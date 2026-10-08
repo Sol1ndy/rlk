@@ -1,0 +1,21 @@
+{
+  "criteria": {
+    "h": {
+      "trigger": "minecraft:entity_hurt_player",
+      "conditions": {
+        "damage": {
+          "source_entity": {
+            "minecraft:distance": {
+              "absolute": {
+                "max": 4096.0
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "rewards": {
+    "function": "rlk:element/on_player_hurt"
+  }
+}

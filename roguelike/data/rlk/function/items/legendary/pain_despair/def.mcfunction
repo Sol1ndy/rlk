@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치". '○○ 원소 피해' 문구는 그 원소 색
+data modify storage rlk:items registry.pain_despair set value {item:"minecraft:diamond_sword",name:"고통 & 절망",type:"accessory",rarity:"legendary",stats:{atkSpeed:40},abilities:[{text:"",extra:[{text:"기본공격, 스킬, 대쉬를 사용할 때마다"}]},{text:"",extra:[{text:"잠시 동안 공격 속도와 이동 속도가 증가한다. (중첩)"}]},{text:""},{text:"",extra:[{text:"지속 시간: "},{text:"2초",color:"#FFE08A"}]},{text:"",extra:[{text:"공격 속도 증가: "},{text:"1회당 1.5% (최대 30%)",color:"#FFE08A"}]},{text:"",extra:[{text:"이동 속도 증가: "},{text:"1회당 1% (최대 20%)",color:"#FFE08A"}]}],desc:["빛나는 그 두 개의 검은, 당신을 도륙 낼 것을 미리 경고하듯 반짝였다."]}
+data modify storage rlk:items ids append value "pain_despair"

@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치". '○○ 원소 피해' 문구는 그 원소 색
+data modify storage rlk:items registry.forbidden_book set value {item:"minecraft:gunpowder",name:"금단의 도서",type:"accessory",rarity:"epic",stats:{atkPct:15},abilities:[{text:"",extra:[{text:"적에게 스킬로 피해를 주면 마도서 페이지를 얻는다."}]},{text:"",extra:[{text:"페이지를 다 모으면 이 아이템은 데모노미콘으로 변한다."}]},{text:""},{text:"",extra:[{text:"페이지 획득: "},{text:"스킬 적중마다 1장 (같은 적에게서 최대 3장)",color:"#FFE08A"}]},{text:"",extra:[{text:"필요 페이지: "},{text:"500장",color:"#FFE08A"}]}],desc:["주문을 흡수하는 정체불명의 서적"]}
+data modify storage rlk:items ids append value "forbidden_book"

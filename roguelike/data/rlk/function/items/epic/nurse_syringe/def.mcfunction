@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.nurse_syringe set value {item:"minecraft:end_rod",name:"간호사의 주사기",type:"accessory",rarity:"epic",stats:{hpPct:15},abilities:[{text:"",extra:[{text:"원소전투 스킬을 쓰면 생명의 계약을 얻는다."}]},{text:"",extra:[{text:"생명의 계약이 해소되면(0이 되면)"}]},{text:"",extra:[{text:"원소 에너지를 얻고 체력을 회복한다."}]},{text:""},{text:"",extra:[{text:"생명의 계약: "},{text:"최대 체력의 20%",color:"#FFE08A"}]},{text:"",extra:[{text:"원소 에너지: "},{text:"6pt",color:"#FFE08A"}]},{text:"",extra:[{text:"회복량: "},{text:"최대 체력의 8%",color:"#FFE08A"}]}],desc:["조금 따끔할 거예요."],engravings:["pact","tide"]}
+data modify storage rlk:items ids append value "nurse_syringe"

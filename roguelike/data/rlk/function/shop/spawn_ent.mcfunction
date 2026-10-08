@@ -1,0 +1,6 @@
+# macro: item, id, price, model. at = 블록 코너. 유리 속 아이템(item_display, 물리 없음/고정) + 이름 + 구매 버튼
+$summon minecraft:item_display ~0.5 ~1.5 ~0.5 {Tags:["rlk_shop_item","rlk_shop_new"],Glowing:1b,item:{id:"$(item)",count:1,components:{"minecraft:custom_data":{rlk_shop:{id:"$(id)",price:$(price)}},"minecraft:item_model":"$(model)"}},item_display:"gui",billboard:"vertical",transformation:{scale:[0.5f,0.5f,0.5f],translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:text_display ~0.5 ~3.05 ~0.5 {Tags:["rlk_shop_info","rlk_shop_new"],billboard:"vertical",see_through:true,alignment:"center",line_width:200,background:1073741824,text:{text:""},transformation:{scale:[0.85f,0.85f,0.85f],translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f]}}
+# 리롤 버튼과 동일 구조: 인터랙션(1.2×0.6) + 라벨은 인터랙션 +0.25
+summon minecraft:interaction ~0.5 ~2.35 ~0.5 {Tags:["rlk_shop_btn","rlk_shop_new"],width:1.2f,height:0.6f,response:true}
+$summon minecraft:text_display ~0.5 ~2.6 ~0.5 {Tags:["rlk_shop_lbl","rlk_shop_new"],billboard:"center",see_through:true,background:1073741824,text:{text:"[ 구매: $(price)G ]",color:"gold",bold:true},transformation:{scale:[0.85f,0.85f,0.85f],translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f]}}

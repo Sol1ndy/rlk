@@ -1,0 +1,1 @@
+$summon minecraft:text_display ^ ^-0.4 ^1.5 {billboard:"center",Tags:["dmgText"],background:0,brightness:{sky:15,block:15},shadow:true,alignment:"center",see_through:true,text:{text:"-$(hd)",color:"$(col)",bold:true},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1.3f,1.3f,1.3f]}}

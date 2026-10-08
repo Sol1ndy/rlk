@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.sun_blossom set value {item:"minecraft:torchflower",name:"양화",type:"accessory",rarity:"epic",stats:{defPct:18},abilities:[{text:"",extra:[{text:"원소전투 스킬을 쓰면 그 자리에 꽃이 핀다."}]},{text:"",extra:[{text:"꽃 주변의 적에게 피해를 주면"}]},{text:"",extra:[{text:"바위 원소 범위 피해",color:"#F2C14E"},{text:"가 한 번 더 들어간다."}]},{text:""},{text:"",extra:[{text:"지속 시간: "},{text:"20초",color:"#FFE08A"}]},{text:"",extra:[{text:"피해: "},{text:"공격력의 60%",color:"#FFE08A"}]},{text:"",extra:[{text:"쿨타임: "},{text:"2초",color:"#FFE08A"}]}],desc:["백악에서 태어난 꽃."],engravings:["petra","guard"]}
+data modify storage rlk:items ids append value "sun_blossom"

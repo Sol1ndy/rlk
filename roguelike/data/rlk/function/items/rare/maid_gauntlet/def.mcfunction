@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.maid_gauntlet set value {item:"minecraft:brick",name:"메이드의 건틀릿",type:"accessory",rarity:"rare",stats:{defPct:12},abilities:[{text:"",extra:[{text:"기본 공격이 적중하면 방어력에 비례해 체력을 회복한다."}]},{text:""},{text:"",extra:[{text:"회복량: "},{text:"방어력의 6%",color:"#FFE08A"}]},{text:"",extra:[{text:"쿨타임: "},{text:"2초",color:"#FFE08A"}]}],desc:["청소도 전투도 맡겨만 주세요."],engravings:["vajra","unyielding"]}
+data modify storage rlk:items ids append value "maid_gauntlet"

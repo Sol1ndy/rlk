@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.hurricane_core set value {item:"minecraft:prismarine_crystals",name:"바람의 정다면체",type:"accessory",rarity:"rare",stats:{moveSpeed:5},abilities:[{text:"",extra:[{text:"원소전투 스킬을 쓰면 앞쪽에 회오리가 생겨"}]},{text:"",extra:[{text:"주변 적을 끌어당기고 "},{text:"바람 원소 범위 피해",color:"#6FE3C1"},{text:"를 준다."}]},{text:""},{text:"",extra:[{text:"지속 시간: "},{text:"2초",color:"#FFE08A"}]},{text:"",extra:[{text:"간격: "},{text:"0.5초",color:"#FFE08A"}]},{text:"",extra:[{text:"피해: "},{text:"공격력의 20%",color:"#FFE08A"}]}],desc:["백 년 묵은 기관술 문제의 답."],engravings:["dash","chain"]}
+data modify storage rlk:items ids append value "hurricane_core"

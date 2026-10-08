@@ -1,0 +1,29 @@
+{
+ "values": [
+  "minecraft:air",
+  "minecraft:cave_air",
+  "minecraft:void_air",
+  "#minecraft:replaceable",
+  "minecraft:light",
+  "minecraft:barrier",
+  "minecraft:structure_void",
+  "#minecraft:impermeable",
+  "minecraft:glass_pane",
+  {
+   "id": "#minecraft:bars",
+   "required": false
+  },
+  "#minecraft:rails",
+  "#minecraft:buttons",
+  "#minecraft:wool_carpets",
+  "minecraft:moss_carpet",
+  "minecraft:torch",
+  "minecraft:wall_torch",
+  "#minecraft:small_flowers",
+  "minecraft:pink_petals",
+  "#minecraft:leaves",
+  "#minecraft:fences",
+  "#minecraft:slabs",
+  "minecraft:lantern"
+ ]
+}

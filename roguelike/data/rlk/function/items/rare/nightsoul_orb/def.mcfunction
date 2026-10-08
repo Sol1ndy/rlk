@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.nightsoul_orb set value {item:"minecraft:ender_pearl",name:"밤혼의 구슬",type:"accessory",rarity:"rare",stats:{elemMastery:40},abilities:[{text:"",extra:[{text:"과부하·감전·초전도 반응을 일으키면"}]},{text:"",extra:[{text:"그 적에게 번개가 한 번 더 내리쳐 "},{text:"번개 원소 범위 피해",color:"#C58BFF"},{text:"를 준다."}]},{text:""},{text:"",extra:[{text:"피해: "},{text:"공격력의 50%",color:"#FFE08A"}]},{text:"",extra:[{text:"쿨타임: "},{text:"3초",color:"#FFE08A"}]}],desc:["밤의 나라로 가는 길을 비춰 준다."],engravings:["thunder","fullmoon"]}
+data modify storage rlk:items ids append value "nightsoul_orb"

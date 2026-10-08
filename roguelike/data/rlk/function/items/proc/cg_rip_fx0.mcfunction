@@ -1,0 +1,23 @@
+# 중력의 물결 모양 0 (위치 = 몸): 바깥 물결 고리 + 안쪽 달빛 고리(반대로 돈다)
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~4.00 ~0.15 ~0.00 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~3.70 ~0.15 ~1.53 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~2.83 ~0.15 ~2.83 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~1.53 ~0.15 ~3.70 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~0.00 ~0.15 ~4.00 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~-1.53 ~0.15 ~3.70 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~-2.83 ~0.15 ~2.83 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~-3.70 ~0.15 ~1.53 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~-4.00 ~0.15 ~0.00 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~-3.70 ~0.15 ~-1.53 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~-2.83 ~0.15 ~-2.83 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~-1.53 ~0.15 ~-3.70 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~-0.00 ~0.15 ~-4.00 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~1.53 ~0.15 ~-3.70 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~2.83 ~0.15 ~-2.83 0 0 0 0 1
+particle minecraft:dust{color:[0.55,0.75,1.0],scale:1.0} ~3.70 ~0.15 ~-1.53 0 0 0 0 1
+particle minecraft:dust{color:[0.85,0.9,1.0],scale:0.8} ~1.80 ~0.35 ~0.00 0 0 0 0 1
+particle minecraft:dust{color:[0.85,0.9,1.0],scale:0.8} ~0.90 ~0.35 ~1.56 0 0 0 0 1
+particle minecraft:dust{color:[0.85,0.9,1.0],scale:0.8} ~-0.90 ~0.35 ~1.56 0 0 0 0 1
+particle minecraft:dust{color:[0.85,0.9,1.0],scale:0.8} ~-1.80 ~0.35 ~0.00 0 0 0 0 1
+particle minecraft:dust{color:[0.85,0.9,1.0],scale:0.8} ~-0.90 ~0.35 ~-1.56 0 0 0 0 1
+particle minecraft:dust{color:[0.85,0.9,1.0],scale:0.8} ~0.90 ~0.35 ~-1.56 0 0 0 0 1

@@ -1,0 +1,1 @@
+$item replace entity @s inventory.1 with minecraft:paper[minecraft:item_name={text:"고유 특성",color:"$(color)",italic:false,bold:true},minecraft:lore=$(passive),minecraft:custom_data={rlk_char:1b,rlk_pas:1b}]

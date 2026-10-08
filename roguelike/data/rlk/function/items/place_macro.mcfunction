@@ -1,0 +1,1 @@
+$item replace entity @s $(slot) with $(item)[minecraft:custom_data={rlk:{id:"$(id)",v:$(ver)}},minecraft:item_model="$(model)",minecraft:attribute_modifiers=[],minecraft:item_name=$(name),minecraft:lore=$(lore)]

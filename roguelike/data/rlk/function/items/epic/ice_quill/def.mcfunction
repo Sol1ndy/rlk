@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.ice_quill set value {item:"minecraft:prismarine_shard",name:"얼음 깃촉",type:"accessory",rarity:"epic",stats:{atkPct:12},abilities:[{text:"",extra:[{text:"원소전투 스킬을 쓰면 얼음 깃을 얻는다."}]},{text:"",extra:[{text:"얼음 원소 피해",color:"#9FE8F5"},{text:"를 줄 때마다 깃을 1개 써서"}]},{text:"",extra:[{text:"추가 얼음 원소 피해",color:"#9FE8F5"},{text:"를 준다."}]},{text:""},{text:"",extra:[{text:"얼음 깃: "},{text:"6개 (10초 유지)",color:"#FFE08A"}]},{text:"",extra:[{text:"추가 피해: "},{text:"공격력의 45%",color:"#FFE08A"}]}],desc:["붉은 끈으로 묶어 두지 않으면 차갑게 날아가 버린다."],engravings:["frost","keen"]}
+data modify storage rlk:items ids append value "ice_quill"

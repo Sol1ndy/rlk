@@ -1,0 +1,1 @@
+$summon minecraft:item ~ ~0.7 ~ {Tags:["rlk_gold","rlk_goldnew"],PickupDelay:32767s,Invulnerable:1b,Item:{id:"minecraft:gold_nugget",count:1,components:{"minecraft:custom_data":{rlk_gold:1b}}},Motion:[$(mx),0.38,$(mz)]}

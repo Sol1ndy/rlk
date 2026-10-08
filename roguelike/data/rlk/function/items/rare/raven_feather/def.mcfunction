@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.raven_feather set value {item:"minecraft:feather",name:"밤까마귀의 깃",type:"accessory",rarity:"rare",stats:{atkPct:8},abilities:[{text:"",extra:[{text:"원소전투 스킬을 쓰면 까마귀가 머리 위를 맴돌며"}]},{text:"",extra:[{text:"가까운 적에게 "},{text:"번개 원소 피해",color:"#C58BFF"},{text:"를 준다."}]},{text:""},{text:"",extra:[{text:"지속 시간: "},{text:"10초",color:"#FFE08A"}]},{text:"",extra:[{text:"공격 간격: "},{text:"1초",color:"#FFE08A"}]},{text:"",extra:[{text:"피해: "},{text:"공격력의 30%",color:"#FFE08A"}]}],desc:["단죄의 황녀를 따르는 권속의 깃털."],engravings:["thunder","cycle"]}
+data modify storage rlk:items ids append value "raven_feather"

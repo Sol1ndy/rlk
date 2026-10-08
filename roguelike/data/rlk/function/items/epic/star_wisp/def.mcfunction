@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.star_wisp set value {item:"minecraft:snowball",name:"별빛 바람뭉치",type:"accessory",rarity:"epic",stats:{atkPct:12},abilities:[{text:"",extra:[{text:"얼음 원소를 확산시키면 그 자리에 별빛 바람뭉치가 생긴다."}]},{text:"",extra:[{text:"바람뭉치는 잠시 뒤 터져 "},{text:"얼음 원소 범위 피해",color:"#9FE8F5"},{text:"를 준다."}]},{text:""},{text:"",extra:[{text:"폭발까지: "},{text:"1.5초",color:"#FFE08A"}]},{text:"",extra:[{text:"피해: "},{text:"공격력의 110%",color:"#FFE08A"}]},{text:"",extra:[{text:"쿨타임: "},{text:"4초",color:"#FFE08A"}]}],desc:["한밤의 무대에서 흩날리던 눈의 그림자."],engravings:["frost","lunar"]}
+data modify storage rlk:items ids append value "star_wisp"

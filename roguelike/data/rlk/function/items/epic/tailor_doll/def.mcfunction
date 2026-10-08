@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.tailor_doll set value {item:"minecraft:armor_stand",name:"재단 인형",type:"accessory",rarity:"epic",stats:{defPct:18},abilities:[{text:"",extra:[{text:"원소전투 스킬을 쓰면 그 자리에 인형이 놓여"}]},{text:"",extra:[{text:"주기적으로 가까운 적에게 "},{text:"바위 원소 피해",color:"#F2C14E"},{text:"를 준다."}]},{text:""},{text:"",extra:[{text:"지속 시간: "},{text:"15초",color:"#FFE08A"}]},{text:"",extra:[{text:"간격: "},{text:"3초",color:"#FFE08A"}]},{text:"",extra:[{text:"피해: "},{text:"방어력의 100%",color:"#FFE08A"}]}],desc:["까다로운 재단사의 조수. 바느질보다 가위질을 잘한다."],engravings:["vajra","coop"]}
+data modify storage rlk:items ids append value "tailor_doll"

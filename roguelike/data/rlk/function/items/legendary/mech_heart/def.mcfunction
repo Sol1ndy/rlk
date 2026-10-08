@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.mech_heart set value {item:"minecraft:heavy_core",name:"기계 심장",type:"accessory",rarity:"legendary",stats:{atkPct:25},abilities:[{text:"",extra:[{text:"번개 원소 피해",color:"#C58BFF"},{text:"를 주면 그 적에게 낙뢰가 떨어져"}]},{text:"",extra:[{text:"번개 원소 범위 피해",color:"#C58BFF"},{text:"를 준다."}]},{text:""},{text:"",extra:[{text:"피해: "},{text:"공격력의 120%",color:"#FFE08A"}]},{text:"",extra:[{text:"범위: "},{text:"반경 3칸",color:"#FFE08A"}]},{text:"",extra:[{text:"쿨타임: "},{text:"3초",color:"#FFE08A"}]}],desc:["오차 없이, 망설임 없이."],engravings:["thunder","fullmoon"]}
+data modify storage rlk:items ids append value "mech_heart"

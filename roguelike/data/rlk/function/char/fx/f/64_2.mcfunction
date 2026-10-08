@@ -1,0 +1,21 @@
+# 모션 64 의 2틱째 조각 (@s = 플레이어, at 몸)
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.62,0.25],scale:0.60} ^-0.79 ^-0.45 ^1.20 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.94,0.68],scale:0.60} ^-0.84 ^-0.25 ^1.20 0 0 0 0 1
+execute anchored eyes run particle minecraft:firework ^-0.84 ^-0.25 ^1.20 0.04 0.04 0.04 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.62,0.25],scale:0.60} ^-0.84 ^-0.05 ^1.20 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.94,0.68],scale:0.60} ^-0.79 ^0.15 ^1.20 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.62,0.25],scale:0.60} ^-0.70 ^0.33 ^1.20 0 0 0 0 1
+execute anchored eyes run particle minecraft:firework ^-0.70 ^0.33 ^1.20 0.04 0.04 0.04 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.94,0.68],scale:0.60} ^-0.56 ^0.49 ^1.20 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.62,0.25],scale:0.60} ^-0.40 ^0.60 ^1.20 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.94,0.68],scale:0.60} ^-0.20 ^0.68 ^1.20 0 0 0 0 1
+execute anchored eyes run particle minecraft:firework ^-0.20 ^0.68 ^1.20 0.04 0.04 0.04 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.62,0.25],scale:0.60} ^0.00 ^0.70 ^1.20 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.62,0.25],scale:0.60} ^-0.44 ^-0.25 ^1.70 0 0 0 0 1
+execute anchored eyes run particle minecraft:firework ^-0.44 ^-0.25 ^1.70 0.04 0.04 0.04 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.94,0.68],scale:0.60} ^-0.44 ^-0.05 ^1.70 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.62,0.25],scale:0.60} ^-0.35 ^0.13 ^1.70 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.94,0.68],scale:0.60} ^-0.20 ^0.26 ^1.70 0 0 0 0 1
+execute anchored eyes run particle minecraft:firework ^-0.20 ^0.26 ^1.70 0.04 0.04 0.04 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.62,0.25],scale:0.60} ^-0.00 ^0.30 ^1.70 0 0 0 0 1
+execute anchored eyes run particle minecraft:firework ^0.00 ^-0.15 ^1.70 0.1 0.1 0.1 0.1 10

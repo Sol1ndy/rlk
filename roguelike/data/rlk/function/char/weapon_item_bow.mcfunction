@@ -1,0 +1,1 @@
+$item replace entity @s hotbar.0 with minecraft:stick[minecraft:item_name={text:"$(name)",color:"white",italic:false},minecraft:lore=$(lore),minecraft:item_model="minecraft:bow",minecraft:custom_data={rlk_ui:{role:"attack"}}]

@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.dream_pillow set value {item:"minecraft:pink_carpet",name:"꿈결 베개",type:"accessory",rarity:"epic",stats:{elemMastery:80},abilities:[{text:"",extra:[{text:"확산 반응을 일으키면 한동안"}]},{text:"",extra:[{text:"원소 마스터리와 이동 속도가 증가한다."}]},{text:""},{text:"",extra:[{text:"원소 마스터리 증가: "},{text:"80",color:"#FFE08A"}]},{text:"",extra:[{text:"이동 속도 증가: "},{text:"10%",color:"#FFE08A"}]},{text:"",extra:[{text:"지속 시간: "},{text:"6초",color:"#FFE08A"}]}],desc:["좋은 꿈은 나눠 먹는 것."],engravings:["elemental","dash"]}
+data modify storage rlk:items ids append value "dream_pillow"

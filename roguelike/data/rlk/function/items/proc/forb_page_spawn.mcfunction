@@ -1,0 +1,1 @@
+$summon minecraft:item ~ ~0.6 ~ {Tags:["rlk_page_orb"],Glowing:1b,PickupDelay:32767s,Invulnerable:1b,Item:{id:"minecraft:paper",count:1,components:{"minecraft:custom_data":{rlk_page_orb:1b}}},Motion:[$(mx),0.42,$(mz)]}

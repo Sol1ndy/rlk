@@ -1,0 +1,1 @@
+$item replace entity @s hotbar.1 with minecraft:gray_dye[minecraft:item_name={text:"",italic:false,extra:[{text:"$(name)",color:"gray"},{text:"  재사용 대기 $(n)초",color:"dark_gray"}]},minecraft:lore=$(lore),minecraft:tooltip_display={hidden_components:["minecraft:fireworks"]},minecraft:custom_data={rlk_ui:{role:"skill"}}] $(n)

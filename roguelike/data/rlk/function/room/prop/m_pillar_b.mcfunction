@@ -1,0 +1,21 @@
+# 프롭 m_pillar_b (위치 = 기준 칸의 바닥 바로 위)
+setblock ~0 ~0 ~0 minecraft:deepslate
+setblock ~0 ~1 ~0 minecraft:stone
+setblock ~0 ~2 ~0 minecraft:stone
+setblock ~0 ~3 ~0 minecraft:andesite
+setblock ~0 ~4 ~0 minecraft:stone
+setblock ~1 ~0 ~0 minecraft:stone
+setblock ~1 ~1 ~0 minecraft:iron_ore
+setblock ~1 ~2 ~0 minecraft:stone
+setblock ~1 ~3 ~0 minecraft:stone
+setblock ~1 ~4 ~0 minecraft:andesite
+setblock ~0 ~0 ~1 minecraft:andesite
+setblock ~0 ~1 ~1 minecraft:stone
+setblock ~0 ~2 ~1 minecraft:deepslate
+setblock ~0 ~3 ~1 minecraft:stone
+setblock ~0 ~4 ~1 minecraft:stone
+setblock ~1 ~0 ~1 minecraft:stone
+setblock ~1 ~1 ~1 minecraft:stone
+setblock ~1 ~2 ~1 minecraft:andesite
+setblock ~1 ~3 ~1 minecraft:copper_ore
+setblock ~1 ~4 ~1 minecraft:stone

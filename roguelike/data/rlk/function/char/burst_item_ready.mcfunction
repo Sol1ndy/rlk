@@ -1,0 +1,1 @@
+$item replace entity @s hotbar.2 with $(item)[minecraft:item_name={text:"",italic:false,extra:[{text:"$(name) - ",color:"$(color)",bold:true},$(bar),{text:" $(e)/$(cost)pt",color:"white"}]},minecraft:lore=$(lore),minecraft:enchantment_glint_override=$(glint),minecraft:tooltip_display={hidden_components:["minecraft:fireworks"]},minecraft:custom_data={rlk_ui:{role:"burst"}}]

@@ -1,0 +1,1 @@
+$summon minecraft:item ~ ~0.6 ~ {Tags:["rlk_healorb"],Glowing:1b,PickupDelay:32767s,Invulnerable:1b,Item:{id:"minecraft:ender_eye",count:1,components:{"minecraft:custom_data":{rlk_healorb:1b}}},Motion:[$(mx),0.42,$(mz)]}

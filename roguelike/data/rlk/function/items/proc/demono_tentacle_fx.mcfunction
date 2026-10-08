@@ -1,0 +1,6 @@
+# @s = 플레이어, at = 촉수 위치. 촉수 이펙트 + 주변(3) 몹 타격
+particle minecraft:sculk_charge_pop ~ ~0.5 ~ 0.3 1 0.3 0.05 30
+particle minecraft:squid_ink ~ ~1.5 ~ 0.3 1 0.3 0.02 20
+particle minecraft:sculk_soul ~ ~2 ~ 0.2 0.5 0.2 0.02 12
+playsound minecraft:entity.warden.tendril_clicks master @a ~ ~ ~ 0.7 0.8
+execute as @e[tag=rlk_mob,distance=..3] at @s run function rlk:combat/apply

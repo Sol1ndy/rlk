@@ -1,0 +1,19 @@
+# 모션 42 의 2틱째 조각 (@s = 플레이어, at 몸)
+execute anchored eyes run particle minecraft:dust{color:[0.92,0.92,0.96],scale:1.25} ^0.06 ^-0.28 ^3.50 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.92,0.92,0.96],scale:1.25} ^0.05 ^-0.27 ^3.73 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.30,0.27,0.34],scale:1.12} ^0.05 ^-0.34 ^3.73 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.92,0.92,0.96],scale:1.25} ^0.03 ^-0.26 ^3.95 0 0 0 0 1
+execute anchored eyes run particle minecraft:crit ^0.03 ^-0.26 ^3.95 0.06 0.06 0.06 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[0.92,0.92,0.96],scale:1.25} ^0.02 ^-0.26 ^4.18 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.30,0.27,0.34],scale:1.12} ^0.02 ^-0.33 ^4.18 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.92,0.92,0.96],scale:1.25} ^0.00 ^-0.25 ^4.40 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.92,0.92,0.96],scale:1.25} ^0.03 ^-0.36 ^3.29 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.30,0.27,0.34],scale:1.12} ^0.03 ^-0.43 ^3.29 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.92,0.92,0.96],scale:1.25} ^0.02 ^-0.35 ^3.52 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.92,0.92,0.96],scale:1.25} ^0.02 ^-0.35 ^3.75 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.30,0.27,0.34],scale:1.12} ^0.02 ^-0.42 ^3.75 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.92,0.92,0.96],scale:1.25} ^0.01 ^-0.34 ^3.97 0 0 0 0 1
+execute anchored eyes run particle minecraft:crit ^0.01 ^-0.34 ^3.97 0.06 0.06 0.06 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[0.92,0.92,0.96],scale:1.25} ^0.00 ^-0.33 ^4.20 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.30,0.27,0.34],scale:1.12} ^0.00 ^-0.40 ^4.20 0 0 0 0 1
+execute anchored eyes run particle minecraft:crit ^0.00 ^-0.25 ^4.40 0.15 0.15 0.15 0.3 8

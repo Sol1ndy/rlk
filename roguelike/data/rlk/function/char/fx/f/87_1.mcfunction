@@ -1,0 +1,19 @@
+# 모션 87 의 1틱째 조각 (@s = 플레이어, at 몸)
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^-0.62 ^-0.19 ^2.11 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^-0.54 ^-0.19 ^1.84 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^-0.41 ^-0.19 ^2.16 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^-0.36 ^-0.19 ^1.88 0 0 0 0 1
+execute anchored eyes run particle minecraft:crit ^-0.41 ^-0.19 ^2.16 0.06 0.06 0.06 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^-0.21 ^-0.20 ^2.19 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^-0.18 ^-0.20 ^1.91 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.00 ^-0.20 ^2.20 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.00 ^-0.20 ^1.91 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.21 ^-0.20 ^2.19 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.18 ^-0.20 ^1.91 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.41 ^-0.21 ^2.16 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.36 ^-0.21 ^1.88 0 0 0 0 1
+execute anchored eyes run particle minecraft:crit ^0.41 ^-0.21 ^2.16 0.06 0.06 0.06 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.62 ^-0.21 ^2.11 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.54 ^-0.21 ^1.84 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.81 ^-0.22 ^2.04 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.71 ^-0.22 ^1.78 0 0 0 0 1

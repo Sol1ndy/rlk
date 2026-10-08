@@ -1,0 +1,1 @@
+$item replace entity @s inventory.0 with minecraft:player_head[minecraft:profile=$(prof),minecraft:item_name={text:"$(name)",color:"$(color)",italic:false,bold:true},minecraft:lore=$(lore),minecraft:custom_data={rlk_char:1b}]

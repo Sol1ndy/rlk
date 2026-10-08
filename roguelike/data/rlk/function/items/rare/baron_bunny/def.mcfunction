@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.baron_bunny set value {item:"minecraft:rabbit_foot",name:"토끼 백작",type:"accessory",rarity:"rare",stats:{moveSpeed:5},abilities:[{text:"",extra:[{text:"원소전투 스킬을 쓰면 그 자리에 인형이 놓여 주변 적을 도발한다."}]},{text:"",extra:[{text:"인형이 파괴되거나 사라질 때 터져 "},{text:"불 원소 범위 피해",color:"#FF8A3D"},{text:"를 준다."}]},{text:""},{text:"",extra:[{text:"지속 시간: "},{text:"5초",color:"#FFE08A"}]},{text:"",extra:[{text:"폭발 피해: "},{text:"공격력의 100%",color:"#FFE08A"}]},{text:"",extra:[{text:"인형 체력: "},{text:"80",color:"#FFE08A"}]},{text:"",extra:[{text:"쿨타임: "},{text:"15초",color:"#FFE08A"}]}],desc:["정찰 기사의 가장 믿음직한 동료."],engravings:["amplify","guard"]}
+data modify storage rlk:items ids append value "baron_bunny"

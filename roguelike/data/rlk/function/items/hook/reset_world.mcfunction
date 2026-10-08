@@ -1,0 +1,13 @@
+# 리셋 시 아이템 소환물 정리
+kill @e[tag=rlk_kslash]
+kill @e[tag=rlk_page_orb]
+kill @e[tag=rlk_core]
+kill @e[tag=rlk_crystal]
+kill @e[tag=rlk_epart]
+kill @e[tag=rlk_lstar]
+kill @e[tag=rlk_jav]
+kill @e[tag=rlk_eye]
+kill @e[tag=rlk_eyeq]
+kill @e[tag=rlk_lndrift]
+kill @e[tag=rlk_dcore]
+kill @e[tag=rlk_coreP]

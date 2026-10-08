@@ -1,0 +1,1 @@
+$summon minecraft:block_display ~ ~ ~ {Tags:["rlk_frz_ice","rlk_frz_new"],brightness:{sky:15,block:15},block_state:{id:"minecraft:ice"},transformation:{translation:[$(tx)f,$(ty)f,$(tx)f],scale:[$(w)f,$(h)f,$(w)f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f]}}

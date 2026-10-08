@@ -1,0 +1,5 @@
+# F 키 (@s = 플레이어, at 몸): 조준 시작. 조준 중이면 쏘지 않고 취소
+execute if score @s bowT matches 1.. run playsound minecraft:item.crossbow.loading_middle master @a ~ ~ ~ 0.5 0.8
+execute if score @s bowT matches 1.. run return run function rlk:char/bow/cancel
+execute if score @s bowCd matches 1.. run return 0
+function rlk:char/bow/start

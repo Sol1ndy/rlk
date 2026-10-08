@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트)
+data modify storage rlk:items registry.favonius_codex set value {item:"minecraft:book",name:"페보니우스 비전",type:"accessory",rarity:"rare",stats:{critChance:5,energyRecharge:15},abilities:[{text:"",extra:[{text:"치명타 발생 시, "},{text:"60%",color:"#FFE08A"},{text:"의 확률로 원소 에너지를 "},{text:"10pt",color:"#FFE08A"},{text:" 회복한다. (쿨타임 8초)"}]},{text:"",extra:[{text:"회복량은 원소 충전 효율의 영향을 받는다."}]}],desc:["페보니우스 기사단 학자들 사이에서 전해지는 비전.","원소와 만물의 이치, 그리고 그 힘이 적혀 있다."]}
+data modify storage rlk:items ids append value "favonius_codex"

@@ -1,0 +1,1 @@
+$item replace entity @s hotbar.1 with $(item)[minecraft:item_name={text:"$(name)",color:"$(color)",italic:false,bold:true},minecraft:lore=$(lore),minecraft:tooltip_display={hidden_components:["minecraft:fireworks"]},minecraft:custom_data={rlk_ui:{role:"skill"}}] $(n)

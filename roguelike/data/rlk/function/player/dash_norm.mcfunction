@@ -1,0 +1,19 @@
+scoreboard players operation #ax tmp = #vx tmp
+execute if score #ax tmp matches ..-1 run scoreboard players operation #ax tmp *= #neg1 tmp
+scoreboard players operation #az tmp = #vz tmp
+execute if score #az tmp matches ..-1 run scoreboard players operation #az tmp *= #neg1 tmp
+scoreboard players operation #mmax tmp = #ax tmp
+execute if score #az tmp > #mmax tmp run scoreboard players operation #mmax tmp = #az tmp
+scoreboard players operation #mmin tmp = #ax tmp
+execute if score #az tmp < #mmin tmp run scoreboard players operation #mmin tmp = #az tmp
+scoreboard players operation #mag tmp = #mmin tmp
+scoreboard players operation #mag tmp *= #c41 tmp
+scoreboard players operation #mag tmp /= #100 tmp
+scoreboard players operation #mag tmp += #mmax tmp
+execute if score #mag tmp matches ..0 run scoreboard players set #mag tmp 1
+scoreboard players operation #ux tmp = #vx tmp
+scoreboard players operation #ux tmp *= #100 tmp
+scoreboard players operation #ux tmp /= #mag tmp
+scoreboard players operation #uz tmp = #vz tmp
+scoreboard players operation #uz tmp *= #100 tmp
+scoreboard players operation #uz tmp /= #mag tmp

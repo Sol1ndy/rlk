@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.pact_dagger set value {item:"minecraft:flint",name:"서약의 단검",type:"accessory",rarity:"rare",stats:{atkPct:8},abilities:[{text:"",extra:[{text:"생명의 계약이 있는 동안 공격 속도가 증가한다."}]},{text:"",extra:[{text:"원소폭발을 쓰면 생명의 계약을 얻는다."}]},{text:""},{text:"",extra:[{text:"공격 속도 증가: "},{text:"15%",color:"#FFE08A"}]},{text:"",extra:[{text:"생명의 계약: "},{text:"최대 체력의 20%",color:"#FFE08A"}]}],desc:["칼끝으로 쓴 약속은 지워지지 않는다."],engravings:["pact","flurry"]}
+data modify storage rlk:items ids append value "pact_dagger"

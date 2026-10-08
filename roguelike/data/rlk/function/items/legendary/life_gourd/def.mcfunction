@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.life_gourd set value {item:"minecraft:glistering_melon_slice",name:"장생의 호리병",type:"accessory",rarity:"legendary",stats:{hpPct:25},abilities:[{text:"",extra:[{text:"주기적으로 체력을 회복한다."}]},{text:"",extra:[{text:"체력이 가득 차 있으면 주는 피해가 증가한다."}]},{text:""},{text:"",extra:[{text:"회복량: "},{text:"3초마다 최대 체력의 2%",color:"#FFE08A"}]},{text:"",extra:[{text:"피해 증가: "},{text:"15%",color:"#FFE08A"}]}],desc:["오래 사는 비결은 서두르지 않는 것."],engravings:["unyielding","tide"]}
+data modify storage rlk:items ids append value "life_gourd"

@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.dragon_flame set value {item:"minecraft:fire_charge",name:"용의 불씨",type:"accessory",rarity:"epic",stats:{atkPct:12},abilities:[{text:"",extra:[{text:"원소전투 스킬을 쓰면 한동안"}]},{text:"",extra:[{text:"증발·융해 반응으로 주는 피해가 증가하고"}]},{text:"",extra:[{text:"불 원소 피해 보너스",color:"#FF8A3D"},{text:"도 증가한다."}]},{text:""},{text:"",extra:[{text:"지속 시간: "},{text:"12초",color:"#FFE08A"}]},{text:"",extra:[{text:"증발·융해 피해 증가: "},{text:"25%",color:"#FFE08A"}]},{text:"",extra:[{text:"불 원소 피해 보너스: "},{text:"+15%",color:"#FFE08A"}]}],desc:["작은 용은 아직 자기 불꽃의 크기를 모른다."],engravings:["amplify","spirit"]}
+data modify storage rlk:items ids append value "dragon_flame"

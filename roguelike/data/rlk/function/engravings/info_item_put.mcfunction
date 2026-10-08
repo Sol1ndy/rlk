@@ -1,0 +1,1 @@
+$item replace entity @s inventory.$(slot) with $(icon)[minecraft:item_name={text:"◆ $(name)",color:"$(color)",bold:true,extra:[{text:"  $(n)개",color:"white",bold:false}]},minecraft:lore=$(lore),minecraft:custom_data={rlk_engi:1b},minecraft:max_stack_size=99] $(cnt)

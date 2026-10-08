@@ -1,0 +1,1 @@
+$item replace entity @s hotbar.1 with $(item)[minecraft:item_name={text:"",italic:false,extra:[{text:"$(name)",color:"$(color)",bold:true},{text:"  좌클릭 수렵 / 우클릭 밤 꿰뚫기",color:"gray"}]},minecraft:lore=$(lore),minecraft:enchantment_glint_override=true,minecraft:tooltip_display={hidden_components:["minecraft:fireworks"]},minecraft:custom_data={rlk_ui:{role:"skill"}}]

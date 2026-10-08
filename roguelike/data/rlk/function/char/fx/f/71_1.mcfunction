@@ -1,0 +1,6 @@
+# 모션 71 의 1틱째 조각 (@s = 플레이어, at 몸)
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.78,0.30],scale:0.70} ^0.21 ^-0.09 ^1.18 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.30,0.10],scale:0.70} ^0.00 ^-0.10 ^1.20 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.78,0.30],scale:0.70} ^-0.21 ^-0.11 ^1.18 0 0 0 0 1
+execute anchored eyes run particle minecraft:small_flame ^-0.21 ^-0.11 ^1.18 0.04 0.04 0.04 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[1.00,0.30,0.10],scale:0.70} ^-0.41 ^-0.12 ^1.13 0 0 0 0 1

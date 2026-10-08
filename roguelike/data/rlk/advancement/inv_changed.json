@@ -1,0 +1,10 @@
+{
+  "criteria": {
+    "inv": {
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "rewards": {
+    "function": "rlk:player/inv/dirty"
+  }
+}

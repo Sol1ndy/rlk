@@ -1,0 +1,3 @@
+# abilities = 설명 줄 목록(텍스트 컴포넌트). 형식: 효과 서술 → 빈 줄 → "항목: 수치"
+data modify storage rlk:items registry.blazing_barrier set value {item:"minecraft:orange_candle",name:"불꽃 방벽",type:"accessory",rarity:"rare",stats:{hpPct:8},abilities:[{text:"",extra:[{text:"기본 공격이 적중하면 보호막이 조금씩 쌓인다."}]},{text:""},{text:"",extra:[{text:"쌓이는 양: "},{text:"적중당 최대 체력의 2%",color:"#FFE08A"}]},{text:"",extra:[{text:"최대: "},{text:"최대 체력의 12%",color:"#FFE08A"}]},{text:"",extra:[{text:"쿨타임: "},{text:"0.5초",color:"#FFE08A"}]}],desc:["가신은 주군보다 먼저 불 속으로 들어간다."],engravings:["guard","spirit"]}
+data modify storage rlk:items ids append value "blazing_barrier"

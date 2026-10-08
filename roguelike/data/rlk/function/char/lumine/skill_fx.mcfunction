@@ -1,0 +1,69 @@
+# 얼음 안개: 전방 부채꼴(좌우 약 50도, 7칸)
+execute rotated ~ 0 rotated ~-48 ~ positioned ^ ^1.0 ^1.4 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-48 ~ positioned ^ ^1.0 ^2.5 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-48 ~ positioned ^ ^1.0 ^3.6 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-48 ~ positioned ^ ^1.0 ^4.7 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-48 ~ positioned ^ ^1.0 ^5.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-48 ~ positioned ^ ^1.0 ^6.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-48 ~ positioned ^ ^1.0 ^3.4 run particle minecraft:dust{color:[0.62f,0.91f,0.96f],scale:1.6f} ~ ~ ~ 0.5 0.35 0.5 0 6
+execute rotated ~ 0 rotated ~-36 ~ positioned ^ ^1.0 ^1.4 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-36 ~ positioned ^ ^1.0 ^2.5 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-36 ~ positioned ^ ^1.0 ^3.6 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-36 ~ positioned ^ ^1.0 ^4.7 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-36 ~ positioned ^ ^1.0 ^5.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-36 ~ positioned ^ ^1.0 ^6.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-36 ~ positioned ^ ^1.0 ^3.4 run particle minecraft:dust{color:[0.62f,0.91f,0.96f],scale:1.6f} ~ ~ ~ 0.5 0.35 0.5 0 6
+execute rotated ~ 0 rotated ~-24 ~ positioned ^ ^1.0 ^1.4 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-24 ~ positioned ^ ^1.0 ^2.5 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-24 ~ positioned ^ ^1.0 ^3.6 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-24 ~ positioned ^ ^1.0 ^4.7 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-24 ~ positioned ^ ^1.0 ^5.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-24 ~ positioned ^ ^1.0 ^6.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-24 ~ positioned ^ ^1.0 ^3.4 run particle minecraft:dust{color:[0.62f,0.91f,0.96f],scale:1.6f} ~ ~ ~ 0.5 0.35 0.5 0 6
+execute rotated ~ 0 rotated ~-12 ~ positioned ^ ^1.0 ^1.4 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-12 ~ positioned ^ ^1.0 ^2.5 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-12 ~ positioned ^ ^1.0 ^3.6 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-12 ~ positioned ^ ^1.0 ^4.7 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-12 ~ positioned ^ ^1.0 ^5.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-12 ~ positioned ^ ^1.0 ^6.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~-12 ~ positioned ^ ^1.0 ^3.4 run particle minecraft:dust{color:[0.62f,0.91f,0.96f],scale:1.6f} ~ ~ ~ 0.5 0.35 0.5 0 6
+execute rotated ~ 0 rotated ~0 ~ positioned ^ ^1.0 ^1.4 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~0 ~ positioned ^ ^1.0 ^2.5 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~0 ~ positioned ^ ^1.0 ^3.6 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~0 ~ positioned ^ ^1.0 ^4.7 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~0 ~ positioned ^ ^1.0 ^5.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~0 ~ positioned ^ ^1.0 ^6.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~0 ~ positioned ^ ^1.0 ^3.4 run particle minecraft:dust{color:[0.62f,0.91f,0.96f],scale:1.6f} ~ ~ ~ 0.5 0.35 0.5 0 6
+execute rotated ~ 0 rotated ~12 ~ positioned ^ ^1.0 ^1.4 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~12 ~ positioned ^ ^1.0 ^2.5 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~12 ~ positioned ^ ^1.0 ^3.6 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~12 ~ positioned ^ ^1.0 ^4.7 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~12 ~ positioned ^ ^1.0 ^5.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~12 ~ positioned ^ ^1.0 ^6.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~12 ~ positioned ^ ^1.0 ^3.4 run particle minecraft:dust{color:[0.62f,0.91f,0.96f],scale:1.6f} ~ ~ ~ 0.5 0.35 0.5 0 6
+execute rotated ~ 0 rotated ~24 ~ positioned ^ ^1.0 ^1.4 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~24 ~ positioned ^ ^1.0 ^2.5 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~24 ~ positioned ^ ^1.0 ^3.6 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~24 ~ positioned ^ ^1.0 ^4.7 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~24 ~ positioned ^ ^1.0 ^5.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~24 ~ positioned ^ ^1.0 ^6.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~24 ~ positioned ^ ^1.0 ^3.4 run particle minecraft:dust{color:[0.62f,0.91f,0.96f],scale:1.6f} ~ ~ ~ 0.5 0.35 0.5 0 6
+execute rotated ~ 0 rotated ~36 ~ positioned ^ ^1.0 ^1.4 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~36 ~ positioned ^ ^1.0 ^2.5 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~36 ~ positioned ^ ^1.0 ^3.6 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~36 ~ positioned ^ ^1.0 ^4.7 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~36 ~ positioned ^ ^1.0 ^5.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~36 ~ positioned ^ ^1.0 ^6.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~36 ~ positioned ^ ^1.0 ^3.4 run particle minecraft:dust{color:[0.62f,0.91f,0.96f],scale:1.6f} ~ ~ ~ 0.5 0.35 0.5 0 6
+execute rotated ~ 0 rotated ~48 ~ positioned ^ ^1.0 ^1.4 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~48 ~ positioned ^ ^1.0 ^2.5 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~48 ~ positioned ^ ^1.0 ^3.6 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~48 ~ positioned ^ ^1.0 ^4.7 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~48 ~ positioned ^ ^1.0 ^5.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~48 ~ positioned ^ ^1.0 ^6.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
+execute rotated ~ 0 rotated ~48 ~ positioned ^ ^1.0 ^3.4 run particle minecraft:dust{color:[0.62f,0.91f,0.96f],scale:1.6f} ~ ~ ~ 0.5 0.35 0.5 0 6
+execute anchored eyes run particle minecraft:sweep_attack ^ ^-0.2 ^1.3 0 0 0 0 1
+playsound minecraft:entity.player.attack.sweep master @a ~ ~ ~ 0.8 0.7
+playsound minecraft:block.glass.break master @a ~ ~ ~ 0.6 1.5
+playsound minecraft:block.powder_snow.break master @a ~ ~ ~ 1 0.8
+playsound minecraft:entity.breeze.shoot master @a ~ ~ ~ 0.5 1.3

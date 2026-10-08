@@ -1,0 +1,24 @@
+# 모션 83 의 1틱째 조각 (@s = 플레이어, at 몸)
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.00 ^1.63 ^2.03 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.00 ^1.63 ^1.76 0 0 0 0 1
+execute anchored eyes run particle minecraft:crit ^0.00 ^1.63 ^2.03 0.06 0.06 0.06 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.00 ^1.48 ^2.16 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.00 ^1.48 ^1.88 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.00 ^1.32 ^2.28 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.00 ^1.32 ^1.99 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.00 ^1.15 ^2.39 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.00 ^1.15 ^2.08 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.00 ^0.97 ^2.49 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.00 ^0.97 ^2.17 0 0 0 0 1
+execute anchored eyes run particle minecraft:crit ^0.00 ^0.97 ^2.49 0.06 0.06 0.06 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.00 ^0.79 ^2.58 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.00 ^0.79 ^2.24 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.00 ^0.60 ^2.65 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.00 ^0.60 ^2.31 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.00 ^0.41 ^2.71 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.00 ^0.41 ^2.36 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.00 ^0.21 ^2.75 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.00 ^0.21 ^2.40 0 0 0 0 1
+execute anchored eyes run particle minecraft:crit ^0.00 ^0.21 ^2.75 0.06 0.06 0.06 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[0.95,0.90,0.70],scale:1.25} ^0.00 ^0.01 ^2.78 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.45,0.40,0.32],scale:1.38} ^0.00 ^0.01 ^2.42 0 0 0 0 1

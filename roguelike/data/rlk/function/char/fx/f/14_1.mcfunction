@@ -1,0 +1,19 @@
+# 모션 14 의 1틱째 조각 (@s = 플레이어, at 몸)
+execute anchored eyes run particle minecraft:dust{color:[0.96,0.98,1.00],scale:1.00} ^0.00 ^0.96 ^1.71 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.70,0.82,1.00],scale:1.10} ^0.00 ^0.96 ^1.49 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.96,0.98,1.00],scale:1.00} ^0.00 ^0.79 ^1.82 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.70,0.82,1.00],scale:1.10} ^0.00 ^0.79 ^1.59 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.96,0.98,1.00],scale:1.00} ^0.00 ^0.61 ^1.92 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.70,0.82,1.00],scale:1.10} ^0.00 ^0.61 ^1.67 0 0 0 0 1
+execute anchored eyes run particle minecraft:crit ^0.00 ^0.61 ^1.92 0.06 0.06 0.06 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[0.96,0.98,1.00],scale:1.00} ^0.00 ^0.43 ^2.00 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.70,0.82,1.00],scale:1.10} ^0.00 ^0.43 ^1.74 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.96,0.98,1.00],scale:1.00} ^0.00 ^0.23 ^2.06 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.70,0.82,1.00],scale:1.10} ^0.00 ^0.23 ^1.79 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.96,0.98,1.00],scale:1.00} ^0.00 ^0.04 ^2.10 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.70,0.82,1.00],scale:1.10} ^0.00 ^0.04 ^1.83 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.96,0.98,1.00],scale:1.00} ^0.00 ^-0.17 ^2.12 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.70,0.82,1.00],scale:1.10} ^0.00 ^-0.17 ^1.85 0 0 0 0 1
+execute anchored eyes run particle minecraft:crit ^0.00 ^-0.17 ^2.12 0.06 0.06 0.06 0.02 1
+execute anchored eyes run particle minecraft:dust{color:[0.96,0.98,1.00],scale:1.00} ^0.00 ^-0.37 ^2.12 0 0 0 0 1
+execute anchored eyes run particle minecraft:dust{color:[0.70,0.82,1.00],scale:1.10} ^0.00 ^-0.37 ^1.85 0 0 0 0 1
