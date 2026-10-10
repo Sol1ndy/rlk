@@ -1,7 +1,9 @@
-"""Display-only lightning for Narukami eyes, stakes and illusion cues.
+"""Display-only lightning for Narukami eyes, stakes and the illusion challenge.
 
 Generate independently of the encounter controller. Object IDs may be reused
 by later patterns, so persistent effects follow a separate unique owner serial.
+Illusion cues are identical for the real and the fake illusions (only the number
+of slashes tells them apart); each slash adds a swing arc and a flying sword wave.
 """
 from pathlib import Path
 import argparse
@@ -16,7 +18,7 @@ OUT = DP / 'data/rlk/function/boss/raiden/object_vfx'
 SCALE = 4
 COLORS = {name:'rlk:raiden/fx/'+tex for name,tex in
           [('purple','violet_dense'),('blue','blue'),('cyan','cyan'),('white','white'),
-           ('glow','glow'),('after','afterglow'),('lavender','lavender')]}
+           ('glow','glow'),('after','afterglow'),('lavender','lavender'),('pearl','pearl')]}
 
 
 def write(name, lines):
@@ -57,7 +59,7 @@ def stroke(points, width=.055, color='purple', core=True):
 def model(name, mesh, fade=False):
     colors=dict(COLORS)
     if fade:
-        colors.update(purple=COLORS['after'],cyan=COLORS['lavender'],white=COLORS['lavender'],blue=COLORS['after'])
+        colors.update(purple=COLORS['after'],cyan=COLORS['lavender'],white=COLORS['lavender'],blue=COLORS['after'],pearl=COLORS['lavender'])
     p = RP / ('assets/rlk/models/item/raiden/fx_object/' + name + '.json')
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps({'ambientocclusion': False,
@@ -99,18 +101,51 @@ for variant in [0, 1]:
     model(f'stake_{variant}', stake)
 
 
-for crossed in [False, True]:
-    for contact in [False, True]:
-        mesh = []
-        for sign in ([1, -1] if crossed else [1]):
-            path = [(-1.13, 1.38-sign*.55, .38), (-.50, 1.38-sign*.29, .38),
-                    (-.18, 1.38-sign*.03, .38), (.24, 1.38+sign*.08, .38),
-                    (.54, 1.38+sign*.37, .38), (1.13, 1.38+sign*.55, .38)]
-            mesh += stroke(path, .13 if contact else .072,
-                           'purple' if contact else 'blue', core=contact)
-        model(('strike_' if contact else 'warn_') + ('cross' if crossed else 'slash'), mesh)
-        if contact:
-            model('fade_' + ('cross' if crossed else 'slash'),mesh,True)
+# Illusion wind-up glint: the same single jagged line for every illusion; its last
+# three ticks switch to the charged (thicker, cored) version right before the cut.
+for contact in [False, True]:
+    path = [(-1.13, .83, .38), (-.50, 1.09, .38), (-.18, 1.35, .38), (.24, 1.46, .38),
+            (.54, 1.75, .38), (1.13, 1.93, .38)]
+    model('strike_slash' if contact else 'warn_slash',
+          stroke(path, .13 if contact else .072, 'purple' if contact else 'blue', core=contact))
+
+
+def ribbon(points, inner, width=.09, color='purple'):
+    # Sword-light smear: bright cored outer edge plus a translucent inner trail.
+    mesh = stroke(points, width, color)
+    mesh += stroke(inner, width*.8, 'lavender', core=False)
+    return mesh
+
+
+# Swing arc: mesh +Z is the illusion's front, -X its right. The cut sweeps from the
+# right side round the front to the left, dropping slightly (a level horizontal cut).
+for fade in [False, True]:
+    arc, trail = [], []
+    for i in range(15):
+        a = math.radians(-105 + 210*i/14)
+        y = 1.62 - .42*i/14
+        arc.append((1.85*math.sin(a), y, 1.85*math.cos(a)))
+        trail.append((1.45*math.sin(a), y - .05, 1.45*math.cos(a)))
+    mesh = ribbon(arc, trail, .10)
+    tip = arc[-1]
+    # A short spark where the blade leaves the arc.
+    mesh += stroke([tip, (tip[0]+.35, tip[1]+.22, tip[2]-.28), (tip[0]+.52, tip[1]+.05, tip[2]-.55)], .05)
+    model('swing_fade' if fade else 'swing', mesh, fade)
+
+# Flying sword wave: a horizontal crescent bulging forward (+Z) at chest height,
+# with two short lightning tails. It travels to the far end of the slash line.
+for fade in [False, True]:
+    outer, inner = [], []
+    for i in range(13):
+        u = -1 + 2*i/12
+        outer.append((1.55*u, 1.18 + .05*math.sin(i*1.9), .62*(1 - u*u)))
+        inner.append((1.25*u, 1.16, .30*(1 - u*u) - .06))
+    mesh = ribbon(outer, inner, .12, 'pearl')
+    mesh += stroke(outer[2:11], .05, 'purple')
+    for side in [-1, 1]:
+        mesh += stroke([(side*.55, 1.2, .35), (side*.75, 1.42, -.25), (side*.48, 1.25, -.85),
+                        (side*.70, 1.38, -1.35)], .045)
+    model('wave_fade' if fade else 'wave', mesh, fade)
 
 
 for flower in [False, True]:
@@ -148,6 +183,7 @@ def spawn(name, kind, owned=True, life=0):
     return lines
 
 
+(OUT / 'cross.mcfunction').unlink(missing_ok=True)  # retired real-illusion X cue
 write('init', [f'scoreboard objectives add {name} dummy' for name in
                ['rdOvId', 'rdOvKind', 'rdOvAge', 'rdOvLife']])
 write('create', [
@@ -159,13 +195,18 @@ write('create', [
 ])
 write('eye', spawn('eye_0', 1))
 write('stake', spawn('stake_0', 2))
+cue = spawn('warn_slash', 5)
+cue[5] = '$scoreboard players set @e[tag=rlk_rd_ofnew] rdOvLife $(life)'
 write('illusion_cue', [
-    '# Copy the already captured attack yaw; true illusion shows two crossing cuts.',
-    'execute if score @s rdReal matches 1 run function rlk:boss/raiden/object_vfx/cross',
-    'execute unless score @s rdReal matches 1 run function rlk:boss/raiden/object_vfx/slash',
-])
-write('slash', spawn('warn_slash', 5, life=32))
-write('cross', spawn('warn_cross', 6, life=32))
+    '# As an illusion facing the arena centre, {life:<ticks until its slash>}. Identical',
+    '# for the real and the fake illusions; it disappears with its owner.',
+] + cue)
+swing = spawn('swing', 6, owned=False, life=4)
+wave = spawn('wave', 7, owned=False, life=5)
+wave.insert(-1, 'data merge entity @e[tag=rlk_rd_ofnew,limit=1] {teleport_duration:1}')
+write('slash', [
+    '# As the slashing illusion at its feet, facing the centre: swing arc + flying wave.',
+] + swing + wave)
 write('break', [
     '# Detached burst survives its destroyed owner for nine ticks, then disappears.',
     'execute if score @s rdObjKind matches 3 run function rlk:boss/raiden/object_vfx/flower_break',
@@ -184,11 +225,16 @@ write('owner', [
     'execute as @e[tag=rlk_rd_object] if score @s rdOvId = #rdOvOwner rd run scoreboard players set #rdOvExists rd 1',
 ])
 setmodel = lambda name: 'data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_object/' + name + '"'
+write('cue_tick', [
+    'scoreboard players operation #rdOvLeft rd = @s rdOvLife',
+    'scoreboard players operation #rdOvLeft rd -= @s rdOvAge',
+    'execute if score #rdOvLeft rd matches 3 run ' + setmodel('strike_slash'),
+])
 write('tick', [
     'execute if score @s rdOvKind matches 1..2 run function rlk:boss/raiden/object_vfx/owner',
-    'execute if score @s rdOvKind matches 5..6 run function rlk:boss/raiden/object_vfx/owner',
+    'execute if score @s rdOvKind matches 5 run function rlk:boss/raiden/object_vfx/owner',
     'execute if score @s rdOvKind matches 1..2 if score #rdOvExists rd matches 0 run return run kill @s',
-    'execute if score @s rdOvKind matches 5..6 if score #rdOvExists rd matches 0 run return run kill @s',
+    'execute if score @s rdOvKind matches 5 if score #rdOvExists rd matches 0 run return run kill @s',
     'scoreboard players add @s rdOvAge 1',
     'execute if score @s rdOvLife matches 1.. if score @s rdOvAge >= @s rdOvLife run return run kill @s',
     'scoreboard players operation #rdOvFrame rd = @s rdOvAge',
@@ -198,12 +244,13 @@ write('tick', [
     'execute if score @s rdOvKind matches 1 if score #rdOvFrame rd matches 4 run ' + setmodel('eye_1'),
     'execute if score @s rdOvKind matches 2 if score #rdOvFrame rd matches 0 run ' + setmodel('stake_0'),
     'execute if score @s rdOvKind matches 2 if score #rdOvFrame rd matches 4 run ' + setmodel('stake_1'),
-    # Illusion danger lands after the same 24-tick warning as its line hazard.
-    'execute if score @s rdOvKind matches 5 if score @s rdOvAge matches 24 run ' + setmodel('strike_slash'),
-    'execute if score @s rdOvKind matches 6 if score @s rdOvAge matches 24 run ' + setmodel('strike_cross'),
-    'execute if score @s rdOvKind matches 5 if score @s rdOvAge matches 28 run ' + setmodel('fade_slash'),
-    'execute if score @s rdOvKind matches 6 if score @s rdOvAge matches 28 run ' + setmodel('fade_cross'),
+    # Illusion cue (5) charges for its last three ticks; it dies on the slash tick.
+    'execute if score @s rdOvKind matches 5 run function rlk:boss/raiden/object_vfx/cue_tick',
+    # Swing arc (6) fades; the sword wave (7) flies 5.5 blocks a tick to the line's end.
+    'execute if score @s rdOvKind matches 6 if score @s rdOvAge matches 2 run ' + setmodel('swing_fade'),
+    'execute if score @s rdOvKind matches 7 if score @s rdOvAge matches 1.. run tp @s ^ ^ ^5.5',
+    'execute if score @s rdOvKind matches 7 if score @s rdOvAge matches 3 run ' + setmodel('wave_fade'),
     'execute if score @s rdOvKind matches 3 if score @s rdOvAge matches 3 run ' + setmodel('object_break_fade'),
     'execute if score @s rdOvKind matches 4 if score @s rdOvAge matches 3 run ' + setmodel('flower_break_fade'),
 ])
-print('Generated 14 layered-alpha object lightning models: eyes, stakes, illusion tells and fading break flashes.')
+print('Generated 14 layered-alpha object lightning models: eyes, stakes, illusion cue/swing/wave and fading break flashes.')

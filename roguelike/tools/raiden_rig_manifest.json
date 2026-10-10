@@ -1,20 +1,28 @@
 {
-  "parts": 43,
+  "parts": 52,
   "phase": {
     "0": "normal",
     "1": "transforming",
     "2": "Baleful Shadowlord",
     "3": "exhausted"
   },
-  "armSilhouette": "two skin arms, giant right sword arm, giant left support palm, two smaller rear puppet arms",
+  "armSilhouette": "two skin arms; one big lilac sword arm (main_r) gripping the pale violet giant katana; four smaller lilac auxiliary arms fanned behind the shoulders (rear_* upper pair, rear2_* lower pair); two dull bronze-grey support hands (support_r, main_l) cradling a dull-tinted Raiden from below",
+  "palette": {
+    "armour": "arm_lilac plates, arm_shade sides, arm_deep joints, gold_dull trims, arm_tomoe/gold_dull tomoe discs",
+    "katana": "blade_pale body, blade_edge cutting edge on model -X, blade_core fuller and spine on +X, grip_dark grip, gold_dull tsuba/habaki/wraps",
+    "support": "hand_dull, hand_dull_dark, nail_glow nails and seams",
+    "raiden": "skin/ribbon *_dull copies tinted #A098AC while the armour is at least half formed"
+  },
+  "blades": "Every blade frame is authored as (tip, edge); the edge (model -X) faces the direction of travel in all cuts. Rotation keys (giant_weapon, *_hand) are slerped.",
   "lightning": {
     "weaponDisplays": 8,
     "palmDisplays": 5,
     "chakraDisplays": 1,
     "materials": "violet geometry and exposed white seams",
-    "hands": "exact hand pivot/rotation/scale; charge, inward focus, contact release; smaller rear hands never emit large release crowns",
+    "hands": "exact hand pivot/rotation/scale; charge, inward focus, contact release; smaller rear hands never emit large release crowns; the clap charge sits on the two support hands",
     "chakra": "sparse outer-rim forks; idle intermittent, charged attacks sustained; empty centre preserves face visibility"
   },
+  "targetSlam": "dull support hand, palm down; grows from age 1, falls from age 15, contacts the ground at hazard age 18, removed at age 32",
   "clips": [
     {
       "id": 0,
@@ -167,5 +175,5 @@
       "loop": false
     }
   ],
-  "integration": "Call rig/init from load, rig/spawn and rig/tick as the real boss at its feet. rdAnim selects a state; private rdRigT resets on rdAnim/rdPhase changes. rig/flash is optional body-hit feedback. rig/cleanup deletes all parts. Supplied skin remains byte-identical."
+  "integration": "Call rig/init from load, rig/spawn and rig/tick as the real boss at its feet. rdAnim selects a state; private rdRigT resets on rdAnim/rdPhase changes. rig/select/<clip> also applies rig/skin_dull or rig/skin_normal for the current rdPhase. rig/flash is optional body-hit feedback. rig/cleanup deletes all parts. Supplied skin remains byte-identical."
 }

@@ -47,6 +47,7 @@ execute if score @s rdShape matches 9 run function rlk:boss/raiden/hazard/hit/s9
 execute if score @s rdShape matches 10 run function rlk:boss/raiden/hazard/hit/s10
 execute if score @s rdShape matches 11 run function rlk:boss/raiden/hazard/hit/s11
 execute if score @s rdShape matches 12 run function rlk:boss/raiden/hazard/hit/s12
+execute if score @s rdShape matches 13 run function rlk:boss/raiden/hazard/hit/s13
 execute unless score #rdHit rd matches 1 run return 0
 scoreboard players set @s rdHHit 1
 scoreboard players operation #cmDmg tmp = @s rdDamage

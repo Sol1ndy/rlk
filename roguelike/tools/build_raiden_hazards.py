@@ -65,6 +65,7 @@ descriptions = {
     10: "Horizontal wave length18, width7",
     11: "Jumpable expanding annulus radius2 to18 over32ticks, half-width0.7",
     12: "Orb disk radius12",
+    13: "Illusion sword wave length22, width2.4",
 }
 outlines = {
     1: sector(6, 60), 2: rectangle(12, 2.2), 3: disk(3),
@@ -72,6 +73,7 @@ outlines = {
     7: rectangle(8, 8), 8: disk(6),
     9: sum((rotate(rectangle(18, .9), a) for a in (-40, -20, 0, 20, 40)), []),
     10: rectangle(18, 7), 11: disk(1.3) + disk(2.7), 12: disk(12),
+    13: rectangle(22, 2.4),
 }
 
 for shape, outline in outlines.items():
@@ -88,7 +90,7 @@ for shape, outline in outlines.items():
     elif shape == 9:
         fill += sum((rotate(line(0, 0, 0, 18, 1), a) for a in (-40, -20, 0, 20, 40)), [])
     else:
-        length = {2: 12, 5: 20, 7: 8, 10: 18}[shape]
+        length = {2: 12, 5: 20, 7: 8, 10: 18, 13: 22}[shape]
         fill += line(0, 0, 0, length, .6)
     write(f"strike/s{shape}", ["# " + descriptions[shape]] + particles(fill, True, .16))
 
@@ -230,7 +232,7 @@ for s, radius, angle in ((1, 6, 60), (4, 12, 70)):
         'execute if score #rdAbsSide rd <= #rdLimit rd run scoreboard players set #rdHit rd 1',
     ])
 
-for s, length, halfwidth in ((2, 12, 1100), (5, 20, 1800), (7, 8, 4000), (10, 18, 3500)):
+for s, length, halfwidth in ((2, 12, 1100), (5, 20, 1800), (7, 8, 4000), (10, 18, 3500), (13, 22, 1200)):
     write(f"hit/s{s}", [
         '# ' + descriptions[s],
         f'execute if score #rdFwd rd matches 0..{length*1000} if score #rdAbsSide rd matches ..{halfwidth} run scoreboard players set #rdHit rd 1',
@@ -283,4 +285,4 @@ write('hit/s11', [
 
 from build_raiden_hazard_vfx import build as build_display_vfx
 build_display_vfx(ROOT, OUT)
-print("Generated 12 hazard shapes, exact floor-aligned hit areas, 32 expanding-wave frames.")
+print("Generated 13 hazard shapes, exact floor-aligned hit areas, 32 expanding-wave frames.")

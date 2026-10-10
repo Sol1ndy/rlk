@@ -23,3 +23,5 @@ execute if score @s rdShape matches 11 if score #rdChargeFrame rd matches 0 run 
 execute if score @s rdShape matches 11 if score #rdChargeFrame rd matches 1 run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_hazard/charge_11_1"
 execute if score @s rdShape matches 12 if score #rdChargeFrame rd matches 0 run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_hazard/charge_12_0"
 execute if score @s rdShape matches 12 if score #rdChargeFrame rd matches 1 run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_hazard/charge_12_1"
+execute if score @s rdShape matches 13 if score #rdChargeFrame rd matches 0 run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_hazard/charge_13_0"
+execute if score @s rdShape matches 13 if score #rdChargeFrame rd matches 1 run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_hazard/charge_13_1"

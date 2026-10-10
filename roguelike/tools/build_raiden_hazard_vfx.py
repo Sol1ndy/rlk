@@ -1,4 +1,4 @@
-"""Native display meshes for all twelve Narukami hazard volumes.
+"""Native display meshes for all thirteen Narukami hazard volumes.
 
 Called by build_raiden_hazards.py. One owned display holds a whole warning or
 strike, regardless of the number of branches in its mesh. The hit generator
@@ -25,6 +25,9 @@ TEXTURES = {
     "particle": "rlk:raiden/fx/violet_dense",
 }
 FACES = ("north", "south", "east", "west", "up", "down")
+# Shape 13 (illusion sword wave) is appended; shapes 1-12 keep their meshes.
+SHAPES = range(1, 14)
+LINES = {2: (12, 2.2), 5: (20, 3.6), 7: (8, 8), 10: (18, 7), 13: (22, 2.4)}
 
 
 def build(root, out):
@@ -106,7 +109,7 @@ def build(root, out):
             return [rot(rect(18,.9), a) for a in (-40,-20,0,20,40)]
         if shape == 11:
             return [circle(1.3),circle(2.7)]
-        length,width = {2:(12,2.2),5:(20,3.6),7:(8,8),10:(18,7)}[shape]
+        length,width = LINES[shape]
         return [rect(length,width)]
 
     def warning(shape,charge=-1):
@@ -121,8 +124,8 @@ def build(root, out):
                 halfwidth=min(z*math.tan(math.radians(half)), math.sqrt(max(0,radius*radius-(z+dz)**2)))
                 if halfwidth>.04:
                     box(mesh,(-halfwidth,.025,z),(halfwidth,.029,z+dz),"fill")
-        elif shape in (2,5,7,10):
-            length,width={2:(12,2.2),5:(20,3.6),7:(8,8),10:(18,7)}[shape]
+        elif shape in (2,5,7,10,13):
+            length,width=LINES[shape]
             box(mesh,(-width/2,.025,0),(width/2,.029,length),"fill")
         elif shape in (3,6,8,12):
             radius={3:3,6:5,8:6,12:12}[shape]
@@ -147,7 +150,7 @@ def build(root, out):
                     x,y,z=path[i]
                     cx,cz=0,0
                     if shape in (1,4): cz=2 if shape==1 else 4
-                    if shape in (2,5,7,10): cz={2:6,5:10,7:4,10:9}[shape]
+                    if shape in (2,5,7,10,13): cz={2:6,5:10,7:4,10:9,13:11}[shape]
                     dx,dz=cx-x,cz-z
                     norm=max(.001,math.hypot(dx,dz))
                     dx,dz=dx/norm,dz/norm
@@ -161,8 +164,8 @@ def build(root, out):
             for ang in (-a*.55,0,a*.55):
                 stroke(mesh,rot([(0,.06,1),(0,.06,r-.25)],ang),.055,"purple",.02)
             stroke(mesh,circle(r*.57,.06,-a,a),.055,"violet",.02)
-        elif shape in (2,5,7,10):
-            length,width = {2:(12,2.2),5:(20,3.6),7:(8,8),10:(18,7)}[shape]
+        elif shape in (2,5,7,10,13):
+            length,width = LINES[shape]
             for z in range(2,length,3):
                 stroke(mesh,[(-min(.6,width*.3),.08,z-.4),(0,.08,z),
                              (min(.6,width*.3),.08,z-.4)],.09,"light",.03)
@@ -246,6 +249,26 @@ def build(root, out):
                 lightning(mesh,[(x,y*.65,z),(sign*.85,y*.82,z+.30),
                                 (sign*1.45,y*.55,z+.65)],.18,False,True,True)
 
+    def sword_wave(mesh,length,residue,variant):
+        # Illusion slash toward the arena centre: a flat blade-light ribbon at waist
+        # height over a thin floor gash, crossed by forward-bulging crescents. The
+        # whole 2.4-wide corridor flashes on the damage tick like every other strike.
+        n=14
+        for i in range(n):
+            z0,z1=.45+(length-.8)*i/n,.45+(length-.8)*(i+1)/n
+            w=.10+.62*math.sin(math.pi*(i+.5)/n)
+            box(mesh,(-w,.95,z0),(w,1.02,z1),"after" if residue else "violet")
+            if not residue:
+                box(mesh,(-w*.22,.935,z0),(w*.22,1.035,z1),"white")
+        stroke(mesh,[(0,.05,.4),(0,.05,length-.3)],.12 if residue else .2,"after" if residue else "light",.03)
+        for i,z in enumerate((3.5,8.5,13.5,18.5)):
+            if residue and (i+variant)%2:
+                continue
+            arc=[(1.12*u,1.0+.10*math.sin((k+variant)*1.7),z+.85*(1-u*u))
+                 for k,u in ((k,-1+2*k/8) for k in range(9))]
+            lightning(mesh,arc,.17,residue)
+        lightning(mesh,forward_bolt(length,.20,.55,0,variant),.15,residue,taper=True)
+
     def strike(shape,residue=False,variant=0):
         mesh=[]
         if shape in (1,4):
@@ -289,6 +312,8 @@ def build(root, out):
                 for z in (3,9,15):
                     lightning(mesh,[(-3.35,.35,z),(-2.3,1.6,z+.3),(-.8,2.0,z-.3),
                                     (.8,1.0,z+.3),(2.3,1.6,z-.3),(3.35,.35,z)],.23,residue)
+        elif shape==13:
+            sword_wave(mesh,22,residue,variant)
         elif shape==7:
             # Two inward claw/lightning walls meet in a bright central rupture.
             for z in (1.0,3.5,6.0,7.6):
@@ -321,7 +346,7 @@ def build(root, out):
         (modeldir/(name+".json")).write_text(json.dumps(model,separators=(",",":"))+"\n",encoding="utf-8")
         (itemdir/(name+".json")).write_text(json.dumps({"model":{"type":"minecraft:model", "model":"rlk:item/raiden/fx_hazard/"+name}},separators=(",",":"))+"\n",encoding="utf-8")
 
-    for shape in range(1,13):
+    for shape in SHAPES:
         save(f"warning_{shape}",warning(shape))
         for phase in (0,1):
             save(f"charge_{shape}_{phase}",warning(shape,phase))
@@ -352,7 +377,7 @@ def build(root, out):
         f'execute as {new} run function rlk:boss/raiden/hazard/vfx_warning',
         'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew',
     ])
-    write("vfx_warning",[f'execute if score @s rdShape matches {s} run {modelset("warning_"+str(s))}' for s in range(1,13)])
+    write("vfx_warning",[f'execute if score @s rdShape matches {s} run {modelset("warning_"+str(s))}' for s in SHAPES])
     write("charge",[
         '# Four ticks before impact: charged borders, no full-path strike yet.',
         'scoreboard players operation #rdVfxOwner rd = @s rdHId',
@@ -362,10 +387,10 @@ def build(root, out):
     ])
     write("vfx_charge",['scoreboard players set @s rdWind 2']+[
         f'execute if score @s rdShape matches {s} if score #rdChargeFrame rd matches {p} run {modelset(f"charge_{s}_{p}")}'
-        for s in range(1,13) for p in (0,1)
+        for s in SHAPES for p in (0,1)
     ])
     write("warning",['# Warning display persists; no repeated particle burst or entity allocation.'])
-    for shape in range(1,13):
+    for shape in SHAPES:
         write(f"warning/s{shape}",['# Mesh: rlk:raiden/fx_hazard/warning_'+str(shape)])
     write("strike",[
         'scoreboard players operation #rdVfxOwner rd = @s rdHId',
@@ -379,14 +404,14 @@ def build(root, out):
         '# Whole path flashes on the exact damage tick; this is instantaneous lightning.',
         'scoreboard players set @s rdWind 1',
         'scoreboard players set @s rdHAge -1',
-    ]+[f'execute if score @s rdShape matches {s} run {modelset("strike_"+str(s))}' for s in range(1,13) if s!=11])
+    ]+[f'execute if score @s rdShape matches {s} run {modelset("strike_"+str(s))}' for s in SHAPES if s!=11])
     for phase in (1,2):
         write(f"vfx_flash_{phase}",[
             '# The whole area remains lit; only branch topology changes, not hit travel.',
-        ]+[f'execute if score @s rdShape matches {s} run {modelset(f"strike_{s}_{phase}")}' for s in range(1,13) if s!=11])
-    write("vfx_after",[f'execute if score @s rdShape matches {s} run {modelset("after_"+str(s))}' for s in range(1,13) if s!=11])
-    write("vfx_fade",[f'execute if score @s rdShape matches {s} run {modelset("after_"+str(s)+"_fade")}' for s in range(1,13) if s!=11])
-    for shape in range(1,13):
+        ]+[f'execute if score @s rdShape matches {s} run {modelset(f"strike_{s}_{phase}")}' for s in SHAPES if s!=11])
+    write("vfx_after",[f'execute if score @s rdShape matches {s} run {modelset("after_"+str(s))}' for s in SHAPES if s!=11])
+    write("vfx_fade",[f'execute if score @s rdShape matches {s} run {modelset("after_"+str(s)+"_fade")}' for s in SHAPES if s!=11])
+    for shape in SHAPES:
         if shape!=11:
             write(f"strike/s{shape}",['# Strike mesh is selected by vfx_strike on the owning display.'])
     for frame in range(32):
@@ -445,4 +470,4 @@ def build(root, out):
                               'execute if score #rdUntil rd matches 1..4 run function rlk:boss/raiden/hazard/charge\n'
                               'scoreboard players operation #rdMod rd = @s rdHAge')
     tickpath.write_text(original,encoding="utf-8")
-    print("Built 123 native display meshes: 12 layered-alpha telegraphs, 24 charge frames, 33 strike frames, 22 fading afterglows, 32 exact ring frames.")
+    print("Built 131 native display meshes: 13 layered-alpha telegraphs, 26 charge frames, 36 strike frames, 24 fading afterglows, 32 exact ring frames.")

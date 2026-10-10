@@ -11,11 +11,23 @@ const rp=path.resolve(arg('--resourcepack'));
 const assets=path.join(rp,'assets/rlk');
 const put=(p,s)=>{fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,s.endsWith('\n')?s:s+'\n');};
 const json=(p,o)=>put(p,JSON.stringify(o,null,2));
-const fn=(n,s)=>put(path.join(dp,'data/rlk/function/boss/raiden/rig',n+'.mcfunction'),Array.isArray(s)?s.join('\n'):s);
-const textures={skin:'rlk:raiden/skin',white:'rlk:player_motion/white_concrete',silver:'rlk:player_motion/light_gray_concrete',dark:'rlk:player_motion/black_concrete',purple:'rlk:player_motion/purple_concrete',blue:'rlk:player_motion/blue_concrete',light:'rlk:player_motion/light_blue_concrete',gold:'rlk:cm/fm/metal',deathGlow:'rlk:raiden/fx/lavender',deathViolet:'rlk:raiden/fx/violet_dense',deathWhite:'rlk:raiden/fx/white'};
+const rigDir=path.join(dp,'data/rlk/function/boss/raiden/rig');
+// Every file under rig/ is generated here: start clean so retimed clips leave no stale ticks.
+fs.rmSync(rigDir,{recursive:true,force:true});
+const fn=(n,s)=>put(path.join(rigDir,n+'.mcfunction'),Array.isArray(s)?s.join('\n'):s);
+const fx=n=>'rlk:raiden/fx/'+n;
+// Concrete/metal keys serve the normal-phase weapons and encounter objects. The armoured
+// Baleful Shadowlord uses the shared opaque swatches from build_raiden_materials.py.
+const textures={skin:'rlk:raiden/skin',white:'rlk:player_motion/white_concrete',silver:'rlk:player_motion/light_gray_concrete',dark:'rlk:player_motion/black_concrete',purple:'rlk:player_motion/purple_concrete',blue:'rlk:player_motion/blue_concrete',light:'rlk:player_motion/light_blue_concrete',gold:'rlk:cm/fm/metal',deathGlow:fx('lavender'),deathViolet:fx('violet_dense'),deathWhite:fx('white'),
+ lilac:fx('arm_lilac'),shade:fx('arm_shade'),deep:fx('arm_deep'),tomoe:fx('arm_tomoe'),gdull:fx('gold_dull'),bpale:fx('blade_pale'),bedge:fx('blade_edge'),bcore:fx('blade_core'),grip:fx('grip_dark'),hdull:fx('hand_dull'),hdark:fx('hand_dull_dark'),nail:fx('nail_glow')};
 const faces=['north','south','east','west','up','down'];
 const box=(from,to,tex,overrides={})=>({from,to,faces:Object.fromEntries(faces.map(f=>[f,{texture:'#'+(overrides[f]||tex),uv:[0,0,16,16]}]))});
 const model=(name,elements)=>{const trail=name.includes('_trail_'),fx=name.startsWith('fx_weapon/')?{purple:'rlk:raiden/fx/'+(trail?'afterglow':'violet_dense'),blue:'rlk:raiden/fx/void',light:'rlk:raiden/fx/cyan',white:'rlk:raiden/fx/'+(trail?'lavender':'white'),silver:'rlk:raiden/fx/lavender'}:{};json(path.join(assets,'models/item/raiden',name+'.json'),{ambientocclusion:false,textures:{...textures,...fx,particle:textures.purple},elements});json(path.join(assets,'items/raiden',name+'.json'),{model:{type:'minecraft:model',model:'rlk:item/raiden/'+name}});};
+// Same geometry, every face tinted by one constant multiplier (item definition tints).
+const DULL_TINT=0xA098AC;
+const tinted=(name,elements,tint=DULL_TINT)=>{json(path.join(assets,'models/item/raiden',name+'.json'),{ambientocclusion:false,textures:{...textures,particle:textures.purple},elements:elements.map(e=>({...e,faces:Object.fromEntries(Object.entries(e.faces).map(([k,f])=>[k,{...f,tintindex:0}]))}))});json(path.join(assets,'items/raiden',name+'.json'),{model:{type:'minecraft:model',model:'rlk:item/raiden/'+name,tints:[{type:'minecraft:constant',value:tint}]}});};
+// A left-hand copy: x -> 16-x with east/west faces exchanged.
+const mirrorX=els=>els.map(e=>({from:[16-e.to[0],e.from[1],e.from[2]],to:[16-e.from[0],e.to[1],e.to[2]],faces:Object.fromEntries(Object.entries(e.faces).map(([k,f])=>[k==='east'?'west':k==='west'?'east':k,f]))}));
 function skinFaces(u,v,w,h,d,start=0,end=h){const face=(a,b,c,e)=>({uv:[a/4,b/4,c/4,e/4],texture:'#skin'});return{east:face(u,v+d+start,u+d,v+d+end),north:face(u+d,v+d+start,u+d+w,v+d+end),west:face(u+d+w,v+d+start,u+2*d+w,v+d+end),south:face(u+2*d+w,v+d+start,u+2*d+2*w,v+d+end),up:face(u+d,v,u+d+w,v+d),down:face(u+d+w,v+d,u+d+2*w,v)};}
 const sb=(a,b,uv,start,end,inflate=0)=>({from:a.map(v=>v-inflate),to:b.map(v=>v+inflate),faces:skinFaces(...uv,start,end)});
 const bodySpecs={
@@ -30,20 +42,76 @@ const bodySpecs={
  left_leg:[[6,2,6],[10,8,10],[16,48,4,12,4],[0,48,4,12,4],0,6,.22],
  left_shin:[[6,2,6],[10,8,10],[16,48,4,12,4],[0,48,4,12,4],6,12,.22]
 };
-for(const[n,[a,b,uv,over,start,end,inf]]of Object.entries(bodySpecs))model(n,[sb(a,b,uv,start,end),sb(a,b,over,start,end,inf)]);
+// Raiden herself is drawn desaturated/dark while the armour carries her (<part>_dull).
+for(const[n,[a,b,uv,over,start,end,inf]]of Object.entries(bodySpecs)){const els=[sb(a,b,uv,start,end),sb(a,b,over,start,end,inf)];model(n,els);tinted(n+'_dull',els);}
 if(arg('--skin')){fs.mkdirSync(path.join(assets,'textures/raiden'),{recursive:true});fs.copyFileSync(arg('--skin'),path.join(assets,'textures/raiden/skin.png'));}
 
+// ---- Baleful Shadowlord armour --------------------------------------------------------
 // All pieces remain within the native model cube bounds. Larger forms use display transforms.
-const eye=(cx,cy,cz,size=1)=>[box([cx-2.4*size,cy-.5*size,cz],[cx+2.4*size,cy+.5*size,cz+.25],'gold'),box([cx-1.4*size,cy-1.05*size,cz+.05],[cx+1.4*size,cy+1.05*size,cz+.32],'white'),box([cx-.45*size,cy-1.2*size,cz+.1],[cx+.45*size,cy+1.2*size,cz+.4],'purple')];
-const upper=[box([5.8,-4,5.8],[10.2,8,10.2],'purple'),box([5.25,-2.6,5.25],[10.75,6.4,10.75],'white',{east:'silver',south:'silver'}),box([5.05,5.3,5.05],[10.95,6.3,10.95],'gold'),box([5.05,-2.5,5.05],[10.95,-1.5,10.95],'gold'),box([5.6,6.5,5.6],[10.4,9.2,10.4],'dark'),...eye(8,2,4.93,.85)];
-model('puppet_upper',upper);
-model('puppet_forearm',[box([5.8,-6,5.8],[10.2,8,10.2],'purple'),box([5.3,-4.8,5.3],[10.7,5.9,10.7],'white',{east:'silver',south:'silver'}),box([5,4.7,5],[11,5.8,11],'gold'),box([5,-4.8,5],[11,-3.8,11],'gold'),box([6.7,-3.5,5.1],[9.3,4.9,5.3],'purple'),box([7.55,-3.4,4.98],[8.45,4.8,5.32],'light'),...eye(8,.3,4.8,.6)]);
-function hand(closed){const e=[box([4.2,1.8,6.4],[11.8,8.3,9.6],'white',{south:'silver'}),box([4.4,6.9,6.1],[11.6,8.3,9.9],'gold'),box([5.3,2.8,6.15],[10.7,6.9,6.4],'purple'),...eye(8,4.8,6.01,.72)];for(let i=0;i<4;i++){const x=4.55+i*1.85;if(closed){e.push(box([x,-.5,6.25],[x+1.45,2.5,10.35],'white'),box([x,-.5,9.5],[x+1.45,3.3,11.0],'silver'),box([x,-.8,6],[x+1.45,.1,7],'purple'));}else{const end=[-3.7,-5,-4.6,-3.1][i];e.push(box([x,end,6.6],[x+1.4,2.2,9.1],'white',{east:'silver'}),box([x,end+1.1,6.45],[x+1.4,end+1.7,9.22],'gold'),box([x,end-.5,6.7],[x+1.4,end+.5,9],'purple'));}}e.push(box([2.5,2.0,6.7],[4.7,6.7,9.2],'white'),box([1.7,closed?1.3:.1,7.1],[3.6,3.8,9.4],'silver'));return e;}
-model('puppet_hand_open',hand(false));model('puppet_hand_closed',hand(true));
+// Shared model conventions (pixels, display pivot at 8,8,8):
+//  * arm segments hang along -Y from their joint; -Z is the outward (front) face.
+//  * hands hang from the wrist along -Y; +Z is the palm, -Z the back, the thumb sits at
+//    model -X: the authored hand is a RIGHT hand and every *_l model is its mirror.
+//  * blades point along +Y; model -X is the cutting edge (convex side of the curve) and
+//    +X the spine. The rig poses blades by (tip, edge) frames so every cut leads with -X.
+// Flat disc emblem on one face: arm_tomoe field, dull-gold rim and three gold commas.
+function face2d(dir,c,[u0,u1],[v0,v1],[d0,d1],tex){
+ const at={'-z':(u,v,d)=>[c[0]+u,c[1]+v,c[2]-d],'+z':(u,v,d)=>[c[0]-u,c[1]+v,c[2]+d],'-x':(u,v,d)=>[c[0]-d,c[1]+v,c[2]-u],'+x':(u,v,d)=>[c[0]+d,c[1]+v,c[2]+u]}[dir];
+ const a=at(u0,v0,d0),b=at(u1,v1,d1);return box(a.map((x,i)=>Math.min(x,b[i])),a.map((x,i)=>Math.max(x,b[i])),tex);
+}
+function tomoe(c,r,dir='-z'){
+ const disc=(R,d,tex)=>[[R,.42*R],[.42*R,R],[.72*R,.72*R]].map(([a,b])=>face2d(dir,c,[-a,a],[-b,b],d,tex));
+ const e=[...disc(r,[-.05,.2],'gdull'),...disc(.74*r,[-.05,.34],'tomoe')];
+ for(let i=0;i<3;i++){const a=Math.PI/2+i*2*Math.PI/3,b=a+.8,h=.16*r,t=.1*r,x=Math.cos(a)*.34*r,y=Math.sin(a)*.34*r,u=Math.cos(b)*.56*r,v=Math.sin(b)*.56*r;
+  e.push(face2d(dir,c,[x-h,x+h],[y-h,y+h],[0,.48],'gdull'),face2d(dir,c,[u-t,u+t],[v-t,v+t],[0,.44],'gdull'));}
+ return e;
+}
+// Pale lilac puppet plates, shaded sides, deep-violet joints, dull-gold trims, tomoe discs.
+const plate={east:'shade',west:'shade',south:'shade'};
+model('puppet_upper',[box([5.8,-4,5.8],[10.2,8,10.2],'deep'),box([5.2,-2.6,5.2],[10.8,6.4,10.8],'lilac',plate),box([5.0,5.3,5.0],[11.0,6.3,11.0],'gdull'),box([5.0,-2.5,5.0],[11.0,-1.5,11.0],'gdull'),box([5.3,6.4,5.3],[10.7,9.3,10.7],'deep',{up:'shade'}),box([5.0,7.4,5.0],[11.0,8.1,11.0],'gdull'),box([5.1,1.3,5.1],[10.9,1.75,10.9],'deep'),...tomoe([8,3.85,5.2],1.95),...tomoe([8,3.85,10.8],1.6,'+z')]);
+model('puppet_forearm',[box([5.8,-6,5.8],[10.2,8,10.2],'deep'),box([5.3,-4.8,5.3],[10.7,5.9,10.7],'lilac',plate),box([5.0,4.7,5.0],[11.0,5.8,11.0],'gdull'),box([5.0,-4.8,5.0],[11.0,-3.8,11.0],'gdull'),box([5.4,5.8,5.4],[10.6,8.5,10.6],'deep'),box([5.1,-1.85,5.1],[10.9,-1.4,10.9],'deep'),box([7.55,-3.6,10.6],[8.45,4.5,10.95],'deep'),...tomoe([8,1.75,5.3],1.75)]);
+function puppetHand(kind){
+ const e=[box([4.2,1.8,6.4],[11.8,8.3,9.6],'lilac',{south:'shade',east:'shade',west:'shade',down:'deep'}),box([4.0,6.9,6.1],[12.0,8.4,9.9],'gdull'),box([4.25,1.35,6.2],[11.75,2.25,9.8],'deep'),...tomoe([8,4.6,6.4],1.75)];
+ for(let i=0;i<4;i++){const x=4.55+i*1.85;
+  if(kind==='closed')e.push(box([x,-.5,6.25],[x+1.45,2.5,10.35],'lilac',{east:'shade',west:'shade'}),box([x,-.5,9.5],[x+1.45,3.3,11.0],'shade'),box([x,-.8,6],[x+1.45,.1,7],'deep'));
+  else if(kind==='open'){const end=[-3.7,-5,-4.6,-3.1][i];e.push(box([x,end+1.5,6.6],[x+1.4,2.2,9.1],'lilac',{east:'shade',west:'shade'}),box([x-.05,end+1.0,6.45],[x+1.45,end+1.6,9.25],'deep'),box([x+.1,end,6.75],[x+1.3,end+1.1,8.95],'shade'),box([x+.25,end-.45,6.95],[x+1.15,end+.05,8.75],'gdull'));}
+  else{const end=[-2.6,-3.5,-3.3,-2.3][i],dx=(i-1.5)*.4;e.push(box([x+dx*.5,end+1.3,6.6],[x+1.4+dx*.5,2.2,9.1],'lilac',{east:'shade',west:'shade'}),box([x+dx-.05,end+.8,6.9],[x+dx+1.45,end+1.5,9.6],'deep'),box([x+dx,end-1.2,8.2],[x+dx+1.4,end+1.0,10.6],'shade'),box([x+dx+.3,end-2.0,9.6],[x+dx+1.1,end-1.0,11.2],'gdull'));}
+ }
+ e.push(box([2.5,2.0,6.7],[4.7,6.7,9.2],'lilac',{west:'shade',south:'shade'}),box([1.7,kind==='closed'?1.3:.1,7.1],[3.6,3.8,9.4],'shade'),box([1.9,kind==='closed'?.9:-.4,7.4],[3.4,kind==='closed'?1.4:.2,9.1],'gdull'));
+ return e;
+}
+for(const kind of['open','closed','claw']){const els=puppetHand(kind);model('puppet_hand_'+kind,els);model('puppet_hand_'+kind+'_l',mirrorX(els));}
+// Two large dull bronze-grey hands carry Raiden from below: dedicated chunky geometry,
+// fingers curled toward the palm, glowing violet nails and faint seams.
+const dullSide={east:'hdark',west:'hdark'};
+model('support_upper',[box([5.6,-4,5.6],[10.4,8,10.4],'hdark'),box([5.0,-2.8,5.0],[11.0,6.6,11.0],'hdull',{...dullSide,south:'hdark'}),box([4.8,5.5,4.8],[11.2,6.6,11.2],'hdark'),box([4.8,-2.8,4.8],[11.2,-1.8,11.2],'hdark'),box([5.2,6.6,5.2],[10.8,9.4,10.8],'hdark'),box([7.7,-1.4,4.82],[8.3,5.2,5.02],'nail')]);
+model('support_forearm',[box([5.6,-6,5.6],[10.4,8,10.4],'hdark'),box([4.9,-4.6,4.9],[11.1,6.0,11.1],'hdull',{...dullSide,south:'hdark'}),box([4.7,4.9,4.7],[11.3,6.0,11.3],'hdark'),box([4.7,-4.8,4.7],[11.3,-3.7,11.3],'hdark'),box([5.3,6.0,5.3],[10.7,8.6,10.7],'hdark'),box([7.7,-3.4,4.72],[8.3,4.6,4.92],'nail'),box([4.72,-.8,7.7],[4.92,3.2,8.3],'nail')]);
+function supportHand(){
+ const e=[box([4.5,6.4,5.5],[11.5,10.2,10.5],'hdark'),box([3.4,.6,5.8],[12.6,7.0,10.2],'hdull',dullSide),box([3.55,-.3,5.45],[12.45,1.5,7.1],'hdark'),box([4.6,2.0,5.5],[11.4,5.6,5.85],'hdark'),box([5.0,3.3,10.15],[11.0,3.75,10.4],'hdark'),box([7.6,.9,10.15],[8.05,6.4,10.4],'hdark')];
+ for(let i=0;i<4;i++){const x=3.6+i*2.3,w=1.95,y=.6-[3.3,4.0,3.8,3.0][i];
+  e.push(box([x,y,5.9],[x+w,.8,9.3],'hdull',dullSide),box([x-.05,y-.2,5.75],[x+w+.05,y+.6,9.45],'hdark'),box([x+.1,y-2.3,7.1],[x+w-.1,y,10.5],'hdull',dullSide),box([x+.35,y-3.0,8.6],[x+w-.35,y-1.9,10.8],'nail'));}
+ e.push(box([1.3,1.3,6.6],[3.5,5.9,9.9],'hdull',{...dullSide,south:'hdark'}),box([.8,-1.1,7.6],[3.0,1.5,10.9],'hdull',dullSide),box([1.05,-1.9,8.9],[2.75,-.8,11.1],'nail'));
+ return e;
+}
+model('support_hand_r',supportHand());model('support_hand_l',mirrorX(supportHand()));
 
-// Curved violet cutting edge, bright silver spine, stepped point and gilded lotus guard.
-function katana(big=false){const e=[box([7.3,1.8,7.25],[8.7,10,8.75],'dark'),box([7.05,2,7.05],[8.95,2.75,8.95],'gold')];for(let y=3;y<9;y+=1.55)e.push(box([7.12,y,7.12],[8.88,y+.62,8.88],'purple'));e.push(box([4.4,9.0,6.75],[11.6,10.15,9.25],'gold'),box([6,8.8,6.2],[10,10.3,9.8],'purple'));for(let i=0;i<14;i++){const y=10+i*1.51,curve=i*i*.0065,width=1.65-i*.075;e.push(box([7.9+curve-width/2,y,7.5],[7.9+curve+width/2,y+1.61,8.5],'purple',{north:'light',east:'white',south:big?'light':'blue'}),box([7.88+curve-width/2,y,7.43],[8.10+curve-width/2,y+1.62,8.57],'white'));}return e;}
-model('katana',katana());model('giant_katana',katana(true));
+// Normal katana: violet body, white cutting edge on -X, violet spine on +X, gilded guard.
+function katana(){const e=[box([7.3,1.8,7.25],[8.7,10,8.75],'dark'),box([7.05,2,7.05],[8.95,2.75,8.95],'gold')];for(let y=3;y<9;y+=1.55)e.push(box([7.12,y,7.12],[8.88,y+.62,8.88],'purple'));e.push(box([4.4,9.0,6.75],[11.6,10.15,9.25],'gold'),box([6,8.8,6.2],[10,10.3,9.8],'purple'));for(let i=0;i<14;i++){const y=10+i*1.51,curve=i*i*.0065,width=1.65-i*.075;e.push(box([7.9+curve-width/2,y,7.5],[7.9+curve+width/2,y+1.61,8.5],'purple',{north:'light',south:'blue'}),box([7.88+curve-width/2,y,7.43],[8.10+curve-width/2,y+1.62,8.57],'white'));}return e;}
+model('katana',katana());
+// The Shadowlord's pale violet katana. The blade bows toward +X (spine), so the convex -X
+// side carries the continuous white cutting edge; a violet fuller runs beside the spine on
+// both flats. Dark grip with dull-gold wraps, tsuba and habaki.
+function giantKatana(){
+ const e=[box([7.2,1.4,7.2],[8.8,9.7,8.8],'grip'),box([6.95,.45,6.95],[9.05,1.45,9.05],'gdull')];
+ for(let y=2.3;y<9.2;y+=1.5)e.push(box([7.1,y,7.1],[8.9,y+.45,8.9],'gdull'));
+ e.push(box([5.0,9.7,6.4],[11.0,10.4,9.6],'gdull'),box([5.7,9.7,5.7],[10.3,10.4,10.3],'gdull'),box([6.3,9.62,6.8],[9.7,10.48,9.2],'deep'),box([6.85,10.4,7.2],[9.2,11.5,8.8],'gdull'));
+ const y0=11.5,N=16,h=(31.4-y0)/N;
+ for(let i=0;i<N;i++){const t=i/(N-1),y=y0+h*i,c=8+1.3*t*t,base=2.7-.75*t,w=i<N-2?base:i===N-2?1.25:.6,xr=c+base/2,xl=xr-w,edge=Math.min(.65,w*.5);
+  e.push(box([xl,y,7.6],[xl+edge,y+h+.01,8.4],'bedge'),box([xl+edge-.1,y,7.42],[xr,y+h+.01,8.58],'bpale',{east:'bcore'}));
+  if(i<N-3)e.push(box([xr-.95,y,7.35],[xr-.42,y+h+.01,8.65],'bcore'));}
+ return e;
+}
+model('giant_katana',giantKatana());
 // Lightning is geometry, not a particle cloud. Its white seam protrudes through
 // the front/back of the violet body so the opaque shell never hides the core.
 // Every blade attachment shares the actual weapon's hand pivot and quaternion.
@@ -109,10 +177,11 @@ function chakraLightning(variant){
 for(const variant of[0,1])model(`fx_weapon/chakra_${variant}`,chakraLightning(variant));
 const spear=[box([7.4,-15.5,7.4],[8.6,18.2,8.6],'dark')];for(const y of[-12,-5,2,9,16])spear.push(box([7.16,y,7.16],[8.84,y+.7,8.84],'gold'));for(let i=0;i<8;i++){const y=18+i*1.65,w=2.2-i*.24,x=8+i*i*.025;spear.push(box([x-w/2,y,7.45],[x+w/2,y+1.72,8.55],'purple',{north:'light',east:'white'}));}spear.push(box([5.6,16,6.8],[10.4,18,9.2],'gold'),box([6.5,-15.8,6.5],[9.5,-14.6,9.5],'purple'));model('polearm',spear);
 
-const ring=[];for(let i=0;i<64;i++){const a=i*Math.PI/32,x=8+13.6*Math.cos(a),y=8+13.6*Math.sin(a);ring.push(box([x-.75,y-.75,7.4],[x+.75,y+.75,8.6],i%8===0?'gold':'purple'));if(i%2===0)ring.push(box([8+12.3*Math.cos(a)-.42,8+12.3*Math.sin(a)-.42,7.65],[8+12.3*Math.cos(a)+.42,8+12.3*Math.sin(a)+.42,8.35],'light'));}for(let i=0;i<12;i++){const a=i*Math.PI/6,x=8+16*Math.cos(a),y=8+16*Math.sin(a);ring.push(box([x-.65,y-1.5,7.8],[x+.65,y+1.5,8.2],i%3===0?'gold':'purple'));}for(let l=0;l<3;l++){const a=l*Math.PI*2/3;for(let i=0;i<8;i++){const b=a+i*.16,x=8+6.2*Math.cos(b),y=8+6.2*Math.sin(b);ring.push(box([x-.6,y-.6,7.6],[x+.6,y+.6,8.4],'purple'));}}model('chakra',ring);
-model('armor',[box([3.5,5.7,5.4],[12.5,8.1,10.6],'white'),box([3.3,5.2,5.2],[12.7,6.15,10.8],'gold'),box([5.1,-4.1,5.5],[10.9,-2,10.5],'purple'),box([4.4,-3.9,5.25],[11.6,-3,10.75],'gold'),box([6.85,1,5.1],[9.15,6.0,5.45],'white'),...eye(8,3.2,5.0,.7),box([3.2,-7.0,7],[5.3,-2.9,10.3],'purple'),box([10.7,-7,7],[12.8,-2.9,10.3],'purple')]);
-model('crown',[box([3.65,12,3.75],[12.35,13.1,12.25],'gold'),box([3,13,5.2],[4.2,18.8,7.4],'purple'),box([2.7,17.6,5.1],[4.5,19.3,7.5],'white'),box([11.8,13,5.2],[13,18.8,7.4],'purple'),box([11.5,17.6,5.1],[13.3,19.3,7.5],'white'),...eye(8,13.3,3.5,.9)]);
-model('ribbon',[box([6.4,-9,8.2],[9.6,8,9.15],'purple',{north:'blue'}),box([6.4,-9,8.1],[7.0,8,9.25],'gold'),box([9.0,-9,8.1],[9.6,8,9.25],'gold'),box([6.1,-11,8.2],[9.9,-8,9.15],'purple')]);
+// Halo: deep-violet ring with dull-gold studs, pale fuller dots, lilac ticks and three tomoe.
+const ring=[];for(let i=0;i<64;i++){const a=i*Math.PI/32,x=8+13.6*Math.cos(a),y=8+13.6*Math.sin(a);ring.push(box([x-.75,y-.75,7.4],[x+.75,y+.75,8.6],i%8===0?'gdull':i%2?'deep':'shade'));if(i%2===0)ring.push(box([8+12.3*Math.cos(a)-.42,8+12.3*Math.sin(a)-.42,7.65],[8+12.3*Math.cos(a)+.42,8+12.3*Math.sin(a)+.42,8.35],'bcore'));}for(let i=0;i<12;i++){const a=i*Math.PI/6,x=8+16*Math.cos(a),y=8+16*Math.sin(a);ring.push(box([x-.65,y-1.5,7.8],[x+.65,y+1.5,8.2],i%3===0?'gdull':'lilac'));}for(let l=0;l<3;l++){const a=l*Math.PI*2/3;for(let i=0;i<8;i++){const b=a+i*.16,x=8+6.2*Math.cos(b),y=8+6.2*Math.sin(b);ring.push(box([x-.6,y-.6,7.6],[x+.6,y+.6,8.4],'shade'));}}for(const d of[90,210,330]){const a=d*Math.PI/180,x=8+13.6*Math.cos(a),y=8+13.6*Math.sin(a);ring.push(...tomoe([x,y,7.4],1.9),...tomoe([x,y,8.6],1.9,'+z'));}model('chakra',ring);
+model('armor',[box([3.5,5.7,5.4],[12.5,8.1,10.6],'lilac',plate),box([3.3,5.2,5.2],[12.7,6.15,10.8],'gdull'),box([5.1,-4.1,5.5],[10.9,-2,10.5],'deep'),box([4.4,-3.9,5.25],[11.6,-3,10.75],'gdull'),box([6.85,.6,5.1],[9.15,5.3,5.45],'lilac'),...tomoe([8,3.0,5.1],1.55),box([3.2,-7.0,7],[5.3,-2.9,10.3],'deep'),box([10.7,-7,7],[12.8,-2.9,10.3],'deep'),box([3.0,-7.3,6.8],[5.5,-6.6,10.5],'gdull'),box([10.5,-7.3,6.8],[13,-6.6,10.5],'gdull')]);
+model('crown',[box([3.65,12,3.75],[12.35,13.1,12.25],'gdull'),box([3.6,12.35,3.7],[12.4,12.75,12.3],'deep'),box([3,13,5.2],[4.2,18.8,7.4],'deep',{north:'shade'}),box([2.7,17.6,5.1],[4.5,19.3,7.5],'lilac'),box([11.8,13,5.2],[13,18.8,7.4],'deep',{north:'shade'}),box([11.5,17.6,5.1],[13.3,19.3,7.5],'lilac'),box([6.3,12.2,3.45],[9.7,15.5,3.75],'deep'),...tomoe([8,13.85,3.45],1.55)]);
+const ribbon=[box([6.4,-9,8.2],[9.6,8,9.15],'deep',{north:'lilac'}),box([6.4,-9,8.1],[7.0,8,9.25],'gdull'),box([9.0,-9,8.1],[9.6,8,9.25],'gdull'),box([6.1,-11,8.2],[9.9,-8,9.15],'deep',{north:'shade'}),box([6.9,-1,8.05],[9.1,.4,9.3],'shade')];model('ribbon',ribbon);tinted('ribbon_dull',ribbon);
 model('electro_orb',[box([4.5,12,4.5],[11.5,19,11.5],'purple'),box([5.2,12.7,3.9],[10.8,18.3,12.1],'light'),box([3.9,12.7,5.2],[12.1,18.3,10.8],'light'),box([6.7,10.9,6.7],[9.3,20.1,9.3],'white'),box([-.8,14.9,6.8],[3.5,16.1,9.2],'gold'),box([12.5,14.9,6.8],[16.8,16.1,9.2],'gold'),box([6.8,14.9,-.8],[9.2,16.1,3.5],'purple'),box([6.8,14.9,12.5],[9.2,16.1,16.8],'purple')]);
 const flower=[box([4.5,8,4.5],[11.5,9.5,11.5],'gold'),box([6,9.5,6],[10,17,10],'purple'),box([6.6,13,6.6],[9.4,19.8,9.4],'light')];for(let i=0;i<6;i++){const a=i*Math.PI/3;for(let s=0;s<4;s++){const r=3+s*1.5,x=8+Math.cos(a)*r,z=8+Math.sin(a)*r,y=13+s*.85;flower.push(box([x-1.4,y-.6,z-1.4],[x+1.4,y+1.4,z+1.4],s===3?'white':s%2?'silver':'purple'));}}model('remembrance_flower',flower);
 const stake=[box([3.2,8,3.2],[12.8,9.3,12.8],'dark'),box([4.0,9.3,4.0],[12,10.5,12],'gold'),box([5.6,10.4,5.6],[10.4,26,10.4],'purple'),box([6.6,10.8,5.2],[9.4,25.2,10.8],'light'),box([6.3,26,6.3],[9.7,28.6,9.7],'white'),box([7.2,28.6,7.2],[8.8,30.5,8.8],'light')];model('lightning_stake',stake);
@@ -123,41 +192,82 @@ const zeros=[0,0,0],rad=d=>d*Math.PI/180;
 function mul(a,b){const[x,y,z,w]=a,[X,Y,Z,W]=b;return[w*X+x*W+y*Z-z*Y,w*Y-x*Z+y*W+z*X,w*Z+x*Y-y*X+z*W,w*W-x*X-y*Y-z*Z];}
 function q(e=zeros){const[x,y,z]=e.map(v=>rad(v)/2);return mul(mul([0,0,Math.sin(z),Math.cos(z)],[0,Math.sin(y),0,Math.cos(y)]),[Math.sin(x),0,0,Math.cos(x)]);}
 const rot=(Q,v)=>mul(mul(Q,[...v,0]),[-Q[0],-Q[1],-Q[2],Q[3]]).slice(0,3),add=(a,b)=>a.map((x,i)=>x+b[i]),sub=(a,b)=>a.map((x,i)=>x-b[i]),times=(v,s)=>v.map(x=>x*s),lerp=(a,b,t)=>a.map((x,i)=>x+(b[i]-x)*t);
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],unit=v=>times(v,1/Math.max(Math.hypot(...v),1e-9));
 function aimDown(v){const len=Math.hypot(...v),n=times(v,1/Math.max(len,.0001));if(n[1]>.9999)return[1,0,0,0];const a=[-n[2],0,n[0],1-n[1]],m=Math.hypot(...a);return a.map(x=>x/m);}
+// Rotation whose columns are the images of the authoring x/y/z axes (orthonormal, right-handed).
+function basisQ(X,Y,Z){const m=[[X[0],Y[0],Z[0]],[X[1],Y[1],Z[1]],[X[2],Y[2],Z[2]]],tr=m[0][0]+m[1][1]+m[2][2];let s;
+ if(tr>0){s=Math.sqrt(tr+1)*2;return[(m[2][1]-m[1][2])/s,(m[0][2]-m[2][0])/s,(m[1][0]-m[0][1])/s,s/4];}
+ if(m[0][0]>m[1][1]&&m[0][0]>m[2][2]){s=Math.sqrt(1+m[0][0]-m[1][1]-m[2][2])*2;return[s/4,(m[0][1]+m[1][0])/s,(m[0][2]+m[2][0])/s,(m[2][1]-m[1][2])/s];}
+ if(m[1][1]>m[2][2]){s=Math.sqrt(1+m[1][1]-m[0][0]-m[2][2])*2;return[(m[0][1]+m[1][0])/s,s/4,(m[1][2]+m[2][1])/s,(m[0][2]-m[2][0])/s];}
+ s=Math.sqrt(1+m[2][2]-m[0][0]-m[1][1])*2;return[(m[0][2]+m[2][0])/s,(m[1][2]+m[2][1])/s,s/4,(m[1][0]-m[0][1])/s];}
+// Authoring space (before the final z-mirror): +X = boss's left, +Y up, -Z forward. Item
+// models appear x-flipped there, so model -X (the blade edge, the thumb) maps to the +X image.
+// bq: blade tip (model +Y) and edge direction. hq: fingers (model -Y) and palm normal (+Z).
+const bq=(tip,edge)=>{const T=unit(tip),E=unit(sub(edge,times(T,dot(edge,T))));return basisQ(E,T,cross(E,T));};
+const hq=(fingers,palm)=>{const F=unit(fingers),P=unit(sub(palm,times(F,dot(palm,F)))),Y=times(F,-1);return basisQ(cross(Y,P),Y,P);};
+// A level cut: theta 0 = tip forward, -90 = boss's right, +90 = boss's left; dir +1 travels
+// toward the boss's left. chop: phi 0 = tip up, 90 = tip forward. The edge faces the travel.
+const sweep=(theta,elev=0,dir=1)=>{const a=rad(theta),e=rad(elev);return bq([Math.sin(a)*Math.cos(e),Math.sin(e),-Math.cos(a)*Math.cos(e)],times([Math.cos(a),0,Math.sin(a)],dir));};
+const chop=(phi,yaw=0)=>{const a=rad(phi),Y=q([0,yaw,0]);return bq(rot(Y,[0,Math.cos(a),-Math.sin(a)]),rot(Y,[0,-Math.sin(a),-Math.cos(a)]));};
+const toQ=v=>v.length===4?v:q(v);
+function slerp(a,b,t){let d=dot(a,b)+a[3]*b[3];if(d<0){b=b.map(x=>-x);d=-d;}if(d>.9995)return unit4(a.map((x,i)=>x+(b[i]-x)*t));const th=Math.acos(d),s=Math.sin(th);return a.map((x,i)=>(x*Math.sin((1-t)*th)+b[i]*Math.sin(t*th))/s);}
+const unit4=v=>{const m=Math.hypot(...v);return v.map(x=>x/m);};
+// Left-side keys mirror the right side: positions x -> -x, rotations [x,-y,-z,w] / euler [a,-b,-c].
+const mx=v=>[-v[0],v[1],v[2]],mq=Q=>[Q[0],-Q[1],-Q[2],Q[3]];
+const arm=(n,spec)=>Object.fromEntries(Object.entries(spec).map(([k,v])=>[n+'_'+k,v]));
+const mirrorSpec=spec=>Object.fromEntries(Object.entries(spec).map(([k,v])=>[k,k==='hand'?(v.length===4?mq(v):[v[0],-v[1],-v[2]]):mx(v)]));
+const pair=(r,l,spec,specL=mirrorSpec(spec))=>({...arm(r,spec),...arm(l,specL)});
+const rear=(s,l)=>pair('rear_r','rear_l',s,l),rear2=(s,l)=>pair('rear2_r','rear2_l',s,l),cradle=(s,l)=>pair('support_r','main_l',s,l);
+// One big lilac sword arm (main_r), two dull cradle hands under Raiden (support_r + main_l),
+// and four smaller lilac arms fanned behind her shoulders (rear = upper pair, rear2 = lower).
+const auxArms=['main_r','main_l','support_r','rear_r','rear_l','rear2_r','rear2_l'];
+const auxSize={main_r:1.7,main_l:2.15,support_r:2.15,rear_r:.95,rear_l:.95,rear2_r:1.05,rear2_l:1.05};
+// Segment thickness when it differs from the hand size: the cradle arms stay slimmer than their hands.
+const auxThick={main_l:1.45,support_r:1.45};
+const rotKeys=new Set(['giant_weapon',...auxArms.map(n=>n+'_hand')]);
 const defaults={shift:[0,0,0],root:[0,0,0],torso:[0,0,0],head:[0,0,0],right_arm:[8,-8,-12],right_elbow:[16,0,0],left_arm:[5,0,9],left_elbow:[8,0,0],right_leg:[0,0,-2],right_knee:[0,0,0],left_leg:[0,0,2],left_knee:[0,0,0],weapon:[-18,0,0],ring:[0,0,0],form:[1],fade:[1],
- main_r_sh:[-.78,2.95,.65],main_r_el:[-1.8,3.65,.42],main_r_wr:[-2.05,2.45,-.5],main_r_hand:[0,0,-15],
- main_l_sh:[.78,2.5,.65],main_l_el:[1.85,1.6,.48],main_l_wr:[.36,1.07,-.15],main_l_hand:[90,0,0],
- rear_r_sh:[-.55,2.6,.92],rear_r_el:[-1.5,2.35,.6],rear_r_wr:[-1.35,2.15,-.2],rear_r_hand:[20,0,-18],
- rear_l_sh:[.55,2.75,.92],rear_l_el:[1.45,3.03,.48],rear_l_wr:[1.56,3.65,-.05],rear_l_hand:[150,0,22],giant_weapon:[-12,0,-15]};
+ ...arm('main_r',{sh:[-.8,3.0,.75],el:[-1.95,3.55,.45],wr:[-2.1,2.3,-.75],hand:[0,0,-15]}),giant_weapon:bq([-.3,1,-.15],[.05,-.1,-1]),
+ ...cradle({sh:[-.75,1.75,1.45],el:[-1.45,.3,1.45],wr:[-1.05,.45,.7],hand:hq([.55,.15,-.85],[0,1,0])}),
+ ...rear({sh:[-.5,3.35,.95],el:[-1.55,3.75,1.0],wr:[-2.0,4.5,.85],hand:hq([-1,.85,0],[0,0,-1])}),
+ ...rear2({sh:[-.55,2.6,1.0],el:[-1.6,2.45,1.1],wr:[-2.6,2.05,.9],hand:hq([-1,-.3,0],[0,0,-1])})};
+const nd=o=>Object.fromEntries(Object.entries(o).map(([k,d])=>[k,add(defaults[k],d)])),back=(...ks)=>Object.fromEntries(ks.map(k=>[k,defaults[k]]));
+const auxJoints=auxArms.flatMap(n=>['_sh','_el','_wr','_hand'].map(j=>n+j));
+// Aux wrists drop and splay as the armour fails (k = 0..1).
+const droop=k=>nd({rear_r_wr:[-.25*k,-1.15*k,.25*k],rear_l_wr:[.25*k,-1.2*k,.25*k],rear2_r_wr:[-.2*k,-.95*k,.2*k],rear2_l_wr:[.2*k,-.9*k,.2*k],support_r_wr:[-.1*k,-.22*k,.1*k],main_l_wr:[.1*k,-.22*k,.1*k]});
 const key=(tick,pose)=>({tick,pose});
 // Forward is authored -Z: a negative torso pitch bows the chest toward the knees.
 // One knee rests low while the opposite foot carries the weight for the recovery.
 const kneeling={shift:[0,-.25,-.025],root:[0,0,0],torso:[-34,0,3],head:[-20,0,-3],right_arm:[45,0,-14],right_elbow:[12,0,0],left_arm:[68,4,16],left_elbow:[34,0,0],right_leg:[52,0,-5],right_knee:[-104,0,0],left_leg:[5,0,5],left_knee:[-93,0,0],weapon:[-76,-10,15],form:[0],fade:[1]};
+const upright=bq([-.15,1,-.28],[0,-.28,-1]),castPalm=hq([.12,1,-.1],[0,.1,-1]),pushPalm=hq([0,.75,-.65],[0,-.65,-.75]);
 const clips=[
- {id:0,name:'idle',length:40,loop:true,keys:[key(0,{}),key(20,{shift:[0,.035,0],head:[-2,0,0],left_arm:[7,0,11],main_r_wr:[-2.04,2.50,-.5],rear_l_wr:[1.53,3.69,-.02],ring:[0,0,4]}),key(40,{shift:[0,0,0],head:[0,0,0],left_arm:defaults.left_arm,main_r_wr:defaults.main_r_wr,rear_l_wr:defaults.rear_l_wr,ring:[0,0,0]})]},
+ {id:0,name:'idle',length:40,loop:true,keys:[key(0,{}),
+  key(10,{...nd({rear_r_wr:[-.1,.12,-.04],rear_r_el:[-.05,.05,0],rear2_l_wr:[.1,.08,0],main_r_wr:[0,.04,0]}),rear_r_hand:hq([-.55,1,.05],[0,0,-1])}),
+  key(20,{shift:[0,.035,0],head:[-2,0,0],left_arm:[7,0,11],ring:[0,0,4],...nd({support_r_wr:[0,.05,0],main_l_wr:[0,.05,0],rear_l_wr:[.1,.12,-.04],rear_l_el:[.05,.05,0],rear2_r_wr:[-.1,.08,0],rear_r_wr:[0,0,0],rear_r_el:[0,0,0],main_r_wr:[0,.05,0]}),rear_r_hand:defaults.rear_r_hand,rear_l_hand:mq(hq([-.55,1,.05],[0,0,-1]))}),
+  key(30,{...nd({rear2_l_wr:[0,0,0],rear_l_wr:[.03,.04,0],rear_l_el:[0,0,0],rear2_r_wr:[0,0,0]}),rear_l_hand:defaults.rear_l_hand,ring:[0,0,2]}),
+  key(40,back('shift','head','left_arm','ring','main_r_wr','rear_r_wr','rear_r_el','rear_l_wr','rear_l_el','rear2_r_wr','rear2_l_wr','support_r_wr','main_l_wr','rear_r_hand','rear_l_hand'))]},
  {id:1,name:'walk',length:24,loop:true,keys:[key(0,{right_leg:[23,0,-3],left_leg:[-23,0,3],right_arm:[-8,0,-12],left_arm:[22,0,10],weapon:[0,0,0]}),key(6,{shift:[0,.06,0],right_knee:[-20,0,0],left_knee:[-8,0,0]}),key(12,{right_leg:[-23,0,-3],left_leg:[23,0,3],right_arm:[20,0,-12],left_arm:[-14,0,10],right_knee:[0,0,0],left_knee:[0,0,0],shift:[0,0,0]}),key(18,{shift:[0,.06,0],right_knee:[-8,0,0],left_knee:[-20,0,0]}),key(24,{right_leg:[23,0,-3],left_leg:[-23,0,3],right_arm:[-8,0,-12],left_arm:[22,0,10],right_knee:[0,0,0],left_knee:[0,0,0],shift:[0,0,0]})]},
- {id:2,name:'slash_wind',length:18,keys:[key(0,{}),key(10,{torso:[-4,-36,-6],right_arm:[65,-35,-75],right_elbow:[32,0,0],left_arm:[18,10,33],left_elbow:[25,0,0],weapon:[-70,8,85],right_leg:[-8,0,-7],left_leg:[12,0,5],main_r_wr:[-2.55,3.65,.15],giant_weapon:[-25,-25,65]}),key(18,{torso:[-5,-42,-8],right_arm:[70,-40,-80],right_elbow:[35,0,0],weapon:[-76,8,85]})]},
- {id:3,name:'slash_a',length:12,keys:[key(0,{torso:[-4,-40,-7],right_arm:[70,-40,-80],right_elbow:[35,0,0],weapon:[-76,8,85],main_r_wr:[-2.55,3.65,.15],giant_weapon:[-25,-25,65]}),key(4,{torso:[10,28,8],right_arm:[88,55,-15],right_elbow:[8,0,0],weapon:[-20,85,90],left_arm:[-12,-10,40],main_r_wr:[.4,2.25,-2.25],main_r_el:[-1.1,3.3,-1.2],giant_weapon:[-78,20,68]}),key(8,{torso:[8,40,12],right_arm:[70,74,10],weapon:[-15,85,90],main_r_wr:[1.45,1.75,-1.5],giant_weapon:[-70,25,100]}),key(12,{torso:[3,20,5],right_arm:[35,35,-10],weapon:[-35,15,45],main_r_wr:[.8,2.15,-1.2]})]},
- {id:4,name:'slash_b',length:12,keys:[key(0,{torso:[4,32,8],right_arm:[70,70,0],weapon:[-25,30,85],main_r_wr:[1.45,2,-1.5],giant_weapon:[-70,25,100]}),key(4,{torso:[8,-35,-7],right_arm:[95,-58,-44],weapon:[-55,-30,-78],left_arm:[-15,0,32],main_r_wr:[-2.3,2.3,-1.8],main_r_el:[-1.8,3.5,-1.2],giant_weapon:[-80,-30,-82]}),key(12,{torso:[0,-15,-2],right_arm:[28,-20,-15],weapon:[-20,0,-30]})]},
- {id:5,name:'thrust_wind',length:18,keys:[key(0,{}),key(12,{torso:[-4,-40,0],right_arm:[30,-42,-28],right_elbow:[68,0,0],left_arm:[36,10,25],left_elbow:[45,0,0],weapon:[-9,0,90],right_leg:[-16,0,-6],left_leg:[16,0,6],main_r_wr:[-1.65,2.6,.65],giant_weapon:[-88,0,0]}),key(18,{torso:[-6,-42,0]})]},
- {id:6,name:'thrust',length:14,keys:[key(0,{torso:[-4,-38,0],right_arm:[32,-40,-24],right_elbow:[60,0,0],weapon:[-4,0,90],main_r_wr:[-1.65,2.6,.65],giant_weapon:[-88,0,0]}),key(4,{shift:[0,0,-.18],torso:[18,10,0],right_arm:[90,4,-6],right_elbow:[2,0,0],weapon:[0,0,90],left_arm:[-22,-15,35],main_r_el:[-.9,2.85,-1.15],main_r_wr:[-.55,2.5,-2.35],giant_weapon:[-92,0,0]}),key(9,{shift:[0,0,-.1],torso:[8,0,0],right_arm:[78,2,-10]}),key(14,{shift:[0,0,0],torso:[0,0,0],right_arm:[24,0,-15],right_elbow:[10,0,0],weapon:[-10,0,0]})]},
- {id:7,name:'cast_wind',length:30,keys:[key(0,{}),key(12,{left_arm:[140,-15,35],left_elbow:[25,0,0],right_arm:[16,0,-16],head:[-13,-6,0],rear_l_wr:[1.3,4.3,-.4],rear_l_hand:[175,0,20],rear_r_wr:[-1.5,3.5,-.5],rear_r_hand:[150,0,-20],ring:[0,0,15]}),key(24,{left_arm:[157,-8,20],left_elbow:[12,0,0],head:[-18,0,0],rear_l_wr:[1.25,4.4,-.4],rear_r_wr:[-1.5,3.6,-.5],ring:[0,0,22]}),key(30,{left_arm:[160,-8,19]})]},
- {id:8,name:'cast',length:16,keys:[key(0,{left_arm:[160,-8,19],left_elbow:[12,0,0],rear_l_wr:[1.25,4.4,-.4],rear_r_wr:[-1.5,3.6,-.5]}),key(4,{torso:[10,0,0],left_arm:[92,-8,18],left_elbow:[2,0,0],rear_l_wr:[.85,2.7,-1.55],rear_r_wr:[-.85,2.7,-1.55],rear_l_hand:[75,0,0],rear_r_hand:[75,0,0]}),key(10,{torso:[5,0,0],left_arm:[78,-8,22]}),key(16,{left_arm:[30,-5,17],left_elbow:[10,0,0],torso:[0,0,0]})]},
- {id:9,name:'transform',length:70,keys:[key(0,{form:[0],torso:[18,0,0],head:[25,0,0],right_arm:[28,0,-12],left_arm:[28,0,12],right_elbow:[70,0,0],left_elbow:[70,0,0]}),key(16,{form:[.1],shift:[0,.1,0],torso:[-10,0,0],head:[-15,0,0],right_arm:[110,-10,-75],left_arm:[110,10,75],right_elbow:[25,0,0],left_elbow:[25,0,0],main_r_wr:[-1.2,2.3,.3],main_l_wr:[1.2,1.3,.3],ring:[0,0,-30]}),key(38,{form:[.75],shift:[0,.15,0],right_arm:[42,0,-45],left_arm:[42,0,45],right_leg:[28,0,-10],left_leg:[28,0,10],right_knee:[-55,0,0],left_knee:[-55,0,0],main_r_wr:[-2.5,3.2,-.5],main_l_wr:[.4,.9,-.15],giant_weapon:[-15,0,-50],ring:[0,0,10]}),key(56,{form:[1],shift:[0,0,0],torso:[0,0,0],head:[0,0,0],right_arm:[20,0,-16],left_arm:[20,0,16],right_elbow:[38,0,0],left_elbow:[38,0,0],main_r_wr:defaults.main_r_wr,main_l_wr:defaults.main_l_wr,giant_weapon:defaults.giant_weapon,ring:[0,0,0]}),key(70,{})]},
- {id:10,name:'arm_sweep_wind',length:30,keys:[key(0,{}),key(18,{torso:[-5,-30,-6],main_r_el:[-1.4,3.9,.7],main_r_wr:[-2.8,4.2,.15],giant_weapon:[-12,-20,75],rear_r_wr:[-1.65,3.1,.0],rear_r_hand:[90,0,-25],left_arm:[36,0,30],ring:[0,0,-10]}),key(30,{main_r_wr:[-2.95,4.25,.25],giant_weapon:[-10,-20,80]})]},
- {id:11,name:'arm_sweep',length:16,keys:[key(0,{torso:[-5,-30,-6],main_r_el:[-1.4,3.9,.7],main_r_wr:[-2.95,4.25,.25],giant_weapon:[-10,-20,80]}),key(4,{torso:[10,15,4],main_r_el:[-1.0,3.0,-1.6],main_r_wr:[0,2.5,-3.0],giant_weapon:[-85,20,85],rear_r_wr:[-.7,2.35,-1.5]}),key(8,{torso:[8,35,10],main_r_el:[-.3,2.8,-1.4],main_r_wr:[2.4,1.65,-1.3],giant_weapon:[-95,20,95]}),key(16,{torso:[0,10,0],main_r_el:defaults.main_r_el,main_r_wr:[-1.5,2.3,-1.2],giant_weapon:[-40,0,15]})]},
- {id:12,name:'clap_wind',length:32,keys:[key(0,{}),key(18,{main_r_el:[-2.0,3.1,.3],main_r_wr:[-3.05,2.35,-.55],main_r_hand:[90,0,-90],main_l_el:[2,3.1,.3],main_l_wr:[3.05,2.35,-.55],main_l_hand:[90,0,90],rear_r_wr:[-.9,3.9,-.1],rear_l_wr:[.9,3.9,-.1],left_arm:[38,0,32],right_arm:[38,0,-32],giant_weapon:[0,0,-25]}),key(32,{main_r_wr:[-3.25,2.45,-.65],main_l_wr:[3.25,2.45,-.65]})]},
- {id:13,name:'clap',length:16,keys:[key(0,{main_r_el:[-2,3.1,.3],main_r_wr:[-3.25,2.45,-.65],main_r_hand:[90,0,-90],main_l_el:[2,3.1,.3],main_l_wr:[3.25,2.45,-.65],main_l_hand:[90,0,90]}),key(4,{torso:[12,0,0],main_r_el:[-1.5,2.3,-1.2],main_r_wr:[-.28,1.65,-2.1],main_l_el:[1.5,2.3,-1.2],main_l_wr:[.28,1.65,-2.1],right_arm:[74,0,-12],left_arm:[74,0,12]}),key(8,{main_r_wr:[-.38,1.65,-2.1],main_l_wr:[.38,1.65,-2.1]}),key(16,{torso:[0,0,0],main_r_wr:[-1.3,2.1,-.7],main_l_wr:[1.3,1.65,-.7]})]},
- {id:14,name:'slam_wind',length:30,keys:[key(0,{}),key(18,{torso:[-15,0,0],head:[-18,0,0],main_l_el:[1.65,3.45,.1],main_l_wr:[1.1,4.8,-.45],main_l_hand:[175,0,15],rear_r_wr:[-1.1,4.2,-.2],rear_l_wr:[1.25,4.1,-.2],left_arm:[142,0,25],right_arm:[110,0,-25]}),key(30,{main_l_wr:[1.05,5.0,-.5]})]},
- {id:15,name:'slam',length:20,keys:[key(0,{main_l_el:[1.65,3.45,.1],main_l_wr:[1.05,5,-.5],main_l_hand:[175,0,15],torso:[-15,0,0]}),key(5,{torso:[30,0,0],head:[12,0,0],main_l_el:[1.3,1.3,-1.2],main_l_wr:[.7,.35,-2.1],main_l_hand:[65,0,10],rear_r_wr:[-1.1,.7,-1.2],rear_l_wr:[1.15,.7,-1.2],left_arm:[95,0,18],right_arm:[84,0,-22]}),key(10,{main_l_wr:[.7,.35,-2.1]}),key(20,{torso:[5,0,0],main_l_el:defaults.main_l_el,main_l_wr:defaults.main_l_wr,left_arm:[30,0,20]})]},
- {id:16,name:'judgment_wind',length:64,keys:[key(0,{}),key(18,{main_r_el:[-1.65,3.8,.3],main_r_wr:[-.75,4.7,-.4],giant_weapon:[0,0,0],main_l_wr:[.75,3.9,-.65],main_l_hand:[155,0,-25],rear_r_wr:[-.85,3.5,-.8],rear_l_wr:[.85,3.5,-.8],right_arm:[150,0,-14],left_arm:[130,0,15],head:[-20,0,0],ring:[0,0,-15]}),key(42,{main_r_wr:[-.25,5.1,-.3],main_l_wr:[.35,4.1,-.7],rear_r_wr:[-.55,3.85,-.75],rear_l_wr:[.55,3.85,-.75],right_arm:[170,0,-10],left_arm:[152,0,10],ring:[0,0,20]}),key(64,{main_r_wr:[-.25,5.25,-.3],ring:[0,0,40]})]},
- {id:17,name:'judgment',length:26,keys:[key(0,{main_r_el:[-1.65,3.8,.3],main_r_wr:[-.25,5.25,-.3],giant_weapon:[0,0,0],main_l_wr:[.35,4.1,-.7],head:[-20,0,0],right_arm:[170,0,-10],left_arm:[152,0,10]}),key(6,{torso:[32,0,0],head:[15,0,0],main_r_el:[-1.05,2.6,-1.25],main_r_wr:[-.2,1.0,-2.25],giant_weapon:[-135,0,0],main_l_wr:[.7,1.8,-1.7],rear_r_wr:[-1.6,1.3,-1.2],rear_l_wr:[1.6,1.3,-1.2],right_arm:[120,0,-10],left_arm:[85,0,20]}),key(13,{torso:[28,0,0],main_r_wr:[-.2,.85,-2.2],giant_weapon:[-150,0,0]}),key(26,{torso:[8,0,0],main_r_wr:[-1.1,2.1,-1.0],giant_weapon:[-65,0,-15],right_arm:[50,0,-15],left_arm:[35,0,20]})]},
- {id:18,name:'stagger',length:30,keys:[key(0,{}),key(4,{torso:[-23,0,-8],head:[-18,0,8],right_arm:[-15,10,-35],left_arm:[-15,-10,35],main_r_wr:[-2.35,2.3,.2],main_l_wr:[.7,.9,.2],rear_r_wr:[-1.7,2.2,.7],rear_l_wr:[1.7,2.9,.7]}),key(13,{torso:[25,0,3],head:[20,0,0],right_arm:[25,0,-12],left_arm:[25,0,12],right_knee:[-30,0,0],left_knee:[-30,0,0],shift:[0,-.15,0]}),key(30,{torso:[20,0,0],head:[18,0,0],shift:[0,-.18,0]})]},
- {id:19,name:'death',length:48,keys:[key(0,{form:[1]}),key(4,{shift:[0,.03,.03],torso:[18,-3,-7],head:[15,0,8],right_arm:[-8,0,-30],left_arm:[-12,0,34],right_elbow:[20,0,0],left_elbow:[16,0,0],main_r_wr:[-2.6,2.1,.25],main_l_wr:[1.5,1.05,.3],rear_r_wr:[-1.6,2.1,.4],rear_l_wr:[1.7,2.8,.5],form:[1]}),key(12,{shift:[0,-.22,-.025],torso:[-18,0,5],head:[-15,0,-4],right_arm:[30,0,-18],left_arm:[55,0,22],right_leg:[48,0,-7],right_knee:[-100,0,0],left_leg:[20,0,7],left_knee:[-90,0,0],main_r_wr:[-2.4,1.0,-.2],main_l_wr:[1.7,.45,-.3],rear_r_wr:[-1.8,1.3,.2],rear_l_wr:[1.75,1.8,.3],giant_weapon:[-105,0,-12],form:[.70]}),key(22,{...kneeling,shift:[0,-.27,-.04],torso:[-55,0,6],head:[-27,0,-4],right_arm:[44,0,-20],right_elbow:[18,0,0],left_arm:[74,0,24],left_elbow:[18,0,0],form:[.16]}),key(30,{shift:[0,-.32,-.07],torso:[-72,-6,8],head:[-24,0,-5],right_arm:[62,0,-24],right_elbow:[10,0,0],left_arm:[78,0,22],left_elbow:[8,0,0],form:[0],fade:[1]}),key(38,{shift:[0,-.32,-.07],torso:[-75,-6,8],fade:[.94]}),key(44,{shift:[0,-.15,-.07],fade:[.44]}),key(48,{shift:[0,.15,-.07],fade:[0]})]},
- {id:20,name:'spin',length:24,loop:true,keys:[key(0,{root:[0,0,0],right_arm:[80,0,-82],weapon:[-70,0,90],left_arm:[40,0,60],giant_weapon:[-75,0,90],main_r_wr:[-2.8,2.6,-.4]}),key(6,{root:[0,90,0],main_r_wr:[-2.6,2.7,-.5]}),key(12,{root:[0,180,0],main_r_wr:[-2.8,2.6,-.4]}),key(18,{root:[0,270,0],main_r_wr:[-2.6,2.7,-.5]}),key(24,{root:[0,360,0],main_r_wr:[-2.8,2.6,-.4]})]},
- {id:21,name:'dash',length:16,loop:true,keys:[key(0,{shift:[0,-.08,0],torso:[30,0,0],head:[-15,0,0],right_arm:[-38,-8,-16],left_arm:[-30,8,20],right_elbow:[10,0,0],left_elbow:[10,0,0],right_leg:[40,0,-5],left_leg:[-38,0,5],weapon:[-35,0,-20],main_r_wr:[-2,2.2,.8],giant_weapon:[-50,0,-30]}),key(8,{right_leg:[-38,0,-5],left_leg:[40,0,5],right_knee:[-30,0,0],left_knee:[-5,0,0]}),key(16,{right_leg:[40,0,-5],left_leg:[-38,0,5],right_knee:[-5,0,0],left_knee:[-30,0,0]})]},
+ {id:2,name:'slash_wind',length:18,keys:[key(0,{}),key(10,{torso:[-4,-36,-6],right_arm:[65,-35,-75],right_elbow:[32,0,0],left_arm:[18,10,33],left_elbow:[25,0,0],weapon:[-70,8,85],right_leg:[-8,0,-7],left_leg:[12,0,5],main_r_el:[-1.45,3.85,.7],main_r_wr:[-2.55,3.65,.15],giant_weapon:sweep(-120,25)}),key(18,{torso:[-5,-42,-8],right_arm:[70,-40,-80],right_elbow:[35,0,0],weapon:[-76,8,85],giant_weapon:sweep(-128,27)})]},
+ {id:3,name:'slash_a',length:12,keys:[key(0,{torso:[-4,-40,-7],right_arm:[70,-40,-80],right_elbow:[35,0,0],weapon:[-76,8,85],main_r_el:[-1.45,3.85,.7],main_r_wr:[-2.55,3.65,.15],giant_weapon:sweep(-128,27)}),key(4,{torso:[10,28,8],right_arm:[88,55,-15],right_elbow:[8,0,0],weapon:[-20,85,90],left_arm:[-12,-10,40],main_r_wr:[.4,2.25,-2.25],main_r_el:[-1.1,3.3,-1.2],giant_weapon:sweep(0,-10)}),key(8,{torso:[8,40,12],right_arm:[70,74,10],weapon:[-15,85,90],main_r_wr:[1.45,1.75,-1.5],giant_weapon:sweep(80,-12)}),key(12,{torso:[3,20,5],right_arm:[35,35,-10],weapon:[-35,15,45],main_r_wr:[.8,2.15,-1.2],giant_weapon:bq([.4,1,-.3],[0,-.3,-1])})]},
+ {id:4,name:'slash_b',length:12,keys:[key(0,{torso:[4,32,8],right_arm:[70,70,0],weapon:[-25,30,85],main_r_wr:[1.45,2,-1.5],main_r_el:[-.6,3.0,-1.2],giant_weapon:sweep(80,-5,-1)}),key(4,{torso:[8,-35,-7],right_arm:[95,-58,-44],weapon:[-55,-30,-78],left_arm:[-15,0,32],main_r_wr:[-2.3,2.3,-1.8],main_r_el:[-1.8,3.5,-1.2],giant_weapon:sweep(-75,-10,-1)}),key(12,{torso:[0,-15,-2],right_arm:[28,-20,-15],weapon:[-20,0,-30],main_r_wr:[-2.1,2.5,-1.0],main_r_el:defaults.main_r_el,giant_weapon:upright})]},
+ {id:5,name:'thrust_wind',length:18,keys:[key(0,{}),key(12,{torso:[-4,-40,0],right_arm:[30,-42,-28],right_elbow:[68,0,0],left_arm:[36,10,25],left_elbow:[45,0,0],weapon:[-9,0,90],right_leg:[-16,0,-6],left_leg:[16,0,6],main_r_wr:[-1.65,2.6,.65],giant_weapon:bq([0,-.04,-1],[0,-1,0])}),key(18,{torso:[-6,-42,0]})]},
+ {id:6,name:'thrust',length:14,keys:[key(0,{torso:[-4,-38,0],right_arm:[32,-40,-24],right_elbow:[60,0,0],weapon:[-4,0,90],main_r_wr:[-1.65,2.6,.65],giant_weapon:bq([0,-.04,-1],[0,-1,0])}),key(4,{shift:[0,0,-.18],torso:[18,10,0],right_arm:[90,4,-6],right_elbow:[2,0,0],weapon:[0,0,90],left_arm:[-22,-15,35],main_r_el:[-.9,2.85,-1.15],main_r_wr:[-.55,2.5,-2.35],giant_weapon:bq([0,-.08,-1],[0,-1,0]),...rear2({wr:[-1.9,2.35,-.4],hand:hq([0,.1,-1],[0,-1,0])})}),key(9,{shift:[0,0,-.1],torso:[8,0,0],right_arm:[78,2,-10]}),key(14,{shift:[0,0,0],torso:[0,0,0],right_arm:[24,0,-15],right_elbow:[10,0,0],weapon:[-10,0,0],...back('main_r_el','main_r_wr','rear2_r_wr','rear2_l_wr','rear2_r_hand','rear2_l_hand'),giant_weapon:upright})]},
+ {id:7,name:'cast_wind',length:30,keys:[key(0,{}),key(12,{left_arm:[140,-15,35],left_elbow:[25,0,0],right_arm:[16,0,-16],head:[-13,-6,0],...rear({wr:[-1.35,4.35,-.35],hand:castPalm}),...rear2({wr:[-2.55,3.35,.4],hand:hq([-.55,1,0],[0,0,-1])}),...cradle({wr:[-1.05,.78,.25]}),ring:[0,0,15]}),key(24,{left_arm:[157,-8,20],left_elbow:[12,0,0],head:[-18,0,0],...rear({wr:[-1.3,4.45,-.4]}),...rear2({wr:[-2.6,3.45,.35]}),ring:[0,0,22]}),key(30,{left_arm:[160,-8,19]})]},
+ {id:8,name:'cast',length:16,keys:[key(0,{left_arm:[160,-8,19],left_elbow:[12,0,0],...rear({wr:[-1.3,4.45,-.4],hand:castPalm}),...rear2({wr:[-2.6,3.45,.35],hand:hq([-.55,1,0],[0,0,-1])}),...cradle({wr:[-1.05,.78,.25]})}),key(4,{torso:[10,0,0],left_arm:[92,-8,18],left_elbow:[2,0,0],...rear({wr:[-.85,2.75,-1.55],hand:pushPalm}),...rear2({wr:[-1.75,2.45,-1.35],hand:hq([.15,.15,-1],[0,-1,0])})}),key(10,{torso:[5,0,0],left_arm:[78,-8,22]}),key(16,{left_arm:[30,-5,17],left_elbow:[10,0,0],torso:[0,0,0],...back('rear_r_wr','rear_l_wr','rear_r_hand','rear_l_hand','rear2_r_wr','rear2_l_wr','rear2_r_hand','rear2_l_hand','support_r_wr','main_l_wr')})]},
+ {id:9,name:'transform',length:70,keys:[key(0,{form:[0],torso:[18,0,0],head:[25,0,0],right_arm:[28,0,-12],left_arm:[28,0,12],right_elbow:[70,0,0],left_elbow:[70,0,0],...rear({wr:[-.75,3.0,.6]}),...rear2({wr:[-.95,2.35,.6]}),...cradle({wr:[-1.3,1.25,.65]}),main_r_wr:[-1.2,2.3,.3]}),key(16,{form:[.1],shift:[0,.1,0],torso:[-10,0,0],head:[-15,0,0],right_arm:[110,-10,-75],left_arm:[110,10,75],right_elbow:[25,0,0],left_elbow:[25,0,0],main_r_wr:[-1.2,2.3,.3],ring:[0,0,-30]}),key(38,{form:[.75],shift:[0,.15,0],right_arm:[42,0,-45],left_arm:[42,0,45],right_leg:[28,0,-10],left_leg:[28,0,10],right_knee:[-55,0,0],left_knee:[-55,0,0],main_r_wr:[-2.5,3.2,-.5],giant_weapon:bq([-.75,.65,-.1],[0,-.1,-1]),...rear({wr:[-2.1,5.0,.6],hand:hq([-.7,1,0],[0,0,-1])}),...rear2({wr:[-2.95,2.25,.6]}),...cradle({wr:[-1.15,.45,.05]}),ring:[0,0,10]}),key(56,{form:[1],shift:[0,0,0],torso:[0,0,0],head:[0,0,0],right_arm:[20,0,-16],left_arm:[20,0,16],right_elbow:[38,0,0],left_elbow:[38,0,0],...back(...auxJoints,'giant_weapon'),ring:[0,0,0]}),key(70,{})]},
+ {id:10,name:'arm_sweep_wind',length:30,keys:[key(0,{}),key(18,{torso:[-5,-30,-6],main_r_el:[-1.4,3.9,.75],main_r_wr:[-2.85,4.15,.3],giant_weapon:sweep(-120,25),rear_r_wr:[-1.65,3.1,.0],rear_r_hand:hq([-.6,.2,-.8],[0,0,-1]),...nd({rear2_r_wr:[.1,.25,.35]}),left_arm:[36,0,30],ring:[0,0,-10]}),key(30,{main_r_wr:[-2.95,4.25,.35],giant_weapon:sweep(-132,28)})]},
+ {id:11,name:'arm_sweep',length:16,keys:[key(0,{torso:[-5,-30,-6],main_r_el:[-1.4,3.9,.75],main_r_wr:[-2.95,4.25,.35],giant_weapon:sweep(-132,28)}),key(4,{torso:[10,15,4],main_r_el:[-1.0,3.0,-1.6],main_r_wr:[0,2.5,-3.0],giant_weapon:sweep(0,-12),rear_r_wr:[-.7,2.35,-1.5],...rear2({wr:[-1.6,2.1,-.9]},{wr:[2.75,2.75,.55]})}),key(8,{torso:[8,35,10],main_r_el:[-.3,2.8,-1.4],main_r_wr:[2.4,1.65,-1.3],giant_weapon:sweep(85,-15)}),key(16,{torso:[0,10,0],main_r_el:defaults.main_r_el,main_r_wr:[-1.5,2.3,-1.2],giant_weapon:upright,...back('rear_r_wr','rear_r_hand','rear2_r_wr','rear2_l_wr')})]},
+ {id:12,name:'clap_wind',length:32,keys:[key(0,{}),key(18,{...cradle({sh:[-1.0,2.35,1.2],el:[-2.3,1.55,.55],wr:[-2.6,2.65,-1.0],hand:hq([0,.75,-.65],[1,0,0])}),...rear({wr:[-1.0,4.15,.2]}),...nd({rear2_r_wr:[-.15,.35,0],rear2_l_wr:[.15,.35,0]}),main_r_wr:[-2.3,2.85,-.25],left_arm:[38,0,32],right_arm:[38,0,-32]}),key(32,{...cradle({wr:[-2.85,2.75,-1.1]})})]},
+ {id:13,name:'clap',length:16,keys:[key(0,{...cradle({sh:[-1.0,2.35,1.2],el:[-2.3,1.55,.55],wr:[-2.85,2.75,-1.1],hand:hq([0,.75,-.65],[1,0,0])}),main_r_wr:[-2.3,2.85,-.25]}),key(4,{torso:[12,0,0],...cradle({sh:[-.9,2.2,1.1],el:[-1.75,1.55,-.6],wr:[-.33,2.1,-2.2],hand:hq([0,.55,-.85],[1,0,0])}),right_arm:[74,0,-12],left_arm:[74,0,12],...nd({rear2_r_wr:[.2,.1,-.4],rear2_l_wr:[-.2,.1,-.4]})}),key(8,{...cradle({wr:[-.37,2.1,-2.2]})}),key(16,{torso:[0,0,0],...cradle({sh:defaults.support_r_sh,el:[-1.6,.6,1.0],wr:[-1.15,.85,.1],hand:defaults.support_r_hand}),...back('main_r_wr','rear_r_wr','rear_l_wr','rear2_r_wr','rear2_l_wr')})]},
+ {id:14,name:'slam_wind',length:30,keys:[key(0,{}),key(18,{torso:[-15,0,0],head:[-18,0,0],main_l_el:[2.1,3.0,.6],main_l_wr:[1.5,4.7,-.35],main_l_hand:hq([.1,1,.1],[0,0,-1]),rear_r_wr:[-1.1,4.2,-.2],rear_l_wr:[1.25,4.1,-.2],left_arm:[142,0,25],right_arm:[110,0,-25]}),key(30,{main_l_wr:[1.45,4.95,-.4]})]},
+ {id:15,name:'slam',length:20,keys:[key(0,{main_l_el:[2.1,3.0,.6],main_l_wr:[1.45,4.95,-.4],main_l_hand:hq([.1,1,.1],[0,0,-1]),torso:[-15,0,0]}),key(5,{torso:[30,0,0],head:[12,0,0],main_l_el:[1.9,1.6,-.7],main_l_wr:[.95,.34,-2.0],main_l_hand:hq([0,-.05,-1],[0,-1,0]),rear_r_wr:[-1.1,.9,-1.2],rear_l_wr:[1.15,.9,-1.2],left_arm:[95,0,18],right_arm:[84,0,-22]}),key(10,{main_l_wr:[.95,.34,-2.0]}),key(20,{torso:[5,0,0],...back('main_l_el','main_l_wr','main_l_hand','rear_r_wr','rear_l_wr'),left_arm:[30,0,20]})]},
+ {id:16,name:'judgment_wind',length:64,keys:[key(0,{}),key(18,{main_r_el:[-1.6,3.9,.35],main_r_wr:[-.8,4.75,-.35],giant_weapon:chop(-10),...cradle({wr:[-1.05,.82,.2]}),rear_r_wr:[-.85,3.5,-.8],rear_l_wr:[.85,3.5,-.8],...rear2({wr:[-2.65,3.15,.55],hand:hq([-.5,1,0],[0,0,-1])}),right_arm:[150,0,-14],left_arm:[130,0,15],head:[-20,0,0],ring:[0,0,-15]}),key(42,{main_r_wr:[-.3,5.1,-.25],giant_weapon:chop(-25),rear_r_wr:[-.55,3.85,-.75],rear_l_wr:[.55,3.85,-.75],right_arm:[170,0,-10],left_arm:[152,0,10],ring:[0,0,20]}),key(64,{main_r_wr:[-.28,5.25,-.25],giant_weapon:chop(-30),ring:[0,0,40]})]},
+ {id:17,name:'judgment',length:26,keys:[key(0,{main_r_el:[-1.6,3.9,.35],main_r_wr:[-.28,5.25,-.25],giant_weapon:chop(-30),head:[-20,0,0],right_arm:[170,0,-10],left_arm:[152,0,10]}),key(6,{torso:[32,0,0],head:[15,0,0],main_r_el:[-1.05,2.8,-1.3],main_r_wr:[-.25,1.75,-2.35],giant_weapon:chop(110),rear_r_wr:[-1.6,1.3,-1.2],rear_l_wr:[1.6,1.3,-1.2],...rear2({wr:[-2.2,1.6,-.6],hand:hq([-.3,-.2,-1],[0,-1,0])}),right_arm:[120,0,-10],left_arm:[85,0,20]}),key(13,{torso:[28,0,0],main_r_wr:[-.25,1.65,-2.3],giant_weapon:chop(113)}),key(26,{torso:[8,0,0],main_r_el:defaults.main_r_el,main_r_wr:[-1.1,2.2,-1.0],giant_weapon:upright,right_arm:[50,0,-15],left_arm:[35,0,20],...back('rear_r_wr','rear_l_wr','rear2_r_wr','rear2_l_wr','rear2_r_hand','rear2_l_hand','support_r_wr','main_l_wr')})]},
+ {id:18,name:'stagger',length:30,keys:[key(0,{}),key(4,{torso:[-23,0,-8],head:[-18,0,8],right_arm:[-15,10,-35],left_arm:[-15,-10,35],main_r_wr:[-2.35,2.3,.2],...droop(.3)}),key(13,{torso:[25,0,3],head:[20,0,0],right_arm:[25,0,-12],left_arm:[25,0,12],right_knee:[-30,0,0],left_knee:[-30,0,0],shift:[0,-.15,0]}),key(30,{torso:[20,0,0],head:[18,0,0],shift:[0,-.18,0]})]},
+ {id:19,name:'death',length:48,keys:[key(0,{form:[1]}),key(4,{shift:[0,.03,.03],torso:[18,-3,-7],head:[15,0,8],right_arm:[-8,0,-30],left_arm:[-12,0,34],right_elbow:[20,0,0],left_elbow:[16,0,0],main_r_wr:[-2.6,2.1,.25],...droop(.25),form:[1]}),key(12,{shift:[0,-.22,-.025],torso:[-18,0,5],head:[-15,0,-4],right_arm:[30,0,-18],left_arm:[55,0,22],right_leg:[48,0,-7],right_knee:[-100,0,0],left_leg:[20,0,7],left_knee:[-90,0,0],main_r_wr:[-2.4,1.0,-.2],...droop(.7),giant_weapon:bq([-.25,-.55,-.8],[0,-.8,.55]),form:[.70]}),key(22,{...kneeling,shift:[0,-.27,-.04],torso:[-55,0,6],head:[-27,0,-4],right_arm:[44,0,-20],right_elbow:[18,0,0],left_arm:[74,0,24],left_elbow:[18,0,0],...droop(1),form:[.16]}),key(30,{shift:[0,-.32,-.07],torso:[-72,-6,8],head:[-24,0,-5],right_arm:[62,0,-24],right_elbow:[10,0,0],left_arm:[78,0,22],left_elbow:[8,0,0],form:[0],fade:[1]}),key(38,{shift:[0,-.32,-.07],torso:[-75,-6,8],fade:[.94]}),key(44,{shift:[0,-.15,-.07],fade:[.44]}),key(48,{shift:[0,.15,-.07],fade:[0]})]},
+ {id:20,name:'spin',length:24,loop:true,keys:[key(0,{root:[0,0,0],right_arm:[80,0,-82],weapon:[-70,0,90],left_arm:[40,0,60],giant_weapon:bq([-.26,-.05,-.97],[-.97,0,.26]),main_r_wr:[-2.8,2.6,-.4]}),key(6,{root:[0,90,0],main_r_wr:[-2.6,2.7,-.5]}),key(12,{root:[0,180,0],main_r_wr:[-2.8,2.6,-.4]}),key(18,{root:[0,270,0],main_r_wr:[-2.6,2.7,-.5]}),key(24,{root:[0,360,0],main_r_wr:[-2.8,2.6,-.4]})]},
+ {id:21,name:'dash',length:16,loop:true,keys:[key(0,{shift:[0,-.08,0],torso:[30,0,0],head:[-15,0,0],right_arm:[-38,-8,-16],left_arm:[-30,8,20],right_elbow:[10,0,0],left_elbow:[10,0,0],right_leg:[40,0,-5],left_leg:[-38,0,5],weapon:[-35,0,-20],main_r_wr:[-2,2.2,.8],giant_weapon:bq([-.35,-.4,.85],[.1,.3,-1]),...nd({rear_r_wr:[0,-.2,.45],rear_l_wr:[0,-.2,.45],rear2_r_wr:[.1,-.1,.5],rear2_l_wr:[-.1,-.1,.5]})}),key(8,{right_leg:[-38,0,-5],left_leg:[40,0,5],right_knee:[-30,0,0],left_knee:[-5,0,0]}),key(16,{right_leg:[40,0,-5],left_leg:[-38,0,5],right_knee:[-5,0,0],left_knee:[-30,0,0]})]},
  {id:22,name:'exhausted',length:60,loop:true,keys:[key(0,kneeling),key(30,{shift:[0,-.23,-.025],torso:[-31,0,3],head:[-17,0,-3],left_arm:[66,4,16]}),key(60,kneeling)]},
- {id:23,name:'collapse',length:46,keys:[key(0,{form:[1]}),key(4,{shift:[0,.025,.02],torso:[20,-5,-7],head:[16,0,8],right_arm:[-10,0,-28],left_arm:[-8,0,32],right_elbow:[20,0,0],left_elbow:[16,0,0],main_r_wr:[-2.5,2.5,.2],main_l_wr:[1.25,1.1,.1],rear_r_wr:[-1.6,2.15,.5],rear_l_wr:[1.7,2.9,.45],form:[1]}),key(11,{shift:[0,-.06,-.005],torso:[-10,0,5],head:[-5,0,-4],right_arm:[26,0,-18],left_arm:[40,0,22],right_leg:[28,0,-6],left_leg:[24,0,6],right_knee:[-55,0,0],left_knee:[-58,0,0],main_r_wr:[-2.3,1.8,-.15],main_l_wr:[1.4,.65,-.1],rear_r_wr:[-1.7,1.7,.4],rear_l_wr:[1.6,2.1,.3],giant_weapon:[-105,0,-15],form:[.88]}),key(20,{...kneeling,shift:[0,-.13,-.015],torso:[-42,0,5],head:[-25,0,-4],right_arm:[54,0,-16],left_arm:[72,4,20],form:[.30]}),key(30,{...kneeling,shift:[0,-.27,-.035],torso:[-43,0,4],head:[-24,0,-4],form:[0]}),key(38,{...kneeling,shift:[0,-.245,-.025],torso:[-32,0,3]}),key(46,kneeling)]},
+ {id:23,name:'collapse',length:46,keys:[key(0,{form:[1]}),key(4,{shift:[0,.025,.02],torso:[20,-5,-7],head:[16,0,8],right_arm:[-10,0,-28],left_arm:[-8,0,32],right_elbow:[20,0,0],left_elbow:[16,0,0],main_r_wr:[-2.5,2.5,.2],...droop(.2),form:[1]}),key(11,{shift:[0,-.06,-.005],torso:[-10,0,5],head:[-5,0,-4],right_arm:[26,0,-18],left_arm:[40,0,22],right_leg:[28,0,-6],left_leg:[24,0,6],right_knee:[-55,0,0],left_knee:[-58,0,0],main_r_wr:[-2.3,1.8,-.15],...droop(.6),giant_weapon:bq([-.3,-.5,-.8],[0,-.8,.5]),form:[.88]}),key(20,{...kneeling,shift:[0,-.13,-.015],torso:[-42,0,5],head:[-25,0,-4],right_arm:[54,0,-16],left_arm:[72,4,20],...droop(1),form:[.30]}),key(30,{...kneeling,shift:[0,-.27,-.035],torso:[-43,0,4],head:[-24,0,-4],form:[0]}),key(38,{...kneeling,shift:[0,-.245,-.025],torso:[-32,0,3]}),key(46,kneeling)]},
  {id:24,name:'recover',length:28,keys:[key(0,kneeling),key(6,{shift:[0,-.26,-.02],torso:[-48,0,1],head:[-8,0,0],left_arm:[76,4,18],left_elbow:[18,0,0],right_arm:[43,0,-14],right_leg:[56,0,-5],right_knee:[-106,0,0],left_knee:[-98,0,0]}),key(14,{shift:[0,-.12,-.01],torso:[-25,0,0],head:[-3,0,0],right_leg:[28,0,-4],right_knee:[-55,0,0],left_leg:[12,0,4],left_knee:[-50,0,0],right_arm:[20,0,-12],left_arm:[46,4,15],left_elbow:[15,0,0]}),key(22,{shift:[0,0,0],torso:[-6,0,0],head:[0,0,0],right_leg:[5,0,-2],right_knee:[-10,0,0],left_leg:[5,0,2],left_knee:[-10,0,0],right_arm:[8,-8,-12],right_elbow:[16,0,0],left_arm:[10,0,10],left_elbow:[8,0,0]}),key(28,{shift:[0,0,0],torso:[0,0,0],head:[0,0,0],right_leg:[0,0,-2],right_knee:[0,0,0],left_leg:[0,0,2],left_knee:[0,0,0],left_arm:[5,0,9],form:[0]})]}
 ];
 // Attacks accelerate into contact, hold only a brief impact beat, then recover.
@@ -169,56 +279,66 @@ const retime={
  13:[0,2,4,9],14:[0,5,8],15:[0,3,5,12],16:[0,6,10,14],
  17:[0,3,6,15],20:[0,3,6,9,12],21:[0,5,10]
 };
-for(const c of clips)if(retime[c.id]){c.keys.forEach((k,i)=>k.tick=retime[c.id][i]);c.length=c.keys.at(-1).tick;}
+for(const c of clips)if(retime[c.id]){if(retime[c.id].length!==c.keys.length)throw new Error(`clip ${c.name}: ${c.keys.length} keys for ${retime[c.id].length} retimed ticks`);c.keys.forEach((k,i)=>k.tick=retime[c.id][i]);c.length=c.keys.at(-1).tick;}
 const hitTick=new Map([[3,2],[4,2],[6,2],[8,2],[11,2],[13,2],[15,3],[17,3]]);
 const windIds=new Set([2,5,7,10,12,14,16]);
 const fxNames=['weapon_fx','weapon_trail_1','weapon_trail_2','weapon_trail_3','giant_fx','giant_trail_1','giant_trail_2','giant_trail_3'];
+// Palm lightning follows these hands; during the clap the sword hand's charge moves to the
+// right cradle hand, which claps together with the left one (main_l).
 const palmParts={palm_main_r:'main_r_hand',palm_main_l:'main_l_hand',palm_rear_r:'rear_r_hand',palm_rear_l:'rear_l_hand'};
+const palmHand=(n,anim)=>n==='palm_main_r'&&[12,13].includes(anim)?'support_r_hand':palmParts[n];
 const powerFxNames=[...Object.keys(palmParts),'palm_skin','chakra_fx'];
-const pnames=[...Object.keys(bodySpecs),'weapon','armor','crown','ribbon_r','ribbon_l','chakra',...['main_r','main_l','rear_r','rear_l'].flatMap(n=>[n+'_upper',n+'_forearm',n+'_hand']),'giant_weapon',...fxNames,...powerFxNames];
+const pnames=[...Object.keys(bodySpecs),'weapon','armor','crown','ribbon_r','ribbon_l','chakra',...auxArms.flatMap(n=>[n+'_upper',n+'_forearm',n+'_hand']),'giant_weapon',...fxNames,...powerFxNames];
+// How much of the Shadowlord form shows (before the death fade).
+function armorAmount(p,phase,anim){let armor=phase===2?1:phase===1?p.form[0]:0;if(anim===23&&phase===3)armor=p.form[0];if(anim===19&&(phase===1||phase===2))armor=p.form[0];return armor;}
 function posed(p,phase,anim){
- let armor=phase===2?1:phase===1?p.form[0]:0;
- if(anim===23&&phase===3)armor=p.form[0];
- if(anim===19&&(phase===1||phase===2))armor=p.form[0];
- const form=armor*p.fade[0],bodyScale=(1.20+.38*form)*p.fade[0],lift=1.05*form,hip=add([0,.75,0],p.shift),root=q(p.root),body=q(p.torso),top=add(hip,rot(body,[0,.75,0])),o={body:{t:top,q:body},head:{t:top,q:mul(body,q(p.head))}};
+ const form=armorAmount(p,phase,anim)*p.fade[0],bodyScale=(1.20+.38*form)*p.fade[0],lift=1.05*form,hip=add([0,.75,0],p.shift),root=q(p.root),body=q(p.torso),top=add(hip,rot(body,[0,.75,0])),o={body:{t:top,q:body},head:{t:top,q:mul(body,q(p.head))}};
  for(const[side,sign]of[['right',-1],['left',1]]){const sh=add(hip,rot(body,[sign*.375,.625,0])),arm=mul(body,q(p[side+'_arm'])),el=add(sh,rot(arm,[0,-.25,0])),fore=mul(arm,q(p[side+'_elbow'])),leg=q(p[side+'_leg']),pelvis=add(hip,[sign*.125,0,0]);o[side+'_arm']={t:sh,q:arm};o[side+'_forearm']={t:el,q:fore};o[side+'_leg']={t:pelvis,q:leg};o[side+'_shin']={t:add(pelvis,rot(leg,[0,-.375,0])),q:mul(leg,q(p[side+'_knee']))};if(side==='right'){
    // Blade +Y must point into the attack. Solve its final orientation in body
    // space while retaining the animated hand pivot; a hanging arm's -Y axis
    // must never silently reverse a spear thrust or turn a cut into a back strike.
-   let blade=[-15,0,-15];
-   if([2,3,4].includes(anim))blade=[-90,p.torso[1]*1.15,0];
-   if([5,6].includes(anim))blade=[-90,p.torso[1]*.35,0];
-   if(anim===20)blade=[-90,-70,0];
-   if(anim===21)blade=[-18,0,-28];
-   if([19,22,23].includes(anim))blade=[-80,-10,15];
-   if(anim===24){const u=Math.max(0,Math.min(1,-p.torso[0]/34));blade=[-15-65*u,-10*u,-15+30*u];}
-   o.weapon={t:add(el,rot(fore,[0,-.31,0])),q:q(blade),s:[1.12,1.12,1.12]};
+   // slash_wind/slash_a and spin travel toward the boss's right, so their blade is rolled
+   // half a turn about its own axis: the white edge (model -X) leads every cut.
+   let blade=q([-15,0,-15]);
+   if([2,3,4].includes(anim))blade=q([-90,p.torso[1]*1.15,0]);
+   if([2,3].includes(anim))blade=mul(blade,q([0,180,0]));
+   if([5,6].includes(anim))blade=q([-90,p.torso[1]*.35,0]);
+   if(anim===20)blade=mul(q([-90,-70,0]),q([0,180,0]));
+   if(anim===21)blade=q([-18,0,-28]);
+   if([19,22,23].includes(anim))blade=q([-80,-10,15]);
+   if(anim===24){const u=Math.max(0,Math.min(1,-p.torso[0]/34));blade=q([-15-65*u,-10*u,-15+30*u]);}
+   o.weapon={t:add(el,rot(fore,[0,-.31,0])),q:blade,s:[1.12,1.12,1.12]};
  }}
  o.armor={t:top,q:body,s:[form,form,form]};o.crown={...o.head,s:[form,form,form]};o.ribbon_r={t:add(top,rot(body,[-.2,-.38,.25])),q:mul(body,q([12,0,-8]))};o.ribbon_l={t:add(top,rot(body,[.2,-.38,.25])),q:mul(body,q([8,0,8]))};
  for(const v of Object.values(o)){v.t=add(hip,rot(root,sub(v.t,hip)));v.q=mul(root,v.q);v.t=add(times(v.t,bodyScale),[0,lift,0]);v.s=times(v.s||[1,1,1],bodyScale);}
  if(form>.01)o.weapon.s=[0,0,0];
- const auxSize={main_r:1.55,main_l:1.85,rear_r:.95,rear_l:.95};
- for(const n of['main_r','main_l','rear_r','rear_l']){const sh=p[n+'_sh'],el=p[n+'_el'],wr=p[n+'_wr'];for(const[part,a,b,base]of[['upper',sh,el,.75],['forearm',el,wr,.875]]){const delta=sub(b,a);o[n+'_'+part]={t:a,q:aimDown(delta),s:[auxSize[n]*form,Math.hypot(...delta)/base*form,auxSize[n]*form]};}o[n+'_hand']={t:wr,q:q(p[n+'_hand']),s:Array(3).fill(auxSize[n]*form)};}
- o.giant_weapon={t:add(p.main_r_wr,[0,-.2,0]),q:q(p.giant_weapon),s:Array(3).fill(2.15*form)};
- if([12,13,15,19].includes(anim))o.giant_weapon.s=[0,0,0];
+ for(const n of auxArms){const sh=p[n+'_sh'],el=p[n+'_el'],wr=p[n+'_wr'];for(const[part,a,b,base]of[['upper',sh,el,.75],['forearm',el,wr,.875]]){const delta=sub(b,a);const th=(auxThick[n]||auxSize[n])*form;o[n+'_'+part]={t:a,q:aimDown(delta),s:[th,Math.hypot(...delta)/base*form,th]};}o[n+'_hand']={t:wr,q:p[n+'_hand'],s:Array(3).fill(auxSize[n]*form)};}
+ // The big lilac fist closes around the katana grip: thumb toward the tsuba (tip), knuckles
+ // continuing the forearm, the grip passing through the curled fingers.
+ const gq=p.giant_weapon,tip=rot(gq,[0,1,0]),fore=sub(p.main_r_wr,p.main_r_el);let F=sub(fore,times(tip,dot(fore,tip)));if(Math.hypot(...F)<.2)F=rot(gq,[1,0,0]);F=unit(F);
+ const palm=cross(tip,times(F,-1)),fs=auxSize.main_r/16;o.main_r_hand.q=basisQ(tip,times(F,-1),palm);
+ o.giant_weapon={t:add(p.main_r_wr,add(add(times(F,6.2*fs),times(palm,.75*fs)),times(tip,2.6/16*2.15))),q:gq,s:Array(3).fill(2.15*form)};
  o.chakra={t:[0,3.28,1.05],q:q(p.ring),s:Array(3).fill(1.65*form)};
- for(const n of pnames.filter(n=>n.startsWith('main_')||n.startsWith('rear_')||['chakra','giant_weapon'].includes(n))){const v=o[n];v.t=add([0,2,0],rot(root,sub(v.t,[0,2,0])));v.q=mul(root,v.q);}
+ for(const n of[...auxArms.flatMap(n=>[n+'_upper',n+'_forearm',n+'_hand']),'chakra','giant_weapon']){const v=o[n];v.t=add([0,2,0],rot(root,sub(v.t,[0,2,0])));v.q=mul(root,v.q);}
  for(const v of Object.values(o)){v.t=[v.t[0],v.t[1],-v.t[2]];v.q=[-v.q[0],-v.q[1],v.q[2],v.q[3]];}
  return o;
 }
 const f=x=>(Math.abs(x)<.0000005?0:x).toFixed(6)+'f',arr=a=>'['+a.map(f).join(',')+']';
 const nbt=v=>`{translation:${arr(v.t)},left_rotation:${arr(v.q)},scale:${arr(v.s||[1,1,1])},right_rotation:[0f,0f,0f,1f]}`;
+const handModel={main_r:'puppet_hand_closed',main_l:'support_hand_l',support_r:'support_hand_r',rear_r:'puppet_hand_open',rear_l:'puppet_hand_open_l',rear2_r:'puppet_hand_claw',rear2_l:'puppet_hand_claw_l'};
 function modelFor(n,anim=0){
  if(n==='chakra_fx')return'fx_weapon/chakra_0';
  if(n.startsWith('palm_'))return palmModel(n,anim,false,0);
  if(fxNames.includes(n)){const kind=n.startsWith('weapon')&&[5,6].includes(anim)?'polearm':'katana';return'fx_weapon/'+kind+(n.includes('trail')?'_trail':'')+'_0';}
- if(n==='weapon')return[5,6].includes(anim)?'polearm':'katana';if(n==='giant_weapon')return'giant_katana';if(n.endsWith('_upper'))return'puppet_upper';if(n.endsWith('_forearm')&&!Object.hasOwn(bodySpecs,n))return'puppet_forearm';if(n.endsWith('_hand'))return(n==='main_r_hand'&&![12,13].includes(anim))||(n==='main_l_hand'&&[14,15].includes(anim))?'puppet_hand_closed':'puppet_hand_open';if(n.startsWith('ribbon_'))return'ribbon';return n;
+ if(n==='weapon')return[5,6].includes(anim)?'polearm':'katana';if(n==='giant_weapon')return'giant_katana';
+ const aux=auxArms.find(a=>n.startsWith(a+'_'));if(aux){const part=n.slice(aux.length+1),cradleArm=aux==='main_l'||aux==='support_r';return part==='hand'?handModel[aux]:(cradleArm?'support_':'puppet_')+part;}
+ if(n.startsWith('ribbon_'))return'ribbon';return n;
 }
 function palmModel(n,anim,release,variant){
- const closed=(n==='palm_main_r'&&![12,13].includes(anim))||(n==='palm_main_l'&&[14,15].includes(anim));
+ const closed=n==='palm_main_r'&&![12,13].includes(anim);
  return`fx_weapon/palm_${closed?'closed':'open'}_${release==='focus'?'focus':release?'release':'charge'}_${variant}`;
 }
-function sample(clip,t){let prev=structuredClone(defaults);const ks=clip.keys.map(k=>{prev={...prev,...k.pose};return{tick:k.tick,p:structuredClone(prev)};});let a=ks[0],b=a;for(const k of ks){if(k.tick<=t)a=k;else{b=k;break;}b=a;}const u=a.tick===b.tick?0:(t-a.tick)/(b.tick-a.tick),contact=hitTick.get(clip.id),smooth=contact!==undefined&&b.tick===contact?u*u:contact!==undefined&&a.tick>=contact?1-(1-u)*(1-u):u*u*(3-2*u);return Object.fromEntries(Object.keys(defaults).map(k=>[k,lerp(a.p[k],b.p[k],smooth)]));}
+function sample(clip,t){let prev=structuredClone(defaults);const ks=clip.keys.map(k=>{prev={...prev,...k.pose};return{tick:k.tick,p:structuredClone(prev)};});let a=ks[0],b=a;for(const k of ks){if(k.tick<=t)a=k;else{b=k;break;}b=a;}const u=a.tick===b.tick?0:(t-a.tick)/(b.tick-a.tick),contact=hitTick.get(clip.id),smooth=contact!==undefined&&b.tick===contact?u*u:contact!==undefined&&a.tick>=contact?1-(1-u)*(1-u):u*u*(3-2*u);return Object.fromEntries(Object.keys(defaults).map(k=>[k,rotKeys.has(k)?slerp(toQ(a.p[k]),toQ(b.p[k]),smooth):lerp(a.p[k],b.p[k],smooth)]));}
 // Half-tick samples make a short continuous blade trail during the fast sweep;
 // they contain only lightning, never duplicate solid swords. Shrink across the
 // blade's width as the trail ages while retaining blade length and exact grip.
@@ -245,8 +365,8 @@ function withLightning(clip,t,phase){
  const handCast=[7,8,12,13,14,15,16,17].includes(clip.id),variant=Math.floor(t/2)%2;
  const release=hit!==undefined&&t>=hit&&t<=hit+2;
  const handPower=hit===undefined?.7+.3*Math.min(t/6,1):t<hit?.85-.32*t/hit:t===hit?1.15:t===hit+1?.82:t===hit+2?.48:0;
- for(const[n,hand]of Object.entries(palmParts)){
-  const v=structuredClone(o[hand]),rear=n.includes('rear'),allow=n==='palm_main_r'?[12,13,16,17].includes(clip.id):handCast;
+ for(const n of Object.keys(palmParts)){
+  const v=structuredClone(o[palmHand(n,clip.id)]),rear=n.includes('rear'),allow=n==='palm_main_r'?[12,13,16,17].includes(clip.id):handCast;
   const on=phase===2&&allow&&visible&&handPower>0;
   v.s=on?v.s:[0,0,0];v.itemModel=palmModel(n,clip.id,hit!==undefined&&t<hit?'focus':release&&!rear,variant);o[n]=v;
  }
@@ -259,6 +379,11 @@ function withLightning(clip,t,phase){
  return o;
 }
 const poseLines=(o)=>pnames.map(n=>`data merge entity @e[tag=rlk_rd_${n},limit=1] {interpolation_duration:1,start_interpolation:0,transformation:${nbt(o[n])}${o[n].itemModel?`,item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/${o[n].itemModel}"}}`:''}}`);
+// Raiden's own skin and ribbons swap to their dull tinted copies while the armour carries
+// her: once per clip/phase change (select) and on the tick the armour crosses half form.
+const skinParts=[...Object.keys(bodySpecs),'ribbon_r','ribbon_l'];
+for(const dull of[false,true])fn('skin_'+(dull?'dull':'normal'),[`# Raiden ${dull?'darkens inside the Shadowlord armour':'regains her own colours'}; item identity only.`,...skinParts.map(n=>`data modify entity @e[tag=rlk_rd_${n},limit=1] item.components."minecraft:item_model" set value "rlk:raiden/${(n.startsWith('ribbon_')?'ribbon':n)+(dull?'_dull':'')}"`)]);
+const dullAt=(c,phase,t)=>{const p=sample(c,t);return armorAmount(p,phase,c.id)*p.fade[0]>=.5;};
 // The reference's final disappearance becomes six distinct translucent display
 // splinters lifting away from the collapsing body. Nothing persists after cleanup.
 for(let i=0;i<3;i++)model('death_shard_'+i,[box([7.2,3,7.6],[8.8,12,8.4],i===0?'deathViolet':'deathGlow'),box([7.65,2.3,7.4],[8.35,12.8,8.6],'deathWhite'),box([6.3,5.2,7.65],[7.2,8.4,8.35],'deathGlow'),box([8.8,7.8,7.7],[9.8,11.0,8.3],'deathViolet')]);
@@ -271,9 +396,9 @@ for(let t=0;t<=48;t++){
 }
 fn('death_fx_tick',Array.from({length:49},(_,t)=>`execute if score @s rdRigT matches ${t} run function rlk:boss/raiden/rig/death_fx/${t}`));
 for(const c of clips){
- const dispatch=[];for(const phase of[0,1,2,3]){const phaseName=phase===0?'normal':phase===1?'forming':phase===2?'armored':'exhausted';for(let t=0;t<=c.length;t++){fn(`poses/${phaseName}/${c.name}/${t}`,poseLines(withLightning(c,t,phase)));dispatch.push(`execute if score @s rdPhase matches ${phase} if score @s rdRigT matches ${t} run function rlk:boss/raiden/rig/poses/${phaseName}/${c.name}/${t}`);}}
+ const dispatch=[],skin0=[];for(const phase of[0,1,2,3]){const phaseName=phase===0?'normal':phase===1?'forming':phase===2?'armored':'exhausted';skin0.push(`execute if score @s rdPhase matches ${phase} run function rlk:boss/raiden/rig/skin_${dullAt(c,phase,0)?'dull':'normal'}`);for(let t=0;t<=c.length;t++){const lines=poseLines(withLightning(c,t,phase));if(t>0&&dullAt(c,phase,t)!==dullAt(c,phase,t-1))lines.push(`function rlk:boss/raiden/rig/skin_${dullAt(c,phase,t)?'dull':'normal'}`);fn(`poses/${phaseName}/${c.name}/${t}`,lines);dispatch.push(`execute if score @s rdPhase matches ${phase} if score @s rdRigT matches ${t} run function rlk:boss/raiden/rig/poses/${phaseName}/${c.name}/${t}`);}}
  fn('clip/'+c.name,[...(!c.loop?[`execute if score @s rdRigT matches ${c.length+1}.. run return 0`]:[`execute if score @s rdRigT matches ${c.length+1}.. run scoreboard players set @s rdRigT 0`]),...dispatch,...(c.id===19?['execute if score @s rdRigT matches 0 run function rlk:boss/raiden/rig/death_fx_spawn','function rlk:boss/raiden/rig/death_fx_tick']:[])]);
- fn('select/'+c.name,['# Only item identity changes here; the next pose interpolates from the current pose.',...['weapon','main_r_hand','main_l_hand',...fxNames,...powerFxNames].map(n=>`data modify entity @e[tag=rlk_rd_${n},limit=1] item.components."minecraft:item_model" set value "rlk:raiden/${modelFor(n,c.id)}"`)]);
+ fn('select/'+c.name,['# Only item identity changes here; the next pose interpolates from the current pose.',...skin0,...['weapon',...fxNames,...powerFxNames].map(n=>`data modify entity @e[tag=rlk_rd_${n},limit=1] item.components."minecraft:item_model" set value "rlk:raiden/${modelFor(n,c.id)}"`)]);
  if([7,12,14,16].includes(c.id))for(const i of[0,1])fn(`charge_mesh/${c.id}_${i}`,powerFxNames.filter(n=>n.startsWith('palm_')).map(n=>`data modify entity @e[tag=rlk_rd_${n},limit=1] item.components."minecraft:item_model" set value "rlk:raiden/${palmModel(n,c.id,false,i)}"`));
 }
 fn('init',['# Private animation state. Safe to call on datapack reload.',...['rdRigA','rdRigT','rdRigP','rdRigHit'].map(o=>`scoreboard objectives add ${o} dummy`),'scoreboard players set #four rdRigT 4']);
@@ -291,15 +416,18 @@ fn('lightning_tick',[
 ]);
 fn('cleanup',['kill @e[tag=rlk_raiden_part]','kill @e[tag=rlk_rd_death_fx]']);
 fn('flash',['# Called as the boss after a real body hit. Visual feedback only.','scoreboard players set @s rdRigHit 4','execute as @e[tag=rlk_raiden_part] run data merge entity @s {Glowing:1b,glow_color_override:13383423}']);
-// A remote hand makes the targeted ground slam visibly reach its marked circle.
+// A remote dull support hand makes the targeted ground slam visibly reach its marked circle.
 // Its entity origin is the captured ground point, never the moving boss/player.
 // Advance it after boss AI each world tick, in the same order as hazard ages:
-// summon tick = age 0; start the fast fall at age 25 and land at contact age 28.
+// summon tick = age 0; start the fast fall at age 15 and land at contact age 18
+// (pattern 13 hazard tell 18). Palm down, fingers toward +Z, palm centred on the origin.
 // It deliberately does not carry rlk_raiden_part, so rig/tick cannot teleport it.
+const slamPose=(y,s)=>`{translation:[0f,${f(y)},${f(-1.55*s/4)}],left_rotation:[-0.7071068f,0f,0f,0.7071068f],scale:[${f(s)},${f(s)},${f(s)}],right_rotation:[0f,0f,0f,1f]}`;
+const slamAt=(age,dur,y,s)=>`execute if score @s rdRigT matches ${age} run data merge entity @s {interpolation_duration:${dur},start_interpolation:0,transformation:${slamPose(y,s)}}`;
 fn('target_slam_spawn',[
  '# Called positioned at the fixed target ground point. This helper does no damage.',
  'tag @e[tag=rlk_rd_slam_new] remove rlk_rd_slam_new',
- 'summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_slam_hand","rlk_rd_slam_new"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:0,view_range:2.5f,width:16f,height:20f,shadow_radius:0f,brightness:{block:15,sky:15},transformation:{translation:[0f,7f,0f],left_rotation:[0.7071068f,0f,0f,0.7071068f],scale:[0.01f,0.01f,0.01f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/puppet_hand_open"}}}',
+ `summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_slam_hand","rlk_rd_slam_new"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:0,view_range:2.5f,width:16f,height:20f,shadow_radius:0f,brightness:{block:15,sky:15},transformation:${slamPose(7,.01)},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/support_hand_l"}}}`,
  'scoreboard players set @e[tag=rlk_rd_slam_new,limit=1] rdRigT -1',
  'tag @e[tag=rlk_rd_slam_new] remove rlk_rd_slam_new'
 ]);
@@ -307,16 +435,12 @@ fn('target_slam_tick',[
  '# @s = one floating hand, at its fixed ground origin. rdRigT is its age.',
  'execute unless entity @e[tag=rlk_raiden,scores={rdPhase=2,rdPat=13},limit=1] run return run kill @s',
  'scoreboard players add @s rdRigT 1',
- 'execute if score @s rdRigT matches 1 run data merge entity @s {interpolation_duration:5,start_interpolation:0,transformation:{translation:[0f,7f,0f],left_rotation:[0.7071068f,0f,0f,0.7071068f],scale:[3.5f,3.5f,3.5f],right_rotation:[0f,0f,0f,1f]}}',
- 'execute if score @s rdRigT matches 21 run data merge entity @s {interpolation_duration:2,start_interpolation:0,transformation:{translation:[0f,7.35f,0f],left_rotation:[0.7071068f,0f,0f,0.7071068f],scale:[3.5f,3.5f,3.5f],right_rotation:[0f,0f,0f,1f]}}',
- 'execute if score @s rdRigT matches 25 run data merge entity @s {interpolation_duration:3,start_interpolation:0,transformation:{translation:[0f,1f,0f],left_rotation:[0.7071068f,0f,0f,0.7071068f],scale:[3.5f,3.5f,3.5f],right_rotation:[0f,0f,0f,1f]}}',
- 'execute if score @s rdRigT matches 31 run data merge entity @s {interpolation_duration:2,start_interpolation:0,transformation:{translation:[0f,1.4f,0f],left_rotation:[0.7071068f,0f,0f,0.7071068f],scale:[3.5f,3.5f,3.5f],right_rotation:[0f,0f,0f,1f]}}',
- 'execute if score @s rdRigT matches 35 run data merge entity @s {interpolation_duration:5,start_interpolation:0,transformation:{translation:[0f,1.8f,0f],left_rotation:[0.7071068f,0f,0f,0.7071068f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}',
- 'execute if score @s rdRigT matches 41.. run kill @s'
+ slamAt(1,5,7,4),slamAt(11,4,7.45,4),slamAt(15,3,.8,4),slamAt(19,2,1.2,4),slamAt(23,6,1.6,0),
+ 'execute if score @s rdRigT matches 32.. run kill @s'
 ]);
 const initial=withLightning(clips[0],0,0);
 fn('spawn',['function rlk:boss/raiden/rig/cleanup',...pnames.map(n=>`summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_part","rlk_raiden_aux","rlk_rd_${n}"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:2.5f,width:16f,height:16f,shadow_radius:0f,brightness:{block:${Object.hasOwn(bodySpecs,n)?12:15},sky:15},transformation:${nbt(initial[n])},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/${modelFor(n)}"}}}`),'scoreboard players set @s rdRigA -1','scoreboard players set @s rdRigP -1','scoreboard players set @s rdRigT 0','scoreboard players set @s rdRigHit 0','execute rotated as @s rotated ~ 0 run tp @e[tag=rlk_raiden_part] ~ ~ ~ ~ 0']);
 fn('changed',['scoreboard players set @s rdRigT 0','scoreboard players operation @s rdRigA = @s rdAnim','scoreboard players operation @s rdRigP = @s rdPhase',...clips.map(c=>`execute if score @s rdAnim matches ${c.id} run function rlk:boss/raiden/rig/select/${c.name}`)]);
 fn('tick',['# @s = unique real boss. Parts inherit body yaw but never pitch.','execute unless entity @e[tag=rlk_raiden_part,limit=1] run function rlk:boss/raiden/rig/spawn','execute rotated as @s rotated ~ 0 run tp @e[tag=rlk_raiden_part] ~ ~ ~ ~ 0','execute unless score @s rdAnim = @s rdRigA run function rlk:boss/raiden/rig/changed','execute unless score @s rdPhase = @s rdRigP run function rlk:boss/raiden/rig/changed',...clips.map(c=>`execute if score @s rdAnim matches ${c.id} run function rlk:boss/raiden/rig/clip/${c.name}`),'function rlk:boss/raiden/rig/lightning_tick','execute if score @s rdRigHit matches 1 run execute as @e[tag=rlk_raiden_part] run data merge entity @s {Glowing:0b}','execute if score @s rdRigHit matches 1.. run scoreboard players remove @s rdRigHit 1','scoreboard players add @s rdRigT 1']);
-json(path.join(here,'raiden_rig_manifest.json'),{parts:pnames.length,phase:{0:'normal',1:'transforming',2:'Baleful Shadowlord',3:'exhausted'},armSilhouette:'two skin arms, giant right sword arm, giant left support palm, two smaller rear puppet arms',lightning:{weaponDisplays:8,palmDisplays:5,chakraDisplays:1,materials:'violet geometry and exposed white seams',hands:'exact hand pivot/rotation/scale; charge, inward focus, contact release; smaller rear hands never emit large release crowns',chakra:'sparse outer-rim forks; idle intermittent, charged attacks sustained; empty centre preserves face visibility'},clips:clips.map(({id,name,length,loop})=>({id,name,length,loop:!!loop})),integration:'Call rig/init from load, rig/spawn and rig/tick as the real boss at its feet. rdAnim selects a state; private rdRigT resets on rdAnim/rdPhase changes. rig/flash is optional body-hit feedback. rig/cleanup deletes all parts. Supplied skin remains byte-identical.'});
-console.log(`Built Raiden: ${pnames.length} animated parts, ${clips.length} motion states, four phase forms, three encounter objects and one illusion.`);
+json(path.join(here,'raiden_rig_manifest.json'),{parts:pnames.length,phase:{0:'normal',1:'transforming',2:'Baleful Shadowlord',3:'exhausted'},armSilhouette:'two skin arms; one big lilac sword arm (main_r) gripping the pale violet giant katana; four smaller lilac auxiliary arms fanned behind the shoulders (rear_* upper pair, rear2_* lower pair); two dull bronze-grey support hands (support_r, main_l) cradling a dull-tinted Raiden from below',palette:{armour:'arm_lilac plates, arm_shade sides, arm_deep joints, gold_dull trims, arm_tomoe/gold_dull tomoe discs',katana:'blade_pale body, blade_edge cutting edge on model -X, blade_core fuller and spine on +X, grip_dark grip, gold_dull tsuba/habaki/wraps',support:'hand_dull, hand_dull_dark, nail_glow nails and seams',raiden:`skin/ribbon *_dull copies tinted #${DULL_TINT.toString(16).toUpperCase()} while the armour is at least half formed`},blades:'Every blade frame is authored as (tip, edge); the edge (model -X) faces the direction of travel in all cuts. Rotation keys (giant_weapon, *_hand) are slerped.',lightning:{weaponDisplays:8,palmDisplays:5,chakraDisplays:1,materials:'violet geometry and exposed white seams',hands:'exact hand pivot/rotation/scale; charge, inward focus, contact release; smaller rear hands never emit large release crowns; the clap charge sits on the two support hands',chakra:'sparse outer-rim forks; idle intermittent, charged attacks sustained; empty centre preserves face visibility'},targetSlam:'dull support hand, palm down; grows from age 1, falls from age 15, contacts the ground at hazard age 18, removed at age 32',clips:clips.map(({id,name,length,loop})=>({id,name,length,loop:!!loop})),integration:'Call rig/init from load, rig/spawn and rig/tick as the real boss at its feet. rdAnim selects a state; private rdRigT resets on rdAnim/rdPhase changes. rig/select/<clip> also applies rig/skin_dull or rig/skin_normal for the current rdPhase. rig/flash is optional body-hit feedback. rig/cleanup deletes all parts. Supplied skin remains byte-identical.'});
+console.log(`Built Raiden: ${pnames.length} animated parts (big sword arm, four auxiliary arms, two cradle hands), ${clips.length} motion states, four phase forms, dull-tinted armoured skin, three encounter objects and one illusion.`);
