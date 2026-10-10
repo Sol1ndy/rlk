@@ -17,5 +17,8 @@ scoreboard players operation @a[tag=player,limit=1] energy = #burstCost100 tmp
 bossbar set rlk:narukami_state color green
 title @a[tag=player] times 5 45 15
 title @a[tag=player] subtitle {text:"갑주 파괴 · 지금 공격하세요!",color:"green",bold:true}
+execute as @a[tag=player] run function rlk:view/ttl_blank
+scoreboard players set @a[tag=player] ttlT 65
+scoreboard players set #rdCap rd 1
 playsound minecraft:entity.iron_golem.death hostile @a[tag=player] ~ ~ ~ 0.8 0.72 0.3
 execute at @s run function rlk:boss/raiden/vfx/armor_break

@@ -1,4 +1,5 @@
 function rlk:boss/raiden/camera/release_all
+function rlk:boss/raiden/caption/pattern_end
 function rlk:boss/raiden/judgment_rig/cleanup
 scoreboard players set @s rdBlink 0
 scoreboard players set @s rdWalk 0

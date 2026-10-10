@@ -102,12 +102,16 @@ bossbar set rlk:narukami_state players @a[tag=player]
 bossbar set rlk:narukami_state visible true
 scoreboard players set #rdBar rd 1
 title @a[tag=player] times 8 60 16
-title @a[tag=player] title {text:"마가츠 미타케 나루카미노 미코토",color:"light_purple",bold:true}
 title @a[tag=player] subtitle {text:"바닥의 보랏빛 예고를 보고 회피하세요",color:"white"}
+title @a[tag=player] title {text:"마가츠 미타케 나루카미노 미코토",color:"light_purple",bold:true}
+scoreboard players set @a[tag=player] vBig 84
+scoreboard players set @a[tag=player] ttlT 84
+scoreboard players set #rdCap rd 1
 playsound minecraft:entity.wither.spawn hostile @a[tag=player] ~ ~ ~ 0.7 0.62 0.3
 ''')
 write('cleanup','''
 function rlk:boss/raiden/camera/release_all
+function rlk:boss/raiden/caption/clear
 function rlk:boss/raiden/illusion/cleanup
 kill @e[tag=rlk_raiden_aux]
 function rlk:boss/raiden/bars_hide
@@ -139,8 +143,27 @@ function rlk:boss/raiden/object_vfx/world
 function rlk:boss/raiden/orb/world
 function rlk:boss/raiden/movement/world
 ''')
+# Boss captions ride on the HUD title timer: ttlT (subtitle lifetime, view/ride_tick
+# blanks the subtitle when it runs out so the 0.5 s crosshair title cannot replay it)
+# and vBig (pauses the crosshair while a big title is up). #rdCap marks a boss caption,
+# #rdCapPat one that belongs to the running pattern and ends with it.
+write('caption/expire','''
+scoreboard players set #rdCap rd 0
+scoreboard players set #rdCapPat rd 0
+''')
+write('caption/clear','''
+execute unless score #rdCap rd matches 1 run return 0
+function rlk:boss/raiden/caption/expire
+title @a[tag=player] subtitle ""
+scoreboard players set @a[tag=player,scores={ttlT=1..}] ttlT 0
+scoreboard players set @a[tag=player,scores={vBig=1..}] vBig 0
+''')
+write('caption/pattern_end','''
+execute if score #rdCapPat rd matches 1 run function rlk:boss/raiden/caption/clear
+''')
 write('pause','''
 function rlk:boss/raiden/camera/release_all
+function rlk:boss/raiden/caption/clear
 function rlk:boss/raiden/judgment_rig/cleanup
 function rlk:boss/raiden/illusion/cleanup
 function rlk:boss/raiden/movement/cleanup
@@ -244,6 +267,7 @@ execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
 ''')
 write('finish','''
 function rlk:boss/raiden/camera/release_all
+function rlk:boss/raiden/caption/pattern_end
 function rlk:boss/raiden/judgment_rig/cleanup
 scoreboard players set @s rdBlink 0
 scoreboard players set @s rdWalk 0
@@ -282,8 +306,11 @@ scoreboard players set @s rdAnim 9
 execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
 execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
 title @a[tag=player] times 8 55 16
-title @a[tag=player] title {text:"악요의 요구우 텐마",color:"light_purple",bold:true}
 title @a[tag=player] subtitle {text:"번개 갑주를 파괴하면 잠시 무력화됩니다",color:"white"}
+title @a[tag=player] title {text:"악요의 요구우 텐마",color:"light_purple",bold:true}
+scoreboard players set @a[tag=player] vBig 79
+scoreboard players set @a[tag=player] ttlT 79
+scoreboard players set #rdCap rd 1
 playsound minecraft:entity.wither.spawn hostile @a[tag=player] ~ ~ ~ 0.8 0.5 0.4
 ''')
 # The blink relocates by rdTime 3-4 and the rig reforms on 7-8, so the burst and its
@@ -336,6 +363,9 @@ scoreboard players operation @a[tag=player,limit=1] energy = #burstCost100 tmp
 bossbar set rlk:narukami_state color green
 title @a[tag=player] times 5 45 15
 title @a[tag=player] subtitle {text:"갑주 파괴 · 지금 공격하세요!",color:"green",bold:true}
+execute as @a[tag=player] run function rlk:view/ttl_blank
+scoreboard players set @a[tag=player] ttlT 65
+scoreboard players set #rdCap rd 1
 playsound minecraft:entity.iron_golem.death hostile @a[tag=player] ~ ~ ~ 0.8 0.72 0.3
 execute at @s run function rlk:boss/raiden/vfx/armor_break
 ''')
@@ -349,6 +379,7 @@ function rlk:boss/raiden/finish
 scoreboard players set @s rdCool 20
 ''')
 write('bars',f'''
+execute if score #rdCap rd matches 1 unless entity @a[tag=player,scores={{ttlT=1..}}] run function rlk:boss/raiden/caption/expire
 bossbar set rlk:narukami players @a[tag=player]
 bossbar set rlk:narukami visible true
 bossbar set rlk:narukami_state players @a[tag=player]
@@ -595,6 +626,10 @@ write('judgment_start',[call('object/clear'),'scoreboard players set @s rdUltUse
     center+'execute positioned ~ ~ ~3 run '+obj(3,'remembrance_flower',4,1,.05),
     'title @a[tag=player] times 4 85 16',
     'title @a[tag=player] subtitle {text:"꽃을 공격 → 보호막 안으로! 번개 1타 / 다른 공격 4타",color:"aqua",bold:true}',
+    'execute as @a[tag=player] run function rlk:view/ttl_blank',
+    'scoreboard players set @a[tag=player] ttlT 105',
+    'scoreboard players set #rdCap rd 1',
+    'scoreboard players set #rdCapPat rd 1',
     sound('entity.wither.ambient',.7,.5)])
 write('dome_create','''
 summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_dome"]}
@@ -766,6 +801,8 @@ function rlk:boss/raiden/test/end
 title @s times 10 40 15
 title @s subtitle {text:"로비로 돌아왔습니다",color:"gray"}
 title @s title {text:"보스 테스트 실패",color:"#E06A5A",bold:true}
+scoreboard players set @s vBig 65
+scoreboard players set @s ttlT 65
 tellraw @s '''+T+'{text:"쓰러졌습니다. 다시 도전: ",color:"gray",bold:false},'+cmd_link(TEST+'start')+']')
 write('test/won','''
 # From room/combat_clear (boss zone cleared) during a test: no next-chapter object.

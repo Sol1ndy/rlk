@@ -1,4 +1,5 @@
 function rlk:boss/raiden/camera/release_all
+function rlk:boss/raiden/caption/clear
 function rlk:boss/raiden/judgment_rig/cleanup
 function rlk:boss/raiden/illusion/cleanup
 function rlk:boss/raiden/movement/cleanup

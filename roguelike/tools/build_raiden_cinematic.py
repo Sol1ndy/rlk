@@ -126,6 +126,7 @@ execute on passengers run kill @s
 # The fight is won: both boss bars disappear now, not after the collapse.
 bossbar set rlk:narukami value 0
 function rlk:boss/raiden/bars_hide
+function rlk:boss/raiden/caption/clear
 playsound minecraft:entity.iron_golem.death hostile @a[tag=player] ~ ~ ~ .7 .7 .3
 function rlk:boss/raiden/rig/tick
 ''')
