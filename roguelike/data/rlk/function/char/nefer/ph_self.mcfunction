@@ -7,7 +7,9 @@ scoreboard players set #icd tmp 1
 scoreboard players set #basic itv 1
 execute rotated ~ 0 positioned ^ ^ ^1.5 run tag @e[tag=rlk_mob,distance=..3] add rlk_hit
 scoreboard players operation #dmgBase tmp = #dmg tmp
-execute as @e[tag=rlk_hit] at @s run function rlk:combat/apply_reset
+function rlk:combat/melee_begin
+execute as @e[tag=rlk_hit] at @s run function rlk:combat/melee_apply
+kill @e[tag=rlk_melee_origin]
 tag @e[tag=rlk_hit] remove rlk_hit
 execute if score #hitLanded tmp matches 1 run function rlk:combat/on_hit
 scoreboard players set #basic itv 0

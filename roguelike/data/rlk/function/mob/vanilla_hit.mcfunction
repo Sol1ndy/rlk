@@ -1,4 +1,7 @@
 # @s = 몹. 바닐라 피해(낙하·불·다른 몹 등)를 받음: 깎인 만큼(올림) 실제 체력에서 빼고 바닐라 체력을 다시 채움. #vh tmp = 바닐라 체력 × 100
+# The boss and mechanic objects receive damage exclusively through custom combat.
+execute if entity @s[tag=rlk_raiden] run return run data modify entity @s Health set value 1024f
+execute if entity @s[tag=rlk_rd_object] run return run data modify entity @s Health set value 1024f
 scoreboard players set #vd tmp 102400
 scoreboard players operation #vd tmp -= #vh tmp
 scoreboard players add #vd tmp 99

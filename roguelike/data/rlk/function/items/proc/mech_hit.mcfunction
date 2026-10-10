@@ -1,6 +1,6 @@
 particle minecraft:electric_spark ~ ~1 ~ 0.6 1.2 0.6 0.5 40
 particle minecraft:end_rod ~ ~2 ~ 0.1 1.5 0.1 0.02 12
-playsound minecraft:entity.lightning_bolt.impact master @a ~ ~ ~ 0.5 1.6
+execute unless score #k183 snd matches 1 run function rlk:snd/f198
 execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:120}
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

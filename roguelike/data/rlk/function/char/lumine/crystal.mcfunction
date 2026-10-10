@@ -2,7 +2,7 @@
 tag @s add rlk_ctgt
 execute at @e[tag=rlk_lstar,limit=1] facing entity @s eyes run function rlk:char/lumine/crystal_trail
 tag @s remove rlk_ctgt
-execute at @e[tag=rlk_lstar,limit=1] run playsound minecraft:block.amethyst_block.hit master @a ~ ~ ~ 0.7 1.8
+execute at @e[tag=rlk_lstar,limit=1] unless score #k345 snd matches 1 run function rlk:snd/f410
 execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:50}
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 4

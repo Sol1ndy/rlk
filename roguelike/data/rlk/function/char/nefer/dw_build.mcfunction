@@ -13,5 +13,5 @@ execute if score @s nfDew matches 3.. at @e[tag=rlk_av,limit=1] run summon minec
 execute if score @s nfDew matches 3.. at @e[tag=rlk_av,limit=1] run summon minecraft:text_display ~ ~1.14 ~ {Tags:["rlk_nfdw","rlk_nfdw_new"],billboard:"center",teleport_duration:2,background:0,brightness:{sky:15,block:15},shadow:false,alignment:"center",text:{text:"☾",color:"#F6FFE8",bold:true},transformation:{translation:[0f,-0.13f,0.01f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.8f,0.8f,0.8f]}}
 scoreboard players set @e[tag=rlk_nfdw_new] nfDwI 2
 tag @e[tag=rlk_nfdw_new] remove rlk_nfdw_new
-execute if score @s nfDew > @s nfDwP run playsound minecraft:block.amethyst_block.chime master @s ~ ~ ~ 0.6 1.8
+execute if score @s nfDew > @s nfDwP unless score #k336 snd matches 1 run function rlk:snd/f396
 scoreboard players operation @s nfDwP = @s nfDew

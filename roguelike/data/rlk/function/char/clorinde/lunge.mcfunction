@@ -23,13 +23,13 @@ execute rotated ~ 0 positioned ^ ^1 ^1 run particle minecraft:electric_spark ~ ~
 execute rotated ~ 0 positioned ^ ^1 ^2.5 run particle minecraft:electric_spark ~ ~ ~ 0.3 0.3 0.3 0.6 14
 execute rotated ~ 0 positioned ^ ^1 ^4 run particle minecraft:electric_spark ~ ~ ~ 0.3 0.3 0.3 0.6 14
 execute rotated ~ 0 positioned ^ ^1 ^2.5 run particle minecraft:sweep_attack ~ ~ ~ 0.2 0.2 1.2 0 4
-playsound minecraft:item.trident.throw master @a ~ ~ ~ 0.9 1.5
-playsound minecraft:entity.lightning_bolt.impact master @a ~ ~ ~ 0.3 1.8
+execute unless score #k250 snd matches 1 run function rlk:snd/f279
+execute unless score #k63 snd matches 1 run function rlk:snd/f66
 # 찌르며 앞으로 전진 + 찌르기 모션 + 스파크 소리
 scoreboard players operation #nSpd tmp = #clStepSpd tmp
 scoreboard players operation #nT tmp = #clStepT tmp
 function rlk:player/nudge
 scoreboard players set #fxId tmp 34
 function rlk:char/fx/play
-playsound minecraft:block.redstone_torch.burnout master @a ~ ~ ~ 0.5 1.4
-playsound minecraft:item.trident.thunder master @a ~ ~ ~ 0.25 2.0
+execute unless score #k251 snd matches 1 run function rlk:snd/f280
+execute unless score #k160 snd matches 1 run function rlk:snd/f169

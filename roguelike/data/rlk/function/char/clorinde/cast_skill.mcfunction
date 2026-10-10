@@ -12,8 +12,8 @@ scoreboard players set #clShoot tmp 1
 scoreboard players set @s clLCd 6
 scoreboard players set @s comboStep 0
 execute as @e[tag=rlk_av,limit=1] run swing @s mainhand
-playsound minecraft:item.crossbow.loading_end master @a ~ ~ ~ 0.9 0.8
-playsound minecraft:entity.lightning_bolt.thunder master @a ~ ~ ~ 0.25 2.0
+execute unless score #k262 snd matches 1 run function rlk:snd/f293
+execute unless score #k263 snd matches 1 run function rlk:snd/f294
 particle minecraft:electric_spark ~ ~1 ~ 0.5 0.7 0.5 0.3 40
 particle minecraft:dust{color:[0.77f,0.55f,1.0f],scale:1.5f} ~ ~1 ~ 0.6 0.8 0.6 0 20
 function rlk:items/hook/on_cast_skill

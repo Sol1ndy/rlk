@@ -2,8 +2,8 @@
 scoreboard players operation @s yoiSk = #yoiSkDur tmp
 scoreboard players set @s yoiPcCd 0
 scoreboard players set @s yoiPcN 0
-playsound minecraft:item.firecharge.use master @a ~ ~ ~ 0.9 1.2
-playsound minecraft:entity.firework_rocket.twinkle master @a ~ ~ ~ 0.7 1.4
+execute unless score #k81 snd matches 1 run function rlk:snd/f277
+execute unless score #k249 snd matches 1 run function rlk:snd/f278
 particle minecraft:flame ~ ~1 ~ 0.5 0.7 0.5 0.06 40
 particle minecraft:dust{color:[1.0f,0.54f,0.24f],scale:1.6f} ~ ~1 ~ 0.6 0.8 0.6 0 20
 particle minecraft:firework ~ ~1.2 ~ 0.3 0.4 0.3 0.12 15

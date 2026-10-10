@@ -10,5 +10,5 @@ execute as @e[tag=rlk_dnow] at @s run function rlk:combat/apply_reset
 execute at @e[tag=rlk_dnow] run particle minecraft:gust ~ ~1 ~ 0.2 0.3 0.2 0 1
 tag @e[tag=rlk_dnow] add rlk_dhit
 tag @e[tag=rlk_dnow] remove rlk_dnow
-playsound minecraft:entity.breeze.wind_burst master @a ~ ~ ~ 0.5 1.6
+execute unless score #k210 snd matches 1 run function rlk:snd/f233
 function rlk:char/after_hit

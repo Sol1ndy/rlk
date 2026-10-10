@@ -1,4 +1,4 @@
-playsound minecraft:entity.bee.sting master @a ~ ~ ~ 0.4 0.9
+execute unless score #k124 snd matches 1 run function rlk:snd/f132
 execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:35}
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

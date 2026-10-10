@@ -5,4 +5,4 @@ scoreboard players set #sn tmp 0
 execute at @e[tag=rlk_nfsh,limit=1] facing entity @e[tag=rlk_nfmv,limit=1] feet run function rlk:char/nefer/shadow_trail
 execute as @e[tag=rlk_nfsh] at @e[tag=rlk_nfmv,limit=1] run tp @s ~ ~ ~ facing entity @e[tag=rlk_nfsp,limit=1] feet
 kill @e[tag=rlk_nfmv]
-playsound minecraft:entity.breeze.jump master @a ~ ~ ~ 0.5 1.6
+execute unless score #k334 snd matches 1 run function rlk:snd/f394

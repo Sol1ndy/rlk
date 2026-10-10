@@ -13,7 +13,7 @@ function rlk:char/after_hit
 execute if score #hitLanded tmp matches 1 run function rlk:char/navia/q_shard
 execute rotated ~ 0 positioned ^ ^ ^4 run particle minecraft:explosion ~ ~1 ~ 2.0 0.4 2.0 0 6
 execute rotated ~ 0 positioned ^ ^ ^4 run particle minecraft:block{block_state:"minecraft:gold_block"} ~ ~0.5 ~ 2.5 0.5 2.5 0.2 60
-playsound minecraft:entity.generic.explode master @a ~ ~ ~ 1.0 0.8
-playsound minecraft:entity.firework_rocket.large_blast master @a ~ ~ ~ 1.0 0.7
+execute unless score #k221 snd matches 1 run function rlk:snd/f245
+execute unless score #k222 snd matches 1 run function rlk:snd/f246
 scoreboard players operation @s nvQ = #nvQDur tmp
 scoreboard players set @s nvQT 0

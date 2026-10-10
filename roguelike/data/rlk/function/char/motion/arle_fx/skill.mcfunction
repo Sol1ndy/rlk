@@ -1,0 +1,25 @@
+# Authored particle choreography, @s = actual player; at body with locked horizontal clip yaw.
+execute if score @s pmTick matches 0 run function rlk:char/motion/arle_fx/skill/00
+execute if score @s pmTick matches 1 run function rlk:char/motion/arle_fx/skill/01
+execute if score @s pmTick matches 2 run function rlk:char/motion/arle_fx/skill/02
+execute if score @s pmTick matches 3 run function rlk:char/motion/arle_fx/skill/03
+execute if score @s pmTick matches 4 run function rlk:char/motion/arle_fx/skill/04
+execute if score @s pmTick matches 5 run function rlk:char/motion/arle_fx/skill/05
+execute if score @s pmTick matches 6 run function rlk:char/motion/arle_fx/skill/06
+execute if score @s pmTick matches 7 run function rlk:char/motion/arle_fx/skill/07
+execute if score @s pmTick matches 8 run function rlk:char/motion/arle_fx/skill/08
+execute if score @s pmTick matches 9 run function rlk:char/motion/arle_fx/skill/09
+execute if score @s pmTick matches 10 run function rlk:char/motion/arle_fx/skill/10
+execute if score @s pmTick matches 11 run function rlk:char/motion/arle_fx/skill/11
+execute if score @s pmTick matches 12 run function rlk:char/motion/arle_fx/skill/12
+execute if score @s pmTick matches 13 run function rlk:char/motion/arle_fx/skill/13
+execute if score @s pmTick matches 14 run function rlk:char/motion/arle_fx/skill/14
+execute if score @s pmTick matches 15 run function rlk:char/motion/arle_fx/skill/15
+execute if score @s pmTick matches 16 run function rlk:char/motion/arle_fx/skill/16
+execute if score @s pmTick matches 17 run function rlk:char/motion/arle_fx/skill/17
+execute if score @s pmTick matches 18 run function rlk:char/motion/arle_fx/skill/18
+execute if score @s pmTick matches 19 run function rlk:char/motion/arle_fx/skill/19
+execute if score @s pmTick matches 20 run function rlk:char/motion/arle_fx/skill/20
+execute if score @s pmTick matches 21 run function rlk:char/motion/arle_fx/skill/21
+execute if score @s pmTick matches 22 run function rlk:char/motion/arle_fx/skill/22
+execute if score @s pmTick matches 23 run function rlk:char/motion/arle_fx/skill/23

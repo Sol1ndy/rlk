@@ -1,7 +1,7 @@
 scoreboard players set #lionQ itv 0
 particle minecraft:flame ~ ~1 ~ 1.5 0.5 1.5 0.06 40
 particle minecraft:lava ~ ~1 ~ 1.2 0.4 1.2 0 8
-playsound minecraft:entity.blaze.shoot master @a ~ ~ ~ 0.7 0.8
+execute unless score #k140 snd matches 1 run function rlk:snd/f148
 execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:150}
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

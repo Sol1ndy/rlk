@@ -9,5 +9,5 @@ attribute @s minecraft:jump_strength modifier add rlk:navia_aim -1 add_multiplie
 function rlk:view/stop_h
 function rlk:char/navia/gun_spawn
 kill @e[tag=rlk_nvopen]
-playsound minecraft:item.crossbow.loading_start master @a ~ ~ ~ 0.8 0.8
-playsound minecraft:block.chain.place master @a ~ ~ ~ 0.6 1.2
+execute unless score #k223 snd matches 1 run function rlk:snd/f247
+execute unless score #k224 snd matches 1 run function rlk:snd/f248

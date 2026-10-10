@@ -5,5 +5,6 @@ execute if score #try tmp matches 16.. run return run function rlk:room/mob_summ
 function rlk:room/mob_cell with entity @s data
 function rlk:room/mob_cell2 with storage rlk:room a
 function rlk:room/mob_pos with storage rlk:room sc
+data modify storage rlk:room sp.y set from entity @s data.cy
 function rlk:room/mob_at with storage rlk:room sp
 execute if score #placed tmp matches 0 run function rlk:room/mob_try

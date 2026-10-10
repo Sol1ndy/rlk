@@ -9,7 +9,7 @@ execute unless score @s burnI matches 10.. run return 0
 scoreboard players set @s burnI 0
 # 타는 동안 불 부착 유지
 execute unless score @s aFire matches 800.. run scoreboard players set @s aFire 800
-playsound minecraft:entity.blaze.burn master @a ~ ~ ~ 0.3 1
+execute unless score #k40 snd matches 1 run function rlk:snd/f42
 scoreboard players operation #dmg tmp = @s burnDmg
 scoreboard players set #elem tmp 1
 function rlk:element/dot

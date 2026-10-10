@@ -1,0 +1,23 @@
+# 오브젝트 동작 (@s = 플레이어). #k lob = 동작 번호
+execute if score #k lob matches 1 run return run function rlk:lobby/start
+execute if score #k lob matches 2 run return run function rlk:lobby/char
+execute if score #k lob matches 3 run return run function rlk:lobby/tut/enter
+execute if score #k lob matches 4 run return run function rlk:lobby/set/enter
+execute if score #k lob matches 5 run return run function rlk:lobby/try/enter
+execute if score #k lob matches 9 run return run function rlk:lobby/go
+execute if score #k lob matches 10 run return run function rlk:lobby/tut/next
+execute if score #k lob matches 11 run return run function rlk:lobby/ct/enter
+execute if score #k lob matches 12 run return run function rlk:lobby/tut/basic
+execute if score #k lob matches 20 run return run function rlk:lobby/set/s20
+execute if score #k lob matches 21 run return run function rlk:lobby/set/s21
+execute if score #k lob matches 22 run return run function rlk:lobby/set/s22
+execute if score #k lob matches 23 run return run function rlk:lobby/set/s23
+execute if score #k lob matches 24 run return run function rlk:lobby/set/s24
+execute if score #k lob matches 25 run return run function rlk:lobby/set/s25
+execute if score #k lob matches 26 run return run function rlk:lobby/set/s26
+execute if score #k lob matches 30 run return run function rlk:lobby/try/codex
+execute if score #k lob matches 31 run return run function rlk:lobby/try/level
+execute if score #k lob matches 32 run return run function rlk:lobby/try/inf
+execute if score #k lob matches 33 run return run function rlk:lobby/try/aura
+execute if score #k lob matches 34 run return run function rlk:lobby/try/reset
+execute if score #k lob matches 35 run return run function rlk:lobby/try/clear

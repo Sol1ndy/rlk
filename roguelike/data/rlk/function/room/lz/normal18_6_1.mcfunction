@@ -1,0 +1,43 @@
+# 구역 건설 (normal18_6, 테마 1): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill 0 200 0 19 200 19 minecraft:tuff
+fill 0 201 0 19 210 19 minecraft:stone
+fill 1 201 1 18 210 18 minecraft:air
+fill 1 209 1 18 209 18 minecraft:light[level=15]
+fill 6 200 14 9 200 16 minecraft:cobblestone
+fill 0 203 9 0 205 10 minecraft:coal_ore
+fill 0 209 13 0 210 18 minecraft:deepslate
+fill 0 202 11 0 203 12 minecraft:coal_ore
+fill 0 205 3 0 206 8 minecraft:tuff
+fill 0 204 6 0 204 9 minecraft:coal_ore
+fill 0 210 11 0 210 13 minecraft:spruce_planks
+fill 19 202 11 19 205 16 minecraft:tuff
+fill 19 208 13 19 208 14 minecraft:deepslate
+fill 19 202 4 19 205 4 minecraft:deepslate
+fill 19 205 6 19 208 11 minecraft:coal_ore
+fill 19 202 0 19 203 5 minecraft:tuff
+fill 9 205 0 14 205 0 minecraft:deepslate
+fill 1 201 0 3 202 0 minecraft:iron_ore
+fill 5 203 0 7 206 0 minecraft:cobblestone
+fill 14 207 0 17 208 0 minecraft:copper_ore
+fill 13 209 19 18 210 19 minecraft:cobblestone
+fill 3 202 19 8 205 19 minecraft:coal_ore
+fill 14 205 19 19 207 19 minecraft:spruce_planks
+fill 13 201 19 15 203 19 minecraft:spruce_planks
+fill 0 210 0 19 210 19 minecraft:polished_deepslate
+fill 1 210 1 18 210 18 minecraft:air
+fill 15 201 5 18 201 6 minecraft:tuff
+fill 18 201 7 18 201 15 minecraft:tuff
+fill 15 201 14 17 201 15 minecraft:tuff
+fill 7 201 3 8 205 4 minecraft:stone
+fill 7 206 3 8 206 4 minecraft:tuff
+fill 12 201 17 12 206 18 minecraft:deepslate
+fill 12 207 17 12 207 18 minecraft:tuff
+fill 10 201 17 11 206 18 minecraft:stone
+fill 10 207 17 11 207 18 minecraft:tuff
+execute positioned 16 201 16 run function rlk:room/prop/m_fence_z
+execute positioned 4 201 3 run function rlk:room/prop/m_pillar_a
+execute positioned 15 201 16 run function rlk:room/prop/m_rail_z
+execute positioned 13 201 12 run function rlk:room/prop/m_rail_z
+execute positioned 13 201 10 run function rlk:room/prop/m_pebble
+setblock 1 203 7 minecraft:wall_torch[facing=east]
+setblock 3 203 18 minecraft:wall_torch[facing=north]

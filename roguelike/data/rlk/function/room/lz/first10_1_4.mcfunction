@@ -1,0 +1,53 @@
+# 구역 건설 (first10_1, 테마 4): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill 0 200 -20 19 200 -1 minecraft:podzol
+fill 0 201 -20 19 210 -1 minecraft:stone
+fill 1 201 -19 18 210 -2 minecraft:air
+fill 1 209 -19 18 209 -2 minecraft:light[level=15]
+fill 15 200 -12 18 200 -9 minecraft:packed_mud
+fill 2 200 -5 6 200 -4 minecraft:packed_mud
+fill 5 200 -14 8 200 -12 minecraft:moss_block
+fill 16 200 -16 18 200 -15 minecraft:moss_block
+fill 0 209 -6 0 210 -6 minecraft:cherry_leaves[persistent=true]
+fill 0 209 -10 0 210 -10 minecraft:cherry_leaves[persistent=true]
+fill 0 201 -19 0 210 -19 minecraft:stripped_dark_oak_log
+fill 0 205 -5 0 206 -4 minecraft:andesite
+fill 19 209 -19 19 210 -18 minecraft:cherry_leaves[persistent=true]
+fill 19 209 -15 19 210 -14 minecraft:cherry_leaves[persistent=true]
+fill 19 210 -18 19 210 -15 minecraft:cobblestone
+fill 14 207 -20 19 207 -20 minecraft:calcite
+fill 3 204 -20 5 206 -20 minecraft:andesite
+fill 4 209 -20 4 210 -20 minecraft:moss_block
+fill 11 210 -20 16 210 -20 minecraft:cherry_leaves[persistent=true]
+fill 15 205 -20 15 207 -20 minecraft:andesite
+fill 16 205 -1 16 208 -1 minecraft:moss_block
+fill 3 205 -1 6 208 -1 minecraft:andesite
+fill 13 202 -1 13 204 -1 minecraft:tuff
+fill 0 210 -1 4 210 -1 minecraft:cherry_leaves[persistent=true]
+fill 5 201 -1 5 210 -1 minecraft:stripped_dark_oak_log
+fill 0 210 -20 19 210 -1 minecraft:polished_deepslate
+fill 1 210 -19 18 210 -2 minecraft:air
+fill 12 201 -5 13 201 -4 minecraft:podzol
+fill 11 201 -4 11 201 -2 minecraft:podzol
+fill 14 201 -4 18 201 -4 minecraft:podzol
+fill 12 201 -3 12 201 -2 minecraft:podzol
+fill 13 201 -3 18 201 -2 minecraft:dirt
+fill 13 202 -3 18 202 -2 minecraft:podzol
+fill 15 201 -19 16 205 -19 minecraft:mossy_stone_bricks
+fill 15 206 -19 16 206 -19 minecraft:podzol
+fill 13 201 -19 14 205 -19 minecraft:stone_bricks
+fill 13 206 -19 14 206 -19 minecraft:podzol
+execute positioned 5 201 -5 run function rlk:room/prop/i_shop
+execute positioned 3 201 -14 run function rlk:room/prop/i_rock
+execute positioned 12 201 -15 run function rlk:room/prop/i_sakura_big
+execute positioned 10 201 -3 run function rlk:room/prop/i_petal
+execute positioned 16 202 -4 run function rlk:room/prop/i_petal
+execute positioned 10 201 -12 run function rlk:room/prop/i_petal
+execute positioned 6 201 -17 run function rlk:room/prop/i_flower
+execute positioned 1 201 -9 run function rlk:room/prop/i_grass
+execute positioned 9 201 -16 run function rlk:room/prop/i_grass
+execute positioned 12 201 -12 run function rlk:room/prop/i_petal
+execute positioned 11 201 -16 run function rlk:room/prop/i_flower
+execute positioned 12 201 -14 run function rlk:room/prop/i_grass
+setblock 13 207 -19 minecraft:short_grass keep
+setblock 14 207 -19 minecraft:cherry_leaves[persistent=true] keep
+setblock 15 207 -19 minecraft:short_grass keep

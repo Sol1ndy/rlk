@@ -4,5 +4,5 @@ scoreboard players operation #gain tmp = @s gval
 execute if score treasure engN matches 2.. run function rlk:engravings/treasure/gain
 execute if score #gain tmp matches ..0 run scoreboard players set #gain tmp 1
 scoreboard players operation @a[tag=player,limit=1] gold += #gain tmp
-execute as @a[tag=player,limit=1] at @s run playsound minecraft:entity.experience_orb.pickup master @s ~ ~ ~ 0.35 1.7
+execute as @a[tag=player,limit=1] at @s unless score #k29 snd matches 1 run function rlk:snd/f30
 kill @s

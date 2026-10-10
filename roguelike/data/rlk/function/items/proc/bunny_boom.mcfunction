@@ -2,7 +2,7 @@
 kill @e[tag=rlk_decoy]
 particle minecraft:explosion ~ ~0.8 ~ 0.6 0.4 0.6 0 4
 particle minecraft:flame ~ ~0.8 ~ 1.2 0.6 1.2 0.08 60
-playsound minecraft:entity.generic.explode master @a ~ ~ ~ 0.8 1.3
+execute unless score #k64 snd matches 1 run function rlk:snd/f122
 execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:100}
 scoreboard players set #sub itv 1
 scoreboard players set #skillDmg tmp 0
@@ -13,6 +13,6 @@ tag @e[tag=rlk_mob,distance=..4] add rlk_hit
 execute as @e[tag=rlk_hit] at @s run function rlk:combat/apply_reset
 tag @e[tag=rlk_hit] remove rlk_hit
 execute as @a[tag=player,limit=1] at @e[tag=rlk_body,limit=1] run function rlk:char/after_hit
-execute if entity @e[tag=rlk_av,limit=1] as @e[tag=rlk_mob,distance=..14] run damage @s 0 minecraft:generic by @e[tag=rlk_av,limit=1]
+execute if entity @e[tag=rlk_av,limit=1] as @e[tag=rlk_mob,tag=!rlk_cmb,distance=..14] run damage @s 0 minecraft:generic by @e[tag=rlk_av,limit=1]
 kill @s
 scoreboard players set #sub itv 0

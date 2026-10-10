@@ -1,7 +1,7 @@
 # @s = 예약 표식, at @s. 반경 3칸에 공격력의 40퍼센트 바위 원소 피해
 particle minecraft:dust{color:[0.95f,0.76f,0.31f],scale:1.3f} ~ ~0.6 ~ 1.2 0.4 1.2 0 30
 particle minecraft:block{block_state:"minecraft:yellow_terracotta"} ~ ~0.4 ~ 1.0 0.2 1.0 0.1 20
-playsound minecraft:block.amethyst_block.break master @a ~ ~ ~ 0.6 0.9
+execute unless score #k142 snd matches 1 run function rlk:snd/f150
 scoreboard players set #aqE eng 5
 tag @e[tag=rlk_mob,distance=..3,sort=nearest,limit=1] add rlk_abt
 execute if entity @e[tag=rlk_abt,limit=1] at @e[tag=rlk_blossom,limit=1,sort=nearest] positioned ~ ~0.4 ~ facing entity @e[tag=rlk_abt,limit=1] eyes run function rlk:items/fx/shot

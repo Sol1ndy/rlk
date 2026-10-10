@@ -30,6 +30,8 @@ scoreboard objectives add init dummy
 scoreboard objectives add pid dummy
 scoreboard objectives add hpMaxPrev dummy
 scoreboard objectives add tmp dummy
+scoreboard objectives add lcSeen dummy
+scoreboard objectives add pkbT dummy
 scoreboard objectives add life dummy
 scoreboard objectives add devMode dummy
 scoreboard objectives add uiHash dummy
@@ -452,6 +454,7 @@ scoreboard objectives add rnEcI dummy
 scoreboard objectives add rnFcd dummy
 scoreboard objectives add rnQ dummy
 scoreboard objectives add rnRev dummy
+scoreboard objectives add snd dummy
 
 # 숄더뷰: 공격·스킬 뒤 조준선을 보는 남은 시간
 scoreboard objectives add vAimT dummy
@@ -491,6 +494,79 @@ scoreboard objectives add nfVeilT dummy
 scoreboard objectives add nfDwK dummy
 scoreboard objectives add nfDwI dummy
 scoreboard objectives add nfDwP dummy
+
+# 풀 원핵 비행: 시작 · 도착 좌표(× 1000) · 진행 틱
+scoreboard objectives add cX0 dummy
+scoreboard objectives add cY0 dummy
+scoreboard objectives add cZ0 dummy
+scoreboard objectives add cX1 dummy
+scoreboard objectives add cY1 dummy
+scoreboard objectives add cZ1 dummy
+scoreboard objectives add cF dummy
+
+# 결정 방어막의 원소(같은 원소 피해를 250% 효율로 막음)
+scoreboard objectives add shieldEl dummy
+
+# 살롱의 초대장: 멤버 번호(0 우셰르 · 1 슈발마린 · 2 크라발레타)
+scoreboard objectives add smI dummy
+
+# 대쉬: 이번 대쉬에서 단차를 넘은 횟수
+scoreboard objectives add dashUpN dummy
+
+# 로노바: 잔향 얻기 대기(틱)
+scoreboard objectives add rnEcd dummy
+
+# 로비: 계산 · 상태(#tutS 튜토리얼 단계 · #dps* DPS · #lobInf · #lobAura)
+scoreboard objectives add lob dummy
+
+# 로비 오브젝트: 묶음 번호 · 동작
+scoreboard objectives add lgid dummy
+scoreboard objectives add lact dummy
+
+# 로비: 지금 있는 방(1 로비 · 2 튜토리얼 · 3 설정 · 4 체험)
+scoreboard objectives add lobRoom dummy
+# 접속 끊음 횟수(다시 접속하면 로비로)
+scoreboard objectives add rlkLeave minecraft.custom:minecraft.leave_game
+
+# 커스텀 몹(cm): 연결 번호 · 상태 · 타이머 · 쿨 · 바라보는 방향 · 방패 · 투사체 값
+scoreboard objectives add cmId dummy
+scoreboard objectives add cmS dummy
+scoreboard objectives add cmT dummy
+scoreboard objectives add cmCd dummy
+scoreboard objectives add cmCd2 dummy
+scoreboard objectives add cmF dummy
+scoreboard objectives add cmYaw dummy
+scoreboard objectives add cmSh dummy
+scoreboard objectives add cmShM dummy
+scoreboard objectives add cmN dummy
+scoreboard objectives add cmD dummy
+scoreboard objectives add cmD2 dummy
+scoreboard objectives add cmLv dummy
+scoreboard objectives add cmEl dummy
+scoreboard objectives add cmV dummy
+scoreboard objectives add cmVx dummy
+scoreboard objectives add cmVy dummy
+scoreboard objectives add cmVz dummy
+scoreboard objectives add cmPx dummy
+scoreboard objectives add cmPy dummy
+scoreboard objectives add cmPz dummy
+
+# 시점: 다른 제목 글자가 떠 있는 동안 조준점 쉬기
+
+# 시점: 큰 제목이 떠 있는 동안 조준점 쉬기 · 지난 틱의 ttlT
+scoreboard objectives add vBig dummy
+scoreboard objectives add vTtp dummy
+
+# F5 위쪽 시점: 웅크리기 직전 상태 · 우클릭(사용 중) 표시 · 누른 틱 수
+scoreboard objectives add vSnk dummy
+scoreboard objectives add rcU dummy
+scoreboard objectives add rcT dummy
+
+scoreboard objectives add rlkMenu trigger
+# 지도 화면: 여는 중 · 연 뒤 틱 · 4번 칸을 들고 있던 직전 상태
+scoreboard objectives add vMap dummy
+scoreboard objectives add vMapT dummy
+scoreboard objectives add vMapH dummy
 
 scoreboard objectives add dbgDropI trigger
 scoreboard objectives add dbgPage trigger
@@ -557,7 +633,25 @@ scoreboard players set #c600 tmp 600
 scoreboard players set #c2 tmp 2
 scoreboard players set #c10 tmp 10
 scoreboard players set #10 tmp 10
+scoreboard objectives remove vTtl
+
 # ===== 조절 지점 =====
+# 로비 · 튜토리얼 · 설정 · 체험 방(lobby/): 항상 불러와 둠
+forceload add 80 14 134 64
+scoreboard players set #c2 lob 2
+scoreboard players set #c5 lob 5
+scoreboard players set #c20 lob 20
+scoreboard players set #c40 lob 40
+# 시작 아이템 개수: 지금은 1개 고정(나중에 사파이어로 해금)
+data modify storage rlk:config start_picks set value 1
+# 결정 방어막: 같은 원소 피해를 막는 효율(%)
+scoreboard players set #shElEff tmp 250
+# 아를레키노 스킬(재가 된 만상): 맞은 적 경직(틱) · 넉백(칸/틱 × 1000)
+scoreboard players set #arSkStun tmp 12
+scoreboard players set #arSkKb tmp 550
+# 풀 원핵이 날아가는 시간(틱) · 포물선 높이(× 0.001칸 ÷ 4 를 시간² 로 나눈 값: 36 = 10틱일 때 0.9칸)
+scoreboard players set #cN tmp 10
+scoreboard players set #cArc tmp 36
 # 각인 만월: (2) 달 반응 피해 +% · (4) 원소 마스터리 · 지속(틱)
 scoreboard players set #fmDmg tmp 15
 scoreboard players set #fmEm tmp 80
@@ -572,7 +666,7 @@ scoreboard players set #cgMoonDur tmp 240
 scoreboard players set #cgMoon tmp 15
 # 네페르: 기본 원소 마스터리 보너스 · 스킬 충전 시간(틱) · 그림자 춤(틱) · 풀 이슬 간격(틱 × 100, 모래의 딸 보너스로 빨라짐) · 기만의 핵 시간(틱) · 기만의 장막 시간(틱)
 scoreboard players set #nfEm tmp 100
-scoreboard players set #nfCd tmp 180
+scoreboard players set #nfCd tmp 240
 scoreboard players set #nfSDT tmp 180
 scoreboard players set #nfDewGap tmp 5000
 scoreboard players set #nfDecDur tmp 300
@@ -589,10 +683,12 @@ scoreboard players set #rnRevPct tmp 30
 scoreboard players set #viewTurn tmp 4500
 scoreboard players set #viewAimHold tmp 15
 # 로노바 · 공허: 공허 공격 1회의 잠식(%) · 잠식 최대(%) · 마지막 공허 공격 뒤 잠식이 줄기 시작하는 시간(틱, 그 뒤 1초에 1%) · 재연 간격(틱) · 일반 공격 간격(틱, 4타 뒤). 계수는 char/ronova/na
-scoreboard players set #rnErHit tmp 5
-scoreboard players set #rnErMax tmp 40
+scoreboard players set #rnErHit tmp 2
+scoreboard players set #rnErMax tmp 20
 scoreboard players set #rnErHold tmp 100
-scoreboard players set #rnGap tmp 10
+scoreboard players set #rnGap tmp 40
+# 로노바: 잔향을 얻은 뒤 다음 잔향을 얻을 수 있기까지(틱)
+scoreboard players set #rnEcdT tmp 40
 scoreboard players set #rnNaCd tmp 10
 scoreboard players set #rnNaCd4 tmp 16
 scoreboard players set #c25 tmp 25
@@ -636,8 +732,8 @@ scoreboard players set #arDirDur tmp 600
 scoreboard players set #arSkDelay tmp 7
 scoreboard players set #arAbs tmp 65
 scoreboard players set #arAbsMax tmp 145
-scoreboard players set #arHealBol tmp 4
-scoreboard players set #arHealAtk tmp 10
+scoreboard players set #arHealBol tmp 30
+scoreboard players set #arHealAtk tmp 40
 # 클로린드: 밤 순찰 지속(틱) / 사격 간격(공격 속도 100% 기준 틱×100) / 사격으로 얻는 생명의 계약(%) / 밤 꿰뚫기 사이 간격(틱) / 원소폭발로 얻는 생명의 계약(%) / 고유 특성 치명타 확률(스택당 %) · 지속(틱)
 scoreboard players set #clDur tmp 180
 scoreboard players set #clShotCd tmp 700
@@ -659,7 +755,7 @@ scoreboard players set #skDrain tmp 35
 scoreboard players set #skModeDur tmp 180
 scoreboard players set #skDashDur tmp 60
 scoreboard players set #skDashCd tmp 160
-scoreboard players set #skDashSpd tmp 200
+scoreboard players set #skDashSpd tmp 150
 #   허계 균열: 흡수 1개당 얻는 양 / 생성 간격(틱) / 남아 있는 시간(틱) — 최대 3개, 흡수 범위 6칸은 char/skirk/absorb
 scoreboard players set #skRiftGain tmp 800
 scoreboard players set #skRiftCdT tmp 50
@@ -697,8 +793,8 @@ scoreboard players set #dashCoolT tmp 5
 scoreboard players set #comboD12 tmp 600
 scoreboard players set #comboD21 tmp 1000
 # 봉인된 검 → 마검: 키리온 변신에 필요한 처치 수 / 금단의 도서 → 데모노미콘 변신에 필요한 페이지 수
-scoreboard players set #kirionNeed tmp 300
-scoreboard players set #forbNeed tmp 500
+scoreboard players set #kirionNeed tmp 150
+scoreboard players set #forbNeed tmp 250
 
 # 액션바 HUD: 다른 액션바 안내(골드 부족 등)가 뜰 때 HUD 를 잠시 멈추는 시간(틱)
 scoreboard players set #hudHoldT tmp 40
@@ -1045,6 +1141,14 @@ execute unless score #aqN eng matches 0.. run scoreboard players set #aqN eng 0
 scoreboard players set @a[tag=player] invDirty 2
 # 시점 시스템: 처음이면 켜 둠 / 카메라 위치 기본값(아바타 머리에서 오른쪽 0.9, 위 0.3, 뒤 3.3)
 execute unless score #on view matches 0..1 run scoreboard players set #on view 1
+# 시점 종류: 1 숄더뷰 · 2 F5 위쪽 시점(처음엔 2)
+scoreboard players set #vmode view 2
+# F5 위쪽 시점: 카메라 거리(칸) · 받침 크기(1 = 머리 위 약 1칸, 0.5 = 0.5칸, 1.5 = 1.5칸)
+execute unless data storage rlk:view ride run data modify storage rlk:view ride set value {d:3.5d,s:0.5d}
+# 카메라 거리·높이 기본을 한 칸씩 당긴 판(ridev 2): 한 번만 '보통'으로 맞춤
+execute unless data storage rlk:view {ridev:2} run data modify storage rlk:lobby cfg set value {dist:1,side:0,h:1}
+execute unless data storage rlk:view {ridev:2} run data modify storage rlk:view ride set value {d:3.5d,s:0.5d}
+data modify storage rlk:view ridev set value 2
 execute unless score #avId view matches 0.. run scoreboard players set #avId view 0
 execute unless data storage rlk:view cam run data modify storage rlk:view cam set value {right:0.9d,up:0.3d,back:3.3d}
 function rlk:view/cam_calc
@@ -1056,8 +1160,10 @@ execute unless score #spr view matches 0..1 run scoreboard players set #spr view
 function rlk:view/tune_apply
 function rlk:view/rays
 team add rlk_cam
+team modify rlk_cam seeFriendlyInvisibles false
 # 경직용 팀: 몸(1인칭의 플레이어 / 숄더뷰의 아바타)이 들어 있고, 경직 중인 몹이 잠깐 들어온다
 team add rlk_stun
+team modify rlk_stun seeFriendlyInvisibles false
 kill @e[tag=rlk_view]
 function rlk:items/register
 function rlk:char/reg_items
@@ -1091,6 +1197,8 @@ tag @e remove rlk_mob
 kill @e[tag=rlk_hb_bg]
 kill @e[tag=rlk_hb_fg]
 kill @e[tag=rlk_hb_num]
+kill @e[tag=rlk_hb_lv]
+kill @e[tag=rlk_hb_er]
 kill @e[tag=rlk_hb_icon]
 kill @e[tag=rlk_mshield]
 # 악요의 눈 조각은 리로드 때 새로 만든다(모양이 바뀌었을 수 있음)
@@ -1116,3 +1224,86 @@ forceload add 1000000 1000000
 team add rlk_nfshade
 team modify rlk_nfshade color dark_green
 team modify rlk_nfshade collisionRule never
+# ===== 1챕터 커스텀 몹(cm) =====
+scoreboard players set #15 tmp 15
+scoreboard players set #6 tmp 6
+scoreboard players set #5000 tmp 5000
+scoreboard players set #25 tmp 25
+scoreboard players set #5 tmp 5
+scoreboard players set #4 tmp 4
+# 피해(원피해, 1레벨 기준 — 몹 레벨 보정은 player/take_damage). 기존 허스크 근접 = 15
+scoreboard players set #cmD_sw tmp 15
+scoreboard players set #cmD_ar tmp 14
+scoreboard players set #cmD_fb tmp 8
+scoreboard players set #cmD_icD tmp 12
+scoreboard players set #cmD_icB tmp 8
+scoreboard players set #cmD_shS tmp 15
+scoreboard players set #cmD_shR tmp 20
+scoreboard players set #cmD_cn tmp 22
+# 공격 간격(틱)
+scoreboard players set #cmCd_sw tmp 30
+scoreboard players set #cmCd_ar tmp 50
+scoreboard players set #cmCd_fm tmp 80
+scoreboard players set #cmCd_im tmp 90
+scoreboard players set #cmCd_sh tmp 35
+scoreboard players set #cmCd2_sh tmp 140
+scoreboard players set #cmCd_cn tmp 90
+# 선딜(틱): 검사 베기 · 궁수 차지(마지막 #cmW_arL 틱은 조준 고정) · 불 마법사 차지/발사 간격 · 얼음 마법사 차지/고드름 매달림 · 방패병 휘두르기/돌진 준비/돌진 끝 휘두르기 · 대포 심지
+scoreboard players set #cmW_sw tmp 12
+scoreboard players set #cmW_ar tmp 36
+scoreboard players set #cmW_arL tmp 10
+scoreboard players set #cmW_fm tmp 40
+scoreboard players set #cmW_fmG tmp 10
+scoreboard players set #cmW_im tmp 30
+scoreboard players set #cmW_imH tmp 24
+scoreboard players set #cmW_sh tmp 16
+scoreboard players set #cmW_shR tmp 26
+scoreboard players set #cmW_shE tmp 8
+scoreboard players set #cmW_cn tmp 36
+# 대포: 조준(표시) 뒤 발사까지
+scoreboard players set #cmW_cnD tmp 16
+# 방패 내구도 = 최대 체력의 #cmShPct %, 방패병이 도는 속도(0.01°/틱)
+scoreboard players set #cmShPct tmp 70
+scoreboard players set #cmTurn tmp 600
+scoreboard players set #cmTurnN tmp -600
+scoreboard players set #m1 tmp -1
+scoreboard players set #3 tmp 3
+scoreboard players set #35 tmp 35
+team add rlk_cmx
+team modify rlk_cmx collisionRule never
+
+# 지도 클릭 화면 (2026-10-10)
+scoreboard objectives add vMapL dummy
+scoreboard objectives add vMapR dummy
+scoreboard players set #128 view 128
+execute as @a[tag=player,scores={vMap=1}] run function rlk:view/map_close
+
+# 검사 디스플레이 모션: 상태/피격/회복/이동/자세/사망 시간
+scoreboard objectives add cmAF dummy
+scoreboard objectives add cmAH dummy
+scoreboard objectives add cmAR dummy
+scoreboard objectives add cmAX dummy
+scoreboard objectives add cmAZ dummy
+scoreboard objectives add cmAP dummy
+scoreboard objectives add cmAD dummy
+execute as @e[tag=rlk_cmb,tag=rlk_cm_sw] at @s run function rlk:cm/sw/rig/rebuild
+
+execute as @e[tag=rlk_cmb,tag=rlk_cm_ar] at @s run function rlk:cm/ar/rig/rebuild
+
+execute as @e[tag=rlk_cmb,tag=rlk_cm_fm] at @s run function rlk:cm/fm/rig/rebuild
+
+execute as @e[tag=rlk_cmb,tag=rlk_cm_im] at @s run function rlk:cm/im/rig/rebuild
+
+execute as @e[tag=rlk_cmb,tag=rlk_cm_sh] at @s run function rlk:cm/sh/rig/rebuild
+
+execute as @e[tag=rlk_cmb,tag=rlk_cm_cn] at @s run function rlk:cm/cn/rig/rebuild
+
+# 리로드 중 남은 짧은 피격 이동/방향 표식 정리
+kill @e[tag=rlk_plkb]
+kill @e[tag=rlk_plkb_source]
+kill @e[tag=rlk_melee_origin]
+
+function rlk:char/motion/install
+
+# Narukami encounter and rig, rebuilt without refilling an existing boss.
+function rlk:boss/raiden/init

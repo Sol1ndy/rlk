@@ -33,5 +33,5 @@ particle minecraft:dust{color:[0.80,0.05,0.18],scale:1.8} ^4.00 ^0.9 ^6.93 0.05 
 particle minecraft:dust{color:[0.80,0.05,0.18],scale:1.8} ^5.14 ^0.9 ^6.13 0.05 0.15 0.05 0 2
 particle minecraft:dust{color:[0.80,0.05,0.18],scale:1.8} ^6.13 ^0.9 ^5.14 0.05 0.15 0.05 0 2
 particle minecraft:sweep_attack ^ ^1 ^4 2 0.3 2 0 6
-playsound minecraft:entity.player.attack.sweep master @a ~ ~ ~ 1.0 0.5
-playsound minecraft:item.trident.riptide_2 master @a ~ ~ ~ 0.6 0.6
+execute unless score #k282 snd matches 1 run function rlk:snd/f317
+execute unless score #k283 snd matches 1 run function rlk:snd/f318

@@ -74,3 +74,4 @@ scoreboard players operation @s hpMaxPrev = @s maxHealth
 effect give @s minecraft:instant_health 1 20 true
 # 자동 초기화 안 되는 아이템 스택 초기화
 function rlk:player/reset_stacks
+scoreboard players set @s shieldEl 0

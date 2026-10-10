@@ -27,5 +27,5 @@ particle minecraft:dust{color:[0.05,0.0,0.02],scale:4.0} ^ ^6 ^6 0.3 0.3 0.1 0 8
 particle minecraft:dust{color:[1.0,0.35,0.4],scale:1.5} ^ ^6 ^5.8 0 0 0 0 2
 particle minecraft:reverse_portal ^ ^1 ^5 2.5 1.5 2.5 0.5 120
 particle minecraft:dust{color:[0.75,0.05,0.15],scale:2.0} ^ ^0.5 ^5 2.5 0.2 2.5 0 60
-playsound minecraft:entity.elder_guardian.curse master @a ~ ~ ~ 0.6 0.7
-playsound minecraft:entity.wither.spawn master @a ~ ~ ~ 0.35 1.6
+execute unless score #k278 snd matches 1 run function rlk:snd/f313
+execute unless score #k279 snd matches 1 run function rlk:snd/f314

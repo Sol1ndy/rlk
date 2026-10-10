@@ -1,0 +1,171 @@
+{
+  "parts": 43,
+  "phase": {
+    "0": "normal",
+    "1": "transforming",
+    "2": "Baleful Shadowlord",
+    "3": "exhausted"
+  },
+  "armSilhouette": "two skin arms, giant right sword arm, giant left support palm, two smaller rear puppet arms",
+  "lightning": {
+    "weaponDisplays": 8,
+    "palmDisplays": 5,
+    "chakraDisplays": 1,
+    "materials": "violet geometry and exposed white seams",
+    "hands": "exact hand pivot/rotation/scale; charge, inward focus, contact release; smaller rear hands never emit large release crowns",
+    "chakra": "sparse outer-rim forks; idle intermittent, charged attacks sustained; empty centre preserves face visibility"
+  },
+  "clips": [
+    {
+      "id": 0,
+      "name": "idle",
+      "length": 40,
+      "loop": true
+    },
+    {
+      "id": 1,
+      "name": "walk",
+      "length": 18,
+      "loop": true
+    },
+    {
+      "id": 2,
+      "name": "slash_wind",
+      "length": 6,
+      "loop": false
+    },
+    {
+      "id": 3,
+      "name": "slash_a",
+      "length": 7,
+      "loop": false
+    },
+    {
+      "id": 4,
+      "name": "slash_b",
+      "length": 7,
+      "loop": false
+    },
+    {
+      "id": 5,
+      "name": "thrust_wind",
+      "length": 6,
+      "loop": false
+    },
+    {
+      "id": 6,
+      "name": "thrust",
+      "length": 9,
+      "loop": false
+    },
+    {
+      "id": 7,
+      "name": "cast_wind",
+      "length": 10,
+      "loop": false
+    },
+    {
+      "id": 8,
+      "name": "cast",
+      "length": 9,
+      "loop": false
+    },
+    {
+      "id": 9,
+      "name": "transform",
+      "length": 46,
+      "loop": false
+    },
+    {
+      "id": 10,
+      "name": "arm_sweep_wind",
+      "length": 8,
+      "loop": false
+    },
+    {
+      "id": 11,
+      "name": "arm_sweep",
+      "length": 9,
+      "loop": false
+    },
+    {
+      "id": 12,
+      "name": "clap_wind",
+      "length": 8,
+      "loop": false
+    },
+    {
+      "id": 13,
+      "name": "clap",
+      "length": 9,
+      "loop": false
+    },
+    {
+      "id": 14,
+      "name": "slam_wind",
+      "length": 8,
+      "loop": false
+    },
+    {
+      "id": 15,
+      "name": "slam",
+      "length": 12,
+      "loop": false
+    },
+    {
+      "id": 16,
+      "name": "judgment_wind",
+      "length": 14,
+      "loop": false
+    },
+    {
+      "id": 17,
+      "name": "judgment",
+      "length": 15,
+      "loop": false
+    },
+    {
+      "id": 18,
+      "name": "stagger",
+      "length": 30,
+      "loop": false
+    },
+    {
+      "id": 19,
+      "name": "death",
+      "length": 48,
+      "loop": false
+    },
+    {
+      "id": 20,
+      "name": "spin",
+      "length": 12,
+      "loop": true
+    },
+    {
+      "id": 21,
+      "name": "dash",
+      "length": 10,
+      "loop": true
+    },
+    {
+      "id": 22,
+      "name": "exhausted",
+      "length": 60,
+      "loop": true
+    },
+    {
+      "id": 23,
+      "name": "collapse",
+      "length": 46,
+      "loop": false
+    },
+    {
+      "id": 24,
+      "name": "recover",
+      "length": 28,
+      "loop": false
+    }
+  ],
+  "integration": "Call rig/init from load, rig/spawn and rig/tick as the real boss at its feet. rdAnim selects a state; private rdRigT resets on rdAnim/rdPhase changes. rig/flash is optional body-hit feedback. rig/cleanup deletes all parts. Supplied skin remains byte-identical."
+}

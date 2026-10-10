@@ -1,2 +1,3 @@
-$fill $(x0) 204 $(z0) $(x1) 205 $(z1) minecraft:polished_diorite
-$fill $(x0) 201 $(z0) $(x1) 203 $(z1) minecraft:iron_bars
+$fill $(x0) $(l0) $(z0) $(x1) $(l1) $(z1) $(fb)
+$fill $(tx0) $(tm) $(tz0) $(tx1) $(tm) $(tz1) minecraft:polished_diorite
+$fill $(x0) $(y0) $(z0) $(x1) $(y1) $(z1) minecraft:iron_bars

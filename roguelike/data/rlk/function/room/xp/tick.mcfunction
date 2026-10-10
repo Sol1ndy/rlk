@@ -11,5 +11,5 @@ execute as @a[tag=player,limit=1] run function rlk:player/level/add_xp
 execute store result storage rlk:room o.x double 0.01 run random value -22..22
 execute store result storage rlk:room o.z double 0.01 run random value -22..22
 function rlk:room/xp/orb with storage rlk:room o
-playsound minecraft:entity.experience_orb.pickup master @a ~ ~ ~ 0.35 0.9
+execute unless score #k21 snd matches 1 run function rlk:snd/f21
 particle minecraft:happy_villager ~ ~1.2 ~ 0.3 0.3 0.3 0 2

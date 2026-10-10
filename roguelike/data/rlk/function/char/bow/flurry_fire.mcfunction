@@ -5,4 +5,4 @@ scoreboard players operation #bCoef tmp = #flurryCoef tmp
 scoreboard players set #bFl tmp 1
 function rlk:char/bow/na_shot
 scoreboard players set #bFl tmp 0
-playsound minecraft:entity.arrow.shoot master @a ~ ~ ~ 0.5 1.7
+execute unless score #k228 snd matches 1 run function rlk:snd/f255

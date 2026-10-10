@@ -2,7 +2,8 @@
 scoreboard players set #t view 0
 effect give @s minecraft:invisibility infinite 0 true
 attribute @s minecraft:camera_distance base set 0
-execute unless score @s bowT matches 1.. run item replace entity @e[tag=rlk_av,limit=1] weapon.mainhand from entity @s hotbar.0
+execute unless score @s pmVisible matches 1 unless score @s pmActive matches 1 unless score @s bowT matches 1.. run item replace entity @e[tag=rlk_av,limit=1] weapon.mainhand from entity @s hotbar.0
+execute unless score @s pmVisible matches 1 unless score @s pmActive matches 1 unless score @s bowT matches 1.. run function rlk:view/av_unwrap
 # 법구(로노바): 아바타는 아무것도 들지 않는다(법구는 옆에 떠 있음)
 execute if score #charN tmp matches 7..8 run item replace entity @e[tag=rlk_av,limit=1] weapon.mainhand with minecraft:air
 # 불러와진 청크에 예전 아바타가 남아 있으면 지운다

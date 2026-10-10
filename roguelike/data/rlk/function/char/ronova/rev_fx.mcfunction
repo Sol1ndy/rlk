@@ -98,6 +98,6 @@ particle minecraft:dust{color:[0.88,0.12,0.22],scale:1.0} ~5.80 ~0.3 ~-1.55 0.05
 particle minecraft:reverse_portal ~ ~1 ~ 1.5 0.8 1.5 1.2 120
 particle minecraft:squid_ink ~ ~0.3 ~ 2.5 0.1 2.5 0.15 60
 particle minecraft:sweep_attack ~ ~0.6 ~ 3 0.2 3 0 12
-playsound minecraft:entity.warden.sonic_boom master @a ~ ~ ~ 0.6 0.8
-playsound minecraft:entity.generic.explode master @a ~ ~ ~ 0.6 0.6
-playsound minecraft:block.respawn_anchor.deplete master @a ~ ~ ~ 1.0 0.6
+execute unless score #k272 snd matches 1 run function rlk:snd/f305
+execute unless score #k143 snd matches 1 run function rlk:snd/f306
+execute unless score #k150 snd matches 1 run function rlk:snd/f307

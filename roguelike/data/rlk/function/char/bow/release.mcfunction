@@ -10,8 +10,8 @@ scoreboard players set #aSub tmp 8
 scoreboard players set #aLife tmp 12
 execute if score #ct tmp < #bowT1 tmp run function rlk:char/bow/shot_aim
 execute if score #ct tmp >= #bowT1 tmp run function rlk:char/bow/shot_full
-execute anchored eyes positioned ^ ^-0.1 ^0.4 run function rlk:char/bow/spawn
+execute positioned ~ ~1.62 ~ positioned ^ ^-0.1 ^0.4 run function rlk:char/bow/spawn
 tag @e[tag=rlk_arrnew] remove rlk_arrnew
-playsound minecraft:entity.arrow.shoot master @a ~ ~ ~ 1.0 1.0
+execute unless score #k233 snd matches 1 run function rlk:snd/f260
 # 요이미야: 모아 둔 염초 화살
 execute if score #charN tmp matches 2 if score #ct tmp >= #bowT1 tmp if score #bK tmp matches 1.. run function rlk:char/yoimiya/kindle_fire

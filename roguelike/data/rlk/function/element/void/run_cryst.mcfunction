@@ -6,7 +6,7 @@ scoreboard players set @e[tag=rlk_cr_new] rxEl 5
 tag @e[tag=rlk_cr_new] remove rlk_cr_new
 particle minecraft:reverse_portal ~ ~1 ~ 0.3 0.4 0.3 0.05 25
 particle minecraft:dust{color:[0.88,0.12,0.22],scale:1.2} ~ ~1 ~ 0.3 0.4 0.3 0 12
-playsound minecraft:block.amethyst_block.break master @a ~ ~ ~ 0.8 0.8
-playsound minecraft:block.respawn_anchor.charge master @a ~ ~ ~ 0.5 1.4
+execute unless score #k59 snd matches 1 run function rlk:snd/f61
+execute unless score #k20 snd matches 1 run function rlk:snd/f62
 execute store result score #cc tmp if entity @e[tag=rlk_crystal]
 execute if score #cc tmp matches 4.. run kill @e[tag=rlk_crystal,limit=1]

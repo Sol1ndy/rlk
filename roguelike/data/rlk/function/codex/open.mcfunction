@@ -1,3 +1,5 @@
+# 다른 화면의 복귀 좌표가 지도 방으로 저장되지 않게 한다.
+execute if score @s vMap matches 1 run return run function rlk:char/deny {t:"지도를 먼저 닫아 주세요"}
 # @s = 플레이어, at @s. 도감 안이면 돌아가고, 아니면 선택 공간과 같은 방으로 이동해 도감(모드 6)을 연다
 execute if score @s pkMode matches 6 run return run function rlk:lvup/exit
 execute if score @s pkMode matches 1.. run return 0
@@ -20,4 +22,4 @@ scoreboard players set @s pkConf 0
 scoreboard players set @s cxTab 0
 scoreboard players set @s cxPage 0
 scoreboard players set @s pkRedraw 2
-playsound minecraft:block.portal.trigger master @s ~ ~ ~ 0.25 1.8
+execute unless score #k71 snd matches 1 run function rlk:snd/f76

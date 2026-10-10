@@ -17,8 +17,7 @@ scoreboard players set @s skBurst 1
 kill @e[tag=rlk_skb]
 execute rotated ~ 0 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_skb"]}
 execute rotated ~ 0 run tp @e[tag=rlk_skb] ~ ~ ~ ~ ~
+execute if entity @e[tag=rlk_pm_basis,limit=1] rotated as @e[tag=rlk_pm_basis,limit=1] rotated ~ 0 run tp @e[tag=rlk_skb] ~ ~ ~ ~ 0
 execute as @e[tag=rlk_av,limit=1] run swing @s mainhand
-playsound minecraft:item.trident.thunder master @a ~ ~ ~ 0.4 1.9
-playsound minecraft:block.glass.break master @a ~ ~ ~ 0.8 0.5
 function rlk:items/hook/on_cast_burst
 function rlk:combat/on_skill

@@ -1,0 +1,2 @@
+scoreboard players set #k72 snd 1
+playsound minecraft:ui.button.click master @s ~ ~ ~ 0.5 1.2

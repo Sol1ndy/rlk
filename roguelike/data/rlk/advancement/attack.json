@@ -5,6 +5,6 @@
     }
   },
   "rewards": {
-    "function": "rlk:combat/on_attack"
+    "function": "rlk:combat/input/attack_event"
   }
 }

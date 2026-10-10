@@ -10,5 +10,7 @@ scoreboard players remove @s pkSubT 1
 execute if score @s pkSubT matches 1.. run return 0
 scoreboard players set @s pkSubT 20
 title @s times 0 30 5
-title @s subtitle [{"text":"고를 아이템 ","color":"#FFE08A"},{"score":{"name":"@s","objective":"pkPending"},"color":"white","bold":true},{"text":"개  ·  ","color":"#FFE08A"},{"text":"Shift + F","color":"white"},{"text":" 로 선택","color":"gray"}]
-title @s title {"text":""}
+execute if score #on view matches 1 if score #vmode view matches 2 run title @s subtitle [{"text":"고를 아이템 ","color":"#FFE08A"},{"score":{"name":"@s","objective":"pkPending"},"color":"white","bold":true},{"text":"개  ·  ","color":"#FFE08A"},{"text":"웅크리기(Shift)","color":"white"},{"text":" 로 선택","color":"gray"}]
+execute unless score #vmode view matches 2 run title @s subtitle [{"text":"고를 아이템 ","color":"#FFE08A"},{"score":{"name":"@s","objective":"pkPending"},"color":"white","bold":true},{"text":"개  ·  ","color":"#FFE08A"},{"text":"Shift + F","color":"white"},{"text":" 로 선택","color":"gray"}]
+execute unless score #on view matches 1 if score #vmode view matches 2 run title @s subtitle [{"text":"고를 아이템 ","color":"#FFE08A"},{"score":{"name":"@s","objective":"pkPending"},"color":"white","bold":true},{"text":"개  ·  ","color":"#FFE08A"},{"text":"Shift + F","color":"white"},{"text":" 로 선택","color":"gray"}]
+function rlk:view/ttl_blank

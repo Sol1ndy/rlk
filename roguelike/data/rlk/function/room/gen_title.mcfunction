@@ -8,6 +8,6 @@ scoreboard players set @s ttlT 60
 title @s subtitle [{"text":"챕터 ","color":"gray"},{"score":{"name":"#chapter","objective":"room"},"color":"gray"},{"text":"  ·  ","color":"dark_gray"},{"score":{"name":"#mi","objective":"tmp"},"color":"gray"},{"text":" / 6","color":"gray"}]
 # 첫 맵(종류 0)은 큰 제목 없이 아래 줄만
 $scoreboard players set #gtT tmp $(t)
-execute if score #gtT tmp matches 0 run title @s title {"text":""}
+execute if score #gtT tmp matches 0 run function rlk:view/ttl_blank
 execute unless score #gtT tmp matches 0 run function rlk:room/gen_title2 with storage rlk:room t
-execute at @s run playsound minecraft:block.portal.travel master @s ~ ~ ~ 0.15 1.6
+execute at @s unless score #k4 snd matches 1 run function rlk:snd/f4

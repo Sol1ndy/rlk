@@ -1,4 +1,7 @@
 # 넉백 (@s = 몹, at @s): 몸(플레이어·아바타)에서 멀어지는 수평 방향으로 #kbBasic(칸/틱 × 1000)만큼 밀고 살짝 띄운다
+execute if entity @s[tag=rlk_cm_cn] run return 0
+execute if entity @s[tag=rlk_raiden] run return 0
+execute if entity @s[tag=rlk_rd_object] run return 0
 # 방향 = 표식을 "몸의 반대쪽 1칸"에 두고 (표식 위치 - 몹 위치) 로 구한 단위 벡터
 execute facing entity @e[tag=rlk_body,limit=1] feet rotated ~180 0 positioned ^ ^ ^1 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_kbm"]}
 execute store result score #kx tmp run data get entity @e[tag=rlk_kbm,limit=1] Pos[0] 1000

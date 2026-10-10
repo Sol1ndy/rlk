@@ -1,0 +1,61 @@
+# 구역 건설 (normal13_7, 테마 5 사막): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill -20 200 -60 -1 200 -41 minecraft:red_sand
+fill -20 201 -60 -1 212 -41 minecraft:smooth_sandstone
+fill -19 201 -59 -2 212 -42 minecraft:air
+fill -19 211 -59 -2 211 -42 minecraft:light[level=15]
+fill -10 202 -53 -7 202 -51 minecraft:cut_sandstone
+fill -11 202 -45 -10 202 -44 minecraft:cut_sandstone
+fill -20 203 -52 -20 206 -48 minecraft:cut_sandstone
+fill -20 210 -49 -20 210 -46 minecraft:smooth_red_sandstone
+fill -20 207 -54 -20 210 -53 minecraft:red_sandstone
+fill -1 208 -47 -1 209 -44 minecraft:orange_terracotta
+fill -1 206 -52 -1 208 -48 minecraft:sandstone
+fill -1 207 -51 -1 208 -47 minecraft:smooth_red_sandstone
+fill -1 204 -43 -1 206 -41 minecraft:smooth_red_sandstone
+fill -1 212 -54 -1 212 -50 minecraft:sandstone
+fill -1 203 -54 -1 203 -52 minecraft:red_sandstone
+fill -13 201 -60 -8 203 -60 minecraft:smooth_red_sandstone
+fill -20 205 -60 -20 207 -60 minecraft:smooth_red_sandstone
+fill -16 206 -60 -13 207 -60 minecraft:red_sandstone
+fill -10 203 -60 -6 204 -60 minecraft:orange_terracotta
+fill -10 209 -60 -10 211 -60 minecraft:red_sandstone
+fill -15 205 -60 -10 206 -60 minecraft:red_sandstone
+fill -5 209 -41 -2 209 -41 minecraft:smooth_red_sandstone
+fill -5 202 -41 -4 204 -41 minecraft:smooth_red_sandstone
+fill -12 212 -41 -7 212 -41 minecraft:terracotta
+fill -20 212 -60 -1 212 -41 minecraft:polished_deepslate
+fill -19 212 -59 -2 212 -42 minecraft:air
+fill -19 201 -59 -15 201 -55 minecraft:sandstone
+fill -19 202 -59 -15 202 -55 minecraft:red_sand
+fill -8 201 -59 -2 201 -42 minecraft:sandstone
+fill -8 202 -59 -2 202 -42 minecraft:red_sand
+fill -14 201 -57 -9 201 -42 minecraft:sandstone
+fill -14 202 -57 -9 202 -42 minecraft:red_sand
+fill -17 201 -54 -15 201 -47 minecraft:sandstone
+fill -17 202 -54 -15 202 -47 minecraft:red_sand
+fill -16 201 -46 -15 201 -42 minecraft:sandstone
+fill -16 202 -46 -15 202 -42 minecraft:red_sand
+fill -17 201 -42 -17 201 -42 minecraft:sandstone
+fill -17 202 -42 -17 202 -42 minecraft:red_sand
+fill -19 201 -54 -18 202 -42 minecraft:sandstone
+fill -19 203 -54 -18 203 -42 minecraft:red_sand
+fill -17 201 -46 -17 202 -43 minecraft:sandstone
+fill -17 203 -46 -17 203 -43 minecraft:red_sand
+fill -14 201 -59 -13 207 -59 minecraft:smooth_red_sandstone
+fill -14 208 -59 -13 208 -59 minecraft:red_sand
+fill -12 201 -58 -9 207 -58 minecraft:smooth_red_sandstone
+fill -12 208 -58 -9 208 -58 minecraft:red_sand
+fill -12 201 -59 -9 207 -59 minecraft:terracotta
+fill -12 208 -59 -9 208 -59 minecraft:red_sand
+fill -14 201 -58 -13 207 -58 minecraft:terracotta
+fill -14 208 -58 -13 208 -58 minecraft:red_sand
+execute positioned -16 203 -42 run function rlk:room/prop/sd_dry
+execute positioned -14 203 -44 run function rlk:room/prop/sd_bush
+execute positioned -5 203 -51 run function rlk:room/prop/sd_bush
+execute positioned -10 203 -51 run function rlk:room/prop/sd_dry
+execute positioned -3 203 -46 run function rlk:room/prop/sd_dry
+execute positioned -17 203 -54 run function rlk:room/prop/sd_dry
+setblock -13 209 -58 minecraft:dead_bush keep
+setblock -12 209 -59 minecraft:dead_bush keep
+setblock -11 209 -58 minecraft:dead_bush keep
+setblock -9 209 -58 minecraft:dead_bush keep

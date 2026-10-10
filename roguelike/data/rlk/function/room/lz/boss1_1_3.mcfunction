@@ -1,0 +1,42 @@
+# 구역 건설 (boss1_1, 테마 3): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill -20 200 0 -1 200 19 minecraft:podzol
+fill -20 201 0 -1 210 19 minecraft:stone
+fill -19 201 1 -2 210 18 minecraft:air
+fill -19 209 1 -2 209 18 minecraft:light[level=15]
+fill -8 200 7 -6 200 8 minecraft:gravel
+fill -10 200 12 -9 200 13 minecraft:coarse_dirt
+fill -20 208 12 -20 210 13 minecraft:tuff
+fill -20 202 5 -20 202 7 minecraft:cobblestone
+fill -20 203 0 -20 204 2 minecraft:mossy_cobblestone
+fill -20 210 8 -20 210 10 minecraft:oak_leaves[persistent=true]
+fill -20 205 2 -20 205 5 minecraft:mossy_cobblestone
+fill -1 203 9 -1 204 12 minecraft:cobblestone
+fill -1 210 9 -1 210 12 minecraft:moss_block
+fill -1 202 15 -1 204 18 minecraft:andesite
+fill -9 206 0 -8 208 0 minecraft:mossy_cobblestone
+fill -12 204 0 -10 205 0 minecraft:tuff
+fill -10 204 0 -7 206 0 minecraft:moss_block
+fill -20 203 19 -16 206 19 minecraft:mossy_cobblestone
+fill -4 209 19 -2 210 19 minecraft:oak_leaves[persistent=true]
+fill -18 207 19 -15 207 19 minecraft:moss_block
+fill -16 207 19 -15 209 19 minecraft:granite
+fill -20 210 0 -1 210 19 minecraft:polished_deepslate
+fill -19 210 1 -2 210 18 minecraft:air
+fill -4 201 1 -2 201 4 minecraft:podzol
+fill -19 201 6 -18 201 14 minecraft:podzol
+fill -17 201 7 -16 201 12 minecraft:podzol
+fill -15 201 9 -15 201 11 minecraft:podzol
+fill -17 201 14 -16 207 14 minecraft:andesite
+fill -17 208 14 -16 208 14 minecraft:podzol
+fill -17 201 13 -16 207 13 minecraft:stone
+fill -17 208 13 -16 208 13 minecraft:podzol
+execute positioned -19 202 7 run function rlk:room/prop/p_ruin_x
+execute positioned -5 201 8 run function rlk:room/prop/p_boulder
+execute positioned -16 201 2 run function rlk:room/prop/p_wildflower
+execute positioned -14 201 15 run function rlk:room/prop/p_dandelion
+execute positioned -15 201 16 run function rlk:room/prop/p_dandelion
+execute positioned -8 201 15 run function rlk:room/prop/p_grass
+execute positioned -15 201 17 run function rlk:room/prop/p_wildflower
+execute positioned -13 201 1 run function rlk:room/prop/p_grass
+setblock -17 209 13 minecraft:short_grass keep
+setblock -17 209 14 minecraft:short_grass keep

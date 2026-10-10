@@ -6,7 +6,7 @@ scoreboard players operation @e[tag=rlk_lnd_new] rxDmg = #qDmg tmp
 scoreboard players operation @e[tag=rlk_lnd_new] rxDmg *= #lnCR tmp
 scoreboard players operation @e[tag=rlk_lnd_new] rxDmg /= #c130 tmp
 tag @e[tag=rlk_lnd_new] remove rlk_lnd_new
-playsound minecraft:block.amethyst_block.resonate master @a ~ ~ ~ 0.8 1.6
+execute unless score #k42 snd matches 1 run function rlk:snd/f72
 scoreboard players set #lnT tmp 3
 function rlk:element/lunar/count
 execute store result score #cc tmp if entity @e[tag=rlk_lndrift]

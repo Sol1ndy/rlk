@@ -22,5 +22,5 @@ particle minecraft:dust{color:[0.55,0.95,0.35],scale:1.8} ^-1.52 ^1.62 ^4 0 0 0 
 particle minecraft:dust{color:[1.0,0.85,0.35],scale:3.0} ^ ^1.4 ^4 0.15 0.15 0.05 0 6
 particle minecraft:dust{color:[0.1,0.25,0.05],scale:2.0} ^ ^1.4 ^3.9 0 0 0 0 2
 particle minecraft:composter ^ ^0.5 ^4 2 0.5 2 0 40
-playsound minecraft:block.beacon.power_select master @a ~ ~ ~ 0.8 1.4
-playsound minecraft:entity.evoker.prepare_attack master @a ~ ~ ~ 0.6 1.2
+execute unless score #k73 snd matches 1 run function rlk:snd/f389
+execute unless score #k330 snd matches 1 run function rlk:snd/f390

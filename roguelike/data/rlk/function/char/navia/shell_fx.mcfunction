@@ -4,4 +4,4 @@ execute positioned ~3 ~9 ~3 facing entity @s feet run function rlk:char/navia/sh
 particle minecraft:explosion ~ ~0.8 ~ 0.3 0.2 0.3 0 2
 particle minecraft:block{block_state:"minecraft:gold_block"} ~ ~0.5 ~ 0.8 0.3 0.8 0.15 16
 particle minecraft:small_flame ~ ~0.5 ~ 0.6 0.3 0.6 0.04 8
-playsound minecraft:entity.generic.explode master @a ~ ~ ~ 0.5 1.3
+execute unless score #k64 snd matches 1 run function rlk:snd/f253

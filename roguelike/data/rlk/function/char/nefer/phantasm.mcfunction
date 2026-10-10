@@ -8,10 +8,14 @@ scoreboard players add @s nfPh 1
 scoreboard players set @s nfPT 1
 scoreboard players set @s atkCD 20
 scoreboard players set @s comboStep 0
-# 그림자가 나타날 자리: 조준한 적(8칸) → 주변 5칸의 가장 가까운 적 → 앞으로 2칸
+# 그림자가 나타날 자리: 조준한 전방 적(8칸) → 전방 5칸의 가장 가까운 적 → 앞으로 2칸
 tag @e[tag=rlk_nftg] remove rlk_nftg
-execute anchored eyes positioned ^ ^ ^ run function rlk:char/nefer/find
-execute unless entity @e[tag=rlk_nftg,limit=1] run tag @e[tag=rlk_mob,distance=..5,sort=nearest,limit=1] add rlk_nftg
+function rlk:combat/melee_begin
+execute positioned ~ ~1.62 ~ positioned ^ ^ ^ run function rlk:char/nefer/find
+execute as @e[tag=rlk_nftg,limit=1] run function rlk:combat/melee_front
+execute if score #meleeFront tmp matches 0 run tag @e[tag=rlk_nftg] remove rlk_nftg
+execute unless entity @e[tag=rlk_nftg,limit=1] as @e[tag=rlk_mob,distance=..5,sort=nearest] run function rlk:char/nefer/ph_front_target
+kill @e[tag=rlk_melee_origin]
 kill @e[tag=rlk_nfsp]
 execute if entity @e[tag=rlk_nftg,limit=1] as @e[tag=rlk_nftg,limit=1] at @s run summon minecraft:marker ~ ~ ~ {Tags:["rlk_nfsp"]}
 execute unless entity @e[tag=rlk_nfsp,limit=1] rotated ~ 0 positioned ^ ^ ^2 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_nfsp"]}
@@ -21,9 +25,9 @@ tag @e[tag=rlk_nftg] remove rlk_nftg
 execute as @e[tag=rlk_dcore,distance=..8] run function rlk:char/nefer/dec_absorb
 # 그림자 소환(노리는 자리 건너편에서 그 자리를 바라봄)
 function rlk:char/nefer/shadow_spawn
-playsound minecraft:entity.evoker.cast_spell master @a ~ ~ ~ 1 1.3
-playsound minecraft:block.respawn_anchor.charge master @a ~ ~ ~ 0.7 1.7
-playsound minecraft:entity.breeze.wind_burst master @a ~ ~ ~ 0.8 1.1
+execute unless score #k269 snd matches 1 run function rlk:snd/f397
+execute unless score #k312 snd matches 1 run function rlk:snd/f359
+execute unless score #k337 snd matches 1 run function rlk:snd/f398
 # 그림자 춤 끝: 환영극 3번
 execute if score @s nfPh matches 3.. run scoreboard players set @s nfSD 0
 scoreboard players set #basic itv 1

@@ -160,3 +160,4 @@ execute if score #cgMoonT itv matches 1.. run scoreboard players remove #cgMoonT
 execute if score #cgMoonT itv matches 1.. at @e[tag=rlk_body,limit=1] run particle minecraft:dust{color:[0.85,0.88,1.0],scale:0.7} ~ ~2.2 ~ 0.3 0.1 0.3 0 1
 # 각인 만월 2개: 달 반응 피해
 execute if score fullmoon engN matches 2.. run scoreboard players operation #lnBuff itv += #fmDmg tmp
+execute unless score #salonT itv matches 1.. if entity @e[tag=rlk_salon,limit=1] run function rlk:items/proc/salon_end

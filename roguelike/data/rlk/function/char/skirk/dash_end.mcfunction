@@ -5,4 +5,10 @@ execute unless score @s skM matches 1.. run attribute @s minecraft:knockback_res
 scoreboard players operation @s skillCd = #skDashCd tmp
 function rlk:char/skirk/cd_reduce
 scoreboard players reset 빠른이동 stacks
-playsound minecraft:entity.breeze.land master @a ~ ~ ~ 0.5 1.4
+# Only transition the hover animation; never replace a newly started attack or burst.
+execute if score @s dead matches 1 run return 0
+execute if score @s vMap matches 1 run return 0
+execute if score @s pkMode matches 1.. run return 0
+execute unless score @s pmActive matches 1 run function rlk:char/motion/start {char:"skirk",clip:"skill_right_end"}
+execute if data storage rlk:player_motion active{char:"skirk",clip:"skill_right"} run function rlk:char/motion/start {char:"skirk",clip:"skill_right_end"}
+execute if data storage rlk:player_motion active{char:"skirk",clip:"skill_right_loop"} run function rlk:char/motion/start {char:"skirk",clip:"skill_right_end"}

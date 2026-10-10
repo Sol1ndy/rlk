@@ -27,4 +27,4 @@ execute if score @s sidx matches 22 run data merge entity @s {start_interpolatio
 execute if score @s sidx matches 23 run data merge entity @s {start_interpolation:0,interpolation_duration:5,transformation:{translation:[0.0000f,1.3586f,0.1040f],left_rotation:[0f,0f,0.38268f,0.92388f],right_rotation:[0f,0f,0f,1f],scale:[0.0010f,0.2000f,0.010f]}}
 # 문마다 한 번: 흩어지는 불티 + 소리
 execute if score @s sidx matches 1 at @s run particle minecraft:dust{color:[1.0f,0.15f,0.12f],scale:1.1f} ~ ~1.5 ~ 0.9 0.8 0.9 0.02 30
-execute if score @s sidx matches 1 at @s run playsound minecraft:block.glass.break master @a ~ ~1.5 ~ 0.5 0.6
+execute if score @s sidx matches 1 at @s unless score #k3 snd matches 1 run function rlk:snd/f3

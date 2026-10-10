@@ -24,3 +24,6 @@ execute if score @s it_holy_shield matches 1.. run scoreboard players operation 
 execute if score @s it_dandelion_seed matches 1.. run function rlk:items/proc/dandelion
 execute if score @s it_crimson_moon matches 1.. run function rlk:items/proc/cmoon_bol
 execute if score @s it_moon_chalice matches 1.. run function rlk:items/proc/cg_moon
+# 튜토리얼: 원소폭발(8단계 · 캐릭터 3쪽)
+execute if score #tutS lob matches 8 if score @s lobRoom matches 2 run scoreboard players add #tutC lob 1
+execute if score #tutS lob matches 23 if score @s lobRoom matches 2 run scoreboard players add #tutC lob 1

@@ -6,4 +6,4 @@ scoreboard players set @s bowPm -1
 # 1인칭: 조준 중 느려짐(숄더뷰는 view/move 가 #bowSlow 로 처리)
 attribute @s minecraft:movement_speed modifier remove rlk:bow_aim
 execute if entity @s[tag=rlk_body] run attribute @s minecraft:movement_speed modifier add rlk:bow_aim -0.6 add_multiplied_total
-execute at @e[tag=rlk_body,limit=1] run playsound minecraft:item.crossbow.loading_start master @a ~ ~ ~ 0.6 1.2
+execute at @e[tag=rlk_body,limit=1] unless score #k230 snd matches 1 run function rlk:snd/f257

@@ -14,6 +14,5 @@ function rlk:view/sync
 scoreboard players set @s dashInvT 20
 execute at @e[tag=rlk_safe,limit=1] run particle minecraft:cloud ~ ~0.5 ~ 0.3 0.4 0.3 0.05 14
 execute at @e[tag=rlk_safe,limit=1] run particle minecraft:damage_indicator ~ ~1.2 ~ 0.3 0.3 0.3 0.1 6
-playsound minecraft:entity.player.hurt master @s ~ ~ ~ 0.9 0.8
-playsound minecraft:entity.player.small_fall master @s ~ ~ ~ 0.9 0.7
-function rlk:room/msg {t:"추락",c:"#E06A5A"}
+execute unless score #k11 snd matches 1 run function rlk:snd/f11
+execute unless score #k12 snd matches 1 run function rlk:snd/f12

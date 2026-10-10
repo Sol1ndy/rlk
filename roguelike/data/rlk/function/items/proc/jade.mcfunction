@@ -5,4 +5,4 @@ execute if score #amt tmp matches ..0 run scoreboard players set #amt tmp 1
 function rlk:element/shield_gain
 scoreboard players operation @s shieldT = #jadeDur tmp
 scoreboard players operation #jadeT itv = #jadeDur tmp
-playsound minecraft:block.anvil.land master @a ~ ~ ~ 0.25 0.7
+execute unless score #k195 snd matches 1 run function rlk:snd/f211

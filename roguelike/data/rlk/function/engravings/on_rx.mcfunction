@@ -49,5 +49,5 @@ execute if score #rx tmp matches 8..9 if score @s rxEl matches 2 run scoreboard 
 execute if score #rx tmp matches 8..9 if score @s rxEl matches 3 run scoreboard players add #ab3 eng 1
 execute if score #rx tmp matches 8..9 if score @s rxEl matches 4 run scoreboard players add #ab4 eng 1
 scoreboard players add #abStack eng 1
-execute at @a[tag=player,limit=1] run playsound minecraft:block.amethyst_block.chime master @a[tag=player,limit=1] ~ ~ ~ 0.5 0.7
+execute at @a[tag=player,limit=1] unless score #k209 snd matches 1 run function rlk:snd/f232
 execute if score #abStack eng >= #abyssMax tmp run function rlk:engravings/abyss/release

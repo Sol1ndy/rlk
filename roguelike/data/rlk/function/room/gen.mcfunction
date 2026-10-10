@@ -27,6 +27,9 @@ execute as @e[tag=rlk_zone,scores={zid=1}] run function rlk:room/zone_build
 execute as @e[tag=rlk_zone,scores={zid=1}] at @s run function rlk:room/zone_first
 # 낙사 구간: 바닐라 낙하 피해는 끈다(피해는 room/fall 이 준다)
 attribute @a[tag=player,limit=1] minecraft:fall_damage_multiplier base set 0
+# 걸음 높이는 기본값(1칸 단차는 점프)
+attribute @a[tag=player,limit=1] minecraft:step_height base set 0.6
+execute as @e[tag=rlk_av] run attribute @s minecraft:step_height base set 0.6
 # 플레이어 이동 + 안내
 execute as @a[tag=player,limit=1] run function rlk:room/gen_tp with storage rlk:room cur.spawn
 execute store result storage rlk:room a.t int 1 run scoreboard players get #mapType room

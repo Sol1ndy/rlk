@@ -5,8 +5,8 @@ scoreboard players set #sub itv 1
 scoreboard players operation #dmg tmp /= #st2 tmp
 function rlk:items/proc/kirion_line_rand
 particle minecraft:crimson_spore ~ ~ ~ 0.6 0.5 0.6 0.04 12
-playsound minecraft:entity.player.attack.sweep master @a ~ ~ ~ 0.64 0.7
-playsound minecraft:entity.player.attack.crit master @a ~ ~ ~ 0.56 1.2
+execute unless score #k175 snd matches 1 run function rlk:snd/f187
+execute unless score #k176 snd matches 1 run function rlk:snd/f188
 execute as @e[tag=rlk_mob,distance=..3] at @s run function rlk:combat/apply
 kill @s
 scoreboard players set #sub itv 0

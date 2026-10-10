@@ -1,4 +1,4 @@
-playsound minecraft:entity.sheep.shear master @a ~ ~ ~ 0.7 1.4
+execute unless score #k168 snd matches 1 run function rlk:snd/f179
 execute as @a[tag=player,limit=1] run function rlk:items/calc_stat {obj:"def",pm:1000}
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

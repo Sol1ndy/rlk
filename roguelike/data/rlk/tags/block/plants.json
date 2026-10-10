@@ -3,6 +3,12 @@
   "minecraft:short_grass",
   "minecraft:fern",
   "#minecraft:small_flowers",
-  "minecraft:pink_petals"
+  "minecraft:pink_petals",
+  "minecraft:wildflowers",
+  "minecraft:leaf_litter",
+  "minecraft:bush",
+  "minecraft:short_dry_grass",
+  "minecraft:tall_dry_grass",
+  "minecraft:dead_bush"
  ]
 }

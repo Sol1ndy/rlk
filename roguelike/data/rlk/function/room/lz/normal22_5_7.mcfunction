@@ -1,0 +1,83 @@
+# 구역 건설 (normal22_5, 테마 7): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill -20 200 0 -1 200 19 minecraft:podzol
+fill -20 201 0 -1 210 19 minecraft:stone
+fill -19 201 1 -2 210 18 minecraft:air
+fill -19 209 1 -2 209 18 minecraft:light[level=15]
+fill -17 200 14 -14 200 15 minecraft:moss_block
+fill -20 202 6 -20 205 6 minecraft:moss_block
+fill -20 202 4 -20 205 5 minecraft:calcite
+fill -20 205 18 -20 206 18 minecraft:diorite
+fill -20 210 14 -20 210 17 minecraft:oak_leaves[persistent=true]
+fill -20 205 5 -20 208 7 minecraft:diorite
+fill -1 209 15 -1 210 15 minecraft:birch_leaves[persistent=true]
+fill -1 210 7 -1 210 12 minecraft:oak_leaves[persistent=true]
+fill -1 210 6 -1 210 6 minecraft:calcite
+fill -19 210 0 -19 210 0 minecraft:oak_leaves[persistent=true]
+fill -12 202 0 -8 202 0 minecraft:dark_prismarine
+fill -11 209 0 -10 210 0 minecraft:oak_leaves[persistent=true]
+fill -12 210 19 -8 210 19 minecraft:oak_leaves[persistent=true]
+fill -17 210 19 -12 210 19 minecraft:birch_leaves[persistent=true]
+fill -15 203 19 -11 205 19 minecraft:calcite
+fill -9 205 19 -6 206 19 minecraft:moss_block
+fill -5 210 19 -4 210 19 minecraft:birch_leaves[persistent=true]
+fill -5 210 19 -1 210 19 minecraft:oak_leaves[persistent=true]
+fill -20 210 0 -1 210 19 minecraft:polished_deepslate
+fill -19 210 1 -2 210 18 minecraft:air
+fill -4 201 5 -2 201 6 minecraft:podzol
+fill -5 201 6 -5 201 14 minecraft:podzol
+fill -3 201 14 -2 201 14 minecraft:podzol
+fill -13 201 15 -6 201 15 minecraft:podzol
+fill -2 201 15 -2 201 15 minecraft:podzol
+fill -13 201 16 -13 201 18 minecraft:podzol
+fill -4 201 7 -2 201 13 minecraft:dirt
+fill -4 202 7 -2 202 13 minecraft:podzol
+fill -4 201 14 -4 201 16 minecraft:dirt
+fill -4 202 14 -4 202 16 minecraft:podzol
+fill -5 201 15 -5 201 15 minecraft:dirt
+fill -5 202 15 -5 202 15 minecraft:podzol
+fill -3 201 15 -3 201 18 minecraft:dirt
+fill -3 202 15 -3 202 18 minecraft:podzol
+fill -12 201 16 -6 201 16 minecraft:dirt
+fill -12 202 16 -6 202 16 minecraft:podzol
+fill -2 201 16 -2 201 18 minecraft:dirt
+fill -2 202 16 -2 202 18 minecraft:podzol
+fill -12 201 17 -11 201 18 minecraft:dirt
+fill -12 202 17 -11 202 18 minecraft:podzol
+fill -5 201 16 -5 202 18 minecraft:dirt
+fill -5 203 16 -5 203 18 minecraft:podzol
+fill -10 201 17 -6 202 18 minecraft:dirt
+fill -10 203 17 -6 203 18 minecraft:podzol
+fill -4 201 17 -4 202 18 minecraft:dirt
+fill -4 203 17 -4 203 18 minecraft:podzol
+fill -4 199 1 -2 199 4 minecraft:clay
+fill -4 200 1 -2 200 4 minecraft:water
+fill -16 199 10 -15 199 14 minecraft:clay
+fill -16 200 10 -15 200 14 minecraft:water
+fill -17 199 11 -17 199 13 minecraft:clay
+fill -17 200 11 -17 200 13 minecraft:water
+fill -19 199 14 -19 199 15 minecraft:clay
+fill -19 200 14 -19 200 15 minecraft:water
+fill -15 199 15 -14 199 16 minecraft:clay
+fill -15 200 15 -14 200 16 minecraft:water
+fill -18 200 15 -16 200 16 minecraft:spruce_planks
+fill -17 200 9 -17 200 10 minecraft:sand
+fill -15 200 9 -15 200 9 minecraft:sand
+fill -18 200 14 -18 200 14 minecraft:sand
+setblock -17 200 12 minecraft:sea_pickle[pickles=1,waterlogged=true]
+setblock -15 200 10 minecraft:sea_pickle[pickles=1,waterlogged=true]
+setblock -15 200 11 minecraft:sea_pickle[pickles=2,waterlogged=true]
+setblock -14 200 16 minecraft:seagrass
+setblock -4 200 4 minecraft:seagrass
+setblock -2 200 1 minecraft:seagrass
+execute positioned -9 202 15 run function rlk:room/prop/fo_crates
+execute positioned -5 202 8 run function rlk:room/prop/fo_pipe_z
+execute positioned -2 202 14 run function rlk:room/prop/fo_col_a
+execute positioned -19 201 10 run function rlk:room/prop/p_grass
+execute positioned -10 201 6 run function rlk:room/prop/fo_flower
+execute positioned -16 201 6 run function rlk:room/prop/fo_flower
+execute positioned -8 202 15 run function rlk:room/prop/p_grass
+execute positioned -4 204 18 run function rlk:room/prop/fo_flower
+execute positioned -17 201 16 run function rlk:room/prop/fo_white
+execute positioned -5 204 16 run function rlk:room/prop/fo_flower
+execute positioned -13 202 15 run function rlk:room/prop/fo_flower
+execute positioned -13 202 18 run function rlk:room/prop/fo_flower

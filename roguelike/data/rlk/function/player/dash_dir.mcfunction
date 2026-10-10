@@ -25,3 +25,4 @@ scoreboard players operation @s dashDZ *= #st10 tmp
 scoreboard players operation @s dashUX = #ux tmp
 scoreboard players operation @s dashUZ = #uz tmp
 scoreboard players set @s dashMoveT 4
+scoreboard players set @s dashUpN 0

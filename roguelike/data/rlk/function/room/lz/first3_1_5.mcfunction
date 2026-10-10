@@ -1,0 +1,46 @@
+# 구역 건설 (first3_1, 테마 5 우림): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill -20 200 0 -1 200 19 minecraft:podzol
+fill -20 201 0 -1 210 19 minecraft:moss_block
+fill -19 201 1 -2 210 18 minecraft:air
+fill -19 209 1 -2 209 18 minecraft:light[level=15]
+fill -8 200 10 -5 200 11 minecraft:rooted_dirt
+fill -8 200 13 -6 200 16 minecraft:packed_mud
+fill -20 210 0 -20 210 0 minecraft:jungle_leaves[persistent=true]
+fill -20 210 15 -20 210 17 minecraft:azalea_leaves[persistent=true]
+fill -20 210 12 -20 210 14 minecraft:stone
+fill -20 209 4 -20 210 9 minecraft:jungle_leaves[persistent=true]
+fill -20 210 8 -20 210 9 minecraft:azalea_leaves[persistent=true]
+fill -20 209 11 -20 210 13 minecraft:azalea_leaves[persistent=true]
+fill -1 207 11 -1 207 15 minecraft:mossy_cobblestone
+fill -1 210 4 -1 210 8 minecraft:jungle_leaves[persistent=true]
+fill -1 209 14 -1 210 16 minecraft:stone
+fill -4 210 0 -2 210 0 minecraft:jungle_leaves[persistent=true]
+fill -19 204 0 -18 206 0 minecraft:mossy_cobblestone
+fill -18 209 0 -17 209 0 minecraft:mud_bricks
+fill -6 210 0 -4 210 0 minecraft:jungle_leaves[persistent=true]
+fill -14 210 19 -9 210 19 minecraft:jungle_leaves[persistent=true]
+fill -8 210 19 -8 210 19 minecraft:azalea_leaves[persistent=true]
+fill -8 205 19 -8 207 19 minecraft:mud_bricks
+fill -17 201 19 -17 210 19 minecraft:jungle_log
+fill -14 207 19 -11 210 19 minecraft:mossy_cobblestone
+fill -20 210 0 -1 210 19 minecraft:polished_deepslate
+fill -19 210 1 -2 210 18 minecraft:air
+fill -17 201 7 -15 201 13 minecraft:podzol
+fill -18 201 8 -18 201 12 minecraft:podzol
+fill -5 201 18 -2 206 18 minecraft:mossy_cobblestone
+fill -5 207 18 -2 207 18 minecraft:podzol
+execute positioned -15 202 9 run function rlk:room/prop/sf_log_z
+execute positioned -8 201 10 run function rlk:room/prop/sf_moss
+execute positioned -5 201 16 run function rlk:room/prop/p_litter
+execute positioned -3 201 7 run function rlk:room/prop/sf_flower
+execute positioned -10 201 10 run function rlk:room/prop/sf_flower
+execute positioned -15 201 16 run function rlk:room/prop/p_litter
+execute positioned -6 201 12 run function rlk:room/prop/p_litter
+execute positioned -12 201 3 run function rlk:room/prop/p_litter
+execute positioned -14 201 9 run function rlk:room/prop/sf_flower
+execute positioned -6 201 1 run function rlk:room/prop/sf_moss
+execute positioned -12 201 3 run function rlk:room/prop/sf_fern
+execute positioned -14 201 6 run function rlk:room/prop/sf_moss
+execute positioned -17 201 16 run function rlk:room/prop/sf_fern
+setblock -5 208 18 minecraft:jungle_leaves[persistent=true] keep
+setblock -3 208 18 minecraft:jungle_leaves[persistent=true] keep

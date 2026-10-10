@@ -1,5 +1,5 @@
 particle minecraft:electric_spark ~ ~1 ~ 1.6 0.3 1.6 0.2 30
-playsound minecraft:entity.bee.sting master @a ~ ~ ~ 0.4 1.2
+execute unless score #k139 snd matches 1 run function rlk:snd/f147
 execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:25}
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

@@ -62,8 +62,8 @@ execute rotated ~ 0 rotated ~48 ~ positioned ^ ^1.0 ^4.7 run particle minecraft:
 execute rotated ~ 0 rotated ~48 ~ positioned ^ ^1.0 ^5.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
 execute rotated ~ 0 rotated ~48 ~ positioned ^ ^1.0 ^6.8 run particle minecraft:snowflake ~ ~ ~ 0.25 0.3 0.25 0.03 3
 execute rotated ~ 0 rotated ~48 ~ positioned ^ ^1.0 ^3.4 run particle minecraft:dust{color:[0.62f,0.91f,0.96f],scale:1.6f} ~ ~ ~ 0.5 0.35 0.5 0 6
-execute anchored eyes run particle minecraft:sweep_attack ^ ^-0.2 ^1.3 0 0 0 0 1
-playsound minecraft:entity.player.attack.sweep master @a ~ ~ ~ 0.8 0.7
-playsound minecraft:block.glass.break master @a ~ ~ ~ 0.6 1.5
-playsound minecraft:block.powder_snow.break master @a ~ ~ ~ 1 0.8
-playsound minecraft:entity.breeze.shoot master @a ~ ~ ~ 0.5 1.3
+execute positioned ~ ~1.62 ~ run particle minecraft:sweep_attack ^ ^-0.2 ^1.3 0 0 0 0 1
+execute unless score #k175 snd matches 1 run function rlk:snd/f403
+execute unless score #k130 snd matches 1 run function rlk:snd/f194
+execute unless score #k341 snd matches 1 run function rlk:snd/f404
+execute unless score #k342 snd matches 1 run function rlk:snd/f405

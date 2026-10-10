@@ -1,4 +1,4 @@
-# 프롭 m_rubble_b (위치 = 기준 칸의 바닥 바로 위)
+# 프롭 m_rubble_b (위치 = 기준 칸의 땅 바로 위)
 setblock ~0 ~0 ~0 minecraft:cobblestone
 setblock ~1 ~0 ~0 minecraft:cobbled_deepslate
 setblock ~2 ~0 ~0 minecraft:andesite

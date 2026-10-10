@@ -1,0 +1,100 @@
+# 구역 건설 (levelup9_6, 테마 3): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill 40 200 40 59 200 59 minecraft:podzol
+fill 40 201 40 59 210 59 minecraft:stone
+fill 41 201 41 58 210 58 minecraft:air
+fill 41 209 41 58 209 58 minecraft:light[level=15]
+fill 45 200 48 48 200 50 minecraft:gravel
+fill 46 200 41 48 200 43 minecraft:rooted_dirt
+fill 40 204 56 40 206 56 minecraft:granite
+fill 40 209 47 40 210 50 minecraft:oak_leaves[persistent=true]
+fill 40 209 47 40 210 50 minecraft:oak_leaves[persistent=true]
+fill 40 209 48 40 210 52 minecraft:oak_leaves[persistent=true]
+fill 40 201 56 40 201 59 minecraft:tuff
+fill 59 209 47 59 210 52 minecraft:oak_leaves[persistent=true]
+fill 59 203 53 59 206 53 minecraft:andesite
+fill 59 209 40 59 210 45 minecraft:oak_leaves[persistent=true]
+fill 59 206 43 59 208 48 minecraft:andesite
+fill 59 204 48 59 205 49 minecraft:andesite
+fill 48 202 40 51 204 40 minecraft:tuff
+fill 53 210 40 54 210 40 minecraft:oak_leaves[persistent=true]
+fill 45 209 40 50 209 40 minecraft:moss_block
+fill 40 203 40 40 203 40 minecraft:moss_block
+fill 55 202 40 57 204 40 minecraft:tuff
+fill 40 202 59 45 203 59 minecraft:mossy_cobblestone
+fill 51 207 59 53 210 59 minecraft:mossy_cobblestone
+fill 48 201 59 52 203 59 minecraft:moss_block
+fill 44 209 59 49 210 59 minecraft:oak_leaves[persistent=true]
+fill 58 208 59 58 209 59 minecraft:mossy_cobblestone
+fill 55 201 50 57 201 50 minecraft:podzol
+fill 55 201 51 55 201 54 minecraft:podzol
+fill 57 201 51 58 201 51 minecraft:podzol
+fill 58 201 52 58 201 52 minecraft:podzol
+fill 41 201 55 43 201 55 minecraft:podzol
+fill 48 201 55 54 201 55 minecraft:podzol
+fill 48 201 56 49 201 56 minecraft:podzol
+fill 47 201 57 48 201 58 minecraft:podzol
+fill 58 201 58 58 201 58 minecraft:podzol
+fill 56 201 51 56 201 54 minecraft:dirt
+fill 56 202 51 56 202 54 minecraft:podzol
+fill 57 201 52 57 201 52 minecraft:dirt
+fill 57 202 52 57 202 52 minecraft:podzol
+fill 41 201 54 42 201 54 minecraft:dirt
+fill 41 202 54 42 202 54 minecraft:podzol
+fill 55 201 55 55 201 55 minecraft:dirt
+fill 55 202 55 55 202 55 minecraft:podzol
+fill 50 201 56 54 201 56 minecraft:dirt
+fill 50 202 56 54 202 56 minecraft:podzol
+fill 58 201 56 58 201 57 minecraft:dirt
+fill 58 202 56 58 202 57 minecraft:podzol
+fill 49 201 57 51 201 58 minecraft:dirt
+fill 49 202 57 51 202 58 minecraft:podzol
+fill 57 201 57 57 201 58 minecraft:dirt
+fill 57 202 57 57 202 58 minecraft:podzol
+fill 52 201 58 52 201 58 minecraft:dirt
+fill 52 202 58 52 202 58 minecraft:podzol
+fill 56 201 58 56 201 58 minecraft:dirt
+fill 56 202 58 56 202 58 minecraft:podzol
+fill 43 201 54 43 201 54 minecraft:stone
+fill 43 202 54 43 202 54 minecraft:podzol
+fill 44 201 48 44 202 51 minecraft:andesite
+fill 44 203 48 44 203 51 minecraft:podzol
+fill 41 201 47 43 202 53 minecraft:dirt
+fill 41 203 47 43 203 53 minecraft:podzol
+fill 56 201 55 56 202 57 minecraft:dirt
+fill 56 203 55 56 203 57 minecraft:podzol
+fill 55 201 56 55 202 58 minecraft:dirt
+fill 55 203 56 55 203 58 minecraft:podzol
+fill 57 201 56 57 202 56 minecraft:dirt
+fill 57 203 56 57 203 56 minecraft:podzol
+fill 52 201 57 54 202 57 minecraft:dirt
+fill 52 203 57 54 203 57 minecraft:podzol
+fill 53 201 58 54 202 58 minecraft:dirt
+fill 53 203 58 54 203 58 minecraft:podzol
+fill 41 201 46 44 202 46 minecraft:stone
+fill 41 203 46 44 203 46 minecraft:podzol
+fill 44 201 47 44 202 47 minecraft:stone
+fill 44 203 47 44 203 47 minecraft:podzol
+fill 44 201 52 44 202 53 minecraft:stone
+fill 44 203 52 44 203 53 minecraft:podzol
+fill 57 201 54 58 207 55 minecraft:andesite
+fill 57 208 54 58 208 55 minecraft:podzol
+fill 57 201 53 58 207 53 minecraft:stone
+fill 57 208 53 58 208 53 minecraft:podzol
+setblock 41 202 54 minecraft:mossy_stone_brick_stairs[facing=north]
+setblock 41 201 55 minecraft:mossy_stone_brick_stairs[facing=north]
+setblock 42 202 54 minecraft:mossy_stone_brick_stairs[facing=north]
+setblock 42 201 55 minecraft:mossy_stone_brick_stairs[facing=north]
+setblock 43 202 54 minecraft:mossy_stone_brick_stairs[facing=north]
+setblock 43 201 55 minecraft:mossy_stone_brick_stairs[facing=north]
+execute positioned 51 202 55 run function rlk:room/prop/p_boulder_s
+execute positioned 51 201 43 run function rlk:room/prop/p_wildflower
+execute positioned 51 201 41 run function rlk:room/prop/p_wildflower
+execute positioned 47 201 53 run function rlk:room/prop/p_grass
+execute positioned 57 201 43 run function rlk:room/prop/p_grass
+execute positioned 56 201 41 run function rlk:room/prop/p_litter
+execute positioned 47 201 44 run function rlk:room/prop/p_dandelion
+execute positioned 56 201 44 run function rlk:room/prop/p_grass
+execute positioned 58 202 52 run function rlk:room/prop/p_dandelion
+execute positioned 49 201 49 run function rlk:room/prop/p_grass
+setblock 57 209 54 minecraft:azalea_leaves[persistent=true] keep
+setblock 57 209 55 minecraft:short_grass keep

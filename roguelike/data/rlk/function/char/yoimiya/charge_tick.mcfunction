@@ -9,6 +9,6 @@ execute if score #ct tmp < #th tmp run return 0
 scoreboard players add @s bowK 1
 scoreboard players operation 염초화살 stacks = @s bowK
 scoreboard players display name 염초화살 stacks {text:"염초 화살",color:"#FF8A3D"}
-playsound minecraft:block.note_block.pling master @s ~ ~ ~ 0.5 2.0
-playsound minecraft:block.fire.ambient master @a ~ ~ ~ 0.6 1.8
+execute unless score #k244 snd matches 1 run function rlk:snd/f271
+execute unless score #k245 snd matches 1 run function rlk:snd/f272
 particle minecraft:flame ~ ~1.9 ~ 0.3 0.1 0.3 0.02 6

@@ -8,4 +8,4 @@ execute unless score #dmgIn tmp matches 1.. run return 0
 scoreboard players operation @s curHealth -= #dmgIn tmp
 execute if score @s curHealth matches ..0 run scoreboard players set @s curHealth 0
 scoreboard players operation #hurtDmg tmp = #dmgIn tmp
-execute at @e[tag=rlk_body,limit=1] anchored eyes run function rlk:player/hurt_do
+execute at @e[tag=rlk_body,limit=1] positioned ~ ~1.62 ~ run function rlk:player/hurt_do

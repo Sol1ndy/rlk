@@ -1,0 +1,39 @@
+# 구역 건설 (first3_1, 테마 1): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill -20 200 0 -1 200 19 minecraft:tuff
+fill -20 201 0 -1 210 19 minecraft:stone
+fill -19 201 1 -2 210 18 minecraft:air
+fill -19 209 1 -2 209 18 minecraft:light[level=15]
+fill -5 200 8 -2 200 10 minecraft:cobblestone
+fill -19 200 4 -16 200 5 minecraft:deepslate
+fill -20 210 6 -20 210 11 minecraft:deepslate
+fill -20 201 0 -20 201 4 minecraft:coal_ore
+fill -20 206 10 -20 208 14 minecraft:deepslate
+fill -20 207 13 -20 209 17 minecraft:copper_ore
+fill -20 203 9 -20 206 10 minecraft:tuff
+fill -20 204 4 -20 204 6 minecraft:cobblestone
+fill -1 201 16 -1 203 19 minecraft:tuff
+fill -1 207 11 -1 208 12 minecraft:copper_ore
+fill -1 206 5 -1 209 6 minecraft:copper_ore
+fill -1 210 9 -1 210 10 minecraft:cobblestone
+fill -1 205 12 -1 205 17 minecraft:deepslate
+fill -19 205 0 -16 207 0 minecraft:tuff
+fill -17 210 0 -16 210 0 minecraft:tuff
+fill -5 201 0 -4 201 0 minecraft:iron_ore
+fill -4 208 0 -3 208 0 minecraft:cobblestone
+fill -10 202 0 -8 204 0 minecraft:iron_ore
+fill -9 204 0 -5 206 0 minecraft:copper_ore
+fill -12 209 19 -10 210 19 minecraft:spruce_planks
+fill -5 203 19 -1 203 19 minecraft:cobblestone
+fill -18 207 19 -17 210 19 minecraft:andesite
+fill -15 208 19 -15 208 19 minecraft:copper_ore
+fill -20 210 0 -1 210 19 minecraft:polished_deepslate
+fill -19 210 1 -2 210 18 minecraft:air
+fill -17 201 7 -15 201 13 minecraft:tuff
+fill -18 201 8 -18 201 12 minecraft:tuff
+fill -5 201 18 -2 206 18 minecraft:stone
+fill -5 207 18 -2 207 18 minecraft:tuff
+execute positioned -11 201 17 run function rlk:room/prop/m_crate_b
+execute positioned -5 201 1 run function rlk:room/prop/m_pebble
+execute positioned -14 201 6 run function rlk:room/prop/m_rail_x
+setblock -19 203 14 minecraft:wall_torch[facing=east]
+setblock -19 203 12 minecraft:wall_torch[facing=east]

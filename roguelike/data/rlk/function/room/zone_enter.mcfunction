@@ -11,4 +11,4 @@ execute if score @s zkind matches 4 run function rlk:room/obj/k_shop
 execute if score @s zkind matches 5 run function rlk:room/obj/k_sapphire
 execute if score @s zkind matches 6 run function rlk:room/obj/k_reforge
 execute if score @s zkind matches 7 run function rlk:room/obj/k_enchant
-playsound minecraft:block.amethyst_block.chime master @a ~ ~ ~ 1 0.9
+execute unless score #k10 snd matches 1 run function rlk:snd/f10

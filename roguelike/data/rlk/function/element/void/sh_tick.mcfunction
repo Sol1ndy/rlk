@@ -12,5 +12,6 @@ kill @e[tag=rlk_aimpt]
 execute if score @s life matches 5.. at @s run tp @s ^ ^ ^0.8
 execute at @s run particle minecraft:snowflake ~ ~ ~ 0.03 0.03 0.03 0 1
 execute at @s run particle minecraft:dust{color:[0.75,0.93,1.0],scale:0.6} ~ ~ ~ 0 0 0 0 1
-execute at @s positioned ~-0.7 ~-0.7 ~-0.7 if entity @e[tag=rlk_rntgt,dx=0.4,dy=0.4,dz=0.4] run function rlk:element/void/sh_hit
+# 처음 6틱(밖으로 튀어 나가는 동안)은 맞지 않는다: 큰 몹 안에서 생겨도 바로 터지지 않게
+execute if score @s life matches 7.. at @s positioned ~-0.7 ~-0.7 ~-0.7 if entity @e[tag=rlk_rntgt,dx=0.4,dy=0.4,dz=0.4] run function rlk:element/void/sh_hit
 tag @e[tag=rlk_rntgt] remove rlk_rntgt

@@ -1,0 +1,16 @@
+execute if score @s pmTick matches 0 run function rlk:char/motion/clips/skirk/infused_3/pose/0 with storage rlk:player_motion active
+execute if score @s pmTick matches 1 run function rlk:char/motion/clips/skirk/infused_3/pose/1 with storage rlk:player_motion active
+execute if score @s pmTick matches 2 run function rlk:char/motion/clips/skirk/infused_3/pose/2 with storage rlk:player_motion active
+execute if score @s pmTick matches 3 run function rlk:char/motion/clips/skirk/infused_3/pose/3 with storage rlk:player_motion active
+execute if score @s pmTick matches 4 run function rlk:char/motion/clips/skirk/infused_3/pose/4 with storage rlk:player_motion active
+execute if score @s pmTick matches 5 run function rlk:char/motion/clips/skirk/infused_3/pose/5 with storage rlk:player_motion active
+execute if score @s pmTick matches 6 run function rlk:char/motion/clips/skirk/infused_3/pose/6 with storage rlk:player_motion active
+execute if score @s pmTick matches 7 run function rlk:char/motion/clips/skirk/infused_3/pose/7 with storage rlk:player_motion active
+execute if score @s pmTick matches 8 run function rlk:char/motion/clips/skirk/infused_3/pose/8 with storage rlk:player_motion active
+execute if score @s pmTick matches 9 run function rlk:char/motion/clips/skirk/infused_3/pose/9 with storage rlk:player_motion active
+execute if score @s pmTick matches 10 run function rlk:char/motion/clips/skirk/infused_3/pose/10 with storage rlk:player_motion active
+execute if score @s pmTick matches 11 run function rlk:char/motion/clips/skirk/infused_3/pose/11 with storage rlk:player_motion active
+execute if score @s pmTick matches 12 run function rlk:char/motion/clips/skirk/infused_3/pose/12 with storage rlk:player_motion active
+execute if score @s pmTick matches 13 run function rlk:char/motion/clips/skirk/infused_3/pose/13 with storage rlk:player_motion active
+execute if score @s pmTick matches 14 run function rlk:char/motion/clips/skirk/infused_3/pose/14 with storage rlk:player_motion active
+execute if score @s pmTick matches 15 run function rlk:char/motion/clips/skirk/infused_3/pose/15 with storage rlk:player_motion active

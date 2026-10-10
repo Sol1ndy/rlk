@@ -24,6 +24,14 @@
   "#minecraft:leaves",
   "#minecraft:fences",
   "#minecraft:slabs",
-  "minecraft:lantern"
+  "minecraft:lantern",
+  "minecraft:wildflowers",
+  "minecraft:leaf_litter",
+  "minecraft:bush",
+  "minecraft:short_grass",
+  "minecraft:fern",
+  "minecraft:short_dry_grass",
+  "minecraft:tall_dry_grass",
+  "minecraft:dead_bush"
  ]
 }

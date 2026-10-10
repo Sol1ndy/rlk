@@ -1,0 +1,8705 @@
+{
+  "character": "skirk",
+  "format_version": 1,
+  "authoring": {
+    "basis": "right=-X,up=+Y,forward=-Z",
+    "euler": "degrees XYZ applied in X then Y then Z order",
+    "reference": "Original keyframes observed from the six user-provided recordings. No game animation asset extraction.",
+    "timing": "20 animation ticks per second; hit_ticks and chain_tick describe reference-aligned integration cues.",
+    "left_arm_balance": "Normal attacks use outward +Z left-shoulder abduction and varied elbow flexion; the free hand balances each swing beside/behind the torso. Recovery matches the relaxed locomotion left arm, while overhead casts retain an open shoulder."
+  },
+  "clips": {
+    "physical_1": {
+      "length": 13,
+      "weapon": "sword",
+      "source": "skirk_physical",
+      "source_start": 0.65,
+      "source_end": 1.3,
+      "hit_ticks": [
+        5
+      ],
+      "chain_tick": 9,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0,
+              0,
+              0
+            ],
+            "root": [
+              0,
+              28,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              30,
+              -28,
+              -32
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              8,
+              0,
+              14
+            ],
+            "left_elbow": [
+              16,
+              0,
+              2
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 2,
+          "pose": {
+            "shift": [
+              -0.05,
+              -0.04,
+              0
+            ],
+            "root": [
+              0,
+              42,
+              0
+            ],
+            "torso": [
+              -6,
+              18,
+              -7
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              38,
+              -46,
+              -73
+            ],
+            "right_elbow": [
+              42,
+              0,
+              0
+            ],
+            "left_arm": [
+              18,
+              -10,
+              28
+            ],
+            "left_elbow": [
+              26,
+              0,
+              4
+            ],
+            "right_leg": [
+              -15,
+              0,
+              12
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              21,
+              0,
+              -10
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -122,
+              0,
+              36
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 4,
+          "pose": {
+            "shift": [
+              0,
+              -0.01,
+              -0.12
+            ],
+            "root": [
+              0,
+              6,
+              -3
+            ],
+            "torso": [
+              -8,
+              -22,
+              -5
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              82,
+              15,
+              -15
+            ],
+            "right_elbow": [
+              15,
+              0,
+              0
+            ],
+            "left_arm": [
+              -8,
+              8,
+              44
+            ],
+            "left_elbow": [
+              22,
+              0,
+              2
+            ],
+            "right_leg": [
+              28,
+              0,
+              8
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -13,
+              0,
+              -9
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -100,
+              12,
+              -80
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 5,
+          "pose": {
+            "shift": [
+              0.04,
+              0,
+              -0.18
+            ],
+            "root": [
+              0,
+              -28,
+              -5
+            ],
+            "torso": [
+              -6,
+              -22,
+              -4
+            ],
+            "head": [
+              0,
+              50,
+              0
+            ],
+            "right_arm": [
+              86,
+              35,
+              58
+            ],
+            "right_elbow": [
+              3,
+              0,
+              0
+            ],
+            "left_arm": [
+              -24,
+              12,
+              50
+            ],
+            "left_elbow": [
+              16,
+              0,
+              2
+            ],
+            "right_leg": [
+              35,
+              0,
+              6
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -20,
+              0,
+              -10
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -112,
+              0,
+              -80
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 8,
+          "pose": {
+            "shift": [
+              0.03,
+              0,
+              -0.12
+            ],
+            "root": [
+              0,
+              -40,
+              -3
+            ],
+            "torso": [
+              2,
+              -12,
+              0
+            ],
+            "head": [
+              0,
+              45,
+              0
+            ],
+            "right_arm": [
+              62,
+              30,
+              83
+            ],
+            "right_elbow": [
+              22,
+              0,
+              0
+            ],
+            "left_arm": [
+              -18,
+              8,
+              34
+            ],
+            "left_elbow": [
+              20,
+              0,
+              2
+            ],
+            "right_leg": [
+              17,
+              0,
+              5
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -6,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -136,
+              -15,
+              -44
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 13,
+          "pose": {
+            "shift": [
+              0,
+              0,
+              0
+            ],
+            "root": [
+              0,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              2.9,
+              2,
+              7
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ]
+    },
+    "physical_2": {
+      "length": 10,
+      "weapon": "sword",
+      "source": "skirk_physical",
+      "source_start": 1.1,
+      "source_end": 1.6,
+      "hit_ticks": [
+        4
+      ],
+      "chain_tick": 6,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0,
+              0,
+              0
+            ],
+            "root": [
+              0,
+              -34,
+              -2
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              28,
+              0
+            ],
+            "right_arm": [
+              68,
+              28,
+              73
+            ],
+            "right_elbow": [
+              23,
+              0,
+              0
+            ],
+            "left_arm": [
+              -18,
+              8,
+              34
+            ],
+            "left_elbow": [
+              20,
+              0,
+              2
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -130,
+              0,
+              -40
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 2,
+          "pose": {
+            "shift": [
+              0.02,
+              -0.05,
+              0
+            ],
+            "root": [
+              0,
+              -48,
+              3
+            ],
+            "torso": [
+              -8,
+              -12,
+              5
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              124,
+              35,
+              35
+            ],
+            "right_elbow": [
+              64,
+              0,
+              0
+            ],
+            "left_arm": [
+              -28,
+              12,
+              42
+            ],
+            "left_elbow": [
+              28,
+              0,
+              4
+            ],
+            "right_leg": [
+              18,
+              0,
+              10
+            ],
+            "right_knee": [
+              -20,
+              0,
+              0
+            ],
+            "left_leg": [
+              -18,
+              0,
+              -8
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -58,
+              -25,
+              -25
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 4,
+          "pose": {
+            "shift": [
+              -0.04,
+              -0.05,
+              -0.2
+            ],
+            "root": [
+              0,
+              30,
+              3
+            ],
+            "torso": [
+              -16,
+              18,
+              0
+            ],
+            "head": [
+              5,
+              -40,
+              0
+            ],
+            "right_arm": [
+              78,
+              -25,
+              -55
+            ],
+            "right_elbow": [
+              7,
+              0,
+              0
+            ],
+            "left_arm": [
+              18,
+              -14,
+              50
+            ],
+            "left_elbow": [
+              16,
+              0,
+              2
+            ],
+            "right_leg": [
+              -18,
+              0,
+              10
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              35,
+              0,
+              -9
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -130,
+              15,
+              90
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 6,
+          "pose": {
+            "shift": [
+              -0.03,
+              -0.02,
+              -0.15
+            ],
+            "root": [
+              0,
+              49,
+              0
+            ],
+            "torso": [
+              -8,
+              12,
+              0
+            ],
+            "head": [
+              0,
+              -58,
+              0
+            ],
+            "right_arm": [
+              24,
+              -32,
+              -62
+            ],
+            "right_elbow": [
+              10,
+              0,
+              0
+            ],
+            "left_arm": [
+              12,
+              -8,
+              32
+            ],
+            "left_elbow": [
+              22,
+              0,
+              2
+            ],
+            "right_leg": [
+              -14,
+              0,
+              8
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              27,
+              0,
+              -6
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -164,
+              0,
+              80
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 10,
+          "pose": {
+            "shift": [
+              0,
+              0,
+              0
+            ],
+            "root": [
+              0,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              2.9,
+              2,
+              7
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ]
+    },
+    "physical_3": {
+      "length": 15,
+      "weapon": "sword",
+      "source": "skirk_physical",
+      "source_start": 1.4,
+      "source_end": 2.15,
+      "hit_ticks": [
+        3,
+        8
+      ],
+      "chain_tick": 12,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0,
+              -0.11,
+              0
+            ],
+            "root": [
+              0,
+              36,
+              0
+            ],
+            "torso": [
+              -15,
+              8,
+              0
+            ],
+            "head": [
+              5,
+              -25,
+              0
+            ],
+            "right_arm": [
+              10,
+              -28,
+              -48
+            ],
+            "right_elbow": [
+              12,
+              0,
+              0
+            ],
+            "left_arm": [
+              12,
+              -8,
+              32
+            ],
+            "left_elbow": [
+              22,
+              0,
+              2
+            ],
+            "right_leg": [
+              35,
+              0,
+              12
+            ],
+            "right_knee": [
+              -55,
+              0,
+              0
+            ],
+            "left_leg": [
+              -23,
+              0,
+              -9
+            ],
+            "left_knee": [
+              -20,
+              0,
+              0
+            ],
+            "weapon": [
+              -168,
+              0,
+              18
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 3,
+          "pose": {
+            "shift": [
+              0,
+              0.18,
+              -0.12
+            ],
+            "root": [
+              4,
+              -25,
+              -8
+            ],
+            "torso": [
+              16,
+              -18,
+              0
+            ],
+            "head": [
+              0,
+              30,
+              0
+            ],
+            "right_arm": [
+              156,
+              -8,
+              -32
+            ],
+            "right_elbow": [
+              20,
+              0,
+              0
+            ],
+            "left_arm": [
+              -15,
+              10,
+              52
+            ],
+            "left_elbow": [
+              30,
+              0,
+              4
+            ],
+            "right_leg": [
+              53,
+              0,
+              12
+            ],
+            "right_knee": [
+              -52,
+              0,
+              0
+            ],
+            "left_leg": [
+              -16,
+              0,
+              -10
+            ],
+            "left_knee": [
+              -25,
+              0,
+              0
+            ],
+            "weapon": [
+              -136,
+              0,
+              20
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 5,
+          "pose": {
+            "shift": [
+              0.02,
+              0.33,
+              -0.16
+            ],
+            "root": [
+              10,
+              -96,
+              -18
+            ],
+            "torso": [
+              13,
+              -10,
+              0
+            ],
+            "head": [
+              0,
+              32,
+              0
+            ],
+            "right_arm": [
+              173,
+              5,
+              15
+            ],
+            "right_elbow": [
+              55,
+              0,
+              0
+            ],
+            "left_arm": [
+              28,
+              -20,
+              54
+            ],
+            "left_elbow": [
+              18,
+              0,
+              4
+            ],
+            "right_leg": [
+              25,
+              0,
+              15
+            ],
+            "right_knee": [
+              -62,
+              0,
+              0
+            ],
+            "left_leg": [
+              -43,
+              0,
+              -15
+            ],
+            "left_knee": [
+              -30,
+              0,
+              0
+            ],
+            "weapon": [
+              -182,
+              10,
+              35
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 8,
+          "pose": {
+            "shift": [
+              -0.04,
+              0.22,
+              -0.2
+            ],
+            "root": [
+              -5,
+              -210,
+              -10
+            ],
+            "torso": [
+              -10,
+              -10,
+              0
+            ],
+            "head": [
+              7,
+              20,
+              0
+            ],
+            "right_arm": [
+              82,
+              20,
+              68
+            ],
+            "right_elbow": [
+              15,
+              0,
+              0
+            ],
+            "left_arm": [
+              -20,
+              8,
+              58
+            ],
+            "left_elbow": [
+              12,
+              0,
+              3
+            ],
+            "right_leg": [
+              -37,
+              0,
+              13
+            ],
+            "right_knee": [
+              -20,
+              0,
+              0
+            ],
+            "left_leg": [
+              55,
+              0,
+              -10
+            ],
+            "left_knee": [
+              -48,
+              0,
+              0
+            ],
+            "weapon": [
+              -172,
+              0,
+              -22
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 11,
+          "pose": {
+            "shift": [
+              0,
+              -0.12,
+              -0.18
+            ],
+            "root": [
+              0,
+              -340,
+              0
+            ],
+            "torso": [
+              -24,
+              8,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -15,
+              -35
+            ],
+            "right_elbow": [
+              12,
+              0,
+              0
+            ],
+            "left_arm": [
+              10,
+              -8,
+              34
+            ],
+            "left_elbow": [
+              24,
+              0,
+              2
+            ],
+            "right_leg": [
+              35,
+              0,
+              12
+            ],
+            "right_knee": [
+              -52,
+              0,
+              0
+            ],
+            "left_leg": [
+              -20,
+              0,
+              -11
+            ],
+            "left_knee": [
+              -28,
+              0,
+              0
+            ],
+            "weapon": [
+              -176,
+              0,
+              30
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 15,
+          "pose": {
+            "shift": [
+              0,
+              0,
+              0
+            ],
+            "root": [
+              0,
+              -348,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              2.9,
+              2,
+              7
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ]
+    },
+    "physical_4": {
+      "length": 14,
+      "weapon": "sword",
+      "source": "skirk_physical",
+      "source_start": 2,
+      "source_end": 2.7,
+      "hit_ticks": [
+        5
+      ],
+      "chain_tick": 11,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0,
+              -0.09,
+              0
+            ],
+            "root": [
+              0,
+              -28,
+              0
+            ],
+            "torso": [
+              -7,
+              -10,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              62,
+              -18,
+              55
+            ],
+            "right_elbow": [
+              88,
+              0,
+              0
+            ],
+            "left_arm": [
+              8,
+              -4,
+              22
+            ],
+            "left_elbow": [
+              26,
+              0,
+              3
+            ],
+            "right_leg": [
+              -25,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              34,
+              0,
+              -8
+            ],
+            "left_knee": [
+              -40,
+              0,
+              0
+            ],
+            "weapon": [
+              -236,
+              0,
+              -16
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 3,
+          "pose": {
+            "shift": [
+              0.01,
+              -0.03,
+              -0.13
+            ],
+            "root": [
+              0,
+              -8,
+              0
+            ],
+            "torso": [
+              -12,
+              0,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              81,
+              0,
+              12
+            ],
+            "right_elbow": [
+              40,
+              0,
+              0
+            ],
+            "left_arm": [
+              -24,
+              10,
+              34
+            ],
+            "left_elbow": [
+              30,
+              0,
+              3
+            ],
+            "right_leg": [
+              18,
+              0,
+              8
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -15,
+              0,
+              -8
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -205,
+              0,
+              -5
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 5,
+          "pose": {
+            "shift": [
+              0,
+              0,
+              -0.35
+            ],
+            "root": [
+              0,
+              10,
+              0
+            ],
+            "torso": [
+              -18,
+              -5,
+              0
+            ],
+            "head": [
+              8,
+              -5,
+              0
+            ],
+            "right_arm": [
+              92,
+              0,
+              -5
+            ],
+            "right_elbow": [
+              0,
+              0,
+              0
+            ],
+            "left_arm": [
+              -38,
+              12,
+              42
+            ],
+            "left_elbow": [
+              20,
+              0,
+              2
+            ],
+            "right_leg": [
+              39,
+              0,
+              8
+            ],
+            "right_knee": [
+              -15,
+              0,
+              0
+            ],
+            "left_leg": [
+              -27,
+              0,
+              -8
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -197,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 8,
+          "pose": {
+            "shift": [
+              0,
+              -0.03,
+              -0.24
+            ],
+            "root": [
+              0,
+              16,
+              0
+            ],
+            "torso": [
+              -11,
+              0,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              83,
+              0,
+              -12
+            ],
+            "right_elbow": [
+              30,
+              0,
+              0
+            ],
+            "left_arm": [
+              -22,
+              8,
+              28
+            ],
+            "left_elbow": [
+              24,
+              0,
+              2
+            ],
+            "right_leg": [
+              20,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -16,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -210,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 14,
+          "pose": {
+            "shift": [
+              0,
+              0,
+              0
+            ],
+            "root": [
+              0,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              2.9,
+              2,
+              7
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ]
+    },
+    "physical_5": {
+      "length": 28,
+      "weapon": "sword",
+      "source": "skirk_physical",
+      "source_start": 2.55,
+      "source_end": 3.95,
+      "hit_ticks": [
+        13
+      ],
+      "chain_tick": 23,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0,
+              -0.08,
+              0
+            ],
+            "root": [
+              0,
+              16,
+              0
+            ],
+            "torso": [
+              -12,
+              10,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              70,
+              -10,
+              -50
+            ],
+            "right_elbow": [
+              55,
+              0,
+              0
+            ],
+            "left_arm": [
+              10,
+              -6,
+              25
+            ],
+            "left_elbow": [
+              24,
+              0,
+              2
+            ],
+            "right_leg": [
+              32,
+              0,
+              12
+            ],
+            "right_knee": [
+              -48,
+              0,
+              0
+            ],
+            "left_leg": [
+              -23,
+              0,
+              -9
+            ],
+            "left_knee": [
+              -20,
+              0,
+              0
+            ],
+            "weapon": [
+              -180,
+              0,
+              30
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 4,
+          "pose": {
+            "shift": [
+              0,
+              0.2,
+              -0.05
+            ],
+            "root": [
+              6,
+              50,
+              -8
+            ],
+            "torso": [
+              10,
+              18,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              120,
+              -20,
+              -70
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              -18,
+              8,
+              50
+            ],
+            "left_elbow": [
+              28,
+              0,
+              4
+            ],
+            "right_leg": [
+              42,
+              0,
+              16
+            ],
+            "right_knee": [
+              -55,
+              0,
+              0
+            ],
+            "left_leg": [
+              -25,
+              0,
+              -18
+            ],
+            "left_knee": [
+              -25,
+              0,
+              0
+            ],
+            "weapon": [
+              -142,
+              0,
+              68
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 7,
+          "pose": {
+            "shift": [
+              0,
+              0.5,
+              -0.1
+            ],
+            "root": [
+              8,
+              148,
+              -12
+            ],
+            "torso": [
+              14,
+              12,
+              0
+            ],
+            "head": [
+              0,
+              18,
+              0
+            ],
+            "right_arm": [
+              140,
+              0,
+              -65
+            ],
+            "right_elbow": [
+              25,
+              0,
+              0
+            ],
+            "left_arm": [
+              28,
+              -20,
+              62
+            ],
+            "left_elbow": [
+              18,
+              0,
+              4
+            ],
+            "right_leg": [
+              53,
+              0,
+              18
+            ],
+            "right_knee": [
+              -66,
+              0,
+              0
+            ],
+            "left_leg": [
+              -30,
+              0,
+              -15
+            ],
+            "left_knee": [
+              -28,
+              0,
+              0
+            ],
+            "weapon": [
+              -145,
+              0,
+              80
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 10,
+          "pose": {
+            "shift": [
+              0,
+              0.28,
+              -0.15
+            ],
+            "root": [
+              -5,
+              254,
+              -5
+            ],
+            "torso": [
+              -4,
+              10,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              90,
+              25,
+              -15
+            ],
+            "right_elbow": [
+              10,
+              0,
+              0
+            ],
+            "left_arm": [
+              -12,
+              6,
+              60
+            ],
+            "left_elbow": [
+              12,
+              0,
+              3
+            ],
+            "right_leg": [
+              -16,
+              0,
+              12
+            ],
+            "right_knee": [
+              -35,
+              0,
+              0
+            ],
+            "left_leg": [
+              45,
+              0,
+              -9
+            ],
+            "left_knee": [
+              -40,
+              0,
+              0
+            ],
+            "weapon": [
+              -116,
+              0,
+              85
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 13,
+          "pose": {
+            "shift": [
+              0.05,
+              -0.12,
+              -0.28
+            ],
+            "root": [
+              0,
+              344,
+              -8
+            ],
+            "torso": [
+              -16,
+              -25,
+              -5
+            ],
+            "head": [
+              4,
+              35,
+              0
+            ],
+            "right_arm": [
+              79,
+              28,
+              73
+            ],
+            "right_elbow": [
+              7,
+              0,
+              0
+            ],
+            "left_arm": [
+              -30,
+              12,
+              48
+            ],
+            "left_elbow": [
+              18,
+              0,
+              3
+            ],
+            "right_leg": [
+              40,
+              0,
+              15
+            ],
+            "right_knee": [
+              -48,
+              0,
+              0
+            ],
+            "left_leg": [
+              -25,
+              0,
+              -13
+            ],
+            "left_knee": [
+              -25,
+              0,
+              0
+            ],
+            "weapon": [
+              -115,
+              0,
+              -80
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 17,
+          "pose": {
+            "shift": [
+              0.02,
+              -0.07,
+              -0.17
+            ],
+            "root": [
+              0,
+              315,
+              -4
+            ],
+            "torso": [
+              -8,
+              -12,
+              0
+            ],
+            "head": [
+              0,
+              40,
+              0
+            ],
+            "right_arm": [
+              53,
+              28,
+              77
+            ],
+            "right_elbow": [
+              15,
+              0,
+              0
+            ],
+            "left_arm": [
+              -16,
+              6,
+              32
+            ],
+            "left_elbow": [
+              22,
+              0,
+              2
+            ],
+            "right_leg": [
+              28,
+              0,
+              11
+            ],
+            "right_knee": [
+              -28,
+              0,
+              0
+            ],
+            "left_leg": [
+              -15,
+              0,
+              -10
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -120,
+              0,
+              -60
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 23,
+          "pose": {
+            "shift": [
+              0,
+              0,
+              0
+            ],
+            "root": [
+              0,
+              349,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              4,
+              0,
+              12
+            ],
+            "left_elbow": [
+              14,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 28,
+          "pose": {
+            "shift": [
+              0,
+              0,
+              0
+            ],
+            "root": [
+              0,
+              372,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              2.9,
+              2,
+              7
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ]
+    },
+    "infused_1": {
+      "length": 14,
+      "weapon": "cryo_sword",
+      "source": "skirk_infused",
+      "source_start": 0.85,
+      "source_end": 1.55,
+      "hit_ticks": [
+        6
+      ],
+      "chain_tick": 10,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              -0.06,
+              0.05,
+              0
+            ],
+            "root": [
+              0,
+              24,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              35,
+              -18,
+              -36
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              8,
+              0,
+              16
+            ],
+            "left_elbow": [
+              16,
+              0,
+              2
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 3,
+          "pose": {
+            "shift": [
+              -0.14,
+              0.08,
+              0.06
+            ],
+            "root": [
+              4,
+              55,
+              -13
+            ],
+            "torso": [
+              6,
+              18,
+              -7
+            ],
+            "head": [
+              0,
+              -55,
+              0
+            ],
+            "right_arm": [
+              61,
+              -25,
+              -74
+            ],
+            "right_elbow": [
+              45,
+              0,
+              0
+            ],
+            "left_arm": [
+              12,
+              -10,
+              48
+            ],
+            "left_elbow": [
+              26,
+              0,
+              4
+            ],
+            "right_leg": [
+              28,
+              0,
+              15
+            ],
+            "right_knee": [
+              -32,
+              0,
+              0
+            ],
+            "left_leg": [
+              -18,
+              0,
+              -14
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -132,
+              0,
+              75
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 5,
+          "pose": {
+            "shift": [
+              -0.06,
+              0.1,
+              -0.16
+            ],
+            "root": [
+              3,
+              3,
+              -6
+            ],
+            "torso": [
+              -6,
+              -12,
+              -4
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              90,
+              14,
+              -5
+            ],
+            "right_elbow": [
+              13,
+              0,
+              0
+            ],
+            "left_arm": [
+              -15,
+              10,
+              60
+            ],
+            "left_elbow": [
+              18,
+              0,
+              3
+            ],
+            "right_leg": [
+              45,
+              0,
+              10
+            ],
+            "right_knee": [
+              -38,
+              0,
+              0
+            ],
+            "left_leg": [
+              -28,
+              0,
+              -10
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -112,
+              0,
+              -45
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 6,
+          "pose": {
+            "shift": [
+              0.07,
+              0.08,
+              -0.24
+            ],
+            "root": [
+              0,
+              -35,
+              -9
+            ],
+            "torso": [
+              -7,
+              -22,
+              -3
+            ],
+            "head": [
+              0,
+              55,
+              0
+            ],
+            "right_arm": [
+              97,
+              22,
+              70
+            ],
+            "right_elbow": [
+              0,
+              0,
+              0
+            ],
+            "left_arm": [
+              -30,
+              12,
+              56
+            ],
+            "left_elbow": [
+              12,
+              0,
+              3
+            ],
+            "right_leg": [
+              42,
+              0,
+              14
+            ],
+            "right_knee": [
+              -35,
+              0,
+              0
+            ],
+            "left_leg": [
+              -30,
+              0,
+              -9
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -116,
+              0,
+              -85
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 9,
+          "pose": {
+            "shift": [
+              0.12,
+              0.04,
+              -0.13
+            ],
+            "root": [
+              0,
+              -60,
+              -8
+            ],
+            "torso": [
+              -2,
+              -10,
+              0
+            ],
+            "head": [
+              0,
+              52,
+              0
+            ],
+            "right_arm": [
+              67,
+              22,
+              80
+            ],
+            "right_elbow": [
+              12,
+              0,
+              0
+            ],
+            "left_arm": [
+              -20,
+              6,
+              36
+            ],
+            "left_elbow": [
+              20,
+              0,
+              2
+            ],
+            "right_leg": [
+              24,
+              0,
+              10
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -17,
+              0,
+              -8
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -145,
+              0,
+              -45
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 14,
+          "pose": {
+            "shift": [
+              0,
+              0.03,
+              0
+            ],
+            "root": [
+              0,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              2.9,
+              2,
+              7
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ]
+    },
+    "infused_2": {
+      "length": 10,
+      "weapon": "cryo_sword",
+      "source": "skirk_infused",
+      "source_start": 1.36,
+      "source_end": 1.86,
+      "hit_ticks": [
+        3
+      ],
+      "chain_tick": 6,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0.05,
+              0.04,
+              0
+            ],
+            "root": [
+              0,
+              -45,
+              -6
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              35,
+              0
+            ],
+            "right_arm": [
+              90,
+              25,
+              60
+            ],
+            "right_elbow": [
+              32,
+              0,
+              0
+            ],
+            "left_arm": [
+              -20,
+              6,
+              36
+            ],
+            "left_elbow": [
+              20,
+              0,
+              2
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -95,
+              0,
+              -40
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 2,
+          "pose": {
+            "shift": [
+              0.02,
+              0.1,
+              -0.08
+            ],
+            "root": [
+              0,
+              -10,
+              0
+            ],
+            "torso": [
+              -6,
+              -8,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              145,
+              15,
+              20
+            ],
+            "right_elbow": [
+              32,
+              0,
+              0
+            ],
+            "left_arm": [
+              -24,
+              10,
+              50
+            ],
+            "left_elbow": [
+              28,
+              0,
+              4
+            ],
+            "right_leg": [
+              35,
+              0,
+              9
+            ],
+            "right_knee": [
+              -25,
+              0,
+              0
+            ],
+            "left_leg": [
+              -20,
+              0,
+              -12
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -35,
+              0,
+              30
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 3,
+          "pose": {
+            "shift": [
+              -0.05,
+              0.04,
+              -0.22
+            ],
+            "root": [
+              0,
+              36,
+              8
+            ],
+            "torso": [
+              -14,
+              18,
+              3
+            ],
+            "head": [
+              4,
+              -52,
+              0
+            ],
+            "right_arm": [
+              72,
+              -18,
+              -65
+            ],
+            "right_elbow": [
+              2,
+              0,
+              0
+            ],
+            "left_arm": [
+              20,
+              -18,
+              56
+            ],
+            "left_elbow": [
+              14,
+              0,
+              3
+            ],
+            "right_leg": [
+              -18,
+              0,
+              13
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              37,
+              0,
+              -13
+            ],
+            "left_knee": [
+              -30,
+              0,
+              0
+            ],
+            "weapon": [
+              -133,
+              0,
+              83
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 6,
+          "pose": {
+            "shift": [
+              -0.06,
+              -0.07,
+              -0.14
+            ],
+            "root": [
+              0,
+              58,
+              5
+            ],
+            "torso": [
+              -15,
+              12,
+              0
+            ],
+            "head": [
+              5,
+              -45,
+              0
+            ],
+            "right_arm": [
+              12,
+              -20,
+              -50
+            ],
+            "right_elbow": [
+              12,
+              0,
+              0
+            ],
+            "left_arm": [
+              22,
+              -12,
+              36
+            ],
+            "left_elbow": [
+              22,
+              0,
+              2
+            ],
+            "right_leg": [
+              28,
+              0,
+              12
+            ],
+            "right_knee": [
+              -45,
+              0,
+              0
+            ],
+            "left_leg": [
+              -18,
+              0,
+              -8
+            ],
+            "left_knee": [
+              -24,
+              0,
+              0
+            ],
+            "weapon": [
+              -160,
+              0,
+              50
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 10,
+          "pose": {
+            "shift": [
+              0,
+              0.03,
+              0
+            ],
+            "root": [
+              0,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              2.9,
+              2,
+              7
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ]
+    },
+    "infused_3": {
+      "length": 15,
+      "weapon": "cryo_sword",
+      "source": "skirk_infused",
+      "source_start": 1.65,
+      "source_end": 2.4,
+      "hit_ticks": [
+        5,
+        8
+      ],
+      "chain_tick": 11,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0,
+              -0.1,
+              0
+            ],
+            "root": [
+              0,
+              28,
+              0
+            ],
+            "torso": [
+              -18,
+              10,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              18,
+              -25,
+              -54
+            ],
+            "right_elbow": [
+              12,
+              0,
+              0
+            ],
+            "left_arm": [
+              18,
+              -10,
+              34
+            ],
+            "left_elbow": [
+              24,
+              0,
+              3
+            ],
+            "right_leg": [
+              34,
+              0,
+              11
+            ],
+            "right_knee": [
+              -54,
+              0,
+              0
+            ],
+            "left_leg": [
+              -23,
+              0,
+              -12
+            ],
+            "left_knee": [
+              -28,
+              0,
+              0
+            ],
+            "weapon": [
+              -175,
+              0,
+              25
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 3,
+          "pose": {
+            "shift": [
+              0,
+              0.36,
+              -0.1
+            ],
+            "root": [
+              28,
+              -10,
+              -12
+            ],
+            "torso": [
+              14,
+              -5,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              150,
+              -15,
+              -40
+            ],
+            "right_elbow": [
+              20,
+              0,
+              0
+            ],
+            "left_arm": [
+              34,
+              -20,
+              48
+            ],
+            "left_elbow": [
+              30,
+              0,
+              4
+            ],
+            "right_leg": [
+              42,
+              0,
+              10
+            ],
+            "right_knee": [
+              -55,
+              0,
+              0
+            ],
+            "left_leg": [
+              -40,
+              0,
+              -12
+            ],
+            "left_knee": [
+              -20,
+              0,
+              0
+            ],
+            "weapon": [
+              -145,
+              0,
+              35
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 5,
+          "pose": {
+            "shift": [
+              0,
+              0.91,
+              -0.16
+            ],
+            "root": [
+              90,
+              -40,
+              -20
+            ],
+            "torso": [
+              10,
+              0,
+              0
+            ],
+            "head": [
+              8,
+              5,
+              0
+            ],
+            "right_arm": [
+              165,
+              0,
+              -42
+            ],
+            "right_elbow": [
+              5,
+              0,
+              0
+            ],
+            "left_arm": [
+              65,
+              -30,
+              42
+            ],
+            "left_elbow": [
+              22,
+              0,
+              3
+            ],
+            "right_leg": [
+              57,
+              0,
+              14
+            ],
+            "right_knee": [
+              -72,
+              0,
+              0
+            ],
+            "left_leg": [
+              -44,
+              0,
+              -16
+            ],
+            "left_knee": [
+              -30,
+              0,
+              0
+            ],
+            "weapon": [
+              -143,
+              0,
+              20
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 7,
+          "pose": {
+            "shift": [
+              0.05,
+              0.85,
+              -0.2
+            ],
+            "root": [
+              202,
+              -55,
+              -14
+            ],
+            "torso": [
+              0,
+              0,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              125,
+              0,
+              48
+            ],
+            "right_elbow": [
+              30,
+              0,
+              0
+            ],
+            "left_arm": [
+              35,
+              -20,
+              58
+            ],
+            "left_elbow": [
+              14,
+              0,
+              4
+            ],
+            "right_leg": [
+              72,
+              0,
+              12
+            ],
+            "right_knee": [
+              -80,
+              0,
+              0
+            ],
+            "left_leg": [
+              -8,
+              0,
+              -14
+            ],
+            "left_knee": [
+              -62,
+              0,
+              0
+            ],
+            "weapon": [
+              -169,
+              0,
+              -48
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 8,
+          "pose": {
+            "shift": [
+              0.06,
+              0.66,
+              -0.22
+            ],
+            "root": [
+              258,
+              -45,
+              -10
+            ],
+            "torso": [
+              -8,
+              0,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              85,
+              15,
+              67
+            ],
+            "right_elbow": [
+              15,
+              0,
+              0
+            ],
+            "left_arm": [
+              -12,
+              8,
+              56
+            ],
+            "left_elbow": [
+              16,
+              0,
+              3
+            ],
+            "right_leg": [
+              42,
+              0,
+              10
+            ],
+            "right_knee": [
+              -42,
+              0,
+              0
+            ],
+            "left_leg": [
+              15,
+              0,
+              -13
+            ],
+            "left_knee": [
+              -36,
+              0,
+              0
+            ],
+            "weapon": [
+              -163,
+              0,
+              -35
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 11,
+          "pose": {
+            "shift": [
+              0.03,
+              -0.14,
+              -0.14
+            ],
+            "root": [
+              350,
+              0,
+              0
+            ],
+            "torso": [
+              -26,
+              5,
+              0
+            ],
+            "head": [
+              10,
+              0,
+              0
+            ],
+            "right_arm": [
+              18,
+              -18,
+              -30
+            ],
+            "right_elbow": [
+              15,
+              0,
+              0
+            ],
+            "left_arm": [
+              12,
+              -8,
+              32
+            ],
+            "left_elbow": [
+              26,
+              0,
+              2
+            ],
+            "right_leg": [
+              45,
+              0,
+              13
+            ],
+            "right_knee": [
+              -62,
+              0,
+              0
+            ],
+            "left_leg": [
+              -25,
+              0,
+              -12
+            ],
+            "left_knee": [
+              -30,
+              0,
+              0
+            ],
+            "weapon": [
+              -174,
+              0,
+              35
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 15,
+          "pose": {
+            "shift": [
+              0,
+              0.03,
+              0
+            ],
+            "root": [
+              360,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              2.9,
+              2,
+              7
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ]
+    },
+    "infused_4": {
+      "length": 17,
+      "weapon": "cryo_sword",
+      "source": "skirk_infused",
+      "source_start": 2.22,
+      "source_end": 3.07,
+      "hit_ticks": [
+        4
+      ],
+      "chain_tick": 13,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0.04,
+              -0.08,
+              0
+            ],
+            "root": [
+              0,
+              15,
+              0
+            ],
+            "torso": [
+              -16,
+              8,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              50,
+              -12,
+              -54
+            ],
+            "right_elbow": [
+              30,
+              0,
+              0
+            ],
+            "left_arm": [
+              16,
+              -10,
+              34
+            ],
+            "left_elbow": [
+              22,
+              0,
+              3
+            ],
+            "right_leg": [
+              34,
+              0,
+              14
+            ],
+            "right_knee": [
+              -42,
+              0,
+              0
+            ],
+            "left_leg": [
+              -24,
+              0,
+              -12
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -150,
+              0,
+              45
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 2,
+          "pose": {
+            "shift": [
+              0.13,
+              0.04,
+              -0.08
+            ],
+            "root": [
+              0,
+              60,
+              -22
+            ],
+            "torso": [
+              2,
+              20,
+              0
+            ],
+            "head": [
+              3,
+              -35,
+              0
+            ],
+            "right_arm": [
+              87,
+              -20,
+              -76
+            ],
+            "right_elbow": [
+              15,
+              0,
+              0
+            ],
+            "left_arm": [
+              -18,
+              10,
+              54
+            ],
+            "left_elbow": [
+              26,
+              0,
+              4
+            ],
+            "right_leg": [
+              46,
+              0,
+              12
+            ],
+            "right_knee": [
+              -38,
+              0,
+              0
+            ],
+            "left_leg": [
+              -40,
+              0,
+              -16
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -118,
+              0,
+              85
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 4,
+          "pose": {
+            "shift": [
+              0.06,
+              0.18,
+              -0.24
+            ],
+            "root": [
+              0,
+              165,
+              -48
+            ],
+            "torso": [
+              8,
+              12,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              90,
+              5,
+              -30
+            ],
+            "right_elbow": [
+              10,
+              0,
+              0
+            ],
+            "left_arm": [
+              12,
+              -10,
+              62
+            ],
+            "left_elbow": [
+              16,
+              0,
+              4
+            ],
+            "right_leg": [
+              30,
+              0,
+              20
+            ],
+            "right_knee": [
+              -55,
+              0,
+              0
+            ],
+            "left_leg": [
+              -42,
+              0,
+              -23
+            ],
+            "left_knee": [
+              -20,
+              0,
+              0
+            ],
+            "weapon": [
+              -126,
+              0,
+              -82
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 7,
+          "pose": {
+            "shift": [
+              -0.1,
+              0.16,
+              -0.23
+            ],
+            "root": [
+              0,
+              270,
+              -65
+            ],
+            "torso": [
+              0,
+              10,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              102,
+              15,
+              66
+            ],
+            "right_elbow": [
+              15,
+              0,
+              0
+            ],
+            "left_arm": [
+              22,
+              -18,
+              64
+            ],
+            "left_elbow": [
+              12,
+              0,
+              4
+            ],
+            "right_leg": [
+              -45,
+              0,
+              14
+            ],
+            "right_knee": [
+              -25,
+              0,
+              0
+            ],
+            "left_leg": [
+              57,
+              0,
+              -19
+            ],
+            "left_knee": [
+              -48,
+              0,
+              0
+            ],
+            "weapon": [
+              -129,
+              0,
+              -65
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 10,
+          "pose": {
+            "shift": [
+              -0.12,
+              0.02,
+              -0.12
+            ],
+            "root": [
+              0,
+              362,
+              -27
+            ],
+            "torso": [
+              -8,
+              5,
+              0
+            ],
+            "head": [
+              4,
+              10,
+              0
+            ],
+            "right_arm": [
+              110,
+              -5,
+              -50
+            ],
+            "right_elbow": [
+              30,
+              0,
+              0
+            ],
+            "left_arm": [
+              -10,
+              6,
+              50
+            ],
+            "left_elbow": [
+              18,
+              0,
+              3
+            ],
+            "right_leg": [
+              38,
+              0,
+              12
+            ],
+            "right_knee": [
+              -33,
+              0,
+              0
+            ],
+            "left_leg": [
+              -18,
+              0,
+              -11
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -168,
+              0,
+              45
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 13,
+          "pose": {
+            "shift": [
+              -0.03,
+              -0.04,
+              -0.03
+            ],
+            "root": [
+              0,
+              395,
+              -6
+            ],
+            "torso": [
+              -12,
+              7,
+              0
+            ],
+            "head": [
+              0,
+              -18,
+              0
+            ],
+            "right_arm": [
+              145,
+              -10,
+              -48
+            ],
+            "right_elbow": [
+              45,
+              0,
+              0
+            ],
+            "left_arm": [
+              10,
+              -6,
+              27
+            ],
+            "left_elbow": [
+              26,
+              0,
+              2
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -187,
+              0,
+              15
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 17,
+          "pose": {
+            "shift": [
+              0,
+              0.03,
+              0
+            ],
+            "root": [
+              0,
+              372,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              2.9,
+              2,
+              7
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ]
+    },
+    "infused_5": {
+      "length": 30,
+      "weapon": "cryo_sword",
+      "source": "skirk_infused",
+      "source_start": 2.88,
+      "source_end": 4.38,
+      "hit_ticks": [
+        11
+      ],
+      "chain_tick": 24,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0,
+              0.07,
+              0
+            ],
+            "root": [
+              0,
+              28,
+              0
+            ],
+            "torso": [
+              8,
+              12,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              140,
+              -12,
+              -46
+            ],
+            "right_elbow": [
+              40,
+              0,
+              0
+            ],
+            "left_arm": [
+              50,
+              -20,
+              28
+            ],
+            "left_elbow": [
+              28,
+              0,
+              2
+            ],
+            "right_leg": [
+              25,
+              0,
+              12
+            ],
+            "right_knee": [
+              -30,
+              0,
+              0
+            ],
+            "left_leg": [
+              -16,
+              0,
+              -12
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -175,
+              0,
+              25
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 4,
+          "pose": {
+            "shift": [
+              0,
+              0.24,
+              -0.04
+            ],
+            "root": [
+              9,
+              48,
+              -5
+            ],
+            "torso": [
+              12,
+              12,
+              0
+            ],
+            "head": [
+              0,
+              -30,
+              0
+            ],
+            "right_arm": [
+              156,
+              5,
+              -18
+            ],
+            "right_elbow": [
+              32,
+              0,
+              0
+            ],
+            "left_arm": [
+              125,
+              -30,
+              15
+            ],
+            "left_elbow": [
+              24,
+              0,
+              4
+            ],
+            "right_leg": [
+              37,
+              0,
+              11
+            ],
+            "right_knee": [
+              -46,
+              0,
+              0
+            ],
+            "left_leg": [
+              -26,
+              0,
+              -13
+            ],
+            "left_knee": [
+              -18,
+              0,
+              0
+            ],
+            "weapon": [
+              -136,
+              0,
+              5
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 7,
+          "pose": {
+            "shift": [
+              0.02,
+              0.18,
+              -0.12
+            ],
+            "root": [
+              4,
+              14,
+              0
+            ],
+            "torso": [
+              4,
+              0,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              115,
+              0,
+              -5
+            ],
+            "right_elbow": [
+              50,
+              0,
+              0
+            ],
+            "left_arm": [
+              95,
+              -28,
+              22
+            ],
+            "left_elbow": [
+              32,
+              0,
+              4
+            ],
+            "right_leg": [
+              38,
+              0,
+              8
+            ],
+            "right_knee": [
+              -25,
+              0,
+              0
+            ],
+            "left_leg": [
+              -23,
+              0,
+              -9
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -235,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 9,
+          "pose": {
+            "shift": [
+              0,
+              0.1,
+              -0.25
+            ],
+            "root": [
+              0,
+              -10,
+              0
+            ],
+            "torso": [
+              -10,
+              -8,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              95,
+              0,
+              -3
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              72,
+              -25,
+              30
+            ],
+            "left_elbow": [
+              18,
+              0,
+              3
+            ],
+            "right_leg": [
+              45,
+              0,
+              10
+            ],
+            "right_knee": [
+              -23,
+              0,
+              0
+            ],
+            "left_leg": [
+              -30,
+              0,
+              -9
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -201,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 11,
+          "pose": {
+            "shift": [
+              0,
+              0.08,
+              -0.44
+            ],
+            "root": [
+              0,
+              -20,
+              0
+            ],
+            "torso": [
+              -20,
+              -9,
+              0
+            ],
+            "head": [
+              10,
+              25,
+              0
+            ],
+            "right_arm": [
+              89,
+              -4,
+              -2
+            ],
+            "right_elbow": [
+              0,
+              0,
+              0
+            ],
+            "left_arm": [
+              60,
+              -20,
+              36
+            ],
+            "left_elbow": [
+              10,
+              0,
+              3
+            ],
+            "right_leg": [
+              50,
+              0,
+              12
+            ],
+            "right_knee": [
+              -30,
+              0,
+              0
+            ],
+            "left_leg": [
+              -38,
+              0,
+              -13
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -198,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 15,
+          "pose": {
+            "shift": [
+              0,
+              0.07,
+              -0.34
+            ],
+            "root": [
+              0,
+              -20,
+              0
+            ],
+            "torso": [
+              -17,
+              -8,
+              0
+            ],
+            "head": [
+              8,
+              20,
+              0
+            ],
+            "right_arm": [
+              90,
+              0,
+              -5
+            ],
+            "right_elbow": [
+              8,
+              0,
+              0
+            ],
+            "left_arm": [
+              48,
+              -18,
+              33
+            ],
+            "left_elbow": [
+              16,
+              0,
+              3
+            ],
+            "right_leg": [
+              40,
+              0,
+              10
+            ],
+            "right_knee": [
+              -27,
+              0,
+              0
+            ],
+            "left_leg": [
+              -27,
+              0,
+              -10
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -204,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 20,
+          "pose": {
+            "shift": [
+              0,
+              0.04,
+              -0.14
+            ],
+            "root": [
+              0,
+              -5,
+              0
+            ],
+            "torso": [
+              -2,
+              0,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              74,
+              -5,
+              -20
+            ],
+            "right_elbow": [
+              25,
+              0,
+              0
+            ],
+            "left_arm": [
+              16,
+              -8,
+              24
+            ],
+            "left_elbow": [
+              24,
+              0,
+              2
+            ],
+            "right_leg": [
+              20,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -13,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -172,
+              0,
+              10
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 25,
+          "pose": {
+            "shift": [
+              0,
+              0.03,
+              0
+            ],
+            "root": [
+              0,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              4,
+              0,
+              12
+            ],
+            "left_elbow": [
+              14,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 30,
+          "pose": {
+            "shift": [
+              0,
+              0.03,
+              0
+            ],
+            "root": [
+              0,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              2.9,
+              2,
+              7
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ]
+    },
+    "skill_left": {
+      "length": 18,
+      "weapon": "cryo_sword",
+      "source": "skirk_skill_left",
+      "source_start": 0.72,
+      "source_end": 1.62,
+      "hit_ticks": [],
+      "chain_tick": 14,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0,
+              0,
+              0
+            ],
+            "root": [
+              0,
+              14,
+              0
+            ],
+            "torso": [
+              0,
+              5,
+              0
+            ],
+            "head": [
+              0,
+              0,
+              0
+            ],
+            "right_arm": [
+              14,
+              0,
+              -15
+            ],
+            "right_elbow": [
+              12,
+              0,
+              0
+            ],
+            "left_arm": [
+              5,
+              8,
+              -12
+            ],
+            "left_elbow": [
+              20,
+              0,
+              0
+            ],
+            "right_leg": [
+              0,
+              0,
+              3
+            ],
+            "right_knee": [
+              0,
+              0,
+              0
+            ],
+            "left_leg": [
+              0,
+              0,
+              -3
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -65,
+              0,
+              10
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 3,
+          "pose": {
+            "shift": [
+              0,
+              0.04,
+              0
+            ],
+            "root": [
+              3,
+              -28,
+              0
+            ],
+            "torso": [
+              7,
+              -8,
+              -3
+            ],
+            "head": [
+              8,
+              35,
+              0
+            ],
+            "right_arm": [
+              94,
+              0,
+              -50
+            ],
+            "right_elbow": [
+              48,
+              0,
+              0
+            ],
+            "left_arm": [
+              30,
+              15,
+              -40
+            ],
+            "left_elbow": [
+              25,
+              0,
+              -5
+            ],
+            "right_leg": [
+              14,
+              0,
+              7
+            ],
+            "right_knee": [
+              0,
+              0,
+              0
+            ],
+            "left_leg": [
+              -10,
+              0,
+              -8
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -137,
+              0,
+              20
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 6,
+          "pose": {
+            "shift": [
+              0,
+              0.19,
+              0
+            ],
+            "root": [
+              7,
+              -14,
+              -3
+            ],
+            "torso": [
+              12,
+              0,
+              0
+            ],
+            "head": [
+              15,
+              10,
+              0
+            ],
+            "right_arm": [
+              170,
+              5,
+              -16
+            ],
+            "right_elbow": [
+              15,
+              0,
+              0
+            ],
+            "left_arm": [
+              74,
+              0,
+              -67
+            ],
+            "left_elbow": [
+              10,
+              0,
+              0
+            ],
+            "right_leg": [
+              18,
+              0,
+              7
+            ],
+            "right_knee": [
+              -25,
+              0,
+              0
+            ],
+            "left_leg": [
+              -15,
+              0,
+              -9
+            ],
+            "left_knee": [
+              -15,
+              0,
+              0
+            ],
+            "weapon": [
+              -145,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 9,
+          "pose": {
+            "shift": [
+              0,
+              0.11,
+              0
+            ],
+            "root": [
+              4,
+              8,
+              0
+            ],
+            "torso": [
+              5,
+              0,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              64,
+              -14,
+              -53
+            ],
+            "right_elbow": [
+              20,
+              0,
+              0
+            ],
+            "left_arm": [
+              54,
+              0,
+              -58
+            ],
+            "left_elbow": [
+              15,
+              0,
+              0
+            ],
+            "right_leg": [
+              15,
+              0,
+              8
+            ],
+            "right_knee": [
+              -18,
+              0,
+              0
+            ],
+            "left_leg": [
+              -12,
+              0,
+              -9
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -116,
+              0,
+              55
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 13,
+          "pose": {
+            "shift": [
+              0,
+              0.04,
+              0
+            ],
+            "root": [
+              0,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              30,
+              -18,
+              -28
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              36,
+              18,
+              -28
+            ],
+            "left_elbow": [
+              46,
+              0,
+              -12
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 18,
+          "pose": {
+            "shift": [
+              0,
+              0.03,
+              0
+            ],
+            "root": [
+              0,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              38,
+              24,
+              -28
+            ],
+            "left_elbow": [
+              46,
+              0,
+              -12
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "activation_tick": 9
+    },
+    "skill_right": {
+      "length": 17,
+      "weapon": "cryo_sword",
+      "source": "skirk_skill_right",
+      "source_start": 1.08,
+      "source_end": 1.93,
+      "hit_ticks": [],
+      "chain_tick": 16,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0,
+              0,
+              0
+            ],
+            "root": [
+              0,
+              14,
+              0
+            ],
+            "torso": [
+              3,
+              0,
+              0
+            ],
+            "head": [
+              0,
+              0,
+              0
+            ],
+            "right_arm": [
+              8,
+              -8,
+              8
+            ],
+            "right_elbow": [
+              12,
+              0,
+              0
+            ],
+            "left_arm": [
+              2.9,
+              2,
+              7
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              0,
+              0,
+              3
+            ],
+            "right_knee": [
+              0,
+              0,
+              0
+            ],
+            "left_leg": [
+              0,
+              0,
+              -3
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -60,
+              0,
+              12
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 3,
+          "pose": {
+            "shift": [
+              0,
+              0.08,
+              0
+            ],
+            "root": [
+              0,
+              -34,
+              -10
+            ],
+            "torso": [
+              8,
+              -10,
+              0
+            ],
+            "head": [
+              0,
+              28,
+              0
+            ],
+            "right_arm": [
+              65,
+              -20,
+              -60
+            ],
+            "right_elbow": [
+              22,
+              0,
+              0
+            ],
+            "left_arm": [
+              18,
+              -12,
+              30
+            ],
+            "left_elbow": [
+              12,
+              0,
+              0
+            ],
+            "right_leg": [
+              34,
+              0,
+              10
+            ],
+            "right_knee": [
+              -38,
+              0,
+              0
+            ],
+            "left_leg": [
+              -23,
+              0,
+              -13
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -135,
+              0,
+              50
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 6,
+          "pose": {
+            "shift": [
+              0,
+              0.23,
+              -0.06
+            ],
+            "root": [
+              -12,
+              -20,
+              0
+            ],
+            "torso": [
+              -10,
+              5,
+              0
+            ],
+            "head": [
+              13,
+              15,
+              0
+            ],
+            "right_arm": [
+              30,
+              -15,
+              -70
+            ],
+            "right_elbow": [
+              20,
+              0,
+              0
+            ],
+            "left_arm": [
+              0,
+              -10,
+              38
+            ],
+            "left_elbow": [
+              8,
+              0,
+              0
+            ],
+            "right_leg": [
+              45,
+              0,
+              11
+            ],
+            "right_knee": [
+              -72,
+              0,
+              0
+            ],
+            "left_leg": [
+              -18,
+              0,
+              -12
+            ],
+            "left_knee": [
+              -40,
+              0,
+              0
+            ],
+            "weapon": [
+              -122,
+              0,
+              70
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 8,
+          "pose": {
+            "shift": [
+              0,
+              0.3,
+              -0.12
+            ],
+            "root": [
+              -30,
+              0,
+              0
+            ],
+            "torso": [
+              -15,
+              0,
+              0
+            ],
+            "head": [
+              35,
+              0,
+              0
+            ],
+            "right_arm": [
+              -45,
+              -10,
+              -55
+            ],
+            "right_elbow": [
+              28,
+              0,
+              0
+            ],
+            "left_arm": [
+              -26,
+              -8,
+              36
+            ],
+            "left_elbow": [
+              8,
+              0,
+              0
+            ],
+            "right_leg": [
+              -16,
+              0,
+              8
+            ],
+            "right_knee": [
+              -53,
+              0,
+              0
+            ],
+            "left_leg": [
+              -30,
+              0,
+              -9
+            ],
+            "left_knee": [
+              -63,
+              0,
+              0
+            ],
+            "weapon": [
+              -82,
+              0,
+              25
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 12,
+          "pose": {
+            "shift": [
+              0,
+              0.25,
+              -0.1
+            ],
+            "root": [
+              -39,
+              0,
+              0
+            ],
+            "torso": [
+              -8,
+              0,
+              0
+            ],
+            "head": [
+              38,
+              0,
+              0
+            ],
+            "right_arm": [
+              -43,
+              -5,
+              -37
+            ],
+            "right_elbow": [
+              22,
+              0,
+              0
+            ],
+            "left_arm": [
+              -32,
+              -8,
+              32
+            ],
+            "left_elbow": [
+              8,
+              0,
+              0
+            ],
+            "right_leg": [
+              -22,
+              0,
+              9
+            ],
+            "right_knee": [
+              -48,
+              0,
+              0
+            ],
+            "left_leg": [
+              -31,
+              0,
+              -9
+            ],
+            "left_knee": [
+              -52,
+              0,
+              0
+            ],
+            "weapon": [
+              -70,
+              0,
+              25
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 17,
+          "pose": {
+            "shift": [
+              0,
+              0.22,
+              0
+            ],
+            "root": [
+              -35,
+              0,
+              0
+            ],
+            "torso": [
+              -8,
+              0,
+              0
+            ],
+            "head": [
+              35,
+              0,
+              0
+            ],
+            "right_arm": [
+              -40,
+              -5,
+              -34
+            ],
+            "right_elbow": [
+              22,
+              0,
+              0
+            ],
+            "left_arm": [
+              -30,
+              -8,
+              30
+            ],
+            "left_elbow": [
+              8,
+              0,
+              0
+            ],
+            "right_leg": [
+              -23,
+              0,
+              8
+            ],
+            "right_knee": [
+              -48,
+              0,
+              0
+            ],
+            "left_leg": [
+              -29,
+              0,
+              -8
+            ],
+            "left_knee": [
+              -52,
+              0,
+              0
+            ],
+            "weapon": [
+              -72,
+              0,
+              25
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "activation_tick": 8
+    },
+    "skill_right_loop": {
+      "length": 12,
+      "weapon": "cryo_sword",
+      "source": "skirk_skill_right",
+      "source_start": 2,
+      "source_end": 2.6,
+      "hit_ticks": [],
+      "chain_tick": 0,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0,
+              0.22,
+              0
+            ],
+            "root": [
+              -35,
+              0,
+              0
+            ],
+            "torso": [
+              -8,
+              0,
+              0
+            ],
+            "head": [
+              35,
+              0,
+              0
+            ],
+            "right_arm": [
+              -40,
+              -5,
+              -34
+            ],
+            "right_elbow": [
+              22,
+              0,
+              0
+            ],
+            "left_arm": [
+              -30,
+              -8,
+              30
+            ],
+            "left_elbow": [
+              8,
+              0,
+              0
+            ],
+            "right_leg": [
+              -23,
+              0,
+              8
+            ],
+            "right_knee": [
+              -48,
+              0,
+              0
+            ],
+            "left_leg": [
+              -29,
+              0,
+              -8
+            ],
+            "left_knee": [
+              -52,
+              0,
+              0
+            ],
+            "weapon": [
+              -72,
+              0,
+              25
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 3,
+          "pose": {
+            "shift": [
+              0,
+              0.25,
+              0
+            ],
+            "root": [
+              -36,
+              0,
+              -3
+            ],
+            "torso": [
+              -8,
+              0,
+              0
+            ],
+            "head": [
+              35,
+              0,
+              0
+            ],
+            "right_arm": [
+              -40,
+              -5,
+              -34
+            ],
+            "right_elbow": [
+              22,
+              0,
+              0
+            ],
+            "left_arm": [
+              -29,
+              -10,
+              32
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              -27,
+              0,
+              9
+            ],
+            "right_knee": [
+              -48,
+              0,
+              0
+            ],
+            "left_leg": [
+              -24,
+              0,
+              -9
+            ],
+            "left_knee": [
+              -52,
+              0,
+              0
+            ],
+            "weapon": [
+              -72,
+              0,
+              25
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 6,
+          "pose": {
+            "shift": [
+              0,
+              0.27,
+              0
+            ],
+            "root": [
+              -35,
+              0,
+              0
+            ],
+            "torso": [
+              -8,
+              0,
+              0
+            ],
+            "head": [
+              35,
+              0,
+              0
+            ],
+            "right_arm": [
+              -40,
+              -5,
+              -34
+            ],
+            "right_elbow": [
+              22,
+              0,
+              0
+            ],
+            "left_arm": [
+              -31,
+              -8,
+              30
+            ],
+            "left_elbow": [
+              8,
+              0,
+              0
+            ],
+            "right_leg": [
+              -23,
+              0,
+              8
+            ],
+            "right_knee": [
+              -48,
+              0,
+              0
+            ],
+            "left_leg": [
+              -29,
+              0,
+              -8
+            ],
+            "left_knee": [
+              -52,
+              0,
+              0
+            ],
+            "weapon": [
+              -72,
+              0,
+              25
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 9,
+          "pose": {
+            "shift": [
+              0,
+              0.25,
+              0
+            ],
+            "root": [
+              -36,
+              0,
+              3
+            ],
+            "torso": [
+              -8,
+              0,
+              0
+            ],
+            "head": [
+              35,
+              0,
+              0
+            ],
+            "right_arm": [
+              -40,
+              -5,
+              -34
+            ],
+            "right_elbow": [
+              22,
+              0,
+              0
+            ],
+            "left_arm": [
+              -29,
+              -6,
+              28
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              -24,
+              0,
+              9
+            ],
+            "right_knee": [
+              -48,
+              0,
+              0
+            ],
+            "left_leg": [
+              -27,
+              0,
+              -9
+            ],
+            "left_knee": [
+              -52,
+              0,
+              0
+            ],
+            "weapon": [
+              -72,
+              0,
+              25
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 12,
+          "pose": {
+            "shift": [
+              0,
+              0.22,
+              0
+            ],
+            "root": [
+              -35,
+              0,
+              0
+            ],
+            "torso": [
+              -8,
+              0,
+              0
+            ],
+            "head": [
+              35,
+              0,
+              0
+            ],
+            "right_arm": [
+              -40,
+              -5,
+              -34
+            ],
+            "right_elbow": [
+              22,
+              0,
+              0
+            ],
+            "left_arm": [
+              -30,
+              -8,
+              30
+            ],
+            "left_elbow": [
+              8,
+              0,
+              0
+            ],
+            "right_leg": [
+              -23,
+              0,
+              8
+            ],
+            "right_knee": [
+              -48,
+              0,
+              0
+            ],
+            "left_leg": [
+              -29,
+              0,
+              -8
+            ],
+            "left_knee": [
+              -52,
+              0,
+              0
+            ],
+            "weapon": [
+              -72,
+              0,
+              25
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "loop": true,
+      "audio": false
+    },
+    "skill_right_end": {
+      "length": 11,
+      "weapon": "cryo_sword",
+      "source": "skirk_skill_right",
+      "source_start": 4.36,
+      "source_end": 4.91,
+      "hit_ticks": [],
+      "chain_tick": 8,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0,
+              0.22,
+              0
+            ],
+            "root": [
+              -35,
+              0,
+              0
+            ],
+            "torso": [
+              -8,
+              0,
+              0
+            ],
+            "head": [
+              35,
+              0,
+              0
+            ],
+            "right_arm": [
+              -40,
+              -5,
+              -34
+            ],
+            "right_elbow": [
+              22,
+              0,
+              0
+            ],
+            "left_arm": [
+              -30,
+              -8,
+              30
+            ],
+            "left_elbow": [
+              8,
+              0,
+              0
+            ],
+            "right_leg": [
+              -23,
+              0,
+              8
+            ],
+            "right_knee": [
+              -48,
+              0,
+              0
+            ],
+            "left_leg": [
+              -29,
+              0,
+              -8
+            ],
+            "left_knee": [
+              -52,
+              0,
+              0
+            ],
+            "weapon": [
+              -72,
+              0,
+              25
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 3,
+          "pose": {
+            "shift": [
+              0,
+              0.12,
+              0
+            ],
+            "root": [
+              -18,
+              0,
+              0
+            ],
+            "torso": [
+              -10,
+              0,
+              0
+            ],
+            "head": [
+              20,
+              0,
+              0
+            ],
+            "right_arm": [
+              -5,
+              -10,
+              -36
+            ],
+            "right_elbow": [
+              12,
+              0,
+              0
+            ],
+            "left_arm": [
+              -18,
+              -8,
+              28
+            ],
+            "left_elbow": [
+              10,
+              0,
+              0
+            ],
+            "right_leg": [
+              20,
+              0,
+              10
+            ],
+            "right_knee": [
+              -45,
+              0,
+              0
+            ],
+            "left_leg": [
+              -20,
+              0,
+              -10
+            ],
+            "left_knee": [
+              -20,
+              0,
+              0
+            ],
+            "weapon": [
+              -60,
+              0,
+              10
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 6,
+          "pose": {
+            "shift": [
+              0,
+              -0.08,
+              0
+            ],
+            "root": [
+              0,
+              12,
+              0
+            ],
+            "torso": [
+              -16,
+              -5,
+              0
+            ],
+            "head": [
+              8,
+              -5,
+              0
+            ],
+            "right_arm": [
+              25,
+              -10,
+              -26
+            ],
+            "right_elbow": [
+              12,
+              0,
+              0
+            ],
+            "left_arm": [
+              8,
+              -5,
+              20
+            ],
+            "left_elbow": [
+              12,
+              0,
+              0
+            ],
+            "right_leg": [
+              32,
+              0,
+              10
+            ],
+            "right_knee": [
+              -42,
+              0,
+              0
+            ],
+            "left_leg": [
+              -14,
+              0,
+              -8
+            ],
+            "left_knee": [
+              -20,
+              0,
+              0
+            ],
+            "weapon": [
+              -110,
+              0,
+              10
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 11,
+          "pose": {
+            "shift": [
+              0,
+              0,
+              0
+            ],
+            "root": [
+              0,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              2.9,
+              2,
+              7
+            ],
+            "left_elbow": [
+              9,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ]
+    },
+    "burst_jin": {
+      "length": 23,
+      "weapon": "cryo_sword",
+      "source": "skirk_burst_metsu",
+      "source_start": 0.95,
+      "source_end": 2.1,
+      "hit_ticks": [],
+      "chain_tick": 20,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0,
+              -0.12,
+              0
+            ],
+            "root": [
+              0,
+              22,
+              0
+            ],
+            "torso": [
+              -24,
+              10,
+              0
+            ],
+            "head": [
+              12,
+              -15,
+              0
+            ],
+            "right_arm": [
+              40,
+              -15,
+              -44
+            ],
+            "right_elbow": [
+              28,
+              0,
+              0
+            ],
+            "left_arm": [
+              55,
+              15,
+              -44
+            ],
+            "left_elbow": [
+              28,
+              0,
+              0
+            ],
+            "right_leg": [
+              41,
+              0,
+              13
+            ],
+            "right_knee": [
+              -64,
+              0,
+              0
+            ],
+            "left_leg": [
+              -25,
+              0,
+              -12
+            ],
+            "left_knee": [
+              -37,
+              0,
+              0
+            ],
+            "weapon": [
+              -124,
+              0,
+              20
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 3,
+          "pose": {
+            "shift": [
+              0,
+              0.52,
+              0
+            ],
+            "root": [
+              60,
+              15,
+              -5
+            ],
+            "torso": [
+              10,
+              0,
+              0
+            ],
+            "head": [
+              8,
+              0,
+              0
+            ],
+            "right_arm": [
+              145,
+              -15,
+              -44
+            ],
+            "right_elbow": [
+              10,
+              0,
+              0
+            ],
+            "left_arm": [
+              145,
+              15,
+              -44
+            ],
+            "left_elbow": [
+              10,
+              0,
+              0
+            ],
+            "right_leg": [
+              50,
+              0,
+              14
+            ],
+            "right_knee": [
+              -68,
+              0,
+              0
+            ],
+            "left_leg": [
+              30,
+              0,
+              -13
+            ],
+            "left_knee": [
+              -63,
+              0,
+              0
+            ],
+            "weapon": [
+              -146,
+              0,
+              20
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 5,
+          "pose": {
+            "shift": [
+              0,
+              0.85,
+              0.05
+            ],
+            "root": [
+              144,
+              0,
+              -8
+            ],
+            "torso": [
+              8,
+              0,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              140,
+              -10,
+              -40
+            ],
+            "right_elbow": [
+              20,
+              0,
+              0
+            ],
+            "left_arm": [
+              140,
+              10,
+              -40
+            ],
+            "left_elbow": [
+              20,
+              0,
+              0
+            ],
+            "right_leg": [
+              60,
+              0,
+              14
+            ],
+            "right_knee": [
+              -75,
+              0,
+              0
+            ],
+            "left_leg": [
+              55,
+              0,
+              -14
+            ],
+            "left_knee": [
+              -80,
+              0,
+              0
+            ],
+            "weapon": [
+              -150,
+              0,
+              15
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 7,
+          "pose": {
+            "shift": [
+              0,
+              0.65,
+              0.06
+            ],
+            "root": [
+              238,
+              -12,
+              -5
+            ],
+            "torso": [
+              -5,
+              0,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              95,
+              -10,
+              -65
+            ],
+            "right_elbow": [
+              10,
+              0,
+              0
+            ],
+            "left_arm": [
+              95,
+              10,
+              -65
+            ],
+            "left_elbow": [
+              10,
+              0,
+              0
+            ],
+            "right_leg": [
+              40,
+              0,
+              12
+            ],
+            "right_knee": [
+              -55,
+              0,
+              0
+            ],
+            "left_leg": [
+              20,
+              0,
+              -12
+            ],
+            "left_knee": [
+              -52,
+              0,
+              0
+            ],
+            "weapon": [
+              -150,
+              0,
+              25
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 10,
+          "pose": {
+            "shift": [
+              0,
+              0.13,
+              0
+            ],
+            "root": [
+              354,
+              0,
+              0
+            ],
+            "torso": [
+              0,
+              0,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              55,
+              -10,
+              -70
+            ],
+            "right_elbow": [
+              0,
+              0,
+              0
+            ],
+            "left_arm": [
+              55,
+              10,
+              -70
+            ],
+            "left_elbow": [
+              0,
+              0,
+              0
+            ],
+            "right_leg": [
+              13,
+              0,
+              8
+            ],
+            "right_knee": [
+              -18,
+              0,
+              0
+            ],
+            "left_leg": [
+              -10,
+              0,
+              -8
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -110,
+              0,
+              35
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 13,
+          "pose": {
+            "shift": [
+              0,
+              0.06,
+              0
+            ],
+            "root": [
+              360,
+              8,
+              0
+            ],
+            "torso": [
+              8,
+              0,
+              0
+            ],
+            "head": [
+              5,
+              -6,
+              0
+            ],
+            "right_arm": [
+              20,
+              -8,
+              -42
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              20,
+              8,
+              -42
+            ],
+            "left_elbow": [
+              46,
+              0,
+              -12
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -90,
+              0,
+              10
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 18,
+          "pose": {
+            "shift": [
+              0,
+              0.03,
+              0
+            ],
+            "root": [
+              360,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              38,
+              24,
+              -28
+            ],
+            "left_elbow": [
+              46,
+              0,
+              -12
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 23,
+          "pose": {
+            "shift": [
+              0,
+              0.03,
+              0
+            ],
+            "root": [
+              360,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              38,
+              24,
+              -28
+            ],
+            "left_elbow": [
+              46,
+              0,
+              -12
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "activation_tick": 10,
+      "reference_observation": "User confirmed current datapack naming: Jin is the empowerment burst. Its visual source is the supplied file named 스커크 극악기 멸.mp4."
+    },
+    "burst_metsu": {
+      "length": 52,
+      "weapon": "cryo_sword",
+      "source": "skirk_burst_jin",
+      "source_start": 3.1,
+      "source_end": 5.7,
+      "hit_ticks": [
+        29,
+        31,
+        33,
+        35,
+        37,
+        41
+      ],
+      "chain_tick": 48,
+      "frames": [
+        {
+          "tick": 0,
+          "pose": {
+            "shift": [
+              0,
+              0,
+              0
+            ],
+            "root": [
+              0,
+              22,
+              0
+            ],
+            "torso": [
+              0,
+              8,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              75,
+              -20,
+              -64
+            ],
+            "right_elbow": [
+              25,
+              0,
+              0
+            ],
+            "left_arm": [
+              40,
+              20,
+              -48
+            ],
+            "left_elbow": [
+              35,
+              0,
+              0
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -120,
+              0,
+              55
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 5,
+          "pose": {
+            "shift": [
+              0,
+              0.11,
+              0
+            ],
+            "root": [
+              4,
+              55,
+              -7
+            ],
+            "torso": [
+              7,
+              12,
+              -3
+            ],
+            "head": [
+              5,
+              -40,
+              0
+            ],
+            "right_arm": [
+              130,
+              -5,
+              -73
+            ],
+            "right_elbow": [
+              28,
+              0,
+              0
+            ],
+            "left_arm": [
+              85,
+              20,
+              -62
+            ],
+            "left_elbow": [
+              40,
+              0,
+              0
+            ],
+            "right_leg": [
+              18,
+              0,
+              10
+            ],
+            "right_knee": [
+              -25,
+              0,
+              0
+            ],
+            "left_leg": [
+              -15,
+              0,
+              -11
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -150,
+              0,
+              80
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 11,
+          "pose": {
+            "shift": [
+              0,
+              0.2,
+              0
+            ],
+            "root": [
+              7,
+              86,
+              -12
+            ],
+            "torso": [
+              12,
+              15,
+              -4
+            ],
+            "head": [
+              6,
+              -55,
+              0
+            ],
+            "right_arm": [
+              155,
+              8,
+              -45
+            ],
+            "right_elbow": [
+              23,
+              0,
+              0
+            ],
+            "left_arm": [
+              120,
+              0,
+              -42
+            ],
+            "left_elbow": [
+              30,
+              0,
+              0
+            ],
+            "right_leg": [
+              26,
+              0,
+              10
+            ],
+            "right_knee": [
+              -35,
+              0,
+              0
+            ],
+            "left_leg": [
+              -22,
+              0,
+              -12
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -147,
+              0,
+              30
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 17,
+          "pose": {
+            "shift": [
+              0,
+              0.25,
+              -0.03
+            ],
+            "root": [
+              5,
+              43,
+              -5
+            ],
+            "torso": [
+              8,
+              10,
+              0
+            ],
+            "head": [
+              8,
+              -30,
+              0
+            ],
+            "right_arm": [
+              151,
+              8,
+              -14
+            ],
+            "right_elbow": [
+              38,
+              0,
+              0
+            ],
+            "left_arm": [
+              144,
+              -5,
+              -17
+            ],
+            "left_elbow": [
+              45,
+              0,
+              5
+            ],
+            "right_leg": [
+              23,
+              0,
+              10
+            ],
+            "right_knee": [
+              -25,
+              0,
+              0
+            ],
+            "left_leg": [
+              -20,
+              0,
+              -10
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -130,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 22,
+          "pose": {
+            "shift": [
+              0,
+              0.21,
+              -0.06
+            ],
+            "root": [
+              0,
+              8,
+              0
+            ],
+            "torso": [
+              8,
+              0,
+              0
+            ],
+            "head": [
+              5,
+              0,
+              0
+            ],
+            "right_arm": [
+              112,
+              0,
+              -6
+            ],
+            "right_elbow": [
+              69,
+              0,
+              0
+            ],
+            "left_arm": [
+              107,
+              0,
+              -13
+            ],
+            "left_elbow": [
+              74,
+              0,
+              0
+            ],
+            "right_leg": [
+              30,
+              0,
+              10
+            ],
+            "right_knee": [
+              -25,
+              0,
+              0
+            ],
+            "left_leg": [
+              -22,
+              0,
+              -10
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -253,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 27,
+          "pose": {
+            "shift": [
+              0,
+              0.13,
+              -0.2
+            ],
+            "root": [
+              0,
+              -12,
+              0
+            ],
+            "torso": [
+              -10,
+              -5,
+              0
+            ],
+            "head": [
+              6,
+              12,
+              0
+            ],
+            "right_arm": [
+              96,
+              0,
+              -3
+            ],
+            "right_elbow": [
+              28,
+              0,
+              0
+            ],
+            "left_arm": [
+              90,
+              0,
+              -18
+            ],
+            "left_elbow": [
+              36,
+              0,
+              10
+            ],
+            "right_leg": [
+              38,
+              0,
+              12
+            ],
+            "right_knee": [
+              -25,
+              0,
+              0
+            ],
+            "left_leg": [
+              -30,
+              0,
+              -12
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -217,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 29,
+          "pose": {
+            "shift": [
+              0,
+              0.08,
+              -0.36
+            ],
+            "root": [
+              0,
+              -20,
+              0
+            ],
+            "torso": [
+              -17,
+              -7,
+              0
+            ],
+            "head": [
+              8,
+              20,
+              0
+            ],
+            "right_arm": [
+              90,
+              0,
+              -2
+            ],
+            "right_elbow": [
+              0,
+              0,
+              0
+            ],
+            "left_arm": [
+              85,
+              0,
+              -16
+            ],
+            "left_elbow": [
+              5,
+              0,
+              10
+            ],
+            "right_leg": [
+              45,
+              0,
+              12
+            ],
+            "right_knee": [
+              -30,
+              0,
+              0
+            ],
+            "left_leg": [
+              -36,
+              0,
+              -12
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -198,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 34,
+          "pose": {
+            "shift": [
+              0,
+              0.07,
+              -0.28
+            ],
+            "root": [
+              0,
+              -17,
+              0
+            ],
+            "torso": [
+              -11,
+              -5,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              93,
+              0,
+              -4
+            ],
+            "right_elbow": [
+              15,
+              0,
+              0
+            ],
+            "left_arm": [
+              81,
+              0,
+              -20
+            ],
+            "left_elbow": [
+              20,
+              0,
+              8
+            ],
+            "right_leg": [
+              36,
+              0,
+              10
+            ],
+            "right_knee": [
+              -22,
+              0,
+              0
+            ],
+            "left_leg": [
+              -29,
+              0,
+              -10
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -207,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 39,
+          "pose": {
+            "shift": [
+              0,
+              0.06,
+              -0.19
+            ],
+            "root": [
+              4,
+              -8,
+              0
+            ],
+            "torso": [
+              3,
+              0,
+              0
+            ],
+            "head": [
+              0,
+              8,
+              0
+            ],
+            "right_arm": [
+              93,
+              0,
+              -12
+            ],
+            "right_elbow": [
+              45,
+              0,
+              0
+            ],
+            "left_arm": [
+              85,
+              0,
+              -23
+            ],
+            "left_elbow": [
+              55,
+              0,
+              8
+            ],
+            "right_leg": [
+              25,
+              0,
+              10
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -18,
+              0,
+              -10
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -230,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 41,
+          "pose": {
+            "shift": [
+              0,
+              0.09,
+              -0.35
+            ],
+            "root": [
+              0,
+              -18,
+              0
+            ],
+            "torso": [
+              -18,
+              -5,
+              0
+            ],
+            "head": [
+              9,
+              16,
+              0
+            ],
+            "right_arm": [
+              90,
+              0,
+              -2
+            ],
+            "right_elbow": [
+              0,
+              0,
+              0
+            ],
+            "left_arm": [
+              82,
+              0,
+              -16
+            ],
+            "left_elbow": [
+              8,
+              0,
+              10
+            ],
+            "right_leg": [
+              45,
+              0,
+              13
+            ],
+            "right_knee": [
+              -29,
+              0,
+              0
+            ],
+            "left_leg": [
+              -34,
+              0,
+              -13
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -199,
+              0,
+              0
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 45,
+          "pose": {
+            "shift": [
+              0,
+              0.04,
+              -0.18
+            ],
+            "root": [
+              0,
+              -9,
+              0
+            ],
+            "torso": [
+              -8,
+              0,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              72,
+              0,
+              -18
+            ],
+            "right_elbow": [
+              20,
+              0,
+              0
+            ],
+            "left_arm": [
+              58,
+              10,
+              -28
+            ],
+            "left_elbow": [
+              46,
+              0,
+              -12
+            ],
+            "right_leg": [
+              23,
+              0,
+              9
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -16,
+              0,
+              -9
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -168,
+              0,
+              15
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 48,
+          "pose": {
+            "shift": [
+              0,
+              0.03,
+              0
+            ],
+            "root": [
+              0,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              38,
+              24,
+              -28
+            ],
+            "left_elbow": [
+              46,
+              0,
+              -12
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "tick": 52,
+          "pose": {
+            "shift": [
+              0,
+              0.03,
+              0
+            ],
+            "root": [
+              0,
+              12,
+              0
+            ],
+            "torso": [
+              4,
+              -7,
+              0
+            ],
+            "head": [
+              0,
+              -5,
+              0
+            ],
+            "right_arm": [
+              28,
+              -18,
+              -24
+            ],
+            "right_elbow": [
+              18,
+              0,
+              0
+            ],
+            "left_arm": [
+              38,
+              24,
+              -28
+            ],
+            "left_elbow": [
+              46,
+              0,
+              -12
+            ],
+            "right_leg": [
+              10,
+              0,
+              7
+            ],
+            "right_knee": [
+              -8,
+              0,
+              0
+            ],
+            "left_leg": [
+              -7,
+              0,
+              -7
+            ],
+            "left_knee": [
+              0,
+              0,
+              0
+            ],
+            "weapon": [
+              -106,
+              0,
+              8
+            ],
+            "weapon_shift": [
+              0,
+              0,
+              0
+            ],
+            "weapon_scale": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "reference_observation": "User confirmed current datapack naming: Metsu is the damaging burst. Its visual source is the supplied file named 스커크 극악기 진.mp4."
+    }
+  }
+}

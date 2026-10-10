@@ -5,7 +5,6 @@ scoreboard players set #killBoss tmp 0
 scoreboard players set #killMini tmp 0
 execute if entity @s[tag=miniboss] run scoreboard players set #killMini tmp 1
 execute at @e[tag=rlk_safe,limit=1] run function rlk:room/fall/mob_reward
-execute at @s run playsound minecraft:entity.generic.death master @a ~ ~ ~ 0.7 0.6
+execute at @s unless score #k13 snd matches 1 run function rlk:snd/f13
 kill @s
 execute as @a[tag=player,limit=1] at @e[tag=rlk_body,limit=1] run function rlk:combat/on_kill
-execute as @a[tag=player,limit=1] run function rlk:room/msg {t:"낙사 처치",c:"#E0B255"}

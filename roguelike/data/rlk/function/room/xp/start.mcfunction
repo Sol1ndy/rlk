@@ -8,6 +8,6 @@ scoreboard players operation @s xpPulse /= #c24 tmp
 scoreboard players set @s life 0
 summon minecraft:block_display ~ ~-1 ~ {Tags:["rlk_room","rlk_odisp"],brightness:{sky:15,block:15},block_state:{id:"minecraft:sculk_catalyst"},transformation:{translation:[-0.5f,1f,-0.5f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[1f,1f,1f]}}
 summon minecraft:text_display ~ ~1.6 ~ {Tags:["rlk_room","rlk_olbl"],billboard:"center",alignment:"center",brightness:{sky:15,block:15},shadow:true,background:0,text:{text:"경험의 샘",color:"#8FD46A",bold:true},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.9f,0.9f,0.9f]}}
-playsound minecraft:block.sculk_catalyst.bloom master @a ~ ~ ~ 1 1
-playsound minecraft:block.respawn_anchor.charge master @a ~ ~ ~ 0.7 1.4
+execute unless score #k19 snd matches 1 run function rlk:snd/f19
+execute unless score #k20 snd matches 1 run function rlk:snd/f20
 particle minecraft:sculk_soul ~ ~1 ~ 0.3 0.5 0.3 0.03 20

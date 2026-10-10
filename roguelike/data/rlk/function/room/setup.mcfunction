@@ -1,5 +1,5 @@
 # 던전 구역 준비 (@s = player 태그 플레이어). 사용: /function rlk:room/setup   ※ 월드당 한 번
-# 오버월드 x -64~63, z -64~63, y 186~210 을 던전 전용으로 쓴다(이 범위의 블록은 지워짐!)
+# 오버월드 x -64~63, z -64~63, y 186~230 을 던전 전용으로 쓴다(이 범위의 블록은 지워짐!)
 execute unless entity @s[tag=player] run return run tellraw @s {"text":"[방] 'player' 태그가 있는 플레이어로 실행하세요.","color":"red"}
 execute if score #active room matches 1 run function rlk:run/stop
 function rlk:room/remove_old

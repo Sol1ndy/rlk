@@ -5,4 +5,4 @@ scoreboard players operation @s gold -= #pkRerollCost tmp
 scoreboard players add @s pkRr 1
 function rlk:lvup/roll
 scoreboard players set @s pkRedraw 1
-playsound minecraft:block.enchantment_table.use master @s ~ ~ ~ 0.6 1.4
+execute unless score #k348 snd matches 1 run function rlk:snd/f414

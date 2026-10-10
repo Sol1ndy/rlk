@@ -4,7 +4,7 @@ function rlk:engravings/on_rx
 execute positioned ~ ~-1.5 ~ run function rlk:element/rx_text
 particle minecraft:flame ~ ~0.5 ~ 1.2 0.8 1.2 0.08 50
 particle minecraft:explosion ~ ~0.5 ~ 0.5 0.5 0.5 0 3
-playsound minecraft:entity.generic.explode master @a ~ ~ ~ 0.7 1.5
+execute unless score #k37 snd matches 1 run function rlk:snd/f39
 scoreboard players operation #qDmg tmp = @s rxDmg3
 scoreboard players set #qEl tmp 7
 scoreboard players set #qU tmp 0

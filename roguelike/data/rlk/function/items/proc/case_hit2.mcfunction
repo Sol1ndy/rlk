@@ -1,4 +1,4 @@
-playsound minecraft:block.azalea_leaves.hit master @a ~ ~ ~ 0.8 1.4
+execute unless score #k141 snd matches 1 run function rlk:snd/f149
 execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:80}
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

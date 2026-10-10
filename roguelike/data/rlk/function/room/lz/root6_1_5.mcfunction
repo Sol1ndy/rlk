@@ -1,0 +1,129 @@
+# 구역 건설 (root6_1, 테마 5 우림): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill -20 200 -20 -1 200 -1 minecraft:podzol
+fill -20 201 -20 -1 210 -1 minecraft:moss_block
+fill -19 201 -19 -2 210 -1 minecraft:air
+fill -19 209 -19 -2 209 -1 minecraft:light[level=15]
+fill -20 200 0 -1 200 19 minecraft:podzol
+fill -20 201 0 -1 210 19 minecraft:moss_block
+fill -19 201 0 -2 210 18 minecraft:air
+fill -19 209 0 -2 209 18 minecraft:light[level=15]
+fill -11 200 -2 -9 200 -1 minecraft:packed_mud
+fill -14 200 8 -13 200 10 minecraft:packed_mud
+fill -12 200 16 -10 200 17 minecraft:packed_mud
+fill -10 200 -2 -9 200 0 minecraft:rooted_dirt
+fill -14 200 12 -13 200 15 minecraft:rooted_dirt
+fill -15 200 8 -13 200 10 minecraft:rooted_dirt
+fill -3 200 -12 -2 200 -9 minecraft:packed_mud
+fill -20 206 -20 -20 207 -17 minecraft:stone
+fill -20 210 -17 -20 210 -13 minecraft:jungle_leaves[persistent=true]
+fill -20 209 -16 -20 210 -14 minecraft:jungle_leaves[persistent=true]
+fill -1 210 -7 -1 210 -7 minecraft:jungle_leaves[persistent=true]
+fill -1 202 -20 -1 204 -18 minecraft:mossy_cobblestone
+fill -1 209 -8 -1 210 -3 minecraft:jungle_leaves[persistent=true]
+fill -6 201 -20 -6 210 -20 minecraft:jungle_log
+fill -6 209 -20 -1 210 -20 minecraft:jungle_leaves[persistent=true]
+fill -12 210 -20 -8 210 -20 minecraft:azalea_leaves[persistent=true]
+fill -17 209 -20 -16 210 -20 minecraft:jungle_leaves[persistent=true]
+fill -8 202 -20 -4 203 -20 minecraft:mossy_cobblestone
+fill -4 210 -20 -4 210 -20 minecraft:jungle_leaves[persistent=true]
+fill -20 210 11 -20 210 15 minecraft:jungle_leaves[persistent=true]
+fill -20 210 13 -20 210 17 minecraft:azalea_leaves[persistent=true]
+fill -20 201 2 -20 210 2 minecraft:jungle_log
+fill -20 203 11 -20 206 15 minecraft:mossy_cobblestone
+fill -1 209 11 -1 210 11 minecraft:jungle_leaves[persistent=true]
+fill -1 202 7 -1 202 9 minecraft:mossy_cobblestone
+fill -1 210 12 -1 210 16 minecraft:jungle_leaves[persistent=true]
+fill -1 210 1 -1 210 6 minecraft:mossy_cobblestone
+fill -1 209 4 -1 210 9 minecraft:azalea_leaves[persistent=true]
+fill -11 209 19 -11 210 19 minecraft:jungle_leaves[persistent=true]
+fill -16 209 19 -13 210 19 minecraft:azalea_leaves[persistent=true]
+fill -5 210 19 -5 210 19 minecraft:jungle_leaves[persistent=true]
+fill -19 201 19 -14 203 19 minecraft:mud_bricks
+fill -18 210 19 -14 210 19 minecraft:stone
+fill -20 210 -20 -1 210 -1 minecraft:polished_deepslate
+fill -19 210 -19 -2 210 -1 minecraft:air
+fill -20 210 0 -1 210 19 minecraft:polished_deepslate
+fill -19 210 0 -2 210 18 minecraft:air
+fill -14 201 -19 -13 201 -18 minecraft:podzol
+fill -13 201 -17 -2 201 -16 minecraft:podzol
+fill -19 201 -8 -18 201 -7 minecraft:podzol
+fill -17 201 -7 -16 201 -7 minecraft:podzol
+fill -16 201 -6 -14 201 -6 minecraft:podzol
+fill -14 201 -5 -13 201 -5 minecraft:podzol
+fill -15 201 -4 -15 201 4 minecraft:podzol
+fill -4 201 -1 -4 201 0 minecraft:podzol
+fill -5 201 0 -5 201 4 minecraft:podzol
+fill -3 201 0 -2 201 0 minecraft:podzol
+fill -2 201 1 -2 201 1 minecraft:podzol
+fill -16 201 4 -16 201 5 minecraft:podzol
+fill -17 201 5 -17 201 5 minecraft:podzol
+fill -8 201 5 -6 201 5 minecraft:podzol
+fill -6 201 6 -6 201 8 minecraft:podzol
+fill -2 201 7 -2 201 8 minecraft:podzol
+fill -5 201 8 -3 201 8 minecraft:podzol
+fill -4 201 9 -4 201 9 minecraft:podzol
+fill -12 201 -19 -2 201 -18 minecraft:dirt
+fill -12 202 -19 -2 202 -18 minecraft:podzol
+fill -19 201 -6 -17 201 -6 minecraft:dirt
+fill -19 202 -6 -17 202 -6 minecraft:podzol
+fill -17 201 -5 -15 201 -5 minecraft:dirt
+fill -17 202 -5 -15 202 -5 minecraft:podzol
+fill -16 201 -4 -16 201 3 minecraft:dirt
+fill -16 202 -4 -16 202 3 minecraft:podzol
+fill -4 201 1 -3 201 7 minecraft:dirt
+fill -4 202 1 -3 202 7 minecraft:podzol
+fill -2 201 2 -2 201 6 minecraft:dirt
+fill -2 202 2 -2 202 6 minecraft:podzol
+fill -17 201 3 -17 201 4 minecraft:dirt
+fill -17 202 3 -17 202 4 minecraft:podzol
+fill -5 201 5 -5 201 7 minecraft:dirt
+fill -5 202 5 -5 202 7 minecraft:podzol
+fill -19 201 -5 -18 202 -1 minecraft:dirt
+fill -19 203 -5 -18 203 -1 minecraft:podzol
+fill -17 201 -4 -17 202 2 minecraft:dirt
+fill -17 203 -4 -17 203 2 minecraft:podzol
+fill -2 201 -4 -2 205 -3 minecraft:mossy_cobblestone
+fill -2 206 -4 -2 206 -3 minecraft:podzol
+fill -2 201 -6 -2 205 -5 minecraft:stone
+fill -2 206 -6 -2 206 -5 minecraft:podzol
+fill -17 201 7 -16 205 8 minecraft:stone
+fill -17 206 7 -16 206 8 minecraft:podzol
+fill -19 201 2 -18 207 5 minecraft:mossy_cobblestone
+fill -19 208 2 -18 208 5 minecraft:podzol
+fill -19 201 0 -18 207 1 minecraft:stone
+fill -19 208 0 -18 208 1 minecraft:podzol
+execute positioned -17 201 11 run function rlk:room/prop/sf_mush_red
+execute positioned -17 201 -17 run function rlk:room/prop/sf_log_z
+execute positioned -15 201 -10 run function rlk:room/prop/sf_ruin_z
+execute positioned -4 201 16 run function rlk:room/prop/sf_mush_red
+execute positioned -4 201 -8 run function rlk:room/prop/sf_mush_red
+execute positioned -2 201 -7 run function rlk:room/prop/sf_fern
+execute positioned -9 201 9 run function rlk:room/prop/sf_fern
+execute positioned -16 201 -16 run function rlk:room/prop/sf_moss
+execute positioned -6 201 -15 run function rlk:room/prop/sf_fern
+execute positioned -5 201 16 run function rlk:room/prop/sf_moss
+execute positioned -3 201 -12 run function rlk:room/prop/sf_fern
+execute positioned -7 201 -14 run function rlk:room/prop/sf_fern
+execute positioned -7 201 8 run function rlk:room/prop/sf_flower
+execute positioned -12 201 -13 run function rlk:room/prop/sf_fern
+execute positioned -11 201 18 run function rlk:room/prop/sf_fern
+execute positioned -17 202 -7 run function rlk:room/prop/sf_fern
+execute positioned -7 201 -10 run function rlk:room/prop/p_litter
+execute positioned -3 202 8 run function rlk:room/prop/sf_fern
+execute positioned -15 201 -15 run function rlk:room/prop/sf_flower
+execute positioned -2 201 -8 run function rlk:room/prop/sf_fern
+execute positioned -12 201 -11 run function rlk:room/prop/sf_flower
+execute positioned -12 201 5 run function rlk:room/prop/sf_fern
+execute positioned -8 201 9 run function rlk:room/prop/sf_fern
+execute positioned -7 201 11 run function rlk:room/prop/p_litter
+setblock -19 209 0 minecraft:fern keep
+setblock -19 209 1 minecraft:jungle_leaves[persistent=true] keep
+setblock -19 209 2 minecraft:jungle_leaves[persistent=true] keep
+setblock -18 209 0 minecraft:jungle_leaves[persistent=true] keep
+setblock -18 209 1 minecraft:jungle_leaves[persistent=true] keep
+setblock -18 209 2 minecraft:fern keep
+setblock -18 209 3 minecraft:jungle_leaves[persistent=true] keep
+setblock -18 209 5 minecraft:fern keep
+setblock -16 207 7 minecraft:fern keep
+setblock -2 207 -6 minecraft:fern keep
+setblock -2 207 -4 minecraft:jungle_leaves[persistent=true] keep

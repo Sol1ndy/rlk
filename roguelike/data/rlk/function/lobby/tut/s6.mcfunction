@@ -1,0 +1,5 @@
+# 튜토리얼 6단계 준비 (@s = 플레이어)
+data modify entity @e[tag=rlk_tutp,limit=1] text set value [{"text": "6. 풀 반응 · 특별한 반응\n", "color": "#7FD3FF", "bold": true}, {"text": "\n연소 (불 + 풀): 풀이 타는 동안 0.5초마다 불 피해", "color": "#E6E6E6", "bold": false}, {"text": "\n개화 (물 + 풀): 풀 씨앗이 생기고(최대 5개) 6초 뒤 터져 주변 4칸 풀 피해", "color": "#E6E6E6", "bold": false}, {"text": "\n만개 (풀 씨앗 + 번개): 씨앗이 가장 가까운 적에게 날아가 큰 풀 피해", "color": "#E6E6E6", "bold": false}, {"text": "\n발화 (풀 씨앗 + 불): 씨앗이 바로 터져 주변 4칸 풀 피해", "color": "#E6E6E6", "bold": false}, {"text": "\n활성 (번개 + 풀): 적이 「활성」 상태가 됩니다", "color": "#E6E6E6", "bold": false}, {"text": "\n촉진 · 발산: 활성 상태의 적을 번개 · 풀로 때리면 이번 타격에 추가 피해", "color": "#E6E6E6", "bold": false}, {"text": "\n달 반응: 특정 아이템 · 캐릭터(네페르 등)가 있으면 감전 · 개화 · 결정이 더 강한 「달 반응」으로 바뀝니다.", "color": "#E6E6E6", "bold": false}, {"text": "\n공허 반응: 로노바 전용 원소 「공허」의 반응 — 로노바의 캐릭터 튜토리얼에서 볼 수 있어요.", "color": "#E6E6E6", "bold": false}]
+data merge entity @e[tag=rlk_tutp,limit=1] {line_width:380,transformation:{translation:[0f,0f,0f],scale:[1.3f,1.3f,1.3f]}}
+scoreboard players set #tutNeed lob 0
+data modify storage rlk:lobby tg set value ""

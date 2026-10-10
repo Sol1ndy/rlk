@@ -1,5 +1,5 @@
 particle minecraft:flame ~ ~1 ~ 1.6 0.3 1.6 0.05 40
-playsound minecraft:entity.blaze.shoot master @a ~ ~ ~ 0.4 1.3
+execute unless score #k148 snd matches 1 run function rlk:snd/f157
 execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:50}
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

@@ -28,6 +28,6 @@ execute if score @s nvGun matches 0 run scoreboard players set @s nvGun -1
 execute if score @s nvS matches 1.. run scoreboard players operation 결정파편 stacks = @s nvS
 execute if score @s nvS matches 1.. run scoreboard players display name 결정파편 stacks {text:"결정 파편",color:"#FFC94D"}
 execute unless score @s nvS matches 1.. run scoreboard players reset 결정파편 stacks
-execute if score @s nvP matches 1.. anchored eyes run particle minecraft:wax_on ^0.4 ^-0.5 ^0.7 0.1 0.1 0.1 0 1
+execute if score @s nvP matches 1.. positioned ~ ~1.62 ~ run particle minecraft:wax_on ^0.4 ^-0.5 ^0.7 0.1 0.1 0.1 0 1
 # 결정 파편 표시(숄더뷰)
 function rlk:char/navia/sh_tick

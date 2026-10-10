@@ -6,7 +6,7 @@ scoreboard players set @s cxMode 0
 function rlk:lvup/tp_back with storage rlk:lvpick ret
 # 교체하며 내려놓은 아이템을 몸(1인칭 = 플레이어, 숄더뷰 = 아바타) 발밑에 떨군다
 execute if data storage rlk:lvpick dropq[0] at @e[tag=rlk_body,limit=1] run function rlk:lvup/drop_loop
-playsound minecraft:block.portal.trigger master @s ~ ~ ~ 0.25 2.0
+execute unless score #k347 snd matches 1 run function rlk:snd/f412
 # 돌아온 직후의 클릭 무시(확인 클릭의 두 번째 인식이 바닥에 놓인 것의 버튼을 누르지 않게)
 scoreboard players set @s uiCd 12
 # 시작 아이템 고르기가 끝남: 미뤄 둔 첫 맵 제목

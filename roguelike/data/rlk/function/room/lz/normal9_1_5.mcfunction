@@ -1,0 +1,51 @@
+# 구역 건설 (normal9_1, 테마 5 사막): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill 0 200 -20 19 200 -1 minecraft:red_sand
+fill 0 201 -20 19 210 -1 minecraft:smooth_sandstone
+fill 1 201 -19 18 210 -2 minecraft:air
+fill 1 209 -19 18 209 -2 minecraft:light[level=15]
+fill 12 200 -12 13 200 -10 minecraft:smooth_sandstone
+fill 0 208 -15 0 209 -11 minecraft:cut_sandstone
+fill 0 210 -15 0 210 -10 minecraft:orange_terracotta
+fill 0 209 -19 0 209 -15 minecraft:sandstone
+fill 19 204 -11 19 205 -8 minecraft:orange_terracotta
+fill 19 205 -18 19 208 -16 minecraft:chiseled_sandstone
+fill 19 206 -18 19 208 -15 minecraft:terracotta
+fill 18 203 -20 18 203 -20 minecraft:smooth_red_sandstone
+fill 15 202 -20 18 205 -20 minecraft:red_sandstone
+fill 0 210 -20 3 210 -20 minecraft:orange_terracotta
+fill 15 210 -20 16 210 -20 minecraft:terracotta
+fill 2 208 -1 7 208 -1 minecraft:cut_sandstone
+fill 6 201 -1 7 202 -1 minecraft:smooth_red_sandstone
+fill 1 206 -1 3 207 -1 minecraft:cut_sandstone
+fill 8 204 -1 13 204 -1 minecraft:sandstone
+fill 6 202 -1 11 205 -1 minecraft:red_sandstone
+fill 4 209 -1 4 210 -1 minecraft:orange_terracotta
+fill 0 210 -20 19 210 -1 minecraft:polished_deepslate
+fill 1 210 -19 18 210 -2 minecraft:air
+fill 5 201 -6 5 201 -5 minecraft:red_sand
+fill 4 201 -5 4 201 -2 minecraft:red_sand
+fill 6 201 -5 13 201 -5 minecraft:red_sand
+fill 3 201 -4 3 201 -2 minecraft:red_sand
+fill 10 201 -4 16 201 -2 minecraft:red_sand
+fill 17 201 -3 17 201 -2 minecraft:red_sand
+fill 5 201 -4 9 201 -2 minecraft:sandstone
+fill 5 202 -4 9 202 -2 minecraft:red_sand
+fill 1 201 -7 2 205 -7 minecraft:smooth_red_sandstone
+fill 1 206 -7 2 206 -7 minecraft:red_sand
+fill 1 201 -4 2 205 -2 minecraft:smooth_red_sandstone
+fill 1 206 -4 2 206 -2 minecraft:red_sand
+fill 1 201 -6 2 205 -5 minecraft:terracotta
+fill 1 206 -6 2 206 -5 minecraft:red_sand
+execute positioned 3 201 -11 run function rlk:room/prop/sd_rock
+execute positioned 9 202 -5 run function rlk:room/prop/sd_gate_x
+execute positioned 17 201 -12 run function rlk:room/prop/sd_bush
+execute positioned 4 202 -2 run function rlk:room/prop/sd_dry
+execute positioned 18 201 -16 run function rlk:room/prop/sd_dry
+execute positioned 9 201 -8 run function rlk:room/prop/sd_dry
+execute positioned 4 202 -3 run function rlk:room/prop/sd_bush
+execute positioned 18 201 -7 run function rlk:room/prop/sd_dry
+execute positioned 10 201 -17 run function rlk:room/prop/sd_dry
+execute positioned 14 201 -9 run function rlk:room/prop/sd_dry
+setblock 1 207 -5 minecraft:dead_bush keep
+setblock 1 207 -2 minecraft:dead_bush keep
+setblock 2 207 -5 minecraft:dead_bush keep

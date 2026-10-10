@@ -8,7 +8,7 @@ tag @s remove rlk_rnc
 particle minecraft:reverse_portal ~ ~1 ~ 1.2 0.5 1.2 0.4 60
 particle minecraft:cloud ~ ~1 ~ 1 0.4 1 0.05 20
 particle minecraft:dust{color:[0.88,0.12,0.22],scale:1.1} ~ ~1 ~ 1.2 0.4 1.2 0 20
-playsound minecraft:entity.breeze.inhale master @a ~ ~ ~ 0.8 0.8
-playsound minecraft:entity.breeze.wind_burst master @a ~ ~ ~ 0.6 0.7
+execute unless score #k60 snd matches 1 run function rlk:snd/f63
+execute unless score #k61 snd matches 1 run function rlk:snd/f64
 scoreboard players set #qU tmp 0
 execute as @e[tag=rlk_mob,distance=..3] at @s run function rlk:element/aoe_hit

@@ -1,2 +1,2 @@
 scoreboard players operation #ringT itv = #ringDur tmp
-playsound minecraft:item.firecharge.use master @a ~ ~ ~ 0.6 1.2
+execute unless score #k81 snd matches 1 run function rlk:snd/f186

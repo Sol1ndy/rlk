@@ -11,10 +11,10 @@ scoreboard players operation #dmg tmp /= #100 tmp
 execute if score #crit tmp matches 1 run scoreboard players operation #dmg tmp *= @s critDamage
 execute if score #crit tmp matches 1 run scoreboard players operation #dmg tmp /= #100 tmp
 scoreboard players operation #elem tmp = @s infuse
-execute unless score #elem tmp matches 0..7 run scoreboard players set #elem tmp 0
+execute unless score #elem tmp matches 0..8 run scoreboard players set #elem tmp 0
 execute if score #charN tmp matches 5 if score @s arM matches 1 run function rlk:char/arlecchino/na_mask
 execute if score #charN tmp matches 6 if score @s nvP matches 1.. run function rlk:char/navia/na_geo
-execute if score #charN tmp matches 8 unless score @s infuse matches 1..7 run scoreboard players set #elem tmp 7
+execute if score #charN tmp matches 8 unless score @s infuse matches 1..8 run scoreboard players set #elem tmp 7
 scoreboard players set #elU tmp 1000
 scoreboard players set #icd tmp 1
 scoreboard players set #tfm tmp 0
@@ -26,9 +26,11 @@ scoreboard players set #killMini tmp 0
 scoreboard players set #skillDmg tmp 0
 scoreboard players operation #dmgBase tmp = #dmg tmp
 function rlk:char/melee/range
-execute if score #naR tmp matches 0 as @e[tag=rlk_mob,distance=..3.5] at @s run function rlk:combat/apply_reset
-execute if score #naR tmp matches 1 as @e[tag=rlk_mob,distance=..5] at @s run function rlk:combat/apply_reset
-execute if score #naR tmp matches 2 as @e[tag=rlk_mob,distance=..4.5] at @s run function rlk:combat/apply_reset
+function rlk:combat/melee_begin
+execute if score #naR tmp matches 0 as @e[tag=rlk_mob,distance=..3.5] at @s run function rlk:combat/melee_apply
+execute if score #naR tmp matches 1 as @e[tag=rlk_mob,distance=..5] at @s run function rlk:combat/melee_apply
+execute if score #naR tmp matches 2 as @e[tag=rlk_mob,distance=..4.5] at @s run function rlk:combat/melee_apply
+kill @e[tag=rlk_melee_origin]
 execute as @e[tag=rlk_av,limit=1] run swing @s mainhand
 # 모션: 두 번째 타격
 execute if score #charN tmp matches 4 run scoreboard players set #fxId tmp 35
@@ -38,8 +40,8 @@ execute if score #charN tmp matches 6 run scoreboard players set #fxId tmp 87
 execute if score #charN tmp matches 6 if score @s nvP matches 1.. run scoreboard players set #fxId tmp 97
 execute if score #charN tmp matches 8 run scoreboard players set #fxId tmp 107
 function rlk:char/fx/play
-playsound minecraft:entity.player.attack.sweep master @a ~ ~ ~ 0.4 1.8
-execute if score #hitLanded tmp matches 1 run playsound minecraft:entity.player.attack.strong master @a ~ ~ ~ 0.6 0.9
+execute unless score #charN tmp matches 5 run execute unless score #k310 snd matches 1 run function rlk:snd/f357
+execute unless score #charN tmp matches 5 run execute if score #hitLanded tmp matches 1 unless score #k311 snd matches 1 run function rlk:snd/f358
 execute if score #hitLanded tmp matches 1 run function rlk:combat/on_hit
 execute if score #mobKilled tmp matches 1.. run function rlk:combat/on_kill
 execute if score #charN tmp matches 5 run function rlk:char/arlecchino/na_post

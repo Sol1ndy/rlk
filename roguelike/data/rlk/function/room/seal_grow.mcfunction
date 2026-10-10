@@ -6,7 +6,7 @@ execute if score @s sidx matches 0 run tag @s add rlk_spulse
 execute if score @s sidx matches 1 run data merge entity @s {start_interpolation:0,interpolation_duration:6,transformation:{translation:[0.0000f,1.3500f,0.0160f],left_rotation:[0f,0f,0.00000f,1.00000f],right_rotation:[0f,0f,0f,1f],scale:[2.0000f,0.3000f,0.010f]}}
 execute if score @s sidx matches 1 run tag @s add rlk_spulse
 execute if score @s sidx matches 2 run data merge entity @s {start_interpolation:0,interpolation_duration:6,transformation:{translation:[0.0000f,1.5550f,0.0200f],left_rotation:[0f,0f,1.00000f,0.00000f],right_rotation:[0f,0f,0f,1f],scale:[2.0000f,0.1100f,0.010f]}}
-execute if score @s sidx matches 2 at @s run playsound minecraft:block.beacon.deactivate master @a ~ ~1.5 ~ 0.5 1.30
+execute if score @s sidx matches 2 at @s unless score #k6 snd matches 1 run function rlk:snd/f6
 execute if score @s sidx matches 3 run data merge entity @s {start_interpolation:0,interpolation_duration:6,transformation:{translation:[0.0000f,1.4450f,0.0240f],left_rotation:[0f,0f,0.00000f,1.00000f],right_rotation:[0f,0f,0f,1f],scale:[2.0000f,0.1100f,0.010f]}}
 execute if score @s sidx matches 4 run data merge entity @s {start_interpolation:0,interpolation_duration:4,transformation:{translation:[-0.6200f,1.2775f,0.0280f],left_rotation:[0f,0f,1.00000f,0.00000f],right_rotation:[0f,0f,0f,1f],scale:[1.1000f,0.0350f,0.010f]}}
 execute if score @s sidx matches 5 run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.6200f,1.1964f,0.0320f],left_rotation:[0f,0f,0.38268f,0.92388f],right_rotation:[0f,0f,0f,1f],scale:[0.0900f,0.0900f,0.010f]}}

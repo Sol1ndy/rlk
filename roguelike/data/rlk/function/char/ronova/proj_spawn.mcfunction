@@ -19,5 +19,8 @@ scoreboard players operation @e[tag=rlk_arrnew] aSub = #pSub tmp
 scoreboard players operation @e[tag=rlk_arrnew] aLife = #pLife tmp
 scoreboard players operation @e[tag=rlk_arrnew] aIcd = #pIcd tmp
 scoreboard players set @e[tag=rlk_arrnew] life 0
-execute as @e[tag=rlk_arrnew] at @s run function rlk:char/bow/assist
+# 평타: 카메라와 법구/손의 위치 차이를 보정해 같은 조준 지점에 모은다. 넓은 활 자동 조준은 잔향만 유지.
+execute if score #pKind tmp matches 7 as @e[tag=rlk_arrnew] at @s facing entity @e[tag=rlk_rn_aim,limit=1] feet run tp @s ~ ~ ~ ~ ~
+execute if score #pKind tmp matches 7 run scoreboard players operation @e[tag=rlk_arrnew] rnTg = #rnAimTg tmp
+execute if score #pKind tmp matches 8 as @e[tag=rlk_arrnew] at @s run function rlk:char/bow/assist
 tag @e[tag=rlk_arrnew] remove rlk_arrnew

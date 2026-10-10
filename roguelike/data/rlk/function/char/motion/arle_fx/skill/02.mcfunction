@@ -1,0 +1,13 @@
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.6} ^0.3481 ^0.7100 ^0.0366 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.6} ^0.3323 ^0.7100 ^-0.1098 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.6} ^0.2578 ^0.7100 ^-0.2368 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.6} ^0.1376 ^0.7100 ^-0.3218 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.6} ^-0.0070 ^0.7100 ^-0.3499 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.6} ^-0.1503 ^0.7100 ^-0.3161 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.6} ^-0.2670 ^0.7100 ^-0.2263 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.6} ^-0.3364 ^0.7100 ^-0.0965 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.12,0.004,0.012],scale:0.85} ^0.3481 ^0.7500 ^0.0366 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.12,0.004,0.012],scale:0.85} ^0.2578 ^0.7500 ^-0.2368 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.12,0.004,0.012],scale:0.85} ^-0.0070 ^0.7500 ^-0.3499 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.12,0.004,0.012],scale:0.85} ^-0.2670 ^0.7500 ^-0.2263 0 0 0 0 1 normal
+particle minecraft:smoke ^ ^1 ^ 0.16 0.3 0.16 0.005 4 normal

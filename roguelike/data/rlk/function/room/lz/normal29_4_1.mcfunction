@@ -1,0 +1,42 @@
+# 구역 건설 (normal29_4, 테마 1): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill -40 200 -60 -21 200 -41 minecraft:tuff
+fill -40 201 -60 -21 210 -41 minecraft:stone
+fill -39 201 -59 -22 210 -42 minecraft:air
+fill -39 209 -59 -22 209 -42 minecraft:light[level=15]
+fill -34 200 -55 -33 200 -53 minecraft:deepslate
+fill -35 200 -52 -34 200 -49 minecraft:coarse_dirt
+fill -40 207 -47 -40 210 -42 minecraft:iron_ore
+fill -40 204 -45 -40 205 -43 minecraft:iron_ore
+fill -40 204 -46 -40 207 -41 minecraft:deepslate
+fill -21 205 -58 -21 205 -55 minecraft:iron_ore
+fill -21 210 -51 -21 210 -47 minecraft:cobblestone
+fill -21 201 -42 -21 202 -41 minecraft:cobblestone
+fill -21 204 -45 -21 205 -41 minecraft:coal_ore
+fill -29 203 -60 -25 205 -60 minecraft:deepslate
+fill -29 210 -60 -26 210 -60 minecraft:deepslate
+fill -35 204 -60 -31 207 -60 minecraft:tuff
+fill -36 206 -41 -36 206 -41 minecraft:deepslate
+fill -23 203 -41 -21 205 -41 minecraft:tuff
+fill -37 202 -41 -32 205 -41 minecraft:andesite
+fill -34 210 -41 -32 210 -41 minecraft:deepslate
+fill -38 207 -41 -34 209 -41 minecraft:deepslate
+fill -40 210 -60 -21 210 -41 minecraft:polished_deepslate
+fill -39 210 -59 -22 210 -42 minecraft:air
+fill -27 201 -59 -27 201 -55 minecraft:tuff
+fill -26 201 -57 -22 201 -57 minecraft:tuff
+fill -24 201 -44 -22 201 -44 minecraft:tuff
+fill -24 201 -43 -24 201 -42 minecraft:tuff
+fill -26 201 -59 -22 201 -58 minecraft:cobbled_deepslate
+fill -26 202 -59 -22 202 -58 minecraft:tuff
+fill -23 201 -43 -22 201 -42 minecraft:cobbled_deepslate
+fill -23 202 -43 -22 202 -42 minecraft:tuff
+fill -34 186 -60 -29 199 -55 minecraft:deepslate
+fill -33 186 -59 -30 186 -56 minecraft:deepslate
+fill -33 187 -59 -30 188 -56 minecraft:lava
+fill -33 189 -59 -30 201 -56 minecraft:air
+execute positioned -25 203 -59 run function rlk:room/prop/m_rubble_a
+execute positioned -26 201 -54 run function rlk:room/prop/m_rail_x
+execute positioned -38 201 -42 run function rlk:room/prop/m_pebble
+execute positioned -25 202 -57 run function rlk:room/prop/m_pebble
+setblock -23 205 -59 minecraft:wall_torch[facing=south]
+setblock -37 203 -59 minecraft:wall_torch[facing=south]

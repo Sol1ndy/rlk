@@ -15,8 +15,8 @@ execute if score #catOn tmp matches 1 if score #pOff tmp matches 0 positioned as
 execute if score #catOn tmp matches 1 if score #pOff tmp matches 1 positioned as @e[tag=rlk_rncat_c,limit=1] positioned ^-0.3 ^ ^ run function rlk:char/ronova/proj_spawn
 execute if score #catOn tmp matches 1 if score #pOff tmp matches 2 positioned as @e[tag=rlk_rncat_c,limit=1] positioned ^0.3 ^ ^ run function rlk:char/ronova/proj_spawn
 execute if score #catOn tmp matches 1 run function rlk:char/ronova/cat_flash
-execute if score #catOn tmp matches 0 if score #pOff tmp matches 0 anchored eyes positioned ^ ^-0.15 ^0.5 run function rlk:char/ronova/proj_spawn
-execute if score #catOn tmp matches 0 if score #pOff tmp matches 1 anchored eyes positioned ^-0.45 ^-0.1 ^0.5 run function rlk:char/ronova/proj_spawn
-execute if score #catOn tmp matches 0 if score #pOff tmp matches 2 anchored eyes positioned ^0.45 ^-0.1 ^0.5 run function rlk:char/ronova/proj_spawn
-playsound minecraft:entity.illusioner.mirror_move master @a ~ ~ ~ 0.6 1.3
-playsound minecraft:block.amethyst_block.resonate master @a ~ ~ ~ 0.7 1.0
+execute if score #catOn tmp matches 0 if score #pOff tmp matches 0 positioned ~ ~1.62 ~ positioned ^ ^-0.15 ^0.5 run function rlk:char/ronova/proj_spawn
+execute if score #catOn tmp matches 0 if score #pOff tmp matches 1 positioned ~ ~1.62 ~ positioned ^-0.45 ^-0.1 ^0.5 run function rlk:char/ronova/proj_spawn
+execute if score #catOn tmp matches 0 if score #pOff tmp matches 2 positioned ~ ~1.62 ~ positioned ^0.45 ^-0.1 ^0.5 run function rlk:char/ronova/proj_spawn
+execute unless score #k273 snd matches 1 run function rlk:snd/f308
+execute unless score #k274 snd matches 1 run function rlk:snd/f309

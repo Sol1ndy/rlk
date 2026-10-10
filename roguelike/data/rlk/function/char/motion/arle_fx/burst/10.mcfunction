@@ -1,0 +1,9 @@
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.65} ^-0.4734 ^1.4243 ^0.3500 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.65} ^-0.4226 ^1.4833 ^0.3500 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.65} ^-0.3455 ^1.4939 ^0.3500 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.65} ^-0.2807 ^1.4509 ^0.3500 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.65} ^-0.2605 ^1.3757 ^0.3500 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.65} ^-0.2952 ^1.3060 ^0.3500 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.65} ^-0.3673 ^1.2767 ^0.3500 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.95,0.035,0.09],scale:0.65} ^-0.4407 ^1.3024 ^0.3500 0 0 0 0 1 normal
+particle minecraft:dust{color:[1,0.48,0.26],scale:0.42} ^-0.3700 ^1.3867 ^0.3500 0 0 0 0 1 normal

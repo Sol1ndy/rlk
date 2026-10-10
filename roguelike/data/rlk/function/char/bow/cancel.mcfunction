@@ -8,3 +8,4 @@ scoreboard players reset 염초화살 stacks
 attribute @s minecraft:movement_speed modifier remove rlk:bow_aim
 execute if items entity @s hotbar.0 *[minecraft:custom_data~{rlk_ui:{role:"attack"}}] run item modify entity @s hotbar.0 {type:"minecraft:set_components",components:{"minecraft:item_model":"minecraft:bow"}}
 execute if entity @e[tag=rlk_av,limit=1] run item replace entity @e[tag=rlk_av,limit=1] weapon.mainhand from entity @s hotbar.0
+function rlk:view/av_unwrap

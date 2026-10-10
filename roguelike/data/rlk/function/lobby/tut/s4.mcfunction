@@ -1,0 +1,5 @@
+# 튜토리얼 4단계 준비 (@s = 플레이어)
+data modify entity @e[tag=rlk_tutp,limit=1] text set value [{"text": "4. 원소 부착과 원소 반응\n", "color": "#7FD3FF", "bold": true}, {"text": "\n불 · 물 · 번개 · 얼음 · 풀 원소로 때리면 적에게 그 원소가 「부착」됩니다. (머리 위 아이콘)", "color": "#E6E6E6", "bold": false}, {"text": "\n부착된 원소는 시간이 지나면 줄어들고, 다른 원소가 닿으면 「원소 반응」을 일으키며 소모됩니다.", "color": "#E6E6E6", "bold": false}, {"text": "\n바람 · 바위는 부착되지 않지만, 부착된 원소에 닿으면 확산 · 결정 반응을 일으킵니다.", "color": "#E6E6E6", "bold": false}, {"text": "\n한 번의 타격은 반응을 하나만 일으키고, 반응 이름이 적 위에 뜹니다.", "color": "#E6E6E6", "bold": false}, {"text": "\n기본 공격은 같은 적에게 2.5초마다(또는 3타마다) 한 번만 원소를 묻힙니다.", "color": "#E6E6E6", "bold": false}, {"text": "\n원소 마스터리가 높을수록 반응의 피해와 효과가 커집니다.", "color": "#E6E6E6", "bold": false}, {"text": "\n다음 두 쪽에서 반응을 하나씩 알아봅시다.", "color": "#E6E6E6", "bold": false}]
+data merge entity @e[tag=rlk_tutp,limit=1] {line_width:300,transformation:{translation:[0f,0f,0f],scale:[1.7f,1.7f,1.7f]}}
+scoreboard players set #tutNeed lob 0
+data modify storage rlk:lobby tg set value ""

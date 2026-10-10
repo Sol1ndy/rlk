@@ -7,6 +7,6 @@ tag @e[tag=rlk_cr_new] remove rlk_cr_new
 # 달 결정: 월광 결정 하나
 execute if score @s lnCr matches 1 run function rlk:element/lunar/drift_spawn
 scoreboard players set @s lnCr 0
-playsound minecraft:block.amethyst_block.break master @a ~ ~ ~ 0.8 1.2
+execute unless score #k65 snd matches 1 run function rlk:snd/f68
 execute store result score #cc tmp if entity @e[tag=rlk_crystal]
 execute if score #cc tmp matches 4.. run kill @e[tag=rlk_crystal,limit=1]

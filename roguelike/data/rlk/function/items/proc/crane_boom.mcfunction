@@ -1,6 +1,6 @@
 particle minecraft:cloud ~ ~0.6 ~ 1.8 0.3 1.8 0.08 40
 particle minecraft:sweep_attack ~ ~1 ~ 2 0.3 2 0 8
-playsound minecraft:entity.breeze.wind_burst master @a ~ ~ ~ 0.8 1.3
+execute unless score #k137 snd matches 1 run function rlk:snd/f145
 execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:150}
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

@@ -4,4 +4,4 @@ execute rotated ~ 0 as @e[tag=rlk_potnew] run rotate @s ~ ~
 scoreboard players set @e[tag=rlk_potnew] life 0
 scoreboard players operation @e[tag=rlk_potnew] pcVal = #potN tmp
 tag @e[tag=rlk_potnew] remove rlk_potnew
-playsound minecraft:block.anvil.place master @a ~ ~ ~ 0.3 1.6
+execute unless score #k122 snd matches 1 run function rlk:snd/f130

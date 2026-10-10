@@ -3,7 +3,5 @@ execute if score @s clTg matches 1.. run return 0
 scoreboard players set @s clTg 5
 execute if score @s clAuto matches 1 run return run function rlk:char/clorinde/auto_off
 scoreboard players set @s clAuto 1
-playsound minecraft:item.crossbow.loading_end master @s ~ ~ ~ 0.6 1.6
-title @s actionbar {"text":"자동 사격 — 다시 좌클릭하면 멈춤","color":"#C58BFF"}
-scoreboard players set @s hudHold 20
+execute unless score #k261 snd matches 1 run function rlk:snd/f292
 execute unless score @s atkCD matches 1.. run function rlk:char/clorinde/shoot

@@ -26,3 +26,6 @@ execute if score @s it_exorcist_charm matches 1.. run function rlk:items/proc/ex
 execute if score @s it_nurse_syringe matches 1.. run function rlk:items/proc/nurse_gain
 execute if score @s it_water_lily matches 1.. run scoreboard players operation #lilyT itv = #lilyDur tmp
 execute if score @s it_moon_chalice matches 1.. run function rlk:items/proc/cg_rip_start
+# 튜토리얼: 스킬(3단계 · 캐릭터 2쪽)
+execute if score #tutS lob matches 3 if score @s lobRoom matches 2 run scoreboard players add #tutC lob 1
+execute if score #tutS lob matches 22 if score @s lobRoom matches 2 run scoreboard players add #tutC lob 1

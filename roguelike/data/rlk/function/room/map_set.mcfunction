@@ -1,0 +1,1 @@
+$item replace entity @s weapon.offhand with minecraft:filled_map[minecraft:map_id=$(map_id),minecraft:custom_data={rlk_map:1b},minecraft:item_name={text:"던전 지도",color:"gold",italic:false},minecraft:map_decorations=$(dec)]

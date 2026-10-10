@@ -11,5 +11,5 @@ scoreboard players operation @e[tag=rlk_javnew] jcrit = #crit tmp
 scoreboard players set @e[tag=rlk_javnew] life 0
 execute as @e[tag=rlk_javnew] at @s facing entity @e[tag=rlk_aimpt,limit=1] feet run tp @s ~ ~ ~ ~ ~
 tag @e[tag=rlk_javnew] remove rlk_javnew
-playsound minecraft:item.trident.throw master @a ~ ~ ~ 0.9 1.5
+execute unless score #k250 snd matches 1 run function rlk:snd/f279
 particle minecraft:snowflake ~ ~ ~ 0.15 0.15 0.15 0.03 6

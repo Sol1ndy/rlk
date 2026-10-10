@@ -1,0 +1,13 @@
+# Original particle geometry observed from the supplied reference video.
+particle minecraft:dust{color:[0.4f,0.15f,0.95f],scale:0.65f} ^-0.78 ^0.36 ^0 0 0 0 0 1 force @a[distance=..64]
+particle minecraft:dust{color:[0.4f,0.15f,0.95f],scale:0.65f} ^-0.7241 ^0.36 ^0.2899 0 0 0 0 1 force @a[distance=..64]
+particle minecraft:dust{color:[0.4f,0.15f,0.95f],scale:0.65f} ^-0.5645 ^0.36 ^0.5383 0 0 0 0 1 force @a[distance=..64]
+particle minecraft:dust{color:[0.4f,0.15f,0.95f],scale:0.65f} ^-0.324 ^0.36 ^0.7095 0 0 0 0 1 force @a[distance=..64]
+particle minecraft:dust{color:[0.4f,0.15f,0.95f],scale:0.65f} ^-0.0371 ^0.36 ^0.7791 0 0 0 0 1 force @a[distance=..64]
+particle minecraft:dust{color:[0.4f,0.15f,0.95f],scale:0.65f} ^0.2551 ^0.36 ^0.7371 0 0 0 0 1 force @a[distance=..64]
+particle minecraft:dust{color:[0.4f,0.15f,0.95f],scale:0.65f} ^0.5108 ^0.36 ^0.5895 0 0 0 0 1 force @a[distance=..64]
+particle minecraft:dust{color:[0.4f,0.15f,0.95f],scale:0.65f} ^0.6933 ^0.36 ^0.3574 0 0 0 0 1 force @a[distance=..64]
+particle minecraft:dust{color:[0.4f,0.15f,0.95f],scale:0.65f} ^0.7765 ^0.36 ^0.0741 0 0 0 0 1 force @a[distance=..64]
+particle minecraft:dust{color:[0.4f,0.15f,0.95f],scale:0.65f} ^0.7484 ^0.36 ^-0.2198 0 0 0 0 1 force @a[distance=..64]
+particle minecraft:dust{color:[0.4f,0.15f,0.95f],scale:0.65f} ^0.6131 ^0.36 ^-0.4822 0 0 0 0 1 force @a[distance=..64]
+particle minecraft:dust{color:[0.4f,0.15f,0.95f],scale:0.65f} ^0.39 ^0.36 ^-0.6755 0 0 0 0 1 force @a[distance=..64]

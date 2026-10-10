@@ -1,0 +1,67 @@
+# 구역 건설 (normal13_5, 테마 3): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill -20 200 -20 -1 200 -1 minecraft:podzol
+fill -20 201 -20 -1 210 -1 minecraft:stone
+fill -19 201 -19 -2 210 -2 minecraft:air
+fill -19 209 -19 -2 209 -2 minecraft:light[level=15]
+fill -7 200 -17 -6 200 -14 minecraft:moss_block
+fill -12 200 -12 -9 200 -9 minecraft:rooted_dirt
+fill -20 201 -9 -20 201 -6 minecraft:tuff
+fill -20 208 -6 -20 208 -5 minecraft:mossy_cobblestone
+fill -20 206 -11 -20 207 -10 minecraft:andesite
+fill -20 210 -14 -20 210 -14 minecraft:oak_leaves[persistent=true]
+fill -20 204 -10 -20 204 -8 minecraft:granite
+fill -20 210 -15 -20 210 -10 minecraft:tuff
+fill -1 207 -20 -1 208 -19 minecraft:moss_block
+fill -1 210 -5 -1 210 -3 minecraft:andesite
+fill -1 205 -6 -1 207 -6 minecraft:moss_block
+fill -1 204 -15 -1 206 -14 minecraft:andesite
+fill -7 208 -20 -5 209 -20 minecraft:mossy_cobblestone
+fill -4 210 -20 -2 210 -20 minecraft:oak_leaves[persistent=true]
+fill -14 203 -20 -11 203 -20 minecraft:andesite
+fill -13 210 -20 -10 210 -20 minecraft:moss_block
+fill -5 208 -20 -4 210 -20 minecraft:moss_block
+fill -8 203 -20 -5 204 -20 minecraft:granite
+fill -15 201 -1 -15 203 -1 minecraft:andesite
+fill -18 202 -1 -18 203 -1 minecraft:andesite
+fill -18 202 -1 -13 202 -1 minecraft:cobblestone
+fill -20 210 -20 -1 210 -1 minecraft:polished_deepslate
+fill -19 210 -19 -2 210 -2 minecraft:air
+fill -19 201 -10 -16 201 -10 minecraft:podzol
+fill -19 201 -9 -18 201 -9 minecraft:podzol
+fill -15 201 -9 -15 201 -6 minecraft:podzol
+fill -19 201 -8 -19 201 -8 minecraft:podzol
+fill -14 201 -5 -13 201 -5 minecraft:podzol
+fill -19 201 -4 -19 201 -2 minecraft:podzol
+fill -15 201 -4 -14 201 -4 minecraft:podzol
+fill -18 201 -3 -15 201 -3 minecraft:podzol
+fill -18 201 -2 -16 201 -2 minecraft:podzol
+fill -18 201 -8 -18 201 -4 minecraft:dirt
+fill -18 202 -8 -18 202 -4 minecraft:podzol
+fill -19 201 -7 -19 201 -5 minecraft:dirt
+fill -19 202 -7 -19 202 -5 minecraft:podzol
+fill -17 201 -7 -16 201 -4 minecraft:dirt
+fill -17 202 -7 -16 202 -4 minecraft:podzol
+fill -15 201 -5 -15 201 -5 minecraft:dirt
+fill -15 202 -5 -15 202 -5 minecraft:podzol
+fill -11 201 -2 -8 206 -2 minecraft:stone
+fill -11 207 -2 -8 207 -2 minecraft:podzol
+fill -17 201 -8 -16 207 -8 minecraft:andesite
+fill -17 208 -8 -16 208 -8 minecraft:podzol
+fill -17 201 -9 -16 207 -9 minecraft:stone
+fill -17 208 -9 -16 208 -9 minecraft:podzol
+execute positioned -8 201 -5 run function rlk:room/prop/p_oak
+execute positioned -17 201 -17 run function rlk:room/prop/p_oak
+execute positioned -16 201 -14 run function rlk:room/prop/p_lantern
+execute positioned -3 201 -2 run function rlk:room/prop/p_boulder_s
+execute positioned -13 201 -4 run function rlk:room/prop/p_boulder_s
+execute positioned -14 201 -15 run function rlk:room/prop/p_wildflower
+execute positioned -2 201 -2 run function rlk:room/prop/p_grass
+execute positioned -4 201 -11 run function rlk:room/prop/p_dandelion
+execute positioned -7 201 -11 run function rlk:room/prop/p_wildflower
+execute positioned -17 202 -3 run function rlk:room/prop/p_wildflower
+execute positioned -12 201 -17 run function rlk:room/prop/p_litter
+execute positioned -11 201 -16 run function rlk:room/prop/p_grass
+setblock -17 209 -9 minecraft:azalea_leaves[persistent=true] keep
+setblock -17 209 -8 minecraft:azalea_leaves[persistent=true] keep
+setblock -11 208 -2 minecraft:azalea_leaves[persistent=true] keep
+setblock -9 208 -2 minecraft:azalea_leaves[persistent=true] keep

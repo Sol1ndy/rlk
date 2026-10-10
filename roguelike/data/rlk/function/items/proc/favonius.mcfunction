@@ -9,5 +9,5 @@ execute if score #rng tmp > #favChance tmp run return 0
 scoreboard players operation #enAdd tmp = #favEnergy tmp
 function rlk:char/energy_add
 scoreboard players operation @s favCd = #favCdT tmp
-execute at @s run playsound minecraft:block.amethyst_block.resonate master @s ~ ~ ~ 0.9 1.5
-execute at @s run playsound minecraft:entity.breeze.charge master @s ~ ~ ~ 0.35 1.8
+execute at @s unless score #k177 snd matches 1 run function rlk:snd/f190
+execute at @s unless score #k178 snd matches 1 run function rlk:snd/f191

@@ -19,5 +19,5 @@ execute if score @s nvS matches 3..5 at @e[tag=rlk_av,limit=1] run summon minecr
 execute if score @s nvS matches 6.. at @e[tag=rlk_av,limit=1] run summon minecraft:block_display ~ ~1.22 ~ {Tags:["rlk_nvsh","rlk_nvsh_new"],teleport_duration:2,brightness:{sky:15,block:15},Glowing:1b,glow_color_override:16766720,block_state:{id:"minecraft:yellow_stained_glass"},transformation:{translation:[0.480f,-0.120f,-0.015f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0.3827f,0.9239f],scale:[0.170f,0.170f,0.030f]}}
 scoreboard players set @e[tag=rlk_nvsh_new] nvShI 2
 tag @e[tag=rlk_nvsh_new] remove rlk_nvsh_new
-execute if score @s nvS > @s nvShP run playsound minecraft:block.amethyst_block.chime master @s ~ ~ ~ 0.6 1.6
+execute if score @s nvS > @s nvShP unless score #k166 snd matches 1 run function rlk:snd/f244
 scoreboard players operation @s nvShP = @s nvS

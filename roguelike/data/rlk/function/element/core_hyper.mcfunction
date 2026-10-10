@@ -3,7 +3,7 @@ scoreboard players set #rx tmp 12
 function rlk:engravings/on_rx
 execute positioned ~ ~-1.5 ~ run function rlk:element/rx_text
 particle minecraft:electric_spark ~ ~0.5 ~ 0.4 0.4 0.4 0.4 25
-playsound minecraft:entity.firework_rocket.launch master @a ~ ~ ~ 0.8 1.6
+execute unless score #k45 snd matches 1 run function rlk:snd/f47
 scoreboard players operation #qDmg tmp = @s rxDmg3
 scoreboard players set #qEl tmp 7
 scoreboard players set #qU tmp 0

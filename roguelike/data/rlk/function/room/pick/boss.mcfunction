@@ -1,3 +1,3 @@
-# 배치 하나를 무작위로 골라 rlk:room cur 에 복사
-execute store result storage rlk:room a.i int 1 run random value 0..7
-function rlk:room/pick/copy_boss with storage rlk:room a
+# 임시로 모든 챕터 보스 = 마가츠 미타케 나루카미노 미코토.
+# 원형·무장식 필드는 boss_id:narukami인 구역에만 적용된다.
+function rlk:room/raiden/layout

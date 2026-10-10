@@ -6,4 +6,4 @@ execute rotated ~ 0 positioned ^ ^ ^1.5 run summon minecraft:rabbit ~ ~0.2 ~ {Ta
 execute rotated ~ 0 positioned ^ ^ ^1.5 run summon minecraft:marker ~ ~0.2 ~ {Tags:["rlk_decoym"]}
 scoreboard players operation @e[tag=rlk_decoym] life = #bunnyDur tmp
 execute as @e[tag=rlk_decoy,limit=1] at @s run function rlk:items/proc/bunny_taunt
-playsound minecraft:entity.rabbit.jump master @a ~ ~ ~ 1 0.8
+execute unless score #k181 snd matches 1 run function rlk:snd/f195

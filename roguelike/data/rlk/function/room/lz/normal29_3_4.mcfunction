@@ -1,0 +1,61 @@
+# 구역 건설 (normal29_3, 테마 4): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill -40 200 -40 -21 200 -21 minecraft:podzol
+fill -40 201 -40 -21 210 -21 minecraft:stone
+fill -39 201 -39 -22 210 -22 minecraft:air
+fill -39 209 -39 -22 209 -22 minecraft:light[level=15]
+fill -28 200 -27 -26 200 -25 minecraft:packed_mud
+fill -40 210 -28 -40 210 -25 minecraft:cherry_leaves[persistent=true]
+fill -40 210 -29 -40 210 -25 minecraft:cherry_leaves[persistent=true]
+fill -40 209 -40 -40 210 -38 minecraft:cherry_leaves[persistent=true]
+fill -40 210 -30 -40 210 -29 minecraft:cherry_leaves[persistent=true]
+fill -40 208 -29 -40 209 -24 minecraft:tuff
+fill -40 201 -28 -40 210 -28 minecraft:stripped_dark_oak_log
+fill -21 201 -40 -21 210 -40 minecraft:stripped_dark_oak_log
+fill -21 203 -24 -21 206 -22 minecraft:cobblestone
+fill -21 204 -37 -21 206 -36 minecraft:andesite
+fill -21 210 -33 -21 210 -31 minecraft:cherry_leaves[persistent=true]
+fill -40 207 -40 -37 210 -40 minecraft:calcite
+fill -36 201 -40 -36 210 -40 minecraft:stripped_dark_oak_log
+fill -29 210 -40 -28 210 -40 minecraft:cherry_leaves[persistent=true]
+fill -39 210 -21 -35 210 -21 minecraft:calcite
+fill -31 210 -21 -27 210 -21 minecraft:cherry_leaves[persistent=true]
+fill -31 210 -21 -26 210 -21 minecraft:cherry_leaves[persistent=true]
+fill -40 210 -40 -21 210 -21 minecraft:polished_deepslate
+fill -39 210 -39 -22 210 -22 minecraft:air
+fill -36 201 -34 -35 201 -33 minecraft:podzol
+fill -38 201 -33 -37 201 -33 minecraft:podzol
+fill -39 201 -32 -38 201 -32 minecraft:podzol
+fill -35 201 -32 -35 201 -27 minecraft:podzol
+fill -39 201 -31 -39 201 -30 minecraft:podzol
+fill -36 201 -27 -36 201 -27 minecraft:podzol
+fill -38 201 -26 -37 201 -25 minecraft:podzol
+fill -37 201 -32 -36 201 -31 minecraft:dirt
+fill -37 202 -32 -36 202 -31 minecraft:podzol
+fill -38 201 -31 -38 201 -27 minecraft:dirt
+fill -38 202 -31 -38 202 -27 minecraft:podzol
+fill -36 201 -30 -36 201 -28 minecraft:dirt
+fill -36 202 -30 -36 202 -28 minecraft:podzol
+fill -39 201 -29 -39 201 -29 minecraft:dirt
+fill -39 202 -29 -39 202 -29 minecraft:podzol
+fill -37 201 -27 -37 201 -27 minecraft:dirt
+fill -37 202 -27 -37 202 -27 minecraft:podzol
+fill -37 201 -30 -37 202 -28 minecraft:dirt
+fill -37 203 -30 -37 203 -28 minecraft:podzol
+fill -39 201 -28 -39 206 -27 minecraft:mossy_stone_bricks
+fill -39 207 -28 -39 207 -27 minecraft:podzol
+fill -39 201 -26 -39 206 -24 minecraft:stone_bricks
+fill -39 207 -26 -39 207 -24 minecraft:podzol
+execute positioned -37 201 -35 run function rlk:room/prop/i_lantern
+execute positioned -24 201 -36 run function rlk:room/prop/i_pillar
+execute positioned -37 204 -30 run function rlk:room/prop/i_petal
+execute positioned -37 201 -37 run function rlk:room/prop/i_flower
+execute positioned -30 201 -25 run function rlk:room/prop/i_petal
+execute positioned -24 201 -31 run function rlk:room/prop/i_grass
+execute positioned -27 201 -39 run function rlk:room/prop/i_petal
+execute positioned -34 201 -37 run function rlk:room/prop/i_petal
+execute positioned -39 201 -39 run function rlk:room/prop/i_petal
+execute positioned -34 201 -30 run function rlk:room/prop/i_flower
+setblock -39 208 -27 minecraft:short_grass keep
+setblock -39 208 -26 minecraft:cherry_leaves[persistent=true] keep
+setblock -39 208 -25 minecraft:cherry_leaves[persistent=true] keep
+setblock -39 208 -24 minecraft:short_grass keep

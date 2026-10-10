@@ -9,5 +9,4 @@ execute if score #mapType room matches 7 run scoreboard players set #seen7 room 
 function rlk:run/field_next
 scoreboard players add #mapIdx room 1
 execute in minecraft:overworld run function rlk:room/gen
-# 로노바: 불사의 저주는 맵마다 한 번
-scoreboard players set @a[tag=player] rnRev 0
+

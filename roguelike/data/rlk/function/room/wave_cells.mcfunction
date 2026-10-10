@@ -12,5 +12,6 @@ execute store result storage rlk:room w.x1 int 1 run scoreboard players get #bx1
 execute store result storage rlk:room w.z0 int 1 run scoreboard players get #bz0 tmp
 execute store result storage rlk:room w.z1 int 1 run scoreboard players get #bz1 tmp
 execute if score #bx0 tmp <= #bx1 tmp if score #bz0 tmp <= #bz1 tmp run function rlk:room/wave_fill with storage rlk:room w
+execute if score #bx0 tmp <= #bx1 tmp if score #bz0 tmp <= #bz1 tmp if data storage rlk:room w.u2 run function rlk:room/wave_fill2 with storage rlk:room w
 data remove storage rlk:room q[0]
 function rlk:room/wave_cells

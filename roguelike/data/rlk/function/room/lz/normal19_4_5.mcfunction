@@ -1,0 +1,73 @@
+# 구역 건설 (normal19_4, 테마 5 우림): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill -60 200 -60 -41 200 -41 minecraft:podzol
+fill -60 201 -60 -41 210 -41 minecraft:moss_block
+fill -59 201 -59 -42 210 -42 minecraft:air
+fill -59 209 -59 -42 209 -42 minecraft:light[level=15]
+fill -58 200 -46 -55 200 -45 minecraft:rooted_dirt
+fill -44 200 -53 -43 200 -50 minecraft:rooted_dirt
+fill -60 209 -48 -60 210 -43 minecraft:jungle_leaves[persistent=true]
+fill -60 201 -45 -60 210 -45 minecraft:jungle_log
+fill -60 209 -55 -60 210 -52 minecraft:jungle_leaves[persistent=true]
+fill -41 201 -50 -41 203 -45 minecraft:stone
+fill -41 201 -46 -41 210 -46 minecraft:jungle_log
+fill -41 209 -57 -41 210 -53 minecraft:jungle_leaves[persistent=true]
+fill -41 201 -48 -41 210 -48 minecraft:jungle_log
+fill -49 203 -60 -49 204 -60 minecraft:mossy_cobblestone
+fill -54 209 -60 -50 210 -60 minecraft:jungle_leaves[persistent=true]
+fill -54 201 -60 -54 210 -60 minecraft:jungle_log
+fill -58 204 -60 -57 205 -60 minecraft:stone
+fill -55 201 -41 -55 210 -41 minecraft:jungle_log
+fill -48 201 -41 -48 210 -41 minecraft:jungle_log
+fill -56 204 -41 -52 207 -41 minecraft:mossy_cobblestone
+fill -56 203 -41 -52 206 -41 minecraft:mossy_cobblestone
+fill -45 210 -41 -44 210 -41 minecraft:azalea_leaves[persistent=true]
+fill -60 210 -60 -41 210 -41 minecraft:polished_deepslate
+fill -59 210 -59 -42 210 -42 minecraft:air
+fill -57 201 -59 -53 201 -59 minecraft:podzol
+fill -57 201 -58 -56 201 -58 minecraft:podzol
+fill -53 201 -58 -53 201 -55 minecraft:podzol
+fill -59 201 -57 -57 201 -56 minecraft:podzol
+fill -54 201 -55 -54 201 -55 minecraft:podzol
+fill -55 201 -54 -55 201 -48 minecraft:podzol
+fill -59 201 -48 -56 201 -47 minecraft:podzol
+fill -55 201 -58 -54 201 -56 minecraft:dirt
+fill -55 202 -58 -54 202 -56 minecraft:podzol
+fill -56 201 -57 -56 201 -51 minecraft:dirt
+fill -56 202 -57 -56 202 -51 minecraft:podzol
+fill -59 201 -55 -57 201 -51 minecraft:dirt
+fill -59 202 -55 -57 202 -51 minecraft:podzol
+fill -55 201 -55 -55 201 -55 minecraft:dirt
+fill -55 202 -55 -55 202 -55 minecraft:podzol
+fill -59 201 -50 -58 201 -49 minecraft:dirt
+fill -59 202 -50 -58 202 -49 minecraft:podzol
+fill -42 201 -48 -42 206 -45 minecraft:mossy_cobblestone
+fill -42 207 -48 -42 207 -45 minecraft:podzol
+fill -42 201 -49 -42 206 -49 minecraft:stone
+fill -42 207 -49 -42 207 -49 minecraft:podzol
+fill -57 201 -50 -56 207 -49 minecraft:mossy_cobblestone
+fill -57 208 -50 -56 208 -49 minecraft:podzol
+fill -51 186 -60 -41 199 -56 minecraft:stone
+fill -50 186 -59 -42 186 -57 minecraft:dirt
+fill -50 187 -59 -42 188 -57 minecraft:jungle_leaves[persistent=true]
+fill -50 189 -59 -42 201 -57 minecraft:air
+execute positioned -59 203 -54 run function rlk:room/prop/sf_bush
+execute positioned -44 201 -52 run function rlk:room/prop/sf_mush_s
+execute positioned -55 203 -56 run function rlk:room/prop/sf_mush_s
+execute positioned -48 201 -56 run function rlk:room/prop/sf_rock
+execute positioned -42 201 -54 run function rlk:room/prop/sf_fern
+execute positioned -48 201 -57 run function rlk:room/prop/sf_moss
+execute positioned -52 201 -44 run function rlk:room/prop/p_litter
+execute positioned -59 202 -56 run function rlk:room/prop/sf_fern
+execute positioned -58 201 -58 run function rlk:room/prop/sf_fern
+execute positioned -54 201 -54 run function rlk:room/prop/p_litter
+execute positioned -51 201 -49 run function rlk:room/prop/sf_flower
+execute positioned -58 201 -43 run function rlk:room/prop/sf_moss
+execute positioned -51 201 -56 run function rlk:room/prop/sf_moss
+execute positioned -57 203 -52 run function rlk:room/prop/sf_fern
+execute positioned -51 201 -44 run function rlk:room/prop/p_litter
+execute positioned -52 201 -58 run function rlk:room/prop/sf_flower
+setblock -56 209 -50 minecraft:fern keep
+setblock -56 209 -49 minecraft:jungle_leaves[persistent=true] keep
+setblock -42 208 -49 minecraft:jungle_leaves[persistent=true] keep
+setblock -42 208 -46 minecraft:fern keep
+setblock -42 208 -45 minecraft:jungle_leaves[persistent=true] keep

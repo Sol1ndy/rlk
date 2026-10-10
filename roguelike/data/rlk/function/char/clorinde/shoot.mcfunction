@@ -19,8 +19,8 @@ execute if score #clPierce tmp matches 1 run scoreboard players set #coef tmp 85
 function rlk:char/bow/calc
 # 총알이 지나갈 줄: 눈높이의 표식을 조준 방향으로 두고(조준 보정) 따라가며 맞을 적을 고른다
 kill @e[tag=rlk_clm]
-execute anchored eyes positioned ^ ^-0.15 ^0.3 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_clm"]}
-execute anchored eyes positioned ^ ^-0.15 ^0.3 run tp @e[tag=rlk_clm] ~ ~ ~ ~ ~
+execute positioned ~ ~1.62 ~ positioned ^ ^-0.15 ^0.3 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_clm"]}
+execute positioned ~ ~1.62 ~ positioned ^ ^-0.15 ^0.3 run tp @e[tag=rlk_clm] ~ ~ ~ ~ ~
 execute as @e[tag=rlk_clm,limit=1] at @s run function rlk:char/bow/assist
 scoreboard players set #cs tmp 40
 scoreboard players set #cStop tmp 0
@@ -47,7 +47,7 @@ execute if score #hitLanded tmp matches 1 if score #clPierce tmp matches 0 run f
 execute if score #hitLanded tmp matches 1 run function rlk:char/clorinde/pc
 function rlk:items/hook/on_basic_attack
 scoreboard players set #basic itv 0
-playsound minecraft:entity.firework_rocket.blast master @a ~ ~ ~ 0.7 1.9
-playsound minecraft:block.amethyst_block.hit master @a ~ ~ ~ 0.6 1.4
-playsound minecraft:entity.lightning_bolt.impact master @a ~ ~ ~ 0.25 2.0
-playsound minecraft:block.redstone_torch.burnout master @a ~ ~ ~ 0.35 1.7
+execute unless score #k255 snd matches 1 run function rlk:snd/f286
+execute unless score #k256 snd matches 1 run function rlk:snd/f287
+execute unless score #k257 snd matches 1 run function rlk:snd/f288
+execute unless score #k258 snd matches 1 run function rlk:snd/f289

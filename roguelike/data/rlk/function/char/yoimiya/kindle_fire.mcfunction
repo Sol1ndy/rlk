@@ -6,12 +6,12 @@ scoreboard players set #aSub tmp 3
 scoreboard players set #aLife tmp 50
 scoreboard players set #coef tmp 30
 function rlk:char/bow/calc
-execute anchored eyes rotated ~ ~-35 positioned ^ ^ ^0.5 run function rlk:char/bow/spawn
+execute positioned ~ ~1.62 ~ rotated ~ ~-35 positioned ^ ^ ^0.5 run function rlk:char/bow/spawn
 tag @e[tag=rlk_arrnew] remove rlk_arrnew
 execute if score #bK tmp matches 2.. run function rlk:char/bow/calc
-execute if score #bK tmp matches 2.. anchored eyes rotated ~-35 ~-20 positioned ^ ^ ^0.5 run function rlk:char/bow/spawn
+execute if score #bK tmp matches 2.. positioned ~ ~1.62 ~ rotated ~-35 ~-20 positioned ^ ^ ^0.5 run function rlk:char/bow/spawn
 tag @e[tag=rlk_arrnew] remove rlk_arrnew
 execute if score #bK tmp matches 3.. run function rlk:char/bow/calc
-execute if score #bK tmp matches 3.. anchored eyes rotated ~35 ~-20 positioned ^ ^ ^0.5 run function rlk:char/bow/spawn
+execute if score #bK tmp matches 3.. positioned ~ ~1.62 ~ rotated ~35 ~-20 positioned ^ ^ ^0.5 run function rlk:char/bow/spawn
 tag @e[tag=rlk_arrnew] remove rlk_arrnew
-playsound minecraft:entity.blaze.shoot master @a ~ ~ ~ 0.4 1.8
+execute unless score #k248 snd matches 1 run function rlk:snd/f276

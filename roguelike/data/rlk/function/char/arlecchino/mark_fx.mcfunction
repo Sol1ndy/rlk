@@ -26,4 +26,4 @@ execute positioned ~ ~1 ~ facing entity @a[tag=player,limit=1] eyes run particle
 execute positioned ~ ~1 ~ facing entity @a[tag=player,limit=1] eyes run particle minecraft:dust{color:[0.88,0.12,0.20],scale:1.4} ^0.75 ^0.75 ^0.5 0 0 0 0 1
 execute positioned ~ ~1 ~ facing entity @a[tag=player,limit=1] eyes run particle minecraft:dust{color:[0.88,0.12,0.20],scale:1.4} ^0.75 ^-0.75 ^0.5 0 0 0 0 1
 particle minecraft:flame ~ ~1 ~ 0.3 0.4 0.3 0.04 8
-playsound minecraft:entity.player.attack.crit master @a ~ ~ ~ 0.5 0.6
+execute unless score #k324 snd matches 1 run function rlk:snd/f380

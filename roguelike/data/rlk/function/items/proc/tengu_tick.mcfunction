@@ -4,7 +4,7 @@ particle minecraft:dust{color:[0.77f,0.55f,1.0f],scale:0.8f} ~ ~0.3 ~ 0.3 0.2 0.
 execute if score @s life matches 1.. run return 0
 particle minecraft:dust{color:[0.77f,0.55f,1.0f],scale:1.5f} ~ ~2.2 ~ 0.08 1.6 0.08 0 30
 particle minecraft:electric_spark ~ ~0.8 ~ 1.2 0.5 1.2 0.4 30
-playsound minecraft:item.trident.thunder master @a ~ ~ ~ 0.3 1.7
+execute unless score #k134 snd matches 1 run function rlk:snd/f142
 scoreboard players operation #tenguT itv = #tenguDur tmp
 function rlk:items/proc/tengu_boom
 kill @s

@@ -24,7 +24,7 @@ execute as @a[tag=player,limit=1] at @e[tag=rlk_body,limit=1] run function rlk:c
 execute at @s run particle minecraft:dust{color:[0.88,0.12,0.22],scale:1.3} ~ ~ ~ 0.15 0.15 0.15 0 8
 execute at @s run particle minecraft:dust{color:[0.10,0.02,0.05],scale:1.0} ~ ~ ~ 0.1 0.1 0.1 0 4
 execute at @s if entity @s[scores={aIcd=0}] run particle minecraft:reverse_portal ~ ~ ~ 0.1 0.1 0.1 0.3 12
-execute at @s run playsound minecraft:block.amethyst_cluster.break master @a ~ ~ ~ 0.4 1.3
-execute at @s if entity @s[scores={aIcd=0}] run playsound minecraft:entity.wither.shoot master @a ~ ~ ~ 0.15 1.9
-execute at @s if entity @s[scores={aIcd=0}] run playsound minecraft:block.respawn_anchor.deplete master @a ~ ~ ~ 0.3 1.6
+execute at @s unless score #k284 snd matches 1 run function rlk:snd/f319
+execute at @s if entity @s[scores={aIcd=0}] unless score #k285 snd matches 1 run function rlk:snd/f320
+execute at @s if entity @s[scores={aIcd=0}] unless score #k286 snd matches 1 run function rlk:snd/f321
 kill @s

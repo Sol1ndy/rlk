@@ -1,0 +1,81 @@
+# 구역 건설 (first7_2, 테마 5 우림): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill 20 200 0 39 200 19 minecraft:podzol
+fill 20 201 0 39 210 19 minecraft:moss_block
+fill 21 201 1 38 210 18 minecraft:air
+fill 21 209 1 38 209 18 minecraft:light[level=15]
+fill 25 200 11 27 200 13 minecraft:packed_mud
+fill 25 200 6 28 200 7 minecraft:rooted_dirt
+fill 20 201 5 20 210 5 minecraft:jungle_log
+fill 20 201 1 20 210 1 minecraft:jungle_log
+fill 20 209 15 20 210 16 minecraft:jungle_leaves[persistent=true]
+fill 39 210 0 39 210 3 minecraft:jungle_leaves[persistent=true]
+fill 39 210 1 39 210 5 minecraft:stone
+fill 39 201 14 39 210 14 minecraft:jungle_log
+fill 39 209 9 39 210 14 minecraft:jungle_leaves[persistent=true]
+fill 25 205 0 29 205 0 minecraft:stone
+fill 28 209 0 31 210 0 minecraft:jungle_leaves[persistent=true]
+fill 24 210 0 28 210 0 minecraft:jungle_leaves[persistent=true]
+fill 33 210 0 35 210 0 minecraft:jungle_leaves[persistent=true]
+fill 30 210 0 35 210 0 minecraft:azalea_leaves[persistent=true]
+fill 23 210 19 24 210 19 minecraft:jungle_leaves[persistent=true]
+fill 35 204 19 37 204 19 minecraft:stone
+fill 21 201 19 21 210 19 minecraft:jungle_log
+fill 31 208 19 32 208 19 minecraft:stone
+fill 20 210 0 39 210 19 minecraft:polished_deepslate
+fill 21 210 1 38 210 18 minecraft:air
+fill 22 201 1 22 201 3 minecraft:podzol
+fill 30 201 1 30 201 2 minecraft:podzol
+fill 23 201 3 25 201 3 minecraft:podzol
+fill 26 201 4 26 201 5 minecraft:podzol
+fill 27 201 5 30 201 5 minecraft:podzol
+fill 26 201 15 33 201 15 minecraft:podzol
+fill 24 201 16 25 201 18 minecraft:podzol
+fill 33 201 16 34 201 18 minecraft:podzol
+fill 23 201 1 24 201 2 minecraft:dirt
+fill 23 202 1 24 202 2 minecraft:podzol
+fill 28 201 1 29 201 1 minecraft:dirt
+fill 28 202 1 29 202 1 minecraft:podzol
+fill 25 201 2 25 201 2 minecraft:dirt
+fill 25 202 2 25 202 2 minecraft:podzol
+fill 29 201 2 29 201 4 minecraft:dirt
+fill 29 202 2 29 202 4 minecraft:podzol
+fill 26 201 3 26 201 3 minecraft:dirt
+fill 26 202 3 26 202 3 minecraft:podzol
+fill 27 201 4 28 201 4 minecraft:dirt
+fill 27 202 4 28 202 4 minecraft:podzol
+fill 26 201 16 32 201 17 minecraft:dirt
+fill 26 202 16 32 202 17 minecraft:podzol
+fill 26 201 18 26 201 18 minecraft:dirt
+fill 26 202 18 26 202 18 minecraft:podzol
+fill 25 201 1 27 202 1 minecraft:dirt
+fill 25 203 1 27 203 1 minecraft:podzol
+fill 26 201 2 28 202 2 minecraft:dirt
+fill 26 203 2 28 203 2 minecraft:podzol
+fill 27 201 3 28 202 3 minecraft:dirt
+fill 27 203 3 28 203 3 minecraft:podzol
+fill 27 201 18 29 207 18 minecraft:mossy_cobblestone
+fill 27 208 18 29 208 18 minecraft:podzol
+fill 30 201 3 31 207 4 minecraft:stone
+fill 30 208 3 31 208 4 minecraft:podzol
+fill 30 201 18 32 207 18 minecraft:stone
+fill 30 208 18 32 208 18 minecraft:podzol
+execute positioned 35 201 3 run function rlk:room/prop/sf_mush_s
+execute positioned 23 203 1 run function rlk:room/prop/sf_rock
+execute positioned 22 201 7 run function rlk:room/prop/sf_moss
+execute positioned 28 204 3 run function rlk:room/prop/sf_fern
+execute positioned 24 202 17 run function rlk:room/prop/sf_moss
+execute positioned 30 201 8 run function rlk:room/prop/sf_flower
+execute positioned 36 201 7 run function rlk:room/prop/sf_fern
+execute positioned 24 201 9 run function rlk:room/prop/sf_flower
+execute positioned 38 201 1 run function rlk:room/prop/sf_flower
+execute positioned 29 202 5 run function rlk:room/prop/sf_moss
+execute positioned 34 202 17 run function rlk:room/prop/sf_moss
+execute positioned 36 201 8 run function rlk:room/prop/sf_fern
+execute positioned 25 201 11 run function rlk:room/prop/sf_fern
+execute positioned 23 201 7 run function rlk:room/prop/sf_fern
+setblock 29 209 18 minecraft:jungle_leaves[persistent=true] keep
+setblock 30 209 4 minecraft:fern keep
+setblock 30 209 18 minecraft:jungle_leaves[persistent=true] keep
+setblock 31 209 3 minecraft:jungle_leaves[persistent=true] keep
+setblock 31 209 4 minecraft:jungle_leaves[persistent=true] keep
+setblock 31 209 18 minecraft:jungle_leaves[persistent=true] keep

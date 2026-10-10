@@ -6,4 +6,4 @@ scoreboard players operation #heal tmp /= #100 tmp
 execute if score @s it_red_herb matches 1.. run function rlk:items/proc/herb
 execute if score #heal tmp matches ..0 run scoreboard players set #heal tmp 1
 function rlk:player/heal
-playsound minecraft:entity.experience_orb.pickup master @s ~ ~ ~ 0.9 1.4
+execute unless score #k30 snd matches 1 run function rlk:snd/f32

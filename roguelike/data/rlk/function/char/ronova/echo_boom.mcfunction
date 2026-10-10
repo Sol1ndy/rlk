@@ -29,6 +29,6 @@ execute at @s if score @s aEl matches 6 run particle minecraft:dust{color:[0.45,
 execute at @s if score @s aEl matches 7 run particle minecraft:dust{color:[0.60,0.85,0.30],scale:1.4} ~ ~ ~ 1.0 0.6 1.0 0 30
 execute at @s if score @s aEl matches 8 run particle minecraft:dust{color:[0.88,0.15,0.30],scale:1.4} ~ ~ ~ 1.0 0.6 1.0 0 30
 execute at @s run particle minecraft:dust{color:[0.88,0.12,0.22],scale:1.0} ~ ~ ~ 0.6 0.4 0.6 0 12
-execute at @s run playsound minecraft:entity.illusioner.cast_spell master @a ~ ~ ~ 0.8 1.2
-execute at @s run playsound minecraft:entity.generic.explode master @a ~ ~ ~ 0.4 1.6
+execute at @s unless score #k289 snd matches 1 run function rlk:snd/f324
+execute at @s unless score #k290 snd matches 1 run function rlk:snd/f325
 kill @s

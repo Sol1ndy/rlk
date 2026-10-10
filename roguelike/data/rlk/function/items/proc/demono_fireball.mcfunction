@@ -3,6 +3,6 @@ execute unless entity @e[tag=rlk_mob,distance=..16] run return 0
 function rlk:items/proc/demono_dmg
 scoreboard players set #elem tmp 4
 particle minecraft:snowflake ~ ~1.2 ~ 0.2 0.2 0.2 0.03 10
-playsound minecraft:entity.player.hurt_freeze master @a ~ ~ ~ 0.8 1.4
-playsound minecraft:item.trident.throw master @a ~ ~ ~ 0.6 1.6
+execute unless score #k161 snd matches 1 run function rlk:snd/f170
+execute unless score #k162 snd matches 1 run function rlk:snd/f171
 execute as @e[tag=rlk_mob,distance=..16,sort=nearest,limit=1] at @s run function rlk:items/proc/demono_fireball_hit

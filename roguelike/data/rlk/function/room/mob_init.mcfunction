@@ -11,6 +11,25 @@ execute if entity @s[tag=rlk_m_vind] run scoreboard players set @s xpDrop 8
 execute if entity @s[tag=rlk_m_boss] run scoreboard players set #mhp tmp 400
 execute if entity @s[tag=rlk_m_boss] run scoreboard players set #mad tmp 6
 execute if entity @s[tag=rlk_m_boss] run scoreboard players set @s xpDrop 40
+# 1챕터 커스텀 몹(공격력 0: 모든 공격은 cm/* 함수가 직접)
+execute if entity @s[tag=rlk_m_cmsw] run scoreboard players set #mhp tmp 18
+execute if entity @s[tag=rlk_m_cmsw] run scoreboard players set #mad tmp 0
+execute if entity @s[tag=rlk_m_cmsw] run scoreboard players set @s xpDrop 4
+execute if entity @s[tag=rlk_m_cmar] run scoreboard players set #mhp tmp 12
+execute if entity @s[tag=rlk_m_cmar] run scoreboard players set #mad tmp 0
+execute if entity @s[tag=rlk_m_cmar] run scoreboard players set @s xpDrop 4
+execute if entity @s[tag=rlk_m_cmfm] run scoreboard players set #mhp tmp 12
+execute if entity @s[tag=rlk_m_cmfm] run scoreboard players set #mad tmp 0
+execute if entity @s[tag=rlk_m_cmfm] run scoreboard players set @s xpDrop 5
+execute if entity @s[tag=rlk_m_cmim] run scoreboard players set #mhp tmp 12
+execute if entity @s[tag=rlk_m_cmim] run scoreboard players set #mad tmp 0
+execute if entity @s[tag=rlk_m_cmim] run scoreboard players set @s xpDrop 5
+execute if entity @s[tag=rlk_m_cmsh] run scoreboard players set #mhp tmp 20
+execute if entity @s[tag=rlk_m_cmsh] run scoreboard players set #mad tmp 0
+execute if entity @s[tag=rlk_m_cmsh] run scoreboard players set @s xpDrop 8
+execute if entity @s[tag=rlk_m_cmcn] run scoreboard players set #mhp tmp 16
+execute if entity @s[tag=rlk_m_cmcn] run scoreboard players set #mad tmp 0
+execute if entity @s[tag=rlk_m_cmcn] run scoreboard players set @s xpDrop 6
 # 레벨 = (챕터 - 1) × 6 + 이번 맵의 순서(1~6). 체력은 레벨에 따라 늘어남(mob/level_apply), 공격력은 맞을 때 레벨로 보정
 scoreboard players operation @s mlv = #chapter room
 scoreboard players remove @s mlv 1

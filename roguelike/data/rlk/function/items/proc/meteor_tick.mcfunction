@@ -26,7 +26,7 @@ execute if score @s life matches 5 run particle minecraft:dust{color:[0.95f,0.76
 execute if score @s life matches 1.. run return 0
 particle minecraft:explosion_emitter ~ ~1 ~ 0 0 0 0 1
 particle minecraft:block{block_state:"minecraft:yellow_terracotta"} ~ ~0.5 ~ 3 0.5 3 0.3 120
-playsound minecraft:entity.generic.explode master @a ~ ~ ~ 1.2 0.6
-playsound minecraft:block.anvil.land master @a ~ ~ ~ 0.8 0.5
+execute unless score #k143 snd matches 1 run function rlk:snd/f151
+execute unless score #k144 snd matches 1 run function rlk:snd/f152
 function rlk:items/proc/meteor_boom
 kill @s

@@ -30,8 +30,8 @@ scoreboard players set #elU tmp 1000
 scoreboard players set #abyssHit tmp 1
 tag @e[tag=rlk_mob,distance=..16,sort=nearest,limit=1] add rlk_abt
 scoreboard players set #bi eng 0
-execute anchored eyes positioned ^ ^ ^0.6 facing entity @e[tag=rlk_abt,limit=1] eyes run function rlk:engravings/abyss/beam
-playsound minecraft:entity.breeze.shoot master @a ~ ~ ~ 0.5 1.8
+execute positioned ~ ~1.62 ~ positioned ^ ^ ^0.6 facing entity @e[tag=rlk_abt,limit=1] eyes run function rlk:engravings/abyss/beam
+execute unless score #k212 snd matches 1 run function rlk:snd/f235
 execute as @e[tag=rlk_abt,limit=1] at @s run function rlk:combat/apply
 tag @e[tag=rlk_abt] remove rlk_abt
 scoreboard players set #abyssHit tmp 0

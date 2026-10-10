@@ -12,6 +12,6 @@ execute at @e[tag=rlk_body,limit=1] run function rlk:char/after_hit
 execute positioned ^ ^1 ^3 run particle minecraft:sweep_attack ~ ~ ~ 1.8 0.8 1.8 0 6
 execute positioned ^ ^1 ^3 run particle minecraft:electric_spark ~ ~ ~ 1.8 0.8 1.8 0.4 30
 execute positioned ^ ^1 ^3 run particle minecraft:dust{color:[0.77f,0.55f,1.0f],scale:1.4f} ~ ~ ~ 2.0 0.9 2.0 0 14
-playsound minecraft:entity.player.attack.sweep master @a ~ ~ ~ 0.8 1.7
-playsound minecraft:entity.lightning_bolt.impact master @a ~ ~ ~ 0.25 2.0
-playsound minecraft:block.redstone_torch.burnout master @a ~ ~ ~ 0.3 1.6
+execute unless score #k259 snd matches 1 run function rlk:snd/f290
+execute unless score #k257 snd matches 1 run function rlk:snd/f288
+execute unless score #k260 snd matches 1 run function rlk:snd/f291

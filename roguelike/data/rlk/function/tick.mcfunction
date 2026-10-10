@@ -1,4 +1,6 @@
 # 로그라이크 시스템 - 매 틱 실행
+# 같은 효과음 겹침 방지 표시를 지움(build/psnd)
+scoreboard players reset * snd
 # uninstall 후에는 정지 (/reload 하면 다시 설치됨)
 execute unless data storage rlk:config {installed:1b} run return 0
 # ===== 'player' 태그 보유자만 시스템 적용. 2명 이상이면 전원 태그 제거 (인벤/아이템 저장소가 1인 기준) =====
@@ -8,6 +10,8 @@ execute if score #pcount tmp matches 2.. run tag @a[tag=player] remove player
 execute if score #pcount tmp matches 2.. run return 0
 
 # 시점 시스템(숄더뷰): 몸(rlk_body) 정하기 · 아바타 이동 · 카메라. 플레이어가 없으면 아바타 정리
+# 이전 틱 피격의 남은 넉백을 카메라 갱신 전에 적용
+execute as @e[tag=rlk_plkb] run function rlk:player/knockback/tick
 execute as @a[tag=player] run function rlk:view/tick
 execute unless entity @a[tag=player,limit=1] if entity @e[tag=rlk_view,limit=1] run kill @e[tag=rlk_view]
 execute as @a[tag=player] run function rlk:player/tick
@@ -18,8 +22,8 @@ function rlk:shop/tick
 execute as @e[tag=rlk_arrow] at @s run function rlk:char/bow/arrow_tick
 
 # 몹 처리 (넉백저항·경직·체력바·상태이상)
-execute as @e[type=!minecraft:player,type=!minecraft:item_display,type=!minecraft:block_display,type=!minecraft:text_display,type=!minecraft:interaction,type=!minecraft:marker,type=!minecraft:item,type=!minecraft:experience_orb,type=!minecraft:arrow,type=!minecraft:area_effect_cloud,tag=!rlk_mob,tag=!rlk_pet] at @s run function rlk:mob/setup
-execute as @e[type=!minecraft:player,type=!minecraft:item_display,type=!minecraft:block_display,type=!minecraft:text_display,type=!minecraft:interaction,type=!minecraft:marker,type=!minecraft:item,type=!minecraft:experience_orb,type=!minecraft:arrow,type=!minecraft:area_effect_cloud,tag=rlk_mob] at @s run function rlk:mob/tick
+execute as @e[type=!minecraft:player,type=!minecraft:item_display,type=!minecraft:block_display,type=!minecraft:text_display,type=!minecraft:interaction,type=!minecraft:marker,type=!minecraft:item,type=!minecraft:experience_orb,type=!minecraft:arrow,type=!minecraft:area_effect_cloud,type=!minecraft:item_frame,type=!minecraft:glow_item_frame,type=!minecraft:painting,tag=!rlk_mapv,tag=!rlk_mob,tag=!rlk_pet] at @s run function rlk:mob/setup
+execute as @e[type=!minecraft:player,type=!minecraft:item_display,type=!minecraft:block_display,type=!minecraft:text_display,type=!minecraft:interaction,type=!minecraft:marker,type=!minecraft:item,type=!minecraft:experience_orb,type=!minecraft:arrow,type=!minecraft:area_effect_cloud,type=!minecraft:item_frame,type=!minecraft:glow_item_frame,type=!minecraft:painting,tag=!rlk_mapv,tag=rlk_mob] at @s run function rlk:mob/tick
 # 어그로 유지: 0.5초마다 대상이 없는 몹을 다시 덤비게
 scoreboard players add #aggT tmp 1
 execute if score #aggT tmp matches 10.. run scoreboard players set #aggT tmp 0
@@ -30,6 +34,14 @@ execute unless entity @e[tag=rlk_mob,limit=1] if entity @e[tag=rlk_hb_bg,limit=1
 # 몹 클릭 실드: 존재할 때만 (고아 정리 + 클릭/우클릭 폴링)
 execute if entity @e[tag=rlk_mshield,limit=1] run function rlk:combat/mshield_tick
 
+# 커스텀 몹(cm): 두뇌 · 투사체 · 모습/부착물 정리
+execute if entity @e[tag=rlk_cmb,limit=1] run function rlk:cm/world
+execute unless entity @e[tag=rlk_cmb,limit=1] if entity @e[tag=rlk_cmglob,limit=1] run kill @e[tag=rlk_cmglob]
+execute if entity @e[tag=rlk_cmp,limit=1] run function rlk:cm/pj/world
+execute if entity @e[tag=rlk_cmlink,limit=1] run function rlk:cm/clean
+# Narukami boss AI, telegraphs, combat objects and orphan cleanup.
+execute if entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/world
+execute unless entity @e[tag=rlk_raiden,limit=1] if entity @e[tag=rlk_raiden_aux,limit=1] run function rlk:boss/raiden/cleanup
 # 회복구슬 / 아이템 소환물
 execute as @e[tag=rlk_healorb] at @s run function rlk:combat/healorb_tick
 execute as @e[tag=rlk_gold] at @s run function rlk:combat/gold_tick
@@ -50,3 +62,5 @@ execute as @a[tag=player] run function rlk:combat/atkblock_manage
 # 대쉬 방향용 이전 위치 저장(다음 틱 델타)
 execute as @a[tag=player] if entity @e[tag=rlk_body,limit=1] store result score @s dashPX run data get entity @e[tag=rlk_body,limit=1] Pos[0] 100
 execute as @a[tag=player] if entity @e[tag=rlk_body,limit=1] store result score @s dashPZ run data get entity @e[tag=rlk_body,limit=1] Pos[2] 100
+# 로비
+function rlk:lobby/tick

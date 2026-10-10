@@ -1,4 +1,4 @@
-playsound minecraft:block.glass.break master @a ~ ~ ~ 0.8 0.9
+execute unless score #k44 snd matches 1 run function rlk:snd/f46
 particle minecraft:snowflake ~ ~1 ~ 0.3 0.5 0.3 0.02 20
 execute if entity @s[type=minecraft:player] run return run function rlk:element/frz_on_player
 # 몹: AI 정지 + 얼음 표시 (원래 NoAI 였던 몹은 해제 때 되돌리지 않음)

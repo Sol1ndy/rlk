@@ -1,0 +1,22 @@
+# 프롭 i_torii_z (위치 = 기준 칸의 땅 바로 위)
+setblock ~0 ~0 ~0 minecraft:stripped_crimson_stem
+setblock ~0 ~1 ~0 minecraft:red_terracotta
+setblock ~0 ~2 ~0 minecraft:red_terracotta
+setblock ~0 ~3 ~0 minecraft:red_terracotta
+setblock ~0 ~0 ~4 minecraft:stripped_crimson_stem
+setblock ~0 ~1 ~4 minecraft:red_terracotta
+setblock ~0 ~2 ~4 minecraft:red_terracotta
+setblock ~0 ~3 ~4 minecraft:red_terracotta
+setblock ~0 ~2 ~0 minecraft:red_terracotta
+setblock ~0 ~2 ~1 minecraft:red_nether_brick_slab[type=top]
+setblock ~0 ~2 ~2 minecraft:red_nether_brick_slab[type=top]
+setblock ~0 ~2 ~3 minecraft:red_nether_brick_slab[type=top]
+setblock ~0 ~2 ~4 minecraft:red_terracotta
+setblock ~0 ~4 ~-1 minecraft:polished_blackstone_slab
+setblock ~0 ~4 ~0 minecraft:polished_blackstone
+setblock ~0 ~4 ~1 minecraft:polished_blackstone
+setblock ~0 ~4 ~2 minecraft:polished_blackstone
+setblock ~0 ~4 ~3 minecraft:polished_blackstone
+setblock ~0 ~4 ~4 minecraft:polished_blackstone
+setblock ~0 ~4 ~5 minecraft:polished_blackstone_slab
+setblock ~0 ~3 ~2 minecraft:red_terracotta

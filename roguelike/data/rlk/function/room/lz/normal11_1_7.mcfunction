@@ -1,0 +1,62 @@
+# 구역 건설 (normal11_1, 테마 7): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill -20 200 -20 -1 200 -1 minecraft:podzol
+fill -20 201 -20 -1 210 -1 minecraft:stone
+fill -19 201 -19 -2 210 -2 minecraft:air
+fill -19 209 -19 -2 209 -2 minecraft:light[level=15]
+fill -8 200 -4 -5 200 -2 minecraft:moss_block
+fill -20 201 -9 -20 202 -6 minecraft:prismarine
+fill -20 205 -18 -20 206 -15 minecraft:calcite
+fill -20 206 -6 -20 208 -4 minecraft:calcite
+fill -20 203 -19 -20 203 -16 minecraft:moss_block
+fill -20 204 -9 -20 206 -8 minecraft:calcite
+fill -20 209 -10 -20 210 -8 minecraft:oak_leaves[persistent=true]
+fill -1 210 -7 -1 210 -7 minecraft:birch_leaves[persistent=true]
+fill -1 204 -7 -1 204 -6 minecraft:diorite
+fill -1 208 -15 -1 208 -12 minecraft:prismarine
+fill -1 209 -4 -1 210 -3 minecraft:oak_leaves[persistent=true]
+fill -1 204 -20 -1 204 -20 minecraft:calcite
+fill -1 207 -7 -1 210 -6 minecraft:calcite
+fill -16 201 -20 -15 202 -20 minecraft:calcite
+fill -9 210 -20 -8 210 -20 minecraft:birch_leaves[persistent=true]
+fill -11 209 -20 -10 210 -20 minecraft:oak_leaves[persistent=true]
+fill -15 210 -1 -10 210 -1 minecraft:prismarine
+fill -10 206 -1 -7 208 -1 minecraft:calcite
+fill -8 210 -1 -4 210 -1 minecraft:birch_leaves[persistent=true]
+fill -8 208 -1 -6 210 -1 minecraft:prismarine
+fill -18 203 -1 -14 204 -1 minecraft:moss_block
+fill -15 205 -1 -11 207 -1 minecraft:moss_block
+fill -20 210 -20 -1 210 -1 minecraft:polished_deepslate
+fill -19 210 -19 -2 210 -2 minecraft:air
+fill -3 201 -16 -2 201 -15 minecraft:podzol
+fill -19 201 -15 -17 201 -11 minecraft:podzol
+fill -4 201 -15 -4 201 -6 minecraft:podzol
+fill -16 201 -14 -16 201 -10 minecraft:podzol
+fill -5 201 -14 -5 201 -7 minecraft:podzol
+fill -18 201 -10 -17 201 -7 minecraft:podzol
+fill -16 201 -7 -15 201 -7 minecraft:podzol
+fill -17 201 -6 -17 201 -2 minecraft:podzol
+fill -3 201 -6 -2 201 -5 minecraft:podzol
+fill -3 201 -14 -2 201 -7 minecraft:dirt
+fill -3 202 -14 -2 202 -7 minecraft:podzol
+fill -19 201 -6 -18 201 -2 minecraft:dirt
+fill -19 202 -6 -18 202 -2 minecraft:podzol
+fill -19 201 -10 -19 207 -9 minecraft:calcite
+fill -19 208 -10 -19 208 -9 minecraft:podzol
+fill -19 201 -8 -19 207 -7 minecraft:diorite
+fill -19 208 -8 -19 208 -7 minecraft:podzol
+fill -19 199 -19 -17 199 -16 minecraft:clay
+fill -19 200 -19 -17 200 -16 minecraft:water
+setblock -17 200 -18 minecraft:sea_pickle[pickles=1,waterlogged=true]
+execute positioned -7 201 -18 run function rlk:room/prop/fo_white
+execute positioned -10 201 -11 run function rlk:room/prop/fo_flower
+execute positioned -5 201 -15 run function rlk:room/prop/p_grass
+execute positioned -7 201 -19 run function rlk:room/prop/fo_flower
+execute positioned -19 203 -4 run function rlk:room/prop/p_grass
+execute positioned -8 201 -3 run function rlk:room/prop/p_grass
+execute positioned -12 201 -17 run function rlk:room/prop/p_grass
+execute positioned -15 201 -18 run function rlk:room/prop/fo_flower
+execute positioned -13 201 -8 run function rlk:room/prop/fo_white
+execute positioned -9 201 -17 run function rlk:room/prop/p_grass
+setblock -19 209 -9 minecraft:short_grass keep
+setblock -19 209 -8 minecraft:short_grass keep
+setblock -19 209 -7 minecraft:birch_leaves[persistent=true] keep

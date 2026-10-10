@@ -2,7 +2,7 @@ scoreboard players remove @s pcVal 1
 particle minecraft:flame ^ ^0.6 ^1.2 0.3 0.25 0.3 0.06 30
 particle minecraft:flame ^ ^0.6 ^2.6 0.6 0.3 0.6 0.05 40
 particle minecraft:flame ^ ^0.6 ^4.0 0.8 0.35 0.8 0.04 40
-playsound minecraft:entity.blaze.shoot master @a ~ ~ ~ 0.7 0.8
+execute unless score #k140 snd matches 1 run function rlk:snd/f148
 particle minecraft:lava ^ ^0.7 ^0.6 0.1 0.1 0.1 0 4
 particle minecraft:small_flame ^ ^0.6 ^2 0.2 0.2 1.2 0.02 40
 execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:45}

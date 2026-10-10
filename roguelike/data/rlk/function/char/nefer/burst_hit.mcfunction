@@ -16,5 +16,5 @@ tag @e[tag=rlk_hit] remove rlk_hit
 function rlk:char/after_hit
 particle minecraft:composter ^ ^0.5 ^4 2.5 0.5 2.5 0 50
 particle minecraft:dust{color:[0.55,0.95,0.35],scale:2.0} ^ ^0.6 ^4 2.5 0.3 2.5 0 40
-playsound minecraft:block.big_dripleaf.tilt_down master @a ~ ~ ~ 1 0.6
-playsound minecraft:entity.generic.explode master @a ~ ~ ~ 0.4 1.6
+execute unless score #k338 snd matches 1 run function rlk:snd/f399
+execute unless score #k290 snd matches 1 run function rlk:snd/f325

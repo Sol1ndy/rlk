@@ -2,7 +2,7 @@ scoreboard players set #lilyHit itv 0
 scoreboard players operation #lilyCd itv = #lilyCdT tmp
 particle minecraft:splash ~ ~0.5 ~ 1.5 0.3 1.5 0.2 40
 particle minecraft:bubble_pop ~ ~1 ~ 1.5 0.5 1.5 0.02 20
-playsound minecraft:entity.generic.splash master @a ~ ~ ~ 0.5 1.5
+execute unless score #k179 snd matches 1 run function rlk:snd/f192
 execute as @a[tag=player,limit=1] run function rlk:items/calc_stat {obj:"maxHealth",pm:40}
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

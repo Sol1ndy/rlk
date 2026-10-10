@@ -1,4 +1,17 @@
+function rlk:boss/raiden/cleanup
+kill @e[tag=rlk_raiden]
+scoreboard objectives remove lcSeen
+execute as @a[tag=player] run function rlk:char/motion/stop
 # 시스템 제거: 임시 엔티티/UI 아이템/스코어보드 정리 후 틱 처리 정지 (사용: /function rlk:uninstall)
+kill @e[tag=rlk_plkb]
+kill @e[tag=rlk_plkb_source]
+scoreboard objectives remove pkbT
+effect clear @a[tag=player] minecraft:night_vision
+kill @e[tag=rlk_melee_origin]
+execute as @a[tag=player,scores={vMap=1}] run function rlk:view/map_close
+kill @e[tag=rlk_mapreturn]
+kill @e[tag=rlk_mapv]
+data remove storage rlk:map ret
 kill @e[tag=dmgText]
 kill @e[type=minecraft:interaction,tag=atkBlock]
 kill @e[type=minecraft:interaction,tag=atkStrike]
@@ -58,6 +71,9 @@ clear @a *[minecraft:custom_data~{rlk_char:1b}]
 # 방 시스템: 진행 중인 런 정리(던전 구역 블록은 남음 — 지우려면 제거 전에 /function rlk:room/remove)
 execute if score #active room matches 1 as @a[tag=player,limit=1] run function rlk:run/stop
 kill @e[tag=rlk_room]
+kill @e[tag=rlk_cmglob]
+kill @e[tag=rlk_cmlink]
+kill @e[tag=rlk_cmp]
 tag @a remove rlk_setup
 clear @a minecraft:filled_map[minecraft:custom_data~{rlk_map:1b}]
 execute as @a run attribute @s minecraft:movement_speed modifier remove rlk:frozen
@@ -144,6 +160,13 @@ scoreboard objectives remove burnDmg
 scoreboard objectives remove burnI
 scoreboard objectives remove burnOn
 scoreboard objectives remove burstCd
+scoreboard objectives remove cF
+scoreboard objectives remove cX0
+scoreboard objectives remove cX1
+scoreboard objectives remove cY0
+scoreboard objectives remove cY1
+scoreboard objectives remove cZ0
+scoreboard objectives remove cZ1
 scoreboard objectives remove cboIdle
 scoreboard objectives remove clAuto
 scoreboard objectives remove clBurst
@@ -154,6 +177,27 @@ scoreboard objectives remove clPT
 scoreboard objectives remove clPcCd
 scoreboard objectives remove clPcN
 scoreboard objectives remove clTg
+scoreboard objectives remove cmCd
+scoreboard objectives remove cmCd2
+scoreboard objectives remove cmD
+scoreboard objectives remove cmD2
+scoreboard objectives remove cmEl
+scoreboard objectives remove cmF
+scoreboard objectives remove cmId
+scoreboard objectives remove cmLv
+scoreboard objectives remove cmN
+scoreboard objectives remove cmPx
+scoreboard objectives remove cmPy
+scoreboard objectives remove cmPz
+scoreboard objectives remove cmS
+scoreboard objectives remove cmSh
+scoreboard objectives remove cmShM
+scoreboard objectives remove cmT
+scoreboard objectives remove cmV
+scoreboard objectives remove cmVx
+scoreboard objectives remove cmVy
+scoreboard objectives remove cmVz
+scoreboard objectives remove cmYaw
 scoreboard objectives remove comboStep
 scoreboard objectives remove critChance
 scoreboard objectives remove critDamage
@@ -180,6 +224,7 @@ scoreboard objectives remove dashPZ
 scoreboard objectives remove dashRegen
 scoreboard objectives remove dashUX
 scoreboard objectives remove dashUZ
+scoreboard objectives remove dashUpN
 scoreboard objectives remove db
 scoreboard objectives remove dbgDropI
 scoreboard objectives remove dbgPage
@@ -283,12 +328,16 @@ scoreboard objectives remove keenCd
 scoreboard objectives remove keenNext
 scoreboard objectives remove kirionFxT
 scoreboard objectives remove kirionKills
+scoreboard objectives remove lact
 scoreboard objectives remove level
+scoreboard objectives remove lgid
 scoreboard objectives remove life
 scoreboard objectives remove lnBloom
 scoreboard objectives remove lnCr
 scoreboard objectives remove lnEC
 scoreboard objectives remove lnI
+scoreboard objectives remove lob
+scoreboard objectives remove lobRoom
 scoreboard objectives remove lumP
 scoreboard objectives remove manageTick
 scoreboard objectives remove maxHealth
@@ -360,12 +409,15 @@ scoreboard objectives remove pkSubT
 scoreboard objectives remove pkSwap
 scoreboard objectives remove pyroBonus
 scoreboard objectives remove quickT
+scoreboard objectives remove rcT
+scoreboard objectives remove rcU
 scoreboard objectives remove rnDie
 scoreboard objectives remove rnE1
 scoreboard objectives remove rnE2
 scoreboard objectives remove rnE3
 scoreboard objectives remove rnEcI
 scoreboard objectives remove rnEcK
+scoreboard objectives remove rnEcd
 scoreboard objectives remove rnEn
 scoreboard objectives remove rnEr
 scoreboard objectives remove rnErT
@@ -385,6 +437,7 @@ scoreboard objectives remove sapphire
 scoreboard objectives remove scT
 scoreboard objectives remove scanTick
 scoreboard objectives remove sdelay
+scoreboard objectives remove shieldEl
 scoreboard objectives remove shieldHP
 scoreboard objectives remove shieldT
 scoreboard objectives remove shopGid
@@ -401,6 +454,7 @@ scoreboard objectives remove skPts
 scoreboard objectives remove skQ
 scoreboard objectives remove skShown
 scoreboard objectives remove skillCd
+scoreboard objectives remove smI
 scoreboard objectives remove sph
 scoreboard objectives remove stacks
 scoreboard objectives remove starlight
@@ -413,9 +467,15 @@ scoreboard objectives remove ttlT
 scoreboard objectives remove uiCd
 scoreboard objectives remove uiHash
 scoreboard objectives remove vAimT
+scoreboard objectives remove vBig
 scoreboard objectives remove vDp
 scoreboard objectives remove vDy
+scoreboard objectives remove vMap
+scoreboard objectives remove vMapH
+scoreboard objectives remove vMapT
 scoreboard objectives remove vPitch
+scoreboard objectives remove vSnk
+scoreboard objectives remove vTtp
 scoreboard objectives remove vYaw
 scoreboard objectives remove vhp
 scoreboard objectives remove view
@@ -438,3 +498,50 @@ scoreboard objectives remove zst
 scoreboard objectives remove stage
 data modify storage rlk:config installed set value 0b
 tellraw @a {"text":"[로그라이크] 시스템이 제거되었습니다. (/reload 하면 다시 설치됩니다. 완전히 끄려면 데이터팩을 비활성화하세요)","color":"red"}
+kill @e[tag=rlk_lobby]
+forceload remove 80 14 134 64
+
+scoreboard objectives remove snd
+
+scoreboard objectives remove vMapL
+scoreboard objectives remove vMapR
+
+scoreboard objectives remove cmAF
+scoreboard objectives remove cmAH
+scoreboard objectives remove cmAR
+scoreboard objectives remove cmAX
+scoreboard objectives remove cmAZ
+scoreboard objectives remove cmAP
+scoreboard objectives remove cmAD
+
+scoreboard objectives remove pmAtkPending
+scoreboard objectives remove pmAtkStep
+scoreboard objectives remove pmAtkKind
+scoreboard objectives remove pmStrike
+scoreboard objectives remove pmSecond
+scoreboard objectives remove pmChain
+scoreboard objectives remove pmMoveLock
+scoreboard objectives remove pmLockUntil
+scoreboard objectives remove pmActive
+scoreboard objectives remove pmTick
+scoreboard objectives remove pmLen
+scoreboard objectives remove pmChar
+scoreboard objectives remove pmSpeed
+scoreboard objectives remove pmAcc
+scoreboard objectives remove pmStep
+data remove storage rlk:player_motion active
+
+scoreboard objectives remove pmVisible
+scoreboard objectives remove pmRigChar
+scoreboard objectives remove pmLocMode
+scoreboard objectives remove pmWantMode
+scoreboard objectives remove pmLocT
+scoreboard objectives remove pmLocAcc
+scoreboard objectives remove pmLocSpeed
+scoreboard objectives remove pmBlend
+scoreboard objectives remove pmPX
+scoreboard objectives remove pmPZ
+scoreboard objectives remove pmPosValid
+scoreboard objectives remove pmWeapon
+scoreboard objectives remove pmWantW
+data remove storage rlk:player_motion loco

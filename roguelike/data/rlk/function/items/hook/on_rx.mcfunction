@@ -16,3 +16,5 @@ execute if score #rx tmp matches 8 if score @a[tag=player,limit=1] it_wind_slime
 # 꿈결 베개: 확산(8) / 달빛 베틀: 모든 반응
 execute if score #rx tmp matches 8 if score @a[tag=player,limit=1] it_dream_pillow matches 1.. run scoreboard players operation #pillowT itv = #pillowDur tmp
 execute if score @a[tag=player,limit=1] it_moonlit_loom matches 1.. run scoreboard players operation #loomT itv = #loomDur tmp
+# 튜토리얼 7단계: 원소 반응(튜토리얼 더미에서)
+execute if score #tutS lob matches 7 if entity @s[tag=rlk_tutE] if entity @a[tag=player,scores={lobRoom=2}] run scoreboard players add #tutC lob 1

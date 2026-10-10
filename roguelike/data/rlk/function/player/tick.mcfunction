@@ -1,9 +1,14 @@
+execute if score @s rdCam matches 1 run scoreboard players set @s dashMoveT 0
+execute if score @s rdCam matches 1 run scoreboard players set @s stepT 0
 # 플레이어별 매 틱 처리 (@s = 플레이어)
 
 # 아직 초기화되지 않았으면 초기화
 execute unless score @s init matches 1 run function rlk:player/init
 # 이전 버전에서 넘어온 플레이어(레벨 없음)는 다시 초기화
 execute unless score @s level matches 1.. run function rlk:player/init
+
+# 상시 야간투시: 입자 없이 무한 유지. 사망/효과 해제 뒤에도 자동 복구.
+execute unless data entity @s active_effects[{id:"minecraft:night_vision",duration:-1}] run effect give @s minecraft:night_vision infinite 0 true
 
 # 이름이 바뀐 아이템(페보니우스 활 → 비전) 교체
 execute if items entity @s container.* *[minecraft:custom_data~{rlk:{id:"favonius_bow"}}] run function rlk:items/migrate_p
@@ -40,6 +45,7 @@ execute at @s run function rlk:player/hotbar/tick
 execute if score @s uiCd matches 1.. run scoreboard players remove @s uiCd 1
 execute if score @s atkCD matches 1.. run scoreboard players remove @s atkCD 1
 scoreboard players add @s cboIdle 1
+execute if score @s pmActive matches 1 if score @s atkCD matches 1.. run scoreboard players set @s cboIdle 0
 execute if score @s cboIdle matches 20.. run scoreboard players set @s comboStep 0
 
 # 대쉬: 자체 쿨 / 충전 / 무적 / 이동
@@ -56,6 +62,9 @@ function rlk:lvup/tick
 # 인벤토리 상세 버튼
 execute unless score @s devMode matches 1 run function rlk:invd/tick
 # 캐릭터(스킬 재사용 대기·원소 에너지·캐릭터별 처리)
+execute if score @s pmActive matches 1 if score @s dead matches 1 run function rlk:char/motion/stop
+execute if score @s pmActive matches 1 if score @s vMap matches 1 run function rlk:char/motion/stop
+execute if score @s pmActive matches 1 if score @s pkMode matches 1.. run function rlk:char/motion/stop
 function rlk:char/tick
 # 생명의 계약 표시
 function rlk:player/bol/tick
@@ -85,3 +94,6 @@ scoreboard players set @s invEvt 0
 execute store result score @s invCnt if items entity @s inventory.* *[minecraft:custom_data~{rlk:{}}]
 execute store result score #ic2 tmp if items entity @s hotbar.* *[minecraft:custom_data~{rlk:{}}]
 scoreboard players operation @s invCnt += #ic2 tmp
+
+# Apply pose and its hit/audio events after movement, skills and character state.
+function rlk:char/motion/tick

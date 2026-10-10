@@ -1,4 +1,14 @@
+execute if score @s rdCam matches 1 run return run function rlk:boss/raiden/camera/hold
 # 시점 시스템 매 틱 (@s = 플레이어). player/tick 보다 먼저 실행된다
+# 지도 클릭 잠금/길게 누름 판정
+execute if score @s vMapH matches 1.. run scoreboard players remove @s vMapH 1
+execute if score @s vMapL matches 1.. run scoreboard players remove @s vMapL 1
+execute if score @s vMapR matches 1.. run scoreboard players remove @s vMapR 1
+# G 메뉴(빠른 동작 대화창)의 버튼
+scoreboard players enable @s rlkMenu
+execute if score @s rlkMenu matches 1.. run function rlk:view/menu_do
+function rlk:view/burst_camera_tick
+execute if score @s vMap matches 1 run return run function rlk:view/map_tick
 # 실제 적용: 켜져 있고(#on) 개발자 모드가 아닐 때
 scoreboard players set #eff view 0
 execute if score #on view matches 1 unless score @s devMode matches 1 run scoreboard players set #eff view 1
@@ -20,7 +30,8 @@ execute unless score #sprNow view = #spr view run function rlk:view/sprint_fov
 execute as @e[tag=rlk_av,limit=1] run function rlk:view/av_tick
 function rlk:view/aim
 scoreboard players set #ci view 0
-function rlk:view/rot
+execute if score #vmode view matches 2 run function rlk:view/ride_tick
+execute unless score #vmode view matches 2 run function rlk:view/rot
 # 2초마다: 투명 유지 · 손에 든 무기 맞춤 · 멈춰 선 몹의 어그로 다시 끌기 · 여분 아바타 정리
 scoreboard players add #t view 1
 execute if score #t view matches 40.. run function rlk:view/slow

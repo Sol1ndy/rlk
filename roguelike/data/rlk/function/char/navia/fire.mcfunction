@@ -19,10 +19,10 @@ scoreboard players operation #nvCr tmp *= #c12 tmp
 scoreboard players operation @s critChance += #nvCr tmp
 # 장미탄
 scoreboard players set @e[tag=rlk_mob] nvHit 0
-execute if score #nvU tmp matches 0 anchored eyes positioned ^ ^-0.2 ^0.6 run function rlk:char/navia/fan_5
-execute if score #nvU tmp matches 1 anchored eyes positioned ^ ^-0.2 ^0.6 run function rlk:char/navia/fan_7
-execute if score #nvU tmp matches 2 anchored eyes positioned ^ ^-0.2 ^0.6 run function rlk:char/navia/fan_9
-execute if score #nvU tmp matches 3.. anchored eyes positioned ^ ^-0.2 ^0.6 run function rlk:char/navia/fan_11
+execute if score #nvU tmp matches 0 positioned ~ ~1.62 ~ positioned ^ ^-0.2 ^0.6 run function rlk:char/navia/fan_5
+execute if score #nvU tmp matches 1 positioned ~ ~1.62 ~ positioned ^ ^-0.2 ^0.6 run function rlk:char/navia/fan_7
+execute if score #nvU tmp matches 2 positioned ~ ~1.62 ~ positioned ^ ^-0.2 ^0.6 run function rlk:char/navia/fan_9
+execute if score #nvU tmp matches 3.. positioned ~ ~1.62 ~ positioned ^ ^-0.2 ^0.6 run function rlk:char/navia/fan_11
 scoreboard players set #hitLanded tmp 0
 scoreboard players set #mobKilled tmp 0
 execute as @e[tag=rlk_mob,scores={nvHit=1..}] at @s run function rlk:char/navia/rose_hit
@@ -36,11 +36,11 @@ execute unless entity @e[tag=rlk_nvgun,limit=1] run function rlk:char/navia/gun_
 scoreboard players set @s nvGun 14
 # 우산이 펴진다
 function rlk:char/navia/gun_open
-execute anchored eyes run particle minecraft:explosion ^ ^-0.2 ^1.4 0 0 0 0 1
-execute anchored eyes run particle minecraft:wax_on ^ ^-0.2 ^1.6 0.4 0.4 0.4 0 16
-playsound minecraft:entity.firework_rocket.blast master @a ~ ~ ~ 1.0 0.6
-playsound minecraft:entity.generic.explode master @a ~ ~ ~ 0.5 1.5
-playsound minecraft:block.amethyst_block.break master @a ~ ~ ~ 0.8 0.9
+execute positioned ~ ~1.62 ~ run particle minecraft:explosion ^ ^-0.2 ^1.4 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:wax_on ^ ^-0.2 ^1.6 0.4 0.4 0.4 0 16
+execute unless score #k226 snd matches 1 run function rlk:snd/f250
+execute unless score #k37 snd matches 1 run function rlk:snd/f251
+execute unless score #k142 snd matches 1 run function rlk:snd/f252
 execute as @e[tag=rlk_av,limit=1] run swing @s mainhand
 function rlk:items/hook/on_cast_skill
 function rlk:combat/on_skill

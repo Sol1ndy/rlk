@@ -1,4 +1,4 @@
-playsound minecraft:entity.breeze.wind_burst master @a ~ ~ ~ 0.35 1.3
+execute unless score #k137 snd matches 1 run function rlk:snd/f209
 execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:40}
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

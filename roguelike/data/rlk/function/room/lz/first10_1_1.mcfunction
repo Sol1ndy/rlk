@@ -1,0 +1,43 @@
+# 구역 건설 (first10_1, 테마 1): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill 0 200 -20 19 200 -1 minecraft:tuff
+fill 0 201 -20 19 210 -1 minecraft:stone
+fill 1 201 -19 18 210 -2 minecraft:air
+fill 1 209 -19 18 209 -2 minecraft:light[level=15]
+fill 14 200 -18 15 200 -16 minecraft:cobblestone
+fill 9 200 -14 11 200 -12 minecraft:cobblestone
+fill 0 207 -9 0 208 -8 minecraft:spruce_planks
+fill 0 206 -9 0 207 -5 minecraft:tuff
+fill 0 202 -10 0 205 -9 minecraft:cobblestone
+fill 0 206 -15 0 208 -15 minecraft:coal_ore
+fill 19 204 -6 19 206 -3 minecraft:cobblestone
+fill 19 207 -12 19 208 -11 minecraft:iron_ore
+fill 19 204 -5 19 204 -3 minecraft:coal_ore
+fill 19 203 -1 19 205 -1 minecraft:andesite
+fill 19 209 -1 19 210 -1 minecraft:coal_ore
+fill 3 207 -20 7 209 -20 minecraft:tuff
+fill 5 209 -20 7 210 -20 minecraft:spruce_planks
+fill 4 207 -20 9 210 -20 minecraft:andesite
+fill 8 201 -20 10 202 -20 minecraft:tuff
+fill 13 206 -20 16 208 -20 minecraft:iron_ore
+fill 17 209 -20 18 210 -20 minecraft:deepslate
+fill 2 202 -1 7 204 -1 minecraft:cobblestone
+fill 14 205 -1 14 206 -1 minecraft:andesite
+fill 8 201 -1 12 203 -1 minecraft:andesite
+fill 0 210 -20 19 210 -1 minecraft:polished_deepslate
+fill 1 210 -19 18 210 -2 minecraft:air
+fill 12 201 -5 13 201 -4 minecraft:tuff
+fill 11 201 -4 11 201 -2 minecraft:tuff
+fill 14 201 -4 18 201 -4 minecraft:tuff
+fill 12 201 -3 12 201 -2 minecraft:tuff
+fill 13 201 -3 18 201 -2 minecraft:cobbled_deepslate
+fill 13 202 -3 18 202 -2 minecraft:tuff
+fill 15 201 -19 16 205 -19 minecraft:deepslate
+fill 15 206 -19 16 206 -19 minecraft:tuff
+fill 13 201 -19 14 205 -19 minecraft:stone
+fill 13 206 -19 14 206 -19 minecraft:tuff
+execute positioned 14 202 -4 run function rlk:room/prop/m_ore_b
+execute positioned 13 201 -10 run function rlk:room/prop/m_pebble
+execute positioned 15 201 -8 run function rlk:room/prop/m_rail_x
+execute positioned 7 201 -17 run function rlk:room/prop/m_pebble
+setblock 18 205 -2 minecraft:wall_torch[facing=north]
+setblock 1 203 -3 minecraft:wall_torch[facing=east]

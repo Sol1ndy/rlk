@@ -1,5 +1,5 @@
 scoreboard players set #stars itv 0
-playsound minecraft:block.amethyst_cluster.break master @a ~ ~ ~ 0.8 1.6
+execute unless score #k125 snd matches 1 run function rlk:snd/f133
 execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:80}
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

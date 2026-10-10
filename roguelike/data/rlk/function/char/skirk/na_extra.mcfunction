@@ -12,7 +12,7 @@ scoreboard players operation #dmg tmp /= #100 tmp
 execute if score #crit tmp matches 1 run scoreboard players operation #dmg tmp *= @s critDamage
 execute if score #crit tmp matches 1 run scoreboard players operation #dmg tmp /= #100 tmp
 scoreboard players operation #elem tmp = @s infuse
-execute unless score #elem tmp matches 0..7 run scoreboard players set #elem tmp 0
+execute unless score #elem tmp matches 0..8 run scoreboard players set #elem tmp 0
 execute if score @s skM matches 1.. run function rlk:char/skirk/na_mode
 scoreboard players set #elU tmp 1000
 scoreboard players set #icd tmp 1
@@ -24,14 +24,14 @@ scoreboard players set #killBoss tmp 0
 scoreboard players set #killMini tmp 0
 scoreboard players set #skillDmg tmp 0
 scoreboard players operation #dmgBase tmp = #dmg tmp
-execute unless score #skMode tmp matches 1 as @e[tag=rlk_mob,distance=..3.5] at @s run function rlk:combat/apply_reset
-execute if score #skMode tmp matches 1 as @e[tag=rlk_mob,distance=..5] at @s run function rlk:combat/apply_reset
+function rlk:combat/melee_begin
+execute unless score #skMode tmp matches 1 as @e[tag=rlk_mob,distance=..3.5] at @s run function rlk:combat/melee_apply
+execute if score #skMode tmp matches 1 as @e[tag=rlk_mob,distance=..5] at @s run function rlk:combat/melee_apply
+kill @e[tag=rlk_melee_origin]
 execute as @e[tag=rlk_av,limit=1] run swing @s mainhand
 scoreboard players set #fxId tmp 15
 execute if score @s skM matches 1.. run scoreboard players set #fxId tmp 25
 function rlk:char/fx/play
-playsound minecraft:entity.player.attack.sweep master @a ~ ~ ~ 0.4 1.8
-execute if score #hitLanded tmp matches 1 run playsound minecraft:entity.player.attack.strong master @a ~ ~ ~ 0.6 0.9
 execute if score #hitLanded tmp matches 1 run function rlk:combat/on_hit
 execute if score #mobKilled tmp matches 1.. run function rlk:combat/on_kill
 execute if score #skDepUsed tmp matches 1 if score #hitLanded tmp matches 1 run function rlk:char/skirk/dep_use

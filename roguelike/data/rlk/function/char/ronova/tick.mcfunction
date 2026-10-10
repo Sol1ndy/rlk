@@ -1,10 +1,9 @@
 # 로노바 매 틱 (@s = 플레이어, at 몸)
 execute if score @s rnFcd matches 1.. run scoreboard players remove @s rnFcd 1
+execute if score @s rnEcd matches 1.. run scoreboard players remove @s rnEcd 1
 # 불사의 저주로 쓰러져 있는 중
 execute if score @s rnDie matches 1.. run function rlk:char/ronova/die_tick
 execute if score @s rnQ matches 1.. run function rlk:char/ronova/q_tick
-execute as @e[tag=rlk_rnsh] at @s run function rlk:element/void/sh_tick
-execute as @e[tag=rlk_rndm] at @s run function rlk:char/ronova/doom_spread
 # 잔향 수 · 표시
 scoreboard players set @s rnEn 0
 execute if score @s rnE1 matches 1.. run scoreboard players add @s rnEn 1

@@ -11,5 +11,4 @@ scoreboard players reset #seen7 room
 scoreboard players set #mapIdx room 0
 scoreboard players set #mapType room 0
 execute in minecraft:overworld run function rlk:room/gen
-# 로노바: 불사의 저주는 맵마다 한 번
-scoreboard players set @a[tag=player] rnRev 0
+

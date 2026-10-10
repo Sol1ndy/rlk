@@ -5,5 +5,5 @@ scoreboard players reset 수호보호막 stacks
 execute if score @s gCd matches 1.. run scoreboard players remove @s gCd 1
 execute if score @s gCd matches 1.. run return 0
 scoreboard players operation @s gShield = #guardAmt tmp
-execute at @e[tag=rlk_body,limit=1] run playsound minecraft:block.beacon.activate master @s ~ ~ ~ 0.5 1.8
+execute at @e[tag=rlk_body,limit=1] unless score #k213 snd matches 1 run function rlk:snd/f236
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:dust{color:[0.44f,0.69f,1.0f],scale:1.2f} ~ ~1 ~ 0.5 0.8 0.5 0 30

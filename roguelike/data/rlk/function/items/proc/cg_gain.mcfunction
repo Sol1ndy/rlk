@@ -9,5 +9,5 @@ execute if score #lnT tmp matches 1 run scoreboard players operation #cgG1 itv +
 execute if score #lnT tmp matches 2 run scoreboard players operation #cgG2 itv += #cgGain tmp
 execute if score #lnT tmp matches 3 run scoreboard players operation #cgG3 itv += #cgGain tmp
 scoreboard players operation #cgG itv += #cgGain tmp
-execute as @a[tag=player,limit=1] at @e[tag=rlk_body,limit=1] run playsound minecraft:block.amethyst_block.chime master @s ~ ~ ~ 0.6 0.8
+execute as @a[tag=player,limit=1] at @e[tag=rlk_body,limit=1] unless score #k145 snd matches 1 run function rlk:snd/f153
 execute if score #cgG itv >= #cgMax tmp as @a[tag=player,limit=1] at @e[tag=rlk_body,limit=1] run function rlk:items/proc/cg_gi

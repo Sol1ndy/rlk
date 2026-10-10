@@ -7,5 +7,5 @@ scoreboard players operation @s gold -= #buyprice tmp
 data modify storage rlk:pinv order append from storage rlk:shop buyid
 function rlk:player/inv/place_items
 scoreboard players set #bought tmp 1
-playsound minecraft:entity.experience_orb.pickup master @s ~ ~ ~ 1 1.2
-playsound minecraft:block.note_block.pling master @s ~ ~ ~ 0.6 1.5
+execute unless score #k202 snd matches 1 run function rlk:snd/f221
+execute unless score #k203 snd matches 1 run function rlk:snd/f222

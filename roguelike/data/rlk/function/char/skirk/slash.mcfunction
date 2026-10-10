@@ -17,8 +17,3 @@ scoreboard players operation #dmgBase tmp = #dmg tmp
 execute as @e[tag=rlk_hit] at @s run function rlk:combat/apply_reset
 tag @e[tag=rlk_hit] remove rlk_hit
 execute at @e[tag=rlk_body,limit=1] run function rlk:char/after_hit
-execute positioned ^ ^1 ^3 run particle minecraft:sweep_attack ~ ~ ~ 1.8 0.8 1.8 0 6
-execute positioned ^ ^1 ^3 run particle minecraft:snowflake ~ ~ ~ 1.8 0.8 1.8 0.05 20
-execute positioned ^ ^1 ^3 run particle minecraft:dust{color:[0.75f,0.6f,1.0f],scale:1.4f} ~ ~ ~ 2.0 0.9 2.0 0 14
-playsound minecraft:entity.player.attack.sweep master @a ~ ~ ~ 0.8 1.9
-playsound minecraft:block.glass.break master @a ~ ~ ~ 0.35 1.8

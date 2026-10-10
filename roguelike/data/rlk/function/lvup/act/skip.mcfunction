@@ -1,2 +1,2 @@
-playsound minecraft:ui.button.click master @s ~ ~ ~ 0.5 0.7
+execute unless score #k349 snd matches 1 run function rlk:snd/f416
 function rlk:lvup/act/resolve

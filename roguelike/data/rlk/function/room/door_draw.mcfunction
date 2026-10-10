@@ -2,9 +2,11 @@
 execute if score @s dst matches ..0 run return 0
 # 지어지기만 하고 아직 들어가 보지 않은 구역의 다른 통로는 그리지 않는다(그냥 벽으로 보임)
 execute if score @s dst matches 1 unless score @s dvis matches 1 run return 0
+data modify storage rlk:room dd set from entity @s data
+data modify storage rlk:room dd.fb set from storage rlk:room th.lb
 scoreboard players set #lk tmp 0
 execute if score #combat room matches 1.. if score @s da = #combat room run scoreboard players set #lk tmp 1
 execute if score #combat room matches 1.. if score @s db = #combat room run scoreboard players set #lk tmp 1
-execute if score #lk tmp matches 1 if score @s dst matches 2 run return run function rlk:room/door_bars with entity @s data
-execute if score @s dst matches 1 run function rlk:room/door_black with entity @s data
-execute if score @s dst matches 2 run function rlk:room/door_air with entity @s data
+execute if score #lk tmp matches 1 if score @s dst matches 2 run return run function rlk:room/door_bars with storage rlk:room dd
+execute if score @s dst matches 1 run function rlk:room/door_black with storage rlk:room dd
+execute if score @s dst matches 2 run function rlk:room/door_air with storage rlk:room dd

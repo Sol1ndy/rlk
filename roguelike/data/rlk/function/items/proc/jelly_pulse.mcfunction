@@ -19,7 +19,7 @@ particle minecraft:dust{color:[0.31f,0.72f,1.0f],scale:1.0f} ~2.35 ~0.2 ~-3.24 0
 particle minecraft:dust{color:[0.31f,0.72f,1.0f],scale:1.0f} ~3.24 ~0.2 ~-2.35 0 0 0 0 1
 particle minecraft:dust{color:[0.31f,0.72f,1.0f],scale:1.0f} ~3.80 ~0.2 ~-1.24 0 0 0 0 1
 particle minecraft:splash ~ ~0.4 ~ 1.8 0.2 1.8 0.1 30
-playsound minecraft:entity.generic.splash master @a ~ ~ ~ 0.3 1.6
+execute unless score #k117 snd matches 1 run function rlk:snd/f125
 execute as @a[tag=player,limit=1] run function rlk:items/calc_stat {obj:"maxHealth",pm:50}
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

@@ -4,4 +4,4 @@ scoreboard players add @s fbMark 1
 execute store result storage rlk:fp mx double 0.01 run random value -18..18
 execute store result storage rlk:fp mz double 0.01 run random value -18..18
 function rlk:items/proc/forb_page_spawn with storage rlk:fp
-playsound minecraft:item.book.page_turn master @a ~ ~ ~ 0.6 1.3
+execute unless score #k193 snd matches 1 run function rlk:snd/f208

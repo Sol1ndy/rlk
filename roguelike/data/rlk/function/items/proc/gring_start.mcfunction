@@ -5,4 +5,4 @@ scoreboard players operation #t1 itv /= #100 tmp
 scoreboard players operation @s curHealth -= #t1 itv
 execute if score @s curHealth matches ..0 run scoreboard players set @s curHealth 1
 scoreboard players operation #gringT itv = #gringDur tmp
-playsound minecraft:block.azalea_leaves.place master @a ~ ~ ~ 1 0.8
+execute unless score #k119 snd matches 1 run function rlk:snd/f127

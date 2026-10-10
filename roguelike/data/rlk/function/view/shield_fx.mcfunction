@@ -2,6 +2,8 @@
 scoreboard players set #shK view 0
 execute if score @s gShield matches 1.. run scoreboard players set #shK view 2
 execute if score @s shieldHP matches 1.. run scoreboard players set #shK view 1
+execute if score @s shieldHP matches 1.. if score @s shieldEl matches 1.. run scoreboard players operation #shK view = @s shieldEl
+execute if score @s shieldHP matches 1.. if score @s shieldEl matches 1.. run scoreboard players add #shK view 10
 execute unless entity @e[tag=rlk_av,limit=1] run scoreboard players set #shK view 0
 execute if score @s dead matches 1 run scoreboard players set #shK view 0
 # 사라짐

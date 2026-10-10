@@ -1,3 +1,4 @@
+execute as @a[tag=player] run function rlk:char/motion/stop
 # 필드에 남은 것을 모두 지운다 (떨어진 아이템·골드·사파이어는 부르는 쪽에서 먼저 처리)
 kill @e[tag=rlk_page_orb]
 kill @e[tag=rlk_healorb]
@@ -52,3 +53,7 @@ scoreboard players set #jadeT itv 0
 kill @e[tag=rlk_lndrift]
 kill @e[tag=rlk_dcore]
 kill @e[tag=rlk_coreP]
+kill @e[tag=rlk_rnsh]
+kill @e[tag=rlk_salonP]
+kill @e[tag=rlk_salon]
+kill @e[tag=rlk_salonPv]

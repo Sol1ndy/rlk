@@ -13,4 +13,4 @@ execute if score #ct tmp matches 14.. run scoreboard players set #pm tmp 2
 execute unless score #pm tmp = @s bowPm run function rlk:char/bow/hand_pull
 execute unless score #pm tmp = @s bowPm if entity @e[tag=rlk_av,limit=1] run function rlk:char/bow/av_pull
 scoreboard players operation @s bowPm = #pm tmp
-execute if score @s bowSt matches 1.. anchored eyes run particle minecraft:small_flame ^-0.3 ^-0.25 ^0.9 0.05 0.05 0.05 0.005 1
+execute if score @s bowSt matches 1.. positioned ~ ~1.62 ~ run particle minecraft:small_flame ^-0.3 ^-0.25 ^0.9 0.05 0.05 0.05 0.005 1

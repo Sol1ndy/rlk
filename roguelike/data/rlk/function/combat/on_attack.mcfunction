@@ -1,5 +1,9 @@
 # 플레이어 좌클릭(공격) (@s = 공격한 플레이어). atkStrike/몹 실드 클릭 또는 발전과제(몹 직타)에서 호출
 advancement revoke @s only rlk:attack
+execute if score @s rdCam matches 1 run return 0
+execute if score @s pmMoveLock matches 1 run return 0
+execute if score @s vMap matches 1 run return run function rlk:view/map_left
+execute if items entity @s weapon.mainhand *[minecraft:custom_data~{rlk_ui:{role:"map"}}] run return run function rlk:view/map_left
 # 아이템 선택 공간에서는 클릭 = 조준한 UI 요소 누르기
 execute if score @s pkMode matches 1.. at @s run return run function rlk:lvup/click
 
@@ -12,6 +16,8 @@ execute if score @s uiCd matches 1.. run return 0
 execute at @s anchored eyes run function rlk:shop/aim_buy
 # 좌클릭으로 방 오브젝트 상호작용 (조준 중인 것)
 execute if score #shopHandled tmp matches 0 as @e[tag=rlk_obj,tag=rlk_ohover,limit=1] at @s run function rlk:room/obj/click
+# 로비 오브젝트
+execute if score #shopHandled tmp matches 0 if score @s lobRoom matches 1.. as @e[tag=rlk_lobj,tag=rlk_lhover,limit=1] at @s run function rlk:lobby/obj/click
 
 # 숄더뷰: 조준 중인 드롭 아이템 버튼(회수/판매) 누르기
 execute if score #shopHandled tmp matches 0 unless entity @s[tag=rlk_body] as @e[tag=rlk_dbtn,tag=rlk_dhover,limit=1] at @s run function rlk:ditem/ray_click
@@ -25,6 +31,7 @@ execute if score #shopHandled tmp matches 0 if items entity @s weapon.mainhand *
 execute if score #shopHandled tmp matches 0 if items entity @s weapon.mainhand *[minecraft:custom_data~{rlk_ui:{role:"burst"}}] at @e[tag=rlk_body,limit=1] run return run function rlk:char/cast_burst
 
 # 공격 가능: 개발자 모드이거나, 기본공격 아이템(핫바 0번)을 들고 있을 때만
+execute if score #charN tmp matches 3 if score @s skDash matches 1.. run return 0
 scoreboard players set #canAtk tmp 0
 execute if score @s devMode matches 1 run scoreboard players set #canAtk tmp 1
 execute if items entity @s weapon.mainhand *[minecraft:custom_data~{rlk_ui:{role:"attack"}}] run scoreboard players set #canAtk tmp 1

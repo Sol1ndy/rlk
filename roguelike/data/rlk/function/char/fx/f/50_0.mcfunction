@@ -1,32 +1,32 @@
 # 모션 50 의 0틱째 조각 (@s = 플레이어, at 몸)
-execute anchored eyes run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.59 ^-0.50 ^0.23 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-2.25 ^-0.50 ^0.20 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.56 ^-0.49 ^0.43 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-2.23 ^-0.49 ^0.37 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.52 ^-0.49 ^0.63 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-2.20 ^-0.49 ^0.55 0 0 0 0 1
-execute anchored eyes run particle minecraft:flame ^-2.52 ^-0.49 ^0.63 0.06 0.06 0.06 0.02 1
-execute anchored eyes run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.47 ^-0.48 ^0.82 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-2.15 ^-0.48 ^0.71 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.40 ^-0.47 ^1.01 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-2.08 ^-0.47 ^0.88 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.31 ^-0.47 ^1.20 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-2.01 ^-0.47 ^1.04 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.21 ^-0.46 ^1.37 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.92 ^-0.46 ^1.19 0 0 0 0 1
-execute anchored eyes run particle minecraft:flame ^-2.21 ^-0.46 ^1.37 0.06 0.06 0.06 0.02 1
-execute anchored eyes run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.09 ^-0.45 ^1.54 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.82 ^-0.45 ^1.34 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-1.97 ^-0.45 ^1.70 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.71 ^-0.45 ^1.48 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-1.83 ^-0.44 ^1.85 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.59 ^-0.44 ^1.61 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-1.68 ^-0.43 ^1.98 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.46 ^-0.43 ^1.73 0 0 0 0 1
-execute anchored eyes run particle minecraft:flame ^-1.68 ^-0.43 ^1.98 0.06 0.06 0.06 0.02 1
-execute anchored eyes run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-1.52 ^-0.43 ^2.11 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.32 ^-0.43 ^1.83 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-1.35 ^-0.42 ^2.22 0 0 0 0 1
-execute anchored eyes run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.18 ^-0.42 ^1.93 0 0 0 0 1
-playsound minecraft:entity.player.attack.sweep master @a ~ ~ ~ 0.6 0.7
-playsound minecraft:item.firecharge.use master @a ~ ~ ~ 0.3 1.5
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.59 ^-0.50 ^0.23 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-2.25 ^-0.50 ^0.20 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.56 ^-0.49 ^0.43 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-2.23 ^-0.49 ^0.37 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.52 ^-0.49 ^0.63 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-2.20 ^-0.49 ^0.55 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:flame ^-2.52 ^-0.49 ^0.63 0.06 0.06 0.06 0.02 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.47 ^-0.48 ^0.82 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-2.15 ^-0.48 ^0.71 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.40 ^-0.47 ^1.01 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-2.08 ^-0.47 ^0.88 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.31 ^-0.47 ^1.20 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-2.01 ^-0.47 ^1.04 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.21 ^-0.46 ^1.37 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.92 ^-0.46 ^1.19 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:flame ^-2.21 ^-0.46 ^1.37 0.06 0.06 0.06 0.02 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-2.09 ^-0.45 ^1.54 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.82 ^-0.45 ^1.34 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-1.97 ^-0.45 ^1.70 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.71 ^-0.45 ^1.48 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-1.83 ^-0.44 ^1.85 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.59 ^-0.44 ^1.61 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-1.68 ^-0.43 ^1.98 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.46 ^-0.43 ^1.73 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:flame ^-1.68 ^-0.43 ^1.98 0.06 0.06 0.06 0.02 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-1.52 ^-0.43 ^2.11 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.32 ^-0.43 ^1.83 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[1.00,0.38,0.30],scale:1.30} ^-1.35 ^-0.42 ^2.22 0 0 0 0 1
+execute positioned ~ ~1.62 ~ run particle minecraft:dust{color:[0.42,0.04,0.09],scale:1.43} ^-1.18 ^-0.42 ^1.93 0 0 0 0 1
+execute unless score #k175 snd matches 1 run function rlk:snd/f335
+execute unless score #k299 snd matches 1 run function rlk:snd/f339

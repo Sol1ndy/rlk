@@ -1,0 +1,19 @@
+{
+ "criteria": {
+  "u": {
+   "trigger": "minecraft:using_item",
+   "conditions": {
+    "item": {
+     "predicates": {
+      "minecraft:custom_data": {
+       "rlk_ui": {}
+      }
+     }
+    }
+   }
+  }
+ },
+ "rewards": {
+  "function": "rlk:combat/rc_use"
+ }
+}

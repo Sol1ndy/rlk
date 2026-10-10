@@ -17,7 +17,10 @@ execute if score @s rnQ matches 1.. run scoreboard players set #lk view 1
 execute if score @s nfPT matches 1.. run scoreboard players set #lk view 1
 execute if score @s nfQ matches 1.. run scoreboard players set #lk view 1
 scoreboard players set #sprNow view 0
+execute if score @s pmMoveLock matches 1 run return run function rlk:view/stop_h
 execute if score @s dashMoveT matches 1.. run return 0
+# 짧은 피격 이동 중에는 걷기 속도로 넉백을 덮어쓰지 않는다.
+execute if entity @e[tag=rlk_plkb,limit=1] run return run function rlk:view/stop_h
 # 원소폭발 시전 중 · 나비아 조준 중 · 로노바 쓰러짐 중에는 옆으로 움직이지 않는다(떨어지는 건 그대로)
 execute if score @s nvA matches 1.. run return run function rlk:view/stop_h
 execute if score @s buT matches 1.. run return run function rlk:view/stop_h

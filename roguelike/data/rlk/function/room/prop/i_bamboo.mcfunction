@@ -1,0 +1,10 @@
+# 프롭 i_bamboo (위치 = 기준 칸의 땅 바로 위)
+setblock ~0 ~0 ~0 minecraft:bamboo[age=1,leaves=none]
+setblock ~0 ~1 ~0 minecraft:bamboo[age=1,leaves=small]
+execute positioned ~0 ~2 ~0 if block ~ ~ ~ #rlk:dash_pass run setblock ~ ~ ~ minecraft:bamboo[age=1,leaves=large]
+execute positioned ~0 ~3 ~0 if block ~ ~ ~ #rlk:dash_pass run setblock ~ ~ ~ minecraft:bamboo[age=1,leaves=large]
+setblock ~1 ~0 ~1 minecraft:bamboo[age=1,leaves=none]
+setblock ~1 ~1 ~1 minecraft:bamboo[age=1,leaves=none]
+execute positioned ~1 ~2 ~1 if block ~ ~ ~ #rlk:dash_pass run setblock ~ ~ ~ minecraft:bamboo[age=1,leaves=small]
+execute positioned ~1 ~3 ~1 if block ~ ~ ~ #rlk:dash_pass run setblock ~ ~ ~ minecraft:bamboo[age=1,leaves=large]
+execute positioned ~1 ~4 ~1 if block ~ ~ ~ #rlk:dash_pass run setblock ~ ~ ~ minecraft:bamboo[age=1,leaves=large]

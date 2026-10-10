@@ -1,8 +1,14 @@
 # 새 몹 (@s = 몹, at @s)
+# 액자 등 생명체가 아닌 엔티티에는 전투 태그와 체력바를 만들지 않는다.
+execute unless data entity @s Health run return 0
 attribute @s minecraft:knockback_resistance base set 0.5
+execute if entity @s[tag=rlk_raiden] run attribute @s minecraft:knockback_resistance base set 1
+execute if entity @s[tag=rlk_raiden] run attribute @s minecraft:explosion_knockback_resistance base set 1
+execute if entity @s[tag=rlk_cm_cn] run attribute @s minecraft:knockback_resistance base set 1
+execute if entity @s[tag=rlk_cm_cn] run attribute @s minecraft:explosion_knockback_resistance base set 1
 # 추적 거리: 아무리 멀어도 놓치지 않게
 attribute @s minecraft:follow_range base set 128
-function rlk:mob/hb_spawn
+execute unless entity @s[tag=rlk_raiden] unless entity @s[tag=rlk_rd_object] run function rlk:mob/hb_spawn
 # 레벨이 없는 몹은 1레벨
 execute unless score @s mlv matches 1.. run scoreboard players set @s mlv 1
 # 체력 스코어 준비(이미 정해진 몹은 그대로)

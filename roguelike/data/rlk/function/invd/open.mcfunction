@@ -1,3 +1,5 @@
+# 다른 화면의 복귀 좌표가 지도 방으로 저장되지 않게 한다.
+execute if score @s vMap matches 1 run return run function rlk:char/deny {t:"지도를 먼저 닫아 주세요"}
 # 버튼을 누름 (@s = 플레이어, at @s): 인벤토리 상세 공간으로 이동. 이미 그 안이면 돌아간다
 execute if score @s pkMode matches 4 run return run function rlk:lvup/exit
 execute if score @s pkMode matches 1.. run return 0
@@ -17,4 +19,4 @@ scoreboard players set @s pkMode 4
 scoreboard players set @s pkSel -1
 scoreboard players set @s pkConf 0
 scoreboard players set @s pkRedraw 2
-playsound minecraft:block.portal.trigger master @s ~ ~ ~ 0.25 1.8
+execute unless score #k71 snd matches 1 run function rlk:snd/f76

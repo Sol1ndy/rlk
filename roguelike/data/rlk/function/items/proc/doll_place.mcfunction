@@ -3,4 +3,4 @@ summon minecraft:armor_stand ~ ~ ~ {Tags:["rlk_doll","rlk_pet","rlk_isn"],Invuln
 execute as @e[tag=rlk_isn] run rotate @s ~ 0
 scoreboard players operation @e[tag=rlk_isn] life = #dollDur tmp
 tag @e[tag=rlk_isn] remove rlk_isn
-playsound minecraft:block.wool.place master @a ~ ~ ~ 1 1.2
+execute unless score #k191 snd matches 1 run function rlk:snd/f206

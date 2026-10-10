@@ -11,3 +11,5 @@ tag @e[tag=rlk_dhit] remove rlk_dhit
 execute if score @s it_kinetic_scale matches 1.. run scoreboard players operation #kinT itv = #kinDur tmp
 # 선학의 깃: 대쉬 뒤의 첫 기본 공격
 execute if score @s it_crane_feather matches 1.. run scoreboard players operation #craneT itv = #craneDur tmp
+# 튜토리얼 1단계: 대쉬 횟수
+execute if score #tutS lob matches 1 if score @s lobRoom matches 2 run scoreboard players add #tutC lob 1

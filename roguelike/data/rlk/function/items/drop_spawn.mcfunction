@@ -18,4 +18,4 @@ data modify storage rlk:dui price set from storage rlk:io price
 scoreboard players operation #uigid tmp = #dgid tmp
 function rlk:items/spawn_ditem_ui with storage rlk:dui
 tag @e[tag=rlk_dnew] remove rlk_dnew
-playsound minecraft:entity.item.pickup master @a ~ ~ ~ 0.4 0.6
+execute unless score #k114 snd matches 1 run function rlk:snd/f121

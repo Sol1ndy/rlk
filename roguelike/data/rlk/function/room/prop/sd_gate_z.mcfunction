@@ -1,0 +1,19 @@
+# 프롭 sd_gate_z (위치 = 기준 칸의 땅 바로 위)
+setblock ~0 ~0 ~0 minecraft:chiseled_sandstone
+setblock ~0 ~1 ~0 minecraft:cut_sandstone
+setblock ~0 ~2 ~0 minecraft:prismarine_bricks
+setblock ~0 ~3 ~0 minecraft:cut_sandstone
+setblock ~0 ~4 ~0 minecraft:cut_sandstone
+setblock ~0 ~0 ~3 minecraft:chiseled_sandstone
+setblock ~0 ~1 ~3 minecraft:cut_sandstone
+setblock ~0 ~2 ~3 minecraft:prismarine_bricks
+setblock ~0 ~3 ~3 minecraft:cut_sandstone
+setblock ~0 ~4 ~3 minecraft:cut_sandstone
+setblock ~0 ~5 ~-1 minecraft:cut_sandstone_slab
+setblock ~0 ~5 ~0 minecraft:smooth_sandstone
+setblock ~0 ~5 ~1 minecraft:cut_sandstone
+setblock ~0 ~5 ~2 minecraft:cut_sandstone
+setblock ~0 ~5 ~3 minecraft:smooth_sandstone
+setblock ~0 ~5 ~4 minecraft:cut_sandstone_slab
+setblock ~0 ~6 ~1 minecraft:chiseled_sandstone
+setblock ~0 ~6 ~2 minecraft:chiseled_sandstone

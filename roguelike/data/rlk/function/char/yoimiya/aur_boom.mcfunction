@@ -13,5 +13,5 @@ execute as @a[tag=player,limit=1] at @e[tag=rlk_body,limit=1] run function rlk:c
 particle minecraft:explosion ~ ~1 ~ 0.6 0.4 0.6 0 2
 particle minecraft:firework ~ ~1 ~ 0.3 0.3 0.3 0.25 40
 particle minecraft:flame ~ ~1 ~ 0.9 0.6 0.9 0.08 40
-playsound minecraft:entity.firework_rocket.blast master @a ~ ~ ~ 1.0 1.1
-playsound minecraft:entity.generic.explode master @a ~ ~ ~ 0.35 1.7
+execute unless score #k247 snd matches 1 run function rlk:snd/f274
+execute unless score #k93 snd matches 1 run function rlk:snd/f275

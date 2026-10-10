@@ -1,3 +1,4 @@
+function rlk:char/motion/cleanup
 # 캐릭터 관련 플레이어 상태 초기화 (@s = 플레이어)
 scoreboard players set @s skillCd 0
 scoreboard players set @s burstCd 0
@@ -118,7 +119,7 @@ scoreboard players reset 결정축포 stacks
 function rlk:char/navia/sh_clear
 scoreboard players set @s nvShP 0
 scoreboard players reset 결정축포 stacks
-# 로노바 (불사의 저주 rnRev 는 맵이 바뀔 때만 초기화)
+# 로노바 (불사의 저주 rnRev 는 판을 새로 시작할 때만 초기화)
 scoreboard players set @s rnE1 0
 scoreboard players set @s rnE2 0
 scoreboard players set @s rnE3 0

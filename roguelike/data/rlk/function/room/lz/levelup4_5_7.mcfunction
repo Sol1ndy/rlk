@@ -1,0 +1,93 @@
+# 구역 건설 (levelup4_5, 테마 7): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill 0 200 40 19 200 59 minecraft:podzol
+fill 0 201 40 19 212 59 minecraft:stone
+fill 1 201 41 18 212 58 minecraft:air
+fill 1 211 41 18 211 58 minecraft:light[level=15]
+fill 9 202 53 10 202 55 minecraft:calcite
+fill 1 202 45 4 202 46 minecraft:gravel
+fill 2 202 42 5 202 43 minecraft:calcite
+fill 0 211 54 0 212 58 minecraft:prismarine
+fill 0 212 50 0 212 55 minecraft:birch_leaves[persistent=true]
+fill 0 211 46 0 212 47 minecraft:oak_leaves[persistent=true]
+fill 0 209 49 0 212 51 minecraft:calcite
+fill 19 211 54 19 212 56 minecraft:oak_leaves[persistent=true]
+fill 19 212 42 19 212 47 minecraft:calcite
+fill 19 212 53 19 212 56 minecraft:diorite
+fill 3 212 40 3 212 40 minecraft:birch_leaves[persistent=true]
+fill 10 211 40 14 212 40 minecraft:oak_leaves[persistent=true]
+fill 6 208 40 11 210 40 minecraft:prismarine
+fill 10 203 59 13 205 59 minecraft:moss_block
+fill 12 212 59 12 212 59 minecraft:birch_leaves[persistent=true]
+fill 11 204 59 11 205 59 minecraft:moss_block
+fill 11 204 59 11 204 59 minecraft:moss_block
+fill 0 212 40 19 212 59 minecraft:polished_deepslate
+fill 1 212 41 18 212 58 minecraft:air
+fill 1 201 41 18 201 48 minecraft:dirt
+fill 1 202 41 18 202 48 minecraft:podzol
+fill 1 201 49 2 201 58 minecraft:dirt
+fill 1 202 49 2 202 58 minecraft:podzol
+fill 5 201 49 18 201 53 minecraft:dirt
+fill 5 202 49 18 202 53 minecraft:podzol
+fill 3 201 51 4 201 58 minecraft:dirt
+fill 3 202 51 4 202 58 minecraft:podzol
+fill 5 201 54 14 201 54 minecraft:dirt
+fill 5 202 54 14 202 54 minecraft:podzol
+fill 18 201 54 18 201 54 minecraft:dirt
+fill 18 202 54 18 202 54 minecraft:podzol
+fill 5 201 55 11 201 55 minecraft:dirt
+fill 5 202 55 11 202 55 minecraft:podzol
+fill 5 201 56 10 201 58 minecraft:dirt
+fill 5 202 56 10 202 58 minecraft:podzol
+fill 15 201 54 17 202 54 minecraft:dirt
+fill 15 203 54 17 203 54 minecraft:podzol
+fill 12 201 55 14 202 55 minecraft:dirt
+fill 12 203 55 14 203 55 minecraft:podzol
+fill 16 201 55 18 202 55 minecraft:dirt
+fill 16 203 55 18 203 55 minecraft:podzol
+fill 11 201 56 12 202 57 minecraft:dirt
+fill 11 203 56 12 203 57 minecraft:podzol
+fill 18 201 56 18 202 57 minecraft:dirt
+fill 18 203 56 18 203 57 minecraft:podzol
+fill 11 201 58 11 202 58 minecraft:dirt
+fill 11 203 58 11 203 58 minecraft:podzol
+fill 15 201 55 15 203 58 minecraft:dirt
+fill 15 204 55 15 204 58 minecraft:podzol
+fill 13 201 56 14 203 58 minecraft:dirt
+fill 13 204 56 14 204 58 minecraft:podzol
+fill 16 201 56 17 203 58 minecraft:dirt
+fill 16 204 56 17 204 58 minecraft:podzol
+fill 12 201 58 12 203 58 minecraft:dirt
+fill 12 204 58 12 204 58 minecraft:podzol
+fill 18 201 58 18 203 58 minecraft:dirt
+fill 18 204 58 18 204 58 minecraft:podzol
+fill 3 201 49 4 208 49 minecraft:calcite
+fill 3 209 49 4 209 49 minecraft:podzol
+fill 3 201 50 4 208 50 minecraft:diorite
+fill 3 209 50 4 209 50 minecraft:podzol
+fill 4 201 53 5 201 55 minecraft:clay
+fill 4 202 53 5 202 55 minecraft:water
+fill 6 201 55 10 201 58 minecraft:clay
+fill 6 202 55 10 202 58 minecraft:water
+fill 5 201 56 5 201 58 minecraft:clay
+fill 5 202 56 5 202 58 minecraft:water
+fill 3 202 52 3 202 56 minecraft:sand
+fill 11 202 55 11 202 55 minecraft:sand
+fill 4 202 56 4 202 58 minecraft:sand
+setblock 4 202 53 minecraft:seagrass
+setblock 5 202 55 minecraft:sea_pickle[pickles=2,waterlogged=true]
+setblock 6 202 56 minecraft:seagrass
+setblock 7 202 56 minecraft:seagrass
+setblock 8 202 57 minecraft:seagrass
+execute positioned 16 203 43 run function rlk:room/prop/fo_pipe_z
+execute positioned 15 205 58 run function rlk:room/prop/fo_crates
+execute positioned 12 203 45 run function rlk:room/prop/fo_white
+execute positioned 12 204 56 run function rlk:room/prop/p_grass
+execute positioned 14 203 41 run function rlk:room/prop/p_grass
+execute positioned 3 203 51 run function rlk:room/prop/fo_white
+execute positioned 2 203 55 run function rlk:room/prop/fo_flower
+execute positioned 11 203 45 run function rlk:room/prop/p_grass
+execute positioned 7 203 44 run function rlk:room/prop/fo_flower
+execute positioned 11 203 43 run function rlk:room/prop/p_grass
+execute positioned 10 203 50 run function rlk:room/prop/p_grass
+setblock 3 210 49 minecraft:short_grass keep
+setblock 4 210 50 minecraft:birch_leaves[persistent=true] keep

@@ -1,6 +1,6 @@
 particle minecraft:dust{color:[0.77f,0.55f,1.0f],scale:1.5f} ~ ~2.2 ~ 0.08 1.6 0.08 0 30
 particle minecraft:electric_spark ~ ~0.8 ~ 0.9 0.5 0.9 0.4 25
-playsound minecraft:item.trident.thunder master @a ~ ~ ~ 0.25 2.0
+execute unless score #k160 snd matches 1 run function rlk:snd/f169
 execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:50}
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

@@ -3,6 +3,6 @@ scoreboard players operation @s pkHK = #pkK tmp
 scoreboard players operation @s pkHI = #pkI tmp
 execute as @e[tag=rlk_pk_hl] run function rlk:lvup/ui/hl_off
 execute if score @s pkHK matches 1.. as @e[tag=rlk_pk_d] if score @s pkKind = #pkK tmp if score @s pkIdx = #pkI tmp run function rlk:lvup/ui/hl_on
-execute if score @s pkHK matches 1.. run playsound minecraft:block.note_block.hat master @s ~ ~ ~ 0.5 1.9
+execute if score @s pkHK matches 1.. unless score #k16 snd matches 1 run function rlk:snd/f413
 function rlk:lvup/tip/update
 function rlk:lvup/eng/refresh

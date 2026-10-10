@@ -1,3 +1,3 @@
 scoreboard players set @s pkSel -1
 scoreboard players set @s pkRedraw 1
-playsound minecraft:ui.button.click master @s ~ ~ ~ 0.5 0.9
+execute unless score #k109 snd matches 1 run function rlk:snd/f116

@@ -1,0 +1,14 @@
+execute if score #cnPose tmp matches 0 run function rlk:cm/cn/rig/pose/0
+execute if score #cnPose tmp matches 1 run function rlk:cm/cn/rig/pose/1
+execute if score #cnPose tmp matches 2 run function rlk:cm/cn/rig/pose/2
+execute if score #cnPose tmp matches 3 run function rlk:cm/cn/rig/pose/3
+execute if score #cnPose tmp matches 10 run function rlk:cm/cn/rig/pose/10
+execute if score #cnPose tmp matches 11 run function rlk:cm/cn/rig/pose/11
+execute if score #cnPose tmp matches 12 run function rlk:cm/cn/rig/pose/12
+execute if score #cnPose tmp matches 13 run function rlk:cm/cn/rig/pose/13
+execute if score #cnPose tmp matches 14 run function rlk:cm/cn/rig/pose/14
+execute if score #cnPose tmp matches 20 run function rlk:cm/cn/rig/pose/20
+execute if score #cnPose tmp matches 30 run function rlk:cm/cn/rig/pose/30
+execute if score #cnPose tmp matches 31 run function rlk:cm/cn/rig/pose/31
+execute if score #cnPose tmp matches 32 run function rlk:cm/cn/rig/pose/32
+execute if score #cnPose tmp matches 33 run function rlk:cm/cn/rig/pose/33

@@ -5,6 +5,6 @@ $data modify storage rlk:lvpick sw.to set from storage rlk:lvpick choices[$(i)]
 data modify storage rlk:lvpick dropq append from storage rlk:lvpick sw.from
 function rlk:items/order_replace with storage rlk:lvpick sw
 scoreboard players set @s invDirty 2
-playsound minecraft:entity.player.levelup master @s ~ ~ ~ 0.5 1.6
-playsound minecraft:block.anvil.use master @s ~ ~ ~ 0.3 1.6
+execute unless score #k2 snd matches 1 run function rlk:snd/f415
+execute unless score #k350 snd matches 1 run function rlk:snd/f417
 function rlk:lvup/act/resolve

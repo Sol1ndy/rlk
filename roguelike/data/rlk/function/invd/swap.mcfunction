@@ -8,4 +8,4 @@ $data modify storage rlk:pinv order[$(i)] set from storage rlk:pinv order[$(j)]
 $data modify storage rlk:pinv order[$(j)] set from storage rlk:lvpick sw.a
 function rlk:player/inv/place_items
 scoreboard players set @s invDirty 2
-playsound minecraft:item.armor.equip_leather master @s ~ ~ ~ 0.8 1.3
+execute unless score #k108 snd matches 1 run function rlk:snd/f115

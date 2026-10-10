@@ -15,4 +15,4 @@ scoreboard players set #sub itv 0
 function rlk:char/after_hit
 particle minecraft:splash ~ ~0.3 ~ 2.5 0.1 2.5 0 40
 particle minecraft:bubble_pop ~ ~0.5 ~ 2.5 0.3 2.5 0.02 20
-playsound minecraft:entity.player.splash master @a ~ ~ ~ 0.4 1.5
+execute unless score #k138 snd matches 1 run function rlk:snd/f146

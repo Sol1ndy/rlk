@@ -6,9 +6,9 @@ scoreboard players set #aEl tmp 1
 scoreboard players set #aIcd tmp 0
 scoreboard players set #aSub tmp 4
 scoreboard players set #aLife tmp 14
-execute anchored eyes positioned ^ ^ ^0.6 run function rlk:char/bow/spawn
+execute positioned ~ ~1.62 ~ positioned ^ ^ ^0.6 run function rlk:char/bow/spawn
 tag @e[tag=rlk_arrnew] remove rlk_arrnew
-playsound minecraft:entity.firework_rocket.launch master @a ~ ~ ~ 1.0 0.9
-playsound minecraft:entity.blaze.shoot master @a ~ ~ ~ 0.7 0.8
+execute unless score #k246 snd matches 1 run function rlk:snd/f273
+execute unless score #k140 snd matches 1 run function rlk:snd/f148
 particle minecraft:firework ~ ~1.4 ~ 0.3 0.5 0.3 0.15 30
 particle minecraft:flame ~ ~1 ~ 0.4 0.6 0.4 0.08 30

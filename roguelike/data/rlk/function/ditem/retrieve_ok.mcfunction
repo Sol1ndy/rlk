@@ -4,5 +4,5 @@ function rlk:ditem/retrieve_getid with storage rlk:dtmp
 data modify storage rlk:pinv order append from storage rlk:dtmp id
 function rlk:player/inv/place_items
 function rlk:ditem/kill_group with storage rlk:dtmp
-playsound minecraft:entity.item.pickup master @s ~ ~ ~ 1 1.2
-playsound minecraft:entity.experience_orb.pickup master @s ~ ~ ~ 0.6 1.4
+execute unless score #k201 snd matches 1 run function rlk:snd/f418
+execute unless score #k30 snd matches 1 run function rlk:snd/f419

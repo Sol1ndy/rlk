@@ -1,5 +1,3 @@
-# @s = atkStrike. 좌클릭(attack)=공격, 우클릭(interaction)=스킬/대쉬. 각 원자적 제거
-execute store success score #lc tmp run data remove entity @s attack
-execute store success score #rc tmp run data remove entity @s interaction
-execute if score #lc tmp matches 1 as @a if score @s pid = #mypid tmp at @s run function rlk:combat/on_attack
-execute if score #rc tmp matches 1 as @a if score @s pid = #mypid tmp at @s run function rlk:combat/rclick_do
+# @s = 앞쪽 예비 입력 실드. 가까운 실드를 빗나간 입력도 같은 경로로 전달한다.
+execute if data entity @s attack run function rlk:combat/input/poll_attack
+execute if data entity @s interaction run function rlk:combat/input/poll_right

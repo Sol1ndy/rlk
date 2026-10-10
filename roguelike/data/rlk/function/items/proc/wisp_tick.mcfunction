@@ -5,7 +5,7 @@ particle minecraft:end_rod ~ ~ ~ 0.2 0.2 0.2 0.01 1
 execute if score @s life matches 1.. run return 0
 particle minecraft:snowflake ~ ~ ~ 1.6 0.6 1.6 0.12 60
 particle minecraft:end_rod ~ ~ ~ 1.2 0.5 1.2 0.08 20
-playsound minecraft:block.glass.break master @a ~ ~ ~ 0.7 1.5
-playsound minecraft:entity.breeze.wind_burst master @a ~ ~ ~ 0.5 1.4
+execute unless score #k130 snd matches 1 run function rlk:snd/f138
+execute unless score #k131 snd matches 1 run function rlk:snd/f139
 execute positioned ~ ~-1 ~ run function rlk:items/proc/wisp_boom
 kill @s

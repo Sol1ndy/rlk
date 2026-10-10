@@ -5,4 +5,4 @@ execute if score #ol tmp matches 9.. run return run function rlk:char/deny {t:"�
 $function rlk:items/give {id:"$(id)"}
 $title @s actionbar [{text:"인벤토리에 추가: ",color:"gray"},{nbt:"registry.$(id).name",storage:"rlk:items",interpret:true,color:"white"}]
 scoreboard players set @s hudHold 20
-playsound minecraft:entity.item.pickup master @s ~ ~ ~ 0.8 1.0
+execute unless score #k69 snd matches 1 run function rlk:snd/f74

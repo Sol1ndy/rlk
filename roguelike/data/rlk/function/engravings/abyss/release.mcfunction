@@ -22,5 +22,5 @@ scoreboard players operation #aqN eng += #ab7 eng
 scoreboard players set #ab7 eng 0
 scoreboard players set #abStack eng 0
 scoreboard players set #aqT eng 0
-execute at @a[tag=player,limit=1] run playsound minecraft:entity.evoker.prepare_attack master @a[tag=player,limit=1] ~ ~ ~ 0.7 1.6
+execute at @a[tag=player,limit=1] unless score #k211 snd matches 1 run function rlk:snd/f234
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:witch ~ ~1.2 ~ 0.4 0.6 0.4 0.2 25

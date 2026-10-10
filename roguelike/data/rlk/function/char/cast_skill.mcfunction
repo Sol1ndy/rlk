@@ -1,3 +1,4 @@
+execute if score @s pmMoveLock matches 1 run return 0
 # 원소전투 스킬 발동 (@s = 플레이어, at @s)
 # 스커크는 스킬·폭발의 조건과 재사용 대기가 따로 돈다
 execute if score #charN tmp matches 3 run return run function rlk:char/skirk/cast_skill

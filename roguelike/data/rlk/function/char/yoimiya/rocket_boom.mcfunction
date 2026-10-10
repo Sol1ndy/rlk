@@ -26,7 +26,7 @@ execute at @s run particle minecraft:explosion ~ ~ ~ 1.5 1.0 1.5 0 6
 execute at @s run particle minecraft:firework ~ ~ ~ 0.5 0.5 0.5 0.35 80
 execute at @s run particle minecraft:flame ~ ~ ~ 1.5 1.0 1.5 0.12 80
 execute at @s run particle minecraft:dust{color:[1.0f,0.75f,0.2f],scale:2.2f} ~ ~ ~ 2.2 1.2 2.2 0 40
-execute at @s run playsound minecraft:entity.firework_rocket.large_blast master @a ~ ~ ~ 1.2 0.9
-execute at @s run playsound minecraft:entity.firework_rocket.twinkle master @a ~ ~ ~ 1.0 1.0
-execute at @s run playsound minecraft:entity.generic.explode master @a ~ ~ ~ 0.5 1.4
+execute at @s unless score #k241 snd matches 1 run function rlk:snd/f268
+execute at @s unless score #k242 snd matches 1 run function rlk:snd/f269
+execute at @s unless score #k243 snd matches 1 run function rlk:snd/f270
 kill @s

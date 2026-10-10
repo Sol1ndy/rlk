@@ -1,0 +1,39 @@
+# 구역 건설 (levelup8_3, 테마 1): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill -60 200 -20 -41 200 -1 minecraft:tuff
+fill -60 201 -20 -41 210 -1 minecraft:stone
+fill -59 201 -19 -42 210 -2 minecraft:air
+fill -59 209 -19 -42 209 -2 minecraft:light[level=15]
+fill -48 200 -10 -47 200 -9 minecraft:cobblestone
+fill -55 200 -12 -51 200 -9 minecraft:deepslate
+fill -60 208 -18 -60 210 -16 minecraft:coal_ore
+fill -60 201 -7 -60 201 -5 minecraft:copper_ore
+fill -60 208 -7 -60 210 -3 minecraft:andesite
+fill -41 207 -8 -41 210 -8 minecraft:copper_ore
+fill -41 208 -11 -41 210 -7 minecraft:andesite
+fill -41 207 -18 -41 209 -14 minecraft:coal_ore
+fill -41 205 -10 -41 207 -5 minecraft:coal_ore
+fill -49 205 -20 -49 205 -20 minecraft:tuff
+fill -48 208 -20 -48 210 -20 minecraft:cobblestone
+fill -59 204 -20 -58 204 -20 minecraft:andesite
+fill -43 203 -20 -43 205 -20 minecraft:andesite
+fill -52 203 -20 -49 206 -20 minecraft:cobblestone
+fill -60 209 -20 -55 210 -20 minecraft:copper_ore
+fill -48 203 -1 -44 205 -1 minecraft:copper_ore
+fill -58 203 -1 -56 205 -1 minecraft:tuff
+fill -48 207 -1 -43 210 -1 minecraft:copper_ore
+fill -47 209 -1 -47 209 -1 minecraft:coal_ore
+fill -48 205 -1 -46 207 -1 minecraft:cobblestone
+fill -60 210 -20 -41 210 -1 minecraft:polished_deepslate
+fill -59 210 -19 -42 210 -2 minecraft:air
+fill -44 201 -6 -43 201 -2 minecraft:tuff
+fill -42 201 -5 -42 201 -2 minecraft:tuff
+execute positioned -43 201 -7 run function rlk:room/prop/m_ore_b
+execute positioned -59 201 -10 run function rlk:room/prop/m_fence_x
+execute positioned -55 201 -9 run function rlk:room/prop/m_fence_z
+execute positioned -59 201 -7 run function rlk:room/prop/m_rubble_a
+execute positioned -58 201 -18 run function rlk:room/prop/m_rail_z
+execute positioned -43 201 -14 run function rlk:room/prop/m_pebble
+execute positioned -50 201 -7 run function rlk:room/prop/m_rail_x
+execute positioned -58 201 -17 run function rlk:room/prop/m_rail_x
+setblock -42 203 -12 minecraft:wall_torch[facing=west]
+setblock -57 203 -19 minecraft:wall_torch[facing=south]

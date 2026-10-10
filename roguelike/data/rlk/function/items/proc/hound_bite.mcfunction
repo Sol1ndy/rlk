@@ -1,5 +1,5 @@
 particle minecraft:electric_spark ~ ~1 ~ 0.3 0.4 0.3 0.3 14
-playsound minecraft:entity.wolf.growl master @a ~ ~ ~ 0.5 1.5
+execute unless score #k132 snd matches 1 run function rlk:snd/f140
 particle minecraft:sweep_attack ~ ~1 ~ 0.2 0.2 0.2 0 2
 particle minecraft:dust{color:[0.77f,0.55f,1.00f],scale:1.5f} ~ ~1 ~ 0.3 0.3 0.3 0 12
 particle minecraft:crit ~ ~1 ~ 0.3 0.3 0.3 0.4 10

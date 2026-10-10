@@ -1,3 +1,5 @@
+execute if score @s rdCam matches 1 run return 0
+execute if score @s pmMoveLock matches 1 run return 0
 # 원소폭발 버튼 (@s = 플레이어, at 몸): 쓸 수 있는지 확인 → 시전 동작(멈춤·무적·화면 확대) → 끝나면 char/burst_go 가 실제로 발동
 execute if score @s buT matches 1.. run return 0
 execute if score @s dead matches 1 run return 0

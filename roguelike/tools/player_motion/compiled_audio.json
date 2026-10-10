@@ -1,0 +1,1120 @@
+{
+  "source": "Minecraft vanilla events only; no recording assets.",
+  "characters": {
+    "arle": {
+      "physical_1": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          4
+        ],
+        "layers": [
+          {
+            "tick": 1,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.461,
+            "pitch": 0.69,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 4,
+            "event": "item.spear.attack",
+            "volume": 0.192,
+            "pitch": 1.08,
+            "layer": "blade_edge_contact"
+          }
+        ]
+      },
+      "physical_2": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          4
+        ],
+        "layers": [
+          {
+            "tick": 1,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.48,
+            "pitch": 0.61,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 4,
+            "event": "item.spear.attack",
+            "volume": 0.2,
+            "pitch": 0.96,
+            "layer": "blade_edge_contact"
+          }
+        ]
+      },
+      "physical_3": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          4
+        ],
+        "layers": [
+          {
+            "tick": 1,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.461,
+            "pitch": 0.66,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 4,
+            "event": "item.spear.attack",
+            "volume": 0.192,
+            "pitch": 1.02,
+            "layer": "blade_edge_contact"
+          }
+        ]
+      },
+      "physical_4": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          5,
+          10
+        ],
+        "layers": [
+          {
+            "tick": 2,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.353,
+            "pitch": 0.77,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 5,
+            "event": "item.spear.attack",
+            "volume": 0.147,
+            "pitch": 1.18,
+            "layer": "blade_edge_contact"
+          },
+          {
+            "tick": 7,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.442,
+            "pitch": 0.63,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 10,
+            "event": "item.spear.attack",
+            "volume": 0.184,
+            "pitch": 1.02,
+            "layer": "blade_edge_contact"
+          }
+        ]
+      },
+      "physical_5": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          6
+        ],
+        "layers": [
+          {
+            "tick": 0,
+            "event": "entity.breeze.slide",
+            "volume": 0.11,
+            "pitch": 0.92,
+            "layer": "vault_takeoff_air"
+          },
+          {
+            "tick": 3,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.494,
+            "pitch": 0.58,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 6,
+            "event": "item.spear.attack",
+            "volume": 0.206,
+            "pitch": 0.91,
+            "layer": "blade_edge_contact"
+          }
+        ]
+      },
+      "physical_6": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          7
+        ],
+        "layers": [
+          {
+            "tick": 4,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.528,
+            "pitch": 0.55,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 7,
+            "event": "item.spear.attack",
+            "volume": 0.22,
+            "pitch": 0.88,
+            "layer": "blade_edge_contact"
+          }
+        ]
+      },
+      "infused_1": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          4
+        ],
+        "layers": [
+          {
+            "tick": 1,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.461,
+            "pitch": 0.69,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 2,
+            "event": "item.firecharge.use",
+            "volume": 0.24,
+            "pitch": 0.69,
+            "layer": "bloodfire_arc"
+          },
+          {
+            "tick": 4,
+            "event": "item.spear.attack",
+            "volume": 0.192,
+            "pitch": 1.08,
+            "layer": "blade_edge_contact"
+          },
+          {
+            "tick": 6,
+            "event": "block.fire.extinguish",
+            "volume": 0.115,
+            "pitch": 0.86,
+            "layer": "bloodfire_cut_tail"
+          }
+        ]
+      },
+      "infused_2": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          4
+        ],
+        "layers": [
+          {
+            "tick": 1,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.48,
+            "pitch": 0.61,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 2,
+            "event": "item.firecharge.use",
+            "volume": 0.25,
+            "pitch": 0.61,
+            "layer": "bloodfire_arc"
+          },
+          {
+            "tick": 4,
+            "event": "item.spear.attack",
+            "volume": 0.2,
+            "pitch": 0.96,
+            "layer": "blade_edge_contact"
+          },
+          {
+            "tick": 6,
+            "event": "block.fire.extinguish",
+            "volume": 0.12,
+            "pitch": 0.86,
+            "layer": "bloodfire_cut_tail"
+          }
+        ]
+      },
+      "infused_3": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          4
+        ],
+        "layers": [
+          {
+            "tick": 1,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.461,
+            "pitch": 0.66,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 2,
+            "event": "item.firecharge.use",
+            "volume": 0.24,
+            "pitch": 0.66,
+            "layer": "bloodfire_arc"
+          },
+          {
+            "tick": 4,
+            "event": "item.spear.attack",
+            "volume": 0.192,
+            "pitch": 1.02,
+            "layer": "blade_edge_contact"
+          },
+          {
+            "tick": 6,
+            "event": "block.fire.extinguish",
+            "volume": 0.115,
+            "pitch": 0.86,
+            "layer": "bloodfire_cut_tail"
+          }
+        ]
+      },
+      "infused_4": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          6,
+          11
+        ],
+        "layers": [
+          {
+            "tick": 3,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.353,
+            "pitch": 0.77,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 4,
+            "event": "item.firecharge.use",
+            "volume": 0.184,
+            "pitch": 0.77,
+            "layer": "bloodfire_arc"
+          },
+          {
+            "tick": 6,
+            "event": "item.spear.attack",
+            "volume": 0.147,
+            "pitch": 1.18,
+            "layer": "blade_edge_contact"
+          },
+          {
+            "tick": 8,
+            "event": "block.fire.extinguish",
+            "volume": 0.088,
+            "pitch": 0.86,
+            "layer": "bloodfire_cut_tail"
+          },
+          {
+            "tick": 8,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.442,
+            "pitch": 0.63,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 9,
+            "event": "item.firecharge.use",
+            "volume": 0.23,
+            "pitch": 0.63,
+            "layer": "bloodfire_arc"
+          },
+          {
+            "tick": 11,
+            "event": "item.spear.attack",
+            "volume": 0.184,
+            "pitch": 1.02,
+            "layer": "blade_edge_contact"
+          },
+          {
+            "tick": 13,
+            "event": "block.fire.extinguish",
+            "volume": 0.11,
+            "pitch": 0.86,
+            "layer": "bloodfire_cut_tail"
+          }
+        ]
+      },
+      "infused_5": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          6
+        ],
+        "layers": [
+          {
+            "tick": 0,
+            "event": "entity.breeze.slide",
+            "volume": 0.11,
+            "pitch": 0.92,
+            "layer": "vault_takeoff_air"
+          },
+          {
+            "tick": 3,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.494,
+            "pitch": 0.58,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 4,
+            "event": "item.firecharge.use",
+            "volume": 0.258,
+            "pitch": 0.58,
+            "layer": "bloodfire_arc"
+          },
+          {
+            "tick": 6,
+            "event": "item.spear.attack",
+            "volume": 0.206,
+            "pitch": 0.91,
+            "layer": "blade_edge_contact"
+          },
+          {
+            "tick": 8,
+            "event": "block.fire.extinguish",
+            "volume": 0.124,
+            "pitch": 0.86,
+            "layer": "bloodfire_cut_tail"
+          }
+        ]
+      },
+      "infused_6": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          7
+        ],
+        "layers": [
+          {
+            "tick": 4,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.528,
+            "pitch": 0.55,
+            "layer": "shaft_cutting_rush"
+          },
+          {
+            "tick": 5,
+            "event": "item.firecharge.use",
+            "volume": 0.275,
+            "pitch": 0.55,
+            "layer": "bloodfire_arc"
+          },
+          {
+            "tick": 7,
+            "event": "item.spear.attack",
+            "volume": 0.22,
+            "pitch": 0.88,
+            "layer": "blade_edge_contact"
+          },
+          {
+            "tick": 9,
+            "event": "block.fire.extinguish",
+            "volume": 0.132,
+            "pitch": 0.72,
+            "layer": "bloodfire_cut_tail"
+          }
+        ]
+      },
+      "skill": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          14
+        ],
+        "layers": [
+          {
+            "tick": 0,
+            "event": "item.firecharge.use",
+            "volume": 0.26,
+            "pitch": 0.64,
+            "layer": "ash_entry_ignition"
+          },
+          {
+            "tick": 4,
+            "event": "entity.breeze.slide",
+            "volume": 0.18,
+            "pitch": 0.68,
+            "layer": "entry_rush_body"
+          },
+          {
+            "tick": 7,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.48,
+            "pitch": 0.58,
+            "layer": "entry_scythe_rush"
+          },
+          {
+            "tick": 7,
+            "event": "item.spear.attack",
+            "volume": 0.23,
+            "pitch": 0.89,
+            "layer": "entry_scythe_edge"
+          },
+          {
+            "tick": 13,
+            "event": "item.firecharge.use",
+            "volume": 0.26,
+            "pitch": 0.58,
+            "layer": "thorn_flare"
+          },
+          {
+            "tick": 14,
+            "event": "entity.generic.explode",
+            "volume": 0.34,
+            "pitch": 0.77,
+            "layer": "thorn_eruption_body"
+          },
+          {
+            "tick": 14,
+            "event": "entity.blaze.shoot",
+            "volume": 0.3,
+            "pitch": 0.63,
+            "layer": "thorn_flame_release"
+          },
+          {
+            "tick": 14,
+            "event": "block.heavy_core.hit",
+            "volume": 0.17,
+            "pitch": 0.65,
+            "layer": "ground_pressure_contact"
+          },
+          {
+            "tick": 17,
+            "event": "block.fire.extinguish",
+            "volume": 0.18,
+            "pitch": 0.75,
+            "layer": "ash_decay"
+          }
+        ]
+      },
+      "burst": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          40
+        ],
+        "layers": [
+          {
+            "tick": 0,
+            "event": "block.respawn_anchor.charge",
+            "volume": 0.26,
+            "pitch": 0.58,
+            "layer": "dark_charge"
+          },
+          {
+            "tick": 18,
+            "event": "item.firecharge.use",
+            "volume": 0.23,
+            "pitch": 0.62,
+            "layer": "raised_hand_fire"
+          },
+          {
+            "tick": 30,
+            "event": "entity.breeze.charge",
+            "volume": 0.17,
+            "pitch": 0.68,
+            "layer": "gathering_pressure"
+          },
+          {
+            "tick": 37,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.58,
+            "pitch": 0.55,
+            "layer": "cross_release_whoosh"
+          },
+          {
+            "tick": 40,
+            "event": "entity.generic.explode",
+            "volume": 0.8,
+            "pitch": 0.67,
+            "layer": "main_blast_body"
+          },
+          {
+            "tick": 40,
+            "event": "item.mace.smash_ground_heavy",
+            "volume": 0.34,
+            "pitch": 0.73,
+            "layer": "main_blast_low_pressure"
+          },
+          {
+            "tick": 40,
+            "event": "entity.blaze.shoot",
+            "volume": 0.45,
+            "pitch": 0.59,
+            "layer": "infernal_fire_release"
+          },
+          {
+            "tick": 42,
+            "event": "block.fire.extinguish",
+            "volume": 0.24,
+            "pitch": 0.64,
+            "layer": "hot_air_decay"
+          },
+          {
+            "tick": 47,
+            "event": "block.heavy_core.hit",
+            "volume": 0.13,
+            "pitch": 0.57,
+            "layer": "last_ash_fragment"
+          }
+        ]
+      }
+    },
+    "skirk": {
+      "physical_1": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          5
+        ],
+        "layers": [
+          {
+            "tick": 3,
+            "event": "item.trident.throw",
+            "volume": 0.19,
+            "pitch": 0.86,
+            "layer": "blade-acceleration"
+          },
+          {
+            "tick": 5,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.48,
+            "pitch": 0.78,
+            "layer": "broad-cut"
+          }
+        ]
+      },
+      "physical_2": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          4
+        ],
+        "layers": [
+          {
+            "tick": 2,
+            "event": "item.trident.throw",
+            "volume": 0.19,
+            "pitch": 0.86,
+            "layer": "blade-acceleration"
+          },
+          {
+            "tick": 4,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.46,
+            "pitch": 0.91,
+            "layer": "broad-cut"
+          }
+        ]
+      },
+      "physical_3": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          3,
+          8
+        ],
+        "layers": [
+          {
+            "tick": 1,
+            "event": "item.trident.throw",
+            "volume": 0.19,
+            "pitch": 0.86,
+            "layer": "blade-acceleration"
+          },
+          {
+            "tick": 3,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.41,
+            "pitch": 0.88,
+            "layer": "broad-cut"
+          },
+          {
+            "tick": 6,
+            "event": "item.trident.throw",
+            "volume": 0.19,
+            "pitch": 0.95,
+            "layer": "blade-acceleration"
+          },
+          {
+            "tick": 8,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.41,
+            "pitch": 0.97,
+            "layer": "broad-cut"
+          }
+        ]
+      },
+      "physical_4": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          5
+        ],
+        "layers": [
+          {
+            "tick": 3,
+            "event": "item.trident.throw",
+            "volume": 0.19,
+            "pitch": 0.86,
+            "layer": "blade-acceleration"
+          },
+          {
+            "tick": 5,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.49,
+            "pitch": 0.8,
+            "layer": "broad-cut"
+          }
+        ]
+      },
+      "physical_5": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          13
+        ],
+        "layers": [
+          {
+            "tick": 8,
+            "event": "entity.breeze.slide",
+            "volume": 0.12,
+            "pitch": 0.72,
+            "layer": "finisher-air-draw"
+          },
+          {
+            "tick": 11,
+            "event": "item.trident.throw",
+            "volume": 0.24,
+            "pitch": 0.86,
+            "layer": "blade-acceleration"
+          },
+          {
+            "tick": 13,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.62,
+            "pitch": 0.65,
+            "layer": "broad-cut"
+          }
+        ]
+      },
+      "infused_1": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          6
+        ],
+        "layers": [
+          {
+            "tick": 4,
+            "event": "entity.breeze.slide",
+            "volume": 0.085,
+            "pitch": 0.8,
+            "layer": "cold-air-draw"
+          },
+          {
+            "tick": 4,
+            "event": "item.trident.throw",
+            "volume": 0.19,
+            "pitch": 0.86,
+            "layer": "blade-acceleration"
+          },
+          {
+            "tick": 6,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.48,
+            "pitch": 0.78,
+            "layer": "broad-cut"
+          }
+        ]
+      },
+      "infused_2": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          3
+        ],
+        "layers": [
+          {
+            "tick": 1,
+            "event": "entity.breeze.slide",
+            "volume": 0.085,
+            "pitch": 0.8,
+            "layer": "cold-air-draw"
+          },
+          {
+            "tick": 1,
+            "event": "item.trident.throw",
+            "volume": 0.19,
+            "pitch": 0.86,
+            "layer": "blade-acceleration"
+          },
+          {
+            "tick": 3,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.46,
+            "pitch": 0.91,
+            "layer": "broad-cut"
+          }
+        ]
+      },
+      "infused_3": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          5,
+          8
+        ],
+        "layers": [
+          {
+            "tick": 3,
+            "event": "entity.breeze.slide",
+            "volume": 0.085,
+            "pitch": 0.8,
+            "layer": "cold-air-draw"
+          },
+          {
+            "tick": 3,
+            "event": "item.trident.throw",
+            "volume": 0.19,
+            "pitch": 0.86,
+            "layer": "blade-acceleration"
+          },
+          {
+            "tick": 5,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.41,
+            "pitch": 0.88,
+            "layer": "broad-cut"
+          },
+          {
+            "tick": 6,
+            "event": "item.trident.throw",
+            "volume": 0.19,
+            "pitch": 0.95,
+            "layer": "blade-acceleration"
+          },
+          {
+            "tick": 8,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.41,
+            "pitch": 0.97,
+            "layer": "broad-cut"
+          }
+        ]
+      },
+      "infused_4": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          4
+        ],
+        "layers": [
+          {
+            "tick": 2,
+            "event": "entity.breeze.slide",
+            "volume": 0.085,
+            "pitch": 0.8,
+            "layer": "cold-air-draw"
+          },
+          {
+            "tick": 2,
+            "event": "item.trident.throw",
+            "volume": 0.19,
+            "pitch": 0.86,
+            "layer": "blade-acceleration"
+          },
+          {
+            "tick": 4,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.49,
+            "pitch": 0.8,
+            "layer": "broad-cut"
+          }
+        ]
+      },
+      "infused_5": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          11
+        ],
+        "layers": [
+          {
+            "tick": 6,
+            "event": "entity.breeze.slide",
+            "volume": 0.14,
+            "pitch": 0.72,
+            "layer": "finisher-air-draw"
+          },
+          {
+            "tick": 9,
+            "event": "item.trident.throw",
+            "volume": 0.24,
+            "pitch": 0.86,
+            "layer": "blade-acceleration"
+          },
+          {
+            "tick": 11,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.62,
+            "pitch": 0.65,
+            "layer": "broad-cut"
+          }
+        ]
+      },
+      "skill_left": {
+        "playback_rate": 100,
+        "hit_ticks": [],
+        "layers": [
+          {
+            "tick": 0,
+            "event": "block.respawn_anchor.charge",
+            "volume": 0.18,
+            "pitch": 0.63,
+            "layer": "shell-charge"
+          },
+          {
+            "tick": 3,
+            "event": "block.amethyst_block.resonate",
+            "volume": 0.09,
+            "pitch": 0.68,
+            "layer": "crystal-pressure"
+          },
+          {
+            "tick": 6,
+            "event": "item.trident.throw",
+            "volume": 0.23,
+            "pitch": 0.74,
+            "layer": "upward-draw"
+          },
+          {
+            "tick": 9,
+            "event": "entity.breeze.wind_burst",
+            "volume": 0.39,
+            "pitch": 0.74,
+            "layer": "shell-opening"
+          },
+          {
+            "tick": 9,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.31,
+            "pitch": 0.69,
+            "layer": "ring-expansion"
+          },
+          {
+            "tick": 13,
+            "event": "block.amethyst_block.resonate",
+            "volume": 0.085,
+            "pitch": 0.67,
+            "layer": "settled-crystal-tail"
+          }
+        ]
+      },
+      "skill_right": {
+        "playback_rate": 100,
+        "hit_ticks": [],
+        "layers": [
+          {
+            "tick": 0,
+            "event": "entity.breeze.slide",
+            "volume": 0.22,
+            "pitch": 0.64,
+            "layer": "dive-inhale"
+          },
+          {
+            "tick": 5,
+            "event": "item.trident.throw",
+            "volume": 0.29,
+            "pitch": 0.75,
+            "layer": "dive-draw"
+          },
+          {
+            "tick": 8,
+            "event": "entity.breeze.wind_burst",
+            "volume": 0.44,
+            "pitch": 0.83,
+            "layer": "dash-pressure"
+          },
+          {
+            "tick": 8,
+            "event": "entity.enderman.teleport",
+            "volume": 0.18,
+            "pitch": 0.69,
+            "layer": "rift-transition"
+          }
+        ]
+      },
+      "skill_right_end": {
+        "playback_rate": 100,
+        "hit_ticks": [],
+        "layers": [
+          {
+            "tick": 1,
+            "event": "entity.breeze.slide",
+            "volume": 0.21,
+            "pitch": 0.73,
+            "layer": "glide-release"
+          },
+          {
+            "tick": 4,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.3,
+            "pitch": 0.81,
+            "layer": "settle-sweep"
+          }
+        ]
+      },
+      "burst_jin": {
+        "playback_rate": 100,
+        "hit_ticks": [],
+        "layers": [
+          {
+            "tick": 0,
+            "event": "block.respawn_anchor.charge",
+            "volume": 0.22,
+            "pitch": 0.58,
+            "layer": "empowerment-draw"
+          },
+          {
+            "tick": 3,
+            "event": "block.amethyst_block.resonate",
+            "volume": 0.11,
+            "pitch": 0.64,
+            "layer": "compressed-crystal"
+          },
+          {
+            "tick": 7,
+            "event": "entity.breeze.slide",
+            "volume": 0.28,
+            "pitch": 0.69,
+            "layer": "somersault-wind"
+          },
+          {
+            "tick": 10,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.45,
+            "pitch": 0.68,
+            "layer": "ring-cut"
+          },
+          {
+            "tick": 10,
+            "event": "entity.breeze.wind_burst",
+            "volume": 0.44,
+            "pitch": 0.68,
+            "layer": "empowerment-pressure"
+          },
+          {
+            "tick": 13,
+            "event": "block.amethyst_block.resonate",
+            "volume": 0.1,
+            "pitch": 0.74,
+            "layer": "empowerment-tail"
+          }
+        ]
+      },
+      "burst_metsu": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          29,
+          31,
+          33,
+          35,
+          37,
+          41
+        ],
+        "layers": [
+          {
+            "tick": 0,
+            "event": "block.respawn_anchor.charge",
+            "volume": 0.27,
+            "pitch": 0.57,
+            "layer": "rift-charge"
+          },
+          {
+            "tick": 10,
+            "event": "block.amethyst_block.resonate",
+            "volume": 0.13,
+            "pitch": 0.62,
+            "layer": "orbiting-crystals"
+          },
+          {
+            "tick": 19,
+            "event": "entity.breeze.slide",
+            "volume": 0.23,
+            "pitch": 0.65,
+            "layer": "rift-contraction"
+          },
+          {
+            "tick": 26,
+            "event": "item.trident.throw",
+            "volume": 0.31,
+            "pitch": 0.69,
+            "layer": "opening-draw"
+          },
+          {
+            "tick": 29,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.4,
+            "pitch": 0.78,
+            "layer": "rift-cut"
+          },
+          {
+            "tick": 31,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.418,
+            "pitch": 0.835,
+            "layer": "rift-cut"
+          },
+          {
+            "tick": 33,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.436,
+            "pitch": 0.89,
+            "layer": "rift-cut"
+          },
+          {
+            "tick": 35,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.454,
+            "pitch": 0.945,
+            "layer": "rift-cut"
+          },
+          {
+            "tick": 37,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.472,
+            "pitch": 1.0,
+            "layer": "rift-cut"
+          },
+          {
+            "tick": 40,
+            "event": "item.trident.throw",
+            "volume": 0.29,
+            "pitch": 0.68,
+            "layer": "final-thrust-draw"
+          },
+          {
+            "tick": 41,
+            "event": "entity.generic.explode",
+            "volume": 0.53,
+            "pitch": 0.72,
+            "layer": "rift-collapse-body"
+          },
+          {
+            "tick": 41,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.54,
+            "pitch": 0.61,
+            "layer": "rift-collapse-cut"
+          },
+          {
+            "tick": 44,
+            "event": "block.amethyst_block.resonate",
+            "volume": 0.105,
+            "pitch": 0.63,
+            "layer": "rift-crystal-tail"
+          }
+        ]
+      }
+    }
+  },
+  "sound_events": [
+    "block.amethyst_block.resonate",
+    "block.fire.extinguish",
+    "block.heavy_core.hit",
+    "block.respawn_anchor.charge",
+    "entity.blaze.shoot",
+    "entity.breeze.charge",
+    "entity.breeze.slide",
+    "entity.breeze.wind_burst",
+    "entity.enderman.teleport",
+    "entity.generic.explode",
+    "entity.player.attack.sweep",
+    "item.firecharge.use",
+    "item.mace.smash_ground_heavy",
+    "item.spear.attack",
+    "item.trident.throw"
+  ]
+}

@@ -1,0 +1,39 @@
+# 구역 건설 (normal23_1, 테마 1): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill -20 200 0 -1 200 19 minecraft:tuff
+fill -20 201 0 -1 210 19 minecraft:stone
+fill -19 201 1 -2 210 18 minecraft:air
+fill -19 209 1 -2 209 18 minecraft:light[level=15]
+fill -10 200 14 -7 200 15 minecraft:deepslate
+fill -14 200 17 -12 200 18 minecraft:coarse_dirt
+fill -20 205 16 -20 207 19 minecraft:spruce_planks
+fill -20 202 11 -20 204 16 minecraft:iron_ore
+fill -20 203 14 -20 206 16 minecraft:cobblestone
+fill -1 210 14 -1 210 14 minecraft:coal_ore
+fill -1 205 4 -1 207 4 minecraft:deepslate
+fill -1 209 8 -1 209 8 minecraft:iron_ore
+fill -1 201 2 -1 203 6 minecraft:tuff
+fill -1 203 9 -1 203 14 minecraft:andesite
+fill -8 210 0 -5 210 0 minecraft:copper_ore
+fill -16 201 0 -11 202 0 minecraft:spruce_planks
+fill -20 203 0 -20 204 0 minecraft:andesite
+fill -16 207 0 -12 209 0 minecraft:tuff
+fill -5 208 0 -1 210 0 minecraft:coal_ore
+fill -15 203 19 -12 206 19 minecraft:andesite
+fill -9 204 19 -8 206 19 minecraft:andesite
+fill -3 210 19 -1 210 19 minecraft:coal_ore
+fill -20 210 0 -1 210 19 minecraft:polished_deepslate
+fill -19 210 1 -2 210 18 minecraft:air
+fill -4 201 1 -2 201 3 minecraft:tuff
+fill -18 201 8 -17 205 9 minecraft:deepslate
+fill -18 206 8 -17 206 9 minecraft:tuff
+fill -19 201 8 -19 205 10 minecraft:stone
+fill -19 206 8 -19 206 10 minecraft:tuff
+fill -18 201 10 -17 205 10 minecraft:stone
+fill -18 206 10 -17 206 10 minecraft:tuff
+execute positioned -5 201 18 run function rlk:room/prop/m_post
+execute positioned -19 201 1 run function rlk:room/prop/m_pillar_a
+execute positioned -4 201 7 run function rlk:room/prop/m_rail_x
+execute positioned -13 201 18 run function rlk:room/prop/m_rail_z
+execute positioned -8 201 14 run function rlk:room/prop/m_pebble
+setblock -14 203 1 minecraft:wall_torch[facing=south]
+setblock -16 203 18 minecraft:wall_torch[facing=north]

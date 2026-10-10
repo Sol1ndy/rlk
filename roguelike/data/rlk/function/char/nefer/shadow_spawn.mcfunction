@@ -5,4 +5,4 @@ execute as @e[tag=rlk_nfsh] at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_nfsp,
 team join rlk_nfshade @e[tag=rlk_nfsh]
 execute at @e[tag=rlk_nfsh,limit=1] run particle minecraft:large_smoke ~ ~1 ~ 0.3 0.6 0.3 0.02 15
 execute at @e[tag=rlk_nfsh,limit=1] run particle minecraft:dust{color:[0.2,0.6,0.15],scale:1.6} ~ ~1 ~ 0.3 0.7 0.3 0 25
-execute at @e[tag=rlk_nfsh,limit=1] run playsound minecraft:entity.illusioner.mirror_move master @a ~ ~ ~ 0.8 1.2
+execute at @e[tag=rlk_nfsh,limit=1] unless score #k333 snd matches 1 run function rlk:snd/f393

@@ -4,5 +4,5 @@ data modify storage rlk:gv id set from storage rlk:chars cur.itemId
 function rlk:ditem/kill_group with storage rlk:dtmp
 function rlk:char/switch with storage rlk:dtmp ch
 execute at @e[tag=rlk_body,limit=1] run function rlk:items/drop with storage rlk:gv
-playsound minecraft:entity.player.levelup master @s ~ ~ ~ 0.5 1.6
-playsound minecraft:block.beacon.power_select master @s ~ ~ ~ 0.5 1.4
+execute unless score #k2 snd matches 1 run function rlk:snd/f415
+execute unless score #k73 snd matches 1 run function rlk:snd/f78

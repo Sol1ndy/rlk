@@ -28,7 +28,7 @@ execute if score #basic itv matches 1 if score #hitLanded tmp matches 1 as @a[ta
 execute if score #aK tmp matches 5 if score #hitLanded tmp matches 1 at @s as @a[tag=player,limit=1] run function rlk:char/yoimiya/blaze_hit
 scoreboard players set #basic itv 0
 execute as @a[tag=player,limit=1] at @e[tag=rlk_body,limit=1] run function rlk:char/after_hit
-execute at @s run playsound minecraft:entity.arrow.hit_player master @a ~ ~ ~ 0.5 1.4
+execute at @s unless score #k238 snd matches 1 run function rlk:snd/f265
 execute at @s if score @s aEl matches 1 run particle minecraft:lava ~ ~ ~ 0.15 0.15 0.15 0 4
 # 기본 공격 화살: 작은 불꽃 / 콤보 마지막 화살: 폭죽(보기만, 피해는 그대로)
 execute at @s if score #aK tmp matches 1 run particle minecraft:firework ~ ~ ~ 0.05 0.05 0.05 0.08 6
@@ -37,6 +37,6 @@ execute at @s if score #aK tmp matches 5 run particle minecraft:flame ~ ~ ~ 0.1 
 execute at @s if entity @s[tag=rlk_arrfin] run particle minecraft:firework ~ ~ ~ 0.1 0.1 0.1 0.2 35
 execute at @s if entity @s[tag=rlk_arrfin] run particle minecraft:dust{color:[1.0,0.55,0.2],scale:1.3} ~ ~ ~ 0.7 0.7 0.7 0 14
 execute at @s if entity @s[tag=rlk_arrfin] run particle minecraft:dust{color:[1.0,0.9,0.5],scale:1.0} ~ ~ ~ 0.9 0.9 0.9 0 10
-execute at @s if entity @s[tag=rlk_arrfin] run playsound minecraft:entity.firework_rocket.blast master @a ~ ~ ~ 0.7 1.2
-execute at @s if entity @s[tag=rlk_arrfin] run playsound minecraft:entity.firework_rocket.twinkle master @a ~ ~ ~ 0.5 1.3
+execute at @s if entity @s[tag=rlk_arrfin] unless score #k239 snd matches 1 run function rlk:snd/f266
+execute at @s if entity @s[tag=rlk_arrfin] unless score #k240 snd matches 1 run function rlk:snd/f267
 kill @s

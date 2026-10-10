@@ -6,8 +6,8 @@ scoreboard players operation @s javBonus = @s starlight
 scoreboard players operation @s javBonus *= #c65 tmp
 scoreboard players set @s starlight 0
 scoreboard players set @s javT 0
-playsound minecraft:item.trident.thunder master @a ~ ~ ~ 0.35 1.8
-playsound minecraft:block.glass.break master @a ~ ~ ~ 0.8 0.6
-playsound minecraft:block.respawn_anchor.set_spawn master @a ~ ~ ~ 0.6 1.6
+execute unless score #k344 snd matches 1 run function rlk:snd/f407
+execute unless score #k3 snd matches 1 run function rlk:snd/f408
+execute unless score #k316 snd matches 1 run function rlk:snd/f409
 particle minecraft:snowflake ~ ~1.2 ~ 0.6 0.8 0.6 0.08 50
 particle minecraft:dust{color:[0.62f,0.91f,0.96f],scale:1.8f} ~ ~1.2 ~ 0.7 0.9 0.7 0 20

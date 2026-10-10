@@ -1,0 +1,46 @@
+# 구역 건설 (first10_1, 테마 3): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
+fill 0 200 -20 19 200 -1 minecraft:podzol
+fill 0 201 -20 19 210 -1 minecraft:stone
+fill 1 201 -19 18 210 -2 minecraft:air
+fill 1 209 -19 18 209 -2 minecraft:light[level=15]
+fill 5 200 -18 8 200 -16 minecraft:coarse_dirt
+fill 7 200 -19 8 200 -16 minecraft:rooted_dirt
+fill 0 206 -14 0 207 -9 minecraft:andesite
+fill 0 204 -12 0 206 -12 minecraft:andesite
+fill 0 209 -20 0 210 -16 minecraft:oak_leaves[persistent=true]
+fill 0 209 -12 0 210 -12 minecraft:oak_leaves[persistent=true]
+fill 19 210 -18 19 210 -13 minecraft:oak_leaves[persistent=true]
+fill 19 208 -14 19 210 -14 minecraft:granite
+fill 19 204 -13 19 206 -10 minecraft:cobblestone
+fill 19 209 -12 19 210 -12 minecraft:andesite
+fill 19 205 -18 19 206 -15 minecraft:moss_block
+fill 1 201 -20 3 203 -20 minecraft:andesite
+fill 10 209 -20 10 210 -20 minecraft:andesite
+fill 1 210 -20 4 210 -20 minecraft:oak_leaves[persistent=true]
+fill 14 208 -1 16 210 -1 minecraft:moss_block
+fill 12 209 -1 14 210 -1 minecraft:mossy_cobblestone
+fill 2 206 -1 6 207 -1 minecraft:mossy_cobblestone
+fill 3 210 -1 6 210 -1 minecraft:andesite
+fill 0 210 -20 19 210 -1 minecraft:polished_deepslate
+fill 1 210 -19 18 210 -2 minecraft:air
+fill 12 201 -5 13 201 -4 minecraft:podzol
+fill 11 201 -4 11 201 -2 minecraft:podzol
+fill 14 201 -4 18 201 -4 minecraft:podzol
+fill 12 201 -3 12 201 -2 minecraft:podzol
+fill 13 201 -3 18 201 -2 minecraft:dirt
+fill 13 202 -3 18 202 -2 minecraft:podzol
+fill 15 201 -19 16 205 -19 minecraft:andesite
+fill 15 206 -19 16 206 -19 minecraft:podzol
+fill 13 201 -19 14 205 -19 minecraft:stone
+fill 13 206 -19 14 206 -19 minecraft:podzol
+execute positioned 17 201 -17 run function rlk:room/prop/p_boulder_s
+execute positioned 9 201 -15 run function rlk:room/prop/p_grass
+execute positioned 5 201 -10 run function rlk:room/prop/p_grass
+execute positioned 15 201 -5 run function rlk:room/prop/p_wildflower
+execute positioned 8 201 -19 run function rlk:room/prop/p_wildflower
+execute positioned 12 201 -6 run function rlk:room/prop/p_wildflower
+execute positioned 14 201 -14 run function rlk:room/prop/p_wildflower
+execute positioned 11 201 -6 run function rlk:room/prop/p_dandelion
+execute positioned 4 201 -6 run function rlk:room/prop/p_wildflower
+setblock 15 207 -19 minecraft:short_grass keep
+setblock 16 207 -19 minecraft:short_grass keep

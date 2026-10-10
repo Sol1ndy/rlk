@@ -2,7 +2,7 @@
 execute store result score #now itv run time query gametime
 execute as @e[tag=rlk_mob,distance=..20] if score @s skEnd > #now itv run tag @s add rlk_skt
 execute at @e[tag=rlk_skt] run particle minecraft:happy_villager ~ ~1.2 ~ 0.3 0.5 0.3 0 12
-execute if entity @e[tag=rlk_skt,limit=1] run playsound minecraft:block.azalea_leaves.break master @a ~ ~ ~ 0.8 1.3
+execute if entity @e[tag=rlk_skt,limit=1] unless score #k156 snd matches 1 run function rlk:snd/f165
 execute as @a[tag=player,limit=1] run function rlk:items/proc/skandha_calc
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

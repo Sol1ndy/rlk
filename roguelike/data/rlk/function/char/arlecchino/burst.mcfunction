@@ -22,9 +22,3 @@ scoreboard players operation #t1 tmp /= #100 tmp
 scoreboard players operation #heal tmp += #t1 tmp
 function rlk:player/heal
 scoreboard players set @s skillCd 0
-execute rotated ~ 0 positioned ^ ^ ^4 run particle minecraft:explosion ~ ~1 ~ 2.0 0.6 2.0 0 8
-execute rotated ~ 0 positioned ^ ^ ^4 run particle minecraft:flame ~ ~1 ~ 2.6 1.0 2.6 0.12 120
-execute rotated ~ 0 positioned ^ ^ ^4 run particle minecraft:dust{color:[0.88f,0.2f,0.3f],scale:2.4f} ~ ~1.2 ~ 2.6 1.2 2.6 0 60
-playsound minecraft:entity.wither.shoot master @a ~ ~ ~ 0.6 0.6
-playsound minecraft:entity.generic.explode master @a ~ ~ ~ 0.7 1.0
-playsound minecraft:block.respawn_anchor.deplete master @a ~ ~ ~ 0.8 0.6

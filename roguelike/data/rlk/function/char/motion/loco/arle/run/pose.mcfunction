@@ -1,0 +1,16 @@
+execute if score @s pmLocT matches 0 run function rlk:char/motion/loco/arle/run/0 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 1 run function rlk:char/motion/loco/arle/run/1 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 2 run function rlk:char/motion/loco/arle/run/2 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 3 run function rlk:char/motion/loco/arle/run/3 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 4 run function rlk:char/motion/loco/arle/run/4 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 5 run function rlk:char/motion/loco/arle/run/5 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 6 run function rlk:char/motion/loco/arle/run/6 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 7 run function rlk:char/motion/loco/arle/run/7 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 8 run function rlk:char/motion/loco/arle/run/8 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 9 run function rlk:char/motion/loco/arle/run/9 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 10 run function rlk:char/motion/loco/arle/run/10 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 11 run function rlk:char/motion/loco/arle/run/11 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 12 run function rlk:char/motion/loco/arle/run/12 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 13 run function rlk:char/motion/loco/arle/run/13 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 14 run function rlk:char/motion/loco/arle/run/14 with storage rlk:player_motion loco
+execute if score @s pmLocT matches 15 run function rlk:char/motion/loco/arle/run/15 with storage rlk:player_motion loco

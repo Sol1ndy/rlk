@@ -21,5 +21,5 @@ scoreboard players remove @s dashMoveT 1
 # 아이템 대쉬 이동 중 트리거
 function rlk:items/hook/on_dash_move
 particle minecraft:cloud ~ ~0.4 ~ 0.15 0.15 0.15 0.01 2
-execute anchored eyes run particle minecraft:cloud ^0.45 ^-0.35 ^0.7 0.05 0.12 0.05 0.01 1
-execute anchored eyes run particle minecraft:cloud ^-0.45 ^-0.35 ^0.7 0.05 0.12 0.05 0.01 1
+execute positioned ~ ~1.62 ~ run particle minecraft:cloud ^0.45 ^-0.35 ^0.7 0.05 0.12 0.05 0.01 1
+execute positioned ~ ~1.62 ~ run particle minecraft:cloud ^-0.45 ^-0.35 ^0.7 0.05 0.12 0.05 0.01 1

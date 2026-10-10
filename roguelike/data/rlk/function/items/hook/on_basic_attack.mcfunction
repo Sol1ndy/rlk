@@ -13,3 +13,5 @@ execute if score #rainT itv matches 1.. unless score #rainCd itv matches 1.. if 
 # 선학의 깃: 대쉬 뒤 첫 기본 공격 → 다음 틱에 바람 폭발
 execute if score #craneT itv matches 1.. run scoreboard players set #craneQ itv 1
 execute if score #craneT itv matches 1.. run scoreboard players set #craneT itv 0
+# 튜토리얼 캐릭터 1쪽: 기본 공격 횟수
+execute if score #tutS lob matches 21 if score @s lobRoom matches 2 run scoreboard players add #tutC lob 1

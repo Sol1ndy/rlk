@@ -32,7 +32,7 @@ execute if score #bN tmp matches 2.. run scoreboard players operation @s bowQc =
 execute if score #bN tmp matches 2.. run scoreboard players operation @s bowQo = #bOff2 tmp
 # 각인 연격 4개: 2타에 추가 화살 한 발(공격력의 #flurryCoef%)
 execute if score #step tmp matches 1 if score flurry engN matches 4.. run scoreboard players set @s bowF 5
-playsound minecraft:entity.arrow.shoot master @a ~ ~ ~ 0.7 1.3
+execute unless score #k231 snd matches 1 run function rlk:snd/f258
 # 기본공격 시 발동(적중 여부 무관)
 scoreboard players set #basic itv 1
 function rlk:items/hook/on_basic_attack

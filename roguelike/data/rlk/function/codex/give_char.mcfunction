@@ -1,3 +1,3 @@
 # macro: char = 캐릭터 id
 $function rlk:char/switch {id:"$(char)"}
-playsound minecraft:block.beacon.power_select master @s ~ ~ ~ 0.5 1.4
+execute unless score #k73 snd matches 1 run function rlk:snd/f78

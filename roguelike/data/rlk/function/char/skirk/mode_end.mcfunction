@@ -10,5 +10,5 @@ scoreboard players set @s buShown -1
 attribute @s minecraft:knockback_resistance modifier remove rlk:skirk
 scoreboard players reset 일곱빛섬광 stacks
 scoreboard players reset 고갈 stacks
-playsound minecraft:block.beacon.deactivate master @a ~ ~ ~ 0.7 1.8
+execute unless score #k315 snd matches 1 run function rlk:snd/f367
 particle minecraft:snowflake ~ ~1 ~ 0.5 0.7 0.5 0.05 20
