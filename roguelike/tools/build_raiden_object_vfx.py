@@ -195,8 +195,9 @@ write('create', [
 ])
 write('eye', spawn('eye_0', 1))
 write('stake', spawn('stake_0', 2))
-cue = spawn('warn_slash', 5)
-cue[5] = '$scoreboard players set @e[tag=rlk_rd_ofnew] rdOvLife $(life)'
+cue = ['$scoreboard players set @e[tag=rlk_rd_ofnew] rdOvLife $(life)' if line.endswith(' rdOvLife 0') else line
+       for line in spawn('warn_slash', 5)]
+assert any(line.startswith('$') for line in cue)
 write('illusion_cue', [
     '# As an illusion facing the arena centre, {life:<ticks until its slash>}. Identical',
     '# for the real and the fake illusions; it disappears with its owner.',

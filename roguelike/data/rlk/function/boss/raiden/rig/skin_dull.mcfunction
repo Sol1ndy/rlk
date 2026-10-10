@@ -1,0 +1,13 @@
+# Raiden darkens inside the Shadowlord armour; item identity only.
+data modify entity @e[tag=rlk_rd_head,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/head_dull"
+data modify entity @e[tag=rlk_rd_body,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/body_dull"
+data modify entity @e[tag=rlk_rd_right_arm,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/right_arm_dull"
+data modify entity @e[tag=rlk_rd_right_forearm,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/right_forearm_dull"
+data modify entity @e[tag=rlk_rd_left_arm,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/left_arm_dull"
+data modify entity @e[tag=rlk_rd_left_forearm,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/left_forearm_dull"
+data modify entity @e[tag=rlk_rd_right_leg,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/right_leg_dull"
+data modify entity @e[tag=rlk_rd_right_shin,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/right_shin_dull"
+data modify entity @e[tag=rlk_rd_left_leg,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/left_leg_dull"
+data modify entity @e[tag=rlk_rd_left_shin,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/left_shin_dull"
+data modify entity @e[tag=rlk_rd_ribbon_r,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/ribbon_dull"
+data modify entity @e[tag=rlk_rd_ribbon_l,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/ribbon_dull"
