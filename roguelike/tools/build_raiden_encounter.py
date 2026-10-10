@@ -45,8 +45,8 @@ DRAIN_REACTION = 1
 # Malice energy: normal-phase ticks before the transformation (45 s, was 30 s).
 RAGE_MAX = 900
 # Transformation: scatter to the centre, then the transformation burst/clip.
-TRANSFORM_FX = 6
-TRANSFORM_LEN = 56
+TRANSFORM_FX = 1
+TRANSFORM_LEN = 52
 
 objectives = ['rd','rdPhase','rdPat','rdTime','rdAnim','rdRage','rdShield','rdCycle','rdCool','rdPrev','rdTurns','rdHitCD','rdObjKind','rdObjId','rdObjHP','rdReal','rdOAge','rdPTime','rdShape','rdWind','rdHAge','rdHLife','rdDamage','rdHHit','rdFX','rdFZ','rdHId','rdVId','rdUltUsed','rdWalk','rdWalkDir','rdBlink','rdCam','rdDeath','rdDeathTime','rdHidden']
 write('init',[f'scoreboard objectives add {v} dummy' for v in objectives]+[
@@ -189,7 +189,9 @@ execute if score @s rdHitCD matches 1.. run scoreboard players remove @s rdHitCD
 execute if score @s rdCool matches 1.. run scoreboard players remove @s rdCool 1
 scoreboard players add @s rdTime 1
 execute if score @s rdPhase matches 0 run scoreboard players add @s rdRage 1
-execute if score @s rdPhase matches 0 if score @s rdRage matches {RAGE_MAX}.. run function rlk:boss/raiden/transform_start
+# A full gauge waits for the running pattern (and any blink) to finish, then the
+# boss transforms where it stands.
+execute if score @s rdPhase matches 0 if score @s rdRage matches {RAGE_MAX}.. if score @s rdPat matches 0 unless score @s rdBlink matches 1.. run function rlk:boss/raiden/transform_start
 execute if score @s rdPhase matches 1 run function rlk:boss/raiden/transform_tick
 execute if score @s rdPhase matches 2 run function rlk:boss/raiden/armor_tick
 execute if score @s rdPhase matches 3 run function rlk:boss/raiden/exhausted_tick
@@ -295,13 +297,9 @@ scoreboard players set @s rdPhase 1
 scoreboard players set @s rdPat 0
 scoreboard players set @s rdTime 0
 scoreboard players add @s rdCycle 1
-# Scatter to the arena centre (depart here, reform there) instead of snapping to it;
-# an unfinished blink is redirected there. Relocation lands by rdTime 4 at the latest.
+# Transforms where it stands (normally only after its pattern ended). A test/forced
+# start can land mid-blink: let that blink finish in place without a destination.
 kill @e[tag=rlk_rd_blink_dest]
-scoreboard players set #rdGo rd 0
-execute if score @s rdBlink matches 1.. run scoreboard players set #rdGo rd 1
-execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..1.5] run scoreboard players set #rdGo rd 1
-execute if score #rdGo rd matches 1 at @e[tag=rlk_raiden_arena,limit=1] run function rlk:boss/raiden/movement/blink_to
 scoreboard players set @s rdAnim 9
 execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
 execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
@@ -316,8 +314,8 @@ scoreboard players set #rdCap rd 1
 scoreboard players set #rdCapPat rd 0
 playsound minecraft:entity.wither.spawn hostile @a[tag=player] ~ ~ ~ 0.8 0.5 0.4
 ''')
-# The blink relocates by rdTime 3-4 and the rig reforms on 7-8, so the burst and its
-# danger circle start at the centre on TRANSFORM_FX; the transform clip (46) ends ~54.
+# The burst and its danger circle start at the boss on TRANSFORM_FX; the transform
+# clip (46) ends before armor_start at TRANSFORM_LEN.
 write('transform_tick',[caption('악요의 요구우 텐마 · 변신'),
     at(str(TRANSFORM_FX),call('vfx/transform')),at(str(TRANSFORM_FX),haz(8,30,18,42)),
     at(str(TRANSFORM_FX+14),sound('entity.lightning_bolt.thunder',.6,.7)),

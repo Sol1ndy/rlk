@@ -9,13 +9,9 @@ scoreboard players set @s rdPhase 1
 scoreboard players set @s rdPat 0
 scoreboard players set @s rdTime 0
 scoreboard players add @s rdCycle 1
-# Scatter to the arena centre (depart here, reform there) instead of snapping to it;
-# an unfinished blink is redirected there. Relocation lands by rdTime 4 at the latest.
+# Transforms where it stands (normally only after its pattern ended). A test/forced
+# start can land mid-blink: let that blink finish in place without a destination.
 kill @e[tag=rlk_rd_blink_dest]
-scoreboard players set #rdGo rd 0
-execute if score @s rdBlink matches 1.. run scoreboard players set #rdGo rd 1
-execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..1.5] run scoreboard players set #rdGo rd 1
-execute if score #rdGo rd matches 1 at @e[tag=rlk_raiden_arena,limit=1] run function rlk:boss/raiden/movement/blink_to
 scoreboard players set @s rdAnim 9
 execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
 execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
