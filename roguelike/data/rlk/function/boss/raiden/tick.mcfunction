@@ -5,7 +5,7 @@ execute if score @s rdHitCD matches 1.. run scoreboard players remove @s rdHitCD
 execute if score @s rdCool matches 1.. run scoreboard players remove @s rdCool 1
 scoreboard players add @s rdTime 1
 execute if score @s rdPhase matches 0 run scoreboard players add @s rdRage 1
-execute if score @s rdPhase matches 0 if score @s rdRage matches 600.. run function rlk:boss/raiden/transform_start
+execute if score @s rdPhase matches 0 if score @s rdRage matches 900.. run function rlk:boss/raiden/transform_start
 execute if score @s rdPhase matches 1 run function rlk:boss/raiden/transform_tick
 execute if score @s rdPhase matches 2 run function rlk:boss/raiden/armor_tick
 execute if score @s rdPhase matches 3 run function rlk:boss/raiden/exhausted_tick

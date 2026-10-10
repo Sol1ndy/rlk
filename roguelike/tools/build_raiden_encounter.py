@@ -42,6 +42,8 @@ FLOWER_BREAK = 190
 DRAIN_DEFAULT = 2
 DRAIN = {1:6, 4:6, 2:3, 5:3, 6:3, 7:4}
 DRAIN_REACTION = 1
+# Malice energy: normal-phase ticks before the transformation (45 s, was 30 s).
+RAGE_MAX = 900
 # Transformation: scatter to the centre, then the transformation burst/clip.
 TRANSFORM_FX = 6
 TRANSFORM_LEN = 56
@@ -164,7 +166,7 @@ execute if score @s rdHitCD matches 1.. run scoreboard players remove @s rdHitCD
 execute if score @s rdCool matches 1.. run scoreboard players remove @s rdCool 1
 scoreboard players add @s rdTime 1
 execute if score @s rdPhase matches 0 run scoreboard players add @s rdRage 1
-execute if score @s rdPhase matches 0 if score @s rdRage matches 600.. run function rlk:boss/raiden/transform_start
+execute if score @s rdPhase matches 0 if score @s rdRage matches {RAGE_MAX}.. run function rlk:boss/raiden/transform_start
 execute if score @s rdPhase matches 1 run function rlk:boss/raiden/transform_tick
 execute if score @s rdPhase matches 2 run function rlk:boss/raiden/armor_tick
 execute if score @s rdPhase matches 3 run function rlk:boss/raiden/exhausted_tick
@@ -354,7 +356,7 @@ bossbar set rlk:narukami_state visible true
 scoreboard players set #rdBar rd 1
 execute store result bossbar rlk:narukami max run scoreboard players get @s mhpM
 execute store result bossbar rlk:narukami value run scoreboard players get @s mhpC
-execute if score @s rdPhase matches 0 run bossbar set rlk:narukami_state max 600
+execute if score @s rdPhase matches 0 run bossbar set rlk:narukami_state max {RAGE_MAX}
 execute if score @s rdPhase matches 0 store result bossbar rlk:narukami_state value run scoreboard players get @s rdRage
 execute if score @s rdPhase matches 0..1 run bossbar set rlk:narukami_state name {{text:"악연의 에너지",color:"light_purple"}}
 execute if score @s rdPhase matches 1 run bossbar set rlk:narukami_state max {TRANSFORM_LEN}
@@ -381,11 +383,11 @@ scoreboard players operation #rdAfter rd -= #dmg tmp
 execute if score @s rdPhase matches 0 if score @s rdCycle matches 0 if score #rdAfter rd <= #rdFloor rd run function rlk:boss/raiden/threshold
 execute if score #dmg tmp matches 1.. run function rlk:boss/raiden/rig/flash
 ''')
-write('threshold','''
+write('threshold',f'''
 scoreboard players operation #dmg tmp = @s mhpC
 scoreboard players operation #dmg tmp -= #rdFloor rd
 execute if score #dmg tmp matches ..0 run scoreboard players set #dmg tmp 0
-scoreboard players set @s rdRage 600
+scoreboard players set @s rdRage {RAGE_MAX}
 ''')
 write('shield_hit','''
 # Armor absorbs 80% body damage. Every character can break it; fire and ice work fastest.
