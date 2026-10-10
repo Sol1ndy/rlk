@@ -311,6 +311,9 @@ title @a[tag=player] title {text:"악요의 요구우 텐마",color:"light_purpl
 scoreboard players set @a[tag=player] vBig 79
 scoreboard players set @a[tag=player] ttlT 79
 scoreboard players set #rdCap rd 1
+# Not a pattern caption: an interrupted illusion caption must not let armor_start's
+# finish (rdTime 56) cut this one short.
+scoreboard players set #rdCapPat rd 0
 playsound minecraft:entity.wither.spawn hostile @a[tag=player] ~ ~ ~ 0.8 0.5 0.4
 ''')
 # The blink relocates by rdTime 3-4 and the rig reforms on 7-8, so the burst and its
@@ -462,45 +465,45 @@ face='execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet'
 flat='execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0'
 target='execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ run '
 center='execute at @e[tag=rlk_raiden_arena,limit=1] run '
-# Short tells (12-19 ticks), then 6-8 ticks of recovery before the next wind-up.
+# Short tells (8-13 ticks; eyes 18), then 4-7 ticks of recovery before the next wind-up.
 # Every wind clip (slash/thrust 6, cast 10, sweep/clap/slam 8, judgment 14) still
 # reaches its hold pose before the strike clip starts 3-4 ticks ahead of contact.
 
 p=pattern(1,'태도 연격 · 옆이나 뒤로 회피')
-for t,n in [(1,3),(19,4),(37,3)]:
-    event(p,t,face,flat,anim(2),haz(1,12,9))
-    event(p,t+12,anim(n),sound('entity.player.attack.sweep',1,.7))
-event(p,55,anim(20),haz(8,13,14));event(p,68,anim(4));end(p,76)
+for t,n in [(1,3),(14,4),(27,3)]:
+    event(p,t,face,flat,anim(2),haz(1,8,9))
+    event(p,t+8,anim(n),sound('entity.player.attack.sweep',1,.7))
+event(p,40,anim(20),haz(8,9,14));event(p,49,anim(4));end(p,55)
 p=pattern(2,'나기나타 · 전방 찌르기와 검파')
-for t in [1,20,39]:
-    event(p,t,face,flat,anim(5),haz(2,13,10));event(p,t+13,anim(6),sound('item.trident.throw',1,.72))
-event(p,58,anim(7),haz(9,14,13));event(p,72,anim(8));end(p,80)
+for t in [1,14,27]:
+    event(p,t,face,flat,anim(5),haz(2,8,10));event(p,t+8,anim(6),sound('item.trident.throw',1,.72))
+event(p,40,anim(7),haz(9,10,13));event(p,50,anim(8));end(p,57)
 p=pattern(3,'뇌명 · 순간이동 후 발도')
 # Each scatter blink keeps the rig hidden for 8 ticks (reforms on blink start + 8).
 event(p,1,anim(21),sound('entity.breeze.charge',.8,.7),call('movement/blink_start'))
-event(p,10,face,flat,anim(2),haz(2,12,16));event(p,22,anim(6),sound('entity.player.attack.sweep',1.1,.65))
-event(p,28,call('movement/blink_start'));event(p,37,face,flat,anim(2),haz(1,13,15));event(p,50,anim(4));end(p,58)
+event(p,10,face,flat,anim(2),haz(2,8,16));event(p,18,anim(6),sound('entity.player.attack.sweep',1.1,.65))
+event(p,24,call('movement/blink_start'));event(p,33,face,flat,anim(2),haz(1,8,15));event(p,41,anim(4));end(p,48)
 p=pattern(4,'마가츠의 뇌안 · 하나를 파괴하고 빈 원으로 이동')
 event(p,1,anim(7),call('eyes_start'))
-event(p,16,anim(8));event(p,46,call('eyes_arm'));event(p,73,anim(18));end(p,84)
+event(p,16,anim(8));event(p,40,call('eyes_arm'));event(p,59,anim(18));end(p,70)
 # Pattern 5 (분신 · 진짜 찾기) belongs to build_raiden_illusions.py; it ends itself.
 patterns[5]=[call('illusion/tick')]
 p=pattern(6,'낙뢰 · 표시된 자리에서 벗어나세요')
-for t in [1,20,39,58]:
-    event(p,t,anim(7),target+haz(3,14,12));event(p,t+14,anim(8),sound('entity.lightning_bolt.impact',.7,.8))
-end(p,80)
+for t in [1,14,27,40]:
+    event(p,t,anim(7),target+haz(3,9,12));event(p,t+9,anim(8),sound('entity.lightning_bolt.impact',.7,.8))
+end(p,54)
 p=pattern(11,'거대 팔 연격 · 검의 궤적과 투척 낙뢰에 주의')
-for t in [1,25]:
-    event(p,t,face,flat,anim(10),haz(4,17,19));event(p,t+17,anim(11),sound('entity.player.attack.sweep',1.2,.62))
-event(p,49,anim(7),target+haz(3,16,22));event(p,65,anim(8));end(p,73)
+for t in [1,17]:
+    event(p,t,face,flat,anim(10),haz(4,11,19));event(p,t+11,anim(11),sound('entity.player.attack.sweep',1.2,.62))
+event(p,33,anim(7),target+haz(3,10,22));event(p,43,anim(8));end(p,50)
 p=pattern(12,'인공팔 협격 · 양손 사이에서 벗어나세요')
-event(p,1,face,flat,anim(12),haz(7,18,25));event(p,19,anim(13),sound('entity.iron_golem.attack',1,.65));end(p,28)
+event(p,1,face,flat,anim(12),haz(7,12,25));event(p,13,anim(13),sound('entity.iron_golem.attack',1,.65));end(p,21)
 p=pattern(13,'인공팔 내려찍기 · 원 밖으로 회피')
-# Contract with build_raiden_rig.mjs: the floating hand lands at hazard age 18; the
+# Contract with build_raiden_rig.mjs: the floating hand lands at hazard age 12 (SLAM_CONTACT); the
 # finish 12 ticks after the second landing leaves its lift-and-fade on screen.
-for t in [1,26]:
-    event(p,t,anim(14),target+haz(6,18,24),target+call('rig/target_slam_spawn'));event(p,t+18,anim(15),sound('entity.generic.explode',.65,.72))
-end(p,56)
+for t in [1,19]:
+    event(p,t,anim(14),target+haz(6,12,24),target+call('rig/target_slam_spawn'));event(p,t+12,anim(15),sound('entity.generic.explode',.65,.72))
+end(p,43)
 p=pattern(14,'천수의 속박 · 퍼지는 번개 고리를 점프로 회피')
 event(p,1,anim(7),call('stakes_start'));event(p,15,anim(8))
 for t,i in [(20,1),(54,2),(88,3)]:event(p,t,call('stakes_pulse_'+str(i)))
@@ -513,14 +516,14 @@ event(p,1,call('judgment_start'),anim(16));event(p,30,sound('block.beacon.ambien
 # The hidden body already waits at centre-8; it reforms there facing the player.
 event(p,120,call('judgment_strike'));event(p,170,face,flat,call('movement/arrive'));end(p,176)
 p=pattern(16,'거검 내려베기 · 길게 표시된 직선에서 벗어나세요')
-event(p,1,face,flat,anim(16),haz(5,19,30));event(p,20,anim(17),sound('entity.lightning_bolt.thunder',.8,.68));end(p,32)
+event(p,1,face,flat,anim(16),haz(5,13,30));event(p,14,anim(17),sound('entity.lightning_bolt.thunder',.8,.68));end(p,25)
 p=pattern(17,'검파 연사 · 다섯 갈래 뒤 넓은 가로 검파')
-event(p,1,face,flat,anim(7),haz(9,16,17));event(p,17,anim(8),sound('entity.breeze.shoot',.8,.72))
-event(p,23,face,flat,anim(10),haz(10,16,21));event(p,39,anim(11));end(p,47)
+event(p,1,face,flat,anim(7),haz(9,10,17));event(p,11,anim(8),sound('entity.breeze.shoot',.8,.72))
+event(p,16,face,flat,anim(10),haz(10,10,21));event(p,26,anim(11));end(p,33)
 p=pattern(18,'발도 돌진 · 고정된 직선 경로를 피하세요')
-event(p,1,face,flat,anim(2),haz(5,16,22));event(p,17,anim(21),sound('item.trident.riptide_3',.7,.8))
-p.append('execute if score @s rdTime matches 17..28 at @s rotated as @s positioned ^ ^ ^0.75 if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] run tp @s ~ ~ ~')
-event(p,31,anim(10),haz(4,13,19));event(p,44,anim(11));end(p,52)
+event(p,1,face,flat,anim(2),haz(5,10,22));event(p,11,anim(21),sound('item.trident.riptide_3',.7,.8))
+p.append('execute if score @s rdTime matches 11..22 at @s rotated as @s positioned ^ ^ ^0.75 if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] run tp @s ~ ~ ~')
+event(p,25,anim(10),haz(4,9,19));event(p,34,anim(11));end(p,41)
 for i,p in patterns.items():write('patterns/'+str(i),p)
 write('blink_relocate','''
 # Hidden middle of a scatter blink. A movement/blink_to marker wins; otherwise reform
@@ -612,7 +615,7 @@ write('eyes_start',[call('object/clear'),
     center+'execute positioned ~10 ~ ~-6 run '+obj(1,'electro_orb',3,2,.3),
     center+'execute positioned ~ ~ ~11 run '+obj(1,'electro_orb',3,3,.3),
     sound('block.beacon.activate',.7,.7)])
-write('eyes_arm',['execute as @e[tag=rlk_rd_object,scores={rdObjKind=1}] at @s run '+haz(12,26,34)])
+write('eyes_arm',['execute as @e[tag=rlk_rd_object,scores={rdObjKind=1}] at @s run '+haz(12,18,34)])
 write('stakes_start',[call('object/clear')]+[
     center+f'execute positioned ~{x} ~ ~{z} run '+obj(4,'lightning_stake',1,i,0)
     for i,(x,z) in enumerate([(-8,-4),(8,-4),(0,9)],1)])
@@ -698,7 +701,12 @@ write('test/start','''
 execute unless entity @s[tag=player] run return run tellraw @s {text:"[보스 테스트] 'player' 태그가 있는 플레이어로 실행하세요.",color:"red"}
 execute unless data storage rlk:room {ready:1b} run return run tellraw @s '''+T+'{text:"던전 구역이 준비되지 않았습니다. 먼저 ",color:"gray",bold:false},'+cmd_link('/function rlk:room/setup')+''',{text:" 을 실행하세요.",color:"gray",bold:false}]
 execute if score #active room matches 1 unless score #rdTest rd matches 1 run return run tellraw @s '''+T+'{text:"진행 중인 런이 있습니다. ",color:"gray",bold:false},'+cmd_link('/function rlk:run/stop')+''',{text:" 후 다시 실행하세요.",color:"gray",bold:false}]
+# Peaceful discards the husk body at once, which would read as an instant win.
+execute store result score #rdDiff rd run difficulty
+execute if score #rdDiff rd matches 0 run return run tellraw @s '''+T+'''{text:"난이도가 '평화로움'이면 나루카미가 나타나지 않습니다. /difficulty easy 이상으로 바꾼 뒤 다시 실행하세요.",color:"gray",bold:false}]
 execute if score @s dead matches 1 run return 0
+# The map screen restores its saved position/game mode on close: close it before moving.
+execute if score @s vMap matches 1 run function rlk:view/map_close
 execute if score @s pkMode matches 1.. run function rlk:lvup/exit
 execute unless score #active room matches 1 run function rlk:run/save_pos
 function rlk:lobby/leave
@@ -727,7 +735,7 @@ write('test/armored','''
 # /function rlk:boss/raiden/test/armored: fresh test fight, transformed straight away.
 function rlk:boss/raiden/test/start
 execute unless score #rdTest rd matches 1 run return 0
-execute as @e[tag=rlk_raiden,limit=1] at @s run function rlk:boss/raiden/transform_start
+execute as @e[tag=rlk_raiden,scores={rdDeath=0},limit=1] at @s run function rlk:boss/raiden/transform_start
 tellraw @s '''+T+'{text:"바로 악요의 요구우 텐마(갑주 단계)로 변신합니다.",color:"white",bold:false}]')
 write('test/pattern','''
 # /function rlk:boss/raiden/test/pattern {id:N}: N = 1~6 (normal) or 11~18 (armored), once.

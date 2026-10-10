@@ -5,7 +5,12 @@
 execute unless entity @s[tag=player] run return run tellraw @s {text:"[보스 테스트] 'player' 태그가 있는 플레이어로 실행하세요.",color:"red"}
 execute unless data storage rlk:room {ready:1b} run return run tellraw @s [{text:"[보스 테스트] ",color:"light_purple",bold:true},{text:"던전 구역이 준비되지 않았습니다. 먼저 ",color:"gray",bold:false},{text:"/function rlk:room/setup",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:room/setup"}},{text:" 을 실행하세요.",color:"gray",bold:false}]
 execute if score #active room matches 1 unless score #rdTest rd matches 1 run return run tellraw @s [{text:"[보스 테스트] ",color:"light_purple",bold:true},{text:"진행 중인 런이 있습니다. ",color:"gray",bold:false},{text:"/function rlk:run/stop",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:run/stop"}},{text:" 후 다시 실행하세요.",color:"gray",bold:false}]
+# Peaceful discards the husk body at once, which would read as an instant win.
+execute store result score #rdDiff rd run difficulty
+execute if score #rdDiff rd matches 0 run return run tellraw @s [{text:"[보스 테스트] ",color:"light_purple",bold:true},{text:"난이도가 '평화로움'이면 나루카미가 나타나지 않습니다. /difficulty easy 이상으로 바꾼 뒤 다시 실행하세요.",color:"gray",bold:false}]
 execute if score @s dead matches 1 run return 0
+# The map screen restores its saved position/game mode on close: close it before moving.
+execute if score @s vMap matches 1 run function rlk:view/map_close
 execute if score @s pkMode matches 1.. run function rlk:lvup/exit
 execute unless score #active room matches 1 run function rlk:run/save_pos
 function rlk:lobby/leave

@@ -1,29 +1,25 @@
-execute if score @s rdRigT matches 7.. run return 0
+execute if score @s rdRigT matches 6.. run return 0
 execute if score @s rdPhase matches 0 if score @s rdRigT matches 0 run function rlk:boss/raiden/rig/poses/normal/thrust_wind/0
 execute if score @s rdPhase matches 0 if score @s rdRigT matches 1 run function rlk:boss/raiden/rig/poses/normal/thrust_wind/1
 execute if score @s rdPhase matches 0 if score @s rdRigT matches 2 run function rlk:boss/raiden/rig/poses/normal/thrust_wind/2
 execute if score @s rdPhase matches 0 if score @s rdRigT matches 3 run function rlk:boss/raiden/rig/poses/normal/thrust_wind/3
 execute if score @s rdPhase matches 0 if score @s rdRigT matches 4 run function rlk:boss/raiden/rig/poses/normal/thrust_wind/4
 execute if score @s rdPhase matches 0 if score @s rdRigT matches 5 run function rlk:boss/raiden/rig/poses/normal/thrust_wind/5
-execute if score @s rdPhase matches 0 if score @s rdRigT matches 6 run function rlk:boss/raiden/rig/poses/normal/thrust_wind/6
 execute if score @s rdPhase matches 1 if score @s rdRigT matches 0 run function rlk:boss/raiden/rig/poses/forming/thrust_wind/0
 execute if score @s rdPhase matches 1 if score @s rdRigT matches 1 run function rlk:boss/raiden/rig/poses/forming/thrust_wind/1
 execute if score @s rdPhase matches 1 if score @s rdRigT matches 2 run function rlk:boss/raiden/rig/poses/forming/thrust_wind/2
 execute if score @s rdPhase matches 1 if score @s rdRigT matches 3 run function rlk:boss/raiden/rig/poses/forming/thrust_wind/3
 execute if score @s rdPhase matches 1 if score @s rdRigT matches 4 run function rlk:boss/raiden/rig/poses/forming/thrust_wind/4
 execute if score @s rdPhase matches 1 if score @s rdRigT matches 5 run function rlk:boss/raiden/rig/poses/forming/thrust_wind/5
-execute if score @s rdPhase matches 1 if score @s rdRigT matches 6 run function rlk:boss/raiden/rig/poses/forming/thrust_wind/6
 execute if score @s rdPhase matches 2 if score @s rdRigT matches 0 run function rlk:boss/raiden/rig/poses/armored/thrust_wind/0
 execute if score @s rdPhase matches 2 if score @s rdRigT matches 1 run function rlk:boss/raiden/rig/poses/armored/thrust_wind/1
 execute if score @s rdPhase matches 2 if score @s rdRigT matches 2 run function rlk:boss/raiden/rig/poses/armored/thrust_wind/2
 execute if score @s rdPhase matches 2 if score @s rdRigT matches 3 run function rlk:boss/raiden/rig/poses/armored/thrust_wind/3
 execute if score @s rdPhase matches 2 if score @s rdRigT matches 4 run function rlk:boss/raiden/rig/poses/armored/thrust_wind/4
 execute if score @s rdPhase matches 2 if score @s rdRigT matches 5 run function rlk:boss/raiden/rig/poses/armored/thrust_wind/5
-execute if score @s rdPhase matches 2 if score @s rdRigT matches 6 run function rlk:boss/raiden/rig/poses/armored/thrust_wind/6
 execute if score @s rdPhase matches 3 if score @s rdRigT matches 0 run function rlk:boss/raiden/rig/poses/exhausted/thrust_wind/0
 execute if score @s rdPhase matches 3 if score @s rdRigT matches 1 run function rlk:boss/raiden/rig/poses/exhausted/thrust_wind/1
 execute if score @s rdPhase matches 3 if score @s rdRigT matches 2 run function rlk:boss/raiden/rig/poses/exhausted/thrust_wind/2
 execute if score @s rdPhase matches 3 if score @s rdRigT matches 3 run function rlk:boss/raiden/rig/poses/exhausted/thrust_wind/3
 execute if score @s rdPhase matches 3 if score @s rdRigT matches 4 run function rlk:boss/raiden/rig/poses/exhausted/thrust_wind/4
 execute if score @s rdPhase matches 3 if score @s rdRigT matches 5 run function rlk:boss/raiden/rig/poses/exhausted/thrust_wind/5
-execute if score @s rdPhase matches 3 if score @s rdRigT matches 6 run function rlk:boss/raiden/rig/poses/exhausted/thrust_wind/6

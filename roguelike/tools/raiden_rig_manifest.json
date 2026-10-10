@@ -22,7 +22,7 @@
     "hands": "exact hand pivot/rotation/scale; charge, inward focus, contact release; smaller rear hands never emit large release crowns; the clap charge sits on the two support hands",
     "chakra": "sparse outer-rim forks; idle intermittent, charged attacks sustained; empty centre preserves face visibility"
   },
-  "targetSlam": "dull support hand, palm down; grows from age 1, falls from age 15, contacts the ground at hazard age 18, removed at age 32",
+  "targetSlam": "dull support hand, palm down; grows from age 1, falls from age 9, contacts the ground at hazard age 12, removed at age 26",
   "clips": [
     {
       "id": 0,
@@ -39,7 +39,7 @@
     {
       "id": 2,
       "name": "slash_wind",
-      "length": 6,
+      "length": 5,
       "loop": false
     },
     {
@@ -57,7 +57,7 @@
     {
       "id": 5,
       "name": "thrust_wind",
-      "length": 6,
+      "length": 5,
       "loop": false
     },
     {
@@ -69,7 +69,7 @@
     {
       "id": 7,
       "name": "cast_wind",
-      "length": 10,
+      "length": 6,
       "loop": false
     },
     {
@@ -87,7 +87,7 @@
     {
       "id": 10,
       "name": "arm_sweep_wind",
-      "length": 8,
+      "length": 6,
       "loop": false
     },
     {
@@ -123,7 +123,7 @@
     {
       "id": 16,
       "name": "judgment_wind",
-      "length": 14,
+      "length": 9,
       "loop": false
     },
     {

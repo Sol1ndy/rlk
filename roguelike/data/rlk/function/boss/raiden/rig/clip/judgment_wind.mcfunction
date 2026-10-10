@@ -1,4 +1,4 @@
-execute if score @s rdRigT matches 15.. run return 0
+execute if score @s rdRigT matches 10.. run return 0
 execute if score @s rdPhase matches 0 if score @s rdRigT matches 0 run function rlk:boss/raiden/rig/poses/normal/judgment_wind/0
 execute if score @s rdPhase matches 0 if score @s rdRigT matches 1 run function rlk:boss/raiden/rig/poses/normal/judgment_wind/1
 execute if score @s rdPhase matches 0 if score @s rdRigT matches 2 run function rlk:boss/raiden/rig/poses/normal/judgment_wind/2
@@ -9,11 +9,6 @@ execute if score @s rdPhase matches 0 if score @s rdRigT matches 6 run function 
 execute if score @s rdPhase matches 0 if score @s rdRigT matches 7 run function rlk:boss/raiden/rig/poses/normal/judgment_wind/7
 execute if score @s rdPhase matches 0 if score @s rdRigT matches 8 run function rlk:boss/raiden/rig/poses/normal/judgment_wind/8
 execute if score @s rdPhase matches 0 if score @s rdRigT matches 9 run function rlk:boss/raiden/rig/poses/normal/judgment_wind/9
-execute if score @s rdPhase matches 0 if score @s rdRigT matches 10 run function rlk:boss/raiden/rig/poses/normal/judgment_wind/10
-execute if score @s rdPhase matches 0 if score @s rdRigT matches 11 run function rlk:boss/raiden/rig/poses/normal/judgment_wind/11
-execute if score @s rdPhase matches 0 if score @s rdRigT matches 12 run function rlk:boss/raiden/rig/poses/normal/judgment_wind/12
-execute if score @s rdPhase matches 0 if score @s rdRigT matches 13 run function rlk:boss/raiden/rig/poses/normal/judgment_wind/13
-execute if score @s rdPhase matches 0 if score @s rdRigT matches 14 run function rlk:boss/raiden/rig/poses/normal/judgment_wind/14
 execute if score @s rdPhase matches 1 if score @s rdRigT matches 0 run function rlk:boss/raiden/rig/poses/forming/judgment_wind/0
 execute if score @s rdPhase matches 1 if score @s rdRigT matches 1 run function rlk:boss/raiden/rig/poses/forming/judgment_wind/1
 execute if score @s rdPhase matches 1 if score @s rdRigT matches 2 run function rlk:boss/raiden/rig/poses/forming/judgment_wind/2
@@ -24,11 +19,6 @@ execute if score @s rdPhase matches 1 if score @s rdRigT matches 6 run function 
 execute if score @s rdPhase matches 1 if score @s rdRigT matches 7 run function rlk:boss/raiden/rig/poses/forming/judgment_wind/7
 execute if score @s rdPhase matches 1 if score @s rdRigT matches 8 run function rlk:boss/raiden/rig/poses/forming/judgment_wind/8
 execute if score @s rdPhase matches 1 if score @s rdRigT matches 9 run function rlk:boss/raiden/rig/poses/forming/judgment_wind/9
-execute if score @s rdPhase matches 1 if score @s rdRigT matches 10 run function rlk:boss/raiden/rig/poses/forming/judgment_wind/10
-execute if score @s rdPhase matches 1 if score @s rdRigT matches 11 run function rlk:boss/raiden/rig/poses/forming/judgment_wind/11
-execute if score @s rdPhase matches 1 if score @s rdRigT matches 12 run function rlk:boss/raiden/rig/poses/forming/judgment_wind/12
-execute if score @s rdPhase matches 1 if score @s rdRigT matches 13 run function rlk:boss/raiden/rig/poses/forming/judgment_wind/13
-execute if score @s rdPhase matches 1 if score @s rdRigT matches 14 run function rlk:boss/raiden/rig/poses/forming/judgment_wind/14
 execute if score @s rdPhase matches 2 if score @s rdRigT matches 0 run function rlk:boss/raiden/rig/poses/armored/judgment_wind/0
 execute if score @s rdPhase matches 2 if score @s rdRigT matches 1 run function rlk:boss/raiden/rig/poses/armored/judgment_wind/1
 execute if score @s rdPhase matches 2 if score @s rdRigT matches 2 run function rlk:boss/raiden/rig/poses/armored/judgment_wind/2
@@ -39,11 +29,6 @@ execute if score @s rdPhase matches 2 if score @s rdRigT matches 6 run function 
 execute if score @s rdPhase matches 2 if score @s rdRigT matches 7 run function rlk:boss/raiden/rig/poses/armored/judgment_wind/7
 execute if score @s rdPhase matches 2 if score @s rdRigT matches 8 run function rlk:boss/raiden/rig/poses/armored/judgment_wind/8
 execute if score @s rdPhase matches 2 if score @s rdRigT matches 9 run function rlk:boss/raiden/rig/poses/armored/judgment_wind/9
-execute if score @s rdPhase matches 2 if score @s rdRigT matches 10 run function rlk:boss/raiden/rig/poses/armored/judgment_wind/10
-execute if score @s rdPhase matches 2 if score @s rdRigT matches 11 run function rlk:boss/raiden/rig/poses/armored/judgment_wind/11
-execute if score @s rdPhase matches 2 if score @s rdRigT matches 12 run function rlk:boss/raiden/rig/poses/armored/judgment_wind/12
-execute if score @s rdPhase matches 2 if score @s rdRigT matches 13 run function rlk:boss/raiden/rig/poses/armored/judgment_wind/13
-execute if score @s rdPhase matches 2 if score @s rdRigT matches 14 run function rlk:boss/raiden/rig/poses/armored/judgment_wind/14
 execute if score @s rdPhase matches 3 if score @s rdRigT matches 0 run function rlk:boss/raiden/rig/poses/exhausted/judgment_wind/0
 execute if score @s rdPhase matches 3 if score @s rdRigT matches 1 run function rlk:boss/raiden/rig/poses/exhausted/judgment_wind/1
 execute if score @s rdPhase matches 3 if score @s rdRigT matches 2 run function rlk:boss/raiden/rig/poses/exhausted/judgment_wind/2
@@ -54,8 +39,3 @@ execute if score @s rdPhase matches 3 if score @s rdRigT matches 6 run function 
 execute if score @s rdPhase matches 3 if score @s rdRigT matches 7 run function rlk:boss/raiden/rig/poses/exhausted/judgment_wind/7
 execute if score @s rdPhase matches 3 if score @s rdRigT matches 8 run function rlk:boss/raiden/rig/poses/exhausted/judgment_wind/8
 execute if score @s rdPhase matches 3 if score @s rdRigT matches 9 run function rlk:boss/raiden/rig/poses/exhausted/judgment_wind/9
-execute if score @s rdPhase matches 3 if score @s rdRigT matches 10 run function rlk:boss/raiden/rig/poses/exhausted/judgment_wind/10
-execute if score @s rdPhase matches 3 if score @s rdRigT matches 11 run function rlk:boss/raiden/rig/poses/exhausted/judgment_wind/11
-execute if score @s rdPhase matches 3 if score @s rdRigT matches 12 run function rlk:boss/raiden/rig/poses/exhausted/judgment_wind/12
-execute if score @s rdPhase matches 3 if score @s rdRigT matches 13 run function rlk:boss/raiden/rig/poses/exhausted/judgment_wind/13
-execute if score @s rdPhase matches 3 if score @s rdRigT matches 14 run function rlk:boss/raiden/rig/poses/exhausted/judgment_wind/14

@@ -2,7 +2,7 @@
 execute if score @s rdTime matches 1 at @s rotated as @s run execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
 execute if score @s rdTime matches 1 at @s rotated as @s run execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
 execute if score @s rdTime matches 1 at @s rotated as @s run scoreboard players set @s rdAnim 12
-execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/hazard/create {shape:7,tell:18,damage:25,life:28}
-execute if score @s rdTime matches 16 at @s rotated as @s run scoreboard players set @s rdAnim 13
-execute if score @s rdTime matches 19 at @s rotated as @s run playsound minecraft:entity.iron_golem.attack hostile @a[tag=player] ~ ~ ~ 1 0.65 0.3
-execute if score @s rdTime matches 28 at @s rotated as @s run function rlk:boss/raiden/finish
+execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/hazard/create {shape:7,tell:12,damage:25,life:22}
+execute if score @s rdTime matches 10 at @s rotated as @s run scoreboard players set @s rdAnim 13
+execute if score @s rdTime matches 13 at @s rotated as @s run playsound minecraft:entity.iron_golem.attack hostile @a[tag=player] ~ ~ ~ 1 0.65 0.3
+execute if score @s rdTime matches 21 at @s rotated as @s run function rlk:boss/raiden/finish

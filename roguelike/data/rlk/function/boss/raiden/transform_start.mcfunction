@@ -25,4 +25,7 @@ title @a[tag=player] title {text:"악요의 요구우 텐마",color:"light_purpl
 scoreboard players set @a[tag=player] vBig 79
 scoreboard players set @a[tag=player] ttlT 79
 scoreboard players set #rdCap rd 1
+# Not a pattern caption: an interrupted illusion caption must not let armor_start's
+# finish (rdTime 56) cut this one short.
+scoreboard players set #rdCapPat rd 0
 playsound minecraft:entity.wither.spawn hostile @a[tag=player] ~ ~ ~ 0.8 0.5 0.4
