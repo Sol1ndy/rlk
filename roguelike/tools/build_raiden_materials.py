@@ -28,6 +28,20 @@ PALETTE = {
     "blue": (61, 64, 199, 148),
     "shield_glass": (115, 191, 255, 22),
     "shield_mist": (177, 222, 255, 44),
+    # Opaque armour palette (Baleful Shadowlord puppet arms, giant katana,
+    # support hands). Alpha 255 keeps these on the solid item sheet.
+    "arm_lilac": (201, 182, 236, 255),
+    "arm_shade": (154, 130, 207, 255),
+    "arm_deep": (75, 45, 122, 255),
+    "arm_tomoe": (58, 37, 96, 255),
+    "gold_dull": (184, 154, 94, 255),
+    "blade_pale": (215, 198, 247, 255),
+    "blade_edge": (245, 240, 255, 255),
+    "blade_core": (156, 120, 224, 255),
+    "grip_dark": (44, 30, 66, 255),
+    "hand_dull": (122, 110, 115, 255),
+    "hand_dull_dark": (86, 75, 82, 255),
+    "nail_glow": (199, 125, 255, 255),
 }
 
 
