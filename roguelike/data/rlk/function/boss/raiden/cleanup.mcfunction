@@ -1,4 +1,4 @@
 function rlk:boss/raiden/camera/release_all
+function rlk:boss/raiden/illusion/cleanup
 kill @e[tag=rlk_raiden_aux]
-bossbar set rlk:narukami visible false
-bossbar set rlk:narukami_state visible false
+function rlk:boss/raiden/bars_hide

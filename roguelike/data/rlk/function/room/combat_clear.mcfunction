@@ -6,4 +6,6 @@ execute as @e[tag=rlk_seal] run function rlk:room/seal_out
 execute unless score #k1 snd matches 1 run function rlk:snd/f1
 execute unless score #k2 snd matches 1 run function rlk:snd/f2
 execute as @a[tag=player,limit=1] run function rlk:room/msg {t:"구역 정리",c:"#8FD46A"}
-execute if score @s zkind matches 9 run function rlk:room/obj/k_chapter
+execute if score @s zkind matches 9 unless score #rdTest rd matches 1 run function rlk:room/obj/k_chapter
+# 보스 테스트(boss/raiden/test/start) 중이면 다음 챕터 대신 다시 하기 / 로비로 안내
+execute if score @s zkind matches 9 if score #rdTest rd matches 1 run function rlk:boss/raiden/test/won

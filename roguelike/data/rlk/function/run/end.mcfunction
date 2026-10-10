@@ -1,6 +1,8 @@
 # 런 종료 공통 처리: 방 치우기 + 지도 회수
 execute as @a[tag=player,scores={vMap=1}] run function rlk:view/map_close
 scoreboard players set #active room 0
+# 보스 테스트 상태도 함께 끝낸다
+scoreboard players set #rdTest rd 0
 execute in minecraft:overworld run function rlk:room/clear
 clear @a minecraft:filled_map[minecraft:custom_data~{rlk_map:1b}]
 clear @a *[minecraft:custom_data~{rlk_ui:{role:"map"}}]

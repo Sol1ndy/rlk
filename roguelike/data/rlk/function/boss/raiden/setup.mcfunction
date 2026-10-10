@@ -12,6 +12,7 @@ bossbar set rlk:narukami players @a[tag=player]
 bossbar set rlk:narukami visible true
 bossbar set rlk:narukami_state players @a[tag=player]
 bossbar set rlk:narukami_state visible true
+scoreboard players set #rdBar rd 1
 title @a[tag=player] times 8 60 16
 title @a[tag=player] title {text:"마가츠 미타케 나루카미노 미코토",color:"light_purple",bold:true}
 title @a[tag=player] subtitle {text:"바닥의 보랏빛 예고를 보고 회피하세요",color:"white"}

@@ -4,5 +4,7 @@ execute if score @s rdTime matches 1 at @s rotated as @s run scoreboard players 
 execute if score @s rdTime matches 30 at @s rotated as @s run playsound minecraft:block.beacon.ambient hostile @a[tag=player] ~ ~ ~ 0.6 0.5 0.3
 execute if score @s rdTime matches 70 at @s rotated as @s run playsound minecraft:block.portal.ambient hostile @a[tag=player] ~ ~ ~ 0.45 0.55 0.3
 execute if score @s rdTime matches 120 at @s rotated as @s run function rlk:boss/raiden/judgment_strike
+execute if score @s rdTime matches 170 at @s rotated as @s run execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
+execute if score @s rdTime matches 170 at @s rotated as @s run execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
 execute if score @s rdTime matches 170 at @s rotated as @s run function rlk:boss/raiden/movement/arrive
 execute if score @s rdTime matches 176 at @s rotated as @s run function rlk:boss/raiden/finish

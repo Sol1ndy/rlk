@@ -7,5 +7,6 @@ execute if score @s rdObjKind matches 1 at @s run kill @e[tag=rlk_rd_hazard,dist
 execute if score @s rdObjKind matches 1 run scoreboard players remove @e[tag=rlk_raiden] rdRage 50
 execute as @e[tag=rlk_raiden,scores={rdRage=..-1}] run scoreboard players set @s rdRage 0
 execute if score @s rdObjKind matches 3 at @s run function rlk:boss/raiden/dome_create
-execute if score @s rdObjKind matches 2 if score @s rdReal matches 1 as @e[tag=rlk_raiden,limit=1] at @s run function rlk:boss/raiden/illusion_win
+# As the broken illusion object, before it is removed (build_raiden_illusions.py).
+execute if score @s rdObjKind matches 2 at @s run function rlk:boss/raiden/illusion/on_break
 kill @s

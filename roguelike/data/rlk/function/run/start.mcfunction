@@ -7,6 +7,8 @@ execute if score #diff tmp matches 0 run tellraw @s [{"text":"[런] ","color":"r
 # 돌아올 자리 기억(런을 이미 진행 중이면 유지)
 execute unless score #active room matches 1 run function rlk:run/save_pos
 function rlk:player/reset_one
+# 보스 테스트 중에 시작해도 일반 런으로 진행
+scoreboard players set #rdTest rd 0
 scoreboard players set #active room 1
 scoreboard players set #chapter room 1
 scoreboard players reset #seen1 room

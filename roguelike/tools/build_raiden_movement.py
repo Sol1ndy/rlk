@@ -2,6 +2,8 @@
 
 The controller owns blink_relocate and hides/protects the actual boss whenever
 rdBlink is 1..9. This module owns the departure/arrival art and its short life.
+Every visible relocation of the boss goes through blink_start (destination: in
+front of the player) or blink_to (destination: the execution position).
 The ghost dissolves into horizontal fragments, lightning seams and speed
 streaks, then reforms at the destination; no particles or copied imagery.
 """
@@ -127,6 +129,7 @@ def build(datapack,resourcepack):
     fn('init',[f'scoreboard objectives add {name} dummy' for name in
                ('rdBlink','rdWalk','rdWalkDir','rdMvAge','rdMvKind','rdMvPhase')])
     fn('cleanup',['kill @e[tag=rlk_rd_move_fx]',
+                  'kill @e[tag=rlk_rd_blink_dest]',
                   'scoreboard players set @e[tag=rlk_raiden] rdBlink 0',
                   'scoreboard players set @e[tag=rlk_raiden] rdWalk 0'])
     fn('blink_start',[
@@ -137,6 +140,17 @@ def build(datapack,resourcepack):
         'scoreboard players set @s rdAnim 21',
         'function rlk:boss/raiden/movement/depart',
         'playsound minecraft:item.trident.throw hostile @a[tag=player] ~ ~1 ~ 0.6 1.45 0.15',
+    ])
+    fn('blink_to',[
+        '# @s boss; the execution position is the destination (e.g. positioned at the arena centre).',
+        '# Scatter blink: depart art where the boss stands, hidden travel, the controller\'s',
+        '# blink_relocate (rdBlink 4) consumes the rlk_rd_blink_dest marker, arrive art there.',
+        'kill @e[tag=rlk_rd_blink_dest]',
+        'summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_blink_dest"]}',
+        '# A blink that has not relocated yet simply takes the new destination.',
+        'execute if score @s rdBlink matches 1..3 run return 0',
+        'scoreboard players set @s rdBlink 0',
+        'execute at @s run function rlk:boss/raiden/movement/blink_start',
     ])
     fn('blink_tick',[
         '# Called once as boss, before its rig; position is refreshed after relocation.',

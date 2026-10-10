@@ -1,6 +1,8 @@
 execute unless entity @e[tag=rlk_raiden,limit=1] run return run function rlk:boss/raiden/cleanup
 execute as @e[tag=rlk_raiden,scores={rdDeath=1},limit=1] at @s run return run function rlk:boss/raiden/death/tick
 execute unless entity @a[tag=player,limit=1] run return 0
+# A dead player means the run (or boss test) is lost: no bars on the death screen.
+execute if entity @a[tag=player,scores={dead=1}] run function rlk:boss/raiden/bars_hide
 execute if entity @a[tag=player,scores={dead=1}] run return run function rlk:boss/raiden/pause
 execute if entity @a[tag=player,scores={rnDie=1..}] run return run function rlk:boss/raiden/pause
 execute if entity @a[tag=player,scores={pkMode=1..}] run return run function rlk:boss/raiden/pause

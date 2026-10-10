@@ -1,0 +1,2 @@
+# From room/combat_clear (boss zone cleared) during a test: no next-chapter object.
+tellraw @a[tag=player] [{text:"[보스 테스트] ",color:"light_purple",bold:true},{text:"나루카미 처치! ",color:"green",bold:false},{text:"[다시 하기]",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/start"}},{text:" ",bold:false},{text:"[로비로]",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/stop"}}]

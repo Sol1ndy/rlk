@@ -33,12 +33,12 @@ scoreboard objectives add rdBlink dummy
 scoreboard objectives add rdCam dummy
 scoreboard objectives add rdDeath dummy
 scoreboard objectives add rdDeathTime dummy
+scoreboard objectives add rdHidden dummy
 bossbar add rlk:narukami {text:"마가츠 미타케 나루카미노 미코토",color:"light_purple"}
 bossbar add rlk:narukami_state {text:"악연의 에너지",color:"light_purple"}
 bossbar set rlk:narukami color purple
 bossbar set rlk:narukami_state color yellow
-bossbar set rlk:narukami visible false
-bossbar set rlk:narukami_state visible false
+function rlk:boss/raiden/bars_hide
 scoreboard players set #rd100 rd 100
 scoreboard players set #rd4 rd 4
 function rlk:boss/raiden/camera/release_all

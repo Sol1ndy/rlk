@@ -1,4 +1,6 @@
 # 현재 맵 치우기 (오버월드에서 실행): 지은 구역·문 블록 제거 + 방 엔티티 제거
+# 나루카미 전투 정리(카메라 복원 · 보조 엔티티 · 보스바 숨김)
+function rlk:boss/raiden/cleanup
 execute as @e[tag=rlk_zone,scores={zst=1..}] run function rlk:room/zone_erase
 execute as @e[tag=rlk_door,scores={dst=1..}] run function rlk:room/door_erase with entity @s data
 kill @e[tag=rlk_room]

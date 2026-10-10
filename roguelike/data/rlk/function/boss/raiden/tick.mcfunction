@@ -11,17 +11,23 @@ execute if score @s rdPhase matches 2 run function rlk:boss/raiden/armor_tick
 execute if score @s rdPhase matches 3 run function rlk:boss/raiden/exhausted_tick
 execute if score @s rdPhase matches 0 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
 execute if score @s rdPhase matches 2 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
-execute if score @s rdPat matches 1..6 run function rlk:boss/raiden/normal_dispatch
-execute if score @s rdPat matches 11..18 run function rlk:boss/raiden/armor_dispatch
+# Timelines start on the tick after choose: rdTime 1 is every pattern's first frame.
+execute if score @s rdPat matches 1..6 if score @s rdTime matches 1.. run function rlk:boss/raiden/normal_dispatch
+execute if score @s rdPat matches 11..18 if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch
 execute if score @s rdPat matches 99 if score @s rdTime matches 60.. run function rlk:boss/raiden/finish
-# Keep the body on the disc; all tracking uses the avatar, never the remote camera.
-execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..21] run tp @s ~ ~ ~
+# Keep the body on the disc without snapping: slide back toward the centre, and only
+# scatter-blink home if it is somehow far outside. Tracking uses the avatar, never the camera.
+execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..21] at @s facing entity @e[tag=rlk_raiden_arena,limit=1] feet rotated ~ 0 positioned ^ ^ ^0.45 run tp @s ~ ~ ~
+execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..26] unless score @s rdBlink matches 1.. run function rlk:boss/raiden/movement/blink_to
 execute if score @s rdBlink matches 1.. run function rlk:boss/raiden/movement/blink_tick
-execute unless score @s rdPat matches 5 unless score @s rdPat matches 15 unless score @s rdBlink matches 1.. at @s run function rlk:boss/raiden/rig/tick
 # Hide the physical rig while illusions, scattering, or the aerial-arm ultimate are active.
-execute if score @s rdPat matches 5 run tp @e[tag=rlk_raiden_part] ~ ~-60 ~
-execute if score @s rdPat matches 15 run tp @e[tag=rlk_raiden_part] ~ ~-60 ~
-execute if score @s rdBlink matches 1.. run tp @e[tag=rlk_raiden_part] ~ ~-60 ~
+scoreboard players set #rdHide rd 0
+execute if score @s rdBlink matches 1.. run scoreboard players set #rdHide rd 1
+execute if score @s rdPat matches 5 if score @s rdTime matches 1.. run scoreboard players set #rdHide rd 1
+execute if score @s rdPat matches 15 if score @s rdTime matches 1.. run scoreboard players set #rdHide rd 1
+execute if score #rdHide rd matches 0 at @s run function rlk:boss/raiden/rig/tick
+execute if score #rdHide rd matches 1 run function rlk:boss/raiden/rig_hide
+execute if score #rdHide rd matches 0 if score @s rdHidden matches 1.. run function rlk:boss/raiden/rig_shown
 execute if score @s rdPat matches 15 run function rlk:boss/raiden/judgment_rig/tick
 execute if score @s rdPat matches 15 if score @s rdTime matches 80..173 run function rlk:boss/raiden/camera/try_start
 execute if score @s rdPat matches 15 if score @s rdTime matches 174 run function rlk:boss/raiden/camera/release_all
