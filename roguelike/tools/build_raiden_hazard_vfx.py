@@ -40,6 +40,8 @@ from build_raiden_fx_textures import (HAZARD_SHAPES, DECALS, DECAL_SYM, RING_R, 
                                       build_fx_textures, catalogue, TEX_SUBDIR, NS)
 
 SCALE = 32
+# Display culling width (blocks) for hazard meshes: the outermost ring frame must fit.
+CULL_W = 2*math.ceil(ring_extent(len(RING_R)-1)*RING_END/RING_R[-1])+2
 # Shapes 13 (illusion sword wave) and 14 (몽상의 일심 disk) are appended; shapes 1-12 keep
 # their hit volumes.
 SHAPES = range(1, 15)
@@ -586,7 +588,8 @@ def build(root, out):
         '# Right-rotate 180deg to cancel that item-only flip: mesh +Z now equals ^ ^ ^forward.',
         'scoreboard players add #rdHazardSerial rd 1',
         'scoreboard players operation @s rdHId = #rdHazardSerial rd',
-        'summon minecraft:item_display ~ ~ ~ {Tags:["rlk_rd_hvfx","rlk_rd_vnew","rlk_raiden_aux","rlk_room"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",interpolation_duration:0,teleport_duration:0,view_range:3f,width:48f,height:22f,shadow_radius:0f,brightness:{block:15,sky:15},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[32f,32f,32f],right_rotation:[0f,1f,0f,0f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/fx_hazard/warning_1"}}}',
+        '# Culling box: wide enough for the outermost ring frame (radius RING_END plus its band).',
+        'summon minecraft:item_display ~ ~ ~ {Tags:["rlk_rd_hvfx","rlk_rd_vnew","rlk_raiden_aux","rlk_room"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",interpolation_duration:0,teleport_duration:0,view_range:3f,width:'+str(CULL_W)+'f,height:22f,shadow_radius:0f,brightness:{block:15,sky:15},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[32f,32f,32f],right_rotation:[0f,1f,0f,0f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/fx_hazard/warning_1"}}}',
         f'data modify entity {new} Rotation set from entity @s Rotation',
         f'scoreboard players operation {new} rdVId = @s rdHId',
         f'scoreboard players operation {new} rdShape = @s rdShape',

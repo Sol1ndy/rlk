@@ -58,9 +58,10 @@ CLAP_LOCK, CLAP_TELL = 17, 14   # pattern 12: hands follow until 17, clap lands 
 SHADOW_LOCK = 37                 # pattern 13: the shadow chases for 36 ticks
 # Close-range patterns and their reach: chosen farther than `start` blocks from the
 # player, she dashes at them (or scatter-blinks in front of them beyond CLOSE_BLINK)
-# until within `stop`, and only then starts. Ranged patterns (3 뇌명, 4, 6, 7, 12-15, 18
-# 발도 돌진) start where she stands.
-REACH = {1: (5.5, 4), 2: (16, 13), 11: (10, 8), 16: (11, 9), 17: (14, 12)}
+# until within `stop`, and only then starts; a dash pinned on the arena rim or timing out
+# scatter-blinks beside the player instead. Ranged patterns (3 뇌명, 4, 6, 7, 12-15) start
+# where she stands; 18 발도 돌진 reaches about 20 blocks (its line, or dash + sweep).
+REACH = {1: (5.5, 4), 2: (16, 13), 11: (10, 8), 16: (11, 9), 17: (14, 12), 18: (20, 17)}
 CLOSE_BLINK, CLOSE_MAX, CLOSE_STEP = 18, 45, (0.55, 0.65)
 # 금강괴멸파 (pattern 14): three stakes spread around the centre; each pulse is a ring that
 # travels from radius 2 to the far wall (RING_END over RING_FRAMES ticks, jump it).
@@ -374,17 +375,27 @@ write('close_in',[
     'scoreboard players set @s rdTime 0',
     'scoreboard players add @s rdGo 1',
     'execute if score @s rdBlink matches 1.. run return 0',
+    '# A blink taken because the dash was pinned or timed out: start where she landed.',
+    'execute if score @s rdGo matches 100.. run return run function rlk:boss/raiden/close_done',
     'execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet',
     'execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0',
     f'execute if score @s rdGo matches 2 at @s unless entity @e[tag=rlk_body,distance=..{CLOSE_BLINK}] run return run function rlk:boss/raiden/movement/blink_start',
     'scoreboard players set #rdNear rd 0']+[
     f'execute if score @s rdPat matches {i} at @s if entity @e[tag=rlk_body,distance=..{stop}] run scoreboard players set #rdNear rd 1' for i,(start,stop) in REACH.items()]+[
     'execute if score #rdNear rd matches 1 run return run function rlk:boss/raiden/close_done',
-    f'execute if score @s rdGo matches {CLOSE_MAX}.. run return run function rlk:boss/raiden/close_done',
+    f'execute if score @s rdGo matches {CLOSE_MAX}.. run return run function rlk:boss/raiden/close_blink',
     'scoreboard players set @s rdAnim 21',
-    f'execute if score @s rdPhase matches 0 at @s rotated as @s positioned ^ ^ ^{CLOSE_STEP[0]} if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] run tp @s ~ ~ ~',
-    f'execute if score @s rdPhase matches 2 at @s rotated as @s positioned ^ ^ ^{CLOSE_STEP[1]} if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] run tp @s ~ ~ ~',
+    'scoreboard players set #rdStep rd 0',
+    f'execute if score @s rdPhase matches 0 at @s rotated as @s positioned ^ ^ ^{CLOSE_STEP[0]} if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] store success score #rdStep rd run tp @s ~ ~ ~',
+    f'execute if score @s rdPhase matches 2 at @s rotated as @s positioned ^ ^ ^{CLOSE_STEP[1]} if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] store success score #rdStep rd run tp @s ~ ~ ~',
+    '# Pinned (the straight line to the player leaves the arena disc, or a block is in the way).',
+    'execute if score #rdStep rd matches 0 run return run function rlk:boss/raiden/close_blink',
     'execute if score @s rdGo matches 3 at @s run playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.5 1.3 0.2',
+])
+write('close_blink',[
+    '# Dash pinned on the rim or timed out: scatter-blink beside the player, then start.',
+    'scoreboard players set @s rdGo 100',
+    'function rlk:boss/raiden/movement/blink_start',
 ])
 write('close_done',[
     'scoreboard players set @s rdGo 0',
@@ -637,7 +648,8 @@ event(p,1,face,flat,anim(20),sound('entity.breeze.charge',.8,.8))
 # Blades leave every 6 ticks; each is marked tell(6) ticks before it flies.
 for t in [4,10,16]:
     event(p,t,face,flat,haz(13,tell(6),10))
-    event(p,t+tell(6),call('object_vfx/slash'),sound('entity.breeze.shoot',.8,1.25))
+    # Blades overlap; launch each wave from its own hazard marker (yaw locked at its tell).
+    event(p,t+tell(6),f'execute as @e[tag=rlk_rd_hazard,scores={{rdShape=13,rdHAge={tell(6)-1}}},limit=1] at @s run '+call('object_vfx/slash'),sound('entity.breeze.shoot',.8,1.25))
 t=16+tell(6)+4
 event(p,t,face,flat,anim(2),haz(10,tell(10),18))
 event(p,t+tell(10),anim(3),call('object_vfx/slash'),sound('entity.player.attack.sweep',1.2,.6))

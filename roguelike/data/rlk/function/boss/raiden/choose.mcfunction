@@ -29,3 +29,4 @@ execute if score @s rdPat matches 2 at @s unless entity @e[tag=rlk_body,distance
 execute if score @s rdPat matches 11 at @s unless entity @e[tag=rlk_body,distance=..10] run scoreboard players set @s rdGo 1
 execute if score @s rdPat matches 16 at @s unless entity @e[tag=rlk_body,distance=..11] run scoreboard players set @s rdGo 1
 execute if score @s rdPat matches 17 at @s unless entity @e[tag=rlk_body,distance=..14] run scoreboard players set @s rdGo 1
+execute if score @s rdPat matches 18 at @s unless entity @e[tag=rlk_body,distance=..20] run scoreboard players set @s rdGo 1
