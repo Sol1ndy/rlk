@@ -26,6 +26,8 @@ if not args.resourcepack.is_dir():
 node = ["node"]
 steps = [
     ["python3", "build_raiden_materials.py", "--resourcepack", rp],
+    # painted gradient lightning sprites (rlk:raiden/fxg/*) used by the effect generators below
+    ["python3", "build_raiden_fx_textures.py", "--resourcepack", rp],
     ["python3", "build_raiden_encounter.py"],
     ["python3", "build_raiden_arena.py"],
     ["python3", "build_raiden_cinematic.py"],

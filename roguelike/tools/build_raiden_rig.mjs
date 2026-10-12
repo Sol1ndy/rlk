@@ -18,11 +18,11 @@ const fn=(n,s)=>put(path.join(rigDir,n+'.mcfunction'),Array.isArray(s)?s.join('\
 const swatch=n=>'rlk:raiden/fx/'+n;
 // Concrete/metal keys serve the normal-phase weapons and encounter objects. The armoured
 // Baleful Shadowlord uses the shared opaque swatches from build_raiden_materials.py.
-const textures={skin:'rlk:raiden/skin',white:'rlk:player_motion/white_concrete',silver:'rlk:player_motion/light_gray_concrete',dark:'rlk:player_motion/black_concrete',purple:'rlk:player_motion/purple_concrete',blue:'rlk:player_motion/blue_concrete',light:'rlk:player_motion/light_blue_concrete',gold:'rlk:cm/fm/metal',deathGlow:swatch('lavender'),deathViolet:swatch('violet_dense'),deathWhite:swatch('white'),
+const textures={skin:'rlk:raiden/skin',white:'rlk:player_motion/white_concrete',silver:'rlk:player_motion/light_gray_concrete',dark:'rlk:player_motion/black_concrete',purple:'rlk:player_motion/purple_concrete',blue:'rlk:player_motion/blue_concrete',light:'rlk:player_motion/light_blue_concrete',gold:'rlk:cm/fm/metal',
  lilac:swatch('arm_lilac'),shade:swatch('arm_shade'),deep:swatch('arm_deep'),tomoe:swatch('arm_tomoe'),gdull:swatch('gold_dull'),bpale:swatch('blade_pale'),bedge:swatch('blade_edge'),bcore:swatch('blade_core'),grip:swatch('grip_dark'),hdull:swatch('hand_dull'),hdark:swatch('hand_dull_dark'),nail:swatch('nail_glow')};
 const faces=['north','south','east','west','up','down'];
 const box=(from,to,tex,overrides={})=>({from,to,faces:Object.fromEntries(faces.map(f=>[f,{texture:'#'+(overrides[f]||tex),uv:[0,0,16,16]}]))});
-const model=(name,elements)=>{const trail=name.includes('_trail_'),fx=name.startsWith('fx_weapon/')?{purple:'rlk:raiden/fx/'+(trail?'afterglow':'violet_dense'),blue:'rlk:raiden/fx/void',light:'rlk:raiden/fx/cyan',white:'rlk:raiden/fx/'+(trail?'lavender':'white'),silver:'rlk:raiden/fx/lavender'}:{};json(path.join(assets,'models/item/raiden',name+'.json'),{ambientocclusion:false,textures:{...textures,...fx,particle:textures.purple},elements});json(path.join(assets,'items/raiden',name+'.json'),{model:{type:'minecraft:model',model:'rlk:item/raiden/'+name}});};
+const model=(name,elements)=>{json(path.join(assets,'models/item/raiden',name+'.json'),{ambientocclusion:false,textures:{...textures,particle:textures.purple},elements});json(path.join(assets,'items/raiden',name+'.json'),{model:{type:'minecraft:model',model:'rlk:item/raiden/'+name}});};
 // Same geometry, every face tinted by one constant multiplier (item definition tints).
 const DULL_TINT=0xA098AC;
 const tinted=(name,elements,tint=DULL_TINT)=>{json(path.join(assets,'models/item/raiden',name+'.json'),{ambientocclusion:false,textures:{...textures,particle:textures.purple},elements:elements.map(e=>({...e,faces:Object.fromEntries(Object.entries(e.faces).map(([k,f])=>[k,{...f,tintindex:0}]))}))});json(path.join(assets,'items/raiden',name+'.json'),{model:{type:'minecraft:model',model:'rlk:item/raiden/'+name,tints:[{type:'minecraft:constant',value:tint}]}});};
@@ -112,69 +112,143 @@ function giantKatana(){
  return e;
 }
 model('giant_katana',giantKatana());
-// Lightning is geometry, not a particle cloud. Its white seam protrudes through
-// the front/back of the violet body so the opaque shell never hides the core.
-// Every blade attachment shares the actual weapon's hand pivot and quaternion.
-function lightningLine(elements,points,outer,inner,trail=false){
- for(let j=1;j<points.length;j++){
-  const a=points[j-1],b=points[j],steps=Math.max(1,Math.ceil(Math.hypot(...b.map((x,i)=>x-a[i]))/.55));
-  for(let i=0;i<=steps;i++){
-   const c=a.map((x,k)=>x+(b[k]-x)*i/steps);
-   elements.push(box([c[0]-outer/2,c[1]-outer/2,c[2]-.24],[c[0]+outer/2,c[1]+outer/2,c[2]+.24],'purple'));
-   elements.push(box([c[0]-inner/2,c[1]-inner/2,c[2]-.34],[c[0]+inner/2,c[1]+inner/2,c[2]+.34],'white'));
-  }
- }
+// ---- Painted lightning cards -------------------------------------------------------------
+// Weapon, palm and chakra lightning (and the death splinters) are painted gradient sprites
+// (rlk:raiden/fxg/*, tools/build_raiden_fx_textures.py; catalogue tools/raiden_fx_textures.json)
+// on a few flat cards: zero-thickness elements with a face on both sides, shade off, uv in
+// 0..16, element rotation about one axis by 0/+-22.5/+-45 degrees only, coordinates -16..32.
+// Each effect keeps its model name and is still one display sharing the attached weapon's or
+// hand's pivot, quaternion and scale, so the datapack's flicker/charge/release logic is unchanged.
+const fxCatalogue=JSON.parse(fs.readFileSync(path.join(here,'raiden_fx_textures.json'),'utf8'));
+const fxSprite=Object.fromEntries(fxCatalogue.textures.map(t=>[t.name,t]));
+const FACE_PAIR={x:['east','west'],y:['up','down'],z:['south','north']};
+const r4=v=>Math.round(v*1e4)/1e4;
+// Corners TL, TR, BR, BL of a face seen from outside (vanilla face vertex order).
+function faceCorners(face,[x0,y0,z0],[x1,y1,z1]){return{north:[[x1,y1,z0],[x0,y1,z0],[x0,y0,z0],[x1,y0,z0]],south:[[x0,y1,z1],[x1,y1,z1],[x1,y0,z1],[x0,y0,z1]],east:[[x1,y1,z1],[x1,y1,z0],[x1,y0,z0],[x1,y0,z1]],west:[[x0,y1,z0],[x0,y1,z1],[x0,y0,z1],[x0,y0,z0]],up:[[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1]],down:[[x0,y0,z1],[x1,y0,z1],[x1,y0,z0],[x0,y0,z0]]}[face];}
+// Face uv [u1,v1,u2,v2] + rotation so every corner shows fn(corner): corner i takes the
+// (i - rotation/90)-th entry of (u1v1, u2v1, u2v2, u1v2), as vanilla does.
+function solveUV(face,lo,hi,fn){const D=faceCorners(face,lo,hi).map(fn),eq=(a,b)=>Math.abs(a-b)<1e-6;
+ for(let k=0;k<4;k++){const u=[0,1,2,3].map(j=>D[(j+k)%4]);if(eq(u[0][1],u[1][1])&&eq(u[1][0],u[2][0])&&eq(u[2][1],u[3][1])&&eq(u[3][0],u[0][0]))return[[u[0][0],u[0][1],u[2][0],u[2][1]].map(r4),k*90];}
+ throw new Error('no uv solution for '+face);}
+// One card in the plane <n> = at. u/v = [axis, a, b]: the texture's uv[0] -> uv[2] runs from model
+// coordinate a to b along that axis (b < a mirrors), likewise v. rot = [axis, angle] about the centre.
+function card(sprite,n,at,[ua,u0,u1],[va,v0,v1],{uv=[0,0,16,16],rot=null}={}){
+ if(!fxSprite[sprite])throw new Error(`fxg sprite ${sprite} is not in raiden_fx_textures.json (run build_raiden_fx_textures.py)`);
+ const N='xyz'.indexOf(n),U='xyz'.indexOf(ua),V='xyz'.indexOf(va),lo=[0,0,0],hi=[0,0,0];
+ lo[N]=hi[N]=at;lo[U]=Math.min(u0,u1);hi[U]=Math.max(u0,u1);lo[V]=Math.min(v0,v1);hi[V]=Math.max(v0,v1);
+ const from=lo.map(r4),to=hi.map(r4);
+ if([...from,...to].some(c=>c<-16||c>32))throw new Error(`card ${sprite} leaves -16..32: ${from} ${to}`);
+ const fn=p=>[uv[0]+(uv[2]-uv[0])*(p[U]-u0)/(u1-u0),uv[1]+(uv[3]-uv[1])*(p[V]-v0)/(v1-v0)];
+ const faces={};for(const f of FACE_PAIR[n]){const[fuv,r]=solveUV(f,from,to,fn);faces[f]={texture:'#'+sprite,uv:fuv,...(r?{rotation:r}:{})};}
+ const el={from,to,shade:false,faces};
+ if(rot&&rot[1]){if(![-45,-22.5,22.5,45].includes(rot[1]))throw new Error('card rotation '+rot[1]);el.rotation={origin:from.map((v,i)=>r4((v+to[i])/2)),axis:rot[0],angle:rot[1]};}
+ return el;
 }
+// uv sub-range of a sprite laid along [a, b] when the whole sprite spans [A, B] (for split cards).
+const span=(a,b,A,B)=>[16*(a-A)/(B-A),16*(b-A)/(B-A)];
+const segments=(a,b,n)=>Array.from({length:n},(_,i)=>[a+(b-a)*i/n,a+(b-a)*(i+1)/n]);
+const meanOver=(f,a,b,n=24)=>{let s=0;for(let i=0;i<=n;i++)s+=f(a+(b-a)*i/n);return s/(n+1);};
+const smoothstep=(a,b,x)=>{const t=Math.min(1,Math.max(0,(x-a)/(b-a)));return t*t*(3-2*t);};
+function fxModel(name,elements,tint=null){
+ const used=[...new Set(elements.flatMap(e=>Object.values(e.faces).map(f=>f.texture.slice(1))))];
+ const tex=Object.fromEntries(used.map(n=>[n,fxSprite[n].texture]));
+ const els=tint===null?elements:elements.map(e=>({...e,faces:Object.fromEntries(Object.entries(e.faces).map(([k,f])=>[k,{...f,tintindex:0}]))}));
+ json(path.join(assets,'models/item/raiden',name+'.json'),{ambientocclusion:false,textures:{...tex,particle:tex[used[0]]},elements:els});
+ json(path.join(assets,'items/raiden',name+'.json'),{model:{type:'minecraft:model',model:'rlk:item/raiden/'+name,...(tint===null?{}:{tints:[{type:'minecraft:constant',value:tint}]})}});
+}
+// Blade lightning is shared by the normal katana and the giant katana (which it is painted to):
+// x/z follow the display's power scale about the pivot, y (length) never scales. The bright
+// edge bolt sits just outside the cutting edge (model -X), a thinner crackle along the spine.
+const bladeOutline=y=>{const t=Math.min(1,Math.max(0,(y-11.5)/19.9)),c=8+1.3*t*t,hb=(2.7-.75*t)/2;return[c-hb+smoothstep(28.4,31.4,y)*(2*hb-.6),c+hb];};
+const bladeMid=y=>{const[a,b]=bladeOutline(y);return(a+b)/2;};
 function bladeLightning(spear=false,variant=0,trail=false){
- const e=[],start=spear?17.8:10.2,end=30.5;
- for(const side of[-1,1]){
-  const pts=[];for(let i=0;i<8;i++){
-   const y=start+(end-start)*i/7,curve=spear?Math.pow((y-18)/1.65,2)*.025:Math.pow((y-10)/1.51,2)*.0065;
-   pts.push([8+curve+side*(.95+(i%2===variant?1.10:.1)),y,8+side*.78]);
+ const e=[],ab='ab'[variant],ba='ba'[variant];
+ if(spear){
+  // Leaf spear head y 18..31.3: a bolt beside each edge, one crossed card through the head.
+  const i=y=>Math.min(7.6,Math.max(0,(y-18)/1.65)),mid=y=>8+i(y)**2*.025,hw=y=>(2.2-.24*i(y))/2,Y0=17.6,Y1=31.8;
+  if(trail){
+   e.push(card('blade_trail_'+ab,'z',8,['y',Y1,Y0],['x',meanOver(mid,Y0,Y1)-2.4,meanOver(mid,Y0,Y1)+2.4]));
+   e.push(card('blade_trail_'+ba,'x',meanOver(mid,Y0,Y1),['y',Y1,Y0],['z',5.6,10.4]));
+   return e;
   }
-  lightningLine(e,pts,trail?.62:1.02,trail?.2:.36,trail);
-  for(const i of[2,5]){
-   const c=pts[i],sign=side*(variant?1:-1);
-   lightningLine(e,[c,[c[0]+side*1.6,c[1]+.8,c[2]+sign*.55],[c[0]+side*2.1,c[1]+2.5,c[2]+sign*.9]],trail?.4:.64,trail?.12:.2,trail);
+  for(const[side,z]of[[-1,7.85],[1,8.15]])for(const[k,[a,b]]of segments(Y0,Y1,2).entries()){
+   const x=meanOver(y=>mid(y)+side*(hw(y)+.3),a,b),[u0,u1]=span(a,b,Y0,Y1);
+   e.push(card('blade_'+'abc'[(k+variant+(side>0?1:0))%3],'z',z,['y',a,b],['x',x-1.6*side,x+1.6*side],{uv:[u0,0,u1,16]}));
   }
+  e.push(card('blade_c','x',meanOver(mid,Y0,Y1),['y',Y0,Y1],variant?['z',10.2,5.8]:['z',5.8,10.2]));
+  return e;
  }
+ if(trail){
+  // Afterimage ribbons: afterglow streaks along the old blade line, brightest at the tip
+  // (blade_trail u=0 is the newest end), in the blade plane and crossed for edge-on views.
+  const Y0=10,Y1=31.6;
+  for(const[a,b]of segments(Y0,Y1,2)){const x=meanOver(bladeMid,a,b),[u0,u1]=span(Y1-b,Y1-a,0,Y1-Y0);
+   e.push(card('blade_trail_'+ab,'z',8,['y',b,a],['x',x-2.8,x+2.8],{uv:[u0,0,u1,16]}));
+   e.push(card('blade_trail_'+ba,'x',x,['y',b,a],['z',5.4,10.6],{uv:[u0,0,u1,16]}));}
+  return e;
+ }
+ // The painted sheath in the blade plane: the blade body hides its middle, leaving the edge
+ // bolt, its outward forks, the spine crackle and the tip fork around the steel.
+ const sh=fxSprite['rig_katana_'+ab].card;
+ e.push(card('rig_katana_'+ab,'z',8,['y',...sh.model_y],['x',...sh.model_x]));
+ // Crossed cards through the same edge bolt (three straight pieces of one continuous blade_*
+ // sprite following the curve) and the spine crackle, read when the blade is seen edge-on.
+ const E0=9.9,E1=31.7;
+ for(const[a,b]of segments(E0,E1,3)){const[u0,u1]=span(a,b,E0,E1);
+  e.push(card('blade_'+ab,'x',meanOver(y=>bladeOutline(y)[0]-.38,a,b),['y',a,b],variant?['z',10.4,5.6]:['z',5.6,10.4],{uv:[u0,0,u1,16]}));}
+ const S0=10.6,S1=30.6;
+ for(const[a,b]of segments(S0,S1,2)){const[u0,u1]=span(a,b,S0,S1);
+  e.push(card('rim_crackle_'+ba,'x',meanOver(y=>bladeOutline(y)[1]+.32,a,b),['y',a,b],['z',6.2,9.8],{uv:[u0,0,u1,16]}));}
  return e;
 }
 for(const kind of['katana','polearm'])for(const variant of[0,1]){
- model(`fx_weapon/${kind}_${variant}`,bladeLightning(kind==='polearm',variant));
- model(`fx_weapon/${kind}_trail_${variant}`,bladeLightning(kind==='polearm',variant,true));
+ fxModel(`fx_weapon/${kind}_${variant}`,bladeLightning(kind==='polearm',variant));
+ fxModel(`fx_weapon/${kind}_trail_${variant}`,bladeLightning(kind==='polearm',variant,true));
 }
-// Open palm negative-Y fingers, with a sparse charged seal on the outside of
-// the palm. The centre stays empty: readable hands rather than a glowing ball.
+// Palm lightning in hand-model space (fingers along -Y, palm +Z, back -Z with the tomoe disc).
+// Charge: arcs from the fingertips and thumb converge into the palm, on the palm side and
+// (mirrored) on the back, with a small crackling seal. Focus: the same arcs, a tighter seal and a
+// small hot core. Release: a radiating crown on both sides plus one crossed card through the hand.
+// The centre never becomes a solid ball: the hand stays readable.
 function palmLightning(closed=false,stage='charge',variant=0){
- const release=stage==='release',focus=stage==='focus',e=[],tips=closed?[.25,.1,.1,.45]:[-3.7,-5,-4.6,-3.1];
- for(let i=0;i<4;i++){
-  const x=5.1+i*1.85,y=tips[i],bend=(i%2===variant?1:-1)*.6;
-  lightningLine(e,[[x,y,6.0],[x+bend,y+1.1,5.8],[x-.15,2.5,5.6],[8+(i-1.5)*(focus?.2:.55),4.15,5.25]],release?.65:focus?.58:.46,release?.25:focus?.23:.16);
-  if(release)lightningLine(e,[[x,y,6.0],[x+bend*1.8,y-1.25,5.7],[x-bend*.8,y-3.4,5.15],[x+bend*2.3,y-5.4,4.65]],.76,.27);
+ const e=[],pc=fxSprite.rig_palm.card,[X0,X1]=pc.model_x,[Y0,Y1]=pc.model_y,[cx,cy]=pc.centre;
+ // Clear of the palm (z 9.6), the curled fingers of the fist (z 11) and the tomoe disc (z 5.92).
+ const front=closed?11.45:10.05,back=5.5,yTip=closed?-1.6:Y0,mirror=m=>m?{uv:[16,0,0,16]}:{};
+ if(stage==='release'){
+  const R=8.4,c=[8,3.8],flip=variant?{uv:[16,16,0,0]}:{};
+  e.push(card('rig_crown','z',front+.4,['x',c[0]-R,c[0]+R],['y',c[1]+R,c[1]-R],flip));
+  e.push(card('rig_crown','z',back-.4,['x',c[0]+R,c[0]-R],['y',c[1]+R,c[1]-R],flip));
+  e.push(card('rig_crown','x',8,['z',8-R,8+R],['y',c[1]-R,c[1]+R],flip));
+  return e;
  }
- const radius=release?5.8:focus?1.15:2.2;
- for(let i=0;i<12;i++){
-  const a=i*Math.PI/6,b=(i+1)*Math.PI/6,r=radius+(i%2===variant?.45:-.15);
-  // The release becomes a broken expanding crown of sparks, not a solid disk.
-  if(release&&i%3===1)continue;
-  lightningLine(e,[[8+Math.cos(a)*r,3.8+Math.sin(a)*r,5.35],[8+Math.cos((a+b)/2)*(r+.4),3.8+Math.sin((a+b)/2)*(r+.4),4.9],[8+Math.cos(b)*r,3.8+Math.sin(b)*r,5.35]],release?.72:.42,release?.25:.14);
- }
+ e.push(card('rig_palm','z',front,['x',X0,X1],['y',Y1,yTip],mirror(variant)));
+ e.push(card('rig_palm','z',back,['x',X0,X1],['y',Y1,yTip],mirror(1-variant)));
+ const r=(stage==='focus'?1.3:2.2)/.8;
+ e.push(card('chakra_'+'ab'[variant],'z',front+.4,['x',cx-r,cx+r],['y',cy+r,cy-r]));
+ if(stage==='focus')e.push(card('orb_core','z',front+.8,['x',cx-1.7,cx+1.7],['y',cy+1.7,cy-1.7]));
  return e;
 }
-for(const form of['open','closed'])for(const phase of['charge','focus','release'])for(const variant of[0,1])model(`fx_weapon/palm_${form}_${phase}_${variant}`,palmLightning(form==='closed',phase,variant));
+for(const form of['open','closed'])for(const phase of['charge','focus','release'])for(const variant of[0,1])fxModel(`fx_weapon/palm_${form}_${phase}_${variant}`,palmLightning(form==='closed',phase,variant));
+// Chakra: sparse arcs leaping along the outside of the rim, a couple of outward forks and
+// rising sparks; the ring's centre (Raiden's face) stays empty. In front of the ring (model -Z).
+// A card is placed radially at angle phi (multiple of 22.5 deg): authored on the nearest
+// axis and turned about Z through its own centre by the remaining 0/+-22.5/+-45 degrees.
+function rimCard(sprite,phi,rIn,rOut,width,z,mirrored){
+ const base=Math.round(phi/90)*90,rho=phi-base,b=(base%360+360)%360,a=phi*Math.PI/180,d=(rIn+rOut)/2,c=[8+d*Math.cos(a),8+d*Math.sin(a)];
+ const R=b%180===0?0:1,T=1-R,out=b<180?1:-1,len=(rOut-rIn)/2,w=(mirrored?-1:1)*width/2;
+ // sprite v=0 (arc apex / bolt top) points outward, v=1 sits on the rim
+ return card(sprite,'z',z,['xy'[T],c[T]-w,c[T]+w],['xy'[R],c[R]+out*len,c[R]-out*len],{rot:['z',rho]});
+}
 function chakraLightning(variant){
- const e=[];
- for(let i=0;i<6;i++){
-  const a=(i*2+variant)*Math.PI/6,r=14.3;
-  const p=(angle,radius,z)=>[8+Math.cos(angle)*radius,8+Math.sin(angle)*radius,z];
-  lightningLine(e,[p(a-.12,r,7.2),p(a-.04,16.6,6.9),p(a+.035,15.8,7.1),p(a+.11,19.5,6.5)],.68,.22);
-  lightningLine(e,[p(a-.04,16.6,6.9),p(a-.17,18.6,7.3),p(a-.20,20.4,7.6)],.46,.15);
-  lightningLine(e,[p(a-.12,r,7.2),p(a-.25,14.8,7.2),p(a-.36,13.7,7.2)],.5,.17);
- }
+ const e=[],arcs=[22.5,112.5,202.5,292.5].map(p=>p+45*variant),forks=[157.5,337.5].map(p=>p+45*variant),sparks=[67.5,247.5].map(p=>p+45*variant);
+ // arc sprite: ends at (0.06,0.86) and (0.94,0.86), apex at v~0.2. Ends on r=15.6, 40 deg apart.
+ const re=15.6,half=20*Math.PI/180,dc=re*Math.cos(half),W=2*re*Math.sin(half)/.88,H=(19.2-dc)/.66;
+ arcs.forEach((phi,i)=>e.push(rimCard('arc_'+'ab'[(i+variant)%2],phi,dc-.14*H,dc+.86*H,W,6.6,i>1)));
+ forks.forEach((phi,i)=>e.push(rimCard('vbolt_'+'abc'[(i+variant)%3],phi,14.6,21.6,2.2,6.35,i===1)));
+ sparks.forEach((phi,i)=>e.push(rimCard('charge_spark',phi,15.0,19.6,2.4,6.1,i===1)));
  return e;
 }
-for(const variant of[0,1])model(`fx_weapon/chakra_${variant}`,chakraLightning(variant));
+for(const variant of[0,1])fxModel(`fx_weapon/chakra_${variant}`,chakraLightning(variant));
 const spear=[box([7.4,-15.5,7.4],[8.6,18.2,8.6],'dark')];for(const y of[-12,-5,2,9,16])spear.push(box([7.16,y,7.16],[8.84,y+.7,8.84],'gold'));for(let i=0;i<8;i++){const y=18+i*1.65,w=2.2-i*.24,x=8+i*i*.025;spear.push(box([x-w/2,y,7.45],[x+w/2,y+1.72,8.55],'purple',{north:'light',east:'white'}));}spear.push(box([5.6,16,6.8],[10.4,18,9.2],'gold'),box([6.5,-15.8,6.5],[9.5,-14.6,9.5],'purple'));model('polearm',spear);
 
 // Halo: deep-violet ring with dull-gold studs, pale fuller dots, lilac ticks and three tomoe.
@@ -386,7 +460,12 @@ for(const dull of[false,true])fn('skin_'+(dull?'dull':'normal'),[`# Raiden ${dul
 const dullAt=(c,phase,t)=>{const p=sample(c,t);return armorAmount(p,phase,c.id)*p.fade[0]>=.5;};
 // The reference's final disappearance becomes six distinct translucent display
 // splinters lifting away from the collapsing body. Nothing persists after cleanup.
-for(let i=0;i<3;i++)model('death_shard_'+i,[box([7.2,3,7.6],[8.8,12,8.4],i===0?'deathViolet':'deathGlow'),box([7.65,2.3,7.4],[8.35,12.8,8.6],'deathWhite'),box([6.3,5.2,7.65],[7.2,8.4,8.35],'deathGlow'),box([8.8,7.8,7.7],[9.8,11.0,8.3],'deathViolet')]);
+// Each splinter is a painted crystal (rig_shard: white ridge, lavender body, violet rim) on two
+// crossed cards, two small side slivers and a star glint at its tip; constant item tints
+// separate the violet, pale and lavender splinters.
+for(let i=0;i<3;i++)fxModel('death_shard_'+i,[card('rig_shard','z',8,['x',6,10],['y',12.8,2.3]),card('rig_shard','x',8,['z',6,10],['y',12.8,2.3],{uv:[16,0,0,16]}),
+ card('rig_shard','z',8.35,['x',6.0,7.5],['y',8.9,4.6],{rot:['z',22.5]}),card('rig_shard','z',7.65,['x',8.6,10.1],['y',11.5,7.4],{rot:['z',-22.5]}),
+ card('glint','z',7.4,['x',6.5,9.5],['y',14.1,11.1]),card('glint','x',8.6,['z',6.5,9.5],['y',14.1,11.1])],[0xB894FF,null,0xDCCBFF][i]);
 const deathParts=Array.from({length:6},(_,i)=>`rlk_rd_death_${i}`);
 fn('death_fx_spawn',['kill @e[tag=rlk_rd_death_fx]',...deathParts.map((n,i)=>`summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_death_fx","${n}"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",brightness:{block:15,sky:15},interpolation_duration:1,teleport_duration:0,view_range:3f,width:0f,height:0f,shadow_radius:0f,transformation:{translation:[0f,0.8f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,1f,0f,0f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/death_shard_${i%3}"}}}`)]);
 for(let t=0;t<=48;t++){
@@ -442,5 +521,5 @@ const initial=withLightning(clips[0],0,0);
 fn('spawn',['function rlk:boss/raiden/rig/cleanup',...pnames.map(n=>`summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_part","rlk_raiden_aux","rlk_rd_${n}"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:2.5f,width:16f,height:16f,shadow_radius:0f,brightness:{block:${Object.hasOwn(bodySpecs,n)?12:15},sky:15},transformation:${nbt(initial[n])},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/${modelFor(n)}"}}}`),'scoreboard players set @s rdRigA -1','scoreboard players set @s rdRigP -1','scoreboard players set @s rdRigT 0','scoreboard players set @s rdRigHit 0','execute rotated as @s rotated ~ 0 run tp @e[tag=rlk_raiden_part] ~ ~ ~ ~ 0']);
 fn('changed',['scoreboard players set @s rdRigT 0','scoreboard players operation @s rdRigA = @s rdAnim','scoreboard players operation @s rdRigP = @s rdPhase',...clips.map(c=>`execute if score @s rdAnim matches ${c.id} run function rlk:boss/raiden/rig/select/${c.name}`)]);
 fn('tick',['# @s = unique real boss. Parts inherit body yaw but never pitch.','execute unless entity @e[tag=rlk_raiden_part,limit=1] run function rlk:boss/raiden/rig/spawn','execute rotated as @s rotated ~ 0 run tp @e[tag=rlk_raiden_part] ~ ~ ~ ~ 0','execute unless score @s rdAnim = @s rdRigA run function rlk:boss/raiden/rig/changed','execute unless score @s rdPhase = @s rdRigP run function rlk:boss/raiden/rig/changed',...clips.map(c=>`execute if score @s rdAnim matches ${c.id} run function rlk:boss/raiden/rig/clip/${c.name}`),'function rlk:boss/raiden/rig/lightning_tick','execute if score @s rdRigHit matches 1 run execute as @e[tag=rlk_raiden_part] run data merge entity @s {Glowing:0b}','execute if score @s rdRigHit matches 1.. run scoreboard players remove @s rdRigHit 1','scoreboard players add @s rdRigT 1']);
-json(path.join(here,'raiden_rig_manifest.json'),{parts:pnames.length,phase:{0:'normal',1:'transforming',2:'Baleful Shadowlord',3:'exhausted'},armSilhouette:'two skin arms; one big lilac sword arm (main_r) gripping the pale violet giant katana; four smaller lilac auxiliary arms fanned behind the shoulders (rear_* upper pair, rear2_* lower pair); two dull bronze-grey support hands (support_r, main_l) cradling a dull-tinted Raiden from below',palette:{armour:'arm_lilac plates, arm_shade sides, arm_deep joints, gold_dull trims, arm_tomoe/gold_dull tomoe discs',katana:'blade_pale body, blade_edge cutting edge on model -X, blade_core fuller and spine on +X, grip_dark grip, gold_dull tsuba/habaki/wraps',support:'hand_dull, hand_dull_dark, nail_glow nails and seams',raiden:`skin/ribbon *_dull copies tinted #${DULL_TINT.toString(16).toUpperCase()} while the armour is at least half formed`},blades:'Every blade frame is authored as (tip, edge); the edge (model -X) faces the direction of travel in all cuts. Rotation keys (giant_weapon, *_hand) are slerped.',lightning:{weaponDisplays:8,palmDisplays:5,chakraDisplays:1,materials:'violet geometry and exposed white seams',hands:'exact hand pivot/rotation/scale; charge, inward focus, contact release; smaller rear hands never emit large release crowns; the clap charge sits on the two support hands',chakra:'sparse outer-rim forks; idle intermittent, charged attacks sustained; empty centre preserves face visibility'},targetSlam:`dull support hand, palm down; grows from age 1, falls from age ${SLAM_CONTACT-3}, contacts the ground at hazard age ${SLAM_CONTACT}, removed at age ${SLAM_CONTACT+14}`,clips:clips.map(({id,name,length,loop})=>({id,name,length,loop:!!loop})),integration:'Call rig/init from load, rig/spawn and rig/tick as the real boss at its feet. rdAnim selects a state; private rdRigT resets on rdAnim/rdPhase changes. rig/select/<clip> also applies rig/skin_dull or rig/skin_normal for the current rdPhase. rig/flash is optional body-hit feedback. rig/cleanup deletes all parts. Supplied skin remains byte-identical.'});
+json(path.join(here,'raiden_rig_manifest.json'),{parts:pnames.length,phase:{0:'normal',1:'transforming',2:'Baleful Shadowlord',3:'exhausted'},armSilhouette:'two skin arms; one big lilac sword arm (main_r) gripping the pale violet giant katana; four smaller lilac auxiliary arms fanned behind the shoulders (rear_* upper pair, rear2_* lower pair); two dull bronze-grey support hands (support_r, main_l) cradling a dull-tinted Raiden from below',palette:{armour:'arm_lilac plates, arm_shade sides, arm_deep joints, gold_dull trims, arm_tomoe/gold_dull tomoe discs',katana:'blade_pale body, blade_edge cutting edge on model -X, blade_core fuller and spine on +X, grip_dark grip, gold_dull tsuba/habaki/wraps',support:'hand_dull, hand_dull_dark, nail_glow nails and seams',raiden:`skin/ribbon *_dull copies tinted #${DULL_TINT.toString(16).toUpperCase()} while the armour is at least half formed`},blades:'Every blade frame is authored as (tip, edge); the edge (model -X) faces the direction of travel in all cuts. Rotation keys (giant_weapon, *_hand) are slerped.',lightning:{weaponDisplays:8,palmDisplays:5,chakraDisplays:1,materials:'painted gradient sprites (rlk:raiden/fxg/*: rig_katana, blade, rim_crackle, blade_trail, rig_palm, chakra, orb_core, rig_crown, arc, vbolt, charge_spark) on flat crossed cards',hands:'exact hand pivot/rotation/scale; charge, inward focus, contact release; smaller rear hands never emit large release crowns; the clap charge sits on the two support hands',chakra:'sparse outer-rim forks; idle intermittent, charged attacks sustained; empty centre preserves face visibility'},targetSlam:`dull support hand, palm down; grows from age 1, falls from age ${SLAM_CONTACT-3}, contacts the ground at hazard age ${SLAM_CONTACT}, removed at age ${SLAM_CONTACT+14}`,clips:clips.map(({id,name,length,loop})=>({id,name,length,loop:!!loop})),integration:'Call rig/init from load, rig/spawn and rig/tick as the real boss at its feet. rdAnim selects a state; private rdRigT resets on rdAnim/rdPhase changes. rig/select/<clip> also applies rig/skin_dull or rig/skin_normal for the current rdPhase. rig/flash is optional body-hit feedback. rig/cleanup deletes all parts. Supplied skin remains byte-identical.'});
 console.log(`Built Raiden: ${pnames.length} animated parts (big sword arm, four auxiliary arms, two cradle hands), ${clips.length} motion states, four phase forms, dull-tinted armoured skin, three encounter objects and one illusion.`);

@@ -1,0 +1,1532 @@
+{
+ "namespace": "rlk:raiden/fxg/",
+ "texture_dir": "assets/rlk/textures/raiden/fxg",
+ "conventions": {
+  "strip": "u along the bolt (u=0 start, u=1 end, soft-faded ends), v=0.5 centre row",
+  "column": "v along height: v=0 top (sky), v=1 bottom (impact), u=0.5 centre",
+  "radial": "centred at (0.5,0.5)",
+  "crescent": "pivot at bottom-centre (0.5,1.0); bright outer edge radius 0.94*h; +-72 deg",
+  "decal": "top view: u = local +x, v = local +z (forward)",
+  "quarter": "circle centre at texture corner (0,0); mirror uv for other quadrants"
+ },
+ "model_rules": "flat cards (from==to on one axis), faces on both sides, shade false, uv 0..16 (per-face rotation 0/90/180/270, u1>u2 mirrors), single-axis element rotation 0/+-22.5/+-45, from/to within -16..32, layers >= 0.02 block apart",
+ "vanilla_rules": [
+  "fragments with alpha < 0.1 are discarded",
+  "translucent item quads are sorted back-to-front by centroid distance and WRITE DEPTH: a card drawn earlier hides translucent cards behind it wherever its alpha >= 0.1; keep halos of overlay cards tight, prefer centred cards under centred overlays, split tall vertical cards so the low part sorts after the floor",
+  "magnified sampling is nearest-neighbour: >= ~32 texels per block for things seen up close",
+  "vertical faces may receive entity diffuse light 0.5..0.74 (up faces 1.0)"
+ ],
+ "textures": [
+  {
+   "name": "bolt_a",
+   "texture": "rlk:raiden/fxg/bolt_a",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5, zig-zag core r~1.5px within v=0.33..0.67",
+   "use": "hot lightning bolt (floor bolts, horizontal strikes, tall walls, long arcs)",
+   "notes": "forks reach v=0.1..0.9; ends fade over 5% of u; tight halo (safe on top of decals)"
+  },
+  {
+   "name": "bolt_b",
+   "texture": "rlk:raiden/fxg/bolt_b",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5, zig-zag core r~1.5px within v=0.33..0.67",
+   "use": "hot lightning bolt (floor bolts, horizontal strikes, tall walls, long arcs)",
+   "notes": "forks reach v=0.1..0.9; ends fade over 5% of u; tight halo (safe on top of decals)"
+  },
+  {
+   "name": "bolt_c",
+   "texture": "rlk:raiden/fxg/bolt_c",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5, zig-zag core r~1.5px within v=0.33..0.67",
+   "use": "hot lightning bolt (floor bolts, horizontal strikes, tall walls, long arcs)",
+   "notes": "forks reach v=0.1..0.9; ends fade over 5% of u; tight halo (safe on top of decals)"
+  },
+  {
+   "name": "bolt_d",
+   "texture": "rlk:raiden/fxg/bolt_d",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5, zig-zag core r~1.5px within v=0.33..0.67",
+   "use": "hot lightning bolt (floor bolts, horizontal strikes, tall walls, long arcs)",
+   "notes": "forks reach v=0.1..0.9; ends fade over 5% of u; tight halo (safe on top of decals)"
+  },
+  {
+   "name": "bolt_after_a",
+   "texture": "rlk:raiden/fxg/bolt_after_a",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "same path as bolt_a",
+   "use": "afterglow of bolt_a",
+   "notes": ""
+  },
+  {
+   "name": "bolt_fade_a",
+   "texture": "rlk:raiden/fxg/bolt_fade_a",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "same path as bolt_a",
+   "use": "final fade of bolt_a (embers)",
+   "notes": ""
+  },
+  {
+   "name": "bolt_after_c",
+   "texture": "rlk:raiden/fxg/bolt_after_c",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "same path as bolt_c",
+   "use": "afterglow of bolt_c",
+   "notes": ""
+  },
+  {
+   "name": "bolt_fade_c",
+   "texture": "rlk:raiden/fxg/bolt_fade_c",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "same path as bolt_c",
+   "use": "final fade of bolt_c (embers)",
+   "notes": ""
+  },
+  {
+   "name": "blade_a",
+   "texture": "rlk:raiden/fxg/blade_a",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5+-0.08, r~1.3px",
+   "use": "blade-hugging bolt along a weapon edge (u = hilt -> tip); long low lightning walls",
+   "notes": "tight glow; short frequent forks"
+  },
+  {
+   "name": "blade_b",
+   "texture": "rlk:raiden/fxg/blade_b",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5+-0.08, r~1.3px",
+   "use": "blade-hugging bolt along a weapon edge (u = hilt -> tip); long low lightning walls",
+   "notes": "tight glow; short frequent forks"
+  },
+  {
+   "name": "blade_c",
+   "texture": "rlk:raiden/fxg/blade_c",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5+-0.08, r~1.3px",
+   "use": "blade-hugging bolt along a weapon edge (u = hilt -> tip); long low lightning walls",
+   "notes": "tight glow; short frequent forks"
+  },
+  {
+   "name": "rim_crackle_a",
+   "texture": "rlk:raiden/fxg/rim_crackle_a",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5+-0.10, tight glow, no halo",
+   "use": "crackle laid on top of another translucent card (decal edges)",
+   "notes": "alpha >= 0.1 only near the core, so it does not hide what lies under it"
+  },
+  {
+   "name": "rim_crackle_b",
+   "texture": "rlk:raiden/fxg/rim_crackle_b",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5+-0.10, tight glow, no halo",
+   "use": "crackle laid on top of another translucent card (decal edges)",
+   "notes": "alpha >= 0.1 only near the core, so it does not hide what lies under it"
+  },
+  {
+   "name": "rim_crackle_c",
+   "texture": "rlk:raiden/fxg/rim_crackle_c",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5+-0.10, tight glow, no halo",
+   "use": "crackle laid on top of another translucent card (decal edges)",
+   "notes": "alpha >= 0.1 only near the core, so it does not hide what lies under it"
+  },
+  {
+   "name": "blade_trail_a",
+   "texture": "rlk:raiden/fxg/blade_trail_a",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "u=0 newest/brightest, fades to u=1",
+   "use": "slash/afterimage trail behind a moving blade",
+   "notes": "afterglow palette"
+  },
+  {
+   "name": "blade_trail_b",
+   "texture": "rlk:raiden/fxg/blade_trail_b",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "u=0 newest/brightest, fades to u=1",
+   "use": "slash/afterimage trail behind a moving blade",
+   "notes": "afterglow palette"
+  },
+  {
+   "name": "vbolt_a",
+   "texture": "rlk:raiden/fxg/vbolt_a",
+   "w": 128,
+   "h": 512,
+   "kind": "column",
+   "along": "v",
+   "core": "u=0.5, top v=0 -> small impact bloom v~0.96",
+   "use": "vertical strike bolt (2-4 crossed vertical cards ~2.5 wide)",
+   "notes": "narrow halo, sides fade over 30% of w"
+  },
+  {
+   "name": "vbolt_b",
+   "texture": "rlk:raiden/fxg/vbolt_b",
+   "w": 128,
+   "h": 512,
+   "kind": "column",
+   "along": "v",
+   "core": "u=0.5, top v=0 -> small impact bloom v~0.96",
+   "use": "vertical strike bolt (2-4 crossed vertical cards ~2.5 wide)",
+   "notes": "narrow halo, sides fade over 30% of w"
+  },
+  {
+   "name": "vbolt_c",
+   "texture": "rlk:raiden/fxg/vbolt_c",
+   "w": 128,
+   "h": 512,
+   "kind": "column",
+   "along": "v",
+   "core": "u=0.5, top v=0 -> small impact bloom v~0.96",
+   "use": "vertical strike bolt (2-4 crossed vertical cards ~2.5 wide)",
+   "notes": "narrow halo, sides fade over 30% of w"
+  },
+  {
+   "name": "vbolt_after_c",
+   "texture": "rlk:raiden/fxg/vbolt_after_c",
+   "w": 128,
+   "h": 512,
+   "kind": "column",
+   "along": "v",
+   "core": "same path as vbolt_c",
+   "use": "afterglow of vbolt_c",
+   "notes": ""
+  },
+  {
+   "name": "pillar_a",
+   "texture": "rlk:raiden/fxg/pillar_a",
+   "w": 128,
+   "h": 512,
+   "kind": "column",
+   "along": "v",
+   "core": "u=0.5 column glow, 3 winding bolts",
+   "use": "stake/pillar current, eye beams",
+   "notes": "soft top and bottom; no impact bloom"
+  },
+  {
+   "name": "pillar_b",
+   "texture": "rlk:raiden/fxg/pillar_b",
+   "w": 128,
+   "h": 512,
+   "kind": "column",
+   "along": "v",
+   "core": "u=0.5 column glow, 3 winding bolts",
+   "use": "stake/pillar current, eye beams",
+   "notes": "soft top and bottom; no impact bloom"
+  },
+  {
+   "name": "arc_a",
+   "texture": "rlk:raiden/fxg/arc_a",
+   "w": 256,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "arch from (0.06,0.86) via apex v~0.2 to (0.94,0.86)",
+   "use": "palm/finger arcs, small jumping arcs",
+   "notes": ""
+  },
+  {
+   "name": "arc_b",
+   "texture": "rlk:raiden/fxg/arc_b",
+   "w": 256,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "arch from (0.06,0.86) via apex v~0.2 to (0.94,0.86)",
+   "use": "palm/finger arcs, small jumping arcs",
+   "notes": ""
+  },
+  {
+   "name": "chakra_a",
+   "texture": "rlk:raiden/fxg/chakra_a",
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "along": "radial",
+   "core": "ring radius 0.40*w",
+   "use": "circular chakra / halo ring of electricity",
+   "notes": ""
+  },
+  {
+   "name": "chakra_b",
+   "texture": "rlk:raiden/fxg/chakra_b",
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "along": "radial",
+   "core": "ring radius 0.40*w",
+   "use": "circular chakra / halo ring of electricity",
+   "notes": ""
+  },
+  {
+   "name": "orb_rim",
+   "texture": "rlk:raiden/fxg/orb_rim",
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "along": "radial",
+   "core": "rim radius 0.37*w",
+   "use": "eye/orb electric rim",
+   "notes": ""
+  },
+  {
+   "name": "orb_core",
+   "texture": "rlk:raiden/fxg/orb_core",
+   "w": 128,
+   "h": 128,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre",
+   "use": "eye/orb core glow",
+   "notes": ""
+  },
+  {
+   "name": "crescent_a",
+   "texture": "rlk:raiden/fxg/crescent_a",
+   "w": 512,
+   "h": 256,
+   "kind": "crescent",
+   "along": "arc",
+   "core": "outer edge r=0.94*h around pivot (0.5,1.0), +-72deg",
+   "use": "clean sword-light crescent / slash wave",
+   "notes": ""
+  },
+  {
+   "name": "crescent_b",
+   "texture": "rlk:raiden/fxg/crescent_b",
+   "w": 512,
+   "h": 256,
+   "kind": "crescent",
+   "along": "arc",
+   "core": "as crescent_a + bolt along the edge",
+   "use": "lightning crescent slash",
+   "notes": ""
+  },
+  {
+   "name": "slash_wave",
+   "texture": "rlk:raiden/fxg/slash_wave",
+   "w": 512,
+   "h": 128,
+   "kind": "strip",
+   "along": "u",
+   "core": "edge at v~0.30, tail toward v~0.9",
+   "use": "straight slash wave / sword beam (travels toward -v)",
+   "notes": ""
+  },
+  {
+   "name": "rift_a",
+   "texture": "rlk:raiden/fxg/rift_a",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5 thin white tear in a dark void band",
+   "use": "rift / cut ribbon, teleport tears",
+   "notes": ""
+  },
+  {
+   "name": "rift_b",
+   "texture": "rlk:raiden/fxg/rift_b",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5 thin white tear in a dark void band",
+   "use": "rift / cut ribbon, teleport tears",
+   "notes": ""
+  },
+  {
+   "name": "shockwave",
+   "texture": "rlk:raiden/fxg/shockwave",
+   "w": 512,
+   "h": 512,
+   "kind": "radial",
+   "along": "radial",
+   "core": "leading edge r=0.46*w, tail inward to ~0.28*w",
+   "use": "expanding ring / shockwave (scale the card)",
+   "notes": ""
+  },
+  {
+   "name": "crackle_a",
+   "texture": "rlk:raiden/fxg/crackle_a",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "band v=0.22..0.86, floor glow at v=0.93",
+   "use": "vertical lightning wall band, chainable along u",
+   "notes": ""
+  },
+  {
+   "name": "crackle_b",
+   "texture": "rlk:raiden/fxg/crackle_b",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "band v=0.22..0.86, floor glow at v=0.93",
+   "use": "vertical lightning wall band, chainable along u",
+   "notes": ""
+  },
+  {
+   "name": "flash",
+   "texture": "rlk:raiden/fxg/flash",
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre, visible radius ~0.3*w",
+   "use": "compact strike / impact flash",
+   "notes": ""
+  },
+  {
+   "name": "impact_sparks",
+   "texture": "rlk:raiden/fxg/impact_sparks",
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre",
+   "use": "shield / hit impact sparks",
+   "notes": ""
+  },
+  {
+   "name": "scorch",
+   "texture": "rlk:raiden/fxg/scorch",
+   "w": 256,
+   "h": 256,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre, burn radius ~0.44*w",
+   "use": "floor scorch decal",
+   "notes": "dark (not glowing) except the ember ring"
+  },
+  {
+   "name": "scorch_strip",
+   "texture": "rlk:raiden/fxg/scorch_strip",
+   "w": 256,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5",
+   "use": "burn streak under floor bolts",
+   "notes": ""
+  },
+  {
+   "name": "spark",
+   "texture": "rlk:raiden/fxg/spark",
+   "w": 32,
+   "h": 32,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre",
+   "use": "spark dot",
+   "notes": ""
+  },
+  {
+   "name": "glint",
+   "texture": "rlk:raiden/fxg/glint",
+   "w": 64,
+   "h": 64,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre",
+   "use": "four-point star glint (armour shards)",
+   "notes": ""
+  },
+  {
+   "name": "charge_spark",
+   "texture": "rlk:raiden/fxg/charge_spark",
+   "w": 64,
+   "h": 128,
+   "kind": "column",
+   "along": "v",
+   "core": "base at (0.5, 0.95), rises to v~0.12",
+   "use": "small rising charge spark",
+   "notes": ""
+  },
+  {
+   "name": "glow_soft",
+   "texture": "rlk:raiden/fxg/glow_soft",
+   "w": 64,
+   "h": 64,
+   "kind": "radial",
+   "along": "radial",
+   "core": "centre",
+   "use": "plain soft glow",
+   "notes": ""
+  },
+  {
+   "name": "glow_strip",
+   "texture": "rlk:raiden/fxg/glow_strip",
+   "w": 256,
+   "h": 32,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5",
+   "use": "plain soft beam glow",
+   "notes": ""
+  },
+  {
+   "name": "tele_1",
+   "texture": "rlk:raiden/fxg/tele_1",
+   "w": 224,
+   "h": 288,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..6.096, z -0.900..6.900",
+   "use": "warning telegraph of hazard shape 1 (sector)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_1",
+   "texture": "rlk:raiden/fxg/charged_1",
+   "w": 224,
+   "h": 288,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..6.096, z -0.900..6.900",
+   "use": "charged (white-hot) telegraph of hazard shape 1 (sector)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_2",
+   "texture": "rlk:raiden/fxg/tele_2",
+   "w": 80,
+   "h": 512,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..2.000, z -0.900..12.900",
+   "use": "warning telegraph of hazard shape 2 (rect)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_2",
+   "texture": "rlk:raiden/fxg/charged_2",
+   "w": 80,
+   "h": 512,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..2.000, z -0.900..12.900",
+   "use": "charged (white-hot) telegraph of hazard shape 2 (rect)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_3",
+   "texture": "rlk:raiden/fxg/tele_3",
+   "w": 160,
+   "h": 160,
+   "kind": "decal",
+   "along": "world",
+   "core": "quad piece: world x 0.000..3.900, z 0.000..3.900",
+   "use": "warning telegraph of hazard shape 3 (disk)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_3",
+   "texture": "rlk:raiden/fxg/charged_3",
+   "w": 160,
+   "h": 160,
+   "kind": "decal",
+   "along": "world",
+   "core": "quad piece: world x 0.000..3.900, z 0.000..3.900",
+   "use": "charged (white-hot) telegraph of hazard shape 3 (disk)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_4",
+   "texture": "rlk:raiden/fxg/tele_4",
+   "w": 400,
+   "h": 448,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..12.176, z -0.900..12.900",
+   "use": "warning telegraph of hazard shape 4 (sector)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_4",
+   "texture": "rlk:raiden/fxg/charged_4",
+   "w": 400,
+   "h": 448,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..12.176, z -0.900..12.900",
+   "use": "charged (white-hot) telegraph of hazard shape 4 (sector)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_5",
+   "texture": "rlk:raiden/fxg/tele_5",
+   "w": 96,
+   "h": 752,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..2.700, z -0.900..20.900",
+   "use": "warning telegraph of hazard shape 5 (rect)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_5",
+   "texture": "rlk:raiden/fxg/charged_5",
+   "w": 96,
+   "h": 752,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..2.700, z -0.900..20.900",
+   "use": "charged (white-hot) telegraph of hazard shape 5 (rect)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_6",
+   "texture": "rlk:raiden/fxg/tele_6",
+   "w": 240,
+   "h": 240,
+   "kind": "decal",
+   "along": "world",
+   "core": "quad piece: world x 0.000..5.900, z 0.000..5.900",
+   "use": "warning telegraph of hazard shape 6 (disk)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_6",
+   "texture": "rlk:raiden/fxg/charged_6",
+   "w": 240,
+   "h": 240,
+   "kind": "decal",
+   "along": "world",
+   "core": "quad piece: world x 0.000..5.900, z 0.000..5.900",
+   "use": "charged (white-hot) telegraph of hazard shape 6 (disk)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_7",
+   "texture": "rlk:raiden/fxg/tele_7",
+   "w": 192,
+   "h": 368,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..4.900, z -0.900..8.900",
+   "use": "warning telegraph of hazard shape 7 (rect)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_7",
+   "texture": "rlk:raiden/fxg/charged_7",
+   "w": 192,
+   "h": 368,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..4.900, z -0.900..8.900",
+   "use": "charged (white-hot) telegraph of hazard shape 7 (rect)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_8",
+   "texture": "rlk:raiden/fxg/tele_8",
+   "w": 256,
+   "h": 256,
+   "kind": "decal",
+   "along": "world",
+   "core": "quad piece: world x 0.000..6.900, z 0.000..6.900",
+   "use": "warning telegraph of hazard shape 8 (disk)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_8",
+   "texture": "rlk:raiden/fxg/charged_8",
+   "w": 256,
+   "h": 256,
+   "kind": "decal",
+   "along": "world",
+   "core": "quad piece: world x 0.000..6.900, z 0.000..6.900",
+   "use": "charged (white-hot) telegraph of hazard shape 8 (disk)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_9_0",
+   "texture": "rlk:raiden/fxg/tele_9_0",
+   "w": 96,
+   "h": 640,
+   "kind": "decal",
+   "along": "world",
+   "core": "ray piece: world x -1.350..1.350, z -0.900..18.900",
+   "use": "warning telegraph of hazard shape 9 (fan)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_9_0",
+   "texture": "rlk:raiden/fxg/charged_9_0",
+   "w": 96,
+   "h": 640,
+   "kind": "decal",
+   "along": "world",
+   "core": "ray piece: world x -1.350..1.350, z -0.900..18.900",
+   "use": "charged (white-hot) telegraph of hazard shape 9 (fan)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_9_25",
+   "texture": "rlk:raiden/fxg/tele_9_25",
+   "w": 112,
+   "h": 640,
+   "kind": "decal",
+   "along": "world",
+   "core": "ray piece: world x -1.350..2.135, z -0.900..18.900",
+   "use": "warning telegraph of hazard shape 9 (fan)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_9_25",
+   "texture": "rlk:raiden/fxg/charged_9_25",
+   "w": 112,
+   "h": 640,
+   "kind": "decal",
+   "along": "world",
+   "core": "ray piece: world x -1.350..2.135, z -0.900..18.900",
+   "use": "charged (white-hot) telegraph of hazard shape 9 (fan)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_9_50",
+   "texture": "rlk:raiden/fxg/tele_9_50",
+   "w": 144,
+   "h": 640,
+   "kind": "decal",
+   "along": "world",
+   "core": "ray piece: world x -1.350..2.919, z -0.900..18.900",
+   "use": "warning telegraph of hazard shape 9 (fan)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_9_50",
+   "texture": "rlk:raiden/fxg/charged_9_50",
+   "w": 144,
+   "h": 640,
+   "kind": "decal",
+   "along": "world",
+   "core": "ray piece: world x -1.350..2.919, z -0.900..18.900",
+   "use": "charged (white-hot) telegraph of hazard shape 9 (fan)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_10",
+   "texture": "rlk:raiden/fxg/tele_10",
+   "w": 144,
+   "h": 640,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..4.400, z -0.900..18.900",
+   "use": "warning telegraph of hazard shape 10 (rect)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_10",
+   "texture": "rlk:raiden/fxg/charged_10",
+   "w": 144,
+   "h": 640,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..4.400, z -0.900..18.900",
+   "use": "charged (white-hot) telegraph of hazard shape 10 (rect)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_11",
+   "texture": "rlk:raiden/fxg/tele_11",
+   "w": 144,
+   "h": 144,
+   "kind": "decal",
+   "along": "world",
+   "core": "quad piece: world x 0.000..3.600, z 0.000..3.600",
+   "use": "warning telegraph of hazard shape 11 (annulus)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_11",
+   "texture": "rlk:raiden/fxg/charged_11",
+   "w": 144,
+   "h": 144,
+   "kind": "decal",
+   "along": "world",
+   "core": "quad piece: world x 0.000..3.600, z 0.000..3.600",
+   "use": "charged (white-hot) telegraph of hazard shape 11 (annulus)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_12",
+   "texture": "rlk:raiden/fxg/tele_12",
+   "w": 416,
+   "h": 416,
+   "kind": "decal",
+   "along": "world",
+   "core": "quad piece: world x 0.000..12.900, z 0.000..12.900",
+   "use": "warning telegraph of hazard shape 12 (disk)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_12",
+   "texture": "rlk:raiden/fxg/charged_12",
+   "w": 416,
+   "h": 416,
+   "kind": "decal",
+   "along": "world",
+   "core": "quad piece: world x 0.000..12.900, z 0.000..12.900",
+   "use": "charged (white-hot) telegraph of hazard shape 12 (disk)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "tele_13",
+   "texture": "rlk:raiden/fxg/tele_13",
+   "w": 80,
+   "h": 768,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..2.100, z -0.900..22.900",
+   "use": "warning telegraph of hazard shape 13 (rect)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_13",
+   "texture": "rlk:raiden/fxg/charged_13",
+   "w": 80,
+   "h": 768,
+   "kind": "decal",
+   "along": "world",
+   "core": "half piece: world x 0.000..2.100, z -0.900..22.900",
+   "use": "charged (white-hot) telegraph of hazard shape 13 (rect)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "ringq_0",
+   "texture": "rlk:raiden/fxg/ringq_0",
+   "w": 96,
+   "h": 96,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at (0,0); band radius 2.3+-0.7 of 3.900 blocks per texture side",
+   "use": "expanding ring quadrant (hazard shape 11)",
+   "notes": ""
+  },
+  {
+   "name": "ringq_1",
+   "texture": "rlk:raiden/fxg/ringq_1",
+   "w": 112,
+   "h": 112,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at (0,0); band radius 2.9+-0.7 of 4.500 blocks per texture side",
+   "use": "expanding ring quadrant (hazard shape 11)",
+   "notes": ""
+  },
+  {
+   "name": "ringq_2",
+   "texture": "rlk:raiden/fxg/ringq_2",
+   "w": 128,
+   "h": 128,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at (0,0); band radius 3.6+-0.7 of 5.200 blocks per texture side",
+   "use": "expanding ring quadrant (hazard shape 11)",
+   "notes": ""
+  },
+  {
+   "name": "ringq_3",
+   "texture": "rlk:raiden/fxg/ringq_3",
+   "w": 160,
+   "h": 160,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at (0,0); band radius 4.5+-0.7 of 6.100 blocks per texture side",
+   "use": "expanding ring quadrant (hazard shape 11)",
+   "notes": ""
+  },
+  {
+   "name": "ringq_4",
+   "texture": "rlk:raiden/fxg/ringq_4",
+   "w": 176,
+   "h": 176,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at (0,0); band radius 5.6+-0.7 of 7.200 blocks per texture side",
+   "use": "expanding ring quadrant (hazard shape 11)",
+   "notes": ""
+  },
+  {
+   "name": "ringq_5",
+   "texture": "rlk:raiden/fxg/ringq_5",
+   "w": 208,
+   "h": 208,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at (0,0); band radius 7.0+-0.7 of 8.600 blocks per texture side",
+   "use": "expanding ring quadrant (hazard shape 11)",
+   "notes": ""
+  },
+  {
+   "name": "ringq_6",
+   "texture": "rlk:raiden/fxg/ringq_6",
+   "w": 256,
+   "h": 256,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at (0,0); band radius 8.8+-0.7 of 10.400 blocks per texture side",
+   "use": "expanding ring quadrant (hazard shape 11)",
+   "notes": ""
+  },
+  {
+   "name": "ringq_7",
+   "texture": "rlk:raiden/fxg/ringq_7",
+   "w": 304,
+   "h": 304,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at (0,0); band radius 11.0+-0.7 of 12.600 blocks per texture side",
+   "use": "expanding ring quadrant (hazard shape 11)",
+   "notes": ""
+  },
+  {
+   "name": "ringq_8",
+   "texture": "rlk:raiden/fxg/ringq_8",
+   "w": 384,
+   "h": 384,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at (0,0); band radius 13.8+-0.7 of 15.400 blocks per texture side",
+   "use": "expanding ring quadrant (hazard shape 11)",
+   "notes": ""
+  },
+  {
+   "name": "ringq_9",
+   "texture": "rlk:raiden/fxg/ringq_9",
+   "w": 464,
+   "h": 464,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at (0,0); band radius 17.2+-0.7 of 18.800 blocks per texture side",
+   "use": "expanding ring quadrant (hazard shape 11)",
+   "notes": ""
+  },
+  {
+   "name": "rig_katana_a",
+   "texture": "rlk:raiden/fxg/rig_katana_a",
+   "w": 224,
+   "h": 112,
+   "kind": "blade",
+   "along": "u",
+   "core": "edge bolt hugs the giant-katana edge; card = model y 9.6..32.0 (u, hilt->tip) x model x 2.6..12.0 (v, edge side first)",
+   "use": "blade-plane sheath card of fx_weapon/katana_*",
+   "notes": "spine crackle at the spine side, tip fork + bloom; the blade body hides the middle",
+   "card": {
+    "model_x": [
+     2.6,
+     12.0
+    ],
+    "model_y": [
+     9.6,
+     32.0
+    ]
+   }
+  },
+  {
+   "name": "rig_katana_b",
+   "texture": "rlk:raiden/fxg/rig_katana_b",
+   "w": 224,
+   "h": 112,
+   "kind": "blade",
+   "along": "u",
+   "core": "edge bolt hugs the giant-katana edge; card = model y 9.6..32.0 (u, hilt->tip) x model x 2.6..12.0 (v, edge side first)",
+   "use": "blade-plane sheath card of fx_weapon/katana_*",
+   "notes": "spine crackle at the spine side, tip fork + bloom; the blade body hides the middle",
+   "card": {
+    "model_x": [
+     2.6,
+     12.0
+    ],
+    "model_y": [
+     9.6,
+     32.0
+    ]
+   }
+  },
+  {
+   "name": "rig_palm",
+   "texture": "rlk:raiden/fxg/rig_palm",
+   "w": 128,
+   "h": 144,
+   "kind": "palm",
+   "along": "v",
+   "core": "arcs from fingertips ((5.25, -3.4), (7.08, -4.8), (8.97, -4.8), (10.8, -3.4)) and the thumb into palm centre (8.0, 4.2); card = model x 1.6..14.4 (u) x model y 8.0..-6.4 (v, wrist first)",
+   "use": "palm-parallel charge card of fx_weapon/palm_*",
+   "notes": "fingertips symmetric about x=8: mirror u for the other flicker frame",
+   "card": {
+    "model_x": [
+     1.6,
+     14.4
+    ],
+    "model_y": [
+     -6.4,
+     8.0
+    ],
+    "centre": [
+     8.0,
+     4.2
+    ]
+   }
+  },
+  {
+   "name": "rig_crown",
+   "texture": "rlk:raiden/fxg/rig_crown",
+   "w": 192,
+   "h": 192,
+   "kind": "radial",
+   "along": "radial",
+   "core": "bolts from r~0.09w to 0.36..0.47w, broken ring r=0.31w",
+   "use": "palm release crown (fx_weapon/palm_*_release_*)",
+   "notes": "dark centre; rotate/mirror the uv for the second flicker frame"
+  },
+  {
+   "name": "rig_shard",
+   "texture": "rlk:raiden/fxg/rig_shard",
+   "w": 48,
+   "h": 128,
+   "kind": "column",
+   "along": "v",
+   "core": "lens tips at v=0.03/0.97, widest at v~0.39, ridge u~0.5",
+   "use": "translucent crystal splinter (death_shard_*)",
+   "notes": ""
+  },
+  {
+   "name": "obj_swing_band",
+   "texture": "rlk:raiden/fxg/obj_swing_band",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "line v=0.27 (u=0) -> 0.73 (u=1), brightest near u~0.9",
+   "use": "illusion swing ribbon (u = swing start -> blade end)",
+   "notes": "u=0 oldest (dissolving tail), u=1 newest; map onto chord cards spanning 0.9 block of height"
+  },
+  {
+   "name": "obj_wave_band",
+   "texture": "rlk:raiden/fxg/obj_wave_band",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5 white core, lens envelope sin(pi*u)",
+   "use": "flying sword-wave front band (chord cards along the crescent edge)",
+   "notes": "layered glow, crackle along the core, cyan sparks"
+  },
+  {
+   "name": "obj_wave_fade",
+   "texture": "rlk:raiden/fxg/obj_wave_fade",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5, lens envelope",
+   "use": "afterglow of obj_wave_band",
+   "notes": "dissolving purple with embers"
+  },
+  {
+   "name": "obj_frag_a",
+   "texture": "rlk:raiden/fxg/obj_frag_a",
+   "w": 128,
+   "h": 32,
+   "kind": "strip",
+   "along": "u",
+   "core": "glowing top edge v=0.2, dim bottom edge v=0.8",
+   "use": "blink silhouette strip (u across the body, v top -> bottom)",
+   "notes": "ragged dissolving ends, short lightning seam"
+  },
+  {
+   "name": "obj_frag_b",
+   "texture": "rlk:raiden/fxg/obj_frag_b",
+   "w": 128,
+   "h": 32,
+   "kind": "strip",
+   "along": "u",
+   "core": "glowing top edge v=0.2, dim bottom edge v=0.8",
+   "use": "blink silhouette strip (u across the body, v top -> bottom)",
+   "notes": "ragged dissolving ends, short lightning seam"
+  },
+  {
+   "name": "obj_frag_fade",
+   "texture": "rlk:raiden/fxg/obj_frag_fade",
+   "w": 128,
+   "h": 32,
+   "kind": "strip",
+   "along": "u",
+   "core": "as obj_frag_*",
+   "use": "dissolving blink strip (afterglow)",
+   "notes": ""
+  },
+  {
+   "name": "obj_shard",
+   "texture": "rlk:raiden/fxg/obj_shard",
+   "w": 64,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "tip at u~0.93, body u 0.42..0.93, streak toward u=0",
+   "use": "flying electro shard (break bursts)",
+   "notes": ""
+  },
+  {
+   "name": "obj_gauge_on",
+   "texture": "rlk:raiden/fxg/obj_gauge_on",
+   "w": 64,
+   "h": 64,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "arc r=0.74*w over 9..81 deg, centre at texel (0,0)",
+   "use": "lit remembrance-orb gauge quadrant (side = 0.5 local blocks)",
+   "notes": "mirror the uv for the other quadrants"
+  },
+  {
+   "name": "obj_gauge_off",
+   "texture": "rlk:raiden/fxg/obj_gauge_off",
+   "w": 64,
+   "h": 64,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "as obj_gauge_on",
+   "use": "spent orb gauge quadrant",
+   "notes": ""
+  }
+ ],
+ "hazard_decals": {
+  "tele_1": {
+   "shape": 1,
+   "sym": "half",
+   "w": 224,
+   "h": 288,
+   "x0": 0.0,
+   "x1": 6.096152422706632,
+   "z0": -0.9,
+   "z1": 6.9,
+   "geom": null
+  },
+  "charged_1": {
+   "shape": 1,
+   "sym": "half",
+   "w": 224,
+   "h": 288,
+   "x0": 0.0,
+   "x1": 6.096152422706632,
+   "z0": -0.9,
+   "z1": 6.9,
+   "geom": null
+  },
+  "tele_2": {
+   "shape": 2,
+   "sym": "half",
+   "w": 80,
+   "h": 512,
+   "x0": 0.0,
+   "x1": 2.0,
+   "z0": -0.9,
+   "z1": 12.9,
+   "geom": null
+  },
+  "charged_2": {
+   "shape": 2,
+   "sym": "half",
+   "w": 80,
+   "h": 512,
+   "x0": 0.0,
+   "x1": 2.0,
+   "z0": -0.9,
+   "z1": 12.9,
+   "geom": null
+  },
+  "tele_3": {
+   "shape": 3,
+   "sym": "quad",
+   "w": 160,
+   "h": 160,
+   "x0": 0.0,
+   "x1": 3.9,
+   "z0": 0.0,
+   "z1": 3.9,
+   "geom": null
+  },
+  "charged_3": {
+   "shape": 3,
+   "sym": "quad",
+   "w": 160,
+   "h": 160,
+   "x0": 0.0,
+   "x1": 3.9,
+   "z0": 0.0,
+   "z1": 3.9,
+   "geom": null
+  },
+  "tele_4": {
+   "shape": 4,
+   "sym": "half",
+   "w": 400,
+   "h": 448,
+   "x0": 0.0,
+   "x1": 12.1763114494309,
+   "z0": -0.9,
+   "z1": 12.9,
+   "geom": null
+  },
+  "charged_4": {
+   "shape": 4,
+   "sym": "half",
+   "w": 400,
+   "h": 448,
+   "x0": 0.0,
+   "x1": 12.1763114494309,
+   "z0": -0.9,
+   "z1": 12.9,
+   "geom": null
+  },
+  "tele_5": {
+   "shape": 5,
+   "sym": "half",
+   "w": 96,
+   "h": 752,
+   "x0": 0.0,
+   "x1": 2.7,
+   "z0": -0.9,
+   "z1": 20.9,
+   "geom": null
+  },
+  "charged_5": {
+   "shape": 5,
+   "sym": "half",
+   "w": 96,
+   "h": 752,
+   "x0": 0.0,
+   "x1": 2.7,
+   "z0": -0.9,
+   "z1": 20.9,
+   "geom": null
+  },
+  "tele_6": {
+   "shape": 6,
+   "sym": "quad",
+   "w": 240,
+   "h": 240,
+   "x0": 0.0,
+   "x1": 5.9,
+   "z0": 0.0,
+   "z1": 5.9,
+   "geom": null
+  },
+  "charged_6": {
+   "shape": 6,
+   "sym": "quad",
+   "w": 240,
+   "h": 240,
+   "x0": 0.0,
+   "x1": 5.9,
+   "z0": 0.0,
+   "z1": 5.9,
+   "geom": null
+  },
+  "tele_7": {
+   "shape": 7,
+   "sym": "half",
+   "w": 192,
+   "h": 368,
+   "x0": 0.0,
+   "x1": 4.9,
+   "z0": -0.9,
+   "z1": 8.9,
+   "geom": null
+  },
+  "charged_7": {
+   "shape": 7,
+   "sym": "half",
+   "w": 192,
+   "h": 368,
+   "x0": 0.0,
+   "x1": 4.9,
+   "z0": -0.9,
+   "z1": 8.9,
+   "geom": null
+  },
+  "tele_8": {
+   "shape": 8,
+   "sym": "quad",
+   "w": 256,
+   "h": 256,
+   "x0": 0.0,
+   "x1": 6.9,
+   "z0": 0.0,
+   "z1": 6.9,
+   "geom": null
+  },
+  "charged_8": {
+   "shape": 8,
+   "sym": "quad",
+   "w": 256,
+   "h": 256,
+   "x0": 0.0,
+   "x1": 6.9,
+   "z0": 0.0,
+   "z1": 6.9,
+   "geom": null
+  },
+  "tele_9_0": {
+   "shape": 9,
+   "sym": "ray",
+   "w": 96,
+   "h": 640,
+   "x0": -1.35,
+   "x1": 1.35,
+   "z0": -0.9,
+   "z1": 18.9,
+   "geom": {
+    "kind": "fan",
+    "length": 18,
+    "width": 0.9,
+    "angles": [
+     0.0
+    ]
+   }
+  },
+  "charged_9_0": {
+   "shape": 9,
+   "sym": "ray",
+   "w": 96,
+   "h": 640,
+   "x0": -1.35,
+   "x1": 1.35,
+   "z0": -0.9,
+   "z1": 18.9,
+   "geom": {
+    "kind": "fan",
+    "length": 18,
+    "width": 0.9,
+    "angles": [
+     0.0
+    ]
+   }
+  },
+  "tele_9_25": {
+   "shape": 9,
+   "sym": "ray",
+   "w": 112,
+   "h": 640,
+   "x0": -1.35,
+   "x1": 2.135148972576048,
+   "z0": -0.9,
+   "z1": 18.9,
+   "geom": {
+    "kind": "fan",
+    "length": 18,
+    "width": 0.9,
+    "angles": [
+     2.5
+    ]
+   }
+  },
+  "charged_9_25": {
+   "shape": 9,
+   "sym": "ray",
+   "w": 112,
+   "h": 640,
+   "x0": -1.35,
+   "x1": 2.135148972576048,
+   "z0": -0.9,
+   "z1": 18.9,
+   "geom": {
+    "kind": "fan",
+    "length": 18,
+    "width": 0.9,
+    "angles": [
+     2.5
+    ]
+   }
+  },
+  "tele_9_50": {
+   "shape": 9,
+   "sym": "ray",
+   "w": 144,
+   "h": 640,
+   "x0": -1.35,
+   "x1": 2.918803369457847,
+   "z0": -0.9,
+   "z1": 18.9,
+   "geom": {
+    "kind": "fan",
+    "length": 18,
+    "width": 0.9,
+    "angles": [
+     5.0
+    ]
+   }
+  },
+  "charged_9_50": {
+   "shape": 9,
+   "sym": "ray",
+   "w": 144,
+   "h": 640,
+   "x0": -1.35,
+   "x1": 2.918803369457847,
+   "z0": -0.9,
+   "z1": 18.9,
+   "geom": {
+    "kind": "fan",
+    "length": 18,
+    "width": 0.9,
+    "angles": [
+     5.0
+    ]
+   }
+  },
+  "tele_10": {
+   "shape": 10,
+   "sym": "half",
+   "w": 144,
+   "h": 640,
+   "x0": 0.0,
+   "x1": 4.4,
+   "z0": -0.9,
+   "z1": 18.9,
+   "geom": null
+  },
+  "charged_10": {
+   "shape": 10,
+   "sym": "half",
+   "w": 144,
+   "h": 640,
+   "x0": 0.0,
+   "x1": 4.4,
+   "z0": -0.9,
+   "z1": 18.9,
+   "geom": null
+  },
+  "tele_11": {
+   "shape": 11,
+   "sym": "quad",
+   "w": 144,
+   "h": 144,
+   "x0": 0.0,
+   "x1": 3.6,
+   "z0": 0.0,
+   "z1": 3.6,
+   "geom": null
+  },
+  "charged_11": {
+   "shape": 11,
+   "sym": "quad",
+   "w": 144,
+   "h": 144,
+   "x0": 0.0,
+   "x1": 3.6,
+   "z0": 0.0,
+   "z1": 3.6,
+   "geom": null
+  },
+  "tele_12": {
+   "shape": 12,
+   "sym": "quad",
+   "w": 416,
+   "h": 416,
+   "x0": 0.0,
+   "x1": 12.9,
+   "z0": 0.0,
+   "z1": 12.9,
+   "geom": null
+  },
+  "charged_12": {
+   "shape": 12,
+   "sym": "quad",
+   "w": 416,
+   "h": 416,
+   "x0": 0.0,
+   "x1": 12.9,
+   "z0": 0.0,
+   "z1": 12.9,
+   "geom": null
+  },
+  "tele_13": {
+   "shape": 13,
+   "sym": "half",
+   "w": 80,
+   "h": 768,
+   "x0": 0.0,
+   "x1": 2.1,
+   "z0": -0.9,
+   "z1": 22.9,
+   "geom": null
+  },
+  "charged_13": {
+   "shape": 13,
+   "sym": "half",
+   "w": 80,
+   "h": 768,
+   "x0": 0.0,
+   "x1": 2.1,
+   "z0": -0.9,
+   "z1": 22.9,
+   "geom": null
+  }
+ },
+ "ring_radii": [
+  2.3,
+  2.9,
+  3.6,
+  4.5,
+  5.6,
+  7.0,
+  8.8,
+  11.0,
+  13.8,
+  17.2
+ ],
+ "ring_half": 0.7,
+ "ring_pad": 0.9
+}
