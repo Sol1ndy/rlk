@@ -28,7 +28,7 @@ execute if score @s rdBlink matches 1.. run function rlk:boss/raiden/movement/bl
 scoreboard players set #rdHide rd 0
 execute if score @s rdBlink matches 1.. run scoreboard players set #rdHide rd 1
 execute if score @s rdPat matches 5 if score @s rdTime matches 1.. run scoreboard players set #rdHide rd 1
-execute if score @s rdPat matches 15 if score @s rdTime matches 1.. run scoreboard players set #rdHide rd 1
+execute if score @s rdPat matches 15 if score @s rdTime matches 26.. run scoreboard players set #rdHide rd 1
 execute if score #rdHide rd matches 0 at @s run function rlk:boss/raiden/rig/tick
 execute if score #rdHide rd matches 1 run function rlk:boss/raiden/rig_hide
 execute if score #rdHide rd matches 0 if score @s rdHidden matches 1.. run function rlk:boss/raiden/rig_shown

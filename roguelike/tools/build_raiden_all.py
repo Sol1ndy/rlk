@@ -45,4 +45,5 @@ for step in steps:
         step = [sys.executable] + step[1:]
     print("$", " ".join(step[:2]))
     subprocess.run(step, cwd=TOOLS, check=True)
+subprocess.run([sys.executable, "check_raiden_pack.py", rp, str(DATAPACK)], cwd=TOOLS, check=True)
 print("Done. Apply with /reload (datapack) and F3+T (resource pack).")

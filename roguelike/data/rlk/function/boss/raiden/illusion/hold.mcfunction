@@ -1,3 +1,9 @@
+title @a[tag=player] times 3 36 10
+title @a[tag=player] subtitle {text:"X자로 베는 분신이 진짜 · 찾아서 공격하세요",color:"light_purple"}
+execute as @a[tag=player] run function rlk:view/ttl_blank
+scoreboard players set @a[tag=player] ttlT 49
+scoreboard players set #rdCap rd 1
+scoreboard players set #rdCapPat rd 1
 # Positions taken: everyone turns to the centre, settles into the guard, can be hit.
 execute as @e[tag=rlk_rd_illusion] at @s facing entity @e[tag=rlk_raiden_arena,limit=1] feet run tp @s ~ ~ ~ ~ 0
 scoreboard players set @e[tag=rlk_rd_illusion] rdHitCD 0

@@ -51,6 +51,9 @@ EXHAUST = 300
 # Transformation: scatter to the centre, then the transformation burst/clip.
 TRANSFORM_FX = 1
 TRANSFORM_LEN = 52
+# Final calamity entry (pattern 15): she gathers lightning, rises inside a lightning
+# pillar while bolts rake the arena, and dissolves at the top (rig hidden from then on).
+ASCEND_END, ASCEND_STEP = 26, 0.32
 CLAP_LOCK, CLAP_TELL = 17, 10   # pattern 12: hands follow until 17, clap lands 10 later
 SHADOW_LOCK = 37                 # pattern 13: the shadow chases for 36 ticks
 
@@ -158,12 +161,81 @@ scoreboard players set #rdCap rd 0
 scoreboard players set #rdCapPat rd 0
 ''')
 write('caption/clear','''
+scoreboard players set #rdLine rd 0
 execute unless score #rdCap rd matches 1 run return 0
 function rlk:boss/raiden/caption/expire
 title @a[tag=player] subtitle ""
 scoreboard players set @a[tag=player,scores={ttlT=1..}] ttlT 0
 scoreboard players set @a[tag=player,scores={vBig=1..}] vBig 0
 ''')
+def typed(text):
+    # Typewriter steps: each word grows at most two syllables at a time; punctuation
+    # stays on its syllable, except the closing punctuation, which lands as the last step.
+    PUNCT = '.,!?…'
+    body = text.rstrip(PUNCT)
+    tail = text[len(body):]
+    steps, done = [], ''
+    for w, word in enumerate(body.split(' ')):
+        sylls = []
+        for ch in word:
+            if ch in PUNCT and sylls:
+                sylls[-1] += ch
+            else:
+                sylls.append(ch)
+        for k in range(0, len(sylls), 2):
+            steps.append(done + ''.join(sylls[:k+2]))
+        done = steps[-1] + ' '
+    if tail:
+        steps.append(text)
+    return steps
+# Boss lines from the original fight (나무위키 「마가츠 미타케 나루카미노 미코토」 3.2 패턴):
+# key: (text or explicit steps, ticks per step, colour, hold of the full line, heavy ending)
+VOICE, VOICE2 = '#d7b4ff', '#e6a3ff'
+LINES = {
+    'mangeop': (['그', '그 끝은', '그 끝은 만겁', '그 끝은 만겁일지니', '그 끝은 만겁일지니...'], 5, VOICE, 24, True),
+    'eternal': ('이 몸이 곧 영원이다', 3, VOICE, 26, True),
+    'nothing': ('그 무엇도 영원한 것은 없다.', 2, VOICE, 40, True),
+    'eyes': ('뇌광이 영원의 땅을 비추는구나.', 2, VOICE, 24, False),
+    'pohyeong': ('찰나의... 포영!', 3, VOICE, 22, False),
+    'ganpa': ('간파했군.', 4, '#bfe4ff', 34, False),
+    'noemyeong': ('뇌명.', 4, VOICE, 20, False),
+    'will': ('뇌전은 인간의 의지 따위로 변하지 않아', 2, VOICE, 22, False),
+    'command': ('번개여, 나의 호령을 따르라.', 2, VOICE, 22, False),
+    'calm': ('무념 무상, 천하가 고요하리.', 2, VOICE, 12, False),
+    'sever_one': ('무념 무상, 일도 단절.', 1, VOICE2, 16, True),
+    'cleave_all': ('방해는 모두 베겠노라', 2, VOICE2, 22, False),
+    'prison': ('감옥으로 만들어 주지', 2, VOICE2, 22, False),
+    'cheonsu': ('천수의 속박!', 3, VOICE2, 30, True),
+    'sever': ('단절!', 2, VOICE2, 20, True),
+    'goemyeol': ('궤멸하라!', 3, VOICE2, 24, False),
+    'pierce': ('뚫려라!', 2, VOICE2, 20, False),
+}
+LINE_IDS = {k: i for i, k in enumerate(LINES, 1)}
+tick_lines = ['# Advances the boss line in progress (#rdLine id, #rdLineT age); called from tick.',
+              'execute unless score #rdLine rd matches 1.. run return 0',
+              'scoreboard players add #rdLineT rd 1']
+for key, (steps, gap, colour, hold, heavy) in LINES.items():
+    steps = typed(steps) if isinstance(steps, str) else steps
+    lid = LINE_IDS[key]
+    write('line/'+key, [f'scoreboard players set #rdLine rd {lid}', 'scoreboard players set #rdLineT rd -1'])
+    for k, text in enumerate(steps):
+        last = k == len(steps)-1
+        stay = hold if last else gap+6
+        frame = [f'title @a[tag=player] times 0 {stay} {12 if last else 0}',
+                 'title @a[tag=player] subtitle {text:"'+text+'",color:"'+colour+'",bold:true}',
+                 'execute as @a[tag=player] run function rlk:view/ttl_blank',
+                 f'scoreboard players set @a[tag=player] ttlT {stay+(12 if last else 0)}',
+                 'scoreboard players set #rdCap rd 1', 'scoreboard players set #rdCapPat rd 1',
+                 f'execute as @a[tag=player] at @s run playsound minecraft:block.respawn_anchor.charge hostile @s ~ ~ ~ .45 {.62+.08*k:.2f} 0',
+                 f'execute as @a[tag=player] at @s run playsound minecraft:block.amethyst_block.hit hostile @s ~ ~ ~ .8 {.55+.06*k:.2f} 0']
+        if last:
+            frame += ['execute as @a[tag=player] at @s run playsound minecraft:block.beacon.power_select hostile @s ~ ~ ~ .7 .5 0',
+                      'scoreboard players set #rdLine rd 0']
+            if heavy:
+                frame.insert(-1, 'execute as @a[tag=player] at @s run playsound minecraft:entity.lightning_bolt.thunder hostile @s ~ ~ ~ .55 .55 0')
+        write(f'line/{key}_{k}', frame)
+        tick_lines.append(f'execute if score #rdLine rd matches {lid} if score #rdLineT rd matches {k*gap} run function rlk:boss/raiden/line/{key}_{k}')
+write('line/tick', tick_lines)
 write('caption/pattern_end','''
 execute if score #rdCapPat rd matches 1 run function rlk:boss/raiden/caption/clear
 ''')
@@ -220,7 +292,7 @@ execute if score @s rdBlink matches 1.. run function rlk:boss/raiden/movement/bl
 scoreboard players set #rdHide rd 0
 execute if score @s rdBlink matches 1.. run scoreboard players set #rdHide rd 1
 execute if score @s rdPat matches 5 if score @s rdTime matches 1.. run scoreboard players set #rdHide rd 1
-execute if score @s rdPat matches 15 if score @s rdTime matches 1.. run scoreboard players set #rdHide rd 1
+execute if score @s rdPat matches 15 if score @s rdTime matches {ASCEND_END}.. run scoreboard players set #rdHide rd 1
 execute if score #rdHide rd matches 0 at @s run function rlk:boss/raiden/rig/tick
 execute if score #rdHide rd matches 1 run function rlk:boss/raiden/rig_hide
 execute if score #rdHide rd matches 0 if score @s rdHidden matches 1.. run function rlk:boss/raiden/rig_shown
@@ -315,20 +387,22 @@ kill @e[tag=rlk_rd_blink_dest]
 scoreboard players set @s rdAnim 9
 execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
 execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
-title @a[tag=player] times 8 55 16
-title @a[tag=player] subtitle {text:"번개 갑주를 파괴하면 잠시 무력화됩니다",color:"white"}
-title @a[tag=player] title {text:"악요의 요구우 텐마",color:"light_purple",bold:true}
-scoreboard players set @a[tag=player] vBig 79
-scoreboard players set @a[tag=player] ttlT 79
-scoreboard players set #rdCap rd 1
-# Not a pattern caption: an interrupted illusion caption must not let armor_start's
-# finish (rdTime 56) cut this one short.
+function rlk:boss/raiden/line/eternal
 scoreboard players set #rdCapPat rd 0
 playsound minecraft:entity.wither.spawn hostile @a[tag=player] ~ ~ ~ 0.8 0.5 0.4
 ''')
 # The burst and its danger circle start at the boss on TRANSFORM_FX; the transform
 # clip (46) ends before armor_start at TRANSFORM_LEN.
-write('transform_tick',[caption('악요의 요구우 텐마 · 변신'),
+write('transform_title',['# After her line: the form name and the armour hint.']+'''title @a[tag=player] times 8 55 16
+title @a[tag=player] subtitle {text:"번개 갑주를 파괴하면 잠시 무력화됩니다",color:"white"}
+title @a[tag=player] title {text:"악요의 요고우 텐마",color:"light_purple",bold:true}
+scoreboard players set @a[tag=player] vBig 79
+scoreboard players set @a[tag=player] ttlT 79
+scoreboard players set #rdCap rd 1
+# Not a pattern caption: an interrupted illusion caption must not let armor_start\'s
+# finish (rdTime 56) cut this one short.
+'''.strip().split('\n')+['scoreboard players set #rdCapPat rd 0'])
+write('transform_tick',[caption('악요의 요고우 텐마 · 변신'),at('30',call('transform_title')),
     at(str(TRANSFORM_FX),call('vfx/transform')),at(str(TRANSFORM_FX),haz(8,30,18,42)),
     at(str(TRANSFORM_FX+14),sound('entity.lightning_bolt.thunder',.6,.7)),
     at(str(TRANSFORM_LEN),call('armor_start'))])
@@ -394,6 +468,7 @@ function rlk:boss/raiden/finish
 scoreboard players set @s rdCool 20
 ''')
 write('bars',f'''
+function rlk:boss/raiden/line/tick
 execute if score #rdCap rd matches 1 unless entity @a[tag=player,scores={{ttlT=1..}}] run function rlk:boss/raiden/caption/expire
 bossbar set rlk:narukami players @a[tag=player]
 bossbar set rlk:narukami visible true
@@ -504,6 +579,7 @@ gated(p,64,'if score #rdFollow rd matches 1',anim(3),call('object_vfx/slash'),so
 gated(p,58,'if score #rdFollow rd matches 0',call('finish'))
 gated(p,70,'if score #rdFollow rd matches 1',call('finish'))
 p=pattern(2,'회전 참격 · 빠른 번개 칼날 세 개와 큰 초승달 검기')
+event(p,1,call('line/will'))
 # She spins in place throwing three fast blades at the player, then a big crescent.
 event(p,1,face,flat,anim(20),sound('entity.breeze.charge',.8,.8))
 for t in [4,10,16]:
@@ -513,35 +589,39 @@ event(p,26,face,flat,anim(2),haz(10,10,18))
 event(p,36,anim(3),call('object_vfx/slash'),sound('entity.player.attack.sweep',1.2,.6))
 end(p,44)
 p=pattern(3,'뇌명 · 순간이동 후 발도')
+event(p,1,call('line/noemyeong'))
 # Each scatter blink keeps the rig hidden for 8 ticks (reforms on blink start + 8).
 event(p,1,anim(21),sound('entity.breeze.charge',.8,.7),call('movement/blink_start'))
 event(p,10,face,flat,anim(2),haz(2,8,16));event(p,18,anim(6),sound('entity.player.attack.sweep',1.1,.65))
 event(p,24,call('movement/blink_start'));event(p,33,face,flat,anim(2),haz(1,8,15));event(p,41,anim(4));end(p,48)
 p=pattern(4,'마가츠의 뇌안 · 하나를 파괴하고 빈 원으로 이동')
-event(p,1,anim(7),call('eyes_start'))
+event(p,1,anim(7),call('eyes_start'),call('line/eyes'))
 event(p,16,anim(8));event(p,40,call('eyes_arm'));event(p,59,anim(18));end(p,70)
 # Pattern 5 (분신 · 진짜 찾기) belongs to build_raiden_illusions.py; it ends itself.
 patterns[5]=[call('illusion/tick')]
 p=pattern(6,'낙뢰 · 표시된 자리에서 벗어나세요')
+event(p,1,call('line/command'))
 for t in [1,14,27,40]:
     event(p,t,anim(7),target+haz(3,9,12));event(p,t+9,anim(8),sound('entity.lightning_bolt.impact',.7,.8))
 end(p,54)
 p=pattern(7,'뇌광 결계 · 번개 씨앗이 떨어진 뒤 안쪽 전체 강타, 바깥으로 피하세요')
 # She pushes the player away, electro seeds fall in a ring 10 blocks around her, then
 # everything inside the ring is struck: run out past the seeds.
-event(p,1,anim(7),haz(8,8,10),sound('entity.warden.sonic_charge',.6,1.4))
+event(p,1,anim(7),haz(8,8,10),sound('entity.warden.sonic_charge',.6,1.4),call('line/calm'))
+event(p,26,call('line/sever_one'))
 for i,(t,a) in enumerate([(4,0),(6,60),(8,120),(10,180),(12,240),(14,300)]):
     event(p,t,f'execute rotated ~{a} 0 positioned ^ ^ ^10 run '+haz(3,10,8))
 event(p,6,haz(12,24,26))
 event(p,30,anim(8),sound('entity.lightning_bolt.thunder',.8,.9))
 end(p,40)
 p=pattern(11,'거대 팔 연격 · 검의 궤적과 투척 낙뢰에 주의')
+event(p,1,call('line/cleave_all'))
 for t in [1,17]:
     event(p,t,face,flat,anim(10),haz(4,11,19));event(p,t+11,anim(11),sound('entity.player.attack.sweep',1.2,.62))
 event(p,33,anim(7),target+haz(3,10,22));event(p,43,anim(8));end(p,50)
 p=pattern(12,'인공팔 협격 · 따라오는 두 손이 박수치기 전에 빠져나오세요')
 # Two hands appear at the player's sides and follow them, then lock and clap shut.
-event(p,1,face,flat,anim(12),call('clap/spawn'))
+event(p,1,face,flat,anim(12),call('clap/spawn'),call('line/prison'))
 p.append('execute if score @s rdTime matches 1..'+str(CLAP_LOCK-1)+' run '+call('clap/follow'))
 event(p,CLAP_LOCK,call('clap/lock'))
 event(p,CLAP_LOCK+CLAP_TELL-3,call('clap/shut'))
@@ -553,32 +633,41 @@ p=pattern(13,'그림자 손 · 따라오는 그림자에서 계속 달아나세�
 # A shadow chases the player (repeated small damage while it covers them), then a hand
 # slams down where it stops. Contract with build_raiden_rig.mjs: the floating hand lands
 # at hazard age 12 (SLAM_CONTACT); the finish 12 ticks after landing lets it fade.
-event(p,1,anim(14),call('shadow/spawn'),sound('entity.warden.dig',.6,1.4))
+event(p,1,anim(14),call('shadow/spawn'),sound('entity.warden.dig',.6,1.4),call('line/prison'))
 p.append('execute if score @s rdTime matches 1..'+str(SHADOW_LOCK-1)+' run '+call('shadow/follow'))
 event(p,SHADOW_LOCK,call('shadow/lock'))
 event(p,SHADOW_LOCK+12,anim(15),sound('entity.generic.explode',.65,.72))
 end(p,SHADOW_LOCK+24)
 p=pattern(14,'천수의 속박 · 퍼지는 번개 고리를 점프로 회피')
-event(p,1,anim(7),call('stakes_start'));event(p,15,anim(8))
+event(p,1,anim(7),call('stakes_start'),call('line/cheonsu'));event(p,15,anim(8))
 for t,i in [(20,1),(54,2),(88,3)]:event(p,t,call('stakes_pulse_'+str(i)))
 event(p,128,call('stakes_pulse'))
 # Each ring keeps its full 32-tick travel; the final pulse ends before this finish.
 end(p,178)
 p=pattern(15,'최종 재앙 · 추억의 꽃을 공격한 뒤 보호막 안으로!')
-event(p,1,call('judgment_start'),anim(16));event(p,30,sound('block.beacon.ambient',.6,.5));event(p,70,sound('block.portal.ambient',.45,.55))
+event(p,1,call('judgment_start'),anim(16));
+p.append(f'execute if score @s rdTime matches 2..{ASCEND_END-1} at @s run tp @s ~ ~{ASCEND_STEP} ~')
+for t,(bx,bz) in zip([3,7,11,15,19,23],[(9,-6),(-11,4),(5,12),(-7,-12),(13,6),(-14,-3)]):
+    event(p,t,center+f'execute positioned ~{bx} ~ ~{bz} run '+call('vfx/judgment_bolt'),center+f'execute positioned ~{bx} ~ ~{bz} run playsound minecraft:entity.lightning_bolt.impact hostile @a[tag=player] ~ ~ ~ 1.2 0.7 0.4')
+event(p,ASCEND_END,call('movement/depart'),sound('entity.lightning_bolt.thunder',1,.6),center+'execute positioned ~ ~ ~-8 run tp @s ~ ~ ~ 0 0')
+# The gameplay hint follows once the line has been spoken (line ends ~tick 46).
+event(p,ASCEND_END+21,call('judgment_hint'));event(p,30,sound('block.beacon.ambient',.6,.5));event(p,70,sound('block.portal.ambient',.45,.55))
 # The flower retains the full six-second response window despite quicker recovery.
 # The hidden body already waits at centre-8; it reforms there facing the player.
 event(p,120,call('judgment_strike'));event(p,170,face,flat,call('movement/arrive'));end(p,176)
 p=pattern(16,'거검 발도 · 하얀 섬광이 보이면 바로 회피')
 # A horizontal iai with the giant sword; a white flash marks the moment to dodge.
 event(p,1,face,flat,anim(10),haz(4,14,30),haz(10,14,26))
+event(p,10,call('line/sever'))
 event(p,11,'execute positioned ^ ^2.4 ^1.2 run '+call('object_vfx/object_break'),sound('block.amethyst_block.resonate',1,1.9))
 event(p,15,anim(11),sound('entity.lightning_bolt.thunder',.8,.68))
 end(p,26)
 p=pattern(17,'검파 연사 · 다섯 갈래 뒤 넓은 가로 검파')
+event(p,1,call('line/goemyeol'))
 event(p,1,face,flat,anim(7),haz(9,10,17));event(p,11,anim(8),sound('entity.breeze.shoot',.8,.72))
 event(p,16,face,flat,anim(10),haz(10,10,21));event(p,26,anim(11));end(p,33)
 p=pattern(18,'발도 돌진 · 고정된 직선 경로를 피하세요')
+event(p,1,call('line/pierce'))
 event(p,1,face,flat,anim(2),haz(5,10,22));event(p,11,anim(21),sound('item.trident.riptide_3',.7,.8))
 p.append('execute if score @s rdTime matches 11..22 at @s rotated as @s positioned ^ ^ ^0.75 if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] run tp @s ~ ~ ~')
 # After the dash she keeps cutting: two wide sweeps in a row.
@@ -755,18 +844,22 @@ write('stakes_start',[call('object/clear')]+[
 write('stakes_pulse',['execute as @e[tag=rlk_rd_object,scores={rdObjKind=4}] at @s run '+haz(11,12,14,49),sound('block.beacon.power_select',.55,.7)])
 for i in [1,2,3]:
     write('stakes_pulse_'+str(i),[f'execute as @e[tag=rlk_rd_object,scores={{rdObjKind=4,rdObjId={i}}}] at @s run '+haz(11,12,14,49),sound('block.beacon.power_select',.55,.7)])
-write('judgment_start',[call('object/clear'),'scoreboard players set @s rdUltUsed 1','scoreboard players set @s rdWalk 0',call('movement/depart'),center+call('judgment_rig/start'),
-    '# The body is hidden from this frame (tick hides rdPat 15), so this move is never seen.',
-    center+'execute positioned ~ ~ ~-8 run tp @s ~ ~ ~ 0 0',
+write('judgment_start',[call('object/clear'),'scoreboard players set @s rdUltUsed 1','scoreboard players set @s rdWalk 0',
+    center+call('judgment_rig/start'),
     center+call('vfx/judgment_warning'),
     center+'execute positioned ~ ~ ~3 run '+obj(3,'remembrance_flower',4,1,.05),
+    '# She stays in view: lightning gathers around her and she rises (patterns/15 lifts her).',
+    call('vfx/judgment_ascend'),
+    call('line/mangeop'),
+    sound('entity.wither.ambient',.7,.5),sound('block.beacon.activate',.9,.5)])
+write('judgment_hint',[
     'title @a[tag=player] times 4 85 16',
     'title @a[tag=player] subtitle {text:"꽃을 공격 → 보호막 안으로! 번개 1타 / 다른 공격 4타",color:"aqua",bold:true}',
     'execute as @a[tag=player] run function rlk:view/ttl_blank',
     'scoreboard players set @a[tag=player] ttlT 105',
     'scoreboard players set #rdCap rd 1',
     'scoreboard players set #rdCapPat rd 1',
-    sound('entity.wither.ambient',.7,.5)])
+])
 write('dome_create','''
 summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_dome"]}
 scoreboard players set @e[tag=rlk_rd_dome] rdTime 0
@@ -869,7 +962,7 @@ write('test/armored','''
 function rlk:boss/raiden/test/start
 execute unless score #rdTest rd matches 1 run return 0
 execute as @e[tag=rlk_raiden,scores={rdDeath=0},limit=1] at @s run function rlk:boss/raiden/transform_start
-tellraw @s '''+T+'{text:"바로 악요의 요구우 텐마(갑주 단계)로 변신합니다.",color:"white",bold:false}]')
+tellraw @s '''+T+'{text:"바로 악요의 요고우 텐마(갑주 단계)로 변신합니다.",color:"white",bold:false}]')
 write('test/pattern','''
 # /function rlk:boss/raiden/test/pattern {id:N}: N = 1~7 (normal) or 11~18 (armored), once.
 $scoreboard players set #rdReq rd $(id)

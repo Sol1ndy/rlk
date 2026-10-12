@@ -310,12 +310,7 @@ write('start', [
     sound('entity.illusioner.mirror_move', .9, .75),
     f'execute at {CENTER} run tp @s ~ ~ ~ facing entity {BODY} feet',
     'execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0',
-    'title @a[tag=player] times 3 36 10',
-    'title @a[tag=player] subtitle {text:"X자로 베는 분신이 진짜 · 찾아서 공격하세요",color:"light_purple"}',
-    'execute as @a[tag=player] run function rlk:view/ttl_blank',
-    'scoreboard players set @a[tag=player] ttlT 49',
-    'scoreboard players set #rdCap rd 1',
-    'scoreboard players set #rdCapPat rd 1',
+    call('line/pohyeong'),
 ])
 intro = [
     '# As the boss (hidden at the centre). Reform there, split in four, run out.',
@@ -367,6 +362,12 @@ write('adopt_visual', [
 write('frame', [f'$execute as {VIS} run '+model_set('$(model)')])
 write('lean', [f'execute as {VIS} run data merge entity @s {{interpolation_duration:3,start_interpolation:0,transformation:{transform(14)}}}'])
 write('hold', [
+    'title @a[tag=player] times 3 36 10',
+    'title @a[tag=player] subtitle {text:"X자로 베는 분신이 진짜 · 찾아서 공격하세요",color:"light_purple"}',
+    'execute as @a[tag=player] run function rlk:view/ttl_blank',
+    'scoreboard players set @a[tag=player] ttlT 49',
+    'scoreboard players set #rdCap rd 1',
+    'scoreboard players set #rdCapPat rd 1',
     '# Positions taken: everyone turns to the centre, settles into the guard, can be hit.',
     f'execute as {ILL} at @s facing entity {CENTER} feet run tp @s ~ ~ ~ ~ 0',
     f'scoreboard players set {ILL} rdHitCD 0',
@@ -465,12 +466,7 @@ write('won', [
     'execute as @e[tag=rlk_rd_illusion,scores={rdReal=0}] at @s run '+call('illusion/dissolve'),
     f'tp {BOSS} ~ ~ ~',
     f'execute as {BOSS} at @s run '+call('illusion/reform'),
-    'title @a[tag=player] times 3 30 10',
-    'title @a[tag=player] subtitle {text:"간파 성공 · 지금 공격하세요!",color:"green",bold:true}',
-    'execute as @a[tag=player] run function rlk:view/ttl_blank',
-    'scoreboard players set @a[tag=player] ttlT 43',
-    'scoreboard players set #rdCap rd 1',
-    'scoreboard players set #rdCapPat rd 1',
+    call('line/ganpa'),
     sound('block.glass.break', .8, .9),
     sound('entity.illusioner.mirror_move', 1, 1.3),
 ])

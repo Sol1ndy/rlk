@@ -26,5 +26,6 @@ kill @e[tag=rlk_rd_shadow]
 bossbar set rlk:narukami value 0
 function rlk:boss/raiden/bars_hide
 function rlk:boss/raiden/caption/clear
+function rlk:boss/raiden/line/nothing
 playsound minecraft:entity.iron_golem.death hostile @a[tag=player] ~ ~ ~ .7 .7 .3
 function rlk:boss/raiden/rig/tick

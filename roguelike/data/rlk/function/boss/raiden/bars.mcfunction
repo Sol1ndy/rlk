@@ -1,3 +1,4 @@
+function rlk:boss/raiden/line/tick
 execute if score #rdCap rd matches 1 unless entity @a[tag=player,scores={ttlT=1..}] run function rlk:boss/raiden/caption/expire
 bossbar set rlk:narukami players @a[tag=player]
 bossbar set rlk:narukami visible true

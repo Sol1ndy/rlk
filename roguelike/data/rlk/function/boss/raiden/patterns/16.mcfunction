@@ -4,6 +4,7 @@ execute if score @s rdTime matches 1 at @s rotated as @s run execute at @s rotat
 execute if score @s rdTime matches 1 at @s rotated as @s run scoreboard players set @s rdAnim 10
 execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/hazard/create {shape:4,tell:14,damage:30,life:24}
 execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/hazard/create {shape:10,tell:14,damage:26,life:24}
+execute if score @s rdTime matches 10 at @s rotated as @s run function rlk:boss/raiden/line/sever
 execute if score @s rdTime matches 11 at @s rotated as @s run execute positioned ^ ^2.4 ^1.2 run function rlk:boss/raiden/object_vfx/object_break
 execute if score @s rdTime matches 11 at @s rotated as @s run playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 1 1.9 0.3
 execute if score @s rdTime matches 12 at @s rotated as @s run scoreboard players set @s rdAnim 11

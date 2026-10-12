@@ -1,4 +1,5 @@
 # Pattern names intentionally stay out of the boss bar.
+execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/line/noemyeong
 execute if score @s rdTime matches 1 at @s rotated as @s run scoreboard players set @s rdAnim 21
 execute if score @s rdTime matches 1 at @s rotated as @s run playsound minecraft:entity.breeze.charge hostile @a[tag=player] ~ ~ ~ 0.8 0.7 0.3
 execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/movement/blink_start

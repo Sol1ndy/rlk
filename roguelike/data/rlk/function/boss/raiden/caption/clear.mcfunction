@@ -1,3 +1,4 @@
+scoreboard players set #rdLine rd 0
 execute unless score #rdCap rd matches 1 run return 0
 function rlk:boss/raiden/caption/expire
 title @a[tag=player] subtitle ""

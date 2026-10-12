@@ -1,4 +1,5 @@
 # Pattern names intentionally stay out of the boss bar.
+execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/line/goemyeol
 execute if score @s rdTime matches 1 at @s rotated as @s run execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
 execute if score @s rdTime matches 1 at @s rotated as @s run execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
 execute if score @s rdTime matches 1 at @s rotated as @s run scoreboard players set @s rdAnim 7

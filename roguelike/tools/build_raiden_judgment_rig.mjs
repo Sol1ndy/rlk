@@ -123,7 +123,7 @@ function fxCard(sprite,n,at,[ua,u0,u1],[va,v0,v1],uv=[0,0,16,16]){
  const N='xyz'.indexOf(n),U='xyz'.indexOf(ua),V='xyz'.indexOf(va),lo=[0,0,0],hi=[0,0,0];
  lo[N]=hi[N]=at;lo[U]=Math.min(u0,u1);hi[U]=Math.max(u0,u1);lo[V]=Math.min(v0,v1);hi[V]=Math.max(v0,v1);
  const from=lo.map(r4),to=hi.map(r4),f=p=>[uv[0]+(uv[2]-uv[0])*(p[U]-u0)/(u1-u0),uv[1]+(uv[3]-uv[1])*(p[V]-v0)/(v1-v0)];
- const faces={};for(const fc of FPAIR[n]){const[fuv,r]=fUV(fc,from,to,f);faces[fc]={texture:'#'+sprite,uv:fuv,...(r?{rotation:r}:{})};}
+ const faces={};for(const fc of FPAIR[n]){const[fuv,r]=fUV(fc,from,to,f);faces[fc]={texture:'#'+sprite,uv:fuv.map(v=>Math.min(16,Math.max(0,v))),...(r?{rotation:r}:{})};}
  return{from,to,shade:false,faces};}
 const fxModel=(name,e)=>{for(const el of e)for(const v of[...el.from,...el.to])if(v<-16||v>32)throw new Error(name+': element outside the -16..32 model cube');
  const used=[...new Set(e.flatMap(el=>Object.values(el.faces).map(f=>f.texture.slice(1))))];

@@ -129,10 +129,12 @@ kill @e[tag=rlk_rd_shadow]
 bossbar set rlk:narukami value 0
 function rlk:boss/raiden/bars_hide
 function rlk:boss/raiden/caption/clear
+function rlk:boss/raiden/line/nothing
 playsound minecraft:entity.iron_golem.death hostile @a[tag=player] ~ ~ ~ .7 .7 .3
 function rlk:boss/raiden/rig/tick
 ''')
 write('death/tick','''
+function rlk:boss/raiden/line/tick
 scoreboard players add @s rdDeathTime 1
 data merge entity @s {Motion:[0d,0d,0d],Health:1024f,Fire:-1s}
 execute if score @s rdDeathTime matches 48.. run return run function rlk:boss/raiden/death/finish

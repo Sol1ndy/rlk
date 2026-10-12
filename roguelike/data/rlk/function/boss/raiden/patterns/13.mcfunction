@@ -2,6 +2,7 @@
 execute if score @s rdTime matches 1 at @s rotated as @s run scoreboard players set @s rdAnim 14
 execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/shadow/spawn
 execute if score @s rdTime matches 1 at @s rotated as @s run playsound minecraft:entity.warden.dig hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.3
+execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/line/prison
 execute if score @s rdTime matches 1..36 run function rlk:boss/raiden/shadow/follow
 execute if score @s rdTime matches 37 at @s rotated as @s run function rlk:boss/raiden/shadow/lock
 execute if score @s rdTime matches 45 at @s rotated as @s run scoreboard players set @s rdAnim 15

@@ -139,7 +139,7 @@ function card(sprite,n,at,[ua,u0,u1],[va,v0,v1],{uv=[0,0,16,16],rot=null}={}){
  const from=lo.map(r4),to=hi.map(r4);
  if([...from,...to].some(c=>c<-16||c>32))throw new Error(`card ${sprite} leaves -16..32: ${from} ${to}`);
  const fn=p=>[uv[0]+(uv[2]-uv[0])*(p[U]-u0)/(u1-u0),uv[1]+(uv[3]-uv[1])*(p[V]-v0)/(v1-v0)];
- const faces={};for(const f of FACE_PAIR[n]){const[fuv,r]=solveUV(f,from,to,fn);faces[f]={texture:'#'+sprite,uv:fuv,...(r?{rotation:r}:{})};}
+ const faces={};for(const f of FACE_PAIR[n]){const[fuv,r]=solveUV(f,from,to,fn);faces[f]={texture:'#'+sprite,uv:fuv.map(v=>Math.min(16,Math.max(0,v))),...(r?{rotation:r}:{})};}
  const el={from,to,shade:false,faces};
  if(rot&&rot[1]){if(![-45,-22.5,22.5,45].includes(rot[1]))throw new Error('card rotation '+rot[1]);el.rotation={origin:from.map((v,i)=>r4((v+to[i])/2)),axis:rot[0],angle:rot[1]};}
  return el;

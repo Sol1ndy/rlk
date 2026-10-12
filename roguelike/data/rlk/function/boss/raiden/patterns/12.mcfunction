@@ -3,6 +3,7 @@ execute if score @s rdTime matches 1 at @s rotated as @s run execute at @s run t
 execute if score @s rdTime matches 1 at @s rotated as @s run execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
 execute if score @s rdTime matches 1 at @s rotated as @s run scoreboard players set @s rdAnim 12
 execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/clap/spawn
+execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/line/prison
 execute if score @s rdTime matches 1..16 run function rlk:boss/raiden/clap/follow
 execute if score @s rdTime matches 17 at @s rotated as @s run function rlk:boss/raiden/clap/lock
 execute if score @s rdTime matches 24 at @s rotated as @s run function rlk:boss/raiden/clap/shut

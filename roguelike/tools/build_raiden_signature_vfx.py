@@ -426,6 +426,22 @@ for i in range(18):
     m.vcard(polar(r*1.08, a, y+.25), a, .45, .9, 'obj_shard')
 save(RP, 'fx_signature', 'armor_break', m)
 
+m = cm()
+# Final calamity entry: a tall pillar of lightning she rises through, a charged ring at
+# her feet and a shock ring on the floor.
+m.crossed((0, 7.0, 0), 3.2, 'vbolt_a', planes=4, sv=14.0)
+m.crossed((0, 7.0, 0), 1.8, 'pillar_a', planes=2, sv=14.0)
+m.hcard((0, .06, 0), 0, 7.0, 7.0, 'shockwave')
+m.hcard((0, 1.0, 0), 22.5, 4.4, 4.4, 'chakra_a')
+m.hcard((0, .08, 0), 0, 4.0, 4.0, 'scorch')
+save(RP, 'fx_signature', 'ascend_pillar', m)
+for k, (bolt, ring) in enumerate((('vbolt_b', 'flash'), ('vbolt_c', 'impact_sparks'))):
+    m = cm()
+    m.crossed((0, 8.0, 0), 2.6, bolt, planes=3, sv=16.0)
+    m.hcard((0, .07, 0), 0, 3.4, 3.4, ring)
+    m.hcard((0, .05, 0), 45, 3.0, 3.0, 'scorch')
+    save(RP, 'fx_signature', 'sky_bolt_'+str(k), m)
+
 write('init', [f'scoreboard objectives add {n} dummy' for n in ['rdSfxAge', 'rdSfxLife', 'rdSfxKind', 'rdSfxStyle']])
 write('dome_create', spawn('dome', 1, 260))
 write('judgment_warning', spawn('judgment_warning', 2, 125))
@@ -447,6 +463,10 @@ for name, kind, life in [('blink_arrive', 5, 10), ('blink_depart', 6, 7)]:
         'data modify entity @e[tag=rlk_rd_sfx_new,limit=1] Rotation[1] set value 0f',
     ]))
 write('armor_break', spawn('armor_break', 7, 15))
+write('judgment_ascend', spawn('ascend_pillar', 8, 28))
+write('judgment_bolt', spawn('sky_bolt_0', 9, 7, [
+    'execute if predicate {condition:"minecraft:random_chance",chance:0.5} run data modify entity @e[tag=rlk_rd_sfx_new,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/fx_signature/sky_bolt_1"',
+]))
 write('world', ['execute as @e[tag=rlk_rd_sfx] at @s run function rlk:boss/raiden/vfx/tick'])
 tick = [
     'scoreboard players add @s rdSfxAge 1',
