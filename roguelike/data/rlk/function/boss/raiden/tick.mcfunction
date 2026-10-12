@@ -14,7 +14,7 @@ execute if score @s rdPhase matches 3 run function rlk:boss/raiden/exhausted_tic
 execute if score @s rdPhase matches 0 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
 execute if score @s rdPhase matches 2 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
 # Timelines start on the tick after choose: rdTime 1 is every pattern's first frame.
-execute if score @s rdPat matches 1..6 if score @s rdTime matches 1.. run function rlk:boss/raiden/normal_dispatch
+execute if score @s rdPat matches 1..7 if score @s rdTime matches 1.. run function rlk:boss/raiden/normal_dispatch
 execute if score @s rdPat matches 11..18 if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch
 execute if score @s rdPat matches 99 if score @s rdTime matches 60.. run function rlk:boss/raiden/finish
 # Found the real illusion: a 10 s stun owned by the illusion generator.

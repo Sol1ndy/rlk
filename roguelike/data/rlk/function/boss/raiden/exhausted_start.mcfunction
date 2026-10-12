@@ -1,4 +1,6 @@
 function rlk:boss/raiden/camera/release_all
+kill @e[tag=rlk_rd_clap]
+kill @e[tag=rlk_rd_shadow]
 function rlk:boss/raiden/judgment_rig/cleanup
 function rlk:boss/raiden/illusion/cleanup
 function rlk:boss/raiden/movement/cleanup

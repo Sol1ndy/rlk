@@ -15,5 +15,5 @@ execute if score @s rdPhase matches 2 run bossbar set rlk:narukami_state max 750
 execute if score @s rdPhase matches 2 store result bossbar rlk:narukami_state value run scoreboard players get @s rdShield
 execute if score @s rdPhase matches 2 run bossbar set rlk:narukami_state name {text:"번개 갑주",color:"aqua"}
 execute if score @s rdPhase matches 3 run bossbar set rlk:narukami_state name {text:"갑주 파괴",color:"green"}
-execute if score @s rdPhase matches 3 run bossbar set rlk:narukami_state max 160
+execute if score @s rdPhase matches 3 run bossbar set rlk:narukami_state max 300
 execute if score @s rdPhase matches 3 store result bossbar rlk:narukami_state value run scoreboard players get @s rdTime

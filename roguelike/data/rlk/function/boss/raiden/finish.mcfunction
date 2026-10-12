@@ -1,4 +1,6 @@
 function rlk:boss/raiden/camera/release_all
+kill @e[tag=rlk_rd_clap]
+kill @e[tag=rlk_rd_shadow]
 function rlk:boss/raiden/caption/pattern_end
 function rlk:boss/raiden/judgment_rig/cleanup
 scoreboard players set @s rdBlink 0

@@ -44,9 +44,15 @@ DRAIN = {1:6, 4:6, 2:3, 5:3, 6:3, 7:4}
 DRAIN_REACTION = 1
 # Malice energy: normal-phase ticks before the transformation (45 s, was 30 s).
 RAGE_MAX = 900
+# Like the original, every hit the boss lands also feeds the malice gauge (+3 s).
+RAGE_HIT = 60
+# Armour-break stun (original: about 15 s of collapse before she recovers).
+EXHAUST = 300
 # Transformation: scatter to the centre, then the transformation burst/clip.
 TRANSFORM_FX = 1
 TRANSFORM_LEN = 52
+CLAP_LOCK, CLAP_TELL = 17, 10   # pattern 12: hands follow until 17, clap lands 10 later
+SHADOW_LOCK = 37                 # pattern 13: the shadow chases for 36 ticks
 
 objectives = ['rd','rdPhase','rdPat','rdTime','rdAnim','rdRage','rdShield','rdCycle','rdCool','rdPrev','rdTurns','rdHitCD','rdObjKind','rdObjId','rdObjHP','rdReal','rdOAge','rdPTime','rdShape','rdWind','rdHAge','rdHLife','rdDamage','rdHHit','rdFX','rdFZ','rdHId','rdVId','rdUltUsed','rdWalk','rdWalkDir','rdBlink','rdCam','rdDeath','rdDeathTime','rdHidden']
 write('init',[f'scoreboard objectives add {v} dummy' for v in objectives]+[
@@ -163,6 +169,8 @@ execute if score #rdCapPat rd matches 1 run function rlk:boss/raiden/caption/cle
 ''')
 write('pause','''
 function rlk:boss/raiden/camera/release_all
+kill @e[tag=rlk_rd_clap]
+kill @e[tag=rlk_rd_shadow]
 function rlk:boss/raiden/caption/clear
 function rlk:boss/raiden/judgment_rig/cleanup
 function rlk:boss/raiden/illusion/cleanup
@@ -198,7 +206,7 @@ execute if score @s rdPhase matches 3 run function rlk:boss/raiden/exhausted_tic
 execute if score @s rdPhase matches 0 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
 execute if score @s rdPhase matches 2 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
 # Timelines start on the tick after choose: rdTime 1 is every pattern's first frame.
-execute if score @s rdPat matches 1..6 if score @s rdTime matches 1.. run function rlk:boss/raiden/normal_dispatch
+execute if score @s rdPat matches 1..7 if score @s rdTime matches 1.. run function rlk:boss/raiden/normal_dispatch
 execute if score @s rdPat matches 11..18 if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch
 execute if score @s rdPat matches 99 if score @s rdTime matches 60.. run function rlk:boss/raiden/finish
 # Found the real illusion: a 10 s stun owned by the illusion generator.
@@ -247,10 +255,10 @@ scoreboard players set @s rdAnim 1
 execute rotated as @s positioned ^ ^ ^0.17 if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless block ~ ~-1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] run tp @s ~ ~ ~
 ''')
 write('choose','''
-execute if score @s rdPhase matches 0 store result score @s rdPat run random value 1..6
+execute if score @s rdPhase matches 0 store result score @s rdPat run random value 1..7
 execute if score @s rdPhase matches 2 store result score @s rdPat run random value 11..18
 execute if score @s rdPat = @s rdPrev run scoreboard players add @s rdPat 1
-execute if score @s rdPhase matches 0 if score @s rdPat matches 7 run scoreboard players set @s rdPat 1
+execute if score @s rdPhase matches 0 if score @s rdPat matches 8 run scoreboard players set @s rdPat 1
 execute if score @s rdPhase matches 2 if score @s rdPat matches 19 run scoreboard players set @s rdPat 11
 scoreboard players add @s rdTurns 1
 scoreboard players operation #rdTurn rd = @s rdTurns
@@ -259,9 +267,9 @@ scoreboard players operation #rdTurn rd %= #rd4 rd
 execute if score @s rdPhase matches 2 if score @s rdUltUsed matches 1 if score @s rdPat matches 15 run scoreboard players set @s rdPat 18
 execute if score @s rdPhase matches 2 if score @s rdUltUsed matches 0 if score #rdTurn rd matches 0 run scoreboard players set @s rdPat 15
 # Boss test hooks (test/lock repeats, test/pattern once) only apply to the current phase.
-execute if score @s rdPhase matches 0 if score #rdLock rd matches 1..6 run scoreboard players operation @s rdPat = #rdLock rd
+execute if score @s rdPhase matches 0 if score #rdLock rd matches 1..7 run scoreboard players operation @s rdPat = #rdLock rd
 execute if score @s rdPhase matches 2 if score #rdLock rd matches 11..18 run scoreboard players operation @s rdPat = #rdLock rd
-execute if score @s rdPhase matches 0 if score #rdForce rd matches 1..6 run scoreboard players operation @s rdPat = #rdForce rd
+execute if score @s rdPhase matches 0 if score #rdForce rd matches 1..7 run scoreboard players operation @s rdPat = #rdForce rd
 execute if score @s rdPhase matches 2 if score #rdForce rd matches 11..18 run scoreboard players operation @s rdPat = #rdForce rd
 execute if score @s rdPat = #rdForce rd run scoreboard players set #rdForce rd 0
 scoreboard players operation @s rdPrev = @s rdPat
@@ -271,6 +279,8 @@ execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
 ''')
 write('finish','''
 function rlk:boss/raiden/camera/release_all
+kill @e[tag=rlk_rd_clap]
+kill @e[tag=rlk_rd_shadow]
 function rlk:boss/raiden/caption/pattern_end
 function rlk:boss/raiden/judgment_rig/cleanup
 scoreboard players set @s rdBlink 0
@@ -348,6 +358,8 @@ execute unless score @s rdPat matches 15 if score @s rdShield matches ..0 run fu
 ''')
 write('exhausted_start','''
 function rlk:boss/raiden/camera/release_all
+kill @e[tag=rlk_rd_clap]
+kill @e[tag=rlk_rd_shadow]
 function rlk:boss/raiden/judgment_rig/cleanup
 function rlk:boss/raiden/illusion/cleanup
 function rlk:boss/raiden/movement/cleanup
@@ -372,7 +384,7 @@ scoreboard players set #rdCap rd 1
 playsound minecraft:entity.iron_golem.death hostile @a[tag=player] ~ ~ ~ 0.8 0.72 0.3
 execute at @s run function rlk:boss/raiden/vfx/armor_break
 ''')
-write('exhausted_tick',[at('46',anim(22)),at('132',anim(24)),at('160',call('normal_return'))])
+write('exhausted_tick',[at('46',anim(22)),at(str(EXHAUST-28),anim(24)),at(str(EXHAUST),call('normal_return'))])
 write('normal_return','''
 attribute @s minecraft:scale base set 1.2
 scoreboard players set @s rdPhase 0
@@ -399,7 +411,7 @@ execute if score @s rdPhase matches 2 run bossbar set rlk:narukami_state max {SH
 execute if score @s rdPhase matches 2 store result bossbar rlk:narukami_state value run scoreboard players get @s rdShield
 execute if score @s rdPhase matches 2 run bossbar set rlk:narukami_state name {{text:"번개 갑주",color:"aqua"}}
 execute if score @s rdPhase matches 3 run bossbar set rlk:narukami_state name {{text:"갑주 파괴",color:"green"}}
-execute if score @s rdPhase matches 3 run bossbar set rlk:narukami_state max 160
+execute if score @s rdPhase matches 3 run bossbar set rlk:narukami_state max {EXHAUST}
 execute if score @s rdPhase matches 3 store result bossbar rlk:narukami_state value run scoreboard players get @s rdTime
 ''')
 write('incoming','''
@@ -445,9 +457,11 @@ execute unless entity @a[tag=player,scores={dead=0},limit=1] run return 0
 execute if entity @a[tag=player,scores={rnDie=1..}] run return 0
 execute if entity @a[tag=player,scores={pkMode=1..}] run return 0
 function rlk:cm/hit_pl
+# A hit that lands (not dodged) feeds the malice gauge, like the original.
+execute unless score #dodged tmp matches 1 as @e[tag=rlk_raiden,scores={rdPhase=0,rdDeath=0},limit=1] run scoreboard players add @s rdRage '''+str(RAGE_HIT)+'''
 ''')
 
-write('normal_dispatch',[f'execute if score @s rdPat matches {i} run '+call('patterns/'+str(i)) for i in range(1,7)])
+write('normal_dispatch',[f'execute if score @s rdPat matches {i} run '+call('patterns/'+str(i)) for i in range(1,8)])
 write('armor_dispatch',[f'execute if score @s rdPat matches {i} run '+call('patterns/'+str(i)) for i in range(11,19)])
 
 patterns={}
@@ -469,15 +483,35 @@ center='execute at @e[tag=rlk_raiden_arena,limit=1] run '
 # Every wind clip (slash/thrust 6, cast 10, sweep/clap/slam 8, judgment 14) still
 # reaches its hold pose before the strike clip starts 3-4 ticks ahead of contact.
 
-p=pattern(1,'태도 연격 · 옆이나 뒤로 회피')
+def gated(lines,t,cond,*commands):
+    # event() with an extra score condition (e.g. a random follow-up).
+    for cmd in commands:
+        n=int(cmd.rsplit(' ',1)[1]) if cmd.startswith('scoreboard players set @s rdAnim ') else -1
+        lead=4 if n in (15,17) else 3 if n in (3,4,6,8,11,13) else 0
+        lines.append(f'execute if score @s rdTime matches {max(1,t-lead)} {cond} at @s rotated as @s run {cmd}')
+p=pattern(1,'4연격 · 가로 베기 세 번, 나기나타 내려찍기, 이어지는 검기')
 for t,n in [(1,3),(14,4),(27,3)]:
     event(p,t,face,flat,anim(2),haz(1,8,9))
     event(p,t+8,anim(n),sound('entity.player.attack.sweep',1,.7))
-event(p,40,anim(20),haz(8,9,14));event(p,49,anim(4));end(p,55)
-p=pattern(2,'나기나타 · 전방 찌르기와 검파')
-for t in [1,14,27]:
-    event(p,t,face,flat,anim(5),haz(2,8,10));event(p,t+8,anim(6),sound('item.trident.throw',1,.72))
-event(p,40,anim(7),haz(9,10,13));event(p,50,anim(8));end(p,57)
+# Fourth hit: the naginata is driven into the floor; lightning bursts around her and
+# falls where the player stands.
+event(p,40,face,flat,anim(5),haz(8,10,15),target+haz(3,10,12))
+event(p,50,anim(6),sound('entity.lightning_bolt.impact',.9,.75),sound('item.trident.hit_ground',1,.6))
+# Half the time a flying sword wave follows (watch her to the end).
+p.append('execute if score @s rdTime matches 52 store result score #rdFollow rd run random value 0..1')
+gated(p,56,'if score #rdFollow rd matches 1',face,flat,anim(2),haz(13,8,12))
+gated(p,64,'if score #rdFollow rd matches 1',anim(3),call('object_vfx/slash'),sound('entity.player.attack.sweep',1.1,.9))
+gated(p,58,'if score #rdFollow rd matches 0',call('finish'))
+gated(p,70,'if score #rdFollow rd matches 1',call('finish'))
+p=pattern(2,'회전 참격 · 빠른 번개 칼날 세 개와 큰 초승달 검기')
+# She spins in place throwing three fast blades at the player, then a big crescent.
+event(p,1,face,flat,anim(20),sound('entity.breeze.charge',.8,.8))
+for t in [4,10,16]:
+    event(p,t,face,flat,haz(13,6,10))
+    event(p,t+6,call('object_vfx/slash'),sound('entity.breeze.shoot',.8,1.25))
+event(p,26,face,flat,anim(2),haz(10,10,18))
+event(p,36,anim(3),call('object_vfx/slash'),sound('entity.player.attack.sweep',1.2,.6))
+end(p,44)
 p=pattern(3,'뇌명 · 순간이동 후 발도')
 # Each scatter blink keeps the rig hidden for 8 ticks (reforms on blink start + 8).
 event(p,1,anim(21),sound('entity.breeze.charge',.8,.7),call('movement/blink_start'))
@@ -492,18 +526,38 @@ p=pattern(6,'낙뢰 · 표시된 자리에서 벗어나세요')
 for t in [1,14,27,40]:
     event(p,t,anim(7),target+haz(3,9,12));event(p,t+9,anim(8),sound('entity.lightning_bolt.impact',.7,.8))
 end(p,54)
+p=pattern(7,'뇌광 결계 · 번개 씨앗이 떨어진 뒤 안쪽 전체 강타, 바깥으로 피하세요')
+# She pushes the player away, electro seeds fall in a ring 10 blocks around her, then
+# everything inside the ring is struck: run out past the seeds.
+event(p,1,anim(7),haz(8,8,10),sound('entity.warden.sonic_charge',.6,1.4))
+for i,(t,a) in enumerate([(4,0),(6,60),(8,120),(10,180),(12,240),(14,300)]):
+    event(p,t,f'execute rotated ~{a} 0 positioned ^ ^ ^10 run '+haz(3,10,8))
+event(p,6,haz(12,24,26))
+event(p,30,anim(8),sound('entity.lightning_bolt.thunder',.8,.9))
+end(p,40)
 p=pattern(11,'거대 팔 연격 · 검의 궤적과 투척 낙뢰에 주의')
 for t in [1,17]:
     event(p,t,face,flat,anim(10),haz(4,11,19));event(p,t+11,anim(11),sound('entity.player.attack.sweep',1.2,.62))
 event(p,33,anim(7),target+haz(3,10,22));event(p,43,anim(8));end(p,50)
-p=pattern(12,'인공팔 협격 · 양손 사이에서 벗어나세요')
-event(p,1,face,flat,anim(12),haz(7,12,25));event(p,13,anim(13),sound('entity.iron_golem.attack',1,.65));end(p,21)
-p=pattern(13,'인공팔 내려찍기 · 원 밖으로 회피')
-# Contract with build_raiden_rig.mjs: the floating hand lands at hazard age 12 (SLAM_CONTACT); the
-# finish 12 ticks after the second landing leaves its lift-and-fade on screen.
-for t in [1,19]:
-    event(p,t,anim(14),target+haz(6,12,24),target+call('rig/target_slam_spawn'));event(p,t+12,anim(15),sound('entity.generic.explode',.65,.72))
-end(p,43)
+p=pattern(12,'인공팔 협격 · 따라오는 두 손이 박수치기 전에 빠져나오세요')
+# Two hands appear at the player's sides and follow them, then lock and clap shut.
+event(p,1,face,flat,anim(12),call('clap/spawn'))
+p.append('execute if score @s rdTime matches 1..'+str(CLAP_LOCK-1)+' run '+call('clap/follow'))
+event(p,CLAP_LOCK,call('clap/lock'))
+event(p,CLAP_LOCK+CLAP_TELL-3,call('clap/shut'))
+event(p,CLAP_LOCK+CLAP_TELL,anim(13),sound('entity.iron_golem.attack',1,.65),sound('entity.zombie.attack_iron_door',.7,.6))
+event(p,CLAP_LOCK+CLAP_TELL+3,call('clap/fade'))
+event(p,CLAP_LOCK+CLAP_TELL+9,call('clap/clear'))
+end(p,CLAP_LOCK+CLAP_TELL+10)
+p=pattern(13,'그림자 손 · 따라오는 그림자에서 계속 달아나세요')
+# A shadow chases the player (repeated small damage while it covers them), then a hand
+# slams down where it stops. Contract with build_raiden_rig.mjs: the floating hand lands
+# at hazard age 12 (SLAM_CONTACT); the finish 12 ticks after landing lets it fade.
+event(p,1,anim(14),call('shadow/spawn'),sound('entity.warden.dig',.6,1.4))
+p.append('execute if score @s rdTime matches 1..'+str(SHADOW_LOCK-1)+' run '+call('shadow/follow'))
+event(p,SHADOW_LOCK,call('shadow/lock'))
+event(p,SHADOW_LOCK+12,anim(15),sound('entity.generic.explode',.65,.72))
+end(p,SHADOW_LOCK+24)
 p=pattern(14,'천수의 속박 · 퍼지는 번개 고리를 점프로 회피')
 event(p,1,anim(7),call('stakes_start'));event(p,15,anim(8))
 for t,i in [(20,1),(54,2),(88,3)]:event(p,t,call('stakes_pulse_'+str(i)))
@@ -515,16 +569,95 @@ event(p,1,call('judgment_start'),anim(16));event(p,30,sound('block.beacon.ambien
 # The flower retains the full six-second response window despite quicker recovery.
 # The hidden body already waits at centre-8; it reforms there facing the player.
 event(p,120,call('judgment_strike'));event(p,170,face,flat,call('movement/arrive'));end(p,176)
-p=pattern(16,'거검 내려베기 · 길게 표시된 직선에서 벗어나세요')
-event(p,1,face,flat,anim(16),haz(5,13,30));event(p,14,anim(17),sound('entity.lightning_bolt.thunder',.8,.68));end(p,25)
+p=pattern(16,'거검 발도 · 하얀 섬광이 보이면 바로 회피')
+# A horizontal iai with the giant sword; a white flash marks the moment to dodge.
+event(p,1,face,flat,anim(10),haz(4,14,30),haz(10,14,26))
+event(p,11,'execute positioned ^ ^2.4 ^1.2 run '+call('object_vfx/object_break'),sound('block.amethyst_block.resonate',1,1.9))
+event(p,15,anim(11),sound('entity.lightning_bolt.thunder',.8,.68))
+end(p,26)
 p=pattern(17,'검파 연사 · 다섯 갈래 뒤 넓은 가로 검파')
 event(p,1,face,flat,anim(7),haz(9,10,17));event(p,11,anim(8),sound('entity.breeze.shoot',.8,.72))
 event(p,16,face,flat,anim(10),haz(10,10,21));event(p,26,anim(11));end(p,33)
 p=pattern(18,'발도 돌진 · 고정된 직선 경로를 피하세요')
 event(p,1,face,flat,anim(2),haz(5,10,22));event(p,11,anim(21),sound('item.trident.riptide_3',.7,.8))
 p.append('execute if score @s rdTime matches 11..22 at @s rotated as @s positioned ^ ^ ^0.75 if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] run tp @s ~ ~ ~')
-event(p,25,anim(10),haz(4,9,19));event(p,34,anim(11));end(p,41)
+# After the dash she keeps cutting: two wide sweeps in a row.
+event(p,25,face,flat,anim(10),haz(4,9,19));event(p,34,anim(11),sound('entity.player.attack.sweep',1.2,.62))
+event(p,38,face,flat,anim(10),haz(4,8,19));event(p,46,anim(11),sound('entity.player.attack.sweep',1.2,.7));end(p,53)
 for i,p in patterns.items():write('patterns/'+str(i),p)
+
+# Following clap hands (pattern 12). Display-only hands owned by the boss; the hazard is
+# created on lock at the hands' midpoint, facing along the boss -> player line.
+HAND='{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/support_hand_%s"}}'
+def hand_tf(side,gap):
+    # Fingers up, palm facing the other hand (half turns about the (1,0,+-1) diagonals of
+    # the support-hand model: fingers -Y, palm -Z), hand centred gap blocks to the side.
+    x=gap if side=='l' else -gap
+    q='[0.7071068f,0f,0.7071068f,0f]' if side=='l' else '[0.7071068f,0f,-0.7071068f,0f]'
+    return '{translation:[%.3ff,1.6f,0f],left_rotation:%s,scale:[3.6f,3.6f,3.6f],right_rotation:[0f,0f,0f,1f]}'%(x,q)
+write('clap/spawn',[
+    '# As the boss. Two hands appear beside the player, facing along the boss -> player line.',
+    'kill @e[tag=rlk_rd_clap]',
+    'execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ facing entity @s feet rotated ~180 0 run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_clap","rlk_rd_clap_l"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",teleport_duration:2,interpolation_duration:4,view_range:3f,width:12f,height:8f,shadow_radius:0f,brightness:{sky:15,block:15},transformation:'+hand_tf('l',4.2).replace('3.6f,3.6f,3.6f','0.2f,0.2f,0.2f')+',item:'+HAND%'l'+'}',
+    'execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ facing entity @s feet rotated ~180 0 run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_clap","rlk_rd_clap_r"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",teleport_duration:2,interpolation_duration:4,view_range:3f,width:12f,height:8f,shadow_radius:0f,brightness:{sky:15,block:15},transformation:'+hand_tf('r',4.2).replace('3.6f,3.6f,3.6f','0.2f,0.2f,0.2f')+',item:'+HAND%'r'+'}',
+    'execute as @e[tag=rlk_rd_clap] at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_raiden,limit=1] feet',
+    'execute as @e[tag=rlk_rd_clap] at @s rotated ~180 0 run tp @s ~ ~ ~ ~ 0',
+    'data merge entity @e[tag=rlk_rd_clap_l,limit=1] {start_interpolation:0,transformation:'+hand_tf('l',4.2)+'}',
+    'data merge entity @e[tag=rlk_rd_clap_r,limit=1] {start_interpolation:0,transformation:'+hand_tf('r',4.2)+'}',
+])
+write('clap/follow',[
+    '# As the boss: the hands drift after the player (slower than a sprint).',
+    'execute as @e[tag=rlk_rd_clap] at @s facing entity @e[tag=rlk_body,limit=1] feet positioned ^ ^ ^0.3 unless entity @e[tag=rlk_body,distance=..0.4] run tp @s ~ 201 ~',
+    'execute as @e[tag=rlk_rd_clap] at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_raiden,limit=1] feet',
+    'execute as @e[tag=rlk_rd_clap] at @s rotated ~180 0 run tp @s ~ ~ ~ ~ 0',
+])
+write('clap/lock',[
+    '# As the boss: the hands stop; the clap zone (8 x 8) is centred between them.',
+    'execute as @e[tag=rlk_rd_clap_l,limit=1] at @s rotated as @s positioned ^ ^ ^-4 run '+haz(7,CLAP_TELL,25),
+    'execute as @e[tag=rlk_rd_clap] run data merge entity @s {teleport_duration:0}',
+])
+write('clap/shut',[
+    '# Three ticks before the hit: the palms slam together over the zone.',
+    'data merge entity @e[tag=rlk_rd_clap_l,limit=1] {interpolation_duration:3,start_interpolation:0,transformation:'+hand_tf('l',.7)+'}',
+    'data merge entity @e[tag=rlk_rd_clap_r,limit=1] {interpolation_duration:3,start_interpolation:0,transformation:'+hand_tf('r',.7)+'}',
+])
+write('clap/fade',[
+    'execute as @e[tag=rlk_rd_clap] run data merge entity @s {interpolation_duration:5,start_interpolation:0,transformation:{translation:[0f,2.4f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}',
+])
+write('clap/clear',['kill @e[tag=rlk_rd_clap]'])
+
+# Chasing shadow (pattern 13): a dark decal follows the player more slowly than a sprint,
+# nibbling them while it covers them, then the floating hand slams where it stopped.
+write('shadow/spawn',[
+    'kill @e[tag=rlk_rd_shadow]',
+    'execute at @e[tag=rlk_body,limit=1] positioned ~ 201.03 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_shadow"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",teleport_duration:1,interpolation_duration:5,view_range:3f,width:6f,height:2f,shadow_radius:0f,brightness:{sky:15,block:15},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[2f,2f,2f],right_rotation:[0f,1f,0f,0f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/fx_hazard/after_3"}}}',
+    'data merge entity @e[tag=rlk_rd_shadow,limit=1] {start_interpolation:0,transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[19f,19f,19f],right_rotation:[0f,1f,0f,0f]}}',
+    'scoreboard players set #rdShadowT rd 0',
+])
+write('shadow/follow',[
+    '# As the boss. 0.26 block/tick: walking cannot outrun it, sprinting/dashing can.',
+    f'execute as @e[tag=rlk_rd_shadow,limit=1] at @s facing entity @e[tag=rlk_body,limit=1] feet positioned ^ ^ ^0.26 unless entity @e[tag=rlk_body,distance=..0.3] run tp @s ~ 201.03 ~',
+    'scoreboard players add #rdShadowT rd 1',
+    'execute if score #rdShadowT rd matches 8.. run '+call('shadow/bite'),
+])
+write('shadow/bite',[
+    'scoreboard players set #rdShadowT rd 0',
+    'execute as @e[tag=rlk_rd_shadow,limit=1] at @s if entity @e[tag=rlk_body,distance=..1.8] run '+call('shadow/hurt'),
+])
+write('shadow/hurt',[
+    '# As the shadow (knockback source).',
+    'scoreboard players set #cmDmg tmp 6',
+    'scoreboard players operation #cmLv tmp = @e[tag=rlk_raiden,limit=1] mlv',
+    'scoreboard players set #cmEl tmp 3',
+    call('hurt'),
+])
+write('shadow/lock',[
+    '# As the boss: the shadow becomes the slam target (hand + 12-tick disk, radius 5).',
+    'execute at @e[tag=rlk_rd_shadow,limit=1] positioned ~ 201 ~ run '+haz(6,12,24),
+    'execute at @e[tag=rlk_rd_shadow,limit=1] positioned ~ 201 ~ run '+call('rig/target_slam_spawn'),
+    'kill @e[tag=rlk_rd_shadow]',
+])
+
 write('blink_relocate','''
 # Hidden middle of a scatter blink. A movement/blink_to marker wins; otherwise reform
 # 5 blocks ahead of the player, or 5 blocks from the player toward the centre.
@@ -618,7 +751,7 @@ write('eyes_start',[call('object/clear'),
 write('eyes_arm',['execute as @e[tag=rlk_rd_object,scores={rdObjKind=1}] at @s run '+haz(12,18,34)])
 write('stakes_start',[call('object/clear')]+[
     center+f'execute positioned ~{x} ~ ~{z} run '+obj(4,'lightning_stake',1,i,0)
-    for i,(x,z) in enumerate([(-8,-4),(8,-4),(0,9)],1)])
+    for i,(x,z) in enumerate([(0,-1.6),(1.4,.8),(-1.4,.8)],1)])
 write('stakes_pulse',['execute as @e[tag=rlk_rd_object,scores={rdObjKind=4}] at @s run '+haz(11,12,14,49),sound('block.beacon.power_select',.55,.7)])
 for i in [1,2,3]:
     write('stakes_pulse_'+str(i),[f'execute as @e[tag=rlk_rd_object,scores={{rdObjKind=4,rdObjId={i}}}] at @s run '+haz(11,12,14,49),sound('block.beacon.power_select',.55,.7)])
@@ -689,7 +822,7 @@ TEST='/function rlk:boss/raiden/test/'
 HELP=(T+'{text:"명령: ",color:"gray",bold:false},'
       +cmd_link(TEST+'start','start')+',{text:" 처음부터 · ",color:"gray",bold:false},'
       +cmd_link(TEST+'armored','armored')+',{text:" 갑주 단계 · ",color:"gray",bold:false},'
-      +cmd_link(TEST+'pattern {id:11}','pattern {id:N}')+',{text:" 다음 패턴(1~6, 11~18) · ",color:"gray",bold:false},'
+      +cmd_link(TEST+'pattern {id:11}','pattern {id:N}')+',{text:" 다음 패턴(1~7, 11~18) · ",color:"gray",bold:false},'
       +cmd_link(TEST+'lock {id:11}','lock {id:N}')+',{text:" 패턴 고정(0 해제) · ",color:"gray",bold:false},'
       +cmd_link(TEST+'level {lv:6}','level {lv:N}')+',{text:" 보스 레벨 · ",color:"gray",bold:false},'
       +cmd_link(TEST+'stop','stop')+',{text:" 종료 후 로비",color:"gray",bold:false}]')
@@ -738,7 +871,7 @@ execute unless score #rdTest rd matches 1 run return 0
 execute as @e[tag=rlk_raiden,scores={rdDeath=0},limit=1] at @s run function rlk:boss/raiden/transform_start
 tellraw @s '''+T+'{text:"바로 악요의 요구우 텐마(갑주 단계)로 변신합니다.",color:"white",bold:false}]')
 write('test/pattern','''
-# /function rlk:boss/raiden/test/pattern {id:N}: N = 1~6 (normal) or 11~18 (armored), once.
+# /function rlk:boss/raiden/test/pattern {id:N}: N = 1~7 (normal) or 11~18 (armored), once.
 $scoreboard players set #rdReq rd $(id)
 execute store result score #rdOk rd run function rlk:boss/raiden/test/request
 execute if score #rdOk rd matches 1 run scoreboard players operation #rdForce rd = #rdReq rd
@@ -756,9 +889,9 @@ write('test/request','''
 # #rdReq = requested id. Starts a test if needed, aborts the current attack and switches
 # phase so the request can run next. Returns 1 when accepted.
 scoreboard players set #rdOk rd 0
-execute if score #rdReq rd matches 1..6 run scoreboard players set #rdOk rd 1
+execute if score #rdReq rd matches 1..7 run scoreboard players set #rdOk rd 1
 execute if score #rdReq rd matches 11..18 run scoreboard players set #rdOk rd 1
-execute if score #rdOk rd matches 0 run tellraw @s '''+T+'''{text:"패턴 번호는 1~6(일반) 또는 11~18(갑주)입니다.",color:"red",bold:false}]
+execute if score #rdOk rd matches 0 run tellraw @s '''+T+'''{text:"패턴 번호는 1~7(일반) 또는 11~18(갑주)입니다.",color:"red",bold:false}]
 execute if score #rdOk rd matches 0 run return 0
 execute unless entity @e[tag=rlk_raiden,scores={rdDeath=0},limit=1] run function rlk:boss/raiden/test/start
 execute unless entity @e[tag=rlk_raiden,scores={rdDeath=0},limit=1] run return 0
@@ -770,7 +903,7 @@ write('test/apply','''
 execute unless score @s rdPat matches 0 run function rlk:boss/raiden/pause
 execute if score #rdReq rd matches 11..18 if score @s rdPhase matches 0 run function rlk:boss/raiden/transform_start
 execute if score #rdReq rd matches 11..18 if score @s rdPhase matches 3 run function rlk:boss/raiden/transform_start
-execute if score #rdReq rd matches 1..6 if score @s rdPhase matches 1.. run function rlk:boss/raiden/test/to_normal
+execute if score #rdReq rd matches 1..7 if score @s rdPhase matches 1.. run function rlk:boss/raiden/test/to_normal
 scoreboard players set @s rdWalk 0
 execute unless score @s rdPhase matches 1 run scoreboard players set @s rdCool 2
 ''')

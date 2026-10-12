@@ -20,6 +20,8 @@ kill @e[tag=rlk_rd_sfx]
 kill @e[tag=rlk_rd_slam_hand]
 function rlk:boss/raiden/hazard/vfx_world
 execute on passengers run kill @s
+kill @e[tag=rlk_rd_clap]
+kill @e[tag=rlk_rd_shadow]
 # The fight is won: both boss bars disappear now, not after the collapse.
 bossbar set rlk:narukami value 0
 function rlk:boss/raiden/bars_hide

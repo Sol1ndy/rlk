@@ -1,0 +1,4 @@
+kill @e[tag=rlk_rd_shadow]
+execute at @e[tag=rlk_body,limit=1] positioned ~ 201.03 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_shadow"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",teleport_duration:1,interpolation_duration:5,view_range:3f,width:6f,height:2f,shadow_radius:0f,brightness:{sky:15,block:15},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[2f,2f,2f],right_rotation:[0f,1f,0f,0f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/fx_hazard/after_3"}}}
+data merge entity @e[tag=rlk_rd_shadow,limit=1] {start_interpolation:0,transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[19f,19f,19f],right_rotation:[0f,1f,0f,0f]}}
+scoreboard players set #rdShadowT rd 0
