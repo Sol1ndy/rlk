@@ -201,6 +201,8 @@ execute if score @s rdPhase matches 2 if score @s rdPat matches 0 run function r
 execute if score @s rdPat matches 1..6 if score @s rdTime matches 1.. run function rlk:boss/raiden/normal_dispatch
 execute if score @s rdPat matches 11..18 if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch
 execute if score @s rdPat matches 99 if score @s rdTime matches 60.. run function rlk:boss/raiden/finish
+# Found the real illusion: a 10 s stun owned by the illusion generator.
+execute if score @s rdPat matches 98 run function rlk:boss/raiden/illusion/stun_tick
 # Keep the body on the disc without snapping: slide back toward the centre, and only
 # scatter-blink home if it is somehow far outside. Tracking uses the avatar, never the camera.
 execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..21] at @s facing entity @e[tag=rlk_raiden_arena,limit=1] feet rotated ~ 0 positioned ^ ^ ^0.45 run tp @s ~ ~ ~

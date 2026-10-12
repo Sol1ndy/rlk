@@ -347,13 +347,18 @@ def build_models():
 STATS = build_models()
 
 
-def spawn(name, kind, owned=True, life=0):
+def spawn(name, kind, owned=True, life=0, roll=0):
+    # roll: degrees about the display's forward (+Z) axis through chest height (the swing
+    # arc's height), e.g. the two diagonal strokes of the real illusion's X slash.
+    r, h = math.radians(roll), 1.2
+    q = f'[0f,0f,{math.sin(r/2):.6f}f,{math.cos(r/2):.6f}f]' if roll else '[0f,0f,0f,1f]'
+    t = f'[{h*math.sin(r):.6f}f,{h-h*math.cos(r):.6f}f,0f]' if roll else '[0f,0f,0f]'
     lines = [
         'summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_object_fx","rlk_rd_ofnew"],'
         'NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",teleport_duration:0,'
         'brightness:{sky:15,block:15},view_range:3f,width:6f,height:6f,shadow_radius:0f,'
         'item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/fx_object/' + name + '"}},'
-        'transformation:{translation:[0f,0f,0f],scale:[4f,4f,4f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,1f,0f,0f]}}',
+        'transformation:{translation:' + t + ',scale:[4f,4f,4f],left_rotation:' + q + ',right_rotation:[0f,1f,0f,0f]}}',
         'data modify entity @e[tag=rlk_rd_ofnew,limit=1] Rotation set from entity @s Rotation',
         'data modify entity @e[tag=rlk_rd_ofnew,limit=1] Rotation[1] set value 0f',
         f'scoreboard players set @e[tag=rlk_rd_ofnew] rdOvKind {kind}',
@@ -392,6 +397,14 @@ wave_lines.insert(-1, 'data merge entity @e[tag=rlk_rd_ofnew,limit=1] {teleport_
 write('slash', [
     '# As the slashing illusion at its feet, facing the centre: swing arc + flying wave.',
 ] + swing_lines + wave_lines)
+# The real illusion's X: two quick diagonal strokes (rolled swing arc + wave each).
+for suffix, roll in (('a', 38), ('b', -38)):
+    xs = spawn('swing', 6, owned=False, life=4, roll=roll)
+    xw = spawn('wave', 7, owned=False, life=5, roll=roll)
+    xw.insert(-1, 'data merge entity @e[tag=rlk_rd_ofnew,limit=1] {teleport_duration:1}')
+    write('slash_x' + suffix, [
+        f'# As the REAL illusion facing the centre: one diagonal stroke of its X slash (roll {roll}).',
+    ] + xs + xw)
 write('break', [
     '# Detached burst survives its destroyed owner for nine ticks, then disappears.',
     'execute if score @s rdObjKind matches 3 run function rlk:boss/raiden/object_vfx/flower_break',

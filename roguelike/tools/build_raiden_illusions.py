@@ -7,21 +7,22 @@ models rlk:raiden/illusion_{ready,run_0..3,wind,slash}. The encounter controller
 dispatches to illusion/tick (patterns/5), calls illusion/on_break from object/break and
 illusion/cleanup from pause/transform/exhausted/cleanup/reload/death.
 
-Timeline (boss rdTime / turn clock):
+Timeline (boss rdTime / volley clock):
   1      the boss scatters where she stands (movement/depart); the hidden body crosses
          to the arena centre in the same frame.
   3      the body reforms at the centre (movement/arrive) ...
   7      ... and splits: four identical illusions appear there, one secretly real.
-  8-19   they run out in four directions (0.7 block/tick, 4-frame stride, forward lean).
-  20     they hold their spots 8.4 blocks out and turn to face the centre (hittable now).
-  21+    one turn per illusion in random order. Wind-up + ground line (13 ticks), slash
-         toward the centre. Fakes slash once; the real one re-winds (9 ticks) and slashes
-         a second time. Same tells for everyone: only the count gives the real one away.
-  end    after the last turn (5 slashes, or fewer when fakes were shattered) the others
-         dissolve and the boss reforms on the real illusion's spot, then finish.
+  8-21   they run out in four directions (1 block/tick, 4-frame stride, forward lean).
+  22     they hold their spots 14 blocks out and turn to face the centre (hittable now).
+  23+    three volleys. In each, all four wind up together with identical tells (a ground
+         line toward the centre, 10 ticks) and slash toward the centre at once: a fake
+         cuts once, the real one cuts an X - two quick diagonal strokes, the second line
+         landing 3 ticks after the first.
+  end    after the third volley without finding her the others dissolve and the boss
+         reforms on the real illusion's spot, then finish.
   hit    shattering the real illusion at any time once they hold their spots: pending
-         slashes vanish, the others dissolve, the boss reforms there facing the player
-         and staggers (rdPat 99, rdAnim 18); a fake just shatters and loses its turn.
+         slashes vanish, the others dissolve, the boss reforms there and is stunned for
+         10 s (rdPat 98: collapse, kneel, recover); a fake just shatters.
 Every relocation of the boss is hidden behind depart/arrive art; nothing snaps in view.
 """
 from pathlib import Path
@@ -36,15 +37,16 @@ parser.add_argument('--resourcepack', required=True)
 RP = Path(parser.parse_args().resourcepack)
 
 # ---- Encounter tuning -----------------------------------------------------------
-RUN_FROM, RUN_TICKS, RUN_STEP = 8, 12, 0.7       # 12 x 0.7 = 8.4 blocks from the centre
+RUN_FROM, RUN_TICKS, RUN_STEP = 8, 14, 1.0       # 14 x 1.0 = 14 blocks from the centre
 SPAWN_T, ARRIVE_T = 7, 3
-HOLD_T = RUN_FROM+RUN_TICKS                      # 20: take positions, hittable from here
-TELL1, TELL2 = 13, 9                             # first slash / the real one's quick second
-STRIKE1 = 1+TELL1                                # turn clock 14
-WIND2 = STRIKE1+3                                # 17: three ticks of follow-through first
-STRIKE2 = WIND2+TELL2                            # 26
-RECOVER = 6
-END1, END2 = STRIKE1+RECOVER, STRIKE2+RECOVER    # 20 / 32 ticks per fake / real turn
+HOLD_T = RUN_FROM+RUN_TICKS                      # 22: take positions, hittable from here
+VOLLEYS = 3                                      # simultaneous volleys before it ends
+TELL = 10                                        # shared wind-up of every volley
+STRIKE = 1+TELL                                  # volley clock 11: everyone cuts
+XGAP = 3                                         # the real one's second X stroke: clock 14
+X_YAW = 15                                       # its second line, turned off the first
+VOLLEY_END = STRIKE+XGAP+7                       # 21 ticks per volley
+STUN = 200                                       # 10 s stun after the real one is found
 DAMAGE = 10
 SHAPE = 13                                       # hazard: 22-long, 2.4-wide sword wave
 REFORM = 5                                       # arrive art needs 5 ticks to finish forming
@@ -286,7 +288,7 @@ write('tick', [
     '# Lost state (should not happen): end visibly instead of hiding the boss forever.',
     'execute unless score #rdIlStep rd matches 1..2 run return run '+call('illusion/lost'),
     'execute if score #rdIlStep rd matches 1 run '+call('illusion/intro'),
-    'execute if score #rdIlStep rd matches 2 run '+call('illusion/turns'),
+    'execute if score #rdIlStep rd matches 2 run '+call('illusion/volleys'),
     'execute if score #rdIlStep rd matches 1..2 if score @s rdTime matches 400.. run '+call('illusion/fail'),
     f'execute if score #rdIlStep rd matches 1..2 as {ILL} at @s run '+call('illusion/sync'),
 ])
@@ -300,7 +302,7 @@ write('start', [
     'kill @e[tag=rlk_rd_blink_dest]',
     'scoreboard players set #rdIlStep rd 1',
     'scoreboard players set #rdIlClock rd 0',
-    'scoreboard players set #rdIlTurn rd 1',
+    'scoreboard players set #rdIlTurn rd 0',
     'scoreboard players set #rdIlSlash rd 0',
     'scoreboard players set #rdIlShots rd 0',
     '# She scatters where she stands; the hidden body crosses to the centre this frame.',
@@ -309,7 +311,7 @@ write('start', [
     f'execute at {CENTER} run tp @s ~ ~ ~ facing entity {BODY} feet',
     'execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0',
     'title @a[tag=player] times 3 36 10',
-    'title @a[tag=player] subtitle {text:"검격을 두 번 날리는 분신이 진짜 · 찾아서 공격하세요",color:"light_purple"}',
+    'title @a[tag=player] subtitle {text:"X자로 베는 분신이 진짜 · 찾아서 공격하세요",color:"light_purple"}',
     'execute as @a[tag=player] run function rlk:view/ttl_blank',
     'scoreboard players set @a[tag=player] ttlT 49',
     'scoreboard players set #rdCap rd 1',
@@ -337,10 +339,8 @@ write('spawn_ring', [
     'execute rotated ~90 0 run '+call('illusion/spawn')+' {id:2}',
     'execute rotated ~180 0 run '+call('illusion/spawn')+' {id:3}',
     'execute rotated ~270 0 run '+call('illusion/spawn')+' {id:4}',
-    '# One random illusion is the real body; every illusion gets one turn, random order.',
+    '# One random illusion is the real body.',
     f'execute as @e[tag=rlk_rd_illusion,sort=random,limit=1] run scoreboard players set @s rdReal 1',
-]+[f'execute as @e[tag=rlk_rd_illusion,scores={{rdTurns=0}},sort=random,limit=1] run scoreboard players set @s rdTurns {n}'
-   for n in range(1, 5)]+[
     sound('entity.illusioner.mirror_move', 1, 1.15),
     sound('entity.breeze.charge', .7, 1.4),
 ])
@@ -387,60 +387,52 @@ write('pose', [
     'scoreboard players operation #rdIlId rd = @s rdObjId',
     f'$execute as {VIS} if score @s rdObjId = #rdIlId rd run '+model_set('$(model)'),
 ])
-write('turns', [
-    '# As the boss. Turn clock 1 = wind-up; fakes slash once, the real one twice.',
+write('volleys', [
+    '# As the boss. Three volleys: everyone winds up together and cuts toward the centre;',
+    f'# fakes once, the real one an X (second diagonal stroke {XGAP} ticks later).',
     'scoreboard players add #rdIlClock rd 1',
     '# hold() hands over with clock -1: nothing happens on the tick the spots are taken.',
     'execute if score #rdIlClock rd matches ..0 run return 0',
-    'execute if score #rdIlClock rd matches 1 run '+call('illusion/turn_begin'),
-    'execute unless score #rdIlStep rd matches 2 run return 0',
-    '# A shattered fake simply gives up the rest of its turn.',
-    f'execute unless entity {ACT} run return run '+call('illusion/turn_end'),
-    f'execute if score #rdIlClock rd matches {STRIKE1} as {ACT} at @s run '+call('illusion/strike'),
-    f'execute if score #rdIlShots rd matches 2 if score #rdIlClock rd matches {WIND2} as {ACT} at @s run '
-    +call('illusion/wind')+f' {{tell:{TELL2},life:{TELL2+10}}}',
-    f'execute if score #rdIlShots rd matches 2 if score #rdIlClock rd matches {STRIKE2} as {ACT} at @s run '+call('illusion/strike'),
-    f'execute if score #rdIlShots rd matches 1 if score #rdIlClock rd matches {END1}.. run return run '+call('illusion/turn_end'),
-    f'execute if score #rdIlClock rd matches {END2}.. run '+call('illusion/turn_end'),
+    f'execute if score #rdIlClock rd matches 1 as {ILL} at @s run '+call('illusion/wind')+f' {{tell:{TELL},life:{TELL+10}}}',
+    f'execute if score #rdIlClock rd matches {STRIKE} as {ILL} at @s run '+call('illusion/strike'),
+    f'execute if score #rdIlClock rd matches {STRIKE+XGAP} as @e[tag=rlk_rd_illusion,scores={{rdReal=1}},limit=1] at @s run '+call('illusion/strike_x2'),
+    f'execute if score #rdIlClock rd matches {VOLLEY_END}.. run '+call('illusion/volley_end'),
 ])
-write('turn_begin', [
-    'tag @e[tag=rlk_rd_ilact] remove rlk_rd_ilact',
-    f'execute as {ILL} if score @s rdTurns = #rdIlTurn rd run tag @s add rlk_rd_ilact',
-    '# Its illusion was shattered before its turn: skip straight to the next one.',
-    f'execute unless entity {ACT} run return run '+call('illusion/turn_skip'),
-    'scoreboard players set #rdIlShots rd 1',
-    'execute if entity @e[tag=rlk_rd_ilact,scores={rdReal=1},limit=1] run scoreboard players set #rdIlShots rd 2',
-    f'execute as {ACT} at @s run '+call('illusion/wind')+f' {{tell:{TELL1},life:{TELL1+10}}}',
-])
-write('turn_skip', [
-    'scoreboard players add #rdIlTurn rd 1',
-    'execute if score #rdIlTurn rd matches 5.. run return run '+call('illusion/fail'),
-    call('illusion/turn_begin'),
-])
-write('turn_end', [
-    f'execute as {ACT} run '+call('illusion/pose')+' {model:"illusion_ready"}',
-    'tag @e[tag=rlk_rd_ilact] remove rlk_rd_ilact',
+write('volley_end', [
+    f'execute as {ILL} run '+call('illusion/pose')+' {model:"illusion_ready"}',
     'scoreboard players add #rdIlTurn rd 1',
     'scoreboard players set #rdIlClock rd 0',
-    '# Five slashes (three fakes once, the real one twice) without finding her: over.',
-    'execute if score #rdIlSlash rd matches 5.. run return run '+call('illusion/fail'),
-    'execute if score #rdIlTurn rd matches 5.. run '+call('illusion/fail'),
+    '# Three volleys without finding her: over.',
+    f'execute if score #rdIlTurn rd matches {VOLLEYS}.. run '+call('illusion/fail'),
 ])
 write('wind', [
-    '# As the active illusion at its feet: face the centre, wind up, lay the slash line.',
+    '# As an illusion at its feet: face the centre, wind up, lay the slash line (all alike).',
     f'execute facing entity {CENTER} feet run tp @s ~ ~ ~ ~ 0',
     f'$function rlk:boss/raiden/hazard/create {{shape:{SHAPE},tell:$(tell),damage:{DAMAGE},life:$(life)}}',
     'tag @e[type=minecraft:marker,tag=rlk_rd_hazard,tag=!rlk_rd_ilhaz,distance=..0.1] add rlk_rd_ilhaz',
     '$function rlk:boss/raiden/object_vfx/illusion_cue {life:$(tell)}',
     call('illusion/pose')+' {model:"illusion_wind"}',
-    sound('item.trident.return', .8, 1.25),
+    sound('item.trident.return', .45, 1.25),
 ])
 write('strike', [
-    '# Same tick as its hazard strike: follow-through pose, swing arc and flying wave.',
+    '# Same tick as its hazard strike. A fake cuts once (flat arc + wave); the real one',
+    '# opens its X with a diagonal stroke and lays the second, crossing line right away.',
     call('illusion/pose')+' {model:"illusion_slash"}',
-    call('object_vfx/slash'),
+    'execute if score @s rdReal matches 0 run '+call('object_vfx/slash'),
+    'execute if score @s rdReal matches 1 run '+call('object_vfx/slash_xa'),
+    f'execute if score @s rdReal matches 1 run tp @s ~ ~ ~ ~{X_YAW} 0',
+    f'execute if score @s rdReal matches 1 run function rlk:boss/raiden/hazard/create {{shape:{SHAPE},tell:{XGAP},damage:{DAMAGE},life:{XGAP+10}}}',
+    'execute if score @s rdReal matches 1 run tag @e[type=minecraft:marker,tag=rlk_rd_hazard,tag=!rlk_rd_ilhaz,distance=..0.1] add rlk_rd_ilhaz',
+    'execute if score @s rdReal matches 1 run tp @s ~ ~ ~ ~ 0',
     'scoreboard players add #rdIlSlash rd 1',
-    sound('entity.player.attack.sweep', 1, .8),
+    sound('entity.player.attack.sweep', .6, .8),
+])
+write('strike_x2', [
+    '# As the REAL illusion: the second diagonal stroke of its X.',
+    call('illusion/pose')+' {model:"illusion_wind"}',
+    call('object_vfx/slash_xb'),
+    'scoreboard players add #rdIlSlash rd 1',
+    sound('entity.player.attack.sweep', .9, 1.15),
 ])
 write('fail', [
     '# As the boss. Not found in time: no punishment strike, she simply reforms.',
@@ -487,15 +479,21 @@ write('won_tick', [
     f'execute if score #rdIlClock rd matches {REFORM+1}.. run '+call('illusion/stagger'),
 ])
 write('stagger', [
-    '# As the boss, reformed on the real illusion\'s spot: the existing stagger window.',
+    "# As the boss, reformed on the real illusion's spot: a 10 s stun (rdPat 98).",
     call('illusion/reset'),
     call('object/clear'),
-    'scoreboard players set @s rdPat 99',
+    'scoreboard players set @s rdPat 98',
     'scoreboard players set @s rdTime 0',
-    'scoreboard players set @s rdAnim 18',
+    'scoreboard players set @s rdAnim 23',
     'scoreboard players remove @s rdRage 120',
     'execute if score @s rdRage matches ..0 run scoreboard players set @s rdRage 0',
     sound('block.beacon.deactivate', .8, .65, '~ ~ ~'),
+])
+write('stun_tick', [
+    '# boss/raiden/tick, as the stunned boss (rdPat 98): collapse, kneel, rise, move on.',
+    'execute if score @s rdTime matches 46 run scoreboard players set @s rdAnim 22',
+    f'execute if score @s rdTime matches {STUN-28} run scoreboard players set @s rdAnim 24',
+    f'execute if score @s rdTime matches {STUN}.. run '+call('finish'),
 ])
 write('reform', [
     '# As the boss at its (new) feet: face the player and play the arrival art. The rig',
@@ -557,4 +555,4 @@ for stale in OUT.glob('*.mcfunction'):
     if stale not in written:
         stale.unlink()
 print(f'Generated the illusion challenge: {len(written)} functions, {len(POSES)} skin pose models '
-      f'(run-out {RUN_TICKS} ticks, turns {END1}/{END2} ticks, hazard shape {SHAPE}).')
+      f'(run-out {RUN_TICKS} ticks to {RUN_TICKS*RUN_STEP:g} blocks, {VOLLEYS} volleys of {VOLLEY_END} ticks, stun {STUN} ticks, hazard shape {SHAPE}).')
