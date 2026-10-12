@@ -297,6 +297,135 @@ for i in range(18):
     shards += stroke(points, .11 if i % 2 else .17, 'purple', plane='vertical', core=i % 3 == 0)
 model('armor_break', shards)
 
+# ---- Painted gradient cards (rlk:raiden/fxg/*) ---------------------------------------
+# The calamity cut, its wings and afterglow, the arena warning ring, the transformation
+# charge, the blink rifts and the armour shards are rebuilt from flat painted cards
+# (tools/build_raiden_fx_textures.py) instead of stair-stepped cubes with flat swatches.
+# They keep the same model names, so the functions below are unchanged. The dome shell
+# stays a glass shell.
+from raiden_obj_cards import Model, save, ensure_textures, fx_names, polar
+
+FX = fx_names()
+ensure_textures(RP, FX)
+
+
+def cm():
+    return Model(SCALE, FX)
+
+
+def cut_path_z(x):
+    return 3 + 1.35*math.sin(x*.13)
+
+
+def outside_dome_card(el):
+    ax, az, bx, bz = el['from'][0]-8, el['from'][2]-8, el['to'][0]-8, el['to'][2]-8
+    dx = max(ax, 0, -bx)
+    dz = max(az-3, 0, 3-bz)
+    return dx*dx+dz*dz > 4.1**2
+
+
+def arc_cards(m, radius, y, start, end, width, tex, step=22.5):
+    # Chords of a horizontal arc around the arena centre, one card per 22.5 degrees.
+    a = start
+    while a <= end+1e-6:
+        chord = 2*radius*math.sin(math.radians(step/2))
+        m.hcard(polar(radius, a, y), a+90, chord*1.04, width, tex)
+        a += step
+
+
+def calamity(frame, after=False):
+    m = cm()
+    cores = [['blade_a', 'blade_b', 'blade_c', 'blade_a'], ['blade_b', 'blade_c', 'blade_a', 'blade_b'],
+             ['blade_c', 'blade_a', 'blade_b', 'blade_c']][frame]
+    bolts = [['bolt_a', 'bolt_b', 'bolt_c', 'bolt_d'], ['bolt_c', 'bolt_d', 'bolt_a', 'bolt_b'], None][frame]
+    fade = [1.0, .8, .6][frame]
+    # Four long straight cards (11 blocks each) along the cut at z = 3, y = 2: few seams,
+    # about 46 texels per block. Alternate cards are mirrored so the sprite never tiles.
+    for i in range(4):
+        x = -16.5+11*i
+        uv = (0, 0, 16, 16) if i % 2 == 0 else (16, 0, 0, 16)
+        y, z = 2.0, 3.0
+        if after:
+            m.vcard((x, y, z), 90, 11.7, .9, 'bolt_after_a' if i % 2 else 'bolt_after_c', uv)
+            m.hcard((x, y-.04, z), 90, 11.7, 1.6, 'blade_trail_b', uv)
+            continue
+        # White-hot cut seen from the locked camera, a violet wake on the cut plane and,
+        # on the first frames, a jagged bolt wrapped around it.
+        m.vcard((x, y, z-.04), 90, 11.7, 1.9*fade, 'glow_strip', uv)
+        m.vcard((x, y, z), 90, 11.7, .55*fade+.25, cores[i], uv)
+        m.hcard((x, y-.03, z), 90, 11.7, 2.1*fade, 'blade_trail_a', uv)
+        if bolts:
+            m.vcard((x, y+.02, z+.04), 90, 11.7, 1.3, bolts[i], uv)
+    if not after:
+        # Curved energy sheets either side give the cut its sweep across the arena.
+        for radius, width in ([(10, 1.1), (17, 1.0), (22, .9)][:3-frame]):
+            arc_cards(m, radius, 1.85, -157.5, 157.5, width, 'slash_wave' if frame == 0 else 'blade_trail_b')
+    return m
+
+
+for frame in range(3):
+    m = calamity(frame)
+    save(RP, 'fx_signature', 'judgment_strike_'+str(frame), m)
+    blocked = cm()
+    blocked.textures = m.textures
+    blocked.elements = [e for e in m.elements if outside_dome_card(e)]
+    save(RP, 'fx_signature', 'judgment_strike_blocked_'+str(frame), blocked)
+after = calamity(0, after=True)
+save(RP, 'fx_signature', 'judgment_after', after)
+after_blocked = cm()
+after_blocked.textures = after.textures
+after_blocked.elements = [e for e in after.elements if outside_dome_card(e)]
+save(RP, 'fx_signature', 'judgment_after_blocked', after_blocked)
+
+
+def boundary(stage=None):
+    # The arena edge at radius 22.6: a soft violet band with crackle, plus inward sparks.
+    m = cm()
+    arc_cards(m, 22.6, .09, 0, 337.5, .7, 'glow_strip')
+    arc_cards(m, 22.6, .11, 0, 337.5, .5, 'rim_crackle_a' if not stage else 'rim_crackle_b')
+    for k in range(8):
+        m.crossed(polar(21.4, k*45, .5), .9, 'charge_spark', planes=2, sv=1.0)
+    if stage is not None:
+        for k in range(16):
+            a = k*22.5
+            chord = 2*22.6*math.sin(math.radians(11.25))
+            h = .35+.25*stage
+            m.vcard(polar(22.7, a, h/2+.05), a+90, chord, h, 'crackle_a' if k % 2 else 'crackle_b')
+    return m
+
+
+save(RP, 'fx_signature', 'judgment_warning', boundary())
+for stage in range(3):
+    save(RP, 'fx_signature', 'judgment_charge_'+str(stage), boundary(stage))
+
+m = cm()
+m.hcard((0, 2.7, 0), 0, 5.4, 5.4, 'chakra_a')
+m.hcard((0, 4.3, 0), 45, 3.8, 3.8, 'chakra_b')
+m.crossed((0, 3.1, 0), 2.4, 'vbolt_a', planes=4, sv=6.0)
+m.crossed((0, 6.0, 0), 2.2, 'flash', planes=2)
+m.hcard((0, .06, 0), 0, 5.0, 5.0, 'scorch')
+save(RP, 'fx_signature', 'transform_charge', m)
+
+m = cm()
+# A tall tear of light where she breaks apart / reforms, forked arcs and a floor scorch.
+m.card((0, 1.6, 0), 'z', '+y', '+x', 3.4, .9, 'rift_a')
+m.card((0, 1.6, .02), 'x', '+y', '+z', 3.4, .9, 'rift_b')
+for y in (.7, 1.5, 2.3):
+    for side in (-1, 1):
+        m.vcard((side*.55, y, 0), 90, .9, .45, 'arc_a' if side > 0 else 'arc_b')
+m.hcard((0, .05, 0), 0, 1.8, 1.8, 'scorch')
+save(RP, 'fx_signature', 'blink', m)
+
+m = cm()
+for i in range(18):
+    a = (i*22.5) % 360
+    r = 1.0+(i % 3)*.3
+    y = .6+(i % 5)*.55
+    p = polar(r, a, y)
+    m.crossed(p, .55 if i % 2 else .8, 'glint', planes=2)
+    m.vcard(polar(r*1.08, a, y+.25), a, .45, .9, 'obj_shard')
+save(RP, 'fx_signature', 'armor_break', m)
+
 write('init', [f'scoreboard objectives add {n} dummy' for n in ['rdSfxAge', 'rdSfxLife', 'rdSfxKind', 'rdSfxStyle']])
 write('dome_create', spawn('dome', 1, 260))
 write('judgment_warning', spawn('judgment_warning', 2, 125))

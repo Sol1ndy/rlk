@@ -105,14 +105,46 @@ for(let i=0;i<BLADE.n;i++){const{y,h,xl,xr,w}=bladeAt(i),top=y+h+.02,edge=Math.m
  katana.push(solid([xl-.12,y,7.68],[xl+edge,top,8.32],'bedge'),solid([xl+edge-.1,y,7.5],[xr,top,8.5],'bpale',{east:'bcore'}));
  if(i<BLADE.n-3)katana.push(solid([xr-1.0,y,7.42],[xr-.45,top,8.58],'bcore'));}
 model('katana',katana);
-// Glows follow the curved blade; the aura leans out past the cutting edge.
-function bladeGlow(color,extra,thick,lean=0){const e=[];for(let i=0;i<BLADE.n;i++){const{y,h,xl,xr}=bladeAt(i);e.push(centered([(xl+xr)/2-8-lean*extra,y+h/2-8,0],[xr-xl+extra,h+.06,thick],color));}return e;}
-model('blade_aura',bladeGlow('violet',1.4,.42,.32));
-model('blade_haze',bladeGlow('glow',3.6,.26,.22));
-model('blade_trail_near',bladeGlow('violet',1,.5));
-model('blade_trail_far',bladeGlow('afterglow',.7,.4));
-model('blade_trail_faint',bladeGlow('lavender',.3,.3));
-for(let v=0;v<2;v++){const e=[];for(const s of[-1,1]){const pts=[];for(let i=0;i<11;i++){const b=bladeAt(Math.min(BLADE.n-1,Math.round(i*2.2)));pts.push([(s<0?b.xl:b.xr)-8+s*(.5+((i+v)%3===0?.85:.15)),b.y+b.h/2-8,s*.55]);}e.push(...line(pts,.21,'violet_dense'));e.push(...line(pts.map(p=>[p[0],p[1],p[2]+s*.17]),.07,'white'));for(const n of[2,6]){const p=pts[n];e.push(...line([p,[p[0]+s*1.3,p[1]+1.1,p[2]],[p[0]+s*.85,p[1]+2.2,p[2]],[p[0]+s*1.9,p[1]+3.2,p[2]]],.12,'cyan'));}}model('blade_lightning_'+v,e);}
+// Glows, trails and lightning follow the blade as painted gradient cards (rlk:raiden/fxg/*,
+// tools/build_raiden_fx_textures.py): flat cards in the blade plane (normal Z) and across it
+// (normal X), u along the blade (hilt -> tip), two halves per card so they follow the curve.
+// The aura leans out past the cutting edge (-X).
+const fxCat=JSON.parse(fs.readFileSync(path.join(here,'raiden_fx_textures.json'),'utf8'));
+const fxTex=Object.fromEntries(fxCat.textures.map(t=>[t.name,t.texture]));
+const FPAIR={x:['east','west'],y:['up','down'],z:['south','north']};
+const fCorners=(face,[x0,y0,z0],[x1,y1,z1])=>({north:[[x1,y1,z0],[x0,y1,z0],[x0,y0,z0],[x1,y0,z0]],south:[[x0,y1,z1],[x1,y1,z1],[x1,y0,z1],[x0,y0,z1]],east:[[x1,y1,z1],[x1,y1,z0],[x1,y0,z0],[x1,y0,z1]],west:[[x0,y1,z0],[x0,y1,z1],[x0,y0,z1],[x0,y0,z0]],up:[[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1]],down:[[x0,y0,z1],[x1,y0,z1],[x1,y0,z0],[x0,y0,z0]]})[face];
+const r4=v=>Math.round(v*1e4)/1e4;
+function fUV(face,lo,hi,f){const D=fCorners(face,lo,hi).map(f),eq=(a,b)=>Math.abs(a-b)<1e-6;
+ for(let k=0;k<4;k++){const u=[0,1,2,3].map(j=>D[(j+k)%4]);if(eq(u[0][1],u[1][1])&&eq(u[1][0],u[2][0])&&eq(u[2][1],u[3][1])&&eq(u[3][0],u[0][0]))return[[u[0][0],u[0][1],u[2][0],u[2][1]].map(r4),k*90];}
+ throw new Error('no uv solution for '+face);}
+// Card in plane <n> = at; texture u runs from model coordinate a to b along axis ua, v likewise.
+function fxCard(sprite,n,at,[ua,u0,u1],[va,v0,v1],uv=[0,0,16,16]){
+ if(!fxTex[sprite])throw new Error('fxg sprite '+sprite+' missing from raiden_fx_textures.json');
+ const N='xyz'.indexOf(n),U='xyz'.indexOf(ua),V='xyz'.indexOf(va),lo=[0,0,0],hi=[0,0,0];
+ lo[N]=hi[N]=at;lo[U]=Math.min(u0,u1);hi[U]=Math.max(u0,u1);lo[V]=Math.min(v0,v1);hi[V]=Math.max(v0,v1);
+ const from=lo.map(r4),to=hi.map(r4),f=p=>[uv[0]+(uv[2]-uv[0])*(p[U]-u0)/(u1-u0),uv[1]+(uv[3]-uv[1])*(p[V]-v0)/(v1-v0)];
+ const faces={};for(const fc of FPAIR[n]){const[fuv,r]=fUV(fc,from,to,f);faces[fc]={texture:'#'+sprite,uv:fuv,...(r?{rotation:r}:{})};}
+ return{from,to,shade:false,faces};}
+const fxModel=(name,e)=>{for(const el of e)for(const v of[...el.from,...el.to])if(v<-16||v>32)throw new Error(name+': element outside the -16..32 model cube');
+ const used=[...new Set(e.flatMap(el=>Object.values(el.faces).map(f=>f.texture.slice(1))))];
+ const tex=Object.fromEntries(used.map(n=>[n,fxTex[n]]));
+ json(path.join(assets,'models/item/raiden/judgment',name+'.json'),{ambientocclusion:false,textures:{...tex,particle:tex[used[0]]},elements:e});
+ json(path.join(assets,'items/raiden/judgment',name+'.json'),{model:{type:'minecraft:model',model:'rlk:item/raiden/judgment/'+name}});};
+// Blade halves: [y0, y1, centre x] following the curve c = 8.15 + 1.35 t^2.
+const HALVES=[[BLADE.y0-.4,(BLADE.y0+BLADE.y1)/2+.3,8.15+1.35*.0625+1.1],[(BLADE.y0+BLADE.y1)/2-.3,Math.min(32,BLADE.y1+.35),8.15+1.35*.5625+.8]];
+function bladeCards(sprite,width,{lean=0,depth=0,side=0,cross=0,z=8,mirror=false}={}){
+ const e=[];HALVES.forEach(([y0,y1,cx],i)=>{const x=cx-lean+side,uv=mirror===(i%2===1)?[0,0,16,16]:[16,0,0,16];
+  e.push(fxCard(sprite,'z',z+depth,['y',y0,y1],['x',x-width/2,x+width/2],uv));
+  if(cross)e.push(fxCard(sprite,'x',x,['y',y0,y1],['z',8-cross/2,8+cross/2],uv));});return e;}
+fxModel('blade_aura',[...bladeCards('glow_strip',4.2,{lean:.7,cross:1.6}),...bladeCards('blade_a',1.7,{lean:.9,depth:.04})]);
+fxModel('blade_haze',bladeCards('glow_strip',8.4,{lean:.5,cross:3.2,depth:-.04}));
+fxModel('blade_trail_near',bladeCards('blade_trail_a',4.4,{lean:.6,cross:1.4}));
+fxModel('blade_trail_far',bladeCards('blade_trail_b',3.6,{lean:.5,cross:1.0}));
+fxModel('blade_trail_faint',bladeCards('blade_trail_b',2.6,{lean:.4}));
+for(let v=0;v<2;v++){const e=[];
+ for(const s of[-1,1])e.push(...bladeCards(v?'bolt_c':'bolt_a',2.6,{side:s*1.7,depth:s*.35,mirror:s>0}));
+ e.push(...bladeCards(v?'bolt_b':'bolt_d',2.2,{cross:2.4,lean:.3}).filter((_,i)=>i%2===1));
+ fxModel('blade_lightning_'+v,e);}
 
 // Quaternion helpers. Model coordinates are world-aligned; the final right-Y-pi
 // correction cancels Minecraft's additional item-display model rotation.

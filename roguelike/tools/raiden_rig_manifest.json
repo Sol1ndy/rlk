@@ -18,7 +18,7 @@
     "weaponDisplays": 8,
     "palmDisplays": 5,
     "chakraDisplays": 1,
-    "materials": "violet geometry and exposed white seams",
+    "materials": "painted gradient sprites (rlk:raiden/fxg/*: rig_katana, blade, rim_crackle, blade_trail, rig_palm, chakra, orb_core, rig_crown, arc, vbolt, charge_spark) on flat crossed cards",
     "hands": "exact hand pivot/rotation/scale; charge, inward focus, contact release; smaller rear hands never emit large release crowns; the clap charge sits on the two support hands",
     "chakra": "sparse outer-rim forks; idle intermittent, charged attacks sustained; empty centre preserves face visibility"
   },
