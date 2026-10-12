@@ -1,6 +1,6 @@
 # Use body feet, not the displaced third-person spectator camera.
 scoreboard players set #rdHit rd 0
-execute unless entity @e[tag=rlk_body,distance=..28,limit=1] run return 0
+execute unless entity @e[tag=rlk_body,distance=..34,limit=1] run return 0
 execute store result score #rdDY rd run data get entity @e[tag=rlk_body,limit=1] Pos[1] 1000
 execute store result score #rdOY rd run data get entity @s Pos[1] 1000
 scoreboard players operation #rdDY rd -= #rdOY rd
@@ -13,7 +13,7 @@ execute store result score #rdOZ rd run data get entity @s Pos[2] 1000
 scoreboard players operation #rdDX rd -= #rdOX rd
 scoreboard players operation #rdDZ rd -= #rdOZ rd
 scoreboard players set #rdScale rd 1000
-# Distance squared stays below 784 million after the 28-block broad phase.
+# Distance squared stays below 1156 million after the 34-block broad phase.
 scoreboard players operation #rdR2 rd = #rdDX rd
 scoreboard players operation #rdR2 rd *= #rdDX rd
 scoreboard players operation #rdT rd = #rdDZ rd
@@ -48,6 +48,7 @@ execute if score @s rdShape matches 10 run function rlk:boss/raiden/hazard/hit/s
 execute if score @s rdShape matches 11 run function rlk:boss/raiden/hazard/hit/s11
 execute if score @s rdShape matches 12 run function rlk:boss/raiden/hazard/hit/s12
 execute if score @s rdShape matches 13 run function rlk:boss/raiden/hazard/hit/s13
+execute if score @s rdShape matches 14 run function rlk:boss/raiden/hazard/hit/s14
 execute unless score #rdHit rd matches 1 run return 0
 scoreboard players set @s rdHHit 1
 scoreboard players operation #cmDmg tmp = @s rdDamage

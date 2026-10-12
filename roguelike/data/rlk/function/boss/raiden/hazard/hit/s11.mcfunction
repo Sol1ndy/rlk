@@ -2,11 +2,11 @@
 execute if score @s rdHHit matches 1 run return 0
 scoreboard players operation #rdElapsed rd = @s rdHAge
 scoreboard players operation #rdElapsed rd -= @s rdWind
-execute unless score #rdElapsed rd matches 0..31 run return 0
+execute unless score #rdElapsed rd matches 0..57 run return 0
 scoreboard players operation #rdRadius rd = #rdElapsed rd
-scoreboard players set #rdSpan rd 16000
+scoreboard players set #rdSpan rd 30000
 scoreboard players operation #rdRadius rd *= #rdSpan rd
-scoreboard players set #rdSteps rd 31
+scoreboard players set #rdSteps rd 57
 scoreboard players operation #rdRadius rd /= #rdSteps rd
 scoreboard players add #rdRadius rd 2000
 scoreboard players operation #rdInner rd = #rdRadius rd

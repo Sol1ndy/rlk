@@ -14,12 +14,13 @@ Timeline (boss rdTime / volley clock):
   7      ... and splits: four identical illusions appear there, one secretly real.
   8-21   they run out in four directions (1 block/tick, 4-frame stride, forward lean).
   22     they hold their spots 14 blocks out and turn to face the centre (hittable now).
-  23+    three volleys. In each, all four wind up together with identical tells (a ground
-         line toward the centre, 10 ticks) and slash toward the centre at once: a fake
-         cuts once, the real one cuts an X - two quick diagonal strokes, the second line
-         landing 3 ticks after the first.
-  end    after the third volley without finding her the others dissolve and the boss
-         reforms on the real illusion's spot, then finish.
+  23+    four volleys, about 1.7 s apart. In each, all four wind up together with
+         identical tells (a ground line toward the centre, 14 ticks) and slash toward the
+         centre at once: a fake cuts once, the real one cuts an X - two quick diagonal
+         strokes, the second line landing 3 ticks after the first.
+  end    after the fourth volley without finding her the others dissolve and the boss
+         reforms on the real illusion's spot, then finish; like the original, 몽상의 일심
+         (pattern 7) always follows an illusion round that was not broken.
   hit    shattering the real illusion at any time once they hold their spots: pending
          slashes vanish, the others dissolve, the boss reforms there and is stunned for
          10 s (rdPat 98: collapse, kneel, recover); a fake just shatters.
@@ -40,12 +41,12 @@ RP = Path(parser.parse_args().resourcepack)
 RUN_FROM, RUN_TICKS, RUN_STEP = 8, 14, 1.0       # 14 x 1.0 = 14 blocks from the centre
 SPAWN_T, ARRIVE_T = 7, 3
 HOLD_T = RUN_FROM+RUN_TICKS                      # 22: take positions, hittable from here
-VOLLEYS = 3                                      # simultaneous volleys before it ends
-TELL = 10                                        # shared wind-up of every volley
-STRIKE = 1+TELL                                  # volley clock 11: everyone cuts
-XGAP = 3                                         # the real one's second X stroke: clock 14
+VOLLEYS = 4                                      # simultaneous volleys before it ends
+TELL = 14                                        # shared wind-up of every volley (0.7 s)
+STRIKE = 1+TELL                                  # volley clock 15: everyone cuts
+XGAP = 3                                         # the real one's second X stroke: clock 18
 X_YAW = 15                                       # its second line, turned off the first
-VOLLEY_END = STRIKE+XGAP+7                       # 21 ticks per volley
+VOLLEY_END = STRIKE+XGAP+16                      # 34 ticks per volley
 STUN = 200                                       # 10 s stun after the real one is found
 DAMAGE = 10
 SHAPE = 13                                       # hazard: 22-long, 2.4-wide sword wave
@@ -389,7 +390,7 @@ write('pose', [
     f'$execute as {VIS} if score @s rdObjId = #rdIlId rd run '+model_set('$(model)'),
 ])
 write('volleys', [
-    '# As the boss. Three volleys: everyone winds up together and cuts toward the centre;',
+    f'# As the boss. {VOLLEYS} volleys: everyone winds up together and cuts toward the centre;',
     f'# fakes once, the real one an X (second diagonal stroke {XGAP} ticks later).',
     'scoreboard players add #rdIlClock rd 1',
     '# hold() hands over with clock -1: nothing happens on the tick the spots are taken.',
@@ -403,7 +404,7 @@ write('volley_end', [
     f'execute as {ILL} run '+call('illusion/pose')+' {model:"illusion_ready"}',
     'scoreboard players add #rdIlTurn rd 1',
     'scoreboard players set #rdIlClock rd 0',
-    '# Three volleys without finding her: over.',
+    f'# {VOLLEYS} volleys without finding her: over.',
     f'execute if score #rdIlTurn rd matches {VOLLEYS}.. run '+call('illusion/fail'),
 ])
 write('wind', [
@@ -452,9 +453,11 @@ write('fail_tick', [
     f'execute if score #rdIlClock rd matches {REFORM}.. run '+call('illusion/fail_end'),
 ])
 write('fail_end', [
-    '# The arrive art is fully formed now: the rig reappears this same tick.',
+    '# The arrive art is fully formed now: the rig reappears this same tick. Not broken:',
+    '# 몽상의 일심 (pattern 7) comes next, as in the original.',
     call('illusion/reset'),
     call('finish'),
+    'scoreboard players set @s rdNext 7',
 ])
 write('won', [
     '# As the shattered REAL illusion at its spot (object/break, before it is removed).',

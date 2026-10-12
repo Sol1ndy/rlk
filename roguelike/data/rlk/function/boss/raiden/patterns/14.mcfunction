@@ -4,7 +4,10 @@ execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/r
 execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/line/cheonsu
 execute if score @s rdTime matches 12 at @s rotated as @s run scoreboard players set @s rdAnim 8
 execute if score @s rdTime matches 20 at @s rotated as @s run function rlk:boss/raiden/stakes_pulse_1
-execute if score @s rdTime matches 54 at @s rotated as @s run function rlk:boss/raiden/stakes_pulse_2
-execute if score @s rdTime matches 88 at @s rotated as @s run function rlk:boss/raiden/stakes_pulse_3
-execute if score @s rdTime matches 128 at @s rotated as @s run function rlk:boss/raiden/stakes_pulse
-execute if score @s rdTime matches 178 at @s rotated as @s run function rlk:boss/raiden/finish
+execute if score @s rdTime matches 48 at @s rotated as @s run function rlk:boss/raiden/stakes_pulse_2
+execute if score @s rdTime matches 76 at @s rotated as @s run function rlk:boss/raiden/stakes_pulse_3
+execute if score @s rdTime matches 104 at @s rotated as @s run function rlk:boss/raiden/stakes_pulse_1
+execute if score @s rdTime matches 132 at @s rotated as @s run function rlk:boss/raiden/stakes_pulse_2
+execute if score @s rdTime matches 160 at @s rotated as @s run function rlk:boss/raiden/stakes_pulse_3
+execute if score @s rdTime matches 192 at @s rotated as @s run function rlk:boss/raiden/stakes_pulse
+execute if score @s rdTime matches 266 at @s rotated as @s run function rlk:boss/raiden/finish

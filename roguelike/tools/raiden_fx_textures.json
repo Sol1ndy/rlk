@@ -843,6 +843,28 @@
    "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
   },
   {
+   "name": "tele_14",
+   "texture": "rlk:raiden/fxg/tele_14",
+   "w": 400,
+   "h": 400,
+   "kind": "decal",
+   "along": "world",
+   "core": "quad piece: world x 0.000..19.900, z 0.000..19.900",
+   "use": "warning telegraph of hazard shape 14 (disk)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
+   "name": "charged_14",
+   "texture": "rlk:raiden/fxg/charged_14",
+   "w": 400,
+   "h": 400,
+   "kind": "decal",
+   "along": "world",
+   "core": "quad piece: world x 0.000..19.900, z 0.000..19.900",
+   "use": "charged (white-hot) telegraph of hazard shape 14 (disk)",
+   "notes": "hazard-specific; u = local x, v = local forward z; mirrored by the cards"
+  },
+  {
    "name": "ringq_0",
    "texture": "rlk:raiden/fxg/ringq_0",
    "w": 96,
@@ -949,6 +971,39 @@
    "kind": "quarter",
    "along": "radial",
    "core": "circle centre at (0,0); band radius 17.2+-0.7 of 18.800 blocks per texture side",
+   "use": "expanding ring quadrant (hazard shape 11)",
+   "notes": ""
+  },
+  {
+   "name": "ringq_10",
+   "texture": "rlk:raiden/fxg/ringq_10",
+   "w": 560,
+   "h": 560,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at (0,0); band radius 21.5+-0.7 of 23.100 blocks per texture side",
+   "use": "expanding ring quadrant (hazard shape 11)",
+   "notes": ""
+  },
+  {
+   "name": "ringq_11",
+   "texture": "rlk:raiden/fxg/ringq_11",
+   "w": 576,
+   "h": 576,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at (0,0); band radius 26.8+-0.7 of 28.400 blocks per texture side",
+   "use": "expanding ring quadrant (hazard shape 11)",
+   "notes": ""
+  },
+  {
+   "name": "ringq_12",
+   "texture": "rlk:raiden/fxg/ringq_12",
+   "w": 576,
+   "h": 576,
+   "kind": "quarter",
+   "along": "radial",
+   "core": "circle centre at (0,0); band radius 31.0+-0.7 of 32.600 blocks per texture side",
    "use": "expanding ring quadrant (hazard shape 11)",
    "notes": ""
   },
@@ -1513,6 +1568,28 @@
    "z0": -0.9,
    "z1": 22.9,
    "geom": null
+  },
+  "tele_14": {
+   "shape": 14,
+   "sym": "quad",
+   "w": 400,
+   "h": 400,
+   "x0": 0.0,
+   "x1": 19.9,
+   "z0": 0.0,
+   "z1": 19.9,
+   "geom": null
+  },
+  "charged_14": {
+   "shape": 14,
+   "sym": "quad",
+   "w": 400,
+   "h": 400,
+   "x0": 0.0,
+   "x1": 19.9,
+   "z0": 0.0,
+   "z1": 19.9,
+   "geom": null
   }
  },
  "ring_radii": [
@@ -1525,7 +1602,10 @@
   8.8,
   11.0,
   13.8,
-  17.2
+  17.2,
+  21.5,
+  26.8,
+  31.0
  ],
  "ring_half": 0.7,
  "ring_pad": 0.9

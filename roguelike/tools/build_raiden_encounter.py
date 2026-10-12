@@ -54,10 +54,21 @@ TRANSFORM_LEN = 52
 # Final calamity entry (pattern 15): she gathers lightning, rises inside a lightning
 # pillar while bolts rake the arena, and dissolves at the top (rig hidden from then on).
 ASCEND_END, ASCEND_STEP = 26, 0.32
-CLAP_LOCK, CLAP_TELL = 17, 10   # pattern 12: hands follow until 17, clap lands 10 later
+CLAP_LOCK, CLAP_TELL = 17, 14   # pattern 12: hands follow until 17, clap lands 14 later
 SHADOW_LOCK = 37                 # pattern 13: the shadow chases for 36 ticks
+# Close-range patterns and their reach: chosen farther than `start` blocks from the
+# player, she dashes at them (or scatter-blinks in front of them beyond CLOSE_BLINK)
+# until within `stop`, and only then starts. Ranged patterns (3 뇌명, 4, 6, 7, 12-15, 18
+# 발도 돌진) start where she stands.
+REACH = {1: (5.5, 4), 2: (16, 13), 11: (10, 8), 16: (11, 9), 17: (14, 12)}
+CLOSE_BLINK, CLOSE_MAX, CLOSE_STEP = 18, 45, (0.55, 0.65)
+# 금강괴멸파 (pattern 14): three stakes spread around the centre; each pulse is a ring that
+# travels from radius 2 to the far wall (RING_END over RING_FRAMES ticks, jump it).
+from build_raiden_fx_textures import RING_END, RING_FRAMES
+STAKES = [(0, -9), (7.8, 4.5), (-7.8, 4.5)]
+STAKE_TELL = 12
 
-objectives = ['rd','rdPhase','rdPat','rdTime','rdAnim','rdRage','rdShield','rdCycle','rdCool','rdPrev','rdTurns','rdHitCD','rdObjKind','rdObjId','rdObjHP','rdReal','rdOAge','rdPTime','rdShape','rdWind','rdHAge','rdHLife','rdDamage','rdHHit','rdFX','rdFZ','rdHId','rdVId','rdUltUsed','rdWalk','rdWalkDir','rdBlink','rdCam','rdDeath','rdDeathTime','rdHidden']
+objectives = ['rd','rdPhase','rdPat','rdTime','rdAnim','rdRage','rdShield','rdCycle','rdCool','rdPrev','rdTurns','rdHitCD','rdObjKind','rdObjId','rdObjHP','rdReal','rdOAge','rdPTime','rdShape','rdWind','rdHAge','rdHLife','rdDamage','rdHHit','rdFX','rdFZ','rdHId','rdVId','rdUltUsed','rdWalk','rdWalkDir','rdBlink','rdCam','rdDeath','rdDeathTime','rdHidden','rdGo','rdNext']
 write('init',[f'scoreboard objectives add {v} dummy' for v in objectives]+[
     'bossbar add rlk:narukami {text:"마가츠 미타케 나루카미노 미코토",color:"light_purple"}',
     'bossbar add rlk:narukami_state {text:"악연의 에너지",color:"light_purple"}',
@@ -80,6 +91,8 @@ function rlk:boss/raiden/illusion/cleanup
 attribute @s minecraft:scale base set 1.2
 scoreboard players set @s rdPhase 0
 scoreboard players set @s rdPat 0
+scoreboard players set @s rdGo 0
+scoreboard players set @s rdNext 0
 scoreboard players set @s rdTime 0
 scoreboard players set @s rdRage 0
 scoreboard players set @s rdCool 40
@@ -189,50 +202,47 @@ def typed(text):
         steps.append(text)
     return steps
 # Boss lines from the original fight (나무위키 「마가츠 미타케 나루카미노 미코토」 3.2 패턴):
-# key: (text or explicit steps, ticks per step, colour, hold of the full line, heavy ending)
+# key: (text or explicit steps, ticks per step, colour, hold of the full line)
 VOICE, VOICE2 = '#d7b4ff', '#e6a3ff'
 LINES = {
-    'mangeop': (['그', '그 끝은', '그 끝은 만겁', '그 끝은 만겁일지니', '그 끝은 만겁일지니...'], 5, VOICE, 24, True),
-    'eternal': ('이 몸이 곧 영원이다', 3, VOICE, 26, True),
-    'nothing': ('그 무엇도 영원한 것은 없다.', 2, VOICE, 40, True),
-    'eyes': ('뇌광이 영원의 땅을 비추는구나.', 2, VOICE, 24, False),
-    'pohyeong': ('찰나의... 포영!', 3, VOICE, 22, False),
-    'ganpa': ('간파했군.', 4, '#bfe4ff', 34, False),
-    'noemyeong': ('뇌명.', 4, VOICE, 20, False),
-    'will': ('뇌전은 인간의 의지 따위로 변하지 않아', 2, VOICE, 22, False),
-    'command': ('번개여, 나의 호령을 따르라.', 2, VOICE, 22, False),
-    'calm': ('무념 무상, 천하가 고요하리.', 2, VOICE, 12, False),
-    'sever_one': ('무념 무상, 일도 단절.', 1, VOICE2, 16, True),
-    'cleave_all': ('방해는 모두 베겠노라', 2, VOICE2, 22, False),
-    'prison': ('감옥으로 만들어 주지', 2, VOICE2, 22, False),
-    'cheonsu': ('천수의 속박!', 3, VOICE2, 30, True),
-    'sever': ('단절!', 2, VOICE2, 20, True),
-    'goemyeol': ('궤멸하라!', 3, VOICE2, 24, False),
-    'pierce': ('뚫려라!', 2, VOICE2, 20, False),
+    'mangeop': (['그', '그 끝은', '그 끝은 만겁', '그 끝은 만겁일지니', '그 끝은 만겁일지니...'], 5, VOICE, 24),
+    'eternal': ('이 몸이 곧 영원이다', 3, VOICE, 26),
+    'nothing': ('그 무엇도 영원한 것은 없다.', 2, VOICE, 40),
+    'eyes': ('뇌광이 영원의 땅을 비추는구나.', 2, VOICE, 24),
+    'pohyeong': ('찰나의... 포영!', 3, VOICE, 22),
+    'ganpa': ('간파했군.', 4, '#bfe4ff', 34),
+    'noemyeong': ('뇌명.', 4, VOICE, 20),
+    'will': ('뇌전은 인간의 의지 따위로 변하지 않아', 2, VOICE, 22),
+    'command': ('번개여, 나의 호령을 따르라.', 2, VOICE, 22),
+    'calm': ('무념 무상, 천하가 고요하리.', 2, VOICE, 12),
+    'sever_one': ('무념 무상, 일도 단절.', 1, VOICE2, 16),
+    'cleave_all': ('방해는 모두 베겠노라', 2, VOICE2, 22),
+    'prison': ('감옥으로 만들어 주지', 2, VOICE2, 22),
+    'cheonsu': ('천수의 속박!', 3, VOICE2, 30),
+    'sever': ('단절!', 2, VOICE2, 20),
+    'goemyeol': ('궤멸하라!', 3, VOICE2, 24),
+    'pierce': ('뚫려라!', 2, VOICE2, 20),
 }
 LINE_IDS = {k: i for i, k in enumerate(LINES, 1)}
 tick_lines = ['# Advances the boss line in progress (#rdLine id, #rdLineT age); called from tick.',
               'execute unless score #rdLine rd matches 1.. run return 0',
               'scoreboard players add #rdLineT rd 1']
-for key, (steps, gap, colour, hold, heavy) in LINES.items():
+for key, (steps, gap, colour, hold) in LINES.items():
     steps = typed(steps) if isinstance(steps, str) else steps
     lid = LINE_IDS[key]
     write('line/'+key, [f'scoreboard players set #rdLine rd {lid}', 'scoreboard players set #rdLineT rd -1'])
     for k, text in enumerate(steps):
         last = k == len(steps)-1
         stay = hold if last else gap+6
+        # One plain, quiet tick per step (same sound and pitch every time).
         frame = [f'title @a[tag=player] times 0 {stay} {12 if last else 0}',
                  'title @a[tag=player] subtitle {text:"'+text+'",color:"'+colour+'",bold:true}',
                  'execute as @a[tag=player] run function rlk:view/ttl_blank',
                  f'scoreboard players set @a[tag=player] ttlT {stay+(12 if last else 0)}',
                  'scoreboard players set #rdCap rd 1', 'scoreboard players set #rdCapPat rd 1',
-                 f'execute as @a[tag=player] at @s run playsound minecraft:block.respawn_anchor.charge hostile @s ~ ~ ~ .45 {.62+.08*k:.2f} 0',
-                 f'execute as @a[tag=player] at @s run playsound minecraft:block.amethyst_block.hit hostile @s ~ ~ ~ .8 {.55+.06*k:.2f} 0']
+                 'execute as @a[tag=player] at @s run playsound minecraft:block.note_block.hat voice @s ~ ~ ~ .3 1 0']
         if last:
-            frame += ['execute as @a[tag=player] at @s run playsound minecraft:block.beacon.power_select hostile @s ~ ~ ~ .7 .5 0',
-                      'scoreboard players set #rdLine rd 0']
-            if heavy:
-                frame.insert(-1, 'execute as @a[tag=player] at @s run playsound minecraft:entity.lightning_bolt.thunder hostile @s ~ ~ ~ .55 .55 0')
+            frame.append('scoreboard players set #rdLine rd 0')
         write(f'line/{key}_{k}', frame)
         tick_lines.append(f'execute if score #rdLine rd matches {lid} if score #rdLineT rd matches {k*gap} run function rlk:boss/raiden/line/{key}_{k}')
 write('line/tick', tick_lines)
@@ -249,6 +259,7 @@ function rlk:boss/raiden/illusion/cleanup
 function rlk:boss/raiden/movement/cleanup
 scoreboard players set @e[tag=rlk_raiden] rdBlink 0
 scoreboard players set @e[tag=rlk_raiden] rdWalk 0
+scoreboard players set @e[tag=rlk_raiden] rdGo 0
 kill @e[tag=rlk_rd_hazard]
 function rlk:boss/raiden/object/clear
 kill @e[tag=rlk_rd_dome]
@@ -277,6 +288,8 @@ execute if score @s rdPhase matches 2 run function rlk:boss/raiden/armor_tick
 execute if score @s rdPhase matches 3 run function rlk:boss/raiden/exhausted_tick
 execute if score @s rdPhase matches 0 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
 execute if score @s rdPhase matches 2 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
+# Close-range patterns first close the distance (rdGo); their clock waits at 0 meanwhile.
+execute if score @s rdGo matches 1.. if score @s rdPat matches 1..18 run function rlk:boss/raiden/close_in
 # Timelines start on the tick after choose: rdTime 1 is every pattern's first frame.
 execute if score @s rdPat matches 1..7 if score @s rdTime matches 1.. run function rlk:boss/raiden/normal_dispatch
 execute if score @s rdPat matches 11..18 if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch
@@ -332,6 +345,9 @@ execute if score @s rdPhase matches 2 store result score @s rdPat run random val
 execute if score @s rdPat = @s rdPrev run scoreboard players add @s rdPat 1
 execute if score @s rdPhase matches 0 if score @s rdPat matches 8 run scoreboard players set @s rdPat 1
 execute if score @s rdPhase matches 2 if score @s rdPat matches 19 run scoreboard players set @s rdPat 11
+# 몽상의 일심 always follows an illusion round that was not broken (illusion/fail_end).
+execute if score @s rdPhase matches 0 if score @s rdNext matches 1..7 run scoreboard players operation @s rdPat = @s rdNext
+scoreboard players set @s rdNext 0
 scoreboard players add @s rdTurns 1
 scoreboard players operation #rdTurn rd = @s rdTurns
 scoreboard players operation #rdTurn rd %= #rd4 rd
@@ -348,7 +364,34 @@ scoreboard players operation @s rdPrev = @s rdPat
 scoreboard players set @s rdTime 0
 execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
 execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
+# A close-range pattern chosen while the player is out of its reach: close in first.
+scoreboard players set @s rdGo 0
+'''+'\n'.join(f'execute if score @s rdPat matches {i} at @s unless entity @e[tag=rlk_body,distance=..{start}] run scoreboard players set @s rdGo 1' for i,(start,stop) in REACH.items())+'''
 ''')
+# Close-in: dash at the player; scatter-blink in front of them when far away.
+write('close_in',[
+    '# As the boss with a chosen close-range pattern (rdGo 1..): the clock stays at 0.',
+    'scoreboard players set @s rdTime 0',
+    'scoreboard players add @s rdGo 1',
+    'execute if score @s rdBlink matches 1.. run return 0',
+    'execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet',
+    'execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0',
+    f'execute if score @s rdGo matches 2 at @s unless entity @e[tag=rlk_body,distance=..{CLOSE_BLINK}] run return run function rlk:boss/raiden/movement/blink_start',
+    'scoreboard players set #rdNear rd 0']+[
+    f'execute if score @s rdPat matches {i} at @s if entity @e[tag=rlk_body,distance=..{stop}] run scoreboard players set #rdNear rd 1' for i,(start,stop) in REACH.items()]+[
+    'execute if score #rdNear rd matches 1 run return run function rlk:boss/raiden/close_done',
+    f'execute if score @s rdGo matches {CLOSE_MAX}.. run return run function rlk:boss/raiden/close_done',
+    'scoreboard players set @s rdAnim 21',
+    f'execute if score @s rdPhase matches 0 at @s rotated as @s positioned ^ ^ ^{CLOSE_STEP[0]} if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] run tp @s ~ ~ ~',
+    f'execute if score @s rdPhase matches 2 at @s rotated as @s positioned ^ ^ ^{CLOSE_STEP[1]} if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] run tp @s ~ ~ ~',
+    'execute if score @s rdGo matches 3 at @s run playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.5 1.3 0.2',
+])
+write('close_done',[
+    'scoreboard players set @s rdGo 0',
+    'scoreboard players set @s rdAnim 0',
+    'execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet',
+    'execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0',
+])
 write('finish','''
 function rlk:boss/raiden/camera/release_all
 kill @e[tag=rlk_rd_clap]
@@ -357,6 +400,7 @@ function rlk:boss/raiden/caption/pattern_end
 function rlk:boss/raiden/judgment_rig/cleanup
 scoreboard players set @s rdBlink 0
 scoreboard players set @s rdWalk 0
+scoreboard players set @s rdGo 0
 kill @e[tag=rlk_rd_blink_dest]
 scoreboard players operation #rdWalkTurn rd = @s rdTurns
 scoreboard players set #rd2 rd 2
@@ -371,6 +415,8 @@ kill @e[tag=rlk_rd_dome]
 ''')
 write('transform_start','''
 function rlk:boss/raiden/camera/release_all
+scoreboard players set @s rdGo 0
+scoreboard players set @s rdNext 0
 function rlk:boss/raiden/judgment_rig/cleanup
 function rlk:boss/raiden/illusion/cleanup
 scoreboard players set @s rdWalk 0
@@ -554,9 +600,12 @@ face='execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet'
 flat='execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0'
 target='execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ run '
 center='execute at @e[tag=rlk_raiden_arena,limit=1] run '
-# Short tells (8-13 ticks; eyes 18), then 4-7 ticks of recovery before the next wind-up.
-# Every wind clip (slash/thrust 6, cast 10, sweep/clap/slam 8, judgment 14) still
-# reaches its hold pose before the strike clip starts 3-4 ticks ahead of contact.
+# Tells: every telegraphed strike gets W extra ticks over the old 8-13 (so at least
+# 12 ticks = 0.6 s; eyes 18), then 4-7 ticks of recovery before the next wind-up.
+# Every wind clip (slash/thrust 6, cast 10, sweep/clap/slam 8, judgment 14) reaches its
+# hold pose and simply holds it longer before the strike clip starts 3-4 ticks ahead.
+W=4
+def tell(t): return max(t+W,12)
 
 def gated(lines,t,cond,*commands):
     # event() with an extra score condition (e.g. a random follow-up).
@@ -565,35 +614,42 @@ def gated(lines,t,cond,*commands):
         lead=4 if n in (15,17) else 3 if n in (3,4,6,8,11,13) else 0
         lines.append(f'execute if score @s rdTime matches {max(1,t-lead)} {cond} at @s rotated as @s run {cmd}')
 p=pattern(1,'4연격 · 가로 베기 세 번, 나기나타 내려찍기, 이어지는 검기')
-for t,n in [(1,3),(14,4),(27,3)]:
-    event(p,t,face,flat,anim(2),haz(1,8,9))
-    event(p,t+8,anim(n),sound('entity.player.attack.sweep',1,.7))
+t=1
+for n in (3,4,3):
+    event(p,t,face,flat,anim(2),haz(1,tell(8),9))
+    event(p,t+tell(8),anim(n),sound('entity.player.attack.sweep',1,.7))
+    t+=tell(8)+5
 # Fourth hit: the naginata is driven into the floor; lightning bursts around her and
 # falls where the player stands.
-event(p,40,face,flat,anim(5),haz(8,10,15),target+haz(3,10,12))
-event(p,50,anim(6),sound('entity.lightning_bolt.impact',.9,.75),sound('item.trident.hit_ground',1,.6))
+hit=t+tell(10)
+event(p,t,face,flat,anim(5),haz(8,tell(10),15),target+haz(3,tell(10),12))
+event(p,hit,anim(6),sound('entity.lightning_bolt.impact',.9,.75),sound('item.trident.hit_ground',1,.6))
 # Half the time a flying sword wave follows (watch her to the end).
-p.append('execute if score @s rdTime matches 52 store result score #rdFollow rd run random value 0..1')
-gated(p,56,'if score #rdFollow rd matches 1',face,flat,anim(2),haz(13,8,12))
-gated(p,64,'if score #rdFollow rd matches 1',anim(3),call('object_vfx/slash'),sound('entity.player.attack.sweep',1.1,.9))
-gated(p,58,'if score #rdFollow rd matches 0',call('finish'))
-gated(p,70,'if score #rdFollow rd matches 1',call('finish'))
+p.append(f'execute if score @s rdTime matches {hit+2} store result score #rdFollow rd run random value 0..1')
+gated(p,hit+6,'if score #rdFollow rd matches 1',face,flat,anim(2),haz(13,tell(8),12))
+gated(p,hit+6+tell(8),'if score #rdFollow rd matches 1',anim(3),call('object_vfx/slash'),sound('entity.player.attack.sweep',1.1,.9))
+gated(p,hit+8,'if score #rdFollow rd matches 0',call('finish'))
+gated(p,hit+12+tell(8),'if score #rdFollow rd matches 1',call('finish'))
 p=pattern(2,'회전 참격 · 빠른 번개 칼날 세 개와 큰 초승달 검기')
 event(p,1,call('line/will'))
 # She spins in place throwing three fast blades at the player, then a big crescent.
 event(p,1,face,flat,anim(20),sound('entity.breeze.charge',.8,.8))
+# Blades leave every 6 ticks; each is marked tell(6) ticks before it flies.
 for t in [4,10,16]:
-    event(p,t,face,flat,haz(13,6,10))
-    event(p,t+6,call('object_vfx/slash'),sound('entity.breeze.shoot',.8,1.25))
-event(p,26,face,flat,anim(2),haz(10,10,18))
-event(p,36,anim(3),call('object_vfx/slash'),sound('entity.player.attack.sweep',1.2,.6))
-end(p,44)
+    event(p,t,face,flat,haz(13,tell(6),10))
+    event(p,t+tell(6),call('object_vfx/slash'),sound('entity.breeze.shoot',.8,1.25))
+t=16+tell(6)+4
+event(p,t,face,flat,anim(2),haz(10,tell(10),18))
+event(p,t+tell(10),anim(3),call('object_vfx/slash'),sound('entity.player.attack.sweep',1.2,.6))
+end(p,t+tell(10)+8)
 p=pattern(3,'뇌명 · 순간이동 후 발도')
 event(p,1,call('line/noemyeong'))
 # Each scatter blink keeps the rig hidden for 8 ticks (reforms on blink start + 8).
 event(p,1,anim(21),sound('entity.breeze.charge',.8,.7),call('movement/blink_start'))
-event(p,10,face,flat,anim(2),haz(2,8,16));event(p,18,anim(6),sound('entity.player.attack.sweep',1.1,.65))
-event(p,24,call('movement/blink_start'));event(p,33,face,flat,anim(2),haz(1,8,15));event(p,41,anim(4));end(p,48)
+t=10+tell(8)
+event(p,10,face,flat,anim(2),haz(2,tell(8),16));event(p,t,anim(6),sound('entity.player.attack.sweep',1.1,.65))
+event(p,t+6,call('movement/blink_start'));event(p,t+15,face,flat,anim(2),haz(1,tell(8),15))
+event(p,t+15+tell(8),anim(4));end(p,t+22+tell(8))
 p=pattern(4,'마가츠의 뇌안 · 하나를 파괴하고 빈 원으로 이동')
 event(p,1,anim(7),call('eyes_start'),call('line/eyes'))
 event(p,16,anim(8));event(p,40,call('eyes_arm'));event(p,59,anim(18));end(p,70)
@@ -601,24 +657,32 @@ event(p,16,anim(8));event(p,40,call('eyes_arm'));event(p,59,anim(18));end(p,70)
 patterns[5]=[call('illusion/tick')]
 p=pattern(6,'낙뢰 · 표시된 자리에서 벗어나세요')
 event(p,1,call('line/command'))
-for t in [1,14,27,40]:
-    event(p,t,anim(7),target+haz(3,9,12));event(p,t+9,anim(8),sound('entity.lightning_bolt.impact',.7,.8))
-end(p,54)
-p=pattern(7,'뇌광 결계 · 번개 씨앗이 떨어진 뒤 안쪽 전체 강타, 바깥으로 피하세요')
-# She pushes the player away, electro seeds fall in a ring 10 blocks around her, then
-# everything inside the ring is struck: run out past the seeds.
-event(p,1,anim(7),haz(8,8,10),sound('entity.warden.sonic_charge',.6,1.4),call('line/calm'))
-event(p,26,call('line/sever_one'))
-for i,(t,a) in enumerate([(4,0),(6,60),(8,120),(10,180),(12,240),(14,300)]):
-    event(p,t,f'execute rotated ~{a} 0 positioned ^ ^ ^10 run '+haz(3,10,8))
-event(p,6,haz(12,24,26))
-event(p,30,anim(8),sound('entity.lightning_bolt.thunder',.8,.9))
-end(p,40)
+for k in range(4):
+    t=1+k*(tell(9)+4)
+    event(p,t,anim(7),target+haz(3,tell(9),12));event(p,t+tell(9),anim(8),sound('entity.lightning_bolt.impact',.7,.8))
+end(p,t+tell(9)+5)
+p=pattern(7,'몽상의 일심 · 가장자리의 번개 구슬 사이로 피하세요')
+# As in the original: she blinks to the centre, electro orbs fall along the outer edge,
+# then time stops and one cut covers nearly the whole arena (radius 19). The orbs burst
+# at the same moment, so the only cover is between them at the very edge.
+HIT=42
+event(p,1,call('line/calm'),center+call('movement/blink_to'),sound('entity.warden.sonic_charge',.6,1.4))
+event(p,10,anim(7))
+event(p,12,center+haz(14,HIT-12,30))
+for k in range(8):
+    t=10+2*k
+    event(p,t,center+f'execute rotated {45*k} 0 positioned ^ ^ ^21 run '+haz(3,HIT-t,10),
+          center+f'execute rotated {45*k} 0 positioned ^ ^ ^21 run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2')
+event(p,HIT-4,call('line/sever_one'))
+event(p,HIT-2,sound('block.beacon.deactivate',.9,.5))
+event(p,HIT,anim(8),sound('entity.lightning_bolt.thunder',.9,.85))
+end(p,HIT+10)
 p=pattern(11,'거대 팔 연격 · 검의 궤적과 투척 낙뢰에 주의')
 event(p,1,call('line/cleave_all'))
-for t in [1,17]:
-    event(p,t,face,flat,anim(10),haz(4,11,19));event(p,t+11,anim(11),sound('entity.player.attack.sweep',1.2,.62))
-event(p,33,anim(7),target+haz(3,10,22));event(p,43,anim(8));end(p,50)
+for t in [1,6+tell(11)]:
+    event(p,t,face,flat,anim(10),haz(4,tell(11),19));event(p,t+tell(11),anim(11),sound('entity.player.attack.sweep',1.2,.62))
+t+=tell(11)+5
+event(p,t,anim(7),target+haz(3,tell(10),22));event(p,t+tell(10),anim(8));end(p,t+tell(10)+7)
 p=pattern(12,'인공팔 협격 · 따라오는 두 손이 박수치기 전에 빠져나오세요')
 # Two hands appear at the player's sides and follow them, then lock and clap shut.
 event(p,1,face,flat,anim(12),call('clap/spawn'),call('line/prison'))
@@ -638,12 +702,15 @@ p.append('execute if score @s rdTime matches 1..'+str(SHADOW_LOCK-1)+' run '+cal
 event(p,SHADOW_LOCK,call('shadow/lock'))
 event(p,SHADOW_LOCK+12,anim(15),sound('entity.generic.explode',.65,.72))
 end(p,SHADOW_LOCK+24)
-p=pattern(14,'천수의 속박 · 퍼지는 번개 고리를 점프로 회피')
+p=pattern(14,'금강괴멸파 · 퍼지는 번개 고리를 점프로 회피')
 event(p,1,anim(7),call('stakes_start'),call('line/cheonsu'));event(p,15,anim(8))
-for t,i in [(20,1),(54,2),(88,3)]:event(p,t,call('stakes_pulse_'+str(i)))
-event(p,128,call('stakes_pulse'))
-# Each ring keeps its full 32-tick travel; the final pulse ends before this finish.
-end(p,178)
+# As in the original: each stake fires once in turn, twice round, then all three at once.
+# Rings overlap in time (each travels RING_FRAMES ticks to the far wall).
+for k,i in enumerate([1,2,3,1,2,3]):
+    event(p,20+28*k,call('stakes_pulse_'+str(i)))
+LAST=20+28*6+4
+event(p,LAST,call('stakes_pulse'))
+end(p,LAST+STAKE_TELL+RING_FRAMES+4)
 p=pattern(15,'최종 재앙 · 추억의 꽃을 공격한 뒤 보호막 안으로!')
 event(p,1,call('judgment_start'),anim(16));
 p.append(f'execute if score @s rdTime matches 2..{ASCEND_END-1} at @s run tp @s ~ ~{ASCEND_STEP} ~')
@@ -655,24 +722,39 @@ event(p,ASCEND_END+21,call('judgment_hint'));event(p,30,sound('block.beacon.ambi
 # The flower retains the full six-second response window despite quicker recovery.
 # The hidden body already waits at centre-8; it reforms there facing the player.
 event(p,120,call('judgment_strike'));event(p,170,face,flat,call('movement/arrive'));end(p,176)
-p=pattern(16,'거검 발도 · 하얀 섬광이 보이면 바로 회피')
-# A horizontal iai with the giant sword; a white flash marks the moment to dodge.
-event(p,1,face,flat,anim(10),haz(4,14,30),haz(10,14,26))
-event(p,10,call('line/sever'))
-event(p,11,'execute positioned ^ ^2.4 ^1.2 run '+call('object_vfx/object_break'),sound('block.amethyst_block.resonate',1,1.9))
-event(p,15,anim(11),sound('entity.lightning_bolt.thunder',.8,.68))
-end(p,26)
+p=pattern(16,'신속한 발도 / 몽상 · 단절')
+# Two moves of the original, picked at random:
+#  0 신속한 발도: a charged horizontal iai around her; a white flash marks the dodge.
+#  1 몽상·단절: the giant sword rises while a straight line lights up on the floor, she
+#    calls "단절!" and brings it straight down along the line; a weak field rings her.
+p.append('execute if score @s rdTime matches 1 store result score #rdVar rd run random value 0..1')
+IAI='if score #rdVar rd matches 0'
+hit=1+tell(14)
+gated(p,1,IAI,face,flat,anim(10),haz(4,tell(14),30),haz(10,tell(14),26))
+gated(p,hit-4,IAI,'execute positioned ^ ^2.4 ^1.2 run '+call('object_vfx/object_break'),sound('block.amethyst_block.resonate',1,1.9))
+gated(p,hit,IAI,anim(11),sound('entity.lightning_bolt.thunder',.8,.68))
+gated(p,hit+11,IAI,call('finish'))
+CUT='if score #rdVar rd matches 1'
+hit=1+tell(16)
+gated(p,1,CUT,face,flat,anim(16),haz(5,tell(16),34),haz(8,12,5),sound('block.beacon.power_select',.7,.6))
+gated(p,hit-5,CUT,call('line/sever'))
+gated(p,hit,CUT,anim(17),sound('entity.lightning_bolt.thunder',.9,.6),sound('entity.generic.explode',.6,.8))
+gated(p,hit+12,CUT,call('finish'))
 p=pattern(17,'검파 연사 · 다섯 갈래 뒤 넓은 가로 검파')
 event(p,1,call('line/goemyeol'))
-event(p,1,face,flat,anim(7),haz(9,10,17));event(p,11,anim(8),sound('entity.breeze.shoot',.8,.72))
-event(p,16,face,flat,anim(10),haz(10,10,21));event(p,26,anim(11));end(p,33)
+t=1+tell(10)
+event(p,1,face,flat,anim(7),haz(9,tell(10),17));event(p,t,anim(8),sound('entity.breeze.shoot',.8,.72))
+event(p,t+5,face,flat,anim(10),haz(10,tell(10),21));event(p,t+5+tell(10),anim(11));end(p,t+12+tell(10))
 p=pattern(18,'발도 돌진 · 고정된 직선 경로를 피하세요')
 event(p,1,call('line/pierce'))
-event(p,1,face,flat,anim(2),haz(5,10,22));event(p,11,anim(21),sound('item.trident.riptide_3',.7,.8))
-p.append('execute if score @s rdTime matches 11..22 at @s rotated as @s positioned ^ ^ ^0.75 if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] run tp @s ~ ~ ~')
+t=1+tell(10)
+event(p,1,face,flat,anim(2),haz(5,tell(10),22));event(p,t,anim(21),sound('item.trident.riptide_3',.7,.8))
+p.append(f'execute if score @s rdTime matches {t}..{t+11} at @s rotated as @s positioned ^ ^ ^0.75 if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] run tp @s ~ ~ ~')
 # After the dash she keeps cutting: two wide sweeps in a row.
-event(p,25,face,flat,anim(10),haz(4,9,19));event(p,34,anim(11),sound('entity.player.attack.sweep',1.2,.62))
-event(p,38,face,flat,anim(10),haz(4,8,19));event(p,46,anim(11),sound('entity.player.attack.sweep',1.2,.7));end(p,53)
+t+=14
+event(p,t,face,flat,anim(10),haz(4,tell(9),19));event(p,t+tell(9),anim(11),sound('entity.player.attack.sweep',1.2,.62))
+t+=tell(9)+4
+event(p,t,face,flat,anim(10),haz(4,tell(8),19));event(p,t+tell(8),anim(11),sound('entity.player.attack.sweep',1.2,.7));end(p,t+tell(8)+7)
 for i,p in patterns.items():write('patterns/'+str(i),p)
 
 # Following clap hands (pattern 12). Display-only hands owned by the boss; the hazard is
@@ -840,10 +922,12 @@ write('eyes_start',[call('object/clear'),
 write('eyes_arm',['execute as @e[tag=rlk_rd_object,scores={rdObjKind=1}] at @s run '+haz(12,18,34)])
 write('stakes_start',[call('object/clear')]+[
     center+f'execute positioned ~{x} ~ ~{z} run '+obj(4,'lightning_stake',1,i,0)
-    for i,(x,z) in enumerate([(0,-1.6),(1.4,.8),(-1.4,.8)],1)])
-write('stakes_pulse',['execute as @e[tag=rlk_rd_object,scores={rdObjKind=4}] at @s run '+haz(11,12,14,49),sound('block.beacon.power_select',.55,.7)])
+    for i,(x,z) in enumerate(STAKES,1)])
+RING=haz(11,STAKE_TELL,14,STAKE_TELL+RING_FRAMES+5)
+write('stakes_pulse',['execute as @e[tag=rlk_rd_object,scores={rdObjKind=4}] at @s run '+RING,sound('block.beacon.power_select',.55,.7)])
 for i in [1,2,3]:
-    write('stakes_pulse_'+str(i),[f'execute as @e[tag=rlk_rd_object,scores={{rdObjKind=4,rdObjId={i}}}] at @s run '+haz(11,12,14,49),sound('block.beacon.power_select',.55,.7)])
+    write('stakes_pulse_'+str(i),[f'execute as @e[tag=rlk_rd_object,scores={{rdObjKind=4,rdObjId={i}}}] at @s run '+RING,
+        f'execute as @e[tag=rlk_rd_object,scores={{rdObjKind=4,rdObjId={i}}}] at @s run playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.9 0.7 0.3'])
 write('judgment_start',[call('object/clear'),'scoreboard players set @s rdUltUsed 1','scoreboard players set @s rdWalk 0',
     center+call('judgment_rig/start'),
     center+call('vfx/judgment_warning'),

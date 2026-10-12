@@ -4,5 +4,4 @@ execute as @a[tag=player] run function rlk:view/ttl_blank
 scoreboard players set @a[tag=player] ttlT 7
 scoreboard players set #rdCap rd 1
 scoreboard players set #rdCapPat rd 1
-execute as @a[tag=player] at @s run playsound minecraft:block.respawn_anchor.charge hostile @s ~ ~ ~ .45 0.78 0
-execute as @a[tag=player] at @s run playsound minecraft:block.amethyst_block.hit hostile @s ~ ~ ~ .8 0.67 0
+execute as @a[tag=player] at @s run playsound minecraft:block.note_block.hat voice @s ~ ~ ~ .3 1 0

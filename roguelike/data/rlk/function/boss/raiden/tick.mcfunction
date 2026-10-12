@@ -13,6 +13,8 @@ execute if score @s rdPhase matches 2 run function rlk:boss/raiden/armor_tick
 execute if score @s rdPhase matches 3 run function rlk:boss/raiden/exhausted_tick
 execute if score @s rdPhase matches 0 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
 execute if score @s rdPhase matches 2 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
+# Close-range patterns first close the distance (rdGo); their clock waits at 0 meanwhile.
+execute if score @s rdGo matches 1.. if score @s rdPat matches 1..18 run function rlk:boss/raiden/close_in
 # Timelines start on the tick after choose: rdTime 1 is every pattern's first frame.
 execute if score @s rdPat matches 1..7 if score @s rdTime matches 1.. run function rlk:boss/raiden/normal_dispatch
 execute if score @s rdPat matches 11..18 if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch

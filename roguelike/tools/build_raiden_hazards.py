@@ -6,6 +6,7 @@ The only damage API is boss/raiden/hurt. Display meshes never change terrain.
 """
 from pathlib import Path
 import math
+from build_raiden_fx_textures import RING_END, RING_FRAMES
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "data/rlk/function/boss/raiden/hazard"
@@ -63,9 +64,10 @@ descriptions = {
     7: "Hand clap length8, width8", 8: "Omni disk radius6",
     9: "Five bolts length18, width0.9, yaw -40/-20/0/20/40",
     10: "Horizontal wave length18, width7",
-    11: "Jumpable expanding annulus radius2 to18 over32ticks, half-width0.7",
+    11: f"Jumpable expanding annulus radius2 to{RING_END} over{RING_FRAMES}ticks, half-width0.7",
     12: "Orb disk radius12",
     13: "Illusion sword wave length22, width2.4",
+    14: "Calamity disk radius19 (몽상의 일심)",
 }
 outlines = {
     1: sector(6, 60), 2: rectangle(12, 2.2), 3: disk(3),
@@ -73,7 +75,7 @@ outlines = {
     7: rectangle(8, 8), 8: disk(6),
     9: sum((rotate(rectangle(18, .9), a) for a in (-40, -20, 0, 20, 40)), []),
     10: rectangle(18, 7), 11: disk(1.3) + disk(2.7), 12: disk(12),
-    13: rectangle(22, 2.4),
+    13: rectangle(22, 2.4), 14: disk(19),
 }
 
 for shape, outline in outlines.items():
@@ -84,8 +86,8 @@ for shape, outline in outlines.items():
     if shape in (1, 4):
         radius, angle = (6, 60) if shape == 1 else (12, 70)
         fill += arc(radius*.4, -angle, angle, 1) + arc(radius*.7, -angle, angle, 1)
-    elif shape in (3, 6, 8, 12):
-        radius = {3: 3, 6: 5, 8: 6, 12: 12}[shape]
+    elif shape in (3, 6, 8, 12, 14):
+        radius = {3: 3, 6: 5, 8: 6, 12: 12, 14: 19}[shape]
         fill += disk(radius*.5)
     elif shape == 9:
         fill += sum((rotate(line(0, 0, 0, 18, 1), a) for a in (-40, -20, 0, 20, 40)), [])
@@ -94,8 +96,8 @@ for shape, outline in outlines.items():
         fill += line(0, 0, 0, length, .6)
     write(f"strike/s{shape}", ["# " + descriptions[shape]] + particles(fill, True, .16))
 
-for i in range(32):
-    radius = 2 + 16*i/31
+for i in range(RING_FRAMES):
+    radius = 2 + (RING_END-2)*i/(RING_FRAMES-1)
     # Exact same radii are used for runtime damage. Two clear rims enclose the
     # dangerous band; its center is deliberately not an invisible hit area.
     write(f"ring/f{i:02}", [f"# Active wave radius {radius:.4f}, band +/-0.7."] +
@@ -162,20 +164,20 @@ write("strike", [f'execute if score @s rdShape matches {s} run function rlk:boss
 write("ring_tick", [
     'scoreboard players operation #rdElapsed rd = @s rdHAge',
     'scoreboard players operation #rdElapsed rd -= @s rdWind',
-    'execute unless score #rdElapsed rd matches 0..31 run return 0',
+    f'execute unless score #rdElapsed rd matches 0..{RING_FRAMES-1} run return 0',
     'scoreboard players operation #rdMod rd = #rdElapsed rd',
     'scoreboard players set #rdTwo rd 2',
     'scoreboard players operation #rdMod rd %= #rdTwo rd',
     'execute if score #rdMod rd matches 0 run function rlk:boss/raiden/hazard/ring_draw',
-    'execute if score #rdElapsed rd matches 31 run function rlk:boss/raiden/hazard/ring_draw',
+    f'execute if score #rdElapsed rd matches {RING_FRAMES-1} run function rlk:boss/raiden/hazard/ring_draw',
     'execute unless score @s rdHHit matches 1 run function rlk:boss/raiden/hazard/hit',
 ])
-write("ring_draw", [f'execute if score #rdElapsed rd matches {i} run function rlk:boss/raiden/hazard/ring/f{i:02}' for i in range(32)])
+write("ring_draw", [f'execute if score #rdElapsed rd matches {i} run function rlk:boss/raiden/hazard/ring/f{i:02}' for i in range(RING_FRAMES)])
 
 write("hit", [
     '# Use body feet, not the displaced third-person spectator camera.',
     'scoreboard players set #rdHit rd 0',
-    'execute unless entity @e[tag=rlk_body,distance=..28,limit=1] run return 0',
+    f'execute unless entity @e[tag=rlk_body,distance=..{RING_END+2},limit=1] run return 0',
     'execute store result score #rdDY rd run data get entity @e[tag=rlk_body,limit=1] Pos[1] 1000',
     'execute store result score #rdOY rd run data get entity @s Pos[1] 1000',
     'scoreboard players operation #rdDY rd -= #rdOY rd',
@@ -188,7 +190,7 @@ write("hit", [
     'scoreboard players operation #rdDX rd -= #rdOX rd',
     'scoreboard players operation #rdDZ rd -= #rdOZ rd',
     'scoreboard players set #rdScale rd 1000',
-    '# Distance squared stays below 784 million after the 28-block broad phase.',
+    f'# Distance squared stays below {(RING_END+2)**2} million after the {RING_END+2}-block broad phase.',
     'scoreboard players operation #rdR2 rd = #rdDX rd',
     'scoreboard players operation #rdR2 rd *= #rdDX rd',
     'scoreboard players operation #rdT rd = #rdDZ rd',
@@ -237,7 +239,7 @@ for s, length, halfwidth in ((2, 12, 1100), (5, 20, 1800), (7, 8, 4000), (10, 18
         '# ' + descriptions[s],
         f'execute if score #rdFwd rd matches 0..{length*1000} if score #rdAbsSide rd matches ..{halfwidth} run scoreboard players set #rdHit rd 1',
     ])
-for s, radius in ((3, 3), (6, 5), (8, 6), (12, 12)):
+for s, radius in ((3, 3), (6, 5), (8, 6), (12, 12), (14, 19)):
     write(f"hit/s{s}", ['# ' + descriptions[s], f'execute if score #rdR2 rd matches ..{radius*radius*1000000} run scoreboard players set #rdHit rd 1'])
 
 fan = ['# ' + descriptions[9]]
@@ -267,11 +269,11 @@ write('hit/s11', [
     'execute if score @s rdHHit matches 1 run return 0',
     'scoreboard players operation #rdElapsed rd = @s rdHAge',
     'scoreboard players operation #rdElapsed rd -= @s rdWind',
-    'execute unless score #rdElapsed rd matches 0..31 run return 0',
+    f'execute unless score #rdElapsed rd matches 0..{RING_FRAMES-1} run return 0',
     'scoreboard players operation #rdRadius rd = #rdElapsed rd',
-    'scoreboard players set #rdSpan rd 16000',
+    f'scoreboard players set #rdSpan rd {(RING_END-2)*1000}',
     'scoreboard players operation #rdRadius rd *= #rdSpan rd',
-    'scoreboard players set #rdSteps rd 31',
+    f'scoreboard players set #rdSteps rd {RING_FRAMES-1}',
     'scoreboard players operation #rdRadius rd /= #rdSteps rd',
     'scoreboard players add #rdRadius rd 2000',
     'scoreboard players operation #rdInner rd = #rdRadius rd',
@@ -285,4 +287,4 @@ write('hit/s11', [
 
 from build_raiden_hazard_vfx import build as build_display_vfx
 build_display_vfx(ROOT, OUT)
-print("Generated 13 hazard shapes, exact floor-aligned hit areas, 32 expanding-wave frames.")
+print(f"Generated {len(descriptions)} hazard shapes, exact floor-aligned hit areas, {RING_FRAMES} expanding-wave frames.")

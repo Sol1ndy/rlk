@@ -7,6 +7,7 @@ import {fileURLToPath} from 'node:url';
 import {buildLocomotion} from './build_player_locomotion.mjs';
 import {buildScytheGeometry} from './scythe_geometry.mjs';
 import {buildSkirkWeaponGeometry} from './skirk_weapon_geometry.mjs';
+import {paintWeaponTextures,spriteId} from './weapon_paint.mjs';
 const here=path.dirname(fileURLToPath(import.meta.url));
 const arg=n=>{const i=process.argv.indexOf(n);return i<0?undefined:process.argv[i+1];};
 const dpRoot=path.resolve(arg('--datapack')||path.join(here,'..'));
@@ -95,10 +96,15 @@ function bodyModels(char,skin){
 const blocks=['black_concrete','red_concrete','orange_concrete','white_concrete','light_blue_concrete','purple_concrete','cyan_concrete','gray_concrete','blue_concrete','light_gray_concrete'];
 const solid=(from,to,tex,rotation)=>({from,to,faces:Object.fromEntries(['north','south','east','west','up','down'].map(k=>[k,{texture:'#'+tex,uv:[0,0,16,16]}])),...(rotation?{rotation}:{} )});
 function weaponModels(){
- const textures=Object.fromEntries(blocks.map(b=>[b.replace('_concrete',''),'rlk:player_motion/'+b]));textures.particle=textures.black;
- const {spear,scythe}=buildScytheGeometry(solid);
- const {sword,cryo_sword:cryo}=buildSkirkWeaponGeometry(solid);
+ // Painted signature-weapon sprites (weapon_paint.mjs): Arlecchino's 붉은 달의 형상 scythe and
+ // Skirk's 창백한 섬광 sword. Each model lists only the sprites it uses.
+ paintWeaponTextures(rpRoot);
+ const {spear,scythe}=buildScytheGeometry();
+ const {sword,cryo_sword:cryo}=buildSkirkWeaponGeometry();
  for(const[name,elements]of Object.entries({spear,scythe,sword,cryo_sword:cryo})){
+  for(const el of elements)for(const v of[...el.from,...el.to])if(v<-16||v>32)throw new Error(name+': element outside -16..32');
+  const used=[...new Set(elements.flatMap(el=>Object.values(el.faces).map(f=>f.texture.slice(1))))];
+  const textures=Object.fromEntries(used.map(n=>[n,spriteId(n)]));textures.particle=textures[used[0]];
   json(path.join(assets,'models/item/player_motion/weapons',name+'.json'),{ambientocclusion:false,textures,elements});
   json(path.join(assets,'items/player_motion/weapons',name+'.json'),{model:{type:'minecraft:model',model:'rlk:item/player_motion/weapons/'+name}});
  }

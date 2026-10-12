@@ -36,14 +36,15 @@ import json
 import math
 import sys
 
-from build_raiden_fx_textures import (HAZARD_SHAPES, DECALS, DECAL_SYM, RING_R, RING_HALF, ring_extent, shape_outline,
+from build_raiden_fx_textures import (HAZARD_SHAPES, DECALS, DECAL_SYM, RING_R, RING_HALF, RING_END, RING_FRAMES, ring_extent, shape_outline,
                                       build_fx_textures, catalogue, TEX_SUBDIR, NS)
 
 SCALE = 32
-# Shape 13 (illusion sword wave) is appended; shapes 1-12 keep their hit volumes.
-SHAPES = range(1, 14)
+# Shapes 13 (illusion sword wave) and 14 (몽상의 일심 disk) are appended; shapes 1-12 keep
+# their hit volumes.
+SHAPES = range(1, 15)
 LINES = {2: (12, 2.2), 5: (20, 3.6), 7: (8, 8), 10: (18, 7), 13: (22, 2.4)}
-DISKS = {3: 3, 6: 5, 8: 6, 12: 12}
+DISKS = {3: 3, 6: 5, 8: 6, 12: 12, 14: 19}
 SECTORS = {1: (6, 60), 4: (12, 70)}
 for _s, (_L, _W) in LINES.items():
     assert HAZARD_SHAPES[_s] == dict(kind="rect", length=_L, width=_W), _s
@@ -393,11 +394,11 @@ def area(m, st, shape):
     if shape in DISKS:
         r = DISKS[shape]
         radial(m, 0, 0, r / 0.46, "shockwave", Y_DECAL, tint is not None, st.v == 1)
-        radial(m, 0, 0, {3: 6.0, 6: 5.0, 8: 5.5, 12: 8.0}[shape], "flash", Y_DECAL + 0.045, flip=st.v == 2)
+        radial(m, 0, 0, {3: 6.0, 6: 5.0, 8: 5.5, 12: 8.0, 14: 11.0}[shape], "flash", Y_DECAL + 0.045, flip=st.v == 2)
         m.tint = tint
     else:
         decal(m, shape, "charged", Y_DECAL, tint)
-    if st.v == 0 and shape not in (9, 12):
+    if st.v == 0 and shape not in (9, 12, 14):
         edge_crackle(m, shape, 1)
 
 
@@ -428,11 +429,11 @@ def strike(shape, st):
     elif shape in DISKS:
         r = DISKS[shape]
         dirs = (0, 90, 180, 270) if shape == 3 else (0, 45, 90, 135, 180, 225, 270, 315)
-        width = {3: 1.0, 6: 1.4, 8: 1.5, 12: 2.4}[shape]
+        width = {3: 1.0, 6: 1.4, 8: 1.5, 12: 2.4, 14: 3.0}[shape]
         for i, a in enumerate(dirs):
             floor_bolt(m, st, polar(min(0.6, r * 0.08), a), polar(r - 0.25, a), width, i, i % 2 == 1)
         if shape != 6:
-            height, w = {3: (9.5, 2.8), 8: (7.0, 2.6), 12: (10.0, 3.4)}[shape]
+            height, w = {3: (9.5, 2.8), 8: (7.0, 2.6), 12: (10.0, 3.4), 14: (12.0, 4.0)}[shape]
             column(m, st, 0, 0, 0.0, height, w, 4)
         if shape == 6:
             for a in (45, 135, 225, 315):
@@ -442,6 +443,10 @@ def strike(shape, st):
             for k in range(6):
                 x, z = polar(7.2, 30 + 60 * k)
                 column(m, st, x, z, 0.0, 4.6, 1.8, 2)
+        if shape == 14:
+            for k in range(8):
+                x, z = polar(11.5, 22.5 + 45 * k)
+                column(m, st, x, z, 0.0, 6.0, 2.2, 2)
         if st.kind == "after":
             radial(m, 0, 0, r * 0.9, "scorch", Y_CRACKLE)
     elif shape == 9:
@@ -497,9 +502,9 @@ def strike(shape, st):
 
 
 def ring(frame):
-    """Ring band of radius r +- 0.7 (exact damage band) at frame 0..31."""
+    """Ring band of radius r +- 0.7 (exact damage band) at frame 0..RING_FRAMES-1."""
     m = Model()
-    r = 2 + 16 * frame / 31
+    r = 2 + (RING_END - 2) * frame / (RING_FRAMES - 1)
     k = min(range(len(RING_R)), key=lambda i: abs(math.log(r / RING_R[i])))
     E = ring_extent(k) * r / RING_R[k]
     for sx in (1, -1):
@@ -569,7 +574,7 @@ def build(root, out):
             save(f"strike_{shape}_2", strike(shape, Style("hot", 2)))
             save(f"after_{shape}", strike(shape, Style("after")))
             save(f"after_{shape}_fade", strike(shape, Style("fade")))
-    for frame in range(32):
+    for frame in range(RING_FRAMES):
         save(f"ring_{frame:02}", ring(frame))
 
     owned='@e[type=minecraft:item_display,tag=rlk_rd_hvfx]'
@@ -627,17 +632,17 @@ def build(root, out):
     for shape in SHAPES:
         if shape!=11:
             write(f"strike/s{shape}",['# Strike mesh is selected by vfx_strike on the owning display.'])
-    for frame in range(32):
+    for frame in range(RING_FRAMES):
         write(f"ring/f{frame:02}",[
-            f'# Exact ring radius {2+16*frame/31:.6f}; visible band half-width0.7.',
+            f'# Exact ring radius {2+(RING_END-2)*frame/(RING_FRAMES-1):.6f}; visible band half-width0.7.',
             'scoreboard players operation #rdVfxOwner rd = @s rdHId',
             f'execute as {owned} if score @s rdVId = #rdVfxOwner rd run {modelset("ring_"+f"{frame:02}")}',
         ])
     write("ring_tick",[
         'scoreboard players operation #rdElapsed rd = @s rdHAge',
         'scoreboard players operation #rdElapsed rd -= @s rdWind',
-        'execute if score #rdElapsed rd matches 32.. run return run function rlk:boss/raiden/hazard/expire',
-        'execute unless score #rdElapsed rd matches 0..31 run return 0',
+        f'execute if score #rdElapsed rd matches {RING_FRAMES}.. run return run function rlk:boss/raiden/hazard/expire',
+        f'execute unless score #rdElapsed rd matches 0..{RING_FRAMES-1} run return 0',
         '# Every damage radius receives its matching model in the same tick.',
         'function rlk:boss/raiden/hazard/ring_draw',
         'execute if score #rdElapsed rd matches 0 run playsound minecraft:entity.lightning_bolt.impact hostile @a[tag=player] ~ ~ ~ 0.35 1.6 0.2',
@@ -648,7 +653,7 @@ def build(root, out):
         f'execute as {owned} run function rlk:boss/raiden/hazard/vfx_tick',
     ])
     write("expire",[
-        '# Cancel the display and its parent together; the ring ends at frame32.',
+        f'# Cancel the display and its parent together; the ring ends at frame{RING_FRAMES}.',
         'scoreboard players operation #rdVfxOwner rd = @s rdHId',
         f'execute as {owned} if score @s rdVId = #rdVfxOwner rd run kill @s',
         'kill @s',
@@ -683,4 +688,4 @@ def build(root, out):
                               'execute if score #rdUntil rd matches 1..4 run function rlk:boss/raiden/hazard/charge\n'
                               'scoreboard players operation #rdMod rd = @s rdHAge')
     tickpath.write_text(original,encoding="utf-8")
-    print(f"Built {stats['models']} textured display meshes (largest {stats['maxname']}: {stats['max']} cards): 13 gradient telegraph decals, 26 charge frames, 36 strike frames, 24 afterglows, 32 exact ring frames.")
+    print(f"Built {stats['models']} textured display meshes (largest {stats['maxname']}: {stats['max']} cards): 13 gradient telegraph decals, 26 charge frames, 36 strike frames, 24 afterglows, {RING_FRAMES} exact ring frames.")

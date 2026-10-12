@@ -11,3 +11,4 @@ execute if score @s rdShape matches 9 run data modify entity @s item.components.
 execute if score @s rdShape matches 10 run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_hazard/strike_10_2"
 execute if score @s rdShape matches 12 run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_hazard/strike_12_2"
 execute if score @s rdShape matches 13 run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_hazard/strike_13_2"
+execute if score @s rdShape matches 14 run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_hazard/strike_14_2"

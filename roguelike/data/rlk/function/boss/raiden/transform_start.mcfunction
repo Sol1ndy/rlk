@@ -1,4 +1,6 @@
 function rlk:boss/raiden/camera/release_all
+scoreboard players set @s rdGo 0
+scoreboard players set @s rdNext 0
 function rlk:boss/raiden/judgment_rig/cleanup
 function rlk:boss/raiden/illusion/cleanup
 scoreboard players set @s rdWalk 0

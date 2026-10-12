@@ -5,6 +5,7 @@ function rlk:boss/raiden/caption/pattern_end
 function rlk:boss/raiden/judgment_rig/cleanup
 scoreboard players set @s rdBlink 0
 scoreboard players set @s rdWalk 0
+scoreboard players set @s rdGo 0
 kill @e[tag=rlk_rd_blink_dest]
 scoreboard players operation #rdWalkTurn rd = @s rdTurns
 scoreboard players set #rd2 rd 2

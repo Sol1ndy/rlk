@@ -150,6 +150,7 @@ HAZARD_SHAPES = {
     11: dict(kind="annulus", r0=1.3, r1=2.7),
     12: dict(kind="disk", r=12),
     13: dict(kind="rect", length=22, width=2.4),
+    14: dict(kind="disk", r=19),
 }
 # Hazard decals are painted only once per symmetry piece and mirrored by the cards, which
 # doubles the texel density for the same memory (all >= 32 texels/block):
@@ -158,8 +159,8 @@ HAZARD_SHAPES = {
 #   ray   the five fan rays: one card per ray turned by the nearest allowed 22.5-deg step,
 #         the remaining 0 / 2.5 / 5 deg slant is painted into the texture (mirror u for -).
 DECAL_SYM = {1: "half", 2: "half", 3: "quad", 4: "half", 5: "half", 6: "quad", 7: "half", 8: "quad",
-             9: "ray", 10: "half", 11: "quad", 12: "quad", 13: "half"}
-DECAL_TPB = {1: 36, 2: 36, 3: 40, 4: 32, 5: 34, 6: 38, 7: 36, 8: 36, 9: 32, 10: 32, 11: 40, 12: 32, 13: 32}
+             9: "ray", 10: "half", 11: "quad", 12: "quad", 13: "half", 14: "quad"}
+DECAL_TPB = {1: 36, 2: 36, 3: 40, 4: 32, 5: 34, 6: 38, 7: 36, 8: 36, 9: 32, 10: 32, 11: 40, 12: 32, 13: 32, 14: 20}
 FAN_SLANTS = (0.0, 2.5, 5.0)
 MARGIN = 0.9
 
@@ -198,9 +199,12 @@ for _s in HAZARD_SHAPES:
             DECALS[f"{_kind}_{_s}{_suffix}"] = dict(shape=_s, sym=DECAL_SYM[_s], w=_w, h=_h, x0=_x0, x1=_x1, z0=_z0, z1=_z1,
                                                      geom=_geom)
 
-# Expanding ring (hazard shape 11): band radius r +- 0.7, r = 2 .. 18. Quarter textures
-# are painted for these centre radii; a frame uses the nearest one scaled by r/RING_R[k].
-RING_R = [2.3, 2.9, 3.6, 4.5, 5.6, 7.0, 8.8, 11.0, 13.8, 17.2]
+# Expanding ring (hazard shape 11): band radius r +- 0.7, r = 2 .. RING_END over RING_FRAMES
+# ticks (about 0.53 blocks/tick), far enough to cross the whole arena from an outer stake.
+# Quarter textures are painted for these centre radii; a frame uses the nearest one scaled
+# by r/RING_R[k].
+RING_END, RING_FRAMES = 32, 58
+RING_R = [2.3, 2.9, 3.6, 4.5, 5.6, 7.0, 8.8, 11.0, 13.8, 17.2, 21.5, 26.8, 31.0]
 RING_HALF = 0.7
 RING_PAD = 0.9
 
@@ -211,7 +215,8 @@ def ring_extent(k):
 
 
 def ring_px(k):
-    return max(64, int(math.ceil(ring_extent(k) * 24 / 16.0)) * 16)
+    # 24 texels/block, capped so the outermost (mostly transparent) quarters stay small.
+    return min(576, max(64, int(math.ceil(ring_extent(k) * 24 / 16.0)) * 16))
 
 # --------------------------------------------------------------------------- palettes
 EMAX = 2.5

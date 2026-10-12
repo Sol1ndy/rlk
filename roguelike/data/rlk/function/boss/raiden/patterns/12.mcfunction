@@ -6,10 +6,10 @@ execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/r
 execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/line/prison
 execute if score @s rdTime matches 1..16 run function rlk:boss/raiden/clap/follow
 execute if score @s rdTime matches 17 at @s rotated as @s run function rlk:boss/raiden/clap/lock
-execute if score @s rdTime matches 24 at @s rotated as @s run function rlk:boss/raiden/clap/shut
-execute if score @s rdTime matches 24 at @s rotated as @s run scoreboard players set @s rdAnim 13
-execute if score @s rdTime matches 27 at @s rotated as @s run playsound minecraft:entity.iron_golem.attack hostile @a[tag=player] ~ ~ ~ 1 0.65 0.3
-execute if score @s rdTime matches 27 at @s rotated as @s run playsound minecraft:entity.zombie.attack_iron_door hostile @a[tag=player] ~ ~ ~ 0.7 0.6 0.3
-execute if score @s rdTime matches 30 at @s rotated as @s run function rlk:boss/raiden/clap/fade
-execute if score @s rdTime matches 36 at @s rotated as @s run function rlk:boss/raiden/clap/clear
-execute if score @s rdTime matches 37 at @s rotated as @s run function rlk:boss/raiden/finish
+execute if score @s rdTime matches 28 at @s rotated as @s run function rlk:boss/raiden/clap/shut
+execute if score @s rdTime matches 28 at @s rotated as @s run scoreboard players set @s rdAnim 13
+execute if score @s rdTime matches 31 at @s rotated as @s run playsound minecraft:entity.iron_golem.attack hostile @a[tag=player] ~ ~ ~ 1 0.65 0.3
+execute if score @s rdTime matches 31 at @s rotated as @s run playsound minecraft:entity.zombie.attack_iron_door hostile @a[tag=player] ~ ~ ~ 0.7 0.6 0.3
+execute if score @s rdTime matches 34 at @s rotated as @s run function rlk:boss/raiden/clap/fade
+execute if score @s rdTime matches 40 at @s rotated as @s run function rlk:boss/raiden/clap/clear
+execute if score @s rdTime matches 41 at @s rotated as @s run function rlk:boss/raiden/finish

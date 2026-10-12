@@ -34,6 +34,8 @@ scoreboard objectives add rdCam dummy
 scoreboard objectives add rdDeath dummy
 scoreboard objectives add rdDeathTime dummy
 scoreboard objectives add rdHidden dummy
+scoreboard objectives add rdGo dummy
+scoreboard objectives add rdNext dummy
 bossbar add rlk:narukami {text:"마가츠 미타케 나루카미노 미코토",color:"light_purple"}
 bossbar add rlk:narukami_state {text:"악연의 에너지",color:"light_purple"}
 bossbar set rlk:narukami color purple

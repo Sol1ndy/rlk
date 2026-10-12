@@ -7,6 +7,7 @@ function rlk:boss/raiden/illusion/cleanup
 function rlk:boss/raiden/movement/cleanup
 scoreboard players set @e[tag=rlk_raiden] rdBlink 0
 scoreboard players set @e[tag=rlk_raiden] rdWalk 0
+scoreboard players set @e[tag=rlk_raiden] rdGo 0
 kill @e[tag=rlk_rd_hazard]
 function rlk:boss/raiden/object/clear
 kill @e[tag=rlk_rd_dome]
