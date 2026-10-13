@@ -7,4 +7,3 @@ scoreboard players set @s rdTurns 0
 scoreboard players set @s rdHitCD 0
 function rlk:boss/raiden/finish
 scoreboard players set @s rdCool 14
-bossbar set rlk:narukami_state color blue

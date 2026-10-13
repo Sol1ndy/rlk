@@ -90,7 +90,9 @@ scoreboard players set #vd34 mm 0
 scoreboard players set #hd35 mm 0
 scoreboard players set #vd35 mm 0
 execute as @e[tag=rlk_door] run function rlk:minimap/door_slot
-data modify storage rlk:mm line set value [{text:"",font:"rlk:minimap"}]
+data modify storage rlk:mm line set value []
+scoreboard players set #neg mm -1
+function rlk:minimap/offset
 scoreboard players set #c mm 0
 execute if score #g0 mm matches 1 run scoreboard players operation #c mm = #zc1 mm
 execute if score #g0 mm matches 2 run scoreboard players operation #c mm = #zc2 mm

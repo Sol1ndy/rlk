@@ -549,3 +549,9 @@ data remove storage rlk:player_motion loco
 # 화면 미니맵
 bossbar remove rlk:minimap
 scoreboard objectives remove mm
+
+# 리소스팩 보스바
+scoreboard objectives remove bu
+scoreboard objectives remove buTrail
+scoreboard objectives remove buLast
+scoreboard objectives remove buT

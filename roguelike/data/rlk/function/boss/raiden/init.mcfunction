@@ -38,8 +38,12 @@ scoreboard objectives add rdGo dummy
 scoreboard objectives add rdNext dummy
 bossbar add rlk:narukami {text:"마가츠 미타케 나루카미노 미코토",color:"light_purple"}
 bossbar add rlk:narukami_state {text:"악연의 에너지",color:"light_purple"}
-bossbar set rlk:narukami color purple
-bossbar set rlk:narukami_state color yellow
+# Resource-pack boss bar (tools/build_bossbar.py): white bars are transparent, the
+# names carry the level/name line and the drawn HP bar with its under bar.
+bossbar set rlk:narukami color white
+bossbar set rlk:narukami_state color white
+bossbar set rlk:narukami style progress
+bossbar set rlk:narukami_state style progress
 function rlk:boss/raiden/bars_hide
 scoreboard players set #rd100 rd 100
 scoreboard players set #rd4 rd 4

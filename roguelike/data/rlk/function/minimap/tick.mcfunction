@@ -9,6 +9,7 @@ execute if entity @a[tag=player,scores={pkMode=1..}] run scoreboard players set 
 execute if entity @a[tag=player,scores={vMap=1..}] run scoreboard players set #mmShow mm 0
 execute if entity @e[tag=rlk_raiden,scores={rdDeath=0},limit=1] run scoreboard players set #mmShow mm 0
 execute if score #mmShow mm matches 0 run return run bossbar set rlk:minimap visible false
+execute unless score #mmBuilt mm matches 1 run function rlk:minimap/build
 bossbar set rlk:minimap players @a[tag=player]
 bossbar set rlk:minimap visible true
 function rlk:minimap/signature

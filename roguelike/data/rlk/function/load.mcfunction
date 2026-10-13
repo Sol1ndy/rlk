@@ -1317,6 +1317,8 @@ kill @e[tag=rlk_melee_origin]
 
 function rlk:char/motion/install
 
+# 리소스팩 보스바(tools/build_bossbar.py)
+function rlk:bossui/init
 # Narukami encounter and rig, rebuilt without refilling an existing boss.
 function rlk:boss/raiden/init
 # 화면 위 미니맵(tools/build_minimap.py)

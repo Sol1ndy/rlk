@@ -73,7 +73,10 @@ objectives = ['rd','rdPhase','rdPat','rdTime','rdAnim','rdRage','rdShield','rdCy
 write('init',[f'scoreboard objectives add {v} dummy' for v in objectives]+[
     'bossbar add rlk:narukami {text:"마가츠 미타케 나루카미노 미코토",color:"light_purple"}',
     'bossbar add rlk:narukami_state {text:"악연의 에너지",color:"light_purple"}',
-    'bossbar set rlk:narukami color purple','bossbar set rlk:narukami_state color yellow',
+    '# Resource-pack boss bar (tools/build_bossbar.py): white bars are transparent, the',
+    '# names carry the level/name line and the drawn HP bar with its under bar.',
+    'bossbar set rlk:narukami color white','bossbar set rlk:narukami_state color white',
+    'bossbar set rlk:narukami style progress','bossbar set rlk:narukami_state style progress',
     call('bars_hide'),
     'scoreboard players set #rd100 rd 100','scoreboard players set #rd4 rd 4',
     call('camera/release_all'), call('rig/init'), call('vfx/init'), call('object_vfx/init'), call('movement/init'), 'kill @e[tag=rlk_raiden_aux]',
@@ -492,7 +495,6 @@ scoreboard players set @s rdTurns 0
 scoreboard players set @s rdHitCD 0
 function rlk:boss/raiden/finish
 scoreboard players set @s rdCool 14
-bossbar set rlk:narukami_state color blue
 ''')
 write('armor_tick','''
 scoreboard players add @s rdPTime 1
@@ -525,7 +527,6 @@ scoreboard players set @s rdTime 0
 scoreboard players set @s rdAnim 23
 scoreboard players set @s rdShield 0
 scoreboard players operation @a[tag=player,limit=1] energy = #burstCost100 tmp
-bossbar set rlk:narukami_state color green
 title @a[tag=player] times 5 45 15
 title @a[tag=player] subtitle {text:"갑주 파괴 · 지금 공격하세요!",color:"green",bold:true}
 execute as @a[tag=player] run function rlk:view/ttl_blank
@@ -539,7 +540,6 @@ write('normal_return','''
 attribute @s minecraft:scale base set 1.2
 scoreboard players set @s rdPhase 0
 scoreboard players set @s rdRage 0
-bossbar set rlk:narukami_state color yellow
 function rlk:boss/raiden/finish
 scoreboard players set @s rdCool 20
 ''')
@@ -551,19 +551,28 @@ bossbar set rlk:narukami visible true
 bossbar set rlk:narukami_state players @a[tag=player]
 bossbar set rlk:narukami_state visible true
 scoreboard players set #rdBar rd 1
-execute store result bossbar rlk:narukami max run scoreboard players get @s mhpM
-execute store result bossbar rlk:narukami value run scoreboard players get @s mhpC
-execute if score @s rdPhase matches 0 run bossbar set rlk:narukami_state max {RAGE_MAX}
-execute if score @s rdPhase matches 0 store result bossbar rlk:narukami_state value run scoreboard players get @s rdRage
-execute if score @s rdPhase matches 0..1 run bossbar set rlk:narukami_state name {{text:"악연의 에너지",color:"light_purple"}}
-execute if score @s rdPhase matches 1 run bossbar set rlk:narukami_state max {TRANSFORM_LEN}
-execute if score @s rdPhase matches 1 store result bossbar rlk:narukami_state value run scoreboard players get @s rdTime
-execute if score @s rdPhase matches 2 run bossbar set rlk:narukami_state max {SHIELD_MAX}
-execute if score @s rdPhase matches 2 store result bossbar rlk:narukami_state value run scoreboard players get @s rdShield
-execute if score @s rdPhase matches 2 run bossbar set rlk:narukami_state name {{text:"번개 갑주",color:"aqua"}}
-execute if score @s rdPhase matches 3 run bossbar set rlk:narukami_state name {{text:"갑주 파괴",color:"green"}}
-execute if score @s rdPhase matches 3 run bossbar set rlk:narukami_state max {EXHAUST}
-execute if score @s rdPhase matches 3 store result bossbar rlk:narukami_state value run scoreboard players get @s rdTime
+# Line 1: level and name (and the armour state). Line 2: the drawn HP bar, numbers on it,
+# the white recent-damage trail, and under it the malice gauge / armour / recovery.
+execute unless score @s rdPhase matches 2..3 run bossbar set rlk:narukami name [{{text:"Lv.",color:"#FFD86B",bold:true}},{{score:{{name:"@s",objective:"mlv"}},color:"#FFD86B",bold:true}},{{text:"  마가츠 미타케 나루카미노 미코토",color:"#E6C8FF"}}]
+execute if score @s rdPhase matches 2 run bossbar set rlk:narukami name [{{text:"Lv.",color:"#FFD86B",bold:true}},{{score:{{name:"@s",objective:"mlv"}},color:"#FFD86B",bold:true}},{{text:"  마가츠 미타케 나루카미노 미코토",color:"#E6C8FF"}},{{text:"  · 번개 갑주",color:"#C58BFF"}}]
+execute if score @s rdPhase matches 3 run bossbar set rlk:narukami name [{{text:"Lv.",color:"#FFD86B",bold:true}},{{score:{{name:"@s",objective:"mlv"}},color:"#FFD86B",bold:true}},{{text:"  마가츠 미타케 나루카미노 미코토",color:"#E6C8FF"}},{{text:"  · 갑주 파괴",color:"#7BD88F"}}]
+scoreboard players operation #buHp bu = @s mhpC
+scoreboard players operation #buMax bu = @s mhpM
+scoreboard players set #buSubCol bu 0
+execute if score @s rdPhase matches 0 run scoreboard players operation #buSub bu = @s rdRage
+execute if score @s rdPhase matches 0 run scoreboard players set #buSubMax bu {RAGE_MAX}
+execute if score @s rdPhase matches 0 run scoreboard players set #buSubCol bu 8
+execute if score @s rdPhase matches 1 run scoreboard players operation #buSub bu = @s rdTime
+execute if score @s rdPhase matches 1 run scoreboard players set #buSubMax bu {TRANSFORM_LEN}
+execute if score @s rdPhase matches 1 run scoreboard players set #buSubCol bu 1
+execute if score @s rdPhase matches 2 run scoreboard players operation #buSub bu = @s rdShield
+execute if score @s rdPhase matches 2 run scoreboard players set #buSubMax bu {SHIELD_MAX}
+execute if score @s rdPhase matches 2 run scoreboard players set #buSubCol bu 1
+execute if score @s rdPhase matches 3 run scoreboard players operation #buSub bu = @s rdTime
+execute if score @s rdPhase matches 3 run scoreboard players set #buSubMax bu {EXHAUST}
+execute if score @s rdPhase matches 3 run scoreboard players set #buSubCol bu 9
+function rlk:bossui/draw
+bossbar set rlk:narukami_state name {{nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""}}
 ''')
 write('incoming','''
 # Called after normal damage/defense modifiers, before damage is deducted.

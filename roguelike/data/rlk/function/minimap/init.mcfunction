@@ -6,3 +6,6 @@ bossbar set rlk:minimap style progress
 bossbar set rlk:minimap value 0
 bossbar set rlk:minimap visible false
 scoreboard players set #mmSig mm -1
+# Rebuild the cell table once after a reload (a map made before it has none).
+scoreboard players set #mmBuilt mm 0
+execute unless score #mmX mm matches -1000..1000 run scoreboard players set #mmX mm -370

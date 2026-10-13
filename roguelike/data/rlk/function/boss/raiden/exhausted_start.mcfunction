@@ -16,7 +16,6 @@ scoreboard players set @s rdTime 0
 scoreboard players set @s rdAnim 23
 scoreboard players set @s rdShield 0
 scoreboard players operation @a[tag=player,limit=1] energy = #burstCost100 tmp
-bossbar set rlk:narukami_state color green
 title @a[tag=player] times 5 45 15
 title @a[tag=player] subtitle {text:"갑주 파괴 · 지금 공격하세요!",color:"green",bold:true}
 execute as @a[tag=player] run function rlk:view/ttl_blank
