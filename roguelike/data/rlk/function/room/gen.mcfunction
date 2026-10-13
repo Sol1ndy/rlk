@@ -34,3 +34,5 @@ execute as @e[tag=rlk_av] run attribute @s minecraft:step_height base set 0.6
 execute as @a[tag=player,limit=1] run function rlk:room/gen_tp with storage rlk:room cur.spawn
 execute store result storage rlk:room a.t int 1 run scoreboard players get #mapType room
 execute as @a[tag=player,limit=1] run function rlk:room/gen_title with storage rlk:room a
+# 화면 미니맵: 이 맵의 칸 → 구역 표
+function rlk:minimap/build

@@ -545,3 +545,7 @@ scoreboard objectives remove pmPosValid
 scoreboard objectives remove pmWeapon
 scoreboard objectives remove pmWantW
 data remove storage rlk:player_motion loco
+
+# 화면 미니맵
+bossbar remove rlk:minimap
+scoreboard objectives remove mm

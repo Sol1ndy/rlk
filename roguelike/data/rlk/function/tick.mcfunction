@@ -16,6 +16,8 @@ execute as @a[tag=player] run function rlk:view/tick
 execute unless entity @a[tag=player,limit=1] if entity @e[tag=rlk_view,limit=1] run kill @e[tag=rlk_view]
 execute as @a[tag=player] run function rlk:player/tick
 function rlk:combat/text_tick
+# 화면 위 미니맵(리소스팩 글꼴, 보이지 않는 흰색 보스바 이름)
+function rlk:minimap/tick
 function rlk:ditem/tick
 function rlk:shop/tick
 # 화살(활 캐릭터)

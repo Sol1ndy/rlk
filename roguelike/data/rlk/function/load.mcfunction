@@ -1317,3 +1317,5 @@ function rlk:char/motion/install
 
 # Narukami encounter and rig, rebuilt without refilling an existing boss.
 function rlk:boss/raiden/init
+# 화면 위 미니맵(tools/build_minimap.py)
+function rlk:minimap/init
