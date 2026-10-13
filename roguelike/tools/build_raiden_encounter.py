@@ -340,12 +340,29 @@ write('approach','''
 scoreboard players set @s rdAnim 1
 execute rotated as @s positioned ^ ^ ^0.17 if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless block ~ ~-1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] run tp @s ~ ~ ~
 ''')
+# Shuffle bag per phase: every move appears once before any repeats, in random order;
+# a refilled bag never starts with the move just used. The ultimate (15) is not in the
+# bag: it comes on the fourth armoured move (below), at most once per transformation.
+BAGS = {0: [1, 2, 3, 4, 5, 6, 7], 2: [11, 12, 13, 14, 16, 17, 18]}
+for ph, moves in BAGS.items():
+    write(f'bag/count_{ph}', ['scoreboard players set #rdCnt rd 0'] +
+          [f'execute if score #rdB{i} rd matches 1 run scoreboard players add #rdCnt rd 1' for i in moves])
+    write(f'bag/fill_{ph}', [f'scoreboard players set #rdB{i} rd 1' for i in moves] +
+          [f'execute if score @s rdPrev matches {i} run scoreboard players set #rdB{i} rd 0' for i in moves] +
+          [call(f'bag/count_{ph}')])
+    write(f'bag/draw_{ph}', ['# As the boss: draw one move from the bag into rdPat.', call(f'bag/count_{ph}'),
+          f'execute if score #rdCnt rd matches 0 run '+call(f'bag/fill_{ph}'),
+          'execute store result score #rdR rd run random value 0..9999',
+          'scoreboard players operation #rdR rd %= #rdCnt rd',
+          'scoreboard players add #rdR rd 1',
+          'scoreboard players set #rdPick rd 0'] +
+          sum(([f'execute if score #rdPick rd matches 0 if score #rdB{i} rd matches 1 run scoreboard players remove #rdR rd 1',
+                f'execute if score #rdPick rd matches 0 if score #rdB{i} rd matches 1 if score #rdR rd matches 0 run scoreboard players set #rdPick rd {i}']
+               for i in moves), []) +
+          ['scoreboard players operation @s rdPat = #rdPick rd'])
 write('choose','''
-execute if score @s rdPhase matches 0 store result score @s rdPat run random value 1..7
-execute if score @s rdPhase matches 2 store result score @s rdPat run random value 11..18
-execute if score @s rdPat = @s rdPrev run scoreboard players add @s rdPat 1
-execute if score @s rdPhase matches 0 if score @s rdPat matches 8 run scoreboard players set @s rdPat 1
-execute if score @s rdPhase matches 2 if score @s rdPat matches 19 run scoreboard players set @s rdPat 11
+execute if score @s rdPhase matches 0 run function rlk:boss/raiden/bag/draw_0
+execute if score @s rdPhase matches 2 run function rlk:boss/raiden/bag/draw_2
 # 몽상의 일심 always follows an illusion round that was not broken (illusion/fail_end).
 execute if score @s rdPhase matches 0 if score @s rdNext matches 1..7 run scoreboard players operation @s rdPat = @s rdNext
 scoreboard players set @s rdNext 0
@@ -361,6 +378,8 @@ execute if score @s rdPhase matches 2 if score #rdLock rd matches 11..18 run sco
 execute if score @s rdPhase matches 0 if score #rdForce rd matches 1..7 run scoreboard players operation @s rdPat = #rdForce rd
 execute if score @s rdPhase matches 2 if score #rdForce rd matches 11..18 run scoreboard players operation @s rdPat = #rdForce rd
 execute if score @s rdPat = #rdForce rd run scoreboard players set #rdForce rd 0
+# Whatever finally runs (bag, forced follow-up, ultimate, test hook) leaves the bag.
+'''+'\n'.join(f'execute if score @s rdPat matches {i} run scoreboard players set #rdB{i} rd 0' for i in BAGS[0]+BAGS[2])+'''
 scoreboard players operation @s rdPrev = @s rdPat
 scoreboard players set @s rdTime 0
 execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet

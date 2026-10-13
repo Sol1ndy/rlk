@@ -1,8 +1,5 @@
-execute if score @s rdPhase matches 0 store result score @s rdPat run random value 1..7
-execute if score @s rdPhase matches 2 store result score @s rdPat run random value 11..18
-execute if score @s rdPat = @s rdPrev run scoreboard players add @s rdPat 1
-execute if score @s rdPhase matches 0 if score @s rdPat matches 8 run scoreboard players set @s rdPat 1
-execute if score @s rdPhase matches 2 if score @s rdPat matches 19 run scoreboard players set @s rdPat 11
+execute if score @s rdPhase matches 0 run function rlk:boss/raiden/bag/draw_0
+execute if score @s rdPhase matches 2 run function rlk:boss/raiden/bag/draw_2
 # 몽상의 일심 always follows an illusion round that was not broken (illusion/fail_end).
 execute if score @s rdPhase matches 0 if score @s rdNext matches 1..7 run scoreboard players operation @s rdPat = @s rdNext
 scoreboard players set @s rdNext 0
@@ -18,6 +15,21 @@ execute if score @s rdPhase matches 2 if score #rdLock rd matches 11..18 run sco
 execute if score @s rdPhase matches 0 if score #rdForce rd matches 1..7 run scoreboard players operation @s rdPat = #rdForce rd
 execute if score @s rdPhase matches 2 if score #rdForce rd matches 11..18 run scoreboard players operation @s rdPat = #rdForce rd
 execute if score @s rdPat = #rdForce rd run scoreboard players set #rdForce rd 0
+# Whatever finally runs (bag, forced follow-up, ultimate, test hook) leaves the bag.
+execute if score @s rdPat matches 1 run scoreboard players set #rdB1 rd 0
+execute if score @s rdPat matches 2 run scoreboard players set #rdB2 rd 0
+execute if score @s rdPat matches 3 run scoreboard players set #rdB3 rd 0
+execute if score @s rdPat matches 4 run scoreboard players set #rdB4 rd 0
+execute if score @s rdPat matches 5 run scoreboard players set #rdB5 rd 0
+execute if score @s rdPat matches 6 run scoreboard players set #rdB6 rd 0
+execute if score @s rdPat matches 7 run scoreboard players set #rdB7 rd 0
+execute if score @s rdPat matches 11 run scoreboard players set #rdB11 rd 0
+execute if score @s rdPat matches 12 run scoreboard players set #rdB12 rd 0
+execute if score @s rdPat matches 13 run scoreboard players set #rdB13 rd 0
+execute if score @s rdPat matches 14 run scoreboard players set #rdB14 rd 0
+execute if score @s rdPat matches 16 run scoreboard players set #rdB16 rd 0
+execute if score @s rdPat matches 17 run scoreboard players set #rdB17 rd 0
+execute if score @s rdPat matches 18 run scoreboard players set #rdB18 rd 0
 scoreboard players operation @s rdPrev = @s rdPat
 scoreboard players set @s rdTime 0
 execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
