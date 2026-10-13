@@ -240,5 +240,7 @@ const atlas=fs.existsSync(atlasPath)?JSON.parse(fs.readFileSync(atlasPath,'utf8'
 for(const block of blocks){const sprite='rlk:player_motion/'+block;atlas.sources=atlas.sources.filter(s=>s.sprite!==sprite);atlas.sources.push({type:'minecraft:single',resource:'minecraft:block/'+block,sprite});}
 for(const info of Object.values(characters))if(!atlas.sources.some(s=>s.type==='minecraft:single'&&s.resource==='rlk:skin/'+info.skin&&!s.sprite))atlas.sources.push({type:'minecraft:single',resource:'rlk:skin/'+info.skin});
 buildLocomotion({fn,poseLines,spawnLines,weaponLines,neutral,lerp,characters,here});
+// Dash: player/dash_go calls this; a character with a "dash" clip plays it (gameplay moves the body).
+fn('dash',['# @s = player, from player/dash_go: play the character dash clip when it has one.',...Object.entries(characters).filter(([c])=>{const src=path.join(here,'player_motion',c+'.json');return fs.existsSync(src)&&JSON.parse(fs.readFileSync(src,'utf8')).clips.dash;}).map(([c,info])=>`execute if score #charN tmp matches ${info.id} run function rlk:char/motion/start {char:"${c}",clip:"dash"}`)].join('\n'));
 json(atlasPath,atlas);json(path.join(here,'player_motion/compiled_clips.json'),manifest);
 console.log(`Built articulated combat avatars and ${manifest.length} clips.`);

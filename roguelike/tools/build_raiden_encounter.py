@@ -607,6 +607,10 @@ write('hurt','''
 execute unless entity @a[tag=player,scores={dead=0},limit=1] run return 0
 execute if entity @a[tag=player,scores={rnDie=1..}] run return 0
 execute if entity @a[tag=player,scores={pkMode=1..}] run return 0
+# Boss damage multiplier (load: #bossDmgMul %), on top of the mob level scaling. Every
+# hazard and the shadow bites set #cmDmg fresh before calling this.
+scoreboard players operation #cmDmg tmp *= #bossDmgMul tmp
+scoreboard players operation #cmDmg tmp /= #100 tmp
 function rlk:cm/hit_pl
 # A hit that lands (not dodged) feeds the malice gauge, like the original.
 execute unless score #dodged tmp matches 1 as @e[tag=rlk_raiden,scores={rdPhase=0,rdDeath=0},limit=1] run scoreboard players add @s rdRage '''+str(RAGE_HIT)+'''
@@ -1032,7 +1036,7 @@ HELP=(T+'{text:"명령: ",color:"gray",bold:false},'
       +cmd_link(TEST+'armored','armored')+',{text:" 갑주 단계 · ",color:"gray",bold:false},'
       +cmd_link(TEST+'pattern {id:11}','pattern {id:N}')+',{text:" 다음 패턴(1~7, 11~18) · ",color:"gray",bold:false},'
       +cmd_link(TEST+'lock {id:11}','lock {id:N}')+',{text:" 패턴 고정(0 해제) · ",color:"gray",bold:false},'
-      +cmd_link(TEST+'level {lv:6}','level {lv:N}')+',{text:" 보스 레벨 · ",color:"gray",bold:false},'
+      +cmd_link(TEST+'level {lv:12}','level {lv:N}')+',{text:" 보스 레벨 · ",color:"gray",bold:false},'
       +cmd_link(TEST+'stop','stop')+',{text:" 종료 후 로비",color:"gray",bold:false}]')
 write('test/start','''
 # /function rlk:boss/raiden/test/start (@s = 'player'): fight only Narukami, normal phase.
@@ -1054,9 +1058,10 @@ function rlk:lobby/leave
 scoreboard players set #rdTest rd 1
 scoreboard players set #rdForce rd 0
 scoreboard players set #rdLock rd 0
-# Chapter-1 boss slot: level = (chapter-1)*6 + mapIdx + 1 = 6 (test/level changes it).
+# Stage-2 boss slot (Narukami's planned stage): level = (chapter-1)*6 + mapIdx + 1 = 12
+# (test/level changes it).
 scoreboard players set #active room 1
-scoreboard players set #chapter room 1
+scoreboard players set #chapter room 2
 scoreboard players set #mapIdx room 5
 scoreboard players set #mapType room 8
 scoreboard players set #stDefer room 0

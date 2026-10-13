@@ -835,11 +835,21 @@ scoreboard players set #enNeutral tmp 270
 scoreboard players set #enOther tmp 130
 # 액션바 원소 에너지 게이지 칸 수 (char/hud_setup 과 같아야 함)
 scoreboard players set #hudEnSeg tmp 15
-# 몬스터 레벨: 레벨당 체력 증가(%) / 레벨당 공격력 증가(%)
+# 몬스터 레벨 (x = 레벨 - 1). 플레이어는 레벨이 오를수록 좋은 아이템을 얻으므로, 몹은 레벨에 따라 플레이어 기초 수치보다 빠르게 강해짐
+#  체력 = 1레벨 체력 × (100 + #mobLvHp·x + #mobLvHp2·x²/100)%
+#  공격 = 원피해 × (100 + #mobLvAtk·x + #mobLvAtk2·x²/100)%
+#  방어: 플레이어 → 몹 레벨 보정의 몹 쪽 항 = 100 + 몹 레벨 × #mobLvDef/100 (플레이어 쪽 = 100 + 플레이어 레벨)
+#  플레이어 방어 상수: 실제 피해 = 원피해 × K/(K + 방어력), K = #defK + #defKLv·(때린 몹 레벨 - 1)
 scoreboard players set #mobLvHp tmp 30
+scoreboard players set #mobLvHp2 tmp 5
 # 모든 몹의 체력 배율(%). 400 = 4배. 몹이 너무 빨리/늦게 죽으면 이 숫자 하나만 바꾸면 됨
 scoreboard players set #mobHpMul tmp 400
-scoreboard players set #mobLvAtk tmp 8
+scoreboard players set #mobLvAtk tmp 14
+scoreboard players set #mobLvAtk2 tmp 6
+scoreboard players set #mobLvDef tmp 150
+scoreboard players set #defKLv tmp 4
+# 보스(나루카미) 공격 피해 배율(%). 레벨 보정과 별개로 곱함
+scoreboard players set #bossDmgMul tmp 160
 
 # 재련 맵을 한 판에 고를 수 있는 최대 횟수
 scoreboard players set #rfMax tmp 2

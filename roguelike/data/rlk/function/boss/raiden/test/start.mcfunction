@@ -17,9 +17,10 @@ function rlk:lobby/leave
 scoreboard players set #rdTest rd 1
 scoreboard players set #rdForce rd 0
 scoreboard players set #rdLock rd 0
-# Chapter-1 boss slot: level = (chapter-1)*6 + mapIdx + 1 = 6 (test/level changes it).
+# Stage-2 boss slot (Narukami's planned stage): level = (chapter-1)*6 + mapIdx + 1 = 12
+# (test/level changes it).
 scoreboard players set #active room 1
-scoreboard players set #chapter room 1
+scoreboard players set #chapter room 2
 scoreboard players set #mapIdx room 5
 scoreboard players set #mapType room 8
 scoreboard players set #stDefer room 0
@@ -34,4 +35,4 @@ scoreboard players set #spawnT room 0
 execute in minecraft:overworld as @e[tag=rlk_zone,scores={zid=2}] at @s run function rlk:room/mob_wave
 scoreboard players operation @s curHealth = @s maxHealth
 tellraw @s [{text:"[보스 테스트] ",color:"light_purple",bold:true},{text:"나루카미 단독 전투를 시작합니다.",color:"white",bold:false}]
-tellraw @s [{text:"[보스 테스트] ",color:"light_purple",bold:true},{text:"명령: ",color:"gray",bold:false},{text:"start",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/start"}},{text:" 처음부터 · ",color:"gray",bold:false},{text:"armored",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/armored"}},{text:" 갑주 단계 · ",color:"gray",bold:false},{text:"pattern {id:N}",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/pattern {id:11}"}},{text:" 다음 패턴(1~7, 11~18) · ",color:"gray",bold:false},{text:"lock {id:N}",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/lock {id:11}"}},{text:" 패턴 고정(0 해제) · ",color:"gray",bold:false},{text:"level {lv:N}",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/level {lv:6}"}},{text:" 보스 레벨 · ",color:"gray",bold:false},{text:"stop",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/stop"}},{text:" 종료 후 로비",color:"gray",bold:false}]
+tellraw @s [{text:"[보스 테스트] ",color:"light_purple",bold:true},{text:"명령: ",color:"gray",bold:false},{text:"start",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/start"}},{text:" 처음부터 · ",color:"gray",bold:false},{text:"armored",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/armored"}},{text:" 갑주 단계 · ",color:"gray",bold:false},{text:"pattern {id:N}",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/pattern {id:11}"}},{text:" 다음 패턴(1~7, 11~18) · ",color:"gray",bold:false},{text:"lock {id:N}",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/lock {id:11}"}},{text:" 패턴 고정(0 해제) · ",color:"gray",bold:false},{text:"level {lv:N}",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/level {lv:12}"}},{text:" 보스 레벨 · ",color:"gray",bold:false},{text:"stop",color:"yellow",bold:false,click_event:{action:"suggest_command",command:"/function rlk:boss/raiden/test/stop"}},{text:" 종료 후 로비",color:"gray",bold:false}]
