@@ -1153,6 +1153,8 @@ scoreboard players set @a[tag=player] invDirty 2
 execute unless score #on view matches 0..1 run scoreboard players set #on view 1
 # 시점 종류: 1 숄더뷰 · 2 F5 위쪽 시점(처음엔 2)
 scoreboard players set #vmode view 2
+# 서버 시작·/reload 뒤 첫 틱에 시점 엔티티를 새로 만든다(view/fresh)
+scoreboard players set #vFresh view 1
 # F5 위쪽 시점: 카메라 거리(칸) · 받침 크기(1 = 머리 위 약 1칸, 0.5 = 0.5칸, 1.5 = 1.5칸)
 execute unless data storage rlk:view ride run data modify storage rlk:view ride set value {d:3.5d,s:0.5d}
 # 카메라 거리·높이 기본을 한 칸씩 당긴 판(ridev 2): 한 번만 '보통'으로 맞춤
