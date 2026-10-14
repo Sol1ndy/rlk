@@ -1,4 +1,4 @@
-# Cell row 0 col 5: the cell, its right/lower joins and doors, the player dot.
+# Cell row 0 col 5: the cell and its right/lower joins and doors.
 execute if score #c mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#5A5A5A"}
 execute if score #c mm matches 1 if score #vc5 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#5A5A5A"}
 execute if score #c mm matches 2 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#B4B4B4"}
@@ -23,4 +23,3 @@ execute if score #c mm matches 11 run data modify storage rlk:mm line append val
 execute if score #c mm matches 11 if score #vc5 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E05050"}
 execute if score #vd5 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#8C8C8C"}
 execute if score #vd5 mm matches 2 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#FFFFFF"}
-execute if score #pc mm matches 5 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#3A2A00"}

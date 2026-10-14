@@ -1,7 +1,8 @@
 # 방 시스템 매 틱 (런 진행 중일 때만 호출)
-# 왼손 지도 유지
-execute as @a[tag=player,limit=1] unless score @s pkMode matches 1.. unless score @s vMap matches 1 unless items entity @s weapon.offhand minecraft:filled_map[minecraft:custom_data~{rlk_map:1b,v:3b}] run function rlk:room/map_give with storage rlk:room
-execute as @a[tag=player,limit=1] unless score @s pkMode matches 1.. unless score @s vMap matches 1 unless items entity @s hotbar.3 minecraft:paper[minecraft:custom_data~{rlk_map_button:1b,v:3b,rlk_ui:{role:"map"}}] run function rlk:room/map_give with storage rlk:room
+# 지도 아이템(왼손 지도 · 3번 칸 지도 버튼)은 더 주지 않는다: 화면 미니맵이 대신하고, 전체 지도는 G 메뉴로 연다.
+# 이전 판에서 받은 지도가 남아 있으면 치운다.
+execute as @a[tag=player,limit=1] if items entity @s weapon.offhand minecraft:filled_map[minecraft:custom_data~{rlk_map:1b}] run item replace entity @s weapon.offhand with air
+execute as @a[tag=player,limit=1] if items entity @s hotbar.3 *[minecraft:custom_data~{rlk_ui:{role:"map"}}] run item replace entity @s hotbar.3 with air
 # 플레이어 위치(×100, 직전 틱 기준)
 scoreboard players operation #px tmp = @a[tag=player,limit=1] dashPX
 scoreboard players operation #pz tmp = @a[tag=player,limit=1] dashPZ

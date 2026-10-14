@@ -8,7 +8,8 @@ boss bar (rlk:minimap, colour white, whose bar sprites this pack makes transpare
 
 - font rlk:minimap: per grid row r (0..5) a set of 20x20 glyphs, all with the same fixed
   advance (a 1/255-alpha pixel pins the width), shifted down 20 px per row via `ascent`:
-  cell square, same-zone connectors (right / below), doors (right / below), player dot;
+  cell square, same-zone connectors (right / below), doors (right / below), and the player
+  as an arrow in 8 directions (where the camera looks; north is up);
   plus space glyphs to overlay (-21), step one cell (+20), return a row (-120) and binary
   position spaces (all positive): boss bar text is centred and the rows return to their
   start, so a trailing space of 2|x| (x < 0) or a leading one of 2x (x > 0) puts the map's
@@ -19,10 +20,12 @@ boss bar (rlk:minimap, colour white, whose bar sprites this pack makes transpare
 
 Datapack (data/rlk/function/minimap/): init (load), build (after room/gen, or once after a
 reload: which zone owns each cell, same-zone connectors), tick (from rlk:tick: every 5 ticks, redraws when the
-player's cell or any zone/door state changed, at least every 2 s; hidden outside a run,
-in the boss arena while Narukami lives, on the map screen, in selection spaces, when dead).
+player's cell or any zone/door state changed, at least every 2 s; only the arrow is redrawn
+when just the facing changed; hidden outside a run, in a boss zone or while Narukami is
+there, on the map screen, in selection spaces, when dead).
 """
 import argparse
+import math
 import json
 import zlib
 import struct
@@ -45,10 +48,11 @@ TOP_ASCENT = 7         # row 0 ascent; each next row TILE px lower
 MAX_ZONE = 12
 OFFS = [1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1]
 
-TYPES = ['cell', 'conn_r', 'conn_d', 'door_r', 'door_d', 'dot', 'conn_c']
+ARROWS = [f'arr{k}' for k in range(8)]   # k = round(yaw / 45) mod 8: 0 south (down), 2 west, 4 north, 6 east
+TYPES = ['cell', 'conn_r', 'conn_d', 'door_r', 'door_d', 'conn_c'] + ARROWS
 BASE = 0xE300
 def glyph(row, t):
-    return chr(BASE + row * 8 + TYPES.index(t))
+    return chr(BASE + row * 16 + TYPES.index(t))
 SP_BACK, SP_STEP, SP_ROW = chr(0xE3F0), chr(0xE3F1), chr(0xE3F2)
 # Position spaces (positive only, so the text never has a negative width): the rows return
 # to their start and boss bar text is centred at centre - width/2, so a trailing 2|x| puts
@@ -63,7 +67,9 @@ COLORS = {1: '#5A5A5A', 2: '#B4B4B4', 3: '#FFE08A',
 # 6 reforge, 7 enchant, 8 root, 9 boss, 10 levelup start)
 KIND_CODE = {2: 4, 3: 5, 4: 6, 5: 7, 6: 8, 7: 9, 8: 10, 9: 11}
 DOOR_COLORS = {1: '#8C8C8C', 2: '#FFFFFF'}
-DOT_COLOR = '#3A2A00'
+DOT_COLOR = '#3A2A00'    # the player arrow
+PERIOD = 2               # ticks between minimap updates
+REDRAW = 20              # forced full redraw every REDRAW updates (2 s)
 
 
 # ---------------------------------------------------------------- resource pack
@@ -92,8 +98,34 @@ shapes = {
     'conn_c': {(x, y): W for x in (C - 1, C, C + 1) for y in (C - 1, C, C + 1)},
     'door_r': {(x, y): OPAQUE for x in (C - 1, C, C + 1) for y in range(C // 2 - 4, C // 2 + 4)},
     'door_d': {(x, y): OPAQUE for y in (C - 1, C, C + 1) for x in range(C // 2 - 4, C // 2 + 4)},
-    'dot': {(x, y): OPAQUE for x in range(C // 2 - 3, C // 2 + 3) for y in range(C // 2 - 3, C // 2 + 3)},
 }
+# Player arrow: an arrowhead (tip, wings, notch) about 12 px long in the cell centre, one per
+# 45 degrees. Screen direction for yaw k*45: (-sin, cos) with y down (yaw 0 = south = down).
+ARROW_POLY = [(7.0, 0.0), (-5.0, 4.5), (-3.0, 0.0), (-5.0, -4.5)]   # (along, across)
+
+
+def inside(poly, u, v):
+    hit = False
+    for (u1, v1), (u2, v2) in zip(poly, poly[1:] + poly[:1]):
+        if (v1 > v) != (v2 > v) and u < u1 + (v - v1) * (u2 - u1) / (v2 - v1):
+            hit = not hit
+    return hit
+
+
+SS = 4   # supersampling per axis; a pixel is drawn when at least 45% of it is covered
+for k in range(8):
+    a = math.radians(45 * k)
+    dx, dy = -math.sin(a), math.cos(a)
+    shapes[f'arr{k}'] = {}
+    for x in range(C):
+        for y in range(C):
+            n = 0
+            for i in range(SS):
+                for j in range(SS):
+                    px_, py_ = x + (i + .5) / SS - C / 2, y + (j + .5) / SS - C / 2
+                    n += inside(ARROW_POLY, px_ * dx + py_ * dy, -px_ * dy + py_ * dx)
+            if n >= .45 * SS * SS:
+                shapes[f'arr{k}'][(x, y)] = OPAQUE
 tex = RP / 'assets/rlk/textures/font/minimap'
 tex.mkdir(parents=True, exist_ok=True)
 for t, f in shapes.items():
@@ -216,24 +248,39 @@ write('set_g', [f'execute if score #idx mm matches {i} run scoreboard players op
 
 # tick: visibility, signature, redraw
 write('tick', [
-    '# From rlk:tick. Every 5 ticks: show/hide, and redraw when something changed.',
+    f'# From rlk:tick. Every {PERIOD} ticks: show/hide, and redraw when something changed.',
     'scoreboard players add #mmT mm 1',
-    'execute if score #mmT mm matches 5.. run scoreboard players set #mmT mm 0',
+    f'execute if score #mmT mm matches {PERIOD}.. run scoreboard players set #mmT mm 0',
     'execute unless score #mmT mm matches 0 run return 0',
     'scoreboard players set #mmShow mm 1',
     'execute unless score #active room matches 1 run scoreboard players set #mmShow mm 0',
     'execute unless entity @a[tag=player,scores={dead=0},limit=1] run scoreboard players set #mmShow mm 0',
     'execute if entity @a[tag=player,scores={pkMode=1..}] run scoreboard players set #mmShow mm 0',
     'execute if entity @a[tag=player,scores={vMap=1..}] run scoreboard players set #mmShow mm 0',
-    'execute if entity @e[tag=rlk_raiden,scores={rdDeath=0},limit=1] run scoreboard players set #mmShow mm 0',
+    '# Boss fight: Narukami is there (any phase, arena or test), or the player is in a boss zone.',
+    'execute if entity @e[tag=rlk_raiden,limit=1] run scoreboard players set #mmShow mm 0',
     'execute if score #mmShow mm matches 0 run return run bossbar set rlk:minimap visible false',
     'execute unless score #mmBuilt mm matches 1 run function rlk:minimap/build',
+    'function rlk:minimap/signature',
+    'scoreboard players set #pz mm 0',
+    'execute if score #pc mm matches 0.. run function rlk:minimap/player_zone',
+    'execute if score #pz mm matches 1.. as @e[tag=rlk_zone,scores={zkind=9}] if score @s zid = #pz mm run return run bossbar set rlk:minimap visible false',
     'bossbar set rlk:minimap players @a[tag=player]',
     'bossbar set rlk:minimap visible true',
-    'function rlk:minimap/signature',
+    'function rlk:minimap/facing',
     'scoreboard players add #mmAge mm 1',
-    'execute if score #mmAge mm matches 8.. run scoreboard players set #mmSig mm -1',
-    'execute unless score #mmNew mm = #mmSig mm run function rlk:minimap/draw',
+    f'execute if score #mmAge mm matches {REDRAW}.. run scoreboard players set #mmSig mm -1',
+    'execute unless score #mmNew mm = #mmSig mm run return run function rlk:minimap/draw',
+    'execute unless score #mmDir mm = #mmDirS mm run function rlk:minimap/arrow',
+])
+write('facing', [
+    '# #mmDir 0..7: where the player looks, in 45 degree steps (0 south, 2 west, 4 north, 6 east).',
+    'execute store result score #mmDir mm run data get entity @a[tag=player,limit=1] Rotation[0] 10',
+    'scoreboard players add #mmDir mm 36225',
+    'scoreboard players set #c3600 mm 3600',
+    'scoreboard players operation #mmDir mm %= #c3600 mm',
+    'scoreboard players set #c450 mm 450',
+    'scoreboard players operation #mmDir mm /= #c450 mm',
 ])
 write('signature', [
     '# #mmNew: player cell + zone states + door states folded into one number.',
@@ -280,13 +327,39 @@ for r in range(N):
         draw.append(f'execute unless score #c mm matches 1.. if score #vd{i} mm matches 1.. run function rlk:minimap/c/{i}')
         draw.append('data modify storage rlk:mm line append value {text:"' + SP_STEP + '",font:"rlk:minimap"}')
     draw.append('data modify storage rlk:mm line append value {text:"' + SP_ROW + '",font:"rlk:minimap"}')
-draw.append('execute if score #mmX mm matches ..-1 run function rlk:minimap/offset')
-draw.append('bossbar set rlk:minimap name {nbt:"line[]",storage:"rlk:mm",interpret:true,separator:""}')
+draw.append('data modify storage rlk:mm base set from storage rlk:mm line')
+draw.append('function rlk:minimap/arrow')
 write('draw', draw)
+# The player arrow goes on top of the finished rows (which return to the map's left edge):
+# step to the player's column, the arrow glyph of its row, then the rest of the row and back.
+write('arrow', [
+    '# The map rows (storage base) + the player arrow + the trailing position space -> boss bar.',
+    'scoreboard players operation #mmDirS mm = #mmDir mm',
+    'data modify storage rlk:mm line set from storage rlk:mm base',
+    'execute if score #pc mm matches 0.. run function rlk:minimap/arrow_put',
+    'execute if score #mmX mm matches ..-1 run function rlk:minimap/offset',
+    'bossbar set rlk:minimap name {nbt:"line[]",storage:"rlk:mm",interpret:true,separator:""}',
+])
+ap = ['# #pc = row * 6 + col, #mmDir: the strings around the arrow and its glyph, then append.',
+      'scoreboard players set #c6 mm 6',
+      'scoreboard players set #c16 mm 16',
+      'scoreboard players operation #acol mm = #pc mm',
+      'scoreboard players operation #acol mm %= #c6 mm',
+      'scoreboard players operation #ak mm = #pc mm',
+      'scoreboard players operation #ak mm /= #c6 mm',
+      'scoreboard players operation #ak mm *= #c16 mm',
+      'scoreboard players operation #ak mm += #mmDir mm']
+ap += [f'execute if score #acol mm matches {c} run data modify storage rlk:mm a set value '
+       + '{pre:"' + SP_STEP * c + '",post:"' + SP_STEP * (N - c) + SP_ROW + '"}' for c in range(N)]
+ap += [f'execute if score #ak mm matches {r * 16 + k} run data modify storage rlk:mm a.g set value "{glyph(r, f"arr{k}")}"'
+       for r in range(N) for k in range(8)]
+ap += ['function rlk:minimap/arrow_add with storage rlk:mm a']
+write('arrow_put', ap)
+write('arrow_add', ['$data modify storage rlk:mm line append value {text:"$(pre)$(g)' + SP_BACK + '$(post)",font:"rlk:minimap",color:"' + DOT_COLOR + '"}'])
 for r in range(N):
     for c in range(N):
         i = r * N + c
-        lines = [f'# Cell row {r} col {c}: the cell, its right/lower joins and doors, the player dot.']
+        lines = [f'# Cell row {r} col {c}: the cell and its right/lower joins and doors.']
         for code, col in COLORS.items():
             lines.append(f'execute if score #c mm matches {code} run data modify storage rlk:mm line append value '
                          + comp(glyph(r, 'cell') + SP_BACK, col))
@@ -306,8 +379,6 @@ for r in range(N):
             if r < N - 1:
                 lines.append(f'execute if score #vd{i} mm matches {st} run data modify storage rlk:mm line append value '
                              + comp(glyph(r, 'door_d') + SP_BACK, col))
-        lines.append(f'execute if score #pc mm matches {i} run data modify storage rlk:mm line append value '
-                     + comp(glyph(r, 'dot') + SP_BACK, DOT_COLOR))
         write(f'c/{i}', lines)
 write('player_zone', [f'execute if score #pc mm matches {i} run scoreboard players operation #pz mm = #g{i} mm' for i in CELLS])
 zc = ['# As a zone marker: its colour code into #zc<zid>.',

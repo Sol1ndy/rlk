@@ -11,8 +11,8 @@ execute in minecraft:overworld unless loaded 1000004 300 1000004 run return run 
 execute in minecraft:overworld unless data storage rlk:map {version:3} run function rlk:view/map_room
 execute in minecraft:overworld unless entity @e[tag=rlk_mapframe,limit=1] run function rlk:view/map_room
 execute in minecraft:overworld unless entity @e[tag=rlk_mappin,limit=1] run function rlk:view/map_room
-execute unless items entity @s weapon.offhand minecraft:filled_map[minecraft:custom_data~{rlk_map:1b,v:3b}] run function rlk:room/map_give with storage rlk:room
-execute in minecraft:overworld run item replace entity @e[tag=rlk_mapframe,limit=1] contents from entity @s weapon.offhand
+execute unless data storage rlk:room map_id run return run function rlk:char/deny {t:"지도를 불러오는 중입니다"}
+execute in minecraft:overworld run function rlk:room/map_frame with storage rlk:room
 execute in minecraft:overworld run item modify entity @e[tag=rlk_mapframe,limit=1] contents {type:"minecraft:set_components",components:{"minecraft:item_model":"minecraft:filled_map"}}
 # 위치/시선/속성은 한 명용 저장소에 정확히 저장한다. 1인칭도 같은 화면을 사용한다.
 data modify storage rlk:map ret set value {scale:1d,camera:4d,gravity:0.08d,was_body:0b}
@@ -45,7 +45,6 @@ attribute @s minecraft:gravity base set 0
 scoreboard players set @s vMap 1
 scoreboard players set @s vMapT 0
 scoreboard players set @s vMapH 8
-item replace entity @s weapon.offhand with air
 function rlk:view/map_position
 function rlk:view/map_marker
 title @s clear

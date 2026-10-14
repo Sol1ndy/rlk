@@ -711,5 +711,5 @@ execute unless score #c mm matches 1.. if score #hd35 mm matches 1.. run functio
 execute unless score #c mm matches 1.. if score #vd35 mm matches 1.. run function rlk:minimap/c/35
 data modify storage rlk:mm line append value {text:"",font:"rlk:minimap"}
 data modify storage rlk:mm line append value {text:"",font:"rlk:minimap"}
-execute if score #mmX mm matches ..-1 run function rlk:minimap/offset
-bossbar set rlk:minimap name {nbt:"line[]",storage:"rlk:mm",interpret:true,separator:""}
+data modify storage rlk:mm base set from storage rlk:mm line
+function rlk:minimap/arrow
