@@ -14,6 +14,9 @@ drawn with font rlk:bossbar glyphs in the name of the second boss bar:
 - Under row: the same pieces 3 px tall, 2 px under the HP bar (shield / gauge).
 - Space glyphs +-1..256 move the cursor (numbers are centred on the bar, then the cursor
   returns to the bar's end so the whole line is exactly BAR px wide and stays centred).
+- Every component in the line names its font: the boss bar shows the stored list through an
+  nbt component, which appends entries 2.. as children of entry 1 (a bar piece), so an entry
+  without a font would inherit rlk:bossbar and its digits would show as missing-glyph boxes.
 
 Datapack: data/rlk/function/bossui/*. A boss calls, as itself, with
   #buHp #buMax (HP), #buSub #buSubMax #buSubCol (under bar; colour code below, 0 = none)
@@ -203,9 +206,11 @@ draw += ['scoreboard players operation #n bu += #nh bu',
          f'scoreboard players set #len bu {BAR // 2}',
          'scoreboard players operation #len bu += #half bu',
          'function rlk:bossui/space_neg',
-         'data modify storage rlk:bu line append value {score:{name:"#buHp",objective:"bu"},color:"white"}',
-         'data modify storage rlk:bu line append value {text:"/",color:"#D0D0D0"}',
-         'data modify storage rlk:bu line append value {score:{name:"#buMax",objective:"bu"},color:"#D0D0D0"}',
+         '# The nbt component joins the list as children of its first entry (a bar piece in font',
+         '# rlk:bossbar), so the numbers must name the default font or they inherit the bar font.',
+         'data modify storage rlk:bu line append value {score:{name:"#buHp",objective:"bu"},color:"white",font:"minecraft:default"}',
+         'data modify storage rlk:bu line append value {text:"/",color:"#D0D0D0",font:"minecraft:default"}',
+         'data modify storage rlk:bu line append value {score:{name:"#buMax",objective:"bu"},color:"#D0D0D0",font:"minecraft:default"}',
          '# forward to the bar end again: BAR/2 - w/2',
          f'scoreboard players set #len bu {BAR // 2}',
          'scoreboard players operation #len bu -= #half bu',

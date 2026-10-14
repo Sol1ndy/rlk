@@ -627,7 +627,7 @@
 - 보스바를 리소스팩 글꼴로 새로 그립니다(바닐라 막대는 흰색으로 지정해 투명 처리). 윗줄: **Lv.레벨 + 이름**(갑주 중에는 '· 번개 갑주', 무력화 중에는 '· 갑주 파괴'). 아랫줄: 200px 체력바 위에 **현재 체력/최대 체력** 숫자.
 - 체력이 깎이면 깎인 만큼은 **흰색**으로 남아 있다가, 0.8초 동안 피해가 들어오지 않으면 흰색이 줄어듭니다.
 - 체력바 바로 밑의 얇은 바: 갑주(보호막) = 원소 색(번개 보라), 평상시 = 악연의 에너지(금색), 변신 중 = 갑주 형성(보라), 무력화 = 회복까지 남은 시간(초록).
-- 생성: `python3 tools/build_bossbar.py --resourcepack <리소스팩>`. 다른 보스도 `#buHp #buMax #buSub #buSubMax #buSubCol` 를 채우고 `function rlk:bossui/draw` 뒤 보스바 이름을 `{nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""}` 로 두면 같은 바를 씁니다(색 번호: 1 번개 2 불 3 물 4 얼음 5 바위 6 바람 7 풀 8 금색 게이지 9 초록).
+- 생성: `python3 tools/build_bossbar.py --resourcepack <리소스팩>`. 다른 보스도 `#buHp #buMax #buSub #buSubMax #buSubCol` 를 채우고 `function rlk:bossui/draw` 뒤 보스바 이름을 `{nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""}` 로 두면 같은 바를 씁니다(색 번호: 1 번개 2 불 3 물 4 얼음 5 바위 6 바람 7 풀 8 금색 게이지 9 초록). 줄에 넣는 글자마다 글꼴을 적어야 합니다: nbt 텍스트는 목록의 2번째부터를 1번째(막대 조각, `rlk:bossbar` 글꼴)의 자식으로 붙이므로, 글꼴이 없으면 막대 글꼴을 물려받아 숫자가 네모로 나옵니다(체력 숫자는 `minecraft:default`).
 - 서버를 껐다 켜거나 다시 접속하면 첫 틱에 시점 엔티티(아바타·받침)를 새로 만듭니다(`view/fresh`). 재접속 직후 방향키가 로비 시작 버튼 쪽으로 붙던 문제 수정.
 
 ### 스커크 · 아를레키노 전용 무기 디자인

@@ -50,9 +50,11 @@ scoreboard players operation #half bu /= #2 bu
 scoreboard players set #len bu 100
 scoreboard players operation #len bu += #half bu
 function rlk:bossui/space_neg
-data modify storage rlk:bu line append value {score:{name:"#buHp",objective:"bu"},color:"white"}
-data modify storage rlk:bu line append value {text:"/",color:"#D0D0D0"}
-data modify storage rlk:bu line append value {score:{name:"#buMax",objective:"bu"},color:"#D0D0D0"}
+# The nbt component joins the list as children of its first entry (a bar piece in font
+# rlk:bossbar), so the numbers must name the default font or they inherit the bar font.
+data modify storage rlk:bu line append value {score:{name:"#buHp",objective:"bu"},color:"white",font:"minecraft:default"}
+data modify storage rlk:bu line append value {text:"/",color:"#D0D0D0",font:"minecraft:default"}
+data modify storage rlk:bu line append value {score:{name:"#buMax",objective:"bu"},color:"#D0D0D0",font:"minecraft:default"}
 # forward to the bar end again: BAR/2 - w/2
 scoreboard players set #len bu 100
 scoreboard players operation #len bu -= #half bu
