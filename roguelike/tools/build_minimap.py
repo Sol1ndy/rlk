@@ -10,8 +10,9 @@ boss bar (rlk:minimap, colour white, whose bar sprites this pack makes transpare
   advance (a 1/255-alpha pixel pins the width), shifted down 20 px per row via `ascent`:
   cell square, same-zone connectors (right / below), doors (right / below), player dot;
   plus space glyphs to overlay (-21), step one cell (+20), return a row (-120) and binary
-  position spaces: boss bar text is centred, so a total advance of 2x puts the map's left
-  edge at centre + x (#mmX, default top-left; /function rlk:minimap/pos {x:N}).
+  position spaces (all positive): boss bar text is centred and the rows return to their
+  start, so a trailing space of 2|x| (x < 0) or a leading one of 2x (x > 0) puts the map's
+  left edge at centre + x (#mmX, default top-left; /function rlk:minimap/pos {x:N}).
 - Glyphs are white; each text component's colour paints them: unexplored-but-open zones
   dim grey, explored zones light grey (special zones in their map colour), the zone the
   player stands in pale gold; open doors white, closed (unexplored) doors grey.
@@ -36,8 +37,9 @@ RP = Path(ap.parse_args().resourcepack)
 N = 6                  # grid size
 TILE = 20              # glyph tile (GUI px); cells are 18 px with a 2 px gap
 ADV = TILE + 1         # bitmap advance = pinned width 20 + 1
-DEFAULT_X = -370       # map's left edge relative to the screen centre (GUI px); top-left
-                       # on a ~770 px wide GUI (1920-2560 wide window at GUI scale 3).
+DEFAULT_X = -364       # map's left edge relative to the screen centre (GUI px): top-left
+                       # (6 px margin) on a ~740 px wide GUI, e.g. a 2220-2304 px window at GUI
+                       # scale 3, measured from the user's screenshot.
                        # Change in game: /function rlk:minimap/pos {x:-300}
 TOP_ASCENT = 7         # row 0 ascent; each next row TILE px lower
 MAX_ZONE = 12
@@ -48,10 +50,10 @@ BASE = 0xE300
 def glyph(row, t):
     return chr(BASE + row * 8 + TYPES.index(t))
 SP_BACK, SP_STEP, SP_ROW = chr(0xE3F0), chr(0xE3F1), chr(0xE3F2)
-# Position spaces: the text's total advance is the offset itself (rows return to their
-# start), and boss bar text is centred, so an advance of 2x puts the map at centre + x.
+# Position spaces (positive only, so the text never has a negative width): the rows return
+# to their start and boss bar text is centred at centre - width/2, so a trailing 2|x| puts
+# the map's left edge at centre + x for x < 0, a leading 2x does it for x > 0.
 SP_POS = {w: chr(0xE3A0 + k) for k, w in enumerate(OFFS)}
-SP_NEG = {w: chr(0xE3C0 + k) for k, w in enumerate(OFFS)}
 
 # Zone colour codes: 0 hidden, 1 open but not entered, 2 explored, 3 player inside, 4.. special
 COLORS = {1: '#5A5A5A', 2: '#B4B4B4', 3: '#FFE08A',
@@ -102,7 +104,7 @@ for r in range(N):
         providers.append({'type': 'bitmap', 'file': f'rlk:font/minimap/{t}.png',
                           'ascent': TOP_ASCENT - TILE * r, 'height': TILE, 'chars': [glyph(r, t)]})
 providers.append({'type': 'space', 'advances': {SP_BACK: -ADV, SP_STEP: TILE, SP_ROW: -TILE * N,
-                                                **{SP_POS[w]: w for w in OFFS}, **{SP_NEG[w]: -w for w in OFFS}}})
+                                                **{SP_POS[w]: w for w in OFFS}}})
 font = RP / 'assets/rlk/font/minimap.json'
 font.parent.mkdir(parents=True, exist_ok=True)
 font.write_text(json.dumps({'providers': providers}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
@@ -137,6 +139,9 @@ write('init', [
     '# Rebuild the cell table once after a reload (a map made before it has none).',
     'scoreboard players set #mmBuilt mm 0',
     f'execute unless score #mmX mm matches -1000..1000 run scoreboard players set #mmX mm {DEFAULT_X}',
+    '# New default position (version 2): the left edge at the top-left corner.',
+    f'execute unless score #mmXv mm matches 2 run scoreboard players set #mmX mm {DEFAULT_X}',
+    'scoreboard players set #mmXv mm 2',
 ])
 write('pos', [
     '# /function rlk:minimap/pos {x:N}: the map\'s left edge, GUI px from the screen centre',
@@ -147,20 +152,21 @@ write('pos', [
     'scoreboard players set #mmSig mm -1',
     'tellraw @s [{text:"[미니맵] ",color:"gold"},{text:"위치 x = ",color:"gray"},{score:{name:"#mmX",objective:"mm"},color:"white"}]',
 ])
+for name, d, word in (('left', -10, '왼쪽'), ('right', 10, '오른쪽')):
+    write(name, [f'# /function rlk:minimap/{name}: nudge the minimap 10 GUI px to the {name}.',
+                 f'scoreboard players add #mmX mm {d}',
+                 'execute if score #mmX mm matches ..-1001 run scoreboard players set #mmX mm -1000',
+                 'execute if score #mmX mm matches 1001.. run scoreboard players set #mmX mm 1000',
+                 'scoreboard players set #mmSig mm -1',
+                 'tellraw @s [{text:"[미니맵] ",color:"gold"},{text:"' + word + '으로 10칸 · 위치 x = ",color:"gray"},{score:{name:"#mmX",objective:"mm"},color:"white"}]'])
 write('offset', [
-    '# Append position spaces for an advance of 2 x #mmX (|#mmX| <= 1000).',
+    '# Append position spaces for an advance of 2 x |#mmX| (|#mmX| <= 1000): before the rows',
+    '# when #mmX > 0, after them when #mmX < 0 (see draw).',
     'scoreboard players operation #len mm = #mmX mm',
     'scoreboard players operation #len mm += #mmX mm',
-    'execute if score #len mm matches 1.. run return run function rlk:minimap/offset_pos',
-    'scoreboard players operation #len mm *= #neg mm',
-    'function rlk:minimap/offset_neg',
-])
-for sign, table in (('pos', SP_POS), ('neg', SP_NEG)):
-    lines = []
-    for w in OFFS:
-        lines.append(f'execute if score #len mm matches {w}.. run data modify storage rlk:mm line append value ' + '{text:"' + table[w] + '",font:"rlk:minimap"}')
-        lines.append(f'execute if score #len mm matches {w}.. run scoreboard players remove #len mm {w}')
-    write(f'offset_{sign}', lines)
+    'execute if score #len mm matches ..-1 run scoreboard players operation #len mm *= #neg mm',
+] + sum(([f'execute if score #len mm matches {w}.. run data modify storage rlk:mm line append value ' + '{text:"' + SP_POS[w] + '",font:"rlk:minimap"}',
+          f'execute if score #len mm matches {w}.. run scoreboard players remove #len mm {w}'] for w in OFFS), []))
 # build: which zone owns each cell, and same-zone connectors
 write('build', [
     '# After room/gen (zones summoned): cell -> zone id (#g<i>), same-zone connectors.',
@@ -262,7 +268,7 @@ draw += sum(([f'scoreboard players set #hd{i} mm 0', f'scoreboard players set #v
 draw += ['execute as @e[tag=rlk_door] run function rlk:minimap/door_slot',
          'data modify storage rlk:mm line set value []',
          'scoreboard players set #neg mm -1',
-         'function rlk:minimap/offset']
+         'execute if score #mmX mm matches 1.. run function rlk:minimap/offset']
 for r in range(N):
     for c in range(N):
         i = r * N + c
@@ -274,6 +280,7 @@ for r in range(N):
         draw.append(f'execute unless score #c mm matches 1.. if score #vd{i} mm matches 1.. run function rlk:minimap/c/{i}')
         draw.append('data modify storage rlk:mm line append value {text:"' + SP_STEP + '",font:"rlk:minimap"}')
     draw.append('data modify storage rlk:mm line append value {text:"' + SP_ROW + '",font:"rlk:minimap"}')
+draw.append('execute if score #mmX mm matches ..-1 run function rlk:minimap/offset')
 draw.append('bossbar set rlk:minimap name {nbt:"line[]",storage:"rlk:mm",interpret:true,separator:""}')
 write('draw', draw)
 for r in range(N):

@@ -92,7 +92,7 @@ scoreboard players set #vd35 mm 0
 execute as @e[tag=rlk_door] run function rlk:minimap/door_slot
 data modify storage rlk:mm line set value []
 scoreboard players set #neg mm -1
-function rlk:minimap/offset
+execute if score #mmX mm matches 1.. run function rlk:minimap/offset
 scoreboard players set #c mm 0
 execute if score #g0 mm matches 1 run scoreboard players operation #c mm = #zc1 mm
 execute if score #g0 mm matches 2 run scoreboard players operation #c mm = #zc2 mm
@@ -711,4 +711,5 @@ execute unless score #c mm matches 1.. if score #hd35 mm matches 1.. run functio
 execute unless score #c mm matches 1.. if score #vd35 mm matches 1.. run function rlk:minimap/c/35
 data modify storage rlk:mm line append value {text:"",font:"rlk:minimap"}
 data modify storage rlk:mm line append value {text:"",font:"rlk:minimap"}
+execute if score #mmX mm matches ..-1 run function rlk:minimap/offset
 bossbar set rlk:minimap name {nbt:"line[]",storage:"rlk:mm",interpret:true,separator:""}
