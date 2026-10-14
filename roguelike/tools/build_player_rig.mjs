@@ -139,7 +139,8 @@ function compileClip(char,name,clip){
  let lastWeapon;
  for(let t=0;t<=clip.length;t++){
   const current=sample(t),lines=[`# ${char} / ${name}: authored animation tick ${t}`,poseLines(current.pose,'$(step)',current.hidden)];
-  if(current.weapon!==lastWeapon)lines.push(weaponLines(current.weapon));
+  // The dash keeps whatever weapon the rig shows (spear or infused scythe, sword or cryo sword).
+  if(name!=='dash'&&current.weapon!==lastWeapon)lines.push(weaponLines(current.weapon));
   lastWeapon=current.weapon;fn(`${base}/pose/${t}`,lines.join('\n'));
   dispatch.push(`execute if score @s pmTick matches ${t} run function rlk:char/motion/${base}/pose/${t} with storage rlk:player_motion active`);
  }

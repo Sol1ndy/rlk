@@ -220,6 +220,19 @@
     "normal": false
   },
   {
+    "length": 10,
+    "chain_tick": 6,
+    "hit_ticks": [],
+    "source": "arle_dash",
+    "source_start": 4.225,
+    "source_end": 4.725,
+    "weapon": "spear",
+    "audio": false,
+    "char": "arle",
+    "name": "dash",
+    "normal": false
+  },
+  {
     "length": 13,
     "weapon": "sword",
     "source": "skirk_physical",
@@ -445,6 +458,20 @@
     "reference_observation": "User confirmed current datapack naming: Metsu is the damaging burst. Its visual source is the supplied file named 스커크 극악기 진.mp4.",
     "char": "skirk",
     "name": "burst_metsu",
+    "normal": false
+  },
+  {
+    "length": 10,
+    "weapon": "sword",
+    "source": "skirk_dash",
+    "source_start": 6.53,
+    "source_end": 7.02,
+    "hit_ticks": [],
+    "chain_tick": 6,
+    "audio": false,
+    "reference_observation": "User dash compilation 1f6c0cf5 (2026-10-13_17-37-38.mp4), Skirk segment 4.95-7.5 s; side-on dash 6.53-7.02 s: lean-forward bound, long low split glide with the near arm reaching forward and the far arm trailing, braking stance, upright recovery.",
+    "char": "skirk",
+    "name": "dash",
     "normal": false
   }
 ]
