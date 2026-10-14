@@ -160,9 +160,9 @@ function compileClip(char,name,clip){
   ]:[]),
   'execute if score @s pmSpeed matches ..24 run scoreboard players set @s pmSpeed 25','execute if score @s pmSpeed matches 501.. run scoreboard players set @s pmSpeed 500',
   'scoreboard players set @s pmAcc 0','scoreboard players set @s pmStep 99','scoreboard players operation @s pmStep += @s pmSpeed','scoreboard players operation @s pmStep /= @s pmSpeed',
-  `data modify storage rlk:player_motion active set value {char:"${char}",clip:"${name}",step:1,loop:${clip.loop?'1b':'0b'},lockedYaw:${name.startsWith('burst')?'1b':'0b'}}`,
+  `data modify storage rlk:player_motion active set value {char:"${char}",clip:"${name}",step:1,loop:${clip.loop?'1b':'0b'},lockedYaw:${name.startsWith('burst')||name==='dash'?'1b':'0b'}}`,
   'execute store result storage rlk:player_motion active.step int 1 run scoreboard players get @s pmStep',
-  ...(name.startsWith('burst')?[
+  ...(name.startsWith('burst')||name==='dash'?[
    'execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_pet","rlk_pm_basis"]}',
    'execute at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run tp @e[tag=rlk_pm_basis,limit=1] ~ ~ ~ ~ 0'
   ]:[]),
@@ -241,6 +241,15 @@ for(const block of blocks){const sprite='rlk:player_motion/'+block;atlas.sources
 for(const info of Object.values(characters))if(!atlas.sources.some(s=>s.type==='minecraft:single'&&s.resource==='rlk:skin/'+info.skin&&!s.sprite))atlas.sources.push({type:'minecraft:single',resource:'rlk:skin/'+info.skin});
 buildLocomotion({fn,poseLines,spawnLines,weaponLines,neutral,lerp,characters,here});
 // Dash: player/dash_go calls this; a character with a "dash" clip plays it (gameplay moves the body).
-fn('dash',['# @s = player, from player/dash_go: play the character dash clip when it has one.',...Object.entries(characters).filter(([c])=>{const src=path.join(here,'player_motion',c+'.json');return fs.existsSync(src)&&JSON.parse(fs.readFileSync(src,'utf8')).clips.dash;}).map(([c,info])=>`execute if score #charN tmp matches ${info.id} run function rlk:char/motion/start {char:"${c}",clip:"dash"}`)].join('\n'));
+// The clip's yaw is locked (like a burst) and its basis turned to the dash direction set by
+// player/dash_dir (dashUX/dashUZ, unit x100), so a sideways or backward dash leans that way.
+fn('dash',['# @s = player, from player/dash_go: play the character dash clip when it has one.',...Object.entries(characters).filter(([c])=>{const src=path.join(here,'player_motion',c+'.json');return fs.existsSync(src)&&JSON.parse(fs.readFileSync(src,'utf8')).clips.dash;}).map(([c,info])=>`execute if score #charN tmp matches ${info.id} run function rlk:char/motion/start {char:"${c}",clip:"dash"}`),
+ 'execute unless data storage rlk:player_motion active{clip:"dash"} run return 0',
+ 'execute store result storage rlk:player_motion face.dx double 0.01 run scoreboard players get @s dashUX',
+ 'execute store result storage rlk:player_motion face.dz double 0.01 run scoreboard players get @s dashUZ',
+ 'function rlk:char/motion/dash_face with storage rlk:player_motion face'].join('\n'));
+fn('dash_face',['# Turn the dash clip basis (and the rig) toward the dash direction.',
+ '$execute as @e[tag=rlk_pm_basis,limit=1] at @s run tp @s ~ ~ ~ facing ~$(dx) ~ ~$(dz)',
+ 'execute at @e[tag=rlk_av,limit=1] rotated as @e[tag=rlk_pm_basis,limit=1] rotated ~ 0 run tp @e[tag=rlk_pm] ~ ~ ~ ~ 0'].join('\n'));
 json(atlasPath,atlas);json(path.join(here,'player_motion/compiled_clips.json'),manifest);
 console.log(`Built articulated combat avatars and ${manifest.length} clips.`);
