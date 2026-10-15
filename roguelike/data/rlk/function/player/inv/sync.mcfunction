@@ -5,6 +5,6 @@ data modify storage rlk:pinv oscan set from storage rlk:pinv order
 data remove storage rlk:pinv pcnt
 function rlk:player/inv/order_rebuild_loop
 data modify storage rlk:pinv order set from storage rlk:pinv neworder
-# 1) order 에 없는 실물(새로 얻은 것) → order 뒤에 추가 (최대 9)
+# 1) order 에 없는 실물(새로 얻은 것) → order 뒤에 추가 (최대 invCap)
 data modify storage rlk:pinv cscan set from storage rlk:items ids
 function rlk:player/inv/collect_loop

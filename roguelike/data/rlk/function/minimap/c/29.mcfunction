@@ -21,5 +21,15 @@ execute if score #c mm matches 10 run data modify storage rlk:mm line append val
 execute if score #c mm matches 10 if score #vc29 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#B08A5A"}
 execute if score #c mm matches 11 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E05050"}
 execute if score #c mm matches 11 if score #vc29 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E05050"}
+execute if score #c mm matches 12 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#8FD46A"}
+execute if score #c mm matches 12 if score #vc29 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#8FD46A"}
+execute if score #c mm matches 13 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#D9D2B8"}
+execute if score #c mm matches 13 if score #vc29 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#D9D2B8"}
+execute if score #c mm matches 14 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#4FC3C9"}
+execute if score #c mm matches 14 if score #vc29 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#4FC3C9"}
+execute if score #c mm matches 15 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E06A8A"}
+execute if score #c mm matches 15 if score #vc29 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E06A8A"}
+execute if score #c mm matches 16 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#FFB347"}
+execute if score #c mm matches 16 if score #vc29 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#FFB347"}
 execute if score #vd29 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#8C8C8C"}
 execute if score #vd29 mm matches 2 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#FFFFFF"}

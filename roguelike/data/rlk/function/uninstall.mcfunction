@@ -90,6 +90,7 @@ clear @a *[minecraft:custom_data~{rlk_stat:1b}]
 clear @a *[minecraft:custom_data~{rlk_eng:1b}]
 clear @a *[minecraft:custom_data~{rlk_engi:1b}]
 clear @a *[minecraft:custom_data~{rlk_invd:1b}]
+clear @a *[minecraft:custom_data~{rlk_lock:1b}]
 clear @a *[minecraft:custom_data~{rlk_ui:{}}]
 clear @a *[minecraft:custom_data~{rlk:{}}]
 # 아이템 보유 플래그(it_<id>) 제거
@@ -315,6 +316,7 @@ scoreboard objectives remove init
 scoreboard objectives remove intOwner
 scoreboard objectives remove invCnt
 scoreboard objectives remove invDirty
+scoreboard objectives remove invCap
 scoreboard objectives remove invEvt
 scoreboard objectives remove iqK
 scoreboard objectives remove itv
@@ -434,6 +436,9 @@ scoreboard objectives remove rxEl
 scoreboard objectives remove rxQ
 scoreboard objectives remove sT
 scoreboard objectives remove sapphire
+scoreboard objectives remove dice
+scoreboard objectives remove nodeHp
+scoreboard objectives remove enhL
 scoreboard objectives remove scT
 scoreboard objectives remove scanTick
 scoreboard objectives remove sdelay

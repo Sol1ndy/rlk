@@ -7,9 +7,18 @@ execute if score @s pkMode matches 1.. run function rlk:lvup/exit
 function rlk:player/init
 function rlk:lvup/init
 scoreboard players set @s gold 0
+scoreboard players set @s dice 0
+scoreboard players set @s nodeHp 0
+scoreboard players set @s invCap 9
 # 아이템 전부 제거 + 인벤 시스템 상태 초기화
 clear @s
 data modify storage rlk:pinv order set value []
+# 아이템 강화 단계 (id → 0~3)
+data modify storage rlk:pinv enh set value {}
+scoreboard players reset * enhL
+function rlk:items/tune/reapply_all
+# 세계수의 기적 받은 각인
+data remove storage rlk:pinv mir
 data remove storage rlk:pinv pcnt
 function rlk:player/reset_stacks
 function rlk:element/infuse_end

@@ -1,0 +1,3 @@
+# macro: icon, name, color, n
+$summon minecraft:item_display ~ ~0.3 ~ {Tags:["rlk_pk","rlk_pk_d","rlk_pk_new"],Rotation:[180f,0f],brightness:{sky:15,block:15},item_display:"gui",glow_color_override:16768138,item:{id:"$(icon)",count:1},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.6f,0.6f,0.6f]}}
+$summon minecraft:text_display ~ ~-0.75 ~ {Tags:["rlk_pk"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:0,line_width:400,text:[{text:"◆ $(name)",color:"$(color)",bold:true},{text:"\n보유 $(n)개",color:"gray",bold:false}],transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.75f,0.75f,0.75f]}}

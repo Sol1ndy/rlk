@@ -62,10 +62,11 @@ SP_POS = {w: chr(0xE3A0 + k) for k, w in enumerate(OFFS)}
 # Zone colour codes: 0 hidden, 1 open but not entered, 2 explored, 3 player inside, 4.. special
 COLORS = {1: '#5A5A5A', 2: '#B4B4B4', 3: '#FFE08A',
           4: '#F0F0F0', 5: '#E0B255', 6: '#6FCF8F', 7: '#5B9BF0', 8: '#D65A5A',
-          9: '#B58BE8', 10: '#B08A5A', 11: '#E05050'}
+          9: '#B58BE8', 10: '#B08A5A', 11: '#E05050', 12: '#8FD46A', 13: '#D9D2B8',
+          14: '#4FC3C9', 15: '#E06A8A', 16: '#FFB347'}
 # zkind -> explored colour code (0 start, 1 combat, 2 last, 3 money, 4 shop, 5 sapphire,
-# 6 reforge, 7 enchant, 8 root, 9 boss, 10 levelup start)
-KIND_CODE = {2: 4, 3: 5, 4: 6, 5: 7, 6: 8, 7: 9, 8: 10, 9: 11}
+# 6 reforge, 7 enchant, 8 root, 9 boss, 10 levelup, 11 dice, 12 slot, 13 hp, 14 item)
+KIND_CODE = {2: 4, 3: 5, 4: 6, 5: 7, 6: 8, 7: 9, 8: 10, 9: 11, 10: 12, 11: 13, 12: 14, 13: 15, 14: 16}
 DOOR_COLORS = {1: '#8C8C8C', 2: '#FFFFFF'}
 DOT_COLOR = '#3A2A00'    # the player arrow
 PERIOD = 2               # ticks between minimap updates

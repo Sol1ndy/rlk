@@ -11,4 +11,11 @@ execute if score @s zkind matches 4 run function rlk:room/obj/k_shop
 execute if score @s zkind matches 5 run function rlk:room/obj/k_sapphire
 execute if score @s zkind matches 6 run function rlk:room/obj/k_reforge
 execute if score @s zkind matches 7 run function rlk:room/obj/k_enchant
+# 노드 구역(중간 구역): 8 나무뿌리, 10 레벨업(경험의 샘), 11 주사위, 12 보유 칸, 13 생명력, 14 아이템
+execute if score @s zkind matches 8 run function rlk:room/obj/k_root
+execute if score @s zkind matches 10 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_xpspot"]}
+execute if score @s zkind matches 11 run function rlk:room/obj/k_dice
+execute if score @s zkind matches 12 run function rlk:room/obj/k_slot
+execute if score @s zkind matches 13 run function rlk:room/obj/k_hp
+execute if score @s zkind matches 14 run function rlk:room/obj/k_item
 execute unless score #k10 snd matches 1 run function rlk:snd/f10

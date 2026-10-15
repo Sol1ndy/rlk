@@ -43,6 +43,26 @@ execute if score #c mm matches 11 run data modify storage rlk:mm line append val
 execute if score #c mm matches 11 if score #hc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E05050"}
 execute if score #c mm matches 11 if score #vc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E05050"}
 execute if score #c mm matches 11 if score #cc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E05050"}
+execute if score #c mm matches 12 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#8FD46A"}
+execute if score #c mm matches 12 if score #hc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#8FD46A"}
+execute if score #c mm matches 12 if score #vc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#8FD46A"}
+execute if score #c mm matches 12 if score #cc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#8FD46A"}
+execute if score #c mm matches 13 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#D9D2B8"}
+execute if score #c mm matches 13 if score #hc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#D9D2B8"}
+execute if score #c mm matches 13 if score #vc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#D9D2B8"}
+execute if score #c mm matches 13 if score #cc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#D9D2B8"}
+execute if score #c mm matches 14 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#4FC3C9"}
+execute if score #c mm matches 14 if score #hc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#4FC3C9"}
+execute if score #c mm matches 14 if score #vc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#4FC3C9"}
+execute if score #c mm matches 14 if score #cc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#4FC3C9"}
+execute if score #c mm matches 15 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E06A8A"}
+execute if score #c mm matches 15 if score #hc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E06A8A"}
+execute if score #c mm matches 15 if score #vc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E06A8A"}
+execute if score #c mm matches 15 if score #cc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E06A8A"}
+execute if score #c mm matches 16 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#FFB347"}
+execute if score #c mm matches 16 if score #hc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#FFB347"}
+execute if score #c mm matches 16 if score #vc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#FFB347"}
+execute if score #c mm matches 16 if score #cc6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#FFB347"}
 execute if score #hd6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#8C8C8C"}
 execute if score #vd6 mm matches 1 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#8C8C8C"}
 execute if score #hd6 mm matches 2 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#FFFFFF"}

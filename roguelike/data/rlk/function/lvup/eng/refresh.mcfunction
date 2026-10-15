@@ -5,6 +5,7 @@ scoreboard players reset * engAdd
 scoreboard players reset * engSub
 data modify storage rlk:lvpick iq set from storage rlk:pinv order
 function rlk:lvup/eng/cur_loop
+execute if data storage rlk:pinv mir run function rlk:engravings/mir_cur with storage rlk:pinv
 # 조준한 인벤 아이템
 execute store result storage rlk:lvpick a.h int 1 run scoreboard players get @s pkHI
 execute if score @s pkHK matches 2 run function rlk:lvup/eng/sub_inv with storage rlk:lvpick a

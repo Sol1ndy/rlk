@@ -11,4 +11,6 @@ data modify entity @e[tag=rlk_shop_info,tag=rlk_shop_new,limit=1] text set from 
 # 레전더리/신화: 드롭과 동일한 오라
 execute if data storage rlk:io {rarity:"legendary"} run tag @e[tag=rlk_shop_item,tag=rlk_shop_new] add rlk_shop_aura
 execute if data storage rlk:io {rarity:"mythic"} run tag @e[tag=rlk_shop_item,tag=rlk_shop_new] add rlk_shop_aura
+# 상점 노드의 진열대는 맵이 바뀌면 함께 사라진다(room/clear)
+execute if score #shopNode tmp matches 1 run tag @e[tag=rlk_shop_new] add rlk_room
 tag @e[tag=rlk_shop_new] remove rlk_shop_new

@@ -10,3 +10,7 @@ execute if score @s zkind matches 7 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:pur
 execute if score @s zkind matches 8 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:moss_block
 execute if score @s zkind matches 9 run fill ~-5 ~-1 ~-5 ~4 ~-1 ~4 minecraft:polished_granite
 execute if score @s zkind matches 10 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:lime_concrete
+execute if score @s zkind matches 11 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:white_concrete
+execute if score @s zkind matches 12 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:cyan_concrete
+execute if score @s zkind matches 13 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:pink_concrete
+execute if score @s zkind matches 14 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:blue_concrete

@@ -38,6 +38,8 @@ scoreboard objectives add uiHash dummy
 scoreboard objectives add scanTick dummy
 scoreboard objectives add manageTick dummy
 scoreboard objectives add invDirty dummy
+# 아이템 보유 칸 수 (9 = 둘째 줄, 최대 18 = 셋째 줄까지). 인벤토리 슬롯 노드가 2칸씩 연다
+scoreboard objectives add invCap dummy
 scoreboard objectives add invEvt dummy
 scoreboard objectives add invCnt dummy
 scoreboard objectives add hudKey dummy
@@ -140,6 +142,11 @@ scoreboard objectives add xp dummy
 scoreboard objectives add xpNeed dummy
 scoreboard objectives add xpDrop dummy
 scoreboard objectives add sapphire dummy
+# 주사위(레벨 업 아이템 선택의 리롤권, 런마다 0) · 생명력 노드로 늘어난 최대 체력 %(런마다 0)
+scoreboard objectives add dice dummy
+scoreboard objectives add nodeHp dummy
+# 아이템 강화 단계 (가짜 플레이어 = 아이템 id, 0~3. rlk:pinv enh 와 같음)
+scoreboard objectives add enhL dummy
 
 # 방어력 · 깡/% 누산기(작업용) / 장비 보너스
 scoreboard objectives add def dummy
@@ -1103,11 +1110,18 @@ scoreboard players set #lilyCdT tmp 20
 scoreboard players set #pkChoices tmp 3
 # 레벨 업 선택지 한 칸이 캐릭터일 확률(%). 한 번의 선택지 묶음에 캐릭터는 최대 하나, 지금 캐릭터는 나오지 않는다
 scoreboard players set #pkCharPct tmp 8
+# 레벨 업 아이템 선택의 리롤: 첫 번째 무료, 그 뒤로 주사위 #pkRerollDice 개씩 (#pkRerollStep/#pkRerollMax 는 예전 골드 비용, 지금은 안 씀)
+scoreboard players set #pkRerollDice tmp 1
 scoreboard players set #pkRerollStep tmp 50
 scoreboard players set #pkRerollMax tmp 200
 # 방 시스템: 돈 구역 골드(× 챕터) / 사파이어 구역 개수
 scoreboard players set #roomGold tmp 100
 scoreboard players set #roomSapphire tmp 2
+# 노드: 선택지에 노드가 2개 붙을 확률(%), 주사위 구역에서 얻는 주사위 수, 생명력 구역의 최대 체력 %, 보유 칸 구역에서 늘어나는 칸 수
+scoreboard players set #node2Pct tmp 25
+scoreboard players set #diceGain tmp 2
+scoreboard players set #hpNodePct tmp 10
+scoreboard players set #slotGain tmp 2
 
 # 원소 반응: 격변 반응의 기준 피해 = 공격력 × #reactBase%
 scoreboard players set #reactBase tmp 50
@@ -1116,6 +1130,7 @@ scoreboard players set #rxPlayerPct tmp 50
 
 # 상수
 scoreboard players set #1000 tmp 1000
+scoreboard players set #500 tmp 500
 scoreboard players set #100 tmp 100
 scoreboard players set #31 tmp 31
 scoreboard players set #neg1 tmp -1
@@ -1138,8 +1153,9 @@ scoreboard players set #st20 tmp 20
 scoreboard players set #st48 tmp 48
 scoreboard players set #st150 tmp 150
 
-# 보유 아이템 목록(획득순, 최대 9). 최초만 초기화
+# 보유 아이템 목록(획득순, 최대 invCap). 최초만 초기화
 execute unless data storage rlk:pinv order run data modify storage rlk:pinv order set value []
+execute unless data storage rlk:pinv enh run data modify storage rlk:pinv enh set value {}
 
 function rlk:element/setup
 function rlk:char/setup
@@ -1178,6 +1194,9 @@ team add rlk_stun
 team modify rlk_stun seeFriendlyInvisibles false
 kill @e[tag=rlk_view]
 function rlk:items/register
+function rlk:engravings/byeng_build
+# 아이템 너프 · 강화 배율(상수 기준값 잡기 + 강화 단계 반영 + 설명 숫자)
+function rlk:items/tune/register
 function rlk:char/reg_items
 # 아이템 선택 공간(검은 방)이 있는 청크는 항상 불러와 둔다
 execute in minecraft:overworld run forceload add 104 4
@@ -1190,6 +1209,7 @@ scoreboard players add #iver tmp 1
 execute store result storage rlk:items ver int 1 run scoreboard players get #iver tmp
 function rlk:shop/register
 function rlk:room/data
+function rlk:room/node/register
 execute unless score #active room matches 0.. run scoreboard players set #active room 0
 execute unless score #combat room matches 0.. run scoreboard players set #combat room 0
 execute unless score #setup room matches 0.. run scoreboard players set #setup room 0
@@ -1201,6 +1221,8 @@ execute unless data storage rlk:room {area:"s0"} run data modify storage rlk:roo
 # 접속 중인 플레이어 초기화
 execute as @a[tag=player] unless score @s init matches 1 run function rlk:player/init
 execute as @a[tag=player] unless score @s level matches 1.. run function rlk:player/init
+# 이미 초기화된 플레이어(업데이트 전 월드)도 보유 칸 수가 있게
+execute as @a[tag=player] unless score @s invCap matches 9..18 run scoreboard players set @s invCap 9
 
 # 리로드 시 재생성: 클릭 감지 인터랙션 / 체력바 / 몹 실드
 kill @e[type=minecraft:interaction,tag=atkBlock]
@@ -1224,7 +1246,7 @@ kill @e[tag=rlk_dbtn]
 kill @e[tag=rlk_dlbl]
 data modify storage rlk:ditems records set value {}
 
-tellraw @a [{"text":"[로그라이크] 시스템 로드 완료","color":"green"},{"text":" · 빌드 10-15","color":"gray"}]
+tellraw @a [{"text":"[로그라이크] 시스템 로드 완료","color":"green"},{"text":" · 빌드 10-15b","color":"gray"}]
 # 리로드 시 전원 강제 재스캔(새 objective/아이템 플래그 즉시 반영)
 execute as @a[tag=player] if score @s init matches 1 run function rlk:items/equip_scan
 scoreboard players set @a[tag=player] invDirty 2

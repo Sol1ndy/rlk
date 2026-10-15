@@ -10,3 +10,8 @@ execute if score #c mm matches 8 run data modify storage rlk:mm line append valu
 execute if score #c mm matches 9 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#B58BE8"}
 execute if score #c mm matches 10 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#B08A5A"}
 execute if score #c mm matches 11 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E05050"}
+execute if score #c mm matches 12 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#8FD46A"}
+execute if score #c mm matches 13 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#D9D2B8"}
+execute if score #c mm matches 14 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#4FC3C9"}
+execute if score #c mm matches 15 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#E06A8A"}
+execute if score #c mm matches 16 run data modify storage rlk:mm line append value {text:"",font:"rlk:minimap",color:"#FFB347"}

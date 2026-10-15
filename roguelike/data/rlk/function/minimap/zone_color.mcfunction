@@ -10,6 +10,11 @@ execute if score @s zst matches 2.. if score @s zkind matches 6 run scoreboard p
 execute if score @s zst matches 2.. if score @s zkind matches 7 run scoreboard players set #z mm 9
 execute if score @s zst matches 2.. if score @s zkind matches 8 run scoreboard players set #z mm 10
 execute if score @s zst matches 2.. if score @s zkind matches 9 run scoreboard players set #z mm 11
+execute if score @s zst matches 2.. if score @s zkind matches 10 run scoreboard players set #z mm 12
+execute if score @s zst matches 2.. if score @s zkind matches 11 run scoreboard players set #z mm 13
+execute if score @s zst matches 2.. if score @s zkind matches 12 run scoreboard players set #z mm 14
+execute if score @s zst matches 2.. if score @s zkind matches 13 run scoreboard players set #z mm 15
+execute if score @s zst matches 2.. if score @s zkind matches 14 run scoreboard players set #z mm 16
 execute if score @s zid = #pz mm run scoreboard players set #z mm 3
 execute if score @s zid matches 1 run scoreboard players operation #zc1 mm = #z mm
 execute if score @s zid matches 2 run scoreboard players operation #zc2 mm = #z mm
