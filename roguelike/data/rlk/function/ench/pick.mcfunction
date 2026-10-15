@@ -11,6 +11,8 @@ function rlk:items/enh_add with storage rlk:lvpick b
 # 남은 횟수 -1 (인챈트대의 oarg 도 같이)
 scoreboard players remove #enchN room 1
 execute as @e[tag=rlk_obj,scores={oact=5}] if score @s ogid = #enchG room run scoreboard players operation @s oarg = #enchN room
+execute store result storage rlk:room a.n int 1 run scoreboard players get #enchN room
+execute as @e[tag=rlk_olbl] if score @s ogid = #enchG room run function rlk:ench/label with storage rlk:room a
 scoreboard players set @s invDirty 2
 execute unless score #k350 snd matches 1 run function rlk:snd/f417
 execute unless score #k2 snd matches 1 run function rlk:snd/f415

@@ -3,6 +3,8 @@ scoreboard players add #shopcnt shopGid 1
 scoreboard players operation #sgid tmp = #shopcnt shopGid
 execute store result storage rlk:shop key int 1 run scoreboard players get #sgid tmp
 function rlk:shop/store_rec with storage rlk:shop
+# 상점 노드의 기록은 맵이 바뀔 때 지운다(room/clear → shop/node/forget)
+execute if score #shopNode tmp matches 1 run data modify storage rlk:shop nodekeys append from storage rlk:shop key
 data modify storage rlk:io rr set from storage rlk:io rarity
 function rlk:shop/get_price with storage rlk:io
 function rlk:shop/spawn_ent with storage rlk:io

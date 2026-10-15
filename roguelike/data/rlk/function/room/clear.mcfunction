@@ -4,6 +4,8 @@ function rlk:boss/raiden/cleanup
 execute as @e[tag=rlk_zone,scores={zst=1..}] run function rlk:room/zone_erase
 execute as @e[tag=rlk_door,scores={dst=1..}] run function rlk:room/door_erase with entity @s data
 kill @e[tag=rlk_room]
+# 상점 노드 진열대의 표시 기록
+function rlk:shop/node/forget
 execute positioned -64 180 -64 run kill @e[type=minecraft:arrow,dx=127,dy=40,dz=127]
 execute positioned -64 180 -64 run kill @e[type=minecraft:item,dx=127,dy=17,dz=127]
 execute positioned -64 198 -64 run kill @e[type=minecraft:experience_orb,dx=127,dy=20,dz=127]

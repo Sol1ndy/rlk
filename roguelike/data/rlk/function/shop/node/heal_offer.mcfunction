@@ -12,6 +12,7 @@ scoreboard players add #shopcnt shopGid 1
 scoreboard players operation #sgid tmp = #shopcnt shopGid
 execute store result storage rlk:shop key int 1 run scoreboard players get #sgid tmp
 function rlk:shop/store_rec with storage rlk:shop
+data modify storage rlk:shop nodekeys append from storage rlk:shop key
 function rlk:shop/spawn_ent with storage rlk:io
 execute as @e[tag=rlk_shop_new] run scoreboard players operation @s shopGid = #sgid tmp
 data modify entity @e[tag=rlk_shop_info,tag=rlk_shop_new,limit=1] text set from storage rlk:io name

@@ -7,6 +7,7 @@ $data modify storage rlk:io id set from storage rlk:pinv order[$(i)]
 function rlk:invd/price with storage rlk:io
 $data remove storage rlk:pinv order[$(i)]
 function rlk:player/inv/place_items
+function rlk:items/enh_forget with storage rlk:io
 scoreboard players set @s invDirty 2
 scoreboard players operation @s gold += #price tmp
 execute store result storage rlk:sell amt int 1 run scoreboard players get #price tmp

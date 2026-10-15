@@ -4,6 +4,8 @@ execute store result score #ck tmp run data get storage rlk:room wq[0].k
 scoreboard players set #cok tmp 1
 # 나무뿌리: 이번 판에 이미 기적을 받았으면 X
 execute if score #ck tmp matches 8 if score #mirUsed room matches 1.. run scoreboard players set #cok tmp 0
+# 나무뿌리: 지금 맵에 아직 쓰지 않은 나무뿌리가 있으면 다음 맵에는 안 낸다(둘 중 하나는 헛것이 됨)
+execute if score #ck tmp matches 8 if entity @e[tag=rlk_zone,scores={zkind=8}] run scoreboard players set #cok tmp 0
 # 보유 칸: 3챕터부터, 18칸 미만일 때만
 execute if score #ck tmp matches 12 if score #chapter room matches ..2 run scoreboard players set #cok tmp 0
 execute if score #ck tmp matches 12 if entity @a[tag=player,limit=1,scores={invCap=18..}] run scoreboard players set #cok tmp 0
