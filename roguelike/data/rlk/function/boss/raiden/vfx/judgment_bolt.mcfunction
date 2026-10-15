@@ -2,5 +2,5 @@ summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_s
 scoreboard players set @e[tag=rlk_rd_sfx_new] rdSfxAge -1
 scoreboard players set @e[tag=rlk_rd_sfx_new] rdSfxLife 7
 scoreboard players set @e[tag=rlk_rd_sfx_new] rdSfxKind 9
-execute if predicate {condition:"minecraft:random_chance",chance:0.5} run data modify entity @e[tag=rlk_rd_sfx_new,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/fx_signature/sky_bolt_1"
+execute if predicate {type:"minecraft:random_chance",chance:0.5} run data modify entity @e[tag=rlk_rd_sfx_new,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/fx_signature/sky_bolt_1"
 tag @e[tag=rlk_rd_sfx_new] remove rlk_rd_sfx_new

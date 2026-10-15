@@ -465,7 +465,7 @@ for name, kind, life in [('blink_arrive', 5, 10), ('blink_depart', 6, 7)]:
 write('armor_break', spawn('armor_break', 7, 15))
 write('judgment_ascend', spawn('ascend_pillar', 8, 28))
 write('judgment_bolt', spawn('sky_bolt_0', 9, 7, [
-    'execute if predicate {condition:"minecraft:random_chance",chance:0.5} run data modify entity @e[tag=rlk_rd_sfx_new,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/fx_signature/sky_bolt_1"',
+    'execute if predicate {type:"minecraft:random_chance",chance:0.5} run data modify entity @e[tag=rlk_rd_sfx_new,limit=1] item.components."minecraft:item_model" set value "rlk:raiden/fx_signature/sky_bolt_1"',
 ]))
 write('world', ['execute as @e[tag=rlk_rd_sfx] at @s run function rlk:boss/raiden/vfx/tick'])
 tick = [

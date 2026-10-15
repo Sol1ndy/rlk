@@ -8,7 +8,7 @@ execute if entity @s[tag=rlk_m_skel] run scoreboard players set @s xpDrop 4
 execute if entity @s[tag=rlk_m_vind] run scoreboard players set #mhp tmp 26
 execute if entity @s[tag=rlk_m_vind] run scoreboard players set #mad tmp 4
 execute if entity @s[tag=rlk_m_vind] run scoreboard players set @s xpDrop 8
-execute if entity @s[tag=rlk_m_boss] run scoreboard players set #mhp tmp 400
+execute if entity @s[tag=rlk_m_boss] run scoreboard players set #mhp tmp 267
 execute if entity @s[tag=rlk_m_boss] run scoreboard players set #mad tmp 6
 execute if entity @s[tag=rlk_m_boss] run scoreboard players set @s xpDrop 40
 # 1챕터 커스텀 몹(공격력 0: 모든 공격은 cm/* 함수가 직접)

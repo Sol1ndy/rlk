@@ -693,3 +693,13 @@
   - 아를레키노: 낫 손잡이를 자루 끝으로 밀어 쥐고 머리를 뒤로 끌며 뛰어나갑니다. 스커크: 칼을 뒤로 젖힌 채 낮게 다리를 벌려 미끄러지고, 멈추며 칼을 바깥으로 돌려 앞에 둡니다.
   - 대쉬 방향(이동 입력, 없으면 시선)을 향해 재생합니다(`char/motion/dash_face`). 무기는 그때 들고 있던 것을 그대로 씁니다(강화 상태의 낫 · 결정검 유지). 효과음·입자는 기존 대쉬 것만 씁니다. 대쉬 이동이 끝나면(3틱 뒤) 공격으로 바로 끊을 수 있습니다.
 - 키프레임 원본은 `tools/player_motion/arle.json`, `skirk.json`이고 `node tools/build_player_rig.mjs --resourcepack <리소스팩>`으로 다시 생성합니다. 일부 무기 각도는 ±180도를 넘는데, 보간이 짧은 쪽으로 돌도록 일부러 고른 값이니 정규화하지 마세요.
+
+### 콘솔 오류 정리 · 라이덴 체력 (2026-10-15)
+
+- 리로드할 때 로드에 실패하던 함수 3개를 고쳤습니다.
+  - `boss/raiden/vfx/judgment_bolt`: 즉석 조건의 키가 이 버전에서 `type`입니다(`{type:"minecraft:random_chance",chance:0.5}`).
+  - `char/motion/arle_fx/burst/40`: `minecraft:flash` 입자에 색이 필요합니다(`flash{color:[...]}`).
+  - `minimap/left`: `scoreboard players add`에는 음수를 쓸 수 없어 `remove 10`으로 바꿨습니다.
+- 평상시 콘솔을 채우던 `Failed to decode value '{extra:[],text:""}'`: 선택 화면 설명 창(`rlk_pk_tip`, `rlk_pk_tip2`)이 아무것도 조준하지 않을 때 빈 목록으로 글자를 만들던 것이 원인입니다. 비어 있으면 빈 글자로 둡니다(`lvup/tip/update`, `invd/tip2`, `codex/tip2`). 각인이 없는 아이템의 설명 줄도 같은 방식으로 막았습니다(`items/lore/engr`).
+- 라이덴(나루카미) 1레벨 기준 체력 400 → 267(2/3). 레벨에 따른 증가율은 그대로입니다(`room/mob_init`, 태그 `rlk_m_boss`).
+

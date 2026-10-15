@@ -186,7 +186,7 @@ write('pos', [
 ])
 for name, d, word in (('left', -10, '왼쪽'), ('right', 10, '오른쪽')):
     write(name, [f'# /function rlk:minimap/{name}: nudge the minimap 10 GUI px to the {name}.',
-                 f'scoreboard players add #mmX mm {d}',
+                 f'scoreboard players {"add" if d > 0 else "remove"} #mmX mm {abs(d)}',
                  'execute if score #mmX mm matches ..-1001 run scoreboard players set #mmX mm -1000',
                  'execute if score #mmX mm matches 1001.. run scoreboard players set #mmX mm 1000',
                  'scoreboard players set #mmSig mm -1',

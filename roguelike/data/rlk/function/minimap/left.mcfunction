@@ -1,5 +1,5 @@
 # /function rlk:minimap/left: nudge the minimap 10 GUI px to the left.
-scoreboard players add #mmX mm -10
+scoreboard players remove #mmX mm 10
 execute if score #mmX mm matches ..-1001 run scoreboard players set #mmX mm -1000
 execute if score #mmX mm matches 1001.. run scoreboard players set #mmX mm 1000
 scoreboard players set #mmSig mm -1
