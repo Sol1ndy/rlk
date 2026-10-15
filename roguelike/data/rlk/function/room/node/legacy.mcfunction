@@ -7,5 +7,6 @@ execute if score @s oarg matches 4 run data modify storage rlk:room next set val
 execute if score @s oarg matches 5 run data modify storage rlk:room next set value [8]
 execute if score @s oarg matches 6 run data modify storage rlk:room next set value [3]
 execute if score @s oarg matches 7 run data modify storage rlk:room next set value [7]
+function rlk:room/node/validate
 scoreboard players set #mapType room 1
 function rlk:run/next_map

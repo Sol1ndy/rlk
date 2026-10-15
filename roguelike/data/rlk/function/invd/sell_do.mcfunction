@@ -6,8 +6,9 @@ $execute unless data storage rlk:pinv order[$(i)] run return 0
 $data modify storage rlk:io id set from storage rlk:pinv order[$(i)]
 function rlk:invd/price with storage rlk:io
 $data remove storage rlk:pinv order[$(i)]
-function rlk:player/inv/place_items
+# 마지막 하나를 팔았으면 강화 단계도 지운다 (place_items 가 io 를 덮어쓰기 전에)
 function rlk:items/enh_forget with storage rlk:io
+function rlk:player/inv/place_items
 scoreboard players set @s invDirty 2
 scoreboard players operation @s gold += #price tmp
 execute store result storage rlk:sell amt int 1 run scoreboard players get #price tmp
