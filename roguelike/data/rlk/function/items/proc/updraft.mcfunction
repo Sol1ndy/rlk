@@ -1,8 +1,9 @@
-# @s = 플레이어, 위치 = 몸. 반경 4칸의 적을 띄워 올리고(보스 제외) 공격력의 150퍼센트 바람 원소 피해
+# @s = 플레이어, 위치 = 몸. 반경 4칸의 적을 띄워 올리고(보스 제외) 공격력의 #updraftCoef% 바람 원소 피해 (강화 단계로 조정)
 particle minecraft:gust_emitter_small ~ ~0.5 ~ 1.5 0.2 1.5 0 4
 execute unless score #k169 snd matches 1 run function rlk:snd/f180
 execute as @e[tag=rlk_mob,tag=!boss,distance=..4] run data merge entity @s {Motion:[0.0d,0.75d,0.0d]}
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:150}
+execute store result storage rlk:tune m_skyward_verse.coef int 1 run scoreboard players get #updraftCoef tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_skyward_verse
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 6

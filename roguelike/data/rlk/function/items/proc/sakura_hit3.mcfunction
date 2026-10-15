@@ -1,5 +1,7 @@
 execute unless score #k124 snd matches 1 run function rlk:snd/f132
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:65}
+# 피해 계수 = #sakCoef3 (그루 3개, 강화 단계로 조정)
+execute store result storage rlk:tune m_sesshou_sakura.coef int 1 run scoreboard players get #sakCoef3 tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_sesshou_sakura
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 3

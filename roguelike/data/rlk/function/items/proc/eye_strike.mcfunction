@@ -1,5 +1,6 @@
-# @s = 예약 표식, at @s. 뇌벌 악요의 눈 협동 공격: 반경 3칸에 공격력의 71% 번개 원소 피해 (치명타 판정 있음, 스킬 피해로 치지 않음)
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:71}
+# @s = 예약 표식, at @s. 뇌벌 악요의 눈 협동 공격: 반경 3칸에 공격력의 #eyeCoef% 번개 원소 피해 (강화 단계로 조정, 치명타 판정 있음, 스킬 피해로 치지 않음)
+execute store result storage rlk:tune m_stormy_eye.coef int 1 run scoreboard players get #eyeCoef tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_stormy_eye
 scoreboard players set #sub itv 1
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

@@ -1,5 +1,8 @@
 execute unless score #k168 snd matches 1 run function rlk:snd/f179
-execute as @a[tag=player,limit=1] run function rlk:items/calc_stat {obj:"def",pm:1000}
+# 방어력의 #dollPm‰ 바위 원소 피해
+data modify storage rlk:tune m_tailor_doll.obj set value "def"
+execute store result storage rlk:tune m_tailor_doll.pm int 1 run scoreboard players get #dollPm tmp
+execute as @a[tag=player,limit=1] run function rlk:items/calc_stat with storage rlk:tune m_tailor_doll
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 5

@@ -936,7 +936,8 @@ scoreboard players set #berTaken tmp 20
 scoreboard players set #berSpd tmp 30
 scoreboard players set #berT tmp 60
 # 아이템 수치 (설명 글은 각 아이템 def 에 따로 적혀 있으니 같이 고칠 것. 피해 계수는 items/proc/* 의 dmg_calc)
-scoreboard players set #hourglassCd tmp 5
+# #hourglassCd: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b2)
+scoreboard players set #hourglassCd tmp 50
 scoreboard players set #slatePct tmp 30
 scoreboard players set #pouchGold tmp 1
 scoreboard players set #herbPct tmp 50
@@ -949,7 +950,8 @@ scoreboard players set #potN tmp 4
 scoreboard players set #potGap tmp 25
 scoreboard players set #flagDur tmp 160
 scoreboard players set #flagAtk tmp 20
-scoreboard players set #flagHeal tmp 2
+# #flagHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b4)
+scoreboard players set #flagHeal tmp 20
 scoreboard players set #mapleDur tmp 160
 scoreboard players set #mapleDmg tmp 25
 scoreboard players set #mapleCdT tmp 280
@@ -960,11 +962,13 @@ scoreboard players set #quillDur tmp 200
 scoreboard players set #bunnyDur tmp 100
 scoreboard players set #bunnyCdT tmp 300
 scoreboard players set #talDur tmp 160
-scoreboard players set #talHeal tmp 2
+# #talHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b8)
+scoreboard players set #talHeal tmp 20
 scoreboard players set #talCdT tmp 10
 scoreboard players set #blossomDur tmp 400
 scoreboard players set #blossomCdT tmp 40
-scoreboard players set #huntPer tmp 3
+# #huntPer: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b5)
+scoreboard players set #huntPer tmp 30
 scoreboard players set #huntMax tmp 10
 scoreboard players set #thiefGold tmp 1
 scoreboard players set #thiefCdT tmp 20
@@ -973,7 +977,8 @@ scoreboard players set #blossomHit itv 0
 scoreboard players set #basic itv 0
 # 아이템 수치 2차 (설명 글은 각 아이템 def 에 따로 적혀 있으니 같이 고칠 것. 피해 계수는 items/proc/* 의 dmg_calc · calc_stat)
 scoreboard players set #jellyDur tmp 240
-scoreboard players set #jellyHeal tmp 2
+# #jellyHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b7)
+scoreboard players set #jellyHeal tmp 20
 scoreboard players set #gflagDur tmp 200
 scoreboard players set #gflagDef tmp 25
 scoreboard players set #gflagDmg tmp 15
@@ -990,10 +995,12 @@ scoreboard players set #chalDur tmp 160
 scoreboard players set #wispFuse tmp 30
 scoreboard players set #wispCdT tmp 80
 scoreboard players set #houndDur tmp 200
-scoreboard players set #houndHeal tmp 1
+# #houndHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b5)
+scoreboard players set #houndHeal tmp 10
 scoreboard players set #gringCost tmp 20
 scoreboard players set #gringDur tmp 240
-scoreboard players set #gringHeal tmp 2
+# #gringHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b4)
+scoreboard players set #gringHeal tmp 20
 scoreboard players set #vortexDur tmp 40
 scoreboard players set #muskAtk tmp 20
 scoreboard players set #muskDur tmp 160
@@ -1049,8 +1056,10 @@ scoreboard players set #omenDur tmp 160
 scoreboard players set #omenDmg tmp 20
 scoreboard players set #caseDur tmp 400
 scoreboard players set #seamDur tmp 280
-scoreboard players set #seamShield tmp 6
-scoreboard players set #seamHeal tmp 2
+# #seamShield: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b8)
+scoreboard players set #seamShield tmp 60
+# #seamHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b8)
+scoreboard players set #seamHeal tmp 20
 scoreboard players set #dragDur tmp 240
 scoreboard players set #dragRx tmp 25
 scoreboard players set #dragFire tmp 15
@@ -1059,14 +1068,17 @@ scoreboard players set #tenguAtk tmp 15
 scoreboard players set #operaDur tmp 240
 scoreboard players set #operaMax tmp 20
 scoreboard players set #operaPm tmp 300
-scoreboard players set #barAdd tmp 2
+# #barAdd: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b4)
+scoreboard players set #barAdd tmp 20
 scoreboard players set #barCap tmp 12
 scoreboard players set #barCdT tmp 10
-scoreboard players set #nightShield tmp 8
+# #nightShield: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b5)
+scoreboard players set #nightShield tmp 80
 scoreboard players set #nightDur tmp 240
 scoreboard players set #genieDur tmp 200
 scoreboard players set #genieEnergy tmp 400
-scoreboard players set #genieHeal tmp 2
+# #genieHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b4)
+scoreboard players set #genieHeal tmp 20
 scoreboard players set #kinDur tmp 100
 scoreboard players set #kinAtk tmp 15
 scoreboard players set #orbCdT tmp 60
@@ -1077,7 +1089,8 @@ scoreboard players set #neg1 tmp -1
 # 아이템 수치 4차 (설명 글은 각 아이템 def 에 따로 적혀 있으니 같이 고칠 것. 피해 계수·회복 계수는 items/proc/*)
 scoreboard players set #beadsHeal tmp 15
 scoreboard players set #thimbleDmg tmp 8
-scoreboard players set #bracerRes tmp 6
+# #bracerRes: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b1)
+scoreboard players set #bracerRes tmp 60
 scoreboard players set #inkBol tmp 15
 scoreboard players set #maidCdT tmp 40
 scoreboard players set #cocktailSpd tmp 10
@@ -1099,9 +1112,11 @@ scoreboard players set #pillowSpd tmp 10
 scoreboard players set #loomDur tmp 160
 scoreboard players set #loomEm tmp 150
 scoreboard players set #mechCdT tmp 60
-scoreboard players set #gourdHeal tmp 2
+# #gourdHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b9)
+scoreboard players set #gourdHeal tmp 20
 scoreboard players set #gourdDmg tmp 15
-scoreboard players set #lionRes tmp 15
+# #lionRes: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b1)
+scoreboard players set #lionRes tmp 150
 scoreboard players set #lionCdT tmp 40
 scoreboard players set #cmoonMax tmp 45
 scoreboard players set #lilyDur tmp 240
