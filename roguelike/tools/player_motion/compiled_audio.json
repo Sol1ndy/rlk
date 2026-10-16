@@ -549,6 +549,75 @@
             "layer": "last_ash_fragment"
           }
         ]
+      },
+      "sheathe": {
+        "playback_rate": 100,
+        "hit_ticks": [],
+        "layers": [
+          {
+            "tick": 12,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.2,
+            "pitch": 1.5,
+            "layer": "putaway_swish"
+          },
+          {
+            "tick": 21,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.17,
+            "pitch": 1.6,
+            "layer": "putaway_swish"
+          },
+          {
+            "tick": 31,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.14,
+            "pitch": 1.7,
+            "layer": "putaway_swish"
+          },
+          {
+            "tick": 36,
+            "event": "block.fire.extinguish",
+            "volume": 0.15,
+            "pitch": 1.8,
+            "layer": "dissolve_sizzle"
+          },
+          {
+            "tick": 36,
+            "event": "block.amethyst_block.resonate",
+            "volume": 0.35,
+            "pitch": 1.6,
+            "layer": "dissolve_shimmer"
+          },
+          {
+            "tick": 40,
+            "event": "block.amethyst_block.chime",
+            "volume": 0.45,
+            "pitch": 1.7,
+            "layer": "gold_takeover_tick"
+          },
+          {
+            "tick": 45,
+            "event": "block.amethyst_cluster.break",
+            "volume": 0.28,
+            "pitch": 1.6,
+            "layer": "gold_shatter"
+          },
+          {
+            "tick": 49,
+            "event": "item.armor.equip_iron",
+            "volume": 0.4,
+            "pitch": 1.3,
+            "layer": "back_reform_clink"
+          },
+          {
+            "tick": 49,
+            "event": "block.enchantment_table.use",
+            "volume": 0.35,
+            "pitch": 1.6,
+            "layer": "back_reform_shimmer"
+          }
+        ]
       }
     },
     "skirk": {
@@ -1097,11 +1166,76 @@
             "layer": "rift-crystal-tail"
           }
         ]
+      },
+      "sheathe": {
+        "playback_rate": 100,
+        "hit_ticks": [],
+        "layers": [
+          {
+            "tick": 6,
+            "event": "entity.breeze.slide",
+            "volume": 0.05,
+            "pitch": 1.6,
+            "layer": "lift-air"
+          },
+          {
+            "tick": 11,
+            "event": "item.armor.equip_diamond",
+            "volume": 0.16,
+            "pitch": 1.7,
+            "layer": "point-down-tap"
+          },
+          {
+            "tick": 24,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.16,
+            "pitch": 1.5,
+            "layer": "wheel-whoosh"
+          },
+          {
+            "tick": 30,
+            "event": "entity.breeze.slide",
+            "volume": 0.12,
+            "pitch": 1.4,
+            "layer": "raise-flick"
+          },
+          {
+            "tick": 38,
+            "event": "block.amethyst_block.resonate",
+            "volume": 0.07,
+            "pitch": 1.4,
+            "layer": "float-shimmer"
+          },
+          {
+            "tick": 40,
+            "event": "entity.breeze.slide",
+            "volume": 0.06,
+            "pitch": 1.9,
+            "layer": "float-turn"
+          },
+          {
+            "tick": 43,
+            "event": "entity.breeze.slide",
+            "volume": 0.04,
+            "pitch": 2.0,
+            "layer": "dissolve-breath"
+          },
+          {
+            "tick": 48,
+            "event": "block.enchantment_table.use",
+            "volume": 0.12,
+            "pitch": 1.6,
+            "layer": "back-reform-shimmer"
+          }
+        ]
       }
     }
   },
   "sound_events": [
+    "block.amethyst_block.chime",
     "block.amethyst_block.resonate",
+    "block.amethyst_cluster.break",
+    "block.enchantment_table.use",
     "block.fire.extinguish",
     "block.heavy_core.hit",
     "block.respawn_anchor.charge",
@@ -1112,6 +1246,8 @@
     "entity.enderman.teleport",
     "entity.generic.explode",
     "entity.player.attack.sweep",
+    "item.armor.equip_diamond",
+    "item.armor.equip_iron",
     "item.firecharge.use",
     "item.mace.smash_ground_heavy",
     "item.spear.attack",
