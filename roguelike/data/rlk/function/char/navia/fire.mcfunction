@@ -1,5 +1,5 @@
-# 결정 축포 발사 (@s = 플레이어, at 몸, 플레이어 시선 방향): 결정 파편을 모두 소모 → 장미탄 5/7/9/11발(꿰뚫음) → 적마다 맞은 발수로 피해
-# 모션 이벤트가 발사 틱에 부른다(events/navia/skill 7틱 · skill_fire 3틱). 충전은 누른 순간 char/navia/spend 가 소모
+# 결정 축포 발사 (@s = 플레이어, at 몸, 발사 방향 = char/navia/fire_dir 가 정함): 결정 파편을 모두 소모 → 장미탄 5/7/9/11발(꿰뚫음) → 적마다 맞은 발수로 피해
+# 모션 이벤트가 발사 틱에 char/navia/fire_dir 로 부른다(events/navia/skill 7틱 · skill_fire 3틱). 충전은 누른 순간 char/navia/spend 가 소모
 scoreboard players set @s nvShot 0
 scoreboard players operation #nvU tmp = @s nvS
 scoreboard players set @s nvS 0
@@ -31,10 +31,13 @@ execute unless score @s pmVisible matches 1 unless entity @e[tag=rlk_nvgun,limit
 execute unless score @s pmVisible matches 1 run scoreboard players set @s nvGun 14
 # 우산이 펴진다
 execute unless score @s pmVisible matches 1 run function rlk:char/navia/gun_open
-execute positioned ~ ~1.62 ~ run particle minecraft:explosion ^ ^-0.2 ^1.4 0 0 0 0 1
-execute positioned ~ ~1.62 ~ run particle minecraft:wax_on ^ ^-0.2 ^1.6 0.4 0.4 0.4 0 16
+# 총구 효과(금빛 별 섬광 · 빛무리 · 원뿔 끝 고리 카드 + 폭발 · 반짝임 입자): 숄더뷰는 몸 디스플레이의 우산 끝, 1인칭은 블록 우산총 끝
+execute if score @s pmVisible matches 1 positioned ~ ~1.12 ~ positioned ^-0.3 ^ ^ run function rlk:char/navia/muzzle_rig
+execute unless score @s pmVisible matches 1 positioned ~ ~1.62 ~ positioned ^-0.42 ^-0.46 ^ run function rlk:char/navia/muzzle_fp
+# 발사음: 폭죽 폭발(갈라지는 소리) · 폭발(몸통) · 자수정 깨짐(결정 파편) + 낮은 바람 폭발(압력 쿵)
 execute unless score #k226 snd matches 1 run function rlk:snd/f250
 execute unless score #k37 snd matches 1 run function rlk:snd/f251
 execute unless score #k142 snd matches 1 run function rlk:snd/f252
+execute unless score #k351 snd matches 1 run function rlk:snd/f421
 function rlk:items/hook/on_cast_skill
 function rlk:combat/on_skill

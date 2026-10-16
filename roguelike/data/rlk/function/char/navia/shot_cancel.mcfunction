@@ -5,5 +5,6 @@ execute if score @s dead matches 1 run scoreboard players set #nvFire tmp 0
 execute if score @s pkMode matches 1.. run scoreboard players set #nvFire tmp 0
 execute unless score #charN tmp matches 6 run scoreboard players set #nvFire tmp 0
 execute unless entity @e[tag=rlk_body,limit=1] run scoreboard players set #nvFire tmp 0
-execute if score #nvFire tmp matches 1 at @e[tag=rlk_body,limit=1] rotated as @s run function rlk:char/navia/fire
+# 방향은 char/navia/fire_dir 가 정한다(방향 고정 클립은 몸이 바라보는 기준 방향, 아니면 시선)
+execute if score #nvFire tmp matches 1 run function rlk:char/navia/fire_dir
 scoreboard players set @s nvShot 0
