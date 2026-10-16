@@ -1,4 +1,56 @@
-# Navia burst fx (owner: burst). PLACEHOLDER gold sparks; one tNNN file per authored tick, particles only,
-# ^left ^up ^forward from the feet in the clip yaw (pitch 0). Gold Geo colours #F6D57A / #E9B949 / #FFF3C4.
+# Navia burst fx (owner: burst). One tNNN file per authored tick; particles and gold cards (rlk:fx/nv/card),
+# ^left ^up ^forward from the feet in the locked basis yaw (pitch 0). Gold Geo #F6D57A / #E9B949 / #FFF3C4 cores.
+# Written by the burst authoring script from the clip poses (parasol rim, muzzle, hand, back mount).
+execute if score @s pmTick matches 0 run function rlk:char/motion/navia_fx/burst/t000
+execute if score @s pmTick matches 1 run function rlk:char/motion/navia_fx/burst/t001
+execute if score @s pmTick matches 2 run function rlk:char/motion/navia_fx/burst/t002
 execute if score @s pmTick matches 3 run function rlk:char/motion/navia_fx/burst/t003
+execute if score @s pmTick matches 4 run function rlk:char/motion/navia_fx/burst/t004
+execute if score @s pmTick matches 5 run function rlk:char/motion/navia_fx/burst/t005
+execute if score @s pmTick matches 6 run function rlk:char/motion/navia_fx/burst/t006
+execute if score @s pmTick matches 7 run function rlk:char/motion/navia_fx/burst/t007
+execute if score @s pmTick matches 8 run function rlk:char/motion/navia_fx/burst/t008
+execute if score @s pmTick matches 9 run function rlk:char/motion/navia_fx/burst/t009
+execute if score @s pmTick matches 10 run function rlk:char/motion/navia_fx/burst/t010
+execute if score @s pmTick matches 11 run function rlk:char/motion/navia_fx/burst/t011
+execute if score @s pmTick matches 12 run function rlk:char/motion/navia_fx/burst/t012
+execute if score @s pmTick matches 13 run function rlk:char/motion/navia_fx/burst/t013
+execute if score @s pmTick matches 14 run function rlk:char/motion/navia_fx/burst/t014
+execute if score @s pmTick matches 15 run function rlk:char/motion/navia_fx/burst/t015
+execute if score @s pmTick matches 16 run function rlk:char/motion/navia_fx/burst/t016
+execute if score @s pmTick matches 17 run function rlk:char/motion/navia_fx/burst/t017
+execute if score @s pmTick matches 18 run function rlk:char/motion/navia_fx/burst/t018
+execute if score @s pmTick matches 19 run function rlk:char/motion/navia_fx/burst/t019
+execute if score @s pmTick matches 20 run function rlk:char/motion/navia_fx/burst/t020
+execute if score @s pmTick matches 21 run function rlk:char/motion/navia_fx/burst/t021
+execute if score @s pmTick matches 22 run function rlk:char/motion/navia_fx/burst/t022
+execute if score @s pmTick matches 23 run function rlk:char/motion/navia_fx/burst/t023
+execute if score @s pmTick matches 24 run function rlk:char/motion/navia_fx/burst/t024
+execute if score @s pmTick matches 25 run function rlk:char/motion/navia_fx/burst/t025
+execute if score @s pmTick matches 26 run function rlk:char/motion/navia_fx/burst/t026
+execute if score @s pmTick matches 27 run function rlk:char/motion/navia_fx/burst/t027
+execute if score @s pmTick matches 28 run function rlk:char/motion/navia_fx/burst/t028
+execute if score @s pmTick matches 29 run function rlk:char/motion/navia_fx/burst/t029
+execute if score @s pmTick matches 30 run function rlk:char/motion/navia_fx/burst/t030
+execute if score @s pmTick matches 31 run function rlk:char/motion/navia_fx/burst/t031
+execute if score @s pmTick matches 32 run function rlk:char/motion/navia_fx/burst/t032
+execute if score @s pmTick matches 33 run function rlk:char/motion/navia_fx/burst/t033
 execute if score @s pmTick matches 34 run function rlk:char/motion/navia_fx/burst/t034
+execute if score @s pmTick matches 35 run function rlk:char/motion/navia_fx/burst/t035
+execute if score @s pmTick matches 36 run function rlk:char/motion/navia_fx/burst/t036
+execute if score @s pmTick matches 37 run function rlk:char/motion/navia_fx/burst/t037
+execute if score @s pmTick matches 38 run function rlk:char/motion/navia_fx/burst/t038
+execute if score @s pmTick matches 39 run function rlk:char/motion/navia_fx/burst/t039
+execute if score @s pmTick matches 40 run function rlk:char/motion/navia_fx/burst/t040
+execute if score @s pmTick matches 41 run function rlk:char/motion/navia_fx/burst/t041
+execute if score @s pmTick matches 42 run function rlk:char/motion/navia_fx/burst/t042
+execute if score @s pmTick matches 43 run function rlk:char/motion/navia_fx/burst/t043
+execute if score @s pmTick matches 44 run function rlk:char/motion/navia_fx/burst/t044
+execute if score @s pmTick matches 45 run function rlk:char/motion/navia_fx/burst/t045
+execute if score @s pmTick matches 46 run function rlk:char/motion/navia_fx/burst/t046
+execute if score @s pmTick matches 47 run function rlk:char/motion/navia_fx/burst/t047
+execute if score @s pmTick matches 48 run function rlk:char/motion/navia_fx/burst/t048
+execute if score @s pmTick matches 49 run function rlk:char/motion/navia_fx/burst/t049
+execute if score @s pmTick matches 50 run function rlk:char/motion/navia_fx/burst/t050
+execute if score @s pmTick matches 51 run function rlk:char/motion/navia_fx/burst/t051
+execute if score @s pmTick matches 52 run function rlk:char/motion/navia_fx/burst/t052

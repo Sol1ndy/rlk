@@ -1,0 +1,19 @@
+# barrage shell (cosmetic): comet streak
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-1 ^4.2 ^4.5 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-1.133 ^3.85 ^4.592 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-1.267 ^3.5 ^4.683 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-1.4 ^3.15 ^4.775 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-1.533 ^2.8 ^4.867 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-1.667 ^2.45 ^4.958 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-1.8 ^2.1 ^5.05 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-1.933 ^1.75 ^5.142 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-2.067 ^1.4 ^5.233 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-2.2 ^1.05 ^5.325 0 0 0 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:1.2} ^-2.333 ^0.7 ^5.417 0 0 0 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:1.2} ^-2.467 ^0.35 ^5.508 0 0 0 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:1.2} ^-2.6 ^0 ^5.6 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.55} ^-0.528 ^0.407 ^0.2 0.02 0.02 0.02 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.55} ^-0.124 ^0.63 ^-0.207 0.02 0.02 0.02 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.55} ^-0.364 ^1.139 ^-0.454 0.02 0.02 0.02 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.55} ^-0.918 ^1.23 ^-0.201 0.02 0.02 0.02 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.55} ^-1.018 ^0.778 ^0.203 0.02 0.02 0.02 0 1 normal

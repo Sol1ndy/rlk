@@ -514,15 +514,14 @@
   {
     "weapon": "navia_parasol_open",
     "weapon_state": "drawn",
+    "draw_fx": false,
     "length": 54,
     "activation_tick": 34,
     "hit_ticks": [
       34
     ],
     "chain_tick": 50,
-    "status": "placeholder",
-    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
-    "source": "v1 (burst; v6 back view), compressed",
+    "source": "v1 rel 0 = f19 (front; cast, shoulder rest, blast 34) + v6 (back view, put-away, halberd re-form on the back), compressed",
     "char": "navia",
     "name": "burst",
     "normal": false
