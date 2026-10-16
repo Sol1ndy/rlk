@@ -6,5 +6,6 @@ function rlk:char/motion/audio/navia/physical_1
 # Retime (Genshin recovery): the tail after the chain tick plays out to IDLE_D unless the player acts.
 # Keep the string alive while the tail plays (player/tick resets comboStep after 20 idle ticks).
 scoreboard players set @s cboIdle 0
-# Moving or jumping from the chain tick on ends the recovery (Genshin walk-cancel); drawn locomotion takes over.
-execute if score @s pmTick matches 14.. if score @s pmVisible matches 1 unless score @s pmWantMode matches 0 run return run function rlk:char/motion/finish
+# Moving or jumping ends the recovery (Genshin walk-cancel) once a chained click would be accepted (#pmChainOpen,
+# player/tick: game tick ceil(100*chain/pmSpeed) after the click, any attack speed); drawn locomotion takes over.
+execute if score @s pmTick matches 14.. if score #pmChainOpen tmp matches 1 if score @s pmVisible matches 1 unless score @s pmWantMode matches 0 run return run function rlk:char/motion/finish

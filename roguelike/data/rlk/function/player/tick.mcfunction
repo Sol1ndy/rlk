@@ -44,6 +44,10 @@ execute at @s run function rlk:player/hotbar/tick
 
 # 공격 쿨다운 / 콤보 유지시간
 execute if score @s uiCd matches 1.. run scoreboard players remove @s uiCd 1
+# #pmChainOpen 1 = atkCD was already 0 before this tick's decrement, so a click this tick was accepted (it arrives
+# before the tick functions). Navia's normal-attack tails end on movement only from then on, never one tick before
+# the earliest chained click (char/motion/events/navia/physical_1..4).
+execute store result score #pmChainOpen tmp unless score @s atkCD matches 1..
 execute if score @s atkCD matches 1.. run scoreboard players remove @s atkCD 1
 scoreboard players add @s cboIdle 1
 execute if score @s pmActive matches 1 if score @s atkCD matches 1.. run scoreboard players set @s cboIdle 0

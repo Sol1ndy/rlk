@@ -35,19 +35,19 @@ execute if score @s pmTick matches 16 run playsound minecraft:item.trident.ripti
 # eruption crash
 execute if score @s pmTick matches 17 run playsound minecraft:block.amethyst_block.break player @s ~ ~ ~ 0.3 0.9 0
 # canopy opens
-execute if score @s pmTick matches 22 run playsound minecraft:item.armor.equip_elytra player @s ~ ~ ~ 0.4 1.3 0
+execute if score @s pmTick matches 21 run playsound minecraft:item.armor.equip_elytra player @s ~ ~ ~ 0.4 1.3 0
 # float tone low
-execute if score @s pmTick matches 24 run playsound minecraft:block.note_block.flute player @s ~ ~ ~ 0.1 0.54 0
+execute if score @s pmTick matches 22 run playsound minecraft:block.note_block.flute player @s ~ ~ ~ 0.1 0.54 0
 # float tone high
-execute if score @s pmTick matches 24 run playsound minecraft:block.note_block.flute player @s ~ ~ ~ 0.08 0.81 0
+execute if score @s pmTick matches 22 run playsound minecraft:block.note_block.flute player @s ~ ~ ~ 0.08 0.81 0
 # landing
 execute if score @s pmTick matches 28 run playsound minecraft:block.stone.step player @s ~ ~ ~ 0.35 0.9 0
 # landing cloth
 execute if score @s pmTick matches 28 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.22 1.1 0
 # canopy twirl
-execute if score @s pmTick matches 33 run playsound minecraft:entity.breeze.slide player @s ~ ~ ~ 0.12 1.3 0
+execute if score @s pmTick matches 32 run playsound minecraft:entity.breeze.slide player @s ~ ~ ~ 0.12 1.3 0
 # parasol closes
-execute if score @s pmTick matches 37 run playsound minecraft:item.crossbow.loading_end player @s ~ ~ ~ 0.28 1.6 0
+execute if score @s pmTick matches 36 run playsound minecraft:item.crossbow.loading_end player @s ~ ~ ~ 0.28 1.6 0
 # parasol dissolves
 execute if score @s pmTick matches 42 run playsound minecraft:block.amethyst_block.resonate player @s ~ ~ ~ 0.2 1.6 0
 # halberd re-forms

@@ -31,8 +31,8 @@ execute if score @s pmTick matches 25 run function rlk:char/motion/navia_fx/phys
 execute if score @s pmTick matches 26 run function rlk:char/motion/navia_fx/physical_4/t026
 execute if score @s pmTick matches 27 run function rlk:char/motion/navia_fx/physical_4/t027
 execute if score @s pmTick matches 28 run function rlk:char/motion/navia_fx/physical_4/t028
-execute if score @s pmTick matches 33 run function rlk:char/motion/navia_fx/physical_4/t033
-execute if score @s pmTick matches 37 run function rlk:char/motion/navia_fx/physical_4/t037
+execute if score @s pmTick matches 32 run function rlk:char/motion/navia_fx/physical_4/t032
+execute if score @s pmTick matches 36 run function rlk:char/motion/navia_fx/physical_4/t036
 execute if score @s pmTick matches 42 run function rlk:char/motion/navia_fx/physical_4/t042
 execute if score @s pmTick matches 45 run function rlk:char/motion/navia_fx/physical_4/t045
 execute if score @s pmTick matches 48 run function rlk:char/motion/navia_fx/physical_4/t048
