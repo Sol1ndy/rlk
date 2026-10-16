@@ -6,16 +6,18 @@ import path from 'node:path';
 //  pmSheath 0 drawn (in hand) | 1 sheathed (on the back) | 2 put-away clip running; unset counts as 1
 //  pmShT    countdown to putting the weapon away; runs only while drawn and no clip is active
 //  pmLocS   sheath state the current loco cycle was begun with (a change restarts the cycle)
-//  pmShFx   quick-stow visual: weapon hidden, then it grows on the back
+//  pmShFx   quick-stow visual: weapon hidden, then it re-forms on the back (<char>.json sheath.grow)
 //  pmWAt    weapon attach currently displayed (0 hand, 1 back, 2 world); a change snaps the weapon
 export const locomotionObjectives=['pmVisible','pmRigChar','pmLocMode','pmWantMode','pmLocT','pmLocAcc','pmLocSpeed','pmBlend','pmPX','pmPZ','pmPosValid','pmWeapon','pmWantW','pmSheath','pmShT','pmLocS','pmShFx','pmWAt'];
 // Ticks a drawn weapon stays out after the last drawn clip (#pmShDelay tmp); <char>.json sheath.delay overrides.
 const SHEATH_DELAY=100;
-export function buildLocomotion({fn,poseLines,spawnLines,weaponLines,neutral,lerp,characters,here,rigPose,transform,handSpark,backSpark,local,arr}){
+// Ticks of the quick-stow visual (pmShFx): the weapon stays hidden, then re-forms on the back in the last ticks.
+const STOW_FX=8;
+export function buildLocomotion({fn,poseLines,spawnLines,weaponLines,neutral,lerp,characters,here,rigPose,transform,handSpark,backSpark,arr}){
  const source=JSON.parse(fs.readFileSync(path.join(here,'player_motion/locomotion.json'),'utf8'));
  const modes=['idle','walk','run','air'];
  for(const char of Object.keys(source.characters))if(!characters[char])throw new Error(`locomotion.json: "${char}" is not in build_player_rig.mjs characters.`);
- const handRest={},backRest={};
+ const backRest={};
  for(const [char,info] of Object.entries(characters)){
   const motions=source.characters[char];
   if(!motions)throw new Error(`locomotion.json: characters.${char} is missing.`);
@@ -41,7 +43,7 @@ export function buildLocomotion({fn,poseLines,spawnLines,weaponLines,neutral,ler
    ].join('\n'));
    if(mode!=='idle')continue;
    fn(`loco/${char}/${sheathed?'spawn_s':'spawn'}`,spawnLines(char,posed(keys[0].pose),info.weapon));
-   (sheathed?backRest:handRest)[char]=transform(posed(keys[0].pose)).weapon;
+   if(sheathed)backRest[char]=transform(posed(keys[0].pose)).weapon;
   }
  }
  const core=['pmActive','pmTick','pmLen','pmChar','pmSpeed','pmAcc','pmStep'];
@@ -179,6 +181,9 @@ export function buildLocomotion({fn,poseLines,spawnLines,weaponLines,neutral,ler
   'execute unless score @s pmLocMode = @s pmWantMode run return run function rlk:char/motion/loco/begin',
   'execute if score @s pmSheath matches 1 unless score @s pmLocS matches 1 run return run function rlk:char/motion/loco/begin',
   'execute unless score @s pmSheath matches 1 unless score @s pmLocS matches 0 run return run function rlk:char/motion/loco/begin',
+  '# The displayed attach must be the cycle\'s: a clip released without finish may leave the weapon on the back or',
+  '# floating, and begin snaps it instead of letting the frames glide it across the change.',
+  'execute unless score @s pmWAt = @s pmLocS run return run function rlk:char/motion/loco/begin',
   'execute if score @s pmBlend matches 1.. run return run scoreboard players remove @s pmBlend 1',
   'scoreboard players set #pmInterp tmp 99','scoreboard players operation #pmInterp tmp += @s pmLocSpeed',
   'scoreboard players operation #pmInterp tmp /= @s pmLocSpeed',
@@ -211,18 +216,20 @@ export function buildLocomotion({fn,poseLines,spawnLines,weaponLines,neutral,ler
   ...weapons.map((w,i)=>`execute if score @s pmWantW matches ${i+1} run function rlk:char/motion/loco/weapon/${w}`),
   'scoreboard players operation @s pmWeapon = @s pmWantW'
  ].join('\n'));
- buildSheath({fn,characters,handRest,backRest,handSpark,backSpark,local,arr});
+ buildSheath({fn,characters,backRest,handSpark,backSpark,arr});
 }
 // Runtime of the sheathed/drawn state machine (M/sheath/*). All visuals are guarded by rlk_pm_weapon, so in
 // first person (no rig) only the state changes; the held vanilla item is never touched.
-function buildSheath({fn,characters,handRest,backRest,handSpark,backSpark,local,arr}){
+function buildSheath({fn,characters,backRest,handSpark,backSpark,arr}){
  const chars=Object.entries(characters);
  const atBody='at @e[tag=rlk_pm_body,limit=1] rotated as @e[tag=rlk_pm_body,limit=1]';
  fn('sheath/tick',[
   '# @s player, every rig tick after loco/observe and before the clip or locomotion.',
   'execute unless score @s pmSheath matches 0.. run scoreboard players set @s pmSheath 1',
-  '# Self-heal: a put-away state without its clip (release without finish) counts as drawn, retry in 1 s.',
+  '# Self-heal: a put-away state without its clip (release without finish) counts as drawn, retry in 1 s. The',
+  '# locomotion cycle restarts, so loco/begin blends the body and snaps the weapon back from the clip\'s attach.',
   'execute if score @s pmSheath matches 2 unless score @s pmActive matches 1 run scoreboard players set @s pmShT 20',
+  'execute if score @s pmSheath matches 2 unless score @s pmActive matches 1 run scoreboard players set @s pmLocS -1',
   'execute if score @s pmSheath matches 2 unless score @s pmActive matches 1 run scoreboard players set @s pmSheath 0',
   '# Moving during the put-away clip: quick stow and blend into sheathed locomotion.',
   'execute if score @s pmActive matches 1 if data storage rlk:player_motion active{clip:"sheathe"} unless score @s pmWantMode matches 0 run return run function rlk:char/motion/sheath/abort',
@@ -244,12 +251,20 @@ function buildSheath({fn,characters,handRest,backRest,handSpark,backSpark,local,
   ...chars.filter(([,info])=>Number.isInteger(info.sheath.delay)).map(([,info])=>`execute if score #charN tmp matches ${info.id} run scoreboard players set @s pmShT ${info.sheath.delay}`)].join('\n'));
  fn('sheath/draw',['# Drawn clip start or weapon_attach "hand" (the start already snapped the weapon and sparkled).',
   'scoreboard players set @s pmSheath 0','scoreboard players set @s pmShFx 0','function rlk:char/motion/sheath/arm'].join('\n'));
- fn('sheath/stow',['# Quick stow: gold sparkle at the hand, the weapon vanishes, then grows on the back (sheath/fx_tick).',
-  'execute unless score @s pmSheath matches 1 if entity @e[tag=rlk_pm_weapon] run scoreboard players set @s pmShFx 8',
+ // Quick stow. The sparkle is where the weapon is (in the hand mid-stride, floating in a put-away clip), read
+ // from its display translation: ^left ^up ^forward from the feet in the rig yaw, like local() points.
+ fn('sheath/stow',['# Quick stow from where the weapon is now (sheath/tick at the end of the delay, sheath/abort).',
+  'execute unless score @s pmSheath matches 1 if entity @e[tag=rlk_pm_weapon] run function rlk:char/motion/sheath/mark',
+  'function rlk:char/motion/sheath/stow_marked'].join('\n'));
+ fn('sheath/mark',['# Grip position of the displayed weapon for the stow sparkle (sheathed clip starts mark before frame zero).',
+  ...['x','y','z'].map((axis,i)=>`execute store result storage rlk:player_motion spark.${axis} double 0.001 run data get entity @e[tag=rlk_pm_weapon,limit=1] transformation.translation[${i}] 1000`)].join('\n'));
+ fn('sheath/stow_marked',['# Gold sparkle at the marked position, the weapon vanishes, then re-forms on the back (sheath/fx_tick).',
+  `execute unless score @s pmSheath matches 1 if entity @e[tag=rlk_pm_weapon] run scoreboard players set @s pmShFx ${STOW_FX}`,
   'execute unless score @s pmSheath matches 1 if entity @e[tag=rlk_pm_weapon] run data merge entity @e[tag=rlk_pm_weapon,limit=1] {start_interpolation:0,interpolation_duration:0,transformation:{scale:[0f,0f,0f]}}',
-  ...chars.map(([char,info])=>`execute unless score @s pmSheath matches 1 if entity @e[tag=rlk_pm_weapon] if score #charN tmp matches ${info.id} ${atBody} positioned ${local(handRest[char].t)} run function rlk:char/motion/sheath/fx_hand`),
+  'execute unless score @s pmSheath matches 1 if entity @e[tag=rlk_pm_weapon] run function rlk:char/motion/sheath/spark with storage rlk:player_motion spark',
   `execute unless score @s pmSheath matches 1 if entity @e[tag=rlk_pm_weapon] at @e[tag=rlk_pm_body,limit=1] run playsound minecraft:item.armor.equip_iron player @s ~ ~1 ~ 0.35 1.5 0`,
   'scoreboard players set @s pmSheath 1','scoreboard players set @s pmShT 0'].join('\n'));
+ fn('sheath/spark',`$execute ${atBody} positioned ^$(x) ^$(y) ^$(z) run function rlk:char/motion/sheath/fx_hand`);
  fn('sheath/abort',['# Moving during the put-away clip.','function rlk:char/motion/sheath/stow','function rlk:char/motion/finish'].join('\n'));
  fn('sheath/snap',['# The weapon jumps to its new attach this tick (no hand/back/world interpolation); repeated at the end of motion/tick.',
   'execute if entity @e[tag=rlk_pm_weapon] run data merge entity @e[tag=rlk_pm_weapon,limit=1] {interpolation_duration:0,start_interpolation:0}',
@@ -257,13 +272,25 @@ function buildSheath({fn,characters,handRest,backRest,handSpark,backSpark,local,
  fn('sheath/snap_end',['# End of motion/tick: re-apply the snap after the last pose of the tick.',
   'execute if entity @e[tag=rlk_pm_weapon] run data merge entity @e[tag=rlk_pm_weapon,limit=1] {interpolation_duration:0,start_interpolation:0}',
   'scoreboard players set #pmSnapW tmp 0'].join('\n'));
- // Grow steps on the back are absolute scales: the character's back-mount scale at 40 % and 75 %.
- const grow=(fx,k)=>chars.map(([char,info])=>`execute if score @s pmShFx matches ${fx} if score #charN tmp matches ${info.id} if entity @e[tag=rlk_pm_weapon] run data merge entity @e[tag=rlk_pm_weapon,limit=1] {start_interpolation:0,interpolation_duration:1,transformation:{scale:${arr(backRest[char].s.map(x=>x*k))}}}`);
- fn('sheath/fx_tick',['# After the pose of this tick: keep the stowed weapon hidden, then grow it on the back.',
+ // Re-form on the back (<char>.json sheath.grow): after the hidden ticks, one step per tick, each a scale [x,y,z]
+ // relative to the back mount, or {"scale":[x,y,z],"snap":true} to jump there without interpolation. The pose's
+ // full scale follows on the next tick. Default: uniform 40 % then 75 %. A crescent that would sweep through the
+ // head while partly wide (Arlecchino) grows as a full-length sliver first and then snaps to its width.
+ const grows=Object.fromEntries(chars.map(([char,info])=>{
+  const steps=(info.sheath.grow??[[.4,.4,.4],[.75,.75,.75]]).map(step=>Array.isArray(step)?{scale:step}:step);
+  if(!steps.length||steps.length>STOW_FX-2||steps.some(step=>!Array.isArray(step.scale)||step.scale.length!==3||!step.scale.every(Number.isFinite)))
+   throw new Error(`${char}.json sheath.grow: 1-${STOW_FX-2} steps, each [x,y,z] or {"scale":[x,y,z],"snap":true}.`);
+  return[char,steps];
+ }));
+ fn('sheath/fx_tick',['# After the pose of this tick: keep the stowed weapon hidden, then re-form it on the back (sheath.grow), with a',
+  '# gold line along it on the first step.',
   'scoreboard players remove @s pmShFx 1',
-  'execute if score @s pmShFx matches 3.. if entity @e[tag=rlk_pm_weapon] run data merge entity @e[tag=rlk_pm_weapon,limit=1] {start_interpolation:0,interpolation_duration:0,transformation:{scale:[0f,0f,0f]}}',
-  ...grow(2,.4),...grow(1,.75),
-  `execute if score @s pmShFx matches 2 if entity @e[tag=rlk_pm_weapon] ${atBody} run function rlk:char/motion/sheath/fx_back`].join('\n'));
+  ...chars.flatMap(([char,info])=>{
+   const steps=grows[char],when=fx=>`execute if score @s pmShFx matches ${fx} if score #charN tmp matches ${info.id} if entity @e[tag=rlk_pm_weapon]`;
+   return[`${when(steps.length+1+'..')} run data merge entity @e[tag=rlk_pm_weapon,limit=1] {start_interpolation:0,interpolation_duration:0,transformation:{scale:[0f,0f,0f]}}`,
+    ...steps.map((step,i)=>`${when(steps.length-i)} run data merge entity @e[tag=rlk_pm_weapon,limit=1] {start_interpolation:0,interpolation_duration:${step.snap?0:1},transformation:{scale:${arr(backRest[char].s.map((x,k)=>x*step.scale[k]))}}}`),
+    `${when(steps.length)} ${atBody} run function rlk:char/motion/sheath/fx_back`];
+  })].join('\n'));
  fn('sheath/fx_hand',['# Gold sparkle at the hand (positioned by the caller).',...handSpark({t:[0,0,0]}).map(line=>line.replace('^0 ^0 ^0','~ ~ ~'))].join('\n'));
  fn('sheath/fx_back',['# Gold line along the weapon hanging on the back (idle sheathed pose; ^ from the feet, rig yaw).',
   ...chars.flatMap(([char,info])=>backSpark(backRest[char],info.weapon).map(line=>`execute if score #charN tmp matches ${info.id} run ${line}`))].join('\n'));

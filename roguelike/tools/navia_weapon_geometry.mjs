@@ -11,19 +11,21 @@
  * is painted on three stacked alpha-cut cards, traced from the reference (navia_weapon_paint.mjs).
  *
  * navia_parasol / navia_parasol_open: her parasol gun, closed and open. A black crook handle
- * with gold fittings and a gold cog, a black shaft and a gold muzzle ferrule. Closed: a gold
- * ruffle collar and the folded black-indigo canopy with a gem plaque and white lace, as four
- * crossed profile cards around stepped core boxes. Open: an eight-rib canopy about 18.6 units
- * across, whose lining (gold with orange-red paisley) and outer face are the cap faces of thin
- * discs stacked into a shallow dome, with crossed profile cards for the side view.
+ * with gold fittings and a gold cog. Closed (18 units, after v4 f342 / v2 f291-f297): a gold
+ * shaft from the cog to a wide ruffle rosette, the folded black-indigo bundle with a gem plaque
+ * tapering to a thin lace collar, and a short gold tip, as crossed cards round core boxes and
+ * discs. Open (about 18 across, after v2 f273-f279): a convex eight-rib dome, its flank sixteen
+ * tangential cards (gold blue-gem emblems on alternate panels), its cap stacked discs painted
+ * in model units with four crossed profile cards (the ribs) for the side view; the gold lining
+ * with orange-red paisley under it, a two-tier hanging gold ruffle and a slim gold finial.
  *
  * Model frame (as the other rig weapons; the motion clips rely on it): grip [8,8,8], shaft
  * along +Y, broad faces of the halberd head facing +-Z, its crescent toward -X; the parasol's
  * muzzle and canopy point to +Y. Every coordinate stays within -16..32 and rotations are single
- * axis, 45 degrees.
+ * axis about Y, 22.5 or 45 degrees.
  */
 import {paintedBox, plate, card, cardX} from './weapon_faces.mjs';
-import {NV_HEAD, NV_TIP, NV_CRYSTAL, NV_GUARD, NV_BUTT, NP} from './navia_weapon_paint.mjs';
+import {NV_HEAD, NV_TIP, NV_CRYSTAL, NV_GUARD, NV_BUTT, NV_SLEEVE, NP} from './navia_weapon_paint.mjs';
 
 // A box whose front/side faces map the sprite along the box, caps from the sprite's middle.
 const fitting = (sprite, capSprite = sprite, capUV = [.2, .2, .8, .8]) => (from, to, rotation) => paintedBox(from, to, {
@@ -60,11 +62,25 @@ function halberd() {
   }));
   e.push(...crossed(NV_BUTT.HW, NV_BUTT.Y0, NV_BUTT.Y1, 'nv_butt'));
   e.push(gold([7.75, 2.2, 7.75], [8.25, 4.15, 8.25], {origin: [8, 3.2, 8], axis: 'y', angle: 45}));
-  // Lower ring, crossguard and the faceted sleeve.
+  // Lower ring, crossguard and the faceted sleeve. The sleeve's faces are cut to a pointed cap
+  // and a waist (open top; a gold floor inside closes it where the navy shaft enters).
   e.push(gold([7.42, 9.35, 7.42], [8.58, 10.65, 8.58]));
   e.push(...crossed(NV_GUARD.HW, NV_GUARD.Y0, NV_GUARD.Y1, 'nv_guard'));
-  e.push(fitting('nv_sleeve', 'nv_gold')([7.25, 11.6, 7.25], [8.75, 14.9, 8.75]));
-  e.push(gold([7.4, 12.4, 7.4], [8.6, 14.2, 8.6], {origin: [8, 13.3, 8], axis: 'y', angle: 45}));
+  const S = NV_SLEEVE, sleeve = fitting('nv_sleeve', 'nv_gold')([8 - S.HW, S.Y0, 8 - S.HW], [8 + S.HW, S.Y1, 8 + S.HW]);
+  delete sleeve.faces.up;
+  e.push(sleeve);
+  // Inner crown turned 45 degrees (half-diagonal 0.735, inside the sleeve faces): its faces
+  // carry a lower chevron (nv_sleeve_crown) that fills the notch at the sleeve's corners.
+  const cw = .52, crown = paintedBox([8 - cw, 13.5, 8 - cw], [8 + cw, S.APEX2, 8 + cw], {
+    front: {sprite: 'nv_sleeve_crown', u: ['x', 8 - cw, 8 + cw], v: ['y', S.APEX2, 13.5]},
+    side: {sprite: 'nv_sleeve_crown', u: ['z', 8 - cw, 8 + cw], v: ['y', S.APEX2, 13.5]},
+    cap: {sprite: 'nv_gold', uv: [.2, .2, .8, .8]},
+  }, {origin: [8, 14, 8], axis: 'y', angle: 45});
+  delete crown.faces.up;
+  e.push(crown);
+  const floor = gold([8 - S.HW + .02, S.SHOULDER - .06, 8 - S.HW + .02], [8 + S.HW - .02, S.SHOULDER + .01, 8 + S.HW - .02]);
+  for (const f of ['north', 'south', 'east', 'west', 'down']) delete floor.faces[f];
+  e.push(floor);
   // Navy shaft, silver collar, navy shaft with the silver strip.
   e.push(fitting('nv_shaft2', 'nv_gold')([7.5, 14.8, 7.5], [8.5, 17.5, 8.5]));
   e.push(fitting('nv_collar', 'nv_gold')([7.28, 17.4, 7.28], [8.72, 19.1, 8.72]));
@@ -73,15 +89,16 @@ function halberd() {
   e.push(gold([7.5, 21.15, 7.5], [8.5, 22.4, 8.5]));
   e.push(plate(8, 21.78, 1.15, 7.46, 'nv_rose'), plate(8, 21.78, 1.15, 8.54, 'nv_rose'));
   e.push(cardX([7.425, 21.205], [8.575, 22.355], 7.46, 'nv_rose'), cardX([7.425, 21.205], [8.575, 22.355], 8.54, 'nv_rose'));
-  // Crystal: a faceted core (diamond cross-section) inside two crossed silhouette cards.
-  e.push(fitting('nv_crystal', 'nv_crystal', [.3, .4, .7, .6])([7.55, 22.6, 7.55], [8.45, 24.7, 8.45], {origin: [8, 23.65, 8], axis: 'y', angle: 45}));
+  // Crystal: two crossed silhouette cards draw the pointed hexagon; a plain opaque core with a
+  // diamond cross-section (half-diagonal 0.49) fills it where the hexagon is wider than 0.5.
+  e.push(fitting('nv_crystal_core', 'nv_crystal_core', [.3, .3, .7, .5])([7.65, 23.05, 7.65], [8.35, 24.38, 8.35], {origin: [8, 23.7, 8], axis: 'y', angle: 45}));
   e.push(...crossed(NV_CRYSTAL.HW, NV_CRYSTAL.Y0, NV_CRYSTAL.Y1, 'nv_crystal'));
   // Bell collar, socket and the spear point.
   e.push(gold([7.42, 24.75, 7.42], [8.58, 25.15, 8.58]), gold([7.58, 25.1, 7.58], [8.42, 25.5, 8.42]));
   e.push(fitting('nv_socket', 'nv_gold')([7.62, 25.45, 7.62], [8.38, 27.95, 8.38]));
   e.push(...crossed(NV_TIP.HW, NV_TIP.Y0, NV_TIP.Y1, 'nv_tip'));
-  // The head on three stacked cards (front, middle, back).
-  for (const z of [7.73, 8.0, 8.27]) e.push(card([NV_HEAD.X0, NV_HEAD.Y0], [NV_HEAD.X1, NV_HEAD.Y1], z, 'nv_head'));
+  // The head on three stacked cards (front, middle, back; weapon.md §11.3).
+  for (const z of [7.64, 8.0, 8.36]) e.push(card([NV_HEAD.X0, NV_HEAD.Y0], [NV_HEAD.X1, NV_HEAD.Y1], z, 'nv_head'));
   return e;
 }
 
@@ -89,70 +106,74 @@ function halberd() {
 function handle() {
   const gold = fitting('np_gold');
   return [
-    // Black crook below the hand (three stacked cards), the grip, gold collar and cog.
+    // Black crook below the hand (three stacked cards, plus one edge-on card through the bend
+    // so the crook keeps its depth from the side), the grip, gold collar and cog.
     ...[7.74, 8.0, 8.26].map(z => card([NP.CROOK.X0, NP.CROOK.Y0], [NP.CROOK.X1, NP.CROOK.Y1], z, 'np_handle')),
+    cardX([7.74, 5.3], [8.26, 6.45], 7.85, 'np_shaft'),
     fitting('np_shaft', 'np_gold')([7.66, 6.4, 7.66], [8.34, 9.6, 8.34]),
     gold([7.55, 9.5, 7.55], [8.45, 10.1, 8.45]),
     gold([7.6, 10.05, 7.6], [8.4, 10.55, 8.4], {origin: [8, 10.3, 8], axis: 'y', angle: 45}),
     disc(NP.COG, 10.32, 'np_cog', 'np_cog'),
   ];
 }
-function muzzle(y0) {
-  const gold = fitting('np_gold');
-  return [
-    fitting('np_ferrule', 'np_gold')([7.58, y0, 7.58], [8.42, y0 + 1.8, 8.42]),
-    paintedBox([7.48, y0 + 1.7, 7.48], [8.52, y0 + 2.3, 8.52], {
-      front: {sprite: 'np_gold', u: ['x', 7.48, 8.52], v: ['y', y0 + 2.3, y0 + 1.7]},
-      side: {sprite: 'np_gold', u: ['z', 7.48, 8.52], v: ['y', y0 + 2.3, y0 + 1.7]},
-      cap: {sprite: 'np_gold', uv: [.2, .2, .8, .8]},
-      up: {sprite: 'np_bore', u: ['x', 7.48, 8.52], v: ['z', 7.48, 8.52]},
-    }),
-    gold([7.62, y0 - .3, 7.62], [8.38, y0 + .05, 8.38]),
-  ];
-}
 function parasolClosed() {
   const fold = fitting('np_fold', 'np_fold', [.3, .1, .7, .3]);
-  const B = NP.BUNDLE;
+  const {ROSETTE: R, BUNDLE: B, TIP: T} = NP;
   return [
     ...handle(),
-    fitting('np_shaft', 'np_gold')([7.72, 10.5, 7.72], [8.28, 13.2, 8.28]),
-    // Folded canopy: stepped core inside four crossed profile cards, the ruffle rosettes, the
-    // gem plaque and the lace collar under the muzzle.
-    fitting('np_ruffle', 'np_gold')([7.1, 11.15, 7.1], [8.9, 13.1, 8.9]),
-    fold([6.98, 13.05, 6.98], [9.02, 15.2, 9.02]),
-    fold([7.14, 15.15, 7.14], [8.86, 17.2, 8.86]),
-    fold([7.32, 17.15, 7.32], [8.68, 19.0, 8.68]),
-    fold([7.5, 18.95, 7.5], [8.5, 20.3, 8.5]),
+    // Gold shaft from the cog into the ruffle rosette (about 30% of the hand-to-tip length).
+    fitting('np_gshaft', 'np_gold')([7.7, 10.5, 7.7], [8.3, 12.7, 8.3]),
+    // The rosette: a wide scalloped ruffle (four crossed cards), its core and three discs.
+    ...star(R.HW, R.Y0, R.Y1, 'np_crosette'),
+    fitting('np_ruffle', 'np_gold')([7.65, 12.6, 7.65], [8.35, 15.0, 8.35]),
+    disc(1.5, 12.5, null, 'np_rosette'), disc(2.4, 13.9, 'np_rosette', 'np_rosette'), disc(1.95, 15.28, 'np_rosette', null),
+    // The folded canopy: stepped core inside four crossed profile cards, the gem plaque, the
+    // thin lace collar (on the cards) and the short gold tip.
+    fold([6.98, 15.3, 6.98], [9.02, 17.3, 9.02]),
+    fold([7.16, 17.25, 7.16], [8.84, 19.0, 8.84]),
+    fold([7.36, 18.95, 7.36], [8.64, 20.4, 8.64]),
+    fold([7.56, 20.35, 7.56], [8.44, 21.4, 8.44]),
+    fold([7.7, 21.35, 7.7], [8.3, 22.0, 8.3]),
     ...star(B.HW, B.Y0, B.Y1, 'np_bundle'),
-    disc(2.05, 13.25, 'np_rosette', null), disc(1.95, 11.05, null, 'np_rosette'),
-    plate(8, 14.6, 1.25, 6.93, 'np_plaque'),
-    fitting('np_lace')([7.42, 20.15, 7.42], [8.58, 20.65, 8.58]),
-    ...muzzle(20.6),
+    plate(8, 16.7, 1.2, 6.93, 'np_plaque'),
+    ...star(T.HW, T.Y0, T.Y1, 'np_ctip'),
   ];
 }
-// Eight tangential cards around the axis at distance D (0, 90 and +-45 degrees about Y).
-function skirt({D, HW, Y0, Y1}) {
-  const yc = (Y0 + Y1) / 2, out = [];
-  for (const z of [8 - D, 8 + D]) out.push(card([8 - HW, Y0], [8 + HW, Y1], z, 'np_skirt'));
-  for (const x of [8 - D, 8 + D]) out.push(cardX([8 - HW, Y0], [8 + HW, Y1], x, 'np_skirt'));
-  for (const angle of [45, -45]) for (const z of [8 - D, 8 + D])
-    out.push(card([8 - HW, Y0], [8 + HW, Y1], z, 'np_skirt', [0, 0, 1, 1], {origin: [8, yc, 8], axis: 'y', angle}));
+// Sixteen tangential cards round the axis at distance D, every 22.5 degrees about Y: XY cards
+// at z = 8 -+ D turned 0, +-22.5 and +-45 degrees, ZY cards at x = 8 -+ D turned 0 and +-22.5.
+// pick(kind) names the sprite: 'rib' for the eight cards centred on a rib (0, 45, ... degrees),
+// 'a' / 'b' for the panel-centre cards turned +22.5 / -22.5 (they alternate round the ring).
+function ring16({D, HW, Y0, Y1}, pick) {
+  const o = {origin: [8, (Y0 + Y1) / 2, 8], axis: 'y'}, kind = a => a === 22.5 ? 'a' : a === -22.5 ? 'b' : 'rib', out = [];
+  for (const angle of [0, 22.5, -22.5, 45, -45]) for (const z of [8 - D, 8 + D])
+    out.push(card([8 - HW, Y0], [8 + HW, Y1], z, pick(kind(angle)), [0, 0, 1, 1], angle ? {...o, angle} : undefined));
+  for (const angle of [0, 22.5, -22.5]) for (const x of [8 - D, 8 + D]) {
+    const el = cardX([8 - HW, Y0], [8 + HW, Y1], x, pick(kind(angle)));
+    if (angle) el.rotation = {...o, angle};
+    out.push(el);
+  }
   return out;
 }
 function parasolOpen() {
-  const C = NP.CANOPY;
+  const C = NP.CANOPY, gold = fitting('np_gold');
   return [
     ...handle(),
-    fitting('np_shaft', 'np_gold')([7.72, 10.5, 7.72], [8.28, 20.4, 8.28]),
-    // Hub and runner under the lining.
+    fitting('np_shaft', 'np_gold')([7.72, 10.5, 7.72], [8.28, 18.9, 8.28]),
+    // Runner under the lining; the rim disc (ruffle top up, lining down).
     fitting('np_hub', 'np_gold')([7.36, 13.4, 7.36], [8.64, 15.1, 8.64]),
-    // Rim disc: outer face (frill, black-indigo panels) up, lining down; the dome above it is
-    // stacked smaller discs, its side view four crossed profile cards (eight ribs).
     disc(C.R, C.RIM, 'np_top', 'np_lining'),
-    ...C.STEPS.map(([r, y]) => disc(r, y, 'np_dome', 'np_dome')),
-    ...star(C.R, C.Y0, C.Y1, 'np_profile'),
-    ...skirt(C.SKIRT),
-    ...muzzle(20.3),
+    // The dome: drum flank (emblem / filigree / rib cards), the elliptic cap as stacked discs
+    // painted in model units, and four profile cards (the eight ribs) for its side view.
+    ...ring16(C.DRUM, k => ({rib: 'np_drum_rib', a: 'np_drum_emb', b: 'np_drum_fil'})[k]),
+    ...C.STEPS.map(([r, y], k) => disc(r, y, 'np_dome' + k, null)),
+    ...star(C.PROFILE.HW, C.PROFILE.Y0, C.PROFILE.Y1, 'np_profile'),
+    // The two-tier ruffle: the long lower tier flares out beyond the upper one, which carries
+    // a bow at each rib.
+    ...ring16(C.RUFFLE_L, () => 'np_ruffle_l'),
+    ...ring16(C.RUFFLE_U, k => k === 'rib' ? 'np_ruffle_ub' : 'np_ruffle_u'),
+    // Finial collar on the crown and the slim gold finial (the muzzle).
+    gold([7.62, 19.5, 7.62], [8.38, 19.9, 8.38]),
+    ...star(C.FINIAL.HW, C.FINIAL.Y0, C.FINIAL.Y1, 'np_finial'),
   ];
 }
 

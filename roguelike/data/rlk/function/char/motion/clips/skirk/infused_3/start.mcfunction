@@ -25,10 +25,11 @@ data modify storage rlk:player_motion active.step set value 2
 execute if entity @e[tag=rlk_pm] run function rlk:char/motion/clips/skirk/infused_3/pose/0 with storage rlk:player_motion active
 execute store result storage rlk:player_motion active.step int 1 run scoreboard players get @s pmStep
 execute at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 run tp @e[tag=rlk_pm] ~ ~ ~ ~ 0
-# Drawn: instant draw from the back (snap, no flight) with a gold sparkle at the hand.
+# Drawn: instant draw (snap, no flight) with a gold sparkle at the hand unless it was already drawn
+# (from the back, or out of the put-away clip where it may be dissolved or floating).
 execute unless score @s pmWAt matches 0 run function rlk:char/motion/sheath/snap
 scoreboard players set @s pmWAt 0
-execute if score @s pmSheath matches 1 if entity @e[tag=rlk_pm_weapon] at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 positioned ^-0.331 ^1.147 ^0.614 run function rlk:char/motion/sheath/fx_hand
+execute unless score @s pmSheath matches 0 if entity @e[tag=rlk_pm_weapon] at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 positioned ^-0.331 ^1.147 ^0.614 run function rlk:char/motion/sheath/fx_hand
 function rlk:char/motion/sheath/draw
 execute if entity @e[tag=rlk_av,limit=1] run function rlk:char/motion/hide_avatar
 execute at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run function rlk:char/motion/skirk_fx/infused_3

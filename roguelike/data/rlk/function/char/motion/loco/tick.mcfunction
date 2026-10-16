@@ -7,6 +7,9 @@ function rlk:char/motion/loco/weapon
 execute unless score @s pmLocMode = @s pmWantMode run return run function rlk:char/motion/loco/begin
 execute if score @s pmSheath matches 1 unless score @s pmLocS matches 1 run return run function rlk:char/motion/loco/begin
 execute unless score @s pmSheath matches 1 unless score @s pmLocS matches 0 run return run function rlk:char/motion/loco/begin
+# The displayed attach must be the cycle's: a clip released without finish may leave the weapon on the back or
+# floating, and begin snaps it instead of letting the frames glide it across the change.
+execute unless score @s pmWAt = @s pmLocS run return run function rlk:char/motion/loco/begin
 execute if score @s pmBlend matches 1.. run return run scoreboard players remove @s pmBlend 1
 scoreboard players set #pmInterp tmp 99
 scoreboard players operation #pmInterp tmp += @s pmLocSpeed
