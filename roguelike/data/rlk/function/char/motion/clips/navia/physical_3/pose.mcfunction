@@ -21,3 +21,5 @@ execute if score @s pmTick matches 19 run function rlk:char/motion/clips/navia/p
 execute if score @s pmTick matches 20 run function rlk:char/motion/clips/navia/physical_3/pose/20 with storage rlk:player_motion active
 execute if score @s pmTick matches 21 run function rlk:char/motion/clips/navia/physical_3/pose/21 with storage rlk:player_motion active
 execute if score @s pmTick matches 22 run function rlk:char/motion/clips/navia/physical_3/pose/22 with storage rlk:player_motion active
+execute if score @s pmTick matches 23 run function rlk:char/motion/clips/navia/physical_3/pose/23 with storage rlk:player_motion active
+execute if score @s pmTick matches 24 run function rlk:char/motion/clips/navia/physical_3/pose/24 with storage rlk:player_motion active
