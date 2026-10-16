@@ -1,5 +1,6 @@
 execute if score #charN tmp matches 5 run data modify storage rlk:player_motion loco.char set value "arle"
 execute if score #charN tmp matches 3 run data modify storage rlk:player_motion loco.char set value "skirk"
+execute if score #charN tmp matches 6 run data modify storage rlk:player_motion loco.char set value "navia"
 execute if score @s pmWantMode matches 0 run data modify storage rlk:player_motion loco.mode set value "idle"
 execute if score @s pmWantMode matches 1 run data modify storage rlk:player_motion loco.mode set value "walk"
 execute if score @s pmWantMode matches 2 run data modify storage rlk:player_motion loco.mode set value "run"

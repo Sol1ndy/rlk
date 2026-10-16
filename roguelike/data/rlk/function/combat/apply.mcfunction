@@ -33,9 +33,10 @@ function rlk:element/color
 execute store result storage rlk:combat dmg int 1 run scoreboard players get #dmg tmp
 # 커스텀 방패병: 정면 공격은 방패 내구도가 먼저 받음(숫자는 그대로, 다 막으면 하늘색)
 execute if entity @s[tag=rlk_cm_sh] if score @s cmSh matches 1.. if score #dmg tmp matches 1.. run function rlk:cm/sh/absorb
-# 아를/스커크: 방패 계산 뒤 실제 체력 피해에만 둔탁한 명중음. 추가타·스킬·궁도 같은 경로.
+# 아를/스커크/나비아: 방패 계산 뒤 실제 체력 피해에만 둔탁한 명중음. 추가타·스킬·궁도 같은 경로.
 execute if score #charN tmp matches 3 if score #dmg tmp matches 1.. unless score #tfm tmp matches 1 unless score #sub itv matches 1 unless score #confirmedHit snd matches 1 run function rlk:combat/confirmed_hit_sound
 execute if score #charN tmp matches 5 if score #dmg tmp matches 1.. unless score #tfm tmp matches 1 unless score #sub itv matches 1 unless score #confirmedHit snd matches 1 run function rlk:combat/confirmed_hit_sound
+execute if score #charN tmp matches 6 if score #dmg tmp matches 1.. unless score #tfm tmp matches 1 unless score #sub itv matches 1 unless score #confirmedHit snd matches 1 run function rlk:combat/confirmed_hit_sound
 # 겹침 방지용 랜덤 스폰 오프셋
 execute store result storage rlk:combat ox float 0.1 run random value -8..8
 execute store result storage rlk:combat oz float 0.1 run random value -8..8

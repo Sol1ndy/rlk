@@ -1229,6 +1229,79 @@
           }
         ]
       }
+    },
+    "navia": {
+      "burst": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          34
+        ],
+        "layers": []
+      },
+      "dash": {
+        "playback_rate": 100,
+        "hit_ticks": [],
+        "layers": []
+      },
+      "sheathe": {
+        "playback_rate": 100,
+        "hit_ticks": [],
+        "layers": []
+      },
+      "physical_1": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          9
+        ],
+        "layers": []
+      },
+      "physical_2": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          6
+        ],
+        "layers": []
+      },
+      "physical_3": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          13,
+          15,
+          17
+        ],
+        "layers": []
+      },
+      "physical_4": {
+        "playback_rate": 150,
+        "hit_ticks": [
+          10
+        ],
+        "layers": []
+      },
+      "skill": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          7
+        ],
+        "layers": []
+      },
+      "skill_aim_in": {
+        "playback_rate": 100,
+        "hit_ticks": [],
+        "layers": []
+      },
+      "skill_aim": {
+        "playback_rate": 100,
+        "hit_ticks": [],
+        "layers": []
+      },
+      "skill_fire": {
+        "playback_rate": 100,
+        "hit_ticks": [
+          3
+        ],
+        "layers": []
+      }
     }
   },
   "sound_events": [

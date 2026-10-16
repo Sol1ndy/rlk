@@ -433,6 +433,8 @@ scoreboard objectives add nvA dummy
 scoreboard objectives add nvGap dummy
 scoreboard objectives add nvFcd dummy
 scoreboard objectives add nvGun dummy
+# 나비아: 결정 축포 발사 대기(모션의 발사 틱 전)
+scoreboard objectives add nvShot dummy
 scoreboard objectives add nvHit dummy
 scoreboard objectives add naQn dummy
 

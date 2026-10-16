@@ -17,6 +17,8 @@ execute if score @s nvQS matches 1.. run scoreboard players remove @s nvQS 1
 execute if score @s nvQ matches 1.. run function rlk:char/navia/q_tick
 # 조준 · 우산총
 execute if score @s nvA matches 1.. run function rlk:char/navia/aim_tick
+# 블록 우산총은 몸 디스플레이가 없을 때(1인칭)만. 숄더뷰에서는 모션의 우산 모델이 보인다
+execute if score @s pmVisible matches 1 if entity @e[tag=rlk_nvgun,limit=1] run kill @e[tag=rlk_nvgun]
 # 펴진 덮개: 다음 틱부터 펼치고, 사라지기 3틱 전에 접는다
 execute if entity @e[tag=rlk_nvop_new,limit=1] run function rlk:char/navia/gun_open_grow
 execute if score @s nvGun matches 4 run function rlk:char/navia/gun_close

@@ -1,5 +1,5 @@
 # Combat active state remains separate from persistent locomotion visibility.
-execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 run return run function rlk:char/motion/cleanup
+execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 unless score #charN tmp matches 6 run return run function rlk:char/motion/cleanup
 execute if score @s dead matches 1 run return run function rlk:char/motion/cleanup
 execute if score @s vMap matches 1 run return run function rlk:char/motion/cleanup
 execute if score @s pkMode matches 1.. run return run function rlk:char/motion/cleanup

@@ -20,3 +20,8 @@ execute if score #charN tmp matches 3 if score @s pmAtkStep matches 1 if score @
 execute if score #charN tmp matches 3 if score @s pmAtkStep matches 2 if score @s skM matches 1.. run function rlk:char/motion/start {char:"skirk",clip:"infused_3"}
 execute if score #charN tmp matches 3 if score @s pmAtkStep matches 3 if score @s skM matches 1.. run function rlk:char/motion/start {char:"skirk",clip:"infused_4"}
 execute if score #charN tmp matches 3 if score @s pmAtkStep matches 4 if score @s skM matches 1.. run function rlk:char/motion/start {char:"skirk",clip:"infused_5"}
+# Navia: one string; the Geo passive (nvP) only changes fx accents and damage, not the clip.
+execute if score #charN tmp matches 6 if score @s pmAtkStep matches 0 run function rlk:char/motion/start {char:"navia",clip:"physical_1"}
+execute if score #charN tmp matches 6 if score @s pmAtkStep matches 1 run function rlk:char/motion/start {char:"navia",clip:"physical_2"}
+execute if score #charN tmp matches 6 if score @s pmAtkStep matches 2 run function rlk:char/motion/start {char:"navia",clip:"physical_3"}
+execute if score #charN tmp matches 6 if score @s pmAtkStep matches 3 run function rlk:char/motion/start {char:"navia",clip:"physical_4"}

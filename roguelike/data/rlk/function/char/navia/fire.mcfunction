@@ -1,14 +1,9 @@
-# 결정 축포 발사 (@s = 플레이어, at 몸): 결정 파편을 모두 소모 → 장미탄 5/7/9/11발(꿰뚫음) → 적마다 맞은 발수로 피해
-scoreboard players remove @s nvC 1
-scoreboard players set @s nvFcd 4
+# 결정 축포 발사 (@s = 플레이어, at 몸, 플레이어 시선 방향): 결정 파편을 모두 소모 → 장미탄 5/7/9/11발(꿰뚫음) → 적마다 맞은 발수로 피해
+# 모션 이벤트가 발사 틱에 부른다(events/navia/skill 7틱 · skill_fire 3틱). 충전은 누른 순간 char/navia/spend 가 소모
+scoreboard players set @s nvShot 0
 scoreboard players operation #nvU tmp = @s nvS
 scoreboard players set @s nvS 0
 scoreboard players reset 결정파편 stacks
-# 충전이 다 차 있었으면 지금부터 다음 충전 시작(재사용 대기 감소 효과 반영)
-execute if score @s nvC matches 1 run scoreboard players set @s nvCT 0
-scoreboard players operation @s skillCd = #nvCd tmp
-function rlk:char/cd_reduce
-scoreboard players operation @s nvCdE = @s skillCd
 # 고유 특성: 소모한 파편 1개당 원소 에너지 1pt · 치명타 확률 +12%(최대 36%)
 scoreboard players operation #t1 tmp = #nvU tmp
 scoreboard players operation #t1 tmp *= #100 tmp
@@ -31,16 +26,15 @@ execute if score #hitLanded tmp matches 1 run function rlk:char/particles {n:2,e
 function rlk:char/after_hit
 # 고유 특성: 일반 공격이 바위 원소로
 scoreboard players operation @s nvP = #nvPDur tmp
-# 우산총 · 소리
-execute unless entity @e[tag=rlk_nvgun,limit=1] run function rlk:char/navia/gun_spawn
-scoreboard players set @s nvGun 14
+# 우산총(1인칭에서만, 숄더뷰는 모션의 우산 모델) · 총구 효과(시선 높낮이를 따름) · 발사 소리(게임 쪽이 소유, 모션 소리에는 넣지 않음)
+execute unless score @s pmVisible matches 1 unless entity @e[tag=rlk_nvgun,limit=1] run function rlk:char/navia/gun_spawn
+execute unless score @s pmVisible matches 1 run scoreboard players set @s nvGun 14
 # 우산이 펴진다
-function rlk:char/navia/gun_open
+execute unless score @s pmVisible matches 1 run function rlk:char/navia/gun_open
 execute positioned ~ ~1.62 ~ run particle minecraft:explosion ^ ^-0.2 ^1.4 0 0 0 0 1
 execute positioned ~ ~1.62 ~ run particle minecraft:wax_on ^ ^-0.2 ^1.6 0.4 0.4 0.4 0 16
 execute unless score #k226 snd matches 1 run function rlk:snd/f250
 execute unless score #k37 snd matches 1 run function rlk:snd/f251
 execute unless score #k142 snd matches 1 run function rlk:snd/f252
-execute as @e[tag=rlk_av,limit=1] run swing @s mainhand
 function rlk:items/hook/on_cast_skill
 function rlk:combat/on_skill

@@ -510,5 +510,168 @@
     "char": "skirk",
     "name": "sheathe",
     "normal": false
+  },
+  {
+    "weapon": "navia_parasol_open",
+    "weapon_state": "drawn",
+    "length": 54,
+    "activation_tick": 34,
+    "hit_ticks": [
+      34
+    ],
+    "chain_tick": 50,
+    "status": "placeholder",
+    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "source": "v1 (burst; v6 back view), compressed",
+    "char": "navia",
+    "name": "burst",
+    "normal": false
+  },
+  {
+    "weapon": "navia_halberd",
+    "weapon_state": "sheathed",
+    "length": 12,
+    "hit_ticks": [],
+    "chain_tick": 6,
+    "status": "placeholder",
+    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "source": "v7 C3 f1163 (dash)",
+    "char": "navia",
+    "name": "dash",
+    "normal": false
+  },
+  {
+    "weapon": "navia_halberd",
+    "weapon_state": "sheathe",
+    "length": 66,
+    "hit_ticks": [],
+    "chain_tick": 66,
+    "status": "placeholder",
+    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "source": "v10 (put-away): shoulder, wrist wheel, palm flip, point-down plant, dissolve +42, back speck +48, grow on the back",
+    "char": "navia",
+    "name": "sheathe",
+    "normal": false
+  },
+  {
+    "playback_rate": 150,
+    "weapon": "navia_halberd",
+    "weapon_state": "drawn",
+    "status": "placeholder",
+    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "length": 15,
+    "hit_ticks": [
+      9
+    ],
+    "chain_tick": 13,
+    "source": "v2 f42-f87 (N1)",
+    "char": "navia",
+    "name": "physical_1",
+    "normal": true
+  },
+  {
+    "playback_rate": 150,
+    "weapon": "navia_halberd",
+    "weapon_state": "drawn",
+    "status": "placeholder",
+    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "length": 14,
+    "hit_ticks": [
+      6
+    ],
+    "chain_tick": 13,
+    "source": "v2 f87-f130 (N2)",
+    "char": "navia",
+    "name": "physical_2",
+    "normal": true
+  },
+  {
+    "playback_rate": 150,
+    "weapon": "navia_halberd",
+    "weapon_state": "drawn",
+    "status": "placeholder",
+    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "length": 22,
+    "hit_ticks": [
+      13,
+      15,
+      17
+    ],
+    "chain_tick": 17,
+    "source": "v2 f131-f192 (N3: drag, plant, kick, thrown claymore)",
+    "char": "navia",
+    "name": "physical_3",
+    "normal": true
+  },
+  {
+    "playback_rate": 150,
+    "weapon": "navia_parasol",
+    "weapon_state": "drawn",
+    "status": "placeholder",
+    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "length": 32,
+    "hit_ticks": [
+      10
+    ],
+    "chain_tick": 20,
+    "source": "v2 f192-f315 (N4: parasol shot and float)",
+    "char": "navia",
+    "name": "physical_4",
+    "normal": true
+  },
+  {
+    "weapon": "navia_parasol",
+    "weapon_state": "drawn",
+    "status": "placeholder",
+    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "length": 34,
+    "activation_tick": 7,
+    "hit_ticks": [
+      7
+    ],
+    "chain_tick": 20,
+    "source": "v5 (tap shot)",
+    "char": "navia",
+    "name": "skill",
+    "normal": false
+  },
+  {
+    "weapon": "navia_parasol",
+    "weapon_state": "drawn",
+    "status": "placeholder",
+    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "length": 16,
+    "source": "v4 f53-f100 (aim in)",
+    "char": "navia",
+    "name": "skill_aim_in",
+    "normal": false
+  },
+  {
+    "weapon": "navia_parasol",
+    "weapon_state": "drawn",
+    "status": "placeholder",
+    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "length": 20,
+    "loop": true,
+    "source": "v4 f100-f168 (aim hold)",
+    "char": "navia",
+    "name": "skill_aim",
+    "normal": false
+  },
+  {
+    "weapon": "navia_parasol",
+    "weapon_state": "drawn",
+    "status": "placeholder",
+    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "length": 24,
+    "activation_tick": 3,
+    "hit_ticks": [
+      3
+    ],
+    "chain_tick": 12,
+    "source": "v4 f168-f358 (release, compressed)",
+    "char": "navia",
+    "name": "skill_fire",
+    "normal": false
   }
 ]

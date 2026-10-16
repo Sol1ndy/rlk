@@ -1,0 +1,20 @@
+{
+  "character": "navia",
+  "schema": 1,
+  "authoring": {
+    "forward": "-Z",
+    "right": "-X",
+    "angles": "XYZ Euler degrees (R = Rz*Ry*Rx); weapon euler in the right-forearm frame",
+    "weapon_tip_axis": "+Y (halberd crescent on model -X; parasol muzzle and canopy +Y)",
+    "weapon_scale": "every authored weapon_scale is multiplied by characters.navia.weaponScale 1.25 (parasol: author 0.8 for true size)",
+    "clips": "in tools/player_motion/navia/*.json fragments, one file per author group (see the README Navia section)",
+    "reference": "User supplied recordings and photo 7.webp; hand-authored motion, no imported game animation files"
+  },
+  "sheath": {
+    "offset": [-0.162, 0.062, 0.4],
+    "euler": [2, 180, -160],
+    "scale": 0.88,
+    "delay": 100,
+    "note": "Photo 7.webp: grip end up over the right shoulder (butt at hat height), head down-left 20 degrees from vertical with the spear tip just above the floor beside the left foot, big crescent outward (left). 0.88 keeps the crossguard below the head box; about 0.23 behind the back surface (hair volume) so the head, hair and legs never intersect."
+  }
+}

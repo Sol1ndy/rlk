@@ -113,6 +113,7 @@ scoreboard players set @s nvQ 0
 scoreboard players set @s nvQS 0
 scoreboard players set @s nvFcd 0
 scoreboard players set @s nvGun -1
+scoreboard players set @s nvShot 0
 scoreboard players set @s naQn 0
 scoreboard players reset 결정파편 stacks
 scoreboard players reset 결정축포 stacks

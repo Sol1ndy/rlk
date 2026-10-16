@@ -5,9 +5,12 @@ execute if score @s pmMoveLock matches 1 run return 0
 execute if score @s arSk matches 1.. run return 0
 execute if score @s skBurst matches 1.. run return 0
 execute if score @s dashMoveT matches 1.. run return 0
+# Navia: no normal attack while aiming the parasol gun.
+execute if score #charN tmp matches 6 if score @s nvA matches 1.. run return 0
 execute if score @s comboStep matches ..-1 run scoreboard players set @s comboStep 0
 execute if score #charN tmp matches 5 if score @s comboStep matches 6.. run scoreboard players set @s comboStep 0
 execute if score #charN tmp matches 3 if score @s comboStep matches 5.. run scoreboard players set @s comboStep 0
+execute if score #charN tmp matches 6 if score @s comboStep matches 4.. run scoreboard players set @s comboStep 0
 scoreboard players operation @s pmAtkStep = @s comboStep
 scoreboard players operation @s pmAtkKind = #charN tmp
 scoreboard players set @s skQ 0

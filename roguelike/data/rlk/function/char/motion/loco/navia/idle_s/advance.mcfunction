@@ -1,0 +1,2 @@
+execute if score @s pmLocT matches 40.. run scoreboard players set @s pmLocT 0
+function rlk:char/motion/loco/navia/idle_s/pose

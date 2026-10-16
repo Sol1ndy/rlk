@@ -377,6 +377,7 @@ scoreboard objectives remove nvCdE
 scoreboard objectives remove nvFcd
 scoreboard objectives remove nvGap
 scoreboard objectives remove nvGun
+scoreboard objectives remove nvShot
 scoreboard objectives remove nvHit
 scoreboard objectives remove nvP
 scoreboard objectives remove nvQ
@@ -524,6 +525,7 @@ scoreboard objectives remove pmAtkStep
 scoreboard objectives remove pmAtkKind
 scoreboard objectives remove pmStrike
 scoreboard objectives remove pmSecond
+scoreboard objectives remove pmThird
 scoreboard objectives remove pmChain
 scoreboard objectives remove pmMoveLock
 scoreboard objectives remove pmLockUntil
