@@ -531,6 +531,24 @@
 - 런타임: `data/rlk/function/char/motion/sheath/`(생성 파일). 점수 `pmSheath`(0 꺼냄 · 1 넣음 · 2 넣는 중), `pmShT`(남은 틱), `pmLocS`(이동 자세가 시작된 상태), `pmShFx`(빠른 수납 연출), `pmWAt`(표시 중인 무기 위치 0 손 · 1 등 · 2 손을 떠남). 집어넣기 동작의 이벤트·효과 파일 자리는 `events/<캐릭터>/sheathe`, `<캐릭터>_fx/sheathe`입니다.
 - 생성: `node tools/build_player_rig.mjs --datapack <데이터팩 폴더> --resourcepack <압축을 푼 리소스팩 폴더>`, 이어서 `python tools/build_player_audio.py`. 적용은 데이터팩 `/reload`, 리소스팩 `F3+T`.
 
+### 나비아 금빛 카드 효과 (`fx/nv/`)
+
+- 입자로는 모양이 잘 안 나오는 나비아의 금빛 바위 원소 효과(장미 문장, 별빛 섬광, 초승달 베기 궤적 등)를 잠깐 떠 있다 사라지는 납작한 `item_display` 카드로 그립니다. 나루카미 카드 효과와는 경로·태그·정리가 모두 따로입니다(태그 `rlk_nvfx`).
+- 카드 종류(`kind`): `rose`(장미 문장) · `star`(네 갈래 반짝임) · `burst`(흰 금빛 별 섬광) · `crescent`(굵은 초승달 베기 궤적, 휘두르는 면에 눕는 카드) · `petal`(금빛 꽃잎) · `shard`(바위 결정 가시, 뿌리 기준) · `ring`(얇은 고리·충격파) · `glow`(부드러운 금빛 빛무리). 모두 밝기 15로 스스로 빛납니다.
+- 부르기(모든 키 필수, 각도·틱은 정수):
+  `function rlk:fx/nv/card {kind:"crescent",pos:"^0 ^1.15 ^0.1",rot:"~ ~",bb:"fixed",roll:0,spin:45,s0:3.8,s1:4.4,move:"0f,0f,0f",life:6,fade:2}`
+  - `pos`: 실행 위치 기준 좌표(`^x`=왼쪽, `^y`=위, `^z`=앞). 초승달은 휘두르는 중심, 가시는 뿌리, 나머지는 가운데.
+  - `rot`: 고정 카드의 방향(`"~ ~"`=실행 방향, `"~ 90"`=바닥에 눕힘). `bb`: `fixed`(3차원 방향 유지) / `center`(항상 카메라를 봄) / `vertical` / `horizontal`.
+  - `roll`: 앞쪽 축으로 돌린 각도. 초승달은 0이면 오른쪽→왼쪽 수평 베기, 180이면 왼쪽→오른쪽, -40 정도면 오른쪽 위에서 왼쪽 아래로 내려 베기, 90/-90이면 세로(뒤에서 보면 옆면만 보이므로 `rot:"~-20 ~"`처럼 조금 비틉니다).
+  - `spin`: 수명 동안 카드 면 안에서 더 도는 각도(-170~170). 초승달은 양수면 휘두르는 방향으로 쓸려 나갑니다.
+  - `s0`→`s1`: 시작·끝 크기(블록, 초승달은 휘두르는 지름). `move`: 끝 위치 이동(`"0f,0.3f,0f"`). `life`: 수명 틱. `fade`: 마지막 몇 틱 동안 작아지며 사라짐.
+  - 0틱에 `s0`로 생기고, 1틱에 한 번의 보간으로 끝 상태로 가며, `life-fade`틱부터 크기 0으로 줄어든 뒤 `life`틱에 지워집니다. 게임 틱 기준이라 공격 속도와 무관합니다.
+- 짧은 형태: `rlk:fx/nv/p/<이름> {pos:"..."}` — `rose_trail`(대쉬 뒤 장미), `rose_pop`, `glint`, `hit_star`, `muzzle_burst`, `flash_glow`, `hit_ring`, `ground_ring`, `slash_h`, `petal`.
+- 주의: 동작 효과 프레임(`navia_fx`) 안의 실행 방향은 몸 방향·**피치 0**이라 `rot:"~ ~"`는 항상 수평입니다. 카드는 생긴 자리에 머무르므로 따라오는 꼬리는 몇 틱마다 다시 만듭니다. 먼지·반짝이 무리·무기 끝 궤적처럼 많은 것은 계속 입자로 그립니다. 살아 있는 카드가 48장이면 새 카드는 건너뜁니다.
+- 정리: 수명이 끝나면 지워지고, 플레이어 사망·런 사망 연출·`run/field_clear`(런 종료·다음 필드)·방 치우기(`rlk_room`)·`uninstall`에서도 지워집니다. 연결은 `rlk:tick`의 `function rlk:fx/nv/world`, `rlk:load`의 `function rlk:fx/nv/init`, `run/field_clear`의 한 줄뿐입니다.
+- 게임 안 확인: `/execute as @p at @s rotated ~ 0 run function rlk:fx/nv/test/all`(종류별 3초), `.../test/slashes`(초승달 방향).
+- 생성: `python3 tools/build_navia_fx_cards.py --resourcepack <압축을 푼 리소스팩 폴더>`(그림·모델·아틀라스 + `data/rlk/function/fx/nv/` 함수, 약 4초). 다른 생성기는 `from build_navia_fx_cards import card_call`로 명령 줄을 만들 수 있습니다. 적용은 `/reload`와 `F3+T`.
+
 ### 아를레키노 낫 방향·공격 속도 보정
 
 - 평상시 낫의 머리는 몸 앞쪽으로 두고, 갈고리 날은 수직 아래에서 캐릭터 오른쪽으로 30도 기울여 잡습니다. 대기·걷기·달리기·공중 자세와 공격 후 복귀에 적용하며 공격 중 날의 진행 방향 보정은 유지합니다.

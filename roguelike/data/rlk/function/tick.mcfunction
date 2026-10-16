@@ -57,6 +57,8 @@ function rlk:element/tick_world
 # 원소 입자 / 캐릭터 소환물
 execute as @e[tag=rlk_epart] at @s run function rlk:char/particle_tick
 execute as @e[tag=rlk_jav] at @s run function rlk:char/lumine/jav_tick
+# 나비아 금빛 카드 효과(tools/build_navia_fx_cards.py): 수명·보간·정리
+function rlk:fx/nv/world
 
 # 버려진 UI 아이템 제거: 바닥에 아이템 엔티티가 하나라도 있을 때만
 execute if entity @e[type=minecraft:item,limit=1] run function rlk:cleanup_grounditems
