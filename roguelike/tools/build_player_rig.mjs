@@ -277,7 +277,10 @@ function compileClip(char,name,clip){
  fn(`${base}/spawn`,spawnLines(char,posed(keys[0],state==='drawn'?keys[0].weapon:info.weapon),keys[0].weapon,keys[0].hidden)+(state==='drawn'?'':'scoreboard players set @s pmWeapon -1\nfunction rlk:char/motion/loco/weapon\n'));
  const normal=/^(physical|infused)_/.test(name);
  // The put-away clip keeps the avatar's facing (an idle character does not turn to the camera).
- const locked=name.startsWith('burst')||name==='dash'||state==='sheathe',yaw=state==='sheathe'?'@e[tag=rlk_pm_basis,limit=1]':'@s';
+ // A clip that throws or floats its weapon ("world" attach) also keeps the heading it started with,
+ // so turning the camera does not swing the detached weapon, its fx or its hits around the body.
+ const worldAttach=clip.frames.some(f=>f.weapon_attach==='world');
+ const locked=name.startsWith('burst')||name==='dash'||state==='sheathe'||worldAttach||clip.locked_yaw===true,yaw=state==='sheathe'?'@e[tag=rlk_pm_basis,limit=1]':'@s';
  const attach0=keys[0].attach,snap0=[`execute unless score @s pmWAt matches ${attachIds[attach0]} run function rlk:char/motion/sheath/snap`,`scoreboard players set @s pmWAt ${attachIds[attach0]}`];
  const hand0=transform(posed(sample(0))).weapon;
  const weaponStart={

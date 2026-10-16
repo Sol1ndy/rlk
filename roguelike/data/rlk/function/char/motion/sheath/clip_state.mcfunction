@@ -3,7 +3,7 @@ execute if score @s pmTick matches 49 if data storage rlk:player_motion active{c
 execute if score @s pmTick matches 48 if data storage rlk:player_motion active{char:"skirk",clip:"sheathe"} run scoreboard players set @s pmSheath 1
 execute if score @s pmTick matches 49 if data storage rlk:player_motion active{char:"navia",clip:"burst"} run scoreboard players set @s pmSheath 1
 execute if score @s pmTick matches 46 if data storage rlk:player_motion active{char:"navia",clip:"sheathe"} run scoreboard players set @s pmSheath 1
-execute if score @s pmTick matches 18 if data storage rlk:player_motion active{char:"navia",clip:"physical_3"} run scoreboard players set @s pmSheath 1
+execute if score @s pmTick matches 20 if data storage rlk:player_motion active{char:"navia",clip:"physical_3"} run scoreboard players set @s pmSheath 1
 execute if score @s pmTick matches 29 if data storage rlk:player_motion active{char:"navia",clip:"physical_4"} run scoreboard players set @s pmSheath 1
 execute if score @s pmTick matches 28 if data storage rlk:player_motion active{char:"navia",clip:"skill"} run scoreboard players set @s pmSheath 1
 execute if score @s pmTick matches 18 if data storage rlk:player_motion active{char:"navia",clip:"skill_fire"} run scoreboard players set @s pmSheath 1

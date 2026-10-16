@@ -1376,7 +1376,169 @@
           15,
           17
         ],
-        "layers": []
+        "layers": [
+          {
+            "tick": 1,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.18,
+            "pitch": 0.55,
+            "layer": "halberd swung back"
+          },
+          {
+            "tick": 2,
+            "event": "block.stone.hit",
+            "volume": 0.3,
+            "pitch": 1.35,
+            "layer": "tip-scrape click"
+          },
+          {
+            "tick": 2,
+            "event": "item.trident.hit_ground",
+            "volume": 0.14,
+            "pitch": 1.5,
+            "layer": "metal tip on stone"
+          },
+          {
+            "tick": 2,
+            "event": "block.stone.step",
+            "volume": 0.18,
+            "pitch": 0.85,
+            "layer": "sliding lunge step"
+          },
+          {
+            "tick": 3,
+            "event": "block.grindstone.use",
+            "volume": 0.07,
+            "pitch": 1.7,
+            "layer": "drag scrape"
+          },
+          {
+            "tick": 4,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.22,
+            "pitch": 0.75,
+            "layer": "whip up"
+          },
+          {
+            "tick": 6,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.2,
+            "pitch": 0.6,
+            "layer": "swing down"
+          },
+          {
+            "tick": 7,
+            "event": "block.heavy_core.hit",
+            "volume": 0.3,
+            "pitch": 1.1,
+            "layer": "planted thunk"
+          },
+          {
+            "tick": 7,
+            "event": "item.trident.hit_ground",
+            "volume": 0.24,
+            "pitch": 0.8,
+            "layer": "spear point bites"
+          },
+          {
+            "tick": 8,
+            "event": "item.armor.equip_leather",
+            "volume": 0.14,
+            "pitch": 1.2,
+            "layer": "knee chamber rustle"
+          },
+          {
+            "tick": 10,
+            "event": "entity.player.attack.knockback",
+            "volume": 0.45,
+            "pitch": 1.2,
+            "layer": "kick crack"
+          },
+          {
+            "tick": 10,
+            "event": "item.trident.throw",
+            "volume": 0.38,
+            "pitch": 0.8,
+            "layer": "halberd launched"
+          },
+          {
+            "tick": 10,
+            "event": "entity.player.attack.strong",
+            "volume": 0.16,
+            "pitch": 1.4,
+            "layer": "kick snap"
+          },
+          {
+            "tick": 11,
+            "event": "item.trident.riptide_1",
+            "volume": 0.16,
+            "pitch": 1.5,
+            "layer": "spin-up whirr"
+          },
+          {
+            "tick": 12,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.15,
+            "pitch": 1.0,
+            "layer": "whirr"
+          },
+          {
+            "tick": 13,
+            "event": "item.spear.attack",
+            "volume": 0.12,
+            "pitch": 1.2,
+            "layer": "halberd chunk"
+          },
+          {
+            "tick": 14,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.15,
+            "pitch": 1.12,
+            "layer": "whirr"
+          },
+          {
+            "tick": 15,
+            "event": "item.spear.attack",
+            "volume": 0.12,
+            "pitch": 1.3,
+            "layer": "halberd chunk"
+          },
+          {
+            "tick": 16,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.15,
+            "pitch": 1.24,
+            "layer": "whirr"
+          },
+          {
+            "tick": 17,
+            "event": "item.spear.attack",
+            "volume": 0.12,
+            "pitch": 1.4,
+            "layer": "halberd chunk"
+          },
+          {
+            "tick": 18,
+            "event": "entity.illusioner.mirror_move",
+            "volume": 0.16,
+            "pitch": 1.6,
+            "layer": "gold dissolve"
+          },
+          {
+            "tick": 21,
+            "event": "block.amethyst_block.chime",
+            "volume": 0.2,
+            "pitch": 1.5,
+            "layer": "re-form chime"
+          },
+          {
+            "tick": 23,
+            "event": "item.armor.equip_iron",
+            "volume": 0.16,
+            "pitch": 1.15,
+            "layer": "settles on the back"
+          }
+        ]
       },
       "physical_4": {
         "playback_rate": 150,
@@ -1419,8 +1581,10 @@
     "block.chain.hit",
     "block.enchantment_table.use",
     "block.fire.extinguish",
+    "block.grindstone.use",
     "block.heavy_core.hit",
     "block.respawn_anchor.charge",
+    "block.stone.hit",
     "block.stone.step",
     "entity.blaze.shoot",
     "entity.breeze.charge",
@@ -1428,6 +1592,9 @@
     "entity.breeze.wind_burst",
     "entity.enderman.teleport",
     "entity.generic.explode",
+    "entity.illusioner.mirror_move",
+    "entity.player.attack.knockback",
+    "entity.player.attack.strong",
     "entity.player.attack.sweep",
     "item.armor.equip_diamond",
     "item.armor.equip_iron",
@@ -1436,6 +1603,8 @@
     "item.mace.smash_ground",
     "item.mace.smash_ground_heavy",
     "item.spear.attack",
+    "item.trident.hit_ground",
+    "item.trident.riptide_1",
     "item.trident.throw"
   ]
 }
