@@ -8,6 +8,7 @@ scoreboard players set @s pmLocT 0
 scoreboard players set @s pmLocAcc 0
 scoreboard players set @s pmLocMode -1
 scoreboard players set @s pmWeapon -1
+scoreboard players set @s pmWModel 0
 # Every lifecycle reset (death, map, selection space, view, character switch, reload) leaves the weapon sheathed.
 scoreboard players set @s pmSheath 1
 scoreboard players set @s pmShT 0

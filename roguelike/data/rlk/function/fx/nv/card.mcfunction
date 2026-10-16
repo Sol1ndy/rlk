@@ -4,6 +4,9 @@
 #  spin:<int deg over the life, -170..170>, s0:<start size>, s1:<end size>,
 #  move:"dx,dy,dz" (end offset, display frame), life:<ticks>, fade:<shrink-out ticks>}
 # Kinds: rose, star, burst, crescent, petal, shard, ring, glow. Full reference: README (나비아 금빛 카드 효과).
+# Clip fx in first person (#pmFxFP, set around the fx call by char/motion/apply and the clip starts):
+# no cards, they would sit at the player's own eye. Gameplay calls (first-person muzzle cards) still draw.
+execute if score #pmFxFP tmp matches 1 run return 0
 execute if score #nvfxN nvfx matches 48.. run return 0
 scoreboard players add #nvfxN nvfx 1
 $data modify storage rlk:nvfx a set value {kind:"$(kind)",pos:"$(pos)",rot:"$(rot)",bb:"$(bb)",s0:$(s0),s1:$(s1),move:"$(move)",ax:"0f,0f,1f",rr:0f,sr:0f,d:1,f:0}

@@ -8,7 +8,8 @@ import path from 'node:path';
 //  pmLocS   sheath state the current loco cycle was begun with (a change restarts the cycle)
 //  pmShFx   quick-stow visual: weapon hidden, then it re-forms on the back (<char>.json sheath.grow)
 //  pmWAt    weapon attach currently displayed (0 hand, 1 back, 2 world); a change snaps the weapon
-export const locomotionObjectives=['pmVisible','pmRigChar','pmLocMode','pmWantMode','pmLocT','pmLocAcc','pmLocSpeed','pmBlend','pmPX','pmPZ','pmPosValid','pmWeapon','pmWantW','pmSheath','pmShT','pmLocS','pmShFx','pmWAt'];
+//  pmWModel weapon model currently displayed (build_player_rig.mjs model id); a drawn clip of another model snaps
+export const locomotionObjectives=['pmVisible','pmRigChar','pmLocMode','pmWantMode','pmLocT','pmLocAcc','pmLocSpeed','pmBlend','pmPX','pmPZ','pmPosValid','pmWeapon','pmWantW','pmSheath','pmShT','pmLocS','pmShFx','pmWAt','pmWModel'];
 // Ticks a drawn weapon stays out after the last drawn clip (#pmShDelay tmp); <char>.json sheath.delay overrides.
 const SHEATH_DELAY=100;
 // Ticks of the quick-stow visual (pmShFx): the weapon stays hidden, then re-forms on the back in the last ticks.
@@ -60,7 +61,7 @@ export function buildLocomotion({fn,poseLines,spawnLines,weaponLines,neutral,ler
   '# Hard cleanup for lifecycle changes; normal animation endings use finish.',
   'function rlk:char/motion/release','kill @e[tag=rlk_pm]',
   ...['pmVisible','pmPosValid','pmBlend','pmLocT','pmLocAcc'].map(o=>`scoreboard players set @s ${o} 0`),
-  'scoreboard players set @s pmLocMode -1','scoreboard players set @s pmWeapon -1',
+  'scoreboard players set @s pmLocMode -1','scoreboard players set @s pmWeapon -1','scoreboard players set @s pmWModel 0',
   '# Every lifecycle reset (death, map, selection space, view, character switch, reload) leaves the weapon sheathed.',
   'scoreboard players set @s pmSheath 1','scoreboard players set @s pmShT 0','scoreboard players set @s pmShFx 0','scoreboard players set @s pmLocS -1','scoreboard players set @s pmWAt -1',
   'execute if entity @e[tag=rlk_av,limit=1] run effect clear @e[tag=rlk_av,limit=1] minecraft:invisibility',

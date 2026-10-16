@@ -1,2 +1,2 @@
-particle minecraft:dust{color:[1.0,0.98,0.86],scale:0.55} ^0.37 ^0.14 ^-0.36 0.03 0.03 0.03 0 2 normal
-particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.9} ^0.37 ^0.14 ^-0.36 0.05 0.05 0.05 0 1 normal
+particle minecraft:dust{color:[1.0,0.98,0.86],scale:0.55} ^0.51 ^0.23 ^-0.27 0.03 0.03 0.03 0 2 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.9} ^0.51 ^0.23 ^-0.27 0.05 0.05 0.05 0 1 normal

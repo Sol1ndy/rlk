@@ -23,6 +23,7 @@ scoreboard objectives add pmShT dummy
 scoreboard objectives add pmLocS dummy
 scoreboard objectives add pmShFx dummy
 scoreboard objectives add pmWAt dummy
+scoreboard objectives add pmWModel dummy
 scoreboard players set #pmShDelay tmp 100
 execute as @a[tag=player] run function rlk:char/motion/stop
 kill @e[tag=rlk_pm]

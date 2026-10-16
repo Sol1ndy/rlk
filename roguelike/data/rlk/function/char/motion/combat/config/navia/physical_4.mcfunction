@@ -2,4 +2,4 @@
 scoreboard players set @s pmStrike 10
 scoreboard players set @s pmSecond 0
 scoreboard players set @s pmThird 0
-scoreboard players set @s pmChain 20
+scoreboard players set @s pmChain 30

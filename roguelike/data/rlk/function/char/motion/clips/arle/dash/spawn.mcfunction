@@ -10,5 +10,6 @@ summon minecraft:item_display ~ ~ ~ {Tags:["rlk_view","rlk_pet","rlk_pm","rlk_pm
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_view","rlk_pet","rlk_pm","rlk_pm_left_shin"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:1.5f,width:8f,height:6f,shadow_radius:0f,transformation:{translation:[0.124364f,0.369018f,0.249613f],left_rotation:[0.069890f,-0.059241f,0.055583f,0.994242f],scale:[1.000000f,1.000000f,1.000000f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:player_motion/arle/left_shin"}}}
 summon minecraft:item_display ~ ~ ~ {Tags:["rlk_view","rlk_pet","rlk_pm","rlk_pm_weapon"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:1.5f,width:8f,height:6f,shadow_radius:0f,transformation:{translation:[-0.076298f,1.091239f,-0.174962f],left_rotation:[0.178643f,-0.124250f,0.233081f,0.947798f],scale:[1.000000f,1.000000f,1.000000f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:player_motion/weapons/spear"}}}
 execute rotated as @s rotated ~ 0 run tp @e[tag=rlk_pm] ~ ~ ~ ~ 0
+scoreboard players set @s pmWModel 1
 scoreboard players set @s pmWeapon -1
 function rlk:char/motion/loco/weapon

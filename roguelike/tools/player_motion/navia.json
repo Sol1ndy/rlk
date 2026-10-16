@@ -11,10 +11,10 @@
     "reference": "User supplied recordings and photo 7.webp; hand-authored motion, no imported game animation files"
   },
   "sheath": {
-    "offset": [-0.162, 0.062, 0.4],
-    "euler": [2, 180, -160],
+    "offset": [-0.22, 0.062, 0.31],
+    "euler": [2, 180, -152],
     "scale": 0.88,
     "delay": 100,
-    "note": "Photo 7.webp: grip end up over the right shoulder (butt at hat height), head down-left 20 degrees from vertical with the spear tip just above the floor beside the left foot, big crescent outward (left). 0.88 keeps the crossguard below the head box; about 0.23 behind the back surface (hair volume) so the head, hair and legs never intersect."
+    "note": "Photo 7.webp: grip end up over the right shoulder (butt at hat height, outside the head box), head down-left about 28 degrees from vertical with the spear tip just above the floor beside the left foot, big crescent outward (left). 0.88 keeps the crossguard below the head box. The shaft hangs 0.14-0.17 behind the back surface (was 0.24-0.27); closer than that the halberd head behind the left foot is kicked by the run_s/walk_s legs and the butt touches the head in the dash lean."
   }
 }

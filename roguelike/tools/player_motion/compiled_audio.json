@@ -1977,70 +1977,70 @@
             "layer": "eruption crash"
           },
           {
-            "tick": 19,
+            "tick": 21,
             "event": "item.armor.equip_elytra",
             "volume": 0.4,
             "pitch": 1.3,
             "layer": "canopy opens"
           },
           {
-            "tick": 21,
+            "tick": 23,
             "event": "block.note_block.flute",
             "volume": 0.1,
             "pitch": 0.54,
             "layer": "float tone low"
           },
           {
-            "tick": 21,
+            "tick": 23,
             "event": "block.note_block.flute",
             "volume": 0.08,
             "pitch": 0.81,
             "layer": "float tone high"
           },
           {
-            "tick": 25,
+            "tick": 31,
             "event": "block.stone.step",
             "volume": 0.35,
             "pitch": 0.9,
             "layer": "landing"
           },
           {
-            "tick": 25,
+            "tick": 31,
             "event": "item.armor.equip_leather",
             "volume": 0.22,
             "pitch": 1.1,
             "layer": "landing cloth"
           },
           {
-            "tick": 26,
+            "tick": 32,
             "event": "entity.breeze.slide",
             "volume": 0.12,
             "pitch": 1.3,
             "layer": "canopy twirl"
           },
           {
-            "tick": 27,
+            "tick": 33,
             "event": "item.crossbow.loading_end",
             "volume": 0.28,
             "pitch": 1.6,
             "layer": "parasol closes"
           },
           {
-            "tick": 28,
+            "tick": 34,
             "event": "block.amethyst_block.resonate",
             "volume": 0.2,
             "pitch": 1.6,
             "layer": "parasol dissolves"
           },
           {
-            "tick": 29,
+            "tick": 35,
             "event": "item.armor.equip_iron",
             "volume": 0.25,
             "pitch": 1.2,
             "layer": "halberd re-forms"
           },
           {
-            "tick": 31,
+            "tick": 37,
             "event": "block.amethyst_block.chime",
             "volume": 0.15,
             "pitch": 1.4,
@@ -2272,16 +2272,9 @@
           {
             "tick": 1,
             "event": "item.armor.equip_leather",
-            "volume": 0.4,
-            "pitch": 1.6,
-            "layer": "canopy pops open"
-          },
-          {
-            "tick": 1,
-            "event": "item.crossbow.loading_middle",
-            "volume": 0.25,
-            "pitch": 1.7,
-            "layer": "canopy mechanism"
+            "volume": 0.2,
+            "pitch": 1.5,
+            "layer": "canopy pops open (soft cloth snap; v4: silent)"
           },
           {
             "tick": 5,
@@ -2341,17 +2334,10 @@
           },
           {
             "tick": 15,
-            "event": "item.crossbow.loading_end",
-            "volume": 0.3,
-            "pitch": 1.7,
-            "layer": "canopy closes"
-          },
-          {
-            "tick": 15,
             "event": "item.armor.equip_leather",
-            "volume": 0.22,
+            "volume": 0.1,
             "pitch": 1.6,
-            "layer": "close rustle"
+            "layer": "close rustle (very quiet; v4: silent close)"
           },
           {
             "tick": 17,

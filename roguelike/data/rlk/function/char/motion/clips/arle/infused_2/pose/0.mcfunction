@@ -12,3 +12,4 @@ $data merge entity @e[tag=rlk_pm,tag=rlk_pm_left_leg,limit=1] {interpolation_dur
 $data merge entity @e[tag=rlk_pm,tag=rlk_pm_left_shin,limit=1] {interpolation_duration:$(step),start_interpolation:0,transformation:{translation:[0.101845f,0.319733f,0.208965f],left_rotation:[-0.085013f,-0.138027f,0.032572f,0.986236f],scale:[1.000000f,1.000000f,1.000000f],right_rotation:[0f,0f,0f,1f]}}
 data modify entity @e[tag=rlk_pm_weapon,limit=1] item set value {id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:player_motion/weapons/scythe"}}
 data merge entity @e[tag=rlk_pm_weapon,limit=1] {brightness:{block:15,sky:15}}
+scoreboard players set @s pmWModel 2

@@ -8,4 +8,4 @@ particle minecraft:dust{color:[1,0.953,0.769],scale:0.3} ^0.904 ^0.95 ^0.873 0 0
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.42} ^0.79 ^0.95 ^0.975 0 0 0 0 1 normal
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.42} ^0.664 ^0.95 ^1.062 0 0 0 0 1 normal
 particle minecraft:dust{color:[1,0.953,0.769],scale:0.3} ^0.528 ^0.95 ^1.133 0 0 0 0 1 normal
-particle minecraft:dust{color:[1,0.953,0.769],scale:0.4} ^-0.191 ^2.823 ^-0.005 0.04 0.04 0.04 0 2 normal
+particle minecraft:dust{color:[1,0.953,0.769],scale:0.4} ^-0.546 ^2.68 ^-0.2 0.04 0.04 0.04 0 2 normal

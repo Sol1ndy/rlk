@@ -12,3 +12,4 @@ $data merge entity @e[tag=rlk_pm,tag=rlk_pm_left_leg,limit=1] {interpolation_dur
 $data merge entity @e[tag=rlk_pm,tag=rlk_pm_left_shin,limit=1] {interpolation_duration:$(step),start_interpolation:0,transformation:{translation:[0.168541f,0.379097f,0.004580f],left_rotation:[0.131029f,-0.121857f,0.069524f,0.981401f],scale:[1.000000f,1.000000f,1.000000f],right_rotation:[0f,0f,0f,1f]}}
 data modify entity @e[tag=rlk_pm_weapon,limit=1] item set value {id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:player_motion/weapons/sword"}}
 data remove entity @e[tag=rlk_pm_weapon,limit=1] brightness
+scoreboard players set @s pmWModel 3

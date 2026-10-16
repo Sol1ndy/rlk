@@ -2,10 +2,8 @@
 # Frame timing follows the animation clock, including attack-speed changes.
 # trigger tick (S4)
 execute if score @s pmTick matches 0 run playsound minecraft:block.lever.click player @s ~ ~ ~ 0.25 1.9 0
-# canopy pops open
-execute if score @s pmTick matches 1 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.4 1.6 0
-# canopy mechanism
-execute if score @s pmTick matches 1 run playsound minecraft:item.crossbow.loading_middle player @s ~ ~ ~ 0.25 1.7 0
+# canopy pops open (soft cloth snap; v4: silent)
+execute if score @s pmTick matches 1 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.2 1.5 0
 # crystal shard crunch (S6)
 execute if score @s pmTick matches 5 run playsound minecraft:block.amethyst_block.hit player @s ~ ~ ~ 0.4 1.3 0
 # shard glint (S6)
@@ -22,10 +20,8 @@ execute if score @s pmTick matches 9 run playsound minecraft:block.amethyst_clus
 execute if score @s pmTick matches 12 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.25 1.2 0
 # canopy rim on the floor (S13)
 execute if score @s pmTick matches 14 run playsound minecraft:block.wool.place player @s ~ ~ ~ 0.25 0.8 0
-# canopy closes
-execute if score @s pmTick matches 15 run playsound minecraft:item.crossbow.loading_end player @s ~ ~ ~ 0.3 1.7 0
-# close rustle
-execute if score @s pmTick matches 15 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.22 1.6 0
+# close rustle (very quiet; v4: silent close)
+execute if score @s pmTick matches 15 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.1 1.6 0
 # dissolve shimmer (S14)
 execute if score @s pmTick matches 17 run playsound minecraft:block.amethyst_block.chime player @s ~ ~ ~ 0.35 1.9 0
 # dissolve ring-out (S14)

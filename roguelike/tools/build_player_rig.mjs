@@ -170,6 +170,10 @@ function bodyModels(char,skin){
 const blocks=['black_concrete','red_concrete','orange_concrete','white_concrete','light_blue_concrete','purple_concrete','cyan_concrete','gray_concrete','blue_concrete','light_gray_concrete'];
 const solid=(from,to,tex,rotation)=>({from,to,faces:Object.fromEntries(['north','south','east','west','up','down'].map(k=>[k,{texture:'#'+tex,uv:[0,0,16,16]}])),...(rotation?{rotation}:{} )});
 const weaponSpan={}; // model px along +Y (butt..tip) per weapon model, for the sheath sparkle lines
+// pmWModel: 1-based id of the weapon model the rig displays (set by every item line and spawn). A drawn clip whose
+// frame-zero model differs snaps the weapon at its start, so one model never blends from another model's transform.
+const modelIds={};
+const modelId=name=>{if(!modelIds[name])throw new Error(`Unknown weapon model "${name}".`);return modelIds[name];};
 function weaponModels(){
  // Painted signature-weapon sprites (weapon_paint.mjs): Arlecchino's 붉은 달의 형상 scythe,
  // Skirk's 창백한 섬광 sword, and Navia's halberd and parasol gun (closed / open, swapped per
@@ -179,6 +183,7 @@ function weaponModels(){
  const {sword,cryo_sword:cryo}=buildSkirkWeaponGeometry();
  for(const[name,elements]of Object.entries({spear,scythe,sword,cryo_sword:cryo,...buildNaviaWeaponGeometry()})){
   for(const el of elements)for(const v of[...el.from,...el.to])if(v<-16||v>32)throw new Error(name+': element outside -16..32');
+  modelIds[name]??=Object.keys(modelIds).length+1;
   weaponSpan[name]=[Math.min(...elements.flatMap(el=>[el.from[1],el.to[1]])),Math.max(...elements.flatMap(el=>[el.from[1],el.to[1]]))];
   const used=[...new Set(elements.flatMap(el=>Object.values(el.faces).map(f=>f.texture.slice(1))))];
   const textures=Object.fromEntries(used.map(n=>[n,spriteId(n)]));textures.particle=textures[used[0]];
@@ -207,7 +212,7 @@ function backSpark(v,weapon){
 }
 function weaponLines(weapon){
  const light=glowing.has(weapon)?'data merge entity @e[tag=rlk_pm_weapon,limit=1] {brightness:{block:15,sky:15}}':'data remove entity @e[tag=rlk_pm_weapon,limit=1] brightness';
- return`data modify entity @e[tag=rlk_pm_weapon,limit=1] item set value {id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:player_motion/weapons/${weapon}"}}\n${light}`;
+ return`data modify entity @e[tag=rlk_pm_weapon,limit=1] item set value {id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:player_motion/weapons/${weapon}"}}\n${light}\nscoreboard players set @s pmWModel ${modelId(weapon)}`;
 }
 function spawnLines(char,pose,weapon,hidden=false){
  const values=transform(pose);
@@ -215,7 +220,7 @@ function spawnLines(char,pose,weapon,hidden=false){
  return parts.map(name=>{
  const item=name==='weapon'?`rlk:player_motion/weapons/${weapon}`:`rlk:player_motion/${char}/${name}`;
  return`summon minecraft:item_display ~ ~ ~ {Tags:["rlk_view","rlk_pet","rlk_pm","rlk_pm_${name}"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:1.5f,width:8f,height:6f,shadow_radius:0f,${name==='weapon'&&glowing.has(weapon)?'brightness:{block:15,sky:15},':''}transformation:${nbt(values[name])},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${item}"}}}`;
- }).join('\n')+'\nexecute rotated as @s rotated ~ 0 run tp @e[tag=rlk_pm] ~ ~ ~ ~ 0\n';
+ }).join('\n')+`\nexecute rotated as @s rotated ~ 0 run tp @e[tag=rlk_pm] ~ ~ ~ ~ 0\nscoreboard players set @s pmWModel ${modelId(weapon)}\n`;
 }
 // Clip-level weapon_state: "drawn" (default; starting it draws instantly), "sheathed" (weapon on the back for
 // the whole clip unless frames change it; a drawn weapon is quick-stowed first; dash) or "sheathe" (the put-away
@@ -225,6 +230,7 @@ function spawnLines(char,pose,weapon,hidden=false){
 // whose attach differs the weapon fields hold the earlier key (the body still blends), so a sparse key gap never
 // drifts the weapon toward the other frame. A frame with "weapon_snap":true (not sticky) also snaps the weapon on
 // its tick, for authored pops such as a crescent appearing at full width.
+const fxCall=line=>['execute store result score #pmFxFP tmp unless score @s pmVisible matches 1',line,'scoreboard players set #pmFxFP tmp 0'];
 const weaponStates=['drawn','sheathed','sheathe'];
 const weaponFields=['weapon','weapon_shift','weapon_scale'];
 const clipStates=[];
@@ -252,15 +258,20 @@ function compileClip(char,name,clip){
  const posed=(current,mount=current.weapon)=>rigPose(char,current.pose,current.attach,mount);
  const base=`clips/${char}/${name}`,dispatch=[];
  let lastWeapon,lastAttach=keys[0].attach,switched=state==='drawn';
+ // models[t]: the model a frame shows on tick t (null = the loco/weapon variant of a sheathed or put-away clip).
+ const models=[];
  for(let t=0;t<=clip.length;t++){
   const current=sample(t),changed=t>0&&current.attach!==lastAttach,snapKey=keys.some(key=>key.tick===t&&key.snap);
   // Drawn clips set their model. The dash, sheathed and put-away clips keep whatever loco/weapon shows
   // (spear or infused scythe, sword or cryo sword) unless a later frame switches the model.
   const swap=state==='drawn'?current.weapon!==lastWeapon:t>0&&current.weapon!==lastWeapon;
-  switched||=swap;
+  switched||=swap;models.push(switched?current.weapon:null);
   const mount=switched?current.weapon:info.weapon;
-  const lines=[`# ${char} / ${name}: authored animation tick ${t}`,poseLines(posed(current,mount),'$(step)',current.hidden,changed||snapKey?['weapon']:[])];
+  // A model switch inside the clip snaps the weapon too: the new model never glides from the old one's transform.
+  const swapSnap=swap&&t>0&&!changed&&!snapKey;
+  const lines=[`# ${char} / ${name}: authored animation tick ${t}`,poseLines(posed(current,mount),'$(step)',current.hidden,changed||snapKey||swapSnap?['weapon']:[])];
   if(swap)lines.push(weaponLines(current.weapon));
+  if(swapSnap)lines.push('# model switch: snap the weapon (no interpolation from the previous model)','scoreboard players set #pmSnapW tmp 1');
   if(changed){
    // Sparkle along the full-size weapon: put-away clips usually ramp weapon_scale to 0 around this tick.
    const placed=transform(posed({...current,pose:{...current.pose,weapon_scale:[1,1,1]}},mount)).weapon;
@@ -273,20 +284,35 @@ function compileClip(char,name,clip){
   dispatch.push(`execute if score @s pmTick matches ${t} run function rlk:char/motion/${base}/pose/${t} with storage rlk:player_motion active`);
  }
  fn(`${base}/pose`,dispatch.join('\n'));
+ // A clip that switches models mid-clip gets <clip>/model: the model in force at pmTick, for a respawn inside the
+ // clip (view switch, avatar re-created), which otherwise shows the frame-zero model until the next switch.
+ const ranges=[];models.forEach((model,t)=>{const last=ranges.at(-1);if(last&&last.model===model)last.to=t;else ranges.push({model,from:t,to:t});});
+ const midSwitch=models.some((model,t)=>t>0&&model!==models[t-1]);
+ if(midSwitch)fn(`${base}/model`,['# Generated: the weapon model in force at pmTick (@s player; after a respawn inside the clip).',
+  ...ranges.filter(r=>r.model).flatMap(r=>weaponLines(r.model).split('\n').map(line=>`execute if score @s pmTick matches ${r.from===r.to?r.from:r.from+'..'+r.to} run ${line}`))].join('\n'));
  // A respawn inside a sheathed or put-away clip restores the loco weapon variant too.
- fn(`${base}/spawn`,spawnLines(char,posed(keys[0],state==='drawn'?keys[0].weapon:info.weapon),keys[0].weapon,keys[0].hidden)+(state==='drawn'?'':'scoreboard players set @s pmWeapon -1\nfunction rlk:char/motion/loco/weapon\n'));
+ fn(`${base}/spawn`,spawnLines(char,posed(keys[0],state==='drawn'?keys[0].weapon:info.weapon),keys[0].weapon,keys[0].hidden)+(state==='drawn'?'':'scoreboard players set @s pmWeapon -1\nfunction rlk:char/motion/loco/weapon\n')+(midSwitch?`function rlk:char/motion/${base}/model\n`:''));
  const normal=/^(physical|infused)_/.test(name);
  // The put-away clip keeps the avatar's facing (an idle character does not turn to the camera).
  // A clip that throws or floats its weapon ("world" attach) also keeps the heading it started with,
  // so turning the camera does not swing the detached weapon, its fx or its hits around the body.
  const worldAttach=clip.frames.some(f=>f.weapon_attach==='world');
- const locked=name.startsWith('burst')||name==='dash'||state==='sheathe'||worldAttach||clip.locked_yaw===true,yaw=state==='sheathe'?'@e[tag=rlk_pm_basis,limit=1]':'@s';
+ const locked=name.startsWith('burst')||name==='dash'||state==='sheathe'||worldAttach||clip.locked_yaw===true;
+ // basis: where a locked clip takes its heading. "camera" (default) = the player's look; "avatar" (put-away
+ // default) = the avatar's facing; "body" = rlk_body, i.e. the avatar in shoulder view (turned toward the
+ // crosshair point by view/face_lock when an attack or skill is pressed) and the player in first person.
+ const basis=clip.basis??(state==='sheathe'?'avatar':'camera'),basisFrom={camera:'@s',avatar:'@e[tag=rlk_av,limit=1]',body:'@e[tag=rlk_body,limit=1]'}[basis];
+ if(!basisFrom)throw new Error(`Invalid basis "${basis}" (camera|avatar|body): ${char}/${name}`);
+ const yaw=locked&&basis!=='camera'?'@e[tag=rlk_pm_basis,limit=1]':'@s';
  const attach0=keys[0].attach,snap0=[`execute unless score @s pmWAt matches ${attachIds[attach0]} run function rlk:char/motion/sheath/snap`,`scoreboard players set @s pmWAt ${attachIds[attach0]}`];
  const hand0=transform(posed(sample(0))).weapon;
  const weaponStart={
   drawn:['# Drawn: instant draw (snap, no flight) with a gold sparkle at the hand unless it was already drawn',
-   '# (from the back, or out of the put-away clip where it may be dissolved or floating).',...snap0,
-   ...(clip.draw_fx===false||attach0!=='hand'?[]:[`execute unless score @s pmSheath matches 0 if entity @e[tag=rlk_pm_weapon] at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 positioned ${local(hand0.t)} run function rlk:char/motion/sheath/fx_hand`]),
+   '# (from the back, or out of the put-away clip where it may be dissolved or floating). A drawn weapon of',
+   '# another model (#pmWNew, read before frame zero) snaps and sparkles the same way.',snap0[0],
+   'execute if score #pmWNew tmp matches 1 run function rlk:char/motion/sheath/snap',snap0[1],
+   ...(clip.draw_fx===false||attach0!=='hand'?[]:['execute unless score @s pmSheath matches 0 run scoreboard players set #pmWNew tmp 1',
+    `execute if score #pmWNew tmp matches 1 if entity @e[tag=rlk_pm_weapon] at @e[tag=rlk_av,limit=1] rotated as ${yaw} rotated ~ 0 positioned ${local(hand0.t)} run function rlk:char/motion/sheath/fx_hand`]),
    'function rlk:char/motion/sheath/draw'],
   sheathed:['# Sheathed: the weapon stays on the back (quick stow from the position marked before frame zero if it was',
    '# drawn); loco/weapon picks the variant.',...snap0,
@@ -312,7 +338,7 @@ function compileClip(char,name,clip){
   'execute store result storage rlk:player_motion active.step int 1 run scoreboard players get @s pmStep',
   ...(locked?[
    'execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_pet","rlk_pm_basis"]}',
-   `execute at @e[tag=rlk_body,limit=1] rotated as ${state==='sheathe'?'@e[tag=rlk_av,limit=1]':'@s'} rotated ~ 0 run tp @e[tag=rlk_pm_basis,limit=1] ~ ~ ~ ~ 0`
+   `execute at @e[tag=rlk_body,limit=1] rotated as ${basisFrom} rotated ~ 0 run tp @e[tag=rlk_pm_basis,limit=1] ~ ~ ~ ~ 0`
   ]:[]),
   'execute unless score @s pmRigChar = #charN tmp run kill @e[tag=rlk_pm]',
   `execute if entity @e[tag=rlk_av,limit=1] unless entity @e[tag=rlk_pm] at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 run function rlk:char/motion/${base}/spawn`,
@@ -320,6 +346,8 @@ function compileClip(char,name,clip){
   'scoreboard players operation @s pmRigChar = #charN tmp',
   ...(state==='sheathed'?['# Where a drawn weapon is before frame zero moves it to the back (the stow sparkle).',
    'execute unless score @s pmSheath matches 1 if entity @e[tag=rlk_pm_weapon] run function rlk:char/motion/sheath/mark']:[]),
+  ...(state==='drawn'?['# The displayed model (pmWModel) before frame zero sets it: another model snaps instead of blending.',
+   'scoreboard players set #pmWNew tmp 0',`execute unless score @s pmWModel matches ${modelId(keys[0].weapon)} run scoreboard players set #pmWNew tmp 1`]:[]),
   '# Reuse the displayed last pose when chaining an attack; interpolate into frame zero.',
   'data modify storage rlk:player_motion active.step set value 2',
   `execute if entity @e[tag=rlk_pm] run function rlk:char/motion/${base}/pose/0 with storage rlk:player_motion active`,
@@ -327,7 +355,7 @@ function compileClip(char,name,clip){
   `execute at @e[tag=rlk_av,limit=1] rotated as ${yaw} rotated ~ 0 run tp @e[tag=rlk_pm] ~ ~ ~ ~ 0`,
   ...weaponStart,
   'execute if entity @e[tag=rlk_av,limit=1] run function rlk:char/motion/hide_avatar',
-  `execute at @e[tag=rlk_body,limit=1] rotated as ${yaw} rotated ~ 0 run function rlk:char/motion/${char}_fx/${name}`,
+  ...fxCall(`execute at @e[tag=rlk_body,limit=1] rotated as ${yaw} rotated ~ 0 run function rlk:char/motion/${char}_fx/${name}`),
   `execute at @e[tag=rlk_body,limit=1] rotated as ${yaw} rotated ~ 0 run function rlk:char/motion/event`,
   'return 1'
  ].join('\n'));
@@ -386,7 +414,10 @@ function runtime(){
   'function rlk:char/motion/apply with storage rlk:player_motion active',
   'execute if score @s pmActive matches 1 if score @s pmAcc matches 100.. run function rlk:char/motion/advance'
  ].join('\n'));
- fn('apply','$execute if entity @e[tag=rlk_pm] run function rlk:char/motion/clips/$(char)/$(clip)/pose\nfunction rlk:char/motion/sheath/clip_state\n$function rlk:char/motion/$(char)_fx/$(clip)\nfunction rlk:char/motion/event');
+ // #pmFxFP: the clip fx run while the rig is not visible (first person). Card engines skip their camera-facing
+ // item_display cards then (they would sit at the player's own eye); particles still play.
+ fn('apply',['$execute if entity @e[tag=rlk_pm] run function rlk:char/motion/clips/$(char)/$(clip)/pose','function rlk:char/motion/sheath/clip_state',
+  ...fxCall('$function rlk:char/motion/$(char)_fx/$(clip)'),'function rlk:char/motion/event'].join('\n'));
 }
 for(const[char,info]of Object.entries(characters))bodyModels(char,info.skin);
 weaponModels();runtime();

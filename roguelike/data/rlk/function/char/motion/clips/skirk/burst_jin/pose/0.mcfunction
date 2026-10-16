@@ -12,3 +12,4 @@ $data merge entity @e[tag=rlk_pm,tag=rlk_pm_left_leg,limit=1] {interpolation_dur
 $data merge entity @e[tag=rlk_pm,tag=rlk_pm_left_shin,limit=1] {interpolation_duration:$(step),start_interpolation:0,transformation:{translation:[0.213996f,0.400767f,-0.071055f],left_rotation:[0.367084f,-0.346916f,0.087595f,0.858619f],scale:[1.000000f,1.000000f,1.000000f],right_rotation:[0f,0f,0f,1f]}}
 data modify entity @e[tag=rlk_pm_weapon,limit=1] item set value {id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:player_motion/weapons/cryo_sword"}}
 data merge entity @e[tag=rlk_pm_weapon,limit=1] {brightness:{block:15,sky:15}}
+scoreboard players set @s pmWModel 4

@@ -35,6 +35,8 @@ scoreboard players set @s pmWAt 1
 function rlk:char/motion/sheath/stow_marked
 function rlk:char/motion/loco/weapon
 execute if entity @e[tag=rlk_av,limit=1] run function rlk:char/motion/hide_avatar
+execute store result score #pmFxFP tmp unless score @s pmVisible matches 1
 execute at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run function rlk:char/motion/skirk_fx/dash
+scoreboard players set #pmFxFP tmp 0
 execute at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run function rlk:char/motion/event
 return 1

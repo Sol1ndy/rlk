@@ -596,11 +596,11 @@
     "playback_rate": 150,
     "weapon": "navia_parasol",
     "weapon_state": "drawn",
-    "length": 32,
+    "length": 38,
     "hit_ticks": [
       10
     ],
-    "chain_tick": 20,
+    "chain_tick": 30,
     "source": "v2 f192-f315 (side) + v3 s2 f424-f532 (back camera, full recovery): parasol shot, backflip, float under the open parasol, land, halberd re-forms on the back",
     "char": "navia",
     "name": "physical_4",
@@ -610,6 +610,7 @@
     "weapon": "navia_parasol",
     "weapon_state": "drawn",
     "draw_fx": false,
+    "basis": "body",
     "length": 34,
     "activation_tick": 7,
     "hit_ticks": [

@@ -556,7 +556,15 @@ scoreboard objectives remove pmShT
 scoreboard objectives remove pmLocS
 scoreboard objectives remove pmShFx
 scoreboard objectives remove pmWAt
+scoreboard objectives remove pmWModel
 data remove storage rlk:player_motion loco
+
+# 나비아 금빛 카드 효과(fx/nv/init 의 점수판 · 저장소; 카드 자체는 rlk_room 으로 위에서 지운다)
+scoreboard objectives remove nvfx
+scoreboard objectives remove nvfxT
+scoreboard objectives remove nvfxD
+scoreboard objectives remove nvfxK
+data remove storage rlk:nvfx a
 
 # 화면 미니맵
 bossbar remove rlk:minimap
