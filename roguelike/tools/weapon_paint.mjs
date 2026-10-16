@@ -20,9 +20,11 @@
 //   ar_crown*      alpha-cut crimson moon with eight radiating blades, CROWN.S wide
 //   ar_tip         alpha-cut gold lance point on two crossed cards spanning TIP
 //   ar_metal / ar_gold / ar_gem  dark silver and gold fittings, a red gem
+//   nv_* / np_*    Navia's halberd and parasol, painted in navia_weapon_paint.mjs
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
+import {naviaWeaponSprites} from './navia_weapon_paint.mjs';
 
 const CRC = (() => {
   const t = new Uint32Array(256);
@@ -38,7 +40,7 @@ const crc32 = buf => {
   for (const b of buf) c = CRC[(c ^ b) & 0xff] ^ (c >>> 8);
   return (c ^ 0xffffffff) >>> 0;
 };
-function png(w, h, rgba) {
+export function png(w, h, rgba) {
   const chunk = (type, data) => {
     const len = Buffer.alloc(4); len.writeUInt32BE(data.length);
     const td = Buffer.concat([Buffer.from(type, 'ascii'), data]);
@@ -57,11 +59,11 @@ function png(w, h, rgba) {
 }
 
 // ---- small colour helpers --------------------------------------------------------------
-const hex = s => [parseInt(s.slice(1, 3), 16), parseInt(s.slice(3, 5), 16), parseInt(s.slice(5, 7), 16), 255];
-const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
-const smooth = (e0, e1, x) => { const t = clamp((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); };
-const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
-function ramp(stops) {
+export const hex = s => [parseInt(s.slice(1, 3), 16), parseInt(s.slice(3, 5), 16), parseInt(s.slice(5, 7), 16), 255];
+export const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+export const smooth = (e0, e1, x) => { const t = clamp((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); };
+export const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+export function ramp(stops) {
   // stops: [[pos, '#rrggbb'], ...] sorted by pos
   const s = stops.map(([p, c]) => [p, typeof c === 'string' ? hex(c) : c]);
   return x => {
@@ -73,9 +75,9 @@ function ramp(stops) {
     return s[s.length - 1][1];
   };
 }
-const over = (base, top, a) => mix(base, [...top.slice(0, 3), 255], clamp(a));
+export const over = (base, top, a) => mix(base, [...top.slice(0, 3), 255], clamp(a));
 // Deterministic value noise.
-function noise2(seed) {
+export function noise2(seed) {
   const h = (x, y) => { let n = (x * 374761393 + y * 668265263 + seed * 2246822519) | 0; n = (n ^ (n >>> 13)) * 1274126177 | 0; return ((n ^ (n >>> 16)) >>> 0) / 4294967295; };
   return (x, y) => {
     const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
@@ -84,9 +86,9 @@ function noise2(seed) {
     return a + (b - a) * sx + (c - a) * sy + (a - b - c + d) * sx * sy;
   };
 }
-function fbm(seed) { const n = noise2(seed); return (x, y) => .5 * n(x, y) + .25 * n(2 * x + 7, 2 * y + 3) + .125 * n(4 * x + 1, 4 * y + 9) + .125 * n(8 * x + 5, 8 * y + 2); }
+export function fbm(seed) { const n = noise2(seed); return (x, y) => .5 * n(x, y) + .25 * n(2 * x + 7, 2 * y + 3) + .125 * n(4 * x + 1, 4 * y + 9) + .125 * n(8 * x + 5, 8 * y + 2); }
 
-function paint(w, h, fn, ss = 4) {
+export function paint(w, h, fn, ss = 4) {
   const buf = Buffer.alloc(w * h * 4);
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     const acc = [0, 0, 0, 0];
@@ -104,7 +106,7 @@ function paint(w, h, fn, ss = 4) {
 }
 
 // Four-pointed star intensity at (dx, dy) in units of its radius.
-const star4 = (dx, dy, r) => {
+export const star4 = (dx, dy, r) => {
   const ax = Math.abs(dx), ay = Math.abs(dy);
   const arm = Math.max(1 - (ax / r) - ay * 9 / r, 1 - (ay / r) - ax * 9 / r, 0);
   const core = Math.max(0, 1 - Math.hypot(dx, dy) / (r * .28));
@@ -137,7 +139,7 @@ export const CROWN = {Y: 25.4, S: 6.4};
 // Gold lance point above the crown, shown on two crossed cards: x/z 8+-TIP.HW, y TIP.Y0..Y1.
 export const TIP = {HW: 1.0, Y0: 27.0, Y1: 32.0};
 
-const TRANSPARENT = [0, 0, 0, 0];
+export const TRANSPARENT = [0, 0, 0, 0];
 
 // ---- Skirk: 창백한 섬광 (Azurelight) ----------------------------------------------------------
 // "Once pure and pristine as a white dawn star, since tinted a deep, dark blue": silver-white
@@ -374,15 +376,18 @@ export const spriteId = name => 'rlk:player_motion/weapons/' + name;
 export function paintWeaponTextures(rp) {
   const dir = path.join(rp, 'assets/rlk/textures/player_motion/weapons');
   fs.mkdirSync(dir, {recursive: true});
-  for (const [name, [w, h, fn]] of Object.entries(WEAPON_SPRITES)) fs.writeFileSync(path.join(dir, name + '.png'), png(w, h, paint(w, h, fn)));
+  // Navia's sprites live in navia_weapon_paint.mjs, which reuses the helpers above; they are
+  // built here (not at module load) because the two modules import each other.
+  const sprites = {...WEAPON_SPRITES, ...naviaWeaponSprites()};
+  for (const [name, [w, h, fn]] of Object.entries(sprites)) fs.writeFileSync(path.join(dir, name + '.png'), png(w, h, paint(w, h, fn)));
   const atlasPath = path.join(rp, 'assets/minecraft/atlases/items.json');
   const atlas = fs.existsSync(atlasPath) ? JSON.parse(fs.readFileSync(atlasPath, 'utf8')) : {sources: []};
   const known = new Set(atlas.sources.map(s => s.sprite || s.resource));
-  for (const name of Object.keys(WEAPON_SPRITES)) {
+  for (const name of Object.keys(sprites)) {
     const id = spriteId(name);
     if (!known.has(id)) atlas.sources.push({type: 'minecraft:single', resource: id});
   }
   fs.mkdirSync(path.dirname(atlasPath), {recursive: true});
   fs.writeFileSync(atlasPath, JSON.stringify(atlas, null, 2) + '\n');
-  return Object.keys(WEAPON_SPRITES).length;
+  return Object.keys(sprites).length;
 }

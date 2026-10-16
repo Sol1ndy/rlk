@@ -9,6 +9,7 @@ import {fileURLToPath} from 'node:url';
 import {buildLocomotion} from './build_player_locomotion.mjs';
 import {buildScytheGeometry} from './scythe_geometry.mjs';
 import {buildSkirkWeaponGeometry} from './skirk_weapon_geometry.mjs';
+import {buildNaviaWeaponGeometry} from './navia_weapon_geometry.mjs';
 import {paintWeaponTextures,spriteId} from './weapon_paint.mjs';
 const here=path.dirname(fileURLToPath(import.meta.url));
 const arg=n=>{const i=process.argv.indexOf(n);return i<0?undefined:process.argv[i+1];};
@@ -144,12 +145,13 @@ const blocks=['black_concrete','red_concrete','orange_concrete','white_concrete'
 const solid=(from,to,tex,rotation)=>({from,to,faces:Object.fromEntries(['north','south','east','west','up','down'].map(k=>[k,{texture:'#'+tex,uv:[0,0,16,16]}])),...(rotation?{rotation}:{} )});
 const weaponSpan={}; // model px along +Y (butt..tip) per weapon model, for the sheath sparkle lines
 function weaponModels(){
- // Painted signature-weapon sprites (weapon_paint.mjs): Arlecchino's 붉은 달의 형상 scythe and
- // Skirk's 창백한 섬광 sword. Each model lists only the sprites it uses.
+ // Painted signature-weapon sprites (weapon_paint.mjs): Arlecchino's 붉은 달의 형상 scythe,
+ // Skirk's 창백한 섬광 sword, and Navia's halberd and parasol gun (closed / open, swapped per
+ // frame). Each model lists only the sprites it uses.
  paintWeaponTextures(rpRoot);
  const {spear,scythe}=buildScytheGeometry();
  const {sword,cryo_sword:cryo}=buildSkirkWeaponGeometry();
- for(const[name,elements]of Object.entries({spear,scythe,sword,cryo_sword:cryo})){
+ for(const[name,elements]of Object.entries({spear,scythe,sword,cryo_sword:cryo,...buildNaviaWeaponGeometry()})){
   for(const el of elements)for(const v of[...el.from,...el.to])if(v<-16||v>32)throw new Error(name+': element outside -16..32');
   weaponSpan[name]=[Math.min(...elements.flatMap(el=>[el.from[1],el.to[1]])),Math.max(...elements.flatMap(el=>[el.from[1],el.to[1]]))];
   const used=[...new Set(elements.flatMap(el=>Object.values(el.faces).map(f=>f.texture.slice(1))))];
