@@ -1097,11 +1097,74 @@
             "layer": "rift-crystal-tail"
           }
         ]
+      },
+      "sheathe": {
+        "playback_rate": 100,
+        "hit_ticks": [],
+        "layers": [
+          {
+            "tick": 6,
+            "event": "entity.breeze.slide",
+            "volume": 0.05,
+            "pitch": 1.6,
+            "layer": "lift-air"
+          },
+          {
+            "tick": 11,
+            "event": "item.armor.equip_diamond",
+            "volume": 0.16,
+            "pitch": 1.7,
+            "layer": "point-down-tap"
+          },
+          {
+            "tick": 24,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.16,
+            "pitch": 1.5,
+            "layer": "wheel-whoosh"
+          },
+          {
+            "tick": 30,
+            "event": "entity.breeze.slide",
+            "volume": 0.12,
+            "pitch": 1.4,
+            "layer": "raise-flick"
+          },
+          {
+            "tick": 38,
+            "event": "block.amethyst_block.resonate",
+            "volume": 0.07,
+            "pitch": 1.4,
+            "layer": "float-shimmer"
+          },
+          {
+            "tick": 40,
+            "event": "entity.breeze.slide",
+            "volume": 0.06,
+            "pitch": 1.9,
+            "layer": "float-turn"
+          },
+          {
+            "tick": 43,
+            "event": "entity.breeze.slide",
+            "volume": 0.04,
+            "pitch": 2.0,
+            "layer": "dissolve-breath"
+          },
+          {
+            "tick": 48,
+            "event": "block.enchantment_table.use",
+            "volume": 0.12,
+            "pitch": 1.6,
+            "layer": "back-reform-shimmer"
+          }
+        ]
       }
     }
   },
   "sound_events": [
     "block.amethyst_block.resonate",
+    "block.enchantment_table.use",
     "block.fire.extinguish",
     "block.heavy_core.hit",
     "block.respawn_anchor.charge",
@@ -1112,6 +1175,7 @@
     "entity.enderman.teleport",
     "entity.generic.explode",
     "entity.player.attack.sweep",
+    "item.armor.equip_diamond",
     "item.firecharge.use",
     "item.mace.smash_ground_heavy",
     "item.spear.attack",

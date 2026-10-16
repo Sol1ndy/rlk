@@ -477,5 +477,19 @@
     "char": "skirk",
     "name": "dash",
     "normal": false
+  },
+  {
+    "length": 60,
+    "weapon": "sword",
+    "weapon_state": "sheathe",
+    "source": "skirk_putaway",
+    "source_start": 17.82,
+    "source_end": 20.82,
+    "hit_ticks": [],
+    "chain_tick": 60,
+    "reference_observation": "v9 PA1 (f1069 onset; identical PA2): lift and flick, point-down hold with the left foot stepping in and the body yawed to her right, one backward wrist wheel at the right hip, raise forward to shoulder height, release; the sword floats and spins on at head height in front-right while the open hand stays raised, whitens, breaks into a gold sparkle line and drifts away; a white speck at the back hilt grows into the sword silhouette across the lower back (photo 6). Downward poses lean the tip outward because the rig sword is longer than in the video.",
+    "char": "skirk",
+    "name": "sheathe",
+    "normal": false
   }
 ]
