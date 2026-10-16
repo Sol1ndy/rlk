@@ -200,6 +200,7 @@
     "source_start": 1,
     "source_end": 2.75,
     "weapon": "scythe",
+    "draw_fx": false,
     "blade_alignment": "Hook leads the sweep: local shaft roll 180 in the cutting phase, smoothly unwound during recovery.",
     "char": "arle",
     "name": "skill",
@@ -215,6 +216,7 @@
     "source_start": 1,
     "source_end": 4.4,
     "weapon": "spear",
+    "weapon_state": "sheathed",
     "char": "arle",
     "name": "burst",
     "normal": false
@@ -227,6 +229,7 @@
     "source_start": 4.225,
     "source_end": 4.725,
     "weapon": "spear",
+    "weapon_state": "sheathed",
     "audio": false,
     "char": "arle",
     "name": "dash",
@@ -463,6 +466,7 @@
   {
     "length": 10,
     "weapon": "sword",
+    "weapon_state": "sheathed",
     "source": "skirk_dash",
     "source_start": 6.53,
     "source_end": 7.02,

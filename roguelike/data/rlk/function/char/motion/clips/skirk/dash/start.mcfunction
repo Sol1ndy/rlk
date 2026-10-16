@@ -26,6 +26,11 @@ data modify storage rlk:player_motion active.step set value 2
 execute if entity @e[tag=rlk_pm] run function rlk:char/motion/clips/skirk/dash/pose/0 with storage rlk:player_motion active
 execute store result storage rlk:player_motion active.step int 1 run scoreboard players get @s pmStep
 execute at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 run tp @e[tag=rlk_pm] ~ ~ ~ ~ 0
+# Sheathed: the weapon stays on the back (quick stow if it was drawn); loco/weapon picks the variant.
+execute unless score @s pmWAt matches 1 run function rlk:char/motion/sheath/snap
+scoreboard players set @s pmWAt 1
+function rlk:char/motion/sheath/stow
+function rlk:char/motion/loco/weapon
 execute if entity @e[tag=rlk_av,limit=1] run function rlk:char/motion/hide_avatar
 execute at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run function rlk:char/motion/skirk_fx/dash
 execute at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run function rlk:char/motion/event

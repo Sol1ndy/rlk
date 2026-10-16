@@ -8,6 +8,21 @@
     "weapon_tip_axis": "+Y",
     "reference": "User supplied recordings; hand-authored motion, no imported game animation files"
   },
+  "sheath": {
+    "offset": [
+      -0.12,
+      -0.39,
+      0.28
+    ],
+    "euler": [
+      -6,
+      0,
+      26
+    ],
+    "scale": 1,
+    "delay": 100,
+    "note": "back.md final mount (photo 5.webp): head and crescent over the right shoulder, butt spike at the left ankle; spear and scythe share it."
+  },
   "clips": {
     "physical_1": {
       "length": 10,
@@ -17108,6 +17123,7 @@
       "source_start": 1.0,
       "source_end": 2.75,
       "weapon": "scythe",
+      "draw_fx": false,
       "frames": [
         {
           "pose": {
@@ -20659,6 +20675,7 @@
       "source_start": 1.0,
       "source_end": 4.4,
       "weapon": "spear",
+      "weapon_state": "sheathed",
       "frames": [
         {
           "tick": 0,
@@ -20732,11 +20749,6 @@
               0,
               0,
               0
-            ],
-            "weapon_scale": [
-              0.001,
-              0.001,
-              0.001
             ]
           }
         },
@@ -21817,11 +21829,6 @@
               0,
               0,
               0
-            ],
-            "weapon_scale": [
-              0.001,
-              0.001,
-              0.001
             ]
           }
         }
@@ -23420,6 +23427,7 @@
       "source_start": 4.225,
       "source_end": 4.725,
       "weapon": "spear",
+      "weapon_state": "sheathed",
       "frames": [
         {
           "tick": 0,

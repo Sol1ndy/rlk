@@ -18,6 +18,12 @@ scoreboard objectives add pmPZ dummy
 scoreboard objectives add pmPosValid dummy
 scoreboard objectives add pmWeapon dummy
 scoreboard objectives add pmWantW dummy
+scoreboard objectives add pmSheath dummy
+scoreboard objectives add pmShT dummy
+scoreboard objectives add pmLocS dummy
+scoreboard objectives add pmShFx dummy
+scoreboard objectives add pmWAt dummy
+scoreboard players set #pmShDelay tmp 100
 execute as @a[tag=player] run function rlk:char/motion/stop
 kill @e[tag=rlk_pm]
 kill @e[tag=rlk_pm_basis]

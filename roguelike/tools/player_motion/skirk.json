@@ -8,6 +8,21 @@
     "timing": "20 animation ticks per second; hit_ticks and chain_tick describe reference-aligned integration cues.",
     "left_arm_balance": "Normal attacks use outward +Z left-shoulder abduction and varied elbow flexion; the free hand balances each swing beside/behind the torso. Recovery matches the relaxed locomotion left arm, while overhead casts retain an open shoulder."
   },
+  "sheath": {
+    "offset": [
+      -0.35,
+      -0.35,
+      0.22
+    ],
+    "euler": [
+      8,
+      0,
+      -113
+    ],
+    "scale": 0.92,
+    "delay": 100,
+    "note": "back.md final mount (photo 6.webp): hilt at the right waist, blade across the lower back 23 degrees down-left, flat to the camera; sword and cryo_sword share it."
+  },
   "clips": {
     "physical_1": {
       "length": 13,
@@ -19824,6 +19839,7 @@
     "dash": {
       "length": 10,
       "weapon": "sword",
+      "weapon_state": "sheathed",
       "source": "skirk_dash",
       "source_start": 6.53,
       "source_end": 7.02,

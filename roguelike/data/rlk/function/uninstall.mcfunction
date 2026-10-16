@@ -549,6 +549,11 @@ scoreboard objectives remove pmPZ
 scoreboard objectives remove pmPosValid
 scoreboard objectives remove pmWeapon
 scoreboard objectives remove pmWantW
+scoreboard objectives remove pmSheath
+scoreboard objectives remove pmShT
+scoreboard objectives remove pmLocS
+scoreboard objectives remove pmShFx
+scoreboard objectives remove pmWAt
 data remove storage rlk:player_motion loco
 
 # 화면 미니맵

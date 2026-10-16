@@ -24,6 +24,10 @@ data modify storage rlk:player_motion active.step set value 2
 execute if entity @e[tag=rlk_pm] run function rlk:char/motion/clips/arle/skill/pose/0 with storage rlk:player_motion active
 execute store result storage rlk:player_motion active.step int 1 run scoreboard players get @s pmStep
 execute at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 run tp @e[tag=rlk_pm] ~ ~ ~ ~ 0
+# Drawn: instant draw from the back (snap, no flight) with a gold sparkle at the hand.
+execute unless score @s pmWAt matches 0 run function rlk:char/motion/sheath/snap
+scoreboard players set @s pmWAt 0
+function rlk:char/motion/sheath/draw
 execute if entity @e[tag=rlk_av,limit=1] run function rlk:char/motion/hide_avatar
 execute at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run function rlk:char/motion/arle_fx/skill
 execute at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run function rlk:char/motion/event
