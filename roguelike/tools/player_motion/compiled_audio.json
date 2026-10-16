@@ -1253,14 +1253,121 @@
         "hit_ticks": [
           9
         ],
-        "layers": []
+        "layers": [
+          {
+            "tick": 2,
+            "event": "item.armor.equip_leather",
+            "volume": 0.18,
+            "pitch": 1.1,
+            "layer": "wind-up grip"
+          },
+          {
+            "tick": 7,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.5,
+            "pitch": 0.62,
+            "layer": "heavy whoosh"
+          },
+          {
+            "tick": 8,
+            "event": "item.trident.throw",
+            "volume": 0.22,
+            "pitch": 0.62,
+            "layer": "swing weight"
+          },
+          {
+            "tick": 10,
+            "event": "item.spear.attack",
+            "volume": 0.22,
+            "pitch": 0.85,
+            "layer": "edge shing"
+          },
+          {
+            "tick": 13,
+            "event": "item.mace.smash_ground",
+            "volume": 0.38,
+            "pitch": 0.9,
+            "layer": "head thud"
+          },
+          {
+            "tick": 13,
+            "event": "block.heavy_core.hit",
+            "volume": 0.2,
+            "pitch": 0.65,
+            "layer": "thud body"
+          }
+        ]
       },
       "physical_2": {
         "playback_rate": 150,
         "hit_ticks": [
           6
         ],
-        "layers": []
+        "layers": [
+          {
+            "tick": 2,
+            "event": "block.chain.hit",
+            "volume": 0.15,
+            "pitch": 1.2,
+            "layer": "re-cock drag"
+          },
+          {
+            "tick": 4,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.46,
+            "pitch": 0.8,
+            "layer": "rising rush"
+          },
+          {
+            "tick": 5,
+            "event": "item.trident.throw",
+            "volume": 0.16,
+            "pitch": 0.78,
+            "layer": "swing weight"
+          },
+          {
+            "tick": 7,
+            "event": "item.spear.attack",
+            "volume": 0.15,
+            "pitch": 0.78,
+            "layer": "edge"
+          },
+          {
+            "tick": 7,
+            "event": "block.amethyst_cluster.place",
+            "volume": 0.38,
+            "pitch": 0.9,
+            "layer": "crystal spikes"
+          },
+          {
+            "tick": 8,
+            "event": "block.heavy_core.hit",
+            "volume": 0.18,
+            "pitch": 0.7,
+            "layer": "spike thump"
+          },
+          {
+            "tick": 8,
+            "event": "entity.player.attack.sweep",
+            "volume": 0.2,
+            "pitch": 1.05,
+            "layer": "overhead carry"
+          },
+          {
+            "tick": 9,
+            "event": "item.armor.equip_leather",
+            "volume": 0.16,
+            "pitch": 1.2,
+            "layer": "skip-hop cloth"
+          },
+          {
+            "tick": 12,
+            "event": "block.stone.step",
+            "volume": 0.3,
+            "pitch": 0.9,
+            "layer": "landing"
+          }
+        ]
       },
       "physical_3": {
         "playback_rate": 150,
@@ -1308,10 +1415,13 @@
     "block.amethyst_block.chime",
     "block.amethyst_block.resonate",
     "block.amethyst_cluster.break",
+    "block.amethyst_cluster.place",
+    "block.chain.hit",
     "block.enchantment_table.use",
     "block.fire.extinguish",
     "block.heavy_core.hit",
     "block.respawn_anchor.charge",
+    "block.stone.step",
     "entity.blaze.shoot",
     "entity.breeze.charge",
     "entity.breeze.slide",
@@ -1321,7 +1431,9 @@
     "entity.player.attack.sweep",
     "item.armor.equip_diamond",
     "item.armor.equip_iron",
+    "item.armor.equip_leather",
     "item.firecharge.use",
+    "item.mace.smash_ground",
     "item.mace.smash_ground_heavy",
     "item.spear.attack",
     "item.trident.throw"

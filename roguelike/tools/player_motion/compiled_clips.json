@@ -557,14 +557,12 @@
     "playback_rate": 150,
     "weapon": "navia_halberd",
     "weapon_state": "drawn",
-    "status": "placeholder",
-    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
     "length": 15,
     "hit_ticks": [
       9
     ],
     "chain_tick": 13,
-    "source": "v2 f42-f87 (N1)",
+    "source": "v2 f42-f87 (N1) + v3 s2 f282-f324",
     "char": "navia",
     "name": "physical_1",
     "normal": true
@@ -573,14 +571,12 @@
     "playback_rate": 150,
     "weapon": "navia_halberd",
     "weapon_state": "drawn",
-    "status": "placeholder",
-    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
     "length": 14,
     "hit_ticks": [
       6
     ],
     "chain_tick": 13,
-    "source": "v2 f87-f130 (N2)",
+    "source": "v2 f87-f130 (N2) + v3 s2 f336-f366",
     "char": "navia",
     "name": "physical_2",
     "normal": true
