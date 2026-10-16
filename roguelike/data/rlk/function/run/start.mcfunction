@@ -24,6 +24,7 @@ scoreboard players set #rfCount room 0
 # 노드: 다음 맵의 노드 목록, 나무뿌리 기적(한 판에 한 번)
 data modify storage rlk:room next set value []
 scoreboard players set #mirUsed room 0
+data modify storage rlk:room seen set value []
 scoreboard players set #mapIdx room 0
 scoreboard players set #mapType room 0
 scoreboard players set #stDefer room 1

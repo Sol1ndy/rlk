@@ -12,6 +12,9 @@ execute if score #ck tmp matches 12 if entity @a[tag=player,limit=1,scores={invC
 # 뺄 목록
 data modify storage rlk:room xq set from storage rlk:room excl
 execute if score #cok tmp matches 1 run function rlk:room/node/excl_loop
+# 이번 챕터에 고른 노드 (#nSeen 1 일 때만)
+execute if score #cok tmp matches 1 if score #nSeen tmp matches 1 run data modify storage rlk:room xq set from storage rlk:room seen
+execute if score #cok tmp matches 1 if score #nSeen tmp matches 1 run function rlk:room/node/excl_loop
 execute if score #cok tmp matches 1 run data modify storage rlk:room cand append from storage rlk:room wq[0]
 execute if score #cok tmp matches 1 store result score #cw tmp run data get storage rlk:room wq[0].w
 execute if score #cok tmp matches 1 run scoreboard players operation #wsum tmp += #cw tmp
