@@ -532,9 +532,7 @@
     "length": 12,
     "hit_ticks": [],
     "chain_tick": 6,
-    "status": "placeholder",
-    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
-    "source": "v7 C3 f1163 (dash)",
+    "source": "v7 C3 (f1163-1204) body timing; arms per plan D9 (running-start swing: right leg leads, left arm forward at chest height, right arm back and low, lean compensated)",
     "char": "navia",
     "name": "dash",
     "normal": false
@@ -545,9 +543,7 @@
     "length": 66,
     "hit_ticks": [],
     "chain_tick": 66,
-    "status": "placeholder",
-    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
-    "source": "v10 (put-away): shoulder, wrist wheel, palm flip, point-down plant, dissolve +42, back speck +48, grow on the back",
+    "source": "v10 PA1 (f475-f628) + plan D8: lift onto the right shoulder, forward wheel beside the head, flip over the palm, hang, drop and plant point-down in front of the left hip (right hand), gold dissolve, back speck and growth",
     "char": "navia",
     "name": "sheathe",
     "normal": false
