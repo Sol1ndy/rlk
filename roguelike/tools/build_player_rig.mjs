@@ -43,14 +43,21 @@ for(const[char,info]of Object.entries(characters)){
  const data=motionData[char]=JSON.parse(fs.readFileSync(source,'utf8'));
  info.weaponScale??=1;info.scytheLoco??=false;info.glow??=[];info.locoWeapons??=[{weapon:info.weapon}];
  // sheath: {offset:[x,y,z] blocks from the neck point in the torso frame, euler:[x,y,z] degrees in the torso
- // frame, scale?, delay? ticks before putting the weapon away, weapons?:{<model>:{offset?,euler?,scale?}}}.
+ // frame, scale?, delay? ticks before putting the weapon away, grow? quick-stow re-form steps (sheath/fx_tick in
+ // build_player_locomotion.mjs), weapons?:{<model>:{offset?,euler?,scale?}}}.
+ // weapons overrides apply to models a drawn clip names while on the back. Sheathed locomotion, its spawn, the
+ // quick stow and the sheathed or put-away clips show whichever locoWeapons variant loco/weapon picked at runtime,
+ // always with the default model's mount, so every variant must keep that mount (checked here).
  info.sheath=data.sheath;
  if(!info.sheath?.offset||!info.sheath?.euler)throw new Error(`${char}.json needs "sheath":{"offset":[x,y,z],"euler":[x,y,z]} (weapon on the back).`);
+ const variants=[...new Set([info.weapon,...info.locoWeapons.map(entry=>entry.weapon)])];
+ for(const weapon of variants)if(JSON.stringify(sheathOf(char,weapon))!==JSON.stringify(sheathOf(char,info.weapon)))
+  throw new Error(`${char}.json sheath.weapons: ${variants.join(', ')} are loco/weapon variants shown on the back with one shared mount; give ${weapon} no separate mount (edit the base sheath block instead).`);
  info.hasSheathe=!!data.clips?.sheathe;
 }
 const glowing=new Set(Object.values(characters).flatMap(info=>info.glow));
 // Back mount of one weapon model: the character's sheath block with that model's overrides.
-function sheathOf(char,weapon){const{weapons,delay,note,...mount}=characters[char].sheath;return{scale:1,...mount,...(weapons?.[weapon]||{})};}
+function sheathOf(char,weapon){const{weapons,delay,grow,note,...mount}=characters[char].sheath;return{scale:1,...mount,...(weapons?.[weapon]||{})};}
 // Pose handed to transform(): weapon_scale times the character multiplier, the attach mode and its back mount.
 function rigPose(char,pose,attach='hand',weapon=characters[char].weapon,extra={}){
  return{...pose,...extra,weapon_attach:attach,weapon_scale:(pose.weapon_scale||[1,1,1]).map(x=>x*characters[char].weaponScale),...(attach==='back'?{sheath:sheathOf(char,weapon)}:{})};
@@ -193,8 +200,12 @@ function spawnLines(char,pose,weapon,hidden=false){
 // the whole clip unless frames change it; a drawn weapon is quick-stowed first; dash) or "sheathe" (the put-away
 // clip: starts with the weapon in hand and must end with weapon_attach "back"). Per-frame weapon_attach
 // "hand"|"back"|"world" is sticky like hidden. A change at t>0 snaps the weapon (interpolation 0) and, through
-// sheath/clip_state, sets pmSheath (back 1, hand 0 + re-armed delay; world keeps the state).
+// sheath/clip_state, sets pmSheath (back 1, hand 0 + re-armed delay; world keeps the state). Between two keys
+// whose attach differs the weapon fields hold the earlier key (the body still blends), so a sparse key gap never
+// drifts the weapon toward the other frame. A frame with "weapon_snap":true (not sticky) also snaps the weapon on
+// its tick, for authored pops such as a crescent appearing at full width.
 const weaponStates=['drawn','sheathed','sheathe'];
+const weaponFields=['weapon','weapon_shift','weapon_scale'];
 const clipStates=[];
 function compileClip(char,name,clip){
  if(!Number.isInteger(clip.length)||clip.length<1)throw new Error(`Invalid clip length ${char}/${name}`);
@@ -204,50 +215,58 @@ function compileClip(char,name,clip){
  const keys=clip.frames.map(frame=>{
   prev={...prev,...frame.pose};weapon=frame.weapon||weapon;hidden=frame.hidden??hidden;attach=frame.weapon_attach??attach;
   if(!(attach in attachIds))throw new Error(`Invalid weapon_attach "${attach}": ${char}/${name} tick ${frame.tick}`);
-  return{tick:frame.tick,pose:structuredClone(prev),weapon,hidden,attach};
+  if(frame.weapon_snap!==undefined&&typeof frame.weapon_snap!=='boolean')throw new Error(`weapon_snap must be true or false: ${char}/${name} tick ${frame.tick}`);
+  return{tick:frame.tick,pose:structuredClone(prev),weapon,hidden,attach,snap:frame.weapon_snap===true};
  }).sort((a,b)=>a.tick-b.tick);
  if(keys[0]?.tick!==0)throw new Error(`First frame must be tick 0: ${char}/${name}`);
  const sample=t=>{
   let a=keys[0],b=a;for(let i=0;i<keys.length;i++){if(keys[i].tick<=t)a=keys[i];if(keys[i].tick>t){b=keys[i];break;}b=a;}
-  const fraction=b.tick===a.tick?0:(t-a.tick)/(b.tick-a.tick),pose={};
-  for(const field of Object.keys(neutral()))pose[field]=lerp(a.pose[field],b.pose[field],fraction);
+  const fraction=b.tick===a.tick?0:(t-a.tick)/(b.tick-a.tick),pose={},hold=a.attach!==b.attach;
+  for(const field of Object.keys(neutral()))pose[field]=lerp(a.pose[field],b.pose[field],hold&&weaponFields.includes(field)?0:fraction);
   return{pose,weapon:a.weapon,hidden:a.hidden,attach:a.attach};
  };
  if(state==='sheathe'&&sample(clip.length).attach!=='back')throw new Error(`${char}/${name}: a "sheathe" clip must end with weapon_attach "back".`);
- const posed=current=>rigPose(char,current.pose,current.attach,current.weapon);
+ // mount: the model whose back mount applies. Sheathed and put-away clips show the loco/weapon variant (mounted
+ // like the default model) until a frame switches the model.
+ const posed=(current,mount=current.weapon)=>rigPose(char,current.pose,current.attach,mount);
  const base=`clips/${char}/${name}`,dispatch=[];
- let lastWeapon,lastAttach=keys[0].attach;
+ let lastWeapon,lastAttach=keys[0].attach,switched=state==='drawn';
  for(let t=0;t<=clip.length;t++){
-  const current=sample(t),changed=t>0&&current.attach!==lastAttach;
-  const lines=[`# ${char} / ${name}: authored animation tick ${t}`,poseLines(posed(current),'$(step)',current.hidden,changed?['weapon']:[])];
+  const current=sample(t),changed=t>0&&current.attach!==lastAttach,snapKey=keys.some(key=>key.tick===t&&key.snap);
   // Drawn clips set their model. The dash, sheathed and put-away clips keep whatever loco/weapon shows
   // (spear or infused scythe, sword or cryo sword) unless a later frame switches the model.
-  if(state==='drawn'?current.weapon!==lastWeapon:t>0&&current.weapon!==lastWeapon)lines.push(weaponLines(current.weapon));
+  const swap=state==='drawn'?current.weapon!==lastWeapon:t>0&&current.weapon!==lastWeapon;
+  switched||=swap;
+  const mount=switched?current.weapon:info.weapon;
+  const lines=[`# ${char} / ${name}: authored animation tick ${t}`,poseLines(posed(current,mount),'$(step)',current.hidden,changed||snapKey?['weapon']:[])];
+  if(swap)lines.push(weaponLines(current.weapon));
   if(changed){
    // Sparkle along the full-size weapon: put-away clips usually ramp weapon_scale to 0 around this tick.
-   const placed=transform(posed({...current,pose:{...current.pose,weapon_scale:[1,1,1]}})).weapon;
+   const placed=transform(posed({...current,pose:{...current.pose,weapon_scale:[1,1,1]}},mount)).weapon;
    lines.push(`# weapon_attach ${lastAttach} -> ${current.attach}: snap (no interpolation across the change)`,
     `scoreboard players set @s pmWAt ${attachIds[current.attach]}`,'scoreboard players set #pmSnapW tmp 1',
-    ...(current.hidden?[]:current.attach==='back'?backSpark(placed,current.weapon):current.attach==='hand'?handSpark(placed):[]));
+    ...(current.hidden?[]:current.attach==='back'?backSpark(placed,mount):current.attach==='hand'?handSpark(placed):[]));
    if(current.attach!=='world')clipStates.push({char,name,tick:t,attach:current.attach});
-  }
+  }else if(snapKey)lines.push('# weapon_snap: the weapon jumps to this pose (also after a later pose of the same tick)','scoreboard players set #pmSnapW tmp 1');
   lastWeapon=current.weapon;lastAttach=current.attach;fn(`${base}/pose/${t}`,lines.join('\n'));
   dispatch.push(`execute if score @s pmTick matches ${t} run function rlk:char/motion/${base}/pose/${t} with storage rlk:player_motion active`);
  }
  fn(`${base}/pose`,dispatch.join('\n'));
  // A respawn inside a sheathed or put-away clip restores the loco weapon variant too.
- fn(`${base}/spawn`,spawnLines(char,posed(keys[0]),keys[0].weapon,keys[0].hidden)+(state==='drawn'?'':'scoreboard players set @s pmWeapon -1\nfunction rlk:char/motion/loco/weapon\n'));
+ fn(`${base}/spawn`,spawnLines(char,posed(keys[0],state==='drawn'?keys[0].weapon:info.weapon),keys[0].weapon,keys[0].hidden)+(state==='drawn'?'':'scoreboard players set @s pmWeapon -1\nfunction rlk:char/motion/loco/weapon\n'));
  const normal=/^(physical|infused)_/.test(name);
  // The put-away clip keeps the avatar's facing (an idle character does not turn to the camera).
  const locked=name.startsWith('burst')||name==='dash'||state==='sheathe',yaw=state==='sheathe'?'@e[tag=rlk_pm_basis,limit=1]':'@s';
  const attach0=keys[0].attach,snap0=[`execute unless score @s pmWAt matches ${attachIds[attach0]} run function rlk:char/motion/sheath/snap`,`scoreboard players set @s pmWAt ${attachIds[attach0]}`];
  const hand0=transform(posed(sample(0))).weapon;
  const weaponStart={
-  drawn:['# Drawn: instant draw from the back (snap, no flight) with a gold sparkle at the hand.',...snap0,
-   ...(clip.draw_fx===false||attach0!=='hand'?[]:[`execute if score @s pmSheath matches 1 if entity @e[tag=rlk_pm_weapon] at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 positioned ${local(hand0.t)} run function rlk:char/motion/sheath/fx_hand`]),
+  drawn:['# Drawn: instant draw (snap, no flight) with a gold sparkle at the hand unless it was already drawn',
+   '# (from the back, or out of the put-away clip where it may be dissolved or floating).',...snap0,
+   ...(clip.draw_fx===false||attach0!=='hand'?[]:[`execute unless score @s pmSheath matches 0 if entity @e[tag=rlk_pm_weapon] at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 positioned ${local(hand0.t)} run function rlk:char/motion/sheath/fx_hand`]),
    'function rlk:char/motion/sheath/draw'],
-  sheathed:['# Sheathed: the weapon stays on the back (quick stow if it was drawn); loco/weapon picks the variant.',...snap0,
-   'function rlk:char/motion/sheath/stow','function rlk:char/motion/loco/weapon'],
+  sheathed:['# Sheathed: the weapon stays on the back (quick stow from the position marked before frame zero if it was',
+   '# drawn); loco/weapon picks the variant.',...snap0,
+   'function rlk:char/motion/sheath/stow_marked','function rlk:char/motion/loco/weapon'],
   sheathe:['# Put-away clip: weapon still in the hand until its weapon_attach "back" frame.',...snap0,
    'scoreboard players set @s pmSheath 2','function rlk:char/motion/loco/weapon']
  }[state];
@@ -275,6 +294,8 @@ function compileClip(char,name,clip){
   `execute if entity @e[tag=rlk_av,limit=1] unless entity @e[tag=rlk_pm] at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 run function rlk:char/motion/${base}/spawn`,
   'execute if entity @e[tag=rlk_pm] run scoreboard players set @s pmVisible 1',
   'scoreboard players operation @s pmRigChar = #charN tmp',
+  ...(state==='sheathed'?['# Where a drawn weapon is before frame zero moves it to the back (the stow sparkle).',
+   'execute unless score @s pmSheath matches 1 if entity @e[tag=rlk_pm_weapon] run function rlk:char/motion/sheath/mark']:[]),
   '# Reuse the displayed last pose when chaining an attack; interpolate into frame zero.',
   'data modify storage rlk:player_motion active.step set value 2',
   `execute if entity @e[tag=rlk_pm] run function rlk:char/motion/${base}/pose/0 with storage rlk:player_motion active`,
@@ -344,7 +365,7 @@ const atlasPath=path.join(rpRoot,'assets/minecraft/atlases/items.json');
 const atlas=fs.existsSync(atlasPath)?JSON.parse(fs.readFileSync(atlasPath,'utf8')):{sources:[]};
 for(const block of blocks){const sprite='rlk:player_motion/'+block;atlas.sources=atlas.sources.filter(s=>s.sprite!==sprite);atlas.sources.push({type:'minecraft:single',resource:'minecraft:block/'+block,sprite});}
 for(const info of Object.values(characters))if(!atlas.sources.some(s=>s.type==='minecraft:single'&&s.resource==='rlk:skin/'+info.skin&&!s.sprite))atlas.sources.push({type:'minecraft:single',resource:'rlk:skin/'+info.skin});
-buildLocomotion({fn,poseLines,spawnLines,weaponLines,neutral,lerp,characters,here,rigPose,transform,handSpark,backSpark,local,arr});
+buildLocomotion({fn,poseLines,spawnLines,weaponLines,neutral,lerp,characters,here,rigPose,transform,handSpark,backSpark,arr});
 // Dash: player/dash_go calls this; a character with a "dash" clip plays it (gameplay moves the body).
 // The clip's yaw is locked (like a burst) and its basis turned to the dash direction set by
 // player/dash_dir (dashUX/dashUZ, unit x100), so a sideways or backward dash leans that way.
