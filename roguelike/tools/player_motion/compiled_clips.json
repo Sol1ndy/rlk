@@ -609,15 +609,14 @@
   {
     "weapon": "navia_parasol",
     "weapon_state": "drawn",
-    "status": "placeholder",
-    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "draw_fx": false,
     "length": 34,
     "activation_tick": 7,
     "hit_ticks": [
       7
     ],
     "chain_tick": 20,
-    "source": "v5 (tap shot)",
+    "source": "v5 f52-f250 (skill tap: draw, twirl, chamber, canopy open, shot at 7, recoil kneel, fold, the parasol left standing on its tip and dissolved; halberd re-forms on the back), recovery compressed from 66 to 34 ticks",
     "char": "navia",
     "name": "skill",
     "normal": false
@@ -625,10 +624,9 @@
   {
     "weapon": "navia_parasol",
     "weapon_state": "drawn",
-    "status": "placeholder",
-    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "draw_fx": false,
     "length": 16,
-    "source": "v4 f53-f100 (aim in)",
+    "source": "v4 f53-f100 (skill hold: pivot, parasol appears at 4, spin with a low ferrule arc, raised pose, overhead spin, drop into the aim at 16)",
     "char": "navia",
     "name": "skill_aim_in",
     "normal": false
@@ -636,11 +634,10 @@
   {
     "weapon": "navia_parasol",
     "weapon_state": "drawn",
-    "status": "placeholder",
-    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "draw_fx": false,
     "length": 20,
     "loop": true,
-    "source": "v4 f100-f168 (aim hold)",
+    "source": "v4 f100-f168 (aim hold, breathing loop; frame 0 = last frame = skill_aim_in end = skill_fire frame 0)",
     "char": "navia",
     "name": "skill_aim",
     "normal": false
@@ -648,15 +645,14 @@
   {
     "weapon": "navia_parasol",
     "weapon_state": "drawn",
-    "status": "placeholder",
-    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
+    "draw_fx": false,
     "length": 24,
     "activation_tick": 3,
     "hit_ticks": [
       3
     ],
     "chain_tick": 12,
-    "source": "v4 f168-f358 (release, compressed)",
+    "source": "v4 f168-f358 (release: canopy pops at 1, blast at 3, shield squat, rise, closed parasol hanging like a cane, dissolve; halberd re-forms on the back), recovery compressed from 63 to 24 ticks",
     "char": "navia",
     "name": "skill_fire",
     "normal": false
