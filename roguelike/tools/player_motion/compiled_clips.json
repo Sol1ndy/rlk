@@ -601,14 +601,12 @@
     "playback_rate": 150,
     "weapon": "navia_parasol",
     "weapon_state": "drawn",
-    "status": "placeholder",
-    "note": "PLACEHOLDER (phase-1 wiring): crude keys so the clip builds and plays; replace per contract.md.",
     "length": 32,
     "hit_ticks": [
       10
     ],
     "chain_tick": 20,
-    "source": "v2 f192-f315 (N4: parasol shot and float)",
+    "source": "v2 f192-f315 (side) + v3 s2 f424-f532 (back camera, full recovery): parasol shot, backflip, float under the open parasol, land, halberd re-forms on the back",
     "char": "navia",
     "name": "physical_4",
     "normal": true

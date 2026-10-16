@@ -32,7 +32,7 @@ execute at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 run tp @e[tag=rlk_pm
 # (from the back, or out of the put-away clip where it may be dissolved or floating).
 execute unless score @s pmWAt matches 0 run function rlk:char/motion/sheath/snap
 scoreboard players set @s pmWAt 0
-execute unless score @s pmSheath matches 0 if entity @e[tag=rlk_pm_weapon] at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 positioned ^-0.32 ^0.95 ^0.2 run function rlk:char/motion/sheath/fx_hand
+execute unless score @s pmSheath matches 0 if entity @e[tag=rlk_pm_weapon] at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 positioned ^-0.419 ^0.938 ^0.317 run function rlk:char/motion/sheath/fx_hand
 function rlk:char/motion/sheath/draw
 execute if entity @e[tag=rlk_av,limit=1] run function rlk:char/motion/hide_avatar
 execute at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run function rlk:char/motion/navia_fx/physical_4
