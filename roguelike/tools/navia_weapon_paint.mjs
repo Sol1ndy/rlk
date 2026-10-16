@@ -13,29 +13,35 @@
 //                traced polygons; the fine scrolls (volutes, eye curl, right frame) are lit
 //                gold tubes drawn over them
 //   nv_tip       spear point with fleur-de-lis curls, two crossed cards spanning NV_TIP
-//   nv_crystal   elongated light-blue hexagonal crystal (crossed cards and the core box)
+//   nv_crystal   elongated light-blue hexagonal crystal with one glint (crossed cards)
+//   nv_crystal_core  plain opaque facets for the crystal's core box (no cut-out, no glint)
 //   nv_socket    violet-navy socket with a gold centre ridge, v along the box
 //   nv_shaft1    indigo shaft with lavender edges and a silver centre strip (upper section)
 //   nv_shaft2    indigo shaft with a lavender diamond lattice fading to dark (lower section)
 //   nv_collar    silver chevron collar with a blue diamond
-//   nv_sleeve    faceted champagne sleeve with stacked chevrons, v along the box
+//   nv_sleeve    faceted champagne sleeve: pointed cap, stacked chevrons, v along the box
+//   nv_sleeve_crown  the lower chevron of the 45-degree inner crown that fills the cap's corners
 //   nv_guard     alpha-cut crossguard knot with two down-swept spikes (crossed cards, NV_GUARD)
 //   nv_wrap      espresso handle with an oxblood spiral wrap and three pearl studs
 //   nv_butt      alpha-cut two-lobed gold finial (crossed cards, NV_BUTT)
 //   nv_gold / nv_rose  champagne fittings and the gold rose emblem
 //
-// Parasol sprites (prefix np_), after the umbrella gun in the reference videos (v1, v4, v5):
-//   np_top       outer face of the open canopy's rim disc: black-indigo panels, gold filigree,
-//                eight ribs and the scalloped gold frill
-//   np_dome      outer face of the smaller stacked discs that suggest the dome
-//   np_lining    inner face: gold lining with orange-red paisley, dark ribs, frill and hub
-//   np_profile   cross-section of the open canopy for the crossed cards (dome, ribs, frill)
-//   np_skirt     the open canopy's hanging gold frill (eight tangential cards round the rim)
-//   np_bundle    closed canopy: gold ruffle collar, folded black-indigo bundle, white lace
-//   np_fold / np_ruffle / np_rosette / np_lace  the closed bundle's core boxes and caps
+// Parasol sprites (prefix np_), after the umbrella gun in the reference videos (v1, v2, v4, v5):
+//   np_top / np_lining  the open canopy's rim disc: the gathered ruffle top / the gold lining
+//                with orange-red paisley, dark ribs, hub and the ruffle's underside
+//   np_dome0..10 the stacked discs of the dome's cap, painted in model units (crown light,
+//                ribs; emblems and filigree crests on one disc only)
+//   np_drum_rib / np_drum_emb / np_drum_fil  the dome's flank (sixteen cards): rib, gold
+//                blue-gem emblem and filigree panels
+//   np_profile   the cap's side view for the four crossed cards (navy, rib line on the edge)
+//   np_ruffle_u / np_ruffle_ub / np_ruffle_l  the two hanging ruffle tiers (upper with bows)
+//   np_finial    the slim gold finial (the muzzle)
+//   np_crosette / np_bundle / np_ctip  closed parasol: ruffle rosette, folded black-indigo
+//                bundle with the thin lace collar, short gold tip (crossed cards)
+//   np_fold / np_ruffle / np_rosette  the closed bundle's and rosette's core boxes and discs
 //   np_handle    black crook handle with a gold cap (stacked cards)
-//   np_shaft / np_gold / np_cog / np_plaque / np_ferrule / np_bore / np_hub  shaft, fittings,
-//                gear, gem plaque, gold muzzle ferrule and its bore, the runner under the lining
+//   np_shaft / np_gshaft / np_gold / np_cog / np_plaque / np_hub  black and gold shafts,
+//                fittings, gear, gem plaque, the runner under the lining
 import {hex, clamp, smooth, mix, ramp, fbm, TRANSPARENT} from './weapon_paint.mjs';
 
 // ---- reference frame ----------------------------------------------------------------------
@@ -47,8 +53,10 @@ const refU = X => (X - 8) / NV_K, refY = Y => 350 - (Y - 8) / NV_K;
 export const NV_HEAD = {X0: 2.0, X1: 13.7, Y0: 17.5, Y1: 31.4};
 export const NV_TIP = {HW: 0.95, Y0: 27.85, Y1: 31.92};
 export const NV_CRYSTAL = {HW: 0.65, Y0: 22.35, Y1: 24.95};
-export const NV_GUARD = {HW: 1.8, Y0: 10.5, Y1: 12.3};
+export const NV_GUARD = {HW: 1.92, Y0: 10.5, Y1: 12.3};
 export const NV_BUTT = {HW: 0.7, Y0: 1.5, Y1: 4.3};
+// Sleeve box: faces cut to a pointed cap (apex Y1 mid-face, SHOULDER at the corners).
+export const NV_SLEEVE = {HW: 0.75, Y0: 11.6, Y1: 15.25, SHOULDER: 14.35, APEX2: 15.0};
 
 // ---- small vector toolkit (reference px) ----------------------------------------------------
 // Points may carry a third entry 'c' to keep a sharp corner; other points are joined by a
@@ -192,7 +200,10 @@ function pal() {
   return PAL || (PAL = {
     outline: hex('#48361f'),
     // Champagne ornament gold: lit tube shading across a stroke (-1 shade side .. +1 lit side).
-    goldTube: ramp([[-1, '#7d6140'], [-.55, '#b09168'], [-.1, '#dcc496'], [.35, '#efd9b6'], [.7, '#fff2de'], [1, '#f6e4c6']]),
+    // Warm mid tones (#c9a466 / #d9b77e, shade #9c7a48); near-white only on the narrow highlight.
+    goldTube: ramp([[-1, '#6e5230'], [-.55, '#9c7a48'], [-.1, '#c9a466'], [.35, '#d9b77e'], [.72, '#f0d9aa'], [1, '#e2c893']]),
+    // Flat champagne fittings across a face: lit edge .. shade.
+    goldFace: ramp([[0, '#eed6a6'], [.25, '#d9b77e'], [.6, '#c09c62'], [1, '#8f6e40']]),
   });
 }
 // Light comes from the upper left of the reference (reference y points down).
@@ -209,8 +220,24 @@ const NV_HEAD_SIL = [
   '-43.9,91.6 -46.9,91.9 -54.5,97.6 -59,102.9 -61.8,109.9 -63.5,119.4 -62.8,122.4 -62.8,125.9 -61.4,131.3 -58.9,132.6 -59.6,136.1 -58.8,138.6 -57.4,140.1 -56.5,139.4 -58.5,132.9 -57.9,127.9 -56.1,121.6 -53.1,117 -49.2,113.1 -45.6,111.2 -44.6,111.2 -39.9,113.2 -37.4,113.1 -36.4,112.4 -36.9,111.9 -39.6,111.4 -43.7,108.4 -45.8,107.9 -45.4,106.1 -46.4,104.1 -45.2,100.1 -44.6,99.7 -44.2,100.1 -43.5,103.1 -41.9,105.4 -38.6,107 -35.6,106.7 -33.9,105.7 -32.5,104.4 -30.9,101.1 -31.1,97.9 -34.4,93.5 -38.4,92.2',
   '14.9,109.1 13.4,110 12.3,112.1 13.1,117.9 12.9,123.4 10.4,125.8 9.7,125.6 9.4,124.4 8.6,125.6 8.5,127.1 9.6,128.1 9.2,130.1 9.6,130.7 11.9,128.1 14.1,124.1 17.3,120.4 20.3,113.6 20,112.4 18.5,110.4 16.1,109.2',
 ];
+// The crescent's outer edge (part of the silhouette's first loop, lower tip round to the upper
+// horn) and the width of the pale band measured in from it (reference px by y): about 0.55
+// units near the horns, 0.8 around Y 22-26, closing at both tips.
+const nvOuterEdge = () => {
+  const l = loops([NV_HEAD_SIL[0]])[0], i = l.findIndex(([u, y]) => u === -28.4 && y === 207);
+  return new Segs([...l.slice(i), l[0]], false);
+};
+const NV_BAND_W = (() => {
+  const w = [[12, 1.5], [24, 6], [40, 8], [70, 10.5], [86, 11.8], [145, 11.8], [165, 10.5], [185, 8.5], [198, 6], [207, 2.5]];
+  return y => {
+    if (y <= w[0][0]) return w[0][1];
+    for (let i = 1; i < w.length; i++) if (y <= w[i][0]) return w[i - 1][1] + (w[i][1] - w[i - 1][1]) * (y - w[i - 1][0]) / (w[i][0] - w[i - 1][0]);
+    return w[w.length - 1][1];
+  };
+})();
+// Inner prong band (the crescent's upper inner horn) and the fin's two bands; the crescent's
+// outer band is NV_BAND_W in from nvOuterEdge.
 const NV_HEAD_LEMON = [
-  '-28.2,25.1 -27.1,25 -26.4,25.9 -25,33.1 -26.3,38.6 -28.3,43.6 -33,51.6 -38.5,58.6 -58.9,77.8 -66.9,88.1 -71,95.6 -74.5,105.9 -75.2,110.6 -75.2,119.4 -73.9,127.4 -72.5,131.4 -68.8,139.6 -62.3,149.4 -55.1,157.2 -35.5,175.4 -27.9,186.6 -25.6,189 -25.6,194.4 -26.8,201.1 -27.9,203.4 -28.7,202.6 -31.6,193.9 -37,184.4 -41.5,179.6 -66.4,157.5 -72.7,150.1 -78.4,141.9 -84.6,126.4 -85.5,121.6 -84.8,115.4 -85.8,111.4 -83.6,99.4 -76.6,83.2 -66.1,70.5 -40.5,45.6 -36.9,40.6 -32.1,28.9',
   '-26.1,43.4 -25.4,43.3 -24.7,44.4 -24.3,47.9 -25.8,56.6 -27.8,60.9 -34.1,67.5 -42.4,73.1 -46.9,78.2 -51.4,80.8 -56.5,85.6 -60.9,91.4 -63.4,95.8 -69.1,98.2 -69.4,97.1 -68.2,94.1 -61.5,83.9 -54.4,75.8 -41.6,64.7 -36.1,58.7 -31.3,52.4',
   '40.2,73.6 41.1,74 44.9,78.8 52.4,85.3 61,96.6 64.7,100.4 67.4,105.4 70.1,108.5 76.6,112.6 77.4,114.1 76.9,115.4 71.6,118.8 67.5,123.1 62.4,133.4 58.2,139.1 46,149.6 43.1,152.9 41.9,153.4 40.9,153 40.6,151.9 43.6,146.4 52,137.9 63.4,120.6 68.1,117.2 72.9,114.9 71.9,114.5 70.4,115.8 64.4,118.4 60.4,121.4 59.4,121.2 59.6,120.2 63.6,117.4 64.1,115.1 59.9,110 56.4,108.1 55.8,103.4 52.8,96.6 54.3,96.9 56.6,100.7 57.1,101 57.4,100.4 54.2,95.1 48.6,89.7 47.8,89.9 50,92.6 49.4,93.6 44.4,89.4 44,88.1 44.6,86.6 40.9,79.1 39.8,74.6',
 ];
@@ -250,7 +277,7 @@ const NV_HEAD_CUTS = () => [-1, 1].map(s => new Stroke([[15.8, 106.5], [16.2, 11
   taper([0, 2.6], [.35, 4.4], [1, 1.6])));
 
 function nvHead() {
-  const sil = new Area(NV_HEAD_SIL), lemon = new Area(NV_HEAD_LEMON), ivory = new Area(NV_HEAD_IVORY);
+  const sil = new Area(NV_HEAD_SIL), lemon = new Area(NV_HEAD_LEMON), ivory = new Area(NV_HEAD_IVORY), outer = nvOuterEdge();
   const n = fbm(37), {outline: OUTLINE} = pal();
   // Taupe engravings on the ivory panel (S-swirls and a vine).
   const engr = [
@@ -261,14 +288,20 @@ function nvHead() {
     new Stroke([[-67.8, 126], [-64.8, 123.6], [-63.6, 126.2], [-65.6, 127.6]], 1.0),
     new Stroke([[-44, 166], [-39.5, 170.5], [-35, 172.4], [-31.6, 171], [-32.8, 168.6]], 1.1),
   ];
-  const gold = ramp([[-1, '#715536'], [-.5, '#ad8f66'], [0, '#dcc59a'], [.45, '#f0dcba'], [1, '#fff5e4']]);
+  // Champagne scroll frame (warm mid tones, near-white only on the lit bevel).
+  const gold = ramp([[-1, '#6a4e2c'], [-.5, '#9c7a48'], [0, '#c9a466'], [.45, '#dbba82'], [.8, '#eed5a5'], [1, '#f7e7c4']]);
+  // Pale lemon blade bands, outer edge -> inner seam (weapon.md §10.2, §11.4).
+  const band = ramp([[0, '#fefdc8'], [.45, '#f9f6b3'], [1, '#ecd7a9']]);
+  const finBand = ramp([[0, '#fdfdcd'], [.5, '#f9f1b8'], [1, '#ecd7a9']]);
   const tubes = NV_HEAD_TUBES(), cuts = NV_HEAD_CUTS(), {goldTube} = pal();
   const [gx, gy, gr] = NV_FIN_GEM;
   return (u, v) => {
     const X = NV_HEAD.X0 + u * (NV_HEAD.X1 - NV_HEAD.X0), Y = NV_HEAD.Y1 - v * (NV_HEAD.Y1 - NV_HEAD.Y0);
     const x = refU(X), y = refY(Y);
-    // The shaft column and the crystal stay clear (their own boxes and cards draw them).
-    if (Math.abs(x) < 6.6 || (y > 98 && y < 142 && Math.abs(x) < 9.6)) return TRANSPARENT;
+    // The shaft column and the crystal stay clear (their own boxes and cards draw them). The
+    // crystal gap is a head texel wider than the crystal cards (|X-8| <= 0.65), so no head
+    // texel shares the z=8 plane with an opaque crystal texel.
+    if (Math.abs(x) < 6.6 || (y > 98 && y < 142 && Math.abs(x) < 10.2)) return TRANSPARENT;
     if (cuts.some(c => c.hit(x, y))) return TRANSPARENT;
     let tube = null;
     for (const t of tubes) { const h = t.hit(x, y); if (h && (!tube || h.e < tube.e)) tube = h; }
@@ -276,20 +309,23 @@ function nvHead() {
     const inSil = sil.inside(x, y) && !(x > fx0 && x < fx1 && y > fy0 && y < fy1 && !lemon.inside(x, y));
     if (!inSil && !tube) return TRANSPARENT;
     const ds = sil.near(x, y, 6), grain = (n(x * .35, y * .35) - .5) * .1;
+    // The crescent's outer band: everything within NV_BAND_W of its outer edge.
+    const W = NV_BAND_W(y), dOut = x < 0 && inSil ? outer.near(x, y, 16).d : 99;
     let col;
     if (tube) {
       const lit = (tube.lx * LX + tube.ly * LY) * Math.sqrt(1 - Math.pow(1 - tube.e, 2));
       col = goldTube(clamp(lit * 1.1 + (1 - tube.e) * .3, -1, 1));
       if (tube.e > .8) col = mix(col, OUTLINE, smooth(.8, .98, tube.e) * .7);
+    } else if (dOut < W) {
+      // Polished pale band ramping across its whole width; only the lower third of the
+      // crescent warms toward saturated gold.
+      col = mix(band(clamp(dOut / W)), hex('#eed17f'), smooth(150, 198, y) * .5);
+      if (W > 6 && W - dOut < .8) col = mix(col, hex('#8a6c44'), .55);
     } else if (lemon.inside(x, y)) {
-      const dz = lemon.near(x, y, 8);
-      // Polished pale band: near-white on the outer edge, deeper toward the inner seam; the
-      // crescent's lower third and the fin's lower band warm to saturated gold.
-      col = mix(hex('#f6ea7e'), hex('#fffcd2'), smooth(3.6, 0, ds.d));
-      if (dz.d < ds.d - .8) col = mix(col, hex('#e0c47c'), smooth(3, 0, dz.d) * .8);
-      const warm = x < 0 ? smooth(148, 192, y) : smooth(112, 126, y) * .8;
-      col = mix(col, hex(x < 0 ? '#efcc5c' : '#f2d870'), warm * .85);
-      if (dz.d < ds.d - .3 && dz.d < .55) col = mix(col, hex('#9a7c50'), .5);
+      // Inner prong band (crescent side) and the fin's bands; the fin's lower band warms.
+      const dz = lemon.near(x, y, 8), t = clamp(ds.d / 7);
+      col = x < 0 ? band(t) : mix(finBand(t), hex('#f4dd8e'), smooth(112, 126, y) * .5);
+      if (dz.d < ds.d - .3 && dz.d < .55) col = mix(col, hex('#8a6c44'), .5);
     } else if (ivory.inside(x, y)) {
       const dz = ivory.near(x, y, 8);
       col = mix(hex('#fff4e2'), hex('#f3e2c8'), smooth(0, 7, dz.d) * .4 + smooth(3, 0, dz.d) * .45);
@@ -327,8 +363,8 @@ const profile = stops => y => {
 // Champagne metal across a profile: x/w in -1..1, lit from the left, ridge highlight.
 function champagne(t, e) {
   const {outline} = pal();
-  let c = mix(hex('#e2cba4'), hex('#a7885f'), smooth(-.2, 1, t));
-  c = mix(c, hex('#fcead4'), Math.max(0, 1 - Math.abs(t + .25) / .3) * .75);
+  let c = mix(hex('#dcbd86'), hex('#9c7a48'), smooth(-.2, 1, t));
+  c = mix(c, hex('#f4e0b6'), Math.max(0, 1 - Math.abs(t + .25) / .22) * .75);
   if (e > .84) c = mix(c, outline, smooth(.84, 1, e) * .9);
   return c;
 }
@@ -359,7 +395,8 @@ function nvTip() {
     return col || TRANSPARENT;
   };
 }
-// Light-blue crystal: an elongated hexagon pointed at both ends (cards and the core box).
+// Light-blue crystal: an elongated hexagon pointed at both ends, on the two crossed cards. A
+// single white glint sits in the upper point, above the core box.
 function nvCrystal() {
   const w = profile([[100.6, 0], [113, 9.5], [127, 9.5], [138.6, 0]]);
   return (u, v) => {
@@ -367,19 +404,26 @@ function nvCrystal() {
     const x = refU(X), y = refY(Y), hw = w(y);
     if (Math.abs(x) > hw) return TRANSPARENT;
     const t = x / Math.max(hw, .01);
-    let c = t < 0 ? mix(hex('#a6c7e9'), hex('#7197de'), smooth(0, .9, -t)) : mix(hex('#a6c7e9'), hex('#84b3ed'), smooth(0, .9, t));
-    c = mix(c, hex('#bce5fe'), smooth(118, 104, y) * .8);
-    c = mix(c, hex('#e8f6ff'), Math.max(0, 1 - Math.hypot(x / 4, (y - 120) / 9)) * .85);
-    if (Math.hypot(x + 4, y - 110) < 2.2) c = mix(c, hex('#ffffff'), .95);
-    if (Math.abs(t) > .82) c = mix(c, hex('#6f7593'), smooth(.82, 1, Math.abs(t)) * .9);
+    let c = t < 0 ? mix(hex('#b3d3f2'), hex('#7ea4e4'), smooth(0, .9, -t)) : mix(hex('#b3d3f2'), hex('#93c0f2'), smooth(0, .9, t));
+    c = mix(c, hex('#c8ecff'), smooth(120, 102, y) * .85);
+    c = mix(c, hex('#eef9ff'), Math.max(0, 1 - Math.hypot(x / 5, (y - 120) / 11)) * .9);
+    if (Math.hypot((x + 2.5) / .8, y - 106.5) < 1.7) c = mix(c, hex('#ffffff'), .95);
+    if (Math.abs(t) > .85) c = mix(c, hex('#6f7593'), smooth(.85, 1, Math.abs(t)) * .8);
     return c;
   };
 }
+// The crystal's core box (rotated 45 degrees inside the crossed cards): plain opaque facets,
+// luminous in the middle, no cut-out and no glint, so the cards alone draw the outline.
+const nvCrystalCore = () => (u, v) => {
+  let c = mix(hex('#d9f0ff'), hex('#97bfee'), smooth(0, 1, Math.abs(u - .5) * 2) * .85);
+  c = mix(c, hex('#eef9ff'), smooth(.55, 0, v) * .35);
+  return mix(c, hex('#86b2ea'), smooth(.5, 1, v) * .35);
+};
 // Violet-navy socket under the point: a gold ridge rising to a point, gold bands at the ends.
 const nvSocket = () => (u, v) => {
-  if (v < .1 || v > .93) return mix(hex('#e7cdab'), hex('#a7885f'), Math.abs(u - .35) * 1.6);
+  if (v < .1 || v > .93) return pal().goldFace(clamp(Math.abs(u - .35) * 1.6));
   const ridge = .06 + .2 * (v - .1) / .83;
-  if (Math.abs(u - .5) < ridge) return mix(hex('#efe0c4'), hex('#c2a77c'), Math.abs(u - .5) / ridge);
+  if (Math.abs(u - .5) < ridge) return mix(hex('#efd9ac'), hex('#c09c62'), Math.abs(u - .5) / ridge);
   return mix(hex('#553d5e'), hex('#301737'), smooth(0, .5, Math.abs(u - .3)));
 };
 // Navy shaft, upper section: lavender edges and a silver strip widening downward.
@@ -410,14 +454,35 @@ const nvCollar = () => (u, v) => {
   if (Math.abs(dd - .3) < .03) c = mix(c, hex('#f2efea'), .8);
   return c;
 };
-// Faceted champagne sleeve: stacked chevrons pointing up, a light diamond in the middle.
+// Faceted champagne sleeve (box faces spanning NV_SLEEVE, v down the box): a pointed cap whose
+// chevron outline rises to the middle of each face, stacked chevrons, a light centre diamond,
+// and a waist above the guard knot suggested by shading (an alpha waist would open a hole at
+// the box corners in three-quarter views).
 const nvSleeve = () => (u, v) => {
-  const dx = Math.abs(u - .5);
-  let c = mix(hex('#e7cdab'), hex('#a7885f'), smooth(.1, .5, dx) * .8 + v * .2);
-  const k = (v * 3 + dx * 1.4) % 1;
-  if (k < .1) c = mix(c, hex('#48361f'), .75 * (1 - k / .1));
-  else if (k < .22) c = mix(c, hex('#fcead4'), .6);
-  if (dx + Math.abs(((v * 3) % 1) - .55) * .5 < .12) c = mix(c, hex('#f8e4c4'), .8);
+  const S = NV_SLEEVE, Y = S.Y1 - v * (S.Y1 - S.Y0), a = Math.abs(u - .5) * 2;
+  const top = S.Y1 - (S.Y1 - S.SHOULDER) * a;
+  if (Y > top) return TRANSPARENT;
+  const {goldFace, outline} = pal();
+  const waist = Math.max(0, 1 - Math.abs(Y - 12.5) / .9);
+  let c = goldFace(clamp(.12 + smooth(.1, 1, a) * (.6 + waist * .35) + (S.Y1 - Y) / (S.Y1 - S.Y0) * .25));
+  const k = (((top - Y) / .95) % 1 + 1) % 1;
+  if (k < .09) c = mix(c, hex('#5a4224'), .7 * (1 - k / .09));
+  else if (k < .2) c = mix(c, hex('#f0d9aa'), .55);
+  if (a * .8 + Math.abs(Y - 14.55) * .55 < .2) c = mix(c, hex('#f6e4bd'), .8);
+  if (top - Y < .06) c = mix(c, outline, .75);
+  else if (a > .94) c = mix(c, outline, .3);
+  return c;
+};
+// The inner crown's faces (Y 13.5..APEX2): a lower chevron in the same gold and grooves.
+const nvSleeveCrown = () => (u, v) => {
+  const S = NV_SLEEVE, Y = S.APEX2 - v * (S.APEX2 - 13.5), a = Math.abs(u - .5) * 2;
+  const top = S.APEX2 - (S.APEX2 - S.SHOULDER) * a;
+  if (Y > top) return TRANSPARENT;
+  let c = pal().goldFace(clamp(.15 + a * .45 + (S.APEX2 - Y) * .12));
+  const k = (((top - Y) / .95) % 1 + 1) % 1;
+  if (k < .09) c = mix(c, hex('#5a4224'), .7 * (1 - k / .09));
+  else if (k < .2) c = mix(c, hex('#f0d9aa'), .55);
+  if (top - Y < .06) c = mix(c, pal().outline, .75);
   return c;
 };
 // Crossguard: a central knot and two thin spikes sweeping out and down (crossed cards).
@@ -465,101 +530,205 @@ function nvButt() {
     return champagne(t, Math.abs(t));
   };
 }
-const nvGold = () => (u, v) => mix(mix(hex('#fcead4'), hex('#a7885f'), smooth(.05, .95, Math.abs(u - .3) * 1.3 + v * .25)), hex('#745633'), smooth(.85, 1, Math.max(Math.abs(u - .5), Math.abs(v - .5)) * 2) * .6);
+const nvGold = () => (u, v) => mix(pal().goldFace(smooth(.05, .95, Math.abs(u - .3) * 1.3 + v * .25)), hex('#6a4c28'), smooth(.85, 1, Math.max(Math.abs(u - .5), Math.abs(v - .5)) * 2) * .6);
 // Gold rose emblem (alpha-cut): three petal rings around a bud.
 const nvRose = () => (u, v) => {
   const dx = u - .5, dy = v - .5, r = Math.hypot(dx, dy) * 2, a = Math.atan2(dy, dx);
   const edge = .86 + .1 * Math.cos(a * 5);
   if (r > edge) return TRANSPARENT;
   const ring = r < .3 ? 0 : r < .58 ? 1 : 2;
-  let c = [hex('#e2ccb0'), hex('#f3dfc5'), hex('#d0ba9e')][ring];
+  let c = [hex('#dcc08e'), hex('#ecd4a6'), hex('#c6a671')][ring];
   const petal = Math.cos(a * (ring === 2 ? 5 : 4) + ring) * .5 + .5;
-  c = mix(c, hex('#978165'), (1 - petal) * .45);
+  c = mix(c, hex('#8a6c42'), (1 - petal) * .45);
   if (r > edge - .1 || Math.abs(r - .3) < .03 || Math.abs(r - .58) < .03) c = mix(c, hex('#48361f'), .7);
   return c;
 };
 
 // ---- parasol gun -----------------------------------------------------------------------------
 // Model-unit layout shared with navia_weapon_geometry.mjs (grip [8,8,8], muzzle toward +Y).
-// CANOPY: rim disc radius R at height RIM, a dome rising to APEX built from STEPS ([radius,
-// height] discs on the dome curve), profile cards spanning Y0..Y1.
-const domeH = r => 15.2 + 4.5 * (1 - Math.pow(Math.min(1, r / 9.3), 1.5));
+// Open canopy (about 0.28 D deep, after v2 f273-f279): a drum of sixteen tangential cards (DRUM,
+// radius D) under a convex elliptic cap (DOME: semi-axes A across and B up from Y, so the cap
+// leaves the drum's top edge at about 47 degrees). The cap shows from above as stacked discs on
+// the ellipse (STEPS: [radius, height]) and from the side as four profile cards through the
+// axis (PROFILE). The lining is the underside of the rim disc (radius R at
+// RIM). The ruffle hangs from the rim in two staggered tiers of sixteen cards: the upper one
+// just outside the drum, the longer lower one flaring further out (about 0.17 D in all).
+// The rim disc sits level with the lower tier's top edge (the upper tier hangs through it).
+// FINIAL is the slim gold muzzle on the crown. Panels are 45 degrees wide with the ribs on the
+// X and Z axes and the diagonals; EMBLEM_FLANK / EMBLEM_TOP are the panel-centre directions
+// (degrees, atan2(z - 8, x - 8)) whose drum card / dome top carries the gold blue-gem emblem,
+// alternating so no panel shows two (the drum card at +22.5 degrees about Y faces -22.5).
+const r2 = v => Math.round(v * 100) / 100;
+// Cap: h(r) = Y + B * sqrt(1 - (r / A)^2), cut by the drum at r = DRUM.D (where it is 16.95).
+const DOME = {A: 9.3, B: 5.2, Y: 14.55}, domeH = r => DOME.Y + DOME.B * Math.sqrt(1 - (r / DOME.A) ** 2);
+// Disc radii: small steps (risers 0.1-0.4) so the rib cards stand only a little above each
+// disc, and one wider ring (4.6..5.8, the MOTIF_DISC) for the emblems and crests on top.
+const DRUM_D = 8.25, STEP_R = [DRUM_D, 7.85, 7.4, 6.9, 6.35, 5.8, 4.6, 3.9, 3.1, 2.2, 1.2];
 export const NP = {
   CROOK: {X0: 5.2, X1: 8.7, Y0: 4.9, Y1: 8.6},
   COG: .95,
-  BUNDLE: {HW: 2.1, Y0: 10.9, Y1: 20.8},
-  CANOPY: {R: 9.3, RIM: 15.2, APEX: 19.7, Y0: 15.2, Y1: 19.8,
-    // Hanging frill: eight tangential cards (an octagon) just inside the rim.
-    SKIRT: {D: 8.62, HW: 3.62, Y0: 14.45, Y1: 15.45},
-    STEPS: [8.1, 6.9, 5.7, 4.5, 3.3, 2.1, 1.0].map(r => [r, Math.round(domeH(r) * 100) / 100])},
+  // Closed: gold shaft from the cog into the ruffle rosette, the folded bundle and a small tip.
+  ROSETTE: {HW: 2.55, Y0: 12.35, Y1: 15.3},
+  BUNDLE: {HW: 2.0, Y0: 15.3, Y1: 22.05},
+  TIP: {HW: .3, Y0: 22.05, Y1: 22.9},
+  CANOPY: {
+    RIM: 13.97, R: 8.9, DOME,
+    DRUM: {D: DRUM_D, HW: 1.69, Y0: 13.97, Y1: r2(domeH(DRUM_D))},
+    STEPS: STEP_R.map(r => [r, r2(domeH(r))]),
+    PROFILE: {HW: 8.15, Y0: 13.97, Y1: 19.75},
+    RUFFLE_U: {D: 8.42, HW: 1.73, Y0: 13.6, Y1: 15.05},
+    RUFFLE_L: {D: 8.92, HW: 1.83, Y0: 11.85, Y1: 13.97},
+    FINIAL: {HW: .34, Y0: 19.9, Y1: 22.15},
+    EMBLEM_FLANK: [-22.5, 67.5, 157.5, 247.5], EMBLEM_TOP: [22.5, 112.5, 202.5, 292.5],
+  },
 };
-// Colours from the reference videos (v1, v4, v5).
+// Colours from the reference videos (v1, v2, v4, v5).
 const NPC = () => ({
-  navy: hex('#272437'), navyDeep: hex('#191937'), navyLit: hex('#3d3a58'),
-  frill: hex('#e9c766'), frillLit: hex('#f7e08e'), frillShade: hex('#a87a38'),
+  navy: hex('#272437'), navyDeep: hex('#191937'), navyLit: hex('#3d3a58'), crown: hex('#37334f'),
+  rib: hex('#5a557f'), ribEdge: hex('#110f20'),
+  frill: hex('#e9c766'), frillShade: hex('#a87a38'),
+  ruf: hex('#ebc35e'), rufLit: hex('#fde492'), rufShade: hex('#b0802e'), rufDeep: hex('#7a5419'),
   lining: hex('#d3b163'), liningLit: hex('#f0c860'), liningShade: hex('#b78c40'),
-  paisley: hex('#c8642a'), paisleyDeep: hex('#a8441c'), rib: hex('#2a2030'), hub: hex('#181423'),
+  paisley: hex('#c8642a'), paisleyDeep: hex('#a8441c'), hub: hex('#181423'),
+  fil: hex('#a88b52'), emb: hex('#e8c672'), embLit: hex('#fdeaa8'), embShade: hex('#8a652c'),
+  gem: hex('#a4ccff'), gemDeep: hex('#2a4ab8'),
 });
-// Scalloped gold frill seen from above or below: r in 0..1 across the band, a around the rim.
-function frillColour(c, t, a, lobes) {
-  const k = Math.cos(a * lobes);
-  let col = mix(c.frillShade, c.frill, smooth(-.6, .8, k) * .8 + .2);
-  col = mix(col, c.frillLit, Math.max(0, k - .6) * 1.2 * (1 - t));
-  if (t > .82) col = mix(col, c.frillShade, .5);
+const sameDeg = (a, b) => Math.abs(((a - b) % 360 + 540) % 360 - 180) < .5;
+// The canopy emblem: a gold lozenge frame with drop finials and side curls round a dark inlay
+// and a blue gem. p across, q up (toward the crown), model units; null outside. About 1.85
+// tall (0.1 D).
+function emblem(c, p, q) {
+  const ap = Math.abs(p), d = ap / .58 + Math.abs(q) / .78;
+  const drop = Math.hypot(p, q - .87) < .09 || Math.hypot(p, (q + .9) / 1.3) < .1;
+  const curl = ap > .58 && Math.abs(Math.hypot(ap - .7, q) - .12) < .045;
+  if (d > 1 && !drop && !curl) return null;
+  if (d > 1) return mix(c.emb, c.embShade, .3);
+  if (d > .76) {
+    let col = mix(c.embShade, c.embLit, clamp(.55 - p * .45 + q * .35));
+    if (d > .95 || Math.abs(d - .79) < .03) col = mix(col, c.embShade, .65);
+    return col;
+  }
+  const g = ap / .32 + Math.abs(q) / .48;
+  if (g < 1) {
+    let col = mix(c.gem, c.gemDeep, smooth(0, 1, g * .75 + (p - q) * .3 + .15));
+    if (Math.hypot(p + .08, q - .13) < .07) col = hex('#ffffff');
+    return col;
+  }
+  if (Math.abs(g - 1.22) < .08) return mix(c.emb, c.embShade, .35);
+  return mix(c.navyDeep, hex('#0b0a16'), .5);
+}
+// Muted gold filigree on the other panels: mirrored open C-scrolls with eye curls, a stem with
+// a fleur on top and lower sweeps. Coverage 0..1 at (p across, q up), model units.
+function filigree(p, q) {
+  const ap = Math.abs(p), line = (d, w) => Math.max(0, 1 - Math.abs(d) / w);
+  let k = 0;
+  const ang = Math.atan2(q - .15, ap - .72);
+  if (ang > -1.1 || ang < -2.9) k = Math.max(k, line(Math.hypot(ap - .72, q - .15) - .4, .055));
+  if (ap < .68) k = Math.max(k, line(Math.hypot(ap - .5, q + .1) - .13, .05));
+  if (q > -.95 && q < .75) k = Math.max(k, line(ap, .05));
+  if (q > .72) k = Math.max(k, line(Math.hypot(ap - .2, q - .95) - .2, .05));
+  if (q < -.25 && ap < 1.25) k = Math.max(k, line(Math.hypot(ap - 1.25, q + .3) - .7, .055));
+  return k;
+}
+// Outer face of the dome at (x, z) from the axis: lighter crown darkening toward the shoulder,
+// raised ribs, and per panel an emblem (EMBLEM_TOP panels) or a filigree crest. The discs sit at
+// different heights, so a motif crossing a disc edge, or repeated on the disc below (seen under
+// the next disc's edge), would split apart in oblique views: the motifs are painted on one disc
+// only (MOTIF_DISC), inside its visible ring and scaled to its width. The rest is painted in
+// model units, so every stacked disc agrees and the steps leave no rings.
+const MOTIF_DISC = 5;
+function domeTop(c, x, z, disc) {
+  const C = NP.CANOPY, rho = Math.hypot(x, z), q45 = Math.PI / 4, phi = Math.atan2(z, x);
+  const seg = ((phi / q45) % 1 + 1) % 1, centre = (Math.floor(phi / q45) + .5) * 45;
+  const p = (seg - .5) * rho * q45, dRib = (.5 - Math.abs(seg - .5)) * rho * q45;
+  let col = mix(c.crown, c.navy, smooth(0, 8.4, rho));
+  col = mix(col, c.navyLit, (1 - smooth(.04, .7, dRib)) * .3);
+  const r0 = C.STEPS[MOTIF_DISC + 1][0], r1 = C.STEPS[MOTIF_DISC][0], k = (r1 - r0 - .1) / 1.9;
+  if (disc === MOTIF_DISC && rho > r0 + .05 && rho < r1 - .05) {
+    const mp = p / k, mq = ((r0 + r1) / 2 - rho) / k;
+    if (C.EMBLEM_TOP.some(a => sameDeg(a, centre))) { const e = emblem(c, mp, mq); if (e) col = e; }
+    else col = mix(col, c.fil, filigree(mp, mq) * .8);
+  }
+  if (dRib < .06 && rho > .5) col = c.rib;
+  else if (dRib < .1 && rho > .5) col = mix(col, c.ribEdge, .5);
+  if (rho < .45 && disc === C.STEPS.length - 1) col = mix(c.emb, c.embShade, smooth(.2, .45, rho));
   return col;
 }
-// Outer face of the rim disc: black-indigo panels with gold filigree and a blue-gem ornament,
-// eight ribs, the scalloped frill.
+const npDome = k => {
+  const c = NPC(), r = NP.CANOPY.STEPS[k][0];
+  return (u, v) => {
+    const x = (u - .5) * 2 * r, z = (v - .5) * 2 * r;
+    return Math.hypot(x, z) > r ? TRANSPARENT : domeTop(c, x, z, k);
+  };
+};
+// Drum cards (the dome's steep flank above the ruffle): 'rib' cards are centred on a rib, 'a'
+// panel cards carry the emblem, 'b' panel cards the filigree.
+function npDrum(kind) {
+  const c = NPC(), D = NP.CANOPY.DRUM, yc = 15.98;
+  return (u, v) => {
+    const p = (u - .5) * 2 * D.HW, Y = D.Y1 - v * (D.Y1 - D.Y0);
+    let col = mix(c.navy, c.navyLit, smooth(15.2, D.Y1, Y) * .45);
+    col = mix(col, c.navyDeep, (1 - smooth(14.6, 15.4, Y)) * .5);
+    if (kind === 'rib') {
+      const d = Math.abs(p);
+      col = mix(col, c.navyLit, (1 - smooth(.04, .7, d)) * .3);
+      if (d < .06) col = c.rib; else if (d < .1) col = mix(col, c.ribEdge, .5);
+    } else if (kind === 'a') { const e = emblem(c, p, Y - yc); if (e) col = e; }
+    else col = mix(col, c.fil, filigree(p, Y - yc) * .8);
+    return col;
+  };
+}
+// Side view of the cap (four cards through the axis): the elliptic crown in the dome's navy,
+// lit toward the top, with the rib line along its edge.
+function npProfile() {
+  const c = NPC(), {PROFILE: P, DOME: {A}} = NP.CANOPY;
+  return (u, v) => {
+    const X = 8 - P.HW + u * 2 * P.HW, Y = P.Y1 - v * (P.Y1 - P.Y0), r = Math.abs(X - 8);
+    const h = domeH(Math.min(r, A));
+    if (r > P.HW || Y > h) return TRANSPARENT;
+    let col = mix(c.crown, c.navy, smooth(0, 8.4, r));
+    col = mix(col, c.navyLit, .3 + smooth(h - .8, h, Y) * .3);
+    return h - Y < .09 ? c.rib : col;
+  };
+}
+// Gathered ruffle seen from above or below: t 0 at the drum .. 1 at the scalloped edge.
+function ruffleTop(c, t, a) {
+  const f = Math.cos(a * 64);
+  let col = mix(c.rufShade, c.ruf, smooth(-.7, .8, f) * .75 + .15);
+  col = mix(col, c.rufLit, Math.max(0, f - .4) * smooth(.2, .8, t) * .8);
+  col = mix(col, c.rufDeep, (1 - smooth(0, .25, t)) * .6);
+  return t > .9 ? mix(col, c.rufShade, .45) : col;
+}
+// Scalloped edge of the rim disc, inside the lower ruffle tier and level with its top, so it
+// never shows edge-on beyond the frill.
+const rimEdge = a => 8.7 + .2 * Math.sqrt(Math.abs(Math.cos(a * 16)));
+// Upper face of the rim disc: the ruffle's gathered top between the drum and the scalloped edge.
 function npTop() {
-  const c = NPC();
+  const c = NPC(), R = NP.CANOPY.R;
   return (u, v) => {
-    const x = (u - .5) * 2, z = (v - .5) * 2, r = Math.hypot(x, z), a = Math.atan2(z, x);
-    if (r > .955 + .045 * Math.cos(a * 24)) return TRANSPARENT;
-    if (r > .87) return frillColour(c, (r - .87) / .13, a, 24);
-    let col = mix(c.navyLit, c.navy, smooth(.2, .85, r));
-    const seg = ((a / (Math.PI / 4)) % 1 + 1) % 1, ribd = Math.min(seg, 1 - seg) * r * Math.PI / 4;
-    if (ribd < .012) col = mix(col, c.navyLit, .8);
-    // Gold filigree: a scroll band near the rim of each panel.
-    const s = Math.sin(seg * Math.PI * 2 + (r - .74) * 30) * .5 + .5;
-    if (r > .68 && r < .82 && Math.abs(s - .5) < .07 && ribd > .03) col = mix(col, c.frill, .85);
-    if (Math.abs(r - .845) < .01) col = mix(col, c.frill, .9);
-    // Blue gem ornament on one panel.
-    const gx = .78 * Math.cos(Math.PI / 8), gz = .78 * Math.sin(Math.PI / 8), gd = Math.abs(x - gx) + Math.abs(z - gz);
-    if (gd < .07) col = gd < .045 ? mix(hex('#9cc4ff'), hex('#2a4ab8'), gd / .045) : c.frill;
-    return col;
+    const x = (u - .5) * 2 * R, z = (v - .5) * 2 * R, rho = Math.hypot(x, z), a = Math.atan2(z, x), edge = rimEdge(a);
+    if (rho > edge) return TRANSPARENT;
+    return rho < 8.2 ? c.navyDeep : ruffleTop(c, (rho - 8.2) / (edge - 8.2), a);
   };
 }
-// Smaller dome discs (scaled copies): even black-indigo with the ribs and a faint seam at the
-// edge, so the stacked terraces read as one dome.
-function npDome() {
-  const c = NPC();
-  return (u, v) => {
-    const x = (u - .5) * 2, z = (v - .5) * 2, r = Math.hypot(x, z), a = Math.atan2(z, x);
-    if (r > 1) return TRANSPARENT;
-    let col = mix(c.navy, c.navyLit, .25);
-    const seg = ((a / (Math.PI / 4)) % 1 + 1) % 1, ribd = Math.min(seg, 1 - seg) * r * Math.PI / 4;
-    if (ribd < .02) col = mix(col, hex('#4a4668'), .7);
-    if (r > .96) col = mix(col, c.navyDeep, .5);
-    return col;
-  };
-}
-// Lining: gold panels with orange-red paisley, dark ribs, the frill's underside, a dark hub.
+// Lining: gold panels with orange-red paisley, dark ribs, a dark hub; beyond the drum the
+// ruffle's shaded underside.
 function npLining() {
-  const c = NPC(), n = fbm(71);
+  const c = NPC(), n = fbm(71), R = NP.CANOPY.R, LR = NP.CANOPY.DRUM.D, S = LR / .89;
   const drops = [];
   for (let k = 0; k < 8; k++) {
     const mid = (k + .5) * Math.PI / 4;
     drops.push([mid + .12, .52, .1, mid], [mid - .18, .76, .085, mid + 1.4]);
   }
   return (u, v) => {
-    const x = (u - .5) * 2, z = (v - .5) * 2, r = Math.hypot(x, z), a = Math.atan2(z, x);
-    if (r > .955 + .045 * Math.cos(a * 24)) return TRANSPARENT;
-    if (r > .89) return mix(frillColour(c, (r - .89) / .11, a, 24), c.frillShade, .25);
-    // The concave lining: brighter mid-panel, shaded toward the ribs and the hub.
+    const X = (u - .5) * 2 * R, Z = (v - .5) * 2 * R, rho = Math.hypot(X, Z), a = Math.atan2(Z, X), edge = rimEdge(a);
+    if (rho > edge) return TRANSPARENT;
+    if (rho > LR) return mix(ruffleTop(c, (rho - LR) / (edge - LR), a), c.rufShade, .3);
+    // The concave lining (r, x, z in units of S): brighter mid-panel, shaded toward ribs and hub.
+    const x = X / S, z = Z / S, r = rho / S;
     const seg = ((a / (Math.PI / 4)) % 1 + 1) % 1, ribd = Math.min(seg, 1 - seg) * r * Math.PI / 4;
     let col = mix(c.liningShade, c.lining, smooth(.1, .6, r) * smooth(0, .12, ribd));
     col = mix(col, c.liningLit, Math.max(0, Math.sin(seg * Math.PI)) * smooth(.35, .8, r) * .45);
-    // Paisley teardrops (a rounded head and a curled tail).
     for (const [da, dr, sz, rot] of drops) {
       const px = dr * Math.cos(da), pz = dr * Math.sin(da), dx = x - px, dz = z - pz;
       const lx = dx * Math.cos(rot) + dz * Math.sin(rot), lz = -dx * Math.sin(rot) + dz * Math.cos(rot);
@@ -568,66 +737,80 @@ function npLining() {
       if (d < 1) col = mix(c.paisley, c.paisleyDeep, smooth(.4, 1, d)), col = d > .82 ? mix(col, c.liningShade, .5) : col;
     }
     col = mix(col, hex('#000000'), (n(x * 6 + 9, z * 6) - .5) * .12);
-    if (ribd < .016 && r > .12) col = c.rib;
-    if (Math.abs(r - .87) < .012) col = mix(col, c.frillShade, .8);
+    if (ribd < .016 && r > .12) col = hex('#2a2030');
+    if (r > .87) col = mix(col, c.frillShade, .8);
     if (r < .16) col = r < .11 ? mix(c.hub, hex('#3a3346'), smooth(.11, 0, r) * .4) : mix(c.frill, c.frillShade, (r - .11) / .05);
     return col;
   };
 }
-// Side view of the open canopy (four crossed cards): the shallow dome in black-indigo with a
-// gold filigree band and the scalloped frill hanging below the rim.
-function npProfile() {
-  const c = NPC(), C = NP.CANOPY, HW = C.R;
+// A small gold bow (two loops, a knot, two tails); p across, q up from its centre.
+function bow(c, p, q) {
+  const ap = Math.abs(p), loop = Math.hypot((ap - .3) / .27, q / .19), knot = Math.hypot(p / .09, q / .11);
+  if (knot < 1) return mix(c.rufLit, c.ruf, knot);
+  if (loop < 1) return loop > .8 ? c.rufDeep : mix(c.rufLit, c.rufShade, smooth(.2, .9, loop) * .7);
+  if (q < 0 && q > -.4 && Math.abs(ap - (.07 - q * .4)) < .06) return c.rufShade;
+  return null;
+}
+// Hanging ruffle cards: gathered gold folds puffing out toward a rolled hem with rounded
+// scallops, shaded where they tuck under the rim; the upper tier's rib cards carry a bow.
+function npRuffle(T, lobes, withBow) {
+  const c = NPC();
   return (u, v) => {
-    const X = 8 - HW + u * 2 * HW, Y = C.Y1 - v * (C.Y1 - C.Y0), r = Math.abs(X - 8);
-    if (r > C.R || Y < C.RIM - .02) return TRANSPARENT;
-    const h = domeH(r);
-    if (Y > h) return TRANSPARENT;
-    let col = mix(c.navyDeep, c.navyLit, smooth(h - 1.2, h, Y) * .8);
-    col = mix(col, c.navy, smooth(0, C.R, r) * .4);
-    const band = Y - C.RIM;
-    if (band > .3 && band < .85 && Math.abs(Math.sin(r * 5.5 + band * 6)) < .22) col = mix(col, c.frill, .8);
-    if (Math.abs(band - .95) < .05) col = mix(col, c.frill, .85);
-    if (h - Y < .05) col = mix(col, hex('#4c486a'), .7);
+    const p = (u - .5) * 2 * T.HW, Y = T.Y1 - v * (T.Y1 - T.Y0), H = T.Y1 - T.Y0;
+    const s = 2 * (((u * lobes) % 1 + 1) % 1) - 1;
+    const hem = T.Y0 + H * .17 * (1 - Math.sqrt(Math.max(0, 1 - s * s)));
+    if (Y < hem) return TRANSPARENT;
+    const f = -Math.cos(Math.PI * s) * .75 + Math.cos(2 * Math.PI * s) * .25, t = (Y - hem) / H;
+    let col = mix(c.rufShade, c.ruf, smooth(-.8, .7, f) * .8 + .12);
+    col = mix(col, c.rufLit, Math.max(0, f - .25) * (1 - t) * .9);
+    col = mix(col, c.rufDeep, smooth(.6, 1, t) * .6);
+    if (Y - hem < .07) col = mix(col, c.rufShade, .6);
+    else if (Y - hem < .16) col = mix(col, c.rufLit, .45);
+    if (withBow) { const b = bow(c, p, Y - (T.Y0 + H * .58)); if (b) col = b; }
     return col;
   };
 }
-// Hanging frill on the skirt cards: gold ruffles with a scalloped lower edge.
-function npSkirt() {
-  const c = NPC(), S = NP.CANOPY.SKIRT;
+// The open parasol's slim gold finial (the muzzle) above its collar box: neck, bulb, ring,
+// knob and point.
+function npFinial() {
+  const F = NP.CANOPY.FINIAL;
+  const w = profile([[19.9, .16], [20.1, .13], [20.5, .3], [20.85, .26], [20.95, .16], [21.07, .21], [21.19, .12], [21.53, .2], [21.85, .12], [22.15, 0]]);
   return (u, v) => {
-    const X = u * 2 * S.HW, Y = S.Y1 - v * (S.Y1 - S.Y0), lobe = Math.abs(Math.sin(Math.PI * X / .62));
-    if (Y < S.Y0 + .32 * lobe) return TRANSPARENT;
-    let col = mix(c.frillLit, c.frillShade, smooth(S.Y1 - .15, S.Y0 + .2, Y) * .75);
-    col = mix(col, c.frillShade, (1 - lobe) * .45);
-    if (Y > S.Y1 - .12) col = mix(col, c.frillShade, .5);
-    return col;
+    const x = (u - .5) * 2 * F.HW, Y = F.Y1 - v * (F.Y1 - F.Y0), hw = w(Y);
+    if (Math.abs(x) > hw) return TRANSPARENT;
+    const t = x / Math.max(hw, .01);
+    const col = pal().goldTube(clamp(-t * .9 + .15, -1, 1));
+    return Math.abs(t) > .82 ? mix(col, pal().outline, smooth(.82, 1, Math.abs(t)) * .6) : col;
   };
 }
-// Closed canopy profile (four crossed cards): gold ruffle collar at the bottom, the folded
-// black-indigo bundle tapering to the muzzle, white lace on top.
-const bundleW = Y => Y < 14.2 ? 1.8 + .05 * smooth(13.3, 14.2, Y) : Math.max(.5, 1.85 * (1 - Math.pow((Y - 14.2) / 6.3, 1.7)));
+// Closed parasol: the gathered ruffle rosette round the shaft (four crossed cards), wider than
+// the bundle, two scalloped tiers.
+function npRosetteSide() {
+  const c = NPC(), T = NP.ROSETTE;
+  const w = profile([[12.35, .45], [12.6, 1.3], [13.0, 2.15], [13.5, 2.5], [14.2, 2.45], [14.8, 2.2], [15.3, 1.9]]);
+  return (u, v) => {
+    const x = (u - .5) * 2 * T.HW, Y = T.Y1 - v * (T.Y1 - T.Y0), ax = Math.abs(x);
+    const lobe = Math.abs(Math.sin((Y - 12.35) * Math.PI / .5)), hw = w(Y) * (1 - .06 * (1 - lobe));
+    if (ax > hw) return TRANSPARENT;
+    const f = Math.cos(x / hw * Math.PI * 2.5);
+    let col = mix(c.rufShade, c.ruf, smooth(-.8, .7, f) * .8 + .15);
+    col = mix(col, c.rufLit, Math.max(0, f - .3) * .8 * smooth(1, .3, ax / hw));
+    if (Math.abs(Y - 13.8) < .09) col = mix(col, c.rufDeep, .55);
+    return mix(col, c.rufDeep, smooth(.75, 1, ax / hw) * .45 + smooth(12.9, 12.35, Y) * .35);
+  };
+}
+// Closed canopy (four crossed cards): the folded black-indigo bundle, bulbous over the rosette
+// and tapering to a thin white lace collar under the tip.
+const bundleW = Y => Y < 15.7 ? 1.75 + .15 * smooth(15.3, 15.7, Y) : Y < 16.5 ? 1.9 - .05 * smooth(15.7, 16.5, Y)
+  : Math.max(.42, 1.85 * (1 - Math.pow((Y - 16.5) / 5.9, 1.5)));
 function npBundle() {
   const c = NPC(), B = NP.BUNDLE;
   return (u, v) => {
     const X = 8 - B.HW + u * 2 * B.HW, Y = B.Y1 - v * (B.Y1 - B.Y0), x = X - 8, ax = Math.abs(x);
-    // Lace collar under the muzzle.
-    if (Y > 19.95) {
-      const w = .85 - .1 * Math.abs(Math.sin((Y - 19.95) * 9));
+    if (Y > 21.85) {
+      const w = .5 - .08 * Math.abs(Math.sin(x * 14));
       if (ax > w) return TRANSPARENT;
-      return mix(hex('#f6f2ec'), hex('#b9b0b8'), Math.abs(Math.sin(x * 9)) * .5 + smooth(.5, .85, ax) * .4);
-    }
-    // Ruffle collar: two tiers of scalloped gold.
-    const lobeL = Math.abs(Math.sin(Math.PI * x / .62)), lobeU = Math.abs(Math.sin(Math.PI * (x + .3) / .55));
-    if (Y < 12.45) {
-      if (ax > B.HW - .12 * lobeL || Y < B.Y0 + .3 * lobeL) return TRANSPARENT;
-      return mix(mix(c.frillLit, c.frillShade, smooth(12.4, 11.1, Y) * .7), c.frillShade, (1 - lobeL) * .45);
-    }
-    if (Y < 13.65) {
-      if (ax > 1.98 - .1 * lobeU) return TRANSPARENT;
-      let col = mix(mix(c.frillLit, c.frillShade, smooth(13.6, 12.5, Y) * .7), c.frillShade, (1 - lobeU) * .45);
-      if (Y < 12.62) col = mix(col, c.frillShade, .6);
-      return col;
+      return mix(hex('#f6f2ec'), hex('#b9b0b8'), Math.abs(Math.sin(x * 9)) * .4 + smooth(.3, .5, ax) * .4);
     }
     const w = bundleW(Y);
     if (ax > w) return TRANSPARENT;
@@ -635,25 +818,33 @@ function npBundle() {
     let col = mix(c.navyDeep, c.navy, Math.cos(f * Math.PI * 2.5) * .5 + .5);
     col = mix(col, c.navyLit, Math.max(0, Math.cos(f * Math.PI * 2.5 - .8)) * .5);
     if (Math.abs(f) > .85) col = mix(col, hex('#0e0c18'), .6);
-    if (Y < 14.0) col = mix(col, c.frill, Math.abs(Math.sin(f * 7 + Y * 9)) < .2 ? .7 : 0);
-    return col;
+    return Y < 15.5 ? mix(col, c.navyDeep, .5) : col;
   };
 }
-// Ruffle collar core: vertical gold folds, shaded toward the bottom.
-const npRuffle = () => (u, v) => {
+// Closed tip: a short gold ferrule and point (crossed cards spanning NP.TIP).
+function npClosedTip() {
+  const T = NP.TIP, w = profile([[22.05, .26], [22.22, .26], [22.3, .16], [22.56, .2], [22.9, 0]]);
+  return (u, v) => {
+    const x = (u - .5) * 2 * T.HW, Y = T.Y1 - v * (T.Y1 - T.Y0), hw = w(Y);
+    if (Math.abs(x) > hw) return TRANSPARENT;
+    return pal().goldTube(clamp(-x / Math.max(hw, .01) * .9 + .15, -1, 1));
+  };
+}
+// Ruffle rosette core: vertical gold folds, shaded toward the bottom.
+const npRuffleCore = () => (u, v) => {
   const c = NPC(), k = Math.cos(u * Math.PI * 6);
-  return mix(mix(c.frillShade, c.frillLit, smooth(-.7, .9, k) * .85), c.frillShade, smooth(.5, 1, v) * .5);
+  return mix(mix(c.rufShade, c.rufLit, smooth(-.7, .9, k) * .85), c.rufShade, smooth(.5, 1, v) * .5);
 };
 const npFold = () => (u, v) => {
   const c = NPC();
   return mix(mix(c.navyDeep, c.navy, Math.cos(u * Math.PI * 5) * .5 + .5), c.navyLit, Math.max(0, Math.cos(u * Math.PI * 5 - .8)) * .4);
 };
-// The gathered ruffle seen from above or below.
+// The gathered rosette seen from above or below.
 const npRosette = () => (u, v) => {
   const c = NPC(), x = (u - .5) * 2, z = (v - .5) * 2, r = Math.hypot(x, z), a = Math.atan2(z, x);
   if (r > .9 + .1 * Math.cos(a * 12)) return TRANSPARENT;
   if (r < .2) return c.hub;
-  return frillColour(c, r, a, 12);
+  return ruffleTop(c, r, a / 4 * 3);
 };
 // Black crook handle with a gold cap (stacked cards spanning NP.CROOK), drawn in sprite px.
 function npHandle() {
@@ -673,6 +864,12 @@ function npHandle() {
   };
 }
 const npShaft = () => (u, v) => mix(mix(hex('#2a2536'), hex('#0e0b14'), smooth(0, .5, Math.abs(u - .35))), hex('#5a5470'), Math.max(0, 1 - Math.abs(u - .32) / .06) * .5);
+// Closed parasol's gold shaft between the cog and the rosette: a lit tube with a fine spiral.
+const npGoldShaft = () => (u, v) => {
+  let col = pal().goldTube(clamp(.55 - Math.abs(u - .3) * 2.6, -1, 1));
+  if (((u * .8 + v * 3) % 1 + 1) % 1 < .12) col = mix(col, hex('#7a5a2a'), .45);
+  return col;
+};
 const npGold = () => (u, v) => mix(mix(hex('#f6e3a2'), hex('#ac8048'), smooth(.05, .95, Math.abs(u - .3) * 1.3 + v * .25)), hex('#7a5a2a'), smooth(.85, 1, Math.max(Math.abs(u - .5), Math.abs(v - .5)) * 2) * .5);
 const npCog = () => (u, v) => {
   const x = (u - .5) * 2, z = (v - .5) * 2, r = Math.hypot(x, z), a = Math.atan2(z, x);
@@ -692,26 +889,23 @@ const npPlaque = () => (u, v) => {
   if (Math.hypot(u - .42, v - .4) < .07) col = hex('#ffffff');
   return col;
 };
-const npFerrule = () => (u, v) => {
-  let col = mix(mix(hex('#f6e3a2'), hex('#ac8048'), smooth(.05, .9, Math.abs(u - .3) * 1.4)), hex('#fff6d8'), Math.max(0, 1 - Math.abs(u - .3) / .07) * .6);
-  if (Math.abs(v - .3) < .05 || Math.abs(v - .72) < .04) col = hex('#2a2030');
-  return col;
-};
-const npBore = () => (u, v) => { const r = Math.hypot(u - .5, v - .5) * 2; return r < .62 ? hex('#0e0a12') : mix(hex('#f6e3a2'), hex('#ac8048'), r); };
 const npHub = () => (u, v) => (Math.abs(v - .12) < .06 || Math.abs(v - .88) < .06) ? npGold()(u, v) : mix(hex('#2a2438'), hex('#181423'), smooth(0, .5, Math.abs(u - .35)));
-const npLace = () => (u, v) => mix(hex('#f6f2ec'), hex('#b9b0b8'), Math.abs(Math.sin(u * Math.PI * 6)) * .45 + v * .2);
 
 export function naviaWeaponSprites() {
   return {
     nv_head: [288, 336, nvHead()],
-    nv_tip: [48, 128, nvTip()], nv_crystal: [48, 96, nvCrystal()], nv_socket: [16, 64, nvSocket()],
+    nv_tip: [48, 128, nvTip()], nv_crystal: [48, 96, nvCrystal()], nv_crystal_core: [16, 48, nvCrystalCore()], nv_socket: [16, 64, nvSocket()],
     nv_shaft1: [32, 64, nvShaft1()], nv_shaft2: [32, 64, nvShaft2()], nv_collar: [32, 32, nvCollar()],
-    nv_sleeve: [32, 96, nvSleeve()], nv_guard: [96, 48, nvGuard()], nv_wrap: [32, 128, nvWrap()],
+    nv_sleeve: [32, 96, nvSleeve()], nv_sleeve_crown: [16, 32, nvSleeveCrown()], nv_guard: [96, 48, nvGuard()], nv_wrap: [32, 128, nvWrap()],
     nv_butt: [48, 96, nvButt()], nv_gold: [32, 32, nvGold()], nv_rose: [32, 32, nvRose()],
-    np_top: [256, 256, npTop()], np_dome: [128, 128, npDome()], np_lining: [256, 256, npLining()],
-    np_profile: [256, 64, npProfile()], np_skirt: [128, 32, npSkirt()], np_bundle: [96, 224, npBundle()], np_fold: [32, 64, npFold()],
-    np_rosette: [64, 64, npRosette()], np_ruffle: [32, 32, npRuffle()], np_handle: [64, 64, npHandle()], np_shaft: [16, 64, npShaft()],
-    np_gold: [32, 32, npGold()], np_cog: [64, 64, npCog()], np_plaque: [32, 32, npPlaque()],
-    np_ferrule: [32, 64, npFerrule()], np_bore: [16, 16, npBore()], np_hub: [16, 32, npHub()], np_lace: [32, 16, npLace()],
+    np_top: [256, 256, npTop()], np_lining: [256, 256, npLining()], np_profile: [256, 96, npProfile()],
+    ...Object.fromEntries(NP.CANOPY.STEPS.map(([r], k) => ['np_dome' + k, [Math.max(64, Math.ceil(r * 28 / 16) * 16), Math.max(64, Math.ceil(r * 28 / 16) * 16), npDome(k)]])),
+    np_drum_rib: [96, 80, npDrum('rib')], np_drum_emb: [96, 80, npDrum('a')], np_drum_fil: [96, 80, npDrum('b')],
+    np_ruffle_u: [64, 32, npRuffle(NP.CANOPY.RUFFLE_U, 5, false)], np_ruffle_ub: [64, 32, npRuffle(NP.CANOPY.RUFFLE_U, 5, true)],
+    np_ruffle_l: [64, 48, npRuffle(NP.CANOPY.RUFFLE_L, 4, false)], np_finial: [16, 64, npFinial()],
+    np_crosette: [80, 48, npRosetteSide()], np_bundle: [64, 112, npBundle()], np_ctip: [16, 32, npClosedTip()],
+    np_fold: [32, 64, npFold()], np_ruffle: [32, 32, npRuffleCore()], np_rosette: [64, 64, npRosette()],
+    np_handle: [64, 64, npHandle()], np_shaft: [16, 64, npShaft()], np_gshaft: [16, 32, npGoldShaft()], np_gold: [32, 32, npGold()],
+    np_cog: [64, 64, npCog()], np_plaque: [32, 32, npPlaque()], np_hub: [16, 32, npHub()],
   };
 }
