@@ -101,4 +101,22 @@ def timeline(name: str, clip: dict) -> list[dict]:
         add(hit + 2, "block.fire.extinguish", 0.24, 0.64, "hot_air_decay")
         add(hit + 7, "block.heavy_core.hit", 0.13, 0.57, "last_ash_fragment")
 
+    elif name == "sheathe":
+        # Put-away (v8): quiet swishes on the flip, the top of the crescent loop and the
+        # drop into the end pose; an airy sizzle and glassy chime as the weapon burns to
+        # gold in the hand, a small shatter, then a soft clink and shimmer as it re-forms
+        # on the back. Much quieter than the attacks.
+        dissolve = int(clip["dissolve_tick"])
+        attach = next(frame["tick"] for frame in clip["frames"]
+                      if frame.get("weapon_attach") == "back")
+        for index, tick in enumerate(clip.get("swish_ticks", [])):
+            add(tick, "entity.player.attack.sweep", 0.2 - 0.03 * index,
+                1.5 + 0.1 * index, "putaway_swish")
+        add(dissolve, "block.fire.extinguish", 0.15, 1.8, "dissolve_sizzle")
+        add(dissolve, "block.amethyst_block.resonate", 0.35, 1.6, "dissolve_shimmer")
+        add(dissolve + 4, "block.amethyst_block.chime", 0.45, 1.7, "gold_takeover_tick")
+        add(dissolve + 9, "block.amethyst_cluster.break", 0.28, 1.6, "gold_shatter")
+        add(attach, "item.armor.equip_iron", 0.4, 1.3, "back_reform_clink")
+        add(attach, "block.enchantment_table.use", 0.35, 1.6, "back_reform_shimmer")
+
     return sorted(out, key=lambda component: component["tick"])

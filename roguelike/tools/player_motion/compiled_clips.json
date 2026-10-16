@@ -236,6 +236,25 @@
     "normal": false
   },
   {
+    "length": 60,
+    "hit_ticks": [],
+    "source": "arle_putaway",
+    "source_start": 5.2,
+    "source_end": 9.93,
+    "weapon": "spear",
+    "weapon_state": "sheathe",
+    "swish_ticks": [
+      12,
+      21,
+      31
+    ],
+    "dissolve_tick": 36,
+    "reference_observation": "v8 cycle B (scythe look), right hand: raise, vertical in front of the right shoulder, flip, backward crescent loop beside the right side, crescent above the head with the shaft behind the back, tip forward-down end pose at the right hip, gold dissolve in the hand (frozen pose), back silhouette re-form. Shaft slides through the hand in the loop so the crescent clears the floor.",
+    "char": "arle",
+    "name": "sheathe",
+    "normal": false
+  },
+  {
     "length": 13,
     "weapon": "sword",
     "source": "skirk_physical",
