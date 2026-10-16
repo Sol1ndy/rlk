@@ -6,11 +6,13 @@ scoreboard players set #nCnt tmp 1
 execute store result score #r tmp run random value 0..99
 execute if score #r tmp < #node2Pct tmp run scoreboard players set #nCnt tmp 2
 # 첫 노드
+scoreboard players set #noRoot tmp 0
 function rlk:room/node/draw_fresh
 execute if score #nk tmp matches ..0 run return 0
 function rlk:room/node/take
-# 상점은 혼자 나오지 않는다
+# 상점은 혼자 나오지 않는다 · 나무뿌리는 다른 노드와 같이 나오지 않는다
 execute if score #nk tmp matches 4 run scoreboard players set #nCnt tmp 2
+execute if score #nk tmp matches 8 run scoreboard players set #nCnt tmp 1
 # 둘째 노드
 execute if score #nCnt tmp matches 2 run function rlk:room/node/offer_two
 execute store result storage rlk:room a.i int 1 run scoreboard players get #slot tmp

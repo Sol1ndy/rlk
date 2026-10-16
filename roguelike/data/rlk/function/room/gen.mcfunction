@@ -4,7 +4,11 @@ function rlk:room/clear
 function rlk:room/theme
 # 맵 종류 → 배치 묶음
 execute if score #mapType room matches 0 run function rlk:room/pick/first
-execute if score #mapType room matches 1..7 run function rlk:room/pick/normal
+# 노드 맵: 레벨업 노드가 있으면 첫 구역에 경험의 샘이 있는 레벨업 배치, 아니면 일반 배치
+scoreboard players set #nLv tmp 0
+execute if score #mapType room matches 1..7 if data storage rlk:room {next:[10]} run scoreboard players set #nLv tmp 1
+execute if score #mapType room matches 1..7 if score #nLv tmp matches 1 run function rlk:room/pick/levelup
+execute if score #mapType room matches 1..7 if score #nLv tmp matches 0 run function rlk:room/pick/normal
 execute if score #mapType room matches 8 run function rlk:room/pick/boss
 # 노드 맵(종류 1): 고른 선택지의 노드(rlk:room next)마다 서로 다른 중간 구역 하나를 그 노드 구역으로 + 제목
 execute if score #mapType room matches 1..7 run function rlk:room/node/place
