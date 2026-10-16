@@ -1362,3 +1362,5 @@ function rlk:bossui/init
 function rlk:boss/raiden/init
 # 화면 위 미니맵(tools/build_minimap.py)
 function rlk:minimap/init
+# 나비아 금빛 카드 효과 점수(tools/build_navia_fx_cards.py)
+function rlk:fx/nv/init
