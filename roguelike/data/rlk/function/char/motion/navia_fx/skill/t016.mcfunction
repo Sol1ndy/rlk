@@ -1,2 +1,4 @@
-particle minecraft:dust{color:[1,0.953,0.769],scale:0.7} ^-0.266 ^0.69 ^0.339 0.03 0.03 0.03 0 2 normal
-particle minecraft:dust{color:[1,0.92,0.5],scale:0.5599999999999999} ^-0.266 ^0.69 ^0.339 0.05 0.05 0.05 0 1 normal
+# (retimed from t013)
+function rlk:fx/nv/p/glint {pos:"^0.088 ^1.09 ^0.546"}
+function rlk:fx/nv/p/glint {pos:"^-0.709 ^0.287 ^0.282"}
+particle minecraft:dust{color:[1,0.953,0.769],scale:0.4} ^-0.311 ^0.689 ^0.414 0.35 0.35 0.35 0 6 normal

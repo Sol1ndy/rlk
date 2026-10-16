@@ -11,28 +11,28 @@ execute if score @s pmTick matches 5 run playsound minecraft:item.crossbow.loadi
 # flare glitter (A1)
 execute if score @s pmTick matches 5 run playsound minecraft:block.amethyst_block.chime player @s ~ ~ ~ 0.3 1.6 0
 # recoil, coat swish
-execute if score @s pmTick matches 9 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.3 0.9 0
+execute if score @s pmTick matches 10 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.3 0.9 0
 # recoil slide
-execute if score @s pmTick matches 11 run playsound minecraft:entity.breeze.slide player @s ~ ~ ~ 0.25 1.3 0
+execute if score @s pmTick matches 12 run playsound minecraft:entity.breeze.slide player @s ~ ~ ~ 0.25 1.3 0
 # Geo shrapnel crackle (A3)
-execute if score @s pmTick matches 13 run playsound minecraft:block.amethyst_cluster.break player @s ~ ~ ~ 0.5 1.3 0
+execute if score @s pmTick matches 16 run playsound minecraft:block.amethyst_cluster.break player @s ~ ~ ~ 0.5 1.3 0
 # petal sparkle (A3)
-execute if score @s pmTick matches 13 run playsound minecraft:entity.firework_rocket.twinkle player @s ~ ~ ~ 0.25 1.4 0
+execute if score @s pmTick matches 16 run playsound minecraft:entity.firework_rocket.twinkle player @s ~ ~ ~ 0.25 1.4 0
 # knee lands
-execute if score @s pmTick matches 14 run playsound minecraft:block.wool.place player @s ~ ~ ~ 0.3 0.8 0
+execute if score @s pmTick matches 18 run playsound minecraft:block.wool.place player @s ~ ~ ~ 0.3 0.8 0
 # rise (A9)
-execute if score @s pmTick matches 20 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.25 1.2 0
+execute if score @s pmTick matches 52 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.25 1.2 0
 # canopy rim on the floor
-execute if score @s pmTick matches 23 run playsound minecraft:block.wool.place player @s ~ ~ ~ 0.2 0.9 0
+execute if score @s pmTick matches 56 run playsound minecraft:block.wool.place player @s ~ ~ ~ 0.2 0.9 0
 # canopy folds (A10)
-execute if score @s pmTick matches 24 run playsound minecraft:item.crossbow.loading_end player @s ~ ~ ~ 0.35 1.7 0
+execute if score @s pmTick matches 58 run playsound minecraft:item.crossbow.loading_end player @s ~ ~ ~ 0.35 1.7 0
 # fold rustle (A10)
-execute if score @s pmTick matches 24 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.25 1.6 0
+execute if score @s pmTick matches 58 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.25 1.6 0
 # parasol dissolves (A11)
-execute if score @s pmTick matches 27 run playsound minecraft:entity.illusioner.mirror_move player @s ~ ~ ~ 0.25 1.5 0
+execute if score @s pmTick matches 62 run playsound minecraft:entity.illusioner.mirror_move player @s ~ ~ ~ 0.25 1.5 0
 # dissolve shimmer (A12)
-execute if score @s pmTick matches 28 run playsound minecraft:block.amethyst_block.chime player @s ~ ~ ~ 0.4 1.9 0
+execute if score @s pmTick matches 63 run playsound minecraft:block.amethyst_block.chime player @s ~ ~ ~ 0.4 1.9 0
 # dissolve sparkle (A12)
-execute if score @s pmTick matches 28 run playsound minecraft:entity.firework_rocket.twinkle player @s ~ ~ ~ 0.18 1.8 0
+execute if score @s pmTick matches 63 run playsound minecraft:entity.firework_rocket.twinkle player @s ~ ~ ~ 0.18 1.8 0
 # halberd re-forms on the back
-execute if score @s pmTick matches 31 run playsound minecraft:item.armor.equip_iron player @s ~ ~ ~ 0.25 1.4 0
+execute if score @s pmTick matches 65 run playsound minecraft:item.armor.equip_iron player @s ~ ~ ~ 0.25 1.4 0

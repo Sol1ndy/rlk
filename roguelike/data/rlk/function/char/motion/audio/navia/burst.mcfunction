@@ -36,27 +36,27 @@ execute if score @s pmTick matches 38 run playsound minecraft:block.fire.extingu
 execute if score @s pmTick matches 39 run playsound minecraft:entity.firework_rocket.blast player @s ~ ~ ~ 0.28 0.9 0
 # barrage pop 1 body
 execute if score @s pmTick matches 39 run playsound minecraft:entity.generic.explode player @s ~ ~ ~ 0.14 1.35 0
-# parasol off the shoulder
-execute if score @s pmTick matches 40 run playsound minecraft:entity.player.attack.sweep player @s ~ ~ ~ 0.18 1.7 0
 # barrage pop 2
 execute if score @s pmTick matches 41 run playsound minecraft:entity.firework_rocket.blast player @s ~ ~ ~ 0.26 1.05 0
 # barrage pop 3
 execute if score @s pmTick matches 43 run playsound minecraft:entity.firework_rocket.blast player @s ~ ~ ~ 0.24 0.85 0
 # barrage pop 3 body
 execute if score @s pmTick matches 43 run playsound minecraft:entity.generic.explode player @s ~ ~ ~ 0.12 1.4 0
-# parasol folds
-execute if score @s pmTick matches 43 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.28 1.3 0
-# ferrule tap
-execute if score @s pmTick matches 44 run playsound minecraft:block.chain.hit player @s ~ ~ ~ 0.2 1.7 0
 # barrage pop 4
 execute if score @s pmTick matches 45 run playsound minecraft:entity.firework_rocket.blast player @s ~ ~ ~ 0.22 1 0
-# dissolve glitter
-execute if score @s pmTick matches 45 run playsound minecraft:entity.firework_rocket.twinkle player @s ~ ~ ~ 0.15 1.5 0
-# dissolve chime
-execute if score @s pmTick matches 46 run playsound minecraft:block.amethyst_block.chime player @s ~ ~ ~ 0.2 1.8 0
 # barrage pop 5
 execute if score @s pmTick matches 47 run playsound minecraft:entity.firework_rocket.blast player @s ~ ~ ~ 0.18 0.95 0
+# parasol off the shoulder
+execute if score @s pmTick matches 86 run playsound minecraft:entity.player.attack.sweep player @s ~ ~ ~ 0.18 1.7 0
+# parasol folds
+execute if score @s pmTick matches 92 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.28 1.3 0
+# ferrule tap
+execute if score @s pmTick matches 94 run playsound minecraft:block.chain.hit player @s ~ ~ ~ 0.2 1.7 0
+# dissolve glitter
+execute if score @s pmTick matches 96 run playsound minecraft:entity.firework_rocket.twinkle player @s ~ ~ ~ 0.15 1.5 0
+# dissolve chime
+execute if score @s pmTick matches 98 run playsound minecraft:block.amethyst_block.chime player @s ~ ~ ~ 0.2 1.8 0
 # re-form shimmer
-execute if score @s pmTick matches 48 run playsound minecraft:block.amethyst_block.resonate player @s ~ ~ ~ 0.14 1.25 0
+execute if score @s pmTick matches 101 run playsound minecraft:block.amethyst_block.resonate player @s ~ ~ ~ 0.14 1.25 0
 # halberd settles on the back
-execute if score @s pmTick matches 51 run playsound minecraft:item.armor.equip_iron player @s ~ ~ ~ 0.16 1.4 0
+execute if score @s pmTick matches 105 run playsound minecraft:item.armor.equip_iron player @s ~ ~ ~ 0.16 1.4 0

@@ -42,6 +42,8 @@ const characters={
 // Clip and back-mount data, read once: tools/player_motion/<char>.json plus optional clip fragments
 // tools/player_motion/<char>/*.json (each {"clips":{...}}), so several authors can own separate files.
 // A clip name may appear only once across the main file and all fragments.
+// Navia's fragments (player_motion/navia/*.json) are the timing source since the D11 retime: dense keys at playback
+// 100 with the full recovery tails. The scratch scripts that first wrote them are superseded; edit the JSON.
 function loadMotion(dir,char){
  const source=path.join(dir,char+'.json');
  if(!fs.existsSync(source))throw new Error(`Missing ${source} for rig character ${char}.`);

@@ -9,22 +9,22 @@ execute if score @s pmTick matches 5 run playsound minecraft:block.amethyst_bloc
 # shard glint (S6)
 execute if score @s pmTick matches 5 run playsound minecraft:block.glass.break player @s ~ ~ ~ 0.2 1.7 0
 # knocked back, coat swish
-execute if score @s pmTick matches 6 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.3 0.9 0
+execute if score @s pmTick matches 7 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.3 0.9 0
 # crystal shard crunch (S6)
-execute if score @s pmTick matches 7 run playsound minecraft:block.amethyst_block.hit player @s ~ ~ ~ 0.35 1.5 0
+execute if score @s pmTick matches 15 run playsound minecraft:block.amethyst_block.hit player @s ~ ~ ~ 0.35 1.5 0
 # squat lands
-execute if score @s pmTick matches 8 run playsound minecraft:block.wool.place player @s ~ ~ ~ 0.3 0.8 0
+execute if score @s pmTick matches 22 run playsound minecraft:block.wool.place player @s ~ ~ ~ 0.3 0.8 0
 # shard crackle (S6)
-execute if score @s pmTick matches 9 run playsound minecraft:block.amethyst_cluster.break player @s ~ ~ ~ 0.3 1.2 0
+execute if score @s pmTick matches 30 run playsound minecraft:block.amethyst_cluster.break player @s ~ ~ ~ 0.3 1.2 0
 # rise
-execute if score @s pmTick matches 12 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.25 1.2 0
+execute if score @s pmTick matches 49 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.25 1.2 0
 # canopy rim on the floor (S13)
-execute if score @s pmTick matches 14 run playsound minecraft:block.wool.place player @s ~ ~ ~ 0.25 0.8 0
+execute if score @s pmTick matches 51 run playsound minecraft:block.wool.place player @s ~ ~ ~ 0.25 0.8 0
 # close rustle (very quiet; v4: silent close)
-execute if score @s pmTick matches 15 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.1 1.6 0
+execute if score @s pmTick matches 57 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.1 1.6 0
 # dissolve shimmer (S14)
-execute if score @s pmTick matches 17 run playsound minecraft:block.amethyst_block.chime player @s ~ ~ ~ 0.35 1.9 0
+execute if score @s pmTick matches 62 run playsound minecraft:block.amethyst_block.chime player @s ~ ~ ~ 0.35 1.9 0
 # dissolve ring-out (S14)
-execute if score @s pmTick matches 18 run playsound minecraft:block.beacon.deactivate player @s ~ ~ ~ 0.15 2 0
+execute if score @s pmTick matches 64 run playsound minecraft:block.beacon.deactivate player @s ~ ~ ~ 0.15 2 0
 # halberd re-forms on the back
-execute if score @s pmTick matches 21 run playsound minecraft:item.armor.equip_iron player @s ~ ~ ~ 0.25 1.4 0
+execute if score @s pmTick matches 67 run playsound minecraft:item.armor.equip_iron player @s ~ ~ ~ 0.25 1.4 0

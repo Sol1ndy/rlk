@@ -7,3 +7,7 @@ execute if score @s pmTick matches 0 run scoreboard players set @s pmLockUntil 4
 execute if score @s pmTick matches 0 run function rlk:char/motion/control/lock
 execute if score @s pmTick matches 0 run scoreboard players set #pmInv tmp 44
 execute if score @s pmTick matches 0 run scoreboard players operation @s dashInvT > #pmInv tmp
+# Retime (108 ticks): the shoulder rest holds to 82 and the put-away ends at 100, halberd on the back from 101
+# (Genshin v1/v6); the blast (34), lock and i-frames (44) do not move.
+# Moving or jumping after the lock: quick stow instead of sliding the shoulder rest.
+execute if score @s pmTick matches 45.. if score @s pmVisible matches 1 unless score @s pmWantMode matches 0 run return run function rlk:char/motion/sheath/abort

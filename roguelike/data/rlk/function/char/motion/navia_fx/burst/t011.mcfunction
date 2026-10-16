@@ -1,3 +1,4 @@
+# (retimed from t011)
 # settles on the shoulder
 particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.5} ^-0.94 ^1.96 ^0.04 0 0 0 0 1 normal
 particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.5} ^-0.891 ^1.512 ^-0.474 0 0 0 0 1 normal

@@ -1,3 +1,4 @@
+# (retimed from t008)
 particle minecraft:dust{color:[1.0,0.953,0.769],scale:1.05} ^-2.58 ^1.34 ^-0.44 0 0 0 0 1 normal
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.95} ^-2.16 ^1.47 ^0.04 0 0 0 0 1 normal
 particle minecraft:dust{color:[1.0,0.953,0.769],scale:1.05} ^-2.57 ^1.52 ^-0.17 0 0 0 0 1 normal
@@ -17,4 +18,4 @@ particle minecraft:dust{color:[1.0,0.953,0.769],scale:1.05} ^-2.04 ^2.3 ^1.18 0 
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.95} ^-1.42 ^2.12 ^1.31 0 0 0 0 1 normal
 execute if score @s nvP matches 1.. run particle minecraft:wax_on ^-2 ^1.73 ^0.5 0.08 0.08 0.08 0 1 normal
 execute if score @s nvP matches 1.. run particle minecraft:wax_on ^-1.59 ^2.05 ^1.12 0.08 0.08 0.08 0 1 normal
-function rlk:fx/nv/card {kind:"crescent",pos:"^0 ^1.4 ^0",rot:"~ ~",bb:"fixed",roll:22,spin:45,s0:4,s1:4.6,move:"0f,0f,0f",life:6,fade:2}
+function rlk:fx/nv/card {kind:"crescent",pos:"^0 ^1.4 ^0",rot:"~ ~",bb:"fixed",roll:22,spin:45,s0:4,s1:4.6,move:"0f,0f,0f",life:9,fade:3}

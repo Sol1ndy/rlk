@@ -21,28 +21,28 @@ execute if score @s pmTick matches 7 run playsound minecraft:item.trident.hit_gr
 # knee chamber rustle
 execute if score @s pmTick matches 8 run playsound minecraft:item.armor.equip_leather player @s ~ ~ ~ 0.14 1.2 0
 # kick crack
-execute if score @s pmTick matches 10 run playsound minecraft:entity.player.attack.knockback player @s ~ ~ ~ 0.45 1.2 0
+execute if score @s pmTick matches 11 run playsound minecraft:entity.player.attack.knockback player @s ~ ~ ~ 0.45 1.2 0
 # halberd launched
-execute if score @s pmTick matches 10 run playsound minecraft:item.trident.throw player @s ~ ~ ~ 0.38 0.8 0
+execute if score @s pmTick matches 11 run playsound minecraft:item.trident.throw player @s ~ ~ ~ 0.38 0.8 0
 # kick snap
-execute if score @s pmTick matches 10 run playsound minecraft:entity.player.attack.strong player @s ~ ~ ~ 0.16 1.4 0
+execute if score @s pmTick matches 11 run playsound minecraft:entity.player.attack.strong player @s ~ ~ ~ 0.16 1.4 0
 # spin-up whirr
-execute if score @s pmTick matches 11 run playsound minecraft:item.trident.riptide_1 player @s ~ ~ ~ 0.16 1.5 0
+execute if score @s pmTick matches 12 run playsound minecraft:item.trident.riptide_1 player @s ~ ~ ~ 0.16 1.5 0
 # whirr
-execute if score @s pmTick matches 12 run playsound minecraft:entity.player.attack.sweep player @s ~ ~ ~ 0.15 1 0
+execute if score @s pmTick matches 13 run playsound minecraft:entity.player.attack.sweep player @s ~ ~ ~ 0.15 1 0
 # halberd chunk
-execute if score @s pmTick matches 13 run playsound minecraft:item.spear.attack player @s ~ ~ ~ 0.12 1.2 0
+execute if score @s pmTick matches 14 run playsound minecraft:item.spear.attack player @s ~ ~ ~ 0.12 1.2 0
 # whirr
-execute if score @s pmTick matches 14 run playsound minecraft:entity.player.attack.sweep player @s ~ ~ ~ 0.15 1.12 0
+execute if score @s pmTick matches 15 run playsound minecraft:entity.player.attack.sweep player @s ~ ~ ~ 0.15 1.12 0
 # halberd chunk
-execute if score @s pmTick matches 15 run playsound minecraft:item.spear.attack player @s ~ ~ ~ 0.12 1.3 0
+execute if score @s pmTick matches 16 run playsound minecraft:item.spear.attack player @s ~ ~ ~ 0.12 1.3 0
 # whirr
-execute if score @s pmTick matches 16 run playsound minecraft:entity.player.attack.sweep player @s ~ ~ ~ 0.15 1.24 0
+execute if score @s pmTick matches 17 run playsound minecraft:entity.player.attack.sweep player @s ~ ~ ~ 0.15 1.24 0
 # halberd chunk
-execute if score @s pmTick matches 17 run playsound minecraft:item.spear.attack player @s ~ ~ ~ 0.12 1.4 0
+execute if score @s pmTick matches 18 run playsound minecraft:item.spear.attack player @s ~ ~ ~ 0.12 1.4 0
 # gold dissolve
-execute if score @s pmTick matches 18 run playsound minecraft:entity.illusioner.mirror_move player @s ~ ~ ~ 0.16 1.6 0
+execute if score @s pmTick matches 20 run playsound minecraft:entity.illusioner.mirror_move player @s ~ ~ ~ 0.16 1.6 0
 # re-form chime
-execute if score @s pmTick matches 21 run playsound minecraft:block.amethyst_block.chime player @s ~ ~ ~ 0.2 1.5 0
+execute if score @s pmTick matches 29 run playsound minecraft:block.amethyst_block.chime player @s ~ ~ ~ 0.2 1.5 0
 # settles on the back
-execute if score @s pmTick matches 23 run playsound minecraft:item.armor.equip_iron player @s ~ ~ ~ 0.16 1.15 0
+execute if score @s pmTick matches 36 run playsound minecraft:item.armor.equip_iron player @s ~ ~ ~ 0.16 1.15 0

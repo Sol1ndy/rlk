@@ -1,3 +1,4 @@
+# (retimed from t002)
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.5} ^0.465 ^1.038 ^0.922 0 0 0 0 1 normal
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.5} ^0.373 ^1.408 ^0.885 0 0 0 0 1 normal
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.5} ^0.119 ^1.693 ^0.857 0 0 0 0 1 normal

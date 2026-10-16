@@ -1,5 +1,7 @@
+# (retimed from t031)
 particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.6198662095562864} ^-0.37 ^1.828 ^0.285 0 0 0 0 1 normal
 particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.553269678402352} ^0.258 ^1.001 ^0.395 0 0 0 0 1 normal
+# (retimed from t031)
 # energy drawn in toward her chest (the video's radial zoom, rel 30-34)
 particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.75} ^-1.786 ^1.15 ^-0.224 0 0 0 0 1 normal
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.75} ^-1.736 ^1.15 ^0.477 0 0 0 0 1 normal

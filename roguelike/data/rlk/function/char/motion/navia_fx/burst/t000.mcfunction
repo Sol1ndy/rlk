@@ -1,3 +1,4 @@
+# (retimed from t000)
 # cast frame: gold motes swirl at the right hand where the parasol materialises (v1 E1)
 particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.5} ^-0.06 ^1.18 ^0.26 0 0 0 0 1 normal
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.5} ^-0.101 ^1.195 ^0.161 0 0 0 0 1 normal

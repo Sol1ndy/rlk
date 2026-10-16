@@ -9,6 +9,6 @@ execute if score @s pmTick matches 8 run playsound minecraft:item.trident.throw 
 # edge shing
 execute if score @s pmTick matches 10 run playsound minecraft:item.spear.attack player @s ~ ~ ~ 0.22 0.85 0
 # head thud
-execute if score @s pmTick matches 13 run playsound minecraft:item.mace.smash_ground player @s ~ ~ ~ 0.38 0.9 0
+execute if score @s pmTick matches 15 run playsound minecraft:item.mace.smash_ground player @s ~ ~ ~ 0.38 0.9 0
 # thud body
-execute if score @s pmTick matches 13 run playsound minecraft:block.heavy_core.hit player @s ~ ~ ~ 0.2 0.65 0
+execute if score @s pmTick matches 15 run playsound minecraft:block.heavy_core.hit player @s ~ ~ ~ 0.2 0.65 0

@@ -1,3 +1,4 @@
+# (retimed from t039)
 particle minecraft:dust{color:[0.839,0.698,0.451],scale:1.4} ^0.96 ^0.28 ^-3.47 0.08 0.06 0.08 0 1 normal
 particle minecraft:dust{color:[0.839,0.698,0.451],scale:1.4} ^0.164 ^0.28 ^-3.596 0.08 0.06 0.08 0 1 normal
 particle minecraft:dust{color:[0.839,0.698,0.451],scale:1.4} ^-0.641 ^0.28 ^-3.543 0.08 0.06 0.08 0 1 normal
@@ -26,6 +27,7 @@ particle minecraft:dust{color:[0.839,0.698,0.451],scale:1.4} ^3.311 ^0.28 ^-1.41
 particle minecraft:dust{color:[0.839,0.698,0.451],scale:1.4} ^2.914 ^0.28 ^-2.114 0.08 0.06 0.08 0 1 normal
 particle minecraft:dust{color:[0.839,0.698,0.451],scale:1.4} ^2.37 ^0.28 ^-2.71 0.08 0.06 0.08 0 1 normal
 particle minecraft:dust{color:[0.839,0.698,0.451],scale:1.4} ^1.708 ^0.28 ^-3.169 0.08 0.06 0.08 0 1 normal
+# (retimed from t039)
 # barrage shell impact: gold flare, sparks, gold flakes
 particle minecraft:explosion ^-1.8 ^0.6 ^3.4 0 0 0 0 1 normal
 particle minecraft:block{block_state:"minecraft:gold_block"} ^-1.8 ^0.4 ^3.4 0.6 0.3 0.6 0.15 10 normal

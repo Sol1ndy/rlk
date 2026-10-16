@@ -1,2 +1,9 @@
-particle minecraft:dust{color:[1,0.953,0.769],scale:0.5} ^-0.269 ^0.696 ^0.332 0.03 0.03 0.03 0 2 normal
-particle minecraft:dust{color:[1,0.92,0.5],scale:0.4} ^-0.269 ^0.696 ^0.332 0.05 0.05 0.05 0 1 normal
+# (retimed from t014)
+particle minecraft:dust{color:[0.8,0.72,0.56],scale:0.7} ^0.446 ^0.09 ^-0.757 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.8,0.72,0.56],scale:0.7} ^0.351 ^0.09 ^-0.953 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.8,0.72,0.56],scale:0.7} ^0.14 ^0.09 ^-1.001 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.8,0.72,0.56],scale:0.7} ^-0.03 ^0.09 ^-0.866 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.8,0.72,0.56],scale:0.7} ^-0.03 ^0.09 ^-0.649 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.8,0.72,0.56],scale:0.7} ^0.14 ^0.09 ^-0.514 0 0 0 0 1 normal
+particle minecraft:dust{color:[0.8,0.72,0.56],scale:0.7} ^0.351 ^0.09 ^-0.562 0 0 0 0 1 normal
+function rlk:fx/nv/p/petal {pos:"^0.271 ^1.9 ^0.947"}

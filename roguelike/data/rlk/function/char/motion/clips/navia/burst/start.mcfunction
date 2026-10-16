@@ -4,7 +4,7 @@ scoreboard players set @s pmBlend 0
 scoreboard players set @s pmWeapon -1
 scoreboard players set @s pmActive 1
 scoreboard players set @s pmTick 0
-scoreboard players set @s pmLen 54
+scoreboard players set @s pmLen 108
 scoreboard players set @s pmChar 6
 scoreboard players set @s pmSpeed 100
 execute if score @s pmSpeed matches ..24 run scoreboard players set @s pmSpeed 25

@@ -1,3 +1,4 @@
+# (retimed from t041)
 # barrage shell impact: gold flare, sparks, gold flakes
 particle minecraft:explosion ^2.4 ^0.6 ^4.4 0 0 0 0 1 normal
 particle minecraft:block{block_state:"minecraft:gold_block"} ^2.4 ^0.4 ^4.4 0.6 0.3 0.6 0.15 10 normal

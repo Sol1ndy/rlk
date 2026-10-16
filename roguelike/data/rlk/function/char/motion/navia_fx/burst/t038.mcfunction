@@ -1,3 +1,4 @@
+# (retimed from t038)
 particle minecraft:dust{color:[0.988,0.851,0.58],scale:1.4} ^2.961 ^0.24 ^-0.919 0.08 0.06 0.08 0 1 normal
 particle minecraft:dust{color:[0.988,0.851,0.58],scale:1.4} ^2.655 ^0.24 ^-1.601 0.08 0.06 0.08 0 1 normal
 particle minecraft:dust{color:[0.988,0.851,0.58],scale:1.4} ^2.195 ^0.24 ^-2.189 0.08 0.06 0.08 0 1 normal
@@ -24,6 +25,7 @@ particle minecraft:dust{color:[0.988,0.851,0.58],scale:1.4} ^2.438 ^0.24 ^1.915 
 particle minecraft:dust{color:[0.988,0.851,0.58],scale:1.4} ^2.825 ^0.24 ^1.276 0.08 0.06 0.08 0 1 normal
 particle minecraft:dust{color:[0.988,0.851,0.58],scale:1.4} ^3.049 ^0.24 ^0.562 0.08 0.06 0.08 0 1 normal
 particle minecraft:dust{color:[0.988,0.851,0.58],scale:1.4} ^3.095 ^0.24 ^-0.183 0.08 0.06 0.08 0 1 normal
+# (retimed from t038)
 # barrage shell (cosmetic): comet streak
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-0.2 ^4.2 ^2.3 0 0 0 0 1 normal
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-0.333 ^3.85 ^2.392 0 0 0 0 1 normal

@@ -1,3 +1,4 @@
+# (retimed from t001)
 # the open parasol appears out of the swirl
 particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.55} ^-0.443 ^1.379 ^0.266 0 0 0 0 1 normal
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.55} ^-0.338 ^1.459 ^0.296 0 0 0 0 1 normal

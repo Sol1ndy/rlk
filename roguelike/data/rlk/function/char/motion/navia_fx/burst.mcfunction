@@ -1,6 +1,8 @@
 # Navia burst fx (owner: burst). One tNNN file per authored tick; particles and gold cards (rlk:fx/nv/card),
 # ^left ^up ^forward from the feet in the locked basis yaw (pitch 0). Gold Geo #F6D57A / #E9B949 / #FFF3C4 cores.
 # Written by the burst authoring script from the clip poses (parasol rim, muzzle, hand, back mount).
+# Retimed (D11, playback 100): the tick files follow the clip time-warp; "(retimed from tNNN)" marks the
+# original authored tick. These files are now the source: edit them directly, the scratch fx scripts are superseded.
 execute if score @s pmTick matches 0 run function rlk:char/motion/navia_fx/burst/t000
 execute if score @s pmTick matches 1 run function rlk:char/motion/navia_fx/burst/t001
 execute if score @s pmTick matches 2 run function rlk:char/motion/navia_fx/burst/t002
@@ -49,8 +51,13 @@ execute if score @s pmTick matches 44 run function rlk:char/motion/navia_fx/burs
 execute if score @s pmTick matches 45 run function rlk:char/motion/navia_fx/burst/t045
 execute if score @s pmTick matches 46 run function rlk:char/motion/navia_fx/burst/t046
 execute if score @s pmTick matches 47 run function rlk:char/motion/navia_fx/burst/t047
-execute if score @s pmTick matches 48 run function rlk:char/motion/navia_fx/burst/t048
-execute if score @s pmTick matches 49 run function rlk:char/motion/navia_fx/burst/t049
-execute if score @s pmTick matches 50 run function rlk:char/motion/navia_fx/burst/t050
-execute if score @s pmTick matches 51 run function rlk:char/motion/navia_fx/burst/t051
-execute if score @s pmTick matches 52 run function rlk:char/motion/navia_fx/burst/t052
+execute if score @s pmTick matches 92 run function rlk:char/motion/navia_fx/burst/t092
+execute if score @s pmTick matches 94 run function rlk:char/motion/navia_fx/burst/t094
+execute if score @s pmTick matches 96 run function rlk:char/motion/navia_fx/burst/t096
+execute if score @s pmTick matches 98 run function rlk:char/motion/navia_fx/burst/t098
+execute if score @s pmTick matches 100 run function rlk:char/motion/navia_fx/burst/t100
+execute if score @s pmTick matches 101 run function rlk:char/motion/navia_fx/burst/t101
+execute if score @s pmTick matches 102 run function rlk:char/motion/navia_fx/burst/t102
+execute if score @s pmTick matches 104 run function rlk:char/motion/navia_fx/burst/t104
+execute if score @s pmTick matches 105 run function rlk:char/motion/navia_fx/burst/t105
+execute if score @s pmTick matches 106 run function rlk:char/motion/navia_fx/burst/t106

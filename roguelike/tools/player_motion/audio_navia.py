@@ -20,6 +20,12 @@ Ownership (do not double these in a clip module):
 - the clips own everything the body and the props do: swings, drags, kicks, steps, the thrown halberd's spin, the
   parasol (appear, twirl, open, close, dissolve), the burst wind-up and the halberd re-forming on the back.
   The generic normal-attack swing/hit layers and the old fx-frame sounds are switched off for Navia.
+
+Timing source (D11 retime): physical_1-4, skill, skill_fire and burst were time-warped to the Genshin cadence
+(playback 100, full recovery tails). Their modules are now literal LAYERS lists, and the clip JSON fragments in
+tools/player_motion/navia/ plus the navia_fx tick files are the source of truth for timing. The scratch authoring
+scripts that first generated these clips emit the old 150 % timing and are superseded: edit the JSON, the LAYERS
+lists and the fx files directly.
 """
 
 from __future__ import annotations

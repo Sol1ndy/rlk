@@ -1,5 +1,9 @@
-particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.45} ^-0.13 ^3.37 ^0.65 0.03 0.03 0.03 0 1 normal
-particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.45} ^-1.11 ^3.53 ^-0.88 0.03 0.03 0.03 0 1 normal
-particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.55} ^0 ^0.27 ^-0.15 0.25 0.25 0.25 0 2 normal
-particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.5} ^0 ^2.61 ^0 1.3 1.3 1.3 0 3 normal
-execute if score @s nvP matches 1.. run particle minecraft:wax_on ^-0.29 ^3.48 ^-0.32 0.6 0.15 0.6 0 2 normal
+# (retimed from t031)
+function rlk:fx/nv/card {kind:"ring",pos:"^0.18 ^0.05 ^-0.02",rot:"~ 90",bb:"fixed",roll:0,spin:60,s0:0.3,s1:1.3,move:"0f,0f,0f",life:6,fade:2}
+particle minecraft:dust{color:[0.62,0.58,0.55],scale:1.2} ^0.18 ^0.05 ^-0.02 0.3 0.3 0.3 0 6 normal
+particle minecraft:poof ^0.18 ^0.05 ^-0.02 0.2 0.02 0.2 0.01 2 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.6} ^0.18 ^0.1 ^-0.02 0.3 0.3 0.3 0 4 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.5} ^-1.51 ^2.09 ^0.68 0.04 0.04 0.04 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.5} ^-1.07 ^2.42 ^-0.11 0.04 0.04 0.04 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.5} ^-0.3 ^2.67 ^0.42 0.04 0.04 0.04 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.5} ^-0.74 ^2.34 ^1.21 0.04 0.04 0.04 0 1 normal

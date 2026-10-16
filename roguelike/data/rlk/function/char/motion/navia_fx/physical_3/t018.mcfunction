@@ -1,17 +1,16 @@
-particle minecraft:dust{color:[0.914,0.725,0.286],scale:1.1} ^-0.58 ^1.69 ^3.38 0.04 0.04 0.04 0 2 normal
-particle minecraft:dust{color:[0.965,0.835,0.478],scale:1.1} ^-0.48 ^1.88 ^3.18 0.04 0.04 0.04 0 2 normal
-particle minecraft:dust{color:[0.914,0.725,0.286],scale:1.1} ^-0.38 ^1.97 ^2.96 0.04 0.04 0.04 0 2 normal
-particle minecraft:dust{color:[0.965,0.835,0.478],scale:1.1} ^-0.28 ^1.98 ^2.75 0.04 0.04 0.04 0 2 normal
-particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.8} ^-0.28 ^1.98 ^2.75 0.03 0.03 0.03 0 2 normal
-particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^0.18 ^0.93 ^1.74 0.03 0.03 0.03 0 1 normal
-particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^-0.02 ^0.84 ^2.17 0.03 0.03 0.03 0 1 normal
-particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.9} ^-0.02 ^0.84 ^2.17 0.06 0.06 0.06 0 2 normal
-particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.9} ^-0.07 ^1.07 ^2.29 0.06 0.06 0.06 0 2 normal
-particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.9} ^-0.12 ^1.3 ^2.4 0.06 0.06 0.06 0 2 normal
-particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.9} ^-0.18 ^1.52 ^2.52 0.06 0.06 0.06 0 2 normal
-particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.9} ^-0.23 ^1.75 ^2.63 0.06 0.06 0.06 0 2 normal
-particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.9} ^-0.28 ^1.98 ^2.75 0.06 0.06 0.06 0 2 normal
-function rlk:fx/nv/card {kind:"glow",pos:"^-0.15 ^1.4 ^2.46",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.6,s1:1.7,move:"0f,0f,0f",life:5,fade:3}
-particle minecraft:end_rod ^-0.15 ^1.41 ^2.46 0.35 0.35 0.35 0.02 5 normal
-function rlk:fx/nv/card {kind:"petal",pos:"^-0.15 ^1.71 ^2.46",rot:"~ ~",bb:"center",roll:30,spin:150,s0:0.16,s1:0.12,move:"0f,-0.7f,0f",life:22,fade:6}
-function rlk:fx/nv/card {kind:"petal",pos:"^-0.65 ^1.7 ^2.16",rot:"~ ~",bb:"center",roll:-40,spin:-140,s0:0.14,s1:0.1,move:"0.1f,-0.8f,0f",life:26,fade:6}
+# (retimed from t017)
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:1.1} ^-0.51 ^0.57 ^3.23 0.04 0.04 0.04 0 2 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:1.1} ^-0.59 ^0.82 ^3.4 0.04 0.04 0.04 0 2 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:1.1} ^-0.64 ^1.11 ^3.5 0.04 0.04 0.04 0 2 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:1.1} ^-0.65 ^1.42 ^3.54 0.04 0.04 0.04 0 2 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.8} ^-0.65 ^1.42 ^3.54 0.03 0.03 0.03 0 2 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^0.29 ^1.98 ^1.52 0.03 0.03 0.03 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.8} ^0.35 ^1.38 ^1.38 0.03 0.03 0.03 0 1 normal
+function rlk:fx/nv/card {kind:"crescent",pos:"^-0.15 ^1.4 ^2.46",rot:"~205 ~",bb:"fixed",roll:-90,spin:50,s0:2.3,s1:2.7,move:"0f,0f,0f",life:6,fade:3}
+function rlk:fx/nv/card {kind:"burst",pos:"^-0.15 ^1.25 ^2.26",rot:"~ ~",bb:"center",roll:60,spin:20,s0:0.45,s1:1.7000000000000002,move:"0f,0f,0f",life:4,fade:2}
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:1.0} ^-0.15 ^1.25 ^2.26 0.2 0.2 0.2 0 6 normal
+particle minecraft:crit ^-0.15 ^1.25 ^2.26 0.25 0.25 0.25 0.3 6 normal
+function rlk:fx/nv/p/hit_ring {pos:"^-0.15 ^1.25 ^2.26"}
+execute if score @s nvP matches 1.. run function rlk:fx/nv/card {kind:"shard",pos:"^0.1 ^0 ^2.36",rot:"~-10 ~",bb:"fixed",roll:-28,spin:0,s0:0,s1:0.9,move:"0f,0f,0f",life:7,fade:3}
+execute if score @s nvP matches 1.. run function rlk:fx/nv/card {kind:"shard",pos:"^-0.45 ^0 ^2.56",rot:"~15 ~",bb:"fixed",roll:5,spin:0,s0:0,s1:0.7,move:"0f,0f,0f",life:7,fade:3}
+execute if score @s nvP matches 1.. run particle minecraft:dust{color:[0.965,0.835,0.478],scale:1.2} ^-0.15 ^0.2 ^2.46 0.35 0.35 0.35 0 6 normal

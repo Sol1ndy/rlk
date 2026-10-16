@@ -46,9 +46,9 @@ execute unless score #lunar tmp matches 1 if score #crit tmp matches 0 run funct
 # 달 피해: 달빛 그라데이션 숫자
 execute if score #lunar tmp matches 1 run function rlk:combat/text_lunar
 
-# 타격 임팩트
-particle minecraft:crit ~ ~1 ~ 0.25 0.35 0.25 0.12 12
-particle minecraft:sweep_attack ~ ~1 ~ 0 0 0 0 1
+# 타격 임팩트 (나비아 장미탄은 금빛 이펙트만: char/navia/fire 가 #noHitFx 1 을 세운 동안 회색 바닐라 입자를 끈다)
+execute unless score #noHitFx tmp matches 1 run particle minecraft:crit ~ ~1 ~ 0.25 0.35 0.25 0.12 12
+execute unless score #noHitFx tmp matches 1 run particle minecraft:sweep_attack ~ ~1 ~ 0 0 0 0 1
 execute if score #crit tmp matches 1 run particle minecraft:enchanted_hit ~ ~1 ~ 0.4 0.5 0.4 0.25 20
 # 기본공격 경직
 execute if score #stunHit tmp matches 1 unless score #cmBlk tmp matches 1 run function rlk:mob/stun

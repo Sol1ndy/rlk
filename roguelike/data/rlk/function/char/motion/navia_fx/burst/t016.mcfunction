@@ -1,3 +1,4 @@
+# (retimed from t016)
 function rlk:fx/nv/card {kind:"glow",pos:"^0 ^0.045 ^0",rot:"~ 90",bb:"fixed",roll:0,spin:0,s0:2.2,s1:2.6,move:"0f,0f,0f",life:18,fade:6}
 particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.5084761143003014} ^-0.577 ^1.115 ^-0.262 0 0 0 0 1 normal
 particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.6251328051905767} ^0.328 ^1.252 ^0.492 0 0 0 0 1 normal

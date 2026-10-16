@@ -1,3 +1,4 @@
+# (retimed from t013)
 function rlk:fx/nv/p/glint {pos:"^0.45 ^1.05 ^0.25"}
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.5206531286568629} ^-0.516 ^1.644 ^-0.305 0 0 0 0 1 normal
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.49747169020002324} ^-0.151 ^0.939 ^0.728 0 0 0 0 1 normal

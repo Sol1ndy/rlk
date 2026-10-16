@@ -20,7 +20,10 @@ execute if score #nvU tmp matches 2 positioned ~ ~1.62 ~ positioned ^ ^-0.2 ^0.6
 execute if score #nvU tmp matches 3.. positioned ~ ~1.62 ~ positioned ^ ^-0.2 ^0.6 run function rlk:char/navia/fan_11
 scoreboard players set #hitLanded tmp 0
 scoreboard players set #mobKilled tmp 0
+# 장미탄 피격에는 회색 바닐라 타격 입자(crit · sweep_attack)를 그리지 않는다(combat/apply)
+scoreboard players set #noHitFx tmp 1
 execute as @e[tag=rlk_mob,scores={nvHit=1..}] at @s run function rlk:char/navia/rose_hit
+scoreboard players set #noHitFx tmp 0
 scoreboard players operation @s critChance -= #nvCr tmp
 execute if score #hitLanded tmp matches 1 run function rlk:char/particles {n:2,el:5}
 function rlk:char/after_hit

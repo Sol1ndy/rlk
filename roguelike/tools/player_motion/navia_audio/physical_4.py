@@ -11,48 +11,41 @@ halberd re-forms on the back with a short metal settle and a faint chime.
 
 Every event is either in scratchpad/navia/dp_sound_events.txt (already used by the pack) or a well-known vanilla
 id: item.crossbow.shoot, item.armor.equip_elytra and block.note_block.flute are vanilla but new to the pack.
-"""
+
+Retimed (D11): the ticks below are the original layers pushed through the clip time-warp (playback 100,
+Genshin cadence and recovery). This literal list is the source now; edit it directly."""
 
 LAYERS = [
-    # parasol appears at the right hip, swung up before the right shoulder
     {"tick": 0, "event": "block.amethyst_block.chime", "volume": 0.3, "pitch": 1.6, "layer": "parasol appears"},
     {"tick": 1, "event": "item.armor.equip_leather", "volume": 0.3, "pitch": 1.3, "layer": "parasol drawn"},
     {"tick": 2, "event": "entity.player.attack.sweep", "volume": 0.15, "pitch": 1.7, "layer": "swing up"},
-    # "load": glint flare, a soft tone (v2 A7 / v3 A14 hum, once) and a cocking click
-    {"tick": 4, "event": "block.amethyst_block.chime", "volume": 0.25, "pitch": 1.9, "layer": "load shimmer"},
-    {"tick": 4, "event": "item.crossbow.loading_middle", "volume": 0.35, "pitch": 1.3, "layer": "load"},
-    {"tick": 5, "event": "block.note_block.chime", "volume": 0.12, "pitch": 0.5, "layer": "load tone"},
-    {"tick": 6, "event": "item.crossbow.loading_end", "volume": 0.3, "pitch": 1.5, "layer": "cocked"},
-    # over the left shoulder, then the whip down to aim
-    {"tick": 7, "event": "entity.player.attack.sweep", "volume": 0.18, "pitch": 1.3, "layer": "shoulder swing"},
-    {"tick": 9, "event": "entity.player.attack.sweep", "volume": 0.35, "pitch": 1.4, "layer": "whip to aim"},
-    # the shot (hit tick 10): muffled boom + crack, short tail
-    {"tick": 10, "event": "entity.firework_rocket.blast", "volume": 0.6, "pitch": 0.8, "layer": "shot body"},
-    {"tick": 10, "event": "item.crossbow.shoot", "volume": 0.45, "pitch": 0.65, "layer": "shot crack"},
-    {"tick": 11, "event": "entity.generic.explode", "volume": 0.18, "pitch": 1.7, "layer": "shot tail"},
-    # launch: wind burst, crystal eruption, the parasol swung overhead, the backflip whirl
-    {"tick": 12, "event": "entity.breeze.wind_burst", "volume": 0.45, "pitch": 0.85, "layer": "launch"},
-    {"tick": 12, "event": "block.amethyst_cluster.break", "volume": 0.45, "pitch": 0.8, "layer": "eruption"},
-    {"tick": 13, "event": "entity.player.attack.sweep", "volume": 0.3, "pitch": 0.7, "layer": "up-swing"},
-    {"tick": 14, "event": "item.trident.riptide_1", "volume": 0.2, "pitch": 1.4, "layer": "flip whirl"},
-    {"tick": 15, "event": "block.amethyst_block.break", "volume": 0.3, "pitch": 0.9, "layer": "eruption crash"},
-    # apex hang from the closed parasol (19-20), the canopy opens at 21; one soft two-tone note under the slow float
-    # (v3 A36 401 + 602 Hz). Retimed with the clip (review fix: hang, eased 10-tick descent, touchdown at 31)
-    {"tick": 21, "event": "item.armor.equip_elytra", "volume": 0.4, "pitch": 1.3, "layer": "canopy opens"},
-    {"tick": 23, "event": "block.note_block.flute", "volume": 0.1, "pitch": 0.54, "layer": "float tone low"},
-    {"tick": 23, "event": "block.note_block.flute", "volume": 0.08, "pitch": 0.81, "layer": "float tone high"},
-    # landing on the left foot, back kick and canopy twirl, close, gold dissolve
-    {"tick": 31, "event": "block.stone.step", "volume": 0.35, "pitch": 0.9, "layer": "landing"},
-    {"tick": 31, "event": "item.armor.equip_leather", "volume": 0.22, "pitch": 1.1, "layer": "landing cloth"},
-    {"tick": 32, "event": "entity.breeze.slide", "volume": 0.12, "pitch": 1.3, "layer": "canopy twirl"},
-    {"tick": 33, "event": "item.crossbow.loading_end", "volume": 0.28, "pitch": 1.6, "layer": "parasol closes"},
-    {"tick": 34, "event": "block.amethyst_block.resonate", "volume": 0.2, "pitch": 1.6, "layer": "parasol dissolves"},
-    # the halberd re-forms on the back
-    {"tick": 35, "event": "item.armor.equip_iron", "volume": 0.25, "pitch": 1.2, "layer": "halberd re-forms"},
-    {"tick": 37, "event": "block.amethyst_block.chime", "volume": 0.15, "pitch": 1.4, "layer": "re-form glint"},
+    {"tick": 5, "event": "block.amethyst_block.chime", "volume": 0.25, "pitch": 1.9, "layer": "load shimmer"},
+    {"tick": 5, "event": "item.crossbow.loading_middle", "volume": 0.35, "pitch": 1.3, "layer": "load"},
+    {"tick": 7, "event": "block.note_block.chime", "volume": 0.12, "pitch": 0.5, "layer": "load tone"},
+    {"tick": 8, "event": "item.crossbow.loading_end", "volume": 0.3, "pitch": 1.5, "layer": "cocked"},
+    {"tick": 9, "event": "entity.player.attack.sweep", "volume": 0.18, "pitch": 1.3, "layer": "shoulder swing"},
+    {"tick": 11, "event": "entity.player.attack.sweep", "volume": 0.35, "pitch": 1.4, "layer": "whip to aim"},
+    {"tick": 12, "event": "entity.firework_rocket.blast", "volume": 0.6, "pitch": 0.8, "layer": "shot body"},
+    {"tick": 12, "event": "item.crossbow.shoot", "volume": 0.45, "pitch": 0.65, "layer": "shot crack"},
+    {"tick": 13, "event": "entity.generic.explode", "volume": 0.18, "pitch": 1.7, "layer": "shot tail"},
+    {"tick": 14, "event": "entity.breeze.wind_burst", "volume": 0.45, "pitch": 0.85, "layer": "launch"},
+    {"tick": 14, "event": "block.amethyst_cluster.break", "volume": 0.45, "pitch": 0.8, "layer": "eruption"},
+    {"tick": 15, "event": "entity.player.attack.sweep", "volume": 0.3, "pitch": 0.7, "layer": "up-swing"},
+    {"tick": 16, "event": "item.trident.riptide_1", "volume": 0.2, "pitch": 1.4, "layer": "flip whirl"},
+    {"tick": 17, "event": "block.amethyst_block.break", "volume": 0.3, "pitch": 0.9, "layer": "eruption crash"},
+    {"tick": 22, "event": "item.armor.equip_elytra", "volume": 0.4, "pitch": 1.3, "layer": "canopy opens"},
+    {"tick": 24, "event": "block.note_block.flute", "volume": 0.1, "pitch": 0.54, "layer": "float tone low"},
+    {"tick": 24, "event": "block.note_block.flute", "volume": 0.08, "pitch": 0.81, "layer": "float tone high"},
+    {"tick": 28, "event": "block.stone.step", "volume": 0.35, "pitch": 0.9, "layer": "landing"},
+    {"tick": 28, "event": "item.armor.equip_leather", "volume": 0.22, "pitch": 1.1, "layer": "landing cloth"},
+    {"tick": 33, "event": "entity.breeze.slide", "volume": 0.12, "pitch": 1.3, "layer": "canopy twirl"},
+    {"tick": 37, "event": "item.crossbow.loading_end", "volume": 0.28, "pitch": 1.6, "layer": "parasol closes"},
+    {"tick": 42, "event": "block.amethyst_block.resonate", "volume": 0.2, "pitch": 1.6, "layer": "parasol dissolves"},
+    {"tick": 43, "event": "item.armor.equip_iron", "volume": 0.25, "pitch": 1.2, "layer": "halberd re-forms"},
+    {"tick": 48, "event": "block.amethyst_block.chime", "volume": 0.15, "pitch": 1.4, "layer": "re-form glint"},
 ]
 
 
 def timeline(clip: dict) -> list[dict]:
-    length = int(clip.get("length", 38))
-    return [layer for layer in LAYERS if layer["tick"] <= length]
+    length = int(clip.get("length", 62))
+    return [dict(layer) for layer in LAYERS if 0 <= layer["tick"] <= length]

@@ -8,19 +8,23 @@ Timeline from v2 A2 / v3 §7.5 (NA2), offsets from the contact tick (hit = 6, au
   thump under them at hit+2;
 - the overhead carry and the skip-hop (air + cloth), then the landing step.
 All names are already used in the pack (scratchpad/navia/dp_sound_events.txt).
-"""
+
+Retimed (D11): the ticks below are the original layers pushed through the clip time-warp (playback 100,
+Genshin cadence and recovery). This literal list is the source now; edit it directly."""
+
+LAYERS = [
+    {"tick": 2, "event": "block.chain.hit", "volume": 0.15, "pitch": 1.2, "layer": "re-cock drag"},
+    {"tick": 5, "event": "entity.player.attack.sweep", "volume": 0.46, "pitch": 0.8, "layer": "rising rush"},
+    {"tick": 6, "event": "item.trident.throw", "volume": 0.16, "pitch": 0.78, "layer": "swing weight"},
+    {"tick": 8, "event": "item.spear.attack", "volume": 0.15, "pitch": 0.78, "layer": "edge"},
+    {"tick": 8, "event": "block.amethyst_cluster.place", "volume": 0.38, "pitch": 0.9, "layer": "crystal spikes"},
+    {"tick": 9, "event": "block.heavy_core.hit", "volume": 0.18, "pitch": 0.7, "layer": "spike thump"},
+    {"tick": 9, "event": "entity.player.attack.sweep", "volume": 0.2, "pitch": 1.05, "layer": "overhead carry"},
+    {"tick": 10, "event": "item.armor.equip_leather", "volume": 0.16, "pitch": 1.2, "layer": "skip-hop cloth"},
+    {"tick": 14, "event": "block.stone.step", "volume": 0.3, "pitch": 0.9, "layer": "landing"},
+]
 
 
 def timeline(clip: dict) -> list[dict]:
-    hit = (clip.get("hit_ticks") or [6])[0]
-    return [
-        {"tick": 2, "event": "block.chain.hit", "volume": 0.15, "pitch": 1.2, "layer": "re-cock drag"},
-        {"tick": hit - 2, "event": "entity.player.attack.sweep", "volume": 0.46, "pitch": 0.8, "layer": "rising rush"},
-        {"tick": hit - 1, "event": "item.trident.throw", "volume": 0.16, "pitch": 0.78, "layer": "swing weight"},
-        {"tick": hit + 1, "event": "item.spear.attack", "volume": 0.15, "pitch": 0.78, "layer": "edge"},
-        {"tick": hit + 1, "event": "block.amethyst_cluster.place", "volume": 0.38, "pitch": 0.9, "layer": "crystal spikes"},
-        {"tick": hit + 2, "event": "block.heavy_core.hit", "volume": 0.18, "pitch": 0.7, "layer": "spike thump"},
-        {"tick": hit + 2, "event": "entity.player.attack.sweep", "volume": 0.2, "pitch": 1.05, "layer": "overhead carry"},
-        {"tick": hit + 3, "event": "item.armor.equip_leather", "volume": 0.16, "pitch": 1.2, "layer": "skip-hop cloth"},
-        {"tick": min(hit + 6, clip.get("length", 14)), "event": "block.stone.step", "volume": 0.3, "pitch": 0.9, "layer": "landing"},
-    ]
+    length = int(clip.get("length", 60))
+    return [dict(layer) for layer in LAYERS if 0 <= layer["tick"] <= length]

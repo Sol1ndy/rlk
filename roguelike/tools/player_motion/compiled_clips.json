@@ -515,13 +515,13 @@
     "weapon": "navia_parasol_open",
     "weapon_state": "drawn",
     "draw_fx": false,
-    "length": 54,
+    "length": 108,
     "activation_tick": 34,
     "hit_ticks": [
       34
     ],
     "chain_tick": 50,
-    "source": "v1 rel 0 = f19 (front; cast, shoulder rest, blast 34) + v6 (back view, put-away, halberd re-form on the back), compressed",
+    "source": "v1 rel 0 = f19 (front; cast, shoulder rest, blast 34) + v6 (back view, put-away, halberd re-form on the back), compressed | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source)",
     "char": "navia",
     "name": "burst",
     "normal": false
@@ -549,59 +549,59 @@
     "normal": false
   },
   {
-    "playback_rate": 150,
+    "playback_rate": 100,
     "weapon": "navia_halberd",
     "weapon_state": "drawn",
-    "length": 15,
+    "length": 55,
     "hit_ticks": [
       9
     ],
-    "chain_tick": 13,
-    "source": "v2 f42-f87 (N1) + v3 s2 f282-f324",
+    "chain_tick": 14,
+    "source": "v2 f42-f87 (N1) + v3 s2 f282-f324 | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source)",
     "char": "navia",
     "name": "physical_1",
     "normal": true
   },
   {
-    "playback_rate": 150,
+    "playback_rate": 100,
     "weapon": "navia_halberd",
     "weapon_state": "drawn",
-    "length": 14,
+    "length": 60,
     "hit_ticks": [
-      6
+      7
     ],
-    "chain_tick": 13,
-    "source": "v2 f87-f130 (N2) + v3 s2 f336-f366",
+    "chain_tick": 14,
+    "source": "v2 f87-f130 (N2) + v3 s2 f336-f366 | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source)",
     "char": "navia",
     "name": "physical_2",
     "normal": true
   },
   {
-    "playback_rate": 150,
+    "playback_rate": 100,
     "weapon": "navia_halberd",
     "weapon_state": "drawn",
-    "length": 24,
+    "length": 38,
     "hit_ticks": [
-      13,
-      15,
-      17
+      14,
+      16,
+      18
     ],
-    "chain_tick": 17,
-    "source": "v2 f131-f192 (= v3 s2 f367-f428): drag (click 2), whip up 4-6, plant 7, release 8 (weapon_attach world), chamber 9, kick 9.5-10, thrown halberd cartwheels 2.46 ahead (hits 13/15/17), gold dissolve 18-19, re-forms on the back 20-23; CCW pirouette 11-19",
+    "chain_tick": 19,
+    "source": "v2 f131-f192 (= v3 s2 f367-f428): drag (click 2), whip up 4-6, plant 7, release 8 (weapon_attach world), chamber 9, kick 9.5-10, thrown halberd cartwheels 2.46 ahead (hits 13/15/17), gold dissolve 18-19, re-forms on the back 20-23; CCW pirouette 11-19 | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source)",
     "char": "navia",
     "name": "physical_3",
     "normal": true
   },
   {
-    "playback_rate": 150,
+    "playback_rate": 100,
     "weapon": "navia_parasol",
     "weapon_state": "drawn",
-    "length": 38,
+    "length": 62,
     "hit_ticks": [
-      10
+      12
     ],
-    "chain_tick": 30,
-    "source": "v2 f192-f315 (side) + v3 s2 f424-f532 (back camera, full recovery): parasol shot, backflip, float under the open parasol, land, halberd re-forms on the back",
+    "chain_tick": 28,
+    "source": "v2 f192-f315 (side) + v3 s2 f424-f532 (back camera, full recovery): parasol shot, backflip, float under the open parasol, land, halberd re-forms on the back | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source)",
     "char": "navia",
     "name": "physical_4",
     "normal": true
@@ -611,13 +611,13 @@
     "weapon_state": "drawn",
     "draw_fx": false,
     "basis": "body",
-    "length": 34,
+    "length": 68,
     "activation_tick": 7,
     "hit_ticks": [
       7
     ],
     "chain_tick": 20,
-    "source": "v5 f52-f250 (skill tap: draw, twirl, chamber, canopy open, shot at 7, recoil kneel, fold, the parasol left standing on its tip and dissolved; halberd re-forms on the back), recovery compressed from 66 to 34 ticks",
+    "source": "v5 f52-f250 (skill tap: draw, twirl, chamber, canopy open, shot at 7, recoil kneel, fold, the parasol left standing on its tip and dissolved; halberd re-forms on the back), recovery compressed from 66 to 34 ticks | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source)",
     "char": "navia",
     "name": "skill",
     "normal": false
@@ -647,13 +647,13 @@
     "weapon": "navia_parasol",
     "weapon_state": "drawn",
     "draw_fx": false,
-    "length": 24,
+    "length": 70,
     "activation_tick": 3,
     "hit_ticks": [
       3
     ],
     "chain_tick": 12,
-    "source": "v4 f168-f358 (release: canopy pops at 1, blast at 3, shield squat, rise, closed parasol hanging like a cane, dissolve; halberd re-forms on the back), recovery compressed from 63 to 24 ticks",
+    "source": "v4 f168-f358 (release: canopy pops at 1, blast at 3, shield squat, rise, closed parasol hanging like a cane, dissolve; halberd re-forms on the back), recovery compressed from 63 to 24 ticks | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source)",
     "char": "navia",
     "name": "skill_fire",
     "normal": false

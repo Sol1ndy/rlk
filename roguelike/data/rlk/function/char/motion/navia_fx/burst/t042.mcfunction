@@ -1,3 +1,4 @@
+# (retimed from t042)
 # barrage shell (cosmetic): comet streak
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-1 ^4.2 ^4.5 0 0 0 0 1 normal
 particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.8} ^-1.133 ^3.85 ^4.592 0 0 0 0 1 normal

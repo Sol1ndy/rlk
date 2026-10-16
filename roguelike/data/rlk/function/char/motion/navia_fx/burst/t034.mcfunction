@@ -1,3 +1,4 @@
+# (retimed from t034)
 # blast / call-in flash (v1 E6, v6 E6): pale lemon flash, starburst, shock rings; the damage, explosion
 # field and blast sound are gameplay (char/navia/burst, rotated as the locked basis)
 particle minecraft:flash{color:[0.992,0.961,0.541,0.9]} ^ ^1.3 ^0.5 0 0 0 0 1 normal

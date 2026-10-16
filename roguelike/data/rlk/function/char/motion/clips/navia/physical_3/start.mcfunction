@@ -4,13 +4,10 @@ scoreboard players set @s pmBlend 0
 scoreboard players set @s pmWeapon -1
 scoreboard players set @s pmActive 1
 scoreboard players set @s pmTick 0
-scoreboard players set @s pmLen 24
+scoreboard players set @s pmLen 38
 scoreboard players set @s pmChar 6
 scoreboard players set @s pmSpeed 100
 execute if score @s atkSpeed matches 1.. run scoreboard players operation @s pmSpeed = @s atkSpeed
-scoreboard players set #pmRate tmp 150
-scoreboard players operation @s pmSpeed *= #pmRate tmp
-scoreboard players operation @s pmSpeed /= #100 tmp
 execute if score @s pmSpeed matches ..24 run scoreboard players set @s pmSpeed 25
 execute if score @s pmSpeed matches 501.. run scoreboard players set @s pmSpeed 500
 scoreboard players set @s pmAcc 0

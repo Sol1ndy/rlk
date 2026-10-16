@@ -8,52 +8,44 @@ short lull (the radial zoom), and the blast lands at 34. The blast itself (explo
 shells and their impacts are gameplay sounds (char/navia/burst, char/navia/shell_fx) and are not repeated here.
 After the blast: a low cannon-report thump, the air hiss and the cosmetic initial-barrage pops (the clip fx
 draw those shells), then the put-away (swing, fold, cane tap, dissolve) and a quiet re-form on the back.
-"""
+
+Retimed (D11): the ticks below are the original layers pushed through the clip time-warp (playback 100,
+Genshin cadence and recovery). This literal list is the source now; edit it directly."""
+
+LAYERS = [
+    {"tick": 1, "event": "block.amethyst_block.resonate", "volume": 0.12, "pitch": 1.6, "layer": "parasol materialise shimmer"},
+    {"tick": 6, "event": "entity.ender_dragon.flap", "volume": 0.3, "pitch": 1.8, "layer": "canopy snap"},
+    {"tick": 6, "event": "entity.player.attack.sweep", "volume": 0.32, "pitch": 1.25, "layer": "flourish swish"},
+    {"tick": 7, "event": "entity.firework_rocket.twinkle", "volume": 0.22, "pitch": 1.3, "layer": "geo glitter"},
+    {"tick": 7, "event": "block.amethyst_block.chime", "volume": 0.4, "pitch": 1.1, "layer": "swing-up chime"},
+    {"tick": 11, "event": "item.armor.equip_leather", "volume": 0.2, "pitch": 1.2, "layer": "parasol on the shoulder"},
+    {"tick": 11, "event": "block.amethyst_block.chime", "volume": 0.22, "pitch": 1.35, "layer": "settle chime"},
+    {"tick": 14, "event": "block.respawn_anchor.charge", "volume": 0.3, "pitch": 0.8, "layer": "low riser"},
+    {"tick": 22, "event": "item.crossbow.loading_end", "volume": 0.45, "pitch": 0.75, "layer": "cannon cock 1"},
+    {"tick": 23, "event": "block.iron_door.close", "volume": 0.3, "pitch": 1.3, "layer": "cannon cock 2"},
+    {"tick": 24, "event": "entity.breeze.charge", "volume": 0.25, "pitch": 0.6, "layer": "pre-blast rumble swell"},
+    {"tick": 25, "event": "entity.firework_rocket.large_blast_far", "volume": 0.3, "pitch": 0.6, "layer": "distant volley 1"},
+    {"tick": 29, "event": "entity.firework_rocket.large_blast_far", "volume": 0.25, "pitch": 0.55, "layer": "distant volley 2"},
+    {"tick": 30, "event": "entity.breeze.inhale", "volume": 0.28, "pitch": 0.8, "layer": "suck-in"},
+    {"tick": 36, "event": "item.mace.smash_ground_heavy", "volume": 0.3, "pitch": 0.7, "layer": "cannon report thump"},
+    {"tick": 38, "event": "block.fire.extinguish", "volume": 0.2, "pitch": 1.5, "layer": "shell air hiss"},
+    {"tick": 39, "event": "entity.firework_rocket.blast", "volume": 0.28, "pitch": 0.9, "layer": "barrage pop 1"},
+    {"tick": 39, "event": "entity.generic.explode", "volume": 0.14, "pitch": 1.35, "layer": "barrage pop 1 body"},
+    {"tick": 41, "event": "entity.firework_rocket.blast", "volume": 0.26, "pitch": 1.05, "layer": "barrage pop 2"},
+    {"tick": 43, "event": "entity.firework_rocket.blast", "volume": 0.24, "pitch": 0.85, "layer": "barrage pop 3"},
+    {"tick": 43, "event": "entity.generic.explode", "volume": 0.12, "pitch": 1.4, "layer": "barrage pop 3 body"},
+    {"tick": 45, "event": "entity.firework_rocket.blast", "volume": 0.22, "pitch": 1.0, "layer": "barrage pop 4"},
+    {"tick": 47, "event": "entity.firework_rocket.blast", "volume": 0.18, "pitch": 0.95, "layer": "barrage pop 5"},
+    {"tick": 86, "event": "entity.player.attack.sweep", "volume": 0.18, "pitch": 1.7, "layer": "parasol off the shoulder"},
+    {"tick": 92, "event": "item.armor.equip_leather", "volume": 0.28, "pitch": 1.3, "layer": "parasol folds"},
+    {"tick": 94, "event": "block.chain.hit", "volume": 0.2, "pitch": 1.7, "layer": "ferrule tap"},
+    {"tick": 96, "event": "entity.firework_rocket.twinkle", "volume": 0.15, "pitch": 1.5, "layer": "dissolve glitter"},
+    {"tick": 98, "event": "block.amethyst_block.chime", "volume": 0.2, "pitch": 1.8, "layer": "dissolve chime"},
+    {"tick": 101, "event": "block.amethyst_block.resonate", "volume": 0.14, "pitch": 1.25, "layer": "re-form shimmer"},
+    {"tick": 105, "event": "item.armor.equip_iron", "volume": 0.16, "pitch": 1.4, "layer": "halberd settles on the back"},
+]
 
 
 def timeline(clip: dict) -> list[dict]:
-    blast = int(clip.get("activation_tick", 34))
-    layers = [
-        # cast: the parasol materialises with a faint shimmer (v1 A0; no sound on the parasol frame in v6)
-        (1, "block.amethyst_block.resonate", 0.12, 1.6, "parasol materialise shimmer"),
-        # swing up / twirl (v1 A1 rel 4.6, v6 A1 rel 3.3-5.2): canopy snap + swish, then glitter
-        (6, "entity.ender_dragon.flap", 0.30, 1.8, "canopy snap"),
-        (6, "entity.player.attack.sweep", 0.32, 1.25, "flourish swish"),
-        (7, "entity.firework_rocket.twinkle", 0.22, 1.3, "geo glitter"),
-        (7, "block.amethyst_block.chime", 0.40, 1.1, "swing-up chime"),
-        # settles on the shoulder (v6 A1b rel 10.3)
-        (11, "item.armor.equip_leather", 0.20, 1.2, "parasol on the shoulder"),
-        (11, "block.amethyst_block.chime", 0.22, 1.35, "settle chime"),
-        # low riser (v1 A2 rel 13-16, v6 A1c)
-        (14, "block.respawn_anchor.charge", 0.30, 0.8, "low riser"),
-        # cannon cocked: clack-clack (v1 A3 rel 22.0 / 23.2, v6 A2 rel 23.0), rumble swell, distant volleys
-        (22, "item.crossbow.loading_end", 0.45, 0.75, "cannon cock 1"),
-        (23, "block.iron_door.close", 0.30, 1.3, "cannon cock 2"),
-        (24, "entity.breeze.charge", 0.25, 0.6, "pre-blast rumble swell"),
-        (25, "entity.firework_rocket.large_blast_far", 0.30, 0.6, "distant volley 1"),
-        (29, "entity.firework_rocket.large_blast_far", 0.25, 0.55, "distant volley 2"),
-        # lull / suck-in during the radial zoom (v6 A2c rel 31-34)
-        (30, "entity.breeze.inhale", 0.28, 0.8, "suck-in"),
-        # blast + 2..3: cannon report body after gameplay's blast crack (v1 A6, v6 A3b rel 36.6)
-        (blast + 2, "item.mace.smash_ground_heavy", 0.30, 0.7, "cannon report thump"),
-        # shells whistling in (v1 A7 rel 39.7)
-        (blast + 4, "block.fire.extinguish", 0.20, 1.5, "shell air hiss"),
-        # cosmetic initial barrage (v1 A8), on the clip fx impact ticks 39/41/43/45/47
-        (39, "entity.firework_rocket.blast", 0.28, 0.9, "barrage pop 1"),
-        (39, "entity.generic.explode", 0.14, 1.35, "barrage pop 1 body"),
-        (41, "entity.firework_rocket.blast", 0.26, 1.05, "barrage pop 2"),
-        (43, "entity.firework_rocket.blast", 0.24, 0.85, "barrage pop 3"),
-        (43, "entity.generic.explode", 0.12, 1.4, "barrage pop 3 body"),
-        (45, "entity.firework_rocket.blast", 0.22, 1.0, "barrage pop 4"),
-        (47, "entity.firework_rocket.blast", 0.18, 0.95, "barrage pop 5"),
-        # put-away (v6 A7, v1 A11): swing off the shoulder, fold, cane tap, dissolve
-        (40, "entity.player.attack.sweep", 0.18, 1.7, "parasol off the shoulder"),
-        (43, "item.armor.equip_leather", 0.28, 1.3, "parasol folds"),
-        (44, "block.chain.hit", 0.20, 1.7, "ferrule tap"),
-        (45, "entity.firework_rocket.twinkle", 0.15, 1.5, "dissolve glitter"),
-        (46, "block.amethyst_block.chime", 0.20, 1.8, "dissolve chime"),
-        # halberd re-forms on the back (v6 E13 is silent; a soft shimmer and a settle clink)
-        (48, "block.amethyst_block.resonate", 0.14, 1.25, "re-form shimmer"),
-        (51, "item.armor.equip_iron", 0.16, 1.4, "halberd settles on the back"),
-    ]
-    return [{"tick": t, "event": e, "volume": v, "pitch": p, "layer": name} for t, e, v, p, name in layers]
+    length = int(clip.get("length", 108))
+    return [dict(layer) for layer in LAYERS if 0 <= layer["tick"] <= length]
