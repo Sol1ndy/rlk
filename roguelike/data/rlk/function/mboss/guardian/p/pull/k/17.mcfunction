@@ -1,0 +1,12 @@
+# pull tick 17 (@s = body, at the body).
+execute rotated as @s rotated ~ 0 run particle minecraft:dust_color_transition{from_color:[0.75f,0.1f,0.18f],to_color:[0.39f,0.12f,0.1f],scale:1.6} ^0 ^1.9 ^-0.8 0.7 0.9 0.35 0 7 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.62f,0.27f,0.35f],scale:1.3} ^-0.382 ^0.798 ^0.899 0.08 0.08 0.08 0 2 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.62f,0.27f,0.35f],scale:1.3} ^1.253 ^1.319 ^-0.154 0.08 0.08 0.08 0 2 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.62f,0.27f,0.35f],scale:1.3} ^-0.869 ^2.191 ^-1.154 0.08 0.08 0.08 0 2 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.9f,0.2f,0.3f],scale:1} ^-0.3 ^2.95 ^0.9 0.1 0.1 0.1 0 2 force @a[tag=player]
+execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p4rc4] run data merge entity @s {start_interpolation:0,interpolation_duration:16,transformation:{translation:[0.4571f,2.8546f,1.7816f],left_rotation:[0.2573f,0.8874f,0.3524f,0.1484f],scale:[0.329f,0.329f,0.329f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p4k6] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.3293f,1.1338f,-0.6459f],left_rotation:[0.0643f,-0.1677f,0.0394f,0.9829f],scale:[0.5f,0.5f,0.5f],right_rotation:[0f,0f,0f,1f]}}
+execute if entity @e[tag=rlk_av,limit=1] at @e[tag=rlk_body,limit=1] run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p4","rlk_mb_gd_p4cage","rlk_mb_gd_p4k7"],brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:0,block_state:{id:"minecraft:black_concrete"},transformation:{translation:[0.0615f,1.5349f,0.3099f],left_rotation:[-0.002f,-0.1188f,-0.0011f,0.9929f],scale:[0.05f,0.05f,0.05f],right_rotation:[0f,0f,0f,1f]},Glowing:1b,glow_color_override:12070714}
+execute at @e[tag=rlk_body,limit=1] run particle minecraft:block{block_state:"minecraft:black_concrete"} ~0.08 ~1.56 ~0.34 0.15 0.15 0.15 0 3 force @a[tag=player]
+execute at @e[tag=rlk_body,limit=1] run particle minecraft:dust{color:[0.72f,0.18f,0.23f],scale:1.2} ~ ~1.1 ~ 0.45 0.8 0.45 0 4 force @a[tag=player]
+execute at @e[tag=rlk_body,limit=1] run particle minecraft:dust{color:[0.38f,0f,0.02f],scale:1.5} ~ ~1.1 ~ 0.55 0.9 0.55 0 2 force @a[tag=player]

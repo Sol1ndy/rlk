@@ -1,0 +1,3 @@
+# pull tick 78 (@s = body, at the body).
+execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_p4cb00] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0f,1.5f,0f],left_rotation:[0.0939f,-0.1985f,-0.0191f,0.9754f],scale:[11.0309f,11.0309f,11.0309f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_p4cb01] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0f,1.5f,0f],left_rotation:[0.0939f,-0.1985f,-0.0191f,0.9754f],scale:[8.6041f,8.6041f,8.6041f],right_rotation:[0f,0f,0f,1f]}}

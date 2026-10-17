@@ -1,0 +1,13 @@
+# slam tick 21 (@s = body, at the body).
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^1.92 ^0.08 ^-3.29 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^0.72 ^0.08 ^-0.02 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-2.87 ^0.08 ^0.48 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^1.49 ^0.08 ^1.21 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^3.59 ^0.08 ^0.08 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-2.16 ^0.08 ^-3.16 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-1.36 ^0.08 ^2.99 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-2.31 ^0.08 ^-2.83 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^1.52 ^0.08 ^-0.53 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-1.63 ^0.08 ^2.19 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^1.62 ^0.08 ^0.32 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^0.29 ^0.08 ^2.65 0 0 0 0 1 force @a[tag=player]
