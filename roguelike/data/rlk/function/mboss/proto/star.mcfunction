@@ -1,8 +1,9 @@
-# Test (pattern id 90): a breakable star 4 b in front of the boss. 40 HP pool, RES 80 % (x0.238), immune to
-# Pyro (aux_hit); breaking it deals 10 % of the boss's max HP as true damage.
+# Test (pattern id 90): a breakable star 4 b in front of the boss. Pool 3 % of the boss's max HP (#auxHpPct,
+# scales with the level; hits on it are modified like hits on the body), RES 80 % (x0.238), immune to Pyro
+# (aux_hit); breaking it deals 10 % of the boss's max HP as true damage.
 kill @e[tag=rlk_mb_proto_star]
 kill @e[tag=rlk_mb_proto_starv]
-scoreboard players set #auxHp mb 40
+scoreboard players set #auxHpPct mb 3
 scoreboard players set #auxRes mb 80
 execute at @s rotated as @s rotated ~ 0 positioned ^ ^ ^4 positioned ~ 201 ~ run function rlk:mboss/aux/spawn
 tag @e[tag=rlk_mb_auxlast,limit=1] add rlk_mb_proto_star

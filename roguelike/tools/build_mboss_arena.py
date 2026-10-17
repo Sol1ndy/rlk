@@ -10,10 +10,13 @@ cy-1 (pattern) and cy-2 (base); a disc of radius r (block-centre test), walkable
 light layer at cy+5 over the walkable disc (floor block light about 10, so nothing spawns at night).
 
 Theme "plaza" follows understand/m2.md §2 (the Corrupted Guardian's plaza): pale marble (calcite with
-cooler white_concrete patches), engraved concentric rings and rim medallions (polished diorite),
-a central rose four-point star (pink concrete with a dark crimson pink-terracotta rim and a light
-pink-wool heart), rose curved pinwheel bands from the star tips, small gold inlays, and twelve gold
-lamp spires on the white wall (gold column, ochre froglight core, end-rod star).
+warmer smooth-quartz patches), three faint engraved rings (white concrete, one block wide) with gold
+studs on the outer one, a central rose four-point star with long thin points (pink concrete, a thin
+crimson pink-terracotta outline, a small light pink-wool heart), eight slender rose blades that swirl
+around it (pink-terracotta outline around a pale pink concrete-powder core; each one detached from the
+star, tapered at both ends and bending at most about 35 degrees, so the floor reads as a whirl and never
+as a cross with hooked arms), and twelve gold lamp spires on the white wall (gold column, ochre
+froglight core, end-rod star).
 
 Runtime files:
   arena/ensure   rebuild when storage rlk:mboss built != "<theme>@<ver>" or the sentinel block is wrong
@@ -36,10 +39,15 @@ YC0, YC1 = CY + 7, CY + 14           # barrier cap 208..215
 YLIGHT = CY + 5
 YTOP = CY + 35
 
-STAR_R = 9.5          # four-point star tip radius (points on the axes)
-STAR_P = 0.62         # superellipse exponent (< 1 = concave sides, sharp points)
-TAIL_LEN, TAIL_TURN, TAIL_W = 15.0, 100.0, (2.6, 0.8)   # shuriken tails from the star tips
-RINGS = (12.6, 16.8, 19.3)                                     # engraved grooves (polished diorite)
+STAR_R = 13.0         # four-point star tip radius (points on the axes)
+STAR_P = 0.62         # superellipse exponent (< 1 = concave sides, long thin points)
+STAR_COVER = 0.4      # a cell belongs to the star when this share of it is inside (keeps the thin points)
+HEART = 3.0           # light heart: |u| + |v| <= HEART
+# Swirl blades: BLADES ribbons, the k-th one starting at radius B_R0 on the bearing B_A0 + k * 360 / BLADES,
+# heading B_LEAN degrees off the outward direction, turning B_TURN degrees over B_LEN blocks (gentle, the
+# same way round for all), width B_W in the middle tapering to B_WMIN at both ends.
+BLADES, B_A0, B_R0, B_LEAN, B_TURN, B_LEN, B_W, B_WMIN = 8, 0.0, 12.0, 40.0, 35.0, 12.0, 3.6, 1.0
+RINGS = (12.6, 16.8, 19.3)                                     # engraved grooves (white concrete)
 LAMPS = 12
 
 
@@ -74,55 +82,81 @@ def star_value(u, v):
     return (abs(u) ** STAR_P + abs(v) ** STAR_P) / (STAR_R ** STAR_P)
 
 
-def _tails():
-    """Cells covered by the four shuriken tails: each leaves a star tip heading outward and curves
-    clockwise (seen from above, north up) along a circular arc, tapering. {(x, z): distance ratio}."""
-    cells = {}
-    rho = TAIL_LEN / math.radians(TAIL_TURN)
-    for k in range(4):
-        a0 = math.radians(k * 90)
-        hx, hz = math.cos(a0), math.sin(a0)          # heading (outward)
-        px, pz = (STAR_R - 1.2) * hx, (STAR_R - 1.2) * hz
-        rx, rz = -hz, hx                              # right-hand normal (clockwise turn)
-        cx, cz = px + rho * rx, pz + rho * rz
-        steps = 240
-        for i in range(steps + 1):
-            t = i / steps
-            ang = math.radians(TAIL_TURN) * t
-            # rotate (p - c) by +ang (clockwise in the u/v plane with v = south)
-            dx, dz = px - cx, pz - cz
-            qx = cx + dx * math.cos(ang) - dz * math.sin(ang)
-            qz = cz + dx * math.sin(ang) + dz * math.cos(ang)
-            half = (TAIL_W[0] + (TAIL_W[1] - TAIL_W[0]) * t) / 2
-            for gx in range(math.floor(qx - half - 1), math.ceil(qx + half + 1) + 1):
-                for gz in range(math.floor(qz - half - 1), math.ceil(qz + half + 1) + 1):
-                    d = math.hypot(gx + 0.5 - qx, gz + 0.5 - qz)
-                    if d <= half:
-                        key = (CX + gx, CZ + gz)
-                        cells[key] = min(cells.get(key, 9), d / max(half, 0.01))
+def _outline(cells):
+    n4 = ((1, 0), (-1, 0), (0, 1), (0, -1))
+    return {c for c in cells if any((c[0] + dx, c[1] + dz) not in cells for dx, dz in n4)}
+
+
+def _star():
+    """Cells of the star by coverage (4 x 4 samples per cell), so the long thin points survive."""
+    cells = set()
+    for z in range(Z0, Z1 + 1):
+        for x in range(X0, X1 + 1):
+            k = sum(star_value(x + (i + 0.5) / 4 - CX, z + (j + 0.5) / 4 - CZ) <= 1.0
+                    for i in range(4) for j in range(4))
+            if k >= STAR_COVER * 16:
+                cells.add((x, z))
     return cells
 
 
-TAILS = _tails()
+def _blades():
+    """Cells of the swirl blades: each follows a circular arc (constant turn rate) from its start point,
+    tapering sin-shaped from B_WMIN to B_W and back. {(x, z)}."""
+    cells = set()
+    steps = 400
+    ds = B_LEN / steps
+    k_turn = math.radians(B_TURN) / B_LEN
+    for k in range(BLADES):
+        a = math.radians(B_A0 + 360.0 / BLADES * k)
+        x, z = B_R0 * math.cos(a), B_R0 * math.sin(a)
+        h = a + math.radians(B_LEAN)
+        for i in range(steps + 1):
+            t = i / steps
+            half = (B_WMIN + (B_W - B_WMIN) * math.sin(math.pi * t) ** 0.8) / 2
+            for gx in range(math.floor(x - half - 1), math.ceil(x + half + 1) + 1):
+                for gz in range(math.floor(z - half - 1), math.ceil(z + half + 1) + 1):
+                    if math.hypot(gx + 0.5 - x, gz + 0.5 - z) <= half:
+                        cells.add((CX + gx, CZ + gz))
+            x += math.cos(h) * ds
+            z += math.sin(h) * ds
+            h += k_turn * ds
+    return cells
+
+
+def _drop_specks(cells, keep=6):
+    """Removes 4-connected pieces smaller than `keep` cells (thin blade ends cut off by the taper or the rim)."""
+    left, out = set(cells), set()
+    while left:
+        stack, comp = [left.pop()], []
+        while stack:
+            c = stack.pop()
+            comp.append(c)
+            for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                n = (c[0] + dx, c[1] + dz)
+                if n in left:
+                    left.remove(n)
+                    stack.append(n)
+        if len(comp) >= keep:
+            out.update(comp)
+    return out
 
 
 def _rose():
-    """Star + tails as one rose shape. depth 1 = boundary cell; boundary cells that have interior
-    behind them get the dark crimson rim, thin parts stay rose. Returns {(x, z): block}."""
-    cells = set(TAILS)
-    for z in range(Z0, Z1 + 1):
-        for x in range(X0, X1 + 1):
-            u, v, _, _ = cell_polar(x, z)
-            if star_value(u, v) <= 1.0:
-                cells.add((x, z))
-    n4 = ((1, 0), (-1, 0), (0, 1), (0, -1))
-    depth = {c: (1 if any((c[0] + dx, c[1] + dz) not in cells for dx, dz in n4) else 0) for c in cells}
+    """Star and blades. The star: light heart, thin crimson outline, rose fill. The blades (never
+    touching the star): crimson outline around a pale pink core. Returns {(x, z): block}."""
+    star = _star()
+    star_ol = _outline(star)
+    blades = {c for c in _blades() - star if cell_polar(*c)[2] <= WALK - 0.6}
+    blades = _drop_specks(blades)
+    blade_ol = _outline(blades)
     out = {}
-    for (x, z), d in depth.items():
+    for (x, z) in blades:
+        out[(x, z)] = 'minecraft:pink_terracotta' if (x, z) in blade_ol else 'minecraft:pink_concrete_powder'
+    for (x, z) in star:
         u, v, _, _ = cell_polar(x, z)
-        if star_value(u, v) <= 0.42:
+        if abs(u) + abs(v) <= HEART:
             out[(x, z)] = 'minecraft:pink_wool'
-        elif (x, z) not in TAILS and d == 1 and any(depth.get((x + dx, z + dz)) == 0 for dx, dz in n4):
+        elif (x, z) in star_ol:
             out[(x, z)] = 'minecraft:pink_terracotta'
         else:
             out[(x, z)] = 'minecraft:pink_concrete'
@@ -143,11 +177,9 @@ def floor_block(x, z):
             # gold studs on the outer groove, one in front of every lamp spire
             if rr == RINGS[-1] and abs(_angdiff(phi, 15 + round((phi - 15) / 30) * 30)) * math.pi / 180 * r < 0.5:
                 return 'minecraft:gold_block'
-            return 'minecraft:polished_diorite'
+            return 'minecraft:white_concrete'
     n = _noise(x, z, 4.0, 1)
-    if n > 0.88:
-        return 'minecraft:white_concrete'
-    if n < 0.08:
+    if n > 0.88 or n < 0.08:
         return 'minecraft:smooth_quartz'
     return 'minecraft:calcite'
 

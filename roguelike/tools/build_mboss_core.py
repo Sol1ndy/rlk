@@ -33,6 +33,8 @@ TOK = {
     '@SAFE@': str(SAFE), '@SAFE1@': str(SAFE + 1), '@WALK@': str(WALK), '@WALK2@': str(WALK + 2),
     '@OOB@': L.num(WALK + 1.5), '@BOX@': f'{BX0} 190 {BZ0}', '@BOXD@': 'dx=47,dy=50,dz=47',
     '@SAFEP@': L.num(SAFE - 0.5), '@WALKP@': L.num(WALK - 0.7),
+    # forceloaded chunk box of the arena (load, room/setup, mboss/start; released by uninstall, room/remove)
+    '@FL@': f'{BX0} {BZ0} {BX0 + 47} {BZ0 + 47}',
 }
 out = L.Out(owned_dirs=['mboss/d', 'mboss/hz', 'mboss/pj', 'mboss/pull', 'mboss/mv', 'mboss/aux',
                         'mboss/line', 'mboss/test'],
@@ -145,6 +147,11 @@ w('init', '\n'.join(
        'execute unless score #mbId mb matches 0.. run scoreboard players set #mbId mb 0',
        'execute unless score #mbGoldMul mb matches 1.. run scoreboard players set #mbGoldMul mb 5',
        'execute unless score #mbSap mb matches 0.. run scoreboard players set #mbSap mb 1',
+       'execute unless score #mbLive mb matches 0.. run scoreboard players set #mbLive mb 0',
+       'execute unless score #mbLd mb matches 0.. run scoreboard players set #mbLd mb 0',
+       '# Library activity flags (a set flag makes the world tick scan for that library\'s entities once).',
+       'scoreboard players set #mbHzOn mb 1', 'scoreboard players set #mbPjOn mb 1',
+       'scoreboard players set #mbPlOn mb 1', 'scoreboard players set #mbMvOn mb 1',
        'function rlk:mboss/opts_reset',
        'function rlk:mboss/bars_hide',
        'scoreboard players set #mbLn mb 0',
@@ -156,6 +163,7 @@ w('init', '\n'.join(
 
 w('reload', '''
 # @s = surviving body after /reload (objectives and the registry are fresh, aux entities are gone).
+scoreboard players set #mbLive mb 1
 execute if entity @s[tag=rlk_mb_dying] run return run function rlk:mboss/death_finish
 execute in minecraft:overworld run summon minecraft:marker @CX@ @CY@ @CZ@ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_arena"],Rotation:[180.0f,0.0f]}
 scoreboard players set #mbPause mb 0
@@ -172,18 +180,18 @@ kill @e[tag=rlk_mb_aux]
 bossbar remove rlk:mboss
 bossbar remove rlk:mboss_state
 bossbar remove rlk:mboss_sub
-execute in minecraft:overworld run forceload remove @BOX_FL@
+execute in minecraft:overworld run forceload remove @FL@
 data remove storage rlk:mboss reg
 data remove storage rlk:mboss byid
 data remove storage rlk:mboss met
-''' .replace('@BOX_FL@', f'{BX0} {BZ0} {BX0 + 47} {BZ0 + 47}') + '\n'.join(f'scoreboard objectives remove {o}' for o in OBJECTIVES))
+''' + '\n'.join(f'scoreboard objectives remove {o}' for o in OBJECTIVES))
 
 w('opts_reset', '''
 # One-shot options of the next hz/pj/pull call, back to their defaults (see README 중간보스).
 scoreboard players set #hzAct mb 1
 scoreboard players set #hzEl mb -1
 scoreboard players set #hzKB mb 3
-scoreboard players set #hzKBDir mb 0
+scoreboard players set #hzKBDir mb -1
 scoreboard players set #hzY0 mb -5
 scoreboard players set #hzY1 mb 35
 scoreboard players set #hzR0 mb 0
@@ -199,6 +207,7 @@ scoreboard players set #pjRet mb 0
 scoreboard players set #pjWall mb 1
 scoreboard players set #pullFace mb 1
 scoreboard players set #auxHp mb 100
+scoreboard players set #auxHpPct mb 0
 scoreboard players set #auxRes mb 0
 ''')
 
@@ -305,10 +314,13 @@ w('start', '''
 # @s = the 중간보스 zone marker, at @s (from room/mob_wave, #combat = its zid). Builds the fight in the
 # arena and teleports the player. A failed spawn retries 10 ticks later (#spawnT), 3 failures cancel
 # the fight without reward. The body holds rlk_zmob from tick 0, so the zone cannot clear early.
-execute in minecraft:overworld unless loaded @CX@ @CY@ @CZ@ run return run scoreboard players set #spawnT room 10
+execute in minecraft:overworld unless loaded @CX@ @CY@ @CZ@ run return run function rlk:mboss/start_unloaded
 execute unless entity @a[tag=player,scores={dead=0},limit=1] run return run scoreboard players set #spawnT room 10
 execute unless data storage rlk:mboss cur run function rlk:mboss/roll
 execute unless data storage rlk:mboss cur run return run function rlk:mboss/start_fail
+scoreboard players set #mbLd mb 0
+# From here on fight entities may exist: rlk:tick runs mboss/main (cleared when the body is gone).
+scoreboard players set #mbLive mb 1
 function rlk:mboss/cleanup_aux
 function rlk:mboss/fight_vars
 execute in minecraft:overworld run function rlk:mboss/arena/ensure
@@ -325,12 +337,26 @@ scoreboard players set #mbT mb 0
 execute as @a[tag=player,limit=1] run function rlk:mboss/tp_in
 function rlk:mboss/bars_show
 ''')
-w('start_fail', T.join(['''
-# Spawn failed (no registry entry, unloaded arena, peaceful): retry twice, then cancel without reward.
+w('start_unloaded', '''
+# @s = zone marker. The arena chunks are not loaded (their forceload was released, e.g. room/remove then
+# room/setup without a /reload): forceload them again and retry every 10 ticks; the 7th miss in a row (3 s) cancels
+# the fight without reward like a failed spawn (the gate comes back).
+execute in minecraft:overworld run forceload add @FL@
+scoreboard players add #mbLd mb 1
+execute if score #mbLd mb matches ..6 run return run scoreboard players set #spawnT room 10
+function rlk:mboss/start_cancel
+''')
+w('start_fail', '''
+# Spawn failed (no registry entry, no body after the spawn hook): retry twice, then cancel without reward.
 function rlk:mboss/cleanup_aux
 scoreboard players add #mbFail mb 1
 execute if score #mbFail mb matches ..2 run return run scoreboard players set #spawnT room 10
+function rlk:mboss/start_cancel
+''')
+w('start_cancel', T.join(['''
+# @s = zone marker: give up this attempt (no reward); room/combat_clear -> mboss/won brings the gate back.
 scoreboard players set #mbFail mb 0
+scoreboard players set #mbLd mb 0
 scoreboard players set #mbKilled mb 0
 tellraw @a[tag=player] ''', gray('중간보스를 불러오지 못해 전투를 취소했습니다. (보상 없음)') + ''']
 function rlk:room/combat_clear
@@ -495,7 +521,9 @@ scoreboard players set #mbSt mb 0
 scoreboard players set #mbT mb 0
 scoreboard players set #mbPause mb 0
 scoreboard players set #mbFail mb 0
+scoreboard players set #mbLd mb 0
 scoreboard players set #mbNoLeash mb 0
+scoreboard players set #mbLive mb 0
 data modify storage rlk:mboss sub set value []
 data modify storage rlk:mboss extra set value []
 ''')
@@ -516,9 +544,20 @@ execute in minecraft:overworld positioned @BOX@ run kill @e[tag=rlk_gold,@BOXD@]
 
 # =============================================================================================
 # World tick, pause, out of bounds, state shells, death
+w('main', '''
+# From rlk:tick, only while #mbLive mb is 1 (set by mboss/start and mboss/reload, cleared by cleanup_fight and
+# here), so outside a fight the server never scans for mid-boss entities. No body any more (killed, /kill,
+# lost): the fight's leftovers and the bars go, and the scans stop until the next mboss/start.
+execute if entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run return run function rlk:mboss/world
+function rlk:mboss/cleanup_aux
+function rlk:mboss/bars_hide
+scoreboard players set #mbLive mb 0
+''')
 w('world', '''
-# From rlk:tick while a body exists. Pause (dead / revival / selection screen / no body entity) freezes
+# From mboss/main while a body exists. Pause (dead / revival / selection screen / no body entity) freezes
 # AI, timers, hazards and projectiles; out-of-bounds puts the player back at the arrival spot.
+# The libraries are scanned only while their activity flag is set (#mbMvOn #mbHzOn #mbPjOn #mbPlOn: set when
+# one is created, kept by every live one in its tick, so the scan stops one tick after the last one ends).
 execute unless entity @a[tag=player,limit=1] run return 0
 scoreboard players set #mbP mb 0
 execute if entity @a[tag=player,scores={dead=1}] run scoreboard players set #mbP mb 1
@@ -528,13 +567,29 @@ execute unless entity @e[tag=rlk_body,limit=1] run scoreboard players set #mbP m
 execute if score #mbP mb matches 1 run return run function rlk:mboss/pause_tick
 execute if score #mbPause mb matches 1 run function rlk:mboss/resume
 execute if score #mbOn mb matches 1 unless entity @a[tag=player,scores={devMode=1}] as @e[tag=rlk_body,limit=1] at @s run function rlk:mboss/oob
-execute if entity @e[tag=rlk_mb_mv,limit=1] as @e[tag=rlk_mb_mv] run function rlk:mboss/mv/tick
-execute as @e[tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/body_tick
-execute if entity @e[tag=rlk_mb_hz,limit=1] as @e[tag=rlk_mb_hz] at @s rotated as @s run function rlk:mboss/hz/tick
-execute if entity @e[tag=rlk_mb_pj,limit=1] as @e[tag=rlk_mb_pj] at @s rotated as @s run function rlk:mboss/pj/tick
-execute if entity @e[tag=rlk_mb_pullpt,limit=1] as @e[tag=rlk_mb_pullpt] at @s run function rlk:mboss/pull/tick
-execute if score #mbSt mb matches 0..1 as @e[tag=rlk_mb_body,limit=1] run function rlk:mboss/bars
+execute if score #mbMvOn mb matches 1 run function rlk:mboss/mv/all
+execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/body_tick
+execute if score #mbHzOn mb matches 1 run function rlk:mboss/hz/all
+execute if score #mbPjOn mb matches 1 run function rlk:mboss/pj/all
+execute if score #mbPlOn mb matches 1 run function rlk:mboss/pull/all
+execute if score #mbSt mb matches 0..1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run function rlk:mboss/bars
 function rlk:mboss/line/tick
+''')
+w('mv/all', '''
+scoreboard players set #mbMvOn mb 0
+execute as @e[tag=rlk_mb_mv] run function rlk:mboss/mv/tick
+''')
+w('hz/all', '''
+scoreboard players set #mbHzOn mb 0
+execute as @e[type=minecraft:marker,tag=rlk_mb_hz] at @s rotated as @s run function rlk:mboss/hz/tick
+''')
+w('pj/all', '''
+scoreboard players set #mbPjOn mb 0
+execute as @e[tag=rlk_mb_pj] at @s rotated as @s run function rlk:mboss/pj/tick
+''')
+w('pull/all', '''
+scoreboard players set #mbPlOn mb 0
+execute as @e[type=minecraft:marker,tag=rlk_mb_pullpt] at @s run function rlk:mboss/pull/tick
 ''')
 w('pause_tick', '''
 execute if score #mbPause mb matches 0 as @e[tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/d/pause
@@ -646,6 +701,9 @@ w('true_hit', '''
 # True damage to @s (any rlk_mob, normally the body) at @s: #mbTrue mb = damage, #mbTrueEl mb = colour
 # of the number (#elem). Goes through combat/apply (kill, rewards, death_start) but skips elements,
 # modifiers, RES and the module hooks (#trueDmg). Never call it from inside combat/apply.
+# A lethal hit on the body runs mboss/death_start (and the module's death_start) BEFORE this returns: when
+# called from the module's own tick, stop that tick right after it if #mbSt mb is 2 (hz/pj/pull refuse
+# anyway while the boss is dying).
 scoreboard players add #hitLanded tmp 0
 scoreboard players operation #mbSaveHL mb = #hitLanded tmp
 function rlk:combat/clear_atkflags
@@ -675,14 +733,20 @@ function rlk:mboss/true_hit
 # =============================================================================================
 # Aux objects (rlk_mb_hit): hit routing from combat/apply
 w('aux_hit', '''
-# From combat/apply right after element/on_hit (@s = aux with rlk_mb_hit; #dmg #elem #elU #rx #tfm #crit
-# known). RES (mres) applies first, then the module hook may change #dmg or take over completely
-# (#mbAuxDone mb 1); by default #dmg comes off the aux's mhpC with a number. Nothing here re-enters
-# combat/apply; a broken aux gets rlk_mb_broken and the module acts on it in its tick.
-execute if entity @s[tag=rlk_mb_broken] run return 0
+# From combat/apply after element/on_hit and combat/apply_mods (@s = aux with rlk_mb_hit; #dmg #elem #elU #rx
+# #tfm #crit known). #dmg is already modified exactly like a hit on the body (engravings, items, level factor,
+# Ronova, the aux's own mres), so a pool sized as a share of the boss's max HP (#auxHpPct) breaks in that share
+# of the boss's kill time. The module hook may change #dmg or take over completely (#mbAuxDone mb 1); by
+# default #dmg comes off the aux's mhpC with a number. Nothing here re-enters combat/apply; a broken aux gets
+# rlk_mb_broken and the module acts on it in its tick.
 scoreboard players set #hitLanded tmp 1
+execute unless entity @s[tag=rlk_mb_broken] run function rlk:mboss/aux_hit2
+# Like the end of combat/apply: a frost crit made for this target only does not spread to the next one.
+execute if score #frostC eng matches 1 run scoreboard players set #crit tmp 0
+execute if score #frostC eng matches 1 run scoreboard players set #frostC eng 0
+''')
+w('aux_hit2', '''
 scoreboard players set #mbAuxDone mb 0
-execute unless score @s mres matches 0 if score #dmg tmp matches 1.. run function rlk:combat/res
 function rlk:mboss/d/aux_hit
 execute if score #mbAuxDone mb matches 1 run return 0
 function rlk:mboss/aux/take
@@ -716,13 +780,16 @@ scoreboard players add #mbAuxBroke mb 1
 ''')
 w('aux/spawn', '''
 # Helper object the player can hit (stars, cores ...), at the execution position. Options set before the
-# call (#auxHp mb = HP pool, #auxRes mb = RES %). Invisible NoAI husk with the boss tag (no stun, freeze,
-# knockback), rlk_mob + overhead HP bar, a click shield, the boss level; never rlk_zmob. The new one
-# carries rlk_mb_auxlast until the next aux/spawn: add the module's own tags/visuals to it.
+# call: #auxHpPct mb = HP pool in % of the body's max HP (scales with the boss level; preferred), else
+# #auxHp mb = fixed HP pool; #auxRes mb = RES %. Invisible NoAI husk with the boss tag (no stun, freeze,
+# knockback), rlk_mob + overhead HP bar, a click shield, the boss level; never rlk_zmob. Player hits on it
+# take the same modifiers as hits on the body (combat/apply_mods). The new one carries rlk_mb_auxlast until
+# the next aux/spawn: add the module's own tags/visuals to it.
 tag @e[tag=rlk_mb_auxlast] remove rlk_mb_auxlast
 summon minecraft:husk ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_hit","boss","rlk_mb_auxlast"],PersistenceRequired:1b,NoAI:1b,NoGravity:1b,Silent:1b,IsBaby:0b,CanPickUpLoot:0b,DeathLootTable:"minecraft:empty",active_effects:[{id:"minecraft:invisibility",duration:-1,amplifier:0,show_particles:0b}]}
 execute as @e[tag=rlk_mb_auxlast,limit=1] at @s run function rlk:mboss/aux/setup
 scoreboard players set #auxHp mb 100
+scoreboard players set #auxHpPct mb 0
 scoreboard players set #auxRes mb 0
 ''')
 w('aux/setup', '''
@@ -733,9 +800,26 @@ execute unless score @s mlv matches 1.. run scoreboard players set @s mlv 1
 function rlk:mob/setup
 attribute @s minecraft:knockback_resistance base set 1
 attribute @s minecraft:explosion_knockback_resistance base set 1
+execute if score #auxHpPct mb matches 1.. run function rlk:mboss/aux/pool_pct
 scoreboard players operation @s mhpM = #auxHp mb
-scoreboard players operation @s mhpC = #auxHp mb
+execute unless score @s mhpM matches 1.. run scoreboard players set @s mhpM 1
+scoreboard players operation @s mhpC = @s mhpM
 scoreboard players operation @s mres = #auxRes mb
+''')
+w('aux/pool_pct', '''
+# #auxHp mb = body max HP x #auxHpPct / 100 (1..100 %, overflow-safe; no body = #auxHp unchanged).
+execute unless entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run return 0
+execute if score #auxHpPct mb matches 101.. run scoreboard players set #auxHpPct mb 100
+scoreboard players operation #t mb = @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] mhpM
+execute if score #t mb matches 10000000.. run return run function rlk:mboss/aux/pool_big
+scoreboard players operation #t mb *= #auxHpPct mb
+scoreboard players operation #t mb /= #c100 mb
+scoreboard players operation #auxHp mb = #t mb
+''')
+w('aux/pool_big', '''
+scoreboard players operation #t mb /= #c100 mb
+scoreboard players operation #t mb *= #auxHpPct mb
+scoreboard players operation #auxHp mb = #t mb
 ''')
 
 # =============================================================================================
@@ -911,6 +995,12 @@ for kind, keys, body in (
 
 w('hz/make', '''
 # In the caller's context (floor point, aim yaw). Summons the hazard marker, then resets the options.
+# Refused while the boss is dying (#mbSt 2: a lethal true hit inside the module tick must not leave
+# hazards behind lib_clear); #hzLast is then 0.
+execute if score #mbSt mb matches 2 run scoreboard players set #hzLast mb 0
+execute if score #mbSt mb matches 2 run function rlk:mboss/opts_reset
+execute if score #mbSt mb matches 2 run return fail
+scoreboard players set #mbHzOn mb 1
 execute rotated ~ 0 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_hz","rlk_mb_aux","rlk_room","rlk_mb_hznew"]}
 execute rotated ~ 0 as @e[tag=rlk_mb_hznew,limit=1] run tp @s ~ ~ ~ ~ ~
 execute as @e[tag=rlk_mb_hznew,limit=1] at @s rotated as @s run function rlk:mboss/hz/init
@@ -926,8 +1016,10 @@ scoreboard players operation @s mbHzA = #hzAct mb
 scoreboard players operation @s mbHzE = #mbEl mb
 execute if score #hzEl mb matches 0.. run scoreboard players operation @s mbHzE = #hzEl mb
 scoreboard players operation @s mbHzB = #hzKB mb
+# Knockback direction: 0 away from the origin, 1 along the aim, -1 (default) = shape default (lines 1, else 0).
 scoreboard players operation @s mbHzKD = #hzKBDir mb
-execute if score @s mbHzK matches 4 if score #hzKBDir mb matches 0 run scoreboard players set @s mbHzKD 1
+execute unless score @s mbHzKD matches 0..1 run scoreboard players set @s mbHzKD 0
+execute if score @s mbHzK matches 4 unless score #hzKBDir mb matches 0..1 run scoreboard players set @s mbHzKD 1
 scoreboard players operation @s mbHzS = #hzSfx mb
 scoreboard players operation @s mbHzV = #hzVis mb
 scoreboard players operation @s mbHzCol = @s mbHzE
@@ -1043,6 +1135,7 @@ data modify entity @s data.sc set value "1.0"
 
 w('hz/tick', '''
 # @s = hazard marker, at/rotated as @s (world tick; frozen while the fight is paused).
+scoreboard players set #mbHzOn mb 1
 scoreboard players add @s mbHzT 1
 execute if score @s mbHzT >= @s mbHzL run return run function rlk:mboss/hz/expire
 scoreboard players operation #t mb = @s mbHzT
@@ -1247,7 +1340,7 @@ function rlk:mboss/hurt
 ''')
 w('hz/cancel', '''
 # Cancels the hazard with id #hzLast mb (or any: set #hzLast mb before the call). Module visuals get event 2.
-execute as @e[tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb at @s run function rlk:mboss/hz/expire
+execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb at @s rotated as @s run function rlk:mboss/hz/expire
 ''')
 
 # Baked particle primitives (macro: col, sc). ^x = left, ^z = forward, relative to the caller.
@@ -1280,9 +1373,15 @@ for k in range(1, 41):
 w('pj/launch', '''
 # @s = a prop entity the module summoned (item/block display, marker ...), positioned at the launch point,
 # rotated = flight direction (pitch counts). {spd: tenths per tick, life: ticks, dmg: % of the base hit
-# (0 = visual only), hr: hit radius in tenths}. Options: #pjEl, #pjKB, #pjRet (1 = fly back to the body at
-# the end), #pjWall (0 = ignore walls). End events go to the module hook pj_end (#pjEv 1 wall, 2 life,
-# 3 returned, 4 hit the player); the prop is killed unless the hook sets #pjKeep mb 1.
+# (0 = visual only), hr: hit radius in tenths}. Options: #pjEl, #pjKB, #pjRet (1 = fly back to the body's
+# eyes at the end), #pjWall (0 = ignore walls). Events go to the module hook pj_end with #pjEv 1 wall,
+# 2 life over, 3 back at the body (or the return time ran out), 4 hit the player; #pjKeep mb is preset to
+# the default and the hook may flip it: 1 = the prop lives on (4: keeps flying, it pierces; 1/2 of a
+# returning prop: flies back; otherwise released as a plain entity), 0 = removed at once.
+# Refused while the boss is dying (#mbSt 2): the prop is removed.
+execute if score #mbSt mb matches 2 run function rlk:mboss/opts_reset
+execute if score #mbSt mb matches 2 run return run kill @s
+scoreboard players set #mbPjOn mb 1
 tag @s add rlk_mb_pj
 tag @s add rlk_mb_aux
 tag @s add rlk_room
@@ -1304,6 +1403,7 @@ function rlk:mboss/opts_reset
 ''')
 w('pj/tick', '''
 # @s = prop, at/rotated as @s. Moves in 0.25-block sub-steps (speed rounded up to 0.25 b/t).
+scoreboard players set #mbPjOn mb 1
 scoreboard players add @s mbPjT 1
 execute if score @s mbPjRet matches 2 run return run function rlk:mboss/pj/back
 execute if score @s mbPjT > @s mbPjL run return run function rlk:mboss/pj/stop {ev:2}
@@ -1316,11 +1416,14 @@ scoreboard players set #pjStop mb 0
 execute store result storage rlk:mboss pjp.hr int 1 run scoreboard players get @s mbPjR
 function rlk:mboss/pj/step
 execute if score #pjStop mb matches 1 run function rlk:mboss/pj/stop {ev:1}
+# The hook ended the flight on a player hit (#pjKeep 0 at event 4).
+execute if score #pjStop mb matches 2 run kill @s
 ''')
 w('pj/step', '''
 execute if score @s mbPjW matches 1 unless block ^ ^ ^0.25 #rlk:cm_pass run return run scoreboard players set #pjStop mb 1
 tp @s ^ ^ ^0.25
 execute if score @s mbPjHit matches 0 if score @s mbPjD matches 1.. at @s run function rlk:mboss/pj/hr with storage rlk:mboss pjp
+execute if score #pjStop mb matches 2 run return 0
 scoreboard players remove #pjN mb 1
 execute if score #pjN mb matches 1.. at @s rotated as @s run function rlk:mboss/pj/step
 ''')
@@ -1329,6 +1432,8 @@ for k in range(1, 41):
     out.write(f'mboss/pj/h/{k}', f'# Hit radius {L.num(k / 10)} b (+0.3 body), measured 0.9 b below the prop.\n'
               f'execute positioned ~ ~-0.9 ~ if entity @e[tag=rlk_body,distance=..{L.num(k / 10 + 0.3)},limit=1] run function rlk:mboss/pj/hit')
 w('pj/hit', '''
+# One hit per prop. Event 4 with #pjKeep 1 preset (the prop pierces and flies on, harmless from now);
+# the hook sets #pjKeep mb 0 to end the flight here (pj/tick removes the prop after this sub-step).
 scoreboard players set @s mbPjHit 1
 scoreboard players operation #mbHitPct mb = @s mbPjD
 scoreboard players operation #cmEl tmp = @s mbPjE
@@ -1338,14 +1443,28 @@ function rlk:mboss/hurt
 scoreboard players set #pjEv mb 4
 scoreboard players set #pjKeep mb 1
 function rlk:mboss/d/pj_end
+execute if score #pjKeep mb matches 0 run scoreboard players set #pjStop mb 2
 ''')
 w('pj/stop', '''
-# End of the outward flight. A returning prop turns around instead.
+# End of the outward flight (ev 1 wall, 2 life over). A returning prop reports it and turns around.
 $scoreboard players set #pjEv mb $(ev)
-execute if score @s mbPjRet matches 1 run return run scoreboard players set @s mbPjRet 2
+execute if score @s mbPjRet matches 1 run return run function rlk:mboss/pj/turn
 function rlk:mboss/pj/finish
 ''')
+w('pj/turn', '''
+# Returning prop at the end of its outward flight: event 1/2 with #pjKeep 1 preset (fly back); 0 = removed.
+# The return leg may last as long as the outward flight plus 2 s (mbPjL = 2 x elapsed + 40), then it
+# ends with event 3 wherever the prop is (the body may have moved away faster than the prop flies).
+scoreboard players set #pjKeep mb 1
+function rlk:mboss/d/pj_end
+execute if score #pjKeep mb matches 0 run return run kill @s
+scoreboard players set @s mbPjRet 2
+scoreboard players operation @s mbPjL = @s mbPjT
+scoreboard players operation @s mbPjL += @s mbPjT
+scoreboard players add @s mbPjL 40
+''')
 w('pj/finish', '''
+# Event 1/2 (non-returning) or 3 with #pjKeep 0 preset: removed unless the hook keeps it (released).
 scoreboard players set #pjKeep mb 0
 function rlk:mboss/d/pj_end
 execute if score #pjKeep mb matches 1 run return run function rlk:mboss/pj/release
@@ -1358,7 +1477,11 @@ scoreboard players reset @s mbPjV
 scoreboard players reset @s mbPjRet
 ''')
 w('pj/back', '''
-execute unless entity @e[tag=rlk_mb_body,limit=1] run return run kill @s
+# Return leg: steer at the body's eyes (facing entity .. eyes); arrived = the prop touches the body's hitbox
+# (a 1-block cube around the prop intersects it; the eye point lies inside the hitbox at any scale). A
+# moving body can outrun the prop, so the time cap from pj/turn ends the leg with event 3 anyway.
+execute unless entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run return run kill @s
+execute if score @s mbPjT > @s mbPjL run return run function rlk:mboss/pj/returned
 scoreboard players operation #pjN mb = @s mbPjV
 scoreboard players operation #pjN mb *= #c4 mb
 scoreboard players add #pjN mb 9
@@ -1367,8 +1490,9 @@ execute if score #pjN mb matches ..0 run scoreboard players set #pjN mb 1
 function rlk:mboss/pj/back_step
 ''')
 w('pj/back_step', '''
-execute at @s facing entity @e[tag=rlk_mb_body,limit=1] eyes run tp @s ^ ^ ^0.25 ~ ~
-execute at @s if entity @e[tag=rlk_mb_body,distance=..1.5,limit=1] run return run function rlk:mboss/pj/returned
+execute at @s facing entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] eyes run tp @s ^ ^ ^0.25 ~ ~
+# Not 'at <body> anchored eyes': that anchor uses the EXECUTOR's eye height (0 for a display or marker).
+execute at @s positioned ~-0.5 ~-0.5 ~-0.5 if entity @e[type=minecraft:husk,tag=rlk_mb_body,dx=0,dy=0,dz=0,limit=1] run return run function rlk:mboss/pj/returned
 scoreboard players remove #pjN mb 1
 execute if score #pjN mb matches 1.. run function rlk:mboss/pj/back_step
 ''')
@@ -1382,7 +1506,11 @@ function rlk:mboss/pj/finish
 w('pull/start', '''
 # Pull the player's body to the execution position over t ticks (t 0 = at once), as anything, positioned at
 # the destination (e.g. 1.2 b in front of the boss). Dash i-frames do not stop it; dead / revival / selection
-# screen / map view refuse it (returns fail). Option #pullFace mb 1 (default): turn the player to the boss.
+# screen / map view / a dying boss refuse it (returns fail). Option #pullFace mb 1 (default): turn the player to
+# the boss.
+scoreboard players operation #plFace mb = #pullFace mb
+scoreboard players set #pullFace mb 1
+execute if score #mbSt mb matches 2 run return fail
 execute unless entity @a[tag=player,scores={dead=0},limit=1] run return fail
 execute if entity @a[tag=player,scores={rnDie=1..}] run return fail
 execute if entity @a[tag=player,scores={pkMode=1..}] run return fail
@@ -1390,9 +1518,9 @@ execute if entity @a[tag=player,scores={vMap=1}] run return fail
 kill @e[tag=rlk_mb_pullpt]
 kill @e[tag=rlk_plkb]
 summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_pullpt","rlk_mb_aux","rlk_room"]}
-$scoreboard players set @e[tag=rlk_mb_pullpt,limit=1] mbPlT $(t)
-scoreboard players operation @e[tag=rlk_mb_pullpt,limit=1] mbPlF = #pullFace mb
-scoreboard players set #pullFace mb 1
+scoreboard players set #mbPlOn mb 1
+$scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_pullpt,limit=1] mbPlT $(t)
+scoreboard players operation @e[type=minecraft:marker,tag=rlk_mb_pullpt,limit=1] mbPlF = #plFace mb
 execute as @a[tag=player,limit=1] run scoreboard players set @s stepT 0
 execute if entity @e[tag=rlk_av,limit=1] as @a[tag=player,limit=1] run function rlk:view/stop_h
 execute as @e[tag=rlk_mb_pullpt,limit=1] if score @s mbPlT matches ..0 at @s run function rlk:mboss/pull/finish
@@ -1400,6 +1528,7 @@ return 1
 ''')
 w('pull/tick', '''
 # @s = pull point, at @s. Glide: body += (point - body) / ticks left, collision-checked like knockback.
+scoreboard players set #mbPlOn mb 1
 execute unless entity @a[tag=player,scores={dead=0},limit=1] run return run kill @s
 execute if entity @a[tag=player,scores={rnDie=1..}] run return run kill @s
 execute if entity @a[tag=player,scores={pkMode=1..}] run return run kill @s
@@ -1456,6 +1585,7 @@ $scoreboard players set @s mbMvH $(h)
 scoreboard players operation @s mbMvH *= #c100 mb
 ''')
 w('mv/setup', '''
+scoreboard players set #mbMvOn mb 1
 tag @s add rlk_mb_mv
 scoreboard players set @s mbMvK 1
 scoreboard players set @s mbMvT 0
@@ -1470,6 +1600,7 @@ kill @e[tag=rlk_mb_help]
 ''')
 w('mv/tick', '''
 # @s = moving entity (world tick, before the body tick so the module sees the new position).
+scoreboard players set #mbMvOn mb 1
 execute unless score @s mbMvN matches 1.. run return run function rlk:mboss/mv/stop
 scoreboard players add @s mbMvT 1
 scoreboard players operation #x mb = @s mbMvX1

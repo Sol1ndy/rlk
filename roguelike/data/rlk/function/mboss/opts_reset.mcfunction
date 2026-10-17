@@ -2,7 +2,7 @@
 scoreboard players set #hzAct mb 1
 scoreboard players set #hzEl mb -1
 scoreboard players set #hzKB mb 3
-scoreboard players set #hzKBDir mb 0
+scoreboard players set #hzKBDir mb -1
 scoreboard players set #hzY0 mb -5
 scoreboard players set #hzY1 mb 35
 scoreboard players set #hzR0 mb 0
@@ -18,4 +18,5 @@ scoreboard players set #pjRet mb 0
 scoreboard players set #pjWall mb 1
 scoreboard players set #pullFace mb 1
 scoreboard players set #auxHp mb 100
+scoreboard players set #auxHpPct mb 0
 scoreboard players set #auxRes mb 0

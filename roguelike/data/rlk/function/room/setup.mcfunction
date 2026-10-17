@@ -4,6 +4,8 @@ execute unless entity @s[tag=player] run return run tellraw @s {"text":"[방] 'p
 execute if score #active room matches 1 run function rlk:run/stop
 function rlk:room/remove_old
 execute in minecraft:overworld run forceload add -64 -64 63 63
+# 중간보스 원형 경기장 청크 고정(room/remove 가 풀었을 수 있음, /reload 없이도 다시 걸리게)
+execute in minecraft:overworld run forceload add 176 -16 223 31
 data modify storage rlk:room ready set value 0b
 scoreboard players set #setup room 0
 tag @a remove rlk_setup

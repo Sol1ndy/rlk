@@ -1,10 +1,13 @@
 # @s = the 중간보스 zone marker, at @s (from room/mob_wave, #combat = its zid). Builds the fight in the
 # arena and teleports the player. A failed spawn retries 10 ticks later (#spawnT), 3 failures cancel
 # the fight without reward. The body holds rlk_zmob from tick 0, so the zone cannot clear early.
-execute in minecraft:overworld unless loaded 200 201 8 run return run scoreboard players set #spawnT room 10
+execute in minecraft:overworld unless loaded 200 201 8 run return run function rlk:mboss/start_unloaded
 execute unless entity @a[tag=player,scores={dead=0},limit=1] run return run scoreboard players set #spawnT room 10
 execute unless data storage rlk:mboss cur run function rlk:mboss/roll
 execute unless data storage rlk:mboss cur run return run function rlk:mboss/start_fail
+scoreboard players set #mbLd mb 0
+# From here on fight entities may exist: rlk:tick runs mboss/main (cleared when the body is gone).
+scoreboard players set #mbLive mb 1
 function rlk:mboss/cleanup_aux
 function rlk:mboss/fight_vars
 execute in minecraft:overworld run function rlk:mboss/arena/ensure

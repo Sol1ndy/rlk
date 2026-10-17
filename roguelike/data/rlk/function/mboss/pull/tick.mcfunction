@@ -1,4 +1,5 @@
 # @s = pull point, at @s. Glide: body += (point - body) / ticks left, collision-checked like knockback.
+scoreboard players set #mbPlOn mb 1
 execute unless entity @a[tag=player,scores={dead=0},limit=1] run return run kill @s
 execute if entity @a[tag=player,scores={rnDie=1..}] run return run kill @s
 execute if entity @a[tag=player,scores={pkMode=1..}] run return run kill @s

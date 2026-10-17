@@ -1,4 +1,5 @@
 # @s = moving entity (world tick, before the body tick so the module sees the new position).
+scoreboard players set #mbMvOn mb 1
 execute unless score @s mbMvN matches 1.. run return run function rlk:mboss/mv/stop
 scoreboard players add @s mbMvT 1
 scoreboard players operation #x mb = @s mbMvX1

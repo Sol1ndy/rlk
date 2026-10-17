@@ -262,11 +262,12 @@ w('pattern', [
 # ---------------------------------------------------------------------------------------------
 # Stars (aux route + true damage)
 w('star', f'''
-# Test (pattern id 90): a breakable star 4 b in front of the boss. 40 HP pool, RES 80 % (x0.238), immune to
-# Pyro (aux_hit); breaking it deals 10 % of the boss's max HP as true damage.
+# Test (pattern id 90): a breakable star 4 b in front of the boss. Pool 3 % of the boss's max HP (#auxHpPct,
+# scales with the level; hits on it are modified like hits on the body), RES 80 % (x0.238), immune to Pyro
+# (aux_hit); breaking it deals 10 % of the boss's max HP as true damage.
 kill @e[tag=rlk_mb_{ID}_star]
 kill @e[tag=rlk_mb_{ID}_starv]
-scoreboard players set #auxHp mb 40
+scoreboard players set #auxHpPct mb 3
 scoreboard players set #auxRes mb 80
 execute at @s rotated as @s rotated ~ 0 positioned ^ ^ ^4 {FLOOR} run function rlk:mboss/aux/spawn
 tag @e[tag=rlk_mb_auxlast,limit=1] add rlk_mb_{ID}_star
@@ -327,6 +328,8 @@ execute if score #prFlash mb matches 1.. run scoreboard players remove #prFlash 
 execute if score #prFlash mb matches 0 run {fn("rig/unglow")}
 execute if score #prFlash mb matches 0 run scoreboard players set #prFlash mb -1
 execute if entity @e[tag=rlk_mb_{ID}_starv,limit=1] run {fn("star_tick")}
+# A star break can be lethal (true_pct runs death_start before it returns): no fight logic on a dying body.
+execute unless score #mbSt mb matches 1 run return 0
 execute if score #prPat mb matches 0 run return run {fn("idle")}
 {fn("pattern")}
 ''')
@@ -336,7 +339,7 @@ execute unless score #prFlash mb matches 1.. run {fn("rig/glow")}
 scoreboard players set #prFlash mb 3
 ''')
 w('aux_hit', f'''
-# Hook aux_hit (@s = a star inside combat/apply, RES already applied to #dmg). Pyro does nothing (immune);
+# Hook aux_hit (@s = a star inside combat/apply, all modifiers and RES already applied to #dmg). Pyro does nothing (immune);
 # everything else falls through to the framework default (pool, number, broken tag).
 execute if entity @s[tag=rlk_mb_{ID}_star] if score #elem tmp matches 1 run scoreboard players set #dmg tmp 0
 ''')
@@ -386,7 +389,8 @@ w('hz_vis', '''
 # framework particle telegraphs, so it never sets #hzVis.
 ''')
 w('pj_end', f'''
-# Hook pj_end (@s = projectile prop, #pjEv 1 wall / 2 life / 3 back at the body / 4 hit the player).
+# Hook pj_end (@s = projectile prop, #pjEv 1 wall / 2 life / 3 back at the body / 4 hit the player; #pjKeep
+# preset to the default: the javelin returns after 1/2 and is removed after 3).
 execute if score #pjEv mb matches 3 at @s run particle minecraft:crit ~ ~ ~ 0.2 0.2 0.2 0.1 6 force @a[tag=player]
 ''')
 w('test', [

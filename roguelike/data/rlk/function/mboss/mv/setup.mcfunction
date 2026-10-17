@@ -1,3 +1,4 @@
+scoreboard players set #mbMvOn mb 1
 tag @s add rlk_mb_mv
 scoreboard players set @s mbMvK 1
 scoreboard players set @s mbMvT 0

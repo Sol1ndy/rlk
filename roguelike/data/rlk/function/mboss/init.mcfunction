@@ -93,6 +93,13 @@ execute unless score #mbLock mb matches 0.. run scoreboard players set #mbLock m
 execute unless score #mbId mb matches 0.. run scoreboard players set #mbId mb 0
 execute unless score #mbGoldMul mb matches 1.. run scoreboard players set #mbGoldMul mb 5
 execute unless score #mbSap mb matches 0.. run scoreboard players set #mbSap mb 1
+execute unless score #mbLive mb matches 0.. run scoreboard players set #mbLive mb 0
+execute unless score #mbLd mb matches 0.. run scoreboard players set #mbLd mb 0
+# Library activity flags (a set flag makes the world tick scan for that library's entities once).
+scoreboard players set #mbHzOn mb 1
+scoreboard players set #mbPjOn mb 1
+scoreboard players set #mbPlOn mb 1
+scoreboard players set #mbMvOn mb 1
 function rlk:mboss/opts_reset
 function rlk:mboss/bars_hide
 scoreboard players set #mbLn mb 0

@@ -19,12 +19,12 @@ scoreboard players set #hitLanded tmp 1
 scoreboard players set #cmBlk tmp 0
 # 원소: 부착/반응 → #dmg 보정(증발·융해·촉진·발산·초전도), 격변 반응 예약, 반응 이름 표시 (진짜 피해는 원소 없음)
 execute unless score #trueDmg tmp matches 1 run function rlk:element/on_hit
-# 중간보스 보조 오브젝트(rlk_mb_hit, 예: 원소별): 반응까지 끝난 피해를 모듈로 넘기고 여기서 끝(보상·처치 없음)
-execute if entity @s[tag=rlk_mb_hit] unless score #trueDmg tmp matches 1 run return run function rlk:mboss/aux_hit
 # 중간보스 몸체: 이번 타격의 원소 정보(#elem #elU #rx #tfm)를 모듈에 알림(점수만 바꿈, 재귀 금지)
 execute if entity @s[tag=rlk_mb_body] unless score #trueDmg tmp matches 1 run function rlk:mboss/d/on_hit
 # 피해 보정(각인 · 아이템 · 레벨 · 저항 · 보스별 받는 피해). 진짜 피해는 건너뜀
 execute unless score #trueDmg tmp matches 1 run function rlk:combat/apply_mods
+# 중간보스 보조 오브젝트(rlk_mb_hit, 예: 원소별): 몸체와 똑같이 보정된 피해를 모듈로 넘기고 여기서 끝(보상·처치 없음)
+execute if entity @s[tag=rlk_mb_hit] unless score #trueDmg tmp matches 1 run return run function rlk:mboss/aux_hit
 # 대미지 숫자 색 = 원소 색
 function rlk:element/color
 execute store result storage rlk:combat dmg int 1 run scoreboard players get #dmg tmp

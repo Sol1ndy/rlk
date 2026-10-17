@@ -425,14 +425,15 @@
 3. 문을 누르면 구역 문이 잠기고(일반 전투와 같음) 이름 · 부제 제목이 뜬 뒤 1.5초 뒤 **원형 경기장**으로 이동(짧은 실명 효과). 돌아올 자리는 던전에서 마지막으로 딛은 안전한 자리(`rlk_safe`).
 4. 등장 연출 동안은 무적이고 체력바가 차오른다. 전투 중에는 미니맵이 숨고, 위쪽에 보스바 3줄(이름 · 부착 원소 아이콘 / 체력바 + 아랫줄 게이지 / 보스별 정보 줄)이 뜬다.
 5. 처치하면(마지막 타격의 회복 구슬 · 경험치 · 골드는 그대로) 쓰러지는 연출 뒤 경기장의 골드를 거두고 던전으로 돌아와 **아이템 선택 2번**이 바로 열린다. 이 두 묶음에는 캐릭터 카드가 나오지 않는다(`pkMb`). 등급 확률은 레벨 업 선택과 같은 챕터 표(`items/roll_rarity`). 골드는 일반 몹의 × `goldMul`(5), 사파이어 조각 `sap`(1)개.
-6. 처치가 아닌 이유로 몸체가 사라지면(`/kill`, 소환 3번 실패, 리로드로 몸체 유실) **보상 없이 취소**되고 던전으로 돌아오며 문이 다시 나타난다.
+6. 처치가 아닌 이유로 몸체가 사라지면(`/kill`, 소환 3번 실패, 리로드로 몸체 유실) **보상 없이 취소**되고 던전으로 돌아오며 문이 다시 나타난다. 경기장 청크가 불려 있지 않으면 고정을 다시 걸고 0.5초마다 다시 시도하며, 3초가 지나도 안 되면 같은 방식으로 취소한다(문이 잠긴 채 멈추지 않음).
 - 플레이어가 쓰러진 동안 · 로노바 부활 중 · 선택 화면에서는 **모든 것이 멈춘다**(패턴 시계 · 바닥 공격 · 투사체). 경기장 밖으로 벗어나면(벽 넘기 · 이상한 넉백) 처음 자리로 돌려놓는다. 보스는 경기장 가장자리에서 안쪽으로 끌려 돌아온다.
 - 정리: 처치 · 취소 · 런 종료 · 사망 · 맵 이동 · `room/wipe` · `/reload`(진행 중 전투는 체력 유지, 보조 엔티티만 다시 만듦) · `uninstall` 모두 경기장 엔티티 · 보스바 · 상태를 지운다.
+- 부하: `rlk:tick` 은 전투가 시작된 뒤(`#mbLive mb` 1, `mboss/start` · `/reload` 가 켜고 정리 · 몸체가 사라진 첫 틱에 끔)에만 `mboss/main` → `mboss/world` 를 돌린다. 전투 밖에서는 중간보스 엔티티를 찾는 선택자가 하나도 돌지 않는다. 바닥 공격 · 투사체 · 끌어당기기 · 이동도 각각 살아 있는 것이 있을 때만(`#mbHzOn` `#mbPjOn` `#mbPlOn` `#mbMvOn`) 엔티티를 훑는다.
 
 ### 원형 경기장 (`tools/build_mboss_arena.py` → `mboss/arena/*`)
-- 오버월드 중심 **(200, 201, 8)**(블록 모서리), 바닥 반지름 22 · 걸을 수 있는 반지름 21(그 밖은 높이 7의 흰 대리석 벽), 벽 위 y 208~215 배리어(이동기로 넘어가지 못함), y 206 빛 블록 층(밤에도 몹이 자연 스폰되지 않음). 청크 9개(x 176~223, z −16~31)를 `load` 에서 **항상 고정**(forceload).
-- 바닥(영상 m2 의 광장): 옅은 대리석(방해석 + 흰 콘크리트 · 매끄러운 석영 얼룩), 한가운데 **장미색 네 갈래 별**(진홍 테두리 · 밝은 가운데)과 별 끝에서 휘어 나가는 장미색 꼬리 4개(바람개비), 새긴 원 3겹(윤나는 섬록암), 램프 앞 금 박힘, 벽에 금 기둥 램프 12개(황토 개구리불 + 엔드 막대 별).
-- `mboss/arena/ensure` 가 판 번호(`rlk:mboss built` = `"plaza@1"`)와 가운데 블록을 보고 다를 때만 다시 짓는다(전투 시작 때 · `room/setup` 이 된 뒤 `/reload` 때). 강제로 다시 짓기: `/execute in minecraft:overworld run function rlk:mboss/arena/rebuild`, 보러 가기: `/function rlk:mboss/test/arena`(런 밖에서).
+- 오버월드 중심 **(200, 201, 8)**(블록 모서리), 바닥 반지름 22 · 걸을 수 있는 반지름 21(그 밖은 높이 7의 흰 대리석 벽), 벽 위 y 208~215 배리어(이동기로 넘어가지 못함), y 206 빛 블록 층(밤에도 몹이 자연 스폰되지 않음). 청크 9개(x 176~223, z −16~31)를 `load` · `room/setup` 에서 **항상 고정**(forceload, `room/remove` 가 풀고 `room/setup` 이 다시 건다. 전투 시작 때 빠져 있으면 `mboss/start` 도 다시 건다).
+- 바닥(영상 m2 의 광장): 옅은 대리석(방해석 + 매끄러운 석영 얼룩), 한가운데 **장미색 네 갈래 별**(길고 가는 끝, 얇은 진홍 테두리, 밝은 가운데), 별을 둘러 소용돌이치는 **가는 장미색 날개 8개**(진홍 테두리 + 연분홍 속, 별과 떨어져 있고 양 끝이 가늘며 35도 정도만 휘어서 꺾인 팔 모양이 생기지 않음), 옅게 새긴 원 3겹(흰 콘크리트, 한 칸 너비), 바깥 원의 램프 앞 금 박힘, 벽에 금 기둥 램프 12개(황토 개구리불 + 엔드 막대 별).
+- `mboss/arena/ensure` 가 판 번호(`rlk:mboss built` = `"plaza@2"`)와 가운데 블록을 보고 다를 때만 다시 짓는다(전투 시작 때 · `room/setup` 이 된 뒤 `/reload` 때). 강제로 다시 짓기: `/execute in minecraft:overworld run function rlk:mboss/arena/rebuild`, 보러 가기: `/function rlk:mboss/test/arena`(런 밖에서).
 
 ### 등록 · 모듈 (`tools/mboss_registry.json`)
 - 중간보스 하나 = 레지스트리 항목 하나 + 모듈 폴더 `mboss/<id>/`(자기 생성기 `tools/build_mboss_<id>.py`). 항목: `id` `n`(고정 번호, 디스패처용) `enabled` `w`(뽑기 가중치, 0 = 테스트 전용) `minCh/maxCh` `name/sub/color` `el`(공격 원소) `hp/xp/atk/lvAdd/dmgMul` `goldMul/sap/picks` `scale` `hit{w,h}`(클릭 판정) `intro/death`(연출 최대 틱) `icon`.
@@ -441,15 +442,18 @@
 - 생성 · 점검: `python3 tools/build_mboss_core.py` → `build_mboss_arena.py` → `build_mboss_<id>.py` → `python3 tools/check_mboss_pack.py`. 생성된 파일은 손으로 고치지 않는다.
 
 ### 공용 라이브러리 (모듈이 쓰는 것)
-- **바닥 공격** `mboss/hz/{disc,ring,sector,line,full}`: 예고(입자 윤곽 + 맞는 순간 테두리에 닿는 진행 윤곽) → 판정(몸 위치 기준, 0.3칸 여유, 공격 하나에 한 번, 대시 무적으로 피함). 원 · 고리 · 부채꼴/호(반각 180 = 360도 휘두르기) · 직선 · 경기장 전체(안전한 원 하나). 원소 · 넉백 · 높이 · 지속 · 소리 · 모듈 장식(`hz_vis`) 옵션. 거리 단위는 0.1칸.
+- **바닥 공격** `mboss/hz/{disc,ring,sector,line,full}`: 예고(입자 윤곽 + 맞는 순간 테두리에 닿는 진행 윤곽) → 판정(몸 위치 기준, 0.3칸 여유, 공격 하나에 한 번, 대시 무적으로 피함). 원 · 고리 · 부채꼴/호(반각 180 = 360도 휘두르기) · 직선 · 경기장 전체(안전한 원 하나). 원소 · 넉백(`#hzKBDir` −1 = 모양 기본값(직선은 겨눈 방향, 나머지는 중심에서 바깥), 0 = 중심에서 바깥, 1 = 겨눈 방향, 직선도 0 을 고를 수 있음) · 높이 · 지속 · 소리 · 모듈 장식(`hz_vis`, 취소될 때도 바닥 공격의 방향 그대로) 옵션. 거리 단위는 0.1칸.
 - **플레이어 피해** `mboss/hurt`: 계수(%) × 레지스트리 `atk` × `dmgMul` → 기존 `cm/hit_pl2` → `player/take_damage`(대시 무적 · 방어 · 레벨 보정 · 원소 · 보호막).
 - **투사체 소품** `mboss/pj/launch`(0.25칸 단위 이동, 벽 · 수명, 몸에 닿으면 피해, 돌아오기), **끌어당기기** `mboss/pull/start`(대시로 못 피함, 사망 · 부활 · 선택 화면에서는 거부), **이동** `mboss/mv/*`(직선 · 포물선 이동, 바라보기 · 천천히 돌기, 걸음, 가장자리 끌어오기, 거리).
-- **보조 오브젝트**(원소별 등) `mboss/aux/spawn` + 태그 `rlk_mb_hit`: 플레이어 타격이 원소 반응까지 끝난 뒤 모듈(`aux_hit`)로 간다(자기 체력 · 저항 · 면역, 처치 보상 없음). **진짜 피해** `mboss/true_hit` · `true_pct {pct}`(보정 없이 `combat/apply` 를 거쳐 처치 · 보상 · 쓰러짐 그대로).
+  - 투사체 끝 알림 `pj_end`(`#pjEv` 1 벽 · 2 수명 · 3 돌아옴 · 4 플레이어 적중): `#pjKeep` 에 기본값이 미리 들어 있고 모듈이 바꿀 수 있다. 적중은 기본으로 관통(한 번만 맞힘, 0 이면 그 자리에서 사라짐), 돌아오는 소품은 벽 · 수명 때도 알림을 받고(0 이면 사라짐) 몸의 눈을 향해 날아와 **몸 판정 상자에 닿으면** 3번. 돌아오는 시간은 나간 시간 + 2초가 최대라 보스가 멀리 날아가도 소품이 남지 않는다. 돌아오는 길에는 피해가 없다.
+  - 보스가 쓰러지는 중(`#mbSt` 2)에는 바닥 공격 · 투사체 · 끌어당기기를 새로 만들지 않는다(`hz` 는 `#hzLast` 0, `pj` 는 소품을 지움, `pull` 은 실패).
+- **보조 오브젝트**(원소별 등) `mboss/aux/spawn` + 태그 `rlk_mb_hit`: 플레이어 타격이 원소 반응과 **몸체와 똑같은 피해 보정**(각인 · 아이템 · 레벨 보정 · 로노바 · 자기 저항, `combat/apply_mods`)을 거친 뒤 모듈(`aux_hit`)로 간다(자기 체력 · 면역, 처치 보상 없음). 체력은 `#auxHpPct mb`(보스 최대 체력의 %, 1~100, 레벨 · 챕터에 맞춰 커짐, 권장) 또는 `#auxHp mb`(고정값). 같은 보정을 받으므로 P% 짜리 별은 보스 처치 시간의 P% 안에 깨진다(저항 차이만큼 보정: 저항 80% 별은 × 1/0.238).
+- **진짜 피해** `mboss/true_hit` · `true_pct {pct}`(보정 없이 `combat/apply` 를 거쳐 처치 · 보상 · 쓰러짐 그대로). 마지막 한 방이면 돌아오기 **전에** 쓰러짐(`death_start`)이 실행되므로, 모듈의 `tick` 안에서 불렀다면 바로 다음 줄에서 `#mbSt mb` 가 1이 아니면 그 틱을 끝내야 한다(`proto/tick` 참고).
 - **저항** `mres`(몹 공용 점수, %): 원신 공식(80% → 피해 × 0.238). `combat/apply_mods` 에서 레벨 보정 뒤에 적용.
 - **대사** `mboss/line/say {t,c,gap,hold,snd}`: 두 글자씩 타자 치듯 나오는 자막 + 작은 효과음(바닐라 소리만).
 
 ### 시험용 강적 `proto`
-블록 디스플레이 9개짜리 허스크 모양 몸, 하늘에서 떨어지는 등장, 패턴 7개(강타 · 찌르기 · 휘두르기(먼저 다가감) · 파문 · 투창(돌아오는 창) · 끌어당겨 회전베기 · 전역 강타(안전한 원 하나))로 모든 라이브러리를 한 번씩 쓴다. `test/pattern {id:90}` 은 부술 수 있는 별(저항 80%, 불 면역, 부수면 보스 최대 체력 10% 진짜 피해).
+블록 디스플레이 9개짜리 허스크 모양 몸, 하늘에서 떨어지는 등장, 패턴 7개(강타 · 찌르기 · 휘두르기(먼저 다가감) · 파문 · 투창(돌아오는 창) · 끌어당겨 회전베기 · 전역 강타(안전한 원 하나))로 모든 라이브러리를 한 번씩 쓴다. `test/pattern {id:90}` 은 부술 수 있는 별(체력 = 보스 최대 체력의 3%, 저항 80%, 불 면역, 부수면 보스 최대 체력 10% 진짜 피해).
 
 ### 테스트 명령
 - `/function rlk:mboss/test/start {id:"proto"}`(챕터 지정: `test/start_ch {id:"proto",ch:2}`): 'player' 태그 · `room/setup` · 진행 중인 런 없음 · 난이도 쉬움 이상. 중간보스 구역이 있는 진짜 노드 맵을 만들고 문을 바로 누른다.
@@ -457,7 +461,7 @@
 - 노드 맵으로 직접: `/data modify storage rlk:room next set value [15]` → `/scoreboard players set #mapType room 1` → `/function rlk:run/next_map`(뽑을 수 있는 중간보스가 있어야 함, 없으면 `#mbForce mb` 를 99로).
 
 ### 고친 공용 파일
-`combat/apply`(쓰러지는 중 · 무적 · 진짜 피해 · 보조 오브젝트 경로 · 몸체 원소 훅 · 쓰러짐), `combat/apply_mods`(새로: 기존 보정 묶음 + 저항 + 보스별 받는 피해), `combat/res*`, `combat/gold_drop`(boss + miniboss 는 중간보스 배율), `combat/clear_atkflags`, `mob/{setup,shield_ensure,vanilla_hit,knock,tick}`, `room/{mob_init,zone_enter,mob_wave,combat_clear,zone_patch,clear,wipe,remove}`, `room/obj/{click,k_mboss}`, `room/node/{register,cand_loop}`, `run/{start,end}`, `player/hook_respawn`, `lvup/{roll,init,act/resolve}`(`pkMb`), `tick`, `load`, `uninstall`, 미니맵(`tools/build_minimap.py` 로 다시 생성). 나루카미 코드는 건드리지 않았다.
+`combat/apply`(쓰러지는 중 · 무적 · 진짜 피해 · 보조 오브젝트 경로 · 몸체 원소 훅 · 쓰러짐), `combat/apply_mods`(새로: 기존 보정 묶음 + 저항 + 보스별 받는 피해), `combat/res*`, `combat/gold_drop`(boss + miniboss 는 중간보스 배율), `combat/clear_atkflags`, `mob/{setup,shield_ensure,vanilla_hit,knock,tick}`, `room/{mob_init,zone_enter,mob_wave,combat_clear,zone_patch,clear,wipe,remove,setup}`, `room/obj/{click,k_mboss}`, `room/node/{register,cand_loop}`, `run/{start,end}`, `player/hook_respawn`, `lvup/{roll,init,act/resolve}`(`pkMb`), `tick`, `load`, `uninstall`, 미니맵(`tools/build_minimap.py` 로 다시 생성). 나루카미 코드는 건드리지 않았다.
 
 ## 13. 시점 (`view/`) — 1인칭 / 숄더뷰 / F5 위쪽 시점
 설정 방의 **시점** 버튼으로 1인칭 → 숄더뷰 → F5 위쪽 시점 순서로 바뀝니다(처음엔 F5 위쪽 시점). 명령: `/function rlk:view/mode {m:1}`(숄더뷰) · `{m:2}`(F5 위쪽 시점) · `/function rlk:view/off`(1인칭).

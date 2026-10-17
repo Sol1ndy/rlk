@@ -9,6 +9,8 @@ scoreboard players set #mbSt mb 0
 scoreboard players set #mbT mb 0
 scoreboard players set #mbPause mb 0
 scoreboard players set #mbFail mb 0
+scoreboard players set #mbLd mb 0
 scoreboard players set #mbNoLeash mb 0
+scoreboard players set #mbLive mb 0
 data modify storage rlk:mboss sub set value []
 data modify storage rlk:mboss extra set value []

@@ -1,4 +1,5 @@
 # @s = hazard marker, at/rotated as @s (world tick; frozen while the fight is paused).
+scoreboard players set #mbHzOn mb 1
 scoreboard players add @s mbHzT 1
 execute if score @s mbHzT >= @s mbHzL run return run function rlk:mboss/hz/expire
 scoreboard players operation #t mb = @s mbHzT
