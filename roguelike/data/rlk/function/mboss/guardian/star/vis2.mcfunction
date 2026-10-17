@@ -1,0 +1,2 @@
+# Star glyph, 물 (#5CC8FF): a billboard 4-point star that grows from 0.
+summon minecraft:text_display ~ ~1.3 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_fx","rlk_mb_gd_starv","rlk_mb_gd_svnew"],billboard:"center",background:0,shadow:true,see_through:false,brightness:{sky:15,block:15},alignment:"center",text:{text:"✦",color:"#5CC8FF"},view_range:2f,transformation:{translation:[0f,-0.4f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.2f,0.2f,0.2f]}}

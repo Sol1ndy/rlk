@@ -1,0 +1,1 @@
+execute as @e[type=minecraft:text_display,tag=rlk_mb_gd_starv] run data merge entity @s {text:{text:"✦",color:"#5A1418"},start_interpolation:0,interpolation_duration:5,transformation:{translation:[0f,-0.2f,0f],scale:[1.2f,1.2f,1.2f]}}
