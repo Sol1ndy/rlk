@@ -5,6 +5,9 @@ scoreboard players set #active room 0
 scoreboard players set #rdTest rd 0
 scoreboard players set #rdForce rd 0
 scoreboard players set #rdLock rd 0
+scoreboard players set #mbTest mb 0
+scoreboard players set #mbForce mb 0
+scoreboard players set #mbLock mb 0
 execute in minecraft:overworld run function rlk:room/clear
 clear @a minecraft:filled_map[minecraft:custom_data~{rlk_map:1b}]
 clear @a *[minecraft:custom_data~{rlk_ui:{role:"map"}}]

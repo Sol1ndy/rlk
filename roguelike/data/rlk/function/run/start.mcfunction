@@ -11,6 +11,9 @@ function rlk:player/reset_one
 scoreboard players set #rdTest rd 0
 scoreboard players set #rdForce rd 0
 scoreboard players set #rdLock rd 0
+scoreboard players set #mbTest mb 0
+scoreboard players set #mbForce mb 0
+scoreboard players set #mbLock mb 0
 scoreboard players set #active room 1
 scoreboard players set #chapter room 1
 scoreboard players reset #seen1 room
@@ -25,6 +28,8 @@ scoreboard players set #rfCount room 0
 data modify storage rlk:room next set value []
 scoreboard players set #mirUsed room 0
 data modify storage rlk:room seen set value []
+# 이번 판에 만난 중간보스(같은 중간보스가 연달아 나오지 않게)
+data modify storage rlk:mboss met set value []
 scoreboard players set #mapIdx room 0
 scoreboard players set #mapType room 0
 scoreboard players set #stDefer room 1

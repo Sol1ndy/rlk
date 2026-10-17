@@ -1,0 +1,13 @@
+# Cross bar width 6.5
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^-3.25 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^-2.659 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^-2.068 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^-1.477 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^-0.886 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^-0.295 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^0.295 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^0.886 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^1.477 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^2.068 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^2.659 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^3.25 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]

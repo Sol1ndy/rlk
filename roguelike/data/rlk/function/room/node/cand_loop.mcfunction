@@ -11,6 +11,9 @@ execute if score #ck tmp matches 8 if score #noRoot tmp matches 1 run scoreboard
 # 보유 칸: 3챕터부터, 18칸 미만일 때만
 execute if score #ck tmp matches 12 if score #chapter room matches ..2 run scoreboard players set #cok tmp 0
 execute if score #ck tmp matches 12 if entity @a[tag=player,limit=1,scores={invCap=18..}] run scoreboard players set #cok tmp 0
+# 중간보스: 1챕터의 첫 선택지(시작 아이템 하나뿐)에는 X, 뽑을 수 있는 중간보스가 없으면 X
+execute if score #ck tmp matches 15 if score #chapter room matches ..1 if score #mapIdx room matches ..0 run scoreboard players set #cok tmp 0
+execute if score #ck tmp matches 15 unless score #mbRoll mb matches 1.. run scoreboard players set #cok tmp 0
 # 뺄 목록
 data modify storage rlk:room xq set from storage rlk:room excl
 execute if score #cok tmp matches 1 run function rlk:room/node/excl_loop

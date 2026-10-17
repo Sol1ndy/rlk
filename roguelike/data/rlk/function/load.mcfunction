@@ -1217,6 +1217,8 @@ function rlk:items/tune/register
 function rlk:char/reg_items
 # 아이템 선택 공간(검은 방)이 있는 청크는 항상 불러와 둔다
 execute in minecraft:overworld run forceload add 104 4
+# 중간보스 원형 경기장(중심 200 201 8, 청크 9개)도 항상 불러와 둔다: 몸체 소환 · 정리가 같은 틱에 되어야 함
+execute in minecraft:overworld run forceload add 176 -16 223 31
 execute unless data storage rlk:lvpick choices run data modify storage rlk:lvpick choices set value []
 kill @e[tag=rlk_pk]
 scoreboard players set @a[scores={pkMode=1..}] pkRedraw 2
@@ -1360,6 +1362,8 @@ function rlk:char/motion/install
 function rlk:bossui/init
 # Narukami encounter and rig, rebuilt without refilling an existing boss.
 function rlk:boss/raiden/init
+# 중간보스 틀(tools/build_mboss_core.py): 점수 · 보스바 · 레지스트리 · 경기장 확인, 진행 중 전투는 체력 유지
+function rlk:mboss/init
 # 화면 위 미니맵(tools/build_minimap.py)
 function rlk:minimap/init
 # 나비아 금빛 카드 효과 점수(tools/build_navia_fx_cards.py)

@@ -12,22 +12,19 @@ execute if entity @s[tag=rlk_raiden,scores={rdPat=5}] run return 0
 execute if entity @s[tag=rlk_raiden,scores={rdPat=15}] run return 0
 execute if entity @s[tag=rlk_raiden,scores={rdBlink=1..}] run return 0
 execute if entity @s[tag=rlk_raiden,scores={rdDeath=1}] run return 0
+# 중간보스: 쓰러지는 중에는 아무 피해도 받지 않음(보상 두 번 방지), 무적(rlk_mb_inv: 등장 · 모듈의 무적 동작)은 진짜 피해(#trueDmg)만 받음
+execute if entity @s[tag=rlk_mb_dying] run return 0
+execute if entity @s[tag=rlk_mb_inv] unless score #trueDmg tmp matches 1 run return 0
 scoreboard players set #hitLanded tmp 1
 scoreboard players set #cmBlk tmp 0
-# 원소: 부착/반응 → #dmg 보정(증발·융해·촉진·발산·초전도), 격변 반응 예약, 반응 이름 표시
-function rlk:element/on_hit
-# 아이템: 대상 기준 데미지 보정/적중 효과
-# 각인: 주는 피해 증가 · 빙설의 치명타
-function rlk:engravings/on_apply
-function rlk:items/hook/on_apply
-# 캐릭터: 요이미야의 유금화광
-execute if score #charN tmp matches 2 run function rlk:char/yoimiya/on_apply
-# 레벨 보정(원신의 방어 계수): 피해 × (플레이어 레벨 + 100) / ((플레이어 레벨 + 100) + (몬스터 레벨 + 100)). 격변 반응 피해(#tfm)는 방어를 무시
-# 로노바: 잠식이 쌓인 보스는 받는 피해 + 잠식/2 %
-execute if score @s rnEr matches 1.. if entity @s[tag=boss] run function rlk:element/void/boss_amp
-execute unless score #tfm tmp matches 1 run function rlk:combat/lv_mult
-# Apply boss armor/exhaustion before the displayed damage value is stored.
-execute if entity @s[tag=rlk_raiden] run function rlk:boss/raiden/incoming
+# 원소: 부착/반응 → #dmg 보정(증발·융해·촉진·발산·초전도), 격변 반응 예약, 반응 이름 표시 (진짜 피해는 원소 없음)
+execute unless score #trueDmg tmp matches 1 run function rlk:element/on_hit
+# 중간보스 보조 오브젝트(rlk_mb_hit, 예: 원소별): 반응까지 끝난 피해를 모듈로 넘기고 여기서 끝(보상·처치 없음)
+execute if entity @s[tag=rlk_mb_hit] unless score #trueDmg tmp matches 1 run return run function rlk:mboss/aux_hit
+# 중간보스 몸체: 이번 타격의 원소 정보(#elem #elU #rx #tfm)를 모듈에 알림(점수만 바꿈, 재귀 금지)
+execute if entity @s[tag=rlk_mb_body] unless score #trueDmg tmp matches 1 run function rlk:mboss/d/on_hit
+# 피해 보정(각인 · 아이템 · 레벨 · 저항 · 보스별 받는 피해). 진짜 피해는 건너뜀
+execute unless score #trueDmg tmp matches 1 run function rlk:combat/apply_mods
 # 대미지 숫자 색 = 원소 색
 function rlk:element/color
 execute store result storage rlk:combat dmg int 1 run scoreboard players get #dmg tmp
@@ -79,7 +76,9 @@ execute if score #mobHP tmp matches ..0 if score #charN tmp matches 2 run functi
 execute if score #mobHP tmp matches ..0 if score #charN tmp matches 5 run function rlk:char/arlecchino/dir_death
 execute if score #mobHP tmp matches ..0 if entity @s[tag=rlk_rndoom] run function rlk:element/void/doom_death
 execute if score #mobHP tmp matches ..0 if entity @s[tag=rlk_raiden] run function rlk:boss/raiden/death/start
-execute if score #mobHP tmp matches ..0 unless entity @s[tag=rlk_raiden] run kill @s
+# 중간보스: 처치 보상(위 회복 구슬 · 경험치 · 골드)은 이미 지급. 몸체는 쓰러지는 연출 뒤에 사라짐
+execute if score #mobHP tmp matches ..0 if entity @s[tag=rlk_mb_body] run function rlk:mboss/death_start
+execute if score #mobHP tmp matches ..0 unless entity @s[tag=rlk_raiden] unless entity @s[tag=rlk_mb_body] run kill @s
 execute if score #mobHP tmp matches 1.. run scoreboard players operation @s mhpC = #mobHP tmp
 # 빙설이 이 대상에게만 만든 치명타 표시는 되돌린다(범위 공격의 다음 대상에 번지지 않게)
 execute if score #frostC eng matches 1 run scoreboard players set #crit tmp 0

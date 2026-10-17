@@ -10,7 +10,9 @@ k10:{k:10,name:"레벨업",item:"minecraft:experience_bottle",model:"minecraft:e
 k11:{k:11,name:"주사위",item:"minecraft:white_dye",model:"rlk:dice",desc:"주사위 2개 (리롤권)",color:"#F2F2F2"},\
 k12:{k:12,name:"보유 칸",item:"minecraft:bundle",model:"minecraft:bundle",desc:"아이템 보유 칸 +2",color:"#4FC3C9"},\
 k13:{k:13,name:"생명력",item:"minecraft:golden_apple",model:"minecraft:golden_apple",desc:"최대 체력 +10%",color:"#E06A8A"},\
-k14:{k:14,name:"아이템",item:"minecraft:chest",model:"minecraft:chest",desc:"아이템 하나 고르기",color:"#FFE08A"}\
+k14:{k:14,name:"아이템",item:"minecraft:chest",model:"minecraft:chest",desc:"아이템 하나 고르기",color:"#FFE08A"},\
+k15:{k:15,name:"중간보스",item:"minecraft:wither_skeleton_skull",model:"minecraft:wither_skeleton_skull",desc:"강적 처치 → 아이템 선택 2번",color:"#E0703A"}\
 }
 # 뽑기 가중치 (클수록 자주). 상점은 반드시 다른 노드와 함께, 나무뿌리는 한 판에 한 번(#mirUsed), 보유 칸은 3챕터부터 · 18칸 미만일 때만
-data modify storage rlk:room nw set value [{k:3,w:10},{k:4,w:8},{k:5,w:7},{k:7,w:8},{k:8,w:5},{k:10,w:9},{k:11,w:8},{k:12,w:3},{k:13,w:7},{k:14,w:8}]
+# 중간보스(15)는 1챕터 첫 선택지에는 안 나오고, 뽑을 수 있는 중간보스(가중치 1 이상)가 등록되어 있을 때만 나옴
+data modify storage rlk:room nw set value [{k:3,w:10},{k:4,w:8},{k:5,w:7},{k:7,w:8},{k:8,w:5},{k:10,w:9},{k:11,w:8},{k:12,w:3},{k:13,w:7},{k:14,w:8},{k:15,w:7}]

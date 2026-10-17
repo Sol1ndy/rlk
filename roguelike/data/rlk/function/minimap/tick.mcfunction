@@ -9,6 +9,8 @@ execute if entity @a[tag=player,scores={pkMode=1..}] run scoreboard players set 
 execute if entity @a[tag=player,scores={vMap=1..}] run scoreboard players set #mmShow mm 0
 # Boss fight: Narukami is there (any phase, arena or test), or the player is in a boss zone.
 execute if entity @e[tag=rlk_raiden,limit=1] run scoreboard players set #mmShow mm 0
+# Mid-boss fight: the player is in the separate circular arena, outside the grid.
+execute if score #mbOn mb matches 1 run scoreboard players set #mmShow mm 0
 execute if score #mmShow mm matches 0 run return run bossbar set rlk:minimap visible false
 execute unless score #mmBuilt mm matches 1 run function rlk:minimap/build
 function rlk:minimap/signature

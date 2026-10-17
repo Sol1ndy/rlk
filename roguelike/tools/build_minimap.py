@@ -22,7 +22,7 @@ Datapack (data/rlk/function/minimap/): init (load), build (after room/gen, or on
 reload: which zone owns each cell, same-zone connectors), tick (from rlk:tick: every 5 ticks, redraws when the
 player's cell or any zone/door state changed, at least every 2 s; only the arrow is redrawn
 when just the facing changed; hidden outside a run, in a boss zone or while Narukami is
-there, on the map screen, in selection spaces, when dead).
+there, during a mid-boss fight, on the map screen, in selection spaces, when dead).
 """
 import argparse
 import math
@@ -65,8 +65,8 @@ COLORS = {1: '#5A5A5A', 2: '#B4B4B4', 3: '#FFE08A',
           9: '#B58BE8', 10: '#B08A5A', 11: '#E05050', 12: '#8FD46A', 13: '#D9D2B8',
           14: '#4FC3C9', 15: '#E06A8A', 16: '#FFB347'}
 # zkind -> explored colour code (0 start, 1 combat, 2 last, 3 money, 4 shop, 5 sapphire,
-# 6 reforge, 7 enchant, 8 root, 9 boss, 10 levelup, 11 dice, 12 slot, 13 hp, 14 item)
-KIND_CODE = {2: 4, 3: 5, 4: 6, 5: 7, 6: 8, 7: 9, 8: 10, 9: 11, 10: 12, 11: 13, 12: 14, 13: 15, 14: 16}
+# 6 reforge, 7 enchant, 8 root, 9 boss, 10 levelup, 11 dice, 12 slot, 13 hp, 14 item, 15 mid-boss)
+KIND_CODE = {2: 4, 3: 5, 4: 6, 5: 7, 6: 8, 7: 9, 8: 10, 9: 11, 10: 12, 11: 13, 12: 14, 13: 15, 14: 16, 15: 11}
 DOOR_COLORS = {1: '#8C8C8C', 2: '#FFFFFF'}
 DOT_COLOR = '#3A2A00'    # the player arrow
 PERIOD = 2               # ticks between minimap updates
@@ -260,6 +260,8 @@ write('tick', [
     'execute if entity @a[tag=player,scores={vMap=1..}] run scoreboard players set #mmShow mm 0',
     '# Boss fight: Narukami is there (any phase, arena or test), or the player is in a boss zone.',
     'execute if entity @e[tag=rlk_raiden,limit=1] run scoreboard players set #mmShow mm 0',
+    '# Mid-boss fight: the player is in the separate circular arena, outside the grid.',
+    'execute if score #mbOn mb matches 1 run scoreboard players set #mmShow mm 0',
     'execute if score #mmShow mm matches 0 run return run bossbar set rlk:minimap visible false',
     'execute unless score #mmBuilt mm matches 1 run function rlk:minimap/build',
     'function rlk:minimap/signature',

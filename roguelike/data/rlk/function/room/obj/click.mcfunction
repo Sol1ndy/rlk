@@ -19,4 +19,6 @@ execute if score @s oact matches 10 run return run function rlk:room/obj/do_dice
 execute if score @s oact matches 11 run return run function rlk:room/obj/do_slot
 execute if score @s oact matches 12 run return run function rlk:room/obj/do_hp
 execute if score @s oact matches 13 run return run function rlk:room/obj/do_item
+# 중간보스 문(oact 14): 구역 전투 시작 → 경기장
+execute if score @s oact matches 14 run return run function rlk:mboss/gate
 execute if score @s oact matches 8 run return run function rlk:run/next_chapter

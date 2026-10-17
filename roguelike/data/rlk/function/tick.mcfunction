@@ -46,6 +46,10 @@ execute if entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/world
 execute unless entity @e[tag=rlk_raiden,limit=1] if entity @e[tag=rlk_raiden_aux,limit=1] run function rlk:boss/raiden/cleanup
 # 보스바는 서버 전체에 남으므로, 불러와진 나루카미가 없으면(런 종료·로비 복귀·청크 밖) 바로 숨긴다
 execute if score #rdBar rd matches 1 unless entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/bars_hide
+# 중간보스(tools/build_mboss_core.py): 전투 · 공격 판정 · 보스바, 몸체가 없으면 남은 보조 엔티티와 보스바 정리
+execute if entity @e[tag=rlk_mb_body,limit=1] run function rlk:mboss/world
+execute unless entity @e[tag=rlk_mb_body,limit=1] if entity @e[tag=rlk_mb_aux,limit=1] run function rlk:mboss/cleanup_aux
+execute if score #mbBar mb matches 1 unless entity @e[tag=rlk_mb_body,limit=1] run function rlk:mboss/bars_hide
 # 회복구슬 / 아이템 소환물
 execute as @e[tag=rlk_healorb] at @s run function rlk:combat/healorb_tick
 execute as @e[tag=rlk_gold] at @s run function rlk:combat/gold_tick

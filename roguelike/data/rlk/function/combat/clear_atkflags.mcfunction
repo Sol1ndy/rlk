@@ -10,3 +10,5 @@ scoreboard players set #lunar tmp 0
 scoreboard players set #rnErAdd tmp 0
 # 아이템 효과로 주는 피해 표시(각인 협동·해류·금강이 봄). 아이템 피해 함수가 피해 계산 뒤에 1 로 세우고 끝나면 내린다
 scoreboard players set #sub itv 0
+# 진짜 피해(중간보스 별 파괴 등, mboss/true_hit): 원소 · 보정 · 저항 없이 그대로
+scoreboard players set #trueDmg tmp 0

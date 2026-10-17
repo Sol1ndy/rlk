@@ -1,0 +1,36 @@
+{
+  "_doc": [
+    "Mid-boss registry (중간보스). Single source for tools/build_mboss_core.py, build_mboss_arena.py and every boss module generator.",
+    "n: stable numeric id used by the generated dispatchers F:mboss/d/<hook> (#mbId mb); never reuse a number.",
+    "enabled: false keeps an entry out of the game (no runtime registry line, no dispatch) until its module F:mboss/<id>/ exists.",
+    "w: roll weight (0 = only through #mbForce, i.e. tests). minCh/maxCh: chapter range.",
+    "hp/xp/atk: level-1 base HP, kill XP and base hit (raw damage before the hit coefficient). lvAdd: level offset over the zone formula.",
+    "dmgMul: % applied to every hit on the player. goldMul: kill gold multiplier (normal mobs x1, chapter boss x15). sap: sapphire shards on kill.",
+    "el: default element of the boss's hits (#elem numbering: 0 physical 1 pyro 2 hydro 3 electro 4 cryo 5 geo 6 anemo 7 dendro).",
+    "scale: hitbox husk scale attribute. hit: click-shield size {w,h} in blocks. intro/death: maximum intro / death-sequence ticks.",
+    "picks: item selections granted on kill (chapter rarity). icon: gate object item {item,model}. start: optional arrival override (else arena.start)."
+  ],
+  "arena": {
+    "theme": "plaza",
+    "ver": 1,
+    "cx": 200, "cy": 201, "cz": 8,
+    "r": 22, "walk": 21, "safe": 19,
+    "start": {"x": 200.5, "y": 201.0, "z": 25.5, "yaw": 180.0, "pitch": 0.0}
+  },
+  "boss": [
+    {
+      "id": "guardian", "n": 1, "enabled": false, "w": 10, "minCh": 1, "maxCh": 99,
+      "name": "파수꾼・타락", "sub": "개안자 · 세계 망루의 파수꾼", "color": "#E0B84A", "el": 5,
+      "hp": 160, "xp": 30, "atk": 12, "lvAdd": 0, "dmgMul": 130, "goldMul": 5, "sap": 1, "picks": 2,
+      "scale": 1.5, "hit": {"w": 1.6, "h": 3.4}, "intro": 80, "death": 50,
+      "icon": {"item": "minecraft:wither_skeleton_skull", "model": "minecraft:wither_skeleton_skull"}
+    },
+    {
+      "id": "proto", "n": 99, "enabled": true, "w": 0, "minCh": 1, "maxCh": 99,
+      "name": "시험용 강적", "sub": "중간보스 틀 점검용", "color": "#C9B27A", "el": 0,
+      "hp": 120, "xp": 20, "atk": 10, "lvAdd": 0, "dmgMul": 120, "goldMul": 5, "sap": 1, "picks": 2,
+      "scale": 1.4, "hit": {"w": 1.4, "h": 3.0}, "intro": 70, "death": 40,
+      "icon": {"item": "minecraft:husk_spawn_egg", "model": "minecraft:husk_spawn_egg"}
+    }
+  ]
+}

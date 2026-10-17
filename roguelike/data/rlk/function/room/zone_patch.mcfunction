@@ -14,3 +14,4 @@ execute if score @s zkind matches 11 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:wh
 execute if score @s zkind matches 12 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:cyan_concrete
 execute if score @s zkind matches 13 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:pink_concrete
 execute if score @s zkind matches 14 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:blue_concrete
+execute if score @s zkind matches 15 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:red_terracotta
