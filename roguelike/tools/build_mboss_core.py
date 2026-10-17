@@ -37,7 +37,7 @@ TOK = {
     '@FL@': f'{BX0} {BZ0} {BX0 + 47} {BZ0 + 47}',
 }
 out = L.Out(owned_dirs=['mboss/d', 'mboss/hz', 'mboss/pj', 'mboss/pull', 'mboss/mv', 'mboss/aux',
-                        'mboss/line', 'mboss/test'],
+                        'mboss/line', 'mboss/test', 'mboss/box'],
             owned_files=[])
 CORE_TOP = set()
 
@@ -97,8 +97,7 @@ def snbt_entry(b):
         'start:{x:%sd,y:%sd,z:%sd,yaw:%sf,pitch:%sf}' % tuple(L.num(float(start[k])) for k in ('x', 'y', 'z', 'yaw', 'pitch')),
         f'title:{{text:{s(b["name"])},color:{s(b["color"])},bold:true}}',
         f'gate:{{item:{s(icon["item"])},model:{s(icon["model"])},name:{s(b["name"])},'
-        f'desc:{s("좌클릭으로 도전 · 처치 시 아이템 선택 %d번" % picks)},color:{s(b["color"])}}}',
-        f'rw:{{n:{picks}}}',
+        f'desc:{s("좌클릭으로 도전 · 처치 시 아이템 상자 %d개" % picks)},color:{s(b["color"])}}}',
     ]
     return '{' + ','.join(parts) + '}'
 
@@ -483,18 +482,147 @@ function rlk:mboss/forget
 execute if score #mbRegate mb matches 1 run function rlk:room/obj/k_mboss
 ''')
 w('reward', '''
-# @s = zone marker; the player is back in the dungeon and #combat is 0, so lvup/toggle opens and
-# saves this spot as its return point. pkMb keeps character cards out of these picks (lvup/roll).
+# @s = zone marker, at @s (the 중간보스 zone centre, where the gate stood); the player is back in the dungeon.
+# No selection screen and no fanfare here: cur.picks item boxes fall onto the floor (mboss/box/*). Each box is
+# a room object (oact 15, room/obj/k_mbox); one click = one chapter-rarity, items-only pick (room/obj/do_mbox).
 title @a[tag=player] times 8 50 14
-title @a[tag=player] subtitle [{text:"아이템 선택 ",color:"#FFE08A"},{nbt:"cur.picks",storage:"rlk:mboss",color:"#FFE08A"},{text:"번 (챕터 등급)",color:"#FFE08A"}]
+title @a[tag=player] subtitle [{text:"아이템 상자 ",color:"#FFE08A"},{nbt:"cur.picks",storage:"rlk:mboss",color:"#FFE08A"},{text:"개 · 챕터 등급",color:"#FFE08A"}]
 title @a[tag=player] title [{nbt:"cur.title",storage:"rlk:mboss",interpret:true},{text:" 처치",color:"#FFE08A",bold:true}]
 scoreboard players set @a[tag=player] vBig 72
 scoreboard players set @a[tag=player] ttlT 72
-execute as @a[tag=player] at @s run playsound minecraft:ui.toast.challenge_complete master @s ~ ~ ~ 0.8 1
-execute as @a[tag=player,limit=1] run function rlk:lvup/add with storage rlk:mboss cur.rw
 execute store result score #mbPk mb run data get storage rlk:mboss cur.picks
-execute as @a[tag=player,limit=1] run scoreboard players operation @s pkMb += #mbPk mb
-execute as @a[tag=player,limit=1] at @s unless score @s pkMode matches 1.. run function rlk:lvup/toggle
+execute if score #mbPk mb matches 1.. run function rlk:mboss/box/drop_all
+''')
+
+# ---------------------------------------------------------------------------------------------
+# Reward item boxes. cur.picks vanilla chests (item_display) fall BOX_H blocks onto the zone centre in
+# BOX_F ticks (stepped tp + teleport_duration 1, light acceleration, an ease-out quarter turn that lands
+# square), one after the other, BOX_GAP apart in a row across the line from the zone centre to the player.
+# On landing each becomes the clickable room object room/obj/k_mbox (hand-written, oact 15); the click is
+# room/obj/do_mbox. Everything carries rlk_room, so room/clear (map change, run end), room/wipe and
+# uninstall remove the boxes like any other room object. room/tick runs box/all while #mbBoxOn mb is 1.
+BOX_S = 1.1            # display scale: the chest item model is 14/16 wide and tall, centred on the entity
+BOX_REST = BOX_S / 2   # display centre above the floor at rest (chest bottom on the floor)
+BOX_GAP = 1.5          # centre to centre
+BOX_H = 6.0            # drop height (blocks)
+BOX_F = 14             # fall ticks
+BOX_SPIN = 90          # yaw turned while falling (degrees, ease-out)
+BOX_STAGGER = 4        # ticks between consecutive boxes
+BOX_NMAX = max([2] + [int(b.get('picks', 2)) for b in BOSSES])
+BOX_GOLD = '{color:[1.0f,0.84f,0.36f],scale:%sf}'
+BOX_SQ = (1.12, 0.82)  # landing squash (xz, y) relative to BOX_S
+
+
+def exact_steps(total, weights, nd=4):
+    # Per-tick steps rounded to nd decimals whose sum is exactly `total`.
+    steps, acc = [], 0.0
+    for i, wt in enumerate(weights):
+        v = round(total - acc, nd) if i == len(weights) - 1 else round(total * wt / sum(weights), nd)
+        steps.append(v)
+        acc = round(acc + v, nd)
+    return steps
+
+
+BOX_FALL = exact_steps(BOX_H, [0.25 / BOX_F + 0.75 * (2 * t - 1) / BOX_F ** 2 for t in range(1, BOX_F + 1)])
+BOX_TURN = exact_steps(BOX_SPIN, [2 * BOX_F - 2 * t + 1 for t in range(1, BOX_F + 1)])
+_bs = L.num(BOX_S)
+_row = []
+for n in range(1, BOX_NMAX + 1):
+    for i in range(n):
+        off = (i - (n - 1) / 2) * BOX_GAP
+        at = f' positioned ^{L.num(off)} ^ ^' if abs(off) > 1e-9 else ''
+        _row.append(f'execute if score #mbPk mb matches {n}{at} run function rlk:mboss/box/drop')
+w('box/drop_all', '\n'.join([
+    '# From mboss/reward (@s = zone marker, at @s; #mbPk mb = cur.picks >= 1). The row stands across the line from',
+    '# the zone centre to the player, its yaw snapped to the room axes, so the player sees the boxes side by side.',
+    'summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_boxq"]}',
+    'execute as @e[type=minecraft:marker,tag=rlk_mb_boxq,limit=1] at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~ 0',
+    'execute store result score #mbBoxY mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_boxq,limit=1] Rotation[0]',
+    'kill @e[type=minecraft:marker,tag=rlk_mb_boxq]',
+    '# quarter = (yaw + 225) / 90 mod 4: 0 player to the north (yaw 180), 1 east (-90), 2 south (0), 3 west (90)',
+    'scoreboard players add #mbBoxY mb 225',
+    'scoreboard players set #mbBoxQ mb 90',
+    'scoreboard players operation #mbBoxY mb /= #mbBoxQ mb',
+    'scoreboard players operation #mbBoxY mb %= #c4 mb',
+    f'execute if score #mbPk mb matches {BOX_NMAX + 1}.. run scoreboard players set #mbPk mb {BOX_NMAX}',
+    'scoreboard players set #mbBoxW mb 0',
+    'execute if score #mbBoxY mb matches 0 rotated 180 0 run function rlk:mboss/box/row',
+    'execute if score #mbBoxY mb matches 1 rotated -90 0 run function rlk:mboss/box/row',
+    'execute if score #mbBoxY mb matches 2 rotated 0 0 run function rlk:mboss/box/row',
+    'execute if score #mbBoxY mb matches 3 rotated 90 0 run function rlk:mboss/box/row',
+    'scoreboard players set #mbBoxOn mb 1',
+    f'playsound minecraft:block.amethyst_block.chime block @a[tag=player] ~ ~{L.num(BOX_H)} ~ 1 1.3',
+    f'playsound minecraft:entity.firework_rocket.twinkle_far block @a[tag=player] ~ ~{L.num(BOX_H)} ~ 0.5 1.4',
+]))
+w('box/row', '\n'.join([
+    '# @s = zone marker, positioned at the zone centre, rotated toward the player (snapped): one set of lines per',
+    f'# row size (1..{BOX_NMAX}), boxes {L.num(BOX_GAP)} b apart, dropped from the player\'s left to right.',
+] + _row))
+w('box/drop', f'''
+# @s = zone marker, positioned at this box's floor spot, rotated toward the player. item_display turns item
+# models 180 degrees, so yaw = toward the player + 180 puts the chest's latch toward the player; {BOX_SPIN} more
+# are turned back while falling. Boxes after the first wait {BOX_STAGGER} ticks each (mbT starts at 0, -{BOX_STAGGER}, ...).
+summon minecraft:item_display ~ ~{L.num(BOX_REST + BOX_H)} ~ {{Tags:["rlk_room","rlk_mb_box","rlk_mb_boxfall","rlk_mb_boxnew"],teleport_duration:1,brightness:{{sky:15,block:15}},item:{{id:"minecraft:chest",count:1}},transformation:{{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[{_bs}f,{_bs}f,{_bs}f]}}}}
+execute as @e[type=minecraft:item_display,tag=rlk_mb_boxnew] run tp @s ~ ~{L.num(BOX_REST + BOX_H)} ~ ~{180 + BOX_SPIN} 0
+scoreboard players set @e[type=minecraft:item_display,tag=rlk_mb_boxnew] mbT 0
+scoreboard players operation @e[type=minecraft:item_display,tag=rlk_mb_boxnew] mbT -= #mbBoxW mb
+tag @e[type=minecraft:item_display,tag=rlk_mb_boxnew] remove rlk_mb_boxnew
+scoreboard players add #mbBoxW mb {BOX_STAGGER}
+''')
+w('box/all', '''
+# From room/tick while #mbBoxOn mb is 1 (drop_all sets it, every box alive keeps it): fall and idle shimmer.
+scoreboard players set #mbBoxOn mb 0
+execute as @e[type=minecraft:item_display,tag=rlk_mb_box] at @s run function rlk:mboss/box/tick
+''')
+w('box/tick', '''
+# @s = box display, at @s. mbT = the box's own clock.
+scoreboard players set #mbBoxOn mb 1
+scoreboard players add @s mbT 1
+execute if entity @s[tag=rlk_mb_boxfall] run return run function rlk:mboss/box/fall
+execute if score @s mbT matches 10.. run function rlk:mboss/box/shimmer
+''')
+_fall = ['# @s = falling box, at @s. mbT <= 0: waiting for its turn up in the air (sparkles).',
+         'execute if score @s mbT matches ..0 run return run particle minecraft:end_rod ~ ~ ~ 0.2 0.2 0.2 0.01 1']
+for t, (dy, dr) in enumerate(zip(BOX_FALL, BOX_TURN), 1):
+    _fall.append(f'execute if score @s mbT matches {t} run tp @s ~ ~-{L.num(dy)} ~ ~-{L.num(dr)} ~')
+_fall += [
+    f'execute if score @s mbT matches 1..{BOX_F - 1} at @s run function rlk:mboss/box/trail',
+    f'execute if score @s mbT matches {BOX_F} at @s run function rlk:mboss/box/land',
+    f'execute if score @s mbT matches {BOX_F + 3} run data merge entity @s {{start_interpolation:0,interpolation_duration:4,'
+    f'transformation:{{translation:[0f,0f,0f],scale:[{_bs}f,{_bs}f,{_bs}f]}}}}',
+    f'execute if score @s mbT matches {BOX_F + 6}.. run function rlk:mboss/box/settle',
+]
+w('box/fall', '\n'.join(_fall))
+w('box/trail', f'''
+# Gold and white sparkles along the fall.
+particle minecraft:dust{BOX_GOLD % '1.3'} ~ ~ ~ 0.25 0.25 0.25 0 3
+particle minecraft:dust{{color:[1.0f,0.97f,0.86f],scale:0.8f}} ~ ~0.35 ~ 0.15 0.3 0.15 0 2
+particle minecraft:end_rod ~ ~0.45 ~ 0.12 0.2 0.12 0.01 1
+''')
+_sx, _sy = BOX_S * BOX_SQ[0], BOX_S * BOX_SQ[1]
+w('box/land', f'''
+# @s = box display at rest, at @s (centre {L.num(BOX_REST)} b above the floor): thud, dust puff and gold burst, a short
+# squash (bottom kept on the floor; it starts 1 t later, when the client has finished the last interpolated fall
+# step, and box/fall springs it back at {BOX_F + 3}), then the clickable room object around it (the display joins its group).
+particle minecraft:poof ~ ~-{L.num(BOX_REST - 0.05)} ~ 0.45 0.02 0.45 0.03 12
+particle minecraft:dust{BOX_GOLD % '1.6'} ~ ~-{L.num(BOX_REST - 0.1)} ~ 0.6 0.03 0.6 0 16
+particle minecraft:end_rod ~ ~0.1 ~ 0.1 0.1 0.1 0.08 8
+playsound minecraft:block.chest.close block @a[tag=player] ~ ~ ~ 0.8 0.7
+playsound minecraft:block.wood.fall block @a[tag=player] ~ ~ ~ 1 0.7
+playsound minecraft:block.anvil.land block @a[tag=player] ~ ~ ~ 0.15 1.6
+data merge entity @s {{start_interpolation:1,interpolation_duration:2,transformation:{{translation:[0f,-{L.num(0.5 * (BOX_S - _sy), 3)}f,0f],scale:[{L.num(_sx, 3)}f,{L.num(_sy, 3)}f,{L.num(_sx, 3)}f]}}}}
+tag @s add rlk_new
+execute positioned ~ ~-{L.num(BOX_REST)} ~ run function rlk:room/obj/k_mbox
+''')
+w('box/settle', '''
+tag @s remove rlk_mb_boxfall
+scoreboard players set @s mbT 0
+''')
+w('box/shimmer', f'''
+# Resting box: a soft gold shimmer every 10 ticks.
+scoreboard players set @s mbT 0
+particle minecraft:dust{BOX_GOLD % '0.9'} ~ ~0.15 ~ 0.35 0.3 0.35 0 2
+particle minecraft:end_rod ~ ~{L.num(BOX_REST)} ~ 0.25 0.1 0.25 0.004 1
 ''')
 w('cancelled', T.join(['''
 tellraw @a[tag=player] ''', gray('중간보스 전투가 취소되었습니다. (보상 없음) 문 오브젝트를 다시 누르면 재도전합니다.') + ''']
@@ -1853,7 +1981,7 @@ tellraw @s ''', gray('쓰러졌습니다. ') + ',' + link('/function rlk:mboss/t
 WON_REPLAY = link('/function rlk:mboss/test/start {id:"$(id)"}', '[다시 하기]')
 w('test/won', '\n'.join([
     '# From mboss/won during a test (with storage rlk:mboss cur).',
-    '$execute if score #mbKilled mb matches 1 run tellraw @a[tag=player] ' + TT + gray('처치! 보상 선택이 열렸습니다. ') + ',' + WON_REPLAY
+    '$execute if score #mbKilled mb matches 1 run tellraw @a[tag=player] ' + TT + gray('처치! 문 자리에 아이템 상자가 떨어졌습니다(누르면 아이템 선택). ') + ',' + WON_REPLAY
     + ',' + gray(' ') + ',' + link('/function rlk:mboss/test/stop', '[로비로]') + ']',
     'execute unless score #mbKilled mb matches 1 run tellraw @a[tag=player] ' + TT + gray('취소되었습니다(보상 없음). ') + ','
     + link('/function rlk:mboss/test/stop', '[로비로]') + ']']))

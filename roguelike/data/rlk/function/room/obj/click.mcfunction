@@ -21,4 +21,6 @@ execute if score @s oact matches 12 run return run function rlk:room/obj/do_hp
 execute if score @s oact matches 13 run return run function rlk:room/obj/do_item
 # 중간보스 문(oact 14): 구역 전투 시작 → 경기장
 execute if score @s oact matches 14 run return run function rlk:mboss/gate
+# 중간보스 아이템 상자(oact 15, 처치 뒤 문 자리에 떨어짐): 상자 하나 = 챕터 등급 아이템 선택 1번
+execute if score @s oact matches 15 run return run function rlk:room/obj/do_mbox
 execute if score @s oact matches 8 run return run function rlk:run/next_chapter
