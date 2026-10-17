@@ -1,2 +1,2 @@
-execute if score @s gdRigT matches ..16 run return run function rlk:mboss/guardian/rig/c/slam/b/0_16
-function rlk:mboss/guardian/rig/c/slam/b/20_34
+execute if score @s gdRigT matches ..15 run return run function rlk:mboss/guardian/rig/c/slam/b/0_15
+function rlk:mboss/guardian/rig/c/slam/b/16_34

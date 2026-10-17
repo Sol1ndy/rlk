@@ -138,21 +138,21 @@
       "uuid": "524c4b4d-4247-4400-8000-000000000014",
       "model": "wing_cov",
       "brightness": 13,
-      "scale": 2.2
+      "scale": 2
     },
     {
       "part": "wing_sec",
       "uuid": "524c4b4d-4247-4400-8000-000000000015",
       "model": "wing_sec",
       "brightness": 13,
-      "scale": 2.4
+      "scale": 2
     },
     {
       "part": "wing_pri",
       "uuid": "524c4b4d-4247-4400-8000-000000000016",
       "model": "wing_pri",
       "brightness": 13,
-      "scale": 2.6
+      "scale": 2.2
     },
     {
       "part": "spear",
@@ -212,8 +212,8 @@
       "loop": true,
       "next": null,
       "events": {},
-      "keyFiles": 19,
-      "keys": 125,
+      "keyFiles": 21,
+      "keys": 124,
       "note": "hover bob +0.05 b at t20; wing tiers breathe; skirt and tail sway; cubes drift"
     },
     {
@@ -223,8 +223,8 @@
       "loop": true,
       "next": null,
       "events": {},
-      "keyFiles": 11,
-      "keys": 66,
+      "keyFiles": 14,
+      "keys": 73,
       "note": "moving pose (approach, guard drift, reposition): leaning into the travel, spear level toward the target, wing swept back"
     },
     {
@@ -243,30 +243,30 @@
         "land": 65,
         "flourish": 72
       },
-      "keyFiles": 82,
-      "keys": 1258,
+      "keyFiles": 84,
+      "keys": 1286,
       "note": "body travel by the pattern code: lunge 2-3 b forward at 27-28; fly back 4-6 b at 38-54; dash 5-6 b at 57-58"
     },
     {
       "id": 3,
       "name": "javelin",
-      "len": 74,
+      "len": 76,
       "loop": false,
       "next": "idle",
       "events": {
         "spin": 0,
-        "vanish": 8,
-        "glyph": 9,
-        "beam": 26,
-        "rematerialise": 29,
-        "release": 33,
-        "launch": 34,
-        "return": 56,
-        "catch": 61
+        "vanish": 10,
+        "glyph": 11,
+        "beam": 28,
+        "rematerialise": 31,
+        "release": 35,
+        "launch": 36,
+        "return": 58,
+        "catch": 63
       },
-      "keyFiles": 69,
-      "keys": 568,
-      "note": "the rig spear is hidden from 8 to 29 and from 34 to 61; the flying spear is a prop (rig/prop/spear) moved by the pattern code"
+      "keyFiles": 71,
+      "keys": 572,
+      "note": "the rig spear is hidden from 10 to 31 and from 36 to 63; the flying spear is a prop (rig/prop/spear) moved by the pattern code"
     },
     {
       "id": 4,
@@ -283,8 +283,8 @@
         "pull": 48,
         "twirl": 54
       },
-      "keyFiles": 57,
-      "keys": 679,
+      "keyFiles": 59,
+      "keys": 706,
       "note": "disc r 5 centred 3.5 b in front; the spear stays planted (rig part) 26-48, so the body must not move then"
     },
     {
@@ -298,8 +298,8 @@
         "cage": 11,
         "relocate": 32
       },
-      "keyFiles": 36,
-      "keys": 283,
+      "keyFiles": 34,
+      "keys": 272,
       "note": "the corrupted claw casts (the left hand takes the shaft); the player is relocated at 32; follow with swing after 10-14 t (K15)"
     },
     {
@@ -315,8 +315,8 @@
         "swing2": 33,
         "swing2_end": 39
       },
-      "keyFiles": 45,
-      "keys": 639,
+      "keyFiles": 46,
+      "keys": 730,
       "note": "two full 360 degree spins with the spear level at waist height: forehand (left to right) 20-24, backhand 33-39 rising low-right to high-left"
     },
     {
@@ -327,7 +327,7 @@
       "next": "idle",
       "events": {
         "raise": 0,
-        "glint": 2,
+        "glint": 6,
         "beam": 16,
         "takeoff": 19,
         "ring": 21,
@@ -338,8 +338,8 @@
         "pull": 71,
         "twirl": 79
       },
-      "keyFiles": 81,
-      "keys": 758,
+      "keyFiles": 86,
+      "keys": 810,
       "note": "rises to +8 b at 19-23 and stays up; move the body under the locked ring during 23-39; dives at 39-41; the spear stays planted 41-71"
     },
     {
@@ -356,7 +356,7 @@
         "guard": 50
       },
       "keyFiles": 48,
-      "keys": 410,
+      "keys": 439,
       "note": "baton twirl in front (0-16), vertical spin discs to her right and front (16-35), ground ring (35-44), settle into the guard pose"
     },
     {
@@ -366,7 +366,7 @@
       "loop": true,
       "next": null,
       "events": {},
-      "keyFiles": 17,
+      "keyFiles": 19,
       "keys": 79,
       "note": "guard mode hold (100 t in the pattern): spear diagonal up-right, wing raised and opened, slight bob"
     },
@@ -382,7 +382,7 @@
         "active_end": 24
       },
       "keyFiles": 42,
-      "keys": 386,
+      "keys": 382,
       "note": "gold sweep: 19 t wind-up (spear cocked behind her right shoulder, tip toward her left), 180-210 degree front arc from her left to her right, active 19-24"
     },
     {
@@ -398,7 +398,7 @@
         "active_end": 27
       },
       "keyFiles": 48,
-      "keys": 438,
+      "keys": 433,
       "note": "enchanted sweep (call rig/spear/<element> first): enchant line 0-6, wind-up raised high to her left 7-19, active 19-27"
     },
     {
@@ -412,7 +412,7 @@
         "land": 32
       },
       "keyFiles": 27,
-      "keys": 723,
+      "keys": 683,
       "note": "leap 0-9, arcing flight 9-31 (move the body to the arena centre meanwhile), landing 32"
     },
     {
@@ -427,7 +427,7 @@
         "rise": 30,
         "hover": 36
       },
-      "keyFiles": 25,
+      "keyFiles": 24,
       "keys": 241,
       "note": "charge on the centre with the spear level (30 t), then the rise to the chaos hover (feet 3 b up)"
     },
@@ -438,7 +438,7 @@
       "loop": true,
       "next": null,
       "events": {},
-      "keyFiles": 16,
+      "keyFiles": 20,
       "keys": 82,
       "note": "chaos hold (350 t timer): arms up, spear horizontal behind the shoulders, wing spread, slow bob"
     },
@@ -454,21 +454,21 @@
         "high": 25
       },
       "keyFiles": 30,
-      "keys": 340,
-      "note": "timeout: twist with the wing swept across the front (10-14), rise 0.5-0.7 BH (21-25) and hold there; then chaos_land when the fail spears are done"
+      "keys": 328,
+      "note": "timeout (tick 0 = timer full): twist with the wing swept across the front (10-14), rise 0.5-0.7 BH (21-25) and hold; play chaos_land at tick 33 (lands at +55, between fail spear 1 at +49 and spear 2 at +80)"
     },
     {
       "id": 16,
       "name": "chaos_land",
       "len": 26,
       "loop": false,
-      "next": "idle",
+      "next": null,
       "events": {
         "land": 22
       },
       "keyFiles": 22,
-      "keys": 491,
-      "note": "descend from the chaos height to the floor at the centre, then idle"
+      "keys": 400,
+      "note": "fail: descends from the chaos height to stand on the floor at the centre, the spear still held across the shoulders (patterns.md §9.4); holds the stance. Then chaos_raise for a second fail spear, or idle / glide when the spears are done"
     },
     {
       "id": 17,
@@ -482,7 +482,7 @@
         "land": 18
       },
       "keyFiles": 17,
-      "keys": 418,
+      "keys": 423,
       "note": "second star broken: hangs 6 t, falls about 1 BH and lands on the floor (no impact), then groggy"
     },
     {
@@ -492,8 +492,8 @@
       "loop": true,
       "next": null,
       "events": {},
-      "keyFiles": 21,
-      "keys": 67,
+      "keyFiles": 22,
+      "keys": 66,
       "note": "pose A: slumped, the spear planted head-down at her right, wing drooped, halo blazing"
     },
     {
@@ -506,7 +506,7 @@
         "fold": 0,
         "getup": 34
       },
-      "keyFiles": 20,
+      "keyFiles": 22,
       "keys": 107,
       "note": "pose B: head bowed, torso folded forward, the shield swung in front of her body"
     },
@@ -521,8 +521,8 @@
         "lift": 6,
         "stance": 12
       },
-      "keyFiles": 37,
-      "keys": 325,
+      "keyFiles": 36,
+      "keys": 324,
       "note": "get-up: the wing sweeps out to its widest, she lifts into the hover and takes the spear forward"
     },
     {
@@ -538,8 +538,8 @@
         "grab": 26,
         "pull": 34
       },
-      "keyFiles": 54,
-      "keys": 497,
+      "keyFiles": 55,
+      "keys": 500,
       "note": "the spear plunges from 7 b above to the floor at 14 (damage), she fades in beside it (14-24), grabs it at 26 and pulls it out (26-34)"
     },
     {
@@ -564,16 +564,30 @@
       "loop": true,
       "next": null,
       "events": {},
-      "keyFiles": 7,
-      "keys": 39,
+      "keyFiles": 14,
+      "keys": 51,
       "note": "the official render pose (hand at mid-shaft, spear crossing the body); for screenshots and the entrance end pose"
+    },
+    {
+      "id": 24,
+      "name": "chaos_raise",
+      "len": 24,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "raise": 0,
+        "overhead": 6
+      },
+      "keyFiles": 21,
+      "keys": 263,
+      "note": "fail spear 2: from the across-the-shoulders stance she raises the spear vertically overhead in the last 0.3 s before the drop (start 6 t before it), holds, then idle"
     }
   ],
   "elements": {
     "geo": {
       "id": 0,
       "eye": "painted",
-      "glow": "#e4b43c"
+      "glow": "#f4d07c"
     },
     "pyro": {
       "id": 1,
@@ -614,5 +628,5 @@
     "gdRigSp": "spear look id",
     "gdRigY": "face/track scratch"
   },
-  "textures": 47
+  "textures": 44
 }

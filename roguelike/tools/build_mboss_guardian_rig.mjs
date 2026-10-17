@@ -8,7 +8,7 @@
 //       rebuilt from scratch on every run)
 //   tools/mboss_guardian_rig_manifest.json (parts, clips, events, API)
 //
-// Runtime model (see scratchpad mboss/rig_api.md for the contract):
+// Runtime model (the contract for the pattern code is tools/mboss_guardian_rig_api.md):
 //   * 29 item_display parts with FIXED UUIDs 524c4b4d-4247-4400-8000-0000000000NN, so every
 //     per-tick command addresses a part directly (no selector scan). All parts also carry
 //     rlk_room, rlk_mb_aux, rlk_mb_part, rlk_mb_guardian_part, rlk_mb_gp_<part>.
@@ -24,8 +24,8 @@ import {fileURLToPath} from 'node:url';
 import {paintGuardianTextures, spriteId, CARD} from './guardian_paint.mjs';
 import {partModels, PART_SCALE, checkBounds} from './guardian_geometry.mjs';
 import {solve, toDisplay} from './guardian_pose.mjs';
-import {CLIPS, DEFAULT_POSE} from './guardian_clips.mjs';
-import {slerp, lerp, qAngle, len, sub} from './guardian_rig_math.mjs';
+import {CLIPS, accumulate, sampleClip as sample} from './guardian_clips.mjs';
+import {slerp, lerp, qAngle, len, sub, add, rot, q as qEuler} from './guardian_rig_math.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const arg = n => { const i = process.argv.indexOf(n); return i < 0 ? null : process.argv[i + 1]; };
@@ -78,7 +78,7 @@ for (const n of PLAIN) item(n, n);
 // Element looks (model.md section 4). Eye: the gem/iris/field of the shield; spear: the head
 // enchanted in the element colour; glow: the aura card along the blade and shaft.
 export const ELEMENTS = {
-  geo: {id: 0, eye: null, spear: null, glow: 0xE4B43C},
+  geo: {id: 0, eye: null, spear: null, glow: 0xF4D07C},
   pyro: {id: 1, eye: 0xFF8A4C, spear: 0xFFB088, glow: 0xFF7A3C},
   hydro: {id: 2, eye: 0x5CC8FF, spear: 0x9CDCFF, glow: 0x4CB8FF},
   electro: {id: 3, eye: 0xE484FC, spear: 0xEEB4FF, glow: 0xD46CFC},
@@ -91,44 +91,20 @@ for (const [el, c] of Object.entries(ELEMENTS)) {
   item('spear_' + el, c.spear === null ? 'spear' : 'spear_e', c.spear);
   item('spear_glow_' + el, 'spear_glow', c.glow);
 }
-item('trail', 'trail', 0xF4D27A);
+// Afterimage cards take the spear look's glow colour (spear/<el> swaps them with the spear).
+const TRAIL_GOLD = 0xF4D27A;
+item('trail', 'trail', TRAIL_GOLD);
+for (const [el, c] of Object.entries(ELEMENTS)) item('trail_' + el, 'trail', el === 'geo' ? TRAIL_GOLD : c.glow);
 // Props share the spear model (not rig parts): javelin flight, planted spear, giant fail spears.
 item('prop_spear', 'spear');
 for (const el of ['red', 'gold', 'hydro', 'electro', 'cryo', 'pyro']) item('prop_spear_' + el, el === 'gold' ? 'spear' : 'spear_e', el === 'gold' ? null : ELEMENTS[el].spear);
 
-// ---- clip sampling -------------------------------------------------------------------------
-const EASE = {io: u => u * u * (3 - 2 * u), i: u => u * u, o: u => 1 - (1 - u) * (1 - u), l: u => u};
-function accumulate(clip) {
-  let prev = structuredClone(DEFAULT_POSE);
-  return clip.keys.map(([tick, pose, ease]) => { prev = {...prev, ...structuredClone(pose)}; return {tick, p: prev, ease: ease || 'io'}; });
-}
-function blend(a, b, u) {
-  const o = {};
-  for (const key of Object.keys(DEFAULT_POSE)) {
-    const x = a[key], y = b[key];
-    if (typeof x === 'string') o[key] = u < 1 ? x : y;
-    else if (typeof x === 'number') o[key] = x + (y - x) * u;
-    else if (x.length === 4) o[key] = slerp(x, y, u);
-    else o[key] = lerp(x, y, u);
-  }
-  return o;
-}
-function sample(clip, t, ks = accumulate(clip)) {
-  if (t <= ks[0].tick) return {...ks[0].p, ph: t / 40};
-  for (let i = 1; i < ks.length; i++) if (t <= ks[i].tick) {
-    const a = ks[i - 1], b = ks[i], u = (t - a.tick) / Math.max(1e-9, b.tick - a.tick);
-    const p = blend(a.p, b.p, EASE[b.ease](u));
-    // discrete channels switch exactly at their key
-    for (const key of ['rHand', 'lHand']) p[key] = t >= b.tick ? b.p[key] : a.p[key];
-    return {...p, ph: t / 40};
-  }
-  return {...ks[ks.length - 1].p, ph: t / 40};
-}
+// ---- clip sampling (guardian_clips.mjs) ------------------------------------------------------
 const TRAIL_LAG = [1, 2].map(n => .55 * n), TRAIL_TAPER = [.72, .45];
-function frame(clip, t, ks) {
+function frame(clip, t, ks, prev = null) {
   const warns = [];
   const p = sample(clip, t, ks);
-  const o = solve(p, {warn: m => warns.push(m)});
+  const o = solve(p, {warn: m => warns.push(m), prev});
   for (const [i, lag] of TRAIL_LAG.entries()) {
     const tt = Math.max(0, t - lag), pp = sample(clip, tt, ks);
     const sp = solve(pp).spear;
@@ -137,7 +113,51 @@ function frame(clip, t, ks) {
   }
   const d = {};
   for (const [n] of PARTS) d[n] = toDisplay(n, o[n], n.startsWith('trail') ? 'trail_1' : n);
-  return {d, p, warns};
+  return {d, p, o, warns, bend: o._bend};
+}
+// All frames of a clip in order (the arm IK carries its bend plane from frame to frame).
+function clipFrames(clip, ks = accumulate(clip)) {
+  const out = [];
+  for (let t = 0; t <= clip.len; t++) out.push(frame(clip, t, ks, t ? out[t - 1].bend : null));
+  return out;
+}
+// Finial-on-face check (every clip, every tick): the butt finial is a red 4-point star like the
+// face diamond, so it must never sit in front of the face, where it reads as a second face.
+// Points on the spear axis below the grip (blocks): finial centre, finial end, orbit star.
+const BUTT_POINTS = [-.95, -1.14, -1.29];
+const FACE = [0, .158, -.12];                       // face diamond from the head pivot (rig frame)
+function buttViolations(clip, frames) {
+  const out = [];
+  frames.forEach((f, t) => {
+    const {o, p} = f, sp = o.spear;
+    if (p.spearS < .5 || p.vis < .5 || p.bodyVis < .5) return;
+    const R0 = qEuler(p.rot), inv = [-R0[0], -R0[1], -R0[2], R0[3]];
+    const face = add(o.head.t, rot(o.head.q, FACE));
+    for (const y of BUTT_POINTS) {
+      const w = add(sp.t, rot(sp.q, [0, y * sp.s[1], 0]));
+      const d = rot(inv, sub(w, face));                 // body frame, -Z forward
+      if (Math.abs(d[0]) < .22 && d[1] > -.35 && d[1] < .12 && d[2] < .05) { out.push(`${clip.name} t${t}: spear butt ${y} b at [${d.map(v => v.toFixed(2))}] from the face`); break; }
+    }
+  });
+  return out;
+}
+// Per-tick rotation check: no part may turn more than MAX_STEP_DEG between two ticks (the
+// client slerps each step the short way; near 180 degrees that path is undefined and a twist
+// or an IK flip shows as a pop through the body). Trails follow the spear and are skipped.
+const MAX_STEP_DEG = 120;
+const shown = v => v.s.some(x => Math.abs(x) > 1e-4);
+function stepViolations(clip, frames) {
+  const out = [];
+  for (const [n] of PARTS) {
+    if (n.startsWith('trail')) continue;
+    for (let t = 1; t < frames.length; t++) {
+      const a = frames[t - 1].d[n], b = frames[t].d[n];
+      if (!shown(a) || !shown(b)) continue;
+      const ang = qAngle(a.q, b.q);
+      if (ang > MAX_STEP_DEG) out.push(`${clip.name} ${n} t${t - 1}->${t}: ${ang.toFixed(0)} degrees`);
+    }
+  }
+  return out;
 }
 // Tolerances for the client-side interpolation check (display space).
 const TOL_T = .012, TOL_S = .015;
@@ -150,12 +170,25 @@ function close(x, y, n) {
   if (Math.max(...x.s.map((v, i) => Math.abs(v - y.s[i]))) > TOL_S * Math.max(1, big)) return false;
   return qAngle(x.q, y.q) <= (TOL_R[n] ?? 1.6);
 }
-function segments(seq, n, minFirst) {
-  const L = seq.length - 1, out = [];
+// A segment never spans more than MAX_SEG_DEG of rotation: near 180 degrees the client's
+// shortest-path slerp has no stable direction (the sign of a cosine of about 1e-9 decides it),
+// so spins get a key every tick. The fit is checked on the values as written (5 decimals).
+// A segment that still turns more than this (a 1-tick step, or the forced blend-in) fails the
+// build. Large 1-tick steps are also checked at the half tick: where the client's slerp leaves
+// the authored path by more than SUB_TOL degrees (an elbow passing through the body) it warns.
+const MAX_SEG_DEG = 120, SUB_TOL = 35;
+const r5 = x => (Math.abs(x) < 5e-7 ? 0 : +x.toFixed(5));
+const written = v => ({t: v.t.map(r5), q: v.q.map(r5), s: v.s.map(r5)});
+function segments(raw, n, minFirst) {
+  const seq = raw.map(written), L = seq.length - 1, out = [];
   let a = 0;
   while (a < L) {
     let b = a + 1;
-    const fits = bb => { for (let t = a + 1; t < bb; t++) if (!close(interp(seq[a], seq[bb], (t - a) / (bb - a)), seq[t], n)) return false; return true; };
+    const fits = bb => {
+      if (qAngle(seq[a].q, seq[bb].q) > MAX_SEG_DEG - 2) return false;
+      for (let t = a + 1; t < bb; t++) if (!close(interp(seq[a], seq[bb], (t - a) / (bb - a)), seq[t], n)) return false;
+      return true;
+    };
     while (b + 1 <= L && fits(b + 1)) b++;
     if (a === 0 && b < minFirst) b = Math.min(L, minFirst);
     out.push([a, b]);
@@ -175,7 +208,7 @@ const swapLine = (part, model) => `data modify entity ${uuidOf(part)} item.compo
 const debugDp = arg('--debug-dp') && path.resolve(arg('--debug-dp'));
 if (debugDp) fs.rmSync(path.join(debugDp, 'data/rlk/function/gd_dbg'), {recursive: true, force: true});
 const putDebug = (n, lines) => put(path.join(debugDp, 'data/rlk/function', n + '.mcfunction'), lines.join('\n'));
-const clipInfo = [], allWarn = new Set();
+const clipInfo = [], allWarn = new Set(), buttErrors = [], motionErrors = [];
 CLIPS.forEach((c, id) => { c.id = id; });
 const byName = Object.fromEntries(CLIPS.map(c => [c.name, c]));
 for (const c of CLIPS) {
@@ -183,14 +216,24 @@ for (const c of CLIPS) {
   if (c.keys[c.keys.length - 1][0] !== c.len) throw new Error(`clip ${c.name}: last key ${c.keys[c.keys.length - 1][0]} != len ${c.len}`);
   if (c.next && !byName[c.next]) throw new Error(`clip ${c.name}: unknown next ${c.next}`);
   const ks = accumulate(c);
-  const frames = Array.from({length: c.len + 1}, (_, t) => frame(c, t, ks));
+  const frames = clipFrames(c, ks);
   frames.forEach((f, t) => f.warns.forEach(w => allWarn.add(`${c.name} t${t}: ${w}`)));
+  buttErrors.push(...buttViolations(c, frames));
+  motionErrors.push(...stepViolations(c, frames));
   const byTick = new Map();
   const add = (t, line) => { if (!byTick.has(t)) byTick.set(t, []); byTick.get(t).push(line); };
   let keyCount = 0;
   for (const [n] of PARTS) {
     const seq = frames.map(f => f.d[n]);
     for (const [a, b] of segments(seq, n, c.blend ?? 3)) {
+      const turn = qAngle(seq[a].q, seq[b].q);
+      if (turn > MAX_SEG_DEG && shown(seq[b]) && shown(seq[a]) && !n.startsWith('trail'))
+        motionErrors.push(`${c.name} ${n} t${a}-${b}: ${turn.toFixed(0)} degree key (ambiguous slerp)`);
+      if (b - a === 1 && turn > 45 && shown(seq[a]) && shown(seq[b])) {
+        const mid = frame(c, a + .5, ks, frames[a].bend).d[n];
+        const dev = qAngle(slerp(seq[a].q, seq[b].q, .5), mid.q);
+        if (dev > SUB_TOL) allWarn.add(`${c.name} ${n} t${a}-${b}: the client path leaves the authored one by ${dev.toFixed(0)} degrees at the half tick`);
+      }
       add(a, `data merge entity ${uuidOf(n)} {start_interpolation:0,interpolation_duration:${b - a},transformation:${nbt(seq[b])}}`);
       keyCount++;
     }
@@ -222,6 +265,14 @@ for (const c of CLIPS) {
   fn(`start/${c.name}`, [`# Internal: chain into ${c.name} now (tick 0 applied immediately). @s = rig anchor.`, `scoreboard players set @s gdRigC ${c.id}`, 'scoreboard players set @s gdRigT 0', `function ${NS}/c/${c.name}/k/0`]);
   clipInfo.push({id: c.id, name: c.name, len: c.len, loop: !!c.loop, next: c.next || null, events: c.events || {}, keyFiles: ticks.length, keys: keyCount, note: c.note || ''});
 }
+if (motionErrors.length) {
+  const msg = `part rotations above ${MAX_STEP_DEG} degrees per tick or per key:\n  ` + motionErrors.slice(0, 120).join('\n  ') + (motionErrors.length > 120 ? `\n  ... ${motionErrors.length} in all` : '');
+  if (flag('--allow-steps')) console.warn(msg); else throw new Error(msg);
+}
+if (buttErrors.length) {
+  const msg = 'spear butt finial in front of the face:\n  ' + buttErrors.slice(0, 30).join('\n  ') + (buttErrors.length > 30 ? `\n  ... ${buttErrors.length} frames` : '');
+  if (flag('--allow-butt')) console.warn(msg); else throw new Error(msg);
+}
 // global dispatch on the clip id
 {
   const ids = CLIPS.map(c => c.id);
@@ -235,20 +286,23 @@ for (const c of CLIPS) {
 }
 
 // ---- API functions -----------------------------------------------------------------------
-const rest = frame(byName.idle, 0, accumulate(byName.idle)).d;
+const rest = clipFrames(byName.idle)[0].d;
 const TAGS = n => `["rlk_room","rlk_mb_aux","rlk_mb_part","rlk_mb_guardian_part","rlk_mb_gp_${n}"]`;
-const summon = ([n, model, bright]) => `summon minecraft:item_display ~ ~ ~ {UUID:${uuidInts(n)},Tags:${TAGS(n)},billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:2.5f,width:16f,height:16f,shadow_radius:0f,brightness:{block:${bright},sky:15},transformation:${nbt(rest[n])},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId(model)}"}}}`;
+const summon = ([n, model, bright], hidden = false) => `summon minecraft:item_display ~ ~ ~ {UUID:${uuidInts(n)},Tags:${TAGS(n)},billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:2.5f,width:16f,height:16f,shadow_radius:0f,brightness:{block:${bright},sky:15},transformation:${nbt(hidden ? {...rest[n], s: [0, 0, 0]} : rest[n])},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId(model)}"}}}`;
 fn('init', ['# Rig objectives. Safe to call on every load.', ...['gdRigC', 'gdRigT', 'gdRigF', 'gdRigEye', 'gdRigSp', 'gdRigY'].map(o => `scoreboard objectives add ${o} dummy`)]);
-fn('spawn', ['# @s = rig anchor (the boss body), positioned and rotated where she should appear.',
-  '# Summons the 29 parts with fixed UUIDs in the idle pose and starts the idle clip.',
-  `function ${NS}/init`, `function ${NS}/kill`, ...PARTS.map(summon),
-  `scoreboard players set @s gdRigC ${byName.idle.id}`, 'scoreboard players set @s gdRigT 0', 'scoreboard players set @s gdRigF 0',
+const spawnTail = [`scoreboard players set @s gdRigC ${byName.idle.id}`, 'scoreboard players set @s gdRigT -1', 'scoreboard players set @s gdRigF 0',
   'execute unless score @s gdRigEye matches 0.. run scoreboard players set @s gdRigEye 0',
   'execute unless score @s gdRigSp matches 0.. run scoreboard players set @s gdRigSp 0',
   `function ${NS}/look_apply`,
-  `execute rotated as @s rotated ~ 0 run function ${NS}/follow`]);
+  `execute rotated as @s rotated ~ 0 run function ${NS}/follow`];
+fn('spawn', ['# @s = rig anchor (the boss body), positioned and rotated where she should appear.',
+  '# Summons the 29 parts with fixed UUIDs in the idle pose and queues idle from its tick 0 (the next rig/tick).',
+  `function ${NS}/init`, `function ${NS}/kill`, ...PARTS.map(summon), ...spawnTail]);
+fn('spawn_hidden', ['# Like spawn, but every part starts at scale 0 (nothing shows). Play the opening clip in the',
+  '# same tick (e.g. play/entrance): its first key brings the parts in. @s = rig anchor.',
+  `function ${NS}/init`, `function ${NS}/kill`, ...PARTS.map(p => summon(p, true)), ...spawnTail]);
 fn('follow', ['# Parts follow the executor position and yaw (run rotated as the anchor, pitch 0).', ...PARTS.map(([n]) => `tp ${uuidOf(n)} ~ ~ ~ ~ ~`)]);
-fn('tick', ['# @s = rig anchor, at its feet. Once per game tick.',
+fn('tick', ['# @s = rig anchor, at its feet. Once per game tick. Missing parts respawn in idle (the clip restarts as idle).',
   `execute unless entity ${uuidOf('torso')} run function ${NS}/spawn`,
   `execute rotated as @s rotated ~ 0 run function ${NS}/follow`,
   'scoreboard players add @s gdRigT 1',
@@ -266,7 +320,8 @@ const elNames = Object.keys(ELEMENTS);
 for (const el of elNames) {
   const id = ELEMENTS[el].id;
   fn(`eye/${el}`, [`# Shield eye in the ${el} colour. @s = rig anchor.`, `scoreboard players set @s gdRigEye ${id}`, swapLine('shield_eye', 'shield_eye_' + el)]);
-  fn(`spear/${el}`, [`# Spear enchant: ${el}. @s = rig anchor.`, `scoreboard players set @s gdRigSp ${id}`, swapLine('spear', 'spear_' + el), swapLine('spear_glow', 'spear_glow_' + el)]);
+  fn(`spear/${el}`, [`# Spear enchant: ${el}. @s = rig anchor.`, `scoreboard players set @s gdRigSp ${id}`, swapLine('spear', 'spear_' + el), swapLine('spear_glow', 'spear_glow_' + el),
+    swapLine('trail_1', 'trail_' + el), swapLine('trail_2', 'trail_' + el)]);
   fn(`tint/${el}`, [`# Shield eye and spear both in the ${el} look. @s = rig anchor.`, `function ${NS}/eye/${el}`, `function ${NS}/spear/${el}`]);
 }
 fn('look_apply', ['# Re-applies the stored eye/spear looks (after a respawn). @s = rig anchor.',
@@ -277,14 +332,20 @@ fn('eye/by_elem', ['# Eye look from #elem-style ids in @s gdRigEye (0 geo, 1 pyr
 fn('face/player', ['# Turn the anchor to face the nearest player (yaw only). @s = rig anchor.',
   'execute facing entity @p[gamemode=!spectator] feet run rotate @s ~ 0']);
 fn('face/track', ['# Turn the anchor toward the nearest player by at most 12 degrees per call. @s = rig anchor.',
+  '# Both yaws are normalised into [-180, 180) first, so the stored yaw never drifts past one turn.',
+  'scoreboard players set #c36000 gdRigY 36000',
   'execute store result score #yaw gdRigY run data get entity @s Rotation[0] 100',
+  'scoreboard players add #yaw gdRigY 18000',
+  'scoreboard players operation #yaw gdRigY %= #c36000 gdRigY',
+  'execute if score #yaw gdRigY matches ..-1 run scoreboard players add #yaw gdRigY 36000',
+  'scoreboard players remove #yaw gdRigY 18000',
   'execute facing entity @p[gamemode=!spectator] feet run summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_aux","rlk_mb_gd_face"]}',
   'execute as @e[type=marker,tag=rlk_mb_gd_face,limit=1] at @s facing entity @p[gamemode=!spectator] feet run rotate @s ~ 0',
   'execute store result score #yawT gdRigY run data get entity @e[type=marker,tag=rlk_mb_gd_face,limit=1] Rotation[0] 100',
   'kill @e[type=marker,tag=rlk_mb_gd_face]',
   'scoreboard players operation #yawT gdRigY -= #yaw gdRigY',
   'execute if score #yawT gdRigY matches 18000.. run scoreboard players remove #yawT gdRigY 36000',
-  'execute if score #yawT gdRigY matches ..-18000 run scoreboard players add #yawT gdRigY 36000',
+  'execute if score #yawT gdRigY matches ..-18001 run scoreboard players add #yawT gdRigY 36000',
   'execute if score #yawT gdRigY matches 1201.. run scoreboard players set #yawT gdRigY 1200',
   'execute if score #yawT gdRigY matches ..-1201 run scoreboard players set #yawT gdRigY -1200',
   'scoreboard players operation #yaw gdRigY += #yawT gdRigY',
@@ -308,5 +369,5 @@ json(path.join(here, 'mboss_guardian_rig_manifest.json'), {
 });
 for (const w of [...allWarn].slice(0, 40)) console.warn('warn:', w);
 const files = clipInfo.reduce((a, c) => a + c.keyFiles, 0);
-console.log(`Built the Corrupted Guardian rig: ${PARTS.length} parts, ${CLIPS.length} clips, ${files} key files, ${clipInfo.reduce((a, c) => a + c.keys, 0)} part keys${allWarn.size ? `, ${allWarn.size} reach warnings` : ''}.`);
+console.log(`Built the Corrupted Guardian rig: ${PARTS.length} parts, ${CLIPS.length} clips, ${files} key files, ${clipInfo.reduce((a, c) => a + c.keys, 0)} part keys${allWarn.size ? `, ${allWarn.size} warnings` : ''}.`);
 if (debugDp) fs.cpSync(rigDir, path.join(debugDp, 'data/rlk/function/mboss/guardian/rig'), {recursive: true});

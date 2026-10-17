@@ -13,7 +13,7 @@
 //   halo, glow    halo and halo glow scale; fx spear glow (0 = off); trail 0/1; vis overall,
 //                 bodyVis everything but the spear (entrance, death)
 //   cubes         spread of the floating body cubes; rHand / lHand discrete hand models
-import {add, sub, times, lerp, dot, cross, len, unit, mul, q, rot, slerp, basisQ, aimQ, ik, toDisplayT, toDisplayQ} from './guardian_rig_math.mjs';
+import {add, sub, times, lerp, dot, cross, len, unit, mul, q, rot, slerp, basisQ, aimQ, ik, armFront, steadyPerp, toDisplayT, toDisplayQ} from './guardian_rig_math.mjs';
 import {PART_SCALE} from './guardian_geometry.mjs';
 
 export const ROOT_PIVOT = [0, 1.9, 0];
@@ -27,7 +27,10 @@ const toQ = v => (v.length === 4 ? v : q(v));
 // wrist to the shaft.
 function fistQ(T, F) { const Y = times(F, -1); return basisQ(T, Y, cross(T, Y)); }
 
-export function solve(p, {warn} = {}) {
+// prev: the previous frame's arm bend directions {rV, lV} (IK continuity, see ik()), fist
+// directions {rF, lF} and segment roll references {rU, rFo, lU, lFo} (steadyPerp); the result
+// carries this frame's in o._bend.
+export function solve(p, {warn, prev = null} = {}) {
   const o = {};
   const R0 = q(p.rot), shift = p.pos;
   const P = q(p.pelvis);
@@ -53,27 +56,37 @@ export function solve(p, {warn} = {}) {
   // spear and right arm
   const S = toQ(p.spear), T = rot(S, [0, 1, 0]), G = p.grip;
   part('spear', sub(G, times(T, p.sAt)), S, p.spearS);
-  part('spear_glow', sub(G, times(T, p.sAt)), S, p.fx > .01 && p.spearS > .01 ? [p.fx, 1, p.fx] : 0);
-  const Fr = unit(perp(sub(G, Rs), T));
+  // glow width grows gently with fx (idle 0.55 -> about 0.4 b of aura around the blade)
+  const gw = .7 + .4 * p.fx;
+  part('spear_glow', sub(G, times(T, p.sAt)), S, p.fx > .01 && p.spearS > .01 ? [gw * p.spearS, p.spearS, gw * p.spearS] : 0);
+  // fist reference: from the shoulder to the shaft, or toward rPalm where a clip sets it (spins)
+  const kP = Math.min(1, len(p.rPalm)), Fref = kP > 1e-3 ? add(times(unit(sub(G, Rs)), 1 - kP), times(unit(p.rPalm), kP)) : sub(G, Rs);
+  const Fr = steadyPerp(Fref, T, prev && prev.rF, front);
   const gripW = sub(G, times(Fr, HAND_GRIP)), gripQ = fistQ(T, Fr);
   const rW = lerp(gripW, p.rw, p.rFree);
   const rQ = p.rFree > 0 ? slerp(gripQ, toQ(p.rq), p.rFree) : gripQ;
-  const RA = ik(Rs, rW, ...R_ARM, p.rPole);
+  const RA = ik(Rs, rW, ...R_ARM, p.rPole, prev && prev.rV);
   if (warn && RA.short > .02) warn(`right wrist out of reach by ${RA.short.toFixed(2)} b`);
-  part('r_upper', Rs, aimQ(sub(RA.E, Rs), front), [1, len(sub(RA.E, Rs)) / R_ARM[0], 1]);
-  part('r_fore', RA.E, aimQ(sub(RA.W, RA.E), front), [1, len(sub(RA.W, RA.E)) / R_ARM[1], 1]);
+  // segment roll: the inside of the bend faces the segment front (armFront), turning at most
+  // 55 degrees per frame about the segment (steadyPerp), so a moving bend plane cannot spin it
+  const roll = (dir, v, key) => steadyPerp(armFront(dir, v, front), unit(dir), prev && prev[key]);
+  const rU = roll(sub(RA.E, Rs), RA.v, 'rU'), rFo = roll(sub(RA.W, RA.E), RA.v, 'rFo');
+  part('r_upper', Rs, aimQ(sub(RA.E, Rs), rU), [1, len(sub(RA.E, Rs)) / R_ARM[0], 1]);
+  part('r_fore', RA.E, aimQ(sub(RA.W, RA.E), rFo), [1, len(sub(RA.W, RA.E)) / R_ARM[1], 1]);
   part('r_hand', RA.W, rQ, 1);
-  part('cubes_a', add(lerp(Rs, RA.E, .5), add(rot(Tq, [-.18, .14, .05]), [0, Math.sin(p.ph * 2 * Math.PI + 1.3) * .06, 0])), mul(Tq, q([0, 40 * Math.sin(p.ph * 2 * Math.PI + .7), 15])), p.cubes);
+  // cubes peel off the top-back of the corrupted shoulder (model.md §3.9), clear of the arm
+  part('cubes_a', add(Rs, add(rot(Tq, [-.17, .1, .12]), [0, Math.sin(p.ph * 2 * Math.PI + 1.3) * .05, 0])), mul(Tq, q([0, 40 * Math.sin(p.ph * 2 * Math.PI + .7), 15])), p.cubes);
   // left arm: free claw or a hand on the shaft
   const LG = add(G, times(T, p.lAt));
-  const Fl = unit(perp(sub(LG, Ls), T));
+  const Fl = steadyPerp(sub(LG, Ls), T, prev && prev.lF, front);
   const lGripW = sub(LG, times(Fl, HAND_GRIP)), lGripQ = fistQ(T, Fl);
   const lW = lerp(p.lw, lGripW, p.lOn);
   const lQ = slerp(toQ(p.lq), lGripQ, p.lOn);
-  const LA = ik(Ls, lW, ...L_ARM, p.lPole);
+  const LA = ik(Ls, lW, ...L_ARM, p.lPole, prev && prev.lV);
   if (warn && p.lOn > .5 && LA.short > .02) warn(`left wrist out of reach by ${LA.short.toFixed(2)} b`);
-  part('l_upper', Ls, aimQ(sub(LA.E, Ls), front), [1, len(sub(LA.E, Ls)) / L_ARM[0], 1]);
-  part('l_fore', LA.E, aimQ(sub(LA.W, LA.E), front), [1, len(sub(LA.W, LA.E)) / L_ARM[1], 1]);
+  const lU = roll(sub(LA.E, Ls), LA.v, 'lU'), lFo = roll(sub(LA.W, LA.E), LA.v, 'lFo');
+  part('l_upper', Ls, aimQ(sub(LA.E, Ls), lU), [1, len(sub(LA.E, Ls)) / L_ARM[0], 1]);
+  part('l_fore', LA.E, aimQ(sub(LA.W, LA.E), lFo), [1, len(sub(LA.W, LA.E)) / L_ARM[1], 1]);
   part('l_hand', LA.W, lQ, 1);
   // bracket, shield, wing
   const B = add(WAIST, rot(Tq, [.28, .64, .06])), Bq = mul(mul(Tq, q(p.bracket)), BRACKET_REST);
@@ -96,6 +109,7 @@ export function solve(p, {warn} = {}) {
     const k = p.vis * (n.startsWith('spear') ? 1 : p.bodyVis);
     if (k !== 1) { v.t = add(c, times(sub(v.t, c), n.startsWith('spear') ? p.vis : k)); v.s = times(v.s, k); }
   }
+  Object.defineProperty(o, '_bend', {value: {rV: RA.v, lV: LA.v, rF: Fr, lF: Fl, rU, rFo, lU, lFo}, enumerable: false});
   return o;
 }
 // Rig frame -> display transform {t, q, s} with the part's display scale applied.

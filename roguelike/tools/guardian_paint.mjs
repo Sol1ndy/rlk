@@ -13,13 +13,16 @@
 //   gd_shield / gd_shield_eye                 the eye shield (gold frame) / its gem+iris+field
 //                                             painted in luminance for element tints
 //   gd_spear_head / gd_spear_head_e           spear head (gold) / enchanted luminance version
-//   gd_spear_edge, gd_spear_gem, gd_spear_star, gd_shaft   spear details
+//   gd_spear_edge, gd_spear_star, gd_shaft   spear details
 //   gd_halo (opaque ring) / gd_halo_glow (glow)
 //   gd_crest / gd_crest_side                  winged crest with the red diamond face and eye
 //   gd_belt, gd_skirt_front, gd_skirt_side, gd_hip_wing, gd_tail, gd_skirt_back
-//   gd_chest, gd_chest_back, gd_collar        torso cards
-//   gd_corrupt, gd_corrupt_b, gd_vox, gd_vox_rune, gd_white, gd_sleeve, gd_gold, gd_gold_dark,
-//   gd_gauntlet, gd_redstar, gd_blackstar, gd_joint, gd_talon, gd_talon_gold, gd_pauldron
+//   gd_chest, gd_chest_back                   torso cards
+//   gd_larm_up / gd_larm_fore                 left-arm silhouettes (white sleeve under a gold plate /
+//                                             amber gauntlet), shown on crossed cards
+//   gd_cap                                    sphere-painted disc for the rounded gold caps
+//   gd_corrupt, gd_corrupt_b, gd_vox, gd_vox_rune, gd_gold, gd_gold_dark, gd_redstar,
+//   gd_blackstar, gd_joint, gd_talon, gd_talon_gold, gd_shaft, gd_redcore, gd_dark
 //   gd_spear_glow, gd_trail                   (glow) aura and afterimage cards
 import fs from 'node:fs';
 import path from 'node:path';
@@ -30,7 +33,7 @@ import {
 } from './guardian_paint_lib.mjs';
 
 const PAL = {
-  goldHi: C('#f8efcc'), goldLit: C('#dfc88e'), goldMid: C('#bb9c60'), goldDark: C('#8e6c3a'), goldDeep: C('#503518'), goldLine: C('#26150a'),
+  goldHi: C('#fbefc8'), goldLit: C('#ebc883'), goldMid: C('#c89c56'), goldDark: C('#92672f'), goldDeep: C('#553419'), goldLine: C('#26150a'),
   spCore: C('#fff8de'), spLit: C('#f9e7a6'), spMid: C('#f0c878'), spEdge: C('#d99a4e'), barb: C('#b96b22'), shaft: C('#c9a35e'),
   gem: C('#c83a28'), gemDark: C('#5a0f0a'), glint: C('#fff4e0'), butt: C('#d8553a'),
   eyeCore: C('#fff6e2'), bezel: C('#f2a060'), iris: C('#f7bc5c'), field: C('#4a1703'),
@@ -66,7 +69,10 @@ const outlineMix = (c, edge, px, col = PAL.goldLine, w = 1.2) => (edge < px * w 
 const WR = rng(9127);
 const jit = (v, k) => v * (1 + (WR() - .5) * 2 * k);
 // primaries: inner ones shorter, the outer edge longest; secondaries hang nearer vertical
-const WING_PRI = Array.from({length: 8}, (_, i) => [2.0 + .7 * i + (WR() - .5) * .3, 1.9 - .14 * i, 20 + 4.3 * i + (WR() - .5) * 2.5, jit(12.6 + .72 * i, .04), jit(1.32, .07)]);
+// irregular spacing: the primaries come in loose pairs with gaps between the tips and varied
+// lengths (m3 f1530), the outer edge longest
+const WING_PRI = [[2.0, 1.9, 17, 12.0], [2.6, 1.8, 20, 11.2], [3.5, 1.62, 26.5, 13.2], [4.05, 1.54, 29, 12.3],
+  [4.95, 1.36, 35.5, 14.2], [5.45, 1.28, 38, 13.1], [6.35, 1.1, 44, 15.4], [6.9, 1.02, 47, 14.8]].map(([x, y, a, L]) => [x, y, a, L, jit(1.3, .07)]);
 const WING_SEC = Array.from({length: 8}, (_, i) => [.1 + .4 * i + (WR() - .5) * .2, .45 + .14 * i, 4 + 3.0 * i + (WR() - .5) * 2, jit(9.2 + .45 * i, .05), jit(1.25, .07)]);
 const WING_COV = Array.from({length: 8}, (_, i) => [.3 + .62 * i, 2.2 + .3 * i, 8 + 5.5 * i + (WR() - .5) * 3, jit(3.4 + .12 * i, .06), jit(1.05, .06)]);
 function wingFeathers(list, kind) {
@@ -121,7 +127,7 @@ function lerpN(a, b, t) { return a + (b - a) * t; }
 // Hollow 4-point star frame centred at SC: long points left/right, the vertical points poke out
 // through the almond; outer and inner concave stars bound the gold band.
 const SC = [-2.3, -.1];
-const STAR = {L: 9.4, R: 8.2, U: 8.9, D: 8.3, p: .78, k: .7};
+const STAR = {L: 9.4, R: 8.2, U: 8.9, D: 8.3, p: .66, k: .66};
 function starBand(x, y) {
   const dx = x - SC[0], dy = y - SC[1];
   const rx = dx < 0 ? STAR.L : STAR.R, ry = dy > 0 ? STAR.U : STAR.D;
@@ -132,7 +138,8 @@ function starBand(x, y) {
 // cream-gold blade feathers on the trailing (lower right) rim, one on the upper right
 const SH_BLADES = [[2.8, -4.6, 44, 6.8, .95], [5.4, -4.0, 54, 6.6, .9], [7.6, -2.9, 63, 6.0, .8], [9.4, -1.6, 72, 5.0, .7], [3.6, 5.4, 140, 5.2, .8]].map(([x, y, a, L, w]) =>
   new Feather(featherPath([x, y], a, L, [-.02, .0, .06]), bladeProfile({w, lead: .5, root: .75, peak: .25, tip: .55, tipPow: 1.2})));
-const GEM = [-2.0, .0];
+// Gem on the star frame's centre, slightly toward its inner (head-side) point; 0.15 b with bezel.
+const GEM = [-2.9, .05], GEM_R = 1.2;
 function shieldSprite(eyeOnly = false, colour = false) {
   const name = eyeOnly ? 'gd_shield_eye' : 'gd_shield', card = CARD[name];
   const px = (card.X1 - card.X0) / SIZE[name][0];
@@ -141,24 +148,44 @@ function shieldSprite(eyeOnly = false, colour = false) {
     const st = starBand(x, y);
     const gr = Math.hypot(x - GEM[0], y - GEM[1]);
     if (eyeOnly) {
-      // eye: gem (core + bezel), the iris crescent hugging the right end, a dark field.
-      // colour = the Geo look; otherwise luminance for the element tints.
+      // eye (m1 f1330, guide.pdf): a small white-hot gem with an orange bezel inside the gold
+      // star frame, the star's inside glowing amber-gold; between the star and the eyelid rim
+      // cream gold with two thin maroon crescents and the amber iris crescent on the outer end.
+      // colour = the Geo look; otherwise the same layout in luminance for the element tints.
       if (dI > .1 || st.band) return null;
-      const col = (lum, c) => (colour ? C(c) : [lum, lum, lum, 255]);
-      if (gr < 2.4) {
-        if (gr < 1.25) return colour ? mix(C('#ffffff'), PAL.eyeCore, gr / 1.25) : mix([255, 255, 255, 255], [238, 238, 238, 255], gr / 1.25);
-        if (gr < 1.5) return col(120, '#b8561e');
-        if (gr < 2.15) return colour ? mix(C('#ffc890'), PAL.bezel, (gr - 1.5) / .65) : mix([222, 222, 222, 255], [170, 170, 170, 255], (gr - 1.5) / .65);
-        return col(70, '#7a2a08');
+      const out = c => {
+        if (colour) return c;
+        const v = Math.min(255, (c[0] * .3 + c[1] * .59 + c[2] * .11) * 1.12 + 12);
+        return [v, v, v, 255];
+      };
+      if (gr < GEM_R) {
+        const r = gr / GEM_R;
+        if (r < .45) return colour ? mix(C('#ffffff'), PAL.eyeCore, r / .45) : [255, 255, 255, 255];
+        if (r < .78) return out(mix(C('#ffd6a0'), PAL.bezel, (r - .45) / .33));
+        return out(mix(C('#c8641e'), C('#7a2a08'), (r - .78) / .22));
       }
-      const ix = (x - 2.6) / 6.4, iy = (y + .2) / 4.4, ir = Math.hypot(ix, iy);
-      const cut = Math.hypot((x - .6) / 5.6, (y + .2) / 4.2);
-      if (ir < 1 && cut > 1) {
-        const k = smooth(0, 1, clamp((cut - 1) / .35)) * (1 - smooth(.85, 1, ir)) + .2;
-        return colour ? mix(C('#c47a22'), PAL.iris, k) : mix([170, 170, 170, 255], [250, 250, 250, 255], k);
+      if (st.inside) {
+        // amber glow around the gem, fading to warm gold at the star frame
+        let c = mix(C('#ffd79a'), C('#f2a060'), smooth(GEM_R, 2.6, gr));
+        c = mix(c, C('#e6c27a'), smooth(2.4, 5.0, gr));
+        return out(c);
       }
-      const spill = Math.exp(-((gr - 2.4) ** 2) / 5) * .5;
-      return colour ? mix(PAL.field, C('#a8481a'), spill) : mix([58, 58, 58, 255], [140, 140, 140, 255], spill);
+      const rim = -dI;                                  // depth inside the eyelid opening
+      // a deeper warm gold than the star band, so the bevelled star frame stands out
+      let c = mix(C('#d8aa5e'), C('#b98a44'), smooth(0, 2.6, rim) * .7);
+      c = mix(c, PAL.goldDeep, (grainG(x * 2, y * 2) - .5) * .12);
+      if (x > 4.2) {
+        // amber iris crescent hugging the outer (right) end, a thin dark line on its inner side
+        const k = smooth(4.2, 7.8, x);
+        const iris = mix(C('#c47a22'), PAL.iris, smooth(.1, 1.2, rim) * (1 - smooth(1.6, 3.2, rim)) + .25);
+        c = mix(c, iris, k);
+        if (Math.abs(x - 4.6 - rim * .35) < .22) c = mix(c, PAL.field, .85);
+        return out(c);
+      }
+      // two thin maroon crescents along the eyelid rim: upper on the inner half, lower on the outer half
+      const upper = y > SC[1] && x < 1.6, lower = y < SC[1] && x > -4.6;
+      if ((upper || lower) && rim > .3 && rim < 1.05) return out(mix(PAL.field, C('#7a2a08'), smooth(.3, 1.05, rim) * .5));
+      return out(c);
     }
     const inAlmond = dA < 0, inSpike = dS < 0;
     let blade = null;
@@ -206,8 +233,9 @@ const SP = (() => {
   const barbR = spline([[.6, 19.6], [1.6, 19.9], [2.6, 19.75], [3.25, 19.0, 'c'], [2.5, 19.15], [1.7, 19.15], [1.05, 18.9]], 8);
   // crescent wing-blade (right): sweeps out from the collar and back toward the butt, its tip
   // the outermost point (m3 f1148); a shorter inner prong splits off at the notch
-  const outer = spline([[.45, 14.8], [1.4, 14.25], [2.45, 13.15], [3.35, 11.75], [3.98, 10.45], [4.28, 9.3, 'c']], 10);
-  const inner = spline([[4.28, 9.3], [3.72, 10.25], [3.08, 11.3], [2.3, 12.4], [1.4, 13.2], [.3, 13.75]], 10);
+  // the tips hook back in toward the shaft (sheet 06 B)
+  const outer = spline([[.45, 14.8], [1.4, 14.25], [2.45, 13.15], [3.35, 11.75], [3.95, 10.45], [4.12, 9.4], [3.7, 8.55, 'c']], 10);
+  const inner = spline([[3.7, 8.55], [3.62, 9.5], [3.2, 10.7], [2.35, 12.0], [1.4, 13.05], [.3, 13.65]], 10);
   const cres = [...outer, ...inner];
   const prong = spline([[.45, 13.3], [1.15, 12.65], [1.72, 11.75], [2.05, 10.7, 'c'], [1.62, 11.55], [1.0, 12.25], [.35, 12.75]], 8);
   return {
@@ -244,9 +272,7 @@ function spearHead(enchanted = false) {
         if (s < .08) c = mix(c, PAL.goldDeep, .7);
         return enchanted ? c : c;   // the gem stays red in every variant
       }
-      // dark maroon field around the gem (glows warmer near the star)
-      const glowK = Math.max(0, 1 - er / .76);
-      return mix(C('#3c0d08'), C('#8a2a14'), glowK * .7);
+      return null;                    // the ring hole is open (model.md §6.3, m3 f1148)
     }
     // collar
     if (y > SPEAR.COLLAR[0] && y < SPEAR.COLLAR[1] && Math.abs(x) < .72 - (y - SPEAR.COLLAR[0]) * .2) {
@@ -307,8 +333,12 @@ function spearEdge(enchanted = false) {
   const card = CARD.gd_spear_edge;
   return onCard(card, (x, y) => {
     let hw = 0;
+    // the ring shows only as its two rims (top and bottom) so the edge card never crosses the
+    // open ring or the gem in oblique views
+    const ringTop = SPEAR.RING[1] + SPEAR.RING_R[1], ringBot = SPEAR.RING[1] - SPEAR.RING_R[1], rim = SPEAR.RING_R[1] * .24;
     if (y > 19 && y < 31.4) hw = .32 * Math.pow(1 - (y - 19) / 12.4, .6) + .02;
-    else if (y >= 14.3 && y <= 19.2) hw = .38;
+    else if (y >= ringTop - rim && y <= ringTop) hw = .38;
+    else if (y >= SPEAR.COLLAR[0] && y <= ringBot + rim) hw = .38;
     else if (y > 8.4 && y < 14.3) hw = .2;
     if (Math.abs(x) > hw) return null;
     const c = mix(PAL.spCore, PAL.spMid, Math.abs(x) / Math.max(hw, .01));
@@ -454,16 +484,18 @@ function crestSide() {
 }
 
 // =============================================================================================
-// LOWER BODY (skirt units: 12.8 per block, origin at the belt centre; X = her left).
-// Front: the tabard with three red 4-point stars over two long front panels of layered
-// feathers with jagged notches; a dark slit between them.
+// LOWER BODY (skirt units: 11.85 per block at display scale 1.35, origin at the belt centre;
+// X = her left; the feet hang at about Y -19.9). Front: the tabard with three red 4-point
+// stars over two long front panels of layered notched feathers, with an open slit between them
+// from under the tabard to the hem, so the dark voxel legs read down the middle (model.md §2).
+const SLIT = y => (y > -5.2 ? 0 : .8 + smooth(-5.2, -17.5, y) * .55);    // half width of the slit
 const SKF = (() => {
   const panels = [];
   // each front panel: a long inner feather and a slightly shorter outer one, notched edges
   for (const side of [-1, 1]) {
-    const specs = [[.95, -2.6, 1.0, 18.8, 1.08, [.42, .66, .83]], [2.15, -2.4, 4.5, 17.4, 1.02, [.5, .74]]];
+    const specs = [[1.75, -2.6, 1.5, 15.4, .95, [.42, .66, .83]], [3.0, -2.4, 4.0, 14.6, .92, [.5, .74]]];
     for (const [x, y, a, L, w, nt] of specs) {
-      const p = featherPath([side * x, y], side * a, L, [0, side * .004, side * -.012]);
+      const p = featherPath([side * x, y], side * a, L, [0, side * .004, side * .01]);
       const notches = nt.map((t, i) => [t, i % 2 ? -side : side, 1.0, .14]);
       panels.push(new Feather(p, bladeProfile({w, lead: .5, root: .95, peak: .12, tip: .8, tipPow: 1.35}), {notches}));
     }
@@ -490,17 +522,24 @@ function skirtFront() {
       c = mix(c, FEATHER_WHITE.deep, (grainW(x, y) - .5) * .12);
       return outlineMix(c, -db, px, FEATHER_WHITE.line, 1.3);
     }
+    const g = SLIT(y);
+    if (Math.abs(x) < g) return null;                                       // the leg slit
     for (const f of SKF.panels) {
       const h = f.sample(x, y);
-      if (h) return featherColour(h, FEATHER_WHITE, {px, trail: -1, grain: grainW, gx: x, gy: y, sky: .12});
+      if (h) {
+        let c = featherColour(h, FEATHER_WHITE, {px, trail: -1, grain: grainW, gx: x, gy: y, sky: .12});
+        if (g && Math.abs(x) - g < px * 1.4) c = mix(c, FEATHER_WHITE.line, .8);  // outline along the slit
+        else if (g && Math.abs(x) - g < px * 3) c = mix(c, FEATHER_WHITE.shadeC, .5);
+        return c;
+      }
     }
-    if (Math.abs(x) < .95 && y < -3 && y > -15.5) return mix(PAL.cor3, PAL.cor4, smooth(-4, -14, y));
     return null;
   });
 }
-// Outer flared panel (her right as drawn; the left one is the uv-mirrored card): long
-// feathers from the hip that sweep down and flare outward at the hem like hakama spikes.
-const SKS = [[.2, -.4, 7, 18.8, 1.15, [-.03, -.03, .13]], [1.5, -1.0, 15, 16.0, 1.0, [-.04, -.02, .17]], [-.7, -.3, 2.5, 17.2, .95, [-.02, -.01, .05]]]
+// Outer flared panel (her right as drawn, +X = outward; the left one is the uv-mirrored card):
+// long feathers from the hip that hang nearly straight past the knee and flare outward only in
+// the lower third, like hakama spikes, the tips just below the feet.
+const SKS = [[.5, -.4, 1.5, 21.0, .95, [0, .02, .30]], [1.2, -.9, 3.0, 20.2, .9, [0, .035, .36]], [1.8, -1.3, 4.5, 18.0, .82, [0, .05, .34]]]
   .map(([x, y, a, L, w, b], i) => new Feather(featherPath([x, y], a, L, b), bladeProfile({w, lead: .45, root: .8, peak: .2, tip: .7, tipPow: 1.25}),
     {notches: [[.48 + .05 * i, -1, 1.0, .14], [.74, 1, .8, .12]]}));
 function skirtSide() {
@@ -510,20 +549,23 @@ function skirtSide() {
     return null;
   });
 }
-// Back panel: broad layered feathers.
-const SKB = Array.from({length: 5}, (_, i) => [-3.8 + i * 1.9, -.3, -7 + i * 3.5, [16.2, 17.8, 18.6, 17.4, 15.8][i], 1.35])
+// Back panel: broad layered feathers in two halves; the legs show between them.
+const SKB = [[-3.7, -.3, -6, 15.8, 1.3], [-2.0, -.3, -3, 17.6, 1.25], [-.95, -.5, -1, 18.4, 1.0], [.95, -.5, 1, 18.4, 1.0], [2.0, -.3, 3, 17.6, 1.25], [3.7, -.3, 6, 15.8, 1.3]]
   .map(([x, y, a, L, w]) => new Feather(featherPath([x, y], a, L, [0, .01, -.01]), bladeProfile({w, lead: .5, root: .9, peak: .15, tip: .75, tipPow: 1.2}),
     {notches: [[.55, 1, 1.1, .14], [.78, -1, .9, .12]]}));
 function skirtBack() {
   const card = CARD.gd_skirt_back, px = (card.X1 - card.X0) / SIZE.gd_skirt_back[0];
   return onCard(card, (x, y) => {
+    const g = SLIT(y) * .9;
+    if (Math.abs(x) < g) return null;
     for (const f of SKB) { const h = f.sample(x, y); if (h) return featherColour(h, FEATHER_WHITE, {px, trail: -1, grain: grainW, gx: x, gy: y, sky: .1}); }
     return null;
   });
 }
-// Hip feather-wing (her right as drawn): 5 feathers fanning out and up from under the belt.
-const HIPW = Array.from({length: 3}, (_, i) => new Feather(featherPath([0, 0], -(100 + i * 16), 4.6 - i * .8, [-.02, -.05, -.1]),
-  bladeProfile({w: .62, lead: .45, root: .7, peak: .2, tip: .6}), {notches: [[.7, -1, .4, .08]]}));
+// Hip feather-wing (her right as drawn): 4 feathers about 0.6 b long fanning out and UP from the
+// belt corner, 30-50 degrees above horizontal (ref.png, guide.pdf, m2 f600).
+const HIPW = [[-118, 6.0, .6], [-127, 7.3, .66], [-136, 7.0, .62], [-145, 5.6, .55]].map(([a, L, w]) => new Feather(featherPath([0, 0], a, L, [.02, .05, .1]),
+  bladeProfile({w, lead: .45, root: .6, peak: .25, tip: .6}), {notches: [[.66, -1, .45, .09]]}));
 function hipWing() {
   const card = CARD.gd_hip_wing, px = (card.X1 - card.X0) / SIZE.gd_hip_wing[0];
   return onCard(card, (x, y) => {
@@ -601,37 +643,26 @@ function chestSprite(back = false) {
     return null;
   });
 }
-function collarSprite() {
-  const card = CARD.gd_collar, px = (card.X1 - card.X0) / SIZE.gd_collar[0];
-  // jagged white/black zig-zag feather plates, small black 4-point stars
-  return onCard(card, (x, y) => {
-    const zig = Math.abs(((x * .9) % 2 + 2) % 2 - 1);
-    const top = 1.2 + zig * 1.4;
-    if (y > top || y < -1.4) return null;
-    for (const sx of [-3.2, 0, 3.2]) { const s = star4in(x - sx, y - .1, .7, .9, .02); if (s > 0) return C('#1a1416'); }
-    const k = (y + 1.4) / (top + 1.4);
-    let c = mix(FEATHER_WHITE.shadeC, FEATHER_WHITE.light, k);
-    if (top - y < px * 1.4) c = mix(c, FEATHER_WHITE.line, .8);
-    if (y < -1.0) c = mix(c, C('#2a2026'), .7);
-    return c;
-  });
-}
-
 // =============================================================================================
 // Small tiling materials (32x32 unless noted). Faces of voxel boxes use the whole texture.
 const tile = fn => (u, v) => fn(u, v);
+// Crimson voxel (model.md §3.4): #A93B27 / #812E21 faces, #5F1D13 / #2A1418 only in the
+// recesses and the bevel, thin glowing #FF5A3C crack lines.
 function corrupt(seed) {
   const n = fbm(seed), m = fbm(seed + 7);
   return tile((u, v) => {
-    let c = mix(PAL.cor2, PAL.cor4, clamp(n(u * 3, v * 3) * 1.4 - .2));
-    c = mix(c, PAL.cor1, smooth(.6, .85, m(u * 2 + 3, v * 2)) * .7);
+    const k = n(u * 2.6, v * 2.6);
+    let c = mix(PAL.cor1, PAL.cor2, smooth(.3, .7, k));
+    c = mix(c, PAL.cor3, smooth(.72, .92, k) * .55);              // shallow recesses
+    c = mix(c, C('#c4513a'), smooth(.25, .05, k) * .5);            // lit facets
     // glowing cracks: thin ridges of a second noise
-    const r = Math.abs(m(u * 4.2, v * 4.2) - .5);
-    if (r < .025) c = mix(PAL.crack, [255, 190, 150, 255], .2);
-    else if (r < .05) c = mix(c, PAL.crack, .55);
-    // bevel edge
+    const r = Math.abs(m(u * 3.4, v * 3.4) - .5);
+    if (r < .014) c = mix(PAL.crack, [255, 196, 160, 255], .3);
+    else if (r < .03) c = mix(c, PAL.crack, .4);
+    // bevel: dark rim, a lit inner edge on the top-left
     const e = Math.min(u, v, 1 - u, 1 - v);
-    if (e < .06) c = mix(c, PAL.cor4, .5);
+    if (e < .045) c = mix(c, PAL.cor4, .75);
+    else if (e < .09) c = mix(c, u + v < 1 ? C('#d0644a') : PAL.cor3, .45);
     return c;
   });
 }
@@ -663,64 +694,126 @@ function goldTile(dark = false) {
     return c;
   });
 }
-function gauntlet() {
-  return tile((u, v) => {
-    // gold with an amber glowing strip along the length (v), engraved swirl
-    let c = goldAt(Math.min(u, 1 - u) * 6, 1, u * 7, v * 14);
-    const s = Math.abs(u - .5);
-    if (s < .2) {
-      c = mix(PAL.gl3, PAL.gl2, 1 - s / .2);
-      c = mix(c, PAL.gl1, Math.max(0, 1 - s / .07) * .8);
-      const sw = Math.abs(Math.sin(v * 18) * .1 - (u - .5));
-      if (sw < .02) c = mix(c, PAL.gl1, .8);
-    }
-    if (Math.min(u, 1 - u) < .04) c = mix(c, PAL.goldLine, .6);
-    return c;
-  });
-}
-function sleeve() {
-  const n = fbm(13);
-  return tile((u, v) => {
-    let c = mix(PAL.white, PAL.whiteShade, n(u * 2, v * 4) * .6);
-    const e = Math.min(u, 1 - u);
-    if (e < .06) c = mix(c, PAL.whiteShade, .6);
-    return c;
-  });
+// Glowing amber gauntlet face (ref.png forearm): #E4833C -> #F2AB76 across ~85 % of the width,
+// a hot #FBDFD4 core strip with a swirl, thin gold edges.
+function amberAt(s, v) {
+  // s = 0 on the centre line .. 1 at the gold edge; v along the length
+  let c = mix(PAL.gl2, PAL.gl3, smooth(.15, .95, s));
+  c = mix(c, PAL.gl1, (1 - smooth(0, .22, s)) * .75);
+  const sw = Math.abs(Math.sin(v * 17) * .16 - s * .8 + .05);
+  if (sw < .035 && s < .7) c = mix(c, PAL.gl1, .7);
+  if (s > .45 && Math.abs(((v * 5.3) % 1) - .5) < .04) c = mix(c, C('#c8642a'), .45);   // faint ribbing
+  return c;
 }
 function jointRing() {
   return (u, v) => {
     const r = Math.hypot(u - .5, v - .5) * 2;
     if (r > 1) return TRANSPARENT;
-    if (r < .38) return mix(C('#2a1a12'), C('#4a3020'), r / .38);
-    if (r < .5) return PAL.goldLine;
+    if (r < .4) return mix(mix(PAL.goldHi, PAL.goldLit, smooth(0, .4, r)), PAL.goldMid, smooth(.25, .4, r) * .6);
+    if (r < .5) return mix(PAL.goldDark, PAL.goldLine, .4);
     return goldAt((1 - r) * 3, 1, u * 5, v * 5);
   };
 }
+// Rounded gold cap (disc cards): a centred dome highlight, mid gold, darker rim and outline.
+function goldCap() {
+  return (u, v) => {
+    const r = Math.hypot(u - .5, v - .5) * 2;
+    if (r > 1) return TRANSPARENT;
+    let c = mix(PAL.goldHi, PAL.goldLit, smooth(0, .4, r));
+    c = mix(c, PAL.goldMid, smooth(.4, .85, r) * .8);
+    c = mix(c, PAL.goldDark, smooth(.8, .97, r) * .7);
+    if (r > .93) c = mix(c, PAL.goldLine, .6);
+    return mix(c, PAL.goldDeep, (grainG(u * 6, v * 6) - .5) * .12);
+  };
+}
+// Talon: a slim hooked claw, root at the top (v 0), tip at the bottom, curving toward u = 1.
 function talon(gold = false) {
   return (u, v) => {
-    const hw = .5 * Math.pow(1 - v, .8);
-    if (Math.abs(u - .5) > hw) return TRANSPARENT;
-    if (gold) return mix(PAL.goldHi, PAL.goldMid, Math.abs(u - .5) / Math.max(hw, .01));
-    return mix(C('#ff6a4a'), PAL.cor3, Math.abs(u - .5) / Math.max(hw, .01) * .8 + v * .2);
+    const cx = .4 + .22 * v * v, hw = .36 * Math.pow(1 - v, .75) + .02;
+    const d = Math.abs(u - cx);
+    if (d > hw) return TRANSPARENT;
+    const k = d / hw;
+    if (gold) return mix(mix(PAL.goldHi, PAL.goldLit, smooth(0, .5, k)), PAL.goldDark, smooth(.6, 1, k) * .7);
+    let c = mix(C('#ff7a56'), PAL.cor1, smooth(0, .6, k));
+    return mix(c, PAL.cor4, smooth(.65, 1, k) * .6 + v * .15);
   };
+}
+// =============================================================================================
+// LEFT ARM (her gold arm; 16 units per block, segment hanging along -Y from its joint). Painted
+// silhouettes for the crossed cards: half width per height, a white sleeve under a gold plate
+// (upper arm) and the glowing amber gauntlet with gold flare and cuff (forearm).
+const LARM_UP = [[1.2, 1.35], [.4, 1.5], [-1.0, 1.52], [-2.6, 1.4], [-4.4, 1.22], [-6.2, 1.06], [-6.5, 1.2], [-7.6, 1.18], [-8.1, .7], [-8.35, 0]];
+const LARM_FO = [[1.0, 1.25], [-.4, 1.35], [-1.0, 1.62], [-1.9, 1.58], [-3.6, 1.38], [-5.6, 1.12], [-6.2, 1.05], [-6.7, 1.0], [-7.2, 1.3], [-7.6, 1.26], [-7.95, .6], [-8.05, 0]];
+const halfAt = (prof, y) => {
+  if (y > prof[0][0] || y < prof[prof.length - 1][0]) return 0;
+  for (let i = 0; i < prof.length - 1; i++) {
+    const [y0, w0] = prof[i], [y1, w1] = prof[i + 1];
+    if (y <= y0 && y >= y1) { const t = (y0 - y) / Math.max(1e-6, y0 - y1); return w0 + (w1 - w0) * smooth(0, 1, t); }
+  }
+  return 0;
+};
+function lArmUpper() {
+  const card = CARD.gd_larm_up, px = (card.X1 - card.X0) / SIZE.gd_larm_up[0];
+  return onCard(card, (x, y) => {
+    const hw = halfAt(LARM_UP, y), e = hw - Math.abs(x);
+    if (e < 0) return null;
+    const s = Math.abs(x) / Math.max(hw, .01);
+    let c;
+    // gold plate over the shoulder (scalloped lower edge), gold band above the elbow
+    const plate = y > -2.3 - .35 * Math.cos(x * 2.2), band = y < -6.35 && y > -7.75;
+    if (plate || band || y < -7.75) {
+      c = goldAt(e, .9, x, y);
+      c = mix(c, PAL.goldDark, smooth(.55, 1, s) * .45);
+      if (plate && y < -1.7 - .35 * Math.cos(x * 2.2)) c = mix(c, PAL.goldDeep, .55);       // groove under the plate rim
+      if (band && (y > -6.6 || y < -7.5)) c = mix(c, PAL.goldDeep, .5);
+    } else {
+      // white sleeve, rounded: light centre, grey-violet sides, two soft folds
+      c = mix(PAL.white, PAL.whiteShade, smooth(.25, 1, s) * .85);
+      const fold = Math.abs(((y * .55 + x * .35) % 1 + 1) % 1 - .5);
+      if (fold < .06) c = mix(c, PAL.whiteShade, .35);
+      c = mix(c, C('#efd7b4'), smooth(-3.4, -2.3, y) * .35);                                   // gold bounce under the plate
+    }
+    return outlineMix(c, e, px, PAL.goldLine, 1.2);
+  });
+}
+function lArmFore() {
+  const card = CARD.gd_larm_fore, px = (card.X1 - card.X0) / SIZE.gd_larm_fore[0];
+  return onCard(card, (x, y) => {
+    const hw = halfAt(LARM_FO, y), e = hw - Math.abs(x);
+    if (e < 0) return null;
+    const s = Math.abs(x) / Math.max(hw, .01);
+    let c;
+    if (y > -1.15 || y < -7.0) {
+      // gold elbow flare and wrist cuff
+      c = goldAt(e, .8, x, y);
+      if (Math.abs(y + 1.1) < .1 || Math.abs(y + 7.05) < .1) c = mix(c, PAL.goldDeep, .6);
+    } else if (y < -6.25) {
+      c = mix(C('#7a1e16'), C('#3a0c0a'), s);                                                   // dark band at the wrist
+    } else {
+      c = s > .86 ? goldAt(e, .4, x, y) : amberAt(s / .86, y * .09);
+    }
+    return outlineMix(c, e, px, PAL.goldLine, 1.1);
+  });
 }
 // Glow cards (translucent): luminance gradients, tinted per element by the item definition.
 function spearGlow() {
   const card = CARD.gd_spear_glow;
   return onCard(card, (x, y) => {
-    // aura hugging the blade (Y 19..31.4) and a thin streak down the shaft
+    // soft aura (model.md §3.10: the blade and crescent always glow softly gold): broad around
+    // the blade and ring, a halo round the crescent wings, a thin streak down the shaft
     let a = 0;
-    if (y > 18.5 && y < 32.2) {
-      const t = (y - 18.5) / 13.7, hw = 1.9 * Math.pow(Math.max(0, 1 - t), .7) + .25;
-      a = Math.max(a, Math.exp(-((x / hw) ** 2) * 2.2) * (.75 - .25 * t));
+    if (y > 13.5 && y < 33) {
+      const t = clamp((y - 17) / 15), hw = 3.0 * Math.pow(1 - t, .55) + .7;
+      a = Math.max(a, Math.exp(-((x / hw) ** 2) * 1.5) * (.6 - .18 * t) * smooth(13.5, 17.5, y));
     }
-    if (y > 2 && y <= 18.5) a = Math.max(a, Math.exp(-((x / .55) ** 2) * 2.5) * .45 * smooth(2, 9, y));
-    const ring = Math.hypot(x / 2.6, (y - 17) / 2.4);
-    a = Math.max(a, Math.exp(-(((ring - .95) / .25) ** 2)) * .12);
-    const fade = (1 - smooth(31, 33.4, y)) * smooth(1.2, 3.5, y) * (1 - smooth(card.X1 * .8, card.X1, Math.abs(x)));
+    const cr = Math.hypot(x / 4.4, (y - 11.6) / 3.4);
+    a = Math.max(a, Math.exp(-(cr ** 2) * 1.7) * .4 * smooth(6.5, 9.5, y));
+    if (y > 2 && y <= 15) a = Math.max(a, Math.exp(-((x / .5) ** 2) * 2.5) * .32 * smooth(2, 9, y));
+    const fade = (1 - smooth(31.5, 33.4, y)) * smooth(1.2, 3.5, y) * (1 - smooth(card.X1 * .8, card.X1, Math.abs(x)));
     a = clamp(a * fade);
-    const w = 255 * (0.82 + .18 * clamp(a * 1.4));
-    return a < .012 ? null : [w, w, w, a * 255];
+    // white-gold core toward a warm rim; the item tint gives the element colour
+    const w = 255 * (.84 + .16 * clamp(a * 1.6));
+    return a < .012 ? null : [w, w * .96, w * .86, a * 255];
   });
 }
 function trailSprite() {
@@ -746,15 +839,16 @@ export const CARD = {
   gd_crest: {X0: -5.4, X1: 5.4, Y0: -.8, Y1: 7.3},
   gd_crest_side: {X0: -3.2, X1: 1.6, Y0: 1.8, Y1: 6.6},
   gd_skirt_front: {X0: -4.6, X1: 4.6, Y0: -20.0, Y1: .8},
-  gd_skirt_side: {X0: -2.2, X1: 8.2, Y0: -20.0, Y1: .8},
+  gd_skirt_side: {X0: -1.4, X1: 10.6, Y0: -22.9, Y1: .9},
   gd_skirt_back: {X0: -6.2, X1: 6.2, Y0: -19.0, Y1: .5},
-  gd_hip_wing: {X0: -7.2, X1: .8, Y0: -1.5, Y1: 4.5},
+  gd_hip_wing: {X0: -7.6, X1: 1.4, Y0: -1.4, Y1: 6.6},
   gd_tail: {X0: -4.4, X1: 5.0, Y0: -20.2, Y1: 1.0},
   gd_belt: {X0: -4.2, X1: 4.2, Y0: -2.5, Y1: 3.6},
   gd_chest: {X0: -6.4, X1: 6.4, Y0: -.4, Y1: 13.0},
-  gd_collar: {X0: -4.8, X1: 4.8, Y0: -1.6, Y1: 2.8},
-  gd_spear_glow: {X0: -3.2, X1: 3.2, Y0: 1.0, Y1: 33.0},
+  gd_spear_glow: {X0: -4.6, X1: 4.6, Y0: 1.0, Y1: 33.0},
   gd_trail: {X0: -3.0, X1: 3.0, Y0: 1.0, Y1: 32.0},
+  gd_larm_up: {X0: -1.7, X1: 1.7, Y0: -8.5, Y1: 1.4},
+  gd_larm_fore: {X0: -1.75, X1: 1.75, Y0: -8.2, Y1: 1.1},
 };
 // [width, height] px; multiples of 16.
 export const SIZE = {
@@ -764,9 +858,10 @@ export const SIZE = {
   gd_halo: [256, 256], gd_halo_glow: [128, 128],
   gd_crest: [256, 192], gd_crest_side: [96, 96],
   gd_skirt_front: [112, 256], gd_skirt_side: [128, 256], gd_skirt_back: [144, 224],
-  gd_hip_wing: [128, 96], gd_tail: [112, 256], gd_belt: [128, 96],
-  gd_chest: [160, 160], gd_collar: [128, 64],
-  gd_spear_glow: [64, 320], gd_trail: [64, 320],
+  gd_hip_wing: [128, 112], gd_tail: [112, 256], gd_belt: [128, 96],
+  gd_chest: [160, 160],
+  gd_spear_glow: [96, 320], gd_trail: [64, 320],
+  gd_larm_up: [48, 144], gd_larm_fore: [48, 128],
 };
 // Fix the aspect of auto-sized cards (wing tiers) so pixels stay square.
 for (const k of ['gd_wing_pri', 'gd_wing_sec', 'gd_wing_cov']) {
@@ -792,7 +887,6 @@ export function guardianSprites() {
     gd_spear_star: [64, 64, facetStar(PAL.butt, C('#8a2a1a'), C('#ff9a70'), .1)],
     gd_redstar: [64, 64, facetStar(PAL.red, PAL.redDark, C('#ff7a5a'), .02)],
     gd_blackstar: [64, 64, facetStar(C('#24181c'), C('#0c0608'), C('#5a4a50'), .02)],
-    gd_spear_gem: [64, 64, facetStar(PAL.gem, PAL.gemDark, C('#ff8a5a'), .02)],
     gd_halo: [...SIZE.gd_halo, haloSprite()],
     gd_halo_glow: [...SIZE.gd_halo_glow, haloGlow(), true],
     gd_crest: [...SIZE.gd_crest, crestSprite()],
@@ -806,18 +900,15 @@ export function guardianSprites() {
     gd_belt: [...SIZE.gd_belt, beltSprite()],
     gd_chest: [...SIZE.gd_chest, chestSprite(false)],
     gd_chest_back: [...SIZE.gd_chest, chestSprite(true)],
-    gd_collar: [...SIZE.gd_collar, collarSprite()],
     gd_corrupt: [32, 32, corrupt(5)], gd_corrupt_b: [32, 32, corrupt(19)],
     gd_vox: [32, 32, voxel(false)], gd_vox_rune: [32, 32, voxel(true)],
-    gd_white: [32, 32, flat('#f7efec', '#e6dbd8', 4)], gd_sleeve: [32, 32, sleeve()],
     gd_gold: [32, 32, goldTile(false)], gd_gold_dark: [32, 32, goldTile(true)],
-    gd_gauntlet: [32, 64, gauntlet()],
-    gd_joint: [32, 32, jointRing()],
+    gd_joint: [32, 32, jointRing()], gd_cap: [32, 32, goldCap()],
+    gd_larm_up: [...SIZE.gd_larm_up, lArmUpper()], gd_larm_fore: [...SIZE.gd_larm_fore, lArmFore()],
     gd_talon: [16, 64, talon(false)], gd_talon_gold: [16, 64, talon(true)],
     gd_shaft: [16, 128, (u, v) => { let c = mix(C('#fff4cc'), C('#e2be78'), Math.abs(u - .5) * 1.8); if ((v * 24) % 1 < .07) c = mix(c, PAL.goldMid, .45); return c; }],
     gd_redcore: [32, 32, flat('#8a2418', '#5a120c', 21)],
     gd_dark: [32, 32, flat('#2a1418', '#1a0c10', 23)],
-    gd_eye: [16, 16, () => PAL.eye],
     gd_spear_glow: [...SIZE.gd_spear_glow, spearGlow(), true],
     gd_trail: [...SIZE.gd_trail, trailSprite(), true],
   };
@@ -835,6 +926,11 @@ export function paintGuardianTextures(rp, only = null) {
   }
   const atlasPath = path.join(rp, 'assets/minecraft/atlases/items.json');
   const atlas = fs.existsSync(atlasPath) ? JSON.parse(fs.readFileSync(atlasPath, 'utf8')) : {sources: []};
+  // the generator owns textures/mboss/guardian: drop sprites (files and atlas entries) that the
+  // current painter no longer makes
+  const ids = new Set(Object.keys(sprites).map(spriteId));
+  if (!only) for (const f of fs.readdirSync(dir)) if (f.endsWith('.png') && !(f.slice(0, -4) in sprites)) fs.rmSync(path.join(dir, f));
+  atlas.sources = atlas.sources.filter(s => { const id = s.sprite || s.resource || ''; return !id.startsWith(spriteId('')) || ids.has(id); });
   const known = new Set(atlas.sources.map(s => s.sprite || s.resource));
   for (const name of Object.keys(sprites)) {
     const id = spriteId(name);

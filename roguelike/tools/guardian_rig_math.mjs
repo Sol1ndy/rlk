@@ -34,7 +34,7 @@ export function basisQ(X, Y, Z) {
   s = Math.sqrt(1 + m[2][2] - m[0][0] - m[1][1]) * 2;
   return unit4([(m[0][2] + m[2][0]) / s, (m[1][2] + m[2][1]) / s, s / 4, (m[1][0] - m[0][1]) / s]);
 }
-const perp = (v, axis) => sub(v, times(axis, dot(v, axis)));
+export const perp = (v, axis) => sub(v, times(axis, dot(v, axis)));
 // Frame with model -Y along dir (a hanging segment) and its front face (-Z) toward `front`.
 export function aimQ(dir, front = [0, 0, -1]) {
   const Y = times(unit(dir), -1);
@@ -54,18 +54,57 @@ export function sp(tip, face = [0, 0, -1]) {
 }
 // Two-bone IK: shoulder S, wrist target W, segment lengths a, b, elbow pole direction.
 // Up to 12 % stretch when the target is out of reach; the wrist falls short beyond that.
-export function ik(S, W, a, b, pole) {
+// prevV (optional): the previous frame's bend direction (`v` of the last result). Where the
+// pole lies within about 30 degrees of the shoulder-wrist line its bend plane is unstable, so
+// the elbow keeps the previous side there, and the bend plane never turns more than MAX_BEND
+// degrees per frame; this removes the one-tick elbow flips of a fixed pole.
+const MAX_BEND = 40 * Math.PI / 180;
+export const smoothK = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+export function ik(S, W, a, b, pole, prevV = null) {
   const d = sub(W, S), L = len(d), u = unit(d);
   let k = 1;
   if (L > (a + b) * .995) k = Math.min(1.12, L / ((a + b) * .995));
   const A = a * k, B = b * k, Lc = Math.min(Math.max(L, Math.abs(A - B) + .02), (A + B) * .995);
   const cosA = Math.max(-1, Math.min(1, (A * A + Lc * Lc - B * B) / (2 * A * Lc))), al = Math.acos(cosA);
-  let v = perp(pole, u);
-  if (len(v) < 1e-4) v = perp([0, -1, 0], u);
-  v = unit(v);
+  const pp = perp(pole, u), strength = len(pp) / Math.max(len(pole), 1e-9);   // sin(pole, line)
+  let v = len(pp) > 1e-4 ? unit(pp) : unit(perp([0, -1, 0], u));
+  if (prevV) {
+    const pv = perp(prevV, u);
+    if (len(pv) > 1e-4) {
+      const P = unit(pv), w = smoothK(.26, .5, strength);
+      const ang = Math.atan2(dot(cross(P, v), u), dot(P, v));
+      const step = Math.max(-MAX_BEND * w, Math.min(MAX_BEND * w, ang));
+      v = unit(add(times(P, Math.cos(step)), times(cross(u, P), Math.sin(step))));
+    }
+  }
   const E = add(S, add(times(u, A * cosA), times(v, A * Math.sin(al))));
   const Wr = add(S, times(u, Lc));
-  return {E, W: Wr, stretch: k, short: L - Lc};
+  return {E, W: Wr, v, stretch: k, short: L - Lc};
+}
+// Roll reference for an arm segment: the inside of the bend (-v) faces the segment's front
+// (model -Z); where the segment runs along the bend direction (a tightly folded arm) it falls
+// back to the torso front. Stable for any arm direction, unlike the torso front alone.
+export function armFront(dir, v, front) {
+  const D = unit(dir), f1 = perp(times(v, -1), D), f2 = perp(front, D), w = smoothK(.12, .35, len(f1));
+  const a = len(f1) > 1e-6 ? unit(f1) : [0, 0, 0], b = len(f2) > 1e-6 ? unit(f2) : unit(perp([0, 1, 0], D));
+  const F = add(times(a, w), times(b, 1 - w));
+  return len(F) > 1e-6 ? F : b;
+}
+// Direction perpendicular to `axis` from `raw`, kept continuous across frames: it turns about
+// the axis from the previous frame's direction toward raw by at most MAX_ROLL per frame, and
+// where raw lies near the axis (strength = sin of the angle below about 0.4) by a weighted
+// share only. A fist therefore rolls round the shaft over a few ticks instead of flipping in
+// one when the shaft sweeps through the shoulder direction (body space: root spins do not count).
+const MAX_ROLL = 55 * Math.PI / 180;
+export function steadyPerp(raw, axis, prev = null, fallback = [0, 0, -1]) {
+  const pr = perp(raw, axis), s = len(pr) / Math.max(len(raw), 1e-9);
+  let F = len(pr) > 1e-6 ? unit(pr) : unit(perp(fallback, axis));
+  if (!prev) return F;
+  const pv = perp(prev, axis);
+  if (len(pv) < 1e-6) return F;
+  const P = unit(pv), w = smoothK(.12, .42, s);
+  const ang = Math.max(-MAX_ROLL, Math.min(MAX_ROLL, Math.atan2(dot(cross(P, F), axis), dot(P, F)) * w));
+  return unit(add(times(P, Math.cos(ang)), times(cross(axis, P), Math.sin(ang))));
 }
 // Display conversion of a rig-frame transform (z mirror; see build_raiden_rig.mjs posed()).
 export const toDisplayT = t => [t[0], t[1], -t[2]];

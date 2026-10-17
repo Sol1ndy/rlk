@@ -2,3 +2,5 @@
 scoreboard players set @s gdRigSp 2
 data modify entity 524c4b4d-4247-4400-8000-000000000017 item.components."minecraft:item_model" set value "rlk:mboss/guardian/spear_hydro"
 data modify entity 524c4b4d-4247-4400-8000-000000000018 item.components."minecraft:item_model" set value "rlk:mboss/guardian/spear_glow_hydro"
+data modify entity 524c4b4d-4247-4400-8000-000000000019 item.components."minecraft:item_model" set value "rlk:mboss/guardian/trail_hydro"
+data modify entity 524c4b4d-4247-4400-8000-00000000001a item.components."minecraft:item_model" set value "rlk:mboss/guardian/trail_hydro"
