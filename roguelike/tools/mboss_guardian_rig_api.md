@@ -62,9 +62,11 @@ Order inside the boss tick: run the AI first, which may call `play/...`, `face/.
   - shield and wing: shield, shield_eye (15), wing_cov, wing_sec, wing_pri;
   - spear: spear (15), spear_glow (15), trail_1, trail_2;
   - cubes_a, cubes_b, cubes_c: floating red/black cubes at the right shoulder, below the feet and at the neck.
+    cubes_b (the loose cubes by the shins and the trail under the feet) follows the mean leg swing and has 8 drift frames
+    (`cubes_b`, `cubes_b_1`..`cubes_b_7`); every clip swaps them every 5 t (per 40 t cube cycle). Pattern code never sets its item model.
 - Body parts use brightness 12-13 (sky 15), `width`/`height` 16 and `view_range` 2.5.
 - Clips compile to interpolation segments. A part gets a key only where the client's lerp/slerp would drift from the authored pose by more than 0.012 b, 0.5-2° or 1.5 % scale.
-  - Result: 25 clips, about 950 key files and 10 100 part keys, about 2.8 MB.
+  - Result: 25 clips, about 980 key files and 10 100 part keys, about 2.8 MB.
   - Raiden's rig is 32 MB.
   - Dispatch is two small binary trees (clip id, then key tick), with no macros on the hot path.
 

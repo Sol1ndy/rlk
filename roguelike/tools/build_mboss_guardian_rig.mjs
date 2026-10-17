@@ -22,7 +22,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {paintGuardianTextures, spriteId, CARD} from './guardian_paint.mjs';
-import {partModels, PART_SCALE, checkBounds} from './guardian_geometry.mjs';
+import {partModels, PART_SCALE, checkBounds, CUBES_B_VARIANTS} from './guardian_geometry.mjs';
 import {solve, toDisplay} from './guardian_pose.mjs';
 import {CLIPS, accumulate, sampleClip as sample} from './guardian_clips.mjs';
 import {slerp, lerp, qAngle, len, sub, add, rot, q as qEuler} from './guardian_rig_math.mjs';
@@ -75,6 +75,8 @@ for (const [name, els] of Object.entries(models)) writeModel(name, els);
 const PLAIN = ['pelvis', 'skirt_f', 'skirt_o', 'tail', 'leg_r', 'leg_l', 'torso', 'head', 'halo', 'halo_glow', 'r_upper', 'r_fore', 'r_hand_fist', 'r_hand_open',
   'l_upper', 'l_fore', 'l_hand_open', 'l_hand_fist', 'bracket', 'shield', 'shield_eye', 'wing_cov', 'wing_sec', 'wing_pri', 'spear', 'cubes_a', 'cubes_b', 'cubes_c'];
 for (const n of PLAIN) item(n, n);
+// drift frames of the trail cubes (cubes_b is frame 0; the clips swap them, see MODEL_OF)
+for (let v = 1; v < CUBES_B_VARIANTS; v++) item('cubes_b_' + v, 'cubes_b_' + v);
 // Element looks (model.md section 4). Eye: the gem/iris/field of the shield; spear: the head
 // enchanted in the element colour; glow: the aura card along the blade and shaft.
 export const ELEMENTS = {
@@ -101,9 +103,12 @@ for (const el of ['red', 'gold', 'hydro', 'electro', 'cryo', 'pyro']) item('prop
 
 // ---- clip sampling (guardian_clips.mjs) ------------------------------------------------------
 const TRAIL_LAG = [1, 2].map(n => .55 * n), TRAIL_TAPER = [.72, .45];
+// trail-cube drift frame: CUBES_B_VARIANTS per cube cycle (40 t, or the loop length)
+const cubeFrame = ph => Math.floor(((ph % 1) + 1) % 1 * CUBES_B_VARIANTS + 1e-6) % CUBES_B_VARIANTS;
 function frame(clip, t, ks, prev = null) {
   const warns = [];
   const p = sample(clip, t, ks);
+  p.cubeV = cubeFrame(p.ph);
   const o = solve(p, {warn: m => warns.push(m), prev});
   for (const [i, lag] of TRAIL_LAG.entries()) {
     const tt = Math.max(0, t - lag), pp = sample(clip, tt, ks);
@@ -199,7 +204,8 @@ function segments(raw, n, minFirst) {
 const f6 = x => (Math.abs(x) < 5e-7 ? 0 : x).toFixed(5).replace(/\.?0+$/, '') + 'f';
 const arr = a => '[' + a.map(f6).join(',') + ']';
 const nbt = v => `{translation:${arr(v.t)},left_rotation:${arr(v.q)},scale:${arr(v.s)},right_rotation:[0f,0f,0f,1f]}`;
-const MODEL_OF = {rHand: ['r_hand', {fist: 'r_hand_fist', open: 'r_hand_open'}], lHand: ['l_hand', {fist: 'l_hand_fist', open: 'l_hand_open'}]};
+const MODEL_OF = {rHand: ['r_hand', {fist: 'r_hand_fist', open: 'r_hand_open'}], lHand: ['l_hand', {fist: 'l_hand_fist', open: 'l_hand_open'}],
+  cubeV: ['cubes_b', Object.fromEntries(Array.from({length: CUBES_B_VARIANTS}, (_, v) => [v, v ? 'cubes_b_' + v : 'cubes_b']))]};
 const swapLine = (part, model) => `data modify entity ${uuidOf(part)} item.components."minecraft:item_model" set value "${itemId(model)}"`;
 
 // ---- compile clips -------------------------------------------------------------------------
