@@ -8,8 +8,8 @@
 // from the A-frame position of each corner, so the conversion never mirrors a sprite.
 //
 // Constraints kept by every model: coordinates within -16..32, element rotations single-axis
-// in 22.5 degree steps within +-45, painted cards shade:false (the sprites carry the shading),
-// voxel/metal boxes shade:true.
+// in 22.5 degree steps within +-45, painted cards and the facets of turned (lathe) parts
+// shade:false (the sprites carry the shading), voxel/metal boxes and armour-step discs shade:true.
 import {CARD} from './guardian_paint.mjs';
 
 const r4 = v => Math.round(v * 1e4) / 1e4;
@@ -164,10 +164,8 @@ function torso() {
     abox([-4.0, 7.8, -1.7], [-2.0, 10.9, 1.5], 'gd_corrupt'),
     cube([-3.8, 11.0, -.3], 1.6, 'gd_corrupt_b', ['y', 22.5]),
     cube([-2.8, 11.4, .6], 1.3, 'gd_corrupt', ['x', 22.5]),
-    // left gold pauldron: a rounded cap over the shoulder joint and a swept plate on top
+    // left shoulder: the chest's gold side plate (the pauldron itself is the bracket's dome)
     abox([2.0, 7.8, -1.6], [3.4, 10.8, 1.4], 'gd_gold'),
-    ...cap([4.1, 9.8, -.1], 1.75),
-    abox([2.8, 10.7, -1.3], [5.6, 11.6, 1.1], 'gd_gold', {rot: ['z', -22.5, [4.2, 11.1, 0]]}),
     // neck voxels
     abox([-.9, 10.6, -.8], [.9, 12.6, .8], 'gd_corrupt_b'),
     cube([.7, 12.0, -.5], 1.0, 'gd_corrupt', ['y', 45]),
@@ -220,30 +218,31 @@ const talonPair = (tal, x, z, y0, y1, w, rot) => [
   cardX(tal, x, {Z0: z - w, Z1: z + w, Y0: y1, Y1: y0}, {rot, flipU: true}),
   cardZ(tal, z, {X0: x - w, X1: x + w, Y0: y1, Y1: y0}, {rot}),
 ];
-// Hands: wrist at the pivot, fingers toward -Y, the palm side toward -Z. Fist: the shaft
-// passes along X at Y -2.2, Z 0, the fingers wrap in front of it and the talons hang past it.
-function clawFist(gold) {
-  const pal = gold ? 'gd_gold' : 'gd_corrupt', tal = gold ? 'gd_talon_gold' : 'gd_talon', e = [];
+// Corrupted right hand (crimson voxel claw): wrist at the pivot, fingers toward -Y, the palm
+// side toward -Z. Fist: the shaft passes along X at Y -2.2, Z 0, the fingers wrap in front of it
+// and the talons hang past it.
+function clawFist() {
+  const pal = 'gd_corrupt', tal = 'gd_talon', e = [];
   e.push(abox([-1.35, -1.3, -.3], [1.35, .4, 1.5], pal));            // back of the hand
   e.push(abox([-1.4, -3.4, .95], [1.4, -1.1, 1.75], pal));           // knuckles behind the shaft
   for (let i = 0; i < 4; i++) {
     const x = -1.25 + i * .68;
     e.push(abox([x, -3.6, -1.5], [x + .5, -1.0, -.9], pal));         // fingers in front of the shaft
-    // long talons hanging past the shaft, the outer ones fanned out (corrupted claw: >= 0.2 b)
-    const L = gold ? 2.0 : 3.6, xc = x + .25;
+    // long talons hanging past the shaft, the outer ones fanned out (>= 0.2 b)
+    const L = 3.6, xc = x + .25;
     const rot = i === 0 ? ['z', 22.5, [xc, -3.5, -1.2]] : i === 3 ? ['z', -22.5, [xc, -3.5, -1.2]] : ['x', 22.5, [xc, -3.5, -1.2]];
-    e.push(...talonPair(tal, xc, -1.2, -3.3, -3.3 - L, gold ? .28 : .36, rot));
+    e.push(...talonPair(tal, xc, -1.2, -3.3, -3.3 - L, .36, rot));
   }
   e.push(abox([1.3, -2.8, -1.1], [2.1, -.6, .5], pal));               // thumb on her left side of the shaft
   return e;
 }
-// Open claw: slim back of the hand, four two-jointed fingers curling toward the palm, long talons.
-// thumb = +1 puts the thumb on +X (the right hand's inside), -1 on -X (the left hand's inside).
-function clawOpen(gold, thumb = 1) {
-  const pal = gold ? 'gd_gold' : 'gd_corrupt', tal = gold ? 'gd_talon_gold' : 'gd_talon', e = [];
+// Open claw: slim back of the hand, four two-jointed fingers curling toward the palm, long
+// talons, the thumb on +X (the right hand's inside).
+function clawOpen() {
+  const pal = 'gd_corrupt', tal = 'gd_talon', e = [];
   e.push(abox([-.85, -.3, -.45], [.85, .7, .65], pal));               // wrist
   e.push(abox([-1.2, -1.95, -.35], [1.2, -.2, .55], pal));            // back of the hand
-  const fx = [-.93, -.31, .31, .93], fl = [1.55, 1.9, 1.85, 1.45], tl = gold ? [2.2, 2.6, 2.5, 2.0] : [3.2, 3.8, 3.6, 3.0];
+  const fx = [-.93, -.31, .31, .93], fl = [1.55, 1.9, 1.85, 1.45], tl = [3.2, 3.8, 3.6, 3.0];
   fx.forEach((x, i) => {
     const L = fl[i];
     e.push(abox([x - .21, -1.85 - L, -.23], [x + .21, -1.75, .23], pal, {rot: ['x', 22.5, [x, -1.8, 0]]}));
@@ -251,37 +250,219 @@ function clawOpen(gold, thumb = 1) {
     e.push(abox([x - .17, jy - 1.0, jz - .19], [x + .17, jy + .1, jz + .19], pal, {rot: ['x', 45, [x, jy, jz]]}));
     e.push(...talonPair(tal, x, jz, jy - .85, jy - .85 - tl[i], .3, ['x', 45, [x, jy, jz]]));
   });
-  const tx = thumb * 1.25;
-  e.push(abox([tx - .25, -1.7, -.6], [tx + .25, -.1, .1], pal, {rot: ['z', thumb * 22.5, [tx, -.2, 0]]}));
-  e.push(...talonPair(tal, tx + thumb * .55, -.3, -1.4, -1.4 - tl[0] * .75, .26, ['z', thumb * 22.5, [tx, -.2, 0]]));
+  e.push(abox([1.0, -1.7, -.6], [1.5, -.1, .1], pal, {rot: ['z', 22.5, [1.25, -.2, 0]]}));
+  e.push(...talonPair(tal, 1.8, -.3, -1.4, -1.4 - tl[0] * .75, .26, ['z', 22.5, [1.25, -.2, 0]]));
   return e;
 }
-// Rounded cap: sphere-painted disc cards in four vertical planes (0, 45, 90, 135 degrees about
-// Y) and one horizontal disc, so the cap reads round from any side.
-function cap(c, r, tex = 'gd_cap') {
-  const [x, y, z] = c, rect = {X0: x - r, X1: x + r, Y0: y - r, Y1: y + r};
+// ---- turned (lathe) geometry --------------------------------------------------------------
+// A round section is a ring of n flat facets (16 by default) about an axis. Each facet is a
+// one-face card turned to its azimuth (single-axis element rotations in 22.5 degree steps), so
+// the outline is round from every side. The facets are unshaded: their wrap-round texture
+// carries the light (a metal highlight toward the side most views see), like the painted cards,
+// so the gold keeps its colour instead of the game's dim side-face shading. All facets of one
+// lathe share that texture: u = azimuth (facet k shows [k/n, (k+1)/n] of
+// the sprite, azimuth 0 = e0 below), v = position along the axis (vFrom -> 0, vTo -> 1).
+const AXV = {x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1]};
+const AZV = {y: [[0, 0, -1], [1, 0, 0]], x: [[0, 0, -1], [0, 1, 0]], z: [[0, 1, 0], [1, 0, 0]]};
+const D2R = Math.PI / 180;
+const vadd = (a, b) => a.map((x, i) => x + b[i]), vsub = (a, b) => a.map((x, i) => x - b[i]);
+const vsc = (v, s) => v.map(x => x * s), vdot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+// Right-handed rotation about an A-frame axis (the sense of `rot` in abox / cardZ / cardX).
+function rotA(axis, deg, [x, y, z]) {
+  const c = Math.cos(deg * D2R), s = Math.sin(deg * D2R);
+  if (axis === 'x') return [x, y * c - z * s, y * s + z * c];
+  if (axis === 'y') return [x * c + z * s, y, -x * s + z * c];
+  return [x * c - y * s, x * s + y * c, z];
+}
+const faceOfDir = d => (d[0] > .5 ? 'left' : d[0] < -.5 ? 'right' : d[1] > .5 ? 'up' : d[1] < -.5 ? 'down' : d[2] > .5 ? 'back' : 'front');
+// Element spanning the A-frame points pts, with only the listed faces; a face's fn(P) maps its
+// A-frame corner points (before the element rotation) to texture [u, v] in 0..16.
+function faceEl(pts, faces, {rot, shade = true} = {}) {
+  const lo = [0, 1, 2].map(i => Math.min(...pts.map(p => p[i]))), hi = [0, 1, 2].map(i => Math.max(...pts.map(p => p[i])));
+  const from = [8 - hi[0], 8 + lo[1], 8 + lo[2]].map(r4), to = [8 - lo[0], 8 + hi[1], 8 + hi[2]].map(r4);
+  const out = {};
+  for (const [af, {tex, fn, uv}] of Object.entries(faces)) {
+    const mf = FACE_OF[af];
+    if (fn) {
+      const [u, r] = solveUV(mf, from, to, p => fn([8 - p[0], p[1] - 8, p[2] - 8]));
+      out[mf] = {texture: '#' + tex, uv: u, ...(r ? {rotation: r} : {})};
+    } else out[mf] = {texture: '#' + tex, uv: uv || [0, 0, 16, 16]};
+  }
+  const el = {from, to, faces: out};
+  if (!shade) el.shade = false;
+  const r = rotM(rot);
+  if (r) el.rotation = r;
+  return el;
+}
+// sections: [{a: [a0, a1] along the axis from c, r: facet inradius, tex}]
+function lathe(axis, c, sections, {vFrom, vTo, n = 16}) {
+  const A = AXV[axis], [e0, e1] = AZV[axis], dirs = [e0, e1, vsc(e0, -1), vsc(e1, -1)], els = [];
+  for (const {a: [a0, a1], r, tex} of sections) {
+    const w = 2 * r * Math.tan(Math.PI / n);
+    for (let k = 0; k < n; k++) {
+      const phi = k * 360 / n, q = Math.round(phi / 90), g = phi - 90 * q, d = dirs[q % 4], t = dirs[(q + 1) % 4];
+      const P = (a, s) => vadd(vadd(c, vsc(A, a)), vadd(vsc(d, r), vsc(t, s)));
+      const fn = X => { const rel = vsub(X, c); return [16 * (k + .5 + vdot(rel, t) / w) / n, 16 * (vdot(rel, A) - vFrom) / (vTo - vFrom)]; };
+      const sg = vdot(rotA(axis, 10, d), t) > 0 ? 1 : -1;
+      els.push(faceEl([P(a0, -w / 2), P(a1, w / 2)], {[faceOfDir(d)]: {tex, fn}},
+        {shade: false, rot: g ? [axis, sg * g, vadd(c, vsc(A, (a0 + a1) / 2))] : undefined}));
+    }
+  }
+  return els;
+}
+// Round end/ledge disc across the axis at a; side '+', '-' or '+-'. Discs are inscribed in the
+// ring they close (R = its facet inradius x 0.995) so they never show past the facets from the
+// side. A plain disc (gold sprite, game-shaded) closes a real armour step; a polar disc is
+// unshaded and maps its sprite so that the sprite angle atan2(u - .5, v - .5) is the lathe
+// azimuth, so a polar sprite painted per azimuth matches the facets beside it.
+function disc(axis, c, a, R, side, tex = 'gd_ldisc', polar = false) {
+  const A = AXV[axis], [e0, e1] = AZV[axis], O = vadd(c, vsc(A, a));
+  const P = (i, j) => vadd(O, vadd(vsc(e0, i * R), vsc(e1, j * R)));
+  const fn = polar ? X => { const rel = vsub(X, O); return [16 * (.5 + vdot(rel, e1) / (2 * R)), 16 * (.5 + vdot(rel, e0) / (2 * R))]; } : undefined;
+  const faces = {};
+  for (const sd of side) faces[faceOfDir(vsc(A, sd === '+' ? 1 : -1))] = {tex, fn};
+  return faceEl([P(-1, -1), P(1, 1)], faces, {shade: !polar});
+}
+const DK = .995;
+// Smooth turned solid: the radius profile prof(a) sampled on the stations `at` (ascending along
+// the axis). Section i spans [at[i], at[i+1]] at the radius of its midpoint and reaches 0.02 into
+// a wider neighbour; each step is closed by a polar ledge disc painted like the surface, so the
+// steps vanish and the outline follows the profile. ends '-' / '+' close the first / last station.
+function turned(axis, c, at, prof, tex, ledge, V, ends = '') {
+  const rs = at.slice(1).map((x, i) => prof((at[i] + x) / 2)), secs = [], els = [];
+  rs.forEach((r, i) => secs.push({a: [at[i] - (i > 0 && rs[i - 1] > r ? .02 : 0), at[i + 1] + (i < rs.length - 1 && rs[i + 1] > r ? .02 : 0)], r, tex}));
+  for (let i = 0; i < rs.length - 1; i++) if (Math.abs(rs[i] - rs[i + 1]) > 1e-3)
+    els.push(disc(axis, c, at[i + 1], Math.max(rs[i], rs[i + 1]) * DK, rs[i] > rs[i + 1] ? '+' : '-', ledge, true));
+  if (ends.includes('-')) els.push(disc(axis, c, at[0], rs[0] * DK, '-', ledge, true));
+  if (ends.includes('+')) els.push(disc(axis, c, at[at.length - 1], rs[rs.length - 1] * DK, '+', ledge, true));
+  return [...lathe(axis, c, secs, V), ...els];
+}
+const stations = (a0, a1, n) => Array.from({length: n + 1}, (_, i) => a0 + (a1 - a0) * i / n);
+// Turned knob: a sphere of radius R in twelve bands of equal angle (shoulder, elbow).
+function knob(axis, c, R) {
+  const at = Array.from({length: 13}, (_, i) => R * Math.sin((-90 + 15 * i) * D2R));
+  return turned(axis, c, at, a => R * Math.sqrt(Math.max(0, 1 - (a / R) ** 2)), 'gd_lknob', 'gd_ledge', {vFrom: R, vTo: -R}, '-+');
+}
+// Straight taper along Y from radius r0 at y0 down to r1 at y1 in n sections.
+const taperY = (y0, y1, r0, r1, n, tex, ledge, V) => turned('y', [0, 0, 0], stations(y1, y0, n), y => r1 + (r0 - r1) * (y - y1) / (y0 - y1), tex, ledge, V);
+// Left (gold) arm, model.md §3.4, ref.png and the binding feedback in plan.md: turned segments
+// (no box corners from any side) under a wrap-round paint. Upper arm: a gold shoulder lame with a
+// flared rim over a slim gold sleeve tapering to the elbow; forearm: a gold elbow flare, then a
+// gauntlet tapering to the wrist whose side toward the viewer in most poses (azimuth about +45,
+// see guardian_paint.mjs) glows amber with gold scrolls beside a gold back strip, a dark wrist
+// wrap and a gold cuff. Smooth turned knobs round the shoulder and the elbow.
+function lUpper() {
+  const T = 'gd_lup', c = [0, 0, 0], V = {vFrom: 1.6, vTo: -7.9};
   return [
-    cardZ(tex, z, rect), cardX(tex, x, {Z0: z - r, Z1: z + r, Y0: y - r, Y1: y + r}),
-    cardZ(tex, z, rect, {rot: ['y', 45, c]}), cardZ(tex, z, rect, {rot: ['y', -45, c]}),
-    abox([x - r, y, z - r], [x + r, y, z + r], {up: tex, down: tex}, {shade: false}),
+    ...knob('y', [0, -.1, 0], 1.5),
+    ...lathe('y', c, [{a: [-3.2, -.6], r: 1.38, tex: T}, {a: [-3.36, -2.94], r: 1.47, tex: T}], V),
+    disc('y', c, -3.36, 1.47 * DK, '-'),
+    ...taperY(-3.1, -7.95, 1.28, 1.04, 6, T, 'gd_ledge_lup', V),
   ];
 }
-// Left (gold) arm, model.md §3.4 and the binding feedback in plan.md: slim tapered segments made
-// of two crossed painted silhouette cards, rounded gold shoulder and elbow caps; a white sleeve
-// under a gold plate, then the glowing amber gauntlet with a gold flare and cuff.
-const crossed = (sprite, r) => [cardZ(sprite, 0, r), cardX(sprite, 0, {Z0: r.X0, Z1: r.X1, Y0: r.Y0, Y1: r.Y1})];
-const lUpper = () => [...crossed('gd_larm_up', CARD.gd_larm_up), ...cap([0, -.15, 0], 1.55)];
-const lFore = () => [...crossed('gd_larm_fore', CARD.gd_larm_fore), ...cap([0, .05, 0], 1.3)];
-function bracket() {
-  // gold arm from the shoulder mount (0,0,0) toward the shield: two bars and two round joints;
-  // it ends under the shield's inner rim (the shield centre sits 1.05 b out along the bar)
+function lFore() {
+  const T = 'gd_lfo', c = [0, 0, 0], V = {vFrom: 1.5, vTo: -7.7};
   return [
-    abox([0, -.85, -.65], [6.6, .85, .65], 'gd_gold'),
-    abox([6.6, -.7, -.55], [10.0, .7, .55], 'gd_gold'),
-    abox([2.4, .7, -.4], [6.0, 1.4, .4], 'gd_gold_dark'),
-    plate('gd_joint', 0, 0, 3.0, -.75), plate('gd_joint', 0, 0, 3.0, .75),
-    plate('gd_joint', 6.6, 0, 3.4, -.7), plate('gd_joint', 6.6, 0, 3.4, .7),
-    plate('gd_blackstar', 6.6, -2.6, 2.8, -.8), plate('gd_blackstar', 6.6, -2.6, 2.8, .8),
+    ...knob('y', c, 1.38),
+    ...lathe('y', c, [{a: [-1.9, -.9], r: 1.5, tex: T}], V), disc('y', c, -1.9, 1.5 * DK, '-'),
+    ...taperY(-1.8, -6.1, 1.42, 1.06, 7, T, 'gd_ledge_lfo', V),
+    ...lathe('y', c, [{a: [-6.86, -6.0], r: .95, tex: T}, {a: [-7.56, -6.8], r: 1.06, tex: T}], V),
+    disc('y', c, -6.8, 1.06 * DK, '+'), disc('y', c, -7.56, 1.06 * DK, '-'),
+  ];
+}
+// ---- left claw: slender gold talons -------------------------------------------------------
+// Thin finger segment: a w x t box hanging from the joint J along -Y before its rotation about J;
+// it reaches 0.16 above J into the previous segment so bent joints stay closed.
+const phalanx = (J, L, w, t, rot) => abox([J[0] - w / 2, J[1] - L, J[2] - t / 2], [J[0] + w / 2, J[1] + .16, J[2] + t / 2], {all: 'gd_lfinger'},
+  {rot: rot ? [rot[0], rot[1], J] : undefined, drop: ['up']});
+// Finger from the knuckle K: the first segment fans out (rotation about Z), the next two and the
+// painted talon curl toward the palm (-Z) by 22.5, 45 and 45 degrees plus the talon's own hook.
+function talonFinger(K, fan, [L1, L2, L3], TL, s = 1) {
+  const e = [phalanx(K, L1, .42 * s, .38 * s, fan ? ['z', fan] : null)];
+  const P1 = vadd(K, [L1 * Math.sin(fan * D2R), -L1 * Math.cos(fan * D2R), 0]);
+  e.push(phalanx(P1, L2, .34 * s, .3 * s, ['x', 22.5]));
+  const P2 = vadd(P1, [0, -L2 * Math.cos(22.5 * D2R), -L2 * Math.sin(22.5 * D2R)]);
+  e.push(phalanx(P2, L3, .27 * s, .24 * s, ['x', 45]));
+  const P3 = vadd(P2, [0, -L3 * Math.SQRT1_2, -L3 * Math.SQRT1_2]);
+  e.push(...talonPair('gd_talon_gold', P3[0], P3[2], P3[1] + .12, P3[1] - TL, .2 * s, ['x', 45, P3]));
+  return e;
+}
+// Back-of-hand plate: the painted plate sprite on two cards that meet in a ridge at x = 0 and
+// turn their outer edges 22.5 degrees toward the palm (a shallow sculpted roof), plus the palm.
+function handPlate(z, Y0, Y1, palmZ) {
+  const R = {X0: -1.4, X1: 1.4, Y0, Y1}, my = (Y0 + Y1) / 2;
+  return [
+    cardZ('gd_lhand', z, {...R, X0: 0}, {uvr: [.5, 0, 1, 1], rot: ['y', 22.5, [0, my, z]]}),
+    cardZ('gd_lhand', z, {...R, X1: 0}, {uvr: [0, 0, .5, 1], rot: ['y', -22.5, [0, my, z]]}),
+    cardZ('gd_lpalm', palmZ, {X0: -1.3, X1: 1.3, Y0: Y0 + .05, Y1: Y1 - .05}),
+  ];
+}
+// Open claw (her left hand): wrist at the pivot, fingers toward -Y, palm toward -Z, the thumb on
+// +X (a left hand's thumb side for that palm), index to pinky from +X to -X, the outer fingers
+// fanned 22.5 degrees like the ref's bird-foot talons.
+function lClawOpen() {
+  const e = handPlate(.42, -2.7, .35, -.18);
+  for (const [x, fan, L, TL, s] of [[-.97, -22.5, [1.15, .8, .62], 1.1, .86], [-.33, 0, [1.35, .9, .7], 1.25, .96], [.31, 0, [1.4, .92, .72], 1.3, 1], [.95, 22.5, [1.28, .86, .68], 1.2, .94]])
+    e.push(...talonFinger([x, -2.38, .12], fan, L, TL, s));
+  const R = [1.0, -.8, -.1], T1 = vadd(R, [.95 * Math.SQRT1_2, -.95 * Math.SQRT1_2, 0]), T2 = vadd(T1, [.7 * Math.sin(22.5 * D2R), -.7 * Math.cos(22.5 * D2R), 0]);
+  e.push(phalanx(R, .95, .4, .36, ['z', 45]), phalanx(T1, .7, .32, .28, ['z', 22.5]));
+  e.push(...talonPair('gd_talon_gold', T2[0], T2[2], T2[1] + .1, T2[1] - 1.05, .18, ['x', 45, T2]));
+  return e;
+}
+// Finger ring round the spear shaft (the X axis through Y -2.24): box slabs one facet wide at
+// the azimuths ks (0 = front -Z, 90 = up), w wide along X; widths alternate by 0.05 so the side
+// faces of neighbouring slabs never share a plane.
+const SHAFT_Y = -2.24;
+function ringArc(x, w, rIn, rOut, ks) {
+  const dirs = [[0, 0, -1], [0, 1, 0], [0, 0, 1], [0, -1, 0]], C = [x, SHAFT_Y, 0], wt = 2 * rOut * Math.tan(Math.PI / 16) + .02, T = {tex: 'gd_lfinger'};
+  const lo = Math.min(...ks), hi = Math.max(...ks);
+  return ks.map((k, i) => {
+    const phi = (((k % 16) + 16) % 16) * 22.5, q = Math.round(phi / 90), g = phi - 90 * q, d = dirs[q % 4], t = dirs[(q + 1) % 4], hw = w / 2 + (i % 2 ? .025 : 0);
+    const P = (dx, rr, s) => vadd(vadd(C, [dx, 0, 0]), vadd(vsc(d, rr), vsc(t, s)));
+    const faces = {[faceOfDir(d)]: T, left: T, right: T};
+    if (k === lo) faces[faceOfDir(vsc(t, -1))] = T;
+    if (k === hi) faces[faceOfDir(t)] = T;
+    const sg = vdot(rotA('x', 10, d), t) > 0 ? 1 : -1;
+    return faceEl([P(-hw, rIn, -wt / 2), P(hw, rOut, wt / 2)], faces, {rot: g ? ['x', sg * g, C] : undefined});
+  });
+}
+// Talon pointing up from its root (y0) toward y1, tilted back by `rot` (fist claws hooking over
+// the shaft toward the palm).
+const talonUp = (x, z, y0, y1, w, rot) => [
+  cardX('gd_talon_gold', x, {Z0: z - w, Z1: z + w, Y0: y0, Y1: y1}, {rot, uvr: [0, 1, 1, 0]}),
+  cardZ('gd_talon_gold', z, {X0: x - w, X1: x + w, Y0: y0, Y1: y1}, {rot, uvr: [0, 1, 1, 0]}),
+];
+// Fist round the shaft (two-hand grips): the plate behind the shaft, four fingers wrapping from
+// the back under the shaft to its top-front with short claws hooking back over it, the thumb
+// wrapping over the top from the other side.
+function lClawFist() {
+  const e = handPlate(.98, -2.85, .3, .6);
+  const fing = [[-.95, .44], [-.32, .5], [.31, .5], [.93, .46]];
+  for (const [x, w] of fing) {
+    e.push(...ringArc(x, w, .6, 1.0, [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]));
+    const a = 56.25 * D2R, root = [x, SHAFT_Y + .8 * Math.sin(a), -.8 * Math.cos(a)];
+    e.push(...talonUp(x, root[2], root[1] - .1, root[1] + .85, .17, ['x', 45, root]));
+  }
+  e.push(...ringArc(1.5, .42, .6, .98, [2, 3, 4, 5, 6]));
+  const a = 33.75 * D2R, tip = [1.5, SHAFT_Y + .8 * Math.sin(a), -.8 * Math.cos(a)];
+  e.push(...talonPair('gd_talon_gold', tip[0], tip[2], tip[1] + .1, tip[1] - .85, .16, ['x', 22.5, tip]));
+  return e;
+}
+// Shield brace (her left shoulder): a smooth gold pauldron dome turned about the brace axis
+// (painted lame grooves) that flows into a slim round rod out to a hinge disc on the shield rim,
+// and a painted swept gold fin above the rod with a spur below it that carries the black 4-point
+// star (the wing-root ornament). The fin and the rod stay clear of the shield card,
+// which lies in this part's z = 0 plane from about x = 6.7 (model units) outward.
+function bracket() {
+  const P = 'gd_paul', V = {vFrom: -1.0, vTo: 6.4};
+  // half-ellipsoid dome (r 2.25 at x = -0.3, closing at x = 3.1) that flows into the 0.62 rod
+  const dome = x => Math.max(.62, 2.25 * Math.sqrt(Math.max(0, 1 - ((x + .3) / 3.4) ** 2)));
+  return [
+    ...turned('x', [0, 0, 0], [...stations(-.95, 2.95, 13), 6.4], dome, P, 'gd_ledge_paul', V, '-'),
+    ...lathe('z', [6.4, 0, 0], [{a: [-.78, .78], r: 1.28, tex: 'gd_lknob'}], {vFrom: .78, vTo: -.78}),
+    plate('gd_joint', 6.4, 0, 2.7, -.8), plate('gd_joint', 6.4, 0, 2.7, .8),
+    cardZ('gd_brace_fin', 0),
+    plate('gd_blackstar', 5.5, -2.55, 2.5, -.45), plate('gd_blackstar', 5.5, -2.55, 2.5, .45),
   ];
 }
 const shield = () => [cardZ('gd_shield', 0)];
@@ -335,8 +516,8 @@ export function partModels() {
   return {
     pelvis: pelvis(), skirt_f: skirtFront(), skirt_o: skirtOuter(), tail: tail(), leg_r: leg(-1), leg_l: leg(1),
     torso: torso(), head: head(), halo: halo(), halo_glow: haloGlow(),
-    r_upper: rUpper(), r_fore: rFore(), r_hand_fist: clawFist(false), r_hand_open: clawOpen(false, 1),
-    l_upper: lUpper(), l_fore: lFore(), l_hand_open: clawOpen(true, -1), l_hand_fist: clawFist(true),
+    r_upper: rUpper(), r_fore: rFore(), r_hand_fist: clawFist(), r_hand_open: clawOpen(),
+    l_upper: lUpper(), l_fore: lFore(), l_hand_open: lClawOpen(), l_hand_fist: lClawFist(),
     bracket: bracket(), shield: shield(), shield_eye: shieldEye(), shield_eye_t: shieldEyeTinted(),
     wing_cov: wingTier('gd_wing_cov', -.9), wing_sec: wingTier('gd_wing_sec', 0), wing_pri: wingTier('gd_wing_pri', .8),
     spear: spear(false), spear_e: spear(true), spear_glow: spearGlow(), trail: trail(),
