@@ -8,13 +8,16 @@ scoreboard players set @s pmLen 62
 scoreboard players set @s pmChar 6
 scoreboard players set @s pmSpeed 100
 execute if score @s atkSpeed matches 1.. run scoreboard players operation @s pmSpeed = @s atkSpeed
+scoreboard players set #pmRate tmp 130
+scoreboard players operation @s pmSpeed *= #pmRate tmp
+scoreboard players operation @s pmSpeed /= #100 tmp
 execute if score @s pmSpeed matches ..24 run scoreboard players set @s pmSpeed 25
 execute if score @s pmSpeed matches 501.. run scoreboard players set @s pmSpeed 500
 scoreboard players set @s pmAcc 0
 scoreboard players set @s pmStep 99
 scoreboard players operation @s pmStep += @s pmSpeed
 scoreboard players operation @s pmStep /= @s pmSpeed
-data modify storage rlk:player_motion active set value {char:"navia",clip:"physical_4",step:1,loop:0b,lockedYaw:0b}
+data modify storage rlk:player_motion active set value {char:"navia",clip:"physical_4",step:1,loop:0b,lockedYaw:0b,normal:1b}
 execute store result storage rlk:player_motion active.step int 1 run scoreboard players get @s pmStep
 execute unless score @s pmRigChar = #charN tmp run kill @e[tag=rlk_pm]
 execute if entity @e[tag=rlk_av,limit=1] unless entity @e[tag=rlk_pm] at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 run function rlk:char/motion/clips/navia/physical_4/spawn

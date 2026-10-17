@@ -26,6 +26,8 @@ Timing source (D11 retime): physical_1-4, skill, skill_fire and burst were time-
 tools/player_motion/navia/ plus the navia_fx tick files are the source of truth for timing. The scratch authoring
 scripts that first generated these clips emit the old 150 % timing and are superseded: edit the JSON, the LAYERS
 lists and the fx files directly.
+D12: the normal attacks physical_1-4 now play at playback_rate 130 (attack speed +30 %). Layer ticks stay authored
+ticks; the animation clock plays them 1.3x faster, so sound, fx, hits and chain stay in step.
 """
 
 from __future__ import annotations

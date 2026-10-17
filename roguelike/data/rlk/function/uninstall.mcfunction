@@ -78,6 +78,8 @@ tag @a remove rlk_setup
 clear @a minecraft:filled_map[minecraft:custom_data~{rlk_map:1b}]
 execute as @a run attribute @s minecraft:movement_speed modifier remove rlk:frozen
 execute as @a run attribute @s minecraft:jump_strength modifier remove rlk:frozen
+execute as @a run attribute @s minecraft:movement_speed modifier remove rlk:swing_hold
+execute as @a run attribute @s minecraft:jump_strength modifier remove rlk:swing_hold
 kill @e[tag=rlk_shop_item]
 kill @e[tag=rlk_shop_info]
 kill @e[tag=rlk_shop_lbl]
@@ -466,6 +468,8 @@ scoreboard objectives remove stacks
 scoreboard objectives remove starlight
 scoreboard objectives remove stepT
 scoreboard objectives remove stunT
+scoreboard objectives remove swHold
+scoreboard objectives remove swJump
 scoreboard objectives remove swungAt
 scoreboard objectives remove talEnd
 scoreboard objectives remove tmp

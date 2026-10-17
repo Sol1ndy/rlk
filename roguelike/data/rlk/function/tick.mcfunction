@@ -12,6 +12,8 @@ execute if score #pcount tmp matches 2.. run return 0
 # 시점 시스템(숄더뷰): 몸(rlk_body) 정하기 · 아바타 이동 · 카메라. 플레이어가 없으면 아바타 정리
 # 이전 틱 피격의 남은 넉백을 카메라 갱신 전에 적용
 execute as @e[tag=rlk_plkb] run function rlk:player/knockback/tick
+# 평타 휘두르기 잠금(swHold): 이번 틱의 이동(view/move, 1인칭 속성)보다 먼저 atkCD 에서 다시 구한다
+execute as @a[tag=player] run function rlk:player/swing/tick
 execute as @a[tag=player] run function rlk:view/tick
 execute unless entity @a[tag=player,limit=1] if entity @e[tag=rlk_view,limit=1] run kill @e[tag=rlk_view]
 execute as @a[tag=player] run function rlk:player/tick

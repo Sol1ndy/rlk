@@ -1,13 +1,13 @@
 {
   "clips": {
     "physical_1": {
-      "playback_rate": 100,
+      "playback_rate": 130,
       "weapon": "navia_halberd",
       "weapon_state": "drawn",
       "length": 55,
       "hit_ticks": [9],
       "chain_tick": 14,
-      "source": "v2 f42-f87 (N1) + v3 s2 f282-f324 | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source)",
+      "source": "v2 f42-f87 (N1) + v3 s2 f282-f324 | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source) | D12: playback_rate 130 (attack speed +30%; ticks here stay authored ticks, the game plays them 1.3x faster)",
       "frames": [
         {"tick":0,"pose":{"shift":[0,0.028,0],"root":[-0.6,0,0],"torso":[-0.4,0,0],"head":[1.2,-3,2.5],"right_arm":[12,-4,-12],"right_elbow":[38,0,0],"left_arm":[4,2,8.5],"left_elbow":[13,0,0],"right_leg":[1.2,0,-1.2],"right_knee":[-1.5,0,0],"left_leg":[3,-4,1.2],"left_knee":[-5,0,0],"weapon":[-110.557,10.417,-85.346],"weapon_shift":[0,0,0],"weapon_scale":[1,1,1]}},
         {"tick":1,"pose":{"shift":[0,-0.08,0],"root":[-5,16.1,0],"torso":[-5,6.9,0],"head":[2,-15,0],"right_arm":[-17.24,-12.091,-9.253],"right_elbow":[92.549,0,0],"left_arm":[10,0,10],"left_elbow":[20,0,0],"right_leg":[42.827,0,-3],"right_knee":[-42.412,0,0],"left_leg":[9.585,0,3],"left_knee":[-42.412,0,0],"weapon":[-85.346,59.357,-65.391],"weapon_shift":[0,0,0],"weapon_scale":[1,1,1]}},
@@ -68,13 +68,13 @@
       ]
     },
     "physical_2": {
-      "playback_rate": 100,
+      "playback_rate": 130,
       "weapon": "navia_halberd",
       "weapon_state": "drawn",
       "length": 60,
       "hit_ticks": [7],
       "chain_tick": 14,
-      "source": "v2 f87-f130 (N2) + v3 s2 f336-f366 | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source)",
+      "source": "v2 f87-f130 (N2) + v3 s2 f336-f366 | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source) | D12: playback_rate 130 (attack speed +30%; ticks here stay authored ticks, the game plays them 1.3x faster)",
       "frames": [
         {"tick":0,"pose":{"shift":[0,0.028,0],"root":[-0.6,0,0],"torso":[-0.4,0,0],"head":[1.2,-3,2.5],"right_arm":[12,-4,-12],"right_elbow":[38,0,0],"left_arm":[4,2,8.5],"left_elbow":[13,0,0],"right_leg":[1.2,0,-1.2],"right_knee":[-1.5,0,0],"left_leg":[3,-4,1.2],"left_knee":[-5,0,0],"weapon":[-180,15,165],"weapon_shift":[0,0,0],"weapon_scale":[1,1,1]}},
         {"tick":1,"pose":{"shift":[0,-0.067,0],"root":[-4.512,6.417,0.044],"torso":[-3.566,2.75,0.015],"head":[1.526,-6.792,1.461],"right_arm":[-21.645,-1.887,-19.154],"right_elbow":[52.623,0,0],"left_arm":[9.842,1.224,14.134],"left_elbow":[24.25,0,0],"right_leg":[30.048,-0.038,-1.953],"right_knee":[-31.591,0,0],"left_leg":[15.909,-2.315,1.913],"left_knee":[-36.422,0,0],"weapon":[135,0,165],"weapon_shift":[0,0,0],"weapon_scale":[1,1,1]}},
