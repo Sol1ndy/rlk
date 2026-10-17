@@ -18,9 +18,12 @@
 //   gd_crest / gd_crest_side                  winged crest with the red diamond face and eye
 //   gd_belt, gd_skirt_front, gd_skirt_side, gd_hip_wing, gd_tail, gd_skirt_back
 //   gd_chest, gd_chest_back                   torso cards
-//   gd_larm_up / gd_larm_fore                 left-arm silhouettes (white sleeve under a gold plate /
-//                                             amber gauntlet), shown on crossed cards
-//   gd_cap                                    sphere-painted disc for the rounded gold caps
+//   gd_lup / gd_lfo / gd_lknob / gd_paul      wrap-round textures of the turned left arm (gold
+//                                             lames / amber-glowing gauntlet), its knobs and the
+//                                             shield brace pauldron; gd_ldisc their armour-step
+//                                             discs, gd_ledge* the polar discs of smooth steps
+//   gd_lhand, gd_lpalm, gd_lfinger            left claw: back plate, palm, finger segments
+//   gd_brace_fin                              the brace's swept gold fin and star spur
 //   gd_corrupt, gd_corrupt_b, gd_vox, gd_vox_rune, gd_gold, gd_gold_dark, gd_redstar,
 //   gd_blackstar, gd_joint, gd_talon, gd_talon_gold, gd_shaft, gd_redcore, gd_dark
 //   gd_spear_glow, gd_trail                   (glow) aura and afterimage cards
@@ -694,17 +697,6 @@ function goldTile(dark = false) {
     return c;
   });
 }
-// Glowing amber gauntlet face (ref.png forearm): #E4833C -> #F2AB76 across ~85 % of the width,
-// a hot #FBDFD4 core strip with a swirl, thin gold edges.
-function amberAt(s, v) {
-  // s = 0 on the centre line .. 1 at the gold edge; v along the length
-  let c = mix(PAL.gl2, PAL.gl3, smooth(.15, .95, s));
-  c = mix(c, PAL.gl1, (1 - smooth(0, .22, s)) * .75);
-  const sw = Math.abs(Math.sin(v * 17) * .16 - s * .8 + .05);
-  if (sw < .035 && s < .7) c = mix(c, PAL.gl1, .7);
-  if (s > .45 && Math.abs(((v * 5.3) % 1) - .5) < .04) c = mix(c, C('#c8642a'), .45);   // faint ribbing
-  return c;
-}
 function jointRing() {
   return (u, v) => {
     const r = Math.hypot(u - .5, v - .5) * 2;
@@ -712,18 +704,6 @@ function jointRing() {
     if (r < .4) return mix(mix(PAL.goldHi, PAL.goldLit, smooth(0, .4, r)), PAL.goldMid, smooth(.25, .4, r) * .6);
     if (r < .5) return mix(PAL.goldDark, PAL.goldLine, .4);
     return goldAt((1 - r) * 3, 1, u * 5, v * 5);
-  };
-}
-// Rounded gold cap (disc cards): a centred dome highlight, mid gold, darker rim and outline.
-function goldCap() {
-  return (u, v) => {
-    const r = Math.hypot(u - .5, v - .5) * 2;
-    if (r > 1) return TRANSPARENT;
-    let c = mix(PAL.goldHi, PAL.goldLit, smooth(0, .4, r));
-    c = mix(c, PAL.goldMid, smooth(.4, .85, r) * .8);
-    c = mix(c, PAL.goldDark, smooth(.8, .97, r) * .7);
-    if (r > .93) c = mix(c, PAL.goldLine, .6);
-    return mix(c, PAL.goldDeep, (grainG(u * 6, v * 6) - .5) * .12);
   };
 }
 // Talon: a slim hooked claw, root at the top (v 0), tip at the bottom, curving toward u = 1.
@@ -739,62 +719,218 @@ function talon(gold = false) {
   };
 }
 // =============================================================================================
-// LEFT ARM (her gold arm; 16 units per block, segment hanging along -Y from its joint). Painted
-// silhouettes for the crossed cards: half width per height, a white sleeve under a gold plate
-// (upper arm) and the glowing amber gauntlet with gold flare and cuff (forearm).
-const LARM_UP = [[1.2, 1.35], [.4, 1.5], [-1.0, 1.52], [-2.6, 1.4], [-4.4, 1.22], [-6.2, 1.06], [-6.5, 1.2], [-7.6, 1.18], [-8.1, .7], [-8.35, 0]];
-const LARM_FO = [[1.0, 1.25], [-.4, 1.35], [-1.0, 1.62], [-1.9, 1.58], [-3.6, 1.38], [-5.6, 1.12], [-6.2, 1.05], [-6.7, 1.0], [-7.2, 1.3], [-7.6, 1.26], [-7.95, .6], [-8.05, 0]];
-const halfAt = (prof, y) => {
-  if (y > prof[0][0] || y < prof[prof.length - 1][0]) return 0;
-  for (let i = 0; i < prof.length - 1; i++) {
-    const [y0, w0] = prof[i], [y1, w1] = prof[i + 1];
-    if (y <= y0 && y >= y1) { const t = (y0 - y) / Math.max(1e-6, y0 - y1); return w0 + (w1 - w0) * smooth(0, 1, t); }
-  }
-  return 0;
+// LEFT ARM and SHIELD BRACE (her gold arm). The arm segments, knobs and the brace are turned
+// (lathe) geometry in guardian_geometry.mjs: their textures wrap round the axis, u = azimuth
+// (facet k of 16 shows [k/16, (k+1)/16], centred on azimuth 22.5k from the segment front, + toward
+// her left), v = along the axis from the top (vFrom) to the bottom (vTo) of the lathe.
+const azOf = u => { const a = u * 360 - 11.25; return a > 180 ? a - 360 : a; };
+const D2R = Math.PI / 180, wrap180 = d => ((d % 360) + 540) % 360 - 180;
+const grainK = (c, u, v, k = .14) => mix(c, PAL.goldDeep, (grainG(u * 9, v * 9) - .5) * k);
+const lit = (c, k) => [c[0] * k, c[1] * k, c[2] * k, 255];
+// Warm gold for the turned parts (a little richer than the card gold, which sits on lighter
+// painted shading).
+const G3 = {hi: C('#fff2cc'), lit: C('#f8d68e'), mid: C('#e3ae5c'), dark: C('#a9722e'), deep: C('#5e3a18')};
+// Baked metal light of the unshaded turned parts: brightest toward azimuth a0 (the side most
+// views see; for the arm segments about +45 to +60 from the segment front, computed from the
+// clips), a soft specular streak just before it, darker toward the back.
+function metalAz(c, a, a0 = 45, lo = .62) {
+  const d = wrap180(a - a0), k = lo + (1 - lo) * Math.pow(.5 + .5 * Math.cos(d * D2R), 1.2);
+  return mix(lit(c, k), [255, 250, 232, 255], Math.exp(-(((d + 26) / 14) ** 2)) * .45);
+}
+// A gold ring band across t = 0 (top) .. 1 (bottom): bright upper middle, dark edge grooves.
+function goldRing3(t) {
+  let c = mix(G3.hi, G3.lit, smooth(.1, .7, Math.abs(t - .4) * 2));
+  c = mix(c, G3.mid, smooth(.6, 1, t) * .5);
+  return t < .08 || t > .92 ? mix(c, G3.deep, .5) : c;
+}
+// Turned knob (shoulder, elbow, brace hinge): lat +1 at the top .. -1 at the bottom, a polished
+// gold ball lit from the upper front with one engraved ring under the equator.
+function knobTex() {
+  return (u, v) => {
+    const lat = 1 - 2 * v;
+    let c = mix(G3.mid, G3.lit, smooth(-.9, .35, lat));
+    c = mix(c, G3.hi, smooth(.25, .75, lat) * (1 - smooth(.75, 1, lat)) * .5);
+    if (Math.abs(lat + .3) < .05) c = mix(c, G3.dark, .5);
+    return grainK(metalAz(c, azOf(u), 45, .62), u, v, .08);
+  };
+}
+// Polar ledge sprites: the unshaded discs that close the steps of the smooth turned parts,
+// coloured per azimuth (sprite angle atan2(u - .5, v - .5)) like the facets around them.
+const polar = col => (u, v) => {
+  const r = Math.hypot(u - .5, v - .5) * 2;
+  return r > 1 ? TRANSPARENT : col(Math.atan2(u - .5, v - .5) / D2R, r);
 };
-function lArmUpper() {
-  const card = CARD.gd_larm_up, px = (card.X1 - card.X0) / SIZE.gd_larm_up[0];
-  return onCard(card, (x, y) => {
-    const hw = halfAt(LARM_UP, y), e = hw - Math.abs(x);
-    if (e < 0) return null;
-    const s = Math.abs(x) / Math.max(hw, .01);
+// End and ledge discs of the turned parts (game-shaded): a gold disc (alpha-cut circle).
+function discTex() {
+  return (u, v) => {
+    const r = Math.hypot(u - .5, v - .5) * 2;
+    if (r > 1) return TRANSPARENT;
+    let c = mix(G3.hi, G3.lit, smooth(0, .75, r));
+    if (Math.abs(r - .62) < .05) c = mix(c, G3.mid, .45);
+    return mix(c, G3.mid, smooth(.85, 1, r) * .6);
+  };
+}
+// Finger segments (thin game-shaded boxes): a bright stripe along each face, darker edges.
+function fingerTex() {
+  return (u, v) => {
+    const e = Math.min(u, 1 - u) * 2;
+    const c = mix(G3.mid, G3.hi, smooth(0, .9, e));
+    return e < .14 ? mix(c, G3.dark, .35) : c;
+  };
+}
+// Upper arm (y = 1.6 - 9.5 v): the shoulder lame (two engraved rings, a bright flared rim with a
+// shadow line under it) over the slim gold sleeve, which carries one engraved line down the side
+// most views see.
+function lUpTex() {
+  return (u, v) => {
+    const y = 1.6 - 9.5 * v, a = azOf(u), d = wrap180(a - 50);
     let c;
-    // gold plate over the shoulder (scalloped lower edge), gold band above the elbow
-    const plate = y > -2.3 - .35 * Math.cos(x * 2.2), band = y < -6.35 && y > -7.75;
-    if (plate || band || y < -7.75) {
-      c = goldAt(e, .9, x, y);
-      c = mix(c, PAL.goldDark, smooth(.55, 1, s) * .45);
-      if (plate && y < -1.7 - .35 * Math.cos(x * 2.2)) c = mix(c, PAL.goldDeep, .55);       // groove under the plate rim
-      if (band && (y > -6.6 || y < -7.5)) c = mix(c, PAL.goldDeep, .5);
-    } else {
-      // white sleeve, rounded: light centre, grey-violet sides, two soft folds
-      c = mix(PAL.white, PAL.whiteShade, smooth(.25, 1, s) * .85);
-      const fold = Math.abs(((y * .55 + x * .35) % 1 + 1) % 1 - .5);
-      if (fold < .06) c = mix(c, PAL.whiteShade, .35);
-      c = mix(c, C('#efd7b4'), smooth(-3.4, -2.3, y) * .35);                                   // gold bounce under the plate
+    if (y > -2.94) {
+      const t = (-.6 - y) / 2.34;
+      c = mix(G3.lit, G3.mid, smooth(.3, 1, t) * .45);
+      for (const r of [.3, .66]) {
+        if (Math.abs(t - r) < .025) c = mix(c, G3.deep, .5);
+        else if (t - r > .025 && t - r < .07) c = mix(c, G3.hi, .45);
+      }
+    } else if (y > -3.36) c = goldRing3((-2.94 - y) / .42);
+    else {
+      const t = (-3.36 - y) / 4.6;
+      c = mix(G3.dark, G3.lit, smooth(0, .1, t));
+      c = mix(c, G3.mid, smooth(.2, 1, t) * .4);
+      if (Math.abs(d) < 2.2 && t > .08 && t < .94) c = mix(c, G3.deep, .4);
+      else if (Math.abs(d - 4.5) < 2.2 && t > .08 && t < .94) c = mix(c, G3.hi, .35);
     }
+    return grainK(metalAz(c, a, 50), u, v, .1);
+  };
+}
+// Forearm gauntlet (y = 1.5 - 9.2 v): gold elbow flare; the gauntlet's side within 137 degrees
+// of azimuth +45 glows amber (#FBDFD4 core line, #F2AB76 body, #E4833C rim) with gold scrolls
+// inside a gold border, the remaining back strip is gold; a dark wrist wrap and a gold cuff.
+function lFoBody(a, t, u = .5, v = .5) {
+  const d = wrap180(a - 45), s = Math.abs(d) / 137;
+  if (s > 1) {                                                                          // gold back strip
+    let c = mix(G3.lit, G3.mid, .35);
+    if (Math.abs(Math.abs(d) - 180) < 4) c = mix(c, G3.deep, .45);
+    return grainK(metalAz(c, a, 45, .58), u, v, .1);
+  }
+  if (s > .9) return mix(G3.hi, G3.lit, smooth(.9, 1, s) * .8);                       // gold border
+  // a thin white-hot core line, the orange body (#F2AB76), deep amber (#E4833C) toward the border
+  let c = mix(PAL.gl1, PAL.gl2, smooth(.02, .16, s));
+  c = mix(c, PAL.gl3, smooth(.3, .9, s));
+  c = mix(c, PAL.gl3, smooth(.7, 1, t) * .3);
+  // gold scrolls: a sinuous line each side of the centre, a bead row down the middle, two curls
+  const sw = 34 + 26 * Math.sin(t * Math.PI * 1.6 + .4), q = Math.abs(Math.abs(d) - sw);
+  if (q < 3.6) c = mix(C('#fff0c4'), G3.hi, .4);
+  else if (q < 6.5) c = mix(c, G3.hi, .25);
+  for (const [ty, ta] of [[.16, 64], [.84, 14]]) {
+    const r = Math.hypot((t - ty) * 4.15 / .5, (Math.abs(d) - ta) / 14);
+    if (Math.abs(r - .8) < .15) c = mix(C('#fff0c4'), G3.hi, .4);
+  }
+  if (Math.abs(d) < 3 && ((t * 12) % 1) < .5) c = mix(c, C('#fff7e6'), .6);
+  return lit(c, .9 + .1 * Math.cos(d * D2R));
+}
+function lFoTex() {
+  return (u, v) => {
+    const y = 1.5 - 9.2 * v, a = azOf(u);
+    if (y > -1.9) return grainK(metalAz(goldRing3((-.9 - y) / 1.0), a), u, v, .08);   // elbow flare
+    if (y < -6.86) return grainK(metalAz(goldRing3((-6.86 - y) / .7), a), u, v, .08);  // wrist cuff
+    if (y < -6.05) {                                                                    // dark wrist wrap
+      let c = mix(C('#7a2016'), C('#33100c'), smooth(-6.1, -6.85, y) * .6 + .2);
+      if ((((a / 40 + y * 2.6) % 1) + 1) % 1 < .14) c = mix(c, C('#1c0606'), .5);
+      if (Math.abs(y + 6.45) < .05) c = mix(c, G3.lit, .85);
+      return metalAz(c, a, 45, .7);
+    }
+    return lFoBody(a, (-1.9 - y) / 4.15, u, v);
+  };
+}
+// Back-of-hand plate (card units, front view, x = 0 is the ridge where the two roof cards meet):
+// a tapering sculpted plate with four knuckle lobes, a ridge, tendon grooves and a small amber
+// diamond gem; the palm is darker bronze.
+const LHAND = {
+  body: new Shape(spline([[0, .3], [.6, .3], [.86, -.1], [1.12, -.85], [1.3, -1.7], [1.3, -2.22, 'c'], [-1.3, -2.22, 'c'], [-1.3, -1.7], [-1.12, -.85], [-.86, -.1], [-.6, .3], [0, .3]], 6)),
+  lobes: [[-.95, -2.24, .34], [-.32, -2.33, .34], [.31, -2.33, .34], [.95, -2.24, .34]],
+  tendons: [[[.2, -.15], [.31, -2.15]], [[-.2, -.15], [-.32, -2.15]], [[.55, -.35], [.92, -2.05]], [[-.55, -.35], [-.94, -2.05]]],
+};
+function lHandSprite(palm = false) {
+  const card = CARD[palm ? 'gd_lpalm' : 'gd_lhand'], px = (card.X1 - card.X0) / SIZE[palm ? 'gd_lpalm' : 'gd_lhand'][0];
+  return onCard(card, (x, y) => {
+    let sd = LHAND.body.sd(x, y, .5);
+    for (const [cx, cy, r] of LHAND.lobes) sd = Math.min(sd, Math.hypot(x - cx, y - cy) - r);
+    if (sd > 0) return null;
+    const e = -sd;
+    let c = goldAt(e, .32, x * 3, y * 3);
+    if (palm) {
+      // palm: deeper gold, a soft hollow in the middle and creases toward the fingers
+      c = mix(c, PAL.goldDark, .35 + .25 * (1 - smooth(.2, 1.1, Math.hypot(x, y + 1.2))));
+      for (const [p0, p1] of LHAND.tendons) if (distPoly([[p0[0] * .8, p0[1] - .4], p1], x, y, false) < .04) c = mix(c, PAL.goldDeep, .4);
+      return outlineMix(c, e, px, PAL.goldLine, 1.2);
+    }
+    for (const [cx, cy, r] of LHAND.lobes) {
+      const d = Math.hypot(x - cx, y - cy);
+      if (d < r) c = mix(c, PAL.goldHi, (1 - d / r) * .55);
+    }
+    if (y > -2.1) {
+      if (Math.abs(x) < .06) c = mix(c, PAL.goldHi, .7);
+      else if (Math.abs(x) < .12) c = mix(c, PAL.goldDark, .35);
+      for (const [p0, p1] of LHAND.tendons) {
+        const d = distPoly([p0, p1], x, y, false);
+        if (d < .035) c = mix(c, PAL.goldDeep, .4);
+        else if (d < .08) c = mix(c, PAL.goldHi, .2);
+      }
+    }
+    const g = Math.abs(x) / .24 + Math.abs(y + .9) / .34;
+    if (g < 1) c = g < .72 ? mix(PAL.gl1, PAL.gl3, smooth(0, .72, g)) : mix(PAL.goldDeep, PAL.goldDark, .4);
     return outlineMix(c, e, px, PAL.goldLine, 1.2);
   });
 }
-function lArmFore() {
-  const card = CARD.gd_larm_fore, px = (card.X1 - card.X0) / SIZE.gd_larm_fore[0];
+// Shield brace fin (the bracket's frontal plane, model units from the shoulder mount; the rod
+// runs along y = 0): a gold blade sweeping up and out toward the shield with a central groove,
+// and a spur under the rod that carries the black star. Both stay inside x < 7.7 (y > 1) and
+// x < 6.5 (y < 0), clear of the shield card.
+const FIN = {
+  blade: new Shape(spline([[1.0, .1, 'c'], [1.0, 1.75], [2.4, 2.45], [4.0, 2.8], [5.6, 3.15], [6.85, 3.65], [7.6, 4.25, 'c'], [6.75, 2.9], [5.65, 2.2], [4.35, 1.6], [3.4, 1.05], [3.0, .1, 'c']], 8)),
+  bladeMid: spline([[1.6, 1.0], [3.2, 1.75], [5.0, 2.35], [6.6, 3.1], [7.45, 4.05]], 8),
+  spur: new Shape(spline([[3.7, .1, 'c'], [4.55, -.85], [5.1, -1.85], [5.5, -3.1, 'c'], [5.95, -1.85], [6.25, -.9], [6.45, .1, 'c']], 8)),
+  spurMid: spline([[5.05, .0], [5.25, -1.5], [5.45, -2.9]], 8),
+};
+function braceFin() {
+  const card = CARD.gd_brace_fin, px = (card.X1 - card.X0) / SIZE.gd_brace_fin[0];
   return onCard(card, (x, y) => {
-    const hw = halfAt(LARM_FO, y), e = hw - Math.abs(x);
-    if (e < 0) return null;
-    const s = Math.abs(x) / Math.max(hw, .01);
-    let c;
-    if (y > -1.15 || y < -7.0) {
-      // gold elbow flare and wrist cuff
-      c = goldAt(e, .8, x, y);
-      if (Math.abs(y + 1.1) < .1 || Math.abs(y + 7.05) < .1) c = mix(c, PAL.goldDeep, .6);
-    } else if (y < -6.25) {
-      c = mix(C('#7a1e16'), C('#3a0c0a'), s);                                                   // dark band at the wrist
-    } else {
-      c = s > .86 ? goldAt(e, .4, x, y) : amberAt(s / .86, y * .09);
+    for (const [sh, mid] of [[FIN.blade, FIN.bladeMid], [FIN.spur, FIN.spurMid]]) {
+      const sd = sh.sd(x, y, .3);
+      if (sd > 0) continue;
+      const e = -sd;
+      let c = goldAt(e, .42, x * 2, y * 2);
+      const d = distPoly(mid, x, y, false);
+      if (d < .07) c = mix(c, PAL.goldDeep, .55);
+      else if (d < .2) c = mix(c, PAL.goldHi, .35 * (1 - (d - .07) / .13));
+      return outlineMix(c, e, px, PAL.goldLine, 1.2);
     }
-    return outlineMix(c, e, px, PAL.goldLine, 1.1);
+    return null;
   });
 }
+// Brace pauldron dome and rod (x = -1 + 7.4 v along the brace; azimuth 0 = front, 90 = up),
+// lit from the upper front: an engraved ring near the base, three painted lame edges (a bright
+// lip over a shadow groove) as the dome narrows, then the rod with two fine rings.
+function paulTex() {
+  return (u, v) => {
+    const x = -1 + 7.4 * v;
+    let c = mix(G3.lit, G3.mid, smooth(-1, 3, x) * .35);
+    if (Math.abs(x + .45) < .06) c = mix(c, G3.dark, .5);
+    for (const e of [.55, 1.45, 2.2]) {
+      const d = x - e;
+      if (d > -.22 && d < 0) c = mix(c, G3.hi, .6 * (1 + d / .22));
+      else if (d >= 0 && d < .1) c = mix(c, G3.deep, .55);
+    }
+    if (x > 3.0 && [4.2, 5.6].some(r => Math.abs(x - r) < .06)) c = mix(c, G3.deep, .5);
+    return grainK(metalAz(c, azOf(u), 45, .55), u, v, .1);
+  };
+}
+// Ledge sprites of the smooth turned parts (knobs, upper-arm sleeve, forearm, pauldron dome).
+const ledgeKnob = () => polar(a => metalAz(mix(G3.mid, G3.lit, .6), a, 45, .62));
+const ledgeLup = () => polar(a => metalAz(mix(G3.lit, G3.mid, .25), a, 50));
+const ledgeLfo = () => polar(a => lFoBody(a, .5));
+const ledgePaul = () => polar(a => metalAz(mix(G3.mid, G3.lit, .6), a, 45, .55));
 // Glow cards (translucent): luminance gradients, tinted per element by the item definition.
 function spearGlow() {
   const card = CARD.gd_spear_glow;
@@ -847,8 +983,9 @@ export const CARD = {
   gd_chest: {X0: -6.4, X1: 6.4, Y0: -.4, Y1: 13.0},
   gd_spear_glow: {X0: -4.6, X1: 4.6, Y0: 1.0, Y1: 33.0},
   gd_trail: {X0: -3.0, X1: 3.0, Y0: 1.0, Y1: 32.0},
-  gd_larm_up: {X0: -1.7, X1: 1.7, Y0: -8.5, Y1: 1.4},
-  gd_larm_fore: {X0: -1.75, X1: 1.75, Y0: -8.2, Y1: 1.1},
+  gd_lhand: {X0: -1.4, X1: 1.4, Y0: -2.7, Y1: .35},
+  gd_lpalm: {X0: -1.3, X1: 1.3, Y0: -2.65, Y1: .3},
+  gd_brace_fin: {X0: .4, X1: 8.2, Y0: -3.4, Y1: 4.4},
 };
 // [width, height] px; multiples of 16.
 export const SIZE = {
@@ -861,7 +998,7 @@ export const SIZE = {
   gd_hip_wing: [128, 112], gd_tail: [112, 256], gd_belt: [128, 96],
   gd_chest: [160, 160],
   gd_spear_glow: [96, 320], gd_trail: [64, 320],
-  gd_larm_up: [48, 144], gd_larm_fore: [48, 128],
+  gd_lhand: [64, 64], gd_lpalm: [64, 64], gd_brace_fin: [160, 160],
 };
 // Fix the aspect of auto-sized cards (wing tiers) so pixels stay square.
 for (const k of ['gd_wing_pri', 'gd_wing_sec', 'gd_wing_cov']) {
@@ -903,8 +1040,11 @@ export function guardianSprites() {
     gd_corrupt: [32, 32, corrupt(5)], gd_corrupt_b: [32, 32, corrupt(19)],
     gd_vox: [32, 32, voxel(false)], gd_vox_rune: [32, 32, voxel(true)],
     gd_gold: [32, 32, goldTile(false)], gd_gold_dark: [32, 32, goldTile(true)],
-    gd_joint: [32, 32, jointRing()], gd_cap: [32, 32, goldCap()],
-    gd_larm_up: [...SIZE.gd_larm_up, lArmUpper()], gd_larm_fore: [...SIZE.gd_larm_fore, lArmFore()],
+    gd_joint: [32, 32, jointRing()],
+    gd_lknob: [16, 64, knobTex()], gd_ldisc: [32, 32, discTex()], gd_lfinger: [16, 16, fingerTex()],
+    gd_lup: [128, 128, lUpTex()], gd_lfo: [128, 128, lFoTex()], gd_paul: [32, 128, paulTex()],
+    gd_ledge: [32, 32, ledgeKnob()], gd_ledge_lup: [32, 32, ledgeLup()], gd_ledge_lfo: [64, 64, ledgeLfo()], gd_ledge_paul: [32, 32, ledgePaul()],
+    gd_lhand: [...SIZE.gd_lhand, lHandSprite()], gd_lpalm: [...SIZE.gd_lpalm, lHandSprite(true)], gd_brace_fin: [...SIZE.gd_brace_fin, braceFin()],
     gd_talon: [16, 64, talon(false)], gd_talon_gold: [16, 64, talon(true)],
     gd_shaft: [16, 128, (u, v) => { let c = mix(C('#fff4cc'), C('#e2be78'), Math.abs(u - .5) * 1.8); if ((v * 24) % 1 < .07) c = mix(c, PAL.goldMid, .45); return c; }],
     gd_redcore: [32, 32, flat('#8a2418', '#5a120c', 21)],
