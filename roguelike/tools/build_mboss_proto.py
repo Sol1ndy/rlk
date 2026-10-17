@@ -94,7 +94,7 @@ spawn = ['# @s = body, at @s: summon the 9-part block-display rig (all rlk_mb_au
 for n in ORDER:
     blk = PARTS[n][0]
     spawn.append(f'summon minecraft:block_display ~ ~ ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_part","rlk_mb_{ID}_part","rlk_mbp_{n}"],'
-                 f'block_state:{{Name:"{blk}"}},teleport_duration:1,interpolation_duration:0,'
+                 f'block_state:{{id:"{blk}"}},teleport_duration:1,interpolation_duration:0,'
                  f'transformation:{L.mat_nbt(part_matrix(n, POSES["rest"]))}}}')
 spawn.append(f'execute rotated as @s rotated ~ 0 run tp @e[type=minecraft:block_display,tag=rlk_mb_{ID}_part] ~ ~ ~ ~ 0')
 w('rig/spawn', spawn)
@@ -188,7 +188,7 @@ for k, lines in PAT.items():
 w('javelin', f'''
 # Visual javelin: a block-display prop that flies 0.25 b sub-steps forward, then back to the body (pj/launch,
 # #pjRet 1). The damage belongs to the line hazard created at the start of the pattern (K23 style).
-execute rotated as @s rotated ~ 0 positioned ^-0.6 ^1.5 ^0.8 run summon minecraft:block_display ~ ~ ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_{ID}_jav"],block_state:{{Name:"minecraft:stripped_dark_oak_log"}},teleport_duration:1,transformation:{{translation:[-0.08f,-0.08f,-1.0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.16f,0.16f,2.0f]}}}}
+execute rotated as @s rotated ~ 0 positioned ^-0.6 ^1.5 ^0.8 run summon minecraft:block_display ~ ~ ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_{ID}_jav"],block_state:{{id:"minecraft:stripped_dark_oak_log"}},teleport_duration:1,transformation:{{translation:[-0.08f,-0.08f,-1.0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.16f,0.16f,2.0f]}}}}
 scoreboard players set #pjRet mb 1
 execute rotated as @s rotated ~ 0 positioned ^-0.6 ^1.5 ^0.8 as @e[tag=rlk_mb_{ID}_jav,tag=!rlk_mb_pj,limit=1] run function rlk:mboss/pj/launch {{spd:30,life:9,dmg:0,hr:6}}
 {L.sound('item.trident.throw', 1, 0.7)}
@@ -271,7 +271,7 @@ scoreboard players set #auxHpPct mb 3
 scoreboard players set #auxRes mb 80
 execute at @s rotated as @s rotated ~ 0 positioned ^ ^ ^4 {FLOOR} run function rlk:mboss/aux/spawn
 tag @e[tag=rlk_mb_auxlast,limit=1] add rlk_mb_{ID}_star
-execute at @e[tag=rlk_mb_{ID}_star,limit=1] run summon minecraft:block_display ~ ~1.1 ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_{ID}_starv"],block_state:{{Name:"minecraft:amethyst_block"}},teleport_duration:1,brightness:{{sky:15,block:15}},transformation:{{translation:[-0.35f,-0.35f,-0.35f],left_rotation:[0.3647f,0.2798f,0.1159f,0.8806f],right_rotation:[0f,0f,0f,1f],scale:[0.7f,0.7f,0.7f]}}}}
+execute at @e[tag=rlk_mb_{ID}_star,limit=1] run summon minecraft:block_display ~ ~1.1 ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_{ID}_starv"],block_state:{{id:"minecraft:amethyst_block"}},teleport_duration:1,brightness:{{sky:15,block:15}},transformation:{{translation:[-0.35f,-0.35f,-0.35f],left_rotation:[0.3647f,0.2798f,0.1159f,0.8806f],right_rotation:[0f,0f,0f,1f],scale:[0.7f,0.7f,0.7f]}}}}
 {L.say('별을 부숴 보아라.', '#C9A8FF', 2, 24, 1)}
 ''')
 w('star_tick', f'''
@@ -376,6 +376,10 @@ scoreboard players set #prT mb 0
 scoreboard players set #prGo mb 0
 scoreboard players set #prReq mb 0
 scoreboard players set #prFlash mb 0
+''')
+w('uninstall', '''
+# Hook uninstall (no executor; from rlk:mboss/uninstall for every module): proto creates no objectives or
+# entities of its own beyond the framework's (rlk_mb_aux, mb), so there is nothing extra to remove.
 ''')
 w('bars', '''
 # Hook bars (@s = body): under-bar = progress of the running pattern (gold); the sub-line is set by choose.

@@ -14,9 +14,11 @@ MB = FN / 'mboss'
 REGISTRY = ROOT / 'tools/mboss_registry.json'
 
 # Hooks every boss module implements as F:mboss/<id>/<hook>.mcfunction (stubs allowed).
-# 'test' is a macro hook ({id:N}); the rest take no arguments.
+# 'test' is a macro hook ({id:N}); the rest take no arguments. 'uninstall' is dispatched to every enabled
+# module (not only the running one): it removes what the module itself created (e.g. its rig objectives).
 HOOKS = ['spawn', 'intro_tick', 'tick', 'on_hit', 'aux_hit', 'incoming', 'pause', 'resume',
-         'death_start', 'death_tick', 'cleanup', 'reload', 'bars', 'hz_vis', 'pj_end', 'test']
+         'death_start', 'death_tick', 'cleanup', 'reload', 'bars', 'hz_vis', 'pj_end', 'test', 'uninstall']
+ALL_MODULE_HOOKS = {'uninstall'}
 MACRO_HOOKS = {'test': ['id']}
 
 # #elem numbering (combat/apply): 0 physical 1 pyro 2 hydro 3 electro 4 cryo 5 geo 6 anemo 7 dendro 8 void

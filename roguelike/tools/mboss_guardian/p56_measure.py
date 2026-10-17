@@ -3,7 +3,6 @@
 (owner: the P5/P6 pattern author).
 
     node tools/build_mboss_guardian_rig.mjs --resourcepack <RP> --datapack <scratch dir> --no-paint --debug-dp <DIR>
-    git checkout tools/mboss_guardian_rig_manifest.json      # --no-paint rewrites its "textures" field
     python3 tools/mboss_guardian/p56_measure.py <DIR>
 
 It reads the exact per-tick poses the rig generator writes for the offline renderer

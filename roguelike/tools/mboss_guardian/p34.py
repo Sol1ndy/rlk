@@ -654,6 +654,10 @@ def pull(g):
                    f'item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{X.card_model("ring")}"}}}}}}')
         vis.append(f'execute if score @s mbHzV matches {40 + kk} if score #hzEv mb matches 1.. run kill @e[type=minecraft:item_display,tag=rlk_mb_gd_p4r{kk}]')
     g.pw(k, 'vis', vis)
+    g.pw(k, 'pause', [
+        '# The fight froze (player dead or reviving; @s = body): the camera layers 0.35 b in front of the eyes would',
+        '# hang where the camera was until the resume, so they go now (later ticks only move or kill them by tag).',
+        'kill @e[tag=rlk_mb_gd_p4scr]', 'kill @e[tag=rlk_mb_gd_p4scn]'])
     g.pw(k, 'cancel', [
         '# P4 cancel (any executor): every entity of the pattern carries rlk_mb_gd_p4 (cage, cubes, screen layers,',
         '# crescents, ring decals); the pull point and hazards go with lib_clear.',

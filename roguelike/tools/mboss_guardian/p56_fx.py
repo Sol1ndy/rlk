@@ -208,7 +208,7 @@ def cubes(tl, pid, name, t, specs, anchor, life, cond=''):
         t1 = add(c['drift'], mul(qrot(c['q1'], (s1 / 2, s1 / 2, s1 / 2)), -1))
         br = '{sky:15,block:15}' if c['kind'] in GLOWING else '{sky:11,block:11}'
         nbt = (f'{{Tags:{tags("rlk_room", "rlk_mb_aux", tag_all, tag_set, f"{tag_set}_{k}")},'
-               f'block_state:{{Name:"{CUBE_BLOCK[c["kind"]]}"}},brightness:{br},view_range:0.7f,shadow_radius:0f,'
+               f'block_state:{{id:"{CUBE_BLOCK[c["kind"]]}"}},brightness:{br},view_range:0.7f,shadow_radius:0f,'
                f'teleport_duration:0,interpolation_duration:0,transformation:{tf(t0, c["q0"], (s, s, s))}}}')
         ts = t + c['dt']
         lf = max(3, int(round(life * c['life_k'])))
@@ -237,7 +237,7 @@ def spoke_tf(theta, r0, r1, w, h, y):
 
 def bd(block, tr, q, sc, tagl, bright=15, extra=''):
     """summon line of a block_display bar (run it positioned at the anchor; rotate afterwards)."""
-    return (f'summon minecraft:block_display ~ ~ ~ {{Tags:{tags(*tagl)},block_state:{{Name:"{block}"}},'
+    return (f'summon minecraft:block_display ~ ~ ~ {{Tags:{tags(*tagl)},block_state:{{id:"{block}"}},'
             f'brightness:{{sky:{bright},block:{bright}}},view_range:1.6f,shadow_radius:0f,teleport_duration:0,'
             f'interpolation_duration:0{extra},transformation:{tf(tr, q, sc)}}}')
 

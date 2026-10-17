@@ -213,7 +213,9 @@ class Core:
             '# Hook incoming (@s = body inside combat/apply_mods, after level and RES): no extra modifiers.',
             '# Groggy has no damage bonus (PDF "추가 내성 감소 없음") and the boss keeps base RES in chaos (K7).'])
         self.w('pause', ['# Hook pause: the framework freezes AI, hazards and props; the rig holds its last key.',
-                         sc_set('#gdFlash', 0)])
+                         '# The running pattern may drop what would hang in the world meanwhile (its optional pause).',
+                         sc_set('#gdFlash', 0),
+                         F('p/pause_d')])
         self.w('resume', ['# Hook resume: nothing to restore (module timers live in the body tick and simply continue).'])
         self.w('death_start', [
             '# Hook death_start (@s = body; hazards, props, pull and movement already cleared, bars hidden).',
@@ -248,6 +250,10 @@ class Core:
             '# Hook cleanup (no executor; idempotent): module fake players back to their defaults.',
             '# Module entities carry rlk_mb_aux (rig parts, props, stars, fx) and die with the framework sweep.',
             F('ai/vars')])
+        self.w('uninstall', [
+            '# Hook uninstall (no executor; rlk:uninstall via the framework, for every module): the rig, its props and',
+            '# its gdRig* objectives (the framework removes mb and the rlk_mb_aux entities).',
+            R('uninstall')])
         self.w('reload', [
             '# Hook reload (@s = body after /reload; every aux entity is gone: rig parts, stars, fx, props).',
             '# AI back to idle with HP kept; a guard pair restarts soon, an interrupted chaos is abandoned.',
@@ -479,6 +485,12 @@ class Core:
             target = 'cancel' if name == 'cancel_d' else name
             self.w(f'p/{name}', [f'# GENERATED dispatcher: the running pattern\'s {doc}, by #gdPat.']
                    + [f'execute if score #gdPat mb matches {p.id} run return run {F(f"p/{p.key}/{target}")}' for p in self.pats])
+        self.w('p/pause_d', ['# GENERATED dispatcher: the running pattern\'s optional pause (the fight just froze: player dead or',
+                             '# reviving), by #gdPat. Not for a pattern picked this tick (its start has not run yet).',
+                             'execute unless score #gdPat mb matches 1.. run return 0',
+                             'execute if score #gdPNew mb matches 1 run return 0']
+               + [f'execute if score #gdPat mb matches {p.id} run return run {F(f"p/{p.key}/pause")}'
+                  for p in self.pats if self.g.has(f'p/{p.key}/pause')])
         vis = ['# GENERATED: hz_vis events of hazards with #hzVis = pattern id x 10 + k (k 1-9), @s = hazard marker.',
                'scoreboard players operation #gdV mb = @s mbHzV', 'scoreboard players operation #gdV mb /= #c10 mb']
         vis += [f'execute if score #gdV mb matches {p.id} run return run {F(f"p/{p.key}/vis")}'
@@ -549,7 +561,7 @@ class Core:
             f'execute if score #gdT mb matches {GUARD_END}.. run {F("guard/timeout")}'])
         self.w('guard/record', [
             '# A record completed (#gdRecNew = element): slot = element, enchanted spear (rig API), enchanted sweep',
-            '# (pattern 12, p56) at once: its hazard strikes 19 t later (patterns.md §8.2).',
+            '# (pattern 12, p56) at once: its blade slices strike 21-27 t later (front at 23; patterns.md §8.2).',
             sc_set('#gdRecOn', 0),
             'scoreboard players operation #gdRecEl mb = #gdRecNew mb', sc_set('#gdRecNew', 0),
             'execute if score #gdGN mb matches 1 run scoreboard players operation #gdSlotA mb = #gdRecEl mb',
@@ -560,7 +572,7 @@ class Core:
             sc_set('#gdGP', 3), sc_set('#gdPat', 12), sc_set('#gdPNew', 1),
             F('hud/sub_guard')])
         self.w('guard/timeout', [
-            f'# No record in {GUARD_ACTIVE} t: the gold sweep (pattern 11, p56); its hazard strikes 19 t later.',
+            f'# No record in {GUARD_ACTIVE} t: the gold sweep (pattern 11, p56); its blade slices strike 20-24 t later (front at 22).',
             sc_set('#gdRecOn', 0), sc_set('#gdGP', 3), sc_set('#gdPat', 11), sc_set('#gdPNew', 1)])
         self.w('guard/after', [
             '# From ai/pat_done: the sweep is over. Spear back to gold, the gems keep the latest recorded element.',
@@ -685,7 +697,7 @@ class Core:
         for (x, y, blk) in ((0, 0, 'redstone_block'), (0, 0.42, 'red_concrete'), (0, -0.42, 'red_concrete'),
                             (0.42, 0, 'red_concrete'), (-0.42, 0, 'red_concrete')):
             sig.append(f'summon minecraft:block_display ~ ~6.7 ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_fx","rlk_mb_gd_sigil"],'
-                       f'billboard:"vertical",brightness:{{sky:15,block:15}},block_state:{{Name:"minecraft:{blk}"}},view_range:2f,'
+                       f'billboard:"vertical",brightness:{{sky:15,block:15}},block_state:{{id:"minecraft:{blk}"}},view_range:2f,'
                        f'transformation:{{translation:[{L.num(x - 0.18, 3)}f,{L.num(y - 0.18, 3)}f,-0.18f],left_rotation:[0f,0f,0f,1f],'
                        f'right_rotation:[0f,0f,0f,1f],scale:[0.36f,0.36f,0.36f]}}}}')
         sig += [g.card('star', '~ ~6.7 ~', bb='center', spin=90, s0=0.2, s1=1.6, life=6, fade=3),
@@ -704,7 +716,7 @@ class Core:
             'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_cs] run scoreboard players add #gdCsN mb 1',
             'execute if score #gdCsN mb matches 3.. run return 0',
             'summon minecraft:block_display ~ ~4.6 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_fx","rlk_mb_gd_cs","rlk_mb_gd_csnew"],'
-            'brightness:{sky:15,block:15},block_state:{Name:"minecraft:gold_block"},teleport_duration:1,view_range:2f,'
+            'brightness:{sky:15,block:15},block_state:{id:"minecraft:gold_block"},teleport_duration:1,view_range:2f,'
             'transformation:{translation:[-0.22f,-0.22f,-0.22f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.44f,0.44f,0.44f]}}',
             'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_csnew,limit=1] store result entity @s Rotation[0] float 1 run random value 0..359',
             'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_csnew,limit=1] run data modify entity @s Rotation[1] set value -35.0f',

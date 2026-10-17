@@ -265,7 +265,7 @@ def flyslam(g):
     # -- 41: IMPACT
     hit = [f'# @s = body on the ring centre (clip tick {imp}): the hazard strikes this tick (framework).',
            'tag @s remove rlk_mb_inv',
-           'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p5r] run data merge entity @s {block_state:{Name:"minecraft:white_stained_glass"}}',
+           'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p5r] run data merge entity @s {block_state:{id:"minecraft:white_stained_glass"}}',
            g.card('burst', '~ ~1.3 ~', bb='center', spin=20, s0=0.8, s1=4.6, life=6, fade=3),
            g.card('glow', '~ ~1.6 ~', bb='center', s0=2.0, s1=7.0, life=5, fade=2),
            g.card('ring', '~ ~0.12 ~', rot='~ 90', s0=1.0, s1=10.5, life=8, fade=3),
@@ -441,7 +441,7 @@ def sweep(g, gold):
     for i, (t, a0, a1) in enumerate(slices):
         for e in els:
             fx = [f'# Slice {i} (clip tick {t}, {a0} -> {a1} deg){"" if gold else ", element " + str(e)}: blade fx.',
-                  f'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}b{i}] run data merge entity @s {{block_state:{{Name:"minecraft:white_stained_glass"}}}}']
+                  f'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}b{i}] run data merge entity @s {{block_state:{{id:"minecraft:white_stained_glass"}}}}']
             # the crescent body: translucent slabs at waist height (higher on her left), white-hot outer edge
             for th in range(95, -96, -10):
                 if slice_of(th) != i:
@@ -761,7 +761,7 @@ def fail(g):
             s = c['s']
             t0 = mul(qrot(c['q0'], (0.05, 0.05, 0.05)), -1)
             nbt = (f'{{Tags:{tags(*X.base_tags(pid, f"rlk_mb_gd_p13c{j}", f"rlk_mb_gd_p13c{j}_{m}"))},'
-                   f'block_state:{{Name:"{X.CUBE_BLOCK[c["kind"]]}"}},brightness:{{sky:15,block:15}},view_range:2f,shadow_radius:0f,'
+                   f'block_state:{{id:"{X.CUBE_BLOCK[c["kind"]]}"}},brightness:{{sky:15,block:15}},view_range:2f,shadow_radius:0f,'
                    f'teleport_duration:0,interpolation_duration:0,transformation:{tf(t0, c["q0"], (0.1, 0.1, 0.1))}}}')
             colsum.append((m, f'execute {ATT} positioned ^{n3(c["off"][0])} ^{n3(hs[m])} ^{n3(c["off"][2])} run summon minecraft:block_display ~ ~ ~ {nbt}',
                            tf(mul(qrot(c['q0'], (s / 2, s / 2, s / 2)), -1), c['q0'], (s, s, s))))
@@ -814,7 +814,7 @@ def fail(g):
                                         ('sf', 90, DECAL_SS[0], DECAL_W, 0.036, 'minecraft:red_stained_glass')):
             tr, rL, rS, rR = X.rhombus_tf(yaw, hl, hw, 0.02, y)
             dec.append(f'execute at {T} run summon minecraft:block_display ~ ~ ~ {{Tags:{tags(*X.base_tags(pid, f"rlk_mb_gd_p13d{j}", f"rlk_mb_gd_p13d{j}{nm}", "rlk_mb_gd_p13dnew"))},'
-                       f'block_state:{{Name:"{blk}"}},brightness:{{sky:15,block:15}},view_range:2f,shadow_radius:0f,teleport_duration:0,'
+                       f'block_state:{{id:"{blk}"}},brightness:{{sky:15,block:15}},view_range:2f,shadow_radius:0f,teleport_duration:0,'
                        f'interpolation_duration:0,transformation:{tf(tr, rL, rS, rR)}}}')
         dec += [f'execute {ATT} run tp @e[type=minecraft:block_display,tag=rlk_mb_gd_p13dnew] ~ ~ ~ ~ 0',
                 'tag @e[type=minecraft:block_display,tag=rlk_mb_gd_p13dnew] remove rlk_mb_gd_p13dnew',

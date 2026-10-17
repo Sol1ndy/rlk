@@ -366,12 +366,15 @@ fn('prop/spear', ['# Summons a free spear prop at the execution position/rotatio
 fn('prop/clear', ['kill @e[type=item_display,tag=rlk_mb_gd_prop]']);
 
 // ---- manifest ------------------------------------------------------------------------------
-json(path.join(here, 'mboss_guardian_rig_manifest.json'), {
+// --no-paint keeps the texture count of the last painted build (the sprites on disk are unchanged).
+const manifestPath = path.join(here, 'mboss_guardian_rig_manifest.json');
+const lastTextures = (() => { try { return JSON.parse(fs.readFileSync(manifestPath, 'utf8')).textures; } catch { return undefined; } })();
+json(manifestPath, {
   parts: PARTS.map(([n, m, b]) => ({part: n, uuid: uuidOf(n), model: m, brightness: b, scale: PART_SCALE[n.startsWith('trail') ? 'trail_1' : n]})),
   clips: clipInfo,
   elements: Object.fromEntries(Object.entries(ELEMENTS).map(([k, v]) => [k, {id: v.id, eye: v.eye === null ? 'painted' : '#' + v.eye.toString(16).padStart(6, '0'), glow: '#' + v.glow.toString(16).padStart(6, '0')}])),
   objectives: {gdRigC: 'current clip id (anchor)', gdRigT: 'tick within the clip (anchor; -1 = queued by play)', gdRigF: 'hit flash countdown', gdRigEye: 'eye look id', gdRigSp: 'spear look id', gdRigY: 'face/track scratch'},
-  textures: sprites ? sprites.length : 'not repainted',
+  textures: sprites ? sprites.length : (typeof lastTextures === 'number' ? lastTextures : 'not repainted'),
 });
 for (const w of [...allWarn].slice(0, 40)) console.warn('warn:', w);
 const files = clipInfo.reduce((a, c) => a + c.keyFiles, 0);

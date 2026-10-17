@@ -241,7 +241,7 @@ def cubes(tl, pid, name, t, cubes_spec, anchor, life, cond=None):
         t1 = add(c['drift'], mul(qrot(c['q1'], (s1 / 2, s1 / 2, s1 / 2)), -1))
         bright = '{sky:15,block:15}' if c['kind'] in ('gold', 'goldb', 'red') else '{sky:12,block:12}'
         nbt = (f'{{Tags:{tags("rlk_room", "rlk_mb_aux", tag_all, tag_set, f"{tag_set}_{k}")},'
-               f'block_state:{{Name:"{CUBE_BLOCK[c["kind"]]}"}},brightness:{bright},view_range:0.6f,shadow_radius:0f,'
+               f'block_state:{{id:"{CUBE_BLOCK[c["kind"]]}"}},brightness:{bright},view_range:0.6f,shadow_radius:0f,'
                f'teleport_duration:0,interpolation_duration:0,transformation:{tf(t0, c["q0"], (s, s, s))}}}')
         pre = (cond(c) + ' ') if cond else ''
         tl.at(t, f'execute {pre}{anchor} positioned {loc(c["off"])} run summon minecraft:block_display ~ ~ ~ {nbt}')
@@ -269,7 +269,7 @@ def decal_parts(pid, vis, w, length):
     ]
     out = []
     for role, block, tr, sc in parts:
-        nbt = (f'{{Tags:{tags(*base, f"rlk_mb_gd_p{pid}{role}")},block_state:{{Name:"{block}"}},'
+        nbt = (f'{{Tags:{tags(*base, f"rlk_mb_gd_p{pid}{role}")},block_state:{{id:"{block}"}},'
                f'brightness:{{sky:15,block:15}},view_range:1.5f,shadow_radius:0f,teleport_duration:0,'
                f'interpolation_duration:0,transformation:{tf(tr, (0, 0, 0, 1), sc)}}}')
         out.append(f'summon minecraft:block_display ~ ~ ~ {nbt}')
@@ -304,7 +304,7 @@ def decal_files(g, key, pid, lanes):
     g.pw(key, 'dflash', [
         '# Strike (@s = a decal part of the striking lane): the amber bar goes, the fill flashes white.',
         f'execute if entity @s[tag=rlk_mb_gd_p{pid}bar] run return run kill @s',
-        f'execute if entity @s[tag=rlk_mb_gd_p{pid}fill] run data merge entity @s {{block_state:{{Name:"minecraft:white_stained_glass"}}}}'])
+        f'execute if entity @s[tag=rlk_mb_gd_p{pid}fill] run data merge entity @s {{block_state:{{id:"minecraft:white_stained_glass"}}}}'])
 
 
 def bar_grow(pid, w, length, ticks):

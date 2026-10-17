@@ -173,8 +173,10 @@ function rlk:mboss/d/reload
 ''')
 
 w('uninstall', '''
-# From rlk:uninstall: remove everything the mid-boss framework created (arena blocks stay).
+# From rlk:uninstall: remove everything the mid-boss framework created (arena blocks stay); every module's
+# uninstall hook first (their own objectives and leftovers).
 function rlk:mboss/cleanup
+function rlk:mboss/d/uninstall
 kill @e[tag=rlk_mb_body]
 kill @e[tag=rlk_mb_aux]
 bossbar remove rlk:mboss
@@ -953,6 +955,11 @@ scoreboard players set @a[tag=player,scores={ttlT=1..}] ttlT 0
 # Dispatchers
 for hook in L.HOOKS:
     args = L.MACRO_HOOKS.get(hook)
+    if hook in L.ALL_MODULE_HOOKS:
+        lines = [f'# GENERATED dispatcher: rlk:mboss/<id>/{hook} of every enabled mid-boss module (none needs to be running).']
+        lines += [f'function rlk:mboss/{b["id"]}/{hook}' for b in BOSSES]
+        out.write('mboss/d/' + hook, '\n'.join(lines))
+        continue
     lines = [f'# GENERATED dispatcher: rlk:mboss/<id>/{hook} of the running mid-boss (#mbId mb = registry n).']
     for b in BOSSES:
         if args:

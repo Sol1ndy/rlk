@@ -1,5 +1,7 @@
-# From rlk:uninstall: remove everything the mid-boss framework created (arena blocks stay).
+# From rlk:uninstall: remove everything the mid-boss framework created (arena blocks stay); every module's
+# uninstall hook first (their own objectives and leftovers).
 function rlk:mboss/cleanup
+function rlk:mboss/d/uninstall
 kill @e[tag=rlk_mb_body]
 kill @e[tag=rlk_mb_aux]
 bossbar remove rlk:mboss
