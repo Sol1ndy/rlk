@@ -758,10 +758,10 @@ scoreboard players set #pactAtk tmp 18
 scoreboard players set #pactDmg tmp 25
 scoreboard players set #pactDur tmp 160
 # 스커크 (뱀의 계략 수치는 pt × 100)
-#   스킬로 얻는 양 / 일곱빛 섬광 중 틱당 소모(35 = 초당 7pt) / 일곱빛 섬광 지속(틱) / 빠른 이동 지속(틱) · 그 뒤 재사용 대기(틱) · 숄더뷰 이동 속도(%)
+#   스킬로 얻는 양 / 일곱빛 섬광 중 틱당 소모(25 = 초당 5pt) / 일곱빛 섬광 지속(틱) / 빠른 이동 지속(틱) · 그 뒤 재사용 대기(틱) · 숄더뷰 이동 속도(%)
 scoreboard players set #skGain tmp 4500
-scoreboard players set #skDrain tmp 35
-scoreboard players set #skModeDur tmp 180
+scoreboard players set #skDrain tmp 25
+scoreboard players set #skModeDur tmp 240
 scoreboard players set #skDashDur tmp 60
 scoreboard players set #skDashCd tmp 160
 scoreboard players set #skDashSpd tmp 150
