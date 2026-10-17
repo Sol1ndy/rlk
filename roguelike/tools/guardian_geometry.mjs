@@ -11,6 +11,9 @@
 // in 22.5 degree steps within +-45, painted cards and the facets of turned (lathe) parts
 // shade:false (the sprites carry the shading), voxel/metal boxes and armour-step discs shade:true.
 import {CARD} from './guardian_paint.mjs';
+import {rng} from './guardian_paint_lib.mjs';
+import {q as qE, rot as qRot, mul as qMul} from './guardian_rig_math.mjs';
+import {DEFAULT_POSE} from './guardian_clips.mjs';
 
 const r4 = v => Math.round(v * 1e4) / 1e4;
 const toM = ([X, Y, Z]) => [8 - X, 8 + Y, 8 + Z];
@@ -146,13 +149,117 @@ function tail() {
   const r = CARD.gd_tail;
   return [cardZ('gd_tail', 0), cardZ('gd_tail', .3), cardX('gd_tail', 1.2, {Z0: -1.8, Z1: 2.6, Y0: r.Y0, Y1: r.Y1}, {uvr: [.25, 0, .75, 1]})];
 }
-// Voxel leg: 5 stacked cubes (glitch-offset, some turned) and the 45 degree foot cube.
-function leg(side) {
-  const s = side, e = [];
-  const cubes = [[.2, -1.6, 0, 2.5, 0], [-.3, -5.0, .2, 2.4, 22.5], [.25, -8.4, -.1, 2.4, 0], [-.2, -11.8, .25, 2.3, -22.5], [.15, -15.1, 0, 2.4, 0]];
-  cubes.forEach(([x, y, z, w, r], i) => e.push(cube([x * s, y, z], w, i % 2 ? 'gd_vox_rune' : 'gd_vox', r ? ['y', r * s] : null)));
-  e.push(cube([0, -18.9, -.2], 3.2, 'gd_vox_rune', ['y', 45]));
-  return e;
+// ---- lower-body voxels: the two legs and the trail under the hem ------------------------------
+// ref.png / the guide render / m1 f340 / m2 f1085 / m3 f1530: no two neat columns, but one broken,
+// glitchy stack of dark cubes of very different sizes (small chips to 0.27 b blocks), each turned
+// its own way (some corner-on), packed and overlapping high up, breaking apart lower down,
+// sticking out past the front panels on her right, a loose cube beside the shins, a big diamond
+// foot with a swirl rune and a second, smaller diamond under it, then cubes thinning and drifting
+// outward as they fall. Nothing is mirrored: the right leg is the longer, more broken one; the
+// left leg ends higher with its foot tucked behind the right foot (the "pair" of m2 f1085).
+//
+// Item-model elements turn about one axis only (22.5 degree steps), so each of the three
+// displays carries a fixed compound turn VOX_REST (applied by the pose after the leg swing);
+// each cube's own single-axis turn composes with it, giving every cube its own 3D tilt.
+// Positions are authored in the rig frame (blocks, foot bottom y = 0, legs as they hang in idle,
+// see VOX_FRAME) and taken into each display's model frame here. The table is art-directed to
+// fit between the front panels, the side panels and the back panel without cutting through
+// their feathers; a seeded PRNG picks the turns left open and the trail's drift phases, so
+// builds are reproducible.
+export const VOX_REST = {leg_r: [10, 16, -13], leg_l: [24, -12, 9], cubes_b: [-15, 38, 19]};
+// display pivots at rest; they must match the leg and trail pivots in guardian_pose.mjs solve()
+export const VOX_PIVOT = {leg_r: [-.10, 1.60, .02], leg_l: [.10, 1.60, .02], cubes_b: [.04, .16, .02]};
+export const CUBES_B_VARIANTS = 8;                  // drift frames of the trail, one per 5 t
+const VOX_TURNS = [null, ['x', 22.5], ['x', -22.5], ['x', 45], ['x', -45], ['y', 22.5], ['y', -22.5], ['y', 45], ['y', -45],
+  ['z', 22.5], ['z', -22.5], ['z', 45], ['z', -45]];
+// [x, y, z, size] in blocks (dim [sx, sy, sz] makes a slab instead of a cube); t material
+// (gd_lv_*); r turn (omitted = seeded pick); top: lit top face; front: front-face sprite; chunk:
+// extra boxes glued to the cube in its own frame ([dx, dy, dz, sx, sy, sz], blocks) for broken,
+// blocky chunks.
+const LEG_R = [
+  {c: [-.04, 1.42, 0, .16], t: 'd', r: ['y', -22.5]},
+  {c: [-.07, 1.25, -.01, .17], t: 'c', top: true},
+  {c: [-.38, 1.03, 0, .26], dim: [.2, .26, .09], t: 'd', r: ['z', 22.5], top: true, chunk: [[.08, -.13, 0, .13, .12, .08]]},
+  {c: [-.05, .97, -.02, .13], t: 'k'},
+  {c: [-.08, .80, .04, .17], t: 'c', r: ['x', -22.5]},
+  {c: [-.36, .70, -.02, .07], t: 'e'},
+  {c: [-.06, .50, .05, .14], t: 'k', r: ['y', 45]},
+  {c: [-.20, .36, .03, .10], t: 'd', top: true},
+  {c: [-.12, .17, -.03, .23], t: 'd', r: ['z', 45], front: 'gd_lv_rune'},
+];
+const LEG_L = [
+  {c: [.05, 1.44, -.01, .14], t: 'k'},
+  {c: [.05, 1.30, -.005, .16], t: 'c', r: ['y', 45]},
+  {c: [.02, 1.13, -.02, .11], t: 'd'},
+  {c: [.06, 1.04, .015, .18], t: 'd', top: true, chunk: [[-.06, .07, .02, .1, .09, .1]]},
+  {c: [.34, .93, -.04, .08], t: 'e', r: ['x', 45]},
+  {c: [.05, .83, -.02, .15], t: 'c'},
+  {c: [.08, .60, -.01, .12], t: 'k', r: ['z', -22.5]},
+  {c: [.03, .36, .02, .18], t: 'c', r: ['x', 22.5], top: true},
+];
+// Trail cubes: drift (amplitude, b) or fall {h: drop b, dx: outward drift}; each gets its own
+// seeded phase, so no two move together (the display adds one slow tumble on top).
+const TRAIL = [
+  {c: [-.42, .50, .02, .10], t: 'c', r: ['y', 45], drift: .03},
+  {c: [-.17, -.13, .03, .15], t: 'd', r: ['z', 45], drift: .02},
+  {c: [.07, -.02, -.03, .07], t: 'k', drift: .025},
+  {c: [-.03, -.20, .06, .09], t: 'c', fall: {h: .1, dx: -.03}},
+  {c: [.18, -.17, -.01, .06], t: 'e', fall: {h: .09, dx: .04}},
+  {c: [-.33, .05, .05, .05], t: 'lit', drift: .03},
+  {c: [.27, .17, 0, .08], t: 'd', drift: .028},
+  {c: [-.13, -.27, 0, .05], t: 'k', fall: {h: .06, dx: -.02}},
+];
+const conjQ = Q => [-Q[0], -Q[1], -Q[2], Q[3]];
+// The legs are authored as they hang in the default (idle) pose, its small leg swing included,
+// so the table is what the idle hover shows; the trail is authored unswung.
+const VOX_FRAME = {leg_r: DEFAULT_POSE.legR, leg_l: DEFAULT_POSE.legL, cubes_b: [0, 0, 0]};
+// Cube list of one display -> elements. off(i) / grow(i) / turn(i): per-cube drift (blocks),
+// size factor and turn override for the trail frames.
+function voxElements(disp, list, seed, {off = () => [0, 0, 0], grow = () => 1, turn = () => undefined} = {}) {
+  const k = 16 / PART_SCALE[disp], piv = VOX_PIVOT[disp], iq = conjQ(qMul(qE(VOX_FRAME[disp]), qE(VOX_REST[disp]))), R = rng(seed);
+  const els = [];
+  let last = -1;
+  list.forEach((cb, i) => {
+    let ti = VOX_TURNS.findIndex(x => JSON.stringify(x) === JSON.stringify(cb.r ?? 'pick'));
+    const pick = Math.floor(R() * (VOX_TURNS.length - 1));       // always drawn: stable sequence
+    if (ti < 0) ti = pick >= last ? pick + 1 : pick;              // never the neighbour's turn
+    last = ti;
+    const r = turn(i) ?? VOX_TURNS[ti];
+    const [x, y, z, s0] = cb.c, s = s0 * grow(i);
+    if (s < .005) return;
+    const m = qRot(iq, add3(sub3([x, y, z], piv), off(i))).map(v => v * k);
+    const tex = {all: 'gd_lv_' + cb.t, ...(cb.top ? {up: 'gd_lv_lit'} : {}), ...(cb.front ? {front: cb.front} : {})};
+    const half = (cb.dim || [s0, s0, s0]).map(v => v * grow(i) * k / 2);
+    els.push(abox(sub3(m, half), add3(m, half), tex, {rot: r ? [r[0], r[1], m] : undefined}));
+    for (const [dx, dy, dz, sx, sy, sz] of cb.chunk || []) {
+      const cc = [m[0] + dx * k, m[1] + dy * k, m[2] + dz * k], h = [sx, sy, sz].map(v => v * k * grow(i) / 2);
+      els.push(abox(sub3(cc, h), add3(cc, h), {all: 'gd_lv_' + cb.t}, {rot: r ? [r[0], r[1], m] : undefined}));
+    }
+  });
+  return els;
+}
+const add3 = (a, b) => a.map((v, i) => v + b[i]), sub3 = (a, b) => a.map((v, i) => v - b[i]);
+const legVox = side => (side < 0 ? voxElements('leg_r', LEG_R, 4111) : voxElements('leg_l', LEG_L, 4127));
+// Trail frame v of CUBES_B_VARIANTS (the clips swap them every 5 t): drift cubes wander on
+// their own Lissajous loops; fall cubes sink, drift outward, tumble and shrink away, then come
+// back small at the top (the shed cubes that are "replaced", model.md 3.9).
+function trailVox(v) {
+  const R = rng(4153), ph = TRAIL.map(() => R() * 2 * Math.PI), w = 2 * Math.PI * v / CUBES_B_VARIANTS;
+  const u = i => (((v / CUBES_B_VARIANTS + ph[i] / (2 * Math.PI)) % 1) + 1) % 1;
+  return voxElements('cubes_b', TRAIL, 4139, {
+    off: i => {
+      const cb = TRAIL[i];
+      if (cb.fall) return [cb.fall.dx * u(i), -cb.fall.h * u(i), 0];
+      const a = cb.drift, p = ph[i];
+      return [a * .6 * Math.sin(w + p), a * Math.sin(w + 1.7 * p + 1), a * .5 * Math.cos(w + p)];
+    },
+    grow: i => {
+      if (!TRAIL[i].fall) return 1;
+      const t = u(i);
+      return t < .2 ? .45 + .55 * t / .2 : t > .7 ? 1 - .7 * (t - .7) / .3 : 1;
+    },
+    turn: i => (TRAIL[i].fall ? VOX_TURNS[1 + (Math.floor(u(i) * 4) + i * 3) % (VOX_TURNS.length - 1)] : undefined),
+  });
 }
 function torso() {
   return [
@@ -506,22 +613,21 @@ function trail() {
 // Floating body cubes: small solid voxels around the attach point.
 const cubesA = () => [cube([0, 0, 0], 3.2, 'gd_vox'), cube([3.6, 2.4, -1.0], 2.2, 'gd_corrupt', ['y', 22.5]), cube([-2.8, 3.6, 1.4], 2.0, 'gd_vox_rune', ['x', 22.5]),
   cube([1.4, 5.6, .6], 1.6, 'gd_corrupt_b', ['z', 45]), cube([-4.0, -1.6, -1.2], 1.8, 'gd_vox', ['y', 45])];
-const cubesB = () => [cube([0, 0, 0], 3.4, 'gd_vox_rune', ['y', 45]), cube([2.6, -4.2, 1.2], 2.6, 'gd_vox', ['x', 22.5]), cube([-2.2, -7.6, -.8], 2.2, 'gd_vox', ['y', 22.5]),
-  cube([.8, -11.4, .6], 2.0, 'gd_vox_rune', ['z', 45]), cube([-3.8, -2.6, 1.6], 1.6, 'gd_corrupt', ['y', 45]), cube([3.6, -9.0, -1.6], 1.4, 'gd_vox')];
 const cubesC = () => [cube([0, 0, 0], 1.8, 'gd_corrupt', ['y', 22.5]), cube([-2.2, 1.6, .6], 1.4, 'gd_vox'), cube([1.6, 2.6, -.8], 1.1, 'gd_corrupt_b', ['x', 45]),
   cube([-3.6, -.6, -.6], 1.2, 'gd_vox', ['z', 22.5])];
 
 // name -> elements. Variants share the display of their part (item model swaps).
 export function partModels() {
   return {
-    pelvis: pelvis(), skirt_f: skirtFront(), skirt_o: skirtOuter(), tail: tail(), leg_r: leg(-1), leg_l: leg(1),
+    pelvis: pelvis(), skirt_f: skirtFront(), skirt_o: skirtOuter(), tail: tail(), leg_r: legVox(-1), leg_l: legVox(1),
     torso: torso(), head: head(), halo: halo(), halo_glow: haloGlow(),
     r_upper: rUpper(), r_fore: rFore(), r_hand_fist: clawFist(), r_hand_open: clawOpen(),
     l_upper: lUpper(), l_fore: lFore(), l_hand_open: lClawOpen(), l_hand_fist: lClawFist(),
     bracket: bracket(), shield: shield(), shield_eye: shieldEye(), shield_eye_t: shieldEyeTinted(),
     wing_cov: wingTier('gd_wing_cov', -.9), wing_sec: wingTier('gd_wing_sec', 0), wing_pri: wingTier('gd_wing_pri', .8),
     spear: spear(false), spear_e: spear(true), spear_glow: spearGlow(), trail: trail(),
-    cubes_a: cubesA(), cubes_b: cubesB(), cubes_c: cubesC(),
+    cubes_a: cubesA(), cubes_c: cubesC(),
+    ...Object.fromEntries(Array.from({length: CUBES_B_VARIANTS}, (_, v) => [v ? 'cubes_b_' + v : 'cubes_b', trailVox(v)])),
   };
 }
 // Mirror a hand for the other side is not needed: the left hand has its own gold models.

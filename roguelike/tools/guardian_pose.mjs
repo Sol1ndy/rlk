@@ -14,7 +14,7 @@
 //                 bodyVis everything but the spear (entrance, death)
 //   cubes         spread of the floating body cubes; rHand / lHand discrete hand models
 import {add, sub, times, lerp, dot, cross, len, unit, mul, q, rot, slerp, basisQ, aimQ, ik, armFront, steadyPerp, toDisplayT, toDisplayQ} from './guardian_rig_math.mjs';
-import {PART_SCALE} from './guardian_geometry.mjs';
+import {PART_SCALE, VOX_REST} from './guardian_geometry.mjs';
 
 export const ROOT_PIVOT = [0, 1.9, 0];
 const HIP = [0, 1.78, 0], WAIST = [0, 1.85, 0];
@@ -22,6 +22,8 @@ const R_ARM = [.5, .48], L_ARM = [.48, .46], HAND_GRIP = .14;
 const BRACKET_REST = q([0, 8, 24]), SHIELD_REST = q([0, 0, -62]), WING_REST = q([0, -12, -16]), TAIL_REST = q([0, 0, 10]);
 const perp = (v, a) => sub(v, times(a, dot(v, a)));
 const toQ = v => (v.length === 4 ? v : q(v));
+// fixed compound turn of the lower-body voxel displays (guardian_geometry.mjs VOX_REST)
+const VOX_Q = Object.fromEntries(Object.entries(VOX_REST).map(([k, e]) => [k, q(e)]));
 
 // Fist frame around the shaft: model X along the shaft (toward the tip), model -Y from the
 // wrist to the shaft.
@@ -40,9 +42,13 @@ export function solve(p, {warn, prev = null} = {}) {
   part('skirt_f', add(HIP, rot(P, [0, -.04, -.1])), mul(P, q(p.skirtF)));
   part('skirt_o', add(HIP, rot(P, [0, -.04, 0])), mul(P, q(p.skirtO)));
   part('tail', add(HIP, rot(P, [.24, -.08, .08])), mul(mul(P, q(p.tail)), TAIL_REST));
-  part('leg_r', add(HIP, rot(P, [-.1, -.18, .02])), mul(P, q(p.legR)));
-  part('leg_l', add(HIP, rot(P, [.1, -.18, .02])), mul(P, q(p.legL)));
-  part('cubes_b', add(add(HIP, rot(P, [.04, -1.62, .02])), [0, Math.sin(p.ph * 2 * Math.PI) * .05, 0]), mul(P, q([0, 25 * Math.sin(p.ph * 2 * Math.PI), 0])), p.cubes);
+  part('leg_r', add(HIP, rot(P, [-.1, -.18, .02])), mul(mul(P, q(p.legR)), VOX_Q.leg_r));
+  part('leg_l', add(HIP, rot(P, [.1, -.18, .02])), mul(mul(P, q(p.legL)), VOX_Q.leg_l));
+  // the trail hangs under the feet and follows the mean leg swing; one slow tumble, out of phase
+  // with the root bob, on top of the per-cube drift frames (the clips swap cubes_b_<n>)
+  const Lq = mul(P, slerp(q(p.legR), q(p.legL), .5)), w = p.ph * 2 * Math.PI;
+  part('cubes_b', add(add(add(HIP, rot(P, [0, -.18, .02])), rot(Lq, [.04, -1.44, 0])), [0, Math.sin(w + 2.2) * .035, 0]),
+    mul(mul(Lq, q([4 * Math.sin(w + .9), 10 * Math.sin(w), 5 * Math.sin(w + 2.6)])), VOX_Q.cubes_b), p.cubes);
   // upper body
   const Tq = q(p.torso);
   part('torso', WAIST, Tq);

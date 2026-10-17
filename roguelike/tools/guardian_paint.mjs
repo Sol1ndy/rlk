@@ -26,6 +26,8 @@
 //   gd_brace_fin                              the brace's swept gold fin and star spur
 //   gd_corrupt, gd_corrupt_b, gd_vox, gd_vox_rune, gd_gold, gd_gold_dark, gd_redstar,
 //   gd_blackstar, gd_joint, gd_talon, gd_talon_gold, gd_shaft, gd_redcore, gd_dark
+//   gd_lv_k / _d / _c / _lit / _e / _rune    lower-body voxels: near-black, dark crimson, crimson,
+//                                             lit top faces, hot (glowing rim), the feet's swirl rune
 //   gd_spear_glow, gd_trail                   (glow) aura and afterimage cards
 import fs from 'node:fs';
 import path from 'node:path';
@@ -687,6 +689,74 @@ function voxel(rune) {
     return c;
   });
 }
+// Lower-body voxels (legs and the trail under the hem; ref.png, the guide render, m1 f340): dark
+// faces crossed by a glowing crack network. The cracks are the borders of a jittered Voronoi
+// tiling (the hex-like cell lines of the reference), broken up by a noise mask so no two faces
+// read alike; the cell count, mask and seed differ per material.
+function crackField(seed, cells) {
+  // jittered grid (no clumps of tiny cells), then drop cells at random down to the count
+  const R = rng(seed), g = Math.ceil(Math.sqrt(cells)), seeds = [], pts = [];
+  for (let i = 0; i < g; i++) for (let j = 0; j < g; j++) seeds.push([(i + .1 + .8 * R()) / g, (j + .1 + .8 * R()) / g]);
+  while (seeds.length > cells) seeds.splice(Math.floor(R() * seeds.length), 1);
+  for (const p of seeds) for (const dx of [-1, 0, 1]) for (const dy of [-1, 0, 1]) pts.push([p[0] + dx, p[1] + dy]);
+  return (u, v) => {
+    let d1 = 9, d2 = 9;
+    for (const [x, y] of pts) {
+      const d = Math.hypot(u - x, v - y);
+      if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) d2 = d;
+    }
+    return d2 - d1;
+  };
+}
+// a, b: face colours; crack: how much of the network shows; glow: crack strength; rim: 'dark'
+// bevel or a glowing 'hot' edge (the few emissive cubes); rune: the swirl ring of the feet.
+const LOW_VOX = {
+  gd_lv_k: {a: '#120709', b: '#241015', cells: 5, crack: .45, glow: .55, seed: 211},     // near-black
+  gd_lv_d: {a: '#2c0d17', b: '#4a1a1b', cells: 7, crack: .75, glow: .85, seed: 263},     // dark crimson
+  gd_lv_c: {a: '#46131a', b: '#6c2322', cells: 10, crack: 1, glow: 1, seed: 227},        // crimson, dense network
+  gd_lv_lit: {a: '#6e2526', b: '#963c33', cells: 8, crack: .85, glow: .9, seed: 229},    // lit top faces
+  gd_lv_e: {a: '#4e1218', b: '#76201f', cells: 9, crack: 1, glow: 1.3, seed: 233, rim: 'hot'},
+  gd_lv_rune: {a: '#2e0e16', b: '#521c1c', cells: 6, crack: .5, glow: .8, seed: 239, rune: true},
+};
+function lowVox(name) {
+  const s = LOW_VOX[name], A = C(s.a), B = C(s.b), n = fbm(s.seed), m = fbm(s.seed + 17), f = fbm(s.seed + 31), cr = crackField(s.seed * 7 + 1, s.cells);
+  const hot = mix(PAL.rune, C('#ffa27a'), .4), deep = C('#b01c28');
+  return tile((u, v) => {
+    let c = mix(A, B, smooth(.28, .78, n(u * 2.2, v * 2.2)));
+    // blocky glitch facets: a few flat steps of a coarse noise
+    c = mix(c, C('#0c0406'), Math.floor(f(u * 1.6, v * 1.6) * 4) / 4 * .12);
+    const e = Math.min(u, v, 1 - u, 1 - v);
+    const g = cr(u, v), keep = smooth(.32, .46, m(u * 2.1, v * 2.1)) * s.crack;
+    if (keep > 0) {
+      const core = 1 - smooth(.01, .028, g), halo = 1 - smooth(.028, .09, g);
+      c = mix(c, deep, Math.min(1, halo * .5 * keep * s.glow));
+      c = mix(c, hot, Math.min(1, core * keep * s.glow));
+    }
+    if (s.rune) {
+      // swirl rune: a ring broken over one arc, an inner spiral and a spur out of the ring
+      const x = u - .5, y = v - .5, r = Math.hypot(x, y), th = Math.atan2(y, x);
+      let d = Math.abs(r - .31);
+      if (th > .45 && th < 1.35) d = 9;
+      for (let k = 0; k < 2; k++) {
+        const t = ((th + Math.PI) / (2 * Math.PI) + k) / 1.3;
+        if (t <= 1) d = Math.min(d, Math.abs(r - (.06 + .19 * t)));
+      }
+      const a0 = 2.4, px = Math.cos(a0), py = Math.sin(a0), along = x * px + y * py;
+      if (along > .31 && along < .43) d = Math.min(d, Math.abs(-x * py + y * px));
+      c = mix(c, deep, (1 - smooth(.02, .07, d)) * .6);
+      c = mix(c, hot, 1 - smooth(.012, .026, d));
+    }
+    if (s.rim === 'hot') {
+      if (e < .05) c = mix(PAL.voxEdge, C('#ffb090'), .35);
+      else c = mix(c, PAL.voxEdge, (1 - smooth(.05, .12, e)) * .55);
+    } else {
+      // dark bevel, a faint lit inner line on the top-left (reads as a block in game light)
+      c = mix(c, C('#0a0405'), (1 - smooth(.02, .055, e)) * .7);
+      if (u + v < 1) c = mix(c, C('#b04a3a'), (smooth(.04, .06, e) - smooth(.06, .09, e)) * .3);
+    }
+    return c;
+  });
+}
 const flat = (c1, c2, seed = 3) => { const n = fbm(seed); return tile((u, v) => mix(C(c1), C(c2), n(u * 3, v * 3))); };
 function goldTile(dark = false) {
   return tile((u, v) => {
@@ -1039,6 +1109,7 @@ export function guardianSprites() {
     gd_chest_back: [...SIZE.gd_chest, chestSprite(true)],
     gd_corrupt: [32, 32, corrupt(5)], gd_corrupt_b: [32, 32, corrupt(19)],
     gd_vox: [32, 32, voxel(false)], gd_vox_rune: [32, 32, voxel(true)],
+    ...Object.fromEntries(Object.keys(LOW_VOX).map(k => [k, [32, 32, lowVox(k)]])),
     gd_gold: [32, 32, goldTile(false)], gd_gold_dark: [32, 32, goldTile(true)],
     gd_joint: [32, 32, jointRing()],
     gd_lknob: [16, 64, knobTex()], gd_ldisc: [32, 32, discTex()], gd_lfinger: [16, 16, fingerTex()],
