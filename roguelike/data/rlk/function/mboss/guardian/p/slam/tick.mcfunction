@@ -1,16 +1,56 @@
-# P3 tick (@s = body, #gdPT = clip tick): disc r 5 centred 3.5 b in front (K25), ring lead 17 t.
-execute if score #gdPT mb matches 9 run scoreboard players set #hzSfx mb 4
-execute if score #gdPT mb matches 9 run scoreboard players set #hzKB mb 3
-execute if score #gdPT mb matches 9 run execute at @s rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run function rlk:mboss/hz/disc {r:50,tell:17,dmg:160}
-execute if score #gdPT mb matches 12 run execute rotated as @s rotated ~ 0 run function rlk:fx/nv/card {kind:"star",pos:"^-0.3 ^4.6 ^0.2",rot:"~ ~",bb:"center",roll:0,spin:60,s0:0.1,s1:1.1,move:"0f,0f,0f",life:8,fade:3}
-execute if score #gdPT mb matches 12 run playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.6 1.5 0.3
-execute if score #gdPT mb matches 26 run execute at @s rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 run function rlk:fx/nv/card {kind:"burst",pos:"~ 202.2 ~",rot:"~ ~",bb:"center",roll:0,spin:20,s0:0.8,s1:3.4,move:"0f,0f,0f",life:6,fade:3}
-execute if score #gdPT mb matches 26 run execute at @s rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:1.6} ~ 202.5 ~ 0.15 2 0.15 0 24 force @a[tag=player]
-execute if score #gdPT mb matches 26 run execute at @s rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 run particle minecraft:block{block_state:"minecraft:gold_block"} ~ 201.3 ~ 2 0.2 2 0 30 force @a[tag=player]
-execute if score #gdPT mb matches 26 run playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.8 0.9 0.3
-execute if score #gdPT mb matches 26 run playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 1 0.9 0.3
-execute if score #gdPT mb matches 26 run playsound minecraft:item.trident.thunder hostile @a[tag=player] ~ ~ ~ 0.3 1.2 0.3
-execute if score #gdPT mb matches 48 run playsound minecraft:block.chain.break hostile @a[tag=player] ~ ~ ~ 0.8 0.6 0.3
-execute if score #gdPT mb matches 48 run playsound minecraft:block.stone.break hostile @a[tag=player] ~ ~ ~ 0.8 0.8 0.3
-execute if score #gdPT mb matches 54 run playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.5 1.4 0.3
-execute if score #gdPT mb matches 70 run function rlk:mboss/guardian/p/end
+# P3 tick (@s = body, #gdPT = slam clip tick). Busy ticks run p/slam/k/<t>. The body never moves:
+# the core closed in to 3 b; she turns to the player until the aim locks at the ring (9); the
+# spear is planted 26-48 (rig API §4).
+execute if score #gdPT mb matches 1..8 run function rlk:mboss/guardian/rig/face/track
+execute if score #gdPT mb matches 2 run function rlk:mboss/guardian/p/slam/k/2
+execute if score #gdPT mb matches 3 run function rlk:mboss/guardian/p/slam/k/3
+execute if score #gdPT mb matches 4 run function rlk:mboss/guardian/p/slam/k/4
+execute if score #gdPT mb matches 5 run function rlk:mboss/guardian/p/slam/k/5
+execute if score #gdPT mb matches 6 run function rlk:mboss/guardian/p/slam/k/6
+execute if score #gdPT mb matches 7 run function rlk:mboss/guardian/p/slam/k/7
+execute if score #gdPT mb matches 9 run function rlk:mboss/guardian/p/slam/k/9
+execute if score #gdPT mb matches 10 run function rlk:mboss/guardian/p/slam/k/10
+execute if score #gdPT mb matches 11 run function rlk:mboss/guardian/p/slam/k/11
+execute if score #gdPT mb matches 12 run function rlk:mboss/guardian/p/slam/k/12
+execute if score #gdPT mb matches 13 run function rlk:mboss/guardian/p/slam/k/13
+execute if score #gdPT mb matches 14 run function rlk:mboss/guardian/p/slam/k/14
+execute if score #gdPT mb matches 15 run function rlk:mboss/guardian/p/slam/k/15
+execute if score #gdPT mb matches 16 run function rlk:mboss/guardian/p/slam/k/16
+execute if score #gdPT mb matches 17 run function rlk:mboss/guardian/p/slam/k/17
+execute if score #gdPT mb matches 18 run function rlk:mboss/guardian/p/slam/k/18
+execute if score #gdPT mb matches 19 run function rlk:mboss/guardian/p/slam/k/19
+execute if score #gdPT mb matches 20 run function rlk:mboss/guardian/p/slam/k/20
+execute if score #gdPT mb matches 21 run function rlk:mboss/guardian/p/slam/k/21
+execute if score #gdPT mb matches 22 run function rlk:mboss/guardian/p/slam/k/22
+execute if score #gdPT mb matches 23 run function rlk:mboss/guardian/p/slam/k/23
+execute if score #gdPT mb matches 24 run function rlk:mboss/guardian/p/slam/k/24
+execute if score #gdPT mb matches 25 run function rlk:mboss/guardian/p/slam/k/25
+execute if score #gdPT mb matches 26 run function rlk:mboss/guardian/p/slam/k/26
+execute if score #gdPT mb matches 27 run function rlk:mboss/guardian/p/slam/k/27
+execute if score #gdPT mb matches 28 run function rlk:mboss/guardian/p/slam/k/28
+execute if score #gdPT mb matches 29 run function rlk:mboss/guardian/p/slam/k/29
+execute if score #gdPT mb matches 30 run function rlk:mboss/guardian/p/slam/k/30
+execute if score #gdPT mb matches 31 run function rlk:mboss/guardian/p/slam/k/31
+execute if score #gdPT mb matches 32 run function rlk:mboss/guardian/p/slam/k/32
+execute if score #gdPT mb matches 33 run function rlk:mboss/guardian/p/slam/k/33
+execute if score #gdPT mb matches 36 run function rlk:mboss/guardian/p/slam/k/36
+execute if score #gdPT mb matches 38 run function rlk:mboss/guardian/p/slam/k/38
+execute if score #gdPT mb matches 39 run function rlk:mboss/guardian/p/slam/k/39
+execute if score #gdPT mb matches 42 run function rlk:mboss/guardian/p/slam/k/42
+execute if score #gdPT mb matches 44 run function rlk:mboss/guardian/p/slam/k/44
+execute if score #gdPT mb matches 45 run function rlk:mboss/guardian/p/slam/k/45
+execute if score #gdPT mb matches 47 run function rlk:mboss/guardian/p/slam/k/47
+execute if score #gdPT mb matches 48 run function rlk:mboss/guardian/p/slam/k/48
+execute if score #gdPT mb matches 49 run function rlk:mboss/guardian/p/slam/k/49
+execute if score #gdPT mb matches 50 run function rlk:mboss/guardian/p/slam/k/50
+execute if score #gdPT mb matches 51 run function rlk:mboss/guardian/p/slam/k/51
+execute if score #gdPT mb matches 52 run function rlk:mboss/guardian/p/slam/k/52
+execute if score #gdPT mb matches 53 run function rlk:mboss/guardian/p/slam/k/53
+execute if score #gdPT mb matches 54 run function rlk:mboss/guardian/p/slam/k/54
+execute if score #gdPT mb matches 55 run function rlk:mboss/guardian/p/slam/k/55
+execute if score #gdPT mb matches 56 run function rlk:mboss/guardian/p/slam/k/56
+execute if score #gdPT mb matches 57 run function rlk:mboss/guardian/p/slam/k/57
+execute if score #gdPT mb matches 58 run function rlk:mboss/guardian/p/slam/k/58
+execute if score #gdPT mb matches 59 run function rlk:mboss/guardian/p/slam/k/59
+execute if score #gdPT mb matches 60 run function rlk:mboss/guardian/p/slam/k/60
+execute if score #gdPT mb matches 70 run function rlk:mboss/guardian/p/slam/k/70

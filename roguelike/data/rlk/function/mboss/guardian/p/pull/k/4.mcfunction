@@ -1,0 +1,14 @@
+# pull tick 4 (@s = body, at the body).
+playsound minecraft:block.fire.extinguish hostile @a[tag=player] ~ ~ ~ 0.25 1.7 0.3
+execute rotated as @s rotated ~ 0 run particle minecraft:dust_color_transition{from_color:[0.75f,0.1f,0.18f],to_color:[0.39f,0.12f,0.1f],scale:1.6} ^0 ^1.9 ^-0.8 0.7 0.9 0.35 0 3 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.62f,0.27f,0.35f],scale:1.3} ^0.397 ^1.187 ^-1.386 0.08 0.08 0.08 0 2 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.62f,0.27f,0.35f],scale:1.3} ^-1.326 ^2.09 ^0.331 0.08 0.08 0.08 0 2 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.62f,0.27f,0.35f],scale:1.3} ^0.759 ^2.634 ^0.786 0.08 0.08 0.08 0 2 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[1f,0.82f,0.86f],scale:0.7} ^-0.716 ^2.865 ^-0.418 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.89f,0.49f,0.58f],scale:0.7} ^-0.78 ^2.907 ^-0.244 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.89f,0.49f,0.58f],scale:0.7} ^-0.792 ^2.878 ^0.002 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[1f,0.82f,0.86f],scale:0.7} ^-0.76 ^2.78 ^0.283 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.89f,0.49f,0.58f],scale:0.7} ^-0.693 ^2.611 ^0.564 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.89f,0.49f,0.58f],scale:0.7} ^-0.6 ^2.373 ^0.809 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[1f,0.82f,0.86f],scale:0.7} ^-0.488 ^2.064 ^0.983 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.89f,0.49f,0.58f],scale:0.7} ^-0.367 ^1.685 ^1.048 0 0 0 0 1 force @a[tag=player]

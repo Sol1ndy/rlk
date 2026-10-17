@@ -3,3 +3,5 @@ scoreboard players operation #gdV mb = @s mbHzV
 scoreboard players operation #gdV mb /= #c10 mb
 execute if score #gdV mb matches 1 run return run function rlk:mboss/guardian/p/thrust/vis
 execute if score #gdV mb matches 2 run return run function rlk:mboss/guardian/p/javelin/vis
+execute if score #gdV mb matches 3 run return run function rlk:mboss/guardian/p/slam/vis
+execute if score #gdV mb matches 4 run return run function rlk:mboss/guardian/p/pull/vis
