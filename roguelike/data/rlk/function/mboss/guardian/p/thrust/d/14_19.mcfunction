@@ -1,0 +1,6 @@
+# dispatch #gdPT 14..19
+execute if score #gdPT mb matches 14 run return run function rlk:mboss/guardian/p/thrust/k/14
+execute if score #gdPT mb matches 15 run return run function rlk:mboss/guardian/p/thrust/k/15
+execute if score #gdPT mb matches 16 run return run function rlk:mboss/guardian/p/thrust/k/16
+execute if score #gdPT mb matches 17 run return run function rlk:mboss/guardian/p/thrust/k/17
+execute if score #gdPT mb matches 19 run return run function rlk:mboss/guardian/p/thrust/k/19
