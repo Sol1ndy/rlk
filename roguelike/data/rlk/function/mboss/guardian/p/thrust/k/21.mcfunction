@@ -1,0 +1,12 @@
+# thrust clip tick 21
+execute at @s rotated as @s rotated ~ 0 positioned ^0.715 ^2.732 ^-0.618 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^0.001 ^2.754 ^-0.409 run particle minecraft:dust{color:[1f,1f,0.99f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-0.714 ^2.777 ^-0.201 run particle minecraft:dust{color:[1f,1f,0.99f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-1.428 ^2.799 ^0.007 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-2.142 ^2.821 ^0.216 run particle minecraft:dust{color:[1f,1f,0.99f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-2.857 ^2.843 ^0.424 run particle minecraft:dust{color:[1f,1f,0.99f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-3.571 ^2.866 ^0.632 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-4.286 ^2.888 ^0.841 run particle minecraft:dust{color:[1f,1f,0.99f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-5 ^2.91 ^1.049 run particle minecraft:dust{color:[1f,1f,0.99f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-5.715 ^2.932 ^1.257 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-6.429 ^2.955 ^1.465 run particle minecraft:dust{color:[1f,1f,0.99f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
