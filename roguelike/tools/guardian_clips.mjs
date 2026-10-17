@@ -81,11 +81,13 @@ function qAxis(axis, a) { const s = Math.sin(a / 2); return [axis[0] * s, axis[1
 
 export const CLIPS = [
   // ---- idle and movement (patterns.md §1) ---------------------------------------------------
-  {name: 'idle', len: 40, loop: true, note: 'hover bob +0.05 b at t20; wing tiers breathe; skirt and tail sway; cubes drift', keys: [
+  // The legs dangle out of step: the right leg leads the swing (peak t10), the left one lags a
+  // quarter cycle (peak t20-30) with its own roll, so the voxel stacks never move in lockstep.
+  {name: 'idle', len: 40, loop: true, note: 'hover bob +0.05 b at t20; wing tiers breathe; skirt and tail sway; legs swing out of step; cubes drift', keys: [
     k(0, {...IDLE}),
-    k(10, {skirtF: [2, 0, 0], tail: [0, 0, 3], wp: 2, ws: 1}),
-    k(20, {pos: [0, H + .05, 0], torso: [-2, 0, 0], head: [-5, 0, 0], grip: [-1.2, 2.09, -.3], wc: 2, wp: 4, ws: 2.5, skirtF: [0, 0, 0], skirtO: [1.5, 0, 0], tail: [0, 0, -2], legR: [5, 0, -3], legL: [3, 0, 3], lw: [.48, 1.66, -.1]}),
-    k(30, {skirtF: [-1.5, 0, 0], tail: [0, 0, 2], wp: 2, ws: 1}),
+    k(10, {skirtF: [2, 0, 0], tail: [0, 0, 3], wp: 2, ws: 1, legR: [5, 0, -3.4], legL: [1.4, 0, 2.4]}),
+    k(20, {pos: [0, H + .05, 0], torso: [-2, 0, 0], head: [-5, 0, 0], grip: [-1.2, 2.09, -.3], wc: 2, wp: 4, ws: 2.5, skirtF: [0, 0, 0], skirtO: [1.5, 0, 0], tail: [0, 0, -2], legR: [3.6, 0, -2.8], legL: [3, 0, 3.2], lw: [.48, 1.66, -.1]}),
+    k(30, {skirtF: [-1.5, 0, 0], tail: [0, 0, 2], wp: 2, ws: 1, legR: [2.4, 0, -2.6], legL: [2.6, 0, 3.8]}),
     k(40, {pos: [0, H, 0], torso: [-3, 0, 0], head: [-6, 0, 0], grip: IDLE_GRIP, wc: 0, wp: 0, ws: 0, skirtF: [0, 0, 0], skirtO: [0, 0, 0], tail: [0, 0, 0], legR: [3, 0, -3], legL: [1, 0, 3], lw: [.48, 1.62, -.1]}),
   ]},
   {name: 'glide', len: 24, loop: true, blend: 5, note: 'moving pose (approach, guard drift, reposition): leaning into the travel, spear level toward the target, wing swept back', keys: [

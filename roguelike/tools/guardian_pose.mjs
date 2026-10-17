@@ -15,6 +15,7 @@
 //   cubes         spread of the floating body cubes; rHand / lHand discrete hand models
 import {add, sub, times, lerp, dot, cross, len, unit, mul, q, rot, slerp, basisQ, aimQ, ik, armFront, steadyPerp, toDisplayT, toDisplayQ} from './guardian_rig_math.mjs';
 import {PART_SCALE, VOX_REST} from './guardian_geometry.mjs';
+import {DEFAULT_POSE} from './guardian_clips.mjs';
 
 export const ROOT_PIVOT = [0, 1.9, 0];
 const HIP = [0, 1.78, 0], WAIST = [0, 1.85, 0];
@@ -24,6 +25,8 @@ const perp = (v, a) => sub(v, times(a, dot(v, a)));
 const toQ = v => (v.length === 4 ? v : q(v));
 // fixed compound turn of the lower-body voxel displays (guardian_geometry.mjs VOX_REST)
 const VOX_Q = Object.fromEntries(Object.entries(VOX_REST).map(([k, e]) => [k, q(e)]));
+// Rest pitch of each leg (deg): the skirt panels keep at least the idle clearance to each leg.
+const LEG_REST = [DEFAULT_POSE.legR[0], DEFAULT_POSE.legL[0]];
 
 // Fist frame around the shaft: model X along the shaft (toward the tip), model -Y from the
 // wrist to the shaft.
@@ -39,9 +42,16 @@ export function solve(p, {warn, prev = null} = {}) {
   const part = (n, t, Q, s = 1) => { o[n] = {t, q: Q, s: Array.isArray(s) ? s : [s, s, s]}; };
   // lower body
   part('pelvis', HIP, P);
-  part('skirt_f', add(HIP, rot(P, [0, -.04, -.1])), mul(P, q(p.skirtF)));
-  part('skirt_o', add(HIP, rot(P, [0, -.04, 0])), mul(P, q(p.skirtO)));
-  part('tail', add(HIP, rot(P, [.24, -.08, .08])), mul(mul(P, q(p.tail)), TAIL_REST));
+  // The voxel legs fill the narrow box between the front panel and the side/back panels, so the
+  // panels give way to them: a leg swung further forward (back) of its panel than at rest pushes
+  // the front (outer) panels along by the excess pitch. At rest nothing changes.
+  const ex = [p.legR[0] - LEG_REST[0], p.legL[0] - LEG_REST[1]];
+  const skF = [Math.max(p.skirtF[0], ...ex), p.skirtF[1], p.skirtF[2]];
+  const skO = [Math.min(p.skirtO[0], ...ex), p.skirtO[1], p.skirtO[2]];
+  part('skirt_f', add(HIP, rot(P, [0, -.04, -.1])), mul(P, q(skF)));
+  part('skirt_o', add(HIP, rot(P, [0, -.04, 0])), mul(P, q(skO)));
+  // the tail streamer behind her left hip trails with the legs too (it hangs right behind the trail cubes)
+  part('tail', add(HIP, rot(P, [.24, -.08, .08])), mul(mul(P, q([Math.min(p.tail[0], ...ex), p.tail[1], p.tail[2]])), TAIL_REST));
   part('leg_r', add(HIP, rot(P, [-.1, -.18, .02])), mul(mul(P, q(p.legR)), VOX_Q.leg_r));
   part('leg_l', add(HIP, rot(P, [.1, -.18, .02])), mul(mul(P, q(p.legL)), VOX_Q.leg_l));
   // the trail hangs under the feet and follows the mean leg swing; one slow tumble, out of phase

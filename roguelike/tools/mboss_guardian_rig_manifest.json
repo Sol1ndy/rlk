@@ -212,9 +212,9 @@
       "loop": true,
       "next": null,
       "events": {},
-      "keyFiles": 25,
-      "keys": 122,
-      "note": "hover bob +0.05 b at t20; wing tiers breathe; skirt and tail sway; cubes drift"
+      "keyFiles": 24,
+      "keys": 121,
+      "note": "hover bob +0.05 b at t20; wing tiers breathe; skirt and tail sway; legs swing out of step; cubes drift"
     },
     {
       "id": 1,

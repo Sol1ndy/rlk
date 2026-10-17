@@ -58,6 +58,8 @@ Order inside the boss tick: run the AI first, which may call `play/...`, `face/.
 - Tags on every part: `rlk_room`, `rlk_mb_aux`, `rlk_mb_part`, `rlk_mb_guardian_part`, `rlk_mb_gp_<part>`. The framework's `kill @e[tag=rlk_mb_aux]` removes the rig.
 - Parts, in UUID order:
   - body: pelvis, skirt_f, skirt_o, tail, leg_r, leg_l, torso, head (with the eye; brightness 15), halo, halo_glow;
+    the front panel (skirt_f), the outer panels (skirt_o) and the tail give way to the voxel legs: a leg pitched further
+    forward (back) than in idle pushes them along by the excess, so the leg cubes never cut the feathers;
   - arms: r_upper, r_fore, r_hand, l_upper, l_fore (gauntlet, 15), l_hand, bracket;
   - shield and wing: shield, shield_eye (15), wing_cov, wing_sec, wing_pri;
   - spear: spear (15), spear_glow (15), trail_1, trail_2;
@@ -99,7 +101,7 @@ The generator refuses to write a rig that fails these checks. `--allow-steps` an
 
 | clip | id | len | then | events | notes and body travel |
 |---|---|---|---|---|---|
-| `idle` | 0 | 40 | loop | | Hover bob +0.05 b at t20. The corrupted arm reaches out to her right, and the claw holds the shaft at the crescent. The butt star sits on the halo's upper edge on her left. The wing tiers breathe, the skirt and tail sway, the cubes drift. |
+| `idle` | 0 | 40 | loop | | Hover bob +0.05 b at t20. The corrupted arm reaches out to her right, and the claw holds the shaft at the crescent. The butt star sits on the halo's upper edge on her left. The wing tiers breathe, the skirt and tail sway, the legs swing out of step, the cubes drift. |
 | `glide` | 1 | 24 | loop | | Moving pose (approach, guard drift, reposition). She leans into the travel, the spear is level toward the target and the wing sweeps back. |
 | `thrust` | 2 | 91 | idle | glow 4, glint 19, **hit1 28**, rise 38, dive 54, **hit2 58**, land 65, flourish 72 | Lunge 2-3 b forward at 27-28. Fly back 4-6 b during 38-54. Dash 5-6 b along the dive at 57-58. |
 | `javelin` | 3 | 76 | idle | spin 0, vanish 10, glyph 11, beam 28, rematerialise 31, **release 35**, launch 36, return 58, catch 63 | A full spin of the spear around her (5-9) before it vanishes. The rig spear is hidden 10-31 and 36-63. The flying spear is a `prop/spear` moved by the pattern code: out at 36, back by 63. |
