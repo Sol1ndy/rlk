@@ -1,0 +1,3 @@
+# flyslam clip tick 5
+execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_q5c4_0,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:5,transformation:{translation:[0.158f,2.679f,0.375f],left_rotation:[0.494f,0.545f,-0.488f,0.47f],scale:[0.01f,0.01f,0.01f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_q5c4_1,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:6,transformation:{translation:[0.252f,2.416f,0.148f],left_rotation:[-0.721f,-0.083f,-0.647f,0.234f],scale:[0.017f,0.017f,0.017f],right_rotation:[0f,0f,0f,1f]}}

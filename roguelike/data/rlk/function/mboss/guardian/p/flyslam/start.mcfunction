@@ -1,5 +1,4 @@
-# P5 start (@s = body, player far): flyslam clip (101 t: glint 6, beam 16, takeoff 19, ring 21, gone 23,
-# dive 39, impact 41, spikes 47, pull 71, twirl 79). The rig rises 8 b; the body (hitbox) glides under the
-# locked ring during 23-39 and is untargetable while she is up (21-41).
-function rlk:mboss/guardian/rig/face/player
+# P5 하늘을 심판하는 자 start (@s = body, player far): flyslam clip (101 t). See p56.py for the timeline.
+kill @e[tag=rlk_mb_gd_p5]
+execute at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~ 0
 function rlk:mboss/guardian/rig/play/flyslam

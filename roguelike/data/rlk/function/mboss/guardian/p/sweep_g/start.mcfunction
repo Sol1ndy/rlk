@@ -1,8 +1,6 @@
-# Gold sweep (guard timeout; @s = body): sweep clip (44 t, active 19-24): 200 degree front arc, r 5 (K6).
-function rlk:mboss/guardian/rig/face/player
+# Gold sweep (guard timeout) start (@s = body): sweep clip (44 t). See p56.py for the timeline.
+kill @e[tag=rlk_mb_gd_p11]
+execute at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~ 0
 function rlk:mboss/guardian/rig/play/sweep
-playsound minecraft:item.trident.riptide_2 hostile @a[tag=player] ~ ~ ~ 0.7 0.7 0.3
-scoreboard players set #hzSfx mb 2
-scoreboard players set #hzKB mb 3
-scoreboard players set #hzAct mb 5
-execute at @s rotated as @s rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/hz/sector {r:50,a:100,tell:19,dmg:165}
+function rlk:mboss/guardian/p/sweep_g/slices
+execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/guardian/p/sweep_g/rim0

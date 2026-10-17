@@ -1,0 +1,5 @@
+# flyslam clip tick 9
+kill @e[type=minecraft:block_display,tag=rlk_mb_gd_q5c2_0]
+execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_q5c8_0,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:5,transformation:{translation:[-0.176f,2.697f,-0.287f],left_rotation:[-0.149f,0.516f,-0.3f,0.788f],scale:[0.012f,0.012f,0.012f],right_rotation:[0f,0f,0f,1f]}}
+execute at @s rotated as @s rotated ~ 0 positioned ^-0.495 ^2.68 ^0.495 positioned ^0.051 ^0.195 ^-0.047 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p5","rlk_mb_gd_q5c8","rlk_mb_gd_q5c8_1"],block_state:{Name:"minecraft:black_concrete"},brightness:{sky:11,block:11},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.019f,-0.005f,0.099f],left_rotation:[0.006f,0.86f,-0.294f,0.417f],scale:[0.116f,0.116f,0.116f],right_rotation:[0f,0f,0f,1f]}}
+execute at @s rotated as @s rotated ~ 0 positioned ^-0.652 ^5.927 ^0.328 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.6} ~ ~ ~ 0.1 0.1 0.1 0 2 force @a[tag=player]

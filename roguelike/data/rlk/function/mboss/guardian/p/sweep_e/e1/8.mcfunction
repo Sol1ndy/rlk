@@ -1,0 +1,13 @@
+# sweep_e clip tick 8, element 1
+execute at @s rotated as @s rotated ~ 0 positioned ^1.876 ^0.1 ^-0.331 run particle minecraft:dust{color:[1f,0.8f,0.5f],scale:0.75} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^1.876 ^0.1 ^0.331 run particle minecraft:dust{color:[1f,0.8f,0.5f],scale:0.75} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^1.65 ^0.1 ^0.952 run particle minecraft:dust{color:[1f,0.8f,0.5f],scale:0.75} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^1.224 ^0.1 ^1.459 run particle minecraft:dust{color:[1f,0.8f,0.5f],scale:0.75} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^0.651 ^0.1 ^1.79 run particle minecraft:dust{color:[1f,0.8f,0.5f],scale:0.75} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^0 ^0.1 ^1.905 run particle minecraft:dust{color:[1f,0.8f,0.5f],scale:0.75} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-0.651 ^0.1 ^1.79 run particle minecraft:dust{color:[1f,0.8f,0.5f],scale:0.75} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-1.224 ^0.1 ^1.459 run particle minecraft:dust{color:[1f,0.8f,0.5f],scale:0.75} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-1.65 ^0.1 ^0.952 run particle minecraft:dust{color:[1f,0.8f,0.5f],scale:0.75} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-1.876 ^0.1 ^0.331 run particle minecraft:dust{color:[1f,0.8f,0.5f],scale:0.75} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-1.876 ^0.1 ^-0.331 run particle minecraft:dust{color:[1f,0.8f,0.5f],scale:0.75} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-2.611 ^3.062 ^0.976 run particle minecraft:dust{color:[1f,0.54f,0.3f],scale:1} ~ ~ ~ 0.15 0.15 0.15 0 2 force @a[tag=player]
