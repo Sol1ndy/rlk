@@ -1,0 +1,2 @@
+execute if score @s gdRigT matches ..25 run return run function rlk:mboss/guardian/rig/c/death/b/17_25
+function rlk:mboss/guardian/rig/c/death/b/26_33
