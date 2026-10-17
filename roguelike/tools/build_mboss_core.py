@@ -93,6 +93,8 @@ def snbt_entry(b):
         f'hp:{b["hp"]}', f'xp:{b["xp"]}', f'atk:{b["atk"]}', f'lvAdd:{b.get("lvAdd", 0)}',
         f'dmgMul:{b["dmgMul"]}', f'goldMul:{b["goldMul"]}', f'sap:{b["sap"]}', f'picks:{picks}',
         f'scale:{L.num(float(b.get("scale", 1.0)))}d', f'intro:{b["intro"]}', f'death:{b["death"]}',
+        # deathSnd false: the module composes its own (non-vocal) death sound, the framework plays none
+        f'deathSnd:{1 if b.get("deathSnd", True) else 0}b',
         'hit:{w:%sf,h:%sf}' % (L.num(float(b['hit']['w'])), L.num(float(b['hit']['h']))),
         'start:{x:%sd,y:%sd,z:%sd,yaw:%sf,pitch:%sf}' % tuple(L.num(float(start[k])) for k in ('x', 'y', 'z', 'yaw', 'pitch')),
         f'title:{{text:{s(b["name"])},color:{s(b["color"])},bold:true}}',
@@ -647,7 +649,8 @@ scoreboard players set #mbSt mb 2
 scoreboard players set #mbT mb 0
 function rlk:mboss/lib_clear
 function rlk:mboss/bars_hide
-execute at @s run playsound minecraft:entity.wither.death hostile @a[tag=player] ~ ~ ~ 0.5 1.4
+# Generic death roar unless the registry entry sets deathSnd false (the module plays its own death sound).
+execute unless data storage rlk:mboss cur{deathSnd:0b} at @s run playsound minecraft:entity.wither.death hostile @a[tag=player] ~ ~ ~ 0.5 1.4 0.17
 function rlk:mboss/d/death_start
 ''')
 w('death_shell', '''
@@ -1225,12 +1228,12 @@ w('hz/d/full_safe2', '$function rlk:mboss/hz/p/c/$(k0) with storage rlk:mboss hz
 w('hz/strike', '''
 # Hit frame: bright outline + fill, sound, module visual event 1.
 execute unless entity @s[tag=rlk_mb_hzq] run function rlk:mboss/hz/flash
-execute if score @s mbHzS matches 1 run playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.55 1.5 0.3
-execute if score @s mbHzS matches 1 run playsound minecraft:block.anvil.land hostile @a[tag=player] ~ ~ ~ 0.3 0.6 0.3
-execute if score @s mbHzS matches 2 run playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 1 0.7 0.3
-execute if score @s mbHzS matches 3 run playsound minecraft:item.trident.throw hostile @a[tag=player] ~ ~ ~ 1 0.8 0.3
-execute if score @s mbHzS matches 4 run playsound minecraft:entity.iron_golem.attack hostile @a[tag=player] ~ ~ ~ 1 0.6 0.3
-execute if score @s mbHzS matches 4 run playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.7 0.8 0.3
+execute if score @s mbHzS matches 1 run playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.55 1.5 0.18
+execute if score @s mbHzS matches 1 run playsound minecraft:block.anvil.land hostile @a[tag=player] ~ ~ ~ 0.3 0.6 0.1
+execute if score @s mbHzS matches 2 run playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 1 0.7 0.33
+execute if score @s mbHzS matches 3 run playsound minecraft:item.trident.throw hostile @a[tag=player] ~ ~ ~ 1 0.8 0.33
+execute if score @s mbHzS matches 4 run playsound minecraft:entity.iron_golem.attack hostile @a[tag=player] ~ ~ ~ 1 0.6 0.33
+execute if score @s mbHzS matches 4 run playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.7 0.8 0.23
 execute if score @s mbHzV matches 1.. run scoreboard players set #hzEv mb 1
 execute if score @s mbHzV matches 1.. run function rlk:mboss/d/hz_vis
 ''')

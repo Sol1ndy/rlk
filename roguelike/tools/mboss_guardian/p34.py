@@ -14,13 +14,17 @@ P3 (clip `slam`, 70 t, melee: the core closes to 3 b first)
   22-25 downswing gold streak; 26 impact: vertical gold pillar, white-gold flash over the ring,
         shock ring, burst, radial gold crystal blades (27-44), gold cubes + dark rock chunks
   26-48 spear planted (body still), 4-point star sparkles at the tip; 47 pull-out thud; 54-70 twirl
-P4 (clips `pull` 40 t, then `swing` 51 t from tick 44; far)
+P4 (clips `pull` 40 t, then `swing` 51 t from tick 44; mid from 5 b and far, weighted x3 far)
   0-31  red haze, swirling mist, crimson arcs, the corrupted claw glow; red cubes float around her
   11-21 a cage of black cubes with glowing red edges stacks up the player (follows the body)
-  22-28 screen: dark-red diamond vignette closes in; 27 line-of-sight + range check (else the
-        cage breaks, no pull, no swings); 28 white flash, 30 orange field + white 4-point star,
-        31 red diamond; 32 the player is placed 1 b in front of her, facing her (undodgeable,
-        tell 32 t >= 28, K14); arrival cubes drift and dissolve; the vignette opens again
+  22-27 screen (title font overlay, guardian_screen.mjs; right in first person and in the F5 seat
+        view): dark-red diamond vignette closes in; 27 line-of-sight check (no range limit inside
+        the arena; light and barrier blocks pass); 28 white flash, 30 orange field + white 4-point
+        star, 31 red diamond; 32 the player is placed 1 b in front of her, facing her (undodgeable,
+        tell 32 t >= 28, K14); arrival cubes drift and dissolve; the vignette opens again 32-38
+        No line of sight at 27, or the destination blocked at 32: the cage shatters, the screen
+        clears and she swings in place (the pattern still resolves). A refused pull (player dead,
+        reviving, selection screen, map view): no swings, the pattern ends at 40.
   44    swing clip (K15: relocation -> wind-up 12 t); two 360 hazards r 5.5, tell 20: swing 1
         forehand at 64, swing 2 backhand (tilted, thicker) at 77, 1.2 each; gold crescents that
         follow the measured spear-tip angles, dark cubes and gold sparkles in the trail
@@ -29,7 +33,7 @@ import math
 import random
 from collections import defaultdict
 
-from .api import Pattern, ev, clip_len, DMG, KB, CY, GOLD, GOLD_PALE, GOLD_DEEP, CRIMSON, CRIMSON_DARK, NS
+from .api import Pattern, ev, clip_len, DMG, KB, CY, GOLD, GOLD_PALE, GOLD_DEEP, CRIMSON, CRIMSON_DARK, NS, SCREEN
 from . import p34_fx as X
 
 SWING_GAP = 12        # relocation -> swing clip start (K15: 10-14 t)
@@ -40,7 +44,10 @@ SWING_LEN = clip_len('swing')
 
 PATTERNS = [
     Pattern(3, 'slam', '공간을 집행하는 시련', bands=('melee',), close=3.0, recover=20, max_len=clip_len('slam') + 4),
-    Pattern(4, 'pull', '어둠 속에서 퍼지는 공간', bands=('far',), recover=22, max_len=SWING_AT + SWING_LEN + 4),
+    # mid band only from 5 b (never in melee); far: favoured over P2 (x3, like P5); the core also guarantees one P4 per
+    # stretch of normals while the player is out of melee (ai/pick)
+    Pattern(4, 'pull', '어둠 속에서 퍼지는 공간', bands=('mid', 'far'), min_d=5.0, weight={'far': 3}, recover=22,
+            max_len=SWING_AT + SWING_LEN + 4),
 ]
 
 # colours (patterns.md §5 / §6 FX)
@@ -365,8 +372,11 @@ CAGE = [  # (spawn tick, centre x, y, z around the body feet, edge)
     (16, -0.20, 1.36, -0.30, 0.50), (17, 0.08, 1.56, 0.34, 0.46), (18, -0.30, 1.80, 0.06, 0.50),
     (19, 0.26, 1.90, -0.22, 0.48), (20, 0.00, 2.14, 0.02, 0.44)]
 CAGE_EYE = 1.3                          # first person: no cage cube reaches above this
-SCR_D, SCR_N = 0.35, 0.33                # screen layers: distance in front of the camera eyes
-VIG_A0, VIG_A1, VIG_B = 0.52, 0.27, 1.6  # vignette aperture (just off the screen corners / closed), band depth
+# screen overlay frames per pull tick (title font glyphs; frames and their texts: guardian_screen.mjs via the
+# rig manifest): vignette closes 22-27, flash 28-29, field + star 30, red diamond 31, vignette reopens 32-38
+SCR_FRAMES = {22: 'vig0', 23: 'vig1', 24: 'vig2', 25: 'vig3', 26: 'vig4', 27: 'vig5', 28: 'flash', 29: 'flash',
+              30: 'field', 31: 'diamond', 32: 'vig5', 33: 'vig5', 34: 'vig4', 35: 'vig3', 36: 'vig2', 37: 'vig1', 38: 'vig0'}
+SCR_LAST = max(SCR_FRAMES)               # its frame fades out over 4 t
 
 
 def p4tags(*extra):
@@ -386,9 +396,11 @@ def pull(g):
     end = SWING_AT + SWING_LEN
     new = 'rlk_mb_gd_p4new'
     body_feet = 'at @e[tag=rlk_body,limit=1]'
-    cam = 'as @a[tag=player,limit=1] at @s anchored eyes'
-    tl.gated(28, end, 'if score #gp4Ok mb matches 1 ')
+    # #gp4Ok: 0 before the check / pull refused, 1 line of sight + pulled, 2 no pull (blocked) but she swings in place
+    tl.gated(28, PULL_LEN - 1, 'if score #gp4Ok mb matches 1 ')
     tl.gate[PULL_LEN] = ''
+    tl.gated(PULL_LEN + 1, end, 'if score #gp4Ok mb matches 1.. ')
+    assert SCREEN and set(SCR_FRAMES.values()) <= set(SCREEN['frames']), 'rig manifest: run build_mboss_guardian_rig.mjs'
 
     # ---- 0-31: aura behind her, swirling mist, crimson arcs, the claw; she tracks the player
     tl.span(1, RELOC - 1, g.rig('face/track'))
@@ -467,33 +479,23 @@ def pull(g):
         tl.at(t, f'execute {body_feet} run ' + g.dust(CAGE_RED, 1.2, '~ ~1.1 ~', (0.45, 0.8, 0.45), 4),
               f'execute {body_feet} run ' + g.dust(CAGE_GLOW, 1.5, '~ ~1.1 ~', (0.55, 0.9, 0.55), 2))
 
-    # ---- 22-40: screen (the real player's camera): diamond vignette, flash, field, star, diamond
-    bands0 = [X.band_tf(ang, VIG_A0, VIG_B) for ang in (-45, 45, 135, 225)]
-    bands1 = [X.band_tf(ang, VIG_A1, VIG_B) for ang in (-45, 45, 135, 225)]
-    vig = X.argb('#820C19', 0.62)
-    scr = ['rlk_mb_gd_p4scr']
-    tl.at(22, '# Screen vignette: four pinwheel bands around a diamond aperture, 0.35 b in front of the eyes.',
-          *[f'execute {cam} positioned ^ ^ ^{SCR_D} run ' + X.text_quad(vig, p4tags(*scr, 'rlk_mb_gd_p4v', f'rlk_mb_gd_p4v{i}'), bands0[i])
-            for i in range(4)])
-    tl.at(23, *[X.merge(f'@e[type=minecraft:text_display,tag=rlk_mb_gd_p4v{i}]', bands1[i], 5) for i in range(4)])  # closes 23-28
-    tl.span(23, PULL_LEN - 1, f'execute {cam} positioned ^ ^ ^{SCR_D} run tp @e[tag=rlk_mb_gd_p4scr] ~ ~ ~')
-    tl.span(30, RELOC, f'execute {cam} positioned ^ ^ ^{SCR_N} run tp @e[tag=rlk_mb_gd_p4scn] ~ ~ ~')
-    full = X.quad_tf(0, 0, 3.2, 3.2)
-    tl.at(27, '# Line of sight + range (K14), checked before the flash: else the cage breaks and nothing follows.',
+    # ---- 22-38: screen overlay (title font glyph frames: on the camera in every view mode)
+    for t, name in sorted(SCR_FRAMES.items()):
+        fade = '0 1 4' if t == SCR_LAST else '0 3 0'
+        # the F5 crosshair title (view/ride_tick, every 10 t) rests until the last frame has faded (vBig)
+        lines = [f'scoreboard players set @a[tag=player] vBig {SCR_LAST - t + 6}',
+                 f'title @a[tag=player] times {fade}', f'title @a[tag=player] title {SCREEN["frames"][name]}']
+        if t == 22:
+            lines.insert(0, '# Screen overlay: every frame is a title of 4 glyph tiles (one flat glyph for the flash).')
+        if t == RELOC:
+            continue                    # shown by p/pull/reloc after a successful pull
+        tl.at(t, *lines)
+    tl.at(27, '# Line of sight (K14), checked before the flash: blocked -> the cage shatters, no pull, she swings in place.',
           g.fn('p/pull/los'),
           f'execute unless score #gp4Ok mb matches 1 run {g.fn("p/pull/fizzle")}')
-    tl.at(28, f'execute {cam} positioned ^ ^ ^{SCR_D} run ' + X.text_quad(X.argb('#FFF4E2', 0.93), p4tags(*scr, 'rlk_mb_gd_p4w'), full),
-          g.sound('entity.enderman.teleport', 1.0, 0.6), g.sound('block.respawn_anchor.deplete', 0.9, 1.0),
+    tl.at(28, g.sound('entity.enderman.teleport', 1.0, 0.6), g.sound('block.respawn_anchor.deplete', 0.9, 1.0),
           f'execute {body_feet} run ' + g.particle('reverse_portal', '~ ~1 ~', (0.4, 0.8, 0.4), 0.05, 20))
-    peach = [(0.25, 0.13, 0.05, 22), (-0.27, -0.10, 0.06, -28), (0.20, -0.15, 0.04, 35), (-0.18, 0.16, 0.045, 14)]
-    tl.at(30, 'kill @e[type=minecraft:text_display,tag=rlk_mb_gd_p4w]',
-          f'execute {cam} positioned ^ ^ ^{SCR_D} run ' + X.text_quad(X.argb('#EE8262', 0.82), p4tags(*scr, 'rlk_mb_gd_p4o'), full),
-          f'execute {cam} positioned ^ ^ ^{SCR_N} run ' + X.item_display(X.card_model('star'), p4tags('rlk_mb_gd_p4scn', 'rlk_mb_gd_p4st'), X.tf(s=0.3), bb='center', tp_dur=1),
-          *[f'execute {cam} positioned ^ ^ ^{SCR_N} run ' + X.text_quad(X.argb('#FABF9F', 0.55), p4tags('rlk_mb_gd_p4scn', 'rlk_mb_gd_p4pc'), X.quad_tf(x, y, s, s, a))
-            for x, y, s, a in peach])
-    tl.at(31, 'kill @e[type=minecraft:text_display,tag=rlk_mb_gd_p4o]', 'kill @e[type=minecraft:item_display,tag=rlk_mb_gd_p4st]',
-          f'execute {cam} positioned ^ ^ ^{SCR_D} run ' + X.text_quad(X.argb('#B92C39', 0.78), p4tags(*scr, 'rlk_mb_gd_p4d'), X.quad_tf(0, 0, 0.283, 0.283, 45)),
-          g.sound('entity.illusioner.mirror_move', 1.0, 1.0))
+    tl.at(31, g.sound('entity.illusioner.mirror_move', 1.0, 1.0))
 
     # ---- 32: the relocation (undodgeable): 1 b in front of her, facing her
     arr = []
@@ -514,9 +516,7 @@ def pull(g):
           f'execute {body_feet} run ' + g.particle('block{block_state:"minecraft:black_concrete"}', '~ ~1 ~', (0.4, 0.8, 0.4), 0, 24),
           f'execute {body_feet} run ' + g.dust(CAGE_RED, 1.4, '~ ~1 ~', (0.5, 0.9, 0.5), 16),
           'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p4cage]',
-          f'execute store success score #gp4Ok mb {BODY} positioned ^ ^ ^1 positioned ~ {CY} ~ run function rlk:mboss/pull/start {{t:0}}',
-          'kill @e[tag=rlk_mb_gd_p4d]', 'kill @e[tag=rlk_mb_gd_p4scn]',
-          *[X.merge(f'@e[type=minecraft:text_display,tag=rlk_mb_gd_p4v{i}]', bands0[i], 8) for i in range(4)],
+          g.fn('p/pull/reloc'),
           *[f'execute if score #gp4Ok mb matches 1 {body_feet} {BODY} run ' + X.block_display(blk, p4tags('rlk_mb_gd_p4ar', tg, new), X.cube_tf(c0, size, q0))
             for tg, blk, c0, c1, size, q0, q1 in arr],
           f'execute {body_feet} {BODY} run tp @e[tag={new}] ~ ~ ~ ~ 0', f'tag @e[tag={new}] remove {new}',
@@ -525,9 +525,10 @@ def pull(g):
     tl.at(RELOC + 1, *[X.merge(f'@e[type=minecraft:block_display,tag={tg}]', X.cube_tf(c1, size * 0.8, q1), 16) for tg, blk, c0, c1, size, q0, q1 in arr])
     tl.at(RELOC + 14, *[X.merge(f'@e[type=minecraft:block_display,tag={tg}]', X.cube_tf(c1, 0.01, q1), 8) for tg, blk, c0, c1, size, q0, q1 in arr])
     tl.at(RELOC + 23, 'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p4ar]')
-    tl.at(PULL_LEN, '# Pull clip over: screen layers gone; a failed pull ends the pattern here (no swings).',
-          'kill @e[tag=rlk_mb_gd_p4scr]', 'kill @e[tag=rlk_mb_gd_p4scn]',
-          f'execute unless score #gp4Ok mb matches 1 run {g.end()}')
+    tl.at(PULL_LEN, '# Pull clip over: a refused pull (#gp4Ok 0) ends the pattern here (no swings, nothing to show).',
+          f'execute if score #gp4Ok mb matches 0 run {g.fn("p/pull/scr_end")}',
+          f'execute if score #gp4Ok mb matches 0 run {g.set_len(PULL_LEN)}',
+          f'execute if score #gp4Ok mb matches 0 run {g.end()}')
 
     # ---- 44-95: the two 360 swings
     tl.at(SWING_AT,
@@ -611,7 +612,8 @@ def pull(g):
 
     tick, start_extra = tl.emit([
         '# P4 tick (@s = body, #gdPT = pull clip tick 0-40, then the swing clip from 44). Busy ticks run',
-        f'# p/{k}/k/<t>; from 28 on they run only while #gp4Ok is 1 (line of sight at 27, pull at 32).'])
+        f'# p/{k}/k/<t>; 28-39 only while #gp4Ok is 1 (line of sight at 27, pull at 32), the swings from 41 while it',
+        '# is 1 (pulled) or 2 (no line of sight / blocked destination: she swings in place).'])
     g.pw(k, 'start', [
         '# P4 start (@s = body, player far): pull clip (aura 0, cage 11, relocate 32), voice line, hiss + charge.',
         'scoreboard players set #gp4Ok mb 0',
@@ -622,10 +624,11 @@ def pull(g):
         g.sound('block.respawn_anchor.charge', 0.7, 0.9)] + start_extra)
     g.pw(k, 'tick', tick)
     g.pw(k, 'los', [
-        '# @s = body, at the body. #gp4Ok = 1 when the player is within 24 b and nothing solid lies between her',
-        '# chest and the player\'s eyes (0.5 b steps; blocks outside #rlk:cm_pass block it; K14).',
+        '# @s = body, at the body. #gp4Ok = 1 when nothing solid lies between her chest and the player\'s eyes',
+        '# (0.5 b steps; blocks outside #rlk:cm_pass block it: the arena\'s light layer and barrier cap pass, the',
+        '# floor and the wall ring do not; K14). No range limit: the arena is 42 b across and the pull is undodgeable.',
         'scoreboard players set #gp4Ok mb 0',
-        'execute unless entity @e[tag=rlk_body,distance=..24,limit=1] run return 0',
+        'execute unless entity @e[tag=rlk_body,limit=1] run return 0',
         'function rlk:mboss/mv/dist',
         'scoreboard players operation #gp4Ln mb = #mbDist mb',
         'scoreboard players set #gp4K mb 5',
@@ -638,12 +641,35 @@ def pull(g):
         'scoreboard players remove #gp4Ln mb 1',
         f'execute if score #gp4Ln mb matches 1.. positioned ^ ^ ^0.5 run {g.fn("p/pull/los_step")}'])
     g.pw(k, 'fizzle', [
-        '# No line of sight (or out of range) at 27: the cage breaks, the screen clears, no pull and no swings.',
+        '# No line of sight at 27 (or the destination blocked at 32): the cage shatters at the player (red/black',
+        '# shards, glass), the screen clears, no pull; #gp4Ok 2 = the swings still follow, in place (the pattern',
+        '# resolves instead of vanishing).',
+        'scoreboard players set #gp4Ok mb 2',
         'execute at @e[tag=rlk_body,limit=1] run ' + g.particle('block{block_state:"minecraft:black_concrete"}', '~ ~1 ~', (0.4, 0.8, 0.4), 0, 20),
-        'execute at @e[tag=rlk_body,limit=1] run ' + g.sound('block.glass.break', 0.7, 0.6),
+        'execute at @e[tag=rlk_body,limit=1] run ' + g.particle('block{block_state:"minecraft:red_concrete"}', '~ ~1.2 ~', (0.5, 0.8, 0.5), 0, 14),
+        'execute at @e[tag=rlk_body,limit=1] run ' + g.dust(CAGE_RED, 1.4, '~ ~1 ~', (0.5, 0.9, 0.5), 12),
+        'execute at @e[tag=rlk_body,limit=1] run ' + g.sound('block.glass.break', 0.9, 0.6),
+        'execute at @e[tag=rlk_body,limit=1] run ' + g.sound('block.chain.break', 0.7, 0.7),
         g.sound('entity.illusioner.mirror_move', 0.6, 0.5),
         'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p4cage]',
-        'kill @e[tag=rlk_mb_gd_p4scr]', 'kill @e[tag=rlk_mb_gd_p4scn]'])
+        g.fn('p/pull/scr_end')])
+    g.pw(k, 'reloc', [
+        f'# @s = body, pull tick {RELOC}: the player 1 b in front of her (floor height, facing her; pull/start t 0 = at once).',
+        '# Refused (dead, reviving, selection screen, map view) -> #gp4Ok 0 (the pattern ends at 40). Placed but not',
+        '# moved (pull/finish found the destination blocked) -> fizzle, she swings in place.',
+        f'execute store success score #gp4Ok mb {BODY} positioned ^ ^ ^1 positioned ~ {CY} ~ run function rlk:mboss/pull/start {{t:0}}',
+        f'execute if score #gp4Ok mb matches 1 {BODY} positioned ^ ^ ^1 positioned ~ {CY} ~ unless entity @e[tag=rlk_body,distance=..0.6,limit=1] run return run {g.fn("p/pull/fizzle")}',
+        f'execute unless score #gp4Ok mb matches 1 run return run {g.fn("p/pull/scr_end")}',
+        f'scoreboard players set @a[tag=player] vBig {SCR_LAST - RELOC + 6}',
+        f'title @a[tag=player] times 0 3 0',
+        f'title @a[tag=player] title {SCREEN["frames"][SCR_FRAMES[RELOC]]}'])
+    g.pw(k, 'scr_end', [
+        '# Ends the screen overlay at once (fizzle, refused pull, pause, cancel): an empty title over it, the F5',
+        '# crosshair title back (view/xhair) for a player on the seat.',
+        'scoreboard players set @a[tag=player] vBig 0',
+        'title @a[tag=player] times 0 1 2',
+        'title @a[tag=player] title ""',
+        'execute as @a[tag=player] if score #on view matches 1 if score #vmode view matches 2 if entity @e[tag=rlk_vseat,limit=1] run function rlk:view/xhair'])
     S_RING = 2 * SWING_R / 0.86
     vis = ['# hz_vis of the swing hazards (@s = marker at her feet; 41 swing 1, 42 swing 2): a gold ring decal at r 5.5',
            '# that turns (opposite ways for the two swings) until its strike.']
@@ -655,11 +681,12 @@ def pull(g):
         vis.append(f'execute if score @s mbHzV matches {40 + kk} if score #hzEv mb matches 1.. run kill @e[type=minecraft:item_display,tag=rlk_mb_gd_p4r{kk}]')
     g.pw(k, 'vis', vis)
     g.pw(k, 'pause', [
-        '# The fight froze (player dead or reviving; @s = body): the camera layers 0.35 b in front of the eyes would',
-        '# hang where the camera was until the resume, so they go now (later ticks only move or kill them by tag).',
-        'kill @e[tag=rlk_mb_gd_p4scr]', 'kill @e[tag=rlk_mb_gd_p4scn]'])
+        '# The fight froze (player dead or reviving; @s = body): the screen overlay goes now; the frames go on from',
+        '# the clock after the resume.',
+        g.fn('p/pull/scr_end')])
     g.pw(k, 'cancel', [
-        '# P4 cancel (any executor): every entity of the pattern carries rlk_mb_gd_p4 (cage, cubes, screen layers,',
-        '# crescents, ring decals); the pull point and hazards go with lib_clear.',
+        '# P4 cancel (any executor): every entity of the pattern carries rlk_mb_gd_p4 (cage, cubes, crescents, ring',
+        '# decals); the pull point and hazards go with lib_clear; the screen overlay ends if it runs.',
         f'kill @e[tag={P4TAG}]',
+        f'execute if score #gdPT mb matches 22..{SCR_LAST} run {g.fn("p/pull/scr_end")}',
         'scoreboard players set #gp4Ok mb 0'])

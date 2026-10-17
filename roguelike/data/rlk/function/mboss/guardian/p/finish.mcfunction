@@ -6,3 +6,4 @@ scoreboard players set #gdPT mb 0
 execute unless score #gdSt mb matches 4 run scoreboard players set #mbNoLeash mb 0
 tag @s remove rlk_mb_inv
 function rlk:mboss/guardian/ai/pat_done
+scoreboard players set #gdPRel mb 0

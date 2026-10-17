@@ -19,8 +19,8 @@ execute rotated ~10.002 0 run function rlk:fx/nv/card {kind:"shard",pos:"^ ^0.02
 execute rotated ~77.753 0 run function rlk:fx/nv/card {kind:"shard",pos:"^ ^0.02 ^5.962",rot:"~ ~",bb:"vertical",roll:0,spin:0,s0:1.0584,s1:2.1168,move:"0f,0f,0f",life:16,fade:6}
 particle minecraft:block{block_state:"minecraft:gold_block"} ~ ~0.4 ~ 3 0.3 3 0.2 40 force @a[tag=player]
 particle minecraft:dust{color:[1f,0.99f,0.68f],scale:1.6} ~ ~1.5 ~ 3 1.2 3 0 30 force @a[tag=player]
-playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 1 0.7 0.3
-playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 1 0.6 0.3
-playsound minecraft:block.pointed_dripstone.land hostile @a[tag=player] ~ ~ ~ 1 1 0.3
-playsound minecraft:entity.lightning_bolt.thunder hostile @a[tag=player] ~ ~ ~ 0.3 1.6 0.3
+playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 1 0.7 0.33
+playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 1 0.6 0.33
+playsound minecraft:block.pointed_dripstone.land hostile @a[tag=player] ~ ~ ~ 1 1 0.33
+playsound minecraft:entity.lightning_bolt.thunder hostile @a[tag=player] ~ ~ ~ 0.3 1.6 0.1
 playsound minecraft:block.basalt.break hostile @a[tag=player] ~ ~ ~ 0.9 0.8 0.3

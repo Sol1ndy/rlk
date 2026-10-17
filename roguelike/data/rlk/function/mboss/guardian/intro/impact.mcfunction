@@ -11,7 +11,7 @@ execute rotated as @s rotated ~ 0 positioned ^-0.62 ^ ^0.7 positioned ~ 201 ~ ro
 execute rotated as @s rotated ~ 0 positioned ^-0.62 ^ ^0.7 positioned ~ 201 ~ rotated ~225 0 run function rlk:fx/nv/card {kind:"shard",pos:"^ ^ ^1.4",rot:"~ -40",bb:"fixed",roll:0,spin:0,s0:0.2,s1:1.1,move:"0f,0f,0f",life:12,fade:5}
 execute rotated as @s rotated ~ 0 positioned ^-0.62 ^ ^0.7 positioned ~ 201 ~ rotated ~270 0 run function rlk:fx/nv/card {kind:"shard",pos:"^ ^ ^1.4",rot:"~ -25",bb:"fixed",roll:0,spin:0,s0:0.2,s1:1.1,move:"0f,0f,0f",life:12,fade:5}
 execute rotated as @s rotated ~ 0 positioned ^-0.62 ^ ^0.7 positioned ~ 201 ~ rotated ~315 0 run function rlk:fx/nv/card {kind:"shard",pos:"^ ^ ^1.4",rot:"~ -40",bb:"fixed",roll:0,spin:0,s0:0.2,s1:1.1,move:"0f,0f,0f",life:12,fade:5}
-execute rotated as @s rotated ~ 0 positioned ^-0.62 ^ ^0.7 run playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.8 0.9 0.3
-execute rotated as @s rotated ~ 0 positioned ^-0.62 ^ ^0.7 run playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 1 0.8 0.3
-execute rotated as @s rotated ~ 0 positioned ^-0.62 ^ ^0.7 run playsound minecraft:item.trident.thunder hostile @a[tag=player] ~ ~ ~ 0.3 1.2 0.3
+execute rotated as @s rotated ~ 0 positioned ^-0.62 ^ ^0.7 run playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.8 0.9 0.27
+execute rotated as @s rotated ~ 0 positioned ^-0.62 ^ ^0.7 run playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 1 0.8 0.33
+execute rotated as @s rotated ~ 0 positioned ^-0.62 ^ ^0.7 run playsound minecraft:item.trident.thunder hostile @a[tag=player] ~ ~ ~ 0.3 1.2 0.1
 function rlk:mboss/guardian/voice/start

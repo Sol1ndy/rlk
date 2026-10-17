@@ -9,13 +9,7 @@ execute rotated as @s rotated ~ 0 run particle minecraft:crimson_spore ^0 ^1.8 ^
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:block{block_state:"minecraft:black_concrete"} ~ ~1 ~ 0.4 0.8 0.4 0 24 force @a[tag=player]
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:dust{color:[0.72f,0.18f,0.23f],scale:1.4} ~ ~1 ~ 0.5 0.9 0.5 0 16 force @a[tag=player]
 kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p4cage]
-execute store success score #gp4Ok mb rotated as @s rotated ~ 0 positioned ^ ^ ^1 positioned ~ 201 ~ run function rlk:mboss/pull/start {t:0}
-kill @e[tag=rlk_mb_gd_p4d]
-kill @e[tag=rlk_mb_gd_p4scn]
-execute as @e[type=minecraft:text_display,tag=rlk_mb_gd_p4v0] run data merge entity @s {start_interpolation:0,interpolation_duration:8,transformation:{translation:[0.7467f,-0.0113f,0f],left_rotation:[0f,0f,-0.3827f,0.9239f],scale:[21.12f,6.4f,1f],right_rotation:[0f,0f,0f,1f]}}
-execute as @e[type=minecraft:text_display,tag=rlk_mb_gd_p4v1] run data merge entity @s {start_interpolation:0,interpolation_duration:8,transformation:{translation:[0.0113f,0.7467f,0f],left_rotation:[0f,0f,0.3827f,0.9239f],scale:[21.12f,6.4f,1f],right_rotation:[0f,0f,0f,1f]}}
-execute as @e[type=minecraft:text_display,tag=rlk_mb_gd_p4v2] run data merge entity @s {start_interpolation:0,interpolation_duration:8,transformation:{translation:[-0.7467f,0.0113f,0f],left_rotation:[0f,0f,0.9239f,0.3827f],scale:[21.12f,6.4f,1f],right_rotation:[0f,0f,0f,1f]}}
-execute as @e[type=minecraft:text_display,tag=rlk_mb_gd_p4v3] run data merge entity @s {start_interpolation:0,interpolation_duration:8,transformation:{translation:[-0.0113f,-0.7467f,0f],left_rotation:[0f,0f,0.9239f,-0.3827f],scale:[21.12f,6.4f,1f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:mboss/guardian/p/pull/reloc
 execute if score #gp4Ok mb matches 1 at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p4","rlk_mb_gd_p4ar","rlk_mb_gd_p4a0","rlk_mb_gd_p4new"],brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,block_state:{id:"minecraft:orange_concrete"},transformation:{translation:[0.9408f,1.0455f,0.4365f],left_rotation:[0.2943f,0.4312f,0.148f,0.84f],scale:[0.482f,0.482f,0.482f],right_rotation:[0f,0f,0f,1f]}}
 execute if score #gp4Ok mb matches 1 at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p4","rlk_mb_gd_p4ar","rlk_mb_gd_p4a1","rlk_mb_gd_p4new"],brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,block_state:{id:"minecraft:red_concrete"},transformation:{translation:[0.9704f,0.0855f,0.211f],left_rotation:[-0.4151f,0.4947f,0.2468f,0.7226f],scale:[0.4294f,0.4294f,0.4294f],right_rotation:[0f,0f,0f,1f]}}
 execute if score #gp4Ok mb matches 1 at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p4","rlk_mb_gd_p4ar","rlk_mb_gd_p4a2","rlk_mb_gd_p4new"],brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,block_state:{id:"minecraft:red_stained_glass"},transformation:{translation:[0.8396f,1.7071f,-0.4936f],left_rotation:[-0.1926f,0.4377f,0.2462f,0.843f],scale:[0.3192f,0.3192f,0.3192f],right_rotation:[0f,0f,0f,1f]}}
@@ -27,4 +21,4 @@ execute if score #gp4Ok mb matches 1 at @e[tag=rlk_body,limit=1] rotated as @s r
 execute at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run tp @e[tag=rlk_mb_gd_p4new] ~ ~ ~ ~ 0
 tag @e[tag=rlk_mb_gd_p4new] remove rlk_mb_gd_p4new
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:dust_color_transition{from_color:[0.93f,0.51f,0.38f],to_color:[0.75f,0.1f,0.18f],scale:1.3} ~ ~1 ~ 1.2 0.9 1.2 0 18 force @a[tag=player]
-playsound minecraft:block.beacon.deactivate hostile @a[tag=player] ~ ~ ~ 0.5 0.7 0.3
+playsound minecraft:block.beacon.deactivate hostile @a[tag=player] ~ ~ ~ 0.5 0.7 0.17

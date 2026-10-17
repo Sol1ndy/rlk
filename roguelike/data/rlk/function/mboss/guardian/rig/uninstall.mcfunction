@@ -8,3 +8,4 @@ scoreboard objectives remove gdRigF
 scoreboard objectives remove gdRigEye
 scoreboard objectives remove gdRigSp
 scoreboard objectives remove gdRigY
+scoreboard objectives remove gdRigGl

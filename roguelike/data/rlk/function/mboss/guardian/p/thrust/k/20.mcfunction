@@ -21,5 +21,5 @@ execute at @s rotated as @s rotated ~ 0 positioned ^-5.408 ^2.913 ^1.173 run par
 execute at @s rotated as @s rotated ~ 0 positioned ^-5.749 ^2.924 ^1.272 run particle minecraft:dust{color:[1f,1f,0.99f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
 execute at @s rotated as @s rotated ~ 0 positioned ^-6.089 ^2.934 ^1.371 run particle minecraft:dust{color:[1f,1f,0.99f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
 execute at @s rotated as @s rotated ~ 0 positioned ^-6.429 ^2.945 ^1.47 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.55} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.35 1.8 0.3
+playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.35 1.8 0.12
 execute positioned as @e[type=minecraft:marker,tag=rlk_mb_gd_p1c,limit=1] run function rlk:mboss/mv/glide {t:6}

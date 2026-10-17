@@ -8,6 +8,6 @@ execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p4rc0] run data merge e
 execute rotated as @s rotated ~ 0 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p4","rlk_mb_gd_p4rc","rlk_mb_gd_p4rc1","rlk_mb_gd_p4new"],brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,block_state:{id:"minecraft:red_stained_glass"},transformation:{translation:[-0.6455f,1.0165f,-1.6945f],left_rotation:[0.1252f,0.2741f,-0.2492f,0.9204f],scale:[0.02f,0.02f,0.02f],right_rotation:[0f,0f,0f,1f]}}
 execute rotated as @s rotated ~ 0 run tp @e[tag=rlk_mb_gd_p4new] ~ ~ ~ ~ 0
 tag @e[tag=rlk_mb_gd_p4new] remove rlk_mb_gd_p4new
-playsound minecraft:entity.illusioner.prepare_mirror hostile @a[tag=player] ~ ~ ~ 0.7 0.8 0.3
+playsound minecraft:entity.illusioner.prepare_mirror hostile @a[tag=player] ~ ~ ~ 0.7 0.8 0.23
 execute at @e[tag=rlk_body,limit=1] run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p4","rlk_mb_gd_p4cage","rlk_mb_gd_p4k0"],brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:0,block_state:{id:"minecraft:black_concrete"},transformation:{translation:[0.0871f,0.236f,0.0853f],left_rotation:[0.0324f,0.2014f,0.0058f,0.979f],scale:[0.05f,0.05f,0.05f],right_rotation:[0f,0f,0f,1f]},Glowing:1b,glow_color_override:12070714}
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:block{block_state:"minecraft:black_concrete"} ~0.12 ~0.26 ~0.1 0.15 0.15 0.15 0 3 force @a[tag=player]

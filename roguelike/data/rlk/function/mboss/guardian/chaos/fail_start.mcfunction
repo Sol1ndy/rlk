@@ -15,7 +15,7 @@ execute if score #gdSa2 mb matches 1 if score #gdFailN mb matches 1 run scoreboa
 execute if score #gdSa2 mb matches 1 if score #gdFailN mb matches 2 run scoreboard players operation #gdFailK2 mb = #gdSk2 mb
 function rlk:mboss/guardian/rig/play/chaos_fail
 playsound minecraft:block.respawn_anchor.deplete hostile @a[tag=player] ~ ~ ~ 0.9 0.7 0.3
-playsound minecraft:block.bell.resonate hostile @a[tag=player] ~ ~ ~ 0.3 0.8 0.3
+playsound minecraft:block.bell.resonate hostile @a[tag=player] ~ ~ ~ 0.3 0.8 0.1
 execute if score #gdFailN mb matches 1.. run scoreboard players set #gdPat mb 13
 execute if score #gdFailN mb matches 1.. run scoreboard players set #gdPNew mb 1
 execute if score #gdFailN mb matches 0 run scoreboard players set #gdFailDone mb 1

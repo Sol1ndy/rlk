@@ -15,3 +15,8 @@ execute if score #gdSa2 mb matches 1 if score #gdSk2 mb matches 4 run data modif
 execute if score #gdSa2 mb matches 1 if score #gdSk2 mb matches 5 run data modify storage rlk:mboss sub append value {text:"✦ ",color:"#FCE582"}
 execute if score #gdSa2 mb matches 1 if score #gdSk2 mb matches 6 run data modify storage rlk:mboss sub append value {text:"✦ ",color:"#A6CEFD"}
 data modify storage rlk:mboss sub append value {text:"  남은 시간 ",color:"#E8B8B8",extra:[{score:{name:"#gdTimS",objective:"mb"},color:"#FFFFFF"},{text:"초"}]}
+# hint while an active (recorded) star stands: it resists its own element
+scoreboard players set #gdHint mb 0
+execute if score #gdSa1 mb matches 1 if score #gdSk1 mb matches 1..4 run scoreboard players set #gdHint mb 1
+execute if score #gdSa2 mb matches 1 if score #gdSk2 mb matches 1..4 run scoreboard players set #gdHint mb 1
+execute if score #gdHint mb matches 1 run data modify storage rlk:mboss sub append value {text:"   기록 원소 별: 같은 원소 40% 내성",color:"#B0A890"}

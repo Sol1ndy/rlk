@@ -7,6 +7,6 @@ execute if score #mbT mb matches 26 run function rlk:mboss/guardian/intro/fall
 execute if score #mbT mb matches 26..999 run function rlk:mboss/guardian/rig/tick
 execute if score #mbT mb matches 27..39 run function rlk:mboss/guardian/intro/trail
 execute if score #mbT mb matches 40 run function rlk:mboss/guardian/intro/impact
-execute if score #mbT mb matches 52 run playsound minecraft:item.armor.equip_netherite hostile @a[tag=player] ~ ~ ~ 0.6 1.3 0.3
+execute if score #mbT mb matches 52 run playsound minecraft:item.armor.equip_netherite hostile @a[tag=player] ~ ~ ~ 0.6 1.3 0.2
 execute if score #mbT mb matches 60 run function rlk:mboss/guardian/intro/pullout
 execute if score #mbT mb matches 66..999 run function rlk:mboss/guardian/intro/done

@@ -20,4 +20,4 @@ execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-2.14
 execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-1.82 ^0.12 ^1.323 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
 execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-1.323 ^0.12 ^1.82 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
 execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-0.695 ^0.12 ^2.14 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] run playsound minecraft:block.beacon.deactivate hostile @a[tag=player] ~ ~ ~ 0.8 1.8 0.3
+execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] run playsound minecraft:block.beacon.deactivate hostile @a[tag=player] ~ ~ ~ 0.8 1.8 0.27

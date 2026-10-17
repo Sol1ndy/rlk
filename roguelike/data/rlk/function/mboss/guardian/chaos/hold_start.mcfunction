@@ -8,7 +8,7 @@ function rlk:mboss/guardian/rig/face/player
 function rlk:mboss/guardian/star/spawn_a
 function rlk:mboss/guardian/star/spawn_b
 function rlk:mboss/guardian/chaos/sigil
-playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 1 1.2 0.3
-playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 1 1.4 0.3
-playsound minecraft:block.beacon.activate hostile @a[tag=player] ~ ~ ~ 0.7 1.4 0.3
+playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 1 1.2 0.33
+playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 1 1.4 0.33
+playsound minecraft:block.beacon.activate hostile @a[tag=player] ~ ~ ~ 0.7 1.4 0.23
 function rlk:mboss/guardian/hud/sub_chaos

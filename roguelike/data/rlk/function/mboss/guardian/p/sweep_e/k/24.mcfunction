@@ -6,4 +6,4 @@ execute if score #gdSwEl mb matches 1 run function rlk:mboss/guardian/p/sweep_e/
 execute if score #gdSwEl mb matches 2 run function rlk:mboss/guardian/p/sweep_e/s3_2
 execute if score #gdSwEl mb matches 3 run function rlk:mboss/guardian/p/sweep_e/s3_3
 execute if score #gdSwEl mb matches 4 run function rlk:mboss/guardian/p/sweep_e/s3_4
-execute if score #gdSwEl mb matches 3 run playsound minecraft:entity.lightning_bolt.impact hostile @a[tag=player] ~ ~ ~ 0.35 2 0.3
+execute if score #gdSwEl mb matches 3 run playsound minecraft:entity.lightning_bolt.impact hostile @a[tag=player] ~ ~ ~ 0.35 2 0.12

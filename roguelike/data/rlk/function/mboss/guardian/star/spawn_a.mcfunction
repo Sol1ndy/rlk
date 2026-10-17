@@ -4,4 +4,4 @@ execute if score #gdSk1 mb matches 0 run scoreboard players set #gdSk1 mb 5
 scoreboard players operation #gdSk mb = #gdSk1 mb
 scoreboard players set #gdSs mb 1
 scoreboard players set #gdSa1 mb 1
-execute rotated as @s rotated ~55 0 positioned ^ ^ ^4.2 positioned ~ 201 ~ run function rlk:mboss/guardian/star/make
+execute rotated as @s rotated ~24 0 positioned ^ ^ ^4.2 positioned ~ 201 ~ run function rlk:mboss/guardian/star/make

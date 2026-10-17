@@ -11,4 +11,4 @@ execute at @s rotated as @s rotated ~ 0 rotated ~202.247 0 run function rlk:fx/n
 execute at @s rotated as @s rotated ~ 0 rotated ~202.247 0 positioned ^ ^0.2 ^3.715 run particle minecraft:block{block_state:"minecraft:gold_block"} ~ ~ ~ 0.2 0.1 0.2 0.1 4 force @a[tag=player]
 execute at @s rotated as @s rotated ~ 0 rotated ~127.903 0 run function rlk:fx/nv/card {kind:"shard",pos:"^ ^0.02 ^3.781",rot:"~ ~",bb:"vertical",roll:0,spin:0,s0:0.6837,s1:0.9767,move:"0f,0f,0f",life:28,fade:6}
 execute at @s rotated as @s rotated ~ 0 rotated ~127.903 0 positioned ^ ^0.2 ^3.781 run particle minecraft:block{block_state:"minecraft:gold_block"} ~ ~ ~ 0.2 0.1 0.2 0.1 4 force @a[tag=player]
-playsound minecraft:block.pointed_dripstone.land hostile @a[tag=player] ~ ~ ~ 0.8 1.2 0.3
+playsound minecraft:block.pointed_dripstone.land hostile @a[tag=player] ~ ~ ~ 0.8 1.2 0.27

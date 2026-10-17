@@ -10,5 +10,5 @@ execute if score #gp13K1 mb matches 6 at @e[type=minecraft:marker,tag=rlk_mb_gd_
 execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run tp @e[type=minecraft:block_display,tag=rlk_mb_gd_p13fnew] ~ ~ ~ ~ 0
 tag @e[type=minecraft:block_display,tag=rlk_mb_gd_p13fnew] add rlk_mb_gd_p13f1
 tag @e[type=minecraft:block_display,tag=rlk_mb_gd_p13fnew] remove rlk_mb_gd_p13fnew
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run playsound minecraft:item.trident.hit_ground hostile @a[tag=player] ~ ~ ~ 1 0.5 0.3
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run playsound minecraft:entity.lightning_bolt.impact hostile @a[tag=player] ~ ~ ~ 0.6 0.8 0.3
+execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run playsound minecraft:item.trident.hit_ground hostile @a[tag=player] ~ ~ ~ 1 0.5 0.33
+execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run playsound minecraft:entity.lightning_bolt.impact hostile @a[tag=player] ~ ~ ~ 0.6 0.8 0.2

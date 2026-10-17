@@ -36,5 +36,6 @@ scoreboard players set @s gdRigT -1
 scoreboard players set @s gdRigF 0
 execute unless score @s gdRigEye matches 0.. run scoreboard players set @s gdRigEye 0
 execute unless score @s gdRigSp matches 0.. run scoreboard players set @s gdRigSp 0
+execute unless score @s gdRigGl matches 0.. run scoreboard players set @s gdRigGl 0
 function rlk:mboss/guardian/rig/look_apply
 execute rotated as @s rotated ~ 0 run function rlk:mboss/guardian/rig/follow

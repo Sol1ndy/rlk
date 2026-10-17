@@ -1,5 +1,7 @@
 # Next action. Test request > test lock (#mbLock 1-5 = that pattern only, 6 = guard pair + chaos only) >
 # rotation: #gdLeft normal patterns, then guard I, guard II, chaos (K3).
+# a released slot pattern (the fail spears' tail) still runs: wait for it
+execute if score #gdPat mb matches 1.. run return 0
 execute if score #gdMv mb matches 1 run function rlk:mboss/guardian/rig/play/idle
 scoreboard players set #gdMv mb 0
 execute if score #gdReq mb matches 1.. run return run function rlk:mboss/guardian/ai/req

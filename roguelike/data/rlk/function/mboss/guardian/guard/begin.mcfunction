@@ -25,6 +25,6 @@ function rlk:mboss/guardian/rig/face/player
 function rlk:mboss/guardian/rig/play/guard_entry
 function rlk:mboss/guardian/look/eye_guard
 function rlk:mboss/guardian/voice/guard
-playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.7 0.8 0.3
-playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 0.6 0.6 0.3
+playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.7 0.8 0.23
+playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 0.6 0.6 0.2
 function rlk:mboss/guardian/hud/sub_guard

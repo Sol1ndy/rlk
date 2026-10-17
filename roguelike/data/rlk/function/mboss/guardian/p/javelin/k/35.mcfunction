@@ -6,5 +6,5 @@ execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] rotated as @e[typ
 execute at @s rotated as @s rotated ~ 0 positioned ^-0.9 ^1.5 ^1.2 run particle minecraft:end_rod ~ ~ ~ 0.2 0.2 0.2 0.2 16 force @a[tag=player]
 execute at @s rotated as @s rotated ~ 0 positioned ^-0.9 ^1.5 ^1.2 run particle minecraft:dust{color:[1f,1f,0.99f],scale:1.6} ~ ~ ~ 0.6 0.6 0.6 0 18 force @a[tag=player]
 function rlk:mboss/guardian/voice/attack
-playsound minecraft:item.trident.throw hostile @a[tag=player] ~ ~ ~ 1 0.7 0.3
+playsound minecraft:item.trident.throw hostile @a[tag=player] ~ ~ ~ 1 0.7 0.33
 playsound minecraft:entity.firework_rocket.blast hostile @a[tag=player] ~ ~ ~ 0.9 1.2 0.3

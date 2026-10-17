@@ -4,6 +4,8 @@
 // Writes
 //   RP  assets/rlk/textures/mboss/guardian/*.png (guardian_paint.mjs) + item atlas entries
 //       assets/rlk/models/item/mboss/guardian/*.json, assets/rlk/items/mboss/guardian/*.json
+//       (also the chaos star crystals star_<kind>, not rig parts) and the P4 screen overlay font
+//       assets/rlk/font/mboss_gd.json + textures/font/mboss_gd/* (guardian_screen.mjs)
 //   DP  data/rlk/function/mboss/guardian/rig/** (this directory is owned by the generator and
 //       rebuilt from scratch on every run)
 //   tools/mboss_guardian_rig_manifest.json (parts, clips, events, API)
@@ -22,7 +24,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {paintGuardianTextures, spriteId, CARD} from './guardian_paint.mjs';
-import {partModels, PART_SCALE, checkBounds, CUBES_B_VARIANTS} from './guardian_geometry.mjs';
+import {partModels, PART_SCALE, checkBounds, CUBES_B_VARIANTS, STAR_KINDS} from './guardian_geometry.mjs';
+import {writeGuardianScreen} from './guardian_screen.mjs';
 import {solve, toDisplay} from './guardian_pose.mjs';
 import {CLIPS, accumulate, sampleClip as sample} from './guardian_clips.mjs';
 import {slerp, lerp, qAngle, len, sub, add, rot, q as qEuler} from './guardian_rig_math.mjs';
@@ -97,6 +100,10 @@ for (const [el, c] of Object.entries(ELEMENTS)) {
 const TRAIL_GOLD = 0xF4D27A;
 item('trail', 'trail', TRAIL_GOLD);
 for (const [el, c] of Object.entries(ELEMENTS)) item('trail_' + el, 'trail', el === 'geo' ? TRAIL_GOLD : c.glow);
+// Chaos element stars (summoned by the module as item_displays): 1-4 active element, 5/6 inert gold/blue, flash, dark.
+for (const k of STAR_KINDS) item('star_' + k, 'star_' + k);
+// P4 screen overlay (title font glyphs): frame texts go to the manifest for the pattern generator.
+const screen = writeGuardianScreen(rp);
 // Props share the spear model (not rig parts): javelin flight, planted spear, giant fail spears.
 item('prop_spear', 'spear');
 for (const el of ['red', 'gold', 'hydro', 'electro', 'cryo', 'pyro']) item('prop_spear_' + el, el === 'gold' ? 'spear' : 'spear_e', el === 'gold' ? null : ELEMENTS[el].spear);
@@ -295,10 +302,12 @@ if (buttErrors.length) {
 const rest = clipFrames(byName.idle)[0].d;
 const TAGS = n => `["rlk_room","rlk_mb_aux","rlk_mb_part","rlk_mb_guardian_part","rlk_mb_gp_${n}"]`;
 const summon = ([n, model, bright], hidden = false) => `summon minecraft:item_display ~ ~ ~ {UUID:${uuidInts(n)},Tags:${TAGS(n)},billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:2.5f,width:16f,height:16f,shadow_radius:0f,brightness:{block:${bright},sky:15},transformation:${nbt(hidden ? {...rest[n], s: [0, 0, 0]} : rest[n])},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId(model)}"}}}`;
-fn('init', ['# Rig objectives. Safe to call on every load.', ...['gdRigC', 'gdRigT', 'gdRigF', 'gdRigEye', 'gdRigSp', 'gdRigY'].map(o => `scoreboard objectives add ${o} dummy`)]);
+const RIG_OBJ = ['gdRigC', 'gdRigT', 'gdRigF', 'gdRigEye', 'gdRigSp', 'gdRigY', 'gdRigGl'];
+fn('init', ['# Rig objectives. Safe to call on every load.', ...RIG_OBJ.map(o => `scoreboard objectives add ${o} dummy`)]);
 const spawnTail = [`scoreboard players set @s gdRigC ${byName.idle.id}`, 'scoreboard players set @s gdRigT -1', 'scoreboard players set @s gdRigF 0',
   'execute unless score @s gdRigEye matches 0.. run scoreboard players set @s gdRigEye 0',
   'execute unless score @s gdRigSp matches 0.. run scoreboard players set @s gdRigSp 0',
+  'execute unless score @s gdRigGl matches 0.. run scoreboard players set @s gdRigGl 0',
   `function ${NS}/look_apply`,
   `execute rotated as @s rotated ~ 0 run function ${NS}/follow`];
 fn('spawn', ['# @s = rig anchor (the boss body), positioned and rotated where she should appear.',
@@ -316,11 +325,21 @@ fn('tick', ['# @s = rig anchor, at its feet. Once per game tick. Missing parts r
   `execute if score @s gdRigF matches 1.. run function ${NS}/flash_tick`]);
 fn('kill', ['# Removes every rig part (the props have their own tag).', 'kill @e[type=item_display,tag=rlk_mb_guardian_part]']);
 fn('uninstall', ['# Removes the rig, its props and its objectives.', `function ${NS}/kill`, `function ${NS}/prop/clear`, 'kill @e[type=marker,tag=rlk_mb_gd_face]',
-  ...['gdRigC', 'gdRigT', 'gdRigF', 'gdRigEye', 'gdRigSp', 'gdRigY'].map(o => `scoreboard objectives remove ${o}`)]);
-fn('flash', ['# Hit feedback: a white outline for 3 ticks. @s = rig anchor.', 'scoreboard players set @s gdRigF 4',
-  ...PARTS.filter(([n]) => !['halo_glow', 'spear_glow', 'trail_1', 'trail_2'].includes(n)).map(([n]) => `data merge entity ${uuidOf(n)} {Glowing:1b,glow_color_override:16772300}`)]);
+  ...RIG_OBJ.map(o => `scoreboard objectives remove ${o}`)]);
+const OUTLINED = PARTS.filter(([n]) => !['halo_glow', 'spear_glow', 'trail_1', 'trail_2'].includes(n));
+fn('flash', ['# Hit feedback: a white outline for 3 ticks (then back to the glow look). @s = rig anchor.', 'scoreboard players set @s gdRigF 4',
+  ...OUTLINED.map(([n]) => `data merge entity ${uuidOf(n)} {Glowing:1b,glow_color_override:16772300}`)]);
 fn('flash_tick', ['scoreboard players remove @s gdRigF 1', `execute if score @s gdRigF matches 0 run function ${NS}/flash_off`]);
-fn('flash_off', PARTS.map(([n]) => `data merge entity ${uuidOf(n)} {Glowing:0b}`));
+fn('flash_off', ['# End of the hit flash: the persistent glow look (gdRigGl) or no outline. @s = rig anchor.', `function ${NS}/glow_apply`]);
+// glow looks: a persistent outline on the whole body (guard mode's gold aura); the hit flash returns to it
+const GLOW = {gold: [1, 0xFCD84C]};
+fn('glow_apply', ['# Applies the stored glow look gdRigGl (0 none). @s = rig anchor.',
+  ...Object.values(GLOW).flatMap(([id, col]) => OUTLINED.map(([n]) => `execute if score @s gdRigGl matches ${id} run data merge entity ${uuidOf(n)} {Glowing:1b,glow_color_override:${col}}`)),
+  ...PARTS.map(([n]) => `execute if score @s gdRigGl matches 0 run data merge entity ${uuidOf(n)} {Glowing:0b}`)]);
+for (const [el, [id]] of Object.entries(GLOW)) fn(`glow/${el}`, [`# Persistent ${el} outline on the whole body (until glow/off; a hit flash returns to it). @s = rig anchor.`,
+  `scoreboard players set @s gdRigGl ${id}`, `execute unless score @s gdRigF matches 1.. run function ${NS}/glow_apply`]);
+fn('glow/off', ['# Ends the glow look (the outline goes unless a hit flash is showing; flash_off then clears it). @s = rig anchor.',
+  'scoreboard players set @s gdRigGl 0', `execute unless score @s gdRigF matches 1.. run function ${NS}/glow_apply`]);
 // element looks: eye (shield gem/iris/field) and spear (head enchant + aura colour)
 const elNames = Object.keys(ELEMENTS);
 for (const el of elNames) {
@@ -330,7 +349,8 @@ for (const el of elNames) {
     swapLine('trail_1', 'trail_' + el), swapLine('trail_2', 'trail_' + el)]);
   fn(`tint/${el}`, [`# Shield eye and spear both in the ${el} look. @s = rig anchor.`, `function ${NS}/eye/${el}`, `function ${NS}/spear/${el}`]);
 }
-fn('look_apply', ['# Re-applies the stored eye/spear looks (after a respawn). @s = rig anchor.',
+fn('look_apply', ['# Re-applies the stored eye/spear/glow looks (after a respawn). @s = rig anchor.',
+  `function ${NS}/glow_apply`,
   ...elNames.map(el => `execute if score @s gdRigEye matches ${ELEMENTS[el].id} run function ${NS}/eye/${el}`),
   ...elNames.map(el => `execute if score @s gdRigSp matches ${ELEMENTS[el].id} run function ${NS}/spear/${el}`)]);
 fn('eye/by_elem', ['# Eye look from #elem-style ids in @s gdRigEye (0 geo, 1 pyro, 2 hydro, 3 electro, 4 cryo, 5 gold, 6 red).', `function ${NS}/look_apply`]);
@@ -373,8 +393,9 @@ json(manifestPath, {
   parts: PARTS.map(([n, m, b]) => ({part: n, uuid: uuidOf(n), model: m, brightness: b, scale: PART_SCALE[n.startsWith('trail') ? 'trail_1' : n]})),
   clips: clipInfo,
   elements: Object.fromEntries(Object.entries(ELEMENTS).map(([k, v]) => [k, {id: v.id, eye: v.eye === null ? 'painted' : '#' + v.eye.toString(16).padStart(6, '0'), glow: '#' + v.glow.toString(16).padStart(6, '0')}])),
-  objectives: {gdRigC: 'current clip id (anchor)', gdRigT: 'tick within the clip (anchor; -1 = queued by play)', gdRigF: 'hit flash countdown', gdRigEye: 'eye look id', gdRigSp: 'spear look id', gdRigY: 'face/track scratch'},
+  objectives: {gdRigC: 'current clip id (anchor)', gdRigT: 'tick within the clip (anchor; -1 = queued by play)', gdRigF: 'hit flash countdown', gdRigEye: 'eye look id', gdRigSp: 'spear look id', gdRigY: 'face/track scratch', gdRigGl: 'glow look id (0 none, 1 gold)'},
   textures: sprites ? sprites.length : (typeof lastTextures === 'number' ? lastTextures : 'not repainted'),
+  screen,
 });
 for (const w of [...allWarn].slice(0, 40)) console.warn('warn:', w);
 const files = clipInfo.reduce((a, c) => a + c.keyFiles, 0);

@@ -16,3 +16,6 @@ execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[1f,0.75f,0.
 execute rotated as @s rotated ~ 0 run particle minecraft:crimson_spore ^0 ^1.8 ^0 1.2 1.2 1.2 0 4 force @a[tag=player]
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:dust{color:[0.72f,0.18f,0.23f],scale:1.2} ~ ~1.1 ~ 0.45 0.8 0.45 0 4 force @a[tag=player]
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:dust{color:[0.38f,0f,0.02f],scale:1.5} ~ ~1.1 ~ 0.55 0.9 0.55 0 2 force @a[tag=player]
+scoreboard players set @a[tag=player] vBig 20
+title @a[tag=player] times 0 3 0
+title @a[tag=player] title [{"text":"\ue508\ue5f0\ue509\ue5f1\ue50a\ue5f0\ue50b\ue5f0","font":"rlk:mboss_gd","color":"white","shadow_color":0}]

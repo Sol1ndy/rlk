@@ -5,3 +5,4 @@ scoreboard objectives add gdRigF dummy
 scoreboard objectives add gdRigEye dummy
 scoreboard objectives add gdRigSp dummy
 scoreboard objectives add gdRigY dummy
+scoreboard objectives add gdRigGl dummy

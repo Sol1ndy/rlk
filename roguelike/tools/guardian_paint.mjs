@@ -352,6 +352,34 @@ function spearEdge(enchanted = false) {
   });
 }
 // Red 4-point star with facets (butt finial, orbit star, red ornaments).
+// Chaos star crystals: [light, mid, dark] per kind (1-4 active element, 5 inert gold, 6 inert blue).
+const STAR_PAL = {
+  1: ['#FFE2B4', '#FF8A4C', '#B8402A'], 2: ['#D8F4FF', '#5CC8FF', '#2A6EC0'], 3: ['#F3CEF9', '#D282FA', '#9D3ED6'],
+  4: ['#DEFFFD', '#98E6F3', '#618CB9'], 5: ['#FFF4C0', '#FCE582', '#E59D78'], 6: ['#E2EEFF', '#A6CEFD', '#8D83D9'],
+  flash: ['#FFFFFF', '#FFFDF4', '#E8E4F0'], dark: ['#8A2A2E', '#5A1418', '#2A080A'],
+};
+// Upright faceted 4-point crystal: each arm is two bevel facets, lit from the upper left (quadrant shading), a
+// hot glint toward the centre and a thin dark rim. Sprite spans the card X -6..6, Y -8..8 (taller than wide).
+function crystalStar(light, mid, dark) {
+  return (u, v) => {
+    const x = (u - .5) * 2, y = (.5 - v) * 2;
+    const s = star4in(x, y, .98, .98, .05);
+    if (s <= 0) return TRANSPARENT;
+    const vert = Math.abs(y) > Math.abs(x);
+    let c = x < 0 && y >= 0 ? light : x >= 0 && y < 0 ? dark : mix(mid, x < 0 ? dark : light, vert ? .18 : .32);
+    c = mix(c, C('#ffffff'), smooth(.62, 1, s) * .65);
+    if (s < .05) c = mix(c, dark, .65);
+    return c;
+  };
+}
+function starCore() {
+  return (u, v) => {
+    const x = (u - .5) * 2, y = (.5 - v) * 2, r = Math.hypot(x, y);
+    const a = clamp(Math.exp(-r * r * 6) * .95 + Math.max(0, star4in(x, y, .95, .95, .02)) * .8);
+    return a < .02 ? TRANSPARENT : [255, 252, 240, a * 255];
+  };
+}
+
 function facetStar(base, dark, light, k = .1) {
   return (u, v) => {
     const x = (u - .5) * 2, y = (.5 - v) * 2;
@@ -1117,6 +1145,9 @@ export function guardianSprites() {
     gd_ledge: [32, 32, ledgeKnob()], gd_ledge_lup: [32, 32, ledgeLup()], gd_ledge_lfo: [64, 64, ledgeLfo()], gd_ledge_paul: [32, 32, ledgePaul()],
     gd_lhand: [...SIZE.gd_lhand, lHandSprite()], gd_lpalm: [...SIZE.gd_lpalm, lHandSprite(true)], gd_brace_fin: [...SIZE.gd_brace_fin, braceFin()],
     gd_talon: [16, 64, talon(false)], gd_talon_gold: [16, 64, talon(true)],
+    // chaos element stars (patterns.md §9.2 palettes: light, mid, dark), a white flash and the dark collapse
+    ...Object.fromEntries(Object.entries(STAR_PAL).map(([k, pal]) => ['gd_star_' + k, [48, 64, crystalStar(...pal.map(C))]])),
+    gd_star_core: [32, 32, starCore(), true],
     gd_shaft: [16, 128, (u, v) => { let c = mix(C('#fff4cc'), C('#e2be78'), Math.abs(u - .5) * 1.8); if ((v * 24) % 1 < .07) c = mix(c, PAL.goldMid, .45); return c; }],
     gd_redcore: [32, 32, flat('#8a2418', '#5a120c', 21)],
     gd_dark: [32, 32, flat('#2a1418', '#1a0c10', 23)],

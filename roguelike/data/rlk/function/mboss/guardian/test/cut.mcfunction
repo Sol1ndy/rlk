@@ -8,6 +8,7 @@ scoreboard players set #gdBq1 mb 0
 scoreboard players set #gdBq2 mb 0
 function rlk:mboss/guardian/rig/spear/geo
 function rlk:mboss/guardian/rig/eye/geo
+function rlk:mboss/guardian/rig/glow/off
 function rlk:mboss/guardian/rig/play/idle
 scoreboard players set #gdCool mb 10
 function rlk:mboss/guardian/ai/enter

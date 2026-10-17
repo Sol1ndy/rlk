@@ -22,5 +22,5 @@ execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.86f
 execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.86f,0.45f],scale:1} ^-0.16 ^5.7 ^2.21 0.04 0.04 0.04 0 1 force @a[tag=player]
 execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.86f,0.45f],scale:1} ^-0.13 ^5.25 ^2.73 0.04 0.04 0.04 0 1 force @a[tag=player]
 execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.86f,0.45f],scale:1} ^-0.1 ^4.8 ^3.25 0.04 0.04 0.04 0 1 force @a[tag=player]
-playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 0.75 0.55 0.3
-playsound minecraft:item.trident.riptide_2 hostile @a[tag=player] ~ ~ ~ 0.4 1.3 0.3
+playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 0.75 0.55 0.25
+playsound minecraft:item.trident.riptide_2 hostile @a[tag=player] ~ ~ ~ 0.4 1.3 0.13

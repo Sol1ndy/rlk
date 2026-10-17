@@ -628,7 +628,17 @@ export function partModels() {
     spear: spear(false), spear_e: spear(true), spear_glow: spearGlow(), trail: trail(),
     cubes_a: cubesA(), cubes_c: cubesC(),
     ...Object.fromEntries(Array.from({length: CUBES_B_VARIANTS}, (_, v) => [v ? 'cubes_b_' + v : 'cubes_b', trailVox(v)])),
+    ...Object.fromEntries(STAR_KINDS.map(k => ['star_' + k, starCrystal('gd_star_' + k)])),
   };
+}
+// Chaos element stars (not rig parts; the module summons them as item_displays): an upright faceted 4-point crystal
+// seen with depth from every side (two crossed cards) and a white-hot core cross turned 45 degrees. 1 b tall at
+// scale 1, centred on the model centre.
+export const STAR_KINDS = ['1', '2', '3', '4', '5', '6', 'flash', 'dark'];
+function starCrystal(sprite) {
+  const R = {X0: -6, X1: 6, Y0: -8, Y1: 8}, c = {X0: -3.4, X1: 3.4, Y0: -3.4, Y1: 3.4};
+  return [cardZ(sprite, 0, R), cardX(sprite, 0, {Z0: R.X0, Z1: R.X1, Y0: R.Y0, Y1: R.Y1}),
+    cardZ('gd_star_core', 0, c, {rot: ['y', 45, [0, 0, 0]]}), cardZ('gd_star_core', 0, c, {rot: ['y', -45, [0, 0, 0]]})];
 }
 // Mirror a hand for the other side is not needed: the left hand has its own gold models.
 export function checkBounds(name, els) {

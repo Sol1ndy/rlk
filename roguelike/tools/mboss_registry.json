@@ -22,7 +22,7 @@
       "id": "guardian", "n": 1, "enabled": true, "w": 10, "minCh": 1, "maxCh": 99,
       "name": "파수꾼・타락", "sub": "개안자 · 세계 망루의 파수꾼", "color": "#E0B84A", "el": 5,
       "hp": 250, "xp": 30, "atk": 12, "lvAdd": 0, "dmgMul": 110, "goldMul": 5, "sap": 1, "picks": 2,
-      "scale": 1.5, "hit": {"w": 1.6, "h": 3.4}, "intro": 90, "death": 90,
+      "scale": 1.5, "hit": {"w": 1.6, "h": 3.4}, "intro": 90, "death": 90, "deathSnd": false,
       "icon": {"item": "minecraft:wither_skeleton_skull", "model": "minecraft:wither_skeleton_skull"}
     },
     {

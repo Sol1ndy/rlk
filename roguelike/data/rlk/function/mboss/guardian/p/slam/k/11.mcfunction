@@ -11,5 +11,5 @@ execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run par
 execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^1.81 ^0.08 ^1.79 0 0 0 0 1 force @a[tag=player]
 execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-1.7 ^0.08 ^2.86 0 0 0 0 1 force @a[tag=player]
 execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-3.4 ^0.08 ^-1.32 0 0 0 0 1 force @a[tag=player]
-playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.6 1.5 0.3
-playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.7 1.5 0.3
+playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.6 1.5 0.2
+playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.7 1.5 0.23

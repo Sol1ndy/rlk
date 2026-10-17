@@ -1,4 +1,4 @@
-# Hit feedback: a white outline for 3 ticks. @s = rig anchor.
+# Hit feedback: a white outline for 3 ticks (then back to the glow look). @s = rig anchor.
 scoreboard players set @s gdRigF 4
 data merge entity 524c4b4d-4247-4400-8000-000000000001 {Glowing:1b,glow_color_override:16772300}
 data merge entity 524c4b4d-4247-4400-8000-000000000002 {Glowing:1b,glow_color_override:16772300}

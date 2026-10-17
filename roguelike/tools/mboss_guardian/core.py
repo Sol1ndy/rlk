@@ -20,14 +20,20 @@ OWN_TOP = 'mboss/' + A.ID
 GUARD_ENTRY = clip_len('guard_entry')        # 50 t twirl, discs, ground ring, settle
 GUARD_ACTIVE = 100                            # PDF 5 s
 GUARD_END = GUARD_ENTRY + GUARD_ACTIVE        # guard clock tick of the timeout
-GUARD_GAP = {1: 20, 2: 20}                    # after the sweep clip: guard I -> guard II, guard II -> chaos
+GUARD_GAP = {1: 20, 2: 0}                     # after the sweep clip: guard I -> guard II (43 t after the strike as
+                                              # in m2), guard II -> chaos (the clip's own 20-23 t tail = m2's 20 t)
 REC_NEW, REC_AGAIN, REC_GAP = 3, 9, 8         # hits to record / re-record, one count per element per 8 t
 CHAOS_TIMER = 350                             # 17.5 s
 CHAOS_NEAR = 6.0                              # nearer than this to the centre: glide instead of the leap
-STAR_DIST, STAR_ANGLE = 4.2, 55               # stars 4.2 b from the body, +-55 degrees off her facing
-STAR_PM = {'active': 70, 'inert': 17}         # star pools, per mille of the body's max HP (K8)
+STAR_DIST, STAR_ANGLE = 4.2, 24               # stars 4.2 b from the body, +-24 deg off her facing: 3.4 b apart (plan)
+STAR_PM = {'active': 42, 'inert': 17}         # star pools, per mille of the body's max HP (K8; see star_sizing())
 STAR_RES_INERT = 80                           # inert stars: all RES +80 % (x0.238)
-IMMUNE_PCT = 0                                # % of an own-element hit an active star takes (0 = immune)
+OWN_EL_RES = 40                               # active star: RES % against its own element (x0.6; user decision,
+                                              # replaces C11's immunity); every other element hits it normally
+STAR_Y, STAR_S, STAR_SPIN = 1.2, (1.15, 2.1), 3  # crystal: display height, size formed / at the timeout (b), deg per tick
+CS_LEN = (8, 12)                              # cube stream: cubes per chain (gold lead + hollow red-edged followers)
+CS_SLOTS = 3                                  # streams alive at once (2-5 in the source)
+KILL_S = 75                                   # assumed skill-light full-damage kill time of the body at the zone level (s)
 BREAK_DELAY = 5                               # star break -> boss damage (S+5)
 BREAK_PCT = (6, 18)                           # 1st / 2nd star break, % of the boss's max HP
 GROGGY = 220                                  # K13
@@ -38,6 +44,28 @@ INTRO_TELL, INTRO_CLIP = 16, 26               # intro clock: ground telegraph, e
 INTRO_IMPACT = INTRO_CLIP + ev('entrance', 'impact')
 INTRO_DONE = 66
 DEATH_LEN = clip_len('death')
+
+def star_tf(size):
+    """Crystal transformation: the model spans 1 b at scale 1, centred; the bottom stays 0.3 b above the floor."""
+    ty = size / 2 - (STAR_Y - 0.3)
+    return (f'{{translation:[0f,{L.num(ty, 3)}f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],'
+            f'scale:[{L.num(size, 3)}f,{L.num(size, 3)}f,{L.num(size, 3)}f]}}')
+
+
+def star_seconds():
+    """Time to break each kind of star at KILL_S (a star pool of P per mille breaks in P/1000 of the kill time,
+    divided by the damage factor: own element x(1 - OWN_EL_RES), inert x0.238)."""
+    act, ine = STAR_PM['active'] / 1000, STAR_PM['inert'] / 1000
+    own = (100 - OWN_EL_RES) / 100
+    return {'active_own': KILL_S * act / own, 'active_other': KILL_S * act, 'inert': KILL_S * ine / 0.238}
+
+
+_SS = star_seconds()
+# A typical character hits mostly with its own element: guard I records it (active star of that element), guard II
+# re-records it (9 hits) or times out (inert star). Both stars must break in about 10-12 s of the 17.5 s timer.
+for _pair in (('active_own', 'inert'), ('active_own', 'active_own'), ('inert', 'inert')):
+    assert 10 <= _SS[_pair[0]] + _SS[_pair[1]] <= 12, (_pair, _SS)
+
 
 ST = {'idle': 0, 'pattern': 1, 'close': 2, 'guard': 3, 'chaos': 4, 'groggy': 5, 'approach': 6, 'dead': 7}
 
@@ -127,8 +155,8 @@ class Core:
         v = ['# Every fake player of the module back to its fight-start value (spawn, reload, cleanup; no executor).',
              '# AI state: 0 idle 1 pattern 2 close-in 3 guard 4 chaos 5 groggy 6 approach 7 dying']
         v += [sc_set(k, 0) for k in ('#gdSt', '#gdT', '#gdLast', '#gdPick', '#gdReq', '#gdPat', '#gdPNew', '#gdPT',
-                                      '#gdPEnd', '#gdPMax', '#gdPDone', '#gdMv', '#gdClk', '#gdVoCd', '#gdVoG',
-                                      '#gdFlash', '#gdTst', '#gdDist')]
+                                      '#gdPEnd', '#gdPMax', '#gdPLen', '#gdPRel', '#gdPDone', '#gdMv', '#gdClk', '#gdVoCd', '#gdVoG',
+                                      '#gdFlash', '#gdTst', '#gdDist', '#gdP4N')]
         v += [sc_set('#gdCool', 30), sc_set('#gdBand', 2),
               f'execute store result score #gdLeft mb run random value {OPENING[0]}..{OPENING[1]}']
         v += [sc_set(f'#gdBag{p.id}', 1) for p in self.normal]
@@ -203,12 +231,14 @@ class Core:
         self.w('aux_hit', [
             '# Hook aux_hit (@s = a star inside combat/apply; #dmg already modified like a body hit, RES included:',
             f'# inert stars carry mres {STAR_RES_INERT}). Outside a running chaos timer the star takes nothing (no number);',
-            '# an active star is immune to its own element (framework "면역" popup when #dmg is 0).',
+            f'# an active star resists its own element ({OWN_EL_RES} % RES, x{(100 - OWN_EL_RES) / 100:g}, at least 1); a hit that still',
+            '# comes to 0 is swallowed silently, so the framework\'s zero-damage popup never shows on a star.',
             f'execute unless score #mbSt mb matches 1 run return run {F("star/ignore")}',
             f'execute unless score #gdSt mb matches 4 run return run {F("star/ignore")}',
             f'execute unless score #gdCP mb matches 3 run return run {F("star/ignore")}',
             'execute unless entity @s[tag=rlk_mb_gd_star] run return 0',
-            f'execute if score @s mbS matches 1..4 if score #elem tmp = @s mbS run {F("star/immune")}'])
+            f'execute if score @s mbS matches 1..4 if score #elem tmp = @s mbS run {F("star/resist")}',
+            f'execute if score #dmg tmp matches ..0 run {F("star/ignore")}'])
         self.w('incoming', [
             '# Hook incoming (@s = body inside combat/apply_mods, after level and RES): no extra modifiers.',
             '# Groggy has no damage bonus (PDF "추가 내성 감소 없음") and the boss keeps base RES in chaos (K7).'])
@@ -223,10 +253,11 @@ class Core:
             F('chaos/reset'),
             sc_set('#gdSt', ST['dead']),
             sc_set('#gdRecOn', 0), sc_set('#gdBq1', 0), sc_set('#gdBq2', 0),
-            R('spear/geo'), R('eye/geo'),
+            R('spear/geo'), R('eye/geo'), R('glow/off'),
             self.g.play('death'),
             F('voice/death'),
-            A.Gen.sound('entity.wither.ambient', 0.25, 1.6)])
+            '# no creature vocals (K18): the typed line, a soft crystal sting and the framework\'s non-vocal death sound',
+            A.Gen.sound('block.amethyst_cluster.break', 0.6, 0.7), A.Gen.sound('block.beacon.deactivate', 0.5, 0.8)])
         trail = ['# Hook death_tick (@s = body, #mbT = 1.. until cur.death): slump, fly-away with a cube trail, fade.',
                  f'# The rig must tick for the clip to run, and must NOT tick after its kill at {DEATH_LEN} (it would respawn).',
                  at_t('#mbT', (1, DEATH_LEN - 1), R('tick')),
@@ -259,6 +290,8 @@ class Core:
             '# AI back to idle with HP kept; a guard pair restarts soon, an interrupted chaos is abandoned.',
             F('ai/consts'),
             'execute if score #mbSt mb matches 0 run function rlk:mboss/intro_end',
+            '# a glide or flight the reloaded AI no longer owns (P5 under the ring, chaos travel) stops here',
+            'execute as @e[tag=rlk_mb_mv] run function rlk:mboss/mv/stop',
             F('p/cancel'),
             'execute if score #gdSt mb matches 3 run scoreboard players set #gdLeft mb 0',
             f'execute if score #gdSt mb matches 4..6 run {F("chaos/reset")}',
@@ -267,6 +300,7 @@ class Core:
             sc_set('#gdStars', 0), sc_set('#gdHaze', 0), sc_set('#gdTim', 0),
             sc_set('#mbNoLeash', 0),
             'tag @s remove rlk_mb_inv',
+            R('glow/off'),
             R('spawn'),
             R('spear/geo'),
             F('look/eye_rest'),
@@ -279,7 +313,7 @@ class Core:
             f'execute if score #gdSt mb matches 3 if score #gdGP mb matches 2 run return run {F("hud/bar_guard")}',
             f'execute if score #gdSt mb matches 4 if score #gdCP mb matches 3 run return run {F("hud/bar_chaos")}',
             f'execute if score #gdSt mb matches 5 run return run {F("hud/bar_groggy")}',
-            f'execute if score #gdPat mb matches 1.. unless score #gdPNew mb matches 1 run {F("hud/bar_pattern")}'])
+            f'execute if score #gdPat mb matches 1.. unless score #gdPNew mb matches 1 unless score #gdPRel mb matches 1 run {F("hud/bar_pattern")}'])
         self.w('hz_vis', ['# Hook hz_vis (@s = hazard marker, #hzEv 0 create / 1 strike / 2 end). Visual ids are pattern id x 10 + k.',
                           F('p/vis')])
         self.w('pj_end', ['# Hook pj_end (@s = prop, #pjEv, #pjKeep preset). Routed by the prop\'s mbId (= pattern id).',
@@ -302,7 +336,7 @@ class Core:
         self.w('intro/tell', [
             '# Entrance telegraph (K19, >= 12 t, a deliberate deviation from the PDF\'s "no sign"): a ground disc where the',
             '# spear will plant (right-front of her, clip grip ^-0.62 ^ ^0.7) and a glint high above it.',
-            sc_set('#hzSfx', 1), sc_set('#hzKB', KB['default']),
+            sc_set('#hzSfx', 0), sc_set('#hzKB', KB['default']),
             f'execute {plant} positioned ~ {CY} ~ run {g.hz_disc(3.0, INTRO_IMPACT - INTRO_TELL, DMG["entrance"])}',
             f'execute {plant} run ' + g.card('star', '^ ^7.4 ^', bb='center', spin=90, s0=0.2, s1=1.4, life=14, fade=6),
             f'execute {plant} run ' + g.sound('block.amethyst_block.chime', 1.0, 1.8),
@@ -354,6 +388,8 @@ class Core:
         self.w('ai/next', [
             '# Next action. Test request > test lock (#mbLock 1-5 = that pattern only, 6 = guard pair + chaos only) >',
             '# rotation: #gdLeft normal patterns, then guard I, guard II, chaos (K3).',
+            '# a released slot pattern (the fail spears\' tail) still runs: wait for it',
+            'execute if score #gdPat mb matches 1.. run return 0',
             f'execute if score #gdMv mb matches 1 run {g.play("idle")}',
             sc_set('#gdMv', 0),
             f'execute if score #gdReq mb matches 1.. run return run {F("ai/req")}',
@@ -364,40 +400,51 @@ class Core:
             F('ai/pick')])
         self.w('ai/req', ['scoreboard players operation #gdPick mb = #gdReq mb', sc_set('#gdReq', 0), F('ai/launch')])
         self.w('ai/lock', ['scoreboard players operation #gdPick mb = #mbLock mb', F('ai/launch')])
-        # shuffle bag
+        # shuffle bag (weighted per band; a pattern with min_d only from that distance on)
         bands = A.BANDS
-        cand = ['# Candidates: in the bag, allowed in the current range band, not the last one.']
-        cand_any = ['# Fallback candidates: allowed in the band (bag and last ignored).']
+        cand = ['# Candidates: in the bag, allowed in the current range band (and distance), not the last one.',
+                '# #gdC<id> = its draw weight in this band (0 = no candidate).']
+        cand_any = ['# Fallback candidates: allowed in the band and distance (bag and last ignored).']
         for p in self.normal:
             cand.append(sc_set(f'#gdC{p.id}', 0))
             cand_any.append(sc_set(f'#gdC{p.id}', 0))
+            dmin = f'if score #gdDist mb matches {int(round(p.min_d * 10))}.. ' if p.min_d else ''
             for b in p.bands:
-                cand.append(f'execute if score #gdBag{p.id} mb matches 1 if score #gdBand mb matches {bands[b]} '
-                            f'unless score #gdLast mb matches {p.id} run scoreboard players set #gdC{p.id} mb 1')
-                cand_any.append(f'execute if score #gdBand mb matches {bands[b]} run scoreboard players set #gdC{p.id} mb 1')
+                wt = p.weight[b]
+                cand.append(f'execute if score #gdBag{p.id} mb matches 1 if score #gdBand mb matches {bands[b]} {dmin}'
+                            f'unless score #gdLast mb matches {p.id} run scoreboard players set #gdC{p.id} mb {wt}')
+                cand_any.append(f'execute if score #gdBand mb matches {bands[b]} {dmin}run scoreboard players set #gdC{p.id} mb {wt}')
         for lines in (cand, cand_any):
             lines.append(sc_set('#gdCn', 0))
-            lines += [f'execute if score #gdC{p.id} mb matches 1 run scoreboard players add #gdCn mb 1' for p in self.normal]
+            lines += [f'scoreboard players operation #gdCn mb += #gdC{p.id} mb' for p in self.normal]
         self.w('ai/cand', cand)
         self.w('ai/cand_any', cand_any)
         self.w('ai/refill', ['# The bag ran dry for this band: refill it with every normal pattern.']
                + [sc_set(f'#gdBag{p.id}', 1) for p in self.normal])
-        draw = ['# #gdR = 0..#gdCn-1 -> the #gdR-th candidate.', sc_set('#gdPick', 0)]
+        draw = ['# #gdR = 0..#gdCn-1 (sum of the weights) -> the candidate whose weight range holds it.', sc_set('#gdPick', 0)]
         for p in self.normal:
-            draw.append(f'execute if score #gdPick mb matches 0 if score #gdC{p.id} mb matches 1 if score #gdR mb matches 0 '
+            draw.append(f'execute if score #gdPick mb matches 0 if score #gdC{p.id} mb matches 1.. if score #gdR mb < #gdC{p.id} mb '
                         f'run scoreboard players set #gdPick mb {p.id}')
-            draw.append(f'execute if score #gdC{p.id} mb matches 1 run scoreboard players remove #gdR mb 1')
+            draw.append(f'scoreboard players operation #gdR mb -= #gdC{p.id} mb')
         draw += [f'execute if score #gdPick mb matches {p.id} run scoreboard players set #gdBag{p.id} mb 0' for p in self.normal]
         self.w('ai/draw', draw)
         mel, far = int(A.MELEE * 10), int(A.FAR * 10)
+        pull = next(p for p in self.normal if p.key == 'pull')
         self.w('ai/pick', [
-            '# @s = body. Range-filtered shuffle bag with no immediate repeat (K2/K3):',
-            '# ' + ', '.join(f'P{p.id} {"/".join(p.bands)}' for p in self.normal) + f' (melee <= {A.MELEE} b, far >= {A.FAR} b).',
+            '# @s = body. Range-filtered, weighted shuffle bag with no immediate repeat (K2/K3):',
+            '# ' + ', '.join(f'P{p.id} ' + '/'.join(b + (f'x{p.weight[b]}' if p.weight[b] > 1 else '') for b in p.bands)
+                             + (f' (from {L.num(p.min_d)} b)' if p.min_d else '') for p in self.normal)
+            + f' (melee <= {A.MELEE} b, far >= {A.FAR} b).',
+            f'# Pull guarantee: P{pull.id} has not run in this stretch of normals (#gdP4N 0), this is the stretch\'s last',
+            f'# pick (#gdLeft 0) and the player is out of melee -> P{pull.id} now (so it shows up in every stretch in which',
+            '# the player keeps out of melee).',
             'function rlk:mboss/mv/dist',
             'scoreboard players operation #gdDist mb = #mbDist mb',
             sc_set('#gdBand', bands['mid']),
             f'execute if score #gdDist mb matches ..{mel} run scoreboard players set #gdBand mb {bands["melee"]}',
             f'execute if score #gdDist mb matches {far}.. run scoreboard players set #gdBand mb {bands["far"]}',
+            f'execute if score #gdP4N mb matches 0 if score #gdLeft mb matches ..0 if score #gdDist mb matches {mel + 1}.. '
+            f'unless score #gdLast mb matches {pull.id} run return run {F("ai/pity")}',
             F('ai/cand'),
             f'execute if score #gdCn mb matches 0 run {F("ai/refill")}',
             f'execute if score #gdCn mb matches 0 run {F("ai/cand")}',
@@ -426,8 +473,13 @@ class Core:
         self.w('ai/launch', launch)
         self.w('ai/close', close)
         self.w('ai/close_begin', [sc_set('#gdSt', ST['close']), sc_set('#gdT', 0), g.play('glide'), F('hud/sub_pattern')])
+        self.w('ai/pity', [f'# @s = body: the stretch\'s guaranteed P{pull.id} (see ai/pick).',
+                           sc_set('#gdPick', pull.id), sc_set(f'#gdBag{pull.id}', 0),
+                           'scoreboard players operation #gdLast mb = #gdPick mb',
+                           F('ai/launch')])
         self.w('ai/go', ['# Into the pattern slot: p/run starts it this tick (pattern clock 0 = clip tick 0).',
                          sc_set('#gdSt', ST['pattern']), 'scoreboard players operation #gdPat mb = #gdPick mb',
+                         f'execute if score #gdPick mb matches {pull.id} run scoreboard players set #gdP4N mb 1',
                          sc_set('#gdPNew', 1)])
         self.w('ai/approach_begin', [
             '# After a failed chaos: she leaves the centre and glides at the player (patterns.md §9.4).',
@@ -444,7 +496,8 @@ class Core:
         rec.append(F('ai/enter'))
         self.w('ai/recover', rec)
         self.w('ai/pat_done', [
-            '# From p/finish: the state that owns the slot continues.',
+            '# From p/finish: the state that owns the slot continues (unless it already moved on at the pattern\'s release).',
+            'execute if score #gdPRel mb matches 1 run return 0',
             f'execute if score #gdSt mb matches {ST["guard"]} run return run {F("guard/after")}',
             f'execute if score #gdSt mb matches {ST["chaos"]} run return run scoreboard players set #gdFailDone mb 1',
             F('ai/recover')])
@@ -453,8 +506,11 @@ class Core:
     def slot(self):
         F = self.F
         begin = ['# @s = body. First tick of the slot pattern #gdPat: clock 0, start function (plays its clip).',
-                 sc_set('#gdPNew', 0), sc_set('#gdPT', 0), sc_set('#gdPEnd', 0), sc_set('#gdPMax', 200)]
+                 sc_set('#gdPNew', 0), sc_set('#gdPT', 0), sc_set('#gdPEnd', 0), sc_set('#gdPRel', 0), sc_set('#gdPMax', 200),
+                 sc_set('#gdPLen', 200)]
         begin += [sc_set_if('#gdPat', p.id, '#gdPMax', p.max_len) for p in self.pats]
+        begin += ['# expected end for the progress bar (a pattern that decides a shorter run sets #gdPLen itself: g.set_len)']
+        begin += [sc_set_if('#gdPat', p.id, '#gdPLen', p.length) for p in self.pats]
         begin += [f'execute if score #gdSt mb matches {ST["pattern"]} run {F("hud/sub_pattern")}', F('p/start')]
         self.w('p/begin', begin)
         self.w('p/run', [
@@ -470,17 +526,23 @@ class Core:
             sc_set('#gdPat', 0), sc_set('#gdPEnd', 0), sc_set('#gdPT', 0),
             f'execute unless score #gdSt mb matches {ST["chaos"]} run scoreboard players set #mbNoLeash mb 0',
             'tag @s remove rlk_mb_inv',
-            F('ai/pat_done')])
+            F('ai/pat_done'),
+            sc_set('#gdPRel', 0)])
         self.w('p/end', ['# Called by a pattern (any executor): it is done; the core finishes it after this tick\'s pattern tick.',
                          sc_set('#gdPEnd', 1)])
+        self.w('p/release', ['# Called by a pattern (any executor): its dangerous part is over, the owning state may move on while the',
+                             '# pattern finishes a harmless tail in the slot (the fail spears: she leaves 10 t after the last impact).',
+                             '# The slot stays busy (no new decision) until p/end.',
+                             sc_set('#gdPRel', 1)])
         self.w('p/cancel', [
             '# Stop the slot pattern now (tests, death, reload). Callers run rlk:mboss/lib_clear first when hazards must',
             '# go. The pattern\'s cancel runs as the caller (the body when it exists): it must use selectors, not @s.',
             f'execute if score #gdPat mb matches 1.. unless score #gdPNew mb matches 1 run {F("p/cancel_d")}',
-            sc_set('#gdPat', 0), sc_set('#gdPNew', 0), sc_set('#gdPEnd', 0), sc_set('#gdPT', 0),
+            sc_set('#gdPat', 0), sc_set('#gdPNew', 0), sc_set('#gdPEnd', 0), sc_set('#gdPT', 0), sc_set('#gdPRel', 0),
             sc_set('#mbNoLeash', 0),
             'execute if score #mbSt mb matches 1 run tag @e[tag=rlk_mb_body] remove rlk_mb_inv',
-            f'execute if score #mbSt mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run {self.R("spear/geo")}'])
+            f'execute if score #mbSt mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run {self.R("spear/geo")}',
+            f'execute if score #mbSt mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run {self.R("glow/off")}'])
         for name, doc in (('start', 'start (clock 0)'), ('tick', 'tick (#gdPT 1..)'), ('cancel_d', 'cancel')):
             target = 'cancel' if name == 'cancel_d' else name
             self.w(f'p/{name}', [f'# GENERATED dispatcher: the running pattern\'s {doc}, by #gdPat.']
@@ -504,7 +566,8 @@ class Core:
     # -----------------------------------------------------------------------------------------
     def guard(self):
         F, R, g = self.F, self.R, self.g
-        self.w('guard/begin1', [sc_set('#gdGN', 1), F('guard/begin')])
+        self.w('guard/begin1', ['# A guard pair starts: the next stretch of normals (after the chaos) owes a new P4 (ai/pick).',
+                                sc_set('#gdGN', 1), sc_set('#gdP4N', 0), F('guard/begin')])
         self.w('guard/begin2', [sc_set('#gdGN', 2), F('guard/begin')])
         begin = [
             '# @s = body. Guard mode #gdGN (1 = slot A, 2 = slot B): entry twirl (50 t), then 100 t of record window.',
@@ -545,15 +608,25 @@ class Core:
             at_t('#gdT', 35, g.sound('entity.iron_golem.step', 0.8, 0.6)),
             at_t('#gdT', (36, 44), g.dust(A.GOLD, 1.0, '~ ~0.15 ~', (2.4, 0.02, 2.4), 6)),
             f'execute if score #gdT mb matches {GUARD_ENTRY}.. run {F("guard/open")}'])
-        self.w('guard/open', ['# The record window opens (guard pose loop follows the entry clip on its own).',
-                              sc_set('#gdGP', 2), sc_set('#gdRecOn', 1), g.sound('block.beacon.activate', 0.4, 1.6)])
+        self.w('guard/open', ['# The record window opens (guard pose loop follows the entry clip on its own). Gold aura (m2, model.md',
+                              '# §4): the rig\'s guard look = gold spear (rig spear/gold) + a gold outline on the whole body (rig',
+                              '# glow/gold; a hit flash returns to it). A record ends both (element spear); the gold sweep keeps them',
+                              '# until guard/after.',
+                              sc_set('#gdGP', 2), sc_set('#gdRecOn', 1), R('spear/gold'), R('glow/gold'),
+                              g.card('glow', '~ ~1.9 ~', bb='center', s0=1.0, s1=3.4, life=8, fade=4),
+                              g.dust(A.GOLD_PALE, 1.6, '~ ~1.6 ~', (0.7, 1.1, 0.7), 24),
+                              g.sound('block.beacon.activate', 0.4, 1.6), g.sound('block.amethyst_block.resonate', 0.6, 1.5)])
         self.w('guard/active', [
             f'# @s = body, guard clock {GUARD_ENTRY + 1}..{GUARD_END}: gold aura, drift ~1 b/s toward the player, record window.',
             R('face/track'),
             'execute unless entity @e[tag=rlk_body,distance=..2.2,limit=1] run function rlk:mboss/mv/toward {d:0.05}',
-            'scoreboard players operation #gdM mb = #gdT mb', 'scoreboard players operation #gdM mb %= #gdK3 mb',
-            f'execute if score #gdM mb matches 0 run {g.dust(A.GOLD, 0.9, "~ ~1.9 ~", (0.55, 1.0, 0.55), 3)}',
+            '# aura: 3 gold dust a tick over the body (0-3 b), a pale square mote and a spark every 2 t, a spear shimmer',
+            g.dust(A.GOLD, 1.1, '~ ~1.5 ~', (0.55, 1.0, 0.55), 2),
+            g.dust(A.GOLD_DEEP, 1.3, '~ ~1.2 ~', (0.45, 0.8, 0.45), 1),
+            'scoreboard players operation #gdM mb = #gdT mb', 'scoreboard players operation #gdM mb %= #gdK2 mb',
+            f'execute if score #gdM mb matches 0 run {g.dust(A.GOLD_PALE, 0.6, "~ ~1.8 ~", (0.9, 1.3, 0.9), 1)}',
             f'execute if score #gdM mb matches 0 run {g.particle("wax_on", "~ ~1.6 ~", (0.8, 1.2, 0.8), 0, 1)}',
+            f'execute if score #gdM mb matches 1 rotated as @s rotated ~ 0 run {g.particle("end_rod", "^-0.9 ^3.0 ^0.6", (0.25, 0.5, 0.25), 0.01, 1)}',
             at_t('#gdT', (GUARD_END - 11, GUARD_END), g.dust(A.GOLD_PALE, 1.3, '~ ~2 ~', (0.45, 0.9, 0.45), 4)),
             at_t('#gdT', GUARD_END - 4, 'execute rotated as @s rotated ~ 0 run ' + g.card('star', '^ ^2.4 ^0.5', bb='center', spin=60, s0=0.4, s1=3.2, life=8, fade=4)),
             at_t('#gdT', GUARD_END - 4, g.sound('block.beacon.power_select', 0.6, 1.6)),
@@ -568,7 +641,7 @@ class Core:
             'execute if score #gdGN mb matches 2 run scoreboard players operation #gdSlotB mb = #gdRecEl mb',
             'scoreboard players operation #gdSwEl mb = #gdRecEl mb',
             F('fx/record'),
-            F('look/spear_rec'), F('look/eye_rec'),
+            R('glow/off'), F('look/spear_rec'), F('look/eye_rec'),
             sc_set('#gdGP', 3), sc_set('#gdPat', 12), sc_set('#gdPNew', 1),
             F('hud/sub_guard')])
         self.w('guard/timeout', [
@@ -576,7 +649,7 @@ class Core:
             sc_set('#gdRecOn', 0), sc_set('#gdGP', 3), sc_set('#gdPat', 11), sc_set('#gdPNew', 1)])
         self.w('guard/after', [
             '# From ai/pat_done: the sweep is over. Spear back to gold, the gems keep the latest recorded element.',
-            R('spear/geo'), F('look/eye_rest'),
+            R('spear/geo'), R('glow/off'), F('look/eye_rest'),
             sc_set('#gdGP', 4), sc_set('#gdT', 0),
             sc_set('#gdGW', GUARD_GAP[1]),
             f'execute if score #gdGN mb matches 2 run scoreboard players set #gdGW mb {GUARD_GAP[2]}',
@@ -707,38 +780,8 @@ class Core:
             'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_sigil] at @s run ' +
             g.particle('block{block_state:"minecraft:red_concrete"}', '~ ~ ~', (0.15, 0.15, 0.15), 0, 4),
             'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_sigil]'])
-        # cube streams
-        self.w('chaos/cs_spawn', [
-            '# @s = body: a new cube stream (at most 3) from around her, homing on the floor near the player.',
-            'execute store result score #gdR mb run random value 18..30',
-            'scoreboard players operation #gdCsT mb = #gdR mb',
-            sc_set('#gdCsN', 0),
-            'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_cs] run scoreboard players add #gdCsN mb 1',
-            'execute if score #gdCsN mb matches 3.. run return 0',
-            'summon minecraft:block_display ~ ~4.6 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_fx","rlk_mb_gd_cs","rlk_mb_gd_csnew"],'
-            'brightness:{sky:15,block:15},block_state:{id:"minecraft:gold_block"},teleport_duration:1,view_range:2f,'
-            'transformation:{translation:[-0.22f,-0.22f,-0.22f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.44f,0.44f,0.44f]}}',
-            'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_csnew,limit=1] store result entity @s Rotation[0] float 1 run random value 0..359',
-            'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_csnew,limit=1] run data modify entity @s Rotation[1] set value -35.0f',
-            'scoreboard players set @e[type=minecraft:block_display,tag=rlk_mb_gd_csnew,limit=1] mbT 0',
-            'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_csnew,limit=1] store result score @s mbS run random value 1..2',
-            'tag @e[type=minecraft:block_display,tag=rlk_mb_gd_csnew] remove rlk_mb_gd_csnew',
-            g.sound('entity.blaze.shoot', 0.25, 0.6)])
-        self.w('chaos/cs_all', ['execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_cs] at @s run ' + F('chaos/cs_tick')])
-        self.w('chaos/cs_tick', [
-            '# @s = stream head (gold cube): out along its own heading for 10 t, then a spiralling dive at the player\'s feet.',
-            'scoreboard players add @s mbT 1',
-            f'execute if score @s mbT matches 48.. run return run {F("chaos/cs_end")}',
-            'execute if score @s mbT matches 10.. at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~ ~',
-            'execute if score @s mbS matches 1 at @s run tp @s ^0.2 ^ ^0.45',
-            'execute if score @s mbS matches 2 at @s run tp @s ^-0.2 ^ ^0.45',
-            g.dust_fade(A.RED_EDGE, (0.30, 0.15, 0.13), 1.5, '~ ~ ~', (0.06, 0.06, 0.06), 2),
-            'scoreboard players operation #gdM mb = @s mbT', 'scoreboard players operation #gdM mb %= #gdK5 mb',
-            f'execute if score #gdM mb matches 0 run {g.particle("small_flame", "~ ~ ~", (0.1, 0.1, 0.1), 0.01, 1)}',
-            f'execute if score @s mbT matches 12.. at @s if entity @e[tag=rlk_body,distance=..1.4,limit=1] run return run {F("chaos/cs_end")}',
-            f'execute at @s unless block ~ ~-0.3 ~ #rlk:cm_pass run {F("chaos/cs_end")}'])
-        self.w('chaos/cs_end', [g.particle('block{block_state:"minecraft:red_concrete"}', '~ ~ ~', (0.2, 0.2, 0.2), 0, 6),
-                                g.sound('block.chain.place', 0.3, 1.4), 'kill @s'])
+        # cube streams: snake chains (patterns.md §9.2): a gold lead cube + hollow red-edged followers on a delay chain
+        self.cube_streams()
         # fail
         fail_land = 33
         fail_raise = 74
@@ -765,7 +808,7 @@ class Core:
             at_t('#gdF', (1, 11), F('chaos/cs_all')),
             at_t('#gdF', 7, F('star/flash')),
             at_t('#gdF', 9, F('star/shrink')),
-            at_t('#gdF', (10, 14), 'execute as @e[type=minecraft:text_display,tag=rlk_mb_gd_starv] at @s run '
+            at_t('#gdF', (10, 14), 'execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_starv] at @s run '
                  + g.particle('block{block_state:"minecraft:gold_block"}', '~ ~1.2 ~', (0.25, 0.25, 0.25), 0, 2)),
             at_t('#gdF', 12, 'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_cs]'),
             at_t('#gdF', 15, F('chaos/sigil_break')),
@@ -781,10 +824,13 @@ class Core:
             at_t('#gdF', fail_land + ev('chaos_land', 'land'), g.sound('block.amethyst_block.fall', 0.8, 0.7)),
             f'execute if score #gdF mb matches {fail_raise} if score #gdFailN mb matches 2.. run {g.play("chaos_raise")}',
             f'execute if score #gdF mb matches {fail_land + ev("chaos_land", "land")}.. if score #gdFailDone mb matches 1 run return run {F("chaos/fail_end")}',
+            f'execute if score #gdF mb matches {fail_land + ev("chaos_land", "land")}.. if score #gdPRel mb matches 1 run return run {F("chaos/fail_end")}',
             f'execute if score #gdF mb matches 170.. run {F("chaos/fail_end")}'])
         self.w('chaos/fail_end', [
-            '# Spears done and she is on the floor: slots reset (K22), then the approach and 4-5 normal patterns.',
-            f'execute if score #gdPat mb matches 1.. run {F("p/cancel")}',
+            '# The last spear has struck (the pattern\'s release, 10 t after it; m4: she leaves at +90 while the giant spear',
+            '# still stands) and she is on the floor: slots reset (K22), then the approach and 4-5 normal patterns. The',
+            '# fail pattern finishes its tail (planted spear dissolving) in the slot; the next decision waits for it.',
+            f'execute if score #gdF mb matches 170.. if score #gdPat mb matches 1.. run {F("p/cancel")}',
             F('chaos/reset'),
             f'execute store result score #gdLeft mb run random value {NEXT_AFTER_CHAOS[0]}..{NEXT_AFTER_CHAOS[1]}',
             F('ai/approach_begin')])
@@ -810,6 +856,109 @@ class Core:
         for a in range(0, 360, 30):
             ring.append(f'execute rotated {a} 0 run ' + g.dust((0.70, 0.04, 0.18), 1.5, '^ ^5.4 ^1.9', (0, 0.05, 0), 2))
         self.w('fx/red_ring', ring)
+
+    # -----------------------------------------------------------------------------------------
+    def cube_streams(self):
+        """Ambient cube streams of the chaos hold (K11, no damage): up to CS_SLOTS chains of CS_LEN cubes. The gold
+        lead cube steers (out along its heading for 10 t, then a spiralling dive at the player's feet); every follower
+        k takes, each tick, the place follower k-1 had on the previous tick (tail first), so the chain traces the
+        lead's path 1 t (about 0.5 b) apart. When the lead lands it stops, turns invisible and the followers run
+        into it one per tick, each popping into red/black shards. Tags: rlk_mb_gd_cs (all), rlk_mb_gd_cs<s> (stream
+        s), rlk_mb_gd_cs<s>_<k> (k = 0 the lead)."""
+        F, g = self.F, self.g
+        import random
+        rng = random.Random(9172)
+        nf = CS_LEN[1] - 1
+        red_glow = 0xFC5454
+        bd = 'minecraft:block_display'
+
+        def seg(sl, k):
+            return f'@e[type={bd},tag=rlk_mb_gd_cs{sl}_{k},limit=1]'
+
+        spawn = ['# @s = body: a new cube stream in the first free slot (at most %d), from above her shoulders.' % CS_SLOTS,
+                 'execute store result score #gdR mb run random value 18..30',
+                 'scoreboard players operation #gdCsT mb = #gdR mb',
+                 sc_set('#gdCsS', 0)]
+        for sl in range(CS_SLOTS, 0, -1):
+            spawn.append(f'execute unless entity @e[type={bd},tag=rlk_mb_gd_cs{sl}] run scoreboard players set #gdCsS mb {sl}')
+        spawn.append('execute if score #gdCsS mb matches 0 run return 0')
+        spawn += [f'execute if score #gdCsS mb matches {sl} run {F(f"chaos/cs{sl}/spawn")}' for sl in range(1, CS_SLOTS + 1)]
+        spawn.append(g.sound('entity.blaze.shoot', 0.25, 0.6))
+        self.w('chaos/cs_spawn', spawn)
+        self.w('chaos/cs_all', ['# Every live stream (chaos hold, and the first 11 t of the fail).']
+               + [f'execute if entity @e[type={bd},tag=rlk_mb_gd_cs{sl}] run {F(f"chaos/cs{sl}/tick")}' for sl in range(1, CS_SLOTS + 1)])
+        # follower sizes taper 0.52 -> 0.3 b with jitter, each with its own fixed tilt
+        fol = []
+        for k in range(1, nf + 1):
+            u = (k - 1) / max(1, nf - 1)
+            size = round(0.52 - 0.22 * u + rng.uniform(-0.04, 0.04), 3)
+            ax = (rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1, 1))
+            n = math.sqrt(sum(a * a for a in ax)) or 1
+            ang = math.radians(rng.uniform(8, 35)) / 2
+            q = tuple(a / n * math.sin(ang) for a in ax) + (math.cos(ang),)
+            fol.append((size, q))
+        for sl in range(1, CS_SLOTS + 1):
+            tags = lambda *x: '["rlk_room","rlk_mb_aux","rlk_mb_gd_fx","rlk_mb_gd_cs","rlk_mb_gd_cs%d",%s]' % (sl, ','.join(f'"{t}"' for t in x))
+            sp = [f'# @s = body: stream {sl}. Lead: gold cube 0.62 b; {nf} followers (black glass, red outline #FC5454), then',
+                  f'# a random length of {CS_LEN[0]}-{CS_LEN[1]} cubes. All start at the lead and string out as it flies.',
+                  f'summon {bd} ~ ~4.6 ~ {{Tags:{tags(f"rlk_mb_gd_cs{sl}_0", "rlk_mb_gd_csh")},brightness:{{sky:15,block:15}},'
+                  'block_state:{id:"minecraft:gold_block"},teleport_duration:1,interpolation_duration:2,view_range:2.5f,shadow_radius:0f,'
+                  'transformation:{translation:[-0.05f,-0.05f,-0.05f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.1f,0.1f,0.1f]}}',
+                  f'execute as {seg(sl, 0)} run data merge entity @s {{start_interpolation:0,transformation:{{translation:[-0.31f,-0.31f,-0.31f],scale:[0.62f,0.62f,0.62f]}}}}',
+                  f'execute as {seg(sl, 0)} store result entity @s Rotation[0] float 1 run random value 0..359',
+                  f'execute as {seg(sl, 0)} run data modify entity @s Rotation[1] set value -35.0f',
+                  f'scoreboard players set {seg(sl, 0)} mbT 0',
+                  f'execute as {seg(sl, 0)} store result score @s mbS run random value 1..2']
+            for k, (size, q) in enumerate(fol, 1):
+                h = size / 2
+                qs = ','.join(L.num(v, 4) + 'f' for v in q)
+                sp.append(f'summon {bd} ~ ~4.6 ~ {{Tags:{tags(f"rlk_mb_gd_cs{sl}_{k}")},brightness:{{sky:15,block:15}},'
+                          f'block_state:{{id:"minecraft:black_stained_glass"}},Glowing:1b,glow_color_override:{red_glow},'
+                          'teleport_duration:1,view_range:2.5f,shadow_radius:0f,'
+                          f'transformation:{{translation:[{L.num(-h, 3)}f,{L.num(-h, 3)}f,{L.num(-h, 3)}f],left_rotation:[{qs}],'
+                          f'right_rotation:[0f,0f,0f,1f],scale:[{L.num(size, 3)}f,{L.num(size, 3)}f,{L.num(size, 3)}f]}}}}')
+            sp.append(f'execute store result score #gdR mb run random value {CS_LEN[0] - 1}..{CS_LEN[1] - 1}')
+            sp += [f'execute if score #gdR mb matches ..{k - 1} run kill @e[type={bd},tag=rlk_mb_gd_cs{sl}_{k}]' for k in range(CS_LEN[0], nf + 1)]
+            self.w(f'chaos/cs{sl}/spawn', sp)
+            tick = [f'# Stream {sl} (any executor). Followers tail first: each takes its predecessor\'s place of the last tick',
+                    '# (or the lead\'s, once the predecessor popped); then the lead moves; then the pop at a landed lead.',
+                    f'execute unless entity {seg(sl, 0)} run return run kill @e[type={bd},tag=rlk_mb_gd_cs{sl}]']
+            for k in range(nf, 0, -1):
+                tick.append(f'execute as {seg(sl, k)} at {seg(sl, k - 1)} run tp @s ~ ~ ~ ~ ~')
+                if k > 1:
+                    tick.append(f'execute as {seg(sl, k)} unless entity {seg(sl, k - 1)} at {seg(sl, 0)} run tp @s ~ ~ ~ ~ ~')
+            tick += [f'execute as {seg(sl, 0)} at @s run {F("chaos/cs_head")}',
+                     f'execute as {seg(sl, 0)} if entity @s[tag=rlk_mb_gd_csend] at @s as @e[type={bd},tag=rlk_mb_gd_cs{sl},tag=!rlk_mb_gd_csh,distance=..0.05] at @s run {F("chaos/cs_pop")}',
+                     f'execute as {seg(sl, 0)} if entity @s[tag=rlk_mb_gd_csend] unless entity @e[type={bd},tag=rlk_mb_gd_cs{sl},tag=!rlk_mb_gd_csh] run kill @s',
+                     f'execute as {seg(sl, 0)} if score @s mbT matches 80.. run kill @e[type={bd},tag=rlk_mb_gd_cs{sl}]']
+            self.w(f'chaos/cs{sl}/tick', tick)
+        self.w('chaos/cs_head', [
+            '# @s = a stream\'s gold lead: out along its own heading for 10 t, then a spiralling dive at the player\'s feet;',
+            '# it lands on the floor, at the player, or after 48 t. A landed lead stays put (the followers run into it).',
+            'scoreboard players add @s mbT 1',
+            'execute if entity @s[tag=rlk_mb_gd_csend] run return 0',
+            f'execute if score @s mbT matches 48.. run return run {F("chaos/cs_end")}',
+            'execute if score @s mbT matches 10.. at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~ ~',
+            'execute if score @s mbS matches 1 at @s run tp @s ^0.2 ^ ^0.45',
+            'execute if score @s mbS matches 2 at @s run tp @s ^-0.2 ^ ^0.45',
+            g.dust_fade(A.RED_EDGE, (0.30, 0.15, 0.13), 1.2, '~ ~ ~', (0.08, 0.08, 0.08), 1),
+            'scoreboard players operation #gdM mb = @s mbT', 'scoreboard players operation #gdM mb %= #gdK4 mb',
+            f'execute if score #gdM mb matches 0 run {g.particle("small_flame", "~ ~ ~", (0.15, 0.15, 0.15), 0.01, 1)}',
+            f'execute if score @s mbT matches 12.. at @s if entity @e[tag=rlk_body,distance=..1.4,limit=1] run return run {F("chaos/cs_end")}',
+            f'execute at @s unless block ~ ~-0.3 ~ #rlk:cm_pass run {F("chaos/cs_end")}'])
+        self.w('chaos/cs_end', [
+            '# @s = a lead that landed: it bursts and turns invisible; the followers pop into its place one per tick.',
+            'tag @s add rlk_mb_gd_csend',
+            'data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0f,0f,0f],scale:[0f,0f,0f]}}',
+            g.particle('block{block_state:"minecraft:gold_block"}', '~ ~ ~', (0.2, 0.2, 0.2), 0, 6),
+            g.particle('block{block_state:"minecraft:red_concrete"}', '~ ~ ~', (0.25, 0.2, 0.25), 0, 6),
+            g.sound('block.chain.place', 0.3, 1.4)])
+        self.w('chaos/cs_pop', [
+            '# @s = a follower that reached the landed lead: red/black shards and an ember.',
+            g.particle('block{block_state:"minecraft:red_concrete"}', '~ ~ ~', (0.15, 0.15, 0.15), 0, 3),
+            g.particle('block{block_state:"minecraft:black_concrete"}', '~ ~ ~', (0.15, 0.15, 0.15), 0, 2),
+            g.dust(A.RED_EDGE, 0.9, '~ ~ ~', (0.1, 0.1, 0.1), 2),
+            'kill @s'])
 
     # -----------------------------------------------------------------------------------------
     def stars(self):
@@ -838,18 +987,20 @@ class Core:
             'scoreboard players operation @e[tag=rlk_mb_auxlast,limit=1] mbId = #gdSs mb',
             'scoreboard players set @e[tag=rlk_mb_auxlast,limit=1] mbT 0']
             + [f'execute if score #gdSk mb matches {k} run {F(f"star/vis{k}")}' for k in range(1, 7)]
-            + ['scoreboard players operation @e[type=minecraft:text_display,tag=rlk_mb_gd_svnew,limit=1] mbId = #gdSs mb',
-               'scoreboard players set @e[type=minecraft:text_display,tag=rlk_mb_gd_svnew,limit=1] mbT 0',
-               'tag @e[type=minecraft:text_display,tag=rlk_mb_gd_svnew] remove rlk_mb_gd_svnew',
+            + ['scoreboard players operation @e[type=minecraft:item_display,tag=rlk_mb_gd_svnew,limit=1] mbId = #gdSs mb',
+               'scoreboard players set @e[type=minecraft:item_display,tag=rlk_mb_gd_svnew,limit=1] mbT 0',
+               'execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_svnew,limit=1] store result entity @s Rotation[0] float 1 run random value 0..359',
+               'tag @e[type=minecraft:item_display,tag=rlk_mb_gd_svnew] remove rlk_mb_gd_svnew',
                g.particle('block{block_state:"minecraft:red_concrete"}', '~ ~0.6 ~', (0.3, 0.3, 0.3), 0, 8),
                'scoreboard players add #gdStars mb 1'])
         for k in range(1, 7):
             self.w(f'star/vis{k}', [
-                f'# Star glyph, {A.STAR_KO[k]} ({A.STAR_HEX[k]}): a billboard 4-point star that grows from 0.',
-                f'summon minecraft:text_display ~ ~1.3 ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_fx","rlk_mb_gd_starv","rlk_mb_gd_svnew"],'
-                f'billboard:"center",background:0,shadow:true,see_through:false,brightness:{{sky:15,block:15}},alignment:"center",'
-                f'text:{{text:"✦",color:"{A.STAR_HEX[k]}"}},view_range:2f,'
-                f'transformation:{{translation:[0f,-0.4f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.2f,0.2f,0.2f]}}}}'])
+                f'# Star crystal, {A.STAR_KO[k]} ({A.STAR_HEX[k]}): the rig\'s 4-point crystal (two crossed faceted cards + a',
+                '# white-hot core cross), upright, slowly turning, grows from 0 (star/vis_tick).',
+                f'summon minecraft:item_display ~ ~{L.num(STAR_Y)} ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_fx","rlk_mb_gd_starv","rlk_mb_gd_svnew"],'
+                f'billboard:"fixed",item_display:"none",brightness:{{sky:15,block:15}},view_range:3f,shadow_radius:0f,'
+                f'teleport_duration:1,interpolation_duration:0,'
+                f'transformation:{star_tf(0.2)},item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"rlk:mboss/guardian/star_{k}"}}}}}}'])
         self.w('star/pool', [
             '# #auxHp = body max HP x #gdPm / 1000 (overflow-safe); #auxHpPct stays 0 so aux/spawn uses #auxHp.',
             'scoreboard players operation #gdX mb = @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] mhpM',
@@ -876,12 +1027,14 @@ class Core:
         self.w('star/tick', [
             '# @s = body: every star husk, then the glyphs (growth over the timer).',
             f'execute as @e[type=minecraft:husk,tag=rlk_mb_gd_star] at @s run {F("star/one")}',
-            f'execute as @e[type=minecraft:text_display,tag=rlk_mb_gd_starv] run {F("star/vis_tick")}'])
+            f'execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_starv] at @s run {F("star/vis_tick")}'])
         self.w('star/vis_tick', [
-            '# @s = star glyph: voxel cluster -> crystal in 8 t, then slow growth to about 2 b over the timer (C9).',
+            f'# @s = star crystal: forms in 8 t ({L.num(STAR_S[0])} b), then grows slowly to {L.num(STAR_S[1])} b over the timer (0.38 -> 0.7 BH,',
+            f'# patterns.md §9.2); turns {STAR_SPIN} deg per tick (teleport_duration 1 smooths it).',
             'scoreboard players add @s mbT 1',
-            'execute if score @s mbT matches 2 run data merge entity @s {start_interpolation:0,interpolation_duration:8,transformation:{translation:[0f,-0.6f,0f],scale:[5f,5f,5f]}}',
-            f'execute if score @s mbT matches 12 run data merge entity @s {{start_interpolation:0,interpolation_duration:{CHAOS_TIMER - 12},transformation:{{translation:[0f,-1.0f,0f],scale:[8.5f,8.5f,8.5f]}}}}'])
+            f'tp @s ~ ~ ~ ~{STAR_SPIN} ~',
+            f'execute if score @s mbT matches 2 run data merge entity @s {{start_interpolation:0,interpolation_duration:8,transformation:{star_tf(STAR_S[0])}}}',
+            f'execute if score @s mbT matches 12 run data merge entity @s {{start_interpolation:0,interpolation_duration:{CHAOS_TIMER - 12},transformation:{star_tf(STAR_S[1])}}}'])
         brk = ['# @s = a broken star husk (rlk_mb_broken from aux/take). 1st break -> 6 %, 2nd -> 18 % + groggy, each',
                f'# {BREAK_DELAY} t later (patterns.md §9.3). Number colour = the star colour.',
                'scoreboard players add #gdBrk mb 1',
@@ -896,7 +1049,7 @@ class Core:
                'scoreboard players operation #gdX mb = @s mbId',
                'execute if score #gdX mb matches 1 run scoreboard players set #gdSa1 mb 0',
                'execute if score #gdX mb matches 2 run scoreboard players set #gdSa2 mb 0',
-               'execute as @e[type=minecraft:text_display,tag=rlk_mb_gd_starv] if score @s mbId = #gdX mb run kill @s']
+               'execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_starv] if score @s mbId = #gdX mb run kill @s']
         for k in range(1, 7):
             brk.append(f'execute if score @s mbS matches {k} run ' + g.dust(A.STAR_RGB[k], 1.8, '~ ~1.3 ~', (0.4, 0.5, 0.4), 30))
         brk += [g.particle('end_rod', '~ ~1.3 ~', (0.2, 0.3, 0.2), 0.12, 14),
@@ -927,27 +1080,29 @@ class Core:
         self.w('fx/break_ring', ring + [g.sound('entity.generic.explode', 0.4, 1.6)])
         self.w('star/ignore', ['# Hit on a star outside a running chaos timer: nothing happens (no number, no pool change).',
                                'scoreboard players set #dmg tmp 0', 'scoreboard players set #mbAuxDone mb 1'])
-        imm = ['# Own-element hit on an active star (C11).']
-        if IMMUNE_PCT <= 0:
-            imm.append('scoreboard players set #dmg tmp 0')
-        else:
-            imm += [f'scoreboard players set #gdX mb {IMMUNE_PCT}', 'scoreboard players operation #dmg tmp *= #gdX mb',
-                    'scoreboard players operation #dmg tmp /= #c100 mb']
-        self.w('star/immune', imm)
+        assert 0 <= OWN_EL_RES < 75, 'OWN_EL_RES: a flat multiplier (Genshin RES below 75 %)'
+        self.w('star/resist', [
+            f'# Own-element hit on an active star: {OWN_EL_RES} % RES (x{(100 - OWN_EL_RES) / 100:g}, at least 1 so a light hit still',
+            '# shows a number). Replaces the source\'s immunity (user decision).',
+            'execute if score #dmg tmp matches ..0 run return 0',
+            f'scoreboard players set #gdX mb {100 - OWN_EL_RES}', 'scoreboard players operation #dmg tmp *= #gdX mb',
+            'scoreboard players operation #dmg tmp /= #c100 mb',
+            'execute if score #dmg tmp matches ..0 run scoreboard players set #dmg tmp 1'])
         self.w('star/flash', [
             '# Fail +7: stars flash white, their husks (and HP bars) go.',
-            'execute as @e[type=minecraft:text_display,tag=rlk_mb_gd_starv] run data merge entity @s {text:{text:"✦",color:"#FFFFFF"}}',
+            'execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_starv] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/guardian/star_flash"',
             'kill @e[type=minecraft:husk,tag=rlk_mb_gd_star]', sc_set('#gdStars', 0)])
         self.w('star/shrink', [
-            'execute as @e[type=minecraft:text_display,tag=rlk_mb_gd_starv] run data merge entity @s {text:{text:"✦",color:"#5A1418"},start_interpolation:0,interpolation_duration:5,transformation:{translation:[0f,-0.2f,0f],scale:[1.2f,1.2f,1.2f]}}'])
+            'execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_starv] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/guardian/star_dark"',
+            f'execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_starv] run data merge entity @s {{start_interpolation:0,interpolation_duration:5,transformation:{star_tf(0.55)}}}'])
         self.w('star/absorb', [
             '# Fail +15: two cube chains fly from the stars into her chest; the glyphs go.',
-            'execute as @e[type=minecraft:text_display,tag=rlk_mb_gd_starv] at @s facing entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] feet rotated ~ 0 run '
+            'execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_starv] at @s facing entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] feet rotated ~ 0 run '
             + F('fx/absorb_line'),
-            'kill @e[type=minecraft:text_display,tag=rlk_mb_gd_starv]'])
-        self.w('fx/absorb_line', ['# From a star glyph (1.3 b up, 4.2 b out) to her chest (5 b up over the body), 8 points.']
+            'kill @e[type=minecraft:item_display,tag=rlk_mb_gd_starv]'])
+        self.w('fx/absorb_line', [f'# From a star crystal ({L.num(STAR_Y)} b up, {L.num(STAR_DIST)} b out) to her chest (5 b up over the body), 8 points.']
                + [g.dust((0.99, 0.80, 0.33) if i % 3 == 0 else A.RED_EDGE, 1.3,
-                         f'^ ^{L.num(3.7 * i / 8, 2)} ^{L.num(STAR_DIST * i / 8, 2)}', (0.05, 0.05, 0.05), 2) for i in range(1, 9)])
+                         f'^ ^{L.num((5.0 - STAR_Y) * i / 8, 2)} ^{L.num(STAR_DIST * i / 8, 2)}', (0.05, 0.05, 0.05), 2) for i in range(1, 9)])
 
     # -----------------------------------------------------------------------------------------
     def groggy(self):
@@ -1074,6 +1229,11 @@ class Core:
                             f'{{text:"✦ ",color:"{A.STAR_HEX[k]}"}}')
         csub.append('data modify storage rlk:mboss sub append value {text:"  남은 시간 ",color:"#E8B8B8",extra:['
                     '{score:{name:"#gdTimS",objective:"mb"},color:"#FFFFFF"},{text:"초"}]}')
+        csub += ['# hint while an active (recorded) star stands: it resists its own element',
+                 sc_set('#gdHint', 0)]
+        csub += [f'execute if score #gdSa{sl} mb matches 1 if score #gdSk{sl} mb matches 1..4 run scoreboard players set #gdHint mb 1' for sl in (1, 2)]
+        csub.append(f'execute if score #gdHint mb matches 1 run data modify storage rlk:mboss sub append value '
+                    f'{{text:"   기록 원소 별: 같은 원소 {OWN_EL_RES}% 내성",color:"#B0A890"}}')
         self.w('hud/sub_chaos', csub)
         self.w('hud/sub_fail', [F('hud/extra'),
                                 'data modify storage rlk:mboss sub set value [{text:"파괴 실패  ",color:"#E06A5A",bold:true},{text:"거대한 창이 떨어진다",color:"#E8B8B8"}]'])
@@ -1099,8 +1259,10 @@ class Core:
                                  sc_set_bu('#buSubCol', 2)])
         self.w('hud/bar_groggy', [sc_set_bu('#buSub', GROGGY), 'scoreboard players operation #buSub bu -= #gdT mb',
                                   sc_set_bu('#buSubMax', GROGGY), sc_set_bu('#buSubCol', 9)])
-        self.w('hud/bar_pattern', ['scoreboard players operation #buSub bu = #gdPMax mb', 'scoreboard players operation #buSub bu -= #gdPT mb',
-                                   'scoreboard players operation #buSubMax bu = #gdPMax mb', sc_set_bu('#buSubCol', 8)])
+        self.w('hud/bar_pattern', ['# Pattern progress against its real end (#gdPLen; not the safety cap #gdPMax), empty at the end.',
+                                   'scoreboard players operation #buSub bu = #gdPLen mb', 'scoreboard players operation #buSub bu -= #gdPT mb',
+                                   'execute if score #buSub bu matches ..-1 run scoreboard players set #buSub bu 0',
+                                   'scoreboard players operation #buSubMax bu = #gdPLen mb', sc_set_bu('#buSubCol', 8)])
 
     # -----------------------------------------------------------------------------------------
     def tests(self):
@@ -1125,7 +1287,7 @@ class Core:
             F('p/cancel'),
             F('chaos/reset'),
             sc_set('#gdRecOn', 0), sc_set('#gdRecNew', 0), sc_set('#gdBq1', 0), sc_set('#gdBq2', 0),
-            R('spear/geo'), R('eye/geo'),
+            R('spear/geo'), R('eye/geo'), R('glow/off'),
             g.play('idle'),
             sc_set('#gdCool', 10),
             F('ai/enter')])

@@ -22,5 +22,5 @@ execute at @s rotated as @s rotated ~ 0 positioned ^0.668 ^2.607 ^0.56 run parti
 execute at @s rotated as @s rotated ~ 0 positioned ^0.831 ^3.079 ^-0.087 run particle minecraft:dust{color:[0.976f,0.91f,0.647f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
 execute at @s rotated as @s rotated ~ 0 positioned ^0.493 ^3.55 ^-0.63 run particle minecraft:dust{color:[0.796f,0.647f,0.51f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
 execute at @s rotated as @s rotated ~ 0 run function rlk:fx/nv/card {kind:"glow",pos:"^ ^0.06 ^",rot:"~ 90",bb:"fixed",roll:0,spin:0,s0:0.6,s1:2.8,move:"0f,0f,0f",life:9,fade:3}
-playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.5 1.5 0.3
-playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.3
+playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.5 1.5 0.17
+playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2

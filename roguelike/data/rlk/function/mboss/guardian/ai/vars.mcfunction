@@ -10,6 +10,8 @@ scoreboard players set #gdPNew mb 0
 scoreboard players set #gdPT mb 0
 scoreboard players set #gdPEnd mb 0
 scoreboard players set #gdPMax mb 0
+scoreboard players set #gdPLen mb 0
+scoreboard players set #gdPRel mb 0
 scoreboard players set #gdPDone mb 0
 scoreboard players set #gdMv mb 0
 scoreboard players set #gdClk mb 0
@@ -18,6 +20,7 @@ scoreboard players set #gdVoG mb 0
 scoreboard players set #gdFlash mb 0
 scoreboard players set #gdTst mb 0
 scoreboard players set #gdDist mb 0
+scoreboard players set #gdP4N mb 0
 scoreboard players set #gdCool mb 30
 scoreboard players set #gdBand mb 2
 execute store result score #gdLeft mb run random value 3..4

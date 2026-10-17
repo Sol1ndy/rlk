@@ -2,9 +2,9 @@
 # The rig must tick for the clip to run, and must NOT tick after its kill at 80 (it would respawn).
 execute if score #mbT mb matches 1..79 run function rlk:mboss/guardian/rig/tick
 execute if score #mbT mb matches 80 run function rlk:mboss/guardian/rig/kill
-execute if score #mbT mb matches 4 run playsound minecraft:block.amethyst_block.fall hostile @a[tag=player] ~ ~ ~ 0.7 0.6 0.3
-execute if score #mbT mb matches 22 run playsound minecraft:entity.ender_dragon.flap hostile @a[tag=player] ~ ~ ~ 0.8 1.3 0.3
-execute if score #mbT mb matches 22 run playsound minecraft:item.trident.riptide_3 hostile @a[tag=player] ~ ~ ~ 0.7 1 0.3
+execute if score #mbT mb matches 4 run playsound minecraft:block.amethyst_block.fall hostile @a[tag=player] ~ ~ ~ 0.7 0.6 0.23
+execute if score #mbT mb matches 22 run playsound minecraft:entity.ender_dragon.flap hostile @a[tag=player] ~ ~ ~ 0.8 1.3 0.27
+execute if score #mbT mb matches 22 run playsound minecraft:item.trident.riptide_3 hostile @a[tag=player] ~ ~ ~ 0.7 1 0.23
 execute if score #mbT mb matches 22 run particle minecraft:dust_color_transition{from_color:[0.99f,0.33f,0.33f],to_color:[0.39f,0.12f,0.1f],scale:1.4} ~ ~1.42 ~ 0.35 0.5 0.35 0 6 force @a[tag=player]
 execute if score #mbT mb matches 24 run particle minecraft:dust_color_transition{from_color:[0.99f,0.33f,0.33f],to_color:[0.39f,0.12f,0.1f],scale:1.4} ~ ~1.77 ~ 0.35 0.5 0.35 0 6 force @a[tag=player]
 execute if score #mbT mb matches 24 run particle minecraft:block{block_state:"minecraft:gold_block"} ~ ~1.77 ~ 0.3 0.4 0.3 0 3 force @a[tag=player]

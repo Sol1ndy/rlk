@@ -72,14 +72,15 @@ SPEAR = json.loads((Path(__file__).resolve().parent / 'p56_spear.json').read_tex
 # fail spear schedule (m4 §4, K12): column 23, decal + lock 25, impact 49, 31 t apart
 FAIL_COL, FAIL_DECAL, FAIL_GAP, FAIL_TELL = 23, 25, 31, 24
 FAIL_HIT = FAIL_DECAL + FAIL_TELL
+FAIL_REL = 10                     # she departs (p/release) this long after the last impact (m4: +90)
 FAIL_R = 2.8
 
 PATTERNS = [
-    Pattern(5, 'flyslam', '하늘을 심판하는 자', bands=('far',), recover=22, max_len=clip_len('flyslam') + 4),
+    Pattern(5, 'flyslam', '하늘을 심판하는 자', bands=('far',), weight={'far': 3}, recover=22, max_len=clip_len('flyslam') + 4),
     Pattern(11, 'sweep_g', '파수 모드 – 휘두르기', kind='service', recover=20, max_len=clip_len('sweep') + 4),
     Pattern(12, 'sweep_e', '파수 모드 – 원소 휘두르기', kind='service', recover=20, max_len=clip_len('sweep_e') + 4),
     Pattern(13, 'fail', '파괴 실패 – 거대한 창', kind='service', recover=20,
-            max_len=FAIL_DECAL + FAIL_GAP + FAIL_TELL + 40),
+            max_len=FAIL_DECAL + FAIL_GAP + FAIL_TELL + 40, length=FAIL_HIT + FAIL_GAP + 31),
 ]
 
 BODY = 'at @s rotated as @s rotated ~ 0'
@@ -345,8 +346,15 @@ SLAB_BLK = {0: ('minecraft:yellow_stained_glass', 'minecraft:white_stained_glass
             2: ('minecraft:light_blue_stained_glass', 'minecraft:white_stained_glass'),
             3: ('minecraft:magenta_stained_glass', 'minecraft:white_stained_glass'),
             4: ('minecraft:white_stained_glass', 'minecraft:light_blue_stained_glass')}
-RIM_BLK = {0: 'minecraft:gold_block', 1: 'minecraft:orange_stained_glass', 2: 'minecraft:light_blue_stained_glass',
-           3: 'minecraft:magenta_stained_glass', 4: 'minecraft:white_stained_glass'}
+# Rim of the sweep: opaque saturated bars on a black under-bar (a dark outline 0.06 b wide), so the full extent
+# reads from the first tick on the white marble and on the pink centre star alike (glass rims vanished there).
+RIM_BLK = {0: 'minecraft:gold_block', 1: 'minecraft:orange_concrete', 2: 'minecraft:blue_concrete',
+           3: 'minecraft:purple_concrete', 4: 'minecraft:light_blue_concrete'}
+RIM_OUT = 'minecraft:black_concrete'
+# progress arc: saturated, darker than the element palette (pale cyan / pale gold vanish on marble), with a dark
+# companion row just outside it
+ARC_COL = {0: (0.90, 0.52, 0.06), 1: (1.0, 0.38, 0.10), 2: (0.10, 0.36, 0.95), 3: (0.62, 0.22, 0.95), 4: (0.05, 0.62, 0.82)}
+ARC_DARK = (0.10, 0.06, 0.08)
 EL_SHARD = {1: 'minecraft:orange_stained_glass', 2: 'minecraft:light_blue_stained_glass',
             3: 'minecraft:purple_stained_glass', 4: 'minecraft:packed_ice'}
 
@@ -395,13 +403,17 @@ def sweep(g, gold):
         return len(slices) - 1
 
     for e in els:
-        rim = [f'# Rim decal of the sweep (@s = body, at it, rotated as it), {RIM_BLK[e]}.']
+        rim = [f'# Rim decal of the sweep (@s = body, at it, rotated as it): {RIM_BLK[e]} on a black outline.']
         for i in range(20):
             th = 95 - 10 * i
-            tr, q, sc = X.bar_tf(th, SW_R, 0.93, 0.13, 0.045, 0.02)
+            tr, q, sc = X.bar_tf(th, SW_R + 0.01, 1.0, 0.27, 0.03, 0.008)
+            rim.append(X.bd(RIM_OUT, tr, q, sc, X.base_tags(pid, f'rlk_mb_gd_p{pid}b', f'rlk_mb_gd_p{pid}o', 'rlk_mb_gd_bnew')))
+            tr, q, sc = X.bar_tf(th, SW_R - 0.05, 0.95, 0.15, 0.045, 0.02)
             rim.append(X.bd(RIM_BLK[e], tr, q, sc, X.base_tags(pid, f'rlk_mb_gd_p{pid}b', f'rlk_mb_gd_p{pid}b{slice_of(th)}', 'rlk_mb_gd_bnew')))
         for th in (100, -100):
-            tr, q, sc = X.spoke_tf(th, 0.8, SW_R, 0.12, 0.045, 0.02)
+            tr, q, sc = X.spoke_tf(th, 0.75, SW_R + 0.05, 0.26, 0.03, 0.008)
+            rim.append(X.bd(RIM_OUT, tr, q, sc, X.base_tags(pid, f'rlk_mb_gd_p{pid}b', f'rlk_mb_gd_p{pid}o', 'rlk_mb_gd_bnew')))
+            tr, q, sc = X.spoke_tf(th, 0.8, SW_R, 0.14, 0.045, 0.02)
             rim.append(X.bd(RIM_BLK[e], tr, q, sc, X.base_tags(pid, f'rlk_mb_gd_p{pid}b', f'rlk_mb_gd_p{pid}e', 'rlk_mb_gd_bnew')))
         rim += ['tp @e[type=minecraft:block_display,tag=rlk_mb_gd_bnew] ~ ~ ~ ~ 0',
                 'tag @e[type=minecraft:block_display,tag=rlk_mb_gd_bnew] remove rlk_mb_gd_bnew']
@@ -422,14 +434,17 @@ def sweep(g, gold):
     # -- one hit per sweep: a hit (or a dodge) on any slice consumes the rest (body tick runs before hz/all)
     tl.span(first + 1, last + 1, f'execute if entity {SL.replace("]", ",scores={mbHzHit=1..}]")} run scoreboard players set {SL.replace(",limit=1", "")} mbHzHit 1')
 
-    # -- progress arc (telegraph timing): reaches the rim when the blade starts
-    for t in range(2, first, 2):
-        r = SW_R * t / first
-        n = max(6, int(math.radians(200) * r / 0.6))
+    # -- progress arc (telegraph timing): a saturated arc with a dark row just outside it, growing from her to
+    #    the rim; it reaches the rim at the end of the tell (the tick before the first slice strikes)
+    tell_end = first - 1
+    for t in sorted(set(range(2, tell_end, 2)) | {tell_end}):
+        r = SW_R * t / tell_end
+        n = max(6, int(math.radians(200) * r / 0.55))
         for e in els:
-            col = PAL_SW[e][3]
             eat(t, e, *[f'execute {BODY} positioned {loc(polar(100 - 200 * j / (n - 1), r, 0.1))} run '
-                       + g.dust(col, 0.75, '~ ~ ~', (0, 0, 0), 1) for j in range(n)])
+                       + g.dust(ARC_COL[e], 0.95, '~ ~ ~', (0, 0, 0), 1) for j in range(n)],
+                *[f'execute {BODY} positioned {loc(polar(100 - 200 * (j + 0.5) / (n - 1), r + 0.16, 0.08))} run '
+                  + g.dust(ARC_DARK, 0.7, '~ ~ ~', (0, 0, 0), 1) for j in range(0, n - 1, 2)])
 
     # -- wind-up: glow on the spear head
     for t in range(1 if gold else 7, first):
@@ -441,7 +456,7 @@ def sweep(g, gold):
     for i, (t, a0, a1) in enumerate(slices):
         for e in els:
             fx = [f'# Slice {i} (clip tick {t}, {a0} -> {a1} deg){"" if gold else ", element " + str(e)}: blade fx.',
-                  f'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}b{i}] run data merge entity @s {{block_state:{{id:"minecraft:white_stained_glass"}}}}']
+                  f'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}b{i}] run data merge entity @s {{block_state:{{id:"minecraft:white_concrete"}}}}']
             # the crescent body: translucent slabs at waist height (higher on her left), white-hot outer edge
             for th in range(95, -96, -10):
                 if slice_of(th) != i:
@@ -609,6 +624,9 @@ KIND = {1: ((1.0, 0.86, 0.66), (1.0, 0.54, 0.30), (0.78, 0.25, 0.10), 'minecraft
 TINT1 = {1: 'pyro', 2: 'hydro', 3: 'electro', 4: 'cryo', 5: 'gold', 6: 'electro'}   # red -> (violet ->) star colour
 TINT2 = {6: 'hydro'}
 DECAL_W = 1.3                     # half width of the star arms at the centre
+# readable on the pink centre star and the white marble: opaque crimson fill, black rim (a pink rim vanished there)
+DECAL_FILL, DECAL_RIM = 'minecraft:red_concrete', 'minecraft:black_concrete'
+RING_N = 20                       # bars of the damage ring at FAIL_R
 DECAL_FB = (4.5, 7.5)             # half length of the front/back arm pair, 25 -> 31
 DECAL_SS = (2.7, 9.5)             # half length of the side arm pair (m4: +-2.7 -> > +-9 in 6 t)
 
@@ -808,14 +826,20 @@ def fail(g):
             dec.append(f'execute if score {KS} mb matches {kind} run scoreboard players set #hzCol mb {STAR_HZCOL[kind]}')
         dec += [f'execute at {T} run {g.hz_disc(FAIL_R, FAIL_TELL, DMG["fail"])}',
                 *hz_tag(pid)]
-        for nm, yaw, hl, hw, y, blk in (('fr', 0, DECAL_FB[0] + 0.35, DECAL_W + 0.25, 0.012, 'minecraft:pink_stained_glass'),
-                                        ('ff', 0, DECAL_FB[0], DECAL_W, 0.036, 'minecraft:red_stained_glass'),
-                                        ('sr', 90, DECAL_SS[0] + 0.35, DECAL_W + 0.25, 0.012, 'minecraft:pink_stained_glass'),
-                                        ('sf', 90, DECAL_SS[0], DECAL_W, 0.036, 'minecraft:red_stained_glass')):
+        for nm, yaw, hl, hw, y, blk in (('fr', 0, DECAL_FB[0] + 0.35, DECAL_W + 0.25, 0.012, DECAL_RIM),
+                                        ('ff', 0, DECAL_FB[0], DECAL_W, 0.036, DECAL_FILL),
+                                        ('sr', 90, DECAL_SS[0] + 0.35, DECAL_W + 0.25, 0.012, DECAL_RIM),
+                                        ('sf', 90, DECAL_SS[0], DECAL_W, 0.036, DECAL_FILL)):
             tr, rL, rS, rR = X.rhombus_tf(yaw, hl, hw, 0.02, y)
             dec.append(f'execute at {T} run summon minecraft:block_display ~ ~ ~ {{Tags:{tags(*X.base_tags(pid, f"rlk_mb_gd_p13d{j}", f"rlk_mb_gd_p13d{j}{nm}", "rlk_mb_gd_p13dnew"))},'
                        f'block_state:{{id:"{blk}"}},brightness:{{sky:15,block:15}},view_range:2f,shadow_radius:0f,teleport_duration:0,'
                        f'interpolation_duration:0,transformation:{tf(tr, rL, rS, rR)}}}')
+        # the damage disc itself: a crimson ring at r FAIL_R on a black outline (the star's diagonals end inside it)
+        for m in range(RING_N):
+            th = 360 * m / RING_N
+            for blk, rr, ww, hh, yy in ((DECAL_RIM, FAIL_R + 0.07, 0.3, 0.02, 0.05), (DECAL_FILL, FAIL_R, 0.15, 0.025, 0.062)):
+                tr, q, sc = X.bar_tf(th, rr + ww / 2, 2 * math.pi * FAIL_R / RING_N + 0.06, ww, hh, yy)
+                dec.append(f'execute at {T} run ' + X.bd(blk, tr, q, sc, X.base_tags(pid, f'rlk_mb_gd_p13d{j}', 'rlk_mb_gd_p13dnew')))
         dec += [f'execute {ATT} run tp @e[type=minecraft:block_display,tag=rlk_mb_gd_p13dnew] ~ ~ ~ ~ 0',
                 'tag @e[type=minecraft:block_display,tag=rlk_mb_gd_p13dnew] remove rlk_mb_gd_p13dnew',
                 f'execute {ATT} positioned ~ ~11.9 ~ run {g.rig("prop/spear")}',
@@ -912,12 +936,17 @@ def fail(g):
            f'kill @e[type=minecraft:marker,tag=rlk_mb_gd_p13t{j}]', f'kill @e[type=minecraft:marker,tag=rlk_mb_gd_p13k{j}]')
 
     last1, last2 = FAIL_HIT + 31, FAIL_HIT + FAIL_GAP + 31
+    # m4: she leaves the centre about 10 t after the last impact while the giant spear still stands; the slot keeps
+    # running the harmless tail (dissolve, residue) until the end
+    tl.at(FAIL_HIT + FAIL_REL, f'execute if score #gdFailN mb matches 1 run {g.release()}')
+    tl.at(FAIL_HIT + FAIL_GAP + FAIL_REL, f'execute if score #gdFailN mb matches 2.. run {g.release()}')
     tl.at(last1, f'execute if score #gdFailN mb matches 1 run {g.end()}')
     tl.at(last2, f'execute if score #gdFailN mb matches 2.. run {g.end()}')
     tl.write(['# Fail spears start (@s = body, T0 = the chaos timer ran out; the core plays chaos_fail and the absorption).',
               '# #gdFailN surviving stars, #gdFailK1/#gdFailK2 their kinds; one spear each, 31 t apart. See p56.py.',
               'kill @e[tag=rlk_mb_gd_p13]',
-              'scoreboard players set #gp13D mb 0'],
+              'scoreboard players set #gp13D mb 0',
+              f'execute if score #gdFailN mb matches 1 run {g.set_len(last1)}'],
              ['# Fail spears tick (@s = body, #gdPT = ticks since T0).',
               f'execute unless score #gdFailN mb matches 1.. run return run {g.end()}'])
     g.pw(k, 'cancel', ['# Fail spears cancel (any executor): spears, targets, decals, columns, beams, cubes, hazards.',

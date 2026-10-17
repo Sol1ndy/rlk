@@ -626,7 +626,40 @@
     "gdRigF": "hit flash countdown",
     "gdRigEye": "eye look id",
     "gdRigSp": "spear look id",
-    "gdRigY": "face/track scratch"
+    "gdRigY": "face/track scratch",
+    "gdRigGl": "glow look id (0 none, 1 gold)"
   },
-  "textures": 60
+  "textures": 69,
+  "screen": {
+    "font": "rlk:mboss_gd",
+    "frames": {
+      "vig0": "[{\"text\":\"\\ue500\\ue5f0\\ue501\\ue5f1\\ue502\\ue5f0\\ue503\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "vig1": "[{\"text\":\"\\ue504\\ue5f0\\ue505\\ue5f1\\ue506\\ue5f0\\ue507\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "vig2": "[{\"text\":\"\\ue508\\ue5f0\\ue509\\ue5f1\\ue50a\\ue5f0\\ue50b\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "vig3": "[{\"text\":\"\\ue50c\\ue5f0\\ue50d\\ue5f1\\ue50e\\ue5f0\\ue50f\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "vig4": "[{\"text\":\"\\ue510\\ue5f0\\ue511\\ue5f1\\ue512\\ue5f0\\ue513\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "vig5": "[{\"text\":\"\\ue514\\ue5f0\\ue515\\ue5f1\\ue516\\ue5f0\\ue517\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "field": "[{\"text\":\"\\ue518\\ue5f0\\ue519\\ue5f1\\ue51a\\ue5f0\\ue51b\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "diamond": "[{\"text\":\"\\ue51c\\ue5f0\\ue51d\\ue5f1\\ue51e\\ue5f0\\ue51f\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]",
+      "flash": "[{\"text\":\"\\ue520\\ue5f0\",\"font\":\"rlk:mboss_gd\",\"color\":\"white\",\"shadow_color\":0}]"
+    },
+    "vig": 6,
+    "codepoints": [
+      "\\ue500",
+      "\\ue520"
+    ],
+    "spaces": [
+      "\\ue5f0",
+      "\\ue5f1"
+    ],
+    "tile_px": [
+      256,
+      144
+    ],
+    "tile_units": [
+      128,
+      72
+    ],
+    "ref_units": 32
+  }
 }

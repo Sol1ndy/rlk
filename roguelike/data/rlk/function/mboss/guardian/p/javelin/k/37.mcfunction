@@ -3,7 +3,7 @@ scoreboard players set #gp2S mb 0
 execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] run function rlk:mboss/guardian/p/javelin/streak
 scoreboard players set #gp2S mb 0
 execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] positioned ~ 201 ~ run function rlk:mboss/guardian/p/javelin/debris
-playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 0.5 1.2 0.3
+playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 0.5 1.2 0.17
 data merge entity @e[type=minecraft:block_display,tag=rlk_mb_gd_q2t_0,limit=1] {start_interpolation:0,interpolation_duration:18,transformation:{translation:[-0.579f,0.366f,-0.418f],left_rotation:[-0.32f,-0.744f,-0.184f,0.557f],scale:[0.046f,0.046f,0.046f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity @e[type=minecraft:block_display,tag=rlk_mb_gd_q2t_1,limit=1] {start_interpolation:0,interpolation_duration:18,transformation:{translation:[-0.406f,0.227f,0.302f],left_rotation:[-0.759f,-0.502f,0.36f,0.207f],scale:[0.048f,0.048f,0.048f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity @e[type=minecraft:block_display,tag=rlk_mb_gd_q2t_2,limit=1] {start_interpolation:0,interpolation_duration:18,transformation:{translation:[0.048f,0.591f,-0.418f],left_rotation:[-0.224f,0.5f,-0.375f,0.748f],scale:[0.047f,0.047f,0.047f],right_rotation:[0f,0f,0f,1f]}}

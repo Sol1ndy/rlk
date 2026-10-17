@@ -7,6 +7,9 @@ execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.9f,0.2f,0
 execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[1f,0.75f,0.8f],scale:0.6} ^-0.3 ^2.95 ^0.9 0.03 0.03 0.03 0 1 force @a[tag=player]
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:dust{color:[0.72f,0.18f,0.23f],scale:1.2} ~ ~1.1 ~ 0.45 0.8 0.45 0 4 force @a[tag=player]
 execute at @e[tag=rlk_body,limit=1] run particle minecraft:dust{color:[0.38f,0f,0.02f],scale:1.5} ~ ~1.1 ~ 0.55 0.9 0.55 0 2 force @a[tag=player]
-# Line of sight + range (K14), checked before the flash: else the cage breaks and nothing follows.
+scoreboard players set @a[tag=player] vBig 17
+title @a[tag=player] times 0 3 0
+title @a[tag=player] title [{"text":"\ue514\ue5f0\ue515\ue5f1\ue516\ue5f0\ue517\ue5f0","font":"rlk:mboss_gd","color":"white","shadow_color":0}]
+# Line of sight (K14), checked before the flash: blocked -> the cage shatters, no pull, she swings in place.
 function rlk:mboss/guardian/p/pull/los
 execute unless score #gp4Ok mb matches 1 run function rlk:mboss/guardian/p/pull/fizzle

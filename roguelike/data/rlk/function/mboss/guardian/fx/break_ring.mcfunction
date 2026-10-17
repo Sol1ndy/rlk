@@ -11,4 +11,4 @@ execute rotated 240 0 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:1
 execute rotated 270 0 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:1.1} ^ ^4.8 ^1.2 0 0 0 0 1 force @a[tag=player]
 execute rotated 300 0 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:1.1} ^ ^4.8 ^1.2 0 0 0 0 1 force @a[tag=player]
 execute rotated 330 0 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:1.1} ^ ^4.8 ^1.2 0 0 0 0 1 force @a[tag=player]
-playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.4 1.6 0.3
+playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.4 1.6 0.13

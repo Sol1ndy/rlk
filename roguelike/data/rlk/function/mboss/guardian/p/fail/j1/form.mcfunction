@@ -7,7 +7,7 @@ execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p13c1_1,limit=1] run da
 execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p13c1_2,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.47f,-0.017f,-0.103f],left_rotation:[-0.113f,0.168f,-0.373f,0.905f],scale:[0.556f,0.556f,0.556f],right_rotation:[0f,0f,0f,1f]}}
 scoreboard players set #gp13D mb 0
 execute at @s positioned ~ ~3.0 ~ facing entity @e[type=minecraft:marker,tag=rlk_mb_gd_p13k1,limit=1] feet run function rlk:mboss/guardian/p/fail/j1/chain
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.8 0.8 0.3
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.6 0.6 0.3
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 0.8 0.8 0.3
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run playsound minecraft:entity.warden.sonic_charge hostile @a[tag=player] ~ ~ ~ 0.3 1.2 0.3
+execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.8 0.8 0.27
+execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.6 0.6 0.2
+execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 0.8 0.8 0.27
+execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run playsound minecraft:entity.warden.sonic_charge hostile @a[tag=player] ~ ~ ~ 0.3 1.2 0.1

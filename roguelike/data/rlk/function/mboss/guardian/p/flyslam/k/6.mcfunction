@@ -8,4 +8,4 @@ execute at @s rotated as @s rotated ~ 0 run function rlk:fx/nv/card {kind:"star"
 execute at @s rotated as @s rotated ~ 0 run function rlk:fx/nv/card {kind:"glow",pos:"^-0.633 ^5.334 ^0.367",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.4,s1:1.2,move:"0f,0f,0f",life:5,fade:3}
 execute at @s rotated as @s rotated ~ 0 positioned ^-0.633 ^5.334 ^0.367 run particle minecraft:end_rod ~ ~ ~ 0.08 0.08 0.08 0.05 6 force @a[tag=player]
 playsound minecraft:block.amethyst_block.chime hostile @a[tag=player] ~ ~ ~ 0.9 2 0.3
-playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.3 1.9 0.3
+playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.3 1.9 0.1

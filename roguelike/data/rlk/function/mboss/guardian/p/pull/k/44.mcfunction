@@ -5,4 +5,4 @@ scoreboard players set #hzSfx mb 0
 scoreboard players set #hzAct mb 3
 scoreboard players set #hzVis mb 41
 execute positioned ~ 201 ~ rotated as @s rotated ~ 0 run function rlk:mboss/hz/sector {r:55,a:180,tell:20,dmg:120}
-playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.4 0.8 0.3
+playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.4 0.8 0.13

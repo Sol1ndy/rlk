@@ -1,6 +1,6 @@
 # javelin clip tick 36
 function rlk:mboss/guardian/p/javelin/throw
-playsound minecraft:item.trident.riptide_2 hostile @a[tag=player] ~ ~ ~ 0.6 1 0.3
+playsound minecraft:item.trident.riptide_2 hostile @a[tag=player] ~ ~ ~ 0.6 1 0.2
 scoreboard players set #gp2S mb 0
 execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] run function rlk:mboss/guardian/p/javelin/streak
 execute if score #gp2Len mb matches 13.. at @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] positioned ^-0.132 ^-0.447 ^1.26 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p2","rlk_mb_gd_q2t","rlk_mb_gd_q2t_0"],block_state:{id:"minecraft:yellow_stained_glass"},brightness:{sky:15,block:15},view_range:0.6f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.051f,-0.23f,0.233f],left_rotation:[-0.473f,0.453f,0.199f,0.729f],scale:[0.383f,0.383f,0.383f],right_rotation:[0f,0f,0f,1f]}}

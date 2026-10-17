@@ -21,7 +21,7 @@ execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run p
 execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run particle minecraft:end_rod ~ ~0.5 ~ 0.3 0.3 0.3 0.18 14 force @a[tag=player]
 execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run particle minecraft:explosion ~ ~0.4 ~ 0.3 0.1 0.3 0 1 force @a[tag=player]
 execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.99f,0.97f,0.68f],scale:1.4} ~ ~0.15 ~ 2.2 0.05 2.2 0 30 force @a[tag=player]
-execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.8 0.9 0.3
-execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 1 0.8 0.3
-execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run playsound minecraft:item.trident.thunder hostile @a[tag=player] ~ ~ ~ 0.3 1.2 0.3
-execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run playsound minecraft:block.amethyst_block.break hostile @a[tag=player] ~ ~ ~ 0.6 0.7 0.3
+execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.8 0.9 0.27
+execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 1 0.8 0.33
+execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run playsound minecraft:item.trident.thunder hostile @a[tag=player] ~ ~ ~ 0.3 1.2 0.1
+execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run playsound minecraft:block.amethyst_block.break hostile @a[tag=player] ~ ~ ~ 0.6 0.7 0.2

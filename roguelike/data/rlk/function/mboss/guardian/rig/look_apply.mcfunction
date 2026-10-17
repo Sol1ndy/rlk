@@ -1,4 +1,5 @@
-# Re-applies the stored eye/spear looks (after a respawn). @s = rig anchor.
+# Re-applies the stored eye/spear/glow looks (after a respawn). @s = rig anchor.
+function rlk:mboss/guardian/rig/glow_apply
 execute if score @s gdRigEye matches 0 run function rlk:mboss/guardian/rig/eye/geo
 execute if score @s gdRigEye matches 1 run function rlk:mboss/guardian/rig/eye/pyro
 execute if score @s gdRigEye matches 2 run function rlk:mboss/guardian/rig/eye/hydro

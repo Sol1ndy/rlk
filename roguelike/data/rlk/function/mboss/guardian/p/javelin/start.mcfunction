@@ -4,5 +4,5 @@
 kill @e[tag=rlk_mb_gd_p2]
 function rlk:mboss/guardian/rig/face/player
 function rlk:mboss/guardian/rig/play/javelin
-playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 0.7 0.7 0.3
-playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.4 1.4 0.3
+playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 0.7 0.7 0.23
+playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.4 1.4 0.13

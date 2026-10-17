@@ -40,6 +40,11 @@ def clip_len(clip):
     return CLIPS[clip]['len']
 
 
+# Screen overlays (tools/guardian_screen.mjs via the rig generator): font id and the title text of each frame
+# (bitmap glyph tiles + negative spaces, already JSON-escaped), e.g. SCREEN['frames']['flash'].
+SCREEN = _MAN.get('screen')
+
+
 # ---------------------------------------------------------------------------------------------
 # Balance (plan.md K17, K16). Damage = % of the registry base hit (atk x dmgMul).
 DMG = {
@@ -97,14 +102,26 @@ class Pattern:
     close   blocks: close in to this distance before the start (melee patterns), None = no
     recover idle ticks after it ends before the next decision
     max_len safety end: the core finishes the pattern at this #gdPT even if it never called p/end
+    length  expected end (#gdPT of its p/end) for the boss-bar progress; default max_len - 4. A pattern that
+            decides a shorter run at runtime sets it with Gen.set_len(t)
+    min_d   blocks: the bag may pick it only from this distance on (inside its bands), None = the band edge
+    weight  {band: n} draw weight in that band (default 1 everywhere): the bag draws a candidate with
+            probability weight / sum of the candidates' weights
     """
 
-    def __init__(self, id, key, label, kind='normal', bands=(), close=None, recover=20, max_len=120):
+    def __init__(self, id, key, label, kind='normal', bands=(), close=None, recover=20, max_len=120, length=None,
+                 min_d=None, weight=None):
         assert kind in ('normal', 'service')
         assert kind == 'service' or bands, key
         assert all(b in BANDS for b in bands), bands
         self.id, self.key, self.label, self.kind = id, key, label, kind
         self.bands, self.close, self.recover, self.max_len = tuple(bands), close, recover, max_len
+        self.length = length if length is not None else max_len - 4
+        assert 0 < self.length <= max_len, (key, self.length, max_len)
+        self.min_d = min_d
+        self.weight = {b: int((weight or {}).get(b, 1)) for b in self.bands}
+        assert all(1 <= w <= 9 for w in self.weight.values()), (key, self.weight)
+        assert set(weight or {}) <= set(self.bands), (key, weight)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -147,6 +164,17 @@ class Gen:
     def end():
         """The pattern is done: the core finishes it after this tick (see gd_contract.md)."""
         return f'function {NS}p/end'
+
+    @staticmethod
+    def release():
+        """The dangerous part is over: the owning state may move on while the pattern finishes a harmless tail
+        (the slot stays busy until end()). Used by the fail spears (she departs 10 t after the last impact)."""
+        return f'function {NS}p/release'
+
+    @staticmethod
+    def set_len(t):
+        """The pattern now knows its real end (#gdPT of its end()): the boss-bar progress uses it."""
+        return f'scoreboard players set #gdPLen mb {int(t)}'
 
     @staticmethod
     def voice_attack():

@@ -22,7 +22,7 @@ All functions below are `rlk:mboss/guardian/rig/...`. Unless a line says otherwi
 
 | function | when | what |
 |---|---|---|
-| `init` | load (idempotent) | Adds the objectives `gdRigC` (clip id), `gdRigT` (clip tick), `gdRigF` (flash), `gdRigEye` and `gdRigSp` (looks), and `gdRigY` (scratch). |
+| `init` | load (idempotent) | Adds the objectives `gdRigC` (clip id), `gdRigT` (clip tick), `gdRigF` (flash), `gdRigEye` and `gdRigSp` (looks), `gdRigGl` (glow look), and `gdRigY` (scratch). |
 | `spawn` | once, as/at the anchor, rotated as it | Kills old parts and summons the 29 parts in the idle pose at the anchor's position and yaw. Queues `idle` from its tick 0 for the next `tick`. Re-applies the stored eye and spear looks. |
 | `spawn_hidden` | instead of `spawn`, before an entrance | The same, but every part starts at scale 0, so nothing shows. Play the opening clip in the same tick (`play/entrance`); its first key brings the parts in. With no clip played, idle grows in over 3 t. |
 | `tick` | **every game tick**: `execute as <anchor> at @s run function rlk:mboss/guardian/rig/tick` | Respawns the parts if they are missing. **A respawn restarts the rig in `idle`**, so replay the current clip if it matters. The parts follow the anchor position and yaw (teleport_duration 1). Advances the current clip, applies its keys and counts down the flash. |
@@ -34,8 +34,9 @@ All functions below are `rlk:mboss/guardian/rig/...`. Unless a line says otherwi
 | `eye/<el>` | record state | Shield eye look: `geo` (the painted default), `pyro`, `hydro`, `electro`, `cryo`, `gold` (guard aura) or `red` (chaos). |
 | `spear/<el>` | enchant state | Spear head enchant, aura colour and the two afterimage trails. Same names; `geo` is the gold spear. |
 | `tint/<el>` | both | `eye/<el>` + `spear/<el>`. |
-| `look_apply` | after a manual score change | Re-applies `gdRigEye` / `gdRigSp`. Ids: 0 geo, 1 pyro, 2 hydro, 3 electro, 4 cryo, 5 gold, 6 red; ids 1-4 match `#elem`. |
-| `flash` | on a body hit (optional) | White-gold outline (`Glowing`) on the parts for 3 t. |
+| `look_apply` | after a manual score change | Re-applies `gdRigEye` / `gdRigSp` / `gdRigGl`. Ids: 0 geo, 1 pyro, 2 hydro, 3 electro, 4 cryo, 5 gold, 6 red; ids 1-4 match `#elem`. |
+| `flash` | on a body hit (optional) | White-gold outline (`Glowing`) on the parts for 3 t, then back to the glow look (`flash_off` → `glow_apply`). |
+| `glow/gold`, `glow/off` | guard mode's gold aura (the core: window open → record or the gold sweep's end) | A persistent `Glowing` outline `#FCD84C` on every part except the glow cards and the afterimages (`gdRigGl` 1 / 0; kept over a respawn, restored after a hit flash). |
 | `prop/spear` | javelin flight, giant fail spears | Summons a free spear `item_display` at the execution position and yaw. |
 | `prop/clear` | cleanup | Kills all props. |
 
@@ -164,3 +165,15 @@ Hit geometry, damage, telegraphs, sounds and FX belong to the pattern code (patt
 - Cube streams and the pull cage.
 - Screen effects and sounds.
 - Moving `prop/spear` copies (javelin, giant fail spears).
+
+## Non-rig resources the rig generator also writes
+
+- Chaos element star crystals (summoned by the module as `item_display`s, not rig parts): item models
+  `rlk:mboss/guardian/star_<k>` for k = 1-4 (active element), 5 / 6 (inert gold / blue), `flash`, `dark`. An upright
+  faceted 4-point crystal, 1 b tall at scale 1 and centred: two crossed cards (`gd_star_<k>`, light / mid / dark per
+  kind) and a white-hot core cross turned 45 degrees (`gd_star_core`, translucent).
+- P4 screen overlay font `rlk:mboss_gd` (`tools/guardian_screen.mjs`): per frame (vig0-vig5, field, diamond) four
+  256 x 144 px bitmap tiles drawn at 128 x 72 title units (top row ascent 69, bottom row -3), the flash as one flat
+  16 x 9 glyph, and two negative spaces (U+E5F0 = -1 for the advance gaps, U+E5F1 = -257 back to the left edge);
+  glyphs U+E500.. The build stops when a codepoint collides with another font of the pack. The manifest's `screen`
+  entry holds each frame's title component (used by `tools/mboss_guardian/p34.py`).

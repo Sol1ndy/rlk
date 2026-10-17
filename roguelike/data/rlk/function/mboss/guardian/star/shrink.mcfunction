@@ -1,1 +1,2 @@
-execute as @e[type=minecraft:text_display,tag=rlk_mb_gd_starv] run data merge entity @s {text:{text:"✦",color:"#5A1418"},start_interpolation:0,interpolation_duration:5,transformation:{translation:[0f,-0.2f,0f],scale:[1.2f,1.2f,1.2f]}}
+execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_starv] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/guardian/star_dark"
+execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_starv] run data merge entity @s {start_interpolation:0,interpolation_duration:5,transformation:{translation:[0f,-0.625f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.55f,0.55f,0.55f]}}

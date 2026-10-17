@@ -5,8 +5,8 @@ tag @e[tag=rlk_mb_gd_p4new] remove rlk_mb_gd_p4new
 execute positioned ~ 201 ~ rotated as @s rotated ~ 0 run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p4","rlk_mb_gd_p4cr","rlk_mb_gd_p4cb01","rlk_mb_gd_p4new"],billboard:"fixed",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0f,1.5f,0f],left_rotation:[0.0304f,-0.944f,-0.0909f,0.3158f],scale:[8.6041f,8.6041f,8.6041f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:navia_fx/crescent"}}}
 execute positioned ~ 201 ~ rotated as @s rotated ~ 0 run tp @e[tag=rlk_mb_gd_p4new] ~ ~ ~ ~ 0
 tag @e[tag=rlk_mb_gd_p4new] remove rlk_mb_gd_p4new
-playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 1 0.65 0.3
-playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.3 1.5 0.3
+playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 1 0.65 0.33
+playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.3 1.5 0.1
 execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.96f,0.65f],scale:1.3} ^0 ^0.606 ^4.6 0.05 0.05 0.05 0 1 force @a[tag=player]
 execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.96f,0.65f],scale:1.3} ^1.024 ^0.628 ^4.485 0.05 0.05 0.05 0 1 force @a[tag=player]
 execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.96f,0.65f],scale:1.3} ^1.996 ^0.694 ^4.144 0.05 0.05 0.05 0 1 force @a[tag=player]

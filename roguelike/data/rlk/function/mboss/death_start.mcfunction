@@ -9,5 +9,6 @@ scoreboard players set #mbSt mb 2
 scoreboard players set #mbT mb 0
 function rlk:mboss/lib_clear
 function rlk:mboss/bars_hide
-execute at @s run playsound minecraft:entity.wither.death hostile @a[tag=player] ~ ~ ~ 0.5 1.4
+# Generic death roar unless the registry entry sets deathSnd false (the module plays its own death sound).
+execute unless data storage rlk:mboss cur{deathSnd:0b} at @s run playsound minecraft:entity.wither.death hostile @a[tag=player] ~ ~ ~ 0.5 1.4 0.17
 function rlk:mboss/d/death_start

@@ -9,5 +9,5 @@ particle minecraft:dust{color:[0.992f,0.961f,0.706f],scale:1.8} ~ ~0.4 ~ 2 0.2 2
 particle minecraft:explosion ~ ~0.6 ~ 1.2 0.2 1.2 0 3 force @a[tag=player]
 particle minecraft:block{block_state:"minecraft:gold_block"} ~ ~0.4 ~ 2.2 0.3 2.2 0.2 40 force @a[tag=player]
 particle minecraft:block{block_state:"minecraft:brown_terracotta"} ~ ~0.4 ~ 1.6 0.3 1.6 0.25 24 force @a[tag=player]
-playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 1 0.9 0.3
-playsound minecraft:entity.zombie.attack_iron_door hostile @a[tag=player] ~ ~ ~ 0.7 0.6 0.3
+playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 1 0.9 0.33
+playsound minecraft:entity.zombie.attack_iron_door hostile @a[tag=player] ~ ~ ~ 0.7 0.6 0.23

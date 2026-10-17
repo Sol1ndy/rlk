@@ -117,9 +117,19 @@ def colour_list(rgb):
     return '[' + ','.join(num(c, 3) + 'f' for c in rgb) + ']'
 
 
-def sound(event, vol=1.0, pitch=1.0, target='@a[tag=player]', source='hostile'):
-    """One vanilla playsound line at the execution position (vanilla sounds only)."""
-    return f'playsound minecraft:{event} {source} {target} ~ ~ ~ {num(vol)} {num(pitch)} 0.3'
+def min_volume(vol):
+    """minVolume of a playsound layer (what a listener beyond its 16 x max(1, vol) b range still hears), scaled with
+    the layer like Raiden's mixes: quiet layers (<= 0.25) fade out completely, the rest keep a third of their volume,
+    at most 0.4. A fixed floor made every layer equally loud past 16 b and main hits quieter at 12-16 b than at 17 b."""
+    if vol <= 0.25:
+        return 0.0
+    return round(min(0.4, vol / 3), 2)
+
+
+def sound(event, vol=1.0, pitch=1.0, target='@a[tag=player]', source='hostile', min_vol=None):
+    """One vanilla playsound line at the execution position (vanilla sounds only). min_vol None = min_volume(vol)."""
+    mv = min_volume(vol) if min_vol is None else min_vol
+    return f'playsound minecraft:{event} {source} {target} ~ ~ ~ {num(vol)} {num(pitch)} {num(float(mv), 2)}'
 
 
 # ---------------------------------------------------------------------------------------------

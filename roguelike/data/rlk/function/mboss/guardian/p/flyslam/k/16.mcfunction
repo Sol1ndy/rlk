@@ -20,4 +20,4 @@ execute at @s run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb
 execute at @s rotated as @s rotated ~ 0 run function rlk:fx/nv/card {kind:"crescent",pos:"^ ^1.5 ^",rot:"~ ~",bb:"fixed",roll:0,spin:160,s0:2.4,s1:3.2,move:"0f,0f,0f",life:5,fade:2}
 execute at @s rotated as @s rotated ~ 0 run function rlk:fx/nv/card {kind:"crescent",pos:"^ ^2.7 ^",rot:"~ ~",bb:"fixed",roll:180,spin:150,s0:2,s1:2.9,move:"0f,0f,0f",life:5,fade:2}
 particle minecraft:dust{color:[1f,0.96f,0.75f],scale:1.6} ~ ~3 ~ 0.15 3 0.15 0 30 force @a[tag=player]
-playsound minecraft:block.beacon.activate hostile @a[tag=player] ~ ~ ~ 0.7 1.6 0.3
+playsound minecraft:block.beacon.activate hostile @a[tag=player] ~ ~ ~ 0.7 1.6 0.23

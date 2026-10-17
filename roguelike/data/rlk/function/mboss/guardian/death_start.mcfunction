@@ -7,6 +7,9 @@ scoreboard players set #gdBq1 mb 0
 scoreboard players set #gdBq2 mb 0
 function rlk:mboss/guardian/rig/spear/geo
 function rlk:mboss/guardian/rig/eye/geo
+function rlk:mboss/guardian/rig/glow/off
 function rlk:mboss/guardian/rig/play/death
 function rlk:mboss/guardian/voice/death
-playsound minecraft:entity.wither.ambient hostile @a[tag=player] ~ ~ ~ 0.25 1.6 0.3
+# no creature vocals (K18): the typed line, a soft crystal sting and the framework's non-vocal death sound
+playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 0.6 0.7 0.2
+playsound minecraft:block.beacon.deactivate hostile @a[tag=player] ~ ~ ~ 0.5 0.8 0.17

@@ -1,7 +1,7 @@
 # pull tick 64 (@s = body, at the body).
 execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_p4ca00] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0f,1.9f,0f],left_rotation:[0f,-0.4384f,0f,0.8988f],scale:[-11.0309f,11.0309f,11.0309f],right_rotation:[0f,0f,0f,1f]}}
-playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 1 0.7 0.3
-playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.3 1.5 0.3
+playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 1 0.7 0.33
+playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.3 1.5 0.1
 execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.96f,0.65f],scale:1.3} ^0 ^1.9 ^4.6 0.05 0.05 0.05 0 1 force @a[tag=player]
 execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.96f,0.65f],scale:1.3} ^1.024 ^1.9 ^4.485 0.05 0.05 0.05 0 1 force @a[tag=player]
 execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.96f,0.65f],scale:1.3} ^1.996 ^1.9 ^4.144 0.05 0.05 0.05 0 1 force @a[tag=player]

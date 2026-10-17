@@ -7,6 +7,7 @@ execute if score #gdGN mb matches 1 run scoreboard players operation #gdSlotA mb
 execute if score #gdGN mb matches 2 run scoreboard players operation #gdSlotB mb = #gdRecEl mb
 scoreboard players operation #gdSwEl mb = #gdRecEl mb
 function rlk:mboss/guardian/fx/record
+function rlk:mboss/guardian/rig/glow/off
 function rlk:mboss/guardian/look/spear_rec
 function rlk:mboss/guardian/look/eye_rec
 scoreboard players set #gdGP mb 3
