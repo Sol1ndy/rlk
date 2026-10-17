@@ -10,6 +10,7 @@ function rlk:mboss/guardian/rig/eye/geo
 function rlk:mboss/guardian/rig/glow/off
 function rlk:mboss/guardian/rig/play/death
 function rlk:mboss/guardian/voice/death
-# no creature vocals (K18): the typed line, a soft crystal sting and the framework's non-vocal death sound
+# no creature vocals (K18): the typed line and soft crystal / beacon stings; the registry's deathSnd false
+# keeps the framework's wither death roar off
 playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 0.6 0.7 0.2
 playsound minecraft:block.beacon.deactivate hostile @a[tag=player] ~ ~ ~ 0.5 0.8 0.17

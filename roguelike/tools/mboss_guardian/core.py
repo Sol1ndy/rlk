@@ -256,7 +256,8 @@ class Core:
             R('spear/geo'), R('eye/geo'), R('glow/off'),
             self.g.play('death'),
             F('voice/death'),
-            '# no creature vocals (K18): the typed line, a soft crystal sting and the framework\'s non-vocal death sound',
+            '# no creature vocals (K18): the typed line and soft crystal / beacon stings; the registry\'s deathSnd false',
+            '# keeps the framework\'s wither death roar off',
             A.Gen.sound('block.amethyst_cluster.break', 0.6, 0.7), A.Gen.sound('block.beacon.deactivate', 0.5, 0.8)])
         trail = ['# Hook death_tick (@s = body, #mbT = 1.. until cur.death): slump, fly-away with a cube trail, fade.',
                  f'# The rig must tick for the clip to run, and must NOT tick after its kill at {DEATH_LEN} (it would respawn).',
