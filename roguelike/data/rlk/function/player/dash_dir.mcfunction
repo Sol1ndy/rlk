@@ -13,6 +13,8 @@ scoreboard players operation #amove tmp = #ax tmp
 scoreboard players operation #amove tmp += #az tmp
 # 이동 중(델타 5~250)이면 이동 벡터, 아니면 시선 전방 벡터
 execute unless entity @s[tag=rlk_body] run function rlk:view/dash_dir
+# 1인칭에서 휘두르는 중(player/swing/tick)이면 몸이 서 있으므로 누르고 있는 이동 키 방향으로
+execute if entity @s[tag=rlk_body] if score @s swHold matches 1 run function rlk:player/swing/dash_dir
 execute unless score #amove tmp matches 5..250 run function rlk:player/dash_lookvec
 execute if score #amove tmp matches 5..250 run scoreboard players operation #vx tmp = #dvx tmp
 execute if score #amove tmp matches 5..250 run scoreboard players operation #vz tmp = #dvz tmp

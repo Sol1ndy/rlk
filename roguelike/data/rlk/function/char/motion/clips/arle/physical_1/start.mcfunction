@@ -17,7 +17,7 @@ scoreboard players set @s pmAcc 0
 scoreboard players set @s pmStep 99
 scoreboard players operation @s pmStep += @s pmSpeed
 scoreboard players operation @s pmStep /= @s pmSpeed
-data modify storage rlk:player_motion active set value {char:"arle",clip:"physical_1",step:1,loop:0b,lockedYaw:0b}
+data modify storage rlk:player_motion active set value {char:"arle",clip:"physical_1",step:1,loop:0b,lockedYaw:0b,normal:1b}
 execute store result storage rlk:player_motion active.step int 1 run scoreboard players get @s pmStep
 execute unless score @s pmRigChar = #charN tmp run kill @e[tag=rlk_pm]
 execute if entity @e[tag=rlk_av,limit=1] unless entity @e[tag=rlk_pm] at @e[tag=rlk_av,limit=1] rotated as @s rotated ~ 0 run function rlk:char/motion/clips/arle/physical_1/spawn

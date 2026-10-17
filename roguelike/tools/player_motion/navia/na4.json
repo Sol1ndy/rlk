@@ -1,13 +1,13 @@
 {
   "clips": {
     "physical_4": {
-      "playback_rate": 100,
+      "playback_rate": 130,
       "weapon": "navia_parasol",
       "weapon_state": "drawn",
       "length": 62,
       "hit_ticks": [12],
       "chain_tick": 28,
-      "source": "v2 f192-f315 (side) + v3 s2 f424-f532 (back camera, full recovery): parasol shot, backflip, float under the open parasol, land, halberd re-forms on the back | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source)",
+      "source": "v2 f192-f315 (side) + v3 s2 f424-f532 (back camera, full recovery): parasol shot, backflip, float under the open parasol, land, halberd re-forms on the back | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source) | D12: playback_rate 130 (attack speed +30%; ticks here stay authored ticks, the game plays them 1.3x faster)",
       "frames": [
         {"tick":0,"pose":{"shift":[0,0.028,0],"root":[-0.6,0,0],"torso":[-0.4,0,0],"head":[1.2,-3,2.5],"right_arm":[12,-4,-12],"right_elbow":[38,0,0],"left_arm":[4,2,8.5],"left_elbow":[13,0,0],"right_leg":[1.2,0,-1.2],"right_knee":[-1.5,0,0],"left_leg":[3,-4,1.2],"left_knee":[-5,0,0],"weapon":[13.963,-12.428,-172.384],"weapon_shift":[0,0,0],"weapon_scale":[0,0,0]},"weapon":"navia_parasol"},
         {"tick":1,"pose":{"shift":[0,0.028,0],"root":[-0.6,4,0],"torso":[-1,4,0],"head":[1.2,-3,2.5],"right_arm":[12.666,-14.451,-3.753],"right_elbow":[61.607,0,0],"left_arm":[4,2,8.5],"left_elbow":[13,0,0],"right_leg":[1.2,0,-1.2],"right_knee":[-1.5,0,0],"left_leg":[3,-4,1.2],"left_knee":[-5,0,0],"weapon":[-22.376,-5.146,-185.243],"weapon_shift":[0,0,0],"weapon_scale":[0.45,0.45,0.45]}},

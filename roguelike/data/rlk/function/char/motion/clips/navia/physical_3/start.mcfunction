@@ -8,13 +8,16 @@ scoreboard players set @s pmLen 38
 scoreboard players set @s pmChar 6
 scoreboard players set @s pmSpeed 100
 execute if score @s atkSpeed matches 1.. run scoreboard players operation @s pmSpeed = @s atkSpeed
+scoreboard players set #pmRate tmp 130
+scoreboard players operation @s pmSpeed *= #pmRate tmp
+scoreboard players operation @s pmSpeed /= #100 tmp
 execute if score @s pmSpeed matches ..24 run scoreboard players set @s pmSpeed 25
 execute if score @s pmSpeed matches 501.. run scoreboard players set @s pmSpeed 500
 scoreboard players set @s pmAcc 0
 scoreboard players set @s pmStep 99
 scoreboard players operation @s pmStep += @s pmSpeed
 scoreboard players operation @s pmStep /= @s pmSpeed
-data modify storage rlk:player_motion active set value {char:"navia",clip:"physical_3",step:1,loop:0b,lockedYaw:1b}
+data modify storage rlk:player_motion active set value {char:"navia",clip:"physical_3",step:1,loop:0b,lockedYaw:1b,normal:1b}
 execute store result storage rlk:player_motion active.step int 1 run scoreboard players get @s pmStep
 execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_pet","rlk_pm_basis"]}
 execute at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 run tp @e[tag=rlk_pm_basis,limit=1] ~ ~ ~ ~ 0
