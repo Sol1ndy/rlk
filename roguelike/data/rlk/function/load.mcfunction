@@ -50,6 +50,7 @@ scoreboard objectives add atkCD dummy
 scoreboard objectives add comboStep dummy
 scoreboard objectives add cboIdle dummy
 # 평타 휘두르기 잠금(player/swing/tick) · 1인칭 점프 통계(평타 사이 간격에서 뛰면 다음 평타는 1타부터)
+scoreboard objectives add swCut dummy
 scoreboard objectives add swHold dummy
 scoreboard objectives add swJump minecraft.custom:minecraft.jump
 scoreboard objectives add swungAt dummy

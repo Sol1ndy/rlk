@@ -468,6 +468,7 @@ scoreboard objectives remove stacks
 scoreboard objectives remove starlight
 scoreboard objectives remove stepT
 scoreboard objectives remove stunT
+scoreboard objectives remove swCut
 scoreboard objectives remove swHold
 scoreboard objectives remove swJump
 scoreboard objectives remove swungAt

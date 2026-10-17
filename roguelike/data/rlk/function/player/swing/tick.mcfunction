@@ -10,6 +10,11 @@
 scoreboard players set #swHold tmp 0
 execute if score @s atkCD matches 1.. run scoreboard players set #swHold tmp 1
 execute if score #swHold tmp matches 1 unless function rlk:char/motion/combat/swing_clip run scoreboard players set #swHold tmp 0
+# 스킬 · 원소폭발로 끊긴 휘두르기(player/swing/cut, swCut = 그때 남은 atkCD): 그 간격이 끝날 때까지 잡지 않는다. 그 뒤에 시작한
+# 새 평타는 atkCD 가 swCut 보다 커지므로 다시 잡는다. swCut 은 atkCD 를 따라 줄어 간격이 끝나면 0이 된다.
+execute if score @s swCut matches 1.. if score @s atkCD > @s swCut run scoreboard players set @s swCut 0
+execute if score @s swCut matches 1.. run scoreboard players set #swHold tmp 0
+execute if score @s swCut matches 1.. run scoreboard players operation @s swCut = @s atkCD
 # 쉬는 상태(사망 · 지도 화면 · 선택 공간 · 보스 연출 카메라)에서는 풀린다
 execute if score @s dead matches 1 run scoreboard players set #swHold tmp 0
 execute if score @s vMap matches 1 run scoreboard players set #swHold tmp 0

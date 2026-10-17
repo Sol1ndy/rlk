@@ -6,6 +6,8 @@ execute unless data storage rlk:config {installed:1b} run return 0
 # ===== 'player' 태그 보유자만 시스템 적용. 2명 이상이면 전원 태그 제거 (인벤/아이템 저장소가 1인 기준) =====
 execute store result score #pcount tmp if entity @a[tag=player]
 execute if score #pcount tmp matches 2.. run tellraw @a [{"text":"[로그라이크] ","color":"red","bold":true},{"text":"'player' 태그는 한 명만 가질 수 있습니다. 전원 태그를 제거합니다.","color":"red"}]
+# 태그를 잃으면 player/swing/tick 이 더 돌지 않으므로 휘두르기 잠금(1인칭 수정자)을 먼저 푼다
+execute if score #pcount tmp matches 2.. as @a[tag=player] run function rlk:player/swing/release
 execute if score #pcount tmp matches 2.. run tag @a[tag=player] remove player
 execute if score #pcount tmp matches 2.. run return 0
 
