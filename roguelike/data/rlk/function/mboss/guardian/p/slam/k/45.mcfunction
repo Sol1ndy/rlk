@@ -1,4 +1,5 @@
 # slam tick 45 (@s = body, at the body).
-execute rotated as @s rotated ~ 0 run function rlk:fx/nv/card {kind:"star",pos:"^-0.216 ^0.912 ^3.592",rot:"~ ~",bb:"center",roll:0,spin:45,s0:0.05,s1:0.6327,move:"0f,0f,0f",life:7,fade:3}
-execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run particle minecraft:end_rod ~ ~0.8 ~ 0.25 0.6 0.25 0.01 2 force @a[tag=player]
-execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run playsound minecraft:block.amethyst_block.chime hostile @a[tag=player] ~ ~ ~ 0.4 2 0.13
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.96f,0.65f],scale:0.9} ^-0.29 ^1.373 ^3.763 0.04 0.04 0.04 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.96f,0.65f],scale:0.9} ^-0.37 ^1.705 ^3.805 0.04 0.04 0.04 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.96f,0.65f],scale:0.9} ^-0.45 ^2.038 ^3.848 0.04 0.04 0.04 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.96f,0.65f],scale:0.9} ^-0.53 ^2.37 ^3.89 0.04 0.04 0.04 0 1 force @a[tag=player]

@@ -9,6 +9,7 @@ framework uses tenths of a block and damage as a % of the registry base hit (atk
 """
 from pathlib import Path
 import json
+import math
 import sys
 
 _TOOLS = Path(__file__).resolve().parents[1]
@@ -27,17 +28,40 @@ BOSS = next(b for b in REG['boss'] if b['id'] == ID)
 # Rig clips (tools/mboss_guardian_rig_manifest.json, written by build_mboss_guardian_rig.mjs).
 _MAN = json.loads((_TOOLS / 'mboss_guardian_rig_manifest.json').read_text(encoding='utf-8'))
 CLIPS = {c['name']: {'id': c['id'], 'len': c['len'], 'loop': c['loop'], 'next': c['next'],
-                     'events': dict(c['events'])} for c in _MAN['clips']}
+                     'events': dict(c['events']), 'retime': c.get('retime')} for c in _MAN['clips']}
 
 
 def ev(clip, event):
-    """Clip tick of a rig event, e.g. ev('thrust', 'hit1') == 28. Pattern clocks (#gdPT) start at
+    """Clip tick of a rig event (as played), e.g. ev('thrust', 'hit1') == 21. Pattern clocks (#gdPT) start at
     0 on the tick the pattern's start function plays its first clip, so #gdPT == clip tick."""
     return CLIPS[clip]['events'][event]
 
 
 def clip_len(clip):
     return CLIPS[clip]['len']
+
+
+# Wind-up retiming (guardian_clips.mjs RETIME, manifest `retime`): the clips are authored on the reference-video
+# timeline and played with shorter wind-ups. A pattern that times its fx on authored ticks maps them with rt().
+def _warp(knots, t):
+    for (a0, b0), (a1, b1) in zip(knots, knots[1:]):
+        if t <= a1:
+            return b0 + (b1 - b0) * (t - a0) / (a1 - a0)
+    a, b = knots[-1]
+    return b + (t - a)
+
+
+def rt(clip, t):
+    """Played clip tick of an authored clip tick (half up, like the rig generator); identity when the clip is not
+    retimed. rt('thrust', 28) == 21 == ev('thrust', 'hit1')."""
+    kn = CLIPS[clip]['retime']
+    return int(t) if not kn else int(math.floor(_warp(kn, t) + 0.5))
+
+
+def inv(clip, t):
+    """Authored time (float) of a played clip tick: the inverse of rt, for resampling authored per-tick tables."""
+    kn = CLIPS[clip]['retime']
+    return float(t) if not kn else _warp([(b, a) for a, b in kn], t)
 
 
 # Screen overlays (tools/guardian_screen.mjs via the rig generator): font id and the title text of each frame
@@ -60,7 +84,9 @@ DMG = {
 }
 KB = {'p1b': 4, 'ench': 4, 'default': 3, 'light': 2}   # knockback steps (K16)
 
-# Range bands (K2), horizontal distance boss body -> player body, blocks.
+# Range bands (K2), horizontal distance boss body -> player body, blocks. Kept through the area tuning (x1.2): the
+# melee patterns close in (P3 to 3 b, inside its r 6 disc 3.5 b ahead) or reposition themselves (P1), P4 hops back
+# from melee range, and between patterns she drifts to within 8-9 b, where the far band (P5) must still start.
 MELEE = 4.0     # melee: d <= 4
 FAR = 8.0       # mid: 4 < d < 8, far: d >= 8
 BANDS = {'melee': 1, 'mid': 2, 'far': 3}
@@ -107,10 +133,12 @@ class Pattern:
     min_d   blocks: the bag may pick it only from this distance on (inside its bands), None = the band edge
     weight  {band: n} draw weight in that band (default 1 everywhere): the bag draws a candidate with
             probability weight / sum of the candidates' weights
+    away    (near, to) blocks: when the player is nearer than `near` at the pick, the core first hops back to `to`
+            from the player (core ai/back, about 12 t) and only then calls start; None = no
     """
 
     def __init__(self, id, key, label, kind='normal', bands=(), close=None, recover=20, max_len=120, length=None,
-                 min_d=None, weight=None):
+                 min_d=None, weight=None, away=None):
         assert kind in ('normal', 'service')
         assert kind == 'service' or bands, key
         assert all(b in BANDS for b in bands), bands
@@ -119,6 +147,8 @@ class Pattern:
         self.length = length if length is not None else max_len - 4
         assert 0 < self.length <= max_len, (key, self.length, max_len)
         self.min_d = min_d
+        self.away = tuple(away) if away else None
+        assert not (self.away and close), (key, 'close-in and hop back exclude each other')
         self.weight = {b: int((weight or {}).get(b, 1)) for b in self.bands}
         assert all(1 <= w <= 9 for w in self.weight.values()), (key, self.weight)
         assert set(weight or {}) <= set(self.bands), (key, weight)

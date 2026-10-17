@@ -1,5 +1,5 @@
 # flyslam clip tick 41
-function rlk:mboss/guardian/p/flyslam/impact
-execute at @s positioned ~ ~0.5 ~ positioned ^-0.722 ^0.025 ^0.608 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p5","rlk_mb_gd_q5i","rlk_mb_gd_q5i_4"],block_state:{id:"minecraft:brown_terracotta"},brightness:{sky:11,block:11},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.212f,-0.139f,-0.187f],left_rotation:[-0.625f,-0.51f,-0.589f,0.047f],scale:[0.364f,0.364f,0.364f],right_rotation:[0f,0f,0f,1f]}}
-execute at @s positioned ~ ~0.5 ~ positioned ^-0.811 ^0.122 ^-0.227 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p5","rlk_mb_gd_q5i","rlk_mb_gd_q5i_8"],block_state:{id:"minecraft:gold_block"},brightness:{sky:15,block:15},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.056f,-0.012f,-0.135f],left_rotation:[0.427f,-0.023f,0.21f,0.879f],scale:[0.169f,0.169f,0.169f],right_rotation:[0f,0f,0f,1f]}}
-execute at @s positioned ~ ~0.5 ~ positioned ^0.204 ^-0.164 ^0.604 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p5","rlk_mb_gd_q5i","rlk_mb_gd_q5i_11"],block_state:{id:"minecraft:brown_terracotta"},brightness:{sky:11,block:11},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.084f,-0.307f,-0.016f],left_rotation:[-0.305f,0.025f,0.199f,0.931f],scale:[0.368f,0.368f,0.368f],right_rotation:[0f,0f,0f,1f]}}
+playsound minecraft:block.pointed_dripstone.land hostile @a[tag=player] ~ ~ ~ 0.7 0.9 0.23
+playsound minecraft:block.amethyst_cluster.place hostile @a[tag=player] ~ ~ ~ 0.6 1.3 0.2
+particle minecraft:wax_on ~ ~0.8 ~ 3.667 0.5 3.667 0 3 force @a[tag=player]
+particle minecraft:dust{color:[0.99f,0.86f,0.45f],scale:0.9} ~ ~0.5 ~ 3.667 0.4 3.667 0 4 force @a[tag=player]

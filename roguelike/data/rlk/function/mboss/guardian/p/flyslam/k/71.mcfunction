@@ -1,3 +1,3 @@
 # flyslam clip tick 71
-particle minecraft:wax_on ~ ~0.8 ~ 3 0.5 3 0 3 force @a[tag=player]
-particle minecraft:dust{color:[0.99f,0.86f,0.45f],scale:0.9} ~ ~0.5 ~ 3 0.4 3 0 4 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^0.237 ^5.61 ^1.108 run particle minecraft:dust{color:[0.992f,0.957f,0.584f],scale:0.8} ~ ~ ~ 0.03 0.03 0.03 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^0.752 ^5.34 ^1.104 run particle minecraft:dust{color:[0.992f,0.957f,0.584f],scale:0.8} ~ ~ ~ 0.03 0.03 0.03 0 1 force @a[tag=player]

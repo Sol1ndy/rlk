@@ -1,10 +1,4 @@
 # sweep_g clip tick 22
-execute if entity @e[type=minecraft:marker,tag=rlk_mb_gd_p11h,scores={mbHzHit=1..}] run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_gd_p11h] mbHzHit 1
-execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p11w1] run data merge entity @s {start_interpolation:0,interpolation_duration:4,transformation:{scale:[0.82f,0.01f,0.04f]}}
-function rlk:mboss/guardian/p/sweep_g/s2
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.6 ^0.4 ^4.0 positioned ^-1.423 ^-0.175 ^0.056 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p11","rlk_mb_gd_q11c","rlk_mb_gd_q11c_1"],block_state:{id:"minecraft:red_stained_glass"},brightness:{sky:15,block:15},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.152f,-0.092f,-0.125f],left_rotation:[0.05f,0.042f,-0.074f,0.995f],scale:[0.251f,0.251f,0.251f],right_rotation:[0f,0f,0f,1f]}}
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.6 ^0.4 ^4.0 positioned ^-0.495 ^-0.151 ^0.692 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p11","rlk_mb_gd_q11c","rlk_mb_gd_q11c_3"],block_state:{id:"minecraft:yellow_stained_glass"},brightness:{sky:15,block:15},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.211f,-0.141f,-0.079f],left_rotation:[-0.425f,-0.172f,-0.298f,0.837f],scale:[0.307f,0.307f,0.307f],right_rotation:[0f,0f,0f,1f]}}
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.6 ^0.4 ^4.0 positioned ^-0.019 ^-0.011 ^0.171 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p11","rlk_mb_gd_q11c","rlk_mb_gd_q11c_4"],block_state:{id:"minecraft:red_concrete"},brightness:{sky:11,block:11},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0.102f,0.089f,-0.09f],left_rotation:[0.297f,-0.299f,-0.869f,0.258f],scale:[0.188f,0.188f,0.188f],right_rotation:[0f,0f,0f,1f]}}
-playsound minecraft:block.pointed_dripstone.land hostile @a[tag=player] ~ ~ ~ 1 0.9 0.33
-playsound minecraft:block.basalt.break hostile @a[tag=player] ~ ~ ~ 0.9 0.8 0.3
-playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.35 1.3 0.12
+kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p11w2]
+kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p11b4]
+kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p11b]

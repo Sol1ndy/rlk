@@ -1,5 +1,6 @@
-# @s = body: stop whatever runs (hazards, props, pull, movement, slot pattern, guard, chaos).
+# @s = body: stop whatever runs (hazards, props, pull, movement, slot pattern, guard, chaos, a hop back).
 function rlk:mboss/lib_clear
+kill @e[type=minecraft:marker,tag=rlk_mb_gd_bk]
 function rlk:mboss/guardian/p/cancel
 function rlk:mboss/guardian/chaos/reset
 scoreboard players set #gdRecOn mb 0

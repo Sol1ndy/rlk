@@ -1,15 +1,15 @@
 # P3 tick (@s = body, #gdPT = slam clip tick). Busy ticks run p/slam/k/<t>. The body never moves:
-# the core closed in to 3 b; she turns to the player until the aim locks at the ring (9); the
-# spear is planted 26-48 (rig API §4).
-execute if score #gdPT mb matches 1..8 run function rlk:mboss/guardian/rig/face/track
+# the core closed in to 3 b; she turns to the player until the aim locks at the ring (7); the
+# spear is planted 20-42 (rig API §4).
+execute if score #gdPT mb matches 1..6 run function rlk:mboss/guardian/rig/face/track
 execute if score #gdPT mb matches 2 run function rlk:mboss/guardian/p/slam/k/2
 execute if score #gdPT mb matches 3 run function rlk:mboss/guardian/p/slam/k/3
 execute if score #gdPT mb matches 4 run function rlk:mboss/guardian/p/slam/k/4
 execute if score #gdPT mb matches 5 run function rlk:mboss/guardian/p/slam/k/5
 execute if score #gdPT mb matches 6 run function rlk:mboss/guardian/p/slam/k/6
 execute if score #gdPT mb matches 7 run function rlk:mboss/guardian/p/slam/k/7
+execute if score #gdPT mb matches 8 run function rlk:mboss/guardian/p/slam/k/8
 execute if score #gdPT mb matches 9 run function rlk:mboss/guardian/p/slam/k/9
-execute if score #gdPT mb matches 10 run function rlk:mboss/guardian/p/slam/k/10
 execute if score #gdPT mb matches 11 run function rlk:mboss/guardian/p/slam/k/11
 execute if score #gdPT mb matches 12 run function rlk:mboss/guardian/p/slam/k/12
 execute if score #gdPT mb matches 13 run function rlk:mboss/guardian/p/slam/k/13
@@ -27,18 +27,18 @@ execute if score #gdPT mb matches 24 run function rlk:mboss/guardian/p/slam/k/24
 execute if score #gdPT mb matches 25 run function rlk:mboss/guardian/p/slam/k/25
 execute if score #gdPT mb matches 26 run function rlk:mboss/guardian/p/slam/k/26
 execute if score #gdPT mb matches 27 run function rlk:mboss/guardian/p/slam/k/27
-execute if score #gdPT mb matches 28 run function rlk:mboss/guardian/p/slam/k/28
-execute if score #gdPT mb matches 29 run function rlk:mboss/guardian/p/slam/k/29
 execute if score #gdPT mb matches 30 run function rlk:mboss/guardian/p/slam/k/30
-execute if score #gdPT mb matches 31 run function rlk:mboss/guardian/p/slam/k/31
 execute if score #gdPT mb matches 32 run function rlk:mboss/guardian/p/slam/k/32
 execute if score #gdPT mb matches 33 run function rlk:mboss/guardian/p/slam/k/33
 execute if score #gdPT mb matches 36 run function rlk:mboss/guardian/p/slam/k/36
 execute if score #gdPT mb matches 38 run function rlk:mboss/guardian/p/slam/k/38
 execute if score #gdPT mb matches 39 run function rlk:mboss/guardian/p/slam/k/39
+execute if score #gdPT mb matches 41 run function rlk:mboss/guardian/p/slam/k/41
 execute if score #gdPT mb matches 42 run function rlk:mboss/guardian/p/slam/k/42
+execute if score #gdPT mb matches 43 run function rlk:mboss/guardian/p/slam/k/43
 execute if score #gdPT mb matches 44 run function rlk:mboss/guardian/p/slam/k/44
 execute if score #gdPT mb matches 45 run function rlk:mboss/guardian/p/slam/k/45
+execute if score #gdPT mb matches 46 run function rlk:mboss/guardian/p/slam/k/46
 execute if score #gdPT mb matches 47 run function rlk:mboss/guardian/p/slam/k/47
 execute if score #gdPT mb matches 48 run function rlk:mboss/guardian/p/slam/k/48
 execute if score #gdPT mb matches 49 run function rlk:mboss/guardian/p/slam/k/49
@@ -47,10 +47,4 @@ execute if score #gdPT mb matches 51 run function rlk:mboss/guardian/p/slam/k/51
 execute if score #gdPT mb matches 52 run function rlk:mboss/guardian/p/slam/k/52
 execute if score #gdPT mb matches 53 run function rlk:mboss/guardian/p/slam/k/53
 execute if score #gdPT mb matches 54 run function rlk:mboss/guardian/p/slam/k/54
-execute if score #gdPT mb matches 55 run function rlk:mboss/guardian/p/slam/k/55
-execute if score #gdPT mb matches 56 run function rlk:mboss/guardian/p/slam/k/56
-execute if score #gdPT mb matches 57 run function rlk:mboss/guardian/p/slam/k/57
-execute if score #gdPT mb matches 58 run function rlk:mboss/guardian/p/slam/k/58
-execute if score #gdPT mb matches 59 run function rlk:mboss/guardian/p/slam/k/59
-execute if score #gdPT mb matches 60 run function rlk:mboss/guardian/p/slam/k/60
-execute if score #gdPT mb matches 70 run function rlk:mboss/guardian/p/slam/k/70
+execute if score #gdPT mb matches 64 run function rlk:mboss/guardian/p/slam/k/64

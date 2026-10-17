@@ -6,48 +6,57 @@ p34_fx.py. Clip ticks below are the rig's (tools/mboss_guardian_rig_manifest.jso
 points were measured on the rig poses (gd_dbg) and are boss-frame offsets (x left, y up from the
 floor, z forward).
 
-P3 (clip `slam`, 70 t, melee: the core closes to 3 b first)
-  0-8   raise; she keeps turning to the player (<= 12 deg/t), gold streak along the spear tip
-  9     aim locked: ground ring r 5 centred 3.5 b ahead (K25), thin gold ring decal + amber fill,
-        hazard disc r 5, tell 17 -> hit at 26 (1.6, K17); ring chime
-  11    charge (beacon power-select + respawn-anchor charge); 12-21 lens glints on the raised blade
-  22-25 downswing gold streak; 26 impact: vertical gold pillar, white-gold flash over the ring,
-        shock ring, burst, radial gold crystal blades (27-44), gold cubes + dark rock chunks
-  26-48 spear planted (body still), 4-point star sparkles at the tip; 47 pull-out thud; 54-70 twirl
-P4 (clips `pull` 40 t, then `swing` 51 t from tick 44; mid from 5 b and far, weighted x3 far)
-  0-31  red haze, swirling mist, crimson arcs, the corrupted claw glow; red cubes float around her
-  11-21 a cage of black cubes with glowing red edges stacks up the player (follows the body)
-  22-27 screen (title font overlay, guardian_screen.mjs; right in first person and in the F5 seat
-        view): dark-red diamond vignette closes in; 27 line-of-sight check (no range limit inside
-        the arena; light and barrier blocks pass); 28 white flash, 30 orange field + white 4-point
-        star, 31 red diamond; 32 the player is placed 1 b in front of her, facing her (undodgeable,
-        tell 32 t >= 28, K14); arrival cubes drift and dissolve; the vignette opens again 32-38
-        No line of sight at 27, or the destination blocked at 32: the cage shatters, the screen
+User tuning (plan.md "공격 선딜 좀 짧게 하고 공격 범위를 좀 늘려봐"): the clips play with ~25 % shorter wind-ups
+(guardian_clips.mjs RETIME; authored ticks of the fx go through api.rt / api.inv) and the hit areas are ~20 % larger.
+Played ticks below.
+
+P3 (clip `slam`, 64 t, melee: the core closes to 3 b first)
+  0-6   raise; she keeps turning to the player (<= 12 deg/t), gold streak along the spear tip
+  7     aim locked: ground ring r 6 centred 3.5 b ahead (K25 x1.2), thin gold ring decal + amber fill,
+        hazard disc r 6, tell 13 -> hit at 20 (1.6, K17); ring chime
+  8     charge (beacon power-select + respawn-anchor charge); 9-15 lens glints on the raised blade
+  16-19 downswing gold streak; 20 impact: vertical gold pillar, white-gold flash over the ring,
+        shock ring, burst, radial gold crystal blades (21-38), gold cubes + dark rock chunks
+  20-42 spear planted (body still), 4-point star sparkles at the tip; 41 pull-out thud; 48-64 twirl
+P4 (clips `pull` 32 t, then `swing` 46 t from tick 36; every band: melee at weight 1 (from closer than 5 b the
+    core first hops back to 6.5 b, ai/back), mid 1, far 3)
+  0-23  red haze, swirling mist, crimson arcs, the corrupted claw glow; red cubes float around her
+  7-13  a cage of black cubes with glowing red edges stacks up the player (follows the body)
+  14-19 screen (title font overlay, guardian_screen.mjs; right in first person and in the F5 seat
+        view): dark-red diamond vignette closes in; 19 line-of-sight check (no range limit inside
+        the arena; light and barrier blocks pass); 20 white flash, 22 orange field + white 4-point
+        star, 23 red diamond; 24 the player is placed 1 b in front of her, facing her (undodgeable,
+        tell 24 t >= 20, K14 tuned); arrival cubes drift and dissolve; the vignette opens again 24-30
+        No line of sight at 19, or the destination blocked at 24: the cage shatters, the screen
         clears and she swings in place (the pattern still resolves). A refused pull (player dead,
-        reviving, selection screen, map view): no swings, the pattern ends at 40.
-  44    swing clip (K15: relocation -> wind-up 12 t); two 360 hazards r 5.5, tell 20: swing 1
-        forehand at 64, swing 2 backhand (tilted, thicker) at 77, 1.2 each; gold crescents that
+        reviving, selection screen, map view): no swings, the pattern ends at 32.
+  36    swing clip (K15: relocation -> wind-up 12 t); two 360 hazards r 6.8, tell 15: swing 1
+        forehand at 51, swing 2 backhand (tilted, thicker) at 64, 1.2 each; gold crescents that
         follow the measured spear-tip angles, dark cubes and gold sparkles in the trail
 """
 import math
 import random
 from collections import defaultdict
 
-from .api import Pattern, ev, clip_len, DMG, KB, CY, GOLD, GOLD_PALE, GOLD_DEEP, CRIMSON, CRIMSON_DARK, NS, SCREEN
+from .api import Pattern, ev, clip_len, rt, inv, DMG, KB, CY, GOLD, GOLD_PALE, GOLD_DEEP, CRIMSON, CRIMSON_DARK, NS, SCREEN
 from . import p34_fx as X
 
 SWING_GAP = 12        # relocation -> swing clip start (K15: 10-14 t)
+SWING_TELL = 15       # swing hazard telegraph (was 20; user tuning: wind-ups ~25 % shorter, floor 10 t)
+AREA = 1.2            # linear scale of the hit areas and their fx (user tuning: ~20 % larger)
 PULL_LEN = clip_len('pull')
 RELOC = ev('pull', 'relocate')
 SWING_AT = RELOC + SWING_GAP
 SWING_LEN = clip_len('swing')
 
 PATTERNS = [
-    Pattern(3, 'slam', '공간을 집행하는 시련', bands=('melee',), close=3.0, recover=20, max_len=clip_len('slam') + 4),
-    # mid band only from 5 b (never in melee); far: favoured over P2 (x3, like P5); the core also guarantees one P4 per
-    # stretch of normals while the player is out of melee (ai/pick)
-    Pattern(4, 'pull', '어둠 속에서 퍼지는 공간', bands=('mid', 'far'), min_d=5.0, weight={'far': 3}, recover=22,
-            max_len=SWING_AT + SWING_LEN + 4),
+    Pattern(3, 'slam', '공간을 집행하는 시련', bands=('melee',), close=3.0, weight={'melee': 2}, recover=20,
+            max_len=clip_len('slam') + 4),
+    # every band: melee at a low weight (1 against 2 for P1 / P3; from closer than 5 b she first hops back to 6.5 b,
+    # core ai/back), mid 1, far favoured over P2 (x3, like P5); the core also guarantees one P4 per stretch of normals
+    # at any distance (ai/pity)
+    Pattern(4, 'pull', '어둠 속에서 퍼지는 공간', bands=('melee', 'mid', 'far'), weight={'melee': 1, 'far': 3}, away=(5.0, 6.5),
+            recover=22, max_len=SWING_AT + SWING_LEN + 4),
 ]
 
 # colours (patterns.md §5 / §6 FX)
@@ -122,7 +131,7 @@ def emit(g):
 # =============================================================================================
 # P3 공간을 집행하는 시련
 SLAM_HZ = 3.5                      # disc centre ahead (K25)
-SLAM_R = 5.0
+SLAM_R = 6.0                       # K25 r 5, x1.2 (user tuning)
 TIP_PLANT = (0.0, 0.0, 3.1)        # planted spear tip (rig: 0, -0.24, 3.09) on the floor
 TIP_OVER = (-0.26, 6.82, 0.30)     # blade tip while held overhead (12-21)
 RAISE = {2: (-3.59, 1.71, 1.08), 3: (-3.86, 2.42, 0.96), 4: (-3.93, 2.80, 0.90), 5: (-3.49, 4.11, 0.89),
@@ -138,6 +147,18 @@ P3TAG = 'rlk_mb_gd_p3'
 
 def p3tags(*extra):
     return ['rlk_room', 'rlk_mb_aux', P3TAG] + list(extra)
+
+
+def replayed(table, clip):
+    """An authored per-tick point table {authored clip tick: point} resampled on the played ticks (api.rt): linear in the
+    authored time, so the measured spear-tip paths follow the retimed clip."""
+    ts = sorted(table)
+    out = {}
+    for t in range(rt(clip, ts[0]), rt(clip, ts[-1]) + 1):
+        u = min(max(inv(clip, t), ts[0]), ts[-1])
+        a, b = max(x for x in ts if x <= u), min(x for x in ts if x >= u)
+        out[t] = table[a] if a == b else lerp3(table[a], table[b], (u - a) / (b - a))
+    return out
 
 
 def streak(g, path, t, rgb, scale, n=5):
@@ -165,7 +186,9 @@ def slam(g):
     rng = random.Random(3034)
     ring, glint, down, imp = ev(k, 'ring'), ev(k, 'glint'), ev(k, 'down'), ev(k, 'impact')
     pullt, twirl, length = ev(k, 'pull'), ev(k, 'twirl'), clip_len(k)
-    assert (ring, imp) == (9, 26) and imp - ring >= 12
+    assert imp - ring >= 10, 'K4 (tuned): the ring leads the impact by >= 10 t'
+    W = lambda t: rt(k, t)            # authored (source) tick -> played tick
+    raise_p, down_p, lift_p = replayed(RAISE, k), replayed(DOWN, k), replayed(LIFT, k)
     tip = TIP_PLANT
     at_tip = f'{BODY} positioned {P(*tip)} positioned ~ {CY} ~'
     at_hz = f'{BODY} positioned ^ ^ ^{SLAM_HZ} positioned ~ {CY} ~'
@@ -173,13 +196,13 @@ def slam(g):
 
     # ---- raise 0-8: she keeps turning to the player until the aim locks at the ring
     tl.span(1, ring - 1, g.rig('face/track'))
-    tl.at(2, g.sound('entity.player.attack.sweep', 0.45, 0.6), g.sound('item.trident.riptide_1', 0.3, 1.5))
-    for t in range(3, 8):
-        tl.at(t, *streak(g, RAISE, t, GOLD_PALE, 0.8, 4))
+    tl.at(W(2), g.sound('entity.player.attack.sweep', 0.45, 0.6), g.sound('item.trident.riptide_1', 0.3, 1.5))
+    for t in sorted(raise_p)[1:]:
+        tl.at(t, *streak(g, raise_p, t, GOLD_PALE, 0.8, 4))
 
-    # ---- 9: ring telegraph + hazard (disc r 5 at 3.5 b, tell 17, 1.6)
+    # ---- ring: telegraph + hazard (disc r 6 at 3.5 b, tell 13, 1.6)
     tl.at(ring,
-          '# Aim locked: disc r 5 centred 3.5 b ahead (K25), ring lead 17 t -> hit on the impact (clip 26).',
+          f'# Aim locked: disc r {X.L.num(SLAM_R)} centred {SLAM_HZ} b ahead (K25 x1.2), ring lead {imp - ring} t -> hit on the impact (clip {imp}).',
           'scoreboard players set #hzSfx mb 0',
           f'scoreboard players set #hzVis mb {3 * 10 + 1}',
           f'scoreboard players set #hzKB mb {KB["default"]}',
@@ -189,27 +212,27 @@ def slam(g):
     # the ring decal (summoned by vis at the marker) widens a little and turns slowly
     tl.at(ring + 1, X.merge('@e[type=minecraft:item_display,tag=rlk_mb_gd_p3ring]',
                             X.tf((0, 0, 0), X.qmul(X.yaw_q(110), X.FLAT_UP), S_RING), imp - ring - 2))
-    fill = [disc_points(rng, SLAM_R - 0.25, 12) for _ in range(3)]
+    fill = [disc_points(rng, SLAM_R - 0.25, 17) for _ in range(3)]
     for t in range(ring, imp, 2):
         pts = fill[(t // 2) % 3]
         tl.at(t, *[f'execute {at_hz} run ' + g.dust(AMBER, 0.9, f'^{X.L.num(round(x, 2))} ^0.08 ^{X.L.num(round(z, 2))}', (0, 0, 0), 1)
                    for x, z in pts])
 
     # ---- 11-21: charge, lens glints on the raised blade
-    tl.at(11, g.sound('block.beacon.power_select', 0.6, 1.5), g.sound('block.respawn_anchor.charge', 0.7, 1.5))
-    for t, (s0, s1, life) in ((glint, (0.2, 1.8, 9)), (17, (0.1, 1.1, 6)), (20, (0.3, 2.3, 5))):
+    tl.at(W(11), g.sound('block.beacon.power_select', 0.6, 1.5), g.sound('block.respawn_anchor.charge', 0.7, 1.5))
+    for t, (s0, s1, life) in ((glint, (0.2, 1.8, 9)), (W(17), (0.1, 1.1, 6)), (W(20), (0.3, 2.3, 5))):
         tl.at(t, f'execute {BODY} run ' + g.card('star', P(*TIP_OVER), bb='center', spin=90, s0=s0, s1=s1, life=life, fade=3),
               f'execute {BODY} run ' + g.particle('end_rod', P(*TIP_OVER), (0.1, 0.1, 0.1), 0.04, 3))
     tl.at(glint, g.sound('block.amethyst_block.chime', 0.6, 2.0))
-    tl.at(20, g.sound('block.amethyst_block.chime', 0.5, 1.8))
+    tl.at(W(20), g.sound('block.amethyst_block.chime', 0.5, 1.8))
     for t in range(glint, down, 2):
         tl.at(t, f'execute {BODY} run ' + g.dust(GOLD, 0.8, P(TIP_OVER[0], TIP_OVER[1] - 0.6, TIP_OVER[2]), (0.12, 0.4, 0.12), 3),
               f'execute {BODY} run ' + g.particle('wax_on', P(*TIP_OVER), (0.2, 0.3, 0.2), 0, 1))
 
     # ---- 22-25: downswing streak
     for t in range(down, imp + 1):
-        tl.at(t, *streak(g, DOWN, t, GOLD_PALE, 1.3, 7), *streak(g, DOWN, t, GOLD, 1.0, 4))
-    tl.at(23, g.sound('entity.player.attack.sweep', 0.75, 0.55), g.sound('item.trident.riptide_2', 0.4, 1.3))
+        tl.at(t, *streak(g, down_p, t, GOLD_PALE, 1.3, 7), *streak(g, down_p, t, GOLD, 1.0, 4))
+    tl.at(W(23), g.sound('entity.player.attack.sweep', 0.75, 0.55), g.sound('item.trident.riptide_2', 0.4, 1.3))
 
     # ---- 26: impact
     pil = ('rlk_mb_gd_p3pil',)
@@ -220,12 +243,12 @@ def slam(g):
           f'execute {at_tip} run ' + X.item_display(X.card_model('glow'), p3tags(*pil), X.tf((0, 3.0, 0), s=(0.45, 6.4, 1)), bb='vertical'),
           f'execute {at_hz} run ' + X.item_display(X.card_model('glow'), p3tags('rlk_mb_gd_p3fl'), X.tf((0, 0.06, 0), X.FLAT_UP, 2 * SLAM_R)),
           f'execute {at_tip} run ' + X.item_display(X.card_model('ring'), p3tags('rlk_mb_gd_p3sw'), X.tf((0, 0.1, 0), X.FLAT_UP, 1.4)),
-          f'execute {BODY} run ' + g.card('burst', P(tip[0], 1.3, tip[2]), bb='center', spin=20, s0=0.8, s1=3.6, life=6, fade=3),
+          f'execute {BODY} run ' + g.card('burst', P(tip[0], 1.3, tip[2]), bb='center', spin=20, s0=0.8, s1=3.6 * AREA, life=6, fade=3),
           f'execute {at_tip} run ' + g.dust(GOLD_PALE, 1.6, '~ ~1.6 ~', (0.15, 1.7, 0.15), 26),
-          f'execute {at_tip} run ' + g.particle('block{block_state:"minecraft:gold_block"}', '~ ~0.3 ~', (1.3, 0.2, 1.3), 0, 30),
+          f'execute {at_tip} run ' + g.particle('block{block_state:"minecraft:gold_block"}', '~ ~0.3 ~', (1.3 * AREA, 0.2, 1.3 * AREA), 0, 30),
           f'execute {at_tip} run ' + g.particle('end_rod', '~ ~0.5 ~', (0.3, 0.3, 0.3), 0.18, 14),
           f'execute {at_tip} run ' + g.particle('explosion', '~ ~0.4 ~', (0.3, 0.1, 0.3), 0, 1),
-          f'execute {at_hz} run ' + g.dust(IMPACT_CORE, 1.4, '~ ~0.15 ~', (2.2, 0.05, 2.2), 30),
+          f'execute {at_hz} run ' + g.dust(IMPACT_CORE, 1.4, '~ ~0.15 ~', (2.2 * AREA, 0.05, 2.2 * AREA), 30),
           f'execute {at_tip} run ' + g.sound('entity.generic.explode', 0.8, 0.9),
           f'execute {at_tip} run ' + g.sound('block.amethyst_cluster.break', 1.0, 0.8),
           f'execute {at_tip} run ' + g.sound('item.trident.thunder', 0.3, 1.2),
@@ -245,7 +268,7 @@ def slam(g):
     for i in range(11):
         inner = i % 2 == 0
         yaw = i * (360 / 11) + rng.uniform(-9, 9)
-        rho = rng.uniform(0.5, 1.1) if inner else rng.uniform(1.6, 2.7)
+        rho = (rng.uniform(0.5, 1.1) if inner else rng.uniform(1.6, 2.7)) * AREA
         L_ = rng.uniform(1.9, 2.7) if inner else rng.uniform(1.1, 1.7)
         lean = rng.uniform(14, 30) if inner else rng.uniform(30, 46)
         roll = rng.uniform(-12, 12)
@@ -271,8 +294,8 @@ def slam(g):
           f'execute {at_tip} run ' + g.sound('block.amethyst_cluster.place', 0.9, 0.7),
           f'execute {at_tip} run ' + g.sound('block.pointed_dripstone.land', 0.6, 0.8))
     tl.at(imp + 2, *grow)
-    tl.at(44, *shrink, f'execute {at_tip} run ' + g.sound('block.amethyst_cluster.step', 0.6, 1.2))
-    tl.at(48, 'kill @e[type=minecraft:item_display,tag=rlk_mb_gd_p3bl]')
+    tl.at(W(44), *shrink, f'execute {at_tip} run ' + g.sound('block.amethyst_cluster.step', 0.6, 1.2))
+    tl.at(W(48), 'kill @e[type=minecraft:item_display,tag=rlk_mb_gd_p3bl]')
 
     # ---- 27-42: gold cubes + dark rock chunks thrown out of the crater
     csum, c1, c2, c3 = [], [], [], []
@@ -283,8 +306,8 @@ def slam(g):
         sel = f'@e[type=minecraft:block_display,tag={tg}]'
         yaw = j * (360 / len(blocks)) + rng.uniform(-14, 14)
         size = rng.uniform(0.28, 0.48) if j < 6 else rng.uniform(0.22, 0.36)
-        d1, h1 = rng.uniform(1.0, 2.4), rng.uniform(1.2, 2.6)
-        d2 = d1 + rng.uniform(0.6, 1.3)
+        d1, h1 = rng.uniform(1.0, 2.4) * AREA, rng.uniform(1.2, 2.6)
+        d2 = d1 + rng.uniform(0.6, 1.3) * AREA
         p0 = (0.0, 0.35, 0.0)
         p1 = (X.fwd(yaw, d1)[0], h1, X.fwd(yaw, d1)[2])
         p2 = (X.fwd(yaw, d2)[0], size / 2, X.fwd(yaw, d2)[2])
@@ -304,17 +327,17 @@ def slam(g):
     tl.at(imp + 16, 'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p3cb]')
     for t in range(imp + 1, imp + 7):
         tl.at(t, f'execute {at_tip} run ' + g.particle('wax_on', '~ ~0.8 ~', (1.4, 0.6, 1.4), 0, 3),
-              f'execute {at_tip} run ' + g.dust(IMPACT_MID, 1.1, '~ ~0.4 ~', (1.6, 0.3, 1.6), 4))
+              f'execute {at_tip} run ' + g.dust(IMPACT_MID, 1.1, '~ ~0.4 ~', (1.6 * AREA, 0.3, 1.6 * AREA), 4))
 
     # ---- 30-47: 4-point star sparkles at the planted tip, twinkles
     spark = [(rng.uniform(-0.6, 0.6), rng.uniform(0.1, 1.7), rng.uniform(-0.5, 0.5)) for _ in range(6)]
-    for n, t in enumerate(range(30, 48, 3)):
+    for n, t in enumerate(range(W(30), W(48), 3)):
         x, y, z = spark[n]
         tl.at(t, f'execute {BODY} run ' + g.card('star', P(tip[0] + x, y, tip[2] + z), bb='center', spin=45, s0=0.05,
                                                  s1=rng.uniform(0.45, 0.75), life=7, fade=3),
               f'execute {at_tip} run ' + g.particle('end_rod', '~ ~0.8 ~', (0.25, 0.6, 0.25), 0.01, 2))
-    tl.at(42, f'execute {at_tip} run ' + g.sound('block.amethyst_block.chime', 0.5, 1.9))
-    tl.at(45, f'execute {at_tip} run ' + g.sound('block.amethyst_block.chime', 0.4, 2.0))
+    tl.at(W(42), f'execute {at_tip} run ' + g.sound('block.amethyst_block.chime', 0.5, 1.9))
+    tl.at(W(45), f'execute {at_tip} run ' + g.sound('block.amethyst_block.chime', 0.4, 2.0))
 
     # ---- 47-53: pull-out
     tl.at(pullt - 1, f'execute {at_tip} run ' + g.sound('block.chain.break', 0.8, 0.6),
@@ -325,8 +348,8 @@ def slam(g):
           f'execute {at_tip} run ' + X.item_display(X.card_model('ring'), p3tags('rlk_mb_gd_p3po'), X.tf((0, 0.08, 0), X.FLAT_UP, 0.8)))
     tl.at(pullt + 1, X.merge('@e[type=minecraft:item_display,tag=rlk_mb_gd_p3po]', X.tf((0, 0.08, 0), X.FLAT_UP, 3.4), 4))
     tl.at(pullt + 6, 'kill @e[type=minecraft:item_display,tag=rlk_mb_gd_p3po]')
-    for t in range(pullt + 1, 61):
-        tl.at(t, *streak(g, LIFT, t, TRAIL_CORE if t < 54 else TRAIL_MID, 0.9 if t < 54 else 0.7, 4))
+    for t in range(pullt + 1, W(61)):
+        tl.at(t, *streak(g, lift_p, t, TRAIL_CORE if t < twirl else TRAIL_MID, 0.9 if t < twirl else 0.7, 4))
 
     # ---- 54-70: twirl to idle
     for t in (twirl + 1, twirl + 6):
@@ -335,17 +358,17 @@ def slam(g):
 
     tick, start_extra = tl.emit([
         f'# P3 tick (@s = body, #gdPT = slam clip tick). Busy ticks run p/{k}/k/<t>. The body never moves:',
-        '# the core closed in to 3 b; she turns to the player until the aim locks at the ring (9); the',
-        '# spear is planted 26-48 (rig API §4).'])
+        f'# the core closed in to 3 b; she turns to the player until the aim locks at the ring ({ring}); the',
+        f'# spear is planted {imp}-{pullt} (rig API §4).'])
     g.pw(k, 'start', [
-        '# P3 start (@s = body, within 3 b after the core\'s close-in): slam clip (70 t: raise 0, ring 9,',
-        '# glint 12, down 22, impact 26, pull 48, twirl 54).',
+        f'# P3 start (@s = body, within 3 b after the core\'s close-in): slam clip ({length} t: raise 0, ring {ring},',
+        f'# glint {glint}, down {down}, impact {imp}, pull {pullt}, twirl {twirl}).',
         g.rig('face/player'),
         g.play(k)] + start_extra)
     g.pw(k, 'tick', tick)
     g.pw(k, 'vis', [
         '# hz_vis of the slam disc (@s = hazard marker on the floor, rotated = aim; #hzEv 0 create / 1 strike / 2 end):',
-        '# a thin gold ring decal (Navia ring card, ring at r 5) that widens and turns until the strike.',
+        f'# a thin gold ring decal (Navia ring card, ring at r {X.L.num(SLAM_R)}) that widens and turns until the strike.',
         f'execute if score #hzEv mb matches 0 run summon minecraft:item_display ~ ~0.04 ~ {{{X.tags(*p3tags("rlk_mb_hzfx", "rlk_mb_gd_p3ring"))},'
         f'billboard:"fixed",{X.BRIGHT},view_range:3f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,'
         f'{X.tf((0, 0, 0), X.FLAT_UP, S_RING * 0.86)},item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{X.card_model("ring")}"}}}}}}',
@@ -360,22 +383,27 @@ def slam(g):
 P4TAG = 'rlk_mb_gd_p4'
 CLAW = (-0.30, 2.95, 0.90)               # the corrupted right claw while casting (pull clip 8-32)
 HOLD_TIP = (2.70, 3.26, -0.75)           # spear tip behind her left shoulder in the swing hold (5-17)
-SWING_R = 5.5
-# measured spear-tip angles (deg, 0 = her front, + = her left) on the swing clip ticks
-SW1 = {18: 31, 19: -20, 20: -60, 21: -132, 22: -204, 23: -276, 24: -348, 25: -420}
-SW2 = {33: -63, 34: -3, 35: 57, 36: 120, 37: 179, 38: 239, 39: 311}
+SWING_R = 6.8                            # K15 r 5-6 (was 5.5), x1.24 (user tuning: about r 6.5-7)
+SW_K = SWING_R / 5.5                     # scale of the swing fx authored for r 5.5
+# measured spear-tip angles (deg, 0 = her front, + = her left) on the authored swing clip ticks, mapped to the played
+# ticks (the strikes sit on a 1:1 segment of the retiming, so the angles stay exact)
+SW1 = {rt('swing', t): a for t, a in {18: 31, 19: -20, 20: -60, 21: -132, 22: -204, 23: -276, 24: -348, 25: -420}.items()}
+SW2 = {rt('swing', t): a for t, a in {33: -63, 34: -3, 35: 57, 36: 120, 37: 179, 38: 239, 39: 311}.items()}
 SW1_Y, SW2_Y = 1.9, 1.5                  # crescent planes (swing 1 level, swing 2 tilted, low in front)
 SW2_TILT = (0, 11)
-CAGE = [  # (spawn tick, centre x, y, z around the body feet, edge)
-    (11, 0.12, 0.26, 0.10, 0.52), (12, -0.30, 0.30, -0.16, 0.50), (13, 0.26, 0.66, -0.28, 0.46),
-    (13, -0.12, 0.72, 0.30, 0.50), (14, -0.34, 0.98, 0.08, 0.54), (15, 0.30, 1.16, 0.20, 0.50),
-    (16, -0.20, 1.36, -0.30, 0.50), (17, 0.08, 1.56, 0.34, 0.46), (18, -0.30, 1.80, 0.06, 0.50),
-    (19, 0.26, 1.90, -0.22, 0.48), (20, 0.00, 2.14, 0.02, 0.44)]
+CAGE = [  # (spawn tick (played), centre x, y, z around the body feet, edge); authored ticks 11-20
+    (rt('pull', t), x, y, z, e) for t, x, y, z, e in (
+        (11, 0.12, 0.26, 0.10, 0.52), (12, -0.30, 0.30, -0.16, 0.50), (13, 0.26, 0.66, -0.28, 0.46),
+        (13, -0.12, 0.72, 0.30, 0.50), (14, -0.34, 0.98, 0.08, 0.54), (15, 0.30, 1.16, 0.20, 0.50),
+        (16, -0.20, 1.36, -0.30, 0.50), (17, 0.08, 1.56, 0.34, 0.46), (18, -0.30, 1.80, 0.06, 0.50),
+        (19, 0.26, 1.90, -0.22, 0.48), (20, 0.00, 2.14, 0.02, 0.44))]
 CAGE_EYE = 1.3                          # first person: no cage cube reaches above this
 # screen overlay frames per pull tick (title font glyphs; frames and their texts: guardian_screen.mjs via the
-# rig manifest): vignette closes 22-27, flash 28-29, field + star 30, red diamond 31, vignette reopens 32-38
-SCR_FRAMES = {22: 'vig0', 23: 'vig1', 24: 'vig2', 25: 'vig3', 26: 'vig4', 27: 'vig5', 28: 'flash', 29: 'flash',
-              30: 'field', 31: 'diamond', 32: 'vig5', 33: 'vig5', 34: 'vig4', 35: 'vig3', 36: 'vig2', 37: 'vig1', 38: 'vig0'}
+# rig manifest): vignette closes 14-19, flash 20-21, field + star 22, red diamond 23, vignette reopens 24-30
+# (authored 22-38; the retiming keeps this part 1:1, every frame stays)
+SCR_FRAMES = {rt('pull', t): n for t, n in {22: 'vig0', 23: 'vig1', 24: 'vig2', 25: 'vig3', 26: 'vig4', 27: 'vig5', 28: 'flash', 29: 'flash',
+              30: 'field', 31: 'diamond', 32: 'vig5', 33: 'vig5', 34: 'vig4', 35: 'vig3', 36: 'vig2', 37: 'vig1', 38: 'vig0'}.items()}
+SCR_FIRST = min(SCR_FRAMES)
 SCR_LAST = max(SCR_FRAMES)               # its frame fades out over 4 t
 
 
@@ -388,39 +416,41 @@ def pull(g):
     tl = TL(g, k)
     rng = random.Random(4044)
     aura, cage0 = ev('pull', 'aura'), ev('pull', 'cage')
-    assert RELOC - aura >= 28, 'K14: the pull needs a tell of at least 28 t'
+    assert RELOC - aura >= 20, 'K14 (tuned): the pull needs a tell of at least 20 t'
+    W = lambda t: rt('pull', t)       # authored (source) pull tick -> played tick
     s1 = SWING_AT + ev('swing', 'swing1')
     s2 = SWING_AT + ev('swing', 'swing2')
-    tell = 20
-    assert s2 - tell > SWING_AT and tell >= 12
+    tell = SWING_TELL
+    assert s2 - tell > SWING_AT and tell >= 10 and s1 - SWING_AT == tell
     end = SWING_AT + SWING_LEN
     new = 'rlk_mb_gd_p4new'
     body_feet = 'at @e[tag=rlk_body,limit=1]'
     # #gp4Ok: 0 before the check / pull refused, 1 line of sight + pulled, 2 no pull (blocked) but she swings in place
-    tl.gated(28, PULL_LEN - 1, 'if score #gp4Ok mb matches 1 ')
+    tl.gated(W(28), PULL_LEN - 1, 'if score #gp4Ok mb matches 1 ')
     tl.gate[PULL_LEN] = ''
     tl.gated(PULL_LEN + 1, end, 'if score #gp4Ok mb matches 1.. ')
     assert SCREEN and set(SCR_FRAMES.values()) <= set(SCREEN['frames']), 'rig manifest: run build_mboss_guardian_rig.mjs'
 
     # ---- 0-31: aura behind her, swirling mist, crimson arcs, the claw; she tracks the player
     tl.span(1, RELOC - 1, g.rig('face/track'))
-    tl.at(4, g.sound('block.fire.extinguish', 0.25, 1.7))
-    tl.at(6, g.sound('entity.warden.sonic_charge', 0.35, 1.4))
+    tl.at(W(4), g.sound('block.fire.extinguish', 0.25, 1.7))
+    tl.at(W(6), g.sound('entity.warden.sonic_charge', 0.35, 1.4))
     for t in (8, 13, 18, 23):
-        tl.at(t, g.sound('block.fire.ambient', 0.8, 0.7 + 0.1 * ((t - 8) // 5)))
-    tl.at(14, g.sound('block.respawn_anchor.charge', 0.6, 1.3))
+        tl.at(W(t), g.sound('block.fire.ambient', 0.8, 0.7 + 0.1 * ((t - 8) // 5)))
+    tl.at(W(14), g.sound('block.respawn_anchor.charge', 0.6, 1.3))
     for t in range(1, PULL_LEN + 1):
+        u = inv('pull', t)            # authored time: the aura is authored on the source timeline
         live = t <= RELOC
         lines = []
-        nh = min(2 + t // 3, 8) if live else max(1, 8 - (t - RELOC))
+        nh = min(2 + int(u) // 3, 8) if live else max(1, 8 - (t - RELOC))
         lines.append(f'execute {BODY} run ' + g.dust_fade(CRIMSON, MIST, 1.6, P(0, 1.9, -0.8), (0.7, 0.9, 0.35), nh))
-        if t >= 2:
+        if u >= 2:
             for kk in range(3 if live else 1):
-                a = math.radians(t * 41 + kk * 120)
-                r = 1.15 + 0.3 * math.sin(t / 3 + kk)
-                y = 0.9 + kk * 0.8 + 0.4 * math.sin(t / 5 + kk)
+                a = math.radians(u * 41 + kk * 120)
+                r = 1.15 + 0.3 * math.sin(u / 3 + kk)
+                y = 0.9 + kk * 0.8 + 0.4 * math.sin(u / 5 + kk)
                 lines.append(f'execute {BODY} run ' + g.dust(AURA, 1.3, P(r * math.sin(a), y, r * math.cos(a)), (0.08, 0.08, 0.08), 2))
-        if live and t >= 4 and t % 2 == 0 and t <= 28:
+        if live and u >= 4 and t % 2 == 0 and u <= 28:
             a0, r0 = rng.uniform(0, 360), rng.uniform(0.5, 1.0)
             a1, r1 = a0 + rng.uniform(70, 140), rng.uniform(0.9, 1.5)
             p0 = (X.fwd(a0, r0)[0], rng.uniform(1.4, 3.0), X.fwd(a0, r0)[2])
@@ -432,11 +462,11 @@ def pull(g):
                 b = 4 * u * (1 - u)
                 p = (p[0] * (1 + 0.35 * b), p[1] + bulge[1] * b, p[2] * (1 + 0.35 * b))
                 lines.append(f'execute {BODY} run ' + g.dust(AURA_PINK if i % 3 else (1.0, 0.82, 0.86), 0.7, P(*p), (0, 0, 0), 1))
-        if live and t >= 6:
+        if live and u >= 6:
             lines.append(f'execute {BODY} run ' + g.dust((0.9, 0.2, 0.3), 1.0, P(*CLAW), (0.1, 0.1, 0.1), 2))
             if t % 3 == 0:
                 lines.append(f'execute {BODY} run ' + g.dust((1.0, 0.75, 0.8), 0.6, P(*CLAW), (0.03, 0.03, 0.03), 1))
-        if live and t >= 8 and t % 2 == 0:
+        if live and u >= 8 and t % 2 == 0:
             lines.append(f'execute {BODY} run ' + g.particle('crimson_spore', P(0, 1.8, 0), (1.2, 1.2, 1.2), 0, 4))
         tl.at(t, *lines)              # after the relocation: the decaying haze (gated on #gp4Ok)
 
@@ -444,7 +474,7 @@ def pull(g):
     rc_sum = {}
     rc_blocks = ['red_concrete', 'red_stained_glass', 'black_concrete', 'red_concrete', 'red_stained_glass', 'black_concrete']
     for j, blk in enumerate(rc_blocks):
-        t0 = 10 + j
+        t0 = W(10 + j)
         tg = f'rlk_mb_gd_p4rc{j}'
         sel = f'@e[type=minecraft:block_display,tag={tg}]'
         a = j * 60 + rng.uniform(-20, 20) + 150
@@ -475,7 +505,7 @@ def pull(g):
               f'execute {body_feet} run ' + g.particle('block{block_state:"minecraft:black_concrete"}', f'~{X.L.num(x)} ~{X.L.num(y)} ~{X.L.num(z)}', (0.15, 0.15, 0.15), 0, 3))
         tl.at(t0 + 1, X.merge(f'@e[type=minecraft:block_display,tag={tg}]', X.cube_tf((x, y, z), e, q), 2))
     tl.span(cage0 + 1, RELOC - 1, f'execute {body_feet} run tp @e[type=minecraft:block_display,tag=rlk_mb_gd_p4cage] ~ ~ ~')
-    for t in range(17, RELOC):
+    for t in range(W(17), RELOC):
         tl.at(t, f'execute {body_feet} run ' + g.dust(CAGE_RED, 1.2, '~ ~1.1 ~', (0.45, 0.8, 0.45), 4),
               f'execute {body_feet} run ' + g.dust(CAGE_GLOW, 1.5, '~ ~1.1 ~', (0.55, 0.9, 0.55), 2))
 
@@ -485,17 +515,17 @@ def pull(g):
         # the F5 crosshair title (view/ride_tick, every 10 t) rests until the last frame has faded (vBig)
         lines = [f'scoreboard players set @a[tag=player] vBig {SCR_LAST - t + 6}',
                  f'title @a[tag=player] times {fade}', f'title @a[tag=player] title {SCREEN["frames"][name]}']
-        if t == 22:
+        if t == SCR_FIRST:
             lines.insert(0, '# Screen overlay: every frame is a title of 4 glyph tiles (one flat glyph for the flash).')
         if t == RELOC:
             continue                    # shown by p/pull/reloc after a successful pull
         tl.at(t, *lines)
-    tl.at(27, '# Line of sight (K14), checked before the flash: blocked -> the cage shatters, no pull, she swings in place.',
+    tl.at(W(27), '# Line of sight (K14), checked before the flash: blocked -> the cage shatters, no pull, she swings in place.',
           g.fn('p/pull/los'),
           f'execute unless score #gp4Ok mb matches 1 run {g.fn("p/pull/fizzle")}')
-    tl.at(28, g.sound('entity.enderman.teleport', 1.0, 0.6), g.sound('block.respawn_anchor.deplete', 0.9, 1.0),
+    tl.at(W(28), g.sound('entity.enderman.teleport', 1.0, 0.6), g.sound('block.respawn_anchor.deplete', 0.9, 1.0),
           f'execute {body_feet} run ' + g.particle('reverse_portal', '~ ~1 ~', (0.4, 0.8, 0.4), 0.05, 20))
-    tl.at(31, g.sound('entity.illusioner.mirror_move', 1.0, 1.0))
+    tl.at(W(31), g.sound('entity.illusioner.mirror_move', 1.0, 1.0))
 
     # ---- 32: the relocation (undodgeable): 1 b in front of her, facing her
     arr = []
@@ -530,9 +560,10 @@ def pull(g):
           f'execute if score #gp4Ok mb matches 0 run {g.set_len(PULL_LEN)}',
           f'execute if score #gp4Ok mb matches 0 run {g.end()}')
 
-    # ---- 44-95: the two 360 swings
+    # ---- the two 360 swings (swing clip from SWING_AT)
     tl.at(SWING_AT,
-          f'# Swing clip (51 t): wind-up 0-5, hold 5-19, swing 1 at clip 20 (= {s1}), swing 2 at clip 33 (= {s2}).',
+          f'# Swing clip ({SWING_LEN} t): wind-up 0-5, hold 5-{ev("swing", "swing1") - 1}, swing 1 at clip {ev("swing", "swing1")} (= {s1}), '
+          f'swing 2 at clip {ev("swing", "swing2")} (= {s2}); hazards r {X.L.num(SWING_R)}, tell {tell}.',
           g.play('swing'),
           'scoreboard players set #hzSfx mb 0', 'scoreboard players set #hzAct mb 3',
           f'scoreboard players set #hzVis mb {4 * 10 + 1}',
@@ -547,7 +578,7 @@ def pull(g):
         tl.at(t0 + 1, X.merge(f'@e[type=minecraft:item_display,tag=rlk_mb_gd_p4r{kk}]',
                               X.tf((0, 0, 0), X.qmul(X.yaw_q(-100 if kk == 1 else 100), X.FLAT_UP), S_RING), tell - 2))
     # hold: gold glint and motes on the spear behind her shoulders
-    hold = SWING_AT + 5
+    hold = SWING_AT + rt('swing', 5)
     tl.at(hold, f'execute {BODY} run ' + g.card('star', P(*HOLD_TIP), bb='center', spin=60, s0=0.2, s1=1.4, life=8, fade=3),
           g.sound('block.amethyst_block.chime', 0.5, 1.7), g.sound('block.beacon.power_select', 0.35, 1.8))
     for t in range(hold, s1 - 1, 3):
@@ -592,30 +623,31 @@ def pull(g):
         return out
 
     for s, y, tilt, pitch in ((s1, SW1_Y, None, 0.7), (s2, SW2_Y, SW2_TILT, 0.65)):
-        pts = ring_pts(4.6, y, 28, tilt)
+        pts = ring_pts(4.6 * SW_K, y, 34, tilt)
         tl.at(s - 2, g.sound('item.trident.riptide_1', 0.4, 1.4 if s == s1 else 1.3),
               g.sound('entity.player.attack.knockback', 0.6, 0.6 if s == s1 else 0.55))
         tl.at(s, g.sound('entity.player.attack.sweep', 1.0, pitch), g.sound('item.trident.riptide_1', 0.3, 1.5),
               *[f'execute {BODY} run ' + g.dust(TRAIL_CORE, 1.3, P(*p), (0.05, 0.05, 0.05), 1) for p in pts],
-              *[f'execute {BODY} run ' + g.particle('sweep_attack', P(*p), (0, 0, 0), 0, 1) for p in ring_pts(3.6, y, 6, tilt)])
+              *[f'execute {BODY} run ' + g.particle('sweep_attack', P(*p), (0, 0, 0), 0, 1) for p in ring_pts(3.6 * SW_K, y, 7, tilt)])
         tl.at(s + 2, g.sound('entity.player.attack.sweep', 0.6, pitch + 0.15))
         for t in range(s + 3, s + 9):
-            pts2 = [p for i, p in enumerate(ring_pts(rng.uniform(3.4, 5.0), y, 10, tilt)) if (i + t) % 2 == 0]
+            pts2 = [p for i, p in enumerate(ring_pts(rng.uniform(3.4, 5.0) * SW_K, y, 10, tilt)) if (i + t) % 2 == 0]
             tl.at(t, *[f'execute {BODY} run ' + g.particle('falling_dust{block_state:"minecraft:black_concrete"}', P(*p), (0.2, 0.1, 0.2), 0, 1) for p in pts2[:3]],
                   *[f'execute {BODY} run ' + g.particle('wax_on', P(*p), (0.3, 0.2, 0.3), 0, 1) for p in pts2[3:5]],
-                  f'execute {BODY} run ' + g.dust(DARK, 0.9, P(0, y, 0), (3.0, 0.3, 3.0), 3))
+                  f'execute {BODY} run ' + g.dust(DARK, 0.9, P(0, y, 0), (3.0 * SW_K, 0.3, 3.0 * SW_K), 3))
 
-    # recovery twirl (swing clip 39-51)
+    # recovery twirl (authored swing clip 39-51)
     for c in (42, 46):
-        tl.at(SWING_AT + c, g.sound('item.trident.riptide_1', 0.35, 1.4), g.sound('entity.player.attack.sweep', 0.45, 0.7))
+        tl.at(SWING_AT + rt('swing', c), g.sound('item.trident.riptide_1', 0.35, 1.4), g.sound('entity.player.attack.sweep', 0.45, 0.7))
     tl.at(end, g.end())
 
     tick, start_extra = tl.emit([
-        '# P4 tick (@s = body, #gdPT = pull clip tick 0-40, then the swing clip from 44). Busy ticks run',
-        f'# p/{k}/k/<t>; 28-39 only while #gp4Ok is 1 (line of sight at 27, pull at 32), the swings from 41 while it',
+        f'# P4 tick (@s = body, #gdPT = pull clip tick 0-{PULL_LEN}, then the swing clip from {SWING_AT}). Busy ticks run',
+        f'# p/{k}/k/<t>; {W(28)}-{PULL_LEN - 1} only while #gp4Ok is 1 (line of sight at {W(27)}, pull at {RELOC}), the swings from {PULL_LEN + 1} while it',
         '# is 1 (pulled) or 2 (no line of sight / blocked destination: she swings in place).'])
     g.pw(k, 'start', [
-        '# P4 start (@s = body, player far): pull clip (aura 0, cage 11, relocate 32), voice line, hiss + charge.',
+        f'# P4 start (@s = body; from closer than 5 b the core first hopped back, ai/back): pull clip (aura 0, cage {cage0},',
+        f'# relocate {RELOC}), voice line, hiss + charge.',
         'scoreboard players set #gp4Ok mb 0',
         g.rig('face/player'),
         g.play(k),
@@ -671,7 +703,7 @@ def pull(g):
         'title @a[tag=player] title ""',
         'execute as @a[tag=player] if score #on view matches 1 if score #vmode view matches 2 if entity @e[tag=rlk_vseat,limit=1] run function rlk:view/xhair'])
     S_RING = 2 * SWING_R / 0.86
-    vis = ['# hz_vis of the swing hazards (@s = marker at her feet; 41 swing 1, 42 swing 2): a gold ring decal at r 5.5',
+    vis = [f'# hz_vis of the swing hazards (@s = marker at her feet; 41 swing 1, 42 swing 2): a gold ring decal at r {X.L.num(SWING_R)}',
            '# that turns (opposite ways for the two swings) until its strike.']
     for kk in (1, 2):
         vis.append(f'execute if score @s mbHzV matches {40 + kk} if score #hzEv mb matches 0 run summon minecraft:item_display ~ ~0.05 ~ '
@@ -688,5 +720,5 @@ def pull(g):
         '# P4 cancel (any executor): every entity of the pattern carries rlk_mb_gd_p4 (cage, cubes, crescents, ring',
         '# decals); the pull point and hazards go with lib_clear; the screen overlay ends if it runs.',
         f'kill @e[tag={P4TAG}]',
-        f'execute if score #gdPT mb matches 22..{SCR_LAST} run {g.fn("p/pull/scr_end")}',
+        f'execute if score #gdPT mb matches {SCR_FIRST}..{SCR_LAST} run {g.fn("p/pull/scr_end")}',
         'scoreboard players set #gp4Ok mb 0'])

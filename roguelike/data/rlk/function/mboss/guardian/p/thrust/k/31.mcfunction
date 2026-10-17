@@ -1,2 +1,4 @@
 # thrust clip tick 31
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.443 ^1.379 ^4.437 run particle minecraft:dust{color:[0.99f,0.86f,0.45f],scale:1} ~ ~ ~ 0.7 0.6 0.7 0 2 force @a[tag=player]
+playsound minecraft:entity.phantom.flap hostile @a[tag=player] ~ ~ ~ 0.55 0.75 0.18
+playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.25 1.2 0
+function rlk:mboss/mv/away {d:0.4}

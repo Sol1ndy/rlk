@@ -1,7 +1,5 @@
 # flyslam clip tick 21
-particle minecraft:dust_color_transition{from_color:[0.99f,0.33f,0.33f],to_color:[0.39f,0.12f,0.1f],scale:1.5} ~ ~3.515 ~ 0.3 0.6 0.3 0 5 force @a[tag=player]
-particle minecraft:block{block_state:"minecraft:black_concrete"} ~ ~3.315 ~ 0.25 0.4 0.25 0 3 force @a[tag=player]
-execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_q5t_0,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:12,transformation:{translation:[0.13f,-0.243f,-0.342f],left_rotation:[-0.769f,0.237f,-0.145f,0.576f],scale:[0.02f,0.02f,0.02f],right_rotation:[0f,0f,0f,1f]}}
-execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_q5t_1,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:13,transformation:{translation:[-0.329f,-0.233f,0.328f],left_rotation:[0.335f,0.104f,-0.693f,0.63f],scale:[0.019f,0.019f,0.019f],right_rotation:[0f,0f,0f,1f]}}
-execute at @s positioned ~ ~3.4 ~ positioned ^-0.243 ^0.532 ^-0.109 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p5","rlk_mb_gd_q5t","rlk_mb_gd_q5t_5"],block_state:{id:"minecraft:black_concrete"},brightness:{sky:11,block:11},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.137f,-0.21f,-0.144f],left_rotation:[-0.266f,-0.262f,-0.144f,0.916f],scale:[0.334f,0.334f,0.334f],right_rotation:[0f,0f,0f,1f]}}
-function rlk:mboss/guardian/p/flyslam/ring
+execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] run function rlk:fx/nv/card {kind:"glow",pos:"~ ~0.04 ~",rot:"0 90",bb:"fixed",roll:0,spin:0,s0:11,s1:11,move:"0f,0f,0f",life:10,fade:0}
+particle minecraft:dust_color_transition{from_color:[0.99f,0.33f,0.33f],to_color:[0.39f,0.12f,0.1f],scale:1.3} ~ ~9.812 ~ 0.25 0.35 0.25 0 3 force @a[tag=player]
+particle minecraft:block{block_state:"minecraft:black_concrete"} ~ ~9.412 ~ 0.2 0.3 0.2 0 2 force @a[tag=player]
+particle minecraft:dust{color:[0.99f,0.86f,0.45f],scale:1} ~ ~10.612 ~ 0.3 0.3 0.3 0 2 force @a[tag=player]

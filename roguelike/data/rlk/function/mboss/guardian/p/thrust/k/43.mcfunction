@@ -1,4 +1,4 @@
 # thrust clip tick 43
-kill @e[type=minecraft:block_display,tag=rlk_mb_gd_q1a]
-execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p1bar] run data merge entity @s {start_interpolation:0,interpolation_duration:15,transformation:{translation:[-1.04f,0.034f,0f],left_rotation:[0f,0f,0f,1f],scale:[2.08f,0.012f,7f],right_rotation:[0f,0f,0f,1f]}}
-execute at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_gd_p1u,limit=1] feet run tp @s ~ ~ ~ ~ 0
+execute at @s rotated as @s rotated ~ 0 positioned ^-0.776 ^3.206 ^1.372 run particle minecraft:dust{color:[0.988f,0.961f,0.682f],scale:0.7} ~ ~ ~ 0.04 0.04 0.04 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-1.012 ^2.349 ^1.767 run particle minecraft:dust{color:[0.988f,0.961f,0.682f],scale:0.7} ~ ~ ~ 0.04 0.04 0.04 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-1.209 ^1.634 ^2.097 run particle minecraft:dust{color:[0.988f,0.961f,0.682f],scale:0.7} ~ ~ ~ 0.04 0.04 0.04 0 1 force @a[tag=player]

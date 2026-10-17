@@ -1,23 +1,7 @@
 # flyslam clip tick 31
-particle minecraft:dust_color_transition{from_color:[0.99f,0.33f,0.33f],to_color:[0.39f,0.12f,0.1f],scale:1.3} ~ ~9.847 ~ 0.25 0.35 0.25 0 3 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^0 ^0.12 ^2.25 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^0.695 ^0.12 ^2.14 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^1.323 ^0.12 ^1.82 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^1.82 ^0.12 ^1.323 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^2.14 ^0.12 ^0.695 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^2.25 ^0.12 ^0 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^2.14 ^0.12 ^-0.695 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^1.82 ^0.12 ^-1.323 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^1.323 ^0.12 ^-1.82 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^0.695 ^0.12 ^-2.14 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^0 ^0.12 ^-2.25 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-0.695 ^0.12 ^-2.14 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-1.323 ^0.12 ^-1.82 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-1.82 ^0.12 ^-1.323 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-2.14 ^0.12 ^-0.695 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-2.25 ^0.12 ^0 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-2.14 ^0.12 ^0.695 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-1.82 ^0.12 ^1.323 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-1.323 ^0.12 ^1.82 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-0.695 ^0.12 ^2.14 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] run playsound minecraft:block.beacon.deactivate hostile @a[tag=player] ~ ~ ~ 0.8 1.8 0.27
+kill @e[type=minecraft:block_display,tag=rlk_mb_gd_q5t_2]
+kill @e[type=minecraft:block_display,tag=rlk_mb_gd_q5t_8]
+function rlk:mboss/guardian/p/flyslam/impact
+execute at @s positioned ~ ~0.5 ~ positioned ^-0.883 ^0.025 ^0.743 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p5","rlk_mb_gd_q5i","rlk_mb_gd_q5i_4"],block_state:{id:"minecraft:brown_terracotta"},brightness:{sky:11,block:11},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.212f,-0.139f,-0.187f],left_rotation:[-0.625f,-0.51f,-0.589f,0.047f],scale:[0.364f,0.364f,0.364f],right_rotation:[0f,0f,0f,1f]}}
+execute at @s positioned ~ ~0.5 ~ positioned ^-0.991 ^0.122 ^-0.278 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p5","rlk_mb_gd_q5i","rlk_mb_gd_q5i_8"],block_state:{id:"minecraft:gold_block"},brightness:{sky:15,block:15},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.056f,-0.012f,-0.135f],left_rotation:[0.427f,-0.023f,0.21f,0.879f],scale:[0.169f,0.169f,0.169f],right_rotation:[0f,0f,0f,1f]}}
+execute at @s positioned ~ ~0.5 ~ positioned ^0.249 ^-0.164 ^0.738 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p5","rlk_mb_gd_q5i","rlk_mb_gd_q5i_11"],block_state:{id:"minecraft:brown_terracotta"},brightness:{sky:11,block:11},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.084f,-0.307f,-0.016f],left_rotation:[-0.305f,0.025f,0.199f,0.931f],scale:[0.368f,0.368f,0.368f],right_rotation:[0f,0f,0f,1f]}}

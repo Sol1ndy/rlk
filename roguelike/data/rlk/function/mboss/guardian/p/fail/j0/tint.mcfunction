@@ -1,4 +1,4 @@
-# Spear 1: red -> the star colour (m4 +37..+40), top to bottom, chime.
+# Spear 1: red -> the star colour (m4 +37..+40, played +28..+30), top to bottom, chime.
 execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] run playsound minecraft:block.amethyst_block.chime hostile @a[tag=player] ~ ~ ~ 0.9 1.5 0.3
 execute if score #gp13K0 mb matches 1 as @e[type=minecraft:item_display,tag=rlk_mb_gd_p13s0,limit=1] run function rlk:mboss/guardian/p/fail/tint1_1
 execute if score #gp13K0 mb matches 1 at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] positioned ~ ~11 ~ run particle minecraft:dust{color:[1f,0.86f,0.66f],scale:1.3} ~ ~ ~ 0.25 0.3 0.25 0 3 force @a[tag=player]

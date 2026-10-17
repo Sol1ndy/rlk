@@ -276,7 +276,8 @@ for (const c of CLIPS) {
   fn(`c/${c.name}/run`, [...head, ...tree(0, 0, runTicks)]);
   fn(`play/${c.name}`, [`# Play clip ${c.name} (${c.len} t) from its tick 0 at the next rig/tick (the same game tick when rig/tick runs later). @s = rig anchor.`, `scoreboard players set @s gdRigC ${c.id}`, 'scoreboard players set @s gdRigT -1']);
   fn(`start/${c.name}`, [`# Internal: chain into ${c.name} now (tick 0 applied immediately). @s = rig anchor.`, `scoreboard players set @s gdRigC ${c.id}`, 'scoreboard players set @s gdRigT 0', `function ${NS}/c/${c.name}/k/0`]);
-  clipInfo.push({id: c.id, name: c.name, len: c.len, loop: !!c.loop, next: c.next || null, events: c.events || {}, keyFiles: ticks.length, keys: keyCount, note: c.note || ''});
+  clipInfo.push({id: c.id, name: c.name, len: c.len, loop: !!c.loop, next: c.next || null, events: c.events || {}, keyFiles: ticks.length, keys: keyCount, note: c.note || '',
+    ...(c.retime ? {authoredLen: c.authoredLen, retime: c.retime} : {})});
 }
 if (motionErrors.length) {
   const msg = `part rotations above ${MAX_STEP_DEG} degrees per tick or per key:\n  ` + motionErrors.slice(0, 120).join('\n  ') + (motionErrors.length > 120 ? `\n  ... ${motionErrors.length} in all` : '');

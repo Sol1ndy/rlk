@@ -69,7 +69,7 @@ Order inside the boss tick: run the AI first, which may call `play/...`, `face/.
     (`cubes_b`, `cubes_b_1`..`cubes_b_7`); every clip swaps them every 5 t (per 40 t cube cycle). Pattern code never sets its item model.
 - Body parts use brightness 12-13 (sky 15), `width`/`height` 16 and `view_range` 2.5.
 - Clips compile to interpolation segments. A part gets a key only where the client's lerp/slerp would drift from the authored pose by more than 0.012 b, 0.5-2° or 1.5 % scale.
-  - Result: 25 clips, about 980 key files and 10 100 part keys, about 2.8 MB.
+  - Result: 26 clips, about 940 key files and 10 100 part keys, about 2.8 MB.
   - Raiden's rig is 32 MB.
   - Dispatch is two small binary trees (clip id, then key tick), with no macros on the hot path.
 
@@ -93,31 +93,39 @@ The generator refuses to write a rig that fails these checks. `--allow-steps` an
   - chaos: +3 b hover, +4.8 b in the fail;
   - `death`: flies out.
 - While the spear is planted (it is a rig part), keep the anchor still:
-  - `slam` 26-48;
-  - `flyslam` 41-71;
+  - `slam` 20-42;
+  - `flyslam` 31-61;
   - `groggy_*`, and `getup` 0-8;
   - `entrance` 14-26.
 
 ## 5. Clips (ticks at 20/s; events are clip ticks)
 
+The keys in `guardian_clips.mjs` are authored on the reference-video timeline. `RETIME` (same file) plays the damaging
+clips with about 25 % shorter wind-ups (user tuning "공격 선딜 좀 짧게"): piecewise-linear knots [authored tick, played
+tick] from [0, 0] to [authored length, played length]; keys and events are mapped and rounded half up, and the build
+stops if two keys collide or a segment would slow the clip down. Fast strike and spin keys sit on 1:1 segments, so
+they keep their speed and land on their events; recoveries after the last hit are shifted, not shortened. The manifest
+carries `retime` and `authoredLen` for the retimed clips (the pattern generator maps its authored fx ticks with
+`api.rt`). Every number below is a played tick.
+
 | clip | id | len | then | events | notes and body travel |
 |---|---|---|---|---|---|
 | `idle` | 0 | 40 | loop | | Hover bob +0.05 b at t20. The corrupted arm reaches out to her right, and the claw holds the shaft at the crescent. The butt star sits on the halo's upper edge on her left. The wing tiers breathe, the skirt and tail sway, the legs swing out of step, the cubes drift. |
 | `glide` | 1 | 24 | loop | | Moving pose (approach, guard drift, reposition). She leans into the travel, the spear is level toward the target and the wing sweeps back. |
-| `thrust` | 2 | 91 | idle | glow 4, glint 19, **hit1 28**, rise 38, dive 54, **hit2 58**, land 65, flourish 72 | Lunge 2-3 b forward at 27-28. Fly back 4-6 b during 38-54. Dash 5-6 b along the dive at 57-58. |
-| `javelin` | 3 | 76 | idle | spin 0, vanish 10, glyph 11, beam 28, rematerialise 31, **release 35**, launch 36, return 58, catch 63 | A full spin of the spear around her (5-9) before it vanishes. The rig spear is hidden 10-31 and 36-63. The flying spear is a `prop/spear` moved by the pattern code: out at 36, back by 63. |
-| `slam` | 4 | 70 | idle | raise 0, ring 9, glint 12, down 22, **impact 26**, pull 48, twirl 54 | Disc r 5 centred 3.5 b in front. The ring leads by 17 t. The spear stays planted 26-48. |
-| `pull` | 5 | 40 | idle | aura 0, cage 11, **relocate 32** | The corrupted claw casts while the left hand holds the shaft. Play `swing` 10-14 t after the relocation (K15). |
-| `swing` | 6 | 51 | idle | windup 0, **swing1 20-24**, **swing2 33-39** | Two full 360° spins at waist height: a one-handed forehand (it comes round over 17-20), then a backhand rising from low right to high left. |
-| `flyslam` | 7 | 101 | idle | raise 0, glint 6, beam 16, takeoff 19, ring 21, gone 23, dive 39, **impact 41**, spikes 47, pull 71, twirl 79 | Up to +8 b at 19-23. Move the anchor to the locked ring centre during 23-39. The spear is planted 41-71. |
+| `thrust` | 2 | 79 | idle | glow 3, glint 14, **hit1 21**, rise 31, dive 42, **hit2 46**, land 53, flourish 60 | Lunge 2-3 b forward at 20-21. Fly back during 31-42. Dash 5-6 b along the dive at 45-46. (Authored 91: hits 28 / 58.) |
+| `javelin` | 3 | 67 | idle | spin 0, vanish 9, glyph 10, beam 20, rematerialise 22, **release 26**, launch 27, return 49, catch 54 | A full spin of the spear around her (4-8) before it vanishes. The rig spear is hidden 9-22 and 27-54. The flying spear is a `prop/spear` moved by the pattern code: out at 27, back by 54. (Authored 76.) |
+| `slam` | 4 | 64 | idle | raise 0, ring 7, glint 9, down 16, **impact 20**, pull 42, twirl 48 | Disc r 6 centred 3.5 b in front. The ring leads by 13 t. The spear stays planted 20-42. (Authored 70.) |
+| `pull` | 5 | 32 | idle | aura 0, cage 7, **relocate 24** | The corrupted claw casts while the left hand holds the shaft. Play `swing` 10-14 t after the relocation (K15). (Authored 40; the screen part 22-40 plays 1:1.) |
+| `swing` | 6 | 46 | idle | windup 0, **swing1 15-19**, **swing2 28-34** | Two full 360° spins at waist height: a one-handed forehand (it comes round over 12-15), then a backhand rising from low right to high left. (Authored 51.) |
+| `flyslam` | 7 | 91 | idle | raise 0, glint 5, beam 12, takeoff 14, ring 16, gone 18, dive 29, **impact 31**, spikes 37, pull 61, twirl 69 | Up to +8 b at 14-18. Move the anchor to the locked ring centre during 18-29. The spear is planted 31-61. (Authored 101.) |
 | `guard_entry` | 8 | 50 | guard | twirl 0, discs 16, ring 35, settle 44, guard 50 | Baton twirl, vertical spin discs to her right and then in front, the ground ring, then she settles into the guard pose. |
 | `guard` | 9 | 40 | loop | | Guard hold (100 t in the pattern): spear diagonal up-right, wing raised and opened. Drift the anchor about 1 b/s toward the player. Call `eye/gold` for the aura. |
-| `sweep` | 10 | 44 | idle | windup 0, **active 19-24** | Gold sweep: a 180-210° front arc from her left to her right, r 4.5-5. |
-| `sweep_e` | 11 | 50 | idle | enchant 0, windup 7, **active 19-27** | Enchanted sweep. Call `spear/<el>` before it and `spear/geo` after; the trails take the element colour too. |
+| `sweep` | 10 | 39 | idle | windup 0, **active 14-19** | Gold sweep: a 180-210° front arc from her left to her right (the pattern's arc is r 6). (Authored 44.) |
+| `sweep_e` | 11 | 45 | idle | enchant 0, windup 5, **active 14-22** | Enchanted sweep. Call `spear/<el>` before it and `spear/geo` after; the trails take the element colour too. (Authored 50.) |
 | `chaos_leap` | 12 | 32 | chaos_charge | leap 0, **land 32** | Leap 0-9, then an arcing flight 9-31: move the anchor to the arena centre. |
 | `chaos_charge` | 13 | 36 | chaos_hover | charge 0, flare 7, rise 30, hover 36 | Spear level on the centre for 30 t, then the rise to the hover (feet 3 b up). |
 | `chaos_hover` | 14 | 40 | loop | | Chaos hold: arms up, spear horizontal behind the shoulders, wing spread. |
-| `chaos_fail` | 15 | 40 | hold | twist 10, rise 21, high 25 | Timeout (tick 0 = timer full, T0): a twist with the wing swept across her front, then a rise to +4.8 b, held. See the fail sequence below. |
+| `chaos_fail` | 15 | 30 | hold | twist 8, rise 16, high 19 | Timeout (tick 0 = timer full, T0): a twist with the wing swept across her front, then a rise to +4.8 b, held. See the fail sequence below. (Authored 40.) |
 | `chaos_land` | 16 | 26 | hold | land 22 | She comes down to stand on the floor at the centre, the spear still across her shoulders, and holds that stance. |
 | `chaos_fall` | 17 | 20 | groggy_a | hang 0, fall 6, land 18 | The 2nd star breaks: she lets go with the left hand, the spear arm comes down round her right side, and she falls about 1 BH with no impact. |
 | `groggy_a` | 18 | 40 | loop | | Pose A: slumped, the spear planted head-down at her right, wing drooped, halo blazing. |
@@ -127,12 +135,13 @@ The generator refuses to write a rig that fails these checks. `--allow-steps` an
 | `death` | 22 | 80 | hold | slump 0, takeoff 22, gone 76 | Slump, then the fly-away to +15 b with a fade. Call `kill` after 80. |
 | `pose_ref` | 23 | 20 | loop | | The official render pose, for screenshots. |
 | `chaos_raise` | 24 | 24 | idle | raise 0, **overhead 6** | Fail spear 2: from the across-the-shoulders stance she raises the spear vertically overhead in 6 t, holds, then returns to idle. |
+| `backstep` | 25 | 12 | idle | push 2, peak 6, land 10 | P4 picked at melee range: a crouch to push off, a leaned-back hop about 1 b up (wing flared, legs trailing forward), the landing; the corrupted arm keeps the spear in its idle hold. The pattern code glides the anchor 6-7 b away from the player over 11 t. |
 
-**Chaos fail sequence** (patterns.md §9.4; T0 = chaos timer full):
+**Chaos fail sequence** (patterns.md §9.4 x0.75 after the wind-up tuning; T0 = chaos timer full):
 1. At T0, play `chaos_fail`.
-2. At T0+33 (`chaos_fail` tick 33), play `chaos_land`. She lands at T0+55, between fail spear 1 (impact T0+49) and fail spear 2 (impact T0+80).
-3. For a second surviving star, play `chaos_raise` at T0+74, so the spear is overhead at the drop.
-4. After the last spear, play `idle` or `glide`. She leaves the centre at about T0+90.
+2. At T0+25, play `chaos_land`. She lands at T0+47, between fail spear 1 (impact T0+37) and fail spear 2 (impact T0+60).
+3. For a second surviving star, play `chaos_raise` at T0+54, so the spear is overhead at the drop.
+4. After the last spear, play `idle` or `glide`. She leaves the centre at about T0+70.
 
 Hit geometry, damage, telegraphs, sounds and FX belong to the pattern code (patterns.md §3-§11, plan.md K-decisions). The clips only time the body.
 

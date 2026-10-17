@@ -1,4 +1,4 @@
-# @s = body, pull tick 32: the player 1 b in front of her (floor height, facing her; pull/start t 0 = at once).
+# @s = body, pull tick 24: the player 1 b in front of her (floor height, facing her; pull/start t 0 = at once).
 # Refused (dead, reviving, selection screen, map view) -> #gp4Ok 0 (the pattern ends at 40). Placed but not
 # moved (pull/finish found the destination blocked) -> fizzle, she swings in place.
 execute store success score #gp4Ok mb rotated as @s rotated ~ 0 positioned ^ ^ ^1 positioned ~ 201 ~ run function rlk:mboss/pull/start {t:0}

@@ -1,14 +1,14 @@
 # @s = body. Range-filtered, weighted shuffle bag with no immediate repeat (K2/K3):
-# P1 melee/mid, P2 mid/far, P3 melee, P4 mid/farx3 (from 5 b), P5 farx3 (melee <= 4.0 b, far >= 8.0 b).
-# Pull guarantee: P4 has not run in this stretch of normals (#gdP4N 0), this is the stretch's last
-# pick (#gdLeft 0) and the player is out of melee -> P4 now (so it shows up in every stretch in which
-# the player keeps out of melee).
+# P1 meleex2/mid, P2 mid/far, P3 meleex2, P4 melee/mid/farx3, P5 farx3 (melee <= 4.0 b, far >= 8.0 b).
+# Pull guarantee: P4 has not run in this stretch of normals (#gdP4N 0) and this is the stretch's last
+# pick (#gdLeft 0) -> P4 now, at any distance (from melee range she hops back first, ai/back), so it
+# shows up in every stretch of normals.
 function rlk:mboss/mv/dist
 scoreboard players operation #gdDist mb = #mbDist mb
 scoreboard players set #gdBand mb 2
 execute if score #gdDist mb matches ..40 run scoreboard players set #gdBand mb 1
 execute if score #gdDist mb matches 80.. run scoreboard players set #gdBand mb 3
-execute if score #gdP4N mb matches 0 if score #gdLeft mb matches ..0 if score #gdDist mb matches 41.. unless score #gdLast mb matches 4 run return run function rlk:mboss/guardian/ai/pity
+execute if score #gdP4N mb matches 0 if score #gdLeft mb matches ..0 unless score #gdLast mb matches 4 run return run function rlk:mboss/guardian/ai/pity
 function rlk:mboss/guardian/ai/cand
 execute if score #gdCn mb matches 0 run function rlk:mboss/guardian/ai/refill
 execute if score #gdCn mb matches 0 run function rlk:mboss/guardian/ai/cand

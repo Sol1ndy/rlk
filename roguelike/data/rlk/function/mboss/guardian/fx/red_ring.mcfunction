@@ -1,4 +1,4 @@
-# Red gyroscope ring around her upper body (fail +18).
+# Red gyroscope ring around her upper body (fail +14, m4 +18).
 execute rotated 0 0 run particle minecraft:dust{color:[0.7f,0.04f,0.18f],scale:1.5} ^ ^5.4 ^1.9 0 0.05 0 0 2 force @a[tag=player]
 execute rotated 30 0 run particle minecraft:dust{color:[0.7f,0.04f,0.18f],scale:1.5} ^ ^5.4 ^1.9 0 0.05 0 0 2 force @a[tag=player]
 execute rotated 60 0 run particle minecraft:dust{color:[0.7f,0.04f,0.18f],scale:1.5} ^ ^5.4 ^1.9 0 0.05 0 0 2 force @a[tag=player]

@@ -1,8 +1,10 @@
-# Spear 2 (T0+54): the target locks on the player (decal frame: toward the arena centre);
+# Spear 2 (T0+40): the target locks on the player (decal frame: toward the arena centre);
 # a gold cube column starts above it.
 kill @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1]
 scoreboard players operation #gp13K1 mb = #gdFailK2 mb
 execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ 201 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p13","rlk_mb_gd_p13t1"]}
+# the disc (r 3.4) stays inside the walkable arena and still covers a player standing at the wall
+execute as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] at @s unless entity @e[type=minecraft:marker,tag=rlk_mb_arena,distance=..17.6] at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] facing entity @s feet rotated ~ 0 positioned ^ ^ ^17.6 run tp @s ~ 201 ~
 execute as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] feet run tp @s ~ ~ ~ ~ 0
 execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run summon minecraft:marker ~ ~11 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p13","rlk_mb_gd_p13k1"]}
 execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] positioned ^0.007 ^6 ^-0.065 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p13","rlk_mb_gd_p13c1","rlk_mb_gd_p13c1_0"],block_state:{id:"minecraft:gold_block"},brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.046f,-0.047f,-0.056f],left_rotation:[0.088f,0.026f,0.068f,0.994f],scale:[0.1f,0.1f,0.1f],right_rotation:[0f,0f,0f,1f]}}

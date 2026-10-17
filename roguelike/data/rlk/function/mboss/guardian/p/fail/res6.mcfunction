@@ -1,5 +1,5 @@
 # Residue (kind 6): tinted floor and glowing cracks.
-particle minecraft:dust{color:[0.23f,0.38f,0.77f],scale:2.6} ~ ~0.08 ~ 2.4 0.02 2.4 0 10 force @a[tag=player]
+particle minecraft:dust{color:[0.23f,0.38f,0.77f],scale:2.6} ~ ~0.08 ~ 2.88 0.02 2.88 0 10 force @a[tag=player]
 execute rotated ~8.996 0 positioned ^ ^0.06 ^1.6 run particle minecraft:dust{color:[0.22f,0.38f,0.77f],scale:1} ~ ~ ~ 0.12 0 0.12 0 1 force @a[tag=player]
 execute rotated ~-3.983 0 positioned ^ ^0.06 ^3.6 run particle minecraft:dust{color:[0.22f,0.38f,0.77f],scale:1} ~ ~ ~ 0.12 0 0.12 0 1 force @a[tag=player]
 execute rotated ~-2.515 0 positioned ^ ^0.06 ^6 run particle minecraft:dust{color:[0.22f,0.38f,0.77f],scale:1} ~ ~ ~ 0.12 0 0.12 0 1 force @a[tag=player]

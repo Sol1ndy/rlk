@@ -1,11 +1,5 @@
 # fail clip tick 58
-execute if score #gdFailN mb matches 1.. run kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p13x0]
-execute if score #gdFailN mb matches 1.. run execute if score #gp13K0 mb matches 1 at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] run function rlk:mboss/guardian/p/fail/tail1
-execute if score #gdFailN mb matches 1.. run execute if score #gp13K0 mb matches 2 at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] run function rlk:mboss/guardian/p/fail/tail2
-execute if score #gdFailN mb matches 1.. run execute if score #gp13K0 mb matches 3 at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] run function rlk:mboss/guardian/p/fail/tail3
-execute if score #gdFailN mb matches 1.. run execute if score #gp13K0 mb matches 4 at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] run function rlk:mboss/guardian/p/fail/tail4
-execute if score #gdFailN mb matches 1.. run execute if score #gp13K0 mb matches 5 at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] run function rlk:mboss/guardian/p/fail/tail5
-execute if score #gdFailN mb matches 1.. run execute if score #gp13K0 mb matches 6 at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] run function rlk:mboss/guardian/p/fail/tail6
+kill @e[type=minecraft:block_display,tag=rlk_mb_gd_q13r0_7]
 execute if score #gdFailN mb matches 1.. run execute if score #gp13K0 mb matches 1 at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] run function rlk:mboss/guardian/p/fail/res1
 execute if score #gdFailN mb matches 1.. run execute if score #gp13K0 mb matches 2 at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] run function rlk:mboss/guardian/p/fail/res2
 execute if score #gdFailN mb matches 1.. run execute if score #gp13K0 mb matches 3 at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0,limit=1] run function rlk:mboss/guardian/p/fail/res3

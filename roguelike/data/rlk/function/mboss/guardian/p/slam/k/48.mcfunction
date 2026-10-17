@@ -1,5 +1,6 @@
 # slam tick 48 (@s = body, at the body).
-kill @e[type=minecraft:item_display,tag=rlk_mb_gd_p3bl]
-execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run particle minecraft:block{block_state:"minecraft:gold_block"} ~ ~0.2 ~ 0.3 0.1 0.3 0 12 force @a[tag=player]
-execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run particle minecraft:block{block_state:"minecraft:black_terracotta"} ~ ~0.2 ~ 0.4 0.1 0.4 0 8 force @a[tag=player]
-execute rotated as @s rotated ~ 0 positioned ^0 ^0 ^3.1 positioned ~ 201 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p3","rlk_mb_gd_p3po"],billboard:"fixed",brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[0f,0.08f,0f],left_rotation:[-0.7071f,0f,0f,0.7071f],scale:[0.8f,0.8f,0.8f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:navia_fx/ring"}}}
+kill @e[type=minecraft:item_display,tag=rlk_mb_gd_p3po]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.87f,0.74f,0.47f],scale:0.7} ^-1.368 ^4.637 ^3.042 0.04 0.04 0.04 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.87f,0.74f,0.47f],scale:0.7} ^-1.405 ^4.715 ^2.975 0.04 0.04 0.04 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.87f,0.74f,0.47f],scale:0.7} ^-1.442 ^4.793 ^2.907 0.04 0.04 0.04 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.87f,0.74f,0.47f],scale:0.7} ^-1.48 ^4.87 ^2.84 0.04 0.04 0.04 0 1 force @a[tag=player]

@@ -1,2 +1,3 @@
 # javelin clip tick 33
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.4 ^3.659 ^2.79 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.6} ~ ~ ~ 0.05 0.05 0.05 0 1 force @a[tag=player]
+scoreboard players set #gp2S mb 0
+execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] run function rlk:mboss/guardian/p/javelin/trail

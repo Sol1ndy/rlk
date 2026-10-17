@@ -2,4 +2,4 @@
 # #gdFailN surviving stars, #gdFailK1/#gdFailK2 their kinds; one spear each, 31 t apart. See p56.py.
 kill @e[tag=rlk_mb_gd_p13]
 scoreboard players set #gp13D mb 0
-execute if score #gdFailN mb matches 1 run scoreboard players set #gdPLen mb 80
+execute if score #gdFailN mb matches 1 run scoreboard players set #gdPLen mb 68

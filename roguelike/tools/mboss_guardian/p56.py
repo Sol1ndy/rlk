@@ -1,56 +1,61 @@
 """P5 하늘을 심판하는 자 (fly-slam), P6 guard sweeps (gold / enchanted) and the chaos fail spears.
 
 Sources: patterns.md §7, §8.1-8.8, §9.4-9.5, m1.md F (26.45-31.5 s), m2.md (clips A/B), m4.md, plan.md K4,
-K6, K12, K16, K17, K26. Clips `flyslam` (101 t), `sweep` (44 t), `sweep_e` (50 t); the fail spears run on the
+K6, K12, K16, K17, K26. Clips `flyslam` (91 t), `sweep` (39 t), `sweep_e` (45 t); the fail spears run on the
 chaos fail clock (T0 = timer full) while the core plays chaos_fail / chaos_land / chaos_raise. Every hit lands
-on a clip event (or the m4 schedule) and is telegraphed >= 12 t (fail decal >= 20 t).
+on a clip event (or the fail schedule) and is telegraphed >= 10 t. User tuning (plan.md): the clips play with
+~25 % shorter wind-ups (guardian_clips.mjs RETIME; authored ticks of the fx go through api.rt / api.inv), the fail
+schedule runs x0.75, and every hit area (with its decal and fx) is ~20 % larger. Played ticks below.
 
 P5 하늘을 심판하는 자  (far)
-  0-12   black-brown cubes climb the raised shaft; 6 glint on the spear head (star card, chime).
-  12-16  gold spiral ribbons wind up around her, a glow at her feet, rising shimmer.
-  16-19  a vertical gold beam (11 b, white core) erupts through her with crescent arcs; ascent whoosh.
-  19     take-off to +8 b (rig) with a dark-cube trail, the attack line, no leash from here.
-  20     the ring locks under the player (take-off + 1, K26), clamped into the safe disc: 24 gold rim bars
-         grow r 1 -> 4.5 over 21-26 (m1 27.48-27.73 s), a translucent amber glow fill and a star emblem.
-  21     hazard: disc r 4.5, 180 %, strikes at 41 (20 t, the clip impact). She is untargetable 21-41.
-  23-39  the body (hitbox) glides under the ring (she flies over it, trailing cubes); 26-38 gold 4-point
+  0-9    black-brown cubes climb the raised shaft; 5 glint on the spear head (star card, chime).
+  9-12   gold spiral ribbons wind up around her, a glow at her feet, rising shimmer.
+  12-14  a vertical gold beam (11 b, white core) erupts through her with crescent arcs; ascent whoosh.
+  14     take-off to +8 b (rig) with a dark-cube trail, the attack line, no leash from here.
+  15     the ring locks under the player (take-off + 1, K26), clamped into the safe disc and then to within
+         21 - 5.5 b of the axis (the ring stays inside the walkable arena and still covers a player at the wall):
+         28 gold rim bars grow r 1 -> 5.5 over 16-21 (m1 27.48-27.73 s), a translucent amber glow fill and a star.
+  16     hazard: disc r 5.5, 180 %, strikes at 31 (15 t, the clip impact). She is untargetable 16-30.
+  18-29  the body (hitbox) glides under the ring (she flies over it, trailing cubes); 20-28 gold 4-point
          sparkles and gold dust fall onto the centre; a progress circle reaches the rim at the strike;
-         31 falling whistle.
-  39-41  descent pillar from the sky onto the ring centre;  41 IMPACT: white flash of the rim, burst,
+         23 falling whistle.
+  29-31  descent pillar from the sky onto the ring centre;  31 IMPACT: white flash of the rim, burst,
          shock ring, gold and rock debris, tumbling gold / dark cubes, boom + iron door crash.
-  42-46  gold flame-like shards burst out;  47-51 the ground spike ring (gold crystal shards 0.6-1.5 b
-         out to r 4.6, inner first) with crystal crackle;  spikes linger to ~77 with sparkles.
-  73     the spear comes out of the floor (chain thud, stone);  80-92 twirl trail, whooshes;  101 idle.
+  32-36  gold flame-like shards burst out;  37-41 the ground spike ring (gold crystal shards 0.6-1.5 b
+         out to r 5.6, inner first) with crystal crackle;  spikes linger to ~67 with sparkles.
+  63     the spear comes out of the floor (chain thud, stone);  70-82 twirl trail, whooshes;  91 idle.
 
 P6 sweeps (service, started by the core from guard mode; the blade is synced to the rig clips)
   The hit is split into angle slices that strike on the tick the rig's blade sweeps over them (measured
   from the rig poses, p56_spear.json), so a player on her left is hit first and one on her right last;
   one hit per sweep across the slices (a hit or an i-frame dodge on one slice consumes the others).
-  Gold (11, timeout): sweep clip; 200 deg front arc r 5 from her left to her right, slices at 20-24
-  (front at 22, m2 hit at timeout+23), 165 %, knockback 3. Gold rim bars (flash white as the blade
-  passes), a progress arc, 12 riptide swell, layered gold crescent ribbon (#CC9C3C / #E4B43C / #FCFC84 /
+  Gold (11, timeout): sweep clip; 200 deg front arc r 6 from her left to her right, slices at 15-19
+  (front at 17, m2 hit at timeout+23 before the tuning), 165 %, knockback 3. Gold rim bars (flash white as the
+  blade passes), a progress arc, 9 riptide swell, layered gold crescent ribbon (#CC9C3C / #E4B43C / #FCFC84 /
   white) + two crescent cards, a row of vertical gold crystal spikes along the arc edge, gold and rock
-  chips, dark-red cubes; sweep whoosh 20, crunch 22 (dripstone, basalt, quiet explode).
+  chips, dark-red cubes; sweep whoosh 15, crunch 17 (dripstone, basalt, quiet explode).
   Enchanted (12, record complete R = clip 0): sweep_e clip; same arc in the recorded element: enchant line
-  through her and along the spear + waist ring burst at 4-6 (beacon thump, short sonic charge), element
-  glow on the wind-up, slices at 21-27 (front at 23, m2 hit ~R+24), 250 % + the element, knockback 4;
-  element crescent ribbon and strike fx inside the arc (electro forked bolts and violet shards, pyro
-  flame bursts, hydro splashes, cryo ice shards), lingering ground fx to R+42; element sounds.
+  through her and along the spear + waist ring burst at 3-4 (beacon thump, short sonic charge), element
+  glow on the wind-up, slices at 16-22 (front at 18), 250 % + the element, knockback 4; element crescent
+  ribbon and strike fx inside the arc (electro forked bolts and violet shards, pyro flame bursts, hydro
+  splashes, cryo ice shards), lingering ground fx to R+37; element sounds.
 
-Fail spears (service, pattern 13; clock 0 = T0; spear j = 0, 1 for each surviving star, 31 t apart)
-  23+31j  the target locks on the player; a gold cube column forms above it, fed by a gold chain from
-          her chest; forming roar (respawn anchor, beacon, amethyst, sonic charge).
-  25+31j  the giant red copy of her spear grows out of the column point-down (tip 3.8 b above the
-          target); the red concave 4-point star decal (crimson fill, pink rim, pink streaks) centred on
-          the player, one arm toward the arena centre, side arms opening +-2.7 -> +-9.5 b in 6 t;
-          hazard: disc r 2.8 (K12 cylinder), 220 %, the star's element, strikes at 49+31j (24 t).
+Fail spears (service, pattern 13; clock 0 = T0; spear j = 0, 1 for each surviving star, 23 t apart; the m4
+schedule x0.75)
+  17+23j  the target locks on the player (pulled to within 21 - 3.4 b of the axis, so the disc stays inside the
+          walkable arena and still covers the player); a gold cube column forms above it, fed by a gold chain
+          from her chest; forming roar (respawn anchor, beacon, amethyst, sonic charge).
+  19+23j  the giant red copy of her spear grows out of the column point-down (tip 3.8 b above the
+          target); the red concave 4-point star decal (crimson fill, black rim, pink streaks) centred on
+          the target, one arm toward the arena centre, side arms opening +-3.2 -> +-11.4 b in 6 t;
+          hazard: disc r 3.4 (K12 cylinder x1.2), 220 %, the star's element, strikes at 37+23j (18 t).
           Spear 1 says the attack line.
-  35-40   hang drone; 37 (+3 for blue) the spear turns from red to the star colour (gold; blue via
-          violet; element colours), chime;  44 pre-drop whistle.
-  49+31j  drop in 1 t + IMPACT: flash column, starburst rays; 50 dome of light (r 1.45); 51 the X of
-          crossed light beams, spike field (gold +-8 b) / ice-water splash (+-4 b) / flames / sparks,
+  27-30   hang drone; 28 (+2 for blue) the spear turns from red to the star colour (gold; blue via
+          violet; element colours), chime;  33 pre-drop whistle.
+  37+23j  drop in 1 t + IMPACT: flash column, starburst rays; 38 dome of light (r 1.75); 39 the X of
+          crossed light beams, spike field (gold +-8 b) / ice-water splash (+-4.8 b) / flames / sparks,
           rock debris and cubes, per-kind blast sounds; residue (crimson floor + gold or blue cracks)
-          to ~+33; the spear stays planted 20 t, then dissolves upward (69) and is gone at 79+31j.
+          to ~+33; the spear stays planted 20 t, then dissolves upward (57) and is gone at 67+23j.
 
 Owner of this file: the P5/P6 pattern author. Writes only F:mboss/guardian/p/{flyslam,sweep_g,sweep_e,
 fail}/** through gen.pw. Entities carry rlk_room, rlk_mb_aux and rlk_mb_gd_p5 / p11 / p12 / p13 (cancel
@@ -62,18 +67,33 @@ import math
 import random
 from pathlib import Path
 
-from .api import (Pattern, ev, clip_len, DMG, KB, CY, NS, GOLD, GOLD_PALE, GOLD_DEEP, RED_EDGE, CRIMSON,
+from .api import (Pattern, ev, clip_len, rt, inv, DMG, KB, CY, NS, GOLD, GOLD_PALE, GOLD_DEEP, RED_EDGE, CRIMSON,
                   CRIMSON_DARK, STAR_HZCOL)
 from . import p56_fx as X
 from .p56_fx import n3, loc, polar, lerp, add, sub, mul, tf, tags, qaxis, qrot
 
 SPEAR = json.loads((Path(__file__).resolve().parent / 'p56_spear.json').read_text(encoding='utf-8'))
 
-# fail spear schedule (m4 §4, K12): column 23, decal + lock 25, impact 49, 31 t apart
-FAIL_COL, FAIL_DECAL, FAIL_GAP, FAIL_TELL = 23, 25, 31, 24
+# fail spear schedule (m4 §4, K12: column 23, decal + lock 25, impact 49, 31 t apart), x0.75 (user tuning: wind-ups
+# ~25 % shorter): column 17, decal + lock 19, impact 37 (tell 18), 23 t apart
+FAIL_COL, FAIL_DECAL, FAIL_GAP, FAIL_TELL = 17, 19, 23, 18
 FAIL_HIT = FAIL_DECAL + FAIL_TELL
 FAIL_REL = 10                     # she departs (p/release) this long after the last impact (m4: +90)
-FAIL_R = 2.8
+FAIL_R = 3.4                      # K12 r 2.5-3 (was 2.8), x1.2
+WALK_R = 21                       # the walkable arena: a fail disc / the P5 ring never crosses it
+AREA = 1.2                        # linear scale of the hit areas and their fx (user tuning)
+
+
+def fail_t(t):
+    """Fail clock tick of spear 1 for an m4 tick between the decal (25) and the impact (49) of the source schedule."""
+    return FAIL_DECAL + int(math.floor((t - 25) * FAIL_TELL / 24 + 0.5))
+
+
+def clamp_in(sel, r):
+    """As the marker sel (on the floor): pulled radially toward the arena axis until it is within r of it (an area
+    of radius WALK_R - r centred there stays inside the walkable arena and still covers a player at the wall)."""
+    return (f'execute as {sel} at @s unless entity @e[type=minecraft:marker,tag=rlk_mb_arena,distance=..{r:g}] '
+            f'at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] facing entity @s feet rotated ~ 0 positioned ^ ^ ^{r:g} run tp @s ~ {CY} ~')
 
 PATTERNS = [
     Pattern(5, 'flyslam', '하늘을 심판하는 자', bands=('far',), weight={'far': 3}, recover=22, max_len=clip_len('flyslam') + 4),
@@ -123,18 +143,21 @@ def flyslam(g):
     glint, beam, take, ring, gone, dive, imp = E('glint'), E('beam'), E('takeoff'), E('ring'), E('gone'), E('dive'), E('impact')
     spikes, pull, twirl, end = E('spikes'), E('pull'), E('twirl'), clip_len(k)
     lock = take + 1                                  # K26: the ring locks at take-off + 1 t
-    R, NB = 4.5, 24
+    R, NB = 5.5, 28                                  # K26 r 4.5, x1.22 (user tuning)
+    K5 = R / 4.5                                     # scale of the fx authored for r 4.5
+    W = lambda t: rt(k, t)                           # authored (source) tick -> played tick
     M = '@e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1]'
     ATM = f'at {M}'
     rnd = random.Random(55)
 
     # -- 0-12: black-brown cubes climb the raised shaft; dark dust along it
-    for t in range(2, 13, 2):
-        gp, tip = sp(k, t, 'grip'), sp(k, min(t + 5, 16))
+    for ta in range(2, 13, 2):
+        t = W(ta)
+        gp, tip = sp(k, t, 'grip'), sp(k, min(W(ta + 5), beam))
         dy = tip[1] - gp[1]
-        specs = X.cube_set(500 + t, 2, ['dark', 'brown', 'dark', 'crimson', 'rock', 'dark'], (0.06, 0.3, 0.06),
+        specs = X.cube_set(500 + ta, 2, ['dark', 'brown', 'dark', 'crimson', 'rock', 'dark'], (0.06, 0.3, 0.06),
                            (0.09, 0.2), (dy * 0.7, dy * 0.95), up=5.0, dirv=(0, 1, 0), delay=1)
-        X.cubes(tl, pid, f'5c{t}', t, specs, f'{BODY} positioned {loc(gp)}', 6)
+        X.cubes(tl, pid, f'5c{ta}', t, specs, f'{BODY} positioned {loc(gp)}', 6)
         for s in (0.25, 0.55, 0.85):
             tl.at(t, f'execute {BODY} positioned {loc(lerp(gp, sp(k, t), s))} run '
                   + g.dust_fade((0.36, 0.22, 0.16), DARK, 0.8, '~ ~ ~', (0.05, 0.12, 0.05), 1))
@@ -147,19 +170,19 @@ def flyslam(g):
           f'execute {BODY} run ' + g.card('glow', loc(gl), bb='center', s0=0.4, s1=1.2, life=5, fade=3),
           f'execute {BODY} positioned {loc(gl)} run ' + g.particle('end_rod', '~ ~ ~', (0.08, 0.08, 0.08), 0.05, 6),
           g.sound('block.amethyst_block.chime', 0.9, 2.0), g.sound('block.beacon.power_select', 0.3, 1.9))
-    for t in range(glint + 1, 12, 2):
+    for t in range(glint + 1, W(12), 2):
         tl.at(t, f'execute {BODY} positioned {loc(sp(k, t))} run ' + g.dust(GOLD_PALE, 0.6, '~ ~ ~', (0.1, 0.1, 0.1), 2))
 
-    # -- 12-16: gold spiral ribbons around her, glow at her feet
-    for t in range(12, beam + 1):
+    # -- authored 12-16: gold spiral ribbons around her, glow at her feet
+    for t in range(W(12), beam + 1):
         for hx in range(2):
             for j in range(8):
                 h = 0.25 + 3.3 * j / 7
-                a = (t - 12) * 70 + j * 46 + hx * 180
+                a = (inv(k, t) - 12) * 70 + j * 46 + hx * 180
                 r = 1.05 - 0.25 * j / 7
                 col = (0.976, 0.910, 0.647) if (j + hx) % 2 else (0.796, 0.647, 0.510)
                 tl.at(t, f'execute {BODY} positioned {loc(polar(a, r, h))} run ' + g.dust(col, 0.9, '~ ~ ~', (0.02, 0.02, 0.02), 1))
-    tl.at(12, f'execute {BODY} run ' + g.card('glow', '^ ^0.06 ^', rot='~ 90', s0=0.6, s1=2.8, life=9, fade=3),
+    tl.at(W(12), f'execute {BODY} run ' + g.card('glow', '^ ^0.06 ^', rot='~ 90', s0=0.6, s1=2.8, life=9, fade=3),
           g.sound('block.beacon.power_select', 0.5, 1.5), g.sound('block.amethyst_block.resonate', 0.6, 1.4))
 
     # -- 16-19: the vertical beam (11 b, white core) through her, crescent arcs; 19 it shoots up
@@ -195,7 +218,9 @@ def flyslam(g):
     lk = [f'# @s = body (clip tick {lock} = take-off + 1, K26): the landing point locks under the player.',
           'kill @e[type=minecraft:marker,tag=rlk_mb_gd_p5t]',
           f'execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ {CY} ~ {{Tags:{tags(*X.base_tags(pid, "rlk_mb_gd_p5t"))}}}',
-          f'execute as {M} run function rlk:mboss/mv/clamp']
+          f'execute as {M} run function rlk:mboss/mv/clamp',
+          '# the ring stays inside the walkable arena (it still covers a player standing at the wall)',
+          clamp_in(M, WALK_R - R)]
 
     def ring_bar(kk, r):
         th = kk * 360 / NB
@@ -206,14 +231,14 @@ def flyslam(g):
         tr, q, sc = ring_bar(kk, 1.0)
         lk.append(f'execute {ATM} run ' + X.bd('minecraft:gold_block', tr, q, sc,
                                                 X.base_tags(pid, 'rlk_mb_gd_p5r', f'rlk_mb_gd_p5r{kk}')))
-    lk += [f'execute {ATM} run ' + g.card('glow', '~ ~0.04 ~', rot='0 90', s0=2.0, s1=9.0, life=ring + 5 - lock + 1),
-           f'execute {ATM} run ' + g.card('star', '~ ~0.05 ~', rot='0 90', spin=45, s0=0.6, s1=2.6, life=imp - lock),
+    lk += [f'execute {ATM} run ' + g.card('glow', '~ ~0.04 ~', rot='0 90', s0=2.0, s1=2 * R, life=ring + 5 - lock + 1),
+           f'execute {ATM} run ' + g.card('star', '~ ~0.05 ~', rot='0 90', spin=45, s0=0.6, s1=2.6 * K5, life=imp - lock),
            f'execute {ATM} run ' + g.sound('block.amethyst_block.resonate', 0.6, 1.2),
            f'execute {ATM} run ' + g.dust(GOLD, 1.2, '~ ~0.1 ~', (0.5, 0.02, 0.5), 10)]
     g.pw(k, 'lock', lk)
     tl.at(lock, g.fn('p/flyslam/lock'))
 
-    # -- 21: the hazard (disc r 4.5, strikes at the clip impact) and the rim growth; untargetable
+    # -- ring: the hazard (disc r R, strikes at the clip impact) and the rim growth; untargetable
     grow = [f'# @s = body (clip tick {ring}): hazard + ring growth r 1 -> {R} over 5 t (m1 27.48-27.73 s).',
             *g.hz_opts(sfx=0, quiet=1, kb=KB['default'], linger=2),
             f'execute {ATM} run {g.hz_disc(R, imp - ring, DMG["p5"])}',
@@ -225,7 +250,7 @@ def flyslam(g):
                     f'{{start_interpolation:0,interpolation_duration:5,transformation:{tf(tr, q, sc)}}}')
     g.pw(k, 'ring', grow)
     tl.at(ring, g.fn('p/flyslam/ring'))
-    tl.at(ring + 5, f'execute {ATM} run ' + g.card('glow', '~ ~0.04 ~', rot='0 90', s0=9.0, s1=9.0, life=imp - ring - 5))
+    tl.at(ring + 5, f'execute {ATM} run ' + g.card('glow', '~ ~0.04 ~', rot='0 90', s0=2 * R, s1=2 * R, life=imp - ring - 5))
 
     # -- 23-39: the body glides under the ring (she flies over it); sky trail
     tl.at(gone, f'execute at @s facing entity {M} feet run tp @s ~ ~ ~ ~ 0',
@@ -243,14 +268,14 @@ def flyslam(g):
         n = max(8, int(2 * math.pi * r / 0.7))
         tl.at(t, *[f'execute {ATM} positioned {loc(polar(360 * j / n, r, 0.12))} run ' + g.dust(GOLD_PALE, 0.8, '~ ~ ~', (0, 0, 0), 1)
                    for j in range(n)])
-    for t in range(26, 39, 2):
-        a, rr, h = rnd.uniform(0, 360), rnd.uniform(0.2, 1.8), rnd.uniform(6.5, 8.5)
+    for t in range(W(26), W(39), 2):
+        a, rr, h = rnd.uniform(0, 360), rnd.uniform(0.2, 1.8) * K5, rnd.uniform(6.5, 8.5)
         p = polar(a, rr, h)
         tl.at(t, f'execute {ATM} run ' + g.card('star', f'~{n3(p[0])} ~{n3(h)} ~{n3(p[2])}', bb='center', spin=90,
                                                 s0=0.32, s1=0.55, move=(0, -(h - 0.4), 0), life=9, fade=2),
               f'execute {ATM} run ' + g.particle('falling_dust{block_state:"minecraft:gold_block"}', '~ ~7 ~', (1.6, 0.8, 1.6), 0, 4),
               f'execute {ATM} run ' + g.particle('end_rod', '~ ~5 ~', (0.8, 1.5, 0.8), 0, 1))
-    tl.at(31, f'execute {ATM} run ' + g.sound('block.beacon.deactivate', 0.8, 1.8))
+    tl.at(W(31), f'execute {ATM} run ' + g.sound('block.beacon.deactivate', 0.8, 1.8))
 
     # -- 39-41: descent pillar onto the ring centre
     for blk, w, nm in (('minecraft:yellow_stained_glass', 0.8, 'po'), ('minecraft:white_concrete', 0.22, 'pi')):
@@ -267,21 +292,21 @@ def flyslam(g):
     hit = [f'# @s = body on the ring centre (clip tick {imp}): the hazard strikes this tick (framework).',
            'tag @s remove rlk_mb_inv',
            'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p5r] run data merge entity @s {block_state:{id:"minecraft:white_stained_glass"}}',
-           g.card('burst', '~ ~1.3 ~', bb='center', spin=20, s0=0.8, s1=4.6, life=6, fade=3),
-           g.card('glow', '~ ~1.6 ~', bb='center', s0=2.0, s1=7.0, life=5, fade=2),
-           g.card('ring', '~ ~0.12 ~', rot='~ 90', s0=1.0, s1=10.5, life=8, fade=3),
+           g.card('burst', '~ ~1.3 ~', bb='center', spin=20, s0=0.8, s1=4.6 * K5, life=6, fade=3),
+           g.card('glow', '~ ~1.6 ~', bb='center', s0=2.0, s1=7.0 * K5, life=5, fade=2),
+           g.card('ring', '~ ~0.12 ~', rot='~ 90', s0=1.0, s1=10.5 * K5, life=8, fade=3),
            g.dust(WHITE, 2.4, '~ ~1 ~', (0.8, 0.8, 0.8), 30),
-           g.dust((0.992, 0.961, 0.706), 1.8, '~ ~0.4 ~', (2.0, 0.2, 2.0), 40),
-           g.particle('explosion', '~ ~0.6 ~', (1.2, 0.2, 1.2), 0, 3),
-           g.particle(GOLD_BLK, '~ ~0.4 ~', (2.2, 0.3, 2.2), 0.2, 40),
-           g.particle(BROWN_BLK, '~ ~0.4 ~', (1.6, 0.3, 1.6), 0.25, 24),
+           g.dust((0.992, 0.961, 0.706), 1.8, '~ ~0.4 ~', (2.0 * K5, 0.2, 2.0 * K5), 40),
+           g.particle('explosion', '~ ~0.6 ~', (1.2 * K5, 0.2, 1.2 * K5), 0, 3),
+           g.particle(GOLD_BLK, '~ ~0.4 ~', (2.2 * K5, 0.3, 2.2 * K5), 0.2, 40),
+           g.particle(BROWN_BLK, '~ ~0.4 ~', (1.6 * K5, 0.3, 1.6 * K5), 0.25, 24),
            g.sound('entity.generic.explode', 1.0, 0.9), g.sound('entity.zombie.attack_iron_door', 0.7, 0.6)]
     g.pw(k, 'impact', hit)
     tl.at(imp, g.fn('p/flyslam/impact'))
     tl.at(imp + 1, g.sound('block.amethyst_cluster.break', 0.9, 0.8), 'kill @e[type=minecraft:marker,tag=rlk_mb_gd_p5t]')
     tl.at(imp + 2, 'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p5r]')
-    specs = X.cube_set(541, 12, ['gold', 'goldb', 'rock', 'dark', 'amber', 'gold', 'rock', 'crimson'], (1.0, 0.3, 1.0),
-                       (0.22, 0.5), (1.6, 3.6), up=0.5, delay=2)
+    specs = X.cube_set(541, 12, ['gold', 'goldb', 'rock', 'dark', 'amber', 'gold', 'rock', 'crimson'], (1.0 * K5, 0.3, 1.0 * K5),
+                       (0.22, 0.5), (1.6 * K5, 3.6 * K5), up=0.5, delay=2)
     X.cubes(tl, pid, '5i', imp, specs, 'at @s positioned ~ ~0.5 ~', 14)
 
     # -- 42-46: gold flame-like shards burst outward; 47-51 the ground spike ring
@@ -291,18 +316,18 @@ def flyslam(g):
               + g.card('shard', f'^ ^0.05 ^{n3(rnd.uniform(0.5, 0.9))}', rot=f'~ {int(rnd.uniform(25, 45))}',
                        s0=0.3, s1=rnd.uniform(1.4, 2.1), life=7, fade=3))
     for t in (imp + 1, imp + 3, imp + 5):
-        tl.at(t, g.dust_fade((1.0, 0.92, 0.55), (0.95, 0.55, 0.15), 1.6, '~ ~0.8 ~', (1.0, 0.6, 1.0), 14))
-    pts = sorted(((rnd.uniform(1.6, 4.6), rnd.uniform(0, 360), rnd.uniform(0.6, 1.5)) for _ in range(14)))
+        tl.at(t, g.dust_fade((1.0, 0.92, 0.55), (0.95, 0.55, 0.15), 1.6, '~ ~0.8 ~', (1.0 * K5, 0.6, 1.0 * K5), 14))
+    pts = sorted(((rnd.uniform(1.6, 4.6) * K5, rnd.uniform(0, 360), rnd.uniform(0.6, 1.5)) for _ in range(16)))
     for r, a, size in pts:
-        t = spikes + int((r - 1.6) / 3.0 * 4)
+        t = spikes + int((r / K5 - 1.6) / 3.0 * 4)
         tl.at(t, f'execute {BODY} rotated ~{n3(a)} 0 run ' + g.card('shard', f'^ ^0.02 ^{n3(r)}', bb='vertical',
-                                                                    s0=size * 0.7, s1=size, life=77 - t, fade=6),
+                                                                    s0=size * 0.7, s1=size, life=W(77) - t, fade=6),
               f'execute {BODY} rotated ~{n3(a)} 0 positioned ^ ^0.2 ^{n3(r)} run ' + g.particle(GOLD_BLK, '~ ~ ~', (0.2, 0.1, 0.2), 0.1, 4))
     tl.at(spikes, g.sound('block.pointed_dripstone.land', 1.0, 1.0), g.sound('block.amethyst_cluster.place', 1.0, 1.0))
     tl.at(spikes + 2, g.sound('block.pointed_dripstone.land', 0.8, 1.2))
     tl.at(spikes + 4, g.sound('block.pointed_dripstone.land', 0.7, 0.9), g.sound('block.amethyst_cluster.place', 0.6, 1.3))
     for t in range(spikes + 4, pull + 1, 4):
-        tl.at(t, g.particle('wax_on', '~ ~0.8 ~', (3.0, 0.5, 3.0), 0, 3), g.dust(GOLD, 0.9, '~ ~0.5 ~', (3.0, 0.4, 3.0), 4))
+        tl.at(t, g.particle('wax_on', '~ ~0.8 ~', (3.0 * K5, 0.5, 3.0 * K5), 0, 3), g.dust(GOLD, 0.9, '~ ~0.5 ~', (3.0 * K5, 0.4, 3.0 * K5), 4))
 
     # -- 73: the spear comes out of the floor; 80-92 twirl trail
     po = pull + 2
@@ -328,12 +353,14 @@ def flyslam(g):
 
 # =============================================================================================
 # P6 sweeps
-# blade slices (strike tick, from deg, to deg; + = her left), measured on the rig blade (p56_spear.json)
-SLICES = {
+# blade slices (strike tick, from deg, to deg; + = her left), measured on the rig blade (p56_spear.json) on the
+# authored clip ticks and mapped to the played ones (the blade sits on a 1:1 segment of the retiming)
+SLICES = {clip: [(rt(clip, t), a0, a1) for t, a0, a1 in sl] for clip, sl in {
     'sweep': [(20, 100, 55), (21, 55, 30), (22, 30, -5), (23, -5, -39), (24, -39, -100)],
     'sweep_e': [(21, 100, 75), (22, 75, 25), (23, 25, 3), (24, 3, -18), (25, -18, -39), (26, -39, -81), (27, -81, -100)],
-}
-SW_R, SW_PAD = 5.0, 5          # pad ~ the 0.3 b body half-width at r 3
+}.items()}
+SW_R, SW_PAD = 6.0, 5          # r (K6 4.5-5, was 5; x1.2); pad ~ the 0.3 b body half-width at r 3
+SW_K = SW_R / 5.0              # scale of the sweep fx authored for r 5
 # ribbon palettes: deep, mid, core (white-hot), light
 PAL_SW = {0: ((0.80, 0.61, 0.24), (0.89, 0.71, 0.24), (0.99, 0.99, 0.95), (0.99, 0.99, 0.52)),
           1: ((0.78, 0.25, 0.10), (1.0, 0.54, 0.30), (1.0, 0.95, 0.85), (1.0, 0.80, 0.50)),
@@ -382,6 +409,7 @@ def sweep(g, gold):
     first, last = slices[0][0], slices[-1][0]
     end = clip_len(clip)
     rnd = random.Random(pid * 7)
+    W = lambda t: rt(clip, t)          # authored (source) tick -> played tick
     els = (0,) if gold else (1, 2, 3, 4)
     SL = f'@e[type=minecraft:marker,tag=rlk_mb_gd_p{pid}h]'
     etl = {e: {} for e in els}
@@ -406,9 +434,9 @@ def sweep(g, gold):
         rim = [f'# Rim decal of the sweep (@s = body, at it, rotated as it): {RIM_BLK[e]} on a black outline.']
         for i in range(20):
             th = 95 - 10 * i
-            tr, q, sc = X.bar_tf(th, SW_R + 0.01, 1.0, 0.27, 0.03, 0.008)
+            tr, q, sc = X.bar_tf(th, SW_R + 0.01, 1.0 * SW_K, 0.27, 0.03, 0.008)
             rim.append(X.bd(RIM_OUT, tr, q, sc, X.base_tags(pid, f'rlk_mb_gd_p{pid}b', f'rlk_mb_gd_p{pid}o', 'rlk_mb_gd_bnew')))
-            tr, q, sc = X.bar_tf(th, SW_R - 0.05, 0.95, 0.15, 0.045, 0.02)
+            tr, q, sc = X.bar_tf(th, SW_R - 0.05, 0.95 * SW_K, 0.15, 0.045, 0.02)
             rim.append(X.bd(RIM_BLK[e], tr, q, sc, X.base_tags(pid, f'rlk_mb_gd_p{pid}b', f'rlk_mb_gd_p{pid}b{slice_of(th)}', 'rlk_mb_gd_bnew')))
         for th in (100, -100):
             tr, q, sc = X.spoke_tf(th, 0.75, SW_R + 0.05, 0.26, 0.03, 0.008)
@@ -447,7 +475,7 @@ def sweep(g, gold):
                   + g.dust(ARC_DARK, 0.7, '~ ~ ~', (0, 0, 0), 1) for j in range(0, n - 1, 2)])
 
     # -- wind-up: glow on the spear head
-    for t in range(1 if gold else 7, first):
+    for t in range(1 if gold else ev(clip, 'windup'), first):
         hd = sp(clip, t, 'head')
         for e in els:
             eat(t, e, f'execute {BODY} positioned {loc(hd)} run ' + g.dust(PAL_SW[e][1], 1.0, '~ ~ ~', (0.15, 0.15, 0.15), 2))
@@ -462,75 +490,75 @@ def sweep(g, gold):
                 if slice_of(th) != i:
                     continue
                 y = 0.72 + 0.5 * (th + 95) / 190
-                for blk, rr, ww, dy in ((SLAB_BLK[e][0], 3.6, 1.5, 0.0), (SLAB_BLK[e][1], 4.5, 0.32, 0.03)):
-                    tr, q, sc = X.bar_tf(th, rr, 0.82, ww, 0.05, y + dy)
+                for blk, rr, ww, dy in ((SLAB_BLK[e][0], 3.6 * SW_K, 1.5 * SW_K, 0.0), (SLAB_BLK[e][1], 4.5 * SW_K, 0.32 * SW_K, 0.03)):
+                    tr, q, sc = X.bar_tf(th, rr, 0.82 * SW_K, ww, 0.05, y + dy)
                     fx.append(f'execute {BODY} run ' + X.bd(blk, tr, q, sc, X.base_tags(pid, f'rlk_mb_gd_p{pid}w', f'rlk_mb_gd_p{pid}w{i}', 'rlk_mb_gd_wnew')))
             fx += [f'execute {BODY} run tp @e[type=minecraft:block_display,tag=rlk_mb_gd_wnew] ~ ~ ~ ~ 0',
                    'tag @e[type=minecraft:block_display,tag=rlk_mb_gd_wnew] remove rlk_mb_gd_wnew']
             n = max(2, int(abs(a0 - a1) / 7) + 1)
             for j in range(n):
                 a = a0 + (a1 - a0) * j / (n - 1)
-                for r, col, sc in ((2.9, PAL_SW[e][0], 1.5), (3.5, PAL_SW[e][1], 1.7), (4.1, PAL_SW[e][2], 1.3), (4.6, PAL_SW[e][3], 1.4)):
-                    y = 1.2 - 0.14 * (r - 2.9) - 0.15 * (j / n)
+                for r, col, sc in ((2.9 * SW_K, PAL_SW[e][0], 1.5), (3.5 * SW_K, PAL_SW[e][1], 1.7), (4.1 * SW_K, PAL_SW[e][2], 1.3), (4.6 * SW_K, PAL_SW[e][3], 1.4)):
+                    y = 1.2 - 0.14 * (r / SW_K - 2.9) - 0.15 * (j / n)
                     fx.append(f'execute {BODY} positioned {loc(polar(a, r, y))} run ' + g.dust(col, sc, '~ ~ ~', (0.06, 0.08, 0.06), 1))
             if gold:
                 for _ in range(2):
-                    a, r, size = rnd.uniform(a1, a0), rnd.uniform(4.55, 5.0), rnd.uniform(0.6, 1.5)
+                    a, r, size = rnd.uniform(a1, a0), rnd.uniform(4.55, 5.0) * SW_K, rnd.uniform(0.6, 1.5)
                     fx += [f'execute {BODY} rotated ~{n3(-a)} 0 run ' + g.card('shard', f'^ ^0.02 ^{n3(r)}', bb='vertical',
                                                                             s0=size * 0.6, s1=size, life=10, fade=4),
                            f'execute {BODY} rotated ~{n3(-a)} 0 positioned ^ ^0.2 ^{n3(r)} run ' + g.particle(GOLD_BLK, '~ ~ ~', (0.25, 0.1, 0.25), 0.15, 6)]
                 am = (a0 + a1) / 2
-                fx += [f'execute {BODY} rotated ~{n3(-am)} 0 positioned ^ ^0.3 ^4.2 run ' + g.particle(BROWN_BLK, '~ ~ ~', (0.6, 0.1, 0.6), 0.2, 5),
-                       f'execute {BODY} rotated ~{n3(-am)} 0 positioned ^ ^0.3 ^4.2 run ' + g.particle(RED_BLK, '~ ~ ~', (0.5, 0.2, 0.5), 0.1, 3),
-                       f'execute {BODY} rotated ~{n3(-am)} 0 positioned ^ ^0.6 ^4.4 run ' + g.particle('wax_on', '~ ~ ~', (0.6, 0.4, 0.6), 0, 2)]
+                fx += [f'execute {BODY} rotated ~{n3(-am)} 0 positioned ^ ^0.3 ^{n3(4.2 * SW_K)} run ' + g.particle(BROWN_BLK, '~ ~ ~', (0.6, 0.1, 0.6), 0.2, 5),
+                       f'execute {BODY} rotated ~{n3(-am)} 0 positioned ^ ^0.3 ^{n3(4.2 * SW_K)} run ' + g.particle(RED_BLK, '~ ~ ~', (0.5, 0.2, 0.5), 0.1, 3),
+                       f'execute {BODY} rotated ~{n3(-am)} 0 positioned ^ ^0.6 ^{n3(4.4 * SW_K)} run ' + g.particle('wax_on', '~ ~ ~', (0.6, 0.4, 0.6), 0, 2)]
             else:
-                fx += element_strike(g, rnd, e, a0, a1)
+                fx += element_strike(g, rnd, e, a0, a1, SW_K)
             g.pw(key, f's{i}' if gold else f's{i}_{e}', fx)
             tl.at(t, g.fn(f'p/{key}/s{i}') if gold else f'execute if score #gdSwEl mb matches {e} run {g.fn(f"p/{key}/s{i}_{e}")}')
         tl.at(t + 3, f'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}b{i}]')
         tl.at(t + 1, f'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}w{i}] run data merge entity @s '
-                     '{start_interpolation:0,interpolation_duration:4,transformation:{scale:[0.82f,0.01f,0.04f]}}')
+                     f'{{start_interpolation:0,interpolation_duration:4,transformation:{{scale:[{n3(0.82 * SW_K)}f,0.01f,0.04f]}}}}')
         tl.at(t + 5, f'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}w{i}]')
     tl.at(last + 3, f'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}b]')
 
     if gold:
         # gold crescent cards following the blade (roll 180 = a left-to-right swing, spin + = to her right)
-        tl.at(first, f'execute {BODY} run ' + g.card('crescent', '^ ^1.0 ^', rot='~-135 0', roll=180, spin=155, s0=9.6, s1=10.2, life=6, fade=2),
-              f'execute {BODY} run ' + g.card('crescent', '^ ^0.55 ^', rot='~-120 0', roll=180, spin=140, s0=8.2, s1=8.8, life=7, fade=3))
-        specs = X.cube_set(1101, 7, ['crimson', 'dark', 'red', 'rock', 'gold', 'dark'], (1.6, 0.2, 1.0), (0.14, 0.32), (0.8, 2.0),
+        tl.at(first, f'execute {BODY} run ' + g.card('crescent', '^ ^1.0 ^', rot='~-135 0', roll=180, spin=155, s0=9.6 * SW_K, s1=10.2 * SW_K, life=6, fade=2),
+              f'execute {BODY} run ' + g.card('crescent', '^ ^0.55 ^', rot='~-120 0', roll=180, spin=140, s0=8.2 * SW_K, s1=8.8 * SW_K, life=7, fade=3))
+        specs = X.cube_set(1101, 7, ['crimson', 'dark', 'red', 'rock', 'gold', 'dark'], (1.6 * SW_K, 0.2, 1.0 * SW_K), (0.14, 0.32), (0.8, 2.0),
                            up=0.6, delay=3)
-        X.cubes(tl, pid, '11c', 22, specs, f'{BODY} positioned ^-0.6 ^0.4 ^4.0', 12)
-        tl.at(12, g.sound('item.trident.riptide_2', 0.7, 0.7))
+        X.cubes(tl, pid, '11c', W(22), specs, f'{BODY} positioned ^-0.6 ^0.4 ^{n3(4.0 * SW_K)}', 12)
+        tl.at(W(12), g.sound('item.trident.riptide_2', 0.7, 0.7))
         tl.at(first, g.sound('entity.player.attack.sweep', 1.0, 0.6), g.sound('item.trident.riptide_1', 0.35, 1.2))
-        tl.at(22, g.sound('block.pointed_dripstone.land', 1.0, 0.9), g.sound('block.basalt.break', 0.9, 0.8),
+        tl.at(W(22), g.sound('block.pointed_dripstone.land', 1.0, 0.9), g.sound('block.basalt.break', 0.9, 0.8),
               g.sound('entity.generic.explode', 0.35, 1.3))
-        tl.at(23, g.sound('block.pointed_dripstone.land', 0.7, 1.15))
-        tl.at(24, g.sound('block.amethyst_cluster.break', 0.5, 1.2))
-        for t in range(26, 33, 3):
-            tl.at(t, f'execute {BODY} positioned ^ ^0.6 ^3.6 run ' + g.particle('wax_on', '~ ~ ~', (2.4, 0.4, 1.4), 0, 3))
+        tl.at(W(23), g.sound('block.pointed_dripstone.land', 0.7, 1.15))
+        tl.at(W(24), g.sound('block.amethyst_cluster.break', 0.5, 1.2))
+        for t in range(W(26), W(33), 3):
+            tl.at(t, f'execute {BODY} positioned ^ ^0.6 ^{n3(3.6 * SW_K)} run ' + g.particle('wax_on', '~ ~ ~', (2.4 * SW_K, 0.4, 1.4 * SW_K), 0, 3))
     else:
         # enchant (4-6): a light line through her and along the spear, a waist ring burst
         for e in els:
-            for t in (4, 5, 6):
+            for t in sorted({W(x) for x in (4, 5, 6)}):
                 gp, tip = sp(clip, t, 'grip'), sp(clip, t)
                 ln = [f'execute {BODY} positioned ^{n3(-2.6 + 0.4 * j)} ^1.75 ^0.35 run '
                       + g.dust_fade(WHITE, PAL_SW[e][1], 1.1, '~ ~ ~', (0, 0.01, 0), 1) for j in range(14)]
                 ln += [f'execute {BODY} positioned {loc(lerp(gp, tip, s / 7))} run ' + g.dust(PAL_SW[e][3], 0.9, '~ ~ ~', (0.02, 0.02, 0.02), 1)
                        for s in range(8)]
                 eat(t, e, *ln)
-            eat(5, e, *[f'execute {BODY} positioned {loc(polar(a, 1.5, 1.35))} run ' + g.dust(PAL_SW[e][2] if a % 60 else PAL_SW[e][1], 1.0, '~ ~ ~', (0, 0, 0), 1)
+            eat(W(5), e, *[f'execute {BODY} positioned {loc(polar(a, 1.5, 1.35))} run ' + g.dust(PAL_SW[e][2] if a % 60 else PAL_SW[e][1], 1.0, '~ ~ ~', (0, 0, 0), 1)
                        for a in range(0, 360, 20)])
             pt = {1: ('small_flame', 0.01), 2: ('falling_water', 0), 3: ('electric_spark', 0.08), 4: ('snowflake', 0.01)}[e]
-            for t in range(7, 21, 2):
+            for t in range(W(7), W(21), 2):
                 eat(t, e, f'execute {BODY} positioned {loc(sp(clip, t))} run ' + g.particle(pt[0], '~ ~ ~', (0.25, 0.25, 0.25), pt[1], 2))
             # lingering ground fx to R+42 inside the arc
-            for t in range(29, 43, 3):
+            for t in range(W(29), W(43), 3):
                 for _ in range(2):
-                    a, r = rnd.uniform(-95, 95), rnd.uniform(1.8, 4.6)
+                    a, r = rnd.uniform(-95, 95), rnd.uniform(1.8, 4.6) * SW_K
                     eat(t, e, *[f'execute {BODY} rotated ~{n3(-a)} 0 positioned ^ ^0.08 ^{n3(r)} run ' + x for x in linger_fx(g, rnd, e)])
-        tl.at(4, g.sound('block.beacon.activate', 0.7, 1.2))
-        tl.at(5, g.sound('entity.warden.sonic_charge', 0.3, 1.6))
-        tl.at(15, g.sound('item.trident.riptide_1', 0.7, 0.8))
+        tl.at(W(4), g.sound('block.beacon.activate', 0.7, 1.2))
+        tl.at(W(5), g.sound('entity.warden.sonic_charge', 0.3, 1.6))
+        tl.at(W(15), g.sound('item.trident.riptide_1', 0.7, 0.8))
         tl.at(first, g.sound('entity.player.attack.sweep', 1.0, 0.6), g.sound('item.trident.riptide_2', 0.4, 1.4))
         snd = {1: [(23, 'item.firecharge.use', 0.9, 0.8), (23, 'entity.blaze.shoot', 0.45, 0.7), (26, 'block.fire.ambient', 0.9, 1.0)],
                2: [(23, 'entity.player.splash.high_speed', 0.9, 1.0), (23, 'entity.generic.splash', 0.5, 1.3), (26, 'entity.player.splash', 0.5, 1.4)],
@@ -539,7 +567,7 @@ def sweep(g, gold):
                4: [(23, 'block.glass.break', 0.9, 1.3), (23, 'block.powder_snow.break', 1.0, 1.0), (26, 'block.amethyst_block.chime', 0.7, 1.8)]}
         for e, lst in snd.items():
             for t, s, v, p in lst:
-                tl.at(t, f'execute if score #gdSwEl mb matches {e} run ' + g.sound(s, v, p))
+                tl.at(W(t), f'execute if score #gdSwEl mb matches {e} run ' + g.sound(s, v, p))
 
     for e in ([] if gold else els):
         for t, lines in sorted(etl[e].items()):
@@ -561,10 +589,10 @@ def sweep(g, gold):
                          f'kill @e[tag=rlk_mb_gd_p{pid}]'])
 
 
-def element_strike(g, rnd, e, a0, a1):
-    """Element strike fx inside the slice a0 -> a1 (@s = body)."""
+def element_strike(g, rnd, e, a0, a1, k=1.0):
+    """Element strike fx inside the slice a0 -> a1 (@s = body); k = the arc radius over the authored r 5."""
     out = []
-    a, r = rnd.uniform(min(a0, a1), max(a0, a1)), rnd.uniform(3.0, 4.3)
+    a, r = rnd.uniform(min(a0, a1), max(a0, a1)), rnd.uniform(3.0, 4.3) * k
     at = f'execute {BODY} rotated ~{n3(-a)} 0 positioned ^ ^ ^{n3(r)} run '
     core, mid, deep = PAL_SW[e][2], PAL_SW[e][1], PAL_SW[e][0]
     shard = f'block{{block_state:"{EL_SHARD[e]}"}}'
@@ -623,12 +651,12 @@ KIND = {1: ((1.0, 0.86, 0.66), (1.0, 0.54, 0.30), (0.78, 0.25, 0.10), 'minecraft
         6: ((0.82, 0.93, 1.0), (0.24, 0.43, 0.80), (0.18, 0.23, 0.75), 'minecraft:light_blue_stained_glass', 'water', (0.22, 0.38, 0.77))}
 TINT1 = {1: 'pyro', 2: 'hydro', 3: 'electro', 4: 'cryo', 5: 'gold', 6: 'electro'}   # red -> (violet ->) star colour
 TINT2 = {6: 'hydro'}
-DECAL_W = 1.3                     # half width of the star arms at the centre
+DECAL_W = 1.3 * AREA              # half width of the star arms at the centre (x1.2 with the disc)
 # readable on the pink centre star and the white marble: opaque crimson fill, black rim (a pink rim vanished there)
 DECAL_FILL, DECAL_RIM = 'minecraft:red_concrete', 'minecraft:black_concrete'
-RING_N = 20                       # bars of the damage ring at FAIL_R
-DECAL_FB = (4.5, 7.5)             # half length of the front/back arm pair, 25 -> 31
-DECAL_SS = (2.7, 9.5)             # half length of the side arm pair (m4: +-2.7 -> > +-9 in 6 t)
+RING_N = 24                       # bars of the damage ring at FAIL_R
+DECAL_FB = (4.5 * AREA, 7.5 * AREA)   # half length of the front/back arm pair, decal -> decal + 6
+DECAL_SS = (2.7 * AREA, 9.5 * AREA)   # half length of the side arm pair (m4: +-2.7 -> > +-9 in 6 t), x1.2
 
 
 def fail(g):
@@ -641,31 +669,32 @@ def fail(g):
     for kind, (core, mid, deep, glass, style, crack) in KIND.items():
         # impact flash: column + starburst rays
         hit = [f'# Impact of a kind-{kind} spear ({style}) at the target: flash column and starburst rays.']
-        for blk, w, nm in ((glass, 1.3, 'fo'), ('minecraft:white_concrete', 0.45, 'fi')):
+        for blk, w, nm in ((glass, 1.3 * AREA, 'fo'), ('minecraft:white_concrete', 0.45 * AREA, 'fi')):
             hit.append(X.bd(blk, (-w / 2, 0, -w / 2), X.QI, (w, 16.0, w), X.base_tags(pid, 'rlk_mb_gd_p13f', 'rlk_mb_gd_p13fnew')))
         for a in range(0, 360, 45):
-            for el, rr in ((10, 1.4), (25, 2.4), (10, 3.4), (35, 4.2)):
+            for el, rr in ((10, 1.4 * AREA), (25, 2.4 * AREA), (10, 3.4 * AREA), (35, 4.2 * AREA)):
                 hit.append(f'execute rotated ~{a + (el % 7)} 0 positioned ^ ^{n3(0.4 + rr * math.tan(math.radians(el)) * 0.5)} ^{n3(rr)} run '
-                           + g.dust(core if rr < 3 else mid, 1.6 if rr < 3 else 1.2, '~ ~ ~', (0.05, 0.05, 0.05), 1))
+                           + g.dust(core if rr < 3 * AREA else mid, 1.6 if rr < 3 * AREA else 1.2, '~ ~ ~', (0.05, 0.05, 0.05), 1))
         hit += [g.dust(WHITE, 2.6, '~ ~1 ~', (0.5, 1.2, 0.5), 30),
                 g.particle('end_rod', '~ ~1 ~', (0.3, 0.6, 0.3), 0.25, 14)]
         if style == 'gold':
             hit.append(g.card('burst', '~ ~1.4 ~', bb='center', spin=20, s0=1.0, s1=4.8, life=6, fade=3))
         g.pw(k, f'hit{kind}', hit)
-        # dome of light r 1.45
-        dome = [f'# Dome of light (kind {kind}), r 1.45 (m4 2.9 b wide and tall).']
-        for el, n in ((0, 12), (30, 10), (60, 6), (88, 1)):
+        # dome of light r 1.45 x1.2
+        DR = 1.45 * AREA
+        dome = [f'# Dome of light (kind {kind}), r {DR:.2f} (m4 2.9 b wide and tall, x1.2 with the disc).']
+        for el, n in ((0, 14), (30, 12), (60, 7), (88, 1)):
             for j in range(n):
-                p = polar(360 * j / n + el, 1.45 * math.cos(math.radians(el)), 1.45 * math.sin(math.radians(el)))
+                p = polar(360 * j / n + el, DR * math.cos(math.radians(el)), DR * math.sin(math.radians(el)))
                 dome.append(f'positioned {loc(p)}')
         dome = [dome[0]] + [f'execute {d} run ' + g.dust(mid, 2.6, '~ ~ ~', (0.08, 0.08, 0.08), 1) for d in dome[1:]]
-        dome += [g.dust(core, 2.0, '~ ~0.7 ~', (0.45, 0.45, 0.45), 16)]
+        dome += [g.dust(core, 2.0, '~ ~0.7 ~', (0.45 * AREA, 0.45 * AREA, 0.45 * AREA), 16)]
         if style == 'gold':
             dome.append(g.card('glow', '~ ~0.9 ~', bb='center', s0=2.4, s1=3.4, life=4, fade=2))
         g.pw(k, f'dome{kind}', dome)
         # blast: X beams, spike field / splash / flames / sparks, rocks
         bl = [f'# Blast of a kind-{kind} spear ({style}): X of crossed light beams, field, debris.']
-        hc, tilt, L = 2.4, 28, 10.0
+        hc, tilt, L = 2.4 * AREA, 28, 10.0
         for sgn in (1, -1):
             q = qaxis((0, 0, 1), -sgn * tilt)
             w = 0.42
@@ -675,44 +704,44 @@ def fail(g):
         bl += ['tp @e[type=minecraft:block_display,tag=rlk_mb_gd_p13xnew] ~ ~ ~ ~ 0',
                'tag @e[type=minecraft:block_display,tag=rlk_mb_gd_p13xnew] remove rlk_mb_gd_p13xnew',
                g.particle('explosion', '~ ~0.8 ~', (1.0, 0.4, 1.0), 0, 3),
-               g.particle(BROWN_BLK, '~ ~0.5 ~', (1.6, 0.4, 1.6), 0.3, 20)]
+               g.particle(BROWN_BLK, '~ ~0.5 ~', (1.6 * AREA, 0.4, 1.6 * AREA), 0.3, 20)]
         if style == 'gold':
             for _ in range(12):
                 a, r, size = rnd.uniform(0, 360), rnd.uniform(1.5, 8.0), rnd.uniform(1.0, 3.0)
                 bl.append(f'execute rotated ~{n3(a)} 0 run ' + g.card('shard', f'^ ^0.02 ^{n3(r)}', bb='vertical', s0=size * 0.5, s1=size,
                                                                       life=int(rnd.uniform(16, 22)), fade=6))
-            bl += [g.particle(GOLD_BLK, '~ ~0.4 ~', (3.0, 0.3, 3.0), 0.2, 40),
-                   g.dust(core, 1.6, '~ ~1.5 ~', (3.0, 1.2, 3.0), 30),
+            bl += [g.particle(GOLD_BLK, '~ ~0.4 ~', (3.0 * AREA, 0.3, 3.0 * AREA), 0.2, 40),
+                   g.dust(core, 1.6, '~ ~1.5 ~', (3.0 * AREA, 1.2, 3.0 * AREA), 30),
                    g.sound('entity.generic.explode', 1.0, 0.7), g.sound('block.amethyst_cluster.break', 1.0, 0.6),
                    g.sound('block.pointed_dripstone.land', 1.0, 1.0), g.sound('entity.lightning_bolt.thunder', 0.3, 1.6),
                    g.sound('block.basalt.break', 0.9, 0.8)]
         elif style in ('water', 'ice'):
             for _ in range(10):
-                a, r = rnd.uniform(0, 360), rnd.uniform(0.8, 4.0)
+                a, r = rnd.uniform(0, 360), rnd.uniform(0.8, 4.0) * AREA
                 bl.append(f'execute rotated ~{n3(a)} 0 positioned ^ ^0.9 ^{n3(r)} run ' + g.dust(core, 1.5, '~ ~ ~', (0.05, 0.8, 0.05), 6))
             ice = 'block{block_state:"minecraft:packed_ice"}' if style == 'ice' else 'block{block_state:"minecraft:blue_ice"}'
-            bl += [g.particle('splash', '~ ~0.4 ~', (2.4, 0.4, 2.4), 0, 60),
-                   g.particle('falling_water', '~ ~1.5 ~', (2.4, 1.2, 2.4), 0, 20),
-                   g.particle(ice, '~ ~0.6 ~', (2.0, 0.6, 2.0), 0.25, 30),
-                   g.dust(mid, 1.8, '~ ~1 ~', (2.0, 0.8, 2.0), 30),
+            bl += [g.particle('splash', '~ ~0.4 ~', (2.4 * AREA, 0.4, 2.4 * AREA), 0, 60),
+                   g.particle('falling_water', '~ ~1.5 ~', (2.4 * AREA, 1.2, 2.4 * AREA), 0, 20),
+                   g.particle(ice, '~ ~0.6 ~', (2.0 * AREA, 0.6, 2.0 * AREA), 0.25, 30),
+                   g.dust(mid, 1.8, '~ ~1 ~', (2.0 * AREA, 0.8, 2.0 * AREA), 30),
                    g.sound('entity.generic.explode', 0.9, 0.8), g.sound('block.glass.break', 1.0, 0.7),
                    g.sound('entity.player.splash.high_speed', 0.9, 1.0), g.sound('block.powder_snow.break', 1.0, 1.0)]
             if style == 'ice':
-                bl.append(g.particle('snowflake', '~ ~1 ~', (2.4, 1.0, 2.4), 0.04, 30))
+                bl.append(g.particle('snowflake', '~ ~1 ~', (2.4 * AREA, 1.0, 2.4 * AREA), 0.04, 30))
         elif style == 'fire':
-            bl += [g.particle('flame', '~ ~0.8 ~', (2.4, 1.0, 2.4), 0.05, 40), g.particle('lava', '~ ~0.4 ~', (2.0, 0.3, 2.0), 0, 10),
-                   g.particle('large_smoke', '~ ~1 ~', (1.6, 0.8, 1.6), 0.02, 10), g.dust(mid, 1.8, '~ ~1 ~', (2.4, 1.0, 2.4), 30),
+            bl += [g.particle('flame', '~ ~0.8 ~', (2.4 * AREA, 1.0, 2.4 * AREA), 0.05, 40), g.particle('lava', '~ ~0.4 ~', (2.0 * AREA, 0.3, 2.0 * AREA), 0, 10),
+                   g.particle('large_smoke', '~ ~1 ~', (1.6 * AREA, 0.8, 1.6 * AREA), 0.02, 10), g.dust(mid, 1.8, '~ ~1 ~', (2.4 * AREA, 1.0, 2.4 * AREA), 30),
                    g.sound('entity.generic.explode', 1.0, 0.8), g.sound('item.firecharge.use', 1.0, 0.7),
                    g.sound('entity.blaze.shoot', 0.6, 0.6)]
         else:                                   # spark
             for j in range(3):
                 a = 120 * j + rnd.uniform(-30, 30)
-                r = rnd.uniform(1.5, 3.5)
+                r = rnd.uniform(1.5, 3.5) * AREA
                 for m, p in enumerate(bolt_points(rnd, rnd.uniform(3.5, 5.0), segs=6, jit=0.45, n=2)):
                     bl.append(f'execute rotated ~{n3(a)} 0 positioned ^{n3(p[0])} ^{n3(p[1])} ^{n3(r + p[2])} run '
                               + g.dust(core if m % 3 == 0 else mid, 1.1, '~ ~ ~', (0, 0, 0), 1))
-            bl += [g.particle('electric_spark', '~ ~0.8 ~', (2.4, 0.8, 2.4), 0.4, 40), g.particle('end_rod', '~ ~1 ~', (1.6, 0.8, 1.6), 0.1, 12),
-                   g.dust(mid, 1.8, '~ ~1 ~', (2.4, 1.0, 2.4), 30),
+            bl += [g.particle('electric_spark', '~ ~0.8 ~', (2.4 * AREA, 0.8, 2.4 * AREA), 0.4, 40), g.particle('end_rod', '~ ~1 ~', (1.6 * AREA, 0.8, 1.6 * AREA), 0.1, 12),
+                   g.dust(mid, 1.8, '~ ~1 ~', (2.4 * AREA, 1.0, 2.4 * AREA), 30),
                    g.sound('entity.generic.explode', 0.9, 0.8), g.sound('entity.lightning_bolt.impact', 1.0, 0.6),
                    g.sound('entity.lightning_bolt.thunder', 0.3, 1.6), g.sound('block.copper_bulb.turn_on', 0.7, 1.2)]
         g.pw(k, f'blast{kind}', bl)
@@ -727,7 +756,7 @@ def fail(g):
             g.pw(k, f'tail{kind}', [g.sound('block.copper_bulb.turn_on', 0.5, 1.6), g.particle('electric_spark', '~ ~0.3 ~', (2.0, 0.2, 2.0), 0.2, 8)])
         # residue: crimson (or blue) floor + glowing cracks radiating >= 8 b
         floor = (0.34, 0.15, 0.13) if style in ('gold', 'fire', 'spark') else (0.23, 0.38, 0.77)
-        res = [f'# Residue (kind {kind}): tinted floor and glowing cracks.', g.dust(floor, 2.6, '~ ~0.08 ~', (2.4, 0.02, 2.4), 10)]
+        res = [f'# Residue (kind {kind}): tinted floor and glowing cracks.', g.dust(floor, 2.6, '~ ~0.08 ~', (2.4 * AREA, 0.02, 2.4 * AREA), 10)]
         for a in range(0, 360, 45):
             for r in (1.6, 3.6, 6.0, 8.0):
                 res.append(f'execute rotated ~{n3(a + 9 * math.sin(r))} 0 positioned ^ ^0.06 ^{n3(r)} run ' + g.dust(crack, 1.0, '~ ~ ~', (0.12, 0, 0.12), 1))
@@ -788,6 +817,8 @@ def fail(g):
                     f'kill @e[type=minecraft:marker,tag=rlk_mb_gd_p13t{j}]',
                     f'scoreboard players operation {KS} mb = #gdFailK{j + 1} mb',
                     f'execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ {CY} ~ {{Tags:{tags(*X.base_tags(pid, f"rlk_mb_gd_p13t{j}"))}}}',
+                    f'# the disc (r {FAIL_R:g}) stays inside the walkable arena and still covers a player standing at the wall',
+                    clamp_in(T, WALK_R - FAIL_R),
                     f'execute as {T} at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] feet run tp @s ~ ~ ~ ~ 0',
                     f'execute at {T} run summon minecraft:marker ~ ~11 ~ {{Tags:{tags(*X.base_tags(pid, f"rlk_mb_gd_p13k{j}"))}}}']
            + [c[1] for c in colsum[:3]]
@@ -876,18 +907,18 @@ def fail(g):
                            f'{{start_interpolation:0,interpolation_duration:3,transformation:{tf((0, 0, 0), X.QI, (0, 0, 0))}}}' for m in range(6)])
         at(FAIL_COL + 9, f'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p13c{j}]')
         # hang, colour change, whistle
-        at(35, f'execute {ATT} run ' + g.sound('block.beacon.ambient', 0.7, 0.5))
-        tint = [f'# Spear {j + 1}: red -> the star colour (m4 +37..+40), top to bottom, chime.',
+        at(fail_t(35), f'execute {ATT} run ' + g.sound('block.beacon.ambient', 0.7, 0.5))
+        tint = [f'# Spear {j + 1}: red -> the star colour (m4 +37..+40, played +{fail_t(37)}..+{fail_t(40)}), top to bottom, chime.',
                 f'execute {ATT} run ' + g.sound('block.amethyst_block.chime', 0.9, 1.5)]
         for kind in KIND:
             tint.append(f'execute if score {KS} mb matches {kind} as {S} run {F(f"tint1_{kind}")}')
             tint += [f'execute if score {KS} mb matches {kind} {ATT} positioned ~ ~{n3(11.0 - 1.4 * m)} ~ run '
                      + g.dust(KIND[kind][0], 1.3, '~ ~ ~', (0.25, 0.3, 0.25), 3) for m in range(5)]
         pw('tint', tint)
-        at(37, J('tint'))
-        at(40, *[f'execute if score {KS} mb matches {kind} as {S} run {F(f"tint2_{kind}")}' for kind in TINT2],
+        at(fail_t(37), J('tint'))
+        at(fail_t(40), *[f'execute if score {KS} mb matches {kind} as {S} run {F(f"tint2_{kind}")}' for kind in TINT2],
            f'execute {ATT} run ' + g.dust((0.92, 0.94, 1.0), 1.0, '~ ~7 ~', (0.25, 2.5, 0.25), 8))
-        at(44, f'execute {ATT} run ' + g.sound('item.trident.riptide_3', 0.5, 1.4))
+        at(fail_t(44), f'execute {ATT} run ' + g.sound('item.trident.riptide_3', 0.5, 1.4))
         # 49: drop (<= 1 t) + impact
         drop = [f'# Spear {j + 1} (T0+{FAIL_HIT + b}): it drops in 1 t (teleport_duration 1) and strikes; the hazard resolves this tick.',
                 f'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p13d{j}]',
@@ -910,8 +941,8 @@ def fail(g):
         bl += [f'tag @e[type=minecraft:block_display,tag=rlk_mb_gd_p13x,tag=!rlk_mb_gd_p13x0,tag=!rlk_mb_gd_p13x1] add rlk_mb_gd_p13x{j}']
         pw('blast', bl)
         at(FAIL_HIT + 2, J('blast'))
-        specs = X.cube_set(1349 + j, 9, ['rock', 'dark', 'gold', 'rock', 'goldb', 'crimson', 'brown'], (1.2, 0.3, 1.2), (0.2, 0.5),
-                           (1.5, 3.4), up=0.6, delay=2)
+        specs = X.cube_set(1349 + j, 9, ['rock', 'dark', 'gold', 'rock', 'goldb', 'crimson', 'brown'], (1.2 * AREA, 0.3, 1.2 * AREA), (0.2, 0.5),
+                           (1.5 * AREA, 3.4 * AREA), up=0.6, delay=2)
         X.cubes(tl, pid, f'13r{j}', FAIL_HIT + 2 + b, specs, f'at {T} positioned ~ ~0.5 ~', 14, cond=cond)
         at(FAIL_HIT + 3, f'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p13x{j}] run data merge entity @s '
                          '{start_interpolation:0,interpolation_duration:5,transformation:{scale:[0f,10f,0f]}}')
