@@ -230,117 +230,279 @@
     {
       "id": 2,
       "name": "thrust",
-      "len": 91,
+      "len": 79,
       "loop": false,
       "next": "idle",
       "events": {
-        "glow": 4,
-        "glint": 19,
-        "hit1": 28,
-        "rise": 38,
-        "dive": 54,
-        "hit2": 58,
-        "land": 65,
-        "flourish": 72
+        "glow": 3,
+        "glint": 14,
+        "hit1": 21,
+        "rise": 31,
+        "dive": 42,
+        "hit2": 46,
+        "land": 53,
+        "flourish": 60
       },
-      "keyFiles": 84,
-      "keys": 1289,
-      "note": "body travel by the pattern code: lunge 2-3 b forward at 27-28; fly back 4-6 b at 38-54; dash 5-6 b at 57-58"
+      "keyFiles": 77,
+      "keys": 1271,
+      "note": "body travel by the pattern code: lunge 2-3 b forward at 27-28; fly back 4-6 b at 38-54; dash 5-6 b at 57-58",
+      "authoredLen": 91,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          26,
+          19
+        ],
+        [
+          28,
+          21
+        ],
+        [
+          38,
+          31
+        ],
+        [
+          54,
+          42
+        ],
+        [
+          58,
+          46
+        ],
+        [
+          91,
+          79
+        ]
+      ]
     },
     {
       "id": 3,
       "name": "javelin",
-      "len": 76,
+      "len": 67,
       "loop": false,
       "next": "idle",
       "events": {
         "spin": 0,
-        "vanish": 10,
-        "glyph": 11,
-        "beam": 28,
-        "rematerialise": 31,
-        "release": 35,
-        "launch": 36,
-        "return": 58,
-        "catch": 63
+        "vanish": 9,
+        "glyph": 10,
+        "beam": 20,
+        "rematerialise": 22,
+        "release": 26,
+        "launch": 27,
+        "return": 49,
+        "catch": 54
       },
-      "keyFiles": 70,
-      "keys": 567,
-      "note": "the rig spear is hidden from 10 to 31 and from 36 to 63; the flying spear is a prop (rig/prop/spear) moved by the pattern code"
+      "keyFiles": 64,
+      "keys": 557,
+      "note": "the rig spear is hidden from 10 to 31 and from 36 to 63; the flying spear is a prop (rig/prop/spear) moved by the pattern code",
+      "authoredLen": 76,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          10,
+          9
+        ],
+        [
+          31,
+          22
+        ],
+        [
+          36,
+          27
+        ],
+        [
+          76,
+          67
+        ]
+      ]
     },
     {
       "id": 4,
       "name": "slam",
-      "len": 70,
+      "len": 64,
       "loop": false,
       "next": "idle",
       "events": {
         "raise": 0,
-        "ring": 9,
-        "glint": 12,
-        "down": 22,
-        "impact": 26,
-        "pull": 48,
-        "twirl": 54
+        "ring": 7,
+        "glint": 9,
+        "down": 16,
+        "impact": 20,
+        "pull": 42,
+        "twirl": 48
       },
-      "keyFiles": 61,
-      "keys": 703,
-      "note": "disc r 5 centred 3.5 b in front; the spear stays planted (rig part) 26-48, so the body must not move then"
+      "keyFiles": 57,
+      "keys": 692,
+      "note": "disc r 5 centred 3.5 b in front; the spear stays planted (rig part) 26-48, so the body must not move then",
+      "authoredLen": 70,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          7,
+          6
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          21,
+          15
+        ],
+        [
+          26,
+          20
+        ],
+        [
+          70,
+          64
+        ]
+      ]
     },
     {
       "id": 5,
       "name": "pull",
-      "len": 40,
+      "len": 32,
       "loop": false,
       "next": "idle",
       "events": {
         "aura": 0,
-        "cage": 11,
-        "relocate": 32
+        "cage": 7,
+        "relocate": 24
       },
-      "keyFiles": 34,
-      "keys": 269,
-      "note": "the corrupted claw casts (the left hand takes the shaft); the player is relocated at 32; follow with swing after 10-14 t (K15)"
+      "keyFiles": 29,
+      "keys": 232,
+      "note": "the corrupted claw casts (the left hand takes the shaft); the player is relocated at 32; follow with swing after 10-14 t (K15)",
+      "authoredLen": 40,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          22,
+          14
+        ],
+        [
+          32,
+          24
+        ],
+        [
+          40,
+          32
+        ]
+      ]
     },
     {
       "id": 6,
       "name": "swing",
-      "len": 51,
+      "len": 46,
       "loop": false,
       "next": "idle",
       "events": {
         "windup": 0,
-        "swing1": 20,
-        "swing1_end": 24,
-        "swing2": 33,
-        "swing2_end": 39
+        "swing1": 15,
+        "swing1_end": 19,
+        "swing2": 28,
+        "swing2_end": 34
       },
-      "keyFiles": 46,
-      "keys": 728,
-      "note": "two full 360 degree spins with the spear level at waist height: forehand (left to right) 20-24, backhand 33-39 rising low-right to high-left"
+      "keyFiles": 43,
+      "keys": 719,
+      "note": "two full 360 degree spins with the spear level at waist height: forehand (left to right) 20-24, backhand 33-39 rising low-right to high-left",
+      "authoredLen": 51,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          17,
+          12
+        ],
+        [
+          39,
+          34
+        ],
+        [
+          51,
+          46
+        ]
+      ]
     },
     {
       "id": 7,
       "name": "flyslam",
-      "len": 101,
+      "len": 91,
       "loop": false,
       "next": "idle",
       "events": {
         "raise": 0,
-        "glint": 6,
-        "beam": 16,
-        "takeoff": 19,
-        "ring": 21,
-        "gone": 23,
-        "dive": 39,
-        "impact": 41,
-        "spikes": 47,
-        "pull": 71,
-        "twirl": 79
+        "glint": 5,
+        "beam": 12,
+        "takeoff": 14,
+        "ring": 16,
+        "gone": 18,
+        "dive": 29,
+        "impact": 31,
+        "spikes": 37,
+        "pull": 61,
+        "twirl": 69
       },
-      "keyFiles": 86,
-      "keys": 806,
-      "note": "rises to +8 b at 19-23 and stays up; move the body under the locked ring during 23-39; dives at 39-41; the spear stays planted 41-71"
+      "keyFiles": 78,
+      "keys": 769,
+      "note": "rises to +8 b at 19-23 and stays up; move the body under the locked ring during 23-39; dives at 39-41; the spear stays planted 41-71",
+      "authoredLen": 101,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          19,
+          14
+        ],
+        [
+          23,
+          18
+        ],
+        [
+          36,
+          26
+        ],
+        [
+          41,
+          31
+        ],
+        [
+          101,
+          91
+        ]
+      ]
     },
     {
       "id": 8,
@@ -373,33 +535,63 @@
     {
       "id": 10,
       "name": "sweep",
-      "len": 44,
+      "len": 39,
       "loop": false,
       "next": "idle",
       "events": {
         "windup": 0,
-        "active": 19,
-        "active_end": 24
+        "active": 14,
+        "active_end": 19
       },
-      "keyFiles": 42,
-      "keys": 380,
-      "note": "gold sweep: 19 t wind-up (spear cocked behind her right shoulder, tip toward her left), 180-210 degree front arc from her left to her right, active 19-24"
+      "keyFiles": 36,
+      "keys": 372,
+      "note": "gold sweep: 19 t wind-up (spear cocked behind her right shoulder, tip toward her left), 180-210 degree front arc from her left to her right, active 19-24",
+      "authoredLen": 44,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          19,
+          14
+        ],
+        [
+          44,
+          39
+        ]
+      ]
     },
     {
       "id": 11,
       "name": "sweep_e",
-      "len": 50,
+      "len": 45,
       "loop": false,
       "next": "idle",
       "events": {
         "enchant": 0,
-        "windup": 7,
-        "active": 19,
-        "active_end": 27
+        "windup": 5,
+        "active": 14,
+        "active_end": 22
       },
-      "keyFiles": 49,
-      "keys": 430,
-      "note": "enchanted sweep (call rig/spear/<element> first): enchant line 0-6, wind-up raised high to her left 7-19, active 19-27"
+      "keyFiles": 44,
+      "keys": 409,
+      "note": "enchanted sweep (call rig/spear/<element> first): enchant line 0-6, wind-up raised high to her left 7-19, active 19-27",
+      "authoredLen": 50,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          19,
+          14
+        ],
+        [
+          50,
+          45
+        ]
+      ]
     },
     {
       "id": 12,
@@ -445,17 +637,28 @@
     {
       "id": 15,
       "name": "chaos_fail",
-      "len": 40,
+      "len": 30,
       "loop": false,
       "next": null,
       "events": {
-        "twist": 10,
-        "rise": 21,
-        "high": 25
+        "twist": 8,
+        "rise": 16,
+        "high": 19
       },
-      "keyFiles": 32,
-      "keys": 325,
-      "note": "timeout (tick 0 = timer full): twist with the wing swept across the front (10-14), rise 0.5-0.7 BH (21-25) and hold; play chaos_land at tick 33 (lands at +55, between fail spear 1 at +49 and spear 2 at +80)"
+      "keyFiles": 24,
+      "keys": 287,
+      "note": "timeout (tick 0 = timer full): twist with the wing swept across the front (10-14), rise 0.5-0.7 BH (21-25) and hold; play chaos_land at tick 33 (lands at +55, between fail spear 1 at +49 and spear 2 at +80)",
+      "authoredLen": 40,
+      "retime": [
+        [
+          0,
+          0
+        ],
+        [
+          40,
+          30
+        ]
+      ]
     },
     {
       "id": 16,
@@ -581,6 +784,21 @@
       "keyFiles": 21,
       "keys": 263,
       "note": "fail spear 2: from the across-the-shoulders stance she raises the spear vertically overhead in the last 0.3 s before the drop (start 6 t before it), holds, then idle"
+    },
+    {
+      "id": 25,
+      "name": "backstep",
+      "len": 12,
+      "loop": false,
+      "next": "idle",
+      "events": {
+        "push": 2,
+        "peak": 6,
+        "land": 10
+      },
+      "keyFiles": 9,
+      "keys": 245,
+      "note": "P4 from melee range: a readable hop back to 6-7 b (move the anchor away over 11 t); the spear stays in its idle hold"
     }
   ],
   "elements": {

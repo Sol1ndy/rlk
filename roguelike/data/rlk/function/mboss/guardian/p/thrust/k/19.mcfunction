@@ -1,6 +1,6 @@
 # thrust clip tick 19
-execute at @s rotated as @s rotated ~ 0 run function rlk:fx/nv/card {kind:"star",pos:"^-3.934 ^2.842 ^0.756",rot:"~ ~",bb:"center",roll:0,spin:45,s0:0.3,s1:1.6,move:"0f,0f,0f",life:6,fade:3}
-execute at @s rotated as @s rotated ~ 0 run function rlk:fx/nv/card {kind:"glow",pos:"^-3.934 ^2.842 ^0.756",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.5,s1:1.3,move:"0f,0f,0f",life:5,fade:3}
-execute at @s rotated as @s rotated ~ 0 positioned ^-3.934 ^2.842 ^0.756 run particle minecraft:end_rod ~ ~ ~ 0.1 0.1 0.1 0.06 8 force @a[tag=player]
-playsound minecraft:block.amethyst_block.chime hostile @a[tag=player] ~ ~ ~ 1 2 0.33
-playsound minecraft:block.amethyst_cluster.hit hostile @a[tag=player] ~ ~ ~ 0.5 1.8 0.17
+execute at @s rotated as @s rotated ~ 0 positioned ^-1.427 ^1.485 ^2.187 run particle minecraft:dust{color:[0.992f,0.957f,0.584f],scale:0.9} ~ ~ ~ 0.03 0.03 0.03 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-1.235 ^1.59 ^2.27 run particle minecraft:dust{color:[0.992f,0.957f,0.584f],scale:0.9} ~ ~ ~ 0.03 0.03 0.03 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-1.037 ^1.699 ^2.356 run particle minecraft:dust{color:[0.992f,0.957f,0.584f],scale:0.9} ~ ~ ~ 0.03 0.03 0.03 0 1 force @a[tag=player]
+execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p1c,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p1c,limit=1] positioned ^ ^ ^3 run function rlk:mboss/mv/glide {t:2}
+playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 0.7 0.9 0.23

@@ -1,6 +1,8 @@
 # pull tick 36 (@s = body, at the body).
-execute rotated as @s rotated ~ 0 run particle minecraft:dust_color_transition{from_color:[0.75f,0.1f,0.18f],to_color:[0.39f,0.12f,0.1f],scale:1.6} ^0 ^1.9 ^-0.8 0.7 0.9 0.35 0 4 force @a[tag=player]
-execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.62f,0.27f,0.35f],scale:1.3} ^0.581 ^1.217 ^0.8 0.08 0.08 0.08 0 2 force @a[tag=player]
-scoreboard players set @a[tag=player] vBig 8
-title @a[tag=player] times 0 3 0
-title @a[tag=player] title [{"text":"\ue508\ue5f0\ue509\ue5f1\ue50a\ue5f0\ue50b\ue5f0","font":"rlk:mboss_gd","color":"white","shadow_color":0}]
+# Swing clip (46 t): wind-up 0-5, hold 5-14, swing 1 at clip 15 (= 51), swing 2 at clip 28 (= 64); hazards r 6.8, tell 15.
+function rlk:mboss/guardian/rig/play/swing
+scoreboard players set #hzSfx mb 0
+scoreboard players set #hzAct mb 3
+scoreboard players set #hzVis mb 41
+execute positioned ~ 201 ~ rotated as @s rotated ~ 0 run function rlk:mboss/hz/sector {r:68,a:180,tell:15,dmg:120}
+playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.4 0.8 0.13

@@ -1,18 +1,7 @@
 # flyslam clip tick 15
-kill @e[type=minecraft:block_display,tag=rlk_mb_gd_q5c8_1]
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.525 ^0.25 ^-0.909 run particle minecraft:dust{color:[0.796f,0.647f,0.51f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.984 ^0.721 ^-0.245 run particle minecraft:dust{color:[0.976f,0.91f,0.647f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.83 ^1.193 ^0.519 run particle minecraft:dust{color:[0.796f,0.647f,0.51f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.196 ^1.664 ^0.922 run particle minecraft:dust{color:[0.976f,0.91f,0.647f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^0.507 ^2.136 ^0.752 run particle minecraft:dust{color:[0.796f,0.647f,0.51f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^0.858 ^2.607 ^0.151 run particle minecraft:dust{color:[0.976f,0.91f,0.647f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^0.676 ^3.079 ^-0.491 run particle minecraft:dust{color:[0.796f,0.647f,0.51f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^0.111 ^3.55 ^-0.792 run particle minecraft:dust{color:[0.976f,0.91f,0.647f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^0.525 ^0.25 ^0.909 run particle minecraft:dust{color:[0.976f,0.91f,0.647f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^0.984 ^0.721 ^0.245 run particle minecraft:dust{color:[0.796f,0.647f,0.51f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^0.83 ^1.193 ^-0.519 run particle minecraft:dust{color:[0.976f,0.91f,0.647f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^0.196 ^1.664 ^-0.922 run particle minecraft:dust{color:[0.796f,0.647f,0.51f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.507 ^2.136 ^-0.752 run particle minecraft:dust{color:[0.976f,0.91f,0.647f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.858 ^2.607 ^-0.151 run particle minecraft:dust{color:[0.796f,0.647f,0.51f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.676 ^3.079 ^0.491 run particle minecraft:dust{color:[0.976f,0.91f,0.647f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.111 ^3.55 ^0.792 run particle minecraft:dust{color:[0.796f,0.647f,0.51f],scale:0.9} ~ ~ ~ 0.02 0.02 0.02 0 1 force @a[tag=player]
+kill @e[type=minecraft:block_display,tag=rlk_mb_gd_q5c10_1]
+particle minecraft:dust_color_transition{from_color:[0.99f,0.33f,0.33f],to_color:[0.39f,0.12f,0.1f],scale:1.5} ~ ~2.049 ~ 0.3 0.6 0.3 0 5 force @a[tag=player]
+particle minecraft:block{block_state:"minecraft:black_concrete"} ~ ~1.849 ~ 0.25 0.4 0.25 0 3 force @a[tag=player]
+execute at @s positioned ~ ~3.4 ~ positioned ^-0.041 ^1.547 ^-0.184 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p5","rlk_mb_gd_q5t","rlk_mb_gd_q5t_0"],block_state:{id:"minecraft:black_terracotta"},brightness:{sky:11,block:11},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.076f,-0.03f,-0.152f],left_rotation:[-0.127f,-0.332f,-0.498f,0.791f],scale:[0.199f,0.199f,0.199f],right_rotation:[0f,0f,0f,1f]}}
+execute at @s positioned ~ ~3.4 ~ positioned ^-0.282 ^-0.358 ^-0.119 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p5","rlk_mb_gd_q5t","rlk_mb_gd_q5t_1"],block_state:{id:"minecraft:black_terracotta"},brightness:{sky:11,block:11},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.145f,-0.083f,0.015f],left_rotation:[-0.388f,0.127f,-0.182f,0.895f],scale:[0.193f,0.193f,0.193f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:mboss/guardian/p/flyslam/lock

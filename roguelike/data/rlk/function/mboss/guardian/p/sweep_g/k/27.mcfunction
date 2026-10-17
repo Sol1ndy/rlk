@@ -1,4 +1,2 @@
 # sweep_g clip tick 27
-kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p11w2]
-kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p11b4]
-kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p11b]
+execute at @s rotated as @s rotated ~ 0 positioned ^ ^0.6 ^4.32 run particle minecraft:wax_on ~ ~ ~ 2.88 0.4 1.68 0 3 force @a[tag=player]

@@ -1,3 +1,6 @@
 # javelin clip tick 23
-function rlk:mboss/guardian/rig/face/track
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.9 ^1.5 ^1.2 run particle minecraft:dust{color:[0.969f,0.918f,0.663f],scale:0.55} ~ ~ ~ 0.35 0.35 0.35 0 3 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 run function rlk:fx/nv/card {kind:"ring",pos:"^-0.9 ^1.5 ^1.2",rot:"~ ~",bb:"center",roll:0,spin:120,s0:0.9,s1:0.5,move:"0f,0f,0f",life:4,fade:2}
+data merge entity @e[type=minecraft:block_display,tag=rlk_mb_gd_q2h_0,limit=1] {start_interpolation:0,interpolation_duration:8,transformation:{translation:[0.563f,0.111f,-0.223f],left_rotation:[-0.009f,0.446f,0.638f,-0.627f],scale:[0.031f,0.031f,0.031f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity @e[type=minecraft:block_display,tag=rlk_mb_gd_q2h_1,limit=1] {start_interpolation:0,interpolation_duration:8,transformation:{translation:[0.184f,0.277f,-0.376f],left_rotation:[0.268f,0.877f,0.329f,0.226f],scale:[0.018f,0.018f,0.018f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity @e[type=minecraft:block_display,tag=rlk_mb_gd_q2h_2,limit=1] {start_interpolation:0,interpolation_duration:8,transformation:{translation:[0.652f,0.497f,-0.048f],left_rotation:[-0.269f,0.277f,0.92f,0.063f],scale:[0.031f,0.031f,0.031f],right_rotation:[0f,0f,0f,1f]}}
+execute at @s rotated as @s rotated ~ 0 positioned ^-0.476 ^3.446 ^1.265 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.6} ~ ~ ~ 0.05 0.05 0.05 0 1 force @a[tag=player]

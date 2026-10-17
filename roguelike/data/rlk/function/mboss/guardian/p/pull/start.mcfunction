@@ -1,4 +1,5 @@
-# P4 start (@s = body, player far): pull clip (aura 0, cage 11, relocate 32), voice line, hiss + charge.
+# P4 start (@s = body; from closer than 5 b the core first hopped back, ai/back): pull clip (aura 0, cage 7,
+# relocate 24), voice line, hiss + charge.
 scoreboard players set #gp4Ok mb 0
 function rlk:mboss/guardian/rig/face/player
 function rlk:mboss/guardian/rig/play/pull

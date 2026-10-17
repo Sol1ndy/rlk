@@ -1,5 +1,5 @@
 # A record completed (#gdRecNew = element): slot = element, enchanted spear (rig API), enchanted sweep
-# (pattern 12, p56) at once: its blade slices strike 21-27 t later (front at 23; patterns.md §8.2).
+# (pattern 12, p56) at once: its blade slices strike 16-22 (front at 18) t later (patterns.md §8.2, wind-up tuned).
 scoreboard players set #gdRecOn mb 0
 scoreboard players operation #gdRecEl mb = #gdRecNew mb
 scoreboard players set #gdRecNew mb 0

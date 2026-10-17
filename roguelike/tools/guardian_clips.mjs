@@ -1,6 +1,7 @@
 // Motion clips of the Corrupted Guardian (파수꾼・타락) rig, authored from the reference videos
 // (scratchpad mboss/understand/m1..m4 frames and sheets; timelines in patterns.md §1-§11).
-// Ticks are game ticks (20/s); the rel ticks of patterns.md map 1:1 onto clip ticks.
+// Ticks are game ticks (20/s); the rel ticks of patterns.md map 1:1 onto the authored clip ticks below, and RETIME
+// (end of the file) maps the damaging clips onto the played timeline with shorter wind-ups.
 //
 // Clip: {name, len, loop?, next?, blend?, keys: [[tick, pose, ease?], ...], events, note}
 //   keys are sparse; each merges onto the previous accumulated pose (DEFAULT_POSE first).
@@ -364,7 +365,66 @@ export const CLIPS = [
       k(12, {grip: [-.12, 3.1, .02], fx: 1.2}),
       k(24, {...IDLE}),
     ]},
+  // ---- added for the pull at melee range (ids stay stable): the hop back before P4 -------------
+  // The pattern code glides the anchor 6-7 b away from the player over 11 t (ai/back); the clip carries the
+  // hop: a crouch to push off, a leaned-back flight about 1 b up with the wing flared and the legs trailing
+  // forward, and the landing; the corrupted arm keeps the spear in its idle hold.
+  {name: 'backstep', len: 12, next: 'idle', events: {push: 2, peak: 6, land: 10},
+    note: 'P4 from melee range: a readable hop back to 6-7 b (move the anchor away over 11 t); the spear stays in its idle hold', keys: [
+      k(0, {sAt: IDLE_SAT}),
+      k(2, {pos: [0, .2, 0], torso: [-14, 0, 0], head: [-8, 0, 0], ...WING_UP, legR: [10, 0, -3], legL: [8, 0, 3], skirtF: [6, 0, 0], fx: .9}, 'i'),
+      k(6, {pos: [0, 1.05, 0], rot: [12, 0, 0], torso: [4, 0, 0], head: [-10, 0, 0], ...WING_WIDE, legR: [18, 0, -4], legL: [14, 0, 4],
+        skirtF: [10, 0, 0], tail: [8, 0, 0], fx: 1.0}, 'o'),
+      k(10, {pos: [0, .2, 0], rot: [0, 0, 0], torso: [-10, 0, 0], head: [-8, 0, 0], wing: [0, 0, 30], wc: 10, ws: 20, wp: 30,
+        legR: [10, 0, -3], legL: [8, 0, 3], skirtF: [6, 0, 0], tail: [0, 0, 0]}, 'i'),
+      k(12, {...IDLE}),
+    ]},
 ];
+
+// ---- retiming (user tuning "공격 선딜 좀 짧게"): every damaging wind-up about 25 % shorter ---------------------
+// The clips above stay authored on the reference-video timeline (patterns.md); RETIME maps a clip onto the played
+// timeline with piecewise-linear knots [authored tick, played tick] from [0, 0] to [authored len, played len]. Keys
+// and events are mapped and rounded to whole ticks (half up). The fast strike and spin keys sit on 1:1 segments, so
+// they keep their speed and the strike still lands on its event; only the wind-ups (and P5's hang in the sky, the
+// hold before the P4 swings, the fail rise) are compressed, the recoveries after the last hit are shifted, not
+// shortened. The pattern generator maps its own authored ticks through the same knots (manifest `retime`, api.rt).
+export const RETIME = {
+  thrust: [[0, 0], [26, 19], [28, 21], [38, 31], [54, 42], [58, 46], [91, 79]],             // hit 1 28 -> 21, hit 2 58 -> 46
+  javelin: [[0, 0], [5, 4], [10, 9], [31, 22], [36, 27], [76, 67]],                         // launch 36 -> 27
+  slam: [[0, 0], [4, 3], [7, 6], [9, 7], [21, 15], [26, 20], [70, 64]],                     // ring 9 -> 7, impact 26 -> 20
+  pull: [[0, 0], [22, 14], [32, 24], [40, 32]],                                             // relocate 32 -> 24 (screen 1:1)
+  swing: [[0, 0], [5, 5], [17, 12], [39, 34], [51, 46]],                                    // swing 1 20 -> 15, swing 2 33 -> 28
+  flyslam: [[0, 0], [4, 4], [19, 14], [23, 18], [36, 26], [41, 31], [101, 91]],             // take-off 19 -> 14, impact 41 -> 31
+  sweep: [[0, 0], [19, 14], [44, 39]],                                                      // blade slices 20-24 -> 15-19
+  sweep_e: [[0, 0], [19, 14], [50, 45]],                                                    // blade slices 21-27 -> 16-22
+  chaos_fail: [[0, 0], [40, 30]],                                                           // the fail schedule x0.75
+};
+export function warp(knots, t) {
+  for (let i = 1; i < knots.length; i++) {
+    const [a0, b0] = knots[i - 1], [a1, b1] = knots[i];
+    if (t <= a1) return b0 + (b1 - b0) * (t - a0) / (a1 - a0);
+  }
+  const [a, b] = knots[knots.length - 1];
+  return b + (t - a);
+}
+export const warpTick = (knots, t) => Math.floor(warp(knots, t) + .5);
+function retime(clip, knots) {
+  const [k0, kn] = [knots[0], knots[knots.length - 1]];
+  if (k0[0] !== 0 || k0[1] !== 0 || kn[0] !== clip.len) throw new Error(`retime ${clip.name}: knots must run from [0, 0] to [${clip.len}, ...]`);
+  for (let i = 1; i < knots.length; i++) {
+    if (!(knots[i][0] > knots[i - 1][0] && knots[i][1] > knots[i - 1][1])) throw new Error(`retime ${clip.name}: knots not increasing`);
+    if (knots[i][1] - knots[i - 1][1] > knots[i][0] - knots[i - 1][0]) throw new Error(`retime ${clip.name}: a knot segment slows the clip down`);
+  }
+  const keys = clip.keys.map(([t, p, e]) => [warpTick(knots, t), p, e]);
+  keys.forEach(([t], i) => { if (i && t <= keys[i - 1][0]) throw new Error(`retime ${clip.name}: keys ${clip.keys[i - 1][0]} and ${clip.keys[i][0]} collide at ${t}`); });
+  clip.keys = keys;
+  clip.events = Object.fromEntries(Object.entries(clip.events || {}).map(([n, t]) => [n, warpTick(knots, t)]));
+  clip.authoredLen = clip.len;
+  clip.len = warpTick(knots, clip.len);
+  clip.retime = knots;
+}
+for (const c of CLIPS) if (RETIME[c.name]) retime(c, RETIME[c.name]);
+for (const n of Object.keys(RETIME)) if (!CLIPS.some(c => c.name === n)) throw new Error(`RETIME: unknown clip ${n}`);
 
 // ---- sampling (used by build_mboss_guardian_rig.mjs and offline checks) -------------------------
 const EASE = {io: u => u * u * (3 - 2 * u), i: u => u * u, o: u => 1 - (1 - u) * (1 - u), l: u => u};

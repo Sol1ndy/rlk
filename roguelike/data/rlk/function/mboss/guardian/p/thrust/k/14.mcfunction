@@ -1,10 +1,6 @@
 # thrust clip tick 14
-function rlk:mboss/guardian/rig/face/track
-execute at @s rotated as @s rotated ~ 0 positioned ^-1.174 ^2.668 ^0.011 run particle minecraft:dust_color_transition{from_color:[0.804f,0.702f,0.494f],to_color:[0.616f,0.525f,0.314f],scale:0.9} ~ ~ ~ 0.03 0.03 0.03 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-1.923 ^2.637 ^0.239 run particle minecraft:dust_color_transition{from_color:[0.988f,0.961f,0.682f],to_color:[0.616f,0.525f,0.314f],scale:0.9} ~ ~ ~ 0.03 0.03 0.03 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-2.601 ^2.805 ^0.473 run particle minecraft:dust_color_transition{from_color:[0.804f,0.702f,0.494f],to_color:[0.616f,0.525f,0.314f],scale:0.9} ~ ~ ~ 0.03 0.03 0.03 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-3.456 ^2.802 ^0.664 run particle minecraft:dust_color_transition{from_color:[0.988f,0.961f,0.682f],to_color:[0.616f,0.525f,0.314f],scale:0.9} ~ ~ ~ 0.03 0.03 0.03 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-4.193 ^2.844 ^0.793 run particle minecraft:dust_color_transition{from_color:[0.804f,0.702f,0.494f],to_color:[0.616f,0.525f,0.314f],scale:0.9} ~ ~ ~ 0.03 0.03 0.03 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-4.884 ^2.721 ^1.104 run particle minecraft:dust_color_transition{from_color:[0.988f,0.961f,0.682f],to_color:[0.616f,0.525f,0.314f],scale:0.9} ~ ~ ~ 0.03 0.03 0.03 0 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-5.302 ^2.818 ^1.195 run particle minecraft:end_rod ~ ~ ~ 0.03 0.03 0.03 0.01 1 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^-3.937 ^2.775 ^0.796 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.5} ~ ~ ~ 0.12 0.12 0.12 0 2 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 run function rlk:fx/nv/card {kind:"star",pos:"^-3.934 ^2.851 ^0.751",rot:"~ ~",bb:"center",roll:0,spin:45,s0:0.3,s1:1.6,move:"0f,0f,0f",life:6,fade:3}
+execute at @s rotated as @s rotated ~ 0 run function rlk:fx/nv/card {kind:"glow",pos:"^-3.934 ^2.851 ^0.751",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.5,s1:1.3,move:"0f,0f,0f",life:5,fade:3}
+execute at @s rotated as @s rotated ~ 0 positioned ^-3.934 ^2.851 ^0.751 run particle minecraft:end_rod ~ ~ ~ 0.1 0.1 0.1 0.06 8 force @a[tag=player]
+playsound minecraft:block.amethyst_block.chime hostile @a[tag=player] ~ ~ ~ 1 2 0.33
+playsound minecraft:block.amethyst_cluster.hit hostile @a[tag=player] ~ ~ ~ 0.5 1.8 0.17

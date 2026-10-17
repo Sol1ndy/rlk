@@ -1,5 +1,4 @@
 # fail clip tick 56
-execute if score #gdFailN mb matches 2.. run execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p13c1_3,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.165f,0.446f,0.045f],left_rotation:[0.542f,0.188f,-0.611f,0.546f],scale:[0.551f,0.551f,0.551f],right_rotation:[0f,0f,0f,1f]}}
-execute if score #gdFailN mb matches 2.. run execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p13c1_4,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.46f,-0.171f,-0.132f],left_rotation:[0.01f,0.213f,-0.151f,0.965f],scale:[0.587f,0.587f,0.587f],right_rotation:[0f,0f,0f,1f]}}
-execute if score #gdFailN mb matches 2.. run execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p13c1_5,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.283f,0.416f,-0.442f],left_rotation:[0.417f,-0.084f,-0.435f,0.794f],scale:[0.774f,0.774f,0.774f],right_rotation:[0f,0f,0f,1f]}}
-execute if score #gdFailN mb matches 2.. run function rlk:mboss/guardian/p/fail/j1/decal
+kill @e[type=minecraft:block_display,tag=rlk_mb_gd_q13r0_1]
+kill @e[type=minecraft:block_display,tag=rlk_mb_gd_q13r0_8]
+execute if score #gdFailN mb matches 2.. run execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run playsound minecraft:item.trident.riptide_3 hostile @a[tag=player] ~ ~ ~ 0.5 1.4 0.17

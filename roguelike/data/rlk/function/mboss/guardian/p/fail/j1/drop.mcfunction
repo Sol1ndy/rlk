@@ -1,4 +1,4 @@
-# Spear 2 (T0+80): it drops in 1 t (teleport_duration 1) and strikes; the hazard resolves this tick.
+# Spear 2 (T0+60): it drops in 1 t (teleport_duration 1) and strikes; the hazard resolves this tick.
 kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p13d1]
 execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_p13s1,limit=1] at @s run tp @s ~ ~-4.2 ~
 execute if score #gp13K1 mb matches 1 at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run function rlk:mboss/guardian/p/fail/hit1

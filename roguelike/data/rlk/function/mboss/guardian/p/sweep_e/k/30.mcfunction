@@ -1,4 +1,5 @@
 # sweep_e clip tick 30
-kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p12w4]
-kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p12b6]
-kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p12b]
+execute if score #gdSwEl mb matches 1 run function rlk:mboss/guardian/p/sweep_e/e1/30
+execute if score #gdSwEl mb matches 2 run function rlk:mboss/guardian/p/sweep_e/e2/30
+execute if score #gdSwEl mb matches 3 run function rlk:mboss/guardian/p/sweep_e/e3/30
+execute if score #gdSwEl mb matches 4 run function rlk:mboss/guardian/p/sweep_e/e4/30

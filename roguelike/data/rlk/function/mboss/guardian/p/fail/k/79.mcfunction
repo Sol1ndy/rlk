@@ -1,5 +1,2 @@
 # fail clip tick 79
-execute if score #gdFailN mb matches 1.. run kill @e[type=minecraft:item_display,tag=rlk_mb_gd_p13s0]
-execute if score #gdFailN mb matches 1.. run kill @e[type=minecraft:marker,tag=rlk_mb_gd_p13t0]
-execute if score #gdFailN mb matches 1.. run kill @e[type=minecraft:marker,tag=rlk_mb_gd_p13k0]
-execute if score #gdFailN mb matches 2.. run execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p13t1,limit=1] run function rlk:mboss/guardian/p/fail/streakf
+kill @e[type=minecraft:block_display,tag=rlk_mb_gd_q13r1_8]

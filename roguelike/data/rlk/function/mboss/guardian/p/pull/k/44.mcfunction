@@ -1,8 +1,3 @@
 # pull tick 44 (@s = body, at the body).
-# Swing clip (51 t): wind-up 0-5, hold 5-19, swing 1 at clip 20 (= 64), swing 2 at clip 33 (= 77).
-function rlk:mboss/guardian/rig/play/swing
-scoreboard players set #hzSfx mb 0
-scoreboard players set #hzAct mb 3
-scoreboard players set #hzVis mb 41
-execute positioned ~ 201 ~ rotated as @s rotated ~ 0 run function rlk:mboss/hz/sector {r:55,a:180,tell:20,dmg:120}
-playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.4 0.8 0.13
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.99f,0.86f,0.45f],scale:0.8} ^1.89 ^2.771 ^-0.525 0.4 0.25 0.3 0 3 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:wax_on ^2.7 ^3.26 ^-0.75 0.2 0.2 0.2 0 1 force @a[tag=player]

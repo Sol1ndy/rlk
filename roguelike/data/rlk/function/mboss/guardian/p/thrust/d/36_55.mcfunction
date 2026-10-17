@@ -1,0 +1,3 @@
+# dispatch #gdPT 36..55
+execute if score #gdPT mb matches 36..43 run return run function rlk:mboss/guardian/p/thrust/d/36_43
+execute if score #gdPT mb matches 44..55 run return run function rlk:mboss/guardian/p/thrust/d/44_55

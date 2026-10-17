@@ -1,2 +1,3 @@
 # thrust clip tick 34
-execute at @s rotated as @s rotated ~ 0 positioned ^-0.443 ^1.379 ^4.437 run particle minecraft:dust{color:[0.99f,0.86f,0.45f],scale:1} ~ ~ ~ 0.7 0.6 0.7 0 2 force @a[tag=player]
+function rlk:mboss/guardian/p/thrust/lock2
+execute at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_gd_p1u,limit=1] feet run tp @s ~ ~ ~ ~ 0

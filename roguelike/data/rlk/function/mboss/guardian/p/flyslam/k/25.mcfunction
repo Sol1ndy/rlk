@@ -1,10 +1,2 @@
 # flyslam clip tick 25
-particle minecraft:dust_color_transition{from_color:[0.99f,0.33f,0.33f],to_color:[0.39f,0.12f,0.1f],scale:1.3} ~ ~9.786 ~ 0.25 0.35 0.25 0 3 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^0 ^0.12 ^0.9 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^0.636 ^0.12 ^0.636 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^0.9 ^0.12 ^0 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^0.636 ^0.12 ^-0.636 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^0 ^0.12 ^-0.9 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-0.636 ^0.12 ^-0.636 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-0.9 ^0.12 ^0 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p5t,limit=1] positioned ^-0.636 ^0.12 ^0.636 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.8} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust_color_transition{from_color:[0.99f,0.33f,0.33f],to_color:[0.39f,0.12f,0.1f],scale:1.3} ~ ~9.876 ~ 0.25 0.35 0.25 0 3 force @a[tag=player]

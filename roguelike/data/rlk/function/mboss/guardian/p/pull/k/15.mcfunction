@@ -1,15 +1,13 @@
 # pull tick 15 (@s = body, at the body).
-execute rotated as @s rotated ~ 0 run particle minecraft:dust_color_transition{from_color:[0.75f,0.1f,0.18f],to_color:[0.39f,0.12f,0.1f],scale:1.6} ^0 ^1.9 ^-0.8 0.7 0.9 0.35 0 7 force @a[tag=player]
-execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.62f,0.27f,0.35f],scale:1.3} ^-0.833 ^0.956 ^-0.223 0.08 0.08 0.08 0 2 force @a[tag=player]
-execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.62f,0.27f,0.35f],scale:1.3} ^0.276 ^1.397 ^1.03 0.08 0.08 0.08 0 2 force @a[tag=player]
-execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.62f,0.27f,0.35f],scale:1.3} ^0.953 ^2.116 ^-0.953 0.08 0.08 0.08 0 2 force @a[tag=player]
+playsound minecraft:block.fire.ambient hostile @a[tag=player] ~ ~ ~ 0.8 1 0.27
+execute rotated as @s rotated ~ 0 run particle minecraft:dust_color_transition{from_color:[0.75f,0.1f,0.18f],to_color:[0.39f,0.12f,0.1f],scale:1.6} ^0 ^1.9 ^-0.8 0.7 0.9 0.35 0 8 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.62f,0.27f,0.35f],scale:1.3} ^-0.985 ^0.503 ^-1.057 0.08 0.08 0.08 0 2 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.62f,0.27f,0.35f],scale:1.3} ^-0.397 ^1.447 ^1.297 0.08 0.08 0.08 0 2 force @a[tag=player]
+execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.62f,0.27f,0.35f],scale:1.3} ^1.051 ^2.625 ^-0.243 0.08 0.08 0.08 0 2 force @a[tag=player]
 execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.9f,0.2f,0.3f],scale:1} ^-0.3 ^2.95 ^0.9 0.1 0.1 0.1 0 2 force @a[tag=player]
 execute rotated as @s rotated ~ 0 run particle minecraft:dust{color:[1f,0.75f,0.8f],scale:0.6} ^-0.3 ^2.95 ^0.9 0.03 0.03 0.03 0 1 force @a[tag=player]
-execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p4rc2] run data merge entity @s {start_interpolation:0,interpolation_duration:18,transformation:{translation:[-2.1337f,3.0809f,-0.2596f],left_rotation:[0.4771f,0.8064f,-0.3082f,-0.1646f],scale:[0.328f,0.328f,0.328f],right_rotation:[0f,0f,0f,1f]}}
-execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p4rc4] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.2118f,2.5842f,1.3975f],left_rotation:[0.0293f,0.101f,0.0401f,0.9936f],scale:[0.329f,0.329f,0.329f],right_rotation:[0f,0f,0f,1f]}}
-execute rotated as @s rotated ~ 0 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p4","rlk_mb_gd_p4rc","rlk_mb_gd_p4rc5","rlk_mb_gd_p4new"],brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,block_state:{id:"minecraft:black_concrete"},transformation:{translation:[1.2524f,1.2527f,0.4343f],left_rotation:[-0.1633f,0.4142f,0.2168f,0.8688f],scale:[0.02f,0.02f,0.02f],right_rotation:[0f,0f,0f,1f]}}
-execute rotated as @s rotated ~ 0 run tp @e[tag=rlk_mb_gd_p4new] ~ ~ ~ ~ 0
-tag @e[tag=rlk_mb_gd_p4new] remove rlk_mb_gd_p4new
-execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p4k4] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.5783f,0.6961f,-0.2052f],left_rotation:[-0.0457f,-0.0795f,-0.0226f,0.9955f],scale:[0.54f,0.54f,0.54f],right_rotation:[0f,0f,0f,1f]}}
-execute if entity @e[tag=rlk_av,limit=1] at @e[tag=rlk_body,limit=1] run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p4","rlk_mb_gd_p4cage","rlk_mb_gd_p4k5"],brightness:{sky:15,block:15},view_range:2f,shadow_radius:0f,teleport_duration:1,interpolation_duration:0,block_state:{id:"minecraft:black_concrete"},transformation:{translation:[0.2947f,1.1381f,0.163f],left_rotation:[0.0771f,-0.2611f,0.0581f,0.9605f],scale:[0.05f,0.05f,0.05f],right_rotation:[0f,0f,0f,1f]},Glowing:1b,glow_color_override:12070714}
-execute at @e[tag=rlk_body,limit=1] run particle minecraft:block{block_state:"minecraft:black_concrete"} ~0.3 ~1.16 ~0.2 0.15 0.15 0.15 0 3 force @a[tag=player]
+execute at @e[tag=rlk_body,limit=1] run particle minecraft:dust{color:[0.72f,0.18f,0.23f],scale:1.2} ~ ~1.1 ~ 0.45 0.8 0.45 0 4 force @a[tag=player]
+execute at @e[tag=rlk_body,limit=1] run particle minecraft:dust{color:[0.38f,0f,0.02f],scale:1.5} ~ ~1.1 ~ 0.55 0.9 0.55 0 2 force @a[tag=player]
+scoreboard players set @a[tag=player] vBig 21
+title @a[tag=player] times 0 3 0
+title @a[tag=player] title [{"text":"\ue504\ue5f0\ue505\ue5f1\ue506\ue5f0\ue507\ue5f0","font":"rlk:mboss_gd","color":"white","shadow_color":0}]

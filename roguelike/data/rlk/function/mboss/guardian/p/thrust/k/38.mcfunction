@@ -1,4 +1,2 @@
 # thrust clip tick 38
-playsound minecraft:entity.phantom.flap hostile @a[tag=player] ~ ~ ~ 0.55 0.75 0.18
-playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.25 1.2 0
-function rlk:mboss/mv/away {d:0.3}
+execute at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_gd_p1u,limit=1] feet run tp @s ~ ~ ~ ~ 0
