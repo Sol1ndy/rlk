@@ -110,11 +110,37 @@ function anchors(o) {
 const debugDp = arg('--debug-dp') && path.resolve(arg('--debug-dp'));
 if (debugDp) fs.rmSync(path.join(debugDp, 'data/rlk/function/bf_dbg'), {recursive: true, force: true});
 const putDebug = (n, lines) => put(path.join(debugDp, 'data/rlk/function', n + '.mcfunction'), lines.join('\n'));
+// the debug pose of a clip tick also swaps in the wing look the clip shows there (the flat lime of transform/release)
+let debugFrames = null;
+const putDebugPose = (n, lines) => {
+  const t = +n.slice(n.lastIndexOf('/') + 1);
+  putDebug(n, [...lines, `function ${NS}/look/${debugFrames[t].p.wlook === 'flat' ? 'flat' : 'dendro'}_swap`]);
+};
 const TOL = {t: .012, s: .015, rDefault: 1.4, r: {fwing_l: .5, fwing_r: .5, fwglow_l: .5, fwglow_r: .5, hwing_l: .6, hwing_r: .6, tendril_ll: .9, tendril_lr: .9, core: 3, flakes: 2}};
 const compiler = createRigCompiler({ns: NS, obj: 'bfRig', fn, parts: PARTS.map(([n]) => n), uuidOf, tol: TOL,
-  debug: debugDp ? {put: putDebug, dir: 'bf_dbg'} : null});
+  debug: debugDp ? {put: putDebugPose, dir: 'bf_dbg'} : null});
 const FORM_ID = {h: 1, b: 2};
-const clipInfo = [], motionErrors = [], warns = new Set();
+const clipInfo = [], motionErrors = [], alignErrors = [], warns = new Set();
+// Alignment checks per frame (butterfly_clips.mjs rules): no horizontal root travel (pos x/z 0: the module moves the
+// body), visible hooves never below the floor (2 cm), wing tips never under the floor, events inside the clip.
+const FW_TIP = wingPoint('fw', [21.9, 23.6]), HW_END = wingPoint('hw', [22.4, -4.4]);
+function alignment(c, frames) {
+  const out = [];
+  frames.forEach((f, t) => {
+    if (Math.abs(f.p.pos[0]) > 1e-9 || Math.abs(f.p.pos[2]) > 1e-9) out.push(`${c.name} t${t}: root travel ${f.p.pos[0]}, ${f.p.pos[2]} (x/z must be 0)`);
+    if (f.p.vis > .5) {
+      const toe = toeHeight(f.o);
+      if (toe < -.02) out.push(`${c.name} t${t}: hoof ${toe.toFixed(3)} b below the floor`);
+    }
+    if (f.p.fwS > .05) for (const [n, pt] of [['fwing_l', FW_TIP], ['fwing_r', FW_TIP], ['hwing_l', HW_END], ['hwing_r', HW_END]]) {
+      const k = PART_SCALE[n] * f.o[n].s[0] / 16, m = n.endsWith('_r') ? -1 : 1;
+      const y = add(f.o[n].t, rot(f.o[n].q, [pt[0] * k * m, pt[1] * k, pt[2] * k]))[1];
+      if (y < .05) out.push(`${c.name} t${t}: ${n} tip ${y.toFixed(3)} b over the floor`);
+    }
+  });
+  for (const [e, t] of Object.entries(c.events || {})) if (!(t >= 0 && t <= c.len)) out.push(`${c.name}: event ${e} at ${t} outside 0..${c.len}`);
+  return out;
+}
 CLIPS.forEach((c, id) => { c.id = id; });
 const byName = Object.fromEntries(CLIPS.map(c => [c.name, c]));
 for (const c of CLIPS) {
@@ -123,6 +149,8 @@ for (const c of CLIPS) {
   if (c.next && !byName[c.next]) throw new Error(`clip ${c.name}: unknown next ${c.next}`);
   const ks = accumulate(c);
   const frames = clipFrames(c, ks);
+  debugFrames = frames;
+  alignErrors.push(...alignment(c, frames));
   // state lines: the form at tick 0 and where it changes; the temporary flat look on/off (wlook)
   const extra = t => {
     const out = [], p = frames[t].p, q = t ? frames[t - 1].p : null;
@@ -139,6 +167,10 @@ for (const c of CLIPS) {
   const form = {start: frames[0].p.form, end: frames[c.len].p.form};
   if (sw > 0) form.switch = [sw, frames[sw].p.form === 'b' ? 'butterfly' : 'human'];
   clipInfo.push({...r.info, form, anchors: ev});
+}
+if (alignErrors.length) {
+  const msg = `clip alignment:\n  ` + alignErrors.slice(0, 60).join('\n  ') + (alignErrors.length > 60 ? `\n  ... ${alignErrors.length} in all` : '');
+  if (flag('--allow-steps')) console.warn(msg); else throw new Error(msg);
 }
 if (motionErrors.length) {
   const msg = `part rotations above 120 degrees per tick or per key:\n  ` + motionErrors.slice(0, 120).join('\n  ') + (motionErrors.length > 120 ? `\n  ... ${motionErrors.length} in all` : '');

@@ -53,9 +53,14 @@ boss body). Call them `as` the anchor and `at` it.
 | `prop/clear` | cleanup | Kills every prop (`rlk_mb_bf_prop`). |
 
 `transform`, `release`, `revert` and `death` switch the form themselves at the right tick (manifest `forms`):
-`transform` → butterfly at 4, `release` → human at 92, `revert` → human at 39; `death` is human from tick 0 (the
+`transform` → butterfly at 4, `release` → human at 92, `revert` → human at 37; `death` is human from tick 0 (the
 wings shrink away over its 6 t blend). The module never needs `form/*` around these clips; `form/*` are for reloads,
 tests and a groggy that starts in butterfly form.
+
+**Facing.** No clip turns the whole body away for good: `groggy_h` and `turn_h` carry no root yaw, because the module
+turns the anchor itself (`groggy/begin` faces it away from the player, `recover` turns it back with `mv/turn` 9°/t).
+Spins inside a clip (`kick_jump`, `dash_kick`, `wing_barrage`, `release`) end on whole turns, so the body faces the
+anchor yaw again when the clip ends.
 
 ## 2. Entities, tags, cost
 
@@ -95,9 +100,12 @@ beside the spine (`butterfly_pose.mjs` ATTACH). Their cards start further out (`
 the card is shifted outward and modelled at half size, so PART_SCALE is doubled). In the hovering rest pose the
 inner edges of the two forewings are about 0.6 b from the spine at head height and lean outward as they rise, so
 open space shows between the wings, around the head and the crest, from the front and from the back (the PDF render,
-v2 f2070). No wing plate crosses the midline. The hook tips are ±3.1 b out and 6.0 b over the floor; the hindwing
-blade tips are ±2.75 b out at 3.0 b. A wing euler turns the whole set about its root, so flaps keep them apart;
-poses that raise a wing far past vertical (`WINGS_V`, `WINGS_POD`) can still bring the tips together on purpose.
+v2 f2070). The hook tips are ±3.1 b out and 6.0 b over the floor; the hindwing blade tips are ±2.75 b out at 3.0 b.
+A forewing card reaches 2.9 b from its root and 2.7 b up, so rolling it up past about 25° brings its upper inner
+edge across the midline: the raised, closed, cupped and wrapped poses of §6.1 lean the tops back or sweep them
+forward instead, and every clip keeps the two wing sets apart and out of the body (§8). In butterfly form the four
+diamond `flakes` over the shoulders are at scale 0 (the forewings sweep through their place on every beat); they
+fade out during `transform` (4-6) and come back with the human form.
 
 ## 3. Looks
 
@@ -128,46 +136,77 @@ Each call summons at the execution position, turned to the execution yaw. Tags: 
 
 ## 5. Body travel versus clip motion
 
-- The rig follows the anchor. **Horizontal travel is the module's job** (`mv/*` on the body); the clips have no
-  horizontal root offsets, so they never double the module's moves or snap back at the end.
-- Heights are in the clips: the butterfly hovers with the toes 1.2 b up (root +1.13 b), the `idle_b` bob is about ±0.1 b,
-  jumps, flips and climbs go up to about +4.2 b (`flap_dive`), the release whirl and blast hover at +3.0-3.4 b.
-- Root spins (`kick_combo` backflip, `kick_jump` spins, `vacuum` backflip, `wing_barrage` swings, `release`
-  tumbles) turn about the hip pivot (1.5 b up) and end on whole turns.
+- The rig follows the anchor. **Horizontal travel is the module's job** (`mv/*` on the body): every key of every clip
+  has the root at x = z = 0 (the build fails otherwise), so the clips never double the module's moves or snap back
+  at the end. Leans, spins and heights stay in the clips.
+- Heights: the human stance sits 0.06 b low with the knees a little bent; jumps and flips lift the hips up to
+  +1.55 b (`kick_combo` backflip), +2.55 b (`kick_jump` spiral and somersault) and +2.6 b (`vacuum` backflip). The
+  butterfly hovers with the toes 1.2 b up (root +1.13 b, the `idle_b` bob ±0.12 b), climbs to +3.0 b (`wing_strike`
+  flutter), swoops down to +0.75 b (`release`), whirls at +3.05 b and hovers at +2.1-2.3 b after the blast.
+- Grounded human keys plant the hooves with a leg IK, so crouches, landings and steps never sink into the floor;
+  the hooves stay where the anchor is (the module's moves slide them with the body).
+- Root spins and flips turn about the hip pivot (1.5 b up) and end on whole turns: `kick_combo` backflip (8-16),
+  `kick_jump` sweep (13-19), two spiral turns (33-44) and forward somersault (44-52), `dash_kick` ring turn (16-22),
+  `vacuum` backflip (18-38), `wing_barrage` four spins, `release` two cartwheels (18-30).
 
 ## 6. Clips (ticks at 20/s; events are clip ticks; `then` = the clip that follows by itself)
 
-Ids follow the module's stub manifest. Event names and ticks follow plan.md "Stage-2 decisions" Q2 (the spec's §3
-retimes); `kick_jump` keeps `disc` as an alias of `orb`. The extra events are hints for fx. **No clip carries
-horizontal root travel** (plan.md Q1): the root's x/z offset is 0 in every key, so the module moves the body.
+Ids follow the module's stub manifest. Event names and ticks follow plan.md "Stage-2 decisions" Q2 and the headers of
+the `mb2/spec/*.md` pattern specs; `kick_jump` keeps `disc` as an alias of `orb`, `vacuum` `tell` as an alias of
+`glint`, `release` `xglint` / `cage` as aliases of `glint` / `rings` (the stub names). The other events are hints for
+fx and anchors (manifest `anchors[event]`). The poses come from the footage key frames (v1-v4, model.md sheets 05,
+08, 09) and the per-tick timelines of the specs.
 
-| clip | id | len | then | events | notes |
+| clip | id | len | then | events | motion |
 |---|---|---|---|---|---|
-| `idle_h` | 0 | 40 | loop | | Standing idle: breathing sway; the crescents and flakes bob; the crest sways. |
-| `step_h` | 1 | 16 | loop | | Short strafing step (0.1-0.15 b/t; the module moves the anchor). |
-| `run_h` | 2 | 8 | loop | | Burst-run (0.6-0.8 b/t for about 5 t): body 30° forward, fans swept back, crescents trailing. |
-| `back_h` | 3 | 12 | idle_h | | Backing off at walking pace. |
-| `turn_h` | 4 | 24 | idle_h | | After groggy: turns from her back (root yaw 180, the `groggy_h` facing) to the anchor facing. |
-| `kick_combo` | 5 | 51 | idle_h | run 0, **hit1 8**, backflip 10, hop 22, leap 34, **hit2 40** | H1 달빛 발차기: run in, rising flip kick at 8, backflip, sideways-hop wind-up, flying leap, axe kick at 40, landing. |
-| `kick_jump` | 6 | 65 | idle_h | tell 0, **sweep 13**, sweep_end 19, jump 33, orb 45 (= disc), kick 52, **impact 55**, land 59 | H2 달빛 점프: the crescent chain lines up at her left (tell 0-13), 360° low sweep 13-19, spiral jump at 33, the orb forms at 45, kicked down at 52, impact 55, landing 59. |
-| `dash_kick` | 7 | 50 | idle_h | charge 0, dash 10, dash_end 12, **kick 15**, ring 19 | H3 달빛 돌진: charge 0-10, dash 10-12 (the module moves the anchor 5-6 b), lunge kick at 15, the ring at 19. |
-| `vacuum` | 8 | 41 | idle_h | crouch 0, tell 9, stomp 16, **blade 17**, backflip 17, land 38 | H4 광폭한 진공: crouch, glint, the stomp at 16 launches the vertical blade at 17, backflip 17-38. |
-| `groggy_h` | 9 | 40 | loop | | Groggy: motionless with her back turned (root yaw 180), fans drooped, crescents hidden. |
-| `entrance` | 10 | 106 | idle_h | nameplate 57, glow 61, whiteout 71, **burst 79**, land 90, stand 106 | Hidden (scale 0) until the burst; she drops from 4 b, lands at 90 and stands by 106. Use `spawn_hidden` + `prop/cocoon`. |
-| `transform` | 11 | 30 | idle_b | glow 0, open 4, **sphere 6**, rings 9, spread 12 | Human → butterfly: core glow, folded flat-lime wings at 4 (form switch), the light sphere at 6, wings unfold 4-12, hover lift. |
-| `idle_b` | 12 | 22 | loop | | Hover flap: forewing leads, hindwing lags 2-3 t, ribbons lag 4 t; body rises on the downstroke. |
-| `glide_b` | 13 | 16 | loop | | Gliding travel: body pitched forward, wings swept back, legs trailing. |
-| `wing_strike` | 14 | 55 | idle_b | bank 0, dive 12, **hit 15** | B1 우아한 날개: bank and climb 0-9, dive 12-15, wing-edge arc at 15, climb and flutter. |
-| `wing_barrage` | 15 | 117 | idle_b | **swing1 5, swing2 31, swing3 69, swing4 94** | B2 화염 날개의 습격 (call `look/pyro` first): a 5 t wind-up, then four spinning wing swings. |
-| `flap_dive` | 16 | 59 | idle_b | rise 0, dive 22, **slam 26**, fan 28, glide 34 | B3 날개 휩쓸개 (pyro): flaps and a rise to +4.2 b, head-first dive 22-26, wing slam at 26, flame fan 28-32, low glide. |
-| `coco` | 17 | 76 | idle_b | wrap 5, **orb1 19**, ball 30, ball_open 42, **orb2 46** | B4 달빛 축복: wings wrap forward, orb 1 at 19 (`prop/orb`), the ball 30-42 (`prop/pod`), orb 2 at 46. |
-| `release` | 18 | 96 | idle_h | swoop 0, whirl 28, cup 31, flash 35, glint 37, rings 38, wrap 44, **detonation 53**, hover 56, shrink 87, flat 87, shatter 91, revert 92, land 96 | B5 달빛 해제: swoop, climb, two tumbles 12-28, cup, ground flash, X glint, ring cage, the pod wrap 44-52, detonation at 53, hover, the wings go flat lime and shrink (87) and shatter (91), human at 92, landing at 96. |
-| `revert` | 19 | 43 | idle_h | shrink 30, flat 34, shatter 38, revert 39, land 43 | Butterfly → human without the blast. |
-| `death` | 20 | 100 | hold | stagger 0, shatter 6, kneel 24, dissolve 40, gone 100 | From either form: stagger, the wings shrink away (flat lime) by 6, she kneels, the crescents and flakes fade, she scales out by 100. Call `kill` after 100. |
-| `chain_reform` | 21 | 18 | idle_h | | The crescent chain re-forms after groggy. |
+| `idle_h` | 0 | 40 | loop | | Fighting stance (v1 f560): knees a little bent, torso 12-14° forward, slow breathing, a weight shift from hip to hip; crescents and flakes bob, the crest sways. |
+| `step_h` | 1 | 16 | loop | | Two light steps in place, hooves lifted 0.3 b, a dip on each contact and a lean over the stance leg (the module moves the anchor 0.1-0.15 b/t in any direction). |
+| `run_h` | 2 | 8 | loop | | Burst-run: two bounding strides, body 30° forward, fans swept back, crescents trailing behind. |
+| `back_h` | 3 | 12 | idle_h | | Backing off: two steps, each hoof set down behind, torso a little more upright. |
+| `turn_h` | 4 | 24 | idle_h | | After groggy: steps round from the drooped groggy stance into the fighting stance while the module turns the anchor; crescents still hidden for `chain_reform`. |
+| `kick_combo` | 5 | 51 | idle_h | run 0, plant 5, **hit1 8**, backflip 9, land1 16, hop 22, hop2 28, leap 32, swirl 36, **hit2 40**, land 44 | H1 (v1 9.87-12.40 s): burst-run with the right knee chambered from 2, plant and chamber (5), the kick whips up to vertical with the crescent locked on the shin and the body leaning back (hit1 8), carried over into a backflip (apex +1.55 b at 12, lands 16), two sideways hops with the kicking leg stretched back and the body coiled (22, 28), leap (32) into a horizontal flying kick (34), the leg raised overhead (36-38), the diagonal axe kick down to her front-right (hit2 40), landing crouch (44). |
+| `kick_jump` | 6 | 65 | idle_h | tell 0, **sweep 13**, sweep_end 19, jump 33, orb 45 (= disc), kick 52, **impact 55**, land 59 | H2 (v1 25.33-28.60 s, v4): three crescent pieces stacked vertically at her left (tell; the module adds `tell/on`), the 360° low sweep pivoting on the right hoof with the left leg straight out at knee height (13-19), recovery, the spiral jump with two rising turns (33-44), the orb at her raised right foot as she tips into a forward somersault (45-51), the axe kick down (52), landing (59). |
+| `dash_kick` | 7 | 50 | idle_h | charge 0, dash 10, dash_end 12, **kick 15**, ring 19 | H3 (v2 2.95-6.47 s): gathering crouch (0-8), coil side-on with the right leg cocked (9), dash low and stretched (10-12, the module moves 5-6 b), the high side kick straight out to her right with the crescent on the shin (15), one full turn with the leg out for the ring (16-21), landing (22), recovery. |
+| `vacuum` | 8 | 41 | idle_h | crouch 0, tell 9 (= glint), stomp 16, **blade 17**, backflip 17, land 38 | H4 (v2 12.80-16.60 s): low cat-like crouch (0-9), rear-up with the right leg high (13-14), the stomp (16), a slow high backflip from 18 (apex +2.6 b at 27), landing crouch (38). |
+| `groggy_h` | 9 | 40 | loop | | Groggy (v4): slack stance, torso 6° forward, head low, fans drooped, crescents hidden, a slow sway; the module keeps the anchor turned away. |
+| `entrance` | 10 | 106 | idle_h | nameplate 57, glow 61, whiteout 71, **burst 79**, land 90, stand 106 | Hidden (scale 0) until the burst; revealed curled 3.6 b up with the crescents scattered, the drop with a slight tumble (80-89), the wide landing crouch with the crescents spread (90), standing by 106. Use `spawn_hidden` + `prop/cocoon`. |
+| `transform` | 11 | 30 | idle_b | glow 0, open 4, **sphere 6**, rings 9, spread 12 | Human → butterfly (v2 24.10-24.70 s): sinks and rises in the sheath (core), the folded flat-lime panels behind the shoulders at 4 (form switch), core flash 5, sphere 6, the wings unfold 4-12 while she lifts into the hover, flung wide at 12, element look from 14, a big flap (18-21) into the `idle_b` phase. |
+| `idle_b` | 12 | 22 | loop | | Hover flap: forewing ±14°, hindwing 2.5 t late at 60 %, ribbons 4-6 t late, body bob ±0.12 b rising on the downstroke, legs and fans trail the beat. |
+| `glide_b` | 13 | 16 | loop | | Gliding: body 16° forward, wings held swept back 30° with a small flutter, legs trailing, ribbons streaming. |
+| `wing_strike` | 14 | 55 | idle_b | bank 0, dive 8, **hit 15** | B1 (v2 35.20-37.92 s): lift with one big flap (0-7), bank to 80° with the left wing hanging as a blade (8-11), swoop 1 b off the floor (13-15) with the wing edge sweeping through (hit 15), pull-up and climb to +3 b (17-27), fluttering rolls and quick flaps (31-49), back to the hover. |
+| `wing_barrage` | 15 | 117 | idle_b | **swing1 5, swing2 31, swing3 69, swing4 94** | B2 (v3 4.30-10.70 s; call `look/pyro` first): each swing has a 5 t wind-up (body turned 75° away, one wing swept back and raised, the other low) and one full turn with the wings flung wide (the crescents at s+2..s+6); swings 1 and 3 spin on a 26° diagonal, 2 and 4 flat; alternating directions; hover flaps between. |
+| `flap_dive` | 16 | 59 | idle_b | rise 0, **dive 20**, slam 26, fan 28, glide 33 | B3 (v3 10.70-14.60 s; pyro): V-up and lean back (tell), big downstroke and upstroke, the rise with the wings closed above her (15-19), the head-first dart dive (20-25), the slam forward-down (26), the fan (28-32), a low glide banked to her right (33-43), settling flaps. |
+| `coco` | 17 | 76 | idle_b | wrap 5, **orb1 19**, ball 30, ball_open 42, **orb2 46** | B4 (v3 20.22-24.20 s): wings to flat (0-4), cupped forward round the chest core (wrap 5-16), snap open (18) and orb 1 (19), the ball: the wings wrapped round her curled body with the crescents tucked (30-42), open (43-44), orb 2 from her side with a twist (46), recovery. |
+| `release` | 18 | 96 | idle_h | fold 0, swoop 5, climb 9, whirl 18, cup 31, flash 35, glint 37 (= xglint), rings 38 (= cage), wrap 44, snap 52, **detonation 53**, hover 63, shrink 87, flat 87, shatter 91, revert 92, land 96 | B5 (v3 32.83-38.28 s, v4 replay): wings closed up (fold), the dart swoop (5-8), climb (9-15), two cartwheels with the wings flung and flicking (18-30), cup (31), flash/X glint/ring cage (35-43), the pod wrap while she sinks (44-51), snap open (52), the detonation flung wide with the ribbons streaming (53), hover +2.2 b with slow beats (63-87), the wings shrink and go flat lime (87-90), shatter (91), human form (92) drops and lands (96). |
+| `revert` | 19 | 43 | idle_h | shrink 30, flat 32, shatter 36, revert 37, land 43 | Butterfly → human without the blast (S3 §D): rising hover with slow flaps, shrink (30), flat (32), shatter (36), human (37), landing (43). Not used by the core. |
+| `death` | 20 | 100 | hold | stagger 0, shatter 6, kneel 24, dissolve 40, gone 100 | From either form: staggers back while the wings go flat lime and shrink away (shatter 6), staggers forward, sinks to one knee (24), the crescents and flakes fade (24-56), then scales out about her hips while rising 0.6 b (40-100). Call `kill` after 100. |
+| `chain_reform` | 21 | 18 | idle_h | stack 6 | The four crescent plates fly in from around her and stack into a vertical chain at her left (stack 6: the thud), a small flourish, then they take their idle places. |
 
-The clips are a first pass that times the body against the events (the key poses are placeholders for the separate
-clips step); retune keys in `butterfly_clips.mjs` and the manifest and the module follow on the next build.
+### 6.1 Wing poses
+
+The clips mix a small library of wing poses (`butterfly_clips.mjs` W_*; her left side, the right mirrors). Each
+pose and every frame between them was checked against the other wing set and the body with the textures' alpha
+(`gap` = the closest approach of the two wing sets):
+
+| pose | used in | gap |
+|---|---|---|
+| `W_REST` spread hover; `W_UP` / `W_DOWN` flap extremes | idle, flutters | 1.47 b; ≈ 0.8 b |
+| `W_V` raised V, faces to the front, tips 7 b up | big flaps (transform, B1, B3, B5) | 0.60 b |
+| `W_CLOSED` closed up above her head (crest leans back, crescents tucked in front) | B3 rise, B5 fold | 0.43 b |
+| `W_SNAP` snap downstroke (the hindwing stays under the forewing) | big flaps | |
+| `W_FLAT`, `W_GLIDE` swept back | B1 bank, glides | 0.62 b |
+| `W_CUP` cupped forward round the chest | B4 wrap, B5 cup | 0.62 b |
+| `W_POD` wrapped round her: forewing hooks over her head, hindwing blades under her | B4 ball, B5 wrap | 0.16 b |
+| `W_FOLD` folded panels behind the shoulders at 0.4 scale | transform | |
+| `W_FLUNG` flung wide, ribbons out | B4 open, B5 detonation | 1.7 b |
+| `W_DART` swept back over her back | B3 dive, B5 swoop | 0.65 b |
+| `W_SLAM` forward and down | B3 slam | |
+
+Flat cards hinged beside the spine cannot close a shell in front of her without cutting through each other or the
+mane, so the pod and the ball frame her from both sides, above and below with the front open (as v4 f420/f440 from
+the front). The closed shell of the footage is the `prop/pod` (r 1.4 b): if the module shows it, summon it at the
+core anchor at `ball` / `wrap` and clear it at `ball_open` / `snap`; the wrapped wings sit inside its silhouette
+from the side and frame it from the front.
 
 ## 7. Manifest and objectives
 
@@ -194,18 +233,23 @@ clips step); retune keys in `butterfly_clips.mjs` and the manifest and the modul
 
 ## 8. Build checks and budgets
 
-The generator refuses to write a rig that fails these (`--allow-steps` turns the rotation checks into warnings):
+The generator refuses to write a rig that fails these (`--allow-steps` turns them into warnings):
 
 - **Rotation per tick and per key:** no part turns more than 120° between two ticks or within one interpolation
   segment (blend-ins included). Large one-tick steps are also solved at the half tick (warning when the client's
-  slerp leaves the authored path by more than 35°).
+  slerp leaves the authored path by more than 35°). The clips build with no warning.
+- **Alignment:** no horizontal root travel in any key (root x = z = 0), no visible hoof below the floor (2 cm), no
+  wing tip under the floor, every event inside its clip.
 - **Keys:** the first key at tick 0, the last at the clip length, `next` must name a clip.
 - **Parts** ≤ 34; **item models** within −16..32 (element rotations are single-axis multiples of 22.5° by
   construction).
 - **Atlas:** ≤ 2 M px in all (now 54 sprites, 1.06 M px), every side a multiple of 16, ≤ 512 px wide and
   ≤ 1024 px tall (the 8-frame strips).
-- Compiled: 22 clips, about 760 key files and 10 350 part keys. A part gets a key only where the client's lerp/slerp
+- Compiled: 22 clips, 832 key files and 14 230 part keys. A part gets a key only where the client's lerp/slerp
   would drift from the authored pose by more than 0.012 b, 0.5-3° (per part) or 1.5 % scale.
+- Wing contacts are checked offline (not in the build: they need the textures' alpha): every tick of the butterfly
+  clips is clean of left-right wing crossings, wing-body crossings beyond 0.45 b from the wing roots, wing-appendage
+  crossings (fans, crest, crescents, tendrils) and fore/hindwing crossings beyond 0.7 b from the roots.
 
 ## 9. The model
 
