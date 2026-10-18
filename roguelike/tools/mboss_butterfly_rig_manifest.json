@@ -327,8 +327,8 @@
       "next": null,
       "events": {},
       "keyFiles": 7,
-      "keys": 100,
-      "note": "burst-run (0.6-0.8 b/t for about 5 t, v1 23.13-23.40 s): two bounding strides, body 30 degrees forward, fans swept back, crescents trailing",
+      "keys": 144,
+      "note": "burst-run (0.6-0.8 b/t for about 5 t, v1 23.13-23.40 s): two bounding strides, body 30 degrees forward, fans swept back, crescents trailing; each hoof lands ahead of the hips (2, 6), is pushed back under her (3, 7) and leaves the floor behind her (4, 0), a short flight between the strides",
       "form": {
         "start": "h",
         "end": "h"
@@ -985,8 +985,8 @@
         "impact": 55,
         "land": 59
       },
-      "keyFiles": 60,
-      "keys": 1229,
+      "keyFiles": 62,
+      "keys": 1241,
       "note": "H2 달빛 점프: the crescent chain lines up at her left (tell 0-13), pivot, 360 degree low sweep with the left leg at knee height (13-19), recovery, spiral jump with two rising turns (33-44), the orb forms at her raised right foot (45, disc = orb) as she tips into a forward somersault, axe kick down (52), impact 55, landing 59",
       "form": {
         "start": "h",
@@ -1040,9 +1040,9 @@
             -0.126
           ],
           "hand_l_a": [
-            0.78,
-            2.719,
-            -0.101
+            0.84,
+            1.918,
+            -0.113
           ]
         },
         "sweep": {
@@ -1092,9 +1092,9 @@
             0.284
           ],
           "hand_l_a": [
-            0.202,
-            2.081,
-            -0.804
+            0.325,
+            2.072,
+            -1.003
           ]
         },
         "sweep_end": {
@@ -1144,9 +1144,9 @@
             -0.783
           ],
           "hand_l_a": [
-            0.746,
-            2.18,
-            -0.382
+            0.978,
+            2.172,
+            -0.416
           ]
         },
         "jump": {
@@ -1578,9 +1578,9 @@
             -0.347
           ],
           "hand_r_a": [
-            -0.387,
-            1.767,
-            -0.385
+            -0.502,
+            1.621,
+            -0.567
           ],
           "hand_l_a": [
             0.676,
@@ -2175,14 +2175,14 @@
       "anchors": {
         "nameplate": {
           "foot_l": [
-            0.197,
-            4.574,
-            -0.201
+            0.237,
+            4.54,
+            -0.425
           ],
           "foot_r": [
-            -0.197,
-            4.574,
-            -0.201
+            -0.237,
+            4.54,
+            -0.425
           ],
           "fwtip_l": [
             0,
@@ -2227,14 +2227,14 @@
         },
         "glow": {
           "foot_l": [
-            0.197,
-            4.574,
-            -0.201
+            0.237,
+            4.54,
+            -0.425
           ],
           "foot_r": [
-            -0.197,
-            4.574,
-            -0.201
+            -0.237,
+            4.54,
+            -0.425
           ],
           "fwtip_l": [
             0,
@@ -2279,14 +2279,14 @@
         },
         "whiteout": {
           "foot_l": [
-            0.197,
-            4.574,
-            -0.201
+            0.237,
+            4.54,
+            -0.425
           ],
           "foot_r": [
-            -0.197,
-            4.574,
-            -0.201
+            -0.237,
+            4.54,
+            -0.425
           ],
           "fwtip_l": [
             0,
@@ -2331,14 +2331,14 @@
         },
         "burst": {
           "foot_l": [
-            0.197,
-            4.574,
-            -0.201
+            0.237,
+            4.54,
+            -0.425
           ],
           "foot_r": [
-            -0.197,
-            4.574,
-            -0.201
+            -0.237,
+            4.54,
+            -0.425
           ],
           "fwtip_l": [
             0.42,
@@ -5103,14 +5103,14 @@
       "next": null,
       "events": {
         "stagger": 0,
-        "shatter": 6,
-        "kneel": 24,
-        "dissolve": 40,
+        "shatter": 10,
+        "kneel": 30,
+        "dissolve": 50,
         "gone": 100
       },
-      "keyFiles": 63,
-      "keys": 360,
-      "note": "from either form: she staggers back while the wings go flat lime and shrink away (shatter 6), staggers forward, sinks to one knee (24), the crescents and flakes fade (24-56), then dissolves into the rising motes (scale out about her hips, 40-100); call kill after 100",
+      "keyFiles": 64,
+      "keys": 358,
+      "note": "from either form: she staggers back while the wings go flat lime and shrink away over the 10 t blend (shatter 10), staggers forward, the knees buckle (20), she sinks to one knee (30), the crescents and flakes fade (30-64), then dissolves into the rising motes (scale out about her hips, 50-100); call kill after 100",
       "form": {
         "start": "h",
         "end": "h"
@@ -5128,24 +5128,24 @@
             -0.06
           ],
           "fwtip_l": [
-            0.42,
-            2.364,
-            0.381
+            0.699,
+            2.621,
+            0.408
           ],
           "fwtip_r": [
-            -0.42,
-            2.364,
-            0.381
+            -0.699,
+            2.621,
+            0.408
           ],
           "hwtip_l": [
-            0.42,
-            2.149,
-            0.419
+            0.653,
+            2.116,
+            0.415
           ],
           "hwtip_r": [
-            -0.42,
-            2.149,
-            0.419
+            -0.653,
+            2.116,
+            0.415
           ],
           "core": [
             0,
@@ -5211,13 +5211,13 @@
           ],
           "hand_r_a": [
             -1.117,
-            2.811,
-            0.38
+            2.821,
+            0.382
           ],
           "hand_l_a": [
             0.821,
-            1.957,
-            0.026
+            1.946,
+            0.024
           ]
         },
         "kneel": {
@@ -5227,9 +5227,9 @@
             -0.42
           ],
           "foot_r": [
-            -0.423,
-            0.005,
-            0.757
+            -0.42,
+            0.121,
+            0.751
           ],
           "fwtip_l": [
             0.462,
@@ -5262,14 +5262,14 @@
             -0.506
           ],
           "hand_r_a": [
-            -0.991,
-            2.039,
-            -0.668
+            -0.992,
+            2.023,
+            -0.655
           ],
           "hand_l_a": [
-            0.855,
-            1.147,
-            -0.279
+            0.856,
+            1.165,
+            -0.293
           ]
         },
         "dissolve": {
@@ -5279,9 +5279,9 @@
             -0.42
           ],
           "foot_r": [
-            -0.422,
-            0.004,
-            0.756
+            -0.42,
+            0.12,
+            0.75
           ],
           "fwtip_l": [
             0.473,
@@ -5314,14 +5314,14 @@
             -0.564
           ],
           "hand_r_a": [
-            -0.975,
-            1.962,
-            -0.799
+            -0.972,
+            1.998,
+            -0.834
           ],
           "hand_l_a": [
-            0.856,
-            1.043,
-            -0.291
+            0.853,
+            1.006,
+            -0.255
           ]
         },
         "gone": {
@@ -5331,9 +5331,9 @@
             -0.42
           ],
           "foot_r": [
-            -0.422,
-            0.604,
-            0.756
+            -0.42,
+            0.72,
+            0.75
           ],
           "fwtip_l": [
             0,
@@ -5442,9 +5442,9 @@
             -0.361
           ],
           "hand_l_a": [
-            0.791,
-            2.645,
-            0.005
+            1.022,
+            2.639,
+            -0.035
           ]
         }
       }
