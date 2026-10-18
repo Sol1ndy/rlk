@@ -324,6 +324,12 @@ def b2(g):
             lines += [BODY + 'run ' + g.kcard('streak', p, '~90 0', s0=3.0, s1=4.5, life=3, fade=1, col='#FBF9F9')
                       for p in ('^2.2 ^3.4 ^0.6', '^-2.2 ^2.6 ^0.6', '^0 ^4.4 ^0.2')]
         lines += [g.snd('fire_cres_launch'), g.sound('entity.ghast.shoot', 0.4, 1.2)]
+        if kk == len(B2_SWINGS):
+            lines += [f'# the pattern bar: B2 ends after its last landing (+1), later than the clip\'s {L_BARRAGE} when a far dive is slow',
+                      'scoreboard players set #bp12E mb 0',
+                      f'execute as @e[type=minecraft:marker,tag={t_}] run scoreboard players operation #bp12E mb > @s mbT',
+                      'scoreboard players add #bp12E mb 1',
+                      'scoreboard players operation #bfPLen mb > #bp12E mb']
         tl.at(s, *lines)
         tl.span(s + 1, s + B2_SPAWN + B2_N, R('face/track'))
         for i in range(B2_N):

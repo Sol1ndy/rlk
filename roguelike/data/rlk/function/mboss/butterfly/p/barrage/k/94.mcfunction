@@ -44,3 +44,8 @@ execute rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind
 execute rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"streak",pos:"^0 ^4.4 ^0.2",rot:"~90 0",bb:"fixed",roll:0,spin:0,s0:3,s1:4.5,move:"0f,0f,0f",life:3,fade:1,col:16513529}
 function rlk:mboss/butterfly/fx/snd/fire_cres_launch
 playsound minecraft:entity.ghast.shoot hostile @a[tag=player] ~ ~ ~ 0.4 1.2 0.13
+# the pattern bar: B2 ends after its last landing (+1), later than the clip's 117 when a far dive is slow
+scoreboard players set #bp12E mb 0
+execute as @e[type=minecraft:marker,tag=rlk_mb_bf_p12t] run scoreboard players operation #bp12E mb > @s mbT
+scoreboard players add #bp12E mb 1
+scoreboard players operation #bfPLen mb > #bp12E mb
