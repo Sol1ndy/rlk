@@ -1,2 +1,3 @@
 # bomb clock 71
-playsound minecraft:block.piston.contract hostile @a[tag=player] ~ ~ ~ 1 0.5 0.33
+execute at @s rotated as @s rotated ~ 0 positioned ~ ~4.5 ~ run function rlk:mboss/fieldgen/fx/p/plunge
+execute at @s rotated as @s rotated ~ 0 positioned ~ ~4.5 ~ run function rlk:mboss/fieldgen/fx/snd/plunge

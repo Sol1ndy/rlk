@@ -1,1 +1,1 @@
-# Nothing of its own lingers.
+# Nothing of its own lingers (the hazard goes with lib_clear).

@@ -1,3 +1,4 @@
 # burst tick.
-execute if score #fgPT mb matches 3..39 run return run function rlk:mboss/fieldgen/p/burst/d/3_39
-execute if score #fgPT mb matches 41..110 run return run function rlk:mboss/fieldgen/p/burst/d/41_110
+execute if score #fq5Pz mb matches 1 run function rlk:mboss/fieldgen/p/burst/resume
+execute if score #fgPT mb matches 1..41 run return run function rlk:mboss/fieldgen/p/burst/d/1_41
+execute if score #fgPT mb matches 44..110 run return run function rlk:mboss/fieldgen/p/burst/d/44_110

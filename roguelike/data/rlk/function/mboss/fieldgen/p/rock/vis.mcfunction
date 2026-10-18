@@ -1,6 +1,4 @@
-# @s = a floor burst (#hzEv 1 = it strikes).
+# @s = a burst (#hzEv 1 = it strikes; the throw lines, hz_vis 62, draw nothing more).
 execute unless score #hzEv mb matches 1 run return 0
-particle minecraft:block{block_state:"minecraft:tuff"} ~ ~0.3 ~ 0.8 0.3 0.8 0 14 force @a[tag=player]
-particle minecraft:flame ~ ~0.4 ~ 0.6 0.2 0.6 0.03 6 force @a[tag=player]
-playsound minecraft:block.tuff.break hostile @a[tag=player] ~ ~ ~ 1.2 0.5 0.4
-playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.6 1.1 0.2
+execute if score @s mbHzV matches 61 at @s run function rlk:mboss/fieldgen/fx/p/floor_burst
+execute if score @s mbHzV matches 61 at @s run function rlk:mboss/fieldgen/fx/snd/floor_burst

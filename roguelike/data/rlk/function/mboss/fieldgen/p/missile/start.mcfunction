@@ -1,5 +1,6 @@
-# C4 바위 폭탄 (clip missiles; @s = body): launches [21, 22, 24, 25, 27, 28, 30, 31, 33, 34], lock +7, impact +20.
-execute at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~ 0
-playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.8 1.4 0.27
-execute at @s rotated as @s run particle minecraft:end_rod ^3.6 ^4.6 ^ 0.1 0.1 0.1 0.02 2 force @a[tag=player]
-execute at @s rotated as @s run particle minecraft:end_rod ^-3.6 ^4.6 ^ 0.1 0.1 0.1 0.02 2 force @a[tag=player]
+# C4 바위 폭탄 (clip missiles; @s = body): launches [21, 22, 24, 25, 27, 28, 30, 31, 33, 34], lock +14 (tell 14), impact +28 = 49..62; 2 volley groups.
+scoreboard players set #fq4Pz mb 0
+function rlk:mboss/fieldgen/rig_stub/face/track
+execute at @s rotated as @s rotated ~ 0 positioned ^5.33 ^4.55 ^0 run function rlk:mboss/fieldgen/fx/p/tip_flare
+execute at @s rotated as @s rotated ~ 0 positioned ^-5.33 ^4.55 ^0 run function rlk:mboss/fieldgen/fx/p/tip_flare
+execute at @s rotated as @s rotated ~ 0 positioned ^5.33 ^4.55 ^0 run function rlk:mboss/fieldgen/fx/snd/tip_flare

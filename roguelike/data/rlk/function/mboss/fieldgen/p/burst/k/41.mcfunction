@@ -1,7 +1,3 @@
 # burst clock 41
-execute at @s run particle minecraft:dust{color:[0.98f,0.871f,0.659f],scale:1.6} ~ ~7 ~ 0.12 0.05 0.12 0 2 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.98f,0.871f,0.659f],scale:1.6} ~ ~5.25 ~ 0.12 0.05 0.12 0 2 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.98f,0.871f,0.659f],scale:1.6} ~ ~3.5 ~ 0.12 0.05 0.12 0 2 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.98f,0.871f,0.659f],scale:1.6} ~ ~1.75 ~ 0.12 0.05 0.12 0 2 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.98f,0.871f,0.659f],scale:1.6} ~ ~0.35 ~ 0.12 0.05 0.12 0 2 force @a[tag=player]
-playsound minecraft:block.respawn_anchor.deplete hostile @a[tag=player] ~ ~ ~ 0.9 0.8 0.3
+execute at @s positioned ~ 201 ~ rotated ~ 0 run function rlk:mboss/fieldgen/fx/p/column_down {h:7.76}
+execute at @s positioned ~ 201 ~ rotated ~ 0 run function rlk:mboss/fieldgen/fx/snd/column_down

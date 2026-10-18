@@ -116,6 +116,8 @@ def build():
     assert all(p.id in range(1, 7) or p.id in (11, 12, 20, 21, 22) for p in pats), ids
     core = Core(g, pats)
     core.emit()
+    from . import seq_c                         # [seq_c: cruise author] E / S4 visuals (seq_c/**), called by the hooks
+    seq_c.emit(g)
     for p in pats:
         for f in ('start', 'tick', 'cancel'):
             assert g.has(f'p/{p.key}/{f}'), f'{p.module}: pattern {p.key} has no {f}'
@@ -433,23 +435,21 @@ class Core:
             R('init'), R('spawn'), g.form('dormant'), g.look('off'), g.play('entrance'),
             '# the kit\'s HUD flags of an earlier fight off (this also starts the kit\'s line version #fkHudV)',
             K.hud('clear'),
-            F('form/hitbox_c'), F('hud/refresh'), F('cfx/ent_setup')])
+            F('form/hitbox_c'), F('hud/refresh'),
+            F('seq_c/entrance/setup')])                # [seq_c: cruise author] E visuals (floor dust, the hum)
         c = lambda t: INTRO_CLIP + t
         self.w('intro_tick', [
             f'# Hook intro_tick (@s = body, #mbT = 1.. intro clock; untargetable until intro_end). Clip tick t = intro t - {INTRO_CLIP}:',
             f'# dormant, the clank ({ENT_CLANK}), the pods unfold ({ENT_UNFOLD}), the eye opens ({ENT_EYE}: nameplate), the rise',
             f'# ({ENT_RISE}..{ENT_RISEN}), the fight at intro {INTRO_DONE} (the idle turn to the player flows into the first pick).',
             R('tick'),
-            at_t('#mbT', c(ENT_CLANK), F('cfx/clank')),
-            at_t('#mbT', c(ENT_UNFOLD), F('cfx/unfold')),
             at_t('#mbT', c(ENT_EYE), F('intro/name')),
-            at_t('#mbT', c(ENT_RISE), F('cfx/rise')),
-            f'execute if score #mbT mb matches {c(ENT_RISE)}..{c(ENT_RISEN)} run {F("cfx/rise_dust")}',
+            F('seq_c/entrance/tick'),                  # [seq_c: cruise author] E visuals and sounds on the intro clock
             at_t('#mbT', (INTRO_DONE, 999), F('intro/done'))])
         self.w('intro/name', [
             '# The eye opens: the nameplate on the sub-line, the idle look.',
             f'data modify storage rlk:mboss sub set value [{{text:"{A.BOSS["sub"]}",color:"{A.LINE_HEX}",bold:true}}]',
-            g.look('idle'), F('cfx/eye')])
+            g.look('idle')])                           # [seq_c: cruise author] the eye fx: seq_c/entrance
         self.w('intro/done', [
             '# The rise is over: end of the untargetable intro; the device turns to the player during the cooldown.',
             'function rlk:mboss/intro_end',
@@ -870,16 +870,13 @@ class Core:
             sc_set('#fgSt', ST['dead']),
             R('prop/clear'),
             g.play('death'),
-            F('cfx/death_start')])
+            F('seq_c/death/start')])                   # [seq_c: cruise author] S4 visuals and sounds
         self.w('death_tick', [
             '# Hook death_tick (@s = body, #mbT = 1.. until cur.death): the clip runs while the rig ticks; it must NOT tick',
             f'# after its kill at {DEATH_LEN} (it would respawn).',
             at_t('#mbT', (1, DEATH_LEN - 1), R('tick')),
-            at_t('#mbT', (4, 4), F('cfx/death_flicker')), at_t('#mbT', (9, 9), F('cfx/death_flicker')),
             at_t('#mbT', 12, g.look('off')),
-            at_t('#mbT', D_DROP, F('cfx/death_drop')),
-            at_t('#mbT', D_SINK, F('cfx/death_sink')),
-            at_t('#mbT', D_OUT, F('cfx/death_out')),
+            F('seq_c/death/tick'),                     # [seq_c: cruise author] S4 visuals and sounds on #mbT
             at_t('#mbT', DEATH_LEN, R('kill'))])
 
     # -----------------------------------------------------------------------------------------
@@ -1028,16 +1025,7 @@ class Core:
         G, GD, WG, V, VD = A.GOLD, A.GOLD_DEEP, A.WHITE_GOLD, A.VIOLET, A.VIOLET_DEEP
         at = lambda y, *cmds: [f'execute at @s run {c}' for c in cmds]
         fx = {
-            'ent_setup': ['# @s = body: the folded device on the floor, dust and a low mechanical hum.',
-                          g.particle('block{block_state:"minecraft:tuff"}', '~ ~0.3 ~', (1.2, 0.1, 1.2), 0, 10),
-                          g.sound('block.respawn_anchor.ambient', 0.6, 0.6)],
-            'clank': [g.sound('block.anvil.place', 0.7, 0.6), g.sound('block.chain.place', 1.0, 0.8),
-                      g.sound('block.piston.extend', 0.8, 0.7), g.particle('crit', '~ ~2 ~', (1.0, 0.4, 1.0), 0.1, 8)],
-            'unfold': [g.sound('block.chain.hit', 0.9, 0.9), g.sound('block.piston.contract', 0.8, 0.8),
-                       g.sound('block.crafter.craft', 0.8, 0.9), *g.ring_dust(G, 3.2, 12, 2.0, 1.2)],
-            'eye': [g.sound('block.beacon.activate', 0.6, 1.4), g.particle('end_rod', '~ ~3.2 ~', (0.3, 0.3, 0.3), 0.02, 6)],
-            'rise': [g.sound('block.respawn_anchor.charge', 0.8, 1.0), g.sound('block.trial_spawner.about_to_spawn_item', 0.8, 0.8)],
-            'rise_dust': [g.dust(G, 1.0, '~ ~0.2 ~', (1.6, 0.05, 1.6), 1)],
+            # [seq_c: cruise author] the entrance (E) and death (S4) visuals moved to the kit: seq_c/entrance, seq_c/death
             'warp_out': ['# @s = body at the old spot: the white-cyan pillar and the warp sounds.',
                          *[g.particle('end_rod', f'~ ~{y} ~', (0.2, 0.4, 0.2), 0.02, 3) for y in (1, 3, 5, 7)],
                          g.sound('block.respawn_anchor.deplete', 1.0, 1.2), g.sound('entity.enderman.teleport', 0.8, 0.6)],
@@ -1063,15 +1051,6 @@ class Core:
             'recover': [g.sound('block.piston.contract', 0.9, 0.7), g.sound('block.chain.place', 0.9, 0.8)],
             'flip': [g.sound('block.crafter.craft', 0.9, 0.8), g.sound('block.beacon.power_select', 0.7, 1.2),
                      g.particle('end_rod', '~ ~4.6 ~', (0.4, 0.3, 0.4), 0.02, 6)],
-            'death_start': [g.sound('block.beacon.deactivate', 1.0, 0.6), g.sound('block.respawn_anchor.deplete', 1.0, 0.6),
-                            g.particle('electric_spark', '~ ~4 ~', (1.5, 0.6, 1.5), 0.1, 12)],
-            'death_flicker': [g.sound('block.beacon.deactivate', 0.6, 1.6), g.particle('electric_spark', '~ ~4 ~', (1.5, 0.4, 1.5), 0.1, 8)],
-            'death_drop': [g.sound('block.anvil.land', 0.9, 0.7), g.sound('block.chain.break', 1.0, 0.8),
-                           g.particle('block{block_state:"minecraft:gold_block"}', '~ ~0.5 ~', (2.0, 0.2, 2.0), 0, 20)],
-            'death_sink': [g.sound('block.anvil.place', 0.9, 0.4), g.sound('entity.iron_golem.damage', 0.8, 0.5),
-                           g.particle('poof', '~ ~0.5 ~', (2.0, 0.2, 2.0), 0.02, 16)],
-            'death_out': [g.sound('block.glass.break', 1.0, 0.6), g.sound('block.amethyst_cluster.break', 1.0, 0.6),
-                          g.dust(G, 1.6, '~ ~1.5 ~', (2.0, 1.2, 2.0), 30), g.dust(V, 1.2, '~ ~1.5 ~', (2.0, 1.2, 2.0), 12)],
         }
         for name, lines in fx.items():
             body = [ln for ln in lines if ln.startswith('#')] + [f'execute at @s run {ln}' for ln in lines if not ln.startswith('#')]

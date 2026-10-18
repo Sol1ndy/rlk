@@ -13,4 +13,4 @@ scoreboard players set #fgBrkQ mb 0
 scoreboard players set #fgSt mb 7
 function rlk:mboss/fieldgen/rig_stub/prop/clear
 function rlk:mboss/fieldgen/rig_stub/play/death
-function rlk:mboss/fieldgen/cfx/death_start
+function rlk:mboss/fieldgen/seq_c/death/start

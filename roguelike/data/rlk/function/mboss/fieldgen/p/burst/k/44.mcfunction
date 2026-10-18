@@ -1,6 +1,4 @@
 # burst clock 44
-execute at @s run particle minecraft:dust{color:[0.98f,0.871f,0.659f],scale:1.6} ~ ~7 ~ 0.12 0.05 0.12 0 2 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.98f,0.871f,0.659f],scale:1.6} ~ ~5.25 ~ 0.12 0.05 0.12 0 2 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.98f,0.871f,0.659f],scale:1.6} ~ ~3.5 ~ 0.12 0.05 0.12 0 2 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.98f,0.871f,0.659f],scale:1.6} ~ ~1.75 ~ 0.12 0.05 0.12 0 2 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.98f,0.871f,0.659f],scale:1.6} ~ ~0.35 ~ 0.12 0.05 0.12 0 2 force @a[tag=player]
+execute at @s positioned ~ 201 ~ rotated ~ 0 run function rlk:mboss/fieldgen/fx/p/floor_hit
+execute at @s positioned ~ 201 ~ rotated ~ 0 run playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 0.7 0.9 0.23
+execute at @s positioned ~ 201 ~ rotated ~ 0 run playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.4 1.3 0.13
