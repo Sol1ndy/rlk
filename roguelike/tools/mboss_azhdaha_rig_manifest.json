@@ -1,0 +1,3413 @@
+{
+  "parts": [
+    {
+      "name": "head",
+      "region": "head",
+      "uuid": "524c4b4d-415a-4400-8000-000000000001",
+      "tag": "rlk_mb_az_head",
+      "model": "head",
+      "brightness": 13,
+      "scale": 2.2,
+      "elements": 354
+    },
+    {
+      "name": "jaw",
+      "region": "head",
+      "uuid": "524c4b4d-415a-4400-8000-000000000002",
+      "tag": "rlk_mb_az_jaw",
+      "model": "jaw",
+      "brightness": 13,
+      "scale": 2,
+      "elements": 209
+    },
+    {
+      "name": "eyes",
+      "region": "head",
+      "uuid": "524c4b4d-415a-4400-8000-000000000003",
+      "tag": "rlk_mb_az_eyes",
+      "model": "eyes",
+      "brightness": 15,
+      "scale": 1,
+      "elements": 2
+    },
+    {
+      "name": "horn_l",
+      "region": "head",
+      "uuid": "524c4b4d-415a-4400-8000-000000000004",
+      "tag": "rlk_mb_az_horn_l",
+      "model": "horn_l",
+      "brightness": 14,
+      "scale": 2,
+      "elements": 165
+    },
+    {
+      "name": "horn_r",
+      "region": "head",
+      "uuid": "524c4b4d-415a-4400-8000-000000000005",
+      "tag": "rlk_mb_az_horn_r",
+      "model": "horn_r",
+      "brightness": 14,
+      "scale": 2,
+      "elements": 165
+    },
+    {
+      "name": "beard1",
+      "region": "head",
+      "uuid": "524c4b4d-415a-4400-8000-000000000006",
+      "tag": "rlk_mb_az_beard1",
+      "model": "beard1",
+      "brightness": 13,
+      "scale": 1.4,
+      "elements": 30
+    },
+    {
+      "name": "beard2",
+      "region": "head",
+      "uuid": "524c4b4d-415a-4400-8000-000000000007",
+      "tag": "rlk_mb_az_beard2",
+      "model": "beard2",
+      "brightness": 13,
+      "scale": 1.4,
+      "elements": 24
+    },
+    {
+      "name": "chest",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-000000000008",
+      "tag": "rlk_mb_az_chest",
+      "model": "chest",
+      "brightness": 13,
+      "scale": 3,
+      "elements": 161
+    },
+    {
+      "name": "belly",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-000000000009",
+      "tag": "rlk_mb_az_belly",
+      "model": "belly",
+      "brightness": 13,
+      "scale": 3,
+      "elements": 110
+    },
+    {
+      "name": "pelvis",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-00000000000a",
+      "tag": "rlk_mb_az_pelvis",
+      "model": "pelvis",
+      "brightness": 13,
+      "scale": 2.8,
+      "elements": 193
+    },
+    {
+      "name": "neck1",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-00000000000b",
+      "tag": "rlk_mb_az_neck1",
+      "model": "neck1",
+      "brightness": 13,
+      "scale": 2,
+      "elements": 80
+    },
+    {
+      "name": "neck2",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-00000000000c",
+      "tag": "rlk_mb_az_neck2",
+      "model": "neck2",
+      "brightness": 13,
+      "scale": 2,
+      "elements": 97
+    },
+    {
+      "name": "apron",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-00000000000d",
+      "tag": "rlk_mb_az_apron",
+      "model": "apron",
+      "brightness": 13,
+      "scale": 1.8,
+      "elements": 22
+    },
+    {
+      "name": "glow_apron",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-00000000000e",
+      "tag": "rlk_mb_az_glow_apron",
+      "model": "empty",
+      "brightness": 15,
+      "scale": 1.8,
+      "elements": 0
+    },
+    {
+      "name": "plates_neck",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-00000000000f",
+      "tag": "rlk_mb_az_plates_neck",
+      "model": "plates_neck",
+      "brightness": 13,
+      "scale": 2,
+      "elements": 33
+    },
+    {
+      "name": "plates_sh",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-000000000010",
+      "tag": "rlk_mb_az_plates_sh",
+      "model": "plates_sh",
+      "brightness": 13,
+      "scale": 2.2,
+      "elements": 36
+    },
+    {
+      "name": "plates_mid",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-000000000011",
+      "tag": "rlk_mb_az_plates_mid",
+      "model": "plates_mid",
+      "brightness": 13,
+      "scale": 2.2,
+      "elements": 30
+    },
+    {
+      "name": "plates_hip",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-000000000012",
+      "tag": "rlk_mb_az_plates_hip",
+      "model": "plates_hip",
+      "brightness": 13,
+      "scale": 2,
+      "elements": 27
+    },
+    {
+      "name": "crys_sh",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-000000000013",
+      "tag": "rlk_mb_az_crys_sh",
+      "model": "crys_sh",
+      "brightness": 14,
+      "scale": 2.2,
+      "elements": 58
+    },
+    {
+      "name": "crys_mid",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-000000000014",
+      "tag": "rlk_mb_az_crys_mid",
+      "model": "crys_mid",
+      "brightness": 14,
+      "scale": 2.2,
+      "elements": 48
+    },
+    {
+      "name": "crys_hip",
+      "region": "body",
+      "uuid": "524c4b4d-415a-4400-8000-000000000015",
+      "tag": "rlk_mb_az_crys_hip",
+      "model": "crys_hip",
+      "brightness": 14,
+      "scale": 2,
+      "elements": 48
+    },
+    {
+      "name": "uarm_l",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-000000000016",
+      "tag": "rlk_mb_az_uarm_l",
+      "model": "uarm_l",
+      "brightness": 13,
+      "scale": 1.8,
+      "elements": 160
+    },
+    {
+      "name": "bracer_l",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-000000000017",
+      "tag": "rlk_mb_az_bracer_l",
+      "model": "bracer_l",
+      "brightness": 13,
+      "scale": 1.6,
+      "elements": 87
+    },
+    {
+      "name": "paw_l",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-000000000018",
+      "tag": "rlk_mb_az_paw_l",
+      "model": "paw_l",
+      "brightness": 13,
+      "scale": 1.4,
+      "elements": 272
+    },
+    {
+      "name": "uarm_r",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-000000000019",
+      "tag": "rlk_mb_az_uarm_r",
+      "model": "uarm_r",
+      "brightness": 13,
+      "scale": 1.8,
+      "elements": 160
+    },
+    {
+      "name": "bracer_r",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-00000000001a",
+      "tag": "rlk_mb_az_bracer_r",
+      "model": "bracer_r",
+      "brightness": 13,
+      "scale": 1.6,
+      "elements": 87
+    },
+    {
+      "name": "paw_r",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-00000000001b",
+      "tag": "rlk_mb_az_paw_r",
+      "model": "paw_r",
+      "brightness": 13,
+      "scale": 1.4,
+      "elements": 272
+    },
+    {
+      "name": "thigh_l",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-00000000001c",
+      "tag": "rlk_mb_az_thigh_l",
+      "model": "thigh_l",
+      "brightness": 13,
+      "scale": 2,
+      "elements": 161
+    },
+    {
+      "name": "gaiter_l",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-00000000001d",
+      "tag": "rlk_mb_az_gaiter_l",
+      "model": "gaiter_l",
+      "brightness": 13,
+      "scale": 1.6,
+      "elements": 598
+    },
+    {
+      "name": "foot_l",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-00000000001e",
+      "tag": "rlk_mb_az_foot_l",
+      "model": "foot_l",
+      "brightness": 13,
+      "scale": 1.4,
+      "elements": 204
+    },
+    {
+      "name": "thigh_r",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-00000000001f",
+      "tag": "rlk_mb_az_thigh_r",
+      "model": "thigh_r",
+      "brightness": 13,
+      "scale": 2,
+      "elements": 161
+    },
+    {
+      "name": "gaiter_r",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-000000000020",
+      "tag": "rlk_mb_az_gaiter_r",
+      "model": "gaiter_r",
+      "brightness": 13,
+      "scale": 1.6,
+      "elements": 598
+    },
+    {
+      "name": "foot_r",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-000000000021",
+      "tag": "rlk_mb_az_foot_r",
+      "model": "foot_r",
+      "brightness": 13,
+      "scale": 1.4,
+      "elements": 204
+    },
+    {
+      "name": "glow_bracer_l",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-000000000022",
+      "tag": "rlk_mb_az_glow_bracer_l",
+      "model": "empty",
+      "brightness": 15,
+      "scale": 1.6,
+      "elements": 0
+    },
+    {
+      "name": "glow_bracer_r",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-000000000023",
+      "tag": "rlk_mb_az_glow_bracer_r",
+      "model": "empty",
+      "brightness": 15,
+      "scale": 1.6,
+      "elements": 0
+    },
+    {
+      "name": "glow_gaiter_l",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-000000000024",
+      "tag": "rlk_mb_az_glow_gaiter_l",
+      "model": "empty",
+      "brightness": 15,
+      "scale": 1.6,
+      "elements": 0
+    },
+    {
+      "name": "glow_gaiter_r",
+      "region": "legs",
+      "uuid": "524c4b4d-415a-4400-8000-000000000025",
+      "tag": "rlk_mb_az_glow_gaiter_r",
+      "model": "empty",
+      "brightness": 15,
+      "scale": 1.6,
+      "elements": 0
+    },
+    {
+      "name": "t1",
+      "region": "tail",
+      "uuid": "524c4b4d-415a-4400-8000-000000000026",
+      "tag": "rlk_mb_az_t1",
+      "model": "t1",
+      "brightness": 13,
+      "scale": 1.8,
+      "elements": 107
+    },
+    {
+      "name": "t2",
+      "region": "tail",
+      "uuid": "524c4b4d-415a-4400-8000-000000000027",
+      "tag": "rlk_mb_az_t2",
+      "model": "t2",
+      "brightness": 13,
+      "scale": 1.6,
+      "elements": 99
+    },
+    {
+      "name": "t3",
+      "region": "tail",
+      "uuid": "524c4b4d-415a-4400-8000-000000000028",
+      "tag": "rlk_mb_az_t3",
+      "model": "t3",
+      "brightness": 13,
+      "scale": 1.45,
+      "elements": 97
+    },
+    {
+      "name": "t4",
+      "region": "tail",
+      "uuid": "524c4b4d-415a-4400-8000-000000000029",
+      "tag": "rlk_mb_az_t4",
+      "model": "t4",
+      "brightness": 13,
+      "scale": 1.35,
+      "elements": 87
+    },
+    {
+      "name": "t5",
+      "region": "tail",
+      "uuid": "524c4b4d-415a-4400-8000-00000000002a",
+      "tag": "rlk_mb_az_t5",
+      "model": "t5",
+      "brightness": 13,
+      "scale": 1.3,
+      "elements": 87
+    },
+    {
+      "name": "t6",
+      "region": "tail",
+      "uuid": "524c4b4d-415a-4400-8000-00000000002b",
+      "tag": "rlk_mb_az_t6",
+      "model": "t6",
+      "brightness": 13,
+      "scale": 1.2,
+      "elements": 44
+    },
+    {
+      "name": "t7",
+      "region": "tail",
+      "uuid": "524c4b4d-415a-4400-8000-00000000002c",
+      "tag": "rlk_mb_az_t7",
+      "model": "t7",
+      "brightness": 13,
+      "scale": 1.2,
+      "elements": 48
+    },
+    {
+      "name": "t8",
+      "region": "tail",
+      "uuid": "524c4b4d-415a-4400-8000-00000000002d",
+      "tag": "rlk_mb_az_t8",
+      "model": "t8",
+      "brightness": 14,
+      "scale": 1.2,
+      "elements": 57
+    },
+    {
+      "name": "tip",
+      "region": "tail",
+      "uuid": "524c4b4d-415a-4400-8000-00000000002e",
+      "tag": "rlk_mb_az_tip",
+      "model": "tip",
+      "brightness": 14,
+      "scale": 1.3,
+      "elements": 49
+    }
+  ],
+  "shadow": {
+    "uuid": "524c4b4d-415a-4400-8000-000000000040",
+    "tag": "rlk_mb_az_shadow",
+    "shadow_radius": 4.5,
+    "note": "empty-model helper under the anchor, not a rig part"
+  },
+  "clips": [
+    {
+      "id": 0,
+      "name": "rest",
+      "len": 2,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 1,
+      "keys": 46,
+      "note": "DEFAULT_POSE: the idle stance, head low",
+      "state": "normal",
+      "extents": [
+        [
+          -4.09,
+          4.09
+        ],
+        [
+          -0.35,
+          8.27
+        ],
+        [
+          -5.3,
+          13.53
+        ]
+      ],
+      "px": {
+        "0": {
+          "head": {
+            "x": 0,
+            "z": -4.3,
+            "base": 0,
+            "top": 3.05,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 1,
+            "top": 4.2,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.35,
+            "base": 0.74,
+            "top": 3.94,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 10.12,
+            "base": 0.9,
+            "top": 3.9,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 12.86,
+            "base": 2.91,
+            "top": 5.81,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 11.9,
+            "base": 5.71,
+            "top": 8.51,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          }
+        },
+        "2": {
+          "head": {
+            "x": 0,
+            "z": -4.3,
+            "base": 0,
+            "top": 3.05,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 1,
+            "top": 4.2,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.35,
+            "base": 0.74,
+            "top": 3.94,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 10.12,
+            "base": 0.9,
+            "top": 3.9,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 12.86,
+            "base": 2.91,
+            "top": 5.81,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 11.9,
+            "base": 5.71,
+            "top": 8.51,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          }
+        }
+      }
+    },
+    {
+      "id": 1,
+      "name": "head_up",
+      "len": 2,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 1,
+      "keys": 46,
+      "note": "head raised (walk, v1 f2130): the neck up, the face still forward, eyes about 3 b",
+      "state": "normal",
+      "extents": [
+        [
+          -4.09,
+          4.09
+        ],
+        [
+          -0.35,
+          8.27
+        ],
+        [
+          -6.3,
+          13.53
+        ]
+      ],
+      "px": {
+        "0": {
+          "head": {
+            "x": 0,
+            "z": -4.97,
+            "base": 0.75,
+            "top": 4.35,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 1,
+            "top": 4.2,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.35,
+            "base": 0.74,
+            "top": 3.94,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 10.12,
+            "base": 0.9,
+            "top": 3.9,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 12.86,
+            "base": 2.91,
+            "top": 5.81,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 11.9,
+            "base": 5.71,
+            "top": 8.51,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          }
+        },
+        "2": {
+          "head": {
+            "x": 0,
+            "z": -4.97,
+            "base": 0.75,
+            "top": 4.35,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 1,
+            "top": 4.2,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.35,
+            "base": 0.74,
+            "top": 3.94,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 10.12,
+            "base": 0.9,
+            "top": 3.9,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 12.86,
+            "base": 2.91,
+            "top": 5.81,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 11.9,
+            "base": 5.71,
+            "top": 8.51,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "name": "roar",
+      "len": 2,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 1,
+      "keys": 46,
+      "note": "low roar: jaw 45, head thrust up (the portrait)",
+      "state": "normal",
+      "extents": [
+        [
+          -4.09,
+          4.09
+        ],
+        [
+          -0.35,
+          8.27
+        ],
+        [
+          -6.11,
+          13.53
+        ]
+      ],
+      "px": {
+        "0": {
+          "head": {
+            "x": 0,
+            "z": -4.65,
+            "base": 0.22,
+            "top": 3.82,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 1,
+            "top": 4.2,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.35,
+            "base": 0.74,
+            "top": 3.94,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 10.12,
+            "base": 0.9,
+            "top": 3.9,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 12.86,
+            "base": 2.91,
+            "top": 5.81,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 11.9,
+            "base": 5.71,
+            "top": 8.51,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          }
+        },
+        "2": {
+          "head": {
+            "x": 0,
+            "z": -4.65,
+            "base": 0.22,
+            "top": 3.82,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 1,
+            "top": 4.2,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.35,
+            "base": 0.74,
+            "top": 3.94,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 10.12,
+            "base": 0.9,
+            "top": 3.9,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 12.86,
+            "base": 2.91,
+            "top": 5.81,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 11.9,
+            "base": 5.71,
+            "top": 8.51,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "name": "rear_up",
+      "len": 2,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 1,
+      "keys": 46,
+      "note": "rear-up roar peak (roar_rear t20, chin_slam t30): pelvis +45, fore paws at chest height",
+      "state": "normal",
+      "extents": [
+        [
+          -4.36,
+          4.36
+        ],
+        [
+          -0.66,
+          9.24
+        ],
+        [
+          -5.15,
+          19.32
+        ]
+      ],
+      "cull_overhang": {
+        "t6": 0.39,
+        "t7": 1.95,
+        "t8": 3.2,
+        "tip": 4.32
+      },
+      "px": {
+        "0": {
+          "head": {
+            "x": 0,
+            "z": -2.96,
+            "base": 5.35,
+            "top": 8.95,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -0.33,
+            "base": 4.51,
+            "top": 8.01,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 1.29,
+            "base": 2.48,
+            "top": 5.98,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.11,
+            "base": 0.19,
+            "top": 3.39,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 5.54,
+            "base": 0,
+            "top": 2.08,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 9.32,
+            "base": 0,
+            "top": 1.68,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 12.92,
+            "base": 0,
+            "top": 1.64,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 16.26,
+            "base": 0,
+            "top": 2.08,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 2.8,
+            "z": -3.93,
+            "base": 3.92,
+            "top": 8.52,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -2.8,
+            "z": -3.93,
+            "base": 3.92,
+            "top": 8.52,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.82,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.82,
+            "w": 1.8
+          }
+        },
+        "2": {
+          "head": {
+            "x": 0,
+            "z": -2.96,
+            "base": 5.35,
+            "top": 8.95,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -0.33,
+            "base": 4.51,
+            "top": 8.01,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 1.29,
+            "base": 2.48,
+            "top": 5.98,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.11,
+            "base": 0.19,
+            "top": 3.39,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 5.54,
+            "base": 0,
+            "top": 2.08,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 9.32,
+            "base": 0,
+            "top": 1.68,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 12.92,
+            "base": 0,
+            "top": 1.64,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 16.26,
+            "base": 0,
+            "top": 2.08,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 2.8,
+            "z": -3.93,
+            "base": 3.92,
+            "top": 8.52,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -2.8,
+            "z": -3.93,
+            "base": 3.92,
+            "top": 8.52,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.82,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.82,
+            "w": 1.8
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "name": "stomp_lift",
+      "len": 2,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 1,
+      "keys": 46,
+      "note": "stomp_fl hang (t15): left fore wrist at 3.0 b, claws curled, weight on the right",
+      "state": "normal",
+      "extents": [
+        [
+          -4.17,
+          4.47
+        ],
+        [
+          -0.35,
+          8.27
+        ],
+        [
+          -5.63,
+          13.53
+        ]
+      ],
+      "px": {
+        "0": {
+          "head": {
+            "x": 0.71,
+            "z": -4.26,
+            "base": 0,
+            "top": 3.15,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 1,
+            "top": 4.2,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.35,
+            "base": 0.74,
+            "top": 3.94,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 10.12,
+            "base": 0.9,
+            "top": 3.9,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 12.86,
+            "base": 2.91,
+            "top": 5.81,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 11.9,
+            "base": 5.71,
+            "top": 8.51,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.25,
+            "z": -2.99,
+            "base": 0.45,
+            "top": 5.05,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.05,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          }
+        },
+        "2": {
+          "head": {
+            "x": 0.71,
+            "z": -4.26,
+            "base": 0,
+            "top": 3.15,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 1,
+            "top": 4.2,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.35,
+            "base": 0.74,
+            "top": 3.94,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 10.12,
+            "base": 0.9,
+            "top": 3.9,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 12.86,
+            "base": 2.91,
+            "top": 5.81,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 11.9,
+            "base": 5.71,
+            "top": 8.51,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.25,
+            "z": -2.99,
+            "base": 0.45,
+            "top": 5.05,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.05,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "name": "whip_mid",
+      "len": 2,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 1,
+      "keys": 46,
+      "note": "tail whip mid-sweep: the tail flat on the floor, swept 150 to the left",
+      "state": "normal",
+      "extents": [
+        [
+          -4.17,
+          11.32
+        ],
+        [
+          -0.57,
+          7.07
+        ],
+        [
+          -5.67,
+          12
+        ]
+      ],
+      "px": {
+        "0": {
+          "head": {
+            "x": -0.49,
+            "z": -4.18,
+            "base": 0,
+            "top": 2.85,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0.14,
+            "z": -2.08,
+            "base": 1.15,
+            "top": 4.65,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0.22,
+            "z": 0.51,
+            "base": 1.15,
+            "top": 4.65,
+            "w": 4.6
+          },
+          "hips": {
+            "x": -0.1,
+            "z": 3.39,
+            "base": 0.8,
+            "top": 4,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0.1,
+            "z": 6.26,
+            "base": 0.32,
+            "top": 3.52,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 2.07,
+            "z": 9.21,
+            "base": 0,
+            "top": 2.24,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 5.29,
+            "z": 10.3,
+            "base": 0,
+            "top": 1.29,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 8.44,
+            "z": 9.31,
+            "base": 0,
+            "top": 1.22,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.6,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.6,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.72,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.72,
+            "w": 1.8
+          }
+        },
+        "2": {
+          "head": {
+            "x": -0.49,
+            "z": -4.18,
+            "base": 0,
+            "top": 2.85,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0.14,
+            "z": -2.08,
+            "base": 1.15,
+            "top": 4.65,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0.22,
+            "z": 0.51,
+            "base": 1.15,
+            "top": 4.65,
+            "w": 4.6
+          },
+          "hips": {
+            "x": -0.1,
+            "z": 3.39,
+            "base": 0.8,
+            "top": 4,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0.1,
+            "z": 6.26,
+            "base": 0.32,
+            "top": 3.52,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 2.07,
+            "z": 9.21,
+            "base": 0,
+            "top": 2.24,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 5.29,
+            "z": 10.3,
+            "base": 0,
+            "top": 1.29,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 8.44,
+            "z": 9.31,
+            "base": 0,
+            "top": 1.22,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.6,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.6,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.72,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.72,
+            "w": 1.8
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "name": "loop",
+      "len": 2,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 1,
+      "keys": 46,
+      "note": "phase-3 tail loop over the back (v8 f2280 / v7 f0600 silhouette)",
+      "state": "normal",
+      "extents": [
+        [
+          -4.09,
+          4.09
+        ],
+        [
+          -0.35,
+          10.48
+        ],
+        [
+          -5.3,
+          10.69
+        ]
+      ],
+      "px": {
+        "0": {
+          "head": {
+            "x": 0,
+            "z": -4.3,
+            "base": 0,
+            "top": 3.05,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 1,
+            "top": 4.2,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.32,
+            "base": 1.18,
+            "top": 4.38,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 9.49,
+            "base": 3.07,
+            "top": 6.07,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 9.93,
+            "base": 6.38,
+            "top": 9.28,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 7.31,
+            "base": 8.16,
+            "top": 10.96,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          }
+        },
+        "2": {
+          "head": {
+            "x": 0,
+            "z": -4.3,
+            "base": 0,
+            "top": 3.05,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 1,
+            "top": 4.2,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.32,
+            "base": 1.18,
+            "top": 4.38,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 9.49,
+            "base": 3.07,
+            "top": 6.07,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 9.93,
+            "base": 6.38,
+            "top": 9.28,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 7.31,
+            "base": 8.16,
+            "top": 10.96,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          }
+        }
+      }
+    },
+    {
+      "id": 7,
+      "name": "tail_low",
+      "len": 2,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 1,
+      "keys": 46,
+      "note": "the tail laid out behind (v3 f1680): the leafy branch near the floor",
+      "state": "normal",
+      "extents": [
+        [
+          -4.09,
+          4.09
+        ],
+        [
+          -0.35,
+          7.27
+        ],
+        [
+          -5.3,
+          20.04
+        ]
+      ],
+      "cull_overhang": {
+        "t6": 1.11,
+        "t7": 2.7,
+        "t8": 3.94,
+        "tip": 5.04
+      },
+      "px": {
+        "0": {
+          "head": {
+            "x": 0,
+            "z": -4.3,
+            "base": 0,
+            "top": 3.05,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 1,
+            "top": 4.2,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.34,
+            "base": 0.68,
+            "top": 3.88,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 10.09,
+            "base": 0.07,
+            "top": 3.07,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 13.66,
+            "base": 0,
+            "top": 2.5,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 17,
+            "base": 0,
+            "top": 2.77,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          }
+        },
+        "2": {
+          "head": {
+            "x": 0,
+            "z": -4.3,
+            "base": 0,
+            "top": 3.05,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 1.35,
+            "top": 4.85,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 1,
+            "top": 4.2,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.34,
+            "base": 0.68,
+            "top": 3.88,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 10.09,
+            "base": 0.07,
+            "top": 3.07,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 13.66,
+            "base": 0,
+            "top": 2.5,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 17,
+            "base": 0,
+            "top": 2.77,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": 2.8,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": 2.92,
+            "w": 1.8
+          }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "name": "burrow",
+      "len": 2,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 1,
+      "keys": 46,
+      "note": "burrow dive mid-sink: root -3.4, nose down 22; the opaque floor hides the buried part",
+      "state": "normal",
+      "extents": [
+        [
+          -4.09,
+          4.09
+        ],
+        [
+          -5.36,
+          5.86
+        ],
+        [
+          -5.67,
+          19.81
+        ]
+      ],
+      "cull_overhang": {
+        "t6": 0.73,
+        "t7": 2.24,
+        "t8": 3.59,
+        "tip": 4.81
+      },
+      "px": {
+        "0": {
+          "head": {
+            "x": 0,
+            "z": -3.19,
+            "base": 0,
+            "top": -2.16,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.12,
+            "base": 0,
+            "top": 0.47,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.29,
+            "base": 0,
+            "top": 1.45,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.11,
+            "base": 0,
+            "top": 1.91,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 5.98,
+            "base": 0,
+            "top": 2.61,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 9.74,
+            "base": 0,
+            "top": 2.93,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 13.3,
+            "base": 0.45,
+            "top": 3.35,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 16.54,
+            "base": 1.46,
+            "top": 4.26,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -1.73,
+            "base": 0,
+            "top": -1.67,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -1.73,
+            "base": 0,
+            "top": -1.67,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 3.32,
+            "base": 0,
+            "top": 0.51,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 3.32,
+            "base": 0,
+            "top": 0.51,
+            "w": 1.8
+          }
+        },
+        "2": {
+          "head": {
+            "x": 0,
+            "z": -3.19,
+            "base": 0,
+            "top": -2.16,
+            "w": 2.8
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.12,
+            "base": 0,
+            "top": 0.47,
+            "w": 4.6
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.29,
+            "base": 0,
+            "top": 1.45,
+            "w": 4.6
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.11,
+            "base": 0,
+            "top": 1.91,
+            "w": 4.4
+          },
+          "tail1": {
+            "x": 0,
+            "z": 5.98,
+            "base": 0,
+            "top": 2.61,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 9.74,
+            "base": 0,
+            "top": 2.93,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 13.3,
+            "base": 0.45,
+            "top": 3.35,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 16.54,
+            "base": 1.46,
+            "top": 4.26,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -1.73,
+            "base": 0,
+            "top": -1.67,
+            "w": 1.8
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -1.73,
+            "base": 0,
+            "top": -1.67,
+            "w": 1.8
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 3.32,
+            "base": 0,
+            "top": 0.51,
+            "w": 1.8
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 3.32,
+            "base": 0,
+            "top": 0.51,
+            "w": 1.8
+          }
+        }
+      }
+    },
+    {
+      "id": 9,
+      "name": "burrowed",
+      "len": 2,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 1,
+      "keys": 46,
+      "note": "underground (burrow_travel): root -7.5, every part at scale 0",
+      "state": "burrowed",
+      "extents": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "px": {
+        "0": {
+          "head": {
+            "x": 0,
+            "z": -4.3,
+            "base": 0,
+            "top": -4.45,
+            "w": 2.8,
+            "hidden": true
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 0,
+            "top": -2.65,
+            "w": 4.6,
+            "hidden": true
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 0,
+            "top": -2.65,
+            "w": 4.6,
+            "hidden": true
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 0,
+            "top": -3.3,
+            "w": 4.4,
+            "hidden": true
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.35,
+            "base": 0,
+            "top": -3.56,
+            "w": 2.6,
+            "hidden": true
+          },
+          "tail2": {
+            "x": 0,
+            "z": 10.12,
+            "base": 0,
+            "top": -3.6,
+            "w": 2.2,
+            "hidden": true
+          },
+          "tail3": {
+            "x": 0,
+            "z": 12.86,
+            "base": 0,
+            "top": -1.69,
+            "w": 1.8,
+            "hidden": true
+          },
+          "tail4": {
+            "x": 0,
+            "z": 11.9,
+            "base": 0,
+            "top": 1.01,
+            "w": 1.4,
+            "hidden": true
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": -4.7,
+            "w": 1.8,
+            "hidden": true
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": -4.7,
+            "w": 1.8,
+            "hidden": true
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": -4.58,
+            "w": 1.8,
+            "hidden": true
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": -4.58,
+            "w": 1.8,
+            "hidden": true
+          }
+        },
+        "2": {
+          "head": {
+            "x": 0,
+            "z": -4.3,
+            "base": 0,
+            "top": -4.45,
+            "w": 2.8,
+            "hidden": true
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.1,
+            "base": 0,
+            "top": -2.65,
+            "w": 4.6,
+            "hidden": true
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.5,
+            "base": 0,
+            "top": -2.65,
+            "w": 4.6,
+            "hidden": true
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.4,
+            "base": 0,
+            "top": -3.3,
+            "w": 4.4,
+            "hidden": true
+          },
+          "tail1": {
+            "x": 0,
+            "z": 6.35,
+            "base": 0,
+            "top": -3.56,
+            "w": 2.6,
+            "hidden": true
+          },
+          "tail2": {
+            "x": 0,
+            "z": 10.12,
+            "base": 0,
+            "top": -3.6,
+            "w": 2.2,
+            "hidden": true
+          },
+          "tail3": {
+            "x": 0,
+            "z": 12.86,
+            "base": 0,
+            "top": -1.69,
+            "w": 1.8,
+            "hidden": true
+          },
+          "tail4": {
+            "x": 0,
+            "z": 11.9,
+            "base": 0,
+            "top": 1.01,
+            "w": 1.4,
+            "hidden": true
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": -4.7,
+            "w": 1.8,
+            "hidden": true
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.95,
+            "base": 0,
+            "top": -4.7,
+            "w": 1.8,
+            "hidden": true
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": -4.58,
+            "w": 1.8,
+            "hidden": true
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 2.55,
+            "base": 0,
+            "top": -4.58,
+            "w": 1.8,
+            "hidden": true
+          }
+        }
+      }
+    },
+    {
+      "id": 10,
+      "name": "tail_only",
+      "len": 2,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 1,
+      "keys": 46,
+      "note": "phase-3 tail-only state: root sunk 9.4 b, the tail a pillar above the floor, the body at scale 0",
+      "state": "tail_only",
+      "extents": [
+        [
+          -1.6,
+          1.6
+        ],
+        [
+          -5.98,
+          10.17
+        ],
+        [
+          2.99,
+          5.21
+        ]
+      ],
+      "px": {
+        "0": {
+          "head": {
+            "x": 0,
+            "z": -3.92,
+            "base": 0,
+            "top": -7.3,
+            "w": 2.8,
+            "hidden": true
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.16,
+            "base": 0,
+            "top": -5.08,
+            "w": 4.6,
+            "hidden": true
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.38,
+            "base": 0,
+            "top": -4.54,
+            "w": 4.6,
+            "hidden": true
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.29,
+            "base": 0,
+            "top": -4.58,
+            "w": 4.4,
+            "hidden": true
+          },
+          "tail1": {
+            "x": 0,
+            "z": 4.64,
+            "base": 0,
+            "top": -2.85,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 4.39,
+            "base": 0,
+            "top": 0.74,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 4.61,
+            "base": 1.33,
+            "top": 4.23,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 4.76,
+            "base": 4.71,
+            "top": 7.51,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.34,
+            "base": 0,
+            "top": -7.24,
+            "w": 1.8,
+            "hidden": true
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.34,
+            "base": 0,
+            "top": -7.24,
+            "w": 1.8,
+            "hidden": true
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 3.02,
+            "base": 0,
+            "top": -5.98,
+            "w": 1.8,
+            "hidden": true
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 3.02,
+            "base": 0,
+            "top": -5.98,
+            "w": 1.8,
+            "hidden": true
+          }
+        },
+        "2": {
+          "head": {
+            "x": 0,
+            "z": -3.92,
+            "base": 0,
+            "top": -7.3,
+            "w": 2.8,
+            "hidden": true
+          },
+          "chest": {
+            "x": 0,
+            "z": -2.16,
+            "base": 0,
+            "top": -5.08,
+            "w": 4.6,
+            "hidden": true
+          },
+          "belly": {
+            "x": 0,
+            "z": 0.38,
+            "base": 0,
+            "top": -4.54,
+            "w": 4.6,
+            "hidden": true
+          },
+          "hips": {
+            "x": 0,
+            "z": 3.29,
+            "base": 0,
+            "top": -4.58,
+            "w": 4.4,
+            "hidden": true
+          },
+          "tail1": {
+            "x": 0,
+            "z": 4.64,
+            "base": 0,
+            "top": -2.85,
+            "w": 2.6
+          },
+          "tail2": {
+            "x": 0,
+            "z": 4.39,
+            "base": 0,
+            "top": 0.74,
+            "w": 2.2
+          },
+          "tail3": {
+            "x": 0,
+            "z": 4.61,
+            "base": 1.33,
+            "top": 4.23,
+            "w": 1.8
+          },
+          "tail4": {
+            "x": 0,
+            "z": 4.76,
+            "base": 4.71,
+            "top": 7.51,
+            "w": 1.4
+          },
+          "paw_l": {
+            "x": 3.15,
+            "z": -2.34,
+            "base": 0,
+            "top": -7.24,
+            "w": 1.8,
+            "hidden": true
+          },
+          "paw_r": {
+            "x": -3.15,
+            "z": -2.34,
+            "base": 0,
+            "top": -7.24,
+            "w": 1.8,
+            "hidden": true
+          },
+          "foot_l": {
+            "x": 2.5,
+            "z": 3.02,
+            "base": 0,
+            "top": -5.98,
+            "w": 1.8,
+            "hidden": true
+          },
+          "foot_r": {
+            "x": -2.5,
+            "z": 3.02,
+            "base": 0,
+            "top": -5.98,
+            "w": 1.8,
+            "hidden": true
+          }
+        }
+      }
+    }
+  ],
+  "looks": {
+    "legs": {
+      "objective": "azRigLegs",
+      "ids": {
+        "geo": 0,
+        "hydro": 1,
+        "pyro": 2
+      },
+      "parts": {
+        "belly": {
+          "geo": "belly",
+          "hydro": "belly_hydro",
+          "pyro": "belly_pyro"
+        },
+        "apron": {
+          "geo": "apron",
+          "hydro": "apron_hydro",
+          "pyro": "apron_pyro"
+        },
+        "glow_apron": {
+          "geo": "empty",
+          "hydro": "glow_apron_hydro",
+          "pyro": "glow_apron_pyro"
+        },
+        "bracer_l": {
+          "geo": "bracer_l",
+          "hydro": "bracer_l_hydro",
+          "pyro": "bracer_l_pyro"
+        },
+        "bracer_r": {
+          "geo": "bracer_r",
+          "hydro": "bracer_r_hydro",
+          "pyro": "bracer_r_pyro"
+        },
+        "paw_l": {
+          "geo": "paw_l",
+          "hydro": "paw_l_hydro",
+          "pyro": "paw_l_pyro"
+        },
+        "paw_r": {
+          "geo": "paw_r",
+          "hydro": "paw_r_hydro",
+          "pyro": "paw_r_pyro"
+        },
+        "gaiter_l": {
+          "geo": "gaiter_l",
+          "hydro": "gaiter_l_hydro",
+          "pyro": "gaiter_l_pyro"
+        },
+        "gaiter_r": {
+          "geo": "gaiter_r",
+          "hydro": "gaiter_r_hydro",
+          "pyro": "gaiter_r_pyro"
+        },
+        "foot_l": {
+          "geo": "foot_l",
+          "hydro": "foot_l_hydro",
+          "pyro": "foot_l_pyro"
+        },
+        "foot_r": {
+          "geo": "foot_r",
+          "hydro": "foot_r_hydro",
+          "pyro": "foot_r_pyro"
+        },
+        "glow_bracer_l": {
+          "geo": "empty",
+          "hydro": "glow_bracer_l_hydro",
+          "pyro": "glow_bracer_l_pyro"
+        },
+        "glow_bracer_r": {
+          "geo": "empty",
+          "hydro": "glow_bracer_r_hydro",
+          "pyro": "glow_bracer_r_pyro"
+        },
+        "glow_gaiter_l": {
+          "geo": "empty",
+          "hydro": "glow_gaiter_l_hydro",
+          "pyro": "glow_gaiter_l_pyro"
+        },
+        "glow_gaiter_r": {
+          "geo": "empty",
+          "hydro": "glow_gaiter_r_hydro",
+          "pyro": "glow_gaiter_r_pyro"
+        }
+      },
+      "brightness": {
+        "hydro": {
+          "apron": 14,
+          "belly": 13
+        },
+        "pyro": {
+          "apron": 14,
+          "belly": 14
+        }
+      },
+      "functions": {
+        "geo": "rlk:mboss/azhdaha/rig/look/legs/geo",
+        "hydro": "rlk:mboss/azhdaha/rig/look/legs/hydro",
+        "pyro": "rlk:mboss/azhdaha/rig/look/legs/pyro"
+      }
+    },
+    "tail": {
+      "objective": "azRigTail",
+      "ids": {
+        "geo": 0,
+        "cryo": 1,
+        "electro": 2
+      },
+      "parts": {
+        "plates_neck": {
+          "geo": "plates_neck",
+          "cryo": "plates_neck_cryo",
+          "electro": "plates_neck_electro"
+        },
+        "plates_sh": {
+          "geo": "plates_sh",
+          "cryo": "plates_sh_cryo",
+          "electro": "plates_sh_electro"
+        },
+        "plates_mid": {
+          "geo": "plates_mid",
+          "cryo": "plates_mid_cryo",
+          "electro": "plates_mid_electro"
+        },
+        "plates_hip": {
+          "geo": "plates_hip",
+          "cryo": "plates_hip_cryo",
+          "electro": "plates_hip_electro"
+        },
+        "t1": {
+          "geo": "t1",
+          "cryo": "t1_cryo",
+          "electro": "t1_electro"
+        },
+        "t2": {
+          "geo": "t2",
+          "cryo": "t2_cryo",
+          "electro": "t2_electro"
+        },
+        "t3": {
+          "geo": "t3",
+          "cryo": "t3_cryo",
+          "electro": "t3_electro"
+        },
+        "t4": {
+          "geo": "t4",
+          "cryo": "t4_cryo",
+          "electro": "t4_electro"
+        },
+        "t5": {
+          "geo": "t5",
+          "cryo": "t5_cryo",
+          "electro": "t5_electro"
+        },
+        "t6": {
+          "geo": "t6",
+          "cryo": "t6_cryo",
+          "electro": "t6_electro"
+        },
+        "t7": {
+          "geo": "t7",
+          "cryo": "t7_cryo",
+          "electro": "t7_electro"
+        },
+        "t8": {
+          "geo": "t8",
+          "cryo": "t8_cryo",
+          "electro": "t8_electro"
+        },
+        "tip": {
+          "geo": "tip",
+          "cryo": "tip_cryo",
+          "electro": "tip_electro"
+        }
+      },
+      "brightness": {
+        "cryo": {
+          "plates_neck": 15,
+          "plates_sh": 15,
+          "plates_mid": 15,
+          "plates_hip": 15,
+          "t6": 15,
+          "t7": 15,
+          "t8": 15,
+          "tip": 15
+        },
+        "electro": {
+          "plates_neck": 15,
+          "plates_sh": 15,
+          "plates_mid": 15,
+          "plates_hip": 15,
+          "t6": 15,
+          "t7": 15,
+          "t8": 15,
+          "tip": 15
+        }
+      },
+      "functions": {
+        "geo": "rlk:mboss/azhdaha/rig/look/tail/geo",
+        "cryo": "rlk:mboss/azhdaha/rig/look/tail/cryo",
+        "electro": "rlk:mboss/azhdaha/rig/look/tail/electro"
+      }
+    }
+  },
+  "tinted_items": {
+    "glow_apron_hydro": {
+      "model": "glow_apron",
+      "tint": "#cde6ff"
+    },
+    "glow_apron_pyro": {
+      "model": "glow_apron",
+      "tint": "#ffb070"
+    },
+    "glow_bracer_l_hydro": {
+      "model": "glow_bracer_l",
+      "tint": "#cde6ff"
+    },
+    "glow_bracer_l_pyro": {
+      "model": "glow_bracer_l",
+      "tint": "#ffb070"
+    },
+    "glow_bracer_r_hydro": {
+      "model": "glow_bracer_r",
+      "tint": "#cde6ff"
+    },
+    "glow_bracer_r_pyro": {
+      "model": "glow_bracer_r",
+      "tint": "#ffb070"
+    },
+    "glow_gaiter_l_hydro": {
+      "model": "glow_gaiter_l",
+      "tint": "#cde6ff"
+    },
+    "glow_gaiter_l_pyro": {
+      "model": "glow_gaiter_l",
+      "tint": "#ffb070"
+    },
+    "glow_gaiter_r_hydro": {
+      "model": "glow_gaiter_r",
+      "tint": "#cde6ff"
+    },
+    "glow_gaiter_r_pyro": {
+      "model": "glow_gaiter_r",
+      "tint": "#ffb070"
+    }
+  },
+  "states": {
+    "objective": "azRigState",
+    "ids": {
+      "normal": 0,
+      "burrowed": 1,
+      "tail_only": 2
+    },
+    "functions": {
+      "normal": "rlk:mboss/azhdaha/rig/state/normal",
+      "burrowed": "rlk:mboss/azhdaha/rig/state/burrowed",
+      "tail_only": "rlk:mboss/azhdaha/rig/state/tail_only"
+    }
+  },
+  "flash_groups": {
+    "head": [
+      "head",
+      "jaw",
+      "horn_l",
+      "horn_r"
+    ],
+    "front": [
+      "chest",
+      "neck1",
+      "neck2",
+      "apron",
+      "uarm_l",
+      "uarm_r",
+      "bracer_l",
+      "bracer_r",
+      "paw_l",
+      "paw_r"
+    ],
+    "rear": [
+      "belly",
+      "pelvis",
+      "thigh_l",
+      "thigh_r",
+      "gaiter_l",
+      "gaiter_r",
+      "foot_l",
+      "foot_r"
+    ],
+    "tail": [
+      "t1",
+      "t2",
+      "t3",
+      "t4",
+      "t5",
+      "t6",
+      "t7",
+      "t8",
+      "tip"
+    ]
+  },
+  "proxies": {
+    "layout": [
+      {
+        "name": "head",
+        "part": "head",
+        "point": [
+          0,
+          -0.6,
+          -1
+        ],
+        "w": 2.8,
+        "top_margin": 1.6,
+        "tail_only": false
+      },
+      {
+        "name": "chest",
+        "part": "chest",
+        "point": [
+          0,
+          0,
+          -0.4
+        ],
+        "w": 4.6,
+        "top_margin": 1.5,
+        "tail_only": false
+      },
+      {
+        "name": "belly",
+        "part": "belly",
+        "point": [
+          0,
+          0,
+          0.2
+        ],
+        "w": 4.6,
+        "top_margin": 1.5,
+        "tail_only": false
+      },
+      {
+        "name": "hips",
+        "part": "pelvis",
+        "point": [
+          0,
+          0,
+          1
+        ],
+        "w": 4.4,
+        "top_margin": 1.2,
+        "tail_only": false
+      },
+      {
+        "name": "tail1",
+        "part": "t1",
+        "point": [
+          0,
+          0,
+          1.6
+        ],
+        "w": 2.6,
+        "top_margin": 1.2,
+        "tail_only": true
+      },
+      {
+        "name": "tail2",
+        "part": "t3",
+        "point": [
+          0,
+          0,
+          1
+        ],
+        "w": 2.2,
+        "top_margin": 1,
+        "tail_only": true
+      },
+      {
+        "name": "tail3",
+        "part": "t5",
+        "point": [
+          0,
+          0,
+          0.9
+        ],
+        "w": 1.8,
+        "top_margin": 0.9,
+        "tail_only": true
+      },
+      {
+        "name": "tail4",
+        "part": "t7",
+        "point": [
+          0,
+          0,
+          1
+        ],
+        "w": 1.4,
+        "top_margin": 0.8,
+        "tail_only": true
+      },
+      {
+        "name": "paw_l",
+        "part": "paw_l",
+        "point": [
+          0,
+          -0.3,
+          -0.5
+        ],
+        "w": 1.8,
+        "top_margin": 2.6,
+        "tail_only": false
+      },
+      {
+        "name": "paw_r",
+        "part": "paw_r",
+        "point": [
+          0,
+          -0.3,
+          -0.5
+        ],
+        "w": 1.8,
+        "top_margin": 2.6,
+        "tail_only": false
+      },
+      {
+        "name": "foot_l",
+        "part": "foot_l",
+        "point": [
+          0,
+          -0.4,
+          -0.5
+        ],
+        "w": 1.8,
+        "top_margin": 2.6,
+        "tail_only": false
+      },
+      {
+        "name": "foot_r",
+        "part": "foot_r",
+        "point": [
+          0,
+          -0.4,
+          -0.5
+        ],
+        "w": 1.8,
+        "top_margin": 2.6,
+        "tail_only": false
+      }
+    ],
+    "rest": {
+      "head": {
+        "x": 0,
+        "z": -4.3,
+        "base": 0,
+        "top": 3.05,
+        "w": 2.8
+      },
+      "chest": {
+        "x": 0,
+        "z": -2.1,
+        "base": 1.35,
+        "top": 4.85,
+        "w": 4.6
+      },
+      "belly": {
+        "x": 0,
+        "z": 0.5,
+        "base": 1.35,
+        "top": 4.85,
+        "w": 4.6
+      },
+      "hips": {
+        "x": 0,
+        "z": 3.4,
+        "base": 1,
+        "top": 4.2,
+        "w": 4.4
+      },
+      "tail1": {
+        "x": 0,
+        "z": 6.35,
+        "base": 0.74,
+        "top": 3.94,
+        "w": 2.6
+      },
+      "tail2": {
+        "x": 0,
+        "z": 10.12,
+        "base": 0.9,
+        "top": 3.9,
+        "w": 2.2
+      },
+      "tail3": {
+        "x": 0,
+        "z": 12.86,
+        "base": 2.91,
+        "top": 5.81,
+        "w": 1.8
+      },
+      "tail4": {
+        "x": 0,
+        "z": 11.9,
+        "base": 5.71,
+        "top": 8.51,
+        "w": 1.4
+      },
+      "paw_l": {
+        "x": 3.15,
+        "z": -2.95,
+        "base": 0,
+        "top": 2.8,
+        "w": 1.8
+      },
+      "paw_r": {
+        "x": -3.15,
+        "z": -2.95,
+        "base": 0,
+        "top": 2.8,
+        "w": 1.8
+      },
+      "foot_l": {
+        "x": 2.5,
+        "z": 2.55,
+        "base": 0,
+        "top": 2.92,
+        "w": 1.8
+      },
+      "foot_r": {
+        "x": -2.5,
+        "z": 2.55,
+        "base": 0,
+        "top": 2.92,
+        "w": 1.8
+      }
+    },
+    "note": "ground-anchored interaction columns (rigtech.md §3.3): x/z = the bone point projected on the floor (rig frame, +x = the boss left, -z = its front), base/top = the column; per clip in clips[].px at the events"
+  },
+  "skeleton": {
+    "joints": {
+      "pelvis": [
+        0,
+        3,
+        2.4
+      ],
+      "spine1": [
+        0,
+        3.35,
+        0.3
+      ],
+      "chest": [
+        0,
+        3.35,
+        -1.7
+      ],
+      "neck1": [
+        0,
+        3.05,
+        -2.55
+      ],
+      "neck2": [
+        0,
+        2.6,
+        -3.05
+      ],
+      "head": [
+        0,
+        2.05,
+        -3.3
+      ],
+      "jaw": [
+        0,
+        1.3,
+        -3.6
+      ],
+      "beard1": [
+        0,
+        1.05,
+        -3.5
+      ],
+      "beard2": [
+        0,
+        0.72,
+        -3.55
+      ],
+      "apron": [
+        0,
+        2.2,
+        -2.8
+      ],
+      "t1": [
+        0,
+        2.85,
+        4.75
+      ],
+      "shoulder": [
+        2.3,
+        3.25,
+        -2.15
+      ],
+      "elbow": [
+        2.95,
+        2.3,
+        -1.8
+      ],
+      "wrist": [
+        3.15,
+        0.5,
+        -2.45
+      ],
+      "hip": [
+        2,
+        3,
+        2.45
+      ],
+      "knee": [
+        2.35,
+        1.9,
+        1.5
+      ],
+      "hock": [
+        2.5,
+        0.72,
+        3.05
+      ],
+      "plN": [
+        0,
+        2.95,
+        -2.85
+      ],
+      "plS": [
+        0,
+        4,
+        -1.75
+      ],
+      "plM": [
+        0,
+        4.05,
+        0.25
+      ],
+      "plH": [
+        0,
+        3.55,
+        2.4
+      ]
+    },
+    "scale_H": 7
+  },
+  "culling": {
+    "width": 30,
+    "height": 12,
+    "view_range": 3
+  },
+  "rest_extents": [
+    [
+      -4.09,
+      4.09
+    ],
+    [
+      -0.35,
+      8.27
+    ],
+    [
+      -5.3,
+      13.53
+    ]
+  ],
+  "budgets": {
+    "parts": 46,
+    "part_budget": "44-48 (cap 56)",
+    "models": 93,
+    "elements_all_models": 12404,
+    "elements_shown_rest": 5531,
+    "atlas_px": 947200,
+    "atlas_budget": 1200000
+  },
+  "objectives": {
+    "azRigC": "current clip id (anchor)",
+    "azRigT": "tick within the clip (anchor; -1 = queued by play)",
+    "azRigF": "hit flash countdown",
+    "azRigY": "face/track scratch",
+    "azRigLegs": "legs look: 0 geo, 1 hydro, 2 pyro",
+    "azRigTail": "tail look: 0 geo, 1 cryo, 2 electro",
+    "azRigState": "body state: 0 normal, 1 burrowed, 2 tail-only"
+  },
+  "textures": 70
+}
