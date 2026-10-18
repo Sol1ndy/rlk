@@ -1,5 +1,7 @@
 # Internal: the legs channel's pyro models and brightness.
+data modify entity 524c4b4d-415a-4400-8000-000000000008 item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/chest_pyro"
 data modify entity 524c4b4d-415a-4400-8000-000000000009 item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/belly_pyro"
+data modify entity 524c4b4d-415a-4400-8000-00000000000a item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/pelvis_pyro"
 data modify entity 524c4b4d-415a-4400-8000-00000000000d item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/apron_pyro"
 data modify entity 524c4b4d-415a-4400-8000-00000000000e item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/glow_apron_pyro"
 data modify entity 524c4b4d-415a-4400-8000-000000000017 item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/bracer_l_pyro"
@@ -14,7 +16,9 @@ data modify entity 524c4b4d-415a-4400-8000-000000000022 item.components."minecra
 data modify entity 524c4b4d-415a-4400-8000-000000000023 item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/glow_bracer_r_pyro"
 data modify entity 524c4b4d-415a-4400-8000-000000000024 item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/glow_gaiter_l_pyro"
 data modify entity 524c4b4d-415a-4400-8000-000000000025 item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/glow_gaiter_r_pyro"
+data merge entity 524c4b4d-415a-4400-8000-000000000008 {brightness:{block:14,sky:15}}
 data merge entity 524c4b4d-415a-4400-8000-000000000009 {brightness:{block:14,sky:15}}
+data merge entity 524c4b4d-415a-4400-8000-00000000000a {brightness:{block:14,sky:15}}
 data merge entity 524c4b4d-415a-4400-8000-00000000000d {brightness:{block:14,sky:15}}
 data merge entity 524c4b4d-415a-4400-8000-00000000000e {brightness:{block:15,sky:15}}
 data merge entity 524c4b4d-415a-4400-8000-000000000017 {brightness:{block:13,sky:15}}

@@ -57,7 +57,7 @@ const mx = v => [-v[0], v[1], v[2]];
 // Display scale per part (blocks per 16 model units; reach 1.5 x scale from the joint).
 export const PART_SCALE = {
   chest: 3.0, belly: 3.0, pelvis: 2.8, neck1: 2.0, neck2: 2.0, apron: 1.8, glow_apron: 1.8,
-  plates_neck: 2.0, plates_sh: 2.2, plates_mid: 2.2, plates_hip: 2.0, crys_sh: 2.2, crys_mid: 2.2, crys_hip: 2.0,
+  plates_neck: 2.0, plates_sh: 2.2, plates_mid: 2.2, plates_hip: 2.0, crys_sh: 3.0, crys_mid: 3.0, crys_hip: 2.8,   // BODY: crystals x1.3 (R2)
   head: 2.2, jaw: 2.0, eyes: 1.0, horn_l: 2.0, horn_r: 2.0, beard1: 1.4, beard2: 1.4,
   uarm_l: 1.8, bracer_l: 1.6, paw_l: 1.4, uarm_r: 1.8, bracer_r: 1.6, paw_r: 1.4,
   thigh_l: 2.0, gaiter_l: 1.6, foot_l: 1.4, thigh_r: 2.0, gaiter_r: 1.6, foot_r: 1.4,
@@ -67,6 +67,9 @@ export const PART_SCALE = {
 // Rest lean of each plate group (deg, top toward the back): the plates are authored upright in the group frame and the
 // group leans them back; the flare channels stand them up (bristle).
 export const PLATE_LEAN = {neck: 35, sh: 12, mid: 15, hip: 25};
+// BODY region: the bristle widens each plate group across X as it flares (a non-uniform display scale x = flK * (1 +
+// PLATE_SPLAY * flare deg)), so the side rows roll further outward instead of the fan only growing (r1_critique 3.6).
+export const PLATE_SPLAY = .012;
 export const TAIL_PARTS = ['t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 'tip'];
 // Fixed placement of the horns in the head frame (the C of each horn is authored in its own YZ plane and turned out:
 // yaw opens the back of the C outward, so the front shows "( )"; model.md §0).
@@ -105,7 +108,7 @@ export function solve(p, {prev = null} = {}) {
   part('horn_r', add(Bh.t, rot(Bh.q, mx(HORN.at))), mul(Bh.q, Qhr));
   // plate groups (flare: pitch back + roll outward is not one axis, so the flare is a pitch about the group base;
   // the fan width comes from the scale flK) and the crystal clusters (rigid)
-  const flare = (n, B, base, deg, g) => part(n, at(B, base), mul(B.q, q([PLATE_LEAN[g] - deg, 0, 0])), p.flK);
+  const flare = (n, B, base, deg, g) => part(n, at(B, base), mul(B.q, q([PLATE_LEAN[g] - deg, 0, 0])), [p.flK * (1 + PLATE_SPLAY * deg), p.flK, p.flK]);
   flare('plates_neck', Bn2, J.plN, p.flN, 'neck'); flare('plates_sh', Bc, J.plS, p.flS, 'sh');
   flare('plates_mid', Bs, J.plM, p.flM, 'mid'); flare('plates_hip', Bp, J.plH, p.flH, 'hip');
   part('crys_sh', at(Bc, J.plS), Bc.q); part('crys_mid', at(Bs, J.plM), Bs.q); part('crys_hip', at(Bp, J.plH), Bp.q);
