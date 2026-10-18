@@ -31,6 +31,9 @@ scoreboard objectives add mbHzY1 dummy
 scoreboard objectives add mbHzHit dummy
 scoreboard objectives add mbHzCol dummy
 scoreboard objectives add mbHzG dummy
+scoreboard objectives add mbHzND dummy
+scoreboard objectives add mbHzRA dummy
+scoreboard objectives add mbHzRT dummy
 scoreboard objectives add mbPjV dummy
 scoreboard objectives add mbPjT dummy
 scoreboard objectives add mbPjL dummy
@@ -107,6 +110,11 @@ execute unless score #mbHealEv mb matches 0.. run scoreboard players set #mbHeal
 execute unless score #mbHealAmt mb matches 0.. run scoreboard players set #mbHealAmt mb 0
 execute unless score #mbGrpN mb matches 0.. run scoreboard players set #mbGrpN mb 0
 execute unless score #mbGrpL mb matches 0.. run scoreboard players set #mbGrpL mb 0
+# Low gravity requested by the running module (#mbLowG 1; mboss/main clears it every tick, the module tick sets it
+# again; rlk:tick syncs the attribute modifiers through mboss/lowg_on|off). Hazard re-arm clock (hz/all).
+execute unless score #mbLowG mb matches 0..1 run scoreboard players set #mbLowG mb 0
+execute unless score #mbHzClk mb matches 0.. run scoreboard players set #mbHzClk mb 0
+scoreboard players set #mbNoDodge mb 0
 # Library activity flags (a set flag makes the world tick scan for that library's entities once).
 scoreboard players set #mbHzOn mb 1
 scoreboard players set #mbPjOn mb 1

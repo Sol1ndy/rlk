@@ -1,0 +1,1478 @@
+{
+ "generator": "tools/build_mboss_fg_fx.py",
+ "functions": "rlk:mboss/fieldgen/fx/",
+ "item_models": "rlk:mboss/fg_kit/",
+ "font": "rlk:mboss_fg",
+ "storage": "rlk:fgkit",
+ "rig": {
+  "mode": "real",
+  "functions": "rlk:mboss/fieldgen/rig/",
+  "manifest": "mboss_fieldgen_rig_manifest.json"
+ },
+ "owned": {
+  "dirs": [
+   "data/rlk/function/mboss/fieldgen/fx/e",
+   "data/rlk/function/mboss/fieldgen/fx/p",
+   "data/rlk/function/mboss/fieldgen/fx/tele",
+   "data/rlk/function/mboss/fieldgen/fx/snd",
+   "data/rlk/function/mboss/fieldgen/fx/hud",
+   "data/rlk/function/mboss/fieldgen/fx/test",
+   "data/rlk/function/mboss/fieldgen/fx/prop",
+   "data/rlk/function/mboss/fieldgen/fx/rig_stub"
+  ],
+  "files": [
+   "data/rlk/function/mboss/fieldgen/fx/card.mcfunction",
+   "data/rlk/function/mboss/fieldgen/fx/cardx.mcfunction",
+   "data/rlk/function/mboss/fieldgen/fx/look.mcfunction",
+   "data/rlk/function/mboss/fieldgen/fx/clear.mcfunction",
+   "data/rlk/function/mboss/fieldgen/fx/uninstall.mcfunction"
+  ],
+  "rp": [
+   "assets/rlk/textures/mboss/fg_kit",
+   "assets/rlk/models/item/mboss/fg_kit",
+   "assets/rlk/items/mboss/fg_kit",
+   "assets/rlk/font/mboss_fg.json",
+   "assets/rlk/textures/font/mboss_fg"
+  ]
+ },
+ "caps": {
+  "fx": 64,
+  "telegraph": 40
+ },
+ "objectives": [
+  "fkS",
+  "fkG",
+  "fkH",
+  "fkK",
+  "fkD"
+ ],
+ "tags": [
+  "rlk_fk",
+  "rlk_fk_t",
+  "rlk_fk_ml<id>",
+  "rlk_fk_demo",
+  "rlk_fk_rs (stub rig)"
+ ],
+ "kinds": {
+  "bomb": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "gold bomb: dark core, glowing equator ring and ports, warm halo"
+  },
+  "bomb_burst": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "gold spiky bomb burst with dark flecks"
+  },
+  "missile": {
+   "plane": "cross",
+   "px": [
+    32,
+    112
+   ],
+   "extent": [
+    -0.14,
+    0.14,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "gold drill missile, nose at +b, hot nose glow, exhaust"
+  },
+  "smoke": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "blue-white missile smoke puff"
+  },
+  "column": {
+   "plane": "cross",
+   "px": [
+    64,
+    256
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "gold light column / beam, foot at b 0, 1 block tall at scale 1"
+  },
+  "laser_core": {
+   "plane": "cross",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -1.0,
+    0.0
+   ],
+   "tint": "painted",
+   "desc": "laser beam core, from the muzzle (b 0) along -b"
+  },
+  "laser_glow": {
+   "plane": "cross",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -1.0,
+    0.0
+   ],
+   "tint": "painted",
+   "desc": "laser beam glow sleeve, along -b"
+  },
+  "muzzle": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "laser muzzle ring with a hot centre"
+  },
+  "scorch": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "floor scorch with a glowing gold centre"
+  },
+  "slam_ring": {
+   "plane": "flat",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "desc": "slam shock ring (unit radius): gold band, dust fringe, flecks"
+  },
+  "dust": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "tan dust puff"
+  },
+  "gold_shard": {
+   "plane": "face",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "gold crystal shard"
+  },
+  "glass_shard": {
+   "plane": "face",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "white-gold bubble glass shard (the break)"
+  },
+  "wave_band": {
+   "plane": "band",
+   "px": [
+    256,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -1.0,
+    0.0
+   ],
+   "tint": "painted",
+   "desc": "gravity-wave band segment: gold-fire strip + flame wall"
+  },
+  "charge_sphere": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "gravity-wave charge sphere with orbit swirls"
+  },
+  "flare_dome": {
+   "plane": "face",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "burst flare dome (half dome, pivot at the base centre)"
+  },
+  "fire_disc": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "filled fire disc (wave start, flame band)"
+  },
+  "erupt_disc": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "dark eruption disc with an amber rim and gold cracks"
+  },
+  "erupt_burst": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "gold eruption burst with floor chunks, pivot at the floor"
+  },
+  "chunk": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "floor chunk / rock with an orange crack"
+  },
+  "pebble": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "floating pebble (low-gravity cue)"
+  },
+  "spike_fan": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "floor-burst crystal-spike fan, pivot at the floor"
+  },
+  "slab": {
+   "plane": "box",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.135,
+    0.135
+   ],
+   "tint": "painted",
+   "desc": "glowing floor slab (box 1 x 0.27 x 0.4 at scale 1)"
+  },
+  "ousia_col": {
+   "plane": "cross",
+   "px": [
+    64,
+    256
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -1.0,
+    0.0
+   ],
+   "tint": "painted",
+   "desc": "violet Ousia column hanging from b 0 along -b"
+  },
+  "glitch": {
+   "plane": "face",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "violet glitch streak"
+  },
+  "warp_pillar": {
+   "plane": "face",
+   "px": [
+    64,
+    192
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.5
+   ],
+   "tint": "painted",
+   "desc": "white-cyan warp pillar, pivot at the floor, 1.5 tall at scale 1"
+  },
+  "warp_bloom": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "white-cyan warp bloom"
+  },
+  "bubble0": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "core bubble, crack stage 0"
+  },
+  "bubble1": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "core bubble, crack stage 1"
+  },
+  "bubble2": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "core bubble, crack stage 2"
+  },
+  "bubble3": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "core bubble, crack stage 3"
+  },
+  "crack_ring": {
+   "plane": "flat",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "desc": "gold crack ring (unit radius)"
+  },
+  "crack_glint": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "per-hit crack glint"
+  },
+  "spark": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "gold spark star"
+  },
+  "arc": {
+   "plane": "face",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.25,
+    0.25
+   ],
+   "tint": "painted",
+   "desc": "electric gold arc"
+  },
+  "flame": {
+   "plane": "face",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "gold flame tongue, pivot at its root"
+  },
+  "glow": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "soft white glow disc (tint it)"
+  },
+  "glint": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "white 4-point glint (tint it)"
+  },
+  "mote": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "soft mote (tint it)"
+  },
+  "streak": {
+   "plane": "face",
+   "px": [
+    256,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.0625,
+    0.0625
+   ],
+   "tint": "neutral",
+   "desc": "long thin streak along a (tint it)"
+  },
+  "ripple": {
+   "plane": "face",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "ripple / shock ring (near white, tint it)"
+  },
+  "t_rim": {
+   "plane": "flat",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "telegraph rim, unit radius"
+  },
+  "t_rim_s": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "thick telegraph rim (r <= 2.5)"
+  },
+  "t_ring": {
+   "plane": "flat",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "thin travelling wave ring"
+  },
+  "t_fill": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "telegraph progress fill, unit radius"
+  },
+  "t_bar": {
+   "plane": "flat",
+   "px": [
+    16,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "lane rail / cap bar"
+  },
+  "t_lane": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "lane progress fill, unit length"
+  },
+  "t_sec30": {
+   "plane": "flat",
+   "px": [
+    256,
+    144
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.125,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector telegraph rim, half-angle 30"
+  },
+  "t_secf30": {
+   "plane": "flat",
+   "px": [
+    128,
+    80
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.25,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector progress fill, half-angle 30"
+  },
+  "t_sec45": {
+   "plane": "flat",
+   "px": [
+    256,
+    144
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.125,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector telegraph rim, half-angle 45"
+  },
+  "t_secf45": {
+   "plane": "flat",
+   "px": [
+    128,
+    80
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.25,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector progress fill, half-angle 45"
+  },
+  "t_sec60": {
+   "plane": "flat",
+   "px": [
+    256,
+    144
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.125,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector telegraph rim, half-angle 60"
+  },
+  "t_secf60": {
+   "plane": "flat",
+   "px": [
+    128,
+    80
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.25,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector progress fill, half-angle 60"
+  },
+  "t_sec90": {
+   "plane": "flat",
+   "px": [
+    256,
+    144
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.125,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector telegraph rim, half-angle 90"
+  },
+  "t_secf90": {
+   "plane": "flat",
+   "px": [
+    128,
+    80
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.25,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector progress fill, half-angle 90"
+  }
+ },
+ "atlas_px": 929280,
+ "presets": {
+  "spark": {
+   "args": [],
+   "doc": "A small gold spark burst (tells, clicks, impacts). Billboard.",
+   "cards": 1
+  },
+  "flash": {
+   "args": [],
+   "doc": "A white-gold glow flash (any bright moment). Billboard.",
+   "cards": 1
+  },
+  "dust_puff": {
+   "args": [],
+   "doc": "A tan dust puff on the floor (landings, scrapes). At the floor point.",
+   "cards": 2
+  },
+  "awake": {
+   "args": [],
+   "doc": "Entrance E0 activation: gold flare and electric arcs at the top hub, small ring lights. At the hub.",
+   "cards": 4
+  },
+  "unfold": {
+   "args": [],
+   "doc": "Entrance +8..+14: the four pods unfold under the ring (sparks and dust at each pod). At the ring centre, rotated as the device.",
+   "cards": 8
+  },
+  "crown_flare": {
+   "args": [],
+   "doc": "Entrance +12..+30: a gold flare as the crown assembles (call 2-3 times). At the hub top.",
+   "cards": 3
+  },
+  "eye_open": {
+   "args": [],
+   "doc": "Entrance +38: the red-gold eye opens (glint and glow). At the eye.",
+   "cards": 2
+  },
+  "rise": {
+   "args": [],
+   "doc": "Entrance +64..+94 (and other lift-offs): a soft gold ground ring and dust under the rising device. At the floor point under it.",
+   "cards": 4
+  },
+  "ports_glow": {
+   "args": [],
+   "doc": "C1 +10: gold dust under the ring as the bomb ports light up (the rig's charge look lights the ports themselves; the module adds a glow card on each port anchor of its rig). At the ring centre, rotated as the device.",
+   "cards": 0
+  },
+  "bomb_drop": {
+   "args": [
+    "h"
+   ],
+   "doc": "C1: a bomb falls {h} blocks from its port onto the floor point in 5 t with a short gold streak (call at the floor point; the bomb starts h above).",
+   "cards": 2
+  },
+  "bomb_burst": {
+   "args": [],
+   "doc": "C1 bomb burst r 1.3: gold spiky burst, scorch mark, dust and sparks. At the floor point.",
+   "cards": 3
+  },
+  "column_tell": {
+   "args": [
+    "h"
+   ],
+   "doc": "C1 / C2 slam tell (13 t): the gold column from the face-down core to the floor, a floor glow and a base flare. At the floor point under the core; {h} = the core height above the floor.",
+   "cards": 3
+  },
+  "column_base": {
+   "args": [],
+   "doc": "C1 / C2 slam point (13 t) without the column: the floor glow and the base flare at the locked point while the rig's own gold column falls under the gliding device. At the floor point.",
+   "cards": 2
+  },
+  "plunge": {
+   "args": [],
+   "doc": "C1 / C2 plunge (3-4 t): speed lines streaming up past the dropping device. At the ring centre.",
+   "cards": 6
+  },
+  "slam": {
+   "args": [],
+   "doc": "C1 / C2 slam impact r 5: gold crystal-shard burst, shock ring, flash, dust ring. At the floor point.",
+   "cards": 18
+  },
+  "pods_drop": {
+   "args": [],
+   "doc": "C3 +0..+4: a medallion drops beside the core (clank sparks). At the medallion.",
+   "cards": 2
+  },
+  "laser_charge": {
+   "args": [],
+   "doc": "C3 spark charge (18 t): gold glints spin on a pod, an arc and a growing glow (call 3-4 times). At the medallion.",
+   "cards": 5
+  },
+  "aim_line": {
+   "args": [
+    "len"
+   ],
+   "doc": "C3 +22: a thin white aim line flickers from the muzzle along the beam for 2 t ({len} = the beam length). At the muzzle, rotated as the beam (yaw and pitch).",
+   "cards": 1
+  },
+  "laser_fire": {
+   "args": [
+    "len"
+   ],
+   "doc": "C3 +24 fire: the muzzle ring and the beam bloom (about 1 b wide for 3 t, {len} = the beam length). At the muzzle, rotated as the beam.",
+   "cards": 3
+  },
+  "laser_spot": {
+   "args": [],
+   "doc": "C3 beam floor spot (call every 2-3 t at each spot): scorch, a gold glow and sparks.",
+   "cards": 2
+  },
+  "laser_end": {
+   "args": [],
+   "doc": "C3 beams off: a power-down spark and smoke at the muzzle.",
+   "cards": 2
+  },
+  "tip_flare": {
+   "args": [],
+   "doc": "C4 tell 1 (8 t; also the next-pattern tell): a gold 4-point starburst with electric arcs. At a spike tip.",
+   "cards": 4
+  },
+  "vent_shaft": {
+   "args": [],
+   "doc": "C4 tell 2 (13 t): the vertical gold light shaft vents up from the hub, vent flames. At the hub top.",
+   "cards": 4
+  },
+  "missile_launch": {
+   "args": [],
+   "doc": "C4 launch (each missile): vent flame and smoke puffs. At the vent.",
+   "cards": 2
+  },
+  "missile_trail": {
+   "args": [],
+   "doc": "C4 smoke trail puff left behind a missile (call every 3 t at the missile prop).",
+   "cards": 1
+  },
+  "missile_impact": {
+   "args": [],
+   "doc": "C4 impact r 1.5: gold crystal-spike burst, a floor glow and dust. At the floor point.",
+   "cards": 3
+  },
+  "core_spark": {
+   "args": [],
+   "doc": "C5 tell 1: a gold spark on the core with arcs. At the core.",
+   "cards": 3
+  },
+  "core_lift": {
+   "args": [],
+   "doc": "C5 +5 \"번쩍\": a gold flame burst around the core as it lifts. At the core.",
+   "cards": 6
+  },
+  "dark_disc": {
+   "args": [
+    "r0",
+    "r",
+    "grow",
+    "life"
+   ],
+   "doc": "C5 / F1: the dark floor disc grows from {r0} to {r} blocks over {grow} ticks and stays to {life} (the video marker: the floor about 25-35 % darker, amber rim). At the floor point; pair with the Geo tele_disc for the timing.",
+   "cards": 1
+  },
+  "up_beam": {
+   "args": [],
+   "doc": "C5 +29..+40: the upward gold beam from the raised core with crawling arcs. At the core.",
+   "cards": 4
+  },
+  "rim_flare": {
+   "args": [
+    "r"
+   ],
+   "doc": "C5 +36..+41: the rim at the final radius {r} flares bright (last warning). At the floor centre.",
+   "cards": 2
+  },
+  "column_down": {
+   "args": [
+    "h"
+   ],
+   "doc": "C5 +41..+44: the gold column down from the core through the violet pendulum glow. At the floor point under the core; {h} = the core height.",
+   "cards": 2
+  },
+  "floor_hit": {
+   "args": [],
+   "doc": "C5 +44: the column hits the floor centre: gold crystal-shard burst. At the floor centre.",
+   "cards": 10
+  },
+  "blast": {
+   "args": [
+    "r"
+   ],
+   "doc": "C5 +48 full-area blast over radius {r}: a white-gold flash over the disc, the jagged gold crack ring at the rim, a shock ring (pair with p/rocks). At the floor centre.",
+   "cards": 4
+  },
+  "rocks": {
+   "args": [],
+   "doc": "C5 +48..+77: about a dozen floor rocks launched across the disc hover, then drift down. At the floor centre (spread r 2-11).",
+   "cards": 12
+  },
+  "dip": {
+   "args": [],
+   "doc": "C6 +0: the dip and roll toward the player (dust kicked up and two speed lines). At the floor point under the device, rotated as it.",
+   "cards": 3
+  },
+  "vent_flare": {
+   "args": [],
+   "doc": "C6 +12 (8 t): the vent flare bursts up from the top centre as the medallions are flung. At the hub top.",
+   "cards": 4
+  },
+  "tower_up": {
+   "args": [],
+   "doc": "C6 +20 (18 t): gold sparks race up the telescoping tower. At the ring centre.",
+   "cards": 7
+  },
+  "flame_band": {
+   "args": [],
+   "doc": "C6 charge (17 t): the horizontal gold flame band flares and pulses under the ring (Ø 4.5 -> 8 b) with standing flame licks. At the ring underside.",
+   "cards": 8
+  },
+  "floor_burst": {
+   "args": [],
+   "doc": "C6 / F2 floor burst r 1.8: a gold crystal-spike fan, rock chips and a white dust ring. At the floor point.",
+   "cards": 8
+  },
+  "slab_rise": {
+   "args": [],
+   "doc": "C6 / F2: a slab tears out of the floor (gold rim glow, dust, chips). At the floor point.",
+   "cards": 5
+  },
+  "slab_throw": {
+   "args": [],
+   "doc": "C6 / F2 throw: white-gold streaks as the slab is flung. At the slab, rotated along the throw.",
+   "cards": 3
+  },
+  "slab_trail": {
+   "args": [],
+   "doc": "C6 / F2: a short white-gold streak behind a flying slab (call every 2 t at the slab prop, rotated along its flight).",
+   "cards": 1
+  },
+  "slab_impact": {
+   "args": [],
+   "doc": "C6 / F2: a slab crashes onto the floor (dust, chunks, a gold glow). At the floor point.",
+   "cards": 7
+  },
+  "revert": {
+   "args": [],
+   "doc": "C6 end: the tower folds back (sparks and a small dust ring). At the ring centre.",
+   "cards": 3
+  },
+  "halo_flip": {
+   "args": [],
+   "doc": "Field +0..+12: the halo flips upright (whirling gold streaks). At the halo.",
+   "cards": 4
+  },
+  "warp_out": {
+   "args": [],
+   "doc": "Field +13 warp-out: the 1-2 frame white-cyan pillar where the device was, glitch streaks start, gold dust on the floor. At the floor point under it.",
+   "cards": 6
+  },
+  "glitch": {
+   "args": [],
+   "doc": "Field +14..+33: violet glitch streaks drift up and out over the old spot (call every 4-5 t). At the old spot (floor).",
+   "cards": 3
+  },
+  "warp_in": {
+   "args": [],
+   "doc": "Field +34 warp-in at the arena centre: a white-cyan bloom and a violet ring. At the core.",
+   "cards": 3
+  },
+  "warp_pillar": {
+   "args": [],
+   "doc": "A white-cyan warp pillar standing on the floor (warp-in, the field arrival). At the floor point.",
+   "cards": 2
+  },
+  "field_unfold": {
+   "args": [],
+   "doc": "Field +35..+51: the violet column grows under the core, violet tendrils whip out, a violet glow. At the core.",
+   "cards": 6
+  },
+  "field_idle": {
+   "args": [],
+   "doc": "Field idle (every 10-20 t): violet crackle under the core. At the core.",
+   "cards": 1
+  },
+  "pebbles": {
+   "args": [],
+   "doc": "Field (every 20 t around the player): pebbles float up slowly, the low-gravity cue (r 1.5-5 around, never at the eyes). At the player's feet.",
+   "cards": 6
+  },
+  "gold_streaks": {
+   "args": [],
+   "doc": "Field charge cue: gold streaks rise from the floor around the device (r 2-6). At the floor point under it.",
+   "cards": 5
+  },
+  "wave_charge": {
+   "args": [
+    "t"
+   ],
+   "doc": "「인력 충격파」 charge: the yellow sphere grows around the lower core over {t} ticks with a glow and arcs (24 t, the third 40 t). At the core.",
+   "cards": 4
+  },
+  "wave_pulse": {
+   "args": [],
+   "doc": "「인력 충격파」 charge pulse (call every 8 t of the charge): streaks converge on the sphere and a glint flares. At the core.",
+   "cards": 4
+  },
+  "wave_beam": {
+   "args": [
+    "h"
+   ],
+   "doc": "「인력 충격파」 the 1-2 tick vertical gold beam core -> floor with a floor splash ({h} = the core height). At the floor point under the core.",
+   "cards": 2
+  },
+  "wave_burst": {
+   "args": [],
+   "doc": "「인력 충격파」 burst: the white-gold flare dome (4 b wide, 2 b tall), then the filled fire disc r 1.8 (5 t) where the ring starts. At the floor point.",
+   "cards": 4
+  },
+  "wave_band": {
+   "args": [
+    "r0",
+    "r1",
+    "w",
+    "dur"
+   ],
+   "doc": "「인력 충격파」 the expanding gold-fire ring: 16 band segments (flat burning strip + standing flame wall) travel from radius {r0} to {r1} in {dur} ticks keeping the band {w} deep (tenths of a block / ticks, like the hazards). Call it on the tick BEFORE the strike: it then starts moving in the strike tick, with the tele/wave front and the hz/ring front. At the floor centre.",
+   "cards": 16
+  },
+  "wave_fire": {
+   "args": [
+    "r"
+   ],
+   "doc": "「인력 충격파」 flames and embers on the travelling front at radius {r} blocks (particles only; call every 3 t with the front radius). At the floor centre.",
+   "cards": 0
+  },
+  "erupt_tell": {
+   "args": [],
+   "doc": "F1 감소 영역: a dark disc r 2.8 fades in over 6 t (15 t lead; pair with tele_disc el 9). At the zone floor point.",
+   "cards": 1
+  },
+  "erupt": {
+   "args": [],
+   "doc": "F1 eruption r 2.8: the gold burst mound with floor chunks, a crack ring, flung rocks and dust. At the zone floor point.",
+   "cards": 9
+  },
+  "debris": {
+   "args": [],
+   "doc": "After an eruption: a few chunks hover 0.3-2.5 b over the zone, then drift down. At the zone floor point.",
+   "cards": 5
+  },
+  "meter_glint": {
+   "args": [],
+   "doc": "Break meter: the crack glint on the bubble at each count. At the core.",
+   "cards": 2
+  },
+  "bubble_crack": {
+   "args": [],
+   "doc": "Break meter stage (counts 5, 10, 15): a big crack flash, glass flakes and a glow. At the core.",
+   "cards": 5
+  },
+  "bubble_glow": {
+   "args": [],
+   "doc": "Break +0..+5: the cracked bubble lights up white-gold before it bursts. At the core.",
+   "cards": 2
+  },
+  "break_burst": {
+   "args": [],
+   "doc": "Break +5: the bubble bursts: a white flash, flying glass shards, a big crack glint and a thin ring. At the core.",
+   "cards": 15
+  },
+  "break_ring": {
+   "args": [],
+   "doc": "Break +5: the horizontal gold spark ring expands at floor level (r 9 in 9 t). At the floor point under the core.",
+   "cards": 2
+  },
+  "groggy_sparks": {
+   "args": [],
+   "doc": "Groggy (every 30-40 t): slow sparks drip from the slumped core with a wisp of smoke. At the core.",
+   "cards": 2
+  },
+  "sink_dust": {
+   "args": [],
+   "doc": "Break +34: the device sinks low (dust ring under it). At the floor point under it.",
+   "cards": 5
+  },
+  "recover": {
+   "args": [],
+   "doc": "Groggy end: re-level and the core flips to the top (a gold ring flash and sparks). At the core.",
+   "cards": 4
+  },
+  "lift_off": {
+   "args": [],
+   "doc": "Field end (unbroken) +23: the lift-off pulse under the device (white-gold burst, r 3 ring, dust). At the floor point under it.",
+   "cards": 5
+  },
+  "pack_up": {
+   "args": [],
+   "doc": "Field end: sparks as the lances dock and the device packs into the compact form. At the ring centre, rotated as the device.",
+   "cards": 3
+  },
+  "death_flicker": {
+   "args": [],
+   "doc": "Death: one flicker of the dying seam (call 3 times, 4-6 t apart). At the core.",
+   "cards": 2
+  },
+  "death_fall": {
+   "args": [],
+   "doc": "Death: the ring lands tilted on the floor (dust ring, chunks). At the floor point under it.",
+   "cards": 9
+  },
+  "death_fade": {
+   "args": [],
+   "doc": "Death tail (every 10-15 t while it scales out): gold motes and sparks rise. Around the core.",
+   "cards": 8
+  }
+ },
+ "props": {
+  "bomb": "C1 bomb: the camera-facing gold bomb, 0.9 across (vertical billboard, so a falling bomb stays upright).",
+  "missile": "C4 drill missile: nose along the prop's facing (local +z; aim it with tp ... facing), 1.3 long.",
+  "slab": "C6 / F2 glowing slab: a box 2.2 x 0.6 x 0.9 b (length along local x), full bright rim.",
+  "pebble": "Floating pebble (field ambience), 0.35 across.",
+  "chunk": "Floor chunk / rock, 0.6 across.",
+  "laser_core": "C3 beam core: hangs from the prop along local -y (pitch the prop down the beam: rotation pitch = beam pitch - 90), 0.45 wide; set scale y = the beam length.",
+  "laser_glow": "C3 beam glow sleeve: as laser_core, 1 b wide; scale x / z 0.5 -> 1.0 -> 0.5 for the bloom.",
+  "column": "Gold column standing on the prop (local +y), 1.1 wide; set scale y = the height.",
+  "ousia_col": "Violet Ousia column hanging from the prop (local -y), 1 wide; set scale y = the length.",
+  "charge": "Gravity-wave charge sphere look, 2 across (camera-facing).",
+  "muzzle": "Laser muzzle ring, 0.8 across (camera-facing).",
+  "bubble0": "Core bubble overlay, crack stage 0 (meter counts 0-4), 2.4 across, camera-facing; swap stages with this prop as the meter climbs.",
+  "bubble1": "Core bubble overlay, crack stage 1 (meter counts 5-9), 2.4 across, camera-facing; swap stages with this prop as the meter climbs.",
+  "bubble2": "Core bubble overlay, crack stage 2 (meter counts 10-14), 2.4 across, camera-facing; swap stages with this prop as the meter climbs.",
+  "bubble3": "Core bubble overlay, crack stage 3 (meter counts 15-19), 2.4 across, camera-facing; swap stages with this prop as the meter climbs."
+ },
+ "sounds": {
+  "awake_clank": "Activation clank (entrance E0): a sharp metallic clank with a bright tail.",
+  "unfold": "Pods unfold and the crown assembles (entrance +8..+30): low thumps and gear clicks.",
+  "gear_click": "Crown gear clicks (call 2-3 times while the crown assembles; quiet).",
+  "eye_open": "The eye opens and the core drum turns (entrance +32..+64): a low mechanical groan and a click.",
+  "rise_hum": "The device rises to cruise height (entrance +64..+94; also field lift-offs): whirring hum.",
+  "bomb_port": "Underside bomb ports light up (C1 +10): shutters and a rising charge.",
+  "bomb_drop": "A bomb leaves a port (C1, every 2-4 t; quiet).",
+  "bomb_fall": "Falling whistle of a bomb (C1, once per volley group).",
+  "bomb_burst": "A bomb bursts on the floor (C1, per landing): short crack and crystal.",
+  "column_tell": "Gold slam column projects to the floor (C1 / C2, 13 t tell): rising hum.",
+  "plunge": "The device plunges core first (C1 / C2, 3-4 t): whoosh and a hydraulic drop.",
+  "slam": "Slam impact r 5 (C1 / C2): heavy boom, anvil and debris.",
+  "pods_drop": "The medallions dock and drop beside the core (C3 +0..+4): clank.",
+  "laser_charge": "Laser spark charge (C3, 18 t): bright rising whine.",
+  "laser_fire": "The two beams fire (C3 +24): hissing burst.",
+  "laser_loop": "Beam loop (C3, every 10 t while firing, at the floor spots): hum and crackle.",
+  "laser_stop": "Beams off and pods retract (C3 end): power-down.",
+  "tip_flare": "Spike-tip flare (C4 tell 1; also the next-pattern tell): crackle.",
+  "missile_vent": "Top vents open with the vertical gold shaft (C4 tell 2): roaring hiss.",
+  "missile_launch": "A drill missile launches (C4, per missile).",
+  "missile_dive": "Missiles turn over and dive (C4, once per volley group): falling whistle.",
+  "missile_impact": "A missile hits the floor (C4, per impact): crack and boom.",
+  "core_flip": "The core flips (C5 lift, the field core flip, groggy recover): clank and whoosh.",
+  "core_spark": "Gold spark on the core (C5 tell 1): dense crackle.",
+  "core_lift": "The core lifts with a gold flare (C5 +5, \"번쩍\"): bright flare.",
+  "up_beam": "Upward gold beam from the raised core (C5 +29..+40): rising crackle.",
+  "column_down": "The column switches down to the floor centre (C5 +41): zap.",
+  "blast": "Full-area gravity blast (C5 +48): big broadband boom, rocks launched.",
+  "rocks_hover": "Rocks hover after the blast (C5 +54..+77, every 6-10 t; quiet): low rumble.",
+  "dip": "Dip and roll toward the player (C6 +0): whoosh.",
+  "vent_flare": "Vent flare, the medallions flung up (C6 +12): roaring hiss.",
+  "tower_up": "The tower telescopes up (C6 +20, 18 t): ratchet clicks.",
+  "flame_charge": "The flame band flares under the ring (C6 charge, 17 t): rising roar.",
+  "floor_burst": "A floor burst erupts (C6 / F2, per burst): crystal crack and thump.",
+  "slab_lift": "A slab tears out and rises (C6 / F2, after each burst; quiet): grinding rise.",
+  "slab_throw": "A slab is flung at the player (C6 / F2, per throw): heavy whoosh.",
+  "slab_impact": "A slab lands (C6 / F2): crash.",
+  "revert": "The tower collapses back into the ring (C6 end): clunk.",
+  "halo_flip": "The halo flips upright before the warp (field +0): whoosh.",
+  "warp_out": "Warp-out flash (field +13): bright zap and a low whoomp.",
+  "glitch": "Violet glitch crackle (field +14..+33 over the old spot, field idle; quiet).",
+  "warp_in": "Warp-in at the arena centre (field +34).",
+  "field_unfold": "The stack unfolds into the field form (field +35..+51): springs and chains.",
+  "field_hum": "Low-gravity field drone (every 40 t while the field is up; quiet).",
+  "field_banner": "The banner \"중력이 감소하고 점프 능력이 향상됩니다\" appears (field +57).",
+  "wave_charge": "「인력 충격파」 charge, start (24 t / 40 t): rising airy hiss.",
+  "wave_charge2": "「인력 충격파」 charge, the last 10 t: higher.",
+  "wave_beam": "「인력 충격파」 1-tick beam core -> floor: thump and zap.",
+  "wave_burst": "「인력 충격파」 burst flare dome: boom and roar.",
+  "wave_ring": "「인력 충격파」 front travelling (every 2-3 t at the front point nearest the player; quiet): rumble.",
+  "erupt_tell": "감소 영역 dark discs appear (F1, per event; quiet).",
+  "erupt": "감소 영역 gold eruption (F1, per event): crack and gravel burst.",
+  "debris_land": "Debris settles after an eruption or the blast (quiet).",
+  "meter_tick": "A break-meter count (each counted hit): crystalline ping on brass (hud/meter_hit adds a note that rises with the count).",
+  "bubble_crack": "The core bubble cracks a stage further (counts 5, 10, 15).",
+  "break_glow": "The bubble lights up before the burst (break +0..+5).",
+  "break_burst": "The bubble bursts: the field is broken (break +5).",
+  "groggy_wobble": "Tilt and damped wobble (break +5..+34): metallic groan.",
+  "groggy_spark": "Slow sparks while groggy (every 30-40 t; quiet).",
+  "recover": "Re-level and core flip back to cruise (groggy end): clockwork.",
+  "lift_off": "Lift-off pulse when the field ends unbroken (field end +23).",
+  "pack_up": "Lances deploy and the device packs into the compact form (field end): mechanical whirr.",
+  "death": "Death: the seam flickers out and the stack collapses (no voices).",
+  "death_fall": "Halo, pods and ring hit the floor (death).",
+  "death_fade": "The device scales out with gold sparks (death tail)."
+ },
+ "glyphs": {
+  "badge": "U+E700",
+  "pip0": "U+E701",
+  "pip1": "U+E702",
+  "pip2": "U+E703",
+  "break_big": "U+E704",
+  "lowg": "U+E705",
+  "lowg_big": "U+E706",
+  "fl_white": "U+E710",
+  "fl_gold": "U+E711",
+  "fl_violet": "U+E712",
+  "fl_amber": "U+E713",
+  "d0": "U+E720",
+  "d1": "U+E721",
+  "d2": "U+E722",
+  "d3": "U+E723",
+  "d4": "U+E724",
+  "d5": "U+E725",
+  "d6": "U+E726",
+  "d7": "U+E727",
+  "d8": "U+E728",
+  "d9": "U+E729",
+  "d_slash": "U+E72A"
+ },
+ "telegraph_colours": {
+  "5": [
+   "#D27A0C",
+   "#F0A93A",
+   "#FFE8A0"
+  ],
+  "9": [
+   "#7046DC",
+   "#A288F2",
+   "#ECE2FF"
+  ],
+  "0": [
+   "#E5304A",
+   "#FF6474",
+   "#FFB8C4"
+  ]
+ },
+ "demos": {
+  "entrance": {
+   "form": "dormant",
+   "clip": "entrance",
+   "len": 84
+  },
+  "bombs": {
+   "form": "cruise",
+   "clip": "bomb_run",
+   "len": 90
+  },
+  "laser": {
+   "form": "laser",
+   "clip": "laser",
+   "len": 76
+  },
+  "missiles": {
+   "form": "cruise",
+   "clip": "missiles",
+   "len": 81
+  },
+  "blast": {
+   "form": "coreup",
+   "clip": "coreup",
+   "len": 80
+  },
+  "rocks": {
+   "form": "tower",
+   "clip": "tower_throw",
+   "len": 130
+  },
+  "field": {
+   "form": "cruise",
+   "clip": "warp_out",
+   "len": 97
+  },
+  "waves": {
+   "form": "field",
+   "clip": "wave",
+   "len": 74
+  },
+  "erupt": {
+   "form": "field",
+   "clip": "field_erupt",
+   "len": 60
+  },
+  "break": {
+   "form": "field",
+   "clip": "break",
+   "len": 80
+  },
+  "death": {
+   "form": "cruise",
+   "clip": "death",
+   "len": 105
+  }
+ }
+}

@@ -141,14 +141,17 @@ def _tenths(v):
 
 
 def hz_opts(act=None, el=None, kb=None, kbdir=None, y0=None, y1=None, r0=None, back=None,
-            sfx=None, vis=None, col=None, linger=None, quiet=None, grp=False):
+            sfx=None, vis=None, col=None, linger=None, quiet=None, grp=False, nododge=None, rearm=None):
     """Lines that set the one-shot options of the next hazard (reset after each create).
-    grp=True: the hazard joins the current volley group #mbGrp (grp_new): one hit per group."""
+    grp=True: the hazard joins the current volley group #mbGrp (grp_new): one hit per group.
+    nododge=1: dash i-frames do not help (#hzNoDodge). rearm=N: a hit disarms it for N ticks only (#hzRearm;
+    with a volley group the whole group re-arms together: at most one hit per N ticks)."""
     out = []
     if grp:
         out.append('scoreboard players operation #hzGrp mb = #mbGrp mb')
     pairs = [('#hzAct', act), ('#hzEl', el), ('#hzKB', kb), ('#hzKBDir', kbdir), ('#hzSfx', sfx),
-             ('#hzVis', vis), ('#hzCol', col), ('#hzLinger', linger), ('#hzQuiet', quiet)]
+             ('#hzVis', vis), ('#hzCol', col), ('#hzLinger', linger), ('#hzQuiet', quiet),
+             ('#hzNoDodge', nododge), ('#hzRearm', rearm)]
     for k, v in pairs:
         if v is not None:
             out.append(f'scoreboard players set {k} mb {int(v)}')
@@ -176,6 +179,16 @@ def hz_line(length, width, tell, dmg):
 
 def hz_full(tell, dmg):
     return f'function rlk:mboss/hz/full {{tell:{int(tell)},dmg:{int(dmg)}}}'
+
+
+def hz_aim():
+    """As a live hazard marker, positioned at its new origin, rotated = its new aim: re-aim it (framework hz/aim)."""
+    return 'function rlk:mboss/hz/aim'
+
+
+def hz_resize(r, r0=0.0, w=0.0):
+    """As a live hazard marker: new outer / inner radius (line: length / back) and line width, blocks (w 0 = keep)."""
+    return f'function rlk:mboss/hz/resize {{r:{_tenths(r)},r0:{_tenths(r0)},w:{_tenths(w)}}}'
 
 
 def tell_line(length, width, tell):

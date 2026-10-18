@@ -13,6 +13,9 @@ execute if score @s mbHzK matches 4 unless score #hzKBDir mb matches 0..1 run sc
 scoreboard players operation @s mbHzS = #hzSfx mb
 scoreboard players operation @s mbHzV = #hzVis mb
 scoreboard players operation @s mbHzG = #hzGrp mb
+scoreboard players operation @s mbHzND = #hzNoDodge mb
+scoreboard players operation @s mbHzRA = #hzRearm mb
+scoreboard players set @s mbHzRT 0
 scoreboard players operation @s mbHzCol = @s mbHzE
 execute if score #hzCol mb matches 0.. run scoreboard players operation @s mbHzCol = #hzCol mb
 execute if score #hzQuiet mb matches 1 run tag @s add rlk_mb_hzq
