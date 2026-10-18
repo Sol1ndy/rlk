@@ -301,3 +301,84 @@ export function paintSpriteSet(rp, dir, sprites, idOf, only = null) {
   fs.writeFileSync(atlasPath, JSON.stringify(atlas, null, 2) + '\n');
   return Object.keys(sprites);
 }
+
+// ---- sampled fields and relief lighting (sculpted plates) -----------------------------------
+// Grid: a scalar field sampled on a lattice over a card rect (card units), with bilinear lookup and a
+// central-difference gradient. Signed-distance grids of polygons make bevels, outlines and soft shadows cheap
+// to evaluate per supersample; a height grid lit by a fixed light gives embossed, sculpted plates.
+export class Grid {
+  constructor(rect, res, fn) {
+    this.r = rect;
+    this.k = res;                                   // lattice points per card unit
+    this.gw = Math.max(2, Math.ceil((rect.X1 - rect.X0) * res));
+    this.gh = Math.max(2, Math.ceil((rect.Y1 - rect.Y0) * res));
+    this.v = new Float32Array((this.gw + 1) * (this.gh + 1));
+    if (fn) this.fill(fn);
+  }
+  fill(fn) {
+    const {r, gw, gh, k} = this;
+    for (let j = 0; j <= gh; j++) for (let i = 0; i <= gw; i++) this.v[j * (gw + 1) + i] = fn(r.X0 + i / k, r.Y0 + j / k);
+    return this;
+  }
+  at(X, Y) {
+    const {r, gw, gh, k} = this;
+    let x = (X - r.X0) * k, y = (Y - r.Y0) * k;
+    x = Math.min(gw - 1e-6, Math.max(0, x)); y = Math.min(gh - 1e-6, Math.max(0, y));
+    const i = Math.floor(x), j = Math.floor(y), fx = x - i, fy = y - j, w = gw + 1, o = j * w + i;
+    const a = this.v[o], b = this.v[o + 1], c = this.v[o + w], d = this.v[o + w + 1];
+    return a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy;
+  }
+  grad(X, Y) {
+    const h = 1 / this.k;
+    return [(this.at(X + h, Y) - this.at(X - h, Y)) / (2 * h), (this.at(X, Y + h) - this.at(X, Y - h)) / (2 * h)];
+  }
+}
+// Signed distance to a closed polygon (negative inside), exact; sdGrid samples it (or any sd function).
+export const sdPoly = (P, near = 6) => {
+  const S = new Shape(P), [a, b, c, d] = S.box;
+  return (x, y) => {
+    // exact within `near` units of the bounding box; beyond it the distance to the box (a lower bound)
+    const dx = Math.max(a - x, 0, x - c), dy = Math.max(b - y, 0, y - d);
+    if (dx > near || dy > near) return Math.hypot(dx, dy);
+    const e = distPoly(P, x, y);
+    return inPoly(P, x, y) ? -e : e;
+  };
+};
+export const sdGrid = (rect, res, sd) => new Grid(rect, res, sd);
+// Signed distance to a stroked path with a half-width profile w(t) (negative inside): a tapered band.
+export function sdStroke(path, w) {
+  const Pth = path instanceof Path ? path : new Path(path);
+  return (x, y) => { const n = Pth.near(x, y); return n.d - w(n.t); };
+}
+// Boolean combinations of signed distances.
+export const sdUnion = (...f) => (x, y) => Math.min(...f.map(g => g(x, y)));
+export const sdSub = (a, b) => (x, y) => Math.max(a(x, y), -b(x, y));
+export const sdInter = (...f) => (x, y) => Math.max(...f.map(g => g(x, y)));
+export const sdCircle = (cx, cy, r) => (x, y) => Math.hypot(x - cx, y - cy) - r;
+export const sdEllipse = (cx, cy, rx, ry, rotDeg = 0) => {
+  const c = Math.cos(rotDeg * Math.PI / 180), s = Math.sin(rotDeg * Math.PI / 180);
+  return (x, y) => { const dx = x - cx, dy = y - cy, u = (dx * c + dy * s) / rx, v = (-dx * s + dy * c) / ry, q = Math.hypot(u, v); return (q - 1) * Math.min(rx, ry); };
+};
+// Rounded bevel: height 0 on the edge rising to 1 at depth w inside (quarter circle profile).
+export const bevel = (d, w) => { const t = clamp(-d / w); return Math.sqrt(1 - (1 - t) * (1 - t)); };
+// Diffuse/specular of a height grid at (X, Y): light from the upper left front by default.
+const LIGHT = (() => { const v = [-.48, .62, .62], m = Math.hypot(...v); return v.map(x => x / m); })();
+export function litAt(hgrid, X, Y, {k = 1, light = LIGHT, shine = 24} = {}) {
+  const [gx, gy] = hgrid.grad(X, Y);
+  let nx = -gx * k, ny = -gy * k, nz = 1;
+  const m = Math.hypot(nx, ny, nz); nx /= m; ny /= m; nz /= m;
+  const diff = nx * light[0] + ny * light[1] + nz * light[2];
+  // Blinn half vector with the viewer straight in front
+  let hx = light[0], hy = light[1], hz = light[2] + 1; const hm = Math.hypot(hx, hy, hz); hx /= hm; hy /= hm; hz /= hm;
+  const spec = Math.pow(Math.max(0, nx * hx + ny * hy + nz * hz), shine);
+  return {diff, spec, n: [nx, ny, nz]};
+}
+// Material ramp lookup: stops [[t, colour], ...] (colours as rgba arrays or hex strings), t in -1..1.
+export function tone(stops) {
+  const s = stops.map(([t, c]) => [t, C(c)]);
+  return t => {
+    if (t <= s[0][0]) return s[0][1];
+    for (let i = 1; i < s.length; i++) if (t <= s[i][0]) return mix(s[i - 1][1], s[i][1], (t - s[i - 1][0]) / (s[i][0] - s[i - 1][0]));
+    return s[s.length - 1][1];
+  };
+}

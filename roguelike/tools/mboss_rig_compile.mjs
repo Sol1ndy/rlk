@@ -74,9 +74,10 @@ export function createRigCompiler({ns, obj, fn, parts, uuidOf, tol, skipStep = (
     return out;
   }
   // One clip: key files c/<clip>/k/<t>, its runner c/<clip>/run (+ b/ subtrees), play/<clip> and start/<clip>.
-  // frames[t] = {d: {part: display transform}, p: sampled pose}; halfFrame(a) = the frame at tick a + 0.5.
+  // frames[t] = {d: {part: display transform}, p: sampled pose}; halfFrame(a) = the frame at tick a + 0.5;
+  // extraLines(t) (optional) = further commands for tick t (after the keys and model swaps), e.g. state switches.
   // Returns {info (manifest entry), motionErrors, warns}.
-  function compileClip(c, frames, halfFrame) {
+  function compileClip(c, frames, halfFrame, extraLines = null) {
     const motionErrors = stepViolations(c, frames), warns = [];
     const byTick = new Map();
     const add = (t, line) => { if (!byTick.has(t)) byTick.set(t, []); byTick.get(t).push(line); };
@@ -99,6 +100,7 @@ export function createRigCompiler({ns, obj, fn, parts, uuidOf, tol, skipStep = (
     for (const [ch, [part, map]] of Object.entries(modelOf)) {
       frames.forEach((f, t) => { if (t === 0 || f.p[ch] !== frames[t - 1].p[ch]) add(t, swapLine(part, map[f.p[ch]])); });
     }
+    if (extraLines) frames.forEach((f, t) => { for (const line of extraLines(t) || []) add(t, line); });
     if (debug) frames.forEach((f, t) => debug.put(`${debug.dir}/${c.name}/${t}`, [...parts.map(n => `data merge entity ${uuidOf(n)} {start_interpolation:0,interpolation_duration:0,transformation:${nbt(f.d[n])}}`),
       ...Object.entries(modelOf).map(([ch, [part, map]]) => swapLine(part, map[f.p[ch]]))]));
     const ticks = [...byTick.keys()].sort((x, y) => x - y);

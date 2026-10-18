@@ -200,3 +200,37 @@ export const taperY = (y0, y1, r0, r1, n, tex, ledge, V) => turned('y', [0, 0, 0
 export function checkBounds(name, els) {
   for (const e of els) for (const v of [...e.from, ...e.to]) if (v < -16 || v > 32) throw new Error(`model ${name} leaves -16..32: ${e.from} ${e.to}`);
 }
+
+// Mirror image of a model in X (model x -> 16 - x): her left side's part becomes her right side's. Faces swap
+// east/west and every texture is flipped across the mirrored direction (u for UV rotation 0/180, v for 90/270),
+// element rotations about y and z change sign. No negative display scale is needed.
+export function mirrorModel(els) {
+  return els.map(e => {
+    const faces = {};
+    for (const [f, face] of Object.entries(e.faces)) {
+      const uv = face.uv.slice(), rot = face.rotation || 0;
+      if (rot === 0 || rot === 180) [uv[0], uv[2]] = [uv[2], uv[0]]; else [uv[1], uv[3]] = [uv[3], uv[1]];
+      faces[f === 'east' ? 'west' : f === 'west' ? 'east' : f] = {...face, uv};
+    }
+    const out = {...e, from: [r4(16 - e.to[0]), e.from[1], e.from[2]], to: [r4(16 - e.from[0]), e.to[1], e.to[2]], faces};
+    if (e.rotation) out.rotation = {...e.rotation, origin: [r4(16 - e.rotation.origin[0]), e.rotation.origin[1], e.rotation.origin[2]],
+      angle: e.rotation.axis === 'x' ? e.rotation.angle : -e.rotation.angle};
+    return out;
+  });
+}
+// Horizontal card in the plane Y = y over {X0, X1, Z0, Z1} (A-frame): the sprite's u runs along +X, v along +Z
+// (toward her back), seen from above and below.
+export function cardY(sprite, y, {X0, X1, Z0, Z1}, {shade = false, tint = false} = {}) {
+  const fn = ([X, , Z]) => [16 * (X - X0) / (X1 - X0), 16 * (Z - Z0) / (Z1 - Z0)];
+  const el = faceEl([[X0, y, Z0], [X1, y, Z1]], {up: {tex: sprite, fn}, down: {tex: sprite, fn}}, {shade});
+  if (tint) for (const f of Object.values(el.faces)) f.tintindex = 0;
+  return el;
+}
+// Moves every element of a model by d (A-frame units).
+export function shiftModel(els, [dx, dy, dz]) {
+  return els.map(e => {
+    const out = {...e, from: [r4(e.from[0] - dx), r4(e.from[1] + dy), r4(e.from[2] + dz)], to: [r4(e.to[0] - dx), r4(e.to[1] + dy), r4(e.to[2] + dz)]};
+    if (e.rotation) out.rotation = {...e.rotation, origin: [r4(e.rotation.origin[0] - dx), r4(e.rotation.origin[1] + dy), r4(e.rotation.origin[2] + dz)]};
+    return out;
+  });
+}

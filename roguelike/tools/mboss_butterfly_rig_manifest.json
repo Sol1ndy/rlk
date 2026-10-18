@@ -1,0 +1,5032 @@
+{
+  "parts": [
+    {
+      "name": "pelvis",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000001",
+      "tag": "rlk_mb_bf_pelvis",
+      "model": "pelvis",
+      "brightness": 13,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "torso",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000002",
+      "tag": "rlk_mb_bf_torso",
+      "model": "torso",
+      "brightness": 13,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "collar",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000003",
+      "tag": "rlk_mb_bf_collar",
+      "model": "collar",
+      "brightness": 14,
+      "scale": 0.82,
+      "look": false
+    },
+    {
+      "name": "head",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000004",
+      "tag": "rlk_mb_bf_head",
+      "model": "head",
+      "brightness": 13,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "head_glow",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000005",
+      "tag": "rlk_mb_bf_head_glow",
+      "model": "head_glow",
+      "brightness": 15,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "crest",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000006",
+      "tag": "rlk_mb_bf_crest",
+      "model": "crest",
+      "brightness": 14,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "fan_r",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000007",
+      "tag": "rlk_mb_bf_fan_r",
+      "model": "fan_r",
+      "brightness": 13,
+      "scale": 1.25,
+      "look": false
+    },
+    {
+      "name": "fan_l",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000008",
+      "tag": "rlk_mb_bf_fan_l",
+      "model": "fan_l",
+      "brightness": 13,
+      "scale": 1.25,
+      "look": false
+    },
+    {
+      "name": "thigh_r",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000009",
+      "tag": "rlk_mb_bf_thigh_r",
+      "model": "thigh_r",
+      "brightness": 13,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "shin_r",
+      "uuid": "524c4b4d-4246-4c00-8000-00000000000a",
+      "tag": "rlk_mb_bf_shin_r",
+      "model": "shin_r",
+      "brightness": 14,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "foot_r",
+      "uuid": "524c4b4d-4246-4c00-8000-00000000000b",
+      "tag": "rlk_mb_bf_foot_r",
+      "model": "foot_r",
+      "brightness": 14,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "thigh_l",
+      "uuid": "524c4b4d-4246-4c00-8000-00000000000c",
+      "tag": "rlk_mb_bf_thigh_l",
+      "model": "thigh_l",
+      "brightness": 13,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "shin_l",
+      "uuid": "524c4b4d-4246-4c00-8000-00000000000d",
+      "tag": "rlk_mb_bf_shin_l",
+      "model": "shin_l",
+      "brightness": 14,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "foot_l",
+      "uuid": "524c4b4d-4246-4c00-8000-00000000000e",
+      "tag": "rlk_mb_bf_foot_l",
+      "model": "foot_l",
+      "brightness": 14,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "hand_r_a",
+      "uuid": "524c4b4d-4246-4c00-8000-00000000000f",
+      "tag": "rlk_mb_bf_hand_r_a",
+      "model": "crescent_r",
+      "brightness": 13,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "hand_r_b",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000010",
+      "tag": "rlk_mb_bf_hand_r_b",
+      "model": "shard_r",
+      "brightness": 13,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "hand_l_a",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000011",
+      "tag": "rlk_mb_bf_hand_l_a",
+      "model": "crescent_l",
+      "brightness": 13,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "hand_l_b",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000012",
+      "tag": "rlk_mb_bf_hand_l_b",
+      "model": "shard_l",
+      "brightness": 13,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "flakes",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000013",
+      "tag": "rlk_mb_bf_flakes",
+      "model": "flakes",
+      "brightness": 12,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "fwing_l",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000014",
+      "tag": "rlk_mb_bf_fwing_l",
+      "model": "fwing_l_dendro",
+      "brightness": 14,
+      "scale": 3.5,
+      "look": true
+    },
+    {
+      "name": "fwing_r",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000015",
+      "tag": "rlk_mb_bf_fwing_r",
+      "model": "fwing_r_dendro",
+      "brightness": 14,
+      "scale": 3.5,
+      "look": true
+    },
+    {
+      "name": "fwglow_l",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000016",
+      "tag": "rlk_mb_bf_fwglow_l",
+      "model": "fwglow_l_dendro",
+      "brightness": 15,
+      "scale": 3.5,
+      "look": true
+    },
+    {
+      "name": "fwglow_r",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000017",
+      "tag": "rlk_mb_bf_fwglow_r",
+      "model": "fwglow_r_dendro",
+      "brightness": 15,
+      "scale": 3.5,
+      "look": true
+    },
+    {
+      "name": "hwing_l",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000018",
+      "tag": "rlk_mb_bf_hwing_l",
+      "model": "hwing_l_dendro",
+      "brightness": 14,
+      "scale": 2.4,
+      "look": true
+    },
+    {
+      "name": "hwing_r",
+      "uuid": "524c4b4d-4246-4c00-8000-000000000019",
+      "tag": "rlk_mb_bf_hwing_r",
+      "model": "hwing_r_dendro",
+      "brightness": 14,
+      "scale": 2.4,
+      "look": true
+    },
+    {
+      "name": "tendril_ul",
+      "uuid": "524c4b4d-4246-4c00-8000-00000000001a",
+      "tag": "rlk_mb_bf_tendril_ul",
+      "model": "tendril_ul_dendro",
+      "brightness": 14,
+      "scale": 1.1,
+      "look": true
+    },
+    {
+      "name": "tendril_ur",
+      "uuid": "524c4b4d-4246-4c00-8000-00000000001b",
+      "tag": "rlk_mb_bf_tendril_ur",
+      "model": "tendril_ur_dendro",
+      "brightness": 14,
+      "scale": 1.1,
+      "look": true
+    },
+    {
+      "name": "tendril_ll",
+      "uuid": "524c4b4d-4246-4c00-8000-00000000001c",
+      "tag": "rlk_mb_bf_tendril_ll",
+      "model": "tendril_ll_dendro",
+      "brightness": 14,
+      "scale": 1.55,
+      "look": true
+    },
+    {
+      "name": "tendril_lr",
+      "uuid": "524c4b4d-4246-4c00-8000-00000000001d",
+      "tag": "rlk_mb_bf_tendril_lr",
+      "model": "tendril_lr_dendro",
+      "brightness": 14,
+      "scale": 1.55,
+      "look": true
+    },
+    {
+      "name": "core",
+      "uuid": "524c4b4d-4246-4c00-8000-00000000001e",
+      "tag": "rlk_mb_bf_core",
+      "model": "core",
+      "brightness": 15,
+      "scale": 1,
+      "look": false
+    },
+    {
+      "name": "body",
+      "tag": "rlk_mb_bf_body",
+      "alias_of": "torso"
+    },
+    {
+      "name": "hand_r",
+      "tag": "rlk_mb_bf_hand_r",
+      "alias_of": "hand_r_a"
+    },
+    {
+      "name": "hand_l",
+      "tag": "rlk_mb_bf_hand_l",
+      "alias_of": "hand_l_a"
+    }
+  ],
+  "clips": [
+    {
+      "id": 0,
+      "name": "idle_h",
+      "len": 40,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 16,
+      "keys": 60,
+      "note": "standing idle: breathing sway; the crescents and flakes bob (phase); crest sways",
+      "form": {
+        "start": "h",
+        "end": "h"
+      },
+      "anchors": {}
+    },
+    {
+      "id": 1,
+      "name": "step_h",
+      "len": 16,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 12,
+      "keys": 122,
+      "note": "short strafing step (0.1-0.15 b/t, the module moves the anchor)",
+      "form": {
+        "start": "h",
+        "end": "h"
+      },
+      "anchors": {}
+    },
+    {
+      "id": 2,
+      "name": "run_h",
+      "len": 8,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 7,
+      "keys": 97,
+      "note": "burst-run (0.6-0.8 b/t for about 5 t): body 30 degrees forward, fans swept back, crescents trailing",
+      "form": {
+        "start": "h",
+        "end": "h"
+      },
+      "anchors": {}
+    },
+    {
+      "id": 3,
+      "name": "back_h",
+      "len": 12,
+      "loop": false,
+      "next": "idle_h",
+      "events": {},
+      "keyFiles": 8,
+      "keys": 105,
+      "note": "backing off at walking pace (the anchor moves back)",
+      "form": {
+        "start": "h",
+        "end": "h"
+      },
+      "anchors": {}
+    },
+    {
+      "id": 4,
+      "name": "turn_h",
+      "len": 24,
+      "loop": false,
+      "next": "idle_h",
+      "events": {},
+      "keyFiles": 18,
+      "keys": 224,
+      "note": "after groggy: turns from her back (root yaw 180, the groggy_h facing) to the anchor facing",
+      "form": {
+        "start": "h",
+        "end": "h"
+      },
+      "anchors": {}
+    },
+    {
+      "id": 5,
+      "name": "kick_combo",
+      "len": 51,
+      "loop": false,
+      "next": "idle_h",
+      "events": {
+        "run": 0,
+        "hit1": 8,
+        "backflip": 10,
+        "hop": 22,
+        "leap": 34,
+        "hit2": 40
+      },
+      "keyFiles": 48,
+      "keys": 844,
+      "note": "H1 달빛 발차기: burst-run in (0-5), rising flip kick at 8, backflip, 12 t sideways-hop wind-up, flying leap, axe kick at 40, landing",
+      "form": {
+        "start": "h",
+        "end": "h"
+      },
+      "anchors": {
+        "run": {
+          "foot_l": [
+            0.419,
+            0.189,
+            -0.359
+          ],
+          "foot_r": [
+            -0.42,
+            0.091,
+            0.486
+          ],
+          "fwtip_l": [
+            0.42,
+            2.444,
+            -0.135
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.444,
+            -0.135
+          ],
+          "hwtip_l": [
+            0.42,
+            2.292,
+            0.022
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.292,
+            0.022
+          ],
+          "core": [
+            0,
+            1.909,
+            -0.462
+          ],
+          "head": [
+            0,
+            2.257,
+            -0.42
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.814,
+            -0.523
+          ],
+          "hand_l_a": [
+            0.84,
+            1.925,
+            -0.222
+          ]
+        },
+        "hit1": {
+          "foot_l": [
+            0.42,
+            0.51,
+            0.172
+          ],
+          "foot_r": [
+            -0.281,
+            3.17,
+            -0.172
+          ],
+          "fwtip_l": [
+            0.42,
+            2.851,
+            0.407
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.851,
+            0.407
+          ],
+          "hwtip_l": [
+            0.42,
+            2.634,
+            0.437
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.634,
+            0.437
+          ],
+          "core": [
+            0,
+            2.63,
+            -0.179
+          ],
+          "head": [
+            0,
+            2.878,
+            0.068
+          ],
+          "hand_r_a": [
+            -0.196,
+            2.553,
+            -0.009
+          ],
+          "hand_l_a": [
+            0.84,
+            2.446,
+            0.013
+          ]
+        },
+        "backflip": {
+          "foot_l": [
+            0.42,
+            2.137,
+            1.376
+          ],
+          "foot_r": [
+            -0.281,
+            3.17,
+            -1.099
+          ],
+          "fwtip_l": [
+            0.42,
+            3.511,
+            -0.533
+          ],
+          "fwtip_r": [
+            -0.42,
+            3.511,
+            -0.533
+          ],
+          "hwtip_l": [
+            0.42,
+            3.429,
+            -0.331
+          ],
+          "hwtip_r": [
+            -0.42,
+            3.429,
+            -0.331
+          ],
+          "core": [
+            0,
+            2.893,
+            -0.635
+          ],
+          "head": [
+            0,
+            3.231,
+            -0.727
+          ],
+          "hand_r_a": [
+            -0.196,
+            3.002,
+            -0.484
+          ],
+          "hand_l_a": [
+            0.84,
+            2.966,
+            -0.378
+          ]
+        },
+        "hop": {
+          "foot_l": [
+            0.516,
+            0.132,
+            -0.23
+          ],
+          "foot_r": [
+            -0.517,
+            0.123,
+            -0.178
+          ],
+          "fwtip_l": [
+            0.417,
+            2.37,
+            0.051
+          ],
+          "fwtip_r": [
+            -0.419,
+            2.37,
+            -0.025
+          ],
+          "hwtip_l": [
+            0.406,
+            2.193,
+            0.178
+          ],
+          "hwtip_r": [
+            -0.431,
+            2.193,
+            0.102
+          ],
+          "core": [
+            0.036,
+            1.9,
+            -0.4
+          ],
+          "head": [
+            0.027,
+            2.235,
+            -0.299
+          ],
+          "hand_r_a": [
+            -1.019,
+            2.787,
+            -0.393
+          ],
+          "hand_l_a": [
+            0.852,
+            1.885,
+            -0.09
+          ]
+        },
+        "leap": {
+          "foot_l": [
+            0.413,
+            0.848,
+            0.215
+          ],
+          "foot_r": [
+            -0.402,
+            1.946,
+            -1.223
+          ],
+          "fwtip_l": [
+            0.444,
+            3.127,
+            0.097
+          ],
+          "fwtip_r": [
+            -0.384,
+            3.127,
+            0.243
+          ],
+          "hwtip_l": [
+            0.46,
+            2.929,
+            0.188
+          ],
+          "hwtip_r": [
+            -0.368,
+            2.929,
+            0.334
+          ],
+          "core": [
+            -0.056,
+            2.745,
+            -0.319
+          ],
+          "head": [
+            -0.028,
+            3.054,
+            -0.158
+          ],
+          "hand_r_a": [
+            -0.655,
+            2.802,
+            -0.278
+          ],
+          "hand_l_a": [
+            0.81,
+            2.713,
+            -0.244
+          ]
+        },
+        "hit2": {
+          "foot_l": [
+            0.398,
+            0.617,
+            0.675
+          ],
+          "foot_r": [
+            -0.42,
+            0.65,
+            -0.901
+          ],
+          "fwtip_l": [
+            0.42,
+            2.744,
+            -0.135
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.744,
+            -0.135
+          ],
+          "hwtip_l": [
+            0.42,
+            2.592,
+            0.022
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.592,
+            0.022
+          ],
+          "core": [
+            0,
+            2.209,
+            -0.462
+          ],
+          "head": [
+            0,
+            2.557,
+            -0.42
+          ],
+          "hand_r_a": [
+            -0.271,
+            1.163,
+            -0.542
+          ],
+          "hand_l_a": [
+            0.84,
+            2.225,
+            -0.222
+          ]
+        }
+      }
+    },
+    {
+      "id": 6,
+      "name": "kick_jump",
+      "len": 65,
+      "loop": false,
+      "next": "idle_h",
+      "events": {
+        "tell": 0,
+        "sweep": 13,
+        "sweep_end": 19,
+        "jump": 33,
+        "orb": 45,
+        "disc": 45,
+        "kick": 52,
+        "impact": 55,
+        "land": 59
+      },
+      "keyFiles": 61,
+      "keys": 991,
+      "note": "H2 달빛 점프: the crescent chain lines up at her left and glows (tell 0-13), 360 degree low sweep 13-19, spiral jump at 33, the orb forms at 45 (disc = orb), kicked down at 52, impact 55, landing 59",
+      "form": {
+        "start": "h",
+        "end": "h"
+      },
+      "anchors": {
+        "tell": {
+          "foot_l": [
+            0.42,
+            0,
+            -0.06
+          ],
+          "foot_r": [
+            -0.42,
+            0,
+            -0.06
+          ],
+          "fwtip_l": [
+            0.42,
+            2.44,
+            0.158
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.44,
+            0.158
+          ],
+          "hwtip_l": [
+            0.42,
+            2.244,
+            0.254
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.244,
+            0.254
+          ],
+          "core": [
+            0,
+            2.049,
+            -0.331
+          ],
+          "head": [
+            0,
+            2.361,
+            -0.173
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.92,
+            -0.08
+          ],
+          "hand_l_a": [
+            0.62,
+            2.602,
+            -0.1
+          ]
+        },
+        "sweep": {
+          "foot_l": [
+            -0.543,
+            0.526,
+            -1.149
+          ],
+          "foot_r": [
+            -0.461,
+            -0.302,
+            0.189
+          ],
+          "fwtip_l": [
+            0.232,
+            1.955,
+            -0.35
+          ],
+          "fwtip_r": [
+            -0.261,
+            1.955,
+            0.329
+          ],
+          "hwtip_l": [
+            0.341,
+            1.783,
+            -0.271
+          ],
+          "hwtip_r": [
+            -0.153,
+            1.783,
+            0.408
+          ],
+          "core": [
+            -0.336,
+            1.471,
+            -0.244
+          ],
+          "head": [
+            -0.263,
+            1.809,
+            -0.191
+          ],
+          "hand_r_a": [
+            -0.914,
+            2.416,
+            0.634
+          ],
+          "hand_l_a": [
+            0.133,
+            2.015,
+            -0.67
+          ]
+        },
+        "sweep_end": {
+          "foot_l": [
+            0.611,
+            0.526,
+            -1.115
+          ],
+          "foot_r": [
+            -0.424,
+            -0.302,
+            -0.261
+          ],
+          "fwtip_l": [
+            0.42,
+            1.955,
+            -0.018
+          ],
+          "fwtip_r": [
+            -0.42,
+            1.955,
+            -0.018
+          ],
+          "hwtip_l": [
+            0.42,
+            1.783,
+            0.117
+          ],
+          "hwtip_r": [
+            -0.42,
+            1.783,
+            0.117
+          ],
+          "core": [
+            0,
+            1.471,
+            -0.415
+          ],
+          "head": [
+            0,
+            1.809,
+            -0.326
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.382,
+            -0.354
+          ],
+          "hand_l_a": [
+            0.62,
+            2.048,
+            -0.3
+          ]
+        },
+        "jump": {
+          "foot_l": [
+            0.389,
+            1.508,
+            0.599
+          ],
+          "foot_r": [
+            -0.339,
+            1.498,
+            -0.159
+          ],
+          "fwtip_l": [
+            0.42,
+            3.6,
+            0.3
+          ],
+          "fwtip_r": [
+            -0.42,
+            3.6,
+            0.3
+          ],
+          "hwtip_l": [
+            0.42,
+            3.39,
+            0.36
+          ],
+          "hwtip_r": [
+            -0.42,
+            3.39,
+            0.36
+          ],
+          "core": [
+            0,
+            3.3,
+            -0.25
+          ],
+          "head": [
+            0,
+            3.58,
+            -0.04
+          ],
+          "hand_r_a": [
+            -1.05,
+            4.069,
+            0.149
+          ],
+          "hand_l_a": [
+            0.62,
+            3.848,
+            0.073
+          ]
+        },
+        "orb": {
+          "foot_l": [
+            0.389,
+            2.808,
+            0.599
+          ],
+          "foot_r": [
+            -0.359,
+            2.774,
+            -0.3
+          ],
+          "fwtip_l": [
+            0.42,
+            4.945,
+            0.129
+          ],
+          "fwtip_r": [
+            -0.42,
+            4.945,
+            0.129
+          ],
+          "hwtip_l": [
+            0.42,
+            4.752,
+            0.232
+          ],
+          "hwtip_r": [
+            -0.42,
+            4.752,
+            0.232
+          ],
+          "core": [
+            0,
+            4.537,
+            -0.346
+          ],
+          "head": [
+            0,
+            4.855,
+            -0.199
+          ],
+          "hand_r_a": [
+            -1.05,
+            5.451,
+            -0.133
+          ],
+          "hand_l_a": [
+            0.62,
+            5.063,
+            -0.127
+          ]
+        },
+        "disc": {
+          "foot_l": [
+            0.389,
+            2.808,
+            0.599
+          ],
+          "foot_r": [
+            -0.359,
+            2.774,
+            -0.3
+          ],
+          "fwtip_l": [
+            0.42,
+            4.945,
+            0.129
+          ],
+          "fwtip_r": [
+            -0.42,
+            4.945,
+            0.129
+          ],
+          "hwtip_l": [
+            0.42,
+            4.752,
+            0.232
+          ],
+          "hwtip_r": [
+            -0.42,
+            4.752,
+            0.232
+          ],
+          "core": [
+            0,
+            4.537,
+            -0.346
+          ],
+          "head": [
+            0,
+            4.855,
+            -0.199
+          ],
+          "hand_r_a": [
+            -1.05,
+            5.451,
+            -0.133
+          ],
+          "hand_l_a": [
+            0.62,
+            5.063,
+            -0.127
+          ]
+        },
+        "kick": {
+          "foot_l": [
+            0.389,
+            2.608,
+            0.599
+          ],
+          "foot_r": [
+            -0.403,
+            4.431,
+            -0.97
+          ],
+          "fwtip_l": [
+            0.42,
+            4.744,
+            -0.135
+          ],
+          "fwtip_r": [
+            -0.42,
+            4.744,
+            -0.135
+          ],
+          "hwtip_l": [
+            0.42,
+            4.592,
+            0.022
+          ],
+          "hwtip_r": [
+            -0.42,
+            4.592,
+            0.022
+          ],
+          "core": [
+            0,
+            4.209,
+            -0.462
+          ],
+          "head": [
+            0,
+            4.557,
+            -0.42
+          ],
+          "hand_r_a": [
+            -0.271,
+            4.083,
+            -0.554
+          ],
+          "hand_l_a": [
+            0.62,
+            4.764,
+            -0.408
+          ]
+        },
+        "impact": {
+          "foot_l": [
+            0.389,
+            1.908,
+            0.599
+          ],
+          "foot_r": [
+            -0.389,
+            1.762,
+            -0.198
+          ],
+          "fwtip_l": [
+            0.42,
+            4.044,
+            -0.135
+          ],
+          "fwtip_r": [
+            -0.42,
+            4.044,
+            -0.135
+          ],
+          "hwtip_l": [
+            0.42,
+            3.892,
+            0.022
+          ],
+          "hwtip_r": [
+            -0.42,
+            3.892,
+            0.022
+          ],
+          "core": [
+            0,
+            3.509,
+            -0.462
+          ],
+          "head": [
+            0,
+            3.857,
+            -0.42
+          ],
+          "hand_r_a": [
+            -1.05,
+            4.444,
+            -0.541
+          ],
+          "hand_l_a": [
+            0.62,
+            4.074,
+            -0.414
+          ]
+        },
+        "land": {
+          "foot_l": [
+            0.424,
+            -0.022,
+            -0.261
+          ],
+          "foot_r": [
+            -0.424,
+            -0.022,
+            -0.261
+          ],
+          "fwtip_l": [
+            0.42,
+            2.235,
+            -0.018
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.235,
+            -0.018
+          ],
+          "hwtip_l": [
+            0.42,
+            2.063,
+            0.117
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.063,
+            0.117
+          ],
+          "core": [
+            0,
+            1.751,
+            -0.415
+          ],
+          "head": [
+            0,
+            2.089,
+            -0.326
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.662,
+            -0.354
+          ],
+          "hand_l_a": [
+            0.62,
+            2.328,
+            -0.3
+          ]
+        }
+      }
+    },
+    {
+      "id": 7,
+      "name": "dash_kick",
+      "len": 50,
+      "loop": false,
+      "next": "idle_h",
+      "events": {
+        "charge": 0,
+        "dash": 10,
+        "dash_end": 12,
+        "kick": 15,
+        "ring": 19
+      },
+      "keyFiles": 35,
+      "keys": 355,
+      "note": "H3 달빛 돌진: mote charge 0-10, dash 5-6 b in 2 t (10-12, the module moves the anchor), lunge kick at 15, the ring at 19",
+      "form": {
+        "start": "h",
+        "end": "h"
+      },
+      "anchors": {
+        "charge": {
+          "foot_l": [
+            0.42,
+            0,
+            -0.06
+          ],
+          "foot_r": [
+            -0.42,
+            0,
+            -0.06
+          ],
+          "fwtip_l": [
+            0.42,
+            2.44,
+            0.158
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.44,
+            0.158
+          ],
+          "hwtip_l": [
+            0.42,
+            2.244,
+            0.254
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.244,
+            0.254
+          ],
+          "core": [
+            0,
+            2.049,
+            -0.331
+          ],
+          "head": [
+            0,
+            2.361,
+            -0.173
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.92,
+            -0.08
+          ],
+          "hand_l_a": [
+            0.84,
+            1.982,
+            -0.1
+          ]
+        },
+        "dash": {
+          "foot_l": [
+            0.424,
+            -0.022,
+            -0.261
+          ],
+          "foot_r": [
+            -0.424,
+            -0.022,
+            -0.261
+          ],
+          "fwtip_l": [
+            0.42,
+            2.213,
+            -0.193
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.213,
+            -0.193
+          ],
+          "hwtip_l": [
+            0.42,
+            2.072,
+            -0.026
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.072,
+            -0.026
+          ],
+          "core": [
+            0,
+            1.656,
+            -0.481
+          ],
+          "head": [
+            0,
+            2.006,
+            -0.464
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.596,
+            -0.634
+          ],
+          "hand_l_a": [
+            0.84,
+            1.646,
+            -0.214
+          ]
+        },
+        "dash_end": {
+          "foot_l": [
+            0.403,
+            0.545,
+            0.637
+          ],
+          "foot_r": [
+            -0.398,
+            1.142,
+            -1.115
+          ],
+          "fwtip_l": [
+            0.42,
+            2.744,
+            -0.135
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.744,
+            -0.135
+          ],
+          "hwtip_l": [
+            0.42,
+            2.592,
+            0.022
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.592,
+            0.022
+          ],
+          "core": [
+            0,
+            2.209,
+            -0.462
+          ],
+          "head": [
+            0,
+            2.557,
+            -0.42
+          ],
+          "hand_r_a": [
+            -0.267,
+            1.417,
+            -0.648
+          ],
+          "hand_l_a": [
+            0.84,
+            2.182,
+            -0.196
+          ]
+        },
+        "kick": {
+          "foot_l": [
+            0.403,
+            0.645,
+            0.637
+          ],
+          "foot_r": [
+            -0.42,
+            1.906,
+            -1.32
+          ],
+          "fwtip_l": [
+            0.42,
+            2.84,
+            0.158
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.84,
+            0.158
+          ],
+          "hwtip_l": [
+            0.42,
+            2.644,
+            0.254
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.644,
+            0.254
+          ],
+          "core": [
+            0,
+            2.449,
+            -0.331
+          ],
+          "head": [
+            0,
+            2.761,
+            -0.173
+          ],
+          "hand_r_a": [
+            -0.271,
+            1.906,
+            -0.694
+          ],
+          "hand_l_a": [
+            0.84,
+            2.344,
+            -0.094
+          ]
+        },
+        "ring": {
+          "foot_l": [
+            0.419,
+            0.271,
+            0.262
+          ],
+          "foot_r": [
+            -0.417,
+            0.881,
+            -1.126
+          ],
+          "fwtip_l": [
+            0.42,
+            2.592,
+            0.085
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.592,
+            0.085
+          ],
+          "hwtip_l": [
+            0.42,
+            2.405,
+            0.198
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.405,
+            0.198
+          ],
+          "core": [
+            0,
+            2.16,
+            -0.368
+          ],
+          "head": [
+            0,
+            2.485,
+            -0.238
+          ],
+          "hand_r_a": [
+            -0.597,
+            1.996,
+            -0.462
+          ],
+          "hand_l_a": [
+            0.84,
+            2.102,
+            -0.129
+          ]
+        }
+      }
+    },
+    {
+      "id": 8,
+      "name": "vacuum",
+      "len": 41,
+      "loop": false,
+      "next": "idle_h",
+      "events": {
+        "crouch": 0,
+        "tell": 9,
+        "stomp": 16,
+        "blade": 17,
+        "backflip": 17,
+        "land": 38
+      },
+      "keyFiles": 38,
+      "keys": 683,
+      "note": "H4 광폭한 진공: crouch 9 t, glint, stomp-kick launches the vertical blade at 17, backflip airborne 17-38",
+      "form": {
+        "start": "h",
+        "end": "h"
+      },
+      "anchors": {
+        "crouch": {
+          "foot_l": [
+            0.42,
+            0,
+            -0.06
+          ],
+          "foot_r": [
+            -0.42,
+            0,
+            -0.06
+          ],
+          "fwtip_l": [
+            0.42,
+            2.44,
+            0.158
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.44,
+            0.158
+          ],
+          "hwtip_l": [
+            0.42,
+            2.244,
+            0.254
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.244,
+            0.254
+          ],
+          "core": [
+            0,
+            2.049,
+            -0.331
+          ],
+          "head": [
+            0,
+            2.361,
+            -0.173
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.92,
+            -0.08
+          ],
+          "hand_l_a": [
+            0.84,
+            1.982,
+            -0.1
+          ]
+        },
+        "tell": {
+          "foot_l": [
+            0.424,
+            -0.022,
+            -0.261
+          ],
+          "foot_r": [
+            -0.297,
+            0.213,
+            -0.122
+          ],
+          "fwtip_l": [
+            0.42,
+            2.235,
+            -0.018
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.235,
+            -0.018
+          ],
+          "hwtip_l": [
+            0.42,
+            2.063,
+            0.117
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.063,
+            0.117
+          ],
+          "core": [
+            0,
+            1.751,
+            -0.415
+          ],
+          "head": [
+            0,
+            2.089,
+            -0.326
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.701,
+            -0.369
+          ],
+          "hand_l_a": [
+            0.84,
+            1.686,
+            -0.156
+          ]
+        },
+        "stomp": {
+          "foot_l": [
+            0.424,
+            0.587,
+            -0.261
+          ],
+          "foot_r": [
+            -0.396,
+            1.586,
+            -1.199
+          ],
+          "fwtip_l": [
+            0.42,
+            2.837,
+            0.11
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.837,
+            0.11
+          ],
+          "hwtip_l": [
+            0.42,
+            2.646,
+            0.217
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.646,
+            0.217
+          ],
+          "core": [
+            0,
+            2.418,
+            -0.356
+          ],
+          "head": [
+            0,
+            2.739,
+            -0.216
+          ],
+          "hand_r_a": [
+            -1.05,
+            3.331,
+            -0.163
+          ],
+          "hand_l_a": [
+            0.84,
+            2.332,
+            -0.114
+          ]
+        },
+        "blade": {
+          "foot_l": [
+            0.424,
+            0.698,
+            -0.261
+          ],
+          "foot_r": [
+            -0.395,
+            1.078,
+            -0.962
+          ],
+          "fwtip_l": [
+            0.42,
+            2.944,
+            -0.135
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.944,
+            -0.135
+          ],
+          "hwtip_l": [
+            0.42,
+            2.792,
+            0.022
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.792,
+            0.022
+          ],
+          "core": [
+            0,
+            2.409,
+            -0.462
+          ],
+          "head": [
+            0,
+            2.757,
+            -0.42
+          ],
+          "hand_r_a": [
+            -1.05,
+            3.333,
+            -0.535
+          ],
+          "hand_l_a": [
+            0.84,
+            2.402,
+            -0.208
+          ]
+        },
+        "backflip": {
+          "foot_l": [
+            0.424,
+            0.698,
+            -0.261
+          ],
+          "foot_r": [
+            -0.395,
+            1.078,
+            -0.962
+          ],
+          "fwtip_l": [
+            0.42,
+            2.944,
+            -0.135
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.944,
+            -0.135
+          ],
+          "hwtip_l": [
+            0.42,
+            2.792,
+            0.022
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.792,
+            0.022
+          ],
+          "core": [
+            0,
+            2.409,
+            -0.462
+          ],
+          "head": [
+            0,
+            2.757,
+            -0.42
+          ],
+          "hand_r_a": [
+            -1.05,
+            3.333,
+            -0.535
+          ],
+          "hand_l_a": [
+            0.84,
+            2.402,
+            -0.208
+          ]
+        },
+        "land": {
+          "foot_l": [
+            0.424,
+            -0.002,
+            -0.261
+          ],
+          "foot_r": [
+            -0.424,
+            -0.002,
+            -0.261
+          ],
+          "fwtip_l": [
+            0.42,
+            2.255,
+            -0.018
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.255,
+            -0.018
+          ],
+          "hwtip_l": [
+            0.42,
+            2.083,
+            0.117
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.083,
+            0.117
+          ],
+          "core": [
+            0,
+            1.771,
+            -0.415
+          ],
+          "head": [
+            0,
+            2.109,
+            -0.326
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.66,
+            -0.345
+          ],
+          "hand_l_a": [
+            0.84,
+            1.767,
+            -0.181
+          ]
+        }
+      }
+    },
+    {
+      "id": 9,
+      "name": "groggy_h",
+      "len": 40,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 7,
+      "keys": 47,
+      "note": "groggy (300 t in the pattern): motionless idle with her back turned (root yaw 180), fans drooped, crescents hidden",
+      "form": {
+        "start": "h",
+        "end": "h"
+      },
+      "anchors": {}
+    },
+    {
+      "id": 10,
+      "name": "entrance",
+      "len": 106,
+      "loop": false,
+      "next": "idle_h",
+      "events": {
+        "nameplate": 57,
+        "glow": 61,
+        "whiteout": 71,
+        "burst": 79,
+        "land": 90,
+        "stand": 106
+      },
+      "keyFiles": 25,
+      "keys": 335,
+      "note": "hidden inside the cocoon prop until the burst at 79 (rig/prop/cocoon); she drops from 4 b, lands at 90 and stands up by 106",
+      "form": {
+        "start": "h",
+        "end": "h"
+      },
+      "anchors": {
+        "nameplate": {
+          "foot_l": [
+            0.42,
+            4,
+            -0.06
+          ],
+          "foot_r": [
+            -0.42,
+            4,
+            -0.06
+          ],
+          "fwtip_l": [
+            0,
+            5.5,
+            0
+          ],
+          "fwtip_r": [
+            0,
+            5.5,
+            0
+          ],
+          "hwtip_l": [
+            0,
+            5.5,
+            0
+          ],
+          "hwtip_r": [
+            0,
+            5.5,
+            0
+          ],
+          "core": [
+            0,
+            5.5,
+            0
+          ],
+          "head": [
+            0,
+            5.5,
+            0
+          ],
+          "hand_r_a": [
+            0,
+            5.5,
+            0
+          ],
+          "hand_l_a": [
+            0,
+            5.5,
+            0
+          ]
+        },
+        "glow": {
+          "foot_l": [
+            0.42,
+            4,
+            -0.06
+          ],
+          "foot_r": [
+            -0.42,
+            4,
+            -0.06
+          ],
+          "fwtip_l": [
+            0,
+            5.5,
+            0
+          ],
+          "fwtip_r": [
+            0,
+            5.5,
+            0
+          ],
+          "hwtip_l": [
+            0,
+            5.5,
+            0
+          ],
+          "hwtip_r": [
+            0,
+            5.5,
+            0
+          ],
+          "core": [
+            0,
+            5.5,
+            0
+          ],
+          "head": [
+            0,
+            5.5,
+            0
+          ],
+          "hand_r_a": [
+            0,
+            5.5,
+            0
+          ],
+          "hand_l_a": [
+            0,
+            5.5,
+            0
+          ]
+        },
+        "whiteout": {
+          "foot_l": [
+            0.42,
+            4,
+            -0.06
+          ],
+          "foot_r": [
+            -0.42,
+            4,
+            -0.06
+          ],
+          "fwtip_l": [
+            0,
+            5.5,
+            0
+          ],
+          "fwtip_r": [
+            0,
+            5.5,
+            0
+          ],
+          "hwtip_l": [
+            0,
+            5.5,
+            0
+          ],
+          "hwtip_r": [
+            0,
+            5.5,
+            0
+          ],
+          "core": [
+            0,
+            5.5,
+            0
+          ],
+          "head": [
+            0,
+            5.5,
+            0
+          ],
+          "hand_r_a": [
+            0,
+            5.5,
+            0
+          ],
+          "hand_l_a": [
+            0,
+            5.5,
+            0
+          ]
+        },
+        "burst": {
+          "foot_l": [
+            0.39,
+            4.364,
+            0.765
+          ],
+          "foot_r": [
+            -0.39,
+            4.289,
+            0.66
+          ],
+          "fwtip_l": [
+            0.42,
+            6.336,
+            0.433
+          ],
+          "fwtip_r": [
+            -0.42,
+            6.336,
+            0.433
+          ],
+          "hwtip_l": [
+            0.42,
+            6.119,
+            0.455
+          ],
+          "hwtip_r": [
+            -0.42,
+            6.119,
+            0.455
+          ],
+          "core": [
+            0,
+            6.136,
+            -0.161
+          ],
+          "head": [
+            0,
+            6.375,
+            0.094
+          ],
+          "hand_r_a": [
+            -1.05,
+            6.861,
+            0.372
+          ],
+          "hand_l_a": [
+            0.84,
+            6.002,
+            0.034
+          ]
+        },
+        "land": {
+          "foot_l": [
+            0.424,
+            -0.152,
+            -0.261
+          ],
+          "foot_r": [
+            -0.424,
+            -0.152,
+            -0.261
+          ],
+          "fwtip_l": [
+            0.42,
+            2.083,
+            -0.193
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.083,
+            -0.193
+          ],
+          "hwtip_l": [
+            0.42,
+            1.942,
+            -0.026
+          ],
+          "hwtip_r": [
+            -0.42,
+            1.942,
+            -0.026
+          ],
+          "core": [
+            0,
+            1.526,
+            -0.481
+          ],
+          "head": [
+            0,
+            1.876,
+            -0.464
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.466,
+            -0.634
+          ],
+          "hand_l_a": [
+            0.84,
+            1.516,
+            -0.214
+          ]
+        },
+        "stand": {
+          "foot_l": [
+            0.42,
+            0,
+            -0.06
+          ],
+          "foot_r": [
+            -0.42,
+            0,
+            -0.06
+          ],
+          "fwtip_l": [
+            0.42,
+            2.44,
+            0.158
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.44,
+            0.158
+          ],
+          "hwtip_l": [
+            0.42,
+            2.244,
+            0.254
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.244,
+            0.254
+          ],
+          "core": [
+            0,
+            2.049,
+            -0.331
+          ],
+          "head": [
+            0,
+            2.361,
+            -0.173
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.88,
+            -0.073
+          ],
+          "hand_l_a": [
+            0.84,
+            2.019,
+            -0.107
+          ]
+        }
+      }
+    },
+    {
+      "id": 11,
+      "name": "transform",
+      "len": 30,
+      "loop": false,
+      "next": "idle_b",
+      "events": {
+        "glow": 0,
+        "open": 4,
+        "sphere": 6,
+        "rings": 9,
+        "spread": 12
+      },
+      "keyFiles": 15,
+      "keys": 243,
+      "note": "human -> butterfly: the cocoon glow (core), folded wings at 4, light sphere at 6 (달빛 고치 is applied there), the wings unfold over 8 t (4-12), hover lift; the form switches to butterfly at 4",
+      "form": {
+        "start": "h",
+        "end": "b",
+        "switch": [
+          4,
+          "butterfly"
+        ]
+      },
+      "anchors": {
+        "glow": {
+          "foot_l": [
+            0.42,
+            0,
+            -0.06
+          ],
+          "foot_r": [
+            -0.42,
+            0,
+            -0.06
+          ],
+          "fwtip_l": [
+            0.42,
+            2.44,
+            0.158
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.44,
+            0.158
+          ],
+          "hwtip_l": [
+            0.42,
+            2.244,
+            0.254
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.244,
+            0.254
+          ],
+          "core": [
+            0,
+            2.049,
+            -0.331
+          ],
+          "head": [
+            0,
+            2.361,
+            -0.173
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.92,
+            -0.08
+          ],
+          "hand_l_a": [
+            0.84,
+            1.982,
+            -0.1
+          ]
+        },
+        "open": {
+          "foot_l": [
+            0.42,
+            0,
+            -0.06
+          ],
+          "foot_r": [
+            -0.42,
+            0,
+            -0.06
+          ],
+          "fwtip_l": [
+            -0.329,
+            2.916,
+            1.392
+          ],
+          "fwtip_r": [
+            0.329,
+            2.916,
+            1.392
+          ],
+          "hwtip_l": [
+            0.992,
+            2.686,
+            0.859
+          ],
+          "hwtip_r": [
+            -0.992,
+            2.686,
+            0.859
+          ],
+          "core": [
+            0,
+            2.049,
+            -0.331
+          ],
+          "head": [
+            0,
+            2.361,
+            -0.173
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.949,
+            -0.085
+          ],
+          "hand_l_a": [
+            0.84,
+            1.953,
+            -0.095
+          ]
+        },
+        "sphere": {
+          "foot_l": [
+            0.42,
+            0,
+            -0.06
+          ],
+          "foot_r": [
+            -0.42,
+            0,
+            -0.06
+          ],
+          "fwtip_l": [
+            -0.329,
+            2.916,
+            1.392
+          ],
+          "fwtip_r": [
+            0.329,
+            2.916,
+            1.392
+          ],
+          "hwtip_l": [
+            0.992,
+            2.686,
+            0.859
+          ],
+          "hwtip_r": [
+            -0.992,
+            2.686,
+            0.859
+          ],
+          "core": [
+            0,
+            2.049,
+            -0.331
+          ],
+          "head": [
+            0,
+            2.361,
+            -0.173
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.96,
+            -0.087
+          ],
+          "hand_l_a": [
+            0.84,
+            1.941,
+            -0.093
+          ]
+        },
+        "rings": {
+          "foot_l": [
+            0.352,
+            0.602,
+            -0.123
+          ],
+          "foot_r": [
+            -0.352,
+            0.596,
+            -0.136
+          ],
+          "fwtip_l": [
+            0.472,
+            5.103,
+            1.852
+          ],
+          "fwtip_r": [
+            -0.472,
+            5.103,
+            1.852
+          ],
+          "hwtip_l": [
+            1.884,
+            3.128,
+            0.993
+          ],
+          "hwtip_r": [
+            -1.884,
+            3.128,
+            0.993
+          ],
+          "core": [
+            0,
+            2.646,
+            -0.284
+          ],
+          "head": [
+            0,
+            2.94,
+            -0.094
+          ],
+          "hand_r_a": [
+            -0.705,
+            3.35,
+            0.147
+          ],
+          "hand_l_a": [
+            0.6,
+            2.786,
+            0.095
+          ]
+        },
+        "spread": {
+          "foot_l": [
+            0.283,
+            1.218,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            1.204,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.129,
+            5.99,
+            1.327
+          ],
+          "fwtip_r": [
+            -3.129,
+            5.99,
+            1.327
+          ],
+          "hwtip_l": [
+            2.746,
+            2.976,
+            0.555
+          ],
+          "hwtip_r": [
+            -2.746,
+            2.976,
+            0.555
+          ],
+          "core": [
+            0,
+            3.238,
+            -0.233
+          ],
+          "head": [
+            0,
+            3.511,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.698,
+            0.342
+          ],
+          "hand_l_a": [
+            0.36,
+            3.602,
+            0.338
+          ]
+        }
+      }
+    },
+    {
+      "id": 12,
+      "name": "idle_b",
+      "len": 22,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 18,
+      "keys": 227,
+      "note": "hover flap: forewing leads, hindwing lags 2-3 t, ribbons lag 4 t; body bob ±0.15 b rising on the downstroke",
+      "form": {
+        "start": "b",
+        "end": "b"
+      },
+      "anchors": {}
+    },
+    {
+      "id": 13,
+      "name": "glide_b",
+      "len": 16,
+      "loop": true,
+      "next": null,
+      "events": {},
+      "keyFiles": 12,
+      "keys": 265,
+      "note": "gliding travel: body pitched forward, wings swept back, legs trailing, ribbons streaming",
+      "form": {
+        "start": "b",
+        "end": "b"
+      },
+      "anchors": {}
+    },
+    {
+      "id": 14,
+      "name": "wing_strike",
+      "len": 55,
+      "loop": false,
+      "next": "idle_b",
+      "events": {
+        "bank": 0,
+        "dive": 12,
+        "hit": 15
+      },
+      "keyFiles": 50,
+      "keys": 906,
+      "note": "B1 우아한 날개: bank and climb 0-9, dive 12-15, wing-edge arc hit at 15, climb and flutter",
+      "form": {
+        "start": "b",
+        "end": "b"
+      },
+      "anchors": {
+        "bank": {
+          "foot_l": [
+            0.283,
+            1.218,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            1.204,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.129,
+            5.99,
+            1.327
+          ],
+          "fwtip_r": [
+            -3.129,
+            5.99,
+            1.327
+          ],
+          "hwtip_l": [
+            2.746,
+            2.976,
+            0.555
+          ],
+          "hwtip_r": [
+            -2.746,
+            2.976,
+            0.555
+          ],
+          "core": [
+            0,
+            3.238,
+            -0.233
+          ],
+          "head": [
+            0,
+            3.511,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.65,
+            0.34
+          ],
+          "hand_l_a": [
+            0.36,
+            3.652,
+            0.34
+          ]
+        },
+        "dive": {
+          "foot_l": [
+            -1.061,
+            2.861,
+            0.312
+          ],
+          "foot_r": [
+            -1.363,
+            3.34,
+            0.294
+          ],
+          "fwtip_l": [
+            4.805,
+            4.272,
+            -0.25
+          ],
+          "fwtip_r": [
+            2.811,
+            7.725,
+            -0.25
+          ],
+          "hwtip_l": [
+            2.214,
+            1.883,
+            0.186
+          ],
+          "hwtip_r": [
+            -0.553,
+            6.676,
+            0.186
+          ],
+          "core": [
+            0.426,
+            4.046,
+            -0.427
+          ],
+          "head": [
+            0.713,
+            4.212,
+            -0.314
+          ],
+          "hand_r_a": [
+            0.79,
+            4.672,
+            -0.044
+          ],
+          "hand_l_a": [
+            1.071,
+            4.003,
+            -0.014
+          ]
+        },
+        "hit": {
+          "foot_l": [
+            -1.409,
+            2.093,
+            0.278
+          ],
+          "foot_r": [
+            -1.45,
+            2.354,
+            -0.223
+          ],
+          "fwtip_l": [
+            2.328,
+            1.328,
+            3.842
+          ],
+          "fwtip_r": [
+            1.987,
+            5.226,
+            -2.935
+          ],
+          "hwtip_l": [
+            -0.047,
+            1.42,
+            2.501
+          ],
+          "hwtip_r": [
+            -0.273,
+            4.012,
+            -2.006
+          ],
+          "core": [
+            0.582,
+            2.06,
+            -0.167
+          ],
+          "head": [
+            0.874,
+            2.232,
+            -0.083
+          ],
+          "hand_r_a": [
+            1.067,
+            2.707,
+            -0.235
+          ],
+          "hand_l_a": [
+            1.027,
+            2.351,
+            0.393
+          ]
+        }
+      }
+    },
+    {
+      "id": 15,
+      "name": "wing_barrage",
+      "len": 117,
+      "loop": false,
+      "next": "idle_b",
+      "events": {
+        "swing1": 5,
+        "swing2": 31,
+        "swing3": 69,
+        "swing4": 94
+      },
+      "keyFiles": 99,
+      "keys": 1327,
+      "note": "B2 화염 날개의 습격 (Pyro look): a 5 t wind-up, then four spinning wing swings at 5/31/69/94, each throwing 5 fire crescents",
+      "form": {
+        "start": "b",
+        "end": "b"
+      },
+      "anchors": {
+        "swing1": {
+          "foot_l": [
+            0.283,
+            1.218,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            1.204,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.41,
+            5.653,
+            1.299
+          ],
+          "fwtip_r": [
+            -3.41,
+            5.653,
+            1.299
+          ],
+          "hwtip_l": [
+            2.71,
+            2.763,
+            0.48
+          ],
+          "hwtip_r": [
+            -2.71,
+            2.763,
+            0.48
+          ],
+          "core": [
+            0,
+            3.238,
+            -0.233
+          ],
+          "head": [
+            0,
+            3.511,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.685,
+            0.341
+          ],
+          "hand_l_a": [
+            0.36,
+            3.616,
+            0.339
+          ]
+        },
+        "swing2": {
+          "foot_l": [
+            0.283,
+            1.218,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            1.204,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.847,
+            4.853,
+            1.284
+          ],
+          "fwtip_r": [
+            -3.847,
+            4.853,
+            1.284
+          ],
+          "hwtip_l": [
+            2.624,
+            2.48,
+            0.469
+          ],
+          "hwtip_r": [
+            -2.624,
+            2.48,
+            0.469
+          ],
+          "core": [
+            0,
+            3.238,
+            -0.233
+          ],
+          "head": [
+            0,
+            3.511,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.601,
+            0.338
+          ],
+          "hand_l_a": [
+            0.36,
+            3.7,
+            0.342
+          ]
+        },
+        "swing3": {
+          "foot_l": [
+            0.283,
+            1.218,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            1.204,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.803,
+            4.961,
+            1.286
+          ],
+          "fwtip_r": [
+            -3.803,
+            4.961,
+            1.286
+          ],
+          "hwtip_l": [
+            2.637,
+            2.516,
+            0.47
+          ],
+          "hwtip_r": [
+            -2.637,
+            2.516,
+            0.47
+          ],
+          "core": [
+            0,
+            3.238,
+            -0.233
+          ],
+          "head": [
+            0,
+            3.511,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.601,
+            0.338
+          ],
+          "hand_l_a": [
+            0.36,
+            3.699,
+            0.342
+          ]
+        },
+        "swing4": {
+          "foot_l": [
+            0.283,
+            1.218,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            1.204,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.728,
+            5.122,
+            1.29
+          ],
+          "fwtip_r": [
+            -3.728,
+            5.122,
+            1.29
+          ],
+          "hwtip_l": [
+            2.656,
+            2.57,
+            0.472
+          ],
+          "hwtip_r": [
+            -2.656,
+            2.57,
+            0.472
+          ],
+          "core": [
+            0,
+            3.238,
+            -0.233
+          ],
+          "head": [
+            0,
+            3.511,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.69,
+            0.341
+          ],
+          "hand_l_a": [
+            0.36,
+            3.608,
+            0.339
+          ]
+        }
+      }
+    },
+    {
+      "id": 16,
+      "name": "flap_dive",
+      "len": 59,
+      "loop": false,
+      "next": "idle_b",
+      "events": {
+        "rise": 0,
+        "dive": 22,
+        "slam": 26,
+        "fan": 28,
+        "glide": 34
+      },
+      "keyFiles": 52,
+      "keys": 1045,
+      "note": "B3 날개 휩쓸개 (Pyro look): two big flaps and a rise (0-22), head-first dive (22-26), wing slam at 26, flame fan 28-32, low glide",
+      "form": {
+        "start": "b",
+        "end": "b"
+      },
+      "anchors": {
+        "rise": {
+          "foot_l": [
+            0.283,
+            1.218,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            1.204,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.129,
+            5.99,
+            1.327
+          ],
+          "fwtip_r": [
+            -3.129,
+            5.99,
+            1.327
+          ],
+          "hwtip_l": [
+            2.746,
+            2.976,
+            0.555
+          ],
+          "hwtip_r": [
+            -2.746,
+            2.976,
+            0.555
+          ],
+          "core": [
+            0,
+            3.238,
+            -0.233
+          ],
+          "head": [
+            0,
+            3.511,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.65,
+            0.34
+          ],
+          "hand_l_a": [
+            0.36,
+            3.652,
+            0.34
+          ]
+        },
+        "dive": {
+          "foot_l": [
+            0.283,
+            4.837,
+            1.132
+          ],
+          "foot_r": [
+            -0.283,
+            4.809,
+            1.132
+          ],
+          "fwtip_l": [
+            -0.557,
+            9.029,
+            -3.199
+          ],
+          "fwtip_r": [
+            0.557,
+            9.029,
+            -3.199
+          ],
+          "hwtip_l": [
+            2.601,
+            6.943,
+            -1.075
+          ],
+          "hwtip_r": [
+            -2.601,
+            6.943,
+            -1.075
+          ],
+          "core": [
+            0,
+            5.803,
+            -0.643
+          ],
+          "head": [
+            0,
+            6.129,
+            -0.769
+          ],
+          "hand_r_a": [
+            -0.36,
+            6.496,
+            -0.7
+          ],
+          "hand_l_a": [
+            0.36,
+            6.512,
+            -0.725
+          ]
+        },
+        "slam": {
+          "foot_l": [
+            0.283,
+            1.011,
+            0.312
+          ],
+          "foot_r": [
+            -0.283,
+            0.99,
+            0.294
+          ],
+          "fwtip_l": [
+            2.383,
+            4.812,
+            -2.902
+          ],
+          "fwtip_r": [
+            -2.383,
+            4.812,
+            -2.902
+          ],
+          "hwtip_l": [
+            1.482,
+            2.042,
+            -1.651
+          ],
+          "hwtip_r": [
+            -1.482,
+            2.042,
+            -1.651
+          ],
+          "core": [
+            0,
+            2.892,
+            -0.427
+          ],
+          "head": [
+            0,
+            3.223,
+            -0.314
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.436,
+            -0.017
+          ],
+          "hand_l_a": [
+            0.36,
+            3.512,
+            -0.041
+          ]
+        },
+        "fan": {
+          "foot_l": [
+            0.297,
+            1.059,
+            0.477
+          ],
+          "foot_r": [
+            -0.297,
+            1.031,
+            0.449
+          ],
+          "fwtip_l": [
+            2.883,
+            4.896,
+            -2.477
+          ],
+          "fwtip_r": [
+            -2.883,
+            4.896,
+            -2.477
+          ],
+          "hwtip_l": [
+            1.912,
+            2.038,
+            -1.333
+          ],
+          "hwtip_r": [
+            -1.912,
+            2.038,
+            -1.333
+          ],
+          "core": [
+            0,
+            2.875,
+            -0.445
+          ],
+          "head": [
+            0,
+            3.211,
+            -0.345
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.428,
+            -0.054
+          ],
+          "hand_l_a": [
+            0.36,
+            3.517,
+            -0.087
+          ]
+        },
+        "glide": {
+          "foot_l": [
+            0.344,
+            1.638,
+            1.176
+          ],
+          "foot_r": [
+            -0.344,
+            1.536,
+            1.133
+          ],
+          "fwtip_l": [
+            1.964,
+            6.744,
+            0.351
+          ],
+          "fwtip_r": [
+            -1.964,
+            6.744,
+            0.351
+          ],
+          "hwtip_l": [
+            2.56,
+            3.236,
+            0.918
+          ],
+          "hwtip_r": [
+            -2.56,
+            3.236,
+            0.918
+          ],
+          "core": [
+            0,
+            2.774,
+            -0.533
+          ],
+          "head": [
+            0,
+            3.123,
+            -0.503
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.401,
+            -0.267
+          ],
+          "hand_l_a": [
+            0.36,
+            3.471,
+            -0.311
+          ]
+        }
+      }
+    },
+    {
+      "id": 17,
+      "name": "coco",
+      "len": 76,
+      "loop": false,
+      "next": "idle_b",
+      "events": {
+        "wrap": 5,
+        "orb1": 19,
+        "ball": 30,
+        "ball_open": 42,
+        "orb2": 46
+      },
+      "keyFiles": 50,
+      "keys": 468,
+      "note": "B4 달빛 축복: wings wrap forward (charge), orb 1 launched at 19 (rig/prop/orb), the cocoon ball 30-42 (rig/prop/pod), orb 2 at 46",
+      "form": {
+        "start": "b",
+        "end": "b"
+      },
+      "anchors": {
+        "wrap": {
+          "foot_l": [
+            0.283,
+            1.218,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            1.204,
+            -0.206
+          ],
+          "fwtip_l": [
+            2.383,
+            5.889,
+            -1.902
+          ],
+          "fwtip_r": [
+            -2.383,
+            5.889,
+            -1.902
+          ],
+          "hwtip_l": [
+            1.482,
+            2.858,
+            -1.674
+          ],
+          "hwtip_r": [
+            -1.482,
+            2.858,
+            -1.674
+          ],
+          "core": [
+            0,
+            3.238,
+            -0.233
+          ],
+          "head": [
+            0,
+            3.511,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.685,
+            0.341
+          ],
+          "hand_l_a": [
+            0.36,
+            3.616,
+            0.339
+          ]
+        },
+        "orb1": {
+          "foot_l": [
+            0.283,
+            1.218,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            1.204,
+            -0.206
+          ],
+          "fwtip_l": [
+            1.994,
+            6.847,
+            1.269
+          ],
+          "fwtip_r": [
+            -1.994,
+            6.847,
+            1.269
+          ],
+          "hwtip_l": [
+            2.767,
+            3.468,
+            0.503
+          ],
+          "hwtip_r": [
+            -2.767,
+            3.468,
+            0.503
+          ],
+          "core": [
+            0,
+            3.238,
+            -0.233
+          ],
+          "head": [
+            0,
+            3.511,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.658,
+            0.34
+          ],
+          "hand_l_a": [
+            0.36,
+            3.64,
+            0.34
+          ]
+        },
+        "ball": {
+          "foot_l": [
+            0.265,
+            1.618,
+            -0.086
+          ],
+          "foot_r": [
+            -0.261,
+            1.613,
+            -0.063
+          ],
+          "fwtip_l": [
+            1.775,
+            0.145,
+            -1.056
+          ],
+          "fwtip_r": [
+            -1.775,
+            0.145,
+            -1.056
+          ],
+          "hwtip_l": [
+            2.399,
+            2.739,
+            -1.057
+          ],
+          "hwtip_r": [
+            -2.399,
+            2.739,
+            -1.057
+          ],
+          "core": [
+            0,
+            3.039,
+            -0.462
+          ],
+          "head": [
+            0,
+            3.387,
+            -0.42
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.649,
+            -0.169
+          ],
+          "hand_l_a": [
+            0.36,
+            3.735,
+            -0.219
+          ]
+        },
+        "ball_open": {
+          "foot_l": [
+            0.265,
+            1.618,
+            -0.086
+          ],
+          "foot_r": [
+            -0.261,
+            1.613,
+            -0.063
+          ],
+          "fwtip_l": [
+            1.775,
+            0.145,
+            -1.056
+          ],
+          "fwtip_r": [
+            -1.775,
+            0.145,
+            -1.056
+          ],
+          "hwtip_l": [
+            2.399,
+            2.739,
+            -1.057
+          ],
+          "hwtip_r": [
+            -2.399,
+            2.739,
+            -1.057
+          ],
+          "core": [
+            0,
+            3.039,
+            -0.462
+          ],
+          "head": [
+            0,
+            3.387,
+            -0.42
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.705,
+            -0.202
+          ],
+          "hand_l_a": [
+            0.36,
+            3.68,
+            -0.187
+          ]
+        },
+        "orb2": {
+          "foot_l": [
+            0.283,
+            1.218,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            1.204,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.029,
+            6.151,
+            1.17
+          ],
+          "fwtip_r": [
+            -3.029,
+            6.151,
+            1.17
+          ],
+          "hwtip_l": [
+            2.65,
+            2.572,
+            0.575
+          ],
+          "hwtip_r": [
+            -2.65,
+            2.572,
+            0.575
+          ],
+          "core": [
+            0,
+            3.238,
+            -0.233
+          ],
+          "head": [
+            0,
+            3.511,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.69,
+            0.341
+          ],
+          "hand_l_a": [
+            0.36,
+            3.611,
+            0.339
+          ]
+        }
+      }
+    },
+    {
+      "id": 18,
+      "name": "release",
+      "len": 96,
+      "loop": false,
+      "next": "idle_h",
+      "events": {
+        "swoop": 0,
+        "whirl": 28,
+        "cup": 31,
+        "flash": 35,
+        "glint": 37,
+        "rings": 38,
+        "wrap": 44,
+        "detonation": 53,
+        "hover": 56,
+        "shrink": 87,
+        "flat": 87,
+        "shatter": 91,
+        "revert": 92,
+        "land": 96
+      },
+      "keyFiles": 77,
+      "keys": 1386,
+      "note": "B5 달빛 해제: wings fold, swoop past (0-8), climb, mid-air whirl (2 tumbles 12-28, the star flare at 28), cup (31 = E-22), ground flash 35, X glint 37, ring cage 38-43, the pod wrap (44-52), DETONATION at 53, hover 2 b up, the wings go flat lime and shrink (87) and shatter (91), the human form drops (92) and lands (96); the form switches to human at 92",
+      "form": {
+        "start": "b",
+        "end": "h",
+        "switch": [
+          92,
+          "human"
+        ]
+      },
+      "anchors": {
+        "swoop": {
+          "foot_l": [
+            0.283,
+            1.218,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            1.204,
+            -0.206
+          ],
+          "fwtip_l": [
+            -0.557,
+            7.065,
+            1.284
+          ],
+          "fwtip_r": [
+            0.557,
+            7.065,
+            1.284
+          ],
+          "hwtip_l": [
+            2.601,
+            4.182,
+            0.539
+          ],
+          "hwtip_r": [
+            -2.601,
+            4.182,
+            0.539
+          ],
+          "core": [
+            0,
+            3.238,
+            -0.233
+          ],
+          "head": [
+            0,
+            3.511,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            3.65,
+            0.34
+          ],
+          "hand_l_a": [
+            0.36,
+            3.652,
+            0.34
+          ]
+        },
+        "whirl": {
+          "foot_l": [
+            0.283,
+            3.488,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            3.474,
+            -0.206
+          ],
+          "fwtip_l": [
+            -0.557,
+            9.335,
+            1.284
+          ],
+          "fwtip_r": [
+            0.557,
+            9.335,
+            1.284
+          ],
+          "hwtip_l": [
+            2.601,
+            6.452,
+            0.539
+          ],
+          "hwtip_r": [
+            -2.601,
+            6.452,
+            0.539
+          ],
+          "core": [
+            0,
+            5.508,
+            -0.233
+          ],
+          "head": [
+            0,
+            5.781,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            5.872,
+            0.338
+          ],
+          "hand_l_a": [
+            0.36,
+            5.967,
+            0.342
+          ]
+        },
+        "cup": {
+          "foot_l": [
+            0.283,
+            3.288,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            3.274,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.129,
+            8.06,
+            1.327
+          ],
+          "fwtip_r": [
+            -3.129,
+            8.06,
+            1.327
+          ],
+          "hwtip_l": [
+            2.746,
+            5.046,
+            0.555
+          ],
+          "hwtip_r": [
+            -2.746,
+            5.046,
+            0.555
+          ],
+          "core": [
+            0,
+            5.308,
+            -0.233
+          ],
+          "head": [
+            0,
+            5.581,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            5.671,
+            0.338
+          ],
+          "hand_l_a": [
+            0.36,
+            5.77,
+            0.342
+          ]
+        },
+        "flash": {
+          "foot_l": [
+            0.283,
+            3.109,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            3.095,
+            -0.206
+          ],
+          "fwtip_l": [
+            2.642,
+            7.76,
+            -1.667
+          ],
+          "fwtip_r": [
+            -2.642,
+            7.76,
+            -1.667
+          ],
+          "hwtip_l": [
+            1.722,
+            4.727,
+            -1.526
+          ],
+          "hwtip_r": [
+            -1.722,
+            4.727,
+            -1.526
+          ],
+          "core": [
+            0,
+            5.129,
+            -0.233
+          ],
+          "head": [
+            0,
+            5.402,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            5.505,
+            0.339
+          ],
+          "hand_l_a": [
+            0.36,
+            5.578,
+            0.341
+          ]
+        },
+        "glint": {
+          "foot_l": [
+            0.283,
+            3.088,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            3.074,
+            -0.206
+          ],
+          "fwtip_l": [
+            2.383,
+            7.759,
+            -1.902
+          ],
+          "fwtip_r": [
+            -2.383,
+            7.759,
+            -1.902
+          ],
+          "hwtip_l": [
+            1.482,
+            4.728,
+            -1.674
+          ],
+          "hwtip_r": [
+            -1.482,
+            4.728,
+            -1.674
+          ],
+          "core": [
+            0,
+            5.108,
+            -0.233
+          ],
+          "head": [
+            0,
+            5.381,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            5.497,
+            0.339
+          ],
+          "hand_l_a": [
+            0.36,
+            5.545,
+            0.341
+          ]
+        },
+        "rings": {
+          "foot_l": [
+            0.283,
+            3.088,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            3.074,
+            -0.206
+          ],
+          "fwtip_l": [
+            2.383,
+            7.759,
+            -1.902
+          ],
+          "fwtip_r": [
+            -2.383,
+            7.759,
+            -1.902
+          ],
+          "hwtip_l": [
+            1.482,
+            4.728,
+            -1.674
+          ],
+          "hwtip_r": [
+            -1.482,
+            4.728,
+            -1.674
+          ],
+          "core": [
+            0,
+            5.108,
+            -0.233
+          ],
+          "head": [
+            0,
+            5.381,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            5.505,
+            0.339
+          ],
+          "hand_l_a": [
+            0.36,
+            5.537,
+            0.341
+          ]
+        },
+        "wrap": {
+          "foot_l": [
+            0.283,
+            3.088,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            3.074,
+            -0.206
+          ],
+          "fwtip_l": [
+            2.383,
+            7.759,
+            -1.902
+          ],
+          "fwtip_r": [
+            -2.383,
+            7.759,
+            -1.902
+          ],
+          "hwtip_l": [
+            1.482,
+            4.728,
+            -1.674
+          ],
+          "hwtip_r": [
+            -1.482,
+            4.728,
+            -1.674
+          ],
+          "core": [
+            0,
+            5.108,
+            -0.233
+          ],
+          "head": [
+            0,
+            5.381,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            5.549,
+            0.341
+          ],
+          "hand_l_a": [
+            0.36,
+            5.492,
+            0.339
+          ]
+        },
+        "detonation": {
+          "foot_l": [
+            0.283,
+            3.088,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            3.074,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.029,
+            8.021,
+            1.17
+          ],
+          "fwtip_r": [
+            -3.029,
+            8.021,
+            1.17
+          ],
+          "hwtip_l": [
+            2.65,
+            4.442,
+            0.575
+          ],
+          "hwtip_r": [
+            -2.65,
+            4.442,
+            0.575
+          ],
+          "core": [
+            0,
+            5.108,
+            -0.233
+          ],
+          "head": [
+            0,
+            5.381,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            5.565,
+            0.342
+          ],
+          "hand_l_a": [
+            0.36,
+            5.475,
+            0.338
+          ]
+        },
+        "hover": {
+          "foot_l": [
+            0.283,
+            3.088,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            3.074,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.029,
+            8.021,
+            1.17
+          ],
+          "fwtip_r": [
+            -3.029,
+            8.021,
+            1.17
+          ],
+          "hwtip_l": [
+            2.65,
+            4.442,
+            0.575
+          ],
+          "hwtip_r": [
+            -2.65,
+            4.442,
+            0.575
+          ],
+          "core": [
+            0,
+            5.108,
+            -0.233
+          ],
+          "head": [
+            0,
+            5.381,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            5.549,
+            0.341
+          ],
+          "hand_l_a": [
+            0.36,
+            5.489,
+            0.339
+          ]
+        },
+        "shrink": {
+          "foot_l": [
+            0.283,
+            2.988,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            2.974,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.029,
+            7.921,
+            1.17
+          ],
+          "fwtip_r": [
+            -3.029,
+            7.921,
+            1.17
+          ],
+          "hwtip_l": [
+            2.65,
+            4.342,
+            0.575
+          ],
+          "hwtip_r": [
+            -2.65,
+            4.342,
+            0.575
+          ],
+          "core": [
+            0,
+            5.008,
+            -0.233
+          ],
+          "head": [
+            0,
+            5.281,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            5.465,
+            0.342
+          ],
+          "hand_l_a": [
+            0.36,
+            5.376,
+            0.338
+          ]
+        },
+        "flat": {
+          "foot_l": [
+            0.283,
+            2.988,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            2.974,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.029,
+            7.921,
+            1.17
+          ],
+          "fwtip_r": [
+            -3.029,
+            7.921,
+            1.17
+          ],
+          "hwtip_l": [
+            2.65,
+            4.342,
+            0.575
+          ],
+          "hwtip_r": [
+            -2.65,
+            4.342,
+            0.575
+          ],
+          "core": [
+            0,
+            5.008,
+            -0.233
+          ],
+          "head": [
+            0,
+            5.281,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            5.465,
+            0.342
+          ],
+          "hand_l_a": [
+            0.36,
+            5.376,
+            0.338
+          ]
+        },
+        "shatter": {
+          "foot_l": [
+            0.283,
+            2.988,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            2.974,
+            -0.206
+          ],
+          "fwtip_l": [
+            1.724,
+            6.605,
+            0.749
+          ],
+          "fwtip_r": [
+            -1.724,
+            6.605,
+            0.749
+          ],
+          "hwtip_l": [
+            1.535,
+            4.71,
+            0.478
+          ],
+          "hwtip_r": [
+            -1.535,
+            4.71,
+            0.478
+          ],
+          "core": [
+            0,
+            5.008,
+            -0.233
+          ],
+          "head": [
+            0,
+            5.281,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            5.469,
+            0.342
+          ],
+          "hand_l_a": [
+            0.36,
+            5.37,
+            0.338
+          ]
+        },
+        "revert": {
+          "foot_l": [
+            0.403,
+            2.737,
+            0.383
+          ],
+          "foot_r": [
+            -0.403,
+            2.713,
+            0.298
+          ],
+          "fwtip_l": [
+            0.42,
+            5.04,
+            0.158
+          ],
+          "fwtip_r": [
+            -0.42,
+            5.04,
+            0.158
+          ],
+          "hwtip_l": [
+            0.42,
+            4.844,
+            0.254
+          ],
+          "hwtip_r": [
+            -0.42,
+            4.844,
+            0.254
+          ],
+          "core": [
+            0,
+            4.649,
+            -0.331
+          ],
+          "head": [
+            0,
+            4.961,
+            -0.173
+          ],
+          "hand_r_a": [
+            -1.05,
+            5.567,
+            -0.088
+          ],
+          "hand_l_a": [
+            0.84,
+            4.533,
+            -0.092
+          ]
+        },
+        "land": {
+          "foot_l": [
+            0.424,
+            -0.052,
+            -0.261
+          ],
+          "foot_r": [
+            -0.424,
+            -0.052,
+            -0.261
+          ],
+          "fwtip_l": [
+            0.42,
+            2.205,
+            -0.018
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.205,
+            -0.018
+          ],
+          "hwtip_l": [
+            0.42,
+            2.033,
+            0.117
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.033,
+            0.117
+          ],
+          "core": [
+            0,
+            1.721,
+            -0.415
+          ],
+          "head": [
+            0,
+            2.059,
+            -0.326
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.652,
+            -0.362
+          ],
+          "hand_l_a": [
+            0.84,
+            1.672,
+            -0.163
+          ]
+        }
+      }
+    },
+    {
+      "id": 19,
+      "name": "revert",
+      "len": 43,
+      "loop": false,
+      "next": "idle_h",
+      "events": {
+        "shrink": 30,
+        "flat": 34,
+        "shatter": 38,
+        "revert": 39,
+        "land": 43
+      },
+      "keyFiles": 29,
+      "keys": 296,
+      "note": "butterfly -> human without the blast (the end of 달빛 해제): hover, the wings shrink, go flat lime and shatter, she drops and lands; the form switches to human at 39",
+      "form": {
+        "start": "b",
+        "end": "h",
+        "switch": [
+          39,
+          "human"
+        ]
+      },
+      "anchors": {
+        "shrink": {
+          "foot_l": [
+            0.283,
+            2.088,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            2.074,
+            -0.206
+          ],
+          "fwtip_l": [
+            3.029,
+            7.021,
+            1.17
+          ],
+          "fwtip_r": [
+            -3.029,
+            7.021,
+            1.17
+          ],
+          "hwtip_l": [
+            2.65,
+            3.442,
+            0.575
+          ],
+          "hwtip_r": [
+            -2.65,
+            3.442,
+            0.575
+          ],
+          "core": [
+            0,
+            4.108,
+            -0.233
+          ],
+          "head": [
+            0,
+            4.381,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            4.47,
+            0.338
+          ],
+          "hand_l_a": [
+            0.36,
+            4.57,
+            0.342
+          ]
+        },
+        "flat": {
+          "foot_l": [
+            0.283,
+            2.088,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            2.074,
+            -0.206
+          ],
+          "fwtip_l": [
+            1.724,
+            5.705,
+            0.749
+          ],
+          "fwtip_r": [
+            -1.724,
+            5.705,
+            0.749
+          ],
+          "hwtip_l": [
+            1.535,
+            3.81,
+            0.478
+          ],
+          "hwtip_r": [
+            -1.535,
+            3.81,
+            0.478
+          ],
+          "core": [
+            0,
+            4.108,
+            -0.233
+          ],
+          "head": [
+            0,
+            4.381,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            4.48,
+            0.339
+          ],
+          "hand_l_a": [
+            0.36,
+            4.562,
+            0.341
+          ]
+        },
+        "shatter": {
+          "foot_l": [
+            0.283,
+            2.088,
+            -0.181
+          ],
+          "foot_r": [
+            -0.283,
+            2.074,
+            -0.206
+          ],
+          "fwtip_l": [
+            1.724,
+            5.705,
+            0.749
+          ],
+          "fwtip_r": [
+            -1.724,
+            5.705,
+            0.749
+          ],
+          "hwtip_l": [
+            1.535,
+            3.81,
+            0.478
+          ],
+          "hwtip_r": [
+            -1.535,
+            3.81,
+            0.478
+          ],
+          "core": [
+            0,
+            4.108,
+            -0.233
+          ],
+          "head": [
+            0,
+            4.381,
+            -0.013
+          ],
+          "hand_r_a": [
+            -0.36,
+            4.505,
+            0.339
+          ],
+          "hand_l_a": [
+            0.36,
+            4.537,
+            0.341
+          ]
+        },
+        "revert": {
+          "foot_l": [
+            0.398,
+            2.147,
+            0.287
+          ],
+          "foot_r": [
+            -0.4,
+            2.124,
+            0.227
+          ],
+          "fwtip_l": [
+            0.42,
+            4.44,
+            0.158
+          ],
+          "fwtip_r": [
+            -0.42,
+            4.44,
+            0.158
+          ],
+          "hwtip_l": [
+            0.42,
+            4.244,
+            0.254
+          ],
+          "hwtip_r": [
+            -0.42,
+            4.244,
+            0.254
+          ],
+          "core": [
+            0,
+            4.049,
+            -0.331
+          ],
+          "head": [
+            0,
+            4.361,
+            -0.173
+          ],
+          "hand_r_a": [
+            -1.05,
+            4.912,
+            -0.079
+          ],
+          "hand_l_a": [
+            0.84,
+            3.99,
+            -0.102
+          ]
+        },
+        "land": {
+          "foot_l": [
+            0.424,
+            -0.052,
+            -0.261
+          ],
+          "foot_r": [
+            -0.424,
+            -0.052,
+            -0.261
+          ],
+          "fwtip_l": [
+            0.42,
+            2.205,
+            -0.018
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.205,
+            -0.018
+          ],
+          "hwtip_l": [
+            0.42,
+            2.033,
+            0.117
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.033,
+            0.117
+          ],
+          "core": [
+            0,
+            1.721,
+            -0.415
+          ],
+          "head": [
+            0,
+            2.059,
+            -0.326
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.646,
+            -0.359
+          ],
+          "hand_l_a": [
+            0.84,
+            1.682,
+            -0.167
+          ]
+        }
+      }
+    },
+    {
+      "id": 20,
+      "name": "death",
+      "len": 100,
+      "loop": false,
+      "next": null,
+      "events": {
+        "stagger": 0,
+        "shatter": 6,
+        "kneel": 24,
+        "dissolve": 40,
+        "gone": 100
+      },
+      "keyFiles": 61,
+      "keys": 245,
+      "note": "she staggers; from butterfly form the wings go flat lime and shrink away over 6 t (the shatter at 6) while she sinks to the floor; she kneels, then dissolves into rising motes (scale out); call kill after 100. Starts from either form",
+      "form": {
+        "start": "h",
+        "end": "h"
+      },
+      "anchors": {
+        "stagger": {
+          "foot_l": [
+            0.42,
+            0,
+            -0.06
+          ],
+          "foot_r": [
+            -0.42,
+            0,
+            -0.06
+          ],
+          "fwtip_l": [
+            0.42,
+            2.351,
+            0.407
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.351,
+            0.407
+          ],
+          "hwtip_l": [
+            0.42,
+            2.134,
+            0.437
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.134,
+            0.437
+          ],
+          "core": [
+            0,
+            2.13,
+            -0.179
+          ],
+          "head": [
+            0,
+            2.378,
+            0.068
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.881,
+            0.329
+          ],
+          "hand_l_a": [
+            0.84,
+            1.995,
+            0.02
+          ]
+        },
+        "shatter": {
+          "foot_l": [
+            0.42,
+            0,
+            -0.06
+          ],
+          "foot_r": [
+            -0.42,
+            0,
+            -0.06
+          ],
+          "fwtip_l": [
+            0.42,
+            2.351,
+            0.407
+          ],
+          "fwtip_r": [
+            -0.42,
+            2.351,
+            0.407
+          ],
+          "hwtip_l": [
+            0.42,
+            2.134,
+            0.437
+          ],
+          "hwtip_r": [
+            -0.42,
+            2.134,
+            0.437
+          ],
+          "core": [
+            0,
+            2.13,
+            -0.179
+          ],
+          "head": [
+            0,
+            2.378,
+            0.068
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.921,
+            0.334
+          ],
+          "hand_l_a": [
+            0.84,
+            1.954,
+            0.014
+          ]
+        },
+        "kneel": {
+          "foot_l": [
+            0.293,
+            0.205,
+            -0.249
+          ],
+          "foot_r": [
+            -0.272,
+            0.431,
+            0.609
+          ],
+          "fwtip_l": [
+            0.42,
+            1.858,
+            -0.278
+          ],
+          "fwtip_r": [
+            -0.42,
+            1.858,
+            -0.278
+          ],
+          "hwtip_l": [
+            0.42,
+            1.736,
+            -0.097
+          ],
+          "hwtip_r": [
+            -0.42,
+            1.736,
+            -0.097
+          ],
+          "core": [
+            0,
+            1.275,
+            -0.506
+          ],
+          "head": [
+            0,
+            1.624,
+            -0.526
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.132,
+            -0.705
+          ],
+          "hand_l_a": [
+            0.84,
+            1.352,
+            -0.289
+          ]
+        },
+        "dissolve": {
+          "foot_l": [
+            0.293,
+            0.205,
+            -0.249
+          ],
+          "foot_r": [
+            -0.272,
+            0.431,
+            0.609
+          ],
+          "fwtip_l": [
+            0.42,
+            1.858,
+            -0.278
+          ],
+          "fwtip_r": [
+            -0.42,
+            1.858,
+            -0.278
+          ],
+          "hwtip_l": [
+            0.42,
+            1.736,
+            -0.097
+          ],
+          "hwtip_r": [
+            -0.42,
+            1.736,
+            -0.097
+          ],
+          "core": [
+            0,
+            1.275,
+            -0.506
+          ],
+          "head": [
+            0,
+            1.624,
+            -0.526
+          ],
+          "hand_r_a": [
+            -1.05,
+            2.154,
+            -0.724
+          ],
+          "hand_l_a": [
+            0.84,
+            1.332,
+            -0.273
+          ]
+        },
+        "gone": {
+          "foot_l": [
+            0.293,
+            1.355,
+            -0.249
+          ],
+          "foot_r": [
+            -0.272,
+            1.581,
+            0.609
+          ],
+          "fwtip_l": [
+            0,
+            2.1,
+            0
+          ],
+          "fwtip_r": [
+            0,
+            2.1,
+            0
+          ],
+          "hwtip_l": [
+            0,
+            2.1,
+            0
+          ],
+          "hwtip_r": [
+            0,
+            2.1,
+            0
+          ],
+          "core": [
+            0,
+            2.1,
+            0
+          ],
+          "head": [
+            0,
+            2.1,
+            0
+          ],
+          "hand_r_a": [
+            0,
+            2.1,
+            0
+          ],
+          "hand_l_a": [
+            0,
+            2.1,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "id": 21,
+      "name": "chain_reform",
+      "len": 18,
+      "loop": false,
+      "next": "idle_h",
+      "events": {},
+      "keyFiles": 15,
+      "keys": 65,
+      "note": "the crescent chain re-forms after groggy (hands scale back in, with a flourish)",
+      "form": {
+        "start": "h",
+        "end": "h"
+      },
+      "anchors": {}
+    }
+  ],
+  "forms": {
+    "transform": [
+      4,
+      "butterfly"
+    ],
+    "release": [
+      92,
+      "human"
+    ],
+    "revert": [
+      39,
+      "human"
+    ]
+  },
+  "form_states": {
+    "human": {
+      "id": 1,
+      "idle": "idle_h",
+      "rest_anchors": {
+        "foot_l": [
+          0.42,
+          0,
+          -0.06
+        ],
+        "foot_r": [
+          -0.42,
+          0,
+          -0.06
+        ],
+        "fwtip_l": [
+          0.42,
+          2.44,
+          0.158
+        ],
+        "fwtip_r": [
+          -0.42,
+          2.44,
+          0.158
+        ],
+        "hwtip_l": [
+          0.42,
+          2.244,
+          0.254
+        ],
+        "hwtip_r": [
+          -0.42,
+          2.244,
+          0.254
+        ],
+        "core": [
+          0,
+          2.049,
+          -0.331
+        ],
+        "head": [
+          0,
+          2.361,
+          -0.173
+        ],
+        "hand_r_a": [
+          -1.05,
+          2.92,
+          -0.08
+        ],
+        "hand_l_a": [
+          0.84,
+          1.982,
+          -0.1
+        ]
+      },
+      "toe_height": 0
+    },
+    "butterfly": {
+      "id": 2,
+      "idle": "idle_b",
+      "rest_anchors": {
+        "foot_l": [
+          0.283,
+          1.218,
+          -0.181
+        ],
+        "foot_r": [
+          -0.283,
+          1.204,
+          -0.206
+        ],
+        "fwtip_l": [
+          3.129,
+          5.99,
+          1.327
+        ],
+        "fwtip_r": [
+          -3.129,
+          5.99,
+          1.327
+        ],
+        "hwtip_l": [
+          2.746,
+          2.976,
+          0.555
+        ],
+        "hwtip_r": [
+          -2.746,
+          2.976,
+          0.555
+        ],
+        "core": [
+          0,
+          3.238,
+          -0.233
+        ],
+        "head": [
+          0,
+          3.511,
+          -0.013
+        ],
+        "hand_r_a": [
+          -0.36,
+          3.65,
+          0.34
+        ],
+        "hand_l_a": [
+          0.36,
+          3.652,
+          0.34
+        ]
+      },
+      "toe_height": 1.204
+    }
+  },
+  "looks": [
+    "dendro",
+    "pyro",
+    "flat"
+  ],
+  "look_ids": {
+    "dendro": 0,
+    "pyro": 1,
+    "flat": 2
+  },
+  "look_parts": [
+    "fwing_l",
+    "fwing_r",
+    "fwglow_l",
+    "fwglow_r",
+    "hwing_l",
+    "hwing_r",
+    "tendril_ul",
+    "tendril_ur",
+    "tendril_ll",
+    "tendril_lr"
+  ],
+  "props": {
+    "cocoon": {
+      "function": "rlk:mboss/butterfly/rig/prop/cocoon",
+      "tag": "rlk_mb_bf_prop_cocoon",
+      "displays": [
+        {
+          "model": "rlk:mboss/butterfly/cocoon",
+          "scale": 3,
+          "billboard": "fixed"
+        },
+        {
+          "model": "rlk:mboss/butterfly/cocoon_halo",
+          "scale": 3,
+          "billboard": "center"
+        }
+      ],
+      "note": "the entrance cocoon (3.8 b tall, wrapped wing plates, a glowing lime window, a lime spike) and its glow halo (billboard centre); the module hides it at the burst"
+    },
+    "pod": {
+      "function": "rlk:mboss/butterfly/rig/prop/pod",
+      "tag": "rlk_mb_bf_prop_pod",
+      "displays": [
+        {
+          "model": "rlk:mboss/butterfly/pod",
+          "scale": 2.5,
+          "billboard": "fixed"
+        }
+      ],
+      "note": "the wrapped wing pod (코코볼 ball, 달빛 해제 wrap; 3.4 b tall, r 1.4 b) centred on the execution point"
+    },
+    "orb": {
+      "function": "rlk:mboss/butterfly/rig/prop/orb",
+      "tag": "rlk_mb_bf_prop_orb",
+      "displays": [
+        {
+          "model": "rlk:mboss/butterfly/orb",
+          "scale": 1,
+          "billboard": "fixed"
+        },
+        {
+          "model": "rlk:mboss/butterfly/ring",
+          "scale": 1,
+          "billboard": "fixed"
+        },
+        {
+          "model": "rlk:mboss/butterfly/ring",
+          "scale": 1,
+          "billboard": "fixed"
+        }
+      ],
+      "note": "the 달빛 축복 orb: a 1.7 b lime glass sphere and two gyroscope rings (spin them with transformation keys)"
+    }
+  },
+  "objectives": {
+    "bfRigC": "current clip id (anchor)",
+    "bfRigT": "tick within the clip (anchor; -1 = queued by play)",
+    "bfRigF": "hit flash countdown",
+    "bfRigY": "face/track scratch",
+    "bfRigForm": "form: 1 human, 2 butterfly",
+    "bfRigLook": "wing look: 0 dendro, 1 pyro, 2 flat",
+    "bfRigFlat": "1 while a clip shows the temporary flat look",
+    "bfRigTell": "1 while the crescents glow (tell)"
+  },
+  "textures": 54,
+  "atlas_px": 1058304
+}

@@ -1,0 +1,5 @@
+data merge entity 524c4b4d-4246-4c00-8000-00000000000f {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-1.05f,2.91792f,-0.29736f],left_rotation:[-0.14204f,-0.00166f,0.05231f,0.98848f],scale:[0.58971f,0.58971f,0.58971f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4246-4c00-8000-000000000010 {start_interpolation:0,interpolation_duration:3,transformation:{translation:[-0.86f,2.09446f,-0.01112f],left_rotation:[-0.12417f,0.00758f,-0.15625f,0.97985f],scale:[0.57778f,0.57778f,0.57778f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4246-4c00-8000-000000000011 {start_interpolation:0,interpolation_duration:3,transformation:{translation:[0.84f,1.90364f,0.00834f],left_rotation:[-0.12503f,-0.00507f,0.10441f,0.98663f],scale:[0.57778f,0.57778f,0.57778f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4246-4c00-8000-000000000012 {start_interpolation:0,interpolation_duration:3,transformation:{translation:[1f,1.46953f,0.06294f],left_rotation:[-0.12297f,0.01008f,-0.20767f,0.97039f],scale:[0.57778f,0.57778f,0.57778f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:mboss/butterfly/rig/look_apply
