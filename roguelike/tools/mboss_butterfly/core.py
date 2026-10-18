@@ -274,10 +274,12 @@ class Core:
             f'execute if score #bfFlash mb matches 1 run {R("flash")}',
             sc_set('#bfFlash', 0),
             f'execute if score #bfDewN mb matches 1.. run {F("dew/all")}',
+            f'execute if score #bpS5T mb matches 1.. at @e[tag=rlk_body,limit=1] run {F("wx/cure/tick")}',  # wing author: S5 cure fx clock
             f'execute if score #mbHealEv mb matches 1.. run {F("coc/heal_ev")}',
             f'execute if score #bfBurnQ mb matches 1 run {F("burn/start")}',
             'execute if score #bfForm mb matches 1 run scoreboard players add #bfHumT mb 1',
             'execute if score #bfForm mb matches 2 run scoreboard players add #bfBfT mb 1',
+            f'execute if score #bfForm mb matches 2 run {F("wx/u/btick")}',  # wing author: body leash r 16.5 (Q9), S6 Pyro embers
             F('ai/state'),
             f'execute if score #bfPat mb matches 1.. run {F("p/run")}',
             R('tick')])
@@ -772,13 +774,7 @@ class Core:
             'scoreboard players operation #bfLook mb = #bfWant mb',
             f'execute if score #bfLook mb matches {A.EL_PYRO} run {g.look("pyro")}',
             f'execute if score #bfLook mb matches {A.EL_DENDRO} run {g.look("dendro")}',
-            f'execute if score #bfLook mb matches {A.EL_PYRO} run ' + g.dust_fade(A.PYRO_GOLD, A.PYRO_MAG, 1.4, '~ ~3.0 ~', (1.6, 1.0, 0.6), 12),
-            f'execute if score #bfLook mb matches {A.EL_PYRO} run ' + g.particle('flame', '~ ~3.0 ~', (1.4, 0.8, 0.5), 0.02, 8),
-            f'execute if score #bfLook mb matches {A.EL_PYRO} rotated as @s rotated ~ 0 positioned ~ ~2.8 ~ run ' + g.fx('pyro_switch'),
-            f'execute if score #bfLook mb matches {A.EL_PYRO} run ' + g.snd('pyro_switch'),
-            f'execute if score #bfLook mb matches {A.EL_DENDRO} run ' + g.dust(A.LIME, 1.3, '~ ~3.0 ~', (1.6, 1.0, 0.6), 12),
-            f'execute if score #bfLook mb matches {A.EL_DENDRO} rotated as @s rotated ~ 0 positioned ~ ~2.8 ~ run ' + g.fx('dendro_switch'),
-            f'execute if score #bfLook mb matches {A.EL_DENDRO} run ' + g.snd('dendro_switch'),
+            F('wx/sw/fx'),  # wing author: S6 switch fx (seq_b.py)
             F('hud/refresh')])
         self.w('form/transform_done', [
             '# From ai/pat_done: the transformation clip is over: butterfly form, its counters, the first decision soon.',
@@ -799,21 +795,11 @@ class Core:
         g = self.g
         key = TRANSFORM.key
         tl = TL(g, key)
-        chest = 'execute rotated as @s rotated ~ 0 positioned ~ ~1.6 ~ run '
-        tl.at(0, g.look('dendro'), sc_set('#bfLook', A.EL_DENDRO), self.R('face/player'),
-              g.dust(A.hexrgb('#B5F089'), 1.3, '~ ~1.0 ~', (0.3, 0.7, 0.3), 10),
-              chest + g.fx('tf_sheath'), g.snd('transform_glow'))
-        for t in range(1, TR_OPEN):
-            tl.at(t, g.dust(A.hexrgb('#C2FA72'), 1.2, '~ ~1.0 ~', (0.25, 0.6, 0.25), 6))
-        tl.at(TR_OPEN, g.sound('entity.ender_dragon.flap', 0.6, 1.5), g.particle('end_rod', '~ ~2.3 ~', (0.4, 0.3, 0.4), 0.05, 6))
-        tl.at(TR_SPHERE - 1, g.dust(A.hexrgb('#FAFCD4'), 1.6, '~ ~2.2 ~', (0.15, 0.15, 0.15), 12))
-        tl.at(TR_SPHERE, chest + g.fx('tf_sphere'), g.snd('transform_swell'),
-              *ring(g, A.hexrgb('#F8FDBB'), 2.5, 12, y='1.6', scale=1.4))
-        tl.at(TR_RINGS, chest + g.fx('tf_ripples'),
-              *ring(g, A.hexrgb('#BDE592'), 4.0, 20, y='0.15', scale=1.2))
-        tl.at(TR_RINGS + 4, g.snd('flap_big'))
-        for t in range(TR_RINGS + 6, TR_LEN, 6):
-            tl.at(t, g.snd('flap_small'))
+        from . import seq_b  # wing author: S2 transformation fx + the wx/** helpers (seq_b.py)
+        seq_b.emit(g)
+        tl.at(0, g.look('dendro'), sc_set('#bfLook', A.EL_DENDRO), self.R('face/player'))
+        for t in seq_b.TF_TICKS:  # wing author: S2 fx per clip tick
+            tl.at(t, g.fn(f'{A.WX}/tf/{t}'))
         tl.at(TR_LEN, g.end())
         tl.write(['# Transformation (core service pattern 20; clip transform, @s = body, at it): the cocoon glows, the wings',
                   f'# open ({TR_OPEN}), the light sphere ({TR_SPHERE}: 달빛 고치 + 달빛 이슬 via p/svc), ripple rings, full spread; end {TR_LEN}.'],
@@ -890,8 +876,7 @@ class Core:
             sc_set('#bfCoc', 1), sc_set('#bfBuff', 0), sc_set('#bfDmgPct', A.COCOON_DMG),
             sc_set('#mbCritAdd', A.COCOON_CRIT), sc_set('#mbHealPct', A.COCOON_HEAL), sc_set('#mbHealEv', 0),
             'scoreboard players add #bfCocN mb 1',
-            'execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run ' + g.fx('coc_apply'),
-            'execute at @e[tag=rlk_body,limit=1] run ' + g.snd('debuff'),
+            f'execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run {F("wx/coc/fx")}',  # wing author: S2 debuff fx (seq_b.py)
             g.khud('buff_off'), g.khud('coc_on'), g.khud('ab_coc'),
             g.say('달빛 고치 — 회복하면 해제', A.COC_SWIRL_HEX, 2, 50, 1),
             F('hud/refresh')])
@@ -906,8 +891,7 @@ class Core:
             '# sparkles) and chime, the badges (coc_off, buff_on), the actionbar notice and the big reward badge.',
             sc_set('#bfCoc', 0), sc_set('#bfBuff', 1), sc_set('#bfDmgPct', A.BUFF_DMG), sc_set('#mbCritAdd', A.BUFF_CRIT),
             sc_set('#mbHealPct', 100),
-            'execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run ' + g.fx('cure'),
-            'execute at @e[tag=rlk_body,limit=1] run ' + g.snd('cure_chime'),
+            f'execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run {F("wx/cure/start")}',  # wing author: S5 cure fx (seq_b.py)
             g.khud('coc_off'), g.khud('buff_on'), g.khud('ab_buff'), g.khud('pop_buff'),
             F('hud/refresh')])
         self.w('coc/clear', [
@@ -915,6 +899,7 @@ class Core:
             '# executor; idempotent).',
             sc_set('#bfCoc', 0), sc_set('#bfBuff', 0), sc_set('#bfDmgPct', 100),
             sc_set('#mbCritAdd', 0), sc_set('#mbHealPct', 100), sc_set('#mbHealEv', 0),
+            sc_set('#bpS5T', 0),  # wing author: S5 cure fx clock
             g.khud('clear')])
         self.w('coc/clear_hud', [F('coc/clear'), f'execute if score #mbSt mb matches 0..1 run {F("hud/refresh")}'])
         self.w('coc/assert', [

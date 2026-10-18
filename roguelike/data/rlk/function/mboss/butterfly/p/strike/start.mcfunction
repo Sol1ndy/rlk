@@ -1,3 +1,4 @@
-# B1 우아한 날개 (STUB; clip wing_strike: dive 12, hit 15).
+# B1 우아한 날개 (clip wing_strike: dive 12, hit 15; lock 3, swoop 8-15).
+# One volley group: the lane 10 x 3.5 from her spot along the aim + the arc r 4 +-60 at L (130 % Dendro, KB 3).
 function rlk:mboss/butterfly/rig_stub/face/player
-playsound minecraft:entity.ender_dragon.flap hostile @a[tag=player] ~ ~ ~ 0.5 1.8 0.17
+function rlk:mboss/butterfly/wx/u/toward {d:0.15}

@@ -6,4 +6,5 @@ scoreboard players set #bfDmgPct mb 100
 scoreboard players set #mbCritAdd mb 0
 scoreboard players set #mbHealPct mb 100
 scoreboard players set #mbHealEv mb 0
+scoreboard players set #bpS5T mb 0
 function rlk:mboss/butterfly/fx/hud/clear

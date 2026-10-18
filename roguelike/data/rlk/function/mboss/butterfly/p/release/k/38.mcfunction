@@ -1,5 +1,4 @@
 # release clock 38
-scoreboard players set #hzKB mb 4
-scoreboard players set #hzSfx mb 4
-execute positioned ~ 201 ~ run function rlk:mboss/hz/disc {r:100,tell:15,dmg:260}
-playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.8 1.4 0.27
+# the gyroscope ring cage r 4 (refreshed 3 t later)
+execute rotated as @s rotated ~ 0 positioned ^0 ^3.24 ^0.23 run function rlk:mboss/butterfly/fx/p/rel_cage
+playsound minecraft:block.conduit.activate hostile @a[tag=player] ~ ~ ~ 0.5 1.4 0.17

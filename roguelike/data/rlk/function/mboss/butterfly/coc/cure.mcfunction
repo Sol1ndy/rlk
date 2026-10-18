@@ -6,8 +6,7 @@ scoreboard players set #bfBuff mb 1
 scoreboard players set #bfDmgPct mb 150
 scoreboard players set #mbCritAdd mb 15
 scoreboard players set #mbHealPct mb 100
-execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/fx/p/cure
-execute at @e[tag=rlk_body,limit=1] run function rlk:mboss/butterfly/fx/snd/cure_chime
+execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/wx/cure/start
 function rlk:mboss/butterfly/fx/hud/coc_off
 function rlk:mboss/butterfly/fx/hud/buff_on
 function rlk:mboss/butterfly/fx/hud/ab_buff

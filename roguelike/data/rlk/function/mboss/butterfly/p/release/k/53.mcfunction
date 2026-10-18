@@ -1,4 +1,6 @@
 # release clock 53
-playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 1 0.8 0.33
-playsound minecraft:entity.warden.sonic_boom hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2
-particle minecraft:dust{color:[0.714f,0.89f,0.353f],scale:2} ~ ~2 ~ 3 1.5 3 0 40 force @a[tag=player]
+# E: the detonation: white flash, the lime dome r 10 (kit rel_dome) at R, the big boom, a white screen flash
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run function rlk:mboss/butterfly/fx/p/rel_dome {r:10}
+function rlk:mboss/butterfly/fx/snd/release_boom
+function rlk:mboss/butterfly/fx/hud/flash_white
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:explosion_emitter ~ ~2 ~ 0 0 0 0 1 force @a[tag=player]

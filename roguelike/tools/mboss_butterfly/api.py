@@ -409,3 +409,78 @@ class TL:
         self.g.pw(self.key, 'start', list(start_head) + self.ev.get(t0, []))
         ts = sorted(t for t in self.ev if t > t0)
         self.g.pw(self.key, 'tick', list(tick_head) + self._node(ts))
+
+
+# =============================================================================================
+# Wing-pattern author (wing.py B1-B5, seq_b.py S2 / S5 / S6): shared helpers. The runtime side lives in
+# F:mboss/butterfly/wx/** (written by seq_b.emit): walk-disc and body clamps, the butterfly body leash.
+WX = 'wx'                     # F:mboss/butterfly/wx/** (seq_b.py)
+WALK_R = 20.3                 # locked ground-hazard targets: the walk disc (plan Q8; the framework's @WALKP@)
+BODY_R_B = 16.5               # her body in butterfly form (plan Q9: wing tips clear the wall ring)
+REL_R = 16.0                  # the 달빛 해제 release point (plan Q9)
+
+
+def _bf(v):
+    """body-frame tuple -> '^x ^y ^z' (x her left, y up, z forward)"""
+    return ' '.join('^' + L.num(round(float(c), 3), 3) for c in v)
+
+
+def anchor_xyz(clip, event, part, default):
+    """A rig fx anchor of the manifest (clips[].anchors[event][part], rig coordinates: x her left, y up, -z her front)
+    as a body-frame tuple (x left, y up, z forward); `default` (body frame) when the manifest has none (the stub)."""
+    c = next((c for c in _MAN.get('clips', []) if c.get('name') == clip), None)
+    a = ((c or {}).get('anchors') or {}).get(event, {}).get(part)
+    if a is None:
+        return tuple(float(x) for x in default)
+    return (float(a[0]), float(a[1]), -float(a[2]))
+
+
+def anchor(clip, event, part, default):
+    """anchor_xyz() as '^x ^y ^z' for an execute positioned in the body frame (rotated as the body, pitch 0)."""
+    return _bf(anchor_xyz(clip, event, part, default))
+
+
+def rest_anchor_xyz(form, part, default):
+    """A part's anchor in a form's rest pose (manifest form_states[form].rest_anchors), body frame."""
+    a = ((_MAN.get('form_states') or {}).get(form) or {}).get('rest_anchors', {}).get(part)
+    if a is None:
+        return tuple(float(x) for x in default)
+    return (float(a[0]), float(a[1]), -float(a[2]))
+
+
+def rest_anchor(form, part, default):
+    return _bf(rest_anchor_xyz(form, part, default))
+
+
+# Rest anchors of the hovering butterfly (the real rig's form_states.butterfly; the stub has none), body frame.
+B_CORE = (0.0, 3.24, 0.23)
+B_FWTIP_L, B_FWTIP_R = (3.13, 5.99, -1.33), (-3.13, 5.99, -1.33)
+B_HWTIP_L, B_HWTIP_R = (2.75, 2.98, -0.56), (-2.75, 2.98, -0.56)
+
+
+def lockw():
+    """Marker rlk_mb_bf_lock on the floor under the player, pulled inside the WALK disc (r 20.3, plan Q8: a player
+    hugging the wall is still covered); keep it with Gen.keep(tag, 'rlk_mb_bf_lock')."""
+    return f'function {NS}{WX}/u/lockw'
+
+
+def clamp_walk():
+    """As @s = a ground-target marker: pulled toward the arena axis until inside the walk disc (r 20.3)."""
+    return f'function {NS}{WX}/u/clamp_w'
+
+
+def clamp_body():
+    """As @s = a marker the butterfly body will move to: pulled inside r 16.5 (plan Q9)."""
+    return f'function {NS}{WX}/u/clamp_b'
+
+
+def clamp_release():
+    """As @s = the 달빛 해제 release-point marker: pulled inside r 16 (plan Q9)."""
+    return f'function {NS}{WX}/u/clamp_r'
+
+
+def bstep(kind, d):
+    """Butterfly body step (as / at the body): kind 'toward' / 'away' (the player) or 'fwd' (her yaw), d blocks,
+    only when the new spot is inside r 16.5 and free (wx/u/okb)."""
+    assert kind in ('toward', 'away', 'fwd'), kind
+    return f'function {NS}{WX}/u/{kind} {{d:{L.num(float(d))}}}'
