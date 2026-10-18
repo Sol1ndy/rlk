@@ -16,7 +16,7 @@ execute if score @s clBurst matches 1.. run scoreboard players set #lk view 1
 execute if score @s rnQ matches 1.. run scoreboard players set #lk view 1
 execute if score @s nfPT matches 1.. run scoreboard players set #lk view 1
 execute if score @s nfQ matches 1.. run scoreboard players set #lk view 1
-# 평타를 휘두르는 동안(swHold, player/swing/tick)은 걷는 방향으로 몸을 돌리지 않는다
+# 평타를 휘두르는 동안(swHold, player/swing/tick)은 걷는 방향으로 몸을 돌리지 않는다(조준선 쪽을 보고 휘두르며 걷는다)
 execute if score @s swHold matches 1 run scoreboard players set #lk view 1
 scoreboard players set #sprNow view 0
 execute if score @s pmMoveLock matches 1 run return run function rlk:view/stop_h
@@ -64,23 +64,23 @@ scoreboard players operation #mz view -= #az view
 scoreboard players set #inAct view 1
 scoreboard players operation #inx view = #mx view
 scoreboard players operation #inz view = #mz view
-# 달리기 시야 효과
+# 달리기 시야 효과. 휘두르는 동안에도 그대로 두어 휘두를 때마다 시야가 출렁이지 않게 한다
 scoreboard players set #sprNow view 0
 execute if score #f view matches 1 if predicate rlk:in_sprint run scoreboard players set #sprNow view 1
-# 평타를 휘두르는 동안(swHold): 누른 방향은 대쉬 방향(#inx/#inz)으로만 쓰고 아바타는 걷지 않는다. 걷던 속도는 휘두르기 시작한 틱에
-# player/swing/tick 이 지웠고(stop_h), 그 뒤에 받은 넉백 · 떨어지기 · 동작의 전진(stepT)은 그대로 적용된다.
-# 달리기 시야 효과(#sprNow)는 그대로 두어 휘두를 때마다 시야가 출렁이지 않게 한다.
-execute if score @s swHold matches 1 run return 0
-# 속도(칸/틱 × 10000) = #viewWalk × 이동 속도% (달리기 ×1.3)
+# 속도(칸/틱 × 10000) = #viewWalk × 이동 속도% (달리기 ×1.3, 휘두르는 동안은 달리기 배율 없음)
 scoreboard players operation #sp view = #viewWalk tmp
 scoreboard players operation #sp view *= @s moveSpeed
 scoreboard players operation #sp view /= #100 tmp
-execute if score #f view matches 1 if predicate rlk:in_sprint run scoreboard players operation #sp view *= #viewSprint tmp
-execute if score #f view matches 1 if predicate rlk:in_sprint run scoreboard players operation #sp view /= #100 tmp
+execute if score #f view matches 1 unless score @s swHold matches 1 if predicate rlk:in_sprint run scoreboard players operation #sp view *= #viewSprint tmp
+execute if score #f view matches 1 unless score @s swHold matches 1 if predicate rlk:in_sprint run scoreboard players operation #sp view /= #100 tmp
 execute if score @s bowT matches 1.. run scoreboard players operation #sp view *= #bowSlow tmp
 execute if score @s bowT matches 1.. run scoreboard players operation #sp view /= #100 tmp
 execute if score @s skDash matches 1.. run scoreboard players operation #sp view *= #skDashSpd tmp
 execute if score @s skDash matches 1.. run scoreboard players operation #sp view /= #100 tmp
+# 평타를 휘두르는 동안(swHold, player/swing/tick): 걷는 속도 × #swSlow%(50). 걷던 속도에서 바로 줄어들고(매 틱 속도를 새로 정함),
+# 간격이 시작되는 틱부터 다시 제 속도다. 넉백 · 떨어지기는 그대로 적용된다.
+execute if score @s swHold matches 1 if score #swSlow tmp matches 0.. run scoreboard players operation #sp view *= #swSlow tmp
+execute if score @s swHold matches 1 if score #swSlow tmp matches 0.. run scoreboard players operation #sp view /= #100 tmp
 scoreboard players operation #mx view *= #sp view
 scoreboard players operation #mx view /= #1000 tmp
 scoreboard players operation #mz view *= #sp view

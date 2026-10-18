@@ -49,7 +49,7 @@ scoreboard objectives add hudHold dummy
 scoreboard objectives add atkCD dummy
 scoreboard objectives add comboStep dummy
 scoreboard objectives add cboIdle dummy
-# 평타 휘두르기 잠금(player/swing/tick) · 1인칭 점프 통계(평타 사이 간격에서 뛰면 다음 평타는 1타부터)
+# 평타 휘두르기 느려짐(player/swing/tick) · 1인칭 점프 통계(평타 사이 간격에서 뛰면 다음 평타는 1타부터)
 scoreboard objectives add swCut dummy
 scoreboard objectives add swHold dummy
 scoreboard objectives add swJump minecraft.custom:minecraft.jump
@@ -869,6 +869,9 @@ scoreboard players set #rfMax tmp 2
 # 시점 시스템(숄더뷰): 걷는 속도(칸/틱 × 10000, 이동 속도 100% 기준) / 달리기 배율(%)
 scoreboard players set #viewWalk tmp 2159
 scoreboard players set #viewSprint tmp 130
+# 평타를 휘두르는 동안(swHold) 걷는 속도(%, 달리기 배율 없음). 숄더뷰 · F5 시점의 아바타(view/move). 1인칭은 걷기를 늦추지 않고
+# 점프만 막는다(이동 속도 속성을 낮추면 바닐라가 화면을 확대함, player/swing/tick)
+scoreboard players set #swSlow tmp 50
 # 숄더뷰 카메라: 시선 고르게 펴기 보정의 한도(각도 × 100)
 # 숄더뷰: 점프로 떠오른 높이 중 카메라가 따라가는 비율(%). 100 = 예전처럼 전부 따라감, 0 = 전혀 안 따라감
 scoreboard players set #viewJump tmp 25

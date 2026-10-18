@@ -6,7 +6,7 @@ execute unless data storage rlk:config {installed:1b} run return 0
 # ===== 'player' 태그 보유자만 시스템 적용. 2명 이상이면 전원 태그 제거 (인벤/아이템 저장소가 1인 기준) =====
 execute store result score #pcount tmp if entity @a[tag=player]
 execute if score #pcount tmp matches 2.. run tellraw @a [{"text":"[로그라이크] ","color":"red","bold":true},{"text":"'player' 태그는 한 명만 가질 수 있습니다. 전원 태그를 제거합니다.","color":"red"}]
-# 태그를 잃으면 player/swing/tick 이 더 돌지 않으므로 휘두르기 잠금(1인칭 수정자)을 먼저 푼다
+# 태그를 잃으면 player/swing/tick 이 더 돌지 않으므로 휘두르기 느려짐(1인칭 점프 수정자)을 먼저 푼다
 execute if score #pcount tmp matches 2.. as @a[tag=player] run function rlk:player/swing/release
 execute if score #pcount tmp matches 2.. run tag @a[tag=player] remove player
 execute if score #pcount tmp matches 2.. run return 0
@@ -14,7 +14,7 @@ execute if score #pcount tmp matches 2.. run return 0
 # 시점 시스템(숄더뷰): 몸(rlk_body) 정하기 · 아바타 이동 · 카메라. 플레이어가 없으면 아바타 정리
 # 이전 틱 피격의 남은 넉백을 카메라 갱신 전에 적용
 execute as @e[tag=rlk_plkb] run function rlk:player/knockback/tick
-# 평타 휘두르기 잠금(swHold): 이번 틱의 이동(view/move, 1인칭 속성)보다 먼저 atkCD 에서 다시 구한다
+# 평타 휘두르기 느려짐(swHold): 이번 틱의 이동(view/move, 1인칭 점프 속성)보다 먼저 atkCD 에서 다시 구한다
 execute as @a[tag=player] run function rlk:player/swing/tick
 execute as @a[tag=player] run function rlk:view/tick
 execute unless entity @a[tag=player,limit=1] if entity @e[tag=rlk_view,limit=1] run kill @e[tag=rlk_view]

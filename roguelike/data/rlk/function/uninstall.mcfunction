@@ -80,8 +80,10 @@ tag @a remove rlk_setup
 clear @a minecraft:filled_map[minecraft:custom_data~{rlk_map:1b}]
 execute as @a run attribute @s minecraft:movement_speed modifier remove rlk:frozen
 execute as @a run attribute @s minecraft:jump_strength modifier remove rlk:frozen
+# 휘두르기: 지금 판은 점프 힘 수정자만 쓴다. 이동 속도 수정자는 D12 판에서 남았을 수 있는 것(player/swing/legacy)
 execute as @a run attribute @s minecraft:movement_speed modifier remove rlk:swing_hold
 execute as @a run attribute @s minecraft:jump_strength modifier remove rlk:swing_hold
+tag @a remove rlk_sw13
 kill @e[tag=rlk_shop_item]
 kill @e[tag=rlk_shop_info]
 kill @e[tag=rlk_shop_lbl]

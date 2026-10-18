@@ -7,6 +7,6 @@ function rlk:char/motion/audio/navia/physical_2
 # Retime (Genshin recovery): the tail after the chain tick plays out to IDLE_D unless the player acts.
 scoreboard players set @s cboIdle 0
 # Moving or jumping ends it once a chained click would be accepted (#pmChainOpen, see physical_1).
-# Before that tick the swing hold (player/swing/tick) keeps the body still and blocks jumping; a jump from then on also
+# Before that tick the swing (player/swing/tick) halves walking (shoulder view) and blocks jumping; a jump from then on also
 # restarts the string at NA1 (player/swing/jump).
 execute if score @s pmTick matches 14.. if score #pmChainOpen tmp matches 1 if score @s pmVisible matches 1 unless score @s pmWantMode matches 0 run return run function rlk:char/motion/finish

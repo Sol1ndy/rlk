@@ -8,6 +8,6 @@ function rlk:char/motion/audio/navia/physical_1
 scoreboard players set @s cboIdle 0
 # Moving or jumping ends the recovery (Genshin walk-cancel) once a chained click would be accepted (#pmChainOpen,
 # player/tick: game tick ceil(100*chain/pmSpeed) after the click, any attack speed); drawn locomotion takes over.
-# Before that tick the swing hold (player/swing/tick) keeps the body still and blocks jumping; a jump from then on also
+# Before that tick the swing (player/swing/tick) halves walking (shoulder view) and blocks jumping; a jump from then on also
 # restarts the string at NA1 (player/swing/jump).
 execute if score @s pmTick matches 14.. if score #pmChainOpen tmp matches 1 if score @s pmVisible matches 1 unless score @s pmWantMode matches 0 run return run function rlk:char/motion/finish

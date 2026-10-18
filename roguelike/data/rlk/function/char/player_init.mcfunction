@@ -92,7 +92,7 @@ kill @e[tag=rlk_clm]
 execute if entity @s[tag=rlk_body] run effect clear @s minecraft:invisibility
 effect clear @e[tag=rlk_av,limit=1] minecraft:invisibility
 scoreboard players set @s comboStep 0
-# 캐릭터 변경: 이전 캐릭터의 평타 간격과 휘두르기 잠금(player/swing)을 바로 끝낸다
+# 캐릭터 변경: 이전 캐릭터의 평타 간격과 휘두르기 느려짐(player/swing)을 바로 끝낸다
 scoreboard players set @s atkCD 0
 function rlk:player/swing/release
 scoreboard players set @s fxId 0
