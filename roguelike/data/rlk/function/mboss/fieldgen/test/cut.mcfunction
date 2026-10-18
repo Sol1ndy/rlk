@@ -3,6 +3,8 @@
 function rlk:mboss/lib_clear
 function rlk:mboss/fieldgen/p/cancel
 function rlk:mboss/fieldgen/rig_stub/prop/clear
+function rlk:mboss/fieldgen/fx/tele/clear
+function rlk:mboss/fieldgen/hud/banner_cut
 scoreboard players set #fgMv mb 0
 scoreboard players set #fgBrkQ mb 0
 execute if score #fgSt mb matches 3..6 run scoreboard players set #fgCrack mb 0

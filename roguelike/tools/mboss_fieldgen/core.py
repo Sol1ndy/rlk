@@ -5,9 +5,13 @@ low gravity on and off, the body clamp r 16.5, the per-form hitbox, death, pause
 core's vanilla fx (cfx/) and the generated pattern dispatchers. See __init__.py for the package layout and the
 scratchpad file mb3/fg_contract.md for the core <-> pattern contract.
 
-Owns F:mboss/fieldgen/** except F:mboss/fieldgen/rig/** (the rig generator, wip/fg-rig) and F:mboss/fieldgen/fx/**
-(the fx kit, wip/fg-fx; plus whatever a kit manifest tools/mboss_fg_fx_manifest.json lists as "owned"). Every file
-it owns is deleted and rewritten on each run (F:mboss/fieldgen/rig_stub/ too: it exists only while api.STUB).
+Owns F:mboss/fieldgen/** except F:mboss/fieldgen/rig/** (the rig generator, wip/fg-rig) and the fx kit's paths
+(tools/build_mboss_fg_fx.py: fx/{card,cardx,look,clear,uninstall} and fx/{e,p,tele,snd,hud,prop,test,rig_stub}/**,
+listed under "owned" in tools/mboss_fg_fx_manifest.json). Every file it owns is deleted and rewritten on each run
+(F:mboss/fieldgen/rig_stub/ too: it exists only while api.STUB). The kit is the effect engine: the core wires its
+hooks (uninstall, cleanup, pause, death, the break), the meter protocol (meter_open / meter_hit / meter_close), the
+field banner, the low-gravity and groggy flags and the boss-bar lines (put_extra / put_sub, redrawn when the kit's
+#fkHudV changes); fg_contract.md section 15. The core's other visuals are still vanilla (cfx/**).
 Copied from tools/mboss_butterfly/core.py; the butterfly review findings (scratchpad mb2/review/core_findings.json)
 are not copied: kept markers die with their pattern (S1), g.release never stops the AI (S2), the body clamp is real
 (S6), test cuts and reloads re-derive the rig form and the counters from the state (S3, S4, S8), the blade reach is
@@ -19,7 +23,7 @@ import json
 
 from . import PATTERN_MODULES
 from . import api as A
-from .api import L, Gen, TL, ev_or, clip_len, CX, CY, CZ
+from .api import L, K, Gen, TL, ev_or, clip_len, CX, CY, CZ
 
 NS = A.NS
 OWN_TOP = 'mboss/' + A.ID
@@ -74,6 +78,12 @@ FLD = {'cruise': 0, 'warp': 1, 'open': 2, 'patterns': 3, 'close': 4, 'pack': 5}
 GOLD_HEX, VIOLET_HEX = A.GOLD_HEX, A.VIOLET_HEX
 BANNER = '중력이 감소하고 점프 능력이 향상됩니다'
 HINT = '코어를 공격해 역장을 깨뜨리세요'
+BANNER_T = 80                                 # the kit's field banner holds the actionbar this long (hud/banner_field)
+# The kit's hud/meter_hit cracks the core bubble itself at counts 5 / 10 / 15 (<RIG>crack/<n> as the body). While
+# the kit drives another rig than the core (its own stub rig, before wip/fg-rig is merged) the core keeps its own
+# crack call; once both drive the same rig the core calls crack only for a stage the kit skipped (test 31's +5 jumps).
+KIT_CRACKS = K.RIG() == f'{NS}{A.RIG_DIR}/'
+KF = K.FN                                     # rlk:mboss/fieldgen/fx/
 
 # The field opening and the pack-up are core service patterns (their mechanics belong to the core).
 FIELD_IN = A.Pattern(20, 'field_in', '역장 생성', 'c', 'warp_out', kind='service', recover=0, max_len=FIN_LEN + 5, length=FIN_LEN)
@@ -122,15 +132,20 @@ def build():
 
 
 def foreign():
-    """Paths under F:mboss/fieldgen/ that other generators own (relative, no extension): the rig generator's rig/ and
-    the fx kit's fx/ (plus a kit manifest's "owned" list when one exists). Returns (dirs, files)."""
-    dirs, files = {'rig', 'fx'}, set()
+    """Paths under F:mboss/fieldgen/ that other generators own (relative, no extension): the rig generator's rig/
+    and the fx kit's owned dirs / files (tools/mboss_fg_fx_manifest.json "owned", united with the kit's own
+    constants so a stale manifest never exposes a kit file). Any other name under fx/ is the core's (fg_fx_api.md 0).
+    Returns (dirs, files)."""
+    dirs, files = {'rig'}, set()
     pre = f'data/rlk/function/{OWN_TOP}/'
     man = A._TOOLS / 'mboss_fg_fx_manifest.json'
     if man.exists():
         own = json.loads(man.read_text(encoding='utf-8')).get('owned', {})
         dirs |= {d[len(pre):] for d in own.get('dirs', []) if d.startswith(pre)}
         files |= {f[len(pre):-len('.mcfunction')] for f in own.get('files', []) if f.startswith(pre)}
+    kfx = K.FDIR[len('data/rlk/function/' + OWN_TOP + '/'):]
+    dirs |= {f'{kfx}/{d}' for d in K.OWNED_DIRS}
+    files |= {f'{kfx}/{f}' for f in K.OWNED_FILES}
     return dirs, files
 
 
@@ -140,7 +155,7 @@ def is_foreign(rel, dirs, files):
 
 
 def clean(out):
-    """Owned: every file under F:mboss/fieldgen/ except rig/ and fx/ (foreign())."""
+    """Owned: every file under F:mboss/fieldgen/ except the rig generator's rig/ and the fx kit's paths (foreign())."""
     root = L.FN / OWN_TOP
     dirs, files = foreign()
     removed = 0
@@ -175,19 +190,6 @@ def sc_set_bu(name, v):
 def at_t(clock, t, cmd):
     rng = f'{t[0]}..{t[1]}' if isinstance(t, tuple) else str(t)
     return f'execute if score {clock} mb matches {rng} run {cmd}'
-
-
-def pips(n, flash):
-    """The 20 pips of the meter (groups of five) for n counted hits; flash = the newest one bright."""
-    s = ''
-    for i in range(1, A.METER_N + 1):
-        if i <= n:
-            s += A.GLYPH['pip_new'] if (flash and i == n) else A.GLYPH['pip_full']
-        else:
-            s += A.GLYPH['pip_empty']
-        if i % 5 == 0 and i < A.METER_N:
-            s += A.GLYPH['gap']
-    return s
 
 
 class Core:
@@ -235,9 +237,10 @@ class Core:
         v += [sc_set(k, 0) for k in ('#fgSt', '#fgT', '#fgMv', '#fgLast', '#fgPick', '#fgReq', '#fgReqK', '#fgPat', '#fgPNew',
                                      '#fgPT', '#fgPEnd', '#fgPMax', '#fgPLen', '#fgPRel', '#fgPDone', '#fgPCol', '#fgClk',
                                      '#fgFlash', '#fgTst', '#fgDist', '#fgField', '#fgFT', '#fgFN', '#fgHintT', '#fgCruN',
-                                     '#fgOpen', '#fgBrk', '#fgBrkFx', '#fgBrkQ', '#fgCrack', '#fgPipT', '#fgLowG', '#fgWvK',
-                                     '#fgTri')]
-        v += [sc_set('#fgCool', 30), sc_set('#fgBand', 2), sc_set('#fgCruLim', FIRST_FIELD_N), sc_set('#fgBrkT', -1000000)]
+                                     '#fgOpen', '#fgBrk', '#fgBrkFx', '#fgBrkQ', '#fgCrack', '#fgLowG', '#fgWvK', '#fgTri',
+                                     '#fgHudV')]
+        v += [sc_set('#fgCool', 30), sc_set('#fgBand', 2), sc_set('#fgCruLim', FIRST_FIELD_N), sc_set('#fgBrkT', -1000000),
+              sc_set('#fgBanG', -1000000)]
         v += [sc_set(f'#fgBag{p.id}', 1) for p in self.normal]
         self.w('ai/vars', v)
 
@@ -290,15 +293,16 @@ class Core:
             f'execute as {BODY} at @s run {F("intro/setup")}'])
         self.w('tick', [
             '# Hook tick (@s = body, at @s, fight state). Order: clocks and flags; the break meter (a count from on_hit,',
-            '# the 20th breaks the field before the AI runs: the running pattern is cancelled); the field clocks; the',
-            '# body clamp r 16.5; AI state; pattern slot; the low-gravity request (mboss/main clears #mbLowG every tick,',
-            '# so it is set again every tick the field holds it, after the slot: the banner tick counts); then the rig.',
+            '# the 20th breaks the field before the AI runs: the running pattern is cancelled); the boss-bar lines again',
+            '# when the fx kit rebuilt its HUD components (#fkHudV: the pip flash ends by a schedule); the field clocks;',
+            '# the body clamp r 16.5; AI state; pattern slot; the low-gravity request (mboss/main clears #mbLowG every',
+            '# tick, so it is set again every tick the field holds it, after the slot: the banner tick counts); the rig.',
             'scoreboard players add #fgClk mb 1',
             f'execute if score #fgFlash mb matches 1 run {R("flash")}',
             sc_set('#fgFlash', 0),
             f'execute if score #fgBrkFx mb matches 1 run {F("brk/count")}',
             f'execute if score #fgBrkQ mb matches 1 run {F("brk/begin")}',
-            f'execute if score #fgPipT mb matches 1.. run {F("hud/pip_tick")}',
+            f'execute unless score #fgHudV mb = #fkHudV mb run {F("hud/refresh")}',
             f'execute if score #fgField mb matches 1.. run {F("field/tick")}',
             f'execute unless entity @s[tag=rlk_mb_mv] positioned ~ {CY} ~ unless entity @e[tag=rlk_mb_arena,distance=..{L.num(A.BODY_R)},limit=1] run {F("u/leash")}',
             F('ai/state'),
@@ -337,21 +341,32 @@ class Core:
             '# Hook pause (the fight froze: player dead / reviving / selection screen / no body). Low gravity drops by',
             '# itself (mboss/main clears #mbLowG every tick and the module tick does not run while paused; the module',
             '# keeps #fgLowG and asks again after the resume). The running pattern may drop what would hang (its pause).',
+            '# The kit\'s ground decals go (the frozen hazards keep their framework markers; the decals would run on and',
+            '# flash early), so does a kit screen flash / pop still on the title line (only while one is up: vBig, so a',
+            '# selection screen\'s own title is left alone); a dead or reviving player clears the kit cards itself.',
             sc_set('#fgFlash', 0),
+            f'function {KF}tele/clear',
+            f'execute if entity @a[tag=player,scores={{vBig=1..}}] run {K.hud("flash_end")}',
             F('p/pause_d')])
         self.w('resume', ['# Hook resume: nothing to restore (module timers live in the body tick and simply continue;',
                           '# the low-gravity request comes back with the first module tick).'])
         self.w('cleanup', [
             '# Hook cleanup (no executor; idempotent; fight end, abort, run end, map change, wipe, uninstall): module',
             '# fake players back to their defaults (the meter, the field, low gravity: the framework\'s player_reset clears',
-            '# #mbLowG, rlk:tick removes the modifiers), the module\'s storage. Module entities carry rlk_mb_aux.',
+            '# #mbLowG, rlk:tick removes the modifiers), the module\'s storage, every kit card and the kit\'s HUD flags',
+            '# (meter, low gravity, groggy, hint), the field banner if it still shows. Module entities carry rlk_mb_aux.',
+            F('hud/banner_cut'),
             F('ai/vars'),
-            'data remove storage rlk:mboss fg'])
+            'data remove storage rlk:mboss fg',
+            f'function {KF}clear',
+            K.hud('clear')])
         self.w('uninstall', [
             '# Hook uninstall (no executor; rlk:uninstall via the framework, for every module): the rig, its props, the',
-            '# rig objectives the manifest names, every module entity, the module storage; the framework removes mb, the',
-            '# rlk_mb_aux entities and the low-gravity modifiers (mboss/uninstall -> mboss/lowg_rem).',
+            '# rig objectives the manifest names, every module entity, the module storage, the fx kit (cards, objectives',
+            '# fk*, the #fk* fake players, storage rlk:fgkit, its schedules; its stub rig while it has one); the framework',
+            '# removes mb, the rlk_mb_aux entities and the low-gravity modifiers (mboss/uninstall -> mboss/lowg_rem).',
             R('kill'), R('prop/clear'),
+            f'function {KF}uninstall',
             'kill @e[tag=rlk_mb_fg_pat]',
             'kill @e[tag=rlk_mb_fg_fx]',
             'kill @e[type=minecraft:marker,tag=rlk_mb_fg_kept]',
@@ -416,6 +431,8 @@ class Core:
             '# @s = the new body (from the spawn hook), at it: module state, the rig folded (dormant, eye shut), the entrance.',
             F('ai/consts'), F('ai/vars'),
             R('init'), R('spawn'), g.form('dormant'), g.look('off'), g.play('entrance'),
+            '# the kit\'s HUD flags of an earlier fight off (this also starts the kit\'s line version #fkHudV)',
+            K.hud('clear'),
             F('form/hitbox_c'), F('hud/refresh'), F('cfx/ent_setup')])
         c = lambda t: INTRO_CLIP + t
         self.w('intro_tick', [
@@ -445,7 +462,11 @@ class Core:
         self.w('ai/state', ['# @s = body. One AI state per tick (the pattern slot runs after it, see p/run).'] + [
             f'execute if score #fgSt mb matches {ST[k]} run return run {F(fn)}'
             for k, fn in (('idle', 'ai/idle'), ('groggy', 'groggy/tick'), ('recover', 'recover/tick'), ('break', 'brk/tick'))])
-        self.w('ai/enter', ['# Enter idle (#fgCool set by the caller).', sc_set('#fgSt', ST['idle']), sc_set('#fgT', 0), F('hud/refresh')])
+        self.w('ai/enter', ['# Enter idle (#fgCool set by the caller). Idle is never groggy: the kit\'s " · 그로기" flag goes (recovery',
+                            '# end, test cuts, reloads).',
+                            sc_set('#fgSt', ST['idle']), sc_set('#fgT', 0),
+                            f'execute if data storage {K.STO} hud{{grog:1b}} run {K.hud("groggy_off")}',
+                            F('hud/refresh')])
         self.w('ai/idle', [f'execute if score #fgField mb matches 1.. run return run {F("ai/idle_f")}', F('ai/idle_c')])
         self.w('ai/idle_c', [
             f'# @s = body, cruise: track the player ({TURN_C} deg/t), keep {KEEP_MIN}-{KEEP_MAX} b (glide in at 0.18 b/t, out at 0.15 b/t, only',
@@ -674,21 +695,29 @@ class Core:
             'tag @s add rlk_mb_inv',
             F('u/centre')])
         self.w('field/open', [
-            f'# Field opening clock {FIN_UNFOLD} (@s = body): the unfold; targetable again; the meter opens at 0/{A.METER_N} (crack 0),',
-            f'# the field look, the field hitbox, the field damage cut ({CUT} %), the first field\'s hint for {HINT_T} t.',
+            f'# Field opening clock {FIN_UNFOLD} (@s = body): the unfold; targetable again; the meter opens at 0/{A.METER_N} (crack 0;',
+            '# the kit\'s meter on the sub-line), the field look, the field hitbox, the field damage cut',
+            f'# ({CUT} %), the first field\'s hint for {HINT_T} t (the kit\'s hint_on / hint_off).',
             'tag @s remove rlk_mb_inv',
             sc_set('#fgOpen', 1), sc_set('#fgBrk', 0), sc_set('#fgBrkT', -1000000), sc_set('#fgBrkFx', 0), sc_set('#fgBrkQ', 0),
-            sc_set('#fgCrack', 0), sc_set('#fgPipT', 0), R('crack/0'), g.look('field'), F('form/hitbox_f'),
+            sc_set('#fgCrack', 0), R('crack/0'), g.look('field'), F('form/hitbox_f'),
             'scoreboard players add #fgFN mb 1', sc_set('#fgHintT', 0),
+            K.hud('meter_open'),
+            f'execute if score #fgFN mb matches 1 run {K.hud("hint_on")}',
             F('cfx/unfold_f'), F('hud/refresh')])
         self.w('field/banner', [
-            f'# Field opening clock {FIN_BANNER}: the banner "{BANNER}" and low gravity (#fgLowG -> #mbLowG every tick).',
+            f'# Field opening clock {FIN_BANNER}: low gravity (#fgLowG -> #mbLowG every tick), the kit\'s banner "{BANNER}"',
+            f'# (actionbar {BANNER_T} t, the big icon, its sound; the start gametime #fgBanG lets a break / cut drop it early), the',
+            '# low-gravity icon on the name line, the typed caption.',
             sc_set('#fgLowG', 1),
-            g.say(BANNER, '#D9C8FF', 1, 50, 1),
-            F('cfx/banner')])
+            K.hud('banner_field'),
+            'execute store result score #fgBanG mb run time query gametime',
+            K.hud('lowg_on'),
+            g.say(BANNER, '#D9C8FF', 1, 50, 1)])
         self.w('field/close', [
-            '# The pack-up begins (@s = body): the meter closes, low gravity and the damage cut end, the idle look.',
-            sc_set('#fgOpen', 0), sc_set('#fgLowG', 0), sc_set('#fgPipT', 0), g.look('idle'), F('hud/refresh')])
+            '# The pack-up begins (@s = body): the meter closes, low gravity and the damage cut end (the kit\'s meter, icon',
+            '# and hint leave the lines), the idle look.',
+            sc_set('#fgOpen', 0), sc_set('#fgLowG', 0), F('hud/kit_off'), g.look('idle'), F('hud/refresh')])
         self.w('field/opened', ['# The field opening is over: the opening waves next.', sc_set('#fgField', FLD['open']),
                                 sc_set('#fgCool', 1), F('ai/enter')])
         self.w('field/patterns', [f'# The opening waves are over: field patterns for {FIELD_T} t.', sc_set('#fgField', FLD['patterns']),
@@ -702,7 +731,7 @@ class Core:
             '# The field state ends without its sequence (pack-up done, the break, a reload): stage 0, the next field after',
             f'# {NEXT_FIELD_N} cruise patterns, meter / low gravity / cut off, the cruise hitbox.',
             sc_set('#fgField', FLD['cruise']), sc_set('#fgWvK', 0), sc_set('#fgFT', 0), sc_set('#fgOpen', 0), sc_set('#fgLowG', 0),
-            sc_set('#fgCruN', 0), sc_set('#fgCruLim', NEXT_FIELD_N), F('form/hitbox_c'), F('hud/refresh')])
+            sc_set('#fgCruN', 0), sc_set('#fgCruLim', NEXT_FIELD_N), F('hud/kit_off'), F('form/hitbox_c'), F('hud/refresh')])
         self.w('field/rig_f', ['# @s = body: the rig in the field form at the centre (reload, tests).',
                                F('u/centre'), g.form('field'), g.look('field'), g.play('field_idle'), F('form/hitbox_f')])
         self.w('field/rig_c', ['# @s = body: the rig in the cruise form (reload, tests).',
@@ -723,7 +752,7 @@ class Core:
             '# pebbles around the player while low gravity holds.',
             f'execute if score #fgField mb matches {FLD["patterns"]} run scoreboard players add #fgFT mb 1',
             f'execute if score #fgOpen mb matches 1 if score #fgHintT mb matches ..{HINT_T} run scoreboard players add #fgHintT mb 1',
-            f'execute if score #fgHintT mb matches {HINT_T} if score #fgFN mb matches 1 run {F("hud/refresh")}',
+            f'execute if score #fgHintT mb matches {HINT_T} if score #fgFN mb matches 1 run {F("hud/hint_end")}',
             'scoreboard players operation #fgM mb = #fgClk mb', 'scoreboard players operation #fgM mb %= #fgK10 mb',
             f'execute if score #fgLowG mb matches 1 if score #fgM mb matches 0 at {PLAYER} run {F("cfx/pebbles")}'])
 
@@ -731,28 +760,44 @@ class Core:
     def meter(self):
         F, R, g = self.F, self.R, self.g
         self.w('brk/count', [
-            '# @s = body (module tick after a counted hit): the crack stage (hits 0-4 / 5-9 / 10-14 / 15-19 = 0-3), the crack',
-            '# glint and the chime at the core, the newest pip flashes for 4 t.',
+            '# @s = body (module tick after a counted hit): the crack stage (hits 0-4 / 5-9 / 10-14 / 15-19 = 0-3); the',
+            '# kit\'s per-count feedback with #fkM = the count, as the body (the rig anchor) at the field core',
+            f'# ({L.num(A.CORE_FIELD_H)} b up): the newest pip flashes white for 4 t, the crack glint, the brass ping + a note rising',
+            '# with the count, and at 5 / 10 / 15 the bubble crack fx, its sound and the rig crack/<n>.',
             sc_set('#fgBrkFx', 0),
             'scoreboard players operation #fgX mb = #fgBrk mb',
             'scoreboard players operation #fgX mb /= #fgK5 mb',
             'execute if score #fgX mb matches 4.. run scoreboard players set #fgX mb 3',
             f'execute unless score #fgX mb = #fgCrack mb run {F("brk/stage")}',
-            F('cfx/count'),
-            sc_set('#fgPipT', 4),
+            'scoreboard players operation #fkM mb = #fgBrk mb',
+            f'execute positioned ~ ~{L.num(A.CORE_FIELD_H)} ~ run {K.hud("meter_hit")}',
             F('hud/refresh')])
-        self.w('brk/stage', ['# The core bubble shows the next crack stage.', 'scoreboard players operation #fgCrack mb = #fgX mb',
-                             F('u/crack_d'), F('cfx/crack')])
+        if KIT_CRACKS:
+            stage = ['# The core bubble shows the next crack stage (#fgCrack, read by reloads and tests). The kit\'s meter_hit',
+                     '# cracks the rig on the counts 5 / 10 / 15; the core does it only for a stage reached another way (test 31).',
+                     'scoreboard players operation #fgCrack mb = #fgX mb',
+                     f'execute unless score #fgBrk mb matches 5 unless score #fgBrk mb matches 10 unless score #fgBrk mb matches 15 run {F("u/crack_d")}']
+        else:
+            stage = ['# The core bubble shows the next crack stage (#fgCrack, read by reloads and tests). The kit\'s meter_hit',
+                     f'# cracks its own stub rig ({K.RIG()}) while the real rig is not merged, so the core cracks its rig here.',
+                     'scoreboard players operation #fgCrack mb = #fgX mb',
+                     F('u/crack_d')]
+        self.w('brk/stage', stage)
         self.w('u/crack_d', ['# The rig crack look of #fgCrack (0-3 the meter stages, 4 burst).']
                + [f'execute if score #fgCrack mb matches {n} run return run {R(f"crack/{n}")}' for n in A.CRACKS])
         self.w('brk/begin', [
             f'# @s = body: the {A.METER_N}th count broke the field (역장 붕괴). Every threat goes (hazards, props, pulls, glides:',
             '# lib_clear; the running pattern, waves included: p/cancel), the meter / low gravity / the damage cut end, the',
             f'# field state ends; the break plays ({BRK_LEN} t: bubble, burst at {BRK_BURST}, tilt, wobble, sink), then groggy {GROGGY} t.',
+            '# The kit: every decal goes (tele/clear), the banner if it still shows, the meter / low-gravity icon / hint',
+            '# (field/drop -> hud/kit_off); " · 그로기" on the name line from here to the end of the recovery.',
             sc_set('#fgBrkQ', 0),
             'function rlk:mboss/lib_clear',
             F('p/cancel'),
+            f'function {KF}tele/clear',
+            F('hud/banner_cut'),
             F('field/drop'),
+            F('hud/groggy_on'),
             '# #fgT -1: the AI state runs brk/tick later this same tick, so #fgT = the break clip tick',
             sc_set('#fgSt', ST['break']), sc_set('#fgT', -1), sc_set('#fgMv', 0),
             g.play('break'),
@@ -766,8 +811,6 @@ class Core:
             f'execute if score #fgT mb matches {BRK_LEN}.. run {F("groggy/begin")}'])
         self.w('brk/burst', ['# The bubble bursts: crack 4, the gold flash and the floor ring.', sc_set('#fgCrack', 4), R('crack/4'),
                              F('cfx/break_burst')])
-        self.w('hud/pip_tick', ['scoreboard players remove #fgPipT mb 1',
-                                f'execute if score #fgPipT mb matches 0 run {F("hud/refresh")}'])
 
     # -----------------------------------------------------------------------------------------
     def groggy(self):
@@ -778,6 +821,7 @@ class Core:
             '# test cut of the groggy keeps them: butterfly S8). No damage bonus.',
             sc_set('#fgSt', ST['groggy']), sc_set('#fgT', 0), sc_set('#mbNoLeash', 0), sc_set('#fgMv', 0),
             sc_set('#fgBrk', 0), sc_set('#fgCruN', 0), sc_set('#fgCruLim', NEXT_FIELD_N),
+            F('hud/groggy_on'),
             F('groggy/rig'),
             F('cfx/groggy'),
             F('hud/refresh')])
@@ -817,8 +861,12 @@ class Core:
             '# Hook death_start (@s = body; hazards, props, pull and movement already cleared, bars hidden). The pattern goes,',
             '# the field ends (meter, low gravity, cut). The death clip: the seam flickers out, the halo and the drill pods',
             '# fall, the ring sinks tilted 40 degrees, then it scales out. Mechanical sounds only (deathSnd false).',
+            '# The kit: every decal goes, the banner if it still shows, every HUD flag off (meter, low gravity, hint, groggy).',
             F('p/cancel'),
-            sc_set('#fgOpen', 0), sc_set('#fgLowG', 0), sc_set('#fgField', 0), sc_set('#fgPipT', 0), sc_set('#fgBrkQ', 0),
+            f'function {KF}tele/clear',
+            F('hud/banner_cut'),
+            K.hud('clear'),
+            sc_set('#fgOpen', 0), sc_set('#fgLowG', 0), sc_set('#fgField', 0), sc_set('#fgBrkQ', 0),
             sc_set('#fgSt', ST['dead']),
             R('prop/clear'),
             g.play('death'),
@@ -838,47 +886,49 @@ class Core:
     def hud(self):
         F, g = self.F, self.g
         self.w('hud/extra', [
-            '# Name-line suffix: 순항 (gold) / 역장 (violet), · 그로기 during the break, groggy and recovery.',
+            '# Name-line suffix: 순항 (gold) in cruise, 역장 (violet) during the warp and the pack-up; the kit\'s flags',
+            '# (put_extra) supply the rest: " · 역장" + the badge while the meter is open, the low-gravity icon, " · 그로기"',
+            '# (the break, groggy and recovery).',
             'data modify storage rlk:mboss extra set value []',
             f'execute if score #fgField mb matches 0 run data modify storage rlk:mboss extra append value {{text:"   순항",color:"{GOLD_HEX}",bold:false}}',
-            'execute if score #fgField mb matches 1.. run data modify storage rlk:mboss extra append value {text:"   역장",color:"#9C86E8",bold:false}',
-            f'execute if score #fgSt mb matches {ST["groggy"]}..{ST["break"]} run data modify storage rlk:mboss extra append value {{text:"  · 그로기",color:"#9FE8A0",bold:false}}'])
-        sub = ['# Third line: what the device is doing; while the field is open the break meter (hud/meter).',
+            'execute if score #fgField mb matches 1.. unless score #fgOpen mb matches 1 run data modify storage rlk:mboss extra append value {text:"   역장",color:"#9C86E8",bold:false}',
+            K.hud('put_extra')])
+        sub = ['# Third line: what the device is doing. While the meter is open the core writes only the running field',
+               '# pattern ("패턴  <label>") and the kit\'s put_sub appends the meter: badge, 역장, the 20 pips in groups of five',
+               '# (the newest one white for 4 t), the "n/20" digits and the first field\'s hint (font rlk:mboss_fg).',
                'execute if score #mbSt mb matches 0 run data modify storage rlk:mboss sub set value []',
                'execute if score #mbSt mb matches 0 run return 0',
                f'data modify storage rlk:mboss sub set value [{{text:"순항",color:"{GOLD_HEX}",bold:true}}]',
-               'execute if score #fgField mb matches 1.. run data modify storage rlk:mboss sub set value [{text:"역장",color:"#C58BFF",bold:true}]']
+               'execute if score #fgField mb matches 1.. run data modify storage rlk:mboss sub set value [{text:"역장",color:"#C58BFF",bold:true}]',
+               'execute if score #fgOpen mb matches 1 run data modify storage rlk:mboss sub set value []']
         for p in self.pats:
             sub.append(f'execute if score #fgSt mb matches {ST["pattern"]} if score #fgPat mb matches {p.id} run data modify storage rlk:mboss sub set value '
                        f'[{{text:"패턴  ",color:"#A8A8A8"}},{{text:"{p.label}",color:"{"#C9B8F5" if p.state == "f" else "#F2E2B0"}"}}]')
-        sub += [f'execute if score #fgOpen mb matches 1 run {F("hud/meter")}',
-                f'execute if score #fgSt mb matches {ST["break"]} run data modify storage rlk:mboss sub set value '
+        sub += [f'execute if score #fgSt mb matches {ST["break"]} run data modify storage rlk:mboss sub set value '
                 f'[{{text:"{A.GLYPH["break"]}",font:"{A.FONT}",color:"white"}},{{text:" 역장 붕괴",color:"#FFE7A0",bold:true}}]',
                 f'execute if score #fgSt mb matches {ST["groggy"]} run data modify storage rlk:mboss sub set value [{{text:"그로기  ",color:"#9FE8A0",bold:true}},{{text:"공격할 기회",color:"#C8E8C8"}}]',
-                f'execute if score #fgSt mb matches {ST["recover"]} run data modify storage rlk:mboss sub set value [{{text:"그로기  ",color:"#9FE8A0",bold:true}},{{text:"다시 떠오른다",color:"#C8E8C8"}}]']
+                f'execute if score #fgSt mb matches {ST["recover"]} run data modify storage rlk:mboss sub set value [{{text:"그로기  ",color:"#9FE8A0",bold:true}},{{text:"다시 떠오른다",color:"#C8E8C8"}}]',
+                f'execute if score #fgOpen mb matches 1 run {K.hud("put_sub")}']
         self.w('hud/sub', sub)
-        meter = ['# The break meter line: [badge] 역장  [20 pips in groups of five]  n/20 (font rlk:mboss_fg of the fx kit),',
-                 '# the running field pattern, the first field\'s hint. Rebuilt only on a change (count, pip flash end, state).',
-                 f'data modify storage rlk:mboss sub set value [{{text:"{A.GLYPH["badge"]}",font:"{A.FONT}",color:"white"}},{{text:" 역장  ",color:"#C58BFF",bold:true}}]',
-                 f'execute if score #fgPipT mb matches 1.. run {F("hud/pipsf_d")}',
-                 f'execute unless score #fgPipT mb matches 1.. run {F("hud/pips_d")}']
-        for p in self.pats:
-            if p.state == 'f':
-                meter.append(f'execute if score #fgSt mb matches {ST["pattern"]} if score #fgPat mb matches {p.id} run data modify storage rlk:mboss sub append value '
-                             f'{{text:"   · {p.label}",color:"#BFAEE8",bold:false}}')
-        meter.append(f'execute if score #fgFN mb matches 1 if score #fgHintT mb matches ..{HINT_T - 1} run data modify storage rlk:mboss sub append value '
-                     f'{{text:"   {HINT}",color:"#E8D8FF",bold:false}}')
-        self.w('hud/meter', meter)
-        for flash, name in ((False, 'pips'), (True, 'pipsf')):
-            self.w(f'hud/{name}_d', [f'# GENERATED: the pips for #fgBrk{" (the newest one flashing)" if flash else ""}.']
-                   + [f'execute if score #fgBrk mb matches {n}{".." if n == A.METER_N else ""} run return run {F(f"hud/{name}/{n}")}'
-                      for n in range(A.METER_N + 1)])
-            for n in range(A.METER_N + 1):
-                self.w(f'hud/{name}/{n}', [
-                    f'data modify storage rlk:mboss sub append value {{text:"{pips(n, flash)}",font:"{A.FONT}",color:"white"}}',
-                    f'data modify storage rlk:mboss sub append value {{text:"  {n}/{A.METER_N}",color:"#E8D8FF",bold:false}}'])
-        self.w('hud/refresh', ['# Both text lines from the current state (on every state, stage and meter change).',
-                               F('hud/extra'), F('hud/sub')])
+        self.w('hud/refresh', ['# Both text lines from the current state (on every state, stage and meter change, and when the kit rebuilt',
+                               '# its HUD components: #fkHudV, compared every module tick).',
+                               F('hud/extra'), F('hud/sub'),
+                               'scoreboard players operation #fgHudV mb = #fkHudV mb'])
+        self.w('hud/kit_off', ['# The field is over (the pack-up, the break, a reload, a test): the kit\'s meter, low-gravity icon and hint',
+                               '# leave the lines (only the flags still on: each kit call rebuilds its components; the caller refreshes',
+                               '# the lines).',
+                               f'execute if data storage {K.STO} hud{{open:1b}} run {K.hud("meter_close")}',
+                               f'execute if data storage {K.STO} hud{{lowg:1b}} run {K.hud("lowg_off")}',
+                               f'execute if data storage {K.STO} hud{{hint:1b}} run {K.hud("hint_off")}'])
+        self.w('hud/hint_end', [f'# The first field\'s hint has shown {HINT_T} t: off.', K.hud('hint_off'), F('hud/refresh')])
+        self.w('hud/groggy_on', ['# " · 그로기" on the name line (the break and groggy; ai/enter drops it).',
+                                 f'execute unless data storage {K.STO} hud{{grog:1b}} run {K.hud("groggy_on")}'])
+        self.w('hud/banner_cut', [
+            f'# Drop the kit\'s field banner while it still shows (within {BANNER_T} t of field/banner; any executor): the break,',
+            '# death, a test cut, a cleanup. Another actionbar message is never cut.',
+            'execute store result score #fgX mb run time query gametime',
+            'scoreboard players operation #fgX mb -= #fgBanG mb',
+            f'execute if score #fgX mb matches 0..{BANNER_T} run {K.hud("banner_end")}'])
         self.w('hud/bar_meter', ['scoreboard players operation #buSub bu = #fgBrk mb', sc_set_bu('#buSubMax', A.METER_N), sc_set_bu('#buSubCol', 1)])
         self.w('hud/bar_full', [sc_set_bu('#buSub', A.METER_N), sc_set_bu('#buSubMax', A.METER_N), sc_set_bu('#buSubCol', 1)])
         self.w('hud/bar_groggy', [sc_set_bu('#buSub', GROGGY), 'scoreboard players operation #buSub bu -= #fgT mb',
@@ -918,6 +968,8 @@ class Core:
             'function rlk:mboss/lib_clear',
             F('p/cancel'),
             R('prop/clear'),
+            f'function {KF}tele/clear',
+            F('hud/banner_cut'),
             sc_set('#fgMv', 0), sc_set('#fgBrkQ', 0),
             f'execute if score #fgSt mb matches {ST["groggy"]}..{ST["break"]} run {sc_set("#fgCrack", 0)}',
             '# a cut field opening (invisible, untargetable, maybe not at the centre yet) finishes at once',
@@ -956,6 +1008,8 @@ class Core:
         self.w('test/lowg', ['# Low gravity on / off by hand (the jump check in both views); the field sets it again at its banner.',
                              'scoreboard players set #fgX mb 1', 'execute if score #fgLowG mb matches 1 run scoreboard players set #fgX mb 0',
                              'scoreboard players operation #fgLowG mb = #fgX mb',
+                             f'execute if score #fgLowG mb matches 1 run {K.hud("lowg_on")}',
+                             f'execute if score #fgLowG mb matches 0 run {K.hud("lowg_off")}',
                              'execute if score #fgLowG mb matches 1 run tellraw @a[tag=player] {text:"[테스트] 저중력 켬",color:"gray"}',
                              'execute if score #fgLowG mb matches 0 run tellraw @a[tag=player] {text:"[테스트] 저중력 끔",color:"gray"}'])
         self.w('test/tri', ['# The HP < 50 % triple front of the 3rd wave by hand.',
@@ -967,7 +1021,9 @@ class Core:
     # -----------------------------------------------------------------------------------------
     def cfx(self):
         """The core's own visuals: vanilla particles and mechanical / brass vanilla sounds (plan: anvil, chain, piston,
-        beacon, respawn anchor, amethyst, trial spawner, breeze charge, crafter). The fx kit may replace them later."""
+        beacon, respawn anchor, amethyst, trial spawner, breeze charge, crafter). The meter count, the crack stages and
+        the banner are the kit's now (hud/meter_hit, hud/banner_field); the entrance, warp, break, groggy and death
+        visuals here are mapped to kit presets by the stage-2 specs (scratchpad mb3/spec E, S1-S4)."""
         g = self.g
         G, GD, WG, V, VD = A.GOLD, A.GOLD_DEEP, A.WHITE_GOLD, A.VIOLET, A.VIOLET_DEEP
         at = lambda y, *cmds: [f'execute at @s run {c}' for c in cmds]
@@ -991,15 +1047,10 @@ class Core:
                         g.sound('block.beacon.power_select', 1.0, 0.8), g.sound('entity.enderman.teleport', 0.8, 0.8)],
             'unfold_f': [*g.ring_dust(V, 3.8, 16, 3.8, 1.4), g.sound('block.amethyst_block.chime', 1.0, 0.8),
                          g.sound('block.chain.place', 0.9, 0.7), g.sound('block.crafter.craft', 0.8, 0.7)],
-            'banner': [g.sound('block.beacon.ambient', 1.0, 0.6), g.sound('block.amethyst_block.resonate', 1.0, 0.6)],
             'pebbles': ['# At the player\'s feet (never at the eyes): pebbles and ash drifting up (low gravity).',
                         g.particle('white_ash', '~ ~0.6 ~', (3.0, 0.4, 3.0), 0, 6),
                         g.particle('end_rod', '~ ~0.4 ~', (3.0, 0.2, 3.0), 0.005, 1),
                         g.dust(V, 0.9, '~ ~0.3 ~', (2.5, 0.2, 2.5), 2)],
-            'count': ['# @s = body: a counted hit: a gold crack glint on the core bubble (about 3.8 b up), a quiet chime.',
-                      g.particle('crit', '~ ~3.8 ~', (0.5, 0.5, 0.5), 0.2, 6), g.dust(WG, 1.0, '~ ~3.8 ~', (0.5, 0.5, 0.5), 4),
-                      g.sound('block.amethyst_block.hit', 0.7, 1.4), g.sound('block.chain.hit', 0.5, 1.2)],
-            'crack': [g.sound('block.amethyst_cluster.hit', 1.0, 0.9), g.particle('wax_off', '~ ~3.8 ~', (0.6, 0.6, 0.6), 0, 6)],
             'break_start': [g.sound('block.respawn_anchor.deplete', 1.0, 0.7),
                             g.particle('end_rod', '~ ~3.8 ~', (0.9, 0.9, 0.9), 0.02, 12)],
             'break_burst': [g.particle('flash{color:[1.0,0.9,0.62,1.0]}', '~ ~3.8 ~', (0, 0, 0), 0, 1),

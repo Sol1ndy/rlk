@@ -8,6 +8,7 @@ scoreboard players set #fgMv mb 0
 scoreboard players set #fgBrk mb 0
 scoreboard players set #fgCruN mb 0
 scoreboard players set #fgCruLim mb 4
+function rlk:mboss/fieldgen/hud/groggy_on
 function rlk:mboss/fieldgen/groggy/rig
 function rlk:mboss/fieldgen/cfx/groggy
 function rlk:mboss/fieldgen/hud/refresh

@@ -19,10 +19,13 @@ STUB = True: the manifest is tools/mboss_fieldgen/stub_rig_manifest.json and eve
 rlk:mboss/fieldgen/rig_stub/ written by stub_rig.py. Both stub files are removable; with the real manifest present
 the build ignores them and deletes F:mboss/fieldgen/rig_stub/.
 
-FX. The effect kit (wip/fg-fx: rlk:mboss/fieldgen/fx/**, font rlk:mboss_fg) is built in parallel. The core never
-calls it (the pack checker requires every referenced function to exist): its own visuals are vanilla particles and
-sounds in F:mboss/fieldgen/cfx/** (core.py), the HUD uses the kit font's codepoints (GLYPH below), and the core's
-clean() spares fx/** so the kit can be merged without a conflict.
+FX. The effect engine is the fx / audio / HUD kit (tools/build_mboss_fg_fx.py, functions
+rlk:mboss/fieldgen/fx/{card,cardx,p/*,tele/*,snd/*,hud/*,prop/*}, font rlk:mboss_fg; API in the scratchpad file
+mb3/fg_fx_api.md). Its Python call builders are re-exported here as api.K and on Gen (g.fx, g.snd, g.kcard, g.tele_*,
+g.kprop, g.khud), so pattern modules never import the kit themselves. Every helper returns one function line to run in
+the executor context the kit documents (position = the event point, rotation = the aim). The core wires the kit's
+hooks and HUD (fg_contract.md section 15); its own remaining visuals are vanilla particles and sounds in
+F:mboss/fieldgen/cfx/** (core.py).
 """
 from pathlib import Path
 import json
@@ -33,6 +36,7 @@ _TOOLS = Path(__file__).resolve().parents[1]
 if str(_TOOLS) not in sys.path:
     sys.path.insert(0, str(_TOOLS))
 import mboss_lib as L  # noqa: E402
+import build_mboss_fg_fx as K  # noqa: E402  (the fx kit: call builders and tables only, no files written on import)
 
 ID = 'fieldgen'
 NS = f'rlk:mboss/{ID}/'
@@ -121,6 +125,16 @@ def hexrgb(h):
     return tuple(int(h[i:i + 2], 16) / 255 for i in (1, 3, 5))
 
 
+def kit_colour(c):
+    """A colour for the fx kit (an RGB int) from an int, '#RRGGBB' or (r, g, b) 0..1."""
+    if isinstance(c, str):
+        return int(c.lstrip('#'), 16)
+    if isinstance(c, int):
+        return c
+    r, g, b = (max(0, min(255, round(255 * float(x)))) for x in c)
+    return (r << 16) | (g << 8) | b
+
+
 GOLD_HEX = BOSS['color']                  # #E8C46A: nameplate, gold glows
 GOLD = hexrgb('#FADEA8')                  # beams, columns
 GOLD_DEEP = hexrgb('#E6B25A')
@@ -132,13 +146,28 @@ VIOLET_DEEP = hexrgb('#6C64E3')
 ROCK = hexrgb('#AF846E')
 LINE_HEX = '#F2E2B0'                      # typed captions (mechanics only: a machine, no voice lines)
 
-# HUD glyphs of the kit font rlk:mboss_fg (U+E700-E7FF), drawn by the fx kit (wip/fg-fx, tools/build_mboss_fg_fx.py
-# GLYPHS): the field badge E700, the pips E701 empty / E702 full / E703 just counted, the big break badge E704, the
-# 2 px group-gap space E7F1. The core only writes these characters into the sub-line; the kit owns the font.
-FONT = 'rlk:mboss_fg'
-GLYPH = {'badge': chr(0xE700), 'pip_empty': chr(0xE701), 'pip_full': chr(0xE702), 'pip_new': chr(0xE703),
-         'break': chr(0xE704), 'gap': chr(0xE7F1)}
+# HUD glyphs of the kit font rlk:mboss_fg (U+E700-E7FF; the kit owns the font, K.GLYPHS): the field badge E700, the
+# pips E701 empty / E702 full / E703 just counted, the big break badge E704, the 2 px group-gap space E7F1, the "N/20"
+# digits E720-E72A (K.digits). The meter line itself (badge, 역장, pips, digits, the first-field hint) is the kit's
+# hud/put_sub; the core writes only the break line's badge.
+FONT = K.FONT
+GLYPH = {'badge': K.glyph('badge'), 'pip_empty': K.glyph('pip0'), 'pip_full': K.glyph('pip1'), 'pip_new': K.glyph('pip2'),
+         'break': K.glyph('break_big'), 'gap': K.SP_GAP}
+assert [ord(GLYPH[k]) for k in ('badge', 'pip_empty', 'pip_full', 'pip_new', 'break', 'gap')] == \
+    [0xE700, 0xE701, 0xE702, 0xE703, 0xE704, 0xE7F1], GLYPH
 METER_N = 20                    # the 20-hit break meter (user decision; replaces the 3 Pneuma hits)
+
+
+def rest_anchor(form, name, default):
+    """Height / offset of a named rig anchor in a rest form, from the real manifest's form_states.<form>.rest_anchors
+    (rig coordinates: x left, y up, -z forward); `default` (an (x, y, z) tuple) while the stub manifest has none."""
+    a = _MAN.get('form_states', {}).get(form, {}).get('rest_anchors', {}).get(name)
+    return tuple(float(v) for v in a) if a else tuple(default)
+
+
+# The core of the field form (the bubble the meter cracks): kit hud/meter_hit runs positioned here above the body.
+# The real rig puts it at 4.1 (spec README 1.1, Q13); the kit's own docs say 3.84 (its stub rig).
+CORE_FIELD_H = rest_anchor('field', 'core', (0, 4.1, 0))[1]
 
 
 class Pattern:
@@ -318,7 +347,36 @@ class Gen:
                 f'scoreboard players operation #fgM mb %= #fgK{n} mb\n'
                 f'execute if score #fgM mb matches {start} run {cmd}')
 
-    # -- fx and sound (vanilla only)
+    # -- the fx kit (THE effect engine; fg_fx_api.md). Every helper returns one function line (fx/...) to run in the
+    # executor context the kit documents: positioned at the event point (floor points at the floor top), rotated as
+    # the aim. Pair every kit telegraph with its framework hazard made in the same tick with the same tell, and
+    # g.hz_opts(quiet=1) (+ sfx=0 when the kit recipes give the sound), so the framework outline does not double it.
+    kit = K
+    fx = staticmethod(K.fx)                  # preset fx/p/<name>, e.g. g.fx('slam'), g.fx('bomb_drop', h=3.8)
+    snd = staticmethod(K.snd)                # sound recipe fx/snd/<name>, e.g. g.snd('slam')
+    kprop = staticmethod(K.prop)             # as @s = a module-owned item_display: the kit look fx/prop/<name>
+    #                                          (g.prop(name) is the RIG's prop, not the kit's)
+    klook = staticmethod(K.look)             # as @s = an item_display: a kit kind's model + tint (fx/look)
+    khud = staticmethod(K.hud)               # fx/hud/<name> (pops, flashes, notices; the meter / flags are the core's)
+    tele_disc = staticmethod(K.tele_disc)    # ground telegraph decals (visual only; blocks in, tenths out)
+    tele_ring = staticmethod(K.tele_ring)
+    tele_sector = staticmethod(K.tele_sector)
+    tele_line = staticmethod(K.tele_line)
+    tele_wave = staticmethod(K.tele_wave)    # the 「인력 충격파」 ring (fg_fx_api.md 4.1)
+    tele_mline = staticmethod(K.tele_mline)  # moving lanes id 0-7 (C3; fg_fx_api.md 4.2)
+    tele_mline_aim = staticmethod(K.tele_mline_aim)
+    tele_mline_turn = staticmethod(K.tele_mline_turn)
+    tele_mline_end = staticmethod(K.tele_mline_end)
+    TELE_CLEAR = f'function {K.FN}tele/clear'   # every kit decal (the core runs it on pause, break, death, test cuts)
+
+    @staticmethod
+    def kcard(kind, pos='~ ~ ~', rot='~ ~', col=K.WHITE, col2=-1, **kw):
+        """One kit card (fx/card, or fx/cardx with dly / dur / hit / col2 / off / vector sizes): K.card with the tints
+        given as an RGB int, '#RRGGBB' or (r, g, b) 0..1. Painted kinds keep their footage colours under white (the
+        default); neutral kinds (glow, glint, mote, streak, ripple) take any colour. Kinds: fg_fx_api.md section 3."""
+        return K.card(kind, pos, rot, col=kit_colour(col), col2=kit_colour(col2) if col2 != -1 else -1, **kw)
+
+    # -- vanilla fx and sound
     @staticmethod
     def sound(event, vol=1.0, pitch=1.0):
         return L.sound(event, vol, pitch)

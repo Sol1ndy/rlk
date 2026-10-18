@@ -6,6 +6,8 @@ function rlk:mboss/fieldgen/rig_stub/spawn
 function rlk:mboss/fieldgen/rig_stub/form/dormant
 function rlk:mboss/fieldgen/rig_stub/look/off
 function rlk:mboss/fieldgen/rig_stub/play/entrance
+# the kit's HUD flags of an earlier fight off (this also starts the kit's line version #fkHudV)
+function rlk:mboss/fieldgen/fx/hud/clear
 function rlk:mboss/fieldgen/form/hitbox_c
 function rlk:mboss/fieldgen/hud/refresh
 function rlk:mboss/fieldgen/cfx/ent_setup

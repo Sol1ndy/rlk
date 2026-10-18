@@ -7,5 +7,6 @@ scoreboard players set #fgOpen mb 0
 scoreboard players set #fgLowG mb 0
 scoreboard players set #fgCruN mb 0
 scoreboard players set #fgCruLim mb 4
+function rlk:mboss/fieldgen/hud/kit_off
 function rlk:mboss/fieldgen/form/hitbox_c
 function rlk:mboss/fieldgen/hud/refresh

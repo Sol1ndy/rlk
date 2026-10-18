@@ -31,14 +31,15 @@ scoreboard players set #fgBrk mb 0
 scoreboard players set #fgBrkFx mb 0
 scoreboard players set #fgBrkQ mb 0
 scoreboard players set #fgCrack mb 0
-scoreboard players set #fgPipT mb 0
 scoreboard players set #fgLowG mb 0
 scoreboard players set #fgWvK mb 0
 scoreboard players set #fgTri mb 0
+scoreboard players set #fgHudV mb 0
 scoreboard players set #fgCool mb 30
 scoreboard players set #fgBand mb 2
 scoreboard players set #fgCruLim mb 5
 scoreboard players set #fgBrkT mb -1000000
+scoreboard players set #fgBanG mb -1000000
 scoreboard players set #fgBag1 mb 1
 scoreboard players set #fgBag2 mb 1
 scoreboard players set #fgBag3 mb 1
