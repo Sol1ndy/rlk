@@ -1,4 +1,4 @@
 # jump clock 39
-function rlk:mboss/butterfly/rig/face/track
-particle minecraft:dust{color:[0.667f,0.859f,0.518f],scale:1} ~-1.21 ~2.4 ~0.7 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.667f,0.859f,0.518f],scale:1} ~1.21 ~2.4 ~-0.7 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 positioned ^-0.42 ^3.568 ^1.364 run function rlk:mboss/butterfly/fx/p/orb_kick
+function rlk:mboss/butterfly/fx/snd/disc_kick
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p2b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p2b,limit=1] rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/butterfly/fx/p/disc_fall {h:2.7}

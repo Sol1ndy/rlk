@@ -10,4 +10,5 @@ scoreboard players set #bfK18 mb 18
 scoreboard players set #bfK20 mb 20
 scoreboard players set #bfK40 mb 40
 scoreboard players set #bfCocPct mb 20
-scoreboard players set #bfDewPct mb 8
+scoreboard players set #bfDewPct mb 13
+scoreboard players set #bfCurePct mb 15

@@ -1,3 +1,3 @@
-# Play clip coco (76 t) from its tick 0 at the next rig/tick (the same game tick when rig/tick runs later). @s = rig anchor.
+# Play clip coco (64 t) from its tick 0 at the next rig/tick (the same game tick when rig/tick runs later). @s = rig anchor.
 scoreboard players set @s bfRigC 17
 scoreboard players set @s bfRigT -1

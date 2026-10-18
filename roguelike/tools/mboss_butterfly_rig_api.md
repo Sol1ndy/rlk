@@ -159,6 +159,28 @@ the `mb2/spec/*.md` pattern specs; `kick_jump` keeps `disc` as an alias of `orb`
 fx and anchors (manifest `anchors[event]`). The poses come from the footage key frames (v1-v4, model.md sheets 05,
 08, 09) and the per-tick timelines of the specs.
 
+**Wind-up retime** (user tuning "선딜 좀 줄이고", as the Guardian's): the keys stay authored on the spec timelines and
+`RETIME` (`butterfly_clips.mjs`) plays the ten damaging clips with about 25 % shorter wind-ups: piecewise-linear knots
+[authored tick, played tick] from [0, 0] to [authored length, played length], keys and events mapped and rounded half
+up (the build stops if two keys collide or a segment would slow the clip down; the rig compiler also refuses a part
+turning more than 120° per tick, which is why the H2 spiral-jump spin 33-45 and the B5 swoop stay 1:1). The strikes
+and their follow-throughs sit on 1:1 segments; only the wind-ups are compressed and the recoveries after the last hit
+are shifted. The manifest carries `retime` and `authoredLen`; the module maps its own authored ticks with `api.rt`.
+The table below is the **authored** timeline; the played lengths and events are:
+
+| clip | played len (authored) | played events |
+|---|---|---|
+| `kick_combo` | 43 (51) | run 0, plant 5, **hit1 8**, backflip 9, land1 16, hop 19, hop2 22, leap 25, swirl 28, **hit2 32**, land 36 |
+| `kick_jump` | 52 (65) | tell 0, **sweep 10**, sweep_end 16, jump 22, orb 34 (= disc), kick 39, **impact 42**, land 46 |
+| `dash_kick` | 46 (50) | charge 0, dash 6, dash_end 8, **kick 11**, ring 15 |
+| `vacuum` | 37 (41) | crouch 0, tell 5 (= glint), stomp 12, **blade 13**, backflip 13, land 34 |
+| `transform` | 29 (30) | glow 0, open 3, **sphere 5**, rings 8, spread 11 (butterfly from 3) |
+| `wing_strike` | 51 (55) | bank 0, dive 4, **hit 11** |
+| `wing_barrage` | 95 (117) | **swing1 4, swing2 24, swing3 52, swing4 72** |
+| `flap_dive` | 52 (59) | rise 0, **dive 13**, slam 19, fan 21, glide 26 |
+| `coco` | 64 (76) | wrap 3, **orb1 14**, ball 22, ball_open 30, **orb2 34** |
+| `release` | 83 (96) | fold 0, swoop 3, climb 7, whirl 14, cup 23, flash 26, glint 28, rings 28, wrap 33, snap 39, **detonation 40**, hover 50, shrink 74, flat 74, shatter 78, revert 79, land 83 (human from 79) |
+
 | clip | id | len | then | events | motion |
 |---|---|---|---|---|---|
 | `idle_h` | 0 | 40 | loop | | Fighting stance (v1 f560): knees a little bent, torso 12-14° forward, slow breathing, a weight shift from hip to hip; crescents and flakes bob, the crest sways. |

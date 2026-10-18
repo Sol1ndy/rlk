@@ -1,5 +1,5 @@
 # @s = a blade prop, at and rotated as it (0.9 b over the floor), before the framework moves it this tick
-# (core ai/state, so its age mbPjT = pattern clock - 17: the trail from 18, every 2 t).
+# (core ai/state, so its age mbPjT = pattern clock - 13: the trail from 14, every 2 t).
 scoreboard players add #bp4B mb 1
 particle minecraft:dust{color:[0.392f,0.737f,0.337f],scale:1.4} ^ ^-0.85 ^ 1.3 0.2 0.1 0 3 force @a[tag=player]
 particle minecraft:dust_color_transition{from_color:[0.965f,0.992f,0.878f],to_color:[0.392f,0.737f,0.337f],scale:1} ^ ^2.9 ^ 1 0.2 0.1 0 2 force @a[tag=player]

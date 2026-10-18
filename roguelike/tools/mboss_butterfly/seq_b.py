@@ -18,17 +18,17 @@ the effect engine; vanilla sounds only. Every function is visual / audio only (n
 import math
 
 from . import api as A
-from .api import L, CY, ev_or, clip_len
+from .api import L, CY, ev_or, clip_len, rt
 
 WX = A.WX
 NS = A.NS
 S5_T = '#bpS5T'               # S5 cure fx clock (1 on the cure tick, 0 = idle)
 
 TR_LEN = clip_len('transform')
-TR_OPEN = ev_or('transform', 'open', 4)
-TR_SPHERE = ev_or('transform', 'sphere', 6)
-TR_RINGS = ev_or('transform', 'rings', 9)
-TR_SPREAD = ev_or('transform', 'spread', 12)
+TR_OPEN = ev_or('transform', 'open', 3)
+TR_SPHERE = ev_or('transform', 'sphere', 5)
+TR_RINGS = ev_or('transform', 'rings', 8)
+TR_SPREAD = ev_or('transform', 'spread', 11)
 
 
 def fn(rel):
@@ -129,7 +129,7 @@ def switch(g):
 
 # =============================================================================================
 def transform(g):
-    """S2 section 3: the fx of the transformation clip (30 t), one file per busy tick (wx/tf/<t>, @s = body, at it).
+    """S2 section 3: the fx of the transformation clip (29 t played, 30 authored), one file per busy tick (wx/tf/<t>, @s = body, at it).
     The core keeps the mechanics (look/dendro, face/player, 달빛 고치 at the sphere, the end)."""
     body = 'execute rotated as @s rotated ~ 0 '
     chest = body + 'positioned ~ ~1.6 ~ run '
@@ -170,11 +170,11 @@ def transform(g):
         body + f'positioned {fl} run ' + g.kcard('glint', bb='center', s0=0.2, s1=0.8, life=4, fade=2, col='#E5FBC8'),
         body + f'positioned {fr} run ' + g.kcard('glint', bb='center', s0=0.2, s1=0.8, life=4, fade=2, col='#E5FBC8'))
     add(max(TR_SPREAD, TR_RINGS + 3) + 1, g.sound('entity.ender_dragon.flap', 0.5, 1.5))
-    for t in range(16, TR_LEN, 4):
-        add(t, body + f'positioned {fl} run ' + g.dust(A.LIME_PALE, 0.8, '~ ~ ~', (0.3, 0.2, 0.3), 2),
+    for t in range(16, 30, 4):                     # authored ticks (the clip plays 1 t sooner after the tuning: api.rt)
+        add(rt('transform', t), body + f'positioned {fl} run ' + g.dust(A.LIME_PALE, 0.8, '~ ~ ~', (0.3, 0.2, 0.3), 2),
             body + f'positioned {fr} run ' + g.dust(A.LIME_PALE, 0.8, '~ ~ ~', (0.3, 0.2, 0.3), 2))
     for t in (18, 24):
-        add(t, g.snd('flap_small'))
+        add(rt('transform', t), g.snd('flap_small'))
     for t, lines in ev.items():
         g.w(f'{WX}/tf/{t}', [f'# S2 transformation fx, clock {t} (@s = body, at it; the core\'s p/transform calls it).'] + lines)
     return sorted(ev)

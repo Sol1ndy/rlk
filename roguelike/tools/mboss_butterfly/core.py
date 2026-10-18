@@ -43,11 +43,11 @@ ENT_WHITE = ev_or('entrance', 'whiteout', ENT_BURST - 8)
 NAMEPLATE = ev_or('entrance', 'nameplate', 57)  # the video's fight trigger (nameplate) on the cocoon timeline
 INTRO_DONE = INTRO_CLIP + ENT_LEN + 1         # she stands; the fight starts
 TR_LEN = clip_len('transform')
-TR_OPEN = ev_or('transform', 'open', 4)
-TR_SPHERE = ev_or('transform', 'sphere', 6)   # 달빛 고치 lands with the light sphere
+TR_OPEN = ev_or('transform', 'open', 3)
+TR_SPHERE = ev_or('transform', 'sphere', 5)   # 달빛 고치 lands with the light sphere (6 authored)
 TR_RINGS = ev_or('transform', 'rings', TR_SPHERE + 2)
 RL_LEN = clip_len('release')
-RL_DET = ev_or('release', 'detonation', 53)
+RL_DET = ev_or('release', 'detonation', 40)
 RL_FLAT = ev_or('release', 'flat', RL_DET + 34)
 RL_REVERT = ev_or('release', 'revert', RL_DET + 39)
 DEATH_LEN = clip_len('death')
@@ -179,7 +179,7 @@ def ring(g, rgb, r, n, y='0.15', scale=1.0, cnt=1):
 
 
 HUM_HEX, BF_HEX = '#C8E6A0', A.LIME_HEX
-COC_HINT = '달빛 고치 — 회복하면 해제'
+COC_HINT = f'달빛 고치 — 체력 {A.CURE_PCT}% 회복하면 해제'
 
 
 class Core:
@@ -219,14 +219,15 @@ class Core:
     def consts_vars(self):
         self.w('ai/consts', ['# Module constants (spawn, reload). #bfK<n> are the moduli of Gen.every and the core\'s cycles.']
                + [sc_set(f'#bfK{n}', n) for n in (2, 3, 4, 5, 6, 8, 10, 18, 20, 40)]
-               + [sc_set('#bfCocPct', A.COCOON_HP_PCT), sc_set('#bfDewPct', A.DEW_HEAL_PCT)])
+               + [sc_set('#bfCocPct', A.COCOON_HP_PCT), sc_set('#bfDewPct', A.DEW_HEAL_PCT), sc_set('#bfCurePct', A.CURE_PCT)])
         v = ['# Every fake player of the module back to its fight-start value (spawn, cleanup; no executor).',
              '# AI state #bfSt: 0 idle 1 pattern 2 burst-run close-in 3 groggy 4 turn + chain re-form 5 wing look prep 7 dying',
              '# form #bfForm: 1 human 2 butterfly']
         v += [sc_set(k, 0) for k in ('#bfSt', '#bfT', '#bfMv', '#bfMvT', '#bfLast', '#bfPick', '#bfReq', '#bfPat', '#bfPNew',
                                       '#bfPT', '#bfPEnd', '#bfPMax', '#bfPLen', '#bfPRel', '#bfPDone', '#bfPCol', '#bfClk',
                                       '#bfFlash', '#bfTst', '#bfDist', '#bfWant', '#bfBurnQ', '#bfDewN', '#bfCocN',
-                                      '#bfHumN', '#bfHumT', '#bfBfN', '#bfBfT', '#bfDew1', '#bfWing', '#bfPSw', '#bfPNeed')]
+                                      '#bfHumN', '#bfHumT', '#bfBfN', '#bfBfT', '#bfDew1', '#bfWing', '#bfPSw', '#bfPNeed', '#bfCure',
+                                      '#bfCureT')]
         v += [sc_set('#bfCool', 30), sc_set('#bfBand', 2), sc_set('#bfSide', 1), sc_set('#bfForm', 1),
               sc_set('#bfHumLim', HUM_FIRST_N), sc_set('#bfHumTL', HUM_FIRST_T), sc_set('#bfBfLim', BF_N[0]),
               sc_set('#bfLook', A.EL_DENDRO)]
@@ -276,7 +277,8 @@ class Core:
             f'execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run {F("intro/setup")}'])
         self.w('tick', [
             '# Hook tick (@s = body, at @s, fight state). Order: clocks and flags, the heal orbs (a pickup heals),',
-            '# heal events (any heal cures 달빛 고치), Burning, form clocks, AI state, pattern slot, then the rig (a clip',
+            f'# heal events (their amounts fill the 달빛 고치 cure meter: {A.CURE_PCT} % of max HP cures it), Burning, form clocks, AI',
+            '# state, pattern slot, then the rig (a clip',
             '# played this tick starts this tick). The fx kit ages its own cards (a self-scheduled function).',
             'scoreboard players add #bfClk mb 1',
             f'execute if score #bfFlash mb matches 1 run {R("flash")}',
@@ -304,7 +306,8 @@ class Core:
         self.w('incoming', [
             '# Hook incoming (@s = body inside combat/apply_mods, after the level factor and mres). NO element RES of any',
             '# kind (user decision "불, 풀 내성은 없애줘"): mres stays 0 and nothing here reads #elem. Only the player\'s',
-            f'# 달빛 고치 (DMG {A.COCOON_DMG} %, forced crits undone: CRIT -100 %) and 달빛 축복 받음 (DMG {A.BUFF_DMG} %), reactions included.',
+            f'# 달빛 고치 (DMG {A.COCOON_DMG} %, forced crits undone: CRIT -100 %), reactions included. (달빛 축복 받음 is CRIT +{A.BUFF_CRIT} /',
+            f'# CRIT DMG +{A.BUFF_CRIT_DMG} through items/hook/stat_buffs: #mbCritAdd / #mbCritDmgAdd, no damage factor here.)',
             f'execute if score #bfCoc mb matches 1 if score #crit tmp matches 1 run {F("coc/uncrit")}',
             f'execute unless score #bfDmgPct mb matches 100 if score #dmg tmp matches 1.. run {F("coc/dmg")}'])
         self.w('pause', [
@@ -389,7 +392,7 @@ class Core:
             F('coc/assert'),
             f'execute if score #bfCoc mb matches 1 if score #bfForm mb matches 2 run {F("dew/spawn")}',
             '# the groggy\'s single 달빛 이슬 (offered while debuffed after 달빛 해제) comes back too (review fix S4)',
-            f'execute if score #bfDew1 mb matches 1 if score #bfForm mb matches 1 unless score #bfRl mb matches 2 run {F("dew/spawn1")}',
+            f'execute if score #bfDew1 mb matches 1.. if score #bfForm mb matches 1 unless score #bfRl mb matches 2 run {F("dew/offer")}',
             f'execute if score #bfRl mb matches 2 run return run {F("groggy/begin")}',
             f'execute if score #bfRl mb matches 3 run return run {F("groggy/end")}',
             f'execute if score #bfSt mb matches 3 run return run {g.play("groggy_h")}',
@@ -801,7 +804,7 @@ class Core:
             F('form/set_b'), sc_set('#bfCool', 16), F('ai/enter')])
         self.w('form/sphere', [
             f'# Transformation clock {TR_SPHERE} (@s = body): the light sphere lands 달빛 고치 on the player and {A.DEW_N} 달빛 이슬',
-            '# heal orbs appear (any heal cures it): exactly 3, a groggy orb still lying there goes first (review fix PL-2).',
+            '# heal orbs appear (two of them fill the cure meter): exactly 3, a groggy orb still lying there goes first (review fix PL-2).',
             F('coc/apply'),
             F('dew/clear'),
             F('dew/spawn')])
@@ -855,7 +858,7 @@ class Core:
             F('hud/refresh')])
         self.w('groggy/tick', [
             'scoreboard players add #bfT mb 1',
-            f'# still debuffed after 달빛 해제: one new 달빛 이슬 during the groggy',
+            f'# still debuffed after 달빛 해제: new 달빛 이슬 during the groggy (as many as the cure meter still needs: 1 or 2)',
             f'execute if score #bfT mb matches 20 if score #bfCoc mb matches 1 run {F("dew/spawn1")}',
             F('seq_h/groggy/tick'),                    # [seq_h: human author] S3 visuals and sounds on #bfT
             f'execute if score #bfT mb matches {GROGGY}.. run {F("recover/begin")}'])
@@ -888,8 +891,9 @@ class Core:
             f'# @s = player, at it. {A.COCOON_HP_PCT} % of the CURRENT HP as damage, non-lethal (at least 1, HP never below 1), no',
             '# element; a debuff, not a hit: no dash i-frames, defence or shields. Then the state: player DMG',
             f'# {A.COCOON_DMG} %, CRIT {A.COCOON_CRIT} (forced crits undone in incoming), healing received {A.COCOON_HEAL} %; a',
-            '# previous 달빛 축복 받음 ends here. The kit: swirl fx and curse chime at the player, the HUD badge (coc_on,',
-            '# buff_off), the actionbar notice with the numbers; the typed hint (core caption).',
+            '# previous 달빛 축복 받음 ends here. The cure meter restarts at 0 (user: "일정 체력 이상 회복해야 하게"; the target is',
+            f'# {A.CURE_PCT} % of max HP). The kit: swirl fx and curse chime at the player, the HUD badge (coc_on, buff_off, the',
+            '# meter readout), the actionbar notice with the numbers; the typed hint (core caption).',
             'scoreboard players operation #bfX mb = @s curHealth',
             'scoreboard players operation #bfX mb *= #bfCocPct mb',
             'scoreboard players operation #bfX mb /= #c100 mb',
@@ -900,23 +904,51 @@ class Core:
             'scoreboard players set #elem tmp 0',
             'execute at @e[tag=rlk_body,limit=1] positioned ~ ~1.62 ~ run function rlk:player/hurt_do',
             sc_set('#bfCoc', 1), sc_set('#bfBuff', 0), sc_set('#bfDmgPct', A.COCOON_DMG),
-            sc_set('#mbCritAdd', A.COCOON_CRIT), sc_set('#mbHealPct', A.COCOON_HEAL), sc_set('#mbHealEv', 0),
+            sc_set('#mbCritAdd', A.COCOON_CRIT), sc_set('#mbCritDmgAdd', 0), sc_set('#mbHealPct', A.COCOON_HEAL),
+            sc_set('#mbHealEv', 0), sc_set('#mbHealAmt', 0), sc_set('#bfCure', 0), F('coc/meter'),
             'scoreboard players add #bfCocN mb 1',
             f'execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run {F("wx/coc/fx")}',  # wing author: S2 debuff fx (seq_b.py)
             g.khud('buff_off'), g.khud('coc_on'), g.khud('ab_coc'),
             g.say(COC_HINT, A.COC_SWIRL_HEX, 2, 50, 1),
             F('hud/refresh')])
         self.w('coc/heal_ev', [
-            '# The player received a heal this tick or the last (rlk:mboss/player_heal counted it; the heal itself was already',
-            f'# reduced to {A.COCOON_HEAL} %): ANY heal cures 달빛 고치 (user decision; not only a full heal).',
-            sc_set('#mbHealEv', 0),
-            f'execute if score #bfCoc mb matches 1 run {F("coc/cure")}'])
+            '# The player received heals since the last module tick (rlk:mboss/player_heal counted them and added their amounts',
+            f'# to #mbHealAmt, already reduced to {A.COCOON_HEAL} %, overheal included). While 달빛 고치 is on they fill the cure meter',
+            f'# #bfCure (user: "일정 체력 이상 회복해야 하게"; it used to be any heal): at {A.CURE_PCT} % of max HP (#bfCureT) it is',
+            '# cured, below that a small chime and the meter on the actionbar (the boss-bar sub-line reads it live).',
+            'execute if score #bfCoc mb matches 1 run scoreboard players operation #bfCure mb += #mbHealAmt mb',
+            sc_set('#mbHealEv', 0), sc_set('#mbHealAmt', 0),
+            'execute unless score #bfCoc mb matches 1 run return 0',
+            f'execute as @a[tag=player,limit=1] run {F("coc/meter")}',
+            f'execute if score #bfCure mb >= #bfCureT mb run return run {F("coc/cure")}',
+            f'execute as @a[tag=player,limit=1] at @s run {F("coc/progress")}'])
+        self.w('coc/meter', [
+            f'# @s = the player: the cure target #bfCureT = {A.CURE_PCT} % of max HP (rounded down, at least 1) and the readout for the',
+            '# kit (#bkCureP = the meter in % of max HP, rounded down, #bkCureT = the target %): the 달빛 고치 entry of the boss-bar',
+            '# sub-line ("회복 9/15%") and hud/ab_cure show them as score components.',
+            'scoreboard players operation #bfCureT mb = @s maxHealth',
+            'scoreboard players operation #bfCureT mb *= #bfCurePct mb',
+            'scoreboard players operation #bfCureT mb /= #c100 mb',
+            'execute if score #bfCureT mb matches ..0 run scoreboard players set #bfCureT mb 1',
+            'scoreboard players operation #bkCureP mb = #bfCure mb',
+            'scoreboard players operation #bkCureP mb *= #c100 mb',
+            'execute if score @s maxHealth matches 1.. run scoreboard players operation #bkCureP mb /= @s maxHealth',
+            'execute if score #bkCureP mb > #bfCurePct mb run scoreboard players operation #bkCureP mb = #bfCurePct mb',
+            'scoreboard players operation #bkCureT mb = #bfCurePct mb'])
+        self.w('coc/progress', [
+            '# @s = the player, at it: a heal filled the cure meter but not to the target: a small rising chime, a short salmon /',
+            '# gold dust swirl at the feet (no cards at the eyes: first person, fix PL-1) and the meter on the actionbar.',
+            g.sound('block.amethyst_block.chime', 0.8, 1.5), g.sound('block.note_block.chime', 0.45, 1.8),
+            g.dust(A.COC_SWIRL, 1.0, '~ ~0.4 ~', (0.45, 0.25, 0.45), 8), g.dust(A.GOLD_RING, 0.9, '~ ~0.8 ~', (0.35, 0.3, 0.35), 6),
+            g.khud('ab_cure')])
         self.w('coc/cure', [
-            f'# 달빛 고치 removed -> 달빛 축복 받음: CRIT +{A.BUFF_CRIT} %, DMG +{A.BUFF_DMG - 100} % until the next 달빛 고치 or the fight\'s end.',
-            '# The kit\'s cure fx at the player\'s feet (about 20 t: gold beam down, gold burst + ring, gold emblem with',
-            '# sparkles) and chime, the badges (coc_off, buff_on), the actionbar notice and the big reward badge.',
-            sc_set('#bfCoc', 0), sc_set('#bfBuff', 1), sc_set('#bfDmgPct', A.BUFF_DMG), sc_set('#mbCritAdd', A.BUFF_CRIT),
-            sc_set('#mbHealPct', 100),
+            f'# 달빛 고치 removed (the meter reached {A.CURE_PCT} % of max HP) -> 달빛 축복 받음: CRIT RATE +{A.BUFF_CRIT} % and CRIT DMG',
+            f'# +{A.BUFF_CRIT_DMG} % (items/hook/stat_buffs: #mbCritAdd / #mbCritDmgAdd; user: "피해 +50%가 아니라 치명타 피해 +50%야")',
+            '# until the next 달빛 고치 or the fight\'s end. The kit\'s cure fx at the player\'s feet (about 20 t: gold beam down, gold',
+            '# burst + ring, gold emblem with sparkles) and chime, the badges (coc_off, buff_on), the actionbar notice and the big',
+            '# reward badge.',
+            sc_set('#bfCoc', 0), sc_set('#bfBuff', 1), sc_set('#bfDmgPct', 100), sc_set('#mbCritAdd', A.BUFF_CRIT),
+            sc_set('#mbCritDmgAdd', A.BUFF_CRIT_DMG), sc_set('#mbHealPct', 100), sc_set('#bfCure', 0), sc_set('#bkCureP', 0),
             f'# the hint "{COC_HINT}" still typing or held on the subtitle line goes now: its steps would blank the reward pop',
             '# below and it would stay 3 s after the cure (review fix FX-3)',
             f'execute if score #mbLn mb matches 1 if data storage rlk:mboss {{ln:{{t:"{COC_HINT}"}}}} run function rlk:mboss/line/clear',
@@ -927,18 +959,21 @@ class Core:
             '# 달빛 고치 and 달빛 축복 받음 off, the framework\'s player modifiers neutral, both kit HUD badges off (no',
             '# executor; idempotent).',
             sc_set('#bfCoc', 0), sc_set('#bfBuff', 0), sc_set('#bfDmgPct', 100),
-            sc_set('#mbCritAdd', 0), sc_set('#mbHealPct', 100), sc_set('#mbHealEv', 0),
+            sc_set('#mbCritAdd', 0), sc_set('#mbCritDmgAdd', 0), sc_set('#mbHealPct', 100), sc_set('#mbHealEv', 0),
+            sc_set('#mbHealAmt', 0), sc_set('#bfCure', 0), sc_set('#bkCureP', 0),
             sc_set('#bpS5T', 0),  # wing author: S5 cure fx clock
             g.khud('clear')])
         self.w('coc/clear_hud', [F('coc/clear'), f'execute if score #mbSt mb matches 0..1 run {F("hud/refresh")}'])
         self.w('coc/assert', [
             '# Reload: the framework values from the module\'s own state (init keeps live values; re-assert anyway).',
-            sc_set('#bfDmgPct', 100), sc_set('#mbCritAdd', 0), sc_set('#mbHealPct', 100),
-            f'execute if score #bfBuff mb matches 1 run scoreboard players set #bfDmgPct mb {A.BUFF_DMG}',
+            sc_set('#bfDmgPct', 100), sc_set('#mbCritAdd', 0), sc_set('#mbCritDmgAdd', 0), sc_set('#mbHealPct', 100),
             f'execute if score #bfBuff mb matches 1 run scoreboard players set #mbCritAdd mb {A.BUFF_CRIT}',
+            f'execute if score #bfBuff mb matches 1 run scoreboard players set #mbCritDmgAdd mb {A.BUFF_CRIT_DMG}',
             f'execute if score #bfCoc mb matches 1 run scoreboard players set #bfDmgPct mb {A.COCOON_DMG}',
             f'execute if score #bfCoc mb matches 1 run scoreboard players set #mbCritAdd mb {A.COCOON_CRIT}',
             f'execute if score #bfCoc mb matches 1 run scoreboard players set #mbHealPct mb {A.COCOON_HEAL}',
+            '# the cure meter (#bfCure) is kept; its target and readout again',
+            f'execute if score #bfCoc mb matches 1 as @a[tag=player,limit=1] run {F("coc/meter")}',
             '# the kit\'s HUD badges from the module state (storage rlk:bfkit survives a reload; re-assert anyway)',
             g.khud('clear'),
             f'execute if score #bfCoc mb matches 1 run {g.khud("coc_on")}',
@@ -952,7 +987,7 @@ class Core:
             'scoreboard players operation #dmg tmp /= @a[tag=player,limit=1] critDamage',
             'execute if score #dmg tmp matches ..0 run scoreboard players set #dmg tmp 1'])
         self.w('coc/dmg', [
-            '# Player DMG on the body x #bfDmgPct % (50 under 달빛 고치, 150 with 달빛 축복 받음), at least 1.',
+            f'# Player DMG on the body x #bfDmgPct % ({A.COCOON_DMG} under 달빛 고치; 100 otherwise: the reward is crit, not damage), at least 1.',
             'scoreboard players operation #dmg tmp *= #bfDmgPct mb',
             'scoreboard players operation #dmg tmp /= #c100 mb',
             'execute if score #dmg tmp matches ..0 run scoreboard players set #dmg tmp 1'])
@@ -963,19 +998,39 @@ class Core:
         r0, r1 = int(A.DEW_R[0] * 10), int(A.DEW_R[1] * 10)
         self.w('dew/spawn', [
             f'# {A.DEW_N} 달빛 이슬 (moon dew) heal orbs at random spots {L.num(A.DEW_R[0])}-{L.num(A.DEW_R[1])} b from the arena centre, 120 degrees',
-            f'# apart (any executor). Touching one heals {A.DEW_HEAL_PCT} % max HP through player/heal (cures 달빛 고치).',
+            f'# apart (any executor). Touching one heals {A.DEW_HEAL_PCT} % max HP through player/heal ({A.DEW_HEAL_PCT * A.COCOON_HEAL / 100:g} % under 달빛 고치:',
+            f'# two of them fill the {A.CURE_PCT} % cure meter).',
             sc_set('#bfDewP', 0),
             'execute store result score #bfX mb run random value 0..359',
             F('dew/one'),
             'scoreboard players add #bfX mb 120', F('dew/one'),
             'scoreboard players add #bfX mb 120', F('dew/one')])
-        self.w('dew/spawn1', ['# One 달빛 이슬 (still debuffed during the groggy): it stays until it is taken, the next transformation\'s',
-                              '# sphere or the next butterfly form\'s end; #bfDew1 = it is offered (a /reload brings it back, fix S4).',
-                              F('dew/clear'),
-                              sc_set('#bfDew1', 1),
-                              sc_set('#bfDewP', 0),
-                              'execute store result score #bfX mb run random value 0..359', F('dew/one'),
-                              g.sound('block.amethyst_block.chime', 0.6, 1.4)])
+        self.w('dew/spawn1', ['# The groggy re-offer (still debuffed after 달빛 해제): as many 달빛 이슬 as the cure meter still needs, one',
+                              '# when one orb finishes it, else two (user: "하나만 먹어도 기믹 처리되는건 너무 쉬운 것 같아"; it used to be one).',
+                              f'execute as @a[tag=player,limit=1] run {F("dew/need")}',
+                              'scoreboard players operation #bfDew1 mb = #bfDewNeed mb',
+                              F('dew/offer')])
+        self.w('dew/need', [f'# @s = the player: #bfDewNeed = 1 when one orb\'s effective heal ({A.DEW_HEAL_PCT} % of max HP rounded up, x the',
+                            '# healing received %, rounded half up as mboss/player_heal does) fills the cure meter to its target, else 2.',
+                            'scoreboard players operation #bfDewQ mb = @s maxHealth',
+                            'scoreboard players operation #bfDewQ mb *= #bfDewPct mb',
+                            'scoreboard players add #bfDewQ mb 99',
+                            'scoreboard players operation #bfDewQ mb /= #c100 mb',
+                            'scoreboard players operation #bfDewQ mb *= #mbHealPct mb',
+                            'scoreboard players add #bfDewQ mb 50',
+                            'scoreboard players operation #bfDewQ mb /= #c100 mb',
+                            'scoreboard players operation #bfDewQ mb += #bfCure mb',
+                            sc_set('#bfDewNeed', 2),
+                            'execute if score #bfDewQ mb >= #bfCureT mb run scoreboard players set #bfDewNeed mb 1'])
+        self.w('dew/offer', ['# The groggy\'s #bfDew1 달빛 이슬 (1 or 2, opposite each other): they stay until taken, the next transformation\'s',
+                             '# sphere or the next butterfly form\'s end; #bfDew1 = the orbs still offered (a /reload brings them back, fix S4).',
+                             'execute as @e[type=minecraft:item_display,tag=rlk_mb_bf_dew] at @s run ' + g.particle('poof', '~ ~ ~', (0.2, 0.2, 0.2), 0.02, 6),
+                             'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_dew]',
+                             sc_set('#bfDewN', 0), sc_set('#bfDewP', 0),
+                             'execute store result score #bfX mb run random value 0..359', F('dew/one'),
+                             'scoreboard players add #bfX mb 180',
+                             f'execute if score #bfDew1 mb matches 2.. run {F("dew/one")}',
+                             g.sound('block.amethyst_block.chime', 0.6, 1.4)])
         self.w('dew/one', [
             '# #bfX = angle (deg); a random radius.',
             'execute store result storage rlk:mboss bfd.a double 1 run scoreboard players get #bfX mb',
@@ -1021,13 +1076,15 @@ class Core:
             g.particle('happy_villager', '~ ~ ~', (0.4, 0.4, 0.4), 0, 6),
             g.sound('block.amethyst_block.chime', 1.0, 1.9), g.sound('block.amethyst_cluster.hit', 0.6, 1.6),
             'scoreboard players remove #bfDewN mb 1',
-            sc_set('#bfDew1', 0),
+            'execute if score #bfDew1 mb matches 1.. run scoreboard players remove #bfDew1 mb 1',
             'kill @s'])
         self.w('dew/heal', [
-            f'# @s = player: {A.DEW_HEAL_PCT} % of max HP (red herb boosts orb heals as for the normal heal orbs), at least 1, through',
-            '# player/heal (so items/hook/on_heal: 달빛 고치 -40 % and the cure).',
+            f'# @s = player: {A.DEW_HEAL_PCT} % of max HP rounded up (red herb boosts orb heals as for the normal heal orbs), at least 1,',
+            '# through player/heal (so items/hook/on_heal: 달빛 고치 -40 % and the cure meter). Rounded up so two orbs always fill',
+            f'# the {A.CURE_PCT} % meter under the debuff whatever the max HP (13 % x 0.6 = 7.8 %).',
             'scoreboard players operation #heal tmp = @s maxHealth',
             'scoreboard players operation #heal tmp *= #bfDewPct mb',
+            'scoreboard players add #heal tmp 99',
             'scoreboard players operation #heal tmp /= #c100 mb',
             'execute if score @s it_red_herb matches 1.. run function rlk:items/proc/herb',
             'execute if score #heal tmp matches ..0 run scoreboard players set #heal tmp 1',
@@ -1101,7 +1158,8 @@ class Core:
         extra.append(g.khud('put_extra'))
         self.w('hud/extra', extra)
         sub = ['# Third line: what she is doing, then the player\'s 달빛 고치 / 달빛 축복 받음 state (the kit\'s hud/put_sub: badge',
-               '# glyph + "달빛 고치 — 회복하면 해제" + the dew icon, or badge + "달빛 축복 받음 (치명타 +15% · 피해 +50%)").',
+               '# glyph + "달빛 고치 — 회복 9/15%" (the cure meter, score components) + the dew icon, or badge + "달빛 축복 받음',
+               '# (치명타 +15% · 치명타 피해 +50%)").',
                'execute if score #mbSt mb matches 0 run data modify storage rlk:mboss sub set value []',
                'execute if score #mbSt mb matches 0 run return 0',
                f'data modify storage rlk:mboss sub set value [{{text:"인간형",color:"{HUM_HEX}",bold:true}}]',
@@ -1149,7 +1207,7 @@ class Core:
         bfl = ', '.join(f'{p.id} {p.label}' for p in self.bfl)
         HELP = [
             ('1-4', f'인간형 패턴 ({hum})'), ('11-14', f'나비형 패턴 ({bfl}), 즉시 나비형'),
-            ('15 / 30', '달빛 해제'), ('20', '변신(달빛 고치 · 달빛 이슬)'), ('21', '달빛 고치만'), ('22', '회복 1 (해제 → 달빛 축복)'),
+            ('15 / 30', '달빛 해제'), ('20', '변신(달빛 고치 · 달빛 이슬)'), ('21', '달빛 고치만'), ('22', '최대 체력 25% 회복 (고치 중 15% → 해제 · 달빛 축복)'),
             ('23', '달빛 이슬 3개'), ('24', '고치 · 축복 끄기'), ('40', '그로기'), ('42', '다음 결정에서 형태 전환'),
             ('91', '나비형 연소 약점 시험(불 타격 흉내)'), ('99', '대기로'),
             ('lock 1-4 / 11-14 / 16', '그 패턴만 / (변신 뒤) 그 나비형 패턴만 / 변신 · 해제만 반복'),
@@ -1199,6 +1257,9 @@ class Core:
                 f'execute if score #bfTst mb matches 99 run return run {F("test/cut")}',
                 F('test/help')]
         self.w('test/run', run)
-        self.w('test/heal', ['# A 1 HP heal through the real path (player/heal -> items/hook/on_heal -> mboss/player_heal).',
-                             'scoreboard players set #heal tmp 1',
+        self.w('test/heal', ['# A heal of 25 % of max HP through the real path (player/heal -> items/hook/on_heal -> mboss/player_heal):',
+                             f'# under 달빛 고치 it is 15 % received (x 0.6), which fills the {A.CURE_PCT} % cure meter at once.',
+                             'execute as @a[tag=player,limit=1] run scoreboard players operation #heal tmp = @s maxHealth',
+                             'scoreboard players operation #heal tmp /= #c4 mb',
+                             'execute if score #heal tmp matches ..0 run scoreboard players set #heal tmp 1',
                              'execute as @a[tag=player,limit=1] run function rlk:player/heal'])

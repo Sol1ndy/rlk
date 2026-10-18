@@ -1,4 +1,5 @@
 # barrage clock 75
 function rlk:mboss/butterfly/rig/face/track
-function rlk:mboss/butterfly/p/barrage/spawn34
-execute if entity @e[tag=rlk_body,distance=..5,limit=1] run function rlk:mboss/butterfly/wx/u/away {d:0.2}
+function rlk:mboss/butterfly/p/barrage/spawn41
+playsound minecraft:block.fire.ambient hostile @a[tag=player] ~ ~ ~ 0.8 1.5 0.27
+playsound minecraft:entity.blaze.burn hostile @a[tag=player] ~ ~ ~ 0.3 1.2 0.1

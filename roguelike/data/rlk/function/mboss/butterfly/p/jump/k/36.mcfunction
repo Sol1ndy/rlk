@@ -1,5 +1,2 @@
 # jump clock 36
-function rlk:mboss/butterfly/rig/face/track
-particle minecraft:dust{color:[0.667f,0.859f,0.518f],scale:1} ~0.7 ~1.35 ~-1.21 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.667f,0.859f,0.518f],scale:1} ~-0.7 ~1.35 ~1.21 0 0 0 0 1 force @a[tag=player]
-playsound minecraft:item.elytra.flying hostile @a[tag=player] ~ ~ ~ 0.2 1.4 0
+execute at @s rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.831f,0.973f,0.776f],scale:1} ^-0.415 ^4.419 ^1.092 0.15 0.15 0.15 0 3 force @a[tag=player]

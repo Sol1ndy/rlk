@@ -7,7 +7,7 @@ function rlk:mboss/butterfly/ai/consts
 execute if score #mbSt mb matches 0 run function rlk:mboss/intro_end
 execute as @e[tag=rlk_mb_mv] run function rlk:mboss/mv/stop
 scoreboard players set #bfRl mb 0
-execute if score #bfPat mb matches 20 if score #bfPT mb matches 6.. run scoreboard players set #bfRl mb 1
+execute if score #bfPat mb matches 20 if score #bfPT mb matches 5.. run scoreboard players set #bfRl mb 1
 execute if score #bfPat mb matches 15 run scoreboard players set #bfRl mb 2
 execute if score #bfSt mb matches 4 run scoreboard players set #bfRl mb 3
 function rlk:mboss/butterfly/p/cancel
@@ -24,7 +24,7 @@ execute if score #bfForm mb matches 1 run function rlk:mboss/butterfly/form/rig_
 function rlk:mboss/butterfly/coc/assert
 execute if score #bfCoc mb matches 1 if score #bfForm mb matches 2 run function rlk:mboss/butterfly/dew/spawn
 # the groggy's single 달빛 이슬 (offered while debuffed after 달빛 해제) comes back too (review fix S4)
-execute if score #bfDew1 mb matches 1 if score #bfForm mb matches 1 unless score #bfRl mb matches 2 run function rlk:mboss/butterfly/dew/spawn1
+execute if score #bfDew1 mb matches 1.. if score #bfForm mb matches 1 unless score #bfRl mb matches 2 run function rlk:mboss/butterfly/dew/offer
 execute if score #bfRl mb matches 2 run return run function rlk:mboss/butterfly/groggy/begin
 execute if score #bfRl mb matches 3 run return run function rlk:mboss/butterfly/groggy/end
 execute if score #bfSt mb matches 3 run return run function rlk:mboss/butterfly/rig/play/groggy_h

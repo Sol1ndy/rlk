@@ -1678,8 +1678,11 @@ def sounds(W):
             [sound_line(*l) for l in layers])
 
 
-HUD_FUNCS = ('coc_on', 'coc_off', 'buff_on', 'buff_off', 'clear', 'put_extra', 'put_sub', 'ab_coc', 'ab_buff',
+HUD_FUNCS = ('coc_on', 'coc_off', 'buff_on', 'buff_off', 'clear', 'put_extra', 'put_sub', 'ab_coc', 'ab_buff', 'ab_cure',
              'pop_coc', 'pop_buff', 'flash_white', 'flash_lime', 'flash_gold', 'flash_maroon', 'flash_end')
+# The 달빛 고치 cure meter readout (user: "일정 체력 이상 회복해야 하게"): score components of these fake players in objective mb,
+# set by the module (the meter and the target in % of max HP); the boss bar re-reads them every tick.
+CURE_P, CURE_T = '#bkCureP', '#bkCureT'
 
 
 def gl(name, extra=''):
@@ -1709,14 +1712,22 @@ def hud_funcs(W):
         f'execute if data storage {STO} hud{{coc:1b}} run data modify storage {STO} hud.sub append value '
         '{text:" 달빛 고치",color:"#E8A0A6"}',
         f'execute if data storage {STO} hud{{coc:1b}} run data modify storage {STO} hud.sub append value '
-        '{text:" — 회복하면 해제 ",color:"#C9A3A6"}',
+        '{text:" — 회복 ",color:"#C9A3A6"}',
+        f'execute if data storage {STO} hud{{coc:1b}} run data modify storage {STO} hud.sub append value '
+        f'{{score:{{name:"{CURE_P}",objective:"mb"}},color:"#F2C4C8",bold:true}}',
+        f'execute if data storage {STO} hud{{coc:1b}} run data modify storage {STO} hud.sub append value '
+        '{text:"/",color:"#C9A3A6"}',
+        f'execute if data storage {STO} hud{{coc:1b}} run data modify storage {STO} hud.sub append value '
+        f'{{score:{{name:"{CURE_T}",objective:"mb"}},color:"#C9A3A6"}}',
+        f'execute if data storage {STO} hud{{coc:1b}} run data modify storage {STO} hud.sub append value '
+        '{text:"% ",color:"#C9A3A6"}',
         f'execute if data storage {STO} hud{{coc:1b}} run data modify storage {STO} hud.sub append value {gl("dew")}',
         f'execute if data storage {STO} hud{{buff:1b}} run data modify storage {STO} hud.sub append value {{text:"     "}}',
         f'execute if data storage {STO} hud{{buff:1b}} run data modify storage {STO} hud.sub append value {gl("buff")}',
         f'execute if data storage {STO} hud{{buff:1b}} run data modify storage {STO} hud.sub append value '
         '{text:" 달빛 축복 받음",color:"#F2D27A"}',
         f'execute if data storage {STO} hud{{buff:1b}} run data modify storage {STO} hud.sub append value '
-        '{text:" (치명타 +15% · 피해 +50%)",color:"#BDB38A"}',
+        '{text:" (치명타 +15% · 치명타 피해 +50%)",color:"#BDB38A"}',
     ])
     W.w('hud/put_extra', ['# Append the badges to the boss-bar name line: call at the end of the module\'s line-1 build',
                           '# (after it resets rlk:mboss extra). Same as the component',
@@ -1727,11 +1738,18 @@ def hud_funcs(W):
     W.w('hud/ab_coc', ['# One-shot actionbar notice (2 s) for every player: the badge and the hint. Holds the regular',
                        '# actionbar HUD (hudHold) meanwhile.',
                        'title @a[tag=player] actionbar [' + gl('coc') + ',{text:" 달빛 고치",color:"#E8A0A6",bold:true},'
-                       '{text:" — 회복하면 해제 · 피해 −50% · 치명타 −100% · 받는 치유 −40%",color:"#C9A3A6"}]',
+                       '{text:" — 체력 15% 회복하면 해제 · 피해 −50% · 치명타 −100% · 받는 치유 −40%",color:"#C9A3A6"}]',
                        'scoreboard players set @a[tag=player] hudHold 40'])
     W.w('hud/ab_buff', ['# One-shot actionbar notice (2 s): the reward badge and its numbers.',
                         'title @a[tag=player] actionbar [' + gl('buff') + ',{text:" 달빛 축복 받음",color:"#F2D27A",bold:true},'
-                        '{text:" — 치명타 +15% · 피해 +50%",color:"#BDB38A"}]',
+                        '{text:" — 치명타 +15% · 치명타 피해 +50%",color:"#BDB38A"}]',
+                        'scoreboard players set @a[tag=player] hudHold 40'])
+    W.w('hud/ab_cure', ['# One-shot actionbar notice (2 s) after a heal that filled the 달빛 고치 cure meter but not to its target:',
+                        f'# the badge and "회복 <{CURE_P}>/<{CURE_T}>%" (score components, set by the module).',
+                        'title @a[tag=player] actionbar [' + gl('coc') + ',{text:" 달빛 고치",color:"#E8A0A6",bold:true},'
+                        '{text:" — 회복 ",color:"#C9A3A6"},'
+                        f'{{score:{{name:"{CURE_P}",objective:"mb"}},color:"#F2C4C8",bold:true}},{{text:"/",color:"#C9A3A6"}},'
+                        f'{{score:{{name:"{CURE_T}",objective:"mb"}},color:"#C9A3A6"}},{{text:"%",color:"#C9A3A6"}}]',
                         'scoreboard players set @a[tag=player] hudHold 40'])
     for name, g in (('pop_coc', 'coc_big'), ('pop_buff', 'buff_big')):
         W.w(f'hud/{name}', ['# The badge pops big on the title line (1.2 s) and fades; the F5 crosshair title rests (vBig).',
@@ -1790,7 +1808,8 @@ def tests(W):
                         'tellraw @s [{"text":"달빛 환영 나비 sounds: ","color":"#B6E35A"}' +
                         ''.join(f',{{"text":"[{n}] ","color":"#D9F5A8","click_event":{{"action":"run_command",'
                                 f'"command":"/execute at @s run function {FN}snd/{n}"}}}}' for n in SOUNDS) + ']'])
-    W.w('test/hud', ['# Both badges on the boss-bar lines and the actionbar (run during a fight), then pops.',
+    W.w('test/hud', ['# Both badges on the boss-bar lines (the cure meter at 9 of 15 %) and the actionbar (run during a fight), then pops.',
+                     f'scoreboard players set {CURE_P} mb 9', f'scoreboard players set {CURE_T} mb 15',
                      f'function {FN}hud/coc_on', f'function {FN}hud/buff_on', f'function {FN}hud/ab_coc',
                      f'function {FN}hud/pop_coc'])
     W.w('test/presets', ['# Click through the presets (tellraw list; macro presets use test values).',

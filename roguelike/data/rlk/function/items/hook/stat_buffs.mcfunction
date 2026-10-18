@@ -53,5 +53,6 @@ execute if score #loomT itv matches 1.. run scoreboard players operation @s elem
 # 네페르: 기본 원소 마스터리 +#nfEm, 기만의 장막 3스택 = +100
 execute if score #charN tmp matches 8 run scoreboard players operation @s elemMastery += #nfEm tmp
 execute if score #charN tmp matches 8 if score @s nfVeil matches 3.. run scoreboard players add @s elemMastery 100
-# 중간보스 전투 중 치명타 확률 보정(#mbCritAdd: 달빛 고치 −100, 달빛 축복 받음 +15). 전투가 끝나면 0
+# 중간보스 전투 중 치명타 확률 · 치명타 피해 보정(#mbCritAdd: 달빛 고치 −100, 달빛 축복 받음 +15 / #mbCritDmgAdd: 달빛 축복 받음 +50). 전투가 끝나면 0
 execute if score #mbLive mb matches 1 run scoreboard players operation @s critChance += #mbCritAdd mb
+execute if score #mbLive mb matches 1 run scoreboard players operation @s critDamage += #mbCritDmgAdd mb

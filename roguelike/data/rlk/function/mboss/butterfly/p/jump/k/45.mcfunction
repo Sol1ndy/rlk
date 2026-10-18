@@ -1,4 +1,3 @@
 # jump clock 45
-execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"sphere",pos:"^-0.415 ^4.419 ^1.092",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.6,s1:1.3,move:"0f,0f,0f",life:8,fade:2,col:16777215}
-execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"ripple",pos:"^-0.415 ^4.419 ^1.092",rot:"~ ~",bb:"center",roll:0,spin:120,s0:1.2,s1:1.8,move:"0f,0f,0f",life:8,fade:2,col:13957318}
-playsound minecraft:block.conduit.activate hostile @a[tag=player] ~ ~ ~ 0.4 1.8 0.13
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p2b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p2b,limit=1] rotated ~ 0 positioned ~ 201 ~ run particle minecraft:dust{color:[0.659f,0.875f,0.455f],scale:3} ~ ~1 ~ 1.2 0.8 1.2 0 4 force @a[tag=player]
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p2b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p2b,limit=1] rotated ~ 0 positioned ~ 201 ~ run particle minecraft:dust{color:[0.553f,0.753f,0.494f],scale:3.5} ~ ~1 ~ 1.2 0.8 1.2 0 3 force @a[tag=player]

@@ -6,5 +6,5 @@ particle minecraft:happy_villager ~ ~ ~ 0.4 0.4 0.4 0 6 force @a[tag=player]
 playsound minecraft:block.amethyst_block.chime hostile @a[tag=player] ~ ~ ~ 1 1.9 0.33
 playsound minecraft:block.amethyst_cluster.hit hostile @a[tag=player] ~ ~ ~ 0.6 1.6 0.2
 scoreboard players remove #bfDewN mb 1
-scoreboard players set #bfDew1 mb 0
+execute if score #bfDew1 mb matches 1.. run scoreboard players remove #bfDew1 mb 1
 kill @s

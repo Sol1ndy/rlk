@@ -1,27 +1,5 @@
 # release clock 47
-# the safe line just outside the dome (r 10.5)
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~0 ~0.3 ~10.5 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~2.72 ~0.3 ~10.14 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~5.25 ~0.3 ~9.09 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~7.42 ~0.3 ~7.42 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~9.09 ~0.3 ~5.25 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~10.14 ~0.3 ~2.72 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~10.5 ~0.3 ~0 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~10.14 ~0.3 ~-2.72 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~9.09 ~0.3 ~-5.25 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~7.42 ~0.3 ~-7.42 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~5.25 ~0.3 ~-9.09 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~2.72 ~0.3 ~-10.14 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~0 ~0.3 ~-10.5 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-2.72 ~0.3 ~-10.14 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-5.25 ~0.3 ~-9.09 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-7.42 ~0.3 ~-7.42 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-9.09 ~0.3 ~-5.25 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-10.14 ~0.3 ~-2.72 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-10.5 ~0.3 ~0 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-10.14 ~0.3 ~2.72 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-9.09 ~0.3 ~5.25 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-7.42 ~0.3 ~7.42 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-5.25 ~0.3 ~9.09 0 0 0 0 1 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-2.72 ~0.3 ~10.14 0 0 0 0 1 force @a[tag=player]
-execute rotated as @s rotated ~ 0 positioned ^0 ^4.811 ^0.415 as @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_pod] run tp @s ~ ~ ~ ~ ~
+function rlk:mboss/butterfly/rig/face/track
+# she re-emerges: lime tendrils stream out
+execute rotated as @s rotated ~ 0 positioned ^0 ^4.956 ^0.161 run function rlk:mboss/butterfly/fx/p/rel_tendrils
+execute rotated as @s rotated ~ 0 positioned ^0 ^4.956 ^0.161 run particle minecraft:dust{color:[0.6f,0.89f,0.345f],scale:1.2} ~ ~ ~ 1.5 1 1.5 0 20 force @a[tag=player]

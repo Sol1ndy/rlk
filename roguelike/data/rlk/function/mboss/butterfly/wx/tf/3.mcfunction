@@ -1,2 +1,5 @@
 # S2 transformation fx, clock 3 (@s = body, at it; the core's p/transform calls it).
-particle minecraft:dust{color:[0.761f,0.98f,0.447f],scale:1.2} ~ ~1.0 ~ 0.25 0.6 0.25 0 6 force @a[tag=player]
+# t3 the folded wings open partially: white sparks, a rim glint on each folded wing.
+particle minecraft:end_rod ~ ~2.3 ~ 0.3 0.3 0.3 0.05 6 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^0.6 ^2.6 ^-0.3 run function rlk:mboss/butterfly/fx/card {kind:"glint",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.3,s1:0.9,move:"0f,0f,0f",life:3,fade:1,col:15728034}
+execute rotated as @s rotated ~ 0 positioned ^-0.6 ^2.6 ^-0.3 run function rlk:mboss/butterfly/fx/card {kind:"glint",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.3,s1:0.9,move:"0f,0f,0f",life:3,fade:1,col:15728034}

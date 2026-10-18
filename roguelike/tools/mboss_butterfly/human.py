@@ -15,21 +15,27 @@ binding plan mb2/plan.md (its "Stage-2 decisions"):
 Clock: #bfPT = the clip tick (the core plays the clip at clock 0); a pattern with lead L starts at -L. Rig events are
 read from the rig manifest (ev_or with the spec's tick as the fallback), fx anchors with api.h_anchor (the manifest's
 clips[].anchors; the spec's body-frame point where the manifest has none).
+
+Wind-up tuning (user "선딜 좀 줄이고", plan.md "User feedback after the 10-18 release"): the clips play through the rig's
+RETIME (butterfly_clips.mjs), so every event above is the played tick; a spec tick that is not an event is mapped with
+api.rt(clip, authored tick), and the telegraphs longer than the 10 t floor are about 25 % shorter (api.tell_rt).
 """
 import math
 import random
 
 from . import api as A
-from .api import Pattern, TL, ev_or, clip_len, DMG, KB, CY
+from .api import Pattern, TL, ev_or, clip_len, rt, tell_rt, DMG, KB, CY
 
 TELL = 10                                     # telegraph floor (plan.md: every damaging hit >= 10 t)
 K_KICK, K_JUMP, K_DASH, K_VAC = 'kick', 'jump', 'dash', 'vacuum'
 L_KICK, L_JUMP, L_DASH, L_VAC = (clip_len(c) for c in ('kick_combo', 'kick_jump', 'dash_kick', 'vacuum'))
-# H1 (kick_combo): run 0, hit1 8, backflip 10, hop 22, leap 34, hit2 40
+# H1 (kick_combo, played): run 0, hit1 8, backflip 9, land1 16, hop 19, hop2 22, leap 25, swirl 28, hit2 32 (authored 40)
 H1_HIT1, H1_HIT2 = ev_or('kick_combo', 'hit1', 8), ev_or('kick_combo', 'hit2', 40)
 H1_LEAD = max(0, TELL - H1_HIT1)              # hit 1 lands 8 t into the clip: its telegraph starts 2 t before the clip
-H1_LOCK2 = H1_HIT2 - 14                       # 26: kick 2 aimed and telegraphed 14 t ahead (spec Q22)
-H1_LEAP = H1_HIT2 - 8                         # 32: the flying leap to the landing point B (4 t)
+H1_LOCK2 = H1_HIT2 - tell_rt(14)              # 21: kick 2 aimed and telegraphed 11 t ahead (spec Q22: 14 before the tuning)
+H1_LEAP = ev_or('kick_combo', 'leap', H1_HIT2 - 7)  # 25: the flying leap to the landing point B (4 t)
+H1_HOPS = (ev_or('kick_combo', 'hop', 19), ev_or('kick_combo', 'hop2', 22))   # the two sideways hops (3 t each)
+H1_SIDE = rt('kick_combo', 20)                # 17: the hop side is drawn, the kicking foot starts to glow
 # H2 (kick_jump): tell 0, sweep 13 (active 4 t, knee height), jump 33, orb 45, kick 52, impact 55, land 59 (plan Q2)
 H2_SWEEP = ev_or('kick_jump', 'sweep', 13)
 H2_JUMP = ev_or('kick_jump', 'jump', 33)
@@ -37,20 +43,20 @@ H2_IMPACT = ev_or('kick_jump', 'impact', 55)
 H2_ORB = ev_or('kick_jump', 'orb', H2_IMPACT - 10)
 H2_KICK = ev_or('kick_jump', 'kick', H2_IMPACT - 3)
 H2_LAND = ev_or('kick_jump', 'land', H2_IMPACT + 4)
-H2_LOCK = H2_IMPACT - 12                      # the disc locked on the player 12 t before the impact
+H2_LOCK = H2_IMPACT - tell_rt(12)              # the disc locked on the player 10 t before the impact (12 before the tuning)
 H2_ACT, H2_Y1 = 4, 1.0                        # sweep: active 4 t, feet test up to 1.0 b (jumpable, Q12)
 # H3 (dash_kick): charge 0, dash 10, dash_end 12, kick 15, ring 19
 H3_DASH, H3_DASH_END = ev_or('dash_kick', 'dash', 10), ev_or('dash_kick', 'dash_end', 12)
 H3_KICK = ev_or('dash_kick', 'kick', 15)
 H3_RING = ev_or('dash_kick', 'ring', H3_KICK + 4)
-H3_LOCK = 3                                   # aim lock and both decals (kick tell 12, ring tell 16)
+H3_LOCK = H3_KICK - tell_rt(12)               # 1: aim lock and both decals (kick tell 10, ring tell 14; 12 / 16 before)
 H3_RING_ACT = 3
 # H4 (vacuum): crouch 0, tell 9 (the glint: aim lock), stomp 16, blade 17, backflip 17, land 38
-H4_GLINT = ev_or('vacuum', 'tell', 9)
-H4_BLADE = ev_or('vacuum', 'blade', 17)
+H4_GLINT = ev_or('vacuum', 'tell', 5)
+H4_BLADE = ev_or('vacuum', 'blade', 13)
 H4_STOMP = ev_or('vacuum', 'stomp', H4_BLADE - 1)
 H4_BACK = ev_or('vacuum', 'backflip', H4_BLADE)
-H4_LAND = ev_or('vacuum', 'land', 38)
+H4_LAND = ev_or('vacuum', 'land', 34)
 H4_SPD, H4_LIFE = 0.75, 60                    # 0.75 b/t (3 sub-steps of 0.25 b; FW-2), 60 t
 H4_HR = 1.5                                    # blade half width (the spec's 3.0 b lane): it reaches hr + 0.3 = 1.8 b off the
                                                # line, the lane decal + the body pad (FW-1; the hr 1.2 workaround is gone)
@@ -161,8 +167,9 @@ def emit(g):
 # =============================================================================================
 # H1 달빛 발차기 (spec H1_kick_combo.md): burst-run S -> A (the clip's own run, <= 4.5 b in 5 t), hit 1 = a narrow
 # vertical strip (lane 4.5 x 2.4 from 0.5 behind A + a splash disc r 1.5 1.2 ahead, one group) at 8 telegraphed from -2;
-# backflip 1.2 b, settle, two sideways hops, kick 2 aimed and telegraphed at 26 (half disc r 5 + ground wave 6 x 2, one
-# group), the flying leap to B at 32, the axe kick at 40; 1.0 / 1.2, at most 2 hits.
+# backflip 1.2 b, settle, two sideways hops (19, 22), kick 2 aimed and telegraphed at 21 (half disc r 5 + ground wave
+# 6 x 2, one group), the flying leap to B at 25, the axe kick at 32 (played ticks: 26 / 32 / 40 before the tuning);
+# 0.7 / 0.9, at most 2 hits.
 def kick(g):
     R = g.rig
     k = K_KICK
@@ -220,18 +227,18 @@ def kick(g):
     tl.at(land1, BODY + g.fx('land'), g.particle('poof', '~ ~0.1 ~', (0.4, 0.05, 0.4), 0.02, 6),
           g.particle('block{block_state:"minecraft:moss_block"}', '~ ~0.1 ~', (0.5, 0.05, 0.5), 0, 8),
           snd(g, 'block.moss.fall', 0.6, 1.0))
-    tl.at(land1 + 2, snd(g, 'block.moss.fall', 0.35, 1.2))
-    # wind-up: the kicking foot glows; two sideways hops of 0.75 b (a random side, then the other)
-    tl.at(H1_LEAP - 12, 'execute store result score #bp1S mb run random value 0..1')
-    for t in range(H1_LEAP - 12, H1_LEAP, 2):
+    tl.at(rt('kick_combo', 18), snd(g, 'block.moss.fall', 0.35, 1.2))
+    # wind-up: the kicking foot glows; two sideways hops of 0.75 b on the clip's hop events (a random side, then the other)
+    tl.at(H1_SIDE, 'execute store result score #bp1S mb run random value 0..1')
+    for t in range(H1_SIDE, H1_LEAP, 2):
         tl.at(t, BODY + g.dust(lime_pale, 0.7, foot_hop, (0.1, 0.1, 0.1), 2))
-    for t0h, first in ((H1_LEAP - 10, True), (H1_LEAP - 4, False)):
+    for t0h, first in ((H1_HOPS[0], True), (H1_HOPS[1], False)):
         s0 = 0 if first else 1
         for t in range(t0h, t0h + 3):
             tl.at(t, f'execute if score #bp1S mb matches {s0} run ' + side_step(90, 0.25),
                   f'execute unless score #bp1S mb matches {s0} run ' + side_step(-90, 0.25))
         tl.at(t0h, g.particle('poof', '~ ~0.1 ~', (0.3, 0.02, 0.3), 0.02, 3), snd(g, 'block.moss_carpet.step', 0.5, 1.2))
-    # ---- hit 2: aim at the player and lock B (the leap's landing point, <= 3.5 b, 1.2 b short), 14 t of decals
+    # ---- hit 2: aim at the player and lock B (the leap's landing point, <= 3.5 b, 1.2 b short), 11 t of decals
     tl.at(H1_LOCK2, R('face/player'), *kill_mk(b), g.dest(3.5, 1.2), g.keep(b), g.GRP_NEW,
           *pair(g, at_mk(B_), g.hz_sector(5.0, 90, H1_HIT2 - H1_LOCK2, DMG['h1b']),
                 g.tele_sector(5.0, 90, H1_HIT2 - H1_LOCK2), grp=True, kb=KB['default']),
@@ -280,10 +287,11 @@ def kick(g):
 
 
 # =============================================================================================
-# H2 달빛 점프 (spec H2_kick_jump.md): after the core's close-in to 3 b, the arm-shard / chain tell (0-13), the 360 low
-# sweep r 3 at knee height (active 13-16, jumpable) telegraphed from 3, the spiral jump at 33 (glide to A, 0.8 b short of
-# the player), the disc locked under the player 12 t before the impact (clamped to the walk disc), the orb at her foot,
-# the star flash, the kick, the falling disc and the impact r 2.5 (heavy knockback); 0.9 / 1.4, two separate hits.
+# H2 달빛 점프 (spec H2_kick_jump.md): after the core's close-in to 3 b, the arm-shard / chain tell (0-10), the 360 low
+# sweep r 3 at knee height (active 10-13, jumpable) telegraphed from 0, the spiral jump at 24 (glide to A, 0.8 b short of
+# the player), the disc locked under the player 10 t before the impact at 41 (clamped to the walk disc), the orb at her
+# foot, the star flash, the kick, the falling disc and the impact r 2.5 (heavy knockback); 0.6 / 0.9, two separate hits
+# (played ticks; 13 / 33 / 55 and a 12 t disc telegraph before the tuning).
 def jump(g):
     R = g.rig
     k = K_JUMP
@@ -295,7 +303,7 @@ def jump(g):
     orb_k = A.h_anchor('kick_jump', 'kick', 'foot_r', '^-0.4 ^4.43 ^0.97')
     tl.at(0, R('face/player'), f'execute at @s rotated as @s rotated ~ 0 positioned {hand} run ' + g.fx('shard_tell'),
           g.snd('shard_tell'))
-    tl.span(1, 10, R('face/track'))
+    tl.span(1, rt('kick_jump', 10), R('face/track'))
     for t in range(0, H2_SWEEP, 2):
         tl.at(t, BODY + g.dust(hx('#B8F060'), 0.9, hand, (0.1, 0.25, 0.1), 3))
     for t in range(0, H2_SWEEP, 4):
@@ -304,7 +312,7 @@ def jump(g):
     tl.at(H2_SWEEP - TELL, *pair(g, f'execute positioned ~ {CY} ~ run ', g.hz_disc(3.0, TELL, DMG['h2a']), g.tele_disc(3.0, TELL),
                                  act=H2_ACT, y1=H2_Y1, kb=KB['default']),
           snd(g, 'block.amethyst_block.resonate', 0.35, 1.6))
-    tl.at(H2_SWEEP - 8, snd(g, 'block.amethyst_block.chime', 0.5, 1.8))
+    tl.at(rt('kick_jump', 5), snd(g, 'block.amethyst_block.chime', 0.5, 1.8))
     for t in (H2_SWEEP - 4, H2_SWEEP - 2):                   # "low": a knee-high ring outline
         tl.at(t, *g.h_ring_dust(hx('#D6FAC5'), 3.0, 18, y=0.5, scale=0.8))
     tl.at(H2_SWEEP - 3, BODY + g.kcard('streak', '^ ^0.1 ^0.3', '~ 90', col='#B8F060', s0=1.2, s1=1.6, life=3, fade=1),
@@ -375,9 +383,10 @@ def jump(g):
 
 
 # =============================================================================================
-# H3 달빛 돌진 (spec H3_dash_kick.md): the mote charge (0-9), the aim locked at 3 (D <= 7 b toward the player, 1.5 b
-# short; the kick disc r 1.5 1.2 b past D, tell 12, and the ring r 3.5 around D, tell 16, active 3: one group = one 1.3
-# hit; the dash lane S -> D, telegraph only), the dash in 2 t, the kick at 15, the all-around ring at 19.
+# H3 달빛 돌진 (spec H3_dash_kick.md): the mote charge (0-5), the aim locked at 1 (D <= 7 b toward the player, 1.5 b
+# short; the kick disc r 1.5 1.2 b past D, tell 10, and the ring r 3.5 around D, tell 14, active 3: one group = one 1.3
+# hit; the dash lane S -> D, telegraph only), the dash in 2 t at 6, the kick at 11, the all-around ring at 15 (played
+# ticks; lock 3, dash 10, kick 15, ring 19 before the tuning).
 LANES3 = [x / 2 for x in range(2, 15)]          # dash lane lengths 1.0 .. 7.0 b (0.5 b buckets)
 
 
@@ -392,10 +401,11 @@ def dash(g):
     tl.span(1, H3_LOCK - 1, R('face/track'))
     for t in range(0, H3_DASH):
         tl.at(t, g.dust(hx('#C7DB75'), 0.6, '~ ~1.0 ~', (0.9, 0.9, 0.9), 3), g.particle('end_rod', '~ ~1.0 ~', (0.8, 0.6, 0.8), 0.02, 1))
-    for t in range(5, H3_DASH):                              # the motes converge (r 1.6 -> 1.0)
-        tl.at(t, *g.h_ring_dust(hx('#E6F6F8'), 1.6 - 0.15 * (t - 5), 6, y=1.2, scale=0.5))
+    c0 = rt('dash_kick', 5)                                   # the motes converge (r 1.6 -> 1.0) until the dash
+    for t in range(c0, H3_DASH):
+        tl.at(t, *g.h_ring_dust(hx('#E6F6F8'), 1.6 - 0.6 * (t - c0) / max(1, H3_DASH - 1 - c0), 6, y=1.2, scale=0.5))
     for t, p in ((2, 1.6), (4, 1.7), (6, 1.8), (8, 1.9)):
-        tl.at(t, snd(g, 'block.amethyst_block.chime', 0.3, p))
+        tl.at(rt('dash_kick', t), snd(g, 'block.amethyst_block.chime', 0.3, p))
     # the lock: D, the kick + ring group, the dash lane (dmg 0) with its length bucketed from |SD|
     lane = dispatch(g, k, 'lane', '#bp3D', range(len(LANES3)), lambda i: f'ln/{i}')
     tl.at(H3_LOCK, R('face/player'), *kill_mk(a), g.dest(7.0, 1.5), g.keep(a), g.GRP_NEW,
@@ -424,7 +434,7 @@ def dash(g):
         pre = f'execute at @s facing entity {D_} feet rotated ~ 0 positioned ~ {CY} ~ run '
         g.pw(k, f'ln/{i}', [f'# The dash lane, {L} b from her toward D (telegraph only: dmg 0), 0.8 b wide, until the dash.']
              + pair(g, pre, g.tell_line(L, 0.8, H3_DASH - H3_LOCK), g.tele_line(L, 0.8, H3_DASH - H3_LOCK)))
-    tl.at(5, snd(g, 'block.azalea_leaves.break', 0.3, 1.7))
+    tl.at(rt('dash_kick', 5), snd(g, 'block.azalea_leaves.break', 0.3, 1.7))
     tl.at(H3_DASH - 2, BODY + g.kcard('glint', foot, bb='center', col='#F0FEF6', s0=0.3, s1=1.0, life=4, fade=2))
     # the dash: S -> D in 2 t, a speed streak along the path, the afterimage at the start
     tl.at(H3_DASH, f'execute positioned as {D_} run function rlk:mboss/mv/glide {{t:{H3_DASH_END - H3_DASH}}}',
@@ -462,10 +472,11 @@ def dash(g):
 
 
 # =============================================================================================
-# H4 광폭한 진공 (spec H4_vacuum.md): crouch (0-8, tracking), the glint at 9 locks the yaw and lays the lane decal 3 b
-# wide from her to the wall, the rear-up, the stomp at 16, the vertical crescent blade (the kit's vblade look, 3 wide x 4
-# tall) launched at 17 along the locked line at 0.75 b/t (blade hit shape, hr 1.2, no homing, 60 t, stopped by the
-# wall, one hit and it flies on), the backflip 2.5 b straight back, the landing at 38; 1.2 Dendro.
+# H4 광폭한 진공 (spec H4_vacuum.md): crouch (0-4, tracking), the glint at 5 locks the yaw and lays the lane decal 3 b
+# wide from her to the wall, the rear-up, the stomp at 12, the vertical crescent blade (the kit's vblade look, 3 wide x 4
+# tall) launched at 13 along the locked line at 0.75 b/t (blade hit shape, hr 1.5, no homing, 60 t, stopped by the
+# wall, one hit and it flies on), the backflip 2.5 b straight back, the landing at 34; 1.2 Dendro (played ticks; glint
+# 9, stomp 16, blade 17, landing 38 before the tuning).
 H4_TAG, H4_SEL = 'rlk_mb_bf_p4b', '@e[type=minecraft:item_display,tag=rlk_mb_bf_p4b]'
 LANES4 = list(range(2, 41))                    # lane lengths 2..40 b (floor of the distance to the wall)
 

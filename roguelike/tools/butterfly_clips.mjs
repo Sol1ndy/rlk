@@ -654,8 +654,27 @@ export const CLIPS = [
       k(18, {...HUMAN, ...STANCE}),
     ]},
 ];
-// Wind-up retiming table (as the Guardian's; empty: the clips are authored on the pattern timelines).
-export const RETIME = {};
+// ---- retiming (user tuning "선딜 좀 줄이고"): every damaging wind-up about 25 % shorter, as the Guardian's ---------
+// The clips above stay authored on the reference-video / spec timelines (plan.md "Rig clips"); RETIME maps a clip onto
+// the played timeline with piecewise-linear knots [authored tick, played tick] from [0, 0] to [authored len, played
+// len] (mboss_rig_clips.mjs). Keys and events are mapped and rounded to whole ticks (half up). The strikes and their
+// follow-throughs sit on 1:1 segments (the H1 burst-run, flip kick and backflip, the H2 sweep, the H3 dash and kick,
+// the H4 stomp and backflip, the B1 dive, the B2 swings, the B3 dart dive and slam, the B4 orb launches, the B5 swoop
+// and the pod snap), so they keep their speed and still land on their events; the wind-ups between them are
+// compressed (the knots sit on key ticks, so no two keys collide), the recoveries after the last hit are shifted, not
+// shortened. The manifest carries `retime` and `authoredLen`; the module maps its own authored ticks with api.rt.
+export const RETIME = {
+  kick_combo: [[0, 0], [16, 16], [20, 17], [23, 20], [25, 21], [28, 22], [29, 23], [31, 24], [34, 27], [36, 28], [51, 43]], // hit 2 40 -> 32
+  kick_jump: [[0, 0], [12, 9], [19, 16], [33, 22], [45, 34], [49, 36], [65, 52]],                // sweep 13 -> 10, impact 55 -> 42 (the spiral jump spin 1:1)
+  dash_kick: [[0, 0], [9, 5], [50, 46]],                                                      // kick 15 -> 11 (ring 19 -> 15)
+  vacuum: [[0, 0], [9, 5], [41, 37]],                                                         // glint 9 -> 5, blade 17 -> 13
+  transform: [[0, 0], [2, 1], [30, 29]],                                                      // sphere (달빛 고치) 6 -> 5
+  wing_strike: [[0, 0], [8, 4], [55, 51]],                                                    // hit 15 -> 11
+  wing_barrage: [[0, 0], [5, 4], [14, 13], [31, 24], [40, 33], [69, 52], [78, 61], [94, 72], [117, 95]], // swings 5/31/69/94 -> 4/24/52/72
+  flap_dive: [[0, 0], [18, 11], [59, 52]],                                                    // slam 26 -> 19, fan 28 -> 21
+  coco: [[0, 0], [16, 11], [21, 16], [42, 30], [76, 64]],                                     // orbs 19 / 46 -> 14 / 34
+  release: [[0, 0], [3, 1], [4, 2], [5, 3], [7, 5], [9, 7], [18, 14], [30, 22], [31, 23], [51, 38], [53, 40], [96, 83]], // cup 31 -> 23, detonation 53 -> 40
+};
 applyRetime(CLIPS, RETIME);
 for (const c of CLIPS) resolvePlants(c);
 

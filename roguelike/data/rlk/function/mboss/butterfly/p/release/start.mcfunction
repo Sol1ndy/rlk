@@ -1,5 +1,5 @@
-# B5 달빛 해제 (service; clip release: cup 31, flash 35, glint 37, rings 38, wrap 44,
-# detonation 53, shrink 87, shatter 91, land 96). The dome r 10 at R: 150 % Dendro.
+# B5 달빛 해제 (service; clip release: cup 23, flash 26, glint 28, rings 28, wrap 33,
+# detonation 40, shrink 74, shatter 78, land 83). The dome r 10 at R: 130 % Dendro.
 # the release point R: L0 (the player's spot) + 4 b outward from the centre (from her when L0 is on the centre),
 # pulled inside r 16; the fold fx (lime butterfly glyphs, a rim glow) and the swoop recipe
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p15l]

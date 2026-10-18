@@ -1,3 +1,3 @@
 # barrage clock 9
 function rlk:mboss/butterfly/rig/face/track
-function rlk:mboss/butterfly/p/barrage/spawn12
+function rlk:mboss/butterfly/p/barrage/spawn13

@@ -1,3 +1,3 @@
 # jump clock 12
-execute at @s rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.722f,0.941f,0.376f],scale:0.9} ^0.84 ^1.918 ^0.113 0.1 0.25 0.1 0 3 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 run particle minecraft:end_rod ^0.84 ^1.918 ^0.113 0.1 0.2 0.1 0.01 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"cres_lime",pos:"^ ^0.5 ^",rot:"~90 0",bb:"fixed",roll:0,spin:170,s0:5,s1:6,move:"0f,0f,0f",life:4,fade:2,col:14088901}
+execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"cres_lime",pos:"^ ^0.52 ^",rot:"~270 0",bb:"fixed",roll:0,spin:170,s0:5,s1:6,move:"0f,0f,0f",life:4,fade:2,col:14088901}

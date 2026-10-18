@@ -102,7 +102,9 @@ execute unless score #mbLd mb matches 0.. run scoreboard players set #mbLd mb 0
 # running fight's values (the module reload hook re-asserts them), so only unset ones are initialised.
 execute unless score #mbHealPct mb matches -1000.. run scoreboard players set #mbHealPct mb 100
 execute unless score #mbCritAdd mb matches -1000.. run scoreboard players set #mbCritAdd mb 0
+execute unless score #mbCritDmgAdd mb matches -1000.. run scoreboard players set #mbCritDmgAdd mb 0
 execute unless score #mbHealEv mb matches 0.. run scoreboard players set #mbHealEv mb 0
+execute unless score #mbHealAmt mb matches 0.. run scoreboard players set #mbHealAmt mb 0
 execute unless score #mbGrpN mb matches 0.. run scoreboard players set #mbGrpN mb 0
 execute unless score #mbGrpL mb matches 0.. run scoreboard players set #mbGrpL mb 0
 # Library activity flags (a set flag makes the world tick scan for that library's entities once).

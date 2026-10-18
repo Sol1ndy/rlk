@@ -43,7 +43,8 @@ MANIFEST = _TOOLS / 'mboss_butterfly_rig_manifest.json'
 _MAN = json.loads(MANIFEST.read_text(encoding='utf-8'))
 RIG_DIR = 'rig'
 CLIPS = {c['name']: {'id': c['id'], 'len': c['len'], 'loop': c.get('loop', False), 'next': c.get('next'),
-                     'events': dict(c.get('events', {}))} for c in _MAN['clips']}
+                     'events': dict(c.get('events', {})), 'retime': c.get('retime'),
+                     'authoredLen': c.get('authoredLen', c['len'])} for c in _MAN['clips']}
 LOOKS = list(_MAN.get('looks', ['dendro', 'pyro', 'flat']))
 PARTS = [p['name'] if isinstance(p, dict) else p for p in _MAN.get('parts', [])]
 PROPS = list(_MAN.get('props', []))
@@ -70,6 +71,29 @@ def clip_len(clip):
     return CLIPS[clip]['len']
 
 
+# Wind-up retiming (butterfly_clips.mjs RETIME, manifest `retime`; user tuning "선딜 좀 줄이고"): the damaging clips are
+# authored on the spec timelines and played with about 25 % shorter wind-ups. ev() / clip_len() are played ticks; a
+# pattern that times something on an authored tick (a spec timeline tick that is not a manifest event) maps it with rt().
+def _warp(knots, t):
+    for (a0, b0), (a1, b1) in zip(knots, knots[1:]):
+        if t <= a1:
+            return b0 + (b1 - b0) * (t - a0) / (a1 - a0)
+    a, b = knots[-1]
+    return b + (t - a)
+
+
+def rt(clip, t):
+    """Played clip tick of an authored clip tick (rounded half up, as the rig generator maps keys and events); the
+    identity for a clip without a retime. rt('kick_combo', 40) == 32 == ev('kick_combo', 'hit2')."""
+    kn = CLIPS[clip]['retime']
+    return int(t) if not kn else int(math.floor(_warp(kn, t) + 0.5))
+
+
+def tell_rt(t):
+    """A telegraph length after the wind-up tuning: about 25 % shorter, never under the 10 t floor (plan.md)."""
+    return max(10, int(math.floor(0.75 * t + 0.5)))
+
+
 def part_sel(name):
     """Selector of a named rig part (fx anchor), e.g. part_sel('foot_r'); None when the rig has no such part."""
     if name not in PARTS:
@@ -80,27 +104,30 @@ def part_sel(name):
 # ---------------------------------------------------------------------------------------------
 # Balance (plan.md). Damage = % of the registry base hit (atk x dmgMul).
 DMG = {
-    # Balance (plan "Review-fix decisions", fairness F1): HP per minute within about 20 % of the Guardian's for a
-    # standing, a melee-walking and a ranged-walking player in the reviewer's fight sim (mb2/balance/bal.py: the
-    # butterfly dealt 1.70 / 2.06 / 2.00x). The butterfly form starts from the plan's x0.7; the human melee patterns
-    # (H1, H2) were cut too, since they hit a swinging melee player most. The player-side Burning of her own Pyro /
-    # Dendro alternation is intended and counted in the sim numbers. (plan's first numbers in brackets)
-    'h1a': 70, 'h1b': 90,        # H1 달빛 발차기: flip-kick crescent / axe-kick crescent + ground wave (1.0 / 1.2)
-    'h2a': 60, 'h2b': 90,        # H2 달빛 점프: 360 low sweep / kicked Dendro disc (0.9 / 1.4)
+    # Balance (plan "Review-fix decisions", fairness F1, and "User feedback after the 10-18 release"): HP per minute within
+    # about 20 % of the Guardian's for a standing, a melee-walking and a ranged-walking player in the reviewer's fight sim
+    # (mb2/balance/bal.py). The fix round cut the butterfly form x0.7 and H1 / H2 (1.70 / 2.06 / 2.00x -> 1.12 / 1.16 /
+    # 0.86x); the wind-up tuning (about 25 % shorter, more patterns per minute) brought it back to 1.16 / 1.39 / 1.09x, so
+    # H1 / H2 (what hits a swinging melee player most) and the butterfly form were cut again. The player-side Burning of
+    # her own Pyro / Dendro alternation is intended and counted in the sim numbers. (the fix round's numbers in brackets)
+    'h1a': 55, 'h1b': 70,        # H1 달빛 발차기: flip-kick crescent / axe-kick crescent + ground wave (0.7 / 0.9)
+    'h2a': 45, 'h2b': 70,        # H2 달빛 점프: 360 low sweep / kicked Dendro disc (0.6 / 0.9)
     'h3': 130,                   # H3 달빛 돌진: dash kick + ring
     'h4': 120,                   # H4 광폭한 진공: vacuum blade
-    'b1': 80,                    # B1 우아한 날개: wing strike (1.3)
-    'b2': 35,                    # B2 화염 날개의 습격: each fire crescent (one hit per swing; 0.5)
-    'b3': 90, 'b3t': 20,         # B3 날개 휩쓸개: wing slam fan (1.6) / flame trail touch (max 2; 0.3)
-    'b4': 120,                   # B4 달빛 축복: each homing orb (contact or burst, one hit per orb; 1.5): it is what reaches
-                                 # a ranged player, so it stays a little higher (ranged walk at 0.8x of the Guardian with 1.0)
-    'b5': 150,                   # B5 달빛 해제: the dome (2.6)
+    'b1': 70,                    # B1 우아한 날개: wing strike (0.8)
+    'b2': 35,                    # B2 화염 날개의 습격: each fire crescent (one hit per swing)
+    'b3': 80, 'b3t': 20,         # B3 날개 휩쓸개: wing slam fan (0.9) / flame trail touch (max 2)
+    'b4': 100,                   # B4 달빛 축복: each homing orb (contact or burst, one hit per orb; 1.2): what reaches a ranged player
+    'b5': 130,                   # B5 달빛 해제: the dome (1.5)
 }
 KB = {'default': 3, 'light': 2, 'heavy': 4, 'none': 0}
 COCOON_HP_PCT = 20                    # 달빛 고치: % of the current HP on application (non-lethal)
 COCOON_DMG, COCOON_HEAL, COCOON_CRIT = 50, 60, -100      # player DMG %, healing received %, crit points
-BUFF_DMG, BUFF_CRIT = 150, 15                            # 달빛 축복 받음 (reward)
-DEW_HEAL_PCT = 8                      # 달빛 이슬: % of max HP per orb
+# 달빛 고치 cure meter (user "일정 체력 이상 회복해야 하게"): while debuffed every heal adds its effective amount (after the
+# -40 %, overheal included) to the meter; the debuff goes at CURE_PCT % of max HP (the meter restarts at each application)
+CURE_PCT = 15
+BUFF_CRIT, BUFF_CRIT_DMG = 15, 50                        # 달빛 축복 받음 (reward): CRIT RATE +15, CRIT DMG +50 (user: not DMG +50 %)
+DEW_HEAL_PCT = 13                     # 달빛 이슬: % of max HP per orb (rounded up; x 0.6 under the debuff = 7.8 %: 2 orbs cure)
 DEW_N = 3
 DEW_R = (6.0, 14.0)                   # spawn ring around the arena centre (blocks)
 

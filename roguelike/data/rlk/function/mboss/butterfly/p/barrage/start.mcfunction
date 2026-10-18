@@ -1,4 +1,4 @@
-# B2 화염 날개의 습격 (clip wing_barrage: swings [5, 31, 69, 94]; lead 0). Crescent i of a swing s: spawn s+2+i,
+# B2 화염 날개의 습격 (clip wing_barrage: swings [4, 24, 52, 72]; lead 0). Crescent i of a swing s: spawn s+2+i,
 # fan-out 5 t, curved dive of D = (L + 1.6) / 0.7 t (7..60), lands s+2+i+5+D on its
 # marker (50 % Pyro each, one hit per swing); the end once the clip is over and every crescent has landed.
 # swing 1 wind-up: she turns, one wing swept back; embers at the wing tips
