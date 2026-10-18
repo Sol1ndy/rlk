@@ -8,4 +8,3 @@ execute if score #fgV mb matches 5 run return run function rlk:mboss/fieldgen/p/
 execute if score #fgV mb matches 6 run return run function rlk:mboss/fieldgen/p/rock/vis
 execute if score #fgV mb matches 11 run return run function rlk:mboss/fieldgen/p/fzone/vis
 execute if score #fgV mb matches 12 run return run function rlk:mboss/fieldgen/p/frock/vis
-execute if score #fgV mb matches 21 run return run function rlk:mboss/fieldgen/p/waves/vis

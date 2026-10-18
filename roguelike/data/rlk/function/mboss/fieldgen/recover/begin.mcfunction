@@ -5,5 +5,5 @@ function rlk:mboss/fieldgen/rig_stub/play/recover
 function rlk:mboss/fieldgen/rig_stub/look/idle
 scoreboard players set #fgCrack mb 0
 function rlk:mboss/fieldgen/rig_stub/crack/0
-function rlk:mboss/fieldgen/cfx/recover
+function rlk:mboss/fieldgen/seq_f/recover/begin
 function rlk:mboss/fieldgen/hud/refresh

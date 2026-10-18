@@ -1,3 +1,2 @@
 # waves clock 167
-function rlk:mboss/fieldgen/p/waves/charge
-playsound minecraft:block.respawn_anchor.ambient hostile @a[tag=player] ~ ~ ~ 0.9 1.4 0.3
+execute positioned ~ ~4.1 ~ run function rlk:mboss/fieldgen/fx/p/wave_pulse

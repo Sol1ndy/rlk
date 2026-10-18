@@ -1,5 +1,7 @@
-# F1 감소 영역 (clip field_erupt; @s = body at the centre): events [22, 40, 52, 78, 100, 116, 146, 170, 190] (strike +15).
-playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.8 1 0.27
-playsound minecraft:block.chain.place hostile @a[tag=player] ~ ~ ~ 0.8 1.2 0.27
-execute at @s rotated as @s run particle minecraft:dust{color:[0.98f,0.871f,0.659f],scale:1} ^3.85 ^3.8 ^ 0.1 0.1 0.1 0 2 force @a[tag=player]
-execute at @s rotated as @s run particle minecraft:dust{color:[0.98f,0.871f,0.659f],scale:1} ^-3.85 ^3.8 ^ 0.1 0.1 0.1 0 2 force @a[tag=player]
+# F1 감소 영역 (clip field_erupt; @s = body at the centre): decals [22, 72, 102, 120, 141, 170, 181, 220, 231] (strike +15), end 260.
+scoreboard players set #fq11P mb 0
+execute rotated as @s rotated ~ 0 positioned ^3.85 ^4.1 ^0 run function rlk:mboss/fieldgen/fx/p/spark
+execute rotated as @s rotated ~ 0 positioned ^-3.85 ^4.1 ^0 run function rlk:mboss/fieldgen/fx/p/spark
+playsound minecraft:block.beacon.activate hostile @a[tag=player] ~ ~ ~ 0.7 1.3 0.23
+playsound minecraft:block.conduit.activate hostile @a[tag=player] ~ ~ ~ 0.6 1.2 0.2
+playsound minecraft:block.crafter.craft hostile @a[tag=player] ~ ~ ~ 0.6 0.7 0.2

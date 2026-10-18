@@ -22,6 +22,7 @@ import importlib
 import json
 
 from . import PATTERN_MODULES
+from . import seq_f  # [seq_f: field author] S1 / S2 / S3 / S5 visuals (seq_f/**), called by the hooks
 from . import api as A
 from .api import L, K, Gen, TL, ev_or, clip_len, CX, CY, CZ
 
@@ -691,7 +692,7 @@ class Core:
             '# teleported to the arena centre facing the player (invisible until the warp-in clip).',
             'kill @e[tag=rlk_mb_fg_fxw]',
             'summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_fg_fx","rlk_mb_fg_fxw"]}',
-            F('cfx/warp_out'),
+            # [seq_f: field author] the warp-out flash plays at the rig's hide tick (seq_f.field_in, spec S1 F1)
             'tag @s add rlk_mb_inv',
             F('u/centre')])
         self.w('field/open', [
@@ -704,7 +705,7 @@ class Core:
             'scoreboard players add #fgFN mb 1', sc_set('#fgHintT', 0),
             K.hud('meter_open'),
             f'execute if score #fgFN mb matches 1 run {K.hud("hint_on")}',
-            F('cfx/unfold_f'), F('hud/refresh')])
+            F('seq_f/unfold'), F('hud/refresh')])  # [seq_f: field author]
         self.w('field/banner', [
             f'# Field opening clock {FIN_BANNER}: low gravity (#fgLowG -> #mbLowG every tick), the kit\'s banner "{BANNER}"',
             f'# (actionbar {BANNER_T} t, the big icon, its sound; the start gametime #fgBanG lets a break / cut drop it early), the',
@@ -713,13 +714,16 @@ class Core:
             K.hud('banner_field'),
             'execute store result score #fgBanG mb run time query gametime',
             K.hud('lowg_on'),
-            g.say(BANNER, '#D9C8FF', 1, 50, 1)])
+            g.say(BANNER, '#D9C8FF', 1, 50, 1),
+            F('seq_f/banner')])  # [seq_f: field author]
         self.w('field/close', [
             '# The pack-up begins (@s = body): the meter closes, low gravity and the damage cut end (the kit\'s meter, icon',
             '# and hint leave the lines), the idle look.',
-            sc_set('#fgOpen', 0), sc_set('#fgLowG', 0), F('hud/kit_off'), g.look('idle'), F('hud/refresh')])
+            sc_set('#fgOpen', 0), sc_set('#fgLowG', 0), F('hud/kit_off'),
+            f'execute unless score #fgPat mb matches 22 run {g.look("idle")}',  # [seq_f: field author] the pack-up's look/idle is at its dock (Q14)
+            F('hud/refresh')])
         self.w('field/opened', ['# The field opening is over: the opening waves next.', sc_set('#fgField', FLD['open']),
-                                sc_set('#fgCool', 1), F('ai/enter')])
+                                sc_set('#fgCool', seq_f.SETTLE), F('ai/enter')])  # [seq_f: field author] the settle (spec S1 F2, Q10)
         self.w('field/patterns', [f'# The opening waves are over: field patterns for {FIELD_T} t.', sc_set('#fgField', FLD['patterns']),
                                   sc_set('#fgFT', 0), sc_set('#fgCool', 14), F('ai/enter')])
         self.w('field/packing', ['# The closing waves are over: the pack-up next.', sc_set('#fgField', FLD['pack']),
@@ -748,13 +752,12 @@ class Core:
             '# Instant cruise (tests, the reload of a pack-up): meter / low gravity off, the cruise form, crack 0.',
             F('field/close'), F('field/drop'), g.form('cruise'), g.play('idle_cruise'), sc_set('#fgCrack', 0), R('crack/0')])
         self.w('field/tick', [
-            '# @s = body, every module tick while #fgField >= 1: the field-pattern clock, the first field\'s hint, the floating',
-            '# pebbles around the player while low gravity holds.',
+            '# @s = body, every module tick while #fgField >= 1: the field-pattern clock, the first field\'s hint, the field',
+            '# ambience (seq_f/field/tick: the pebbles around the player while low gravity holds, ...).',  # [seq_f: field author]
             f'execute if score #fgField mb matches {FLD["patterns"]} run scoreboard players add #fgFT mb 1',
             f'execute if score #fgOpen mb matches 1 if score #fgHintT mb matches ..{HINT_T} run scoreboard players add #fgHintT mb 1',
             f'execute if score #fgHintT mb matches {HINT_T} if score #fgFN mb matches 1 run {F("hud/hint_end")}',
-            'scoreboard players operation #fgM mb = #fgClk mb', 'scoreboard players operation #fgM mb %= #fgK10 mb',
-            f'execute if score #fgLowG mb matches 1 if score #fgM mb matches 0 at {PLAYER} run {F("cfx/pebbles")}'])
+            F('seq_f/field/tick')])  # [seq_f: field author] the field ambience, the settle, the first field's notice
 
     # -----------------------------------------------------------------------------------------
     def meter(self):
@@ -802,15 +805,15 @@ class Core:
             sc_set('#fgSt', ST['break']), sc_set('#fgT', -1), sc_set('#fgMv', 0),
             g.play('break'),
             g.say('역장 붕괴', '#FFE7A0', 2, 40, 2),
-            F('cfx/break_start'),
+            F('seq_f/brk/start'),  # [seq_f: field author]
             F('hud/refresh')])
         self.w('brk/tick', [
             'scoreboard players add #fgT mb 1',
             f'execute if score #fgT mb matches {BRK_BURST} run {F("brk/burst")}',
-            f'execute if score #fgT mb matches {BRK_WOBBLE} run {F("cfx/groan")}',
+            F('seq_f/brk/tick'),  # [seq_f: field author]
             f'execute if score #fgT mb matches {BRK_LEN}.. run {F("groggy/begin")}'])
         self.w('brk/burst', ['# The bubble bursts: crack 4, the gold flash and the floor ring.', sc_set('#fgCrack', 4), R('crack/4'),
-                             F('cfx/break_burst')])
+                             F('seq_f/brk/burst')])  # [seq_f: field author]
 
     # -----------------------------------------------------------------------------------------
     def groggy(self):
@@ -823,21 +826,20 @@ class Core:
             sc_set('#fgBrk', 0), sc_set('#fgCruN', 0), sc_set('#fgCruLim', NEXT_FIELD_N),
             F('hud/groggy_on'),
             F('groggy/rig'),
-            F('cfx/groggy'),
+            F('seq_f/groggy/begin'),  # [seq_f: field author]
             F('hud/refresh')])
         self.w('groggy/rig', ['# The groggy rig (clip, look) and hitbox.', g.form('cruise'), g.play('groggy'), g.look('groggy'),
                               F('form/hitbox_g')])
         self.w('groggy/tick', [
             'scoreboard players add #fgT mb 1',
-            'scoreboard players operation #fgM mb = #fgT mb', 'scoreboard players operation #fgM mb %= #fgK20 mb',
-            f'execute if score #fgM mb matches 0 run {F("cfx/groggy_spark")}',
+            F('seq_f/groggy/tick'),  # [seq_f: field author] sparks every 40 t (spec Q17)
             f'execute if score #fgT mb matches {GROGGY}.. run {F("recover/begin")}'])
         self.w('recover/begin', [
             f'# Groggy over: re-level ({REC_FLIP} t), the core flips to the top ({REC_LEN - REC_FLIP} t), compact again.',
             sc_set('#fgSt', ST['recover']), sc_set('#fgT', 0), g.play('recover'), g.look('idle'),
-            sc_set('#fgCrack', 0), R('crack/0'), F('cfx/recover'), F('hud/refresh')])
+            sc_set('#fgCrack', 0), R('crack/0'), F('seq_f/recover/begin'), F('hud/refresh')])  # [seq_f: field author]
         self.w('recover/tick', ['scoreboard players add #fgT mb 1',
-                                f'execute if score #fgT mb matches {REC_FLIP} run {F("cfx/flip")}',
+                                f'execute if score #fgT mb matches {REC_FLIP} run {F("seq_f/recover/flip")}',  # [seq_f: field author]
                                 f'execute if score #fgT mb matches {REC_LEN}.. run {F("recover/end")}'])
         self.w('recover/end', ['# Back to the cruise rotation.', F('form/hitbox_c'), g.look('idle'), sc_set('#fgCool', 16), F('ai/enter')])
 
@@ -1084,31 +1086,19 @@ class Core:
         """The core's service patterns: their fx timelines (the mechanics run from p/svc)."""
         g, F = self.g, self.F
         key, tl = FIELD_IN.key, TL(g, FIELD_IN.key)
-        tl.at(0, f'execute at @s facing entity {PLAYER} feet run tp @s ~ ~ ~ ~ 0',
-              g.sound('block.chain.place', 0.9, 0.7), g.sound('block.piston.extend', 0.8, 0.8))
-        tl.at(6, g.sound('block.beacon.power_select', 0.8, 1.2))
-        for t in range(WARP_OUT + 1, WARP_LEN, 2):
-            tl.at(t, 'execute at @e[tag=rlk_mb_fg_fxw,limit=1] run ' + g.particle('reverse_portal', '~ ~3 ~', (0.8, 2.0, 0.8), 0.05, 6),
-                  'execute at @e[tag=rlk_mb_fg_fxw,limit=1] run ' + g.dust(A.VIOLET_DEEP, 1.2, '~ ~3 ~', (0.6, 1.8, 0.6), 3))
-        tl.at(WARP_LEN, 'kill @e[tag=rlk_mb_fg_fxw]', F('cfx/warp_in'))
-        for t in range(FIN_UNFOLD, FIN_BANNER, 4):
-            tl.at(t, *['execute at @s run ' + x for x in g.ring_dust(A.VIOLET, 3.8, 12, 3.8, 1.2)])
+        tl.at(0, f'execute at @s facing entity {PLAYER} feet run tp @s ~ ~ ~ ~ 0')
+        seq_f.field_in(g, tl)  # [seq_f: field author] the opening's fx (spec S1)
+        tl.at(WARP_LEN, 'kill @e[tag=rlk_mb_fg_fxw]')
         tl.at(FIN_LEN, g.end())
         tl.write([f'# Field opening (core service 20; clip warp_out, then warp_in_field at {WARP_LEN}; @s = body): halo flip, warp-out',
                   f'# at {WARP_OUT}, violet glitch over the old spot, warp-in at the centre, unfold at {FIN_UNFOLD}, banner at {FIN_BANNER}.'],
                  [f'# {key} tick.'])
         g.pw(key, 'cancel', ['# The glitch marker (the core re-derives the field state: ai/next -> field/up).', 'kill @e[tag=rlk_mb_fg_fxw]'])
         key, tl = FIELD_OUT.key, TL(g, FIELD_OUT.key)
-        tl.at(0, 'execute at @s run ' + g.particle('flash{color:[1.0,0.95,0.8,1.0]}', '~ ~0.5 ~', (0, 0, 0), 0, 1),
-              'execute at @s run ' + g.particle('end_rod', '~ ~0.4 ~', (1.5, 0.2, 1.5), 0.05, 16),
-              g.sound('block.respawn_anchor.set_spawn', 0.9, 0.8), g.sound('entity.breeze.wind_burst', 0.8, 0.7))
-        for t in range(2, FOUT_LANCES, 4):
-            tl.at(t, 'execute at @s run ' + g.dust(A.GOLD, 1.0, '~ ~1 ~', (1.2, 0.6, 1.2), 3))
-        tl.at(FOUT_LANCES, g.sound('block.chain.place', 1.0, 0.7), g.sound('block.piston.extend', 0.9, 0.6))
-        tl.at(FOUT_PACK, g.sound('block.piston.contract', 1.0, 0.6), g.sound('block.crafter.craft', 0.9, 0.7))
-        tl.at(FOUT_LEN - 1, g.sound('block.chain.place', 0.8, 1.0))
+        seq_f.field_out(g, tl)  # [seq_f: field author] the pack-up's fx and look/idle at the dock (spec S2, Q14)
         tl.at(FOUT_LEN, g.end())
         tl.write([f'# Pack-up (core service 22; clip field_end; @s = body at the centre): lift-off flash, rise, lances at {FOUT_LANCES},',
                   f'# the roll / pack at {FOUT_PACK}, compact at {FOUT_LEN}; the meter and low gravity ended at 0 (p/svc).'],
                  [f'# {key} tick.'])
         g.pw(key, 'cancel', ['# Nothing of its own lingers.'])
+        seq_f.emit(g)  # [seq_f: field author]

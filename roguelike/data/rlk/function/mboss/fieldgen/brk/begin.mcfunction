@@ -16,5 +16,5 @@ scoreboard players set #fgT mb -1
 scoreboard players set #fgMv mb 0
 function rlk:mboss/fieldgen/rig_stub/play/break
 function rlk:mboss/line/say {t:"역장 붕괴",c:"#FFE7A0",gap:2,hold:40,snd:2}
-function rlk:mboss/fieldgen/cfx/break_start
+function rlk:mboss/fieldgen/seq_f/brk/start
 function rlk:mboss/fieldgen/hud/refresh

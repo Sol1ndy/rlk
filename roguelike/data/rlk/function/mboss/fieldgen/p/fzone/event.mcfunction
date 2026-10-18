@@ -2,6 +2,6 @@
 function rlk:mboss/grp_new
 execute store result score #fq11N mb run random value 1..4
 execute store result storage rlk:mboss fg.fz.d double 0.1 run random value 20..30
+scoreboard players set #fq11F mb 1
 function rlk:mboss/fieldgen/p/fzone/disc
 function rlk:mboss/fieldgen/p/fzone/more
-playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.6 1.5 0.2

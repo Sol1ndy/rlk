@@ -15,5 +15,5 @@ scoreboard players add #fgFN mb 1
 scoreboard players set #fgHintT mb 0
 function rlk:mboss/fieldgen/fx/hud/meter_open
 execute if score #fgFN mb matches 1 run function rlk:mboss/fieldgen/fx/hud/hint_on
-function rlk:mboss/fieldgen/cfx/unfold_f
+function rlk:mboss/fieldgen/seq_f/unfold
 function rlk:mboss/fieldgen/hud/refresh

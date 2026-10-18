@@ -1,2 +1,2 @@
 # waves clock 171
-function rlk:mboss/fieldgen/p/waves/charge
+execute if score #fq21T mb matches 1 run function rlk:mboss/fieldgen/p/waves/mkx

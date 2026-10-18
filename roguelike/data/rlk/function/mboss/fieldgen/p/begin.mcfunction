@@ -12,9 +12,9 @@ execute if score #fgPat mb matches 3 run scoreboard players set #fgPMax mb 180
 execute if score #fgPat mb matches 4 run scoreboard players set #fgPMax mb 78
 execute if score #fgPat mb matches 5 run scoreboard players set #fgPMax mb 118
 execute if score #fgPat mb matches 6 run scoreboard players set #fgPMax mb 165
-execute if score #fgPat mb matches 11 run scoreboard players set #fgPMax mb 224
-execute if score #fgPat mb matches 12 run scoreboard players set #fgPMax mb 128
-execute if score #fgPat mb matches 21 run scoreboard players set #fgPMax mb 240
+execute if score #fgPat mb matches 11 run scoreboard players set #fgPMax mb 268
+execute if score #fgPat mb matches 12 run scoreboard players set #fgPMax mb 118
+execute if score #fgPat mb matches 21 run scoreboard players set #fgPMax mb 232
 execute if score #fgPat mb matches 20 run scoreboard players set #fgPMax mb 62
 execute if score #fgPat mb matches 22 run scoreboard players set #fgPMax mb 83
 # expected end for the progress bar (a pattern that decides a shorter run sets #fgPLen itself: g.set_len)
@@ -24,9 +24,9 @@ execute if score #fgPat mb matches 3 run scoreboard players set #fgPLen mb 174
 execute if score #fgPat mb matches 4 run scoreboard players set #fgPLen mb 70
 execute if score #fgPat mb matches 5 run scoreboard players set #fgPLen mb 110
 execute if score #fgPat mb matches 6 run scoreboard players set #fgPLen mb 157
-execute if score #fgPat mb matches 11 run scoreboard players set #fgPLen mb 216
-execute if score #fgPat mb matches 12 run scoreboard players set #fgPLen mb 120
-execute if score #fgPat mb matches 21 run scoreboard players set #fgPLen mb 232
+execute if score #fgPat mb matches 11 run scoreboard players set #fgPLen mb 260
+execute if score #fgPat mb matches 12 run scoreboard players set #fgPLen mb 110
+execute if score #fgPat mb matches 21 run scoreboard players set #fgPLen mb 212
 execute if score #fgPat mb matches 20 run scoreboard players set #fgPLen mb 57
 execute if score #fgPat mb matches 22 run scoreboard players set #fgPLen mb 78
 function rlk:mboss/fieldgen/hud/refresh

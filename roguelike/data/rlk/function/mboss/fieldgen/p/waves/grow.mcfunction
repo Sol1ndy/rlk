@@ -12,6 +12,3 @@ scoreboard players operation #hzSzR0 mb = #hzSzR mb
 scoreboard players remove #hzSzR0 mb 25
 scoreboard players set #hzSzW mb 0
 function rlk:mboss/hz/resize_s
-scoreboard players operation #fgM mb = @s mbHzT
-scoreboard players operation #fgM mb %= #fgK2 mb
-execute if score #fgM mb matches 0 at @s run function rlk:mboss/fieldgen/p/waves/draw

@@ -572,3 +572,23 @@ def rocks(g, tl, key, pid, burst0, n_burst=8, gap=6, throw0=None, n_throw=5, thr
 def rocks_cancel(pid):
     """Lines that remove everything rocks() made (cancel / end)."""
     return [f'kill @e[tag=rlk_mb_fg_p{pid}]', f'kill @e[type=minecraft:marker,tag=rlk_mb_fg_p{pid}w]']
+
+
+# =============================================================================================
+# Field-pattern author (field.py, seq_f.py): shared helpers, prefixed f_.
+def f_clip_anchor(clip, event, name, default):
+    """A rig anchor (rig coordinates x left, y up, -z forward) of a clip at one of its events, from the real
+    manifest's clips[].anchors[event][name] (e.g. the core height while wave_drop rests on the floor); `default` (an
+    (x, y, z) tuple) while the stub manifest, the clip or the anchor is missing."""
+    for c in _MAN.get('clips', []):
+        if c.get('name') == clip:
+            a = c.get('anchors', {}).get(event, {}).get(name)
+            if a:
+                return tuple(float(v) for v in a)
+    return tuple(default)
+
+
+def f_body_pos(anchor):
+    """A rig anchor (x left, y up, -z forward) as a body-frame position '^x ^y ^z' (run rotated as the body)."""
+    x, y, z = anchor
+    return f'^{L.num(float(x), 3)} ^{L.num(float(y), 3)} ^{L.num(-float(z), 3)}'

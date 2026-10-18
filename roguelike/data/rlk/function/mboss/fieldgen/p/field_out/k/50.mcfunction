@@ -1,3 +1,3 @@
 # field_out clock 50
-playsound minecraft:block.piston.contract hostile @a[tag=player] ~ ~ ~ 1 0.6 0.33
-playsound minecraft:block.crafter.craft hostile @a[tag=player] ~ ~ ~ 0.9 0.7 0.3
+execute rotated as @s rotated ~ 0 positioned ^ ^6.2 ^ run function rlk:mboss/fieldgen/fx/p/pack_up
+function rlk:mboss/fieldgen/fx/snd/core_flip
