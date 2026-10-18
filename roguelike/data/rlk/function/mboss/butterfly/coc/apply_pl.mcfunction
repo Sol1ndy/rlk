@@ -19,8 +19,7 @@ scoreboard players set #mbCritAdd mb -100
 scoreboard players set #mbHealPct mb 60
 scoreboard players set #mbHealEv mb 0
 scoreboard players add #bfCocN mb 1
-execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/fx/p/coc_apply
-execute at @e[tag=rlk_body,limit=1] run function rlk:mboss/butterfly/fx/snd/debuff
+execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/wx/coc/fx
 function rlk:mboss/butterfly/fx/hud/buff_off
 function rlk:mboss/butterfly/fx/hud/coc_on
 function rlk:mboss/butterfly/fx/hud/ab_coc

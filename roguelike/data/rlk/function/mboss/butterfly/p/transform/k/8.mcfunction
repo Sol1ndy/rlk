@@ -1,22 +1,2 @@
 # transform clock 8
-execute rotated as @s rotated ~ 0 positioned ~ ~1.6 ~ run function rlk:mboss/butterfly/fx/p/tf_ripples
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~0 ~0.15 ~4 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~1.24 ~0.15 ~3.8 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~2.35 ~0.15 ~3.24 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~3.24 ~0.15 ~2.35 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~3.8 ~0.15 ~1.24 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~4 ~0.15 ~0 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~3.8 ~0.15 ~-1.24 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~3.24 ~0.15 ~-2.35 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~2.35 ~0.15 ~-3.24 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~1.24 ~0.15 ~-3.8 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~0 ~0.15 ~-4 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~-1.24 ~0.15 ~-3.8 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~-2.35 ~0.15 ~-3.24 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~-3.24 ~0.15 ~-2.35 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~-3.8 ~0.15 ~-1.24 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~-4 ~0.15 ~0 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~-3.8 ~0.15 ~1.24 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~-3.24 ~0.15 ~2.35 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~-2.35 ~0.15 ~3.24 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.741f,0.898f,0.573f],scale:1.2} ~-1.24 ~0.15 ~3.8 0 0 0 0 1 force @a[tag=player]
+function rlk:mboss/butterfly/wx/tf/8

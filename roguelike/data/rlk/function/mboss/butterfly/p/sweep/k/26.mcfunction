@@ -1,3 +1,4 @@
 # sweep clock 26
-playsound minecraft:entity.blaze.shoot hostile @a[tag=player] ~ ~ ~ 0.8 0.8 0.27
-playsound minecraft:item.firecharge.use hostile @a[tag=player] ~ ~ ~ 0.8 0.9 0.27
+# the wing slam: two vertical flame crescents at the wing tips
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p13p,limit=1] positioned ~ ~2.8 ~ run function rlk:mboss/butterfly/fx/p/flame_slam
+function rlk:mboss/butterfly/fx/snd/flame_slam

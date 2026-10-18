@@ -1,5 +1,5 @@
 # @s = body. Range-filtered, weighted shuffle bag of the butterfly form, no immediate repeat:
-# strike melee/mid/far, barrage mid/farx2, sweep melee/midx2/far, coco mid/far (melee <= 4.0 b, far >= 8.0 b).
+# strike meleex2/mid, barrage mid/farx2, sweep melee/midx2, coco mid/far (melee <= 4.0 b, far >= 8.0 b).
 function rlk:mboss/mv/dist
 scoreboard players operation #bfDist mb = #mbDist mb
 scoreboard players set #bfBand mb 2

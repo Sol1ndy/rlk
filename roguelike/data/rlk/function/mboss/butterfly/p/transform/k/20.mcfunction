@@ -1,2 +1,2 @@
 # transform clock 20
-function rlk:mboss/butterfly/fx/snd/flap_small
+function rlk:mboss/butterfly/wx/tf/20
