@@ -26,7 +26,7 @@
 //                          is the total yaw spread evenly over the chain (+ = the tail swings to the boss's left),
 //                          tTwist the total roll; all added to t1..t8
 //   vis visBody visTail    visibility scales (0 hides; burrow / tail-only); visBody = everything but the tail
-import {add, sub, times, mul, q, rot, len, unit, aimQ, ik, toDisplayT, toDisplayQ} from './mboss_rig_math.mjs';
+import {add, sub, times, mul, q, rot, len, unit, aimQ, ik, toDisplayT, toDisplayQ, slerp} from './mboss_rig_math.mjs';
 
 export const H = 7.0;
 export const ROOT_PIVOT = [0, 2.8, .4];
@@ -43,9 +43,11 @@ export const J = {
   beard2: [0, .72, -3.55],        // the lower layer hangs from the first
   apron: [0, 2.2, -2.8],          // throat plate, hangs between the fore legs
   t1: [0, 2.85, 4.75],            // tail root
-  // left limbs (the right mirrors x)
-  shoulder: [2.3, 3.25, -2.15], elbow: [2.95, 2.3, -1.8], wrist: [3.15, .5, -2.45],
-  hip: [2.0, 3.0, 2.45], knee: [2.35, 1.9, 1.5], hock: [2.5, .72, 3.05],
+  // left limbs (the right mirrors x). Legs (R2): the shoulder sits high in the hump so the elbow can rise (stomp lift);
+  // the bracer column hangs near-vertical (wrist 0.2 b ahead of the elbow); the hind hock is high (1.5 b): the ribbed
+  // gaiter column is the metatarsus on foot_*, the shin (gaiter_*) a short hide segment from the forward knee
+  shoulder: [2.25, 3.6, -2.05], elbow: [2.95, 2.35, -2.2], wrist: [3.15, .5, -2.4],
+  hip: [2.0, 3.0, 2.45], knee: [2.3, 2.3, 1.85], hock: [2.5, 1.5, 2.9],
   // plate-group bases (flare pivots) and crystal mounts
   plN: [0, 2.95, -2.85], plS: [0, 4.0, -1.75], plM: [0, 4.05, .25], plH: [0, 3.55, 2.4],
 };
@@ -61,7 +63,7 @@ export const PART_SCALE = {
   head: 2.2, jaw: 2.0, eyes: 1.0, horn_l: 2.0, horn_r: 2.0, beard1: 1.4, beard2: 1.4,
   uarm_l: 1.8, bracer_l: 1.6, paw_l: 1.4, uarm_r: 1.8, bracer_r: 1.6, paw_r: 1.4,
   thigh_l: 2.0, gaiter_l: 1.6, foot_l: 1.4, thigh_r: 2.0, gaiter_r: 1.6, foot_r: 1.4,
-  glow_bracer_l: 1.6, glow_bracer_r: 1.6, glow_gaiter_l: 1.6, glow_gaiter_r: 1.6,
+  glow_bracer_l: 1.6, glow_bracer_r: 1.6, glow_gaiter_l: 1.4, glow_gaiter_r: 1.4,
   t1: 1.8, t2: 1.6, t3: 1.45, t4: 1.35, t5: 1.3, t6: 1.2, t7: 1.2, t8: 1.2, tip: 1.3,
 };
 // Rest lean of each plate group (deg, top toward the back): the plates are authored upright in the group frame and the
@@ -78,6 +80,20 @@ const inv = Q => [-Q[0], -Q[1], -Q[2], Q[3]];
 // Rest bend directions of the limbs (the IK pole that reproduces the rest elbow / knee), in the chest / pelvis frame.
 const poleOf = (S, E, W) => { const u = unit(sub(W, S)); return unit(perpv(sub(E, S), u)); };
 const ARM_POLE = poleOf(J.shoulder, J.elbow, J.wrist), LEG_POLE = poleOf(J.hip, J.knee, J.hock);
+// Legs (R2): the upper arm and the haunch are masses, not tubes, so they are authored in REST-ALIGNED frames (the rig
+// axes of the rest pose, origin at the shoulder / hip): the part turns by the bone's rotation away from its rest
+// direction. The bracer and the shin stay bone-aligned (columns along the bone); paw and foot carry their eulers.
+const LIMB_FRONT = [0, 0, -1];
+const REST_INV = s => {
+  const m = v => (s > 0 ? v : mx(v));
+  return {a: inv(aimQ(sub(m(J.elbow), m(J.shoulder)), LIMB_FRONT)), l: inv(aimQ(sub(m(J.knee), m(J.hip)), LIMB_FRONT))};
+};
+// Sole heights in the paw / foot frames (blocks below the wrist / hock), for the floor checks.
+export const SOLE = {paw: -.5, foot: -1.5};
+// The haunch turns only half way with its bone and half with the pelvis: it is the hip's muscle mass, so in a rear-up
+// (pelvis +45, hind feet planted) it stays seated on the pelvis instead of keeping its world orientation (the knee and
+// the shin stay inside it).
+const HAUNCH_FOLLOW = .5;
 
 // prev: the previous frame's limb bend directions (o._bend) for IK continuity (ik prevV).
 export function solve(p, {prev = null} = {}) {
@@ -111,10 +127,11 @@ export function solve(p, {prev = null} = {}) {
   part('crys_sh', at(Bc, J.plS), Bc.q); part('crys_mid', at(Bs, J.plM), Bs.q); part('crys_hip', at(Bp, J.plH), Bp.q);
   // legs: two-bone IK to the wrist / hock targets (root frame), rest pole carried by the chest / pelvis
   const bend = {};
-  const limb = (side, S, Wt, ab, pole, prevV, names, endQ) => {
+  const limb = (side, S, Wt, ab, pole, prevV, names, endQ, rest0, base = null) => {
     const R = ik(S, Wt, ab[0], ab[1], pole, prevV);
     const front = [0, 0, -1];
-    part(names[0], S, aimQ(sub(R.E, S), front), [1, 1, 1]);
+    const q0 = mul(aimQ(sub(R.E, S), front), rest0);
+    part(names[0], S, base ? slerp(base, q0, HAUNCH_FOLLOW) : q0, [1, 1, 1]);
     part(names[1], R.E, aimQ(sub(R.W, R.E), front), [1, 1, 1]);
     part(names[2], R.W, endQ);
     return R;
@@ -122,11 +139,12 @@ export function solve(p, {prev = null} = {}) {
   for (const [s, k] of [[1, 'L'], [-1, 'R']]) {
     const sx = s > 0 ? 'l' : 'r', m = v => (s > 0 ? v : mx(v));
     const poleA = rot(Bc.q, m(ARM_POLE)), poleL = rot(Bp.q, m(LEG_POLE));
-    const RA = limb(s, at(Bc, m(J.shoulder)), p['fw' + k], ARM, poleA, prev && prev['a' + k], [`uarm_${sx}`, `bracer_${sx}`, `paw_${sx}`], q(p['fp' + k]));
-    const RL = limb(s, at(Bp, m(J.hip)), p['hk' + k], LEG, poleL, prev && prev['l' + k], [`thigh_${sx}`, `gaiter_${sx}`, `foot_${sx}`], q(p['hf' + k]));
+    const RI = REST_INV(s);
+    const RA = limb(s, at(Bc, m(J.shoulder)), p['fw' + k], ARM, poleA, prev && prev['a' + k], [`uarm_${sx}`, `bracer_${sx}`, `paw_${sx}`], q(p['fp' + k]), RI.a);
+    const RL = limb(s, at(Bp, m(J.hip)), p['hk' + k], LEG, poleL, prev && prev['l' + k], [`thigh_${sx}`, `gaiter_${sx}`, `foot_${sx}`], q(p['hf' + k]), RI.l, Bp.q);
     bend['a' + k] = RA.v; bend['l' + k] = RL.v;
     part(`glow_bracer_${sx}`, o[`bracer_${sx}`].t, o[`bracer_${sx}`].q);
-    part(`glow_gaiter_${sx}`, o[`gaiter_${sx}`].t, o[`gaiter_${sx}`].q);
+    part(`glow_gaiter_${sx}`, o[`foot_${sx}`].t, o[`foot_${sx}`].q);   // the ribbed gaiter column is on the foot (R2)
   }
   // tail chain from the pelvis: segment i points along +Z from its joint; the parametric channels add to t1..t8
   let T = at(Bp, J.t1), Qt = Bp.q;
@@ -166,7 +184,7 @@ export const PROXIES = [
   ['tail1', 't1', [0, 0, 1.6], 2.6, 1.2, 'tail_only'], ['tail2', 't3', [0, 0, 1.0], 2.2, 1.0, 'tail_only'],
   ['tail3', 't5', [0, 0, .9], 1.8, .9, 'tail_only'], ['tail4', 't7', [0, 0, 1.0], 1.4, .8, 'tail_only'],
   ['paw_l', 'paw_l', [0, -.3, -.5], 1.8, 2.6, ''], ['paw_r', 'paw_r', [0, -.3, -.5], 1.8, 2.6, ''],
-  ['foot_l', 'foot_l', [0, -.4, -.5], 1.8, 2.6, ''], ['foot_r', 'foot_r', [0, -.4, -.5], 1.8, 2.6, ''],
+  ['foot_l', 'foot_l', [0, -1.15, -.5], 1.8, 2.6, ''], ['foot_r', 'foot_r', [0, -1.15, -.5], 1.8, 2.6, ''],
 ];
 // Proxy columns for a solved pose: {name: {x, z, base, top, w}} (rig frame; base = max(0, the point's floor
 // projection), top = the bone point's height + its top margin). A part hidden by vis (scale 0) reports hidden: true.
