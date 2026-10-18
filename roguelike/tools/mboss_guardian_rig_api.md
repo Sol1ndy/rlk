@@ -2,7 +2,7 @@
 
 This is the contract between the rig and the mid-boss pattern code. README.md §"중간보스 파수꾼・타락 모델과 리그" gives the overview in Korean.
 
-Generator: `tools/build_mboss_guardian_rig.mjs`, with `guardian_paint.mjs`, `guardian_paint_lib.mjs`, `guardian_geometry.mjs`, `guardian_pose.mjs`, `guardian_rig_math.mjs` and `guardian_clips.mjs`.
+Generator: `tools/build_mboss_guardian_rig.mjs`, with `guardian_paint.mjs`, `guardian_geometry.mjs`, `guardian_pose.mjs`, `guardian_clips.mjs` and `guardian_screen.mjs`. The generic code is shared with the other mid-boss rigs: `mboss_rig_math.mjs` (vectors, quaternions, IK), `mboss_paint_lib.mjs` (2D painting, sprite sets and atlas entries), `mboss_model_lib.mjs` (item-model boxes, cards, turned solids, bounds), `mboss_rig_clips.mjs` (clip format, retime, sampling), `mboss_rig_compile.mjs` (interpolation segments, key files, dispatch trees, facing helpers) and `mboss_screen_lib.mjs` (title-font screen overlays). `guardian_rig_math.mjs` and `guardian_paint_lib.mjs` remain as re-exports.
 
 ```
 node tools/build_mboss_guardian_rig.mjs --resourcepack <unpacked RP> [--datapack <dp>] [--no-paint | --paint a,b] [--debug-dp <scratch dir>]
