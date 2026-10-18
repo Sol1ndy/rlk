@@ -39,7 +39,8 @@ execute if predicate rlk:in_r run scoreboard players remove #s view 1
 # 점프: 땅에 서 있을 때만. 평타를 휘두르는 동안(swHold)은 뛰지 않는다. 평타 사이 간격에서 뛰면 다음 평타는 1타부터(player/swing/jump)
 scoreboard players set #vJmp view 0
 execute unless score @s swHold matches 1 if predicate rlk:in_jump as @e[tag=rlk_av,limit=1] if data entity @s {OnGround:1b} run scoreboard players set #vJmp view 1
-execute if score #vJmp view matches 1 as @e[tag=rlk_av,limit=1] run data modify entity @s Motion[1] set value 0.42d
+# 점프 세기 = 아바타 자신의 jump_strength 속성(기본 0.42, 중간보스 저중력 rlk:mb_lowg 이면 × 1.19)
+execute if score #vJmp view matches 1 as @e[tag=rlk_av,limit=1] store result entity @s Motion[1] double 0.000001 run attribute @s minecraft:jump_strength get 1000000
 execute if score #vJmp view matches 1 run function rlk:player/swing/jump
 # 입력이 없으면 그대로 둔다(마찰로 멈춤, 넉백도 그대로 받음)
 execute if score #f view matches 0 if score #s view matches 0 run return 0

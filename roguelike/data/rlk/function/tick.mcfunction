@@ -16,6 +16,10 @@ execute if score #pcount tmp matches 2.. run return 0
 execute as @e[tag=rlk_plkb] run function rlk:player/knockback/tick
 # 평타 휘두르기 느려짐(swHold): 이번 틱의 이동(view/move, 1인칭 점프 속성)보다 먼저 atkCD 에서 다시 구한다
 execute as @a[tag=player] run function rlk:player/swing/tick
+# 중간보스 저중력(tools/build_mboss_core.py mboss/lowg_on|off): 모듈이 이번 전투 틱에 요청했으면(#mbLowG 1) 플레이어와 아바타에 붙이고,
+# 아니면 아직 달고 있는 쪽(태그 rlk_lowg)에서 뗀다. view/tick(아바타 점프)보다 먼저
+execute if score #mbLowG mb matches 1 as @a[tag=player] run function rlk:mboss/lowg_on
+execute unless score #mbLowG mb matches 1 if entity @e[tag=rlk_lowg,limit=1] run function rlk:mboss/lowg_off
 execute as @a[tag=player] run function rlk:view/tick
 execute unless entity @a[tag=player,limit=1] if entity @e[tag=rlk_view,limit=1] run kill @e[tag=rlk_view]
 execute as @a[tag=player] run function rlk:player/tick

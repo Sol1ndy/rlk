@@ -1,0 +1,3 @@
+# @s = a marker: pulled toward the arena axis (0.5 b steps) until within 20.3 b of it.
+scoreboard players set #fgCl mb 0
+function rlk:mboss/fieldgen/u/clamp_w_s

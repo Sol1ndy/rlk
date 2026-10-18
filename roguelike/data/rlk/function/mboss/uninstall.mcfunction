@@ -2,6 +2,9 @@
 # uninstall hook first (their own objectives and leftovers).
 function rlk:mboss/cleanup
 function rlk:mboss/d/uninstall
+# low gravity (mboss/lowg_on): the modifiers off every player and every entity still tagged
+execute as @a run function rlk:mboss/lowg_rem
+execute as @e[tag=rlk_lowg] run function rlk:mboss/lowg_rem
 kill @e[tag=rlk_mb_body]
 kill @e[tag=rlk_mb_aux]
 bossbar remove rlk:mboss
@@ -42,6 +45,9 @@ scoreboard objectives remove mbHzY1
 scoreboard objectives remove mbHzHit
 scoreboard objectives remove mbHzCol
 scoreboard objectives remove mbHzG
+scoreboard objectives remove mbHzND
+scoreboard objectives remove mbHzRA
+scoreboard objectives remove mbHzRT
 scoreboard objectives remove mbPjV
 scoreboard objectives remove mbPjT
 scoreboard objectives remove mbPjL

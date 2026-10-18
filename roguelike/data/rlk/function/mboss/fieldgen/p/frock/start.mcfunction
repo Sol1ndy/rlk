@@ -1,0 +1,15 @@
+# F2 파쇄 (clip field_erupt; @s = body at the centre): bursts from 20, throws from 62.
+playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.8 0.9 0.27
+playsound minecraft:block.chain.place hostile @a[tag=player] ~ ~ ~ 0.8 0.8 0.27
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~0 ~1 ~3 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~1.5 ~1 ~2.6 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~2.6 ~1 ~1.5 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~3 ~1 ~0 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~2.6 ~1 ~-1.5 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~1.5 ~1 ~-2.6 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~0 ~1 ~-3 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~-1.5 ~1 ~-2.6 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~-2.6 ~1 ~-1.5 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~-3 ~1 ~0 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~-2.6 ~1 ~1.5 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~-1.5 ~1 ~2.6 0 0 0 0 1 force @a[tag=player]

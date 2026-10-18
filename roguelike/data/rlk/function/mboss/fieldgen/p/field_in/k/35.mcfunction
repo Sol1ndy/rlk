@@ -1,0 +1,13 @@
+# field_in clock 35
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~0 ~3.8 ~3.8 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~1.9 ~3.8 ~3.29 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~3.29 ~3.8 ~1.9 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~3.8 ~3.8 ~0 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~3.29 ~3.8 ~-1.9 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~1.9 ~3.8 ~-3.29 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~0 ~3.8 ~-3.8 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~-1.9 ~3.8 ~-3.29 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~-3.29 ~3.8 ~-1.9 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~-3.8 ~3.8 ~0 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~-3.29 ~3.8 ~1.9 0 0 0 0 1 force @a[tag=player]
+execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~-1.9 ~3.8 ~3.29 0 0 0 0 1 force @a[tag=player]

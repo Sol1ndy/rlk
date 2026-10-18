@@ -1,0 +1,22 @@
+# GENERATED: the pips for #fgBrk.
+execute if score #fgBrk mb matches 0 run return run function rlk:mboss/fieldgen/hud/pips/0
+execute if score #fgBrk mb matches 1 run return run function rlk:mboss/fieldgen/hud/pips/1
+execute if score #fgBrk mb matches 2 run return run function rlk:mboss/fieldgen/hud/pips/2
+execute if score #fgBrk mb matches 3 run return run function rlk:mboss/fieldgen/hud/pips/3
+execute if score #fgBrk mb matches 4 run return run function rlk:mboss/fieldgen/hud/pips/4
+execute if score #fgBrk mb matches 5 run return run function rlk:mboss/fieldgen/hud/pips/5
+execute if score #fgBrk mb matches 6 run return run function rlk:mboss/fieldgen/hud/pips/6
+execute if score #fgBrk mb matches 7 run return run function rlk:mboss/fieldgen/hud/pips/7
+execute if score #fgBrk mb matches 8 run return run function rlk:mboss/fieldgen/hud/pips/8
+execute if score #fgBrk mb matches 9 run return run function rlk:mboss/fieldgen/hud/pips/9
+execute if score #fgBrk mb matches 10 run return run function rlk:mboss/fieldgen/hud/pips/10
+execute if score #fgBrk mb matches 11 run return run function rlk:mboss/fieldgen/hud/pips/11
+execute if score #fgBrk mb matches 12 run return run function rlk:mboss/fieldgen/hud/pips/12
+execute if score #fgBrk mb matches 13 run return run function rlk:mboss/fieldgen/hud/pips/13
+execute if score #fgBrk mb matches 14 run return run function rlk:mboss/fieldgen/hud/pips/14
+execute if score #fgBrk mb matches 15 run return run function rlk:mboss/fieldgen/hud/pips/15
+execute if score #fgBrk mb matches 16 run return run function rlk:mboss/fieldgen/hud/pips/16
+execute if score #fgBrk mb matches 17 run return run function rlk:mboss/fieldgen/hud/pips/17
+execute if score #fgBrk mb matches 18 run return run function rlk:mboss/fieldgen/hud/pips/18
+execute if score #fgBrk mb matches 19 run return run function rlk:mboss/fieldgen/hud/pips/19
+execute if score #fgBrk mb matches 20.. run return run function rlk:mboss/fieldgen/hud/pips/20

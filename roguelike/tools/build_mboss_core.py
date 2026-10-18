@@ -71,6 +71,8 @@ PER_ENTITY = [
     'mbHzHi', 'mbHzHW', 'mbHzFX', 'mbHzFZ', 'mbHzY0', 'mbHzY1', 'mbHzHit', 'mbHzCol',
     # hazard volley group (one hit per group)
     'mbHzG',
+    # hazard options of the field generator: no dash dodge (mbHzND), re-arm period / re-arm clock (mbHzRA / mbHzRT)
+    'mbHzND', 'mbHzRA', 'mbHzRT',
     # projectiles (mbPjK hit shape 0 sphere / 1 blade, mbPjG volley group)
     'mbPjV', 'mbPjT', 'mbPjL', 'mbPjD', 'mbPjE', 'mbPjB', 'mbPjR', 'mbPjHit', 'mbPjRet', 'mbPjW', 'mbPjK', 'mbPjG',
     # pull
@@ -158,6 +160,11 @@ w('init', '\n'.join(
        'execute unless score #mbCritAdd mb matches -1000.. run scoreboard players set #mbCritAdd mb 0',
        'execute unless score #mbHealEv mb matches 0.. run scoreboard players set #mbHealEv mb 0',
        'execute unless score #mbGrpN mb matches 0.. run scoreboard players set #mbGrpN mb 0',
+       '# Low gravity requested by the running module (#mbLowG 1; mboss/main clears it every tick, the module tick sets it',
+       '# again; rlk:tick syncs the attribute modifiers through mboss/lowg_on|off). Hazard re-arm clock (hz/all).',
+       'execute unless score #mbLowG mb matches 0..1 run scoreboard players set #mbLowG mb 0',
+       'execute unless score #mbHzClk mb matches 0.. run scoreboard players set #mbHzClk mb 0',
+       'scoreboard players set #mbNoDodge mb 0',
        '# Library activity flags (a set flag makes the world tick scan for that library\'s entities once).',
        'scoreboard players set #mbHzOn mb 1', 'scoreboard players set #mbPjOn mb 1',
        'scoreboard players set #mbPlOn mb 1', 'scoreboard players set #mbMvOn mb 1',
@@ -186,6 +193,9 @@ w('uninstall', '''
 # uninstall hook first (their own objectives and leftovers).
 function rlk:mboss/cleanup
 function rlk:mboss/d/uninstall
+# low gravity (mboss/lowg_on): the modifiers off every player and every entity still tagged
+execute as @a run function rlk:mboss/lowg_rem
+execute as @e[tag=rlk_lowg] run function rlk:mboss/lowg_rem
 kill @e[tag=rlk_mb_body]
 kill @e[tag=rlk_mb_aux]
 bossbar remove rlk:mboss
@@ -212,6 +222,8 @@ scoreboard players set #hzVis mb 0
 scoreboard players set #hzCol mb -1
 scoreboard players set #hzLinger mb 8
 scoreboard players set #hzQuiet mb 0
+scoreboard players set #hzNoDodge mb 0
+scoreboard players set #hzRearm mb 0
 scoreboard players set #pjEl mb -1
 scoreboard players set #pjKB mb 2
 scoreboard players set #pjRet mb 0
@@ -397,10 +409,12 @@ function rlk:mboss/opts_reset
 ''')
 w('player_reset', '''
 # Player-side fight modifiers back to neutral (fight start, cleanup_fight): healing received 100 %, no crit
-# change, no pending heal events. The player's crit chance is recomputed every 2 t (items/stat_light).
+# change, no pending heal events, no low gravity. The player's crit chance is recomputed every 2 t (items/stat_light).
 scoreboard players set #mbHealPct mb 100
 scoreboard players set #mbCritAdd mb 0
 scoreboard players set #mbHealEv mb 0
+# low gravity off (rlk:tick removes the modifiers on the next tick: mboss/lowg_off)
+scoreboard players set #mbLowG mb 0
 ''')
 w('player_heal', '''
 # From items/hook/on_heal, its first line (@s = player, #heal tmp >= 1), only while a fight is live (#mbLive 1).
@@ -413,6 +427,34 @@ execute if score #mbHealPct mb matches 100 run return 0
 scoreboard players operation #heal tmp *= #mbHealPct mb
 scoreboard players operation #heal tmp /= #c100 mb
 execute if score #heal tmp matches ..0 run scoreboard players set #heal tmp 1
+''')
+
+w('lowg_on', '''
+# From rlk:tick while #mbLowG mb is 1 (@s = a player; before view/tick, so this tick's jump already uses it): low
+# gravity on the player and on the shoulder-view avatar (view/move reads the avatar's own jump_strength):
+# gravity x0.5, jump strength x1.19 (apex about 3 b, 25 t airtime), safe fall distance +4, all modifier
+# rlk:mb_lowg. Multiplicative on purpose: the shoulder-view camera player has gravity base 0 and stays put.
+# Re-added every tick (an existing modifier is not changed), so a re-created avatar gets it at once. The swing
+# hold (jump x0, player/swing/tick) and every other x0 jump lock still win. Tag rlk_lowg marks who carries it.
+function rlk:mboss/lowg_add
+execute as @e[type=minecraft:mannequin,tag=rlk_av] run function rlk:mboss/lowg_add
+''')
+w('lowg_add', '''
+attribute @s minecraft:gravity modifier add rlk:mb_lowg -0.5 add_multiplied_base
+attribute @s minecraft:jump_strength modifier add rlk:mb_lowg 0.19 add_multiplied_base
+attribute @s minecraft:safe_fall_distance modifier add rlk:mb_lowg 4 add_value
+tag @s add rlk_lowg
+''')
+w('lowg_off', '''
+# From rlk:tick while #mbLowG mb is not 1 and something still carries low gravity (any player or avatar tagged
+# rlk_lowg: a field that ended, broke or paused, a fight that is over, a relog or crash mid-field, a view switch).
+execute as @e[tag=rlk_lowg] run function rlk:mboss/lowg_rem
+''')
+w('lowg_rem', '''
+attribute @s minecraft:gravity modifier remove rlk:mb_lowg
+attribute @s minecraft:jump_strength modifier remove rlk:mb_lowg
+attribute @s minecraft:safe_fall_distance modifier remove rlk:mb_lowg
+tag @s remove rlk_lowg
 ''')
 
 w('body', '''
@@ -758,6 +800,9 @@ w('main', '''
 # From rlk:tick, only while #mbLive mb is 1 (set by mboss/start and mboss/reload, cleared by cleanup_fight and
 # here), so outside a fight the server never scans for mid-boss entities. No body any more (killed, /kill,
 # lost): the fight's leftovers and the bars go, and the scans stop until the next mboss/start.
+# Low gravity is a per-tick request: cleared here, set again by the running module's tick (#mbLowG mb 1), so a
+# paused fight, a missing player or body, the intro, the death sequence and every exit path drop it at once.
+scoreboard players set #mbLowG mb 0
 execute if entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run return run function rlk:mboss/world
 function rlk:mboss/cleanup_aux
 function rlk:mboss/bars_hide
@@ -791,6 +836,8 @@ execute as @e[tag=rlk_mb_mv] run function rlk:mboss/mv/tick
 ''')
 w('hz/all', '''
 scoreboard players set #mbHzOn mb 0
+# re-arm clock of #hzRearm hazards (advances only while hazards are scanned, so a paused fight freezes it too)
+scoreboard players add #mbHzClk mb 1
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] at @s rotated as @s run function rlk:mboss/hz/tick
 ''')
 w('pj/all', '''
@@ -884,7 +931,8 @@ w('hurt', '''
 # it is the knockback source. Inputs: #mbHitPct mb (coefficient %, 100 = registry atk), #cmEl tmp
 # (element), #mbKB mb (knockback steps, 0 none), #mbKBDir mb (0 away from @s, 1 along @s's yaw).
 # Goes through cm/hit_pl2 -> player/take_damage: dash i-frames, defence, level scaling, element, shields.
-# Output: #dodged tmp 1 when the dash i-frames ate the hit.
+# Output: #dodged tmp 1 when the dash i-frames ate the hit. #mbNoDodge mb 1 (set around the call by hz/hurt for a
+# #hzNoDodge hazard): the dash i-frames are ignored for this one hit (the player keeps them for the next).
 scoreboard players set #dodged tmp 0
 execute unless entity @a[tag=player,scores={dead=0},limit=1] run return 0
 execute if entity @a[tag=player,scores={rnDie=1..}] run return 0
@@ -899,9 +947,18 @@ scoreboard players operation #cmLv tmp = #mbLv mb
 scoreboard players operation #cmKB tmp = #mbKB mb
 kill @e[tag=rlk_plkb_source]
 execute if score #cmKB tmp matches 1.. run function rlk:mboss/kb_src
-execute as @a[tag=player,limit=1] run function rlk:cm/hit_pl2
+execute unless score #mbNoDodge mb matches 1 as @a[tag=player,limit=1] run function rlk:cm/hit_pl2
+# #mbNoDodge mb 1 (a #hzNoDodge hazard): dash i-frames do not help this hit
+execute if score #mbNoDodge mb matches 1 as @a[tag=player,limit=1] run function rlk:mboss/hurt_nd
 kill @e[tag=rlk_plkb_source]
 scoreboard players set #mbKBDir mb 0
+''')
+w('hurt_nd', '''
+# @s = player: one hit that dash i-frames cannot dodge (dashInvT is 0 during the call, then restored).
+execute store result score #mbDI mb run scoreboard players get @s dashInvT
+scoreboard players set @s dashInvT 0
+function rlk:cm/hit_pl2
+scoreboard players operation @s dashInvT = #mbDI mb
 ''')
 w('kb_src', '''
 execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_plkb_source"]}
@@ -1205,7 +1262,8 @@ for kind, keys, body in (
         f'# {doc}',
         '# As anything, positioned on the floor point, rotated = aim (pitch ignored). tell = ticks of telegraph',
         '# until the hit is resolved, dmg = % of the boss base hit (0 = telegraph only). Units: tenths of a block.',
-        '# Options: opts_reset (#hzGrp = volley group, see mboss/grp_new).',
+        '# Options: opts_reset (#hzGrp = volley group, see mboss/grp_new; #hzNoDodge 1 = dash i-frames do not help;',
+        '# #hzRearm N = a hit disarms it for N ticks only, then it can hit again; live changes: hz/aim, hz/resize).',
         f'# Call: function rlk:mboss/hz/{kind} {{' + ','.join(f'{k}:..' for k in keys) + '}'] + body + [
         '$scoreboard players set #hzW mb $(tell)', '$scoreboard players set #hzD mb $(dmg)',
         'function rlk:mboss/hz/make']))
@@ -1240,6 +1298,9 @@ execute if score @s mbHzK matches 4 unless score #hzKBDir mb matches 0..1 run sc
 scoreboard players operation @s mbHzS = #hzSfx mb
 scoreboard players operation @s mbHzV = #hzVis mb
 scoreboard players operation @s mbHzG = #hzGrp mb
+scoreboard players operation @s mbHzND = #hzNoDodge mb
+scoreboard players operation @s mbHzRA = #hzRearm mb
+scoreboard players set @s mbHzRT 0
 scoreboard players operation @s mbHzCol = @s mbHzE
 execute if score #hzCol mb matches 0.. run scoreboard players operation @s mbHzCol = #hzCol mb
 execute if score #hzQuiet mb matches 1 run tag @s add rlk_mb_hzq
@@ -1362,6 +1423,8 @@ execute if score @s mbHzT < @s mbHzW if score #t mb matches 0 unless entity @s[t
 execute if score @s mbHzT = @s mbHzW run function rlk:mboss/hz/strike
 scoreboard players operation #hzEnd mb = @s mbHzW
 scoreboard players operation #hzEnd mb += @s mbHzA
+# #hzRearm: a hit (or a hit of its volley group) disarmed it until the re-arm clock reaches mbHzRT
+execute if score @s mbHzHit matches 1 if score @s mbHzRA matches 1.. if score #mbHzClk mb >= @s mbHzRT run scoreboard players set @s mbHzHit 0
 # dmg 0 = telegraph only (outline, strike flash and the module visuals; never a hit)
 execute if score @s mbHzHit matches 0 if score @s mbHzD matches 1.. if score @s mbHzT >= @s mbHzW if score @s mbHzT < #hzEnd mb run function rlk:mboss/hz/hit
 ''')
@@ -1548,16 +1611,91 @@ scoreboard players operation #r2 mb += #t mb
 execute if score #r2 mb > @s mbHzRI run function rlk:mboss/hz/hurt
 ''')
 w('hz/hurt', '''
-# One hit per hazard: a dodge (dash i-frames) also consumes it.
+# One hit per hazard: a dodge (dash i-frames) also consumes it. #hzRearm hazards arm again mbHzRA ticks later;
+# #hzNoDodge hazards ignore the dash i-frames (mboss/hurt with #mbNoDodge 1).
 scoreboard players set @s mbHzHit 1
+execute if score @s mbHzRA matches 1.. run function rlk:mboss/hz/rearm_at
 scoreboard players set #hzHit mb 1
 scoreboard players operation #mbHitPct mb = @s mbHzD
 scoreboard players operation #cmEl tmp = @s mbHzE
 scoreboard players operation #mbKB mb = @s mbHzB
 scoreboard players operation #mbKBDir mb = @s mbHzKD
+scoreboard players operation #mbNoDodge mb = @s mbHzND
 function rlk:mboss/hurt
+scoreboard players set #mbNoDodge mb 0
 scoreboard players operation #g mb = @s mbHzG
 execute if score #dodged tmp matches 0 if score #g mb matches 1.. run function rlk:mboss/grp_mark
+''')
+w('hz/rearm_at', '''
+# @s = a #hzRearm hazard that is disarmed now: armed again when the re-arm clock #mbHzClk reaches mbHzRT.
+scoreboard players operation @s mbHzRT = #mbHzClk mb
+scoreboard players operation @s mbHzRT += @s mbHzRA
+''')
+w('hz/aim', '''
+# Re-aim a live hazard (@s = its marker): it moves to the execution position and turns to the execution yaw
+# (pitch ignored); the frozen forward axis of the hit test is recomputed exactly as hz/init does. For sweeping
+# lines (lasers): execute as <marker> at <body> rotated as @s rotated ~5 0 positioned ^ ^ ^2.8 run function
+# rlk:mboss/hz/aim. Call it from the module tick (it runs before hz/all, so this tick's hit test uses the new aim).
+tp @s ~ ~ ~ ~ 0
+execute at @s rotated as @s positioned ^ ^ ^1 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_hzax"]}
+execute store result score #ox mb run data get entity @s Pos[0] 1000
+execute store result score #oz mb run data get entity @s Pos[2] 1000
+execute store result score @s mbHzFX run data get entity @e[type=minecraft:marker,tag=rlk_mb_hzax,limit=1] Pos[0] 1000
+execute store result score @s mbHzFZ run data get entity @e[type=minecraft:marker,tag=rlk_mb_hzax,limit=1] Pos[2] 1000
+scoreboard players operation @s mbHzFX -= #ox mb
+scoreboard players operation @s mbHzFZ -= #oz mb
+kill @e[type=minecraft:marker,tag=rlk_mb_hzax]
+''')
+w('hz/resize', '''
+# Change a live hazard's size (@s = its marker), tenths of a block: {r, r0} = outer / inner radius of a disc, ring,
+# sector or full (r0 = the safe hole) or the length / back of a line, {w} = the width of a line (0 = keep). The
+# hit bounds are recomputed with the 0.3 b body pad (as hz/init). Meant for #hzQuiet hazards whose visual the module
+# draws (the framework outline of a loud one is redrawn too). Score form without a macro: set #hzSzR #hzSzR0
+# #hzSzW mb and call hz/resize_s (an expanding wave front calls it every tick).
+$scoreboard players set #hzSzR mb $(r)
+$scoreboard players set #hzSzR0 mb $(r0)
+$scoreboard players set #hzSzW mb $(w)
+function rlk:mboss/hz/resize_s
+''')
+w('hz/resize_s', '''
+# @s = live hazard marker; #hzSzR / #hzSzR0 / #hzSzW mb in tenths (see hz/resize). r is clamped to 0..40 b (the
+# squared bounds stay inside 32 bits).
+execute if score #hzSzR mb matches ..-1 run scoreboard players set #hzSzR mb 0
+execute if score #hzSzR mb matches 401.. run scoreboard players set #hzSzR mb 400
+scoreboard players operation @s mbHzR = #hzSzR mb
+scoreboard players operation @s mbHzR *= #c100 mb
+scoreboard players operation @s mbHzR0 = #hzSzR0 mb
+scoreboard players operation @s mbHzR0 *= #c100 mb
+execute if score @s mbHzK matches 4 run function rlk:mboss/hz/resize_line
+execute unless score @s mbHzK matches 4 run function rlk:mboss/hz/resize_rad
+execute unless entity @s[tag=rlk_mb_hzq] run function rlk:mboss/hz/init_draw
+''')
+w('hz/resize_rad', '''
+execute if score @s mbHzR0 matches ..-1 run scoreboard players set @s mbHzR0 0
+scoreboard players operation #t mb = @s mbHzR
+scoreboard players add #t mb 300
+scoreboard players operation @s mbHzRR = #t mb
+scoreboard players operation @s mbHzRR *= #t mb
+scoreboard players operation #t mb = @s mbHzR0
+scoreboard players remove #t mb 300
+execute if score #t mb matches ..-1 run scoreboard players set #t mb 0
+scoreboard players operation @s mbHzRI = #t mb
+scoreboard players operation @s mbHzRI *= #t mb
+execute if score @s mbHzK matches 5 run scoreboard players operation @s mbHzRI = @s mbHzR0
+execute if score @s mbHzK matches 5 run scoreboard players operation @s mbHzRI *= @s mbHzR0
+''')
+w('hz/resize_line', '''
+# len = mbHzR, back = mbHzR0, width #hzSzW (tenths, 0 = keep): as hz/init_line.
+execute if score #hzSzW mb matches 1.. run scoreboard players operation @s mbHzHW = #hzSzW mb
+execute if score #hzSzW mb matches 1.. run scoreboard players operation @s mbHzHW *= #c100 mb
+execute if score #hzSzW mb matches 1.. run scoreboard players operation @s mbHzHW /= #c2 mb
+execute if score #hzSzW mb matches 1.. run scoreboard players operation @s mbHzC = @s mbHzHW
+execute if score #hzSzW mb matches 1.. run scoreboard players add @s mbHzHW 300
+scoreboard players operation @s mbHzLo = @s mbHzR0
+scoreboard players operation @s mbHzLo *= #cm1 mb
+scoreboard players remove @s mbHzLo 300
+scoreboard players operation @s mbHzHi = @s mbHzR
+scoreboard players add @s mbHzHi 300
 ''')
 w('hz/cancel', '''
 # Cancels the hazard with id #hzLast mb (or any: set #hzLast mb before the call). Module visuals get event 2.
@@ -1684,6 +1822,8 @@ w('grp_mark', '''
 # #g mb = a volley group that just landed a hit: its hazards and props stop testing for hits (the strike
 # visuals and the flights go on).
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzG = #g mb run scoreboard players set @s mbHzHit 1
+# #hzRearm members of the group re-arm together (one hit per re-arm period for the whole group)
+execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzG = #g mb if score @s mbHzRA matches 1.. run function rlk:mboss/hz/rearm_at
 execute as @e[tag=rlk_mb_pj] if score @s mbPjG = #g mb run scoreboard players set @s mbPjHit 1
 ''')
 w('pj/steer', '''

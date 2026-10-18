@@ -1,0 +1,22 @@
+# GENERATED: the pips for #fgBrk (the newest one flashing).
+execute if score #fgBrk mb matches 0 run return run function rlk:mboss/fieldgen/hud/pipsf/0
+execute if score #fgBrk mb matches 1 run return run function rlk:mboss/fieldgen/hud/pipsf/1
+execute if score #fgBrk mb matches 2 run return run function rlk:mboss/fieldgen/hud/pipsf/2
+execute if score #fgBrk mb matches 3 run return run function rlk:mboss/fieldgen/hud/pipsf/3
+execute if score #fgBrk mb matches 4 run return run function rlk:mboss/fieldgen/hud/pipsf/4
+execute if score #fgBrk mb matches 5 run return run function rlk:mboss/fieldgen/hud/pipsf/5
+execute if score #fgBrk mb matches 6 run return run function rlk:mboss/fieldgen/hud/pipsf/6
+execute if score #fgBrk mb matches 7 run return run function rlk:mboss/fieldgen/hud/pipsf/7
+execute if score #fgBrk mb matches 8 run return run function rlk:mboss/fieldgen/hud/pipsf/8
+execute if score #fgBrk mb matches 9 run return run function rlk:mboss/fieldgen/hud/pipsf/9
+execute if score #fgBrk mb matches 10 run return run function rlk:mboss/fieldgen/hud/pipsf/10
+execute if score #fgBrk mb matches 11 run return run function rlk:mboss/fieldgen/hud/pipsf/11
+execute if score #fgBrk mb matches 12 run return run function rlk:mboss/fieldgen/hud/pipsf/12
+execute if score #fgBrk mb matches 13 run return run function rlk:mboss/fieldgen/hud/pipsf/13
+execute if score #fgBrk mb matches 14 run return run function rlk:mboss/fieldgen/hud/pipsf/14
+execute if score #fgBrk mb matches 15 run return run function rlk:mboss/fieldgen/hud/pipsf/15
+execute if score #fgBrk mb matches 16 run return run function rlk:mboss/fieldgen/hud/pipsf/16
+execute if score #fgBrk mb matches 17 run return run function rlk:mboss/fieldgen/hud/pipsf/17
+execute if score #fgBrk mb matches 18 run return run function rlk:mboss/fieldgen/hud/pipsf/18
+execute if score #fgBrk mb matches 19 run return run function rlk:mboss/fieldgen/hud/pipsf/19
+execute if score #fgBrk mb matches 20.. run return run function rlk:mboss/fieldgen/hud/pipsf/20
