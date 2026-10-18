@@ -1,6 +1,6 @@
 # H2 달빛 점프 (clip kick_jump; after the core's close-in to 3 b). Sweep r 3 decal 0 -> 10
 # (active 4 t, y <= 1.0 b: jumpable), the jump 22 -> 46, the disc r 2.5 locked under the
-# player (walk disc) at 32 -> impact 42 (orb 34, kick 39); 0.9 / 1.4 Dendro, 2 hits.
+# player (walk disc) at 32 -> impact 42 (orb 34, kick 39); 0.45 / 0.7 Dendro, 2 hits.
 function rlk:mboss/butterfly/rig/face/player
 execute at @s rotated as @s rotated ~ 0 positioned ^0.84 ^1.918 ^0.113 run function rlk:mboss/butterfly/fx/p/shard_tell
 function rlk:mboss/butterfly/fx/snd/shard_tell

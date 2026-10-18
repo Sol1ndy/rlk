@@ -236,7 +236,7 @@ def b1(g):
     tl.at(rt('wing_strike', 50), g.snd('flap_small'))
     tl.at(L_STRIKE, g.end())
     tl.write([f'# B1 우아한 날개 (clip wing_strike: dive {B1_DIVE}, hit {B1_HIT}; lock {B1_LOCK}, swoop {B1_GLIDE}-{B1_HIT}).',
-              '# One volley group: the lane 10 x 3.5 from her spot along the aim + the arc r 4 +-60 at L (130 % Dendro, KB 3).'],
+              f'# One volley group: the lane 10 x 3.5 from her spot along the aim + the arc r 4 +-60 at L ({DMG["b1"]} % Dendro, KB 3).'],
              ['# B1 tick.'])
     g.pw(k, 'cancel', ['# Remove what B1 owns (its markers; the hazards go with lib_clear).',
                        f'kill @e[type=minecraft:marker,tag={s_}]', f'kill @e[type=minecraft:marker,tag={l_}]',
@@ -275,7 +275,7 @@ def b2(g):
     in game at the swing from the distance it has to cover (D = (L + 4 h) / 0.7 b/t, 7..60 t: review fix F1, the plan's
     0.6-0.75 b/t dives at any range), and the same D drives its decal (the fill reaches the rim on the landing tick
     s+2+i+5+D), its dive, its landing and its pj life. Harmless in the air, it hits on landing (a sphere r 1.2 under the
-    prop = the splash on the floor), 50 % Pyro, KB 2; the 5 crescents of a swing share a volley group: one hit per swing
+    prop = the splash on the floor), DMG['b2'] (35 %) Pyro, KB 2; the 5 crescents of a swing share a volley group: one hit per swing
     at most. Each crescent leaves a short flame tail drawn along its actual flight (review fix F4). Between the swings
     she glides in at 0.3 b/t while beyond 9 b (the plan: she keeps 6-8 b for the Pyro patterns)."""
     R, k, pid = g.rig, K_BARRAGE, 12
@@ -446,7 +446,7 @@ def b2(g):
                        f'execute if score #bp12W mb matches {w_lo}.. run function {NS}p/{k}/tele/pick'])
     tl.write([f'# B2 화염 날개의 습격 (clip wing_barrage: swings {B2_SWINGS}; lead {B2_LEAD}). Crescent i of a swing s: spawn s+{B2_SPAWN}+i,',
               f'# fan-out {B2_UP} t, curved dive of D = (L + {L.num(4 * B2_ARC)}) / {L.num(B2_VMAX)} t ({B2_DMIN}..{B2_DMAX}), lands s+{B2_SPAWN}+i+{B2_UP}+D on its',
-              '# marker (50 % Pyro each, one hit per swing); the end once the clip is over and every crescent has landed.'],
+              f'# marker ({DMG["b2"]} % Pyro each, one hit per swing); the end once the clip is over and every crescent has landed.'],
              ['# B2 tick: the crescents fly first (the module tick runs before mv and pj move them next tick).',
               f'execute if entity @e[type=minecraft:item_display,tag={c_},limit=1] run {g.fn(f"p/{k}/fly")}',
               f'execute if score #bfPT mb matches {L_BARRAGE}.. unless entity @e[type=minecraft:item_display,tag={c_},limit=1] '
@@ -550,8 +550,8 @@ def b4(g):
     """B4 달빛 축복 / 2단 코코볼 (Dendro, spec B4_coco.md): the wing-wrap charge, orb 1 at orb1 (her chest, ahead) and orb 2
     at orb2 (her right side), the cocoon ball between. Each orb is a framework pj (a kit sphere prop with two spinning
     gyroscope rings, or the rig's orb prop once it exists) flying 0.25 b/t and steering 9 degrees/t toward the player
-    for its 40 t life (contact: 150 % Dendro, KB 2, it pops); then it stops, a burst decal r 2.8 fills under it and
-    10 t later the radial ground blades burst (150 %, KB 3) in the orb's own volley group: one hit per orb."""
+    for its 40 t life (contact: DMG['b4'], 100 % Dendro, KB 2, it pops); then it stops, a burst decal r 2.8 fills under it and
+    10 t later the radial ground blades burst (the same 100 %, KB 3) in the orb's own volley group: one hit per orb."""
     R, k, pid = g.rig, K_COCO, 14
     o_, r_, n_, v_ = 'rlk_mb_bf_p14o', 'rlk_mb_bf_p14r', 'rlk_mb_bf_p14n', 'rlk_mb_bf_p14v'
     rig_orb, rig_pod = g.prop('orb'), g.prop('pod')
@@ -671,7 +671,7 @@ def b5(g):
     outward from the arena centre (toward her side when the player stands on the centre), clamped to r 16; the swoop
     glide to R (3-14, at most 1.2 b/t), the whirl with the lime star flare and slash streaks, the cup (the dome decal r 10
     and its hazard, tell 17: dodge by > 10.3 b from R or a dash at E), the ground flash, the cyan X glint, the gyroscope
-    ring cage, the pod, the detonation E at 40 (150 % Dendro, KB 4 radial), the tendrils, the embers, the wing shards and
+    ring cage, the pod, the detonation E at 40 (DMG['b5'], 130 % Dendro, KB 4 radial), the tendrils, the embers, the wing shards and
     shatter, the landing (played ticks; the swoop 5-14, the cup 31, tell 22, E 53 before the tuning).
     The core: the caption at 0, the flat look, the revert to human form and the groggy."""
     R, k, pid = g.rig, K_RELEASE, 15

@@ -169,7 +169,7 @@ def emit(g):
 # vertical strip (lane 4.5 x 2.4 from 0.5 behind A + a splash disc r 1.5 1.2 ahead, one group) at 8 telegraphed from -2;
 # backflip 1.2 b, settle, two sideways hops (19, 22), kick 2 aimed and telegraphed at 21 (half disc r 5 + ground wave
 # 6 x 2, one group), the flying leap to B at 25, the axe kick at 32 (played ticks: 26 / 32 / 40 before the tuning);
-# 0.7 / 0.9, at most 2 hits.
+# DMG h1a / h1b (0.55 / 0.7), at most 2 hits.
 def kick(g):
     R = g.rig
     k = K_KICK
@@ -279,7 +279,7 @@ def kick(g):
     tl.at(L_KICK, *kill_mk(a, b), g.end())
     tl.write([f'# H1 달빛 발차기 (lead {H1_LEAD}: start at clock {t0}, clip kick_combo at 0). Hit 1 {H1_HIT1}: the strip (lane',
               f'# 4.5 x 2.4 from 0.5 behind A + splash r 1.5, one group, decals from {t0}); kick 2 locked at {H1_LOCK2}, the leap',
-              f'# at {H1_LEAP}, hit 2 {H1_HIT2}: half disc r 5 + ground wave 6 x 2 at B (one group); 1.0 / 1.2 Dendro.'],
+              f'# at {H1_LEAP}, hit 2 {H1_HIT2}: half disc r 5 + ground wave 6 x 2 at B (one group); {DMG["h1a"] / 100:g} / {DMG["h1b"] / 100:g} Dendro.'],
              ['# H1 tick.'], t0=t0)
     g.pw(k, 'cancel', ['# Markers A / B; the kit decals (only this pattern has any while it runs).',
                        f'kill @e[type=minecraft:marker,tag={a}]', f'kill @e[type=minecraft:marker,tag={b}]',
@@ -288,9 +288,9 @@ def kick(g):
 
 # =============================================================================================
 # H2 달빛 점프 (spec H2_kick_jump.md): after the core's close-in to 3 b, the arm-shard / chain tell (0-10), the 360 low
-# sweep r 3 at knee height (active 10-13, jumpable) telegraphed from 0, the spiral jump at 24 (glide to A, 0.8 b short of
-# the player), the disc locked under the player 10 t before the impact at 41 (clamped to the walk disc), the orb at her
-# foot, the star flash, the kick, the falling disc and the impact r 2.5 (heavy knockback); 0.6 / 0.9, two separate hits
+# sweep r 3 at knee height (active 10-13, jumpable) telegraphed from 0, the spiral jump at 22 (glide to A, 0.8 b short of
+# the player), the disc locked under the player 10 t before the impact at 42 (clamped to the walk disc), the orb at her
+# foot, the star flash, the kick, the falling disc and the impact r 2.5 (heavy knockback); DMG h2a / h2b (0.45 / 0.7), two separate hits
 # (played ticks; 13 / 33 / 55 and a 12 t disc telegraph before the tuning).
 def jump(g):
     R = g.rig
@@ -376,7 +376,7 @@ def jump(g):
     tl.at(L_JUMP, *kill_mk(a, b), g.end())
     tl.write([f'# H2 달빛 점프 (clip kick_jump; after the core\'s close-in to 3 b). Sweep r 3 decal {H2_SWEEP - TELL} -> {H2_SWEEP}',
               f'# (active {H2_ACT} t, y <= {H2_Y1} b: jumpable), the jump {H2_JUMP} -> {H2_LAND}, the disc r 2.5 locked under the',
-              f'# player (walk disc) at {H2_LOCK} -> impact {H2_IMPACT} (orb {H2_ORB}, kick {H2_KICK}); 0.9 / 1.4 Dendro, 2 hits.'],
+              f'# player (walk disc) at {H2_LOCK} -> impact {H2_IMPACT} (orb {H2_ORB}, kick {H2_KICK}); {DMG["h2a"] / 100:g} / {DMG["h2b"] / 100:g} Dendro, 2 hits.'],
              ['# H2 tick.'])
     g.pw(k, 'cancel', [f'kill @e[type=minecraft:marker,tag={a}]', f'kill @e[type=minecraft:marker,tag={b}]',
                        f'function {A.K.FN}tele/clear'])

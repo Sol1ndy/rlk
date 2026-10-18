@@ -1,6 +1,6 @@
 # H1 달빛 발차기 (lead 2: start at clock -2, clip kick_combo at 0). Hit 1 8: the strip (lane
 # 4.5 x 2.4 from 0.5 behind A + splash r 1.5, one group, decals from -2); kick 2 locked at 21, the leap
-# at 25, hit 2 32: half disc r 5 + ground wave 6 x 2 at B (one group); 1.0 / 1.2 Dendro.
+# at 25, hit 2 32: half disc r 5 + ground wave 6 x 2 at B (one group); 0.55 / 0.7 Dendro.
 function rlk:mboss/butterfly/rig/face/player
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p1a]
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p1b]
