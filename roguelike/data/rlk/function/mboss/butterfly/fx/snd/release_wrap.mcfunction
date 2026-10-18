@@ -4,3 +4,4 @@
 playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.8 1.8 0.27
 playsound minecraft:entity.breeze.inhale hostile @a[tag=player] ~ ~ ~ 0.7 1.2 0.23
 playsound minecraft:block.conduit.activate hostile @a[tag=player] ~ ~ ~ 0.5 1.4 0.17
+playsound minecraft:entity.illusioner.prepare_mirror hostile @a[tag=player] ~ ~ ~ 0.4 1.6 0.13

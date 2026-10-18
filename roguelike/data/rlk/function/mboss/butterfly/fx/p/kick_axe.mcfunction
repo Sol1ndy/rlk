@@ -2,5 +2,7 @@
 # H1 hit 2: the huge diagonal axe-kick crescent from above-behind down to the floor ahead (r about 5). At her feet, rotated as the kick.
 function rlk:mboss/butterfly/fx/card {kind:"cres_lime",pos:"^ ^1.2 ^0.4",rot:"~15 -45",bb:"fixed",roll:90,spin:-60,s0:7,s1:10.5,move:"0f,0f,0f",life:8,fade:3,col:16777215}
 function rlk:mboss/butterfly/fx/card {kind:"cres_lime",pos:"^ ^1.0 ^0.4",rot:"~15 -40",bb:"fixed",roll:90,spin:-50,s0:6,s1:9,move:"0f,0f,0f",life:7,fade:3,col:15135968}
-function rlk:mboss/butterfly/fx/card {kind:"burst",pos:"^ ^0.3 ^3",rot:"~ ~",bb:"center",roll:0,spin:0,s0:1,s1:3.4,move:"0f,0f,0f",life:5,fade:2,col:16777215}
+function rlk:mboss/butterfly/fx/card {kind:"burst",pos:"^ ^0.3 ^3",rot:"~ ~",bb:"center",roll:20,spin:0,s0:1,s1:3.8,move:"0f,0f,0f",life:5,fade:2,col:16777215}
 particle minecraft:explosion ^ ^0.3 ^3 0.3 0.1 0.3 0 1 force @a[tag=player]
+particle minecraft:dust_color_transition{from_color:[0.929f,0.976f,0.855f],to_color:[0.31f,0.612f,0.506f],scale:1.6} ^ ^0.4 ^3 1.2 0.2 1.2 0 12 force @a[tag=player]
+particle minecraft:end_rod ^ ^0.5 ^3 0.8 0.3 0.8 0.12 6 force @a[tag=player]
