@@ -507,7 +507,8 @@ execute if score #mbPk mb matches 1.. run function rlk:mboss/box/drop_all
 # Opened boxes: the first click grants the box's pick and opens it (box/open: rlk_mb_boxopen on its whole group,
 # gold outline, label "(열림)", oarg = open age); backing out of the screen leaves it there and a later click only
 # reopens the screen. When a mid-boss pick is used (lvup/act/resolve on an mbSet), box/spend removes the oldest
-# opened box (box/gone: the open fx, then its group). No global counter: the state lives on the box entities, so
+# opened box (box/gone: the open sounds at the player, who is in the selection screen; the particles at the box;
+# then its group). No global counter: the state lives on the box entities, so
 # a map change (room/clear) leaves nothing behind and an unused pick simply stays pending (Shift+F).
 BOX_S = 1.1            # display scale: the chest item model is 14/16 wide and tall, centred on the entity
 BOX_REST = BOX_S / 2   # display centre above the floor at rest (chest bottom on the floor)
@@ -662,8 +663,10 @@ w('box/gone', f'''
 # @s = an opened box's object marker, at @s (box centre): the open fx (chest opening, chime, gold burst, poof), then
 # the whole group (marker, chest display, label, hint) via room/obj/kill_group. From box/spend, and from
 # room/obj/do_mbox for an opened box whose pick no longer exists (guard only: pkMb < 1 with an opened box).
-playsound minecraft:block.chest.open block @a[tag=player] ~ ~ ~ 0.9 1
-playsound minecraft:block.amethyst_block.chime block @a[tag=player] ~ ~ ~ 1 1.2
+# The two sounds play at the player: a pick is used in the selection screen (overworld 104 195 4), at least 40 b
+# from any box in the room (-64..63), where a sound at the box (heard up to 16 b) would never reach the player.
+execute at @a[tag=player,limit=1] run playsound minecraft:block.chest.open block @a[tag=player] ~ ~ ~ 0.9 1
+execute at @a[tag=player,limit=1] run playsound minecraft:block.amethyst_block.chime block @a[tag=player] ~ ~ ~ 1 1.2
 particle minecraft:dust{BOX_GOLD % '1.4'} ~ ~ ~ 0.35 0.35 0.35 0 18
 particle minecraft:end_rod ~ ~0.2 ~ 0.15 0.15 0.15 0.1 12
 particle minecraft:poof ~ ~-{L.num(BOX_REST - 0.1)} ~ 0.35 0.25 0.35 0.02 12
