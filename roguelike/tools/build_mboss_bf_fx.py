@@ -486,22 +486,27 @@ SOUNDS = {
                      ('entity.firework_rocket.twinkle_far', 0.35, 1.6)]),
     'land': ('Soft landing (entrance t90, revert landing, backflip landings).',
              [('block.moss.break', 0.8, 0.9), ('entity.iron_golem.step', 0.4, 1.4), ('entity.breeze.land', 0.5, 0.9)]),
-    'kick_whoosh': ('Burst-run / kick wind-up whoosh with a leafy crack (H1 hit 1 lead-in).',
-                    [('entity.breeze.wind_burst', 0.6, 1.4), ('entity.player.attack.sweep', 0.5, 1.5),
-                     ('block.azalea_leaves.break', 0.6, 1.2)]),
-    'kick_impact': ('Kick crescent lands (H1 hits, H3 kick): big airy swoosh with a leafy crackle.',
-                    [('entity.player.attack.sweep', 1.0, 0.8), ('entity.breeze.wind_burst', 0.9, 1.0),
-                     ('block.big_dripleaf.tilt_down', 0.7, 1.0), ('block.azalea.break', 0.8, 0.9),
-                     ('block.azalea_leaves.break', 0.6, 0.8)]),
+    'kick_whoosh': ('Burst-run / kick wind-up whoosh with a leafy crack (H1 hit 1 lead-in): bright air '
+                    'attack, a rising swish and a glint tick on top.',
+                    [('entity.breeze.wind_burst', 0.55, 1.5), ('entity.player.attack.sweep', 0.45, 1.6),
+                     ('item.trident.riptide_1', 0.3, 1.9), ('block.azalea_leaves.break', 0.55, 1.25),
+                     ('block.amethyst_block.chime', 0.22, 1.9)]),
+    'kick_impact': ('Kick crescent lands (H1 hits, H3 kick): a thump transient, a big low airy swoosh '
+                    '(pitched down so it rings longer), a leafy crackle and a short airy tail.',
+                    [('entity.player.attack.strong', 0.55, 0.9), ('entity.player.attack.sweep', 1.0, 0.75),
+                     ('entity.breeze.wind_burst', 0.9, 0.95), ('block.big_dripleaf.tilt_down', 0.6, 0.9),
+                     ('block.azalea.break', 0.75, 0.85), ('block.azalea_leaves.break', 0.65, 1.15),
+                     ('item.trident.riptide_1', 0.3, 1.7)]),
     'crescent_fly': ('A crescent wave travels (H1 ground wave, B1 trailing crescent).',
                      [('entity.phantom.swoop', 0.6, 1.4), ('item.trident.riptide_1', 0.35, 1.6),
                       ('block.azalea_leaves.hit', 0.5, 1.2)]),
     'shard_tell': ('Arm shard glows lime (H2 tell, the chain glow): shimmer chime.',
                    [('block.amethyst_block.chime', 0.8, 1.6), ('block.beacon.ambient', 0.5, 1.8),
                     ('block.amethyst_cluster.hit', 0.4, 1.9)]),
-    'sweep': ('360-degree low sweep kick (H2): thump then swish.',
+    'sweep': ('360-degree low sweep kick (H2): thump then a whirling swish and leaf debris.',
               [('entity.player.attack.sweep', 1.0, 1.1), ('block.moss.break', 0.7, 0.9),
-               ('entity.breeze.charge', 0.5, 1.5), ('entity.iron_golem.attack', 0.3, 1.6)]),
+               ('entity.breeze.whirl', 0.45, 1.4), ('entity.breeze.charge', 0.4, 1.5),
+               ('entity.iron_golem.attack', 0.3, 1.6), ('block.cherry_leaves.break', 0.4, 1.2)]),
     'spiral_jump': ('Spiral jump (H2): rising whirl and a low rumble.',
                     [('entity.breeze.charge', 0.8, 1.1), ('entity.breeze.jump', 0.6, 1.0),
                      ('item.elytra.flying', 0.15, 1.6)]),
@@ -516,10 +521,12 @@ SOUNDS = {
                      ('entity.breeze.charge', 0.6, 1.4)]),
     'dash': ('Dash lunge (H3, burst-runs): short airy whoosh.',
              [('entity.breeze.jump', 0.8, 1.3), ('item.trident.riptide_1', 0.5, 1.5), ('block.moss.place', 0.5, 1.0)]),
-    'dash_kick': ('Dash kick impact + ring (H3): deep thump, bright leafy burst, crackling tail.',
-                  [('entity.breeze.wind_burst', 1.0, 1.0), ('item.mace.smash_ground', 0.6, 1.3),
-                   ('block.azalea_leaves.break', 0.8, 1.1), ('block.cherry_sapling.place', 0.6, 0.8),
-                   ('entity.player.attack.sweep', 0.8, 0.7)]),
+    'dash_kick': ('Dash kick impact + ring (H3): deep thump, a bright air pop, a leafy burst and a crackling '
+                  'low tail.',
+                  [('entity.player.attack.strong', 0.6, 0.85), ('entity.breeze.wind_burst', 1.0, 1.0),
+                   ('item.mace.smash_ground', 0.6, 1.3), ('entity.wind_charge.wind_burst', 0.5, 1.2),
+                   ('block.azalea_leaves.break', 0.8, 1.1), ('block.cherry_leaves.break', 0.6, 1.3),
+                   ('block.cherry_sapling.place', 0.6, 0.8), ('entity.player.attack.sweep', 0.8, 0.7)]),
     'vacuum_glint': ('Vacuum blade tell glint (H4): sharp crystalline ping.',
                      [('block.amethyst_cluster.hit', 0.8, 1.8), ('block.note_block.chime', 0.35, 2.0),
                       ('entity.firework_rocket.twinkle', 0.3, 1.9)]),
@@ -538,50 +545,68 @@ SOUNDS = {
     'debuff': ('달빛 고치 lands on the player (with the light sphere): curse-like chime burst.',
                [('item.totem.use', 0.45, 1.4), ('block.beacon.deactivate', 0.6, 1.5),
                 ('block.respawn_anchor.deplete', 0.6, 1.6), ('entity.illusioner.prepare_mirror', 0.5, 1.2)]),
-    'flap_big': ('Big wing flap (B3 tell, B5 flight, the glide settle).',
-                 [('entity.ender_dragon.flap', 0.7, 1.4), ('entity.phantom.flap', 0.5, 0.8)]),
-    'flap_small': ('Small hover flap (every 13-20 t in butterfly form; quiet).',
-                   [('entity.phantom.flap', 0.3, 1.6)]),
-    'wing_dive': ('Bank + dive before the wing strike (B1), the release swoop (B5).',
-                  [('entity.ender_dragon.flap', 0.5, 1.8), ('entity.phantom.swoop', 0.8, 1.3)]),
+    'flap_big': ('Big wing flap (B3 tell, B5 flight, the glide settle): a deep whump, the membrane body, a '
+                 'low air push and a soft rustle.',
+                 [('entity.ender_dragon.flap', 0.75, 1.35), ('entity.phantom.flap', 0.55, 0.75),
+                  ('entity.breeze.wind_burst', 0.3, 0.7), ('item.armor.equip_elytra', 0.35, 1.3)]),
+    'flap_small': ('Small hover flap (every 13-20 t in butterfly form; quiet): a soft flap and a feathery '
+                   'flutter.',
+                   [('entity.phantom.flap', 0.3, 1.55), ('entity.parrot.fly', 0.22, 1.2)]),
+    'wing_dive': ('Bank + dive before the wing strike (B1), the release swoop (B5): a high flap, the swoop '
+                  'and a rushing air tail.',
+                  [('entity.ender_dragon.flap', 0.5, 1.75), ('entity.phantom.swoop', 0.8, 1.25),
+                   ('item.trident.riptide_2', 0.35, 1.4), ('entity.phantom.flap', 0.3, 1.1)]),
     'wing_strike': ('Wing edge hits and sweeps on (B1): solid hit then a long airy swish with leaf crackle.',
-                    [('entity.player.attack.sweep', 1.0, 0.8), ('entity.breeze.wind_burst', 0.9, 1.0),
-                     ('block.azalea_leaves.break', 0.7, 1.0), ('item.trident.riptide_1', 0.5, 1.6)]),
-    'pyro_switch': ('Wings turn Pyro (1 t swap, 5-12 t before B2 / B3): soft whump + shimmer.',
-                    [('item.firecharge.use', 0.5, 1.4), ('block.respawn_anchor.set_spawn', 0.3, 1.6),
-                     ('block.fire.ambient', 0.6, 1.4)]),
+                    [('entity.player.attack.strong', 0.5, 0.95), ('entity.player.attack.sweep', 1.0, 0.8),
+                     ('entity.breeze.wind_burst', 0.9, 1.0), ('block.azalea_leaves.break', 0.7, 1.0),
+                     ('item.trident.riptide_1', 0.5, 1.6), ('entity.phantom.swoop', 0.35, 1.5)]),
+    'pyro_switch': ('Wings turn Pyro (1 t swap, 5-12 t before B2 / B3): a soft fire whump, a glassy shimmer '
+                    'as the wing glass recolours, a bright hiss and a crackling tail.',
+                    [('item.firecharge.use', 0.55, 1.35), ('block.fire.ambient', 0.7, 1.3),
+                     ('block.respawn_anchor.set_spawn', 0.3, 1.6), ('block.amethyst_block.resonate', 0.3, 1.8),
+                     ('entity.blaze.shoot', 0.22, 1.7), ('block.campfire.crackle', 0.5, 1.2)]),
     'dendro_switch': ('Wings turn back to Dendro (before B1 / B4 / B5).',
                       [('block.amethyst_block.resonate', 0.6, 1.4), ('block.azalea_leaves.place', 0.6, 1.0)]),
-    'fire_cres_launch': ('Wing swing throws the fire crescents (B2, each swing): whoosh then a roaring burst.',
-                         [('entity.player.attack.sweep', 0.9, 0.7), ('entity.blaze.shoot', 0.8, 0.9),
-                          ('item.firecharge.use', 0.7, 0.8), ('entity.ender_dragon.flap', 0.5, 1.4),
-                          ('block.fire.ambient', 0.6, 1.5)]),
-    'fire_cres_fly': ('Crescents turn and dive (B2): crackling hiss.',
-                      [('block.fire.ambient', 0.7, 1.5), ('entity.blaze.burn', 0.25, 1.4),
-                       ('item.trident.riptide_1', 0.3, 1.6)]),
-    'fire_cres_land': ('A fire crescent lands (B2, per landing): sharp crack + fire puff.',
-                       [('entity.generic.burn', 0.6, 1.2), ('entity.firework_rocket.blast', 0.5, 0.8),
+    'fire_cres_launch': ('Wing swing throws the fire crescents (B2, each swing): a low whoosh attack, the '
+                         'roaring flame burst, a wing whump, air and a crackling tail.',
+                         [('entity.player.attack.sweep', 0.9, 0.65), ('entity.blaze.shoot', 0.85, 0.85),
+                          ('item.firecharge.use', 0.75, 0.75), ('entity.ender_dragon.flap', 0.5, 1.4),
+                          ('entity.breeze.wind_burst', 0.45, 1.3), ('block.fire.ambient', 0.7, 1.4),
+                          ('block.campfire.crackle', 0.6, 1.0)]),
+    'fire_cres_fly': ('Crescents turn and dive (B2): crackling hiss with an airy streak.',
+                      [('block.fire.ambient', 0.7, 1.5), ('block.campfire.crackle', 0.45, 1.4),
+                       ('entity.blaze.burn', 0.25, 1.4), ('item.trident.riptide_1', 0.3, 1.6)]),
+    'fire_cres_land': ('A fire crescent lands (B2, per landing): a sharp pop and crack, a fire puff and a '
+                       'short hiss.',
+                       [('block.lava.pop', 0.55, 1.1), ('entity.generic.burn', 0.6, 1.2),
+                        ('entity.firework_rocket.blast', 0.5, 0.8), ('item.firecharge.use', 0.35, 1.3),
                         ('block.fire.extinguish', 0.3, 1.6)]),
     'flame_slam': ('Wing slam (B3 slam): low thump.',
                    [('entity.ender_dragon.flap', 0.9, 0.9), ('entity.generic.explode', 0.4, 1.6),
                     ('item.mace.smash_ground', 0.5, 0.9)]),
-    'flame_fan': ('180-degree flame eruption (B3): crackling roar then a low rumble.',
-                  [('entity.blaze.shoot', 1.0, 0.8), ('item.firecharge.use', 0.9, 0.6), ('block.fire.ambient', 1.0, 1.0),
-                   ('entity.generic.explode', 0.35, 0.7), ('entity.blaze.burn', 0.4, 0.9)]),
+    'flame_fan': ('180-degree flame eruption (B3): crackling roar, a low boom under it and a long crackling '
+                  'rumble.',
+                  [('entity.blaze.shoot', 1.0, 0.8), ('item.firecharge.use', 0.9, 0.6),
+                   ('block.fire.ambient', 1.0, 1.0), ('entity.generic.explode', 0.35, 0.7),
+                   ('entity.blaze.burn', 0.4, 0.9), ('block.campfire.crackle', 0.8, 0.8),
+                   ('block.lava.pop', 0.45, 0.9)]),
     'flame_trail': ('Flame line under the low glide (B3 trail, every 4-6 t; quiet).',
                     [('block.fire.ambient', 0.45, 1.2), ('entity.blaze.burn', 0.15, 1.5)]),
-    'orb_charge': ('Wing-wrap core charge (B4 before each orb): thin rising sparkle.',
-                   [('block.beacon.power_select', 0.5, 1.8), ('block.conduit.activate', 0.4, 1.6),
-                    ('block.amethyst_block.resonate', 0.5, 1.8)]),
+    'orb_charge': ('Wing-wrap core charge (B4 before each orb): a thin rising sparkle over a quiet hum.',
+                   [('block.beacon.power_select', 0.5, 1.85), ('block.conduit.activate', 0.4, 1.6),
+                    ('block.amethyst_block.resonate', 0.5, 1.8), ('block.enchantment_table.use', 0.45, 1.5),
+                    ('block.respawn_anchor.charge', 0.25, 1.9), ('block.amethyst_block.chime', 0.22, 2.0)]),
     'orb_launch': ('Orb released (B4 t19 / t46): soft launch whir.',
                    [('entity.breeze.shoot', 0.8, 1.2), ('block.amethyst_block.chime', 0.6, 1.4),
                     ('item.trident.riptide_1', 0.4, 1.8), ('block.beacon.ambient', 0.5, 2.0)]),
     'orb_fly': ('Orb flight loop (every 10-12 t while it homes; quiet).',
                 [('block.beacon.ambient', 0.35, 2.0), ('block.amethyst_block.step', 0.2, 1.8)]),
-    'orb_burst': ('Orb bursts into radial ground blades (B4): airy boom + leafy crackle.',
-                  [('entity.breeze.wind_burst', 1.0, 1.0), ('block.azalea_leaves.break', 1.0, 0.9),
-                   ('entity.generic.explode', 0.4, 1.5), ('block.big_dripleaf.tilt_down', 0.6, 0.9),
-                   ('block.moss.break', 0.6, 0.8)]),
+    'orb_burst': ('Orb bursts into radial ground blades (B4): an airy boom, a low thump, a leafy crackle and '
+                  'a glassy sparkle tail.',
+                  [('entity.breeze.wind_burst', 1.0, 0.95), ('entity.wind_charge.wind_burst', 0.6, 0.8),
+                   ('entity.generic.explode', 0.4, 1.5), ('block.azalea_leaves.break', 1.0, 0.9),
+                   ('block.cherry_leaves.break', 0.5, 1.2), ('block.big_dripleaf.tilt_down', 0.6, 0.9),
+                   ('block.moss.break', 0.6, 0.8), ('block.amethyst_block.chime', 0.35, 1.6)]),
     'cocoon_ball': ('Wings curl into the ball (B4 t30-42): swirling rustle.',
                     [('item.elytra.flying', 0.25, 1.4), ('block.moss.place', 0.6, 1.0),
                      ('entity.breeze.charge', 0.4, 1.5)]),
@@ -590,16 +615,21 @@ SOUNDS = {
     'release_whirl': ('달빛 해제 whirl / cup (B5): airy swishes.',
                       [('item.trident.riptide_1', 0.5, 1.3), ('entity.player.attack.sweep', 0.4, 1.6),
                        ('entity.player.attack.sweep', 0.35, 1.9)]),
-    'release_charge': ('달빛 해제 charge (flare, X glint, ring cage): rising hum + sparkle; call 2-3 times rising.',
+    'release_charge': ('달빛 해제 charge (flare, X glint, ring cage): rising hum + sparkle; call 2-3 times '
+                       'rising.',
                        [('block.respawn_anchor.charge', 0.9, 1.4), ('block.beacon.activate', 0.8, 1.6),
-                        ('entity.warden.sonic_charge', 0.35, 1.8), ('block.beacon.power_select', 0.6, 1.4)]),
+                        ('entity.warden.sonic_charge', 0.35, 1.8), ('block.beacon.power_select', 0.6, 1.4),
+                        ('block.enchantment_table.use', 0.5, 1.2)]),
     'release_wrap': ('달빛 해제 wings wrap into the pod (E-9): pressure builds.',
                      [('block.respawn_anchor.charge', 0.8, 1.8), ('entity.breeze.inhale', 0.7, 1.2),
-                      ('block.conduit.activate', 0.5, 1.4)]),
-    'release_boom': ('달빛 해제 detonation (E): big broadband boom, bright crackle, whooshing tail.',
-                     [('entity.generic.explode', 1.6, 0.7), ('entity.breeze.wind_burst', 1.2, 0.6),
-                      ('entity.warden.sonic_boom', 0.6, 1.4), ('block.beacon.deactivate', 0.8, 1.4),
-                      ('block.amethyst_cluster.break', 0.9, 0.8), ('block.azalea_leaves.break', 1.0, 0.8)]),
+                      ('block.conduit.activate', 0.5, 1.4), ('entity.illusioner.prepare_mirror', 0.4, 1.6)]),
+    'release_boom': ('달빛 해제 detonation (E): a broadband boom pitched down for a long body, an airy blast, the '
+                     'sonic crack, a falling beacon tone, crystal and leaf crackle and a low glassy tail.',
+                     [('entity.generic.explode', 1.6, 0.65), ('entity.dragon_fireball.explode', 1.0, 0.8),
+                      ('entity.breeze.wind_burst', 1.2, 0.55), ('entity.warden.sonic_boom', 0.6, 1.4),
+                      ('entity.firework_rocket.large_blast', 0.7, 0.7), ('block.beacon.deactivate', 0.8, 1.3),
+                      ('block.amethyst_cluster.break', 0.9, 0.8), ('block.azalea_leaves.break', 1.0, 0.75),
+                      ('block.amethyst_block.chime', 0.5, 0.6)]),
     'wing_shatter': ('Wings shrink, go flat lime and shatter (B5 E+38 / death).',
                      [('block.amethyst_cluster.break', 0.7, 1.5), ('block.glass.break', 0.4, 1.6),
                       ('entity.illusioner.mirror_move', 0.6, 1.4), ('block.beacon.deactivate', 0.5, 1.8)]),
@@ -611,10 +641,14 @@ SOUNDS = {
     'dew_spawn': ('A 달빛 이슬 heal orb appears.',
                   [('block.amethyst_block.chime', 0.6, 1.8), ('block.bubble_column.upwards_inside', 0.3, 1.6),
                    ('entity.experience_orb.pickup', 0.25, 0.7)]),
-    'cure_chime': ('달빛 고치 removed by a heal: bright rising chime burst (beam, burst, emblem).',
-                   [('block.beacon.activate', 0.8, 1.6), ('entity.player.levelup', 0.4, 1.4),
-                    ('block.amethyst_block.chime', 0.9, 1.2), ('block.amethyst_block.chime', 0.8, 1.6),
-                    ('block.note_block.chime', 0.5, 2.0)]),
+    'cure_chime': ('달빛 고치 removed by a heal: bright rising chime burst (beam, burst, emblem): an A-major '
+                   'chord of note-block bell and chimes (pitch 1.19 / 1.5 / 1.78) and amethyst chimes over the '
+                   'beacon swell, with a sparkle and a shimmering tail.',
+                   [('block.beacon.activate', 0.75, 1.6), ('entity.player.levelup', 0.35, 1.5),
+                    ('block.amethyst_block.chime', 0.9, 1.19), ('block.amethyst_block.chime', 0.8, 1.5),
+                    ('block.note_block.bell', 0.45, 1.19), ('block.note_block.chime', 0.5, 1.5),
+                    ('block.note_block.chime', 0.4, 1.78), ('entity.experience_orb.pickup', 0.3, 1.2),
+                    ('block.amethyst_block.resonate', 0.5, 1.5)]),
     'death': ('Death: stagger, the wings shatter, she kneels and dissolves (no voices).',
               [('block.amethyst_cluster.break', 1.0, 0.9), ('block.beacon.deactivate', 0.9, 1.0),
                ('entity.breeze.wind_burst', 0.8, 0.7), ('block.amethyst_block.resonate', 0.8, 0.6),
@@ -733,10 +767,12 @@ def _p_glint():
 @preset('kick_rise', 'H1 hit 1: the tall rising flip-kick crescent (sagittal, sweeping up and back) + ground '
         'splash. At her feet, rotated as her (yaw).')
 def _p_kick_rise():
-    return [card('cres_lime', '^ ^0.9 ^0.9', '~ -90', roll=90, spin=-70, s0=5.0, s1=8.0, life=8, fade=3),
-            card('burst', '^ ^0.2 ^1.2', bb='center', s0=0.4, s1=2.2, life=4, fade=2),
-            card('glow', '^ ^0.05 ^1.2', '~ 90', s0=1, s1=3, life=6, fade=3, col=LIME),
+    return [card('cres_lime', '^ ^0.9 ^0.9', '~ -90', roll=90, spin=-70, s0=5.5, s1=8.8, life=8, fade=3),
+            card('burst', '^ ^0.2 ^1.2', bb='center', roll=15, s0=0.5, s1=2.6, life=4, fade=2),
+            card('glow', '^ ^0.05 ^1.2', '~ 90', s0=1, s1=3.4, life=6, fade=3, col=rgb('#9BE84A')),
             dust(rgb('#C1F788'), 1.5, '^ ^0.3 ^1.2', (0.5, 0.1, 0.5), 8),
+            dust_fade(rgb('#E5FBC8'), rgb('#297272'), 1.2, '^ ^2.5 ^0.6', (0.3, 1.6, 0.6), 10),
+            part('end_rod', '^ ^0.4 ^1.2', (0.3, 0.2, 0.3), 0.08, 5),
             part('cherry_leaves', '^ ^1 ^1', (0.6, 1.0, 0.6), 0, 5)]
 
 
@@ -746,8 +782,10 @@ def _p_kick_axe():
     return [card('cres_lime', '^ ^1.2 ^0.4', '~15 -45', roll=90, spin=-60, s0=7.0, s1=10.5, life=8, fade=3),
             card('cres_lime', '^ ^1.0 ^0.4', '~15 -40', roll=90, spin=-50, s0=6.0, s1=9.0, life=7, fade=3,
                  col=rgb('#E6F4E0')),
-            card('burst', '^ ^0.3 ^3', bb='center', s0=1, s1=3.4, life=5, fade=2),
-            part('explosion', '^ ^0.3 ^3', (0.3, 0.1, 0.3), 0, 1)]
+            card('burst', '^ ^0.3 ^3', bb='center', roll=20, s0=1, s1=3.8, life=5, fade=2),
+            part('explosion', '^ ^0.3 ^3', (0.3, 0.1, 0.3), 0, 1),
+            dust_fade(rgb('#EDF9DA'), rgb('#4F9C81'), 1.6, '^ ^0.4 ^3', (1.2, 0.2, 1.2), 12),
+            part('end_rod', '^ ^0.5 ^3', (0.8, 0.3, 0.8), 0.12, 6)]
 
 
 @preset('ground_wave', 'H1 hit 2 ground wave: lime blades erupt one after another along 6 blocks ahead, plus a '
@@ -759,7 +797,7 @@ def _p_ground_wave():
         z = 0.6 + 0.75 * k
         x = rnd.uniform(-0.6, 0.6)
         out.append(card('blade', f'^{num(x, 2)} ^ ^{num(z, 2)}', f'~{rnd.randint(-40, 40)} {rnd.randint(-8, 12)}',
-                        roll=rnd.randint(-18, 18), s0=0.2, s1=rnd.uniform(1.2, 1.8), life=9, fade=3,
+                        roll=rnd.randint(-22, 22), s0=0.3, s1=rnd.uniform(1.6, 2.4), life=9, fade=3,
                         dly=k // 2, dur=3))
     out += [dust(rgb('#A8DF74'), 1.6, '^ ^0.3 ^3', (0.4, 0.2, 2.0), 14), part('composter', '^ ^0.4 ^3', (0.4, 0.3, 2.2), 0, 8)]
     return out
@@ -799,8 +837,9 @@ def _p_orb_star():
 @preset('orb_kick', 'H2 orb burst as it is kicked down: lime starburst and two white wind crescents circling it.')
 def _p_orb_kick():
     return [card('burst', '~ ~ ~', bb='center', spin=30, s0=1, s1=4.2, life=5, fade=2),
-            card('cres_cyan', '~ ~ ~', '~ -20', spin=170, s0=3.4, s1=4.2, life=7, fade=3),
-            card('cres_cyan', '~ ~ ~', '~180 20', spin=170, s0=3.4, s1=4.2, life=7, fade=3)]
+            card('cres_cyan', '~ ~ ~', '~ -20', spin=170, s0=3.4, s1=4.4, life=7, fade=3, col=rgb('#EEF6F2')),
+            card('cres_cyan', '~ ~ ~', '~180 20', spin=170, s0=3.4, s1=4.4, life=7, fade=3, col=rgb('#EEF6F2')),
+            part('end_rod', '~ ~ ~', (0.4, 0.4, 0.4), 0.18, 8)]
 
 
 @preset('disc_fall', 'H2 the Dendro disc drops {h} blocks onto the floor point in 3 t (call at the floor point; '
@@ -852,7 +891,7 @@ def _p_kick_burst():
            card('cres_lime', '~ ~0.9 ~', '~180 0', spin=170, s0=5.5, s1=7.2, life=7, fade=3)]
     for yaw in radial(8, 9):
         out.append(card('blade', '~ ~0.8 ~', f'~{ang(yaw)} {ang(90 - rnd.uniform(5, 30))}', roll=rnd.randint(-15, 15),
-                        s0=0.3, s1=0.9, move=(0, rnd.uniform(1.8, 2.8), 0), life=8, fade=3))
+                        s0=0.4, s1=1.3, move=(0, rnd.uniform(1.8, 2.8), 0), life=8, fade=3))
     out += [part('explosion', '^ ^1 ^1', (0.2, 0.2, 0.2), 0, 1), dust(rgb('#74E542'), 1.6, '~ ~0.8 ~', (2.0, 0.3, 2.0), 16)]
     return out
 
@@ -942,11 +981,12 @@ def _p_dendro_switch():
 @preset('fire_swing', 'B2 swing: a giant flame sheet in the swing plane (r 4) with white wind streaks. At her '
         'chest, rotated as the swing (roll the plane with an execute rotated / the diagonal variant).')
 def _p_fire_swing():
-    return [card('cres_fire', '~ ~ ~', '~ -24', roll=12, spin=150, s0=6.5, s1=8.5, life=7, fade=3),
-            card('cres_fire', '~ ~0.3 ~', '~25 -14', roll=-10, spin=140, s0=5.5, s1=7.5, life=6, fade=3,
+    return [card('cres_fire', '~ ~ ~', '~ -32', roll=12, spin=150, s0=6.5, s1=8.8, life=7, fade=3),
+            card('cres_fire', '~ ~0.3 ~', '~25 -20', roll=-10, spin=140, s0=5.5, s1=7.6, life=6, fade=3,
                  col=rgb('#FFE8C8')),
             card('streak', '^ ^0.3 ^2', '~90 0', s0=2, s1=6, life=5, fade=2, col=rgb('#FBF9F9')),
-            part('flame', '^ ^ ^2.5', (2.0, 0.4, 2.0), 0.05, 14), part('small_flame', '^ ^ ^3', (2.5, 0.6, 2.5), 0.02, 10)]
+            part('flame', '^ ^ ^2.5', (2.0, 0.4, 2.0), 0.05, 14), part('small_flame', '^ ^ ^3', (2.5, 0.6, 2.5), 0.02, 10),
+            dust_fade(rgb('#F9E38E'), rgb('#C680A2'), 1.8, '^ ^0.2 ^3', (2.4, 0.6, 2.4), 12)]
 
 
 @preset('fire_swing_d', 'B2 swing, diagonal plane (upper-left to lower-right). At her chest, rotated as her.')
@@ -954,7 +994,8 @@ def _p_fire_swing_d():
     return [card('cres_fire', '~ ~0.3 ~', '~ 0', roll=-38, spin=150, s0=6.5, s1=8.5, life=7, fade=3),
             card('cres_fire', '~ ~0.5 ~', '~20 0', roll=-30, spin=140, s0=5.5, s1=7.5, life=6, fade=3,
                  col=rgb('#FFE8C8')),
-            part('flame', '^ ^ ^2.5', (2.0, 1.2, 2.0), 0.05, 14)]
+            part('flame', '^ ^ ^2.5', (2.0, 1.2, 2.0), 0.05, 14),
+            dust_fade(rgb('#F9E38E'), rgb('#C680A2'), 1.8, '^ ^0.3 ^3', (2.4, 1.2, 2.4), 12)]
 
 
 @preset('fire_spawn', 'B2: a fire crescent appears in the air (small puff + embers). At the crescent.')
@@ -973,7 +1014,7 @@ def _p_fire_trail():
 @preset('fire_land', 'B2 crescent landing: fire splash r 1.2 with a 2.5-block vertical flame streak. At the '
         'floor point.')
 def _p_fire_land():
-    out = [card('flame_tongue', '~ ~ ~', bb='vertical', s0=(0.6, 0.6, 0.6), s1=(1.4, 2.8, 1.4), life=8, fade=3),
+    out = [card('flame_tongue', '~ ~ ~', bb='vertical', s0=(0.5, 0.8, 0.5), s1=(1.1, 3.2, 1.1), life=8, fade=3),
            card('flame_puff', '~ ~0.4 ~', bb='center', s0=0.8, s1=2.2, life=6, fade=3),
            card('glow', '~ ~0.05 ~', '~ 90', s0=1.0, s1=2.6, life=8, fade=4, col=ORANGE)]
     for yaw in radial(4, 30):
@@ -984,8 +1025,8 @@ def _p_fire_land():
 
 @preset('flame_slam', 'B3 slam: two vertical flame crescents rise at the wing tips. At her chest, rotated as her.')
 def _p_flame_slam():
-    return [card('cres_fire', '^2.6 ^-0.4 ^0.6', '~ -90', roll=90, spin=-50, s0=2.5, s1=4.0, life=6, fade=3),
-            card('cres_fire', '^-2.6 ^-0.4 ^0.6', '~ -90', roll=90, spin=-50, s0=2.5, s1=4.0, life=6, fade=3),
+    return [card('cres_fire', '^2.6 ^-0.4 ^0.6', '~ -90', roll=90, spin=-50, s0=2.8, s1=4.8, life=6, fade=3),
+            card('cres_fire', '^-2.6 ^-0.4 ^0.6', '~ -90', roll=90, spin=-50, s0=2.8, s1=4.8, life=6, fade=3),
             part('flame', '^ ^-1 ^1.5', (2.0, 0.2, 0.8), 0.06, 10)]
 
 
@@ -994,12 +1035,12 @@ def _p_flame_slam():
 def _p_flame_fan():
     rnd = random.Random(28)
     out = [card('fan_fire', '~ ~0.06 ~', '~ 0', s0=2.0, s1=9.6, life=14, fade=5, dur=3)]
-    for ring, (r, n, h) in enumerate(((2.0, 6, 2.0), (3.6, 8, 2.7))):
+    for ring, (r, n, h) in enumerate(((2.0, 6, 2.3), (3.6, 8, 3.0))):
         for k in range(n):
             a = -80 + 160 * (k + rnd.uniform(0.2, 0.8)) / n
             x, z = -r * math.sin(math.radians(a)), r * math.cos(math.radians(a))
             out.append(card('flame_tongue', f'^{num(x, 2)} ^ ^{num(z, 2)}', f'~{ang(a)} 0', roll=rnd.randint(-10, 10),
-                            s0=0.3, s1=(h * 1.1, h * rnd.uniform(0.85, 1.15), 1), life=8, fade=3,
+                            s0=0.3, s1=(h * 1.6, h * rnd.uniform(0.85, 1.15), 1), life=8, fade=3,
                             dly=ring, dur=3))
     out += [part('flame', '^ ^0.4 ^2.5', (2.4, 0.6, 1.4), 0.06, 22), part('lava', '^ ^0.3 ^2.5', (2.0, 0.2, 1.2), 0, 6),
             part('large_smoke', '^ ^1.2 ^2.5', (2.0, 0.6, 1.2), 0.02, 4)]
@@ -1008,7 +1049,7 @@ def _p_flame_fan():
 
 @preset('flame_trail', 'B3 low glide: a flame line on the floor (call every 2 t at the wing-tip floor point).')
 def _p_flame_trail():
-    return [card('flame_puff', '~ ~0.06 ~', '~ 90', spin=60, s0=1.2, s1=0.6, life=14, fade=6),
+    return [card('flame_puff', '~ ~0.06 ~', '~ 90', spin=60, s0=1.8, s1=1.1, life=16, fade=7, col=rgb('#F7A090')),
             card('flame_tongue', '~ ~ ~', bb='vertical', s0=0.4, s1=1.0, life=8, fade=4),
             part('small_flame', '~ ~0.2 ~', (0.3, 0.1, 0.3), 0.01, 2)]
 
@@ -1040,7 +1081,7 @@ def _p_orb_burst():
         r = rnd.uniform(1.0, 2.6)
         x, z = -r * math.sin(math.radians(yaw)), r * math.cos(math.radians(yaw))
         out.append(card('blade', f'^{num(x, 2)} ^ ^{num(z, 2)}', f'~{ang(yaw)} {rnd.randint(15, 30)}',
-                        roll=rnd.randint(-12, 12), s0=0.2, s1=rnd.uniform(1.4, 2.2), life=10, fade=3,
+                        roll=rnd.randint(-12, 12), s0=0.3, s1=rnd.uniform(1.9, 2.9), life=10, fade=3,
                         dly=k % 3, dur=3))
     out += [part('cherry_leaves', '~ ~1 ~', (1.4, 0.8, 1.4), 0, 8), part('composter', '~ ~0.4 ~', (1.4, 0.3, 1.4), 0, 10),
             dust(rgb('#83D394'), 2.0, '~ ~0.5 ~', (1.4, 0.3, 1.4), 10)]
@@ -1161,8 +1202,8 @@ def _p_wing_shatter():
     out = [card('glow', '~ ~ ~', bb='center', s0=2.0, s1=4.5, life=4, fade=2, col=rgb('#E7FD7A'))]
     for yaw in radial(10, 3):
         el = rnd.uniform(-20, 50)
-        out.append(card('shard', '~ ~ ~', f'~{ang(yaw)} {ang(90 - el)}', roll=rnd.randint(-30, 30), s0=0.7,
-                        s1=rnd.uniform(0.6, 1.0), move=(0, rnd.uniform(2.0, 3.2), 0), life=10, fade=5,
+        out.append(card('shard', '~ ~ ~', f'~{ang(yaw)} {ang(90 - el)}', roll=rnd.randint(-30, 30), s0=0.8,
+                        s1=rnd.uniform(0.9, 1.4), move=(0, rnd.uniform(2.0, 3.2), 0), life=10, fade=5,
                         col=rgb('#DBF796')))
     out += [part('cherry_leaves', '~ ~ ~', (1.5, 1.0, 1.5), 0, 8), dust(rgb('#E7FD7A'), 1.5, '~ ~ ~', (1.8, 1.0, 1.8), 14)]
     return out
@@ -1182,8 +1223,8 @@ def _p_chain_reform():
 @preset('coc_apply', '달빛 고치 applied: a maroon swirl ring closes on the player and a salmon glow. At the '
         'player\'s feet.')
 def _p_coc_apply():
-    return [card('ripple', '~ ~0.06 ~', '~ 90', spin=-120, s0=4.0, s1=1.2, life=10, fade=3, col=SALMON),
-            card('glow', '~ ~1 ~', bb='center', s0=2.4, s1=1.0, life=10, fade=3, col=MAROON),
+    return [card('ripple', '~ ~0.06 ~', '~ 90', spin=-120, s0=4.0, s1=1.2, life=10, fade=3, col=rgb('#A8545E')),
+            card('glow', '~ ~1 ~', bb='center', s0=2.4, s1=1.0, life=10, fade=3, col=rgb('#E8858A')),
             card('bfly', '~ ~2.3 ~', bb='center', s0=0.5, s1=0.7, move=(0, 0.3, 0), life=14, fade=4, col=SALMON),
             dust(rgb('#8C525C'), 1.4, '~ ~1 ~', (0.4, 0.8, 0.4), 12)]
 

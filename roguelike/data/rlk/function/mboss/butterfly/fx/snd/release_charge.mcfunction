@@ -5,3 +5,4 @@ playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.9
 playsound minecraft:block.beacon.activate hostile @a[tag=player] ~ ~ ~ 0.8 1.6 0.27
 playsound minecraft:entity.warden.sonic_charge hostile @a[tag=player] ~ ~ ~ 0.35 1.8 0.12
 playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2
+playsound minecraft:block.enchantment_table.use hostile @a[tag=player] ~ ~ ~ 0.5 1.2 0.17
