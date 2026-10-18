@@ -1,2 +1,2 @@
 # coco clock 22
-function rlk:mboss/butterfly/rig_stub/face/track
+function rlk:mboss/butterfly/rig/face/track

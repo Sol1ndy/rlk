@@ -10,11 +10,9 @@ tenths of a block and damage as a % of the registry base hit (atk).
 
 Rig. The module codes against the rig API rlk:mboss/butterfly/rig/... (init, spawn, tick, kill, play/<clip>,
 look/<dendro|pyro|flat>, form/<human|butterfly>, face/player, face/track, flash, prop/clear, optional prop/<name>)
-and reads clips, events, parts and props from tools/mboss_butterfly_rig_manifest.json (the rig generator's).
-While that file does not exist (the rig is built on another branch), STUB = True: the manifest is
-tools/mboss_butterfly/stub_rig_manifest.json and every rig call goes to the stand-in rlk:mboss/butterfly/rig_stub/
-written by stub_rig.py. Both stub files are removable; with the real manifest present the build ignores them and
-deletes F:mboss/butterfly/rig_stub/.
+and reads clips, events, anchors, parts and props from tools/mboss_butterfly_rig_manifest.json (written by the rig
+generator tools/build_mboss_butterfly_rig.mjs; API tools/mboss_butterfly_rig_api.md), so a retimed clip reaches the
+module on its next build.
 
 FX. The effect engine is the fx / audio / HUD kit (tools/build_mboss_bf_fx.py, functions
 rlk:mboss/butterfly/fx/{card,cardx,p/*,tele/*,snd/*,hud/*,prop/*}, API in the scratchpad file mb2/bf_fx_api.md). Its
@@ -40,13 +38,10 @@ CX, CY, CZ = ARENA['cx'], ARENA['cy'], ARENA['cz']
 BOSS = next(b for b in REG['boss'] if b['id'] == ID)
 
 # ---------------------------------------------------------------------------------------------
-# Rig manifest (real or stub) and the clip table.
-REAL_MANIFEST = _TOOLS / 'mboss_butterfly_rig_manifest.json'
-STUB_MANIFEST = Path(__file__).resolve().parent / 'stub_rig_manifest.json'
-STUB = not REAL_MANIFEST.exists()
-MANIFEST = STUB_MANIFEST if STUB else REAL_MANIFEST
+# Rig manifest and the clip table.
+MANIFEST = _TOOLS / 'mboss_butterfly_rig_manifest.json'
 _MAN = json.loads(MANIFEST.read_text(encoding='utf-8'))
-RIG_DIR = 'rig_stub' if STUB else 'rig'
+RIG_DIR = 'rig'
 CLIPS = {c['name']: {'id': c['id'], 'len': c['len'], 'loop': c.get('loop', False), 'next': c.get('next'),
                      'events': dict(c.get('events', {}))} for c in _MAN['clips']}
 LOOKS = list(_MAN.get('looks', ['dendro', 'pyro', 'flat']))
@@ -219,7 +214,7 @@ class Gen:
 
     @staticmethod
     def rig(call):
-        """A rig API call (rig/<call>; the stub rig while STUB)."""
+        """A rig API call (rig/<call>)."""
         return f'function {NS}{RIG_DIR}/{call}'
 
     @staticmethod
@@ -421,7 +416,7 @@ H_ANCHOR_FALLBACKS = []               # (clip, event, part) taken from the calle
 def h_anchor(clip, event, part, default):
     """Body-frame position '^x ^y ^z' of a rig anchor at a clip event (manifest clips[].anchors[event][part]: rig
     coordinates x her left, y up, -z forward, so the body frame is ^x ^y ^-z; README Q3). default ('^x ^y ^z') when
-    the manifest has none (the stub rig): the spec's body-frame point."""
+    the manifest has none at that event: the spec's body-frame point."""
     c = next((c for c in _MAN['clips'] if c['name'] == clip), {})
     a = c.get('anchors', {}).get(event, {}).get(part)
     if a is None:
@@ -474,7 +469,7 @@ def _bf(v):
 
 def anchor_xyz(clip, event, part, default):
     """A rig fx anchor of the manifest (clips[].anchors[event][part], rig coordinates: x her left, y up, -z her front)
-    as a body-frame tuple (x left, y up, z forward); `default` (body frame) when the manifest has none (the stub)."""
+    as a body-frame tuple (x left, y up, z forward); `default` (body frame) when the manifest has none at that event."""
     c = next((c for c in _MAN.get('clips', []) if c.get('name') == clip), None)
     a = ((c or {}).get('anchors') or {}).get(event, {}).get(part)
     if a is None:
@@ -499,7 +494,7 @@ def rest_anchor(form, part, default):
     return _bf(rest_anchor_xyz(form, part, default))
 
 
-# Rest anchors of the hovering butterfly (the real rig's form_states.butterfly; the stub has none), body frame.
+# Rest anchors of the hovering butterfly (the rig's form_states.butterfly, rounded), body frame: defaults only.
 B_CORE = (0.0, 3.24, 0.23)
 B_FWTIP_L, B_FWTIP_R = (3.13, 5.99, -1.33), (-3.13, 5.99, -1.33)
 B_HWTIP_L, B_HWTIP_R = (2.75, 2.98, -0.56), (-2.75, 2.98, -0.56)

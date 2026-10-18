@@ -4,7 +4,7 @@ function rlk:mboss/butterfly/wx/u/toward {d:0.15}
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p11l]
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p11s]
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p11h]
-function rlk:mboss/butterfly/rig_stub/face/player
+function rlk:mboss/butterfly/rig/face/player
 function rlk:mboss/butterfly/wx/u/lockw
 tag @e[type=minecraft:marker,tag=rlk_mb_bf_lock] add rlk_mb_bf_p11l
 tag @e[type=minecraft:marker,tag=rlk_mb_bf_p11l] remove rlk_mb_bf_lock

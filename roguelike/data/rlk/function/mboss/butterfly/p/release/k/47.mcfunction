@@ -24,3 +24,4 @@ execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle min
 execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-7.42 ~0.3 ~7.42 0 0 0 0 1 force @a[tag=player]
 execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-5.25 ~0.3 ~9.09 0 0 0 0 1 force @a[tag=player]
 execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~-2.72 ~0.3 ~10.14 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^0 ^4.811 ^0.415 as @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_pod] run tp @s ~ ~ ~ ~ ~

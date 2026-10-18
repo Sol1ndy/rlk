@@ -1,6 +1,6 @@
 # kick clock 26
-execute at @s rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.898f,0.984f,0.784f],scale:0.7} ^-0.5 ^0.15 ^0.2 0.1 0.1 0.1 0 2 force @a[tag=player]
-function rlk:mboss/butterfly/rig_stub/face/player
+execute at @s rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.898f,0.984f,0.784f],scale:0.7} ^-0.55 ^0.001 ^-0.719 0.1 0.1 0.1 0 2 force @a[tag=player]
+function rlk:mboss/butterfly/rig/face/player
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p1b]
 scoreboard players set #bfDMax mb 35
 scoreboard players set #bfDKeep mb 12

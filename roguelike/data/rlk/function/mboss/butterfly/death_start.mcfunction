@@ -6,8 +6,8 @@ function rlk:mboss/butterfly/p/cancel
 function rlk:mboss/butterfly/coc/clear
 function rlk:mboss/butterfly/dew/clear
 scoreboard players set #bfSt mb 7
-function rlk:mboss/butterfly/rig_stub/prop/clear
-function rlk:mboss/butterfly/rig_stub/play/death
+function rlk:mboss/butterfly/rig/prop/clear
+function rlk:mboss/butterfly/rig/play/death
 # the kit: its ground decals go (the hazards are already cleared)
 function rlk:mboss/butterfly/fx/tele/clear
 function rlk:mboss/butterfly/seq_h/death/start

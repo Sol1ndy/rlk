@@ -10,8 +10,8 @@ and the slow glowing orb). Locked ground targets clamp to the walk disc r 20.3 (
 body moves to clamps to r 16.5 (wx/u/clamp_b, plan Q9), the release point to r 16; the core tick also leashes the body
 at r 16.5 in butterfly form (wx/u/btick).
 
-Clock: #bfPT = the clip tick (the core plays the clip at clock 0). Event ticks come from the rig manifest (the stub's
-until the real rig merges) by their Stage-2 names, with the Stage-2 ticks as defaults.
+Clock: #bfPT = the clip tick (the core plays the clip at clock 0). Event ticks come from the rig manifest
+(tools/mboss_butterfly_rig_manifest.json) by their Stage-2 names, with the Stage-2 ticks as defaults.
 """
 import math
 
@@ -23,9 +23,9 @@ NS = A.NS
 K_STRIKE, K_BARRAGE, K_SWEEP, K_COCO, K_RELEASE = 'strike', 'barrage', 'sweep', 'coco', 'release'
 L_STRIKE, L_BARRAGE, L_SWEEP, L_COCO, L_RELEASE = (clip_len(c) for c in ('wing_strike', 'wing_barrage', 'flap_dive', 'coco', 'release'))
 
-# ---- B1 우아한 날개 (wing_strike): bank 0, dive 12, hit 15
+# ---- B1 우아한 날개 (wing_strike): bank 0, dive 8, hit 15
 B1_HIT = ev_or('wing_strike', 'hit', 15)
-B1_DIVE = ev_or('wing_strike', 'dive', 12)
+B1_DIVE = ev_or('wing_strike', 'dive', 8)
 B1_TELL = 12
 B1_LOCK = B1_HIT - B1_TELL                      # 3: lock L / H, the lane + arc decals
 B1_GLIDE = B1_HIT - 7                           # 8: the swoop glide S -> H, 7 t
@@ -35,7 +35,7 @@ B1_ARC = (4.0, 60)                              # sector r 4, +-60 at L (the pla
 # ---- B2 화염 날개의 습격 (wing_barrage): four swings, 5 fire crescents each
 B2_SWINGS = [ev_or('wing_barrage', f'swing{i}', d) for i, d in enumerate((5, 31, 69, 94), 1)]
 B2_WIND = 5                                     # the wind-up 5 t before each swing (the rig: inside the clip)
-B2_LEAD = max(0, B2_WIND - B2_SWINGS[0])        # 0 with the Stage-2 events (swing1 5); 5 with the old stub (swing1 0)
+B2_LEAD = max(0, B2_WIND - B2_SWINGS[0])        # 0 with the rig's swing1 5 (the wind-up is inside the clip)
 B2_N = 5
 B2_SPAWN, B2_FLIGHT, B2_UP = 2, 12, 5           # crescent i appears at s+2+i, lands 12 t later (s+14+i); 5 t fan-out
 B2_FAN = (0, 30, -30, 60, -60)                  # fan yaw of crescent i (her left +)
@@ -46,17 +46,17 @@ B2_SPAWN_R, B2_SPAWN_Y = 2.4, 3.6               # wing-root launch points (body 
 B2_OUT, B2_PITCH = 3.0, 35.0                    # fan-out: 3 b at 0.6 b/t, rising 35 degrees
 B2_ARC = 0.8                                    # the dive curves 0.8 b over its straight line (mv/leap)
 
-# ---- B3 날개 휩쓸개 (flap_dive): rise 0, dive 22, slam 26, fan 28, glide 34
-B3_DIVE = ev_or('flap_dive', 'dive', 22)
+# ---- B3 날개 휩쓸개 (flap_dive): rise 0, dive 20, slam 26, fan 28, glide 33 (the rig's events)
+B3_DIVE = ev_or('flap_dive', 'dive', 20)
 B3_SLAM = ev_or('flap_dive', 'slam', 26)
 B3_FAN = ev_or('flap_dive', 'fan', B3_SLAM + 2)
-B3_GLIDE = ev_or('flap_dive', 'glide', 34)
+B3_GLIDE = ev_or('flap_dive', 'glide', 33)       # the low glide starts on this event (spec B3 §3: glide 33)
 B3_TELL, B3_ACT = 12, 5
 B3_LOCK = B3_FAN - B3_TELL                      # 16
-B3_TRAIL = [B3_GLIDE + 2 * i for i in range(4)] # 34 36 38 40: trail segments (strike +10, act 8)
+B3_TRAIL = [B3_GLIDE + 1 + 2 * i for i in range(4)]  # 34 36 38 40: trail segments (strike +10, act 8)
 B3_SIDE = 4.5                                   # the low glide to her right
 
-# ---- B4 달빛 축복 (coco): wrap 5, orb1 19, ball 30, ball_open 42, orb2 46
+# ---- B4 달빛 축복 (coco): wrap 5, orb1 19, ball 30, ball_open 42, orb2 46 (the rig's prop/pod at the core anchor 30-41)
 B4_WRAP = ev_or('coco', 'wrap', 5)
 B4_ORBS = (ev_or('coco', 'orb1', 19), ev_or('coco', 'orb2', 46))
 B4_BALL = ev_or('coco', 'ball', 30)
@@ -73,6 +73,7 @@ B5_FLASH = ev_or('release', 'flash', 35)
 B5_GLINT = ev_or('release', 'glint', 37)
 B5_RINGS = ev_or('release', 'rings', 38)
 B5_WRAP = ev_or('release', 'wrap', 44)
+B5_SNAP = ev_or('release', 'snap', 52)          # the wings snap open: the pod prop (44-51) goes
 B5_DET = ev_or('release', 'detonation', 53)
 B5_SHRINK = ev_or('release', 'shrink', 87)
 B5_SHATTER = ev_or('release', 'shatter', 91)
@@ -396,8 +397,8 @@ def b3(g):
     tl.at(B3_FAN + 4, f'execute at {P_} positioned ^ ^0.1 ^2.2 run ' + g.dust(A.hexrgb('#585542'), 1.8, '~ ~ ~', (2.0, 0.02, 1.2), 16))
     tl.at(B3_FAN + 5, f'execute at {P_} positioned ^ ^0.5 ^2.0 run ' + g.particle('campfire_cosy_smoke', '~ ~ ~', (1.5, 0.2, 1.0), 0.01, 3),
           g.sound('entity.blaze.burn', 0.4, 0.9))
-    g0 = B3_GLIDE - 1
-    tl.at(g0, '# the low glide to her right (G = P + 4.5 b sideways, body clamp), 10 t',
+    g0 = B3_GLIDE
+    tl.at(g0, '# the low glide to her right (G = P + 4.5 b sideways, body clamp), 10 t from the rig\'s glide event',
           f'kill @e[type=minecraft:marker,tag={gl_}]', f'execute at {P_} positioned ^-{L.num(B3_SIDE)} ^ ^ run ' + summon_m(pid, gl_),
           f'execute as {G_} run {A.clamp_body()}', f'execute positioned as {G_} run function rlk:mboss/mv/glide {{t:10}}',
           g.sound('block.fire.ambient', 0.5, 0.8))
@@ -416,7 +417,7 @@ def b3(g):
                       g.kcard('flame_tongue', '~-0.4 ~ ~0.2', bb='vertical', s0=0.4, s1=1.0, life=8, fade=3, col='#F06A30'),
                       g.particle('flame', '~ ~0.3 ~', (0.5, 0.3, 0.5), 0.02, 8),
                       g.sound('block.fire.ambient', 0.5, 1.6), g.sound('entity.generic.burn', 0.3, 1.4)])
-    ret = B3_GLIDE + 9
+    ret = g0 + 10
     tl.span(ret, L_SWEEP - 1, R('face/track'))
     tl.span(ret, L_SWEEP - 1, f'execute if entity @e[tag=rlk_body,distance=..6,limit=1] run {A.bstep("away", 0.25)}')
     tl.at(ret + 2, g.sound('entity.ender_dragon.flap', 0.4, 1.6))
@@ -452,17 +453,19 @@ def b4(g):
     tl.at(B4_ORBS[0] - 3, g.sound('entity.ender_dragon.flap', 0.5, 1.6))
     for n, t in enumerate(B4_ORBS):
         tl.at(t, f'# orb {n + 1}', R('face/player'), g.fn(f'p/{k}/orb_new{n}'))
-    tl.at(B4_BALL, '# the cocoon ball (wings wrapped, drifting toward the player): lime glow inside, swirling rustle',
-          at_b('^ ^3.0 ^') + g.fx('cocoon_ball'), g.snd('cocoon_ball'), g.sound('entity.breeze.whirl', 0.6, 1.2),
-          *([f'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_pod]', at_b('^ ^3.0 ^') + rig_pod] if rig_pod else []))
+    ball = core('ball')
+    tl.at(B4_BALL, '# the cocoon ball (wings wrapped, drifting toward the player): the rig\'s closed pod at the core anchor (rig API',
+          '# section 6.1: summoned at ball, cleared at ball_open), lime glow inside, swirling rustle',
+          *([f'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_pod]', at_b(ball) + rig_pod] if rig_pod else []),
+          at_b(ball) + g.fx('cocoon_ball'), g.snd('cocoon_ball'), g.sound('entity.breeze.whirl', 0.6, 1.2))
     tl.span(B4_BALL, B4_OPEN - 1, f'execute unless entity @e[tag=rlk_body,distance=..5,limit=1] run {A.bstep("toward", 0.12)}')
     if rig_pod:
-        tl.span(B4_BALL + 1, B4_OPEN - 1, f'{BODY}positioned ^ ^3.0 ^ as @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_pod] run tp @s ~ ~ ~ ~ ~')
+        tl.span(B4_BALL + 1, B4_OPEN - 1, f'{BODY}positioned {ball} as @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_pod] run tp @s ~ ~ ~ ~ ~')
     tl.at(B4_BALL + 2, at_b(core('ball')) + g.fx('orb_charge'), g.snd('orb_charge'))
     tl.at(B4_BALL + 6, g.sound('entity.breeze.whirl', 0.4, 1.0))
-    tl.at(B4_OPEN, '# the ball opens: a pale lime ring flash',
+    tl.at(B4_OPEN, '# the ball opens (the pod prop goes): a pale lime ring flash',
           *(['kill @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_pod]'] if rig_pod else []),
-          at_b('^ ^3.0 ^') + g.kcard('ripple', bb='center', s0=2.0, s1=4.0, life=4, fade=2, col='#CCF39C'),
+          at_b(ball) + g.kcard('ripple', bb='center', s0=2.0, s1=4.0, life=4, fade=2, col='#CCF39C'),
           g.sound('entity.ender_dragon.flap', 0.5, 1.5))
     tl.at(B4_END, g.end())
     tl.write([f'# B4 달빛 축복 (clip coco: wrap {B4_WRAP}, orbs {B4_ORBS}, ball {B4_BALL}-{B4_OPEN}; orb pj {B4_SPD} b/t, steer 9/t for',
@@ -618,15 +621,18 @@ def b5(g):
                                                   (0, 0, 0), 0, 1) for a in range(0, 360, 15)]
     for t in (B5_RINGS + 3, B5_WRAP + 3):
         tl.at(t, '# the safe line just outside the dome (r 10.5)', *safe)
-    tl.at(B5_WRAP, '# the wings wrap into the pod: the core glow grows inside it, inward streaks; pressure builds',
-          at_b(core('wrap')) + g.fx('rel_pod'), g.snd('release_wrap'), g.sound('entity.breeze.whirl', 0.5, 0.9),
-          *([at_b(core('wrap')) + rig_pod] if rig_pod else []))
+    tl.at(B5_WRAP, '# the wings wrap into the pod (the rig\'s pod prop at the core anchor until the snap, rig API section 6.1):',
+          '# the core glow grows inside it, inward streaks; pressure builds',
+          *([f'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_pod]', at_b(core('wrap')) + rig_pod] if rig_pod else []),
+          at_b(core('wrap')) + g.fx('rel_pod'), g.snd('release_wrap'), g.sound('entity.breeze.whirl', 0.5, 0.9))
+    if rig_pod:
+        tl.span(B5_WRAP + 1, B5_SNAP - 1, f'{BODY}positioned {core("wrap")} as @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_pod] run tp @s ~ ~ ~ ~ ~')
+        tl.at(B5_SNAP, '# the snap: the wings fling open, the pod goes', 'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_pod]')
     for t in (B5_WRAP + 4, B5_DET - 2):
         tl.at(t, at_b(core('wrap')) + g.kcard('burst', bb='center', s0=1.5, s1=2.5, life=4, fade=2, col='#DFF99C'))
     tl.at(B5_DET - 4, g.sound('entity.warden.sonic_charge', 0.5, 1.8))
     tl.span(B5_DET + 1, B5_LAND - 1, R('face/track'))
     tl.at(B5_DET, '# E: the detonation: white flash, the lime dome r 10 (kit rel_dome) at R, the big boom, a white screen flash',
-          *(['kill @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_pod]'] if rig_pod else []),
           f'execute at {R_} run ' + g.fx('rel_dome', r=B5_R), g.snd('release_boom'), g.khud('flash_white'),
           f'execute at {R_} run ' + g.particle('explosion_emitter', '~ ~2 ~', (0, 0, 0), 0, 1))
     tl.at(B5_DET + 2, g.khud('flash_lime'), g.sound('block.azalea_leaves.break', 0.8, 0.9), g.sound('entity.breeze.wind_burst', 0.5, 0.8))

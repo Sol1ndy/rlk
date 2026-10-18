@@ -7,7 +7,7 @@ mb2/bf_contract.md for the core <-> pattern contract.
 Owns F:mboss/butterfly/** except F:mboss/butterfly/rig/** (the rig generator) and the fx kit's paths (tools/
 build_mboss_bf_fx.py: fx/{card,cardx,look,clear,uninstall} and fx/{e,p,tele,snd,hud,prop,test}/**, listed under
 "owned" in tools/mboss_bf_fx_manifest.json). Every file it owns is deleted and rewritten on each run
-(F:mboss/butterfly/rig_stub/ too: it exists only while api.STUB). Every visual of the core goes through the fx kit
+(a stale F:mboss/butterfly/rig_stub/ of the old stand-in rig too). Every visual of the core goes through the fx kit
 (api.K / Gen.fx, snd, kcard, khud, kprop; scratchpad mb2/bf_fx_api.md), plus plain vanilla particles.
 """
 import importlib
@@ -37,7 +37,7 @@ ENT_BURST = ev_or('entrance', 'burst', 79)
 ENT_LAND = ev_or('entrance', 'land', 90)
 ENT_GLOW = ev_or('entrance', 'glow', ENT_BURST - 18)
 ENT_WHITE = ev_or('entrance', 'whiteout', ENT_BURST - 8)
-NAMEPLATE = 57                                # the video's fight trigger (nameplate) on the cocoon timeline
+NAMEPLATE = ev_or('entrance', 'nameplate', 57)  # the video's fight trigger (nameplate) on the cocoon timeline
 INTRO_DONE = INTRO_CLIP + ENT_LEN + 1         # she stands; the fight starts
 TR_LEN = clip_len('transform')
 TR_OPEN = ev_or('transform', 'open', 4)
@@ -48,9 +48,10 @@ RL_DET = ev_or('release', 'detonation', 53)
 RL_FLAT = ev_or('release', 'flat', RL_DET + 34)
 RL_REVERT = ev_or('release', 'revert', RL_DET + 39)
 DEATH_LEN = clip_len('death')
-D_SHATTER = ev_or('death', 'shatter', 6)
-D_KNEEL = ev_or('death', 'kneel', 24)
-D_DISSOLVE = ev_or('death', 'dissolve', 40)
+D_SHATTER = ev_or('death', 'shatter', 10)     # the rig (spec S4): wings flat and gone with the 10 t blend
+D_KNEEL = ev_or('death', 'kneel', 30)
+D_DISSOLVE = ev_or('death', 'dissolve', 50)
+COCOON_Y = 2.15                               # the cocoon prop's origin is its centre (rig API section 4)
 HIT_H, SCALE_H = (A.BOSS['hit']['w'], A.BOSS['hit']['h']), A.BOSS['scale']   # human form = the registry
 HIT_B, SCALE_B = (2.2, 4.4), 1.8              # butterfly form: hovering toes at +1.2 b, the body still on the floor
 DEW_GLOW = int(A.LIME_HEX[1:], 16)
@@ -95,14 +96,11 @@ def build():
     for p in pats:
         for f in ('start', 'tick', 'cancel'):
             assert g.has(f'p/{p.key}/{f}'), f'{p.module}: pattern {p.key} has no {f}'
-    if A.STUB:
-        from . import stub_rig
-        stub_rig.emit(g)
     removed = clean(out)
     normal = [p for p in pats if p.kind == 'normal']
     print(f'mboss butterfly: {len(g.files)} functions ({len(normal)} normal + {len(pats) - len(normal)} service patterns '
           f'from {", ".join(PATTERN_MODULES)} + core), {removed} stale removed, rig '
-          f'{"STUB (" + A.MANIFEST.name + ")" if A.STUB else A.MANIFEST.name}.')
+          f'{A.MANIFEST.name}.')
     for clip, event, default in sorted(set(A.FALLBACKS)):
         print(f'  note: manifest clip {clip} has no event {event!r}; using tick {default}')
 
@@ -382,11 +380,12 @@ class Core:
         F, R, g = self.F, self.R, self.g
         cocoon = g.prop('cocoon')
         setup = ['# @s = the new body (from the spawn hook), at it: module state, rig in the entrance clip (the cocoon), HUD.',
+                 '# spawn_hidden: every part starts at scale 0 (spawn would show her for the 3 t blend into the clip).',
                  F('ai/consts'), F('ai/vars'),
-                 R('init'), R('spawn'),
+                 R('init'), R('spawn_hidden'),
                  g.play('entrance')]
         if cocoon:
-            setup.append(cocoon)
+            setup.append(f'execute positioned ~ ~{L.num(COCOON_Y)} ~ run {cocoon}')
         setup += [F('form/hitbox_h'), F('hud/refresh'),
                   F('seq_h/entrance/setup')]       # [seq_h: human author] S1 visuals (the floor disc ...)
         self.w('intro/setup', setup)

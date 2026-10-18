@@ -15,9 +15,9 @@ snd / kcard / tele_* / kprop / khud); this generator imports its Python call bui
 
 The generator is the package tools/mboss_butterfly/: core.py (hooks, forms, AI, debuff, heal orbs, entrance,
 death, HUD, tests) plus one file per pattern group (human.py H1-H4, wing.py B1-B5), so the pattern authors work
-in parallel without touching shared files. While the real rig manifest (tools/mboss_butterfly_rig_manifest.json)
-does not exist, the module calls the removable stub rig F:mboss/butterfly/rig_stub/ (tools/mboss_butterfly/
-stub_rig.py). The core <-> pattern contract is in tools/mboss_butterfly/api.py and the scratchpad bf_contract.md.
+in parallel without touching shared files. Clips, events, fx anchors and props come from the rig manifest
+tools/mboss_butterfly_rig_manifest.json (node tools/build_mboss_butterfly_rig.mjs, which runs before this one). The
+core <-> pattern contract is in tools/mboss_butterfly/api.py and the scratchpad bf_contract.md.
 """
 import sys
 from pathlib import Path

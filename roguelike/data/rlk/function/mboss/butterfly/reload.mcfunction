@@ -13,8 +13,8 @@ scoreboard players set #mbNoLeash mb 0
 scoreboard players set #bfDewN mb 0
 scoreboard players set #bfMv mb 0
 tag @s remove rlk_mb_inv
-function rlk:mboss/butterfly/rig_stub/init
-function rlk:mboss/butterfly/rig_stub/spawn
+function rlk:mboss/butterfly/rig/init
+function rlk:mboss/butterfly/rig/spawn
 execute if score #bfX mb matches 1 run function rlk:mboss/butterfly/form/set_b
 execute if score #bfX mb matches 2 run function rlk:mboss/butterfly/form/set_h
 execute if score #bfForm mb matches 2 run function rlk:mboss/butterfly/form/rig_b
@@ -23,6 +23,6 @@ function rlk:mboss/butterfly/coc/assert
 execute if score #bfCoc mb matches 1 if score #bfForm mb matches 2 run function rlk:mboss/butterfly/dew/spawn
 execute if score #bfX mb matches 2 run return run function rlk:mboss/butterfly/groggy/begin
 execute if score #bfX mb matches 3 run return run function rlk:mboss/butterfly/groggy/end
-execute if score #bfSt mb matches 3 run return run function rlk:mboss/butterfly/rig_stub/play/groggy_h
+execute if score #bfSt mb matches 3 run return run function rlk:mboss/butterfly/rig/play/groggy_h
 scoreboard players set #bfCool mb 20
 function rlk:mboss/butterfly/ai/enter

@@ -1,10 +1,10 @@
-# B5 달빛 해제 (service; clip release: cup 31, flash 36, glint 37, rings 38, wrap 44,
+# B5 달빛 해제 (service; clip release: cup 31, flash 35, glint 37, rings 38, wrap 44,
 # detonation 53, shrink 87, shatter 91, land 96). The dome r 10 at R: 260 % Dendro.
 # the release point R: L0 (the player's spot) + 4 b outward from the centre (from her when L0 is on the centre),
 # pulled inside r 16; the fold fx (lime butterfly glyphs, a rim glow) and the swoop recipe
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p15l]
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p15r]
-function rlk:mboss/butterfly/rig_stub/face/player
+function rlk:mboss/butterfly/rig/face/player
 function rlk:mboss/butterfly/wx/u/lockw
 tag @e[type=minecraft:marker,tag=rlk_mb_bf_lock] add rlk_mb_bf_p15l
 tag @e[type=minecraft:marker,tag=rlk_mb_bf_p15l] remove rlk_mb_bf_lock
@@ -15,6 +15,6 @@ execute if score #bp15C mb matches 0 as @e[type=minecraft:marker,tag=rlk_mb_bf_p
 execute if score #bp15C mb matches 1 as @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] at @s facing entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] feet rotated ~180 0 run tp @s ^ ^ ^4
 execute as @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] at @s run tp @s ~ 201 ~
 execute as @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run function rlk:mboss/butterfly/wx/u/clamp_r
-execute rotated as @s rotated ~ 0 positioned ^0 ^3.24 ^0.23 run function rlk:mboss/butterfly/fx/p/rel_fold
-execute rotated as @s rotated ~ 0 positioned ^0 ^3.24 ^0.23 run function rlk:mboss/butterfly/fx/card {kind:"glow",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:1,s1:1.6,move:"0f,0f,0f",life:10,fade:4,col:11985754}
+execute rotated as @s rotated ~ 0 positioned ^0 ^3.175 ^0.447 run function rlk:mboss/butterfly/fx/p/rel_fold
+execute rotated as @s rotated ~ 0 positioned ^0 ^3.175 ^0.447 run function rlk:mboss/butterfly/fx/card {kind:"glow",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:1,s1:1.6,move:"0f,0f,0f",life:10,fade:4,col:11985754}
 function rlk:mboss/butterfly/fx/snd/release_swoop

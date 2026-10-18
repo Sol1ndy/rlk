@@ -2,7 +2,7 @@
 # the lock: the slam point P (dest 3 b, 2.5 b short of the player; body clamp), the aim at the player,
 # the flame fan (half disc r 4.5 ahead of P, 2.5 tall, active 5 t) with its Pyro decal
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p13p]
-function rlk:mboss/butterfly/rig_stub/face/player
+function rlk:mboss/butterfly/rig/face/player
 scoreboard players set #bfDMax mb 30
 scoreboard players set #bfDKeep mb 25
 function rlk:mboss/butterfly/u/dest

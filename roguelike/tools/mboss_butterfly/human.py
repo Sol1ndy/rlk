@@ -13,8 +13,8 @@ binding plan mb2/plan.md (its "Stage-2 decisions"):
   of H2 (plan Q8), the body moved by the module (plan Q1: the clips carry no horizontal root travel).
 
 Clock: #bfPT = the clip tick (the core plays the clip at clock 0); a pattern with lead L starts at -L. Rig events are
-read from the manifest (ev_or with the spec's tick as the fallback), anchors with api.h_anchor (the spec's body-frame
-points while the stub rig is in use).
+read from the rig manifest (ev_or with the spec's tick as the fallback), fx anchors with api.h_anchor (the manifest's
+clips[].anchors; the spec's body-frame point where the manifest has none).
 """
 import math
 import random
