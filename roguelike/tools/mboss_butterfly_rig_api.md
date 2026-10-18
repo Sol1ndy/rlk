@@ -76,17 +76,17 @@ anchor yaw again when the clip ends.
 
 | NN | part | model (dendro look) | scale | what |
 |---|---|---|---|---|
-| 01 | `pelvis` | pelvis | 1 | hips, navy hip plates and lime fins |
-| 02 | `torso` | torso | 1 | waist and chest under the mane |
+| 01 | `pelvis` | pelvis | 1 | hips (a smooth turned solid flaring out of the waist, rounded crotch), navy tasset blades and steel fins |
+| 02 | `torso` | torso | 1 | waist and chest under the mane (smooth elliptic turned solid, lavender belly band, periwinkle swirls) |
 | 03 | `collar` | collar | 1 | white fur mane: front bib, sides, the hood and the royal-blue capelet tips at the back |
-| 04 | `head` | head | 1 | faceted steel helm-mask, crown, side plates, cheek blades |
+| 04 | `head` | head | 1 | faceted steel helm-mask, a smooth slate helmet dome behind it, crown, cheek blades |
 | 05 | `head_glow` | head_glow | 1 | coral eyes and the lime chevron (brightness 15) |
-| 06 | `crest` | crest | 1 | the two antennae and the lime lyre streamers |
+| 06 | `crest` | crest | 1 | the two antennae (thin periwinkle rods) and the lime lyre streamers (one card each) |
 | 07, 08 | `fan_r`, `fan_l` | fan_r, fan_l | 1.25 | navy shoulder plates with lime spiral eyes and the side-blade fans |
 | 09-0e | `thigh_r`, `shin_r`, `foot_r`, `thigh_l`, `shin_l`, `foot_l` | same names | 1 | digitigrade legs: thigh, shin with white knee spike and blue fur boot, hoof (cream, with claws) |
 | 0f, 11 | `hand_r_a`, `hand_l_a` | crescent_r, crescent_l (tell: crescent_tell_*) | 1 / .82 | the floating crescent hands (big one at her right) |
 | 10, 12 | `hand_r_b`, `hand_l_b` | shard_r, shard_l | 1 / .72 | the blade links of the crescent chains |
-| 13 | `flakes` | flakes | 1 | the floating moon flakes behind her |
+| 13 | `flakes` | flakes | 1 | the floating moon flakes behind her shoulders (0.2-0.4 b behind the spine: behind the forewing plates in butterfly form) |
 | 14, 15 | `fwing_l`, `fwing_r` | fwing_*_dendro | 3.5 (half-size model) | forewings: steel spar with a curled hook, lime baroque scroll plate with spiral eye, iridescent opal lobes in lime rims, violet trailing rim |
 | 16, 17 | `fwglow_l`, `fwglow_r` | fwglow_*_dendro | 3.5 | translucent holographic shimmer over the forewing lobes (animated, brightness 15) |
 | 18, 19 | `hwing_l`, `hwing_r` | hwing_*_dendro | 2.4 (half-size model) | hindwings: lime scroll lobe with raised volute, long blade with a glowing blue tip |
@@ -130,8 +130,8 @@ Each call summons at the execution position, turned to the execution yaw. Tags: 
 
 | function | displays | notes |
 |---|---|---|
-| `prop/cocoon` | `cocoon` ×3 (fixed), `cocoon_halo` ×3 (billboard centre) | The entrance cocoon, 3.8 b tall: a navy-green kite of wrapped wing plates with two curled navy horns, crossing lime seams, a glowing lime window and a lime spike at the bottom; the halo glows behind it. Its origin is the cocoon's centre: summon it about 2.15 b above the floor. The module clears it at the burst (79). |
-| `prop/pod` | `pod` ×2.5 | The wrapped wing pod (코코볼 ball, the 달빛 해제 wrap): 8 lime leaf panels with white-mint lobes in navy frames, seam glow, shoulder-plate caps; 3.4 b tall, r 1.4 b, centred on the execution point. |
+| `prop/cocoon` | `cocoon` ×3 (fixed), `cocoon_halo` ×3 (billboard centre) | The entrance cocoon, 4 b tall: a turned diamond of two wrapped slate-green wing plates (lime leading edges crossing in an X, a diamond window over the glowing lime bud inside, engraved scrolls, a scalloped rim), two ram's-horn scrolls at the widest corners and a lime crystal spike at the bottom; the halo glows behind it. Its origin is the cocoon's centre: summon it about 2.15 b above the floor. The module clears it at the burst (79). |
+| `prop/pod` | `pod` ×2.5 | The wrapped wing pod (코코볼 ball, the 달빛 해제 wrap): an egg of the four folded wings, forewings over the front (sculpted lime scroll plates, opal lobes, steel spars) and hindwings over the back (navy spiral eyes, blades), over a glowing core that shows in the front and back seams; the hindwing blade tips stick out below the sides; 3.5 b tall, r 1.4 b, centred on the execution point. |
 | `prop/orb` | `orb` ×1, `ring` ×1 twice (tilted) | The 달빛 축복 orb: a 1.7 b lime glass sphere and two gyroscope rings; spin the rings with transformation keys. |
 
 ## 5. Body travel versus clip motion
@@ -245,7 +245,7 @@ The generator refuses to write a rig that fails these (`--allow-steps` turns the
 - **Keys:** the first key at tick 0, the last at the clip length, `next` must name a clip.
 - **Parts** ≤ 34; **item models** within −16..32 (element rotations are single-axis multiples of 22.5° by
   construction).
-- **Atlas:** ≤ 2 M px in all (now 54 sprites, 1.06 M px), every side a multiple of 16, ≤ 512 px wide and
+- **Atlas:** ≤ 2 M px in all (now 72 sprites, 1.33 M px), every side a multiple of 16, ≤ 512 px wide and
   ≤ 1024 px tall (the 8-frame strips).
 - Compiled: 22 clips, 835 key files and 14 284 part keys. A part gets a key only where the client's lerp/slerp
   would drift from the authored pose by more than 0.012 b, 0.5-3° (per part) or 1.5 % scale.
@@ -262,6 +262,11 @@ The generator refuses to write a rig that fails these (`--allow-steps` turns the
   bevelled height fields lit from the upper left, tone ramps, groove/ridge reliefs, fur clumps (`furPainter`) for the
   mane and boots. The membranes are marbled white-mint → lime with the violet trailing rim; the hindwing blade tips
   and the eyes are brightness 15.
+- The round parts (torso, pelvis, thighs, fur-boot cores, hooves, helmet dome, mane core, the cocoon, the pod and the
+  orb) are smooth turned solids (`butterfly_geometry.mjs` smooth3): 16-facet elliptic rings whose radius steps are
+  small, each ring reaching into its wider neighbour instead of closing on a ledge disc, under wrap textures that
+  carry the light (front-lit, lilac-shaded backs), so no section seams show. The profiles are `BODY` / `PROPS` in
+  `butterfly_paint.mjs`; the boots' fur cards are painted on the same profiles.
 - Legs are digitigrade (hip, knee, hock, hoof, a slight A-stance) with an FK chain per side; the crescent hands
   float on paths relative to the torso; the two wing sets pivot on the upper back beside the spine and the ribbon
   tendrils hang beside the chest (torso frame).
