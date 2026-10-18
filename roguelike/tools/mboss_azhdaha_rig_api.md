@@ -18,7 +18,7 @@ tail in parallel (plan.md R9):
 | `azhdaha_head.mjs` | head (face mask plates, keel, crown spikes, ear plates 回, upper teeth), jaw (chin shield, lower teeth, fangs, tongue), eyes, horns (gold sleeve C + knob + dark horn), beard plates |
 | `azhdaha_body.mjs` | chest / belly / pelvis, neck, apron (+ glow overlay), the four dorsal plate groups, the three gold crystal groups |
 | `azhdaha_legs.mjs` | upper arms, engraved bracers (gold studs, amber elbow crystals), paws and talons, haunches, ribbed gaiters (heel spurs), feet, the four leg glow overlays |
-| `azhdaha_tail.mjs` | t1..t8 (core, cream ventral fin with gold veins, top spikes), the leafy branch and the tip (leaves / blossoms) |
+| `azhdaha_tail.mjs` | t1..t8 (a broad lens-section body: cream ventral face with the gold midrib and chevrons, dark scale-plated flanks, the ridge blades, the V-fan side rows and the flank plates; collared, capped joints), the gnarled leafy branch t6..t8 and the tip (thorns, twigs, leaf sprays / blossoms), `tail_skirt` (the cream rump plate under the tail root, rigid with the pelvis), the tail's per-part culling boxes (`CULL_BOX`) |
 | `azhdaha_shape.mjs` | shared shape helpers (loft, slab, crossCards, rockBox, retex, mirrorX, tile UV registry) |
 | `azhdaha_materials.mjs` | shared palette ramps (model.md §4) and the shared tile sprites (hide, cream, plate, gold, horn, talon, bark, mask/mouth) |
 
@@ -69,16 +69,18 @@ body, on the floor under the centre of the four feet). Call them `as` the anchor
 
 ## 2. Entities, tags, cost
 
-- 46 `item_display` parts (plan.md R3: 44-48, cap 56), fixed UUIDs `524c4b4d-415a-4400-8000-0000000000NN`
-  (NN = 1..46 in the order of `PARTS`: head, body, legs, tail). The shadow helper is `...00000040` (an empty model with
+- 47 `item_display` parts (plan.md R3: 44-48, cap 56), fixed UUIDs `524c4b4d-415a-4400-8000-0000000000NN`
+  (NN = 1..47 in the order of `PARTS`: head, body, legs, tail). The shadow helper is `...00000040` (an empty model with
   `shadow_radius 4.5`, not a rig part).
 - Tags: `rlk_room`, `rlk_mb_aux`, `rlk_mb_part`, `rlk_mb_azhdaha_part`, `rlk_mb_az_<part>`, `rlk_mb_az_g_<region>`.
 - Summon: `billboard:"fixed"`, `item_display:"none"`, `interpolation_duration:1`, `teleport_duration:1`,
   `view_range:3f`, **`width:30f,height:12f`** (plan.md R4: the culling box is centred on the anchor; the tail reaches
-  15 b behind it), `shadow_radius:0f`, brightness 13 (hide), 14 (gold horns, crystals, tail tip), 15 (eyes, overlays).
+  15 b behind it; the distal tail `t4..t8 tip` uses `width:44f,height:18f` so it never vanishes when laid out, swept
+  or raised: the tail region's `CULL_BOX`, manifest `culling.per_part`), `shadow_radius:0f`, brightness 13 (hide), 14 (gold horns, crystals, tail tip), 15 (eyes, overlays).
 - Parts by region: head 7 (`head jaw eyes horn_l horn_r beard1 beard2`), body 14 (`chest belly pelvis neck1 neck2
   apron glow_apron plates_neck plates_sh plates_mid plates_hip crys_sh crys_mid crys_hip`), legs 16 (`uarm_* bracer_*
-  paw_* thigh_* gaiter_* foot_*` x2 and `glow_bracer_* glow_gaiter_*`), tail 9 (`t1..t8 tip`).
+  paw_* thigh_* gaiter_* foot_*` x2 and `glow_bracer_* glow_gaiter_*`), tail 10 (`t1..t8 tip tail_skirt`; the skirt rides
+  the pelvis at the tail root, hidden with the body, and flashes with the `rear` group).
 - Per tick: 47 `tp` (follow) + dispatch + the keys of the current clip. Elements shown at rest: about 5.6 k
   (rigtech.md §2.2: 6-8 k visible is the client budget).
 
@@ -88,7 +90,7 @@ body, on the floor under the centre of the four feet). Call them `as` the anchor
 |---|---|---|---|
 | normal | 0 | any | none |
 | burrowed | 1 | root sunk (`pos` y -7.5, see `burrowed`) | every part at scale 0 (`visBody 0`, `visTail 0`) |
-| tail-only | 2 | root sunk 9.4 b, pitch -12, the tail a pillar (`tail_only`) | every non-tail part at scale 0 (`visBody 0`) |
+| tail-only | 2 | the root pitched nose-down 90 and sunk (`pos` y -11.15, `rot` -90: `TAIL_PILLAR_ROOT`), so the tail rises at the anchor's x / z (t1 and most of t2 under the floor, the crown at ~11 b) (`tail_only`) | every non-tail part at scale 0 (`visBody 0`) |
 
 The anchor (husk body) never goes into blocks: the clips sink the **rig** below the opaque arena floor. The floor
 under the burrow must be opaque full blocks (rigtech.md §4.1). The tail-only state keeps the tail look.
@@ -101,7 +103,7 @@ Two independent channels; all four combinations (불/번개, 물/얼음, 불/얼
 |---|---|---|---|
 | legs (`azRigLegs`) | geo 0 / hydro 1 / pyro 2 | bracer_l/r, paw_l/r, gaiter_l/r, foot_l/r, apron, belly | palette-swapped models (navy-black or deep red stone, glowing carved lines; the belly cracks glow in Pyro) |
 | legs | hydro / pyro | glow_bracer_l/r, glow_gaiter_l/r, glow_apron | white line masks 0.025 b proud, `tintindex 0`, item definitions with constant tints (`#cde6ff` / `#ffb070`), brightness 15; the `empty` model in Geo |
-| tail (`azRigTail`) | geo 0 / cryo 1 / electro 2 | plates_neck/sh/mid/hip, t1..t8, tip | palette-swapped models: slate / violet-dark plates with glowing edges, the tail skin cooled, leaves to crystal / violet blossoms; plates and the branch at brightness 15 |
+| tail (`azRigTail`) | geo 0 / cryo 1 / electro 2 | plates_neck/sh/mid/hip, t1..t8, tip | palette-swapped models: slate / violet-dark plates with glowing edges; the tail skin, blades and bark go to the deep end of the element's stone ramp with thin glowing cracks and blade rims (the cream ventral face and the skirt keep their gold veins), the leaves become crystal sprays / violet blossoms; t6..t8 and tip (the blossoms) at brightness 15, t1..t5 stay 13 |
 
 The eyes stay red and the gold (horns, crystals, studs) stays gold in every look. The model and item names per
 part and look are in the manifest (`looks`).
@@ -119,7 +121,10 @@ Pose channels (`DEFAULT_POSE`): `pos [0,y,0]`, `rot [p,y,r]` (about ROOT_PIVOT 0
 neck1 neck2 head` eulers, `jaw` (deg open), `beard1 beard2 apron` eulers, `flN flS flM flH` plate flare (deg, +
 stands the plates up), `flK` plate scale, `fwL fwR` wrist targets and `fpL fpR` paw eulers, `hkL hkR` hock targets and
 `hfL hfR` foot eulers (root frame: planted feet stay put while the body rears), `t1..t8` tail eulers (pitch - raises a
-segment) plus `tLift tCurl tSweep tTwist`, `vis visBody visTail`. Clips carry no horizontal root travel and no root
+segment) plus `tLift tCurl tSweep tTwist` (`tSweep` is spread root-weighted by `TAIL_SWEEP` .30 .20 .15 .11 .08 .07
+.05 .04: the root leads, the distal tail stays nearly straight), `vis visBody visTail`. The tail curl constants live in
+`azhdaha_clips.mjs`: `TAIL_REST` (idle arc), `TAIL_LOOP`, `TAIL_LOW`, `TAIL_WHIP`, `TAIL_PILLAR` (+ `TAIL_PILLAR_ROOT`);
+authored bends stay at 30 degrees per joint or less. Clips carry no horizontal root travel and no root
 yaw (the module moves and turns the anchor). The legs are solved by two-bone IK at bake time with the rest bend as
 the pole (`ik()` with `prevV` continuity across frames).
 
@@ -127,17 +132,17 @@ the pole (`ik()` with `prevV` continuity across frames).
 
 | clip | state | what |
 |---|---|---|
-| `rest` | normal | DEFAULT_POSE: idle stance, head low, tail in a high curl |
+| `rest` | normal | DEFAULT_POSE: idle stance, head low, the tail in a big arc over the back, the leafy tip over the mid-back at ~10 b (v3 23.6 s) |
 | `head_up` | normal | the neck raised, the face forward (v1 f2130) |
 | `roar` | normal | jaw 45, head thrust up |
 | `rear_up` | normal | roar_rear peak: pelvis +45, fore paws at chest height, tail braced on the floor |
 | `stomp_lift` | normal | stomp_fl hang: left wrist at 3.0 b, weight to the right |
-| `whip_mid` | normal | the tail flat on the floor, swept 150 to the left |
-| `loop` | normal | the phase-3 tail loop over the back (v8 f2280) |
+| `whip_mid` | normal | the tail just off the floor, swept 110 to the left (root-weighted) |
+| `loop` | normal | the phase-3 tail loop / shells carry (v8 f2280: top ~11.7 b, the tip over the shoulders) |
 | `tail_low` | normal | the tail laid out behind (v3 f1680) |
 | `burrow` | normal | burrow dive mid-sink: root -3.4, nose down 22 |
 | `burrowed` | burrowed | root -7.5, every part hidden |
-| `tail_only` | tail_only | the phase-3 pillar: body hidden, the tail standing ~8 b above the floor |
+| `tail_only` | tail_only | the phase-3 pillar at the anchor: body hidden, the tail rising from the floor in a slight S to ~12 b, the crown nodding forward |
 
 Each is a 2-tick loop (46 keys at tick 0). The motion clips of motion.md §6 replace this list in a later stage.
 
@@ -155,9 +160,11 @@ sole cards) sits at about -0.05.
 Objectives: `azRigC` clip id, `azRigT` clip tick, `azRigF` flash countdown, `azRigY` face scratch, `azRigLegs`,
 `azRigTail`, `azRigState`.
 
-Hit proxies (plan.md R5, rigtech.md §3.3): 12 ground-anchored columns — `head chest belly hips tail1..tail4 paw_l paw_r
+Hit proxies (plan.md R5, rigtech.md §3.3): 13 ground-anchored columns — `head chest belly hips tail1..tail5 paw_l paw_r
 foot_l foot_r` — each `{x, z}` (the bone point projected on the floor, rig frame: +x = the boss left, -z = its front),
-`base`, `top`, `w`; `hidden: true` when the bone is at scale 0. Tail proxies are flagged for the tail-only state.
+`base`, `top`, `w`; `hidden: true` when the bone is at scale 0 or the column's top is under the floor. The tail
+columns sit on t2, t4, t6, t8 and the tip (the leafy crown, the phase-3 target) and are flagged for the tail-only
+state.
 The framework side (interaction entities, `combat/apply` routing, dedupe) is a later stage.
 
 ## 8. Build checks and budgets

@@ -8,3 +8,4 @@ data merge entity 524c4b4d-415a-4400-8000-00000000001d {Glowing:1b,glow_color_ov
 data merge entity 524c4b4d-415a-4400-8000-000000000020 {Glowing:1b,glow_color_override:16774620}
 data merge entity 524c4b4d-415a-4400-8000-00000000001e {Glowing:1b,glow_color_override:16774620}
 data merge entity 524c4b4d-415a-4400-8000-000000000021 {Glowing:1b,glow_color_override:16774620}
+data merge entity 524c4b4d-415a-4400-8000-00000000002f {Glowing:1b,glow_color_override:16774620}

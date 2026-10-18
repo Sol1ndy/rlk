@@ -46,3 +46,4 @@ data merge entity 524c4b4d-415a-4400-8000-00000000002b {start_interpolation:0,in
 data merge entity 524c4b4d-415a-4400-8000-00000000002c {start_interpolation:0,interpolation_duration:0,transformation:{scale:[0f,0f,0f]}}
 data merge entity 524c4b4d-415a-4400-8000-00000000002d {start_interpolation:0,interpolation_duration:0,transformation:{scale:[0f,0f,0f]}}
 data merge entity 524c4b4d-415a-4400-8000-00000000002e {start_interpolation:0,interpolation_duration:0,transformation:{scale:[0f,0f,0f]}}
+data merge entity 524c4b4d-415a-4400-8000-00000000002f {start_interpolation:0,interpolation_duration:0,transformation:{scale:[0f,0f,0f]}}

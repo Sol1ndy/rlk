@@ -23,7 +23,8 @@
 //   t1 .. t8               tail segment eulers relative to the previous segment (pitch - raises a segment: it points
 //                          back, so up = negative pitch; use the tail* helpers in azhdaha_clips.mjs)
 //   tLift tCurl tSweep tTwist   parametric tail: tLift raises t1 (deg, up +), tCurl adds per segment (up +), tSweep
-//                          is the total yaw spread evenly over the chain (+ = the tail swings to the boss's left),
+//                          is the total yaw spread over the chain by TAIL_SWEEP (root-weighted; + = the tail swings
+//                          to the boss's left),
 //                          tTwist the total roll; all added to t1..t8
 //   vis visBody visTail    visibility scales (0 hides; burrow / tail-only); visBody = everything but the tail
 import {add, sub, times, mul, q, rot, len, unit, aimQ, ik, toDisplayT, toDisplayQ} from './mboss_rig_math.mjs';
@@ -62,12 +63,15 @@ export const PART_SCALE = {
   uarm_l: 1.8, bracer_l: 1.6, paw_l: 1.4, uarm_r: 1.8, bracer_r: 1.6, paw_r: 1.4,
   thigh_l: 2.0, gaiter_l: 1.6, foot_l: 1.4, thigh_r: 2.0, gaiter_r: 1.6, foot_r: 1.4,
   glow_bracer_l: 1.6, glow_bracer_r: 1.6, glow_gaiter_l: 1.6, glow_gaiter_r: 1.6,
-  t1: 1.8, t2: 1.6, t3: 1.45, t4: 1.35, t5: 1.3, t6: 1.2, t7: 1.2, t8: 1.2, tip: 1.3,
+  t1: 1.9, t2: 1.7, t3: 1.6, t4: 1.5, t5: 1.4, t6: 1.4, t7: 1.4, t8: 1.4, tip: 1.3, tail_skirt: 1.8,
 };
 // Rest lean of each plate group (deg, top toward the back): the plates are authored upright in the group frame and the
 // group leans them back; the flare channels stand them up (bristle).
 export const PLATE_LEAN = {neck: 35, sh: 12, mid: 15, hip: 25};
 export const TAIL_PARTS = ['t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 'tip'];
+// tSweep share per segment (sum 1), root-weighted: the root leads a whip and the distal tail stays nearly straight
+// (R2 critique 5.7); the bake-time lag of motion.md §2.4 goes on top in the clip stage.
+export const TAIL_SWEEP = [.3, .2, .15, .11, .08, .07, .05, .04];
 // Fixed placement of the horns in the head frame (the C of each horn is authored in its own YZ plane and turned out:
 // yaw opens the back of the C outward, so the front shows "( )"; model.md §0).
 export const HORN = {at: [1.85, -.55, -.45], e: [0, 45, 0]};
@@ -133,11 +137,12 @@ export function solve(p, {prev = null} = {}) {
   const n = TAIL_LEN.length;
   for (let i = 0; i < n; i++) {
     const e = p['t' + (i + 1)], up = (i === 0 ? p.tLift : 0) + p.tCurl;
-    Qt = mul(Qt, q([e[0] - up, e[1] + p.tSweep / n, e[2] + p.tTwist / n]));
+    Qt = mul(Qt, q([e[0] - up, e[1] + p.tSweep * TAIL_SWEEP[i], e[2] + p.tTwist / n]));
     part('t' + (i + 1), T, Qt);
     T = add(T, rot(Qt, [0, 0, TAIL_LEN[i]]));
   }
   part('tip', T, Qt);
+  part('tail_skirt', at(Bp, J.t1), Bp.q);              // the cream rump plate under the tail root (tail region)
   // root: offset and rotation about ROOT_PIVOT (applied to everything, the limb targets included: they are root-frame)
   const R0 = q(p.rot);
   for (const v of Object.values(o)) { v.t = add(add(ROOT_PIVOT, rot(R0, sub(v.t, ROOT_PIVOT))), p.pos); v.q = mul(R0, v.q); }
@@ -163,8 +168,9 @@ export const pointOf = (o, n, pt) => { const v = o[n]; return add(v.t, rot(v.q, 
 export const PROXIES = [
   ['head', 'head', [0, -.6, -1.0], 2.8, 1.6, ''], ['chest', 'chest', [0, 0, -.4], 4.6, 1.5, ''], ['belly', 'belly', [0, 0, .2], 4.6, 1.5, ''],
   ['hips', 'pelvis', [0, 0, 1.0], 4.4, 1.2, ''],
-  ['tail1', 't1', [0, 0, 1.6], 2.6, 1.2, 'tail_only'], ['tail2', 't3', [0, 0, 1.0], 2.2, 1.0, 'tail_only'],
-  ['tail3', 't5', [0, 0, .9], 1.8, .9, 'tail_only'], ['tail4', 't7', [0, 0, 1.0], 1.4, .8, 'tail_only'],
+  ['tail1', 't2', [0, 0, .6], 2.6, 1.3, 'tail_only'], ['tail2', 't4', [0, 0, .6], 2.0, 1.0, 'tail_only'],
+  ['tail3', 't6', [0, 0, .5], 1.6, .9, 'tail_only'], ['tail4', 't8', [0, 0, .4], 1.6, .9, 'tail_only'],
+  ['tail5', 'tip', [0, 0, .5], 1.8, 1.0, 'tail_only'],
   ['paw_l', 'paw_l', [0, -.3, -.5], 1.8, 2.6, ''], ['paw_r', 'paw_r', [0, -.3, -.5], 1.8, 2.6, ''],
   ['foot_l', 'foot_l', [0, -.4, -.5], 1.8, 2.6, ''], ['foot_r', 'foot_r', [0, -.4, -.5], 1.8, 2.6, ''],
 ];
@@ -173,7 +179,7 @@ export const PROXIES = [
 export function proxyPoints(o) {
   const out = {};
   for (const [nm, pt, at, w, top] of PROXIES) {
-    const v = o[pt], P = add(v.t, rot(v.q, at)), hidden = v.s[0] < 1e-3;
+    const v = o[pt], P = add(v.t, rot(v.q, at)), hidden = v.s[0] < 1e-3 || P[1] + top <= 0;
     out[nm] = {x: +P[0].toFixed(2), z: +P[2].toFixed(2), base: +Math.max(0, P[1] - 2).toFixed(2), top: +(P[1] + top).toFixed(2), w, ...(hidden ? {hidden: true} : {})};
   }
   return out;
