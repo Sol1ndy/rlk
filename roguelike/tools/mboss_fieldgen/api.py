@@ -13,19 +13,18 @@ of a block and damage as a % of the registry base hit (atk 12 x dmgMul 110: 100 
 
 Rig. The module codes against the rig API rlk:mboss/fieldgen/rig/... (init, spawn, tick, kill, play/<clip>,
 form/<dormant|cruise|field|coreup|tower|laser|deployed>, look/<idle|charge|field|groggy|off>, crack/<0..4>,
-face/player, face/track, flash, prop/clear) and reads clips, events, parts and props from
-tools/mboss_fieldgen_rig_manifest.json (the rig generator's, branch wip/fg-rig). While that file does not exist,
-STUB = True: the manifest is tools/mboss_fieldgen/stub_rig_manifest.json and every rig call goes to the stand-in
-rlk:mboss/fieldgen/rig_stub/ written by stub_rig.py. Both stub files are removable; with the real manifest present
-the build ignores them and deletes F:mboss/fieldgen/rig_stub/.
+face/player, face/track, flash, prop/clear) and reads clips, events, anchors, parts and props from
+tools/mboss_fieldgen_rig_manifest.json (the rig generator's, tools/build_mboss_fieldgen_rig.mjs; API in
+tools/mboss_fieldgen_rig_api.md). The manifest is required: the stand-in stub rig is gone since the real rig was
+merged (wip/fg-rig), and every clip tick the module reads comes from that manifest.
 
 FX. The effect engine is the fx / audio / HUD kit (tools/build_mboss_fg_fx.py, functions
 rlk:mboss/fieldgen/fx/{card,cardx,p/*,tele/*,snd/*,hud/*,prop/*}, font rlk:mboss_fg; API in the scratchpad file
 mb3/fg_fx_api.md). Its Python call builders are re-exported here as api.K and on Gen (g.fx, g.snd, g.kcard, g.tele_*,
 g.kprop, g.khud), so pattern modules never import the kit themselves. Every helper returns one function line to run in
 the executor context the kit documents (position = the event point, rotation = the aim). The core wires the kit's
-hooks and HUD (fg_contract.md section 15); its own remaining visuals are vanilla particles and sounds in
-F:mboss/fieldgen/cfx/** (core.py).
+hooks and HUD (fg_contract.md section 15); every visual of the core, the patterns and the sequences (seq_c.py,
+seq_f.py) goes through the kit.
 """
 from pathlib import Path
 import json
@@ -46,13 +45,11 @@ CX, CY, CZ = ARENA['cx'], ARENA['cy'], ARENA['cz']
 BOSS = next(b for b in REG['boss'] if b['id'] == ID)
 
 # ---------------------------------------------------------------------------------------------
-# Rig manifest (real or stub) and the clip table.
-REAL_MANIFEST = _TOOLS / 'mboss_fieldgen_rig_manifest.json'
-STUB_MANIFEST = Path(__file__).resolve().parent / 'stub_rig_manifest.json'
-STUB = not REAL_MANIFEST.exists()
-MANIFEST = STUB_MANIFEST if STUB else REAL_MANIFEST
+# The rig manifest (required) and the clip table.
+MANIFEST = _TOOLS / 'mboss_fieldgen_rig_manifest.json'
+assert MANIFEST.exists(), f'{MANIFEST} is missing: run node tools/build_mboss_fieldgen_rig.mjs --resourcepack <RP>'
 _MAN = json.loads(MANIFEST.read_text(encoding='utf-8'))
-RIG_DIR = 'rig_stub' if STUB else 'rig'
+RIG_DIR = 'rig'
 CLIPS = {c['name']: {'id': c['id'], 'len': c['len'], 'loop': c.get('loop', False), 'next': c.get('next'),
                      'events': dict(c.get('events', {}))} for c in _MAN['clips']}
 LOOKS = ['idle', 'charge', 'field', 'groggy', 'off']                          # rig API look/<name>
@@ -242,7 +239,7 @@ class Gen:
 
     @staticmethod
     def rig(call):
-        """A rig API call (rig/<call>; the stub rig while STUB)."""
+        """A rig API call (rig/<call>)."""
         return f'function {NS}{RIG_DIR}/{call}'
 
     @staticmethod

@@ -1,2 +1,3 @@
 # entrance tick 60
-execute at @s rotated as @s rotated ~ 0 positioned ~ ~3.2 ~ run playsound minecraft:block.grindstone.use hostile @a[tag=player] ~ ~ ~ 0.3 0.6 0.1
+execute at @s rotated as @s rotated ~ 0 positioned ^0 ^4.034 ^1.053 run function rlk:mboss/fieldgen/fx/p/eye_open
+execute at @s rotated as @s rotated ~ 0 positioned ^0 ^4.034 ^1.053 run function rlk:mboss/fieldgen/fx/snd/eye_open

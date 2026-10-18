@@ -1,6 +1,6 @@
 # C2 내려찍기 (clip slam; @s = body): face, lock + glide 10 t, slam r 5 at 17.
 scoreboard players set #fq2Pz mb 0
-function rlk:mboss/fieldgen/rig_stub/face/player
+function rlk:mboss/fieldgen/rig/face/player
 function rlk:mboss/fieldgen/u/lockb
 kill @e[type=minecraft:marker,tag=rlk_mb_fg_p2a]
 tag @e[type=minecraft:marker,tag=rlk_mb_fg_lock] add rlk_mb_fg_kept

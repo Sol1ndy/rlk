@@ -5,7 +5,7 @@
 function rlk:mboss/fieldgen/fx/test/stop
 execute positioned ^ ^ ^9 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_fk_demo","rlk_room","rlk_mb_aux"]}
 execute as @e[type=minecraft:marker,tag=rlk_fk_demo,limit=1] at @s facing entity @p feet run tp @s ~ ~ ~ ~ 0
-execute as @e[type=minecraft:marker,tag=rlk_fk_demo,limit=1] at @s rotated as @s run function rlk:mboss/fieldgen/fx/rig_stub/spawn
+execute as @e[type=minecraft:marker,tag=rlk_fk_demo,limit=1] at @s rotated as @s run function rlk:mboss/fieldgen/rig/spawn
 scoreboard players set #fkDemo mb 0
 scoreboard players set #fkDT mb 0
 schedule function rlk:mboss/fieldgen/fx/test/e/tick 1t replace

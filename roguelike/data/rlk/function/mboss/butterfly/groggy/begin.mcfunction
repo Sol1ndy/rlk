@@ -5,7 +5,7 @@ scoreboard players set #bfT mb 0
 scoreboard players set #mbNoLeash mb 0
 scoreboard players set #bfMv mb 0
 execute if score #bfForm mb matches 2 run function rlk:mboss/butterfly/form/now_h
-function rlk:mboss/butterfly/rig_stub/play/groggy_h
+function rlk:mboss/butterfly/rig/play/groggy_h
 execute at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~180 0
 function rlk:mboss/butterfly/seq_h/groggy/begin
 function rlk:mboss/butterfly/hud/refresh

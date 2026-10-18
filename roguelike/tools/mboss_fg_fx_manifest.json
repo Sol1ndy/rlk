@@ -5,8 +5,8 @@
  "font": "rlk:mboss_fg",
  "storage": "rlk:fgkit",
  "rig": {
-  "mode": "stub",
-  "functions": "rlk:mboss/fieldgen/fx/rig_stub/",
+  "mode": "real",
+  "functions": "rlk:mboss/fieldgen/rig/",
   "manifest": "mboss_fieldgen_rig_manifest.json"
  },
  "owned": {

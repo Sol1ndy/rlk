@@ -3,14 +3,11 @@
 kill @e[tag=rlk_mb_bf_p14o1]
 kill @e[tag=rlk_mb_bf_p14r1]
 kill @e[tag=rlk_mb_bf_p14v1]
-execute rotated as @s rotated ~ 0 positioned ^-1.2 ^3 ^0.8 run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_p14","rlk_mb_bf_p14o","rlk_mb_bf_p14o1","rlk_mb_bf_p14n"],teleport_duration:1,brightness:{block:15,sky:15}}
-execute as @e[type=minecraft:item_display,tag=rlk_mb_bf_p14n] run function rlk:mboss/butterfly/fx/prop/orb
-execute rotated as @s rotated ~ 0 positioned ^-1.2 ^3 ^0.8 run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_p14","rlk_mb_bf_p14r","rlk_mb_bf_p14r1","rlk_mb_bf_p14r1a","rlk_mb_bf_p14m"],teleport_duration:1,Rotation:[0f,0f]}
-execute as @e[type=minecraft:item_display,tag=rlk_mb_bf_p14m] run function rlk:mboss/butterfly/fx/prop/orb_ring
-tag @e[type=minecraft:item_display,tag=rlk_mb_bf_p14m] remove rlk_mb_bf_p14m
-execute rotated as @s rotated ~ 0 positioned ^-1.2 ^3 ^0.8 run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_p14","rlk_mb_bf_p14r","rlk_mb_bf_p14r1","rlk_mb_bf_p14r1b","rlk_mb_bf_p14m"],teleport_duration:1,Rotation:[30f,55f]}
-execute as @e[type=minecraft:item_display,tag=rlk_mb_bf_p14m] run function rlk:mboss/butterfly/fx/prop/orb_ring
-tag @e[type=minecraft:item_display,tag=rlk_mb_bf_p14m] remove rlk_mb_bf_p14m
+execute rotated as @s rotated ~ 0 positioned ^-1.2 ^3 ^0.8 run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_p14","rlk_mb_bf_p14o","rlk_mb_bf_p14o1","rlk_mb_bf_p14n"],teleport_duration:1}
+execute rotated as @s rotated ~ 0 positioned ^-1.2 ^3 ^0.8 run function rlk:mboss/butterfly/rig/prop/orb
+tag @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_new] add rlk_mb_bf_p14v1
+tag @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_new] add rlk_mb_bf_p14
+tag @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_new] remove rlk_mb_bf_prop_new
 scoreboard players set @e[type=minecraft:item_display,tag=rlk_mb_bf_p14n] mbId 14
 scoreboard players set @e[type=minecraft:item_display,tag=rlk_mb_bf_p14n] mbT 0
 function rlk:mboss/grp_new

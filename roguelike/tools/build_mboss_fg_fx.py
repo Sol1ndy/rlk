@@ -22,7 +22,9 @@ in the module core). Parts, all regenerated on every run:
      "N/20" digit style, the low-gravity icon, a big break badge and flat screen flashes; the meter, low-gravity and
      groggy flags for the boss-bar lines, the per-count feedback and the field banner.
   5. Presets per event of the plan (fx/p/<name>), prop looks (fx/prop/<name>), in-game test and demo functions.
-  6. A REMOVABLE stub rig (tools/mboss_fg_fx_stub_rig.py, F:mboss/fieldgen/fx/rig_stub/**) with the rig API, used by
+  6. (Removed with the merge of the real rig, wip/fg-rig: the stub rig tools/mboss_fg_fx_stub_rig.py that wrote
+     F:mboss/fieldgen/fx/rig_stub/**. The kit now needs the rig manifest; the text below is the stage-1 design.) A stub
+     rig with the rig API, used by
      the kit's demos and meter crack calls only while the real rig manifest tools/mboss_fieldgen_rig_manifest.json
      does not exist. With the manifest present the kit calls rlk:mboss/fieldgen/rig/... and deletes the stub.
 
@@ -2550,9 +2552,9 @@ def build_datapack(dp):
     presets_dp(W)
     props(W)
     tests(W)
-    if rig_mode() == 'stub':
-        import mboss_fg_fx_stub_rig as STUB      # removable with the stub (see its docstring)
-        STUB.emit(W)
+    # The kit's stand-in rig (tools/mboss_fg_fx_stub_rig.py) was removed when the real rig was merged (fg_fx_api.md
+    # section 9): the kit drives rlk:mboss/fieldgen/rig/ and still cleans its old fx/rig_stub/ (an owned dir).
+    assert rig_mode() == 'real', f'{RIG_MANIFEST} is missing: build the field generator rig first (tools/build_mboss_fieldgen_rig.mjs)'
     removed = W.flush()
     return len(W.files), removed
 

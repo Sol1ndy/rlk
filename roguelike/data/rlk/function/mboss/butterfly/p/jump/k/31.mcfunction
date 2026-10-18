@@ -1,2 +1,2 @@
 # jump clock 31
-function rlk:mboss/butterfly/rig_stub/face/player
+function rlk:mboss/butterfly/rig/face/player

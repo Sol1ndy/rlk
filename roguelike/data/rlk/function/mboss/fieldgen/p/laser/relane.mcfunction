@@ -1,10 +1,10 @@
 # The lanes again after a pause (@s = body): tell = the ticks left to the fire (1 while firing), hold to the off.
-execute if score #fgPT mb matches 157.. run return 0
-scoreboard players set #fgX mb 24
+execute if score #fgPT mb matches 155.. run return 0
+scoreboard players set #fgX mb 22
 scoreboard players operation #fgX mb -= #fgPT mb
 execute if score #fgX mb matches ..0 run scoreboard players set #fgX mb 1
 execute store result storage rlk:mboss fg.ln.tell int 1 run scoreboard players get #fgX mb
-scoreboard players set #fgM mb 157
+scoreboard players set #fgM mb 155
 scoreboard players operation #fgM mb -= #fgPT mb
 scoreboard players operation #fgM mb -= #fgX mb
 execute store result storage rlk:mboss fg.ln.hold int 1 run scoreboard players get #fgM mb

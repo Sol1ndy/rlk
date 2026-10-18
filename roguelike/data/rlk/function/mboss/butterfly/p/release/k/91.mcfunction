@@ -1,5 +1,5 @@
 # release clock 91
-function rlk:mboss/butterfly/rig_stub/face/track
+function rlk:mboss/butterfly/rig/face/track
 # the shrunken flat lime wings shatter
 execute rotated as @s rotated ~ 0 positioned ^ ^2.8 ^-0.4 run function rlk:mboss/butterfly/fx/p/wing_shatter
 function rlk:mboss/butterfly/fx/snd/wing_shatter

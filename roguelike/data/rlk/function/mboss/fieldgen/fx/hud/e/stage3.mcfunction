@@ -2,4 +2,4 @@
 # Crack stage 3 (count 15).
 function rlk:mboss/fieldgen/fx/p/bubble_crack
 function rlk:mboss/fieldgen/fx/snd/bubble_crack
-execute if entity @s[type=!minecraft:player] run function rlk:mboss/fieldgen/fx/rig_stub/crack/3
+execute if entity @s[type=!minecraft:player] run function rlk:mboss/fieldgen/rig/crack/3

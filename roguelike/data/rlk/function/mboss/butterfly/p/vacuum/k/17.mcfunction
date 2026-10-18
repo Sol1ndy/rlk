@@ -11,4 +11,4 @@ tag @e[type=minecraft:item_display,tag=rlk_mb_bf_p4n] remove rlk_mb_bf_p4n
 scoreboard players set #bp4B mb 1
 function rlk:mboss/butterfly/fx/snd/vacuum_blade
 playsound minecraft:block.azalea_leaves.break hostile @a[tag=player] ~ ~ ~ 0.6 0.9 0.2
-execute at @s rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.788f,0.949f,0.678f],scale:0.7} ^ ^2.4 ^0.46 0.15 0.15 0.15 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.788f,0.949f,0.678f],scale:0.7} ^0 ^2.436 ^0.154 0.15 0.15 0.15 0 1 force @a[tag=player]

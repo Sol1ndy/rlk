@@ -2,7 +2,7 @@
 # Demo "rocks": the rig in form tower plays tower_throw, the kit fires the events of the plan.
 # Needs test/stage first.
 execute unless entity @e[type=minecraft:marker,tag=rlk_fk_demo,limit=1] run function rlk:mboss/fieldgen/fx/test/stage
-execute as @e[type=minecraft:marker,tag=rlk_fk_demo,limit=1] at @s run function rlk:mboss/fieldgen/fx/rig_stub/form/tower
-execute as @e[type=minecraft:marker,tag=rlk_fk_demo,limit=1] at @s run function rlk:mboss/fieldgen/fx/rig_stub/play/tower_throw
+execute as @e[type=minecraft:marker,tag=rlk_fk_demo,limit=1] at @s run function rlk:mboss/fieldgen/rig/form/tower
+execute as @e[type=minecraft:marker,tag=rlk_fk_demo,limit=1] at @s run function rlk:mboss/fieldgen/rig/play/tower_throw
 scoreboard players set #fkDemo mb 6
 scoreboard players set #fkDT mb -1

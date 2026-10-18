@@ -2,7 +2,7 @@
 # Demo "missiles": the rig in form cruise plays missiles, the kit fires the events of the plan.
 # Needs test/stage first.
 execute unless entity @e[type=minecraft:marker,tag=rlk_fk_demo,limit=1] run function rlk:mboss/fieldgen/fx/test/stage
-execute as @e[type=minecraft:marker,tag=rlk_fk_demo,limit=1] at @s run function rlk:mboss/fieldgen/fx/rig_stub/form/cruise
-execute as @e[type=minecraft:marker,tag=rlk_fk_demo,limit=1] at @s run function rlk:mboss/fieldgen/fx/rig_stub/play/missiles
+execute as @e[type=minecraft:marker,tag=rlk_fk_demo,limit=1] at @s run function rlk:mboss/fieldgen/rig/form/cruise
+execute as @e[type=minecraft:marker,tag=rlk_fk_demo,limit=1] at @s run function rlk:mboss/fieldgen/rig/play/missiles
 scoreboard players set #fkDemo mb 4
 scoreboard players set #fkDT mb -1

@@ -18,8 +18,8 @@ scoreboard players set #fgMv mb 0
 scoreboard players set #fgBrkQ mb 0
 scoreboard players set #fgBrkFx mb 0
 tag @s remove rlk_mb_inv
-function rlk:mboss/fieldgen/rig_stub/init
-function rlk:mboss/fieldgen/rig_stub/spawn
+function rlk:mboss/fieldgen/rig/init
+function rlk:mboss/fieldgen/rig/spawn
 execute if score #fgX mb matches 1 run function rlk:mboss/fieldgen/field/drop
 execute if score #fgX mb matches 2 run function rlk:mboss/fieldgen/field/up
 execute if score #fgX mb matches 3 run function rlk:mboss/fieldgen/field/now_c

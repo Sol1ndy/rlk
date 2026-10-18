@@ -1,17 +1,18 @@
 """Field generator core: hooks, the state machine (entrance, the cruise rotation with its range-band shuffle bag, the
 field trigger, the field sequence: warp to the centre, 「인력 충격파」 x3, field patterns, the closing waves, the pack-up),
 the 20-hit break meter (counting rules, HUD, crack stages), the break, groggy 200 t and recovery, the field damage cut,
-low gravity on and off, the body clamp r 16.5, the per-form hitbox, death, pause, reload, uninstall, tests, the
-core's vanilla fx (cfx/) and the generated pattern dispatchers. See __init__.py for the package layout and the
+low gravity on and off, the body clamp r 16.5, the per-form hitbox, death, pause, reload, uninstall, tests and the
+generated pattern dispatchers. See __init__.py for the package layout and the
 scratchpad file mb3/fg_contract.md for the core <-> pattern contract.
 
 Owns F:mboss/fieldgen/** except F:mboss/fieldgen/rig/** (the rig generator, wip/fg-rig) and the fx kit's paths
 (tools/build_mboss_fg_fx.py: fx/{card,cardx,look,clear,uninstall} and fx/{e,p,tele,snd,hud,prop,test,rig_stub}/**,
 listed under "owned" in tools/mboss_fg_fx_manifest.json). Every file it owns is deleted and rewritten on each run
-(F:mboss/fieldgen/rig_stub/ too: it exists only while api.STUB). The kit is the effect engine: the core wires its
+(so the stand-in rig's old rig_stub/ and the retired vanilla cfx/ go too). The kit is the effect engine: the core wires its
 hooks (uninstall, cleanup, pause, death, the break), the meter protocol (meter_open / meter_hit / meter_close), the
 field banner, the low-gravity and groggy flags and the boss-bar lines (put_extra / put_sub, redrawn when the kit's
-#fkHudV changes); fg_contract.md section 15. The core's other visuals are still vanilla (cfx/**).
+#fkHudV changes); fg_contract.md section 15. The core's sequence visuals are the authors' seq_c.py (entrance,
+death) and seq_f.py (warp, unfold, banner, field ambience, pack-up, break, groggy, recovery), both on the kit.
 Copied from tools/mboss_butterfly/core.py; the butterfly review findings (scratchpad mb2/review/core_findings.json)
 are not copied: kept markers die with their pattern (S1), g.release never stops the AI (S2), the body clamp is real
 (S6), test cuts and reloads re-derive the rig form and the counters from the state (S3, S4, S8), the blade reach is
@@ -80,10 +81,11 @@ GOLD_HEX, VIOLET_HEX = A.GOLD_HEX, A.VIOLET_HEX
 BANNER = '중력이 감소하고 점프 능력이 향상됩니다'
 HINT = '코어를 공격해 역장을 깨뜨리세요'
 BANNER_T = 80                                 # the kit's field banner holds the actionbar this long (hud/banner_field)
-# The kit's hud/meter_hit cracks the core bubble itself at counts 5 / 10 / 15 (<RIG>crack/<n> as the body). While
-# the kit drives another rig than the core (its own stub rig, before wip/fg-rig is merged) the core keeps its own
-# crack call; once both drive the same rig the core calls crack only for a stage the kit skipped (test 31's +5 jumps).
-KIT_CRACKS = K.RIG() == f'{NS}{A.RIG_DIR}/'
+# The kit's hud/meter_hit cracks the core bubble itself at counts 5 / 10 / 15 (<RIG>crack/<n> as the body): the kit
+# and the core drive the same rig (rig/), so the core calls crack only for a stage the kit skipped (test 31's +5
+# jumps, reloads). Rerun the kit generator after a rig change: its RIG() must name the module's rig.
+KIT_CRACKS = True
+assert K.RIG() == f'{NS}{A.RIG_DIR}/', (K.RIG(), 'rerun python3 tools/build_mboss_fg_fx.py with the rig manifest present')
 KF = K.FN                                     # rlk:mboss/fieldgen/fx/
 
 # The field opening and the pack-up are core service patterns (their mechanics belong to the core).
@@ -122,14 +124,11 @@ def build():
     for p in pats:
         for f in ('start', 'tick', 'cancel'):
             assert g.has(f'p/{p.key}/{f}'), f'{p.module}: pattern {p.key} has no {f}'
-    if A.STUB:
-        from . import stub_rig
-        stub_rig.emit(g)
     removed = clean(out)
     normal = [p for p in pats if p.kind == 'normal']
     print(f'mboss fieldgen: {len(g.files)} functions ({len(normal)} normal + {len(pats) - len(normal)} service patterns '
           f'from {", ".join(PATTERN_MODULES)} + core), {removed} stale removed, rig '
-          f'{"STUB (" + A.MANIFEST.name + ")" if A.STUB else A.MANIFEST.name}.')
+          f'{A.MANIFEST.name}.')
     for clip, event, default in sorted(set(A.FALLBACKS)):
         print(f'  note: manifest clip {clip} has no event {event!r}; using tick {default}')
 
@@ -225,7 +224,6 @@ class Core:
         self.death()
         self.hud()
         self.tests()
-        self.cfx()
         self.services()
 
     # -----------------------------------------------------------------------------------------
@@ -775,17 +773,12 @@ class Core:
             'scoreboard players operation #fkM mb = #fgBrk mb',
             f'execute positioned ~ ~{L.num(A.CORE_FIELD_H)} ~ run {K.hud("meter_hit")}',
             F('hud/refresh')])
-        if KIT_CRACKS:
-            stage = ['# The core bubble shows the next crack stage (#fgCrack, read by reloads and tests). The kit\'s meter_hit',
-                     '# cracks the rig on the counts 5 / 10 / 15; the core does it only for a stage reached another way (test 31).',
-                     'scoreboard players operation #fgCrack mb = #fgX mb',
-                     f'execute unless score #fgBrk mb matches 5 unless score #fgBrk mb matches 10 unless score #fgBrk mb matches 15 run {F("u/crack_d")}']
-        else:
-            stage = ['# The core bubble shows the next crack stage (#fgCrack, read by reloads and tests). The kit\'s meter_hit',
-                     f'# cracks its own stub rig ({K.RIG()}) while the real rig is not merged, so the core cracks its rig here.',
-                     'scoreboard players operation #fgCrack mb = #fgX mb',
-                     F('u/crack_d')]
-        self.w('brk/stage', stage)
+        assert KIT_CRACKS
+        self.w('brk/stage', [
+            '# The core bubble shows the next crack stage (#fgCrack, read by reloads and tests). The kit\'s meter_hit',
+            '# cracks the rig on the counts 5 / 10 / 15; the core does it only for a stage reached another way (test 31).',
+            'scoreboard players operation #fgCrack mb = #fgX mb',
+            f'execute unless score #fgBrk mb matches 5 unless score #fgBrk mb matches 10 unless score #fgBrk mb matches 15 run {F("u/crack_d")}'])
         self.w('u/crack_d', ['# The rig crack look of #fgCrack (0-3 the meter stages, 4 burst).']
                + [f'execute if score #fgCrack mb matches {n} run return run {R(f"crack/{n}")}' for n in A.CRACKS])
         self.w('brk/begin', [
@@ -1016,49 +1009,6 @@ class Core:
                             'scoreboard players operation #fgTri mb = #fgX mb',
                             'execute if score #fgTri mb matches 1 run tellraw @a[tag=player] {text:"[테스트] 세 겹 충격파 켬",color:"gray"}',
                             'execute if score #fgTri mb matches 0 run tellraw @a[tag=player] {text:"[테스트] 세 겹 충격파 끔",color:"gray"}'])
-
-    # -----------------------------------------------------------------------------------------
-    def cfx(self):
-        """The core's own visuals: vanilla particles and mechanical / brass vanilla sounds (plan: anvil, chain, piston,
-        beacon, respawn anchor, amethyst, trial spawner, breeze charge, crafter). The meter count, the crack stages and
-        the banner are the kit's now (hud/meter_hit, hud/banner_field); the entrance, warp, break, groggy and death
-        visuals here are mapped to kit presets by the stage-2 specs (scratchpad mb3/spec E, S1-S4)."""
-        g = self.g
-        G, GD, WG, V, VD = A.GOLD, A.GOLD_DEEP, A.WHITE_GOLD, A.VIOLET, A.VIOLET_DEEP
-        at = lambda y, *cmds: [f'execute at @s run {c}' for c in cmds]
-        fx = {
-            # [seq_c: cruise author] the entrance (E) and death (S4) visuals moved to the kit: seq_c/entrance, seq_c/death
-            'warp_out': ['# @s = body at the old spot: the white-cyan pillar and the warp sounds.',
-                         *[g.particle('end_rod', f'~ ~{y} ~', (0.2, 0.4, 0.2), 0.02, 3) for y in (1, 3, 5, 7)],
-                         g.sound('block.respawn_anchor.deplete', 1.0, 1.2), g.sound('entity.enderman.teleport', 0.8, 0.6)],
-            'warp_in': ['# @s = body at the centre: the warp-in flash.',
-                        g.particle('flash{color:[0.92,0.86,1.0,1.0]}', '~ ~5 ~', (0, 0, 0), 0, 1),
-                        g.particle('end_rod', '~ ~5 ~', (1.2, 1.2, 1.2), 0.08, 20),
-                        g.sound('block.beacon.power_select', 1.0, 0.8), g.sound('entity.enderman.teleport', 0.8, 0.8)],
-            'unfold_f': [*g.ring_dust(V, 3.8, 16, 3.8, 1.4), g.sound('block.amethyst_block.chime', 1.0, 0.8),
-                         g.sound('block.chain.place', 0.9, 0.7), g.sound('block.crafter.craft', 0.8, 0.7)],
-            'pebbles': ['# At the player\'s feet (never at the eyes): pebbles and ash drifting up (low gravity).',
-                        g.particle('white_ash', '~ ~0.6 ~', (3.0, 0.4, 3.0), 0, 6),
-                        g.particle('end_rod', '~ ~0.4 ~', (3.0, 0.2, 3.0), 0.005, 1),
-                        g.dust(V, 0.9, '~ ~0.3 ~', (2.5, 0.2, 2.5), 2)],
-            'break_start': [g.sound('block.respawn_anchor.deplete', 1.0, 0.7),
-                            g.particle('end_rod', '~ ~3.8 ~', (0.9, 0.9, 0.9), 0.02, 12)],
-            'break_burst': [g.particle('flash{color:[1.0,0.9,0.62,1.0]}', '~ ~3.8 ~', (0, 0, 0), 0, 1),
-                            g.dust(WG, 1.6, '~ ~3.8 ~', (1.2, 1.2, 1.2), 20), *g.ring_dust(GD, 4.0, 20, 0.2, 1.4),
-                            g.sound('block.glass.break', 1.0, 0.8), g.sound('block.amethyst_cluster.break', 1.0, 0.7),
-                            g.sound('block.respawn_anchor.deplete', 1.0, 0.5)],
-            'groan': [g.sound('block.anvil.place', 0.8, 0.5), g.sound('entity.iron_golem.damage', 0.7, 0.6)],
-            'groggy': [g.sound('block.beacon.deactivate', 0.9, 0.7), g.particle('smoke', '~ ~2 ~', (0.8, 0.5, 0.8), 0.01, 10)],
-            'groggy_spark': [g.particle('electric_spark', '~ ~2.6 ~', (0.8, 0.6, 0.8), 0.05, 4), g.sound('block.chain.hit', 0.3, 1.6)],
-            'recover': [g.sound('block.piston.contract', 0.9, 0.7), g.sound('block.chain.place', 0.9, 0.8)],
-            'flip': [g.sound('block.crafter.craft', 0.9, 0.8), g.sound('block.beacon.power_select', 0.7, 1.2),
-                     g.particle('end_rod', '~ ~4.6 ~', (0.4, 0.3, 0.4), 0.02, 6)],
-        }
-        for name, lines in fx.items():
-            body = [ln for ln in lines if ln.startswith('#')] + [f'execute at @s run {ln}' for ln in lines if not ln.startswith('#')]
-            if name == 'pebbles':
-                body = [ln for ln in lines]
-            self.w(f'cfx/{name}', [f'# Core fx {name} (vanilla particles / sounds; @s = body unless noted).'] + body)
 
     # -----------------------------------------------------------------------------------------
     def services(self):

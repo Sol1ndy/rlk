@@ -53,4 +53,3 @@ schedule clear rlk:mboss/fieldgen/fx/e/world
 schedule clear rlk:mboss/fieldgen/fx/hud/e/unflash
 schedule clear rlk:mboss/fieldgen/fx/test/e/tick
 schedule clear rlk:mboss/fieldgen/fx/test/e/mturn
-function rlk:mboss/fieldgen/fx/rig_stub/uninstall

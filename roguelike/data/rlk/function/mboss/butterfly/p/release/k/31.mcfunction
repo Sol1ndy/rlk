@@ -6,6 +6,6 @@ scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run function rlk:mboss/hz/disc {r:100,tell:22,dmg:260}
 execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run function rlk:mboss/butterfly/fx/tele/disc {r:100,tell:22,el:7,hold:4}
-execute rotated as @s rotated ~ 0 positioned ^0 ^3.24 ^0.23 run function rlk:mboss/butterfly/fx/card {kind:"glow",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:1,s1:1.8,move:"0f,0f,0f",life:8,fade:3,col:14217916}
+execute rotated as @s rotated ~ 0 positioned ^0 ^5.071 ^0.3 run function rlk:mboss/butterfly/fx/card {kind:"glow",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:1,s1:1.8,move:"0f,0f,0f",life:8,fade:3,col:14217916}
 playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.7 1.2 0.23
 playsound minecraft:block.beacon.activate hostile @a[tag=player] ~ ~ ~ 0.6 1.6 0.2

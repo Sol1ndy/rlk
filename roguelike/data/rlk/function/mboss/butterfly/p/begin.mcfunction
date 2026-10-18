@@ -38,7 +38,6 @@ execute if score #bfPat mb matches 14 run scoreboard players set #bfPCol mb 7
 execute if score #bfPat mb matches 15 run scoreboard players set #bfPCol mb 7
 execute if score #bfPat mb matches 20 run scoreboard players set #bfPCol mb 7
 execute if score #bfPat mb matches 1 run scoreboard players set #bfPT mb -2
-execute if score #bfPat mb matches 12 run scoreboard players set #bfPT mb -5
 function rlk:mboss/butterfly/hud/refresh
 execute if score #bfPT mb matches 0 run function rlk:mboss/butterfly/p/clip_d
 function rlk:mboss/butterfly/p/start

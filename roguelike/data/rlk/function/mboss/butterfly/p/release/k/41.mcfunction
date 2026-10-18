@@ -1,5 +1,5 @@
 # release clock 41
-execute rotated as @s rotated ~ 0 positioned ^0 ^3.24 ^0.23 run function rlk:mboss/butterfly/fx/p/rel_cage
+execute rotated as @s rotated ~ 0 positioned ^0 ^5.001 ^0.3 run function rlk:mboss/butterfly/fx/p/rel_cage
 playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.6 1.5 0.2
 # the safe line just outside the dome (r 10.5)
 execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p15r,limit=1] run particle minecraft:end_rod ~0 ~0.3 ~10.5 0 0 0 0 1 force @a[tag=player]

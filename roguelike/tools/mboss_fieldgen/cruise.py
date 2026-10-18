@@ -27,8 +27,9 @@ every recommended answer of spec/README.md section 5 is accepted):
   lanes), the kit's card caps (64 fx / 40 telegraph cards) hold for every pattern.
 
 Clock: #fgPT = the clip tick of the pattern's clip (the core plays it at 0). Every rig event is read with ev_or from
-the manifest (the stub's numbers while the real rig is not merged; the specs quote the real rig of 0f7c0e8), anchors
-with api.c_anchor (the specs' body-frame points while the stub has none). Pattern scores #fq<id>*, tags
+the rig manifest (the real rig since the integration; the ev_or defaults are the old stub's numbers and never apply
+now: the build prints a note for any default it uses), anchors with api.c_anchor (the manifest's clip anchors; the
+defaults are the specs' body-frame points). Pattern scores #fq<id>*, tags
 rlk_mb_fg_p<id>* + rlk_mb_fg_pat. Deviations: scratchpad mb3/fg_contract.md section 16.
 """
 import math
@@ -351,9 +352,7 @@ def laser(g):
     key, tl = 'laser', TL(g, 'laser')
     HZ = {'e': 'rlk_mb_fg_p3e', 'g': 'rlk_mb_fg_p3g'}
     LANE = {'e': 0, 'g': 1}
-    BP = {'e': 'rlk_mb_fg_p3be', 'g': 'rlk_mb_fg_p3bg'}            # stub-only beam props (the real rig draws its beams)
     hz = {b: mk(HZ[b]) for b in 'eg'}
-    tags = '"rlk_room","rlk_mb_aux","rlk_mb_fg_pat","rlk_mb_fg_p3"'
 
     def opts():
         return g.hz_opts(act=C3_ACT, y0=-0.5, y1=2.0, kb=KB['light'], grp=True, rearm=10, sfx=0, quiet=1, vis=31)
@@ -385,20 +384,6 @@ def laser(g):
             *[beam_at(b, spot, g.fx('laser_spot')) for b in 'eg'],
             at_body(4.5, g.snd('laser_fire'))]
     fire += [f'execute as {hz[b]} run ' + g.hz_resize(C3_LLEN, 0, C3_W_BLOOM) for b in 'eg']
-    if A.STUB:
-        # the stub rig draws no beams: the kit's beam props stand in (core + glow sleeve), re-aimed with the hazards
-        fire += ['kill @e[type=minecraft:item_display,tag=rlk_mb_fg_p3b]']
-        for b in 'eg':
-            for part in ('laser_core', 'laser_glow'):
-                fire += [beam_at(b, muz, f'summon minecraft:item_display ~ ~ ~ {{Tags:[{tags},"rlk_mb_fg_p3b","{BP[b]}",'
-                                          f'"rlk_mb_fg_pnew"],teleport_duration:1}}'),
-                         f'execute as @e[type=minecraft:item_display,tag=rlk_mb_fg_pnew] run {g.kprop(part)}',
-                         f'execute as @e[type=minecraft:item_display,tag=rlk_mb_fg_pnew] run data merge entity @s '
-                         f'{{transformation:{{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],'
-                         f'scale:[{"0.45" if part == "laser_core" else "1"}f,{L.num(C3_BEAM_LEN, 2)}f,{"0.45" if part == "laser_core" else "1"}f]}}}}',
-                         'tag @e[type=minecraft:item_display,tag=rlk_mb_fg_pnew] remove rlk_mb_fg_pnew']
-            fire.append(f'execute as @e[type=minecraft:item_display,tag={BP[b]}] at {BODY} rotated as {hz[b]} rotated ~ 0 '
-                        f'positioned {muz} run tp @s ~ ~ ~ ~ {C3_PITCH - 90}')
     tl.at(C3_FIRE, *fire)
     tl.at(C3_FIRE + C3_BLOOM_T, *[f'execute as {hz[b]} run ' + g.hz_resize(C3_LLEN, 0, C3_W) for b in 'eg'])
     for i, t in enumerate(range(C3_FIRE, C3_OFF, 10)):
@@ -408,7 +393,7 @@ def laser(g):
         tl.at(t, beam_at('e', spot, g.fx('spark')), beam_at('e', spot, g.sound('block.amethyst_block.resonate', 0.4, 1.6)))
     off = [*[beam_at(b, muz, g.fx('laser_end'), C3_PITCH) for b in 'eg'],
            g.tele_mline_end(0), g.tele_mline_end(1), at_body(4.5, g.snd('laser_stop')),
-           *kill_mk(HZ['e'], HZ['g']), 'kill @e[type=minecraft:item_display,tag=rlk_mb_fg_p3b]']
+           *kill_mk(HZ['e'], HZ['g'])]
     tl.at(C3_OFF, *off)
     tl.at(C3_RETRACT + 7, at_body(4.5, g.sound('block.piston.contract', 0.6, 0.9)))
     tl.at(C3_LEN, *kill_mk(HZ['e'], HZ['g']), g.end())
@@ -419,9 +404,6 @@ def laser(g):
         aim += [f'execute as {hz[b]} at {BODY} rotated as @s rotated ~{L.num(C3_DYAW[b])} 0 positioned ^ ^ ^{L.num(C3_R0)} '
                 f'run function rlk:mboss/hz/aim',
                 f'execute as {hz[b]} rotated as @s run ' + g.tele_mline_aim(LANE[b])]
-        if A.STUB:
-            aim.append(f'execute as @e[type=minecraft:item_display,tag={BP[b]}] at {BODY} rotated as {hz[b]} rotated ~ 0 '
-                       f'positioned {muz} run tp @s ~ ~ ~ ~ {C3_PITCH - 90}')
     aim += ['scoreboard players operation #fgM mb = #fgPT mb', 'scoreboard players operation #fgM mb %= #fgK3 mb']
     aim += [f'execute if score #fgM mb matches {C3_FIRE % 3} run ' + beam_at(b, spot, g.fx('laser_spot')) for b in 'eg']
     g.pw(key, 'aim', aim)
@@ -451,7 +433,7 @@ def laser(g):
     g.pw(key, 'vis', ['# @s = a beam hazard (#hzEv 1 = the fire): the beams and their floor spots are drawn by the rig and the',
                       '# aim function; nothing more here.'])
     g.pw(key, 'pause', pause_lines(3))
-    g.pw(key, 'cancel', ['# Both beams, their lanes and the stub beam props.', *kill_mk(HZ['e'], HZ['g']),
+    g.pw(key, 'cancel', ['# Both beams and their lanes (the rig draws the beams themselves).', *kill_mk(HZ['e'], HZ['g']),
                          g.tele_mline_end(0), g.tele_mline_end(1), 'kill @e[tag=rlk_mb_fg_p3]'])
 
 

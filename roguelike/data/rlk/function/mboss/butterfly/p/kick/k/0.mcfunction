@@ -1,5 +1,5 @@
 # kick clock 0
-function rlk:mboss/butterfly/rig_stub/face/track
+function rlk:mboss/butterfly/rig/face/track
 execute positioned as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] run function rlk:mboss/mv/glide {t:5}
 playsound minecraft:entity.breeze.jump hostile @a[tag=player] ~ ~ ~ 0.6 1.3 0.2
 playsound minecraft:block.moss_carpet.step hostile @a[tag=player] ~ ~ ~ 0.5 1 0.17

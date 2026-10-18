@@ -2,7 +2,7 @@
 # One meter count, all its feedback (the module calls it once per counted hit, with #fkM mb = the new
 # count 1-20): the newest pip flashes white for 4 t, the crack glint at the executing position (run it at
 # the core), the brass ping plus a note that rises with the count, and on 5 / 10 / 15 the bubble cracks a
-# stage: a bigger crack flash, the crack sound and rlk:mboss/fieldgen/fx/rig_stub/crack/<1-3> as @s (run it as the
+# stage: a bigger crack flash, the crack sound and rlk:mboss/fieldgen/rig/crack/<1-3> as @s (run it as the
 # rig anchor, the body; without an anchor the rig call does nothing). Does not count anything itself.
 execute if score #fkM mb matches ..0 run scoreboard players set #fkM mb 1
 execute if score #fkM mb matches 21.. run scoreboard players set #fkM mb 20

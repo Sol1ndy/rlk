@@ -1,5 +1,5 @@
 # jump clock 3
-function rlk:mboss/butterfly/rig_stub/face/track
+function rlk:mboss/butterfly/rig/face/track
 scoreboard players set #hzAct mb 4
 scoreboard players set #hzKB mb 3
 scoreboard players set #hzSfx mb 0
