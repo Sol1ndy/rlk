@@ -30,6 +30,7 @@ scoreboard objectives add mbHzY0 dummy
 scoreboard objectives add mbHzY1 dummy
 scoreboard objectives add mbHzHit dummy
 scoreboard objectives add mbHzCol dummy
+scoreboard objectives add mbHzG dummy
 scoreboard objectives add mbPjV dummy
 scoreboard objectives add mbPjT dummy
 scoreboard objectives add mbPjL dummy
@@ -40,6 +41,8 @@ scoreboard objectives add mbPjR dummy
 scoreboard objectives add mbPjHit dummy
 scoreboard objectives add mbPjRet dummy
 scoreboard objectives add mbPjW dummy
+scoreboard objectives add mbPjK dummy
+scoreboard objectives add mbPjG dummy
 scoreboard objectives add mbPlT dummy
 scoreboard objectives add mbPlF dummy
 scoreboard objectives add mbMvK dummy
@@ -95,6 +98,12 @@ execute unless score #mbGoldMul mb matches 1.. run scoreboard players set #mbGol
 execute unless score #mbSap mb matches 0.. run scoreboard players set #mbSap mb 1
 execute unless score #mbLive mb matches 0.. run scoreboard players set #mbLive mb 0
 execute unless score #mbLd mb matches 0.. run scoreboard players set #mbLd mb 0
+# Player-side fight modifiers a module may set (player_heal, items/hook/stat_buffs); a /reload keeps a
+# running fight's values (the module reload hook re-asserts them), so only unset ones are initialised.
+execute unless score #mbHealPct mb matches -1000.. run scoreboard players set #mbHealPct mb 100
+execute unless score #mbCritAdd mb matches -1000.. run scoreboard players set #mbCritAdd mb 0
+execute unless score #mbHealEv mb matches 0.. run scoreboard players set #mbHealEv mb 0
+execute unless score #mbGrpN mb matches 0.. run scoreboard players set #mbGrpN mb 0
 # Library activity flags (a set flag makes the world tick scan for that library's entities once).
 scoreboard players set #mbHzOn mb 1
 scoreboard players set #mbPjOn mb 1

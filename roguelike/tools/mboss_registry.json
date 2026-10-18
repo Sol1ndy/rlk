@@ -26,6 +26,13 @@
       "icon": {"item": "minecraft:wither_skeleton_skull", "model": "minecraft:wither_skeleton_skull"}
     },
     {
+      "id": "butterfly", "n": 2, "enabled": true, "w": 10, "minCh": 1, "maxCh": 99,
+      "name": "달빛 환영 나비", "sub": "달빛의 화신", "color": "#B6E35A", "el": 7,
+      "hp": 240, "xp": 30, "atk": 12, "lvAdd": 0, "dmgMul": 110, "goldMul": 5, "sap": 1, "picks": 2,
+      "scale": 1.4, "hit": {"w": 1.6, "h": 3.0}, "intro": 140, "death": 100, "deathSnd": false,
+      "icon": {"item": "minecraft:verdant_froglight", "model": "minecraft:verdant_froglight"}
+    },
+    {
       "id": "proto", "n": 99, "enabled": true, "w": 0, "minCh": 1, "maxCh": 99,
       "name": "시험용 강적", "sub": "중간보스 틀 점검용", "color": "#C9B27A", "el": 0,
       "hp": 120, "xp": 20, "atk": 10, "lvAdd": 0, "dmgMul": 120, "goldMul": 5, "sap": 1, "picks": 2,

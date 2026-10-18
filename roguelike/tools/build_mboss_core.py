@@ -69,8 +69,10 @@ PER_ENTITY = [
     'mbHzK', 'mbHzT', 'mbHzW', 'mbHzA', 'mbHzL', 'mbHzD', 'mbHzE', 'mbHzB', 'mbHzKD', 'mbHzS',
     'mbHzV', 'mbHzI', 'mbHzR', 'mbHzR0', 'mbHzC', 'mbHzAng', 'mbHzRR', 'mbHzRI', 'mbHzLo',
     'mbHzHi', 'mbHzHW', 'mbHzFX', 'mbHzFZ', 'mbHzY0', 'mbHzY1', 'mbHzHit', 'mbHzCol',
-    # projectiles
-    'mbPjV', 'mbPjT', 'mbPjL', 'mbPjD', 'mbPjE', 'mbPjB', 'mbPjR', 'mbPjHit', 'mbPjRet', 'mbPjW',
+    # hazard volley group (one hit per group)
+    'mbHzG',
+    # projectiles (mbPjK hit shape 0 sphere / 1 blade, mbPjG volley group)
+    'mbPjV', 'mbPjT', 'mbPjL', 'mbPjD', 'mbPjE', 'mbPjB', 'mbPjR', 'mbPjHit', 'mbPjRet', 'mbPjW', 'mbPjK', 'mbPjG',
     # pull
     'mbPlT', 'mbPlF',
     # movement
@@ -150,6 +152,12 @@ w('init', '\n'.join(
        'execute unless score #mbSap mb matches 0.. run scoreboard players set #mbSap mb 1',
        'execute unless score #mbLive mb matches 0.. run scoreboard players set #mbLive mb 0',
        'execute unless score #mbLd mb matches 0.. run scoreboard players set #mbLd mb 0',
+       '# Player-side fight modifiers a module may set (player_heal, items/hook/stat_buffs); a /reload keeps a',
+       '# running fight\'s values (the module reload hook re-asserts them), so only unset ones are initialised.',
+       'execute unless score #mbHealPct mb matches -1000.. run scoreboard players set #mbHealPct mb 100',
+       'execute unless score #mbCritAdd mb matches -1000.. run scoreboard players set #mbCritAdd mb 0',
+       'execute unless score #mbHealEv mb matches 0.. run scoreboard players set #mbHealEv mb 0',
+       'execute unless score #mbGrpN mb matches 0.. run scoreboard players set #mbGrpN mb 0',
        '# Library activity flags (a set flag makes the world tick scan for that library\'s entities once).',
        'scoreboard players set #mbHzOn mb 1', 'scoreboard players set #mbPjOn mb 1',
        'scoreboard players set #mbPlOn mb 1', 'scoreboard players set #mbMvOn mb 1',
@@ -208,6 +216,9 @@ scoreboard players set #pjEl mb -1
 scoreboard players set #pjKB mb 2
 scoreboard players set #pjRet mb 0
 scoreboard players set #pjWall mb 1
+scoreboard players set #pjShape mb 0
+scoreboard players set #pjGrp mb 0
+scoreboard players set #hzGrp mb 0
 scoreboard players set #pullFace mb 1
 scoreboard players set #auxHp mb 100
 scoreboard players set #auxHpPct mb 0
@@ -381,7 +392,27 @@ data modify storage rlk:mboss sub set value []
 data modify storage rlk:mboss extra set value []
 data modify storage rlk:mboss aura set value []
 scoreboard players set #mbAuraK mb -1
+function rlk:mboss/player_reset
 function rlk:mboss/opts_reset
+''')
+w('player_reset', '''
+# Player-side fight modifiers back to neutral (fight start, cleanup_fight): healing received 100 %, no crit
+# change, no pending heal events. The player's crit chance is recomputed every 2 t (items/stat_light).
+scoreboard players set #mbHealPct mb 100
+scoreboard players set #mbCritAdd mb 0
+scoreboard players set #mbHealEv mb 0
+''')
+w('player_heal', '''
+# From items/hook/on_heal, its first line (@s = player, #heal tmp >= 1), only while a fight is live (#mbLive 1).
+# Every heal attempt counts as one heal event (#mbHealEv mb +1; the running module reads and clears it in its
+# tick, e.g. the butterfly's 달빛 고치 cure), and the healing received is x #mbHealPct % (set by the module,
+# 100 = unchanged), at least 1. It runs before the character hooks (Clorinde's Night Vigil turns heals into
+# Bond of Life), so a heal that a character converts still counts and is reduced first.
+scoreboard players add #mbHealEv mb 1
+execute if score #mbHealPct mb matches 100 run return 0
+scoreboard players operation #heal tmp *= #mbHealPct mb
+scoreboard players operation #heal tmp /= #c100 mb
+execute if score #heal tmp matches ..0 run scoreboard players set #heal tmp 1
 ''')
 
 w('body', '''
@@ -702,6 +733,7 @@ scoreboard players set #mbFail mb 0
 scoreboard players set #mbLd mb 0
 scoreboard players set #mbNoLeash mb 0
 scoreboard players set #mbLive mb 0
+function rlk:mboss/player_reset
 data modify storage rlk:mboss sub set value []
 data modify storage rlk:mboss extra set value []
 ''')
@@ -1172,7 +1204,8 @@ for kind, keys, body in (
     w('hz/' + kind, '\n'.join([
         f'# {doc}',
         '# As anything, positioned on the floor point, rotated = aim (pitch ignored). tell = ticks of telegraph',
-        '# until the hit is resolved, dmg = % of the boss base hit. Units: tenths of a block. Options: opts_reset.',
+        '# until the hit is resolved, dmg = % of the boss base hit (0 = telegraph only). Units: tenths of a block.',
+        '# Options: opts_reset (#hzGrp = volley group, see mboss/grp_new).',
         f'# Call: function rlk:mboss/hz/{kind} {{' + ','.join(f'{k}:..' for k in keys) + '}'] + body + [
         '$scoreboard players set #hzW mb $(tell)', '$scoreboard players set #hzD mb $(dmg)',
         'function rlk:mboss/hz/make']))
@@ -1206,6 +1239,7 @@ execute unless score @s mbHzKD matches 0..1 run scoreboard players set @s mbHzKD
 execute if score @s mbHzK matches 4 unless score #hzKBDir mb matches 0..1 run scoreboard players set @s mbHzKD 1
 scoreboard players operation @s mbHzS = #hzSfx mb
 scoreboard players operation @s mbHzV = #hzVis mb
+scoreboard players operation @s mbHzG = #hzGrp mb
 scoreboard players operation @s mbHzCol = @s mbHzE
 execute if score #hzCol mb matches 0.. run scoreboard players operation @s mbHzCol = #hzCol mb
 execute if score #hzQuiet mb matches 1 run tag @s add rlk_mb_hzq
@@ -1328,7 +1362,8 @@ execute if score @s mbHzT < @s mbHzW if score #t mb matches 0 unless entity @s[t
 execute if score @s mbHzT = @s mbHzW run function rlk:mboss/hz/strike
 scoreboard players operation #hzEnd mb = @s mbHzW
 scoreboard players operation #hzEnd mb += @s mbHzA
-execute if score @s mbHzHit matches 0 if score @s mbHzT >= @s mbHzW if score @s mbHzT < #hzEnd mb run function rlk:mboss/hz/hit
+# dmg 0 = telegraph only (outline, strike flash and the module visuals; never a hit)
+execute if score @s mbHzHit matches 0 if score @s mbHzD matches 1.. if score @s mbHzT >= @s mbHzW if score @s mbHzT < #hzEnd mb run function rlk:mboss/hz/hit
 ''')
 w('hz/expire', '''
 execute if score @s mbHzV matches 1.. run scoreboard players set #hzEv mb 2
@@ -1521,6 +1556,8 @@ scoreboard players operation #cmEl tmp = @s mbHzE
 scoreboard players operation #mbKB mb = @s mbHzB
 scoreboard players operation #mbKBDir mb = @s mbHzKD
 function rlk:mboss/hurt
+scoreboard players operation #g mb = @s mbHzG
+execute if score #dodged tmp matches 0 if score #g mb matches 1.. run function rlk:mboss/grp_mark
 ''')
 w('hz/cancel', '''
 # Cancels the hazard with id #hzLast mb (or any: set #hzLast mb before the call). Module visuals get event 2.
@@ -1558,7 +1595,9 @@ w('pj/launch', '''
 # @s = a prop entity the module summoned (item/block display, marker ...), positioned at the launch point,
 # rotated = flight direction (pitch counts). {spd: tenths per tick, life: ticks, dmg: % of the base hit
 # (0 = visual only), hr: hit radius in tenths}. Options: #pjEl, #pjKB, #pjRet (1 = fly back to the body's
-# eyes at the end), #pjWall (0 = ignore walls). Events go to the module hook pj_end with #pjEv 1 wall,
+# eyes at the end), #pjWall (0 = ignore walls), #pjShape (0 sphere of radius hr; 1 blade: a line hr wide on
+# each side across the flight, see pj/b/*), #pjGrp (volley group id from mboss/grp_new: the first hit that lands
+# makes every prop and hazard of the group harmless). Steering: mboss/pj/steer. Events go to the module hook pj_end with #pjEv 1 wall,
 # 2 life over, 3 back at the body (or the return time ran out), 4 hit the player; #pjKeep mb is preset to
 # the default and the hook may flip it: 1 = the prop lives on (4: keeps flying, it pierces; 1/2 of a
 # returning prop: flies back; otherwise released as a plain entity), 0 = removed at once.
@@ -1580,6 +1619,8 @@ execute if score #pjEl mb matches 0.. run scoreboard players operation @s mbPjE 
 scoreboard players operation @s mbPjB = #pjKB mb
 scoreboard players operation @s mbPjRet = #pjRet mb
 scoreboard players operation @s mbPjW = #pjWall mb
+scoreboard players operation @s mbPjK = #pjShape mb
+scoreboard players operation @s mbPjG = #pjGrp mb
 execute if score @s mbPjR matches 41.. run scoreboard players set @s mbPjR 40
 execute if score @s mbPjR matches ..0 run scoreboard players set @s mbPjR 1
 tp @s ~ ~ ~ ~ ~
@@ -1606,7 +1647,8 @@ execute if score #pjStop mb matches 2 run kill @s
 w('pj/step', '''
 execute if score @s mbPjW matches 1 unless block ^ ^ ^0.25 #rlk:cm_pass run return run scoreboard players set #pjStop mb 1
 tp @s ^ ^ ^0.25
-execute if score @s mbPjHit matches 0 if score @s mbPjD matches 1.. at @s run function rlk:mboss/pj/hr with storage rlk:mboss pjp
+execute if score @s mbPjHit matches 0 if score @s mbPjD matches 1.. if score @s mbPjK matches 1 at @s run function rlk:mboss/pj/br with storage rlk:mboss pjp
+execute if score @s mbPjHit matches 0 if score @s mbPjD matches 1.. unless score @s mbPjK matches 1 at @s run function rlk:mboss/pj/hr with storage rlk:mboss pjp
 execute if score #pjStop mb matches 2 run return 0
 scoreboard players remove #pjN mb 1
 execute if score #pjN mb matches 1.. at @s rotated as @s run function rlk:mboss/pj/step
@@ -1615,6 +1657,69 @@ w('pj/hr', '$function rlk:mboss/pj/h/$(hr)')
 for k in range(1, 41):
     out.write(f'mboss/pj/h/{k}', f'# Hit radius {L.num(k / 10)} b (+0.3 body), measured 0.9 b below the prop.\n'
               f'execute positioned ~ ~-0.9 ~ if entity @e[tag=rlk_body,distance=..{L.num(k / 10 + 0.3)},limit=1] run function rlk:mboss/pj/hit')
+w('pj/br', '$function rlk:mboss/pj/b/$(hr)')
+# Blade hit shape (#pjShape 1): a line across the flight direction, hr tenths on each side, sampled by points at
+# most 0.8 b apart, in two rows (0.9 b below the prop = the sphere test's point, and 0.3 b above the prop, so a
+# jumping player is caught too), each a 0.65 b sphere against the player's feet. Swept by the 0.25 b sub-steps.
+BLADE_R = 0.65
+for k in range(1, 41):
+    hw = k / 10
+    n = max(1, math.ceil(2 * hw / 0.8))
+    xs = [-hw + 2 * hw * i / n for i in range(n + 1)]
+    lines = [f'# Blade half width {L.num(hw)} b: {len(xs)} points x 2 rows, radius {L.num(BLADE_R)} b (@s = prop, at and rotated as it).']
+    for dy in (-0.9, 0.3):
+        for x in xs:
+            lines.append(f'execute positioned ^{L.num(x, 3)} ^{L.num(dy)} ^ if entity @e[tag=rlk_body,distance=..{L.num(BLADE_R)},limit=1] '
+                         'run return run function rlk:mboss/pj/hit')
+    out.write(f'mboss/pj/b/{k}', '\n'.join(lines))
+w('grp_new', '''
+# A new volley group id in #mbGrp mb (never 0). Before each hz/pj create of the volley copy it into the one-shot
+# option: scoreboard players operation #hzGrp mb = #mbGrp mb (or #pjGrp). The first hit of the group that lands
+# (not dodged) makes every other live hazard and prop of the group harmless (mboss/grp_mark).
+scoreboard players add #mbGrpN mb 1
+execute if score #mbGrpN mb matches 1000000.. run scoreboard players set #mbGrpN mb 1
+scoreboard players operation #mbGrp mb = #mbGrpN mb
+''')
+w('grp_mark', '''
+# #g mb = a volley group that just landed a hit: its hazards and props stop testing for hits (the strike
+# visuals and the flights go on).
+execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzG = #g mb run scoreboard players set @s mbHzHit 1
+execute as @e[tag=rlk_mb_pj] if score @s mbPjG = #g mb run scoreboard players set @s mbPjHit 1
+''')
+w('pj/steer', '''
+# Homing (@s = a live prop, at @s; from the module tick, which runs before pj/all moves the props): turn the
+# flight direction toward the player's chest (body feet + 0.9 b, so the hit point 0.9 b below the prop meets the
+# feet) by at most $(max) degrees in yaw and in pitch this tick; the pitch stays within +-60 degrees.
+execute unless entity @e[tag=rlk_body,limit=1] run return 0
+execute store result score #y0 mb run data get entity @s Rotation[0] 100
+execute store result score #p0 mb run data get entity @s Rotation[1] 100
+kill @e[type=minecraft:marker,tag=rlk_mb_help]
+execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ ~0.9 ~ {Tags:["rlk_mb_help"]}
+execute facing entity @e[type=minecraft:marker,tag=rlk_mb_help,limit=1] feet run tp @e[type=minecraft:marker,tag=rlk_mb_help,limit=1] ~ ~ ~ ~ ~
+execute store result score #y1 mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_help,limit=1] Rotation[0] 100
+execute store result score #p1 mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_help,limit=1] Rotation[1] 100
+kill @e[type=minecraft:marker,tag=rlk_mb_help]
+scoreboard players operation #y1 mb -= #y0 mb
+scoreboard players add #y1 mb 90000
+scoreboard players operation #y1 mb %= #c36000 mb
+scoreboard players remove #y1 mb 18000
+scoreboard players operation #p1 mb -= #p0 mb
+$scoreboard players set #m mb $(max)
+scoreboard players operation #m mb *= #c100 mb
+scoreboard players operation #y1 mb < #m mb
+scoreboard players operation #p1 mb < #m mb
+scoreboard players operation #m mb *= #cm1 mb
+scoreboard players operation #y1 mb > #m mb
+scoreboard players operation #p1 mb > #m mb
+scoreboard players operation #y0 mb += #y1 mb
+scoreboard players operation #p0 mb += #p1 mb
+scoreboard players set #m mb 6000
+scoreboard players operation #p0 mb < #m mb
+scoreboard players set #m mb -6000
+scoreboard players operation #p0 mb > #m mb
+execute store result entity @s Rotation[0] float 0.01 run scoreboard players get #y0 mb
+execute store result entity @s Rotation[1] float 0.01 run scoreboard players get #p0 mb
+''')
 w('pj/hit', '''
 # One hit per prop. Event 4 with #pjKeep 1 preset (the prop pierces and flies on, harmless from now);
 # the hook sets #pjKeep mb 0 to end the flight here (pj/tick removes the prop after this sub-step).
@@ -1624,6 +1729,8 @@ scoreboard players operation #cmEl tmp = @s mbPjE
 scoreboard players operation #mbKB mb = @s mbPjB
 scoreboard players set #mbKBDir mb 1
 function rlk:mboss/hurt
+scoreboard players operation #g mb = @s mbPjG
+execute if score #dodged tmp matches 0 if score #g mb matches 1.. run function rlk:mboss/grp_mark
 scoreboard players set #pjEv mb 4
 scoreboard players set #pjKeep mb 1
 function rlk:mboss/d/pj_end
@@ -1941,6 +2048,8 @@ execute if score #mbDiff mb matches 0 run return run tellraw @s ''', gray("난�
 execute if score @s dead matches 1 run return 0
 $execute unless data storage rlk:mboss byid.$(id) run return run tellraw @s ''', gray('등록되지 않았거나 꺼진 중간보스입니다: $(id)') + ''']
 $execute store result score #mbForce mb run data get storage rlk:mboss byid.$(id).n
+# the boss of this test, for the replay links (test/defeat runs after test/end has forgotten cur)
+$data modify storage rlk:mboss tlast set value {id:"$(id)"}
 $scoreboard players set #mbReqCh mb $(ch)
 execute unless score #mbReqCh mb matches 1.. run scoreboard players set #mbReqCh mb 1
 execute if score @s vMap matches 1 run function rlk:view/map_close
@@ -2018,15 +2127,20 @@ function rlk:run/end
 function rlk:mboss/cleanup
 execute as @a[tag=player] run function rlk:lobby/go
 ''')
-w('test/defeat', TT.join(['''
-# From player/hook_respawn during a test: never fails/resets the character.
+w('test/defeat', '''
+# From player/hook_respawn during a test: never fails/resets the character. The replay link restarts the boss of
+# this test (rlk:mboss tlast, saved by test/start_ch; cur is forgotten by test/end).
+execute unless data storage rlk:mboss tlast.id run data modify storage rlk:mboss tlast set value {id:"proto"}
+execute if data storage rlk:mboss cur.id run data modify storage rlk:mboss tlast.id set from storage rlk:mboss cur.id
 function rlk:mboss/test/end
 title @s times 10 40 15
 title @s subtitle {text:"로비로 돌아왔습니다",color:"gray"}
 title @s title {text:"중간보스 테스트 실패",color:"#E06A5A",bold:true}
 scoreboard players set @s vBig 65
 scoreboard players set @s ttlT 65
-tellraw @s ''', gray('쓰러졌습니다. ') + ',' + link('/function rlk:mboss/test/start {id:"proto"}', '[다시 하기]') + ']']))
+function rlk:mboss/test/defeat_msg with storage rlk:mboss tlast
+''')
+w('test/defeat_msg', '$tellraw @s ' + TT + gray('쓰러졌습니다. ') + ',' + link('/function rlk:mboss/test/start {id:"$(id)"}', '[다시 하기]') + ']')
 WON_REPLAY = link('/function rlk:mboss/test/start {id:"$(id)"}', '[다시 하기]')
 w('test/won', '\n'.join([
     '# From mboss/won during a test (with storage rlk:mboss cur).',

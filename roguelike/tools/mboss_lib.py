@@ -141,9 +141,12 @@ def _tenths(v):
 
 
 def hz_opts(act=None, el=None, kb=None, kbdir=None, y0=None, y1=None, r0=None, back=None,
-            sfx=None, vis=None, col=None, linger=None, quiet=None):
-    """Lines that set the one-shot options of the next hazard (reset after each create)."""
+            sfx=None, vis=None, col=None, linger=None, quiet=None, grp=False):
+    """Lines that set the one-shot options of the next hazard (reset after each create).
+    grp=True: the hazard joins the current volley group #mbGrp (grp_new): one hit per group."""
     out = []
+    if grp:
+        out.append('scoreboard players operation #hzGrp mb = #mbGrp mb')
     pairs = [('#hzAct', act), ('#hzEl', el), ('#hzKB', kb), ('#hzKBDir', kbdir), ('#hzSfx', sfx),
              ('#hzVis', vis), ('#hzCol', col), ('#hzLinger', linger), ('#hzQuiet', quiet)]
     for k, v in pairs:
@@ -173,6 +176,37 @@ def hz_line(length, width, tell, dmg):
 
 def hz_full(tell, dmg):
     return f'function rlk:mboss/hz/full {{tell:{int(tell)},dmg:{int(dmg)}}}'
+
+
+def tell_line(length, width, tell):
+    """Telegraph-only ground line (dmg 0: outline, strike flash, module visuals; never a hit)."""
+    return hz_line(length, width, tell, 0)
+
+
+def pj_opts(el=None, kb=None, ret=None, wall=None, shape=None, grp=False):
+    """Lines that set the one-shot options of the next pj/launch (reset after it). shape 0 sphere, 1 blade
+    (hr = half width across the flight); grp=True joins the current volley group #mbGrp (grp_new)."""
+    out = []
+    for k, v in (('#pjEl', el), ('#pjKB', kb), ('#pjRet', ret), ('#pjWall', wall), ('#pjShape', shape)):
+        if v is not None:
+            out.append(f'scoreboard players set {k} mb {int(v)}')
+    if grp:
+        out.append('scoreboard players operation #pjGrp mb = #mbGrp mb')
+    return out
+
+
+def pj_launch(spd, life, dmg, hr):
+    """As the prop, positioned at the launch point, rotated = flight direction (pitch counts). spd in blocks per
+    tick, life ticks, dmg % of the base hit (0 = visual), hr hit radius (sphere) / half width (blade) in blocks."""
+    return f'function rlk:mboss/pj/launch {{spd:{_tenths(spd)},life:{int(life)},dmg:{int(dmg)},hr:{max(1, min(40, _tenths(hr)))}}}'
+
+
+def pj_steer(max_deg):
+    """Homing: as a live prop, at it, from the module tick: turn toward the player's chest by <= max_deg (yaw, pitch)."""
+    return f'function rlk:mboss/pj/steer {{max:{int(max_deg)}}}'
+
+
+GRP_NEW = 'function rlk:mboss/grp_new'
 
 
 def say(text, colour='#FFFFFF', gap=2, hold=40, snd=1):

@@ -6,6 +6,8 @@ scoreboard players operation #cmEl tmp = @s mbPjE
 scoreboard players operation #mbKB mb = @s mbPjB
 scoreboard players set #mbKBDir mb 1
 function rlk:mboss/hurt
+scoreboard players operation #g mb = @s mbPjG
+execute if score #dodged tmp matches 0 if score #g mb matches 1.. run function rlk:mboss/grp_mark
 scoreboard players set #pjEv mb 4
 scoreboard players set #pjKeep mb 1
 function rlk:mboss/d/pj_end

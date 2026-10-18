@@ -1,0 +1,383 @@
+"""Shared API of the Moonlit Illusion Butterfly (달빛 환영 나비) module generator (core <-> pattern modules).
+
+Stable on purpose: the pattern authors (human.py, wing.py) import this and never edit it. The runtime side of
+the same contract (score names, entry points, cancel rules) is documented in the scratchpad file
+mb2/bf_contract.md. Copied from tools/mboss_guardian/api.py and renamed (#gd* -> #bf*), as the reuse study
+recommends; the Guardian package is not touched.
+
+Units follow the framework: Python helpers take blocks and ticks; at the runtime boundary the framework uses
+tenths of a block and damage as a % of the registry base hit (atk).
+
+Rig. The module codes against the rig API rlk:mboss/butterfly/rig/... (init, spawn, tick, kill, play/<clip>,
+look/<dendro|pyro|flat>, form/<human|butterfly>, face/player, face/track, flash, prop/clear, optional prop/<name>)
+and reads clips, events, parts and props from tools/mboss_butterfly_rig_manifest.json (the rig generator's).
+While that file does not exist (the rig is built on another branch), STUB = True: the manifest is
+tools/mboss_butterfly/stub_rig_manifest.json and every rig call goes to the stand-in rlk:mboss/butterfly/rig_stub/
+written by stub_rig.py. Both stub files are removable; with the real manifest present the build ignores them and
+deletes F:mboss/butterfly/rig_stub/.
+"""
+from pathlib import Path
+import json
+import math
+import sys
+
+_TOOLS = Path(__file__).resolve().parents[1]
+if str(_TOOLS) not in sys.path:
+    sys.path.insert(0, str(_TOOLS))
+import mboss_lib as L  # noqa: E402
+
+ID = 'butterfly'
+NS = f'rlk:mboss/{ID}/'
+REG = L.load_registry()
+ARENA = REG['arena']
+CX, CY, CZ = ARENA['cx'], ARENA['cy'], ARENA['cz']
+BOSS = next(b for b in REG['boss'] if b['id'] == ID)
+
+# ---------------------------------------------------------------------------------------------
+# Rig manifest (real or stub) and the clip table.
+REAL_MANIFEST = _TOOLS / 'mboss_butterfly_rig_manifest.json'
+STUB_MANIFEST = Path(__file__).resolve().parent / 'stub_rig_manifest.json'
+STUB = not REAL_MANIFEST.exists()
+MANIFEST = STUB_MANIFEST if STUB else REAL_MANIFEST
+_MAN = json.loads(MANIFEST.read_text(encoding='utf-8'))
+RIG_DIR = 'rig_stub' if STUB else 'rig'
+CLIPS = {c['name']: {'id': c['id'], 'len': c['len'], 'loop': c.get('loop', False), 'next': c.get('next'),
+                     'events': dict(c.get('events', {}))} for c in _MAN['clips']}
+LOOKS = list(_MAN.get('looks', ['dendro', 'pyro', 'flat']))
+PARTS = [p['name'] if isinstance(p, dict) else p for p in _MAN.get('parts', [])]
+PROPS = list(_MAN.get('props', []))
+RIG_OBJECTIVES = list(_MAN.get('objectives', []))
+FALLBACKS = []          # (clip, event, default) used because the manifest lacks the event (printed by the build)
+
+
+def ev(clip, event):
+    """Clip tick of a rig event, e.g. ev('kick_combo', 'hit1') == 8. Pattern clocks (#bfPT) are 0 on the tick the
+    core plays the pattern's clip, so #bfPT == clip tick."""
+    return CLIPS[clip]['events'][event]
+
+
+def ev_or(clip, event, default):
+    """ev() with a fallback for an event the manifest does not name (recorded in FALLBACKS)."""
+    e = CLIPS.get(clip, {}).get('events', {})
+    if event in e:
+        return e[event]
+    FALLBACKS.append((clip, event, default))
+    return default
+
+
+def clip_len(clip):
+    return CLIPS[clip]['len']
+
+
+def part_sel(name):
+    """Selector of a named rig part (fx anchor), e.g. part_sel('foot_r'); None when the rig has no such part."""
+    if name not in PARTS:
+        return None
+    return f'@e[type=minecraft:item_display,tag=rlk_mb_bf_{name},limit=1]'
+
+
+# ---------------------------------------------------------------------------------------------
+# Balance (plan.md). Damage = % of the registry base hit (atk x dmgMul).
+DMG = {
+    'h1a': 100, 'h1b': 120,      # H1 달빛 발차기: flip-kick crescent / axe-kick crescent + ground wave
+    'h2a': 90, 'h2b': 140,       # H2 달빛 점프: 360 low sweep / kicked Dendro disc
+    'h3': 130,                   # H3 달빛 돌진: dash kick + ring
+    'h4': 120,                   # H4 광폭한 진공: vacuum blade
+    'b1': 130,                   # B1 우아한 날개: wing strike
+    'b2': 50,                    # B2 화염 날개의 습격: each fire crescent (one hit per swing)
+    'b3': 160, 'b3t': 30,        # B3 날개 휩쓸개: wing slam fan / flame trail touch (max 2)
+    'b4': 150,                   # B4 달빛 축복: each homing orb (contact or burst, one hit per orb)
+    'b5': 260,                   # B5 달빛 해제: the dome
+}
+KB = {'default': 3, 'light': 2, 'heavy': 4, 'none': 0}
+COCOON_HP_PCT = 20                    # 달빛 고치: % of the current HP on application (non-lethal)
+COCOON_DMG, COCOON_HEAL, COCOON_CRIT = 50, 60, -100      # player DMG %, healing received %, crit points
+BUFF_DMG, BUFF_CRIT = 150, 15                            # 달빛 축복 받음 (reward)
+DEW_HEAL_PCT = 8                      # 달빛 이슬: % of max HP per orb
+DEW_N = 3
+DEW_R = (6.0, 14.0)                   # spawn ring around the arena centre (blocks)
+
+# Range bands (as the Guardian), horizontal distance boss body -> player body, blocks.
+MELEE = 4.0     # melee: d <= 4
+FAR = 8.0       # mid: 4 < d < 8, far: d >= 8
+BANDS = {'melee': 1, 'mid': 2, 'far': 3}
+FORMS = {'h': 1, 'b': 2}
+
+# ---------------------------------------------------------------------------------------------
+# Elements and colours (#elem numbering: 1 pyro, 7 dendro).
+EL_PYRO, EL_DENDRO = 1, 7
+EL_LOOK = {EL_DENDRO: 'dendro', EL_PYRO: 'pyro'}
+
+
+def hexrgb(h):
+    return tuple(int(h[i:i + 2], 16) / 255 for i in (1, 3, 5))
+
+
+LIME_HEX = '#B6E35A'
+LIME = hexrgb('#B6E35A')
+LIME_PALE = hexrgb('#E5FBC8')
+LIME_CORE = hexrgb('#EDF9DA')
+TEAL_DARK = hexrgb('#297272')
+OPAL = hexrgb('#D4F8C6')
+CYAN = hexrgb('#8DEAF0')
+CYAN_DEEP = hexrgb('#39B4C1')
+WHITE = (1.0, 1.0, 1.0)
+PYRO_GOLD = hexrgb('#FAD77C')
+PYRO_MAG = hexrgb('#C680A2')
+PYRO_ORANGE = hexrgb('#FF8A3D')
+GOLD = hexrgb('#F4EDC9')
+GOLD_RING = hexrgb('#E0DD9C')
+GOLD_EMBLEM = hexrgb('#D5DD81')
+COC_HEX, COC_SWIRL_HEX = '#8C525C', '#E8858A'      # 달빛 고치 badge: maroon fill, salmon swirl
+COC = hexrgb(COC_HEX)
+COC_SWIRL = hexrgb(COC_SWIRL_HEX)
+LINE_HEX = '#D9F5A8'          # typed caption colour (mechanics only: she has no voice lines)
+
+
+class Pattern:
+    """One pattern a module provides.
+
+    id      stable number: 1-4 human patterns H1-H4, 11-14 butterfly patterns B1-B4, 15 B5 달빛 해제 (service),
+            20 the transformation (service, core)
+    key     directory name F:mboss/butterfly/p/<key>/
+    label   Korean name shown on the boss bar sub-line while it runs
+    kind    'normal' (in its form's shuffle bag) or 'service' (started by the core)
+    form    'h' human or 'b' butterfly: the form it runs in (the bag of that form)
+    clip    the rig clip the core plays at clock 0 (#bfPT 0 = clip tick 0)
+    bands   range bands the bag may pick it in: subset of ('melee', 'mid', 'far')
+    el      element of its hits (1 pyro, 7 dendro): butterfly patterns switch the wing look to it before they start
+    lead    ticks before the clip: start runs at #bfPT = -lead (telegraphs that must begin before the clip's first
+            motion, e.g. H1's hit 1 at clip tick 8 with a 10 t telegraph -> lead 2)
+    close   blocks: human melee patterns burst-run to this distance before the start, None = no
+    recover idle ticks after it ends before the next decision
+    max_len safety end: the core finishes the pattern at this #bfPT even if it never called p/end
+    length  expected end (#bfPT of its p/end) for the boss-bar progress; default max_len - 4
+    weight  {band: n} draw weight in that band (default 1 everywhere)
+    """
+
+    def __init__(self, id, key, label, form, clip, kind='normal', bands=(), el=EL_DENDRO, lead=0, close=None,
+                 recover=20, max_len=120, length=None, weight=None):
+        assert kind in ('normal', 'service')
+        assert form in FORMS, form
+        assert kind == 'service' or bands, key
+        assert all(b in BANDS for b in bands), bands
+        assert clip in CLIPS, (key, clip)
+        assert el in (EL_PYRO, EL_DENDRO), el
+        assert 0 <= lead <= 20
+        self.id, self.key, self.label, self.kind, self.form = id, key, label, kind, form
+        self.clip, self.bands, self.el, self.lead, self.close = clip, tuple(bands), el, int(lead), close
+        self.recover, self.max_len = recover, max_len
+        self.length = length if length is not None else max_len - 4
+        assert 0 < self.length <= max_len, (key, self.length, max_len)
+        self.weight = {b: int((weight or {}).get(b, 1)) for b in self.bands}
+        assert all(1 <= w <= 9 for w in self.weight.values()), (key, self.weight)
+        assert set(weight or {}) <= set(self.bands), (key, weight)
+
+
+# ---------------------------------------------------------------------------------------------
+class Gen:
+    """Writer handed to every emit(gen). Paths are relative to F:mboss/butterfly/."""
+
+    def __init__(self, out):
+        self.out = out
+        self.files = set()
+
+    # -- files
+    def w(self, rel, lines):
+        if isinstance(lines, str):
+            lines = lines.strip('\n').split('\n')
+        self.out.write(f'mboss/{ID}/{rel}', list(lines))
+        self.files.add(rel)
+
+    def pw(self, key, name, lines):
+        """Write F:mboss/butterfly/p/<key>/<name> (pattern modules write only these)."""
+        self.w(f'p/{key}/{name}', lines)
+
+    def has(self, rel):
+        return rel in self.files
+
+    # -- references
+    @staticmethod
+    def fn(rel):
+        return f'function {NS}{rel}'
+
+    @staticmethod
+    def rig(call):
+        """A rig API call (rig/<call>; the stub rig while STUB)."""
+        return f'function {NS}{RIG_DIR}/{call}'
+
+    @staticmethod
+    def play(clip):
+        assert clip in CLIPS, clip
+        return f'function {NS}{RIG_DIR}/play/{clip}'
+
+    @staticmethod
+    def look(name):
+        assert name in LOOKS, name
+        return f'function {NS}{RIG_DIR}/look/{name}'
+
+    @staticmethod
+    def prop(name):
+        """rig/prop/<name> when the rig provides that prop (manifest props), else None."""
+        return f'function {NS}{RIG_DIR}/prop/{name}' if name in PROPS else None
+
+    @staticmethod
+    def end():
+        """The pattern is done: the core finishes it after this tick (see bf_contract.md)."""
+        return f'function {NS}p/end'
+
+    @staticmethod
+    def release():
+        """The dangerous part is over: the owning state may move on while the pattern finishes a harmless tail."""
+        return f'function {NS}p/release'
+
+    @staticmethod
+    def set_len(t):
+        """The pattern now knows its real end (#bfPT of its end()): the boss-bar progress uses it."""
+        return f'scoreboard players set #bfPLen mb {int(t)}'
+
+    # -- positions (core utilities; see bf_contract.md)
+    @staticmethod
+    def dest(max_b, keep_b):
+        """As the body, at it: marker rlk_mb_bf_dest on the line toward the player, at most max_b blocks from her and
+        keep_b short of the player, inside the safe disc (core u/dest). Keep it with keep()."""
+        return [f'scoreboard players set #bfDMax mb {int(round(max_b * 10))}',
+                f'scoreboard players set #bfDKeep mb {int(round(keep_b * 10))}', f'function {NS}u/dest']
+
+    @staticmethod
+    def lockp():
+        """Marker rlk_mb_bf_lock on the floor under the player, inside the safe disc (core u/lockp). Keep it with keep()."""
+        return f'function {NS}u/lockp'
+
+    @staticmethod
+    def keep(new_tag, src='rlk_mb_bf_dest'):
+        """Re-tag the marker of the last dest()/lockp() (src rlk_mb_bf_dest / rlk_mb_bf_lock) so the next call keeps it."""
+        return [f'tag @e[type=minecraft:marker,tag={src}] add {new_tag}', f'tag @e[type=minecraft:marker,tag={new_tag}] remove {src}']
+
+    # -- timeline helpers on the pattern clock #bfPT
+    @staticmethod
+    def at(t, cmd):
+        if isinstance(t, tuple):
+            return f'execute if score #bfPT mb matches {t[0]}..{t[1]} run {cmd}'
+        return f'execute if score #bfPT mb matches {t} run {cmd}'
+
+    @staticmethod
+    def at_body(t, sub):
+        """sub = the rest of an execute chain after 'at @s rotated as @s rotated ~ 0' (body yaw)."""
+        rng = f'{t[0]}..{t[1]}' if isinstance(t, tuple) else t
+        return f'execute if score #bfPT mb matches {rng} at @s rotated as @s rotated ~ 0 {sub}'
+
+    @staticmethod
+    def every(n, cmd, start=0):
+        """Every n ticks of #bfPT (core constants #bfK<n>; n in 2, 3, 4, 5, 6, 8, 10, 20)."""
+        assert n in (2, 3, 4, 5, 6, 8, 10, 20)
+        return (f'scoreboard players operation #bfM mb = #bfPT mb\n'
+                f'scoreboard players operation #bfM mb %= #bfK{n} mb\n'
+                f'execute if score #bfM mb matches {start} run {cmd}')
+
+    # -- fx and sound
+    @staticmethod
+    def sound(event, vol=1.0, pitch=1.0):
+        return L.sound(event, vol, pitch)
+
+    @staticmethod
+    def dust(rgb, scale=1.0, pos='~ ~ ~', delta=(0, 0, 0), n=1, speed=0):
+        c = L.colour_list(rgb)
+        d = ' '.join(L.num(float(v), 3) for v in delta)
+        return f'particle minecraft:dust{{color:{c},scale:{L.num(float(scale), 2)}}} {pos} {d} {L.num(float(speed), 3)} {int(n)} force @a[tag=player]'
+
+    @staticmethod
+    def dust_fade(rgb0, rgb1, scale=1.0, pos='~ ~ ~', delta=(0, 0, 0), n=1):
+        d = ' '.join(L.num(float(v), 3) for v in delta)
+        return (f'particle minecraft:dust_color_transition{{from_color:{L.colour_list(rgb0)},to_color:{L.colour_list(rgb1)},'
+                f'scale:{L.num(float(scale), 2)}}} {pos} {d} 0 {int(n)} force @a[tag=player]')
+
+    @staticmethod
+    def particle(name, pos='~ ~ ~', delta=(0, 0, 0), speed=0, n=1):
+        d = ' '.join(L.num(float(v), 3) for v in delta)
+        return f'particle minecraft:{name} {pos} {d} {L.num(float(speed), 3)} {int(n)} force @a[tag=player]'
+
+    @staticmethod
+    def card(kind, pos, **kw):
+        """A gold card (Navia's rlk:fx/nv engine: rose, star, burst, crescent, petal, shard, ring, glow; gold only,
+        cap 48 shared with Navia); see tools/build_navia_fx_cards.py card_call for the arguments."""
+        from build_navia_fx_cards import card_call
+        return card_call(kind, pos, **kw)
+
+    @staticmethod
+    def tcard(kind, pos, colour, **kw):
+        """A TINTED card of the module's own engine (cards.py: star, burst, ring, glow, orb, slash, crescent, moon,
+        shard, leaf, flame, swirl; colour = (r, g, b) 0..1, '#RRGGBB' or an int; the other arguments as card(); cap
+        cards.CAP live, ticked by the module)."""
+        from .cards import tcard_call
+        return tcard_call(NS, kind, pos, colour, **kw)
+
+    @staticmethod
+    def say(text, colour=LINE_HEX, gap=2, hold=40, snd=1):
+        return L.say(text, colour, gap, hold, snd)
+
+    # -- hazards (blocks; see mboss_lib.hz_*). Call positioned on the floor point, rotated = aim.
+    hz_opts = staticmethod(L.hz_opts)
+    hz_disc = staticmethod(L.hz_disc)
+    hz_ring = staticmethod(L.hz_ring)
+    hz_sector = staticmethod(L.hz_sector)
+    hz_line = staticmethod(L.hz_line)
+    hz_full = staticmethod(L.hz_full)
+    tell_line = staticmethod(L.tell_line)
+    # -- projectiles (framework pj; blocks per tick / blocks), steering and volley groups
+    pj_opts = staticmethod(L.pj_opts)
+    pj_launch = staticmethod(L.pj_launch)
+    pj_steer = staticmethod(L.pj_steer)
+    GRP_NEW = L.GRP_NEW
+
+
+class TL:
+    """Per-tick timeline of one pattern (promoted from the Guardian's p12.py): lines are grouped into
+    p/<key>/k/<t> (t < 0: k/m<-t>, the lead before the clip) and reached through a small binary dispatch tree
+    on #bfPT, so a tick runs a handful of score tests, not every line.
+
+        tl = TL(g, 'kick'); tl.at(8, cmd, ...); tl.span(10, 14, cmd); tl.write(start_head, tick_head, t0=-lead)
+
+    write() puts the lines of tick t0 (the start clock: 0, or -lead) into start; every later tick goes through
+    the dispatch from tick."""
+
+    def __init__(self, g, key):
+        self.g, self.key, self.ev = g, key, {}
+
+    def at(self, t, *lines):
+        for line in lines:
+            if not line:
+                continue
+            for one in (line.split('\n') if isinstance(line, str) else line):
+                self.ev.setdefault(int(t), []).append(one)
+
+    def span(self, t0, t1, *lines):
+        for t in range(t0, t1 + 1):
+            self.at(t, *lines)
+
+    def fn(self, rel):
+        return f'function {NS}p/{self.key}/{rel}'
+
+    @staticmethod
+    def tname(t):
+        return f'k/{t}' if t >= 0 else f'k/m{-t}'
+
+    def _node(self, ts):
+        if len(ts) <= 6:
+            return [f'execute if score #bfPT mb matches {t} run return run {self.fn(self.tname(t))}' for t in ts]
+        mid = len(ts) // 2
+        a, b = ts[:mid], ts[mid:]
+        out = []
+        for part in (a, b):
+            name = f'd/{part[0]}_{part[-1]}'.replace('-', 'm')
+            self.g.pw(self.key, name, [f'# dispatch #bfPT {part[0]}..{part[-1]}'] + self._node(part))
+            out.append(f'execute if score #bfPT mb matches {part[0]}..{part[-1]} run return run {self.fn(name)}')
+        return out
+
+    def write(self, start_head, tick_head, t0=0):
+        for t, lines in sorted(self.ev.items()):
+            if t > t0:
+                self.g.pw(self.key, self.tname(t), [f'# {self.key} clock {t}'] + lines)
+        self.g.pw(self.key, 'start', list(start_head) + self.ev.get(t0, []))
+        ts = sorted(t for t in self.ev if t > t0)
+        self.g.pw(self.key, 'tick', list(tick_head) + self._node(ts))

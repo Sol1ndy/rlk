@@ -6,3 +6,5 @@ scoreboard players operation #cmEl tmp = @s mbHzE
 scoreboard players operation #mbKB mb = @s mbHzB
 scoreboard players operation #mbKBDir mb = @s mbHzKD
 function rlk:mboss/hurt
+scoreboard players operation #g mb = @s mbHzG
+execute if score #dodged tmp matches 0 if score #g mb matches 1.. run function rlk:mboss/grp_mark

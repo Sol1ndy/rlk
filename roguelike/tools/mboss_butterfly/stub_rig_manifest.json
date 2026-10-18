@@ -1,0 +1,342 @@
+{
+ "_doc": [
+  "STUB rig manifest (tools/mboss_butterfly/stub_rig_manifest.json), used only while the real one",
+  "(tools/mboss_butterfly_rig_manifest.json, written by the rig generator) does not exist. Same shape as the",
+  "real manifest: clips {name,id,len,loop,next,events}, looks, parts {name,tag}, props, objectives.",
+  "forms {clip:[tick,form]} = the clip tick at which the clip switches the wings on (butterfly) / off (human).",
+  "Delete it (and stub_rig.py) once the real rig is merged."
+ ],
+ "stub": true,
+ "clips": [
+  {
+   "name": "idle_h",
+   "id": 0,
+   "len": 40,
+   "loop": true,
+   "next": null,
+   "events": {}
+  },
+  {
+   "name": "step_h",
+   "id": 1,
+   "len": 16,
+   "loop": true,
+   "next": null,
+   "events": {}
+  },
+  {
+   "name": "run_h",
+   "id": 2,
+   "len": 8,
+   "loop": true,
+   "next": null,
+   "events": {}
+  },
+  {
+   "name": "back_h",
+   "id": 3,
+   "len": 12,
+   "loop": false,
+   "next": "idle_h",
+   "events": {}
+  },
+  {
+   "name": "turn_h",
+   "id": 4,
+   "len": 24,
+   "loop": false,
+   "next": "idle_h",
+   "events": {}
+  },
+  {
+   "name": "kick_combo",
+   "id": 5,
+   "len": 51,
+   "loop": false,
+   "next": "idle_h",
+   "events": {
+    "run": 0,
+    "hit1": 8,
+    "backflip": 10,
+    "hop": 22,
+    "leap": 34,
+    "hit2": 40
+   }
+  },
+  {
+   "name": "kick_jump",
+   "id": 6,
+   "len": 65,
+   "loop": false,
+   "next": "idle_h",
+   "events": {
+    "tell": 0,
+    "sweep": 13,
+    "sweep_end": 19,
+    "jump": 33,
+    "disc": 40,
+    "impact": 50,
+    "land": 55
+   }
+  },
+  {
+   "name": "dash_kick",
+   "id": 7,
+   "len": 50,
+   "loop": false,
+   "next": "idle_h",
+   "events": {
+    "charge": 0,
+    "dash": 10,
+    "dash_end": 12,
+    "kick": 15
+   }
+  },
+  {
+   "name": "vacuum",
+   "id": 8,
+   "len": 41,
+   "loop": false,
+   "next": "idle_h",
+   "events": {
+    "crouch": 0,
+    "tell": 9,
+    "blade": 17,
+    "backflip": 17,
+    "land": 38
+   }
+  },
+  {
+   "name": "groggy_h",
+   "id": 9,
+   "len": 40,
+   "loop": true,
+   "next": null,
+   "events": {}
+  },
+  {
+   "name": "entrance",
+   "id": 10,
+   "len": 106,
+   "loop": false,
+   "next": "idle_h",
+   "events": {
+    "glow": 61,
+    "whiteout": 71,
+    "burst": 79,
+    "land": 90,
+    "stand": 106
+   }
+  },
+  {
+   "name": "transform",
+   "id": 11,
+   "len": 30,
+   "loop": false,
+   "next": "idle_b",
+   "events": {
+    "glow": 0,
+    "open": 4,
+    "sphere": 6,
+    "rings": 8,
+    "spread": 12
+   }
+  },
+  {
+   "name": "idle_b",
+   "id": 12,
+   "len": 22,
+   "loop": true,
+   "next": null,
+   "events": {}
+  },
+  {
+   "name": "glide_b",
+   "id": 13,
+   "len": 16,
+   "loop": true,
+   "next": null,
+   "events": {}
+  },
+  {
+   "name": "wing_strike",
+   "id": 14,
+   "len": 55,
+   "loop": false,
+   "next": "idle_b",
+   "events": {
+    "bank": 0,
+    "dive": 12,
+    "hit": 15
+   }
+  },
+  {
+   "name": "wing_barrage",
+   "id": 15,
+   "len": 117,
+   "loop": false,
+   "next": "idle_b",
+   "events": {
+    "swing1": 0,
+    "swing2": 26,
+    "swing3": 64,
+    "swing4": 89
+   }
+  },
+  {
+   "name": "flap_dive",
+   "id": 16,
+   "len": 59,
+   "loop": false,
+   "next": "idle_b",
+   "events": {
+    "rise": 0,
+    "dive": 22,
+    "slam": 26,
+    "glide": 34
+   }
+  },
+  {
+   "name": "coco",
+   "id": 17,
+   "len": 76,
+   "loop": false,
+   "next": "idle_b",
+   "events": {
+    "orb1": 19,
+    "ball": 30,
+    "orb2": 46
+   }
+  },
+  {
+   "name": "release",
+   "id": 18,
+   "len": 96,
+   "loop": false,
+   "next": "idle_h",
+   "events": {
+    "swoop": 0,
+    "whirl": 28,
+    "cup": 31,
+    "flash": 36,
+    "xglint": 37,
+    "cage": 38,
+    "wrap": 44,
+    "detonation": 53,
+    "flat": 87,
+    "shatter": 91,
+    "revert": 92,
+    "land": 96
+   }
+  },
+  {
+   "name": "revert",
+   "id": 19,
+   "len": 43,
+   "loop": false,
+   "next": "idle_h",
+   "events": {
+    "flat": 34,
+    "shatter": 38,
+    "revert": 39,
+    "land": 43
+   }
+  },
+  {
+   "name": "death",
+   "id": 20,
+   "len": 100,
+   "loop": false,
+   "next": null,
+   "events": {
+    "stagger": 0,
+    "shatter": 6,
+    "kneel": 24,
+    "dissolve": 40
+   }
+  },
+  {
+   "name": "chain_reform",
+   "id": 21,
+   "len": 18,
+   "loop": false,
+   "next": "idle_h",
+   "events": {}
+  }
+ ],
+ "looks": [
+  "dendro",
+  "pyro",
+  "flat"
+ ],
+ "forms": {
+  "transform": [
+   4,
+   "butterfly"
+  ],
+  "release": [
+   92,
+   "human"
+  ],
+  "revert": [
+   39,
+   "human"
+  ]
+ },
+ "parts": [
+  {
+   "name": "body",
+   "tag": "rlk_mb_bf_body"
+  },
+  {
+   "name": "head",
+   "tag": "rlk_mb_bf_head"
+  },
+  {
+   "name": "foot_r",
+   "tag": "rlk_mb_bf_foot_r"
+  },
+  {
+   "name": "foot_l",
+   "tag": "rlk_mb_bf_foot_l"
+  },
+  {
+   "name": "hand_r",
+   "tag": "rlk_mb_bf_hand_r"
+  },
+  {
+   "name": "hand_l",
+   "tag": "rlk_mb_bf_hand_l"
+  },
+  {
+   "name": "core",
+   "tag": "rlk_mb_bf_core"
+  },
+  {
+   "name": "fwing_l",
+   "tag": "rlk_mb_bf_fwing_l"
+  },
+  {
+   "name": "fwing_r",
+   "tag": "rlk_mb_bf_fwing_r"
+  },
+  {
+   "name": "hwing_l",
+   "tag": "rlk_mb_bf_hwing_l"
+  },
+  {
+   "name": "hwing_r",
+   "tag": "rlk_mb_bf_hwing_r"
+  }
+ ],
+ "props": [
+  "cocoon"
+ ],
+ "objectives": [
+  "bfStubC",
+  "bfStubT",
+  "bfStubF",
+  "bfStubL",
+  "bfStubY"
+ ]
+}
