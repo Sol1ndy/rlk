@@ -15,9 +15,9 @@ field banner, the low-gravity and groggy flags and the boss-bar lines (put_extra
 death) and seq_f.py (warp, unfold, banner, field ambience, pack-up, break, groggy, recovery), both on the kit.
 Copied from tools/mboss_butterfly/core.py; the butterfly review findings (scratchpad mb2/review/core_findings.json)
 are not copied: kept markers die with their pattern (S1), g.release never stops the AI (S2), the body clamp is real
-(S6), test cuts and reloads re-derive the rig form and the counters from the state (S3, S4, S8), the slab blades keep
-their 1.45 b reach under the framework blade rule (FW-1: hr + 0.3, api.c_blade_hr), every volley group's members exist before its first strike (FW-4), uninstall removes the
-module's storage (perf-4).
+(S6), test cuts and reloads re-derive the rig form and the counters from the state (S3, S4, S8), the slab blades take
+their half width from the framework blade rule (FW-1: reach hr + 0.3; api.c_blade_hr: hr 1.2, reach 1.5 b), every
+volley group's members exist before its first strike (FW-4), uninstall removes the module's storage (perf-4).
 """
 import importlib
 import json

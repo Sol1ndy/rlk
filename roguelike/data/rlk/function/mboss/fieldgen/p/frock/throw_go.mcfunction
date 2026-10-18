@@ -1,4 +1,4 @@
-# @s = the slab: a blade projectile at the locked feet (1.5 b/t, life 24, hr 1.15 = reach 1.45 b, its own group).
+# @s = the slab: a blade projectile at the locked feet (1.5 b/t, life 24, hr 1.2 = reach 1.5 b, its own group).
 scoreboard players set @s mbId 12
 tag @s remove rlk_mb_fg_p12s
 tag @s remove rlk_mb_fg_p12r

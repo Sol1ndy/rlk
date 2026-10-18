@@ -29,7 +29,7 @@ fg.rw.
 import math
 
 from .api import (Pattern, TL, ev_or, clip_len, CLIPS, DMG, KB, CY, NS, L, CORE_FIELD_H, rest_anchor, f_clip_anchor,
-                  f_body_pos, f_core_h, rocks_cancel, c_blade_pad)
+                  f_body_pos, f_core_h, rocks_cancel, c_blade_pad, c_blade_hr)
 
 BODY = '@e[type=minecraft:husk,tag=rlk_mb_body,limit=1]'
 PLAYER = '@e[tag=rlk_body,limit=1]'
@@ -83,10 +83,11 @@ F2_END = clip_len('frock') if 'frock' in CLIPS else 110
 F2_GAP, F2_N, F2_TGAP, F2_NT, F2_CAP = 6, 8, 8, 5, 2
 F2_THETA = [round(90 * (7 - k) / 7) for k in range(F2_N)]    # the arc offsets 90 77 64 51 39 26 13 0 (C6 F1)
 F2_PAIR = 6                                              # bursts 7-8 (index 6, 7) share one volley group
-SLAB_REACH = 1.45                                        # the slab's reach from its flight line (the w 2.4 line + pad)
+SLAB_REACH = 1.45                                        # the slab's design reach from its flight line (spec Q16)
 BLADE_PAD = c_blade_pad()                                # the framework blade's reach beyond hr (read from build_mboss_core.py:
                                                          # 0.3 since the butterfly review fix FW-1; it was 0.65)
-SLAB_HR = round(SLAB_REACH - BLADE_PAD, 2)               # 1.15 (Q16: the slab keeps its 1.45 b reach whatever the blade pad)
+SLAB_HR = c_blade_hr(SLAB_REACH)                         # 1.2 in the framework's tenths: reach 1.5 b = the w 2.4 throw lane +
+                                                         # its 0.3 pad (Q16: about 1.45 b whatever the blade rule; was 0.8 + 0.65)
 SLAB_RISE = (4.0, 5.0, 6.0, 4.5, 5.5, 4.0, 6.0, 5.0)     # the slabs hover 4-6 b up (spec C6 section 7)
 assert F2_THROW - 10 > F2_BURST + F2_GAP * (F2_NT - 1) + 2 and F2_CRUMBLE > F2_THROW + F2_TGAP * (F2_NT - 1)
 assert F2_END >= F2_THROW + F2_TGAP * (F2_NT - 1) + 8
@@ -291,7 +292,7 @@ def frock(g):
     sigma * 90 (7 - k) / 7 deg; sigma drawn once), each hz/disc r 1.8 (tell 10, jumpable: height to 1.2 b, KB 4, Geo
     1.3) with a violet decal; bursts 7-8 are one volley group (a standing player takes one burst); a kit slab tears out
     at every burst and hovers 4-6 b up; from the throw tick one slab every 8 t at the player's feet locked 10 t ahead
-    (a dmg-0 line w 2.4 + the violet line decal, then a blade pj 1.5 b/t, reach 1.45 b, KB 3, Geo 1.1, life 24, its
+    (a dmg-0 line w 2.4 + the violet line decal, then a blade pj 1.5 b/t, reach 1.5 b, KB 3, Geo 1.1, life 24, its
     own group); at most 2 slab hits per run (the later throws crumble); every unthrown slab crumbles at the clip end."""
     key, tl, pid = 'frock', TL(g, 'frock'), 12
     W, S, R, Fl = 'rlk_mb_fg_p12w', 'rlk_mb_fg_p12s', 'rlk_mb_fg_p12r', 'rlk_mb_fg_p12f'
@@ -357,7 +358,7 @@ def frock(g):
         f'{KFN}tele/line with storage rlk:mboss fg.f2l',
         g.sound('block.chain.hit', 0.5, 0.8)])
     g.pw(key, 'throw_go', [
-        f'# @s = the slab: a blade projectile at the locked feet (1.5 b/t, life 24, hr {L.num(SLAB_HR)} = reach {L.num(SLAB_REACH)} b, its own group).',
+        f'# @s = the slab: a blade projectile at the locked feet (1.5 b/t, life 24, hr {L.num(SLAB_HR)} = reach {L.num(SLAB_HR + BLADE_PAD)} b, its own group).',
         f'scoreboard players set @s mbId {pid}',
         f'tag @s remove {S}', f'tag @s remove {R}', f'tag @s add {Fl}',
         'data merge entity @s {teleport_duration:1}',

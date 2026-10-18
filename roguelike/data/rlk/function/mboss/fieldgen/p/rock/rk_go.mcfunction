@@ -1,5 +1,5 @@
-# [c_rocks] @s = the slab: a blade projectile at the locked feet (rlk_mb_fg_p6tl), 1.5 b/t, life 24, half width 1.15
-# (reach 1.45 b with the framework blade rule), its own volley group.
+# [c_rocks] @s = the slab: a blade projectile at the locked feet (rlk_mb_fg_p6tl), 1.5 b/t, life 24, half width 1.2
+# (reach 1.5 b with the framework blade rule), its own volley group.
 scoreboard players set @s mbId 6
 tag @s remove rlk_mb_fg_p6s
 tag @s add rlk_mb_fg_p6f

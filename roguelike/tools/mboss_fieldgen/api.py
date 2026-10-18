@@ -487,7 +487,7 @@ def rocks(g, tl, key, pid, burst0, n_burst=8, gap=6, throw0=None, n_throw=5, thr
     10 t ahead at the walker marker: the first 6 b from the player on the device's side, each next 2.5 b toward the
     player's current position); a slab rises at every burst (tuff display, up 4 b over 15 t); from throw0 one slab
     every throw_gap t flies at the player's locked feet (dmg-0 tell_line 10 t ahead, then a blade pj at 1.5 b/t,
-    hr 0.8 -> reach 1.45 b: the framework blade reaches hr + 0.65 (review FW-1), so hr is not the reach). Unthrown
+    hr c_blade_hr(1.45): the framework blade reaches hr + its pad (review FW-1), so hr is not the reach). Unthrown
     slabs crumble in the pattern's end / cancel (they carry rlk_mb_fg_pat). Returns the clock by which the last slab
     has landed. Tags rlk_mb_fg_p<pid>w (walker), p<pid>s (slab), p<pid>f (flying slab), p<pid>t<j> (throw locks)."""
     W, S = f'rlk_mb_fg_p{pid}w', f'rlk_mb_fg_p{pid}s'
@@ -541,7 +541,7 @@ def rocks(g, tl, key, pid, burst0, n_burst=8, gap=6, throw0=None, n_throw=5, thr
         f'tag @s add rlk_mb_fg_p{pid}f',
         'data merge entity @s {teleport_duration:1}',
         g.pj_opts(shape=1, kb=KB['default'], wall=1, grp=True),
-        f'execute at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p{pid}tl,limit=1] feet run {g.pj_launch(1.5, 24, dmg_s, 0.8)}',
+        f'execute at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p{pid}tl,limit=1] feet run {g.pj_launch(1.5, 24, dmg_s, c_blade_hr(1.45))}',
         g.sound('entity.breeze.shoot', 0.9, 0.6), g.sound('block.tuff.break', 1.0, 0.7)])
     for j in range(n_throw):
         T = f'rlk_mb_fg_p{pid}t{j}'
@@ -618,9 +618,11 @@ def c_blade_pad():
 
 
 def c_blade_hr(reach):
-    """The blade half width hr whose framework hit reach is `reach` blocks (spec Q16: keep the slabs' total reach at
-    about 1.45 b whichever blade rule the framework has)."""
-    return round(max(0.1, reach - c_blade_pad()), 2)
+    """The blade half width hr whose framework hit reach (hr + c_blade_pad()) is about `reach` blocks (spec Q16: keep
+    the slabs' total reach at about 1.45 b whichever blade rule the framework has), in the tenths the framework
+    launches (mboss_lib.pj_launch rounds hr to tenths, halves up): with the blade rule since FW-1 (pad 0.3) 1.45 gives
+    hr 1.2, a reach of 1.5 b = the w 2.4 throw lane plus the same 0.3 pad (before the merge: hr 0.8 + 0.65 = 1.45 b)."""
+    return max(0.1, math.floor((reach - c_blade_pad()) * 10 + 0.5 + 1e-9) / 10)
 
 
 def c_redraw(g, key, vis_lo, vis_hi, el=5, hold=3):
@@ -770,7 +772,7 @@ def c_rocks(g, tl, key, pid, bursts, throws, dmg, dmg_s, el=5, pair=2, cap=2, re
         L.sound('block.chain.hit', 0.5, 0.8)])
     g.pw(key, 'rk_go', [
         f'# [c_rocks] @s = the slab: a blade projectile at the locked feet ({TLT}), 1.5 b/t, life 24, half width {L.num(hr)}',
-        f'# (reach {L.num(reach)} b with the framework blade rule), its own volley group.',
+        f'# (reach {L.num(hr + c_blade_pad())} b with the framework blade rule), its own volley group.',
         f'scoreboard players set @s mbId {pid}',
         f'tag @s remove {S}', f'tag @s add {Fl}',
         'data merge entity @s {teleport_duration:1}',

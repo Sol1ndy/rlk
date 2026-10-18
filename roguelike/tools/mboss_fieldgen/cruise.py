@@ -605,7 +605,7 @@ def rock(g):
     until the vent, F4), the vent flare (12), the tower (20), the flame band (38); the device tracks the player
     (4 deg/t) until the revert. Then api.c_rocks: 8 floor bursts on the arc walker (the sweep crosses the device's
     front and ends on the player's feet; r 1.8, tell 10, jumpable 1.2 b, heavy KB, 1.3; bursts 7-8 one volley group),
-    a slab torn out at each, 5 throws from slabs 1-5 (a 10 t throw line, then a blade pj 1.5 b/t, total reach 1.45 b,
+    a slab torn out at each, 5 throws from slabs 1-5 (a 10 t throw line, then a blade pj 1.5 b/t, total reach 1.5 b,
     1.1) with at most 2 slab hits per run (the rest crumble), the unthrown slabs crumble at the revert."""
     key, tl = 'rock', TL(g, 'rock')
     rk = A.c_rocks(g, tl, key, 6, C6_BURSTS, C6_THROWS, DMG['c6'], DMG['c6s'], el=5)
