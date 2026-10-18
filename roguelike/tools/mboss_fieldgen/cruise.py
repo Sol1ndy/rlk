@@ -99,7 +99,8 @@ C1_SIDE = (round(C1_PORT_L[0], 3), round(C1_PORT_R[0], 3), 0.0)  # L, R, C (body
 C1_FWD = round(-(C1_PORT_L[2] + C1_PORT_R[2]) / 2, 3)          # ahead of the body axis (^z)
 C1_PORT_H = round((C1_PORT_L[1] + C1_PORT_R[1]) / 2, 3)        # the bomb starts this high above its decal
 C1_GLOW = [A.c_anchor('bomb_run', 'ports', f'port_{i}', None) for i in range(8)] if A.c_clip('bomb_run', 'anchors') else []
-C1_SLAM = clip_len('bomb_run')                                 # the finisher's slam clip starts here
+C1_GLOW_LIFE = C1_RUN - C1_PORTS + 2                           # the port glows: 2 t, gone 2 t into the run glide
+C1_SLAM = clip_len('bomb_run')                                # the finisher's slam clip starts here
 C1_SLAM_T = ev_or('slam', 'impact', 16)                        # its tell (the clip's impact)
 C1_SLAM_HIT = C1_SLAM + C1_SLAM_T
 C1_PLUNGE = C1_SLAM + ev_or('slam', 'plunge', 13)
@@ -282,11 +283,13 @@ def bomb(g):
     tl.at(0, f'execute at @s facing entity {PLAYER} feet rotated ~ 0 run function {NS}p/{key}/route',
           g.rig('face/track'), g.sound('entity.breeze.whirl', 0.5, 0.9))
     # the ports light up (+10): the kit's port dust under the ring and a glow on each of the rig's 8 ports (the manifest's
-    # bomb_run `ports` anchors, the nose-down pose: fix round FID-3)
+    # bomb_run `ports` anchors, the nose-down pose: fix round FID-3). The cards stand still, so they flash only while the
+    # device does (plan C1 "ports glow 2 t") and fade over the first 2 t of the run glide; the rig's charge look keeps
+    # the real ports lit (verification round: with life 14 they trailed the gliding ports by up to 2.9 b)
     tl.at(C1_PORTS, f'execute at @s facing entity {end} feet run tp @s ~ ~ ~ ~ 0',
           at_body(4.5, g.fx('ports_glow')), at_body(4.5, g.snd('bomb_port')),
           *[f'execute at @s rotated as @s rotated ~ 0 positioned {A.c_bf(pt)} run '
-            + g.kcard('glow', bb='center', s0=0.3, s1=0.75, life=14, fade=4, col='#E1BC7E') for pt in C1_GLOW])
+            + g.kcard('glow', bb='center', s0=0.3, s1=0.75, life=C1_GLOW_LIFE, fade=2, col='#E1BC7E') for pt in C1_GLOW])
     tl.at(C1_RUN - C1_LEAD, f'execute as {pred} positioned as {end} run function rlk:mboss/mv/glide {{t:{C1_GLIDE}}}')
     tl.at(C1_RUN, f'execute positioned as {end} run function rlk:mboss/mv/glide {{t:{C1_GLIDE}}}',
           g.sound('entity.breeze.charge', 0.6, 0.6))
