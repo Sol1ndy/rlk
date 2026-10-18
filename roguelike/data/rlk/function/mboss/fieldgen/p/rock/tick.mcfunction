@@ -1,4 +1,10 @@
 # rock tick.
-function rlk:mboss/fieldgen/p/rock/slabs
-execute if score #fgPT mb matches 12..63 run return run function rlk:mboss/fieldgen/p/rock/d/12_63
-execute if score #fgPT mb matches 69..157 run return run function rlk:mboss/fieldgen/p/rock/d/69_157
+execute if score #fq6Pz mb matches 1 run function rlk:mboss/fieldgen/p/rock/resume
+execute if score #fgPT mb matches 1..11 run execute at @s unless entity @e[tag=rlk_body,distance=..5] run function rlk:mboss/fieldgen/u/toward {d:0.2}
+execute if score #fgPT mb matches 1..142 run function rlk:mboss/fieldgen/rig_stub/face/track
+execute as @e[type=minecraft:item_display,tag=rlk_mb_fg_p6s] at @s run function rlk:mboss/fieldgen/p/rock/rk_slab
+scoreboard players operation #fgM mb = #fgPT mb
+scoreboard players operation #fgM mb %= #fgK2 mb
+execute if score #fgM mb matches 0 as @e[type=minecraft:item_display,tag=rlk_mb_fg_p6f] at @s rotated as @s run function rlk:mboss/fieldgen/fx/p/slab_trail
+execute if score #fgPT mb matches 12..75 run return run function rlk:mboss/fieldgen/p/rock/d/12_75
+execute if score #fgPT mb matches 81..157 run return run function rlk:mboss/fieldgen/p/rock/d/81_157

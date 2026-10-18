@@ -1,2 +1,2 @@
 # rock clock 93
-function rlk:mboss/fieldgen/p/rock/throw_tell1
+function rlk:mboss/fieldgen/p/rock/rk_tt1

@@ -1,4 +1,5 @@
 # bomb tick.
-execute as @e[type=minecraft:item_display,tag=rlk_mb_fg_p1b] at @s run function rlk:mboss/fieldgen/p/bomb/bomb
-execute if score #fgPT mb matches 8..36 run return run function rlk:mboss/fieldgen/p/bomb/d/8_36
-execute if score #fgPT mb matches 37..100 run return run function rlk:mboss/fieldgen/p/bomb/d/37_100
+execute if score #fq1Pz mb matches 1 run function rlk:mboss/fieldgen/p/bomb/resume
+execute if score #fgPT mb matches 1..9 run function rlk:mboss/fieldgen/rig_stub/face/track
+execute if score #fgPT mb matches 8..35 run return run function rlk:mboss/fieldgen/p/bomb/d/8_35
+execute if score #fgPT mb matches 36..103 run return run function rlk:mboss/fieldgen/p/bomb/d/36_103

@@ -18,7 +18,7 @@ execute if score #fgPat mb matches 21 run scoreboard players set #fgPMax mb 240
 execute if score #fgPat mb matches 20 run scoreboard players set #fgPMax mb 62
 execute if score #fgPat mb matches 22 run scoreboard players set #fgPMax mb 83
 # expected end for the progress bar (a pattern that decides a shorter run sets #fgPLen itself: g.set_len)
-execute if score #fgPat mb matches 1 run scoreboard players set #fgPLen mb 100
+execute if score #fgPat mb matches 1 run scoreboard players set #fgPLen mb 103
 execute if score #fgPat mb matches 2 run scoreboard players set #fgPLen mb 45
 execute if score #fgPat mb matches 3 run scoreboard players set #fgPLen mb 174
 execute if score #fgPat mb matches 4 run scoreboard players set #fgPLen mb 70

@@ -1,29 +1,5 @@
 # @s = the slam hazard (#hzEv 1 = the impact).
 execute unless score #hzEv mb matches 1 run return 0
-particle minecraft:explosion ~ ~0.3 ~ 1.5 0.1 1.5 0 6 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~0 ~0.2 ~5 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~1.29 ~0.2 ~4.83 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~2.5 ~0.2 ~4.33 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~3.54 ~0.2 ~3.54 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~4.33 ~0.2 ~2.5 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~4.83 ~0.2 ~1.29 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~5 ~0.2 ~0 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~4.83 ~0.2 ~-1.29 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~4.33 ~0.2 ~-2.5 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~3.54 ~0.2 ~-3.54 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~2.5 ~0.2 ~-4.33 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~1.29 ~0.2 ~-4.83 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~0 ~0.2 ~-5 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~-1.29 ~0.2 ~-4.83 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~-2.5 ~0.2 ~-4.33 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~-3.54 ~0.2 ~-3.54 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~-4.33 ~0.2 ~-2.5 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~-4.83 ~0.2 ~-1.29 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~-5 ~0.2 ~0 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~-4.83 ~0.2 ~1.29 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~-4.33 ~0.2 ~2.5 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~-3.54 ~0.2 ~3.54 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~-2.5 ~0.2 ~4.33 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.698f,0.353f],scale:1.6} ~-1.29 ~0.2 ~4.83 0 0 0 0 1 force @a[tag=player]
-playsound minecraft:block.anvil.land hostile @a[tag=player] ~ ~ ~ 1 0.5 0.33
-playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.9 0.7 0.3
+execute if score @s mbHzV matches 21 at @s rotated ~ 0 run function rlk:mboss/fieldgen/fx/p/slam
+execute if score @s mbHzV matches 21 at @s rotated ~ 0 run function rlk:mboss/fieldgen/fx/p/dust_puff
+execute if score @s mbHzV matches 21 at @s run function rlk:mboss/fieldgen/fx/snd/slam
