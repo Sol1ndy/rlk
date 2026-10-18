@@ -6,7 +6,9 @@ kill @e[type=minecraft:marker,tag=rlk_mb_bf_p3a]
 scoreboard players set #bfDMax mb 70
 scoreboard players set #bfDKeep mb 15
 function rlk:mboss/butterfly/u/dest
+kill @e[type=minecraft:marker,tag=rlk_mb_bf_p3a]
 tag @e[type=minecraft:marker,tag=rlk_mb_bf_dest] add rlk_mb_bf_p3a
+tag @e[type=minecraft:marker,tag=rlk_mb_bf_p3a] add rlk_mb_bf_kept
 tag @e[type=minecraft:marker,tag=rlk_mb_bf_p3a] remove rlk_mb_bf_dest
 function rlk:mboss/grp_new
 scoreboard players operation #hzGrp mb = #mbGrp mb

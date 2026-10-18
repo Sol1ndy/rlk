@@ -20,6 +20,8 @@ execute if score @s mbHzW matches ..0 run scoreboard players set @s mbHzW 1
 execute if score @s mbHzA matches ..0 run scoreboard players set @s mbHzA 1
 scoreboard players set @s mbHzT -1
 scoreboard players set @s mbHzHit 0
+# a member made after its volley group already landed its hit is harmless from the start (#mbGrpL, grp_mark)
+execute if score @s mbHzG matches 1.. if score @s mbHzG = #mbGrpL mb run scoreboard players set @s mbHzHit 1
 scoreboard players operation @s mbHzL = @s mbHzW
 scoreboard players operation @s mbHzL += @s mbHzA
 scoreboard players operation @s mbHzL += #hzLinger mb

@@ -6,7 +6,7 @@ scoreboard players set @e[type=minecraft:item_display,tag=rlk_mb_bf_p4n,limit=1]
 scoreboard players set #pjKB mb 3
 scoreboard players set #pjWall mb 1
 scoreboard players set #pjShape mb 1
-execute as @e[type=minecraft:item_display,tag=rlk_mb_bf_p4n,limit=1] at @s run function rlk:mboss/pj/launch {spd:7,life:60,dmg:120,hr:12}
+execute as @e[type=minecraft:item_display,tag=rlk_mb_bf_p4n,limit=1] at @s run function rlk:mboss/pj/launch {spd:7,life:60,dmg:120,hr:15}
 tag @e[type=minecraft:item_display,tag=rlk_mb_bf_p4n] remove rlk_mb_bf_p4n
 scoreboard players set #bp4B mb 1
 function rlk:mboss/butterfly/fx/snd/vacuum_blade

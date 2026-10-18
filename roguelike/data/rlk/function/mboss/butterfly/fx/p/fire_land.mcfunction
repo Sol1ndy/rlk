@@ -4,8 +4,6 @@ function rlk:mboss/butterfly/fx/cardx {kind:"flame_tongue",pos:"~ ~ ~",rot:"~ ~"
 function rlk:mboss/butterfly/fx/card {kind:"flame_puff",pos:"~ ~0.4 ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.8,s1:2.2,move:"0f,0f,0f",life:6,fade:3,col:16777215}
 function rlk:mboss/butterfly/fx/card {kind:"glow",pos:"~ ~0.05 ~",rot:"~ 90",bb:"fixed",roll:0,spin:0,s0:1,s1:2.6,move:"0f,0f,0f",life:8,fade:4,col:16289593}
 function rlk:mboss/butterfly/fx/card {kind:"flame_tongue",pos:"^ ^ ^",rot:"~30 0",bb:"fixed",roll:0,spin:0,s0:0.2,s1:1.1,move:"0f,0f,0.9f",life:7,fade:3,col:16777215}
-function rlk:mboss/butterfly/fx/card {kind:"flame_tongue",pos:"^ ^ ^",rot:"~120 0",bb:"fixed",roll:0,spin:0,s0:0.2,s1:1.1,move:"0f,0f,0.9f",life:7,fade:3,col:16777215}
 function rlk:mboss/butterfly/fx/card {kind:"flame_tongue",pos:"^ ^ ^",rot:"~210 0",bb:"fixed",roll:0,spin:0,s0:0.2,s1:1.1,move:"0f,0f,0.9f",life:7,fade:3,col:16777215}
-function rlk:mboss/butterfly/fx/card {kind:"flame_tongue",pos:"^ ^ ^",rot:"~300 0",bb:"fixed",roll:0,spin:0,s0:0.2,s1:1.1,move:"0f,0f,0.9f",life:7,fade:3,col:16777215}
 particle minecraft:lava ~ ~0.2 ~ 0.3 0.1 0.3 0 3 force @a[tag=player]
 particle minecraft:flame ~ ~0.3 ~ 0.6 0.2 0.6 0.04 8 force @a[tag=player]

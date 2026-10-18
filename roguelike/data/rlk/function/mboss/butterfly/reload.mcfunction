@@ -21,6 +21,8 @@ execute if score #bfForm mb matches 2 run function rlk:mboss/butterfly/form/rig_
 execute if score #bfForm mb matches 1 run function rlk:mboss/butterfly/form/rig_h
 function rlk:mboss/butterfly/coc/assert
 execute if score #bfCoc mb matches 1 if score #bfForm mb matches 2 run function rlk:mboss/butterfly/dew/spawn
+# the groggy's single 달빛 이슬 (offered while debuffed after 달빛 해제) comes back too (review fix S4)
+execute if score #bfDew1 mb matches 1 if score #bfForm mb matches 1 unless score #bfX mb matches 2 run function rlk:mboss/butterfly/dew/spawn1
 execute if score #bfX mb matches 2 run return run function rlk:mboss/butterfly/groggy/begin
 execute if score #bfX mb matches 3 run return run function rlk:mboss/butterfly/groggy/end
 execute if score #bfSt mb matches 3 run return run function rlk:mboss/butterfly/rig/play/groggy_h

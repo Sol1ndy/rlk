@@ -1,3 +1,6 @@
-# From mboss/won during a test (with storage rlk:mboss cur).
-$execute if score #mbKilled mb matches 1 run tellraw @a[tag=player] [{text:"[중간보스 테스트] ",color:"#E0703A",bold:true},{text:"처치! 문 자리에 아이템 상자가 떨어졌습니다(누르면 아이템 선택). ",color:"gray",bold:false},{text:"[다시 하기]",color:"yellow",bold:false,click_event:{action:"suggest_command",command:'/function rlk:mboss/test/start {id:"$(id)"}'}},{text:" ",color:"gray",bold:false},{text:"[로비로]",color:"yellow",bold:false,click_event:{action:"suggest_command",command:'/function rlk:mboss/test/stop'}}]
+# From mboss/won during a test (with storage rlk:mboss cur): the replay link comes from rlk:mboss tlast {id, ch}
+# (test/start_ch), with this fight's id.
+$data modify storage rlk:mboss tlast.id set value "$(id)"
+execute unless data storage rlk:mboss tlast.ch run data modify storage rlk:mboss tlast.ch set value 1
+execute if score #mbKilled mb matches 1 run function rlk:mboss/test/won_msg with storage rlk:mboss tlast
 execute unless score #mbKilled mb matches 1 run tellraw @a[tag=player] [{text:"[중간보스 테스트] ",color:"#E0703A",bold:true},{text:"취소되었습니다(보상 없음). ",color:"gray",bold:false},{text:"[로비로]",color:"yellow",bold:false,click_event:{action:"suggest_command",command:'/function rlk:mboss/test/stop'}}]

@@ -88,6 +88,10 @@ def utils(g):
         '# while the wings are Pyro, every 6 t a small flame and a magenta-pink spark at each forewing tip.',
         f'execute positioned ~ {CY} ~ unless entity @e[tag=rlk_mb_arena,distance=..{L.num(A.BODY_R_B)},limit=1] '
         f'facing entity {arena} feet rotated ~ 0 positioned ^ ^ ^0.3 run tp @s ~ ~ ~',
+        '# the soft hover flap every 18 t while no pattern runs (idle, look switch; bf_fx_api section 9: every 13-20 t;',
+        '# review fix FX-6)',
+        'scoreboard players operation #bfM mb = #bfClk mb', 'scoreboard players operation #bfM mb %= #bfK18 mb',
+        f'execute if score #bfM mb matches 0 unless score #bfPat mb matches 1.. positioned ~ ~2.8 ~ run {g.snd("flap_small")}',
         f'execute unless score #bfLook mb matches {A.EL_PYRO} run return 0',
         'scoreboard players operation #bfM mb = #bfClk mb', 'scoreboard players operation #bfM mb %= #bfK6 mb',
         f'execute if score #bfM mb matches 0 run {fn("sw/embers")}'])
@@ -142,8 +146,8 @@ def transform(g):
     add(TR_OPEN, f'# t{TR_OPEN} the folded wings open partially: white sparks, a rim glint on each folded wing.',
         g.particle('end_rod', '~ ~2.3 ~', (0.3, 0.3, 0.3), 0.05, 6),
         body + 'positioned ^0.6 ^2.6 ^-0.3 run ' + g.kcard('glint', bb='center', s0=0.3, s1=0.9, life=3, fade=1, col='#EFFDA2'),
-        body + 'positioned ^-0.6 ^2.6 ^-0.3 run ' + g.kcard('glint', bb='center', s0=0.3, s1=0.9, life=3, fade=1, col='#EFFDA2'),
-        g.sound('entity.ender_dragon.flap', 0.6, 1.5))
+        body + 'positioned ^-0.6 ^2.6 ^-0.3 run ' + g.kcard('glint', bb='center', s0=0.3, s1=0.9, life=3, fade=1, col='#EFFDA2'))
+    # (no flap here: snd/transform_swell plays it at the sphere; review fix FX-4)
     add(TR_SPHERE - 1, f'# t{TR_SPHERE - 1} the core flash: a yellow-white flare at her chest.',
         body + f'positioned {core_at} run ' + g.kcard('glint', bb='center', s0=0.4, s1=2.0, life=3, fade=1, col='#FAFCD4'),
         g.dust(A.hexrgb('#FAFCD4'), 1.6, '~ ~2.2 ~', (0.15, 0.15, 0.15), 12))
@@ -157,7 +161,7 @@ def transform(g):
     add(TR_SPHERE, *sph)
     add(TR_RINGS, f'# t{TR_RINGS} the sphere bursts into ripple rings (kit tf_ripples: a floor ring, two vertical arcs, radial',
         '# speed lines) and a floor dust ring r 3.', chest + g.fx('tf_ripples'),
-        g.sound('entity.breeze.wind_burst', 0.8, 0.8), g.sound('block.amethyst_block.resonate', 0.7, 1.0),
+        g.sound('entity.breeze.wind_burst', 0.7, 1.1),
         *ring_pts(g, A.hexrgb('#BDE592'), 3.0, 16, y=0.15, scale=1.2))
     add(TR_RINGS + 1, '# ripple 2: floor ring r 4.', *ring_pts(g, A.hexrgb('#BDE592'), 4.0, 20, y=0.15, scale=1.2))
     add(TR_RINGS + 2, '# ripple 3: floor ring r 5 (dark mint), the swell flap.', *ring_pts(g, A.hexrgb('#428B71'), 5.0, 24, y=0.15, scale=1.2),
@@ -189,13 +193,20 @@ def debuff(g):
         y = 0.3 + 1.9 * i / 15
         col = A.COC if i % 2 == 0 else A.COC_SWIRL
         pts.append(g.dust(col, 1.1, f'~{L.num(r * math.sin(a), 2)} ~{L.num(y, 2)} ~{L.num(r * math.cos(a), 2)}', (0, 0, 0), 1))
-    g.w(f'{WX}/coc/fx', ['# At the player\'s feet (the core\'s coc/apply_pl): the kit\'s maroon swirl ring, salmon glow and badge glyph',
-                         '# (coc_apply), a maroon / salmon dust spiral rising 0.3 -> 2.2 b around the body, the badge pop glow over',
-                         '# the head; the debuff recipe and a curse chime.',
-                         g.fx('coc_apply'), *pts,
-                         g.kcard('glow', '~ ~2.4 ~', bb='center', s0=0.4, s1=1.2, life=8, fade=4, col=A.COC_HEX),
+    g.w(f'{WX}/coc/fx', ['# At the player\'s feet (the core\'s coc/apply_pl): a maroon / salmon dust spiral rising 0.3 -> 2.2 b around',
+                         '# the body, the debuff recipe and a curse chime; the kit\'s cards only around the shoulder-view avatar (rlk_av).',
+                         '# In first person rlk_body is the player itself and the camera-facing cards would sit on the eyes (a maroon',
+                         '# screen wash): only the closing swirl ring on the floor (fix PL-1; the title line belongs to the hint caption).',
+                         *pts,
+                         f'execute if entity @e[tag=rlk_av,limit=1] run function {NS}{WX}/coc/fx3',
+                         'execute unless entity @e[tag=rlk_av,limit=1] run ' + g.kcard('ripple', '~ ~0.06 ~', '~ 90', spin=-120, s0=4.0,
+                                                                                       s1=1.2, life=10, fade=3, col=A.COC_HEX),
                          g.snd('debuff'), g.sound('entity.elder_guardian.curse', 0.35, 1.7),
                          g.sound('block.amethyst_block.resonate', 0.6, 0.7)])
+    g.w(f'{WX}/coc/fx3', ['# Shoulder view: the kit\'s maroon swirl ring, salmon glow and badge glyph (coc_apply), the badge pop glow',
+                          '# over the avatar\'s head.',
+                          g.fx('coc_apply'),
+                          g.kcard('glow', '~ ~2.4 ~', bb='center', s0=0.4, s1=1.2, life=8, fade=4, col=A.COC_HEX)])
 
 
 # =============================================================================================
@@ -204,13 +215,19 @@ def cure(g):
     plus the descending beam dust, the gold particle rings, the sparkle rain and the chime layers."""
     ev = {}
     add = lambda t, *lines: ev.setdefault(t, []).extend(lines)
-    add(0, '# t0 (the cure tick): the kit\'s cure (gold beam 0-8, burst + ring from 6, emblem from 11) and its chime recipe.',
-        g.fx('cure'), g.snd('cure_chime'))
+    add(0, '# t0 (the cure tick): the kit\'s cure (gold beam 0-8, burst + ring from 6, emblem from 11) around the shoulder-view',
+        '# avatar; in first person (the player is rlk_body: the camera-facing cards would sit on the eyes) only the gold',
+        '# ring spreading on the floor (fix PL-1; the reward pop owns the title line). The chime recipe either way.',
+        f'execute if entity @e[tag=rlk_av,limit=1] run {g.fx("cure")}',
+        'execute unless entity @e[tag=rlk_av,limit=1] run ' + g.kcard('ripple', '~ ~0.07 ~', '~ 90', spin=50, s0=1.2, s1=5.2,
+                                                                      life=8, fade=3, col=A.GOLD_RING),
+        g.snd('cure_chime'))
     add(1, g.sound('block.amethyst_block.chime', 0.6, 2.0))
     for t in range(1, 7):
         y = 6.5 - (t - 1)
-        add(t, g.dust(A.GOLD, 1.3, f'~ ~{L.num(y)} ~', (0.05, 0.5, 0.05), 6),
-            g.dust(A.WHITE, 0.8, f'~ ~{L.num(y - 0.6)} ~', (0.05, 0.2, 0.05), 2))
+        av = 'execute if entity @e[tag=rlk_av,limit=1] run '          # the beam column passes the eyes in first person
+        add(t, av + g.dust(A.GOLD, 1.3, f'~ ~{L.num(y)} ~', (0.05, 0.5, 0.05), 6),
+            av + g.dust(A.WHITE, 0.8, f'~ ~{L.num(y - 0.6)} ~', (0.05, 0.2, 0.05), 2))
     add(3, g.sound('block.beacon.ambient', 0.4, 2.0))
     add(7, g.sound('entity.firework_rocket.twinkle', 0.6, 1.2), g.sound('block.amethyst_block.resonate', 0.6, 1.4))
     for t in range(7, 12):

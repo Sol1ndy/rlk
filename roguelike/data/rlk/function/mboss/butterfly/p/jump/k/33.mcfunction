@@ -5,7 +5,9 @@ kill @e[type=minecraft:marker,tag=rlk_mb_bf_p2a]
 scoreboard players set #bfDMax mb 35
 scoreboard players set #bfDKeep mb 8
 function rlk:mboss/butterfly/u/dest
+kill @e[type=minecraft:marker,tag=rlk_mb_bf_p2a]
 tag @e[type=minecraft:marker,tag=rlk_mb_bf_dest] add rlk_mb_bf_p2a
+tag @e[type=minecraft:marker,tag=rlk_mb_bf_p2a] add rlk_mb_bf_kept
 tag @e[type=minecraft:marker,tag=rlk_mb_bf_p2a] remove rlk_mb_bf_dest
 execute positioned as @e[type=minecraft:marker,tag=rlk_mb_bf_p2a,limit=1] run function rlk:mboss/mv/glide {t:26}
 execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/p/spiral_jump

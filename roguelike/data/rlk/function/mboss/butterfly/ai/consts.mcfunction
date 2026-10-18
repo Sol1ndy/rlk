@@ -6,6 +6,7 @@ scoreboard players set #bfK5 mb 5
 scoreboard players set #bfK6 mb 6
 scoreboard players set #bfK8 mb 8
 scoreboard players set #bfK10 mb 10
+scoreboard players set #bfK18 mb 18
 scoreboard players set #bfK20 mb 20
 scoreboard players set #bfK40 mb 40
 scoreboard players set #bfCocPct mb 20

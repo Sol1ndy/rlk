@@ -158,6 +158,7 @@ w('init', '\n'.join(
        'execute unless score #mbCritAdd mb matches -1000.. run scoreboard players set #mbCritAdd mb 0',
        'execute unless score #mbHealEv mb matches 0.. run scoreboard players set #mbHealEv mb 0',
        'execute unless score #mbGrpN mb matches 0.. run scoreboard players set #mbGrpN mb 0',
+       'execute unless score #mbGrpL mb matches 0.. run scoreboard players set #mbGrpL mb 0',
        '# Library activity flags (a set flag makes the world tick scan for that library\'s entities once).',
        'scoreboard players set #mbHzOn mb 1', 'scoreboard players set #mbPjOn mb 1',
        'scoreboard players set #mbPlOn mb 1', 'scoreboard players set #mbMvOn mb 1',
@@ -195,6 +196,7 @@ execute in minecraft:overworld run forceload remove @FL@
 data remove storage rlk:mboss reg
 data remove storage rlk:mboss byid
 data remove storage rlk:mboss met
+data remove storage rlk:mboss tlast
 ''' + '\n'.join(f'scoreboard objectives remove {o}' for o in OBJECTIVES))
 
 w('opts_reset', '''
@@ -1247,6 +1249,8 @@ execute if score @s mbHzW matches ..0 run scoreboard players set @s mbHzW 1
 execute if score @s mbHzA matches ..0 run scoreboard players set @s mbHzA 1
 scoreboard players set @s mbHzT -1
 scoreboard players set @s mbHzHit 0
+# a member made after its volley group already landed its hit is harmless from the start (#mbGrpL, grp_mark)
+execute if score @s mbHzG matches 1.. if score @s mbHzG = #mbGrpL mb run scoreboard players set @s mbHzHit 1
 scoreboard players operation @s mbHzL = @s mbHzW
 scoreboard players operation @s mbHzL += @s mbHzA
 scoreboard players operation @s mbHzL += #hzLinger mb
@@ -1621,6 +1625,7 @@ scoreboard players operation @s mbPjRet = #pjRet mb
 scoreboard players operation @s mbPjW = #pjWall mb
 scoreboard players operation @s mbPjK = #pjShape mb
 scoreboard players operation @s mbPjG = #pjGrp mb
+execute if score @s mbPjG matches 1.. if score @s mbPjG = #mbGrpL mb run scoreboard players set @s mbPjHit 1
 execute if score @s mbPjR matches 41.. run scoreboard players set @s mbPjR 40
 execute if score @s mbPjR matches ..0 run scoreboard players set @s mbPjR 1
 tp @s ~ ~ ~ ~ ~
@@ -1658,18 +1663,27 @@ for k in range(1, 41):
     out.write(f'mboss/pj/h/{k}', f'# Hit radius {L.num(k / 10)} b (+0.3 body), measured 0.9 b below the prop.\n'
               f'execute positioned ~ ~-0.9 ~ if entity @e[tag=rlk_body,distance=..{L.num(k / 10 + 0.3)},limit=1] run function rlk:mboss/pj/hit')
 w('pj/br', '$function rlk:mboss/pj/b/$(hr)')
-# Blade hit shape (#pjShape 1): a line across the flight direction, hr tenths on each side, sampled by points at
-# most 0.8 b apart, in two rows (0.9 b below the prop = the sphere test's point, and 0.3 b above the prop, so a
-# jumping player is caught too), each a 0.65 b sphere against the player's feet. Swept by the 0.25 b sub-steps.
-BLADE_R = 0.65
+# Blade hit shape (#pjShape 1): a line across the flight direction, hr tenths on each side. Its reach is hr + 0.3
+# off the line (the same 0.3 body pad as every other shape and the telegraph): sample spheres of radius BLADE_R
+# whose outer centres sit at +-(hr + 0.3 - BLADE_R), at most 0.6 b apart, in three rows 0.9 / 0.3 b below and 0.3 b
+# above the prop (the prop flies 0.9 b over the floor: feet from the floor to floor + 1.65 are covered without a gap,
+# a jump's apex is 1.25), each tested against the player's feet. Swept by the 0.25 b sub-steps. (Before the review
+# fix FW-1 the outer points sat at +-hr with 0.65 b spheres in two rows: a reach of hr + 0.65 and a height gap.)
+BLADE_R, BLADE_PAD, BLADE_GAP = 0.45, 0.3, 0.6
 for k in range(1, 41):
     hw = k / 10
-    n = max(1, math.ceil(2 * hw / 0.8))
-    xs = [-hw + 2 * hw * i / n for i in range(n + 1)]
-    lines = [f'# Blade half width {L.num(hw)} b: {len(xs)} points x 2 rows, radius {L.num(BLADE_R)} b (@s = prop, at and rotated as it).']
-    for dy in (-0.9, 0.3):
+    reach = hw + BLADE_PAD
+    if reach <= BLADE_R:
+        xs, rad = [0.0], reach
+    else:
+        outer = reach - BLADE_R
+        n = max(1, math.ceil(2 * outer / BLADE_GAP - 1e-9))
+        xs, rad = [-outer + 2 * outer * i / n for i in range(n + 1)], BLADE_R
+    lines = [f'# Blade half width {L.num(hw)} b (reach {L.num(reach)} b off the line): {len(xs)} points x 3 rows, radius {L.num(rad)} b '
+             '(@s = prop, at and rotated as it).']
+    for dy in (-0.9, -0.3, 0.3):
         for x in xs:
-            lines.append(f'execute positioned ^{L.num(x, 3)} ^{L.num(dy)} ^ if entity @e[tag=rlk_body,distance=..{L.num(BLADE_R)},limit=1] '
+            lines.append(f'execute positioned ^{L.num(x, 3)} ^{L.num(dy)} ^ if entity @e[tag=rlk_body,distance=..{L.num(rad + 0.001, 3)},limit=1] '
                          'run return run function rlk:mboss/pj/hit')
     out.write(f'mboss/pj/b/{k}', '\n'.join(lines))
 w('grp_new', '''
@@ -1682,7 +1696,9 @@ scoreboard players operation #mbGrp mb = #mbGrpN mb
 ''')
 w('grp_mark', '''
 # #g mb = a volley group that just landed a hit: its hazards and props stop testing for hits (the strike
-# visuals and the flights go on).
+# visuals and the flights go on). #mbGrpL remembers it, so a member made later (hz/init, pj/launch) starts harmless:
+# one hit per group even when a member is created after the hit (e.g. a burst made at a prop's life end).
+scoreboard players operation #mbGrpL mb = #g mb
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzG = #g mb run scoreboard players set @s mbHzHit 1
 execute as @e[tag=rlk_mb_pj] if score @s mbPjG = #g mb run scoreboard players set @s mbPjHit 1
 ''')
@@ -2049,9 +2065,11 @@ execute if score @s dead matches 1 run return 0
 $execute unless data storage rlk:mboss byid.$(id) run return run tellraw @s ''', gray('등록되지 않았거나 꺼진 중간보스입니다: $(id)') + ''']
 $execute store result score #mbForce mb run data get storage rlk:mboss byid.$(id).n
 # the boss of this test, for the replay links (test/defeat runs after test/end has forgotten cur)
-$data modify storage rlk:mboss tlast set value {id:"$(id)"}
+$data modify storage rlk:mboss tlast set value {id:"$(id)",ch:1}
 $scoreboard players set #mbReqCh mb $(ch)
 execute unless score #mbReqCh mb matches 1.. run scoreboard players set #mbReqCh mb 1
+# ... and its chapter, so [다시 하기] replays the same chapter (test/defeat_msg, test/won_msg)
+execute store result storage rlk:mboss tlast.ch int 1 run scoreboard players get #mbReqCh mb
 execute if score @s vMap matches 1 run function rlk:view/map_close
 execute if score @s pkMode matches 1.. run function rlk:lvup/exit
 execute unless score #active room matches 1 run function rlk:run/save_pos
@@ -2128,10 +2146,11 @@ function rlk:mboss/cleanup
 execute as @a[tag=player] run function rlk:lobby/go
 ''')
 w('test/defeat', '''
-# From player/hook_respawn during a test: never fails/resets the character. The replay link restarts the boss of
-# this test (rlk:mboss tlast, saved by test/start_ch; cur is forgotten by test/end).
-execute unless data storage rlk:mboss tlast.id run data modify storage rlk:mboss tlast set value {id:"proto"}
+# From player/hook_respawn during a test: never fails/resets the character. The replay link restarts the boss and
+# the chapter of this test (rlk:mboss tlast {id, ch}, saved by test/start_ch; cur is forgotten by test/end).
+execute unless data storage rlk:mboss tlast.id run data modify storage rlk:mboss tlast set value {id:"proto",ch:1}
 execute if data storage rlk:mboss cur.id run data modify storage rlk:mboss tlast.id set from storage rlk:mboss cur.id
+execute unless data storage rlk:mboss tlast.ch run data modify storage rlk:mboss tlast.ch set value 1
 function rlk:mboss/test/end
 title @s times 10 40 15
 title @s subtitle {text:"로비로 돌아왔습니다",color:"gray"}
@@ -2140,14 +2159,19 @@ scoreboard players set @s vBig 65
 scoreboard players set @s ttlT 65
 function rlk:mboss/test/defeat_msg with storage rlk:mboss tlast
 ''')
-w('test/defeat_msg', '$tellraw @s ' + TT + gray('쓰러졌습니다. ') + ',' + link('/function rlk:mboss/test/start {id:"$(id)"}', '[다시 하기]') + ']')
-WON_REPLAY = link('/function rlk:mboss/test/start {id:"$(id)"}', '[다시 하기]')
+# [다시 하기] replays the same boss AND chapter (review fix FW-3: it used to restart at chapter 1 through test/start).
+REPLAY = link('/function rlk:mboss/test/start_ch {id:"$(id)",ch:$(ch)}', '[다시 하기]')
+w('test/defeat_msg', '$tellraw @s ' + TT + gray('쓰러졌습니다. ') + ',' + REPLAY + ']')
 w('test/won', '\n'.join([
-    '# From mboss/won during a test (with storage rlk:mboss cur).',
-    '$execute if score #mbKilled mb matches 1 run tellraw @a[tag=player] ' + TT + gray('처치! 문 자리에 아이템 상자가 떨어졌습니다(누르면 아이템 선택). ') + ',' + WON_REPLAY
-    + ',' + gray(' ') + ',' + link('/function rlk:mboss/test/stop', '[로비로]') + ']',
+    '# From mboss/won during a test (with storage rlk:mboss cur): the replay link comes from rlk:mboss tlast {id, ch}',
+    '# (test/start_ch), with this fight\'s id.',
+    '$data modify storage rlk:mboss tlast.id set value "$(id)"',
+    'execute unless data storage rlk:mboss tlast.ch run data modify storage rlk:mboss tlast.ch set value 1',
+    'execute if score #mbKilled mb matches 1 run function rlk:mboss/test/won_msg with storage rlk:mboss tlast',
     'execute unless score #mbKilled mb matches 1 run tellraw @a[tag=player] ' + TT + gray('취소되었습니다(보상 없음). ') + ','
     + link('/function rlk:mboss/test/stop', '[로비로]') + ']']))
+w('test/won_msg', '$tellraw @a[tag=player] ' + TT + gray('처치! 문 자리에 아이템 상자가 떨어졌습니다(누르면 아이템 선택). ') + ',' + REPLAY
+  + ',' + gray(' ') + ',' + link('/function rlk:mboss/test/stop', '[로비로]') + ']')
 w('test/arena', TT.join(['''
 # Rebuild the arena and look at it (outside a run). Back: /function rlk:lobby/go
 execute if score #active room matches 1 run return run tellraw @s ''', gray('런 중에는 쓸 수 없습니다.') + ''']

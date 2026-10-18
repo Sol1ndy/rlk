@@ -51,9 +51,9 @@ H4_BLADE = ev_or('vacuum', 'blade', 17)
 H4_STOMP = ev_or('vacuum', 'stomp', H4_BLADE - 1)
 H4_BACK = ev_or('vacuum', 'backflip', H4_BLADE)
 H4_LAND = ev_or('vacuum', 'land', 38)
-H4_SPD, H4_LIFE = 0.7, 60                     # 0.7 b/t (the framework flies it at 0.75), 60 t
-H4_HR = 1.2                                    # blade half width: its 0.65 b sample spheres reach 1.85 b off the line,
-                                               # the spec's 3.0 b lane + the body (1.8 b); hr 1.5 would reach 2.15 b
+H4_SPD, H4_LIFE = 0.75, 60                    # 0.75 b/t (3 sub-steps of 0.25 b; FW-2), 60 t
+H4_HR = 1.5                                    # blade half width (the spec's 3.0 b lane): it reaches hr + 0.3 = 1.8 b off the
+                                               # line, the lane decal + the body pad (FW-1; the hr 1.2 workaround is gone)
 H4_EFF = 0.75                                  # effective speed (0.25 b sub-steps, rounded up)
 H4_REAR, H4_P0 = 0.3, 1.0                      # rear-up 0.3 b back (12-14); the blade spawns 1.0 b ahead of her
 H4_EDGE = 20.7                                 # the blade stops at the wall ring (r 21): its lane ends there
@@ -245,7 +245,6 @@ def kick(g):
     tl.at(H1_HIT2 - 4, BODY + g.kcard('ripple', foot_leap, bb='center', col='#D7F899', spin=160, s0=0.4, s1=1.4, life=6, fade=2),
           snd(g, 'block.amethyst_block.resonate', 0.5, 1.6))
     tl.at(H1_HIT2 - 2, f'execute at @s rotated as @s rotated ~ 0 positioned {foot_leap} run ' + g.fx('glint'))
-    tl.at(H1_HIT2 - 1, snd(g, 'entity.player.attack.sweep', 0.8, 0.8))
     # the axe kick (kit kick_axe, two crescent layers) and the ground wave (kit ground_wave: blades along 6 b)
     tl.at(H1_HIT2, aim(B_) + g.fx('kick_axe'),
           aim(B_) + g.kcard('burst', '^ ^0.08 ^2.0', '~ 90', s0=1.0, s1=4.0, life=5, fade=2),
@@ -350,8 +349,7 @@ def jump(g):
     for t in range(H2_ORB + 2, H2_KICK - 1):
         tl.at(t, BODY + g.dust(hx('#D4F8C6'), 1.0, orb, (0.15, 0.15, 0.15), 3))
     tl.at(H2_ORB + 3, snd(g, 'item.trident.riptide_1', 0.25, 1.6))
-    tl.at(H2_KICK - 1, f'execute at @s rotated as @s rotated ~ 0 positioned {orb_k} run ' + g.fx('orb_star'),
-          snd(g, 'entity.firework_rocket.twinkle', 0.6, 1.4))
+    tl.at(H2_KICK - 1, f'execute at @s rotated as @s rotated ~ 0 positioned {orb_k} run ' + g.fx('orb_star'))
     tl.at(H2_KICK, f'execute at @s rotated as @s rotated ~ 0 positioned {orb_k} run ' + g.fx('orb_kick'),
           g.snd('disc_kick'), at_mk(L_) + g.fx('disc_fall', h=2.7))
     tl.at(H2_IMPACT, at_mk(L_) + g.fx('disc_impact'),
@@ -508,8 +506,8 @@ def vacuum(g):
     tl.at(H4_GLINT + 4, snd(g, 'entity.breeze.jump', 0.4, 1.0))
     tl.at(H4_STOMP, f'execute at @s rotated as @s rotated ~ 0 positioned ^ ^ ^1.0 positioned ~ {CY} ~ run ' + g.fx('vac_stomp'),
           BODY + g.kcard('flame_tongue', '^ ^ ^1.0', bb='vertical', s0=0.4, s1=1.2, life=4, fade=2),
-          BODY + g.particle('block{block_state:"minecraft:mossy_cobblestone"}', '^ ^0.2 ^1.0', (0.4, 0.2, 0.4), 0.2, 8),
-          snd(g, 'entity.breeze.wind_burst', 0.8, 1.0), snd(g, 'block.big_dripleaf.tilt_down', 0.6, 1.0))
+          BODY + g.particle('block{block_state:"minecraft:mossy_cobblestone"}', '^ ^0.2 ^1.0', (0.4, 0.2, 0.4), 0.2, 8))
+    # (no stomp sound layers here: snd/vacuum_blade one tick later is the stomp + blade rise; review fix FX-4)
     # the blade: an item_display 0.9 b over the floor 1 b ahead, the kit's lime crescent, rising from its lower tip
     # (scale 0.3 -> 1 over 3 t about the tip 0.9 b under the prop), launched along the locked yaw at pitch 0
     s = 0.3
@@ -563,7 +561,6 @@ def vacuum(g):
         f'execute if score #bfM mb matches 1 positioned ^ ^-0.9 ^ run ' + g.fx('vac_trail'),
         'scoreboard players operation #bfM mb = @s mbPjT', 'scoreboard players operation #bfM mb %= #bfK4 mb',
         f'execute if score #bfM mb matches 1 run function {A.NS}p/{k}/debris',
-        'execute if score @s mbPjT matches 2 run ' + snd(g, 'entity.phantom.swoop', 0.5, 1.4),
         'execute if score @s mbPjT matches 6 run ' + snd(g, 'entity.breeze.idle_air', 0.4, 1.0),
         f'execute unless entity @s[tag=rlk_mb_bf_p4s] if entity @e[tag=rlk_body,distance=..4,limit=1] run function {A.NS}p/{k}/pass'])
     g.pw(k, 'debris', ['# Every 4 t: rock debris and two lime leaves thrown up and forward, the grass rustle.',

@@ -104,6 +104,7 @@ execute unless score #mbHealPct mb matches -1000.. run scoreboard players set #m
 execute unless score #mbCritAdd mb matches -1000.. run scoreboard players set #mbCritAdd mb 0
 execute unless score #mbHealEv mb matches 0.. run scoreboard players set #mbHealEv mb 0
 execute unless score #mbGrpN mb matches 0.. run scoreboard players set #mbGrpN mb 0
+execute unless score #mbGrpL mb matches 0.. run scoreboard players set #mbGrpL mb 0
 # Library activity flags (a set flag makes the world tick scan for that library's entities once).
 scoreboard players set #mbHzOn mb 1
 scoreboard players set #mbPjOn mb 1

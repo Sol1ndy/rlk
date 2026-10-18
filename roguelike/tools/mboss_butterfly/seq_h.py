@@ -228,8 +228,9 @@ def death(g, C):
     ck = Clock(g, 'death', '#mbT')
     cracks = [g.kcard('streak', '~ ~ ~', bb='center', col='#E5FBC8', roll=r, s0=1.0, s1=1.8, life=4, fade=2) for r in (25, 95, 160)]
     ck.at(4, *[core + c for c in cracks], *[core_b + c for c in cracks], g.sound('block.amethyst_block.break', 0.6, 0.9))
-    ck.at(sh, f'execute if score #bfForm mb matches 2 run function {A.NS}{SEQ}/death/shatter_b',
-          f'execute unless score #bfForm mb matches 2 run function {A.NS}{SEQ}/death/shatter_h')
+    # #bfWing (the core's death_start): the wings were shown, also in a transformation past its open event (fix S3)
+    ck.at(sh, f'execute if score #bfWing mb matches 1 run function {A.NS}{SEQ}/death/shatter_b',
+          f'execute unless score #bfWing mb matches 1 run function {A.NS}{SEQ}/death/shatter_h')
     g.w(f'{SEQ}/death/shatter_b', ['# Butterfly form: the wings shatter into lime / opal shards (kit wing_shatter at her back).',
                                    g.particle('block{block_state:"minecraft:lime_stained_glass"}', '~ ~3.0 ~', (1.8, 1.0, 0.6), 0, 30),
                                    g.particle('block{block_state:"minecraft:white_stained_glass"}', '~ ~3.0 ~', (1.6, 1.0, 0.6), 0, 16),
@@ -256,10 +257,13 @@ def death(g, C):
              g.dust_fade(A.WHITE, A.CYAN, 0.9, '~ ~1.8 ~', (0.4, 0.9, 0.4), 3),
              g.particle('end_rod', '~ ~1.4 ~', (0.35, 0.8, 0.35), 0.03, 2),
              g.particle('block{block_state:"minecraft:light_blue_stained_glass"}', '~ ~1.2 ~', (0.4, 0.8, 0.4), 0, 2))
-    for t in range(dv, ln - 10, 15):
+    # every kit card of the death ends before the fight cleanup's fx/clear at death tick {ln} (review fix perf-5): a card
+    # made at tick m with delay d and life L is gone at the end of tick m + d + L, so m + d + L <= ln - 1 (the death
+    # motes preset: d + L <= 30, the shards 10, the last glow 6)
+    for t in range(dv, ln - 30, 15):
         ck.at(t, 'execute positioned ~ ~1.5 ~ run ' + g.fx('death_motes'))
     rnd = random.Random(100)
-    for t in range(dv + 3, ln - 4, 6):                      # crystal shards rising from random body points
+    for t in range(dv + 3, ln - 10, 6):                     # crystal shards rising from random body points
         ck.at(t, g.kcard('shard', f'~{A.L.num(rnd.uniform(-0.5, 0.5), 2)} ~{A.L.num(rnd.uniform(0.4, 2.0), 2)} '
                                   f'~{A.L.num(rnd.uniform(-0.5, 0.5), 2)}', bb='center', col='#BAF3E3', roll=rnd.randint(-30, 30),
                          s0=0.4, s1=1.0, move=(0, 2.5, 0), life=10, fade=5))
@@ -267,9 +271,9 @@ def death(g, C):
         if t < ln:
             ck.at(t, g.sound('block.amethyst_block.chime', 0.6, p))
     ck.at(ln - 10, g.snd('death_motes'))
+    ck.at(ln - 8, BODY + g.kcard('glow', '^ ^1.2 ^', bb='center', col='#E5FBC8', s0=1.0, s1=2.5, life=6, fade=3))
     ck.at(ln - 4, g.particle('end_rod', '~ ~1.2 ~', (0.3, 0.6, 0.3), 0.18, 20),
           g.dust(A.LIME_CORE, 1.6, '~ ~1.6 ~', (0.6, 1.0, 0.6), 16),
-          BODY + g.kcard('glow', '^ ^1.2 ^', bb='center', col='#E5FBC8', s0=1.0, s1=2.5, life=6, fade=3),
           g.sound('block.amethyst_block.chime', 0.8, 2.0))
     ck.write([f'# S4 death (@s = body, at it; #mbT 1..{ln} = the death clip tick): cracks 4, shatter {sh}, kneel {kn},',
               f'# dissolve {dv}.. (motes every 2 t, kit motes every 15 t, shards every 6 t, a descending chime), the last motes {ln - 4}.'])

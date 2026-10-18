@@ -37,14 +37,16 @@ B2_SWINGS = [ev_or('wing_barrage', f'swing{i}', d) for i, d in enumerate((5, 31,
 B2_WIND = 5                                     # the wind-up 5 t before each swing (the rig: inside the clip)
 B2_LEAD = max(0, B2_WIND - B2_SWINGS[0])        # 0 with the rig's swing1 5 (the wind-up is inside the clip)
 B2_N = 5
-B2_SPAWN, B2_FLIGHT, B2_UP = 2, 12, 5           # crescent i appears at s+2+i, lands 12 t later (s+14+i); 5 t fan-out
+B2_SPAWN, B2_UP = 2, 5                         # crescent i appears at s+2+i; 5 t fan-out, then the dive
+B2_VMAX, B2_DMIN, B2_DMAX = 0.7, 7, 60          # dive time from the distance: (L + 4 arc) / 0.7 b/t, 7..60 t (fix F1)
+B2_KEEP = 9.0                                   # between the swings she glides in while beyond 9 b (keeps 6-8 b)
 B2_FAN = (0, 30, -30, 60, -60)                  # fan yaw of crescent i (her left +)
 B2_CROSS = [(0.0, 0.0), (1.8, 0.0), (-1.8, 0.0), (3.6, 0.0), (-3.6, 0.0)]   # odd swings: across the aim (x = her left)
 B2_LONG = [(0.0, 0.0), (0.0, 1.8), (0.0, -1.8), (0.0, 3.6), (0.0, -3.6)]    # even swings: along the aim
 B2_R = 1.2                                      # splash radius (the decal and the projectile's hit sphere)
 B2_SPAWN_R, B2_SPAWN_Y = 2.4, 3.6               # wing-root launch points (body frame)
 B2_OUT, B2_PITCH = 3.0, 35.0                    # fan-out: 3 b at 0.6 b/t, rising 35 degrees
-B2_ARC = 0.8                                    # the dive curves 0.8 b over its straight line (mv/leap)
+B2_ARC = 0.4                                    # the dive curves 0.4 b over its straight line (mv/leap)
 
 # ---- B3 날개 휩쓸개 (flap_dive): rise 0, dive 20, slam 26, fan 28, glide 33 (the rig's events)
 B3_DIVE = ev_or('flap_dive', 'dive', 20)
@@ -79,13 +81,14 @@ B5_SHRINK = ev_or('release', 'shrink', 87)
 B5_SHATTER = ev_or('release', 'shatter', 91)
 B5_LAND = ev_or('release', 'land', 96)
 B5_R, B5_OUT = 10.0, 4.0                        # the dome radius; the release point 4 b beyond the player (outward)
+B5_GLIDE = (9, 13)                              # the swoop S -> R: ceil(|SR| / 1.0 b/t) ticks, 9..13 (fix F3: was a fixed 9)
 assert B5_DET - B5_CUP >= 10 and B3_TELL >= 10 and B1_TELL >= 10
 
 PATTERNS = [
     Pattern(11, K_STRIKE, '우아한 날개', 'b', 'wing_strike', bands=('melee', 'mid'), weight={'melee': 2}, el=EL_DENDRO,
             recover=18, max_len=L_STRIKE + 5, length=L_STRIKE),
     Pattern(12, K_BARRAGE, '화염 날개의 습격', 'b', 'wing_barrage', bands=('mid', 'far'), weight={'far': 2}, el=EL_PYRO,
-            lead=B2_LEAD, recover=20, max_len=L_BARRAGE + 5, length=L_BARRAGE),
+            lead=B2_LEAD, recover=20, max_len=L_BARRAGE + B2_DMAX + 12, length=L_BARRAGE),
     Pattern(13, K_SWEEP, '날개 휩쓸개', 'b', 'flap_dive', bands=('melee', 'mid'), weight={'mid': 2}, el=EL_PYRO,
             recover=18, max_len=L_SWEEP + 5, length=L_SWEEP),
     Pattern(14, K_COCO, '달빛 축복', 'b', 'coco', bands=('mid', 'far'), el=EL_DENDRO, recover=20,
@@ -102,7 +105,8 @@ def M(tag):
 
 
 def summon_m(pid, tag, pos='~ ~ ~'):
-    return f'summon minecraft:marker {pos} {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_p{pid}","{tag}"]}}'
+    """A pattern marker; rlk_mb_bf_kept: the core kills it when the pattern ends (review fix S1)."""
+    return f'summon minecraft:marker {pos} {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_p{pid}","{tag}","rlk_mb_bf_kept"]}}'
 
 
 def at_b(pos):
@@ -195,8 +199,7 @@ def b1(g):
     tl.at(B1_HIT + 1, '# the ground slash band along her path (the kit wing_band arc at L + floor slashes from her spot)',
           f'execute at {L_} run ' + g.fx('wing_band'),
           band(2, '#38896B', 0.05, 2.8, 3.2), band(2, '#E7FDAA', 0.07, 2.5, 3.0),
-          band(4, '#38896B', 0.05, 2.8, 3.2), band(4, '#E7FDAA', 0.07, 2.5, 3.0),
-          g.sound('item.trident.riptide_1', 0.5, 1.6))
+          band(4, '#38896B', 0.05, 2.8, 3.2), band(4, '#E7FDAA', 0.07, 2.5, 3.0))
     tl.at(B1_HIT + 2, band(6, '#38896B', 0.05, 2.8, 3.2), band(6, '#E7FDAA', 0.07, 2.5, 3.0),
           band(8, '#38896B', 0.05, 2.8, 3.2), band(8, '#E7FDAA', 0.07, 2.5, 3.0))
     tl.at(B1_HIT + 3, *[f'execute at {S_} positioned ^ ^0.2 ^{d} run ' + g.dust(A.hexrgb('#ADDE6D'), 1.0, '~ ~ ~', (0.6, 0.1, 0.6), 3)
@@ -243,22 +246,55 @@ def b2_points():
     return out
 
 
+def b2_dive_table():
+    """[(L2_min, D)] ascending: the dive time D of a crescent from the straight distance L (tenths) between its fan-out
+    end and its landing point: D = max(B2_DMIN, ceil((L + 4 h) / B2_VMAX)), at most B2_DMAX (the lerp + parabola of
+    mv/leap never moves faster than L / D + 4 h / D per tick). D is needed once L > B2_VMAX (D - 1) - 4 h."""
+    out = []
+    for D in range(B2_DMIN + 1, B2_DMAX + 1):
+        lmin = B2_VMAX * (D - 1) - 4 * B2_ARC
+        if lmin > 0:
+            out.append((int(math.floor((10 * lmin) ** 2)) + 1, D))
+    return out
+
+
 def b2(g):
     """B2 화염 날개의 습격 / 날개탄 (Pyro, spec B2_wing_barrage.md): four swings; at each swing s the player's spot L is locked
     (walk disc) and 5 targets T_i are set in a row (odd swings across the aim, even swings along it, 1.8 b apart) with
-    a Pyro ground marker each (decal r 1.2, its fill reaching the rim on the landing tick s+14+i); crescent i is a REAL
-    projectile (framework pj, a fire_claw prop): it leaves her wing root at s+2+i, fans out and rises for 5 t at 0.6 b/t,
-    then dives on a curved path onto T_i in 7 t (mv/glide + mv/leap carry it on a fixed timetable, so it lands exactly
-    when its marker fills); it is harmless in the air and hits on landing (a sphere r 1.2 under the prop = the splash
-    on the floor), 50 % Pyro, KB 2; the 5 crescents of a swing share a volley group: one hit per swing at most."""
+    a Pyro ground marker each; crescent i is a REAL projectile (framework pj, a fire_claw prop): it leaves her wing root
+    at s+2+i, fans out and rises for 5 t at 0.6 b/t, then dives on a curved path onto T_i. Its dive time D is measured
+    in game at the swing from the distance it has to cover (D = (L + 4 h) / 0.7 b/t, 7..60 t: review fix F1, the plan's
+    0.6-0.75 b/t dives at any range), and the same D drives its decal (the fill reaches the rim on the landing tick
+    s+2+i+5+D), its dive, its landing and its pj life. Harmless in the air, it hits on landing (a sphere r 1.2 under the
+    prop = the splash on the floor), 50 % Pyro, KB 2; the 5 crescents of a swing share a volley group: one hit per swing
+    at most. Each crescent leaves a short flame tail drawn along its actual flight (review fix F4). Between the swings
+    she glides in at 0.3 b/t while beyond 9 b (the plan: she keeps 6-8 b for the Pyro patterns)."""
     R, k, pid = g.rig, K_BARRAGE, 12
     l_ = 'rlk_mb_bf_p12l'
-    t_, c_, n_ = 'rlk_mb_bf_p12t', 'rlk_mb_bf_p12c', 'rlk_mb_bf_p12n'
+    t_, c_, n_, q_ = 'rlk_mb_bf_p12t', 'rlk_mb_bf_p12c', 'rlk_mb_bf_p12n', 'rlk_mb_bf_p12q'
     L_ = M(l_)
     pts = b2_points()
     fw = lambda ev: (A.anchor('wing_barrage', ev, 'fwtip_l', A.B_FWTIP_L), A.anchor('wing_barrage', ev, 'fwtip_r', A.B_FWTIP_R))
     tl = TL(g, k)
     t0 = -B2_LEAD
+    table = b2_dive_table()
+    # the decal of a crescent: tell W = its landing - now (at the swing 2 + i + 5 + D; after a pause what is left)
+    w_lo, w_hi = 1, B2_SPAWN + B2_N - 1 + B2_UP + B2_DMAX
+    for w in range(w_lo, w_hi + 1):
+        g.pw(k, f'tele/{w}', [g.tele_disc(B2_R, w, el=EL_PYRO, hold=3)])
+
+    def tele_node(lo, hi):
+        if hi - lo <= 3:
+            return [f'execute if score #bp12W mb matches {w} run return run {g.fn(f"p/{k}/tele/{w}")}' for w in range(lo, hi + 1)]
+        mid = (lo + hi) // 2
+        for a, b in ((lo, mid), (mid + 1, hi)):
+            g.pw(k, f'tele/d{a}_{b}', tele_node(a, b))
+        return [f'execute if score #bp12W mb matches {lo}..{mid} run return run {g.fn(f"p/{k}/tele/d{lo}_{mid}")}',
+                f'execute if score #bp12W mb matches {mid + 1}..{hi} run return run {g.fn(f"p/{k}/tele/d{mid + 1}_{hi}")}']
+    g.pw(k, 'tele/pick', ['# #bp12W = the tell (ticks): the Pyro ground decal r 1.2 of a crescent\'s landing point, here.']
+         + tele_node(w_lo, w_hi))
+    far = f'execute unless entity @e[tag=rlk_body,distance=..{L.num(B2_KEEP)},limit=1] run {A.bstep("toward", 0.3)}'
+    tl.span(t0, B2_SWINGS[0] - B2_WIND - 1, far)
     for kk, s in enumerate(B2_SWINGS, 1):
         ev = f'swing{kk}'
         a = fw(ev)
@@ -268,20 +304,19 @@ def b2(g):
               at_b(a[1]) + g.particle('flame', '~ ~ ~', (0.3, 0.3, 0.3), 0.02, 3),
               g.sound('entity.ender_dragon.flap', 0.6, 1.4), g.sound('entity.player.attack.sweep', 0.4, 0.7))
         tl.span(w0 + 1, s - 1, R('face/track'))
-        if s - 1 > w0:
-            tl.at(s - 1, g.sound('entity.player.attack.sweep', 0.8, 0.7))
         rows = B2_CROSS if kk % 2 else B2_LONG
-        lines = [f'# SWING {kk}: lock L (walk disc), her yaw S -> L, the 5 targets ({"across" if kk % 2 else "along"} the aim) with their',
-                 '# Pyro ground markers (fill = landing tick), the volley group of the swing, the flame sheet and the launch roar.',
-                 R('face/player'), f'kill @e[type=minecraft:marker,tag={l_}]', f'kill @e[type=minecraft:marker,tag={t_}]',
+        lines = [f'# SWING {kk}: lock L (walk disc), her yaw S -> L, the 5 targets ({"across" if kk % 2 else "along"} the aim), each',
+                 '# crescent\'s dive time from its distance and its Pyro ground marker (fill = landing tick), the volley group of',
+                 '# the swing, the flame sheet and the launch roar.',
+                 R('face/player'), f'kill @e[type=minecraft:marker,tag={l_}]', f'kill @e[type=minecraft:marker,tag={t_}s{kk}]',
                  A.lockw(), g.keep(l_, 'rlk_mb_bf_lock'), f'execute at @s facing entity {L_} feet run tp @s ~ ~ ~ ~ 0', g.GRP_NEW]
         for i, (x, z) in enumerate(rows):
-            land = B2_SPAWN + B2_FLIGHT + i
+            tag = f'{t_}{kk}{i}'
             lines += [f'execute at {L_} rotated as @s rotated ~ 0 positioned ^{L.num(x)} ^ ^{L.num(z)} run '
-                      + summon_m(pid, f'{t_}{i}', f'~ {CY} ~'),
-                      f'tag @e[type=minecraft:marker,tag={t_}{i}] add {t_}',
-                      f'execute as {M(t_ + str(i))} run {A.clamp_walk()}',
-                      f'execute at {M(t_ + str(i))} run ' + g.tele_disc(B2_R, land, el=EL_PYRO, hold=3)]
+                      + summon_m(pid, tag, f'~ {CY} ~'),
+                      f'tag @e[type=minecraft:marker,tag={tag}] add {t_}', f'tag @e[type=minecraft:marker,tag={tag}] add {t_}s{kk}',
+                      f'execute as {M(tag)} run {A.clamp_walk()}',
+                      f'{BODY}positioned {bf(pts[i][1])} run function {NS}p/{k}/dive{kk}{i}']
         sheet = 'fire_swing_d' if kk % 2 else 'fire_swing'
         lines += [BODY + 'positioned ~ ~3.0 ~ run ' + g.fx(sheet),
                   BODY + 'run ' + g.particle('flame', '^ ^3.0 ^1.5', (2.5, 0.6, 1.0), 0.05, 20)]
@@ -292,57 +327,122 @@ def b2(g):
         tl.at(s, *lines)
         tl.span(s + 1, s + B2_SPAWN + B2_N, R('face/track'))
         for i in range(B2_N):
-            tl.at(s + B2_SPAWN + i, g.fn(f'p/{k}/spawn{i}'))
+            tl.at(s + B2_SPAWN + i, g.fn(f'p/{k}/spawn{kk}{i}'))
         tl.at(s + 3, g.sound('block.fire.ambient', 0.8, 1.5), g.sound('entity.blaze.burn', 0.3, 1.2))
-        tl.at(s + 6, g.sound('item.trident.riptide_1', 0.3, 1.6))
         tl.at(s + B2_SPAWN + B2_UP, g.snd('fire_cres_fly'))
         tl.at(s + 12, g.sound('entity.ender_dragon.flap', 0.4, 1.6))
         tl.span(s + 6, s + 20, f'execute if entity @e[tag=rlk_body,distance=..5,limit=1] run {A.bstep("away", 0.2)}')
-        tl.span(s + B2_SPAWN + B2_N + 1, (B2_SWINGS[kk] - B2_WIND - 1) if kk < 4 else L_BARRAGE - 1, R('face/track'))
-    tl.at(L_BARRAGE, g.end())
+        gap_end = (B2_SWINGS[kk] - B2_WIND - 1) if kk < 4 else L_BARRAGE - 1
+        tl.span(s + B2_SPAWN + B2_N + 1, gap_end, R('face/track'))
+        tl.span(s + 21, gap_end, far)
+        for i in range(B2_N):
+            tag, T = f'{t_}{kk}{i}', M(f'{t_}{kk}{i}')
+            # the dive time of crescent (kk, i): L^2 (tenths^2) from the fan-out end (here) to the marker + 0.65 b
+            g.pw(k, f'dive{kk}{i}', [
+                f'# @s = body, positioned at the fan-out end of crescent {i} of swing {kk}: #bp12D{kk}{i} = its dive time (from the',
+                '# straight distance to its landing point), its landing clock on the marker (mbT), the decal.',
+                f'execute store result score #bp12X mb run data get entity {T} Pos[0] 10',
+                'summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_help","rlk_mb_bf_p12h"]}',
+                'execute store result score #t mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_bf_p12h,limit=1] Pos[0] 10',
+                'scoreboard players operation #bp12X mb -= #t mb',
+                f'execute store result score #bp12Y mb run data get entity {T} Pos[1] 10',
+                'scoreboard players add #bp12Y mb 7',
+                'execute store result score #t mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_bf_p12h,limit=1] Pos[1] 10',
+                'scoreboard players operation #bp12Y mb -= #t mb',
+                f'execute store result score #bp12Z mb run data get entity {T} Pos[2] 10',
+                'execute store result score #t mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_bf_p12h,limit=1] Pos[2] 10',
+                'scoreboard players operation #bp12Z mb -= #t mb',
+                'kill @e[type=minecraft:marker,tag=rlk_mb_bf_p12h]',
+                'scoreboard players operation #bp12X mb *= #bp12X mb', 'scoreboard players operation #bp12Y mb *= #bp12Y mb',
+                'scoreboard players operation #bp12Z mb *= #bp12Z mb', 'scoreboard players operation #bp12X mb += #bp12Y mb',
+                'scoreboard players operation #bp12X mb += #bp12Z mb',
+                f'scoreboard players set #bp12D{kk}{i} mb {B2_DMIN}']
+                + [f'execute if score #bp12X mb matches {q}.. run scoreboard players set #bp12D{kk}{i} mb {D}' for q, D in table]
+                + [f'scoreboard players operation #bp12W mb = #bp12D{kk}{i} mb', f'scoreboard players add #bp12W mb {B2_SPAWN + i + B2_UP}',
+                   f'scoreboard players operation @e[type=minecraft:marker,tag={tag}] mbT = #bp12W mb',
+                   f'scoreboard players operation @e[type=minecraft:marker,tag={tag}] mbT += #bfPT mb',
+                   f'execute at {T} run function {NS}p/{k}/tele/pick'])
+            g.pw(k, f'spawn{kk}{i}', [
+                f'# @s = body: fire crescent {i} of swing {kk} at her wing root ({B2_FAN[i]} degrees), a pj prop (harmless until it',
+                '# lands; the swing\'s volley group), then the fan-out glide (5 t, rising); the dive starts in fly at age 5.',
+                f'kill @e[type=minecraft:item_display,tag={c_}{kk}{i}]', f'kill @e[type=minecraft:marker,tag={q_}{kk}{i}]',
+                at_b(bf(pts[i][0])) + f'summon minecraft:item_display ~ ~ ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_p12","{c_}","{c_}{kk}{i}","{n_}"],'
+                'teleport_duration:1,brightness:{block:15,sky:15}}',
+                at_b(bf(pts[i][0])) + f'summon minecraft:marker ~ ~ ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_p12","{q_}","{q_}{kk}{i}"]}}',
+                f'execute as @e[type=minecraft:item_display,tag={n_}] run {g.kprop("fire")}',
+                f'scoreboard players set @e[type=minecraft:item_display,tag={n_}] mbId {pid}',
+                f'scoreboard players set @e[type=minecraft:item_display,tag={n_}] mbT 0',
+                *g.pj_opts(el=EL_PYRO, kb=KB['light'], wall=0, grp=True),
+                f'execute as @e[type=minecraft:item_display,tag={n_},limit=1] at @s rotated ~ -90 run ' + g.pj_launch(0.25, B2_DMAX + 8, 0, B2_R),
+                f'# its landing age mbS = 5 + D; the pj life ends the tick after',
+                f'scoreboard players operation @e[type=minecraft:item_display,tag={n_}] mbS = #bp12D{kk}{i} mb',
+                f'scoreboard players add @e[type=minecraft:item_display,tag={n_}] mbS {B2_UP}',
+                f'scoreboard players operation @e[type=minecraft:item_display,tag={n_}] mbPjL = @e[type=minecraft:item_display,tag={n_},limit=1] mbS',
+                f'scoreboard players add @e[type=minecraft:item_display,tag={n_}] mbPjL 1',
+                f'{BODY}positioned {bf(pts[i][1])} as @e[type=minecraft:item_display,tag={n_},limit=1] run function rlk:mboss/mv/glide {{t:{B2_UP}}}',
+                f'execute at @e[type=minecraft:item_display,tag={n_},limit=1] run ' + g.fx('fire_spawn'),
+                f'tag @e[type=minecraft:item_display,tag={n_}] remove {n_}'])
+            g.pw(k, f'fly{kk}{i}', [
+                f'# @s = crescent {i} of swing {kk}, at it (module tick: before mv and pj move it). Age = mbT; its flame tail.',
+                'scoreboard players add @s mbT 1',
+                f'# the flame tail while it flies (its helper {q_}{kk}{i} holds last tick\'s spot; gone with the landing)',
+                f'execute if entity @e[type=minecraft:marker,tag={q_}{kk}{i},limit=1] run function {NS}p/{k}/tail{kk}{i}',
+                'scoreboard players operation #bfM mb = @s mbT', 'scoreboard players operation #bfM mb %= #bfK4 mb',
+                'execute if score #bfM mb matches 0 run ' + g.particle('small_flame', '~ ~ ~', (0.08, 0.08, 0.08), 0.01, 2),
+                f'# age {B2_UP}: the dive onto its marker (curved, D t; the prop lands 0.65 b up, the pj sub-step lifts it 0.25 b,',
+                '# so the hit point 0.9 b under it is on the floor at the marker)',
+                f'execute if score @s mbT matches {B2_UP} at {T} positioned ~ ~0.65 ~ run function rlk:mboss/mv/leap {{t:{B2_DMIN},h:{int(round(B2_ARC * 10))}}}',
+                f'execute if score @s mbT matches {B2_UP} run scoreboard players operation @s mbMvN = @s mbS',
+                f'execute if score @s mbT matches {B2_UP} run scoreboard players remove @s mbMvN {B2_UP}',
+                f'execute if score @s mbT = @s mbS run {g.fn(f"p/{k}/land{kk}{i}")}'])
+            g.pw(k, f'tail{kk}{i}', [f'# @s = crescent {i} of swing {kk}, at it: its flame tail (p/{k}/tail), then its helper follows it.',
+                                    f'tag @s add {q_}y', f'tag @e[type=minecraft:marker,tag={q_}{kk}{i}] add {q_}x',
+                                    f'function {NS}p/{k}/tail',
+                                    f'tag @s remove {q_}y', f'tag @e[type=minecraft:marker,tag={q_}x] remove {q_}x',
+                                    f'execute at @s run tp @e[type=minecraft:marker,tag={q_}{kk}{i},limit=1] ~ ~ ~'])
+            g.pw(k, f'land{kk}{i}', [
+                f'# @s = crescent {i} of swing {kk} on its landing tick: armed for this tick\'s pj step (the splash r {L.num(B2_R)} on',
+                '# the floor), the fire splash and the landing crack at its marker (gone with it).',
+                f'scoreboard players set @s mbPjD {DMG["b2"]}',
+                f'execute at {T} run ' + g.fx('fire_land'),
+                f'execute at {T} run ' + g.dust(A.hexrgb('#585542'), 1.6, '~ ~0.1 ~', (0.5, 0.02, 0.5), 6),
+                f'execute at {T} run ' + g.snd('fire_cres_land'),
+                f'kill @e[type=minecraft:marker,tag={tag}]', f'kill @e[type=minecraft:marker,tag={q_}{kk}{i}]'])
+    tail = g.kcard('streak', '~ ~ ~', '~ ~', roll=90, s0=1.8, s1=0.7, life=3, fade=1, col='#F6A341')
+    X, Y = f'@e[type=minecraft:marker,tag={q_}x,limit=1]', f'@e[type=minecraft:item_display,tag={q_}y,limit=1]'
+    g.pw(k, 'tail', [
+        f'# As / at a crescent ({q_}y), its helper marker {q_}x at its spot one tick ago: a flame streak 1-2 b long behind',
+        '# it, lying along its actual flight (from there to here) in the plane that holds the flight line and the level',
+        '# cross-line, so the player it dives at sees it full; the camera-facing claw is its head (review fix F4).',
+        f'# Decorative: it gives way near the fx card cap (#bkN {A.K.CAP - 16}+; fix FX-2).',
+        f'execute if score #bkN mb matches {A.K.CAP - 16}.. run return 0',
+        f'execute as {X} at @s facing entity {Y} feet run tp @s ~ ~ ~ ~ ~',
+        f'execute if entity @e[type=minecraft:marker,tag={q_}x,distance=..0.05,limit=1] run return 0',
+        f'execute store result score #bp12P mb run data get entity {X} Rotation[1]',
+        f'execute if score #bp12P mb matches 0.. rotated as {X} positioned ^ ^ ^-0.7 rotated ~ ~-90 run {tail}',
+        f'execute if score #bp12P mb matches ..-1 rotated as {X} positioned ^ ^ ^-0.7 rotated ~ ~90 run {tail}'])
+    g.pw(k, 'resume', ['# The fight runs again after a pause (core resume hook): every landing marker still waiting gets its decal back',
+                       '# with the tell it has left (its landing clock mbT - #bfPT; the pause cleared the decals; review fix FX-1).',
+                       f'execute as @e[type=minecraft:marker,tag={t_}] at @s run function {NS}p/{k}/redraw'])
+    g.pw(k, 'redraw', ['# @s = a landing marker: it lands when #bfPT reaches its mbT; the module tick after this hook counts #bfPT',
+                       '# up once more, so the landing is mbT - #bfPT - 1 ticks from now.',
+                       'scoreboard players operation #bp12W mb = @s mbT', 'scoreboard players operation #bp12W mb -= #bfPT mb',
+                       'scoreboard players remove #bp12W mb 1',
+                       f'execute if score #bp12W mb matches {w_lo}.. run function {NS}p/{k}/tele/pick'])
     tl.write([f'# B2 화염 날개의 습격 (clip wing_barrage: swings {B2_SWINGS}; lead {B2_LEAD}). Crescent i of a swing s: spawn s+{B2_SPAWN}+i,',
-              f'# fan-out {B2_UP} t, curved dive, lands s+{B2_SPAWN + B2_FLIGHT}+i on its marker (50 % Pyro each, one hit per swing).'],
+              f'# fan-out {B2_UP} t, curved dive of D = (L + {L.num(4 * B2_ARC)}) / {L.num(B2_VMAX)} t ({B2_DMIN}..{B2_DMAX}), lands s+{B2_SPAWN}+i+{B2_UP}+D on its',
+              '# marker (50 % Pyro each, one hit per swing); the end once the clip is over and every crescent has landed.'],
              ['# B2 tick: the crescents fly first (the module tick runs before mv and pj move them next tick).',
-              f'execute if entity @e[type=minecraft:item_display,tag={c_},limit=1] run {g.fn(f"p/{k}/fly")}'], t0=t0)
-    g.pw(k, 'fly', [f'execute as @e[type=minecraft:item_display,tag={c_}{i},limit=1] at @s run {g.fn(f"p/{k}/fly{i}")}' for i in range(B2_N)])
-    for i, (sp, fo) in enumerate(pts):
-        T = M(f'{t_}{i}')
-        g.pw(k, f'spawn{i}', [
-            f'# @s = body: fire crescent {i} at her wing root ({B2_FAN[i]} degrees), a pj prop (harmless until it lands; the',
-            '# swing\'s volley group), then the fan-out glide (5 t, rising); the dive starts in fly at age 5.',
-            f'kill @e[type=minecraft:item_display,tag={c_}{i}]',
-            at_b(bf(sp)) + f'summon minecraft:item_display ~ ~ ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_p12","{c_}","{c_}{i}","{n_}"],'
-            'teleport_duration:1,brightness:{block:15,sky:15}}',
-            f'execute as @e[type=minecraft:item_display,tag={n_}] run {g.kprop("fire")}',
-            f'scoreboard players set @e[type=minecraft:item_display,tag={n_}] mbId {pid}',
-            f'scoreboard players set @e[type=minecraft:item_display,tag={n_}] mbT 0',
-            *g.pj_opts(el=EL_PYRO, kb=KB['light'], wall=0, grp=True),
-            f'execute as @e[type=minecraft:item_display,tag={n_},limit=1] at @s rotated ~ -90 run ' + g.pj_launch(0.25, B2_FLIGHT + 1, 0, B2_R),
-            f'{BODY}positioned {bf(fo)} as @e[type=minecraft:item_display,tag={n_},limit=1] run function rlk:mboss/mv/glide {{t:{B2_UP}}}',
-            f'execute at @e[type=minecraft:item_display,tag={n_},limit=1] run ' + g.fx('fire_spawn'),
-            f'tag @e[type=minecraft:item_display,tag={n_}] remove {n_}'])
-        g.pw(k, f'fly{i}', [
-            f'# @s = crescent {i}, at it (module tick: before mv and pj move it). Age = mbT; the flame puff trail every 2 t.',
-            'scoreboard players add @s mbT 1',
-            'scoreboard players operation #bfM mb = @s mbT', 'scoreboard players operation #bfM mb %= #bfK2 mb',
-            'execute if score #bfM mb matches 0 run ' + g.fx('fire_trail'),
-            f'# age {B2_UP}: the dive onto its marker (curved, {B2_FLIGHT - B2_UP} t; the prop lands 0.65 b up, the pj sub-step lifts it',
-            '# 0.25 b, so the hit point 0.9 b under it is on the floor at the marker)',
-            f'execute if score @s mbT matches {B2_UP} at {T} positioned ~ ~0.65 ~ run function rlk:mboss/mv/leap {{t:{B2_FLIGHT - B2_UP},h:{int(round(B2_ARC * 10))}}}',
-            f'execute if score @s mbT matches {B2_FLIGHT} run {g.fn(f"p/{k}/land{i}")}'])
-        g.pw(k, f'land{i}', [
-            f'# @s = crescent {i} on its landing tick: armed for this tick\'s pj step (the splash r {L.num(B2_R)} on the floor), the fire',
-            '# splash and the landing crack at its marker (gone with it).',
-            f'scoreboard players set @s mbPjD {DMG["b2"]}',
-            f'execute at {T} run ' + g.fx('fire_land'),
-            f'execute at {T} run ' + g.dust(A.hexrgb('#585542'), 1.6, '~ ~0.1 ~', (0.5, 0.02, 0.5), 6),
-            f'execute at {T} run ' + g.snd('fire_cres_land'),
-            f'kill @e[type=minecraft:marker,tag={t_}{i}]'])
+              f'execute if entity @e[type=minecraft:item_display,tag={c_},limit=1] run {g.fn(f"p/{k}/fly")}',
+              f'execute if score #bfPT mb matches {L_BARRAGE}.. unless entity @e[type=minecraft:item_display,tag={c_},limit=1] '
+              f'unless entity @e[type=minecraft:marker,tag={t_},limit=1] run return run {g.end()}'], t0=t0)
+    g.pw(k, 'fly', [f'execute as @e[type=minecraft:item_display,tag={c_}{kk}{i},limit=1] at @s run {g.fn(f"p/{k}/fly{kk}{i}")}'
+                    for kk in range(1, len(B2_SWINGS) + 1) for i in range(B2_N)])
     g.pw(k, 'pj_end', ['# A crescent event (@s = prop): a hit ends it at once; its life end (the tick after landing) removes it.',
                        'execute if score #pjEv mb matches 4 run scoreboard players set #pjKeep mb 0'])
-    g.pw(k, 'cancel', ['# Remove what B2 owns: the crescents (pj props; lib_clear may have taken them) and the markers.',
-                       f'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_p12]', f'kill @e[type=minecraft:marker,tag={t_}]',
-                       f'kill @e[type=minecraft:marker,tag={l_}]'])
+    g.pw(k, 'cancel', ['# Remove what B2 owns: the crescents (pj props; lib_clear may have taken them), their trail helpers, the markers.',
+                       f'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_p12]', f'kill @e[type=minecraft:marker,tag=rlk_mb_bf_p12]',
+                       f'kill @e[type=minecraft:marker,tag={t_}]', f'kill @e[type=minecraft:marker,tag={l_}]'])
 
 
 # ---------------------------------------------------------------------------------------------
@@ -382,8 +482,8 @@ def b3(g):
         tl.at(t, at_b(a[0]) + g.dust(A.hexrgb('#F88F39'), 1.2, '~ ~ ~', (0.1, 0.1, 0.1), 2),
               at_b(a[1]) + g.dust(A.hexrgb('#F88F39'), 1.2, '~ ~ ~', (0.1, 0.1, 0.1), 2))
     tl.at(B3_DIVE - 1, g.snd('wing_dive'))
-    tl.at(B3_DIVE, '# the head-first dive: glide to P', f'execute positioned as {P_} run function rlk:mboss/mv/glide {{t:{B3_SLAM - B3_DIVE}}}',
-          g.sound('entity.phantom.swoop', 0.7, 1.2))
+    tl.at(B3_DIVE, '# the head-first dive: glide to P (its swoop is in snd/wing_dive 1 t earlier)',
+          f'execute positioned as {P_} run function rlk:mboss/mv/glide {{t:{B3_SLAM - B3_DIVE}}}')
     tl.at(B3_SLAM, '# the wing slam: two vertical flame crescents at the wing tips',
           f'execute at {P_} positioned ~ ~2.8 ~ run ' + g.fx('flame_slam'), g.snd('flame_slam'))
     tl.at(B3_SLAM + 1, '# the flame sweeps along the floor toward the player',
@@ -576,13 +676,43 @@ def b5(g):
           f'execute at {arena} positioned ~ {CY} ~ if entity @e[type=minecraft:marker,tag={l_},distance=..1] run scoreboard players set #bp15C mb 1',
           f'execute if score #bp15C mb matches 0 as {R_} at @s facing entity {arena} feet rotated ~180 0 run tp @s ^ ^ ^{L.num(B5_OUT)}',
           f'execute if score #bp15C mb matches 1 as {R_} at @s facing entity {body_sel} feet rotated ~180 0 run tp @s ^ ^ ^{L.num(B5_OUT)}',
-          f'execute as {R_} at @s run tp @s ~ {CY} ~', f'execute as {R_} run {A.clamp_release()}',
+          f'execute as {R_} at @s run tp @s ~ {CY} ~',
+          f'# a player beyond about r {L.num(A.REL_R - B5_OUT)}: the r {L.num(A.REL_R)} clamp would pull R back onto them (escape up to 10.3 b): R goes',
+          f'# {L.num(B5_OUT)} b along the wall instead, on the side away from her (plan "Review-fix decisions", fairness F3: escape <= 6.5 b)',
+          f'execute as {R_} at @s unless entity @e[tag=rlk_mb_arena,distance=..{L.num(A.REL_R)},limit=1] run function {NS}p/{k}/tangent',
+          f'execute as {R_} run {A.clamp_release()}',
+          f'function {NS}p/{k}/swoop_t',
           at_b(core('swoop')) + g.fx('rel_fold'),
           at_b(core('swoop')) + g.kcard('glow', bb='center', s0=1.0, s1=1.6, life=10, fade=4, col=A.LIME_HEX),
           g.snd('release_swoop'))
     tl.span(1, B5_CUP - 1, R('face/track'))
-    tl.at(B5_SWOOP, '# the swoop past the player to R (9 t), the dive whoosh',
-          f'execute positioned as {R_} run function rlk:mboss/mv/glide {{t:9}}', g.snd('wing_dive'))
+    tl.at(B5_SWOOP, f'# the swoop past the player to R ({B5_GLIDE[0]}-{B5_GLIDE[1]} t: about 1 b/t, ended before the whirl), the dive whoosh',
+          f'execute positioned as {R_} run function rlk:mboss/mv/glide {{t:{B5_GLIDE[0]}}}',
+          'scoreboard players operation @s mbMvN = #bp15T mb', g.snd('wing_dive'))
+    tan = [f'# @s = the release marker R (beyond r {L.num(A.REL_R)}): back on L0, then {L.num(B5_OUT)} b along the wall tangent, the way that',
+           '# takes it farther from her (two candidates; the farther one from the body stays).',
+           'kill @e[type=minecraft:marker,tag=rlk_mb_bf_p15k]',
+           f'execute at {L_} facing entity {arena} feet rotated ~90 0 positioned ^ ^ ^{L.num(B5_OUT)} run '
+           f'summon minecraft:marker ~ {CY} ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_p15k","rlk_mb_bf_kept"]}}',
+           f'execute at {L_} facing entity {arena} feet rotated ~-90 0 positioned ^ ^ ^{L.num(B5_OUT)} run '
+           f'summon minecraft:marker ~ {CY} ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_p15k","rlk_mb_bf_kept"]}}',
+           f'execute at {body_sel} positioned as @e[type=minecraft:marker,tag=rlk_mb_bf_p15k,sort=furthest,limit=1] run tp @s ~ ~ ~',
+           'kill @e[type=minecraft:marker,tag=rlk_mb_bf_p15k]']
+    g.pw(k, 'tangent', tan)
+    sw = ['# @s = body at clock 0: #bp15T = the swoop time to R, ceil(|SR| / 1.0 b/t) clamped to '
+          f'{B5_GLIDE[0]}..{B5_GLIDE[1]} (|SR| squared in tenths; fix F3).',
+          f'execute store result score #bp15X mb run data get entity {R_} Pos[0] 10',
+          'execute store result score #t mb run data get entity @s Pos[0] 10',
+          'scoreboard players operation #bp15X mb -= #t mb',
+          f'execute store result score #bp15Z mb run data get entity {R_} Pos[2] 10',
+          'execute store result score #t mb run data get entity @s Pos[2] 10',
+          'scoreboard players operation #bp15Z mb -= #t mb',
+          'scoreboard players operation #bp15X mb *= #bp15X mb', 'scoreboard players operation #bp15Z mb *= #bp15Z mb',
+          'scoreboard players operation #bp15X mb += #bp15Z mb',
+          f'scoreboard players set #bp15T mb {B5_GLIDE[0]}']
+    for T in range(B5_GLIDE[0] + 1, B5_GLIDE[1] + 1):
+        sw.append(f'execute if score #bp15X mb matches {((T - 1) * 10) ** 2 + 1}.. run scoreboard players set #bp15T mb {T}')
+    g.pw(k, 'swoop_t', sw)
     for t in every(B5_SWOOP, B5_SWOOP + 6, 2):
         tl.at(t, BODY + 'positioned ~ ~0.06 ~ run ' + g.kcard('streak', '~ ~ ~', '~90 90', s0=2.0, s1=3.0, life=4, fade=2, col=A.LIME_HEX),
               g.particle('cherry_leaves', '~ ~0.6 ~', (0.6, 0.2, 0.6), 0, 2))

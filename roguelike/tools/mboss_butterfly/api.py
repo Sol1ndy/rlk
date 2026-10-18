@@ -80,15 +80,21 @@ def part_sel(name):
 # ---------------------------------------------------------------------------------------------
 # Balance (plan.md). Damage = % of the registry base hit (atk x dmgMul).
 DMG = {
-    'h1a': 100, 'h1b': 120,      # H1 달빛 발차기: flip-kick crescent / axe-kick crescent + ground wave
-    'h2a': 90, 'h2b': 140,       # H2 달빛 점프: 360 low sweep / kicked Dendro disc
+    # Balance (plan "Review-fix decisions", fairness F1): HP per minute within about 20 % of the Guardian's for a
+    # standing, a melee-walking and a ranged-walking player in the reviewer's fight sim (mb2/balance/bal.py: the
+    # butterfly dealt 1.70 / 2.06 / 2.00x). The butterfly form starts from the plan's x0.7; the human melee patterns
+    # (H1, H2) were cut too, since they hit a swinging melee player most. The player-side Burning of her own Pyro /
+    # Dendro alternation is intended and counted in the sim numbers. (plan's first numbers in brackets)
+    'h1a': 70, 'h1b': 90,        # H1 달빛 발차기: flip-kick crescent / axe-kick crescent + ground wave (1.0 / 1.2)
+    'h2a': 60, 'h2b': 90,        # H2 달빛 점프: 360 low sweep / kicked Dendro disc (0.9 / 1.4)
     'h3': 130,                   # H3 달빛 돌진: dash kick + ring
     'h4': 120,                   # H4 광폭한 진공: vacuum blade
-    'b1': 130,                   # B1 우아한 날개: wing strike
-    'b2': 50,                    # B2 화염 날개의 습격: each fire crescent (one hit per swing)
-    'b3': 160, 'b3t': 30,        # B3 날개 휩쓸개: wing slam fan / flame trail touch (max 2)
-    'b4': 150,                   # B4 달빛 축복: each homing orb (contact or burst, one hit per orb)
-    'b5': 260,                   # B5 달빛 해제: the dome
+    'b1': 80,                    # B1 우아한 날개: wing strike (1.3)
+    'b2': 35,                    # B2 화염 날개의 습격: each fire crescent (one hit per swing; 0.5)
+    'b3': 90, 'b3t': 20,         # B3 날개 휩쓸개: wing slam fan (1.6) / flame trail touch (max 2; 0.3)
+    'b4': 120,                   # B4 달빛 축복: each homing orb (contact or burst, one hit per orb; 1.5): it is what reaches
+                                 # a ranged player, so it stays a little higher (ranged walk at 0.8x of the Guardian with 1.0)
+    'b5': 150,                   # B5 달빛 해제: the dome (2.6)
 }
 KB = {'default': 3, 'light': 2, 'heavy': 4, 'none': 0}
 COCOON_HP_PCT = 20                    # 달빛 고치: % of the current HP on application (non-lethal)
@@ -260,10 +266,18 @@ class Gen:
         """Marker rlk_mb_bf_lock on the floor under the player, inside the safe disc (core u/lockp). Keep it with keep()."""
         return f'function {NS}u/lockp'
 
+    KEPT = 'rlk_mb_bf_kept'      # every kept / pattern-summoned marker: p/finish and p/cancel kill them all
+
     @staticmethod
     def keep(new_tag, src='rlk_mb_bf_dest'):
-        """Re-tag the marker of the last dest()/lockp() (src rlk_mb_bf_dest / rlk_mb_bf_lock) so the next call keeps it."""
-        return [f'tag @e[type=minecraft:marker,tag={src}] add {new_tag}', f'tag @e[type=minecraft:marker,tag={new_tag}] remove {src}']
+        """Re-tag the marker of the last dest()/lockp() (src rlk_mb_bf_dest / rlk_mb_bf_lock) so the next call keeps it.
+        An older marker of new_tag goes first, and the kept one also carries rlk_mb_bf_kept, which the core kills when
+        the pattern ends or is cancelled (review fix S1: kept markers used to pile up, one per run, and
+        `@e[tag=<kept>,limit=1]` picked the OLDEST, so every later run aimed at the first run's spot)."""
+        return [f'kill @e[type=minecraft:marker,tag={new_tag}]',
+                f'tag @e[type=minecraft:marker,tag={src}] add {new_tag}',
+                f'tag @e[type=minecraft:marker,tag={new_tag}] add {Gen.KEPT}',
+                f'tag @e[type=minecraft:marker,tag={new_tag}] remove {src}']
 
     # -- timeline helpers on the pattern clock #bfPT
     @staticmethod
@@ -432,7 +446,7 @@ def _lock_walk(tag, steps=3):
     toward the centre are enough. Kill <tag> in the pattern's cancel."""
     sel = f'@e[type=minecraft:marker,tag={tag},limit=1]'
     out = [f'kill @e[type=minecraft:marker,tag={tag}]',
-           f'execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ {CY} ~ {{Tags:["rlk_room","rlk_mb_aux","{tag}"]}}']
+           f'execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ {CY} ~ {{Tags:["rlk_room","rlk_mb_aux","{tag}","rlk_mb_bf_kept"]}}']
     out += [f'execute as {sel} at @s unless entity @e[tag=rlk_mb_arena,distance=..{L.num(H_WALK_R)},limit=1] '
             f'facing entity @e[tag=rlk_mb_arena,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.25'] * steps
     return out

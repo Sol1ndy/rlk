@@ -1,5 +1,5 @@
 # H4 광폭한 진공 (clip vacuum). The glint 9: the yaw locked, the lane decal to the wall; the stomp 16;
-# the blade at 17 (pj blade hr 1.2, 0.7 b/t -> 0.75, 60 t, no homing; it outlives the
+# the blade at 17 (pj blade hr 1.5, 0.75 b/t -> 0.75, 60 t, no homing; it outlives the
 # pattern: p/vacuum/blades from the core ai/state); the backflip 18-34, the landing 38; 1.2 Dendro.
 function rlk:mboss/butterfly/rig/face/player
 execute at @s rotated as @s rotated ~ 0 positioned ^-0.42 ^0 ^0.06 run function rlk:mboss/butterfly/fx/p/vac_crouch

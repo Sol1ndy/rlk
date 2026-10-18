@@ -9,4 +9,5 @@ scoreboard players set #bfPRel mb 0
 scoreboard players set #mbNoLeash mb 0
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_dest]
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_lock]
+kill @e[type=minecraft:marker,tag=rlk_mb_bf_kept]
 execute if score #mbSt mb matches 1 run tag @e[tag=rlk_mb_body] remove rlk_mb_inv

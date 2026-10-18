@@ -1014,10 +1014,12 @@ def _p_fire_trail():
 @preset('fire_land', 'B2 crescent landing: fire splash r 1.2 with a 2.5-block vertical flame streak. At the '
         'floor point.')
 def _p_fire_land():
+    # 5 cards (2 radial tongues, was 4): five landings of a swing plus a cure and the dew pulses stay under the 64-card
+    # cap in a real fight (review fix FX-2)
     out = [card('flame_tongue', '~ ~ ~', bb='vertical', s0=(0.5, 0.8, 0.5), s1=(1.1, 3.2, 1.1), life=8, fade=3),
            card('flame_puff', '~ ~0.4 ~', bb='center', s0=0.8, s1=2.2, life=6, fade=3),
            card('glow', '~ ~0.05 ~', '~ 90', s0=1.0, s1=2.6, life=8, fade=4, col=ORANGE)]
-    for yaw in radial(4, 30):
+    for yaw in radial(2, 30):
         out.append(card('flame_tongue', '^ ^ ^', f'~{ang(yaw)} 0', s0=0.2, s1=1.1, move=(0, 0, 0.9), life=7, fade=3))
     out += [part('lava', '~ ~0.2 ~', (0.3, 0.1, 0.3), 0, 3), part('flame', '~ ~0.3 ~', (0.6, 0.2, 0.6), 0.04, 8)]
     return out
@@ -1403,6 +1405,11 @@ def engine(W):
         f'function {E}spawn with storage rlk:bfkit a',
         f'execute if score #bkTel mb matches 1 run tag {SEL}_new] add rlk_bk_t',
         'execute store result score #bkNow mb run time query gametime',
+        '# The ager (e/world, scheduled 1t) runs at the end of this same server tick, when the game time already',
+        '# reads +1: count the stages from that tick, so the main interpolation starts one tick after the summon (the',
+        '# client first gets the start state; merged in the summon tick it would never animate) and every stage, the',
+        '# telegraph flash on the strike tick included, lands on its documented tick (review fix perf-2).',
+        'scoreboard players add #bkNow mb 1',
         f'execute as {SEL}_new,limit=1] run function {E}born',
         f'tag {SEL}_new] remove rlk_bk_new',
         f'schedule function {E}world 1t replace',

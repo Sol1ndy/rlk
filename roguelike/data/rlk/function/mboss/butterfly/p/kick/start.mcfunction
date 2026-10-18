@@ -7,7 +7,9 @@ kill @e[type=minecraft:marker,tag=rlk_mb_bf_p1b]
 scoreboard players set #bfDMax mb 45
 scoreboard players set #bfDKeep mb 15
 function rlk:mboss/butterfly/u/dest
+kill @e[type=minecraft:marker,tag=rlk_mb_bf_p1a]
 tag @e[type=minecraft:marker,tag=rlk_mb_bf_dest] add rlk_mb_bf_p1a
+tag @e[type=minecraft:marker,tag=rlk_mb_bf_p1a] add rlk_mb_bf_kept
 tag @e[type=minecraft:marker,tag=rlk_mb_bf_p1a] remove rlk_mb_bf_dest
 function rlk:mboss/grp_new
 scoreboard players operation #hzGrp mb = #mbGrp mb
@@ -15,12 +17,12 @@ scoreboard players set #hzKB mb 3
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzBack mb 5
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/hz/line {len:40,w:24,tell:10,dmg:100}
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/hz/line {len:40,w:24,tell:10,dmg:70}
 execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/butterfly/fx/tele/line {len:40,w:24,back:5,tell:10,el:7,hold:3}
 scoreboard players operation #hzGrp mb = #mbGrp mb
 scoreboard players set #hzKB mb 3
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 positioned ^ ^ ^1.2 positioned ~ 201 ~ run function rlk:mboss/hz/disc {r:15,tell:10,dmg:100}
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 positioned ^ ^ ^1.2 positioned ~ 201 ~ run function rlk:mboss/hz/disc {r:15,tell:10,dmg:70}
 execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1a,limit=1] rotated ~ 0 positioned ^ ^ ^1.2 positioned ~ 201 ~ run function rlk:mboss/butterfly/fx/tele/disc {r:15,tell:10,el:7,hold:3}
 playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 0.35 1.6 0.12

@@ -11,7 +11,7 @@ execute if score #bfPat mb matches 2 run scoreboard players set #bfPMax mb 70
 execute if score #bfPat mb matches 3 run scoreboard players set #bfPMax mb 55
 execute if score #bfPat mb matches 4 run scoreboard players set #bfPMax mb 46
 execute if score #bfPat mb matches 11 run scoreboard players set #bfPMax mb 60
-execute if score #bfPat mb matches 12 run scoreboard players set #bfPMax mb 122
+execute if score #bfPat mb matches 12 run scoreboard players set #bfPMax mb 189
 execute if score #bfPat mb matches 13 run scoreboard players set #bfPMax mb 64
 execute if score #bfPat mb matches 14 run scoreboard players set #bfPMax mb 102
 execute if score #bfPat mb matches 15 run scoreboard players set #bfPMax mb 100

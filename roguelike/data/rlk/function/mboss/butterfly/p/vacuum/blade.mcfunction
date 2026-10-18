@@ -9,6 +9,5 @@ execute if score #bfM mb matches 1 positioned ^ ^-0.9 ^ run function rlk:mboss/b
 scoreboard players operation #bfM mb = @s mbPjT
 scoreboard players operation #bfM mb %= #bfK4 mb
 execute if score #bfM mb matches 1 run function rlk:mboss/butterfly/p/vacuum/debris
-execute if score @s mbPjT matches 2 run playsound minecraft:entity.phantom.swoop hostile @a[tag=player] ~ ~ ~ 0.5 1.4 0.17
 execute if score @s mbPjT matches 6 run playsound minecraft:entity.breeze.idle_air hostile @a[tag=player] ~ ~ ~ 0.4 1 0.13
 execute unless entity @s[tag=rlk_mb_bf_p4s] if entity @e[tag=rlk_body,distance=..4,limit=1] run function rlk:mboss/butterfly/p/vacuum/pass
