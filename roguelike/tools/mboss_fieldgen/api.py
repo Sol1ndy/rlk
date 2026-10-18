@@ -816,3 +816,23 @@ def c_rocks(g, tl, key, pid, bursts, throws, dmg, dmg_s, el=5, pair=2, cap=2, re
              [f'kill @e[type=minecraft:marker,tag={base}t{j}]' for j in range(m)]
     return {'tick': tick, 'vis': vis, 'crumble': fn('rk_crumble'), 'cancel': cancel, 'done': throws[-1] + 26,
             'hr': hr, 'vis_ids': (v_burst, v_line)}
+
+
+# =============================================================================================
+# Field-pattern author (field.py, seq_f.py): shared helpers, prefixed f_.
+def f_clip_anchor(clip, event, name, default):
+    """A rig anchor (rig coordinates x left, y up, -z forward) of a clip at one of its events, from the real
+    manifest's clips[].anchors[event][name] (e.g. the core height while wave_drop rests on the floor); `default` (an
+    (x, y, z) tuple) while the stub manifest, the clip or the anchor is missing."""
+    for c in _MAN.get('clips', []):
+        if c.get('name') == clip:
+            a = c.get('anchors', {}).get(event, {}).get(name)
+            if a:
+                return tuple(float(v) for v in a)
+    return tuple(default)
+
+
+def f_body_pos(anchor):
+    """A rig anchor (x left, y up, -z forward) as a body-frame position '^x ^y ^z' (run rotated as the body)."""
+    x, y, z = anchor
+    return f'^{L.num(float(x), 3)} ^{L.num(float(y), 3)} ^{L.num(-float(z), 3)}'

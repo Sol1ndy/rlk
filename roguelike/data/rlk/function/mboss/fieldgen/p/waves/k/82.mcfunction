@@ -1,2 +1,2 @@
 # waves clock 82
-function rlk:mboss/fieldgen/p/waves/charge
+function rlk:mboss/fieldgen/fx/snd/wave_charge2

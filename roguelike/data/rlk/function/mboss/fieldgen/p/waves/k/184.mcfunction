@@ -1,2 +1,3 @@
 # waves clock 184
-execute if score #fq21T mb matches 1 run function rlk:mboss/fieldgen/p/waves/impact
+function rlk:mboss/fieldgen/fx/p/wave_fire {r:7.45}
+execute facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 positioned ^ ^ ^7.45 run function rlk:mboss/fieldgen/fx/snd/wave_ring

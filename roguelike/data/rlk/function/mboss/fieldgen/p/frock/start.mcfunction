@@ -1,15 +1,9 @@
-# F2 파쇄 (clip field_erupt; @s = body at the centre): bursts from 20, throws from 62.
-playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.8 0.9 0.27
-playsound minecraft:block.chain.place hostile @a[tag=player] ~ ~ ~ 0.8 0.8 0.27
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~0 ~1 ~3 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~1.5 ~1 ~2.6 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~2.6 ~1 ~1.5 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~3 ~1 ~0 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~2.6 ~1 ~-1.5 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~1.5 ~1 ~-2.6 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~0 ~1 ~-3 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~-1.5 ~1 ~-2.6 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~-2.6 ~1 ~-1.5 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~-3 ~1 ~0 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~-2.6 ~1 ~1.5 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.3} ~-1.5 ~1 ~2.6 0 0 0 0 1 force @a[tag=player]
+# F2 파쇄 (clip field_erupt; @s = body at the centre): bursts strike from 25 every 6 t (arc onto the
+# player, 7-8 one group), throws from 65 every 8 t (at most 2 slab hits), crumble 100, end 110.
+scoreboard players set #fq12SH mb 0
+scoreboard players set #fq12P mb 0
+execute store result score #fq12S mb run random value 0..1
+execute if score #fq12S mb matches 0 run scoreboard players set #fq12S mb -1
+kill @e[type=minecraft:marker,tag=rlk_mb_fg_p12w]
+execute positioned ~ ~6.5 ~ run function rlk:mboss/fieldgen/fx/p/vent_flare
+function rlk:mboss/fieldgen/fx/snd/vent_flare

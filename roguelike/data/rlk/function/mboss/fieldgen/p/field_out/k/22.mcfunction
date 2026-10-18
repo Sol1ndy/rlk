@@ -1,3 +1,4 @@
 # field_out clock 22
-playsound minecraft:block.chain.place hostile @a[tag=player] ~ ~ ~ 1 0.7 0.33
-playsound minecraft:block.piston.extend hostile @a[tag=player] ~ ~ ~ 0.9 0.6 0.3
+execute rotated as @s rotated ~ 0 positioned ^5.6 ^5.6 ^ run function rlk:mboss/fieldgen/fx/p/spark
+execute rotated as @s rotated ~ 0 positioned ^-5.6 ^5.6 ^ run function rlk:mboss/fieldgen/fx/p/spark
+function rlk:mboss/fieldgen/fx/snd/pack_up

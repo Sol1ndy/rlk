@@ -2,6 +2,5 @@
 # teleported to the arena centre facing the player (invisible until the warp-in clip).
 kill @e[tag=rlk_mb_fg_fxw]
 summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_fg_fx","rlk_mb_fg_fxw"]}
-function rlk:mboss/fieldgen/cfx/warp_out
 tag @s add rlk_mb_inv
 function rlk:mboss/fieldgen/u/centre

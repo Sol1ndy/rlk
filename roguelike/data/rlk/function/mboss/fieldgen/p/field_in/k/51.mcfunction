@@ -1,13 +1,4 @@
 # field_in clock 51
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~0 ~3.8 ~3.8 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~1.9 ~3.8 ~3.29 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~3.29 ~3.8 ~1.9 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~3.8 ~3.8 ~0 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~3.29 ~3.8 ~-1.9 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~1.9 ~3.8 ~-3.29 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~0 ~3.8 ~-3.8 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~-1.9 ~3.8 ~-3.29 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~-3.29 ~3.8 ~-1.9 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~-3.8 ~3.8 ~0 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~-3.29 ~3.8 ~1.9 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:dust{color:[0.612f,0.525f,0.91f],scale:1.2} ~-1.9 ~3.8 ~3.29 0 0 0 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^3.85 ^4.1 ^0 run function rlk:mboss/fieldgen/fx/p/spark
+execute rotated as @s rotated ~ 0 positioned ^-3.85 ^4.1 ^0 run function rlk:mboss/fieldgen/fx/p/spark
+playsound minecraft:block.beacon.activate hostile @a[tag=player] ~ ~ ~ 0.5 0.7 0.17
