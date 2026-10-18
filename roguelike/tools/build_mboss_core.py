@@ -486,7 +486,8 @@ execute if score #mbRegate mb matches 1 run function rlk:room/obj/k_mboss
 w('reward', '''
 # @s = zone marker, at @s (the 중간보스 zone centre, where the gate stood); the player is back in the dungeon.
 # No selection screen and no fanfare here: cur.picks item boxes fall onto the floor (mboss/box/*). Each box is
-# a room object (oact 15, room/obj/k_mbox); one click = one chapter-rarity, items-only pick (room/obj/do_mbox).
+# a room object (oact 15, room/obj/k_mbox); its first click = one chapter-rarity, items-only pick (room/obj/do_mbox),
+# and the box stays (opened) until that pick is used (lvup/act/resolve -> box/spend).
 title @a[tag=player] times 8 50 14
 title @a[tag=player] subtitle [{text:"아이템 상자 ",color:"#FFE08A"},{nbt:"cur.picks",storage:"rlk:mboss",color:"#FFE08A"},{text:"개 · 챕터 등급",color:"#FFE08A"}]
 title @a[tag=player] title [{nbt:"cur.title",storage:"rlk:mboss",interpret:true},{text:" 처치",color:"#FFE08A",bold:true}]
@@ -503,6 +504,11 @@ execute if score #mbPk mb matches 1.. run function rlk:mboss/box/drop_all
 # On landing each becomes the clickable room object room/obj/k_mbox (hand-written, oact 15); the click is
 # room/obj/do_mbox. Everything carries rlk_room, so room/clear (map change, run end), room/wipe and
 # uninstall remove the boxes like any other room object. room/tick runs box/all while #mbBoxOn mb is 1.
+# Opened boxes: the first click grants the box's pick and opens it (box/open: rlk_mb_boxopen on its whole group,
+# gold outline, label "(열림)", oarg = open age); backing out of the screen leaves it there and a later click only
+# reopens the screen. When a mid-boss pick is used (lvup/act/resolve on an mbSet), box/spend removes the oldest
+# opened box (box/gone: the open fx, then its group). No global counter: the state lives on the box entities, so
+# a map change (room/clear) leaves nothing behind and an unused pick simply stays pending (Shift+F).
 BOX_S = 1.1            # display scale: the chest item model is 14/16 wide and tall, centred on the entity
 BOX_REST = BOX_S / 2   # display centre above the floor at rest (chest bottom on the floor)
 BOX_GAP = 1.5          # centre to centre
@@ -513,6 +519,11 @@ BOX_STAGGER = 4        # ticks between consecutive boxes
 BOX_NMAX = max([2] + [int(b.get('picks', 2)) for b in BOSSES])
 BOX_GOLD = '{color:[1.0f,0.84f,0.36f],scale:%sf}'
 BOX_SQ = (1.12, 0.82)  # landing squash (xz, y) relative to BOX_S
+BOX_GLOW = 0xFFD24A    # outline of an opened box (the label's gold)
+# Label of an opened box: three short lines like the closed one (room/obj/k_mbox), so two labels 1.5 b apart
+# never overlap (a one-line "아이템 상자 (열림)" would be about 1.8 b wide at the label's 0.8 scale).
+BOX_OPEN_TEXT = ('[{text:"아이템 상자",color:"#FFD24A",bold:true},{text:"\\n(열림)",color:"#FFE08A",bold:true},'
+                 '{text:"\\n다시 눌러 선택",color:"#D0D0D0",bold:false}]')
 
 
 def exact_steps(total, weights, nd=4):
@@ -625,6 +636,38 @@ w('box/shimmer', f'''
 scoreboard players set @s mbT 0
 particle minecraft:dust{BOX_GOLD % '0.9'} ~ ~0.15 ~ 0.35 0.3 0.35 0 2
 particle minecraft:end_rod ~ ~{L.num(BOX_REST)} ~ 0.25 0.1 0.25 0.004 1
+''')
+w('box/open', f'''
+# From room/obj/do_mbox on the FIRST click of a box (@s = its object marker, at @s), after its pick was granted.
+# The box stays where it is until a mid-boss pick is used (box/spend): backing out of the screen with Shift leaves
+# it, and a later click only reopens the screen. oarg = open age (closed 0; the newest opened box 1, older ones
+# count up), so box/spend takes the oldest. Every entity of its group gets rlk_mb_boxopen; the chest gets a gold
+# outline, the label "(열림)". No global counter: room/clear and uninstall remove the tags with the entities.
+scoreboard players add @e[type=minecraft:marker,tag=rlk_obj,tag=rlk_mb_boxopen] oarg 1
+scoreboard players set @s oarg 1
+scoreboard players operation #mbBoxG mb = @s ogid
+execute as @e[tag=rlk_room] if score @s ogid = #mbBoxG mb run tag @s add rlk_mb_boxopen
+execute as @e[type=minecraft:item_display,tag=rlk_mb_box,tag=rlk_mb_boxopen] if score @s ogid = #mbBoxG mb run data merge entity @s {{Glowing:1b,glow_color_override:{BOX_GLOW}}}
+execute as @e[type=minecraft:text_display,tag=rlk_olbl,tag=rlk_mb_boxopen] if score @s ogid = #mbBoxG mb run data modify entity @s text set value {BOX_OPEN_TEXT}
+''')
+w('box/spend', '''
+# From lvup/act/resolve (@s = player) when a mid-boss pick is used: an mbSet was chosen (or skipped) while pkMb >= 1,
+# just before pkMb -1. Exactly one opened box goes: the oldest (highest oarg; box/gone). None opened (the room with
+# the opened box was left and its pick stayed pending for Shift+F): nothing. Closed boxes are never removed here.
+scoreboard players set #mbBoxA mb 0
+execute as @e[type=minecraft:marker,tag=rlk_obj,tag=rlk_mb_boxopen] run scoreboard players operation #mbBoxA mb > @s oarg
+execute as @e[type=minecraft:marker,tag=rlk_obj,tag=rlk_mb_boxopen] if score @s oarg = #mbBoxA mb at @s run return run function rlk:mboss/box/gone
+''')
+w('box/gone', f'''
+# @s = an opened box's object marker, at @s (box centre): the open fx (chest opening, chime, gold burst, poof), then
+# the whole group (marker, chest display, label, hint) via room/obj/kill_group. From box/spend, and from
+# room/obj/do_mbox for an opened box whose pick no longer exists (guard only: pkMb < 1 with an opened box).
+playsound minecraft:block.chest.open block @a[tag=player] ~ ~ ~ 0.9 1
+playsound minecraft:block.amethyst_block.chime block @a[tag=player] ~ ~ ~ 1 1.2
+particle minecraft:dust{BOX_GOLD % '1.4'} ~ ~ ~ 0.35 0.35 0.35 0 18
+particle minecraft:end_rod ~ ~0.2 ~ 0.15 0.15 0.15 0.1 12
+particle minecraft:poof ~ ~-{L.num(BOX_REST - 0.1)} ~ 0.35 0.25 0.35 0.02 12
+function rlk:room/obj/kill_group
 ''')
 w('cancelled', T.join(['''
 tellraw @a[tag=player] ''', gray('중간보스 전투가 취소되었습니다. (보상 없음) 문 오브젝트를 다시 누르면 재도전합니다.') + ''']

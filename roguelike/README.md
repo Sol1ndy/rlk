@@ -435,7 +435,7 @@
 
 ## 중간보스 (`mboss/`)
 
-노드 맵의 **중간보스 구역**(구역 종류 15)에서 원형 경기장으로 순간이동해 싸우는 강적. 여러 중간보스를 등록해 두고 무작위로 하나가 나오며, 처치하면 문이 있던 자리에 **아이템 상자 2개**가 떨어지고, 상자 하나를 누를 때마다 **챕터에 맞는 등급의 아이템 선택 1번**을 받는다. 지금 뽑히는 중간보스는 **파수꾼・타락**(`guardian`, 가중치 10, 아래 "파수꾼・타락 모듈") 하나이고, 틀 점검용 `proto`(시험용 강적, 가중치 0)는 테스트 명령으로만 나온다.
+노드 맵의 **중간보스 구역**(구역 종류 15)에서 원형 경기장으로 순간이동해 싸우는 강적. 여러 중간보스를 등록해 두고 무작위로 하나가 나오며, 처치하면 문이 있던 자리에 **아이템 상자 2개**가 떨어지고, 상자 하나를 열 때마다 **챕터에 맞는 등급의 아이템 선택 1번**을 받는다(상자는 그 선택을 실제로 쓸 때 사라진다). 지금 뽑히는 중간보스는 **파수꾼・타락**(`guardian`, 가중치 10, 아래 "파수꾼・타락 모듈") 하나이고, 틀 점검용 `proto`(시험용 강적, 가중치 0)는 테스트 명령으로만 나온다.
 
 ### 진행
 1. 마지막 구역의 선택지에 노드 **중간보스**(가중치 7)가 다른 노드처럼 붙는다. 1챕터 첫 선택지에는 안 나오고, 한 챕터에 두 번 고를 수 없다(기존 `seen` 규칙).
@@ -444,9 +444,11 @@
 4. 등장 연출 동안은 무적이고 체력바가 차오른다. 전투 중에는 미니맵이 숨고, 위쪽에 보스바 3줄(이름 · 부착 원소 아이콘 / 체력바 + 아랫줄 게이지 / 보스별 정보 줄)이 뜬다.
 5. 처치하면(마지막 타격의 회복 구슬 · 경험치 · 골드는 그대로) 쓰러지는 연출 뒤 경기장의 골드를 거두고 던전으로 돌아온다. 선택 화면은 바로 열리지 않고(축하 효과음도 없음) 처치 제목(부제 "아이템 상자 2개")과 함께 **아이템 상자 2개**(`picks`)가 문이 있던 구역 한가운데로 하늘에서 떨어진다.
    - 상자: 바닐라 상자 모양(크기 1.1)이 6칸 위에서 14틱 동안 살짝 빨라지며 4분의 1 바퀴 돌아 떨어지고(금빛 · 흰 입자), 땅에 닿으면 먼지 · 금빛 터짐 · 쿵 소리(상자 닫힘 + 나무 떨어짐 + 작은 모루 소리)와 함께 살짝 눌렸다 펴진다. 두 번째 상자는 4틱 뒤에 떨어진다. 두 상자는 구역 한가운데에서 플레이어 쪽을 잇는 선과 직각으로 1.5칸 간격으로 나란히 서고(방의 축에 맞춤), 자물쇠가 플레이어 쪽을 본다. 가만히 있는 동안 금빛으로 조금씩 반짝인다.
-   - 땅에 닿은 상자는 방 오브젝트(`oact` 15, `room/obj/k_mbox`, 이름 "아이템 상자" · 설명 "챕터 등급 아이템 선택")가 되어 조준하면 "▶ 좌클릭"이 뜬다. 누르면(`room/obj/do_mbox`) 아이템 선택 1번(`lvup/add {n:1}`, `pkMb` +1 이라 이 묶음에는 캐릭터 카드가 나오지 않음)을 받고 그 상자만 사라진 뒤 선택 화면으로 들어간다(이미 선택 화면이면 그대로). 상자 하나 = 선택 1번, 고르고 돌아와 나머지 상자를 누르면 된다. 전투 중에는 눌리지 않는다.
-   - 등급 확률은 레벨 업 선택과 같은 챕터 표(`items/roll_rarity`). 골드는 일반 몹의 × `goldMul`(5), 사파이어 조각 `sap`(1)개. 상자는 다른 방 오브젝트처럼 `rlk_room` 이라 맵 이동 · 런 종료 · `room/wipe` · `uninstall` 때 사라진다(누르지 않은 상자는 맵을 옮기면 없어짐). 처치한 뒤에는 문이 다시 나타나지 않고 구역은 정리된 채(문 열림)로 남는다.
-   - 생성: 떨어지는 연출은 `tools/build_mboss_core.py` 의 `mboss/box/*`(`drop_all` → `row` → `drop`, 매 틱 `room/tick` → `box/all`(상자가 있을 때만, `#mbBoxOn mb`) → `fall` → `land` → `room/obj/k_mbox`), 오브젝트와 클릭은 손으로 쓴 `room/obj/{k_mbox,do_mbox}`.
+   - 땅에 닿은 상자는 방 오브젝트(`oact` 15, `room/obj/k_mbox`, 이름 "아이템 상자" · 설명 "챕터 등급 아이템 선택")가 되어 조준하면 "▶ 좌클릭"이 뜬다. 닫힌 상자를 누르면(`room/obj/do_mbox`) 아이템 선택 1번(`lvup/add {n:1}`, `pkMb` +1 이라 이 묶음에는 캐릭터 카드가 나오지 않음)을 받고, 상자가 **열림**이 된 뒤(`mboss/box/open`: 묶음 전체에 태그 `rlk_mb_boxopen`, 상자에 금빛 윤곽, 글자 "아이템 상자 / (열림) / 다시 눌러 선택") 선택 화면으로 들어간다(이미 선택 화면이면 그대로). 전투 중에는 눌리지 않는다.
+   - 열린 상자는 **그 선택을 실제로 쓸 때까지 그 자리에 남는다**. 선택 화면에서 Shift 로 돌아와도 상자가 있고, 열린 상자를 다시 누르면 선택 화면만 다시 연다(기회는 늘지 않고 선택지도 그대로: 선택지는 `rlk:lvpick choices` 에 남아 있고 `lvup/toggle` 은 비었을 때만 굴리므로, 나갔다 들어와도 공짜 리롤이 되지 않음). Shift+F 로 다시 들어가도 같다. 중간보스 선택을 쓰면(아이템을 고르거나 건너뛰면: `lvup/act/resolve` 가 중간보스 묶음 `mbSet` 을 쓸 때) **열린 상자 하나가 사라진다**(`mboss/box/spend` → `box/gone`: 상자 열림 · 자수정 소리, 금빛 터짐 · 연기 뒤 그 묶음 제거). 둘 다 열어 두었으면 고를 때마다 하나씩, 먼저 연 상자부터 사라진다(`oarg` = 연 순서, 닫힌 상자는 0).
+   - 열린 상자의 선택을 쓰지 않고 맵을 옮기면 그 선택은 그대로 남고(Shift+F 로 고름) 상자는 방과 함께 치워진다. 상태는 상자 엔티티의 태그 · 점수에만 있어(따로 세는 수 없음) 남는 것이 없다. 중간보스 선택을 쓸 때 열린 상자가 없으면 아무것도 지우지 않고, 닫힌 상자는 어떤 선택으로도 지워지지 않는다(레벨 업 선택 묶음을 써도 상자는 그대로). 늘 열린 상자 수 ≤ `pkMb` ≤ `pkPending`.
+   - 등급 확률은 레벨 업 선택과 같은 챕터 표(`items/roll_rarity`). 골드는 일반 몹의 × `goldMul`(5), 사파이어 조각 `sap`(1)개. 상자는 다른 방 오브젝트처럼 `rlk_room` 이라 맵 이동 · 런 종료 · `room/wipe` · `uninstall` 때 사라진다(열지 않은 상자는 맵을 옮기면 없어짐). 처치한 뒤에는 문이 다시 나타나지 않고 구역은 정리된 채(문 열림)로 남는다.
+   - 생성: 떨어지는 연출은 `tools/build_mboss_core.py` 의 `mboss/box/*`(`drop_all` → `row` → `drop`, 매 틱 `room/tick` → `box/all`(상자가 있을 때만, `#mbBoxOn mb`) → `fall` → `land` → `room/obj/k_mbox`)와 열기 · 지우기 `box/{open,spend,gone}`, 오브젝트와 클릭은 손으로 쓴 `room/obj/{k_mbox,do_mbox}`, 선택을 쓸 때의 연결은 `lvup/act/resolve`.
 6. 처치가 아닌 이유로 몸체가 사라지면(`/kill`, 소환 3번 실패, 리로드로 몸체 유실) **보상 없이 취소**되고 던전으로 돌아오며 문이 다시 나타난다. 경기장 청크가 불려 있지 않으면 고정을 다시 걸고 0.5초마다 다시 시도하며, 3초가 지나도 안 되면 같은 방식으로 취소한다(문이 잠긴 채 멈추지 않음).
 - 플레이어가 쓰러진 동안 · 로노바 부활 중 · 선택 화면에서는 **모든 것이 멈춘다**(패턴 시계 · 바닥 공격 · 투사체). 경기장 밖으로 벗어나면(벽 넘기 · 이상한 넉백) 처음 자리로 돌려놓는다. 보스는 경기장 가장자리에서 안쪽으로 끌려 돌아온다.
 - 정리: 처치 · 취소 · 런 종료 · 사망 · 맵 이동 · `room/wipe` · `/reload`(진행 중 전투는 체력 유지, 보조 엔티티만 다시 만듦) · `uninstall` 모두 경기장 엔티티 · 보스바 · 상태를 지운다.
@@ -542,7 +544,7 @@
 - 노드 맵으로 직접: `/data modify storage rlk:room next set value [15]` → `/scoreboard players set #mapType room 1` → `/function rlk:run/next_map`(뽑을 수 있는 중간보스가 있어야 함, 없으면 `#mbForce mb` 를 99로).
 
 ### 고친 공용 파일
-`combat/apply`(쓰러지는 중 · 무적 · 진짜 피해 · 보조 오브젝트 경로 · 몸체 원소 훅 · 쓰러짐), `combat/apply_mods`(새로: 기존 보정 묶음 + 저항 + 보스별 받는 피해), `combat/res*`, `combat/gold_drop`(boss + miniboss 는 중간보스 배율), `combat/clear_atkflags`, `mob/{setup,shield_ensure,vanilla_hit,knock,tick}`, `room/{mob_init,zone_enter,mob_wave,combat_clear,zone_patch,clear,wipe,remove,setup}`, `room/obj/{click,k_mboss,k_mbox,do_mbox}`(상자 `oact` 15), `room/tick`(상자 연출), `room/node/{register,cand_loop}`, `run/{start,end}`, `player/hook_respawn`, `lvup/{roll,init,act/resolve}`(`pkMb`), `tick`, `load`, `uninstall`, 미니맵(`tools/build_minimap.py` 로 다시 생성). 나루카미 코드는 건드리지 않았다.
+`combat/apply`(쓰러지는 중 · 무적 · 진짜 피해 · 보조 오브젝트 경로 · 몸체 원소 훅 · 쓰러짐), `combat/apply_mods`(새로: 기존 보정 묶음 + 저항 + 보스별 받는 피해), `combat/res*`, `combat/gold_drop`(boss + miniboss 는 중간보스 배율), `combat/clear_atkflags`, `mob/{setup,shield_ensure,vanilla_hit,knock,tick}`, `room/{mob_init,zone_enter,mob_wave,combat_clear,zone_patch,clear,wipe,remove,setup}`, `room/obj/{click,k_mboss,k_mbox,do_mbox}`(상자 `oact` 15), `room/tick`(상자 연출), `room/node/{register,cand_loop}`, `run/{start,end}`, `player/hook_respawn`, `lvup/{roll,init,act/resolve}`(`pkMb`, 선택을 쓰면 열린 상자 하나를 지우는 `mboss/box/spend`), `tick`, `load`, `uninstall`, 미니맵(`tools/build_minimap.py` 로 다시 생성). 나루카미 코드는 건드리지 않았다.
 
 ## 13. 시점 (`view/`) — 1인칭 / 숄더뷰 / F5 위쪽 시점
 설정 방의 **시점** 버튼으로 1인칭 → 숄더뷰 → F5 위쪽 시점 순서로 바뀝니다(처음엔 F5 위쪽 시점). 명령: `/function rlk:view/mode {m:1}`(숄더뷰) · `{m:2}`(F5 위쪽 시점) · `/function rlk:view/off`(1인칭).
