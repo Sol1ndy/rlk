@@ -10,7 +10,7 @@ scoreboard players set #hzKB mb 3
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzVis mb 41
 scoreboard players set #hzQuiet mb 1
-execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p4t7,limit=1] positioned ~ 201 ~ run function rlk:mboss/hz/disc {r:15,tell:14,dmg:90}
+execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p4t7,limit=1] positioned ~ 201 ~ run function rlk:mboss/hz/disc {r:15,tell:14,dmg:110}
 execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p4t7,limit=1] positioned ~ 201 ~ rotated ~ 0 run function rlk:mboss/fieldgen/fx/tele/disc {r:15,tell:14,el:5,hold:3}
 data merge entity @s {teleport_duration:1}
 execute at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p4t7,limit=1] feet run tp @s ~ ~ ~ ~ ~

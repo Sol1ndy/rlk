@@ -924,8 +924,8 @@
   },
   "ports_glow": {
    "args": [],
-   "doc": "C1 +10: the ring of bomb ports under the ring lights up (8 port glows). At the ring centre, rotated as the device.",
-   "cards": 8
+   "doc": "C1 +10: gold dust under the ring as the bomb ports light up (the rig's charge look lights the ports themselves; the module adds a glow card on each port anchor of its rig). At the ring centre, rotated as the device.",
+   "cards": 0
   },
   "bomb_drop": {
    "args": [
@@ -945,6 +945,11 @@
    ],
    "doc": "C1 / C2 slam tell (13 t): the gold column from the face-down core to the floor, a floor glow and a base flare. At the floor point under the core; {h} = the core height above the floor.",
    "cards": 3
+  },
+  "column_base": {
+   "args": [],
+   "doc": "C1 / C2 slam point (13 t) without the column: the floor glow and the base flare at the locked point while the rig's own gold column falls under the gliding device. At the floor point.",
+   "cards": 2
   },
   "plunge": {
    "args": [],

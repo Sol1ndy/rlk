@@ -35,6 +35,8 @@ scoreboard players set #fgLowG mb 0
 scoreboard players set #fgWvK mb 0
 scoreboard players set #fgTri mb 0
 scoreboard players set #fgHudV mb 0
+scoreboard players set #fgBanF mb 0
+scoreboard players set #fgBrkLo mb 0
 scoreboard players set #fgCool mb 30
 scoreboard players set #fgBand mb 2
 scoreboard players set #fgCruLim mb 5

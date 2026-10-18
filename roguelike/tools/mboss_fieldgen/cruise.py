@@ -1,11 +1,13 @@
 """Cruise-form patterns C1-C6 of the field generator (실험성 역장 발생 장치), stage 2 (the cruise-pattern author).
 
-    1 bomb     C1 중력 시스템·일점 상쇄 (폭격) + the slam finisher   mid / far x2
+    1 bomb     C1 중력 시스템·일점 상쇄 (폭격) + the slam finisher   melee / mid / far x2
     2 slam     C2 내려찍기                                         melee x2 / mid
-    3 laser    C3 중력 시스템·코어 (레이저 빔)                       melee x2 / mid x2
+    3 laser    C3 중력 시스템·코어 (레이저 빔)                       mid only
     4 missile  C4 중력 시스템·바위 폭탄 (미사일)                     far x3 only
-    5 burst    C5 중력 시스템·지면 충격 (중력 폭발)                   melee x2 / mid
-    6 rock     C6 중력 시스템·파쇄 (바위 날리기, the tower)          mid x2 / far
+    5 burst    C5 중력 시스템·지면 충격 (중력 폭발)                   mid only
+    6 rock     C6 중력 시스템·파쇄 (바위 날리기, the tower)          melee / mid x2 / far
+    (the fix round's balance bands, scratchpad plan.md "Fix round": C3 / C5 left the melee band, C1 / C6 joined it;
+    every cruise pattern recovers 12 t, was 20)
 
 Faithful to the scratchpad specs mb3/spec/C1_bomb_run.md .. C6_rock_tower.md and plan.md (its "Stage-2 decisions":
 every recommended answer of spec/README.md section 5 is accepted):
@@ -88,8 +90,15 @@ C1_SPEED = 0.55
 C1_BOMBS = [C1_RUN + (9 * k) // 4 for k in range(20)]          # drop ticks, 2.25 t apart
 C1_FALL = 6                                                    # a bomb falls 6 t onto its decal
 C1_LEAD = 4                                                    # decal 4 t before the drop: tell 10
-C1_SIDE = (1.05, -1.05, 0.0)                                   # L, R, C (body frame ^x = left; spec F3)
-C1_PORT_H = 3.8                                                # the axis underside in the nose-down pose
+# The bombs leave the rig's front ports (fix round FID-2): port_0 (left) and port_7 (right) of the manifest's bomb_run
+# `drop` anchors (rig x left, y up, -z forward: 1.048 b to the side, 2.253 b ahead of the axis, 3.483 b up in the
+# 16-degree nose-down pose) and the point between them for the centre bomb.
+C1_PORT_L = A.c_anchor('bomb_run', 'drop', 'port_0', (1.048, 3.483, -2.253))
+C1_PORT_R = A.c_anchor('bomb_run', 'drop', 'port_7', (-1.048, 3.483, -2.253))
+C1_SIDE = (round(C1_PORT_L[0], 3), round(C1_PORT_R[0], 3), 0.0)  # L, R, C (body frame ^x = left)
+C1_FWD = round(-(C1_PORT_L[2] + C1_PORT_R[2]) / 2, 3)          # ahead of the body axis (^z)
+C1_PORT_H = round((C1_PORT_L[1] + C1_PORT_R[1]) / 2, 3)        # the bomb starts this high above its decal
+C1_GLOW = [A.c_anchor('bomb_run', 'ports', f'port_{i}', None) for i in range(8)] if A.c_clip('bomb_run', 'anchors') else []
 C1_SLAM = clip_len('bomb_run')                                 # the finisher's slam clip starts here
 C1_SLAM_T = ev_or('slam', 'impact', 16)                        # its tell (the clip's impact)
 C1_SLAM_HIT = C1_SLAM + C1_SLAM_T
@@ -188,19 +197,25 @@ C6_LEN = clip_len('tower_throw')
 C6_END = max(C6_LEN, C6_THROWS[-1] + 26)                        # the last slab has landed (life 24 at 1.5 b/t)
 C6_DIP_T, C6_DIP_STEP, C6_DIP_MIN = 11, 0.2, 5.0                # the dip glide toward a player >= 5 b away (spec F4)
 
+# Bands and recovery after the fix round's balance runs (scratchpad mb3/fgfix/sim, plan.md "Fix round"): a melee player
+# stands under C3's medallions (r < 2.7: out of the beam band) and jumps C5's blast, so in the melee band those two were
+# free time; they are now the mid band's (4-8 b), and the melee band takes the bomb run and the rock throw (the spec's
+# bands were C1 mid / far, C3 and C5 melee / mid, C6 mid / far). The bag still deals each pattern of a band once per
+# cycle. Every cruise pattern recovers 12 t (was 20).
+CRU_RECOVER = 12
 PATTERNS = [
-    Pattern(1, 'bomb', '중력 시스템·일점 상쇄', 'c', 'bomb_run', bands=('mid', 'far'), weight={'far': 2},
-            max_len=C1_END + 7, length=C1_END),
+    Pattern(1, 'bomb', '중력 시스템·일점 상쇄', 'c', 'bomb_run', bands=('melee', 'mid', 'far'), weight={'far': 2},
+            recover=CRU_RECOVER, max_len=C1_END + 7, length=C1_END),
     Pattern(2, 'slam', '내려찍기', 'c', 'slam', bands=('melee', 'mid'), weight={'melee': 2},
-            max_len=C2_LEN + 7, length=C2_LEN),
-    Pattern(3, 'laser', '중력 시스템·코어', 'c', 'laser', bands=('melee', 'mid'), weight={'melee': 2, 'mid': 2},
-            max_len=C3_LEN + 6, length=C3_LEN),
+            recover=CRU_RECOVER, max_len=C2_LEN + 7, length=C2_LEN),
+    Pattern(3, 'laser', '중력 시스템·코어', 'c', 'laser', bands=('mid',), weight={'mid': 2},
+            recover=CRU_RECOVER, max_len=C3_LEN + 6, length=C3_LEN),
     Pattern(4, 'missile', '중력 시스템·바위 폭탄', 'c', 'missiles', bands=('far',), weight={'far': 3},
-            max_len=C4_END + 8, length=C4_END),
-    Pattern(5, 'burst', '중력 시스템·지면 충격', 'c', 'coreup', bands=('melee', 'mid'), weight={'melee': 2},
-            max_len=C5_LEN + 8, length=C5_LEN),
-    Pattern(6, 'rock', '중력 시스템·파쇄', 'c', 'tower_throw', bands=('mid', 'far'), weight={'mid': 2},
-            max_len=C6_END + 8, length=C6_END),
+            recover=CRU_RECOVER, max_len=C4_END + 8, length=C4_END),
+    Pattern(5, 'burst', '중력 시스템·지면 충격', 'c', 'coreup', bands=('mid',),
+            recover=CRU_RECOVER, max_len=C5_LEN + 8, length=C5_LEN),
+    Pattern(6, 'rock', '중력 시스템·파쇄', 'c', 'tower_throw', bands=('melee', 'mid', 'far'), weight={'mid': 2},
+            recover=CRU_RECOVER, max_len=C6_END + 8, length=C6_END),
 ]
 
 
@@ -225,8 +240,9 @@ def bomb(g):
     """C1 일점 상쇄 (spec C1): the route is locked at 0 through the player's feet (24.75 b = 45 t x 0.55 b/t, its end
     pulled back along the line into r 16.5); the device tracks 0-9, snaps onto the route at the ports (10) and glides
     it from the run (12); a predictor marker glides the same route 4 t ahead, so each bomb's decal (hz/disc r 1.3,
-    tell 10, quiet, with the kit tele_disc) is made at the predictor 4 t before its drop, exactly under its port
-    (+1.05 / -1.05 / 0 b across the line), and the kit bomb falls 6 t onto it; 20 bombs every 2.25 t in volley groups
+    tell 10, quiet, with the kit tele_disc) is made at the predictor 4 t before its drop, exactly under its port (the
+    rig's front ports port_0 / port_7: 1.05 b to each side and 2.25 b ahead of the axis, the centre bomb between them;
+    fix round FID-2), and the kit bomb falls 6 t from the port onto it; 20 bombs every 2.25 t in volley groups
     of 4 (light KB, 0.8). The finisher (spec F1, Q4): at the end of bomb_run the player is locked again (lockb), the
     device glides up to 6 b toward the lock in 10 t, and the slam clip plays: decal r 5 at the destination from its
     start, strike at the clip's impact (r 5, feet up to 2.0 b, heavy KB, 1.4). The pattern ends with the slam clip
@@ -265,19 +281,23 @@ def bomb(g):
     # 0: the route lock, the turn cue; 0-9 tracking (the rig turns the anchor <= 4 deg/t); 10 the snap onto the route
     tl.at(0, f'execute at @s facing entity {PLAYER} feet rotated ~ 0 run function {NS}p/{key}/route',
           g.rig('face/track'), g.sound('entity.breeze.whirl', 0.5, 0.9))
+    # the ports light up (+10): the kit's port dust under the ring and a glow on each of the rig's 8 ports (the manifest's
+    # bomb_run `ports` anchors, the nose-down pose: fix round FID-3)
     tl.at(C1_PORTS, f'execute at @s facing entity {end} feet run tp @s ~ ~ ~ ~ 0',
-          at_body(4.5, g.fx('ports_glow')), at_body(4.5, g.snd('bomb_port')))
+          at_body(4.5, g.fx('ports_glow')), at_body(4.5, g.snd('bomb_port')),
+          *[f'execute at @s rotated as @s rotated ~ 0 positioned {A.c_bf(pt)} run '
+            + g.kcard('glow', bb='center', s0=0.3, s1=0.75, life=14, fade=4, col='#E1BC7E') for pt in C1_GLOW])
     tl.at(C1_RUN - C1_LEAD, f'execute as {pred} positioned as {end} run function rlk:mboss/mv/glide {{t:{C1_GLIDE}}}')
     tl.at(C1_RUN, f'execute positioned as {end} run function rlk:mboss/mv/glide {{t:{C1_GLIDE}}}',
           g.sound('entity.breeze.charge', 0.6, 0.6))
     for k, d in enumerate(C1_BOMBS):
-        x = L.num(C1_SIDE[k % 3])
-        pre = f'execute at {pred} rotated as {pred} rotated ~ 0 positioned ^{x} ^ ^ positioned ~ {CY} ~ run '
+        x, f = L.num(C1_SIDE[k % 3]), L.num(C1_FWD)
+        pre = f'execute at {pred} rotated as {pred} rotated ~ 0 positioned ^{x} ^ ^{f} positioned ~ {CY} ~ run '
         lines = [g.GRP_NEW] if k % 4 == 0 else []
         lines += g.hz_opts(kb=KB['light'], grp=True, vis=11 if k % 2 == 0 else 13, quiet=1, sfx=0)
         lines += [pre + g.hz_disc(1.3, C1_LEAD + C1_FALL, DMG['c1']), pre + g.tele_disc(1.3, C1_LEAD + C1_FALL)]
         tl.at(d - C1_LEAD, *lines)
-        drop = f'execute at @s rotated as {pred} rotated ~ 0 positioned ^{x} ^ ^ positioned ~ {CY} ~ run '
+        drop = f'execute at @s rotated as {pred} rotated ~ 0 positioned ^{x} ^ ^{f} positioned ~ {CY} ~ run '
         tl.at(d, drop + g.fx('bomb_drop', h=C1_PORT_H), at_body(C1_PORT_H, g.snd('bomb_drop')),
               at_body(C1_PORT_H, g.snd('bomb_fall')) if k % 4 == 0 else None)
     # the finisher: re-lock, destination, the slam clip with its decal and hazard at the destination, the glide
@@ -287,7 +307,8 @@ def bomb(g):
           f'execute at {dst} positioned ~ {CY} ~ rotated ~ 0 run ' + g.tele_disc(5.0, C1_SLAM_T),
           f'execute positioned as {dst} run function rlk:mboss/mv/glide {{t:{C1_DST_T}}}',
           at_body(4.5, g.snd('column_tell')))
-    tl.at(C1_SLAM + 3, f'execute at {dst} positioned ~ {CY} ~ rotated ~ 0 run ' + g.fx('column_tell', h=4.5))
+    # the slam point: the kit's floor glow and base flare (the rig draws the gold column under the gliding device: FID-5)
+    tl.at(C1_SLAM + 3, f'execute at {dst} positioned ~ {CY} ~ rotated ~ 0 run ' + g.fx('column_base'))
     tl.at(C1_SLAM + 6, at_body(4.5, g.sound('block.beacon.power_select', 0.5, 1.2)))
     tl.at(C1_PLUNGE, at_body(4.5, g.fx('plunge')), at_body(4.5, g.snd('plunge')))
     tl.at(C1_RISE, at_floor(g.fx('rise')), at_body(2.3, g.sound('block.piston.contract', 0.6, 0.8)),
@@ -314,7 +335,8 @@ def bomb(g):
 # ---------------------------------------------------------------------------------------------
 def slam(g):
     """C2 내려찍기 (spec C2): the nose turns to the player and the feet are locked at 0 (lockb: inside r 16.5, kept),
-    the device glides onto the lock in 10 t while the gold column falls; the decal r 5 is at the lock from 0 and the
+    the device glides onto the lock in 10 t while the rig's gold column falls under it (the kit marks the lock with a
+    floor glow and a base flare, column_base: fix round FID-5); the decal r 5 is at the lock from 0 and the
     slam strikes at the clip's impact (r 5, feet up to 2.0 b, heavy KB, 1.4). The dash is the answer."""
     key, tl = 'slam', TL(g, 'slam')
     A2 = 'rlk_mb_fg_p2a'
@@ -325,7 +347,7 @@ def slam(g):
           f'execute at {sel} positioned ~ {CY} ~ rotated ~ 0 run ' + g.tele_disc(5.0, C2_HIT),
           f'execute positioned as {sel} run function rlk:mboss/mv/glide {{t:10}}',
           at_body(4.5, g.snd('column_tell')))
-    tl.at(3, f'execute at {sel} positioned ~ {CY} ~ rotated ~ 0 run ' + g.fx('column_tell', h=4.5))
+    tl.at(3, f'execute at {sel} positioned ~ {CY} ~ rotated ~ 0 run ' + g.fx('column_base'))       # FID-5
     tl.at(8, at_body(4.5, g.sound('block.beacon.power_select', 0.5, 1.2)))
     tl.at(C2_PLUNGE, at_body(4.5, g.fx('plunge')), at_body(4.5, g.snd('plunge')))
     tl.at(C2_RISE, at_floor(g.fx('rise')), at_body(2.3, g.sound('block.piston.contract', 0.6, 0.8)),

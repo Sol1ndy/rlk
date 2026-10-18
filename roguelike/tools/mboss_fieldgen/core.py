@@ -62,6 +62,11 @@ FOUT_PACK = ev_or('field_end', 'pack', 50)
 BRK_LEN = clip_len('break')                   # 34: bubble 0-5, burst 5, tilt, wobble, sink
 BRK_BURST = ev_or('break', 'burst', 5)
 BRK_WOBBLE = ev_or('break', 'wobble', 14)
+# The break on the floor (fix round FID-1): the rig's break_low starts from the closing wave_drop's grounded pose; the
+# module plays it instead of break while the device is low (field.W3_LOW), with the same length and events.
+BRK_LOW = 'break_low' if 'break_low' in A.CLIPS else None
+if BRK_LOW:
+    assert clip_len(BRK_LOW) == BRK_LEN and A.CLIPS[BRK_LOW]['events'] == A.CLIPS['break']['events'], 'break_low = break timing'
 REC_LEN = clip_len('recover')                 # 15: re-level 6 + core flip 9
 REC_FLIP = ev_or('recover', 'flip', 6)
 DEATH_LEN = clip_len('death')
@@ -239,7 +244,7 @@ class Core:
                                      '#fgPT', '#fgPEnd', '#fgPMax', '#fgPLen', '#fgPRel', '#fgPDone', '#fgPCol', '#fgClk',
                                      '#fgFlash', '#fgTst', '#fgDist', '#fgField', '#fgFT', '#fgFN', '#fgHintT', '#fgCruN',
                                      '#fgOpen', '#fgBrk', '#fgBrkFx', '#fgBrkQ', '#fgCrack', '#fgLowG', '#fgWvK', '#fgTri',
-                                     '#fgHudV')]
+                                     '#fgHudV', '#fgBanF', '#fgBrkLo')]
         v += [sc_set('#fgCool', 30), sc_set('#fgBand', 2), sc_set('#fgCruLim', FIRST_FIELD_N), sc_set('#fgBrkT', -1000000),
               sc_set('#fgBanG', -1000000)]
         v += [sc_set(f'#fgBag{p.id}', 1) for p in self.normal]
@@ -389,7 +394,7 @@ class Core:
             'execute if score #fgPat mb matches 22 run scoreboard players set #fgX mb 3',
             'execute if score #fgField mb matches 5 run scoreboard players set #fgX mb 3',
             F('p/cancel'),
-            sc_set('#mbNoLeash', 0), sc_set('#fgMv', 0), sc_set('#fgBrkQ', 0), sc_set('#fgBrkFx', 0),
+            sc_set('#mbNoLeash', 0), sc_set('#fgMv', 0), sc_set('#fgBrkQ', 0),
             'tag @s remove rlk_mb_inv',
             R('init'), R('spawn'),
             f'execute if score #fgX mb matches 1 run {F("field/drop")}',
@@ -398,6 +403,10 @@ class Core:
             f'execute if score #fgField mb matches 2..4 run {F("field/rig_f")}',
             f'execute if score #fgField mb matches 0 run {F("field/rig_c")}',
             F('u/crack_d'),
+            '# a count still waiting for its module tick (fix round FG-S1): the 20th re-derives the break from the meter, a',
+            '# pending count keeps its feedback while the meter is open (the reload must not leave the meter stuck at 20)',
+            f'execute if score #fgOpen mb matches 1 if score #fgBrk mb matches {A.METER_N}.. run scoreboard players set #fgBrkQ mb 1',
+            'execute unless score #fgOpen mb matches 1 run scoreboard players set #fgBrkFx mb 0',
             f'execute if score #fgX mb matches 1 run return run {F("groggy/begin")}',
             f'execute if score #fgSt mb matches 3 run return run {F("groggy/rig")}',
             f'execute if score #fgSt mb matches 4 run return run {F("recover/end")}',
@@ -696,18 +705,27 @@ class Core:
         self.w('field/open', [
             f'# Field opening clock {FIN_UNFOLD} (@s = body): the unfold; targetable again; the meter opens at 0/{A.METER_N} (crack 0;',
             '# the kit\'s meter on the sub-line), the field look, the field hitbox, the field damage cut',
-            f'# ({CUT} %), the first field\'s hint for {HINT_T} t (the kit\'s hint_on / hint_off).',
+            f'# ({CUT} %), the first field\'s hint for {HINT_T} t (the kit\'s hint_on / hint_off). Idempotent (fix round FG-S2): a',
+            '# meter already open (a reload or test cut of the opening after the unfold, a test request inside the field)',
+            '# keeps its count, its field number and its hint; only the look, the hitbox and the lines are applied again.',
             'tag @s remove rlk_mb_inv',
+            f'execute if score #fgOpen mb matches 1 run return run {F("field/reopen")}',
             sc_set('#fgOpen', 1), sc_set('#fgBrk', 0), sc_set('#fgBrkT', -1000000), sc_set('#fgBrkFx', 0), sc_set('#fgBrkQ', 0),
             sc_set('#fgCrack', 0), R('crack/0'), g.look('field'), F('form/hitbox_f'),
             'scoreboard players add #fgFN mb 1', sc_set('#fgHintT', 0),
             K.hud('meter_open'),
             f'execute if score #fgFN mb matches 1 run {K.hud("hint_on")}',
             F('seq_f/unfold'), F('hud/refresh')])  # [seq_f: field author]
+        self.w('field/reopen', ['# field/open with the meter open already (fix round FG-S2): no second count reset, field number,',
+                                '# hint or unfold fx; the rig look, the field hitbox and the lines again.',
+                                g.look('field'), F('form/hitbox_f'), F('hud/refresh')])
         self.w('field/banner', [
             f'# Field opening clock {FIN_BANNER}: low gravity (#fgLowG -> #mbLowG every tick), the kit\'s banner "{BANNER}"',
             f'# (actionbar {BANNER_T} t, the big icon, its sound; the start gametime #fgBanG lets a break / cut drop it early), the',
-            '# low-gravity icon on the name line, the typed caption.',
+            '# low-gravity icon on the name line, the typed caption. Once per field (fix round FG-S2): #fgBanF = the field',
+            '# number #fgFN whose banner played, so a reload or a test request inside the field does not play it again.',
+            'execute if score #fgBanF mb = #fgFN mb run return 0',
+            'scoreboard players operation #fgBanF mb = #fgFN mb',
             sc_set('#fgLowG', 1),
             K.hud('banner_field'),
             'execute store result score #fgBanG mb run time query gametime',
@@ -771,8 +789,31 @@ class Core:
             'execute if score #fgX mb matches 4.. run scoreboard players set #fgX mb 3',
             f'execute unless score #fgX mb = #fgCrack mb run {F("brk/stage")}',
             'scoreboard players operation #fkM mb = #fgBrk mb',
-            f'execute positioned ~ ~{L.num(A.CORE_FIELD_H)} ~ run {K.hud("meter_hit")}',
+            F('brk/hit'),
             F('hud/refresh')])
+        self.w('brk/hit', [
+            f'# The kit\'s meter_hit as the body at the rig core: the field core {L.num(A.CORE_FIELD_H)} b, or where the closing',
+            '# wave_drop has it (down to the floor and back up: fix round FID-4).',
+            f'execute if score #fgPat mb matches 21 if score #fgWvK mb matches 2 run return run {F("brk/hit_wd")}',
+            f'execute positioned ~ ~{L.num(A.CORE_FIELD_H)} ~ run {K.hud("meter_hit")}'])
+        fld = importlib.import_module(f'{__package__}.field')
+        bins = []                                  # (lo, hi, h): runs of the pattern clock with one core height (0.1 b)
+        for t, h in sorted(fld.WD_CORE.items()):
+            h = round(h, 1)
+            if bins and bins[-1][2] == h and bins[-1][1] == t - 1:
+                bins[-1][1] = t
+            else:
+                bins.append([t, t, h])
+        hw = ['# The meter feedback during the closing 3rd wave (#fgPat 21, #fgWvK 2; @s = body): positioned at the rig core of',
+              f'# wave_drop on this pattern clock (the manifest anchors: 4.1 -> 3.6 over the charge, 1.3 on the floor, back up), else',
+              f'# at the field core {L.num(A.CORE_FIELD_H)} b.']
+        for lo, hi, h in bins:
+            if abs(h - A.CORE_FIELD_H) < 0.05:
+                continue
+            rng = f'{lo}..{hi}' if hi > lo else f'{lo}'
+            hw.append(f'execute if score #fgPT mb matches {rng} positioned ~ ~{L.num(h)} ~ run return run {K.hud("meter_hit")}')
+        hw += [f'execute positioned ~ ~{L.num(A.CORE_FIELD_H)} ~ run {K.hud("meter_hit")}']
+        self.w('brk/hit_wd', hw)
         assert KIT_CRACKS
         self.w('brk/stage', [
             '# The core bubble shows the next crack stage (#fgCrack, read by reloads and tests). The kit\'s meter_hit',
@@ -788,6 +829,8 @@ class Core:
             '# The kit: every decal goes (tele/clear), the banner if it still shows, the meter / low-gravity icon / hint',
             '# (field/drop -> hud/kit_off); " · 그로기" on the name line from here to the end of the recovery.',
             sc_set('#fgBrkQ', 0),
+            '# the device low in the closing wave_drop (read before p/cancel clears the clock): the grounded break_low (FID-1)',
+            F('brk/low'),
             'function rlk:mboss/lib_clear',
             F('p/cancel'),
             f'function {KF}tele/clear',
@@ -796,10 +839,18 @@ class Core:
             F('hud/groggy_on'),
             '# #fgT -1: the AI state runs brk/tick later this same tick, so #fgT = the break clip tick',
             sc_set('#fgSt', ST['break']), sc_set('#fgT', -1), sc_set('#fgMv', 0),
-            g.play('break'),
+            *([f'execute if score #fgBrkLo mb matches 1 run {g.play(BRK_LOW)}',
+               f'execute unless score #fgBrkLo mb matches 1 run {g.play("break")}'] if BRK_LOW else [g.play('break')]),
             g.say('역장 붕괴', '#FFE7A0', 2, 40, 2),
             F('seq_f/brk/start'),  # [seq_f: field author]
             F('hud/refresh')])
+        lo = ['# #fgBrkLo 1 when the break comes while the closing wave_drop has the device on the floor or low in its rise',
+              '# (the pattern clock in field.W3_LOW): the rig plays break_low (same events) and the break fx follow its core.',
+              sc_set('#fgBrkLo', 0)]
+        if BRK_LOW and fld.W3_LOW:
+            lo.append(f'execute if score #fgPat mb matches 21 if score #fgWvK mb matches 2 if score #fgPT mb matches '
+                      f'{fld.W3_LOW[0]}..{fld.W3_LOW[1]} run scoreboard players set #fgBrkLo mb 1')
+        self.w('brk/low', lo)
         self.w('brk/tick', [
             'scoreboard players add #fgT mb 1',
             f'execute if score #fgT mb matches {BRK_BURST} run {F("brk/burst")}',

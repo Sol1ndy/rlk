@@ -809,11 +809,13 @@ function rlk:mboss/bars_hide
 scoreboard players set #mbLive mb 0
 ''')
 w('world', '''
-# From mboss/main while a body exists. Pause (dead / revival / selection screen / no body entity) freezes
-# AI, timers, hazards and projectiles; out-of-bounds puts the player back at the arrival spot.
+# From mboss/main while a body exists. Pause (dead / revival / selection screen / no body entity / no tagged
+# player) freezes AI, timers, hazards and projectiles; out-of-bounds puts the player back at the arrival spot.
+# No tagged player (a disconnect, the tag gone) is a pause too, so the module's pause hook runs (its decals go and
+# their redraw is queued for the resume) instead of the fight freezing silently.
 # The libraries are scanned only while their activity flag is set (#mbMvOn #mbHzOn #mbPjOn #mbPlOn: set when
 # one is created, kept by every live one in its tick, so the scan stops one tick after the last one ends).
-execute unless entity @a[tag=player,limit=1] run return 0
+execute unless entity @a[tag=player,limit=1] run return run function rlk:mboss/pause_tick
 scoreboard players set #mbP mb 0
 execute if entity @a[tag=player,scores={dead=1}] run scoreboard players set #mbP mb 1
 execute if entity @a[tag=player,scores={rnDie=1..}] run scoreboard players set #mbP mb 1

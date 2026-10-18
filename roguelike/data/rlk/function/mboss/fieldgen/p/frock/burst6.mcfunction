@@ -18,7 +18,7 @@ scoreboard players set #hzSfx mb 0
 scoreboard players set #hzVis mb 121
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzY1 mb 12
-execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p12w,limit=1] run function rlk:mboss/hz/disc {r:18,tell:10,dmg:130}
+execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p12w,limit=1] run function rlk:mboss/hz/disc {r:18,tell:10,dmg:70}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_fg_p12z
 execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p12w,limit=1] rotated ~ 0 run function rlk:mboss/fieldgen/fx/tele/disc {r:18,tell:10,el:9,hold:3}
 execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p12w,limit=1] run playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 0.3 1.4 0.1

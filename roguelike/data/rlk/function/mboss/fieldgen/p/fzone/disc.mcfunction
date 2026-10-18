@@ -9,7 +9,7 @@ scoreboard players set #hzKB mb 3
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzVis mb 111
 scoreboard players set #hzQuiet mb 1
-execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p11d,limit=1] run function rlk:mboss/hz/disc {r:28,tell:15,dmg:120}
+execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p11d,limit=1] run function rlk:mboss/hz/disc {r:28,tell:15,dmg:50}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_fg_p11z
 execute if score #fq11F mb matches 1 as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_fg_p11f
 execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p11d,limit=1] rotated ~ 0 run function rlk:mboss/fieldgen/fx/tele/disc {r:28,tell:15,el:9,hold:3}

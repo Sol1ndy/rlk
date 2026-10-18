@@ -47,11 +47,12 @@ D_LAND = ev_or('death', 'land', 60)
 D_OUT = ev_or('death', 'out', 70)
 D_REG = A.BOSS['death']                                          # death_finish (the boxes, the cleanup) at #mbT = this
 D_FADE_LIFE = 28                                                 # a death_fade card lives at most dly 6 + life 22
-D_FADE2 = min(D_OUT + 12, D_REG - D_FADE_LIFE)                   # the last fade (82): gone before death_finish
-D_FADE1 = min(D_OUT, D_FADE2 - 12)                               # the first one (70)
+# The gold motes go with the scale-out (out 80 -> gone 110): one death_fade at `out`, its cards gone by 108 <= death_finish
+# (the butterfly's perf-5). Fix round FID-8: the old pair (70 / 82) put the first one 10 t before the rig scales out.
+D_FADE1 = D_FADE2 = min(D_OUT, D_REG - D_FADE_LIFE)
 D_CORE = 4.5
 D_CORE_LOW = 1.9                                                 # the core once the ring has landed
-assert D_DROP < D_SINK < D_LAND and D_FADE1 < D_FADE2 and D_FADE2 + D_FADE_LIFE <= D_REG, (D_FADE1, D_FADE2, D_REG)
+assert D_DROP < D_SINK < D_LAND <= D_FADE1 and D_FADE2 + D_FADE_LIFE <= D_REG, (D_FADE1, D_FADE2, D_REG)
 
 
 class Clock:
@@ -147,7 +148,7 @@ def death(g):
     """S4: the seam flickers out three times (0 / 6 / 12, the core's look/off at 12), the halo drops and the pods fall
     (drop: dust under the halo side, chains and copper), the ring tilts and sinks (sink: anvil and chain groan), it
     lands on its low rim (land: the dust ring, the medallions' clatter), then it scales out with gold motes (out and
-    out + 12, early enough that every card is gone before death_finish). Mechanical sounds only."""
+    out: one fade with the scale-out, every card gone before death_finish). Mechanical sounds only."""
     g.w(f'{SEQ}/death/start', [
         '# S4 death clip tick 0 (@s = body; the core cancelled the pattern, cleared the decals and the HUD flags): the',
         '# first flicker of the dying seam, the power-down.',
@@ -159,7 +160,6 @@ def death(g):
           at_h(2.0, g.sound('block.copper.fall', 0.5, 0.8)))
     ck.at(D_SINK, at_h(2.5, g.sound('block.anvil.place', 0.6, 0.5)), at_h(2.5, g.sound('block.chain.step', 0.5, 0.6)))
     ck.at(D_LAND, at_floor(g.fx('death_fall')), at_h(1.0, g.snd('death_fall')))
-    ck.at(D_FADE1, at_h(D_CORE_LOW, g.fx('death_fade')))
-    ck.at(D_FADE2, at_h(D_CORE_LOW, g.fx('death_fade')), at_h(D_CORE_LOW, g.snd('death_fade')))
+    ck.at(D_FADE1, at_h(D_CORE_LOW, g.fx('death_fade')), at_h(D_CORE_LOW, g.snd('death_fade')))
     ck.write([f'# S4 on the death clock (@s = body; #mbT = death clip tick 1 ..): flickers 6 / 12, drop {D_DROP}, sink {D_SINK},',
-              f'# land {D_LAND}, the fades {D_FADE1} / {D_FADE2} (every card gone by {D_FADE2 + D_FADE_LIFE} <= death_finish {D_REG}).'])
+              f'# land {D_LAND}, the fade {D_FADE1} with the scale-out (every card gone by {D_FADE1 + D_FADE_LIFE} <= death_finish {D_REG}).'])

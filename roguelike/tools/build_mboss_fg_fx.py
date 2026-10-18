@@ -949,15 +949,13 @@ def _p_rise():
 
 
 # --- C1 bombs and slam
-@preset('ports_glow', 'C1 +10: the ring of bomb ports under the ring lights up (8 port glows). At the ring centre, '
-        'rotated as the device.')
+@preset('ports_glow', 'C1 +10: gold dust under the ring as the bomb ports light up (the rig\'s charge look lights the '
+        'ports themselves; the module adds a glow card on each port anchor of its rig). At the ring centre, rotated as the '
+        'device.')
 def _p_ports_glow():
-    out = []
-    for yaw in radial(8, 22.5):
-        x, z = ring_xz(1.9, yaw)
-        out.append(card('glow', p3(x, -0.72, z), bb='center', s0=0.25, s1=0.65, life=14, fade=4, col=rgb('#E1BC7E')))
-    out.append(dust(rgb('#FCE8AE'), 0.8, '~ ~-0.8 ~', (1.2, 0.05, 1.2), 8))
-    return out
+    # review FID-3 (mb3 fix round): no fixed ring of glow cards (it sat at r 1.9 inside the ring hole, 0.7-1.4 b from the
+    # real ports at r 2.5-2.8 in the nose-down pose); the module places the port glows at the rig's anchors
+    return [dust(rgb('#FCE8AE'), 0.8, '~ ~-0.8 ~', (1.6, 0.1, 1.6), 10)]
 
 
 @preset('bomb_drop', 'C1: a bomb falls {h} blocks from its port onto the floor point in 5 t with a short gold streak '
@@ -985,6 +983,15 @@ def _p_column_tell():
             card('glow', '~ ~0.04 ~', '~ 90', s0=0.6, s1=2.6, life=15, fade=3, col=GOLD),
             card('spark', '~ ~0.3 ~', bb='center', spin=60, s0=0.3, s1=1.6, life=6, fade=3, dly=9),
             part('end_rod', '~ ~1.5 ~', (0.15, 1.2, 0.15), 0.02, 8)]
+
+
+@preset('column_base', 'C1 / C2 slam point (13 t) without the column: the floor glow and the base flare at the locked '
+        'point while the rig\'s own gold column falls under the gliding device. At the floor point.')
+def _p_column_base():
+    # review FID-5 (mb3 fix round): the rig draws the column under the device; this marks only where the slam lands
+    return [card('glow', '~ ~0.04 ~', '~ 90', s0=0.6, s1=2.6, life=15, fade=3, col=GOLD),
+            card('spark', '~ ~0.3 ~', bb='center', spin=60, s0=0.3, s1=1.6, life=6, fade=3, dly=9),
+            part('end_rod', '~ ~0.4 ~', (0.3, 0.2, 0.3), 0.02, 4)]
 
 
 @preset('plunge', 'C1 / C2 plunge (3-4 t): speed lines streaming up past the dropping device. At the ring centre.')

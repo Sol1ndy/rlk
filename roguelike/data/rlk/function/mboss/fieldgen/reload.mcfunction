@@ -16,7 +16,6 @@ function rlk:mboss/fieldgen/p/cancel
 scoreboard players set #mbNoLeash mb 0
 scoreboard players set #fgMv mb 0
 scoreboard players set #fgBrkQ mb 0
-scoreboard players set #fgBrkFx mb 0
 tag @s remove rlk_mb_inv
 function rlk:mboss/fieldgen/rig/init
 function rlk:mboss/fieldgen/rig/spawn
@@ -26,6 +25,10 @@ execute if score #fgX mb matches 3 run function rlk:mboss/fieldgen/field/now_c
 execute if score #fgField mb matches 2..4 run function rlk:mboss/fieldgen/field/rig_f
 execute if score #fgField mb matches 0 run function rlk:mboss/fieldgen/field/rig_c
 function rlk:mboss/fieldgen/u/crack_d
+# a count still waiting for its module tick (fix round FG-S1): the 20th re-derives the break from the meter, a
+# pending count keeps its feedback while the meter is open (the reload must not leave the meter stuck at 20)
+execute if score #fgOpen mb matches 1 if score #fgBrk mb matches 20.. run scoreboard players set #fgBrkQ mb 1
+execute unless score #fgOpen mb matches 1 run scoreboard players set #fgBrkFx mb 0
 execute if score #fgX mb matches 1 run return run function rlk:mboss/fieldgen/groggy/begin
 execute if score #fgSt mb matches 3 run return run function rlk:mboss/fieldgen/groggy/rig
 execute if score #fgSt mb matches 4 run return run function rlk:mboss/fieldgen/recover/end
