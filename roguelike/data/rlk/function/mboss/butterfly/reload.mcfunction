@@ -11,7 +11,6 @@ execute if score #bfSt mb matches 4 run scoreboard players set #bfX mb 3
 function rlk:mboss/butterfly/p/cancel
 scoreboard players set #mbNoLeash mb 0
 scoreboard players set #bfDewN mb 0
-scoreboard players set #bfCureT mb 0
 scoreboard players set #bfMv mb 0
 tag @s remove rlk_mb_inv
 function rlk:mboss/butterfly/rig_stub/init

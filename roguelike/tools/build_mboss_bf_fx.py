@@ -1597,10 +1597,12 @@ PROPS = {
     # name -> (comment, item kind, tint, billboard, transformation SNBT)
     'fire': ('B2 fire crescent projectile: the camera-facing golden claw, 1.4 blocks.', 'fire_claw', WHITE, 'center',
              '{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[1.4f,1.4f,1.4f],right_rotation:[0f,0f,0f,1f]}'),
-    'vblade': ('H4 vacuum blade: a vertical lime crescent about 4 tall and 2 deep bulging along the prop\'s facing '
-               '(roll 90 about z); its lower tip sits 0.9 below the prop (the pj hit point), so fly the prop 0.9 '
-               'above the floor.', 'cres_lime', WHITE, 'fixed',
-               '{translation:[0f,1.15f,0f],left_rotation:[0f,0f,0.7071068f,0.7071068f],scale:[4.2f,4.2f,4.2f],'
+    'vblade': ('H4 vacuum blade: a vertical lime crescent wall facing the flight (in the plane across it, where the '
+               'blade hit line is), 4 tall from its lower tip 0.9 below the prop (the pj hit row on the floor) and '
+               'about 2.7 across (x -1.33..+1.33 of the hr 1.5 hit), the thick bright head on top, bulging to the '
+               'prop\'s left; fly the prop 0.9 above the floor. Cyclic turn x->y, y->z, z->x of the flat card, '
+               'chord x4.4, bulge x6.8 (measured by scratchpad mb2/integ/vblade_check.py).', 'cres_lime', WHITE, 'fixed',
+               '{translation:[-1.9f,1.02f,0f],left_rotation:[0.5f,0.5f,0.5f,0.5f],scale:[4.4f,1f,6.8f],'
                'right_rotation:[0f,0f,0f,1f]}'),
     'orb': ('B4 coco orb fallback look (when the rig has no orb prop): a lime light sphere 1.7 across.', 'sphere',
             rgb('#D2FA8E'), 'center',

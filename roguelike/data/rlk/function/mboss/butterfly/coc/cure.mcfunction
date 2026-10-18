@@ -1,12 +1,15 @@
 # 달빛 고치 removed -> 달빛 축복 받음: CRIT +15 %, DMG +50 % until the next 달빛 고치 or the fight's end.
-# The gold fx runs 20 t on the player (coc/cure_fx).
+# The kit's cure fx at the player's feet (about 20 t: gold beam down, gold burst + ring, gold emblem with
+# sparkles) and chime, the badges (coc_off, buff_on), the actionbar notice and the big reward badge.
 scoreboard players set #bfCoc mb 0
 scoreboard players set #bfBuff mb 1
 scoreboard players set #bfDmgPct mb 150
 scoreboard players set #mbCritAdd mb 15
 scoreboard players set #mbHealPct mb 100
-scoreboard players set #bfCureT mb 1
-playsound minecraft:block.beacon.activate hostile @a[tag=player] ~ ~ ~ 0.8 1.6 0.27
-playsound minecraft:entity.player.levelup hostile @a[tag=player] ~ ~ ~ 0.4 1.4 0.13
-playsound minecraft:block.amethyst_block.chime hostile @a[tag=player] ~ ~ ~ 1 1.4 0.33
+execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/fx/p/cure
+execute at @e[tag=rlk_body,limit=1] run function rlk:mboss/butterfly/fx/snd/cure_chime
+function rlk:mboss/butterfly/fx/hud/coc_off
+function rlk:mboss/butterfly/fx/hud/buff_on
+function rlk:mboss/butterfly/fx/hud/ab_buff
+function rlk:mboss/butterfly/fx/hud/pop_buff
 function rlk:mboss/butterfly/hud/refresh

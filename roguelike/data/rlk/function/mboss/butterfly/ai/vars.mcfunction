@@ -24,13 +24,11 @@ scoreboard players set #bfDist mb 0
 scoreboard players set #bfWant mb 0
 scoreboard players set #bfBurnQ mb 0
 scoreboard players set #bfDewN mb 0
-scoreboard players set #bfCureT mb 0
 scoreboard players set #bfCocN mb 0
 scoreboard players set #bfHumN mb 0
 scoreboard players set #bfHumT mb 0
 scoreboard players set #bfBfN mb 0
 scoreboard players set #bfBfT mb 0
-scoreboard players set #bfTcN mb 0
 scoreboard players set #bfCool mb 30
 scoreboard players set #bfBand mb 2
 scoreboard players set #bfSide mb 1
@@ -47,5 +45,5 @@ scoreboard players set #bfBag11 mb 1
 scoreboard players set #bfBag12 mb 1
 scoreboard players set #bfBag13 mb 1
 scoreboard players set #bfBag14 mb 1
-# 달빛 고치 / 달빛 축복 받음 and the framework's player modifiers
+# 달빛 고치 / 달빛 축복 받음, the framework's player modifiers and the kit's HUD badges
 function rlk:mboss/butterfly/coc/clear

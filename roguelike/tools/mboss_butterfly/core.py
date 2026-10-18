@@ -4,15 +4,19 @@ hitbox, the wing element looks, the Burning weakness, 달빛 고치 and its rewa
 HUD, tests and the generated pattern dispatchers. See __init__.py for the package layout and the scratchpad file
 mb2/bf_contract.md for the core <-> pattern contract.
 
-Owns F:mboss/butterfly/** except F:mboss/butterfly/rig/** (the rig generator). Every file it owns is deleted and
-rewritten on each run (F:mboss/butterfly/rig_stub/ too: it exists only while api.STUB).
+Owns F:mboss/butterfly/** except F:mboss/butterfly/rig/** (the rig generator) and the fx kit's paths (tools/
+build_mboss_bf_fx.py: fx/{card,cardx,look,clear,uninstall} and fx/{e,p,tele,snd,hud,prop,test}/**, listed under
+"owned" in tools/mboss_bf_fx_manifest.json). Every file it owns is deleted and rewritten on each run
+(F:mboss/butterfly/rig_stub/ too: it exists only while api.STUB). Every visual of the core goes through the fx kit
+(api.K / Gen.fx, snd, kcard, khud, kprop; scratchpad mb2/bf_fx_api.md), plus plain vanilla particles.
 """
 import importlib
+import json
 import math
 
 from . import PATTERN_MODULES
 from . import api as A
-from .api import L, Gen, TL, ev_or, clip_len, DMG, KB, CX, CY, CZ
+from .api import L, K, Gen, TL, ev_or, clip_len, DMG, KB, CX, CY, CZ
 
 NS = A.NS
 OWN_TOP = 'mboss/' + A.ID
@@ -89,8 +93,6 @@ def build():
     for p in pats:
         for f in ('start', 'tick', 'cancel'):
             assert g.has(f'p/{p.key}/{f}'), f'{p.module}: pattern {p.key} has no {f}'
-    from . import cards
-    cards.emit(g, NS)
     if A.STUB:
         from . import stub_rig
         stub_rig.emit(g)
@@ -103,20 +105,44 @@ def build():
         print(f'  note: manifest clip {clip} has no event {event!r}; using tick {default}')
 
 
+def foreign():
+    """Paths under F:mboss/butterfly/ that other generators own (relative, no extension): the rig generator's rig/
+    and the fx kit's owned dirs / files (tools/mboss_bf_fx_manifest.json "owned", united with the kit's own
+    constants so a stale manifest never exposes a kit file). Returns (dirs, files)."""
+    dirs, files = {'rig'}, set()
+    pre = f'data/rlk/function/{OWN_TOP}/'
+    man = A._TOOLS / 'mboss_bf_fx_manifest.json'
+    if man.exists():
+        own = json.loads(man.read_text(encoding='utf-8')).get('owned', {})
+        dirs |= {d[len(pre):] for d in own.get('dirs', []) if d.startswith(pre)}
+        files |= {f[len(pre):-len('.mcfunction')] for f in own.get('files', []) if f.startswith(pre)}
+    kfx = K.FDIR[len('data/rlk/function/' + OWN_TOP + '/'):]
+    dirs |= {f'{kfx}/{d}' for d in K.OWNED_DIRS}
+    files |= {f'{kfx}/{f}' for f in K.OWNED_FILES}
+    return dirs, files
+
+
+def is_foreign(rel, dirs, files):
+    """rel: path under F:mboss/butterfly/ (posix, without .mcfunction for files)."""
+    return rel in files or any(rel == d or rel.startswith(d + '/') for d in dirs)
+
+
 def clean(out):
-    """Owned: every file under F:mboss/butterfly/ except rig/ (the rig generator)."""
+    """Owned: every file under F:mboss/butterfly/ except the rig generator's rig/ and the fx kit's paths (foreign())."""
     root = L.FN / OWN_TOP
+    dirs, files = foreign()
     removed = 0
     for p in sorted(root.rglob('*.mcfunction')):
-        rel = p.relative_to(root).as_posix()
-        if rel.startswith('rig/'):
+        rel = p.relative_to(root).with_suffix('').as_posix()
+        if is_foreign(rel, dirs, files):
+            assert p.resolve() not in out.written, f'the butterfly core wrote into a foreign path: {rel}'
             continue
         if p.resolve() not in out.written:
             p.unlink()
             removed += 1
     for p in sorted(root.rglob('*'), reverse=True):
         rel = p.relative_to(root).as_posix()
-        if p.is_dir() and not (rel == 'rig' or rel.startswith('rig/')) and not any(p.iterdir()):
+        if p.is_dir() and not is_foreign(rel, dirs, files) and not any(p.iterdir()):
             p.rmdir()
     return removed
 
@@ -149,21 +175,7 @@ def ring(g, rgb, r, n, y='0.15', scale=1.0, cnt=1):
     return out
 
 
-def vring(g, rgb, r, n, cy=1.2, scale=1.0, yaw=0):
-    """Dust points on a vertical circle (local x/y plane, turned by yaw) centred cy above the execution position."""
-    out = []
-    for i in range(n):
-        a = 360 * i / n
-        x, y = r * math.cos(math.radians(a)), cy + r * math.sin(math.radians(a))
-        out.append(f'execute rotated {yaw} 0 run ' + g.dust(rgb, scale, f'^{L.num(x, 2)} ^{L.num(y, 2)} ^', (0, 0, 0), 1))
-    return out
-
-
-GREY = '#8A8A8A'
 HUM_HEX, BF_HEX = '#C8E6A0', A.LIME_HEX
-BADGE = ('{text:"  ◖",color:"%s",bold:false},{text:"꩜",color:"%s",bold:true},{text:"◗",color:"%s",bold:false}'
-         % (A.COC_HEX, A.COC_SWIRL_HEX, A.COC_HEX))
-BUFF_HEX = '#F4E28A'
 
 
 class Core:
@@ -203,21 +215,19 @@ class Core:
     def consts_vars(self):
         self.w('ai/consts', ['# Module constants (spawn, reload). #bfK<n> are the moduli of Gen.every and the core\'s cycles.']
                + [sc_set(f'#bfK{n}', n) for n in (2, 3, 4, 5, 6, 8, 10, 20, 40)]
-               + [sc_set('#bfCocPct', A.COCOON_HP_PCT), sc_set('#bfDewPct', A.DEW_HEAL_PCT),
-                  '# the tinted cards\' clock (tc/all; int range lasts years, never reset while cards may live)',
-                  'execute unless score #bfTcNow mb matches -2147483648.. run scoreboard players set #bfTcNow mb 0'])
+               + [sc_set('#bfCocPct', A.COCOON_HP_PCT), sc_set('#bfDewPct', A.DEW_HEAL_PCT)])
         v = ['# Every fake player of the module back to its fight-start value (spawn, cleanup; no executor).',
              '# AI state #bfSt: 0 idle 1 pattern 2 burst-run close-in 3 groggy 4 turn + chain re-form 5 wing look prep 7 dying',
              '# form #bfForm: 1 human 2 butterfly']
         v += [sc_set(k, 0) for k in ('#bfSt', '#bfT', '#bfMv', '#bfMvT', '#bfLast', '#bfPick', '#bfReq', '#bfPat', '#bfPNew',
                                       '#bfPT', '#bfPEnd', '#bfPMax', '#bfPLen', '#bfPRel', '#bfPDone', '#bfPCol', '#bfClk',
-                                      '#bfFlash', '#bfTst', '#bfDist', '#bfWant', '#bfBurnQ', '#bfDewN', '#bfCureT', '#bfCocN',
-                                      '#bfHumN', '#bfHumT', '#bfBfN', '#bfBfT', '#bfTcN')]
+                                      '#bfFlash', '#bfTst', '#bfDist', '#bfWant', '#bfBurnQ', '#bfDewN', '#bfCocN',
+                                      '#bfHumN', '#bfHumT', '#bfBfN', '#bfBfT')]
         v += [sc_set('#bfCool', 30), sc_set('#bfBand', 2), sc_set('#bfSide', 1), sc_set('#bfForm', 1),
               sc_set('#bfHumLim', HUM_FIRST_N), sc_set('#bfHumTL', HUM_FIRST_T), sc_set('#bfBfLim', BF_N[0]),
               sc_set('#bfLook', A.EL_DENDRO)]
         v += [sc_set(f'#bfBag{p.id}', 1) for p in self.normal]
-        v += ['# 달빛 고치 / 달빛 축복 받음 and the framework\'s player modifiers', self.F('coc/clear')]
+        v += ['# 달빛 고치 / 달빛 축복 받음, the framework\'s player modifiers and the kit\'s HUD badges', self.F('coc/clear')]
         self.w('ai/vars', v)
 
     # -----------------------------------------------------------------------------------------
@@ -258,16 +268,14 @@ class Core:
             f'execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run {F("intro/setup")}'])
         self.w('tick', [
             '# Hook tick (@s = body, at @s, fight state). Order: clocks and flags, the heal orbs (a pickup heals),',
-            '# heal events (any heal cures 달빛 고치), the cure fx, Burning, form clocks, AI state, pattern slot, then the',
-            '# rig (a clip played this tick starts this tick).',
+            '# heal events (any heal cures 달빛 고치), Burning, form clocks, AI state, pattern slot, then the rig (a clip',
+            '# played this tick starts this tick). The fx kit ages its own cards (a self-scheduled function).',
             'scoreboard players add #bfClk mb 1',
             f'execute if score #bfFlash mb matches 1 run {R("flash")}',
             sc_set('#bfFlash', 0),
             f'execute if score #bfDewN mb matches 1.. run {F("dew/all")}',
             f'execute if score #mbHealEv mb matches 1.. run {F("coc/heal_ev")}',
-            f'execute if score #bfCureT mb matches 1.. run {F("coc/cure_fx")}',
             f'execute if score #bfBurnQ mb matches 1 run {F("burn/start")}',
-            f'execute if score #bfTcN mb matches 1.. run {F("tc/all")}',
             'execute if score #bfForm mb matches 1 run scoreboard players add #bfHumT mb 1',
             'execute if score #bfForm mb matches 2 run scoreboard players add #bfBfT mb 1',
             F('ai/state'),
@@ -292,20 +300,29 @@ class Core:
         self.w('pause', [
             '# Hook pause (the fight froze: player dead / reviving / selection screen / no body). Death ends 달빛 고치 and',
             '# 달빛 축복 받음 (plan "cleared on death"); the running pattern may drop what would hang (its optional pause).',
+            '# The kit\'s ground decals go (the frozen hazards keep their framework markers; the decals would run on and',
+            '# flash early), so does a kit screen flash / pop still on the title line (only while one is up: vBig, so a',
+            '# selection screen\'s own title is left alone); a dead or reviving player clears the kit cards.',
             sc_set('#bfFlash', 0),
-            F('tc/clear'),
+            f'function {K.FN}tele/clear',
+            f'execute if entity @a[tag=player,scores={{vBig=1..}}] run {g.khud("flash_end")}',
             f'execute if entity @a[tag=player,scores={{dead=1}}] run {F("coc/clear_hud")}',
             f'execute if entity @a[tag=player,scores={{rnDie=1..}}] run {F("coc/clear_hud")}',
             F('p/pause_d')])
         self.w('resume', ['# Hook resume: nothing to restore (module timers live in the body tick and simply continue).'])
         self.w('cleanup', [
             '# Hook cleanup (no executor; idempotent; fight end, abort, run end, map change, wipe, uninstall): module',
-            '# fake players back to their defaults, 달빛 고치 / 달빛 축복 받음 off. Module entities carry rlk_mb_aux.',
-            F('ai/vars')])
+            '# fake players back to their defaults, 달빛 고치 / 달빛 축복 받음 off, every kit card and both kit HUD badges',
+            '# gone. Module entities carry rlk_mb_aux.',
+            F('ai/vars'),
+            f'function {K.FN}clear',
+            g.khud('clear')])
         self.w('uninstall', [
             '# Hook uninstall (no executor; rlk:uninstall via the framework, for every module): the rig, its props, the',
-            '# rig objectives the manifest names (the framework removes mb and the rlk_mb_aux entities).',
+            '# rig objectives the manifest names, the fx kit (cards, objectives bk*, storage rlk:bfkit, its scheduled',
+            '# ager); the framework removes mb and the rlk_mb_aux entities.',
             R('kill'), R('prop/clear'),
+            f'function {K.FN}uninstall',
             'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_dew]',
             'kill @e[tag=rlk_mb_bf_fx]']
             + [f'scoreboard objectives remove {o}' for o in A.RIG_OBJECTIVES])
@@ -321,7 +338,7 @@ class Core:
             'execute if score #bfPat mb matches 15 run scoreboard players set #bfX mb 2',
             'execute if score #bfSt mb matches 4 run scoreboard players set #bfX mb 3',
             F('p/cancel'),
-            sc_set('#mbNoLeash', 0), sc_set('#bfDewN', 0), sc_set('#bfCureT', 0), sc_set('#bfMv', 0),
+            sc_set('#mbNoLeash', 0), sc_set('#bfDewN', 0), sc_set('#bfMv', 0),
             'tag @s remove rlk_mb_inv',
             R('init'), R('spawn'),
             f'execute if score #bfX mb matches 1 run {F("form/set_b")}',
@@ -366,7 +383,9 @@ class Core:
                  g.play('entrance')]
         if cocoon:
             setup.append(cocoon)
-        setup += [F('form/hitbox_h'), F('hud/refresh')]
+        setup += [F('form/hitbox_h'), F('hud/refresh'),
+                  '# the glowing lime floor disc under the cocoon until the burst',
+                  f'execute positioned ~ {CY} ~ run ' + g.fx('cocoon_disc', life=INTRO_CLIP + ENT_BURST)]
         self.w('intro/setup', setup)
         c = lambda t: INTRO_CLIP + t           # intro tick of entrance clip tick t
         self.w('intro_tick', [
@@ -375,18 +394,17 @@ class Core:
             f'# ({ENT_GLOW}), whiteout ({ENT_WHITE}), burst into crystal shards ({ENT_BURST}), the drop, landing ({ENT_LAND}), she stands',
             f'# ({ENT_LEN}); the fight at intro {INTRO_DONE}. No damage.',
             R('tick'),
-            f'execute if score #bfTcN mb matches 1.. run {F("tc/all")}',
             'scoreboard players operation #bfM mb = #mbT mb',
             'scoreboard players operation #bfM mb %= #bfK4 mb',
             f'execute if score #bfM mb matches 0 if score #mbT mb matches 1..{c(ENT_BURST) - 1} run {F("intro/hover")}',
             at_t('#mbT', c(NAMEPLATE), F('intro/name')),
+            *[at_t('#mbT', c(t), 'execute positioned ~ ~2.0 ~ run ' + g.fx('motes')) for t in (0, 20, 40)],
             at_t('#mbT', c(ENT_GLOW), F('intro/glow_snd')),
             f'execute if score #bfM mb matches 0..1 if score #mbT mb matches {c(ENT_GLOW)}..{c(ENT_BURST) - 1} run {F("intro/glow")}',
             at_t('#mbT', c(ENT_WHITE), F('intro/white')),
             at_t('#mbT', c(ENT_BURST), F('intro/burst')),
             f'execute if score #bfM mb matches 0 if score #mbT mb matches {c(ENT_BURST) + 1}..{c(ENT_LAND) - 1} run {F("intro/fall")}',
-            at_t('#mbT', c(ENT_BURST) + 3, g.sound('block.amethyst_block.chime', 0.7, 1.8)),
-            at_t('#mbT', c(ENT_BURST) + 6, g.sound('block.amethyst_block.chime', 0.6, 1.5)),
+            at_t('#mbT', c(ENT_BURST) + 3, g.snd('cocoon_tail')),
             at_t('#mbT', c(ENT_BURST) + 9, g.sound('block.amethyst_block.chime', 0.5, 1.7)),
             at_t('#mbT', c(ENT_LAND), F('intro/land')),
             at_t('#mbT', (INTRO_DONE, 999), F('intro/done'))])
@@ -401,50 +419,38 @@ class Core:
             'data modify storage rlk:mboss sub set value [{text:"달빛의 화신",color:"#D9F5A8",bold:true}]',
             g.sound('block.amethyst_block.resonate', 0.7, 1.2), g.sound('block.beacon.ambient', 0.4, 1.6)])
         self.w('intro/glow_snd', [
-            '# The core brightens: rising glassy shimmer (v1 audio 3.48 s).',
-            g.sound('block.beacon.power_select', 0.8, 1.4), g.sound('block.amethyst_block.resonate', 0.8, 1.0),
-            g.sound('block.respawn_anchor.charge', 0.35, 1.6)])
+            '# The core brightens: rising glassy shimmer (v1 audio 3.48 s) and the glow ramp (18 t).',
+            'execute positioned ~ ~2.1 ~ run ' + g.fx('cocoon_glow'),
+            g.snd('cocoon_glow')])
         self.w('intro/glow', [
             '# Glow ramp: light rays from the seams (lime #CADE48 -> #D5F086).',
             g.dust(A.hexrgb('#D5F086'), 1.4, '~ ~2.1 ~', (0.35, 0.9, 0.35), 6),
             g.particle('end_rod', '~ ~2.1 ~', (0.25, 0.8, 0.25), 0.06, 2)])
         self.w('intro/white', [
-            '# Whiteout: blinding white-yellow glow (#F8FFC0) swallows the cocoon.',
-            g.dust(A.hexrgb('#F8FFC0'), 2.6, '~ ~2.1 ~', (0.7, 1.2, 0.7), 30),
-            g.particle('end_rod', '~ ~2.1 ~', (0.3, 0.6, 0.3), 0.12, 16),
+            '# Whiteout: blinding white-yellow glow (#F8FFC0) swallows the cocoon, and a white flash on screen.',
+            'execute positioned ~ ~2.1 ~ run ' + g.fx('whiteout'),
+            g.khud('flash_white'),
+            g.dust(A.hexrgb('#F8FFC0'), 2.6, '~ ~2.1 ~', (0.7, 1.2, 0.7), 16),
+            g.particle('end_rod', '~ ~2.1 ~', (0.3, 0.6, 0.3), 0.12, 10),
             g.sound('block.beacon.activate', 0.6, 1.8)])
-        burst = ['# BURST: a star of white/cyan/mint crystal shards and two thin lime crescents (the wing outline).',
+        burst = ['# BURST: a star of white/cyan/mint crystal shards, two lime wing crescents and a cyan wind ring (kit',
+                 '# cocoon_burst), glass shards; the cocoon prop is gone.',
                  self.R('prop/clear'),
-                 g.particle('block{block_state:"minecraft:white_stained_glass"}', '~ ~2.2 ~', (1.2, 1.5, 1.2), 0, 36),
-                 g.particle('block{block_state:"minecraft:light_blue_stained_glass"}', '~ ~2.2 ~', (1.0, 1.3, 1.0), 0, 22),
-                 g.dust(A.hexrgb('#BAF3E3'), 1.6, '~ ~2.2 ~', (1.6, 1.6, 1.6), 30),
-                 g.dust(A.CYAN_DEEP, 1.2, '~ ~2.2 ~', (1.2, 1.2, 1.2), 16),
-                 g.particle('end_rod', '~ ~2.2 ~', (0.2, 0.2, 0.2), 0.22, 24)]
-        for side in (-1, 1):
-            for i in range(9):
-                a = math.radians(-60 + 15 * i)
-                burst.append('execute rotated as @s rotated ~ 0 run ' + g.dust(A.hexrgb('#C8F060'), 1.0,
-                             f'^{L.num(side * (1.3 + 0.5 * math.cos(a)), 2)} ^{L.num(2.4 + 2.0 * math.sin(a), 2)} ^', (0, 0, 0), 1))
-        burst += [g.tcard('burst', '^ ^2.2 ^', '#F9FDFC', bb='center', spin=25, s0=1.0, s1=6.5, life=7, fade=3),
-                  g.tcard('glow', '^ ^2.2 ^', '#BAF3E3', bb='center', s0=2.0, s1=5.0, life=6, fade=3)]
-        for k in range(8):
-            burst.append(g.tcard('shard', '^ ^2.2 ^', ('#BAF3E3', '#78D8D1', '#F9FDFC', '#39B4C1')[k % 4], rot=f'~{45 * k} {-50 + 25 * (k % 4)}',
-                                 s0=0.6, s1=1.6, move=(0, 0, 0), life=10, fade=5))
-        for side, roll in ((-1, 0), (1, 180)):
-            burst.append('execute rotated as @s rotated ~ 0 run ' + g.tcard('moon', f'^{L.num(1.5 * side)} ^2.6 ^', '#C8F060', roll=roll,
-                                                                          s0=2.0, s1=3.2, life=8, fade=4))
-        burst += [g.sound('block.amethyst_cluster.break', 1.0, 1.0), g.sound('block.glass.break', 0.8, 1.3),
-                  g.sound('entity.breeze.wind_burst', 0.8, 1.2), g.sound('block.amethyst_block.chime', 0.9, 1.6)]
+                 'execute rotated as @s rotated ~ 0 positioned ~ ~2.2 ~ run ' + g.fx('cocoon_burst'),
+                 g.particle('block{block_state:"minecraft:white_stained_glass"}', '~ ~2.2 ~', (1.2, 1.5, 1.2), 0, 30),
+                 g.particle('block{block_state:"minecraft:light_blue_stained_glass"}', '~ ~2.2 ~', (1.0, 1.3, 1.0), 0, 18),
+                 g.dust(A.CYAN_DEEP, 1.2, '~ ~2.2 ~', (1.2, 1.2, 1.2), 12),
+                 g.snd('cocoon_burst')]
         self.w('intro/burst', burst)
         self.w('intro/fall', ['# The drop: white sparkles and drifting lime leaves.',
                               g.particle('wax_off', '~ ~1.0 ~', (1.6, 0.6, 1.6), 0, 2),
                               g.dust(A.hexrgb('#A8DF74'), 0.8, '~ ~2.6 ~', (1.2, 1.0, 1.2), 3),
                               g.particle('end_rod', '~ ~3.0 ~', (1.0, 0.6, 1.0), 0.01, 1)])
-        self.w('intro/land', ['# Landing crouch: soft thud, moss dust, a lime floor ring.',
+        self.w('intro/land', ['# Landing crouch: soft thud, moss dust, a mint ripple with drifting leaves (kit land).',
+                              g.fx('land'),
                               g.particle('poof', '~ ~0.15 ~', (0.6, 0.05, 0.6), 0.03, 10),
-                              g.particle('block{block_state:"minecraft:moss_block"}', '~ ~0.1 ~', (0.7, 0.05, 0.7), 0, 14)]
-                    + ring(g, A.LIME, 1.3, 12, scale=1.0)
-                    + [g.sound('block.moss.fall', 0.9, 1.0), g.sound('entity.iron_golem.step', 0.4, 1.4)])
+                              g.particle('block{block_state:"minecraft:moss_block"}', '~ ~0.1 ~', (0.7, 0.05, 0.7), 0, 14),
+                              g.snd('land'), g.sound('block.moss.fall', 0.7, 1.0)])
         self.w('intro/done', [
             '# She stands: end of the untargetable intro.',
             'function rlk:mboss/intro_end',
@@ -766,13 +772,13 @@ class Core:
             'scoreboard players operation #bfLook mb = #bfWant mb',
             f'execute if score #bfLook mb matches {A.EL_PYRO} run {g.look("pyro")}',
             f'execute if score #bfLook mb matches {A.EL_DENDRO} run {g.look("dendro")}',
-            f'execute if score #bfLook mb matches {A.EL_PYRO} run ' + g.dust_fade(A.PYRO_GOLD, A.PYRO_MAG, 1.4, '~ ~3.0 ~', (1.6, 1.0, 0.6), 24),
-            f'execute if score #bfLook mb matches {A.EL_PYRO} run ' + g.particle('flame', '~ ~3.0 ~', (1.4, 0.8, 0.5), 0.02, 10),
-            f'execute if score #bfLook mb matches {A.EL_PYRO} run ' + g.sound('item.firecharge.use', 0.5, 1.4),
-            f'execute if score #bfLook mb matches {A.EL_DENDRO} run ' + g.dust(A.LIME, 1.3, '~ ~3.0 ~', (1.6, 1.0, 0.6), 24),
-            f'execute if score #bfLook mb matches {A.EL_DENDRO} run ' + g.sound('block.azalea_leaves.break', 0.7, 1.4),
-            f'execute if score #bfLook mb matches {A.EL_PYRO} run ' + g.tcard('glow', '^ ^3.0 ^', '#FAD77C', bb='center', s0=1.5, s1=5.0, life=6, fade=3),
-            f'execute if score #bfLook mb matches {A.EL_DENDRO} run ' + g.tcard('glow', '^ ^3.0 ^', A.LIME_HEX, bb='center', s0=1.5, s1=5.0, life=6, fade=3),
+            f'execute if score #bfLook mb matches {A.EL_PYRO} run ' + g.dust_fade(A.PYRO_GOLD, A.PYRO_MAG, 1.4, '~ ~3.0 ~', (1.6, 1.0, 0.6), 12),
+            f'execute if score #bfLook mb matches {A.EL_PYRO} run ' + g.particle('flame', '~ ~3.0 ~', (1.4, 0.8, 0.5), 0.02, 8),
+            f'execute if score #bfLook mb matches {A.EL_PYRO} rotated as @s rotated ~ 0 positioned ~ ~2.8 ~ run ' + g.fx('pyro_switch'),
+            f'execute if score #bfLook mb matches {A.EL_PYRO} run ' + g.snd('pyro_switch'),
+            f'execute if score #bfLook mb matches {A.EL_DENDRO} run ' + g.dust(A.LIME, 1.3, '~ ~3.0 ~', (1.6, 1.0, 0.6), 12),
+            f'execute if score #bfLook mb matches {A.EL_DENDRO} rotated as @s rotated ~ 0 positioned ~ ~2.8 ~ run ' + g.fx('dendro_switch'),
+            f'execute if score #bfLook mb matches {A.EL_DENDRO} run ' + g.snd('dendro_switch'),
             F('hud/refresh')])
         self.w('form/transform_done', [
             '# From ai/pat_done: the transformation clip is over: butterfly form, its counters, the first decision soon.',
@@ -793,32 +799,21 @@ class Core:
         g = self.g
         key = TRANSFORM.key
         tl = TL(g, key)
+        chest = 'execute rotated as @s rotated ~ 0 positioned ~ ~1.6 ~ run '
         tl.at(0, g.look('dendro'), sc_set('#bfLook', A.EL_DENDRO), self.R('face/player'),
               g.dust(A.hexrgb('#B5F089'), 1.3, '~ ~1.0 ~', (0.3, 0.7, 0.3), 10),
-              g.sound('block.beacon.power_select', 0.8, 1.6), g.sound('block.respawn_anchor.charge', 0.3, 1.6))
+              chest + g.fx('tf_sheath'), g.snd('transform_glow'))
         for t in range(1, TR_OPEN):
             tl.at(t, g.dust(A.hexrgb('#C2FA72'), 1.2, '~ ~1.0 ~', (0.25, 0.6, 0.25), 6))
         tl.at(TR_OPEN, g.sound('entity.ender_dragon.flap', 0.6, 1.5), g.particle('end_rod', '~ ~2.3 ~', (0.4, 0.3, 0.4), 0.05, 6))
         tl.at(TR_SPHERE - 1, g.dust(A.hexrgb('#FAFCD4'), 1.6, '~ ~2.2 ~', (0.15, 0.15, 0.15), 12))
-        sph = []
-        for yaw in (0, 60, 120):
-            sph += vring(g, A.hexrgb('#EFFDA2'), 2.5, 16, cy=1.6, scale=1.4, yaw=yaw)
-        sph += ring(g, A.hexrgb('#F8FDBB'), 2.5, 18, y='1.6', scale=1.4)
-        tl.at(TR_SPHERE, *sph, g.sound('item.totem.use', 0.5, 1.4), g.sound('entity.elder_guardian.curse', 0.4, 1.6),
-              g.sound('block.beacon.activate', 0.7, 1.8),
-              g.tcard('orb', '^ ^1.6 ^', '#F8FDBB', bb='center', spin=30, s0=0.8, s1=5.0, life=7, fade=3),
-              g.tcard('glow', '^ ^1.6 ^', '#FAFCD4', bb='center', s0=2.0, s1=6.5, life=6, fade=3))
-        for k, r in enumerate((3.0, 4.0, 5.0)):
-            t = TR_RINGS + 2 * k
-            tl.at(t, *ring(g, A.hexrgb('#BDE592'), r, 20 + 6 * k, y='0.15', scale=1.2),
-                  *vring(g, A.hexrgb('#D0F2B9'), r * 0.6, 14, cy=1.4, scale=1.0, yaw=90))
-        tl.at(TR_RINGS, g.sound('entity.breeze.wind_burst', 0.8, 0.8), g.sound('block.amethyst_block.resonate', 0.7, 1.0),
-              g.tcard('ring', '^ ^0.12 ^', '#BDE592', rot='~ 90', s0=3.0, s1=10.0, life=9, fade=4),
-              g.tcard('ring', '^ ^1.4 ^', '#D0F2B9', rot='~90 0', s0=2.0, s1=7.5, life=8, fade=4),
-              g.tcard('ring', '^ ^1.4 ^', '#D0F2B9', rot='~ 0', s0=2.0, s1=7.0, life=8, fade=4))
-        tl.at(TR_RINGS + 4, g.sound('entity.ender_dragon.flap', 0.5, 1.5))
+        tl.at(TR_SPHERE, chest + g.fx('tf_sphere'), g.snd('transform_swell'),
+              *ring(g, A.hexrgb('#F8FDBB'), 2.5, 12, y='1.6', scale=1.4))
+        tl.at(TR_RINGS, chest + g.fx('tf_ripples'),
+              *ring(g, A.hexrgb('#BDE592'), 4.0, 20, y='0.15', scale=1.2))
+        tl.at(TR_RINGS + 4, g.snd('flap_big'))
         for t in range(TR_RINGS + 6, TR_LEN, 6):
-            tl.at(t, g.sound('entity.phantom.flap', 0.3, 1.6))
+            tl.at(t, g.snd('flap_small'))
         tl.at(TR_LEN, g.end())
         tl.write(['# Transformation (core service pattern 20; clip transform, @s = body, at it): the cocoon glows, the wings',
                   f'# open ({TR_OPEN}), the light sphere ({TR_SPHERE}: 달빛 고치 + 달빛 이슬 via p/svc), ripple rings, full spread; end {TR_LEN}.'],
@@ -835,7 +830,7 @@ class Core:
             f'execute if score #bfForm mb matches 2 run {F("form/now_h")}',
             g.play('groggy_h'),
             'execute at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~180 0',
-            g.sound('block.respawn_anchor.deplete', 0.6, 1.2),
+            g.snd('groggy'),
             F('hud/refresh')])
         self.w('fx/groggy', ['# Dazed: a few lime motes drift up from her shoulders.',
                              g.dust(A.LIME, 0.7, '~ ~2.4 ~', (0.5, 0.3, 0.5), 2),
@@ -846,6 +841,8 @@ class Core:
             f'execute if score #bfT mb matches 20 if score #bfCoc mb matches 1 run {F("dew/spawn1")}',
             'scoreboard players operation #bfM mb = #bfT mb', 'scoreboard players operation #bfM mb %= #bfK10 mb',
             f'execute if score #bfM mb matches 0 run {F("fx/groggy")}',
+            'scoreboard players operation #bfM mb = #bfT mb', 'scoreboard players operation #bfM mb %= #bfK40 mb',
+            'execute if score #bfM mb matches 0 positioned ~ ~1.6 ~ run ' + g.fx('motes'),
             f'execute if score #bfT mb matches {GROGGY}.. run {F("recover/begin")}'])
         self.w('recover/begin', [
             f'# Groggy over: she turns to face the player ({TURN_T} t), then the crescent chain re-forms ({CHAIN_T} t).',
@@ -855,8 +852,9 @@ class Core:
             'scoreboard players add #bfT mb 1',
             f'execute if score #bfT mb matches 1..{TURN_T} run function rlk:mboss/mv/turn {{max:9}}',
             at_t('#bfT', TURN_T, g.play('chain_reform')),
-            at_t('#bfT', TURN_T + 6, g.sound('block.chain.place', 0.8, 0.8)),
-            at_t('#bfT', TURN_T + 6, g.sound('block.amethyst_block.place', 0.7, 1.2)),
+            '# the crescent chain re-forms at her left side (display frame: ^+x = left)',
+            at_t('#bfT', TURN_T, 'execute rotated as @s rotated ~ 0 positioned ^0.5 ^1.5 ^0.1 run ' + g.fx('chain_reform')),
+            at_t('#bfT', TURN_T + 6, g.snd('chain_reform')),
             at_t('#bfT', TURN_T + 6, g.dust(A.LIME, 1.1, '~ ~1.8 ~', (0.6, 0.6, 0.6), 10)),
             f'execute if score #bfT mb matches {TURN_T + CHAIN_T}.. run {F("groggy/end")}'])
         self.w('groggy/end', [
@@ -874,16 +872,12 @@ class Core:
             '# 달빛 고치 on the player (any executor): skipped while the player is dead, reviving or on a selection screen.',
             'execute as @a[tag=player,scores={dead=0},limit=1] unless score @s rnDie matches 1.. unless score @s pkMode matches 1.. '
             f'at @s run {F("coc/apply_pl")}'])
-        swirl = []
-        for i in range(16):
-            a = math.radians(i * 45)
-            r = 0.35 + 0.05 * i
-            swirl.append(g.dust(A.COC_SWIRL if i % 2 else A.COC, 1.0, f'~{L.num(r * math.sin(a), 2)} ~{L.num(0.3 + 0.12 * i, 2)} ~{L.num(r * math.cos(a), 2)}', (0, 0, 0), 1))
         self.w('coc/apply_pl', [
             f'# @s = player, at it. {A.COCOON_HP_PCT} % of the CURRENT HP as damage, non-lethal (at least 1, HP never below 1), no',
             '# element; a debuff, not a hit: no dash i-frames, defence or shields. Then the state: player DMG',
             f'# {A.COCOON_DMG} %, CRIT {A.COCOON_CRIT} (forced crits undone in incoming), healing received {A.COCOON_HEAL} %; a',
-            '# previous 달빛 축복 받음 ends here. The HUD badge, the typed hint.',
+            '# previous 달빛 축복 받음 ends here. The kit: swirl fx and curse chime at the player, the HUD badge (coc_on,',
+            '# buff_off), the actionbar notice with the numbers; the typed hint (core caption).',
             'scoreboard players operation #bfX mb = @s curHealth',
             'scoreboard players operation #bfX mb *= #bfCocPct mb',
             'scoreboard players operation #bfX mb /= #c100 mb',
@@ -893,12 +887,12 @@ class Core:
             'scoreboard players operation #hurtDmg tmp = #bfX mb',
             'scoreboard players set #elem tmp 0',
             'execute at @e[tag=rlk_body,limit=1] positioned ~ ~1.62 ~ run function rlk:player/hurt_do',
-            sc_set('#bfCoc', 1), sc_set('#bfBuff', 0), sc_set('#bfCureT', 0), sc_set('#bfDmgPct', A.COCOON_DMG),
+            sc_set('#bfCoc', 1), sc_set('#bfBuff', 0), sc_set('#bfDmgPct', A.COCOON_DMG),
             sc_set('#mbCritAdd', A.COCOON_CRIT), sc_set('#mbHealPct', A.COCOON_HEAL), sc_set('#mbHealEv', 0),
             'scoreboard players add #bfCocN mb 1',
-            *[f'execute at @e[tag=rlk_body,limit=1] run {x}' for x in swirl],
-            'execute at @e[tag=rlk_body,limit=1] run ' + g.tcard('swirl', '^ ^1.2 ^', A.COC_SWIRL_HEX, bb='center', spin=-150, s0=0.3, s1=1.8, life=14, fade=6),
-            g.sound('entity.elder_guardian.curse', 0.35, 1.7), g.sound('block.amethyst_block.resonate', 0.6, 0.7),
+            'execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run ' + g.fx('coc_apply'),
+            'execute at @e[tag=rlk_body,limit=1] run ' + g.snd('debuff'),
+            g.khud('buff_off'), g.khud('coc_on'), g.khud('ab_coc'),
             g.say('달빛 고치 — 회복하면 해제', A.COC_SWIRL_HEX, 2, 50, 1),
             F('hud/refresh')])
         self.w('coc/heal_ev', [
@@ -908,47 +902,20 @@ class Core:
             f'execute if score #bfCoc mb matches 1 run {F("coc/cure")}'])
         self.w('coc/cure', [
             f'# 달빛 고치 removed -> 달빛 축복 받음: CRIT +{A.BUFF_CRIT} %, DMG +{A.BUFF_DMG - 100} % until the next 달빛 고치 or the fight\'s end.',
-            '# The gold fx runs 20 t on the player (coc/cure_fx).',
+            '# The kit\'s cure fx at the player\'s feet (about 20 t: gold beam down, gold burst + ring, gold emblem with',
+            '# sparkles) and chime, the badges (coc_off, buff_on), the actionbar notice and the big reward badge.',
             sc_set('#bfCoc', 0), sc_set('#bfBuff', 1), sc_set('#bfDmgPct', A.BUFF_DMG), sc_set('#mbCritAdd', A.BUFF_CRIT),
-            sc_set('#mbHealPct', 100), sc_set('#bfCureT', 1),
-            g.sound('block.beacon.activate', 0.8, 1.6), g.sound('entity.player.levelup', 0.4, 1.4),
-            g.sound('block.amethyst_block.chime', 1.0, 1.4),
+            sc_set('#mbHealPct', 100),
+            'execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run ' + g.fx('cure'),
+            'execute at @e[tag=rlk_body,limit=1] run ' + g.snd('cure_chime'),
+            g.khud('coc_off'), g.khud('buff_on'), g.khud('ab_buff'), g.khud('pop_buff'),
             F('hud/refresh')])
-        cure = ['# 달빛 고치 cure fx clock #bfCureT 1..20 at the player\'s body: gold beam down (1-6), gold burst with a ring (7-11),',
-                '# gold emblem with sparkles (12-20).',
-                f'execute at @e[tag=rlk_body,limit=1] run {F("coc/cure_at")}',
-                'scoreboard players add #bfCureT mb 1',
-                'execute if score #bfCureT mb matches 21.. run scoreboard players set #bfCureT mb 0']
-        self.w('coc/cure_fx', cure)
-        at = ['# @s = body (module tick), at the player\'s body.']
-        for t in range(1, 7):
-            y0 = 6.5 - (t - 1) * 1.0
-            at.append(at_t('#bfCureT', t, g.dust(A.GOLD, 1.3, f'~ ~{L.num(y0, 1)} ~', (0.05, 0.5, 0.05), 6)))
-            at.append(at_t('#bfCureT', t, g.dust(A.WHITE, 0.8, f'~ ~{L.num(y0 - 0.5, 1)} ~', (0.03, 0.3, 0.03), 2)))
-        at.append(at_t('#bfCureT', 1, g.card('star', '^ ^6.6 ^', bb='center', spin=60, s0=0.3, s1=1.1, life=8, fade=4)))
-        at.append(at_t('#bfCureT', 7, g.card('burst', '^ ^1.1 ^', bb='center', spin=30, s0=0.8, s1=3.2, life=6, fade=3)))
-        at.append(at_t('#bfCureT', 7, g.card('ring', '^ ^0.1 ^', rot='~ 90', s0=1.5, s1=5.0, life=9, fade=4)))
-        for k, t in enumerate(range(7, 12)):
-            at += [at_t('#bfCureT', t, x) for x in ring(g, A.GOLD_RING, 1.5 + 0.25 * k, 14, y='1.0', scale=1.1)]
-        at.append(at_t('#bfCureT', 9, g.sound('block.amethyst_block.chime', 0.8, 1.7)))
-        at.append(at_t('#bfCureT', 12, g.card('star', '^ ^2.8 ^', bb='center', spin=40, s0=0.5, s1=2.0, life=10, fade=4)))
-        at.append(at_t('#bfCureT', 12, g.card('glow', '^ ^2.2 ^', bb='center', s0=0.8, s1=2.4, life=9, fade=4)))
-        emblem = []
-        for i in range(7):
-            emblem.append(g.dust(A.GOLD_EMBLEM, 0.9, f'^ ^{L.num(1.6 + 0.2 * i, 2)} ^', (0, 0, 0), 1))
-        for side in (-1, 1):
-            for i in range(5):
-                a = math.radians(30 * i)
-                emblem.append(g.dust(A.GOLD_EMBLEM, 0.9, f'^{L.num(side * (0.25 + 0.45 * math.sin(a)), 2)} ^{L.num(2.0 + 0.6 * math.cos(a), 2)} ^', (0, 0, 0), 1))
-        at += [f'execute if score #bfCureT mb matches 12..16 rotated as @a[tag=player,limit=1] rotated ~ 0 run {x}' for x in emblem]
-        at.append(at_t('#bfCureT', (12, 20), g.particle('wax_on', '~ ~3.0 ~', (0.8, 0.4, 0.8), 0, 2)))
-        at.append(at_t('#bfCureT', (12, 20), g.particle('end_rod', '~ ~3.2 ~', (0.6, 0.3, 0.6), 0.01, 1)))
-        at.append(at_t('#bfCureT', 14, g.sound('block.amethyst_block.chime', 0.7, 2.0)))
-        self.w('coc/cure_at', at)
         self.w('coc/clear', [
-            '# 달빛 고치 and 달빛 축복 받음 off, the framework\'s player modifiers neutral (no executor; idempotent).',
-            sc_set('#bfCoc', 0), sc_set('#bfBuff', 0), sc_set('#bfDmgPct', 100), sc_set('#bfCureT', 0),
-            sc_set('#mbCritAdd', 0), sc_set('#mbHealPct', 100), sc_set('#mbHealEv', 0)])
+            '# 달빛 고치 and 달빛 축복 받음 off, the framework\'s player modifiers neutral, both kit HUD badges off (no',
+            '# executor; idempotent).',
+            sc_set('#bfCoc', 0), sc_set('#bfBuff', 0), sc_set('#bfDmgPct', 100),
+            sc_set('#mbCritAdd', 0), sc_set('#mbHealPct', 100), sc_set('#mbHealEv', 0),
+            g.khud('clear')])
         self.w('coc/clear_hud', [F('coc/clear'), f'execute if score #mbSt mb matches 0..1 run {F("hud/refresh")}'])
         self.w('coc/assert', [
             '# Reload: the framework values from the module\'s own state (init keeps live values; re-assert anyway).',
@@ -957,7 +924,11 @@ class Core:
             f'execute if score #bfBuff mb matches 1 run scoreboard players set #mbCritAdd mb {A.BUFF_CRIT}',
             f'execute if score #bfCoc mb matches 1 run scoreboard players set #bfDmgPct mb {A.COCOON_DMG}',
             f'execute if score #bfCoc mb matches 1 run scoreboard players set #mbCritAdd mb {A.COCOON_CRIT}',
-            f'execute if score #bfCoc mb matches 1 run scoreboard players set #mbHealPct mb {A.COCOON_HEAL}'])
+            f'execute if score #bfCoc mb matches 1 run scoreboard players set #mbHealPct mb {A.COCOON_HEAL}',
+            '# the kit\'s HUD badges from the module state (storage rlk:bfkit survives a reload; re-assert anyway)',
+            g.khud('clear'),
+            f'execute if score #bfCoc mb matches 1 run {g.khud("coc_on")}',
+            f'execute if score #bfBuff mb matches 1 run {g.khud("buff_on")}'])
         self.w('coc/uncrit', [
             '# A forced crit (engravings: 6 keen, frost) on the body while CRIT -100 %: back to a normal hit (x 100 / crit',
             '# damage), shown as a normal number. Roll-based crits never happen (critChance -100 in items/hook/stat_buffs).',
@@ -995,16 +966,17 @@ class Core:
         self.w('dew/at', [f'$execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] rotated $(a) 0 positioned ^ ^ ^$(r) '
                           f'positioned ~ {CY} ~ run function {NS}dew/summon'])
         self.w('dew/summon', [
-            '# A glowing lime moon-dew orb 1.1 b above the floor here (item_display, billboard; rlk_mb_aux: dies with the fight).',
-            'summon minecraft:item_display ~ ~1.1 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_dew"],billboard:"center",'
+            '# A glowing moon-dew orb 1.1 b above the floor here (an item_display dressed as the kit\'s dew look, with a lime',
+            '# glow outline; rlk_mb_aux: dies with the fight), the kit\'s spawn ripple and chime.',
+            'summon minecraft:item_display ~ ~1.1 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_dew","rlk_mb_bf_dewn"],billboard:"center",'
             f'Glowing:1b,glow_color_override:{DEW_GLOW},brightness:{{block:15,sky:15}},item:{{id:"minecraft:slime_ball",count:1}},'
             'transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.8f,0.8f,0.8f]}}',
+            f'execute as @e[type=minecraft:item_display,tag=rlk_mb_bf_dewn] run {g.kprop("dew")}',
+            'tag @e[type=minecraft:item_display,tag=rlk_mb_bf_dewn] remove rlk_mb_bf_dewn',
             'scoreboard players add #bfDewN mb 1',
-            g.dust(A.LIME_PALE, 1.3, '~ ~1.1 ~', (0.3, 0.3, 0.3), 12),
-            g.particle('end_rod', '~ ~1.1 ~', (0.1, 0.1, 0.1), 0.08, 8),
-            *ring(g, A.LIME, 0.9, 10, y='0.12', scale=1.0),
-            g.tcard('star', '^ ^1.1 ^', A.LIME_HEX, bb='center', spin=60, s0=0.2, s1=1.4, life=9, fade=4),
-            g.sound('block.amethyst_block.chime', 0.7, 1.6)])
+            g.fx('dew_spawn'),
+            g.particle('end_rod', '~ ~1.1 ~', (0.1, 0.1, 0.1), 0.08, 6),
+            g.snd('dew_spawn')])
         self.w('dew/all', ['# Every live heal orb (module tick while #bfDewN >= 1): shimmer, pickup.', sc_set('#bfDewN', 0),
                            f'execute as @e[type=minecraft:item_display,tag=rlk_mb_bf_dew] at @s run {F("dew/tick")}'])
         self.w('dew/tick', [
@@ -1014,8 +986,9 @@ class Core:
             'scoreboard players operation #bfM mb = @s mbT', 'scoreboard players operation #bfM mb %= #bfK3 mb',
             'execute if score #bfM mb matches 0 run ' + g.dust(A.LIME_PALE, 0.9, '~ ~ ~', (0.22, 0.22, 0.22), 2),
             'execute if score #bfM mb matches 1 run ' + g.particle('end_rod', '~ ~0.2 ~', (0.15, 0.25, 0.15), 0.004, 1),
-            'scoreboard players operation #bfM mb = @s mbT', 'scoreboard players operation #bfM mb %= #bfK10 mb',
-            *[f'execute if score #bfM mb matches 0 positioned ~ ~-1.1 ~ run {x}' for x in ring(g, A.LIME, 0.8, 8, y='0.12', scale=0.9)],
+            'scoreboard players operation #bfM mb = @s mbT', 'scoreboard players operation #bfM mb %= #bfK20 mb',
+            '# the kit\'s idle pulse (a soft floor ring and rising motes) so it reads on the marble',
+            'execute if score #bfM mb matches 0 run ' + g.fx('dew_pulse'),
             f'execute positioned ~ ~-1.1 ~ if entity @e[tag=rlk_body,distance=..1.6,limit=1] run {F("dew/take")}'])
         self.w('dew/take', [
             '# The player touched it (@s = orb, at it): heal, sparkle, gone.',
@@ -1077,12 +1050,13 @@ class Core:
             sc_set('#bfSt', ST['dead']),
             R('prop/clear'),
             g.play('death'),
-            g.sound('block.amethyst_cluster.break', 0.8, 0.8), g.sound('block.beacon.deactivate', 0.6, 0.9)])
+            '# the kit: its ground decals go (the hazards are already cleared), the death recipe (no voices)',
+            f'function {K.FN}tele/clear',
+            g.snd('death')])
         lines = ['# Hook death_tick (@s = body, #mbT = 1.. until cur.death): the clip runs while the rig ticks; it must NOT tick',
                  f'# after its kill at {DEATH_LEN} (it would respawn).',
                  at_t('#mbT', (1, DEATH_LEN - 1), R('tick')),
                  at_t('#mbT', DEATH_LEN, R('kill')),
-                 f'execute if score #bfTcN mb matches 1.. run {F("tc/all")}',
                  f'execute if score #mbT mb matches {D_SHATTER} if score #bfForm mb matches 2 run {F("fx/death_shatter")}',
                  at_t('#mbT', D_KNEEL, g.sound('block.moss.fall', 0.8, 0.9)),
                  at_t('#mbT', D_KNEEL, g.sound('entity.iron_golem.step', 0.4, 1.4)),
@@ -1091,6 +1065,8 @@ class Core:
                  at_t('#mbT', D_DISSOLVE, g.sound('block.amethyst_block.resonate', 0.6, 0.8)),
                  'scoreboard players operation #bfM mb = #mbT mb', 'scoreboard players operation #bfM mb %= #bfK2 mb',
                  f'execute if score #bfM mb matches 0 if score #mbT mb matches {D_DISSOLVE}..{DEATH_LEN - 4} run {F("fx/death_motes")}']
+        for t in range(D_DISSOLVE, DEATH_LEN - 10, 15):
+            lines.append(at_t('#mbT', t, 'execute positioned ~ ~1.5 ~ run ' + g.fx('death_motes')))
         for t, p in ((D_DISSOLVE + 18, 1.8), (D_DISSOLVE + 34, 1.5), (D_DISSOLVE + 48, 1.2)):
             if t < DEATH_LEN:
                 lines.append(at_t('#mbT', t, g.sound('block.amethyst_block.chime', 0.6, p)))
@@ -1100,9 +1076,8 @@ class Core:
                                     g.particle('block{block_state:"minecraft:lime_stained_glass"}', '~ ~3.0 ~', (1.8, 1.0, 0.6), 0, 30),
                                     g.particle('block{block_state:"minecraft:white_stained_glass"}', '~ ~3.0 ~', (1.6, 1.0, 0.6), 0, 16),
                                     g.dust(A.OPAL, 1.4, '~ ~3.0 ~', (2.0, 1.2, 0.8), 20),
-                                    g.sound('block.glass.break', 0.6, 1.2), g.sound('entity.illusioner.mirror_move', 0.5, 1.4)]
-               + [g.tcard('shard', '^ ^3.0 ^', ('#B6E35A', '#D4F8C6', '#8DEAF0')[k % 3], rot=f'~{60 * k} {-35 + 20 * (k % 3)}',
-                          s0=0.8, s1=1.8, life=12, fade=6) for k in range(6)])
+                                    'execute rotated as @s rotated ~ 0 positioned ^ ^2.8 ^-0.4 run ' + g.fx('wing_shatter'),
+                                    g.snd('wing_shatter')])
         self.w('fx/death_motes', ['# Dissolve: rising moonlight motes and white-cyan crystal shards.',
                                   g.dust(A.LIME_PALE, 1.0, '~ ~1.4 ~', (0.4, 0.9, 0.4), 4),
                                   g.dust_fade(A.WHITE, A.CYAN, 0.9, '~ ~1.8 ~', (0.4, 0.9, 0.4), 3),
@@ -1111,23 +1086,21 @@ class Core:
         self.w('fx/death_end', ['# The last motes fly up.',
                                 g.particle('end_rod', '~ ~1.2 ~', (0.3, 0.6, 0.3), 0.18, 20),
                                 g.dust(A.LIME_CORE, 1.6, '~ ~1.6 ~', (0.6, 1.0, 0.6), 16),
-                                g.sound('block.amethyst_block.chime', 0.8, 2.0)])
+                                g.snd('death_motes')])
 
     # -----------------------------------------------------------------------------------------
     def hud(self):
-        F = self.F
-        extra = ['# Name-line suffix: form, groggy, the 달빛 고치 badge (maroon pill, salmon swirl) or the reward star.',
+        F, g = self.F, self.g
+        extra = ['# Name-line suffix: form, groggy, then the kit\'s badges (hud/put_extra: the 달빛 고치 glyph, maroon disc with a',
+                 '# salmon swirl, and / or the 달빛 축복 받음 glyph; flags set by fx/hud/coc_on|off, buff_on|off).',
                  'data modify storage rlk:mboss extra set value []',
                  f'execute if score #bfForm mb matches 1 run data modify storage rlk:mboss extra append value {{text:"   인간형",color:"{HUM_HEX}",bold:false}}',
                  f'execute if score #bfForm mb matches 2 run data modify storage rlk:mboss extra append value {{text:"   나비형",color:"{BF_HEX}",bold:false}}',
                  f'execute if score #bfSt mb matches {ST["groggy"]}..{ST["recover"]} run data modify storage rlk:mboss extra append value {{text:"  · 그로기",color:"#9FE8A0",bold:false}}']
-        for part in BADGE.split('},{'):
-            comp = part if part.startswith('{') else '{' + part
-            comp = comp if comp.endswith('}') else comp + '}'
-            extra.append(f'execute if score #bfCoc mb matches 1 run data modify storage rlk:mboss extra append value {comp}')
-        extra.append(f'execute if score #bfBuff mb matches 1 run data modify storage rlk:mboss extra append value {{text:"  ✦",color:"{BUFF_HEX}",bold:true}}')
+        extra.append(g.khud('put_extra'))
         self.w('hud/extra', extra)
-        sub = ['# Third line: what she is doing, then the player\'s 달빛 고치 / 달빛 축복 받음 state.',
+        sub = ['# Third line: what she is doing, then the player\'s 달빛 고치 / 달빛 축복 받음 state (the kit\'s hud/put_sub: badge',
+               '# glyph + "달빛 고치 — 회복하면 해제" + the dew icon, or badge + "달빛 축복 받음 (치명타 +15% · 피해 +50%)").',
                'execute if score #mbSt mb matches 0 run data modify storage rlk:mboss sub set value []',
                'execute if score #mbSt mb matches 0 run return 0',
                f'data modify storage rlk:mboss sub set value [{{text:"인간형",color:"{HUM_HEX}",bold:true}}]',
@@ -1145,13 +1118,7 @@ class Core:
                            f'[{{text:"패턴  ",color:"#A8A8A8"}},{{text:"{p.label}",color:"{col}"}}]')
         sub += [f'execute if score #bfSt mb matches {ST["groggy"]} run data modify storage rlk:mboss sub set value [{{text:"그로기  ",color:"#9FE8A0",bold:true}},{{text:"공격할 기회",color:"#C8E8C8"}}]',
                 f'execute if score #bfSt mb matches {ST["recover"]} run data modify storage rlk:mboss sub set value [{{text:"그로기  ",color:"#9FE8A0",bold:true}},{{text:"다시 일어선다",color:"#C8E8C8"}}]',
-                f'execute if score #bfCoc mb matches 1 run data modify storage rlk:mboss sub append value {{text:"     ◖",color:"{A.COC_HEX}"}}',
-                f'execute if score #bfCoc mb matches 1 run data modify storage rlk:mboss sub append value {{text:"꩜",color:"{A.COC_SWIRL_HEX}",bold:true}}',
-                f'execute if score #bfCoc mb matches 1 run data modify storage rlk:mboss sub append value {{text:"◗ ",color:"{A.COC_HEX}"}}',
-                'execute if score #bfCoc mb matches 1 run data modify storage rlk:mboss sub append value {text:"달빛 고치 — 회복하면 해제",color:"#E8A0A6"}',
-                f'execute if score #bfCoc mb matches 1 run data modify storage rlk:mboss sub append value {{text:"  (피해 {A.COCOON_DMG - 100}% · 치명타 {A.COCOON_CRIT}% · 받는 치유 {A.COCOON_HEAL - 100}%)",color:"#A89496"}}',
-                f'execute if score #bfBuff mb matches 1 run data modify storage rlk:mboss sub append value {{text:"     ✦ 달빛 축복 받음",color:"{BUFF_HEX}"}}',
-                f'execute if score #bfBuff mb matches 1 run data modify storage rlk:mboss sub append value {{text:"  (치명타 +{A.BUFF_CRIT}% · 피해 +{A.BUFF_DMG - 100}%)",color:"#BDB38A"}}']
+                g.khud('put_sub')]
         self.w('hud/sub', sub)
         self.w('hud/refresh', ['# Both text lines from the current state (on every state, form, look and debuff change).',
                                F('hud/extra'), F('hud/sub')])

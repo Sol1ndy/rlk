@@ -470,7 +470,16 @@
 - 뽑기: 이번 판에 아직 안 만난 · 챕터 범위 안 · 가중치 1 이상 → 만난 것 허용 → 챕터 무시 → 첫 항목 순. 테스트는 `#mbForce mb`(번호)로 고정.
 - 등록된 항목: `guardian`(n 1, 가중치 10), `butterfly`(n 2, 가중치 10), `proto`(n 99, 가중치 0 = 테스트 전용). 둘 다 1~99챕터라 한 판의 첫 중간보스는 반반, 두 번째는 아직 안 만난 쪽이다.
 - 모듈이 채우는 훅(전부 있어야 함, 빈 함수 가능): `spawn intro_tick tick on_hit aux_hit incoming pause resume death_start death_tick cleanup reload bars hz_vis pj_end test uninstall`. 생성된 디스패처 `mboss/d/<훅>` 이 `#mbId` 로 모듈을 부른다(`uninstall` 만은 등록된 모든 모듈을 부른다: 모듈이 만든 점수판 등을 지움). 훅마다의 호출 맥락 · 라이브러리 인자는 생성된 `mboss/*` 함수의 머리 주석에 있고, `tools/build_mboss_proto.py` 가 모든 훅을 채운 예시 모듈이다.
-- 생성 · 점검: `python3 tools/build_mboss_core.py` → `build_mboss_arena.py` → `build_mboss_<id>.py` → `python3 tools/check_mboss_pack.py`. 생성된 파일은 손으로 고치지 않는다.
+- 생성 · 점검(정해진 순서, 생성된 파일은 손으로 고치지 않는다):
+  1. `python3 tools/build_mboss_core.py`(틀: `mboss/*.mcfunction` · `mboss/{d,hz,pj,pull,mv,aux,line,test,box}/`)
+  2. `python3 tools/build_mboss_arena.py`(`mboss/arena/`)
+  3. `python3 tools/build_mboss_proto.py`(`mboss/proto/`)
+  4. 리그(따로, 리소스팩이 필요): `node tools/build_mboss_guardian_rig.mjs --resourcepack <RP>`(`mboss/guardian/rig/`), 나비 리그는 합쳐지면 `mboss/butterfly/rig/`
+  5. `python3 tools/build_mboss_guardian.py`(`mboss/guardian/` 중 `rig/` 밖)
+  6. `python3 tools/build_mboss_bf_fx.py --resourcepack <RP>`(나비 효과 도구: `mboss/butterfly/fx/{card,cardx,look,clear,uninstall}` · `fx/{e,p,tele,snd,hud,prop,test}/` + 리소스팩, 데이터팩만이면 `--skip-rp`)
+  7. `python3 tools/build_mboss_butterfly.py`(`mboss/butterfly/` 중 `rig/` 와 효과 도구 몫 밖)
+  8. `python3 tools/check_mboss_pack.py`
+  - 생성기마다 **자기 몫의 경로만** 쓰고 지운다(위 괄호). 그래서 어떤 순서로 돌려도, 두 번 돌려도 결과가 같다(스크래치패드 `mb2/tests/gen_check.py` 가 문서 순서 · 두 번째 · 거꾸로 · 나비 폴더를 지우고 두 순서로 다시 만들기를 바이트 단위로 비교한다). 순서는 레지스트리를 바꿨을 때 틀이 먼저 디스패처를 만들게 하려는 관례일 뿐이다.
 
 ### 공용 라이브러리 (모듈이 쓰는 것)
 - **바닥 공격** `mboss/hz/{disc,ring,sector,line,full}`: 예고(입자 윤곽 + 맞는 순간 테두리에 닿는 진행 윤곽) → 판정(몸 위치 기준, 0.3칸 여유, 공격 하나에 한 번, 대시 무적으로 피함). 원 · 고리 · 부채꼴/호(반각 180 = 360도 휘두르기) · 직선 · 경기장 전체(안전한 원 하나). 원소 · 넉백(`#hzKBDir` −1 = 모양 기본값(직선은 겨눈 방향, 나머지는 중심에서 바깥), 0 = 중심에서 바깥, 1 = 겨눈 방향, 직선도 0 을 고를 수 있음) · 높이 · 지속 · 소리 · 모듈 장식(`hz_vis`, 취소될 때도 바닥 공격의 방향 그대로) 옵션. 거리 단위는 0.1칸.
@@ -549,7 +558,7 @@
 
 #### 테스트 · 생성
 - **테스트**: `/function rlk:mboss/test/start {id:"guardian"}` 뒤 `/function rlk:mboss/test/pattern {id:N}` — 1~5 다음 보통 패턴(P3 는 먼저 다가감), 11 금빛 휘두르기, 12 원소(번개) 휘두르기, 13 실패 창 둘(타성 별 둘), 20 파수 모드 I, 21 파수 모드 II(칸 A = 번개, 다시 기록 9회), 30~33 혼돈(지금 칸 / 번개 둘 / 타성 둘 / 불 + 얼음), 40 그로기, 41 별 하나 부수기, 42 혼돈 1초 남기기, 91~94 불 · 물 · 번개 · 얼음 타격 기록 흉내(8틱 제한 그대로), 99 대기, 그 밖의 번호는 도움말. `test/lock {id:N}`: 1~5 그 패턴만, 6 파수 모드 둘 + 혼돈만, 0 해제. P4 화면 효과는 F5 위쪽 시점과 1인칭 둘 다로 보는 것이 좋다(리소스팩에 `rlk:mboss_gd` 글꼴이 있어야 함).
-- **생성**: `python3 tools/build_mboss_core.py`(레지스트리를 바꿨을 때) → `python3 tools/build_mboss_guardian.py` → `python3 tools/check_mboss_pack.py`. 리그는 따로 `node tools/build_mboss_guardian_rig.mjs --resourcepack <RP>`.
+- **생성**: 위 "등록 · 모듈"의 순서대로(`build_mboss_core.py`(레지스트리를 바꿨을 때) → … → `build_mboss_guardian.py` → … → `check_mboss_pack.py`). 리그는 따로 `node tools/build_mboss_guardian_rig.mjs --resourcepack <RP>`.
 - **지금 상태**: 코어와 다섯 패턴 · 휘두르기 둘 · 실패 창 모두 효과 · 소리까지 완성. 오프라인 명령 시뮬레이터로 판정 틱 · 계수 · 회피 · 정리와 처음부터 끝까지의 싸움(문 → 경기장 → 등장 → 보통 패턴 → 파수 모드 둘 → 혼돈 → 별 둘 부수기 → 그로기 → 처치 → 보상, 실패 창 경로 포함)을 확인했고, 게임 안에서는 아직 보지 않았다(카드 크기 · 입자 밀도 · 화면 효과 글리프의 위치와 크기 · 26.3 의 블록 디스플레이 형식). 리뷰 수정(별 40% 내성 · 별 간격 · 수정 별 · 큐브 사슬 · 금빛 윤곽 · 휘두르기 테두리 · 실패 표식 · P4 빈도와 화면 효과 · 소리)은 실제 경기장 바닥을 깐 오프라인 렌더와 명령 시뮬레이터로 확인했다. 선딜 · 범위 조정과 근접 P4 는 명령 시뮬레이터로 판정 틱 · 크기 · 회피(끌려온 뒤 달려서 빠지기, 대시) · 뒤로 물러나기(벽 앞 포함)를 확인했고, 30000틱 싸움 시뮬레이션에서 3칸 · 2.5칸에 붙어 있는 플레이어, 들락날락하는 근접 플레이어, 원거리 플레이어 모두 보통 패턴 묶음마다 P4 가 나왔다(조정 전 근접 0/127묶음).
 
 ### 달빛 환영 나비 모듈 (`mboss/butterfly/`, `tools/build_mboss_butterfly.py`)
@@ -580,16 +589,17 @@
 - **걸려 있는 동안**: 그녀에게 주는 피해 **−50%**(반응 피해 포함), **치명타 확률 −100**(각인의 확정 치명타 · 빙설 치명타도 보통 타격으로 되돌림), **받는 치유 −40%**.
 - **풀리는 법**(사용자 결정): **어떤 치유든** 1 이상 받으면 풀린다(꽉 찬 체력까지 회복할 필요 없음, 클로린드가 생명의 계약으로 바꾸는 치유도 셈; 그 치유 자체는 −40% 그대로). 풀리면 금빛 빛줄기가 내려오고 → 금빛 터짐과 고리 → 금빛 문장과 반짝이(20틱) + 신호기 · 레벨 업 · 종소리, 그리고 **달빛 축복 받음**: 치명타 확률 **+15**, 주는 피해 **+50%**. 다음 달빛 고치가 걸리거나 싸움이 끝날 때까지.
 - **달빛 이슬**: 치유하는 캐릭터가 적어서, 걸릴 때 경기장 가운데에서 6~14칸 떨어진 곳(120도 간격)에 빛나는 연두 이슬 구슬 3개가 생긴다. 닿으면(1.6칸) 최대 체력의 8% 회복(고치 중에는 × 0.6, 붉은 약초 적용) → 그 회복으로 고치가 풀린다. 남은 구슬은 나비형이 끝날 때(달빛 해제) 사라진다.
-- **보스바**: 이름 줄 끝에 `인간형`/`나비형` · `그로기` · 고치 배지 `◖꩜◗`(적갈색 #8C525C, 연어색 소용돌이) 또는 `✦`(축복), 셋째 줄에 지금 패턴과 "◖꩜◗ 달빛 고치 — 회복하면 해제 (피해 -50% · 치명타 -100% · 받는 치유 -40%)" / "✦ 달빛 축복 받음 (치명타 +15% · 피해 +50%)". 아랫줄 게이지 = 패턴 진행(원소 색), 그로기 · 일어서기(초록), 나비형 남은 시간(풀), 첫 인간형 남은 시간(금색).
+- **보스바**: 이름 줄 끝에 `인간형`/`나비형` · `그로기` · 효과 도구의 배지 글리프(달빛 고치: 적갈색 #8C525C 원에 연어색 소용돌이 / 축복: 금빛 별과 초승달), 셋째 줄에 지금 패턴과 "[배지] 달빛 고치 — 회복하면 해제 [이슬 아이콘]" / "[배지] 달빛 축복 받음 (치명타 +15% · 피해 +50%)". 걸릴 때와 풀릴 때 행동 표시줄에 수치 안내(피해 −50% · 치명타 −100% · 받는 치유 −40% / 치명타 +15% · 피해 +50%), 풀릴 때 큰 축복 배지가 잠깐 뜬다. 아랫줄 게이지 = 패턴 진행(원소 색), 그로기 · 일어서기(초록), 나비형 남은 시간(풀), 첫 인간형 남은 시간(금색).
 - **정리**: 처치 · 취소 · 플레이어 사망(또는 로노바 부활) · 런 종료 · 맵 이동 · `room/wipe` · `uninstall` 에서 고치 · 축복 · 받는 치유 보정 · 치명타 보정을 모두 끈다(`/reload` 는 모듈 상태에서 다시 세운다). 공용 파일은 `items/hook/on_heal` · `items/hook/stat_buffs` 한 줄씩만 고쳤다.
 
 #### 사망 · 효과 · 생성
 - **사망**(영상에 없음): 비틀거림 → 나비형이면 6틱 날개가 연두 · 오팔 조각으로 부서짐 → 24틱 무릎 꿇음 → 40틱부터 달빛 티끌과 흰 · 청록 수정 조각으로 흩어지며 사라짐(100틱). 목소리 없음(위더 소리 끔). 그 뒤 던전으로 돌아와 아이템 상자 2개.
-- **효과**: 연두 #B6E35A · 오팔 · 청록 먼지와 **색을 입히는 카드**(`tools/mboss_butterfly/cards.py`: 별 · 터짐 · 고리 · 빛 · 구슬 · 줄기 · 초승달 · 달 · 조각 · 잎 · 불꽃 · 소용돌이 회색 그림에 생성할 때 색을 줌(아이템 `custom_model_data` 색), 동시에 최대 40장, 모듈이 직접 돌리고 멈춤 · 정리 때 지움). 불은 #FAD77C → #C680A2. 리소스팩: `python3 tools/build_mboss_butterfly_fx.py --resourcepack <RP>`(12종, 약 13만 픽셀). 소리는 바닐라만(영상 소리 분석의 표대로).
-- **생성기 구조**: `tools/build_mboss_butterfly.py` → 패키지 `tools/mboss_butterfly/`: `core.py`(훅 17개 · 형태 상태 기계 · 순환 · 변신 · 그로기 · 고치 · 이슬 · 연소 약점 · 등장 · 사망 · 보스바 · 테스트), `api.py`(패턴 쪽 고정 API: 피해 계수, 거리 구간, 색, 리그 클립 표, `Gen` · `TL`), `human.py`(H1~H4), `wing.py`(B1~B5), `cards.py`. 패턴 쪽 약속은 스크래치패드 `mb2/bf_contract.md`. 가디언 생성기는 건드리지 않고 복사해 이름만 `#bf*` 로 바꿨다.
+- **효과 도구**(`tools/build_mboss_bf_fx.py` + 그림 `tools/mboss_bf_fx_paint.py`, 함수 `mboss/butterfly/fx/…`, 매니페스트 `tools/mboss_bf_fx_manifest.json`, API 는 스크래치패드 `mb2/bf_fx_api.md`): 나비의 **유일한 효과 엔진**. 그림 카드(영상 색을 그대로 그린 초승달 · 불꽃 부채 · 돔 조각 · 금빛 문장 등과 색을 입히는 빛 · 반짝임 · 물결 등 27종, 아이템 `custom_model_data` 색), 바닥 예고 그림(원 · 고리 · 부채꼴 · 띠: 테두리 + 맞는 틱에 테두리에 닿는 진행 채움 + 번쩍임, 풀 · 불 · 물리 색), 바닐라 소리 조합 50개(`fx/snd/*`, 목소리 없음), 사건마다의 효과 묶음 60개(`fx/p/*`), 투사체 모양(`fx/prop/*`: 진공 칼날 · 불꽃 초승달 · 구슬 · 이슬), 보스바 글리프(글꼴 `rlk:mboss_bf` U+E600~: 달빛 고치 배지 · 축복 배지 · 큰 배지 · 이슬 아이콘 · 화면 번쩍임). 카드는 스스로 예약한 함수가 나이를 먹이고(공용 틱 훅 없음) 동시에 효과 64장 · 예고 40장까지. 코어는 등장 · 변신 · 날개 색 바꾸기 · 고치 · 해제(축복) · 이슬 · 그로기 · 사슬 · 사망을 이 도구로 그리고, 훅을 잇는다: `uninstall` → `fx/uninstall`, `cleanup` → `fx/clear` + `fx/hud/clear`, `pause` → `fx/tele/clear` + `fx/hud/flash_end`(화면 번쩍임이 떠 있을 때만, `vBig`), `death_start` → `fx/tele/clear`, 보스바 두 줄 끝에 `fx/hud/put_extra` · `put_sub`, 배지는 `#bfCoc` / `#bfBuff` 가 바뀌는 곳마다 `hud/coc_on|off` · `buff_on|off`. 연두 #B6E35A · 오팔 · 청록, 불은 #FAD77C → #C680A2. 리소스팩: `python3 tools/build_mboss_bf_fx.py --resourcepack <RP>`(그림 40장, 약 83만 픽셀, 약 16초). 예전 코어의 작은 색 카드 엔진(`cards.py`, `mboss/butterfly/tc/`, 리소스팩 `mboss/bf_fx/`)은 이 도구로 옮기고 지웠다.
+- **생성기 구조**: `tools/build_mboss_butterfly.py` → 패키지 `tools/mboss_butterfly/`: `core.py`(훅 17개 · 형태 상태 기계 · 순환 · 변신 · 그로기 · 고치 · 이슬 · 연소 약점 · 등장 · 사망 · 보스바 · 테스트), `api.py`(패턴 쪽 고정 API: 피해 계수, 거리 구간, 색, 리그 클립 표, `Gen` · `TL`), `human.py`(H1~H4), `wing.py`(B1~B5). 효과는 효과 도구를 `api.K` / `Gen.fx` · `snd` · `kcard` · `tele_*` · `kprop` · `khud` 로 부른다. 코어의 `clean()` 은 `rig/` 와 효과 도구 몫(매니페스트 `owned`)을 건드리지 않는다. 패턴 쪽 약속은 스크래치패드 `mb2/bf_contract.md`. 가디언 생성기는 건드리지 않고 복사해 이름만 `#bf*` 로 바꿨다.
 - **리그**: 모듈은 리그 API `rlk:mboss/butterfly/rig/…`(`init spawn tick kill play/<클립> look/{dendro,pyro,flat} form/{human,butterfly} face/{player,track} flash prop/clear`)와 매니페스트 `tools/mboss_butterfly_rig_manifest.json` 의 클립 · 사건 틱을 쓴다. 진짜 리그가 합쳐지기 전에는 지울 수 있는 대역 리그(`tools/mboss_butterfly/stub_rig.py` + `stub_rig_manifest.json` → `mboss/butterfly/rig_stub/`, 바닐라 유리 모양)를 부르고, 진짜 매니페스트가 생기면 저절로 `rig/` 를 부르며 대역 폴더를 지운다.
 - **테스트**: `/function rlk:mboss/test/start {id:"butterfly"}`(= `#mbForce mb 2`; 노드 맵으로는 `/scoreboard players set #mbForce mb 2` 뒤 위 "테스트 명령"의 노드 경로) 뒤 `/function rlk:mboss/test/pattern {id:N}` — 1~4 인간형 패턴, 11~14 나비형 패턴(바로 나비형, 고치 없음), 15 또는 30 달빛 해제, 20 변신(고치 + 이슬), 21 달빛 고치만, 22 1 회복(풀림 → 축복), 23 달빛 이슬 3개, 24 고치 · 축복 끄기, 40 그로기, 42 다음 결정에서 형태 바꾸기, 91 나비형 연소 약점(불 타격 흉내), 99 대기. `test/lock {id:N}`: 1~4 · 11~14(변신 뒤) 그 패턴만, 16 변신 · 해제만 반복, 0 해제.
-- **생성**: `python3 tools/build_mboss_core.py`(레지스트리를 바꿨을 때) → `python3 tools/build_mboss_butterfly.py` → `python3 tools/check_mboss_pack.py`.
+- **생성**: 위 "등록 · 모듈"의 순서대로: `build_mboss_core.py`(레지스트리를 바꿨을 때) → (리그) → `python3 tools/build_mboss_bf_fx.py --resourcepack <RP>` → `python3 tools/build_mboss_butterfly.py` → `python3 tools/check_mboss_pack.py`. 둘 다 서로의 파일을 지우지 않아 순서를 바꿔도 결과가 같다.
+- **시험**: 스크래치패드 `mb2/tests/run_all.sh <데이터팩 폴더>` 가 나비 시험(`test_butterfly.py` · `test_e2e_butterfly.py` · `test_pjx.py`), 효과 도구 시험(`mb2/fxtests/test_fx_engine.py`), 틀 · 가디언 시험(`mb/int_tests/`), 생성기 순서 시험(`gen_check.py`), 검사기 다섯 개를 돌린다. 패턴마다의 판정 틱 시험은 패턴 파일마다 하나(`pat_human.py` · `pat_wing.py`, 형식은 `pat_case.py`).
 - **지금 상태**: 코어(형태 · 순환 · 변신 · 고치 · 이슬 · 연소 약점 · 그로기 · 등장 · 사망 · 보스바 · 테스트)는 완성, 패턴 9개는 시간표 · 판정 · 예고 · 계수 · 원소가 맞는 **임시본**(효과와 소리는 최소)이라 처음부터 끝까지 싸울 수 있다. 진짜 효과 · 예고 장식 · 소리는 패턴 작업(2단계)에서, 모델은 리그 작업에서 들어온다. 오프라인 명령 시뮬레이터로 순환 · 형태 시간 · 고치 · 이슬 · 연소 · 같은 원소 피해 · 판정 틱 · 처음부터 끝까지의 싸움(뽑기 → 문 → 경기장 → 등장 → 싸움 → 처치 → 상자)을 확인했다(게임 안에서는 아직 확인하지 않음).
 
 ### 테스트 명령

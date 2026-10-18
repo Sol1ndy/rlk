@@ -7,3 +7,5 @@ function rlk:mboss/butterfly/rig_stub/play/entrance
 function rlk:mboss/butterfly/rig_stub/prop/cocoon
 function rlk:mboss/butterfly/form/hitbox_h
 function rlk:mboss/butterfly/hud/refresh
+# the glowing lime floor disc under the cocoon until the burst
+execute positioned ~ 201 ~ run function rlk:mboss/butterfly/fx/p/cocoon_disc {life:80}

@@ -8,5 +8,6 @@ function rlk:mboss/butterfly/dew/clear
 scoreboard players set #bfSt mb 7
 function rlk:mboss/butterfly/rig_stub/prop/clear
 function rlk:mboss/butterfly/rig_stub/play/death
-playsound minecraft:block.amethyst_cluster.break hostile @a[tag=player] ~ ~ ~ 0.8 0.8 0.27
-playsound minecraft:block.beacon.deactivate hostile @a[tag=player] ~ ~ ~ 0.6 0.9 0.2
+# the kit: its ground decals go (the hazards are already cleared), the death recipe (no voices)
+function rlk:mboss/butterfly/fx/tele/clear
+function rlk:mboss/butterfly/fx/snd/death

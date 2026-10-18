@@ -1,3 +1,7 @@
 # dispatch #bfPT 8..30
-execute if score #bfPT mb matches 8..12 run return run function rlk:mboss/butterfly/p/transform/d/8_12
-execute if score #bfPT mb matches 14..30 run return run function rlk:mboss/butterfly/p/transform/d/14_30
+execute if score #bfPT mb matches 8 run return run function rlk:mboss/butterfly/p/transform/k/8
+execute if score #bfPT mb matches 12 run return run function rlk:mboss/butterfly/p/transform/k/12
+execute if score #bfPT mb matches 14 run return run function rlk:mboss/butterfly/p/transform/k/14
+execute if score #bfPT mb matches 20 run return run function rlk:mboss/butterfly/p/transform/k/20
+execute if score #bfPT mb matches 26 run return run function rlk:mboss/butterfly/p/transform/k/26
+execute if score #bfPT mb matches 30 run return run function rlk:mboss/butterfly/p/transform/k/30

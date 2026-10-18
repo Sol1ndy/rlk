@@ -15,6 +15,11 @@ While that file does not exist (the rig is built on another branch), STUB = True
 tools/mboss_butterfly/stub_rig_manifest.json and every rig call goes to the stand-in rlk:mboss/butterfly/rig_stub/
 written by stub_rig.py. Both stub files are removable; with the real manifest present the build ignores them and
 deletes F:mboss/butterfly/rig_stub/.
+
+FX. The effect engine is the fx / audio / HUD kit (tools/build_mboss_bf_fx.py, functions
+rlk:mboss/butterfly/fx/{card,cardx,p/*,tele/*,snd/*,hud/*,prop/*}, API in the scratchpad file mb2/bf_fx_api.md). Its
+Python call builders are re-exported here as api.K and on Gen (g.fx, g.snd, g.kcard, g.tele_*, g.kprop, g.khud), so
+pattern modules never import the kit themselves.
 """
 from pathlib import Path
 import json
@@ -25,6 +30,7 @@ _TOOLS = Path(__file__).resolve().parents[1]
 if str(_TOOLS) not in sys.path:
     sys.path.insert(0, str(_TOOLS))
 import mboss_lib as L  # noqa: E402
+import build_mboss_bf_fx as K  # noqa: E402  (the fx kit: call builders only, no files written on import)
 
 ID = 'butterfly'
 NS = f'rlk:mboss/{ID}/'
@@ -111,6 +117,16 @@ EL_LOOK = {EL_DENDRO: 'dendro', EL_PYRO: 'pyro'}
 
 def hexrgb(h):
     return tuple(int(h[i:i + 2], 16) / 255 for i in (1, 3, 5))
+
+
+def kit_colour(c):
+    """A colour for the fx kit (an RGB int) from an int, '#RRGGBB' or (r, g, b) 0..1."""
+    if isinstance(c, str):
+        return int(c.lstrip('#'), 16)
+    if isinstance(c, int):
+        return c
+    r, g, b = (max(0, min(255, round(255 * float(x)))) for x in c)
+    return (r << 16) | (g << 8) | b
 
 
 LIME_HEX = '#B6E35A'
@@ -299,18 +315,30 @@ class Gen:
 
     @staticmethod
     def card(kind, pos, **kw):
-        """A gold card (Navia's rlk:fx/nv engine: rose, star, burst, crescent, petal, shard, ring, glow; gold only,
-        cap 48 shared with Navia); see tools/build_navia_fx_cards.py card_call for the arguments."""
+        """A gold card of Navia's engine (rlk:fx/nv: rose, star, burst, crescent, petal, shard, ring, glow; gold only,
+        cap 48 shared with Navia); see tools/build_navia_fx_cards.py card_call. Prefer the kit (g.fx / g.kcard): the
+        butterfly no longer uses this."""
         from build_navia_fx_cards import card_call
         return card_call(kind, pos, **kw)
 
+    # -- the fx kit (THE effect engine; bf_fx_api.md). Every helper returns one function line (fx/... ) to run in
+    # the executor context the kit documents (position = the event point, rotation = the aim).
+    kit = K
+    fx = staticmethod(K.fx)                  # preset fx/p/<name>, e.g. g.fx('kick_rise'), g.fx('rel_dome', r=10.0)
+    snd = staticmethod(K.snd)                # sound recipe fx/snd/<name>
+    kprop = staticmethod(K.prop)             # as @s = a module-owned item_display: the kit look fx/prop/<name>
+    khud = staticmethod(K.hud)               # fx/hud/<name> (badges, actionbar notices, pops, screen flashes)
+    tele_disc = staticmethod(K.tele_disc)    # ground telegraph decals (visual only; pair with hz/* + #hzQuiet 1)
+    tele_ring = staticmethod(K.tele_ring)
+    tele_sector = staticmethod(K.tele_sector)
+    tele_line = staticmethod(K.tele_line)
+
     @staticmethod
-    def tcard(kind, pos, colour, **kw):
-        """A TINTED card of the module's own engine (cards.py: star, burst, ring, glow, orb, slash, crescent, moon,
-        shard, leaf, flame, swirl; colour = (r, g, b) 0..1, '#RRGGBB' or an int; the other arguments as card(); cap
-        cards.CAP live, ticked by the module)."""
-        from .cards import tcard_call
-        return tcard_call(NS, kind, pos, colour, **kw)
+    def kcard(kind, pos='~ ~ ~', rot='~ ~', col=K.WHITE, col2=-1, **kw):
+        """One kit card (fx/card, or fx/cardx with dly / dur / hit / col2 / vector sizes): K.card with the tints given
+        as an RGB int, '#RRGGBB' or (r, g, b) 0..1. Painted kinds keep their video colours under white (the default);
+        neutral kinds (glow, glint, mote, streak, leaf, bfly, ripple) take any colour. Kinds: bf_fx_api.md section 3."""
+        return K.card(kind, pos, rot, col=kit_colour(col), col2=kit_colour(col2) if col2 != -1 else -1, **kw)
 
     @staticmethod
     def say(text, colour=LINE_HEX, gap=2, hold=40, snd=1):

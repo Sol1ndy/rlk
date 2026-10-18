@@ -10,5 +10,3 @@ scoreboard players set #bfK20 mb 20
 scoreboard players set #bfK40 mb 40
 scoreboard players set #bfCocPct mb 20
 scoreboard players set #bfDewPct mb 8
-# the tinted cards' clock (tc/all; int range lasts years, never reset while cards may live)
-execute unless score #bfTcNow mb matches -2147483648.. run scoreboard players set #bfTcNow mb 0

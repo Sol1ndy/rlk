@@ -893,7 +893,7 @@
  },
  "props": {
   "fire": "B2 fire crescent projectile: the camera-facing golden claw, 1.4 blocks.",
-  "vblade": "H4 vacuum blade: a vertical lime crescent about 4 tall and 2 deep bulging along the prop's facing (roll 90 about z); its lower tip sits 0.9 below the prop (the pj hit point), so fly the prop 0.9 above the floor.",
+  "vblade": "H4 vacuum blade: a vertical lime crescent wall facing the flight (in the plane across it, where the blade hit line is), 4 tall from its lower tip 0.9 below the prop (the pj hit row on the floor) and about 2.7 across (x -1.33..+1.33 of the hr 1.5 hit), the thick bright head on top, bulging to the prop's left; fly the prop 0.9 above the floor. Cyclic turn x->y, y->z, z->x of the flat card, chord x4.4, bulge x6.8 (measured by scratchpad mb2/integ/vblade_check.py).",
   "orb": "B4 coco orb fallback look (when the rig has no orb prop): a lime light sphere 1.7 across.",
   "orb_ring": "B4 gyroscope ring around an orb (fixed; turn it from the module tick), 2.2 across.",
   "dew": "달빛 이슬 heal orb look (camera-facing, 0.9 across)."

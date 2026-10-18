@@ -7,5 +7,5 @@ scoreboard players set #bfMv mb 0
 execute if score #bfForm mb matches 2 run function rlk:mboss/butterfly/form/now_h
 function rlk:mboss/butterfly/rig_stub/play/groggy_h
 execute at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~180 0
-playsound minecraft:block.respawn_anchor.deplete hostile @a[tag=player] ~ ~ ~ 0.6 1.2 0.2
+function rlk:mboss/butterfly/fx/snd/groggy
 function rlk:mboss/butterfly/hud/refresh

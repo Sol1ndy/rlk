@@ -4,5 +4,5 @@ function rlk:mboss/butterfly/rig_stub/look/dendro
 scoreboard players set #bfLook mb 7
 function rlk:mboss/butterfly/rig_stub/face/player
 particle minecraft:dust{color:[0.71f,0.941f,0.537f],scale:1.3} ~ ~1.0 ~ 0.3 0.7 0.3 0 10 force @a[tag=player]
-playsound minecraft:block.beacon.power_select hostile @a[tag=player] ~ ~ ~ 0.8 1.6 0.27
-playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.3 1.6 0.1
+execute rotated as @s rotated ~ 0 positioned ~ ~1.6 ~ run function rlk:mboss/butterfly/fx/p/tf_sheath
+function rlk:mboss/butterfly/fx/snd/transform_glow
