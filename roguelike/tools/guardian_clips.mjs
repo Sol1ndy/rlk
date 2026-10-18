@@ -3,6 +3,7 @@
 // Ticks are game ticks (20/s); the rel ticks of patterns.md map 1:1 onto the authored clip ticks below, and RETIME
 // (end of the file) maps the damaging clips onto the played timeline with shorter wind-ups.
 //
+// Clip format, retiming and sampling: mboss_rig_clips.mjs (shared).
 // Clip: {name, len, loop?, next?, blend?, keys: [[tick, pose, ease?], ...], events, note}
 //   keys are sparse; each merges onto the previous accumulated pose (DEFAULT_POSE first).
 //   ease of the segment arriving at a key: 'io' smooth (default), 'i' accelerate into the key
@@ -14,6 +15,7 @@
 // the offset from the anchor (the boss body): pattern code moves the body for horizontal
 // travel, the clip carries heights, leans, limbs and the spear.
 import {sp, unit, basisQ, cross, sub, times, dot, rot, q, slerp as qSlerp, lerp as vLerp} from './guardian_rig_math.mjs';
+import {warp, warpTick, applyRetime, accumulate as accumulateClip, sampleClip as sampleAt} from './mboss_rig_clips.mjs';
 
 const H = .35;                                       // idle hover (feet above the floor)
 // Free hand frame: fingers along f, the claw curling toward c (palm side).
@@ -399,62 +401,14 @@ export const RETIME = {
   sweep_e: [[0, 0], [19, 14], [50, 45]],                                                    // blade slices 21-27 -> 16-22
   chaos_fail: [[0, 0], [40, 30]],                                                           // the fail schedule x0.75
 };
-export function warp(knots, t) {
-  for (let i = 1; i < knots.length; i++) {
-    const [a0, b0] = knots[i - 1], [a1, b1] = knots[i];
-    if (t <= a1) return b0 + (b1 - b0) * (t - a0) / (a1 - a0);
-  }
-  const [a, b] = knots[knots.length - 1];
-  return b + (t - a);
-}
-export const warpTick = (knots, t) => Math.floor(warp(knots, t) + .5);
-function retime(clip, knots) {
-  const [k0, kn] = [knots[0], knots[knots.length - 1]];
-  if (k0[0] !== 0 || k0[1] !== 0 || kn[0] !== clip.len) throw new Error(`retime ${clip.name}: knots must run from [0, 0] to [${clip.len}, ...]`);
-  for (let i = 1; i < knots.length; i++) {
-    if (!(knots[i][0] > knots[i - 1][0] && knots[i][1] > knots[i - 1][1])) throw new Error(`retime ${clip.name}: knots not increasing`);
-    if (knots[i][1] - knots[i - 1][1] > knots[i][0] - knots[i - 1][0]) throw new Error(`retime ${clip.name}: a knot segment slows the clip down`);
-  }
-  const keys = clip.keys.map(([t, p, e]) => [warpTick(knots, t), p, e]);
-  keys.forEach(([t], i) => { if (i && t <= keys[i - 1][0]) throw new Error(`retime ${clip.name}: keys ${clip.keys[i - 1][0]} and ${clip.keys[i][0]} collide at ${t}`); });
-  clip.keys = keys;
-  clip.events = Object.fromEntries(Object.entries(clip.events || {}).map(([n, t]) => [n, warpTick(knots, t)]));
-  clip.authoredLen = clip.len;
-  clip.len = warpTick(knots, clip.len);
-  clip.retime = knots;
-}
-for (const c of CLIPS) if (RETIME[c.name]) retime(c, RETIME[c.name]);
-for (const n of Object.keys(RETIME)) if (!CLIPS.some(c => c.name === n)) throw new Error(`RETIME: unknown clip ${n}`);
+export {warp, warpTick};
+applyRetime(CLIPS, RETIME);
 
 // ---- sampling (used by build_mboss_guardian_rig.mjs and offline checks) -------------------------
-const EASE = {io: u => u * u * (3 - 2 * u), i: u => u * u, o: u => 1 - (1 - u) * (1 - u), l: u => u};
-export function accumulate(clip) {
-  let prev = structuredClone(DEFAULT_POSE);
-  return clip.keys.map(([tick, pose, ease]) => { prev = {...prev, ...structuredClone(pose)}; return {tick, p: prev, ease: ease || 'io'}; });
-}
-function blendPose(a, b, u) {
-  const o = {};
-  for (const key of Object.keys(DEFAULT_POSE)) {
-    const x = a[key], y = b[key];
-    if (typeof x === 'string') o[key] = u < 1 ? x : y;
-    else if (typeof x === 'number') o[key] = x + (y - x) * u;
-    else if (x.length === 4) o[key] = qSlerp(x, y, u);
-    else o[key] = vLerp(x, y, u);
-  }
-  return o;
-}
+// The shared sampler (mboss_rig_clips.mjs) bound to this rig's default pose, its discrete hand channels and the
+// cube drift phase.
+export const accumulate = clip => accumulateClip(clip, DEFAULT_POSE);
 // Drift phase of the floating cubes (one cycle per 40 t). A looping clip uses its own length
 // (whole cycles per loop) so the cubes close seamlessly at the wrap.
 export const cubePhase = (clip, t) => (clip.loop ? t / clip.len * Math.max(1, Math.round(clip.len / 40)) : t / 40);
-export function sampleClip(clip, t, ks = accumulate(clip)) {
-  const ph = cubePhase(clip, Math.max(0, t));
-  if (t <= ks[0].tick) return {...ks[0].p, ph};
-  for (let i = 1; i < ks.length; i++) if (t <= ks[i].tick) {
-    const a = ks[i - 1], b = ks[i], u = (t - a.tick) / Math.max(1e-9, b.tick - a.tick);
-    const p = blendPose(a.p, b.p, EASE[b.ease](u));
-    // discrete channels switch exactly at their key
-    for (const key of ['rHand', 'lHand']) p[key] = t >= b.tick ? b.p[key] : a.p[key];
-    return {...p, ph};
-  }
-  return {...ks[ks.length - 1].p, ph};
-}
+export const sampleClip = (clip, t, ks = accumulate(clip)) => sampleAt(clip, t, ks, {defaults: DEFAULT_POSE, discrete: ['rHand', 'lHand'], phase: cubePhase});

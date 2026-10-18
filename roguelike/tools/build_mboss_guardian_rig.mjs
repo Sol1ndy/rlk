@@ -16,10 +16,11 @@
 //     rlk_room, rlk_mb_aux, rlk_mb_part, rlk_mb_guardian_part, rlk_mb_gp_<part>.
 //   * The anchor (the boss body) runs rig/tick each tick: the parts follow its position and
 //     yaw (tp, teleport_duration 1), and the current clip applies its keys.
-//   * Clips are compiled per part into interpolation segments: at tick a a part receives the
-//     pose of tick b with interpolation_duration b-a, where b is the furthest tick whose
-//     in-between poses the client's lerp/slerp reproduces within tolerance (spins, arcs and
-//     fast strikes get a key every tick; holds get one key).
+//   * Clips are compiled per part into interpolation segments (the shared compiler
+//     mboss_rig_compile.mjs): at tick a a part receives the pose of tick b with
+//     interpolation_duration b-a, where b is the furthest tick whose in-between poses the client's
+//     lerp/slerp reproduces within tolerance (spins, arcs and fast strikes get a key every tick;
+//     holds get one key).
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -28,7 +29,8 @@ import {partModels, PART_SCALE, checkBounds, CUBES_B_VARIANTS, STAR_KINDS} from 
 import {writeGuardianScreen} from './guardian_screen.mjs';
 import {solve, toDisplay} from './guardian_pose.mjs';
 import {CLIPS, accumulate, sampleClip as sample} from './guardian_clips.mjs';
-import {slerp, lerp, qAngle, len, sub, add, rot, q as qEuler} from './guardian_rig_math.mjs';
+import {sub, add, rot, q as qEuler} from './guardian_rig_math.mjs';
+import {createRigCompiler, nbt} from './mboss_rig_compile.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const arg = n => { const i = process.argv.indexOf(n); return i < 0 ? null : process.argv[i + 1]; };
@@ -153,64 +155,13 @@ function buttViolations(clip, frames) {
   });
   return out;
 }
-// Per-tick rotation check: no part may turn more than MAX_STEP_DEG between two ticks (the
-// client slerps each step the short way; near 180 degrees that path is undefined and a twist
-// or an IK flip shows as a pop through the body). Trails follow the spear and are skipped.
+// Per-tick and per-key rotation checks, the half-tick path warning and the segment fit: the
+// shared compiler (mboss_rig_compile.mjs). No part may turn more than MAX_STEP_DEG between two
+// ticks; trails follow the spear and are skipped.
 const MAX_STEP_DEG = 120;
-const shown = v => v.s.some(x => Math.abs(x) > 1e-4);
-function stepViolations(clip, frames) {
-  const out = [];
-  for (const [n] of PARTS) {
-    if (n.startsWith('trail')) continue;
-    for (let t = 1; t < frames.length; t++) {
-      const a = frames[t - 1].d[n], b = frames[t].d[n];
-      if (!shown(a) || !shown(b)) continue;
-      const ang = qAngle(a.q, b.q);
-      if (ang > MAX_STEP_DEG) out.push(`${clip.name} ${n} t${t - 1}->${t}: ${ang.toFixed(0)} degrees`);
-    }
-  }
-  return out;
-}
 // Tolerances for the client-side interpolation check (display space).
-const TOL_T = .012, TOL_S = .015;
-const TOL_R = {spear: .5, spear_glow: .8, trail_1: .8, trail_2: .8, wing_pri: .9, wing_sec: 1, wing_cov: 1.2, shield: 1, bracket: 1, halo: 1.5, halo_glow: 2};
-function interp(a, b, u) { return {t: lerp(a.t, b.t, u), q: slerp(a.q, b.q, u), s: lerp(a.s, b.s, u)}; }
-function close(x, y, n) {
-  const big = Math.max(...y.s.map(Math.abs), ...x.s.map(Math.abs));
-  if (big < 1e-4) return true;           // hidden both ways
-  if (len(sub(x.t, y.t)) > TOL_T) return false;
-  if (Math.max(...x.s.map((v, i) => Math.abs(v - y.s[i]))) > TOL_S * Math.max(1, big)) return false;
-  return qAngle(x.q, y.q) <= (TOL_R[n] ?? 1.6);
-}
-// A segment never spans more than MAX_SEG_DEG of rotation: near 180 degrees the client's
-// shortest-path slerp has no stable direction (the sign of a cosine of about 1e-9 decides it),
-// so spins get a key every tick. The fit is checked on the values as written (5 decimals).
-// A segment that still turns more than this (a 1-tick step, or the forced blend-in) fails the
-// build. Large 1-tick steps are also checked at the half tick: where the client's slerp leaves
-// the authored path by more than SUB_TOL degrees (an elbow passing through the body) it warns.
-const MAX_SEG_DEG = 120, SUB_TOL = 35;
-const r5 = x => (Math.abs(x) < 5e-7 ? 0 : +x.toFixed(5));
-const written = v => ({t: v.t.map(r5), q: v.q.map(r5), s: v.s.map(r5)});
-function segments(raw, n, minFirst) {
-  const seq = raw.map(written), L = seq.length - 1, out = [];
-  let a = 0;
-  while (a < L) {
-    let b = a + 1;
-    const fits = bb => {
-      if (qAngle(seq[a].q, seq[bb].q) > MAX_SEG_DEG - 2) return false;
-      for (let t = a + 1; t < bb; t++) if (!close(interp(seq[a], seq[bb], (t - a) / (bb - a)), seq[t], n)) return false;
-      return true;
-    };
-    while (b + 1 <= L && fits(b + 1)) b++;
-    if (a === 0 && b < minFirst) b = Math.min(L, minFirst);
-    out.push([a, b]);
-    a = b;
-  }
-  return out;
-}
-const f6 = x => (Math.abs(x) < 5e-7 ? 0 : x).toFixed(5).replace(/\.?0+$/, '') + 'f';
-const arr = a => '[' + a.map(f6).join(',') + ']';
-const nbt = v => `{translation:${arr(v.t)},left_rotation:${arr(v.q)},scale:${arr(v.s)},right_rotation:[0f,0f,0f,1f]}`;
+const TOL = {t: .012, s: .015, rDefault: 1.6,
+  r: {spear: .5, spear_glow: .8, trail_1: .8, trail_2: .8, wing_pri: .9, wing_sec: 1, wing_cov: 1.2, shield: 1, bracket: 1, halo: 1.5, halo_glow: 2}};
 const MODEL_OF = {rHand: ['r_hand', {fist: 'r_hand_fist', open: 'r_hand_open'}], lHand: ['l_hand', {fist: 'l_hand_fist', open: 'l_hand_open'}],
   cubeV: ['cubes_b', Object.fromEntries(Array.from({length: CUBES_B_VARIANTS}, (_, v) => [v, v ? 'cubes_b_' + v : 'cubes_b']))]};
 const swapLine = (part, model) => `data modify entity ${uuidOf(part)} item.components."minecraft:item_model" set value "${itemId(model)}"`;
@@ -221,6 +172,8 @@ const swapLine = (part, model) => `data modify entity ${uuidOf(part)} item.compo
 const debugDp = arg('--debug-dp') && path.resolve(arg('--debug-dp'));
 if (debugDp) fs.rmSync(path.join(debugDp, 'data/rlk/function/gd_dbg'), {recursive: true, force: true});
 const putDebug = (n, lines) => put(path.join(debugDp, 'data/rlk/function', n + '.mcfunction'), lines.join('\n'));
+const compiler = createRigCompiler({ns: NS, obj: 'gdRig', fn, parts: PARTS.map(([n]) => n), uuidOf, tol: TOL, skipStep: n => n.startsWith('trail'),
+  modelOf: MODEL_OF, swapLine, debug: debugDp ? {put: putDebug, dir: 'gd_dbg'} : null, maxStepDeg: MAX_STEP_DEG});
 const clipInfo = [], allWarn = new Set(), buttErrors = [], motionErrors = [];
 CLIPS.forEach((c, id) => { c.id = id; });
 const byName = Object.fromEntries(CLIPS.map(c => [c.name, c]));
@@ -232,52 +185,10 @@ for (const c of CLIPS) {
   const frames = clipFrames(c, ks);
   frames.forEach((f, t) => f.warns.forEach(w => allWarn.add(`${c.name} t${t}: ${w}`)));
   buttErrors.push(...buttViolations(c, frames));
-  motionErrors.push(...stepViolations(c, frames));
-  const byTick = new Map();
-  const add = (t, line) => { if (!byTick.has(t)) byTick.set(t, []); byTick.get(t).push(line); };
-  let keyCount = 0;
-  for (const [n] of PARTS) {
-    const seq = frames.map(f => f.d[n]);
-    for (const [a, b] of segments(seq, n, c.blend ?? 3)) {
-      const turn = qAngle(seq[a].q, seq[b].q);
-      if (turn > MAX_SEG_DEG && shown(seq[b]) && shown(seq[a]) && !n.startsWith('trail'))
-        motionErrors.push(`${c.name} ${n} t${a}-${b}: ${turn.toFixed(0)} degree key (ambiguous slerp)`);
-      if (b - a === 1 && turn > 45 && shown(seq[a]) && shown(seq[b])) {
-        const mid = frame(c, a + .5, ks, frames[a].bend).d[n];
-        const dev = qAngle(slerp(seq[a].q, seq[b].q, .5), mid.q);
-        if (dev > SUB_TOL) allWarn.add(`${c.name} ${n} t${a}-${b}: the client path leaves the authored one by ${dev.toFixed(0)} degrees at the half tick`);
-      }
-      add(a, `data merge entity ${uuidOf(n)} {start_interpolation:0,interpolation_duration:${b - a},transformation:${nbt(seq[b])}}`);
-      keyCount++;
-    }
-  }
-  for (const [ch, [part, map]] of Object.entries(MODEL_OF)) {
-    frames.forEach((f, t) => { if (t === 0 || f.p[ch] !== frames[t - 1].p[ch]) add(t, swapLine(part, map[f.p[ch]])); });
-  }
-  if (debugDp) frames.forEach((f, t) => putDebug(`gd_dbg/${c.name}/${t}`, [...PARTS.map(([n]) => `data merge entity ${uuidOf(n)} {start_interpolation:0,interpolation_duration:0,transformation:${nbt(f.d[n])}}`),
-    ...Object.entries(MODEL_OF).map(([ch, [part, map]]) => swapLine(part, map[f.p[ch]]))]));
-  const ticks = [...byTick.keys()].sort((x, y) => x - y);
-  for (const t of ticks) fn(`c/${c.name}/k/${t}`, byTick.get(t));
-  // per-clip runner: wrap / chain / hold, then a binary dispatch over the key ticks
-  const head = [`# ${c.name}: ${c.len} t${c.loop ? ', loop' : c.next ? `, then ${c.next}` : ', holds the last pose'}. @s = rig anchor.`];
-  if (c.loop) head.push(`execute if score @s gdRigT matches ${c.len}.. run scoreboard players set @s gdRigT 0`);
-  else if (c.next) head.push(`execute if score @s gdRigT matches ${c.len}.. run return run function ${NS}/start/${c.next}`);
-  else head.push(`execute if score @s gdRigT matches ${c.len + 1}.. run return run scoreboard players set @s gdRigT ${c.len + 1}`);
-  const runTicks = ticks;
-  const tree = (lo, hi, list, prefix) => {
-    if (list.length <= 6) return list.map(t => `execute if score @s gdRigT matches ${t} run return run function ${NS}/c/${c.name}/k/${t}`);
-    const mid = list[Math.floor(list.length / 2) - 1];
-    const L = list.filter(t => t <= mid), R = list.filter(t => t > mid);
-    fn(`c/${c.name}/b/${L[0]}_${L[L.length - 1]}`, tree(0, 0, L));
-    fn(`c/${c.name}/b/${R[0]}_${R[R.length - 1]}`, tree(0, 0, R));
-    return [`execute if score @s gdRigT matches ..${mid} run return run function ${NS}/c/${c.name}/b/${L[0]}_${L[L.length - 1]}`,
-      `function ${NS}/c/${c.name}/b/${R[0]}_${R[R.length - 1]}`];
-  };
-  fn(`c/${c.name}/run`, [...head, ...tree(0, 0, runTicks)]);
-  fn(`play/${c.name}`, [`# Play clip ${c.name} (${c.len} t) from its tick 0 at the next rig/tick (the same game tick when rig/tick runs later). @s = rig anchor.`, `scoreboard players set @s gdRigC ${c.id}`, 'scoreboard players set @s gdRigT -1']);
-  fn(`start/${c.name}`, [`# Internal: chain into ${c.name} now (tick 0 applied immediately). @s = rig anchor.`, `scoreboard players set @s gdRigC ${c.id}`, 'scoreboard players set @s gdRigT 0', `function ${NS}/c/${c.name}/k/0`]);
-  clipInfo.push({id: c.id, name: c.name, len: c.len, loop: !!c.loop, next: c.next || null, events: c.events || {}, keyFiles: ticks.length, keys: keyCount, note: c.note || '',
-    ...(c.retime ? {authoredLen: c.authoredLen, retime: c.retime} : {})});
+  const r = compiler.compileClip(c, frames, a => frame(c, a + .5, ks, frames[a].bend));
+  motionErrors.push(...r.motionErrors);
+  r.warns.forEach(w => allWarn.add(w));
+  clipInfo.push(r.info);
 }
 if (motionErrors.length) {
   const msg = `part rotations above ${MAX_STEP_DEG} degrees per tick or per key:\n  ` + motionErrors.slice(0, 120).join('\n  ') + (motionErrors.length > 120 ? `\n  ... ${motionErrors.length} in all` : '');
@@ -288,16 +199,7 @@ if (buttErrors.length) {
   if (flag('--allow-butt')) console.warn(msg); else throw new Error(msg);
 }
 // global dispatch on the clip id
-{
-  const ids = CLIPS.map(c => c.id);
-  const tree = list => {
-    if (list.length <= 6) return list.map(i => `execute if score @s gdRigC matches ${i} run return run function ${NS}/c/${CLIPS[i].name}/run`);
-    const mid = list[Math.floor(list.length / 2) - 1], L = list.filter(i => i <= mid), R = list.filter(i => i > mid);
-    fn(`d/${L[0]}_${L[L.length - 1]}`, tree(L)); fn(`d/${R[0]}_${R[R.length - 1]}`, tree(R));
-    return [`execute if score @s gdRigC matches ..${mid} run return run function ${NS}/d/${L[0]}_${L[L.length - 1]}`, `function ${NS}/d/${R[0]}_${R[R.length - 1]}`];
-  };
-  fn('run', ['# Current clip -> its runner. @s = rig anchor.', ...tree(ids)]);
-}
+compiler.writeDispatch(CLIPS);
 
 // ---- API functions -----------------------------------------------------------------------
 const rest = clipFrames(byName.idle)[0].d;
@@ -356,28 +258,7 @@ fn('look_apply', ['# Re-applies the stored eye/spear/glow looks (after a respawn
   ...elNames.map(el => `execute if score @s gdRigSp matches ${ELEMENTS[el].id} run function ${NS}/spear/${el}`)]);
 fn('eye/by_elem', ['# Eye look from #elem-style ids in @s gdRigEye (0 geo, 1 pyro, 2 hydro, 3 electro, 4 cryo, 5 gold, 6 red).', `function ${NS}/look_apply`]);
 // facing helpers (the parts take the anchor's yaw every tick)
-fn('face/player', ['# Turn the anchor to face the nearest player (yaw only). @s = rig anchor.',
-  'execute facing entity @p[gamemode=!spectator] feet run rotate @s ~ 0']);
-fn('face/track', ['# Turn the anchor toward the nearest player by at most 12 degrees per call. @s = rig anchor.',
-  '# Both yaws are normalised into [-180, 180) first, so the stored yaw never drifts past one turn.',
-  'scoreboard players set #c36000 gdRigY 36000',
-  'execute store result score #yaw gdRigY run data get entity @s Rotation[0] 100',
-  'scoreboard players add #yaw gdRigY 18000',
-  'scoreboard players operation #yaw gdRigY %= #c36000 gdRigY',
-  'execute if score #yaw gdRigY matches ..-1 run scoreboard players add #yaw gdRigY 36000',
-  'scoreboard players remove #yaw gdRigY 18000',
-  'execute facing entity @p[gamemode=!spectator] feet run summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_aux","rlk_mb_gd_face"]}',
-  'execute as @e[type=marker,tag=rlk_mb_gd_face,limit=1] at @s facing entity @p[gamemode=!spectator] feet run rotate @s ~ 0',
-  'execute store result score #yawT gdRigY run data get entity @e[type=marker,tag=rlk_mb_gd_face,limit=1] Rotation[0] 100',
-  'kill @e[type=marker,tag=rlk_mb_gd_face]',
-  'scoreboard players operation #yawT gdRigY -= #yaw gdRigY',
-  'execute if score #yawT gdRigY matches 18000.. run scoreboard players remove #yawT gdRigY 36000',
-  'execute if score #yawT gdRigY matches ..-18001 run scoreboard players add #yawT gdRigY 36000',
-  'execute if score #yawT gdRigY matches 1201.. run scoreboard players set #yawT gdRigY 1200',
-  'execute if score #yawT gdRigY matches ..-1201 run scoreboard players set #yawT gdRigY -1200',
-  'scoreboard players operation #yaw gdRigY += #yawT gdRigY',
-  'execute store result entity @s Rotation[0] float 0.01 run scoreboard players get #yaw gdRigY']);
-fn('face/set', ['# Set the anchor yaw: function rlk:mboss/guardian/rig/face/set {yaw:<degrees>}. @s = rig anchor.', '$rotate @s $(yaw) 0']);
+compiler.writeFace({marker: 'rlk_mb_gd_face'});
 // props: spear copies that are not rig parts (javelin flight, giant fail spears)
 fn('prop/spear', ['# Summons a free spear prop at the execution position/rotation, tagged rlk_mb_gd_prop + rlk_mb_gd_prop_new.',
   '# The pattern code moves/poses it (model frame: grip at the origin, tip along +Y). Scale 2.2 = her spear.',
