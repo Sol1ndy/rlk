@@ -12,5 +12,6 @@ scoreboard players set #mbFail mb 0
 scoreboard players set #mbLd mb 0
 scoreboard players set #mbNoLeash mb 0
 scoreboard players set #mbLive mb 0
+function rlk:mboss/player_reset
 data modify storage rlk:mboss sub set value []
 data modify storage rlk:mboss extra set value []

@@ -8,4 +8,5 @@ execute if score @s mbHzT < @s mbHzW if score #t mb matches 0 unless entity @s[t
 execute if score @s mbHzT = @s mbHzW run function rlk:mboss/hz/strike
 scoreboard players operation #hzEnd mb = @s mbHzW
 scoreboard players operation #hzEnd mb += @s mbHzA
-execute if score @s mbHzHit matches 0 if score @s mbHzT >= @s mbHzW if score @s mbHzT < #hzEnd mb run function rlk:mboss/hz/hit
+# dmg 0 = telegraph only (outline, strike flash and the module visuals; never a hit)
+execute if score @s mbHzHit matches 0 if score @s mbHzD matches 1.. if score @s mbHzT >= @s mbHzW if score @s mbHzT < #hzEnd mb run function rlk:mboss/hz/hit

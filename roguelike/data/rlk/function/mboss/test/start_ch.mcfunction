@@ -7,6 +7,8 @@ execute if score #mbDiff mb matches 0 run return run tellraw @s [{text:"[중간�
 execute if score @s dead matches 1 run return 0
 $execute unless data storage rlk:mboss byid.$(id) run return run tellraw @s [{text:"[중간보스 테스트] ",color:"#E0703A",bold:true},{text:"등록되지 않았거나 꺼진 중간보스입니다: $(id)",color:"gray",bold:false}]
 $execute store result score #mbForce mb run data get storage rlk:mboss byid.$(id).n
+# the boss of this test, for the replay links (test/defeat runs after test/end has forgotten cur)
+$data modify storage rlk:mboss tlast set value {id:"$(id)"}
 $scoreboard players set #mbReqCh mb $(ch)
 execute unless score #mbReqCh mb matches 1.. run scoreboard players set #mbReqCh mb 1
 execute if score @s vMap matches 1 run function rlk:view/map_close

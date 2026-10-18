@@ -16,6 +16,9 @@ scoreboard players set #pjEl mb -1
 scoreboard players set #pjKB mb 2
 scoreboard players set #pjRet mb 0
 scoreboard players set #pjWall mb 1
+scoreboard players set #pjShape mb 0
+scoreboard players set #pjGrp mb 0
+scoreboard players set #hzGrp mb 0
 scoreboard players set #pullFace mb 1
 scoreboard players set #auxHp mb 100
 scoreboard players set #auxHpPct mb 0

@@ -41,6 +41,7 @@ scoreboard objectives remove mbHzY0
 scoreboard objectives remove mbHzY1
 scoreboard objectives remove mbHzHit
 scoreboard objectives remove mbHzCol
+scoreboard objectives remove mbHzG
 scoreboard objectives remove mbPjV
 scoreboard objectives remove mbPjT
 scoreboard objectives remove mbPjL
@@ -51,6 +52,8 @@ scoreboard objectives remove mbPjR
 scoreboard objectives remove mbPjHit
 scoreboard objectives remove mbPjRet
 scoreboard objectives remove mbPjW
+scoreboard objectives remove mbPjK
+scoreboard objectives remove mbPjG
 scoreboard objectives remove mbPlT
 scoreboard objectives remove mbPlF
 scoreboard objectives remove mbMvK

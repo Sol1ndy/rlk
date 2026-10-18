@@ -1,7 +1,9 @@
 # @s = a prop entity the module summoned (item/block display, marker ...), positioned at the launch point,
 # rotated = flight direction (pitch counts). {spd: tenths per tick, life: ticks, dmg: % of the base hit
 # (0 = visual only), hr: hit radius in tenths}. Options: #pjEl, #pjKB, #pjRet (1 = fly back to the body's
-# eyes at the end), #pjWall (0 = ignore walls). Events go to the module hook pj_end with #pjEv 1 wall,
+# eyes at the end), #pjWall (0 = ignore walls), #pjShape (0 sphere of radius hr; 1 blade: a line hr wide on
+# each side across the flight, see pj/b/*), #pjGrp (volley group id from mboss/grp_new: the first hit that lands
+# makes every prop and hazard of the group harmless). Steering: mboss/pj/steer. Events go to the module hook pj_end with #pjEv 1 wall,
 # 2 life over, 3 back at the body (or the return time ran out), 4 hit the player; #pjKeep mb is preset to
 # the default and the hook may flip it: 1 = the prop lives on (4: keeps flying, it pierces; 1/2 of a
 # returning prop: flies back; otherwise released as a plain entity), 0 = removed at once.
@@ -23,6 +25,8 @@ execute if score #pjEl mb matches 0.. run scoreboard players operation @s mbPjE 
 scoreboard players operation @s mbPjB = #pjKB mb
 scoreboard players operation @s mbPjRet = #pjRet mb
 scoreboard players operation @s mbPjW = #pjWall mb
+scoreboard players operation @s mbPjK = #pjShape mb
+scoreboard players operation @s mbPjG = #pjGrp mb
 execute if score @s mbPjR matches 41.. run scoreboard players set @s mbPjR 40
 execute if score @s mbPjR matches ..0 run scoreboard players set @s mbPjR 1
 tp @s ~ ~ ~ ~ ~

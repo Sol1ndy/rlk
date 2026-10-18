@@ -1,0 +1,31 @@
+# Third line: what she is doing, then the player's 달빛 고치 / 달빛 축복 받음 state.
+execute if score #mbSt mb matches 0 run data modify storage rlk:mboss sub set value []
+execute if score #mbSt mb matches 0 run return 0
+data modify storage rlk:mboss sub set value [{text:"인간형",color:"#C8E6A0",bold:true}]
+execute if score #bfForm mb matches 2 run data modify storage rlk:mboss sub set value [{text:"나비형",color:"#B6E35A",bold:true}]
+execute if score #bfForm mb matches 2 if score #bfLook mb matches 1 run data modify storage rlk:mboss sub append value {text:"  화염 날개",color:"#FFB070"}
+execute if score #bfForm mb matches 2 if score #bfLook mb matches 7 run data modify storage rlk:mboss sub append value {text:"  달빛 날개",color:"#D9F5A8"}
+execute if score #bfSt mb matches 1..2 if score #bfPick mb matches 1 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"달빛 발차기",color:"#D9F5A8"}]
+execute if score #bfSt mb matches 1..2 if score #bfPick mb matches 2 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"달빛 점프",color:"#D9F5A8"}]
+execute if score #bfSt mb matches 1..2 if score #bfPick mb matches 3 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"달빛 돌진",color:"#D9F5A8"}]
+execute if score #bfSt mb matches 1..2 if score #bfPick mb matches 4 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"광폭한 진공",color:"#D9F5A8"}]
+execute if score #bfSt mb matches 1..2 if score #bfPick mb matches 11 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"우아한 날개",color:"#D9F5A8"}]
+execute if score #bfSt mb matches 5 if score #bfPick mb matches 11 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"우아한 날개",color:"#D9F5A8"}]
+execute if score #bfSt mb matches 1..2 if score #bfPick mb matches 12 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"화염 날개의 습격",color:"#FFB070"}]
+execute if score #bfSt mb matches 5 if score #bfPick mb matches 12 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"화염 날개의 습격",color:"#FFB070"}]
+execute if score #bfSt mb matches 1..2 if score #bfPick mb matches 13 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"날개 휩쓸개",color:"#FFB070"}]
+execute if score #bfSt mb matches 5 if score #bfPick mb matches 13 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"날개 휩쓸개",color:"#FFB070"}]
+execute if score #bfSt mb matches 1..2 if score #bfPick mb matches 14 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"달빛 축복",color:"#D9F5A8"}]
+execute if score #bfSt mb matches 5 if score #bfPick mb matches 14 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"달빛 축복",color:"#D9F5A8"}]
+execute if score #bfSt mb matches 1..2 if score #bfPick mb matches 15 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"달빛 해제",color:"#D9F5A8"}]
+execute if score #bfSt mb matches 5 if score #bfPick mb matches 15 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"달빛 해제",color:"#D9F5A8"}]
+execute if score #bfSt mb matches 1..2 if score #bfPick mb matches 20 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"변신",color:"#E8858A"}]
+execute if score #bfSt mb matches 3 run data modify storage rlk:mboss sub set value [{text:"그로기  ",color:"#9FE8A0",bold:true},{text:"공격할 기회",color:"#C8E8C8"}]
+execute if score #bfSt mb matches 4 run data modify storage rlk:mboss sub set value [{text:"그로기  ",color:"#9FE8A0",bold:true},{text:"다시 일어선다",color:"#C8E8C8"}]
+execute if score #bfCoc mb matches 1 run data modify storage rlk:mboss sub append value {text:"     ◖",color:"#8C525C"}
+execute if score #bfCoc mb matches 1 run data modify storage rlk:mboss sub append value {text:"꩜",color:"#E8858A",bold:true}
+execute if score #bfCoc mb matches 1 run data modify storage rlk:mboss sub append value {text:"◗ ",color:"#8C525C"}
+execute if score #bfCoc mb matches 1 run data modify storage rlk:mboss sub append value {text:"달빛 고치 — 회복하면 해제",color:"#E8A0A6"}
+execute if score #bfCoc mb matches 1 run data modify storage rlk:mboss sub append value {text:"  (피해 -50% · 치명타 -100% · 받는 치유 -40%)",color:"#A89496"}
+execute if score #bfBuff mb matches 1 run data modify storage rlk:mboss sub append value {text:"     ✦ 달빛 축복 받음",color:"#F4E28A"}
+execute if score #bfBuff mb matches 1 run data modify storage rlk:mboss sub append value {text:"  (치명타 +15% · 피해 +50%)",color:"#BDB38A"}

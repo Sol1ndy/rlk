@@ -14,4 +14,5 @@ data modify storage rlk:mboss sub set value []
 data modify storage rlk:mboss extra set value []
 data modify storage rlk:mboss aura set value []
 scoreboard players set #mbAuraK mb -1
+function rlk:mboss/player_reset
 function rlk:mboss/opts_reset
