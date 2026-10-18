@@ -1,0 +1,981 @@
+{
+ "generator": "tools/build_mboss_bf_fx.py",
+ "functions": "rlk:mboss/butterfly/fx/",
+ "item_models": "rlk:mboss/bf_kit/",
+ "font": "rlk:mboss_bf",
+ "storage": "rlk:bfkit",
+ "owned": {
+  "dirs": [
+   "data/rlk/function/mboss/butterfly/fx/e",
+   "data/rlk/function/mboss/butterfly/fx/p",
+   "data/rlk/function/mboss/butterfly/fx/tele",
+   "data/rlk/function/mboss/butterfly/fx/snd",
+   "data/rlk/function/mboss/butterfly/fx/hud",
+   "data/rlk/function/mboss/butterfly/fx/test",
+   "data/rlk/function/mboss/butterfly/fx/prop"
+  ],
+  "files": [
+   "data/rlk/function/mboss/butterfly/fx/card.mcfunction",
+   "data/rlk/function/mboss/butterfly/fx/cardx.mcfunction",
+   "data/rlk/function/mboss/butterfly/fx/look.mcfunction",
+   "data/rlk/function/mboss/butterfly/fx/clear.mcfunction",
+   "data/rlk/function/mboss/butterfly/fx/uninstall.mcfunction"
+  ],
+  "rp": [
+   "assets/rlk/textures/mboss/bf_kit",
+   "assets/rlk/models/item/mboss/bf_kit",
+   "assets/rlk/items/mboss/bf_kit",
+   "assets/rlk/font/mboss_bf.json",
+   "assets/rlk/textures/font/mboss_bf"
+  ]
+ },
+ "caps": {
+  "fx": 64,
+  "telegraph": 40
+ },
+ "objectives": [
+  "bkS",
+  "bkG",
+  "bkH",
+  "bkK",
+  "bkD"
+ ],
+ "kinds": {
+  "cres_lime": {
+   "plane": "flat",
+   "px": [
+    256,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "lime kick / vacuum-blade crescent ribbon (swing plane, head at the left)"
+  },
+  "cres_cyan": {
+   "plane": "flat",
+   "px": [
+    256,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "cyan-white crescent (cocoon burst, wind crescents)"
+  },
+  "cres_fire": {
+   "plane": "flat",
+   "px": [
+    256,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "fire crescent / flame sheet, orange-gold to magenta"
+  },
+  "fire_claw": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "camera-facing fire crescent projectile (claw / feather)"
+  },
+  "star4": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "lime 4-point star flare, white core"
+  },
+  "glint": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "white 4-point glint (tint it)"
+  },
+  "burst": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "lime-white spiky starburst"
+  },
+  "glow": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "soft white glow disc (tint it)"
+  },
+  "mote": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "moonlight mote (tint it)"
+  },
+  "streak": {
+   "plane": "face",
+   "px": [
+    256,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.0625,
+    0.0625
+   ],
+   "tint": "neutral",
+   "desc": "long thin streak along a (tint it)"
+  },
+  "leaf": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "leaf / petal flake (tint lime or amber)"
+  },
+  "bfly": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "small butterfly outline glyph (tint it)"
+  },
+  "disc_lime": {
+   "plane": "flat",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "Dendro disc decal: lime swirl, bright rim"
+  },
+  "ripple": {
+   "plane": "face",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "desc": "ripple / wind ring (near white, tint it)"
+  },
+  "gyro": {
+   "plane": "face",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "lime gyroscope ring with beads"
+  },
+  "sphere": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "translucent light sphere, limb-brightened"
+  },
+  "dome_lo": {
+   "plane": "seg",
+   "px": [
+    128,
+    112
+   ],
+   "extent": [
+    -0.42,
+    0.42,
+    -0.36,
+    0.36
+   ],
+   "tint": "painted",
+   "desc": "dome shell segment, lower band (ground ring)"
+  },
+  "dome_hi": {
+   "plane": "seg",
+   "px": [
+    128,
+    112
+   ],
+   "extent": [
+    -0.42,
+    0.42,
+    -0.36,
+    0.36
+   ],
+   "tint": "painted",
+   "desc": "dome shell segment, upper band (narrow top)"
+  },
+  "fan_fire": {
+   "plane": "flat",
+   "px": [
+    256,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "180-degree flame fan sheet on the floor"
+  },
+  "flame_tongue": {
+   "plane": "face",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "vertical flame tongue, pivot at its root"
+  },
+  "flame_puff": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "flame trail puff"
+  },
+  "blade": {
+   "plane": "face",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "desc": "radial ground blade, pivot at its root"
+  },
+  "shard": {
+   "plane": "face",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "white / cyan crystal shard"
+  },
+  "cure_beam": {
+   "plane": "face",
+   "px": [
+    64,
+    192
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.5
+   ],
+   "tint": "painted",
+   "desc": "pale-gold beam, pivot at its foot"
+  },
+  "cure_burst": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "white-gold burst sphere with a gold ring"
+  },
+  "cure_emblem": {
+   "plane": "face",
+   "px": [
+    128,
+    192
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.75,
+    0.75
+   ],
+   "tint": "painted",
+   "desc": "gold emblem: spire, star, scroll arms, crescent"
+  },
+  "dew_orb": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "desc": "\"달빛 이슬\" moon-dew heal orb look"
+  },
+  "t_rim": {
+   "plane": "flat",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "telegraph rim, unit radius"
+  },
+  "t_rim_s": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "thick telegraph rim (r <= 2.5)"
+  },
+  "t_fill": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "telegraph progress fill, unit radius"
+  },
+  "t_bar": {
+   "plane": "flat",
+   "px": [
+    16,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "lane rail / cap bar"
+  },
+  "t_lane": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "desc": "lane progress fill, unit length"
+  },
+  "t_sec30": {
+   "plane": "flat",
+   "px": [
+    256,
+    144
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.125,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector telegraph rim, half-angle 30"
+  },
+  "t_secf30": {
+   "plane": "flat",
+   "px": [
+    128,
+    80
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.25,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector progress fill, half-angle 30"
+  },
+  "t_sec45": {
+   "plane": "flat",
+   "px": [
+    256,
+    144
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.125,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector telegraph rim, half-angle 45"
+  },
+  "t_secf45": {
+   "plane": "flat",
+   "px": [
+    128,
+    80
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.25,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector progress fill, half-angle 45"
+  },
+  "t_sec60": {
+   "plane": "flat",
+   "px": [
+    256,
+    144
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.125,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector telegraph rim, half-angle 60"
+  },
+  "t_secf60": {
+   "plane": "flat",
+   "px": [
+    128,
+    80
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.25,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector progress fill, half-angle 60"
+  },
+  "t_sec90": {
+   "plane": "flat",
+   "px": [
+    256,
+    144
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.125,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector telegraph rim, half-angle 90"
+  },
+  "t_secf90": {
+   "plane": "flat",
+   "px": [
+    128,
+    80
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.25,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "sector progress fill, half-angle 90"
+  }
+ },
+ "atlas_px": 834560,
+ "presets": {
+  "cocoon_disc": {
+   "args": [
+    "life"
+   ],
+   "doc": "Entrance: the glowing lime floor disc under the cocoon (at the floor point). {life}"
+  },
+  "cocoon_glow": {
+   "args": [],
+   "doc": "Entrance / transformation: the cocoon core brightens (glow ramp, 18 t). At the core."
+  },
+  "whiteout": {
+   "args": [],
+   "doc": "Entrance whiteout / big flash: a white-yellow glow ball (8 t). At the core."
+  },
+  "cocoon_burst": {
+   "args": [],
+   "doc": "Entrance t79: crystal shard star, two lime wing crescents, cyan wind ring. At the core."
+  },
+  "motes": {
+   "args": [],
+   "doc": "Moonlight motes rising around the point (idle sparkle, charge, death). 6 cards."
+  },
+  "land": {
+   "args": [],
+   "doc": "Landing: a mint ripple on the floor, drifting leaves, moss dust. At the floor point."
+  },
+  "glint": {
+   "args": [],
+   "doc": "A small white-lime glint (tells, foot sparkles). Billboard."
+  },
+  "kick_rise": {
+   "args": [],
+   "doc": "H1 hit 1: the tall rising flip-kick crescent (sagittal, sweeping up and back) + ground splash. At her feet, rotated as her (yaw)."
+  },
+  "kick_axe": {
+   "args": [],
+   "doc": "H1 hit 2: the huge diagonal axe-kick crescent from above-behind down to the floor ahead (r about 5). At her feet, rotated as the kick."
+  },
+  "ground_wave": {
+   "args": [],
+   "doc": "H1 hit 2 ground wave: lime blades erupt one after another along 6 blocks ahead, plus a streak on the floor. At the floor point, rotated as the line."
+  },
+  "shard_tell": {
+   "args": [],
+   "doc": "H2 tell: one arm shard glows into a lime crescent blade (13 t). At the shard."
+  },
+  "sweep": {
+   "args": [],
+   "doc": "H2 360-degree low sweep (r 3, active 6 t): two knee-high lime crescents turning around her. At her feet."
+  },
+  "spiral_jump": {
+   "args": [],
+   "doc": "H2 spiral jump: two lime spiral ribbons wind up around her. At her feet."
+  },
+  "orb_star": {
+   "args": [],
+   "doc": "H2 star flash at the orb (and any white 4-point flash). Billboard."
+  },
+  "orb_kick": {
+   "args": [],
+   "doc": "H2 orb burst as it is kicked down: lime starburst and two white wind crescents circling it."
+  },
+  "disc_fall": {
+   "args": [
+    "h"
+   ],
+   "doc": "H2 the Dendro disc drops {h} blocks onto the floor point in 3 t (call at the floor point; the disc starts h above)."
+  },
+  "disc_impact": {
+   "args": [],
+   "doc": "H2 disc impact (r 2.5): lime disc splash, burst, ripple, dust puffs and leaves. At the floor point."
+  },
+  "dash_charge": {
+   "args": [],
+   "doc": "H3 mote charge (10 t): motes converge on her and a faint floor glow. At her feet."
+  },
+  "dash_streak": {
+   "args": [],
+   "doc": "H3 dash: a 5.5-block speed streak along the dash path. At her start point, rotated along the dash."
+  },
+  "kick_burst": {
+   "args": [],
+   "doc": "H3 kick + Dendro ring r 3.5: white-lime burst at the foot, flung blades, a floor ripple and the all-around crescent ring. At her feet."
+  },
+  "vac_crouch": {
+   "args": [],
+   "doc": "H4 crouch: the kicking leg glows lime (9 t). At the foot."
+  },
+  "vac_glint": {
+   "args": [],
+   "doc": "H4 tell: a green spike flares behind her, a horizontal cyan-white glint line and a 4-point flare at the foot. At the foot, rotated as her."
+  },
+  "vac_stomp": {
+   "args": [],
+   "doc": "H4 stomp: yellow-green ground flare at the foot as the blade rises. At the floor point."
+  },
+  "vac_trail": {
+   "args": [],
+   "doc": "H4 travelling blade, every 2 t at the blade prop: small blades and leaves left behind, a dark-green scar. At the prop (floor height)."
+  },
+  "tf_sheath": {
+   "args": [],
+   "doc": "Transformation: the green vertical glow sheath wraps her lower body. At her chest."
+  },
+  "tf_sphere": {
+   "args": [],
+   "doc": "Transformation: core flash, then the light sphere r 2.5 (6 t). At her chest."
+  },
+  "tf_ripples": {
+   "args": [],
+   "doc": "Transformation: concentric ripple rings r 4-5 (a floor ring and two vertical arcs) and radial speed lines. At her chest; the floor ring is drawn 1.6 below."
+  },
+  "wing_band": {
+   "args": [],
+   "doc": "B1 hit: the bright yellow-green ground slash band along the wing path (r 4 arc on the floor). At the floor under her, rotated as the strike."
+  },
+  "wing_flare": {
+   "args": [],
+   "doc": "B1 trailing vertical crescent flare (2-3 b) at the end of the arc. At the wing tip."
+  },
+  "pyro_switch": {
+   "args": [],
+   "doc": "Wings turn Pyro: a magenta-pink rim glow pulse around her (1 t swap). At her chest."
+  },
+  "dendro_switch": {
+   "args": [],
+   "doc": "Wings turn back to Dendro: a lime glow pulse. At her chest."
+  },
+  "fire_swing": {
+   "args": [],
+   "doc": "B2 swing: a giant flame sheet in the swing plane (r 4) with white wind streaks. At her chest, rotated as the swing (roll the plane with an execute rotated / the diagonal variant)."
+  },
+  "fire_swing_d": {
+   "args": [],
+   "doc": "B2 swing, diagonal plane (upper-left to lower-right). At her chest, rotated as her."
+  },
+  "fire_spawn": {
+   "args": [],
+   "doc": "B2: a fire crescent appears in the air (small puff + embers). At the crescent."
+  },
+  "fire_trail": {
+   "args": [],
+   "doc": "B2 / B3: a short flame puff left behind a moving fire crescent (call every 1-2 t at the prop)."
+  },
+  "fire_land": {
+   "args": [],
+   "doc": "B2 crescent landing: fire splash r 1.2 with a 2.5-block vertical flame streak. At the floor point."
+  },
+  "flame_slam": {
+   "args": [],
+   "doc": "B3 slam: two vertical flame crescents rise at the wing tips. At her chest, rotated as her."
+  },
+  "flame_fan": {
+   "args": [],
+   "doc": "B3 eruption: the 180-degree front flame fan r 4.5, 2.5 tall (t28-32) with a scorched floor sheet. At the floor under her, rotated as her."
+  },
+  "flame_trail": {
+   "args": [],
+   "doc": "B3 low glide: a flame line on the floor (call every 2 t at the wing-tip floor point)."
+  },
+  "orb_charge": {
+   "args": [],
+   "doc": "B4 wing-wrap charge (14 t): a lime core grows at her chest with converging streaks."
+  },
+  "orb_launch": {
+   "args": [],
+   "doc": "B4 orb release: a lime ring flash and sparkle where the orb leaves her. At the orb."
+  },
+  "orb_burst": {
+   "args": [],
+   "doc": "B4 orb burst r 2.5-3: starburst, radial V-shaped ground blades, a floor ripple, leaves. At the floor under the orb."
+  },
+  "cocoon_ball": {
+   "args": [],
+   "doc": "B4 wing ball (12 t): a lime glow inside the ball. At its centre."
+  },
+  "rel_fold": {
+   "args": [],
+   "doc": "B5 fold: small lime butterfly glyphs float up around her (20 t). At her chest."
+  },
+  "rel_flare": {
+   "args": [],
+   "doc": "B5 whirl: the pulsing lime 4-point star flare at her side with converging lines (call 2-3 times over the 20 t whirl). At the flare point."
+  },
+  "rel_slashes": {
+   "args": [],
+   "doc": "B5 whirl: thin lime slash streaks whip around her (4 cards). At her chest."
+  },
+  "rel_ground_flash": {
+   "args": [],
+   "doc": "B5 E-18: a lime mist cone bursts from the floor under her. At the floor point."
+  },
+  "rel_xglint": {
+   "args": [],
+   "doc": "B5 E-16: two long cyan-white lines cross through her chest as an X (8 blocks each). At her chest (camera-facing)."
+  },
+  "rel_cage": {
+   "args": [],
+   "doc": "B5 E-15..-10: the gyroscope ring cage r 4 (three spinning lime rings). At her chest."
+  },
+  "rel_pod": {
+   "args": [],
+   "doc": "B5 E-9..-1: the white-lime core glow grows inside the wrapped pod with inward streaks. At her chest."
+  },
+  "rel_dome": {
+   "args": [
+    "r"
+   ],
+   "doc": "B5 detonation E: white flash, then the lime dome grows to radius {r} blocks in 5 t (16 shell segments + cap) and lingers, with a floor shock ring. At the floor under her."
+  },
+  "rel_tendrils": {
+   "args": [],
+   "doc": "B5 E+7: long lime flame-like tendrils stream out radially as she re-emerges. At her chest."
+  },
+  "embers": {
+   "args": [],
+   "doc": "After the blast: amber ember petals and lime motes drift down (E+10..+34). Around her chest."
+  },
+  "wing_shatter": {
+   "args": [],
+   "doc": "B5 E+38 / death: the shrunken lime wings break into shards (12 cards). At her back."
+  },
+  "chain_reform": {
+   "args": [],
+   "doc": "After the groggy turn: lime streaks converge on her side as the crescent chain re-forms (18 t). At the chain point."
+  },
+  "coc_apply": {
+   "args": [],
+   "doc": "달빛 고치 applied: a maroon swirl ring closes on the player and a salmon glow. At the player's feet."
+  },
+  "cure": {
+   "args": [],
+   "doc": "달빛 고치 removed (about 20 t): gold beam down (6 t), gold burst + ring (5 t), gold emblem with sparkles (9 t). At the player's feet."
+  },
+  "dew_spawn": {
+   "args": [],
+   "doc": "A 달빛 이슬 orb appears: a cyan-lime floor ripple, a glow and motes. At the orb's floor point."
+  },
+  "dew_pulse": {
+   "args": [],
+   "doc": "Idle pulse of a 달빛 이슬 orb (call every 20 t at the orb): a soft ring on the floor and two rising motes, so it reads on the marble."
+  },
+  "death_motes": {
+   "args": [],
+   "doc": "Death: rising moonlight motes and crystal shards (call every 10-20 t of the 100 t death). Around her chest."
+  }
+ },
+ "props": {
+  "fire": "B2 fire crescent projectile: the camera-facing golden claw, 1.4 blocks.",
+  "vblade": "H4 vacuum blade: a vertical lime crescent about 4 tall and 2 deep bulging along the prop's facing (roll 90 about z); its lower tip sits 0.9 below the prop (the pj hit point), so fly the prop 0.9 above the floor.",
+  "orb": "B4 coco orb fallback look (when the rig has no orb prop): a lime light sphere 1.7 across.",
+  "orb_ring": "B4 gyroscope ring around an orb (fixed; turn it from the module tick), 2.2 across.",
+  "dew": "달빛 이슬 heal orb look (camera-facing, 0.9 across)."
+ },
+ "sounds": {
+  "cocoon_glow": "Cocoon core brightens (entrance t57+, transformation start): rising glassy shimmer.",
+  "cocoon_burst": "Cocoon bursts into crystal shards (entrance about t79): bright shatter + wind.",
+  "cocoon_tail": "Glittering tail of the burst (2-8 t after cocoon_burst).",
+  "land": "Soft landing (entrance t90, revert landing, backflip landings).",
+  "kick_whoosh": "Burst-run / kick wind-up whoosh with a leafy crack (H1 hit 1 lead-in).",
+  "kick_impact": "Kick crescent lands (H1 hits, H3 kick): big airy swoosh with a leafy crackle.",
+  "crescent_fly": "A crescent wave travels (H1 ground wave, B1 trailing crescent).",
+  "shard_tell": "Arm shard glows lime (H2 tell, the chain glow): shimmer chime.",
+  "sweep": "360-degree low sweep kick (H2): thump then swish.",
+  "spiral_jump": "Spiral jump (H2): rising whirl and a low rumble.",
+  "disc_kick": "Orb kicked down as the Dendro disc (H2 star flash + kick): bright sparkle and a crack.",
+  "disc_impact": "Dendro disc hits the floor (H2 impact): boom with a leafy crackle.",
+  "dash_charge": "Mote charge before the dash (H3): rustling glittery shimmer.",
+  "dash": "Dash lunge (H3, burst-runs): short airy whoosh.",
+  "dash_kick": "Dash kick impact + ring (H3): deep thump, bright leafy burst, crackling tail.",
+  "vacuum_glint": "Vacuum blade tell glint (H4): sharp crystalline ping.",
+  "vacuum_blade": "Foot stomp + blade rise (H4): whoosh and leafy roar.",
+  "vacuum_pass": "The blade rushes past (H4 travel): hiss and a low thump.",
+  "transform_glow": "Transformation: the cocoon sheath glows and the folded wings open.",
+  "transform_swell": "Light sphere + ripple rings + wings unfurl: broad airy swell.",
+  "debuff": "달빛 고치 lands on the player (with the light sphere): curse-like chime burst.",
+  "flap_big": "Big wing flap (B3 tell, B5 flight, the glide settle).",
+  "flap_small": "Small hover flap (every 13-20 t in butterfly form; quiet).",
+  "wing_dive": "Bank + dive before the wing strike (B1), the release swoop (B5).",
+  "wing_strike": "Wing edge hits and sweeps on (B1): solid hit then a long airy swish with leaf crackle.",
+  "pyro_switch": "Wings turn Pyro (1 t swap, 5-12 t before B2 / B3): soft whump + shimmer.",
+  "dendro_switch": "Wings turn back to Dendro (before B1 / B4 / B5).",
+  "fire_cres_launch": "Wing swing throws the fire crescents (B2, each swing): whoosh then a roaring burst.",
+  "fire_cres_fly": "Crescents turn and dive (B2): crackling hiss.",
+  "fire_cres_land": "A fire crescent lands (B2, per landing): sharp crack + fire puff.",
+  "flame_slam": "Wing slam (B3 slam): low thump.",
+  "flame_fan": "180-degree flame eruption (B3): crackling roar then a low rumble.",
+  "flame_trail": "Flame line under the low glide (B3 trail, every 4-6 t; quiet).",
+  "orb_charge": "Wing-wrap core charge (B4 before each orb): thin rising sparkle.",
+  "orb_launch": "Orb released (B4 t19 / t46): soft launch whir.",
+  "orb_fly": "Orb flight loop (every 10-12 t while it homes; quiet).",
+  "orb_burst": "Orb bursts into radial ground blades (B4): airy boom + leafy crackle.",
+  "cocoon_ball": "Wings curl into the ball (B4 t30-42): swirling rustle.",
+  "release_swoop": "달빛 해제 fold + swoop (B5 start): low swoosh.",
+  "release_whirl": "달빛 해제 whirl / cup (B5): airy swishes.",
+  "release_charge": "달빛 해제 charge (flare, X glint, ring cage): rising hum + sparkle; call 2-3 times rising.",
+  "release_wrap": "달빛 해제 wings wrap into the pod (E-9): pressure builds.",
+  "release_boom": "달빛 해제 detonation (E): big broadband boom, bright crackle, whooshing tail.",
+  "wing_shatter": "Wings shrink, go flat lime and shatter (B5 E+38 / death).",
+  "groggy": "Groggy starts (after the revert landing): spent, deflating cue.",
+  "chain_reform": "Crescent chain re-forms at her side (after the groggy turn): plates clink into place.",
+  "dew_spawn": "A 달빛 이슬 heal orb appears.",
+  "cure_chime": "달빛 고치 removed by a heal: bright rising chime burst (beam, burst, emblem).",
+  "death": "Death: stagger, the wings shatter, she kneels and dissolves (no voices).",
+  "death_motes": "Death tail: the last motes rise."
+ },
+ "glyphs": {
+  "coc": "U+E600",
+  "buff": "U+E601",
+  "coc_big": "U+E602",
+  "buff_big": "U+E603",
+  "dew": "U+E604",
+  "fl_white": "U+E610",
+  "fl_lime": "U+E611",
+  "fl_gold": "U+E612",
+  "fl_maroon": "U+E613"
+ },
+ "telegraph_colours": {
+  "7": [
+   "#3FBE16",
+   "#7BE639",
+   "#EEFF6A"
+  ],
+  "1": [
+   "#FF5612",
+   "#FF8A2A",
+   "#FFE04A"
+  ],
+  "0": [
+   "#E5304A",
+   "#FF6474",
+   "#FFB8C4"
+  ]
+ }
+}
