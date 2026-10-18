@@ -146,7 +146,10 @@ export const FACE_FRONT = [0, 90, 0];      // a medallion at az +90 facing the f
 // ---- rest poses of the seven body configurations (model.md §8) ---------------------------------------------------------
 // The dock: the medallion centre and the spike pivot at each ring end (the X frame round the medallion).
 export const DOCK = [3.6, .05, 0];
-export const RATES = {wHalo: 2.25, wHalo2: -4.5, wBrim: 4.5, wMedE: 4.5, wMedG: -6.75, wDrill: 11.25, wT1: 2.25, wT2: -2.25, wArch: 0, wPlate: .75};
+// Spin rates, degrees per tick (model.md §5.1): halo 2.25 (a turn in 8 s), the inner ring -4.5, the brim precession 4.5,
+// the eye medallion 4.5 and the gear medallion -6, the drill pods 11.25, the tower tiers +-2.25, the plates 1.5; the arch
+// gyroscope is 0 in cruise and 3 in the field.
+export const RATES = {wHalo: 2.25, wHalo2: -4.5, wBrim: 4.5, wMedE: 4.5, wMedG: -6, wDrill: 11.25, wT1: 2.25, wT2: -2.25, wArch: 0, wPlate: 1.5};
 const STILL = Object.fromEntries(Object.keys(RATES).map(k => [k, 0]));
 export const CRUISE = {
   pos: [0, 4.5, 0], rot: [0, 0, 0], vis: 1,

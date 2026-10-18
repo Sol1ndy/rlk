@@ -1,0 +1,1 @@
+data merge entity 524c4b4d-4647-4400-8000-000000000003 {start_interpolation:0,interpolation_duration:23,transformation:{translation:[0.00056f,5.94074f,3.56f],left_rotation:[0f,0f,-0.00565f,0.99998f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}

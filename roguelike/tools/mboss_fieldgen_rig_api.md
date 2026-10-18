@@ -3,7 +3,9 @@
 This is the contract between the rig and the mid-boss module (`tools/mboss_fieldgen/`). The module reads clips,
 events, form switches, hidden spans, parts, props and objectives from the manifest, so retimed keys reach it on the
 next module build. The clip and event names are the ones the module's stub manifest
-(`tools/mboss_fieldgen/stub_rig_manifest.json`) uses; every clip and event the module looks up exists here (§6).
+(`tools/mboss_fieldgen/stub_rig_manifest.json`) and the stage-2 specs (`mb3/spec`) use; every clip and event they
+look up exists here (§6). The clips are authored from the footage (`mb3/understand/v1..v4.md`, `model.md` §5) on the
+timelines of `mb3/plan.md`.
 
 Generator: `tools/build_mboss_fieldgen_rig.mjs`, with `fieldgen_paint.mjs` (textures), `fieldgen_geometry.mjs`
 (item models), `fieldgen_pose.mjs` (the free-body pose solver and the seven form poses) and `fieldgen_clips.mjs`
@@ -53,12 +55,17 @@ boss body, on the floor under the ring axis). Call them `as` the anchor and `at`
 | `prop/clear` | cleanup | Kills every prop (`rlk_mb_fg_prop`). |
 
 Typical sequence (what the module core does): entrance = `init`, `spawn`, `form/dormant`, `look/off`,
-`play/entrance`, then `look/idle` at `eye`; the field = `play/warp_out`, the warp (move the body) at `out`,
-`play/warp_in_field` at the end of `warp_out`, `crack/0` + `look/field` at `unfold`; the break = `crack/4` +
-`play/break`, then `groggy`, `recover` + `look/idle`, `crack/0`.
+`play/entrance`, then `look/idle` at `eye`; C1 = `play/bomb_run`, then `play/slam` at its end (it also chains by
+itself); the field = `play/warp_out`, the warp flash at `hide`, move the body at `out`, `play/warp_in_field` at the
+end of `warp_out`, `crack/0` + `look/field` at `unfold`; F1 = `play/field_erupt`, then `play/field_idle` when the
+pattern ends; the pack-up = `play/field_end`, `look/idle` at `dock`; the break = `play/break`, `crack/4` at `burst`,
+then `groggy` + `look/groggy`, `recover` + `look/idle`, `crack/0`.
 
-**Facing.** No clip yaws the whole body: the module turns the anchor (`face/*`). Every spinner inside a clip ends on
-whole turns (§6), so nothing unwinds when a clip ends or a blend starts.
+`form/<f>` and `play/<clip>` in the same tick (the core's `groggy/rig`, reloads): the clip's first keys overwrite the
+form snap before the client sees it, so the clip blends from the visible pose without a pop.
+
+**Facing.** No clip yaws the whole body: the module turns the anchor (`face/*`). Every spinner ends each clip on a
+symmetry multiple and the looping / chaining clips snap it back invisibly (§6), so nothing unwinds when a clip ends.
 
 ## 2. Entities, tags, cost
 
@@ -117,8 +124,8 @@ the ring centre over the floor; the pendulum tip hangs 0.2-0.55 b over the floor
 | 7 | `deployed` | 5.6 | `hold_deployed` | the lances: spikes and medallions 5.6 b out on both sides, the core hanging |
 
 Form switches inside clips (manifest `forms`, `{clip: [[tick, form], ...]}`; the module's hitbox / state may follow
-them): `entrance` dormant 0 → cruise 110; `laser` laser 4 → cruise 175; `coreup` coreup 15 → cruise 128;
-`tower_throw` tower 38 → cruise 157; `warp_in_field` field 17; `field_end` deployed 40 → cruise 96; `recover` cruise 15.
+them): `entrance` dormant 0 → cruise 94; `laser` laser 4 → cruise 165; `coreup` coreup 15 → cruise 120;
+`tower_throw` tower 38 → cruise 150; `warp_in_field` field 17; `field_end` deployed 20 → cruise 70; `recover` cruise 15.
 
 ## 4. Looks and crack stages
 
@@ -130,7 +137,9 @@ them): `entrance` dormant 0 → cruise 110; `laser` laser 4 → cruise 175; `cor
     at the stored crack stage.
   - **groggy**: seam off, the iris shut, the eye dim amber. **off**: the same for dormant and death.
 - Clips show temporary looks without touching `fgRigLook` (`look/temp_<look>`, `fgRigTmp` 1): the attacks go to
-  charge for their tell and active part, `break` to groggy, `entrance` and `death` to off. When the temporary span
+  charge for their tell and active part (`bomb_run` 10-57 and `slam` 0-22, `laser` 4-157, `missiles` 0-42,
+  `coreup` 0-81, `tower_throw` 10-142), `break` to groggy from 8, `entrance` (0-60) and `death` to off; the field
+  clips keep the stored look. When the temporary span
   ends the clip calls `look_apply`, so a look set by the module during the clip wins afterwards. A `look/<x>` call
   during a temporary span shows at once and clears `fgRigTmp`.
 - `crack/<s>` swaps `core_shell` to `bubble_<s>` (stage 4 `bubble_burst`) when the field look is on, and stores the
@@ -152,86 +161,163 @@ Each call summons at the execution position, turned to the execution yaw. Tags: 
 
 ## 6. Clips
 
-Ticks at 20/s; events are clip ticks; `then` = the clip that follows by itself (`hold` = it holds its last pose).
+Ticks at 20/s; events are clip ticks; `then` = the clip that follows by itself (`loop`, or `hold` = it holds its
+last pose). Hit and launch ticks are relative to the clip start. Read every tick from the manifest (`ev`,
+`clip_len`), never hard-code one.
 
-**Body travel.** The rig follows the anchor; horizontal travel is the module's job (the bombing glide, the warp).
-Every key of every clip has the root at x = z = 0 (the build fails otherwise). Heights, pitches and rolls, the stack
-spacing and every part's own motion are in the clips.
+**Body travel.** The rig follows the anchor; horizontal travel and yaw are the module's job (the bombing glide, the
+warp, `face/*`). Every tick of every clip has the root at x = z = 0 and no root yaw (the build fails otherwise).
+Heights, pitches and rolls, the stack spacing and every part's own motion are in the clips.
 
-**Spinners.** The halo (2.25°/t), inner ring (−4.5), brim (4.5), medallions (4.5 / −6.75), drill pods (11.25), tower
-tiers and plates turn at rate channels. Per clip, each spinner's integrated angle is scaled to a whole number of
-turns (manifest `spin_turns`), so every clip starts and ends with every spinner at its rest angle and no blend ever
-unwinds a spin.
+**Authoring** (`fieldgen_clips.mjs`). Each clip is written as per-channel keys (a key moves only the channels it
+names; `k(t, pose, ease, from)` starts the move at `from`), then baked to one pose per tick with overlays (the
+hover bob and wobble, the arch rocking, link-beam pulses; exact formulas such as the laser orbit and the drill orbit)
+and a simulated pendulum (a stiff damped pendulum, period about 26 t, driven by its hang point's acceleration from
+the clip's heights and tilts and by a gentle visual drive where the clip knows the module's travel, soft-limited to
+about 28°). Loops and the clips that end in a rest form meet their neighbours exactly (every hover term is 0 at the
+loop start).
 
-| clip | len | then | events |
-|---|---|---|---|
-| `idle_cruise` | 160 | loop | cruise hover: bob ±0.12 b, ±1.5° wobble, the arch tilted 35° and rocking ±20°, the pendulum lagging |
-| `glide` | 40 | loop | travel: nose down 6°, the pendulum swung back |
-| `field_idle` | 240 | loop | field hover: the pods orbit the core, the arch turns round it like a gyroscope |
-| `idle_dormant`, `hold_coreup`, `hold_tower`, `hold_laser`, `hold_deployed` | 40 / 80 / 80 / 72 / 80 | loop | the form holds (`form/*` queues them); `hold_laser` counter-orbits the medallions at 5°/t |
-| `entrance` | 130 | `idle_cruise` | clank 16, pods 24, unfold 30, eye 54, turn 60, rise 80, risen 110, face 115 |
-| `bomb_run` | 58 | `idle_cruise` | turn 0, ports 10, run 12, end 56 |
-| `slam` | 45 | `idle_cruise` | column 0, plunge 13, impact 16, rise 23 |
-| `laser` | 175 | `idle_cruise` | drop 0, charge 4, aim 23, fire 25, off 158, retract 159 |
-| `missiles` | 64 | `idle_cruise` | flare 0, vent 8, launch 22, last 35 |
-| `coreup` | 130 | `idle_cruise` | spark 0, eye 1, rim 3, lift 5, up 16, beam 29, column 41, blast 48, sink 81 |
-| `tower_throw` | 157 | `idle_cruise` | dip 0, vent 12, tower 20, band 38, burst 55, throw 95, revert 142 |
-| `warp_out` | 34 | hold | flip 0, hide 12, out 13 |
-| `warp_in_field` | 24 | `field_idle` | in 0, unfold 1, field 17, banner 22 |
-| `wave` | 40 | `field_idle` | charge 0, beam 25, impact 25 |
-| `wave_long` | 56 | `field_idle` | charge 0, beam 41, impact 41 |
-| `wave_drop` | 84 | `field_idle` | charge 0, drop 36, land 40, beam 40, impact 40, lift 60, risen 80 |
-| `field_erupt` | 40 | `field_idle` | activate 0, lock 12, erupt 22 |
-| `frock` | 110 | `field_idle` | vent 0, flame 8, burst 25, throw 65, end 100 |
-| `field_end` | 102 | `idle_cruise` | lift 0, rise 2, lances 20, horiz 40, pack 50, dock 72, packed 96 |
-| `break` | 34 | `groggy` | bubble 0, burst 5, tilt 5, wobble 14, sink 34 |
-| `groggy` | 160 | loop | the slump: ring centre 3.3 b, roll 25°, pitch 8°, halo slid, pendulum swinging ±12° |
-| `recover` | 15 | `idle_cruise` | relevel 0, flip 6, done 15 |
-| `death` | 110 | hold | flicker 0, drop 20, sink 40, land 60, out 70, gone 110 |
+**Spinners.** halo 2.25°/t, inner ring −4.5, brim precession 4.5, eye medallion 4.5, gear medallion −6, drill pods
+11.25, tower tiers ±2.25 (±4.5 in the C6 charge), plates 1.5, the arch gyroscope 3 in the field (0 in cruise). Per
+clip each spinner's integrated angle is scaled to a whole number of its **symmetry steps** (manifest `spinners`:
+halo 45°, inner ring 22.5°, drill pods 90°, gear medallion 180°, tower tiers 22.5° / 90°, the rest 360°; the
+per-clip angle is `spin_deg`), so every clip ends each spinner on a pose that looks exactly like its rest angle and
+the loops keep their rates (all exact in the 240 t loops). A clip that loops or chains also **snaps** those parts at
+its last tick (`end_snap` lines: the same pose turned back by the symmetry multiple, interpolation 0, invisible), so
+the next clip's first key continues each spin forward instead of unwinding it; `field_end` and `recover` snap the
+arch they turn over by 180° (the ring's own symmetry) the same way. A clip started in the middle of another one
+blends from wherever the spinners are (the first key segment, at least 3 t).
 
-Notes per clip (the full text is each clip's manifest `note`):
+| clip | len | then | events | used for |
+|---|---|---|---|---|
+| `idle_cruise` | 240 | loop | | cruise hover; the end of every cruise clip |
+| `glide` | 80 | loop | | the module's slow glides in / out |
+| `entrance` | 110 | `idle_cruise` | clank 16, pods 20, unfold 30, eye 60, turn 60, rise 64, **risen 94**, face 99, settled 110 | the intro (untargetable until `risen`) |
+| `bomb_run` | 57 | **`slam`** | turn 0, **ports 10**, **run 12**, drop 12, end 57 | C1 일점 상쇄, the run (then the finisher) |
+| `slam` | 37 | `idle_cruise` | column 0, plunge 13, slam 17, **impact 17**, rise 22, risen 37 | C2 내려찍기, and the C1 finisher at 57 |
+| `laser` | 165 | `idle_cruise` | dock 0, drop 0, charge 4, aim 20, **fire 22**, off 155, retract 155, end 165 | C3 코어 (manifest `orbit`) |
+| `missiles` | 60 | `idle_cruise` | flare 0, tell 0, **vent 8**, **launch 23**, last 37, end 60 | C4 바위 폭탄 |
+| `coreup` | 130 | `idle_cruise` | spark 0, eye 1, **rim 3**, lift 5, up 15, beam 29, column 41, **blast 48**, sink 81, end 130 | C5 지면 충격 |
+| `tower_throw` | 155 | `idle_cruise` | dip 0, flare 12, vent 12, tower 20, band 38, charge 38, **burst 55**, burst_last 97, **throw 100**, throw_last 132, revert 140, end 155 | C6 파쇄 (manifest `bursts`, `throws`) |
+| `warp_out` | 34 | hold | flip 0, **hide 12**, **out 13**, end 34 | field opener, part 1 (hidden from 12) |
+| `warp_in_field` | 40 | `field_idle` | in 0, **unfold 1**, field 17, links 17, **banner 22**, settled 40 | field opener, part 2 |
+| `wave` | 40 | `field_idle` | charge 0, beam 23, burst 24, **impact 24**, end 40 | 「인력 충격파」 (24 t charge) |
+| `wave_long` | 56 | `field_idle` | charge 0, beam 39, burst 40, **impact 40**, end 56 | the opening third wave (40 t charge) |
+| `wave_drop` | 84 | `field_idle` | charge 0, beam 39, burst 40, **impact 40**, drop 40, land 44, lift 63, risen 83, end 84 | the closing third wave (drops onto the floor) |
+| `field_idle` | 240 | loop | | field hover; the end of every field clip |
+| `field_erupt` | 22 | **`field_active`** | activate 0, lock 12, **erupt 22** | F1 감소 영역 activation |
+| `field_active` | 240 | loop | | the activated hover after `field_erupt` |
+| `frock` | 110 | `field_idle` | vent 0, flame 8, **burst 25**, burst_last 67, **throw 65**, throw_last 97, **end 100** | F2 파쇄 in the field form (manifest `bursts`, `throws`) |
+| `field_end` | 70 | `idle_cruise` | lift 0, rise 2, **lances 20**, **horiz 32**, **pack 40**, **dock 58**, **packed 70** | the unbroken field's pack-up |
+| `break` | 40 | `groggy` | bubble 0, **burst 5**, tilt 5, **wobble 14**, sink 14, slumped 40 | 역장 붕괴 (the 20th hit) |
+| `groggy` | 160 | loop | | the 200 t groggy |
+| `recover` | 15 | `idle_cruise` | relevel 0, **flip 6**, done 15 | back to cruise |
+| `death` | 110 | hold | flicker 0, **drop 20**, **sink 40**, land 62, **out 80**, gone 110 | death (call `kill` after 110) |
+| `idle_dormant`, `hold_coreup`, `hold_tower`, `hold_laser`, `hold_deployed` | 40 / 80 / 80 / 72 / 80 | loop | | the form holds (`form/*` queues them) |
 
-- `entrance` (untargetable until `risen`): the clank, the pods drop and it lifts to 2.6 b (24-30); the halo, inner
-  ring and core rise out of the hole and the plates and pendulum drop while it lifts to 3.0 b (30-48); the eye opens
-  at 54 (call `look/idle` there); the arch turns (60-78); the rise to 4.5 b (80-110); settled by 115.
-- `bomb_run`: nose down 18° (0-10, temporary charge look), the ports glow (10), the run 12-56 (the module glides the
-  body and drops the bombs at `port_0..7`), level out (56-58) into the first pose of `slam`, which the module plays
-  at 58 for the finisher.
-- `slam`: the core turns face down and the gold column reaches the floor (0-13 tell), the plunge 4.5 → 2.3 b
-  (13-16) with the stack compressed, impact 16, sit 7 t, rise 23-44.
-- `laser`: the medallions drop to r 2.8 b, 2 b under the ring (0-4), the charge (4-23, medallions hot), the beams
-  extend over 23-25 (48° from straight down), from `fire` they orbit at exactly 5°/t for 133 t, beams off at 158-160,
-  retract and re-dock (159-175). **Hazard aim** (manifest `orbit`): at clip tick t in `from`..`to` (25..158) the eye
-  medallion's beam is at azimuth `90 − 5(t − 25)` and the gear's at `−90 + 5(t − 25)` (azimuth = degrees round the
-  ring axis from the device's front toward its left, +X); each beam runs from its medallion (r 2.8, 2.0 b under the
-  ring) down-out at 48° to a floor spot at r `spot_r` = 5.58 b from the axis (ring centre 4.5 b). The two spots meet
-  in front 18 t after `fire`, then every 36 t, back and front.
-- `missiles`: the spike tips flare (0-8; fx at `spike_tip_l/r`), the eye turns up and the gold vent column rises
-  (8-21), launches 22-35 from `vent_l` / `vent_r` (the module's missiles, `prop/missile`), back by 64.
-- `coreup` (지면 충격): the eye out (1-4), gold flash and lift (5-15: the core to +2.8 b, roll 10°), the up-beam
-  (29-40), the core drops back with the column down to the floor (41-44), blast 48, settle back (81-130).
-- `tower_throw`: dip to 2.8 b with a 27° roll toward the player (0-12), vent column and the medallions flung out
-  (12-20), the tower telescopes up (20-38), the flame band (38-55, module fx at `tower_top`), bursts from 55 every
-  6 t, throws from 95 every 8 t, revert with a roll wobble (142-157).
-- `warp_out` / `warp_in_field` (manifest `hidden`: `warp_out` [12, −1], `warp_in_field` [−1, 1]; −1 = the clip
-  start or end): the halo flips upright while the device noses up 35° (0-11), the rig scales to 0 by 12 and stays
-  hidden to the end of `warp_out` (it holds there until the module plays `warp_in_field`), so moving the body at
-  `out` (13) is invisible. `warp_in_field` scales it back at the body's new spot (0-2, ring centre 5.8 b) and
-  unfolds the field form (1-17), link beams and violet column at 17-21.
-- `wave` / `wave_long` / `wave_drop` (「인력 충격파」): the charge sphere grows in 4 pulses (24 t / 40 t), the 1 t gold
-  beam down and the burst flare at `impact` (the front leaves the axis then). `wave_drop` sinks during the charge and
-  drops onto the floor (ring centre 2.4 b) at `land`, grounded 20 t, then rises.
-- `field_erupt` (F1): the arch locks facing the front and the eye looks out (0-12), the eruption pulse at 22, back
-  to the hover by 40; the module runs the eruption events on its own clock. `frock` is an optional F2 clip (vent
-  column, flame band, bursts from 25, throws from 65).
-- `field_end`: lift-off flash (0) and a 20 t rise to 6.2 b, the lances out (20-40), the pack-up roll and rock
-  (50-72), the lances dock and the core swings up into the hole (72-96; call `look/idle` at 72 or earlier).
-- `break`: call `crack/4` at 0 or at `burst`. The bubble flares and bursts (0-7), the whole device tilts 28° in 9 t
-  (5-14), a damped wobble ±8° → 0 (14-34) while it sinks into the groggy slump.
-- `recover`: re-level 6 t, the core flips to the top 9 t (the arch swings over), back to cruise.
-- `death`: the seam flickers hot / off three times (0-18), the halo drops and rolls off, the pods stop and fall, the
-  spikes droop, the ring tilts 30° and sinks until its low rim rests on the floor (20-60), the pendulum topples, the
-  medallions clatter down; everything scales out (70-110). Call `kill` after 110.
+Bold events are the ones the module core and the stage-2 specs read today (`mb3/spec`). Form switches (manifest
+`forms`): `entrance` dormant 0 → cruise 94; `laser` laser 4 → cruise 165; `coreup` coreup 15 → cruise 120;
+`tower_throw` tower 38 → cruise 150; `warp_in_field` field 17; `field_end` deployed 20 → cruise 70; `recover`
+cruise 15. Hidden spans (manifest `hidden`, −1 = the clip start or end): `warp_out` [12, −1], `warp_in_field` [−1, 1].
+
+### 6.1 Per clip
+
+- **`entrance`** (v1 0.0-5.5 s; plan: untargetable until about t94). Folded at ring centre 2.15 b (temporary off
+  look), the clank jolt (16), a gold flare at the hub (20-29), the pods drop and spin up (20-30), the halo and the
+  inner ring rise out of the hole and the core drum grows on top while the ring lifts to 2.8 b with the plate and the
+  pendulum hanging under it, the dagger near the floor (30-50). The eye opens at 60: call `look/idle` there (the
+  clip ends its temporary off look at 60). The arch turns from flat to its 35° tilt and the eye swings from up to the
+  front (60-78), the rise 2.8 → 4.5 b (64-94, eased) with the stack spreading as it leaves the floor, an overshoot and
+  settle (94-110). Turn the body to the player from `risen` (`face/track`; footage +99..110).
+- **C1 = `bomb_run` + `slam`** (v1 5.75-10.6 s). `bomb_run` chains into `slam` at 57 by itself and the module plays
+  `slam` on the same tick (the same result), so on the pattern clock: turn and nose down 16° while rising to 4.8 b
+  0-10, ports glow 10-12 (temporary charge look), the run 12-57 (glide the body about 0.55 b/t, bombs from
+  `port_0..7`), level out 48-57; then the column 57-70, the plunge 70-74, the slam **74** (= 57 + `impact`), the rise
+  74-94.
+- **`slam`** (C2, and the finisher). The eye turns face down, the arch flat, the core sinks 0.35 b (0-4), the gold
+  column reaches the floor (4-8) and holds while the device lifts 0.25 b (8-13), the plunge to ring centre 2.1 b
+  (13-17, ease in), the slam at 17 (r 5), a bounce and sit (17-22), the rise to 4.5 b (22-37). Charge look 0-22.
+- **`laser`** (C3, v1 13.9-22.6 s). The medallions drop from the docks to r 2.8 b, 2 b under the ring, beside the
+  core (0-4), the charge (4-22, charge look, the medallions tremble), thin aim lines (20), fire at 22 with a width
+  bloom 0.5 → 1.0 b (22-25), 133 t of counter-orbit at exactly 5°/t, the width back to 0.5 (148-155), beams off
+  (155-157), the medallions rise back into the docks finishing their second turn (155-165). **Hazard aim** (manifest
+  `orbit` {from 22, to 155, rate 5, medal_eye {az0 90, sense −1}, medal_gear {az0 −90, sense +1}, beam {from_down
+  48, length 3.74, spot_r 5.58}}): at clip tick t in 22..155 the eye medallion is at azimuth `90 − 5(t − 22)` and the
+  gear at `−90 + 5(t − 22)` (azimuth = degrees round the ring axis from the device front toward its **left**, +x; in
+  MC yaw terms yaw = body yaw − az). Each beam runs from its medallion (r 2.8, 2.0 b under the ring centre) radially
+  down-out at 48° from vertical to a floor spot at r 5.58 b. The spots start at the sides, meet in front 18 t after
+  `fire`, then every 36 t (back, front, …). Do not yaw the body during the clip.
+- **`missiles`** (C4, v1 25.7-29.3 s). The spikes tip up 10° and tremble while their tips flare (0-8; fx at
+  `spike_tip_l/r`), the eye turns up, the arch lies flat and the gold vent column rises 6 b from the core, lifting the
+  halo (8-12), held and flickering (12-23), ten launches 23-37 from `vent_l` / `vent_r` with a recoil sag, the column
+  drops away (38-41), back to cruise by 60. Charge look 0-42.
+- **`coreup`** (C5, v4 2.55-6.5 s; model.md §5.3). The spark (0), the arch upright and the eye out (1-4), the gold
+  flash (5-8, `core_glow` 0 → 1.6 → 1.1), the lift (6-15): the exposed gold sphere rises 2.8 b over the ring, the device rises to 5.0 b and rolls
+  10°, the spikes roll vertical, the medallions slide to the ring ends facing out and the iris spike flips up; hold
+  (15-28), the up-beam (28-40, gold column up 6 b), the core drops back to +0.6 b and the column goes down to the floor
+  (41-44), the blast at 48 (a recoil jolt), hold (49-81), the return with a roll rock (81-130).
+- **`tower_throw`** (C6, v3 17.0-24.85 s). The dip toward the player to ring centre 2.9 b, nose down 24° and rolled 8°
+  (0-12), the vent: column up and the medallions flung up and out to ±5.5 b (12-20), the rise and level while the tower
+  telescopes up (20-38; the medallions dock on the column top by 36), the flame band charge (38-55; the tiers
+  counter-rotate at 4.5°/t), eight bursts at manifest `bursts` 55, 61, …, 97 (a dip and a tier pulse each), five
+  throws at `throws` 100, 108, …, 132 (a roll twitch each), the revert: the tower folds and a roll wobble −18 → 9 → 0
+  (140-155). Charge look 10-142.
+- **`warp_out` / `warp_in_field`** (v1 31.85-34.4 s). The halo flips upright and spins like a wheel while the device
+  pitches nose up 35° (0-11), the rig scales to 0 in 1 t (11-12); flash at `hide` 12, move the body at `out` 13; it
+  holds hidden until the module plays `warp_in_field` at 34. `warp_in_field` flashes in (0-2, ring centre 5.8 b) and
+  unfolds like a spring (1-17: the core drops and hangs, plates and pendulum spread, pods to core level, medallions
+  out, the gyroscope starts; overshoot at 12), the link beams and the violet column appear (17-21), settle (21-40).
+  Call `crack/0` + `look/field` at `unfold`.
+- **`wave` / `wave_long`**: the charge sphere (`core_glow` charge) grows round the core to scale 1.5 in four pulses (24 / 40 t), the 1 t
+  gold beam from the core to the floor at `beam`, the burst at `impact` (the front starts), a 0.16 b recoil lift.
+  **`wave_drop`**: the 40 t charge sinks the device 0.5 b, the burst at 40, then it drops onto the floor (40-44:
+  ring centre 2.4 b, the core resting on the floor), grounded to 63, the lift-off flash at `lift` 63 and the rise.
+- **`field_erupt` → `field_active`** (F1, v3 2.2-3.3 s). The gyroscope arch slows and locks facing the front, the
+  eye looks out, the device rises 0.15 b (0-12), the medallions slide out to r 4.2 b on brightening link beams and
+  the core flashes gold (12-22). It then loops in `field_active` (arch locked, bright pulsing links) until the module
+  plays another clip: **play `field_idle` when the pattern is over** (the footage's gyroscope spins again when the
+  beams go off).
+- **`frock`** (F2). The arch locks, the gold vent column up 4 b with a roll (0-12), back to the violet column, the
+  flame band (8-25, fx), eight bursts at `bursts` 25..67 (dips), five throws at `throws` 65..97 (roll twitches), `end`
+  100, back to the field hover by 110.
+- **`field_end`** (v2 26.3-31.3 s). The lift-off flash and the rise to 6.3 b (0-20) while the links and the violet
+  column go out, the spikes turn spike-down in their docks, the lances move out to 5.6 b with the medallions in their
+  X frames (20-28), turn horizontal (32-40, the deployed form), the pack-up roll 24 → −15 → 8° while the core swings
+  up to the top (40-55), the lances dock and the pods tuck (50-62), settle to 4.5 b (55-70). Call `look/idle` at
+  `dock` (58), so the violet fades with the pack.
+- **`break`** (v2 11.9-14.95 s). Call `crack/4` at `burst` (5). The bubble flares with the core (0-5), bursts (5-7,
+  scale 1 → 1.6 → 0), the links, the violet column and the Ousia flame go out, the seam goes dark (temporary groggy
+  look from 8), the device tilts 28° in 9 t (5-14), a damped wobble ±8° → 0 (14-34) while it sinks to the groggy slump
+  (14-40). Then `groggy` (call `look/groggy`).
+- **`groggy`**: ring centre 3.3 b, roll 25°, pitch 8°, a slow ±3° wobble, the core sunk with the arch upright, the
+  halo slid and tilted, pods at a quarter speed, the pendulum swinging ±12°. **`recover`**: re-level and rise (0-6),
+  the core flips to the top while the arch turns 180° over (6-15); call `look/idle` at 0.
+- **`death`**: the seam flickers three times (0-16), every spinner stops (14-20), the halo slides off the low side
+  and lands flat on the floor, the pods drop, the spikes droop, the ring tilts 40° and sinks onto its low rim (ring
+  centre 3.0 b; 26-60) with a bounce (60-67), the pendulum topples, the medallions clatter down; everything scales out
+  (80-110). It holds there; call `kill` after 110.
+
+### 6.2 Changes from the first rig (0f7c0e8)
+
+| clip | was | now |
+|---|---|---|
+| `entrance` | 130: pods 24, eye 54, rise 80, risen 110, face 115 | 110: pods 20, eye 60, rise 64, risen 94, face 99 |
+| `bomb_run` | 58 → `idle_cruise`, end 56 | 57 → `slam`, end 57 |
+| `slam` | 45: impact 16, rise 23 | 37: impact 17, rise 22, risen 37 |
+| `laser` | 175: aim 23, fire 25, off 158, `orbit` 25-158 | 165: aim 20, fire 22, off 155, `orbit` 22-155 |
+| `missiles` | 64: launch 22, last 35 | 60: launch 23, last 37 |
+| `coreup` | up 16, cruise form at 128 | up 15, cruise form at 120 |
+| `tower_throw` | 157: throw 95, revert 142 | 155: throw 100, revert 140 (+ `bursts`, `throws`) |
+| `warp_in_field` | 24 | 40 (events unchanged) |
+| `wave` / `wave_long` | impact 25 / 41 | impact 24 / 40 (+ `burst`) |
+| `wave_drop` | drop 36, land 40, lift 60, risen 80 | burst 40, then drop 40, land 44, lift 63, risen 83 |
+| `field_erupt` | 40 → `field_idle` | 22 → `field_active` (new loop) |
+| `field_end` | 102: horiz 40, pack 50, dock 72, packed 96 | 70: horiz 32, pack 40, dock 58, packed 70 |
+| `break` | 34 | 40 (burst 5, wobble 14 unchanged) |
+| `death` | land 60, out 70 | land 62, out 80 |
+| `idle_cruise` / `glide` | 160 / 40 | 240 / 80 |
+
+Unchanged: `frock` (burst 25, throw 65, end 100), `warp_out`, `recover`, `groggy`.
 
 **Anchors.** `anchors[event]` in each manifest clip entry (and `form_states.<form>.rest_anchors`) hold fx points in
 rig coordinates, blocks from the anchor: x the device's left, y up, −z its front, so the body-frame position is
@@ -254,7 +340,11 @@ tilts and rolls at that tick.
 
 - `parts`: `{name, uuid, tag, model, brightness, scale, elements}` per part, then the alias entries
   `{name, tag, alias_of}`.
-- `clips`: `{id, name, len, loop, next, events, keyFiles, keys, note, anchors, forms?, hidden?, orbit?, spin_turns}`.
+- `clips`: `{id, name, len, loop, next, events, keyFiles, keys, note, anchors, forms?, hidden?, orbit?, bursts?,
+  throws?, spin_deg, end_snap}`: `orbit` (laser) the beam azimuths, `bursts` / `throws` (`tower_throw`, `frock`) the
+  clip ticks of every burst dip and throw twitch, `spin_deg` each spinner's angle over the clip (a multiple of its
+  symmetry step), `end_snap` the number of parts snapped at the last tick (§6).
+- `spinners`: `rates` (degrees per tick in the cruise pose) and `symmetry_deg` (the step each spinner ends on).
 - `rig_forms` (the seven names), `forms` (`{clip: [[tick, form], ...]}`), `hidden` (`{clip: [hide, show]}`),
   `form_states` (per form its id, function, hold clip, ring centre, rest anchors).
 - `looks`, `look_ids`, `look_models`, `crack` (objective, stages, part), `clip_models`, `props` (function, tag,
@@ -278,11 +368,12 @@ The generator refuses to write a rig that fails these (`--allow-steps` turns the
 - **Rotation per tick and per key:** no part turns more than 120° between two ticks or within one interpolation
   segment (blend-ins included); large one-tick steps are also solved at the half tick.
 - **Alignment** (every tick of every clip): no horizontal root travel; while visible, the pendulum tip, the drill
-  tips and the ring's low rim stay over the floor; every event and form switch inside its clip; form names valid.
+  tips, the spike tips, the ring's low rim and the core sphere stay over the floor, the medallion centres at least
+  0.45 b and the halo centre 0.2 b over it; every event and form switch inside its clip; form names valid.
 - **Keys:** the first key at tick 0, the last at the clip length, `next` must name a clip.
 - **Parts** ≤ 32; **item models** within −16..32 (single-axis element rotations, multiples of 22.5°).
 - **Atlas:** ≤ 0.5 M px (now 106 sprites, 0.45 M px), every side ≤ 512 px and a multiple of 16.
-- Compiled: 27 clips, 1595 key files, 9578 part keys; 47 item models with 4083 elements. A part gets a key only
+- Compiled: 28 clips, 1936 key files, 14499 part keys; 47 item models with 4083 elements. A part gets a key only
   where the client's lerp/slerp would drift from the authored pose by more than 0.012 b, 0.25-2° (per part) or
   1.5 % scale.
 

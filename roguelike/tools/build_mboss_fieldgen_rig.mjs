@@ -28,7 +28,7 @@ import {fileURLToPath} from 'node:url';
 import {paintFieldgenTextures, spriteId, fieldgenSprites} from './fieldgen_paint.mjs';
 import {partModels, checkBounds, RING, EMPTY, SPIKE_TIP} from './fieldgen_geometry.mjs';
 import {solve, toDisplay, PART_SCALE, FORMS, radial} from './fieldgen_pose.mjs';
-import {CLIPS, accumulate, sampleClip as sample, restPose, FORM_HOLD, spinTurns} from './fieldgen_clips.mjs';
+import {CLIPS, accumulate, sampleClip as sample, restPose, FORM_HOLD, spinInfo, snapPose, SYM} from './fieldgen_clips.mjs';
 import {add, rot} from './mboss_rig_math.mjs';
 import {createRigCompiler, nbt} from './mboss_rig_compile.mjs';
 
@@ -176,6 +176,11 @@ function alignment(c, frames) {
     for (const n of ['drill_fl', 'drill_fr', 'drill_bl', 'drill_br']) { const y = at(f.o, n, [0, -16, 0])[1]; if (y < .02 && f.o[n].s[0] > .05) out.push(`${c.name} t${t}: ${n} tip ${y.toFixed(2)} b`); }
     const ringLow = f.o.ring.t[1] - Math.abs(Math.sin(Math.max(Math.abs(f.p.rot[0]), Math.abs(f.p.rot[2])) * Math.PI / 180)) * 3.5 - .72;
     if (ringLow < -.05) out.push(`${c.name} t${t}: ring rim ${ringLow.toFixed(2)} b`);
+    const coreLow = f.o.core.t[1] - 1.25 * f.p.coreS * f.p.vis;
+    if (coreLow < -.05) out.push(`${c.name} t${t}: core bottom ${coreLow.toFixed(2)} b`);
+    for (const [n, x] of [['spike_l', SPIKE_TIP], ['spike_r', -SPIKE_TIP]]) { const y = at(f.o, n, [x, 0, 0])[1]; if (y < .02) out.push(`${c.name} t${t}: ${n} tip ${y.toFixed(2)} b`); }
+    for (const n of ['medal_eye', 'medal_gear']) if (f.o[n].t[1] < .45) out.push(`${c.name} t${t}: ${n} centre ${f.o[n].t[1].toFixed(2)} b`);
+    if (f.o.halo.s[0] > .05 && f.o.halo.t[1] < .2) out.push(`${c.name} t${t}: halo centre ${f.o.halo.t[1].toFixed(2)} b`);
   });
   for (const [e, t] of Object.entries(c.events || {})) if (!(t >= 0 && t <= c.len)) out.push(`${c.name}: event ${e} at ${t} outside 0..${c.len}`);
   return out;
@@ -191,10 +196,23 @@ for (const c of CLIPS) {
   debugFrames = frames;
   alignErrors.push(...alignment(c, frames));
   // temporary looks (lk): a look name shows that look's models without touching fgRigLook; back to 'el' re-applies it
+  // the end snap of a looping / chaining clip (fieldgen_clips.mjs snapPose): at its last tick the spinners (and an
+  // arch turned over) jump back by a symmetry multiple, invisibly, with interpolation 0; shown parts only
+  const snap = snapPose(c), snapLines = [];
+  if (snap) {
+    snap.pose.beamLook2 = snap.pose.beamLook;
+    const o = solve(snap.pose);
+    for (const n of snap.parts) {
+      const d = toDisplay(n, o[n]);
+      if (d.s.every(x => Math.abs(x) < 1e-4)) continue;
+      snapLines.push(`data merge entity ${uuidOf(n)} {start_interpolation:0,interpolation_duration:0,transformation:${nbt(d)}}`);
+    }
+  }
   const extra = t => {
     const out = [], p = frames[t].p, q0 = t ? frames[t - 1].p : null;
     if (!q0) out.push(p.lk === 'el' ? `execute if score @s fgRigTmp matches 1 run function ${NS}/look_apply` : `function ${NS}/look/temp_${p.lk}`);
     else if (p.lk !== q0.lk) out.push(p.lk === 'el' ? `function ${NS}/look_apply` : `function ${NS}/look/temp_${p.lk}`);
+    if (snap && t === snap.t) out.push(...snapLines);
     return out;
   };
   const r = (debugOf(c) ? debugCompiler : compiler).compileClip(c, frames, a => frame(c, a + .5, ks), extra);
@@ -202,7 +220,9 @@ for (const c of CLIPS) {
   r.warns.forEach(w => warns.add(w));
   const ev = Object.fromEntries(Object.entries(c.events || {}).map(([n, t]) => [n, anchors(frames[Math.min(t, c.len)].o)]));
   for (const [t, f] of c.forms || []) if (!(t >= 0 && t <= c.len) || !FORM_ID[f]) throw new Error(`clip ${c.name}: bad form switch ${t} ${f}`);
-  clipInfo.push({...r.info, anchors: ev, ...(c.forms ? {forms: c.forms} : {}), ...(c.hidden ? {hidden: c.hidden} : {}), ...(c.orbit ? {orbit: c.orbit} : {}), spin_turns: spinTurns(c)});
+  const si = spinInfo(c);
+  clipInfo.push({...r.info, anchors: ev, ...(c.forms ? {forms: c.forms} : {}), ...(c.hidden ? {hidden: c.hidden} : {}), ...(c.orbit ? {orbit: c.orbit} : {}),
+    ...(c.bursts ? {bursts: c.bursts} : {}), ...(c.throws ? {throws: c.throws} : {}), spin_deg: si.deg, end_snap: snap ? snapLines.length : 0});
 }
 if (alignErrors.length) {
   const msg = `clip alignment:\n  ` + alignErrors.slice(0, 60).join('\n  ') + (alignErrors.length > 60 ? `\n  ... ${alignErrors.length} in all` : '');
@@ -310,6 +330,7 @@ json(manifestPath, {
   hidden: Object.fromEntries(CLIPS.filter(c => c.hidden).map(c => [c.name, c.hidden])),
   form_states: Object.fromEntries(Object.entries(FORM_ID).map(([f, id]) => [f, {id, function: `${NS}/form/${f}`, hold: FORM_HOLD[f], ring_centre: FORMS[f].pos[1], rest_anchors: anchors(solve(restPose(f)))}])),
   looks: Object.keys(LOOKS), look_ids: LOOK_ID, look_models: LOOKS,
+  spinners: {rates: Object.fromEntries(Object.entries(FORMS.cruise).filter(([n]) => /^w[A-Z]/.test(n))), symmetry_deg: SYM},
   crack: {objective: 'fgRigCrack', stages: {0: 'hits 0-4', 1: 'hits 5-9', 2: 'hits 10-14', 3: 'hits 15-19', 4: 'burst (with play/break)'}, part: 'core_shell'},
   clip_models: Object.fromEntries(Object.entries(MODEL_OF).filter(([k2]) => k2 !== 'beamLook2').map(([k2, [part, map]]) => [k2, {part, models: map}])),
   props: Object.fromEntries(Object.entries(PROP_DEF).map(([k2, l]) => [k2, {function: `${NS}/prop/${k2}`, tag: 'rlk_mb_fg_prop_' + k2, displays: l.map(([m, s]) => ({model: itemId(m), scale: s})), note: PROP_NOTE[k2]}])),

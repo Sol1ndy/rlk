@@ -1,2 +1,2 @@
-execute if score @s fgRigT matches ..50 run return run function rlk:mboss/fieldgen/rig/c/groggy/b/47_50
-function rlk:mboss/fieldgen/rig/c/groggy/b/51_54
+execute if score @s fgRigT matches ..49 run return run function rlk:mboss/fieldgen/rig/c/groggy/b/47_49
+function rlk:mboss/fieldgen/rig/c/groggy/b/50_54

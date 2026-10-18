@@ -1,2 +1,2 @@
-execute if score @s fgRigT matches ..103 run return run function rlk:mboss/fieldgen/rig/c/death/b/98_103
-function rlk:mboss/fieldgen/rig/c/death/b/104_109
+execute if score @s fgRigT matches ..102 run return run function rlk:mboss/fieldgen/rig/c/death/b/98_102
+function rlk:mboss/fieldgen/rig/c/death/b/103_109

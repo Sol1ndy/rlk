@@ -1,0 +1,5 @@
+execute if score @s fgRigT matches 102 run return run function rlk:mboss/fieldgen/rig/c/field_idle/k/102
+execute if score @s fgRigT matches 103 run return run function rlk:mboss/fieldgen/rig/c/field_idle/k/103
+execute if score @s fgRigT matches 104 run return run function rlk:mboss/fieldgen/rig/c/field_idle/k/104
+execute if score @s fgRigT matches 107 run return run function rlk:mboss/fieldgen/rig/c/field_idle/k/107
+execute if score @s fgRigT matches 108 run return run function rlk:mboss/fieldgen/rig/c/field_idle/k/108
