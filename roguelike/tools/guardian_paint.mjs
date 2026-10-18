@@ -34,7 +34,7 @@ import path from 'node:path';
 import {png, paint, ramp} from './weapon_paint.mjs';
 import {
   rng, C, hex, clamp, smooth, mix, fbm, TRANSPARENT, paintT, onCard, cubic, spline, Path, Shape, mirrorX, star4in,
-  Feather, bladeProfile, roundProfile, featherPath, featherColour, firstHit, FEATHER_WHITE, FEATHER_CREAM, inPoly, distPoly,
+  Feather, bladeProfile, roundProfile, featherPath, featherColour, firstHit, FEATHER_WHITE, FEATHER_CREAM, inPoly, distPoly, paintSpriteSet,
 } from './guardian_paint_lib.mjs';
 
 const PAL = {
@@ -1157,28 +1157,8 @@ export function guardianSprites() {
 }
 
 export const spriteId = name => 'rlk:mboss/guardian/' + name;
-// Paint every sprite into the resource pack and merge them into the item atlas.
+// Paint every sprite into the resource pack and merge them into the item atlas (mboss_paint_lib.mjs
+// paintSpriteSet; the generator owns textures/mboss/guardian).
 export function paintGuardianTextures(rp, only = null) {
-  const dir = path.join(rp, 'assets/rlk/textures/mboss/guardian');
-  fs.mkdirSync(dir, {recursive: true});
-  const sprites = guardianSprites();
-  for (const [name, [w, h, fn, translucent]] of Object.entries(sprites)) {
-    if (only && !only.includes(name)) continue;
-    fs.writeFileSync(path.join(dir, name + '.png'), png(w, h, translucent ? paintT(w, h, fn) : paint(w, h, fn)));
-  }
-  const atlasPath = path.join(rp, 'assets/minecraft/atlases/items.json');
-  const atlas = fs.existsSync(atlasPath) ? JSON.parse(fs.readFileSync(atlasPath, 'utf8')) : {sources: []};
-  // the generator owns textures/mboss/guardian: drop sprites (files and atlas entries) that the
-  // current painter no longer makes
-  const ids = new Set(Object.keys(sprites).map(spriteId));
-  if (!only) for (const f of fs.readdirSync(dir)) if (f.endsWith('.png') && !(f.slice(0, -4) in sprites)) fs.rmSync(path.join(dir, f));
-  atlas.sources = atlas.sources.filter(s => { const id = s.sprite || s.resource || ''; return !id.startsWith(spriteId('')) || ids.has(id); });
-  const known = new Set(atlas.sources.map(s => s.sprite || s.resource));
-  for (const name of Object.keys(sprites)) {
-    const id = spriteId(name);
-    if (!known.has(id)) atlas.sources.push({type: 'minecraft:single', resource: id});
-  }
-  fs.mkdirSync(path.dirname(atlasPath), {recursive: true});
-  fs.writeFileSync(atlasPath, JSON.stringify(atlas, null, 2) + '\n');
-  return Object.keys(sprites);
+  return paintSpriteSet(rp, 'assets/rlk/textures/mboss/guardian', guardianSprites(), spriteId, only);
 }

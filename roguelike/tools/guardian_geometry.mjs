@@ -14,99 +14,13 @@ import {CARD} from './guardian_paint.mjs';
 import {rng} from './guardian_paint_lib.mjs';
 import {q as qE, rot as qRot, mul as qMul} from './guardian_rig_math.mjs';
 import {DEFAULT_POSE} from './guardian_clips.mjs';
+import {r4, toM, FACE_OF, solveUV, rotM, abox, cardZ as cardZRect, cardX, shiftRect, mirrorRect, cube, AXV, AZV, D2R, vadd, vsub, vsc, vdot, rotA,
+  faceOfDir, faceEl, lathe, disc as discTex, DK, turned, stations, knob as knobTex, taperY, checkBounds} from './mboss_model_lib.mjs';
 
-const r4 = v => Math.round(v * 1e4) / 1e4;
-const toM = ([X, Y, Z]) => [8 - X, 8 + Y, 8 + Z];
-const FACE_OF = {front: 'north', back: 'south', left: 'west', right: 'east', up: 'up', down: 'down'};
-const corners = (face, [x0, y0, z0], [x1, y1, z1]) => ({
-  north: [[x1, y1, z0], [x0, y1, z0], [x0, y0, z0], [x1, y0, z0]],
-  south: [[x0, y1, z1], [x1, y1, z1], [x1, y0, z1], [x0, y0, z1]],
-  east: [[x1, y1, z1], [x1, y1, z0], [x1, y0, z0], [x1, y0, z1]],
-  west: [[x0, y1, z0], [x0, y1, z1], [x0, y0, z1], [x0, y0, z0]],
-  up: [[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]],
-  down: [[x0, y0, z1], [x1, y0, z1], [x1, y0, z0], [x0, y0, z0]],
-})[face];
-function solveUV(face, lo, hi, fn) {
-  const D = corners(face, lo, hi).map(fn), eq = (a, b) => Math.abs(a - b) < 1e-5;
-  for (let k = 0; k < 4; k++) {
-    const u = [0, 1, 2, 3].map(j => D[(j + k) % 4]);
-    if (eq(u[0][1], u[1][1]) && eq(u[1][0], u[2][0]) && eq(u[2][1], u[3][1]) && eq(u[3][0], u[0][0]))
-      return [[u[0][0], u[0][1], u[2][0], u[2][1]].map(v => r4(Math.min(16, Math.max(0, v)))), k * 90];
-  }
-  throw new Error('no uv solution for ' + face);
-}
-const rotM = rot => {
-  if (!rot) return undefined;
-  const [axis, angle, origin] = rot;
-  if (![-45, -22.5, 22.5, 45].includes(angle)) throw new Error('element rotation ' + angle);
-  return {origin: toM(origin).map(r4), axis, angle: axis === 'x' ? angle : -angle};
-};
-// Box in the A-frame. tex: sprite name, or {all, front, back, left, right, up, down, uv}.
-export function abox(a, b, tex, {rot, shade = true, uv = [0, 0, 16, 16], drop = []} = {}) {
-  const lo = a.map((v, i) => Math.min(v, b[i])), hi = a.map((v, i) => Math.max(v, b[i]));
-  const from = [8 - hi[0], 8 + lo[1], 8 + lo[2]].map(r4), to = [8 - lo[0], 8 + hi[1], 8 + hi[2]].map(r4);
-  const spec = typeof tex === 'string' ? {all: tex} : tex;
-  const faces = {};
-  for (const [af, mf] of Object.entries(FACE_OF)) {
-    if (drop.includes(af)) continue;
-    const t = spec[af] || spec.all;
-    if (!t) continue;
-    faces[mf] = {texture: '#' + t, uv: (spec.uv && spec.uv[af]) || uv};
-  }
-  const el = {from, to, faces};
-  if (!shade) el.shade = false;
-  const r = rotM(rot);
-  if (r) el.rotation = r;
-  return el;
-}
-// Card in the plane Z = z, spanning rect {X0,X1,Y0,Y1} (A-frame), sprite as painted, seen from -Z.
-// uvr = sprite sub-rectangle [u0, v0, u1, v1] in 0..1; flipU mirrors the sprite left-right.
-export function cardZ(sprite, z, rect = CARD[sprite], {uvr = [0, 0, 1, 1], flipU = false, rot, shade = false, tint = false} = {}) {
-  const {X0, X1, Y0, Y1} = rect;
-  const from = [8 - X1, 8 + Y0, 8 + z].map(r4), to = [8 - X0, 8 + Y1, 8 + z].map(r4);
-  const fn = p => {
-    const X = 8 - p[0], Y = p[1] - 8;
-    let s = (X - X0) / (X1 - X0);
-    if (flipU) s = 1 - s;
-    const t = (Y1 - Y) / (Y1 - Y0);
-    return [16 * (uvr[0] + (uvr[2] - uvr[0]) * s), 16 * (uvr[1] + (uvr[3] - uvr[1]) * t)];
-  };
-  const faces = {};
-  for (const f of ['north', 'south']) {
-    const [uv, r] = solveUV(f, from, to, fn);
-    faces[f] = {texture: '#' + sprite, uv, ...(r ? {rotation: r} : {}), ...(tint ? {tintindex: 0} : {})};
-  }
-  const el = {from, to, faces};
-  if (!shade) el.shade = false;
-  const r = rotM(rot);
-  if (r) el.rotation = r;
-  return el;
-}
-// Card in the plane X = x: u runs along +Z (toward her back) over Z0..Z1, v top to bottom.
-export function cardX(sprite, x, {Z0, Z1, Y0, Y1}, {uvr = [0, 0, 1, 1], flipU = false, rot, shade = false, tint = false} = {}) {
-  const from = [8 - x, 8 + Y0, 8 + Z0].map(r4), to = [8 - x, 8 + Y1, 8 + Z1].map(r4);
-  const fn = p => {
-    const Z = p[2] - 8, Y = p[1] - 8;
-    let s = (Z - Z0) / (Z1 - Z0);
-    if (flipU) s = 1 - s;
-    const t = (Y1 - Y) / (Y1 - Y0);
-    return [16 * (uvr[0] + (uvr[2] - uvr[0]) * s), 16 * (uvr[1] + (uvr[3] - uvr[1]) * t)];
-  };
-  const faces = {};
-  for (const f of ['east', 'west']) {
-    const [uv, r] = solveUV(f, from, to, fn);
-    faces[f] = {texture: '#' + sprite, uv, ...(r ? {rotation: r} : {}), ...(tint ? {tintindex: 0} : {})};
-  }
-  const el = {from, to, faces};
-  if (!shade) el.shade = false;
-  const r = rotM(rot);
-  if (r) el.rotation = r;
-  return el;
-}
-const shiftRect = (r, dx = 0, dy = 0) => ({X0: r.X0 + dx, X1: r.X1 + dx, Y0: r.Y0 + dy, Y1: r.Y1 + dy});
-const mirrorRect = r => ({X0: -r.X1, X1: -r.X0, Y0: r.Y0, Y1: r.Y1});
+export {abox, cardX, checkBounds};
+// Card in the plane Z = z on rect (default: the sprite's CARD rectangle), see mboss_model_lib.mjs cardZ.
+export const cardZ = (sprite, z, rect = CARD[sprite], opt) => cardZRect(sprite, z, rect, opt);
 const plate = (sprite, cx, cy, size, z, opt) => cardZ(sprite, z, {X0: cx - size / 2, X1: cx + size / 2, Y0: cy - size / 2, Y1: cy + size / 2}, opt);
-const cube = (c, s, tex, rot) => abox([c[0] - s / 2, c[1] - s / 2, c[2] - s / 2], [c[0] + s / 2, c[1] + s / 2, c[2] + s / 2], tex, {rot: rot ? [rot[0], rot[1], c] : undefined});
 
 // ---- parts --------------------------------------------------------------------------------
 // Display scale per part (blocks per 16 model units = scale).
@@ -361,97 +275,10 @@ function clawOpen() {
   e.push(...talonPair(tal, 1.8, -.3, -1.4, -1.4 - tl[0] * .75, .26, ['z', 22.5, [1.25, -.2, 0]]));
   return e;
 }
-// ---- turned (lathe) geometry --------------------------------------------------------------
-// A round section is a ring of n flat facets (16 by default) about an axis. Each facet is a
-// one-face card turned to its azimuth (single-axis element rotations in 22.5 degree steps), so
-// the outline is round from every side. The facets are unshaded: their wrap-round texture
-// carries the light (a metal highlight toward the side most views see), like the painted cards,
-// so the gold keeps its colour instead of the game's dim side-face shading. All facets of one
-// lathe share that texture: u = azimuth (facet k shows [k/n, (k+1)/n] of
-// the sprite, azimuth 0 = e0 below), v = position along the axis (vFrom -> 0, vTo -> 1).
-const AXV = {x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1]};
-const AZV = {y: [[0, 0, -1], [1, 0, 0]], x: [[0, 0, -1], [0, 1, 0]], z: [[0, 1, 0], [1, 0, 0]]};
-const D2R = Math.PI / 180;
-const vadd = (a, b) => a.map((x, i) => x + b[i]), vsub = (a, b) => a.map((x, i) => x - b[i]);
-const vsc = (v, s) => v.map(x => x * s), vdot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-// Right-handed rotation about an A-frame axis (the sense of `rot` in abox / cardZ / cardX).
-function rotA(axis, deg, [x, y, z]) {
-  const c = Math.cos(deg * D2R), s = Math.sin(deg * D2R);
-  if (axis === 'x') return [x, y * c - z * s, y * s + z * c];
-  if (axis === 'y') return [x * c + z * s, y, -x * s + z * c];
-  return [x * c - y * s, x * s + y * c, z];
-}
-const faceOfDir = d => (d[0] > .5 ? 'left' : d[0] < -.5 ? 'right' : d[1] > .5 ? 'up' : d[1] < -.5 ? 'down' : d[2] > .5 ? 'back' : 'front');
-// Element spanning the A-frame points pts, with only the listed faces; a face's fn(P) maps its
-// A-frame corner points (before the element rotation) to texture [u, v] in 0..16.
-function faceEl(pts, faces, {rot, shade = true} = {}) {
-  const lo = [0, 1, 2].map(i => Math.min(...pts.map(p => p[i]))), hi = [0, 1, 2].map(i => Math.max(...pts.map(p => p[i])));
-  const from = [8 - hi[0], 8 + lo[1], 8 + lo[2]].map(r4), to = [8 - lo[0], 8 + hi[1], 8 + hi[2]].map(r4);
-  const out = {};
-  for (const [af, {tex, fn, uv}] of Object.entries(faces)) {
-    const mf = FACE_OF[af];
-    if (fn) {
-      const [u, r] = solveUV(mf, from, to, p => fn([8 - p[0], p[1] - 8, p[2] - 8]));
-      out[mf] = {texture: '#' + tex, uv: u, ...(r ? {rotation: r} : {})};
-    } else out[mf] = {texture: '#' + tex, uv: uv || [0, 0, 16, 16]};
-  }
-  const el = {from, to, faces: out};
-  if (!shade) el.shade = false;
-  const r = rotM(rot);
-  if (r) el.rotation = r;
-  return el;
-}
-// sections: [{a: [a0, a1] along the axis from c, r: facet inradius, tex}]
-function lathe(axis, c, sections, {vFrom, vTo, n = 16}) {
-  const A = AXV[axis], [e0, e1] = AZV[axis], dirs = [e0, e1, vsc(e0, -1), vsc(e1, -1)], els = [];
-  for (const {a: [a0, a1], r, tex} of sections) {
-    const w = 2 * r * Math.tan(Math.PI / n);
-    for (let k = 0; k < n; k++) {
-      const phi = k * 360 / n, q = Math.round(phi / 90), g = phi - 90 * q, d = dirs[q % 4], t = dirs[(q + 1) % 4];
-      const P = (a, s) => vadd(vadd(c, vsc(A, a)), vadd(vsc(d, r), vsc(t, s)));
-      const fn = X => { const rel = vsub(X, c); return [16 * (k + .5 + vdot(rel, t) / w) / n, 16 * (vdot(rel, A) - vFrom) / (vTo - vFrom)]; };
-      const sg = vdot(rotA(axis, 10, d), t) > 0 ? 1 : -1;
-      els.push(faceEl([P(a0, -w / 2), P(a1, w / 2)], {[faceOfDir(d)]: {tex, fn}},
-        {shade: false, rot: g ? [axis, sg * g, vadd(c, vsc(A, (a0 + a1) / 2))] : undefined}));
-    }
-  }
-  return els;
-}
-// Round end/ledge disc across the axis at a; side '+', '-' or '+-'. Discs are inscribed in the
-// ring they close (R = its facet inradius x 0.995) so they never show past the facets from the
-// side. A plain disc (gold sprite, game-shaded) closes a real armour step; a polar disc is
-// unshaded and maps its sprite so that the sprite angle atan2(u - .5, v - .5) is the lathe
-// azimuth, so a polar sprite painted per azimuth matches the facets beside it.
-function disc(axis, c, a, R, side, tex = 'gd_ldisc', polar = false) {
-  const A = AXV[axis], [e0, e1] = AZV[axis], O = vadd(c, vsc(A, a));
-  const P = (i, j) => vadd(O, vadd(vsc(e0, i * R), vsc(e1, j * R)));
-  const fn = polar ? X => { const rel = vsub(X, O); return [16 * (.5 + vdot(rel, e1) / (2 * R)), 16 * (.5 + vdot(rel, e0) / (2 * R))]; } : undefined;
-  const faces = {};
-  for (const sd of side) faces[faceOfDir(vsc(A, sd === '+' ? 1 : -1))] = {tex, fn};
-  return faceEl([P(-1, -1), P(1, 1)], faces, {shade: !polar});
-}
-const DK = .995;
-// Smooth turned solid: the radius profile prof(a) sampled on the stations `at` (ascending along
-// the axis). Section i spans [at[i], at[i+1]] at the radius of its midpoint and reaches 0.02 into
-// a wider neighbour; each step is closed by a polar ledge disc painted like the surface, so the
-// steps vanish and the outline follows the profile. ends '-' / '+' close the first / last station.
-function turned(axis, c, at, prof, tex, ledge, V, ends = '') {
-  const rs = at.slice(1).map((x, i) => prof((at[i] + x) / 2)), secs = [], els = [];
-  rs.forEach((r, i) => secs.push({a: [at[i] - (i > 0 && rs[i - 1] > r ? .02 : 0), at[i + 1] + (i < rs.length - 1 && rs[i + 1] > r ? .02 : 0)], r, tex}));
-  for (let i = 0; i < rs.length - 1; i++) if (Math.abs(rs[i] - rs[i + 1]) > 1e-3)
-    els.push(disc(axis, c, at[i + 1], Math.max(rs[i], rs[i + 1]) * DK, rs[i] > rs[i + 1] ? '+' : '-', ledge, true));
-  if (ends.includes('-')) els.push(disc(axis, c, at[0], rs[0] * DK, '-', ledge, true));
-  if (ends.includes('+')) els.push(disc(axis, c, at[at.length - 1], rs[rs.length - 1] * DK, '+', ledge, true));
-  return [...lathe(axis, c, secs, V), ...els];
-}
-const stations = (a0, a1, n) => Array.from({length: n + 1}, (_, i) => a0 + (a1 - a0) * i / n);
-// Turned knob: a sphere of radius R in twelve bands of equal angle (shoulder, elbow).
-function knob(axis, c, R) {
-  const at = Array.from({length: 13}, (_, i) => R * Math.sin((-90 + 15 * i) * D2R));
-  return turned(axis, c, at, a => R * Math.sqrt(Math.max(0, 1 - (a / R) ** 2)), 'gd_lknob', 'gd_ledge', {vFrom: R, vTo: -R}, '-+');
-}
-// Straight taper along Y from radius r0 at y0 down to r1 at y1 in n sections.
-const taperY = (y0, y1, r0, r1, n, tex, ledge, V) => turned('y', [0, 0, 0], stations(y1, y0, n), y => r1 + (r0 - r1) * (y - y1) / (y0 - y1), tex, ledge, V);
+// ---- turned (lathe) geometry: mboss_model_lib.mjs (lathe, turned, disc, knob, taperY) -------
+// The Guardian's plain armour-step discs use the gold disc sprite, its knobs the gold knob sprites.
+const disc = (axis, c, a, R, side, tex = 'gd_ldisc', polar = false) => discTex(axis, c, a, R, side, tex, polar);
+const knob = (axis, c, R) => knobTex(axis, c, R, 'gd_lknob', 'gd_ledge');
 // Left (gold) arm, model.md §3.4, ref.png and the binding feedback in plan.md: turned segments
 // (no box corners from any side) under a wrap-round paint. Upper arm: a gold shoulder lame with a
 // flared rim over a slim gold sleeve tapering to the elbow; forearm: a gold elbow flare, then a
@@ -641,6 +468,4 @@ function starCrystal(sprite) {
     cardZ('gd_star_core', 0, c, {rot: ['y', 45, [0, 0, 0]]}), cardZ('gd_star_core', 0, c, {rot: ['y', -45, [0, 0, 0]]})];
 }
 // Mirror a hand for the other side is not needed: the left hand has its own gold models.
-export function checkBounds(name, els) {
-  for (const e of els) for (const v of [...e.from, ...e.to]) if (v < -16 || v > 32) throw new Error(`model ${name} leaves -16..32: ${e.from} ${e.to}`);
-}
+// checkBounds: mboss_model_lib.mjs (re-exported above).
