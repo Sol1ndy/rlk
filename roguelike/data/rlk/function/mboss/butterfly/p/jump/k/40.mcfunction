@@ -1,8 +1,6 @@
 # jump clock 40
-function rlk:mboss/butterfly/u/lockp
-tag @e[type=minecraft:marker,tag=rlk_mb_bf_lock] add rlk_mb_bf_p2b
-tag @e[type=minecraft:marker,tag=rlk_mb_bf_p2b] remove rlk_mb_bf_lock
-scoreboard players set #hzKB mb 4
-scoreboard players set #hzSfx mb 1
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p2b,limit=1] run function rlk:mboss/hz/disc {r:25,tell:10,dmg:140}
+particle minecraft:dust{color:[0.667f,0.859f,0.518f],scale:1} ~-0.24 ~2.75 ~1.38 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.667f,0.859f,0.518f],scale:1} ~0.24 ~2.75 ~-1.38 0 0 0 0 1 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"sphere",pos:"^-0.36 ^2.77 ^0.3",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.6,s1:1.3,move:"0f,0f,0f",life:8,fade:2,col:16777215}
+execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"ripple",pos:"^-0.36 ^2.77 ^0.3",rot:"~ ~",bb:"center",roll:0,spin:120,s0:1.2,s1:1.8,move:"0f,0f,0f",life:8,fade:2,col:13957318}
 playsound minecraft:block.conduit.activate hostile @a[tag=player] ~ ~ ~ 0.4 1.8 0.13

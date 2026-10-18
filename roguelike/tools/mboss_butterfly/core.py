@@ -90,6 +90,8 @@ def build():
     assert all(p.id in range(1, 5) or p.form == 'b' or p.id == 20 for p in pats)
     core = Core(g, pats)
     core.emit()
+    from . import seq_h                         # [seq_h: human author] S1 / S3 / S4 visuals (seq_h/**), called by the hooks
+    seq_h.emit(g)
     for p in pats:
         for f in ('start', 'tick', 'cancel'):
             assert g.has(f'p/{p.key}/{f}'), f'{p.module}: pattern {p.key} has no {f}'
@@ -384,8 +386,7 @@ class Core:
         if cocoon:
             setup.append(cocoon)
         setup += [F('form/hitbox_h'), F('hud/refresh'),
-                  '# the glowing lime floor disc under the cocoon until the burst',
-                  f'execute positioned ~ {CY} ~ run ' + g.fx('cocoon_disc', life=INTRO_CLIP + ENT_BURST)]
+                  F('seq_h/entrance/setup')]       # [seq_h: human author] S1 visuals (the floor disc ...)
         self.w('intro/setup', setup)
         c = lambda t: INTRO_CLIP + t           # intro tick of entrance clip tick t
         self.w('intro_tick', [
@@ -394,63 +395,15 @@ class Core:
             f'# ({ENT_GLOW}), whiteout ({ENT_WHITE}), burst into crystal shards ({ENT_BURST}), the drop, landing ({ENT_LAND}), she stands',
             f'# ({ENT_LEN}); the fight at intro {INTRO_DONE}. No damage.',
             R('tick'),
-            'scoreboard players operation #bfM mb = #mbT mb',
-            'scoreboard players operation #bfM mb %= #bfK4 mb',
-            f'execute if score #bfM mb matches 0 if score #mbT mb matches 1..{c(ENT_BURST) - 1} run {F("intro/hover")}',
             at_t('#mbT', c(NAMEPLATE), F('intro/name')),
-            *[at_t('#mbT', c(t), 'execute positioned ~ ~2.0 ~ run ' + g.fx('motes')) for t in (0, 20, 40)],
-            at_t('#mbT', c(ENT_GLOW), F('intro/glow_snd')),
-            f'execute if score #bfM mb matches 0..1 if score #mbT mb matches {c(ENT_GLOW)}..{c(ENT_BURST) - 1} run {F("intro/glow")}',
-            at_t('#mbT', c(ENT_WHITE), F('intro/white')),
             at_t('#mbT', c(ENT_BURST), F('intro/burst')),
-            f'execute if score #bfM mb matches 0 if score #mbT mb matches {c(ENT_BURST) + 1}..{c(ENT_LAND) - 1} run {F("intro/fall")}',
-            at_t('#mbT', c(ENT_BURST) + 3, g.snd('cocoon_tail')),
-            at_t('#mbT', c(ENT_BURST) + 9, g.sound('block.amethyst_block.chime', 0.5, 1.7)),
-            at_t('#mbT', c(ENT_LAND), F('intro/land')),
+            F('seq_h/entrance/tick'),                 # [seq_h: human author] S1 visuals and sounds on the intro clock
             at_t('#mbT', (INTRO_DONE, 999), F('intro/done'))])
-        self.w('intro/hover', [
-            '# Cocoon hover: glowing lime floor disc, thin white-cyan wind streaks curling round the cocoon.']
-            + ring(g, A.LIME, 1.6, 14, scale=1.2)
-            + [g.dust(A.LIME_PALE, 1.0, '~ ~0.12 ~', (0.7, 0.02, 0.7), 4),
-               g.particle('end_rod', '~ ~2.0 ~', (0.9, 1.3, 0.9), 0.01, 1),
-               g.dust_fade(A.WHITE, A.CYAN, 0.8, '~ ~2.2 ~', (1.0, 1.4, 1.0), 2)])
         self.w('intro/name', [
-            '# The video\'s fight trigger: the title on the sub-line, a soft chime.',
-            'data modify storage rlk:mboss sub set value [{text:"달빛의 화신",color:"#D9F5A8",bold:true}]',
-            g.sound('block.amethyst_block.resonate', 0.7, 1.2), g.sound('block.beacon.ambient', 0.4, 1.6)])
-        self.w('intro/glow_snd', [
-            '# The core brightens: rising glassy shimmer (v1 audio 3.48 s) and the glow ramp (18 t).',
-            'execute positioned ~ ~2.1 ~ run ' + g.fx('cocoon_glow'),
-            g.snd('cocoon_glow')])
-        self.w('intro/glow', [
-            '# Glow ramp: light rays from the seams (lime #CADE48 -> #D5F086).',
-            g.dust(A.hexrgb('#D5F086'), 1.4, '~ ~2.1 ~', (0.35, 0.9, 0.35), 6),
-            g.particle('end_rod', '~ ~2.1 ~', (0.25, 0.8, 0.25), 0.06, 2)])
-        self.w('intro/white', [
-            '# Whiteout: blinding white-yellow glow (#F8FFC0) swallows the cocoon, and a white flash on screen.',
-            'execute positioned ~ ~2.1 ~ run ' + g.fx('whiteout'),
-            g.khud('flash_white'),
-            g.dust(A.hexrgb('#F8FFC0'), 2.6, '~ ~2.1 ~', (0.7, 1.2, 0.7), 16),
-            g.particle('end_rod', '~ ~2.1 ~', (0.3, 0.6, 0.3), 0.12, 10),
-            g.sound('block.beacon.activate', 0.6, 1.8)])
-        burst = ['# BURST: a star of white/cyan/mint crystal shards, two lime wing crescents and a cyan wind ring (kit',
-                 '# cocoon_burst), glass shards; the cocoon prop is gone.',
-                 self.R('prop/clear'),
-                 'execute rotated as @s rotated ~ 0 positioned ~ ~2.2 ~ run ' + g.fx('cocoon_burst'),
-                 g.particle('block{block_state:"minecraft:white_stained_glass"}', '~ ~2.2 ~', (1.2, 1.5, 1.2), 0, 30),
-                 g.particle('block{block_state:"minecraft:light_blue_stained_glass"}', '~ ~2.2 ~', (1.0, 1.3, 1.0), 0, 18),
-                 g.dust(A.CYAN_DEEP, 1.2, '~ ~2.2 ~', (1.2, 1.2, 1.2), 12),
-                 g.snd('cocoon_burst')]
-        self.w('intro/burst', burst)
-        self.w('intro/fall', ['# The drop: white sparkles and drifting lime leaves.',
-                              g.particle('wax_off', '~ ~1.0 ~', (1.6, 0.6, 1.6), 0, 2),
-                              g.dust(A.hexrgb('#A8DF74'), 0.8, '~ ~2.6 ~', (1.2, 1.0, 1.2), 3),
-                              g.particle('end_rod', '~ ~3.0 ~', (1.0, 0.6, 1.0), 0.01, 1)])
-        self.w('intro/land', ['# Landing crouch: soft thud, moss dust, a mint ripple with drifting leaves (kit land).',
-                              g.fx('land'),
-                              g.particle('poof', '~ ~0.15 ~', (0.6, 0.05, 0.6), 0.03, 10),
-                              g.particle('block{block_state:"minecraft:moss_block"}', '~ ~0.1 ~', (0.7, 0.05, 0.7), 0, 14),
-                              g.snd('land'), g.sound('block.moss.fall', 0.7, 1.0)])
+            '# The video\'s fight trigger: the title on the sub-line (the star and the chime: seq_h/entrance).',
+            'data modify storage rlk:mboss sub set value [{text:"달빛의 화신",color:"#D9F5A8",bold:true}]'])
+        self.w('intro/burst', ['# BURST: the cocoon prop is gone (the crystal shards and the sounds: seq_h/entrance).',
+                               self.R('prop/clear')])
         self.w('intro/done', [
             '# She stands: end of the untargetable intro.',
             'function rlk:mboss/intro_end',
@@ -460,7 +413,9 @@ class Core:
     # -----------------------------------------------------------------------------------------
     def ai(self):
         F, R, g = self.F, self.R, self.g
-        self.w('ai/state', ['# @s = body. One AI state per tick (the pattern slot runs after it, see p/run).'] + [
+        self.w('ai/state', ['# @s = body. One AI state per tick (the pattern slot runs after it, see p/run).',
+                            # [human author] H4: the flying vacuum blades outlive their pattern (spec Q14)
+                            f'execute if score #bp4B mb matches 1.. run {F("p/vacuum/blades")}'] + [
             f'execute if score #bfSt mb matches {ST[k]} run return run {F(fn)}'
             for k, fn in (('idle', 'ai/idle'), ('close', 'ai/close'), ('groggy', 'groggy/tick'), ('recover', 'recover/tick'),
                           ('prep', 'ai/prep'))])
@@ -790,7 +745,8 @@ class Core:
             F('dew/spawn')])
         self.w('form/revert', [
             f'# 달빛 해제 clock {RL_REVERT} (@s = body): the wings have shattered, she is human again; uncollected heal orbs vanish.',
-            F('form/set_h'), F('dew/clear'), F('hud/refresh')])
+            F('form/set_h'), F('dew/clear'), F('hud/refresh'),
+            F('seq_h/revert')])                       # [seq_h: human author] S3 drift
 
     # -----------------------------------------------------------------------------------------
     def transform(self):
@@ -830,32 +786,23 @@ class Core:
             f'execute if score #bfForm mb matches 2 run {F("form/now_h")}',
             g.play('groggy_h'),
             'execute at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~180 0',
-            g.snd('groggy'),
+            F('seq_h/groggy/begin'),                   # [seq_h: human author] S3 visuals and sounds
             F('hud/refresh')])
-        self.w('fx/groggy', ['# Dazed: a few lime motes drift up from her shoulders.',
-                             g.dust(A.LIME, 0.7, '~ ~2.4 ~', (0.5, 0.3, 0.5), 2),
-                             g.particle('end_rod', '~ ~2.6 ~', (0.4, 0.2, 0.4), 0.005, 1)])
         self.w('groggy/tick', [
             'scoreboard players add #bfT mb 1',
             f'# still debuffed after 달빛 해제: one new 달빛 이슬 during the groggy',
             f'execute if score #bfT mb matches 20 if score #bfCoc mb matches 1 run {F("dew/spawn1")}',
-            'scoreboard players operation #bfM mb = #bfT mb', 'scoreboard players operation #bfM mb %= #bfK10 mb',
-            f'execute if score #bfM mb matches 0 run {F("fx/groggy")}',
-            'scoreboard players operation #bfM mb = #bfT mb', 'scoreboard players operation #bfM mb %= #bfK40 mb',
-            'execute if score #bfM mb matches 0 positioned ~ ~1.6 ~ run ' + g.fx('motes'),
+            F('seq_h/groggy/tick'),                    # [seq_h: human author] S3 visuals and sounds on #bfT
             f'execute if score #bfT mb matches {GROGGY}.. run {F("recover/begin")}'])
         self.w('recover/begin', [
             f'# Groggy over: she turns to face the player ({TURN_T} t), then the crescent chain re-forms ({CHAIN_T} t).',
             sc_set('#bfSt', ST['recover']), sc_set('#bfT', 0), g.play('turn_h'),
-            g.sound('entity.breeze.idle_air', 0.4, 1.2), F('hud/refresh')])
+            F('seq_h/recover/begin'), F('hud/refresh')])   # [seq_h: human author]
         self.w('recover/tick', [
             'scoreboard players add #bfT mb 1',
             f'execute if score #bfT mb matches 1..{TURN_T} run function rlk:mboss/mv/turn {{max:9}}',
             at_t('#bfT', TURN_T, g.play('chain_reform')),
-            '# the crescent chain re-forms at her left side (display frame: ^+x = left)',
-            at_t('#bfT', TURN_T, 'execute rotated as @s rotated ~ 0 positioned ^0.5 ^1.5 ^0.1 run ' + g.fx('chain_reform')),
-            at_t('#bfT', TURN_T + 6, g.snd('chain_reform')),
-            at_t('#bfT', TURN_T + 6, g.dust(A.LIME, 1.1, '~ ~1.8 ~', (0.6, 0.6, 0.6), 10)),
+            F('seq_h/recover/tick'),                   # [seq_h: human author] S3 the chain re-form visuals
             f'execute if score #bfT mb matches {TURN_T + CHAIN_T}.. run {F("groggy/end")}'])
         self.w('groggy/end', [
             f'# Human rotation again: {HUM_NEXT_N} patterns before the next transformation (no time limit), starting with',
@@ -1050,43 +997,15 @@ class Core:
             sc_set('#bfSt', ST['dead']),
             R('prop/clear'),
             g.play('death'),
-            '# the kit: its ground decals go (the hazards are already cleared), the death recipe (no voices)',
+            '# the kit: its ground decals go (the hazards are already cleared)',
             f'function {K.FN}tele/clear',
-            g.snd('death')])
+            F('seq_h/death/start')])                   # [seq_h: human author] S4 visuals and sounds
         lines = ['# Hook death_tick (@s = body, #mbT = 1.. until cur.death): the clip runs while the rig ticks; it must NOT tick',
                  f'# after its kill at {DEATH_LEN} (it would respawn).',
                  at_t('#mbT', (1, DEATH_LEN - 1), R('tick')),
                  at_t('#mbT', DEATH_LEN, R('kill')),
-                 f'execute if score #mbT mb matches {D_SHATTER} if score #bfForm mb matches 2 run {F("fx/death_shatter")}',
-                 at_t('#mbT', D_KNEEL, g.sound('block.moss.fall', 0.8, 0.9)),
-                 at_t('#mbT', D_KNEEL, g.sound('entity.iron_golem.step', 0.4, 1.4)),
-                 at_t('#mbT', D_KNEEL, g.particle('poof', '~ ~0.2 ~', (0.5, 0.05, 0.5), 0.02, 8)),
-                 at_t('#mbT', D_DISSOLVE, g.sound('block.beacon.deactivate', 0.7, 1.2)),
-                 at_t('#mbT', D_DISSOLVE, g.sound('block.amethyst_block.resonate', 0.6, 0.8)),
-                 'scoreboard players operation #bfM mb = #mbT mb', 'scoreboard players operation #bfM mb %= #bfK2 mb',
-                 f'execute if score #bfM mb matches 0 if score #mbT mb matches {D_DISSOLVE}..{DEATH_LEN - 4} run {F("fx/death_motes")}']
-        for t in range(D_DISSOLVE, DEATH_LEN - 10, 15):
-            lines.append(at_t('#mbT', t, 'execute positioned ~ ~1.5 ~ run ' + g.fx('death_motes')))
-        for t, p in ((D_DISSOLVE + 18, 1.8), (D_DISSOLVE + 34, 1.5), (D_DISSOLVE + 48, 1.2)):
-            if t < DEATH_LEN:
-                lines.append(at_t('#mbT', t, g.sound('block.amethyst_block.chime', 0.6, p)))
-        lines.append(at_t('#mbT', DEATH_LEN - 4, F('fx/death_end')))
+                 F('seq_h/death/tick')]                  # [seq_h: human author] S4 visuals and sounds on #mbT
         self.w('death_tick', lines)
-        self.w('fx/death_shatter', ['# The wings shatter into lime / opal shards.',
-                                    g.particle('block{block_state:"minecraft:lime_stained_glass"}', '~ ~3.0 ~', (1.8, 1.0, 0.6), 0, 30),
-                                    g.particle('block{block_state:"minecraft:white_stained_glass"}', '~ ~3.0 ~', (1.6, 1.0, 0.6), 0, 16),
-                                    g.dust(A.OPAL, 1.4, '~ ~3.0 ~', (2.0, 1.2, 0.8), 20),
-                                    'execute rotated as @s rotated ~ 0 positioned ^ ^2.8 ^-0.4 run ' + g.fx('wing_shatter'),
-                                    g.snd('wing_shatter')])
-        self.w('fx/death_motes', ['# Dissolve: rising moonlight motes and white-cyan crystal shards.',
-                                  g.dust(A.LIME_PALE, 1.0, '~ ~1.4 ~', (0.4, 0.9, 0.4), 4),
-                                  g.dust_fade(A.WHITE, A.CYAN, 0.9, '~ ~1.8 ~', (0.4, 0.9, 0.4), 3),
-                                  g.particle('end_rod', '~ ~1.4 ~', (0.35, 0.8, 0.35), 0.03, 2),
-                                  g.particle('block{block_state:"minecraft:light_blue_stained_glass"}', '~ ~1.2 ~', (0.4, 0.8, 0.4), 0, 2)])
-        self.w('fx/death_end', ['# The last motes fly up.',
-                                g.particle('end_rod', '~ ~1.2 ~', (0.3, 0.6, 0.3), 0.18, 20),
-                                g.dust(A.LIME_CORE, 1.6, '~ ~1.6 ~', (0.6, 1.0, 0.6), 16),
-                                g.snd('death_motes')])
 
     # -----------------------------------------------------------------------------------------
     def hud(self):

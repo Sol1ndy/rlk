@@ -409,3 +409,50 @@ class TL:
         self.g.pw(self.key, 'start', list(start_head) + self.ev.get(t0, []))
         ts = sorted(t for t in self.ev if t > t0)
         self.g.pw(self.key, 'tick', list(tick_head) + self._node(ts))
+
+
+# =============================================================================================
+# Human-pattern author (H1-H4 in human.py, the S1 / S3 / S4 sequences in seq_h.py): shared helpers. Every name
+# carries an h_ / H_ prefix so it never collides with the wing author's block (theirs: WALK_R, anchor, lockw).
+H_WALK_R = ARENA['walk'] - 0.7        # 20.3: the player's walk disc (the framework's @WALKP@)
+H_ANCHOR_FALLBACKS = []               # (clip, event, part) taken from the caller's default (no manifest anchor)
+
+
+def h_anchor(clip, event, part, default):
+    """Body-frame position '^x ^y ^z' of a rig anchor at a clip event (manifest clips[].anchors[event][part]: rig
+    coordinates x her left, y up, -z forward, so the body frame is ^x ^y ^-z; README Q3). default ('^x ^y ^z') when
+    the manifest has none (the stub rig): the spec's body-frame point."""
+    c = next((c for c in _MAN['clips'] if c['name'] == clip), {})
+    a = c.get('anchors', {}).get(event, {}).get(part)
+    if a is None:
+        H_ANCHOR_FALLBACKS.append((clip, event, part))
+        return default
+    return f'^{L.num(float(a[0]), 3)} ^{L.num(float(a[1]), 3)} ^{L.num(-float(a[2]), 3)}'
+
+
+def _lock_walk(tag, steps=3):
+    """Lines (any executor): marker <tag> on the floor under the player, pulled inside the WALK disc (r 20.3) instead
+    of the safe disc (plan Q8: a locked ground hazard still covers a player hugging the wall; the points the body moves
+    to keep the r 18.5 of u/dest / mv/clamp). The player's feet are at most about 20.7 b out, so 3 steps of 0.25 b
+    toward the centre are enough. Kill <tag> in the pattern's cancel."""
+    sel = f'@e[type=minecraft:marker,tag={tag},limit=1]'
+    out = [f'kill @e[type=minecraft:marker,tag={tag}]',
+           f'execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ {CY} ~ {{Tags:["rlk_room","rlk_mb_aux","{tag}"]}}']
+    out += [f'execute as {sel} at @s unless entity @e[tag=rlk_mb_arena,distance=..{L.num(H_WALK_R)},limit=1] '
+            f'facing entity @e[tag=rlk_mb_arena,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^0.25'] * steps
+    return out
+
+
+def _ring_dust(rgb, r, n, y=0.15, scale=1.0, cnt=1):
+    """Dust points on a horizontal circle of radius r around the execution position (rotation-free)."""
+    out = []
+    for i in range(n):
+        a = math.radians(360 * i / n)
+        out.append(Gen.dust(rgb, scale, f'~{L.num(r * math.sin(a), 2)} ~{L.num(y, 2)} ~{L.num(r * math.cos(a), 2)}',
+                            (0, 0, 0), cnt))
+    return out
+
+
+Gen.h_lock_walk = staticmethod(_lock_walk)
+Gen.h_ring_dust = staticmethod(_ring_dust)
+Gen.h_anchor = staticmethod(h_anchor)

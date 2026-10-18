@@ -1,2 +1,2 @@
 # vacuum clock 28
-function rlk:mboss/mv/away {d:0.12}
+execute at @s rotated as @s rotated ~180 0 positioned ^ ^ ^0.15 if function rlk:mboss/mv/ok run tp @s ~ ~ ~

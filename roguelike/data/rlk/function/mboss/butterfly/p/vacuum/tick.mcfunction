@@ -1,3 +1,3 @@
 # H4 tick.
-execute if score #bfPT mb matches 7..27 run return run function rlk:mboss/butterfly/p/vacuum/d/7_27
-execute if score #bfPT mb matches 28..41 run return run function rlk:mboss/butterfly/p/vacuum/d/28_41
+execute if score #bfPT mb matches 1..19 run return run function rlk:mboss/butterfly/p/vacuum/d/1_19
+execute if score #bfPT mb matches 20..41 run return run function rlk:mboss/butterfly/p/vacuum/d/20_41
