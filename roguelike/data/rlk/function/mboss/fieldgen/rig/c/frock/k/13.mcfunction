@@ -1,0 +1,3 @@
+data merge entity 524c4b4d-4647-4400-8000-000000000018 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[3.99649f,4.48071f,0f],left_rotation:[0f,0f,-0.67201f,0.74054f],scale:[0.32f,2.5f,0.32f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-000000000019 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-3.66734f,3.73526f,0f],left_rotation:[0f,0f,0.74054f,0.67201f],scale:[0.32f,2.5f,0.32f],right_rotation:[0f,0f,0f,1f]}}
+data modify entity 524c4b4d-4647-4400-8000-00000000001a item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/col_violet"

@@ -1,0 +1,5 @@
+data merge entity 524c4b4d-4647-4400-8000-000000000003 {start_interpolation:0,interpolation_duration:23,transformation:{translation:[0f,3.50697f,3.41906f],left_rotation:[0.14781f,0f,0f,0.98902f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-000000000006 {start_interpolation:0,interpolation_duration:46,transformation:{translation:[0f,4.5f,0f],left_rotation:[0.13917f,0f,0f,0.99027f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-000000000008 {start_interpolation:0,interpolation_duration:46,transformation:{translation:[0f,4.5f,0f],left_rotation:[0.43051f,0f,0f,0.90259f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-000000000009 {start_interpolation:0,interpolation_duration:19,transformation:{translation:[0f,4.5f,0f],left_rotation:[-0.11677f,-0.99249f,-0.0109f,0.03488f],scale:[1.3f,1.3f,1.3f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:mboss/fieldgen/rig/look/temp_charge

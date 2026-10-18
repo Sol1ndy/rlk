@@ -1,5 +1,5 @@
 // Item-model geometry helpers shared by the mid-boss display-entity rigs (Corrupted Guardian, Moonlit
-// Butterfly). Moved out of guardian_geometry.mjs unchanged; the Guardian keeps thin wrappers for its defaults
+// Butterfly, Field Generator). Moved out of guardian_geometry.mjs unchanged; the Guardian keeps thin wrappers for its defaults
 // (the CARD rectangle of a sprite, its gold ledge/knob textures).
 //
 // Authoring frame ("A-frame", the rig's frame): +X = her LEFT (screen right in a front view),
@@ -145,18 +145,60 @@ export function faceEl(pts, faces, {rot, shade = true} = {}) {
   return el;
 }
 // sections: [{a: [a0, a1] along the axis from c, r: facet inradius, tex}]
-export function lathe(axis, c, sections, {vFrom, vTo, n = 16}) {
+// Options (all off by default; the defaults reproduce the original facets exactly):
+//   tile    every facet shows the whole sprite width (u = 16 (.5 + s / w)) instead of its 1/n slice of a wrap-round
+//           sprite: a repeating band (a square-wave seam, block joints) needs only one small tile;
+//   inward  the facets face the axis (an inner wall seen from inside the ring); u runs so that the sprite reads
+//           unmirrored from the inside, and a wrap-round sprite keeps its order round the ring;
+//   range   [k0, k1): only facets k0 <= k < k1 (k may be negative), for arcs (a protractor, a curved bracket);
+//   phase   degrees added to every facet azimuth (the facet rotation must stay a multiple of 22.5 within +-45,
+//           e.g. a 4-facet diamond with phase 45);
+// and a section's tex may be a function k -> sprite (per-facet variants, e.g. a light level baked per azimuth).
+export function lathe(axis, c, sections, {vFrom, vTo, n = 16, tile = false, inward = false, range = null, phase = 0}) {
   const A = AXV[axis], [e0, e1] = AZV[axis], dirs = [e0, e1, vsc(e0, -1), vsc(e1, -1)], els = [];
+  const [k0, k1] = range || [0, n], sgn = inward ? -1 : 1;
   for (const {a: [a0, a1], r, tex} of sections) {
     const w = 2 * r * Math.tan(Math.PI / n);
-    for (let k = 0; k < n; k++) {
-      const phi = k * 360 / n, q = Math.round(phi / 90), g = phi - 90 * q, d = dirs[q % 4], t = dirs[(q + 1) % 4];
+    for (let k = k0; k < k1; k++) {
+      const phi = k * 360 / n + phase, q = Math.round(phi / 90), g = phi - 90 * q, d = dirs[((q % 4) + 4) % 4], t = dirs[(((q + 1) % 4) + 4) % 4];
       const P = (a, s) => vadd(vadd(c, vsc(A, a)), vadd(vsc(d, r), vsc(t, s)));
-      const fn = X => { const rel = vsub(X, c); return [16 * (k + .5 + vdot(rel, t) / w) / n, 16 * (vdot(rel, A) - vFrom) / (vTo - vFrom)]; };
+      const kk = inward ? n - 1 - k : k, tx = typeof tex === 'function' ? tex(k) : tex;
+      const fn = X => { const rel = vsub(X, c), s = sgn * vdot(rel, t) / w, v = 16 * (vdot(rel, A) - vFrom) / (vTo - vFrom);
+        return [tile ? 16 * (.5 + s) : 16 * (kk + .5 + s) / n, v]; };
       const sg = vdot(rotA(axis, 10, d), t) > 0 ? 1 : -1;
-      els.push(faceEl([P(a0, -w / 2), P(a1, w / 2)], {[faceOfDir(d)]: {tex, fn}},
+      els.push(faceEl([P(a0, -w / 2), P(a1, w / 2)], {[faceOfDir(inward ? vsc(d, -1) : d)]: {tex: tx, fn}},
         {shade: false, rot: g ? [axis, sg * g, vadd(c, vsc(A, (a0 + a1) / 2))] : undefined}));
     }
+  }
+  return els;
+}
+// Flat annulus across the axis at a (r0..r1), as n segment quads that match the facets of a lathe of inradius r1
+// (the outer edge is the same n-gon; each quad spans r0..r1 radially and the outer facet width tangentially, so
+// neighbours overlap in a thin wedge near the inner edge). side '+', '-' or '+-' (faces toward +axis / -axis).
+// Options:
+//   stagger  offset of the odd segments along the axis (toward the face side): the overlapping wedges of
+//            neighbouring quads never z-fight;
+//   tile     (default) every quad shows the whole sprite: u across the segment, v from the outer edge (0) to the
+//            inner edge (1); seen from either side the sprite reads unmirrored. tile false: one wrap-round sprite,
+//            u = azimuth slice k/n..(k+1)/n as lathe();
+//   range    [k0, k1) segments only; shade (default true) the game's face shading; tex may be a function k -> sprite.
+export function annulus(axis, c, a, r0, r1, side, tex, {n = 16, stagger = 0, tile = true, range = null, shade = true} = {}) {
+  const A = AXV[axis], [e0, e1] = AZV[axis], dirs = [e0, e1, vsc(e0, -1), vsc(e1, -1)], els = [];
+  const [k0, k1] = range || [0, n], w = 2 * r1 * Math.tan(Math.PI / n);
+  for (let k = k0; k < k1; k++) {
+    const phi = k * 360 / n, q = Math.round(phi / 90), g = phi - 90 * q, d = dirs[((q % 4) + 4) % 4], t = dirs[(((q + 1) % 4) + 4) % 4];
+    const sg = vdot(rotA(axis, 10, d), t) > 0 ? 1 : -1;
+    const odd = ((k % 2) + 2) % 2 === 1;
+    const lift = odd ? stagger * (side === '-' ? -1 : 1) : 0, O = vadd(c, vsc(A, a + lift));
+    const P = (rad, s) => vadd(O, vadd(vsc(d, rad), vsc(t, s)));
+    const faces = {};
+    for (const sd of side) {
+      const m = sd === '+' ? 1 : -1;
+      const fn = X => { const rel = vsub(X, O), s = vdot(rel, t) / w, rad = vdot(rel, d);
+        return [tile ? 16 * (.5 + m * s) : 16 * (k + .5 + m * s) / n, 16 * (r1 - rad) / (r1 - r0)]; };
+      faces[faceOfDir(vsc(A, m))] = {tex: typeof tex === 'function' ? tex(k) : tex, fn};
+    }
+    els.push(faceEl([P(r0, -w / 2), P(r1, w / 2)], faces, {shade, rot: g ? [axis, sg * g, O] : undefined}));
   }
   return els;
 }

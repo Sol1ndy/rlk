@@ -1,0 +1,5 @@
+data merge entity 524c4b4d-4647-4400-8000-00000000000e {start_interpolation:0,interpolation_duration:1,transformation:{translation:[1.94591f,2.76422f,-2.15442f],left_rotation:[-0.28391f,0.81064f,-0.45197f,0.2408f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-00000000000f {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-1.94591f,2.76422f,-2.15442f],left_rotation:[0.47659f,0.71457f,-0.49765f,-0.12083f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-000000000018 {start_interpolation:0,interpolation_duration:15,transformation:{translation:[3.6f,4.55f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-000000000019 {start_interpolation:0,interpolation_duration:15,transformation:{translation:[-3.6f,4.55f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:mboss/fieldgen/rig/look_apply

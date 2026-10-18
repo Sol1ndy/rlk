@@ -1,0 +1,5 @@
+data merge entity 524c4b4d-4647-4400-8000-000000000001 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,5f,0f],left_rotation:[0f,0f,0.08716f,0.99619f],scale:[2.4f,2.4f,2.4f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-000000000002 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,5f,0f],left_rotation:[0f,0f,0.08716f,0.99619f],scale:[2.4f,2.4f,2.4f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-00000000000a {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.48621f,7.75746f,0f],left_rotation:[0f,0f,0.08716f,0.99619f],scale:[0.4725f,0.4725f,0.4725f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-00000000001a {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.48621f,7.75746f,0f],left_rotation:[-0.99619f,-0.08716f,0f,0f],scale:[1.3f,2.625f,1.3f],right_rotation:[0f,0f,0f,1f]}}
+data modify entity 524c4b4d-4647-4400-8000-00000000000a item.components."minecraft:item_model" set value "rlk:mboss/fieldgen/glow_gold"
