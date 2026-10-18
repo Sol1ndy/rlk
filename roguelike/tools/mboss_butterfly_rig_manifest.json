@@ -5027,6 +5027,6 @@
     "bfRigFlat": "1 while a clip shows the temporary flat look",
     "bfRigTell": "1 while the crescents glow (tell)"
   },
-  "textures": 54,
-  "atlas_px": 1058304
+  "textures": 72,
+  "atlas_px": 1326848
 }
