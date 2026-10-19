@@ -3,3 +3,4 @@ execute if score #mbId mb matches 1 run return run function rlk:mboss/guardian/a
 execute if score #mbId mb matches 2 run return run function rlk:mboss/butterfly/aux_hit
 execute if score #mbId mb matches 3 run return run function rlk:mboss/fieldgen/aux_hit
 execute if score #mbId mb matches 99 run return run function rlk:mboss/proto/aux_hit
+execute if score #mbId mb matches 10 run return run function rlk:mboss/azhdaha/aux_hit

@@ -1,0 +1,19 @@
+# GENERATED: the running pattern's tick, by #azPat.
+execute if score #azPat mb matches 1 run return run function rlk:mboss/azhdaha/p/chin/tick
+execute if score #azPat mb matches 2 run return run function rlk:mboss/azhdaha/p/jump/tick
+execute if score #azPat mb matches 3 run return run function rlk:mboss/azhdaha/p/charge/tick
+execute if score #azPat mb matches 4 run return run function rlk:mboss/azhdaha/p/spikes/tick
+execute if score #azPat mb matches 5 run return run function rlk:mboss/azhdaha/p/stomp/tick
+execute if score #azPat mb matches 10 run return run function rlk:mboss/azhdaha/p/stomp3/tick
+execute if score #azPat mb matches 6 run return run function rlk:mboss/azhdaha/p/feint/tick
+execute if score #azPat mb matches 7 run return run function rlk:mboss/azhdaha/p/whip/tick
+execute if score #azPat mb matches 8 run return run function rlk:mboss/azhdaha/p/tailslam/tick
+execute if score #azPat mb matches 9 run return run function rlk:mboss/azhdaha/p/burrow/tick
+execute if score #azPat mb matches 43 run return run function rlk:mboss/azhdaha/p/icicle/tick
+execute if score #azPat mb matches 44 run return run function rlk:mboss/azhdaha/p/shell/tick
+execute if score #azPat mb matches 45 run return run function rlk:mboss/azhdaha/p/icespike/tick
+execute if score #azPat mb matches 46 run return run function rlk:mboss/azhdaha/p/elspike/tick
+execute if score #azPat mb matches 20 run return run function rlk:mboss/azhdaha/p/slide/tick
+execute if score #azPat mb matches 21 run return run function rlk:mboss/azhdaha/p/absorb1/tick
+execute if score #azPat mb matches 22 run return run function rlk:mboss/azhdaha/p/absorb2/tick
+execute if score #azPat mb matches 23 run return run function rlk:mboss/azhdaha/p/burrow3/tick

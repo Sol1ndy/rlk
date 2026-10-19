@@ -1,0 +1,3 @@
+# STUB (S1-MOD, s2.md 2.1): 천동만상 – 얼음 가시 (icespike, id 45); the S2 author replaces this file.
+# keeps time only
+execute if score #azPT mb matches 100.. run function rlk:mboss/azhdaha/p/end

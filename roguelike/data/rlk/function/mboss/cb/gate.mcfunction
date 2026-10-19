@@ -10,4 +10,5 @@ execute if score #mbArBuild mb matches 1.. run tag @e[tag=rlk_cbz] remove rlk_cb
 execute if score #mbArBuild mb matches 1.. run return run tellraw @a[tag=player] [{text:"[챕터 보스] ",color:"#E0703A",bold:true},{text:"경기장을 준비하는 중입니다. 잠시 뒤 다시 누르세요.",color:"gray",bold:false}]
 data modify storage rlk:mboss cbg set value ""
 data modify storage rlk:mboss cbg set from entity @e[tag=rlk_cbz,limit=1] data.boss_id
+execute if data storage rlk:mboss {cbg:"azhdaha"} run return run function rlk:mboss/cb/g/azhdaha
 tag @e[tag=rlk_cbz] remove rlk_cbz
