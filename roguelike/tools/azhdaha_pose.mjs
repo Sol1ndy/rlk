@@ -37,10 +37,10 @@ export const J = {
   chest: [0, 3.35, -1.7],         // shoulder girdle
   neck1: [0, 3.05, -2.55],
   neck2: [0, 2.6, -3.05],
-  head: [0, 2.05, -3.3],          // atlas
-  jaw: [0, 1.3, -3.6],            // hinge under the ear
-  beard1: [0, 1.05, -3.5],        // throat, under the jaw hinge
-  beard2: [0, .72, -3.55],        // the lower layer hangs from the first
+  head: [0, 2.05, -3.7],          // atlas (R2: 0.4 further forward, neck ~1.7 b, the chin slam reaches z -5.5)
+  jaw: [0, 1.3, -4.0],            // hinge under the ear
+  beard1: [0, 1.05, -3.9],        // throat, under the jaw hinge
+  beard2: [0, .72, -3.95],        // the lower layer hangs from the first
   apron: [0, 2.2, -2.8],          // throat plate, hangs between the fore legs
   t1: [0, 2.85, 4.75],            // tail root
   // left limbs (the right mirrors x)
@@ -70,7 +70,7 @@ export const PLATE_LEAN = {neck: 35, sh: 12, mid: 15, hip: 25};
 export const TAIL_PARTS = ['t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 'tip'];
 // Fixed placement of the horns in the head frame (the C of each horn is authored in its own YZ plane and turned out:
 // yaw opens the back of the C outward, so the front shows "( )"; model.md §0).
-export const HORN = {at: [1.85, -.55, -.45], e: [0, 45, 0]};
+export const HORN = {at: [1.8, -.15, -.35], e: [0, 53, 0]};   // R2: the C plane runs from the knob beside the mouth back to the temple
 const Q0 = [0, 0, 0, 1];
 const perpv = (v, a) => sub(v, times(a, v[0] * a[0] + v[1] * a[1] + v[2] * a[2]));
 const inv = Q => [-Q[0], -Q[1], -Q[2], Q[3]];
@@ -91,7 +91,7 @@ export function solve(p, {prev = null} = {}) {
   const Bp = bone(null, J.pelvis, p.pelvis);
   const Bs = bone(Bp, J.spine1, p.spine), Bc = bone(Bs, J.chest, p.chest);
   const Bn1 = bone(Bc, J.neck1, p.neck1), Bn2 = bone(Bn1, J.neck2, p.neck2), Bh = bone(Bn2, J.head, p.head);
-  const Bj = bone(Bh, J.jaw, [p.jaw, 0, 0]);
+  const Bj = bone(Bh, J.jaw, [-p.jaw, 0, 0]);    // jaw opens chin-down (pitch - lowers a forward bone)
   const Bb1 = bone(Bj, J.beard1, p.beard1), Bb2 = bone(Bb1, J.beard2, p.beard2);
   const Ba = bone(Bc, J.apron, p.apron);
   const at = (B, v) => add(B.t, rot(B.q, sub(v, B.rest)));           // a rest-frame point carried by bone B

@@ -15,7 +15,7 @@ tail in parallel (plan.md R9):
 | `azhdaha_clips.mjs` | `DEFAULT_POSE` (the idle stance), the debug poses (`CLIPS`), `RETIME` (empty), pose helpers `tailUp`, `fore`, `hind` |
 | `azhdaha_geometry.mjs` | thin aggregator: `PARTS`, `partModels()`, `LOOKS`, `TINTED`, `LOOK_BRIGHT` over the four region modules |
 | `azhdaha_paint.mjs` | thin aggregator: `azhdahaSprites()`, `paintAzhdahaTextures()`, `spriteId()`, the 1.2 M px atlas budget |
-| `azhdaha_head.mjs` | head (face mask plates, keel, crown spikes, ear plates 回, upper teeth), jaw (chin shield, lower teeth, fangs, tongue), eyes, horns (gold sleeve C + knob + dark horn), beard plates |
+| `azhdaha_head.mjs` | head (V-wedge mask plates, brow ledges and wings, keel blade, a two-rank crown of gold-rimmed blades and crest fins, cheek guards, the ear plates 回 on their mounts, rounded skull, palate, upper teeth), jaw (V chin shield over a V-wedge lower jaw: cheek plates, underside, mouth floor, teeth, fangs, tongue), eyes (slits), horns (broad gold sleeve band bent into a C, rim wrapped round its rounded lower end, meander face, dome stud knob, carded dark horn), beard bibs |
 | `azhdaha_body.mjs` | chest / belly / pelvis, neck, apron (+ glow overlay), the four dorsal plate groups, the three gold crystal groups |
 | `azhdaha_legs.mjs` | upper arms, engraved bracers (gold studs, amber elbow crystals), paws and talons, haunches, ribbed gaiters (heel spurs), feet, the four leg glow overlays |
 | `azhdaha_tail.mjs` | t1..t8 (core, cream ventral fin with gold veins, top spikes), the leafy branch and the tip (leaves / blossoms) |
@@ -110,13 +110,21 @@ part and look are in the manifest (`looks`).
 
 Rig frame: +X = the boss's left, +Y up, -Z forward, blocks; origin = the floor under the centre of the four feet.
 Joints (rest, `azhdaha_pose.mjs J`): pelvis (hip line) 0,3.0,2.4; spine1 0,3.35,0.3; chest 0,3.35,-1.7; neck1
-0,3.05,-2.55; neck2 0,2.6,-3.05; head (atlas) 0,2.05,-3.3; jaw hinge 0,1.3,-3.6; left shoulder 2.3,3.25,-2.15,
+0,3.05,-2.55; neck2 0,2.6,-3.05; head (atlas) 0,2.05,-3.7; jaw hinge 0,1.3,-4.0; left shoulder 2.3,3.25,-2.15,
 elbow 2.95,2.3,-1.8, wrist 3.15,0.5,-2.45; left hip 2.0,3.0,2.45, knee 2.35,1.9,1.5, hock 2.5,0.72,3.05; tail root
 0,2.85,4.75; tail segments 2.3, 2.1, 1.9, 1.8, 1.7, 1.6, 1.6, 1.5 (14.5 b). Rest silhouette: H 7.0 b (tallest plate),
 nose to rump 10.2 b, wheelbase 5.0 b, claw span 8.1 b, horn span 4.4 b, snout 0.85 b, crest 2.65 b, eyes 1.5 b.
+Head (R2, measured on the real quads): eyes 1.5 b at z -4.74, chin 0.25 b above the floor, horn span 4.5 b, dark horn
+tips 4.9 b (3.4 b above the eyes), nose to rump 10.7 b. The neck (neck1 -> neck2 -> atlas) is 1.5 b, so a chin slam
+reaches the floor at z -5.8 with the eyes at 1.4 b (root -0.25 b and tilted 10 degrees nose-down, neck1 +30, neck2
++10, head 0); at that impact the jaw's underside dips 0.23 b into the floor and the beards 0.2 b when they sweep back
+(beard1 -35, beard2 -20; hanging straight they reach 0.33 b), inside the 0.3 b impact allowance. A roar_rear at
+pelvis +55, head +30 puts the eyes at 8.7 b (the debug rear_up, pelvis +45 and head +22, reaches 7.7 b).
 
 Pose channels (`DEFAULT_POSE`): `pos [0,y,0]`, `rot [p,y,r]` (about ROOT_PIVOT 0,2.8,0.4), `pelvis spine chest
-neck1 neck2 head` eulers, `jaw` (deg open), `beard1 beard2 apron` eulers, `flN flS flM flH` plate flare (deg, +
+neck1 neck2 head` eulers, `jaw` (deg open: the chin swings down about the hinge; at the head-low rest the chin
+clears the floor up to jaw 10, wider needs the head pitched up by about (jaw - 10) / 2 degrees, e.g. jaw 50 with head
++21), `beard1 beard2 apron` eulers, `flN flS flM flH` plate flare (deg, +
 stands the plates up), `flK` plate scale, `fwL fwR` wrist targets and `fpL fpR` paw eulers, `hkL hkR` hock targets and
 `hfL hfR` foot eulers (root frame: planted feet stay put while the body rears), `t1..t8` tail eulers (pitch - raises a
 segment) plus `tLift tCurl tSweep tTwist`, `vis visBody visTail`. Clips carry no horizontal root travel and no root
