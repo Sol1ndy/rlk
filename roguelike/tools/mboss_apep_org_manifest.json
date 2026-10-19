@@ -1158,7 +1158,7 @@
             1.6,
             0
           ],
-          "elements": 341,
+          "elements": 437,
           "note": "translucent lemon seed 3.2 x 2.6 x 2.3, alpha ~0.86; the arrival egg = this model at scale 0.7, pitch 90 (upright)"
         },
         {
@@ -1180,7 +1180,7 @@
             0.9,
             0
           ],
-          "elements": 207,
+          "elements": 225,
           "note": "5 knobbly root fingers + the mound; pedestal adds pale petal clumps + 3 gold sprouts"
         },
         {
@@ -1201,7 +1201,7 @@
             2.1,
             0
           ],
-          "elements": 36,
+          "elements": 56,
           "note": "two root arms curling over the bulb to 4.0-4.3 b"
         },
         {
@@ -1222,7 +1222,7 @@
             2.1,
             0
           ],
-          "elements": 16,
+          "elements": 18,
           "note": "leaf-flame sprouts, swaying"
         },
         {
@@ -1235,7 +1235,7 @@
           },
           "default_look": "idle",
           "brightness": 14,
-          "scale": 1,
+          "scale": 1.8,
           "pivot": "centre",
           "idx": 4,
           "uuid": "524c4b4d-4150-4800-8000-000000000004",
@@ -1244,7 +1244,7 @@
             11.2,
             0
           ],
-          "elements": 7
+          "elements": 25
         },
         {
           "name": "vine_stem_0",
@@ -1551,8 +1551,8 @@
         "elements": 800,
         "px": 40000
       },
-      "elements": 619,
-      "px": 30464,
+      "elements": 773,
+      "px": 18176,
       "states": {
         "entrance": {
           "function": "rlk:mboss/apep/om/heart/spawn/entrance",
@@ -2013,7 +2013,7 @@
     "px_total": 200000,
     "organism_elements": 500,
     "heart_elements": 800,
-    "px": 127232
+    "px": 114944
   },
   "sprites": {
     "bo_bell": {
@@ -2296,14 +2296,9 @@
       "h": 64,
       "owner": "heart"
     },
-    "he_rootc": {
-      "w": 64,
-      "h": 64,
-      "owner": "heart"
-    },
-    "he_armc": {
-      "w": 64,
-      "h": 96,
+    "he_vine": {
+      "w": 32,
+      "h": 32,
       "owner": "heart"
     },
     "he_tip": {
@@ -2319,11 +2314,6 @@
     "he_sprout": {
       "w": 16,
       "h": 48,
-      "owner": "heart"
-    },
-    "he_tendril": {
-      "w": 48,
-      "h": 64,
       "owner": "heart"
     },
     "he_stem": {

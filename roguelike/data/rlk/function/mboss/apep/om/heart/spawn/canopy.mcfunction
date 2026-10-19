@@ -17,7 +17,7 @@ summon minecraft:item_display ~ ~ ~ {UUID:[I;1380731725,1095780352,-2147483648,3
 rotate 524c4b4d-4150-4800-8000-000000000003 ~ 0
 scoreboard players set 524c4b4d-4150-4800-8000-000000000003 apOI -1
 scoreboard players set 524c4b4d-4150-4800-8000-000000000003 apOC 0
-summon minecraft:item_display ~ ~ ~ {UUID:[I;1380731725,1095780352,-2147483648,4],Tags:["rlk_room","rlk_mb_aux","rlk_ap_om","rlk_ap_om_obj","rlk_mb_ap_vine_hand"],billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:2,view_range:3f,width:9f,height:30f,shadow_radius:0f,brightness:{block:14,sky:15},transformation:{translation:[0f,22.36f,0f],left_rotation:[0f,0f,0f,1f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/apep_om/vine_hand_idle"}}}
+summon minecraft:item_display ~ ~ ~ {UUID:[I;1380731725,1095780352,-2147483648,4],Tags:["rlk_room","rlk_mb_aux","rlk_ap_om","rlk_ap_om_obj","rlk_mb_ap_vine_hand"],billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:2,view_range:3f,width:9f,height:30f,shadow_radius:0f,brightness:{block:14,sky:15},transformation:{translation:[0f,22.36f,0f],left_rotation:[0f,0f,0f,1f],scale:[1.8f,1.8f,1.8f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/apep_om/vine_hand_idle"}}}
 rotate 524c4b4d-4150-4800-8000-000000000004 ~ 0
 scoreboard players set 524c4b4d-4150-4800-8000-000000000004 apOI -1
 scoreboard players set 524c4b4d-4150-4800-8000-000000000004 apOC 0

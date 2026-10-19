@@ -122,16 +122,9 @@ export const SH = {
   h_tip: SHP({u0: -.16, u1: .16, v0: 0, v1: .62}, (u, v) => { const t = clamp(v / .62), w = .13 * Math.sin(Math.PI * Math.pow(t, .7)) + .008; return Math.abs(u - .05 * Math.sin(t * 4)) - w; }),
   h_petal: SHP({u0: -.3, u1: .3, v0: 0, v1: .36}, (u, v) => { const r = Math.hypot(u / .28, v / .34), lob = .12 * Math.cos(Math.atan2(v, u) * 7); return (r - 1 + lob) * .25; }),
   h_sprout: SHP({u0: -.12, u1: .12, v0: 0, v1: .7}, sdUnion(stroke([[0, 0], [.02, .3], [-.02, .5]], t => .025).sd, sdLens(.11, .22, .48), (u, v) => sdLens(.09, .18, 0)(u * .7 - (v - .28) * .7 - .02, u * .7 + (v - .28) * .7))),
-  h_tendril: SHP({u0: -.5, u1: .5, v0: -1.1, v1: .1}, sdUnion(...[[-.1, -.45], [.1, -.4], [-.3, -.3], [.32, -.28], [0, -.5]].map(([x, b], i) =>
-    stroke(bez([x * .3, 0], [x * 1.4, b], [x * 1.1 - (i % 2 ? .08 : -.08), b * 2.1], 10).concat([[x * .7, b * 2.1 + .06]]), t => .05 - .035 * t).sd))),
   h_stem: SHP({u0: -.3, u1: .3, v0: -6.2, v1: .1}, sdUnion(stroke([[0, 0], [.06, -1.5], [-.08, -3.0], [.07, -4.5], [-.02, -6.1]], t => .08).sd,
     stroke([[.02, -1.0], [.2, -1.25], [.24, -1.45]], t => .03 - .02 * t).sd, stroke([[-.04, -3.6], [-.22, -3.85], [-.25, -4.0]], t => .03 - .02 * t).sd)),
   // the Heart cradle: a knobbly root finger (radial plane: u = distance from the centre, v = height) and a tall root arm
-  h_root: SHP({u0: .55, u1: 2.3, v0: -.04, v1: 1.6}, (() => { const P = [[2.08, 0], [1.88, .42], [1.5, .98], [1.27, 1.3], [1.02, 1.38], [.8, 1.24]]; const st = stroke(P, t => .21 - .14 * t + .035 * Math.sin(t * 17));
-    return (u, v) => Math.max(st.sd(u, v), -v - .02); })()),
-  h_arm: SHP({u0: .05, u1: 2.85, v0: -.04, v1: 4.5}, (() => { const P = [[2.3, 0], [2.48, 1.2], [2.24, 2.6], [1.78, 3.6], [1.12, 4.2], [.58, 4.08], [.36, 3.72]]; const st = stroke(P, t => .27 - .2 * t + .03 * Math.sin(t * 13));
-    return (u, v) => Math.max(st.sd(u, v), -v - .02); })()),
-  // 둥지 wall: a leaf blade 0.9 x 2.8 with a midrib and two windows (z plane, u across, v up)
   wa_blade: SHP({u0: -.5, u1: .5, v0: 0, v1: 2.86}, (u, v) => { const t = clamp(v / 2.86), w = .46 * Math.sin(Math.PI * Math.pow(t, .8)) ** .8 + .01, c = .1 * Math.sin(t * 3.2);
     const blade = Math.abs(u - c) - w, win = (cx, cy) => Math.hypot((u - c - cx) / .1, (v - cy) / .3) - 1; return Math.max(blade, -Math.min(win(-.2, 1.35), win(.2, 1.85)) * .1); }),
   // 생명의 손 stalk: the hooked tip in profile (x plane: u = Z, v = Y, tip frame from the joint up)
@@ -322,13 +315,11 @@ add('he_bulb', 128, 64, (s, t) => {
 add('he_swirl', 32, 32, (s, t) => { const x = s - .5, y = t - .5, r = Math.hypot(x, y) * 2, a = Math.atan2(y, x); if (r > 1) return TRANSPARENT;
   const arm = Math.abs(Math.sin(a * 2 + r * 7)); return A([200, 200, 196, 255], clamp(.5 * smooth(.25, 0, arm) * smooth(1, .4, r))); }, 'heart', true);
 add('he_root', 32, 64, rootPx, 'heart');
+add('he_vine', 32, 32, (s, t) => { let c = PAL.vine(.25 + .25 * (N.c(s * 4, t * 12) - .5)); if (Math.abs(N.a(s * 3, t * 9) - .5) < .03) c = mix(c, PAL.vine(0), .5); return c; }, 'heart');
 const rootCard = sd => (u, v) => { const b = bevel(sd, u, v, .12); let c = rootPx(u * .45, v * .3); if (b.lit > 0) c = mix(c, PAL.root(.1), .45 * b.rim * b.lit); else c = sink(c, .35 * b.rim * -b.lit); if (-b.d < .02) c = sink(c, .4); return c; };
-shapeSprite('he_rootc', SH.h_root, 30, 'heart', rootCard(SH.h_root.sd));
-shapeSprite('he_armc', SH.h_arm, 21, 'heart', rootCard(SH.h_arm.sd));
 shapeSprite('he_tip', SH.h_tip, 64, 'heart', (u, v) => { const d = -SH.h_tip.sd(u, v); return mix(PAL.tip(.05 + .3 * clamp(v / .62)), PAL.tip(0), smooth(.05, 0, d) * .5); });
 shapeSprite('he_petal', SH.h_petal, 48, 'heart', (u, v) => shadeShape(SH.h_petal.sd, u, v, PAL.pale, {t0: .1, edge: .01, w: .05}));
 shapeSprite('he_sprout', SH.h_sprout, 48, 'heart', (u, v) => shadeShape(SH.h_sprout.sd, u, v, PAL.gold, {t0: .2, edge: .008, w: .03}));
-shapeSprite('he_tendril', SH.h_tendril, 40, 'heart', (u, v) => shadeShape(SH.h_tendril.sd, u, v, PAL.vine, {t0: .35, edge: .01, w: .03, rimLit: .35}));
 shapeSprite('he_stem', SH.h_stem, 20, 'heart', (u, v) => shadeShape(SH.h_stem.sd, u, v, PAL.vine, {t0: .4, edge: .015, w: .04, rimLit: .3}));
 
 // 소생의 찬가 domes (24 k)
@@ -367,6 +358,7 @@ add('st_bark_l', 16, 16, (s, t) => ledgeOf(PAL.stalk(.3 + .1 * N.b(s * 3, t * 3)
 // loft tiles / wraps: texel density per block for the tileUV windows; wraps map u = facet k / n, v along the loft
 for (const n of ['bo_bell', 'bo_skirt', 'nu_rib', 'gu_sheath', 'gu_bud', 'ne_cap', 'de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'he_bulb', 'do_shell', 'do_vine', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
 registerTile('he_root', 32, 64, 28);
+registerTile('he_vine', 32, 32, 40);
 registerTile('st_bark', 64, 64, 22);
 
 export const orgSprites = () => Object.fromEntries(Object.entries(S).map(([k, [w, h, fn, tr]]) => [k, [w, h, fn, tr]]));
