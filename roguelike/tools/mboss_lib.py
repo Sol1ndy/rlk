@@ -92,6 +92,16 @@ def load_registry():
         for ph, m in b.get('music', {}).items():
             assert ph in {str(k) for k in range(1, 10)} and m['ev'].startswith('minecraft:') and int(m['len']) >= 0, b['id']
         assert 0 <= int(b.get('pxBase', 65)) <= 240, b['id']
+        ic = b.get('icon')
+        assert ic is None or (isinstance(ic, dict) and 'item' in ic and 'model' in ic), f'{b["id"]}: icon must be {{item, model}}'
+        for k in ('minCh', 'maxCh', 'name', 'sub', 'color', 'el'):
+            assert k in b, f'{b["id"]}: missing {k}'
+    claimed = {}
+    for b in data['boss']:
+        if b.get('kind', 'mid') == 'chapter' and b.get('enabled', True) and b.get('route', True):
+            for c in b.get('ch', []):
+                assert c not in claimed, f'chapter {c} routed to both {claimed[c]} and {b["id"]}'
+                claimed[c] = b['id']
     return data
 
 

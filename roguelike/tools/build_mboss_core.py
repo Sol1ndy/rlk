@@ -18,6 +18,7 @@ Units at the runtime boundary: distances in tenths of a block (r:50 = 5 blocks),
 damage as a percentage of the boss's base hit (dmg:160 = 1.6 x registry atk), elements in #elem
 numbering (0 physical 1 pyro 2 hydro 3 electro 4 cryo 5 geo 6 anemo 7 dendro).
 """
+import json
 import math
 import mboss_lib as L
 
@@ -49,6 +50,8 @@ CORE_TOP = set()
 
 
 def w(name, text):
+    if isinstance(text, list):
+        text = '\n'.join(text)
     for k, v in TOK.items():
         text = text.replace(k, v)
     if '/' not in name:
@@ -118,7 +121,7 @@ def snbt_entry(b):
         'start:{x:%sd,y:%sd,z:%sd,yaw:%sf,pitch:%sf}' % tuple(L.num(float(start[k])) for k in ('x', 'y', 'z', 'yaw', 'pitch')),
         f'title:{{text:{s(b["name"])},color:{s(b["color"])},bold:true}}',
         f'gate:{{item:{s(icon["item"])},model:{s(icon["model"])},name:{s(b["name"])},'
-        f'desc:{s("좌클릭으로 도전 · 처치 시 아이템 상자 %d개" % picks)},color:{s(b["color"])}}}',
+        f'desc:{s(("좌클릭으로 도전 · 처치 시 아이템 상자 %d개" % picks) if b.get("kind", "mid") == "mid" else "좌클릭으로 도전 · 챕터 보스")},color:{s(b["color"])}}}',
         # schema v2 (AZ-CM, scratchpad az/contract/cm.md 3.1): every entry, mid-boss defaults. Int lists are plain lists
         # ([1], not [I;1]): the same reads in game, and the offline harness (mcsim) parses SNBT records as JSON.
         f'kind:{s(b.get("kind", "mid"))}', 'ch:[' + ','.join(str(int(c)) for c in b.get('ch', [])) + ']',
@@ -237,6 +240,7 @@ w('init', '\n'.join(
        'scoreboard players set #mbLn mb 0',
        '# Every helper entity dies on reload; a surviving body rebuilds its own (module reload hook).',
        'kill @e[tag=rlk_mb_aux]',
+       'kill @e[tag=rlk_mb_arena_prop]',
        'execute as @e[tag=rlk_mb_body] at @s run function rlk:mboss/reload',
        '# The arena is built once the dungeon area is set up (room/setup) and its chunks are loaded.',
        f'execute if data storage rlk:room {{ready:1b}} in minecraft:overworld if loaded {CX} {CY} {CZ} run function rlk:mboss/arena/ensure']))
@@ -446,6 +450,7 @@ execute in minecraft:overworld run function rlk:mboss/ar/marker
 execute in minecraft:overworld as @e[tag=rlk_mb_arena,limit=1] at @s rotated as @s run function rlk:mboss/d/spawn
 execute unless entity @e[tag=rlk_mb_body,limit=1] run return run function rlk:mboss/start_fail
 scoreboard players set #mbFail mb 0
+scoreboard players set #cbWait mb 0
 execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/start_body
 function rlk:mboss/ret_save
 scoreboard players operation #mbLv mb = @e[tag=rlk_mb_body,limit=1] mlv
@@ -515,7 +520,6 @@ execute store result score #mbAr mb run data get storage rlk:mboss cur.ar
               f'execute if score #mbAr mb matches {a["n"]} run scoreboard players set #mbArS10 mb {int(round(a["safe"] * 10))}\n'
               for _, a in ARENAS) + '''execute store result score #mbPx mb run data get storage rlk:mboss cur.px
 scoreboard players set #mbLost mb 0
-scoreboard players set #cbWait mb 0
 scoreboard players set #mbFloor mb 0
 scoreboard players set #mbFloorHit mb 0
 scoreboard players set #mbCine mb 0
@@ -893,8 +897,9 @@ scoreboard players set #mbId mb 0
 scoreboard players set #mbKilled mb 0
 ''')
 w('cleanup_aux', '''
-# Every entity of the fight (body, rig, hazards, props, aux objects, arena marker).
+# Every entity of the fight (body, rig, hazards, props, aux objects, arena marker; chapter arena props, cm.md 12).
 kill @e[tag=rlk_mb_aux]
+kill @e[tag=rlk_mb_arena_prop]
 kill @e[tag=rlk_mb_body]
 ''')
 w('cleanup_fight', '''
@@ -2757,6 +2762,7 @@ function rlk:mboss/floor
     w(f'cb/g/{b["id"]}', f'''
 # The gate of {b["id"]} was pressed (@s = the object marker, at it; the zone tagged rlk_cbz): forceload again (a cancelled
 # cb/won released it; the chunks load during the 30-t delay), the object goes, the zone fight starts, the gate texts.
+scoreboard players set #cbWait mb 0
 execute in minecraft:overworld run function rlk:mboss/ar/{a["aid"]}/fl_on
 function rlk:room/obj/kill_group
 execute as @e[tag=rlk_zone,tag=rlk_cbz,limit=1] at @s run function rlk:room/combat_start
@@ -2809,7 +2815,6 @@ execute store result score #mbAr mb run data get storage rlk:mboss cur.ar
 execute in minecraft:overworld run function rlk:mboss/ar/fl_on
 execute unless entity @a[tag=player,scores={dead=0},limit=1] run return run scoreboard players set #spawnT room 10
 execute in minecraft:overworld unless function rlk:mboss/ar/ensure run return run function rlk:mboss/cb/wait
-scoreboard players set #cbWait mb 0
 function rlk:mboss/start_go
 ''')
 w('cb/wait', '''
@@ -3014,12 +3019,18 @@ w('pl_dot', '''
 # Guard shield, then the element shield; no defence; dash i-frames do not block it; hurt fx. Output #mbDotDmg (HP lost).
 # Refused (nothing, #mbDotDmg 0) while dead, reviving, on a selection screen, the boss dying (#mbSt 2) or #mbCine 1.
 scoreboard players set #mbDotDmg mb 0
-execute unless entity @a[tag=player,scores={dead=0},limit=1] run return run scoreboard players set #mbDotLethal mb 0
-execute if entity @a[tag=player,scores={rnDie=1..}] run return run scoreboard players set #mbDotLethal mb 0
-execute if entity @a[tag=player,scores={pkMode=1..}] run return run scoreboard players set #mbDotLethal mb 0
-execute if score #mbSt mb matches 2 run return run scoreboard players set #mbDotLethal mb 0
-execute if score #mbCine mb matches 1 run return run scoreboard players set #mbDotLethal mb 0
+execute unless entity @a[tag=player,scores={dead=0},limit=1] run return run function rlk:mboss/pl_dot_end
+execute if entity @a[tag=player,scores={rnDie=1..}] run return run function rlk:mboss/pl_dot_end
+execute if entity @a[tag=player,scores={pkMode=1..}] run return run function rlk:mboss/pl_dot_end
+execute if score #mbSt mb matches 2 run return run function rlk:mboss/pl_dot_end
+execute if score #mbCine mb matches 1 run return run function rlk:mboss/pl_dot_end
 execute as @a[tag=player,limit=1] at @s run function rlk:mboss/pl_dot2
+function rlk:mboss/pl_dot_end
+''')
+w('pl_dot_end', '''
+# Every pl_dot input is reset after the call, refused or not (a stale value never leaks into the next caller).
+scoreboard players set #mbDotPct mb 0
+scoreboard players set #mbDotEl mb 0
 scoreboard players set #mbDotLethal mb 0
 ''')
 w('pl_dot2', '''
@@ -3321,11 +3332,251 @@ w('test/chelp', 'tellraw @s ' + CTT + gray('명령: ') + ',' + link('/function r
   + gray(' 챕터 지정 · ') + ',' + link('/function rlk:mboss/test/lose', 'lose') + ',' + gray(' 패배 경로 · kill / abort / pattern / lock / level / stop 공통') + ']')
 
 # ---------------------------------------------------------------------------------------------
-# Proxy dispatchers (per px boss; the per-boss runtime F:mboss/px/<id>/** is compiled by px_build, cm.md 9.3)
+# Hit proxies (cm.md 9): the runtime of every proxy boss (registry px:true) compiled from its rig manifest (schema v1):
+# the real T:mboss_<id>_rig_manifest.json ("source": "rig") merged per clip with the stub T:mboss_<id>/stub_rig_manifest.json
+# (a static "source": "stub" file at the real path counts as the stub: cproto). Interactions with fixed UUIDs follow the
+# anchor (the body) every tick at ^x ^ ^z of the pose the rig shows (clip_obj / tick_obj of the anchor).
 PXB = [b for b in CHAPS if b.get('px')]
+PX_MOVE = 0.15                  # a key is written when a sampled column moved more than this (x, z or top)
+PX_UP = 0.3                     # a column at or below this is parked (hidden bone, sunk part)
+PX_PARK = -8.0                  # parked proxies stand this far under the floor
+
+
+def px_manifest(b):
+    tools = L.ROOT / 'tools'
+    real_p, stub_p = tools / f'mboss_{b["id"]}_rig_manifest.json', tools / f'mboss_{b["id"]}' / 'stub_rig_manifest.json'
+    real = stub = None
+    if real_p.exists():
+        m = json.loads(real_p.read_text(encoding='utf-8'))
+        if m.get('schema') == 1 and m.get('source') == 'rig':
+            real = m
+        elif m.get('schema') == 1 and m.get('source') == 'stub':
+            stub = m
+    if stub_p.exists():
+        m = json.loads(stub_p.read_text(encoding='utf-8'))
+        if m.get('schema') == 1:
+            stub = m
+    assert real or stub, f'px boss {b["id"]}: no schema-v1 rig manifest ({real_p.name} / {stub_p.relative_to(tools)})'
+    G = ('proxies', 'uuids', 'states', 'capsules', 'runtime', 'functions')
+    if real:
+        merged = {k: real[k] for k in G if k in real}
+        for k in G:
+            if k not in merged and stub and k in stub:
+                merged[k] = stub[k]
+        have = {c['name'] for c in real['clips']}
+        clips = list(real['clips']) + ([c for c in stub['clips'] if c['name'] not in have] if stub else [])
+    else:
+        merged = {k: stub[k] for k in G if k in stub}
+        clips = list(stub['clips'])
+    merged['clips'] = [c for c in clips if not c['name'].startswith('dbg_')]
+    lay = merged['proxies']['layout']
+    assert 1 <= len(lay) <= 16, f'{b["id"]}: {len(lay)} proxies (at most 16)'
+    pxb = int(b.get('pxBase', 65))
+    for k, p in enumerate(lay):
+        want = pxb + k
+        assert p.get('idx', want) == want, f'{b["id"]}: proxy {p["name"]} idx {p.get("idx")} != pxBase + {k}'
+        assert merged['uuids'].get('proxies', {}).get(p['name'], want) == want, f'{b["id"]}: uuids.proxies.{p["name"]}'
+    for st in ('inv', 'dead'):
+        assert st in merged['states'], f'{b["id"]}: state set {st} missing from the manifest'
+    names = [p['name'] for p in lay]
+    for st, sd in merged['states'].items():
+        assert set(sd['px']) <= set(names), f'{b["id"]}: state {st} names unknown proxies'
+        for c in sd.get('capsules', []):
+            assert c in merged.get('capsules', {}), f'{b["id"]}: state {st} capsule {c}'
+    return merged
+
+
+def px_sample(clip, names):
+    """[(t, {name: (x, z, top)})] for t = 0 .. len-1, linear between the clip's px keys (missing proxies: rest)."""
+    keys = sorted((int(t), v) for t, v in clip.get('px', {}).get('keys', {}).items())
+    out = []
+    for t in range(int(clip['len'])):
+        lo = max((k for k in keys if k[0] <= t), default=keys[0], key=lambda k: k[0])
+        hi = min((k for k in keys if k[0] >= t), default=keys[-1], key=lambda k: k[0])
+        f = 0.0 if hi[0] == lo[0] else (t - lo[0]) / (hi[0] - lo[0])
+        row = {}
+        for n in names:
+            a, c = lo[1].get(n), hi[1].get(n)
+            if a is None or c is None:
+                continue
+            row[n] = tuple(a[i] + (c[i] - a[i]) * f for i in range(3))
+        out.append((t, row))
+    return out
+
+
+PX = {b['id']: px_manifest(b) for b in PXB}
+for b in PXB:
+    PX_STATES[b['id']] = list(PX[b['id']]['states'])
+
+
+def px_build(b):
+    bid, m = b['id'], PX[b['id']]
+    P, F = f'px/{bid}/', f'rlk:mboss/px/{bid}/'
+    lay = m['proxies']['layout']
+    names = [p['name'] for p in lay]
+    ints = m['uuids']['ints']
+    block = m['uuids']['block']
+    pxb = int(b.get('pxBase', 65))
+    uu = [f'{block}{pxb + k:02x}' for k in range(len(lay))]
+    rest = m['proxies'].get('rest', {})
+    co, to = m['runtime']['clip_obj'], m['runtime']['tick_obj']
+    tag_n = lambda n: f'rlk_mb_px_{n}'
+    o0 = ','.join(f'{n}_x:{L.num(float(rest.get(n, [0, 0, 0])[0]))}d,{n}_y:{L.num(PX_PARK)}d,{n}_z:{L.num(float(rest.get(n, [0, 0, 0])[1]))}d' for n in names)
+    t0 = ','.join(f'{n}:{L.num(float(rest.get(n, [0, 0, 1.0])[2]))}f' for n in names)
+    sp = [f'# @s = the body of {bid} (anchor), at it: its {len(lay)} hit proxies (interactions, UUID block {block}.., low byte',
+          f'# pxBase {pxb} + k) summoned parked, then the current state set (px.set; inv at a fight start) applied. A /reload',
+          '# respawns them from rlk:mboss px (the offsets and tops of the last pose written).']
+    sp += [f'kill {u}' for u in uu]
+    sp += [f'execute unless data storage rlk:mboss px.o run data modify storage rlk:mboss px.o set value {{{o0}}}',
+           f'execute unless data storage rlk:mboss px.top run data modify storage rlk:mboss px.top set value {{{t0}}}',
+           'execute unless data storage rlk:mboss px.set run data modify storage rlk:mboss px.set set value "inv"']
+    for k, p in enumerate(lay):
+        ui = '[I;' + ','.join(str(i) for i in ints + [pxb + k]) + ']'
+        sp += [f'execute at @s rotated as @s rotated ~ 0 positioned ^ ^{L.num(PX_PARK)} ^ run summon minecraft:interaction ~ ~ ~ '
+               f'{{UUID:{ui},Tags:["rlk_room","rlk_mb_aux","boss","rlk_mb_px","{tag_n(p["name"])}"],width:{L.num(float(p["w"]))}f,height:1.0f,response:false}}',
+               f'scoreboard players set {uu[k]} mbPart {k + 1}',
+               f'execute store result score #t mb run data get storage rlk:mboss px.top.{p["name"]} 100',
+               f'scoreboard players set #pxU{k + 1} mb 0',
+               f'execute if score #t mb matches {int(PX_UP * 100) + 1}.. run scoreboard players set #pxU{k + 1} mb 1',
+               'execute if score #t mb matches ..10 run scoreboard players set #t mb 10',
+               f'execute store result entity {uu[k]} height float 0.01 run scoreboard players get #t mb']
+    sp += ['function rlk:mboss/px/state with storage rlk:mboss px']
+    w(P + 'spawn', '\n'.join(sp))
+    for k, p in enumerate(lay):
+        n = p['name']
+        w(P + f'on/{k + 1}', f'# Proxy {n} live: on the anchor floor, rlk_mob (targetable).\n'
+          f'data modify storage rlk:mboss px.o.{n}_y set value 0.0d\ntag {uu[k]} add rlk_mob')
+        w(P + f'off/{k + 1}', f'# Proxy {n} parked: {L.num(-PX_PARK)} b under the floor, no rlk_mob.\n'
+          f'data modify storage rlk:mboss px.o.{n}_y set value {L.num(PX_PARK)}d\ntag {uu[k]} remove rlk_mob')
+        w(P + f'ev/{k + 1}', f'# Proxy {n}: live iff in the current state set (#pxS{k + 1}) and its column top > {PX_UP} b (#pxU{k + 1}).\n'
+          f'scoreboard players operation #t mb = #pxS{k + 1} mb\nscoreboard players operation #t mb *= #pxU{k + 1} mb\n'
+          f'execute if score #t mb matches 1 run return run function {F}on/{k + 1}\nfunction {F}off/{k + 1}')
+    fns = m.get('functions') or {}
+    for st, sd in m['states'].items():
+        caps = []
+        for c in sd.get('capsules', []):
+            cd = m['capsules'][c]
+            caps.append('{f0:%d,f1:%d,hw:%d,px:%s,top:%d}' % (round(cd['f0'] * 10), round(cd['f1'] * 10), round(cd['hw'] * 10),
+                                                            L.snbt_str(cd.get('px', '')), round(cd.get('top_max', 0) * 10)))
+        lines = [f'# State set "{st}" of {bid}: membership, live / parked, the push capsules (tenths, anchor frame), the rig',
+                 '# visibility, the inv rule (rlk_mb_inv only through rlk_mb_pxinv: an inv the body already has is never touched).',
+                 f'data modify storage rlk:mboss px.set set value "{st}"']
+        lines += [f'scoreboard players set #pxS{k + 1} mb {1 if n in sd["px"] else 0}' for k, n in enumerate(names)]
+        lines += [f'function {F}ev/{k + 1}' for k in range(len(names))]
+        lines.append('data modify storage rlk:mboss push set value [' + ','.join(caps) + ']')
+        vis = sd.get('vis')
+        if vis:
+            st_fns = fns.get('state') if isinstance(fns, dict) else None
+            vfn = (st_fns.get(vis) if isinstance(st_fns, dict) else None) or (m['runtime'].get('ns', f'rlk:mboss/{bid}/rig/') + 'state/' + vis)
+            # always the literal call (the output never depends on which generator ran first): the rig / the module's
+            # stand-in rig provides it (manifest.md 8), check_mboss_pack reports it when it is missing
+            lines.append(f'execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function {vfn}')
+        if sd.get('inv'):
+            lines.append('execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] unless entity @s[tag=rlk_mb_inv] run function rlk:mboss/px/inv_on')
+        else:
+            lines.append('execute as @e[type=minecraft:husk,tag=rlk_mb_body,tag=rlk_mb_pxinv,limit=1] run function rlk:mboss/px/inv_off')
+        w(P + f's/{st}', '\n'.join(lines))
+    # keys: per clip, the ticks where a sampled column moved > PX_MOVE since the last write (t 0 writes all)
+    kd = {}
+    for c in m['clips']:
+        if not c.get('px', {}).get('keys'):
+            continue
+        last, ticks = {}, []
+        for t, row in px_sample(c, names):
+            lines = []
+            for k, n in enumerate(names):
+                if n not in row:
+                    continue
+                x, z, top = row[n]
+                prev = last.get(n)
+                if prev is not None and max(abs(x - prev[0]), abs(z - prev[1]), abs(top - prev[2])) <= PX_MOVE:
+                    continue
+                lines += [f'data modify storage rlk:mboss px.o.{n}_x set value {L.num(x, 3)}d',
+                          f'data modify storage rlk:mboss px.o.{n}_z set value {L.num(z, 3)}d',
+                          f'data modify storage rlk:mboss px.top.{n} set value {L.num(top, 3)}f',
+                          f'data merge entity {uu[k]} {{height:{L.num(max(top, 0.1), 3)}f}}']
+                up = 1 if top > PX_UP else 0
+                if prev is None or (1 if prev[2] > PX_UP else 0) != up:
+                    lines += [f'scoreboard players set #pxU{k + 1} mb {up}', f'function {F}ev/{k + 1}']
+                last[n] = (x, z, top)
+            if lines:
+                w(P + f'k/{c["id"]}/{t}', [f'# Clip {c["name"]} (id {c["id"]}) tick {t}: the proxy columns that moved.'] + lines)
+                ticks.append(t)
+        kd[c['id']] = (c['name'], ticks)
+
+    def tree(cid, ts):
+        if len(ts) <= 8:
+            return [f'execute if score #pxT mb matches {t} run return run function {F}k/{cid}/{t}' for t in ts]
+        h = len(ts) // 2
+        a, bb = ts[:h], ts[h:]
+        for part in (a, bb):
+            w(P + f't/{cid}_{part[0]}_{part[-1]}', tree(cid, part))
+        return [f'execute if score #pxT mb matches {a[0]}..{a[-1]} run return run function {F}t/{cid}_{a[0]}_{a[-1]}',
+                f'execute if score #pxT mb matches {bb[0]}..{bb[-1]} run return run function {F}t/{cid}_{bb[0]}_{bb[-1]}']
+    for cid, (cname, ts) in kd.items():
+        if ts:
+            w(P + f'c/{cid}', [f'# Clip {cname}: the key of tick #pxT (binary tree over the {len(ts)} key ticks).'] + tree(cid, ts))
+    w(P + 'c', [f'# The clip shown this tick (#pxC = the anchor\'s {co}).']
+      + [f'execute if score #pxC mb matches {cid} run return run function {F}c/{cid}' for cid, (_, ts) in kd.items() if ts])
+    w(P + 'tick', f'''
+# @s = the body of {bid} (the anchor), at it, after the module and rig ticks: the key of the shown clip tick (the anchor's
+# {to}; negative = queued: the offsets stay), then every proxy follows the anchor.
+execute unless score @s {to} matches 0.. run return run function {F}follow with storage rlk:mboss px.o
+execute store result score #pxC mb run scoreboard players get @s {co}
+scoreboard players operation #pxT mb = @s {to}
+function {F}c
+function {F}follow with storage rlk:mboss px.o
+''')
+    w(P + 'follow', '\n'.join(
+        [f'# (macro px.o) @s = the anchor: one tp per proxy to ^x ^y ^z from the anchor (yaw only; y 0 live, {L.num(PX_PARK)} parked).']
+        + [f'$execute at @s rotated as @s rotated ~ 0 as {uu[k]} run tp @s ^$({n}_x) ^$({n}_y) ^$({n}_z)' for k, n in enumerate(names)]))
+    w(P + 'park', '\n'.join([f'# Every proxy of {bid} parked (the state set is kept; the next px/state or key re-evaluates).']
+                            + [f'function {F}off/{k + 1}' for k in range(len(names))]))
+    w(P + 'poll', '\n'.join([f'# Clicks on the proxies of {bid} (interaction attack / interaction data) go through the normal click input, every',
+                             '# live tick (the click shield path of combat/mshield_tick).']
+                            + [ln for u in uu for ln in (f'execute as {u} if data entity @s attack at @s run function rlk:combat/input/poll_attack',
+                                                         f'execute as {u} if data entity @s interaction at @s run function rlk:combat/input/poll_right')]))
+    w(P + 'clear_input', '\n'.join([f'# Paused: drop the stored clicks of the proxies of {bid}.']
+                                   + [ln for u in uu for ln in (f'data remove entity {u} attack', f'data remove entity {u} interaction')]))
+    return len(lay), sum(len(ts) for _, ts in kd.values())
+
+
+PX_INFO = {b['id']: px_build(b) for b in PXB}
+w('px/inv_on', '''
+# @s = the body: an inv:true proxy state made it untargetable (rlk_mb_pxinv marks that px added the inv).
+tag @s add rlk_mb_inv
+tag @s add rlk_mb_pxinv
+''')
+w('px/inv_off', '''
+# @s = the body with rlk_mb_pxinv: leaving the inv set removes the inv px added (and only that one).
+tag @s remove rlk_mb_inv
+tag @s remove rlk_mb_pxinv
+''')
+# Target-side state that M0 code writes with distance / rlk_hit selectors outside combat/apply lands on the proxies
+# (cm.md 9.6 audit, README "챕터 보스" audit table); combat/apply reads it on the body. px/db (every px tick, before the
+# key) moves it to the body: countdown timers (element/tick counts them down on the body, elAct 1) and game-time ends
+# (max). Proxies are interactions: mob/tick never runs on them, so a value left there would never decay.
+PX_DB = (('scT', 'superconduct (element/run/supercond)', True),
+         ('rnNoE', "Ronova's echo window (char/ronova/echo_boom)", True),
+         ('mirEnd', 'the mirror item (items/proc/mirror)', False),
+         ('aurEnd', "Yoimiya's aura (char/yoimiya/rocket_boom, aur_move)", False))
+w('px/db', ['# @s = the body (px/tick): proxy-held target state moves to the body (cm.md 9.6 audit).']
+  + [f'execute as @e[type=minecraft:interaction,tag=rlk_mb_px,scores={{{o}=1..}}] run function rlk:mboss/px/db/{o.lower()}' for o, _, _ in PX_DB])
+for o, what, timer in PX_DB:
+    w(f'px/db/{o.lower()}', [f'# @s = a proxy holding {o} ({what}): the body takes the larger value, the proxy drops it.',
+                     f'scoreboard players operation @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] {o} > @s {o}']
+      + (['scoreboard players set @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] elAct 1'] if timer else [])
+      + [f'scoreboard players set @s {o} 0'])
+w('px/to_body', '''
+# @s = a proxy tagged rlk_hit (a §16 line in char/arlecchino/skill_hit, after the damage): the rest of that skill's
+# target-side writes (arDir, the blood-debt mark) go to the body, once per boss, not to each proxy that was in range.
+tag @s remove rlk_hit
+tag @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] add rlk_hit
+''')
 for fn_, ctx in (('spawn', 'as the body, at it'), ('tick', 'as the body, at it (mboss/world after body_tick)'),
                  ('park', 'anywhere'), ('poll', 'anywhere (mboss/world, live ticks)'), ('clear_input', 'anywhere (pause_tick)')):
     w(f'px/{fn_}', '\n'.join([f'# GENERATED dispatcher ({ctx}): rlk:mboss/px/<id>/{fn_} of the running proxy boss (#mbId).']
+                              + (['function rlk:mboss/px/db'] if fn_ == 'tick' else [])
                               + [f'execute if score #mbId mb matches {b["n"]} run return run function rlk:mboss/px/{b["id"]}/{fn_}' for b in PXB]))
 w('px/state', '\n'.join(
     ['# {set} (anywhere): the proxy state set of the running proxy boss (a key of its manifest states). Literal lines per',
@@ -3334,14 +3585,271 @@ w('px/state', '\n'.join(
     + [f'execute if score #mbId mb matches {b["n"]} if data storage rlk:mboss {{pxq:"{st}"}} run return run function rlk:mboss/px/{b["id"]}/s/{st}'
        for b in PXB for st in PX_STATES.get(b['id'], [])]
     + ['execute if score #mbPx mb matches 1 run tellraw @a[tag=player] ' + CT + gray('알 수 없는 판정 상태: ') + ',{nbt:"pxq",storage:"rlk:mboss",color:"gray"}]']))
+
 w('push/capsule', '''
-# @s = the body, at it, rotated as it (mboss/world after body_tick while #mbPushOn 1): the push capsules of push[].
+# @s = the body (the anchor), at it, rotated as it: mboss/world after body_tick while #mbPushOn 1 (a per-tick request of
+# the module; cm.md 13.5). Capsules = rlk:mboss push[] {f0,f1,hw,px,top} in tenths in the anchor frame (f0 <= f <= f1,
+# |s| < hw; an entry with px is active only while that proxy's current top <= top). A player inside is moved toward the
+# nearest exit (side, front end, back end) whose end point is not inside a live disc / ring / line hazard, by at most
+# 0.6 b this tick in 0.1-b player/knockback/check steps (no velocity, no FOV). Refused while dead, reviving, selecting,
+# in the map view or dashing.
+execute unless entity @a[tag=player,scores={dead=0},limit=1] run return 0
+execute if entity @a[tag=player,scores={rnDie=1..}] run return 0
+execute if entity @a[tag=player,scores={pkMode=1..}] run return 0
+execute if entity @a[tag=player,scores={vMap=1}] run return 0
+execute if entity @a[tag=player,scores={dashMoveT=1..}] run return 0
+execute unless data storage rlk:mboss push[0] run return 0
+execute unless function rlk:mboss/mv/local run return 0
+execute store result score #pbx mb run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000
+execute store result score #pbz mb run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000
+scoreboard players set #puDone mb 0
+data modify storage rlk:mboss pq set from storage rlk:mboss push
+function rlk:mboss/push/cap_loop
 ''')
+w('push/cap_loop', '''
+execute if score #puDone mb matches 1 run return 0
+execute unless data storage rlk:mboss pq[0] run return 0
+function rlk:mboss/push/cap_one
+data remove storage rlk:mboss pq[0]
+function rlk:mboss/push/cap_loop
+''')
+w('push/cap_one', '''
+# @s = the anchor: the capsule pq[0] (tenths -> mb); the player's anchor-frame position is #mbLf / #mbLs (mb).
+execute store result score #pF0 mb run data get storage rlk:mboss pq[0].f0 100
+execute store result score #pF1 mb run data get storage rlk:mboss pq[0].f1 100
+execute store result score #pHW mb run data get storage rlk:mboss pq[0].hw 100
+execute store result score #pTop mb run data get storage rlk:mboss pq[0].top
+scoreboard players set #pAct mb 1
+data modify storage rlk:mboss pc set from storage rlk:mboss pq[0]
+execute unless data storage rlk:mboss pc{px:""} run function rlk:mboss/push/cap_top with storage rlk:mboss pc
+execute if score #pAct mb matches 0 run return 0
+execute if score #mbLf mb < #pF0 mb run return 0
+execute if score #mbLf mb > #pF1 mb run return 0
+scoreboard players operation #pAs mb = #mbLs mb
+execute if score #pAs mb matches ..-1 run scoreboard players operation #pAs mb *= #cm1 mb
+execute if score #pAs mb >= #pHW mb run return 0
+# inside: the three exits (distance to the edge, mb) tried nearest first
+scoreboard players operation #pdS mb = #pHW mb
+scoreboard players operation #pdS mb -= #pAs mb
+scoreboard players operation #pdF mb = #pF1 mb
+scoreboard players operation #pdF mb -= #mbLf mb
+scoreboard players operation #pdB mb = #mbLf mb
+scoreboard players operation #pdB mb -= #pF0 mb
+scoreboard players set #pU1 mb 0
+scoreboard players set #pU2 mb 0
+scoreboard players set #pU3 mb 0
+scoreboard players set #pEx mb 0
+function rlk:mboss/push/pick
+execute if score #pEx mb matches 0 run function rlk:mboss/push/pick
+execute if score #pEx mb matches 0 run function rlk:mboss/push/pick
+execute if score #pEx mb matches 0 run return 0
+scoreboard players set #puDone mb 1
+function rlk:mboss/push/move
+''')
+w('push/cap_top', '''
+# (macro px) a capsule bound to a proxy is active only while that proxy's current column top <= top (tenths).
+$execute store result score #t mb run data get storage rlk:mboss px.top.$(px) 10
+execute if score #t mb > #pTop mb run scoreboard players set #pAct mb 0
+''')
+w('push/pick', '''
+# The nearest exit not tried yet (#pU1 side, #pU2 front end, #pU3 back end); #pEx = 1 left 2 right 3 front 4 back when
+# its end point (the edge + 0.3 b) is clear of live disc / ring / line hazards.
+scoreboard players set #pBest mb 0
+scoreboard players set #pBd mb 2147483647
+execute if score #pU1 mb matches 0 if score #pdS mb < #pBd mb run scoreboard players set #pBest mb 1
+execute if score #pBest mb matches 1 run scoreboard players operation #pBd mb = #pdS mb
+execute if score #pU2 mb matches 0 if score #pdF mb < #pBd mb run scoreboard players set #pBest mb 2
+execute if score #pBest mb matches 2 run scoreboard players operation #pBd mb = #pdF mb
+execute if score #pU3 mb matches 0 if score #pdB mb < #pBd mb run scoreboard players set #pBest mb 3
+execute if score #pBest mb matches 3 run scoreboard players operation #pBd mb = #pdB mb
+execute if score #pBest mb matches 0 run return 0
+execute if score #pBest mb matches 1 run scoreboard players set #pU1 mb 1
+execute if score #pBest mb matches 2 run scoreboard players set #pU2 mb 1
+execute if score #pBest mb matches 3 run scoreboard players set #pU3 mb 1
+# unit direction x1000 in the world (#fx #fz = the anchor forward from mv/local; left = (fz, -fx))
+execute if score #pBest mb matches 1 if score #mbLs mb matches 0.. run function rlk:mboss/push/dir_left
+execute if score #pBest mb matches 1 if score #mbLs mb matches ..-1 run function rlk:mboss/push/dir_right
+execute if score #pBest mb matches 2 run function rlk:mboss/push/dir_front
+execute if score #pBest mb matches 3 run function rlk:mboss/push/dir_back
+scoreboard players operation #pDist mb = #pBd mb
+scoreboard players add #pDist mb 300
+scoreboard players operation #peX mb = #pux mb
+scoreboard players operation #peX mb *= #pDist mb
+scoreboard players operation #peX mb /= #c1000 mb
+scoreboard players operation #peX mb += #pbx mb
+scoreboard players operation #peZ mb = #puz mb
+scoreboard players operation #peZ mb *= #pDist mb
+scoreboard players operation #peZ mb /= #c1000 mb
+scoreboard players operation #peZ mb += #pbz mb
+function rlk:mboss/push/end_ok
+execute if score #pOK mb matches 1 run scoreboard players operation #pEx mb = #pDir mb
+''')
+for nm, d, ux, uz in (('left', 1, '#fz', '#fx'), ('right', 2, '#fz', '#fx'), ('front', 3, '#fx', '#fz'), ('back', 4, '#fx', '#fz')):
+    sx = {'left': '', 'right': ' *= #cm1 mb', 'front': '', 'back': ' *= #cm1 mb'}[nm]
+    sz = {'left': ' *= #cm1 mb', 'right': '', 'front': '', 'back': ' *= #cm1 mb'}[nm]
+    lines = [f'scoreboard players set #pDir mb {d}', f'scoreboard players operation #pux mb = {ux} mb', f'scoreboard players operation #puz mb = {uz} mb']
+    if sx:
+        lines.append('scoreboard players operation #pux mb' + sx)
+    if sz:
+        lines.append('scoreboard players operation #puz mb' + sz)
+    w(f'push/dir_{nm}', '\n'.join([f'# exit {nm}: the unit direction x1000 of the anchor frame in the world.'] + lines))
+w('push/end_ok', '''
+# #peX / #peZ mb = a proposed end point (the player's y): #pOK 1 unless it lies inside a live disc / ring (kind 1-2) or
+# line (kind 4) hazard (their own bounds with the body pad).
+scoreboard players set #pOK mb 1
+execute as @e[type=minecraft:marker,tag=rlk_mb_hz,scores={mbHzK=1..2}] run function rlk:mboss/push/end_disc
+execute as @e[type=minecraft:marker,tag=rlk_mb_hz,scores={mbHzK=4}] run function rlk:mboss/push/end_line
+''')
+w('push/end_disc', '''
+execute if score #pOK mb matches 0 run return 0
+execute store result score #t mb run data get entity @s Pos[0] 1000
+scoreboard players operation #qx mb = #peX mb
+scoreboard players operation #qx mb -= #t mb
+execute store result score #t mb run data get entity @s Pos[2] 1000
+scoreboard players operation #qz mb = #peZ mb
+scoreboard players operation #qz mb -= #t mb
+execute unless score #qx mb matches -32000..32000 run return 0
+execute unless score #qz mb matches -32000..32000 run return 0
+scoreboard players operation #q2 mb = #qx mb
+scoreboard players operation #q2 mb *= #qx mb
+scoreboard players operation #t mb = #qz mb
+scoreboard players operation #t mb *= #qz mb
+scoreboard players operation #q2 mb += #t mb
+execute if score #q2 mb <= @s mbHzRR if score #q2 mb >= @s mbHzRI run scoreboard players set #pOK mb 0
+''')
+w('push/end_line', '''
+execute if score #pOK mb matches 0 run return 0
+execute store result score #t mb run data get entity @s Pos[0] 1000
+scoreboard players operation #qx mb = #peX mb
+scoreboard players operation #qx mb -= #t mb
+execute store result score #t mb run data get entity @s Pos[2] 1000
+scoreboard players operation #qz mb = #peZ mb
+scoreboard players operation #qz mb -= #t mb
+execute unless score #qx mb matches -48000..48000 run return 0
+execute unless score #qz mb matches -48000..48000 run return 0
+scoreboard players operation #q2 mb = #qx mb
+scoreboard players operation #q2 mb *= @s mbHzFX
+scoreboard players operation #t mb = #qz mb
+scoreboard players operation #t mb *= @s mbHzFZ
+scoreboard players operation #q2 mb += #t mb
+scoreboard players operation #q2 mb /= #c1000 mb
+execute if score #q2 mb < @s mbHzLo run return 0
+execute if score #q2 mb > @s mbHzHi run return 0
+scoreboard players operation #qs mb = #qx mb
+scoreboard players operation #qs mb *= @s mbHzFZ
+scoreboard players operation #t mb = #qz mb
+scoreboard players operation #t mb *= @s mbHzFX
+scoreboard players operation #qs mb -= #t mb
+scoreboard players operation #qs mb /= #c1000 mb
+execute if score #qs mb matches ..-1 run scoreboard players operation #qs mb *= #cm1 mb
+execute if score #qs mb <= @s mbHzHW run scoreboard players set #pOK mb 0
+''')
+w('push/move', '\n'.join(
+    ['# @s = the anchor: up to 6 steps of 0.1 b toward exit #pEx (collision-checked like knockback); the distance needed is',
+     '# the edge distance #pBd + 0.1 b.',
+     'scoreboard players operation #pN mb = #pBd mb',
+     'scoreboard players add #pN mb 199',
+     'scoreboard players operation #pN mb /= #c100 mb',
+     'execute if score #pN mb matches 7.. run scoreboard players set #pN mb 6']
+    + [f'execute if score #pEx mb matches {d} run function rlk:mboss/push/step_{nm}' for d, nm in ((1, 'left'), (2, 'right'), (3, 'front'), (4, 'back'))]))
+for nm, off in (('left', '^0.1 ^ ^'), ('right', '^-0.1 ^ ^'), ('front', '^ ^ ^0.1'), ('back', '^ ^ ^-0.1')):
+    w(f'push/step_{nm}', f'''
+# @s = the anchor: one 0.1-b step of the player's body toward the {nm} exit, while #pN steps are left.
+execute unless score #pN mb matches 1.. run return 0
+scoreboard players remove #pN mb 1
+scoreboard players set #pkbBlocked tmp 0
+execute at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 positioned {off} run function rlk:player/knockback/check
+execute if score #pkbBlocked tmp matches 1 run return 0
+execute at @e[tag=rlk_body,limit=1] rotated as @s rotated ~ 0 positioned {off} run tp @e[tag=rlk_body,limit=1] ~ ~ ~
+function rlk:mboss/push/step_{nm}
+''')
+pisq = []
+for _ in range(14):
+    pisq += ['scoreboard players operation #t mb = #n mb', 'scoreboard players operation #t mb /= #pd mb',
+             'scoreboard players operation #pd mb += #t mb', 'scoreboard players operation #pd mb /= #c2 mb',
+             'execute if score #pd mb matches ..0 run scoreboard players set #pd mb 1']
+w('push/sqrt', '\n'.join(['# #pd = isqrt(#n) (#n >= 1).', 'scoreboard players set #pd mb 10000'] + pisq))
 w('push/ring', '''
-# {r,to,kb} (as anything, at the centre): the push-only ring (cm.md 13.5).
+# {r,to,kb} (as anything, at the centre; cm.md 13.5 / N18): a push-only ring. A player whose body is within r (tenths,
+# horizontal) is moved radially outward to the distance to (tenths, to >= r) on its bearing over kb ticks (1..10; the
+# collision-checked pull glide, no facing turn); a player at the centre goes toward the arena start. Skipped when the
+# landing point is inside a live disc / ring / line hazard. No damage, no hit event, not dodgeable.
 $scoreboard players set #prR mb $(r)
 $scoreboard players set #prTo mb $(to)
 $scoreboard players set #prKb mb $(kb)
+execute unless entity @e[tag=rlk_body,limit=1] run return 0
+execute if score #prTo mb < #prR mb run scoreboard players operation #prTo mb = #prR mb
+execute if score #prKb mb matches ..0 run scoreboard players set #prKb mb 1
+execute if score #prKb mb matches 11.. run scoreboard players set #prKb mb 10
+summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_prc"]}
+execute store result score #qcx mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_prc,limit=1] Pos[0] 1000
+execute store result score #qcz mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_prc,limit=1] Pos[2] 1000
+kill @e[type=minecraft:marker,tag=rlk_mb_prc]
+execute store result score #pbx mb run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000
+execute store result score #pbz mb run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000
+scoreboard players operation #qx mb = #pbx mb
+scoreboard players operation #qx mb -= #qcx mb
+scoreboard players operation #qz mb = #pbz mb
+scoreboard players operation #qz mb -= #qcz mb
+execute unless score #qx mb matches -40000..40000 run return 0
+execute unless score #qz mb matches -40000..40000 run return 0
+scoreboard players operation #n mb = #qx mb
+scoreboard players operation #n mb *= #qx mb
+scoreboard players operation #t mb = #qz mb
+scoreboard players operation #t mb *= #qz mb
+scoreboard players operation #n mb += #t mb
+scoreboard players operation #t mb = #prR mb
+scoreboard players operation #t mb *= #c100 mb
+scoreboard players operation #t mb *= #t mb
+execute if score #n mb > #t mb run return 0
+scoreboard players set #pd mb 0
+execute if score #n mb matches 1.. run function rlk:mboss/push/sqrt
+execute if score #pd mb matches ..49 run function rlk:mboss/push/ring_start
+execute if score #pd mb matches ..49 run return 0
+function rlk:mboss/push/ring_land
+''')
+w('push/ring_start', '''
+# A player at the centre: the bearing toward the arena arrival spot (cur.start) instead.
+execute store result score #qx mb run data get storage rlk:mboss cur.start.x 1000
+execute store result score #qz mb run data get storage rlk:mboss cur.start.z 1000
+scoreboard players operation #qx mb -= #qcx mb
+scoreboard players operation #qz mb -= #qcz mb
+execute unless score #qx mb matches -40000..40000 run return 0
+execute unless score #qz mb matches -40000..40000 run return 0
+scoreboard players operation #n mb = #qx mb
+scoreboard players operation #n mb *= #qx mb
+scoreboard players operation #t mb = #qz mb
+scoreboard players operation #t mb *= #qz mb
+scoreboard players operation #n mb += #t mb
+execute if score #n mb matches ..0 run return 0
+function rlk:mboss/push/sqrt
+function rlk:mboss/push/ring_land
+''')
+w('push/ring_land', '''
+# The landing point = centre + (#qx, #qz) / #pd x to (mb); then the glide unless it lands inside a live hazard.
+scoreboard players operation #t mb = #prTo mb
+scoreboard players operation #t mb *= #c100 mb
+scoreboard players operation #peX mb = #qx mb
+scoreboard players operation #peX mb *= #t mb
+scoreboard players operation #peX mb /= #pd mb
+scoreboard players operation #peX mb += #qcx mb
+scoreboard players operation #peZ mb = #qz mb
+scoreboard players operation #peZ mb *= #t mb
+scoreboard players operation #peZ mb /= #pd mb
+scoreboard players operation #peZ mb += #qcz mb
+function rlk:mboss/push/end_ok
+execute if score #pOK mb matches 0 run return 0
+execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_prl"]}
+execute store result entity @e[type=minecraft:marker,tag=rlk_mb_prl,limit=1] Pos[0] double 0.001 run scoreboard players get #peX mb
+execute store result entity @e[type=minecraft:marker,tag=rlk_mb_prl,limit=1] Pos[2] double 0.001 run scoreboard players get #peZ mb
+execute store result storage rlk:mboss a.t int 1 run scoreboard players get #prKb mb
+scoreboard players set #pullFace mb 0
+execute at @e[type=minecraft:marker,tag=rlk_mb_prl,limit=1] run function rlk:mboss/push/ring_go with storage rlk:mboss a
+kill @e[type=minecraft:marker,tag=rlk_mb_prl]
+''')
+w('push/ring_go', '''
+# (macro t) at the landing point: the undodgeable, collision-checked glide (mboss/pull/start) without the facing turn.
+$function rlk:mboss/pull/start {t:$(t)}
 ''')
 
 # Stale top-level framework files: every F:mboss/*.mcfunction belongs to this generator

@@ -3,3 +3,4 @@ execute if score #mbId mb matches 1 run return run function rlk:mboss/guardian/h
 execute if score #mbId mb matches 2 run return run function rlk:mboss/butterfly/hz_vis
 execute if score #mbId mb matches 3 run return run function rlk:mboss/fieldgen/hz_vis
 execute if score #mbId mb matches 99 run return run function rlk:mboss/proto/hz_vis
+execute if score #mbId mb matches 98 run return run function rlk:mboss/cproto/hz_vis

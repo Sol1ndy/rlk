@@ -8,5 +8,4 @@ execute store result score #mbAr mb run data get storage rlk:mboss cur.ar
 execute in minecraft:overworld run function rlk:mboss/ar/fl_on
 execute unless entity @a[tag=player,scores={dead=0},limit=1] run return run scoreboard players set #spawnT room 10
 execute in minecraft:overworld unless function rlk:mboss/ar/ensure run return run function rlk:mboss/cb/wait
-scoreboard players set #cbWait mb 0
 function rlk:mboss/start_go

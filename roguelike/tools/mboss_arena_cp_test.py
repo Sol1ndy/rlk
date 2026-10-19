@@ -56,9 +56,13 @@ def slices():
 
 
 def props(look=None):
-    """Two test props (kind water_sheet; the boss module spawns them, a missing kit kind is skipped)."""
-    return [{'name': 'water_t%d' % i, 'kind': 'water_sheet', 'group': 'water', 'pos': (CX - 3.0 + 6.0 * i, 201.005, float(CZ)),
-             'yaw': 0.0, 'pitch': 0.0, 'scale': 5.0, 'el': 'fight', 'uuid': None} for i in range(2)]
+    """Two test props per look with vanilla kinds (theme.md 7): 'plain' glass, 'lit' gold blocks (group 'test', el 5,
+    no fixed UUID); cproto spawns them at fight start and after its own look calls (tag prefix rlk_mb_cp_ap_test)."""
+    look = look or LOOKS[0]
+    assert look in LOOKS, look
+    item = 'minecraft:glass' if look == 'plain' else 'minecraft:gold_block'
+    return [{'name': f'{look}_{i}', 'kind': 'item:' + item, 'group': 'test', 'pos': (CX - 3.0 + 6.0 * i, 202.5, float(CZ - 4)),
+             'yaw': 0.0, 'pitch': 0.0, 'scale': 0.8, 'el': 5, 'uuid': None} for i in range(2)]
 
 
 def _cell(x0, z0, x1, z1, m=3):

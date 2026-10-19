@@ -3,10 +3,10 @@
 # Guard shield, then the element shield; no defence; dash i-frames do not block it; hurt fx. Output #mbDotDmg (HP lost).
 # Refused (nothing, #mbDotDmg 0) while dead, reviving, on a selection screen, the boss dying (#mbSt 2) or #mbCine 1.
 scoreboard players set #mbDotDmg mb 0
-execute unless entity @a[tag=player,scores={dead=0},limit=1] run return run scoreboard players set #mbDotLethal mb 0
-execute if entity @a[tag=player,scores={rnDie=1..}] run return run scoreboard players set #mbDotLethal mb 0
-execute if entity @a[tag=player,scores={pkMode=1..}] run return run scoreboard players set #mbDotLethal mb 0
-execute if score #mbSt mb matches 2 run return run scoreboard players set #mbDotLethal mb 0
-execute if score #mbCine mb matches 1 run return run scoreboard players set #mbDotLethal mb 0
+execute unless entity @a[tag=player,scores={dead=0},limit=1] run return run function rlk:mboss/pl_dot_end
+execute if entity @a[tag=player,scores={rnDie=1..}] run return run function rlk:mboss/pl_dot_end
+execute if entity @a[tag=player,scores={pkMode=1..}] run return run function rlk:mboss/pl_dot_end
+execute if score #mbSt mb matches 2 run return run function rlk:mboss/pl_dot_end
+execute if score #mbCine mb matches 1 run return run function rlk:mboss/pl_dot_end
 execute as @a[tag=player,limit=1] at @s run function rlk:mboss/pl_dot2
-scoreboard players set #mbDotLethal mb 0
+function rlk:mboss/pl_dot_end

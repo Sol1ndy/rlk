@@ -7,6 +7,6 @@ scoreboard players set #mbN mb 4
 scoreboard players set #mbRoll mb 3
 # Chapter bosses (kind chapter, AZ-CM): creg[] = their records, cbyid.<id> = the full record (cb/start copies it
 # into cur). The roll never sees them.
-data modify storage rlk:mboss creg set value []
-data modify storage rlk:mboss cbyid set value {}
-scoreboard players set #mbCN mb 0
+data modify storage rlk:mboss creg set value [{id:"cproto",n:98,w:0,minCh:1,maxCh:99,name:"시험용 수호자",sub:"챕터 보스 틀 점검용",color:"#9FC6E8",el:0,hp:120,xp:20,atk:10,lvAdd:0,dmgMul:120,goldMul:1,sap:0,picks:0,scale:0.1d,intro:40,death:40,deathSnd:0b,hit:{w:1f,h:1f},start:{x:540.5d,y:201d,z:17.5d,yaw:180f,pitch:0f},title:{text:"시험용 수호자",color:"#9FC6E8",bold:true},gate:{item:"minecraft:lodestone",model:"minecraft:lodestone",name:"시험용 수호자",desc:"좌클릭으로 도전 · 챕터 보스",color:"#9FC6E8"},kind:"chapter",ch:[],route:0b,arena:"cp_test",ar:9,px:1b,pxBase:65,shield:0b,phases:[60,40],res:[30,10,10,10,10,30,10,10,10],music:{"1":{ev:"minecraft:music.end",len:18090},"2":{ev:"minecraft:music.dragon",len:6883}}}]
+data modify storage rlk:mboss cbyid set value {cproto:{id:"cproto",n:98,w:0,minCh:1,maxCh:99,name:"시험용 수호자",sub:"챕터 보스 틀 점검용",color:"#9FC6E8",el:0,hp:120,xp:20,atk:10,lvAdd:0,dmgMul:120,goldMul:1,sap:0,picks:0,scale:0.1d,intro:40,death:40,deathSnd:0b,hit:{w:1f,h:1f},start:{x:540.5d,y:201d,z:17.5d,yaw:180f,pitch:0f},title:{text:"시험용 수호자",color:"#9FC6E8",bold:true},gate:{item:"minecraft:lodestone",model:"minecraft:lodestone",name:"시험용 수호자",desc:"좌클릭으로 도전 · 챕터 보스",color:"#9FC6E8"},kind:"chapter",ch:[],route:0b,arena:"cp_test",ar:9,px:1b,pxBase:65,shield:0b,phases:[60,40],res:[30,10,10,10,10,30,10,10,10],music:{"1":{ev:"minecraft:music.end",len:18090},"2":{ev:"minecraft:music.dragon",len:6883}}}}
+scoreboard players set #mbCN mb 1

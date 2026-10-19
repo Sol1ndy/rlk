@@ -168,6 +168,7 @@ function rlk:mboss/bars_hide
 scoreboard players set #mbLn mb 0
 # Every helper entity dies on reload; a surviving body rebuilds its own (module reload hook).
 kill @e[tag=rlk_mb_aux]
+kill @e[tag=rlk_mb_arena_prop]
 execute as @e[tag=rlk_mb_body] at @s run function rlk:mboss/reload
 # The arena is built once the dungeon area is set up (room/setup) and its chunks are loaded.
 execute if data storage rlk:room {ready:1b} in minecraft:overworld if loaded 200 201 8 run function rlk:mboss/arena/ensure

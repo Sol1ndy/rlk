@@ -3,3 +3,4 @@ execute if score #mbId mb matches 1 run return run function rlk:mboss/guardian/d
 execute if score #mbId mb matches 2 run return run function rlk:mboss/butterfly/death_tick
 execute if score #mbId mb matches 3 run return run function rlk:mboss/fieldgen/death_tick
 execute if score #mbId mb matches 99 run return run function rlk:mboss/proto/death_tick
+execute if score #mbId mb matches 98 run return run function rlk:mboss/cproto/death_tick

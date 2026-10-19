@@ -10,6 +10,7 @@ execute in minecraft:overworld run function rlk:mboss/ar/marker
 execute in minecraft:overworld as @e[tag=rlk_mb_arena,limit=1] at @s rotated as @s run function rlk:mboss/d/spawn
 execute unless entity @e[tag=rlk_mb_body,limit=1] run return run function rlk:mboss/start_fail
 scoreboard players set #mbFail mb 0
+scoreboard players set #cbWait mb 0
 execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/start_body
 function rlk:mboss/ret_save
 scoreboard players operation #mbLv mb = @e[tag=rlk_mb_body,limit=1] mlv

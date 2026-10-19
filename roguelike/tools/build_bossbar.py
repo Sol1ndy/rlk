@@ -23,6 +23,11 @@ Datapack: data/rlk/function/bossui/*. A boss calls, as itself, with
   function rlk:bossui/draw
 which updates the boss's trail scores and leaves the line in storage rlk:bu line; then
   bossbar set <id> name {nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""}
+
+Options (the chapter-boss mode, scratchpad az/contract/cm.md 11), both read by one draw and reset to 0 at its end, so
+a caller that never sets them (Raiden, the mid-bosses) always gets the M0 line:
+  #buHpCol bu   0 = the HP colour #E0484B; 1..9 = the under-bar colour codes (SUB_COLORS); 10 = #EDCF63 (gold)
+  #buNoNum bu   1 = no "hp/max" numbers (bossui/nums is skipped; the cursor is already at the bar end)
 """
 import argparse
 import json
@@ -46,6 +51,7 @@ DIGIT = 6                       # default-font advance of 0-9 and '/'
 
 HP_COLOR, TRAIL_COLOR, EMPTY_COLOR = '#E0484B', '#FFFFFF', '#2A2A2E'
 SUB_EMPTY = '#1E1E22'
+HP_GOLD = '#EDCF63'             # #buHpCol 10 (Apep's Heart)
 # Under-bar colour codes: elements (shield) and gauges.
 SUB_COLORS = {1: '#C58BFF',   # electro
               2: '#FF8A3D',   # pyro
@@ -185,18 +191,23 @@ draw += ['execute if score #tr bu < #fill bu run scoreboard players operation #t
          'scoreboard players operation #empty bu -= #tr bu',
          'execute if score #empty bu matches ..-1 run scoreboard players set #empty bu 0',
          'scoreboard players operation #len bu = #fill bu',
-         f'function rlk:bossui/run_hp {{col:"{HP_COLOR}"}}',
+         f'execute unless score #buHpCol bu matches 1..10 run function rlk:bossui/run_hp {{col:"{HP_COLOR}"}}']
+draw += [f'execute if score #buHpCol bu matches {k} run function rlk:bossui/run_hp {{col:"{c}"}}'
+         for k, c in list(SUB_COLORS.items()) + [(10, HP_GOLD)]]
+draw += [
          'scoreboard players operation #len bu = #white bu',
          f'function rlk:bossui/run_hp {{col:"{TRAIL_COLOR}"}}',
          'scoreboard players operation #len bu = #empty bu',
          f'function rlk:bossui/run_hp {{col:"{EMPTY_COLOR}"}}',
-         '# Numbers "hp/max" centred on the bar (default font, 6 px per character).',
-         'scoreboard players set #n bu 1']
+         '# Numbers "hp/max" centred on the bar (#buNoNum 1: none; the cursor already stands at the bar end).',
+         'execute unless score #buNoNum bu matches 1.. run function rlk:bossui/nums']
+nums = ['# Numbers "hp/max" centred on the bar (default font, 6 px per character); from draw.',
+        'scoreboard players set #n bu 1',
+        'scoreboard players set #nh bu 1', 'scoreboard players set #nm bu 1']
 for lo, d in ((1, 1), (10, 2), (100, 3), (1000, 4), (10000, 5), (100000, 6), (1000000, 7)):
-    draw.append(f'execute if score #buHp bu matches {lo}.. run scoreboard players set #nh bu {d}')
-    draw.append(f'execute if score #buMax bu matches {lo}.. run scoreboard players set #nm bu {d}')
-draw = draw[:-14] + ['scoreboard players set #nh bu 1', 'scoreboard players set #nm bu 1'] + draw[-14:]
-draw += ['scoreboard players operation #n bu += #nh bu',
+    nums.append(f'execute if score #buHp bu matches {lo}.. run scoreboard players set #nh bu {d}')
+    nums.append(f'execute if score #buMax bu matches {lo}.. run scoreboard players set #nm bu {d}')
+nums += ['scoreboard players operation #n bu += #nh bu',
          'scoreboard players operation #n bu += #nm bu',
          'scoreboard players operation #w bu = #n bu',
          'scoreboard players operation #w bu *= #digit bu',
@@ -214,9 +225,13 @@ draw += ['scoreboard players operation #n bu += #nh bu',
          '# forward to the bar end again: BAR/2 - w/2',
          f'scoreboard players set #len bu {BAR // 2}',
          'scoreboard players operation #len bu -= #half bu',
-         'execute if score #len bu matches 1.. run function rlk:bossui/space_pos',
-         '# Under bar (shield in its element colour, or a gauge).',
-         'execute if score #buSubCol bu matches 1.. if score #buSubMax bu matches 1.. run function rlk:bossui/sub']
+         'execute if score #len bu matches 1.. run function rlk:bossui/space_pos']
+write('nums', nums)
+draw += ['# Under bar (shield in its element colour, or a gauge).',
+         'execute if score #buSubCol bu matches 1.. if score #buSubMax bu matches 1.. run function rlk:bossui/sub',
+         '# The options hold for this draw only.',
+         'scoreboard players set #buHpCol bu 0',
+         'scoreboard players set #buNoNum bu 0']
 write('draw', draw)
 sub = ['# Thin bar under the HP bar: #buSub / #buSubMax in colour #buSubCol.',
        f'scoreboard players set #len bu {BAR}',
