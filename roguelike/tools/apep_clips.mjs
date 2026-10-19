@@ -75,6 +75,21 @@ export const STANCE_FORM_REF = {CROUCH: 'p1', UPRIGHT: 'p3'};
   const oU = solve(STANCES.UPRIGHT), hf = {};
   for (const s of SIDES) for (const L of LIMBS) hf[`hf_${L}_${s}`] = eulerOf(oU[`${L}_hand_${s}`].R);
   STANCES.CRAWL = {...structuredClone(STANCES.CROUCH), ...hf};
+  // UPRIGHT keeps its FK arms (ik 0); its IK targets are set to its own FK wrists and its hand eulers to the crawl's, so
+  // a stance blend lerps the targets wrist to wrist and the hands keep one world orientation (nothing changes at rest)
+  for (const s of SIDES) for (const L of LIMBS) STANCES.UPRIGHT[`tg_${L}_${s}`] = oU[`${L}_hand_${s}`].t.slice();
+  Object.assign(STANCES.UPRIGHT, structuredClone(hf));
+}
+// The halfway key of every stance blend (stand_p3 / crouch_p3 and the blends inside clips): the body halfway, every limb
+// still on IK with the B and C wrists lifted off the water (a plain IK -> FK lerp swings the hands through the floor)
+{
+  const a = STANCES.CRAWL, b = STANCES.UPRIGHT, mid = {};
+  for (const k of Object.keys(a)) { const x = a[k], y = b[k]; mid[k] = typeof x === 'number' ? x + (y - x) / 2 : x.map((v, i) => v + (y[i] - v) / 2); }
+  for (const s of SIDES) for (const L of LIMBS) {
+    mid[`ik_${L}_${s}`] = 1;
+    if (L !== 'a') mid[`tg_${L}_${s}`] = [mid[`tg_${L}_${s}`][0], mid[`tg_${L}_${s}`][1] + 1.2, mid[`tg_${L}_${s}`][2]];
+  }
+  STANCES.MID = mid;
 }
 // The camera fallback of plan R1 (pose only, never rescaled bones): thorax 10 deg back, waist lowered (hood ~ 8.0).
 export const UPRIGHT_LOW = {...STANCES.UPRIGHT, pelT: [0, .03, -.91], chest: [3.5, 0, 0]};
@@ -121,7 +136,10 @@ export const CLIP_TABLE = [
 // ---- the stub motion ---------------------------------------------------------------------------------------------------
 // Stance-move windows [from, to] (played ticks) of the clips that change stance: the pose blends STANCES[start] ->
 // STANCES[end] over the window (eased); stand_p3 / crouch_p3 are the plan's continuous blends (no body look swap: R12).
-const STANCE_MOVES = {crouch_p3: [0, 7], stand_p3: [0, 13], move_strike_p3: [[0, 7], [85, 91]], aftermath: [76, 84], sink_p3: [0, 7], tail_p3: [57, 86]};
+const STANCE_MOVES = {crouch_p3: [0, 7], stand_p3: [0, 13], move_strike_p3: [[0, 7], [85, 91]], aftermath: [72, 84], sink_p3: [0, 7], tail_p3: [57, 86], death: [55, 82]};
+// the pose a blend ends in when it is not the clip's end stance: death kneels and falls (55-82) into the crawl before it
+// sinks (R9: the upright always folds before sinking; the stance score stays UPRIGHT, the module never reads it after)
+const STANCE_TO = {death: 'CROUCH'};
 // Burrow sinks (plan R9): the root sinks to SINK_DEPTH under the opaque floor through the follow_y offsets (no part keys),
 // fully buried parts at scale 0 inside the hidden span; the emergence rises back in RISE ticks.
 export const SINK_DEPTH = -6, SINK_STEP = .25, RISE = 6;
@@ -156,8 +174,9 @@ function stubKeys(c) {
   const wins = !mv ? [] : Array.isArray(mv[0]) ? mv : [mv];
   let cur = s0;
   wins.forEach(([a, b], i) => {
-    const to = i === wins.length - 1 ? s1 : (cur === 'UPRIGHT' ? 'CROUCH' : 'UPRIGHT');
+    const to = i === wins.length - 1 ? (STANCE_TO[c.name] || s1) : (cur === 'UPRIGHT' ? 'CROUCH' : 'UPRIGHT');
     if (a > 0) keys.push([a, structuredClone(stancePose(cur, c.form))]);
+    if (c.form === 'p3' && b - a >= 4) keys.push([Math.round((a + b) / 2), structuredClone(STANCES.MID)]);
     keys.push([b, structuredClone(stancePose(to, c.form))]);
     cur = to;
   });
@@ -189,7 +208,7 @@ export const DBG = [
   dbg('hoop', 'p3', {...lerpPose(C0, U0, 0), ...both({pelT: [0, 2.2, 0], pelvis: [70, 0, 0], abdomen: [-55, 0, 0], chest: [35, 0, 0], shoulders: [35, 0, 0], neck: [30, 0, 0],
     head: [40, 0, 0], tail_1: [-40, 0, 0], tail_2: [-40, 0, 0], tail_3: [-40, 0, 0], tail_4: [-35, 0, 0], tail_5: [-35, 0, 0], tail_6: [-30, 0, 0],
     ik_a_l: 0, a_up_l: [0, 0, 40], ik_b_l: 0, b_up_l: [40, 0, 20], ik_c_l: 0, c_up_l: [-40, 0, 20]})}, 'the 이동 돌진 hoop / wheel (v5 f930-f951): body arched into a ring'),
-  dbg('crouch_over', 'p3', {...lerpPose(C0, U0, .62), ...both({ik_b_l: 0, b_up_l: [40, -30, 40], b_lo_l: [10, -20, 30], b_hand_l: [-20, 0, 0], ik_a_l: 0, ik_c_l: .5}), __s: 'UPRIGHT'},
+  dbg('crouch_over', 'p3', {...lerpPose(STANCES.CRAWL, U0, .62), ...both({ik_b_l: 0, b_up_l: [40, -30, 40], b_lo_l: [10, -20, 30], b_hand_l: [-20, 0, 0], ik_a_l: 0, ik_c_l: 1}), __s: 'UPRIGHT'},
     'crouch over the player (v5 f1086-f1140): half-upright, the B arms spread overhead like an umbrella (identified: the B arms, not the mantle)'),
 ];
 // ---- the clip list ---------------------------------------------------------------------------------------------------

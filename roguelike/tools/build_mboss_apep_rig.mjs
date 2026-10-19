@@ -30,7 +30,7 @@ import {paintApepTextures, spriteId, apepSprites, ATLAS_BUDGET} from './apep_pai
 import {partModels, checkBounds, FORM_MODELS, HAND_VARIANTS, FACE_ITEMS, CORE_MODELS, EMPTY, REGION_OF} from './apep_geometry.mjs';
 import {solve, modelFrames, toDisplay, modelPoint, carry, PART_NAMES, PART_SCALE, PART_REGION, PART_BRIGHT, PART_BRIGHT_P3, BONES, BONE, J, POSE_ONLY,
   PROXIES, proxyPoints, pxLocal, CAPSULES, ANCHOR_POINTS, FORM_POINTS, toLocal, TAIL_C, LIMB_C, HAND_PARTS, TAIL_PARTS, FRAMES} from './apep_pose.mjs';
-import {CLIPS, accumulate, sampleClip as sample, STANCES, denseYaw, sinkAt, SINK_TABLE, CLIP_TABLE} from './apep_clips.mjs';
+import {CLIPS as ALL_CLIPS, accumulate, sampleClip as sample, STANCES, denseYaw, sinkAt, SINK_TABLE, CLIP_TABLE} from './apep_clips.mjs';
 import {itemTints, TINT_IDS, TINT_COLOR, TINT_FORMS, SLOTS, SLOT_COLOR, FACE_MUL} from './apep_materials.mjs';
 import {createRigCompiler, createRigFollow, summonPart, summonShadow, cullOverhang, fitTracks, nbt} from './mboss_rig_compile.mjs';
 import {abox} from './mboss_model_lib.mjs';
@@ -264,8 +264,10 @@ const TOL = {t: .012, s: .015, rDefault: .8, r: Object.fromEntries(PART_NAMES.ma
   tp: Object.fromEntries(LONG.map(n => [n, .03]))};
 const mkCompiler = debug => createRigCompiler({ns: NS, obj: 'apRig', fn, parts: PART_NAMES, uuidOf, tol: TOL, swapLine: () => '', debug: debug ? {put: putDebug, dir: 'ap_dbg'} : null});
 const compiler = mkCompiler(false), debugCompiler = debugDp ? mkCompiler(true) : null;
+// the shipped clips (the frozen contract's table) and the debug poses (dbg_*: renders and checks only, never in the rig)
+const CLIPS = ALL_CLIPS.filter(c => !c.dbg), DBG_CLIPS = ALL_CLIPS.filter(c => c.dbg);
 CLIPS.forEach((c, id) => { c.id = id; });
-const byName = Object.fromEntries(CLIPS.map(c => [c.name, c]));
+const byName = Object.fromEntries(ALL_CLIPS.map(c => [c.name, c]));
 const STANCE_IDS = {CROUCH: 0, UPRIGHT: 1};
 // commands a clip applies on its own ticks: looks, hands, visibility state, stance, the sink offset, the follow list
 function clipLines(c) {
@@ -280,6 +282,12 @@ function clipLines(c) {
   return t => [...(at.get(t) || []).flatMap(l => l.split('\n')), ...(sink ? sink(t) : [])];
 }
 const clipInfo = [], motionErrors = [], poseErrors = [], warns = new Set(), extents = {}, keysPerTick = {};
+for (const c of DBG_CLIPS) {
+  const frames = clipFrames(c), chk = poseChecks(c, frames);
+  poseErrors.push(...chk.errors);
+  extents[c.name] = chk.extents;
+  if (debugDp) frames.forEach((f, t) => putDebug(`ap_dbg/${c.name}/${t}`, PART_NAMES.map(n => `data merge entity ${uuidOf(n)} {start_interpolation:0,interpolation_duration:0,transformation:${nbt(f.d[n])}}`)));
+}
 for (const c of CLIPS) {
   if (c.keys[0][0] !== 0) throw new Error(`clip ${c.name}: first key must be tick 0`);
   if (c.keys[c.keys.length - 1][0] !== c.len) throw new Error(`clip ${c.name}: last key ${c.keys[c.keys.length - 1][0]} != len ${c.len}`);
@@ -330,7 +338,7 @@ for (const c of CLIPS) {
     ...(tbl ? {} : {})});
 }
 if (poseErrors.length) {
-  const msg = 'pose checks:\n  ' + poseErrors.slice(0, 60).join('\n  ') + (poseErrors.length > 60 ? `\n  ... ${poseErrors.length} in all` : '');
+  const msg = 'pose checks:\n  ' + poseErrors.slice(0, +(arg("--show") || 60)).join('\n  ') + (poseErrors.length > 60 ? `\n  ... ${poseErrors.length} in all` : '');
   if (flag('--allow-steps')) console.warn(msg); else throw new Error(msg);
 }
 if (motionErrors.length) {
@@ -588,7 +596,7 @@ const manifest = {
     residuals: {max: residMax, limit: .25, table: residuals}, hood_swing_deg: hoodSwing, upright_top: r2(hoodTopU), face_centre_upright: faceU.map(r2), sternum_centre_upright: coreU.map(r2),
     poses: {CROUCH: STANCES.CROUCH, UPRIGHT: STANCES.UPRIGHT, CRAWL: STANCES.CRAWL}},
   hands: {objective: 'apRigHands', parts: HAND_PARTS, variants: handVariants, sets: HANDS_SET, ids: HAND_SET_IDS,
-    functions: {...Object.fromEntries(Object.keys(HANDS_SET).map(s => [s, fnId('hands/' + s)])), ...Object.fromEntries(Object.entries(HAND_ITEMS).flatMap(([p, v]) => Object.keys(v).map(x => [`${p}/${x}`, fnId(`hand/${p}/${x}`)])))},
+    functions: {set: fnId('hands/<set>'), part: fnId('hand/<part>/<variant>')},
     pulse: PULSE},
   park: {objective: 'apRigPark', px_set: 'parked', shadow: false, tick: 'skip', respawn: 'keeps scale 0 while the flag is set', reapply: ['form', 'stance', 'looks', 'hands', 'follow'],
     functions: {park: fnId('park'), unpark: fnId('unpark')}},

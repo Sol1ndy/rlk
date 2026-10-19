@@ -1,0 +1,6 @@
+execute if score @s apRigFy matches 14 run return run function rlk:mboss/apep/rig/follow/all_y14
+execute if score @s apRigFy matches 15 run return run function rlk:mboss/apep/rig/follow/all_y15
+execute if score @s apRigFy matches 16 run return run function rlk:mboss/apep/rig/follow/all_y16
+execute if score @s apRigFy matches 17 run return run function rlk:mboss/apep/rig/follow/all_y17
+execute if score @s apRigFy matches 18 run return run function rlk:mboss/apep/rig/follow/all_y18
+execute if score @s apRigFy matches 19 run return run function rlk:mboss/apep/rig/follow/all_y19

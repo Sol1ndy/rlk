@@ -82,8 +82,9 @@ function petalHand(k, back, curl) {
   return els;
 }
 // ---- B / C phase 3 curl: a fiddlehead (plane z facing the front: u = X outward, v = Y) ----------------------------------------
-const CURL_R = {u0: -.25, u1: .95, v0: -.75, v1: .45};
-const SPIRAL = (() => { const pts = []; for (let i = 0; i <= 40; i++) { const t = i / 40, a = -1.2 + t * 9.0, r = .55 * (1 - t * .85); pts.push([.35 + r * Math.cos(a) - .1 * (1 - t), -.15 + r * Math.sin(a)]); } return stroke(pts, t => .17 * (1 - t) + .03); })();
+// the curl grows up and out of the wrist (its lowest point ~0.45 b under the wrist: the crawl wrists at 0.4 b touch the water)
+const CURL_R = {u0: -.55, u1: 1.05, v0: -.55, v1: 1.1};
+const SPIRAL = (() => { const pts = []; for (let i = 0; i <= 40; i++) { const t = i / 40, a = -2.0 + t * 9.0, r = .55 * (1 - t * .85); pts.push([.25 + r * Math.cos(a), .3 + r * Math.sin(a)]); } return stroke(pts, t => .17 * (1 - t) + .03); })();
 const curlSd = (u, v) => SPIRAL.sd(u, v);
 const curlPaint = glyph => (u, v) => { const n = SPIRAL.near(u, v), hw = .17 * (1 - n.t) + .03; if (n.d > hw) return null; let c = PAL.p3_leafhand(clamp(.15 + .5 * n.t + .1 * (N.a(u * 8, v * 8) - .5))); if (n.t > .82) c = mix(c, C('#F2EE7A'), .6); if (glyph && n.t < .45) { const gx = Math.abs(((u * 9) % 1 + 1) % 1 - .5), gy = Math.abs(((v * 9) % 1 + 1) % 1 - .5); if (Math.max(gx, gy) > .38 && Math.max(gx, gy) < .46) c = PAL.p3_line(.4); } return lineOut(c, n.d - hw, .025, PAL.p3_line(.65)); };
 function curlP3(k, glyph) {

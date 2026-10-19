@@ -1,0 +1,4 @@
+execute if score @s apRigT matches 185 run return run function rlk:mboss/apep/rig/c/aftermath/k/185
+execute if score @s apRigT matches 186 run return run function rlk:mboss/apep/rig/c/aftermath/k/186
+execute if score @s apRigT matches 187 run return run function rlk:mboss/apep/rig/c/aftermath/k/187
+execute if score @s apRigT matches 188 run return run function rlk:mboss/apep/rig/c/aftermath/k/188
