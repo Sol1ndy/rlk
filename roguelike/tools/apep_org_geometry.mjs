@@ -173,28 +173,29 @@ const inPlane = (plane, c, pts) => pts.map(([a, b]) => (plane === 'xy' ? [a, b, 
 // bell (1.15 b, 1.35 with the stem): an egg-shaped dome, widest a little under half way, a waist above the skirt;
 // the skirt is its own 2-section loft flaring out at the hem, its lower facets cut into 8 rounded feet (bo_skirt wrap)
 const smooth01 = x => { const t = Math.min(1, Math.max(0, x)); return t * t * (3 - 2 * t); };
-const bellR = y => (y < .52 ? .41 + .08 * Math.sin(Math.PI / 2 * smooth01((y - .26) / .26)) : .49 * Math.sqrt(Math.max(0, 1 - ((y - .52) / .64) ** 2)));
-const BELL_Y = [.26, .33, .42, .52, .62, .71, .79, .86, .92, .97, 1.02, 1.06, 1.09, 1.12];
+const bellR = y => (y < .42 ? .42 + .06 * Math.sin(Math.PI / 2 * smooth01((y - .26) / .16)) : .48 * Math.sqrt(Math.max(0, 1 - ((y - .42) / .74) ** 2)));
+const BELL_Y = [.26, .34, .42, .52, .62, .71, .8, .88, .95, 1.01, 1.06, 1.1, 1.13, 1.155];
 function bellModel() {
   const els = [...loft('y', BELL_Y.map(a => ({a, r: bellR(a) + .012})), {n: 8, tex: 'bo_bell', ledgeTex: 'bo_bell_l', caps: '-+', tint: true, seed: 3}),
-    ...loft('y', [{a: 0, r: .59}, {a: .1, r: .53}, {a: .2, r: .47}, {a: .3, r: .41}],
+    ...loft('y', [{a: 0, r: .66}, {a: .1, r: .58}, {a: .2, r: .5}, {a: .3, r: .42}],
       {n: 8, tex: 'bo_skirt', ledgeTex: 'bo_bell_l', caps: '+', tint: true, seed: 4})];
   // the skirt's inside (dark, seen between the feet) and the stem: two crossed core-less slabs
-  els.push(...tint(lathe('y', [0, 0, 0], [{a: [0, .2], r: .48, tex: 'bo_in'}], {vFrom: .2, vTo: 0, n: 8, inward: true, tile: true})));
+  els.push(...tint(lathe('y', [0, 0, 0], [{a: [0, .2], r: .52, tex: 'bo_in'}], {vFrom: .2, vTo: 0, n: 8, inward: true, tile: true})));
   els.push(...tint(shapeSlab('b_stem', 'bo_stem', 'x', 0, {half: .02, core: false})), ...tint(shapeSlab('b_stem', 'bo_stem', 'z', 0, {half: .02, core: false, rot: ['y', 45, [0, 0, 0]]})));
   return els;
 }
-// the bag: a pear lying on its side, the round belly behind, the neck forward (-Z) and rising; a drawstring ring at the neck
-const BAG = {zc: .16, a: .46, R: .43, y: .43};
+// the bag: a pear lying on its side along Z, the round belly behind, the neck forward (-Z); its axis is level (no
+// stepped rise) and the clips pitch the bulb 20 degrees so the neck lifts (BAG_POSE); a drawstring ring at the neck
+const BAG = {zc: .14, a: .44, R: .42, y: .42, z0: -.62};
+export const BAG_POSE = {r: 20, t: .1, crown: [0, .71, -.45], crownR: -70};
 const bagR = z => {
   const e = z0 => BAG.R * Math.sqrt(Math.max(0, 1 - ((z0 - BAG.zc) / BAG.a) ** 2));
-  return z >= -.12 ? e(z) : .085 + (e(-.12) - .085) * smooth01((z + .56) / .44) ** 1.4;
+  return z >= -.12 ? e(z) : .085 + (e(-.12) - .085) * smooth01((z - BAG.z0) / (-.12 - BAG.z0)) ** 1.5;
 };
-const bagY = z => BAG.y + .16 * smooth01((-z + .05) / .6);
-const BAG_Z = [-.56, -.5, -.44, -.37, -.29, -.2, -.1, .01, .13, .25, .37, .46, .53, .59];
+const BAG_Z = [-.62, -.55, -.47, -.38, -.28, -.17, -.05, .07, .19, .31, .42, .5, .55, .58];
 function bagModel() {
-  const els = loft('z', BAG_Z.map(a => ({a, r: bagR(a) + .01, c: [0, bagY(a)]})), {n: 8, tex: 'bo_bell', ledgeTex: 'bo_bell_l', caps: '-+', tint: true, seed: 5});
-  els.push(...tint(loft('z', [{a: -.55, r: .11, c: [0, bagY(-.55)]}, {a: -.5, r: .11, c: [0, bagY(-.5)]}], {n: 8, tex: 'bo_stem', caps: ''})));
+  const els = loft('z', BAG_Z.map(a => ({a, r: bagR(a) + .01, c: [0, BAG.y]})), {n: 8, tex: 'bo_bell', ledgeTex: 'bo_bell_l', caps: '-+', tint: true, seed: 5});
+  els.push(...tint(loft('z', [{a: -.6, r: .11, c: [0, BAG.y]}, {a: -.55, r: .11, c: [0, BAG.y]}], {n: 8, tex: 'bo_stem', caps: ''})));
   return els;
 }
 // the crown (joint at the bag neck, its +Y along the neck): 4 cardinal petals leaning out, 4 diagonal ones
@@ -458,19 +459,22 @@ const vineStem = () => [quad('he_stem', [-.3, .1, 0], [.6, 0, 0], [0, -6.3, 0]),
 // ================================================================================================================
 // domes, wall blade, stalks, seed
 // ================================================================================================================
-const DOME = [[0, 1.1, 4.42], [1.1, 2.1, 4.02], [2.1, 3.0, 3.3], [3.0, 3.7, 2.36], [3.7, 4.22, 1.3]];
+// the dome: a hemisphere-like shell r 4.45, h 4.22 in 8 bands of equal latitude steps (tall near the ground, thin near
+// the top), each a two-sided 16-gon ring, the steps closed by two-sided annuli, a small cap on top
+const DOME = Array.from({length: 8}, (_, i) => { const a0 = i * 11.25 * D2R, a1 = (i + 1) * 11.25 * D2R, am = (a0 + a1) / 2;
+  return [r4(4.22 * Math.sin(a0)), r4(4.22 * Math.sin(a1)), r4(4.45 * Math.cos(am) + .02)]; });
 function domeShell() {
   const els = [];
   for (const [y0, y1, r] of DOME) els.push(...band([0, 0, 0], r, y0, y1, 'do_shell'));
   for (let i = 0; i < DOME.length - 1; i++) els.push(...annulus('y', [0, 0, 0], DOME[i][1], DOME[i + 1][2] - .01, DOME[i][2], '+-', 'do_shell', {n: 16, stagger: .003}));
-  els.push(...annulus('y', [0, 0, 0], 4.22, 0, 1.3, '+-', 'do_shell', {n: 8, stagger: .003}));
+  els.push(...annulus('y', [0, 0, 0], DOME[DOME.length - 1][1], 0, DOME[DOME.length - 1][2], '+-', 'do_shell', {n: 8, stagger: .003}));
   return els;
 }
 function domeDecor() {
   const els = [];
-  for (const [y0, y1, r] of DOME.slice(0, 3)) els.push(...band([0, 0, 0], r - .05, y0, y1, 'do_vine'));
+  for (const [y0, y1, r] of DOME.slice(0, 2)) els.push(...band([0, 0, 0], r - .05, y0, y1, 'do_vine'));
   els.push(...band([0, 0, 0], 4.47, 0, .32, 'do_rim'));
-  els.push(...crossCards('do_sprout', [0, 4.2, 0], .6, .7, {y0: 0}));
+  els.push(...crossCards('do_sprout', [0, 4.18, 0], .6, .7, {y0: 0}));
   return els;
 }
 function wallBlade() {
@@ -500,7 +504,7 @@ export const ORG = {
         models: {basic_bulb_m_bell: bellModel, basic_bulb_m_bag: bagModel},
         items: {basic_bulb_bell: ['basic_bulb_m_bell', 0xEFEEE8], basic_bulb_buffed: ['basic_bulb_m_bell', 0xF4FFE0], basic_bulb_dying: ['basic_bulb_m_bell', 0x8E8A76],
           basic_bulb_bag: ['basic_bulb_m_bag', 0xEFEEE8], basic_bulb_bag_buffed: ['basic_bulb_m_bag', 0xF4FFE0], basic_bulb_bag_dying: ['basic_bulb_m_bag', 0x8E8A76]}}),
-      D('crown', {pivot: 'centre', joint: [0, .69, -.53], looks: {closed: 'basic_crown_closed', open: 'basic_crown_open'}, def: 'closed',
+      D('crown', {pivot: 'centre', joint: [0, .71, -.45], looks: {closed: 'basic_crown_closed', open: 'basic_crown_open'}, def: 'closed',
         models: {basic_crown_closed: () => crownModel(false), basic_crown_open: () => crownModel(true)}, note: 'the petal crown at the bag neck (scale 0 while a bell); the glow is painted emissive'}),
       D('shield', {pivot: 'feet', frame: 'object', overlay: true, scale: 1.15, looks: {on: 'basic_shield_on'}, def: 'on', models: {basic_shield_on: shieldModel},
         note: '3 cutout vesica panes 0.62 x 1.42 + a low-alpha bubble rim band + a yellow 3-leaf crown; only while shielded (om/basic/shield/on|off)'}),

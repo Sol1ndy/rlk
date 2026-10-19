@@ -121,14 +121,14 @@
           "pivot": "centre",
           "offset": [
             0,
-            -1.31,
-            0.53
+            -1.29,
+            0.45
           ],
           "overlay": false,
           "joint": [
             0,
-            0.69,
-            -0.53
+            0.71,
+            -0.45
           ],
           "elements": 8,
           "note": "the petal crown at the bag neck (scale 0 while a bell); the glow is painted emissive"
@@ -1654,7 +1654,7 @@
             0,
             0
           ],
-          "elements": 232,
+          "elements": 376,
           "note": "two-sided shell, alpha <= 0.35"
         },
         {
@@ -1678,7 +1678,7 @@
             0,
             0
           ],
-          "elements": 130,
+          "elements": 98,
           "note": "cutout vine band, bright base rim, sprout on top"
         }
       ],
@@ -1730,10 +1730,10 @@
         }
       ],
       "budget": {
-        "elements": 400,
+        "elements": 500,
         "px": 24000
       },
-      "elements": 362,
+      "elements": 474,
       "px": 14336,
       "functions": {
         "spawn": "rlk:mboss/apep/om/dome/spawn {i}",

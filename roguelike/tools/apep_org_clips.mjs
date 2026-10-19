@@ -12,7 +12,7 @@
 // of next's displays, else it stops).
 import {accumulate, sampleClip} from './mboss_rig_clips.mjs';
 import {q, mul, rot, aimQ, add, sub, len, toDisplayT, toDisplayQ} from './mboss_rig_math.mjs';
-import {ORG, RIDE_Y, restJoint} from './apep_org_geometry.mjs';
+import {ORG, RIDE_Y, restJoint, BAG_POSE as BP} from './apep_org_geometry.mjs';
 
 const S = k => [k, k, k];
 const sq = (k, w = 1 / Math.sqrt(k)) => [w, k, w];         // volume-keeping squash / stretch along y
@@ -49,11 +49,11 @@ export const CLIPS = {
         [10, {bulb: {s: sq(.96), t: [0, 0, -.42], r: [-24, 0, 0]}}], [14, {bulb: {s: S(1), t: [0, 0, 0], r: [0, 0, 0]}}, 'o']]}),
     C('basic_lie', 10, {events: {bag: 10}, note: 'bell -> bag: tips forward 0-9, the bag model at 10 (cut), crown out',
       keys: [[0, {bulb: {s: S(1), t: [0, 0, 0], r: [0, 0, 0]}, crown: {s: 0}}], [3, {bulb: {s: sq(.94), r: [8, 0, 0]}}], [9, {bulb: {s: S(1), t: [0, .44, -.2], r: [-88, 0, 0]}}, 'i'],
-        [10, {bulb: {s: [1.06, .94, 1.06], t: [0, 0, 0], r: [0, 0, 0], look: 'bag'}, crown: {s: .8, r: [-62, 0, 0], look: 'closed'}}]]}),
+        [10, {bulb: {s: [1.06, .94, 1.06], t: [0, BP.t, 0], r: [BP.r, 0, 0], look: 'bag'}, crown: {s: .8, r: [BP.crownR, 0, 0], look: 'closed'}}]]}),
     C('basic_ranged', 20, {events: {open: 0, fire: 12}, note: 'bag: squash 0-3, crown glow 3, petals open 5-12, launch 12, recoil, close 14-20',
-      keys: [[0, {bulb: {s: S(1), t: [0, 0, 0], r: [0, 0, 0]}, crown: {s: 1, r: [-62, 0, 0], look: 'closed'}}], [3, {bulb: {s: [1.05, .93, 1.05]}, crown: {s: .92, look: 'open'}}],
-        [6, {bulb: {s: [.98, 1.04, .98]}, crown: {s: 1.08}}, 'o'], [11, {crown: {s: 1.22, r: [-58, 0, 0]}}], [12, {bulb: {s: [1.02, .98, 1.02]}, crown: {s: 1.28}}],
-        [13, {bulb: {s: [.96, 1.04, .96], t: [0, 0, .1]}, crown: {r: [-48, 0, 0]}}, 'o'], [16, {bulb: {s: S(1), t: [0, 0, 0]}, crown: {s: 1.0, r: [-62, 0, 0]}}],
+      keys: [[0, {bulb: {s: S(1), t: [0, BP.t, 0], r: [BP.r, 0, 0]}, crown: {s: 1, r: [BP.crownR, 0, 0], look: 'closed'}}], [3, {bulb: {s: [1.05, .93, 1.05]}, crown: {s: .92, look: 'open'}}],
+        [6, {bulb: {s: [.98, 1.04, .98]}, crown: {s: 1.08}}, 'o'], [11, {crown: {s: 1.22, r: [BP.crownR + 4, 0, 0]}}], [12, {bulb: {s: [1.02, .98, 1.02]}, crown: {s: 1.28}}],
+        [13, {bulb: {s: [.96, 1.04, .96], t: [0, BP.t, .1]}, crown: {r: [BP.crownR + 14, 0, 0]}}, 'o'], [16, {bulb: {s: S(1), t: [0, BP.t, 0]}, crown: {s: 1.0, r: [BP.crownR, 0, 0]}}],
         [17, {crown: {look: 'closed'}}], [20, {}]]}),
     C('org_die', 10, {events: {gone: 10}, force: ['bulb'], note: 'dying look (the bag keeps its form), squash, shrink to nothing',
       keys: [[0, {bulb: {look: 'dying'}}], [3, {bulb: {s: [1.12, .72, 1.12]}, crown: {s: 0}, shield: {s: 0}}, 'o'], [7, {bulb: {s: S(.5), t: [0, -.05, 0]}}], [10, {bulb: {s: 0, t: [0, -.1, 0]}}, 'i']]}),

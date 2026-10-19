@@ -204,10 +204,10 @@ add('bo_bell', 96, 48, bellPx, 'basic');
 const ledgeOf = (c, k = .7) => [c[0] * k, c[1] * k, c[2] * k, 255];
 // the skirt wrap (u round the 8 facets, v top 0 .. hem 1): one rounded foot per facet below v .55, creased between
 add('bo_skirt', 96, 32, (u, v) => {
-  const f = (u * 8) % 1, x = Math.abs(f - .5) / .5, tip = v > .55 ? Math.hypot(x / .94, (v - .55) / .45) : x / .94;
-  if (v > .4 && tip > 1) return TRANSPARENT;
+  const f = (u * 8) % 1, x = Math.abs(f - .5) / .5, tip = v > .5 ? Math.hypot(x / .9, (v - .5) / .5) : x / .9;
+  if (v > .3 && tip > 1) return TRANSPARENT;
   let t = .3 + .18 * smooth(.2, 1, v) + .1 * x * x + .04 * (N.a(u * 12, v * 4) - .5);
-  if (v > .4 && tip > .8) t += .35 * smooth(.8, 1, tip);                 // the foot's dark rim
+  if (v > .3 && tip > .8) t += .35 * smooth(.8, 1, tip);                 // the foot's dark rim
   if (x > .82) t += .45 * smooth(.82, 1, x);                               // crease between the feet
   else t -= .12 * smooth(.6, 0, x) * smooth(.3, .8, v);                  // the foot's lit middle
   return PAL.bell(t);
