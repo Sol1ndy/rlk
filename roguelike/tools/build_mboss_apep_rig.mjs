@@ -127,7 +127,15 @@ const M = modelFrames(REF);
 const KEY = {};
 for (const [n, els] of Object.entries(models)) {
   const pts = new Map();
-  for (const e of els) for (const x of [e.from[0], e.to[0]]) for (const y of [e.from[1], e.to[1]]) for (const z of [e.from[2], e.to[2]]) pts.set(`${x},${y},${z}`, [x, y, z]);
+  // element corners with the element rotation applied (one axis, about its origin; Minecraft's sense: +angle turns
+  // y about x as (y cos - z sin, y sin + z cos), and likewise for the other axes)
+  const turn = (p, r) => {
+    if (!r || !r.angle) return p;
+    const a = r.angle * Math.PI / 180, c = Math.cos(a), s = Math.sin(a), o = r.origin, d = p.map((v, i) => v - o[i]);
+    const q = r.axis === 'x' ? [d[0], d[1] * c - d[2] * s, d[1] * s + d[2] * c] : r.axis === 'y' ? [d[0] * c + d[2] * s, d[1], -d[0] * s + d[2] * c] : [d[0] * c - d[1] * s, d[0] * s + d[1] * c, d[2]];
+    return q.map((v, i) => +(v + o[i]).toFixed(4));
+  };
+  for (const e of els) for (const x of [e.from[0], e.to[0]]) for (const y of [e.from[1], e.to[1]]) for (const z of [e.from[2], e.to[2]]) { const P = turn([x, y, z], e.rotation); pts.set(P.join(','), P); }
   let arr = [...pts.values()];
   if (arr.length > 120) arr = arr.filter((_, i) => i % Math.ceil(arr.length / 120) === 0);
   KEY[n] = arr;   // model units; converted per part scale below
@@ -600,7 +608,7 @@ const manifest = {
     pulse: PULSE},
   park: {objective: 'apRigPark', px_set: 'parked', shadow: false, tick: 'skip', respawn: 'keeps scale 0 while the flag is set', reapply: ['form', 'stance', 'looks', 'hands', 'follow'],
     functions: {park: fnId('park'), unpark: fnId('unpark')}},
-  sprites: {budget: ATLAS_BUDGET, total: atlasPx, regions: regionsPx, ledger, planned: false, densities: {face: 64, crown: 64, b_hand: 48, hood: 48, default: 32}},
+  sprites: {budget: ATLAS_BUDGET, total: atlasPx, regions: regionsPx, ledger, planned: false, densities: {face: 64, crown: 64, b_hand: 64, hood: 48, default: 32}},
   elements: {budget: {p1: 7000, p3: 8000}, visible_rest: {p1: shown('p1'), p3: shown('p3')}, per_region: perRegion, per_part: perPart,
     densest: Object.entries(perPart).sort((a, b) => Math.max(b[1].p1, b[1].p3) - Math.max(a[1].p1, a[1].p3)).slice(0, 8).map(([n]) => n)},
   follow: F.info(), keys_per_tick: keysPerTick,
@@ -615,6 +623,10 @@ console.log(`Built the Apep rig: ${PART_NAMES.length} parts, ${CLIPS.length} cli
 console.log(`R3 residuals (UPRIGHT vs model_p3 §6.2): max ${residMax} b over ${residuals.length} joints; hood swing ${hoodSwing} deg; upright top ${hoodTopU.toFixed(2)} b; face centre ${faceU.map(r2)}`);
 console.log(`coverage (R7, within 3.0 b): ${Object.entries(COVER).map(([k, v]) => `${k} ${(v.covered * 100).toFixed(1)} %`).join(', ')}`);
 console.log(`rest extents CROUCH x ${extents.dbg_crouch[0]}, y ${extents.dbg_crouch[1]}, z ${extents.dbg_crouch[2]}; UPRIGHT x ${extents.dbg_upright[0]}, y ${extents.dbg_upright[1]}, z ${extents.dbg_upright[2]}`);
+if (flag('--part-extents')) for (const [st, f, o] of [['CROUCH', 'p1', REF.CROUCH], ['UPRIGHT', 'p3', REF.UPRIGHT]]) {
+  console.log(`part extents ${st} (${f}): x / y / z min..max`);
+  for (const n of PART_NAMES) { const P = partPoints(o, n, f, modelOfPart(n, restLook(f))); if (!P.length) continue; const e = [0, 1, 2].map(i => `${Math.min(...P.map(p => p[i])).toFixed(2)}..${Math.max(...P.map(p => p[i])).toFixed(2)}`); console.log(`  ${n.padEnd(11)} ${e.join('  ')}`); }
+}
 if (flag('--residuals')) for (const r of residuals) console.log(`  ${r.joint.padEnd(22)} ${r.d.toFixed(3)}  fk [${r.fk}] target [${r.target}]`);
 if (debugDp) {
   const link = path.join(debugDp, 'data/rlk/function/mboss/apep/rig');

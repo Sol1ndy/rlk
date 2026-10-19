@@ -136,6 +136,8 @@ export const CLIP_TABLE = [
 // ---- the stub motion ---------------------------------------------------------------------------------------------------
 // Stance-move windows [from, to] (played ticks) of the clips that change stance: the pose blends STANCES[start] ->
 // STANCES[end] over the window (eased); stand_p3 / crouch_p3 are the plan's continuous blends (no body look swap: R12).
+const HAND_SET_P1 = {p1_rest: {a_hand_l: 'p1_planted', a_hand_r: 'p1_planted', b_hand_l: 'p1_open', b_hand_r: 'p1_open', c_hand_l: 'p1_open', c_hand_r: 'p1_open'},
+  p1_lift: {a_hand_l: 'p1_raised', a_hand_r: 'p1_raised', b_hand_l: 'p1_curl', b_hand_r: 'p1_curl', c_hand_l: 'p1_curl', c_hand_r: 'p1_curl'}};
 const STANCE_MOVES = {crouch_p3: [0, 7], stand_p3: [0, 13], move_strike_p3: [[0, 7], [85, 91]], aftermath: [72, 84], sink_p3: [0, 7], tail_p3: [57, 86], death: [55, 82]};
 // the pose a blend ends in when it is not the clip's end stance: death kneels and falls (55-82) into the crawl before it
 // sinks (R9: the upright always folds before sinking; the stance score stays UPRIGHT, the module never reads it after)
@@ -180,6 +182,27 @@ function stubKeys(c) {
     keys.push([b, structuredClone(stancePose(to, c.form))]);
     cur = to;
   });
+  // P1 lifted hand variants (R8: `p1_raised` is the claw held up, `p1_curl` the petals lifted >= 0.3 b): the stub lifts
+  // that wrist (IK target) over the 2 ticks before the swap and lowers it over the 2 ticks after the swap back
+  if (c.form === 'p1') {
+    const LIFT = {p1_raised: 1.6, p1_curl: .45}, base = STANCES.CROUCH;
+    const H = {};
+    for (const ev of c.hand_events || []) {
+      const parts = ev.length === 2 ? Object.keys(HAND_SET_P1[ev[1]] || {}) : [ev[1]];
+      for (const part of parts) { const v = ev.length === 2 ? HAND_SET_P1[ev[1]][part] : ev[2]; (H[part] ||= []).push([ev[0], LIFT[v] || 0]); }
+    }
+    for (const [part, evs] of Object.entries(H)) {
+      const [L, , s] = part.split('_'), ch = `tg_${L}_${s}`, tg = h => [base[ch][0], base[ch][1] + h, base[ch][2]];
+      let h0 = 0;
+      for (const [te, h1] of evs.sort((a, b) => a[0] - b[0])) {
+        if (h1 === h0) continue;
+        const up = h1 > h0;
+        if (up) { if (te >= 2) keys.push([te - 2, {[ch]: tg(h0)}]); keys.push([te, {[ch]: tg(h1)}]); }
+        else { keys.push([te, {[ch]: tg(h0)}]); keys.push([Math.min(te + 2, c.len), {[ch]: tg(h1)}]); }
+        h0 = h1;
+      }
+    }
+  }
   // hidden spans: every part at scale 0 inside (vis is a number channel: it lerps; hard switches use adjacent keys)
   for (const [a, b] of c.hidden || []) {
     if (a > 0) keys.push([a - 1, {vis: 1}, 'l']);

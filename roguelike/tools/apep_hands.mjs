@@ -110,8 +110,8 @@ const finSd = (u, v) => stroke([[.0, -.05], [.9, .45], [1.75, 1.0], [2.38, 1.5]]
 const finPaint = (u, v) => { const d = finSd(u, v); if (d > 0) return null; let c = PAL.p3_pale(clamp(.1 + .2 * (N.e(u * 6, v * 6) - .5) + .1 * u / 2.4)); return lineOut(c, d, .03, PAL.p3_line(.5)); };
 function openP3() {
   const els = [rockBox([-.2, -.22, -.2], [.25, .2, .2], 'g_shell', {seed: 451})];
-  els.push(...slab({plane: 'z', at: -.04, rect: LEAF_R, sd: leafSd, half: .05, sprite: card('p3_leafhand', LEAF_R, leafPaint, 48, 'p3'), edge: 'p3_lime', cell: .1}));
-  els.push(...slab({plane: 'z', at: .1, rect: FIN_R, sd: finSd, half: .025, sprite: card('p3_underleaf', FIN_R, finPaint, 32, 'p3'), edge: 'g_shell', cell: .1, core: false}));
+  els.push(...slab({plane: 'z', at: -.04, rect: LEAF_R, sd: leafSd, half: .05, sprite: card('p3_leafhand', LEAF_R, leafPaint, 64, 'p3'), edge: 'p3_lime', cell: .1}));
+  els.push(...slab({plane: 'z', at: .1, rect: FIN_R, sd: finSd, half: .025, sprite: card('p3_underleaf', FIN_R, finPaint, 48, 'p3'), edge: 'g_shell', cell: .1, core: false}));
   els.push(...cone([.1, .18, .0], .1, .32, 'p3_cone', {seed: 452}));
   return els;
 }

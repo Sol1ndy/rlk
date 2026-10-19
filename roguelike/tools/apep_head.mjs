@@ -96,14 +96,16 @@ function faceP3() {
   return els;
 }
 // ================================================= hood (the cowl; CROUCH frame about the hinge) ==============================
-const COWL = [{a: .45, r: [1.0, .5, 1.0, .35], c: [0, .05]}, {a: -.3, r: [1.42, .62, 1.42, .62], c: [0, .02]}, {a: -.9, r: [1.55, .62, 1.55, .85], c: [0, -.02]},
-  {a: -1.55, r: [1.25, .45, 1.25, .78], c: [0, -.3]}, {a: -2.12, r: [.42, .18, .42, .25], c: [0, -.74]}];
+// a rounded dome (model.md §3.1: 3.3 b over the ears, 2.5-3 b long, top 4.3-4.5 b in the idle crouch) narrowing into the
+// pointed face plate; its height becomes the depth of the cowl after the upright swing
+const COWL = [{a: .5, r: [.9, .5, .9, .3], c: [0, -.05]}, {a: -.15, r: [1.35, .82, 1.35, .6], c: [0, -.15]}, {a: -.75, r: [1.55, .95, 1.55, .8], c: [0, -.25]},
+  {a: -1.35, r: [1.4, .82, 1.4, .82], c: [0, -.35]}, {a: -1.8, r: [.95, .55, .95, .55], c: [0, -.55]}, {a: -2.14, r: [.36, .2, .36, .2], c: [0, -.76]}];
 const EAR_R = {u0: -1.55, u1: -.2, v0: -.85, v1: .35};
 const EAR = stroke([[-.3, .2], [-.8, -.05], [-1.2, -.4], [-1.48, -.78]], t => .3 * (1 - t) + .02);
 const earPaint = (u, v) => { const n = EAR.near(u, v), hw = .3 * (1 - n.t) + .02; if (n.d > hw) return null; let g = .55 + .1 * (N.c(u * 6, v * 6) - .5) - .1 * n.t; if (n.d > hw - .04) g = .85; return grey(g); };
 const FACEPLATE_R = {u0: -.75, u1: .75, v0: -1.0, v1: .12};
 const faceplateSd = (u, v) => Math.max(Math.abs(u) - (.7 - .55 * clamp((-.2 - v) / .8)), v - .1, -.98 - v);
-const faceplateP1 = (u, v) => { const d = faceplateSd(u, v); if (d > 0) return null; let c = PAL.p1_slate(clamp(.45 + .2 * (N.a(u * 6, v * 6) - .5))); const row = ((v * 3.2) % 1 + 1) % 1; if (row < .08) c = lift(c, .2); if (Math.abs(Math.abs(u) - (v + .82) * .55) < .045 && v < -.45 && v > -.82) c = PAL.p1_gold(.2); return lineOut(c, d, .04, PAL.p1_line(.7)); };
+const faceplateP1 = (u, v) => { const d = faceplateSd(u, v); if (d > 0) return null; let c = PAL.p1_slate(clamp(.3 + .2 * (N.a(u * 6, v * 6) - .5))); const row = ((v * 3.2) % 1 + 1) % 1; if (row < .08) c = lift(c, .2); if (Math.abs(Math.abs(u) - (v + .82) * .55) < .045 && v < -.45 && v > -.82) c = PAL.p1_gold(.2); return lineOut(c, d, .04, PAL.p1_line(.7)); };
 const faceplateP3 = (u, v) => { const d = faceplateSd(u, v); if (d > 0) return null; let c = PAL.p3_bottle(clamp(.4 + .2 * (N.a(u * 6, v * 6) - .5))); if (Math.abs(((u * 2.5 + v * 1.5) % 1 + 1) % 1 - .5) < .04) c = PAL.p3_rim(.4); return lineOut(c, d, .045, PAL.p3_rim(.3)); };
 function hood(form) {
   const els = loft('z', COWL, {tex: (k, th) => (sinD(th) < -.35 ? (form === 'p1' ? 'p1_inner' : 'p3_inner') : 'g_plate'), caps: '+', seed: 841});
@@ -117,7 +119,7 @@ function hood(form) {
   const ear = slab({plane: 'x', at: 1.42, rect: EAR_R, sd: EAR.sd, half: .05, sprite: es, edge: 'g_plate', cell: .09, rot: ['y', -22.5, [1.42, 0, -.3]]});
   els.push(...ear, ...mirrorX(ear));
   els.push(...slab({plane: 'z', at: -2.02, rect: FACEPLATE_R, sd: faceplateSd, half: .05, sprite: card(`${form}_faceplate`, FACEPLATE_R, form === 'p1' ? faceplateP1 : faceplateP3, 48, form), edge: 'g_plate', cell: .09}));
-  if (form === 'p1') els.push(...cone([0, -.3, -2.06], .11, .42, 'p1_gold', {axis: 'z', sign: -1, seed: 842}));
+  if (form === 'p1') els.push(...cone([0, -.28, -2.1], .1, .36, 'p1_gold', {seed: 842}));
   else {
     els.push(rockBox([-.2, -.48, -2.16], [.2, -.12, -2.06], 'g_plate', {seed: 843}), rockBox([-.14, -.42, -2.22], [.14, -.18, -2.12], 'p3_gem', {seed: 844}));
     for (const [x, y, z] of [[.55, .52, -.75], [-.55, .52, -.75], [0, .58, -.3]]) els.push(...cone([x, y, z], .1, .36, 'p3_emerald', {seed: 845 + x}));
@@ -147,14 +149,14 @@ function crownP3() {
   return els;
 }
 // ================================================= hair (bone frame 'y') =====================================================
-const DRAPE_R = {u0: -.24, u1: .24, v0: -1.6, v1: .08};
+const DRAPE_R = {u0: -.24, u1: .24, v0: -1.6, v1: .08}, DRAPE_W = {p1: 1.9, p3: 1};
 const drapePaint = (tip, R, edge) => (u, v) => { const t = clamp(-v / 1.6), hw = tip ? .22 * (1 - t) + .015 : .22 - .04 * t; if (Math.abs(u) > hw) return null; let c = R(clamp(.55 + .2 * t + .1 * (N.d(u * 9, v * 5) - .5))); if (Math.abs(u) > hw - .035) c = edge(c); if (Math.abs(u - .05) < .03) c = mix(c, PAL.p3_hair(.1), R === PAL.p3_hair ? .7 : 0); return c; };
 function hair(form, seg) {
   const L = seg === 1 ? dist(J.hair_l_2, J.hair_l_1) : dist([1.7, .2, -2.8], J.hair_l_2);
   const tip = seg === 2, R = form === 'p1' ? PAL.p1_slate : PAL.p3_hair, edge = form === 'p1' ? c => lift(c, .15) : c => mix(c, PAL.p3_rim(.4), .5);
-  const sp = card(`${form}_hair${seg}`, DRAPE_R, drapePaint(tip, R, edge), 32, form);
+  const sp = card(`${form}_hair${seg}`, DRAPE_R, drapePaint(tip, R, edge), 32, form), w = .24 * DRAPE_W[form];
   const strands = form === 'p1' ? [[0, .02]] : [[-.12, .03], [.13, -.03]];
-  return strands.flatMap(([x, z]) => oneSided([cardZ(sp, z, {X0: x - .24, X1: x + .24, Y0: -L - .05, Y1: .08})], ['north']));
+  return strands.flatMap(([x, z]) => oneSided([cardZ(sp, z, {X0: x - w, X1: x + w, Y0: -L - .05, Y1: .08})], ['north']));
 }
 // ---- region interface ------------------------------------------------------------------------------------------------------
 let built = null;
