@@ -1,1 +1,1 @@
-execute on passengers if entity @s[tag=rlk_ap_om_bulb] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,-1.56f,0.2f],left_rotation:[0.69466f,0f,0f,0.71934f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+execute on passengers if entity @s[tag=rlk_ap_om_bulb] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,-1.6f,0.2f],left_rotation:[0.62932f,0f,0f,0.77715f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}

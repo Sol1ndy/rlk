@@ -48,7 +48,7 @@ export const CLIPS = {
       keys: [[0, {bulb: {s: S(1), t: [0, 0, 0], r: [0, 0, 0]}}], [5, {bulb: {s: sq(.94), t: [0, 0, .06], r: [14, 0, 0]}}, 'o'], [9, {bulb: {s: sq(1.08), t: [0, .04, -.36], r: [-20, 0, 0]}}, 'i'],
         [10, {bulb: {s: sq(.96), t: [0, 0, -.42], r: [-24, 0, 0]}}], [14, {bulb: {s: S(1), t: [0, 0, 0], r: [0, 0, 0]}}, 'o']]}),
     C('basic_lie', 10, {events: {bag: 10}, note: 'bell -> bag: tips forward 0-9, the bag model at 10 (cut), crown out',
-      keys: [[0, {bulb: {s: S(1), t: [0, 0, 0], r: [0, 0, 0]}, crown: {s: 0}}], [3, {bulb: {s: sq(.94), r: [8, 0, 0]}}], [9, {bulb: {s: S(1), t: [0, .44, -.2], r: [-88, 0, 0]}}, 'i'],
+      keys: [[0, {bulb: {s: S(1), t: [0, 0, 0], r: [0, 0, 0]}, crown: {s: 0}}], [3, {bulb: {s: sq(.94), r: [8, 0, 0]}}], [9, {bulb: {s: S(1), t: [0, .4, -.2], r: [-78, 0, 0]}}, 'i'],
         [10, {bulb: {s: [1.06, .94, 1.06], t: [0, BP.t, 0], r: [BP.r, 0, 0], look: 'bag'}, crown: {s: .8, r: [BP.crownR, 0, 0], look: 'closed'}}]]}),
     C('basic_ranged', 20, {events: {open: 0, fire: 12}, note: 'bag: squash 0-3, crown glow 3, petals open 5-12, launch 12, recoil, close 14-20',
       keys: [[0, {bulb: {s: S(1), t: [0, BP.t, 0], r: [BP.r, 0, 0]}, crown: {s: 1, r: [BP.crownR, 0, 0], look: 'closed'}}], [3, {bulb: {s: [1.05, .93, 1.05]}, crown: {s: .92, look: 'open'}}],
