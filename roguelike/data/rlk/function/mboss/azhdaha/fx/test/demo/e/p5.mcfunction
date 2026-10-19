@@ -3,14 +3,14 @@
 $execute if score #akDT mb matches 3 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/tele/disc {r:28,tell:14,el:$(g),nd:0,hold:3}
 $execute if score #akDT mb matches 3 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/tele/ring {r0:28,r:97,tell:14,el:$(g),nd:0,hold:3}
 $execute if score #akDT mb matches 3 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/tele/wave {id:0,r0:15,r1:97,w:20,tell:14,dur:15,el:$(g),nd:0,hold:2}
-$execute if score #akDT mb matches 16 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/p/front/$(g) {r0:15,r1:97,w:20,dur:15}
+$execute if score #akDT mb matches 16 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/p/front {el:$(g),r0:15,r1:97,w:20,dur:15}
 execute if score #akDT mb matches 17 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/snd/stomp_wave
-$execute if score #akDT mb matches 17 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/p/impact/$(g)
+$execute if score #akDT mb matches 17 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/p/impact {el:$(g)}
 execute if score #akDT mb matches 17 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/snd/stomp_slam
-$execute if score #akDT mb matches 17 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/p/cracks/$(g) {r:28}
+$execute if score #akDT mb matches 17 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/p/cracks {el:$(g),r:28}
 $execute if score #akDT mb matches 18 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/tele/wave {id:1,r0:15,r1:97,w:20,tell:14,dur:15,el:$(g),nd:0,hold:2}
-$execute if score #akDT mb matches 31 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/p/front/$(g) {r0:15,r1:97,w:20,dur:15}
+$execute if score #akDT mb matches 31 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/p/front {el:$(g),r0:15,r1:97,w:20,dur:15}
 execute if score #akDT mb matches 32 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/snd/stomp_wave
 $execute if score #akDT mb matches 33 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/tele/wave {id:2,r0:15,r1:97,w:20,tell:14,dur:15,el:$(g),nd:0,hold:2}
-$execute if score #akDT mb matches 46 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/p/front/$(g) {r0:15,r1:97,w:20,dur:15}
+$execute if score #akDT mb matches 46 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/p/front {el:$(g),r0:15,r1:97,w:20,dur:15}
 execute if score #akDT mb matches 47 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^3 run function rlk:mboss/azhdaha/fx/snd/stomp_wave

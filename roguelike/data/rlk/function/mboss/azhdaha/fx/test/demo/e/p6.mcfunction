@@ -6,10 +6,10 @@ $execute if score #akDT mb matches 0 at @s rotated as @s rotated ~ 0 positioned 
 $execute if score #akDT mb matches 0 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^-5.5 run function rlk:mboss/azhdaha/fx/tele/disc {r:25,tell:22,el:$(g),nd:0,hold:3}
 execute if score #akDT mb matches 0 at @s rotated as @s rotated ~ 0 run function rlk:mboss/azhdaha/fx/snd/feint_sway
 execute if score #akDT mb matches 8 at @s rotated as @s rotated ~ 0 run function rlk:mboss/azhdaha/fx/snd/feint_sway
-$execute if score #akDT mb matches 22 at @s rotated as @s rotated ~ 0 positioned ^5.3 ^0 ^-6 run function rlk:mboss/azhdaha/fx/p/flank_blades/$(g) {len:110}
+$execute if score #akDT mb matches 22 at @s rotated as @s rotated ~ 0 positioned ^5.3 ^0 ^-6 run function rlk:mboss/azhdaha/fx/p/flank_blades {el:$(g),len:110}
 execute if score #akDT mb matches 22 at @s rotated as @s rotated ~ 0 positioned ^5.3 ^0 ^-6 run function rlk:mboss/azhdaha/fx/p/dust_wall {len:110}
-$execute if score #akDT mb matches 22 at @s rotated as @s rotated ~ 0 positioned ^-5.3 ^0 ^5 rotated ~180 0 run function rlk:mboss/azhdaha/fx/p/flank_blades/$(g) {len:110}
+$execute if score #akDT mb matches 22 at @s rotated as @s rotated ~ 0 positioned ^-5.3 ^0 ^5 rotated ~180 0 run function rlk:mboss/azhdaha/fx/p/flank_blades {el:$(g),len:110}
 execute if score #akDT mb matches 22 at @s rotated as @s rotated ~ 0 positioned ^-5.3 ^0 ^5 rotated ~180 0 run function rlk:mboss/azhdaha/fx/p/dust_wall {len:110}
-$execute if score #akDT mb matches 22 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^6.5 run function rlk:mboss/azhdaha/fx/p/impact/$(g)
-$execute if score #akDT mb matches 22 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^-5.5 run function rlk:mboss/azhdaha/fx/p/impact/$(g)
+$execute if score #akDT mb matches 22 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^6.5 run function rlk:mboss/azhdaha/fx/p/impact {el:$(g)}
+$execute if score #akDT mb matches 22 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^-5.5 run function rlk:mboss/azhdaha/fx/p/impact {el:$(g)}
 execute if score #akDT mb matches 22 at @s rotated as @s rotated ~ 0 run function rlk:mboss/azhdaha/fx/snd/feint_burst

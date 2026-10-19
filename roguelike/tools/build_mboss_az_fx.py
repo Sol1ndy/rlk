@@ -748,11 +748,13 @@ def snd(name):
 
 
 def snde(name, el):
-    """a sound family member fx/snd/<name>/<el> (el an int in the family's range or a '$(..)' placeholder)"""
+    """a sound family member fx/snd/<name>/<el> (el an int in the family's range); a '$(..)' placeholder el calls the
+    dispatcher fx/snd/<name> {el} instead (static target names; out-of-range values follow the family rule)"""
     assert name in SFAM, name
-    if not isinstance(el, str):
-        lo, hi = SFAM_RANGE[name]
-        assert lo <= el <= hi, (name, el)
+    if isinstance(el, str):
+        return f'function {FN}snd/{name} {{el:{el}}}'
+    lo, hi = SFAM_RANGE[name]
+    assert lo <= el <= hi, (name, el)
     return f'function {FN}snd/{name}/{el}'
 
 
@@ -784,12 +786,14 @@ def fx(name, **args):
 
 
 def fxe(name, el, **args):
-    """A family preset member fx/p/<name>/<el> (el 1..5, 0 and 6-8 draw Geo; or a '$(..)' placeholder)."""
+    """A family preset member fx/p/<name>/<el> (el 1..5, 0 and 6-8 draw Geo); a '$(..)' placeholder el calls the
+    dispatcher fx/p/<name> {el, ...} instead (static target names, same clamp)."""
     assert name in EPRESETS, name
     need = EPRESETS[name][1]
     assert set(args) == set(need), (name, sorted(args), need)
-    if not isinstance(el, str):
-        el = el if 1 <= el <= 5 else 5
+    if isinstance(el, str):
+        return fx(name, el=el, **args)
+    el = el if 1 <= el <= 5 else 5
     if not need:
         return f'function {FN}p/{name}/{el}'
     body = ','.join(f'{k}:{_parg(k, args[k])}' for k in need)
@@ -808,10 +812,12 @@ def prop(name):
 
 
 def prope(name, el):
+    """a prop family member (as @s); a '$(..)' placeholder el calls the dispatcher fx/prop/<name> {el}"""
     assert name in PFAM, name
-    if not isinstance(el, str):
-        lo, hi = PFAM[name][1]
-        assert lo <= el <= hi, (name, el)
+    if isinstance(el, str):
+        return f'function {FN}prop/{name} {{el:{el}}}'
+    lo, hi = PFAM[name][1]
+    assert lo <= el <= hi, (name, el)
     return f'function {FN}prop/{name}/{el}'
 
 
@@ -823,9 +829,11 @@ def hud(name, **args):
 
 
 def hude(name, el):
+    """a banner family member; a '$(..)' placeholder el calls the dispatcher fx/hud/<name> {el}"""
     assert name in HFAM, name
-    if not isinstance(el, str):
-        assert 1 <= el <= 4, (name, el)
+    if isinstance(el, str):
+        return f'function {FN}hud/{name} {{el:{el}}}'
+    assert 1 <= el <= 4, (name, el)
     return f'function {FN}hud/{name}/{el}'
 
 
@@ -2144,7 +2152,7 @@ FAKE = ('#akInit', '#akN', '#akTN', '#akFN', '#akNow', '#akWd', '#akC2', '#akRol
         '#akTs', '#akT30', '#akTlast', '#akTodd', '#akA', '#akB', '#akPe', '#akWl', '#akHudV', '#akDemo', '#akDT',
         '#akMT', '#akWid', *[f'#akWw{k}' for k in range(8)], *[f'#akWh{k}' for k in range(8)],
         *[f'#akA_{k}' for k in ('r', 'r0', 'r1', 'w', 'len', 'h', 't', 'dur')])
-STORAGE_KEYS = ('a', 't', 'w', 'pr', 'pd', 'hud', 'ax', 'dm', 'fd')
+STORAGE_KEYS = ('a', 't', 'w', 'pr', 'hud', 'ax', 'dm', 'fd')
 
 
 def telegraphs(W):
@@ -2886,6 +2894,13 @@ def prop_line(kind, col, bb, scale, name):
             f'shadow_radius:0f,transformation:{tr}}}')
 
 
+def static_dispatch(base, lo, hi, call=''):
+    """One static line per family member, chosen by #akPe (already clamped by the caller): no macro-built function
+    names, so check_refs / lint / check_macro see every target (az_fx_api.md section 0.7)."""
+    return [('$' if '$(' in call else '') + f'execute if score #akPe mb matches {k} run return run function {base}/{k}' +
+            (' ' + call if call else '') for k in range(lo, hi + 1)]
+
+
 def props(W):
     for name, (doc, kind, col, bb, sc) in PROPS.items():
         W.w(f'prop/{name}', [f'# {doc}', '# As @s = an item_display the module owns: item, tint, billboard, full bright,',
@@ -2898,10 +2913,7 @@ def props(W):
                f'execute unless score #akPe mb matches {lo}..{hi} run return 0')
         W.w(f'prop/{name}', [f'# {doc}', f'# Dispatcher {{el}} (as @s): el {lo}..{hi}; anything else ' +
                              ('draws Geo (5).' if hi == 5 else 'does nothing.'),
-                             '$scoreboard players set #akPe mb $(el)', oor,
-                             f'execute store result storage {STO} pd.el int 1 run scoreboard players get #akPe mb',
-                             f'function {FN}prop/e/{name} with storage {STO} pd'])
-        W.w(f'prop/e/{name}', [f'$function {FN}prop/{name}/$(el)'])
+                             '$scoreboard players set #akPe mb $(el)', oor] + static_dispatch(f'{FN}prop/{name}', lo, hi))
 
 
 # ----------------------------------------------------------------------------- sounds
@@ -2918,10 +2930,7 @@ def sounds(W):
                f'execute unless score #akPe mb matches {lo}..{hi} run return 0')
         W.w(f'snd/{name}', [f'# Dispatcher {{el}}: snd/{name}/<el> for el {lo}..{hi}; anything else ' +
                             ('plays Geo (5).' if hi == 5 else 'plays nothing.'),
-                            '$scoreboard players set #akPe mb $(el)', oor,
-                            f'execute store result storage {STO} pd.el int 1 run scoreboard players get #akPe mb',
-                            f'function {FN}snd/e/{name} with storage {STO} pd'])
-        W.w(f'snd/e/{name}', [f'$function {FN}snd/{name}/$(el)'])
+                            '$scoreboard players set #akPe mb $(el)', oor] + static_dispatch(f'{FN}snd/{name}', lo, hi))
 
 
 # ----------------------------------------------------------------------------- HUD
@@ -2969,10 +2978,7 @@ def hud_funcs(W):
                                      f'scoreboard players set @a[tag=player] hudHold {hold}'])
         W.w(f'hud/{kind}', [f'# Dispatcher {{el}} of hud/{kind}/<el> (el 1..4; anything else shows nothing).',
                             '$scoreboard players set #akPe mb $(el)',
-                            'execute unless score #akPe mb matches 1..4 run return 0',
-                            f'execute store result storage {STO} pd.el int 1 run scoreboard players get #akPe mb',
-                            f'function {H}e/{kind} with storage {STO} pd'])
-        W.w(f'hud/e/{kind}', [f'$function {H}{kind}/$(el)'])
+                            'execute unless score #akPe mb matches 1..4 run return 0'] + static_dispatch(f'{H}{kind}', 1, 4))
     W.w('hud/banner_end', ['# Drop a banner early (cancel, cut-scene end).', 'title @a[tag=player] actionbar ""',
                            'scoreboard players set @a[tag=player] hudHold 0'])
     W.w('hud/cue_jump', ['# The "점프!" cue on the title line for 12 t (landslide waves - 8; the kit\'s big glyph); vBig rests',
@@ -3060,12 +3066,8 @@ def presets_dp(W):
         W.w(f'p/{name}', [f'# {doc}', '# Dispatcher {el' + ''.join(', ' + a for a in args) + '} (macro): fx/p/' + name +
                           '/<el>, el 1..5 (0 and 6-8 draw Geo).',
                           '$scoreboard players set #akPe mb $(el)',
-                          'execute unless score #akPe mb matches 1..5 run scoreboard players set #akPe mb 5',
-                          *([f'$data modify storage {STO} pd set value {call}'] if args else
-                            [f'data modify storage {STO} pd set value {{}}']),
-                          f'execute store result storage {STO} pd.el int 1 run scoreboard players get #akPe mb',
-                          f'function {FN}p/e/d_{name} with storage {STO} pd'])
-        W.w(f'p/e/d_{name}', [f'$function {FN}p/{name}/$(el)' + (' ' + call if call else '')])
+                          'execute unless score #akPe mb matches 1..5 run scoreboard players set #akPe mb 5']
+            + static_dispatch(f'{FN}p/{name}', 1, 5, call))
 
 
 def preset_cards(name, el=None):

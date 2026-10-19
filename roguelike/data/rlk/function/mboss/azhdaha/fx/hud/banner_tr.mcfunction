@@ -2,5 +2,7 @@
 # Dispatcher {el} of hud/banner_tr/<el> (el 1..4; anything else shows nothing).
 $scoreboard players set #akPe mb $(el)
 execute unless score #akPe mb matches 1..4 run return 0
-execute store result storage rlk:azkit pd.el int 1 run scoreboard players get #akPe mb
-function rlk:mboss/azhdaha/fx/hud/e/banner_tr with storage rlk:azkit pd
+execute if score #akPe mb matches 1 run return run function rlk:mboss/azhdaha/fx/hud/banner_tr/1
+execute if score #akPe mb matches 2 run return run function rlk:mboss/azhdaha/fx/hud/banner_tr/2
+execute if score #akPe mb matches 3 run return run function rlk:mboss/azhdaha/fx/hud/banner_tr/3
+execute if score #akPe mb matches 4 run return run function rlk:mboss/azhdaha/fx/hud/banner_tr/4

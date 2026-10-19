@@ -3,9 +3,9 @@
 execute if score #akDT mb matches 0 at @s rotated as @s rotated ~ 0 run function rlk:mboss/azhdaha/fx/snd/chin_rear
 $execute if score #akDT mb matches 10 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^6.5 run function rlk:mboss/azhdaha/fx/tele/disc {r:50,tell:25,el:$(g),nd:0,hold:3}
 $execute if score #akDT mb matches 10 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^6.5 run function rlk:mboss/azhdaha/fx/tele/sector {r:56,a:30,tell:25,el:$(g),nd:0,hold:3}
-$execute if score #akDT mb matches 35 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^6.5 run function rlk:mboss/azhdaha/fx/p/crown/$(g)
-$execute if score #akDT mb matches 35 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^6.5 run function rlk:mboss/azhdaha/fx/p/cracks/$(g) {r:56}
-$execute if score #akDT mb matches 35 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^6.5 run function rlk:mboss/azhdaha/fx/p/dust_ring/$(g) {r:50}
-$execute if score #akDT mb matches 35 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^6.5 run function rlk:mboss/azhdaha/fx/p/impact/$(g)
+$execute if score #akDT mb matches 35 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^6.5 run function rlk:mboss/azhdaha/fx/p/crown {el:$(g)}
+$execute if score #akDT mb matches 35 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^6.5 run function rlk:mboss/azhdaha/fx/p/cracks {el:$(g),r:56}
+$execute if score #akDT mb matches 35 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^6.5 run function rlk:mboss/azhdaha/fx/p/dust_ring {el:$(g),r:50}
+$execute if score #akDT mb matches 35 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^6.5 run function rlk:mboss/azhdaha/fx/p/impact {el:$(g)}
 execute if score #akDT mb matches 35 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^6.5 run function rlk:mboss/azhdaha/fx/snd/chin_impact
 execute if score #akDT mb matches 35 at @p[tag=player] rotated as @s rotated ~ 0 run function rlk:mboss/azhdaha/fx/hud/flash_amber

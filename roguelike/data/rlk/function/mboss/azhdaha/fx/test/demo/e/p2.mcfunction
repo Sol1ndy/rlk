@@ -4,10 +4,10 @@ $execute if score #akDT mb matches 1 at @s rotated as @s rotated ~ 0 positioned 
 $execute if score #akDT mb matches 1 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^8 run function rlk:mboss/azhdaha/fx/tele/wave {id:0,r0:30,r1:105,w:25,tell:20,dur:5,el:$(g),nd:0,hold:2}
 execute if score #akDT mb matches 6 at @s rotated as @s rotated ~ 0 run function rlk:mboss/azhdaha/fx/snd/jump_takeoff
 $execute if score #akDT mb matches 12 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^8 run function rlk:mboss/azhdaha/fx/tele/wave {id:1,r0:30,r1:105,w:25,tell:20,dur:5,el:$(g),nd:0,hold:2}
-$execute if score #akDT mb matches 20 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/front/$(g) {r0:30,r1:105,w:25,dur:5}
-$execute if score #akDT mb matches 21 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/impact/$(g)
-$execute if score #akDT mb matches 21 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/dust_ring/$(g) {r:45}
+$execute if score #akDT mb matches 20 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/front {el:$(g),r0:30,r1:105,w:25,dur:5}
+$execute if score #akDT mb matches 21 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/impact {el:$(g)}
+$execute if score #akDT mb matches 21 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/dust_ring {el:$(g),r:45}
 execute if score #akDT mb matches 21 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^8 run function rlk:mboss/azhdaha/fx/snd/jump_land
-$execute if score #akDT mb matches 31 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/front/$(g) {r0:30,r1:105,w:25,dur:5}
+$execute if score #akDT mb matches 31 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/front {el:$(g),r0:30,r1:105,w:25,dur:5}
 execute if score #akDT mb matches 32 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^8 run function rlk:mboss/azhdaha/fx/snd/jump_wave2
 execute if score #akDT mb matches 32 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/dust

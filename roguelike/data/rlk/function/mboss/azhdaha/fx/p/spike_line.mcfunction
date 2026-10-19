@@ -3,6 +3,8 @@
 # Dispatcher {el, len} (macro): fx/p/spike_line/<el>, el 1..5 (0 and 6-8 draw Geo).
 $scoreboard players set #akPe mb $(el)
 execute unless score #akPe mb matches 1..5 run scoreboard players set #akPe mb 5
-$data modify storage rlk:azkit pd set value {len:$(len)}
-execute store result storage rlk:azkit pd.el int 1 run scoreboard players get #akPe mb
-function rlk:mboss/azhdaha/fx/p/e/d_spike_line with storage rlk:azkit pd
+$execute if score #akPe mb matches 1 run return run function rlk:mboss/azhdaha/fx/p/spike_line/1 {len:$(len)}
+$execute if score #akPe mb matches 2 run return run function rlk:mboss/azhdaha/fx/p/spike_line/2 {len:$(len)}
+$execute if score #akPe mb matches 3 run return run function rlk:mboss/azhdaha/fx/p/spike_line/3 {len:$(len)}
+$execute if score #akPe mb matches 4 run return run function rlk:mboss/azhdaha/fx/p/spike_line/4 {len:$(len)}
+$execute if score #akPe mb matches 5 run return run function rlk:mboss/azhdaha/fx/p/spike_line/5 {len:$(len)}

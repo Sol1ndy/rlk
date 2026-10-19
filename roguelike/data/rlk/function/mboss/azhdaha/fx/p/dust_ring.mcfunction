@@ -3,6 +3,8 @@
 # Dispatcher {el, r} (macro): fx/p/dust_ring/<el>, el 1..5 (0 and 6-8 draw Geo).
 $scoreboard players set #akPe mb $(el)
 execute unless score #akPe mb matches 1..5 run scoreboard players set #akPe mb 5
-$data modify storage rlk:azkit pd set value {r:$(r)}
-execute store result storage rlk:azkit pd.el int 1 run scoreboard players get #akPe mb
-function rlk:mboss/azhdaha/fx/p/e/d_dust_ring with storage rlk:azkit pd
+$execute if score #akPe mb matches 1 run return run function rlk:mboss/azhdaha/fx/p/dust_ring/1 {r:$(r)}
+$execute if score #akPe mb matches 2 run return run function rlk:mboss/azhdaha/fx/p/dust_ring/2 {r:$(r)}
+$execute if score #akPe mb matches 3 run return run function rlk:mboss/azhdaha/fx/p/dust_ring/3 {r:$(r)}
+$execute if score #akPe mb matches 4 run return run function rlk:mboss/azhdaha/fx/p/dust_ring/4 {r:$(r)}
+$execute if score #akPe mb matches 5 run return run function rlk:mboss/azhdaha/fx/p/dust_ring/5 {r:$(r)}

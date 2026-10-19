@@ -3,6 +3,8 @@
 # Dispatcher {el, r0, r1, w, dur} (macro): fx/p/front/<el>, el 1..5 (0 and 6-8 draw Geo).
 $scoreboard players set #akPe mb $(el)
 execute unless score #akPe mb matches 1..5 run scoreboard players set #akPe mb 5
-$data modify storage rlk:azkit pd set value {r0:$(r0),r1:$(r1),w:$(w),dur:$(dur)}
-execute store result storage rlk:azkit pd.el int 1 run scoreboard players get #akPe mb
-function rlk:mboss/azhdaha/fx/p/e/d_front with storage rlk:azkit pd
+$execute if score #akPe mb matches 1 run return run function rlk:mboss/azhdaha/fx/p/front/1 {r0:$(r0),r1:$(r1),w:$(w),dur:$(dur)}
+$execute if score #akPe mb matches 2 run return run function rlk:mboss/azhdaha/fx/p/front/2 {r0:$(r0),r1:$(r1),w:$(w),dur:$(dur)}
+$execute if score #akPe mb matches 3 run return run function rlk:mboss/azhdaha/fx/p/front/3 {r0:$(r0),r1:$(r1),w:$(w),dur:$(dur)}
+$execute if score #akPe mb matches 4 run return run function rlk:mboss/azhdaha/fx/p/front/4 {r0:$(r0),r1:$(r1),w:$(w),dur:$(dur)}
+$execute if score #akPe mb matches 5 run return run function rlk:mboss/azhdaha/fx/p/front/5 {r0:$(r0),r1:$(r1),w:$(w),dur:$(dur)}

@@ -17,8 +17,8 @@ $execute if score #akDT mb matches 19 at @s rotated as @s rotated ~ 0 positioned
 execute if score #akDT mb matches 23 at @s rotated as @s rotated ~ 0 run function rlk:mboss/azhdaha/fx/snd/whip_sweep
 execute if score #akDT mb matches 25 at @s rotated as @s rotated ~ 0 positioned ^-5 ^0 ^-2 rotated ~120 0 run function rlk:mboss/azhdaha/fx/p/tail_lane
 execute if score #akDT mb matches 28 at @s rotated as @s rotated ~ 0 positioned ^-6 ^0 ^-6 rotated ~150 0 run function rlk:mboss/azhdaha/fx/p/boulders
-$execute if score #akDT mb matches 33 at @s rotated as @s rotated ~ 0 positioned ^-1.5 ^0 ^-5 run function rlk:mboss/azhdaha/fx/p/crown/$(g)
-$execute if score #akDT mb matches 33 at @s rotated as @s rotated ~ 0 positioned ^-4 ^0 ^-4.5 run function rlk:mboss/azhdaha/fx/p/crown/$(g)
-$execute if score #akDT mb matches 33 at @s rotated as @s rotated ~ 0 positioned ^-6.5 ^0 ^-4 run function rlk:mboss/azhdaha/fx/p/crown/$(g)
-$execute if score #akDT mb matches 33 at @s rotated as @s rotated ~ 0 positioned ^-9 ^0 ^-3.5 run function rlk:mboss/azhdaha/fx/p/crown/$(g)
+$execute if score #akDT mb matches 33 at @s rotated as @s rotated ~ 0 positioned ^-1.5 ^0 ^-5 run function rlk:mboss/azhdaha/fx/p/crown {el:$(g)}
+$execute if score #akDT mb matches 33 at @s rotated as @s rotated ~ 0 positioned ^-4 ^0 ^-4.5 run function rlk:mboss/azhdaha/fx/p/crown {el:$(g)}
+$execute if score #akDT mb matches 33 at @s rotated as @s rotated ~ 0 positioned ^-6.5 ^0 ^-4 run function rlk:mboss/azhdaha/fx/p/crown {el:$(g)}
+$execute if score #akDT mb matches 33 at @s rotated as @s rotated ~ 0 positioned ^-9 ^0 ^-3.5 run function rlk:mboss/azhdaha/fx/p/crown {el:$(g)}
 execute if score #akDT mb matches 33 at @s rotated as @s rotated ~ 0 run function rlk:mboss/azhdaha/fx/snd/whip_erupt

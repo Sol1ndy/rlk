@@ -8,26 +8,26 @@ $execute if score #akDT mb matches 37 at @s rotated as @s rotated ~ 0 positioned
 $execute if score #akDT mb matches 40 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^12 run function rlk:mboss/azhdaha/fx/tele/disc {r:16,tell:14,el:$(g),nd:0,hold:3}
 execute if score #akDT mb matches 42 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^4 run function rlk:mboss/azhdaha/fx/p/shard_fall {h:80}
 $execute if score #akDT mb matches 45 at @s rotated as @s rotated ~ 0 positioned ^3 ^0 ^16 run function rlk:mboss/azhdaha/fx/tele/disc {r:16,tell:14,el:$(g),nd:0,hold:3}
-$execute if score #akDT mb matches 46 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^4 run function rlk:mboss/azhdaha/fx/p/impact/$(g)
+$execute if score #akDT mb matches 46 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^4 run function rlk:mboss/azhdaha/fx/p/impact {el:$(g)}
 execute if score #akDT mb matches 46 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^4 run function rlk:mboss/azhdaha/fx/snd/spikes_land
 execute if score #akDT mb matches 47 at @s rotated as @s rotated ~ 0 positioned ^1 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/shard_fall {h:80}
 execute if score #akDT mb matches 50 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^12 run function rlk:mboss/azhdaha/fx/p/shard_fall {h:80}
-$execute if score #akDT mb matches 51 at @s rotated as @s rotated ~ 0 positioned ^1 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/impact/$(g)
+$execute if score #akDT mb matches 51 at @s rotated as @s rotated ~ 0 positioned ^1 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/impact {el:$(g)}
 execute if score #akDT mb matches 51 at @s rotated as @s rotated ~ 0 positioned ^1 ^0 ^8 run function rlk:mboss/azhdaha/fx/snd/spikes_land
-$execute if score #akDT mb matches 54 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^12 run function rlk:mboss/azhdaha/fx/p/impact/$(g)
+$execute if score #akDT mb matches 54 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^12 run function rlk:mboss/azhdaha/fx/p/impact {el:$(g)}
 execute if score #akDT mb matches 54 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^12 run function rlk:mboss/azhdaha/fx/snd/spikes_land
 execute if score #akDT mb matches 55 at @s rotated as @s rotated ~ 0 positioned ^3 ^0 ^16 run function rlk:mboss/azhdaha/fx/p/shard_fall {h:80}
-$execute if score #akDT mb matches 59 at @s rotated as @s rotated ~ 0 positioned ^3 ^0 ^16 run function rlk:mboss/azhdaha/fx/p/impact/$(g)
+$execute if score #akDT mb matches 59 at @s rotated as @s rotated ~ 0 positioned ^3 ^0 ^16 run function rlk:mboss/azhdaha/fx/p/impact {el:$(g)}
 execute if score #akDT mb matches 59 at @s rotated as @s rotated ~ 0 positioned ^3 ^0 ^16 run function rlk:mboss/azhdaha/fx/snd/spikes_land
 $execute if score #akDT mb matches 62 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^4 run function rlk:mboss/azhdaha/fx/tele/disc {r:25,tell:14,el:$(g),nd:0,hold:3}
 $execute if score #akDT mb matches 65 at @s rotated as @s rotated ~ 0 positioned ^1 ^0 ^8 run function rlk:mboss/azhdaha/fx/tele/disc {r:25,tell:14,el:$(g),nd:0,hold:3}
 $execute if score #akDT mb matches 68 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^12 run function rlk:mboss/azhdaha/fx/tele/disc {r:25,tell:14,el:$(g),nd:0,hold:3}
 $execute if score #akDT mb matches 71 at @s rotated as @s rotated ~ 0 positioned ^3 ^0 ^16 run function rlk:mboss/azhdaha/fx/tele/disc {r:25,tell:14,el:$(g),nd:0,hold:3}
-$execute if score #akDT mb matches 76 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^4 run function rlk:mboss/azhdaha/fx/p/crown/$(g)
+$execute if score #akDT mb matches 76 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^4 run function rlk:mboss/azhdaha/fx/p/crown {el:$(g)}
 execute if score #akDT mb matches 76 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^4 run function rlk:mboss/azhdaha/fx/snd/spikes_explode
-$execute if score #akDT mb matches 79 at @s rotated as @s rotated ~ 0 positioned ^1 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/crown/$(g)
+$execute if score #akDT mb matches 79 at @s rotated as @s rotated ~ 0 positioned ^1 ^0 ^8 run function rlk:mboss/azhdaha/fx/p/crown {el:$(g)}
 execute if score #akDT mb matches 79 at @s rotated as @s rotated ~ 0 positioned ^1 ^0 ^8 run function rlk:mboss/azhdaha/fx/snd/spikes_explode
-$execute if score #akDT mb matches 82 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^12 run function rlk:mboss/azhdaha/fx/p/crown/$(g)
+$execute if score #akDT mb matches 82 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^12 run function rlk:mboss/azhdaha/fx/p/crown {el:$(g)}
 execute if score #akDT mb matches 82 at @s rotated as @s rotated ~ 0 positioned ^2 ^0 ^12 run function rlk:mboss/azhdaha/fx/snd/spikes_explode
-$execute if score #akDT mb matches 85 at @s rotated as @s rotated ~ 0 positioned ^3 ^0 ^16 run function rlk:mboss/azhdaha/fx/p/crown/$(g)
+$execute if score #akDT mb matches 85 at @s rotated as @s rotated ~ 0 positioned ^3 ^0 ^16 run function rlk:mboss/azhdaha/fx/p/crown {el:$(g)}
 execute if score #akDT mb matches 85 at @s rotated as @s rotated ~ 0 positioned ^3 ^0 ^16 run function rlk:mboss/azhdaha/fx/snd/spikes_explode

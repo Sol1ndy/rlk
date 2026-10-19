@@ -3,5 +3,8 @@
 # Dispatcher {el} (as @s): el 1..5; anything else draws Geo (5).
 $scoreboard players set #akPe mb $(el)
 execute unless score #akPe mb matches 1..5 run scoreboard players set #akPe mb 5
-execute store result storage rlk:azkit pd.el int 1 run scoreboard players get #akPe mb
-function rlk:mboss/azhdaha/fx/prop/e/water_sheet with storage rlk:azkit pd
+execute if score #akPe mb matches 1 run return run function rlk:mboss/azhdaha/fx/prop/water_sheet/1
+execute if score #akPe mb matches 2 run return run function rlk:mboss/azhdaha/fx/prop/water_sheet/2
+execute if score #akPe mb matches 3 run return run function rlk:mboss/azhdaha/fx/prop/water_sheet/3
+execute if score #akPe mb matches 4 run return run function rlk:mboss/azhdaha/fx/prop/water_sheet/4
+execute if score #akPe mb matches 5 run return run function rlk:mboss/azhdaha/fx/prop/water_sheet/5
