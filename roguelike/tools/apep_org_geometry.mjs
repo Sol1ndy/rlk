@@ -112,41 +112,47 @@ function spike(sprite, P, dir, L, w, rot) {
 // ================================================================================================================
 // 기본 basic: bell (melee, walks) / bag (ranged, lying), a petal crown at the bag neck, the 수호 shield overlay
 // ================================================================================================================
-const BELL = {y: [.15, .28, .44, .58, .7, .8, .88, .95, 1.01, 1.06], r: [.4, .44, .452, .44, .405, .352, .29, .222, .148, .07]};
+// bell (1.15 b, 1.35 with the stem): an egg-shaped dome, widest a little under half way, a waist above the skirt;
+// the skirt is its own 2-section loft flaring out at the hem, its lower facets cut into 8 rounded feet (bo_skirt wrap)
+const smooth01 = x => { const t = Math.min(1, Math.max(0, x)); return t * t * (3 - 2 * t); };
+const bellR = y => (y < .52 ? .41 + .08 * Math.sin(Math.PI / 2 * smooth01((y - .26) / .26)) : .49 * Math.sqrt(Math.max(0, 1 - ((y - .52) / .64) ** 2)));
+const BELL_Y = [.26, .33, .42, .52, .62, .71, .79, .86, .92, .97, 1.02, 1.06, 1.09, 1.12];
 function bellModel() {
-  const els = [...loft('y', stops(BELL.y, BELL.r), {n: 16, tex: 'bo_bell', ledgeTex: 'bo_bell_l', caps: '+', tint: true, seed: 3})];
-  for (let k = 0; k < 8; k++) {
-    const th = k * 45 + 22.5 * (k % 2);
-    els.push(radialCard('bo_lobe', k * 45, .26, .66, 0, .26, {tint: true}));
-    if (k % 2 === 0) els.push(tangentCard('bo_lobeF', k * 45, .38, .2, .24, .24, {tilt: 45, tint: true}));
-  }
-  els.push(...tint(shapeSlab('b_stem', 'bo_stem', 'x', 0, {half: .028, cell: .03, inset: .4})));
+  const els = [...loft('y', BELL_Y.map(a => ({a, r: bellR(a) + .012})), {n: 8, tex: 'bo_bell', ledgeTex: 'bo_bell_l', caps: '-+', tint: true, seed: 3}),
+    ...loft('y', [{a: 0, r: .59}, {a: .1, r: .53}, {a: .2, r: .47}, {a: .3, r: .41}],
+      {n: 8, tex: 'bo_skirt', ledgeTex: 'bo_bell_l', caps: '+', tint: true, seed: 4})];
+  // the skirt's inside (dark, seen between the feet) and the stem: two crossed core-less slabs
+  els.push(...tint(lathe('y', [0, 0, 0], [{a: [0, .2], r: .48, tex: 'bo_in'}], {vFrom: .2, vTo: 0, n: 8, inward: true, tile: true})));
+  els.push(...tint(shapeSlab('b_stem', 'bo_stem', 'x', 0, {half: .02, core: false})), ...tint(shapeSlab('b_stem', 'bo_stem', 'z', 0, {half: .02, core: false, rot: ['y', 45, [0, 0, 0]]})));
   return els;
 }
-// the bag: the same bulb lying, the neck forward (-Z) and raised; a drawstring ring at the neck
-const BAG = {z: [-.53, -.42, -.24, 0, .26, .46, .58], r: [.1, .16, .31, .43, .43, .3, .1], up: [.24, .19, .09, .02, 0, 0, 0]};
+// the bag: a pear lying on its side, the round belly behind, the neck forward (-Z) and rising; a drawstring ring at the neck
+const BAG = {zc: .16, a: .46, R: .43, y: .43};
+const bagR = z => {
+  const e = z0 => BAG.R * Math.sqrt(Math.max(0, 1 - ((z0 - BAG.zc) / BAG.a) ** 2));
+  return z >= -.12 ? e(z) : .085 + (e(-.12) - .085) * smooth01((z + .56) / .44) ** 1.4;
+};
+const bagY = z => BAG.y + .16 * smooth01((-z + .05) / .6);
+const BAG_Z = [-.56, -.5, -.44, -.37, -.29, -.2, -.1, .01, .13, .25, .37, .46, .53, .59];
 function bagModel() {
-  const els = loft('z', BAG.z.map((a, i) => ({a, r: BAG.r[i], c: [0, .45 + BAG.up[i]]})), {n: 16, tex: 'bo_bell', ledgeTex: 'bo_bell_l', caps: '-+', tint: true, seed: 5});
-  els.push(...tint(loft('z', [{a: -.5, r: .14, c: [0, .45 + .225]}, {a: -.44, r: .14, c: [0, .45 + .21]}], {n: 8, tex: 'bo_stem', caps: ''})));
+  const els = loft('z', BAG_Z.map(a => ({a, r: bagR(a) + .01, c: [0, bagY(a)]})), {n: 8, tex: 'bo_bell', ledgeTex: 'bo_bell_l', caps: '-+', tint: true, seed: 5});
+  els.push(...tint(loft('z', [{a: -.55, r: .11, c: [0, bagY(-.55)]}, {a: -.5, r: .11, c: [0, bagY(-.5)]}], {n: 8, tex: 'bo_stem', caps: ''})));
   return els;
 }
 // the crown (joint at the bag neck, its +Y along the neck): 4 cardinal petals leaning out, 4 diagonal ones
 function crownModel(open) {
+  // 4 broad crumpled petals leaning out of the neck (more when open) + 2 small ones between; open adds the lime glow
   const els = [];
-  for (let k = 0; k < 8; k++) {
-    const th = k * 45, card = k % 2 === 0;
-    els.push(tangentCard('bo_petal', th, card ? .06 : .075, open ? .44 : .42, .32, .44, {tilt: card ? (open ? 45 : 22.5) : 0, pivot: 'bottom', uvr: [0, 0, 1, 1]}));
-  }
-  // tangentCard hangs from yTop; the petals rise from the neck: shift them so their bottom edge sits at y 0
-  const out = shift(els, [0, 0, 0]);
-  if (open) out.push(...crossCards('bo_glow', [0, .1, 0], .26, .26, {y0: -.13}));
-  return out;
+  for (let k = 0; k < 4; k++) els.push(tangentCard('bo_petal', k * 90, .05, .42, .4, .42, {tilt: open ? 45 : 22.5, pivot: 'bottom'}));
+  for (const th of [45, 225]) els.push(tangentCard('bo_petal', th, .06, .3, .28, .3));
+  if (open) els.push(...crossCards('bo_glow', [0, .1, 0], .3, .3, {y0: -.15}));
+  return els;
 }
 // the shield overlay: 3 vesica panes, the bubble rim band, the yellow 3-leaf crown
 function shieldModel() {
   const els = [];
   for (const th of [67.5, 180, 292.5]) els.push(tangentCard('bo_pane', th, .64, 1.47, .62, 1.42));
-  els.push(...band([0, 0, 0], .8, 0, .42, 'bo_bubble'));
+  els.push(...band([0, 0, 0], .8, 0, .42, 'bo_bubble', 8));
   els.push(...crossCards('bo_lcrown', [0, 1.42, 0], .48, .26, {y0: 0}));
   return els;
 }

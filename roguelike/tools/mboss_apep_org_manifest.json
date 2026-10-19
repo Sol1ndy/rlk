@@ -105,7 +105,7 @@
             0,
             0
           ],
-          "elements": 294
+          "elements": 279
         },
         {
           "name": "crown",
@@ -130,7 +130,7 @@
             0.69,
             -0.53
           ],
-          "elements": 10,
+          "elements": 8,
           "note": "the petal crown at the bag neck (scale 0 while a bell); the glow is painted emissive"
         },
         {
@@ -155,7 +155,7 @@
             0,
             0
           ],
-          "elements": 37,
+          "elements": 21,
           "note": "3 cutout vesica panes 0.62 x 1.42 + a low-alpha bubble rim band + a yellow 3-leaf crown; only while shielded (om/basic/shield/on|off)"
         }
       ],
@@ -240,8 +240,8 @@
         "elements": 350,
         "px": 12000
       },
-      "elements": 341,
-      "px": 10496,
+      "elements": 308,
+      "px": 11264,
       "functions": {
         "spawn": "rlk:mboss/apep/om/basic/spawn",
         "tick": "rlk:mboss/apep/om/basic/tick",
@@ -2013,7 +2013,7 @@
     "px_total": 200000,
     "organism_elements": 500,
     "heart_elements": 800,
-    "px": 128512
+    "px": 129280
   },
   "sprites": {
     "bo_bell": {
@@ -2021,23 +2021,23 @@
       "h": 48,
       "owner": "basic"
     },
+    "bo_skirt": {
+      "w": 96,
+      "h": 24,
+      "owner": "basic"
+    },
+    "bo_in": {
+      "w": 16,
+      "h": 16,
+      "owner": "basic"
+    },
     "bo_bell_l": {
       "w": 16,
       "h": 16,
       "owner": "basic"
     },
-    "bo_lobe": {
-      "w": 32,
-      "h": 32,
-      "owner": "basic"
-    },
-    "bo_lobeF": {
-      "w": 16,
-      "h": 16,
-      "owner": "basic"
-    },
     "bo_stem": {
-      "w": 32,
+      "w": 16,
       "h": 32,
       "owner": "basic"
     },

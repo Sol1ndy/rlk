@@ -71,13 +71,11 @@ const sdLens = (w, h, y0 = 0) => (u, v) => { const R = (h * h / 4 + w * w / 4) /
 const pts = (...a) => a;
 export const SH = {
   // 기본: a skirt foot in a radial plane (u = distance from the axis, v = height): hangs from the bell rim, curls up
-  b_lobe: SHP({u0: .26, u1: .66, v0: 0, v1: .26}, stroke(bez([.36, .22], [.4, .02], [.58, .05], 14).concat([[.62, .11]]), t => .06 - .032 * t).sd),
   // a foot seen face-on (tangential plane, u across, v up from the ground along the card)
-  b_lobeF: SHP({u0: -.12, u1: .12, v0: 0, v1: .24}, (u, v) => { const t = 1 - v / .24, w = .05 + .062 * Math.sin(Math.PI * Math.min(1, t * .85 + .1)); return Math.max(Math.abs(u) - w * (t > .85 ? Math.sqrt(Math.max(0, 1 - ((t - .85) / .17) ** 2)) : 1), v - .24, -v); }),
   // the curled sprout on the bell top (x plane: u = Z, v = Y)
-  b_stem: SHP({u0: -.12, u1: .24, v0: .98, v1: 1.36}, stroke(bez([0, 1.0], [-.03, 1.3], [.12, 1.31], 12).concat([[.19, 1.27], [.2, 1.21]]), t => .042 - .024 * t).sd),
+  b_stem: SHP({u0: -.1, u1: .2, v0: 1.0, v1: 1.36}, stroke(bez([0, 1.02], [-.02, 1.28], [.09, 1.31], 12).concat([[.15, 1.28], [.16, 1.23]]), t => .03 - .016 * t).sd),
   // a jagged crown petal of the bag (tangential card; u across, v up from the neck)
-  b_petal: SHP({u0: -.17, u1: .17, v0: 0, v1: .46}, sdPoly(pts([-.04, 0], [.04, 0], [.11, .2], [.16, .3], [.12, .33], [.14, .42], [.07, .37], [.04, .46], [-.01, .38], [-.07, .44], [-.09, .34], [-.15, .36], [-.12, .25]))),
+  b_petal: SHP({u0: -.21, u1: .21, v0: 0, v1: .43}, sdPoly(pts([-.06, 0], [.06, 0], [.16, .17], [.2, .3], [.15, .31], [.18, .41], [.09, .35], [.04, .43], [-.02, .35], [-.09, .42], [-.12, .32], [-.2, .33], [-.17, .2]))),
   // 수호 shield: a vesica pane 0.6 x 1.4 and the small 3-leaf crown
   b_pane: SHP({u0: -.31, u1: .31, v0: 0, v1: 1.42}, sdLens(.6, 1.4, .01)),
   b_lcrown: SHP({u0: -.24, u1: .24, v0: 0, v1: .26}, sdUnion(sdLens(.11, .25, 0), (u, v) => sdLens(.1, .22, 0)(u * .8 + v * .6 - .02, -u * .6 + v * .8 + .04),
@@ -206,12 +204,21 @@ const shapeSprite = (name, shape, ppb, owner, fn, {plane = 'z', translucent = fa
 add('bo_bell', 96, 48, bellPx, 'basic');
 // loft ledges / caps face up: the game's up-face light is ~1.4x the side faces', so their tone is painted darker
 const ledgeOf = (c, k = .7) => [c[0] * k, c[1] * k, c[2] * k, 255];
+// the skirt wrap (u round the 8 facets, v top 0 .. hem 1): one rounded foot per facet below v .55, creased between
+add('bo_skirt', 96, 24, (u, v) => {
+  const f = (u * 8) % 1, x = Math.abs(f - .5) / .5, tip = v > .55 ? Math.hypot(x / .94, (v - .55) / .45) : x / .94;
+  if (v > .4 && tip > 1) return TRANSPARENT;
+  let t = .3 + .18 * smooth(.2, 1, v) + .1 * x * x + .04 * (N.a(u * 12, v * 4) - .5);
+  if (v > .4 && tip > .8) t += .35 * smooth(.8, 1, tip);                 // the foot's dark rim
+  if (x > .82) t += .45 * smooth(.82, 1, x);                               // crease between the feet
+  else t -= .12 * smooth(.6, 0, x) * smooth(.3, .8, v);                  // the foot's lit middle
+  return PAL.bell(t);
+}, 'basic');
+add('bo_in', 16, 16, (s, t) => PAL.bell(.95 - .1 * t), 'basic');
 add('bo_bell_l', 16, 16, (s, t) => ledgeOf(PAL.bell(.14 + .05 * N.a(s * 4, t * 4))), 'basic');
-shapeSprite('bo_lobe', SH.b_lobe, 64, 'basic', (u, v) => { const R = PAL.bell, b = bevel(SH.b_lobe.sd, u, v, .03); let c = R(.22 + .3 * smooth(.6, .78, u)); if (-b.d < .01) c = mix(c, R(.95), .8); else if (b.lit > 0) c = mix(c, R(0), .3 * b.rim); return c; });
-shapeSprite('bo_lobeF', SH.b_lobeF, 64, 'basic', (u, v) => { let c = PAL.bell(.2 + .35 * smooth(.2, 0, v) + .08 * Math.abs(u) / .15); if (-SH.b_lobeF.sd(u, v) < .012) c = mix(c, PAL.bell(.95), .75); return c; });
 shapeSprite('bo_stem', SH.b_stem, 48, 'basic', (u, v) => shadeShape(SH.b_stem.sd, u, v, PAL.olive, {t0: .45, edge: .008, w: .02}));
-shapeSprite('bo_petal', SH.b_petal, 64, 'basic', (u, v) => { let c = shadeShape(SH.b_petal.sd, u, v, PAL.bell, {t0: .16 + .25 * smooth(.25, 0, v), edge: .008, w: .04, line: .6});
-  if (Math.abs(u) < .012 && v < .3) c = mix(c, PAL.bell(.55), .5); return c; });
+shapeSprite('bo_petal', SH.b_petal, 64, 'basic', (u, v) => { let c = shadeShape(SH.b_petal.sd, u, v, PAL.bell, {t0: .1 + .3 * smooth(.25, 0, v), edge: .008, w: .05, line: .55});
+  const fold = Math.abs(Math.sin(u * 22 + v * 9)); if (fold < .12 && v > .1) c = mix(c, PAL.bell(.5), .3); return c; });
 add('bo_glow', 16, 16, glowPx(PAL.core), 'basic');
 shapeSprite('bo_pane', SH.b_pane, 22, 'basic', (u, v) => { const d = -SH.b_pane.sd(u, v); const rib = Math.abs(u) < .018;
   return A(mix(PAL.lime(.3), PAL.lime(0), smooth(.06, 0, d)), clamp(.26 + .6 * smooth(.08, 0, d) + (rib ? .3 : 0))); }, {translucent: true});
@@ -335,7 +342,7 @@ add('he_bulb_l', 16, 16, (s, t) => A([190, 190, 186, 255], .86), 'heart', true);
 add('he_root_l', 16, 16, (s, t) => ledgeOf(PAL.root(.4 + .2 * N.c(s * 3, t * 3))), 'heart');
 add('st_bark_l', 16, 16, (s, t) => ledgeOf(PAL.stalk(.3 + .1 * N.b(s * 3, t * 3))), 'stalk');
 // loft tiles / wraps: texel density per block for the tileUV windows; wraps map u = facet k / n, v along the loft
-for (const n of ['bo_bell', 'nu_rib', 'gu_sheath', 'gu_bud', 'ne_cap', 'de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'he_bulb', 'do_shell', 'do_vine', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
+for (const n of ['bo_bell', 'bo_skirt', 'nu_rib', 'gu_sheath', 'gu_bud', 'ne_cap', 'de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'he_bulb', 'do_shell', 'do_vine', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
 registerTile('he_root', 32, 64, 28);
 registerTile('st_bark', 64, 64, 22);
 
