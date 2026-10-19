@@ -62,8 +62,8 @@
   "glow": {
    "plane": "face",
    "px": [
-    32,
-    32
+    64,
+    64
    ],
    "extent": [
     -0.5,
@@ -482,8 +482,8 @@
   "smoke": {
    "plane": "face",
    "px": [
-    32,
-    32
+    64,
+    64
    ],
    "extent": [
     -0.5,
@@ -1277,8 +1277,8 @@
   "t_mask": {
    "plane": "flat",
    "px": [
-    64,
-    64
+    128,
+    128
    ],
    "extent": [
     -1,
@@ -1635,7 +1635,7 @@
    "desc": "lingering strip (cryo)"
   }
  },
- "atlas_px": 549632,
+ "atlas_px": 568064,
  "telegraphs": {
   "disc": [
    "r",

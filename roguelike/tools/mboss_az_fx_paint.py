@@ -625,11 +625,11 @@ def paint_t_mask(a, b):
     r = math.hypot(a, b)
     if r > 1:
         return CLEAR
-    n = fbm(a * 6 + 3, b * 6 + 3, 3)
-    streak = smooth(0.62, 0.72, fbm(a * 14 + 1, b * 14 + 7, 2))
-    rim = math.exp(-((r - 0.975) / 0.02) ** 2)
-    al = 0.2 + 0.1 * n + 0.18 * streak + 0.6 * rim
-    v = 0.85 + 0.15 * max(streak, rim)
+    n = fbm(a * 4 + 3, b * 4 + 3, 3)
+    streak = smooth(0.6, 0.75, fbm(a * 7 + 1, b * 7 + 7, 2))     # low frequency: no texel-scale speckle at 18 b
+    rim = math.exp(-((r - 0.975) / 0.025) ** 2)
+    al = 0.2 + 0.05 * n + 0.08 * streak + 0.14 * smooth(0.55, 1.0, r) + 0.6 * rim
+    v = 0.86 + 0.14 * max(streak, rim)
     return (v, v, v, clamp01(al))
 
 

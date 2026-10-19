@@ -149,7 +149,7 @@ def _slice_box(half):
 
 KINDS = {
     # neutral (tint them)
-    'glow':        ('face', (32, 32), SQ, BX, P.paint_glow, 2, True, 'soft white glow disc'),
+    'glow':        ('face', (64, 64), SQ, BX, P.paint_glow, 2, True, 'soft white glow disc'),
     'glint':       ('face', (32, 32), SQ, BX, P.paint_glint, 3, True, 'white 4-point glint'),
     'mote':        ('face', (16, 16), SQ, BX, P.paint_mote, 4, True, 'soft mote (embers, motes, frost glints)'),
     'streak':      ('face', (128, 16), (-0.5, 0.5, -0.0625, 0.0625), BX, P.paint_streak, 2, True, 'long thin streak along a'),
@@ -187,7 +187,7 @@ KINDS = {
     'lava':        ('face', (32, 32), SQ, BX, P.paint_lava, 3, False, 'molten rock lump'),
     'meteor':      ('face', (64, 96), (-0.5, 0.5, -0.5, 1.0), (-0.5, 0.5, -0.5, 1.0), P.paint_meteor, 2, False,
                     '운석 meteor: molten head at the bottom, flame trail up'),
-    'smoke':       ('face', (32, 32), SQ, BX, P.paint_smoke, 3, False, 'smoke / steam puff'),
+    'smoke':       ('face', (64, 64), SQ, BX, P.paint_smoke, 3, False, 'smoke / steam puff'),
     # Cryo
     'ice_spike':   ('cross', (32, 64), FOOT, FOOT, P.paint_ice_spike, 2, False, 'ice crystal spike, foot at b 0'),
     'frost':       ('face', (32, 32), SQ, BX, P.paint_frost, 3, False, 'frost mist puff'),
@@ -238,7 +238,7 @@ KINDS.update({
     't_hex':   ('flat', (128, 128), UNIT, BX, P.paint_t_hex, 2, True, '번개 가시 hexagram + 번개 rune'),
     't_star':  ('flat', (128, 128), UNIT, BX, P.paint_t_star, 2, True, '얼음 가시 star seal + rune'),
     't_seal8': ('flat', (128, 128), UNIT, BX, P.paint_t_seal8, 2, True, '운석 seal: two squares + 火 runes'),
-    't_mask':  ('flat', (64, 64), UNIT, BX, P.paint_t_mask, 2, True, '벼락 습격 violet strike wash'),
+    't_mask':  ('flat', (128, 128), UNIT, BX, P.paint_t_mask, 2, True, '벼락 습격 violet strike wash'),
     't_safe':  ('flat', (64, 64), UNIT, BX, P.paint_t_safe, 2, True, '벼락 습격 safe circle (rim + glyph)'),
     't_crater': ('flat', (64, 64), UNIT, BX, P.paint_t_crater, 3, False, 'B3 crater (also the crater prop)'),
     't_wall':  ('face', (64, 32), FOOT, FOOT, P.paint_t_wall, 2, True, 'dust wall on a flank strip rail'),
