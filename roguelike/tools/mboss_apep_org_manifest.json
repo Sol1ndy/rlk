@@ -1,0 +1,2444 @@
+{
+  "schema": 1,
+  "boss": "apep",
+  "source": "org",
+  "manifest": "org",
+  "generator": "tools/build_mboss_apep_org.mjs",
+  "runtime": {
+    "ns": "rlk:mboss/apep/om/",
+    "kind_obj": "apK",
+    "clip_obj": "apOI",
+    "tick_obj": "apOC",
+    "note": "organisms: the husk holds apOI / apOC (om/<kind>/tick as the husk applies tick apOC then advances); objects: every display holds its own apOI / apOC (-1 = stopped), om/<object>/tick runs them"
+  },
+  "uuids": {
+    "block": "524c4b4d-4150-4800-8000-0000000000",
+    "ints": [
+      1380731725,
+      1095780352,
+      -2147483648
+    ]
+  },
+  "objectives": {
+    "apK": "organism kind id (kinds.<k>.id)",
+    "apS": "organism state",
+    "apT": "state clock",
+    "apL": "link id (buffed basic -> its 양육)",
+    "apShd": "shield pool",
+    "apOC": "org clip clock (the tick applied at the next tick call)",
+    "apOI": "org clip id (clips[].id; -1 = a stopped object display)",
+    "apSock": "Heart socket (0-2, -1 none)",
+    "apTok": "attack token"
+  },
+  "passenger": {
+    "ride_y": 2,
+    "tag_prefix": "rlk_ap_om_",
+    "tags": [
+      "rlk_room",
+      "rlk_mb_aux"
+    ],
+    "face": "rotate",
+    "key": "execute on passengers if entity @s[tag=rlk_ap_om_<display>] run data merge entity @s {..}",
+    "note": "every model passenger also carries rlk_ap_om; culling off (width / height 0); om/face turns them to the husk yaw; om/<kind>/bars moves the rlk_hb_* bar to hp_bar_y (FN-29 fallback)"
+  },
+  "spawn": {
+    "marker_ticks": 20,
+    "scale_in": {
+      "ticks": 4,
+      "from": 0.85
+    },
+    "untargetable_until": "solid",
+    "clips": {
+      "basic": "org_spawn",
+      "nurt": "nurt_idle",
+      "guard": "guard_idle",
+      "nest": "nest_fly",
+      "destr": "destr_roll",
+      "pred": "pred_swim"
+    }
+  },
+  "kinds": {
+    "basic": {
+      "id": 1,
+      "name": "기본",
+      "tag": "rlk_mb_ap_basic",
+      "size": {
+        "h": 1.15,
+        "h_stem": 1.35,
+        "d": 0.9,
+        "bag": [
+          1.43,
+          1.31
+        ]
+      },
+      "hover_y": 0,
+      "hp_bar_y": 1.6,
+      "shield": {
+        "w": 1.2,
+        "h": 1.6
+      },
+      "displays": [
+        {
+          "name": "bulb",
+          "tag": "rlk_ap_om_bulb",
+          "model": "basic_bulb_bell",
+          "looks": {
+            "bell": "basic_bulb_bell",
+            "bag": "basic_bulb_bag",
+            "buffed": "basic_bulb_buffed",
+            "bag_buffed": "basic_bulb_bag_buffed",
+            "dying": "basic_bulb_dying",
+            "bag_dying": "basic_bulb_bag_dying"
+          },
+          "default_look": "bell",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "feet",
+          "offset": [
+            0,
+            -2,
+            0
+          ],
+          "overlay": false,
+          "joint": [
+            0,
+            0,
+            0
+          ],
+          "elements": 294
+        },
+        {
+          "name": "crown",
+          "tag": "rlk_ap_om_crown",
+          "model": "basic_crown_closed",
+          "looks": {
+            "closed": "basic_crown_closed",
+            "open": "basic_crown_open"
+          },
+          "default_look": "closed",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "centre",
+          "offset": [
+            0,
+            -1.31,
+            0.53
+          ],
+          "overlay": false,
+          "joint": [
+            0,
+            0.69,
+            -0.53
+          ],
+          "elements": 10,
+          "note": "the petal crown at the bag neck (scale 0 while a bell); the glow is painted emissive"
+        },
+        {
+          "name": "shield",
+          "tag": "rlk_ap_om_shield",
+          "model": "basic_shield_on",
+          "looks": {
+            "on": "basic_shield_on"
+          },
+          "default_look": "on",
+          "brightness": 14,
+          "scale": 1.15,
+          "pivot": "feet",
+          "offset": [
+            0,
+            -2,
+            0
+          ],
+          "overlay": true,
+          "joint": [
+            0,
+            0,
+            0
+          ],
+          "elements": 37,
+          "note": "3 cutout vesica panes 0.62 x 1.42 + a low-alpha bubble rim band + a yellow 3-leaf crown; only while shielded (om/basic/shield/on|off)"
+        }
+      ],
+      "clips": [
+        {
+          "id": 0,
+          "name": "org_spawn",
+          "len": 20,
+          "loop": false,
+          "next": "basic_bob",
+          "events": {},
+          "keys": 11,
+          "key_files": 9,
+          "note": "emergence pop 0.85 -> 1.06 -> 1 (the spawn scale-in)"
+        },
+        {
+          "id": 1,
+          "name": "basic_bob",
+          "len": 24,
+          "loop": true,
+          "next": null,
+          "events": {},
+          "keys": 14,
+          "key_files": 12,
+          "note": "two hop-slides: squash 0.92 / stretch 1.1, up 0.15"
+        },
+        {
+          "id": 2,
+          "name": "basic_melee",
+          "len": 14,
+          "loop": false,
+          "next": "basic_bob",
+          "events": {
+            "hit": 10
+          },
+          "keys": 14,
+          "key_files": 12,
+          "note": "lean back 0-5, bump 0.4 forward, hit 10, settle"
+        },
+        {
+          "id": 3,
+          "name": "basic_lie",
+          "len": 10,
+          "loop": false,
+          "next": null,
+          "events": {
+            "bag": 10
+          },
+          "keys": 12,
+          "key_files": 9,
+          "note": "bell -> bag: tips forward 0-9, the bag model at 10 (cut), crown out"
+        },
+        {
+          "id": 4,
+          "name": "basic_ranged",
+          "len": 20,
+          "loop": false,
+          "next": null,
+          "events": {
+            "open": 0,
+            "fire": 12
+          },
+          "keys": 21,
+          "key_files": 13,
+          "note": "bag: squash 0-3, crown glow 3, petals open 5-12, launch 12, recoil, close 14-20"
+        },
+        {
+          "id": 5,
+          "name": "org_die",
+          "len": 10,
+          "loop": false,
+          "next": null,
+          "events": {
+            "gone": 10
+          },
+          "keys": 17,
+          "key_files": 9,
+          "note": "dying look (the bag keeps its form), squash, shrink to nothing"
+        }
+      ],
+      "budget": {
+        "elements": 350,
+        "px": 12000
+      },
+      "elements": 341,
+      "px": 10496,
+      "functions": {
+        "spawn": "rlk:mboss/apep/om/basic/spawn",
+        "tick": "rlk:mboss/apep/om/basic/tick",
+        "kill": "rlk:mboss/apep/om/basic/kill",
+        "play": "rlk:mboss/apep/om/basic/play/<clip>",
+        "start": "rlk:mboss/apep/om/basic/start/<clip>",
+        "look": "rlk:mboss/apep/om/basic/look/<display>/<look>",
+        "bars": "rlk:mboss/apep/om/basic/bars",
+        "shield": "rlk:mboss/apep/om/basic/shield/on|off"
+      }
+    },
+    "nurt": {
+      "id": 2,
+      "name": "양육",
+      "tag": "rlk_mb_ap_nurt",
+      "size": {
+        "h": 2.4
+      },
+      "hover_y": 0,
+      "hp_bar_y": 2.8,
+      "shield": {
+        "w": 1.4,
+        "h": 2.6
+      },
+      "displays": [
+        {
+          "name": "stalk",
+          "tag": "rlk_ap_om_stalk",
+          "model": "nurt_stalk_idle",
+          "looks": {
+            "idle": "nurt_stalk_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 1.6,
+          "pivot": "feet",
+          "offset": [
+            0,
+            -2,
+            0
+          ],
+          "overlay": false,
+          "joint": [
+            0,
+            0,
+            0
+          ],
+          "elements": 33,
+          "note": "S-curved dark-teal ribbon with pale rims, fronds, the gold shard"
+        },
+        {
+          "name": "cap",
+          "tag": "rlk_ap_om_cap",
+          "model": "nurt_cap_idle",
+          "looks": {
+            "idle": "nurt_cap_idle",
+            "tilt": "nurt_cap_tilt"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "centre",
+          "offset": [
+            0,
+            0.18,
+            -0.06
+          ],
+          "overlay": false,
+          "joint": [
+            0,
+            2.18,
+            0.06
+          ],
+          "elements": 14,
+          "note": "cream hood-leaf; tilt = the hood lifted open"
+        },
+        {
+          "name": "orb",
+          "tag": "rlk_ap_om_orb",
+          "model": "nurt_orb_on",
+          "looks": {
+            "on": "nurt_orb_on"
+          },
+          "default_look": "on",
+          "brightness": 15,
+          "scale": 1,
+          "pivot": "centre",
+          "offset": [
+            0,
+            0.06,
+            0.4
+          ],
+          "overlay": false,
+          "joint": [
+            0,
+            2.06,
+            -0.4
+          ],
+          "elements": 5,
+          "note": "pulse"
+        },
+        {
+          "name": "ring",
+          "tag": "rlk_ap_om_ring",
+          "model": "nurt_ring_on",
+          "looks": {
+            "on": "nurt_ring_on"
+          },
+          "default_look": "on",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "feet",
+          "offset": [
+            0,
+            -2,
+            0
+          ],
+          "overlay": true,
+          "joint": [
+            0,
+            0,
+            0
+          ],
+          "elements": 32,
+          "note": "translucent cylinder r 1.3, h 0.5, only while immune (om/nurt/ring/on|off)"
+        }
+      ],
+      "clips": [
+        {
+          "id": 6,
+          "name": "nurt_idle",
+          "len": 40,
+          "loop": true,
+          "next": null,
+          "events": {},
+          "keys": 16,
+          "key_files": 10,
+          "note": "stalk sway, the hood nods with a lag, the orb breathes"
+        },
+        {
+          "id": 7,
+          "name": "nurt_buff",
+          "len": 20,
+          "loop": false,
+          "next": "nurt_idle",
+          "events": {
+            "tilt": 0,
+            "tethers": 8
+          },
+          "keys": 24,
+          "key_files": 15,
+          "note": "the hood tilts toward the targets 0-8 and opens (tilt), the orb flares at 8"
+        },
+        {
+          "id": 8,
+          "name": "nurt_die",
+          "len": 17,
+          "loop": false,
+          "next": null,
+          "events": {
+            "gone": 17
+          },
+          "keys": 34,
+          "key_files": 17,
+          "note": "the orb bursts, the ring goes, the stalk droops and the hood falls, shrink to nothing"
+        }
+      ],
+      "budget": {
+        "elements": 450,
+        "px": 16000
+      },
+      "elements": 84,
+      "px": 12544,
+      "functions": {
+        "spawn": "rlk:mboss/apep/om/nurt/spawn",
+        "tick": "rlk:mboss/apep/om/nurt/tick",
+        "kill": "rlk:mboss/apep/om/nurt/kill",
+        "play": "rlk:mboss/apep/om/nurt/play/<clip>",
+        "start": "rlk:mboss/apep/om/nurt/start/<clip>",
+        "look": "rlk:mboss/apep/om/nurt/look/<display>/<look>",
+        "bars": "rlk:mboss/apep/om/nurt/bars",
+        "ring": "rlk:mboss/apep/om/nurt/ring/on|off"
+      }
+    },
+    "guard": {
+      "id": 3,
+      "name": "수호",
+      "tag": "rlk_mb_ap_guard",
+      "size": {
+        "h": 4.4,
+        "bud": 2,
+        "orb_d": 0.4
+      },
+      "hover_y": 0,
+      "hp_bar_y": 3,
+      "shield": {
+        "w": 1.4,
+        "h": 3
+      },
+      "displays": [
+        {
+          "name": "spire",
+          "tag": "rlk_ap_om_spire",
+          "model": "guard_spire_spire",
+          "looks": {
+            "spire": "guard_spire_spire",
+            "bud": "guard_spire_bud",
+            "wisp": "guard_spire_wisp"
+          },
+          "default_look": "spire",
+          "brightness": 14,
+          "scale": 1.6,
+          "pivot": "mid",
+          "offset": [
+            0,
+            0.2,
+            0
+          ],
+          "overlay": false,
+          "joint": [
+            0,
+            2.2,
+            0
+          ],
+          "elements": 227
+        },
+        {
+          "name": "orb",
+          "tag": "rlk_ap_om_orb",
+          "model": "guard_orb_on",
+          "looks": {
+            "on": "guard_orb_on"
+          },
+          "default_look": "on",
+          "brightness": 15,
+          "scale": 1,
+          "pivot": "mid",
+          "offset": [
+            0,
+            3.05,
+            0
+          ],
+          "overlay": false,
+          "joint": [
+            0,
+            5.05,
+            0
+          ],
+          "elements": 5,
+          "note": "bobs 0.6-0.8 above the tip"
+        }
+      ],
+      "clips": [
+        {
+          "id": 9,
+          "name": "guard_idle",
+          "len": 60,
+          "loop": true,
+          "next": null,
+          "events": {},
+          "keys": 16,
+          "key_files": 14,
+          "note": "the orb bobs and turns; the spire sways a little"
+        },
+        {
+          "id": 10,
+          "name": "guard_cast",
+          "len": 30,
+          "loop": false,
+          "next": "guard_idle",
+          "events": {
+            "collapse": 0,
+            "bud": 7,
+            "regrow": 16,
+            "regrow_end": 24,
+            "shields": 30
+          },
+          "keys": 41,
+          "key_files": 25,
+          "note": "collapse 0-7, bud 7-16 (glowing slit), regrow 16-24, the orb flares at the shields"
+        },
+        {
+          "id": 11,
+          "name": "guard_die",
+          "len": 17,
+          "loop": false,
+          "next": null,
+          "events": {
+            "gone": 17
+          },
+          "keys": 13,
+          "key_files": 11,
+          "note": "shudder, the black wisp at 3 (red embers: kit), fades up"
+        }
+      ],
+      "budget": {
+        "elements": 450,
+        "px": 16000
+      },
+      "elements": 232,
+      "px": 15872,
+      "functions": {
+        "spawn": "rlk:mboss/apep/om/guard/spawn",
+        "tick": "rlk:mboss/apep/om/guard/tick",
+        "kill": "rlk:mboss/apep/om/guard/kill",
+        "play": "rlk:mboss/apep/om/guard/play/<clip>",
+        "start": "rlk:mboss/apep/om/guard/start/<clip>",
+        "look": "rlk:mboss/apep/om/guard/look/<display>/<look>",
+        "bars": "rlk:mboss/apep/om/guard/bars"
+      }
+    },
+    "nest": {
+      "id": 4,
+      "name": "둥지",
+      "tag": "rlk_mb_ap_nest",
+      "size": {
+        "w": 2.2,
+        "h": 1.3
+      },
+      "hover_y": 1,
+      "hp_bar_y": 2.75,
+      "shield": {
+        "w": 1.6,
+        "h": 2.2
+      },
+      "displays": [
+        {
+          "name": "cap",
+          "tag": "rlk_ap_om_cap",
+          "model": "nest_cap_idle",
+          "looks": {
+            "idle": "nest_cap_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "centre",
+          "offset": [
+            0,
+            -0.7,
+            0
+          ],
+          "overlay": false,
+          "joint": [
+            0,
+            1.3,
+            0
+          ],
+          "elements": 288,
+          "note": "cap + the orb eye (painted emissive)"
+        },
+        {
+          "name": "wing_l",
+          "tag": "rlk_ap_om_wing_l",
+          "model": "nest_wing_l_idle",
+          "looks": {
+            "idle": "nest_wing_l_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "centre",
+          "offset": [
+            0.17,
+            -0.68,
+            -0.02
+          ],
+          "overlay": false,
+          "parent": "cap",
+          "joint": [
+            0.17,
+            1.32,
+            0.02
+          ],
+          "elements": 18
+        },
+        {
+          "name": "wing_r",
+          "tag": "rlk_ap_om_wing_r",
+          "model": "nest_wing_r_idle",
+          "looks": {
+            "idle": "nest_wing_r_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "centre",
+          "offset": [
+            -0.17,
+            -0.68,
+            -0.02
+          ],
+          "overlay": false,
+          "parent": "cap",
+          "joint": [
+            -0.17,
+            1.32,
+            0.02
+          ],
+          "elements": 18
+        }
+      ],
+      "clips": [
+        {
+          "id": 12,
+          "name": "nest_fly",
+          "len": 14,
+          "loop": true,
+          "next": null,
+          "events": {},
+          "keys": 30,
+          "key_files": 12,
+          "note": "wings flap V (up 28) <-> wide arch (down 14), the body bobs"
+        },
+        {
+          "id": 13,
+          "name": "nest_cast",
+          "len": 12,
+          "loop": false,
+          "next": "nest_fly",
+          "events": {
+            "walls": 12
+          },
+          "keys": 24,
+          "key_files": 10,
+          "note": "the wings curl up into a vertical loop round the orb, the body rises"
+        },
+        {
+          "id": 14,
+          "name": "nest_blink",
+          "len": 6,
+          "loop": false,
+          "next": "nest_fly",
+          "events": {
+            "out": 0,
+            "in": 3
+          },
+          "keys": 18,
+          "key_files": 6,
+          "note": "out 0-2 (the module moves the husk at 3), back in 3-6"
+        },
+        {
+          "id": 15,
+          "name": "org_die",
+          "len": 12,
+          "loop": false,
+          "next": null,
+          "events": {
+            "gone": 12
+          },
+          "keys": 34,
+          "key_files": 12,
+          "note": "the wings droop, it falls to the ground and shrinks"
+        }
+      ],
+      "budget": {
+        "elements": 400,
+        "px": 12000
+      },
+      "elements": 324,
+      "px": 7168,
+      "functions": {
+        "spawn": "rlk:mboss/apep/om/nest/spawn",
+        "tick": "rlk:mboss/apep/om/nest/tick",
+        "kill": "rlk:mboss/apep/om/nest/kill",
+        "play": "rlk:mboss/apep/om/nest/play/<clip>",
+        "start": "rlk:mboss/apep/om/nest/start/<clip>",
+        "look": "rlk:mboss/apep/om/nest/look/<display>/<look>",
+        "bars": "rlk:mboss/apep/om/nest/bars"
+      }
+    },
+    "destr": {
+      "id": 5,
+      "name": "파괴",
+      "tag": "rlk_mb_ap_destr",
+      "size": {
+        "d": 1.2,
+        "spikes": 0.2,
+        "beak": 0.4
+      },
+      "hover_y": 0,
+      "hp_bar_y": 1.75,
+      "shield": {
+        "w": 1.3,
+        "h": 1.3
+      },
+      "displays": [
+        {
+          "name": "shell",
+          "tag": "rlk_ap_om_shell",
+          "model": "destr_shell_normal",
+          "looks": {
+            "normal": "destr_shell_normal",
+            "husk": "destr_shell_husk"
+          },
+          "default_look": "normal",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "centre",
+          "offset": [
+            0,
+            -1.38,
+            0
+          ],
+          "overlay": false,
+          "joint": [
+            0,
+            0.62,
+            0
+          ],
+          "elements": 235
+        },
+        {
+          "name": "face",
+          "tag": "rlk_ap_om_face",
+          "model": "destr_face_on",
+          "looks": {
+            "on": "destr_face_on"
+          },
+          "default_look": "on",
+          "brightness": 15,
+          "scale": 1,
+          "pivot": "centre",
+          "offset": [
+            0,
+            -1.38,
+            0
+          ],
+          "overlay": false,
+          "joint": [
+            0,
+            0.62,
+            0
+          ],
+          "elements": 50,
+          "note": "pulse scale"
+        }
+      ],
+      "clips": [
+        {
+          "id": 16,
+          "name": "destr_roll",
+          "len": 32,
+          "loop": true,
+          "next": null,
+          "events": {},
+          "keys": 10,
+          "key_files": 5,
+          "note": "rolls on its side (face to the left), one turn per 32 t"
+        },
+        {
+          "id": 17,
+          "name": "destr_fuse",
+          "len": 56,
+          "loop": false,
+          "next": "destr_suck",
+          "events": {
+            "pulse_1": 0,
+            "pulse_2": 9,
+            "pulse_3": 18,
+            "pulse_4": 27,
+            "pulse_5": 36,
+            "fast": 36
+          },
+          "keys": 63,
+          "key_files": 43,
+          "note": "upright, face to the Heart; pulses every 9 t, every 4 t from 36"
+        },
+        {
+          "id": 18,
+          "name": "destr_suck",
+          "len": 5,
+          "loop": false,
+          "next": "destr_blast",
+          "events": {},
+          "keys": 5,
+          "key_files": 4,
+          "note": "shrinks white-hot"
+        },
+        {
+          "id": 19,
+          "name": "destr_blast",
+          "len": 1,
+          "loop": false,
+          "next": null,
+          "events": {
+            "blast": 1
+          },
+          "keys": 3,
+          "key_files": 2,
+          "note": "flash; the split husk at 1 (the module then plays org_die)"
+        },
+        {
+          "id": 20,
+          "name": "org_die",
+          "len": 10,
+          "loop": false,
+          "next": null,
+          "events": {
+            "gone": 10
+          },
+          "keys": 11,
+          "key_files": 10,
+          "note": "the blackened split husk tumbles back to the ground and fades"
+        }
+      ],
+      "budget": {
+        "elements": 300,
+        "px": 8000
+      },
+      "elements": 285,
+      "px": 4608,
+      "functions": {
+        "spawn": "rlk:mboss/apep/om/destr/spawn",
+        "tick": "rlk:mboss/apep/om/destr/tick",
+        "kill": "rlk:mboss/apep/om/destr/kill",
+        "play": "rlk:mboss/apep/om/destr/play/<clip>",
+        "start": "rlk:mboss/apep/om/destr/start/<clip>",
+        "look": "rlk:mboss/apep/om/destr/look/<display>/<look>",
+        "bars": "rlk:mboss/apep/om/destr/bars"
+      }
+    },
+    "pred": {
+      "id": 6,
+      "name": "포식성",
+      "tag": "rlk_mb_ap_pred",
+      "size": {
+        "fish": [
+          2.5,
+          1.3
+        ],
+        "bud": [
+          2.1,
+          1.6
+        ],
+        "pod": [
+          3.5,
+          1.8
+        ]
+      },
+      "hover_y": 1.2,
+      "hp_bar_y": 2.75,
+      "shield": {
+        "w": 1.6,
+        "h": 1.6
+      },
+      "displays": [
+        {
+          "name": "body",
+          "tag": "rlk_ap_om_body",
+          "model": "pred_body_fish",
+          "looks": {
+            "fish": "pred_body_fish",
+            "fish_flare": "pred_body_fish_flare",
+            "bud": "pred_body_bud",
+            "pod": "pred_body_pod",
+            "face": "pred_body_face"
+          },
+          "default_look": "fish",
+          "brightness": 14,
+          "scale": 1.6,
+          "pivot": "centre",
+          "offset": [
+            0,
+            -0.7,
+            0
+          ],
+          "overlay": false,
+          "joint": [
+            0,
+            1.3,
+            0
+          ],
+          "elements": 241,
+          "note": "fish = the leaf-shark hood; bud / pod / face are their own models (jaw and fin hidden)"
+        },
+        {
+          "name": "jaw",
+          "tag": "rlk_ap_om_jaw",
+          "model": "pred_jaw_idle",
+          "looks": {
+            "idle": "pred_jaw_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 1.6,
+          "pivot": "centre",
+          "offset": [
+            0,
+            -0.72,
+            -0.4
+          ],
+          "overlay": false,
+          "parent": "body",
+          "joint": [
+            0,
+            1.28,
+            0.4
+          ],
+          "elements": 209,
+          "note": "the translucent bowl, sepals and the long front fin; hinge behind the middle"
+        },
+        {
+          "name": "fin",
+          "tag": "rlk_ap_om_fin",
+          "model": "pred_fin_idle",
+          "looks": {
+            "idle": "pred_fin_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "centre",
+          "offset": [
+            0,
+            -0.68,
+            -1.12
+          ],
+          "overlay": false,
+          "parent": "body",
+          "joint": [
+            0,
+            1.32,
+            1.12
+          ],
+          "elements": 1,
+          "note": "the tail fin; yaw +-25 in pred_swim"
+        },
+        {
+          "name": "core",
+          "tag": "rlk_ap_om_core",
+          "model": "pred_core_on",
+          "looks": {
+            "on": "pred_core_on"
+          },
+          "default_look": "on",
+          "brightness": 15,
+          "scale": 1,
+          "pivot": "centre",
+          "offset": [
+            0,
+            -0.78,
+            0.2
+          ],
+          "overlay": false,
+          "parent": "body",
+          "joint": [
+            0,
+            1.22,
+            -0.2
+          ],
+          "elements": 5
+        }
+      ],
+      "clips": [
+        {
+          "id": 21,
+          "name": "pred_swim",
+          "len": 16,
+          "loop": true,
+          "next": null,
+          "events": {},
+          "keys": 35,
+          "key_files": 15,
+          "note": "tail fin yaw +-25, body +-8 with a 3 t lag, a slow bob"
+        },
+        {
+          "id": 22,
+          "name": "pred_swallow",
+          "len": 24,
+          "loop": false,
+          "next": "pred_bud",
+          "events": {
+            "eat": 12,
+            "bud": 14
+          },
+          "keys": 64,
+          "key_files": 22,
+          "note": "rears 0-6, scoops 6-12 (eat), closes into the bud at 14"
+        },
+        {
+          "id": 23,
+          "name": "pred_bud",
+          "len": 20,
+          "loop": true,
+          "next": null,
+          "events": {},
+          "keys": 13,
+          "key_files": 5,
+          "note": "spins 45 degrees per loop (8-fold), bobs over the gold swirl; the core pulses"
+        },
+        {
+          "id": 24,
+          "name": "pred_inflate",
+          "len": 10,
+          "loop": false,
+          "next": "pred_burst",
+          "events": {},
+          "keys": 12,
+          "key_files": 8,
+          "note": "the pod grows from the ground (its own model) over 8 t"
+        },
+        {
+          "id": 25,
+          "name": "pred_burst",
+          "len": 10,
+          "loop": false,
+          "next": "pred_swim",
+          "events": {
+            "hit": 0,
+            "fish": 2
+          },
+          "keys": 18,
+          "key_files": 7,
+          "note": "the pod bursts (hit 0), the fish again at 2"
+        },
+        {
+          "id": 26,
+          "name": "pred_bite",
+          "len": 6,
+          "loop": false,
+          "next": "pred_swim",
+          "events": {
+            "open": 0,
+            "hit": 4
+          },
+          "keys": 20,
+          "key_files": 5,
+          "note": "jaw open 0-3 with the spikes flared, snap 4 (the module lunges the husk)"
+        },
+        {
+          "id": 27,
+          "name": "pred_bite_chain",
+          "len": 38,
+          "loop": false,
+          "next": "pred_swim",
+          "events": {
+            "hit_1": 4,
+            "hit_2": 10,
+            "hit_3": 16,
+            "hit_4": 22
+          },
+          "keys": 102,
+          "key_files": 30,
+          "note": "4 snaps 6 t apart (the module starts it 8 t before the first sector strike)"
+        },
+        {
+          "id": 28,
+          "name": "org_die",
+          "len": 12,
+          "loop": false,
+          "next": null,
+          "events": {
+            "gone": 12
+          },
+          "keys": 30,
+          "key_files": 11,
+          "note": "the core flashes out, the fish sinks to the ground nose first and shrinks"
+        }
+      ],
+      "budget": {
+        "elements": 500,
+        "px": 20000
+      },
+      "elements": 456,
+      "px": 18944,
+      "functions": {
+        "spawn": "rlk:mboss/apep/om/pred/spawn",
+        "tick": "rlk:mboss/apep/om/pred/tick",
+        "kill": "rlk:mboss/apep/om/pred/kill",
+        "play": "rlk:mboss/apep/om/pred/play/<clip>",
+        "start": "rlk:mboss/apep/om/pred/start/<clip>",
+        "look": "rlk:mboss/apep/om/pred/look/<display>/<look>",
+        "bars": "rlk:mboss/apep/om/pred/bars",
+        "form": "rlk:mboss/apep/om/pred/form/<fish|bud|pod|face>"
+      }
+    }
+  },
+  "objects": {
+    "heart": {
+      "kind": "single",
+      "tag": "rlk_mb_ap_heart",
+      "marker": {
+        "tags": [
+          "rlk_mb_ap_heart",
+          "rlk_room",
+          "rlk_mb_aux"
+        ],
+        "not": [
+          "rlk_mob",
+          "rlk_zmob"
+        ]
+      },
+      "displays": [
+        {
+          "name": "heart_bulb",
+          "tag": "rlk_mb_ap_heart_bulb",
+          "model": "heart_bulb_idle",
+          "looks": {
+            "idle": "heart_bulb_idle",
+            "egg_gold": "heart_bulb_egg_gold",
+            "egg_green": "heart_bulb_egg_green",
+            "withered": "heart_bulb_withered",
+            "blaze": "heart_bulb_blaze"
+          },
+          "default_look": "idle",
+          "brightness": 15,
+          "scale": 1.2,
+          "pivot": "centre",
+          "idx": 0,
+          "uuid": "524c4b4d-4150-4800-8000-000000000000",
+          "joint": [
+            0,
+            1.6,
+            0
+          ],
+          "elements": 341,
+          "note": "translucent lemon seed 3.2 x 2.6 x 2.3, alpha ~0.86; the arrival egg = this model at scale 0.7, pitch 90 (upright)"
+        },
+        {
+          "name": "heart_cradle",
+          "tag": "rlk_mb_ap_heart_cradle",
+          "model": "heart_cradle_pedestal",
+          "looks": {
+            "pedestal": "heart_cradle_pedestal",
+            "full": "heart_cradle_full"
+          },
+          "default_look": "pedestal",
+          "brightness": 14,
+          "scale": 2.2,
+          "pivot": "mid",
+          "idx": 1,
+          "uuid": "524c4b4d-4150-4800-8000-000000000001",
+          "joint": [
+            0,
+            0.9,
+            0
+          ],
+          "elements": 207,
+          "note": "5 knobbly root fingers + the mound; pedestal adds pale petal clumps + 3 gold sprouts"
+        },
+        {
+          "name": "heart_arms",
+          "tag": "rlk_mb_ap_heart_arms",
+          "model": "heart_arms_idle",
+          "looks": {
+            "idle": "heart_arms_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 2.2,
+          "pivot": "mid",
+          "idx": 2,
+          "uuid": "524c4b4d-4150-4800-8000-000000000002",
+          "joint": [
+            0,
+            2.1,
+            0
+          ],
+          "elements": 36,
+          "note": "two root arms curling over the bulb to 4.0-4.3 b"
+        },
+        {
+          "name": "heart_tips",
+          "tag": "rlk_mb_ap_heart_tips",
+          "model": "heart_tips_idle",
+          "looks": {
+            "idle": "heart_tips_idle"
+          },
+          "default_look": "idle",
+          "brightness": 15,
+          "scale": 2.2,
+          "pivot": "mid",
+          "idx": 3,
+          "uuid": "524c4b4d-4150-4800-8000-000000000003",
+          "joint": [
+            0,
+            2.1,
+            0
+          ],
+          "elements": 16,
+          "note": "leaf-flame sprouts, swaying"
+        },
+        {
+          "name": "vine_hand",
+          "tag": "rlk_mb_ap_vine_hand",
+          "model": "vine_hand_idle",
+          "looks": {
+            "idle": "vine_hand_idle",
+            "wrap": "vine_hand_wrap"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "centre",
+          "idx": 4,
+          "uuid": "524c4b4d-4150-4800-8000-000000000004",
+          "joint": [
+            0,
+            11.2,
+            0
+          ],
+          "elements": 7
+        },
+        {
+          "name": "vine_stem_0",
+          "tag": "rlk_mb_ap_vine_stem_0",
+          "model": "heart_vine_stem",
+          "looks": {
+            "idle": "heart_vine_stem"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 4.4,
+          "pivot": "centre",
+          "idx": 5,
+          "uuid": "524c4b4d-4150-4800-8000-000000000005",
+          "joint": [
+            0,
+            26,
+            0
+          ],
+          "elements": 3,
+          "note": "stretched along its length between the canopy rim and the hand"
+        },
+        {
+          "name": "vine_stem_1",
+          "tag": "rlk_mb_ap_vine_stem_1",
+          "model": "heart_vine_stem",
+          "looks": {
+            "idle": "heart_vine_stem"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 4.4,
+          "pivot": "centre",
+          "idx": 6,
+          "uuid": "524c4b4d-4150-4800-8000-000000000006",
+          "joint": [
+            0,
+            26,
+            0
+          ],
+          "elements": 3,
+          "note": "stretched along its length between the canopy rim and the hand"
+        },
+        {
+          "name": "vine_stem_2",
+          "tag": "rlk_mb_ap_vine_stem_2",
+          "model": "heart_vine_stem",
+          "looks": {
+            "idle": "heart_vine_stem"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 4.4,
+          "pivot": "centre",
+          "idx": 7,
+          "uuid": "524c4b4d-4150-4800-8000-000000000007",
+          "joint": [
+            0,
+            26,
+            0
+          ],
+          "elements": 3,
+          "note": "stretched along its length between the canopy rim and the hand"
+        },
+        {
+          "name": "vine_stem_3",
+          "tag": "rlk_mb_ap_vine_stem_3",
+          "model": "heart_vine_stem",
+          "looks": {
+            "idle": "heart_vine_stem"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 4.4,
+          "pivot": "centre",
+          "idx": 8,
+          "uuid": "524c4b4d-4150-4800-8000-000000000008",
+          "joint": [
+            0,
+            26,
+            0
+          ],
+          "elements": 3,
+          "note": "stretched along its length between the canopy rim and the hand"
+        }
+      ],
+      "egg": {
+        "scale": 0.7,
+        "pitch": 0,
+        "land_ticks": 6,
+        "note": "upright (pose pitch 90 about x of the lying lemon); scales to 1 and pitches to lying over the landing (heart_drop 0-6)"
+      },
+      "clips": [
+        {
+          "id": 29,
+          "name": "heart_hang",
+          "len": 80,
+          "loop": true,
+          "next": null,
+          "events": {},
+          "displays": [
+            "heart_bulb",
+            "vine_hand",
+            "vine_stem_0",
+            "vine_stem_1",
+            "vine_stem_2",
+            "vine_stem_3"
+          ],
+          "keys": 74,
+          "key_files": 74,
+          "note": "the egg hangs in the canopy (hang canopy_y), swaying"
+        },
+        {
+          "id": 30,
+          "name": "heart_up",
+          "len": 30,
+          "loop": false,
+          "next": "heart_hang",
+          "events": {},
+          "displays": [
+            "heart_bulb",
+            "vine_hand",
+            "vine_stem_0",
+            "vine_stem_1",
+            "vine_stem_2",
+            "vine_stem_3"
+          ],
+          "keys": 58,
+          "key_files": 58,
+          "note": "drawn up from the entrance height (9 b) into the canopy"
+        },
+        {
+          "id": 31,
+          "name": "heart_lower",
+          "len": 50,
+          "loop": false,
+          "next": null,
+          "events": {},
+          "displays": [
+            "heart_bulb",
+            "vine_hand",
+            "vine_stem_0",
+            "vine_stem_1",
+            "vine_stem_2",
+            "vine_stem_3"
+          ],
+          "keys": 56,
+          "key_files": 56,
+          "note": "lowered from the canopy to the lowered height, swaying 1-2 b and calming"
+        },
+        {
+          "id": 32,
+          "name": "heart_drop",
+          "len": 30,
+          "loop": false,
+          "next": "heart_idle",
+          "events": {
+            "land": 6,
+            "beam": 6,
+            "beam_end": 16
+          },
+          "displays": [
+            "heart_bulb",
+            "vine_hand",
+            "vine_stem_0",
+            "vine_stem_1",
+            "vine_stem_2",
+            "vine_stem_3",
+            "heart_cradle",
+            "heart_tips"
+          ],
+          "keys": 102,
+          "key_files": 102,
+          "note": "released at 0, falls 0-5, lands 6 (pitches to lying, 0.7 -> 1, squash), settles; the hand rises away; the cradle full at 6"
+        },
+        {
+          "id": 33,
+          "name": "heart_idle",
+          "len": 40,
+          "loop": true,
+          "next": null,
+          "events": {},
+          "displays": [
+            "heart_bulb",
+            "heart_tips"
+          ],
+          "keys": 9,
+          "key_files": 9,
+          "note": "the bulb breathes 1.00 <-> 1.03, the sprouts sway"
+        },
+        {
+          "id": 34,
+          "name": "heart_hit",
+          "len": 6,
+          "loop": false,
+          "next": "heart_idle",
+          "events": {},
+          "displays": [
+            "heart_bulb",
+            "heart_tips"
+          ],
+          "keys": 6,
+          "key_files": 6,
+          "note": "a flinch"
+        },
+        {
+          "id": 35,
+          "name": "heart_gain",
+          "len": 8,
+          "loop": false,
+          "next": "heart_idle",
+          "events": {},
+          "displays": [
+            "heart_bulb",
+            "heart_tips"
+          ],
+          "keys": 6,
+          "key_files": 6,
+          "note": "a bright swell"
+        },
+        {
+          "id": 36,
+          "name": "heart_wither",
+          "len": 30,
+          "loop": false,
+          "next": null,
+          "events": {},
+          "displays": [
+            "heart_bulb",
+            "heart_tips"
+          ],
+          "keys": 9,
+          "key_files": 9,
+          "note": "the withered look at 0, sags and shrinks a little, the sprouts droop"
+        },
+        {
+          "id": 37,
+          "name": "heart_blaze",
+          "len": 24,
+          "loop": false,
+          "next": null,
+          "events": {},
+          "displays": [
+            "heart_bulb",
+            "heart_tips"
+          ],
+          "keys": 8,
+          "key_files": 8,
+          "note": "blazes (CS 0-24): bright look, swelling pulses"
+        },
+        {
+          "id": 38,
+          "name": "heart_lift",
+          "len": 46,
+          "loop": false,
+          "next": null,
+          "events": {},
+          "displays": [
+            "heart_bulb",
+            "vine_hand",
+            "vine_stem_0",
+            "vine_stem_1",
+            "vine_stem_2",
+            "vine_stem_3"
+          ],
+          "keys": 80,
+          "key_files": 80,
+          "note": "golden egg lifts out of the cradle (0-30) to hang cs_y, the vine hand comes down 20-40 and wraps at 40"
+        },
+        {
+          "id": 39,
+          "name": "cradle_rise",
+          "len": 20,
+          "loop": false,
+          "next": null,
+          "events": {},
+          "displays": [
+            "heart_cradle",
+            "heart_arms",
+            "heart_tips"
+          ],
+          "keys": 51,
+          "key_files": 51,
+          "note": "the cradle (pedestal look), arms and sprouts rise out of the ground"
+        },
+        {
+          "id": 40,
+          "name": "cradle_sink",
+          "len": 10,
+          "loop": false,
+          "next": null,
+          "events": {},
+          "displays": [
+            "heart_cradle",
+            "heart_arms",
+            "heart_tips"
+          ],
+          "keys": 30,
+          "key_files": 30,
+          "note": "back into the ground"
+        }
+      ],
+      "budget": {
+        "elements": 800,
+        "px": 40000
+      },
+      "elements": 619,
+      "px": 30464,
+      "states": {
+        "entrance": {
+          "function": "rlk:mboss/apep/om/heart/spawn/entrance",
+          "note": "E: the egg held by the vine hand at the entrance height, the cradle under the floor"
+        },
+        "canopy": {
+          "function": "rlk:mboss/apep/om/heart/spawn/canopy",
+          "note": "phase 1 (and a reload in P1): hanging in the canopy"
+        },
+        "play": {
+          "function": "rlk:mboss/apep/om/heart/spawn/play",
+          "note": "phase 2 (and a reload in T1 / P2): lying in the full cradle; the hand and the stems gone"
+        }
+      },
+      "footprint": {
+        "centre": "the arena centre (cx, cz) = theme POINTS[\"heart\"]",
+        "note": "bearings are compass degrees round the centre: 0 = north (-z), 90 = east (+x), 180 = south (+z); hang = the egg's lowest point above the floor",
+        "bulb_box": {
+          "l": 3.2,
+          "w": 2.6,
+          "h": 2.3,
+          "centre_y": 1.6,
+          "yaw": 0
+        },
+        "root_radius": 2.5,
+        "sockets": [
+          {
+            "id": 0,
+            "bearing": 0,
+            "r": 3.4
+          },
+          {
+            "id": 1,
+            "bearing": 120,
+            "r": 3.4
+          },
+          {
+            "id": 2,
+            "bearing": 240,
+            "r": 3.4
+          }
+        ],
+        "wait_ring": 4.5,
+        "destr_stop": {
+          "r": 2.6,
+          "bearings": [
+            60,
+            180,
+            300
+          ]
+        },
+        "wall_exclusion": 4.6,
+        "bolt_end": {
+          "r": 1.5,
+          "from": "bulb_box"
+        },
+        "swirl_r": 3.5,
+        "hang": {
+          "entrance_y": 9,
+          "canopy_y": 20,
+          "lowered_y": 3,
+          "cs_y": 10
+        },
+        "arms_r": 2.6,
+        "arms_h": 4.3
+      },
+      "functions": {
+        "spawn": "rlk:mboss/apep/om/heart/spawn/<entrance|canopy|play>",
+        "tick": "rlk:mboss/apep/om/heart/tick",
+        "play": "rlk:mboss/apep/om/heart/play/<clip>",
+        "look": "rlk:mboss/apep/om/heart/look/<display>/<look>",
+        "kill": "rlk:mboss/apep/om/heart/kill"
+      }
+    },
+    "dome": {
+      "kind": "fixed_set",
+      "count": 3,
+      "radius": 4.5,
+      "tag": "rlk_mb_ap_dome",
+      "displays": [
+        {
+          "name": "dome_shell",
+          "tag": "rlk_mb_ap_dome_shell",
+          "model": "dome_shell_idle",
+          "looks": {
+            "idle": "dome_shell_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 3.3,
+          "pivot": "feet",
+          "idxs": [
+            16,
+            18,
+            20
+          ],
+          "joint": [
+            0,
+            0,
+            0
+          ],
+          "elements": 232,
+          "note": "two-sided shell, alpha <= 0.35"
+        },
+        {
+          "name": "dome_decor",
+          "tag": "rlk_mb_ap_dome_decor",
+          "model": "dome_decor_idle",
+          "looks": {
+            "idle": "dome_decor_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 3.3,
+          "pivot": "feet",
+          "idxs": [
+            17,
+            19,
+            21
+          ],
+          "joint": [
+            0,
+            0,
+            0
+          ],
+          "elements": 130,
+          "note": "cutout vine band, bright base rim, sprout on top"
+        }
+      ],
+      "clips": [
+        {
+          "id": 41,
+          "name": "dome_rise",
+          "len": 10,
+          "loop": false,
+          "next": "dome_idle",
+          "events": {},
+          "displays": [
+            "dome_shell",
+            "dome_decor"
+          ],
+          "keys": 18,
+          "key_files": 18,
+          "note": "grows up from the footprint, a small overshoot"
+        },
+        {
+          "id": 42,
+          "name": "dome_idle",
+          "len": 40,
+          "loop": true,
+          "next": null,
+          "events": {},
+          "displays": [
+            "dome_shell",
+            "dome_decor"
+          ],
+          "keys": 3,
+          "key_files": 3,
+          "note": "a faint breath"
+        },
+        {
+          "id": 43,
+          "name": "dome_pop",
+          "len": 6,
+          "loop": false,
+          "next": null,
+          "events": {},
+          "displays": [
+            "dome_shell",
+            "dome_decor"
+          ],
+          "keys": 12,
+          "key_files": 12,
+          "note": "swells and pops (shards: kit)"
+        }
+      ],
+      "budget": {
+        "elements": 400,
+        "px": 24000
+      },
+      "elements": 362,
+      "px": 14336,
+      "functions": {
+        "spawn": "rlk:mboss/apep/om/dome/spawn {i}",
+        "play": "rlk:mboss/apep/om/dome/play {i,clip}",
+        "tick": "rlk:mboss/apep/om/dome/tick",
+        "kill": "rlk:mboss/apep/om/dome/i<k>/kill",
+        "kill_all": "rlk:mboss/apep/om/dome/kill_all"
+      }
+    },
+    "wall": {
+      "kind": "multi",
+      "max": 15,
+      "tag": "rlk_mb_ap_wall",
+      "blocks": {
+        "block": "minecraft:barrier",
+        "y": [
+          201,
+          202
+        ],
+        "place": "replace air"
+      },
+      "displays": [
+        {
+          "name": "wall_blade",
+          "tag": "rlk_mb_ap_wall_blade",
+          "model": "wall_blade_idle",
+          "looks": {
+            "idle": "wall_blade_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 2,
+          "pivot": "feet",
+          "joint": [
+            0,
+            0,
+            0
+          ],
+          "elements": 3,
+          "note": "translucent yellow-green blade 0.9 x 2.86, midrib, two windows"
+        }
+      ],
+      "clips": [
+        {
+          "id": 44,
+          "name": "wall_rise",
+          "len": 5,
+          "loop": false,
+          "next": null,
+          "events": {},
+          "displays": [
+            "wall_blade"
+          ],
+          "keys": 4,
+          "key_files": 4,
+          "note": "shoots up from the ground"
+        },
+        {
+          "id": 45,
+          "name": "wall_fade",
+          "len": 8,
+          "loop": false,
+          "next": null,
+          "events": {},
+          "displays": [
+            "wall_blade"
+          ],
+          "keys": 8,
+          "key_files": 8,
+          "note": "shrinks into the ground (motes: kit)"
+        }
+      ],
+      "budget": {
+        "elements": 60,
+        "px": 8000
+      },
+      "elements": 3,
+      "px": 5376,
+      "functions": {
+        "spawn": "rlk:mboss/apep/om/wall/spawn",
+        "tick": "rlk:mboss/apep/om/wall/tick",
+        "play": "rlk:mboss/apep/om/wall/play/<clip> (as the blade)",
+        "kill_all": "rlk:mboss/apep/om/wall/kill_all"
+      }
+    },
+    "stalk": {
+      "kind": "fixed_set",
+      "count": 4,
+      "height": [
+        5.5,
+        6
+      ],
+      "tag": "rlk_mb_ap_stalk",
+      "displays": [
+        {
+          "name": "stalk_low",
+          "tag": "rlk_mb_ap_stalk_low",
+          "model": "stalk_low_idle",
+          "looks": {
+            "idle": "stalk_low_idle"
+          },
+          "default_look": "idle",
+          "brightness": 13,
+          "scale": 1.9,
+          "pivot": "feet",
+          "idxs": [
+            32,
+            35,
+            38,
+            41
+          ],
+          "joint": [
+            0,
+            0,
+            0
+          ],
+          "elements": 178
+        },
+        {
+          "name": "stalk_high",
+          "tag": "rlk_mb_ap_stalk_high",
+          "model": "stalk_high_idle",
+          "looks": {
+            "idle": "stalk_high_idle"
+          },
+          "default_look": "idle",
+          "brightness": 13,
+          "scale": 1.5,
+          "pivot": "feet",
+          "idxs": [
+            33,
+            36,
+            39,
+            42
+          ],
+          "parent": "stalk_low",
+          "joint": [
+            0,
+            2.62,
+            0
+          ],
+          "elements": 146
+        },
+        {
+          "name": "stalk_tip",
+          "tag": "rlk_mb_ap_stalk_tip",
+          "model": "stalk_tip_idle",
+          "looks": {
+            "idle": "stalk_tip_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 1.1,
+          "pivot": "feet",
+          "idxs": [
+            34,
+            37,
+            40,
+            43
+          ],
+          "parent": "stalk_high",
+          "joint": [
+            0,
+            4.64,
+            0
+          ],
+          "elements": 12,
+          "note": "hooked tip + small gold cone"
+        }
+      ],
+      "clips": [
+        {
+          "id": 46,
+          "name": "leg_rise",
+          "len": 10,
+          "loop": false,
+          "next": null,
+          "events": {},
+          "displays": [
+            "stalk_low",
+            "stalk_high",
+            "stalk_tip"
+          ],
+          "keys": 30,
+          "key_files": 30,
+          "note": "bursts up from below the floor, leaning back from the lock, the upper segments whip"
+        },
+        {
+          "id": 47,
+          "name": "leg_slam",
+          "len": 6,
+          "loop": false,
+          "next": null,
+          "events": {
+            "hit": 4
+          },
+          "displays": [
+            "stalk_low",
+            "stalk_high",
+            "stalk_tip"
+          ],
+          "keys": 18,
+          "key_files": 18,
+          "note": "slams forward onto the ground toward the lock (hit 4), a bounce"
+        },
+        {
+          "id": 48,
+          "name": "leg_sink",
+          "len": 10,
+          "loop": false,
+          "next": null,
+          "events": {},
+          "displays": [
+            "stalk_low",
+            "stalk_high",
+            "stalk_tip"
+          ],
+          "keys": 30,
+          "key_files": 30,
+          "note": "sinks back through the floor"
+        }
+      ],
+      "budget": {
+        "elements": 400,
+        "px": 16000
+      },
+      "elements": 336,
+      "px": 7680,
+      "reach": 6,
+      "functions": {
+        "spawn": "rlk:mboss/apep/om/stalk/spawn {i} (positioned at the root, facing the lock)",
+        "play": "rlk:mboss/apep/om/stalk/play {i,clip}",
+        "tick": "rlk:mboss/apep/om/stalk/tick",
+        "kill_all": "rlk:mboss/apep/om/stalk/kill_all"
+      }
+    },
+    "seed": {
+      "kind": "single",
+      "tag": "rlk_mb_ap_seed",
+      "displays": [
+        {
+          "name": "seed",
+          "tag": "rlk_mb_ap_seed",
+          "model": "seed_idle",
+          "looks": {
+            "idle": "seed_idle"
+          },
+          "default_look": "idle",
+          "brightness": 15,
+          "scale": 1,
+          "pivot": "feet",
+          "idx": 48,
+          "uuid": "524c4b4d-4150-4800-8000-000000000030",
+          "joint": [
+            0,
+            0,
+            0
+          ],
+          "elements": 4,
+          "note": "glowing golden seed at the death spot"
+        }
+      ],
+      "clips": [],
+      "budget": {
+        "elements": 40,
+        "px": 2000
+      },
+      "elements": 4,
+      "px": 1024,
+      "functions": {
+        "spawn": "rlk:mboss/apep/om/seed/spawn",
+        "kill": "rlk:mboss/apep/om/seed/kill"
+      }
+    }
+  },
+  "budgets": {
+    "px_total": 200000,
+    "organism_elements": 500,
+    "heart_elements": 800,
+    "px": 128512
+  },
+  "sprites": {
+    "bo_bell": {
+      "w": 96,
+      "h": 48,
+      "owner": "basic"
+    },
+    "bo_bell_l": {
+      "w": 16,
+      "h": 16,
+      "owner": "basic"
+    },
+    "bo_lobe": {
+      "w": 32,
+      "h": 32,
+      "owner": "basic"
+    },
+    "bo_lobeF": {
+      "w": 16,
+      "h": 16,
+      "owner": "basic"
+    },
+    "bo_stem": {
+      "w": 32,
+      "h": 32,
+      "owner": "basic"
+    },
+    "bo_petal": {
+      "w": 32,
+      "h": 32,
+      "owner": "basic"
+    },
+    "bo_glow": {
+      "w": 16,
+      "h": 16,
+      "owner": "basic"
+    },
+    "bo_pane": {
+      "w": 16,
+      "h": 32,
+      "owner": "basic"
+    },
+    "bo_bubble": {
+      "w": 32,
+      "h": 16,
+      "owner": "basic"
+    },
+    "bo_lcrown": {
+      "w": 32,
+      "h": 32,
+      "owner": "basic"
+    },
+    "nu_rib": {
+      "w": 32,
+      "h": 64,
+      "owner": "nurt"
+    },
+    "nu_ribS": {
+      "w": 32,
+      "h": 64,
+      "owner": "nurt"
+    },
+    "nu_ribT": {
+      "w": 32,
+      "h": 48,
+      "owner": "nurt"
+    },
+    "nu_hood": {
+      "w": 48,
+      "h": 32,
+      "owner": "nurt"
+    },
+    "nu_hoodF": {
+      "w": 32,
+      "h": 32,
+      "owner": "nurt"
+    },
+    "nu_hoodT": {
+      "w": 48,
+      "h": 48,
+      "owner": "nurt"
+    },
+    "nu_frond": {
+      "w": 16,
+      "h": 32,
+      "owner": "nurt"
+    },
+    "nu_gem": {
+      "w": 16,
+      "h": 16,
+      "owner": "nurt"
+    },
+    "nu_orb": {
+      "w": 16,
+      "h": 16,
+      "owner": "nurt"
+    },
+    "nu_ring": {
+      "w": 64,
+      "h": 16,
+      "owner": "nurt"
+    },
+    "gu_ribA": {
+      "w": 32,
+      "h": 112,
+      "owner": "guard"
+    },
+    "gu_ribB": {
+      "w": 32,
+      "h": 112,
+      "owner": "guard"
+    },
+    "gu_sheath": {
+      "w": 64,
+      "h": 32,
+      "owner": "guard"
+    },
+    "gu_lobe": {
+      "w": 32,
+      "h": 32,
+      "owner": "guard"
+    },
+    "gu_drape": {
+      "w": 32,
+      "h": 48,
+      "owner": "guard"
+    },
+    "gu_bud": {
+      "w": 48,
+      "h": 32,
+      "owner": "guard"
+    },
+    "gu_wisp": {
+      "w": 32,
+      "h": 48,
+      "owner": "guard"
+    },
+    "gu_gem": {
+      "w": 16,
+      "h": 16,
+      "owner": "guard"
+    },
+    "gu_orb": {
+      "w": 16,
+      "h": 16,
+      "owner": "guard"
+    },
+    "ne_cap": {
+      "w": 64,
+      "h": 32,
+      "owner": "nest"
+    },
+    "ne_wing": {
+      "w": 64,
+      "h": 48,
+      "owner": "nest"
+    },
+    "ne_ring": {
+      "w": 32,
+      "h": 32,
+      "owner": "nest"
+    },
+    "ne_orb": {
+      "w": 16,
+      "h": 16,
+      "owner": "nest"
+    },
+    "ne_drop": {
+      "w": 16,
+      "h": 16,
+      "owner": "nest"
+    },
+    "ne_thorn": {
+      "w": 16,
+      "h": 16,
+      "owner": "nest"
+    },
+    "de_shell": {
+      "w": 64,
+      "h": 32,
+      "owner": "destr"
+    },
+    "de_spike": {
+      "w": 16,
+      "h": 32,
+      "owner": "destr"
+    },
+    "de_face": {
+      "w": 32,
+      "h": 32,
+      "owner": "destr"
+    },
+    "de_beak": {
+      "w": 16,
+      "h": 16,
+      "owner": "destr"
+    },
+    "de_rim": {
+      "w": 32,
+      "h": 16,
+      "owner": "destr"
+    },
+    "pr_hood": {
+      "w": 64,
+      "h": 64,
+      "owner": "pred"
+    },
+    "pr_bowl": {
+      "w": 64,
+      "h": 32,
+      "owner": "pred"
+    },
+    "pr_horn": {
+      "w": 32,
+      "h": 48,
+      "owner": "pred"
+    },
+    "pr_hornS": {
+      "w": 16,
+      "h": 32,
+      "owner": "pred"
+    },
+    "pr_fin": {
+      "w": 16,
+      "h": 48,
+      "owner": "pred"
+    },
+    "pr_sepal": {
+      "w": 16,
+      "h": 48,
+      "owner": "pred"
+    },
+    "pr_tail": {
+      "w": 48,
+      "h": 48,
+      "owner": "pred"
+    },
+    "pr_eye": {
+      "w": 16,
+      "h": 16,
+      "owner": "pred"
+    },
+    "pr_core": {
+      "w": 16,
+      "h": 16,
+      "owner": "pred"
+    },
+    "pr_gem": {
+      "w": 16,
+      "h": 16,
+      "owner": "pred"
+    },
+    "pr_flare": {
+      "w": 16,
+      "h": 32,
+      "owner": "pred"
+    },
+    "pr_petal": {
+      "w": 48,
+      "h": 32,
+      "owner": "pred"
+    },
+    "pr_podlid": {
+      "w": 48,
+      "h": 48,
+      "owner": "pred"
+    },
+    "pr_face": {
+      "w": 32,
+      "h": 32,
+      "owner": "pred"
+    },
+    "he_bulb": {
+      "w": 128,
+      "h": 64,
+      "owner": "heart"
+    },
+    "he_swirl": {
+      "w": 32,
+      "h": 32,
+      "owner": "heart"
+    },
+    "he_root": {
+      "w": 32,
+      "h": 64,
+      "owner": "heart"
+    },
+    "he_rootc": {
+      "w": 64,
+      "h": 64,
+      "owner": "heart"
+    },
+    "he_armc": {
+      "w": 64,
+      "h": 96,
+      "owner": "heart"
+    },
+    "he_tip": {
+      "w": 32,
+      "h": 48,
+      "owner": "heart"
+    },
+    "he_petal": {
+      "w": 32,
+      "h": 32,
+      "owner": "heart"
+    },
+    "he_sprout": {
+      "w": 16,
+      "h": 48,
+      "owner": "heart"
+    },
+    "he_tendril": {
+      "w": 48,
+      "h": 64,
+      "owner": "heart"
+    },
+    "he_stem": {
+      "w": 16,
+      "h": 128,
+      "owner": "heart"
+    },
+    "do_shell": {
+      "w": 64,
+      "h": 64,
+      "owner": "dome"
+    },
+    "do_vine": {
+      "w": 128,
+      "h": 64,
+      "owner": "dome"
+    },
+    "do_rim": {
+      "w": 64,
+      "h": 16,
+      "owner": "dome"
+    },
+    "do_sprout": {
+      "w": 32,
+      "h": 32,
+      "owner": "dome"
+    },
+    "wa_blade": {
+      "w": 48,
+      "h": 112,
+      "owner": "wall"
+    },
+    "st_bark": {
+      "w": 64,
+      "h": 64,
+      "owner": "stalk"
+    },
+    "st_hook": {
+      "w": 48,
+      "h": 64,
+      "owner": "stalk"
+    },
+    "st_cone": {
+      "w": 16,
+      "h": 16,
+      "owner": "stalk"
+    },
+    "se_seed": {
+      "w": 32,
+      "h": 32,
+      "owner": "seed"
+    },
+    "ne_cap_l": {
+      "w": 16,
+      "h": 16,
+      "owner": "nest"
+    },
+    "gu_sheath_l": {
+      "w": 16,
+      "h": 16,
+      "owner": "guard"
+    },
+    "gu_bud_l": {
+      "w": 16,
+      "h": 16,
+      "owner": "guard"
+    },
+    "de_shell_l": {
+      "w": 16,
+      "h": 16,
+      "owner": "destr"
+    },
+    "pr_hood_l": {
+      "w": 16,
+      "h": 16,
+      "owner": "pred"
+    },
+    "pr_bowl_l": {
+      "w": 16,
+      "h": 16,
+      "owner": "pred"
+    },
+    "pr_face_l": {
+      "w": 16,
+      "h": 16,
+      "owner": "pred"
+    },
+    "he_bulb_l": {
+      "w": 16,
+      "h": 16,
+      "owner": "heart"
+    },
+    "he_root_l": {
+      "w": 16,
+      "h": 16,
+      "owner": "heart"
+    },
+    "st_bark_l": {
+      "w": 16,
+      "h": 16,
+      "owner": "stalk"
+    }
+  },
+  "functions": {
+    "face": "rlk:mboss/apep/om/face",
+    "tick": "rlk:mboss/apep/om/tick",
+    "objects_tick": "rlk:mboss/apep/om/objects_tick",
+    "kill": "rlk:mboss/apep/om/kill",
+    "kill_all": "rlk:mboss/apep/om/kill_all",
+    "init": "rlk:mboss/apep/om/init",
+    "files": 1676
+  }
+}

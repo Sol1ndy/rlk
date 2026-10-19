@@ -1,0 +1,3 @@
+execute on passengers if entity @s[tag=rlk_ap_om_shell] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,-1.47167f,-0.21389f],left_rotation:[-0.15931f,0f,0f,0.98723f],scale:[0.98472f,0.98472f,0.98472f],right_rotation:[0f,0f,0f,1f]}}
+execute on passengers if entity @s[tag=rlk_ap_om_shell] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/apep_om/destr_shell_husk"
+execute on passengers if entity @s[tag=rlk_ap_om_face] run data merge entity @s {start_interpolation:0,interpolation_duration:10,transformation:{translation:[0f,-1.38f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
