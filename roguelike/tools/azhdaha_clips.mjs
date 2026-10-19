@@ -35,8 +35,8 @@ export const CLIPS = [
   pose('rear_up', 2, {pos: [0, -.1, 0], pelvis: [45, 0, 0], spine: [6, 0, 0], chest: [4, 0, 0], neck1: [-10, 0, 0], neck2: [5, 0, 0], head: [22, 0, 0], jaw: 40,
     apron: [-18, 0, 0], beard1: [-15, 0, 0], beard2: [-10, 0, 0], flS: 10, flM: 8,
     ...fore([2.9, 6.6, -4.6], [-55, 0, 0]), ...tailUp([36, 6, 4, 0, 0, 6, 12, 18])}, 'rear-up roar peak (roar_rear t20, chin_slam t30): pelvis +45, fore paws at chest height'),
-  pose('stomp_lift', 2, {chest: [0, 0, 8], spine: [0, 0, 3], neck1: [0, -6, 0], head: [0, -10, 0],
-    ...fore([3.25, 3.0, -2.8], [-40, 0, 0], [-3.05, .5, -2.45], [0, 0, 0])}, 'stomp_fl hang (t15): left fore wrist at 3.0 b, claws curled, weight on the right'),
+  pose('stomp_lift', 2, {pelvis: [3, 0, 0], spine: [2, 0, 4], chest: [6, 0, 10], neck1: [0, -6, 0], head: [0, -10, 0],
+    ...fore([3.45, 2.4, -2.75], [-30, 0, 0], [-3.15, .5, -2.4], [0, 0, 0])}, 'stomp_fl hang (t15): the front rises (pelvis +3, chest +6) and rolls away, the left elbow high, the bracer a hanging column (18 deg from vertical), wrist 2.4 b, claws curled; weight on the right'),
   pose('whip_mid', 2, {pos: [0, -.2, 0], chest: [0, 12, 0], spine: [0, 6, 0], pelvis: [0, -6, 0], head: [0, 10, 0],
     ...tailUp([-12, -6, -3, 0, 0, 2, 4, 6]), tSweep: 150}, 'tail whip mid-sweep: the tail flat on the floor, swept 150 to the left'),
   pose('loop', 2, {...tailUp([12, 15, 25, 30, 32, 30, 30, 22])}, 'phase-3 tail loop over the back (v8 f2280 / v7 f0600 silhouette)'),
@@ -51,3 +51,13 @@ applyRetime(CLIPS, RETIME);
 export const accumulate = clip => acc(clip, DEFAULT_POSE);
 export const sampleClip = (clip, t, ks) => sampleShared(clip, t, ks, {defaults: DEFAULT_POSE});
 export const restPose = () => structuredClone(DEFAULT_POSE);
+
+// ---- legs (R2) -----------------------------------------------------------------------------------------------------------
+// The limb targets are root-frame, so the debug poses that dip the root (rear_up -0.1, whip_mid -0.2) lift their planted
+// targets by the dip to keep the paws and feet on the floor (r1_critique §1.2: they sank 0.15-0.25 b). Motion clips
+// that dip the root need the same compensation.
+const plantedAt = dy => ({...fore([J.wrist[0], J.wrist[1] + dy, J.wrist[2]]), ...hind([J.hock[0], J.hock[1] + dy, J.hock[2]])});
+for (const [name, dy, chans] of [['rear_up', .1, ['hkL', 'hkR']], ['whip_mid', .2, ['fwL', 'fwR', 'hkL', 'hkR']]]) {
+  const c = CLIPS.find(x => x.name === name), k = c && c.keys[0][1], P = plantedAt(dy);
+  if (k) for (const ch of chans) if (!(ch in k)) k[ch] = P[ch];
+}

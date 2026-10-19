@@ -17,7 +17,7 @@ tail in parallel (plan.md R9):
 | `azhdaha_paint.mjs` | thin aggregator: `azhdahaSprites()`, `paintAzhdahaTextures()`, `spriteId()`, the 1.2 M px atlas budget |
 | `azhdaha_head.mjs` | head (V-wedge mask plates, brow ledges and wings, keel blade, a two-rank crown of gold-rimmed blades and crest fins, cheek guards, the ear plates 回 on their mounts, rounded skull, palate, upper teeth), jaw (V chin shield over a V-wedge lower jaw: cheek plates, underside, mouth floor, teeth, fangs, tongue), eyes (slits), horns (broad gold sleeve band bent into a C, rim wrapped round its rounded lower end, meander face, dome stud knob, carded dark horn), beard bibs |
 | `azhdaha_body.mjs` | chest / belly / pelvis, neck, apron (+ glow overlay), the four dorsal plate groups, the three gold crystal groups |
-| `azhdaha_legs.mjs` | upper arms, engraved bracers (gold studs, amber elbow crystals), paws and talons, haunches, ribbed gaiters (heel spurs), feet, the four leg glow overlays |
+| `azhdaha_legs.mjs` | upper arms, engraved octagonal bracers (ragged crown, painted gold studs, amber elbow crystals), paws (knuckles, 4 talons, dew claw), haunches, shins (`gaiter_*`), the ribbed gaiter columns on `foot_*` (collar, heel spur, rings, plinth, 3 + 1 talons), the four leg glow overlays |
 | `azhdaha_tail.mjs` | t1..t8 (core, cream ventral fin with gold veins, top spikes), the leafy branch and the tip (leaves / blossoms) |
 | `azhdaha_shape.mjs` | shared shape helpers (loft, slab, crossCards, rockBox, retex, mirrorX, tile UV registry) |
 | `azhdaha_materials.mjs` | shared palette ramps (model.md §4) and the shared tile sprites (hide, cream, plate, gold, horn, talon, bark, mask/mouth) |
@@ -60,7 +60,7 @@ body, on the floor under the centre of the four feet). Call them `as` the anchor
 | `play/<clip>` | any time | Plays a clip from tick 0 at the next `tick`. |
 | `start/<clip>` | internal | Chains into a clip now. |
 | `face/player`, `face/track`, `face/set {yaw}` | AI | Anchor yaw (track: at most 2 degrees per call: a slow, heavy turn). |
-| `look/legs/<geo\|hydro\|pyro>` | phase 2 absorb | Legs channel: bracers, paws, gaiters, feet, apron, belly cracks, glow overlays. Stored in `azRigLegs`. |
+| `look/legs/<geo\|hydro\|pyro>` | phase 2 absorb | Legs channel: bracers, paws, the gaiter columns (`foot_*`), apron, belly cracks, glow overlays. Stored in `azRigLegs`. |
 | `look/tail/<geo\|cryo\|electro>` | phase 3 absorb | Tail channel: the four dorsal plate groups and the tail chain (leaves to blossoms). Stored in `azRigTail`. |
 | `look_apply` | after respawn | Re-applies both stored looks. |
 | `state/normal`, `state/burrowed`, `state/tail_only` | burrow, phase 3 | Records the body state (`azRigState`) and hides what must not show (§3). |
@@ -99,8 +99,8 @@ Two independent channels; all four combinations (불/번개, 물/얼음, 불/얼
 
 | channel | look | parts | how |
 |---|---|---|---|
-| legs (`azRigLegs`) | geo 0 / hydro 1 / pyro 2 | bracer_l/r, paw_l/r, gaiter_l/r, foot_l/r, apron, belly | palette-swapped models (navy-black or deep red stone, glowing carved lines; the belly cracks glow in Pyro) |
-| legs | hydro / pyro | glow_bracer_l/r, glow_gaiter_l/r, glow_apron | white line masks 0.025 b proud, `tintindex 0`, item definitions with constant tints (`#cde6ff` / `#ffb070`), brightness 15; the `empty` model in Geo |
+| legs (`azRigLegs`) | geo 0 / hydro 1 / pyro 2 | bracer_l/r, paw_l/r, foot_l/r, apron, belly | palette-swapped models (navy-black or deep red-brown stone, glowing carved lines; the belly cracks glow in Pyro). `gaiter_l/r` is the hide shin since R2 and keeps one model. |
+| legs | hydro / pyro | glow_bracer_l/r, glow_gaiter_l/r, glow_apron | white line masks 0.025 b proud, `tintindex 0`, item definitions with constant tints (`#cde6ff` / `#ffb070`), brightness 15; the `empty` model in Geo. `glow_gaiter_*` follows `foot_*` (the ring column). |
 | tail (`azRigTail`) | geo 0 / cryo 1 / electro 2 | plates_neck/sh/mid/hip, t1..t8, tip | palette-swapped models: slate / violet-dark plates with glowing edges, the tail skin cooled, leaves to crystal / violet blossoms; plates and the branch at brightness 15 |
 
 The eyes stay red and the gold (horns, crystals, studs) stays gold in every look. The model and item names per
@@ -110,8 +110,8 @@ part and look are in the manifest (`looks`).
 
 Rig frame: +X = the boss's left, +Y up, -Z forward, blocks; origin = the floor under the centre of the four feet.
 Joints (rest, `azhdaha_pose.mjs J`): pelvis (hip line) 0,3.0,2.4; spine1 0,3.35,0.3; chest 0,3.35,-1.7; neck1
-0,3.05,-2.55; neck2 0,2.6,-3.05; head (atlas) 0,2.05,-3.7; jaw hinge 0,1.3,-4.0; left shoulder 2.3,3.25,-2.15,
-elbow 2.95,2.3,-1.8, wrist 3.15,0.5,-2.45; left hip 2.0,3.0,2.45, knee 2.35,1.9,1.5, hock 2.5,0.72,3.05; tail root
+0,3.05,-2.55; neck2 0,2.6,-3.05; head (atlas) 0,2.05,-3.7; jaw hinge 0,1.3,-4.0; left shoulder 2.25,3.6,-2.05,
+elbow 2.95,2.35,-2.2, wrist 3.15,0.5,-2.4; left hip 2.0,3.0,2.45, knee 2.3,2.3,1.85, hock 2.5,1.5,2.9; tail root
 0,2.85,4.75; tail segments 2.3, 2.1, 1.9, 1.8, 1.7, 1.6, 1.6, 1.5 (14.5 b). Rest silhouette: H 7.0 b (tallest plate),
 nose to rump 10.2 b, wheelbase 5.0 b, claw span 8.1 b, horn span 4.4 b, snout 0.85 b, crest 2.65 b, eyes 1.5 b.
 Head (R2, measured on the real quads): eyes 1.5 b at z -4.74, chin 0.25 b above the floor, horn span 4.5 b, dark horn
@@ -129,7 +129,11 @@ stands the plates up), `flK` plate scale, `fwL fwR` wrist targets and `fpL fpR` 
 `hfL hfR` foot eulers (root frame: planted feet stay put while the body rears), `t1..t8` tail eulers (pitch - raises a
 segment) plus `tLift tCurl tSweep tTwist`, `vis visBody visTail`. Clips carry no horizontal root travel and no root
 yaw (the module moves and turns the anchor). The legs are solved by two-bone IK at bake time with the rest bend as
-the pole (`ik()` with `prevV` continuity across frames).
+the pole (`ik()` with `prevV` continuity across frames). Leg parts (R2): `uarm_*` / `thigh_*` turn with their bone
+relative to its rest direction (rest-aligned masses); `bracer_*` (elbow -> wrist) and `gaiter_*` (the shin, knee ->
+hock) are bone-aligned columns; `paw_*` / `foot_*` sit at the wrist / hock with their eulers. The hock is 1.5 b up:
+`foot_*` is the near-vertical ribbed gaiter column (the metatarsus) plus the toes, so a planted hind foot keeps
+`hfL/hfR` near [0,0,0] and a lifted one hangs the column from the hock. Soles: `SOLE` = paw -0.5, foot -1.5 (part frame).
 
 ## 6. Clips (R1: static debug poses)
 
@@ -139,7 +143,7 @@ the pole (`ik()` with `prevV` continuity across frames).
 | `head_up` | normal | the neck raised, the face forward (v1 f2130) |
 | `roar` | normal | jaw 45, head thrust up |
 | `rear_up` | normal | roar_rear peak: pelvis +45, fore paws at chest height, tail braced on the floor |
-| `stomp_lift` | normal | stomp_fl hang: left wrist at 3.0 b, weight to the right |
+| `stomp_lift` | normal | stomp_fl hang: the front rises and rolls away, the left elbow high, the bracer a hanging column, wrist 2.4 b |
 | `whip_mid` | normal | the tail flat on the floor, swept 150 to the left |
 | `loop` | normal | the phase-3 tail loop over the back (v8 f2280) |
 | `tail_low` | normal | the tail laid out behind (v3 f1680) |

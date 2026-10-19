@@ -31,7 +31,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {paintAzhdahaTextures, spriteId, azhdahaSpriteSizes, ATLAS_BUDGET} from './azhdaha_paint.mjs';
 import {partModels, checkBounds, PARTS, LOOKS, TINTED, LOOK_BRIGHT, EMPTY, REGION_OF} from './azhdaha_geometry.mjs';
-import {solve, toDisplay, PART_SCALE, TAIL_PARTS, proxyPoints, PROXIES, pointOf, J} from './azhdaha_pose.mjs';
+import {solve, toDisplay, PART_SCALE, TAIL_PARTS, proxyPoints, PROXIES, pointOf, J, SOLE} from './azhdaha_pose.mjs';
 import {CLIPS, accumulate, sampleClip as sample, restPose} from './azhdaha_clips.mjs';
 import {add, rot} from './mboss_rig_math.mjs';
 import {createRigCompiler, nbt} from './mboss_rig_compile.mjs';
@@ -137,7 +137,7 @@ function poseChecks(c, frames) {
       if (o > 0) over[n] = Math.max(over[n] || 0, +o.toFixed(2));
     }
     if (f.p.pos[1] >= -.01) for (const n of ['paw_l', 'paw_r', 'foot_l', 'foot_r']) {
-      const y = pointOf(f.o, n, [0, n.startsWith('paw') ? -.5 : -.72, 0])[1];
+      const y = pointOf(f.o, n, [0, n.startsWith('paw') ? SOLE.paw : SOLE.foot, 0])[1];
       if (y < -.08) out.push(`${c.name} t${t}: ${n} sole ${y.toFixed(2)} b below the floor`);
     }
     if (c.state === 'tail_only') for (const [n] of PARTS) if (!TAIL_PARTS.includes(n) && f.o[n].s[0] > 1e-4) out.push(`${c.name} t${t}: ${n} shown in the tail-only state`);
