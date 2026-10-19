@@ -95,7 +95,7 @@ function crysBackP1() {
 // ================================================= phase 3 (UPRIGHT, world axes about the joint) ===============================
 // abdomen (joint the waist (0, 3.11, 0.07)): the robe stem hanging to y 1.0 (loft 'y': e2 = the front)
 function abdomenP3() {
-  return loft('y', [{a: .4, r: [1.02, .88, 1.02, .9]}, {a: -.5, r: [1.06, .95, 1.06, .95]}, {a: -1.3, r: [1.12, 1.0, 1.12, 1.0]}, {a: -2.15, r: [1.18, 1.05, 1.18, 1.05]}],
+  return loft('y', [{a: .4, r: [.66, .6, .66, .62]}, {a: -.3, r: [.62, .58, .62, .6]}, {a: -1.3, r: [.74, .66, .74, .7]}, {a: -2.15, r: [.86, .76, .86, .8]}],
     {tex: (k, th) => (sinD(th) > .25 ? 'p3_robe' : 'g_plate'), caps: '+', seed: 561});
 }
 // hem_a (bone frame 'y' upright, the joint in front of the stem axis by ~0.55): the lower robe + the pointed front flaps
@@ -103,16 +103,16 @@ const FLAP_R = {u0: -.32, u1: .32, v0: -1.0, v1: 0};
 const flapSd = (u, v) => { const t = clamp(-v / 1.0); return Math.abs(u) - .3 * Math.pow(1 - t, .8) + (v > 0 ? v : 0); };
 const flapPaint = (u, v) => { const d = flapSd(u, v); if (d > 0) return null; let c = PAL.p3_robe(clamp(.3 + .2 * (N.a(u * 8, v * 8) - .5) - .1 * v)); if (d > -.04) c = mix(c, C('#C9C27A'), .7); if (Math.abs(u) < .02) c = mix(c, C('#7F8345'), .6); return c; };
 function hemAP3() {
-  const els = loft('y', [{a: .2, r: [1.15, 1.0, 1.15, 1.0], c: [0, -.55]}, {a: -.7, r: [1.2, 1.05, 1.2, 1.05], c: [0, -.55]}, {a: -1.35, r: [1.25, 1.08, 1.25, 1.08], c: [0, -.55]}],
+  const els = loft('y', [{a: .2, r: [.84, .74, .84, .78], c: [0, -.55]}, {a: -.7, r: [.95, .84, .95, .88], c: [0, -.55]}, {a: -1.35, r: [1.08, .95, 1.08, .98], c: [0, -.55]}],
     {tex: (k, th) => (sinD(th) > .25 ? 'p3_robe' : 'g_plate'), seed: 571});
   const fs = card('p3_hemflap', FLAP_R, flapPaint, 32, 'p3');
-  for (const [x, r] of [[-.62, 22.5], [0, 0], [.62, -22.5]]) els.push(...slab({plane: 'z', at: -.52, rect: {u0: x - .32, u1: x + .32, v0: -1.4, v1: -.4}, sd: (u, v) => flapSd(u - x, v + .4), half: .03, sprite: fs, edge: 'g_plate', cell: .08, core: false, rot: r ? ['z', r, [x, -.4, -.52]] : null}));
+  for (const [x, r] of [[-.5, 22.5], [0, 0], [.5, -22.5]]) els.push(...slab({plane: 'z', at: -.42, rect: {u0: x - .32, u1: x + .32, v0: -1.4, v1: -.4}, sd: (u, v) => flapSd(u - x, v + .4), half: .03, sprite: fs, edge: 'g_plate', cell: .08, core: false, rot: r ? ['z', r, [x, -.4, -.52]] : null}));
   return els;
 }
 // hem_b (bone frame 'y' upright, from 1.3 b down to the water): the hem flare, pointed dark flaps splayed onto the water
 function hemBP3() {
   const fs = card('p3_hemflap', FLAP_R, flapPaint, 32, 'p3'), els = [], cz = .85;
-  els.push(...loft('y', [{a: .1, r: 1.22, c: [0, -cz]}, {a: -.6, r: 1.32, c: [0, -cz]}, {a: -.95, r: 1.45, c: [0, -cz]}], {tex: (k, th) => (sinD(th) > .25 ? 'p3_robe' : 'g_plate'), seed: 581}));
+  els.push(...loft('y', [{a: .1, r: 1.06, c: [0, -cz]}, {a: -.6, r: 1.22, c: [0, -cz]}, {a: -.95, r: 1.42, c: [0, -cz]}], {tex: (k, th) => (sinD(th) > .25 ? 'p3_robe' : 'g_plate'), seed: 581}));
   // four flaps flaring outward 45 deg (front, back, sides) + four upright diagonal flaps
   const F = (plane, at, x, axis, deg, piv) => slab({plane, at, rect: {u0: x - .34, u1: x + .34, v0: -1.15, v1: -.15}, sd: (u, v) => flapSd(u - x, v + .15), half: .03, sprite: fs, edge: 'g_plate', cell: .08, core: false, rot: [axis, deg, piv]});
   els.push(...F('z', -1.35 + cz, 0, 'x', -45, [0, -.55, -1.35 + cz]), ...F('z', 1.35 + cz, 0, 'x', 45, [0, -.55, 1.35 + cz]));
@@ -125,11 +125,11 @@ const BLADE_R = {u0: -.55, u1: .55, v0: -.2, v1: .2};
 const BLADE = stroke([[-.5, -.08], [-.15, .06], [.2, .08], [.52, -.06]], t => .15 * Math.sin(Math.PI * t) + .02);
 const bladePaint = (u, v) => { const n = BLADE.near(u, v), hw = .15 * Math.sin(Math.PI * n.t) + .02; if (n.d > hw) return null; const s = Math.abs(Math.sin((n.t * 6 + n.d * 9) * Math.PI)); let g = .9 + .05 * (N.b(u * 7, v * 7) - .5); if (s < .1) g -= .16; if (n.d > hw - .03) g = .35; return grey(g); };
 function chestP3() {
-  const els = loft('y', [{a: -.85, r: [1.02, .72, 1.02, .8]}, {a: 0, r: [1.18, .8, 1.18, .86]}, {a: .8, r: [1.32, .8, 1.32, .9]}, {a: 1.3, r: [1.28, .72, 1.28, .86]}],
+  const els = loft('y', [{a: -.85, r: [.7, .6, .7, .64]}, {a: 0, r: [.98, .72, .98, .8]}, {a: .8, r: [1.18, .78, 1.18, .86]}, {a: 1.3, r: [1.18, .72, 1.18, .84]}],
     {tex: (k, th) => (sinD(th) > .3 ? 'p3_lime' : 'g_plate'), caps: '-', seed: 591});
   const bs = card('g_bladecard', BLADE_R, bladePaint, 32, 'both', 'tinted');
   const half = [];
-  for (const [y, x] of [[.8, 1.05], [.3, 1.0], [-.2, .92]]) half.push(...slab({plane: 'z', at: -.62, rect: {u0: x - .55, u1: x + .55, v0: y - .2, v1: y + .2}, sd: (u, v) => BLADE.sd(u - x, v - y), half: .03, sprite: bs, edge: 'g_shell', cell: .08, core: false, rot: ['y', 45, [x - .45, y, -.62]]}));
+  for (const [y, x] of [[.8, .95], [.3, .82], [-.2, .62]]) half.push(...slab({plane: 'z', at: -.62, rect: {u0: x - .55, u1: x + .55, v0: y - .2, v1: y + .2}, sd: (u, v) => BLADE.sd(u - x, v - y), half: .03, sprite: bs, edge: 'g_shell', cell: .08, core: false, rot: ['y', 45, [x - .45, y, -.62]]}));
   els.push(...half, ...mirrorEls(half));
   return els;
 }

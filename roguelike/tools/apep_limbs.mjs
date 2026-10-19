@@ -34,7 +34,7 @@ function p1(seg) {
   return segLoft(len, ...R[x], x === 'up' ? 'g_plate' : 'p1_leg', {seed: 310 + len * 10, bulge: 1.1});
 }
 // ---- phase 3 ---------------------------------------------------------------------------------------------------------------
-const A3 = {up: [.25, .21], lo: [.22, .17]}, B3 = {up: [.36, .31], lo: [.32, .26]}, C3 = {up: [.33, .28], lo: [.3, .24]};
+const A3 = {up: [.2, .17], lo: [.17, .13]}, B3 = {up: [.3, .25], lo: [.26, .21]}, C3 = {up: [.28, .23], lo: [.24, .19]};
 // lime leaf blade card in the plane x = at (u = Z, v = Y), along the segment
 const BLADE_R = {u0: -.2, u1: .2, v0: -1.0, v1: 0};
 const bladeSd = sdLeaf(0, -1.0, 0, .17, {p: .9});

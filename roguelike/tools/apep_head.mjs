@@ -107,6 +107,12 @@ const faceplateP1 = (u, v) => { const d = faceplateSd(u, v); if (d > 0) return n
 const faceplateP3 = (u, v) => { const d = faceplateSd(u, v); if (d > 0) return null; let c = PAL.p3_bottle(clamp(.4 + .2 * (N.a(u * 6, v * 6) - .5))); if (Math.abs(((u * 2.5 + v * 1.5) % 1 + 1) % 1 - .5) < .04) c = PAL.p3_rim(.4); return lineOut(c, d, .045, PAL.p3_rim(.3)); };
 function hood(form) {
   const els = loft('z', COWL, {tex: (k, th) => (sinD(th) < -.35 ? (form === 'p1' ? 'p1_inner' : 'p3_inner') : 'g_plate'), caps: '+', seed: 841});
+  // the cowl sides: plates hanging below the dome beside the face (P1: the cheek guards round the bud-skull; UPRIGHT: the
+  // swing turns them into the hood rims reaching forward past the mask on both sides, so the face sits inside the cowl)
+  const inner = form === 'p1' ? 'p1_inner' : 'p3_inner';
+  const side = loft('z', [{a: .38, r: [.09, .22, .09, .3], c: [.98, -.3]}, {a: -.35, r: [.13, .4, .13, .62], c: [1.22, -.55]}, {a: -1.2, r: [.13, .42, .13, .66], c: [1.26, -.6]},
+    {a: -1.9, r: [.1, .3, .1, .42], c: [1.0, -.52]}], {tex: (k, th) => (Math.cos(th * Math.PI / 180) < -.3 ? inner : 'g_plate'), caps: '-+', seed: 848});
+  els.push(...side, ...mirrorX(side));
   const es = card('g_earcard', EAR_R, earPaint, 32, 'both', 'tinted');
   const ear = slab({plane: 'x', at: 1.42, rect: EAR_R, sd: EAR.sd, half: .05, sprite: es, edge: 'g_plate', cell: .09, rot: ['y', -22.5, [1.42, 0, -.3]]});
   els.push(...ear, ...mirrorX(ear));

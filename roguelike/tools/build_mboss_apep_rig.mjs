@@ -635,6 +635,7 @@ if (debugDp) {
   const ref = (x, z) => `summon minecraft:item_display ^${x} ^ ^${z} {Tags:["rlk_ap_ref"],item_display:"none",transformation:{translation:[0f,0.9f,0f],left_rotation:[0f,0f,0f,1f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:ap_ref/player"}}}`;
   putDebug('ap_dbg/player_ref', ['# renders: a 1.8 b player 1.5 b in front of the hood and one beside the left B hand', ref(0, 5.8), ref(4.4, 3.6)]);
   putDebug('ap_dbg/player_front', ['# renders: a 1.8 b player 4 b in front of the anchor (the P3 fighting distance)', ref(0, 4.0)]);
+  putDebug('ap_dbg/player_far', ['# renders: a 1.8 b player 6.5 b in front of the anchor (the reference camera frames)', ref(0, 6.5)]);
   // proxy columns and capsules overlay (thin translucent columns): ap_dbg/px/<pose>
   const col = (x, z, w, top, tag, item) => `summon minecraft:item_display ^${-x} ^ ^${-z} {Tags:["rlk_ap_ref","${tag}"],item_display:"none",transformation:{translation:[0f,${(top / 2).toFixed(3)}f,0f],left_rotation:[0f,0f,0f,1f],scale:[${(w / 1).toFixed(3)}f,${top.toFixed(3)}f,${(w / 1).toFixed(3)}f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:ap_ref/${item}"}}}`;
   for (const [nm, clip] of [['CROUCH', 'dbg_crouch'], ['UPRIGHT', 'dbg_upright'], ['HOOP', 'dbg_hoop'], ['CROUCH_OVER', 'dbg_crouch_over']]) {
