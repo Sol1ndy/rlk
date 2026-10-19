@@ -887,10 +887,11 @@
   `build_mboss_azhdaha.py` → `check_mboss_pack.py`. 코어가 `tools/mboss_azhdaha/stub_rig_manifest.json` 을 읽으므로 그 파일은
   커밋한다. 두 번 돌려도, 모듈을 먼저 돌려도 결과가 같다.
 - **지금 임시로 대신하는 것**(빌드가 메모를 찍음): 리그 = 대역 `rig_stub/`(41개 클립의 시간만 같은 상자 4개), 효과 도구 =
-  `kstub/`(빈 함수), 테마 = `api._THEME_FALLBACK`(물판 16장 · 비석 · 프리즘, 수정 · 입구 문양 없음), 프레임워크 판정 기둥 =
-  `px/state` 의 로컬 대역(`cmstub/px_state`)과 `mboss/px/azhdaha/*` 의 표시된 빈 함수(AZ-CM 이 판정 기둥 런타임을 만들 때까지;
-  기둥이 없어서 게임에서는 아직 칠 수 없다). 진짜가 들어오면 생성기가 알아서 그쪽을 부른다(대역 물판은 세워진 유리판이라
-  눕혀 놓고, 키트의 물판은 처음부터 수평이라 그대로 둔다). 효과 도구(wip/az-fx)와 테마(wip/az-arena)를 얹은 시험 빌드도 통과.
+  `kstub/`(빈 함수), 테마 = `api._THEME_FALLBACK`(물판 16장 · 비석 · 프리즘, 수정 · 입구 문양 없음). 진짜가 들어오면 생성기가
+  알아서 그쪽을 부른다(대역 물판은 세워진 유리판이라 눕혀 놓고, 키트의 물판은 처음부터 수평이라 그대로 둔다). 효과
+  도구(wip/az-fx)와 테마(wip/az-arena)를 얹은 시험 빌드도 통과. 판정 기둥 12개는 챕터 보스 틀(AZ-CM)이 커밋된 대역
+  매니페스트(`tools/mboss_azhdaha/stub_rig_manifest.json`)로 만들어 준다(`mboss/px/azhdaha/**`; 예전의 로컬 대역
+  `cmstub/px_state` · 빈 `px/azhdaha/*` 는 그때부터 저절로 쓰이지 않음).
 - 게임에서 한 번 확인할 것: 문 → 경기장 → 등장 → 전환 두 번 → B3 → 처치 → 다음 챕터, 음악이 겹치지 않음, `/reload` 뒤 이어짐.
 
 ## 13. 시점 (`view/`) — 1인칭 / 숄더뷰 / F5 위쪽 시점
