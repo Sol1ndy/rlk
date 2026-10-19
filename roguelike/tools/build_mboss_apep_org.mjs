@@ -110,9 +110,12 @@ function displaySegments(compiler, name, frames, c, from = 0) {
   const out = [];
   for (let i = 0; i < stops.length - 1; i++) {
     let a = stops[i]; const b = stops[i + 1];
-    if (cuts.has(a)) { out.push([a, a]); a += 1; if (a > b) continue; if (a === b && i < stops.length - 2) continue; }
+    let held = null;
+    if (cuts.has(a)) { out.push([a, a]); held = seq[a]; a += 1; if (a > b) continue; if (a === b && i < stops.length - 2) continue; }
     if (a >= b) continue;
-    for (const [x, y] of compiler.segments(seq.slice(a, b + 1), name, 1)) out.push([a + x, a + y]);
+    // after a cut the client still shows the cut tick's pose at a: fit the run from that pose
+    const run = seq.slice(a, b + 1); if (held) run[0] = held;
+    for (const [x, y] of compiler.segments(run, name, 1)) out.push([a + x, a + y]);
   }
   // the last tick of a hold clip is reached by the last segment; a cut there needs its own instant key
   if (cuts.has(c.len) && !out.some(([x, y]) => x === c.len)) out.push([c.len, c.len]);
@@ -125,7 +128,7 @@ function lookLines(owner, d, look, sel) {
   const has = it => `if data entity @s {item:{components:{"minecraft:item_model":"${itemId(it)}"}}}`;
   const set = it => `data modify entity @s item.components."minecraft:item_model" set value "${itemId(it)}"`;
   for (const [fromLook, toLook] of Object.entries(alt)) lines.push(`${sel}${has(items0[fromLook])} run ${set(items0[toLook])}`);
-  const guard = [...new Set(Object.values(alt))].map(l => `un${has(items0[l]).slice(2)}`).join(' ');
+  const guard = [...new Set(Object.values(alt))].map(l => `unless${has(items0[l]).slice(2)}`).join(' ');
   lines.push(`${sel}${guard ? guard + ' ' : ''}run ${set(items0[look])}`.replace(/run run/, 'run'));
   return lines;
 }
@@ -411,6 +414,18 @@ const manifest = {
   functions: {face: `${NS}/face`, tick: `${NS}/tick`, objects_tick: `${NS}/objects_tick`, kill: `${NS}/kill`, kill_all: `${NS}/kill_all`, init: `${NS}/init`, files: FILES.size},
 };
 json(path.join(here, 'mboss_apep_org_manifest.json'), manifest);
+
+// ---- test fixture: the exact per-tick display transforms (as written) of every clip --------------------------------------
+if (arg('--dump')) {
+  const out = {};
+  for (const [owner, cs] of Object.entries(allFrames)) {
+    out[owner] = {};
+    for (const [cn, frames] of Object.entries(cs)) out[owner][cn] = frames.map(f => Object.fromEntries(Object.entries(f).map(([n, v]) => [n, {...written(v), look: v.look}])));
+  }
+  out._spawn = {scale_in: SCALE_IN, clips: SPAWN_CLIP};
+  out._items = Object.fromEntries(Object.entries(ORG).map(([o, v]) => [o, Object.fromEntries(v.displays.map(d => [d.name, d.looks]))]));
+  json(path.resolve(arg('--dump')), out);
+}
 
 // ---- report -----------------------------------------------------------------------------------------------------------
 const rows = Object.keys(ORG).map(o => `${o.padEnd(6)} ${String(elementsOf(o)).padStart(4)} el / ${String(BUDGET[o][0]).padStart(3)}   ${String(pxOf(o)).padStart(6)} px / ${BUDGET[o][1]}`);

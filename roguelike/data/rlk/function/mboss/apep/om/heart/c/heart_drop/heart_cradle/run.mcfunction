@@ -4,4 +4,4 @@ execute if score @s apOC matches 0 run return run function rlk:mboss/apep/om/hea
 execute if score @s apOC matches 5 run return run function rlk:mboss/apep/om/heart/c/heart_drop/heart_cradle/k/5
 execute if score @s apOC matches 6 run return run function rlk:mboss/apep/om/heart/c/heart_drop/heart_cradle/k/6
 execute if score @s apOC matches 7 run return run function rlk:mboss/apep/om/heart/c/heart_drop/heart_cradle/k/7
-execute if score @s apOC matches 13 run return run function rlk:mboss/apep/om/heart/c/heart_drop/heart_cradle/k/13
+execute if score @s apOC matches 8 run return run function rlk:mboss/apep/om/heart/c/heart_drop/heart_cradle/k/8

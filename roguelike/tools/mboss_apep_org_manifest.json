@@ -391,8 +391,8 @@
             "tilt": 0,
             "tethers": 8
           },
-          "keys": 24,
-          "key_files": 15,
+          "keys": 25,
+          "key_files": 13,
           "note": "the hood tilts toward the targets 0-8 and opens (tilt), the orb flares at 8"
         },
         {
@@ -788,8 +788,8 @@
           "loop": true,
           "next": null,
           "events": {},
-          "keys": 10,
-          "key_files": 5,
+          "keys": 12,
+          "key_files": 6,
           "note": "rolls on its side (face to the left), one turn per 32 t"
         },
         {
@@ -1018,8 +1018,8 @@
             "eat": 12,
             "bud": 14
           },
-          "keys": 64,
-          "key_files": 22,
+          "keys": 65,
+          "key_files": 21,
           "note": "rears 0-6, scoops 6-12 (eat), closes into the bud at 14"
         },
         {
@@ -1029,8 +1029,8 @@
           "loop": true,
           "next": null,
           "events": {},
-          "keys": 13,
-          "key_files": 5,
+          "keys": 15,
+          "key_files": 6,
           "note": "spins 45 degrees per loop (8-fold), bobs over the gold swirl; the core pulses"
         },
         {
@@ -1084,7 +1084,7 @@
             "hit_3": 16,
             "hit_4": 22
           },
-          "keys": 102,
+          "keys": 103,
           "key_files": 30,
           "note": "4 snaps 6 t apart (the module starts it 8 t before the first sector strike)"
         },
@@ -2439,6 +2439,6 @@
     "kill": "rlk:mboss/apep/om/kill",
     "kill_all": "rlk:mboss/apep/om/kill_all",
     "init": "rlk:mboss/apep/om/init",
-    "files": 1676
+    "files": 1673
   }
 }
