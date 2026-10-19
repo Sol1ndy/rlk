@@ -281,10 +281,11 @@ function guardSpire() {
   return els;
 }
 function guardBud() {
-  const els = [...loft('y', stops([.95, 1.2, 1.45, 1.65, 1.82, 1.95, 2.04], [.4, .38, .33, .26, .17, .09, .03]), {n: 16, tex: 'gu_bud', ledgeTex: 'gu_bud_l', caps: '-+', seed: 9})];
-  for (let k = 0; k < 8; k++) els.push(tangentCard('gu_drape', k * 45, .34, 1.3, .58, 1.3));
-  for (let k = 0; k < 8; k++) els.push(radialCard('gu_lobe', k * 45 + 22.5, .14, .62, 0, .34));
-  els.push(abox([-.12, .22, -.44], [.12, .5, -.34], 'gu_gem'));
+  // the teal pointed hood over a pale drape flaring to a wavy hem (a wrap loft), the hem lobes and the gold gem in front
+  const els = [...loft('y', stops([.95, 1.2, 1.45, 1.65, 1.82, 1.95, 2.04], [.44, .41, .35, .27, .18, .1, .03]), {n: 16, tex: 'gu_bud', ledgeTex: 'gu_bud_l', caps: '-+', seed: 9}),
+    ...loft('y', stops([0, .14, .32, .55, .8, 1.05], [.7, .6, .51, .45, .42, .4]), {n: 8, tex: 'gu_drapeW', ledgeTex: 'gu_drape_l', caps: '', seed: 10})];
+  for (let k = 0; k < 8; k++) els.push(radialCard('gu_lobe', k * 45 + 22.5, .3, .78, 0, .3));
+  els.push(abox([-.13, .24, -.62], [.13, .5, -.5], 'gu_gem', {rot: ['x', -22.5, [0, .37, -.56]]}));
   return els;
 }
 const guardWisp = () => [...shapeSlab('g_wisp', 'gu_wisp', 'z', 0, {half: .05, cell: .08, inset: .5, edge: 'gu_wisp'}), ...shapeSlab('g_wisp', 'gu_wisp', 'x', 0, {half: .04, core: false})];
@@ -324,8 +325,8 @@ function destrShell(husk) {
   return els;
 }
 function destrFace() {
-  return [cardZ('de_face', -.33, {X0: -.33, X1: .33, Y0: -.33, Y1: .33}),
-    ...loft('z', stops([-.33, -.45, -.58, -.72], [.12, .1, .06, .015]), {n: 8, tex: 'de_beak', caps: '+', seed: 19})];
+  return [cardZ('de_face', -.38, {X0: -.4, X1: .4, Y0: -.4, Y1: .4}),
+    ...loft('z', stops([-.38, -.46, -.53], [.09, .07, .02]), {n: 8, tex: 'de_beak', caps: '+', seed: 19})];
 }
 
 // ================================================================================================================
@@ -365,21 +366,24 @@ function predJaw() {
 }
 const predTail = () => [quad('pr_tail', [0, .5, -.04], [0, 0, .94], [0, -1.0, 0])];
 const predCore = () => [...orb([0, 0, 0], .22, 'pr_core'), ...crossCards('pr_core', [0, 0, 0], .6, .6, {y0: -.3})];
+// the bud (empowered): a diamond 2.1 x 1.6 - a cream ogive of eight petal facets closing to a point (a short horn on
+// top, four petals leaning in), over a translucent green star bowl tapering to the lower point, eight sepals at the rim
 function predBud() {
-  const els = [];
-  for (let k = 0; k < 8; k++) els.push(tangentCard('pr_petal', k * 45, .5, .78, .84, .78, {tilt: k % 2 ? 0 : 22.5, pivot: 'bottom'}));
-  els.push(...shift(crossCards('pr_horn', [0, 0, 0], .4, .66, {y0: 0}), [0, .74, 0]));
-  for (let k = 0; k < 8; k++) els.push(tangentCard('pr_sepal', k * 45 + 22.5, .42, .02, .5, .7));
-  els.push(...crossCards('pr_hornS', [0, -.62, 0], .24, .36, {y0: -.36}));
+  const els = [...loft('y', stops([0, .2, .4, .58, .74, .87, .97, 1.02], [0, .2, .4, .58, .74, .87, .97, 1.02].map(y => .76 * Math.cos(Math.PI / 2 * Math.min(1, y / 1.02)) ** .85 + .02)), {n: 16, tex: 'pr_hood', ledgeTex: 'pr_hood_l', caps: '-', seed: 61}),
+    ...loft('y', prof(-.95, 0, 5, y => .7 * (1 - Math.pow(-y / .95, 1.15)) + .02), {n: 8, tex: 'pr_bowl', ledgeTex: 'pr_bowl_l', caps: '', seed: 62})];
+  for (let k = 0; k < 4; k++) els.push(tangentCard('pr_petal', k * 90, .7, .82, .82, .84, {tilt: -22.5, pivot: 'bottom'}));
+  els.push(...shift(crossCards('pr_horn', [0, 0, 0], .26, .44, {y0: 0}), [0, .9, 0]));
+  for (let k = 0; k < 8; k++) els.push(radialCard('pr_sepal', k * 45 + 22.5, .45, 1.02, -.42, .06));
   return els;
 }
+// the pod (inflated, 3.5 b): a tall double-lobed clam - the round translucent lower lobe holding the core, the cream lid
+// lobe closed on top of it at a waist (centre frame: the floor at y -1.3)
 function predPod() {
-  // a tall double-lobed clam (centre frame: the floor at y -1.3): the round lower lobe with the core opening at the
-  // front, the scalloped translucent lid standing open behind
-  const low = prof(-1.3, .3, 6, y => { const t = (y + 1.3) / 1.6; return .1 + .78 * Math.sin(Math.PI * Math.min(1, t * .95 + .03)) ** .7; });
-  const els = [...loft('y', low, {n: 16, tex: 'pr_bowl', ledgeTex: 'pr_bowl_l', caps: '-', seed: 31, skip: (k, th, i) => i >= 2 && i <= 4 && k >= 3 && k <= 5})];
-  els.push(quad('pr_podlid', [-.95, 2.1, .3], [1.9, 0, 0], [0, -1.8, 0], {rot: ['x', -22.5, [0, .3, .3]]}));
-  els.push(quad('pr_podlid', [-.8, 1.9, .12], [1.6, 0, 0], [0, -1.6, 0], {rot: ['x', 22.5, [0, .3, .12]]}));
+  // sphere-like lobes in equal latitude steps (smooth outlines): the lower lobe 16-sided, the lid 8-sided
+  const lat = (c, R, n, k = 1) => Array.from({length: n + 1}, (_, i) => { const th = -Math.PI / 2 + Math.PI * i / n; return {a: c + R * k * Math.sin(th), r: R * Math.cos(th) + .04}; });
+  const els = [...loft('y', lat(-.43, .87, 8), {n: 16, tex: 'pr_bowl', ledgeTex: 'pr_bowl_l', caps: '-+', seed: 63}),
+    ...loft('y', lat(1.02, .72, 7, 1.12), {n: 8, tex: 'pr_hood', ledgeTex: 'pr_hood_l', caps: '-+', seed: 64})];
+  els.push(...shift(crossCards('pr_horn', [0, 0, 0], .3, .5, {y0: 0}), [0, 1.8, 0]));
   return els;
 }
 function predFace() {

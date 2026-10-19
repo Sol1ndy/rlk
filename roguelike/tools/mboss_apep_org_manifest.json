@@ -466,7 +466,7 @@
             2.2,
             0
           ],
-          "elements": 263
+          "elements": 291
         },
         {
           "name": "orb",
@@ -541,8 +541,8 @@
         "elements": 500,
         "px": 16000
       },
-      "elements": 268,
-      "px": 10752,
+      "elements": 296,
+      "px": 15104,
       "functions": {
         "spawn": "rlk:mboss/apep/om/guard/spawn",
         "tick": "rlk:mboss/apep/om/guard/tick",
@@ -776,7 +776,7 @@
             0.62,
             0
           ],
-          "elements": 50,
+          "elements": 34,
           "note": "pulse scale"
         }
       ],
@@ -852,7 +852,7 @@
         "elements": 500,
         "px": 8000
       },
-      "elements": 426,
+      "elements": 410,
       "px": 4608,
       "functions": {
         "spawn": "rlk:mboss/apep/om/destr/spawn",
@@ -915,7 +915,7 @@
             1.3,
             0
           ],
-          "elements": 374,
+          "elements": 382,
           "note": "fish = the leaf-shark hood; bud / pod / face are their own models (jaw and fin hidden)"
         },
         {
@@ -1106,8 +1106,8 @@
         "elements": 500,
         "px": 20000
       },
-      "elements": 470,
-      "px": 18944,
+      "elements": 478,
+      "px": 16640,
       "functions": {
         "spawn": "rlk:mboss/apep/om/pred/spawn",
         "tick": "rlk:mboss/apep/om/pred/tick",
@@ -2013,7 +2013,7 @@
     "px_total": 200000,
     "organism_elements": 500,
     "heart_elements": 800,
-    "px": 114944
+    "px": 116992
   },
   "sprites": {
     "bo_bell": {
@@ -2129,6 +2129,11 @@
     "gu_lobe": {
       "w": 32,
       "h": 32,
+      "owner": "guard"
+    },
+    "gu_drapeW": {
+      "w": 64,
+      "h": 64,
       "owner": "guard"
     },
     "gu_drape": {
@@ -2271,11 +2276,6 @@
       "h": 32,
       "owner": "pred"
     },
-    "pr_podlid": {
-      "w": 48,
-      "h": 48,
-      "owner": "pred"
-    },
     "pr_face": {
       "w": 32,
       "h": 32,
@@ -2377,6 +2377,11 @@
       "owner": "guard"
     },
     "gu_bud_l": {
+      "w": 16,
+      "h": 16,
+      "owner": "guard"
+    },
+    "gu_drape_l": {
       "w": 16,
       "h": 16,
       "owner": "guard"

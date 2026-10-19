@@ -117,7 +117,6 @@ export const SH = {
     stroke([[0, 0], [.42, -.18], [.86, -.42]], t => .13 * Math.sin(Math.PI * Math.min(1, t * 1.15)) + .015).sd)),
   p_flare: SHP({u0: -.07, u1: .07, v0: -.02, v1: .55}, sdPoly(pts([-.06, -.02], [.06, -.02], [.004, .55]))),
   p_petal: SHP({u0: -.42, u1: .42, v0: 0, v1: .78}, (u, v) => { const w = .4 * Math.sin(Math.PI * clamp(v / .78)) ** .7 + .02, notch = .06 * Math.max(0, Math.cos(u * 22)) * smooth(.1, 0, v); return Math.max(Math.abs(u) - w, -v + notch, v - .78); }),
-  p_podlid: SHP({u0: -.95, u1: .95, v0: 0, v1: 1.8}, (u, v) => { const r = .9 * Math.sin(Math.PI * clamp(v / 1.8)) ** .55 + .01, sc = .05 * Math.abs(Math.sin(v * 14)); return Math.abs(u) - r + sc; }),
   // the Heart: a leaf-flame sprout, a petal clump, a vine tendril, a vine stem strip
   h_tip: SHP({u0: -.16, u1: .16, v0: 0, v1: .62}, (u, v) => { const t = clamp(v / .62), w = .13 * Math.sin(Math.PI * Math.pow(t, .7)) + .008; return Math.abs(u - .05 * Math.sin(t * 4)) - w; }),
   h_petal: SHP({u0: -.3, u1: .3, v0: 0, v1: .36}, (u, v) => { const r = Math.hypot(u / .28, v / .34), lob = .12 * Math.cos(Math.atan2(v, u) * 7); return (r - 1 + lob) * .25; }),
@@ -166,7 +165,7 @@ const ribbonPx = (u, v, R = PAL.teal, rim = PAL.pale, rw = .14, ra = .9) => {
 };
 function shellPx(u, v) {     // 파괴: dark armour plates with pale grey bands at the seams
   const x = u * 8, y = v * 4, fx = x - Math.floor(x), fy = y - Math.floor(y);
-  let c = PAL.destr(.62 + .14 * (N.d(u * 12, v * 12) - .5) + .08 * h1(Math.floor(x) * 3 + Math.floor(y) * 11));
+  let c = PAL.destr(.3 + .14 * (N.d(u * 12, v * 12) - .5) + .08 * h1(Math.floor(x) * 3 + Math.floor(y) * 11));
   const band = Math.min(fx, 1 - fx);
   if (band < .09) c = mix(c, PAL.destr(.12), .75 * (1 - band / .09));
   if (Math.min(fy, 1 - fy) < .06) c = sink(c, .3);
@@ -262,6 +261,14 @@ add('gu_rib', 16, 128, (s, t) => {
 }, 'guard');
 add('gu_sheath', 64, 32, (s, t) => { let c = tealPx(s, t, .12 * t); const sc = Math.abs(Math.sin(s * Math.PI * 6)); if (t > .82) c = mix(c, PAL.pale(.45), smooth(.82, .95, t) * (1 - sc * .5)); return c; }, 'guard');
 shapeSprite('gu_lobe', SH.g_lobe, 56, 'guard', (u, v) => shadeShape(SH.g_lobe.sd, u, v, ramp(['#C8D2D6', '#A4B2BA', '#84949E', '#66767E', '#4A585E']), {t0: .25, edge: .01, w: .04}));
+// the bud's drape wrap (u round 8 facets, v top 0 .. hem 1): pale folds, a wavy hem cut into soft lobes at the bottom
+add('gu_drapeW', 64, 64, (s, t) => {
+  const f = (s * 8) % 1, x = Math.abs(f - .5) * 2, hem = .9 + .07 * Math.cos(f * Math.PI * 2) - .03 * Math.cos(f * Math.PI * 6);
+  if (t > hem) return TRANSPARENT;
+  let c = PAL.pale(.1 + .16 * Math.abs(Math.sin(s * Math.PI * 24 + t * 2)) ** 2 + .12 * smooth(.3, 1, t) + .06 * x);
+  if (hem - t < .03) c = mix(c, PAL.pale(.55), .6);
+  return c;
+}, 'guard');
 shapeSprite('gu_drape', SH.g_drape, 32, 'guard', (u, v) => { let c = PAL.pale(.12 + .1 * Math.abs(Math.sin(u * 18)) + .2 * smooth(.4, 0, v)); if (-SH.g_drape.sd(u, v) < .02) c = mix(c, PAL.pale(.6), .5); return c; });
 add('gu_bud', 48, 32, (s, t) => { let c = tealPx(s, t, -.04); const slit = Math.abs(s - .25) < .02 && t > .25 && t < .85; if (slit) c = PAL.core(.1); else if (Math.abs(s - .25) < .045 && t > .2 && t < .9) c = mix(c, PAL.core(.3), .5); return c; }, 'guard');
 shapeSprite('gu_wisp', SH.g_wisp, 28, 'guard', (u, v) => { let c = PAL.black(.4 + .3 * (N.a(u * 6, v * 6) - .5)); if (-SH.g_wisp.sd(u, v) < .012) c = mix(c, C('#8E2A1E'), .5); return c; });
@@ -299,8 +306,7 @@ add('pr_gem', 16, 16, (s, t) => { const d = Math.abs(s - .5) + Math.abs(t - .5) 
 shapeSprite('pr_flare', SH.p_flare, 48, 'pred', (u, v) => A(mix(C('#FFFFF2'), PAL.lime(0), clamp(v / .55) * .6), 1));
 shapeSprite('pr_petal', SH.p_petal, 40, 'pred', (u, v) => { let c = shadeShape(SH.p_petal.sd, u, v, PAL.hood, {t0: .14, edge: .012, w: .06});
   const st = Math.abs(Math.sin(u * 14 + v * 3)); if (st < .1) c = mix(c, PAL.hood(.55), .45); return c; });
-shapeSprite('pr_podlid', SH.p_podlid, 22, 'pred', (u, v) => { const d = -SH.p_podlid.sd(u, v); return A(mix(PAL.fin(.2 + .2 * clamp(v / 1.8)), PAL.fin(0), smooth(.06, 0, d)), clamp(.82 + .15 * smooth(.06, 0, d))); }, {translucent: true});
-add('pr_face', 32, 32, (s, t) => PAL.teal(.38 + .2 * t + .08 * (N.a(s * 5, t * 5) - .5)), 'pred');
+add('pr_face', 32, 32, (s, t) => { let c = PAL.fin(.22 + .28 * t + .06 * (N.a(s * 5, t * 5) - .5)); const w = Math.abs(Math.sin(s * Math.PI * 8 + Math.sin(t * 6))); if (w < .1) c = mix(c, PAL.fin(.6), .35); return c; }, 'pred');
 
 // the Heart of the Oasis (40 k): the bulb is painted as grey values and tinted per look (idle / egg / withered / blaze)
 add('he_bulb', 128, 64, (s, t) => {
@@ -348,15 +354,16 @@ shapeSprite('se_seed', SH.se_seed, 64, 'seed', (u, v) => { const d = -SH.se_seed
 add('ne_cap_l', 16, 16, (s, t) => ledgeOf(PAL.teal(.42)), 'nest');
 add('gu_sheath_l', 16, 16, (s, t) => ledgeOf(PAL.teal(.42)), 'guard');
 add('gu_bud_l', 16, 16, (s, t) => ledgeOf(PAL.teal(.36)), 'guard');
-add('de_shell_l', 16, 16, (s, t) => ledgeOf(PAL.destr(.6)), 'destr');
+add('gu_drape_l', 16, 16, (s, t) => ledgeOf(PAL.pale(.2)), 'guard');
+add('de_shell_l', 16, 16, (s, t) => ledgeOf(PAL.destr(.32)), 'destr');
 add('pr_hood_l', 16, 16, (s, t) => ledgeOf(PAL.hood(.2)), 'pred');
 add('pr_bowl_l', 16, 16, (s, t) => A(ledgeOf(PAL.fin(.3)), .75), 'pred', true);
-add('pr_face_l', 16, 16, (s, t) => ledgeOf(PAL.teal(.42)), 'pred');
+add('pr_face_l', 16, 16, (s, t) => ledgeOf(PAL.fin(.3)), 'pred');
 add('he_bulb_l', 16, 16, (s, t) => A([190, 190, 186, 255], .86), 'heart', true);
 add('he_root_l', 16, 16, (s, t) => ledgeOf(PAL.root(.4 + .2 * N.c(s * 3, t * 3))), 'heart');
 add('st_bark_l', 16, 16, (s, t) => ledgeOf(PAL.stalk(.3 + .1 * N.b(s * 3, t * 3))), 'stalk');
 // loft tiles / wraps: texel density per block for the tileUV windows; wraps map u = facet k / n, v along the loft
-for (const n of ['bo_bell', 'bo_skirt', 'nu_rib', 'gu_sheath', 'gu_bud', 'ne_cap', 'de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'he_bulb', 'do_shell', 'do_vine', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
+for (const n of ['bo_bell', 'bo_skirt', 'gu_drapeW', 'nu_rib', 'gu_sheath', 'gu_bud', 'ne_cap', 'de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'he_bulb', 'do_shell', 'do_vine', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
 registerTile('he_root', 32, 64, 28);
 registerTile('he_vine', 32, 32, 40);
 registerTile('st_bark', 64, 64, 22);
