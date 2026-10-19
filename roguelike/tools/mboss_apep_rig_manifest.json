@@ -553,7 +553,7 @@
       "model": "a_up_l_p1",
       "brightness": 13,
       "scale": 2,
-      "elements": 98,
+      "elements": 132,
       "parent": "clav_a_l",
       "tol_tp": 0.03,
       "reach": 3,
@@ -571,7 +571,7 @@
       "model": "a_up_r_p1",
       "brightness": 13,
       "scale": 2,
-      "elements": 98,
+      "elements": 132,
       "parent": "clav_a_r",
       "tol_tp": 0.03,
       "reach": 3,
@@ -589,7 +589,7 @@
       "model": "a_lo_l_p1",
       "brightness": 13,
       "scale": 2.1,
-      "elements": 114,
+      "elements": 132,
       "parent": "a_up_l",
       "tol_tp": 0.03,
       "reach": 3.15,
@@ -607,7 +607,7 @@
       "model": "a_lo_r_p1",
       "brightness": 13,
       "scale": 2.1,
-      "elements": 114,
+      "elements": 132,
       "parent": "a_up_r",
       "tol_tp": 0.03,
       "reach": 3.15,
@@ -661,7 +661,7 @@
       "model": "b_up_l_p1",
       "brightness": 13,
       "scale": 1.5,
-      "elements": 114,
+      "elements": 99,
       "parent": "shoulders",
       "tol_tp": 0.03,
       "reach": 2.25,
@@ -679,7 +679,7 @@
       "model": "b_up_r_p1",
       "brightness": 13,
       "scale": 1.5,
-      "elements": 114,
+      "elements": 99,
       "parent": "shoulders",
       "tol_tp": 0.03,
       "reach": 2.25,
@@ -697,7 +697,7 @@
       "model": "b_lo_l_p1",
       "brightness": 13,
       "scale": 1.5,
-      "elements": 114,
+      "elements": 134,
       "parent": "b_up_l",
       "tol_tp": 0.03,
       "reach": 2.25,
@@ -715,7 +715,7 @@
       "model": "b_lo_r_p1",
       "brightness": 13,
       "scale": 1.5,
-      "elements": 114,
+      "elements": 134,
       "parent": "b_up_r",
       "tol_tp": 0.03,
       "reach": 2.25,
@@ -769,7 +769,7 @@
       "model": "c_up_l_p1",
       "brightness": 13,
       "scale": 1.4,
-      "elements": 114,
+      "elements": 99,
       "parent": "pelvis",
       "tol_tp": 0.03,
       "reach": 2.1,
@@ -787,7 +787,7 @@
       "model": "c_up_r_p1",
       "brightness": 13,
       "scale": 1.4,
-      "elements": 114,
+      "elements": 99,
       "parent": "pelvis",
       "tol_tp": 0.03,
       "reach": 2.1,
@@ -805,7 +805,7 @@
       "model": "c_lo_l_p1",
       "brightness": 13,
       "scale": 1.6,
-      "elements": 114,
+      "elements": 134,
       "parent": "c_up_l",
       "tol_tp": 0.03,
       "reach": 2.4,
@@ -823,7 +823,7 @@
       "model": "c_lo_r_p1",
       "brightness": 13,
       "scale": 1.6,
-      "elements": 114,
+      "elements": 134,
       "parent": "c_up_r",
       "tol_tp": 0.03,
       "reach": 2.4,
@@ -1021,7 +1021,7 @@
       "model": "beads_l_p1",
       "brightness": 14,
       "scale": 1.6,
-      "elements": 7,
+      "elements": 67,
       "parent": "b_up_l",
       "tol_tp": 0.03,
       "reach": 2.4,
@@ -1039,7 +1039,7 @@
       "model": "beads_r_p1",
       "brightness": 14,
       "scale": 1.6,
-      "elements": 7,
+      "elements": 67,
       "parent": "b_up_r",
       "tol_tp": 0.03,
       "reach": 2.4,
@@ -2631,12 +2631,12 @@
       ],
       "result": {
         "CROUCH": {
-          "points": 667,
+          "points": 706,
           "covered": 1,
           "worst": 2.48
         },
         "UPRIGHT": {
-          "points": 351,
+          "points": 343,
           "covered": 1,
           "worst": 2.26
         },
@@ -2646,14 +2646,14 @@
           "worst": 1.69
         },
         "CROUCH_OVER": {
-          "points": 343,
+          "points": 337,
           "covered": 1,
           "worst": 2.33
         },
         "CRAWL": {
-          "points": 638,
+          "points": 613,
           "covered": 1,
-          "worst": 2.4
+          "worst": 2.36
         }
       }
     },
@@ -16522,7 +16522,7 @@
           5.06
         ],
         [
-          -0.18,
+          -0.22,
           5.21
         ],
         [
@@ -20619,7 +20619,7 @@
           7.03
         ],
         [
-          -6.18,
+          -6.22,
           10.18
         ],
         [
@@ -23107,7 +23107,7 @@
           7.01
         ],
         [
-          -6.18,
+          -6.22,
           10.18
         ],
         [
@@ -23315,7 +23315,7 @@
           5.06
         ],
         [
-          -0.18,
+          -0.22,
           5.21
         ],
         [
@@ -27516,7 +27516,7 @@
           6.98
         ],
         [
-          -6.18,
+          -6.22,
           10.18
         ],
         [
@@ -27585,11 +27585,11 @@
     "models": 94,
     "hand_models": 20,
     "items": 325,
-    "atlas_px": 247808,
+    "atlas_px": 326144,
     "atlas_budget": 900000,
     "elements_shown_rest": {
-      "p1": 3684,
-      "p3": 3426
+      "p1": 3808,
+      "p3": 3598
     },
     "elements_budget": {
       "p1": 7000,
@@ -27606,7 +27606,7 @@
       },
       "limbs": {
         "parts": 14,
-        "px": 11264
+        "px": 89600
       },
       "hands": {
         "parts": 6,
@@ -27645,7 +27645,7 @@
     "apRigQz": "static skip: last z",
     "apRigQw": "static skip: last yaw"
   },
-  "textures": 59,
+  "textures": 71,
   "stances": {
     "objective": "apRigStance",
     "ids": {
@@ -29919,14 +29919,14 @@
   },
   "sprites": {
     "budget": 900000,
-    "total": 247808,
+    "total": 326144,
     "regions": {
       "body": 47360,
       "head": 59904,
       "shared": 46080,
       "tail": 19200,
-      "hands": 64000,
-      "limbs": 11264
+      "limbs": 89600,
+      "hands": 64000
     },
     "ledger": [
       {
@@ -30058,6 +30058,146 @@
         "px_per_b": 32,
         "use": "tinted",
         "forms": "both"
+      },
+      {
+        "name": "l1_arm",
+        "region": "limbs",
+        "w": 128,
+        "h": 192,
+        "px": 24576,
+        "px_per_b": 32,
+        "use": "unique",
+        "forms": "p1"
+      },
+      {
+        "name": "l1_leg",
+        "region": "limbs",
+        "w": 128,
+        "h": 192,
+        "px": 24576,
+        "px_per_b": 32,
+        "use": "unique",
+        "forms": "p1"
+      },
+      {
+        "name": "l1_plate",
+        "region": "limbs",
+        "w": 48,
+        "h": 48,
+        "px": 2304,
+        "px_per_b": 48,
+        "use": "unique",
+        "forms": "p1"
+      },
+      {
+        "name": "l1_rim",
+        "region": "limbs",
+        "w": 32,
+        "h": 32,
+        "px": 1024,
+        "px_per_b": 32,
+        "use": "unique",
+        "forms": "p1"
+      },
+      {
+        "name": "l1_rimd",
+        "region": "limbs",
+        "w": 32,
+        "h": 32,
+        "px": 1024,
+        "px_per_b": 32,
+        "use": "unique",
+        "forms": "p1"
+      },
+      {
+        "name": "l3_bleaf",
+        "region": "limbs",
+        "w": 16,
+        "h": 32,
+        "px": 512,
+        "px_per_b": 64,
+        "use": "unique",
+        "forms": "p3"
+      },
+      {
+        "name": "l3_bud",
+        "region": "limbs",
+        "w": 16,
+        "h": 16,
+        "px": 256,
+        "px_per_b": 64,
+        "use": "unique",
+        "forms": "p3"
+      },
+      {
+        "name": "l3_cara",
+        "region": "limbs",
+        "w": 48,
+        "h": 48,
+        "px": 2304,
+        "px_per_b": 48,
+        "use": "unique",
+        "forms": "p3"
+      },
+      {
+        "name": "l3_leaf",
+        "region": "limbs",
+        "w": 32,
+        "h": 64,
+        "px": 2048,
+        "px_per_b": 64,
+        "use": "unique",
+        "forms": "p3"
+      },
+      {
+        "name": "l3_leafd",
+        "region": "limbs",
+        "w": 32,
+        "h": 48,
+        "px": 1536,
+        "px_per_b": 48,
+        "use": "unique",
+        "forms": "p3"
+      },
+      {
+        "name": "l3_leafu",
+        "region": "limbs",
+        "w": 32,
+        "h": 48,
+        "px": 1536,
+        "px_per_b": 48,
+        "use": "unique",
+        "forms": "p3"
+      },
+      {
+        "name": "l3_plate",
+        "region": "limbs",
+        "w": 128,
+        "h": 144,
+        "px": 18432,
+        "px_per_b": 32,
+        "use": "unique",
+        "forms": "p3"
+      },
+      {
+        "name": "l3_rim",
+        "region": "limbs",
+        "w": 32,
+        "h": 32,
+        "px": 1024,
+        "px_per_b": 32,
+        "use": "unique",
+        "forms": "p3"
+      },
+      {
+        "name": "l3_vine",
+        "region": "limbs",
+        "w": 16,
+        "h": 16,
+        "px": 256,
+        "px_per_b": 64,
+        "use": "unique",
+        "forms": "p3"
       },
       {
         "name": "p1_bud",
@@ -30268,26 +30408,6 @@
         "px_per_b": 48,
         "use": "unique",
         "forms": "p1"
-      },
-      {
-        "name": "p3_bead",
-        "region": "limbs",
-        "w": 32,
-        "h": 48,
-        "px": 1536,
-        "px_per_b": 64,
-        "use": "unique",
-        "forms": "p3"
-      },
-      {
-        "name": "p3_blade",
-        "region": "limbs",
-        "w": 32,
-        "h": 48,
-        "px": 1536,
-        "px_per_b": 48,
-        "use": "unique",
-        "forms": "p3"
       },
       {
         "name": "p3_bud",
@@ -30535,8 +30655,8 @@
       "p3": 8000
     },
     "visible_rest": {
-      "p1": 3684,
-      "p3": 3426
+      "p1": 3808,
+      "p3": 3598
     },
     "per_region": {
       "body": {
@@ -30548,8 +30668,8 @@
         "p3": 898
       },
       "limbs": {
-        "p1": 1336,
-        "p3": 1442
+        "p1": 1460,
+        "p3": 1614
       },
       "hands": {
         "p1": 368,
@@ -30646,20 +30766,20 @@
         "p3": 11
       },
       "a_up_l": {
-        "p1": 98,
-        "p3": 102
+        "p1": 132,
+        "p3": 127
       },
       "a_up_r": {
-        "p1": 98,
-        "p3": 102
+        "p1": 132,
+        "p3": 127
       },
       "a_lo_l": {
-        "p1": 114,
-        "p3": 151
+        "p1": 132,
+        "p3": 136
       },
       "a_lo_r": {
-        "p1": 114,
-        "p3": 151
+        "p1": 132,
+        "p3": 136
       },
       "a_hand_l": {
         "p1": 56,
@@ -30670,20 +30790,20 @@
         "p3": 40
       },
       "b_up_l": {
-        "p1": 114,
-        "p3": 100
+        "p1": 99,
+        "p3": 107
       },
       "b_up_r": {
-        "p1": 114,
-        "p3": 100
+        "p1": 99,
+        "p3": 107
       },
       "b_lo_l": {
-        "p1": 114,
-        "p3": 149
+        "p1": 134,
+        "p3": 140
       },
       "b_lo_r": {
-        "p1": 114,
-        "p3": 149
+        "p1": 134,
+        "p3": 140
       },
       "b_hand_l": {
         "p1": 69,
@@ -30694,20 +30814,20 @@
         "p3": 53
       },
       "c_up_l": {
-        "p1": 114,
-        "p3": 98
+        "p1": 99,
+        "p3": 125
       },
       "c_up_r": {
-        "p1": 114,
-        "p3": 98
+        "p1": 99,
+        "p3": 125
       },
       "c_lo_l": {
-        "p1": 114,
-        "p3": 114
+        "p1": 134,
+        "p3": 105
       },
       "c_lo_r": {
-        "p1": 114,
-        "p3": 114
+        "p1": 134,
+        "p3": 105
       },
       "c_hand_l": {
         "p1": 59,
@@ -30751,11 +30871,11 @@
       },
       "beads_l": {
         "p1": 0,
-        "p3": 7
+        "p3": 67
       },
       "beads_r": {
         "p1": 0,
-        "p3": 7
+        "p3": 67
       }
     },
     "densest": [
@@ -30765,8 +30885,8 @@
       "core",
       "crys_back",
       "shoulders",
-      "a_lo_l",
-      "a_lo_r"
+      "b_lo_l",
+      "b_lo_r"
     ]
   },
   "follow": {
