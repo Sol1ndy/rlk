@@ -1,2 +1,25 @@
-# LOCAL STUB (S1-MOD, tools/mboss_azhdaha/core.py): rlk:mboss/px/azhdaha/clear_input of the framework px runtime
-# (cm.md 9.3) that AZ-CM has not compiled yet; no proxies exist, so this does nothing.
+# Paused: drop the stored clicks of the proxies of azhdaha.
+data remove entity 524c4b4d-415a-4400-8000-000000000041 attack
+data remove entity 524c4b4d-415a-4400-8000-000000000041 interaction
+data remove entity 524c4b4d-415a-4400-8000-000000000042 attack
+data remove entity 524c4b4d-415a-4400-8000-000000000042 interaction
+data remove entity 524c4b4d-415a-4400-8000-000000000043 attack
+data remove entity 524c4b4d-415a-4400-8000-000000000043 interaction
+data remove entity 524c4b4d-415a-4400-8000-000000000044 attack
+data remove entity 524c4b4d-415a-4400-8000-000000000044 interaction
+data remove entity 524c4b4d-415a-4400-8000-000000000045 attack
+data remove entity 524c4b4d-415a-4400-8000-000000000045 interaction
+data remove entity 524c4b4d-415a-4400-8000-000000000046 attack
+data remove entity 524c4b4d-415a-4400-8000-000000000046 interaction
+data remove entity 524c4b4d-415a-4400-8000-000000000047 attack
+data remove entity 524c4b4d-415a-4400-8000-000000000047 interaction
+data remove entity 524c4b4d-415a-4400-8000-000000000048 attack
+data remove entity 524c4b4d-415a-4400-8000-000000000048 interaction
+data remove entity 524c4b4d-415a-4400-8000-000000000049 attack
+data remove entity 524c4b4d-415a-4400-8000-000000000049 interaction
+data remove entity 524c4b4d-415a-4400-8000-00000000004a attack
+data remove entity 524c4b4d-415a-4400-8000-00000000004a interaction
+data remove entity 524c4b4d-415a-4400-8000-00000000004b attack
+data remove entity 524c4b4d-415a-4400-8000-00000000004b interaction
+data remove entity 524c4b4d-415a-4400-8000-00000000004c attack
+data remove entity 524c4b4d-415a-4400-8000-00000000004c interaction

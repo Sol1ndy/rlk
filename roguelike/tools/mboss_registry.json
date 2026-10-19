@@ -66,12 +66,12 @@
       "icon": {"item": "minecraft:husk_spawn_egg", "model": "minecraft:husk_spawn_egg"}
     },
     {
-      "id": "cproto", "n": 98, "kind": "chapter", "ch": [], "route": false, "enabled": false, "w": 0, "minCh": 1, "maxCh": 99,
+      "id": "cproto", "n": 98, "kind": "chapter", "ch": [], "route": false, "enabled": true, "w": 0, "minCh": 1, "maxCh": 99,
       "name": "시험용 수호자", "sub": "챕터 보스 틀 점검용", "color": "#9FC6E8", "el": 0,
       "hp": 120, "xp": 20, "atk": 10, "lvAdd": 0, "dmgMul": 120, "goldMul": 1, "sap": 0, "picks": 0,
       "scale": 0.1, "hit": {"w": 1.0, "h": 1.0}, "intro": 40, "death": 40, "deathSnd": false,
       "arena": "cp_test", "px": true, "pxBase": 65, "res": {"0": 30, "5": 30, "*": 10}, "phases": [60, 40],
-      "music": {"1": {"ev": "minecraft:music.end", "len": 0}, "2": {"ev": "minecraft:music.dragon", "len": 0}},
+      "music": {"1": {"ev": "minecraft:music.end", "len": 18090}, "2": {"ev": "minecraft:music.dragon", "len": 6883}},
       "icon": {"item": "minecraft:lodestone", "model": "minecraft:lodestone"}
     },
     {
@@ -80,7 +80,7 @@
       "hp": 260, "xp": 40, "atk": 12, "lvAdd": 0, "dmgMul": 140, "goldMul": 1, "sap": 0, "picks": 0,
       "scale": 0.1, "px": true, "pxBase": 65, "intro": 160, "death": 140, "deathSnd": false,
       "arena": "az_cavern", "theme": "az_cavern", "res": {"0": 30, "5": 30, "*": 10}, "phases": [100],
-      "music": {"1": {"ev": "minecraft:music.end", "len": 0}, "2": {"ev": "minecraft:music.dragon", "len": 0}},
+      "music": {"1": {"ev": "minecraft:music.end", "len": 18090}, "2": {"ev": "minecraft:music.dragon", "len": 6883}},
       "icon": {"item": "minecraft:raw_gold_block", "model": "rlk:mboss/az_kit/gate_icon"}
     }
   ]

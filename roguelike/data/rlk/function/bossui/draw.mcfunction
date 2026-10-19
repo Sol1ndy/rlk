@@ -17,47 +17,25 @@ scoreboard players operation #empty bu = #bar bu
 scoreboard players operation #empty bu -= #tr bu
 execute if score #empty bu matches ..-1 run scoreboard players set #empty bu 0
 scoreboard players operation #len bu = #fill bu
-function rlk:bossui/run_hp {col:"#E0484B"}
+execute unless score #buHpCol bu matches 1..10 run function rlk:bossui/run_hp {col:"#E0484B"}
+execute if score #buHpCol bu matches 1 run function rlk:bossui/run_hp {col:"#C58BFF"}
+execute if score #buHpCol bu matches 2 run function rlk:bossui/run_hp {col:"#FF8A3D"}
+execute if score #buHpCol bu matches 3 run function rlk:bossui/run_hp {col:"#4FB8FF"}
+execute if score #buHpCol bu matches 4 run function rlk:bossui/run_hp {col:"#9FE8F5"}
+execute if score #buHpCol bu matches 5 run function rlk:bossui/run_hp {col:"#F2C14E"}
+execute if score #buHpCol bu matches 6 run function rlk:bossui/run_hp {col:"#6FE3C1"}
+execute if score #buHpCol bu matches 7 run function rlk:bossui/run_hp {col:"#A5D94A"}
+execute if score #buHpCol bu matches 8 run function rlk:bossui/run_hp {col:"#E8C35A"}
+execute if score #buHpCol bu matches 9 run function rlk:bossui/run_hp {col:"#7BD88F"}
+execute if score #buHpCol bu matches 10 run function rlk:bossui/run_hp {col:"#EDCF63"}
 scoreboard players operation #len bu = #white bu
 function rlk:bossui/run_hp {col:"#FFFFFF"}
 scoreboard players operation #len bu = #empty bu
 function rlk:bossui/run_hp {col:"#2A2A2E"}
-# Numbers "hp/max" centred on the bar (default font, 6 px per character).
-scoreboard players set #n bu 1
-scoreboard players set #nh bu 1
-scoreboard players set #nm bu 1
-execute if score #buHp bu matches 1.. run scoreboard players set #nh bu 1
-execute if score #buMax bu matches 1.. run scoreboard players set #nm bu 1
-execute if score #buHp bu matches 10.. run scoreboard players set #nh bu 2
-execute if score #buMax bu matches 10.. run scoreboard players set #nm bu 2
-execute if score #buHp bu matches 100.. run scoreboard players set #nh bu 3
-execute if score #buMax bu matches 100.. run scoreboard players set #nm bu 3
-execute if score #buHp bu matches 1000.. run scoreboard players set #nh bu 4
-execute if score #buMax bu matches 1000.. run scoreboard players set #nm bu 4
-execute if score #buHp bu matches 10000.. run scoreboard players set #nh bu 5
-execute if score #buMax bu matches 10000.. run scoreboard players set #nm bu 5
-execute if score #buHp bu matches 100000.. run scoreboard players set #nh bu 6
-execute if score #buMax bu matches 100000.. run scoreboard players set #nm bu 6
-execute if score #buHp bu matches 1000000.. run scoreboard players set #nh bu 7
-execute if score #buMax bu matches 1000000.. run scoreboard players set #nm bu 7
-scoreboard players operation #n bu += #nh bu
-scoreboard players operation #n bu += #nm bu
-scoreboard players operation #w bu = #n bu
-scoreboard players operation #w bu *= #digit bu
-scoreboard players operation #half bu = #w bu
-scoreboard players operation #half bu /= #2 bu
-# back from the bar end to the text start: BAR/2 + w/2
-scoreboard players set #len bu 100
-scoreboard players operation #len bu += #half bu
-function rlk:bossui/space_neg
-# The nbt component joins the list as children of its first entry (a bar piece in font
-# rlk:bossbar), so the numbers must name the default font or they inherit the bar font.
-data modify storage rlk:bu line append value {score:{name:"#buHp",objective:"bu"},color:"white",font:"minecraft:default"}
-data modify storage rlk:bu line append value {text:"/",color:"#D0D0D0",font:"minecraft:default"}
-data modify storage rlk:bu line append value {score:{name:"#buMax",objective:"bu"},color:"#D0D0D0",font:"minecraft:default"}
-# forward to the bar end again: BAR/2 - w/2
-scoreboard players set #len bu 100
-scoreboard players operation #len bu -= #half bu
-execute if score #len bu matches 1.. run function rlk:bossui/space_pos
+# Numbers "hp/max" centred on the bar (#buNoNum 1: none; the cursor already stands at the bar end).
+execute unless score #buNoNum bu matches 1.. run function rlk:bossui/nums
 # Under bar (shield in its element colour, or a gauge).
 execute if score #buSubCol bu matches 1.. if score #buSubMax bu matches 1.. run function rlk:bossui/sub
+# The options hold for this draw only.
+scoreboard players set #buHpCol bu 0
+scoreboard players set #buNoNum bu 0

@@ -3,4 +3,5 @@ execute if score #mbId mb matches 1 run return run function rlk:mboss/guardian/s
 execute if score #mbId mb matches 2 run return run function rlk:mboss/butterfly/spawn
 execute if score #mbId mb matches 3 run return run function rlk:mboss/fieldgen/spawn
 execute if score #mbId mb matches 99 run return run function rlk:mboss/proto/spawn
+execute if score #mbId mb matches 98 run return run function rlk:mboss/cproto/spawn
 execute if score #mbId mb matches 10 run return run function rlk:mboss/azhdaha/spawn
