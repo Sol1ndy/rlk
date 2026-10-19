@@ -237,11 +237,11 @@
         }
       ],
       "budget": {
-        "elements": 350,
+        "elements": 500,
         "px": 12000
       },
       "elements": 308,
-      "px": 11264,
+      "px": 12032,
       "functions": {
         "spawn": "rlk:mboss/apep/om/basic/spawn",
         "tick": "rlk:mboss/apep/om/basic/tick",
@@ -289,7 +289,7 @@
             0,
             0
           ],
-          "elements": 33,
+          "elements": 36,
           "note": "S-curved dark-teal ribbon with pale rims, fronds, the gold shard"
         },
         {
@@ -315,7 +315,7 @@
             2.18,
             0.06
           ],
-          "elements": 14,
+          "elements": 11,
           "note": "cream hood-leaf; tilt = the hood lifted open"
         },
         {
@@ -410,11 +410,11 @@
         }
       ],
       "budget": {
-        "elements": 450,
+        "elements": 500,
         "px": 16000
       },
       "elements": 84,
-      "px": 12544,
+      "px": 12800,
       "functions": {
         "spawn": "rlk:mboss/apep/om/nurt/spawn",
         "tick": "rlk:mboss/apep/om/nurt/tick",
@@ -466,7 +466,7 @@
             2.2,
             0
           ],
-          "elements": 227
+          "elements": 263
         },
         {
           "name": "orb",
@@ -538,11 +538,11 @@
         }
       ],
       "budget": {
-        "elements": 450,
+        "elements": 500,
         "px": 16000
       },
-      "elements": 232,
-      "px": 15872,
+      "elements": 268,
+      "px": 10752,
       "functions": {
         "spawn": "rlk:mboss/apep/om/guard/spawn",
         "tick": "rlk:mboss/apep/om/guard/tick",
@@ -616,7 +616,7 @@
             1.32,
             0.02
           ],
-          "elements": 18
+          "elements": 27
         },
         {
           "name": "wing_r",
@@ -641,7 +641,7 @@
             1.32,
             0.02
           ],
-          "elements": 18
+          "elements": 27
         }
       ],
       "clips": [
@@ -698,11 +698,11 @@
         }
       ],
       "budget": {
-        "elements": 400,
+        "elements": 500,
         "px": 12000
       },
-      "elements": 324,
-      "px": 7168,
+      "elements": 342,
+      "px": 9216,
       "functions": {
         "spawn": "rlk:mboss/apep/om/nest/spawn",
         "tick": "rlk:mboss/apep/om/nest/tick",
@@ -752,7 +752,7 @@
             0.62,
             0
           ],
-          "elements": 235
+          "elements": 376
         },
         {
           "name": "face",
@@ -849,10 +849,10 @@
         }
       ],
       "budget": {
-        "elements": 300,
+        "elements": 500,
         "px": 8000
       },
-      "elements": 285,
+      "elements": 426,
       "px": 4608,
       "functions": {
         "spawn": "rlk:mboss/apep/om/destr/spawn",
@@ -915,7 +915,7 @@
             1.3,
             0
           ],
-          "elements": 241,
+          "elements": 374,
           "note": "fish = the leaf-shark hood; bud / pod / face are their own models (jaw and fin hidden)"
         },
         {
@@ -941,7 +941,7 @@
             1.28,
             0.4
           ],
-          "elements": 209,
+          "elements": 90,
           "note": "the translucent bowl, sepals and the long front fin; hinge behind the middle"
         },
         {
@@ -1106,7 +1106,7 @@
         "elements": 500,
         "px": 20000
       },
-      "elements": 456,
+      "elements": 470,
       "px": 18944,
       "functions": {
         "spawn": "rlk:mboss/apep/om/pred/spawn",
@@ -2013,7 +2013,7 @@
     "px_total": 200000,
     "organism_elements": 500,
     "heart_elements": 800,
-    "px": 129280
+    "px": 127232
   },
   "sprites": {
     "bo_bell": {
@@ -2023,7 +2023,7 @@
     },
     "bo_skirt": {
       "w": 96,
-      "h": 24,
+      "h": 32,
       "owner": "basic"
     },
     "bo_in": {
@@ -2071,29 +2071,29 @@
       "h": 64,
       "owner": "nurt"
     },
-    "nu_ribS": {
+    "nu_ribB": {
+      "w": 16,
+      "h": 64,
+      "owner": "nurt"
+    },
+    "nu_hoodL": {
       "w": 32,
       "h": 64,
       "owner": "nurt"
     },
-    "nu_ribT": {
-      "w": 32,
-      "h": 48,
-      "owner": "nurt"
-    },
-    "nu_hood": {
-      "w": 48,
-      "h": 32,
-      "owner": "nurt"
-    },
-    "nu_hoodF": {
-      "w": 32,
-      "h": 32,
-      "owner": "nurt"
-    },
-    "nu_hoodT": {
+    "nu_cheek": {
       "w": 48,
       "h": 48,
+      "owner": "nurt"
+    },
+    "nu_cheekT": {
+      "w": 48,
+      "h": 48,
+      "owner": "nurt"
+    },
+    "nu_base": {
+      "w": 32,
+      "h": 32,
       "owner": "nurt"
     },
     "nu_frond": {
@@ -2116,14 +2116,9 @@
       "h": 16,
       "owner": "nurt"
     },
-    "gu_ribA": {
-      "w": 32,
-      "h": 112,
-      "owner": "guard"
-    },
-    "gu_ribB": {
-      "w": 32,
-      "h": 112,
+    "gu_rib": {
+      "w": 16,
+      "h": 128,
       "owner": "guard"
     },
     "gu_sheath": {
@@ -2167,8 +2162,8 @@
       "owner": "nest"
     },
     "ne_wing": {
-      "w": 64,
-      "h": 48,
+      "w": 80,
+      "h": 64,
       "owner": "nest"
     },
     "ne_ring": {

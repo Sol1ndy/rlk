@@ -67,6 +67,14 @@ function shadeShape(sd, u, v, R, {t0 = .3, rimLit = .25, rimDark = .25, edge = .
 // ---- 2D shapes (blocks) shared with the geometry ---------------------------------------------------------------------
 // Each: {rect: {u0, u1, v0, v1}, sd(u, v)}. Plane conventions in the comments; the geometry passes plane / at.
 const SHP = (rect, sd) => ({rect, sd});
+// the 양육 hood arcs ([y, z] round the cap joint; the geometry lays strips along them, the cheeks follow them inward)
+export const HOOD = {
+  idle: [[-.06, .1], [.16, .08], [.32, -.04], [.38, -.22], [.32, -.42], [.16, -.58], [-.06, -.66], [-.22, -.62]],
+  tilt: [[-.06, .1], [.18, .06], [.36, -.08], [.44, -.28], [.42, -.48], [.32, -.66], [.16, -.78], [.02, -.8]],
+};
+// the inner offset of an arc (toward the curl) as [u = z, v = y] points
+const hoodIn = (P, k) => P.map(([y, z], i) => { const j = Math.min(P.length - 1, i + 1), m = Math.max(0, i - 1), ty = P[j][0] - P[m][0], tz = P[j][1] - P[m][1], L = Math.hypot(ty, tz);
+  return [z - k * ty / L, y + k * tz / L]; });
 const sdLens = (w, h, y0 = 0) => (u, v) => { const R = (h * h / 4 + w * w / 4) / w, c = R - w / 2; return Math.max(Math.hypot(u - c, v - y0 - h / 2), Math.hypot(u + c, v - y0 - h / 2)) - R; };
 const pts = (...a) => a;
 export const SH = {
@@ -81,24 +89,21 @@ export const SH = {
   b_lcrown: SHP({u0: -.24, u1: .24, v0: 0, v1: .26}, sdUnion(sdLens(.11, .25, 0), (u, v) => sdLens(.1, .22, 0)(u * .8 + v * .6 - .02, -u * .6 + v * .8 + .04),
     (u, v) => sdLens(.1, .22, 0)(u * .8 - v * .6 + .02, u * .6 + v * .8 + .04))),
   // 양육: the S ribbon in profile (x plane: u = Z, v = Y) and its lower twist face-on (z plane: u = X)
-  n_rib: SHP({u0: -.5, u1: .5, v0: 0, v1: 2.24}, stroke([[.12, .02], [.24, .32], [.22, .62], [.05, .95], [-.16, 1.25], [-.22, 1.52], [-.12, 1.8], [.04, 2.0], [.06, 2.2]], t => .17 - .1 * t).sd),
-  n_rib2: SHP({u0: -.4, u1: .4, v0: 0, v1: 1.3}, stroke([[-.04, .02], [-.2, .35], [-.14, .7], [.08, 1.02], [.12, 1.28]], t => .15 - .08 * t).sd),
   // the hood leaf in profile (x plane, cap frame: joint at the origin; it arches forward over the orb) and face-on
-  n_hood: SHP({u0: -.74, u1: .26, v0: -.34, v1: .44}, sdUnion(stroke([[.08, -.04], [.1, .2], [-.08, .36], [-.36, .34], [-.56, .16], [-.64, -.08], [-.6, -.3]], t => .07 + .06 * Math.sin(Math.PI * t)).sd)),
-  n_hoodF: SHP({u0: -.36, u1: .36, v0: -.3, v1: .42}, (u, v) => Math.max(Math.hypot(u / .33, (v - .06) / .34) - 1, -(v + .3)) * .3),
-  n_hoodT: SHP({u0: -.6, u1: .32, v0: -.2, v1: .62}, stroke([[.08, -.04], [.12, .24], [.0, .46], [-.24, .56], [-.46, .48], [-.56, .3], [-.52, .12]], t => .07 + .06 * Math.sin(Math.PI * t)).sd),
+  // the hood cheeks (plane 'x': u = Z, v = Y round the cap joint): a crescent just inside the arc
+  n_cheek: SHP({u0: -.8, u1: .2, v0: -.5, v1: .5}, stroke(hoodIn(HOOD.idle, .08).slice(1, -1), t => .02 + .06 * Math.sin(Math.PI * t)).sd),
+  n_cheekT: SHP({u0: -.9, u1: .2, v0: -.4, v1: .55}, stroke(hoodIn(HOOD.tilt, .08).slice(1, -1), t => .02 + .06 * Math.sin(Math.PI * t)).sd),
+  n_base: SHP({u0: -.21, u1: .21, v0: 0, v1: .56}, sdLens(.42, .56, 0)),
   n_frond: SHP({u0: -.11, u1: .11, v0: 0, v1: .56}, sdLens(.2, .56, 0)),
   // 수호: two helix ribbons (u across, v up; shape centre wanders sideways), the hem lobe, the death wisp
-  g_ribA: SHP({u0: -.5, u1: .5, v0: .45, v1: 4.45}, (u, v) => { const t = (v - .45) / 4, c = .22 * Math.sin(t * 7.2), w = .2 * (1 - .55 * t) * smooth(-.02, .05, t) + .012; const tip = v > 4.0 ? (v - 4.0) / .45 : 0;
-    const split = tip > 0 ? Math.abs(Math.abs(u - c) - .07 * tip) - w * (1 - tip) : Math.abs(u - c) - w; return Math.max(split, .45 - v, v - 4.45); }),
-  g_ribB: SHP({u0: -.5, u1: .5, v0: .45, v1: 4.2}, (u, v) => { const t = (v - .45) / 3.75, c = .2 * Math.sin(t * 6.4 + 2.2), w = .17 * (1 - .6 * t) + .012; return Math.max(Math.abs(u - c) - w, .45 - v, v - 4.2); }),
   g_lobe: SHP({u0: .14, u1: .62, v0: 0, v1: .34}, stroke(bez([.2, .32], [.3, .02], [.56, .05], 10), t => .09 - .05 * t).sd),
   g_wisp: SHP({u0: -.5, u1: .5, v0: 0, v1: 1.7}, sdUnion(stroke([[0, 0], [.08, .4], [-.06, .8], [.04, 1.1]], t => .14 - .08 * t).sd,
     stroke([[.04, 1.1], [-.14, 1.3], [-.3, 1.62]], t => .05 - .04 * t).sd, stroke([[.04, 1.1], [.2, 1.32], [.38, 1.58]], t => .05 - .04 * t).sd)),
   g_drape: SHP({u0: -.42, u1: .42, v0: 0, v1: 1.3}, (u, v) => { const w = .26 + .14 * (1 - v / 1.3), sc = .035 * Math.cos(u * 26); return Math.max(Math.abs(u) - w, -(v - .02 - sc), v - 1.3); }),
   // 둥지: a sepal wing in front view (z plane, wing frame: hinge at the origin, +u = outward), the eye ring
-  w_wing: SHP({u0: -.06, u1: 1.06, v0: -.62, v1: .32}, sdUnion(stroke([[0, 0], [.2, .17], [.42, .2], [.64, .06], [.8, -.16], [.88, -.38]], t => .085 - .045 * t).sd,
-    stroke([[.88, -.38], [.97, -.5], [1.02, -.42]], t => .04 - .02 * t).sd, stroke([[.86, -.36], [.78, -.54], [.84, -.6]], t => .035 - .02 * t).sd)),
+  w_wing: SHP({u0: -.06, u1: 1.36, v0: -.8, v1: .4}, sdUnion(stroke([[0, 0], [.22, .22], [.48, .28], [.74, .14], [.94, -.12], [1.06, -.42]], t => .13 - .07 * t).sd,
+    stroke([[1.06, -.42], [1.18, -.6], [1.3, -.56]], t => .07 - .04 * t).sd, stroke([[1.04, -.4], [1.0, -.64], [1.08, -.74]], t => .06 - .035 * t).sd,
+    stroke([[1.05, -.4], [1.22, -.42], [1.32, -.32]], t => .05 - .03 * t).sd)),
   w_ring: SHP({u0: -.25, u1: .25, v0: -.25, v1: .25}, (u, v) => Math.abs(Math.hypot(u, v) - .19) - .05),
   w_drop: SHP({u0: -.07, u1: .07, v0: -.22, v1: 0}, sdLens(.12, .22, -.22)),
   // 파괴: a cone spike as a triangle card (u across, v out from the shell)
@@ -160,10 +165,10 @@ function bagPx(u, v) {     // v 0 = the neck .. 1 = the round back
 }
 const tealPx = (u, v, k = 0) => { let c = PAL.teal(.35 + .3 * (N.b(u * 6, v * 12) - .5) + k); const g = Math.abs(Math.sin(u * Math.PI * 8)); if (g < .08) c = sink(c, .25); return c; };
 // a ribbon strap with pale rims along both edges (u across 0..1)
-const ribbonPx = (u, v, R = PAL.teal, rim = PAL.pale) => {
+const ribbonPx = (u, v, R = PAL.teal, rim = PAL.pale, rw = .14, ra = .9) => {
   const e = Math.min(u, 1 - u);
   let c = R(.35 + .18 * (N.c(u * 4, v * 20) - .5) + .1 * Math.sin(v * 9));
-  if (e < .14) c = mix(c, rim(.1 + .2 * e / .14), .9 * smooth(.14, .05, e));
+  if (e < rw) c = mix(c, rim(.1 + .2 * e / rw), ra * smooth(rw, rw * .35, e));
   return c;
 };
 function shellPx(u, v) {     // 파괴: dark armour plates with pale grey bands at the seams
@@ -205,7 +210,7 @@ add('bo_bell', 96, 48, bellPx, 'basic');
 // loft ledges / caps face up: the game's up-face light is ~1.4x the side faces', so their tone is painted darker
 const ledgeOf = (c, k = .7) => [c[0] * k, c[1] * k, c[2] * k, 255];
 // the skirt wrap (u round the 8 facets, v top 0 .. hem 1): one rounded foot per facet below v .55, creased between
-add('bo_skirt', 96, 24, (u, v) => {
+add('bo_skirt', 96, 32, (u, v) => {
   const f = (u * 8) % 1, x = Math.abs(f - .5) / .5, tip = v > .55 ? Math.hypot(x / .94, (v - .55) / .45) : x / .94;
   if (v > .4 && tip > 1) return TRANSPARENT;
   let t = .3 + .18 * smooth(.2, 1, v) + .1 * x * x + .04 * (N.a(u * 12, v * 4) - .5);
@@ -226,14 +231,23 @@ add('bo_bubble', 32, 16, (s, t) => A(mix(PAL.lime(.05), PAL.lime(.35), t), clamp
 shapeSprite('bo_lcrown', SH.b_lcrown, 64, 'basic', (u, v) => shadeShape(SH.b_lcrown.sd, u, v, PAL.gem, {t0: .2, edge: .006, w: .02, line: .5}));
 
 // 양육 nurturing (16 k)
-add('nu_rib', 32, 64, (s, t) => ribbonPx(s, t), 'nurt');
-shapeSprite('nu_ribS', SH.n_rib, 28, 'nurt', (u, v) => { const n = SH.n_rib.sd; const b = bevel(n, u, v, .07); let c = PAL.teal(.42 + .1 * Math.sin(v * 5) + .06 * (N.a(u * 8, v * 8) - .5));
-  if (-b.d < .045) c = mix(c, PAL.pale(.12), .9); else if (b.lit > 0) c = mix(c, PAL.teal(0), .35 * b.rim * b.lit); return c; });
-shapeSprite('nu_ribT', SH.n_rib2, 28, 'nurt', (u, v) => { const b = bevel(SH.n_rib2.sd, u, v, .07); let c = PAL.teal(.48 + .08 * Math.sin(v * 6)); if (-b.d < .04) c = mix(c, PAL.pale(.15), .9); return c; });
-shapeSprite('nu_hood', SH.n_hood, 40, 'nurt', (u, v) => { let c = shadeShape(SH.n_hood.sd, u, v, PAL.hood, {t0: .14, edge: .01, w: .06, rimDark: .35});
-  const vein = Math.abs(Math.sin((u * 1.2 + v) * 16)); if (vein < .06) c = mix(c, PAL.hood(.45), .35); return c; });
-shapeSprite('nu_hoodF', SH.n_hoodF, 40, 'nurt', (u, v) => { const d = -SH.n_hoodF.sd(u, v); let c = mix(PAL.hood(.1), PAL.hood(.5), smooth(.25, -.25, v) * .6 + .25 * smooth(.08, 0, d)); if (d < .008) c = mix(c, PAL.hood(.8), .6); return c; });
-shapeSprite('nu_hoodT', SH.n_hoodT, 40, 'nurt', (u, v) => shadeShape(SH.n_hoodT.sd, u, v, PAL.hood, {t0: .12, edge: .01, w: .06, rimDark: .35}));
+add('nu_rib', 32, 64, (s, t) => ribbonPx(s, t, PAL.teal, PAL.pale, .08, .75), 'nurt');
+add('nu_ribB', 16, 64, (s, t) => ribbonPx(s, t, u => PAL.teal(.8 * u - .1), PAL.pale, .1, .7), 'nurt');
+// the hood leaf along its arc (s across, t from the stalk to the drooping tip): narrow at the stalk, broad, a round tip
+add('nu_hoodL', 32, 64, (s, t) => {
+  const x = Math.abs(s - .5) * 2, hw = t < .6 ? .42 + .58 * smooth(0, .6, t) : Math.sqrt(Math.max(0, 1 - ((t - .6) / .4) ** 2));
+  if (x > hw) return TRANSPARENT;
+  const e = (hw - x) / Math.max(.05, hw);
+  let c = PAL.hood(.12 + .14 * (1 - e) + .05 * (N.a(s * 6, t * 12) - .5) - .06 * smooth(.5, 1, t));
+  if (Math.abs(Math.sin((x * .8 + t) * 15)) < .07 && e > .15) c = mix(c, PAL.hood(.4), .3);   // veins
+  if (x < .04) c = mix(c, PAL.hood(.38), .4);                                               // midrib
+  if (e < .1) c = mix(c, PAL.hood(.65), .7);                                               // rim
+  return c;
+}, 'nurt');
+shapeSprite('nu_cheek', SH.n_cheek, 40, 'nurt', (u, v) => shadeShape(SH.n_cheek.sd, u, v, PAL.hood, {t0: .3, edge: .008, w: .03, rimDark: .4}));
+shapeSprite('nu_cheekT', SH.n_cheekT, 40, 'nurt', (u, v) => shadeShape(SH.n_cheekT.sd, u, v, PAL.hood, {t0: .3, edge: .008, w: .03, rimDark: .4}));
+shapeSprite('nu_base', SH.n_base, 40, 'nurt', (u, v) => { const b = bevel(SH.n_base.sd, u, v, .06); if (b.d > 0) return null; let c = PAL.teal(.38 + .25 * smooth(.5, 0, v) + .05 * (N.b(u * 9, v * 9) - .5));
+  if (-b.d < .035) c = mix(c, PAL.pale(.15), .9); return c; });
 shapeSprite('nu_frond', SH.n_frond, 40, 'nurt', (u, v) => { let c = shadeShape(SH.n_frond.sd, u, v, PAL.pale, {t0: .18, edge: .008, w: .03}); if (Math.abs(u) < .01) c = mix(c, PAL.pale(.5), .5); return c; });
 add('nu_gem', 16, 16, (s, t) => { const d = Math.abs(s - .5) + Math.abs(t - .5); return d > .5 ? TRANSPARENT : PAL.gem(clamp(.1 + .7 * (s > .5 ? .6 : .2) * (t > .5 ? 1.2 : .6) + .2 * d)); }, 'nurt');
 add('nu_orb', 16, 16, glowPx(PAL.core, .2), 'nurt');
@@ -242,8 +256,17 @@ add('nu_ring', 64, 16, (s, t) => A(mix(PAL.lime(0), PAL.lime(.35), t), clamp(.16
 // 수호 guarding (16 k)
 const ribPale = (sd, k = 0) => (u, v) => { const b = bevel(sd, u, v, .08); let c = PAL.pale(.14 + .14 * (N.b(u * 4, v * 3) - .5) + k);
   if (b.lit < -.1) c = mix(c, PAL.teal(.25), .45 * b.rim); else if (b.lit > 0) c = mix(c, PAL.pale(0), .4 * b.rim * b.lit); if (-b.d < .012) c = mix(c, PAL.pale(.7), .6); return c; };
-shapeSprite('gu_ribA', SH.g_ribA, 28, 'guard', ribPale(SH.g_ribA.sd));
-shapeSprite('gu_ribB', SH.g_ribB, 28, 'guard', ribPale(SH.g_ribB.sd, .06));
+// the helix ribbons (s across, t from the tip 0 to the base 1): pale with a grey-teal shade on one half, a fine dark
+// edge, narrowing to a point over the top tenth
+add('gu_rib', 16, 128, (s, t) => {
+  const x = (s - .5) * 2, hw = t < .14 ? Math.sqrt(t / .14) : 1;
+  if (Math.abs(x) > hw) return TRANSPARENT;
+  const e = hw - Math.abs(x);
+  let c = PAL.pale(.12 + .08 * (N.b(s * 3, t * 30) - .5) + .1 * smooth(.2, 1, x));
+  if (x > .35) c = mix(c, PAL.teal(.2), .35 * smooth(.35, .9, x));
+  if (e < .16) c = mix(c, PAL.pale(.62), .7 * smooth(.16, .04, e));
+  return c;
+}, 'guard');
 add('gu_sheath', 64, 32, (s, t) => { let c = tealPx(s, t, .12 * t); const sc = Math.abs(Math.sin(s * Math.PI * 6)); if (t > .82) c = mix(c, PAL.pale(.45), smooth(.82, .95, t) * (1 - sc * .5)); return c; }, 'guard');
 shapeSprite('gu_lobe', SH.g_lobe, 56, 'guard', (u, v) => shadeShape(SH.g_lobe.sd, u, v, ramp(['#C8D2D6', '#A4B2BA', '#84949E', '#66767E', '#4A585E']), {t0: .25, edge: .01, w: .04}));
 shapeSprite('gu_drape', SH.g_drape, 32, 'guard', (u, v) => { let c = PAL.pale(.12 + .1 * Math.abs(Math.sin(u * 18)) + .2 * smooth(.4, 0, v)); if (-SH.g_drape.sd(u, v) < .02) c = mix(c, PAL.pale(.6), .5); return c; });
@@ -254,8 +277,8 @@ add('gu_orb', 16, 16, glowPx(PAL.core, .15), 'guard');
 
 // 둥지 nesting (12 k)
 add('ne_cap', 64, 32, (s, t) => { let c = tealPx(s, t, -.06 + .1 * t); if (t > .9) c = mix(c, PAL.pale(.4), .5); return c; }, 'nest');
-shapeSprite('ne_wing', SH.w_wing, 48, 'nest', (u, v) => { const b = bevel(SH.w_wing.sd, u, v, .05); let c = mix(PAL.pale(.2), C('#9DB3B0'), .45 * smooth(.2, .7, u));
-  if (u > .82) c = mix(c, PAL.hood(.1), .7 * smooth(.82, .9, u)); if (b.lit < 0) c = mix(c, PAL.teal(.3), .35 * b.rim); if (-b.d < .01) c = mix(c, PAL.pale(.75), .6); return c; });
+shapeSprite('ne_wing', SH.w_wing, 48, 'nest', (u, v) => { const b = bevel(SH.w_wing.sd, u, v, .05); let c = mix(PAL.pale(.2), C('#9DB3B0'), .45 * smooth(.2, .8, u));
+  if (u > 1.0) c = mix(c, PAL.hood(.1), .7 * smooth(1.0, 1.1, u)); if (b.lit < 0) c = mix(c, PAL.teal(.3), .35 * b.rim); if (-b.d < .01) c = mix(c, PAL.pale(.75), .6); return c; });
 shapeSprite('ne_ring', SH.w_ring, 64, 'nest', (u, v) => { const r = Math.hypot(u, v); let c = PAL.pale(.08 + .3 * smooth(.14, .24, r)); if (Math.abs(r - .19) > .04) c = mix(c, PAL.pale(.6), .4); return c; });
 add('ne_orb', 16, 16, glowPx(PAL.core, .25), 'nest');
 shapeSprite('ne_drop', SH.w_drop, 64, 'nest', (u, v) => shadeShape(SH.w_drop.sd, u, v, PAL.gem, {t0: .15, edge: .006, w: .03}));

@@ -8,9 +8,9 @@
 // in blocks with the shared shape helpers (mboss_shape_lib.mjs, mboss_model_lib.mjs): root displays with frame 'object'
 // are authored in the object frame and shifted by their joint here; frame 'joint' models are authored round the joint.
 // Element rotations stay single-axis on the 22.5 degree grid.
-import {abox, cardZ, cardX, cardY, faceEl, faceOfDir, lathe, annulus, checkBounds, r4} from './mboss_model_lib.mjs';
+import {abox, cardZ, cardX, cardY, faceEl, faceOfDir, lathe, annulus, checkBounds, r4, rotA} from './mboss_model_lib.mjs';
 import {loft, slab, crossCards, toUnits, mirrorX, retex, rockBox} from './mboss_shape_lib.mjs';
-import {SH} from './apep_org_paint.mjs';
+import {SH, HOOD as NHOOD} from './apep_org_paint.mjs';
 
 export {checkBounds};
 export const RIDE_Y = 2.0;           // the husk passenger point above its feet (org manifest passenger.ride_y)
@@ -109,6 +109,34 @@ function spike(sprite, P, dir, L, w, rot) {
   return [mk(o1), mk(o2)];
 }
 
+// a vertical two-sided panel centred at c, w wide along the azimuth phi (deg: 0 = across X, facing -Z; the 22.5 grid),
+// h tall; sprite rows v0..v1 top to bottom (twisted ribbons: one panel per segment, phi stepping round)
+function vpanel(sprite, c, w, h, phi, v0 = 0, v1 = 1, tn = false) {
+  phi = Math.round(phi / 22.5) * 22.5; phi = ((phi % 180) + 270) % 180 - 90;    // the grid, -90 .. 90
+  const base = Math.abs(phi) <= 45 ? 0 : 90, g = base ? (phi > 0 ? phi - 90 : phi + 90) : phi;
+  const P0 = base ? [c[0], c[1] + h / 2, c[2] - w / 2] : [c[0] - w / 2, c[1] + h / 2, c[2]], du = base ? [0, 0, w] : [w, 0, 0];
+  return quad(sprite, P0, du, [0, -h, 0], {rot: g ? ['y', g, c] : undefined, uvr: [0, v0, 1, v1], tint: tn});
+}
+// a two-sided strip from A to B (points in the Y-Z plane at x = c0, [y, z]), W wide across X: the strip direction is
+// snapped to the 22.5 degree grid (one rotation about X round its middle); sprite rows v0 (at A) .. v1 (at B)
+function stripYZ(sprite, A, B, W, v0, v1, {x = 0, ext = .02} = {}) {
+  const dy = B[0] - A[0], dz = B[1] - A[1], L = Math.hypot(dy, dz) + 2 * ext, t = [0, dy / Math.hypot(dy, dz), dz / Math.hypot(dy, dz)];
+  let best = null;
+  for (const d of [[0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]) for (const g of [0, 22.5, -22.5, 45, -45]) {
+    const r = rotA('x', g, d), e = Math.hypot(r[1] - t[1], r[2] - t[2]);
+    if (!best || e < best.e - 1e-9 || (Math.abs(e - best.e) < 1e-9 && Math.abs(g) < Math.abs(best.g))) best = {d, g, e};
+  }
+  const m = [x, (A[0] + B[0]) / 2, (A[1] + B[1]) / 2], dv = best.d.map(v => v * L);
+  const P0 = [m[0] - W / 2, m[1] - dv[1] / 2, m[2] - dv[2] / 2];
+  return quad(sprite, P0, [W, 0, 0], dv, {rot: best.g ? ['x', best.g, m] : undefined, uvr: [0, v0, 1, v1]});
+}
+// a polyline of strips (pts [y, z]), the sprite running along its whole length
+function stripChain(sprite, pts, W, opt = {}) {
+  const seg = pts.slice(1).map((p, i) => Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1])), tot = seg.reduce((a, b) => a + b, 0);
+  let acc = 0;
+  return seg.map((l, i) => { const e = stripYZ(sprite, pts[i], pts[i + 1], W, acc / tot, (acc + l) / tot, opt); acc += l; return e; });
+}
+
 // ================================================================================================================
 // 기본 basic: bell (melee, walks) / bag (ranged, lying), a petal crown at the bag neck, the 수호 shield overlay
 // ================================================================================================================
@@ -160,24 +188,41 @@ function shieldModel() {
 // ================================================================================================================
 // 양육 nurturing: S ribbon stalk + fronds + gold shard, the hood cap, the orb, the immune ring overlay
 // ================================================================================================================
+// the stalk: two leaf ribbons twisting round each other in an S (a panel per segment, the azimuth stepping 22.5 degrees),
+// broad basal leaves, pale fronds splayed on the ground, the gold shard high on its left
+const NR = {top: 2.14, n: 14};
+const nurtZ = t => .12 * Math.sin(2 * Math.PI * .8 * t) - .02;
+const nurtX = t => .2 * Math.sin(2 * Math.PI * .85 * t + .3) * (1 - .4 * t);
 function nurtStalk() {
-  const els = [...shapeSlab('n_rib', 'nu_ribS', 'x', 0, {half: .07, cell: .08, inset: .5, edge: 'nu_rib'}),
-    ...shapeSlab('n_rib2', 'nu_ribT', 'z', .02, {half: .045, cell: .08, inset: .5, edge: 'nu_rib'})];
+  const els = [], N = NR.n;
+  for (let i = 0; i < N; i++) {
+    const t = (i + .5) / N, h = NR.top / N;
+    const wA = .62 - .34 * t + .12 * (1 - smooth01(t / .2));
+    els.push(vpanel('nu_rib', [nurtX(t), t * NR.top, nurtZ(t)], wA, h + .05, -45 + 22.5 * Math.round(10 * t), i / N, (i + 1) / N));
+    if (t < .7) {
+      const tb = t / .7, wB = .44 - .26 * tb + .1 * (1 - smooth01(tb / .25));
+      els.push(vpanel('nu_ribB', [nurtX(t) - .12 * Math.cos(2 * Math.PI * .6 * tb), t * NR.top, nurtZ(t) + .1 * Math.sin(2 * Math.PI * .6 * tb)], wB, h + .05, 45 + 22.5 * Math.round(7 * tb), i / N / .7, Math.min(1, (i + 1) / N / .7)));
+    }
+  }
+  // basal leaves leaning out (the sheath the ribbons rise from)
+  for (let k = 0; k < 4; k++) els.push(tangentCard('nu_base', k * 90, .1, .56, .42, .56, {tilt: 22.5, pivot: 'bottom'}));
   for (let k = 0; k < 6; k++) {
     const th = [0, 67.5, 112.5, 180, 247.5, 292.5][k], [b, g] = baseAz(th), d = unitAz(b), tg = tanAz(b);
     // a frond lying outward on the ground, tip slightly raised (cardinal ones tilted 22.5 up)
-    const L = .56, w = .2, P0 = [d[0] * .08 - tg[0] * w / 2, .03, d[2] * .08 - tg[2] * w / 2];
+    const L = .62, w = .22, P0 = [d[0] * .1 - tg[0] * w / 2, .03, d[2] * .1 - tg[2] * w / 2];
     let rot = g ? ['y', g, [0, 0, 0]] : null;
-    if (!g) { const axis = Math.abs(d[2]) > .5 ? 'x' : 'z'; rot = [axis, axis === 'x' ? (d[2] < 0 ? 22.5 : -22.5) : (d[0] > 0 ? 22.5 : -22.5), [d[0] * .08, .03, d[2] * .08]]; }
+    if (!g) { const axis = Math.abs(d[2]) > .5 ? 'x' : 'z'; rot = [axis, axis === 'x' ? (d[2] < 0 ? 22.5 : -22.5) : (d[0] > 0 ? 22.5 : -22.5), [d[0] * .1, .03, d[2] * .1]]; }
     els.push(quad('nu_frond', P0.map((x, i) => x + d[i] * L), [tg[0] * w, 0, tg[2] * w], [-d[0] * L, 0, -d[2] * L], {rot}));
   }
-  els.push(...crossCards('nu_gem', [0, 1.66, .2], .18, .3, {y0: -.15}));
+  els.push(...crossCards('nu_gem', [.2, 1.72, .12], .2, .34, {y0: -.17}));
   return els;
 }
+// the hood: a cream leaf bent over the top like a drooping tulip (strips along an arc in the Y-Z plane, the leaf outline
+// in the sprite), its edges curled down (two crescent cheeks); tilt = the hood lifted open toward the targets
 function nurtCap(t) {
-  const name = t ? 'n_hoodT' : 'n_hood', spr = t ? 'nu_hoodT' : 'nu_hood';
-  return [...shapeSlab(name, spr, 'x', 0, {half: .22, cell: .07, inset: .45, edge: 'nu_hoodF'}),
-    ...shapeSlab('n_hoodF', 'nu_hoodF', 'z', t ? -.2 : -.14, {half: .03, core: false})];
+  const els = stripChain('nu_hoodL', NHOOD[t ? 'tilt' : 'idle'], .64);
+  for (const x of [.25, -.25]) els.push(...shapeSlab(t ? 'n_cheekT' : 'n_cheek', t ? 'nu_cheekT' : 'nu_cheek', 'x', x, {half: .015, core: false}));
+  return els;
 }
 const nurtOrb = () => [...orb([0, 0, 0], .15, 'nu_orb'), ...crossCards('nu_orb', [0, 0, 0], .44, .44, {y0: -.22})];
 const nurtRing = () => band([0, 0, 0], 1.3, 0, .5, 'nu_ring');
@@ -192,10 +237,17 @@ function guardBase() {
   els.push(abox([-.12, .3, -.42], [.12, .58, -.32], 'gu_gem', {rot: ['x', -22.5, [0, .44, -.37]]}));
   return els;
 }
+// the spire: three pale ribbons in a loose triple helix round the axis (a tangent panel per segment), converging and
+// narrowing to points at the top
+const HELIX = [{th0: 0, y0: .5, y1: 4.42, n: 40, w: .42}, {th0: 180, y0: .5, y1: 4.1, n: 36, w: .38}];
 function guardSpire() {
-  return [...guardBase(), ...shapeSlab('g_ribA', 'gu_ribA', 'z', 0, {half: .03, cell: .1, inset: .5, edge: 'gu_ribA'}),
-    ...shapeSlab('g_ribB', 'gu_ribB', 'x', 0, {half: .03, cell: .1, inset: .5, edge: 'gu_ribB'}),
-    ...shapeSlab('g_ribB', 'gu_ribB', 'z', 0, {half: .02, core: false, rot: ['y', 45, [0, 0, 0]]})];
+  const els = guardBase();
+  for (const R of HELIX) for (let i = 0; i < R.n; i++) {
+    const t = (i + .5) / R.n, y = R.y0 + t * (R.y1 - R.y0), h = (R.y1 - R.y0) / R.n, th = R.th0 + 360 * 1.05 * (y - .5) / 3.9;
+    const r = .3 * (1 - .8 * smooth01((y - .5) / 3.9)) + .03, w = R.w * (1 - .5 * t) + .03;
+    els.push(vpanel('gu_rib', [r * Math.cos(th * D2R), y, r * Math.sin(th * D2R)], w, h + .025, -(th + 90) + 22.5 * 0, 1 - (i + 1) / R.n, 1 - i / R.n));
+  }
+  return els;
 }
 function guardBud() {
   const els = [...loft('y', stops([.95, 1.2, 1.45, 1.65, 1.82, 1.95, 2.04], [.4, .38, .33, .26, .17, .09, .03]), {n: 16, tex: 'gu_bud', ledgeTex: 'gu_bud_l', caps: '-+', seed: 9})];
@@ -224,7 +276,7 @@ const nestWing = () => shapeSlab('w_wing', 'ne_wing', 'z', 0, {half: .03, cell: 
 // ================================================================================================================
 // 파괴 destruction: the armoured ball (open front), its glowing face + beak; the split husk
 // ================================================================================================================
-const BALL = {z: [-.44, -.3, -.08, .16, .36, .52, .6], R: .6};
+const BALL = {z: [-.44, -.36, -.26, -.14, -.02, .1, .22, .34, .45, .54, .6], R: .6};
 function destrShell(husk) {
   const st = BALL.z.map(z => ({a: z, r: Math.sqrt(Math.max(.0025, BALL.R * BALL.R - z * z)) * (z === -.44 ? 1 : 1)}));
   if (husk) {
@@ -234,7 +286,7 @@ function destrShell(husk) {
   }
   const els = [...loft('z', st, {n: 16, tex: 'de_shell', ledgeTex: 'de_shell_l', caps: '+', seed: 17}), ...annulus('z', [0, 0, 0], -.44, .3, .41, '-', 'de_rim', {n: 16, stagger: .002})];
   // 12 cone spikes on the axis-aligned and 45-degree directions (none on the open front)
-  const S = (dir, rot) => spike('de_spike', dir.map(x => x * .5), dir, .3, .17, rot);
+  const S = (dir, rot) => spike('de_spike', dir.map(x => x * .5), dir, .46, .26, rot);
   els.push(...S([0, 1, 0]), ...S([0, -1, 0]), ...S([1, 0, 0]), ...S([-1, 0, 0]), ...S([0, 0, 1]));
   for (const [dir, rot] of [[[0, 1, 0], ['x', 45]], [[0, -1, 0], ['x', -45]], [[0, 1, 0], ['z', 45]], [[0, 1, 0], ['z', -45]], [[0, -1, 0], ['z', 45]], [[0, -1, 0], ['z', -45]], [[1, 0, 0], ['y', -45]], [[-1, 0, 0], ['y', 45]]])
     els.push(...S(dir, rot));
@@ -248,15 +300,22 @@ function destrFace() {
 // ================================================================================================================
 // 포식성 predatory: body looks fish / fish_flare / bud / pod / face; the jaw bowl, the tail fin, the core (children)
 // ================================================================================================================
-const HOOD = {z: [-1.25, -.85, -.4, .1, .58, .95, 1.2], w: [.05, .32, .54, .6, .5, .24, .04], h: [.04, .24, .39, .44, .36, .18, .04]};
+// the fish hood: a leaf-shaped shell, pointed at the snout (-Z) and toward the tail, widest a little before the middle,
+// a high rounded back and a flat underside where the translucent bowl hangs (profile leaf(s), s = 0 snout .. 1 tail)
+const FISH = {z0: -1.25, z1: 1.2, w: .54, top: .6, bot: .12};
+const leaf = z => { const s = Math.min(1, Math.max(0, (z - FISH.z0) / (FISH.z1 - FISH.z0))); return s < .42 ? Math.sin(Math.PI / 2 * s / .42) ** 1.4 : Math.sin(Math.PI / 2 * (1 - s) / .58) ** .9; };
+const FISH_U = [0, .04, .1, .19, .3, .43, .57, .71, .83, .93, 1];
+const fishZ = FISH_U.map(u => FISH.z0 + u * (FISH.z1 - FISH.z0));
+const topAt = z => FISH.top * leaf(z) + .02;
 function predFish(flare) {
-  const st = HOOD.z.map((a, i) => ({a, r: [HOOD.w[i], HOOD.h[i], HOOD.w[i], .07], c: [0, 0], box: .2}));
+  const st = fishZ.map(a => { const L = leaf(a); return {a, r: [FISH.w * L + .02, FISH.top * L + .02, FISH.w * L + .02, FISH.bot * L + .02], c: [0, 0], box: -.3}; });
   const els = [...loft('z', st, {n: 16, tex: 'pr_hood', ledgeTex: 'pr_hood_l', caps: '-+', seed: 23})];
-  for (const [z, big] of [[-.25, 1], [.22, 1], [.66, 0]]) {
-    const y = big ? .4 : .3, sp = big ? 'pr_horn' : 'pr_hornS', H = big ? .67 : .36, W = big ? .4 : .24;
+  for (const [z, big] of [[-.3, 1], [.18, 1], [.62, 0]]) {
+    const y = topAt(z) - .08, sp = big ? 'pr_horn' : 'pr_hornS', H = big ? .67 : .36, W = big ? .4 : .24;
     els.push(quad(sp, [-W / 2, y + H - .05, z], [W, 0, 0], [0, -H, 0], {rot: ['x', 22.5, [0, y, z]]}), quad(sp, [0, y + H - .05, z - W / 2], [0, 0, W], [0, -H, 0], {rot: ['x', 22.5, [0, y, z]]}));
   }
-  for (const s of [1, -1]) els.push(quad('pr_eye', [s * .5, .26, -.66], [0, 0, .22], [0, -.22, 0]));
+  const ew = FISH.w * leaf(-.62) + .03;
+  for (const s of [1, -1]) els.push(quad('pr_eye', [s * ew, .26, -.73], [0, 0, .22], [0, -.22, 0]));
   if (flare) {
     for (const [dir, rot] of [[[0, 1, 0]], [[1, 0, 0]], [[-1, 0, 0]], [[0, 1, 0], ['z', 45]], [[0, 1, 0], ['z', -45]], [[0, -1, 0], ['z', 45]], [[0, -1, 0], ['z', -45]]])
       for (const z of [-.55, -.1]) els.push(...spike('pr_flare', [dir[0] * .3, dir[1] * .25, z], dir, .55, .14, rot ? rot : undefined));
@@ -265,8 +324,9 @@ function predFish(flare) {
 }
 function predJaw() {
   // the translucent bowl under the hood (hinge frame: hinge at body z +0.4), two bottom sepals, the long front fin + gem
-  const z0 = -.4, st = HOOD.z.map((a, i) => ({a: a + z0, r: [HOOD.w[i] * .93, .05, HOOD.w[i] * .93, HOOD.h[i] * 1.05], c: [0, 0], box: .3}));
-  const els = [...loft('z', st, {n: 16, tex: 'pr_bowl', ledgeTex: 'pr_bowl_l', caps: '-+', seed: 29})];
+  const z0 = -.4, zs = [0, .1, .3, .55, .78, .95].map(u => FISH.z0 + .04 + u * (FISH.z1 - FISH.z0 - .1));
+  const st = zs.map(a => { const L = leaf(a); return {a: a + z0, r: [FISH.w * L * .9 + .02, .04, FISH.w * L * .9 + .02, .5 * L + .03], c: [0, -.02]}; });
+  const els = [...loft('z', st, {n: 8, tex: 'pr_bowl', ledgeTex: 'pr_bowl_l', caps: '-+', seed: 29})];
   for (const s of [1, -1]) els.push(quad('pr_sepal', [s * .25 - .07, -.94, -.2 + z0], [.14, 0, 0], [0, .62, 0], {rot: ['z', s * 22.5, [s * .25, -.32, -.2 + z0]]}));
   els.push(quad('pr_fin', [.34, -.12, -.62 + z0], [.24, 0, 0], [0, 0, -1.15], {rot: ['y', -22.5, [.46, -.12, -.62 + z0]]}));
   els.push(abox([.38, -.2, -.72 + z0], [.56, -.04, -.56 + z0], 'pr_gem'));
