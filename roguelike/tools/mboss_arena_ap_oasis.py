@@ -221,7 +221,13 @@ def ground_top(x, z):
     e = _edge(x, z)
     if e < 7:
         g += (7 - e) * 0.55
-    return FLOOR_Y + max(0, min(7, int(round(g))))
+    lo = 1 if _under_water_tiles(x, z) else 0      # the lush water tiles (y 201.005) reach r 39.6 at their corners:
+    return FLOOR_Y + max(lo, min(7, int(round(g))))  # the ground they cover beyond the bank rises over them
+
+
+def _under_water_tiles(x, z):
+    """True for a column under the 4 x 4 lush water-sheet tiles (x / z within CX / CZ +- 28)."""
+    return CX - 28 <= x <= CX + 27 and CZ - 28 <= z <= CZ + 27
 
 
 # ---------------------------------------------------------------------------------------------------------------
