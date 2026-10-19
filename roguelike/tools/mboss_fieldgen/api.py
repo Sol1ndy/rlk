@@ -92,17 +92,22 @@ def part_sel(name):
 
 
 # ---------------------------------------------------------------------------------------------
-# Balance (plan.md "Rotation"). Damage = % of the registry base hit (atk x dmgMul).
+# Balance (plan.md "Rotation", then its "Fix round" decisions). Damage = % of the registry base hit (atk x dmgMul).
+# Fix round balance (scratchpad mb3/fgfix/sim: the reviewer's fairness sim, Lv4 item-less player, 3 seeds x 3 min, the
+# Guardian on the same harness): the field patterns hit only a player who never breaks the field (a walker breaks it
+# during the opening waves, which a jump clears), so they went down; the cruise patterns a walking player cannot simply
+# walk out of (C1 bombs, the slams, C4, C6) went up. Was: c1 80 / c1s 140, c2 140, c4 90, c6 130 / 110, f1 120,
+# f2 130 / 110, wave 120.
 DMG = {
-    'c1': 80, 'c1s': 140,          # C1 일점 상쇄: each bomb (one hit per volley group of 4) / the finisher slam
-    'c2': 140,                     # C2 내려찍기: slam r 5
+    'c1': 100, 'c1s': 180,         # C1 일점 상쇄: each bomb (one hit per volley group of 4) / the finisher slam
+    'c2': 180,                     # C2 내려찍기: slam r 5 (the same slam as C1's finisher)
     'c3': 50,                      # C3 코어: per beam touch (one volley group, re-armed every 10 t)
-    'c4': 90,                      # C4 바위 폭탄: each missile (2 volley groups of 5)
+    'c4': 110,                     # C4 바위 폭탄: each missile (2 volley groups of 5)
     'c5': 220,                     # C5 지면 충격: the full-area blast
-    'c6': 130, 'c6s': 110,         # C6 파쇄: each floor burst / each slab throw
-    'f1': 120,                     # F1 감소 영역 (field): each eruption (one hit per event)
-    'f2': 130, 'f2s': 110,         # F2 파쇄 (field): bursts / slabs
-    'wave': 120,                   # 「인력 충격파」: each front
+    'c6': 150, 'c6s': 120,         # C6 파쇄: each floor burst / each slab throw
+    'f1': 50,                      # F1 감소 영역 (field): each eruption (one hit per event)
+    'f2': 70, 'f2s': 80,           # F2 파쇄 (field): bursts / slabs
+    'wave': 50,                    # 「인력 충격파」: each front
 }
 KB = {'default': 3, 'light': 2, 'heavy': 4, 'none': 0}
 
@@ -482,7 +487,7 @@ def rocks(g, tl, key, pid, burst0, n_burst=8, gap=6, throw0=None, n_throw=5, thr
     10 t ahead at the walker marker: the first 6 b from the player on the device's side, each next 2.5 b toward the
     player's current position); a slab rises at every burst (tuff display, up 4 b over 15 t); from throw0 one slab
     every throw_gap t flies at the player's locked feet (dmg-0 tell_line 10 t ahead, then a blade pj at 1.5 b/t,
-    hr 0.8 -> reach 1.45 b: the framework blade reaches hr + 0.65 (review FW-1), so hr is not the reach). Unthrown
+    hr c_blade_hr(1.45): the framework blade reaches hr + its pad (review FW-1), so hr is not the reach). Unthrown
     slabs crumble in the pattern's end / cancel (they carry rlk_mb_fg_pat). Returns the clock by which the last slab
     has landed. Tags rlk_mb_fg_p<pid>w (walker), p<pid>s (slab), p<pid>f (flying slab), p<pid>t<j> (throw locks)."""
     W, S = f'rlk_mb_fg_p{pid}w', f'rlk_mb_fg_p{pid}s'
@@ -536,7 +541,7 @@ def rocks(g, tl, key, pid, burst0, n_burst=8, gap=6, throw0=None, n_throw=5, thr
         f'tag @s add rlk_mb_fg_p{pid}f',
         'data merge entity @s {teleport_duration:1}',
         g.pj_opts(shape=1, kb=KB['default'], wall=1, grp=True),
-        f'execute at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p{pid}tl,limit=1] feet run {g.pj_launch(1.5, 24, dmg_s, 0.8)}',
+        f'execute at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p{pid}tl,limit=1] feet run {g.pj_launch(1.5, 24, dmg_s, c_blade_hr(1.45))}',
         g.sound('entity.breeze.shoot', 0.9, 0.6), g.sound('block.tuff.break', 1.0, 0.7)])
     for j in range(n_throw):
         T = f'rlk_mb_fg_p{pid}t{j}'
@@ -601,8 +606,8 @@ def c_bf(xyz, nd=3):
 
 def c_blade_pad():
     """How far the framework blade (pj shape 1) reaches beyond its half width hr: the blade rule of
-    tools/build_mboss_core.py, read from its source (today BLADE_R 0.65: reach = hr + 0.65, review FW-1; the
-    butterfly fix round's rule BLADE_R, BLADE_PAD, BLADE_GAP = ..., 0.3, ... gives reach = hr + 0.3)."""
+    tools/build_mboss_core.py, read from its source (since the merge with the butterfly fix round: BLADE_R, BLADE_PAD,
+    BLADE_GAP = ..., 0.3, ...: reach = hr + 0.3, review FW-1; the older rule BLADE_R 0.65 gave reach = hr + 0.65)."""
     import re
     src = (_TOOLS / 'build_mboss_core.py').read_text(encoding='utf-8')
     m = re.search(r'^BLADE_R, BLADE_PAD, BLADE_GAP\s*=\s*([\d.]+),\s*([\d.]+)', src, re.M)
@@ -613,9 +618,11 @@ def c_blade_pad():
 
 
 def c_blade_hr(reach):
-    """The blade half width hr whose framework hit reach is `reach` blocks (spec Q16: keep the slabs' total reach at
-    about 1.45 b whichever blade rule the framework has)."""
-    return round(max(0.1, reach - c_blade_pad()), 2)
+    """The blade half width hr whose framework hit reach (hr + c_blade_pad()) is about `reach` blocks (spec Q16: keep
+    the slabs' total reach at about 1.45 b whichever blade rule the framework has), in the tenths the framework
+    launches (mboss_lib.pj_launch rounds hr to tenths, halves up): with the blade rule since FW-1 (pad 0.3) 1.45 gives
+    hr 1.2, a reach of 1.5 b = the w 2.4 throw lane plus the same 0.3 pad (before the merge: hr 0.8 + 0.65 = 1.45 b)."""
+    return max(0.1, math.floor((reach - c_blade_pad()) * 10 + 0.5 + 1e-9) / 10)
 
 
 def c_redraw(g, key, vis_lo, vis_hi, el=5, hold=3):
@@ -765,7 +772,7 @@ def c_rocks(g, tl, key, pid, bursts, throws, dmg, dmg_s, el=5, pair=2, cap=2, re
         L.sound('block.chain.hit', 0.5, 0.8)])
     g.pw(key, 'rk_go', [
         f'# [c_rocks] @s = the slab: a blade projectile at the locked feet ({TLT}), 1.5 b/t, life 24, half width {L.num(hr)}',
-        f'# (reach {L.num(reach)} b with the framework blade rule), its own volley group.',
+        f'# (reach {L.num(hr + c_blade_pad())} b with the framework blade rule), its own volley group.',
         f'scoreboard players set @s mbId {pid}',
         f'tag @s remove {S}', f'tag @s add {Fl}',
         'data merge entity @s {teleport_duration:1}',
@@ -833,3 +840,36 @@ def f_body_pos(anchor):
     """A rig anchor (x left, y up, -z forward) as a body-frame position '^x ^y ^z' (run rotated as the body)."""
     x, y, z = anchor
     return f'^{L.num(float(x), 3)} ^{L.num(float(y), 3)} ^{L.num(-float(z), 3)}'
+
+
+def f_anchor_at(clip, t, name, default):
+    """A rig anchor of a clip at clip tick t (rig coordinates x left, y up, -z forward): linear between the manifest's
+    anchors at the clip's events (clips[].anchors[event], at events[event]), held before the first and after the last
+    (e.g. the core of wave_drop while it drops, rests on the floor and rises: fix round FID-4 / FID-7); `default` when
+    the clip or the anchor is missing."""
+    c = next((c for c in _MAN.get('clips', []) if c.get('name') == clip), None)
+    if not c:
+        return tuple(default)
+    pts = {}
+    for e, tick in (c.get('events') or {}).items():
+        a = (c.get('anchors') or {}).get(e, {}).get(name)
+        if a:
+            pts[int(tick)] = tuple(float(v) for v in a)
+    if not pts:
+        return tuple(default)
+    ts = sorted(pts)
+    if t <= ts[0]:
+        return pts[ts[0]]
+    if t >= ts[-1]:
+        return pts[ts[-1]]
+    for a, b in zip(ts, ts[1:]):
+        if a <= t <= b:
+            u = (t - a) / (b - a) if b > a else 1.0
+            return tuple(pa + (pb - pa) * u for pa, pb in zip(pts[a], pts[b]))
+    return pts[ts[-1]]
+
+
+def f_core_h(clip, t, default=None):
+    """The rig core's height above the anchor at clip tick t (f_anchor_at of 'core'), rounded to 0.01 b."""
+    d = (0.0, CORE_FIELD_H if default is None else float(default), 0.0)
+    return round(f_anchor_at(clip, t, 'core', d)[1], 2)

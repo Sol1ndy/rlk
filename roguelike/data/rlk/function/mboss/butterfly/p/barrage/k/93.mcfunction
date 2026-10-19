@@ -1,3 +1,3 @@
 # barrage clock 93
 function rlk:mboss/butterfly/rig/face/track
-playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 0.8 0.7 0.27
+execute unless entity @e[tag=rlk_body,distance=..9,limit=1] run function rlk:mboss/butterfly/wx/u/toward {d:0.3}

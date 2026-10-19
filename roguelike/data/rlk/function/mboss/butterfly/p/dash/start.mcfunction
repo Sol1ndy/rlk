@@ -1,5 +1,5 @@
-# H3 달빛 돌진 (clip dash_kick). Lock D at 3: kick r 1.5 1.2 b past D (tell 12) + ring r 3.5
-# around D (tell 16, act 3), one group = one 1.3 hit; the dash 10-12, kick 15, ring 19.
+# H3 달빛 돌진 (clip dash_kick). Lock D at 1: kick r 1.5 1.2 b past D (tell 10) + ring r 3.5
+# around D (tell 14, act 3), one group = one 1.3 hit; the dash 6-8, kick 11, ring 15.
 function rlk:mboss/butterfly/rig/face/player
 execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/p/dash_charge
 function rlk:mboss/butterfly/fx/snd/dash_charge

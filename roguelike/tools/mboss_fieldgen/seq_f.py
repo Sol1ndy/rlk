@@ -116,9 +116,12 @@ def field_out(g, tl):
     if 'wave_drop' not in A.CLIPS:              # the field's one lift-off flash (wave_drop has it when the rig does)
         zero = [floor(g.fx('lift_off')), g.snd('lift_off'), g.snd('rise_hum')]
     tl.at(0, *zero)
-    ly = f_clip_anchor('field_end', 'lances', 'ring_centre', (0, 5.6, 0))[1]
-    tl.at(lances, body_rot(f'^5.6 ^{h(ly)} ^', g.fx('spark')), body_rot(f'^-5.6 ^{h(ly)} ^', g.fx('spark')), g.snd('pack_up'))
-    tl.at(horiz, g.sound('block.chain.place', 0.6, 0.9))
+    # the lances start out at `lances` (the pack-up sound) and reach 5.6 b by `horiz`, where they turn horizontal: the
+    # sparks there, on the medallions in their X frames (the manifest's horiz anchors; fix round FID-9)
+    me = f_body_pos(f_clip_anchor('field_end', 'horiz', 'medal_e', (5.6, 5.45, -0.175)))
+    mg = f_body_pos(f_clip_anchor('field_end', 'horiz', 'medal_g', (-5.6, 5.45, -0.163)))
+    tl.at(lances, g.snd('pack_up'))
+    tl.at(horiz, body_rot(me, g.fx('spark')), body_rot(mg, g.fx('spark')), g.sound('block.chain.place', 0.6, 0.9))
     py = f_clip_anchor('field_end', 'pack', 'ring_centre', (0, 6.2, 0))[1]
     tl.at(pack, body_rot(f'^ ^{h(py)} ^', g.fx('pack_up')), g.snd('core_flip'))
     tl.at(pack + 10, g.sound('block.chain.step', 0.6, 0.7))
@@ -167,24 +170,35 @@ def break_fns(g, C):
     core5 = f_clip_anchor('break', 'burst', 'core', (0, CORE_H, 0))[1]
     corew = f_clip_anchor('break', 'wobble', 'core', (0, 3.5, 0))[1]
     slump = f_clip_anchor('break', 'slumped', 'core', (0, 2.5, 0))[1]
+    # the break on the floor (fix round FID-1: #fgBrkLo 1, the rig's break_low): the same fx at its own core heights
+    low = C.BRK_LOW
+    lcore0 = f_clip_anchor(low, 'bubble', 'core', (0, 1.3, 0))[1] if low else core0
+    lcore5 = f_clip_anchor(low, 'burst', 'core', (0, 1.3, 0))[1] if low else core5
+    lcorew = f_clip_anchor(low, 'wobble', 'core', (0, 2.1, 0))[1] if low else corew
+
+    def by(hi, lo_h, line_at):
+        """line_at(h) under the break variant: the hover break at hi, break_low at lo_h (one line when equal)."""
+        if not low or abs(hi - lo_h) < 0.05:
+            return [line_at(hi)]
+        return [ex('unless score #fgBrkLo mb matches 1', line_at(hi)), ex('if score #fgBrkLo mb matches 1', line_at(lo_h))]
     rec = f_clip_anchor('recover', 'flip', 'core', (0, 3.3, 0))[1]
     ring = f_clip_anchor('recover', 'flip', 'ring_centre', (0, 4.2, 0))[1]
     spark_t = C.BRK_WOBBLE + 10
     assert C.BRK_BURST < C.BRK_WOBBLE < spark_t < C.BRK_LEN, (C.BRK_BURST, C.BRK_WOBBLE, C.BRK_LEN)
     g.w(f'{SEQ}/brk/start', [
         '# S3 break 0 (@s = body; brk/begin after the 20th count: the hazards, decals, banner and meter are gone): the',
-        '# cracked bubble lights up white-gold.',
-        at_y(core0, g.fx('bubble_glow')), g.snd('break_glow')])
+        '# cracked bubble lights up white-gold (at the grounded core for break_low: FID-1).',
+        *by(core0, lcore0, lambda y: at_y(y, g.fx('bubble_glow'))), g.snd('break_glow')])
     g.w(f'{SEQ}/brk/burst', [
         f'# S3 break {C.BRK_BURST}: the bubble bursts (crack 4 is the core\'s): the flash and the glass shards at the core, the gold',
         '# spark ring at the floor, the cracked-bubble pop and a gold flat on the title line.',
-        at_y(core5, g.fx('break_burst')), floor(g.fx('break_ring')), g.khud('pop_break'), g.khud('flash_gold'),
-        g.snd('break_burst')])
+        *by(core5, lcore5, lambda y: at_y(y, g.fx('break_burst'))), floor(g.fx('break_ring')), g.khud('pop_break'),
+        g.khud('flash_gold'), g.snd('break_burst')])
     g.w(f'{SEQ}/brk/tick', [
         f'# S3 the break clip (@s = body, #fgT 1..{C.BRK_LEN}): the metallic groan of the tilt and wobble ({C.BRK_WOBBLE}), a spark and',
         f'# a chain creak as it sinks ({spark_t}).',
         f'execute if score #fgT mb matches {C.BRK_WOBBLE} run ' + g.snd('groggy_wobble'),
-        ex(f'if score #fgT mb matches {spark_t}', at_y((corew + slump) / 2, g.fx('spark'))),
+        *by((corew + slump) / 2, (lcorew + slump) / 2, lambda y: ex(f'if score #fgT mb matches {spark_t}', at_y(y, g.fx('spark')))),
         f'execute if score #fgT mb matches {spark_t} run ' + g.sound('block.chain.step', 0.5, 0.6)])
     g.w(f'{SEQ}/groggy/begin', [
         '# S3 groggy 0 (@s = body; also a reload / test 40): the device has sunk low: the dust ring, the power-down.',

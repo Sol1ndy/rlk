@@ -208,10 +208,25 @@ def pj_opts(el=None, kb=None, ret=None, wall=None, shape=None, grp=False):
     return out
 
 
+def pj_speed_tenths(spd):
+    """The runtime speed (tenths of a block per tick) that flies exactly n = ceil(spd / 0.25) sub-steps of 0.25 b:
+    pj/tick takes (4 V + 9) / 10 sub-steps, so V = int(2.5 n) maps back to n (2, 5, 7, 10, 12, 15, 17, ...). Rounding
+    spd * 10 instead sent 0.75 / 1.75 / 2.75 b/t one sub-step too fast (review fix FW-2)."""
+    n = max(1, math.ceil(float(spd) / 0.25 - 1e-9))
+    return int(n * 2.5)
+
+
+def _tenths_up(v):
+    """Tenths, halves rounded up (1.25 -> 13), for the pj hit radius."""
+    return int(math.floor(float(v) * 10 + 0.5 + 1e-9))
+
+
 def pj_launch(spd, life, dmg, hr):
     """As the prop, positioned at the launch point, rotated = flight direction (pitch counts). spd in blocks per
-    tick, life ticks, dmg % of the base hit (0 = visual), hr hit radius (sphere) / half width (blade) in blocks."""
-    return f'function rlk:mboss/pj/launch {{spd:{_tenths(spd)},life:{int(life)},dmg:{int(dmg)},hr:{max(1, min(40, _tenths(hr)))}}}'
+    tick (flown in 0.25 b sub-steps, rounded up: 0.7 and 0.75 both fly 0.75), life ticks, dmg % of the base hit
+    (0 = visual), hr hit radius (sphere) / half width (blade) in blocks."""
+    return (f'function rlk:mboss/pj/launch {{spd:{pj_speed_tenths(spd)},life:{int(life)},dmg:{int(dmg)},'
+            f'hr:{max(1, min(40, _tenths_up(hr)))}}}')
 
 
 def pj_steer(max_deg):

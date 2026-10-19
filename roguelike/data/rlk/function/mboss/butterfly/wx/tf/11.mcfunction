@@ -1,27 +1,4 @@
 # S2 transformation fx, clock 11 (@s = body, at it; the core's p/transform calls it).
-# ripple 3: floor ring r 5 (dark mint), the swell flap.
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~0 ~0.15 ~5 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~1.29 ~0.15 ~4.83 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~2.5 ~0.15 ~4.33 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~3.54 ~0.15 ~3.54 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~4.33 ~0.15 ~2.5 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~4.83 ~0.15 ~1.29 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~5 ~0.15 ~0 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~4.83 ~0.15 ~-1.29 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~4.33 ~0.15 ~-2.5 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~3.54 ~0.15 ~-3.54 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~2.5 ~0.15 ~-4.33 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~1.29 ~0.15 ~-4.83 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~0 ~0.15 ~-5 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~-1.29 ~0.15 ~-4.83 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~-2.5 ~0.15 ~-4.33 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~-3.54 ~0.15 ~-3.54 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~-4.33 ~0.15 ~-2.5 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~-4.83 ~0.15 ~-1.29 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~-5 ~0.15 ~0 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~-4.83 ~0.15 ~1.29 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~-4.33 ~0.15 ~2.5 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~-3.54 ~0.15 ~3.54 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~-2.5 ~0.15 ~4.33 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.259f,0.545f,0.443f],scale:1.2} ~-1.29 ~0.15 ~4.83 0 0 0 0 1 force @a[tag=player]
-playsound minecraft:entity.ender_dragon.flap hostile @a[tag=player] ~ ~ ~ 0.6 1.5 0.2
+# the wings fully spread: a sparkle at each forewing tip.
+execute rotated as @s rotated ~ 0 positioned ^3.129 ^5.99 ^-1.327 run function rlk:mboss/butterfly/fx/card {kind:"glint",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.2,s1:0.8,move:"0f,0f,0f",life:4,fade:2,col:15072200}
+execute rotated as @s rotated ~ 0 positioned ^-3.129 ^5.99 ^-1.327 run function rlk:mboss/butterfly/fx/card {kind:"glint",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.2,s1:0.8,move:"0f,0f,0f",life:4,fade:2,col:15072200}

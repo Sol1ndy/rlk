@@ -1,7 +1,4 @@
 # barrage clock 64
-# swing 3 wind-up: she turns, one wing swept back; embers at the wing tips
-function rlk:mboss/butterfly/rig/face/player
-execute rotated as @s rotated ~ 0 positioned ^-1.92 ^7.027 ^-0.92 run particle minecraft:flame ~ ~ ~ 0.3 0.3 0.3 0.02 3 force @a[tag=player]
-execute rotated as @s rotated ~ 0 positioned ^-0.391 ^5.388 ^3.841 run particle minecraft:flame ~ ~ ~ 0.3 0.3 0.3 0.02 3 force @a[tag=player]
-playsound minecraft:entity.ender_dragon.flap hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2
-playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 0.4 0.7 0.13
+playsound minecraft:entity.ender_dragon.flap hostile @a[tag=player] ~ ~ ~ 0.4 1.6 0.13
+execute if entity @e[tag=rlk_body,distance=..5,limit=1] run function rlk:mboss/butterfly/wx/u/away {d:0.2}
+function rlk:mboss/butterfly/rig/face/track

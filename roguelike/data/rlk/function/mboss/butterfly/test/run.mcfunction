@@ -21,7 +21,7 @@ execute if score #bfTst mb matches 24 run return run function rlk:mboss/butterfl
 execute if score #bfTst mb matches 40 run function rlk:mboss/butterfly/test/cut
 execute if score #bfTst mb matches 40 run return run function rlk:mboss/butterfly/groggy/begin
 execute if score #bfTst mb matches 42 if score #bfForm mb matches 1 run scoreboard players operation #bfHumN mb = #bfHumLim mb
-execute if score #bfTst mb matches 42 if score #bfForm mb matches 2 run scoreboard players set #bfBfT mb 880
+execute if score #bfTst mb matches 42 if score #bfForm mb matches 2 run scoreboard players operation #bfBfN mb = #bfBfLim mb
 execute if score #bfTst mb matches 42 run return 0
 execute if score #bfTst mb matches 91 run scoreboard players set #elem tmp 1
 execute if score #bfTst mb matches 91 run scoreboard players set #tfm tmp 0

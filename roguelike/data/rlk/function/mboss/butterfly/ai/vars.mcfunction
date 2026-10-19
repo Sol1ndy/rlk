@@ -29,6 +29,12 @@ scoreboard players set #bfHumN mb 0
 scoreboard players set #bfHumT mb 0
 scoreboard players set #bfBfN mb 0
 scoreboard players set #bfBfT mb 0
+scoreboard players set #bfDew1 mb 0
+scoreboard players set #bfWing mb 0
+scoreboard players set #bfPSw mb 0
+scoreboard players set #bfPNeed mb 0
+scoreboard players set #bfCure mb 0
+scoreboard players set #bfCureT mb 0
 scoreboard players set #bfCool mb 30
 scoreboard players set #bfBand mb 2
 scoreboard players set #bfSide mb 1

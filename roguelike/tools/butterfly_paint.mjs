@@ -21,6 +21,7 @@ import {
   Feather, bladeProfile, featherPath, featherColour, firstHit, onCard, cubic,
 } from './mboss_paint_lib.mjs';
 import {ramp} from './weapon_paint.mjs';
+import {LEG_LEN} from './butterfly_pose.mjs';
 
 // ---- palette (model.md §4.1) ------------------------------------------------------------------------------------
 export const PAL = {
@@ -348,17 +349,21 @@ const HW = (() => {
   // the curled crest at the top of the scroll (a hooked flame tip pointing up and back toward the body)
   const crest = sdTaper([[2.6, 3.0], [1.6, 4.4], [.2, 5.0], [-.6, 4.4], [-.2, 3.8]], .62, .1, .8);
   const sdLobe = sdUnion(sdSmooth(lobe), crest);
-  const bladeTop = [[8.0, 1.6], [11.4, .4], [14.6, -.8], [17.6, -2.0], [20.4, -3.3], [22.6, -4.5]];
-  const bladeBot = [[22.6, -4.5], [20.0, -4.1], [17.0, -3.7], [14.0, -3.3], [11.0, -2.9], [8.0, -2.6]];
+  // the blade: a sickle whose back bulges up and whose point (kept at the FX anchor 22.6, -4.5) bends down (PDF)
+  const bladeTop = [[8.0, 1.6], [11.4, .7], [14.6, -.3], [17.6, -1.3], [20.3, -2.7], [22.6, -4.5]];
+  const bladeBot = [[22.6, -4.5], [20.2, -4.6], [17.2, -4.4], [14.2, -3.9], [11.0, -3.2], [8.0, -2.6]];
   const bl = [...spline(bladeTop, 8), ...spline(bladeBot, 8).slice(1)];
   const sdBlade = sdPoly(bl);
-  const spine = new Path(spline([[8.0, -.5], [11.5, -1.25], [15.0, -2.2], [18.5, -3.15], [22.6, -4.5]], 8));
+  const spine = new Path(spline([[8.0, -.5], [11.3, -1.25], [14.6, -2.1], [17.6, -2.9], [20.4, -3.7], [22.6, -4.5]], 8));
+  // the glow flaring round the point: an opaque light-blue aura just past the blade (the card is cut out, so the
+  // haze is painted as a soft-coloured fringe that reads as light)
+  const flare = sdTaper([[18.6, -3.4], [20.6, -4.0], [22.4, -4.5], [23.3, -4.8]], .55, .3, 1);
   const sdEye = sdCircle(4.0, .25, 2.05);
   // the volute: a raised spiral tube (the grooves between its turns are the dark navy gaps), flourishes
   const volute = grooveOf([spiralPts(4.0, .25, .35, 2.0, 1.55, 80, 1)], .4);
   const grooves = grooveOf([spline([[1.0, 3.2], [2.6, 2.2], [5.6, 2.4], [8.6, 1.4]], 8), spline([[1.6, -1.6], [3.6, -2.4], [6.6, -2.2], [9.6, -1.5]], 8)], .22);
-  const sil = sdUnion(sdLobe, sdBlade);
-  return {sdLobe, sdBlade, spine, sdEye, volute, grooves, sil};
+  const sil = sdUnion(sdLobe, sdBlade, flare);
+  return {sdLobe, sdBlade, spine, sdEye, volute, grooves, sil, flare};
 })();
 let HWG = null;
 function hwGrids() {
@@ -366,25 +371,34 @@ function hwGrids() {
   const r = CARD.hw, res = 14;
   HWG = {
     h: new Grid(r, res, (x, y) => Math.max(plateH(HW.sdLobe, .75, HW.grooves, .5)(x, y) + (HW.sdEye(x, y) < 0 ? .55 * HW.volute(x, y) - .35 : 0), .9 * plateH(HW.sdBlade, .5)(x, y))),
-    sil: new Grid(r, res, HW.sil), lobe: new Grid(r, res, HW.sdLobe), blade: new Grid(r, res, HW.sdBlade), eye: new Grid(r, res, HW.sdEye),
+    sil: new Grid(r, res, HW.sil), lobe: new Grid(r, res, HW.sdLobe), blade: new Grid(r, res, HW.sdBlade), eye: new Grid(r, res, HW.sdEye), flare: new Grid(r, res, HW.flare),
   };
   return HWG;
 }
 function hwPainter(look) {
   const G = hwGrids(), r = CARD.hw, px = (r.X1 - r.X0) / SIZE[look === 'flat' ? 'hwf' : 'hw'][0];
-  const tipRamp = ramp([[0, '#A4BD6A'], [.35, '#86B8EA'], [.6, '#284AA4'], [.72, '#1028B6'], [.84, '#86B8EA'], [.93, '#C1DFFA'], [1, '#E4F0FF']]);
-  const tipPyro = ramp([[0, '#F2B076'], [.4, '#DF9258'], [.62, '#C05C6F'], [.76, '#C680A2'], [.9, '#FCE2CF'], [1, '#FFF6E8']]);
+  // the point glows: lime -> sky -> ice -> white-hot, ringed in saturated blue (Pyro: orange -> rose -> peach-white)
+  const tipRamp = ramp([[0, '#A4BD6A'], [.28, '#8EC6EE'], [.5, '#C1DFFA'], [.75, '#E8F3FF'], [1, '#FFFFFF']]);
+  const tipPyro = ramp([[0, '#F2B076'], [.3, '#E59A62'], [.55, '#F2A0A8'], [.8, '#FCE2CF'], [1, '#FFF8EE']]);
+  const rimTip = look === 'pyro' ? C('#C0485A') : C('#2F57D8'), aura = look === 'pyro' ? C('#F6B2B0') : C('#9DC2FA');
   return (u, v) => {
     const x = r.X0 + u * (r.X1 - r.X0), y = r.Y1 - v * (r.Y1 - r.Y0);
     const ds = G.sil.at(x, y);
     if (ds > 0) return TRANSPARENT;
+    const dLobe = G.lobe.at(x, y), dB = G.blade.at(x, y);
     if (look === 'flat') {
       let c = mix(P.fxLime, P.fxHi, smooth(14, 22, x));
       if (ds > -px * 1.2) c = mix(c, P.fxShade, .8);
       return c;
     }
+    if (dLobe > 0 && dB > 0) {
+      // the aura round the point: pale blue fading to a deeper blue at its rim
+      const k = smooth(0, .5, -G.flare.at(x, y));
+      let c = mix(mix(aura, rimTip, .55), mix(aura, C('#FFFFFF'), .5), k);
+      if (ds > -px * 1.2) c = mix(c, rimTip, .7);
+      return c;
+    }
     const L = litAt(G.h, x, y, {k: 1.2});
-    const dLobe = G.lobe.at(x, y), dB = G.blade.at(x, y);
     let c;
     if (dLobe < 0 && !(dB < 0 && x > 10.5)) {
       c = shadeAt(M.lime, L, ds, px, {outline: 0});
@@ -395,19 +409,20 @@ function hwPainter(look) {
         c = tube > .25 ? c : mix(c, P.spiralNavy, .9 * smooth(.25, .05, tube) * smooth(0, -.25, de));
       }
     } else {
-      // blade: lime upper half, iridescent lower half, glowing blue tip
+      // blade: lime upper half, iridescent lower half with a violet-pink edge glow, the glowing point
       const n = HW.spine.near(x, y), t = n.t;
-      const upper = n.s > 0;
       c = shadeAt(M.lime, L, ds, px, {outline: 0});
-      if (!upper) {
-        const k = clamp((x * .11 + y * .2 + 10) % 1);
-        c = mix(c, (look === 'pyro' ? RAMP.pyro : RAMP.holo)(k), .7);
-        c = mix(c, look === 'pyro' ? C('#F9D0B2') : C('#E8F4FF'), .25 * Math.pow(Math.max(0, L.diff - .5) * 2, 2));
+      if (n.s < .15) {
+        const k = clamp(((x * .1 + y * .24 + 10) % 1 + 1) % 1);
+        c = mix(c, (look === 'pyro' ? RAMP.pyro : RAMP.holo)(k), .82 * smooth(.15, -.25, n.s));
+        c = mix(c, look === 'pyro' ? C('#F9D0B2') : C('#F0F6FF'), .3 * Math.pow(Math.max(0, L.diff - .5) * 2, 2));
+        if (dB > -.35) c = mix(c, look === 'pyro' ? C('#C680A2') : C('#C9A8F4'), .7);
       }
-      const tip = smooth(.62, 1, t);
-      if (tip > 0) c = mix(c, (look === 'pyro' ? tipPyro : tipRamp)(tip), smooth(0, .25, tip));
+      const tip = smooth(.58, 1, t);
+      if (tip > 0) c = mix(c, (look === 'pyro' ? tipPyro : tipRamp)(tip), smooth(0, .2, tip));
+      if (tip > .2 && dB > -.28) c = mix(c, rimTip, .75);
     }
-    if (ds > -px * 1.2) c = mix(c, x > 19 ? (look === 'pyro' ? C('#8A3A3A') : P.tipDeep) : M.lime.line, .85);
+    if (ds > -px * 1.2) c = mix(c, x > 19 ? rimTip : M.lime.line, .85);
     return c;
   };
 }
@@ -420,12 +435,15 @@ const FUR = {base: P.fur, light: P.furHi, shadeC: P.furShade, deep: P.furLilac, 
 const furR = seed => rng(seed);
 // Tuft list -> painter. tuft: {r: [x, y] root, a: angle from straight down (deg, + toward +X), L, w, bend, tip}
 // (tip: colour the last part of the tuft takes, e.g. the capelets' royal blue). First in the list = in front.
-function furPainter(rect, tufts, {px = .08, shadow = .9, tipK = .55} = {}) {
+// pal: the clump colours (default the mane's cool white); fit false keeps tufts that leave the card (wrap textures,
+// whose tufts repeat across the seam); light(x, y) -> 0..1 darkens the clump colour toward pal.deep (wrap shading).
+const FUR_PAL = {shade: P.furShade, base: P.fur, hi: P.furHi, lilac: P.furLilac, edge: C('#B2BFD4')};
+function furPainter(rect, tufts, {px = .08, shadow = .9, tipK = .55, pal = FUR_PAL, fit = true, light = null, deep = null} = {}) {
   const grain = fbm(977);
   // keep every tuft inside the card (a tuft cut by the card edge shows as a straight line): shorten it until its
   // tip and its sides fit, with a small margin
   const m = .25;
-  for (const t of tufts) {
+  if (fit) for (const t of tufts) {
     for (let i = 0; i < 30; i++) {
       const ar = t.a * Math.PI / 180, tx = t.r[0] + Math.sin(ar) * t.L, ty = t.r[1] - Math.cos(ar) * t.L;
       const okTip = tx > rect.X0 + m && tx < rect.X1 - m && ty > rect.Y0 + m && ty < rect.Y1 - m;
@@ -439,16 +457,17 @@ function furPainter(rect, tufts, {px = .08, shadow = .9, tipK = .55} = {}) {
     col: (h, x, y) => {
       // a soft rounded clump: lilac in the crease at its root and along its edges, bright toward the middle and tip
       const e = Math.pow(h.e, .7);
-      let c = mix(P.furShade, P.fur, clamp(.5 + .8 * e));
-      c = mix(c, P.furHi, clamp((e - .5) * 1.6) * (.45 + .55 * h.t));
-      c = mix(c, P.furLilac, (1 - h.t) * .15);
+      let c = mix(pal.shade, pal.base, clamp(.5 + .8 * e));
+      c = mix(c, pal.hi, clamp((e - .5) * 1.6) * (.45 + .55 * h.t));
+      c = mix(c, pal.lilac, (1 - h.t) * .15);
       // strands along the clump
       const st = Math.sin(h.s * 9 + h.t * 3 + 6 * grain(x * .6, y * .6));
-      c = mix(c, P.furShade, smooth(.75, 1, st) * .15 * (1 - h.t * .5));
+      c = mix(c, pal.shade, smooth(.75, 1, st) * .15 * (1 - h.t * .5));
       if (t.tip) c = mix(c, t.tip, Math.min(1, tipK * smooth(.4, .85, h.t) * (.7 + .3 * e)));
-      if (t.shade) c = mix(c, P.furLilac, t.shade);
+      if (t.shade) c = mix(c, pal.lilac, t.shade);
+      if (light) c = mix(c, deep || pal.lilac, 1 - light(x, y));
       // a soft light edge so the clumps separate without outlines (soft fur, not shingles)
-      if (h.edge < px * 1.1) c = mix(c, C('#B2BFD4'), .45);
+      if (h.edge < px * 1.1) c = mix(c, pal.edge, .45);
       return c;
     },
   }));
@@ -460,7 +479,7 @@ function furPainter(rect, tufts, {px = .08, shadow = .9, tipK = .55} = {}) {
       // soft contact shadow of the clumps in front
       for (let j = Math.max(0, i - 40); j < i; j++) {
         const g = list[j].f.sample(x, y, shadow);
-        if (g) { c = mix(c, P.furLilac, .2 * clamp(1 + g.edge / shadow)); break; }
+        if (g) { c = mix(c, pal.lilac, .2 * clamp(1 + g.edge / shadow)); break; }
       }
       return c;
     }
@@ -469,7 +488,7 @@ function furPainter(rect, tufts, {px = .08, shadow = .9, tipK = .55} = {}) {
 }
 // Rows of tufts filling an envelope: top(x) / bot(x) bound the roots; tufts hang down (fanned by `fan` deg per
 // unit of x), the bottom row longer; an upper fringe of short tufts points up so the top edge is fluffy too.
-function furRows(seed, {x0, x1, top, bot, L = 3, Lb = 4.6, w = 1.25, dx = 1.15, dy = 1.25, fan = 2.5, fringe = true, tip = null, tipRows = 0, spread = 14}) {
+function furRows(seed, {x0, x1, top, bot, L = 3, Lb = 4.6, w = 1.25, dx = 1.15, dy = 1.25, fan = 2.5, fringe = true, tip = null, tipRows = 0, spread = 14, noFringe = null}) {
   const R = furR(seed), out = [], rows = [];
   for (let y = 0; ; y++) {
     const row = [];
@@ -493,7 +512,10 @@ function furRows(seed, {x0, x1, top, bot, L = 3, Lb = 4.6, w = 1.25, dx = 1.15, 
   for (const row of rows) out.push(...row);
   if (fringe) {
     const R2 = furR(seed + 7);
-    for (let x = x0 + .3; x <= x1; x += dx * 1.1) out.unshift({r: [x, top(x) - .5], a: 180 + x * fan * .6 + (R2() - .5) * 40, L: 1.3 + R2() * .9, w: w * .7});
+    for (let x = x0 + .3; x <= x1; x += dx * 1.1) {
+      const t = {r: [x, top(x) - .5], a: 180 + x * fan * .6 + (R2() - .5) * 40, L: 1.3 + R2() * .9, w: w * .7};
+      if (!noFringe || !noFringe(x)) out.unshift(t);
+    }
   }
   return out;
 }
@@ -519,15 +541,20 @@ const capeTip = mix(P.capeBlue, P.capeDeep, .35);
 function maneFront() {
   // top: dips under the chin, rises beside the head and over the shoulders; bottom: pointed chest tufts
   // a fluffy ball from the front: dips under the chin, rounded shoulders, pointed chest tufts lowest in the middle
-  const top = x => { const a = Math.abs(x); return .3 + 5.0 * smooth(.8, 4.6, a) - 4.4 * smooth(6.6, 10.8, a) * smooth(6.6, 10.8, a); };
+  // the dip under the chin stays below the beak tip (2.35 b) so the whole mask shows above the ruff, also seen
+  // from below up close; no upright fringe in the dip
+  const top = x => { const a = Math.abs(x); return -.9 + 6.0 * smooth(2.2, 6.0, a) - 4.2 * smooth(6.6, 10.8, a) * smooth(6.6, 10.8, a); };
   const bot = x => -4.6 + 3.6 * smooth(0, 9.5, Math.abs(x));        // a V of chest tufts, lowest in the middle
-  return furPainter(CARD.mane_f, furRows(311, {x0: -10.0, x1: 10.0, top, bot, L: 3.6, Lb: 4.8, w: 1.9, dx: 1.55, dy: 1.45, fan: 3.6, spread: 18}));
+  return furPainter(CARD.mane_f, furRows(311, {x0: -10.0, x1: 10.0, top, bot, L: 3.6, Lb: 4.8, w: 1.9, dx: 1.55, dy: 1.45, fan: 3.6, spread: 18, noFringe: x => Math.abs(x) < 2.8}));
 }
 function maneCorner(seed, back) {
   // a rounded clump of fur (dome on top, rounded tufted bottom), not a rectangle
-  const top = x => 3.9 - 3.2 * (x / 4.6) ** 2, bot = x => (back ? -3.4 : -2.2) - .25 * x + 2.6 * (x / 4.6) ** 4;
+  // the front corners slope down on their inner side (x < 0, toward the chin), so they never hide the mask from a
+  // three-quarter view or from below
+  const dip = x => (back ? 0 : 3.6 * smooth(.6, -3.8, x));
+  const top = x => 3.9 - 3.2 * (x / 4.6) ** 2 - dip(x), bot = x => (back ? -3.4 : -2.2) - .25 * x + 2.6 * (x / 4.6) ** 4 - .5 * dip(x);
   return furPainter(CARD[back ? 'mane_bs' : 'mane_fs'], furRows(seed, {x0: -4.3, x1: 4.3, top, bot, L: 3.4, Lb: back ? 4.4 : 4.0, w: 1.85, dx: 1.5, dy: 1.45, fan: 2.4, spread: 18,
-    tip: back ? capeTip : null, tipRows: back ? 3 : 0}), {tipK: 1});
+    tip: back ? capeTip : null, tipRows: back ? 3 : 0, noFringe: back ? null : x => x < -1.2}), {tipK: 1});
 }
 function maneSide() {
   // side silhouette: front edge (X -6) under the chin, back edge (X +6) with capelets hanging lower
@@ -563,7 +590,6 @@ function maneBack() {
 def('helm', {X0: -3.3, X1: 3.3, Y0: -.6, Y1: 7.6}, [96, 128]);
 def('cheek', {X0: 1.4, X1: 7.8, Y0: -.4, Y1: 6.6}, [96, 96]);
 def('crown', {X0: -3.8, X1: 3.8, Y0: 2.8, Y1: 10.4}, [96, 96]);
-def('helm_side', {X0: -2.8, X1: 2.8, Y0: -.6, Y1: 7.6}, [64, 96]);       // side of the helmet (cardX: X = front -> back)
 def('eye', {X0: -.7, X1: .7, Y0: -.45, Y1: .45}, [32, 32]);
 def('chev', {X0: -1.2, X1: 1.2, Y0: -.7, Y1: .7}, [48, 32]);
 // facets of the mask (her left half; the right half mirrors): polygon, facet normal (x, y, z), the right half
@@ -637,17 +663,6 @@ function crownPainter() {
     let c = shadeAt(M.navy, litAt(G, x, y, {k: 1.4}), d, px, {outline: 0});
     if (d > -px * 2.6) c = mix(c, C('#B9AEEA'), .7);
     return c;
-  };
-}
-function helmSidePainter() {
-  // the helmet seen from the side: the beak profile in front, the crown spike, dark back (covered by the hood)
-  const sd = sdSmooth([[-2.6, 2.2], [-2.0, .4], [-1.0, -.4], [.4, .2], [1.8, 1.6], [2.6, 3.6], [2.0, 5.8], [.6, 7.2], [-.6, 6.4], [-1.6, 4.6]]);
-  const G = new Grid(CARD.helm_side, 14, plateH(sd, .9));
-  const r = CARD.helm_side, px = (r.X1 - r.X0) / SIZE.helm_side[0];
-  return (u, v) => {
-    const x = r.X0 + u * (r.X1 - r.X0), y = r.Y1 - v * (r.Y1 - r.Y0), d = sd(x, y);
-    if (d > 0) return TRANSPARENT;
-    return shadeAt(M.helm, litAt(G, x, y, {k: 1.2}), d, px);
   };
 }
 function eyePainter() {
@@ -821,73 +836,260 @@ function diamondPainter() {
   };
 }
 
-// ---- torso, pelvis, legs (wrap textures of the turned limbs + cards) ---------------------------------------------
-// Wrap textures: u = azimuth (0 = front, .25 = her left / outward, .5 = back, .75 = inward), v = down the limb.
-def('skin', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [64, 64]);
-def('thigh', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [64, 64]);
-def('boot', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [64, 64]);
-def('hoofw', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [32, 32]);
+// ---- torso, pelvis, legs (smooth turned solids under wrap textures, fur cards) ------------------------------------
+// BODY holds the radius profiles (model units at scale 1; a = position along the part's axis, 0 at its pivot joint,
+// limbs hang along -a; r = the radius across, kz = depth / width of the elliptic sections). butterfly_geometry.mjs
+// turns them (smooth rings, no ledge discs); the fur cards below are painted on the same profiles. Wrap textures:
+// u = azimuth (0 front, .25 her left / the outside of her left leg, .5 back, .75 inward), v from the top of the part
+// (a1) to its bottom (a0). Their light is painted (the facets are unshaded): lit from the front, a soft falloff to
+// the sides, the back in lilac shade, so neighbouring rings and parts meet without seams.
+const TH = LEG_LEN.thigh * 16, SH = LEG_LEN.shin * 16, FT = LEG_LEN.foot * 16;
+// Monotone cubic through control points [[a, r], ...] (ascending a), flat outside them.
+export function profile(pts) {
+  const n = pts.length, d = [];
+  for (let i = 0; i < n - 1; i++) d.push((pts[i + 1][1] - pts[i][1]) / (pts[i + 1][0] - pts[i][0]));
+  const m = pts.map((_, i) => (i === 0 ? d[0] : i === n - 1 ? d[n - 2] : d[i - 1] * d[i] <= 0 ? 0 : 2 / (1 / d[i - 1] + 1 / d[i])));
+  return a => {
+    if (a <= pts[0][0]) return pts[0][1];
+    if (a >= pts[n - 1][0]) return pts[n - 1][1];
+    let i = 0;
+    while (a > pts[i + 1][0]) i++;
+    const [x0, y0] = pts[i], [x1, y1] = pts[i + 1], hh = x1 - x0, t = (a - x0) / hh, t2 = t * t, t3 = t2 * t;
+    return (2 * t3 - 3 * t2 + 1) * y0 + (t3 - 2 * t2 + t) * hh * m[i] + (-2 * t3 + 3 * t2) * y1 + (t3 - t2) * hh * m[i + 1];
+  };
+}
+export const BODY = {
+  // waist 0.42 b at 1.61 b, the chest ending inside the mane (2.06 b, behind the front ruff and below the face);
+  // its lower end sits inside the pelvis
+  torso: {a: [-3.8, 7.2], kz: .76, pts: [[-3.8, 3.6], [-2.2, 3.48], [-.3, 3.38], [1.5, 3.42], [3.5, 3.8], [5.6, 4.22], [7.2, 4.3]]},
+  // hips (0.57 b) flaring out of the waist at 1.50 b (the two profiles cross there, so each part's open end stays
+  // inside the other however the torso leans) and rounding into the crotch (1.18 b) between the thigh tops
+  pelvis: {a: [-4.0, 3.6], kz: .75, pts: [[-4.0, .35], [-3.6, 1.0], [-3.0, 1.75], [-2.2, 2.6], [-1.3, 3.35], [-.4, 3.9], [.6, 4.15], [1.6, 4.0], [2.6, 3.62], [3.6, 3.25]]},
+  // thigh: wide at the hip, slim at the knee, a rounded knee end (it turns inside the boot cuff)
+  thigh: {a: [-TH - 1.2, 1.6], pts: [[-TH - 1.2, .3], [-TH - .95, .82], [-TH - .45, 1.08], [-TH + .4, 1.17], [-TH * .72, 1.33], [-TH * .42, 1.58], [-TH * .12, 1.8], [.5, 1.86], [1.6, 1.7]]},
+  // fur boot: from a cuff over the knee, flaring toward the hock; it reaches on into the foot's boot
+  shin: {a: [-SH - 1.5, .2], pts: [[-SH - 1.5, 2.3], [-SH, 2.26], [-SH * .7, 2.02], [-SH * .4, 1.8], [-SH * .1, 1.66], [.2, 1.6]]},
+  // lower boot: widest at the ankle cuff (0.37 b with the fur), closing over the hoof
+  foot: {a: [-5.0, 1.0], pts: [[-5.0, 1.75], [-4.6, 2.55], [-3.7, 2.95], [-2.4, 2.86], [-1.0, 2.56], [0, 2.4], [1.0, 2.3]]},
+  // cream hoof: a blunt cone pointing along the foot (down and forward), its top inside the boot
+  hoof: {a: [-FT - .15, -3.9], pts: [[-FT - .15, .3], [-FT + .25, .82], [-FT + 1.0, 1.28], [-FT + 2.1, 1.62], [-3.9, 1.78]]},
+};
+for (const b of Object.values(BODY)) b.r = profile(b.pts);
+const azL = (u, k = 1) => Math.pow(.5 + .5 * Math.cos(u * 2 * Math.PI), k);       // front-lit
+const wrapD = (a, b) => { const d = ((a - b) % 1 + 1) % 1; return Math.min(d, 1 - d); };
+// Polar sprite (end caps): col(azimuth 0..1 like the wraps' u, radius 0..1).
+const polarSprite = col => (u, v) => {
+  const r = Math.hypot(u - .5, v - .5) * 2;
+  return r > 1 ? TRANSPARENT : col(((Math.atan2(u - .5, v - .5) / (2 * Math.PI)) + 1) % 1, r);
+};
+def('torso_w', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [128, 128]);
+def('pelvis_w', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [128, 64]);
+def('pelvis_w_cap', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [32, 32]);
+def('thigh_w', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [128, 64]);
+def('thigh_w_cap', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [16, 16]);
+def('boot_s', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [128, 128]);
+def('boot_s_cap', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [32, 32]);
+def('boot_f', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [128, 48]);
+def('boot_f_cap', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [32, 32]);
+def('hoof_w', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [64, 32]);
+def('hoof_w_cap', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [16, 16]);
 def('furw', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [64, 64]);
-def('helmw', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [32, 32]);
-const azShade = u => Math.pow(.5 + .5 * Math.cos((u - .1) * 2 * Math.PI), 1.4);   // lit toward the front-left
-function skinTex() {
-  const n = fbm(733);
-  return (u, v) => {
-    let c = mix(mix(P.skinShade, P.skinDeep, .35), P.skinHi, azShade(u));
-    c = mix(c, P.skinLilac, .2 + .15 * n(u * 5, v * 5));
-    const du = Math.min(Math.abs(u), Math.abs(u - 1));
-    if (du < .035) c = mix(c, P.stripe, .9);                                 // lavender centre stripe
-    // navy tribal swirls on the flanks
-    for (const uc of [.25, .75]) {
-      const a = (u - uc) * 14, b = (v - .55) * 6;
-      const sw = Math.abs(Math.sin(Math.hypot(a, b) * 2.2 - Math.atan2(b, a) * 1.0));
-      if (Math.hypot(a, b) < 2.2 && sw < .22) c = mix(c, P.swirl, .8);
-    }
+def('helmw', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [64, 32]);
+def('antw', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [16, 16]);
+def('helmw_cap', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [16, 16]);
+def('furw_cap', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [32, 32]);
+const SKIN = {
+  base: t => mix(mix(P.skinLilac, P.skinShade, .55), P.skinHi, t),   // t = painted light 0..1
+};
+// a tribal swirl stroke field in (x, y) units: an open spiral curling into a tail
+function swirlField(cx, cy, r0, r1, turns, a0, dir, tail) {
+  const paths = [spiralPts(cx, cy, r0, r1, turns, a0, dir, 48)];
+  if (tail) paths.push(spline(tail, 8));
+  const P2 = paths.map(p => new Path(p));
+  return (x, y) => Math.min(...P2.map(p => p.near(x, y).d));
+}
+// Torso and pelvis share one painter keyed to the height above the floor (y, blocks at rest), so the lavender belly
+// band, the light and the shading run on unbroken where the hips flare out of the waist.
+function skinAt(n) {
+  return (u, y, sw) => {
+    const du = wrapD(u, 0), db = wrapD(u, .5);
+    let c = SKIN.base(.25 + .75 * azL(u, .8));
+    c = mix(c, P.skinLilac, .1 + .14 * n(u * 7, y * 9));
+    // the belly: a soft lavender band down the front, widening toward the crotch, a finer darker centre
+    const bw = .03 + .03 * smooth(1.85, 1.3, y), fade = smooth(2.06, 1.88, y);
+    c = mix(c, C('#B3BDEA'), .6 * smooth(bw * 1.9, bw * .7, du) * fade);
+    c = mix(c, P.stripe, .75 * smooth(bw * .75, bw * .3, du) * smooth(2.0, 1.86, y));
+    // the chest under the mane in its shadow; the crotch and the seat underneath in shade; the spine darker
+    c = mix(c, P.furLilac, .45 * smooth(1.9, 2.06, y));
+    c = mix(c, P.skinShade, .45 * smooth(1.28, 1.1, y));
+    c = mix(c, P.skinShade, .22 * smooth(.2, 0, db) * smooth(1.6, 1.4, y));
+    // periwinkle tribal swirls on the flanks and hips (sw: distance to their strokes)
+    if (sw < .2) c = mix(c, C('#6F7FB8'), .62 * smooth(.2, .1, sw));
     return c;
   };
 }
+function torsoTex() {
+  const n = fbm(733), {a: [a0, a1]} = BODY.torso, per = 22, skin = skinAt(n);
+  // navy swirls on the flanks (her left; u .25 side): x = (u - .25) * per (toward the back +), y = a
+  const sw = swirlField(-.5, -.6, .22, 1.15, 1.3, 120, -1, [[-1.4, -.1], [-2.1, 1.2], [-2.3, 2.7], [-1.8, 3.9]]);
+  const sw2 = swirlField(1.5, 2.4, .2, .72, 1.1, 300, 1, [[2.1, 3.0], [1.9, 4.2], [1.2, 4.9]]);
+  return (u, v) => {
+    const a = a1 - v * (a1 - a0), x = (u < .5 ? u - .25 : .75 - u) * per;
+    return skin(u, 1.61 + a / 16, Math.min(sw(x, a), sw2(x, a)));
+  };
+}
+function pelvisTex() {
+  const n = fbm(733), {a: [a0, a1]} = BODY.pelvis, per = 24, skin = skinAt(n);
+  const sw = swirlField(.5, .5, .2, 1.0, 1.25, 60, 1, [[-1.0, 1.3], [-1.6, 2.3]]);
+  return (u, v) => {
+    const a = a1 - v * (a1 - a0), x = (u < .5 ? u - .25 : .75 - u) * per;
+    return skin(u, 1.33 + a / 16, sw(x, a));
+  };
+}
+const pelvisCap = () => polarSprite((az, r) => mix(P.skinShade, P.skinDeep, .3 + .3 * r));
 function thighTex() {
-  const n = fbm(741);
+  const n = fbm(741), {a: [a0, a1]} = BODY.thigh;
   return (u, v) => {
-    let c = mix(mix(P.skinShade, P.skinDeep, .35), P.skinHi, azShade(u));
-    c = mix(c, P.skinLilac, .18);
-    if (Math.abs(Math.sin(u * 18 + v * 2 + 3 * n(u * 4, v * 2))) < .08) c = mix(c, C('#8C9CB8'), .45);   // steel streaks
-    if (Math.abs(u - .25) < .07 && v < .85) c = mix(c, mix(P.navy, P.navyMid, azShade(u)), .92);       // navy armour strip, outer thigh
-    if (Math.abs(u - .25) < .085 && Math.abs(u - .25) > .07) c = mix(c, P.navyRim, .8);
+    const a = a1 - v * (a1 - a0);
+    // lit from the front, the inner side (u .75) in a lilac shade, a cool rim on the outside
+    let c = SKIN.base(.22 + .78 * azL(u - .04, .9));
+    c = mix(c, P.skinLilac, .2 * smooth(.12, 0, wrapD(u, .75)));
+    c = mix(c, P.skinLilac, .1 + .12 * n(u * 6, v * 3));
+    // steel streaks curving round the thigh
+    const st = Math.abs(Math.sin(u * 2 * Math.PI * 3 + a * .55 + 2.5 * n(u * 4, v * 2)));
+    if (st < .06 && wrapD(u, .5) > .12) c = mix(c, C('#8C9CB8'), .38);
+    // navy armour strip on the outer thigh (u .25) with a periwinkle rim and a lime inlay line
+    const half = .075 * smooth(-TH * .78, -TH * .3, a) * smooth(1.2, -.4, a);
+    const dd = wrapD(u, .25);
+    if (half > .01 && dd < half) {
+      c = mix(mix(P.navy, P.navyMid, azL(u - .1)), P.navyDeep, .3 * smooth(-TH * .3, -TH * .75, a));
+      if (dd > half - .016) c = mix(c, P.navyRim, .8);
+      else if (Math.abs(dd - half * .35) < .009 && a < -1 && a > -TH * .65) c = mix(c, P.inlay, .85);
+    }
+    // the knee end in shade (it turns inside the boot cuff)
+    c = mix(c, P.skinShade, .4 * smooth(-TH + .2, -TH - .9, a));
     return c;
   };
 }
-function bootTex() {
-  const n = fbm(751);
+const thighCap = () => polarSprite(() => mix(P.skinShade, P.skinDeep, .35));
+// Fur palette of the boots: blue-white clumps, blue-grey creases, the vivid blue stripe on the inner side.
+const BOOT_PAL = {shade: C('#93A5C6'), base: C('#CFDCEE'), hi: C('#F2F8FC'), lilac: C('#8495BA'), edge: C('#A3B3D0')};
+const BOOT_DEEP = C('#64759A');
+// Fur wrap: rows of hanging tufts in wrap coordinates (x = u * per, y = -v * H), repeated across the seam.
+function furWrap(seed, per, H, {dy = 1.5, dx = 1.15, L = 3.8, w = .86, blueU = .84, top = .3, light = 1, rows = null} = {}) {
+  const R = rng(seed), tufts = [];
+  for (let y = top, i = 0; y > -H - L * .3; y -= dy, i++) {
+    for (let x = (i % 2 ? dx / 2 : 0); x < per - 1e-6; x += dx) {
+      const r = [x + (R() - .5) * dx * .35, y + (R() - .5) * .3], uu = r[0] / per;
+      const t = {r, a: (R() - .5) * 24, L: L * (.75 + .5 * R()), w: w * (.8 + .4 * R()), bend: [(R() - .5) * .16, (R() - .5) * .22, (R() - .5) * .28]};
+      if (wrapD(uu, blueU) < .07) t.tip = P.bootBlue;
+      else if (wrapD(uu, blueU) < .13) t.tip = C('#7E9CC8');
+      if (rows) rows(t, i, uu);
+      tufts.push(t);
+    }
+  }
+  const all = [];
+  for (const t of tufts) {
+    all.push(t);
+    if (t.r[0] < 2.5) all.push({...t, r: [t.r[0] + per, t.r[1]]});
+    if (t.r[0] > per - 2.5) all.push({...t, r: [t.r[0] - per, t.r[1]]});
+  }
+  const rect = {X0: 0, X1: per, Y0: -H, Y1: 0};
+  return furPainter(rect, all, {pal: BOOT_PAL, fit: false, tipK: .75, px: per / 128, deep: BOOT_DEEP,
+    light: (x) => .76 + .24 * light * azL(x / per - .03, 1.1) + (1 - light) * .24});
+}
+function bootShin() {
+  const {a: [a0, a1]} = BODY.shin;
+  const f = furWrap(853, 12, a1 - a0, {top: .2});
+  return (u, v) => { const c = f(u, v); return c[3] ? c : mix(BOOT_PAL.shade, BOOT_DEEP, .3); };
+}
+function bootFoot() {
+  const {a: [a0, a1]} = BODY.foot;
+  const f = furWrap(859, 17, a1 - a0, {top: .2, dy: 1.3, L: 3.2});
+  return (u, v) => { const c = f(u, v); return c[3] ? c : mix(BOOT_PAL.shade, BOOT_DEEP, .3); };
+}
+const bootCapTop = () => polarSprite((az, r) => mix(mix(BOOT_PAL.base, BOOT_PAL.hi, azL(az)), BOOT_PAL.shade, .5 * smooth(.5, 1, r)));
+const bootCapBot = () => polarSprite((az, r) => mix(BOOT_DEEP, BOOT_PAL.shade, .4 * azL(az)));
+function hoofTex() {
+  const {a: [a0, a1]} = BODY.hoof;
   return (u, v) => {
-    let c = mix(mix(P.bootShade, P.bootDeep, .3), P.bootHi, azShade(u) * .7);
-    c = mix(c, P.furLilac, .2 + .2 * n(u * 6, v * 3));
-    const strand = Math.sin(u * 60 + 8 * n(u * 3, v * 4));
-    c = mix(c, P.furShade, smooth(.8, 1, strand) * .35);
-    if (Math.abs(u - .75) < .06) c = mix(c, P.bootBlue, .9);                 // vivid blue inner stripe
-    else if (Math.abs(u - .75) < .1) c = mix(c, P.bootDeep, .6);
+    const a = a1 - v * (a1 - a0);
+    let c = mix(mix(P.hoofShade, P.hoofDeep, .25), mix(P.hoof, P.claw, .5), azL(u - .03, .8));
+    c = mix(c, P.hoofDeep, .45 * smooth(-FT + 1.4, -FT - .1, a));
+    c = mix(c, C('#FFF7EA'), .35 * smooth(.08, 0, wrapD(u, .04)) * smooth(-FT + .6, -4.4, a));
+    // claw grooves splitting the toe at the front
+    for (const g of [-.065, .065]) if (Math.abs(wrapD(u, 0) - Math.abs(g)) < .012 && a < -4.6) c = mix(c, C('#8C846E'), .7);
+    // the top under the boot fringe in shade
+    c = mix(c, P.hoofDeep, .5 * smooth(-4.6, -3.9, a));
     return c;
   };
 }
-function hoofTex() { return (u, v) => mix(mix(P.hoofShade, P.claw, azShade(u)), P.hoofDeep, smooth(.6, 1, v) * .4); }
-function helmTex() { return (u, v) => mix(P.helmShade, P.helm, azShade(u) * .7); }
+const hoofCap = () => polarSprite(() => mix(P.hoofDeep, P.hoofShade, .3));
 
-def('boot_tuft', {X0: -2.8, X1: 2.8, Y0: -9.6, Y1: 1.0}, [64, 112]);   // shin fur (4 crossed cards)
-def('boot_flare', {X0: -3.6, X1: 3.6, Y0: -8.6, Y1: 1.0}, [80, 96]);   // lower boot flaring to the ankle
+// Fur silhouette cards of the boots: four cards cross on the leg axis; each paints the boot's outline (the profile)
+// plus a fringe of tufts that stands just past the turned core, so the outline is shaggy from every side while the
+// round core carries the volume. Shin: spiky white tufts at the knee; foot: a pointed fringe over the hoof.
+def('fur_s', {X0: -3.5, X1: 3.5, Y0: -SH - 1.2, Y1: 1.9}, [96, 176]);
+def('fur_f', {X0: -4.3, X1: 4.3, Y0: -6.2, Y1: 1.4}, [112, 96]);
+function furCard(seed, rect, size, prof, y0, y1, {L = 1.9, w = .7, out = .55, dy = .9, fringe = null, cuff = null, blue = false} = {}) {
+  const R = rng(seed), tufts = [];
+  // edge tufts rooted just inside the profile, hanging down and out; top rows first (in front)
+  for (let y = y1, i = 0; y > y0; y -= dy, i++) {
+    for (const s of [1, -1]) {
+      const r0 = prof(y - L * .5) + out - L * .45;
+      const t = {r: [s * Math.max(.2, r0 + (R() - .5) * .25), y + (R() - .5) * .3], a: s * (14 + 14 * R()), L: L * (.85 + .3 * R()), w: w * (.85 + .3 * R()),
+        bend: [s * .03, s * (R() - .3) * .1, s * (R() - .2) * .14]};
+      if (blue && s < 0) t.tip = C('#8FA9D2');
+      tufts.push(t);
+    }
+    // a few tufts across the face (visible where the card is in front of the core: the ends)
+    for (let x = -prof(y) + .6; x < prof(y) - .5; x += 1.1) tufts.push({r: [x + (R() - .5) * .4, y], a: (R() - .5) * 16, L: L * (.8 + .3 * R()), w: w * 1.1, bend: [0, (R() - .5) * .1, 0]});
+  }
+  if (cuff) cuff(tufts, R);
+  if (fringe) fringe(tufts, R);
+  return furPainter(rect, tufts, {pal: BOOT_PAL, px: (rect.X1 - rect.X0) / size, tipK: .7, deep: BOOT_DEEP, fit: true});
+}
+function furShin() {
+  const B = BODY.shin;
+  return furCard(877, CARD.fur_s, SIZE.fur_s[0], B.r, -SH - 1.0, .6, {
+    cuff: (t, R) => {
+      // spiky white tufts at the knee pointing up and out (in front of everything: unshift)
+      for (const [x, a, L] of [[-1.7, 206, 2.4], [-1.1, 194, 2.1], [-.4, 184, 1.8], [.3, 174, 1.9], [1.0, 165, 2.2], [1.7, 152, 2.6]])
+        t.unshift({r: [x * .95, -.55 + (R() - .5) * .25], a: a + (R() - .5) * 10, L: L * (.8 + .25 * R()), w: .66, tip: C('#F6FBFF')});
+    },
+  });
+}
+function furFoot() {
+  const B = BODY.foot;
+  return furCard(881, CARD.fur_f, SIZE.fur_f[0], B.r, -4.4, 1.0, {L: 2.0, w: .78, out: .65,
+    fringe: (t, R) => {
+      // the pointed fringe hanging over the hoof: longest in the middle, cream-white tips
+      for (let x = -2.7; x <= 2.71; x += .62) {
+        const L = 1.9 + .9 * (1 - Math.abs(x) / 2.9) + R() * .3;
+        t.push({r: [x, -4.0 + .25 * Math.abs(x) / 2.9], a: x * 7 + (R() - .5) * 8, L, w: .72, tip: C('#F1EEE2')});
+      }
+    },
+  });
+}
+
+// Back of the helmet (a smooth dome behind the mask; v from its crown (0) to its jaw line (1)): slate, lit from the
+// front and above, a cool rim along the crown, the underside in deep shade.
+function helmTex() {
+  return (u, v) => {
+    let c = mix(P.helmShade, P.helmLit, .25 + .65 * azL(u, 1.0) * (1 - .45 * v));
+    c = mix(c, P.helmRim, .55 * smooth(.35, .05, v) * (.4 + .6 * azL(u, .6)));
+    // facet lines of the plates (a few meridians and one ring)
+    if (Math.abs(((u * 6 + .5) % 1) - .5) < .03 && v < .8) c = mix(c, P.helmDeep, .45);
+    if (Math.abs(v - .45) < .025) c = mix(c, P.helmDeep, .35);
+    c = mix(c, P.helmDeep, .5 * smooth(.65, 1, v));
+    return c;
+  };
+}
+const helmCap = () => polarSprite((az, r) => mix(P.helmShade, P.helmDeep, .5));
+const furCap = () => polarSprite((az, r) => { const s = Math.sin(az * 2 * Math.PI * 9 + r * 4) * .5 + .5; return mix(mix(P.fur, P.furShade, .35 * r), P.furLilac, .25 * smooth(.7, 1, s)); });
+
 def('knee', {X0: -2.4, X1: 3.6, Y0: -1.6, Y1: 4.2}, [64, 64]);         // white knee spikes with a lime one
 def('hoof_claws', {X0: -2.0, X1: 2.0, Y0: -2.0, Y1: 1.0}, [48, 32]);   // cream hoof claws (front)
-function bootTuft() {
-  const t = furRows(811, {x0: -1.6, x1: 1.6, top: () => .2, bot: () => -5.8, L: 3.2, Lb: 3.8, w: 1.15, dx: 1.1, dy: 1.4, fan: 5, spread: 16, fringe: false})
-    .filter(f => Math.abs(f.r[0]) < .7 + .15 * (-f.r[1]));                // narrow at the knee, wider toward the hock
-  t.forEach(f => { if (Math.abs(f.r[0]) < .7) f.tip = P.bootBlue; else f.shade = .25; });
-  return furPainter(CARD.boot_tuft, t, {tipK: .45});
-}
-function bootFlare() {
-  const t = furRows(823, {x0: -2.2, x1: 2.2, top: () => .2, bot: () => -4.4, L: 3.0, Lb: 4.4, w: 1.4, dx: 1.15, dy: 1.4, fan: 12, spread: 18, fringe: false})
-    .filter(f => Math.abs(f.r[0]) < 1.1 + .3 * (-f.r[1]));
-  t.forEach(f => { f.shade = .3; if (f.last) f.shade = .05; if (Math.abs(f.r[0]) < .6 && !f.last) f.tip = P.bootBlue; });
-  return furPainter(CARD.boot_flare, t, {tipK: .5});
-}
 function kneeSpikes() {
   const list = [{r: [0, 0], a: 160, L: 3.6, w: 1.0}, {r: [.8, 0], a: 140, L: 3.2, w: .9}, {r: [1.6, -.2], a: 120, L: 2.6, w: .8}, {r: [-.6, .1], a: 175, L: 2.6, w: .8}];
   const fur = furPainter(CARD.knee, list);
@@ -911,18 +1113,24 @@ function hoofClaws() {
     return shadeAt(M.hoof, litAt(G, x, y, {k: 1.4}), d, px);
   };
 }
-def('hipplate', {X0: -.6, X1: 4.0, Y0: -4.4, Y1: 1.0}, [48, 64]);      // navy hip plate with a lime swirl (her left)
+
+def('hipplate', {X0: -.6, X1: 3.4, Y0: -5.0, Y1: 1.2}, [48, 80]);      // navy tasset blade over the outer thigh (her left)
 def('fin', {X0: -.4, X1: 2.6, Y0: -3.2, Y1: .8}, [32, 48]);             // small steel hip fin
 function hipPlate() {
-  const sd = sdSmooth([[0, .6], [2.4, .2], [3.6, -1.6], [2.8, -4.0], [1.4, -2.6], [.2, -1.4]]);
-  const sp = new Path(spiralPts(1.9, -1.2, .15, .8, 1.3, 90, 1));
-  const G = new Grid(CARD.hipplate, 16, plateH(sd, .45));
+  // a navy tasset blade hanging from the hip over the outer thigh: lime inlay stroke, pale rim, violet point
+  const b = sickle([.2, .55], 74, 4.9, .85, -.3);
+  const sd = (x, y) => { const n = b.path.near(x, y); return n.d - b.w(n.t); };
+  const G = new Grid(CARD.hipplate, 16, plateH(sd, .38));
   const r = CARD.hipplate, px = (r.X1 - r.X0) / SIZE.hipplate[0];
   return (u, v) => {
     const x = r.X0 + u * (r.X1 - r.X0), y = r.Y1 - v * (r.Y1 - r.Y0), d = sd(x, y);
     if (d > 0) return TRANSPARENT;
-    let c = shadeAt(M.navy, litAt(G, x, y, {k: 1.4}), d, px);
-    if (sp.near(x, y).d < .16) c = mix(c, P.inlay, .9);
+    const n = b.path.near(x, y), s = n.s / Math.max(1e-6, b.w(n.t));
+    let c = shadeAt(M.navy, litAt(G, x, y, {k: 1.5}), d, px, {outline: 0});
+    if (s > .08 && s < .42 && n.t > .12 && n.t < .72) c = mix(c, P.inlay, .9 * smooth(.08, .16, s) * smooth(.42, .32, s));
+    c = mix(c, P.violetTip, .7 * smooth(.72, 1, n.t));
+    if (d > -px * 1.2) c = mix(c, M.navy.line, .85);
+    else if (d > -px * 2.6) c = mix(c, P.navyRim, .45);
     return c;
   };
 }
@@ -937,10 +1145,10 @@ function finPainter() {
 }
 
 // ---- ribbon tendrils (her left; the upper one scale 1, the lower one 1.25) ---------------------------------------
-def('tu', {X0: -3.4, X1: 12.6, Y0: -12.2, Y1: 3.8}, [128, 128]);
-def('tl', {X0: -4.0, X1: 8.0, Y0: -20.6, Y1: 1.4}, [80, 144]);
-def('tuf', {X0: -3.4, X1: 12.6, Y0: -12.2, Y1: 3.8}, [64, 64]);
-def('tlf', {X0: -4.0, X1: 8.0, Y0: -20.6, Y1: 1.4}, [48, 80]);
+def('tu', {X0: -4.2, X1: 12.6, Y0: -12.2, Y1: 4.6}, [128, 128]);
+def('tl', {X0: -4.4, X1: 8.0, Y0: -20.6, Y1: 1.8}, [80, 144]);
+def('tuf', {X0: -4.2, X1: 12.6, Y0: -12.2, Y1: 4.6}, [64, 64]);
+def('tlf', {X0: -4.4, X1: 8.0, Y0: -20.6, Y1: 1.8}, [48, 80]);
 // spiral "eye" curl at the hip (0, 0) whose outer turn leaves as the ribbon toward the end point (9.6, -9.4)
 const TU_PATH = () => {
   const sp = spiralPts(0, 0, .55, 2.4, 1.15, 200, 1, 40);
@@ -948,42 +1156,51 @@ const TU_PATH = () => {
   return new Path([...sp, ...tail.slice(1)]);
 };
 const TL_PATH = () => new Path(spline([[0, 0], [1.6, -3.4], [1.0, -7.2], [-1.0, -10.6], [-.4, -14.4], [1.8, -17.2], [3.6, -19.6]], 10));
-function ribbonPainter(rect, size, pth, w, look, {eye = false} = {}) {
+// A flat ribbon that twists: its lit edge (yellow-white) and its shaded edge (teal underside) swap sides past the
+// S-bend (twist > 0: the t where the twist happens), a fine vein down the middle (Pyro: gold, magenta underside).
+function ribbonPainter(rect, size, pth, w, look, {twist = 2} = {}) {
   const sd = (x, y) => { const n = pth.near(x, y); return n.d - w(n.t); };
-  const G = new Grid(rect, 12, plateH(sd, .5));
+  const G = new Grid(rect, 12, plateH(sd, .22));
   const px = (rect.X1 - rect.X0) / size[0];
   const pyro = look === 'pyro', flat = look === 'flat';
-  const m = pyro ? mat([[-.2, C('#6D3A4A')], [.25, C('#A35D83')], [.48, C('#C96839')], [.64, C('#F2B076')], [.86, C('#FAD77C')], [1, C('#FCE2CF')]], C('#5A2A2A'), white, .4) : M.rib;
+  const m = pyro ? mat([[-.2, C('#6D3A4A')], [.25, C('#A35D83')], [.48, C('#C96839')], [.64, C('#F2B076')], [.86, C('#FAD77C')], [1, C('#FCE2CF')]], C('#5A2A2A'), white, .4)
+    : mat([[-.2, C('#2F5A3A')], [.15, C('#4E7F3A')], [.35, C('#8DB043')], [.52, C('#B5D24E')], [.68, C('#D2E668')], [.84, C('#EAF59A')], [1, C('#FAFFD8')]], C('#2C5A3C'), C('#FFFFF0'), .4);
+  const under = pyro ? C('#A35D83') : P.ribTeal, lit = pyro ? C('#FFF0C8') : C('#F4FCB8');
   return (u, v) => {
     const x = rect.X0 + u * (rect.X1 - rect.X0), y = rect.Y1 - v * (rect.Y1 - rect.Y0), d = sd(x, y);
     if (d > 0) return TRANSPARENT;
     if (flat) return d > -px * 1.2 ? P.fxShade : P.fxLime;
-    const n = pth.near(x, y), L = litAt(G, x, y, {k: 1.3});
+    const n = pth.near(x, y), L = litAt(G, x, y, {k: 1.3}), ww = Math.max(1e-3, w(n.t));
+    const side = clamp(n.s / ww, -1, 1) * (n.t > twist ? -1 : 1);
     let c = shadeAt(m, L, d, px, {outline: 0});
-    // teal underside on the lower edge of the ribbon (Dendro), magenta in Pyro
-    if (n.s < 0) c = mix(c, pyro ? C('#A35D83') : P.ribTeal, .35 * smooth(0, -w(n.t), n.s));
-    if (eye && n.t < .42) c = mix(c, P.spiralNavy, .0);
+    c = mix(c, under, .7 * smooth(-.05, -.7, side));
+    c = mix(c, lit, .7 * smooth(.3, .75, side));
+    // the twist itself: the ribbon turns edge-on, a narrow bright band across it
+    const tw = Math.abs(n.t - twist) * pth.L;
+    if (twist < 1 && tw < .5) c = mix(c, lit, .45 * smooth(.5, 0, tw));
+    if (Math.abs(n.s) < px * 1.3 && n.t > .05 && n.t < .92) c = mix(c, pyro ? C('#C96839') : C('#6E9A3A'), .5);
     if (d > -px * 1.2) c = mix(c, pyro ? C('#5A2A2A') : C('#2C5A3C'), .85);
     return c;
   };
 }
 function tendrilUp(look) {
-  const pth = TU_PATH(), L = pth.L;
-  const w = t => (t < .42 ? .6 + .6 * t / .42 : 1.2 - .45 * (t - .42) / .58);
-  const base = ribbonPainter(CARD.tu, SIZE[look === 'flat' ? 'tuf' : 'tu'], pth, w, look, {eye: true});
+  // the spiral "eye" scroll at the hip (a flat ribbon curling in, round a navy core), then the broad ribbon
+  const pth = TU_PATH();
+  const w = t => (t < .42 ? .5 + .72 * t / .42 : 1.22 + .38 * Math.sin(Math.min(1, (t - .42) / .58) * Math.PI * .5));
+  const base = ribbonPainter(CARD.tu, SIZE[look === 'flat' ? 'tuf' : 'tu'], pth, w, look, {twist: 2});
   const r = CARD.tu;
-  // the navy spiral core of the eye
   return (u, v) => {
     const c = base(u, v);
     if (c[3]) return c;
     const x = r.X0 + u * (r.X1 - r.X0), y = r.Y1 - v * (r.Y1 - r.Y0), rr = Math.hypot(x, y);
-    if (rr < 1.15 && look !== 'flat') return mix(P.spiralNavy, C('#2E3E7A'), smooth(1.15, .3, rr));
+    if (rr < 1.2 && look !== 'flat') return mix(P.spiralNavy, C('#2E3E7A'), smooth(1.2, .3, rr));
     return TRANSPARENT;
   };
 }
 function tendrilLo(look) {
+  // the ribbon's long lower half: an S that swells, twists once and tapers to a sharp point
   const pth = TL_PATH();
-  return ribbonPainter(CARD.tl, SIZE[look === 'flat' ? 'tlf' : 'tl'], pth, t => 1.35 * (1 - Math.pow(t, 1.5) * .97), look);
+  return ribbonPainter(CARD.tl, SIZE[look === 'flat' ? 'tlf' : 'tl'], pth, t => 1.12 * (1 + .45 * Math.sin(Math.min(1, t / .7) * Math.PI)) * (1 - Math.pow(t, 1.7) * .97), look, {twist: .48});
 }
 
 // ---- chest core glow and the props --------------------------------------------------------------------------------
@@ -996,40 +1213,222 @@ function corePainter() {
     return [c[0], c[1], c[2], Math.round(255 * Math.pow(1 - r, 1.6) * .95)];
   };
 }
-// Entrance cocoon (scale 3, 1 u = 0.1875 b; 3.8 b tall): a vertical lozenge of wrapped dark slate-green wing
-// plates, curled hooks at the upper corners (the forewing hooks meeting at the top), lime leading edges, a glowing
-// lime core window and a lime crystal spike pointing down (v1 f120-150, sheet 08 H).
-def('cocoon', {X0: -5.2, X1: 5.2, Y0: -10.8, Y1: 10.6}, [112, 224]);
-function cocoonPainter() {
-  // kite outline: widest high up under two inward-curling horn hooks, a notch between them, tapering to the spike
-  const shell = sdSmooth([[0, 6.6], [1.6, 7.6], [3.6, 7.4], [4.6, 5.6], [4.3, 2.6], [3.3, -1.6], [2.0, -5.2], [.8, -7.6], [0, -8.2], [-.8, -7.6], [-2.0, -5.2], [-3.3, -1.6], [-4.3, 2.6], [-4.6, 5.6], [-3.6, 7.4], [-1.6, 7.6]]);
-  const hooks = sdUnion(sdTaper([[3.6, 6.4], [4.6, 8.4], [3.6, 9.8], [2.2, 9.6], [1.9, 8.6], [2.6, 8.2]], .75, .14, .9),
-    sdTaper([[-3.6, 6.4], [-4.6, 8.4], [-3.6, 9.8], [-2.2, 9.6], [-1.9, 8.6], [-2.6, 8.2]], .75, .14, .9));
-  const spike = sdPoly([[-1.0, -7.4], [0, -10.6], [1.0, -7.4]]);
-  const win = sdSmooth([[0, 6.0], [1.7, 3.0], [1.4, -1.4], [0, -5.0], [-1.4, -1.4], [-1.7, 3.0]]);
-  // two folded wing plates crossing low down (an X of seams), lime leading edges along them
-  const seamL = new Path(spline([[-4.3, 4.6], [-2.2, 1.0], [.4, -3.6], [1.6, -6.6]], 8)), seamR = new Path(spline([[4.3, 4.6], [2.2, 1.0], [-.4, -3.6], [-1.6, -6.6]], 8));
-  const seams = grooveOf([seamL, seamR, spline([[-3.8, 6.8], [-2.4, 5.0], [-1.9, 3.0]], 6), spline([[3.8, 6.8], [2.4, 5.0], [1.9, 3.0]], 6)], .34);
-  const sd = sdUnion(shell, hooks, spike);
-  const G = new Grid(CARD.cocoon, 10, (x, y) => Math.max(plateH(shell, 1.8, seams, .55)(x, y), plateH(hooks, .45)(x, y)));
-  const r = CARD.cocoon, px = (r.X1 - r.X0) / SIZE.cocoon[0];
+// ---- props: the entrance cocoon and the wrapped pod (turned shells, butterfly_geometry.mjs) -----------------------
+// PROPS holds their profiles (model units at the prop's display scale; a along the vertical axis from the model
+// centre, r the radius across, kz depth / width). Each prop is two smooth turned solids: a glowing lime inner core
+// and, just outside it, a cut-out shell of wrapped wing plates; where the shell's plates part (the windows, the seams)
+// the core's light shows, with the plates' real thickness at the edges.
+export const PROPS = {
+  // entrance cocoon (scale 3, 1 u = 0.19 b, 4 b tall): a diamond, widest a third from the top, a knot and a crystal spike below
+  cocoonCore: {a: [-10.8, 10.6], kz: .86, pts: [[-10.8, .05], [-9.8, .42], [-8.9, .8], [-8.3, 1.05], [-7.4, 1.0], [-5.0, 1.75], [-2.0, 2.6], [1.0, 3.2], [3.0, 3.35],
+    [5.0, 3.0], [7.0, 2.25], [8.8, 1.3], [10.0, .5], [10.6, .05]]},
+  cocoonShell: {a: [-8.4, 8.8], kz: .86, pts: [[-8.4, 1.25], [-7.4, 1.35], [-5.0, 2.1], [-2.0, 2.95], [1.0, 3.55], [3.0, 3.72], [5.0, 3.35], [7.0, 2.55], [8.8, 1.6]]},
+  // wrapped pod (scale 2.5, 1 u = 0.156 b): an egg r 1.4 b, 3.5 b tall
+  podCore: {a: [-10.0, 10.0], kz: .92, pts: [[-10.0, .6], [-9.3, 3.0], [-7.4, 5.6], [-4.0, 7.2], [0, 7.6], [4.0, 7.2], [7.4, 5.6], [9.3, 3.0], [10.0, .6]]},
+  podShell: {a: [-11.2, 11.2], kz: .92, pts: [[-11.2, .7], [-10.5, 3.2], [-8.6, 6.2], [-4.6, 8.4], [0, 8.95], [4.6, 8.4], [8.6, 6.2], [10.5, 3.2], [11.2, .7]]},
+};
+for (const b of Object.values(PROPS)) b.r = profile(b.pts);
+def('cocoon_core', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [128, 256]);
+def('cocoon_shell', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [256, 256]);
+def('cocoon_hook', {X0: -1.0, X1: 7.0, Y0: -1.6, Y1: 4.6}, [96, 80]);
+def('pod_core', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [64, 64]);
+def('pod_shell', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [512, 256]);
+def('pod_hook', {X0: -.6, X1: 5.6, Y0: -.8, Y1: 6.8}, [64, 80]);
+// signed azimuth of a wrap u in degrees: 0 front, + toward her left, -180..180
+const azDeg = u => ((u + .5) % 1 + 1) % 1 * 360 - 180;
+// The inner bud of the cocoon: hot white-lime at the front and back windows, nested lime V petals rising to the tip,
+// a bright crystal spike below.
+function cocoonCoreTex() {
+  const {a: [a0, a1]} = PROPS.cocoonCore, n = fbm(1201);
+  return (u, v) => {
+    const a = a1 - v * (a1 - a0), s = azDeg(u), sf = Math.min(Math.abs(s), 180 - Math.abs(s)) / 90;   // 0 at the windows .. 1 at the sides
+    let c = mix(P.cocoonWin, C('#9FC33A'), .55 * sf);
+    // nested V petals (chevrons pointing down), brighter toward the window centre lines
+    const ph = (a * .55 + sf * 2.6 + .3 * n(u * 6, v * 6)) % 1;
+    c = mix(c, C('#7FA324'), .55 * smooth(.08, 0, Math.abs(ph - .5) - .38) * (1 - .4 * sf));
+    c = mix(c, C('#F4FFD0'), .75 * smooth(.35, 0, sf) * smooth(-6, 2, a) * smooth(10.4, 6.0, a));
+    c = mix(c, C('#FBFFE8'), .6 * smooth(7.5, 10.4, a));
+    // the knot and the spike: a pale lime crystal with facet lines
+    if (a < -7.3) {
+      const f = Math.abs(Math.sin(s * Math.PI / 45));
+      c = mix(mix(P.cocoonSpike, C('#F1FCC3'), .55 * (1 - f)), C('#7FB82A'), .35 * smooth(.85, 1, f));
+    }
+    return c;
+  };
+}
+// The wrapped wing plates: two dark slate-green plates crossing in an X low on the front and the back; above the
+// crossing their lime leading edges part into the glowing V window, at the top the plates end in a scalloped rim.
+// Shapes are drawn in surface units: x = arc length round the axis at the widest ring, y = a.
+function cocoonShellTex() {
+  const {a: [a0, a1]} = PROPS.cocoonShell, n = fbm(1213), K = Math.PI * 3.5 / 180;
+  // the V window (v1 f120): a diamond of glowing bud between the plates' lime leading edges, widest at the corners
+  // (a = 4, half-width 2.8 u of arc), narrowing to the lime tip at the top and closing where the plates cross at
+  // a = -2; below it plate B lies over plate A and its edge runs on down to the knot (an X of lime edges)
+  const ww = y => (y < -2 ? 0 : y < 4 ? 2.8 * Math.sin(Math.PI / 2 * (y + 2) / 6) : 2.8 - 1.7 * Math.pow((y - 4) / 4.8, 1.3));
+  const eA = y => (y >= -2 ? -ww(y) : 2.6 * (-2 - y) / 5.6), eB = y => (y >= -2 ? ww(y) : -2.6 * (-2 - y) / 5.6), XC = -2;
+  // engraved scroll lines on the side plates (x from the side line at +-5.5)
+  // (the back half folds onto the front, so the lines stay clear of the side line at 5.5)
+  const grooves = grooveOf([spline([[3.6, 7.6], [4.5, 4.6], [4.8, .8], [4.6, -3.4], [3.9, -6.8]], 8), spline([[3.2, 6.0], [3.0, 4.4], [3.4, 3.4], [4.0, 3.6]], 6),
+    spline([[2.6, -2.6], [3.2, -4.8], [2.8, -7.2]], 6)], .24);
+  return (u, v) => {
+    const y = a1 - v * (a1 - a0);
+    let sd = azDeg(u);
+    if (Math.abs(sd) > 90) sd = (sd > 0 ? 180 : -180) - sd;      // the back repeats the front, mirrored
+    const x = sd * K, ea = eA(y), eb = eB(y);
+    if (x > ea && x < eb) return TRANSPARENT;                      // the V window over the glowing core
+    // scalloped top rim: low over the window, rising to the side corners under the hooks
+    const top = 8.8 - .35 * Math.abs(Math.sin(x * 1.1));
+    if (y > top) return TRANSPARENT;
+    // distance to the visible leading edge: A's and B's edges above the crossing, only B's below it (B lies over A)
+    const dE = y > XC ? Math.min(Math.abs(x - ea), Math.abs(x - eb)) : Math.abs(x - eb);
+    const L = .35 + .65 * azL(u, 1);
+    let c = mix(P.cocoon, P.cocoonLit, L);
+    c = mix(c, C('#2A3934'), .35 * smooth(-4, -8.5, y));
+    // A's plate under B below the crossing: a contact shadow beside B's edge
+    if (y < XC && x < eb && eb - x < .8) c = mix(c, C('#16201C'), .5 * smooth(.8, 0, eb - x));
+    const g = grooves(Math.abs(x), y);
+    if (g > .2) c = mix(c, C('#22302B'), .6 * g);
+    // the plates' lime leading edges and a lime rim at the top
+    if (dE < .42 && !(y < XC && x < eb)) c = mix(c, mix(P.fxLime, C('#E8FFB0'), smooth(.42, 0, dE) * .6), .92 * smooth(.42, .22, dE));
+    if (y > top - .32) c = mix(c, P.fxLime, .8);
+    c = mix(c, C('#4E6D5C'), .15 * n(u * 9, v * 9));
+    return c;
+  };
+}
+function cocoonHook() {
+  // a curled scroll horn at the upper corner: rises from the plate and curls outward and down (sheet 08 H)
+  // grows out of the widest corner, sweeps out and up and rolls over outward and down (a ram's-horn scroll, sheet 08 H)
+  const sd = sdTaper([[.1, -.2], [1.0, 1.5], [2.4, 2.8], [4.0, 3.1], [5.3, 2.2], [5.5, .8], [4.7, .1], [3.9, .5], [4.0, 1.3]], 1.25, .22, .8);
+  const G = new Grid(CARD.cocoon_hook, 16, plateH(sd, .5));
+  const inner = new Path(spline([[.5, .1], [1.3, 1.3], [2.5, 2.2], [3.8, 2.4], [4.6, 1.8]], 8));
+  const r = CARD.cocoon_hook, px = (r.X1 - r.X0) / SIZE.cocoon_hook[0];
   return (u, v) => {
     const x = r.X0 + u * (r.X1 - r.X0), y = r.Y1 - v * (r.Y1 - r.Y0), d = sd(x, y);
     if (d > 0) return TRANSPARENT;
-    if (spike(x, y) < 0) return mix(P.cocoonSpike, C('#F1FCC3'), smooth(.5, -.1, Math.abs(x)) * .8);
-    const dw = win(x, y);
-    if (dw < 0) {
-      // the glowing lime core window: a hot white-lime centre line, facets
-      const k = smooth(0, -1.3, dw);
-      return mix(mix(P.cocoonWin, P.cocoonWinHi, k), C('#F4FFD0'), smooth(.5, 0, Math.abs(x)) * k * .8);
-    }
-    const L = litAt(G, x, y, {k: 1.0});
-    let c = shadeAt(hooks(x, y) < 0 ? M.navy : M.cocoon, L, d, px, {outline: 0});
-    // lime leading edges on the seam ridges and round the window
-    const sm = Math.min(seamL.near(x, y).d, seamR.near(x, y).d);
-    if (sm < .16 && hooks(x, y) > 0) c = mix(c, P.fxLime, .85);
-    if (dw < .5) c = mix(c, P.fxLime, .8 * smooth(.5, .15, dw));
+    let c = shadeAt(M.cocoon, litAt(G, x, y, {k: 1.3}), d, px, {outline: 0});
+    if (inner.near(x, y).d < .16) c = mix(c, P.fxLime, .9);
     if (d > -px * 1.2) c = mix(c, C('#0E1614'), .85);
+    return c;
+  };
+}
+// The pod's inner light: white-hot at the equator seams, lime toward the poles, soft radial streaks.
+function podCoreTex() {
+  const n = fbm(1229);
+  return (u, v) => {
+    const lat = Math.abs(v - .5) * 2, st = Math.sin(u * 2 * Math.PI * 7 + 3 * n(u * 4, v * 4)) * .5 + .5;
+    let c = mix(C('#FBFFE8'), P.fxHi, smooth(.2, .9, lat));
+    c = mix(c, P.fxLime, .5 * smooth(.6, 1, lat));
+    return mix(c, C('#FFFFFF'), .25 * smooth(.7, 1, st) * (1 - lat));
+  };
+}
+// The four wings folded round her: each forewing covers the front half of one side (s 3..104 degrees from the
+// front seam), each hindwing the back half (96..177, under the forewing's rear edge), so the silhouette is solid
+// plate from every side and the core's light shows only in the front and back seams and at the poles. Forewing
+// panel: opal lobes in raised lime frames on the sculpted scroll plate, the steel spar sweeping along its lower edge,
+// a violet rim on the seam; hindwing panel: the scroll lobe with its navy spiral eye, the blade along the lower edge
+// with its glowing blue tip. The plates are height fields lit like the wing cards (litAt). Local units: X 0 at the
+// panel's front edge .. 16 at its rear edge, Y = a.
+function podShellTex() {
+  const {a: [a0, a1]} = PROPS.podShell, H = 11.2;
+  const FW = {s0: 3, s1: 104}, HW = {s0: 96, s1: 177}, rect = {X0: 0, X1: 16, Y0: -H, Y1: H};
+  // the leading-edge spar crosses the panel in a long S from the top of the front seam to the rear-bottom; the outer
+  // lobe sits above-behind it, the inner lobe below-in-front, scroll ridges and a spiral eye between
+  const fwLobe = sdEllipse(10.4, 3.6, 3.6, 4.6, 24), fwLobe2 = sdEllipse(8.6, -7.6, 1.7, 1.3, -30);
+  const fwLobes = sdUnion(fwLobe, fwLobe2);
+  const fwSpar = new Path(spline([[.4, 10.4], [2.4, 7.2], [4.6, 2.6], [7.4, -1.6], [11.0, -5.0], [15.6, -7.0]], 10));
+  const sparW = t => .8 + .25 * Math.sin(t * Math.PI);
+  const fwEye = sdCircle(13.4, -2.4, 1.5), fwVol = grooveOf([spiralPts(13.4, -2.4, .25, 1.45, 1.4, 90, 1)], .3);
+  const fwRidges = grooveOf([spline([[6.0, 9.8], [7.0, 7.4], [6.4, 4.8]], 6), spline([[14.8, 9.6], [14.4, 7.4], [15.2, 5.4]], 6),
+    spiralPts(6.4, 9.0, .25, 1.15, 1.2, 250, -1), spline([[1.2, -1.6], [2.2, -3.4], [1.6, -5.4], [1.8, -8.6]], 6), spline([[7.4, -6.6], [9.0, -8.6], [12.0, -9.6]], 6)], .42);
+  const hwEye = sdCircle(4.6, 3.4, 2.3), hwVol = grooveOf([spiralPts(4.6, 3.4, .3, 2.2, 1.5, 80, 1)], .42);
+  const hwBlade = new Path(spline([[12.8, -1.2], [9.8, -4.4], [6.4, -7.0], [2.8, -8.8], [.4, -9.4]], 10));
+  const bladeW = t => 1.3 - .85 * t;
+  const hwRidges = grooveOf([spline([[8.2, 9.4], [9.8, 6.0], [8.6, 2.2], [10.2, -.6], [12.6, -2.4]], 8), spline([[1.4, 9.2], [3.2, 7.4], [6.2, 7.4]], 6),
+    spiralPts(11.6, 6.8, .25, 1.3, 1.25, 90, 1)], .42);
+  const dome = (X, Y) => .7 * Math.sqrt(Math.max(0, 1 - ((X - 8) / 9) ** 2 - (Y / 12) ** 2));
+  const rim = (d, w) => (d > 0 && d < w ? Math.sin(Math.PI * d / w) : 0);
+  const hF = (X, Y) => {
+    const dl = fwLobes(X, Y), n = fwSpar.near(X, Y);
+    let h = dome(X, Y) + .55 * rim(dl, .9) + .5 * fwRidges(X, Y) - (dl < 0 ? .35 : 0) + .4 * bevel(Math.min(X, 16 - X) - 16, .1) * 0;
+    if (fwEye(X, Y) < 0) h += .5 * fwVol(X, Y) - .3;
+    if (n.d < sparW(n.t)) h = Math.max(h, .9 + .5 * Math.sqrt(1 - (n.d / sparW(n.t)) ** 2));
+    return h - .5 * smooth(1.2, 0, X);
+  };
+  const hH = (X, Y) => {
+    const n = hwBlade.near(X, Y);
+    let h = dome(X, Y) + .5 * hwRidges(X, Y);
+    if (hwEye(X, Y) < 0) h += .55 * hwVol(X, Y) - .35;
+    if (n.d < bladeW(n.t)) h = Math.max(h, .8 + .3 * Math.sqrt(1 - (n.d / bladeW(n.t)) ** 2));
+    return h - .5 * smooth(1.2, 0, 16 - X);
+  };
+  const GF = new Grid(rect, 10, hF), GH = new Grid(rect, 10, hH), px = 16 / 256;
+  const tipRamp = ramp([[0, '#86B8EA'], [.4, '#284AA4'], [.7, '#C1DFFA'], [1, '#F2F8FF']]);
+  return (u, v) => {
+    const a = a1 - v * (a1 - a0), py = a / H, s = Math.abs(azDeg(u)), Y = a;
+    const inFW = s >= FW.s0 && s <= FW.s1, inHW = s >= HW.s0 && s <= HW.s1;
+    if (!inFW && !inHW) return TRANSPARENT;                 // the front and back seams
+    const cap = 1;                                           // (the seams stay narrow up to the poles)
+    if (inFW && (s <= FW.s1 - 1.5 || !inHW)) {
+      const pxl = (s - FW.s0) / (FW.s1 - FW.s0), X = pxl * 16;
+      if (pxl < .55 * (1 - cap)) return TRANSPARENT;
+      const L = litAt(GF, X, Y, {k: 1.1}), dl = fwLobes(X, Y), n = fwSpar.near(X, Y), sw = sparW(n.t);
+      let c;
+      if (n.d < sw) {
+        c = shadeAt(M.steel, L, -1, px, {outline: 0});
+        const k = n.s / sw;
+        c = mix(c, RAMP.sheen(clamp(n.t * .9)), .5 * smooth(.45, .1, Math.abs(k + .4)));
+        if (n.d > sw - px * 2) c = mix(c, M.steel.line, .8);
+      } else if (dl < 0) {
+        c = membrane('dendro', X * 1.2 + 6, Y * 1.1 + 12, dl, 2.0);
+        if (dl > -.3) c = mix(c, C('#4A3C6A'), .65);
+      } else {
+        c = shadeAt(M.lime, L, -1, px, {outline: 0});
+        if (dl < .9) {
+          const vio = mat([[-.2, C('#1E1430')], [.3, C('#3A2C5C')], [.6, C('#5E4A8E')], [.85, C('#A48ADC')], [1, C('#E8D8FF')]], C('#140C22'));
+          c = mix(c, shadeAt(vio, L, -1, px, {outline: 0}), .55 * smooth(.9, .3, dl) * smooth(-.2, .8, -(X - 7.6) * .6 - (Y - 3) * .8));
+        }
+        const de = fwEye(X, Y);
+        if (de < 0 && fwVol(X, Y) < .25) c = mix(c, P.spiralNavy, .9 * smooth(.25, .05, fwVol(X, Y)));
+        if (n.d < sw + .5) c = mix(c, P.limeDeep, .4 * smooth(sw + .5, sw, n.d));
+      }
+      if (pxl < .035) c = mix(c, C('#A48ADC'), .8 * smooth(.035, .01, pxl));
+      if (pxl < .012 + .55 * (1 - cap)) c = mix(c, P.fxCore, .85);
+      return c;
+    }
+    const pxl = (s - HW.s0) / (HW.s1 - HW.s0), X = pxl * 16;
+    if (1 - pxl < .55 * (1 - cap)) return TRANSPARENT;
+    const L = litAt(GH, X, Y, {k: 1.1}), n = hwBlade.near(X, Y), bw = bladeW(n.t);
+    let c = shadeAt(M.lime, L, -1, px, {outline: 0});
+    const de = hwEye(X, Y);
+    if (de < 0 && hwVol(X, Y) < .25) c = mix(c, P.spiralNavy, .9 * smooth(.25, .05, hwVol(X, Y)));
+    if (n.d < bw) {
+      c = mix(c, RAMP.holo(clamp(.2 + n.t * .7 + n.s * .1)), .65);
+      const tip = smooth(.6, 1, n.t);
+      c = mix(c, tipRamp(tip), smooth(0, .3, tip));
+      if (n.d > bw - px * 2) c = mix(c, P.limeDeep, .6);
+    }
+    if (X < 1.2) c = mix(c, P.limeDeep, .4 * smooth(1.2, 0, X));     // tucked under the forewing's rear edge
+    if (pxl > .965) c = mix(c, C('#A48ADC'), .8 * smooth(.965, .99, pxl));
+    if (1 - pxl < .012 + .55 * (1 - cap)) c = mix(c, P.fxCore, .85);
+    return c;
+  };
+}
+function podHook() {
+  // a hindwing blade tip sticking out of the folded pod: lime root, iridescent body, a glowing blue point
+  const pth = new Path(spline([[.2, 6.2], [1.4, 4.4], [2.8, 2.6], [4.2, .8], [5.3, -.6]], 10));
+  const w = t => .9 * (1 - Math.pow(t, 1.6) * .96);
+  const sd = (x, y) => { const n = pth.near(x, y); return n.d - w(n.t); };
+  const G = new Grid(CARD.pod_hook, 16, plateH(sd, .5));
+  const r = CARD.pod_hook, px = (r.X1 - r.X0) / SIZE.pod_hook[0];
+  const tip = ramp([[0, '#A4BD6A'], [.35, '#86B8EA'], [.6, '#284AA4'], [.8, '#86B8EA'], [.92, '#C1DFFA'], [1, '#F2F8FF']]);
+  return (u, v) => {
+    const x = r.X0 + u * (r.X1 - r.X0), y = r.Y1 - v * (r.Y1 - r.Y0), d = sd(x, y);
+    if (d > 0) return TRANSPARENT;
+    const n = pth.near(x, y);
+    let c = shadeAt(M.lime, litAt(G, x, y, {k: 1.2}), d, px, {outline: 0});
+    if (n.s < 0) c = mix(c, RAMP.holo(clamp(n.t * .8 + .1)), .65);
+    c = mix(c, tip(smooth(.3, 1, n.t)), smooth(.3, .6, n.t));
+    if (d > -px * 1.2) c = mix(c, n.t > .7 ? P.tipDeep : M.lime.line, .85);
     return c;
   };
 }
@@ -1042,31 +1441,10 @@ function cocoonGlow() {
     return [c[0], c[1], c[2], Math.round(255 * .7 * Math.pow(1 - r, 1.2))];
   };
 }
-// Wrapped pod (B4/B5, scale 2.5, 1 u = 0.156 b): panels of the folded wings closing round her, lime wing plates with
-// navy frames outside and lime light leaking from the seams (v4 f440, v3 f1314).
-def('pod', {X0: -4.6, X1: 4.6, Y0: -11.2, Y1: 11.2}, [80, 192]);
-function podPainter() {
-  // one leaf-shaped wing panel (pointed top and bottom): lime scroll frame with navy frame lines, a white-mint
-  // iridescent lobe, a hot lime seam glow along its edges (light leaking between the panels)
-  const shell = sdSmooth([[0, 10.8], [2.2, 8.4], [3.8, 3.6], [4.2, -1.2], [3.4, -6.2], [1.8, -9.4], [0, -10.8], [-1.8, -9.4], [-3.4, -6.2], [-4.2, -1.2], [-3.8, 3.6], [-2.2, 8.4]]);
-  const lobe = sdSmooth([[-.6, 6.6], [1.8, 5.0], [2.4, 1.4], [1.2, -2.6], [-1.0, -1.6], [-1.8, 1.8], [-1.6, 4.8]]);
-  const frames = grooveOf([spline([[0, 10.4], [-2.6, 6.0], [-3.0, 0], [-2.0, -6.0], [0, -10.4]], 8), spiralPts(1.2, -6.0, .2, 1.4, 1.2, 60, 1)], .32);
-  const G = new Grid(CARD.pod, 10, (x, y) => plateH(shell, 1.2)(x, y) + .45 * frames(x, y) - (lobe(x, y) < 0 ? .3 : 0));
-  const r = CARD.pod, px = (r.X1 - r.X0) / SIZE.pod[0];
-  return (u, v) => {
-    const x = r.X0 + u * (r.X1 - r.X0), y = r.Y1 - v * (r.Y1 - r.Y0), d = shell(x, y);
-    if (d > 0) return TRANSPARENT;
-    const dl = lobe(x, y);
-    if (dl < 0) return membrane('dendro', x * 1.5 + 9, y * 1.1 + 6, dl, 2.4);
-    const L = litAt(G, x, y, {k: 1.0});
-    let c = frames(x, y) > .5 ? shadeAt(M.navy, L, d, px, {outline: 0}) : shadeAt(M.lime, L, d, px, {outline: 0});
-    if (dl < .4) c = mix(c, C('#4A3C6A'), .5 * smooth(.4, 0, dl));
-    if (d > -px * 2.5) c = mix(c, P.fxCore, .85);                          // lime light leaking at the seams
-    return c;
-  };
-}
 // Orb (B4): a translucent lime glass sphere (wrap texture of a turned sphere) with bright rim; gyroscope ring.
 def('orb', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [64, 64]);
+def('orb_cap', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [32, 32]);
+for (const k of [50, 70, 85, 95]) def('orb_a' + k, {X0: 0, X1: 1, Y0: 0, Y1: 1}, [32, 32]);
 def('ring', {X0: -8, X1: 8, Y0: -8, Y1: 8}, [128, 128]);
 def('ringw', {X0: 0, X1: 1, Y0: 0, Y1: 1}, [64, 16]);
 function orbTex() {
@@ -1078,6 +1456,11 @@ function orbTex() {
     c = mix(c, C('#F4FFD8'), smooth(.6, 1, sw) * .6);
     return [c[0], c[1], c[2], Math.round(255 * (.42 + .3 * lat + .15 * smooth(.6, 1, sw)))];
   };
+}
+function orbCap(inner = 0) {
+  // the orb's caps and step ledges: flat glass discs / annuli (inner = inner radius ratio), the orb's polar colour
+  const c = mix(C('#D2FA8E'), C('#9CDB7D'), .6);
+  return (u, v) => { const r = Math.hypot(u - .5, v - .5) * 2; return r > 1 || r < inner ? TRANSPARENT : [c[0], c[1], c[2], Math.round(255 * .66)]; };
 }
 function ringPainter() {
   return (u, v) => {
@@ -1120,18 +1503,24 @@ export function butterflySprites() {
   add('tu_flat', 'tuf', tendrilUp('flat')); add('tl_flat', 'tlf', tendrilLo('flat'));
   add('mane_f', 'mane_f', maneFront()); add('mane_fs', 'mane_fs', maneCorner(317, false)); add('mane_s', 'mane_s', maneSide());
   add('mane_bs', 'mane_bs', maneCorner(337, true)); add('mane_b', 'mane_b', maneBack());
-  add('helm', 'helm', helmPainter()); add('cheek', 'cheek', cheekPainter()); add('crown', 'crown', crownPainter()); add('helm_side', 'helm_side', helmSidePainter());
+  add('helm', 'helm', helmPainter()); add('cheek', 'cheek', cheekPainter()); add('crown', 'crown', crownPainter());
   add('eye', 'eye', eyePainter()); add('chev', 'chev', chevPainter());
   add('antenna', 'antenna', antennaPainter()); add('streamer', 'streamer', streamerPainter());
   add('fan', 'fan', bladePainter(CARD.fan, SIZE.fan, FAN_BLADES())); add('fanb', 'fanb', bladePainter(CARD.fanb, SIZE.fanb, FANB_BLADES())); add('shplate', 'shplate', shplatePainter());
   add('crescent', 'crescent', crescentPainter(false)); add('crescent_tell', 'crescent_tell', crescentPainter(true)); add('shard', 'shard', shardPainter()); add('diamond', 'diamond', diamondPainter());
-  add('skin', 'skin', skinTex()); add('thigh', 'thigh', thighTex()); add('boot', 'boot', bootTex()); add('hoofw', 'hoofw', hoofTex());
-  add('furw', 'furw', furTile(941)); add('helmw', 'helmw', helmTex());
-  add('boot_tuft', 'boot_tuft', bootTuft()); add('boot_flare', 'boot_flare', bootFlare()); add('knee', 'knee', kneeSpikes()); add('hoof_claws', 'hoof_claws', hoofClaws());
+  add('torso_w', 'torso_w', torsoTex()); add('pelvis_w', 'pelvis_w', pelvisTex()); add('pelvis_w_cap', 'pelvis_w_cap', pelvisCap());
+  add('thigh_w', 'thigh_w', thighTex()); add('thigh_w_cap', 'thigh_w_cap', thighCap());
+  add('boot_s', 'boot_s', bootShin()); add('boot_s_cap', 'boot_s_cap', bootCapTop()); add('boot_f', 'boot_f', bootFoot()); add('boot_f_cap', 'boot_f_cap', bootCapBot());
+  add('hoof_w', 'hoof_w', hoofTex()); add('hoof_w_cap', 'hoof_w_cap', hoofCap());
+  add('furw', 'furw', furTile(941)); add('helmw', 'helmw', helmTex()); add('antw', 'antw', (u, v) => mix(mix(P.antShade, P.ant, .6), P.antHi, Math.sin(u * Math.PI) ** 2)); add('helmw_cap', 'helmw_cap', helmCap()); add('furw_cap', 'furw_cap', furCap());
+  add('fur_s', 'fur_s', furShin()); add('fur_f', 'fur_f', furFoot()); add('knee', 'knee', kneeSpikes()); add('hoof_claws', 'hoof_claws', hoofClaws());
   add('hipplate', 'hipplate', hipPlate()); add('fin', 'fin', finPainter());
   add('core', 'core', corePainter(), true);
-  add('cocoon', 'cocoon', cocoonPainter()); add('cocoon_glow', 'cocoon_glow', cocoonGlow(), true); add('pod', 'pod', podPainter());
-  add('orb', 'orb', orbTex(), true); add('ring', 'ring', ringPainter(), true); add('ringw', 'ringw', ringBandTex(), true);
+  add('cocoon_core', 'cocoon_core', cocoonCoreTex()); add('cocoon_shell', 'cocoon_shell', cocoonShellTex()); add('cocoon_hook', 'cocoon_hook', cocoonHook());
+  add('cocoon_glow', 'cocoon_glow', cocoonGlow(), true);
+  add('pod_core', 'pod_core', podCoreTex()); add('pod_shell', 'pod_shell', podShellTex()); add('pod_hook', 'pod_hook', podHook());
+  add('orb', 'orb', orbTex(), true); add('orb_cap', 'orb_cap', orbCap(), true);
+  for (const k of [50, 70, 85, 95]) add('orb_a' + k, 'orb_a' + k, orbCap(k / 100), true); add('ring', 'ring', ringPainter(), true); add('ringw', 'ringw', ringBandTex(), true);
   return out;
 }
 export const spriteId = name => 'rlk:mboss/butterfly/' + name;

@@ -14,6 +14,7 @@ execute in minecraft:overworld run forceload remove 176 -16 223 31
 data remove storage rlk:mboss reg
 data remove storage rlk:mboss byid
 data remove storage rlk:mboss met
+data remove storage rlk:mboss tlast
 scoreboard objectives remove mb
 scoreboard objectives remove mres
 scoreboard objectives remove pkMb

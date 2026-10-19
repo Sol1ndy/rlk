@@ -4,6 +4,8 @@
 # The kit: every decal goes (tele/clear), the banner if it still shows, the meter / low-gravity icon / hint
 # (field/drop -> hud/kit_off); " · 그로기" on the name line from here to the end of the recovery.
 scoreboard players set #fgBrkQ mb 0
+# the device low in the closing wave_drop (read before p/cancel clears the clock): the grounded break_low (FID-1)
+function rlk:mboss/fieldgen/brk/low
 function rlk:mboss/lib_clear
 function rlk:mboss/fieldgen/p/cancel
 function rlk:mboss/fieldgen/fx/tele/clear
@@ -14,7 +16,8 @@ function rlk:mboss/fieldgen/hud/groggy_on
 scoreboard players set #fgSt mb 6
 scoreboard players set #fgT mb -1
 scoreboard players set #fgMv mb 0
-function rlk:mboss/fieldgen/rig/play/break
+execute if score #fgBrkLo mb matches 1 run function rlk:mboss/fieldgen/rig/play/break_low
+execute unless score #fgBrkLo mb matches 1 run function rlk:mboss/fieldgen/rig/play/break
 function rlk:mboss/line/say {t:"역장 붕괴",c:"#FFE7A0",gap:2,hold:40,snd:2}
 function rlk:mboss/fieldgen/seq_f/brk/start
 function rlk:mboss/fieldgen/hud/refresh

@@ -1,6 +1,3 @@
 # kick clock 28
-execute at @s rotated as @s rotated ~ 0 run particle minecraft:dust{color:[0.898f,0.984f,0.784f],scale:0.7} ^-0.55 ^0.001 ^-0.719 0.1 0.1 0.1 0 2 force @a[tag=player]
-execute if score #bp1S mb matches 1 run execute at @s rotated as @s rotated ~90 0 positioned ^ ^ ^0.25 if function rlk:mboss/mv/ok run tp @s ~ ~ ~
-execute unless score #bp1S mb matches 1 run execute at @s rotated as @s rotated ~-90 0 positioned ^ ^ ^0.25 if function rlk:mboss/mv/ok run tp @s ~ ~ ~
-particle minecraft:poof ~ ~0.1 ~ 0.3 0.02 0.3 0.02 3 force @a[tag=player]
-playsound minecraft:block.moss_carpet.step hostile @a[tag=player] ~ ~ ~ 0.5 1.2 0.17
+execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"ripple",pos:"^0.054 ^0.664 ^0.549",rot:"~ ~",bb:"center",roll:0,spin:160,s0:0.4,s1:1.4,move:"0f,0f,0f",life:6,fade:2,col:14153881}
+playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 0.5 1.6 0.17

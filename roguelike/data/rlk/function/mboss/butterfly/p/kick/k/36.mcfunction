@@ -1,3 +1,8 @@
 # kick clock 36
-execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"ripple",pos:"^0.054 ^0.664 ^0.549",rot:"~ ~",bb:"center",roll:0,spin:160,s0:0.4,s1:1.4,move:"0f,0f,0f",life:6,fade:2,col:14153881}
-playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 0.5 1.6 0.17
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated ~ 0 positioned ~ 201 ~ run particle minecraft:dust{color:[0.682f,0.878f,0.545f],scale:1.2} ^ ^0.2 ^3 0.3 0.1 2.5 0 6 force @a[tag=player]
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p1b,limit=1] rotated ~ 0 positioned ~ 201 ~ run particle minecraft:dust{color:[0.718f,0.847f,0.686f],scale:1} ^ ^0.2 ^3 0.3 0.1 2.5 0 8 force @a[tag=player]
+execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/p/land
+function rlk:mboss/butterfly/fx/snd/land
+playsound minecraft:block.moss.fall hostile @a[tag=player] ~ ~ ~ 0.6 0.9 0.2
+particle minecraft:poof ~ ~0.1 ~ 0.4 0.05 0.4 0.02 6 force @a[tag=player]
+particle minecraft:block{block_state:"minecraft:moss_block"} ~ ~0.1 ~ 0.5 0.05 0.5 0 8 force @a[tag=player]

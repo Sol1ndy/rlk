@@ -1,4 +1,4 @@
 # sweep clock 19
-execute rotated as @s rotated ~ 0 positioned ^2.302 ^5.027 ^-1.389 run particle minecraft:dust{color:[0.973f,0.561f,0.224f],scale:1.2} ~ ~ ~ 0.1 0.1 0.1 0 2 force @a[tag=player]
-execute rotated as @s rotated ~ 0 positioned ^-2.302 ^5.027 ^-1.389 run particle minecraft:dust{color:[0.973f,0.561f,0.224f],scale:1.2} ~ ~ ~ 0.1 0.1 0.1 0 2 force @a[tag=player]
-function rlk:mboss/butterfly/fx/snd/wing_dive
+# the wing slam: two vertical flame crescents at the wing tips
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p13p,limit=1] positioned ~ ~2.8 ~ run function rlk:mboss/butterfly/fx/p/flame_slam
+function rlk:mboss/butterfly/fx/snd/flame_slam

@@ -1,10 +1,5 @@
 # dash clock 6
-particle minecraft:dust{color:[0.78f,0.859f,0.459f],scale:0.6} ~ ~1.0 ~ 0.9 0.9 0.9 0 3 force @a[tag=player]
-particle minecraft:end_rod ~ ~1.0 ~ 0.8 0.6 0.8 0.02 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.965f,0.973f],scale:0.5} ~0 ~1.2 ~1.45 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.965f,0.973f],scale:0.5} ~1.26 ~1.2 ~0.73 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.965f,0.973f],scale:0.5} ~1.26 ~1.2 ~-0.72 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.965f,0.973f],scale:0.5} ~0 ~1.2 ~-1.45 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.965f,0.973f],scale:0.5} ~-1.26 ~1.2 ~-0.73 0 0 0 0 1 force @a[tag=player]
-particle minecraft:dust{color:[0.902f,0.965f,0.973f],scale:0.5} ~-1.26 ~1.2 ~0.73 0 0 0 0 1 force @a[tag=player]
-playsound minecraft:block.amethyst_block.chime hostile @a[tag=player] ~ ~ ~ 0.3 1.8 0.1
+execute positioned as @e[type=minecraft:marker,tag=rlk_mb_bf_p3a,limit=1] run function rlk:mboss/mv/glide {t:2}
+execute at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_bf_p3a,limit=1] feet rotated ~ 0 run function rlk:mboss/butterfly/fx/p/dash_streak
+execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"glow",pos:"^ ^1.2 ^",rot:"~ ~",bb:"center",roll:0,spin:0,s0:1.2,s1:0.4,move:"0f,0f,0f",life:4,fade:2,col:11729885}
+function rlk:mboss/butterfly/fx/snd/dash

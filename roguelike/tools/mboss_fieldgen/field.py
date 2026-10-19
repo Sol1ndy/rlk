@@ -29,7 +29,7 @@ fg.rw.
 import math
 
 from .api import (Pattern, TL, ev_or, clip_len, CLIPS, DMG, KB, CY, NS, L, CORE_FIELD_H, rest_anchor, f_clip_anchor,
-                  f_body_pos, rocks_cancel)
+                  f_body_pos, f_core_h, rocks_cancel, c_blade_pad, c_blade_hr)
 
 BODY = '@e[type=minecraft:husk,tag=rlk_mb_body,limit=1]'
 PLAYER = '@e[tag=rlk_body,limit=1]'
@@ -83,9 +83,11 @@ F2_END = clip_len('frock') if 'frock' in CLIPS else 110
 F2_GAP, F2_N, F2_TGAP, F2_NT, F2_CAP = 6, 8, 8, 5, 2
 F2_THETA = [round(90 * (7 - k) / 7) for k in range(F2_N)]    # the arc offsets 90 77 64 51 39 26 13 0 (C6 F1)
 F2_PAIR = 6                                              # bursts 7-8 (index 6, 7) share one volley group
-SLAB_REACH = 1.45                                        # the slab's reach from its flight line (the w 2.4 line + pad)
-BLADE_PAD = 0.65                                         # the framework blade's point radius (FW-1: reach = hr + 0.65)
-SLAB_HR = round(SLAB_REACH - BLADE_PAD, 2)               # 0.8 (Q16: if the blade pad changes, only BLADE_PAD moves)
+SLAB_REACH = 1.45                                        # the slab's design reach from its flight line (spec Q16)
+BLADE_PAD = c_blade_pad()                                # the framework blade's reach beyond hr (read from build_mboss_core.py:
+                                                         # 0.3 since the butterfly review fix FW-1; it was 0.65)
+SLAB_HR = c_blade_hr(SLAB_REACH)                         # 1.2 in the framework's tenths: reach 1.5 b = the w 2.4 throw lane +
+                                                         # its 0.3 pad (Q16: about 1.45 b whatever the blade rule; was 0.8 + 0.65)
 SLAB_RISE = (4.0, 5.0, 6.0, 4.5, 5.5, 4.0, 6.0, 5.0)     # the slabs hover 4-6 b up (spec C6 section 7)
 assert F2_THROW - 10 > F2_BURST + F2_GAP * (F2_NT - 1) + 2 and F2_CRUMBLE > F2_THROW + F2_TGAP * (F2_NT - 1)
 assert F2_END >= F2_THROW + F2_TGAP * (F2_NT - 1) + 8
@@ -119,6 +121,28 @@ def _w3(v):
 
 
 W3 = {v: _w3(v) for v in (1, 2)}
+
+
+def w3_core(v, t):
+    """The rig core's height at pattern clock t of the 3rd wave of variant v (its clip's core anchor, linear between the
+    events: the closing wave_drop sinks it 4.1 -> 3.6 over the charge, drops it to 1.3 on the floor, then lifts it;
+    fix round FID-7). Before the clip (waves 1-2) and with the stub rig: the field core CORE_H."""
+    w = W3[v]
+    if not w['real'] or t < w['clip_at']:
+        return CORE_H
+    return f_core_h(w['clip'], t - w['clip_at'])
+
+
+# The closing wave_drop (fix round FID-1 / FID-4): the pattern clocks where the device has dropped (drop + 1 ..) and is
+# still in the lower half of its rise (.. (lift + risen) / 2 - 1): a break there plays the rig's grounded break_low, and
+# the meter's per-count fx follow the core height (WD_CORE: clock -> height while the clip runs).
+WD_AT = W3[2]['clip_at'] if W3[2]['real'] and W3[2]['clip'] == 'wave_drop' else None
+if WD_AT is not None:
+    W3_LOW = (WD_AT + ev_or('wave_drop', 'drop', 40) + 1,
+              WD_AT + (ev_or('wave_drop', 'lift', 63) + ev_or('wave_drop', 'risen', 83)) // 2 - 1)
+    WD_CORE = {t: w3_core(2, t) for t in range(WD_AT, WD_AT + clip_len('wave_drop') + 1)}
+else:
+    W3_LOW, WD_CORE = None, {}
 W3_SAME = W3[1] == W3[2]           # one 3rd wave for both (the stub rig): no variant guards
 W_ENDS = {(v, tri): max(W_IMPACT[2] + (2 * W_TRI_GAP if tri else 0) + W_TAIL, W3[v]['end']) for v in (1, 2) for tri in (0, 1)}
 W_LEN, W_MAX = W_ENDS[(1, 0)], max(W_ENDS.values())
@@ -232,8 +256,10 @@ def fzone(g):
         tl.at(t, f'function {NS}p/{key}/event')
     for t in F1_STRIKES:
         tl.at(t + 25, g.snd('debris_land'))
-    tl.at(F1_OFF, g.sound('block.chain.place', 0.6, 0.9), g.sound('block.copper_trapdoor.close', 0.6, 0.9))
-    tl.at(F1_END, g.play('field_idle'), g.end())
+    # the link beams go off (footage Z+204..208): the rig back to field_idle with its own beams-off sounds, so the last two
+    # eruptions follow with the gyroscope spinning again (fix round FID-6; the pattern still ends in field_idle)
+    tl.at(F1_OFF, g.play('field_idle'), g.sound('block.chain.place', 0.6, 0.9), g.sound('block.copper_trapdoor.close', 0.6, 0.9))
+    tl.at(F1_END, g.end())
     tl.write([f'# F1 감소 영역 (clip field_erupt; @s = body at the centre): decals {F1_EVENTS} (strike +{F1_TELL}), end {F1_END}.',
               'scoreboard players set #fq11P mb 0'],
              ['# fzone tick: track the player (3 deg/t), the decals again after a pause.'], extra_tick=[TURN, redraw])
@@ -266,7 +292,7 @@ def frock(g):
     sigma * 90 (7 - k) / 7 deg; sigma drawn once), each hz/disc r 1.8 (tell 10, jumpable: height to 1.2 b, KB 4, Geo
     1.3) with a violet decal; bursts 7-8 are one volley group (a standing player takes one burst); a kit slab tears out
     at every burst and hovers 4-6 b up; from the throw tick one slab every 8 t at the player's feet locked 10 t ahead
-    (a dmg-0 line w 2.4 + the violet line decal, then a blade pj 1.5 b/t, reach 1.45 b, KB 3, Geo 1.1, life 24, its
+    (a dmg-0 line w 2.4 + the violet line decal, then a blade pj 1.5 b/t, reach 1.5 b, KB 3, Geo 1.1, life 24, its
     own group); at most 2 slab hits per run (the later throws crumble); every unthrown slab crumbles at the clip end."""
     key, tl, pid = 'frock', TL(g, 'frock'), 12
     W, S, R, Fl = 'rlk_mb_fg_p12w', 'rlk_mb_fg_p12s', 'rlk_mb_fg_p12r', 'rlk_mb_fg_p12f'
@@ -332,7 +358,7 @@ def frock(g):
         f'{KFN}tele/line with storage rlk:mboss fg.f2l',
         g.sound('block.chain.hit', 0.5, 0.8)])
     g.pw(key, 'throw_go', [
-        f'# @s = the slab: a blade projectile at the locked feet (1.5 b/t, life 24, hr {L.num(SLAB_HR)} = reach {L.num(SLAB_REACH)} b, its own group).',
+        f'# @s = the slab: a blade projectile at the locked feet (1.5 b/t, life 24, hr {L.num(SLAB_HR)} = reach {L.num(SLAB_HR + BLADE_PAD)} b, its own group).',
         f'scoreboard players set @s mbId {pid}',
         f'tag @s remove {S}', f'tag @s remove {R}', f'tag @s add {Fl}',
         'data merge entity @s {teleport_duration:1}',
@@ -434,8 +460,19 @@ def waves(g):
         g.pw(key, f'mk{tell}', [f'# @s = body at the centre: a front with a {tell} t charge (the hazard, the violet ring decal, the',
                                 '# charge sphere at the core, the charge hiss).'] + front(tell)
              + [at_core(g.fx('wave_charge', t=tell)), g.snd('wave_charge')])
-    g.pw(key, 'mkx', ['# @s = body: an extra front of the triple 3rd wave (tell 10): the hazard, a fresh ring decal, a charge pulse.']
-         + front(10) + [at_core(g.fx('wave_pulse')), g.snd('wave_charge2')])
+    g.pw(key, 'mkx', ['# @s = body: an extra front of the triple 3rd wave (tell 10): the hazard, a fresh ring decal, its sound (the',
+                      '# charge pulse is on the timeline, at the core\'s height of that variant: fix round FID-7).']
+         + front(10) + [g.snd('wave_charge2')])
+    # the 3rd wave's charge sphere: at the core for the opening (wave_long holds it at 4.1); the closing wave_drop sinks the
+    # core 0.5 b over its charge, so its sphere sits at the mean of the core's heights over the charge (FID-7)
+    sph = {}
+    for v in (1, 2):
+        w = W3[v]
+        hs = round((w3_core(v, w['start']) + w3_core(v, W_IMPACT[2] - 1)) / 2, 2)     # the charge: its start .. the beam
+        sph[v] = f'mk{w["tell"]}' if abs(hs - CORE_H) < 0.05 else f'mk{w["tell"]}h{int(round(hs * 100))}'
+        if sph[v] != f'mk{w["tell"]}':
+            g.pw(key, sph[v], [f'# @s = body: the {w["tell"]} t front of the closing 3rd wave, its charge sphere at {L.num(hs)} b (the sinking core).']
+                 + front(w['tell']) + [at_core(g.fx('wave_charge', t=w['tell']), hs), g.snd('wave_charge')])
     g.pw(key, 'grow', [
         '# @s = a live front (from tick, before hz/all): radius 2.5 + 0.55 k b at its k-th active tick (this tick\'s hit',
         '# test), inner radius r - 2.5 (tenths: r = 25 + 11 k / 2).',
@@ -487,11 +524,12 @@ def waves(g):
         'execute if score #fgTri mb matches 1 run scoreboard players set #fq21T mb 1'])
     g.pw(key, 'fin', ['# The last front has expired: the pattern ends.', f'kill @e[type=minecraft:marker,tag={F}]', g.end()])
 
-    def strike_fx(S, h, guard=None, main=True):
-        """The fx of one front's strike S (on the body = the floor centre); guard = an execute condition."""
+    def strike_fx(S, h, guard=None, main=True, beam=None):
+        """The fx of one front's strike S (on the body = the floor centre); guard = an execute condition; h = the core's
+        height for the 1-tick beam, drawn on the rig's own beam tick `beam` when the clip has one (fix round FID-7)."""
         G = (lambda ln: ex(guard, ln)) if guard else (lambda ln: ln)                               # noqa: E731
         tl.at(S - 1, G(band()))
-        tl.at(S, G(g.fx('wave_beam', h=float(h))), G(g.snd('wave_beam')))
+        tl.at(S if beam is None else beam, G(g.fx('wave_beam', h=float(h))), G(g.snd('wave_beam')))
         if not main:
             tl.at(S + 1, G(g.fx('wave_burst')))
             return
@@ -502,9 +540,9 @@ def waves(g):
             tl.at(S + 3 * k, G(g.fx('wave_fire', r=round(r, 2))),
                   G(f'execute facing entity {PLAYER} feet rotated ~ 0 positioned ^ ^ ^{L.num(r, 2)} run {g.snd("wave_ring")}'))
 
-    def pulses(t0, S, guard=None):
+    def pulses(t0, S, guard=None, v=None):
         for t in range(t0 + 8, S, 8):
-            ln = at_core(g.fx('wave_pulse'))
+            ln = at_core(g.fx('wave_pulse'), None if v is None else w3_core(v, t))
             tl.at(t, ex(guard, ln) if guard else ln)
 
     # wave 1 (the core plays `wave` at 0) and wave 2
@@ -512,9 +550,10 @@ def waves(g):
           f'function {NS}p/{key}/mk{W_IMP0}')
     t2 = W_IMPACT[1] - W_IMP0
     tl.at(t2, g.play('wave'), f'function {NS}p/{key}/mk{W_IMP0}')
+    w_beam = W_IMP0 - ev_or('wave', 'beam', W_IMP0)                 # the rig's beam is 1 t before the impact
     for t0, S in ((0, W_IMPACT[0]), (t2, W_IMPACT[1])):
         pulses(t0, S)
-        strike_fx(S, CORE_H)
+        strike_fx(S, f_core_h('wave', ev_or('wave', 'beam', W_IMP0)), beam=S - w_beam)
     # wave 3, per variant (opening / closing)
     S3 = W_IMPACT[2]
     for v in ((1,) if W3_SAME else (1, 2)):
@@ -525,14 +564,19 @@ def waves(g):
         g.pw(key, f'w3_{v}', [
             f'# The 3rd wave ({"opening" if v == 1 else "closing"}): the triple check, the front ({w["tell"]} t charge), the real end '
             f'({e0}, triple {e1}).',
-            f'function {NS}p/{key}/tri', f'function {NS}p/{key}/mk{w["tell"]}',
+            f'function {NS}p/{key}/tri', f'function {NS}p/{key}/{sph[v]}',
             g.set_len(e0), f'execute if score #fq21T mb matches 1 run {g.set_len(e1)}'])
         tl.at(w['clip_at'], gx(g.play(w['clip'])))
         tl.at(w['start'], gx(f'function {NS}p/{key}/w3_{v}'))
-        pulses(w['start'], S3, vg)
-        strike_fx(S3, w['core'], vg)
+        pulses(w['start'], S3, vg, v)
+        b3 = (w['clip_at'] + ev_or(w['clip'], 'beam', w['tell'])) if w['real'] else None
+        strike_fx(S3, w3_core(v, b3) if b3 is not None else w['core'], vg, beam=b3)
+        tri = 'if score #fq21T mb matches 1' + (f' {vg}' if vg else '')
         for m in (1, 2):
-            strike_fx(S3 + m * W_TRI_GAP, w['core'], 'if score #fq21T mb matches 1' + (f' {vg}' if vg else ''), main=False)
+            # the extra fronts: the beam from the core where it is then (on the floor in the closing wave_drop) and the
+            # charge pulse of its tell at the core (FID-7)
+            strike_fx(S3 + m * W_TRI_GAP, w3_core(v, S3 + m * W_TRI_GAP), tri, main=False)
+            tl.at(S3 + m * W_TRI_GAP - 10, ex(tri, at_core(g.fx('wave_pulse'), w3_core(v, S3 + m * W_TRI_GAP - 10))))
         for (vv, tri), e in W_ENDS.items():
             if vv == v:
                 tl.at(e, gx(ex(f'{"if" if tri else "unless"} score #fq21T mb matches 1', f'function {NS}p/{key}/fin')))

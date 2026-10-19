@@ -8,9 +8,11 @@ execute if score @s dead matches 1 run return 0
 $execute unless data storage rlk:mboss byid.$(id) run return run tellraw @s [{text:"[중간보스 테스트] ",color:"#E0703A",bold:true},{text:"등록되지 않았거나 꺼진 중간보스입니다: $(id)",color:"gray",bold:false}]
 $execute store result score #mbForce mb run data get storage rlk:mboss byid.$(id).n
 # the boss of this test, for the replay links (test/defeat runs after test/end has forgotten cur)
-$data modify storage rlk:mboss tlast set value {id:"$(id)"}
+$data modify storage rlk:mboss tlast set value {id:"$(id)",ch:1}
 $scoreboard players set #mbReqCh mb $(ch)
 execute unless score #mbReqCh mb matches 1.. run scoreboard players set #mbReqCh mb 1
+# ... and its chapter, so [다시 하기] replays the same chapter (test/defeat_msg, test/won_msg)
+execute store result storage rlk:mboss tlast.ch int 1 run scoreboard players get #mbReqCh mb
 execute if score @s vMap matches 1 run function rlk:view/map_close
 execute if score @s pkMode matches 1.. run function rlk:lvup/exit
 execute unless score #active room matches 1 run function rlk:run/save_pos

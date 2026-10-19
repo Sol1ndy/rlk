@@ -1,5 +1,7 @@
-// Clip compiler shared by the mid-boss display-entity rigs (Corrupted Guardian, Moonlit Butterfly). Moved out of
-// build_mboss_guardian_rig.mjs; each rig generator supplies its parts, its pose sampler and its names.
+// Clip compiler shared by the display-entity boss rigs (Corrupted Guardian, Moonlit Butterfly, Field Generator, and the
+// chapter bosses). Moved out of build_mboss_guardian_rig.mjs; each rig generator supplies its parts, its pose sampler
+// and its names. The opt-in rig-runtime helpers below the compiler (part and shadow summons, follow lists, tracks) are
+// documented in tools/mboss_shape_lib.md; a rig that does not use them builds exactly as before.
 //
 // Runtime model: the anchor (the boss body) runs rig/tick each tick; the parts follow its position and yaw, and the
 // current clip applies its keys. Clips are compiled per part into interpolation segments: at tick a a part
@@ -12,7 +14,9 @@
 //   cfg.obj       objective prefix ('gdRig': gdRigC clip id, gdRigT clip tick, gdRigY face scratch)
 //   cfg.fn        (name, lines) writer of a function file below the rig directory
 //   cfg.parts     part names in UUID order; cfg.uuidOf(part) -> UUID string
-//   cfg.tol       {t, s, r: {part: degrees}, rDefault}: client-interpolation tolerances (display space)
+//   cfg.tol       {t, s, r: {part: degrees}, rDefault, tp?: {part: blocks}}: client-interpolation tolerances (display
+//                 space); tp is the translation tolerance per part (default t), e.g. about 0.03 b on the long tail and
+//                 torso parts of a 20 b boss and t (0.012) on the head and paws (rigtech.md §2.8)
 //   cfg.skipStep  part -> true for parts the rotation checks skip (afterimages that follow another part)
 //   cfg.modelOf   {channel: [part, {value: model}]}: discrete pose channels that swap a part's item model
 //   cfg.swapLine  (part, model) -> the item-model swap command
@@ -36,10 +40,11 @@ export function interp(a, b, u) { return {t: lerp(a.t, b.t, u), q: slerp(a.q, b.
 
 export function createRigCompiler({ns, obj, fn, parts, uuidOf, tol, skipStep = () => false, modelOf = {}, swapLine, debug = null,
   maxStepDeg = 120, maxSegDeg = 120, subTol = 35}) {
+  for (const n of Object.keys(tol.tp || {})) if (!parts.includes(n)) throw new Error(`tol.tp: unknown part ${n}`);
   function close(x, y, n) {
     const big = Math.max(...y.s.map(Math.abs), ...x.s.map(Math.abs));
     if (big < 1e-4) return true;           // hidden both ways
-    if (len(sub(x.t, y.t)) > tol.t) return false;
+    if (len(sub(x.t, y.t)) > (tol.tp?.[n] ?? tol.t)) return false;
     if (Math.max(...x.s.map((v, i) => Math.abs(v - y.s[i]))) > tol.s * Math.max(1, big)) return false;
     return qAngle(x.q, y.q) <= (tol.r[n] ?? tol.rDefault);
   }
@@ -165,4 +170,186 @@ export function createRigCompiler({ns, obj, fn, parts, uuidOf, tol, skipStep = (
     fn('face/set', [`# Set the anchor yaw: function ${ns}/face/set {yaw:<degrees>}. @s = rig anchor.`, '$rotate @s $(yaw) 0']);
   }
   return {close, segments, stepViolations, compileClip, writeDispatch, writeFace};
+}
+
+// ==== rig-runtime helpers (opt-in; the Guardian, butterfly and field generator builders write their own) ===============
+// SNBT numbers as the rigs write them: the shortest JS form, a leading "0." as "." (the Azhdaha shadow's .8f).
+const fnum = v => String(+v).replace(/^(-?)0\./, '$1.');
+const uuidNbt = u => (Array.isArray(u) ? `[I;${u.join(',')}]` : u);
+const tagsNbt = t => (Array.isArray(t) ? JSON.stringify(t) : t);
+
+// ---- summons: per-rig culling box and view range ----------------------------------------------------------------------
+// One rig part, an item_display at the execution position in the display transform `pose` ({t, q, s}). uuid is the
+// int-array SNBT ('[I;a,b,c,d]') or [a, b, c, d]; tags a list of tag names. cull = the frustum-culling box (width,
+// height: ±width/2 round the entity position, 0..height up; 0 turns culling off); every part sits at the anchor, so a
+// 20+ b boss needs {width: 30, height: 12} instead of the 16 x 16 of the small rigs (rigtech.md §2.5).
+export function summonPart({uuid, tags, item, brightness, pose, viewRange = 3, cull = {width: 16, height: 16}, sky = 15}) {
+  return `summon minecraft:item_display ~ ~ ~ {UUID:${uuidNbt(uuid)},Tags:${tagsNbt(tags)},billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:${fnum(viewRange)}f,width:${fnum(cull.width)}f,height:${fnum(cull.height)}f,shadow_radius:0f,brightness:{block:${brightness},sky:${sky}},transformation:${nbt(pose)},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${item}"}}}`;
+}
+// The shadow helper (rigtech.md §2.7): an item_display with an empty model whose only job is its ground shadow (the parts
+// all have shadow_radius 0). It follows the anchor through createRigFollow's `fixed` list, never sunk.
+export function summonShadow({uuid, tags, item, radius = 4.5, strength = .8, viewRange = 3, cull = {width: 16, height: 16}}) {
+  if (!(radius > 0 && radius <= 64)) throw new Error(`shadow radius ${radius}: 0 < r <= 64`);
+  return `summon minecraft:item_display ~ ~ ~ {UUID:${uuidNbt(uuid)},Tags:${tagsNbt(tags)},billboard:"fixed",item_display:"none",teleport_duration:1,view_range:${fnum(viewRange)}f,width:${fnum(cull.width)}f,height:${fnum(cull.height)}f,shadow_radius:${fnum(radius)}f,shadow_strength:${fnum(strength)}f,item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${item}"}}}`;
+}
+// Culling-box overhang in blocks (> 0: outside) of a rig-frame point [x, y, z] of a part at the anchor. The box is
+// axis-aligned in world space and does not turn with the yaw, so the check is radial (hypot(x, z) <= width / 2 holds
+// at every yaw; a per-axis check in the rig frame under-reports at diagonal yaws by up to 41 %). Points below the anchor
+// are buried and do not count. cull.width or cull.height 0 = culling off.
+export function cullOverhang(P, cull) {
+  if (!cull.width || !cull.height) return -Infinity;
+  return P[1] < 0 ? Math.hypot(P[0], P[2]) - cull.width / 2 : Math.max(Math.hypot(P[0], P[2]) - cull.width / 2, P[1] - cull.height);
+}
+
+// ---- follow: per-state lists, sink offsets (follow_y), static-anchor skip ---------------------------------------------
+// createRigFollow(cfg) -> {write, listLines, sinkLines, sinkIndex, sinkExtra, invalidate, objectives, info}
+//   cfg.ns, cfg.obj, cfg.fn, cfg.uuidOf  as createRigCompiler (uuidOf also maps the extra followers, e.g. 'shadow')
+//   cfg.lists       {name: [part names]}, in id order: the follow list per body state (e.g. all, tail_only, and an
+//                   empty one for a fully hidden state). The first (id 0) is used while <obj>Fl is unset.
+//   cfg.fixed       names that follow in every list at the anchor itself and never sink (the shadow helper)
+//   cfg.sink        [dy_1, dy_2, ...] blocks (k = 1..n, usually negative): follow offsets, so a straight descent costs
+//                   no part keys (rigtech.md §2.8, §4.1); <obj>Fy = k picks one (0 / unset: none)
+//   cfg.staticSkip  true: follow returns after 5 commands while the anchor's x, y, z and yaw (x100 as ints, so |x|, |z|
+//                   < 21 M blocks) equal those of the last follow that ran (the boss stands still in most attacks)
+//   cfg.comment     the header line of the follow function
+// With one list, no sink and no static skip, write() writes the classic follow (comment + one tp per part), the same
+// file the existing rigs write. Otherwise:
+//   follow                 the per-tick entry, run as and rotated as the anchor at its feet, pitch 0: the static check,
+//                          then the sink tree or the list's tp file
+//   follow_now             invalidates the static cache, then follow (spawn, a state change, a teleport of the parts)
+//   follow/<list>          the tp lines of a list (+ fixed); follow/<list>_y<k> the same sunk by dy_k (fixed unsunk)
+//   follow/sink, follow/<list>_y[/a_b]   the dispatch on <obj>Fl and <obj>Fy (binary, at most 6 leaves per file)
+// listLines(name) / sinkLines(k) are the commands that select a list / an offset (they invalidate the cache: a
+// change of list or offset always moves the parts on the next follow). Select the full list again at least one tick
+// before a clip shows the hidden parts, so they never slide in from where they were left.
+// sinkExtra(dyAt, len, lead = 1) returns an extraLines(t) for compileClip that drives the offset of a clip: dyAt(t) in
+// blocks (0 = none; every other value must be one of cfg.sink). The rig tick runs follow BEFORE the clip's keys, so
+// the line at tick t selects dyAt(t + lead) (lead 1: the parts sit at dyAt(t) on every tick t >= 1, in step with the
+// keys); it is written at tick 0 and wherever the selected index changes. Tick 0 itself follows with the offset in
+// force when the clip starts (normally 0): a clip that starts sunk keeps its parts hidden on tick 0, or the caller
+// selects the offset before play. objectives: the ones the rig's init / uninstall must add / remove.
+export function createRigFollow({ns, obj, fn, uuidOf, lists, fixed = [], sink = [], staticSkip = false,
+  comment = '# Parts follow the executor position and yaw (run rotated as the anchor, pitch 0).'}) {
+  const names = Object.keys(lists || {});
+  if (!names.length) throw new Error('createRigFollow: no follow list');
+  for (const n of names) if (!/^[a-z][a-z0-9_]*$/.test(n) || n === 'sink' || /_y\d*$/.test(n)) throw new Error(`createRigFollow: bad list name ${n}`);
+  sink.forEach((dy, i) => { if (!Number.isFinite(dy) || Math.abs(dy) < 1e-6) throw new Error(`createRigFollow: sink ${i + 1} = ${dy}`); });
+  const classic = names.length === 1 && !sink.length && !staticSkip;
+  const Q = `${obj}Q`, invalidate = staticSkip ? [`scoreboard players reset @s ${Q}x`] : [];
+  const objectives = [...(names.length > 1 ? [`${obj}Fl`] : []), ...(sink.length ? [`${obj}Fy`] : []), ...(staticSkip ? [Q, `${Q}x`, `${Q}y`, `${Q}z`, `${Q}w`] : [])];
+  const dyStr = dy => String(+dy.toFixed(4));
+  const tp = (n, dy = 0) => { const u = uuidOf(n); if (!u) throw new Error(`createRigFollow: no UUID for ${n}`); return `tp ${u} ~ ~${dy ? dyStr(dy) : ''} ~ ~ ~`; };
+  const tps = (list, dy = 0) => [...lists[list].map(n => tp(n, dy)), ...fixed.map(n => tp(n))];
+  // binary dispatch on a score over [value, function] pairs (sorted), as the compiler's key trees
+  const tree = (dir, score, items) => {
+    if (items.length <= 6) return items.map(([v, f]) => `execute if score @s ${score} matches ${v} run return run function ${f}`);
+    const mid = items[Math.floor(items.length / 2) - 1][0], L = items.filter(([v]) => v <= mid), R = items.filter(([v]) => v > mid);
+    const sub = part => `${dir}/${part[0][0]}_${part[part.length - 1][0]}`;
+    fn(sub(L), tree(dir, score, L)); fn(sub(R), tree(dir, score, R));
+    return [`execute if score @s ${score} matches ..${mid} run return run function ${ns}/${sub(L)}`, `function ${ns}/${sub(R)}`];
+  };
+  const byList = suffix => [...names.slice(1).map((n, i) => `execute if score @s ${obj}Fl matches ${i + 1} run return run function ${ns}/follow/${n}${suffix}`),
+    `function ${ns}/follow/${names[0]}${suffix}`];
+  function write() {
+    if (classic) { fn('follow', [comment, ...tps(names[0])]); return; }
+    const head = [comment];
+    if (staticSkip) head.push(
+      ...['x', 'y', 'z'].map((a, i) => `execute store result score #${a} ${Q} run data get entity @s Pos[${i}] 100`),
+      `execute store result score #w ${Q} run data get entity @s Rotation[0] 100`,
+      `execute if score #x ${Q} = @s ${Q}x if score #y ${Q} = @s ${Q}y if score #z ${Q} = @s ${Q}z if score #w ${Q} = @s ${Q}w run return 0`,
+      ...['x', 'y', 'z', 'w'].map(a => `scoreboard players operation @s ${Q}${a} = #${a} ${Q}`));
+    if (sink.length) head.push(`execute if score @s ${obj}Fy matches 1.. run return run function ${ns}/follow/sink`);
+    fn('follow', [...head, ...byList('')]);
+    fn('follow_now', ['# Follow now, whatever the static cache says (spawn, state changes). Run as and rotated as the anchor, pitch 0.', ...invalidate, `function ${ns}/follow`]);
+    for (const n of names) fn(`follow/${n}`, [`# Follow list ${n}: ${lists[n].length} parts${fixed.length ? ` + ${fixed.join(', ')}` : ''}.`, ...tps(n)]);
+    if (!sink.length) return;
+    fn('follow/sink', [`# Sunk follow (sink offset ${obj}Fy >= 1) of the current list.`, ...byList('_y')]);
+    for (const n of names) {
+      const items = sink.map((dy, i) => [i + 1, `${ns}/follow/${n}_y${i + 1}`]);
+      fn(`follow/${n}_y`, [`# List ${n}, sink offset by ${obj}Fy.`, ...tree(`follow/${n}_y`, `${obj}Fy`, items)]);
+      sink.forEach((dy, i) => fn(`follow/${n}_y${i + 1}`, [`# Follow list ${n} sunk by ${dyStr(dy)} b${fixed.length ? ` (${fixed.join(', ')} at the anchor)` : ''}.`, ...tps(n, dy)]));
+    }
+  }
+  const listLines = name => {
+    const id = names.indexOf(name);
+    if (id < 0) throw new Error(`createRigFollow: unknown list ${name}`);
+    return [...(names.length > 1 ? [`scoreboard players set @s ${obj}Fl ${id}`] : []), ...invalidate];
+  };
+  const sinkLines = k => {
+    if (!sink.length) throw new Error('createRigFollow: no sink table');
+    if (!(Number.isInteger(k) && k >= 0 && k <= sink.length)) throw new Error(`createRigFollow: sink index ${k}`);
+    return [`scoreboard players set @s ${obj}Fy ${k}`, ...invalidate];
+  };
+  const sinkIndex = dy => {
+    if (Math.abs(dy) < 1e-9) return 0;
+    const i = sink.findIndex(v => Math.abs(v - dy) < 1e-6);
+    if (i < 0) throw new Error(`createRigFollow: sink offset ${dy} is not in the table`);
+    return i + 1;
+  };
+  const sinkExtra = (dyAt, len, lead = 1) => {
+    const ks = Array.from({length: len + 1}, (_, t) => sinkIndex(dyAt(Math.min(len, t + lead))));
+    return t => (t === 0 || ks[t] !== ks[t - 1] ? sinkLines(ks[t]) : []);
+  };
+  const info = () => ({lists: Object.fromEntries(names.map((n, i) => [n, {id: i, parts: lists[n]}])), fixed, sink: sink.map((dy, i) => ({k: i + 1, dy})),
+    static_skip: staticSkip, objectives, functions: classic ? {follow: `${ns}/follow`} : {follow: `${ns}/follow`, follow_now: `${ns}/follow_now`}});
+  return {write, listLines, sinkLines, sinkIndex, sinkExtra, invalidate, objectives, info};
+}
+
+// ---- tracks: keys + linear interpolation (the manifest's per-clip proxy columns, tail points) --------------------------
+// fitTrack(samples, {tol}) -> [[t, sample], ...]: keys chosen greedily (each segment as long as it fits, as the part
+// segments) such that linear interpolation between consecutive keys reproduces every sample within tol. The first and
+// the last tick are always keys. samples[t] (t = 0..len) is a number, an array, an object or null (e.g. a parked
+// proxy). Number fields (and array entries) lerp; every other field, the key set and null switch: where they change
+// between t - 1 and t, both ticks are keys, so no segment interpolates across the change. tol: blocks, one number for
+// every number field, or {field: blocks, default} (a missing field takes default, 0 when absent). The framework
+// compiles the keys into its own px functions (az/plan.md §3.3); trackAt evaluates them (tests, checks).
+const splitSample = v => {
+  if (v === null || v === undefined) return {num: [], rest: 'null'};
+  if (typeof v === 'number') return {num: [['', v]], rest: 'n'};
+  const num = [], rest = {};
+  for (const [k, x] of Object.entries(v)) if (typeof x === 'number') num.push([k, x]); else rest[k] = x;
+  return {num, rest: (Array.isArray(v) ? 'a' : 'o') + JSON.stringify([num.map(([k]) => k), rest])};
+};
+const lerpSample = (a, b, u) => {
+  if (a === null || a === undefined) return a;
+  if (typeof a === 'number') return a + (b - a) * u;
+  const o = Array.isArray(a) ? [...a] : {...a};
+  for (const [k, x] of Object.entries(a)) if (typeof x === 'number') o[k] = x + (b[k] - x) * u;
+  return o;
+};
+export function fitTrack(samples, {tol = .15} = {}) {
+  const S = samples.map(splitSample), L = samples.length - 1;
+  const tolOf = k => (typeof tol === 'number' ? tol : tol[k] ?? tol.default ?? 0);
+  const fits = (a, b) => {
+    for (let t = a + 1; t <= b; t++) if (S[t].rest !== S[a].rest) return false;
+    for (let t = a + 1; t < b; t++) {
+      const u = (t - a) / (b - a);
+      for (let i = 0; i < S[t].num.length; i++) {
+        const [k, x] = S[t].num[i], x0 = S[a].num[i][1], x1 = S[b].num[i][1];
+        if (Math.abs(x0 + (x1 - x0) * u - x) > tolOf(k) + 1e-9) return false;
+      }
+    }
+    return true;
+  };
+  const keys = [[0, samples[0]]];
+  let a = 0;
+  while (a < L) {
+    let b = a + 1;
+    while (b + 1 <= L && fits(a, b + 1)) b++;
+    keys.push([b, samples[b]]);
+    a = b;
+  }
+  return keys;
+}
+// fitTracks(samples, opt): samples[t] = {name: sample} -> {name: keys} (one fitTrack per name, the names of tick 0).
+export const fitTracks = (samples, opt) => Object.fromEntries(Object.keys(samples[0] || {}).map(n => [n, fitTrack(samples.map(s => s[n] ?? null), opt)]));
+// The value of a fitted track at tick t (between keys: linear in the number fields, the rest from the earlier key).
+export function trackAt(keys, t) {
+  if (t <= keys[0][0]) return keys[0][1];
+  for (let i = 1; i < keys.length; i++) {
+    const [ta, a] = keys[i - 1], [tb, b] = keys[i];
+    if (t === tb) return b;
+    if (t < tb) return lerpSample(a, b, (t - ta) / (tb - ta));
+  }
+  return keys[keys.length - 1][1];
 }

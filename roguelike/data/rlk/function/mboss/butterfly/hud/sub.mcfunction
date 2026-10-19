@@ -1,5 +1,6 @@
 # Third line: what she is doing, then the player's 달빛 고치 / 달빛 축복 받음 state (the kit's hud/put_sub: badge
-# glyph + "달빛 고치 — 회복하면 해제" + the dew icon, or badge + "달빛 축복 받음 (치명타 +15% · 피해 +50%)").
+# glyph + "달빛 고치 — 회복 9/15%" (the cure meter, score components) + the dew icon, or badge + "달빛 축복 받음
+# (치명타 +15% · 치명타 피해 +50%)").
 execute if score #mbSt mb matches 0 run data modify storage rlk:mboss sub set value []
 execute if score #mbSt mb matches 0 run return 0
 data modify storage rlk:mboss sub set value [{text:"인간형",color:"#C8E6A0",bold:true}]

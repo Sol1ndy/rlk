@@ -1,5 +1,6 @@
 # Hook tick (@s = body, at @s, fight state). Order: clocks and flags, the heal orbs (a pickup heals),
-# heal events (any heal cures 달빛 고치), Burning, form clocks, AI state, pattern slot, then the rig (a clip
+# heal events (their amounts fill the 달빛 고치 cure meter: 15 % of max HP cures it), Burning, form clocks, AI
+# state, pattern slot, then the rig (a clip
 # played this tick starts this tick). The fx kit ages its own cards (a self-scheduled function).
 scoreboard players add #bfClk mb 1
 execute if score #bfFlash mb matches 1 run function rlk:mboss/butterfly/rig/flash

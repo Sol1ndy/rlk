@@ -393,6 +393,20 @@ add({name: 'hold_laser', len: 72, loop: true, keys: [k(0, {...LASER}), k(72, {})
   note: 'Laser rest pose (form/laser): the medallions counter-orbit at 5 degrees per tick with their beams (one turn per 72 t).'});
 add({name: 'hold_deployed', len: 80, loop: true, keys: [k(0, {...DEPLOYED}), k(80, {})], over: [osc('pos', 1, .08, 80)], note: 'Deployed rest pose (form/deployed): the lances far out; bob +-0.08.'});
 
+// ---- the break on the floor (module fix round FID-1): the 20th hit lands while the closing wave_drop has the device on
+// the floor (or still low in its rise); the module plays this instead of break, with the same events and length, so
+// nothing jumps up to the hover first: the bubble flares and bursts at the grounded core, then the pods tuck, the device heaves up
+// 0.7 b and tilts into the groggy slump (a smaller wobble, so the low spike stays over the floor).
+const GROUNDED = {pos: [0, 2.4, 0], coreO: [0, -1.1, 0], plY: -1.9, pl2Y: -1.65, pdY: -.2, drY: -1.2, ...medals(90, 3.6, -1.1), blLen: 2.3, brLen: 2.3, colLen: 0};
+add({name: 'break_low', len: 40, next: 'groggy', events: {bubble: 0, burst: 5, tilt: 5, wobble: 14, sink: 14, slumped: 40},
+  keys: [k(0, {...FIELD, ...GROUNDED, shellS: 1, glowS: 0, glowLook: 'flash', wArch: 0}), k(5, {shellS: 1.12, glowS: 1.35}, 'i'),
+    k(7, {shellS: 1.6, blLen: 0, brLen: 0, colLen: 0, glowS: 1.7}, 'o', 5), k(8, {shellS: 0, pglow: 0, lk: 'groggy'}, 'l'), k(9, {glowS: 0}),
+    k(12, {drY: -.8, drR: 2.6, pdY: -.6}, 'io', 4),
+    k(14, {rot: [5, 0, 21], pos: [0, 3.1, 0], arch: [0, 0, 0]}, 'o', 5),
+    k(40, {...GROGGY, shellS: 1}, 'io', 14)],
+  over: [ring('rot', 2, 4, 14, 10, 7), ring('rot', 0, 2, 15, 12, 7)],
+  note: '역장 붕괴 on the floor (the 20th hit while the closing wave_drop has the device grounded or low; the module plays it instead of break and calls crack/4 at burst): the bubble flares with the core at the grounded pose (ring centre 2.4 b, the core resting on the floor; 0-5), bursts (5-7: scale 1 -> 1.6 -> 0), the link beams go out and the seam goes dark (temporary groggy look from 8), the pods tuck (4-12) and the device heaves up to 3.1 b while it tilts 21 degrees (5-14), a damped wobble +-4 -> 0 (14-34) while it settles into the groggy slump at ring centre 3.3 b (14-40). Same events and length as break.'});
+
 for (const c of CLIPS) if (!c.events) c.events = {};
 
 // ---- sampling -------------------------------------------------------------------------------------------------------

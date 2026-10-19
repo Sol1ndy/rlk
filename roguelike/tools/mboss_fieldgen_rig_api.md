@@ -210,6 +210,7 @@ blends from wherever the spinners are (the first key segment, at least 3 t).
 | `frock` | 110 | `field_idle` | vent 0, flame 8, **burst 25**, burst_last 67, **throw 65**, throw_last 97, **end 100** | F2 파쇄 in the field form (manifest `bursts`, `throws`) |
 | `field_end` | 70 | `idle_cruise` | lift 0, rise 2, **lances 20**, **horiz 32**, **pack 40**, **dock 58**, **packed 70** | the unbroken field's pack-up |
 | `break` | 40 | `groggy` | bubble 0, **burst 5**, tilt 5, **wobble 14**, sink 14, slumped 40 | 역장 붕괴 (the 20th hit) |
+| `break_low` | 40 | `groggy` | the same as `break` | 역장 붕괴 while the closing `wave_drop` has the device on the floor (module fix round FID-1) |
 | `groggy` | 160 | loop | | the 200 t groggy |
 | `recover` | 15 | `idle_cruise` | relevel 0, **flip 6**, done 15 | back to cruise |
 | `death` | 110 | hold | flicker 0, **drop 20**, **sink 40**, land 62, **out 80**, gone 110 | death (call `kill` after 110) |
@@ -289,6 +290,13 @@ cruise 15. Hidden spans (manifest `hidden`, −1 = the clip start or end): `warp
   scale 1 → 1.6 → 0), the links, the violet column and the Ousia flame go out, the seam goes dark (temporary groggy
   look from 8), the device tilts 28° in 9 t (5-14), a damped wobble ±8° → 0 (14-34) while it sinks to the groggy slump
   (14-40). Then `groggy` (call `look/groggy`).
+- **`break_low`** (module fix round FID-1): the break when the 20th hit lands while the closing `wave_drop` has the device
+  on the floor or low in its rise (the module plays it instead of `break`; same length and events, so the module's break
+  clock is unchanged). It starts from `wave_drop`'s grounded pose (ring centre 2.4 b, the core resting on the floor at
+  1.3 b, the stack compressed), so nothing jumps up to the hover first: the bubble flares (0-5) and bursts (5-7) at the
+  grounded core, the links go out and the seam goes dark (temporary groggy look from 8), the pods tuck (4-12) and the
+  device heaves up to 3.1 b while it tilts 21° (5-14), a damped wobble ±4° → 0 (14-34) while it settles into the groggy
+  slump at 3.3 b (14-40). The smaller tilt and wobble keep the low spike tip over the floor.
 - **`groggy`**: ring centre 3.3 b, roll 25°, pitch 8°, a slow ±3° wobble, the core sunk with the arch upright, the
   halo slid and tilted, pods at a quarter speed, the pendulum swinging ±12°. **`recover`**: re-level and rise (0-6),
   the core flips to the top while the arch turns 180° over (6-15); call `look/idle` at 0.
@@ -373,7 +381,7 @@ The generator refuses to write a rig that fails these (`--allow-steps` turns the
 - **Keys:** the first key at tick 0, the last at the clip length, `next` must name a clip.
 - **Parts** ≤ 32; **item models** within −16..32 (single-axis element rotations, multiples of 22.5°).
 - **Atlas:** ≤ 0.5 M px (now 106 sprites, 0.45 M px), every side ≤ 512 px and a multiple of 16.
-- Compiled: 28 clips, 1936 key files, 14499 part keys; 47 item models with 4083 elements. A part gets a key only
+- Compiled: 29 clips, 1975 key files, 14898 part keys; 47 item models with 4083 elements. A part gets a key only
   where the client's lerp/slerp would drift from the authored pose by more than 0.012 b, 0.25-2° (per part) or
   1.5 % scale.
 

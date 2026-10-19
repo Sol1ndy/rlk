@@ -1,4 +1,4 @@
-# wing_strike: 55 t, then idle_b. @s = rig anchor.
-execute if score @s bfRigT matches 55.. run return run function rlk:mboss/butterfly/rig/start/idle_b
-execute if score @s bfRigT matches ..27 run return run function rlk:mboss/butterfly/rig/c/wing_strike/b/0_27
-function rlk:mboss/butterfly/rig/c/wing_strike/b/28_54
+# wing_strike: 51 t, then idle_b. @s = rig anchor.
+execute if score @s bfRigT matches 51.. run return run function rlk:mboss/butterfly/rig/start/idle_b
+execute if score @s bfRigT matches ..25 run return run function rlk:mboss/butterfly/rig/c/wing_strike/b/0_25
+function rlk:mboss/butterfly/rig/c/wing_strike/b/26_50

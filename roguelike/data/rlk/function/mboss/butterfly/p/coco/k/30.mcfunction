@@ -1,9 +1,7 @@
 # coco clock 30
 function rlk:mboss/butterfly/rig/face/track
-# the cocoon ball (wings wrapped, drifting toward the player): lime glow inside, swirling rustle
-execute rotated as @s rotated ~ 0 positioned ^ ^3.0 ^ run function rlk:mboss/butterfly/fx/p/cocoon_ball
-function rlk:mboss/butterfly/fx/snd/cocoon_ball
-playsound minecraft:entity.breeze.whirl hostile @a[tag=player] ~ ~ ~ 0.6 1.2 0.2
+execute if entity @e[tag=rlk_body,distance=..5,limit=1] run function rlk:mboss/butterfly/wx/u/away {d:0.2}
+# the ball opens (the pod prop goes): a pale lime ring flash
 kill @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_pod]
-execute rotated as @s rotated ~ 0 positioned ^ ^3.0 ^ run function rlk:mboss/butterfly/rig/prop/pod
-execute unless entity @e[tag=rlk_body,distance=..5,limit=1] run function rlk:mboss/butterfly/wx/u/toward {d:0.12}
+execute rotated as @s rotated ~ 0 positioned ^0 ^3.156 ^0.428 run function rlk:mboss/butterfly/fx/card {kind:"ripple",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:2,s1:4,move:"0f,0f,0f",life:4,fade:2,col:13431708}
+playsound minecraft:entity.ender_dragon.flap hostile @a[tag=player] ~ ~ ~ 0.5 1.5 0.17

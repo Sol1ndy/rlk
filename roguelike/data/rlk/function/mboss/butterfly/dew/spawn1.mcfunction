@@ -1,4 +1,5 @@
-# One 달빛 이슬 (still debuffed during the groggy).
-execute store result score #bfX mb run random value 0..359
-function rlk:mboss/butterfly/dew/one
-playsound minecraft:block.amethyst_block.chime hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2
+# The groggy re-offer (still debuffed after 달빛 해제): as many 달빛 이슬 as the cure meter still needs, one
+# when one orb finishes it, else two (user: "하나만 먹어도 기믹 처리되는건 너무 쉬운 것 같아"; it used to be one).
+execute as @a[tag=player,limit=1] run function rlk:mboss/butterfly/dew/need
+scoreboard players operation #bfDew1 mb = #bfDewNeed mb
+function rlk:mboss/butterfly/dew/offer

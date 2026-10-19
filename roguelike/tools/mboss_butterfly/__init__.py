@@ -5,8 +5,7 @@
 Layout (every file is plain Python, stdlib only):
 
     api.py       shared, stable: score names, damage coefficients, ranges, colours, the rig clip table (read
-                 from tools/mboss_butterfly_rig_manifest.json, or the stub manifest while the real rig is not
-                 merged), the Pattern record, the Gen writer helpers and the TL timeline that pattern modules use.
+                 from tools/mboss_butterfly_rig_manifest.json, the rig generator's), the Pattern record, the Gen writer helpers and the TL timeline that pattern modules use.
                  Pattern authors read it; they do not edit it.
     core.py      everything that is not a pattern: the 17 framework hooks, the form state machine (entrance,
                  human rotation, transformation, butterfly rotation, 달빛 해제, revert, groggy 300 t, turn and
@@ -16,8 +15,8 @@ Layout (every file is plain Python, stdlib only):
     human.py     human-form patterns H1-H4 (달빛 발차기, 달빛 점프, 달빛 돌진, 광폭한 진공).
     wing.py      butterfly-form patterns B1-B4 (우아한 날개, 화염 날개의 습격, 날개 휩쓸개, 달빛 축복) and the
                  finale B5 달빛 해제 (service pattern 15; the core owns its form/groggy mechanics).
-    stub_rig.py  + stub_rig_manifest.json: REMOVABLE stand-in rig (F:mboss/butterfly/rig_stub/) used only while
-                 the real rig manifest does not exist.
+    seq_h.py     the human author's S1 entrance / S3 revert, groggy, recover / S4 death visuals (seq_h/**).
+    seq_b.py     the wing author's S2 transformation / S5 cure / S6 wing switch visuals and runtime helpers (wx/**).
 
 A pattern module defines PATTERNS (a list of api.Pattern) and emit(gen). emit writes only
 F:mboss/butterfly/p/<key>/** through gen.pw(key, name, lines): at least start, tick and cancel for every pattern it

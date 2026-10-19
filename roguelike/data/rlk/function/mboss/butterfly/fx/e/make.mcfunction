@@ -29,6 +29,11 @@ execute if score #bkDly mb matches 1.. run data modify storage rlk:bfkit a.z set
 function rlk:mboss/butterfly/fx/e/spawn with storage rlk:bfkit a
 execute if score #bkTel mb matches 1 run tag @e[type=minecraft:item_display,tag=rlk_bk_new] add rlk_bk_t
 execute store result score #bkNow mb run time query gametime
+# The ager (e/world, scheduled 1t) runs at the end of this same server tick, when the game time already
+# reads +1: count the stages from that tick, so the main interpolation starts one tick after the summon (the
+# client first gets the start state; merged in the summon tick it would never animate) and every stage, the
+# telegraph flash on the strike tick included, lands on its documented tick (review fix perf-2).
+scoreboard players add #bkNow mb 1
 execute as @e[type=minecraft:item_display,tag=rlk_bk_new,limit=1] run function rlk:mboss/butterfly/fx/e/born
 tag @e[type=minecraft:item_display,tag=rlk_bk_new] remove rlk_bk_new
 schedule function rlk:mboss/butterfly/fx/e/world 1t replace

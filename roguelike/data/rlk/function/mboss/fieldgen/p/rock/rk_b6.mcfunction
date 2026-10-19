@@ -14,7 +14,7 @@ scoreboard players set #hzSfx mb 0
 scoreboard players set #hzVis mb 61
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzY1 mb 12
-execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p6w,limit=1] run function rlk:mboss/hz/disc {r:18,tell:10,dmg:130}
+execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p6w,limit=1] run function rlk:mboss/hz/disc {r:18,tell:10,dmg:150}
 execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p6w,limit=1] rotated ~ 0 run function rlk:mboss/fieldgen/fx/tele/disc {r:18,tell:10,el:5,hold:3}
 execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p6w,limit=1] run playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 0.3 1.4 0.1
 execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p6w,limit=1] run summon minecraft:item_display ~ ~0.45 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_fg_pat","rlk_mb_fg_p6","rlk_mb_fg_p6s","rlk_mb_fg_pnew"],teleport_duration:12,brightness:{block:15,sky:15},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f]}}

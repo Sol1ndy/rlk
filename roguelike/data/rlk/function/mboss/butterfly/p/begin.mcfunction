@@ -6,27 +6,27 @@ scoreboard players set #bfPRel mb 0
 scoreboard players set #bfPMax mb 200
 scoreboard players set #bfPLen mb 200
 scoreboard players set #bfPCol mb 8
-execute if score #bfPat mb matches 1 run scoreboard players set #bfPMax mb 56
-execute if score #bfPat mb matches 2 run scoreboard players set #bfPMax mb 70
-execute if score #bfPat mb matches 3 run scoreboard players set #bfPMax mb 55
-execute if score #bfPat mb matches 4 run scoreboard players set #bfPMax mb 46
-execute if score #bfPat mb matches 11 run scoreboard players set #bfPMax mb 60
-execute if score #bfPat mb matches 12 run scoreboard players set #bfPMax mb 122
-execute if score #bfPat mb matches 13 run scoreboard players set #bfPMax mb 64
-execute if score #bfPat mb matches 14 run scoreboard players set #bfPMax mb 102
-execute if score #bfPat mb matches 15 run scoreboard players set #bfPMax mb 100
-execute if score #bfPat mb matches 20 run scoreboard players set #bfPMax mb 34
+execute if score #bfPat mb matches 1 run scoreboard players set #bfPMax mb 48
+execute if score #bfPat mb matches 2 run scoreboard players set #bfPMax mb 57
+execute if score #bfPat mb matches 3 run scoreboard players set #bfPMax mb 51
+execute if score #bfPat mb matches 4 run scoreboard players set #bfPMax mb 42
+execute if score #bfPat mb matches 11 run scoreboard players set #bfPMax mb 56
+execute if score #bfPat mb matches 12 run scoreboard players set #bfPMax mb 167
+execute if score #bfPat mb matches 13 run scoreboard players set #bfPMax mb 57
+execute if score #bfPat mb matches 14 run scoreboard players set #bfPMax mb 90
+execute if score #bfPat mb matches 15 run scoreboard players set #bfPMax mb 87
+execute if score #bfPat mb matches 20 run scoreboard players set #bfPMax mb 33
 # expected end for the progress bar (a pattern that decides a shorter run sets #bfPLen itself: g.set_len)
-execute if score #bfPat mb matches 1 run scoreboard players set #bfPLen mb 51
-execute if score #bfPat mb matches 2 run scoreboard players set #bfPLen mb 65
-execute if score #bfPat mb matches 3 run scoreboard players set #bfPLen mb 50
-execute if score #bfPat mb matches 4 run scoreboard players set #bfPLen mb 41
-execute if score #bfPat mb matches 11 run scoreboard players set #bfPLen mb 55
-execute if score #bfPat mb matches 12 run scoreboard players set #bfPLen mb 117
-execute if score #bfPat mb matches 13 run scoreboard players set #bfPLen mb 59
-execute if score #bfPat mb matches 14 run scoreboard players set #bfPLen mb 98
-execute if score #bfPat mb matches 15 run scoreboard players set #bfPLen mb 96
-execute if score #bfPat mb matches 20 run scoreboard players set #bfPLen mb 30
+execute if score #bfPat mb matches 1 run scoreboard players set #bfPLen mb 43
+execute if score #bfPat mb matches 2 run scoreboard players set #bfPLen mb 52
+execute if score #bfPat mb matches 3 run scoreboard players set #bfPLen mb 46
+execute if score #bfPat mb matches 4 run scoreboard players set #bfPLen mb 37
+execute if score #bfPat mb matches 11 run scoreboard players set #bfPLen mb 51
+execute if score #bfPat mb matches 12 run scoreboard players set #bfPLen mb 95
+execute if score #bfPat mb matches 13 run scoreboard players set #bfPLen mb 52
+execute if score #bfPat mb matches 14 run scoreboard players set #bfPLen mb 86
+execute if score #bfPat mb matches 15 run scoreboard players set #bfPLen mb 83
+execute if score #bfPat mb matches 20 run scoreboard players set #bfPLen mb 29
 execute if score #bfPat mb matches 1 run scoreboard players set #bfPCol mb 7
 execute if score #bfPat mb matches 2 run scoreboard players set #bfPCol mb 7
 execute if score #bfPat mb matches 3 run scoreboard players set #bfPCol mb 7

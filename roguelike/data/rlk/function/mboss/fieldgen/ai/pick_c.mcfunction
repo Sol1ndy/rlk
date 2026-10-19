@@ -1,5 +1,5 @@
 # @s = body. Range-filtered, weighted shuffle bag of the cruise state, no immediate repeat:
-# bomb mid/farx2, slam meleex2/mid, laser meleex2/midx2, missile farx3, burst meleex2/mid, rock midx2/far (melee <= 4.0 b, far >= 8.0 b).
+# bomb melee/mid/farx2, slam meleex2/mid, laser midx2, missile farx3, burst mid, rock melee/midx2/far (melee <= 4.0 b, far >= 8.0 b).
 function rlk:mboss/mv/dist
 scoreboard players operation #fgDist mb = #mbDist mb
 scoreboard players set #fgBand mb 2

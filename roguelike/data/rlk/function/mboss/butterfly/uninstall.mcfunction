@@ -6,6 +6,9 @@ function rlk:mboss/butterfly/rig/prop/clear
 function rlk:mboss/butterfly/fx/uninstall
 kill @e[type=minecraft:item_display,tag=rlk_mb_bf_dew]
 kill @e[tag=rlk_mb_bf_fx]
+# the module's scratch storage (heal-orb spawn args, the decal redraw args; review fix perf-4)
+data remove storage rlk:mboss bfd
+data remove storage rlk:mboss bfr
 scoreboard objectives remove bfRigC
 scoreboard objectives remove bfRigT
 scoreboard objectives remove bfRigF

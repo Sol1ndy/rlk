@@ -170,9 +170,12 @@ const TRAIL_HANDS = {
 // the crescent chain lined up vertically at her left side (달빛 점프 tell, chain re-form): three pieces stacked,
 // the big crescent stays at her right
 const CHAIN_L = {
-  hLA: inTorso([.78, 2.78, -.06], H_TORSO), hLAe: [6, 0, 4], hLB: inTorso([.84, 2.3, -.06], H_TORSO), hLBe: [6, 0, -8],
-  hRB: inTorso([.8, 1.84, -.06], H_TORSO), hRBe: [6, 0, 172],
+  hLA: inTorso([1.0, 2.78, -.14], H_TORSO), hLAe: [6, 0, 4], hLB: inTorso([1.08, 2.3, -.14], H_TORSO), hLBe: [6, 0, -8],
+  hRB: inTorso([1.0, 1.84, -.14], H_TORSO), hRBe: [6, 0, 172],
 };
+// the tail blade's way across her front between its idle place at her right and the chain at her left (in front of
+// the mane, never through it)
+const CHAIN_PASS = {hRB: inTorso([.15, 1.98, -.78], H_TORSO), hRBe: [6, 0, 90]};
 // crescents scattered wide (chain re-form start, the entrance burst)
 const SCATTER = {
   hRA: inTorso([-1.9, 3.4, -.4], H_TORSO), hRB: inTorso([-1.7, 1.4, .5], H_TORSO), hLA: inTorso([1.9, 3.2, .3], H_TORSO), hLB: inTorso([1.8, 1.2, -.5], H_TORSO),
@@ -268,12 +271,19 @@ export const CLIPS = [
     k(12, {pos: P(0, -.02, 0), pelvis: [0, 0, -3], torso: [-12, 0, -2.5], head: [10, 0, 2], crest: [-2, 0, 4], plant: {l: FEET.l, r: [-.44, .3, -.16], tr: 10}}),
     k(16, {...HUMAN, ...STANCE, pos: P(0, -.09, 0)}),
   ]},
-  {name: 'run_h', len: 8, loop: true, blend: 2, note: 'burst-run (0.6-0.8 b/t for about 5 t, v1 23.13-23.40 s): two bounding strides, body 30 degrees forward, fans swept back, crescents trailing', keys: [
-    k(0, {...HUMAN, ...RUN_LEAN, ...TRAIL_HANDS, pos: P(0, -.04, 0), pelvis: [0, -6, 0], ...legs([42, -24, 18], [-46, -18, 42])}),
-    k(2, {pos: P(0, .22, 0), pelvis: [0, 0, 0], torso: [-28, 0, 0], ...legs([-8, -70, 40], [64, -96, 46])}),
-    k(4, {pos: P(0, -.04, 0), pelvis: [0, 6, 0], torso: [-30, 0, 0], ...legs([-46, -18, 42], [42, -24, 18])}),
-    k(6, {pos: P(0, .22, 0), pelvis: [0, 0, 0], torso: [-28, 0, 0], ...legs([64, -96, 46], [-8, -70, 40])}),
-    k(8, {pos: P(0, -.04, 0), pelvis: [0, -6, 0], torso: [-30, 0, 0], ...legs([42, -24, 18], [-46, -18, 42])}),
+  // run_h (two strides): a hoof lands ahead of the hips (contact, planted with the leg IK), is pushed back under her
+  // (mid-stance, the body at its lowest) and leaves the floor behind her (toe-off); a short flight while the other leg
+  // reaches forward. The loop starts at a toe-off, so the forced 2 t blend-in segment (0-2) only skips the flight.
+  {name: 'run_h', len: 8, loop: true, blend: 2, note: 'burst-run (0.6-0.8 b/t for about 5 t, v1 23.13-23.40 s): two bounding strides, body 30 degrees forward, fans swept back, crescents trailing; each hoof lands ahead of the hips (2, 6), is pushed back under her (3, 7) and leaves the floor behind her (4, 0), a short flight between the strides', keys: [
+    k(0, {...HUMAN, ...RUN_LEAN, ...TRAIL_HANDS, pos: P(0, .02, 0), pelvis: [0, 0, 0], torso: [-28, 0, 0], legR: [62, 0, 0], kneeR: -100, hockR: 50, legL: [-34, 0, 0], kneeL: 10, hockL: 10}),
+    k(1, {pos: P(0, .14, 0), pelvis: [0, 3, 0], torso: [-29, 0, 0], ...legs([-30, -96, 70], [48, -50, 32])}, 'l'),
+    k(2, {pos: P(0, -.1, 0), pelvis: [0, 6, 0], torso: [-30, 0, 0], legL: [-40, 0, 0], kneeL: -60, hockL: 60, plant: {r: [-.44, 0, -.36], tr: -8}}, 'i'),
+    k(3, {pos: P(0, -.16, 0), pelvis: [0, 3, 0], torso: [-31, 0, 0], legL: [16, 0, 0], kneeL: -112, hockL: 66, plant: {r: [-.42, 0, .14]}}, 'l'),
+    k(4, {pos: P(0, .02, 0), pelvis: [0, 0, 0], torso: [-28, 0, 0], legL: [62, 0, 0], kneeL: -100, hockL: 50, legR: [-34, 0, 0], kneeR: 10, hockR: 10}, 'l'),
+    k(5, {pos: P(0, .14, 0), pelvis: [0, -3, 0], torso: [-29, 0, 0], ...legs([48, -50, 32], [-30, -96, 70])}, 'l'),
+    k(6, {pos: P(0, -.1, 0), pelvis: [0, -6, 0], torso: [-30, 0, 0], legR: [-40, 0, 0], kneeR: -60, hockR: 60, plant: {l: [.44, 0, -.36], tl: -8}}, 'i'),
+    k(7, {pos: P(0, -.16, 0), pelvis: [0, -3, 0], torso: [-31, 0, 0], legR: [16, 0, 0], kneeR: -112, hockR: 66, plant: {l: [.42, 0, .14]}}, 'l'),
+    k(8, {...HUMAN, ...RUN_LEAN, ...TRAIL_HANDS, pos: P(0, .02, 0), pelvis: [0, 0, 0], torso: [-28, 0, 0], legR: [62, 0, 0], kneeR: -100, hockR: 50, legL: [-34, 0, 0], kneeL: 10, hockL: 10}, 'l'),
   ]},
   {name: 'back_h', len: 12, next: 'idle_h', note: 'backing off at walking pace (the anchor moves back): two steps, each hoof lifted and set down behind, torso a little more upright, eyes on the player', keys: [
     k(0, {...HUMAN, ...STANCE}),
@@ -307,7 +317,7 @@ export const CLIPS = [
       k(8, {rot: [-332, 0, 0], pos: P(0, .34, 0), torso: [2, 0, 0], head: [2, 0, 0], ...fans([0, 0, 36]), crest: [10, 0, 0], ...legs([-14, 30, -30], [125, 40, -40, 8])}, 'i'),
       k(9, {rot: [-296, 0, 0], pos: P(0, .78, 0), ...legs([10, -40, 20], [124, 20, -20, 6])}, 'l'),
       k(10, {rot: [-245, 0, 0], pos: P(0, 1.18, 0), ...legs([70, -110, 40], [110, -90, 30]), lockR: .7}, 'l'),
-      k(11, {rot: [-190, 0, 0], pos: P(0, 1.45, 0), ...legs([96, -130, 50], [100, -125, 50])}, 'l'),
+      k(11, {rot: [-190, 0, 0], pos: P(0, 1.45, 0), ...legs([96, -118, 50], [100, -116, 50])}, 'l'),
       k(12, {rot: [-135, 0, 0], pos: P(0, 1.55, 0), crest: [18, 0, 0]}, 'l'),
       k(13, {rot: [-85, 0, 0], pos: P(0, 1.42, 0), ...legs([80, -110, 40], [84, -114, 44]), lockR: .3}, 'l'),
       k(14, {rot: [-45, 0, 0], pos: P(0, 1.06, 0), ...legs([40, -60, 30], [44, -64, 32])}, 'l'),
@@ -342,15 +352,16 @@ export const CLIPS = [
   // and the pitch down from 360 (the same orientation) so both end at 0.
   {name: 'kick_jump', len: 65, next: 'idle_h', events: {tell: 0, sweep: 13, sweep_end: 19, jump: 33, orb: 45, disc: 45, kick: 52, impact: 55, land: 59},
     note: 'H2 달빛 점프: the crescent chain lines up at her left (tell 0-13), pivot, 360 degree low sweep with the left leg at knee height (13-19), recovery, spiral jump with two rising turns (33-44), the orb forms at her raised right foot (45, disc = orb) as she tips into a forward somersault, axe kick down (52), impact 55, landing 59', keys: [
-      k(0, {...HUMAN, ...STANCE, rot: [360, -1080, 0], ...CHAIN_L, ...fans([0, 0, 10])}),
-      k(6, {pos: P(0, -.16, 0), torso: [-18, -10, 0], head: [14, 10, 0], plant: {l: [.5, 0, -.08], r: [-.4, 0, .02]}}),
+      k(0, {...HUMAN, ...STANCE, rot: [360, -1080, 0], ...fans([0, 0, 10])}),
+      k(3, {...CHAIN_PASS, hLA: CHAIN_L.hLA, hLAe: CHAIN_L.hLAe}, 'o'),
+      k(6, {pos: P(0, -.16, 0), torso: [-18, -10, 0], head: [14, 10, 0], ...CHAIN_L, plant: {l: [.5, 0, -.08], r: [-.4, 0, .02]}}),
       k(10, {pos: P(0, -.36, 0), torso: [-26, -16, 0], head: [20, 16, 0], ...fans([0, -6, 18]), plant: {l: [.62, 0, -.2], r: [-.22, 0, .04]}}),
       // the sweep: pivot on the right hoof under her, the left leg stretched out low; the band starts at her left
       k(12, {pos: P(0, -.62, 0), torso: [-34, -10, 6], head: [26, 10, 0], ...fans([0, -18, 24]), ...CHAIN_L, legL: [20, 0, 78], kneeL: -6, hockL: 26, plant: {r: [-.18, 0, .02]}}),
       ...[[13, -1030], [14, -950], [15, -870], [16, -800], [17, -750], [18, -725]].map(([t, y], i) => k(t, {rot: [360, y, 0], plant: {r: [-.18, 0, .02]}}, i ? 'l' : 'i')),
       k(19, {rot: [360, -720, 0], pos: P(0, -.55, 0), legL: [20, 0, 60], kneeL: -20, plant: {r: [-.18, 0, .02]}}, 'o'),
-      k(22, {...CROUCH(-.38), torso: [-28, 0, 0], ...H_HANDS}),
-      k(27, {...CROUCH(-.16), torso: [-16, 0, 0], head: [12, 0, 0]}),
+      k(22, {...CROUCH(-.38), torso: [-28, 0, 0], ...H_HANDS, hRB: inTorso([-.15, 1.98, -.78], H_TORSO), hRBe: [6, 0, 90]}),
+      k(27, {...CROUCH(-.16), torso: [-16, 0, 0], head: [12, 0, 0], hRB: H_HANDS.hRB, hRBe: H_HANDS.hRBe}),
       k(31, {...CROUCH(-.42), torso: [-24, 0, 0], head: [22, 0, 0], ...fans([0, 0, -10])}, 'i'),
       // the spiral jump: two rising turns, legs together, crescents flung out
       k(33, {pos: P(0, .55, 0), rot: [360, -700, 0], torso: [-4, 0, 0], head: [6, 0, 0], ...fans([0, -10, 24]), ...legs([-14, -20, 20], [6, -50, 30])}, 'o'),
@@ -376,7 +387,7 @@ export const CLIPS = [
       k(0, {...HUMAN, ...STANCE}),
       k(6, {...CROUCH(-.22), torso: [-20, 0, 0], ...fans([0, 0, 24]), hRA: inTorso([-.8, 2.6, -.3], H_TORSO), hLA: inTorso([.7, 2.0, -.3], H_TORSO)}),
       k(9, {rot: [0, -50, 0], pos: P(0, -.26, 0), torso: [-28, 10, 0], head: [22, 40, 0], ...fans([0, -18, 26]), legR: [70, 0, 6], kneeR: -110, hockR: 50,
-        hRA: inTorso([-.9, 2.5, .6], H_TORSO), lockR: .4, plant: {l: rot(q([0, -50, 0]), [.4, 0, 0])}}),
+        hRA: inTorso([-1.45, 2.2, .3], H_TORSO), lockR: .4, plant: {l: rot(q([0, -50, 0]), [.4, 0, 0])}}),
       k(11, {rot: [-24, -50, 0], pos: P(0, .14, 0), torso: [-30, 10, 0], head: [30, 40, 0], ...RUN_LEAN, ...TRAIL_HANDS, ...legs([-50, -24, 30], [84, -116, 46]), lockR: .8}, 'i'),
       k(13, {rot: [6, -76, 0], pos: P(0, .32, 0), torso: [-8, 0, -6], head: [6, 60, 0], ...fans([0, -30, 10]), ...H_HANDS, legL: [10, 0, 0], kneeL: -70, hockL: 40, legR: [30, 0, 60], kneeR: -120, hockR: 50, lockR: 1}, 'o'),
       // the side kick: the right leg straight out to her right (toward the player), the body leaning away
@@ -402,7 +413,7 @@ export const CLIPS = [
       k(16, {pos: P(0, -.24, 0), torso: [-26, 0, 0], head: [22, 0, 0], ...fans([0, -10, 30]), lockR: .9, plant: {l: [.5, 0, .25], r: [-.36, 0, -.6], tr: -10}}, 'i'),
       k(18, {rot: [24, 0, 0], pos: P(0, .5, 0), torso: [-6, 0, 0], head: [8, 0, 0], ...legs([-20, -20, 20], [-10, -14, 20]), lockR: .4}, 'o'),
       k(21, {rot: [70, 0, 0], pos: P(0, 1.5, 0), torso: [0, 0, 0], ...legs([40, -90, 40], [44, -94, 42]), lockR: 0}, 'o'),
-      k(24, {rot: [130, 0, 0], pos: P(0, 2.25, 0), ...legs([96, -140, 50], [100, -140, 50])}, 'l'),
+      k(24, {rot: [130, 0, 0], pos: P(0, 2.25, 0), ...legs([96, -118, 50], [100, -118, 50])}, 'l'),
       k(27, {rot: [195, 0, 0], pos: P(0, 2.6, 0)}, 'l'),
       k(30, {rot: [260, 0, 0], pos: P(0, 2.45, 0)}, 'l'),
       k(33, {rot: [325, 0, 0], pos: P(0, 1.9, 0), ...legs([50, -80, 40], [54, -84, 40])}, 'l'),
@@ -421,7 +432,7 @@ export const CLIPS = [
   // rising to the stance by 106.
   {name: 'entrance', len: 106, next: 'idle_h', events: {nameplate: 57, glow: 61, whiteout: 71, burst: 79, land: 90, stand: 106},
     note: 'hidden inside the cocoon prop until the burst at 79 (rig/prop/cocoon); revealed curled 3.6 b up, she drops with a slight tumble, lands in a wide crouch at 90 with the crescents spread and stands up by 106', keys: [
-      k(0, {...HUMAN, vis: 0, pos: P(0, 3.6, 0), torso: [-40, 0, 0], head: [30, 0, 0], ...legs([100, -140, 60]), ...fans([0, 0, -30]), hands: .6}),
+      k(0, {...HUMAN, vis: 0, pos: P(0, 3.6, 0), torso: [-40, 0, 0], head: [30, 0, 0], ...legs([100, -118, 60]), ...fans([0, 0, -30]), hands: .6}),
       k(78, {vis: 0}),
       k(79, {vis: 1}, 'l'),
       k(82, {pos: P(0, 3.35, 0), rot: [-14, 0, 4], torso: [-30, 0, 0], head: [22, 0, 0], ...legs([70, -110, 50], [80, -120, 50]), ...fans([0, 0, 10]), hands: 1, ...SCATTER}, 'o'),
@@ -613,20 +624,23 @@ export const CLIPS = [
       k(43, {...CROUCH(-.3), hands: 0, torso: [-26, 0, 0], head: [20, 0, 0]}, 'i'),
     ]},
   // ---- death and the chain re-form ---------------------------------------------------------------------------------
-  // Not in the footage (plan.md "Death"): from either form she staggers back (the wings go flat lime and shrink away
-  // over the 6 t blend; the module's shatter at 6), staggers forward, sinks to one knee (24), the crescents and flakes
-  // sink and fade (24-56), then she dissolves: everything scales out about her hips while rising 0.6 b (40-100).
-  {name: 'death', len: 100, blend: 6, events: {stagger: 0, shatter: 6, kneel: 24, dissolve: 40, gone: 100},
-    note: 'from either form: she staggers back while the wings go flat lime and shrink away (shatter 6), staggers forward, sinks to one knee (24), the crescents and flakes fade (24-56), then dissolves into the rising motes (scale out about her hips, 40-100); call kill after 100', keys: [
-      k(0, {...HUMAN, ...WINGS_OFF, form: 'h', wlook: 'flat', pos: P(0, 0, 0), torso: [6, 0, 0], head: [-8, 0, 0], ...fans([0, 0, 30]), plant: FEET}),
-      k(6, {wlook: 'el', pos: P(0, -.04, 0), torso: [10, 0, 3], head: [-12, 0, -4], crest: [14, 0, 0], ...fans([0, -10, 34]), hands: .8, plant: {l: FEET.l, r: [-.46, 0, .34], tr: -10}}),
-      k(14, {pos: P(0, -.22, 0), torso: [-24, 0, -2], head: [18, 0, 3], crest: [-10, 0, 0], ...fans([0, 0, 10]), hands: .7, plant: {l: [.44, 0, -.2], r: [-.46, 0, .3]}}, 'i'),
-      k(16, {pos: P(0, -.3, 0), torso: [-27, 0, -2], head: [20, 0, 3], plant: {l: [.44, 0, -.24], r: [-.45, 0, .4], tr: -20}}),
-      k(19, {pos: P(0, -.46, 0), torso: [-32, 0, -3], head: [24, 0, 4], hands: .55, plant: {l: [.43, 0, -.32], r: [-.44, 0, .55], tr: -50}}),
-      k(24, {pos: P(0, -.72, 0), torso: [-38, 0, -3], head: [28, 0, 4], crest: [-14, 0, 0], ...fans([0, 0, -26]), hands: .45,
-        plant: {l: [.42, 0, -.42], r: [-.42, 0, .75], tr: -100}}, 'i'),
-      k(40, {pos: P(0, -.76, 0), torso: [-44, 0, -4], head: [34, 0, 4], ...fans([0, 0, -32]), hands: .25, plant: {l: [.42, 0, -.42], r: [-.42, 0, .75], tr: -100}}),
-      k(56, {hands: 0, flakes: 0, torso: [-42, 0, -2], head: [30, 0, 2]}),
+  // Not in the footage (plan.md "Death", spec S4): from either form she staggers back (the wings go flat lime and
+  // shrink away over the 10 t blend; the module's shatter at 10), staggers forward, the knees buckle (20), she sinks
+  // to one knee (30), the crescents and flakes sink and fade (30-64), then she dissolves: everything scales out about
+  // her hips while rising 0.6 b (50-100). The wing-side parts and the chest glow start at a small non-zero scale and
+  // reach 0 at the blend tick, so their first key ends there (hidden throughout, they would form one 100 t key: from
+  // the butterfly form the wings would shrink over 100 t and drift off the falling body).
+  {name: 'death', len: 100, blend: 10, events: {stagger: 0, shatter: 10, kneel: 30, dissolve: 50, gone: 100},
+    note: 'from either form: she staggers back while the wings go flat lime and shrink away over the 10 t blend (shatter 10), staggers forward, the knees buckle (20), she sinks to one knee (30), the crescents and flakes fade (30-64), then dissolves into the rising motes (scale out about her hips, 50-100); call kill after 100', keys: [
+      k(0, {...HUMAN, ...WINGS_OFF, fwS: .1, hwS: .1, tS: .1, core: .1, form: 'h', wlook: 'flat', pos: P(0, 0, 0), torso: [6, 0, 0], head: [-8, 0, 0], ...fans([0, 0, 30]), plant: FEET}),
+      k(10, {...WINGS_OFF, wlook: 'el', pos: P(0, -.04, 0), torso: [10, 0, 3], head: [-12, 0, -4], crest: [14, 0, 0], ...fans([0, -10, 34]), hands: .8, plant: {l: FEET.l, r: [-.46, 0, .34], tr: -10}}),
+      k(18, {pos: P(0, -.22, 0), torso: [-24, 0, -2], head: [18, 0, 3], crest: [-10, 0, 0], ...fans([0, 0, 10]), hands: .7, plant: {l: [.44, 0, -.2], r: [-.46, 0, .3]}}, 'i'),
+      k(21, {pos: P(0, -.3, 0), torso: [-27, 0, -2], head: [20, 0, 3], plant: {l: [.44, 0, -.24], r: [-.45, 0, .4], tr: -20}}),
+      k(25, {pos: P(0, -.46, 0), torso: [-32, 0, -3], head: [24, 0, 4], hands: .55, plant: {l: [.43, 0, -.32], r: [-.44, .1, .55], tr: -50}}),
+      k(30, {pos: P(0, -.72, 0), torso: [-38, 0, -3], head: [28, 0, 4], crest: [-14, 0, 0], ...fans([0, 0, -26]), hands: .45,
+        plant: {l: [.42, 0, -.42], r: [-.42, .12, .75], tr: -100}}, 'i'),
+      k(50, {pos: P(0, -.76, 0), torso: [-44, 0, -4], head: [34, 0, 4], ...fans([0, 0, -32]), hands: .25, plant: {l: [.42, 0, -.42], r: [-.42, .12, .75], tr: -100}}),
+      k(64, {hands: 0, flakes: 0, torso: [-42, 0, -2], head: [30, 0, 2]}),
       k(100, {vis: 0, pos: P(0, -.16, 0), torso: [-30, 0, 0], head: [20, 0, 0]}, 'i'),
     ]},
   // v4 27.40-28.70 s: the four crescent plates fly in from around her and stack into a vertical chain at her left
@@ -640,8 +654,27 @@ export const CLIPS = [
       k(18, {...HUMAN, ...STANCE}),
     ]},
 ];
-// Wind-up retiming table (as the Guardian's; empty: the clips are authored on the pattern timelines).
-export const RETIME = {};
+// ---- retiming (user tuning "선딜 좀 줄이고"): every damaging wind-up about 25 % shorter, as the Guardian's ---------
+// The clips above stay authored on the reference-video / spec timelines (plan.md "Rig clips"); RETIME maps a clip onto
+// the played timeline with piecewise-linear knots [authored tick, played tick] from [0, 0] to [authored len, played
+// len] (mboss_rig_clips.mjs). Keys and events are mapped and rounded to whole ticks (half up). The strikes and their
+// follow-throughs sit on 1:1 segments (the H1 burst-run, flip kick and backflip, the H2 sweep, the H3 dash and kick,
+// the H4 stomp and backflip, the B1 dive, the B2 swings, the B3 dart dive and slam, the B4 orb launches, the B5 swoop
+// and the pod snap), so they keep their speed and still land on their events; the wind-ups between them are
+// compressed (the knots sit on key ticks, so no two keys collide), the recoveries after the last hit are shifted, not
+// shortened. The manifest carries `retime` and `authoredLen`; the module maps its own authored ticks with api.rt.
+export const RETIME = {
+  kick_combo: [[0, 0], [16, 16], [20, 17], [23, 20], [25, 21], [28, 22], [29, 23], [31, 24], [34, 27], [36, 28], [51, 43]], // hit 2 40 -> 32
+  kick_jump: [[0, 0], [12, 9], [19, 16], [33, 22], [45, 34], [49, 36], [65, 52]],                // sweep 13 -> 10, impact 55 -> 42 (the spiral jump spin 1:1)
+  dash_kick: [[0, 0], [9, 5], [50, 46]],                                                      // kick 15 -> 11 (ring 19 -> 15)
+  vacuum: [[0, 0], [9, 5], [41, 37]],                                                         // glint 9 -> 5, blade 17 -> 13
+  transform: [[0, 0], [2, 1], [30, 29]],                                                      // sphere (달빛 고치) 6 -> 5
+  wing_strike: [[0, 0], [8, 4], [55, 51]],                                                    // hit 15 -> 11
+  wing_barrage: [[0, 0], [5, 4], [14, 13], [31, 24], [40, 33], [69, 52], [78, 61], [94, 72], [117, 95]], // swings 5/31/69/94 -> 4/24/52/72
+  flap_dive: [[0, 0], [18, 11], [59, 52]],                                                    // slam 26 -> 19, fan 28 -> 21
+  coco: [[0, 0], [16, 11], [21, 16], [42, 30], [76, 64]],                                     // orbs 19 / 46 -> 14 / 34
+  release: [[0, 0], [3, 1], [4, 2], [5, 3], [7, 5], [9, 7], [18, 14], [30, 22], [31, 23], [51, 38], [53, 40], [96, 83]], // cup 31 -> 23, detonation 53 -> 40
+};
 applyRetime(CLIPS, RETIME);
 for (const c of CLIPS) resolvePlants(c);
 

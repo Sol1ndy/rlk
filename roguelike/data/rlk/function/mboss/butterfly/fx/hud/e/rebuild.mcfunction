@@ -9,9 +9,13 @@ execute if data storage rlk:bfkit hud{buff:1b} run data modify storage rlk:bfkit
 execute if data storage rlk:bfkit hud{coc:1b} run data modify storage rlk:bfkit hud.sub append value {text:"     "}
 execute if data storage rlk:bfkit hud{coc:1b} run data modify storage rlk:bfkit hud.sub append value {text:"",font:"rlk:mboss_bf",color:"white"}
 execute if data storage rlk:bfkit hud{coc:1b} run data modify storage rlk:bfkit hud.sub append value {text:" 달빛 고치",color:"#E8A0A6"}
-execute if data storage rlk:bfkit hud{coc:1b} run data modify storage rlk:bfkit hud.sub append value {text:" — 회복하면 해제 ",color:"#C9A3A6"}
+execute if data storage rlk:bfkit hud{coc:1b} run data modify storage rlk:bfkit hud.sub append value {text:" — 회복 ",color:"#C9A3A6"}
+execute if data storage rlk:bfkit hud{coc:1b} run data modify storage rlk:bfkit hud.sub append value {score:{name:"#bkCureP",objective:"mb"},color:"#F2C4C8",bold:true}
+execute if data storage rlk:bfkit hud{coc:1b} run data modify storage rlk:bfkit hud.sub append value {text:"/",color:"#C9A3A6"}
+execute if data storage rlk:bfkit hud{coc:1b} run data modify storage rlk:bfkit hud.sub append value {score:{name:"#bkCureT",objective:"mb"},color:"#C9A3A6"}
+execute if data storage rlk:bfkit hud{coc:1b} run data modify storage rlk:bfkit hud.sub append value {text:"% ",color:"#C9A3A6"}
 execute if data storage rlk:bfkit hud{coc:1b} run data modify storage rlk:bfkit hud.sub append value {text:"",font:"rlk:mboss_bf",color:"white"}
 execute if data storage rlk:bfkit hud{buff:1b} run data modify storage rlk:bfkit hud.sub append value {text:"     "}
 execute if data storage rlk:bfkit hud{buff:1b} run data modify storage rlk:bfkit hud.sub append value {text:"",font:"rlk:mboss_bf",color:"white"}
 execute if data storage rlk:bfkit hud{buff:1b} run data modify storage rlk:bfkit hud.sub append value {text:" 달빛 축복 받음",color:"#F2D27A"}
-execute if data storage rlk:bfkit hud{buff:1b} run data modify storage rlk:bfkit hud.sub append value {text:" (치명타 +15% · 피해 +50%)",color:"#BDB38A"}
+execute if data storage rlk:bfkit hud{buff:1b} run data modify storage rlk:bfkit hud.sub append value {text:" (치명타 +15% · 치명타 피해 +50%)",color:"#BDB38A"}

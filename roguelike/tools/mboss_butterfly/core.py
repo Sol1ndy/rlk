@@ -7,7 +7,7 @@ mb2/bf_contract.md for the core <-> pattern contract.
 Owns F:mboss/butterfly/** except F:mboss/butterfly/rig/** (the rig generator) and the fx kit's paths (tools/
 build_mboss_bf_fx.py: fx/{card,cardx,look,clear,uninstall} and fx/{e,p,tele,snd,hud,prop,test}/**, listed under
 "owned" in tools/mboss_bf_fx_manifest.json). Every file it owns is deleted and rewritten on each run
-(F:mboss/butterfly/rig_stub/ too: it exists only while api.STUB). Every visual of the core goes through the fx kit
+(a stale F:mboss/butterfly/rig_stub/ of the old stand-in rig too). Every visual of the core goes through the fx kit
 (api.K / Gen.fx, snd, kcard, khud, kprop; scratchpad mb2/bf_fx_api.md), plus plain vanilla particles.
 """
 import importlib
@@ -24,6 +24,9 @@ OWN_TOP = 'mboss/' + A.ID
 # ---------------------------------------------------------------------------------------------
 # Tunables (plan.md "Forms and rotation", "Debuff 달빛 고치")
 GROGGY = 300                                  # 15 s after 달빛 해제 (the Guardian's is 220)
+GLIDE_OUT = 3.5                               # butterfly idle: glide out inside 3.5 b (plan "Review-fix decisions", fairness F5; was 5)
+PYRO_KEEP = 6.0                               # the Pyro patterns' back-off before they start (plan: she keeps 6-8 b)
+B5_NEAR, B5_APPROACH_T = 8.0, 10              # 달빛 해제: glide in at 0.4 b/t while beyond 8 b, at most 10 t (fidelity F3)
 TURN_T = clip_len('turn_h')                   # 24: she turns to face the player
 CHAIN_T = clip_len('chain_reform')            # 18: the crescent chain re-forms
 HUM_FIRST_T, HUM_FIRST_N = 600, 5             # first human stretch: 600 t of fight or 5 patterns, whichever first
@@ -37,20 +40,21 @@ ENT_BURST = ev_or('entrance', 'burst', 79)
 ENT_LAND = ev_or('entrance', 'land', 90)
 ENT_GLOW = ev_or('entrance', 'glow', ENT_BURST - 18)
 ENT_WHITE = ev_or('entrance', 'whiteout', ENT_BURST - 8)
-NAMEPLATE = 57                                # the video's fight trigger (nameplate) on the cocoon timeline
+NAMEPLATE = ev_or('entrance', 'nameplate', 57)  # the video's fight trigger (nameplate) on the cocoon timeline
 INTRO_DONE = INTRO_CLIP + ENT_LEN + 1         # she stands; the fight starts
 TR_LEN = clip_len('transform')
-TR_OPEN = ev_or('transform', 'open', 4)
-TR_SPHERE = ev_or('transform', 'sphere', 6)   # 달빛 고치 lands with the light sphere
+TR_OPEN = ev_or('transform', 'open', 3)
+TR_SPHERE = ev_or('transform', 'sphere', 5)   # 달빛 고치 lands with the light sphere (6 authored)
 TR_RINGS = ev_or('transform', 'rings', TR_SPHERE + 2)
 RL_LEN = clip_len('release')
-RL_DET = ev_or('release', 'detonation', 53)
+RL_DET = ev_or('release', 'detonation', 40)
 RL_FLAT = ev_or('release', 'flat', RL_DET + 34)
 RL_REVERT = ev_or('release', 'revert', RL_DET + 39)
 DEATH_LEN = clip_len('death')
-D_SHATTER = ev_or('death', 'shatter', 6)
-D_KNEEL = ev_or('death', 'kneel', 24)
-D_DISSOLVE = ev_or('death', 'dissolve', 40)
+D_SHATTER = ev_or('death', 'shatter', 10)     # the rig (spec S4): wings flat and gone with the 10 t blend
+D_KNEEL = ev_or('death', 'kneel', 30)
+D_DISSOLVE = ev_or('death', 'dissolve', 50)
+COCOON_Y = 2.15                               # the cocoon prop's origin is its centre (rig API section 4)
 HIT_H, SCALE_H = (A.BOSS['hit']['w'], A.BOSS['hit']['h']), A.BOSS['scale']   # human form = the registry
 HIT_B, SCALE_B = (2.2, 4.4), 1.8              # butterfly form: hovering toes at +1.2 b, the body still on the floor
 DEW_GLOW = int(A.LIME_HEX[1:], 16)
@@ -95,14 +99,11 @@ def build():
     for p in pats:
         for f in ('start', 'tick', 'cancel'):
             assert g.has(f'p/{p.key}/{f}'), f'{p.module}: pattern {p.key} has no {f}'
-    if A.STUB:
-        from . import stub_rig
-        stub_rig.emit(g)
     removed = clean(out)
     normal = [p for p in pats if p.kind == 'normal']
     print(f'mboss butterfly: {len(g.files)} functions ({len(normal)} normal + {len(pats) - len(normal)} service patterns '
           f'from {", ".join(PATTERN_MODULES)} + core), {removed} stale removed, rig '
-          f'{"STUB (" + A.MANIFEST.name + ")" if A.STUB else A.MANIFEST.name}.')
+          f'{A.MANIFEST.name}.')
     for clip, event, default in sorted(set(A.FALLBACKS)):
         print(f'  note: manifest clip {clip} has no event {event!r}; using tick {default}')
 
@@ -178,6 +179,7 @@ def ring(g, rgb, r, n, y='0.15', scale=1.0, cnt=1):
 
 
 HUM_HEX, BF_HEX = '#C8E6A0', A.LIME_HEX
+COC_HINT = f'달빛 고치 — 체력 {A.CURE_PCT}% 회복하면 해제'
 
 
 class Core:
@@ -216,15 +218,16 @@ class Core:
     # -----------------------------------------------------------------------------------------
     def consts_vars(self):
         self.w('ai/consts', ['# Module constants (spawn, reload). #bfK<n> are the moduli of Gen.every and the core\'s cycles.']
-               + [sc_set(f'#bfK{n}', n) for n in (2, 3, 4, 5, 6, 8, 10, 20, 40)]
-               + [sc_set('#bfCocPct', A.COCOON_HP_PCT), sc_set('#bfDewPct', A.DEW_HEAL_PCT)])
+               + [sc_set(f'#bfK{n}', n) for n in (2, 3, 4, 5, 6, 8, 10, 18, 20, 40)]
+               + [sc_set('#bfCocPct', A.COCOON_HP_PCT), sc_set('#bfDewPct', A.DEW_HEAL_PCT), sc_set('#bfCurePct', A.CURE_PCT)])
         v = ['# Every fake player of the module back to its fight-start value (spawn, cleanup; no executor).',
              '# AI state #bfSt: 0 idle 1 pattern 2 burst-run close-in 3 groggy 4 turn + chain re-form 5 wing look prep 7 dying',
              '# form #bfForm: 1 human 2 butterfly']
         v += [sc_set(k, 0) for k in ('#bfSt', '#bfT', '#bfMv', '#bfMvT', '#bfLast', '#bfPick', '#bfReq', '#bfPat', '#bfPNew',
                                       '#bfPT', '#bfPEnd', '#bfPMax', '#bfPLen', '#bfPRel', '#bfPDone', '#bfPCol', '#bfClk',
                                       '#bfFlash', '#bfTst', '#bfDist', '#bfWant', '#bfBurnQ', '#bfDewN', '#bfCocN',
-                                      '#bfHumN', '#bfHumT', '#bfBfN', '#bfBfT')]
+                                      '#bfHumN', '#bfHumT', '#bfBfN', '#bfBfT', '#bfDew1', '#bfWing', '#bfPSw', '#bfPNeed', '#bfCure',
+                                      '#bfCureT')]
         v += [sc_set('#bfCool', 30), sc_set('#bfBand', 2), sc_set('#bfSide', 1), sc_set('#bfForm', 1),
               sc_set('#bfHumLim', HUM_FIRST_N), sc_set('#bfHumTL', HUM_FIRST_T), sc_set('#bfBfLim', BF_N[0]),
               sc_set('#bfLook', A.EL_DENDRO)]
@@ -243,14 +246,18 @@ class Core:
             'summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_dest"]}',
             'execute as @e[type=minecraft:marker,tag=rlk_mb_bf_dest,limit=1] at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~ 0',
             'scoreboard players operation #bfDLeft mb = #bfDMax mb',
+            '# the distance to the player once: every 0.5 b step straight at her takes 5 tenths off it (review fix perf-3:',
+            '# it used to be re-measured, 89 commands, on every step)',
+            'execute as @e[type=minecraft:marker,tag=rlk_mb_bf_dest,limit=1] run function rlk:mboss/mv/dist',
             f'execute as @e[type=minecraft:marker,tag=rlk_mb_bf_dest,limit=1] at @s run {self.F("u/dest_step")}'])
         self.w('u/dest_step', [
-            '# @s = the dest marker, at it (rotation = toward the player): one 0.5 b step while allowed.',
+            '# @s = the dest marker, at it (rotation = toward the player): one 0.5 b step while allowed (#mbDist = the',
+            '# distance to the player from here, tenths). In butterfly form the point stays inside r 16.5 (plan Q9, fix S6).',
             'execute if score #bfDLeft mb matches ..4 run return 0',
-            'function rlk:mboss/mv/dist',
             'scoreboard players remove #mbDist mb 5',
             'execute if score #mbDist mb < #bfDKeep mb run return 0',
             'execute rotated as @s positioned ^ ^ ^0.5 unless function rlk:mboss/mv/ok run return 0',
+            f'execute if score #bfForm mb matches 2 rotated as @s positioned ^ ^ ^0.5 unless function {NS}{A.WX}/u/okb run return 0',
             'execute rotated as @s run tp @s ^ ^ ^0.5',
             'scoreboard players remove #bfDLeft mb 5',
             f'execute at @s run {self.F("u/dest_step")}'])
@@ -270,7 +277,8 @@ class Core:
             f'execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run {F("intro/setup")}'])
         self.w('tick', [
             '# Hook tick (@s = body, at @s, fight state). Order: clocks and flags, the heal orbs (a pickup heals),',
-            '# heal events (any heal cures 달빛 고치), Burning, form clocks, AI state, pattern slot, then the rig (a clip',
+            f'# heal events (their amounts fill the 달빛 고치 cure meter: {A.CURE_PCT} % of max HP cures it), Burning, form clocks, AI',
+            '# state, pattern slot, then the rig (a clip',
             '# played this tick starts this tick). The fx kit ages its own cards (a self-scheduled function).',
             'scoreboard players add #bfClk mb 1',
             f'execute if score #bfFlash mb matches 1 run {R("flash")}',
@@ -298,7 +306,8 @@ class Core:
         self.w('incoming', [
             '# Hook incoming (@s = body inside combat/apply_mods, after the level factor and mres). NO element RES of any',
             '# kind (user decision "불, 풀 내성은 없애줘"): mres stays 0 and nothing here reads #elem. Only the player\'s',
-            f'# 달빛 고치 (DMG {A.COCOON_DMG} %, forced crits undone: CRIT -100 %) and 달빛 축복 받음 (DMG {A.BUFF_DMG} %), reactions included.',
+            f'# 달빛 고치 (DMG {A.COCOON_DMG} %, forced crits undone: CRIT -100 %), reactions included. (달빛 축복 받음 is CRIT +{A.BUFF_CRIT} /',
+            f'# CRIT DMG +{A.BUFF_CRIT_DMG} through items/hook/stat_buffs: #mbCritAdd / #mbCritDmgAdd, no damage factor here.)',
             f'execute if score #bfCoc mb matches 1 if score #crit tmp matches 1 run {F("coc/uncrit")}',
             f'execute unless score #bfDmgPct mb matches 100 if score #dmg tmp matches 1.. run {F("coc/dmg")}'])
         self.w('pause', [
@@ -313,7 +322,33 @@ class Core:
             f'execute if entity @a[tag=player,scores={{dead=1}}] run {F("coc/clear_hud")}',
             f'execute if entity @a[tag=player,scores={{rnDie=1..}}] run {F("coc/clear_hud")}',
             F('p/pause_d')])
-        self.w('resume', ['# Hook resume: nothing to restore (module timers live in the body tick and simply continue).'])
+        self.w('resume', [
+            '# Hook resume (the fight runs again; module timers live in the body tick and simply continue). The pause hook',
+            '# cleared the kit\'s ground decals of the frozen hazards: every quiet hazard still in its tell gets its decal',
+            '# back with the tell it has left, so no strike lands without a telegraph (review fix FX-1); the running',
+            '# pattern redraws what is not a framework hazard (its optional p/<key>/resume, e.g. B2\'s landing markers).',
+            f'execute as @e[type=minecraft:marker,tag=rlk_mb_hz,tag=rlk_mb_hzq] if score @s mbHzT < @s mbHzW at @s rotated as @s run {F("u/redraw")}',
+            F('p/resume_d')])
+        rd = ['# @s = a quiet hazard marker in its tell, at / rotated as it: its kit decal again, from its scores (tenths of a block,',
+              '# the element colour mbHzE; hold 3). The resume hook runs before this tick\'s hz/all, which still counts mbHzT up',
+              '# once: the strike comes mbHzW - mbHzT - 1 ticks from now, the decal\'s tell. Storage rlk:mboss bfr = the macro args.',
+              'scoreboard players operation #bfX mb = @s mbHzW', 'scoreboard players operation #bfX mb -= @s mbHzT',
+              'scoreboard players remove #bfX mb 1',
+              'execute if score #bfX mb matches ..0 run return 0',
+              'execute store result storage rlk:mboss bfr.tell int 1 run scoreboard players get #bfX mb',
+              'execute store result storage rlk:mboss bfr.el int 1 run scoreboard players get @s mbHzE',
+              'data modify storage rlk:mboss bfr.hold set value 3',
+              'execute store result storage rlk:mboss bfr.r int 0.01 run scoreboard players get @s mbHzR',
+              'execute store result storage rlk:mboss bfr.r0 int 0.01 run scoreboard players get @s mbHzR0',
+              'execute store result storage rlk:mboss bfr.a int 1 run scoreboard players get @s mbHzAng',
+              'execute store result storage rlk:mboss bfr.len int 0.01 run scoreboard players get @s mbHzR',
+              'execute store result storage rlk:mboss bfr.w int 0.02 run scoreboard players get @s mbHzC',
+              'execute store result storage rlk:mboss bfr.back int 0.01 run scoreboard players get @s mbHzR0',
+              f'execute if score @s mbHzK matches 1 run return run function {K.FN}tele/disc with storage rlk:mboss bfr',
+              f'execute if score @s mbHzK matches 2 run return run function {K.FN}tele/ring with storage rlk:mboss bfr',
+              f'execute if score @s mbHzK matches 3 run return run function {K.FN}tele/sector with storage rlk:mboss bfr',
+              f'execute if score @s mbHzK matches 4 run return run function {K.FN}tele/line with storage rlk:mboss bfr']
+        self.w("u/redraw", rd)
         self.w('cleanup', [
             '# Hook cleanup (no executor; idempotent; fight end, abort, run end, map change, wipe, uninstall): module',
             '# fake players back to their defaults, 달빛 고치 / 달빛 축복 받음 off, every kit card and both kit HUD badges',
@@ -328,31 +363,38 @@ class Core:
             R('kill'), R('prop/clear'),
             f'function {K.FN}uninstall',
             'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_dew]',
-            'kill @e[tag=rlk_mb_bf_fx]']
+            'kill @e[tag=rlk_mb_bf_fx]',
+            '# the module\'s scratch storage (heal-orb spawn args, the decal redraw args; review fix perf-4)',
+            'data remove storage rlk:mboss bfd',
+            'data remove storage rlk:mboss bfr']
             + [f'scoreboard objectives remove {o}' for o in A.RIG_OBJECTIVES])
         rl = [
             '# Hook reload (@s = body after /reload; every aux entity is gone: rig parts, props, heal orbs, fx).',
             '# HP is kept. A transformation past its sphere finishes into butterfly form (the cocoon was applied); a',
             '# release goes straight to the groggy in human form; a groggy goes on; otherwise idle in the same form.',
+            '# #bfRl = what to resume (its own score: the helpers below use #bfX as scratch, e.g. dew/spawn1\'s random',
+            '# angle, which used to land on 2 / 3 now and then and start a second groggy).',
             F('ai/consts'),
             'execute if score #mbSt mb matches 0 run function rlk:mboss/intro_end',
             'execute as @e[tag=rlk_mb_mv] run function rlk:mboss/mv/stop',
-            sc_set('#bfX', 0),
-            f'execute if score #bfPat mb matches 20 if score #bfPT mb matches {TR_SPHERE}.. run scoreboard players set #bfX mb 1',
-            'execute if score #bfPat mb matches 15 run scoreboard players set #bfX mb 2',
-            'execute if score #bfSt mb matches 4 run scoreboard players set #bfX mb 3',
+            sc_set('#bfRl', 0),
+            f'execute if score #bfPat mb matches 20 if score #bfPT mb matches {TR_SPHERE}.. run scoreboard players set #bfRl mb 1',
+            'execute if score #bfPat mb matches 15 run scoreboard players set #bfRl mb 2',
+            'execute if score #bfSt mb matches 4 run scoreboard players set #bfRl mb 3',
             F('p/cancel'),
             sc_set('#mbNoLeash', 0), sc_set('#bfDewN', 0), sc_set('#bfMv', 0),
             'tag @s remove rlk_mb_inv',
             R('init'), R('spawn'),
-            f'execute if score #bfX mb matches 1 run {F("form/set_b")}',
-            f'execute if score #bfX mb matches 2 run {F("form/set_h")}',
+            f'execute if score #bfRl mb matches 1 run {F("form/set_b")}',
+            f'execute if score #bfRl mb matches 2 run {F("form/set_h")}',
             f'execute if score #bfForm mb matches 2 run {F("form/rig_b")}',
             f'execute if score #bfForm mb matches 1 run {F("form/rig_h")}',
             F('coc/assert'),
             f'execute if score #bfCoc mb matches 1 if score #bfForm mb matches 2 run {F("dew/spawn")}',
-            f'execute if score #bfX mb matches 2 run return run {F("groggy/begin")}',
-            f'execute if score #bfX mb matches 3 run return run {F("groggy/end")}',
+            '# the groggy\'s single 달빛 이슬 (offered while debuffed after 달빛 해제) comes back too (review fix S4)',
+            f'execute if score #bfDew1 mb matches 1.. if score #bfForm mb matches 1 unless score #bfRl mb matches 2 run {F("dew/offer")}',
+            f'execute if score #bfRl mb matches 2 run return run {F("groggy/begin")}',
+            f'execute if score #bfRl mb matches 3 run return run {F("groggy/end")}',
             f'execute if score #bfSt mb matches 3 run return run {g.play("groggy_h")}',
             sc_set('#bfCool', 20),
             F('ai/enter')]
@@ -382,11 +424,12 @@ class Core:
         F, R, g = self.F, self.R, self.g
         cocoon = g.prop('cocoon')
         setup = ['# @s = the new body (from the spawn hook), at it: module state, rig in the entrance clip (the cocoon), HUD.',
+                 '# spawn_hidden: every part starts at scale 0 (spawn would show her for the 3 t blend into the clip).',
                  F('ai/consts'), F('ai/vars'),
-                 R('init'), R('spawn'),
+                 R('init'), R('spawn_hidden'),
                  g.play('entrance')]
         if cocoon:
-            setup.append(cocoon)
+            setup.append(f'execute positioned ~ ~{L.num(COCOON_Y)} ~ run {cocoon}')
         setup += [F('form/hitbox_h'), F('hud/refresh'),
                   F('seq_h/entrance/setup')]       # [seq_h: human author] S1 visuals (the floor disc ...)
         self.w('intro/setup', setup)
@@ -453,18 +496,18 @@ class Core:
                                 'execute if score #bfSide mb matches 1 run ' + side.format(a=90),
                                 'execute if score #bfSide mb matches -1 run ' + side.format(a=-90)])
         self.w('ai/idle_b', [
-            '# @s = body, butterfly form (she always hovers; the rig carries the height): track, keep 5-8 b (gliding',
-            '# in at 0.25 b/t, out at 0.2 b/t), decide when the cooldown is over.',
+            f'# @s = body, butterfly form (she always hovers; the rig carries the height): track, glide in beyond 8 b at',
+            f'# 0.25 b/t and out inside {L.num(GLIDE_OUT)} b at 0.2 b/t (inside r 16.5: wx/u/toward|away), decide when the cooldown is over.',
             R('face/track'),
             'execute if score #bfCool mb matches 1.. run scoreboard players remove #bfCool mb 1',
             F('ai/loco_b'),
             f'execute if score #bfCool mb matches ..0 run {F("ai/next")}'])
         self.w('ai/loco_b', [
             f'execute unless entity @e[tag=rlk_body,distance=..8,limit=1] run return run {F("ai/glide_in")}',
-            f'execute if entity @e[tag=rlk_body,distance=..5,limit=1] run return run {F("ai/glide_out")}',
+            f'execute if entity @e[tag=rlk_body,distance=..{L.num(GLIDE_OUT)},limit=1] run return run {F("ai/glide_out")}',
             f'execute unless score #bfMv mb matches 0 run {F("ai/mv0")}'])
-        self.w('ai/glide_in', [f'execute unless score #bfMv mb matches 4 run {F("ai/mv4")}', 'function rlk:mboss/mv/toward {d:0.25}'])
-        self.w('ai/glide_out', [f'execute unless score #bfMv mb matches 5 run {F("ai/mv5")}', 'function rlk:mboss/mv/away {d:0.2}'])
+        self.w('ai/glide_in', [f'execute unless score #bfMv mb matches 4 run {F("ai/mv4")}', A.bstep('toward', 0.25)])
+        self.w('ai/glide_out', [f'execute unless score #bfMv mb matches 5 run {F("ai/mv5")}', A.bstep('away', 0.2)])
         mv = {0: None, 1: 'step_h', 2: 'back_h', 3: 'step_h', 4: 'glide_b', 5: 'glide_b'}
         for m, clip in mv.items():
             lines = [f'# Locomotion mode {m} (0 stand, 1 walk, 2 back off, 3 strafe, 4 glide in, 5 glide out).', sc_set('#bfMv', m), sc_set('#bfMvT', 0)]
@@ -586,18 +629,34 @@ class Core:
         self.w('ai/close_begin', [sc_set('#bfSt', ST['close']), sc_set('#bfT', 0), sc_set('#bfMv', 0), g.play('run_h'),
                                   g.sound('entity.breeze.jump', 0.6, 1.3), g.sound('block.moss_carpet.step', 0.6, 1.0),
                                   F('hud/refresh')])
-        prep = ['# @s = body, butterfly form: the wing element look of #bfPick (1 t switch), the pattern 8 t later; no switch',
-                '# needed = at once.', sc_set('#bfWant', A.EL_DENDRO)]
+        pk, nr = L.num(PYRO_KEEP), L.num(B5_NEAR)
+        prep = ['# @s = body, butterfly form, before #bfPick: the wing element look (a 1 t switch, the pattern 8 t later), the',
+                f'# Pyro patterns\' back-off to {pk} b (even when the wings are already Pyro: review fix F5), the approach of 달빛 해제',
+                f'# (beyond {nr} b: glide in, fix F3). Nothing to do = at once.', sc_set('#bfWant', A.EL_DENDRO)]
         prep += [sc_set_if('#bfPick', p.id, '#bfWant', p.el) for p in self.pats if p.form == 'b']
-        prep += [f'execute if score #bfLook mb = #bfWant mb run return run {F("ai/go")}',
-                 sc_set('#bfSt', ST['prep']), sc_set('#bfT', 0), F('look/switch')]
+        prep += [sc_set('#bfPSw', 0), 'execute unless score #bfLook mb = #bfWant mb run scoreboard players set #bfPSw mb 1',
+                 'scoreboard players operation #bfPNeed mb = #bfPSw mb',
+                 f'execute if score #bfWant mb matches {A.EL_PYRO} if entity @e[tag=rlk_body,distance=..{pk},limit=1] run scoreboard players set #bfPNeed mb 1',
+                 f'execute if score #bfPick mb matches 15 unless entity @e[tag=rlk_body,distance=..{nr},limit=1] run scoreboard players set #bfPNeed mb 1',
+                 f'execute if score #bfPNeed mb matches 0 run return run {F("ai/go")}',
+                 sc_set('#bfSt', ST['prep']), sc_set('#bfT', 0),
+                 f'execute if score #bfPSw mb matches 1 run {F("look/switch")}']
         self.w('ai/prep_begin', prep)
         self.w('ai/prep', [
             'scoreboard players add #bfT mb 1',
             R('face/track'),
-            '# Pyro patterns want 6-8 b',
-            f'execute if score #bfWant mb matches {A.EL_PYRO} if entity @e[tag=rlk_body,distance=..6,limit=1] run function rlk:mboss/mv/away {{d:0.25}}',
-            f'execute if score #bfT mb matches {LOOK_LEAD}.. run {F("ai/go")}'])
+            sc_set('#bfPNeed', 0),
+            f'# Pyro patterns want {pk}-8 b: back off at 0.25 b/t (inside r 16.5)',
+            f'execute if score #bfWant mb matches {A.EL_PYRO} if entity @e[tag=rlk_body,distance=..{pk},limit=1] run scoreboard players set #bfPNeed mb 1',
+            f'execute if score #bfWant mb matches {A.EL_PYRO} if entity @e[tag=rlk_body,distance=..{pk},limit=1] run {A.bstep("away", 0.25)}',
+            f'# 달빛 해제 starts within {nr} b: glide in at 0.4 b/t, at most {B5_APPROACH_T} t (its swoop stays near 1 b/t)',
+            f'execute if score #bfPick mb matches 15 unless entity @e[tag=rlk_body,distance=..{nr},limit=1] run scoreboard players set #bfPNeed mb 1',
+            f'execute if score #bfPick mb matches 15 unless entity @e[tag=rlk_body,distance=..{nr},limit=1] run {A.bstep("toward", 0.4)}',
+            f'# a switched look always waits {LOOK_LEAD} t; then go once nothing is left to do, or at the cap',
+            f'execute if score #bfPSw mb matches 1 if score #bfT mb matches ..{LOOK_LEAD - 1} run return 0',
+            f'execute if score #bfPNeed mb matches 0 run return run {F("ai/go")}',
+            f'execute if score #bfPick mb matches 15 if score #bfT mb matches {B5_APPROACH_T}.. run return run {F("ai/go")}',
+            f'execute unless score #bfPick mb matches 15 if score #bfT mb matches {LOOK_LEAD}.. run return run {F("ai/go")}'])
         go = ['# Into the pattern slot: p/run starts it this tick (pattern clock 0 = clip tick 0).',
               sc_set('#bfSt', ST['pattern']), 'scoreboard players operation #bfPat mb = #bfPick mb', sc_set('#bfPNew', 1)]
         go += [f'execute if score #bfPick mb matches {p.id} run scoreboard players add #bfHumN mb 1' for p in self.hum]
@@ -608,8 +667,8 @@ class Core:
         rec.append(F('ai/enter'))
         self.w('ai/recover', rec)
         self.w('ai/pat_done', [
-            '# From p/finish: the owner continues (unless it already moved on at the pattern\'s release).',
-            'execute if score #bfPRel mb matches 1 run return 0',
+            '# From p/finish: the owner continues. (#bfPRel, set by g.release(), only hides the pattern bar: no butterfly',
+            '# state moves on at a release, so returning early here froze the AI for the rest of the fight; review fix S2.)',
             f'execute if score #bfPDone mb matches 20 run return run {F("form/transform_done")}',
             f'execute if score #bfPDone mb matches 15 run return run {F("groggy/begin")}',
             F('ai/recover')])
@@ -647,12 +706,15 @@ class Core:
             'tag @s remove rlk_mb_inv',
             'kill @e[type=minecraft:marker,tag=rlk_mb_bf_dest]',
             'kill @e[type=minecraft:marker,tag=rlk_mb_bf_lock]',
+            '# every marker a pattern kept (Gen.keep) or summoned for itself (rlk_mb_bf_kept): one run never aims with',
+            '# another run\'s marker (review fix S1 / perf-1)',
+            'kill @e[type=minecraft:marker,tag=rlk_mb_bf_kept]',
             F('ai/pat_done'),
             sc_set('#bfPRel', 0)])
         self.w('p/end', ['# Called by a pattern (any executor): it is done; the core finishes it after this tick\'s pattern tick.',
                          sc_set('#bfPEnd', 1)])
-        self.w('p/release', ['# Called by a pattern (any executor): its dangerous part is over; the owner may move on while the',
-                             '# pattern finishes a harmless tail in the slot. The slot stays busy (no new decision) until p/end.',
+        self.w('p/release', ['# Called by a pattern (any executor): its dangerous part is over. It hides the pattern bar for the',
+                             '# harmless tail; the slot stays busy (no new decision) until p/end, and then the owner continues as usual.',
                              sc_set('#bfPRel', 1)])
         self.w('p/cancel', [
             '# Stop the slot pattern now (tests, death, reload). Callers run rlk:mboss/lib_clear first when hazards must',
@@ -662,6 +724,7 @@ class Core:
             sc_set('#mbNoLeash', 0),
             'kill @e[type=minecraft:marker,tag=rlk_mb_bf_dest]',
             'kill @e[type=minecraft:marker,tag=rlk_mb_bf_lock]',
+            'kill @e[type=minecraft:marker,tag=rlk_mb_bf_kept]',
             'execute if score #mbSt mb matches 1 run tag @e[tag=rlk_mb_body] remove rlk_mb_inv'])
         for name, doc in (('start', 'start (clock -lead)'), ('tick', 'tick (#bfPT -lead+1 ..)'), ('cancel_d', 'cancel')):
             target = 'cancel' if name == 'cancel_d' else name
@@ -674,6 +737,11 @@ class Core:
                              'execute if score #bfPNew mb matches 1 run return 0']
                + [f'execute if score #bfPat mb matches {p.id} run return run {F(f"p/{p.key}/pause")}'
                   for p in self.pats if self.g.has(f'p/{p.key}/pause')])
+        self.w('p/resume_d', ['# GENERATED dispatcher: the running pattern\'s optional resume (the fight runs again), by #bfPat.',
+                              'execute unless score #bfPat mb matches 1.. run return 0',
+                              'execute if score #bfPNew mb matches 1 run return 0']
+               + [f'execute if score #bfPat mb matches {p.id} run return run {F(f"p/{p.key}/resume")}'
+                  for p in self.pats if self.g.has(f'p/{p.key}/resume')])
         vis = ['# GENERATED: hz_vis events of hazards with #hzVis = pattern id x 10 + k (k 1-9), @s = hazard marker.',
                'scoreboard players operation #bfV mb = @s mbHzV', 'scoreboard players operation #bfV mb /= #c10 mb']
         vis += [f'execute if score #bfV mb matches {p.id} run return run {F(f"p/{p.key}/vis")}'
@@ -736,8 +804,9 @@ class Core:
             F('form/set_b'), sc_set('#bfCool', 16), F('ai/enter')])
         self.w('form/sphere', [
             f'# Transformation clock {TR_SPHERE} (@s = body): the light sphere lands 달빛 고치 on the player and {A.DEW_N} 달빛 이슬',
-            '# heal orbs appear (any heal cures it).',
+            '# heal orbs appear (two of them fill the cure meter): exactly 3, a groggy orb still lying there goes first (review fix PL-2).',
             F('coc/apply'),
+            F('dew/clear'),
             F('dew/spawn')])
         self.w('form/revert', [
             f'# 달빛 해제 clock {RL_REVERT} (@s = body): the wings have shattered, she is human again; uncollected heal orbs vanish.',
@@ -753,14 +822,25 @@ class Core:
         tl = TL(g, key)
         from . import seq_b  # wing author: S2 transformation fx + the wx/** helpers (seq_b.py)
         seq_b.emit(g)
-        tl.at(0, g.look('dendro'), sc_set('#bfLook', A.EL_DENDRO), self.R('face/player'))
+        tl.at(0, g.look('dendro'), sc_set('#bfLook', A.EL_DENDRO), self.R('face/player'),
+              f'# the wings open at {TR_OPEN}: glide inside the butterfly body disc r {L.num(A.BODY_R_B)} first (at most 0.5 b/t;',
+              '# the wing tips must clear the wall ring, plan Q9; review fix F2)',
+              'kill @e[type=minecraft:marker,tag=rlk_mb_bf_p20c]',
+              'summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_bf_p20c","rlk_mb_bf_kept"]}',
+              f'execute as @e[type=minecraft:marker,tag=rlk_mb_bf_p20c,limit=1] run {A.clamp_body()}',
+              f'execute positioned as @e[type=minecraft:marker,tag=rlk_mb_bf_p20c,limit=1] run function rlk:mboss/mv/glide {{t:{TR_OPEN}}}',
+              'kill @e[type=minecraft:marker,tag=rlk_mb_bf_p20c]')
         for t in seq_b.TF_TICKS:  # wing author: S2 fx per clip tick
             tl.at(t, g.fn(f'{A.WX}/tf/{t}'))
         tl.at(TR_LEN, g.end())
         tl.write(['# Transformation (core service pattern 20; clip transform, @s = body, at it): the cocoon glows, the wings',
                   f'# open ({TR_OPEN}), the light sphere ({TR_SPHERE}: 달빛 고치 + 달빛 이슬 via p/svc), ripple rings, full spread; end {TR_LEN}.'],
                  [f'# {key} tick (#bfPT 1..{TR_LEN}).'])
-        g.pw(key, 'cancel', ['# Nothing of its own lingers (dust only).'])
+        g.pw(key, 'cancel', [f'# Nothing of its own lingers (dust only). A cut in the fight (test commands; #mbSt 1) after the open event',
+                             f'# ({TR_OPEN}) put the rig in butterfly form while #bfForm is still 1: back to the human rig (review fix S3).',
+                             f'# A death keeps the wings so they can shatter; a reload respawns the rig anyway.',
+                             f'execute if score #mbSt mb matches 1 if score #bfForm mb matches 1 if score #bfPT mb matches {TR_OPEN}.. '
+                             f'as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run {self.F("form/rig_h")}'])
 
     # -----------------------------------------------------------------------------------------
     def groggy(self):
@@ -769,6 +849,8 @@ class Core:
             f'# @s = body, after 달빛 해제 (she has just landed in human form): {GROGGY} t of groggy: motionless idle, back',
             '# turned to the player, no tracking, no attacks; then the turn and the chain re-form (recover). No damage bonus.',
             sc_set('#bfSt', ST['groggy']), sc_set('#bfT', 0), sc_set('#mbNoLeash', 0), sc_set('#bfMv', 0),
+            f'# the next human stretch ({HUM_NEXT_N} patterns) counts from here, so a test cut or a reload in the groggy sees it (fix S8)',
+            sc_set('#bfHumN', 0), sc_set('#bfHumLim', HUM_NEXT_N), sc_set('#bfHumT', 0), sc_set('#bfHumTL', 0),
             f'execute if score #bfForm mb matches 2 run {F("form/now_h")}',
             g.play('groggy_h'),
             'execute at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~180 0',
@@ -776,7 +858,7 @@ class Core:
             F('hud/refresh')])
         self.w('groggy/tick', [
             'scoreboard players add #bfT mb 1',
-            f'# still debuffed after 달빛 해제: one new 달빛 이슬 during the groggy',
+            f'# still debuffed after 달빛 해제: new 달빛 이슬 during the groggy (as many as the cure meter still needs: 1 or 2)',
             f'execute if score #bfT mb matches 20 if score #bfCoc mb matches 1 run {F("dew/spawn1")}',
             F('seq_h/groggy/tick'),                    # [seq_h: human author] S3 visuals and sounds on #bfT
             f'execute if score #bfT mb matches {GROGGY}.. run {F("recover/begin")}'])
@@ -809,8 +891,9 @@ class Core:
             f'# @s = player, at it. {A.COCOON_HP_PCT} % of the CURRENT HP as damage, non-lethal (at least 1, HP never below 1), no',
             '# element; a debuff, not a hit: no dash i-frames, defence or shields. Then the state: player DMG',
             f'# {A.COCOON_DMG} %, CRIT {A.COCOON_CRIT} (forced crits undone in incoming), healing received {A.COCOON_HEAL} %; a',
-            '# previous 달빛 축복 받음 ends here. The kit: swirl fx and curse chime at the player, the HUD badge (coc_on,',
-            '# buff_off), the actionbar notice with the numbers; the typed hint (core caption).',
+            '# previous 달빛 축복 받음 ends here. The cure meter restarts at 0 (user: "일정 체력 이상 회복해야 하게"; the target is',
+            f'# {A.CURE_PCT} % of max HP). The kit: swirl fx and curse chime at the player, the HUD badge (coc_on, buff_off, the',
+            '# meter readout), the actionbar notice with the numbers; the typed hint (core caption).',
             'scoreboard players operation #bfX mb = @s curHealth',
             'scoreboard players operation #bfX mb *= #bfCocPct mb',
             'scoreboard players operation #bfX mb /= #c100 mb',
@@ -821,23 +904,54 @@ class Core:
             'scoreboard players set #elem tmp 0',
             'execute at @e[tag=rlk_body,limit=1] positioned ~ ~1.62 ~ run function rlk:player/hurt_do',
             sc_set('#bfCoc', 1), sc_set('#bfBuff', 0), sc_set('#bfDmgPct', A.COCOON_DMG),
-            sc_set('#mbCritAdd', A.COCOON_CRIT), sc_set('#mbHealPct', A.COCOON_HEAL), sc_set('#mbHealEv', 0),
+            sc_set('#mbCritAdd', A.COCOON_CRIT), sc_set('#mbCritDmgAdd', 0), sc_set('#mbHealPct', A.COCOON_HEAL),
+            sc_set('#mbHealEv', 0), sc_set('#mbHealAmt', 0), sc_set('#bfCure', 0), F('coc/meter'),
             'scoreboard players add #bfCocN mb 1',
             f'execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run {F("wx/coc/fx")}',  # wing author: S2 debuff fx (seq_b.py)
             g.khud('buff_off'), g.khud('coc_on'), g.khud('ab_coc'),
-            g.say('달빛 고치 — 회복하면 해제', A.COC_SWIRL_HEX, 2, 50, 1),
+            g.say(COC_HINT, A.COC_SWIRL_HEX, 2, 50, 1),
             F('hud/refresh')])
         self.w('coc/heal_ev', [
-            '# The player received a heal this tick or the last (rlk:mboss/player_heal counted it; the heal itself was already',
-            f'# reduced to {A.COCOON_HEAL} %): ANY heal cures 달빛 고치 (user decision; not only a full heal).',
-            sc_set('#mbHealEv', 0),
-            f'execute if score #bfCoc mb matches 1 run {F("coc/cure")}'])
+            '# The player received heals since the last module tick (rlk:mboss/player_heal counted them and added their amounts',
+            f'# to #mbHealAmt, already reduced to {A.COCOON_HEAL} %, overheal included). While 달빛 고치 is on they fill the cure meter',
+            f'# #bfCure (user: "일정 체력 이상 회복해야 하게"; it used to be any heal): at {A.CURE_PCT} % of max HP (#bfCureT) it is',
+            '# cured, below that a small chime and the meter on the actionbar (the boss-bar sub-line reads it live).',
+            'execute if score #bfCoc mb matches 1 run scoreboard players operation #bfCure mb += #mbHealAmt mb',
+            sc_set('#mbHealEv', 0), sc_set('#mbHealAmt', 0),
+            'execute unless score #bfCoc mb matches 1 run return 0',
+            f'execute as @a[tag=player,limit=1] run {F("coc/meter")}',
+            f'execute if score #bfCure mb >= #bfCureT mb run return run {F("coc/cure")}',
+            f'execute as @a[tag=player,limit=1] at @s run {F("coc/progress")}'])
+        self.w('coc/meter', [
+            f'# @s = the player: the cure target #bfCureT = {A.CURE_PCT} % of max HP (rounded down, at least 1) and the readout for the',
+            '# kit (#bkCureP = the meter in % of max HP, rounded down, #bkCureT = the target %): the 달빛 고치 entry of the boss-bar',
+            '# sub-line ("회복 9/15%") and hud/ab_cure show them as score components.',
+            'scoreboard players operation #bfCureT mb = @s maxHealth',
+            'scoreboard players operation #bfCureT mb *= #bfCurePct mb',
+            'scoreboard players operation #bfCureT mb /= #c100 mb',
+            'execute if score #bfCureT mb matches ..0 run scoreboard players set #bfCureT mb 1',
+            'scoreboard players operation #bkCureP mb = #bfCure mb',
+            'scoreboard players operation #bkCureP mb *= #c100 mb',
+            'execute if score @s maxHealth matches 1.. run scoreboard players operation #bkCureP mb /= @s maxHealth',
+            'execute if score #bkCureP mb > #bfCurePct mb run scoreboard players operation #bkCureP mb = #bfCurePct mb',
+            'scoreboard players operation #bkCureT mb = #bfCurePct mb'])
+        self.w('coc/progress', [
+            '# @s = the player, at it: a heal filled the cure meter but not to the target: a small rising chime, a short salmon /',
+            '# gold dust swirl at the feet (no cards at the eyes: first person, fix PL-1) and the meter on the actionbar.',
+            g.sound('block.amethyst_block.chime', 0.8, 1.5), g.sound('block.note_block.chime', 0.45, 1.8),
+            g.dust(A.COC_SWIRL, 1.0, '~ ~0.4 ~', (0.45, 0.25, 0.45), 8), g.dust(A.GOLD_RING, 0.9, '~ ~0.8 ~', (0.35, 0.3, 0.35), 6),
+            g.khud('ab_cure')])
         self.w('coc/cure', [
-            f'# 달빛 고치 removed -> 달빛 축복 받음: CRIT +{A.BUFF_CRIT} %, DMG +{A.BUFF_DMG - 100} % until the next 달빛 고치 or the fight\'s end.',
-            '# The kit\'s cure fx at the player\'s feet (about 20 t: gold beam down, gold burst + ring, gold emblem with',
-            '# sparkles) and chime, the badges (coc_off, buff_on), the actionbar notice and the big reward badge.',
-            sc_set('#bfCoc', 0), sc_set('#bfBuff', 1), sc_set('#bfDmgPct', A.BUFF_DMG), sc_set('#mbCritAdd', A.BUFF_CRIT),
-            sc_set('#mbHealPct', 100),
+            f'# 달빛 고치 removed (the meter reached {A.CURE_PCT} % of max HP) -> 달빛 축복 받음: CRIT RATE +{A.BUFF_CRIT} % and CRIT DMG',
+            f'# +{A.BUFF_CRIT_DMG} % (items/hook/stat_buffs: #mbCritAdd / #mbCritDmgAdd; user: "피해 +50%가 아니라 치명타 피해 +50%야")',
+            '# until the next 달빛 고치 or the fight\'s end. The kit\'s cure fx at the player\'s feet (about 20 t: gold beam down, gold',
+            '# burst + ring, gold emblem with sparkles) and chime, the badges (coc_off, buff_on), the actionbar notice and the big',
+            '# reward badge.',
+            sc_set('#bfCoc', 0), sc_set('#bfBuff', 1), sc_set('#bfDmgPct', 100), sc_set('#mbCritAdd', A.BUFF_CRIT),
+            sc_set('#mbCritDmgAdd', A.BUFF_CRIT_DMG), sc_set('#mbHealPct', 100), sc_set('#bfCure', 0), sc_set('#bkCureP', 0),
+            f'# the hint "{COC_HINT}" still typing or held on the subtitle line goes now: its steps would blank the reward pop',
+            '# below and it would stay 3 s after the cure (review fix FX-3)',
+            f'execute if score #mbLn mb matches 1 if data storage rlk:mboss {{ln:{{t:"{COC_HINT}"}}}} run function rlk:mboss/line/clear',
             f'execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run {F("wx/cure/start")}',  # wing author: S5 cure fx (seq_b.py)
             g.khud('coc_off'), g.khud('buff_on'), g.khud('ab_buff'), g.khud('pop_buff'),
             F('hud/refresh')])
@@ -845,18 +959,21 @@ class Core:
             '# 달빛 고치 and 달빛 축복 받음 off, the framework\'s player modifiers neutral, both kit HUD badges off (no',
             '# executor; idempotent).',
             sc_set('#bfCoc', 0), sc_set('#bfBuff', 0), sc_set('#bfDmgPct', 100),
-            sc_set('#mbCritAdd', 0), sc_set('#mbHealPct', 100), sc_set('#mbHealEv', 0),
+            sc_set('#mbCritAdd', 0), sc_set('#mbCritDmgAdd', 0), sc_set('#mbHealPct', 100), sc_set('#mbHealEv', 0),
+            sc_set('#mbHealAmt', 0), sc_set('#bfCure', 0), sc_set('#bkCureP', 0),
             sc_set('#bpS5T', 0),  # wing author: S5 cure fx clock
             g.khud('clear')])
         self.w('coc/clear_hud', [F('coc/clear'), f'execute if score #mbSt mb matches 0..1 run {F("hud/refresh")}'])
         self.w('coc/assert', [
             '# Reload: the framework values from the module\'s own state (init keeps live values; re-assert anyway).',
-            sc_set('#bfDmgPct', 100), sc_set('#mbCritAdd', 0), sc_set('#mbHealPct', 100),
-            f'execute if score #bfBuff mb matches 1 run scoreboard players set #bfDmgPct mb {A.BUFF_DMG}',
+            sc_set('#bfDmgPct', 100), sc_set('#mbCritAdd', 0), sc_set('#mbCritDmgAdd', 0), sc_set('#mbHealPct', 100),
             f'execute if score #bfBuff mb matches 1 run scoreboard players set #mbCritAdd mb {A.BUFF_CRIT}',
+            f'execute if score #bfBuff mb matches 1 run scoreboard players set #mbCritDmgAdd mb {A.BUFF_CRIT_DMG}',
             f'execute if score #bfCoc mb matches 1 run scoreboard players set #bfDmgPct mb {A.COCOON_DMG}',
             f'execute if score #bfCoc mb matches 1 run scoreboard players set #mbCritAdd mb {A.COCOON_CRIT}',
             f'execute if score #bfCoc mb matches 1 run scoreboard players set #mbHealPct mb {A.COCOON_HEAL}',
+            '# the cure meter (#bfCure) is kept; its target and readout again',
+            f'execute if score #bfCoc mb matches 1 as @a[tag=player,limit=1] run {F("coc/meter")}',
             '# the kit\'s HUD badges from the module state (storage rlk:bfkit survives a reload; re-assert anyway)',
             g.khud('clear'),
             f'execute if score #bfCoc mb matches 1 run {g.khud("coc_on")}',
@@ -870,7 +987,7 @@ class Core:
             'scoreboard players operation #dmg tmp /= @a[tag=player,limit=1] critDamage',
             'execute if score #dmg tmp matches ..0 run scoreboard players set #dmg tmp 1'])
         self.w('coc/dmg', [
-            '# Player DMG on the body x #bfDmgPct % (50 under 달빛 고치, 150 with 달빛 축복 받음), at least 1.',
+            f'# Player DMG on the body x #bfDmgPct % ({A.COCOON_DMG} under 달빛 고치; 100 otherwise: the reward is crit, not damage), at least 1.',
             'scoreboard players operation #dmg tmp *= #bfDmgPct mb',
             'scoreboard players operation #dmg tmp /= #c100 mb',
             'execute if score #dmg tmp matches ..0 run scoreboard players set #dmg tmp 1'])
@@ -881,14 +998,39 @@ class Core:
         r0, r1 = int(A.DEW_R[0] * 10), int(A.DEW_R[1] * 10)
         self.w('dew/spawn', [
             f'# {A.DEW_N} 달빛 이슬 (moon dew) heal orbs at random spots {L.num(A.DEW_R[0])}-{L.num(A.DEW_R[1])} b from the arena centre, 120 degrees',
-            f'# apart (any executor). Touching one heals {A.DEW_HEAL_PCT} % max HP through player/heal (cures 달빛 고치).',
+            f'# apart (any executor). Touching one heals {A.DEW_HEAL_PCT} % max HP through player/heal ({A.DEW_HEAL_PCT * A.COCOON_HEAL / 100:g} % under 달빛 고치:',
+            f'# two of them fill the {A.CURE_PCT} % cure meter).',
+            sc_set('#bfDewP', 0),
             'execute store result score #bfX mb run random value 0..359',
             F('dew/one'),
             'scoreboard players add #bfX mb 120', F('dew/one'),
             'scoreboard players add #bfX mb 120', F('dew/one')])
-        self.w('dew/spawn1', ['# One 달빛 이슬 (still debuffed during the groggy).',
-                              'execute store result score #bfX mb run random value 0..359', F('dew/one'),
-                              g.sound('block.amethyst_block.chime', 0.6, 1.4)])
+        self.w('dew/spawn1', ['# The groggy re-offer (still debuffed after 달빛 해제): as many 달빛 이슬 as the cure meter still needs, one',
+                              '# when one orb finishes it, else two (user: "하나만 먹어도 기믹 처리되는건 너무 쉬운 것 같아"; it used to be one).',
+                              f'execute as @a[tag=player,limit=1] run {F("dew/need")}',
+                              'scoreboard players operation #bfDew1 mb = #bfDewNeed mb',
+                              F('dew/offer')])
+        self.w('dew/need', [f'# @s = the player: #bfDewNeed = 1 when one orb\'s effective heal ({A.DEW_HEAL_PCT} % of max HP rounded up, x the',
+                            '# healing received %, rounded half up as mboss/player_heal does) fills the cure meter to its target, else 2.',
+                            'scoreboard players operation #bfDewQ mb = @s maxHealth',
+                            'scoreboard players operation #bfDewQ mb *= #bfDewPct mb',
+                            'scoreboard players add #bfDewQ mb 99',
+                            'scoreboard players operation #bfDewQ mb /= #c100 mb',
+                            'scoreboard players operation #bfDewQ mb *= #mbHealPct mb',
+                            'scoreboard players add #bfDewQ mb 50',
+                            'scoreboard players operation #bfDewQ mb /= #c100 mb',
+                            'scoreboard players operation #bfDewQ mb += #bfCure mb',
+                            sc_set('#bfDewNeed', 2),
+                            'execute if score #bfDewQ mb >= #bfCureT mb run scoreboard players set #bfDewNeed mb 1'])
+        self.w('dew/offer', ['# The groggy\'s #bfDew1 달빛 이슬 (1 or 2, opposite each other): they stay until taken, the next transformation\'s',
+                             '# sphere or the next butterfly form\'s end; #bfDew1 = the orbs still offered (a /reload brings them back, fix S4).',
+                             'execute as @e[type=minecraft:item_display,tag=rlk_mb_bf_dew] at @s run ' + g.particle('poof', '~ ~ ~', (0.2, 0.2, 0.2), 0.02, 6),
+                             'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_dew]',
+                             sc_set('#bfDewN', 0), sc_set('#bfDewP', 0),
+                             'execute store result score #bfX mb run random value 0..359', F('dew/one'),
+                             'scoreboard players add #bfX mb 180',
+                             f'execute if score #bfDew1 mb matches 2.. run {F("dew/one")}',
+                             g.sound('block.amethyst_block.chime', 0.6, 1.4)])
         self.w('dew/one', [
             '# #bfX = angle (deg); a random radius.',
             'execute store result storage rlk:mboss bfd.a double 1 run scoreboard players get #bfX mb',
@@ -904,6 +1046,9 @@ class Core:
             f'Glowing:1b,glow_color_override:{DEW_GLOW},brightness:{{block:15,sky:15}},item:{{id:"minecraft:slime_ball",count:1}},'
             'transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.8f,0.8f,0.8f]}}',
             f'execute as @e[type=minecraft:item_display,tag=rlk_mb_bf_dewn] run {g.kprop("dew")}',
+            '# its age starts 7 t after the previous orb\'s, so the 20 t idle pulses never land on one tick (fix FX-2)',
+            'scoreboard players operation @e[type=minecraft:item_display,tag=rlk_mb_bf_dewn] mbT = #bfDewP mb',
+            'scoreboard players add #bfDewP mb 7',
             'tag @e[type=minecraft:item_display,tag=rlk_mb_bf_dewn] remove rlk_mb_bf_dewn',
             'scoreboard players add #bfDewN mb 1',
             g.fx('dew_spawn'),
@@ -919,8 +1064,9 @@ class Core:
             'execute if score #bfM mb matches 0 run ' + g.dust(A.LIME_PALE, 0.9, '~ ~ ~', (0.22, 0.22, 0.22), 2),
             'execute if score #bfM mb matches 1 run ' + g.particle('end_rod', '~ ~0.2 ~', (0.15, 0.25, 0.15), 0.004, 1),
             'scoreboard players operation #bfM mb = @s mbT', 'scoreboard players operation #bfM mb %= #bfK20 mb',
-            '# the kit\'s idle pulse (a soft floor ring and rising motes) so it reads on the marble',
-            'execute if score #bfM mb matches 0 run ' + g.fx('dew_pulse'),
+            '# the kit\'s idle pulse (a soft floor ring and rising motes) so it reads on the marble; decorative, so it gives way',
+            f'# when the fx cards are near their cap (#bkN {K.CAP - 16}+: landings and the cure keep their slots; fix FX-2)',
+            f'execute if score #bfM mb matches 0 unless score #bkN mb matches {K.CAP - 16}.. run ' + g.fx('dew_pulse'),
             f'execute positioned ~ ~-1.1 ~ if entity @e[tag=rlk_body,distance=..1.6,limit=1] run {F("dew/take")}'])
         self.w('dew/take', [
             '# The player touched it (@s = orb, at it): heal, sparkle, gone.',
@@ -930,12 +1076,15 @@ class Core:
             g.particle('happy_villager', '~ ~ ~', (0.4, 0.4, 0.4), 0, 6),
             g.sound('block.amethyst_block.chime', 1.0, 1.9), g.sound('block.amethyst_cluster.hit', 0.6, 1.6),
             'scoreboard players remove #bfDewN mb 1',
+            'execute if score #bfDew1 mb matches 1.. run scoreboard players remove #bfDew1 mb 1',
             'kill @s'])
         self.w('dew/heal', [
-            f'# @s = player: {A.DEW_HEAL_PCT} % of max HP (red herb boosts orb heals as for the normal heal orbs), at least 1, through',
-            '# player/heal (so items/hook/on_heal: 달빛 고치 -40 % and the cure).',
+            f'# @s = player: {A.DEW_HEAL_PCT} % of max HP rounded up (red herb boosts orb heals as for the normal heal orbs), at least 1,',
+            '# through player/heal (so items/hook/on_heal: 달빛 고치 -40 % and the cure meter). Rounded up so two orbs always fill',
+            f'# the {A.CURE_PCT} % meter under the debuff whatever the max HP (13 % x 0.6 = 7.8 %).',
             'scoreboard players operation #heal tmp = @s maxHealth',
             'scoreboard players operation #heal tmp *= #bfDewPct mb',
+            'scoreboard players add #heal tmp 99',
             'scoreboard players operation #heal tmp /= #c100 mb',
             'execute if score @s it_red_herb matches 1.. run function rlk:items/proc/herb',
             'execute if score #heal tmp matches ..0 run scoreboard players set #heal tmp 1',
@@ -943,7 +1092,7 @@ class Core:
         self.w('dew/clear', ['# Every heal orb fades (the butterfly form ended).',
                              'execute as @e[type=minecraft:item_display,tag=rlk_mb_bf_dew] at @s run ' + g.particle('poof', '~ ~ ~', (0.2, 0.2, 0.2), 0.02, 6),
                              'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_dew]',
-                             sc_set('#bfDewN', 0)])
+                             sc_set('#bfDewN', 0), sc_set('#bfDew1', 0)])
 
     # -----------------------------------------------------------------------------------------
     def burn(self):
@@ -976,6 +1125,11 @@ class Core:
             '# over for the player too: 달빛 고치 / 달빛 축복 받음 off, heal orbs gone. The death clip: she staggers, the wings',
             '# (in butterfly form) shatter into lime/opal shards, she kneels and dissolves into moonlight motes and crystal',
             '# shards. No creature voices; the registry\'s deathSnd false keeps the framework roar off.',
+            f'# #bfWing: the wings are shown (butterfly form, or a transformation past its open event {TR_OPEN}, where the rig is',
+            '# already in butterfly form while #bfForm is still 1): they shatter (seq_h death; review fix S3).',
+            sc_set('#bfWing', 0),
+            'execute if score #bfForm mb matches 2 run scoreboard players set #bfWing mb 1',
+            f'execute if score #bfPat mb matches 20 if score #bfPT mb matches {TR_OPEN}.. run scoreboard players set #bfWing mb 1',
             F('p/cancel'),
             F('coc/clear'),
             F('dew/clear'),
@@ -1004,7 +1158,8 @@ class Core:
         extra.append(g.khud('put_extra'))
         self.w('hud/extra', extra)
         sub = ['# Third line: what she is doing, then the player\'s 달빛 고치 / 달빛 축복 받음 state (the kit\'s hud/put_sub: badge',
-               '# glyph + "달빛 고치 — 회복하면 해제" + the dew icon, or badge + "달빛 축복 받음 (치명타 +15% · 피해 +50%)").',
+               '# glyph + "달빛 고치 — 회복 9/15%" (the cure meter, score components) + the dew icon, or badge + "달빛 축복 받음',
+               '# (치명타 +15% · 치명타 피해 +50%)").',
                'execute if score #mbSt mb matches 0 run data modify storage rlk:mboss sub set value []',
                'execute if score #mbSt mb matches 0 run return 0',
                f'data modify storage rlk:mboss sub set value [{{text:"인간형",color:"{HUM_HEX}",bold:true}}]',
@@ -1052,7 +1207,7 @@ class Core:
         bfl = ', '.join(f'{p.id} {p.label}' for p in self.bfl)
         HELP = [
             ('1-4', f'인간형 패턴 ({hum})'), ('11-14', f'나비형 패턴 ({bfl}), 즉시 나비형'),
-            ('15 / 30', '달빛 해제'), ('20', '변신(달빛 고치 · 달빛 이슬)'), ('21', '달빛 고치만'), ('22', '회복 1 (해제 → 달빛 축복)'),
+            ('15 / 30', '달빛 해제'), ('20', '변신(달빛 고치 · 달빛 이슬)'), ('21', '달빛 고치만'), ('22', '최대 체력 25% 회복 (고치 중 15% → 해제 · 달빛 축복)'),
             ('23', '달빛 이슬 3개'), ('24', '고치 · 축복 끄기'), ('40', '그로기'), ('42', '다음 결정에서 형태 전환'),
             ('91', '나비형 연소 약점 시험(불 타격 흉내)'), ('99', '대기로'),
             ('lock 1-4 / 11-14 / 16', '그 패턴만 / (변신 뒤) 그 나비형 패턴만 / 변신 · 해제만 반복'),
@@ -1094,7 +1249,7 @@ class Core:
                 f'execute if score #bfTst mb matches 40 run {F("test/cut")}',
                 f'execute if score #bfTst mb matches 40 run return run {F("groggy/begin")}',
                 f'execute if score #bfTst mb matches 42 if score #bfForm mb matches 1 run scoreboard players operation #bfHumN mb = #bfHumLim mb',
-                f'execute if score #bfTst mb matches 42 if score #bfForm mb matches 2 run scoreboard players set #bfBfT mb {BF_T - 20}',
+                f'execute if score #bfTst mb matches 42 if score #bfForm mb matches 2 run scoreboard players operation #bfBfN mb = #bfBfLim mb',
                 'execute if score #bfTst mb matches 42 run return 0',
                 'execute if score #bfTst mb matches 91 run scoreboard players set #elem tmp 1',
                 'execute if score #bfTst mb matches 91 run scoreboard players set #tfm tmp 0',
@@ -1102,6 +1257,9 @@ class Core:
                 f'execute if score #bfTst mb matches 99 run return run {F("test/cut")}',
                 F('test/help')]
         self.w('test/run', run)
-        self.w('test/heal', ['# A 1 HP heal through the real path (player/heal -> items/hook/on_heal -> mboss/player_heal).',
-                             'scoreboard players set #heal tmp 1',
+        self.w('test/heal', ['# A heal of 25 % of max HP through the real path (player/heal -> items/hook/on_heal -> mboss/player_heal):',
+                             f'# under 달빛 고치 it is 15 % received (x 0.6), which fills the {A.CURE_PCT} % cure meter at once.',
+                             'execute as @a[tag=player,limit=1] run scoreboard players operation #heal tmp = @s maxHealth',
+                             'scoreboard players operation #heal tmp /= #c4 mb',
+                             'execute if score #heal tmp matches ..0 run scoreboard players set #heal tmp 1',
                              'execute as @a[tag=player,limit=1] run function rlk:player/heal'])

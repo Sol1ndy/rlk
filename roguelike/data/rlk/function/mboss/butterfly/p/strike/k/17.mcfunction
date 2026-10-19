@@ -1,6 +1,6 @@
 # strike clock 17
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p11s,limit=1] positioned ^ ^0.05 ^6 run function rlk:mboss/butterfly/fx/card {kind:"streak",pos:"~ ~ ~",rot:"~90 90",bb:"fixed",roll:0,spin:0,s0:2.8,s1:3.2,move:"0f,0f,0f",life:8,fade:4,col:3705195}
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p11s,limit=1] positioned ^ ^0.07 ^6 run function rlk:mboss/butterfly/fx/card {kind:"streak",pos:"~ ~ ~",rot:"~90 90",bb:"fixed",roll:0,spin:0,s0:2.5,s1:3,move:"0f,0f,0f",life:8,fade:4,col:15203754}
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p11s,limit=1] positioned ^ ^0.05 ^8 run function rlk:mboss/butterfly/fx/card {kind:"streak",pos:"~ ~ ~",rot:"~90 90",bb:"fixed",roll:0,spin:0,s0:2.8,s1:3.2,move:"0f,0f,0f",life:8,fade:4,col:3705195}
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p11s,limit=1] positioned ^ ^0.07 ^8 run function rlk:mboss/butterfly/fx/card {kind:"streak",pos:"~ ~ ~",rot:"~90 90",bb:"fixed",roll:0,spin:0,s0:2.5,s1:3,move:"0f,0f,0f",life:8,fade:4,col:15203754}
 function rlk:mboss/butterfly/wx/u/fwd {d:0.12}
+execute rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"leaf",pos:"^1.2 ^3.5 ^-0.5",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.3,s1:0.25,move:"0f,-2f,0f",life:16,fade:6,col:13957768}
+execute rotated as @s rotated ~ 0 run function rlk:mboss/butterfly/fx/card {kind:"leaf",pos:"^-1.5 ^3.0 ^0.4",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.3,s1:0.25,move:"0f,-2f,0f",life:16,fade:6,col:13957768}
+execute rotated as @s rotated ~ 0 positioned ^3.998 ^1.606 ^2.406 run particle minecraft:dust{color:[0.898f,0.984f,0.784f],scale:0.7} ~ ~ ~ 0.3 0.3 0.3 0 1 force @a[tag=player]
+execute rotated as @s rotated ~ 0 positioned ^3.577 ^5.616 ^-0.744 run particle minecraft:dust{color:[0.898f,0.984f,0.784f],scale:0.7} ~ ~ ~ 0.3 0.3 0.3 0 1 force @a[tag=player]

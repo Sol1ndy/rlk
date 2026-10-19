@@ -1,2 +1,2 @@
 # coco clock 86
-function rlk:mboss/butterfly/rig/face/track
+function rlk:mboss/butterfly/p/end

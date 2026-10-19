@@ -3,3 +3,4 @@
 function rlk:mboss/butterfly/fx/card {kind:"cres_fire",pos:"~ ~0.3 ~",rot:"~ 0",bb:"fixed",roll:-38,spin:150,s0:6.5,s1:8.5,move:"0f,0f,0f",life:7,fade:3,col:16777215}
 function rlk:mboss/butterfly/fx/card {kind:"cres_fire",pos:"~ ~0.5 ~",rot:"~20 0",bb:"fixed",roll:-30,spin:140,s0:5.5,s1:7.5,move:"0f,0f,0f",life:6,fade:3,col:16771272}
 particle minecraft:flame ^ ^ ^2.5 2 1.2 2 0.05 14 force @a[tag=player]
+particle minecraft:dust_color_transition{from_color:[0.976f,0.89f,0.557f],to_color:[0.776f,0.502f,0.635f],scale:1.8} ^ ^0.3 ^3 2.4 1.2 2.4 0 12 force @a[tag=player]
