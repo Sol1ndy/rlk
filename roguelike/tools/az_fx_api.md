@@ -384,7 +384,8 @@ font collision check. The kit never edits hand-written files, the registry, the 
 - **Fake players** `#ak*` (objective `mb`), all reset by `fx/uninstall`: `#akN #akTN #akFN` (live counts), `#akNow`
   (stage clock), `#akInit` + the constants `#akK2 #akMinus1 #akK10 #akK15 #akK150 #akK300 #akK1000`, the card
   arguments `#akRoll #akSpin #akLife #akFade #akDly #akDur #akHit #akTel`, telegraph scratch `#akT*`, `#akPe` (family
-  element), `#akPar` (2-t particle phase), `#akWw<id> #akWh<id>` (wave widths / holds), the demo clock `#akDemo #akDT`.
+  element), `#akPar` (2-t particle phase), `#akWw<id> #akWh<id>` (wave widths / holds, id 0-7) and the wave scratch
+  `#akWd #akWid #akWl`, `#akA #akB #akC2` (engine scratch), `#akHudV` (HUD), the test / demo clocks `#akMT #akDemo #akDT`.
 
 ## 14. Card engine
 
@@ -735,6 +736,16 @@ scale — the transformation. **The arena_crystal, water_sheet and glyph familie
 | `prop/glyph/<el>` (1..5) | 1: `glyph_pyro` #FFFFFF, 2: `glyph_hydro` #FFFFFF, 3: `glyph_electro` #FFFFFF, 4: `glyph_cryo` #FFFFFF, 5: `glyph_geo` #FFFFFF |  | kept | kept | Entrance stele / arrival glyph: flame, water curl, bolt, snowflake, Geo emblem (the item models rlk:mboss/az_kit/glyph_<pyro\|hydro\|electro\|cryo\|geo>). Keeps the module's transformation. |
 | `prop/spike/<el>` (3..5) | 3: `spike_electro` #FFFFFF, 4: `spike_cryo` #FFFFFF, 5: `spike_geo` #FFFFFF |  | fixed | [2.5f,2.5f,2.5f] | 천동만상 spike (P4 Geo / 45 Cryo / 46 Electro): 2.5 b, tip up at scale 1 (pitch the prop to plant it point first). |
 | `prop/shard/<el>` (1..4) | 1: `shard_pyro` #FFFFFF, 2: `shard_hydro` #FFFFFF, 3: `shard_electro` #FFFFFF, 4: `shard_cryo` #FFFFFF |  | center | [1f,1f,1f] | 응결 결정 (the brand shield pickup, plan §4.10-4): a gold-amber crystal with the brand element inside, 1 b, camera-facing. |
+
+Model frames the arena records rely on (S1-ARENA, `az/requests/arena.md` item 4; kept stable):
+
+- `arena_crystal/<el>` (`crystal`, cross plane): base at the display origin, growing along local +y, ≤ 1 b tall per
+  scale unit; hanging records use scale `(s, −s, −s)` (a 180° turn about x) with `pos` at the tip.
+- `water_sheet/<el>` (`water`, flat plane): a horizontal 1 × 1 plane centred on the origin (scale 14 = one 14-b tile),
+  drawn at the record's y 201.005, about 40 % alpha. It is already horizontal: no left_rotation.
+- `glyph/<el>` (`glyph_<el>`, face plane): a vertical plane centred on the origin facing the record's yaw (yaw 180 = the
+  plane faces −z), about 1 b per scale unit.
+- Every card and prop is full bright (`brightness {sky:15, block:15}`): the cavern's floor-level block light is 3-4.
 
 ## 18. HUD (font `rlk:mboss_az`, U+E800-E8FF)
 
