@@ -135,3 +135,6 @@ tick / looks / park / kill, determinism).
 - The v5 f1104 "umbrella" is the B arms seen from below (up-turned gold-coned tips, dark back, lime rim; v5 f1908), not
   the mantle; the mantle keeps scales 1.7 / 1.5.
 - The death stub falls into the crawl (55-82) before its sink so that R9 holds; its stance score stays UPRIGHT.
+- The rigid-skeleton fit moved a few CROUCH bind joints from the measured crouch table (hair roots and `hem_a`
+  ≤ 0.38 b, the pose-only `clav_a` 0.68 b, the tail joints re-spaced); `skeleton.joints` lists the values used.
+- Notes for other stages: `S:ap/requests/rig.md`; the AP-R2 work list: `S:ap/rigwork/r1_worklist.md`.

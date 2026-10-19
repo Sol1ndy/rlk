@@ -48,8 +48,11 @@ function blade(at, y0, h, flip = 1) {
 function p3(seg) {
   const [L] = seg.split('_'), len = LEN[seg], x = seg.slice(2);
   const R = L === 'a' ? A3 : L === 'b' ? B3 : C3;
-  // shell sides, lime cladding on the front, the dorsal carapace (tinted plate) on the back
-  const tex = (k, th) => (sinD(th) > .38 ? 'p3_lime' : sinD(th) < -.38 && L !== 'c' ? 'g_plate' : 'g_shell');
+  // shell sides, lime cladding on the front, the dorsal carapace (tinted plate) on the back; the sideways B arms carry it
+  // over the top as well (v5 f1908: from behind they read dark with a lime rim). In the bone frame 'y' of a B arm at
+  // UPRIGHT, model +X is world up (left arm; the mirrored right arm likewise), model -Z the front.
+  const cosD = th => Math.cos(th * Math.PI / 180);
+  const tex = (k, th) => (sinD(th) > .38 ? 'p3_lime' : (sinD(th) < -.38 && L !== 'c') || (L === 'b' && cosD(th) > .55) ? 'g_plate' : 'g_shell');
   const els = segLoft(len, ...R[x], tex, {seed: 330 + len * 10});
   if (L === 'a') { els.push(...blade(R[x][0] + .04, -len * .12, len * .5, 1), ...blade(R[x][0] + .02, -len * .52, len * .42, 1)); }
   if (L === 'b') els.push(...blade(R[x][0] + .03, -len * .2, len * .55, 1));

@@ -12,7 +12,7 @@
 //   crown     P1 the gold crown cone + leaf sprig + lime seed bulb on the cowl top | P3 the fan of gold leaves framing
 //             the top of the face, the glowing bud at its centre, the brow emeralds (it rides the hood's front edge)
 //   hair_<s>_1/2   P1 the dark drapes from the cowl sides to the ground | P3 the hair strands to the waist. The hair hangs
-//             from the HOOD (not the head, plan R2): the swing of the hood carries the hair roots from the cowl sides
+//             from the HOOD (not from the head as the plan R2 tree draws it): the swing of the hood carries the hair roots from the cowl sides
 //             (crouch) to the hood sides beside the face (upright), which the residual table needs (≤ 0.25 b).
 // Region interface: see apep_body.mjs. P1 parts in world axes about the joint at the CROUCH stance, P3 at the UPRIGHT
 // stance (solved here from apep_clips STANCES so the offsets follow the skeleton); the hair in its bone frame 'y'.
@@ -98,8 +98,9 @@ function faceP3() {
 // ================================================= hood (the cowl; CROUCH frame about the hinge) ==============================
 // a rounded dome (model.md §3.1: 3.3 b over the ears, 2.5-3 b long, top 4.3-4.5 b in the idle crouch) narrowing into the
 // pointed face plate; its height becomes the depth of the cowl after the upright swing
-const COWL = [{a: .5, r: [.9, .5, .9, .3], c: [0, -.05]}, {a: -.15, r: [1.35, .82, 1.35, .6], c: [0, -.15]}, {a: -.75, r: [1.55, .95, 1.55, .8], c: [0, -.25]},
-  {a: -1.35, r: [1.4, .82, 1.4, .82], c: [0, -.35]}, {a: -1.8, r: [.95, .55, .95, .55], c: [0, -.55]}, {a: -2.14, r: [.36, .2, .36, .2], c: [0, -.76]}];
+// (the underside stays behind the P3 mask plane after the swing: hood-model y >= -0.85 + 0.315 (z + 0.26) - 0.08)
+const COWL = [{a: .5, r: [.9, .5, .9, .3], c: [0, -.05]}, {a: -.15, r: [1.35, .82, 1.35, .52], c: [0, -.15]}, {a: -.75, r: [1.55, .95, 1.55, .64], c: [0, -.25]},
+  {a: -1.35, r: [1.4, .82, 1.4, .74], c: [0, -.35]}, {a: -1.8, r: [.95, .55, .95, .55], c: [0, -.55]}, {a: -2.14, r: [.36, .2, .36, .2], c: [0, -.76]}];
 const EAR_R = {u0: -1.55, u1: -.2, v0: -.85, v1: .35};
 const EAR = stroke([[-.3, .2], [-.8, -.05], [-1.2, -.4], [-1.48, -.78]], t => .3 * (1 - t) + .02);
 const earPaint = (u, v) => { const n = EAR.near(u, v), hw = .3 * (1 - n.t) + .02; if (n.d > hw) return null; let g = .55 + .1 * (N.c(u * 6, v * 6) - .5) - .1 * n.t; if (n.d > hw - .04) g = .85; return grey(g); };

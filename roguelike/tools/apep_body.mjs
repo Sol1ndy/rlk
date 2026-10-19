@@ -123,14 +123,14 @@ function hemBP3() {
 }
 // chest (joint (0, 4.18, -0.03)): the lower chest plates + pale rib-blades (loft 'y': e2 = front)
 const BLADE_R = {u0: -.55, u1: .55, v0: -.2, v1: .2};
-const BLADE = stroke([[-.5, .1], [-.15, .1], [.2, 0], [.52, -.16]], t => .15 * Math.sin(Math.PI * t) + .02);   // sweeping out and down round the ribs
-const bladePaint = (u, v) => { const n = BLADE.near(u, v), hw = .15 * Math.sin(Math.PI * n.t) + .02; if (n.d > hw) return null; const s = Math.abs(Math.sin((n.t * 6 + n.d * 9) * Math.PI)); let g = .9 + .05 * (N.b(u * 7, v * 7) - .5); if (s < .1) g -= .16; if (n.d > hw - .03) g = .35; return grey(g); };
+const BLADE = stroke([[-.5, .1], [-.15, .1], [.2, 0], [.52, -.16]], t => .09 * Math.sin(Math.PI * t) + .015);   // slim blades sweeping out and down round the ribs
+const bladePaint = (u, v) => { const n = BLADE.near(u, v), hw = .09 * Math.sin(Math.PI * n.t) + .015; if (n.d > hw) return null; const s = Math.abs(Math.sin((n.t * 6 + n.d * 9) * Math.PI)); let g = .9 + .05 * (N.b(u * 7, v * 7) - .5); if (s < .1) g -= .16; if (n.d > hw - .03) g = .35; return grey(g); };
 function chestP3() {
   const els = loft('y', [{a: -.85, r: [.7, .6, .7, .64]}, {a: 0, r: [.98, .72, .98, .8]}, {a: .8, r: [1.18, .78, 1.18, .86]}, {a: 1.3, r: [1.18, .72, 1.18, .84]}],
     {tex: (k, th) => (sinD(th) > .3 ? 'p3_lime' : 'g_plate'), caps: '-', seed: 591});
   const bs = card('g_bladecard', BLADE_R, bladePaint, 32, 'both', 'tinted');
   const half = [];
-  for (const [y, x] of [[.8, .95], [.3, .82], [-.2, .62]]) half.push(...slab({plane: 'z', at: -.62, rect: {u0: x - .55, u1: x + .55, v0: y - .2, v1: y + .2}, sd: (u, v) => BLADE.sd(u - x, v - y), half: .03, sprite: bs, edge: 'g_shell', cell: .08, core: false, rot: ['y', 45, [x - .45, y, -.62]]}));
+  for (const [y, x] of [[.95, .98], [.55, .92], [.15, .82], [-.25, .66]]) half.push(...slab({plane: 'z', at: -.62, rect: {u0: x - .55, u1: x + .55, v0: y - .2, v1: y + .2}, sd: (u, v) => BLADE.sd(u - x, v - y), half: .03, sprite: bs, edge: 'g_shell', cell: .08, core: false, rot: ['y', 45, [x - .45, y, -.62]]}));
   els.push(...half, ...mirrorEls(half));
   return els;
 }
