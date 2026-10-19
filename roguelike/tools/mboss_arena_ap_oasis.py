@@ -15,15 +15,16 @@ withered and olive-yellow, phase 3 lush and green (the lake: the kit's water-she
   bank (26 < r <= 29.6) a low lip (0-1) inside the barrier ring, rock / soil 1-3 high behind it, mangrove-root tangles,
                         dry grass / dead bushes / leaf litter (withered) <-> azalea / flowers / moss carpet (lush), the
                         ember twig; the invisible barrier ring (centre distance 26.9..28.3, y 201..215)
-  trees (r 32.5-37)     9 leaning giant trunks (jungle / mangrove / pale oak) with buttress fins, root arches looping
+  trees (r 33-36.5)     9 leaning giant trunks (jungle / mangrove / pale oak) with buttress fins, root arches looping
                         over the shore above y 207, shelf mushrooms and froglight bulbs (ochre <-> verdant) at their feet,
                         limbs arching under the vault toward the shaft with moss clumps (pale moss <-> flowering azalea)
   canopy (y 225..250)   three rings of giant leaves (lanceolate, moss midrib and laterals, stained-glass windows yellow
                         <-> lime with green cells, leafy margins pale oak <-> azalea), foliage between them, the shaft
                         r <= 8 open
-  forest wall           bushes, secondary trunks and a closed leaf / wood wall at the box edge up to the canopy
-  lights                the light layer y 206 over r <= 25.5 (level 12 withered, 14 lush); hidden level-15 lights on a
-                        lattice outside the bank and over the canopy so no hostile mob spawns anywhere in the box
+  forest floor / wall   fallen mossy logs, giant brown mushrooms, bushes, secondary trunks and a foliage curtain closed
+                        by a wood / moss column at the box edge, up to the canopy
+  lights                the light layer y 206 over r <= 25.5 (level 12 withered, 14 lush); hidden light[level=15]
+                        blocks wherever a block-light flood of either look leaves a hostile spawn cell dark (~130)
 
 Coordinates: the centre (440, 201, 8) is a block corner, floor blocks at y 200, stand height 201. A cell (x, z) is "at
 distance d" when its centre (x + 0.5, z + 0.5) is d blocks from (440, 8) horizontally. Compass bearings (POINTS):
@@ -647,7 +648,6 @@ def _paint_tree(g, t):
                         m = mat['wood']
                 g.put(x, y, z, m, 'tree')
     # buttress fins: mostly outward and sideways; the inner ones are clipped by the bank mask below y 207
-    a0 = math.radians(t['bearing'])
     for j, off in enumerate((-150.0, -95.0, -40.0, 0.0, 40.0, 95.0, 150.0, 180.0)):
         ang = math.radians(t['bearing'] + off + 14.0 * (_mix(k, j, 54) - 0.5))
         ox, oz = math.sin(ang), -math.cos(ang)            # outward direction of the fin (compass)
@@ -1051,7 +1051,7 @@ def _build_full():
 def _build_day1():
     """{cell: str | Lk} of the day-1 geometry (ap_contract.md §0.6.9)."""
     g = {}
-    x0, y0, z0, x1, y1, z1 = (BOX[k] for k in ('x0', 'y0', 'z0', 'x1', 'y1', 'z1'))
+    x0, z0, x1, z1 = (BOX[k] for k in ('x0', 'z0', 'x1', 'z1'))
     leaf = lk(B + 'pale_oak_leaves[persistent=true]', B + 'azalea_leaves[persistent=true]')
     for z in range(z0, z1 + 1):
         for x in range(x0, x1 + 1):
@@ -1309,7 +1309,7 @@ def _entrance_blocks_full():
                 bl[(x, 200, z)] = B + pick(x, z)
 
     def planters(bl, cells, seed):
-        for i, (x, z) in enumerate(cells):
+        for (x, z) in cells:
             bl[(x, 200, z)] = B + 'moss_block'
             h = _mix(x, z, seed)
             if h < 0.45:
