@@ -10,4 +10,4 @@ execute in minecraft:overworld positioned 316 201 1.072 run summon minecraft:ite
 execute as @e[type=minecraft:item_display,tag=rlk_mb_az_seal] run function rlk:mboss/azhdaha/kstub/prop/seal_stele
 execute in minecraft:overworld positioned 320 201 8 run summon minecraft:item_display ~ ~4.2 ~ {UUID:[I;1380731725,1096434688,-2147483648,128],Tags:["rlk_mb_aux","rlk_mb_az_seal","rlk_mb_az_seal_prism"],billboard:"fixed",brightness:{block:15,sky:15},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[11f,9f,13f]},item:{id:"minecraft:yellow_stained_glass",count:1}}
 execute as @e[type=minecraft:item_display,tag=rlk_mb_az_seal_prism] run function rlk:mboss/azhdaha/kstub/prop/seal_prism
-execute in minecraft:overworld positioned 320 201 8 run function rlk:mboss/azhdaha/kstub/tele/disc
+execute in minecraft:overworld positioned 320 201 8 run function rlk:mboss/azhdaha/kstub/tele/glyph_circle

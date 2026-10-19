@@ -43,7 +43,7 @@ def emit(g):
               'billboard:"fixed",brightness:{block:15,sky:15},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],'
               'right_rotation:[0f,0f,0f,1f],scale:[11f,9f,13f]},item:{id:"minecraft:yellow_stained_glass",count:1}}',
               f'execute as @e[type=minecraft:item_display,tag={SEAL_TAG}_prism] run {A.K.prop("seal_prism")}',
-              f'execute in minecraft:overworld positioned {_pos(A.THEME["seal_prism"])} run {A.K.tele_disc(9.0, 140, 5, hold=3)}']
+              f'execute in minecraft:overworld positioned {_pos(A.THEME["seal_prism"])} run {A.K.tele_glyph_circle(9.0, 140, hold=3)}']
     g.sw('intro/setup', setup)
     c = lambda t: t + 1                                                  # noqa: E731  #mbT of clip tick t
     at = lambda t, cmd: f'execute if score #mbT mb matches {c(t)} run {cmd}'   # noqa: E731

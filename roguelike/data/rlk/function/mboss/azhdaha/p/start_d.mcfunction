@@ -19,3 +19,6 @@ execute if score #azPat mb matches 20 run return run function rlk:mboss/azhdaha/
 execute if score #azPat mb matches 21 run return run function rlk:mboss/azhdaha/p/absorb1/start
 execute if score #azPat mb matches 22 run return run function rlk:mboss/azhdaha/p/absorb2/start
 execute if score #azPat mb matches 23 run return run function rlk:mboss/azhdaha/p/burrow3/start
+execute if score #azPat mb matches 27 run return run function rlk:mboss/azhdaha/p/turn/start
+execute if score #azPat mb matches 28 run return run function rlk:mboss/azhdaha/p/walk/start
+execute if score #azPat mb matches 30 run return run function rlk:mboss/azhdaha/p/cast_host/start

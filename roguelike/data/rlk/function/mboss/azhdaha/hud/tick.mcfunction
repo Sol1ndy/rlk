@@ -6,4 +6,4 @@ execute if score #azHint mb matches 1.. if score #azHintT mb <= #azClk mb run sc
 scoreboard players remove @e[type=minecraft:text_display,tag=rlk_mb_az_pop] azT 1
 kill @e[type=minecraft:text_display,tag=rlk_mb_az_pop,scores={azT=..0}]
 execute if score #azHudQ mb matches 1 run return run function rlk:mboss/azhdaha/hud/refresh
-execute if score #azM mb matches 0 run function rlk:mboss/azhdaha/hud/refresh
+execute if score #azQ4 mb matches 0 run function rlk:mboss/azhdaha/hud/refresh

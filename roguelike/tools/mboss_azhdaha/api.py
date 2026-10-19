@@ -79,24 +79,28 @@ CLEAR_PAD = 1.5                      # pattern fields keep r + 1.5 off the two c
 MAX_HP_CAP = 2 ** 31 - 1
 
 
-# The arena theme (theme.md 4; S1-ARENA's T:mboss_arena_az_cavern.py): props, POINTS, the entrance glyph spots.
-# LOCAL STUB while the theme module is not in the tree: theme.md 6.3 / 6.4 values (the day-1 final positions).
-def _theme_stub():
+# The arena theme (theme.md 1, 4; S1-ARENA's T:mboss_arena_az_cavern.py): api.POINTS = the theme's POINTS, api.PROPS =
+# props('default'), api.ENTRANCE_GLYPHS / ENTRANCE_GLOW = entrance_layout()['glyphs'] / ['stele_glow'] (s2.md 5.1).
+# While L.theme_module('az_cavern') is None (wip/az-mod before it merges wip/az-arena) the module uses _THEME_FALLBACK,
+# its own copy of theme.md 6.3 / 6.4: the spawn (320, 201, 8) yaw 0, the 16 water tiles, the seal steles r 8 at the
+# compass bearings 30 + 60 k (0 = north -z, 90 = east +x; a centre-facing prop at bearing b has yaw b), the prism and
+# the crater at the centre; no crystals, no glyphs; ENTRANCE_GLYPHS empty (prep summons no glyph props). The build
+# prints a WARN; the I1 build asserts the real theme was used.
+def _theme_fallback():
     import math as _m
     water = [(float(x), 201.005, float(z)) for z in (-13, 1, 15, 29) for x in (299, 313, 327, 341)]
     steles = []
     for k in range(6):
-        a = 30 + 60 * k
-        steles.append((round(320 + 8 * _m.sin(_m.radians(a)), 3), 201.0, round(8 - 8 * _m.cos(_m.radians(a)), 3), float(a)))
-    glyphs_arr = {'upper': (308.5, 203.5, 33.97, 180.0), 'lower': (331.5, 203.5, 33.97, 180.0)}
+        b = 30 + 60 * k
+        steles.append((round(320 + 8 * _m.sin(_m.radians(b)), 3), 201.0, round(8 - 8 * _m.cos(_m.radians(b)), 3), float(b)))
+    points = {'spawn': (320.0, 201.0, 8.0, 0.0), 'seal_steles': steles, 'seal_prism': (320.0, 201.0, 8.0),
+              'crater': (320.0, 201.0, 8.0), 'motes': []}
     props = [{'name': f'water_{i % 4}_{i // 4}', 'kind': 'water_sheet', 'group': 'water', 'pos': p, 'yaw': 0.0, 'pitch': 0.0,
               'scale': 14.0, 'el': 'fight', 'uuid': None} for i, p in enumerate(water)]
-    props += [{'name': f'glyph_{k}', 'kind': 'glyph', 'group': f'glyph_{k}', 'pos': v[:3], 'yaw': v[3], 'pitch': 0.0,
-               'scale': 1.0, 'el': 'fight', 'uuid': None} for k, v in glyphs_arr.items()]
-    return {'spawn': (320.0, 201.0, 8.0, 0.0), 'seal_steles': steles, 'seal_prism': (320.0, 201.0, 8.0),
-            'crater': (320.0, 201.0, 8.0), 'props': props, 'motes': [],
-            'glyphs': {'upper': (-4.0, 205.2, 15.03, 0.0), 'lower': (-4.0, 203.7, 15.03, 0.0)},
-            'stele_glow': (-4.0, 204.4, 15.4), 'centre': (320, 8)}
+    return {'POINTS': points, 'PROPS': props, 'GLYPHS': {}, 'GLOW': None}
+
+
+_THEME_FALLBACK = _theme_fallback()
 
 
 def _load_theme():
@@ -105,23 +109,21 @@ def _load_theme():
     name = ARENA.get('theme', 'az_cavern')
     if hasattr(L, 'theme_module'):
         mod = L.theme_module(name)
+    elif (_TOOLS / f'mboss_arena_{name}.py').exists():
+        mod = importlib.import_module('mboss_arena_' + name)
     if mod is None:
-        try:
-            mod = importlib.import_module('mboss_arena_' + name)
-        except ImportError:
-            mod = None
-    if mod is None:
-        return _theme_stub(), True
-    P = mod.POINTS
+        fb = _THEME_FALLBACK
+        return dict(fb['POINTS']), list(fb['PROPS']), dict(fb['GLYPHS']), fb['GLOW'], True
     ent = mod.entrance_layout()
-    chk = getattr(mod, 'CHECK', {})
-    return {'spawn': tuple(P['spawn']), 'seal_steles': [tuple(v) for v in P['seal_steles']], 'seal_prism': tuple(P['seal_prism']),
-            'crater': tuple(P['crater']), 'props': list(mod.props(None)), 'motes': [tuple(v) for v in P.get('motes', [])],
-            'glyphs': dict(ent['glyphs']), 'stele_glow': tuple(ent['stele_glow']),
-            'centre': (chk.get('cx', ARENA['cx']), chk.get('cz', ARENA['cz']))}, False
+    return (dict(mod.POINTS), list(mod.props('default')), dict(ent.get('glyphs') or {}), ent.get('stele_glow'), False)
 
 
-THEME, THEME_STUBBED = _load_theme()
+POINTS, PROPS, ENTRANCE_GLYPHS, ENTRANCE_GLOW, THEME_STUBBED = _load_theme()
+# the module's view of the theme (seq.py, core.py)
+THEME = {'spawn': tuple(POINTS['spawn']), 'seal_steles': [tuple(v) for v in POINTS['seal_steles']],
+         'seal_prism': tuple(POINTS['seal_prism']), 'crater': tuple(POINTS['crater']),
+         'motes': [tuple(v) for v in POINTS.get('motes', [])], 'props': PROPS, 'glyphs': ENTRANCE_GLYPHS,
+         'stele_glow': ENTRANCE_GLOW, 'centre': (ARENA['cx'], ARENA['cz'])}
 THEME_CENTRE = THEME['centre']
 
 
@@ -503,6 +505,9 @@ class KitStub:
 
     def tele_halo(self, r, h, tell, el=1, hold=3):
         return self._c('tele/halo', r=r, h=h, tell=tell, el=el)
+
+    def tele_glyph_circle(self, r, tell, hold=3):
+        return self._c('tele/glyph_circle', r=r, tell=tell)
 
     def tele_field(self, id, r, el, life):   # noqa: A002
         return self._c('tele/field', id=id, r=r, el=el, life=life)

@@ -8,4 +8,3 @@ execute if score #azPair mb matches 1 run function rlk:mboss/azhdaha/prep/pair_1
 execute if score #azPair mb matches 2 run function rlk:mboss/azhdaha/prep/pair_2
 execute if score #azPair mb matches 3 run function rlk:mboss/azhdaha/prep/pair_3
 function rlk:mboss/azhdaha/prep/glyphs
-schedule function rlk:mboss/azhdaha/prep_glow 10t replace

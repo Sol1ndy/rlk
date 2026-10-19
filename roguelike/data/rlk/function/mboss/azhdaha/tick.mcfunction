@@ -7,9 +7,9 @@ execute if score #azFlash mb matches 1.. run function rlk:mboss/azhdaha/u/flash
 scoreboard players set #azFlash mb 0
 function rlk:mboss/azhdaha/brand/tick
 function rlk:mboss/azhdaha/ev/tick
-scoreboard players operation #azM mb = #azClk mb
-scoreboard players operation #azM mb %= #azK4 mb
-execute if score #azM mb matches 0 run function rlk:mboss/azhdaha/ai/sample4
+scoreboard players operation #azQ4 mb = #azClk mb
+scoreboard players operation #azQ4 mb %= #azK4 mb
+execute if score #azQ4 mb matches 0 run function rlk:mboss/azhdaha/ai/sample4
 execute if score #azPat mb matches 0 run function rlk:mboss/azhdaha/ai/state
 execute if score #azPat mb matches 1.. run function rlk:mboss/azhdaha/p/run
 execute if score #azCast mb matches 1.. run function rlk:mboss/azhdaha/cast/run
@@ -23,7 +23,7 @@ execute if score #azFldN mb matches 1.. run function rlk:mboss/azhdaha/fld/tick
 execute if entity @e[type=minecraft:marker,tag=rlk_mb_az_orbc,limit=1] run function rlk:mboss/azhdaha/orb/centre
 function rlk:mboss/azhdaha/push/req
 function rlk:mboss/azhdaha/hud/tick
-execute if score #azM mb matches 0 run function rlk:mboss/azhdaha/arena/tick
+execute if score #azQ4 mb matches 0 run function rlk:mboss/azhdaha/arena/tick
 execute if score #azYawC mb matches 1.. run function rlk:mboss/azhdaha/yaw/tick
 function rlk:mboss/azhdaha/rig_stub/tick
 scoreboard players set #azNoPush mb 0

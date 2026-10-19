@@ -96,7 +96,7 @@ def build():
     if A.ARENA_STUBBED:
         notes.append('arena: no arena_of / arenas{} (AZ-CM): api.ARENA_STUB used')
     if A.THEME_STUBBED:
-        notes.append('theme: tools/mboss_arena_az_cavern.py absent (S1-ARENA): api THEME stub used')
+        notes.append('WARN theme az_cavern missing (S1-ARENA unmerged): api._THEME_FALLBACK used (no entrance glyphs, no crystals)')
     if A.CMSTUBS:
         notes.append('framework (AZ-CM) local stubs: ' + ', '.join(f'{k} (cm.md {v})' for k, v in sorted(A.CMSTUBS.items())))
     if not A.KIT:
@@ -222,8 +222,8 @@ class Core:
         self.prep()
         self.intro()
         AI.emit(self)
+        self.services()                       # before slot(): its dispatchers list the files that exist (g.has)
         self.slot()
-        self.services()
         self.cast_bg_b3()
         self.transitions()
         self.yaw()
@@ -244,7 +244,7 @@ class Core:
         yw = []
         for name in SR.YAW_CLIPS:
             c = A.CLIPS[name]
-            yw.append(f'c{c["id"]}:[I;' + ','.join(str(int(round(v * 100))) for v in c['yaw']) + ']')
+            yw.append(f'c{c["id"]}:[' + ','.join(str(int(round(v * 100))) for v in c['yaw']) + ']')
         self.w('ai/consts', [
             '# Module constants (spawn, reload): the moduli #azK<n> of Gen.every, the yaw schedules of the manifest (x 100,',
             '# storage az.yw.c<clip id>), the module objectives (entity: azT age, azS state / element, azPT owner pattern id,',
@@ -331,8 +331,8 @@ class Core:
             f'execute if score #azFlash mb matches 1.. run {F("u/flash")}', sc('#azFlash', 0),
             F('brand/tick'),
             F('ev/tick'),
-            'scoreboard players operation #azM mb = #azClk mb', 'scoreboard players operation #azM mb %= #azK4 mb',
-            f'execute if score #azM mb matches 0 run {F("ai/sample4")}',
+            'scoreboard players operation #azQ4 mb = #azClk mb', 'scoreboard players operation #azQ4 mb %= #azK4 mb',
+            f'execute if score #azQ4 mb matches 0 run {F("ai/sample4")}',
             f'execute if score #azPat mb matches 0 run {F("ai/state")}',
             f'execute if score #azPat mb matches 1.. run {F("p/run")}',
             f'execute if score #azCast mb matches 1.. run {F("cast/run")}',
@@ -346,7 +346,7 @@ class Core:
             f'execute if entity @e[type=minecraft:marker,tag=rlk_mb_az_orbc,limit=1] run {F("orb/centre")}',
             F('push/req'),
             F('hud/tick'),
-            f'execute if score #azM mb matches 0 run {F("arena/tick")}',
+            f'execute if score #azQ4 mb matches 0 run {F("arena/tick")}',
             f'execute if score #azYawC mb matches 1.. run {F("yaw/tick")}']
         tick += A.rig_tick_lines()
         tick += [sc('#azNoPush', 0), sc('#azNoTurn', 0)]
@@ -449,7 +449,9 @@ class Core:
                  'execute store result score #azPair mb run random value 0..3']
         for i, (leg, tail) in A.PAIRS.items():
             lines.append(f'execute if score #azPair mb matches {i} run function {NS}prep/pair_{i}')
-        lines += [f'function {NS}prep/glyphs', f'schedule function {NS}prep_glow 10t replace']
+        lines += [f'function {NS}prep/glyphs']
+        if th['glyphs']:
+            lines.append(f'schedule function {NS}prep_glow 10t replace')
         self.w('prep', lines)
         for i, (leg, tail) in A.PAIRS.items():
             ln, tn = A.EL_NAME[leg], A.EL_NAME[tail]
@@ -469,7 +471,11 @@ class Core:
                 f'data modify entity @s data.az_pair set value {{leg:{leg},tail:{tail},i:{i}}}'])
         gl = ['# The two glyph props on the entrance stele (theme entrance_layout glyphs; rlk_room: room/clear removes them).',
               'kill @e[type=minecraft:item_display,tag=rlk_mb_az_glyph]']
+        if not th['glyphs']:
+            gl.append('# theme fallback (s2.md 5.1): no entrance glyphs, no glyph props')
         for slot, which in (('upper', 'tail'), ('lower', 'leg')):
+            if slot not in th['glyphs']:
+                continue
             x, y, z, yaw = th['glyphs'][slot]
             els = A.TAIL_ELS if which == 'tail' else A.LEG_ELS
             for e in els:
@@ -480,14 +486,15 @@ class Core:
                           f'scale:[0.9f,0.9f,0.9f]}},item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":'
                           f'"rlk:mboss/az_kit/glyph_{A.EL_KEY[e]}"}}}}}}')
         self.w('prep/glyphs', gl)
-        gx, gy, gz = th['stele_glow']
-        self.w('prep_glow', ['# The entrance stele glow (every 10 t while its glyph props live; uninstall clears the schedule).',
-                             'execute unless entity @e[type=minecraft:item_display,tag=rlk_mb_az_glyph,limit=1] run return 0',
-                             f'execute in minecraft:overworld positioned {L.num(gx, 3)} {L.num(gy, 3)} {L.num(gz, 3)} run '
-                             f'{K.fx("glyph_glow")}',
-                             f'execute in minecraft:overworld run particle minecraft:wax_on {L.num(gx, 3)} {L.num(gy, 3)} {L.num(gz, 3)} '
-                             '0.25 0.6 0.1 0 2 force @a[tag=player]',
-                             f'schedule function {NS}prep_glow 10t replace'])
+        glow = ['# The entrance stele glow (every 10 t while its glyph props live; uninstall clears the schedule).',
+                'execute unless entity @e[type=minecraft:item_display,tag=rlk_mb_az_glyph,limit=1] run return 0']
+        if th['stele_glow']:
+            gx, gy, gz = th['stele_glow']
+            glow += [f'execute in minecraft:overworld positioned {L.num(gx, 3)} {L.num(gy, 3)} {L.num(gz, 3)} run {K.fx("glyph_glow")}',
+                     f'execute in minecraft:overworld run particle minecraft:wax_on {L.num(gx, 3)} {L.num(gy, 3)} {L.num(gz, 3)} '
+                     '0.25 0.6 0.1 0 2 force @a[tag=player]']
+        glow.append(f'schedule function {NS}prep_glow 10t replace')
+        self.w('prep_glow', glow)
 
     # -----------------------------------------------------------------------------------------
     def intro(self):
@@ -1321,7 +1328,7 @@ class Core:
                             'scoreboard players remove @e[type=minecraft:text_display,tag=rlk_mb_az_pop] azT 1',
                             'kill @e[type=minecraft:text_display,tag=rlk_mb_az_pop,scores={azT=..0}]',
                             f'execute if score #azHudQ mb matches 1 run return run {F("hud/refresh")}',
-                            f'execute if score #azM mb matches 0 run {F("hud/refresh")}'])
+                            f'execute if score #azQ4 mb matches 0 run {F("hud/refresh")}'])
         bar = ['# @s = body: the under-bar (plan 4.11): fight = mhpC - #mbFloor of the phase pool (Geo -> leg -> tail colour);',
                '# transition = the step progress (gold); B3 tail window = time left (the tail colour).',
                'execute if score #mbSt mb matches 0 run return 0',
