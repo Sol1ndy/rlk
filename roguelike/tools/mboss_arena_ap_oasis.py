@@ -722,7 +722,7 @@ def _paint_limbs(g, t):
     R = _trunk_r(t, top)
     _tube(g, [(ax, top - 1.0, az), (ax, top + 1.5, az)], [R * 0.95, R * 0.8], mat['wood'], 'tree')
     tips = []
-    for j, (db, d_end, outward) in enumerate(((-11.0, 12.5, False), (12.0, 15.5, False), (-38.0, 50.0, True),
+    for j, (db, d_end, outward) in enumerate(((-19.0, 13.0, False), (21.0, 16.0, False), (-38.0, 50.0, True),
                                               (34.0, 47.0, True))):
         b_end = t['bearing'] + db + 6.0 * (_mix(k, j, 70) - 0.5)
         d_end += 2.5 * (_mix(k, j, 71) - 0.5)
@@ -733,6 +733,12 @@ def _paint_limbs(g, t):
         d_e = math.hypot(ex - CX, ez - CZ)
         ey = canopy_y(d_e) - (1.7 if not outward else 1.4)
         mx, mz = (ax + ex) / 2.0, (az + ez) / 2.0
+        if not outward:                                   # bow the limb sideways (away from the straight chord)
+            side = 1.0 if db > 0 else -1.0
+            cx_, cz_ = ex - ax, ez - az
+            ln = math.hypot(cx_, cz_) or 1.0
+            mx += side * 3.5 * (-cz_ / ln)
+            mz += side * 3.5 * (cx_ / ln)
         dm = math.hypot(mx - CX, mz - CZ)
         p1 = (ax + (mx - ax) * 0.5, top + 1.5, az + (mz - az) * 0.5)
         p2 = (mx + (ex - mx) * 0.4, canopy_y(dm) - 1.6, mz + (ez - mz) * 0.4)
@@ -810,10 +816,49 @@ def _paint_wall(g):
                 if math.hypot(x + 0.5 - sx, z + 0.5 - sz) <= R:
                     for y in range(ground_top(x, z), top + 1):
                         g.put(x, y, z, SPECIES[sp]['log'], 'wall')
+    # fallen logs (mossy, horizontal) and giant brown mushrooms on the forest floor between the trees
+    for k in range(5):
+        b = 360.0 * k / 5 + 30.0 + 20.0 * (_mix(k, 95) - 0.5)
+        d = 39.0 + 6.0 * _mix(k, 96)
+        x, z = polar_point(d, b)
+        if any(math.hypot(x - t['x'], z - t['z']) < t['R'] + 4.0 for t in TREES_FULL):
+            continue
+        ang = math.radians(b + 90.0 + 50.0 * (_mix(k, 97) - 0.5))
+        L = 5.0 + 4.0 * _mix(k, 98)
+        R = 0.9 + 0.5 * _mix(k, 99)
+        sp = SPECIES[('jungle', 'pale_oak', 'jungle', 'mangrove', 'pale_oak')[k]]
+        gy = ground_top(math.floor(x), math.floor(z)) + R
+        p0 = (x - math.sin(ang) * L / 2, gy, z + math.cos(ang) * L / 2)
+        p1 = (x + math.sin(ang) * L / 2, gy, z - math.cos(ang) * L / 2)
+
+        def bark(xx, yy, zz, f, sp=sp, gy=gy):
+            return _p('moss_block') if (yy + 0.5 > gy + 0.3 and _mix(xx, yy, zz, 100) < 0.45) else sp['wood']
+        _tube(g, [p0, p1], [R, R * 0.85], sp['wood'], 'wall', sel=bark)
+    for k in range(4):
+        b = 360.0 * k / 4 + 75.0 + 25.0 * (_mix(k, 101) - 0.5)
+        d = 38.0 + 7.0 * _mix(k, 102)
+        x, z = polar_point(d, b)
+        if any(math.hypot(x - t['x'], z - t['z']) < t['R'] + 3.5 for t in TREES_FULL):
+            continue
+        xi, zi = math.floor(x), math.floor(z)
+        gy = ground_top(xi, zi)
+        h = 4 + int(3 * _mix(k, 103))
+        rc = 2.4 + 1.2 * _mix(k, 104)
+        for y in range(gy + 1, gy + h + 1):
+            g.put(xi, y, zi, _p('mushroom_stem'), 'wall')
+        for xx in range(math.floor(x - rc - 1), math.floor(x + rc + 1) + 1):
+            for zz in range(math.floor(z - rc - 1), math.floor(z + rc + 1) + 1):
+                r = math.hypot(xx + 0.5 - x, zz + 0.5 - z)
+                if r <= rc:
+                    g.put(xx, gy + h + 1, zz, _p('brown_mushroom_block'), 'wall')
+                    if r <= rc * 0.55:
+                        g.put(xx, gy + h + 2, zz, _p('brown_mushroom_block'), 'wall')
+                elif r <= rc + 0.8:
+                    g.put(xx, gy + h, zz, _p('brown_mushroom_block'), 'wall')
     # bushes on the ground between the trees and the wall
-    for k in range(46):
+    for k in range(70):
         b = 360.0 * _mix(k, 85)
-        d = 37.5 + 24.0 * _mix(k, 86)
+        d = 37.0 + 24.0 * _mix(k, 86)
         x, z = polar_point(d, b)
         if not (BOX['x0'] <= x <= BOX['x1'] and BOX['z0'] <= z <= BOX['z1']):
             continue
@@ -936,6 +981,15 @@ def _paint_spawn_lights(g):
         cells = {c: (v[look] if isinstance(v, Lk) else v) for c, v in g.items()}
         cells = {c: v for c, v in cells.items() if v is not None}
         opq, lv = bytearray(N), bytearray(N)
+        # the margin around the box (x / z sides and below) is opaque: no light leaks in from outside and the flat
+        # index never wraps from one edge to the opposite one
+        for xi in range(nx):
+            for yi in range(ny):
+                base = (xi * ny + yi) * nz
+                if xi in (0, nx - 1) or yi == 0:
+                    opq[base:base + nz] = b'\x01' * nz
+                else:
+                    opq[base] = opq[base + nz - 1] = 1
         seeds = []
         for (x, y, z), b in cells.items():
             i = idx(x, y, z)
@@ -1321,7 +1375,7 @@ def _entrance_blocks_full():
 
     def arch_top(x):
         u = abs(x + 0.5 - acx)
-        return 201.0 + 9.2 - 0.55 * u * u if u <= 4.0 else None
+        return 201.0 + 9.4 - 0.22 * u * u if u <= 4.0 else None
 
     for x in range(hx0, hx1 + 1):
         u = abs(x + 0.5 - acx)
@@ -1329,12 +1383,13 @@ def _entrance_blocks_full():
             at = arch_top(x)
             if u <= 4.0 and at is not None and y + 0.5 <= at:
                 # the portal panel: a giant leaf (lime terracotta cells, green rim, glowing midrib and veins)
-                yy = y - 201
-                vein = (u < 0.6) or (abs(yy - 1.1 * u - 1.0) < 0.6 and yy % 2 == 0)
-                if vein:
-                    m = 'verdant_froglight'
+                yy = y + 0.5 - 201.0
+                if u < 0.6:
+                    m = 'verdant_froglight'                       # the glowing midrib
                 elif at - (y + 0.5) < 1.0 or u > 3.4:
-                    m = 'green_terracotta'
+                    m = 'green_terracotta'                        # the leaf rim
+                elif (yy - 0.9 * u) % 2.6 < 0.9:
+                    m = 'green_terracotta'                        # lateral veins rising toward the tip
                 else:
                     m = 'lime_terracotta'
                 z2[(x, y, hz0)] = B + m
