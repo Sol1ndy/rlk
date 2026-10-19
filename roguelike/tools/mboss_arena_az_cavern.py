@@ -19,7 +19,9 @@ hold the rim element-crystal props); 26 hanging gold-crystal clusters from the v
 raw gold / gold cores, ochre-froglight or shroomlight glow, yellow / orange glass shells, pointed-dripstone tips);
 golden roots (stripped jungle wood, mangrove roots) down the north wall and across the vault; five 1-deep rim pools of
 real water in wall-foot recesses beyond r 28 (contained on every side); the hidden light[level=9] layer at y 206 over
-r <= 27.5. The shallow-water look, the element crystals and the arrival glyphs are props (props(), theme.md §4.1).
+r <= 27.5. No mob can spawn (the pack never turns natural spawning off): every open ring cell from y 208 up is barrier,
+the rock envelope is a solid cylinder up to y 240 whose top layer is tinted glass, and every other upward surface in
+the box has block light >= 1 (test_arena_az.py checks it with a light flood). The shallow-water look, the element crystals and the arrival glyphs are props (props(), theme.md §4.1).
 
 The entrance (plan §2.3, entrance_layout()): Raiden's foyer box as zone 1 in plain Liyue stonework, and the kind-9 hall
 x -10..9, z 4..23: a Liyue stone arch (andesite columns, dark-oak beam, gold trim, tiled roof, hanging lanterns) over the
@@ -351,9 +353,15 @@ def wall_r(b, y):
 
 
 def _roof(x, z):
-    d = cell_polar(x, z)[2]
-    r = math.floor(dome_y(x, z) + 2.2 + 1.6 * _vnoise(x, z, 4.0, 91))
-    return min(BOX['y1'], max(r, 216 if d > WALK else r))
+    """Top of the rock column (x, z): the whole envelope is a solid cylinder up to the box top, so the outside of the
+    cavern has no ledge or dome step; its only upward faces are the y 240 layer, capped with tinted glass (no mob
+    spawns on it, no light through it)."""
+    return BOX['y1']
+
+
+def _shell_top(x, z):
+    """Where decor that runs up into the vault (pillar capitals) stops: two blocks into the rock above the cavity."""
+    return min(BOX['y1'] - 1, math.floor(dome_y(x, z)) + 2)
 
 
 def _rock(x, y, z):
@@ -464,7 +472,7 @@ def _build_full():
             for y in range(ybot, 200):
                 blocks[(x, y, z)] = B + ('smooth_basalt' if d <= 2.5 else 'tuff')
             for y in range(200, roof + 1):
-                if y >= 201 and y + 0.5 < dy and (d <= WALK or d <= wall_r(b, y)):
+                if 201 <= y < BOX['y1'] and y + 0.5 < dy and (d <= WALK or d <= wall_r(b, y)):
                     opened.add((x, y, z))
                 else:
                     blocks[(x, y, z)] = 'R'
@@ -520,7 +528,7 @@ def _build_full():
                 dist = math.hypot(dx, dz)
                 ang = math.atan2(dz, dx)
                 rr = p['r'] * (1.0 + 0.24 * (_vnoise(math.cos(ang) * 3 + 10, math.sin(ang) * 3, 1.6, p['seed']) - 0.5))
-                top = _roof(x, z)
+                top = _shell_top(x, z)
                 for y in range(201, top + 1):
                     rad = rr + (0.7 if y <= 202 else 0.0) + (0.32 * (y - 211) if y > 211 else 0.0)
                     if dist > rad or not guard((x, y, z)):
@@ -703,14 +711,16 @@ def _build_full():
                 break
         blocks[c] = _rock(x, y, z) if exposed else B + 'tuff'
 
-    # 11. hidden light layer and the barrier cap
+    # 11. hidden light layer, the barrier cap and the roof cap. The cap fills every open ring cell from y 208 up (the
+    #     plaza's band 208..215 and the dark recesses of the vault spring above it): nothing can climb or spawn there.
     for (x, z), (d, b) in pol.items():
         if d <= WALK - 0.5:
             blocks[(x, YLIGHT, z)] = LIGHT
         elif d > WALK:
-            for y in range(208, 216):
+            for y in range(208, BOX['y1'] + 1):
                 if (x, y, z) in opened:
                     blocks[(x, y, z)] = B + 'barrier'
+        blocks[(x, BOX['y1'], z)] = B + 'tinted_glass'
     return blocks
 
 
@@ -855,7 +865,7 @@ def _entrance_blocks():
             else:
                 z1[(x, 200, z)] = B + ('stone' if _mix(x, z, 172) < 0.5 else 'andesite')
             if not edge:
-                z1[(x, 214, z)] = 'minecraft:light[level=15]'
+                z1[(x, 208, z)] = 'minecraft:light[level=15]'
     _liyue_walls(z1, fx0, fz0, fx1, fz1, 173)
     # ---- zone 2: the domain hall
     hx0, hz0, hx1, hz1 = HALL
@@ -875,8 +885,8 @@ def _entrance_blocks():
             else:
                 blk = _brick(x, 200, z, 181)
             z2[(x, 200, z)] = blk
-            if hx0 < x < hx1 and hz0 < z < hz1:
-                z2[(x, 214, z)] = 'minecraft:light[level=15]'
+            if hx0 < x < hx1 and hz0 + 2 < z < hz1:
+                z2[(x, 208, z)] = 'minecraft:light[level=15]'
     _liyue_walls(z2, hx0, hz0, hx1, hz1, 182)
     # the north side: a rough rock cliff with golden roots and the dark mouth of the domain behind the gate
     for x in range(hx0, hx1 + 1):
@@ -946,8 +956,8 @@ def entrance_layout():
     hall = _zone(2, 9, HALL, (GATE[0], GATE[2]), [_cell(*HALL, (-8, 6, 8, 20))])
     cur = {'n': 2, 'zones': [foyer, hall], 'doors': [dict(DOOR)], 'spawn': {'x': 0, 'z': 33, 'yaw': 180},
            'spot': {'x': 0, 'z': 33}}
-    clear = {1: [((FOYER[0], 201, FOYER[1]), (FOYER[2], 230, FOYER[3]))],
-             2: [((HALL[0], 201, HALL[1]), (HALL[2], 230, HALL[3]))]}
+    clear = {1: [(FOYER[0], 199, FOYER[1], FOYER[2], 230, FOYER[3])],      # flat (x0, y0, z0, x1, y1, z1) boxes
+             2: [(HALL[0], 199, HALL[1], HALL[2], 230, HALL[3])]}
     return {'cur': cur, 'blocks': _entrance_blocks(), 'clear': clear, 'gate': GATE,
             'glyphs': dict(ENT_GLYPHS), 'stele_glow': ENT_GLOW,
             'th': {'lb': B + 'stone_bricks', 'lb2': B + 'polished_andesite'}}
