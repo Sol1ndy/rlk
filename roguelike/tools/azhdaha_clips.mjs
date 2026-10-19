@@ -15,7 +15,20 @@ export const hind = (h, e = [0, 0, 0], hr = null, er = null) => ({hkL: h, hfL: e
 
 // Idle stance (model.md §1.2 / §2): head carried low (snout 0.85 b, crest 2.65 b), fore columns at x +-3.15,
 // wheelbase 5.0 b, the tail rising behind the rump in a high curl with the leafy tip hanging forward (motion.md §5.1).
-export const TAIL_REST = [-4, 4, 12, 22, 32, 40, 42, 38];
+// Tail curls (per-segment up angles, the tail region's constants; R2 critique 5.1-5.3, 5.7, 1.9). Bends of 25-30
+// degrees are covered by the segment collars and the overlapping flank plates.
+// TAIL_REST: the idle carry, a big arc rising from the rump, back and over, the leafy tip forward over the mid-back at
+// ~10 b (v3 23.6 s, v3 f1365, v1 idle front: the "tree" above the plates).
+export const TAIL_REST = [22, 25, 27, 28, 27, 25, 23, 21];
+// TAIL_LOOP: the phase-3 loop / shells carry (v8 f2280 trace: top 11.3-11.8 b, rear z ~9, the tip over the shoulders).
+export const TAIL_LOOP = [29, 28, 29, 29, 26, 22, 19, 18];
+// TAIL_LOW: laid out behind, the branch just off the floor (v3 f1680); TAIL_WHIP: flat on the floor for the sweep.
+export const TAIL_LOW = [-8, -6, -2, 4, 7, 5, 3, 1];
+export const TAIL_WHIP = [-9, -10, 1, 6, 9, 4, 0, -3];
+// TAIL_PILLAR: the tail-only pillar. The root pose (TAIL_PILLAR_ROOT) pitches the buried body nose-down 90 degrees
+// so the tail rises at the anchor's x / z (critique 1.9), the root 4 b under the floor; a slight S, the crown nodding.
+export const TAIL_PILLAR = [0, -6, -6, -2, 4, 8, 12, 16];
+export const TAIL_PILLAR_ROOT = {pos: [0, -11.15, 0], rot: [-90, 0, 0]};
 export const DEFAULT_POSE = {
   pos: [0, 0, 0], rot: [0, 0, 0],
   pelvis: [0, 0, 0], spine: [0, 0, 0], chest: [0, 0, 0], neck1: [0, 0, 0], neck2: [0, 0, 0], head: [0, 0, 0], jaw: 0,
@@ -38,12 +51,12 @@ export const CLIPS = [
   pose('stomp_lift', 2, {pelvis: [3, 0, 0], spine: [2, 0, 4], chest: [6, 0, 10], neck1: [0, -6, 0], head: [0, -10, 0],
     ...fore([3.45, 2.4, -2.75], [-30, 0, 0], [-3.15, .5, -2.4], [0, 0, 0])}, 'stomp_fl hang (t15): the front rises (pelvis +3, chest +6) and rolls away, the left elbow high, the bracer a hanging column (18 deg from vertical), wrist 2.4 b, claws curled; weight on the right'),
   pose('whip_mid', 2, {pos: [0, -.2, 0], chest: [0, 12, 0], spine: [0, 6, 0], pelvis: [0, -6, 0], head: [0, 10, 0],
-    ...tailUp([-12, -6, -3, 0, 0, 2, 4, 6]), tSweep: 150}, 'tail whip mid-sweep: the tail flat on the floor, swept 150 to the left'),
-  pose('loop', 2, {...tailUp([12, 15, 25, 30, 32, 30, 30, 22])}, 'phase-3 tail loop over the back (v8 f2280 / v7 f0600 silhouette)'),
-  pose('tail_low', 2, {...tailUp([-6, -4, 0, 2, 4, 8, 14, 20])}, 'the tail laid out behind (v3 f1680): the leafy branch near the floor'),
+    ...tailUp(TAIL_WHIP), tSweep: 110}, 'tail whip mid-sweep: the tail flat on the floor, swept 110 to the left (root-weighted)'),
+  pose('loop', 2, {...tailUp(TAIL_LOOP)}, 'phase-3 tail loop over the back (v8 f2280 / v7 f0600 silhouette)'),
+  pose('tail_low', 2, {...tailUp(TAIL_LOW)}, 'the tail laid out behind (v3 f1680): the leafy branch near the floor'),
   pose('burrow', 2, {pos: [0, -3.4, 0], rot: [-22, 0, 0], head: [-15, 0, 0], ...tailUp([-10, -5, 0, 0, 5, 5, 5, 5]), flS: 6, flM: 6}, 'burrow dive mid-sink: root -3.4, nose down 22; the opaque floor hides the buried part'),
   pose('burrowed', 2, {pos: [0, -7.5, 0], visBody: 0, visTail: 0}, 'underground (burrow_travel): root -7.5, every part at scale 0', {state: 'burrowed'}),
-  pose('tail_only', 2, {pos: [0, -9.4, 0], rot: [-12, 0, 0], visBody: 0, ...tailUp([78, 6, -4, -6, -4, 4, 8, 12])}, 'phase-3 tail-only state: root sunk 9.4 b, the tail a pillar above the floor, the body at scale 0', {state: 'tail_only'}),
+  pose('tail_only', 2, {...TAIL_PILLAR_ROOT, visBody: 0, ...tailUp(TAIL_PILLAR)}, 'phase-3 tail-only state: the body pitched nose-down 90 and sunk, the tail a pillar rising at the anchor, the body at scale 0', {state: 'tail_only'}),
 ];
 // RETIME table (authored -> played ticks), empty in R1.
 export const RETIME = {};

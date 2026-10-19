@@ -21,7 +21,7 @@ data merge entity 524c4b4d-415a-4400-8000-000000000027 {brightness:{block:13,sky
 data merge entity 524c4b4d-415a-4400-8000-000000000028 {brightness:{block:13,sky:15}}
 data merge entity 524c4b4d-415a-4400-8000-000000000029 {brightness:{block:13,sky:15}}
 data merge entity 524c4b4d-415a-4400-8000-00000000002a {brightness:{block:13,sky:15}}
-data merge entity 524c4b4d-415a-4400-8000-00000000002b {brightness:{block:13,sky:15}}
-data merge entity 524c4b4d-415a-4400-8000-00000000002c {brightness:{block:13,sky:15}}
+data merge entity 524c4b4d-415a-4400-8000-00000000002b {brightness:{block:14,sky:15}}
+data merge entity 524c4b4d-415a-4400-8000-00000000002c {brightness:{block:14,sky:15}}
 data merge entity 524c4b4d-415a-4400-8000-00000000002d {brightness:{block:14,sky:15}}
 data merge entity 524c4b4d-415a-4400-8000-00000000002e {brightness:{block:14,sky:15}}

@@ -21,6 +21,7 @@ data merge entity 524c4b4d-415a-4400-8000-00000000001d {Glowing:0b}
 data merge entity 524c4b4d-415a-4400-8000-000000000020 {Glowing:0b}
 data merge entity 524c4b4d-415a-4400-8000-00000000001e {Glowing:0b}
 data merge entity 524c4b4d-415a-4400-8000-000000000021 {Glowing:0b}
+data merge entity 524c4b4d-415a-4400-8000-00000000002f {Glowing:0b}
 data merge entity 524c4b4d-415a-4400-8000-000000000026 {Glowing:0b}
 data merge entity 524c4b4d-415a-4400-8000-000000000027 {Glowing:0b}
 data merge entity 524c4b4d-415a-4400-8000-000000000028 {Glowing:0b}

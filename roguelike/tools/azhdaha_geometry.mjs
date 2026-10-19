@@ -35,3 +35,6 @@ export const TINTED = merge('tinted item', r => r.TINTED);
 export const LOOK_BRIGHT = {legs: {}, tail: {}};
 for (const r of REGIONS) for (const [ch, looks] of Object.entries(r.LOOK_BRIGHT || {})) for (const [l, parts] of Object.entries(looks)) LOOK_BRIGHT[ch][l] = {...(LOOK_BRIGHT[ch][l] || {}), ...parts};
 export const REGION_OF = Object.fromEntries(PARTS.map(([n, , , r]) => [n, r]));
+// Per-part culling boxes {part: {width, height}} (a region's CULL_BOX; parts not listed keep the rig-wide box):
+// the distal tail reaches past the rig-wide box when it is laid out, swept or raised.
+export const CULL_BOX = merge('culling box', r => r.CULL_BOX);

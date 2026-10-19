@@ -30,7 +30,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {paintAzhdahaTextures, spriteId, azhdahaSpriteSizes, ATLAS_BUDGET} from './azhdaha_paint.mjs';
-import {partModels, checkBounds, PARTS, LOOKS, TINTED, LOOK_BRIGHT, EMPTY, REGION_OF} from './azhdaha_geometry.mjs';
+import {partModels, checkBounds, PARTS, LOOKS, TINTED, LOOK_BRIGHT, EMPTY, REGION_OF, CULL_BOX} from './azhdaha_geometry.mjs';
 import {solve, toDisplay, PART_SCALE, TAIL_PARTS, proxyPoints, PROXIES, pointOf, J, SOLE} from './azhdaha_pose.mjs';
 import {CLIPS, accumulate, sampleClip as sample, restPose} from './azhdaha_clips.mjs';
 import {add, rot} from './mboss_rig_math.mjs';
@@ -62,6 +62,7 @@ const uuidInts = n => `[I;1380731725,1096434688,-2147483648,${PART_INDEX[n]}]`;
 const SHADOW_UUID = '524c4b4d-415a-4400-8000-000000000040', SHADOW_INTS = '[I;1380731725,1096434688,-2147483648,64]';
 const itemId = m => `rlk:mboss/azhdaha/${m}`;
 const CULL = {width: 30, height: 12}, VIEW_RANGE = 3;
+const cullOf = n => CULL_BOX[n] || CULL;   // per-part boxes (the distal tail: azhdaha_tail.mjs CULL_BOX)
 
 // ---- resource pack: textures, models, item definitions ---------------------------------------------------------------------
 const sprites = flag('--no-paint') ? null : paintAzhdahaTextures(rp, arg('--paint') ? arg('--paint').split(',') : null);
@@ -133,7 +134,7 @@ function poseChecks(c, frames) {
     for (const [n] of PARTS) for (const P of partCorners(f.o, n, MODEL_OF_PART[n])) {
       for (let i = 0; i < 3; i++) { ext[i][0] = Math.min(ext[i][0], P[i]); ext[i][1] = Math.max(ext[i][1], P[i]); }
       // culling-box overhang (blocks past the box): recorded, not fatal (the box is plan.md R4's fixed 30 x 12)
-      const o = Math.max(Math.abs(P[0]) - CULL.width / 2, Math.abs(P[2]) - CULL.width / 2, P[1] - CULL.height);
+      const cb = cullOf(n), o = Math.max(Math.abs(P[0]) - cb.width / 2, Math.abs(P[2]) - cb.width / 2, P[1] - cb.height);
       if (o > 0) over[n] = Math.max(over[n] || 0, +o.toFixed(2));
     }
     if (f.p.pos[1] >= -.01) for (const n of ['paw_l', 'paw_r', 'foot_l', 'foot_r']) {
@@ -176,7 +177,7 @@ for (const c of CLIPS) {
   motionErrors.push(...r.motionErrors);
   r.warns.forEach(w => warns.add(w));
   const evTicks = [...new Set([0, ...Object.values(c.events || {}), c.len])].sort((a, b) => a - b);
-  if (Object.keys(chk.over).length) warns.add(`${c.name}: outside the ${CULL.width} x ${CULL.height} culling box by ${JSON.stringify(chk.over)}`);
+  if (Object.keys(chk.over).length) warns.add(`${c.name}: outside the culling box (${CULL.width} x ${CULL.height}; per part for the distal tail) by ${JSON.stringify(chk.over)}`);
   clipInfo.push({...r.info, state: c.state || 'normal', extents: chk.extents, ...(Object.keys(chk.over).length ? {cull_overhang: chk.over} : {}), px: pxTrack(frames, evTicks)});
 }
 if (poseErrors.length) {
@@ -193,7 +194,7 @@ compiler.writeDispatch(CLIPS);
 const REST = (() => { const o = solve(restPose()); return Object.fromEntries(PARTS.map(([n]) => [n, toDisplay(n, o[n])])); })();
 const REGION_TAG = n => `rlk_mb_az_g_${REGION_OF[n]}`;
 const TAGS = n => `["rlk_room","rlk_mb_aux","rlk_mb_part","rlk_mb_azhdaha_part","rlk_mb_az_${n}","${REGION_TAG(n)}"]`;
-const summon = ([n, model, bright], pose) => `summon minecraft:item_display ~ ~ ~ {UUID:${uuidInts(n)},Tags:${TAGS(n)},billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:${VIEW_RANGE}f,width:${CULL.width}f,height:${CULL.height}f,shadow_radius:0f,brightness:{block:${bright},sky:15},transformation:${nbt(pose)},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId(model)}"}}}`;
+const summon = ([n, model, bright], pose) => `summon minecraft:item_display ~ ~ ~ {UUID:${uuidInts(n)},Tags:${TAGS(n)},billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:${VIEW_RANGE}f,width:${cullOf(n).width}f,height:${cullOf(n).height}f,shadow_radius:0f,brightness:{block:${bright},sky:15},transformation:${nbt(pose)},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId(model)}"}}}`;
 const shadowSummon = `summon minecraft:item_display ~ ~ ~ {UUID:${SHADOW_INTS},Tags:["rlk_room","rlk_mb_aux","rlk_mb_azhdaha_part","rlk_mb_az_shadow"],billboard:"fixed",item_display:"none",teleport_duration:1,view_range:${VIEW_RANGE}f,width:${CULL.width}f,height:${CULL.height}f,shadow_radius:4.5f,shadow_strength:.8f,item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId(EMPTY)}"}}}`;
 const RIG_OBJ = ['azRigC', 'azRigT', 'azRigF', 'azRigY', 'azRigLegs', 'azRigTail', 'azRigState'];
 fn('init', ['# Rig objectives. Safe to call on every load.', ...RIG_OBJ.map(o => `scoreboard objectives add ${o} dummy`)]);
@@ -242,7 +243,7 @@ fn('state/burrowed', ['# Burrowed (underground travel): every part at scale 0 un
 fn('state/tail_only', ['# Tail-only (phase-3 sink): the body parts at scale 0, the tail chain shown by the tail clips. @s = rig anchor.', 'scoreboard players set @s azRigState 2', ...hideParts(nonTail)]);
 // hit flash: a warm white outline for 3 ticks on one part group (rigtech.md §2.6: never all 46 parts at once)
 const GROUPS = {head: ['head', 'jaw', 'horn_l', 'horn_r'], front: ['chest', 'neck1', 'neck2', 'apron', 'uarm_l', 'uarm_r', 'bracer_l', 'bracer_r', 'paw_l', 'paw_r'],
-  rear: ['belly', 'pelvis', 'thigh_l', 'thigh_r', 'gaiter_l', 'gaiter_r', 'foot_l', 'foot_r'], tail: ['t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 'tip']};
+  rear: ['belly', 'pelvis', 'thigh_l', 'thigh_r', 'gaiter_l', 'gaiter_r', 'foot_l', 'foot_r', 'tail_skirt'], tail: ['t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 'tip']};
 for (const [g, list] of Object.entries(GROUPS)) {
   fn(`flash/${g}`, [`# Hit feedback on the ${g} group: a warm white outline for 3 ticks. @s = rig anchor.`, 'scoreboard players set @s azRigF 4', ...list.map(n => `data merge entity ${uuidOf(n)} {Glowing:1b,glow_color_override:16774620}`)]);
 }
@@ -267,7 +268,7 @@ json(manifestPath, {
   proxies: {layout: PROXIES.map(([name, part, at, w, top, flags]) => ({name, part, point: at, w, top_margin: top, tail_only: flags === 'tail_only'})), rest: proxyPoints(restO),
     note: 'ground-anchored interaction columns (rigtech.md §3.3): x/z = the bone point projected on the floor (rig frame, +x = the boss left, -z = its front), base/top = the column; per clip in clips[].px at the events'},
   skeleton: {joints: J, scale_H: 7.0},
-  culling: {width: CULL.width, height: CULL.height, view_range: VIEW_RANGE},
+  culling: {width: CULL.width, height: CULL.height, view_range: VIEW_RANGE, per_part: CULL_BOX},
   rest_extents: extents.rest,
   budgets: {parts: PARTS.length, part_budget: '44-48 (cap 56)', models: Object.keys(models).length, elements_all_models: Object.values(elementCount).reduce((a, b) => a + b, 0),
     elements_shown_rest: shownElements, atlas_px: atlasPx, atlas_budget: ATLAS_BUDGET},
