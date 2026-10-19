@@ -76,7 +76,8 @@ function shouldersP1() {
   for (const s of [1, -1]) {
     const half = [...slab({plane: 'x', at: 1.5, rect: HOOK_R, sd: HOOK.sd, half: .08, sprite: hs, edge: 'g_plate', cell: .1}),
       rockBox([1.52, -.05, -.62], [1.66, .32, -.28], 'g_plate', {seed: 522}), rockBox([1.6, .02, -.56], [1.72, .25, -.34], 'p1_gem', {seed: 523}),
-      ...slab({plane: 'x', at: 1.38, rect: {u0: SIDE_R.u0 + .1, u1: SIDE_R.u1 + .1, v0: SIDE_R.v0 - .55, v1: SIDE_R.v1 - .55}, sd: (u, v) => sideSd(u - .1, v + .55), half: .05, sprite: ss, edge: 'g_shell', cell: .1})];
+      // the pale bark side plate: a big rounded pauldron just outside the B-leg root (v2 f870, model.md §3.2), 2.4 x 1.9 b
+      ...slab({plane: 'x', at: 1.95, rect: {u0: SIDE_R.u0 * 1.4 + .15, u1: SIDE_R.u1 * 1.4 + .15, v0: SIDE_R.v0 * 1.4 - .45, v1: SIDE_R.v1 * 1.4 - .45}, sd: (u, v) => sideSd((u - .15) / 1.4, (v + .45) / 1.4) * 1.4, half: .06, sprite: ss, edge: 'g_shell', cell: .12})];
     els.push(...(s > 0 ? half : mirrorEls(half)));
   }
   return els;

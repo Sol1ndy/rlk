@@ -332,9 +332,9 @@ export const ANCHOR_POINTS = {
 //   crown P1 the crown cone tip (0, 5.0, -2.55) | P3 the glowing bud at the fan centre
 //   hood_top P1 the cowl top (0, 4.4, -2.6) | P3 the peak (the cowl's front tip swung up, 8.5 b upright)
 export const FORM_POINTS = {
-  face: {p1: ['face', [0, -.5, -1.35]], p3: ['face', [0, .82, -.56]]},
+  face: {p1: ['face', [0, -.2, -1.2]], p3: ['face', [0, .82, -.56]]},   // P1: the bud-skull inside the cowl (model.md §3.1)
   core: {p1: ['core', [0, -.5, -.15]], p3: ['core', [0, -.42, .41]]},
   crown: {p1: ['crown', [0, 1.2, .55]], p3: ['crown', [0, .45, -.82]]},
-  hood_top: {p1: ['hood', [0, .64, -.67]], p3: ['hood', [0, -.76, -2.07]]},
+  hood_top: {p1: ['hood', [0, .7, -.75]], p3: ['hood', [0, -.76, -2.07]]},
 };
 export const toLocal = P => [+P[0].toFixed(2) || 0, +P[1].toFixed(2) || 0, +(-P[2]).toFixed(2) || 0];

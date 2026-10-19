@@ -649,13 +649,16 @@ if (debugDp) {
   putDebug('ap_dbg/player_front', ['# renders: a 1.8 b player 4 b in front of the anchor (the P3 fighting distance)', ref(0, 4.0)]);
   putDebug('ap_dbg/player_far', ['# renders: a 1.8 b player 6.5 b in front of the anchor (the reference camera frames)', ref(0, 6.5)]);
   // proxy columns and capsules overlay (thin translucent columns): ap_dbg/px/<pose>
-  const col = (x, z, w, top, tag, item) => `summon minecraft:item_display ^${-x} ^ ^${-z} {Tags:["rlk_ap_ref","${tag}"],item_display:"none",transformation:{translation:[0f,${(top / 2).toFixed(3)}f,0f],left_rotation:[0f,0f,0f,1f],scale:[${(w / 1).toFixed(3)}f,${top.toFixed(3)}f,${(w / 1).toFixed(3)}f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:ap_ref/${item}"}}}`;
+  // x / z in the local frame (left, forward: contract §0.4.2), placed with ^left ^up ^forward
+  const col = (x, z, w, top, tag, item) => `summon minecraft:item_display ^${x} ^ ^${z} {Tags:["rlk_ap_ref","${tag}"],item_display:"none",transformation:{translation:[0f,${(top / 2).toFixed(3)}f,0f],left_rotation:[0f,0f,0f,1f],scale:[${(w / 1).toFixed(3)}f,${top.toFixed(3)}f,${(w / 1).toFixed(3)}f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:ap_ref/${item}"}}}`;
   for (const [nm, clip] of [['CROUCH', 'dbg_crouch'], ['UPRIGHT', 'dbg_upright'], ['HOOP', 'dbg_hoop'], ['CROUCH_OVER', 'dbg_crouch_over']]) {
     const c = byName[clip], o = solve(sample(c, 0, accumulate(c)));
     putDebug(`ap_dbg/px/${nm.toLowerCase()}`, Object.values(pxOf(o)).map(v => col(v.x, -v.z, v.w, v.top, 'rlk_ap_px', 'px')));
   }
   for (const [nm, caps] of [['crouch', ['sac', 'hips']], ['upright', ['stem']]])
-    putDebug(`ap_dbg/caps/${nm}`, caps.map(k => { const cp = CAPSULES[k]; return col(0, -cp.col.f, 2 * cp.col.r, 3.0, 'rlk_ap_cap', 'cap'); }));
+    putDebug(`ap_dbg/caps/${nm}`, caps.map(k => { const cp = CAPSULES[k]; return col(0, cp.col.f, 2 * cp.col.r, 3.0, 'rlk_ap_cap', 'cap'); }));
+  // the burrow sink for the offline renderer: every part moved down by dy (the follow_y offset the rig applies)
+  for (const dy of [1, 1.75, 2, 3.5, 4, 5.25]) putDebug(`ap_dbg/sink/${String(dy).replace('.', '_')}`, [`execute as @e[tag=rlk_mb_apep_part] at @s run tp @s ~ ~-${dy} ~`]);
   const rpRef = path.join(debugDp, 'rp_ref/assets/rlk');
   for (const [n, rgba] of [['player', [60, 120, 210, 255]], ['px', [240, 70, 70, 110]], ['cap', [70, 200, 240, 90]]]) {
     fs.mkdirSync(path.join(rpRef, 'textures/ap_ref'), {recursive: true});

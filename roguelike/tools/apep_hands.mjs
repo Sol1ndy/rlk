@@ -47,7 +47,7 @@ function forkP3() {
     const rect = {u0: FORK_R.u0 + dx, u1: FORK_R.u1 + dx, v0: .05, v1: .95}, sd = (u, v) => forkSd(u - dx, v - .05);
     els.push(...slab({plane: 'z', at: 0, rect, sd, half: .03, sprite: sp, edge: 'p3_lime', cell: .06, core: false, rot: r ? ['z', r, [dx, .05, 0]] : null}));
   }
-  els.push(...cone([.04, .82, 0], .09, .3, 'p3_gold', {seed: 412}));
+  els.push(...cone([0, .12, -.07], .1, .42, 'p3_gold', {seed: 412}));   // the gold tip cone in the fork, in front of the leaves
   return els;
 }
 // ---- B / C phase 1: the petal hand (plane y; the petals radiate from the hand centre) --------------------------------------
