@@ -13,7 +13,7 @@ execute if score #azPT mb matches 66..334 run function rlk:mboss/azhdaha/rig_stu
 execute if score #azPT mb matches 335..379 run function rlk:mboss/azhdaha/rig_stub/play/tail_pillar_sink
 execute if score #azPT mb matches 380.. run function rlk:mboss/azhdaha/rig_stub/play/burrow_emerge
 scoreboard players set #azBur mb 0
-execute if score #azPT mb matches 58..334 run scoreboard players set #azBur mb 1
+execute if score #azPT mb matches 58..417 run scoreboard players set #azBur mb 1
 execute if score #azPT mb matches 58..387 if score #azB3Sp mb matches 1.. run function rlk:mboss/azhdaha/b3/special_reload
 execute if score #azPT mb matches 58..387 unless score #azB3Sp mb matches 1.. run function rlk:mboss/azhdaha/b3/special_start
 execute if score #azPT mb matches 360..387 at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] run function rlk:mboss/azhdaha/p/burrow3/emerge

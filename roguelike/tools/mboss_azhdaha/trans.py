@@ -152,7 +152,9 @@ def burrow3(g):
     tl.at(B.B3_EMERGE_DECAL, f'execute at {ARENA_M} run function {NS}p/{key}/emerge')
     tl.at(B.B3_EMERGE, g.play('burrow_emerge'))
     tl.at(B.B3_BURST, g.b3_special('stop'), f'{centre}{A.K.fx("emerge_spikes", r=52)}', A.K.snd('b3_emerge'))
-    tl.at(B.B3_OUT, g.px('normal'), g.floor(0), 'scoreboard players set #azBur mb 0', 'scoreboard players set #azSkipF mb 1',
+    # the surfacing ends the transition (tr/done: #azTr 0, the FLANK skip, the cooldown): the fight is on again for the
+    # last 15 t of the frame ("마지막 일격!")
+    tl.at(B.B3_OUT, g.px('normal'), g.floor(0), 'scoreboard players set #azBur mb 0', f'function {NS}tr/done',
           f'execute as {BODY} if score @s mhpC matches ..1 run function {NS}p/{key}/last')
     tl.at(B.B3_END, 'scoreboard players set #mbNoLeash mb 0', g.end())
     tl.write([f'# 23 the B3 frame (WORKING STUB, S1-MOD; s2.md 7): #azB3T = #azPT; dig, inv {B.B3_INV}, the hidden glide to the',
@@ -188,7 +190,7 @@ def burrow3(g):
          f'execute if score #azPT mb matches {B.B3_TAILSINK}..{B.B3_EMERGE - 1} run {g.play("tail_pillar_sink")}',
          f'execute if score #azPT mb matches {B.B3_EMERGE}.. run {g.play("burrow_emerge")}',
          'scoreboard players set #azBur mb 0',
-         f'execute if score #azPT mb matches {B.B3_TAILUP}..{B.B3_TAILSINK - 1} run scoreboard players set #azBur mb 1',
+         f'execute if score #azPT mb matches {B.B3_TAILUP}..{B.B3_OUT - 1} run scoreboard players set #azBur mb 1',
          f'execute if score #azPT mb matches {B.B3_TAILUP}..{B.B3_BURST - 1} if score #azB3Sp mb matches 1.. run {g.b3_special("reload")}',
          f'execute if score #azPT mb matches {B.B3_TAILUP}..{B.B3_BURST - 1} unless score #azB3Sp mb matches 1.. run {g.b3_special("start")}',
          f'execute if score #azPT mb matches {B.B3_EMERGE_DECAL}..{B.B3_BURST - 1} at {ARENA_M} run function {NS}p/{key}/emerge']
