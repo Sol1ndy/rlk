@@ -1394,8 +1394,8 @@ def _entrance_blocks_full():
                     m = 'verdant_froglight'                       # the glowing midrib
                 elif at - (y + 0.5) < 1.0 or u > 3.4:
                     m = 'green_terracotta'                        # the leaf rim
-                elif (yy - 0.9 * u) % 2.6 < 0.9:
-                    m = 'green_terracotta'                        # lateral veins rising toward the tip
+                elif int(math.floor(yy - u + 0.5)) % 3 == 0:
+                    m = 'green_terracotta'                        # lateral veins: chevrons rising toward the tip
                 else:
                     m = 'lime_terracotta'
                 z2[(x, y, hz0)] = B + m
