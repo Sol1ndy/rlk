@@ -67,6 +67,14 @@ export const PART_SCALE = {
 // Rest lean of each plate group (deg, top toward the back): the plates are authored upright in the group frame and the
 // group leans them back; the flare channels stand them up (bristle).
 export const PLATE_LEAN = {neck: 35, sh: 12, mid: 15, hip: 25};
+// BODY region: the bristle widens each plate group across X as it flares (a non-uniform display scale x = flK * (1 +
+// PLATE_SPLAY * flare deg)), so the side rows roll further outward instead of the fan only growing (r1_critique 3.6).
+export const PLATE_SPLAY = .012;
+// BODY region (R2): the neck tubes are lofted along their own axis (no ring steps on a sloping neck), so the neck1 /
+// neck2 parts carry the rest slope of their bone (a fixed nose-down pitch, deg) on top of the bone rotation; the neck
+// models are authored in that tilted frame. Nothing else uses the neck part frames.
+export const NECK_TILT = {neck1: Math.atan2(J.neck1[1] - J.neck2[1], J.neck1[2] - J.neck2[2]) * 180 / Math.PI,
+  neck2: Math.atan2(J.neck2[1] - J.head[1], J.neck2[2] - J.head[2]) * 180 / Math.PI};
 export const TAIL_PARTS = ['t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 'tip'];
 // Fixed placement of the horns in the head frame (the C of each horn is authored in its own YZ plane and turned out:
 // yaw opens the back of the C outward, so the front shows "( )"; model.md §0).
@@ -96,7 +104,7 @@ export function solve(p, {prev = null} = {}) {
   const Ba = bone(Bc, J.apron, p.apron);
   const at = (B, v) => add(B.t, rot(B.q, sub(v, B.rest)));           // a rest-frame point carried by bone B
   part('pelvis', Bp.t, Bp.q); part('belly', Bs.t, Bs.q); part('chest', Bc.t, Bc.q);
-  part('neck1', Bn1.t, Bn1.q); part('neck2', Bn2.t, Bn2.q);
+  part('neck1', Bn1.t, mul(Bn1.q, q([-NECK_TILT.neck1, 0, 0]))); part('neck2', Bn2.t, mul(Bn2.q, q([-NECK_TILT.neck2, 0, 0])));
   part('head', Bh.t, Bh.q); part('jaw', Bj.t, Bj.q); part('eyes', Bh.t, Bh.q);
   part('beard1', Bb1.t, Bb1.q); part('beard2', Bb2.t, Bb2.q);
   part('apron', Ba.t, Ba.q); part('glow_apron', Ba.t, Ba.q);
@@ -105,7 +113,7 @@ export function solve(p, {prev = null} = {}) {
   part('horn_r', add(Bh.t, rot(Bh.q, mx(HORN.at))), mul(Bh.q, Qhr));
   // plate groups (flare: pitch back + roll outward is not one axis, so the flare is a pitch about the group base;
   // the fan width comes from the scale flK) and the crystal clusters (rigid)
-  const flare = (n, B, base, deg, g) => part(n, at(B, base), mul(B.q, q([PLATE_LEAN[g] - deg, 0, 0])), p.flK);
+  const flare = (n, B, base, deg, g) => part(n, at(B, base), mul(B.q, q([PLATE_LEAN[g] - deg, 0, 0])), [p.flK * (1 + PLATE_SPLAY * deg), p.flK, p.flK]);
   flare('plates_neck', Bn2, J.plN, p.flN, 'neck'); flare('plates_sh', Bc, J.plS, p.flS, 'sh');
   flare('plates_mid', Bs, J.plM, p.flM, 'mid'); flare('plates_hip', Bp, J.plH, p.flH, 'hip');
   part('crys_sh', at(Bc, J.plS), Bc.q); part('crys_mid', at(Bs, J.plM), Bs.q); part('crys_hip', at(Bp, J.plH), Bp.q);

@@ -78,7 +78,7 @@
       "model": "chest",
       "brightness": 13,
       "scale": 3,
-      "elements": 161
+      "elements": 321
     },
     {
       "name": "belly",
@@ -88,7 +88,7 @@
       "model": "belly",
       "brightness": 13,
       "scale": 3,
-      "elements": 110
+      "elements": 238
     },
     {
       "name": "pelvis",
@@ -98,7 +98,7 @@
       "model": "pelvis",
       "brightness": 13,
       "scale": 2.8,
-      "elements": 193
+      "elements": 417
     },
     {
       "name": "neck1",
@@ -108,7 +108,7 @@
       "model": "neck1",
       "brightness": 13,
       "scale": 2,
-      "elements": 80
+      "elements": 129
     },
     {
       "name": "neck2",
@@ -118,7 +118,7 @@
       "model": "neck2",
       "brightness": 13,
       "scale": 2,
-      "elements": 97
+      "elements": 129
     },
     {
       "name": "apron",
@@ -128,7 +128,7 @@
       "model": "apron",
       "brightness": 13,
       "scale": 1.8,
-      "elements": 22
+      "elements": 36
     },
     {
       "name": "glow_apron",
@@ -148,7 +148,7 @@
       "model": "plates_neck",
       "brightness": 13,
       "scale": 2,
-      "elements": 33
+      "elements": 21
     },
     {
       "name": "plates_sh",
@@ -158,7 +158,7 @@
       "model": "plates_sh",
       "brightness": 13,
       "scale": 2.2,
-      "elements": 36
+      "elements": 18
     },
     {
       "name": "plates_mid",
@@ -168,7 +168,7 @@
       "model": "plates_mid",
       "brightness": 13,
       "scale": 2.2,
-      "elements": 30
+      "elements": 18
     },
     {
       "name": "plates_hip",
@@ -178,7 +178,7 @@
       "model": "plates_hip",
       "brightness": 13,
       "scale": 2,
-      "elements": 27
+      "elements": 30
     },
     {
       "name": "crys_sh",
@@ -188,7 +188,7 @@
       "model": "crys_sh",
       "brightness": 14,
       "scale": 2.2,
-      "elements": 58
+      "elements": 40
     },
     {
       "name": "crys_mid",
@@ -198,7 +198,7 @@
       "model": "crys_mid",
       "brightness": 14,
       "scale": 2.2,
-      "elements": 48
+      "elements": 24
     },
     {
       "name": "crys_hip",
@@ -208,7 +208,7 @@
       "model": "crys_hip",
       "brightness": 14,
       "scale": 2,
-      "elements": 48
+      "elements": 20
     },
     {
       "name": "uarm_l",
@@ -1085,8 +1085,8 @@
           4.36
         ],
         [
-          -0.66,
-          9.31
+          -0.52,
+          9.53
         ],
         [
           -5.15,
@@ -1492,7 +1492,7 @@
         ],
         [
           -0.57,
-          7.07
+          7.22
         ],
         [
           -5.65,
@@ -1892,7 +1892,7 @@
         ],
         [
           -0.35,
-          7.27
+          7.42
         ],
         [
           -5.33,
@@ -2736,15 +2736,20 @@
         "pyro": 2
       },
       "parts": {
+        "chest": {
+          "geo": "chest",
+          "hydro": "chest_hydro",
+          "pyro": "chest_pyro"
+        },
         "belly": {
           "geo": "belly",
           "hydro": "belly_hydro",
           "pyro": "belly_pyro"
         },
-        "apron": {
-          "geo": "apron",
-          "hydro": "apron_hydro",
-          "pyro": "apron_pyro"
+        "pelvis": {
+          "geo": "pelvis",
+          "hydro": "pelvis_hydro",
+          "pyro": "pelvis_pyro"
         },
         "glow_apron": {
           "geo": "empty",
@@ -2814,12 +2819,12 @@
       },
       "brightness": {
         "hydro": {
-          "apron": 14,
           "belly": 13
         },
         "pyro": {
-          "apron": 14,
-          "belly": 14
+          "belly": 14,
+          "chest": 14,
+          "pelvis": 14
         }
       },
       "functions": {
@@ -2904,20 +2909,20 @@
       },
       "brightness": {
         "cryo": {
-          "plates_neck": 15,
-          "plates_sh": 15,
-          "plates_mid": 15,
-          "plates_hip": 15,
+          "plates_neck": 14,
+          "plates_sh": 14,
+          "plates_mid": 14,
+          "plates_hip": 14,
           "t6": 15,
           "t7": 15,
           "t8": 15,
           "tip": 15
         },
         "electro": {
-          "plates_neck": 15,
-          "plates_sh": 15,
-          "plates_mid": 15,
-          "plates_hip": 15,
+          "plates_neck": 14,
+          "plates_sh": 14,
+          "plates_mid": 14,
+          "plates_hip": 14,
           "t6": 15,
           "t7": 15,
           "t8": 15,
@@ -3394,10 +3399,10 @@
   "budgets": {
     "parts": 46,
     "part_budget": "44-48 (cap 56)",
-    "models": 93,
-    "elements_all_models": 12045,
-    "elements_shown_rest": 5172,
-    "atlas_px": 984320,
+    "models": 95,
+    "elements_all_models": 14162,
+    "elements_shown_rest": 5670,
+    "atlas_px": 1042688,
     "atlas_budget": 1200000
   },
   "objectives": {
@@ -3409,5 +3414,5 @@
     "azRigTail": "tail look: 0 geo, 1 cryo, 2 electro",
     "azRigState": "body state: 0 normal, 1 burrowed, 2 tail-only"
   },
-  "textures": 80
+  "textures": 101
 }
