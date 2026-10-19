@@ -34,7 +34,7 @@ import {partModels, checkBounds, PARTS, LOOKS, TINTED, LOOK_BRIGHT, EMPTY, REGIO
 import {solve, toDisplay, PART_SCALE, TAIL_PARTS, proxyPoints, PROXIES, pointOf, J, SOLE} from './azhdaha_pose.mjs';
 import {CLIPS, accumulate, sampleClip as sample, restPose} from './azhdaha_clips.mjs';
 import {add, rot} from './mboss_rig_math.mjs';
-import {createRigCompiler, nbt} from './mboss_rig_compile.mjs';
+import {createRigCompiler, nbt, summonPart, summonShadow, createRigFollow} from './mboss_rig_compile.mjs';
 import {abox} from './mboss_model_lib.mjs';
 import {png} from './weapon_paint.mjs';
 
@@ -194,8 +194,8 @@ compiler.writeDispatch(CLIPS);
 const REST = (() => { const o = solve(restPose()); return Object.fromEntries(PARTS.map(([n]) => [n, toDisplay(n, o[n])])); })();
 const REGION_TAG = n => `rlk_mb_az_g_${REGION_OF[n]}`;
 const TAGS = n => `["rlk_room","rlk_mb_aux","rlk_mb_part","rlk_mb_azhdaha_part","rlk_mb_az_${n}","${REGION_TAG(n)}"]`;
-const summon = ([n, model, bright], pose) => `summon minecraft:item_display ~ ~ ~ {UUID:${uuidInts(n)},Tags:${TAGS(n)},billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:${VIEW_RANGE}f,width:${cullOf(n).width}f,height:${cullOf(n).height}f,shadow_radius:0f,brightness:{block:${bright},sky:15},transformation:${nbt(pose)},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId(model)}"}}}`;
-const shadowSummon = `summon minecraft:item_display ~ ~ ~ {UUID:${SHADOW_INTS},Tags:["rlk_room","rlk_mb_aux","rlk_mb_azhdaha_part","rlk_mb_az_shadow"],billboard:"fixed",item_display:"none",teleport_duration:1,view_range:${VIEW_RANGE}f,width:${CULL.width}f,height:${CULL.height}f,shadow_radius:4.5f,shadow_strength:.8f,item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId(EMPTY)}"}}}`;
+const summon = ([n, model, bright], pose) => summonPart({uuid: uuidInts(n), tags: TAGS(n), item: itemId(model), brightness: bright, pose, viewRange: VIEW_RANGE, cull: cullOf(n)});
+const shadowSummon = summonShadow({uuid: SHADOW_INTS, tags: ['rlk_room', 'rlk_mb_aux', 'rlk_mb_azhdaha_part', 'rlk_mb_az_shadow'], item: itemId(EMPTY), radius: 4.5, strength: .8, viewRange: VIEW_RANGE, cull: CULL});
 const RIG_OBJ = ['azRigC', 'azRigT', 'azRigF', 'azRigY', 'azRigLegs', 'azRigTail', 'azRigState'];
 fn('init', ['# Rig objectives. Safe to call on every load.', ...RIG_OBJ.map(o => `scoreboard objectives add ${o} dummy`)]);
 const setPose = (pose, dur = 0) => PARTS.map(([n]) => `data merge entity ${uuidOf(n)} {start_interpolation:0,interpolation_duration:${dur},transformation:${nbt(pose[n])}}`);
@@ -209,7 +209,8 @@ fn('spawn', ['# @s = rig anchor (the boss body, on the floor under the centre of
   'scoreboard players set @s azRigT -1', 'scoreboard players set @s azRigF 0', `scoreboard players set @s azRigC ${byName.rest.id}`,
   `function ${NS}/look_apply`, `execute if score @s azRigState matches 1 run function ${NS}/state/burrowed`, `execute if score @s azRigState matches 2 run function ${NS}/state/tail_only`,
   `execute rotated as @s rotated ~ 0 run function ${NS}/follow`]);
-fn('follow', ['# Parts (and the shadow helper) follow the executor position and yaw (run rotated as the anchor, pitch 0).', ...PARTS.map(([n]) => `tp ${uuidOf(n)} ~ ~ ~ ~ ~`), `tp ${SHADOW_UUID} ~ ~ ~ ~ ~`]);
+createRigFollow({ns: NS, obj: 'azRig', fn, uuidOf: n => (n === 'shadow' ? SHADOW_UUID : uuidOf(n)), lists: {all: PARTS.map(([n]) => n)}, fixed: ['shadow'],
+  comment: '# Parts (and the shadow helper) follow the executor position and yaw (run rotated as the anchor, pitch 0).'}).write();
 fn('tick', ['# @s = rig anchor, at its feet. Once per game tick. Missing parts respawn in the rest pose (stored looks and state kept).',
   `execute unless entity ${uuidOf('chest')} run function ${NS}/spawn`,
   `execute rotated as @s rotated ~ 0 run function ${NS}/follow`,
