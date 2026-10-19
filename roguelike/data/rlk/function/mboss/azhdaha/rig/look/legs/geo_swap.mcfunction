@@ -2,7 +2,6 @@
 data modify entity 524c4b4d-415a-4400-8000-000000000008 item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/chest"
 data modify entity 524c4b4d-415a-4400-8000-000000000009 item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/belly"
 data modify entity 524c4b4d-415a-4400-8000-00000000000a item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/pelvis"
-data modify entity 524c4b4d-415a-4400-8000-00000000000d item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/apron"
 data modify entity 524c4b4d-415a-4400-8000-00000000000e item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/empty"
 data modify entity 524c4b4d-415a-4400-8000-000000000017 item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/bracer_l"
 data modify entity 524c4b4d-415a-4400-8000-00000000001a item.components."minecraft:item_model" set value "rlk:mboss/azhdaha/bracer_r"
@@ -19,7 +18,6 @@ data modify entity 524c4b4d-415a-4400-8000-000000000025 item.components."minecra
 data merge entity 524c4b4d-415a-4400-8000-000000000008 {brightness:{block:13,sky:15}}
 data merge entity 524c4b4d-415a-4400-8000-000000000009 {brightness:{block:13,sky:15}}
 data merge entity 524c4b4d-415a-4400-8000-00000000000a {brightness:{block:13,sky:15}}
-data merge entity 524c4b4d-415a-4400-8000-00000000000d {brightness:{block:13,sky:15}}
 data merge entity 524c4b4d-415a-4400-8000-00000000000e {brightness:{block:15,sky:15}}
 data merge entity 524c4b4d-415a-4400-8000-000000000017 {brightness:{block:13,sky:15}}
 data merge entity 524c4b4d-415a-4400-8000-00000000001a {brightness:{block:13,sky:15}}

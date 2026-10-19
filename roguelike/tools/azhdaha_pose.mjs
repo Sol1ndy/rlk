@@ -57,7 +57,7 @@ const mx = v => [-v[0], v[1], v[2]];
 // Display scale per part (blocks per 16 model units; reach 1.5 x scale from the joint).
 export const PART_SCALE = {
   chest: 3.0, belly: 3.0, pelvis: 2.8, neck1: 2.0, neck2: 2.0, apron: 1.8, glow_apron: 1.8,
-  plates_neck: 2.0, plates_sh: 2.2, plates_mid: 2.2, plates_hip: 2.0, crys_sh: 3.0, crys_mid: 3.0, crys_hip: 2.8,   // BODY: crystals x1.3 (R2)
+  plates_neck: 2.0, plates_sh: 2.2, plates_mid: 2.2, plates_hip: 2.0, crys_sh: 2.2, crys_mid: 2.2, crys_hip: 2.0,
   head: 2.2, jaw: 2.0, eyes: 1.0, horn_l: 2.0, horn_r: 2.0, beard1: 1.4, beard2: 1.4,
   uarm_l: 1.8, bracer_l: 1.6, paw_l: 1.4, uarm_r: 1.8, bracer_r: 1.6, paw_r: 1.4,
   thigh_l: 2.0, gaiter_l: 1.6, foot_l: 1.4, thigh_r: 2.0, gaiter_r: 1.6, foot_r: 1.4,
@@ -70,6 +70,11 @@ export const PLATE_LEAN = {neck: 35, sh: 12, mid: 15, hip: 25};
 // BODY region: the bristle widens each plate group across X as it flares (a non-uniform display scale x = flK * (1 +
 // PLATE_SPLAY * flare deg)), so the side rows roll further outward instead of the fan only growing (r1_critique 3.6).
 export const PLATE_SPLAY = .012;
+// BODY region (R2): the neck tubes are lofted along their own axis (no ring steps on a sloping neck), so the neck1 /
+// neck2 parts carry the rest slope of their bone (a fixed nose-down pitch, deg) on top of the bone rotation; the neck
+// models are authored in that tilted frame. Nothing else uses the neck part frames.
+export const NECK_TILT = {neck1: Math.atan2(J.neck1[1] - J.neck2[1], J.neck1[2] - J.neck2[2]) * 180 / Math.PI,
+  neck2: Math.atan2(J.neck2[1] - J.head[1], J.neck2[2] - J.head[2]) * 180 / Math.PI};
 export const TAIL_PARTS = ['t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 'tip'];
 // Fixed placement of the horns in the head frame (the C of each horn is authored in its own YZ plane and turned out:
 // yaw opens the back of the C outward, so the front shows "( )"; model.md §0).
@@ -99,7 +104,7 @@ export function solve(p, {prev = null} = {}) {
   const Ba = bone(Bc, J.apron, p.apron);
   const at = (B, v) => add(B.t, rot(B.q, sub(v, B.rest)));           // a rest-frame point carried by bone B
   part('pelvis', Bp.t, Bp.q); part('belly', Bs.t, Bs.q); part('chest', Bc.t, Bc.q);
-  part('neck1', Bn1.t, Bn1.q); part('neck2', Bn2.t, Bn2.q);
+  part('neck1', Bn1.t, mul(Bn1.q, q([-NECK_TILT.neck1, 0, 0]))); part('neck2', Bn2.t, mul(Bn2.q, q([-NECK_TILT.neck2, 0, 0])));
   part('head', Bh.t, Bh.q); part('jaw', Bj.t, Bj.q); part('eyes', Bh.t, Bh.q);
   part('beard1', Bb1.t, Bb1.q); part('beard2', Bb2.t, Bb2.q);
   part('apron', Ba.t, Ba.q); part('glow_apron', Ba.t, Ba.q);

@@ -175,3 +175,19 @@ The framework side (interaction entities, `combat/apply` routing, dedupe) is a l
 The element sigils, brands, floor glyphs, rocks, meteors, water orbs, ice spikes, lightning, the absorb vortex, the
 burrow crater and rubble, the dust (fx kit); the seal steles (arena props); the interaction hit proxies and the body
 solidity push (framework); the motion clips (later stage).
+
+## 10. Body region notes (R2)
+
+- Torso: chest / belly / pelvis are one hull (`azhdaha_body.mjs BODY`, U/egg sections lofted along z) split by
+  ownership (chest z <= -1.0, belly -1.0..1.6, pelvis >= 1.6); each part carries tucked overlap past its range so the
+  joints stay closed when the spine bends. The hide is a light-corrected wrap sprite per part (`tw_chest`, `tw_belly`,
+  `tw_pelvis`, `tw_neck1`, `tw_neck2`), the ventral facets are the cream plastron rolls (`tz_pl*`).
+- Legs channel looks: the torso swaps `chest`, `belly` and `pelvis` (`*_hydro`, `*_pyro`: plastron cracks glow in
+  Pyro, at brightness 14; Hydro lifts only the belly to 13). The apron keeps its single stone model in every look and
+  only its `glow_apron` overlay changes (the R1 `apron_hydro` / `apron_pyro` models are gone).
+- Neck part frames: `neck1` / `neck2` carry their bone's rest slope (`azhdaha_pose.mjs NECK_TILT`, a fixed nose-down
+  pitch on top of the bone rotation), so their models are lofted along the neck axis. Anything placed in those part
+  frames must use the tilted frame.
+- Plate groups: the bristle widens a group across X with its flare (`PLATE_SPLAY`), so the side rows roll outward.
+- Gold crystals: slender blades as crossed card pairs along each blade's axis (sprite `shards`, 4 cells of 48 x 128),
+  1-3 per cluster, within the R1 crystal part reach.
