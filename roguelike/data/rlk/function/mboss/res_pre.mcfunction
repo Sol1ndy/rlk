@@ -1,0 +1,11 @@
+# @s = a rlk_mb_resel entity inside combat/apply (not true damage), after element/on_hit and before the module on_hit:
+# mres = mbRes<#elem> (a module on_hit may override). Reactions, amplified hits and DoTs come back with their own #elem.
+execute if score #elem tmp matches 0 run scoreboard players operation @s mres = @s mbRes0
+execute if score #elem tmp matches 1 run scoreboard players operation @s mres = @s mbRes1
+execute if score #elem tmp matches 2 run scoreboard players operation @s mres = @s mbRes2
+execute if score #elem tmp matches 3 run scoreboard players operation @s mres = @s mbRes3
+execute if score #elem tmp matches 4 run scoreboard players operation @s mres = @s mbRes4
+execute if score #elem tmp matches 5 run scoreboard players operation @s mres = @s mbRes5
+execute if score #elem tmp matches 6 run scoreboard players operation @s mres = @s mbRes6
+execute if score #elem tmp matches 7 run scoreboard players operation @s mres = @s mbRes7
+execute if score #elem tmp matches 8 run scoreboard players operation @s mres = @s mbRes8

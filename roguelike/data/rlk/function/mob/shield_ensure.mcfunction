@@ -4,6 +4,8 @@ execute if entity @s[tag=rlk_raiden,scores={rdBlink=1..}] run return 0
 execute if entity @s[tag=rlk_raiden,scores={rdPat=15}] run return 0
 # 중간보스 무적(등장 · 쓰러짐 · 모듈의 무적 동작): 클릭 실드 없음
 execute if entity @s[tag=rlk_mb_inv] run return 0
+# 챕터 보스(rlk_mb_noshield: 히트 프록시로 맞는 큰 몸체 · 숨은 몸체): 클릭 실드 없음
+execute if entity @s[tag=rlk_mb_noshield] run return 0
 # @s = 몹, at @s. 클릭 실드(인터랙션) 생성/추적/동기화 표시
 # msid 부여
 execute unless score @s msid matches 1.. run scoreboard players add #msidC tmp 1

@@ -10,3 +10,5 @@ execute as @e[tag=rlk_mb_auxlast,limit=1] at @s run function rlk:mboss/aux/setup
 scoreboard players set #auxHp mb 100
 scoreboard players set #auxHpPct mb 0
 scoreboard players set #auxRes mb 0
+scoreboard players set #auxResEl mb -1
+scoreboard players set #auxResElV mb 0

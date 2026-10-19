@@ -19,7 +19,7 @@ execute unless score #elem tmp matches 0..7 run scoreboard players set #elem tmp
 execute if score #elem tmp matches 0 if score @s scT matches 1.. run scoreboard players set #c tmp 140
 execute if score #elem tmp matches 0 if score @s scT matches 1.. run scoreboard players operation #dmgIn tmp *= #c tmp
 execute if score #elem tmp matches 0 if score @s scT matches 1.. run scoreboard players operation #dmgIn tmp /= #100 tmp
-execute if score #elem tmp matches 1.. run function rlk:element/player_hit
+execute if score #elem tmp matches 1.. unless score #mbNRNow mb matches 1 run function rlk:element/player_hit
 # (받는 피해 감소 등 피격 보정은 여기에 추가)
 function rlk:items/proc/taken
 # 각인 광전사 4개: 받는 피해 증가

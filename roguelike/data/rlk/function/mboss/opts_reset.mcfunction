@@ -25,3 +25,10 @@ scoreboard players set #pullFace mb 1
 scoreboard players set #auxHp mb 100
 scoreboard players set #auxHpPct mb 0
 scoreboard players set #auxRes mb 0
+# chapter mode (AZ-CM): no-reaction / mask safe group / projectile no-dodge / per-element aux RES (-1 = none)
+scoreboard players set #hzNR mb 0
+scoreboard players set #hzSafeG mb 0
+scoreboard players set #pjNoDodge mb 0
+scoreboard players set #pjNR mb 0
+scoreboard players set #auxResEl mb -1
+scoreboard players set #auxResElV mb 0

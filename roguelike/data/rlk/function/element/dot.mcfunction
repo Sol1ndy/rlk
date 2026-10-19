@@ -1,4 +1,6 @@
 # 반응 피해 1회를 @s 에게 (입력: #dmg, #elem). 원소 부착 없음, 증폭 없음
+# 공격 순번(챕터 보스 히트 프록시의 중복 거름, mboss/px/hit)
+scoreboard players add #atkSeq tmp 1
 scoreboard players set #crit tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elU tmp 0

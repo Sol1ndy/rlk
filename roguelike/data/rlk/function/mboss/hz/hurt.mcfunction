@@ -8,6 +8,8 @@ scoreboard players operation #cmEl tmp = @s mbHzE
 scoreboard players operation #mbKB mb = @s mbHzB
 scoreboard players operation #mbKBDir mb = @s mbHzKD
 scoreboard players operation #mbNoDodge mb = @s mbHzND
+scoreboard players operation #mbNoRx mb = @s mbHzNR
+scoreboard players set #mbSrc mb 1
 function rlk:mboss/hurt
 scoreboard players set #mbNoDodge mb 0
 scoreboard players operation #g mb = @s mbHzG

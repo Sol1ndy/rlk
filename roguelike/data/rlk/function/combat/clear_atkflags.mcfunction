@@ -1,4 +1,6 @@
 # 공격 플래그 초기화 (기본공격 외 경로에서 combat/apply 호출 전에 실행). 이후 필요한 값만 다시 설정
+# 공격 순번(챕터 보스 히트 프록시의 중복 거름, mboss/px/hit)
+scoreboard players add #atkSeq tmp 1
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #elem tmp 0
 scoreboard players set #elU tmp 0

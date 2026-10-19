@@ -9,4 +9,6 @@ execute in minecraft:overworld run fill 96 188 0 111 202 10 minecraft:air
 # 중간보스 원형 경기장도 제거(청크 고정은 room/setup · /reload · 전투 시작 때 다시 걸리고, 다음 전투에서 다시 지어짐)
 execute in minecraft:overworld run function rlk:mboss/arena/clear
 execute in minecraft:overworld run forceload remove 176 -16 223 31
+# 챕터 보스 경기장도 제거(블록이 로드돼 있을 때) + 청크 고정 해제, 돌던 경기장 작업은 중단
+execute in minecraft:overworld run function rlk:mboss/cb/remove
 tellraw @a [{"text":"[방] ","color":"gold","bold":true},{"text":"던전 구역을 제거했습니다.","color":"gray","bold":false}]

@@ -5,6 +5,7 @@ scoreboard players set #active room 0
 scoreboard players set #rdTest rd 0
 scoreboard players set #rdForce rd 0
 scoreboard players set #rdLock rd 0
+function rlk:mboss/cb/run_reset
 scoreboard players set #mbTest mb 0
 scoreboard players set #mbForce mb 0
 scoreboard players set #mbLock mb 0

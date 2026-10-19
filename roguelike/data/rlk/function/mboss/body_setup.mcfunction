@@ -11,3 +11,5 @@ attribute @s minecraft:explosion_knockback_resistance base set 1
 execute store result storage rlk:mboss a.s double 0.01 run data get storage rlk:mboss cur.scale 100
 function rlk:mboss/body_scale with storage rlk:mboss a
 scoreboard players set @s mres 0
+# chapter mode (AZ-CM): per-element RES from the registry res (mbRes0..8, rlk_mb_resel); mid-bosses have none (mres 0)
+execute if data storage rlk:mboss cur.res run function rlk:mboss/res_set

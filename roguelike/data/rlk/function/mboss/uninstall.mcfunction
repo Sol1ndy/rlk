@@ -11,10 +11,24 @@ bossbar remove rlk:mboss
 bossbar remove rlk:mboss_state
 bossbar remove rlk:mboss_sub
 execute in minecraft:overworld run forceload remove 176 -16 223 31
+# chapter mode: the running arena job, every arena's forceload, the music, chapter storage
+function rlk:mboss/arena/abort
+schedule clear rlk:mboss/arena/job_tick
+function rlk:mboss/music/stop
+execute in minecraft:overworld run function rlk:mboss/ar/az_cavern/fl_off
+execute in minecraft:overworld run function rlk:mboss/ar/cp_test/fl_off
 data remove storage rlk:mboss reg
 data remove storage rlk:mboss byid
 data remove storage rlk:mboss met
 data remove storage rlk:mboss tlast
+data remove storage rlk:mboss creg
+data remove storage rlk:mboss cbyid
+data remove storage rlk:mboss cprep
+data remove storage rlk:mboss cbpeek
+data remove storage rlk:mboss cbl
+data remove storage rlk:mboss arjob
+data remove storage rlk:mboss built_az_cavern
+data remove storage rlk:mboss built_cp_test
 scoreboard objectives remove mb
 scoreboard objectives remove mres
 scoreboard objectives remove pkMb
@@ -76,3 +90,17 @@ scoreboard objectives remove mbMvZ1
 scoreboard objectives remove mbT
 scoreboard objectives remove mbS
 scoreboard objectives remove mbId
+scoreboard objectives remove mbRes0
+scoreboard objectives remove mbRes1
+scoreboard objectives remove mbRes2
+scoreboard objectives remove mbRes3
+scoreboard objectives remove mbRes4
+scoreboard objectives remove mbRes5
+scoreboard objectives remove mbRes6
+scoreboard objectives remove mbRes7
+scoreboard objectives remove mbRes8
+scoreboard objectives remove mbHzNR
+scoreboard objectives remove mbHzSG
+scoreboard objectives remove mbPjND
+scoreboard objectives remove mbPjNR
+scoreboard objectives remove mbPart

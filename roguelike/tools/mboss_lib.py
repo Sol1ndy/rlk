@@ -5,8 +5,10 @@ Used by tools/build_mboss_core.py, tools/build_mboss_arena.py and every boss mod
 README.md (중간보스) and in the framework comments of F:mboss/*.
 """
 from pathlib import Path
+import importlib
 import json
 import math
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 FN = ROOT / 'data/rlk/function'
@@ -20,6 +22,9 @@ HOOKS = ['spawn', 'intro_tick', 'tick', 'on_hit', 'aux_hit', 'incoming', 'pause'
          'death_start', 'death_tick', 'cleanup', 'reload', 'bars', 'hz_vis', 'pj_end', 'test', 'uninstall']
 ALL_MODULE_HOOKS = {'uninstall'}
 MACRO_HOOKS = {'test': ['id']}
+# Chapter bosses (kind "chapter", AZ-CM) implement the 17 hooks plus these (not macros): prep = the domain entrance
+# build (@s = the kind-9 zone marker, at it): writes rlk:mboss cprep.<id>.{gate,title,sub} (scratchpad az/contract/cm.md 5.3).
+CHAPTER_HOOKS = ['prep']
 
 # #elem numbering (combat/apply): 0 physical 1 pyro 2 hydro 3 electro 4 cryo 5 geo 6 anemo 7 dendro 8 void
 ELEM_NAMES = ['물리', '불', '물', '번개', '얼음', '바위', '바람', '풀', '공허']
@@ -40,21 +45,113 @@ HZ_COLOURS = {
 STRIKE_COLOUR = (1.0, 0.97, 0.88)
 
 
+RES_KEYS = {str(k) for k in range(9)} | {'*'}
+# The plaza's arena box (build_mboss_arena.py: centre -24..+23, y 190..240; the core's @FL@ forceload box).
+PLAZA_BOX = (-24, 190, -24, 23, 240, 23)
+
+
 def load_registry():
+    """The registry (schema v2), validated: unique ids / n across mid-boss and chapter entries, the chapter-entry rules of
+    scratchpad az/contract/cm.md 2.2 and the arena entries of 2.3."""
     data = json.loads(REGISTRY.read_text(encoding='utf-8'))
     ids, ns = set(), set()
+    arenas = data.get('arenas', {})
+    assert 'plaza' not in arenas, 'arenas{} never holds the plaza (it is the top-level arena)'
+    arn = set()
+    for aid, a in arenas.items():
+        assert isinstance(a.get('n'), int) and a['n'] >= 1 and a['n'] not in arn, f'arena {aid}: n must be unique and >= 1'
+        arn.add(a['n'])
+        for k in ('theme', 'ver', 'cx', 'cy', 'cz', 'r', 'walk', 'safe', 'start', 'box', 'looks'):
+            assert k in a, f'arena {aid}: missing {k}'
+        assert a['looks'], f'arena {aid}: looks[] is empty'
+        bx = a['box']
+        assert bx['x0'] <= a['cx'] <= bx['x1'] and bx['z0'] <= a['cz'] <= bx['z1'] and bx['y0'] < a['cy'] <= bx['y1'], aid
     for b in data['boss']:
         assert b['id'] not in ids, 'duplicate id ' + b['id']
         assert b['n'] not in ns, 'duplicate n %d' % b['n']
         assert 1 <= b['n'] <= 9999
         ids.add(b['id'])
         ns.add(b['n'])
+        kind = b.get('kind', 'mid')
+        assert kind in ('mid', 'chapter'), f'{b["id"]}: kind {kind}'
+        if kind == 'chapter':
+            for k, v in (('goldMul', 1), ('sap', 0), ('picks', 0), ('w', 0)):
+                assert b.get(k) == v, f'{b["id"]}: a chapter entry needs {k} {v}'
+            aid = b.get('arena', 'plaza')
+            assert aid == 'plaza' or aid in arenas, f'{b["id"]}: unknown arena {aid}'
+            for c in b.get('ch', []):
+                assert b['minCh'] <= c <= b['maxCh'], f'{b["id"]}: ch {c} outside minCh..maxCh'
+        else:
+            assert not b.get('px'), f'{b["id"]}: px is for chapter entries only'
+            for k in ('ch', 'route', 'phases', 'music', 'res'):
+                assert k not in b, f'{b["id"]}: {k} is a chapter-entry field'
+        if b.get('shield', not b.get('px', False)):
+            assert 'hit' in b, f'{b["id"]}: shield needs hit {{w,h}}'
+        assert set(b.get('res', {})) <= RES_KEYS, f'{b["id"]}: res keys'
+        assert sum(b.get('phases', [100])) <= 100 and all(1 <= p <= 100 for p in b.get('phases', [100])), b['id']
+        for ph, m in b.get('music', {}).items():
+            assert ph in {str(k) for k in range(1, 10)} and m['ev'].startswith('minecraft:') and int(m['len']) >= 0, b['id']
+        assert 0 <= int(b.get('pxBase', 65)) <= 240, b['id']
     return data
 
 
 def enabled_bosses(reg=None):
+    """Every enabled entry, mid-boss and chapter boss (hook dispatchers, uninstall)."""
     reg = reg or load_registry()
     return [b for b in reg['boss'] if b.get('enabled', True)]
+
+
+def mid_bosses(reg=None):
+    """Enabled mid-boss entries (kind "mid"): rlk:mboss reg[] / byid, the roll."""
+    return [b for b in enabled_bosses(reg) if b.get('kind', 'mid') == 'mid']
+
+
+def chapter_bosses(reg=None):
+    """Enabled chapter-boss entries (kind "chapter"): rlk:mboss creg[] / cbyid, routing, the gate."""
+    return [b for b in enabled_bosses(reg) if b.get('kind', 'mid') == 'chapter']
+
+
+def arena_of(b, reg=None):
+    """The arena dict of boss b with 'aid' and 'n' added: arenas[b.arena], or the plaza (the top-level arena, n 0, with
+    its legacy box x 176..223, y 190..240, z -16..31)."""
+    reg = reg or load_registry()
+    aid = b.get('arena', 'plaza')
+    if aid == 'plaza':
+        a = dict(reg['arena'])
+        x0, y0, z0, x1, y1, z1 = PLAZA_BOX
+        a.setdefault('box', {'x0': a['cx'] + x0, 'y0': y0, 'z0': a['cz'] + z0, 'x1': a['cx'] + x1, 'y1': y1, 'z1': a['cz'] + z1})
+        a.setdefault('looks', [a['theme']])
+        a.update(aid='plaza', n=0)
+        return a
+    a = dict(reg['arenas'][aid])
+    a.update(aid=aid)
+    return a
+
+
+def arenas(reg=None):
+    """[(aid, arena dict)] with the plaza first, then the arenas{} entries by n (each dict as arena_of returns it)."""
+    reg = reg or load_registry()
+    out = [('plaza', arena_of({'arena': 'plaza'}, reg))]
+    for aid in sorted(reg.get('arenas', {}), key=lambda k: reg['arenas'][k]['n']):
+        out.append((aid, arena_of({'arena': aid}, reg)))
+    return out
+
+
+def arena_oob(a):
+    """(y0, y1) out-of-bounds band of an arena: its 'oob' entry or cy-3 .. cy+16 (the plaza's 198..217)."""
+    o = a.get('oob')
+    return (o['y0'], o['y1']) if o else (a['cy'] - 3, a['cy'] + 16)
+
+
+def theme_module(theme):
+    """The arena theme module tools/mboss_arena_<theme>.py (imported; tools/ on sys.path), or None when the file is
+    missing (the arena generator then writes stub functions, cm.md 6.3)."""
+    tools = str(ROOT / 'tools')
+    if not (ROOT / 'tools' / f'mboss_arena_{theme}.py').exists():
+        return None
+    if tools not in sys.path:
+        sys.path.insert(0, tools)
+    return importlib.import_module('mboss_arena_' + theme)
 
 
 class Out:
@@ -141,17 +238,24 @@ def _tenths(v):
 
 
 def hz_opts(act=None, el=None, kb=None, kbdir=None, y0=None, y1=None, r0=None, back=None,
-            sfx=None, vis=None, col=None, linger=None, quiet=None, grp=False, nododge=None, rearm=None):
+            sfx=None, vis=None, col=None, linger=None, quiet=None, grp=False, nododge=None, rearm=None,
+            norx=None, safe_g=None):
     """Lines that set the one-shot options of the next hazard (reset after each create).
     grp=True: the hazard joins the current volley group #mbGrp (grp_new): one hit per group.
     nododge=1: dash i-frames do not help (#hzNoDodge). rearm=N: a hit disarms it for N ticks only (#hzRearm;
-    with a volley group the whole group re-arms together: at most one hit per N ticks)."""
+    with a volley group the whole group re-arms together: at most one hit per N ticks).
+    Chapter mode (AZ-CM): norx=1: no player-side element reaction from its hit (#hzNR); safe_g=G: the safe group of a
+    mask hazard (#hzSafeG, 0 = its own id)."""
     out = []
     if grp:
         out.append('scoreboard players operation #hzGrp mb = #mbGrp mb')
+    if norx is not None:
+        assert int(norx) in (0, 1)
+    if safe_g is not None:
+        assert int(safe_g) >= 0
     pairs = [('#hzAct', act), ('#hzEl', el), ('#hzKB', kb), ('#hzKBDir', kbdir), ('#hzSfx', sfx),
              ('#hzVis', vis), ('#hzCol', col), ('#hzLinger', linger), ('#hzQuiet', quiet),
-             ('#hzNoDodge', nododge), ('#hzRearm', rearm)]
+             ('#hzNoDodge', nododge), ('#hzRearm', rearm), ('#hzNR', norx), ('#hzSafeG', safe_g)]
     for k, v in pairs:
         if v is not None:
             out.append(f'scoreboard players set {k} mb {int(v)}')
@@ -196,11 +300,15 @@ def tell_line(length, width, tell):
     return hz_line(length, width, tell, 0)
 
 
-def pj_opts(el=None, kb=None, ret=None, wall=None, shape=None, grp=False):
+def pj_opts(el=None, kb=None, ret=None, wall=None, shape=None, grp=False, nododge=None, norx=None):
     """Lines that set the one-shot options of the next pj/launch (reset after it). shape 0 sphere, 1 blade
-    (hr = half width across the flight); grp=True joins the current volley group #mbGrp (grp_new)."""
+    (hr = half width across the flight); grp=True joins the current volley group #mbGrp (grp_new).
+    Chapter mode (AZ-CM): nododge=1: dash i-frames do not help (#pjNoDodge); norx=1: no player-side reaction (#pjNR)."""
     out = []
-    for k, v in (('#pjEl', el), ('#pjKB', kb), ('#pjRet', ret), ('#pjWall', wall), ('#pjShape', shape)):
+    for v in (nododge, norx):
+        assert v is None or int(v) in (0, 1)
+    for k, v in (('#pjEl', el), ('#pjKB', kb), ('#pjRet', ret), ('#pjWall', wall), ('#pjShape', shape),
+                 ('#pjNoDodge', nododge), ('#pjNR', norx)):
         if v is not None:
             out.append(f'scoreboard players set {k} mb {int(v)}')
     if grp:
@@ -235,6 +343,78 @@ def pj_steer(max_deg):
 
 
 GRP_NEW = 'function rlk:mboss/grp_new'
+
+
+# ---------------------------------------------------------------------------------------------
+# Chapter-mode call builders (AZ-CM, scratchpad az/contract/cm.md 13.10). Blocks / per-mille in, runtime units out.
+
+def hz_mask(r0, tell, dmg):
+    """Mask hazard (kind 6): hits a player whose feet are not within r0 + 0.3 b of a rlk_mb_hzsafe marker of its safe
+    group. As anything (position = the hazard marker; not drawn by the framework). r0 in blocks."""
+    assert 0 < r0 <= 40 and tell >= 1 and dmg >= 0
+    return [f'scoreboard players set #hzR0 mb {_tenths(r0)}',
+            f'function rlk:mboss/hz/mask {{tell:{int(tell)},dmg:{int(dmg)}}}']
+
+
+def hz_extend(n):
+    """As a live hazard marker: its active window and its life grow by n ticks (a lingering field refresh)."""
+    assert 1 <= int(n) <= 72000
+    return f'function rlk:mboss/hz/extend {{n:{int(n)}}}'
+
+
+def lockv(lead):
+    """Predictive lock: a rlk_mb_lock marker at the player + velocity x lead ticks, inside walk - 0.7 (mboss/mv/lockv)."""
+    assert 0 <= int(lead) <= 40
+    return f'function rlk:mboss/mv/lockv {{lead:{int(lead)}}}'
+
+
+def local():
+    """As the anchor: #mbLf / #mbLs mb = the player body in the anchor frame (milliblocks, f forward, s left)."""
+    return 'function rlk:mboss/mv/local'
+
+
+def pl_dot(pm, el, lethal=0):
+    """Lines of one player DoT tick: pm per mille of the player's max HP, el = #elem for the shield efficiency."""
+    assert 1 <= int(pm) <= 1000 and 0 <= int(el) <= 8 and int(lethal) in (0, 1)
+    return [f'scoreboard players set #mbDotPct mb {int(pm)}', f'scoreboard players set #mbDotEl mb {int(el)}',
+            f'scoreboard players set #mbDotLethal mb {int(lethal)}', 'function rlk:mboss/pl_dot']
+
+
+def push_ring(r_blocks, kb, to_blocks=None):
+    """Push-only ring at the execution position: players within r are moved out to `to` (default r + 0.5) over kb ticks."""
+    to = r_blocks + 0.5 if to_blocks is None else to_blocks
+    assert 0 < r_blocks <= 40 and r_blocks <= to <= 48 and 1 <= int(kb) <= 10
+    return f'function rlk:mboss/push/ring {{r:{_tenths(r_blocks)},to:{_tenths(to)},kb:{int(kb)}}}'
+
+
+def cine(on):
+    """Cine on / off: boss hits on the player (mboss/hurt, pl_dot) are refused while on."""
+    return 'function rlk:mboss/cine/' + ('start' if on else 'end')
+
+
+def repool(pct):
+    """Pool split: the body's max HP = #mbTot x pct / 100, full, the bar refills over 30 t."""
+    assert 1 <= int(pct) <= 100
+    return f'function rlk:mboss/repool {{pct:{int(pct)}}}'
+
+
+def title(text, sub, color):
+    """Rename the fight title (boss bar name, gate texts read cur.title / cur.sub)."""
+    for t in (text, sub, color):
+        assert '"' not in t and '\\' not in t
+    return f'function rlk:mboss/title {{title:"{text}",sub:"{sub}",color:"{color}"}}'
+
+
+def music(ph):
+    """Play the registry music of phase ph (1..9; 0 stops)."""
+    assert 0 <= int(ph) <= 9
+    return f'function rlk:mboss/music/set {{ph:{int(ph)}}}'
+
+
+def px_state(name):
+    """Switch the hit-proxy state set (a key of the rig manifest's states)."""
+    assert name.replace('_', '').isalnum()
+    return f'function rlk:mboss/px/state {{set:"{name}"}}'
 
 
 def say(text, colour='#FFFFFF', gap=2, hold=40, snd=1):

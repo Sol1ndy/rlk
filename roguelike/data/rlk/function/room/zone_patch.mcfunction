@@ -1,5 +1,5 @@
 # 바닥 한가운데 무늬 = 구역 종류, 지도에서도 구분됨 (@s = 구역 표식, at @s)
-execute if data entity @s data{boss_id:"narukami"} run return 0
+execute if data entity @s data.boss_id run return 0
 fill ~-5 ~ ~-5 ~4 ~ ~4 minecraft:air replace #rlk:plants
 execute if score @s zkind matches 2 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:quartz_block
 execute if score @s zkind matches 3 run fill ~-3 ~-1 ~-3 ~2 ~-1 ~2 minecraft:yellow_concrete

@@ -61,6 +61,20 @@ scoreboard objectives add mbMvZ1 dummy
 scoreboard objectives add mbT dummy
 scoreboard objectives add mbS dummy
 scoreboard objectives add mbId dummy
+scoreboard objectives add mbRes0 dummy
+scoreboard objectives add mbRes1 dummy
+scoreboard objectives add mbRes2 dummy
+scoreboard objectives add mbRes3 dummy
+scoreboard objectives add mbRes4 dummy
+scoreboard objectives add mbRes5 dummy
+scoreboard objectives add mbRes6 dummy
+scoreboard objectives add mbRes7 dummy
+scoreboard objectives add mbRes8 dummy
+scoreboard objectives add mbHzNR dummy
+scoreboard objectives add mbHzSG dummy
+scoreboard objectives add mbPjND dummy
+scoreboard objectives add mbPjNR dummy
+scoreboard objectives add mbPart dummy
 bossbar add rlk:mboss {text:"중간보스"}
 bossbar add rlk:mboss_state {text:""}
 bossbar add rlk:mboss_sub {text:""}
@@ -115,6 +129,35 @@ execute unless score #mbGrpL mb matches 0.. run scoreboard players set #mbGrpL m
 execute unless score #mbLowG mb matches 0..1 run scoreboard players set #mbLowG mb 0
 execute unless score #mbHzClk mb matches 0.. run scoreboard players set #mbHzClk mb 0
 scoreboard players set #mbNoDodge mb 0
+# Chapter mode (AZ-CM): the fight arena (#mbAr = arena n, plaza 0) and its walk / safe radius in tenths, the
+# chapter flag, proxies, pools, floor, cine, music, the running arena job (re-armed after /reload).
+execute unless score #mbAr mb matches 0.. run scoreboard players set #mbAr mb 0
+execute unless score #mbArW10 mb matches 1.. run scoreboard players set #mbArW10 mb 210
+execute unless score #mbArS10 mb matches 1.. run scoreboard players set #mbArS10 mb 190
+execute unless score #mbMode mb matches 0.. run scoreboard players set #mbMode mb 0
+execute unless score #mbPx mb matches 0.. run scoreboard players set #mbPx mb 0
+execute unless score #mbPoolPct mb matches 1.. run scoreboard players set #mbPoolPct mb 100
+execute unless score #mbRamp mb matches 0.. run scoreboard players set #mbRamp mb 0
+execute unless score #mbFloor mb matches 0.. run scoreboard players set #mbFloor mb 0
+execute unless score #mbFloorHit mb matches 0.. run scoreboard players set #mbFloorHit mb 0
+execute unless score #mbCine mb matches 0.. run scoreboard players set #mbCine mb 0
+execute unless score #mbLost mb matches 0.. run scoreboard players set #mbLost mb 0
+execute unless score #cbForce mb matches 0.. run scoreboard players set #cbForce mb 0
+execute unless score #cbAuto mb matches 0.. run scoreboard players set #cbAuto mb 0
+execute unless score #cbWait mb matches 0.. run scoreboard players set #cbWait mb 0
+execute unless score #mbMusPh mb matches 0.. run scoreboard players set #mbMusPh mb 0
+execute unless score #mbArBuild mb matches 0.. run scoreboard players set #mbArBuild mb 0
+execute unless score #mbHitEv mb matches 0.. run scoreboard players set #mbHitEv mb 0
+execute unless score #mbDodgeEv mb matches 0.. run scoreboard players set #mbDodgeEv mb 0
+execute unless score #mbDodgeOk mb matches 0.. run scoreboard players set #mbDodgeOk mb 0
+execute unless score #mbPart mb matches 0.. run scoreboard players set #mbPart mb 0
+execute unless score #atkSeq tmp matches -2147483648.. run scoreboard players set #atkSeq tmp 0
+scoreboard players set #mbPushOn mb 0
+scoreboard players set #mbNRNow mb 0
+scoreboard players set #mbNoRx mb 0
+scoreboard players set #pxIn mb 0
+scoreboard players set #c280 mb 280
+execute if score #mbArBuild mb matches 1.. run schedule function rlk:mboss/arena/job_tick 1t replace
 # Library activity flags (a set flag makes the world tick scan for that library's entities once).
 scoreboard players set #mbHzOn mb 1
 scoreboard players set #mbPjOn mb 1

@@ -6,6 +6,9 @@
 # 출력: #hitLanded, #mobKilled(처치 수 누적), #killBoss(boss 태그 처치), #killMini(miniboss 태그 처치)
 # Encounter objects use attack counts, before any reactions, damage procs or loot.
 execute if entity @s[tag=rlk_rd_object] run return run function rlk:boss/raiden/object/on_hit
+# 챕터 보스 히트 프록시(rlk_mb_px): 같은 공격의 중복을 거르고 몸체로 넘김(숫자는 프록시 자리). 큰 몸체(rlk_mb_big)를 직접 맞힌 공격도 같은 거름
+execute if entity @s[tag=rlk_mb_px] run return run function rlk:mboss/px/hit
+execute if entity @s[tag=rlk_mb_big] unless score #pxIn mb matches 1 unless score #trueDmg tmp matches 1 unless function rlk:mboss/px/dup run return 0
 # The transformation and the hidden real body of the illusion challenge are protected.
 execute if entity @s[tag=rlk_raiden,scores={rdPhase=1}] run return 0
 execute if entity @s[tag=rlk_raiden,scores={rdPat=5}] run return 0
@@ -19,6 +22,8 @@ scoreboard players set #hitLanded tmp 1
 scoreboard players set #cmBlk tmp 0
 # 원소: 부착/반응 → #dmg 보정(증발·융해·촉진·발산·초전도), 격변 반응 예약, 반응 이름 표시 (진짜 피해는 원소 없음)
 execute unless score #trueDmg tmp matches 1 run function rlk:element/on_hit
+# 원소별 저항(챕터 보스 몸체 · 보조 오브젝트, rlk_mb_resel): mres = mbRes<#elem>. 모듈 on_hit 앞이라 모듈이 덮어쓸 수 있음
+execute if entity @s[tag=rlk_mb_resel] unless score #trueDmg tmp matches 1 run function rlk:mboss/res_pre
 # 중간보스 몸체: 이번 타격의 원소 정보(#elem #elU #rx #tfm)를 모듈에 알림(점수만 바꿈, 재귀 금지)
 execute if entity @s[tag=rlk_mb_body] unless score #trueDmg tmp matches 1 run function rlk:mboss/d/on_hit
 # 피해 보정(각인 · 아이템 · 레벨 · 저항 · 보스별 받는 피해). 진짜 피해는 건너뜀

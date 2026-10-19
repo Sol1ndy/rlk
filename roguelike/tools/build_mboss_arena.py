@@ -23,6 +23,17 @@ Runtime files:
   arena/build    clear + build the current theme, set built
   arena/build_<theme>, arena/rebuild (forced), arena/clear (air over the whole box, for room/remove)
 Run with "in minecraft:overworld" (callers do). layout() is importable for offline renders.
+
+Chapter arenas (AZ-CM, scratchpad az/contract/cm.md 6.3 / theme.md 3): every registry arenas{} entry whose theme module
+tools/mboss_arena_<theme>.py exists gets sliced jobs (one slice per tick, #mbArBuild = slices left, rlk:mboss arjob):
+  arena/<aid>/ensure   1 when built in its default look (stamp built_<aid> = "<aid>@<ver>:<looks[0]>", sentinel) and
+                       loaded; else fail, and a build / look / verify job runs (one job at a time)
+  arena/<aid>/build    start a full build job (s/<i> slices, done); rebuild = drop the stamp + build; clear = air over
+                       the box when loaded + no stamp; sweep {y0,y1} = barriers -> air in row spans inside walk - 0.5
+  arena/<aid>/look/<look>  start a look job (l/<look>/<i> slices: the theme's look_lines(look) or the cell diff)
+  arena/job_tick (the scheduler), arena/abort (drop the running job), arena/clear_all (every arena's clear)
+An arena whose theme module is missing gets stub functions (ensure stamps "<aid>@0:stub" and returns 1). emit(aid) gives
+the command lists without writing (theme.md 3; S1-ARENA's test_arena_az.py reproduces it).
 """
 import math
 import mboss_lib as L
@@ -291,6 +302,237 @@ def build_lines():
     return lines
 
 
+# =============================================================================================
+# Chapter arenas (arenas{}): sliced builds, looks, stamps (cm.md 6.3-6.5, theme.md 3)
+MAX_SLICES, MAX_FILL, MAX_CMDS = 40, 32768, 8000
+
+
+def _vol(b):
+    (x0, y0, z0), (x1, y1, z1) = b
+    return (x1 - x0 + 1) * (y1 - y0 + 1) * (z1 - z0 + 1)
+
+
+def _span_lines(cells):
+    """Row spans of {(x, y, z): block} (y ascending, z ascending, x runs of equal blocks): fill / setblock ... strict."""
+    by_y = {}
+    for (x, y, z), b in cells.items():
+        by_y.setdefault(y, {})[(x, z)] = b
+    lines = []
+    for y in sorted(by_y):
+        for z, xa, xb, b in spans(by_y[y]):
+            if xa == xb:
+                lines.append(f'setblock {xa} {y} {z} {b} strict')
+            else:
+                lines.append(f'fill {xa} {y} {z} {xb} {y} {z} {b} strict')
+    return lines
+
+
+def _in(c, b):
+    (x0, y0, z0), (x1, y1, z1) = b
+    return x0 <= c[0] <= x1 and y0 <= c[1] <= y1 and z0 <= c[2] <= z1
+
+
+def emit(aid, reg=None):
+    """{'build': [[cmd]], 'looks': {look: [[cmd]]}, 'clear': [cmd]} of a chapter arena with a theme module (no file
+    writes): build slices (air + row spans, theme.md 3.1; the done call is added by the writer), look jobs (the theme's
+    look_lines or the cell diff against looks[0], grouped by the slices() boxes, theme.md 3.3), the clear fills."""
+    reg = reg or REG
+    a = reg['arenas'][aid]
+    th = L.theme_module(a['theme'])
+    assert th is not None, f'{aid}: theme module mboss_arena_{a["theme"]} missing'
+    assert th.THEME == a['theme'] and th.AID == aid, (th.THEME, th.AID)
+    for k, v in getattr(th, 'CHECK', {}).items():
+        assert a[k] == v, f'{aid}: registry {k} {a[k]} != theme CHECK {v}'
+    bx = a['box']
+    box = ((bx['x0'], bx['y0'], bx['z0']), (bx['x1'], bx['y1'], bx['z1']))
+    sl = th.slices()
+    assert 1 <= len(sl) <= MAX_SLICES, f'{aid}: {len(sl)} slices'
+    assert sum(_vol(b) for b in sl) == _vol(box), f'{aid}: the slices do not cover the box'
+    for i, b in enumerate(sl):
+        assert _vol(b) <= MAX_FILL, f'{aid}: slice {i} has {_vol(b)} blocks'
+        assert _in(b[0], box) and _in(b[1], box), f'{aid}: slice {i} outside the box'
+        for j in range(i):
+            o = sl[j]
+            assert any(b[1][k] < o[0][k] or o[1][k] < b[0][k] for k in range(3)), f'{aid}: slices {j} and {i} overlap'
+    looks = a['looks']
+    lay0 = th.arena_layout(looks[0])
+    for c in lay0:
+        assert _in(c, box), f'{aid}: block {c} outside the box'
+    (sx, sy, sz), sb = th.SENTINEL
+    assert lay0.get((sx, sy, sz)) == sb, f'{aid}: the sentinel is not in the default layout'
+    build = []
+    for i, b in enumerate(sl):
+        (x0, y0, z0), (x1, y1, z1) = b
+        cmds = [f'fill {x0} {y0} {z0} {x1} {y1} {z1} minecraft:air strict']
+        cmds += _span_lines({c: v for c, v in lay0.items() if _in(c, b)})
+        assert len(cmds) <= MAX_CMDS, f'{aid}: build slice {i} has {len(cmds)} commands'
+        build.append(cmds)
+    out_looks = {}
+    for look in looks:
+        if len(looks) == 1:
+            break
+        if hasattr(th, 'look_lines'):
+            groups = [list(g) for g in th.look_lines(look)]
+        else:
+            lay = th.arena_layout(look)
+            diff = {c for c in set(lay) | set(lay0) if lay.get(c) != lay0.get(c)}
+            if look == looks[0]:
+                # the default look from any other look: every cell any other look changes, back to the default
+                diff = set()
+                for other in looks[1:]:
+                    lo = th.arena_layout(other)
+                    diff |= {c for c in set(lo) | set(lay0) if lo.get(c) != lay0.get(c)}
+            groups = []
+            for b in sl:
+                cells = {c: lay.get(c, 'minecraft:air') for c in diff if _in(c, b)}
+                if cells:
+                    groups.append(_span_lines(cells))
+        assert 1 <= len(groups) <= MAX_SLICES, f'{aid}: look {look} has {len(groups)} slices'
+        for g in groups:
+            assert len(g) <= MAX_CMDS
+            for cmd in g:
+                if cmd.startswith('fill '):
+                    t = cmd.split()
+                    v = (abs(int(t[4]) - int(t[1])) + 1) * (abs(int(t[5]) - int(t[2])) + 1) * (abs(int(t[6]) - int(t[3])) + 1)
+                    assert v <= MAX_FILL, f'{aid}: look {look} fill of {v} blocks'
+        out_looks[look] = groups
+    clear = [f'fill {b[0][0]} {b[0][1]} {b[0][2]} {b[1][0]} {b[1][1]} {b[1][2]} minecraft:air strict' for b in sl]
+    return {'build': build, 'looks': out_looks, 'clear': clear}
+
+
+def sweep_rows(a):
+    """[(z, x0, x1)] rows of the cells with centre distance <= walk - 0.5 (the barrier sweep, cm.md 6.3)."""
+    rows = {}
+    rr = a['walk'] - 0.5
+    for z in range(a['box']['z0'], a['box']['z1'] + 1):
+        for x in range(a['box']['x0'], a['box']['x1'] + 1):
+            if math.hypot(x + 0.5 - a['cx'], z + 0.5 - a['cz']) <= rr:
+                rows.setdefault(z, []).append(x)
+    return [(z, min(xs), max(xs)) for z, xs in sorted(rows.items())]
+
+
+def write_chapter_arenas(out):
+    """Every arenas{} entry: real sliced functions when its theme module exists, else the stub set (cm.md 6.3)."""
+    real = []
+    for aid, a in L.arenas(REG):
+        if aid == 'plaza':
+            continue
+        P = f'mboss/arena/{aid}/'
+        F = f'rlk:mboss/arena/{aid}/'
+        ver, look0 = a['ver'], a['looks'][0]
+        stamp0 = f'{aid}@{ver}:{look0}'
+        if L.theme_module(a['theme']) is None:
+            print(f'WARN theme {a["theme"]} missing: stub arena {aid}')
+            out.write(P + 'ensure', [f'# STUB (theme module tools/mboss_arena_{a["theme"]}.py missing): nothing is built; the stamp says so.',
+                                     f'data modify storage rlk:mboss built_{aid} set value "{aid}@0:stub"', 'return 1'])
+            for fn in ('build', 'rebuild', 'clear', 'done'):
+                out.write(P + fn, [f'# STUB (theme module tools/mboss_arena_{a["theme"]}.py missing): no-op.'])
+            out.write(P + 'sweep', [f'# STUB (theme module tools/mboss_arena_{a["theme"]}.py missing): no-op ({{y0,y1}} kept).',
+                                    '$data modify storage rlk:mboss arsw set value {y0:$(y0),y1:$(y1)}'])
+            continue
+        real.append((aid, a))
+        th = L.theme_module(a['theme'])
+        (sx, sy, sz), sb = th.SENTINEL
+        em = emit(aid)
+        n = len(em['build'])
+        others = a['looks'][1:]
+        bx = a['box']
+        for i, cmds in enumerate(em['build']):
+            tail = [f'function {F}done with storage rlk:mboss arjob'] if i == n - 1 else []
+            out.write(P + f's/{i}', [f'# GENERATED build slice {i + 1}/{n} of {aid} (in minecraft:overworld, the box loaded).'] + cmds + tail)
+        out.write(P + 'ensure', [
+            f'# 1 when no arena job runs, the box of {aid} is loaded, the stamp is "{stamp0}" and the sentinel is right.',
+            '# Otherwise fail, after making sure a job runs: a wrong / missing version -> build; the right version in another',
+            '# look -> the default look job; built but not loaded -> a verify job (waits for the chunks). While another',
+            "# arena's job runs nothing starts. Run in minecraft:overworld.",
+            'execute if score #mbArBuild mb matches 1.. run return fail',
+            f'execute unless data storage rlk:mboss {{built_{aid}:"{stamp0}"}} run function {F}restore',
+            f'execute unless data storage rlk:mboss {{built_{aid}:"{stamp0}"}} run return fail',
+            f'execute unless function rlk:mboss/ar/{aid}/loaded run function {F}verify',
+            'execute if score #mbArBuild mb matches 1.. run return fail',
+            f'execute unless block {sx} {sy} {sz} {sb} run function {F}build',
+            'execute if score #mbArBuild mb matches 1.. run return fail',
+            'return 1'])
+        out.write(P + 'restore', [f'# The stamp of {aid} is not the default look: the right version in another look -> the look job back to',
+                                  f'# "{look0}"; anything else (no stamp, an old version, a stub) -> a full build.']
+                  + [f'execute if data storage rlk:mboss {{built_{aid}:"{aid}@{ver}:{lk}"}} run return run function {F}look/{look0}' for lk in others]
+                  + [f'function {F}build'])
+        def start(kind, look, nsl):
+            return [f'execute if score #mbArBuild mb matches 1.. run return fail',
+                    f'data modify storage rlk:mboss arjob set value {{aid:"{aid}",kind:"{kind}",look:"{look}",i:0,n:{nsl},wait:0}}',
+                    f'scoreboard players set #mbArBuild mb {nsl}',
+                    'schedule function rlk:mboss/arena/job_tick 1t replace']
+        out.write(P + 'build', [f'# Start a full build job of {aid} ({n} slices, one per tick; the stamp goes until done).']
+                  + start('build', look0, n)[:1] + [f'data remove storage rlk:mboss built_{aid}'] + start('build', look0, n)[1:])
+        out.write(P + 'rebuild', [f'# Dev / test: drop the stamp of {aid} and build it again (a running job of another arena blocks it).',
+                                  f'execute if score #mbArBuild mb matches 1.. run return fail', f'data remove storage rlk:mboss built_{aid}',
+                                  f'function {F}build'])
+        out.write(P + 'verify', [f'# The stamp of {aid} is right but the box is not loaded: a 1-slice job that waits for the chunks, then checks',
+                                 '# the sentinel (done -> stamp kept; wrong -> a full build).'] + start('verify', look0, 1))
+        out.write(P + 'vdone', [f'# Verify job of {aid}: the chunks are loaded.',
+                                'scoreboard players set #mbArBuild mb 0', 'data remove storage rlk:mboss arjob',
+                                f'execute unless block {sx} {sy} {sz} {sb} run function {F}build'])
+        out.write(P + 'clear', [f'# Air over the box of {aid} when it is loaded (room/remove -> cb/remove), and no stamp.',
+                                f'execute if data storage rlk:mboss arjob{{aid:"{aid}"}} run function rlk:mboss/arena/abort',
+                                f'data remove storage rlk:mboss built_{aid}',
+                                f'execute unless function rlk:mboss/ar/{aid}/loaded run return fail'] + em['clear'] + ['return 1'])
+        rows = sweep_rows(a)
+        out.write(P + 'sweep', [f'# {{y0,y1}} (absolute y): barriers -> air in {len(rows)} row spans inside walk - 0.5 of {aid} (never a',
+                                '# rectangle: blocks outside the disc are not touched). Only while the box is loaded.',
+                                f'execute unless function rlk:mboss/ar/{aid}/loaded run return fail']
+                  + [f'$fill {x0} $(y0) {z} {x1} $(y1) {z} minecraft:air replace minecraft:barrier' for z, x0, x1 in rows] + ['return 1'])
+        out.write(P + 'done', [f'# (macro arjob) The last slice of a job of {aid}: the stamp of the look just built, the sentinel check (a wrong',
+                               '# sentinel restarts one full build: #arRedo).',
+                               'scoreboard players set #mbArBuild mb 0',
+                               'data remove storage rlk:mboss arjob',
+                               f'$data modify storage rlk:mboss built_{aid} set value "{aid}@{ver}:$(look)"',
+                               f'execute if block {sx} {sy} {sz} {sb} run return run scoreboard players set #arRedo mb 0',
+                               f'data remove storage rlk:mboss built_{aid}',
+                               'execute if score #arRedo mb matches 1 run return run scoreboard players set #arRedo mb 0',
+                               'scoreboard players set #arRedo mb 1',
+                               f'function {F}build'])
+        for look, groups in em['looks'].items():
+            m = len(groups)
+            out.write(P + f'look/{look}', [f'# Start the look job "{look}" of {aid} ({m} slices; the stamp goes until done stamps "{aid}@{ver}:{look}").',
+                                           'execute if score #mbArBuild mb matches 1.. run return fail',
+                                           f'data remove storage rlk:mboss built_{aid}'] + start('look', look, m)[1:])
+            for i, cmds in enumerate(groups):
+                tail = [f'function {F}done with storage rlk:mboss arjob'] if i == m - 1 else []
+                out.write(P + f'l/{look}/{i}', [f'# GENERATED look slice {i + 1}/{m} of {aid} -> {look}.'] + cmds + tail)
+        # job tick of this arena: wait for the chunks (<= 200 t, then abort), else the next slice
+        tick = [f'# @s = the server (arena/job_tick), in minecraft:overworld: one step of the running job of {aid}.',
+                f'execute unless function rlk:mboss/ar/{aid}/loaded run return run function {F}wait',
+                'data modify storage rlk:mboss arjob.wait set value 0',
+                f'execute if data storage rlk:mboss arjob{{kind:"verify"}} run return run function {F}vdone',
+                'execute store result score #arI mb run data get storage rlk:mboss arjob.i',
+                'scoreboard players remove #mbArBuild mb 1',
+                'execute store result storage rlk:mboss arjob.i int 1 run scoreboard players add #arI mb 1',
+                'scoreboard players remove #arI mb 1']
+        tick += [f'execute if data storage rlk:mboss arjob{{kind:"build"}} if score #arI mb matches {i} run function {F}s/{i}' for i in range(n)]
+        for look, groups in em['looks'].items():
+            tick += [f'execute if data storage rlk:mboss arjob{{kind:"look",look:"{look}"}} if score #arI mb matches {i} run function {F}l/{look}/{i}'
+                     for i in range(len(groups))]
+        out.write(P + 'tick', tick)
+        out.write(P + 'wait', [f'# The box of {aid} is not loaded yet: wait (forceloaded chunks load within a few ticks); 200 t -> abort.',
+                               'execute store result score #arW mb run data get storage rlk:mboss arjob.wait',
+                               'scoreboard players add #arW mb 1',
+                               'execute store result storage rlk:mboss arjob.wait int 1 run scoreboard players get #arW mb',
+                               'execute if score #arW mb matches 200.. run function rlk:mboss/arena/abort'])
+    out.write('mboss/arena/job_tick', ['# The one running arena job (rlk:mboss arjob, #mbArBuild = slices left): one step per tick, re-scheduled while',
+                                       '# it runs (mboss/init re-arms it after /reload).',
+                                       'execute unless score #mbArBuild mb matches 1.. run return run data remove storage rlk:mboss arjob']
+              + [f'execute if data storage rlk:mboss arjob{{aid:"{aid}"}} in minecraft:overworld run function rlk:mboss/arena/{aid}/tick' for aid, _ in real]
+              + ['execute unless data storage rlk:mboss arjob run scoreboard players set #mbArBuild mb 0',
+                 'execute if score #mbArBuild mb matches 1.. run schedule function rlk:mboss/arena/job_tick 1t replace'])
+    out.write('mboss/arena/abort', ['# Drop the running arena job (cb/remove, uninstall, a 200-t chunk wait): no job, the half-built arena loses its stamp.']
+              + [f'execute if data storage rlk:mboss arjob{{aid:"{aid}"}} run data remove storage rlk:mboss built_{aid}' for aid, _ in real]
+              + ['scoreboard players set #mbArBuild mb 0', 'data remove storage rlk:mboss arjob', 'schedule clear rlk:mboss/arena/job_tick'])
+    out.write('mboss/arena/clear_all', ['# Every arena cleared (the plaza and every chapter arena; when loaded). Not called by the game files.',
+                                        'function rlk:mboss/arena/clear']
+              + [f'function rlk:mboss/arena/{aid}/clear' for aid, _ in L.arenas(REG) if aid != 'plaza'])
+    return real
+
+
 def main():
     out = L.Out(owned_dirs=['mboss/arena'])
     body = build_lines()
@@ -316,10 +558,12 @@ def main():
         + [f'fill {xa} {YB} {za} {xb} {YTOP} {zb} minecraft:air strict'
            for xa, xb in ((X0, CX - 1), (CX, X1)) for za, zb in ((Z0, CZ - 1), (CZ, Z1))]
         + ['data remove storage rlk:mboss built'])
+    real = write_chapter_arenas(out)
     removed = out.clean()
     n = len(body)
     print(f'mboss arena: {THEME}@{VER}, centre ({CX},{CY},{CZ}) r {RAD} walk {WALK}, {n} build commands, '
-          f'{len(layout())} blocks, sentinel {sentinel()}, {removed} stale removed.')
+          f'{len(layout())} blocks, sentinel {sentinel()}; chapter arenas: '
+          f'{", ".join(aid for aid, _ in real) or "none built"}; {removed} stale removed.')
 
 
 if __name__ == '__main__':

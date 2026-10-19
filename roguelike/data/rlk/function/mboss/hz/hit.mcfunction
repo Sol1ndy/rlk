@@ -7,6 +7,7 @@ scoreboard players operation #dy mb -= #t mb
 execute if score #dy mb < @s mbHzY0 run return 0
 execute if score #dy mb > @s mbHzY1 run return 0
 execute if score @s mbHzK matches 5 run return run function rlk:mboss/hz/hit_full
+execute if score @s mbHzK matches 6 run return run function rlk:mboss/hz/hit_mask
 execute unless entity @e[tag=rlk_body,distance=..48,limit=1] run return 0
 execute store result score #dx mb run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000
 execute store result score #dz mb run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000

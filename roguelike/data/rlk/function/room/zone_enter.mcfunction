@@ -3,6 +3,8 @@ scoreboard players set @s zst 2
 function rlk:room/cells_kill
 function rlk:room/wave_start
 execute if score @s zkind matches 1 run return run function rlk:room/combat_start
+# 챕터 보스 입구(data.cboss): 바로 싸우지 않고 문 오브젝트(oact 16, room/obj/k_cboss)가 선다
+execute if score @s zkind matches 9 if data entity @s data.cboss run return run function rlk:mboss/cb/enter
 execute if score @s zkind matches 9 run return run function rlk:room/combat_start
 scoreboard players set @s zst 3
 execute if score @s zkind matches 2 run function rlk:room/end_setup

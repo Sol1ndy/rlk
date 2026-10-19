@@ -11,6 +11,8 @@ function rlk:player/reset_one
 scoreboard players set #rdTest rd 0
 scoreboard players set #rdForce rd 0
 scoreboard players set #rdLock rd 0
+# 챕터 보스: 강제 라우팅 · 자동 문 누르기 · 보스 맵별 준비 저장소(cprep) 초기화
+function rlk:mboss/cb/run_reset
 scoreboard players set #mbTest mb 0
 scoreboard players set #mbForce mb 0
 scoreboard players set #mbLock mb 0

@@ -16,6 +16,9 @@ scoreboard players operation @s mbHzG = #hzGrp mb
 scoreboard players operation @s mbHzND = #hzNoDodge mb
 scoreboard players operation @s mbHzRA = #hzRearm mb
 scoreboard players set @s mbHzRT 0
+# chapter mode (AZ-CM): no player-side reaction; the mask's safe group (0 = this hazard's own id, set below)
+scoreboard players operation @s mbHzNR = #hzNR mb
+scoreboard players operation @s mbHzSG = #hzSafeG mb
 scoreboard players operation @s mbHzCol = @s mbHzE
 execute if score #hzCol mb matches 0.. run scoreboard players operation @s mbHzCol = #hzCol mb
 execute if score #hzQuiet mb matches 1 run tag @s add rlk_mb_hzq
@@ -31,6 +34,7 @@ scoreboard players operation @s mbHzL += #hzLinger mb
 scoreboard players add #hzId mb 1
 scoreboard players operation @s mbHzI = #hzId mb
 scoreboard players operation #hzLast mb = #hzId mb
+execute if score @s mbHzSG matches ..0 run scoreboard players operation @s mbHzSG = @s mbHzI
 scoreboard players operation @s mbHzY0 = #hzY0 mb
 scoreboard players operation @s mbHzY0 *= #c100 mb
 scoreboard players operation @s mbHzY1 = #hzY1 mb
@@ -56,6 +60,8 @@ scoreboard players operation @s mbHzRI *= #t mb
 # full: the safe circle is exact (body centre inside = safe).
 execute if score @s mbHzK matches 5 run scoreboard players operation @s mbHzRI = @s mbHzR0
 execute if score @s mbHzK matches 5 run scoreboard players operation @s mbHzRI *= @s mbHzR0
+# mask (kind 6, AZ-CM): the safe distance (R0 + 0.3 b) squared
+execute if score @s mbHzK matches 6 run function rlk:mboss/hz/init_mask
 # Local forward axis x1000 from a temporary marker (exact, no trigonometry at runtime).
 execute positioned ^ ^ ^1 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_hzax"]}
 execute store result score #ox mb run data get entity @s Pos[0] 1000

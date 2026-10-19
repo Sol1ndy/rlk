@@ -6,7 +6,9 @@ execute unless data storage rlk:mboss tlast.ch run data modify storage rlk:mboss
 function rlk:mboss/test/end
 title @s times 10 40 15
 title @s subtitle {text:"로비로 돌아왔습니다",color:"gray"}
-title @s title {text:"중간보스 테스트 실패",color:"#E06A5A",bold:true}
+execute unless data storage rlk:mboss tlast{cb:1b} run title @s title {text:"중간보스 테스트 실패",color:"#E06A5A",bold:true}
+execute if data storage rlk:mboss tlast{cb:1b} run title @s title {text:"챕터 보스 테스트 실패",color:"#E06A5A",bold:true}
 scoreboard players set @s vBig 65
 scoreboard players set @s ttlT 65
+execute if data storage rlk:mboss tlast{cb:1b} run return run function rlk:mboss/test/cdefeat_msg with storage rlk:mboss tlast
 function rlk:mboss/test/defeat_msg with storage rlk:mboss tlast

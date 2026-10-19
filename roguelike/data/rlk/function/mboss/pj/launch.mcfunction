@@ -27,6 +27,9 @@ scoreboard players operation @s mbPjRet = #pjRet mb
 scoreboard players operation @s mbPjW = #pjWall mb
 scoreboard players operation @s mbPjK = #pjShape mb
 scoreboard players operation @s mbPjG = #pjGrp mb
+# chapter mode (AZ-CM): no dash dodge / no player-side reaction
+scoreboard players operation @s mbPjND = #pjNoDodge mb
+scoreboard players operation @s mbPjNR = #pjNR mb
 execute if score @s mbPjG matches 1.. if score @s mbPjG = #mbGrpL mb run scoreboard players set @s mbPjHit 1
 execute if score @s mbPjR matches 41.. run scoreboard players set @s mbPjR 40
 execute if score @s mbPjR matches ..0 run scoreboard players set @s mbPjR 1

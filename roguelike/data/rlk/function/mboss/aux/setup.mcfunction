@@ -10,3 +10,4 @@ scoreboard players operation @s mhpM = #auxHp mb
 execute unless score @s mhpM matches 1.. run scoreboard players set @s mhpM 1
 scoreboard players operation @s mhpC = @s mhpM
 scoreboard players operation @s mres = #auxRes mb
+execute if score #auxResEl mb matches 0..8 run function rlk:mboss/aux/res_el
