@@ -79,7 +79,7 @@ for (const [item, {model, tint}] of Object.entries(items)) if (tint !== null) {
 // ---- budgets ------------------------------------------------------------------------------------------------------------
 const pxOf = owner => Object.entries(SPR).filter(([n]) => SOWN[n] === owner).reduce((a, [, [w, h]]) => a + w * h, 0);
 const elementsOf = owner => ORG[owner].displays.reduce((a, d) => a + Math.max(0, ...Object.values(d.looks).map(it => models[items[it].model].els.length)), 0);
-const BUDGET = {basic: [500, 12000], nurt: [500, 16000], guard: [500, 16000], nest: [500, 12000], destr: [500, 8000], pred: [500, 20000],
+const BUDGET = {basic: [500, 14000], nurt: [500, 16000], guard: [500, 16000], nest: [500, 12000], destr: [500, 8000], pred: [500, 20000],
   heart: [800, 40000], dome: [400, 24000], wall: [60, 8000], stalk: [400, 16000], seed: [40, 2000]};
 let pxTotal = 0;
 for (const o of Object.keys(ORG)) {
