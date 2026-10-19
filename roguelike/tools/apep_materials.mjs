@@ -60,7 +60,7 @@ export const SLOT = Object.fromEntries(SLOTS.map((s, i) => [s, i]));
 // form colours per slot (multiplied onto the grey sprites; the sprites keep their own light and dark)
 export const SLOT_COLOR = {
   p1: {paint: '#FFFFFF', shell: '#E9E1C8', plate: '#8C9583', band_a: '#D6D2BE', band_b: '#8E9888'},
-  p3: {paint: '#FFFFFF', shell: '#EDF0E5', plate: '#6FA45C', band_a: '#B6E6B4', band_b: '#5E7A66'},
+  p3: {paint: '#FFFFFF', shell: '#EDF0E5', plate: '#6FA45C', band_a: '#EEF1E8', band_b: '#86A290'},
 };
 // tint looks (R12): ids and colours as the contract (§0.4.7); the forms each applies to
 export const TINT_IDS = {none: 0, p1_dark: 1, p1_brown: 2, withered: 3, p3_dim: 4};
