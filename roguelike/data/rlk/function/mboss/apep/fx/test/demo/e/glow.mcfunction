@@ -48,6 +48,7 @@ execute if score #wkDT mb matches 157 at @s rotated as @s rotated ~ 0 positioned
 execute if score #wkDT mb matches 157 at @s rotated as @s rotated ~ 0 positioned ^2.5 ^1 ^5 run function rlk:mboss/apep/fx/snd/p3_homing_loop
 execute if score #wkDT mb matches 159 at @s rotated as @s rotated ~ 0 positioned ^2.5 ^1 ^5 run function rlk:mboss/apep/fx/p/homing_trail
 execute if score #wkDT mb matches 161 at @s rotated as @s rotated ~ 0 positioned ^2.5 ^1 ^5 run function rlk:mboss/apep/fx/p/homing_trail
+execute if score #wkDT mb matches 161 at @p[tag=player] rotated as @s rotated ~ 0 run function rlk:mboss/apep/fx/snd/p3_wheel_hit
 execute if score #wkDT mb matches 163 at @s rotated as @s rotated ~ 0 positioned ^2.5 ^1 ^5 run function rlk:mboss/apep/fx/p/homing_trail
 execute if score #wkDT mb matches 163 at @s rotated as @s rotated ~ 0 run function rlk:mboss/apep/fx/p/wheel_carpet {r0:30,r1:144,dur:14}
 execute if score #wkDT mb matches 164 at @s rotated as @s rotated ~ 0 run function rlk:mboss/apep/fx/p/gold_burst

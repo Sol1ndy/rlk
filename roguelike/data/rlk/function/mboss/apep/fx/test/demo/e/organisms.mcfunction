@@ -6,6 +6,7 @@ execute if score #wkDT mb matches 10 at @s rotated as @s rotated ~ 0 positioned 
 execute if score #wkDT mb matches 10 at @s rotated as @s rotated ~ 0 positioned ^0 ^2.2 ^0 run function rlk:mboss/apep/fx/snd/heart_hit
 execute if score #wkDT mb matches 20 at @s rotated as @s rotated ~ 0 positioned ^3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/snd/o2_pivot
 execute if score #wkDT mb matches 20 at @s rotated as @s rotated ~ 0 positioned ^3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/tele/line {len:60,w:14,back:0,tell:12,el:7,nd:0,hold:3}
+execute if score #wkDT mb matches 20 at @s rotated as @s rotated ~ 0 positioned ^3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/p/spark
 execute if score #wkDT mb matches 23 at @s rotated as @s rotated ~ 0 positioned ^3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/p/crown_flare
 execute if score #wkDT mb matches 23 at @s rotated as @s rotated ~ 0 positioned ^3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/snd/o2_charge
 execute if score #wkDT mb matches 32 at @s rotated as @s rotated ~ 0 positioned ^3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/snd/o2_shoot
@@ -58,6 +59,7 @@ execute if score #wkDT mb matches 140 at @s rotated as @s rotated ~ 0 positioned
 execute if score #wkDT mb matches 150 at @s rotated as @s rotated ~ 0 positioned ^4.35 ^0 ^5.16 run function rlk:mboss/apep/fx/p/org_burst
 execute if score #wkDT mb matches 150 at @s rotated as @s rotated ~ 0 positioned ^4.35 ^0 ^5.16 run function rlk:mboss/apep/fx/snd/org_kill
 execute if score #wkDT mb matches 150 at @s rotated as @s rotated ~ 0 positioned ^0 ^2.2 ^0 run function rlk:mboss/apep/fx/p/heart_gain
+execute if score #wkDT mb matches 150 at @s rotated as @s rotated ~ 0 positioned ^0 ^2.2 ^0 run function rlk:mboss/apep/fx/p/flash
 execute if score #wkDT mb matches 150 at @s rotated as @s rotated ~ 0 positioned ^0 ^2.2 ^0 run function rlk:mboss/apep/fx/snd/heart_gain
 execute if score #wkDT mb matches 160 at @s rotated as @s rotated ~ 0 positioned ^-3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/tele/disc {r:36,tell:10,el:7,nd:0,hold:3}
 execute if score #wkDT mb matches 160 at @s rotated as @s rotated ~ 0 positioned ^-3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/snd/o6_inflate
@@ -67,7 +69,10 @@ execute if score #wkDT mb matches 180 at @s rotated as @s rotated ~ 0 positioned
 execute if score #wkDT mb matches 190 at @s rotated as @s rotated ~ 0 positioned ^-3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/p/bite_flash
 execute if score #wkDT mb matches 190 at @s rotated as @s rotated ~ 0 positioned ^-3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/snd/o6_bite_first
 execute if score #wkDT mb matches 196 at @s rotated as @s rotated ~ 0 positioned ^-3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/snd/o6_swim
+execute if score #wkDT mb matches 198 at @s rotated as @s rotated ~ 0 positioned ^-3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/tele/sector {r:26,a:24,tell:10,el:7,nd:0,hold:3}
 execute if score #wkDT mb matches 200 at @s rotated as @s rotated ~ 0 positioned ^-4.35 ^0 ^5.16 run function rlk:mboss/apep/fx/snd/o7_roll
+execute if score #wkDT mb matches 208 at @s rotated as @s rotated ~ 0 positioned ^-3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/p/bite_flash
+execute if score #wkDT mb matches 208 at @s rotated as @s rotated ~ 0 positioned ^-3.45 ^0 ^6.89 run function rlk:mboss/apep/fx/snd/o6_bite
 execute if score #wkDT mb matches 208 at @s rotated as @s rotated ~ 0 positioned ^-4.35 ^0 ^5.16 run function rlk:mboss/apep/fx/tele/disc {r:36,tell:61,el:7,nd:0,hold:3}
 execute if score #wkDT mb matches 208 at @s rotated as @s rotated ~ 0 positioned ^-4.35 ^0 ^5.16 run function rlk:mboss/apep/fx/snd/o7_primed
 execute if score #wkDT mb matches 208 at @s rotated as @s rotated ~ 0 positioned ^-4.35 ^0 ^5.16 run function rlk:mboss/apep/fx/p/fuse_pulse

@@ -185,14 +185,19 @@ for _w in P.PIECES:
     _ax = _fx / 128
     KINDS[f't_pf{_w}'] = ('flat', (_fx, 64), (-_ax, _ax, 0.0, 1.0), (-_ax, _ax, 0.0, 1.0), P.make_t_pf(_w), 2, True,
                           f'sector / wedge fill piece, {_w} deg')
-    _rx = max(16, math.ceil(2 * _hw * 128 / 16) * 16)
-    _bx = _rx / 256
-    KINDS[f't_pa{_w}'] = ('flat', (_rx, 32), (-_bx, _bx, 0.75, 1.0), (-_bx, _bx, 0.75, 1.0), P.make_t_pa(_w), 2, True,
-                          f'sector / wedge rim piece, {_w} deg')
+    if _w in P.PIECES_NARROW:
+        _rx = max(16, math.ceil(2 * _hw * 128 / 16) * 16)
+        _bx = _rx / 256
+        KINDS[f't_pa{_w}'] = ('flat', (_rx, 32), (-_bx, _bx, 0.75, 1.0), (-_bx, _bx, 0.75, 1.0), P.make_t_pa(_w), 2, True,
+                              f'sector / wedge rim piece, {_w} deg')
     _sx = max(16, math.ceil(2 * _hw * 64 / 16) * 16)
     _cx = _sx / 128
-    KINDS[f't_pas{_w}'] = ('flat', (_sx, 32), (-_cx, _cx, 0.5, 1.0), (-_cx, _cx, 0.5, 1.0), P.make_t_pa(_w, True), 2,
+    _y0 = 0.5 if _w <= 32 else 0.375
+    _sy = 32 if _w <= 32 else 48
+    KINDS[f't_pas{_w}'] = ('flat', (_sx, _sy), (-_cx, _cx, _y0, 1.0), (-_cx, _cx, _y0, 1.0), P.make_t_pa(_w, True), 2,
                            True, f'thick sector / wedge rim piece (r <= 3.5), {_w} deg')
+    KINDS[f't_pe{_w}'] = ('flat', (_sx, 64), (-_cx, _cx, 0.0, 1.0), (-_cx, _cx, 0.0, 1.0), P.make_t_pa(_w, True, True), 2,
+                          True, f'thick one-piece sector rim with both radial edges (r <= 3.5), {_w} deg')
 
 # Generic kinds referenced from the fg kit (the Apep item model points at the fg texture; no px of our own).
 REF = {
@@ -2051,7 +2056,7 @@ DEF_A = 'tg:"rlk_wk_c",tpd:0'          # storage a defaults: an extra tag, telep
 POOL_FX, POOL_TELE, POOL_FLOOD = 0, 1, 3
 FAKE = ('#wkInit', '#wkN', '#wkTN', '#wkDN', '#wkFN', '#wkNow', '#wkWd', '#wkC2', '#wkRoll', '#wkSpin', '#wkLife', '#wkFade',
         '#wkDly', '#wkDur', '#wkHit', '#wkTel', '#wkTr', '#wkTr0', '#wkTa', '#wkTl', '#wkTw', '#wkTb', '#wkTd', '#wkTell',
-        '#wkTEl', '#wkTnd', '#wkThold', '#wkTn', '#wkTi', '#wkTq', '#wkTP', '#wkTW', '#wkTk', '#wkTx', '#wkTs', '#wkTA0',
+        '#wkTEl', '#wkTnd', '#wkThold', '#wkTn', '#wkTe', '#wkTi', '#wkTq', '#wkTP', '#wkTW', '#wkTk', '#wkTx', '#wkTs', '#wkTA0',
         '#wkMinus1', '#wkPh', '#wk3', '#wk4', '#wk8', '#wk20', '#wkAr', '#wkAa', '#wkAd', '#wkAx', '#wkAl', '#wkFl',
         '#wkDemo', '#wkDT', '#wkHv', '#wkHk', '#wkBan', '#wkSp')
 
@@ -2248,39 +2253,48 @@ def engine(W):
 
 # ----------------------------------------------------------------------------- telegraphs
 T = FN + 'tele/e/'
-PIECE_MAX = 32                    # widest piece (degrees); a shape of F degrees is cut into ceil(F / 32) pieces
+PIECE_MAX = 32                    # widest piece (degrees) above SMALL_R; a shape of F degrees is ceil(F / 32) pieces
+PIECE_MAX_SMALL = 64              # widest piece at radii <= SMALL_R (the dip stays <= 0.14 b there)
+SMALL_R = 3.5                     # blocks: thick rims, wide pieces and the one-piece edged sector rim at or below it
 
 
 def piece_k_coeffs():
-    """per family width W: (lo, hi, A, B) with the piece width P (tenths of a degree) in (lo, hi] and the card's x
-    squeeze k(P) = tan(P / 2) / tan(W / 2) ~= (A + B P) / 1e6 (exact at both ends, convex: within 0.01 % between)"""
+    """per family width W: (lo, hi, A, B, W) with the piece width P (tenths of a degree) in (lo, hi] and the card's x
+    squeeze k(P) = tan(P / 2) / tan(W / 2) ~= (A + B P) / 1e6 (k(hi) = 1 exactly, k(lo) within 0.01 %; tan is convex so
+    the line is within 0.02 % between)"""
     out = []
     lo = 0
     for w in P.PIECES:
         hi = w * 10
         tw = math.tan(math.radians(w / 2))
         k_lo = math.tan(math.radians(lo / 20)) / tw
-        b = (1.0 - k_lo) / (hi - lo)
-        a = k_lo - b * lo
-        out.append((lo, hi, round(a * 1e6), round(b * 1e6), w))
+        b = round((1.0 - k_lo) / (hi - lo) * 1e6)
+        a = 1_000_000 - b * hi
+        out.append((lo, hi, a, b, w))
         lo = hi
     return out
 
 
-def piece_geometry(f_deg, a0=0.0):
-    """Python mirror of the fan drawing (renderer, tests): [(bearing deg, W, k)] for a shape a0 .. a0 + f_deg"""
+def piece_geometry(f_deg, r=7.2, a0=0.0):
+    """Python mirror of the fan drawing (renderer, tests): [(bearing deg, W, k)] for a shape a0 .. a0 + f_deg of radius
+    r blocks"""
     f10 = int(round(f_deg * 10))
-    n = (f10 + PIECE_MAX * 10 - 1) // (PIECE_MAX * 10)
+    m10 = (PIECE_MAX_SMALL if r <= SMALL_R + 1e-9 else PIECE_MAX) * 10
+    n = (f10 + m10 - 1) // m10
     p10 = f10 // n
-    out = []
     for lo, hi, a, b, w in piece_k_coeffs():
         if lo < p10 <= hi or (w == P.PIECES[0] and p10 <= lo):
             k = (a + b * p10) / 1e6
             break
-    for i in range(n):
-        b10 = int(round(a0 * 10)) + (f10 * (2 * i + 1)) // (2 * n)
-        out.append((b10 / 10, w, k))
-    return out
+    return [((int(round(a0 * 10)) + (f10 * (2 * i + 1)) // (2 * n)) / 10, w, k) for i in range(n)]
+
+
+def sector_cards(r, a):
+    """attack-telegraph cards of tele/sector (r blocks, half-angle a degrees)"""
+    if a >= 175:
+        return 2
+    n = len(piece_geometry(2 * a, r))
+    return 2 if n == 1 and r <= SMALL_R + 1e-9 else 2 * n + 2
 
 
 def telegraphs(W):
@@ -2295,6 +2309,7 @@ def telegraphs(W):
         '# Life = tell + hold + 1; the fill grows over tell - 1 ticks from the tick after the call, so its edge reaches',
         '# the rim on call + tell (the framework hz strike tick when both are made in the same tick with the same',
         '# tell); every card flashes (col2) on that tick.',
+        f'execute unless score #wkInit mb matches 1 run function {E}init',
         'execute if score #wkTell mb matches ..1 run scoreboard players set #wkTell mb 2',
         'execute if score #wkThold mb matches ..-1 run scoreboard players set #wkThold mb 0',
         f'data modify storage {STO} t set value {{c1:{d1},c2:{d2},c3:{d3},tg:"rlk_wk_c",tpd:0}}',
@@ -2332,6 +2347,13 @@ def telegraphs(W):
                 f'tg:"{tg}",tpd:$(tpd)}}',
                 f'function {E}make']
 
+    def fan_n():
+        """#wkTn = ceil(#wkTa / M) with M = 320 tenths, or 640 at r <= SMALL_R"""
+        return [f'scoreboard players set #wkTx mb {PIECE_MAX * 10}',
+                f'execute if score #wkTr mb matches ..{int(SMALL_R * 10)} run scoreboard players set #wkTx mb {PIECE_MAX_SMALL * 10}',
+                'scoreboard players operation #wkTn mb = #wkTa mb', 'scoreboard players operation #wkTn mb += #wkTx mb',
+                'scoreboard players remove #wkTn mb 1', 'scoreboard players operation #wkTn mb /= #wkTx mb']
+
     jump = ['execute if score #wkTnd mb matches 2 run function ' + T + 'jump with storage ' + STO + ' t']
     W.w('tele/e/jump', ['# Internal (macro, storage t): the jump chevron of nd 2 at the decal centre (tinted the rim).',
                         *mk('t_jump', '~ ~0.05 ~', '0.6f,1f,0.6f', '1.3f,1f,1.3f', 'c1')])
@@ -2357,22 +2379,24 @@ def telegraphs(W):
     for lo, hi, a, b, w in piece_k_coeffs():
         cond = f'{lo + 1}..{hi}' if lo else f'..{hi}'
         sel.append(f'execute if score #wkTP mb matches {cond} run function {T}kw{w}')
+        pa = f't_pa{w}' if w in P.PIECES_NARROW else f't_pas{w}'
         W.w(f'tele/e/kw{w}', [f'# Internal: pieces of family width {w} deg: k(P) = ({a} + {b} P) / 1e6 (P in tenths).',
                               f'scoreboard players set #wkTW mb {w}', f'scoreboard players set #wkTk mb {b}',
                               'scoreboard players operation #wkTk mb *= #wkTP mb',
                               f'scoreboard players {"add" if a >= 0 else "remove"} #wkTk mb {abs(a)}',
-                              f'data modify storage {STO} t merge value {{pf:"t_pf{w}",pa:"t_pa{w}",pas:"t_pas{w}"}}'])
+                              f'data modify storage {STO} t merge value {{pf:"t_pf{w}",pa:"{pa}",pas:"t_pas{w}",pe:"t_pe{w}"}}'])
     W.w('tele/e/fan', [
         '# Internal: draw the fan from #wkTA0 (start, tenths of a degree relative to the executor yaw) over #wkTa',
-        '# (the full angle, tenths) with radius #wkTr (and inner #wkTr0 when >= 10): n = ceil(F / 32 deg) equal pieces',
-        '# of width P, each the family piece W >= P squeezed across by k = tan(P / 2) / tan(W / 2), so the drawn edges',
-        '# are exactly P apart and every arc stays at or inside the radius (ap_fx_api.md §3.2).',
-        f'scoreboard players operation #wkTn mb = #wkTa mb', f'scoreboard players add #wkTn mb {PIECE_MAX * 10 - 1}',
-        f'scoreboard players set #wkTx mb {PIECE_MAX * 10}', 'scoreboard players operation #wkTn mb /= #wkTx mb',
+        '# (the full angle, tenths) with radius #wkTr (and inner #wkTr0 when >= 10): n = ceil(F / M) equal pieces of',
+        f'# width P (M = {PIECE_MAX} deg, {PIECE_MAX_SMALL} at r <= {SMALL_R}), each the family piece W >= P squeezed across by',
+        '# k = tan(P / 2) / tan(W / 2), so the drawn edges are exactly P apart and every arc stays at or inside the',
+        '# radius (ap_fx_api.md §3.2). #wkTe 0 = a one-piece small sector: its rim piece carries both edges.',
+        *fan_n(),
         'scoreboard players operation #wkTP mb = #wkTa mb', 'scoreboard players operation #wkTP mb /= #wkTn mb',
         *sel,
         f'data modify storage {STO} t.pr set from storage {STO} t.pa',
-        f'execute if score #wkTr mb matches ..35 run data modify storage {STO} t.pr set from storage {STO} t.pas',
+        f'execute if score #wkTr mb matches ..{int(SMALL_R * 10)} run data modify storage {STO} t.pr set from storage {STO} t.pas',
+        f'execute if score #wkTe mb matches 0 run data modify storage {STO} t.pr set from storage {STO} t.pe',
         'scoreboard players operation #wkTs mb = #wkTk mb', 'scoreboard players operation #wkTs mb *= #wkTr mb',
         f'execute store result storage {STO} t.sx float 0.0000001 run scoreboard players get #wkTs mb',
         f'execute store result storage {STO} t.r float 0.1 run scoreboard players get #wkTr mb',
@@ -2410,17 +2434,17 @@ def telegraphs(W):
                              off='0.12f,0f,0f')])
 
     def fan_need():
-        """#wkTq = the cards the fan will make (2 per piece, + 1 per piece with an inner rim, + edges + chevron)"""
-        return [f'scoreboard players operation #wkTn mb = #wkTa mb', f'scoreboard players add #wkTn mb {PIECE_MAX * 10 - 1}',
-                f'scoreboard players set #wkTx mb {PIECE_MAX * 10}', 'scoreboard players operation #wkTn mb /= #wkTx mb',
-                'scoreboard players operation #wkTq mb = #wkTn mb', 'scoreboard players operation #wkTq mb += #wkTn mb',
+        """#wkTq = #wkTN + the cards the fan will make (2 per piece, + 1 per piece with an inner rim)"""
+        return [*fan_n(), 'scoreboard players operation #wkTq mb = #wkTn mb', 'scoreboard players operation #wkTq mb += #wkTn mb',
                 'execute if score #wkTr0 mb matches 10.. run scoreboard players operation #wkTq mb += #wkTn mb',
                 'scoreboard players operation #wkTq mb += #wkTN mb']
     W.w('tele/sector', [
         '# Sector decal: {r (tenths), a:<half-angle, any integer 1..180, drawn within 1 degree>, tell, el, nd, hold}.',
-        '# At the apex, rotated = the aim (yaw). a >= 175 draws a disc. Fill + rim-arc pieces (2 per 32 degrees) and two',
-        '# edge bars: a 78-degree hit-1 sector is 12 cards, a 27-degree cone 6. Skipped when it would pass the cap.',
-        *head(['$scoreboard players set #wkTr mb $(r)', '$scoreboard players set #wkTa mb $(a)'], need=4),
+        '# At the apex, rotated = the aim (yaw). a >= 175 draws a disc. Fill + rim-arc pieces (2 per 32 degrees, 64 at',
+        f'# r <= {SMALL_R}) and two edge bars; a one-piece sector of r <= {SMALL_R} paints its edges into the rim: a 78-degree',
+        '# P6 hit 1 (r 7.2) is 12 cards, the 27-degree O1 cone (r 3.1) and the 24-degree O6b bite 2. Skipped when it',
+        '# would pass the cap.',
+        *head(['$scoreboard players set #wkTr mb $(r)', '$scoreboard players set #wkTa mb $(a)'], need=2),
         'execute if score #wkTa mb matches 175.. run return run function ' + T + 'sector_disc with storage ' + STO + ' t',
         'execute if score #wkTa mb matches ..0 run scoreboard players set #wkTa mb 1',
         'execute if score #wkTr mb matches ..1 run scoreboard players set #wkTr mb 2',
@@ -2431,10 +2455,13 @@ def telegraphs(W):
         f'execute store result storage {STO} t.e0 float -1 run scoreboard players get #wkTa mb',
         f'execute store result storage {STO} t.e1 float 1 run scoreboard players get #wkTa mb',
         'scoreboard players set #wkTx mb 20', 'scoreboard players operation #wkTa mb *= #wkTx mb',
-        *fan_need(), 'scoreboard players add #wkTq mb 2',
+        *fan_need(),
+        'scoreboard players set #wkTe mb 1',
+        f'execute if score #wkTn mb matches 1 if score #wkTr mb matches ..{int(SMALL_R * 10)} run scoreboard players set #wkTe mb 0',
+        'execute if score #wkTe mb matches 1 run scoreboard players add #wkTq mb 2',
         f'execute if score #wkTq mb matches {TCAP + 1}.. run return 0',
         f'function {T}fan',
-        f'function {T}edges with storage {STO} t',
+        f'execute if score #wkTe mb matches 1 run function {T}edges with storage {STO} t',
     ])
     W.w('tele/e/sector_disc', ['# Internal (macro): a >= 175 draws the disc of radius r.',
                                f'execute store result storage {STO} t.r float 0.1 run scoreboard players get #wkTr mb',
@@ -2457,6 +2484,7 @@ def telegraphs(W):
         'scoreboard players set #wkTx mb 10', 'scoreboard players operation #wkTA0 mb *= #wkTx mb',
         'scoreboard players operation #wkTa mb *= #wkTx mb',
         *fan_need(),
+        'scoreboard players set #wkTe mb 1',
         f'execute if score #wkTq mb matches {TCAP + 1}.. run return 0',
         f'function {T}fan',
     ])
@@ -2646,6 +2674,7 @@ def dress_funcs(W):
         '# The Heart\'s gold swirl ring: {r (tenths)}. At the arena centre (T1 t45 -> CS t24). Replaces an earlier swirl;',
         f'# remembered in storage {STO} dress.swirl for dress/redraw. 2 cards of the dressing pool (never aged).',
         f'$data modify storage {STO} dress.swirl set value {{r:$(r)}}',
+        f'execute unless score #wkInit mb matches 1 run function {E}init',
         f'kill {SEL}_dsw]',
         '$scoreboard players set #wkTr mb $(r)',
         f'execute store result storage {STO} dress.s.d float 0.1 run scoreboard players get #wkTr mb',
@@ -2670,6 +2699,7 @@ def dress_funcs(W):
            f'# strips from r {LEY_R0} to r {LEY_R1} on the absolute bearings {LEY_BEARINGS} (the first n). Replaces',
            f'# earlier strips; remembered in storage {STO} dress.ley for dress/redraw. n cards of the dressing pool.',
            f'$data modify storage {STO} dress.ley set value {{n:$(n)}}',
+           f'execute unless score #wkInit mb matches 1 run function {E}init',
            f'kill {SEL}_dly]', '$scoreboard players set #wkTn mb $(n)',
            'execute if score #wkTn mb matches ..5 run scoreboard players set #wkTn mb 6',
            'execute if score #wkTn mb matches 9.. run scoreboard players set #wkTn mb 8']
@@ -2982,6 +3012,7 @@ def _demos():
                *[_ev(ts + d, 'floor', snd('p3_wheel_roll')) for d in range(0, 14, 4)],
                *[_ev(ts + d, 'wheel', f('homing_trail')) for d in range(6, 28, 2)], _ev(ts + 16, 'wheel', snd('p3_homing_loop')),
                _ev(ts + 28, 'wheel', f('wheel_pop'))]
+    ev.append(_ev(slams[0][1] + 20, 'player', snd('p3_wheel_hit')))
     D['glow'] = sum(ev, [])
     D['wither'] = sum([
         _ev(0, 'body', snd('p4_rear')), _ev(16, 'floor', tele_disc(9.0, 24, el=23, hold=31), snd('p4_hum')),
@@ -3010,7 +3041,7 @@ def _demos():
         *[_ev(t, 'floor', f('gold_motes')) for t in (60, 80, 100, 120)]], [])
     D['organisms'] = sum([
         _ev(0, 'org0', tele_sector(3.1, 27, 10)), _ev(10, 'org0', snd('o1_attack')), _ev(10, 'bulbT1', f('heart_hit'), snd('heart_hit')),
-        _ev(20, 'org1', snd('o2_pivot'), tele_line(6.0, 1.4, 12)), _ev(23, 'org1', f('crown_flare'), snd('o2_charge')),
+        _ev(20, 'org1', snd('o2_pivot'), tele_line(6.0, 1.4, 12), f('spark')), _ev(23, 'org1', f('crown_flare'), snd('o2_charge')),
         _ev(32, 'org1', snd('o2_shoot')), *[_ev(t, 'bolt', f('comet_trail')) for t in range(32, 42, 2)], _ev(42, 'org1', snd('o2_hit')),
         _ev(40, 'org2', snd('o3_collapse')), _ev(56, 'org2', snd('o3_collapse')), _ev(70, 'org0', snd('o3_cast'), f('shield_pop'), snd('o3_pop')),
         _ev(74, 'org0', snd('shield_hit')), _ev(90, 'org2', f('guard_death'), snd('o3_death')),
@@ -3022,10 +3053,11 @@ def _demos():
         _ev(140, 'org5', snd('o6_gulp'), snd('o6_bud')), _ev(160, 'org5', tele_disc(3.6, 10), snd('o6_inflate')),
         _ev(170, 'org5', f('pred_burst'), snd('o6_burst')),
         _ev(180, 'org5', tele_sector(2.6, 24, 10)), _ev(190, 'org5', f('bite_flash'), snd('o6_bite_first')), _ev(196, 'org5', snd('o6_swim')),
+        _ev(198, 'org5', tele_sector(2.6, 24, 10)), _ev(208, 'org5', f('bite_flash'), snd('o6_bite')),
         _ev(200, 'org6', snd('o7_roll')), _ev(208, 'org6', tele_disc(3.6, 61), snd('o7_primed'), f('fuse_pulse')),
         *[_ev(t, 'org6', f('fuse_pulse')) for t in (217, 226, 235, 244, 253, 257, 261, 265)],
         _ev(264, 'org6', snd('o7_suck')), _ev(269, 'org6', f('blast_dome'), snd('o7_blast')),
-        _ev(150, 'org0', f('org_burst'), snd('org_kill')), _ev(150, 'bulbT1', f('heart_gain'), snd('heart_gain')),
+        _ev(150, 'org0', f('org_burst'), snd('org_kill')), _ev(150, 'bulbT1', f('heart_gain'), f('flash'), snd('heart_gain')),
         _ev(250, 'floor', snd('timeout_warn'), hud('title', g='warn', t='!', c='#C36E5A', s='시간이 얼마 남지 않았습니다', hold=40))], [])
     D['failure'] = sum([_ev(0, 'floor', f('shock_ring'), snd('fail_strike'),
                             hud('title', g='fail', t='「소생 실패」', c='#C36E5A', s='다시 한 번 실패하면 쓰러집니다', hold=60)),
@@ -3281,7 +3313,7 @@ def manifest():
         'badges': {k: {'name': v[0], 'colour': v[1]} for k, v in BADGES.items()},
         'palettes': {str(k): [f'#{c:06X}' for c in v] for k, v in TELE_COL.items()},
         'nd_rim': f'#{ND_RIM:06X}',
-        'pieces': {'family': list(P.PIECES), 'max': PIECE_MAX,
+        'pieces': {'family': list(P.PIECES), 'max': PIECE_MAX, 'max_small_r': PIECE_MAX_SMALL, 'small_r': SMALL_R,
                    'k': [{'lo': lo, 'hi': hi, 'A': a, 'B': b, 'W': w} for lo, hi, a, b, w in piece_k_coeffs()]},
         'flood_cells': len(flood_cells()), 'dome_tag': DOME_TAG, 'dome_skip': DOME_SKIP,
         'demos': {k: DEMO_LEN[k] for k in DEMOS},

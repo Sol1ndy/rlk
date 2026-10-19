@@ -209,11 +209,14 @@ def _fill(r):
     return WHITE + (0.26 + 0.18 * (r / 0.85) ** 2,)
 
 
-# Sector / wedge pieces. A shape of full angle F is drawn as n = ceil(F / 32) equal pieces of width P = F / n; each
-# piece is the family member W >= P (PIECES) squeezed across by k = tan(P / 2) / tan(W / 2) (the card's x scale), which
-# keeps its two edges exactly P apart and its arc at radius 1 on the centre line; the arc dips by at most
-# cos(W / 2) / cos(P / 2) at the edges (<= 1.2 % for this family), so a piece never reaches beyond its hazard.
-PIECES = (2, 4, 8, 16, 22, 27, 32)
+# Sector / wedge pieces. A shape of full angle F is drawn as n = ceil(F / M) equal pieces of width P = F / n (M = 32
+# degrees, or 64 for radii <= 3.5 b); each piece is the family member W >= P (PIECES) squeezed across by
+# k = tan(P / 2) / tan(W / 2) (the card's x scale), which keeps its two edges exactly P apart and its arc at radius 1 on
+# the centre line; the arc dips by cos(W / 2) / cos(P / 2) at the edges (<= 1.2 % up to 32 degrees, <= 4 % for the wide
+# small-radius pieces, at most 0.14 b), so a piece never reaches beyond its hazard. A one-piece sector of radius
+# <= 3.5 b draws its rim with both radial edges painted in (t_pe), so a small cone is two cards.
+PIECES = (2, 4, 8, 16, 22, 27, 32, 40, 48, 56, 64)
+PIECES_NARROW = tuple(w for w in PIECES if w <= 32)
 
 
 def piece_half_width(w_deg):
@@ -233,7 +236,7 @@ def make_t_pf(w_deg):
     return fill
 
 
-def make_t_pa(w_deg, thick=False):
+def make_t_pa(w_deg, thick=False, edges=False):
     half = w_deg / 2
     bands = RIM_BANDS_S if thick else RIM_BANDS
 
@@ -241,9 +244,21 @@ def make_t_pa(w_deg, thick=False):
         phi = math.degrees(math.atan2(a, b))
         if abs(phi) > half or b <= 0:
             return CLEAR
-        return _band(math.hypot(a, b), bands)
+        r = math.hypot(a, b)
+        if edges and r < 0.99:
+            # the radial edges, drawn just inside the piece: a white core and a dark outline toward the inside
+            t = math.radians(half)
+            inward = min(r * math.sin(t - math.radians(abs(phi))), 9.0)
+            if inward < 0.045:
+                return WHITE + (1.0,)
+            if inward < 0.075:
+                return DARK + (0.92,)
+        if r < 0.05 and edges:
+            return DARK + (1.0,)
+        return _band(r, bands)
     rim.__doc__ = (f'Sector / wedge rim-arc piece, full angle {w_deg} deg' + (' (thick, r <= 3.5)' if thick else '') +
-                   ': dark outline, tinted band, dark inner line; no radial edges (the shape\'s edges are t_bar cards).')
+                   (', both radial edges painted (a one-piece small sector)' if edges else
+                    ': dark outline, tinted band, dark inner line; no radial edges (t_bar cards draw them)') + '.')
     return rim
 
 

@@ -4,6 +4,7 @@
 # Life = tell + hold + 1; the fill grows over tell - 1 ticks from the tick after the call, so its edge reaches
 # the rim on call + tell (the framework hz strike tick when both are made in the same tick with the same
 # tell); every card flashes (col2) on that tick.
+execute unless score #wkInit mb matches 1 run function rlk:mboss/apep/fx/e/init
 execute if score #wkTell mb matches ..1 run scoreboard players set #wkTell mb 2
 execute if score #wkThold mb matches ..-1 run scoreboard players set #wkThold mb 0
 data modify storage rlk:apkit t set value {c1:5147166,c2:10933338,c3:15859666,tg:"rlk_wk_c",tpd:0}

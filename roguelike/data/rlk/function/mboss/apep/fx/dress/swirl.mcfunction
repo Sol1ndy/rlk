@@ -2,6 +2,7 @@
 # The Heart's gold swirl ring: {r (tenths)}. At the arena centre (T1 t45 -> CS t24). Replaces an earlier swirl;
 # remembered in storage rlk:apkit dress.swirl for dress/redraw. 2 cards of the dressing pool (never aged).
 $data modify storage rlk:apkit dress.swirl set value {r:$(r)}
+execute unless score #wkInit mb matches 1 run function rlk:mboss/apep/fx/e/init
 kill @e[type=minecraft:item_display,tag=rlk_wk_dsw]
 $scoreboard players set #wkTr mb $(r)
 execute store result storage rlk:apkit dress.s.d float 0.1 run scoreboard players get #wkTr mb

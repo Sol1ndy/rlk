@@ -36,6 +36,7 @@ scoreboard players reset #wkTEl mb
 scoreboard players reset #wkTnd mb
 scoreboard players reset #wkThold mb
 scoreboard players reset #wkTn mb
+scoreboard players reset #wkTe mb
 scoreboard players reset #wkTi mb
 scoreboard players reset #wkTq mb
 scoreboard players reset #wkTP mb

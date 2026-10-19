@@ -4,4 +4,4 @@ scoreboard players set #wkTW mb 2
 scoreboard players set #wkTk mb 50000
 scoreboard players operation #wkTk mb *= #wkTP mb
 scoreboard players add #wkTk mb 0
-data modify storage rlk:apkit t merge value {pf:"t_pf2",pa:"t_pa2",pas:"t_pas2"}
+data modify storage rlk:apkit t merge value {pf:"t_pf2",pa:"t_pa2",pas:"t_pas2",pe:"t_pe2"}

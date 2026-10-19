@@ -3,6 +3,7 @@
 # strips from r 1.8 to r 14.0 on the absolute bearings (12, 58, 104, 152, 197, 243, 290, 333) (the first n). Replaces
 # earlier strips; remembered in storage rlk:apkit dress.ley for dress/redraw. n cards of the dressing pool.
 $data modify storage rlk:apkit dress.ley set value {n:$(n)}
+execute unless score #wkInit mb matches 1 run function rlk:mboss/apep/fx/e/init
 kill @e[type=minecraft:item_display,tag=rlk_wk_dly]
 $scoreboard players set #wkTn mb $(n)
 execute if score #wkTn mb matches ..5 run scoreboard players set #wkTn mb 6

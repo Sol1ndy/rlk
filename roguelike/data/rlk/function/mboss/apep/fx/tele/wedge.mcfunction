@@ -22,13 +22,16 @@ execute if score #wkTr0 mb >= #wkTr mb run scoreboard players set #wkTr0 mb 0
 scoreboard players set #wkTx mb 10
 scoreboard players operation #wkTA0 mb *= #wkTx mb
 scoreboard players operation #wkTa mb *= #wkTx mb
-scoreboard players operation #wkTn mb = #wkTa mb
-scoreboard players add #wkTn mb 319
 scoreboard players set #wkTx mb 320
+execute if score #wkTr mb matches ..35 run scoreboard players set #wkTx mb 640
+scoreboard players operation #wkTn mb = #wkTa mb
+scoreboard players operation #wkTn mb += #wkTx mb
+scoreboard players remove #wkTn mb 1
 scoreboard players operation #wkTn mb /= #wkTx mb
 scoreboard players operation #wkTq mb = #wkTn mb
 scoreboard players operation #wkTq mb += #wkTn mb
 execute if score #wkTr0 mb matches 10.. run scoreboard players operation #wkTq mb += #wkTn mb
 scoreboard players operation #wkTq mb += #wkTN mb
+scoreboard players set #wkTe mb 1
 execute if score #wkTq mb matches 41.. run return 0
 function rlk:mboss/apep/fx/tele/e/fan
