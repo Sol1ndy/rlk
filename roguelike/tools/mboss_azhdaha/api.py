@@ -548,10 +548,15 @@ class KitStub:
 
     def badge(self, el, lit):
         """Name-line badge ◈<element> (fx.md 7): dim #707070 until lit, then the element colour (plain text here)."""
-        nm = {1: '불', 2: '물', 3: '번개', 4: '얼음', 5: '바위', 9: '낙인'}.get(int(el), '?')
-        col = ({1: '#FF8A3D', 2: '#4FB8FF', 3: '#C58BFF', 4: '#9FE8F5', 5: '#F0A93A', 9: '#FF6A4A'}.get(int(el), '#FFFFFF')
+        nm = {1: '불', 2: '물', 3: '번개', 4: '얼음', 5: '바위'}.get(int(el), '?')
+        col = ({1: '#FF8A3D', 2: '#4FB8FF', 3: '#C58BFF', 4: '#9FE8F5', 5: '#F0A93A'}.get(int(el), '#FFFFFF')
                if lit else '#707070')
         return f'{{text:"  ◈{nm}",color:"{col}",bold:false}}'
+
+    def brand_badge(self, el):
+        """The third badge ◈낙인 while branded, in the brand element's colour (az_fx_api.md K.brand_badge)."""
+        col = {1: '#FF8A3D', 2: '#4FB8FF', 3: '#C58BFF', 4: '#9FE8F5', 5: '#F0A93A'}.get(int(el), '#FFFFFF')
+        return f'{{text:"  ◈낙인",color:"{col}",bold:false}}'
 
 
 try:

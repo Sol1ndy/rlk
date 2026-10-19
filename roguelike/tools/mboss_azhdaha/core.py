@@ -1217,7 +1217,10 @@ class Core:
             x, y, z = pr['pos']
             sc_ = pr.get('scale', 1.0)
             sx, sy, sz = (sc_, sc_, sc_) if not isinstance(sc_, (list, tuple)) else sc_
-            rot = '[0.7071f,0f,0f,0.7071f]' if pr['kind'] == 'water_sheet' else '[0f,0f,0f,1f]'
+            # the vanilla pane stand-in stands upright, so it is laid flat (90 deg about x); the kit's az_kit/water model is
+            # already a horizontal plane (requests/arena.md 8), so with the kit the rotation is dropped
+            flat = pr['kind'] == 'water_sheet' and not A.KIT
+            rot = '[0.7071f,0f,0f,0.7071f]' if flat else '[0f,0f,0f,1f]'
             props.append(f'execute in minecraft:overworld run summon minecraft:item_display {L.num(x, 3)} {L.num(y, 3)} {L.num(z, 3)} '
                          f'{{Tags:["rlk_mb_aux","rlk_mb_arena_prop","rlk_mb_ar_{aid}","rlk_mb_az_ap","rlk_mb_az_ap_{pr["group"]}"],'
                          f'Rotation:[{L.num(float(pr.get("yaw", 0.0)))}f,{L.num(float(pr.get("pitch", 0.0)))}f],billboard:"fixed",'
@@ -1288,7 +1291,9 @@ class Core:
         for e in A.TAIL_ELS:
             ex.append(f'execute if score #azTail mb matches {e} unless score #azPh mb matches 3 run data modify storage rlk:mboss extra append value {K.badge(e, False)}')
             ex.append(f'execute if score #azTail mb matches {e} if score #azPh mb matches 3 run data modify storage rlk:mboss extra append value {K.badge(e, True)}')
-        ex.append(f'execute if entity @a[tag=player,scores={{azBrT=1..}}] run data modify storage rlk:mboss extra append value {K.badge(9, True)}')
+        for e in (1, 2, 3, 4):           # the third badge in the brand element's colour (K.brand_badge, az_fx_api.md)
+            ex.append(f'execute if entity @a[tag=player,scores={{azBrT=1..,azBrE={e}}}] run data modify storage rlk:mboss extra append '
+                      f'value {K.brand_badge(e)}')
         self.w('hud/extra', ex)
         sub = ['# The sub-line (plan 4.11), first match: intro name, "마지막 일격!", the jump cue, B3 "꼬리만 공격할 수 있습니다",',
                '# the transition message, a hint, the running pattern; then the brand part and any pattern-provided part',

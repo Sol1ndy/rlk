@@ -9,4 +9,7 @@ execute if score #azTail mb matches 3 unless score #azPh mb matches 3 run data m
 execute if score #azTail mb matches 3 if score #azPh mb matches 3 run data modify storage rlk:mboss extra append value {text:"  ◈번개",color:"#C58BFF",bold:false}
 execute if score #azTail mb matches 4 unless score #azPh mb matches 3 run data modify storage rlk:mboss extra append value {text:"  ◈얼음",color:"#707070",bold:false}
 execute if score #azTail mb matches 4 if score #azPh mb matches 3 run data modify storage rlk:mboss extra append value {text:"  ◈얼음",color:"#9FE8F5",bold:false}
-execute if entity @a[tag=player,scores={azBrT=1..}] run data modify storage rlk:mboss extra append value {text:"  ◈낙인",color:"#FF6A4A",bold:false}
+execute if entity @a[tag=player,scores={azBrT=1..,azBrE=1}] run data modify storage rlk:mboss extra append value {text:"  ◈낙인",color:"#FF8A3D",bold:false}
+execute if entity @a[tag=player,scores={azBrT=1..,azBrE=2}] run data modify storage rlk:mboss extra append value {text:"  ◈낙인",color:"#4FB8FF",bold:false}
+execute if entity @a[tag=player,scores={azBrT=1..,azBrE=3}] run data modify storage rlk:mboss extra append value {text:"  ◈낙인",color:"#C58BFF",bold:false}
+execute if entity @a[tag=player,scores={azBrT=1..,azBrE=4}] run data modify storage rlk:mboss extra append value {text:"  ◈낙인",color:"#9FE8F5",bold:false}
