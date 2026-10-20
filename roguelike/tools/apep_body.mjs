@@ -509,7 +509,7 @@ function coreP1() {
 // ---- abdomen (joint J_ABD): the rear body hull, back plates rising into spiky leaf points (v1 f720), belly scales ----------
 function abdomenP1() {
   const J = J_ABD, els = [];
-  els.push(...wrapLoft('p1_abd_wrap', 'z', hullSt(J, [.62, .95, 1.4, 1.9, 2.45, 2.95], .95, 3.2), (th, a) => p1Hull('ab')(th, a + J[2]), {caps: '+', seed: 501, forms: 'p1'}));
+  els.push(...wrapLoft('p1_abd_wrap', 'z', hullSt(J, [.62, .99, 1.4, 1.9, 2.45, 2.95], .95, 3.2)/* AP-R3: station 0.99, off the chest's 0.95 ledge (coplanar ledges) */, (th, a) => p1Hull('ab')(th, a + J[2]), {caps: '+', seed: 501, forms: 'p1'}));
   // two rows of back plates, the rear ones lifting into points (plane y, pitched up at the back) + flank points
   const ps = card('p1_plate_y', UR, (u, v) => p1PlatePaint(u, -v), 32, 'p1', 'unique', 'y');
   const pz = card('p1_plate_z', UR, p1PlatePaint, 32, 'p1');
@@ -700,7 +700,7 @@ function chestP3() {
 // gems in raised dark frames on both shoulders (v6 f90 / v5 f450)
 function shouldersP3() {
   const J = J3_SH, els = [];
-  els.push(...wrapLoft('p3_sh_wrap', 'y', torsoSt(J, [4.6, 4.85, 5.25, 5.6, 5.9, 6.15], 4.85, 9), (th, a) => p3Torso(th, a + J[1], 'sh'), {forms: 'p3', seed: 601, caps: '+', ppb: 32}));
+  els.push(...wrapLoft('p3_sh_wrap', 'y', torsoSt(J, [4.6, 4.92, 5.25, 5.6, 5.9, 6.15], 4.85, 9)/* AP-R3: 4.92, off the chest's 4.85 station (coplanar facets) */, (th, a) => p3Torso(th, a + J[1], 'sh'), {forms: 'p3', seed: 601, caps: '+', ppb: 32}));
   const half = [];
   const gy = 5.62 - J[1], gz = -.48 - J[2], gx = .98;
   half.push(rockBox([gx - .2, gy - .2, gz - .12], [gx + .2, gy + .2, gz + .08], 'g_plate', {seed: 602, rot: ['y', -22.5, [gx, gy, gz]]}));

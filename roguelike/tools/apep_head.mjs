@@ -701,7 +701,8 @@ const HAIR_P3 = {
     pts: [[.36, 8.48, -.8], [.76, 8.3, -1.06], [1.16, 7.86, -1.22], [1.43, 7.2, -1.26], [1.53, 6.5, -1.2], [1.5, 5.82, -1.12]]},
   outer2: {seg: [2], lime: false, cuts: [0, .5, 1],
     w: t => .02 + .2 * Math.pow(Math.sin(Math.PI * Math.min(1, .1 + t * .9)), .8),
-    pts: [[1.28, 6.12, -1.14], [1.5, 5.5, -1.08], [1.76, 4.88, -.98], [1.92, 4.3, -.9]]},
+    // AP-R3: the strand passes in front of the B upper arm (its leaf cladding reaches z -1.18 at x 1.2-2.2), not through it
+    pts: [[1.28, 6.12, -1.18], [1.5, 5.5, -1.33], [1.74, 4.88, -1.37], [1.9, 4.3, -1.26]]},
   inner: {seg: [1, 2], lime: true, cut: 4,
     w: t => .04 + .17 * Math.pow(Math.sin(Math.PI * Math.min(1, .08 + t * .95)), .5),
     pts: [[.6, 8.02, -1.14], [.86, 7.56, -1.31], [.98, 6.9, -1.36], [.93, 6.3, -1.37], [.9, 5.96, -1.37],
@@ -734,7 +735,9 @@ tile('hd_p3_hairout', 16, 16, 32, (u, v) => PAL.p3_hair(clamp(.7 + .1 * N.b(u * 
 tile('hd_p3_hairin', 16, 16, 32, (u, v) => mix(PAL.p3_lime(.5), PAL.p3_hair(.45), .4), 'p3');
 const DRAPE_P1 = {
   // from under the ear flare the ribbon sweeps out and down over the long arm, then falls to the ground and splays (v2 f2076)
-  pts: [[.98, 3.28, -2.62], [1.5, 2.98, -2.72], [2.02, 2.52, -2.8], [2.4, 1.98, -2.84], [2.62, 1.38, -2.86], [2.8, .78, -2.88], [2.98, .28, -2.92], [3.12, .1, -2.96]],
+  // AP-R3: the ribbon falls in front of the R2 front leg (its root base reaches z -3.7 at the foot) and the hump front, not
+  // through them; it ends on the ground outside the front petals
+  pts: [[.98, 3.28, -2.72], [1.5, 2.98, -2.98], [2.0, 2.52, -3.2], [2.36, 1.98, -3.38], [2.6, 1.38, -3.55], [2.78, .78, -3.82], [2.95, .3, -3.98], [3.08, .12, -4.05]],
   cut: 3, w: t => .13 + .2 * Math.pow(Math.sin(Math.PI * Math.min(1, .2 + .85 * t)), .6) + .08 * Math.pow(t, 4),
 };
 const drapeP1Paint = ({t, s, d}) => {

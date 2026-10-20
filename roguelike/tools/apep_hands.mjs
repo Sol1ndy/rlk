@@ -214,10 +214,11 @@ const bladeShape = (L, W, phi = 0, {m = .4, r0 = .7, p = 1.4, q = .9, hook = 0} 
 const FING = [[.25, .28, 7, 1.16, .15, -.05], [-.03, .31, -4, 1.24, .17, 0], [-.31, .27, -15, 1.1, .16, .05]];
 const clawParts = k => {
   const F = FING.map(([a0, s0, deg, L, W, hook]) => { const sd = bladeShape(L * k, W, deg * D2R, {hook}); return {a0, s0, deg, L: L * k, sd: (a, s) => sd(a - a0, s - s0)}; });
-  const palm = sdPoly([[-.18, -.3], [.14, -.3], [.24, .2], [.3, .55], [-.46, .55], [-.4, .18]]);
+  // AP-R3: the palm root, the back plate and the cuff meet the forearm at the shared 1.0 b wrist (the forearm paddle tapers to it)
+  const palm = sdPoly([[-.46, -.3], [.4, -.3], [.42, .12], [.34, .55], [-.5, .55], [-.48, .12]]);
   const T = FING.map(([a0, s0, deg, , W]) => { const sd = bladeShape(.3 * k + .08, .7 * W, deg * D2R, {m: .3, r0: .9, p: 2, q: .6}); return (a, s) => sd(a - a0, s - s0 + .12); });
-  const back = sdPoly([[-.25, .02], [.22, .02], [.28, .4], [-.37, .4]]);
-  const cuff = sdPoly([[-.17, -.24], [.13, -.24], [.2, .12], [-.26, .12]]);
+  const back = sdPoly([[-.4, .02], [.36, .02], [.32, .4], [-.42, .4]]);
+  const cuff = sdPoly([[-.42, -.24], [.38, -.24], [.4, .12], [-.44, .12]]);
   return {F, sd: sdUnion((a, s) => palm(a, s) - .05, ...F.map(f => f.sd)), cover: sdUnion((a, s) => back(a, s) - .05, ...T), cuff: (a, s) => cuff(a, s) - .05};
 };
 // pale bark: each finger folded along its axis (a lit half, a shaded half, a dark crease), contour lines running inside
@@ -347,8 +348,11 @@ function petalFoot(k, back, curl) {
   els.push(...sheet({o: [0, curl ? -.02 : .0, cz], U: '+x', R: '-z', N: '+y', rect: {a0: -.32 * k, a1: .32 * k, s0: -.32 * k, s1: .32 * k}, sd: disc,
     tex: sheetSprite(`h_palm${k < 1 ? 'c' : 'b'}`, {a0: -.32 * k, a1: .32 * k, s0: -.32 * k, s1: .32 * k}, petalPaint(disc, {a: 0, s: -.3 * k, da: 0, ds: 1, L: .6 * k}, {root: .01, base: .2}), 40, 'p1'),
     edge, bands: [{s: -.32 * k, ang: 0, half: .05}], seed: 431, cell: .1}));
-  els.push(rockBox([-.14 * k, .03, cc - .14 * k], [.14 * k, .1, cc + .14 * k], 'g_plate', {seed: 432}));
-  els.push(...spike([0, .1, cc], .14 * k, spikeSprite('h_spk_cream1', PAL.p1_cone, 'p1')));
+  // AP-R3: the planted foot's cone stands on the petals in front of the R2 leg's root base (radius ~0.65 b round the
+  // bone), where v2 f2076 shows it; the lifted (curl) foot keeps it on the ankle
+  const [cx, cy, cz2] = curl ? [0, .03, cc] : [(back ? .55 : -.55) * k, -.37, cz + (back ? .62 : -.62) * k];   // front feet: the inner side (the drape falls outside)
+  els.push(rockBox([cx - .14 * k, cy, cz2 - .14 * k], [cx + .14 * k, cy + .07, cz2 + .14 * k], 'g_plate', {seed: 432}));
+  els.push(...spike([cx, cy + .07, cz2], .14 * k, spikeSprite('h_spk_cream1', PAL.p1_cone, 'p1')));
   return els;
 }
 

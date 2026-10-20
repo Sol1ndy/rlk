@@ -455,8 +455,8 @@ function p1(seg) {
       [.36, [.29, .56, .22, .54], [.09, 0]],
       [.56, [.28, .59, .21, .57], [.1, 0]],                  // the second panel (the overlap past the bone middle)
       [.74, [.27, .62, .2, .6], [.08, 0]],
-      [.88, [.26, .65, .19, .63], [.05, 0]],
-      [1.02, [.25, .67, .18, .65], [.03, 0]],                // the paddle under the claw
+      [.88, [.26, .58, .19, .56], [.05, 0]],
+      [1.02, [.24, .5, .17, .49], [.03, 0]],                 // AP-R3: tapers to the shared 1.0 b wrist over the claw
     ], ARM1, 1, rimP1, {seed: 320}).concat(
       // two pale shell plates over the forearm's top, overlapping toward the claw
       leafPlate('x', .44, {u0: -.5, u1: .5, v0: -.5 * L, v1: -.02 * L}, null, PLATE1P, 'l1_rim'),
