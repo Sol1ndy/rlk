@@ -245,7 +245,7 @@
       "model": "shoulders_p1",
       "brightness": 13,
       "scale": 2,
-      "elements": 735,
+      "elements": 799,
       "parent": "chest",
       "tol_tp": 0.012,
       "reach": 3,
@@ -263,7 +263,7 @@
       "model": "core_p1_bulb",
       "brightness": 15,
       "scale": 1.3,
-      "elements": 258,
+      "elements": 194,
       "parent": "chest",
       "tol_tp": 0.012,
       "reach": 1.95,
@@ -481,7 +481,7 @@
       "model": "mantle_l_a_p1",
       "brightness": 13,
       "scale": 1.7,
-      "elements": 24,
+      "elements": 12,
       "parent": "shoulders",
       "tol_tp": 0.03,
       "reach": 2.55,
@@ -499,7 +499,7 @@
       "model": "mantle_r_a_p1",
       "brightness": 13,
       "scale": 1.7,
-      "elements": 24,
+      "elements": 12,
       "parent": "shoulders",
       "tol_tp": 0.03,
       "reach": 2.55,
@@ -517,7 +517,7 @@
       "model": "mantle_l_b_p1",
       "brightness": 13,
       "scale": 1.5,
-      "elements": 19,
+      "elements": 12,
       "parent": "mantle_l_a",
       "tol_tp": 0.03,
       "reach": 2.25,
@@ -535,7 +535,7 @@
       "model": "mantle_r_b_p1",
       "brightness": 13,
       "scale": 1.5,
-      "elements": 19,
+      "elements": 12,
       "parent": "mantle_r_a",
       "tol_tp": 0.03,
       "reach": 2.25,
@@ -2631,9 +2631,9 @@
       ],
       "result": {
         "CROUCH": {
-          "points": 671,
+          "points": 701,
           "covered": 1,
-          "worst": 2.55
+          "worst": 2.43
         },
         "UPRIGHT": {
           "points": 345,
@@ -27585,11 +27585,11 @@
     "models": 94,
     "hand_models": 20,
     "items": 325,
-    "atlas_px": 590592,
+    "atlas_px": 526592,
     "atlas_budget": 900000,
     "elements_shown_rest": {
-      "p1": 4384,
-      "p3": 4338
+      "p1": 4346,
+      "p3": 4300
     },
     "elements_budget": {
       "p1": 7000,
@@ -27598,7 +27598,7 @@
     "regions": {
       "body": {
         "parts": 12,
-        "px": 390144
+        "px": 326144
       },
       "head": {
         "parts": 9,
@@ -29919,10 +29919,10 @@
   },
   "sprites": {
     "budget": 900000,
-    "total": 590592,
+    "total": 526592,
     "regions": {
       "head": 59904,
-      "body": 390144,
+      "body": 326144,
       "shared": 46080,
       "tail": 19200,
       "hands": 64000,
@@ -30072,10 +30072,10 @@
       {
         "name": "p1_chest_wrap",
         "region": "body",
-        "w": 384,
-        "h": 80,
-        "px": 30720,
-        "px_per_b": 40,
+        "w": 304,
+        "h": 64,
+        "px": 19456,
+        "px_per_b": 32,
         "use": "unique",
         "forms": "p1"
       },
@@ -30172,20 +30172,20 @@
       {
         "name": "p1_hook",
         "region": "body",
-        "w": 128,
-        "h": 112,
-        "px": 14336,
-        "px_per_b": 48,
+        "w": 96,
+        "h": 96,
+        "px": 9216,
+        "px_per_b": 40,
         "use": "unique",
         "forms": "p1"
       },
       {
         "name": "p1_hump_wrap",
         "region": "body",
-        "w": 336,
+        "w": 304,
         "h": 96,
-        "px": 32256,
-        "px_per_b": 36,
+        "px": 29184,
+        "px_per_b": 32,
         "use": "unique",
         "forms": "p1"
       },
@@ -30362,40 +30362,40 @@
       {
         "name": "p1g_cr_f",
         "region": "body",
-        "w": 96,
-        "h": 96,
-        "px": 9216,
-        "px_per_b": 48,
+        "w": 64,
+        "h": 64,
+        "px": 4096,
+        "px_per_b": 32,
         "use": "unique",
         "forms": "p1"
       },
       {
         "name": "p1g_cr_s",
         "region": "body",
-        "w": 96,
-        "h": 96,
-        "px": 9216,
-        "px_per_b": 48,
+        "w": 64,
+        "h": 64,
+        "px": 4096,
+        "px_per_b": 32,
         "use": "unique",
         "forms": "p1"
       },
       {
         "name": "p1gs_cr_f",
         "region": "body",
-        "w": 96,
-        "h": 96,
-        "px": 9216,
-        "px_per_b": 48,
+        "w": 64,
+        "h": 64,
+        "px": 4096,
+        "px_per_b": 32,
         "use": "unique",
         "forms": "p1"
       },
       {
         "name": "p1gs_cr_s",
         "region": "body",
-        "w": 96,
-        "h": 96,
-        "px": 9216,
-        "px_per_b": 48,
+        "w": 64,
+        "h": 64,
+        "px": 4096,
+        "px_per_b": 32,
         "use": "unique",
         "forms": "p1"
       },
@@ -30432,10 +30432,10 @@
       {
         "name": "p3_chest_wrap",
         "region": "body",
-        "w": 240,
+        "w": 224,
         "h": 80,
-        "px": 19200,
-        "px_per_b": 36,
+        "px": 17920,
+        "px_per_b": 32,
         "use": "unique",
         "forms": "p3"
       },
@@ -30712,30 +30712,30 @@
       {
         "name": "p3_rib0",
         "region": "body",
-        "w": 144,
-        "h": 64,
-        "px": 9216,
-        "px_per_b": 40,
+        "w": 112,
+        "h": 48,
+        "px": 5376,
+        "px_per_b": 32,
         "use": "unique",
         "forms": "p3"
       },
       {
         "name": "p3_rib1",
         "region": "body",
-        "w": 144,
-        "h": 64,
-        "px": 9216,
-        "px_per_b": 40,
+        "w": 112,
+        "h": 48,
+        "px": 5376,
+        "px_per_b": 32,
         "use": "unique",
         "forms": "p3"
       },
       {
         "name": "p3_rib2",
         "region": "body",
-        "w": 128,
-        "h": 64,
-        "px": 8192,
-        "px_per_b": 40,
+        "w": 112,
+        "h": 48,
+        "px": 5376,
+        "px_per_b": 32,
         "use": "unique",
         "forms": "p3"
       },
@@ -30762,10 +30762,10 @@
       {
         "name": "p3_sh_wrap",
         "region": "body",
-        "w": 256,
+        "w": 224,
         "h": 64,
-        "px": 16384,
-        "px_per_b": 36,
+        "px": 14336,
+        "px_per_b": 32,
         "use": "unique",
         "forms": "p3"
       },
@@ -30822,20 +30822,20 @@
       {
         "name": "p3e_cr_f",
         "region": "body",
-        "w": 96,
-        "h": 96,
-        "px": 9216,
-        "px_per_b": 48,
+        "w": 64,
+        "h": 64,
+        "px": 4096,
+        "px_per_b": 32,
         "use": "unique",
         "forms": "p1"
       },
       {
         "name": "p3e_cr_s",
         "region": "body",
-        "w": 96,
-        "h": 96,
-        "px": 9216,
-        "px_per_b": 48,
+        "w": 64,
+        "h": 64,
+        "px": 4096,
+        "px_per_b": 32,
         "use": "unique",
         "forms": "p1"
       }
@@ -30855,13 +30855,13 @@
       "p3": 8000
     },
     "visible_rest": {
-      "p1": 4384,
-      "p3": 4338
+      "p1": 4346,
+      "p3": 4300
     },
     "per_region": {
       "body": {
-        "p1": 1654,
-        "p3": 1515
+        "p1": 1616,
+        "p3": 1477
       },
       "head": {
         "p1": 809,
@@ -30898,11 +30898,11 @@
         "p3": 222
       },
       "shoulders": {
-        "p1": 735,
+        "p1": 799,
         "p3": 161
       },
       "core": {
-        "p1": 258,
+        "p1": 194,
         "p3": 100
       },
       "crys_low": {
@@ -30950,20 +30950,20 @@
         "p3": 2
       },
       "mantle_l_a": {
-        "p1": 24,
-        "p3": 24
+        "p1": 12,
+        "p3": 12
       },
       "mantle_r_a": {
-        "p1": 24,
-        "p3": 24
+        "p1": 12,
+        "p3": 12
       },
       "mantle_l_b": {
-        "p1": 19,
-        "p3": 19
+        "p1": 12,
+        "p3": 12
       },
       "mantle_r_b": {
-        "p1": 19,
-        "p3": 19
+        "p1": 12,
+        "p3": 12
       },
       "a_up_l": {
         "p1": 98,
@@ -31082,10 +31082,10 @@
       "shoulders",
       "hood",
       "hem_b",
-      "core",
       "abdomen",
       "hem_a",
       "chest",
+      "core",
       "face"
     ]
   },

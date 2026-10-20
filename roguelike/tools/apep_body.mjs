@@ -235,7 +235,7 @@ function p1Dorsal(th, z, y, x, {seed = 5} = {}) {
   let c = SLATE(clamp(t, .05, .95));
   const vein = Math.abs(sh.fu - .5);
   if (vein < .025 && sh.fv > .2) c = SLATE(clamp(t + .12, 0, 1));
-  if (sh.inside && sh.e < .035) c = mix(SLATE(.02), C('#8E967F'), .5 + .5 * smooth(.035, 0, sh.e));   // the pale bevel rim
+  if (sh.inside && sh.e < .03) c = mix(SLATE(.1), C('#8A9279'), .45 + .45 * smooth(.03, 0, sh.e));   // the thin bevel rim
   if (!sh.inside) c = SLATE(.92);
   // transition to the pale underside
   if (s < -.3) c = mix(c, LINE(.6), smooth(-.3, -.5, s));
@@ -253,8 +253,8 @@ function p1PlatePaint(u, v) {
   if (vein < .05 && Math.abs(u) > .08) t += .07;
   if (Math.abs(u) < .05) t -= .14; else if (Math.abs(u) < .09) t += .06 * (u > 0 ? 1 : -1);
   let c = SLATE(clamp(t, .05, .95));
-  if (d > -.09) c = mix(C('#8E967F'), C('#C3C8B0'), smooth(-.09, -.02, d) * .6);
-  if (d > -.025) c = SLATE(.95);
+  if (d > -.065) c = mix(C('#6F7766'), C('#A3A98F'), smooth(-.065, -.025, d) * (.55 + .35 * smooth(-.4, .6, v)));   // the thin bevel rim, lit toward the root
+  if (d > -.022) c = SLATE(.95);
   return c;
 }
 // slab of one leaf plate with a normalised sprite (painted over UR): centre (cu, cv) in the slab plane, half sizes hu x hv;
@@ -285,7 +285,7 @@ const PAULD = [
   // the shoulder cap the A arm and the B leg grow out of (the A root 1.55, 3.66, -0.93; the B root 1.23, 2.85, -1.36): its
   // tiers drift forward-up, so the contour rings swirl toward the hook
   {z: -1.45, y: 3.3, r: [1.1, .76, 1.06, .86], x0: 1.1, x1: 2.3, s: 0,
-    T: [[0, 1, 0, 0], [.36, .9, -.12, .05], [.62, .72, -.26, .1], [.84, .48, -.36, .13], [1, .18, -.4, .14]]},
+    T: [[0, 1, 0, 0], [.3, .93, -.1, .04], [.52, .81, -.2, .08], [.7, .65, -.29, .11], [.86, .44, -.36, .13], [1, .16, -.4, .14]]},
   // the lower lobe over the B leg's top, layered under the cap's lower rim, its tiers drifting back-down
   {z: -2.0, y: 2.55, r: [.7, .5, .8, .48], x0: 1.32, x1: 2.24, s: 1,
     T: [[0, 1, 0, 0], [.48, .84, .1, -.04], [.8, .54, .18, -.06], [1, .18, .2, -.06]]},
@@ -341,7 +341,7 @@ const grp = (label, arr) => { ELDBG[label] = (ELDBG[label] || 0) + arr.length; r
 function shouldersP1() {
   const J = J_SH, els = [];
   // the hull (front hump), from under the cowl to the chest
-  els.push(...grp('sh1_hump', wrapLoft('p1_hump_wrap', 'z', hullSt(J, [-2.55, -2.2, -1.75, -1.3, -.85, -.3, .02], -9, -.3), (th, a) => p1Hull('sh')(th, a + J[2]), {caps: '-', seed: 521, forms: 'p1', ppb: 36})));
+  els.push(...grp('sh1_hump', wrapLoft('p1_hump_wrap', 'z', hullSt(J, [-2.55, -2.2, -1.75, -1.3, -.85, -.3, .02], -9, -.3), (th, a) => p1Hull('sh')(th, a + J[2]), {caps: '-', seed: 521, forms: 'p1', ppb: 32})));
   // dorsal shingle plates: rows along the spine, 3 across (the centre flat / pitched, the sides rolled 22.5 / 45 deg)
   const ps = card('p1_plate_y', UR, (u, v) => p1PlatePaint(u, -v), 40, 'p1', 'unique', 'y');
   const pz = card('p1_plate_z', UR, p1PlatePaint, 40, 'p1');
@@ -363,7 +363,7 @@ function shouldersP1() {
   const half = [];
   PAULD.forEach((D, i) => half.push(...grp('sh1_pauld', barkDome(`p1_pauld${i}`, J, D))));
   // the hook + gem: a dark curl in front of the pauldron, the square gem in a raised dark frame facing out-forward
-  const hs = card('p1_hook', HOOK_R, hookPaint, 48, 'p1');
+  const hs = card('p1_hook', HOOK_R, hookPaint, 40, 'p1');
   const hz0 = -2.5 - J[2], hy0 = 3.28 - J[1], hx = 1.98, HK = .8;
   half.push(...slab({plane: 'x', at: hx, rect: {u0: hz0 + HOOK_R.u0 * HK, u1: hz0 + HOOK_R.u1 * HK, v0: hy0 + HOOK_R.v0 * HK, v1: hy0 + HOOK_R.v1 * HK},
     sd: (u, v) => HOOK.sd((u - hz0) / HK, (v - hy0) / HK) * HK, half: .09, sprite: hs, edge: 'g_plate', cell: .08, rot: ['y', 22.5, [hx, hy0, hz0]]}));
@@ -461,7 +461,7 @@ function calyxPaint(th, z) {
 }
 function chestP1() {
   const J = J_CH, els = [];
-  els.push(...wrapLoft('p1_chest_wrap', 'z', hullSt(J, [-.72, -.3, .15, .6, .95, 1.25], -.3, .95), (th, a) => p1Hull('ch')(th, a + J[2]), {seed: 511, forms: 'p1', ppb: 40}));
+  els.push(...wrapLoft('p1_chest_wrap', 'z', hullSt(J, [-.72, -.3, .15, .6, .95, 1.25], -.3, .95), (th, a) => p1Hull('ch')(th, a + J[2]), {seed: 511, forms: 'p1', ppb: 32}));
   // the calyx round the sac
   const zs = [-1.18, -.92, -.66, -.45, -.3];
   const st = zs.map(z => { const d = z - SAC.c[2], r = Math.sqrt(Math.max(.02, SAC.r * SAC.r - d * d)) + .1; return {a: z - J[2], r: [r, r, r, r], c: [SAC.c[0] - J[0], SAC.c[1] - J[1]]}; });
@@ -501,7 +501,7 @@ function sacPaint(d) {
 function coreP1() {
   const J = J_CORE, c = sub3(SAC.c, J);
   // lofted across (axis x): the two views that matter (the front, and from below in the rear-up) see facets, not ledges
-  const ts = [-.98, -.86, -.62, -.3, 0, .3, .62, .86, .98];
+  const ts = [-.97, -.8, -.45, 0, .45, .8, .97];
   const st = ts.map(t => ({a: c[0] + t * SAC.r, r: SAC.r * Math.sqrt(1 - t * t), c: [-c[2], c[1]]}));
   return wrapLoft('p1_sac', 'x', st, (th, a, p) => sacPaint(nrm3(sub3(p, c))), {caps: '-+', ledgeTex: 'p1_core', seed: 531, forms: 'p1', light: false, ppb: 40});
 }
@@ -547,7 +547,7 @@ function crystal(c, r, h, lean, ramp, tag, {side = 0} = {}) {
   // c: base centre; lean = the tip's offset toward +z (back) in units of h; side: the tip's offset toward +x (out)
   const els = [];
   els.push(...loft('y', [{a: c[1] - .05, r: r * 1.25, c: [c[0], -c[2]]}, {a: c[1] + .06, r: r * 1.12, c: [c[0], -c[2]]}], {n: 8, tex: 'g_plate', caps: '+', seed: 7}));
-  const sf = card(`${tag}_cr_f`, UR, crystalPaint(ramp, side / r), 48, 'p1'), ss = card(`${tag}_cr_s`, UR, crystalPaint(ramp, -lean * h / r), 48, 'p1');
+  const sf = card(`${tag}_cr_f`, UR, crystalPaint(ramp, side / r), 32, 'p1'), ss = card(`${tag}_cr_s`, UR, crystalPaint(ramp, -lean * h / r), 32, 'p1');
   els.push(cardZ(sf, c[2], {X0: c[0] - r, X1: c[0] + r, Y0: c[1], Y1: c[1] + h}, {rot: lean ? ['x', 22.5, [c[0], c[1], c[2]]] : undefined}));
   els.push(cardX(ss, c[0], {Z0: c[2] - r, Z1: c[2] + r, Y0: c[1], Y1: c[1] + h}));
   return els;
@@ -633,7 +633,7 @@ function p3Torso(th, y, kind) {
   return c;
 }
 // ---- compact band lofts: a one-section loft keeping facets ks, its wrap sprite packed to those slots ---------------------
-function bandLoft(name, axis, st, ks, painter, {n = 16, ppb = 40, forms = 'p3'} = {}) {
+function bandLoft(name, axis, st, ks, painter, {n = 16, ppb = 32, forms = 'p3'} = {}) {
   const m = ks.length, as = st.map(s => s.a), aMin = Math.min(...as), aMax = Math.max(...as), L = aMax - aMin;
   if (!SP[name]) {
     const per = Math.max(...st.map(s => { const r = arr4(s.r); return Math.PI / 2 * (Math.hypot(r[0], r[1]) + Math.hypot(r[1], r[2]) + Math.hypot(r[2], r[3]) + Math.hypot(r[3], r[0])) / Math.SQRT2; }));
@@ -679,7 +679,7 @@ function ribBlade(th, y, [yf, yb, w0]) {
 }
 function chestP3() {
   const J = J3_CH, els = [];
-  els.push(...wrapLoft('p3_chest_wrap', 'y', torsoSt(J, [3.0, 3.3, 3.7, 4.1, 4.5, 4.85, 5.15], 3.3, 4.85), (th, a) => p3Torso(th, a + J[1], 'ch'), {forms: 'p3', seed: 591, ppb: 36}));
+  els.push(...wrapLoft('p3_chest_wrap', 'y', torsoSt(J, [3.0, 3.3, 3.7, 4.1, 4.5, 4.85, 5.15], 3.3, 4.85), (th, a) => p3Torso(th, a + J[1], 'ch'), {forms: 'p3', seed: 591, ppb: 32}));
   const half = [];
   RIBS3.forEach(([yf, yb, w0], i) => {
     // one band per blade: its section radii follow the torso at the blade's own height in each quadrant (high at the
@@ -696,7 +696,7 @@ function chestP3() {
 // gems in raised dark frames on both shoulders (v6 f90 / v5 f450)
 function shouldersP3() {
   const J = J3_SH, els = [];
-  els.push(...wrapLoft('p3_sh_wrap', 'y', torsoSt(J, [4.6, 4.85, 5.25, 5.6, 5.9, 6.15], 4.85, 9), (th, a) => p3Torso(th, a + J[1], 'sh'), {forms: 'p3', seed: 601, caps: '+', ppb: 36}));
+  els.push(...wrapLoft('p3_sh_wrap', 'y', torsoSt(J, [4.6, 4.85, 5.25, 5.6, 5.9, 6.15], 4.85, 9), (th, a) => p3Torso(th, a + J[1], 'sh'), {forms: 'p3', seed: 601, caps: '+', ppb: 32}));
   const half = [];
   const gy = 5.62 - J[1], gz = -.48 - J[2], gx = .98;
   half.push(rockBox([gx - .2, gy - .2, gz - .12], [gx + .2, gy + .2, gz + .08], 'g_plate', {seed: 602, rot: ['y', -22.5, [gx, gy, gz]]}));
@@ -956,9 +956,9 @@ function mantle(L, W, tag) {
     const dy = y + s0, th = ang[i], R = {...rect, v0: rect.v0 + dy, v1: rect.v1 + dy};
     const clip = {v0: -s1 + dy - (i < segs.length - 1 ? .03 : .06), v1: -s0 + dy + (i ? .03 : .1)};
     const sdf = (u, v) => sd(u, v - dy), rot = th ? ['x', th, [0, y, z]] : null;
-    els.push(...slab({plane: 'z', at: z, rect: R, sd: sdf, half: .05, sprite: so, edge: 'g_plate', cell: .1, cards: '-', clip, rot}));
-    els.push(...slab({plane: 'z', at: z, rect: R, sd: sdf, half: .05, sprite: si, edge: 'g_plate', cell: .1, cards: '+', core: false, clip, rot}));
-    els.push(...slab({plane: 'z', at: z, rect: R, sd: sdf, half: .062, sprite: sr, edge: 'g_plate', cell: .1, cards: '-', core: false, clip, rot}));
+    els.push(...slab({plane: 'z', at: z, rect: R, sd: sdf, half: .04, sprite: so, edge: 'g_plate', cell: .1, cards: '-', core: false, clip, rot}));
+    els.push(...slab({plane: 'z', at: z, rect: R, sd: sdf, half: .04, sprite: si, edge: 'g_plate', cell: .1, cards: '+', core: false, clip, rot}));
+    els.push(...slab({plane: 'z', at: z, rect: R, sd: sdf, half: .052, sprite: sr, edge: 'g_plate', cell: .1, cards: '-', core: false, clip, rot}));
     const len = s1 - s0;
     y -= len * Math.cos(th * D2R); z -= len * Math.sin(th * D2R);
   });
