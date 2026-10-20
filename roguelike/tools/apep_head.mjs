@@ -17,7 +17,7 @@
 // Region interface: see apep_body.mjs. P1 parts in world axes about the joint at the CROUCH stance, P3 at the UPRIGHT
 // stance (solved here from apep_clips STANCES so the offsets follow the skeleton); the hair in its bone frame 'y'.
 import {loft, slab, rockBox, crossCards, toUnits, mirrorX, stroke, sdUnion, registerTile} from './mboss_shape_lib.mjs';
-import {PART_SCALE, J, solve, FORM_POINTS} from './apep_pose.mjs';
+import {PART_SCALE, J, solve, FORM_POINTS, modelFrames, modelPoint} from './apep_pose.mjs';
 import {STANCES} from './apep_clips.mjs';
 import {PAL, C, clamp, mix, N, lift, sink, grey, autoSlot, sprite, onRect, onRectY, spriteSize, sdLeaf, cone, ball, TRANSPARENT} from './apep_materials.mjs';
 import {cardZ, rotA} from './mboss_model_lib.mjs';
@@ -81,19 +81,53 @@ tile('p3_collar', 32, 32, 32, (u, v) => { let c = mix(PAL.p3_pale(.55), PAL.p3_b
 
 // ================================================= neck, head =================================================================
 function neckP1() { const L = dist(J.head, J.neck); return loft('z', [{a: .3, r: .7}, {a: -L * .5, r: [.66, .62, .66, .58]}, {a: -L - .25, r: [.62, .58, .62, .55]}], {tex: 'g_plate', seed: 801}); }
+// P3 neck + the collar ruff (model_p3 §2.1 item 6, model.md §4 "collar ruff of pale lilac-grey petals"; v6 f480 zoom): a slim
+// neck under two rings of pale grey petals drooping out over the chest; the back petals stay short, since in the crawl
+// the neck's back turns up under the hood's rear edge
+const ruffPaint = ({t, s, d}) => {
+  let c = PAL.p3_pale(clamp(.38 + .3 * t + .15 * Math.abs(s) + .06 * (N.c(t * 7, s * 3) - .5)));
+  if (Math.abs(s) < .08 && t > .1 && t < .85) c = mix(c, PAL.p3_pale(.85), .5);
+  if (s > .45) c = mix(c, PAL.p3_pale(.2), .4);
+  if (d < .02) c = PAL.p3_line(.55);
+  return c;
+};
 function neckP3() {
-  return [...loft('y', [{a: -.4, r: [.64, .56, .64, .62]}, {a: .3, r: [.6, .52, .6, .58]}, {a: .72, r: [.55, .48, .55, .55]}], {tex: 'g_plate', seed: 802}),
-    ...loft('y', [{a: -.3, r: .9}, {a: -.05, r: .86}, {a: .12, r: .7}], {tex: 'p3_collar', caps: '-+', seed: 803})];
+  const els = loft('y', [{a: -.4, r: [.52, .46, .52, .4]}, {a: .3, r: [.48, .42, .48, .38]}, {a: .66, r: [.44, .38, .44, .34]}], {tex: 'g_plate', seed: 802});
+  const fr = partFrame('neck', 'p3', oU), C = [0, 5.84, -.44];
+  const ring = (phis, r0, r1, y0, drop, wk, tag) => phis.forEach((ph, i) => {
+    const back = Math.abs(ph) > 100, dir = [Math.sin(ph * D2R), 0, -Math.cos(ph * D2R)], R1 = back ? r0 + (r1 - r0) * .45 : r1;
+    const P = k => [C[0] + dir[0] * k[0], y0 + k[1], C[2] + dir[2] * k[0]];
+    const pts = [P([r0, 0]), P([(r0 + R1) / 2, -drop * .35]), P([R1, -drop])];
+    const w = t => wk * Math.pow(Math.sin(Math.PI * Math.min(1, .08 + t * .92)), .7) + .01;
+    els.push(...ribbon(`p3_ruff${tag}${i}`, fr, pts, w, {cuts: [0, 1], face: () => [dir[0] * .6, .8, dir[2] * .6], paint: ruffPaint, ppb: 40, forms: 'p3', half: .025, edge: 'hd_p3_ruffedge'}));
+  });
+  ring([0, 40, -40, 80, -80, 125, -125], .4, 1.0, 5.8, .42, .17, 'a');
+  ring([20, -20, 60, -60, 100, -100], .34, .78, 5.92, .3, .13, 'b');
+  return els;
 }
+tile('hd_p3_ruffedge', 16, 16, 32, (u, v) => PAL.p3_pale(clamp(.45 + .1 * N.b(u * 4, v * 4))), 'p3');
 function headP1() { return loft('z', [{a: .25, r: [.7, .6, .7, .55]}, {a: -.6, r: [.74, .64, .74, .6], c: [0, -.05]}, {a: -1.3, r: [.55, .45, .55, .48], c: [0, -.15]}], {tex: 'p1_inner', caps: '-+', seed: 811}); }
 // the P3 skull: behind the mask, from the chin to the face top; the leaf scarf wraps the chin and throat
 const SCARF_R = {u0: -.82, u1: .82, v0: -.42, v1: .3};
 const scarfSd = (u, v) => { const outer = Math.hypot(u / .8, (v - .3) / .7) - 1, inner = Math.hypot(u / .52, (v - .32) / .42) - 1; return Math.max(outer, -inner); };
 const scarfPaint = (u, v) => { const d = scarfSd(u, v); if (d > 0) return null; let c = PAL.p3_lime(clamp(.15 + .25 * (N.a(u * 7, v * 7) - .5) + .3 * (-v))); const lf = Math.abs(((Math.atan2(v - .3, u) * 3) % 1 + 1) % 1 - .5); if (lf < .05) c = mix(c, PAL.p3_line(.4), .6); return lineOut(c, d, .03, PAL.p3_line(.6)); };
+// the lime leaf scarf: broad lime leaves wrapping the chin under the mask's lower edge and hanging over the ruff
+const scarfLeafPaint = ({t, s, d}) => {
+  let c = PAL.p3_lime(clamp(.18 + .3 * t + .15 * Math.abs(s) + .06 * (N.a(t * 8, s * 3) - .5)));
+  if (Math.abs(s) < .07 && t < .9) c = mix(c, PAL.p3_line(.3), .45);
+  const sv = Math.abs(((t * 4 - Math.abs(s) * 1.2) % 1 + 1) % 1 - .5); if (sv < .05 && Math.abs(s) > .12) c = mix(c, PAL.p3_line(.4), .3);
+  if (d < .018) c = PAL.p3_line(.55);
+  return c;
+};
 function headP3() {
-  const f = FORM_POINTS.face.p3[1];   // the mask centre offset from the head joint (upright)
   const els = loft('y', [{a: -.3, r: [.62, .36, .62, .5]}, {a: .25, r: [.66, .38, .66, .56]}, {a: .62, r: [.5, .3, .5, .46]}], {tex: 'hd_p3_lining', caps: '-+', seed: 821});
-  els.push(...slab({plane: 'z', at: f[2] - .02, rect: SCARF_R, sd: scarfSd, half: .05, sprite: card('p3_scarf', SCARF_R, scarfPaint, 48, 'p3'), edge: 'p3_lime', cell: .08}));
+  const fr = partFrame('head', 'p3', oU);
+  // leaves rooted on the lower mask rim (the mask: 1.6 x 1.9 about (0, 6.9), front at z -0.97), drooping over the chin
+  for (const [i, [x0, y0, x1, y1, wk]] of [[0, 6.22, 0, 5.55, .2], [.3, 6.25, .48, 5.62, .17], [-.3, 6.25, -.48, 5.62, .17], [.55, 6.38, .82, 5.85, .14], [-.55, 6.38, -.82, 5.85, .14]].entries()) {
+    const zr = -1.0 - .02 * i, pts = [[x0, y0, zr], [(x0 + x1) / 2, (y0 + y1) / 2 - .03, zr - .1], [x1, y1, zr - .06]];
+    const w = t => wk * Math.pow(Math.sin(Math.PI * Math.min(1, .1 + t * .9)), .75) + .01;
+    els.push(...ribbon(`p3_scarf${i}`, fr, pts, w, {cuts: [0, 1], face: () => [x1 * .3, .25, -1], paint: scarfLeafPaint, ppb: 40, forms: 'p3', half: .025, edge: 'p3_lime'}));
+  }
   return els;
 }
 // ================================================= face ==================================================================
@@ -138,27 +172,58 @@ function faceP1() {
 }
 const MASK_R = {u0: -.82, u1: .82, v0: -.97, v1: .97};
 const maskSd = (u, v) => Math.hypot(u / .8, v / .95) - 1;
+// a pointed leaf from (x0, y0) along angle a (rad, 0 = +u), length L, half width W: {e (< 0 inside, ~-1 at the rib), x (along 0..1), y (across)}
+const leafAt = (u, v, x0, y0, a, L, W, p = .8) => {
+  const ca = Math.cos(a), sa = Math.sin(a), x = ((u - x0) * ca + (v - y0) * sa) / L, y = (-(u - x0) * sa + (v - y0) * ca);
+  const hw = W * Math.pow(Math.max(0, Math.sin(Math.PI * clamp(x))), p);
+  return {e: x < 0 || x > 1 ? 1 : Math.abs(y) / Math.max(hw, 1e-4) - 1, x, y, hw};
+};
+// the face rosette (model_p3 §2.1 item 1; v5 f1074, v6 f480 zoom): a glowing gold-lime oval, the gold lily emblem in the upper
+// half (a drop-shaped bud between two curled fronds, a small trefoil above), broad pale leaves fanning down over the lower
+// face with darker lime outlines and midribs, fine radiating veins, a darker lime rim. One model, three looks (FACE_MUL).
+const MASK_LEAVES = [[-90, .62, .2], [-58, .66, .19], [-122, .66, .19], [-28, .56, .16], [-152, .56, .16], [4, .42, .13], [176, .42, .13]];
 function maskPaint(u, v) {
   const d = maskSd(u, v);
   if (d > 0) return null;
-  let c = PAL.p3_face(clamp(.1 + .35 * (d + 1) * .5 + .08 * (N.a(u * 6, v * 6) - .5)));
-  // vein lines radiating from the emblem, darker lime
-  const ang = Math.atan2(v - .25, u), vr = Math.abs(((ang * 4 / Math.PI) % 1 + 1) % 1 - .5);
-  if (vr < .035 && Math.hypot(u, v - .25) > .35) c = mix(c, PAL.p3_line(.2), .55);
-  // the gold lily emblem in the upper half: three leaves round a drop
-  const lx = u, ly = v - .32;
-  const leaf = (cx, cy, rot) => { const ca = Math.cos(rot), sa = Math.sin(rot), x = (lx - cx) * ca + (ly - cy) * sa, y = -(lx - cx) * sa + (ly - cy) * ca; return Math.hypot(x / .09, y / .22) - 1; };
-  const em = Math.min(leaf(0, .14, 0), leaf(-.15, .02, -.9), leaf(.15, .02, .9), Math.hypot(lx / .08, (ly + .12) / .11) - 1);
-  if (em < 0) c = mix(PAL.p3_sternum(.15), PAL.p3_sternum(.5), clamp(-em * 2));
-  else if (em < .25) c = mix(c, PAL.p3_line(.35), .5 * (1 - em / .25));
-  // two leaf shapes framing the lower half
-  for (const s of [1, -1]) { const x = u - s * .42, y = v + .45; if (Math.hypot(x / .2, y / .38) < 1 && Math.hypot((x + s * .08) / .14, y / .3) > 1) c = mix(c, PAL.p3_line(.25), .5); }
-  return lineOut(c, d, .05, PAL.p3_line(.5));
+  const r = Math.hypot(u / .8, (v - .1) / .95);
+  let c = PAL.p3_face(clamp(.38 + .42 * r * r + .07 * (N.a(u * 6, v * 6) - .5)));
+  // fine veins radiating from the emblem
+  const ang = Math.atan2(v - .3, u), vr = Math.abs(((ang * 9 / Math.PI) % 1 + 1) % 1 - .5);
+  if (vr < .03 && Math.hypot(u, v - .3) > .3) c = mix(c, PAL.p3_face(.15), .5);
+  // the leaf fan below the emblem (drawn back to front: the side leaves under the middle one)
+  for (const [deg, L, W] of [...MASK_LEAVES].reverse()) {
+    const q = leafAt(u, v, 0, .12, deg * D2R, L, W);
+    if (q.e < 0) {
+      c = PAL.p3_face(clamp(-.05 + .3 * q.x + .18 * Math.abs(q.y) / Math.max(q.hw, 1e-3) + .05 * (N.b(u * 7, v * 7) - .5)));
+      if (Math.abs(q.y) < .012 && q.x > .08 && q.x < .9) c = mix(c, PAL.p3_face(.8), .6);                         // midrib
+      const sv = Math.abs(((q.x * 5 - Math.abs(q.y) * 9) % 1 + 1) % 1 - .5); if (sv < .05 && q.x > .15 && Math.abs(q.y) > .02) c = mix(c, PAL.p3_face(.5), .5);    // side veins
+      if (q.e > -.16) c = mix(c, PAL.p3_line(.05), .85);                                                           // outline
+    }
+  }
+  // the lily emblem: the drop-shaped bud, the two fronds curling out and up, the trefoil above
+  const bu = u, bv = v - .4, drop = Math.hypot(bu / .085, (bv + .02) / (bv > -.02 ? .17 : .1)) - 1;
+  for (const sx of [1, -1]) {
+    // frond: an arc from the bud foot curling out and up, ending in a curl
+    const cx = sx * .2, cy = .38, rr = Math.hypot(u - cx, v - cy), an = Math.atan2(v - cy, (u - cx) * sx);
+    if (Math.abs(rr - .16) < .035 * (1 - .4 * clamp((an + 1.4) / 3.6)) && an > -2.6 && an < 1.6) c = mix(PAL.p3_sternum(.2), PAL.p3_sternum(.5), clamp((rr - .13) / .07));
+    const curl = Math.hypot(u - sx * .31, v - .5) - .045; if (curl < 0 && curl > -.025) c = PAL.p3_sternum(.45);
+    const lf = leafAt(u, v, sx * .05, .58, (90 - sx * 40) * D2R, .2, .045); if (lf.e < 0) c = mix(PAL.p3_sternum(.1), PAL.p3_sternum(.4), clamp(-lf.e));
+  }
+  const top = leafAt(u, v, 0, .6, 90 * D2R, .2, .05); if (top.e < 0) c = mix(PAL.p3_sternum(.1), PAL.p3_sternum(.4), clamp(-top.e));
+  if (drop < 0) c = mix(PAL.p3_sternum(.05), PAL.p3_sternum(.45), clamp(-drop * 1.5) * .5 + clamp(u * 4 + .3) * .5);
+  else if (drop < .2) c = mix(c, PAL.p3_line(.3), .6 * (1 - drop / .2));
+  // the darker lime rim and the outline
+  if (d > -.14) c = mix(c, PAL.p3_face(.85), clamp((d + .14) / .14) * .75);
+  return lineOut(c, d, .03, PAL.p3_line(.45));
 }
 function faceP3() {
-  const f = FORM_POINTS.face.p3[1];
+  const f = FORM_POINTS.face.p3[1], sp = card('p3_mask', MASK_R, maskPaint, 72, 'p3');
   const rect = {u0: MASK_R.u0, u1: MASK_R.u1, v0: f[1] + MASK_R.v0, v1: f[1] + MASK_R.v1};
-  const els = slab({plane: 'z', at: f[2], rect, sd: (u, v) => maskSd(u, v - f[1]), half: .07, sprite: card('p3_mask', MASK_R, maskPaint, 64, 'p3'), edge: 'p3_gold', cell: .1});
+  const els = slab({plane: 'z', at: f[2], rect, sd: (u, v) => maskSd(u, v - f[1]), half: .06, sprite: sp, edge: 'p3_gold', cell: .1});
+  // slightly domed: the middle of the face stands 0.07 b proud as a second layer of the same painting
+  const k = .7, inner = (u, v) => Math.hypot(u / (.8 * k), (v - .08) / (.95 * k)) - 1;
+  els.push(...slab({plane: 'z', at: f[2] - .1, rect: {u0: -.6, u1: .6, v0: f[1] - .62, v1: f[1] + .78}, sd: (u, v) => inner(u, v - f[1]) * .6, half: .025, cards: '-', core: false,
+    sprite: card('p3_mask_in', {u0: -.6, u1: .6, v0: -.62, v1: .78}, (u, v) => (inner(u, v) > 0 ? null : maskPaint(u, v)), 72, 'p3')}));
   return els;
 }
 // ================================================= plate rings ================================================================
@@ -348,18 +413,18 @@ function hoodP1() {
 const oCr = solve(STANCES.CROUCH);
 const hoodU = P => rot(oCr.hood.R, rot(invQ(oU.hood.R), sub(P, oU.hood.t)));             // UPRIGHT world -> hood model
 const maskY = z => -.85 + .315 * (z + .26);
-const P3PL = (lime, peel) => (s, t, d) => {
+const P3PL = (lime, peel, grey = 0) => (s, t, d) => {
   const g = N.a(s * 2 + t * 5, t * 7) - .5;
-  let c = lime ? PAL.p3_lime(clamp(.42 + .15 * g + .15 * (1 - t))) : mix(PAL.p3_bottle(clamp(.62 + .12 * g + .12 * (1 - t))), PAL.p1_slate(clamp(.4 + .1 * g)), .45);
+  let c = lime ? PAL.p3_lime(clamp(.42 + .15 * g + .15 * (1 - t))) : mix(PAL.p3_bottle(clamp(.66 + .12 * g + .12 * (1 - t))), PAL.p1_slate(clamp(.32 + .1 * g + .12 * (1 - t))), .45 + .35 * grey);
   if (t < .16) c = sink(c, .35 * (1 - t / .16));
   if (Math.abs(s) < .05 && t > .2) c = mix(c, PAL.p3_line(.5), .35);
   const fl = Math.abs(((Math.abs(s) * 1.6 + t * 2.2) % 1) - .5); if (fl < .035 && t > .25) c = mix(c, lime ? PAL.p3_line(.45) : PAL.p3_bottle(.85), .5);
   if (peel) { const pe = N.e(s * 2.2 + 3, t * 3.1 + 1); if (pe > .62 && t > .2) c = mix(PAL.p3_pale(.35), PAL.p3_pale(.6), clamp((pe - .62) * 6)); }
-  if (d < .05) c = mix(PAL.p3_rim(.1), PAL.p3_rim(.4), clamp(d / .05));                // the lime rim
+  if (d < .04) c = mix(PAL.p3_rim(.35), PAL.p3_bottle(.5), clamp(d / .04));             // the lime rim
   if (d < .016) c = PAL.p3_bottle(.95);                                                  // near-black outline
   return c;
 };
-tile('hd_p3_hedge', 16, 16, 32, (u, v) => PAL.p3_rim(clamp(.3 + .15 * N.b(u * 4, v * 4))), 'p3');
+tile('hd_p3_hedge', 16, 16, 32, (u, v) => mix(PAL.p3_rim(.55), PAL.p3_bottle(.7), .55 + .15 * N.b(u * 4, v * 4)), 'p3');
 tile('hd_p3_lining', 32, 32, 32, (u, v) => { let c = PAL.p3_bottle(clamp(.72 + .12 * N.b(u * 6, v * 6))); if (Math.abs(((u * 2 + v * .5) % 1) - .5) < .03) c = mix(c, PAL.p3_rim(.6), .35); return c; }, 'p3');
 // rows (tongues toward the front = up the hood when upright); the bottom facets (k -2 / 5) are left open
 const P3_ROWS = [
@@ -384,17 +449,19 @@ function frontPlate(name, dWorld, Hc, shape, paint, {half = .045, ppb = 40, edge
   const sp = cardY(name, rect, (u, v) => { const W = toW(u, v); return shape(W[0], W[1]) > 0 ? null : paint(W[0], W[1], -shape(W[0], W[1])); }, ppb, 'p3');
   return slab({plane: 'y', at: piv[1], rect, sd, half, sprite: sp, edge, cell: .07, rot: ['x', -22.5, piv], core});
 }
-// the veil frame round the mask: the hole a little larger than the mask (0.8 x 0.95 about (0, 6.9)), the outer edge
-// running from the peak (8.55) out over the brows and down the cheeks to the shoulders (open under the chin)
+// the visor round the mask top (the hood's front rim, >= 0.2 b in front of the mask): the hole a little larger than the
+// mask (0.8 x 0.95 about (0, 6.9)), the outer edge from the peak (8.55) out over the brows, ending at the temples (7.0) where
+// the hair strands take over the sides; dark inside (the shadow over the glowing face) with a thin lime lip
 const holeE = (x, H) => Math.hypot(x / .88, (H - 6.92) / 1.02) - 1;
-const archOut = H => (H > 8.55 ? -1 : H > 7.7 ? 1.08 * Math.pow((8.55 - H) / .85, .6) : H > 6.4 ? 1.08 + .04 * Math.sin((7.7 - H) * 2.4) : 1.08 - .5 * Math.pow((6.4 - H) / .7, 1.4));
-const archSd = (x, H) => Math.max(Math.abs(x) - archOut(H), -holeE(x, H) * .9, 5.7 - H);
+const archOut = H => (H > 8.55 ? -1 : H > 7.75 ? 1.04 * Math.sqrt(1 - Math.pow((H - 7.75) / .8, 2.2)) : 1.04);
+const archSd = (x, H) => Math.max(Math.abs(x) - archOut(H), -holeE(x, H) * .9, 6.95 + .25 * (1.04 - Math.abs(x)) - H);
 const archPaint = (x, H, d) => {
   const e = holeE(x, H);
-  let c = PAL.p3_bottle(clamp(.62 - .18 * clamp((H - 6) / 2.5) + .08 * (N.a(x * 4, H * 4) - .5)));
-  const vein = Math.abs(((Math.atan2(x, H - 9.2) * 9) % 1 + 1) % 1 - .5); if (vein < .035 && e > .2) c = mix(c, PAL.p3_bottle(.3), .4);
-  if (e < .1) c = mix(PAL.p3_rim(.05), PAL.p3_rim(.4), clamp(e / .1));                // the lime rim round the face
-  else if (Math.abs(x) > archOut(H) - .07) c = mix(c, PAL.p3_rim(.45), .7);             // the outer lime line
+  let c = PAL.p3_bottle(clamp(.8 - .1 * clamp((8.5 - H) / 1.5) + .06 * (N.a(x * 4, H * 4) - .5)));
+  const vein = Math.abs(((Math.atan2(x, H - 9.2) * 9) % 1 + 1) % 1 - .5); if (vein < .035 && e > .15) c = mix(c, PAL.p3_bottle(.55), .4);
+  if (e < .05) c = mix(PAL.p3_rim(.35), PAL.p3_rim(.6), clamp(e / .05));                // the lime lip round the face
+  else if (e < .12) c = mix(c, PAL.p3_bottle(.95), .5);                                   // its shadow
+  else if (Math.abs(x) > archOut(H) - .04 && H > 7.6) c = mix(c, PAL.p3_rim(.5), .6);     // the outer line over the brow
   if (d < .014) c = PAL.p3_bottle(.95);
   return c;
 };
@@ -404,23 +471,24 @@ const wallY = z => -.83 - .54 * clamp((.68 - z) / 1.72) / 1 * 1;     // the fram
 const wallSd = (u, v) => Math.max(v - (-.76), wallY(u) + .02 - v, u - .7, -1.1 - u);
 const wallPaint = (u, v) => { const d = -wallSd(u, v); if (d < 0) return null; let c = PAL.p3_bottle(clamp(.72 + .1 * (N.b(u * 6, v * 6) - .5))); if (Math.abs(((u * 2.2 + v * 3) % 1 + 1) % 1 - .5) < .03) c = mix(c, PAL.p3_rim(.6), .3); if (v - wallY(u) < .07) c = mix(PAL.p3_rim(.1), PAL.p3_rim(.4), clamp((v - wallY(u)) / .07)); return c; };
 // the horns: the P1 ear flares grown into dark leaf horns sweeping out and up from the upper sides of the hood
-const HORN = stroke([[.82, 7.62], [1.15, 7.85], [1.42, 8.15], [1.56, 8.5], [1.52, 8.86]], t => .2 * Math.pow(Math.sin(Math.PI * Math.min(1, .25 + .78 * t)), .7) + .015);
+const HORN = stroke([[.72, 7.78], [1.08, 7.98], [1.46, 8.2], [1.76, 8.5], [1.9, 8.86]], t => .24 * Math.pow(Math.sin(Math.PI * Math.min(1, .2 + .82 * t)), .75) + .015);
 const hornSd = (x, H) => HORN.sd(Math.abs(x), H);
 const hornPaint = (x, H, d) => { const n = HORN.near(Math.abs(x), H); let c = PAL.p3_bottle(clamp(.58 + .1 * (N.c(x * 5, H * 5) - .5) - .2 * n.t)); if (Math.abs(n.s) < .015) c = mix(c, PAL.p3_bottle(.85), .5); if (n.s < 0 && d < .06) c = mix(PAL.p3_rim(.1), PAL.p3_rim(.4), d / .06); if (d < .014) c = PAL.p3_bottle(.95); return c; };
 // the brow emeralds: cut crystals on the frame beside the mask's upper half (lit facets up-left)
-const browGemSd = (x, H) => Math.abs(Math.abs(x) - .98) / .19 + Math.abs(H - 7.62) / .3 - 1;
-const browGemPaint = (x, H) => { const dx = Math.abs(x) - .98, dy = H - 7.62; let t = dx < 0 ? (dy > 0 ? .1 : .35) : (dy > 0 ? .25 : .55); if (Math.abs(dx) < .012 || Math.abs(dy) < .012) t += .15; if (Math.abs(dx) / .19 + Math.abs(dy) / .3 > .82) t = .75; return PAL.p3_emerald(t); };
+const GEM = [1.02, 8.08, .16, .25];   // the brow emeralds: x, H, half width, half height (over the outer strands' roots)
+const browGemSd = (x, H) => Math.abs(Math.abs(x) - GEM[0]) / GEM[2] + Math.abs(H - GEM[1]) / GEM[3] - 1;
+const browGemPaint = (x, H) => { const dx = Math.abs(x) - GEM[0], dy = H - GEM[1]; let t = dx < 0 ? (dy > 0 ? .1 : .35) : (dy > 0 ? .25 : .55); if (Math.abs(dx) < .012 || Math.abs(dy) < .012) t += .15; if (Math.abs(dx) / GEM[2] + Math.abs(dy) / GEM[3] > .82) t = .75; return PAL.p3_emerald(t); };
 function hoodP3() {
   const els = [];
   P3_ROWS.forEach((row, i) => els.push(...plateRing({...row, half: .045, edge: 'hd_p3_hedge', name: `hd_p3_hp${i}`, forms: 'p3',
-    paintOf: k => ((k === 1 || k === 2) && i === 4 ? ['l', P3PL(true, false)] : ['', P3PL(false, (k === 1 && i === 1) || (k === 2 && i === 3) || (k === 0 && i === 2))])})));
+    paintOf: k => ((k === 1 || k === 2) && i === 4 ? ['l', P3PL(true, false)] : (k === 1 || k === 2) && i > 0 && i < 4 ? ['g', P3PL(false, (k === 1 && i === 1) || (k === 2 && i === 3), 1)] : ['', P3PL(false, k === 0 && i === 2)])})));
   els.push(...loft('z', P3_CORE, {tex: 'hd_p3_lining', caps: '+', seed: 861, skip: (k, th) => Math.sin(th * D2R) < -.3}));
   // the veil frame round the mask (>= 0.2 b in front of it), the horns behind its upper corners, the brow emeralds
-  els.push(...frontPlate('hd_p3_arch', -1.16, 6.9, archSd, archPaint, {box: [-1.25, 1.25, 5.7, 8.6]}));
+  els.push(...frontPlate('hd_p3_arch', -1.16, 7.6, archSd, archPaint, {box: [-1.1, 1.1, 6.9, 8.6]}));
   const wall = slab({plane: 'x', at: 1.02, rect: WALL_R, sd: wallSd, half: .03, sprite: card('hd_p3_wall', WALL_R, wallPaint, 32, 'p3'), edge: 'hd_p3_lining', cell: .07});
   els.push(...wall, ...mirrorX(wall));
-  els.push(...frontPlate('hd_p3_horns', -.82, 8.2, hornSd, hornPaint, {box: [-1.8, 1.8, 7.4, 8.95]}));
-  els.push(...frontPlate('hd_p3_browgem', -1.3, 7.62, browGemSd, browGemPaint, {box: [-1.2, 1.2, 7.28, 7.96], half: .07, edge: 'p3_emerald', ppb: 64}));
+  els.push(...frontPlate('hd_p3_horns', -.82, 8.2, hornSd, hornPaint, {box: [-2.15, 2.15, 7.45, 8.95]}));
+  els.push(...frontPlate('hd_p3_browgem', -1.36, GEM[1], browGemSd, browGemPaint, {box: [-1.22, 1.22, GEM[1] - .27, GEM[1] + .27], half: .07, edge: 'p3_emerald', ppb: 64}));
   // the square lime-gold gem in its raised dark frame near the carapace front, emerald shards along the crest / back
   els.push(rockBox([-.2, -.3, -1.78], [.2, -.16, -1.38], 'hd_p3_hedge', {seed: 863}), rockBox([-.14, -.2, -1.72], [.14, -.1, -1.44], 'p3_gem', {seed: 864}));
   for (const [x, y, z, h] of [[0, .14, -.3, .42], [.38, .08, -.65, .32], [-.38, .08, -.65, .32], [.5, -.02, .05, .3], [-.5, -.02, .05, .3], [0, .02, -1.05, .3]]) els.push(...crystal(`hd_p3_shard`, [x, y, z], .07, h, PAL.p3_emerald, {forms: 'p3', ppb: 48, edge: 'p3_emerald'}));
@@ -467,7 +535,7 @@ function crownP1() {
 // reads from the front, the side and from behind (where it rises past the hood's silhouette)
 const LEAF_V = {u0: -.13, u1: .13, v0: 0, v1: .98}, LEAF_H = {u0: 0, u1: .98, v0: -.13, v1: .13};
 const goldLeafSd = (a, r) => sdLeaf(0, .0, .98, .12, {p: .85})(a, r);
-const goldLeafPaint = (a, r) => { const d = -goldLeafSd(a, r); if (d < 0) return null; let c = PAL.p3_crown(clamp(.5 - .4 * (r / .98) + .12 * Math.abs(a) / .12 + .06 * (N.b(a * 9, r * 9) - .5))); if (Math.abs(a) < .012 && r < .85) c = PAL.p3_crown(.75); const vein = Math.abs(((r * 7 - Math.abs(a) * 10) % 1 + 1) % 1 - .5); if (vein < .06 && Math.abs(a) > .02 && r > .15) c = mix(c, PAL.p3_crown(.6), .4); if (d < .014) c = PAL.p3_crown(.9); return c; };
+const goldLeafPaint = (a, r) => { const d = -goldLeafSd(a, r); if (d < 0) return null; let c = PAL.p3_crown(clamp(.32 - .3 * (r / .98) + .14 * Math.abs(a) / .12 + .06 * (N.b(a * 9, r * 9) - .5))); if (Math.abs(a) < .012 && r < .85) c = PAL.p3_crown(.75); const vein = Math.abs(((r * 7 - Math.abs(a) * 10) % 1 + 1) % 1 - .5); if (vein < .06 && Math.abs(a) > .02 && r > .15) c = mix(c, PAL.p3_crown(.6), .4); if (d < .014) c = PAL.p3_crown(.9); return c; };
 function crownP3() {
   const F = FORM_POINTS.crown.p3[1];
   const els = [...ball(F, .19, 'p3_bud', {seed: 861, n: 8})];
@@ -493,16 +561,164 @@ function crownP3() {
   }
   return els;
 }
-// ================================================= hair (bone frame 'y') =====================================================
-const DRAPE_R = {u0: -.24, u1: .24, v0: -1.6, v1: .08}, DRAPE_W = {p1: 1.9, p3: 1};
-const drapePaint = (tip, R, edge) => (u, v) => { const t = clamp(-v / 1.6), hw = tip ? .22 * (1 - t) + .015 : .22 - .04 * t; if (Math.abs(u) > hw) return null; let c = R(clamp(.55 + .2 * t + .1 * (N.d(u * 9, v * 5) - .5))); if (Math.abs(u) > hw - .035) c = edge(c); if (Math.abs(u - .05) < .03) c = mix(c, PAL.p3_hair(.1), R === PAL.p3_hair ? .7 : 0); return c; };
-function hair(form, seg) {
-  const L = seg === 1 ? dist(J.hair_l_2, J.hair_l_1) : dist([1.7, .2, -2.8], J.hair_l_2);
-  const tip = seg === 2, R = form === 'p1' ? PAL.p1_slate : PAL.p3_hair, edge = form === 'p1' ? c => lift(c, .15) : c => mix(c, PAL.p3_rim(.4), .5);
-  const sp = card(`${form}_hair${seg}`, DRAPE_R, drapePaint(tip, R, edge), 32, form), w = .24 * DRAPE_W[form];
-  const strands = form === 'p1' ? [[0, .02]] : [[-.12, .03], [.13, -.03]];
-  return strands.flatMap(([x, z]) => oneSided([cardZ(sp, z, {X0: x - w, X1: x + w, Y0: -L - .05, Y1: .08})], ['north']));
+// ================================================= ribbons (strands designed in world space) ===================================
+// A part's model frame at a stance: model (A-frame blocks) <-> world (rig frame, blocks)
+const MF = modelFrames({CROUCH: solve(STANCES.CROUCH), UPRIGHT: oU});
+const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const nrm3 = a => { const l = Math.hypot(...a) || 1; return a.map(v => v / l); };
+function partFrame(part, form, o) {
+  const O = modelPoint(o, MF, form, part, [0, 0, 0]), ax = [[1, 0, 0], [0, 1, 0], [0, 0, 1]].map(a => sub(modelPoint(o, MF, form, part, a), O));
+  return {O, ax, toM: W => ax.map(a => dot3(sub(W, O), a)), dirM: D => ax.map(a => dot3(D, a))};
 }
+// Catmull-Rom densified polyline through pts (3D) with n samples per span, plus the arc fraction of every sample
+function spline(pts, n = 8) {
+  const P = [pts[0], ...pts, pts[pts.length - 1]], out = [];
+  for (let i = 1; i < P.length - 2; i++) for (let k = 0; k < n; k++) {
+    const t = k / n, t2 = t * t, t3 = t2 * t;
+    out.push([0, 1, 2].map(j => .5 * (2 * P[i][j] + (-P[i - 1][j] + P[i + 1][j]) * t + (2 * P[i - 1][j] - 5 * P[i][j] + 4 * P[i + 1][j] - P[i + 2][j]) * t2 + (-P[i - 1][j] + 3 * P[i][j] - 3 * P[i + 1][j] + P[i + 2][j]) * t3)));
+  }
+  out.push(pts[pts.length - 1]);
+  const L = [0]; for (let i = 1; i < out.length; i++) L.push(L[i - 1] + dist(out[i], out[i - 1]));
+  return {pts: out, t: L.map(l => l / L[L.length - 1]), len: L[L.length - 1]};
+}
+// nearest point of a 2D polyline with per-vertex values t: {t, s (signed side, + = left of the direction), d}; past either end
+// the line runs on straight (t < 0 or > 1), so a clip by t cuts the ends square
+function near2(P, T) {
+  return (x, y) => {
+    let best = null;
+    for (let i = 0; i < P.length - 1; i++) {
+      const [ax, ay] = P[i], [bx, by] = P[i + 1], dx = bx - ax, dy = by - ay, l = Math.hypot(dx, dy) || 1e-9, ux = dx / l, uy = dy / l;
+      const qx = x - ax, qy = y - ay, p = qx * ux + qy * uy, a = (i === 0 && p < 0) || (i === P.length - 2 && p > l) ? p : Math.max(0, Math.min(l, p)), ex = qx - a * ux, ey = qy - a * uy, d2 = ex * ex + ey * ey;
+      if (!best || d2 < best.d2) best = {d2, t: T[i] + (T[i + 1] - T[i]) * a / l, s: ux * qy - uy * qx};
+    }
+    return {t: best.t, s: best.s, d: Math.sqrt(best.d2)};
+  };
+}
+const PLANE_N = {z: [0, 0, 1], x: [1, 0, 0], y: [0, 1, 0]}, PLANE_UV = {z: [0, 1], x: [2, 1], y: [0, 2]}, PLANE_I = {z: 2, x: 0, y: 1};
+const ROTS = [0, 22.5, -22.5, 45, -45];
+// A ribbon: a strand centreline in WORLD space (stance frame fr of the part) with half width w(t), split into flat panels at
+// the arc fractions `cuts`; each panel is one painted slab in the element plane / single-axis 22.5-degree rotation closest
+// to facing face(t) (a world direction) across the strand. paint({t, s, d, side}) -> colour (s: -1..1 across, d: blocks
+// inside the edge). oneSide: a world direction; the panel keeps only its card facing that way and no core (R18).
+function ribbon(name, fr, world, w, {cuts = [0, 1], face = () => [0, 0, -1], side = null, paint, ppb = 32, forms, half = .03, edge, core = true, oneSide = null, ov = .015, n = 8, bend = null}) {
+  const S = spline(world.map(fr.toM), n), els = [];
+  for (let i = 0; i < cuts.length - 1; i++) {
+    const ta = Math.max(0, cuts[i] - ov), tb = Math.min(1, cuts[i + 1] + ov);
+    const idx = S.t.map((t, k) => (t >= ta - .06 && t <= tb + .06 ? k : -1)).filter(k => k >= 0);
+    const sub3 = idx.map(k => S.pts[k]), T = nrm3(sub(sub3[sub3.length - 1], sub3[0]));
+    const F = fr.dirM(face((ta + tb) / 2)), nn = nrm3(sub(F, T.map(v => v * dot3(F, T))));
+    let best = null;
+    for (const pl of ['z', 'x', 'y']) for (const ax of ['x', 'y', 'z']) for (const deg of ROTS) {
+      if (ax === pl && deg) continue;
+      if (deg === 0 && ax !== 'x') continue;
+      const N = rotA(ax, deg, PLANE_N[pl]), sc = Math.abs(dot3(N, nn)) - (deg ? .002 * Math.abs(deg) / 22.5 : 0);
+      if (!best || sc > best.sc) best = {sc, pl, ax, deg, N};
+    }
+    const piv = [0, 1, 2].map(j => sub3.reduce((a, p) => a + p[j], 0) / sub3.length);
+    const unrot = P => add(piv, rotA(best.ax, -best.deg, sub(P, piv)));
+    const Q = S.pts.map(unrot), [iu, iv] = PLANE_UV[best.pl], ia = PLANE_I[best.pl];
+    const at = idx.reduce((a, k) => a + Q[k][ia], 0) / idx.length;
+    const P2 = Q.map(q => [q[iu], q[iv]]), nr = near2(P2, S.t);
+    const wmax = Math.max(...idx.map(k => w(S.t[k])));
+    const us = idx.map(k => P2[k][0]), vs = idx.map(k => P2[k][1]);
+    const R0 = {u0: Math.min(...us) - wmax - .04, u1: Math.max(...us) + wmax + .04, v0: Math.min(...vs) - wmax - .04, v1: Math.max(...vs) + wmax + .04};
+    const sd = (u, v) => { const q = nr(u, v); return Math.max(q.d - w(q.t), (ta - q.t) * S.len, (q.t - tb) * S.len); };
+    // the tight rect of the panel's shape (sampled), padded by 0.02
+    const rect = {u0: 9, u1: -9, v0: 9, v1: -9}, G = 60;
+    for (let a = 0; a <= G; a++) for (let b = 0; b <= G; b++) {
+      const u = R0.u0 + (R0.u1 - R0.u0) * a / G, v = R0.v0 + (R0.v1 - R0.v0) * b / G;
+      if (sd(u, v) < .015) { rect.u0 = Math.min(rect.u0, u); rect.u1 = Math.max(rect.u1, u); rect.v0 = Math.min(rect.v0, v); rect.v1 = Math.max(rect.v1, v); }
+    }
+    rect.u0 -= .02; rect.u1 += .02; rect.v0 -= .02; rect.v1 += .02;
+    // s > 0 on the side of the world direction side(t) (default: the left of the 2D direction)
+    let sg = 1;
+    if (side) {
+      const km = idx[Math.floor(idx.length / 2)], k2 = Math.min(S.pts.length - 1, km + 1), k1 = k2 - 1, dx = P2[k2][0] - P2[k1][0], dy = P2[k2][1] - P2[k1][1];
+      const r3 = rotA(best.ax, -best.deg, fr.dirM(side(S.t[km]))), r2 = [r3[iu], r3[iv]];
+      sg = Math.sign(-dy * r2[0] + dx * r2[1]) || 1;
+    }
+    const pt = (u, v) => { const q = nr(u, v), hw = w(q.t), d = hw - q.d; if (d < 0 || q.t < ta - .002 || q.t > tb + .002) return null; return paint({t: q.t, s: clamp(sg * q.s / Math.max(hw, 1e-3), -1, 1), d, len: S.len}); };
+    const sname = `${name}_${i}`, sp = best.pl === 'y' ? cardY(sname, rect, pt, ppb, forms) : card(sname, rect, pt, ppb, forms);
+    const rot = best.deg ? [best.ax, best.deg, piv] : null;
+    if (oneSide) {
+      const o = rotA(best.ax, -best.deg, fr.dirM(oneSide)), sgn = Math.sign(dot3(o, PLANE_N[best.pl])) || 1;
+      const keep = {z: sgn > 0 ? 'south' : 'north', x: sgn > 0 ? 'west' : 'east', y: sgn > 0 ? 'up' : 'down'}[best.pl];
+      els.push(...oneSided(slab({plane: best.pl, at, rect, sd, half, sprite: sp, edge, core: false, rot, cards: sgn > 0 ? '+' : '-'}), [keep]));
+    } else els.push(...slab({plane: best.pl, at, rect, sd, half, sprite: sp, edge: edge || sp, cell: .06, rot, core}));
+    void bend;
+  }
+  return els;
+}
+
+// ================================================= hair (bone frame 'y') =====================================================
+// P3 (model_p3 §2.1 item 5; v5 f1074, v6 f480 face zoom): per side an outer dark bottle-green strand with a lime streak
+// that leaves the hood's upper side, sweeps out and down past the face to the shoulder and on down the chest, and an inner
+// lime-olive strand along the mask edge. The strands are designed in UPRIGHT world space; hair_1 carries them down to its
+// joint beside the chin, hair_2 on to the chest (<= 1.8 b from each joint, the part reach).
+// P1 (model.md §3.5, v2 f2076 / f2040): broad dark slate ribbons from the cowl sides to the ground, turning outward as
+// they fall, the ends splayed on the ground; one-sided below 2.5 b (R18).
+// seg: which hair part carries the strand (1: the hood side down to the chin, 2: the chin down to the chest); [lo, hi] the arc
+// span the part covers when a strand crosses the joint
+const HAIR_P3 = {
+  outer: {seg: [1], lime: false, cuts: [0, .3, .62, 1],
+    w: t => .02 + .22 * Math.pow(Math.sin(Math.PI * Math.min(1, .06 + t * .9)), .9) * (1 - .3 * t),
+    pts: [[.36, 8.48, -.8], [.76, 8.3, -1.06], [1.16, 7.86, -1.22], [1.43, 7.2, -1.26], [1.53, 6.5, -1.2], [1.5, 5.82, -1.12]]},
+  outer2: {seg: [2], lime: false, cuts: [0, .5, 1],
+    w: t => .02 + .17 * Math.pow(Math.sin(Math.PI * Math.min(1, .1 + t * .9)), .8),
+    pts: [[1.28, 6.12, -1.14], [1.5, 5.5, -1.08], [1.76, 4.88, -.98], [1.92, 4.3, -.9]]},
+  inner: {seg: [1, 2], lime: true, cut: 4,
+    w: t => .04 + .15 * Math.pow(Math.sin(Math.PI * Math.min(1, .08 + t * .95)), .5),
+    pts: [[.6, 8.02, -1.12], [.86, 7.56, -1.27], [.98, 6.9, -1.32], [.93, 6.3, -1.34], [.9, 5.96, -1.35],
+      [.98, 5.45, -1.34], [1.13, 4.9, -1.26], [1.26, 4.35, -1.12]]},
+};
+const hairP3Paint = lime => ({t, s, d}) => {
+  const R = PAL.p3_hair;
+  let c = lime ? mix(PAL.p3_lime(clamp(.4 + .3 * t)), R(.5), .3) : R(clamp(.74 + .12 * t + .06 * (N.d(t * 9, s * 2) - .5)));
+  if (!lime && s > .5) c = mix(c, R(clamp(.1 + .3 * t)), clamp((s - .5) / .15));        // the lime streak along the inner edge
+  if (!lime && Math.abs(s + .25) < .08) c = mix(c, R(.95), .5);                          // a darker groove
+  if (lime && Math.abs(s - .25) < .12) c = mix(c, PAL.p3_lime(.12), .5);                 // the lit ridge
+  if (lime && s < -.5) c = mix(c, R(.6), .45);
+  if (d < .018) c = PAL.p3_bottle(.95);
+  return c;
+};
+function hairP3(seg) {
+  const part = `hair_l_${seg}`, fr = partFrame(part, 'p3', oU), els = [];
+  for (const [k, st] of Object.entries(HAIR_P3)) {
+    if (!st.seg.includes(seg)) continue;
+    const split = st.seg.length > 1, n = st.pts.length - 1;
+    const P = !split ? st.pts : seg === 1 ? st.pts.slice(0, st.cut + 1) : st.pts.slice(st.cut);
+    const T0 = !split || seg === 1 ? 0 : st.cut / n, T1 = !split ? 1 : seg === 1 ? st.cut / n : 1, g = t => T0 + (T1 - T0) * t;
+    const cuts = st.cuts || [0, .5, 1];
+    els.push(...ribbon(`p3_hair${seg}_${k}`, fr, P, t => st.w(g(t)), {cuts, paint: ({t, s, d}) => hairP3Paint(st.lime)({t: g(t), s, d}), ppb: 40, forms: 'p3', half: .03,
+      face: t => (k === 'outer' && t < .45 ? [.15, .5, -1] : [.3, 0, -1]), side: () => [-1, -.3, 0], edge: st.lime ? 'hd_p3_hairin' : 'hd_p3_hairout'}));
+  }
+  return els;
+}
+tile('hd_p3_hairout', 16, 16, 32, (u, v) => PAL.p3_hair(clamp(.7 + .1 * N.b(u * 4, v * 4))), 'p3');
+tile('hd_p3_hairin', 16, 16, 32, (u, v) => mix(PAL.p3_lime(.5), PAL.p3_hair(.45), .4), 'p3');
+const DRAPE_P1 = {
+  // cowl side (under the ear flare) -> down and out to the ground, turning to face outward as it falls; hair_2 splays on the ground
+  pts: [[.98, 3.32, -2.62], [1.2, 2.75, -2.72], [1.38, 2.1, -2.74], [1.5, 1.6, -2.72], [1.68, 1.0, -2.75], [1.95, .45, -2.8], [2.35, .16, -2.85], [2.75, .1, -2.9]],
+  cut: 3, w: t => .2 + .28 * Math.pow(Math.sin(Math.PI * Math.min(1, .25 + .8 * t)), .7) - .12 * Math.pow(t, 6),
+};
+const drapeP1Paint = ({t, s, d}) => {
+  let c = PAL.p1_slate(clamp(.55 + .2 * t + .08 * (N.d(t * 11, s * 3) - .5)));
+  const gr = Math.abs(((s * 1.6 + t * .6) % 1 + 1) % 1 - .5); if (gr < .04) c = sink(c, .25);    // folds
+  if (s > .55) c = mix(c, PAL.p1_slate(.2), clamp((s - .55) / .3) * .7);                         // the lit outer edge
+  if (d < .05 && s < 0) c = mix(c, PAL.p1_bark(.55), .35);                                       // the pale underside peeking
+  if (d < .018) c = PAL.p1_line(.85);
+  return c;
+};
+function hairP1(seg) {
+  const part = `hair_l_${seg}`, fr = partFrame(part, 'p1', solve(STANCES.CROUCH)), st = DRAPE_P1;
+  const P = seg === 1 ? st.pts.slice(0, st.cut + 1) : st.pts.slice(st.cut);
+  const T0 = seg === 1 ? 0 : st.cut / (st.pts.length - 1), T1 = seg === 1 ? st.cut / (st.pts.length - 1) : 1, w = t => st.w(T0 + (T1 - T0) * t);
+  const faceOf = t => { const g = T0 + (T1 - T0) * t; return g < .75 ? [.35 + .9 * g, 0, -1] : [.5, 1.2, -.3]; };
+  const els = ribbon(`p1_hair${seg}`, fr, P, w, {cuts: seg === 1 ? [0, .5, 1] : [0, .4, .75, 1], face: faceOf, paint: ({t, s, d}) => drapeP1Paint({t: T0 + (T1 - T0) * t, s, d}),
+    ppb: 32, forms: 'p1', half: .035, edge: 'hd_p1_hedge', oneSide: seg === 2 ? [1, .4, -.4] : [1, 0, -.6]});
+  return els;
+}
+function hair(form, seg) { return form === 'p1' ? hairP1(seg) : hairP3(seg); }
 // ---- region interface ------------------------------------------------------------------------------------------------------
 let built = null;
 export function models() {
