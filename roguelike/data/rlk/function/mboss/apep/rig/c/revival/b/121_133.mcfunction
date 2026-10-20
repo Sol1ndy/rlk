@@ -1,2 +1,2 @@
-execute if score @s apRigT matches ..127 run return run function rlk:mboss/apep/rig/c/revival/b/121_127
-function rlk:mboss/apep/rig/c/revival/b/128_133
+execute if score @s apRigT matches ..126 run return run function rlk:mboss/apep/rig/c/revival/b/121_126
+function rlk:mboss/apep/rig/c/revival/b/127_133

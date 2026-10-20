@@ -182,20 +182,26 @@ const GUARD = [
   {bones: ['hem_a', 'hem_b'], ax: 0, sg: -1, y: .14},
   {bones: ['hair_l_1', 'hair_l_2'], ax: 2, sg: 1, y: .18}, {bones: ['hair_r_1', 'hair_r_2'], ax: 2, sg: -1, y: .18},
 ];
-function floorGuard(p) {
+// nearest = the smallest turn in either direction, or with ref the solution closest to ref's angle (the floor pass
+// between keys: a blend that dips stays continuous instead of jumping sides); the key poses use the preferred
+// direction first.
+function floorGuard(p, nearest = false, ref = null) {
   for (const {bones, ax, sg, y} of GUARD) for (const b of bones) {
     const end = () => carry(solve(p), b, BONE[b].tip)[1];
     if (end() >= y - 1e-3) continue;
     const base = p[b].slice(), set = d => { p[b] = base.slice(); p[b][ax] += d; };
     // the preferred direction first, then the other; if neither reaches the floor height, the highest end of either
-    let done = false;
+    const sol = [];
     for (const dir of [sg, -sg]) {
       set(dir * 75); if (end() < y) continue;
       let lo = 0, hi = 75;
       for (let i = 0; i < 9; i++) { const m = (lo + hi) / 2; set(dir * m); if (end() >= y) hi = m; else lo = m; }
-      set(dir * Math.round(hi * 10) / 10); done = true; break;
+      sol.push(dir * Math.round(hi * 10) / 10);
+      if (!nearest) break;
     }
-    if (!done) { let best = [-1e9, 0]; for (let d = -75; d <= 75; d += 5) { set(d); const e = end(); if (e > best[0]) best = [e, d]; } set(best[1]); }
+    const cost = d => (ref ? Math.abs(base[ax] + d - ref[b][ax]) : Math.abs(d));
+    if (sol.length) set(sol.reduce((a, d) => (cost(d) < cost(a) ? d : a)));
+    else { let best = [-1e9, 0]; for (let d = -75; d <= 75; d += 5) { set(d); const e = end(); if (e > best[0]) best = [e, d]; } set(best[1]); }
   }
   return p;
 }
@@ -255,8 +261,8 @@ const SWIRL = def('SWIRL', P(SPREAD, {chest: [SPREAD.chest[0], -12, 0], shoulder
 const OVERHEAD = def('OVERHEAD', P(C0, {...rear(.62, {head: -22, y: .45}), ...tg('a', .7, 8.4, -2.4, Z), ...tg('b', 2.4, 2.2, -2.6, Z), ...tg('c', 2.9, .4, 1.0)}));
 const PLUNGE = def('PLUNGE', P(C0, {pelT: [0, -.5, -.3], pelvis: [-16, 0, 0], chest: [-12, 0, 0], shoulders: [-6, 0, 0], neck: [14, 0, 0], head: [14, 0, 0], tail_1: [6, 0, 0],
   ...tg('a', 1.1, .35, -4.4), ...tg('b', 2.1, .4, -2.9), ...tg('c', 2.9, .4, 2.3)}));
-const PLUNGE_DEEP = def('PLUNGE_DEEP', P(PLUNGE, {pelT: [0, -.6, -.2], pelvis: [-18, 0, 0], chest: [-12, 0, 0], head: [16, 0, 0]}));
-const PLUNGE_DIP = def('PLUNGE_DIP', P(PLUNGE_DEEP, {pelT: [0, -.64, -.25], chest: [-15, 0, 0], neck: [17, 0, 0]}));
+const PLUNGE_DEEP = def('PLUNGE_DEEP', P(PLUNGE, {pelT: [0, -.52, -.2], pelvis: [-18, 0, 0], chest: [-12, 0, 0], head: [16, 0, 0]}));
+const PLUNGE_DIP = def('PLUNGE_DIP', P(PLUNGE_DEEP, {pelT: [0, -.56, -.25], chest: [-15, 0, 0], neck: [17, 0, 0]}));
 const CROSS = def('CROSS', P(C0, {...rear(.5, {head: -8}), ...tg('a', 1.2, .35, -4.2), ...tg('b', 2.4, .4, -2.4), ...tg('c', 2.9, .4, 1.3), mantle_l_a: [0, 0, 60], mantle_l_b: [0, 0, 20]}));
 const FLOWER = def('FLOWER', P(C0, {...rear(.95, {head: -18, y: .9, lean: -5}), ...tg('a', 3.4, 7.6, -1.2, Z), ...tg('b', 2.8, 3.6, -2.2, Z), ...tg('c', 2.8, .4, .8),
   mantle_l_a: [-20, 0, 70], mantle_l_b: [0, 0, 30]}));
@@ -285,7 +291,10 @@ const CRASH = def('CRASH', P(C0, {pelT: [0, -.55, 0], pelvis: [0, 0, 46], chest:
   ...tg('a', 2.6, 4.2, -3.2, Z), ...tgR('a', -6.2, .4, -1.8), ...tg('b', 3.0, 3.0, -2.6, Z), ...tgR('b', -3.4, .4, -3.0), ...tg('c', 3.0, 2.6, 2.2, Z), ...tgR('c', -3.6, .4, 2.6),
   mantle_l_a: [0, 0, 40], mantle_l_b: [0, 0, 20]}));
 const CRASH_B = def('CRASH_B', P(CRASH, {chest: [-8, 0, 12], tSweep: -45, tg_a_l: [3.4, 4.6, -1.6], tg_a_r: [-6.4, .4, .2]}));
-const SPRAWL = def('SPRAWL', P(C0, {pelT: [0, -1.1, 0], pelvis: [0, 0, 22], chest: [-3, 0, 4], ...tg('a', 5.8, .4, -1.4), ...tg('b', 3.3, .4, -3.2), ...tg('c', 3.6, .4, 2.9)}));
+// (the right drapes roll the same way as in the crash, so the blend from the crash stays over the floor; the guard's
+// preferred outward roll folds them into an S here)
+const SPRAWL = def('SPRAWL', P(C0, {pelT: [0, -1.1, 0], pelvis: [0, 0, 22], chest: [-3, 0, 4], ...tg('a', 5.8, .4, -1.4), ...tg('b', 3.3, .4, -3.2), ...tg('c', 3.6, .4, 2.9),
+  hair_r_1: [0, 0, 30], hair_r_2: [0, 0, 46]}));
 const PUSHUP = def('PUSHUP', P(C0, {pelT: [0, -.35, 0], pelvis: [8, 0, 8], chest: [4, 0, 2], neck: [-4, 0, 0], head: [-2, 0, 0], ...tg('a', 5.0, .4, -2.0), ...tg('b', 2.3, .4, -2.6)}));
 // tail: pitch - raises a back-pointing segment; yaw + swings it to the boss's left (tSweep spreads a yaw over the chain)
 const TAIL_S = def('TAIL_S', P(C0, {pelT: [0, .15, 0], pelvis: [-5, 0, 0], chest: [2, 0, 0], neck: [-4, 0, 0], head: [-2, 0, 0],
@@ -299,7 +308,7 @@ const TAIL_FOLLOW = def('TAIL_FOLLOW', tailYaw(C0, [-8, 2], [-30, -14, -10, -8, 
 const TAIL_COCK2 = def('TAIL_COCK2', tailYaw(C0, [-38, 6], [-34, -22, -18, -14, -10, -8, -6, -6], {...BRACE, pelvis: [-4, 10, 0], chest: [0, -8, 0]}));
 const TAIL_WHIP2 = def('TAIL_WHIP2', tailYaw(C0, [-10, 2], [-28, -14, -10, -6, -4, -2, 0, 0], {...BRACE, pelvis: [-4, -4, 0], chest: [0, 4, 0]}));
 const TAIL_FOLLOW2 = def('TAIL_FOLLOW2', tailYaw(C0, [-6, 2], [30, 14, 10, 8, 6, 4, 2, 2], {...BRACE, pelvis: [-4, -8, 0], chest: [0, 8, 0]}));
-const TAIL_REST = def('TAIL_REST', P(SPRAWL, {pelvis: [0, 0, 8], tail_1: [6, 0, 0]}));
+const TAIL_REST = def('TAIL_REST', P(SPRAWL, {pelvis: [0, 0, 8], tail_1: [6, 0, 0], hair_r_1: [0, 0, 0], hair_r_2: [0, 0, 0]}));   // (drapes: its own guard)
 // the melee combo (4 segments)
 const SWEEP_BACK = def('SWEEP_BACK', P(C0, {...rear(.15, {head: -4}), chest: [rear(.15).chest[0], 18, 0], shoulders: [rear(.15).shoulders[0], 8, 0], ...tgR('a', -4.8, 1.6, 1.8, Z), ...tg('a', 4.8, .6, -2.4)}));
 const SWEEP_THRU = def('SWEEP_THRU', P(C0, {pelT: [0, -.3, -.2], pelvis: [-4, 0, 0], chest: [-4, -22, 0], shoulders: [0, -8, 0], ...tgR('a', 2.6, 1.0, -5.6, Z), ...tg('a', 4.8, .6, -2.4)}));
@@ -378,9 +387,10 @@ const FLICK_L = def('FLICK_L', (() => { const p = Pd(T_WIDE); for (const [k, d] 
 const FLICK_R = def('FLICK_R', (() => { const p = Pd(T_WIDE); for (const [k, d] of [['b_up_r', [0, -26, -14]], ['b_lo_r', [0, 0, 18]], ['a_up_r', [0, -12, -6]]]) p[k] = p[k].map((v, i) => v + d[i]); return p; })());
 // CROUCH_OVER (v5 f1086-f1140, the umbrella): half upright, the B arms spread over the player
 const CROUCH_OVER = def('CROUCH_OVER', mix(W0, U0, .62, {ik_b_l: 0, b_up_l: [40, -30, 40], b_lo_l: [10, -20, 30], b_hand_l: [-20, 0, 0], ik_a_l: 0, ik_c_l: 1}));
-// the 종말의 여파 cast: seated after the whirl, aloft in a V, the blast
-const SEATED = def('SEATED', P(W0, {pelT: [0, -.6, 0], pelvis: [18, 0, 0], chest: [6, 0, 0], neck: [-10, 0, 0], head: [-8, 0, 0], tail_1: [-14, 0, 0],
-  ...tg('a', 6.0, 2.6, -1.0, Z), ...tg('b', 3.8, 1.0, -2.6, Z), ...tg('c', 3.4, .4, 2.2)}));
+// the 종말의 여파 cast: seated after the whirl (w1 f123-f135: a tall hunched mass over the field, every arm curved down to
+// the water round it, the hood forward), aloft in a V, the blast
+const SEATED = def('SEATED', Pd(lerpPose(M0, U0, .35), {pelT: [0, -.35, -.25], chest: [-14, 0, 0], shoulders: [-8, 0, 0], neck: [6, 0, 0], head: [8, 0, 0], tail_1: [-6, 0, 0]},
+  {ik_a_l: 1, ik_b_l: 1, ik_c_l: 1, ...tg('a', 5.6, .6, -1.8), ...tg('b', 4.0, .45, -2.2), ...tg('c', 3.4, .4, 2.2), mantle_l_a: [0, 0, -10]}));
 const WHIRL = def('WHIRL', mix(M0, U0, .35, {pelT: [0, .9, -.6], ik_a_l: 0, ik_b_l: 0, a_up_l: [0, -30, 70], a_lo_l: [0, 0, 20], b_up_l: [0, -40, 60], b_lo_l: [0, 0, 10], tSweep: -40}));
 const ALOFT = def('ALOFT', Pd(V, {pelT: [0, 3.4, 0], tail_1: [30, 0, 0], tCurl: -6, c_up_l: [0, 0, -16], c_lo_l: [10, 0, 0], hem_a: [8, 0, 0]}));
 const ALOFT_HI = def('ALOFT_HI', Pd(ALOFT, {pelT: [0, .25, 0], a_lo_l: [0, 0, 6], b_up_l: [0, 0, 6]}));
@@ -391,7 +401,7 @@ const REACH_P3 = def('REACH_P3', (() => { const p = Pd(HUNCH, {pelT: [0, .3, 0],
 const HIT_SNAP = def('HIT_SNAP', Pd(U0, {pelvis: [6, 0, 0], chest: [6, 0, 0], neck: [-10, 0, 0], head: [18, 0, 0], hood_hinge: [8, 0, 0], a_up_l: [0, -10, 10], b_up_l: [0, -16, 8]}));
 const DROOP = def('DROOP', Pd(U0K, {pelT: [0, -.4, -.1], pelvis: [-8, 0, 0], chest: [-8, 0, 0], shoulders: [-6, 0, 0], neck: [-6, 0, 0], head: [-26, 0, 0], hood_hinge: [-20, 0, 0],
   a_up_l: [0, 8, -30], a_lo_l: [0, 0, -16], b_up_l: [0, 8, -22], b_lo_l: [0, 0, -10]}));
-const KNEEL = def('KNEEL', Pd(DROOP, {pelT: [0, -1.2, -.2], pelvis: [-6, 0, 0], chest: [-6, 0, 0], head: [-10, 0, 0], hood_hinge: [-20, 0, 0], b_up_l: [0, 0, 8], a_up_l: [0, 0, 6]}, {tg_c_l: [3.0, .5, -1.4]}));
+const KNEEL = def('KNEEL', Pd(DROOP, {pelT: [0, -.85, -.2], pelvis: [-6, 0, 0], chest: [-6, 0, 0], head: [-10, 0, 0], hood_hinge: [-20, 0, 0], b_up_l: [0, 0, 8], a_up_l: [0, 0, 6]}, {tg_c_l: [3.0, .5, -1.4]}));
 const FALLEN = def('FALLEN', P(W0, {pelT: [0, -1.3, -.6], pelvis: [-8, 0, 0], chest: [-8, 0, 0], neck: [5, 0, 0], head: [10, 0, 0],
   ...tg('a', 5.9, .45, -1.6), ...tg('b', 3.5, .45, -3.0), ...tg('c', 3.7, .45, 2.7), mantle_l_a: [0, 0, -15], tSweep: 20}));
 // the surfacing shot (surface_p3): the crawl with the hood raised at the player, then the thrust
@@ -485,7 +495,7 @@ const BURST_P3 = def('BURST_P3', mix(MOUND, HOOP, .5, {pelT: [0, 1.8, -.1]}));
 const MOUND_LIT = def('MOUND_LIT', P(MOUND, {pelT: [0, -.8, .2], pelvis: [-2, 0, 0], head: [4, 0, 0], hood_hinge: [20, 0, 0]}));
 const WHIRL_A = def('WHIRL_A', mix(MOUND_LIT, WHIRL, .5));
 const WHIRL_B = def('WHIRL_B', P(WHIRL, {tSweep: -60, a_up_l: [0, -40, 80], b_up_l: [0, -50, 70]}));
-const SEATED_LIT = def('SEATED_LIT', P(SEATED, {hood_hinge: [60, 0, 0], head: [-14, 0, 0]}));
+const SEATED_LIT = def('SEATED_LIT', Pd(SEATED, {hood_hinge: [8, 0, 0], head: [-4, 0, 0], chest: [2, 0, 0]}));
 const ALOFT_RISE = def('ALOFT_RISE', mix(SEATED_LIT, ALOFT, .35));
 const KNEEL_LEAN = def('KNEEL_LEAN', Pd(KNEEL, {pelvis: [-10, 0, 0], chest: [-8, 0, 0], head: [-8, 0, 0]}));
 const FALLING = def('FALLING', mix(KNEEL_LEAN, FALLEN, .45));
@@ -495,6 +505,11 @@ const SURF_DOWN = def('SURF_DOWN', P(MOUND, {pelT: [0, -1.2, .2]}));
 const SCOIL_LOW2 = def('SCOIL_LOW2', finish(Object.assign(deep(SCOIL_LOW), Object.fromEntries(TAILS.map(k => [k, P3_COCK2[k].slice()])))));
 // move_strike_p3: the wheel slams down with the tail still curled, then the tail unrolls onto the water (61-66)
 const BELLY_TAILUP = def('BELLY_TAILUP', P(BELLY_FLOP, {tCurl: 10, tLift: -62}));
+// the ring opening after the slam (61 -> 65): the tail uncurls while it swings out sideways (tSweep), so no tail segment
+// turns more than ~110 deg per tick (a straight uncurl in 4 t either exceeds that or passes 3-6 b under the floor)
+const HOOP_DOWN = Object.assign(withRot(HOOP, [-360, 0, 0]), {pos: [0, 1.0, 0]}), FLOP_SW = withRot(P(BELLY_FLOP, {tSweep: 45}), [-360, 0, 0]);
+const RING_OPEN_A = Object.assign(lerpPose(HOOP_DOWN, FLOP_SW, .25), {tCurl: -18, tLift: -10, tSweep: 160});
+const RING_OPEN_B = Object.assign(lerpPose(HOOP_DOWN, FLOP_SW, .75), {tCurl: -2, tLift: 10, tSweep: 120});
 
 // ==== CLIP_KEYS: the motion of every clip on the played timeline (events: CLIP_TABLE) ==================================
 export const CLIP_KEYS = {
@@ -505,12 +520,12 @@ export const CLIP_KEYS = {
   idle_p1: () => breathe(CROUCH, CROUCH_IN, 60, 5),
   // pivot steps (v1 15.10): B_L, C_R, B_R, C_L lift in turn, the pelvis counter-rolls
   turn_p1: () => steps(20, 1, [['b', 'l', 0, 5, .55, .15], ['c', 'r', 5, 5, .5, .15], ['b', 'r', 10, 5, .55, .15], ['c', 'l', 15, 5, .5, .15]],
-    t => P(C0, {pelvis: [0, 0, 4 * Math.sin(2 * Math.PI * t / 10)], chest: [0, -3 * Math.sin(2 * Math.PI * t / 20), 0], pelT: [0, -.08, 0]})),
-  turn_p1_step: () => steps(10, 1, [['b', 'l', 0, 5, .6, .2], ['c', 'r', 5, 5, .55, .2]], t => P(C0, {pelvis: [0, 0, 4 * Math.sin(Math.PI * t / 5)], chest: [0, 4 * Math.sin(Math.PI * t / 10), 0], pelT: [0, -.08, 0]})),
+    t => P(C0, {pelvis: [0, 0, 2.5 * Math.sin(2 * Math.PI * t / 10)], chest: [0, -2 * Math.sin(2 * Math.PI * t / 20), 0], pelT: [0, -.08, 0]})),
+  turn_p1_step: () => steps(10, 1, [['b', 'l', 0, 5, .6, .2], ['c', 'r', 5, 5, .55, .2]], t => P(C0, {pelvis: [0, 0, 2.5 * Math.sin(Math.PI * t / 5)], chest: [0, 4 * Math.sin(Math.PI * t / 10), 0], pelT: [0, -.08, 0]})),
   // the spider crawl (v1 15.60): diagonal tripods {B_L, C_R, A_R} 0-8 and {B_R, C_L, A_L} 8-16, stride 2 b (0.25 b/t)
   crawl_p1: () => gait(16, 2, [['b', 'l', 0, 8, 2.0, .6, [2.4, .4, -2.9]], ['c', 'r', 0, 8, 2.0, .6, [-2.9, .4, 2.6]], ['a', 'r', 0, 8, 2.2, .8, [-4.8, .6, -2.4]],
     ['b', 'r', 8, 8, 2.0, .6, [-2.4, .4, -2.9]], ['c', 'l', 8, 8, 2.0, .6, [2.9, .4, 2.6]], ['a', 'l', 8, 8, 2.2, .8, [4.8, .6, -2.4]]],
-    t => P(LOW, {pelvis: [-3, 0, 3 * Math.sin(2 * Math.PI * t / 16)], pelT: [0, -.45 + .08 * Math.cos(4 * Math.PI * t / 16), .1], chest: [-3, 3 * Math.sin(2 * Math.PI * t / 16), 0], tail_1: [3, -4 * Math.sin(2 * Math.PI * t / 16), 0]})),
+    t => P(LOW, {pelvis: [-3, 0, 2 * Math.sin(2 * Math.PI * t / 16)], pelT: [0, -.45 + .05 * Math.cos(4 * Math.PI * t / 16), .1], chest: [-3, 2 * Math.sin(2 * Math.PI * t / 16), 0], tail_1: [3, -4 * Math.sin(2 * Math.PI * t / 16), 0]})),
   // stops (LOW -> CROUCH at the plant 8), rises into the half-stand with the core lit (v1 17.40)
   crawl_stop_p1: () => [K(0, LOW), K(8, CROUCH, 'o'), K(16, HALF, 'o'), K(24, HALF), K(32, CROUCH)],
   // the crab side-walk (v2 13.50): C_L 0, B_L 9, C_R 18, B_R 27, heavy thumps, the hump rolls toward the planted side
@@ -529,7 +544,7 @@ export const CLIP_KEYS = {
   emerge_crown_p1: () => [K(0, EMERGE), K(10, EMERGE), K(21, HALF, 'o'), K(30, HALF), K(40, CROUCH)],
   // 생명의 손 (v1 18.60): spread, swirl 5-27 (the anchor spins 360), hands overhead 27, plunge 30, buried while the four
   // remote stalks slam (body dips 62/69/75/82), upright on the buried hands 100, pull out, the mantle flower 118, fold
-  hands: () => [K(0, CROUCH), K(5, SPREAD, 'o'), K(16, SWIRL), K(24, SWIRL2), K(27, OVERHEAD, 'o'), K(30, PLUNGE, 'i'), K(36, PLUNGE_DEEP, 'o'), K(60, PLUNGE_DEEP),
+  hands: () => [K(0, CROUCH), K(5, SPREAD, 'o'), K(16, SWIRL), K(24, SWIRL2), K(27, OVERHEAD, 'io'), K(30, PLUNGE, 'i'), K(36, PLUNGE_DEEP, 'o'), K(60, PLUNGE_DEEP),
     ...[62, 69, 75, 82].flatMap(s => [K(s, PLUNGE_DIP, 'i'), K(s + 3, PLUNGE_DEEP, 'o')]), K(100, CROSS, 'io'), K(108, CROSS_PULL), K(118, FLOWER, 'o'), K(124, FLOWER),
     K(134, CROUCH_LOW, 'i'), K(140, CROUCH, 'o')],
   // 발광하는 파수꾼 (v1 34.60): arms lift, coil into the spiral column (36), slam 1 (47), re-rear, slam 2 (70), leap (77),
@@ -575,7 +590,10 @@ export const CLIP_KEYS = {
   // 이동 돌진 (v5 12.45): fold 0-7, mound 8, sink (follow_y) and travel hidden 16-41, burst 44, hoop 44-49, the wheel roll
   // 49-61 (keyed root pitch -360), slam 61, the tail lands 65, the 360-degree ground whip 66-72 (the anchor), rise, stand
   move_strike_p3: () => [K(0, UPRIGHT), K(4, HUNCH_MID, 'io'), K(7, CRAWL, 'o'), K(10, MOUND, 'i'), K(15, MOUND), K(41, MOUND), K(44, BURST_P3, 'o'), K(49, Object.assign(deep(HOOP), {pos: [0, 1.2, 0]}), 'o'),
-    K(55, Object.assign(withRot(HOOP, [-180, 0, 0]), {pos: [0, 1.5, 0]}), 'l'), K(61, Object.assign(withRot(HOOP, [-360, 0, 0]), {pos: [0, 1.0, 0]}), 'l'), K(65, withRot(BELLY_FLOP, [-360, 0, 0]), 'io'), K(69, withRot(TAIL_SWEEP, [-360, 0, 0]), 'io'),
+    K(55, Object.assign(withRot(HOOP, [-180, 0, 0]), {pos: [0, 2.2, 0]}), 'l'), K(61, Object.assign(withRot(HOOP, [-360, 0, 0]), {pos: [0, 1.0, 0]}), 'l'),
+    // the ring opens sideways: the tail half swings out to the boss's left (62-64) and lands trailing there at the tail
+    // event (65), ready for the ground whip (FLOOR_SKIP: it grazes under the water for 2-3 ticks under the slam splash)
+    K(62, RING_OPEN_A, 'l'), K(64, RING_OPEN_B, 'l'), K(65, withRot(TAIL_SWEEP, [-360, 0, 0]), 'l'), K(69, withRot(TAIL_SWEEP, [-360, 0, 0]), 'io'),
     K(72, withRot(TAIL_SWEEP, [-360, 0, 0])), K(78, withRot(CRAWL, [-360, 0, 0]), 'o'), K(85, withRot(CRAWL, [-360, 0, 0])), K(88, withRot(MID, [-360, 0, 0]), 'io'),
     K(91, withRot(UPRIGHT, [-360, 0, 0]), 'o'), K(92, withRot(UPRIGHT, [-360, 0, 0]))],
   // 종말의 여파 (w1, v5): charge curled on the water (lit), whirl up 18-36 (the anchor spins 360), land seated 40 (the
@@ -606,6 +624,8 @@ export const CLIP_KEYS = {
   death: () => [K(0, UPRIGHT), K(3, HIT_SNAP, 'o'), K(8, HIT_SNAP), K(18, mix(HIT_SNAP, DROOP, .4)), K(30, DROOP, 'io'), K(55, KNEEL, 'io'), K(64, KNEEL_LEAN), K(72, FALLING, 'i'),
     K(82, FALLEN, 'i'), K(100, FALLEN), K(119, FALLEN), K(120, FALLEN)],
 };
+// spans the floor pass leaves alone (see the clip's keys)
+const FLOOR_SKIP = {move_strike_p3: [[61, 65]]};
 // first-segment blends (the compiler's minimum first segment; a clip entered from any pose eases in over these ticks)
 const BLEND = {combo_end: 10, death: 6, idle_p1: 4, idle_p3: 6, crawl_stop_p1: 4};
 // hand / look events beyond the stub (plan R8 / R12): the revival keeps the crawl hands and the face covered until the
@@ -701,19 +721,11 @@ function buildKeys(c) {
       }
     }
     const extra = [...adds].map(([t, {e, o}]) => [t, at(t), e || 'io', o]);
-    for (const [t, p, e, o] of extra) { const k = keys.find(x => x[0] === t); if (k) Object.assign(k[1], deep(o)); else keys.push([t, Object.assign(p, deep(o)), e]); }
+    for (const [t, p, e, o] of extra) { const k = keys.find(x => x[0] === t); if (k) Object.assign(k[1], deep(o)); else keys.push([t, floorGuard(Object.assign(p, deep(o)), true), e]); }
     keys.sort((x, y) => x[0] - y[0]);
   }
-  const vis = [];
-  for (const [a, b] of c.hidden || []) { if (a > 0) vis.push([a - 1, 1]); vis.push([a, 0], [b, 0]); if (b < c.len) vis.push([b + 1, 1]); }
-  for (const [t, v] of vis) {
-    let k = keys.find(x => x[0] === t);
-    if (!k) { k = [t, at(t), 'l']; keys.push(k); keys.sort((x, y) => x[0] - y[0]); }
-    k[1] = {...k[1], vis: v};
-    if (t === vis[0]?.[0] || true) k[2] = k[2] || 'l';
-  }
   // hand eulers: each key's triple is re-expressed (wraps and the (p + 180, 180 - y, r + 180) twin) closest to the previous
-  // key's, so the channel blend never takes the long way round
+  // key's, so the channel blend never takes the long way round (before the floor pass samples the blend, and again after)
   const near = (e, ref) => {
     let best = null;
     for (const c of [e, [e[0] + 180, 180 - e[1], e[2] + 180]]) {
@@ -723,7 +735,42 @@ function buildKeys(c) {
     }
     return best[1].map(v => Math.round(v * 100) / 100);
   };
-  for (let i = 1; i < keys.length; i++) for (const k of Object.keys(keys[i][1])) if (k.startsWith('hf_')) keys[i][1][k] = near(keys[i][1][k], keys[i - 1][1][k]);
+  const nearFix = () => { for (let i = 1; i < keys.length; i++) for (const k of Object.keys(keys[i][1])) if (k.startsWith('hf_')) keys[i][1][k] = near(keys[i][1][k], keys[i - 1][1][k]); };
+  nearFix();
+  // Floor pass: both ends of a key segment are guarded, but the channel blend between them can still carry a guarded
+  // chain (tail, hem, drapes) under its floor height (a drape rolled outward one way at one key and the other way at
+  // the next passes through the floor). Every segment whose blended pose needs the guard is re-keyed on each of its
+  // ticks with the guarded sample (linear between ticks), so the timing of the motion is kept exactly.
+  {
+    // (ticks with the burrow sink under way are skipped: parts are meant to be under the floor there)
+    const GB = GUARD.flatMap(g => g.bones), sk = {sink: sinkKnots(c)}, skip = [...(c.hidden || []), ...(FLOOR_SKIP[c.name] || [])];
+    const hidF = t => skip.some(([a, b]) => t >= a && t <= b) || sinkAt(sk, t) < 0;
+    const ks = acc({keys}, DEFAULT_POSE), adds = [];
+    for (let i = 1; i < keys.length; i++) {
+      const [t0, p0] = keys[i - 1], [t1, p1] = keys[i], seg = [];
+      if (GB.every(b => JSON.stringify(p0[b]) === JSON.stringify(p1[b]))) continue;   // a hold of the guarded chains
+      let need = false, ref = p0;
+      for (let t = t0 + 1; t < t1; t++) {
+        if (hidF(t)) continue;
+        const p = sampleShared({keys}, t, ks, {defaults: DEFAULT_POSE}); delete p.ph;
+        const g = floorGuard(deep(p), true, ref);
+        ref = g;
+        if (GB.some(b => g[b].some((v, j) => Math.abs(v - p[b][j]) > .5))) need = true;
+        seg.push([t, g, 'l']);
+      }
+      if (need) adds.push(...seg);
+    }
+    if (adds.length) { keys.push(...adds); keys.sort((x, y) => x[0] - y[0]); }
+  }
+  const vis = [];
+  for (const [a, b] of c.hidden || []) { if (a > 0) vis.push([a - 1, 1]); vis.push([a, 0], [b, 0]); if (b < c.len) vis.push([b + 1, 1]); }
+  for (const [t, v] of vis) {
+    let k = keys.find(x => x[0] === t);
+    if (!k) { k = [t, at(t), 'l']; keys.push(k); keys.sort((x, y) => x[0] - y[0]); }
+    k[1] = {...k[1], vis: v};
+    if (t === vis[0]?.[0] || true) k[2] = k[2] || 'l';
+  }
+  nearFix();
   // inside a hidden span vis stays 0 on every key; outside it 1
   const hid = t => (c.hidden || []).some(([a, b]) => t >= a && t <= b);
   for (const k of keys) k[1].vis = hid(k[0]) ? 0 : 1;

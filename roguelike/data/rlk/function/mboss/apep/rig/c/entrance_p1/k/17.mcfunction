@@ -7,6 +7,5 @@ data merge entity 524c4b4d-4150-4400-8000-000000000017 {start_interpolation:0,in
 data merge entity 524c4b4d-4150-4400-8000-000000000018 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-3.68781f,3.97436f,1.00557f],left_rotation:[-0.13925f,0.01124f,0.06602f,0.98799f],scale:[2.1f,2.1f,2.1f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4150-4400-8000-00000000001b {start_interpolation:0,interpolation_duration:6,transformation:{translation:[1.23f,3.79177f,1.35652f],left_rotation:[-0.15874f,-0.10957f,0.26603f,0.94447f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4150-4400-8000-00000000001c {start_interpolation:0,interpolation_duration:6,transformation:{translation:[-1.23f,3.79177f,1.35652f],left_rotation:[-0.15874f,0.10957f,-0.26603f,0.94447f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4150-4400-8000-00000000002e {start_interpolation:0,interpolation_duration:2,transformation:{translation:[1.48f,2.03624f,-9.06132f],left_rotation:[0.22263f,-0.05831f,-0.01273f,0.97307f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
 scoreboard players set @s apRigFy 16
 scoreboard players reset @s apRigQx

@@ -1,0 +1,6 @@
+execute if score @s apRigT matches 54 run return run function rlk:mboss/apep/rig/c/shells/k/54
+execute if score @s apRigT matches 55 run return run function rlk:mboss/apep/rig/c/shells/k/55
+execute if score @s apRigT matches 56 run return run function rlk:mboss/apep/rig/c/shells/k/56
+execute if score @s apRigT matches 57 run return run function rlk:mboss/apep/rig/c/shells/k/57
+execute if score @s apRigT matches 58 run return run function rlk:mboss/apep/rig/c/shells/k/58
+execute if score @s apRigT matches 59 run return run function rlk:mboss/apep/rig/c/shells/k/59
