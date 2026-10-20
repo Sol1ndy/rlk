@@ -366,10 +366,10 @@ function shouldersP1() {
   const hs = card('p1_hook', HOOK_R, hookPaint, 40, 'p1');
   const hz0 = -2.5 - J[2], hy0 = 3.28 - J[1], hx = 1.98, HK = .8;
   half.push(...slab({plane: 'x', at: hx, rect: {u0: hz0 + HOOK_R.u0 * HK, u1: hz0 + HOOK_R.u1 * HK, v0: hy0 + HOOK_R.v0 * HK, v1: hy0 + HOOK_R.v1 * HK},
-    sd: (u, v) => HOOK.sd((u - hz0) / HK, (v - hy0) / HK) * HK, half: .09, sprite: hs, edge: 'g_plate', cell: .08, rot: ['y', 22.5, [hx, hy0, hz0]]}));
+    sd: (u, v) => HOOK.sd((u - hz0) / HK, (v - hy0) / HK) * HK, half: .035, sprite: hs, edge: 'g_plate', cell: .08, core: false, rot: ['y', 45, [hx, hy0, hz0]]}));
   const gz = -2.62 - J[2], gy = 3.22 - J[1], gx = 1.98;
-  half.push(rockBox([gx - .12, gy - .21, gz - .21], [gx + .12, gy + .21, gz + .21], 'g_plate', {seed: 522, rot: ['y', 22.5, [gx, gy, gz]]}));
-  half.push(rockBox([gx, gy - .14, gz - .14], [gx + .2, gy + .14, gz + .14], 'p1_gem', {seed: 523, rot: ['y', 22.5, [gx, gy, gz]]}));
+  half.push(rockBox([gx - .12, gy - .21, gz - .21], [gx + .12, gy + .21, gz + .21], 'g_plate', {seed: 522, rot: ['y', 45, [gx, gy, gz]]}));
+  half.push(rockBox([gx, gy - .14, gz - .14], [gx + .2, gy + .14, gz + .14], 'p1_gem', {seed: 523, rot: ['y', 45, [gx, gy, gz]]}));
   // dark hanging plates over the flank behind the pauldron (over the C-leg root), pointed tips down
   const hp = pz;
   for (const [cz, cy, hz, hy] of [[-.15, 3.25, .42, .85], [.45, 3.1, .4, .8]]) {
@@ -613,20 +613,23 @@ function p3Back(U, V, seed = 41, big = 1) {
   return c;
 }
 // lime leaf plates (front / upper chest): broad leaves fanning out from the sternum, darker green veins and outlines
-function p3Front(U, V, seed = 43) {
-  const sh = shingle(U * .9, V, .62, .55, seed, .25);
-  let c = LIME(clamp(.28 + .14 * (sh.id - .5) + .1 * (N.c(U * 3, V * 3) - .5) + .18 * smooth(.25, 0, sh.fv), 0, .95));
+// lime leaf plates (front / upper chest): broad leaves in chevron rows rising from the sternum to the flanks (a fan, v6
+// f480), hanging tips, darker green midribs and veins, dark outlines. X = the arc from the front midline, y = height.
+function p3Front(X, y, seed = 43) {
+  const ax = Math.abs(X), V = (9 - y) + .55 * ax;
+  const sh = shingle(ax * .95, V, .6, .5, seed, .2);
+  let c = LIME(clamp(.26 + .14 * (sh.id - .5) + .1 * (N.c(ax * 3, y * 3) - .5) + .2 * smooth(.25, 0, sh.fv) - .08 * smooth(.6, 1, sh.fv), 0, .95));
   const vein = Math.abs(sh.fu - .5);
-  if (vein < .02) c = mix(c, L3(.4), .5);
+  if (vein < .022) c = mix(c, L3(.4), .55);
   else { const sv = Math.abs(((sh.fv * 3 + vein * 2.5) % 1) - .5); if (sv < .05) c = mix(c, L3(.3), .3); }
-  if (!sh.inside || sh.e < .022) c = L3(.6);
+  if (!sh.inside || sh.e < .022) c = L3(.62);
   return c;
 }
 // the torso wrap: back plates behind, lime plates in front, dark green on the flanks under the rib-blades
 function p3Torso(th, y, kind) {
   const s = sinD(th), U = th * D2R * 1.1;
   if (s < -.25) return p3Back(U, 9 - y);
-  let c = p3Front(U, 9 - y);
+  let c = p3Front((th - 90) * D2R * 1.1, y);
   const flank = smooth(.55, .2, s);
   c = mix(c, BOT(.62 + .1 * N.b(th * .05, y * 2)), flank * (kind === 'ch' ? .85 : .5));
   if (s < -.1) c = mix(c, BOT(.95), smooth(-.1, -.25, s));
@@ -707,22 +710,28 @@ function shouldersP3() {
 // core (joint J3_CORE): the gold sternum (model_p3 §2.2 item 7): a dark-gold frame plate under a bright segmented plate, 7
 // chevron segments with bevels, the diamond at the top, the navel glow at the bottom
 const STERN_R = {u0: -.46, u1: .46, v0: -1.62, v1: .78};
-const sternSd = (u, v) => { const w = .4 - .12 * clamp((-.42 - v) / 1.1) - .25 * clamp((v - .3) / .42); return Math.max(Math.abs(u) - w, v - .7, -1.52 - v); };
+// the outline: wide between the pectorals, tapering to the navel; every chevron segment flares at its upper corners and
+// narrows toward its lower edge, so the sides read as a serrated spine (v6 f480) rather than a smooth board
+const sternSd = (u, v) => {
+  const ph = (v - Math.abs(u) * .65 + 1.52) * 3.1, f = ph - Math.floor(ph);
+  const w = (.4 - .12 * clamp((-.42 - v) / 1.1) - .25 * clamp((v - .3) / .42)) * (1 - .16 * (1 - f) * smooth(-1.45, -1.2, v) * smooth(.45, .3, v));
+  return Math.max(Math.abs(u) - w, v - .7, -1.52 - v);
+};
 function sternPaint(u, v) {
   const d = sternSd(u, v);
   if (d > 0) return null;
   const seg = (v - Math.abs(u) * .65 + 1.52) * 3.1, i = Math.floor(seg), f = seg - i;
-  let c = PAL.p3_sternum(clamp(.08 + .18 * f + .1 * (N.c(u * 6, v * 6) - .5) + .1 * (Math.abs(u) / .4), 0, 1));
+  let c = PAL.p3_sternum(clamp(.02 + .5 * f * f + .08 * (N.c(u * 6, v * 6) - .5) + .14 * (Math.abs(u) / .4), 0, 1));
   if (f < .14) c = PAL.p3_sternum(.82);                                   // the dark seam between chevrons
   else if (f < .24) c = PAL.p3_sternum(0);                                // the lit lip below it
   if (Math.abs(u) < .03 && v < .25) c = mix(c, C('#FFFFE8'), .6);         // the glowing centre vein
   if (v > .22 && Math.abs(u) + Math.abs(v - .48) * 1.1 < .19) c = Math.abs(u) + Math.abs(v - .48) * 1.1 < .1 ? C('#FFFFE8') : C('#F1F59A');
-  return lineOut(c, d, .035, PAL.p3_sternum(.92));
+  return lineOut(c, d, .022, PAL.p3_sternum(.95));
 }
-const sternFrameSd = (u, v) => sternSd(u * .88, (v + .4) * .95 - .4) - .03;
+const sternFrameSd = (u, v) => sternSd(u * .96, (v + .4) * .985 - .4) - .012;
 function coreP3() {
   const els = [];
-  els.push(...slab({plane: 'z', at: .36, rect: STERN_R, sd: sternFrameSd, half: .04, sprite: card('p3_sternframe', STERN_R, (u, v) => (sternFrameSd(u, v) > 0 ? null : PAL.p3_cone_gold(clamp(.72 + .15 * (N.b(u * 5, v * 5) - .5)))), 32, 'p3'), edge: 'p3_gold', cell: .12, cards: '-', core: true}));
+  els.push(...slab({plane: 'z', at: .36, rect: STERN_R, sd: sternFrameSd, half: .04, sprite: card('p3_sternframe', STERN_R, (u, v) => (sternFrameSd(u, v) > 0 ? null : mix(PAL.p3_cone_gold(clamp(.86 + .1 * (N.b(u * 5, v * 5) - .5))), L3(.8), .55)), 32, 'p3'), edge: 'p3_gold', cell: .12, cards: '-', core: true}));
   els.push(...slab({plane: 'z', at: .28, rect: STERN_R, sd: sternSd, half: .05, sprite: card('p3_sternum', STERN_R, sternPaint, 56, 'p3'), edge: 'p3_gold', cell: .1, cards: '-'}));
   // the navel: a glowing gold-lime knob under the sternum
   els.push(...ball([0, -1.74, .3], .17, 'p3_gold', {seed: 611}));

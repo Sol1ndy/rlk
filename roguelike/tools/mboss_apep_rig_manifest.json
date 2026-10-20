@@ -245,7 +245,7 @@
       "model": "shoulders_p1",
       "brightness": 13,
       "scale": 2,
-      "elements": 799,
+      "elements": 765,
       "parent": "chest",
       "tol_tp": 0.012,
       "reach": 3,
@@ -2631,9 +2631,9 @@
       ],
       "result": {
         "CROUCH": {
-          "points": 701,
+          "points": 677,
           "covered": 1,
-          "worst": 2.43
+          "worst": 2.55
         },
         "UPRIGHT": {
           "points": 345,
@@ -2651,7 +2651,7 @@
           "worst": 2.33
         },
         "CRAWL": {
-          "points": 631,
+          "points": 635,
           "covered": 1,
           "worst": 2.4
         }
@@ -27588,8 +27588,8 @@
     "atlas_px": 526592,
     "atlas_budget": 900000,
     "elements_shown_rest": {
-      "p1": 4346,
-      "p3": 4300
+      "p1": 4312,
+      "p3": 4303
     },
     "elements_budget": {
       "p1": 7000,
@@ -30855,13 +30855,13 @@
       "p3": 8000
     },
     "visible_rest": {
-      "p1": 4346,
-      "p3": 4300
+      "p1": 4312,
+      "p3": 4303
     },
     "per_region": {
       "body": {
-        "p1": 1616,
-        "p3": 1477
+        "p1": 1582,
+        "p3": 1480
       },
       "head": {
         "p1": 809,
@@ -30898,12 +30898,12 @@
         "p3": 222
       },
       "shoulders": {
-        "p1": 799,
+        "p1": 765,
         "p3": 161
       },
       "core": {
         "p1": 194,
-        "p3": 100
+        "p3": 103
       },
       "crys_low": {
         "p1": 38,
