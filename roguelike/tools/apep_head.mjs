@@ -106,7 +106,8 @@ function neckP3() {
   return els;
 }
 tile('hd_p3_ruffedge', 16, 16, 32, (u, v) => PAL.p3_pale(clamp(.45 + .1 * N.b(u * 4, v * 4))), 'p3');
-function headP1() { return loft('z', [{a: .25, r: [.7, .6, .7, .55]}, {a: -.6, r: [.74, .64, .74, .6], c: [0, -.05]}, {a: -1.3, r: [.55, .45, .55, .48], c: [0, -.15]}], {tex: 'p1_inner', caps: '-+', seed: 811}); }
+// the skull base: only the back of the head (the bud-skull stands in front of it, under the cowl, seen from below / reared)
+function headP1() { return loft('z', [{a: .25, r: [.66, .56, .66, .52]}, {a: -.35, r: [.66, .58, .66, .55], c: [0, -.02]}, {a: -.72, r: [.42, .4, .42, .36], c: [0, -.06]}], {tex: 'p1_inner', caps: '-+', seed: 811}); }
 // the P3 skull: behind the mask, from the chin to the face top; the leaf scarf wraps the chin and throat
 const SCARF_R = {u0: -.82, u1: .82, v0: -.42, v1: .3};
 const scarfSd = (u, v) => { const outer = Math.hypot(u / .8, (v - .3) / .7) - 1, inner = Math.hypot(u / .52, (v - .32) / .42) - 1; return Math.max(outer, -inner); };
@@ -333,9 +334,9 @@ const P1_ROWS = [
 const P1_CORE = [{a: .5, r: [.84, .48, .84, .2], c: [0, -.25]}, {a: .05, r: [1.1, .62, 1.1, .36], c: [0, -.25]}, {a: -.5, r: [1.06, .58, 1.06, .4], c: [0, -.27]},
   {a: -.9, r: [.95, .5, .95, .42], c: [0, -.32]}, {a: -1.25, r: [.84, .44, .84, .44], c: [0, -.36]}, {a: -1.55, r: [.64, .3, .64, .42], c: [0, -.42]}, {a: -1.82, r: [.46, .16, .46, .3], c: [0, -.5]}];
 // ear flare (plane z, turned 22.5 deg about x so it faces forward-up): a leaf sweeping out and up from the dome side
-const EAR1_R = {u0: .8, u1: 2.3, v0: -.1, v1: 1.0};
-const EAR1_W = t => .2 * Math.pow(Math.sin(Math.PI * Math.min(1, .22 + t * .8)), .6) + .012;
-const EAR1 = stroke([[.95, .22], [1.3, .3], [1.65, .38], [1.95, .52], [2.12, .72], [2.2, .9]], EAR1_W);
+const EAR1_R = {u0: .78, u1: 2.36, v0: -.16, v1: 1.12};
+const EAR1_W = t => .28 * Math.pow(Math.sin(Math.PI * Math.min(1, .2 + t * .82)), .65) + .012;
+const EAR1 = stroke([[.92, .22], [1.3, .27], [1.68, .35], [1.98, .5], [2.16, .72], [2.22, 1.0]], EAR1_W);
 const ear1Paint = (u, v) => {
   const n = EAR1.near(u, v), hw = EAR1_W(n.t), d = hw - n.d;
   if (d < 0) return null;
@@ -419,7 +420,7 @@ const P3PL = (lime, peel, grey = 0) => (s, t, d) => {
   if (t < .16) c = sink(c, .35 * (1 - t / .16));
   if (Math.abs(s) < .05 && t > .2) c = mix(c, PAL.p3_line(.5), .35);
   const fl = Math.abs(((Math.abs(s) * 1.6 + t * 2.2) % 1) - .5); if (fl < .035 && t > .25) c = mix(c, lime ? PAL.p3_line(.45) : PAL.p3_bottle(.85), .5);
-  if (peel) { const pe = N.e(s * 2.2 + 3, t * 3.1 + 1); if (pe > .62 && t > .2) c = mix(PAL.p3_pale(.35), PAL.p3_pale(.6), clamp((pe - .62) * 6)); }
+  if (peel) { const pe = N.e(s * 1.1 + 3, t * 1.5 + 1); if (pe > .56 && t > .22 && d > .06) c = mix(mix(PAL.p3_pale(.45), PAL.p3_bottle(.5), .25), PAL.p3_pale(.7), clamp((pe - .56) * 5)); }
   if (d < .04) c = mix(PAL.p3_rim(.35), PAL.p3_bottle(.5), clamp(d / .04));             // the lime rim
   if (d < .016) c = PAL.p3_bottle(.95);                                                  // near-black outline
   return c;
@@ -428,13 +429,13 @@ tile('hd_p3_hedge', 16, 16, 32, (u, v) => mix(PAL.p3_rim(.55), PAL.p3_bottle(.7)
 tile('hd_p3_lining', 32, 32, 32, (u, v) => { let c = PAL.p3_bottle(clamp(.72 + .12 * N.b(u * 6, v * 6))); if (Math.abs(((u * 2 + v * .5) % 1) - .5) < .03) c = mix(c, PAL.p3_rim(.6), .35); return c; }, 'p3');
 // rows (tongues toward the front = up the hood when upright); the bottom facets (k -2 / 5) are left open
 const P3_ROWS = [
-  {z0: -.1, z1: .52, tongue: .2, r: [.98, .5, .98, .55], c: [0, -.42], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'round'},
+  {z0: -.1, z1: .52, tongue: .2, r: [.84, .48, .84, .55], c: [0, -.42], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'round'},
   {z0: .14, z1: -.55, tongue: .3, r: [1.16, .64, 1.16, .62], c: [0, -.45], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'tip'},
   {z0: -.45, z1: -1.08, tongue: .28, r: [1.06, .57, 1.06, .6], c: [0, -.5], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'split'},
   {z0: -.98, z1: -1.5, tongue: .26, r: [.86, .46, .86, .52], c: [0, -.58], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'tip'},
   {z0: -1.4, z1: -1.86, tongue: .32, r: [.58, .33, .58, .4], c: [0, -.68], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'tip'},
 ];
-const P3_CORE = [{a: .55, r: [.86, .4, .86, .3], c: [0, -.42]}, {a: .1, r: [1.06, .52, 1.06, .36], c: [0, -.45]}, {a: -.5, r: [.98, .48, .98, .36], c: [0, -.5]},
+const P3_CORE = [{a: .55, r: [.72, .38, .72, .3], c: [0, -.42]}, {a: .1, r: [1.0, .5, 1.0, .36], c: [0, -.45]}, {a: -.5, r: [.98, .48, .98, .36], c: [0, -.5]},
   {a: -1.0, r: [.78, .38, .78, .34], c: [0, -.58]}, {a: -1.45, r: [.52, .26, .52, .26], c: [0, -.68]}, {a: -1.84, r: [.3, .16, .3, .16], c: [0, -.74]}];
 const toU = P => add(oU.hood.t, rot(oU.hood.R, rot(invQ(oCr.hood.R), P)));              // hood model -> UPRIGHT world
 // FRONT PLATES: slabs in the hood's plane y turned -22.5 deg about x (5 deg off the upright world vertical), drawn in
@@ -489,8 +490,21 @@ function hoodP3() {
   els.push(...wall, ...mirrorX(wall));
   els.push(...frontPlate('hd_p3_horns', -.82, 8.2, hornSd, hornPaint, {box: [-2.15, 2.15, 7.45, 8.95]}));
   els.push(...frontPlate('hd_p3_browgem', -1.36, GEM[1], browGemSd, browGemPaint, {box: [-1.22, 1.22, GEM[1] - .27, GEM[1] + .27], half: .07, edge: 'p3_emerald', ppb: 64}));
-  // the square lime-gold gem in its raised dark frame near the carapace front, emerald shards along the crest / back
-  els.push(rockBox([-.2, -.3, -1.78], [.2, -.16, -1.38], 'hd_p3_hedge', {seed: 863}), rockBox([-.14, -.2, -1.72], [.14, -.1, -1.44], 'p3_gem', {seed: 864}));
+  // the square lime-gold gem (a diamond pointing forward) in its raised dark frame on the carapace ridge near the front
+  // (v6 f90; upright it faces back from the top of the hood), emerald shards along the crest / back
+  const GEM_C = [0, -.2, -1.92], dia = r => (u, v) => (Math.abs(u) + Math.abs(v - GEM_C[2])) - r;
+  const gemFrame = (u, v) => { const e = Math.abs(u) + Math.abs(v - GEM_C[2]); if (e > .25) return null; return e > .2 ? PAL.p3_rim(.5) : PAL.p3_bottle(clamp(.85 + .08 * (N.a(u * 9, v * 9) - .5))); };
+  const gemPaint = (u, v) => { const x = u, y = v - GEM_C[2], e = Math.abs(x) + Math.abs(y); if (e > .155) return null; let t = x < 0 ? (y < 0 ? .05 : .3) : (y < 0 ? .2 : .55); if (Math.abs(x) < .01 || Math.abs(y) < .01) t += .15; if (e > .13) t = .75; return PAL.p3_gem(t); };
+  const RG = {u0: -.26, u1: .26, v0: GEM_C[2] - .26, v1: GEM_C[2] + .26};
+  els.push(...slab({plane: 'y', at: GEM_C[1], rect: RG, sd: dia(.25), half: .05, sprite: cardY('hd_p3_gemframe', RG, gemFrame, 48, 'p3'), edge: 'hd_p3_hedge', cell: .06}));
+  els.push(...slab({plane: 'y', at: GEM_C[1] + .08, rect: RG, sd: dia(.155), half: .03, sprite: cardY('hd_p3_gemface', RG, gemPaint, 64, 'p3'), edge: 'p3_gem', cell: .05}));
+  // the jagged leaf crest at the peak, curling forward over the visor top (upright) / hooking down from the carapace tip (crawl)
+  const frH = partFrame('hood', 'p3', oU), saw = t => 1 - .35 * Math.abs(((t * 5) % 1) - .5) * 2;
+  const crestPaint = ({t, s, d}) => { let c = PAL.p3_bottle(clamp(.78 + .1 * t + .05 * (N.c(t * 9, s * 3) - .5))); if (s > .45) c = mix(c, PAL.p3_rim(.45), .6); if (Math.abs(s) < .08 && t < .9) c = mix(c, PAL.p3_bottle(.95), .5); if (d < .014) c = PAL.p3_bottle(.98); return c; };
+  els.push(...ribbon('hd_p3_crest', frH, [[0, 8.3, -.05], [0, 8.58, -.42], [0, 8.66, -.84], [0, 8.56, -1.22], [0, 8.34, -1.44]], t => (.06 + .14 * Math.pow(Math.sin(Math.PI * Math.min(1, .15 + t * .9)), .7)) * saw(t),
+    {cuts: [0, .5, 1], face: () => [1, 0, 0], side: () => [0, 1, 0], paint: crestPaint, ppb: 48, forms: 'p3', half: .035, edge: 'hd_p3_hairout'}));
+  for (const sx of [1, -1]) els.push(...ribbon(`hd_p3_crest_${sx > 0 ? 'l' : 'r'}`, frH, [[sx * .14, 8.2, -.2], [sx * .2, 8.42, -.55], [sx * .24, 8.48, -.92], [sx * .26, 8.36, -1.2]], t => (.04 + .1 * Math.pow(Math.sin(Math.PI * Math.min(1, .15 + t * .9)), .7)) * saw(t),
+    {cuts: [0, 1], face: () => [1, .3 * sx, 0], side: () => [0, 1, 0], paint: crestPaint, ppb: 48, forms: 'p3', half: .03, edge: 'hd_p3_hairout'}));
   for (const [x, y, z, h] of [[0, .14, -.3, .42], [.38, .08, -.65, .32], [-.38, .08, -.65, .32], [.5, -.02, .05, .3], [-.5, -.02, .05, .3], [0, .02, -1.05, .3]]) els.push(...crystal(`hd_p3_shard`, [x, y, z], .07, h, PAL.p3_emerald, {forms: 'p3', ppb: 48, edge: 'p3_emerald'}));
   return els;
 }
@@ -499,21 +513,26 @@ function hoodP3() {
 // crown p1) rising from a dark collar on the crest ridge, two gold leaf sprigs fanned round its foot and the small glowing
 // lime seed bulb in front of it
 const SPRIG_R = {u0: -.42, u1: .42, v0: 0, v1: .62};
-const SPRIGS = [[0, .02, 0], [-.05, .04, -.75], [.05, .04, .75]];
+// two branches in a V (v1 f255: cream-gold leaves in pairs along each twig, the tip leaf largest)
+const SPRIGS = [[-.03, .02, -.42, .58], [.03, .02, .42, .58], [0, .02, 0, .36]];
 const sprigPaint = (u, v) => {
-  for (const [x0, y0, a] of SPRIGS) {
-    const ca = Math.cos(a), sa = Math.sin(a), x = (u - x0) * ca - (v - y0) * sa, y = (u - x0) * sa + (v - y0) * ca;   // y along the branch
-    if (y < 0 || y > .56) continue;
-    if (Math.abs(x) < .012) return PAL.p1_sprig(.55);
-    for (let i = 0; i < 5; i++) {
-      const ly = .12 + i * .1, side = i % 2 ? 1 : -1, ang = side * .9, lx = x - side * .015, yy = y - ly;
-      const px = lx * Math.cos(ang) - yy * Math.sin(ang), py = lx * Math.sin(ang) + yy * Math.cos(ang);
-      const e = Math.hypot(px / .032, (py - side * .0) / .075);
-      if (e < 1 && px * side * 0 === 0 && Math.hypot(lx, yy) < .11) return e > .7 ? PAL.p1_sprig(.75) : PAL.p1_sprig(.05 + .3 * e + .1 * i / 5);
+  let best = null;
+  for (const [x0, y0, a, L] of SPRIGS) {
+    const ca = Math.cos(a), sa = Math.sin(a), x = (u - x0) * ca - (v - y0) * sa, y = (u - x0) * sa + (v - y0) * ca;   // y along the twig
+    if (y < -.02 || y > L + .02) continue;
+    if (Math.abs(x) < .014 && y < L - .08) return PAL.p1_sprig(.62);
+    // leaf pairs at .3 / .55 / .8 of the twig, angled 50 deg off it, plus the tip leaf
+    const leaves = [[.3, 1, .9, .11, .045], [.3, -1, .9, .11, .045], [.55, 1, .8, .13, .05], [.55, -1, .8, .13, .05], [.82, 1, .7, .12, .045], [.82, -1, .7, .12, .045], [1, 0, 0, .14, .055]];
+    for (const [f, sd, an, ll, ww] of leaves) {
+      const by = f * (L - .1), ang = sd * an, lx = x, yy = y - by;
+      const px = lx * Math.cos(ang) - yy * Math.sin(ang), py = lx * Math.sin(ang) + yy * Math.cos(ang);   // py along the leaf
+      if (py < 0 || py > ll) continue;
+      const hw = ww * Math.pow(Math.sin(Math.PI * py / ll), .8), e = Math.abs(px) / Math.max(hw, 1e-4);
+      if (e < 1 && (!best || e < best)) best = e;
     }
-    if (y > .5 && Math.hypot(x, y - .53) < .04) return PAL.p1_sprig(.15);
   }
-  return null;
+  if (best === null) return null;
+  return best > .72 ? PAL.p1_sprig(.8) : PAL.p1_sprig(clamp(.05 + .35 * best));
 };
 function crownP1() {
   const tip = FORM_POINTS.crown.p1[1], h = .78, lean = Math.tan(22.5 * D2R);
@@ -536,29 +555,30 @@ function crownP1() {
 const LEAF_V = {u0: -.13, u1: .13, v0: 0, v1: .98}, LEAF_H = {u0: 0, u1: .98, v0: -.13, v1: .13};
 const goldLeafSd = (a, r) => sdLeaf(0, .0, .98, .12, {p: .85})(a, r);
 const goldLeafPaint = (a, r) => { const d = -goldLeafSd(a, r); if (d < 0) return null; let c = PAL.p3_crown(clamp(.32 - .3 * (r / .98) + .14 * Math.abs(a) / .12 + .06 * (N.b(a * 9, r * 9) - .5))); if (Math.abs(a) < .012 && r < .85) c = PAL.p3_crown(.75); const vein = Math.abs(((r * 7 - Math.abs(a) * 10) % 1 + 1) % 1 - .5); if (vein < .06 && Math.abs(a) > .02 && r > .15) c = mix(c, PAL.p3_crown(.6), .4); if (d < .014) c = PAL.p3_crown(.9); return c; };
+// leaves as world-space ribbons: a front layer of nine (from side to side, leaning 15 deg toward the face) and a back layer
+// of six between them leaning 35 deg back over the hood, each curving out at the tip, so the fan reads from the front,
+// the side and from behind (w2 f436), under the 9.0 b upright top
+const crownLeafPaint = ({t, s, d}) => {
+  let c = PAL.p3_crown(clamp(.36 - .3 * t + .18 * Math.abs(s) + .05 * (N.b(t * 9, s * 4) - .5)));
+  if (Math.abs(s) < .1 && t < .88) c = PAL.p3_crown(.72);                                                       // the midrib
+  const vein = Math.abs(((t * 6 - Math.abs(s) * 1.4) % 1 + 1) % 1 - .5); if (vein < .06 && Math.abs(s) > .16) c = mix(c, PAL.p3_crown(.6), .45);
+  if (d < .014) c = PAL.p3_crown(.92);
+  return c;
+};
 function crownP3() {
-  const F = FORM_POINTS.crown.p3[1];
+  const F = FORM_POINTS.crown.p3[1], fr = partFrame('crown', 'p3', oU), Fw = add(fr.O, [0, 1, 2].map(j => fr.ax[0][j] * F[0] + fr.ax[1][j] * F[1] + fr.ax[2][j] * F[2]));
   const els = [...ball(F, .19, 'p3_bud', {seed: 861, n: 8})];
-  const sv = card('hd_p3_leaf_v', LEAF_V, (u, v) => goldLeafPaint(u, v), 64, 'p3'), sh = card('hd_p3_leaf_h', LEAF_H, (u, v) => goldLeafPaint(v, Math.abs(u)), 64, 'p3');
-  const r0 = .12;
-  [-90, -67.5, -45, -22.5, 0, 22.5, 45, 67.5, 90].forEach((phi, i) => {
-    const z = F[2] + .05 + (i % 2) * .05, piv = [F[0], F[1], z];
-    if (Math.abs(phi) <= 45) {
-      const k = .8 + .2 * Math.abs(phi) / 90;   // the upright leaves shorter (the fan stays under the 9.0 b top)
-      const rect = {u0: F[0] + LEAF_V.u0, u1: F[0] + LEAF_V.u1, v0: F[1] + r0, v1: F[1] + r0 + LEAF_V.v1 * k};
-      els.push(...slab({plane: 'z', at: z, rect, sd: (u, v) => goldLeafSd(u - F[0], (v - F[1] - r0) / k), half: .02, sprite: sv, edge: 'p3_gold', cell: .05, rot: phi ? ['z', -phi, piv] : null}));
-    } else {
-      const sx = Math.sign(phi), g = sx > 0 ? 90 - phi : -(90 + phi);
-      const rect = sx > 0 ? {u0: F[0] + r0, u1: F[0] + r0 + .98, v0: F[1] - .13, v1: F[1] + .13} : {u0: F[0] - r0 - .98, u1: F[0] - r0, v0: F[1] - .13, v1: F[1] + .13};
-      const sp = sx > 0 ? sh : card('hd_p3_leaf_h2', {u0: -.98, u1: 0, v0: -.13, v1: .13}, (u, v) => goldLeafPaint(v, Math.abs(u)), 64, 'p3');
-      els.push(...slab({plane: 'z', at: z, rect, sd: (u, v) => goldLeafSd(v - F[1], Math.abs(u - F[0]) - r0), half: .02, sprite: sp, edge: 'p3_gold', cell: .05, rot: g ? ['z', g, piv] : null}));
-    }
-  });
-  // three leaves swept back over the hood (plane x, tilted back about x)
-  for (const [x, tilt] of [[0, 45], [.1, 22.5], [-.1, 22.5]]) {
-    const k = .85, rect = {u0: F[2] - .13, u1: F[2] + .13, v0: F[1] + r0, v1: F[1] + r0 + .98 * k};
-    els.push(...slab({plane: 'x', at: F[0] + x, rect, sd: (u, v) => goldLeafSd(u - F[2], (v - F[1] - r0) / k), half: .02, sprite: card('hd_p3_leaf_x', {u0: -.13, u1: .13, v0: 0, v1: .98}, (u, v) => goldLeafPaint(u, v), 64, 'p3'), edge: 'p3_gold', cell: .05, rot: ['x', tilt, [F[0] + x, F[1], F[2]]]}));
-  }
+  const leaf = (tag, phi, lean, L, w0) => {
+    const dir = [Math.sin(phi * D2R) * Math.cos(lean * D2R), Math.cos(phi * D2R) * Math.cos(lean * D2R), Math.sin(lean * D2R)];   // world; lean > 0 = back
+    const side = [Math.cos(phi * D2R), -Math.sin(phi * D2R), 0];
+    const P = k => add(Fw, dir.map((v, j) => v * k));
+    const pts = [P(.1), add(P(.1 + L * .5), side.map(v => v * .03 * Math.sign(phi || 1))), add(P(.1 + L), side.map(v => v * .1 * Math.sign(phi || 1)))];
+    const w = t => w0 * Math.pow(Math.sin(Math.PI * Math.min(1, .06 + t * .94)), .85) + .008;
+    const nrm = [dir[1] * side[2] - dir[2] * side[1], dir[2] * side[0] - dir[0] * side[2], dir[0] * side[1] - dir[1] * side[0]];   // across the leaf plane
+    els.push(...ribbon(`hd_p3_crown_${tag}`, fr, pts, w, {face: () => nrm, paint: crownLeafPaint, ppb: 56, forms: 'p3', half: .018, edge: 'p3_gold'}));
+  };
+  [-96, -72, -48, -24, 0, 24, 48, 72, 96].forEach((phi, i) => leaf(`f${i}`, phi, -15, Math.abs(phi) > 50 ? .9 : Math.abs(phi) > 20 ? .82 : .76, .13));
+  [-84, -60, -36, 36, 60, 84].forEach((phi, i) => leaf(`b${i}`, phi, 35, Math.abs(phi) > 70 ? .82 : .76, .11));
   return els;
 }
 // ================================================= ribbons (strands designed in world space) ===================================
@@ -568,7 +588,7 @@ const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const nrm3 = a => { const l = Math.hypot(...a) || 1; return a.map(v => v / l); };
 function partFrame(part, form, o) {
   const O = modelPoint(o, MF, form, part, [0, 0, 0]), ax = [[1, 0, 0], [0, 1, 0], [0, 0, 1]].map(a => sub(modelPoint(o, MF, form, part, a), O));
-  return {O, ax, toM: W => ax.map(a => dot3(sub(W, O), a)), dirM: D => ax.map(a => dot3(D, a))};
+  return {O, ax, toM: W => ax.map(a => dot3(sub(W, O), a)), dirM: D => ax.map(a => dot3(D, a)), lim: 1.5 * PART_SCALE[part] - .01};
 }
 // Catmull-Rom densified polyline through pts (3D) with n samples per span, plus the arc fraction of every sample
 function spline(pts, n = 8) {
@@ -600,52 +620,59 @@ const ROTS = [0, 22.5, -22.5, 45, -45];
 // the arc fractions `cuts`; each panel is one painted slab in the element plane / single-axis 22.5-degree rotation closest
 // to facing face(t) (a world direction) across the strand. paint({t, s, d, side}) -> colour (s: -1..1 across, d: blocks
 // inside the edge). oneSide: a world direction; the panel keeps only its card facing that way and no core (R18).
-function ribbon(name, fr, world, w, {cuts = [0, 1], face = () => [0, 0, -1], side = null, paint, ppb = 32, forms, half = .03, edge, core = true, oneSide = null, ov = .015, n = 8, bend = null}) {
+function ribbon(name, fr, world, w, {cuts = [0, 1], face = () => [0, 0, -1], side = null, paint, ppb = 32, forms, half = .03, edge, core = true, oneSide = null, ov = .015, n = 8, lim = fr.lim}) {
   const S = spline(world.map(fr.toM), n), els = [];
   for (let i = 0; i < cuts.length - 1; i++) {
     const ta = Math.max(0, cuts[i] - ov), tb = Math.min(1, cuts[i + 1] + ov);
     const idx = S.t.map((t, k) => (t >= ta - .06 && t <= tb + .06 ? k : -1)).filter(k => k >= 0);
     const sub3 = idx.map(k => S.pts[k]), T = nrm3(sub(sub3[sub3.length - 1], sub3[0]));
     const F = fr.dirM(face((ta + tb) / 2)), nn = nrm3(sub(F, T.map(v => v * dot3(F, T))));
-    let best = null;
+    const cands = [];
     for (const pl of ['z', 'x', 'y']) for (const ax of ['x', 'y', 'z']) for (const deg of ROTS) {
       if (ax === pl && deg) continue;
       if (deg === 0 && ax !== 'x') continue;
-      const N = rotA(ax, deg, PLANE_N[pl]), sc = Math.abs(dot3(N, nn)) - (deg ? .002 * Math.abs(deg) / 22.5 : 0);
-      if (!best || sc > best.sc) best = {sc, pl, ax, deg, N};
+      const N = rotA(ax, deg, PLANE_N[pl]);
+      cands.push({sc: Math.abs(dot3(N, nn)) - (deg ? .002 * Math.abs(deg) / 22.5 : 0), pl, ax, deg, N});
     }
+    cands.sort((x, y) => y.sc - x.sc);
     const piv = [0, 1, 2].map(j => sub3.reduce((a, p) => a + p[j], 0) / sub3.length);
-    const unrot = P => add(piv, rotA(best.ax, -best.deg, sub(P, piv)));
-    const Q = S.pts.map(unrot), [iu, iv] = PLANE_UV[best.pl], ia = PLANE_I[best.pl];
-    const at = idx.reduce((a, k) => a + Q[k][ia], 0) / idx.length;
-    const P2 = Q.map(q => [q[iu], q[iv]]), nr = near2(P2, S.t);
-    const wmax = Math.max(...idx.map(k => w(S.t[k])));
-    const us = idx.map(k => P2[k][0]), vs = idx.map(k => P2[k][1]);
-    const R0 = {u0: Math.min(...us) - wmax - .04, u1: Math.max(...us) + wmax + .04, v0: Math.min(...vs) - wmax - .04, v1: Math.max(...vs) + wmax + .04};
-    const sd = (u, v) => { const q = nr(u, v); return Math.max(q.d - w(q.t), (ta - q.t) * S.len, (q.t - tb) * S.len); };
-    // the tight rect of the panel's shape (sampled), padded by 0.02
-    const rect = {u0: 9, u1: -9, v0: 9, v1: -9}, G = 60;
-    for (let a = 0; a <= G; a++) for (let b = 0; b <= G; b++) {
-      const u = R0.u0 + (R0.u1 - R0.u0) * a / G, v = R0.v0 + (R0.v1 - R0.v0) * b / G;
-      if (sd(u, v) < .015) { rect.u0 = Math.min(rect.u0, u); rect.u1 = Math.max(rect.u1, u); rect.v0 = Math.min(rect.v0, v); rect.v1 = Math.max(rect.v1, v); }
-    }
-    rect.u0 -= .02; rect.u1 += .02; rect.v0 -= .02; rect.v1 += .02;
+    // the panel in a candidate plane: the unrotated strand, its 2D outline and the tight card rect
+    const build = best => {
+      const unrot = P => add(piv, rotA(best.ax, -best.deg, sub(P, piv)));
+      const Q = S.pts.map(unrot), [iu, iv] = PLANE_UV[best.pl], ia = PLANE_I[best.pl];
+      const at = idx.reduce((a, k) => a + Q[k][ia], 0) / idx.length;
+      const P2 = Q.map(q => [q[iu], q[iv]]), nr = near2(P2, S.t);
+      const wmax = Math.max(...idx.map(k => w(S.t[k])));
+      const us = idx.map(k => P2[k][0]), vs = idx.map(k => P2[k][1]);
+      const R0 = {u0: Math.min(...us) - wmax - .04, u1: Math.max(...us) + wmax + .04, v0: Math.min(...vs) - wmax - .04, v1: Math.max(...vs) + wmax + .04};
+      const sd = (u, v) => { const q = nr(u, v); return Math.max(q.d - w(q.t), (ta - q.t) * S.len, (q.t - tb) * S.len); };
+      const rect = {u0: 9, u1: -9, v0: 9, v1: -9}, G = 60;
+      for (let a = 0; a <= G; a++) for (let b = 0; b <= G; b++) {
+        const u = R0.u0 + (R0.u1 - R0.u0) * a / G, v = R0.v0 + (R0.v1 - R0.v0) * b / G;
+        if (sd(u, v) < .015) { rect.u0 = Math.min(rect.u0, u); rect.u1 = Math.max(rect.u1, u); rect.v0 = Math.min(rect.v0, v); rect.v1 = Math.max(rect.v1, v); }
+      }
+      rect.u0 -= .02; rect.u1 += .02; rect.v0 -= .02; rect.v1 += .02;
+      const fits = !lim || (Math.max(Math.abs(rect.u0), Math.abs(rect.u1), Math.abs(rect.v0), Math.abs(rect.v1), Math.abs(at) + half + .02) <= lim);
+      return {...best, iu, iv, at, P2, nr, sd, rect, fits};
+    };
+    let B = null;
+    for (const c of cands) { const b = build(c); if (b.fits) { B = b; break; } if (!B) B = b; }
+    const {iu, iv, at, P2, nr, sd, rect} = B;
     // s > 0 on the side of the world direction side(t) (default: the left of the 2D direction)
     let sg = 1;
     if (side) {
       const km = idx[Math.floor(idx.length / 2)], k2 = Math.min(S.pts.length - 1, km + 1), k1 = k2 - 1, dx = P2[k2][0] - P2[k1][0], dy = P2[k2][1] - P2[k1][1];
-      const r3 = rotA(best.ax, -best.deg, fr.dirM(side(S.t[km]))), r2 = [r3[iu], r3[iv]];
+      const r3 = rotA(B.ax, -B.deg, fr.dirM(side(S.t[km]))), r2 = [r3[iu], r3[iv]];
       sg = Math.sign(-dy * r2[0] + dx * r2[1]) || 1;
     }
     const pt = (u, v) => { const q = nr(u, v), hw = w(q.t), d = hw - q.d; if (d < 0 || q.t < ta - .002 || q.t > tb + .002) return null; return paint({t: q.t, s: clamp(sg * q.s / Math.max(hw, 1e-3), -1, 1), d, len: S.len}); };
-    const sname = `${name}_${i}`, sp = best.pl === 'y' ? cardY(sname, rect, pt, ppb, forms) : card(sname, rect, pt, ppb, forms);
-    const rot = best.deg ? [best.ax, best.deg, piv] : null;
+    const sname = `${name}_${i}`, sp = B.pl === 'y' ? cardY(sname, rect, pt, ppb, forms) : card(sname, rect, pt, ppb, forms);
+    const rot = B.deg ? [B.ax, B.deg, piv] : null;
     if (oneSide) {
-      const o = rotA(best.ax, -best.deg, fr.dirM(oneSide)), sgn = Math.sign(dot3(o, PLANE_N[best.pl])) || 1;
-      const keep = {z: sgn > 0 ? 'south' : 'north', x: sgn > 0 ? 'west' : 'east', y: sgn > 0 ? 'up' : 'down'}[best.pl];
-      els.push(...oneSided(slab({plane: best.pl, at, rect, sd, half, sprite: sp, edge, core: false, rot, cards: sgn > 0 ? '+' : '-'}), [keep]));
-    } else els.push(...slab({plane: best.pl, at, rect, sd, half, sprite: sp, edge: edge || sp, cell: .06, rot, core}));
-    void bend;
+      const o = rotA(B.ax, -B.deg, fr.dirM(oneSide)), sgn = Math.sign(dot3(o, PLANE_N[B.pl])) || 1;
+      const keep = {z: sgn > 0 ? 'south' : 'north', x: sgn > 0 ? 'west' : 'east', y: sgn > 0 ? 'up' : 'down'}[B.pl];
+      els.push(...oneSided(slab({plane: B.pl, at, rect, sd, half, sprite: sp, edge, core: false, rot, cards: sgn > 0 ? '+' : '-'}), [keep]));
+    } else els.push(...slab({plane: B.pl, at, rect, sd, half, sprite: sp, edge: edge || sp, cell: .06, rot, core}));
   }
   return els;
 }
@@ -697,9 +724,9 @@ function hairP3(seg) {
 tile('hd_p3_hairout', 16, 16, 32, (u, v) => PAL.p3_hair(clamp(.7 + .1 * N.b(u * 4, v * 4))), 'p3');
 tile('hd_p3_hairin', 16, 16, 32, (u, v) => mix(PAL.p3_lime(.5), PAL.p3_hair(.45), .4), 'p3');
 const DRAPE_P1 = {
-  // cowl side (under the ear flare) -> down and out to the ground, turning to face outward as it falls; hair_2 splays on the ground
-  pts: [[.98, 3.32, -2.62], [1.2, 2.75, -2.72], [1.38, 2.1, -2.74], [1.5, 1.6, -2.72], [1.68, 1.0, -2.75], [1.95, .45, -2.8], [2.35, .16, -2.85], [2.75, .1, -2.9]],
-  cut: 3, w: t => .2 + .28 * Math.pow(Math.sin(Math.PI * Math.min(1, .25 + .8 * t)), .7) - .12 * Math.pow(t, 6),
+  // from under the ear flare the ribbon sweeps out and down over the long arm, then falls to the ground and splays (v2 f2076)
+  pts: [[.98, 3.28, -2.62], [1.5, 2.98, -2.72], [2.02, 2.52, -2.8], [2.4, 1.98, -2.84], [2.62, 1.38, -2.86], [2.8, .78, -2.88], [2.98, .28, -2.92], [3.12, .1, -2.96]],
+  cut: 3, w: t => .13 + .2 * Math.pow(Math.sin(Math.PI * Math.min(1, .2 + .85 * t)), .6) + .08 * Math.pow(t, 4),
 };
 const drapeP1Paint = ({t, s, d}) => {
   let c = PAL.p1_slate(clamp(.55 + .2 * t + .08 * (N.d(t * 11, s * 3) - .5)));
@@ -713,9 +740,9 @@ function hairP1(seg) {
   const part = `hair_l_${seg}`, fr = partFrame(part, 'p1', solve(STANCES.CROUCH)), st = DRAPE_P1;
   const P = seg === 1 ? st.pts.slice(0, st.cut + 1) : st.pts.slice(st.cut);
   const T0 = seg === 1 ? 0 : st.cut / (st.pts.length - 1), T1 = seg === 1 ? st.cut / (st.pts.length - 1) : 1, w = t => st.w(T0 + (T1 - T0) * t);
-  const faceOf = t => { const g = T0 + (T1 - T0) * t; return g < .75 ? [.35 + .9 * g, 0, -1] : [.5, 1.2, -.3]; };
-  const els = ribbon(`p1_hair${seg}`, fr, P, w, {cuts: seg === 1 ? [0, .5, 1] : [0, .4, .75, 1], face: faceOf, paint: ({t, s, d}) => drapeP1Paint({t: T0 + (T1 - T0) * t, s, d}),
-    ppb: 32, forms: 'p1', half: .035, edge: 'hd_p1_hedge', oneSide: seg === 2 ? [1, .4, -.4] : [1, 0, -.6]});
+  const faceOf = t => { const g = T0 + (T1 - T0) * t; return g < .4 ? [.25, .9, -1] : g < .82 ? [.6, .2, -1] : [.4, 1.2, -.5]; };
+  const els = ribbon(`p1_hair${seg}`, fr, P, w, {cuts: seg === 1 ? [0, .5, 1] : [0, .45, .8, 1], face: faceOf, side: () => [0, 1, 0], paint: ({t, s, d}) => drapeP1Paint({t: T0 + (T1 - T0) * t, s, d}),
+    ppb: 32, forms: 'p1', half: .035, edge: 'hd_p1_hedge', oneSide: seg === 2 ? [.6, .6, -.6] : [.3, .6, -1]});
   return els;
 }
 function hair(form, seg) { return form === 'p1' ? hairP1(seg) : hairP3(seg); }
