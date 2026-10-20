@@ -1,0 +1,25 @@
+# whip r #azPT 11
+scoreboard players set #hzKB mb 4
+scoreboard players set #hzKBDir mb 0
+scoreboard players set #hzSfx mb 0
+scoreboard players set #hzQuiet mb 1
+scoreboard players set #hzNoDodge mb 1
+scoreboard players set #hzNR mb 1
+scoreboard players operation #hzGrp mb = #aq7G mb
+scoreboard players set #hzEl mb 5
+scoreboard players set #pjEl mb 5
+execute positioned ^-4.331 ^0 ^1.929 rotated ~72.89 0 run function rlk:mboss/hz/sector {r:120,a:7,tell:20,dmg:150}
+execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_p7
+execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_p7h
+scoreboard players set #hzKB mb 4
+scoreboard players set #hzSfx mb 0
+scoreboard players set #hzQuiet mb 1
+scoreboard players set #hzNoDodge mb 1
+scoreboard players set #hzNR mb 1
+scoreboard players operation #hzGrp mb = #aq7G mb
+scoreboard players set #hzEl mb 5
+scoreboard players set #pjEl mb 5
+execute positioned ^-4.331 ^0 ^1.929 run function rlk:mboss/hz/disc {r:11,tell:20,dmg:150}
+execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_p7
+execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_p7h
+execute positioned ^-1.924 ^0 ^-4.327 run function rlk:mboss/azhdaha/p/whip/ax_sweep_r
