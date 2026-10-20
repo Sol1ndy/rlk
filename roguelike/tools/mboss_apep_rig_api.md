@@ -1,4 +1,4 @@
-# 아펩의 오아시스 파수꾼 (Apep, Guardian of Apep's Oasis) rig: API (stage AP-R1)
+# 아펩의 오아시스 파수꾼 (Apep, Guardian of Apep's Oasis) rig: API (stage AP-R3)
 
 The display-entity rig of the chapter-3 boss: one superset skeleton of 49 parts that carries both forms (phase 1 종막,
 phase 3 기원) and both stances (CROUCH, UPRIGHT). It is the contract between the rig and the Apep module
@@ -6,11 +6,11 @@ phase 3 기원) and both stances (CROUCH, UPRIGHT). It is the contract between t
 §0.4 (the manifest schema and the rig API, frozen), `ap/spec/rig_manifest.schema.json` and the frozen clip table
 `ap/spec/stub_rig_manifest.json`. References: `ap/understand/model.md`, `model_p3.md`, `motion.md`, `mechanics.md`.
 
-Stage R1 delivers the block-out of every part in both forms, the skeleton with both stances, the hand variants, the
-looks and tints, the 11 hit proxies, the capsules, burrow and park, and **stub clips**: every clip of the frozen table
-exists with its length, events, hidden spans, stance / look / hand / state events, sinks and px tracks, but its keys
-are the stance poses (plus the stance blends of `stand_p3`, `crouch_p3` and the blends inside clips). AP-RC1 authors
-the motion; AP-R2 refines the five regions (`S:ap/rigwork/r1_worklist.md`).
+History: AP-R1 built the skeleton with both stances, the block-out of every part, the hand variants, looks and tints,
+the 11 hit proxies, capsules, burrow and park and stub clips. AP-R2 refined the five regions in parallel (one region
+file each, `S:ap/rigwork/r1_worklist.md`); AP-RC1 keyed all 36 clips (§4). **AP-R3** (this state) merged the five
+regions and the RC1 clips on `wip/ap-rig`, brought the atlas back under budget, fixed the cross-region seams and
+regenerated every output (§7). AP-RC2 polishes the motion next (names, lengths and event ticks frozen).
 
 ## 0. Files
 
@@ -26,11 +26,11 @@ node tools/build_mboss_apep_rig.mjs --resourcepack <unpacked RP> [--datapack <dp
 | `apep_clips.mjs` | `DEFAULT_POSE`, `STANCES` (CROUCH, UPRIGHT, CRAWL = CROUCH with the P3 hand orientation, MID = the halfway key of a stance blend), the clip table (generated from the stub), stub keys, sinks (`SINK_TABLE`), debug poses `dbg_*` |
 | `apep_geometry.mjs`, `apep_paint.mjs` | thin aggregators over the five regions (duplicate names fail the build) |
 | `apep_materials.mjs` | palette ramps, tint slots and looks, the shared grey tiles (`g_shell`, `g_plate`, tail bands), gold / cone / emerald / lime / robe / gem / core tiles, sprite helpers |
-| `apep_head.mjs` | neck, head, face (P1 bud-skull + crescents, P3 mask), hood (one cowl for both stances), crown, hair ×4 |
-| `apep_body.mjs` | abdomen (P1 rear body / P3 robe stem), hem_a / hem_b, chest, shoulders, core (P1 bulb / P3 sternum), crys_low / crys_back, mantle ×4 |
-| `apep_limbs.mjs` | the six limb segments ×2 per form, the P3 bead vines |
-| `apep_hands.mjs` | the 20 hand models (A `p1_planted p1_raised p3_fork`, B `p1_open p1_curl p3_curl p3_open`, C `p1_open p1_curl p3_curl`) |
-| `apep_tail.mjs` | the seven banded segments (shared by both forms, tinted) and the two tips (P1 scythe hook + leaf curl, P3 whip + leaf) |
+| `apep_head.mjs` | neck, head, face (P1 bud-skull + crescents, P3 rosette mask with the lily emblem, three looks on one model), hood (one cowl for both stances: P1 plate dome + ear flares, P3 visor / crest / horns / plate back, the crawl carapace), crown (P1 cone + sprig + bulb, P3 3D leaf fan + bud), hair ×4 (ribbons designed in world space: P1 drapes to the ground, P3 dark strands with a lime streak + an inner lime strand); P3 petal ruff + lime scarf leaves |
+| `apep_body.mjs` | abdomen (P1 rear body / P3 robe stem), hem_a / hem_b (P3 hem flaps splayed on the water), chest (P1 hull + calyx, P3 rib-blade bands), shoulders (P1 hump, bark-dome pauldrons with projected contour tiers, hooks + gems; P3 chevron chest leaves, glossy back plates), core (P1 bulb / P3 chevron sternum), crys_low / crys_back, mantle ×4 (one tinted model: P1 horn blades, P3 carapace wings) |
+| `apep_limbs.mjs` | the six limb segments ×2 per form (P1 arched shell paddles, armour legs flaring to a root base; P3 leaf-clad shells, antler blades, carapace plates, pale fringe), the P3 bead vines |
+| `apep_hands.mjs` | the 20 hand models (A `p1_planted p1_raised p3_fork`, B `p1_open p1_curl p3_curl p3_open`, C `p1_open p1_curl p3_curl`): the P1 three-blade claw (raised = rolled hook), the spoon-petal feet with the cream cone, the P3 cupped five-lobe leaf hand with grey undersides, the tulip C curl with the spiral glyph, the bud B curl, the bracted fork |
+| `apep_tail.mjs` | the seven banded segments (shared by both forms, tinted: two twisted straps, a scaled root sheath on tail_1 / 2 with a leaf frill) and the two tips (P1 spiral scroll + scythe crescent, P3 twisting whip + leaf) |
 
 Every region module exports `REGION`, `PARTS`, `models()` (model units), `FORM_MODELS {part: {p1, p3}}`, `sprites()`.
 The builder owns and rewrites `data/rlk/function/mboss/apep/rig/**` and, in the RP, `assets/rlk/{textures,models/item,
@@ -98,14 +98,44 @@ Culling 30 × 16, view range 3, `billboard fixed`, brightness per part (P1 13 / 
 
 ## 4. Clips
 
-The 36 clips of the frozen table (`ap_contract.md` §0.4.10), ids in table order. R1 keys: the stance pose of each
-segment; stance blends (`crouch_p3` 0-7, `stand_p3` 0-13, `move_strike_p3` 0-7 / 85-91, `aftermath` 72-84,
-`sink_p3` 0-7, `tail_p3` 57-86, `death` 55-82 into the crawl before its sink) pass a halfway key with every limb on IK
-and the B / C wrists 1.2 b off the water; hidden spans set every part to scale 0 one tick after the sink reaches
-−6 b (follow_y offsets, `SINK_TABLE` −0.25 … −6.5), and the full follow list returns one tick before a span ends.
+The 36 clips of the frozen table (`ap_contract.md` §0.4.10), ids in table order, keyed by AP-RC1 from `motion.md`, the
+video analyses and the footage (`apep_clips.mjs`): a pose library (`POSES`, the P1 key poses of `MO` §5 and the P3
+glossary of plan §6.2: UPRIGHT, CRAWL, HUNCH, MOUND, HOOP, SCOIL, CURL, BALL, V, CROUCH_OVER, BELLY_FLOP, KNEEL, …),
+per clip keys `[t, pose, ease]` at authored ticks, `RETIME` knots (wind-ups −25 %, plan U4), hidden spans, yaw
+schedules (the contract knots), look / face / core / tint / bright events and hand events (P1 clips swap a hand to its
+lifted variant automatically when it leaves the ground). Between keys a floor pass re-keys the tail, hem and drape
+chains tick by tick so they stay above the water (`GUARD`), except the `move_strike_p3` slam window t62-63 (the splash
+covers it). Stance blends (`crouch_p3` 0-7, `stand_p3` 0-13 and the blends inside clips) pass a halfway key (`MID`)
+with every limb on IK and the B / C wrists off the water. Hidden spans set every part to scale 0 one tick after the
+sink reaches −6 b (follow_y offsets, `SINK_TABLE`), and the full follow list returns one tick before a span ends.
+
+| clip | played / authored | next | hidden | yaw knots | keys/t |
+|---|---|---|---|---|---|
+| `entrance_p1` | 110 | idle_p1 | 0-3 | — | 19.3 |
+| `idle_p1` / `turn_p1` / `turn_p1_step` | 60 / 20 / 10 | loop / loop / idle_p1 | — | step 0:0 9:-90 | 4.1 / 23.9 / 22.9 |
+| `crawl_p1` / `crawl_stop_p1` / `walk_p1` | 16 / 32 / 36 | loop / idle_p1 / loop | — | — | 25.3 / 20.3 / 16.1 |
+| `burrow_strike` | 82 / 94 | idle_p1 | 22-43 | — | 23.9 |
+| `sink_p1` / `emerge_on_p1` / `burrow_in_p1` / `emerge_crown_p1` | 17 / 24 / 23 / 40 | hold / rotation / hold / idle_p1 | 14-16 / 0 / 21-22 / 0-4 | — | 18.9 / 9.7 / 26.7 / 17.3 |
+| `hands` | 140 / 160 | idle_p1 | — | 5:0 27:360 | 21.4 |
+| `glow_slams` | 131 / 160 | idle_p1 | — | — | 27.4 |
+| `rotation` | 130 / 135 | idle_p1 | — | 47:0 71:360 | 20.5 |
+| `tail_p1x2` | 127 / 141 | idle_p1 | — | 27:0 35:200 51:200 59:0 | 16.1 |
+| `combo_a` / `b` / `c` / `d` / `combo_end` | 29 / 44 / 20 / 77 / 20 | chained by the module | — | c 5:0 15:360 | 26.2 / 27.3 / 25.2 / 20.2 / 4.1 |
+| `sink_revive` / `revival` | 60 / 160 | hold, park / idle_p3 | 45-59 / 0-59 | — | 14.4 / 11.0 |
+| `idle_p3` / `turn_p3` / `walk_p3` | 60 / 20 / 32 | loop | — | turn 0:0 19:114 | 6.8 / 8.1 / 13.8 |
+| `crouch_p3` / `stand_p3` | 8 / 14 | hold / idle_p3 | — | — | 36.5 / 39.1 |
+| `move_strike_p3` | 92 / 100 | idle_p3 | 16-41 | 66:0 72:360 | 26.4 |
+| `aftermath` | 224 / 240 | idle_p3 | — | 18:0 36:360 | 17.0 |
+| `shells` | 113 / 140 | idle_p3 | — | — | 18.3 |
+| `sink_p3` / `surface_p3` | 20 / 40 | hold / stand_p3 | 12-19 / — | — | 29.4 / 10.6 |
+| `tail_p3` | 87 / 100 | idle_p3 | — | 13:0 21:200 45:200 53:0 | 30.6 |
+| `spikes` | 72 / 84 | idle_p3 | — | — | 22.1 |
+| `death` | 120 | hold | 118-119 | — | 16.5 |
+
 Per clip the manifest carries events, anchors (impact / muzzle / ball / face / core / crown / hood_top points per
-event), tracks, px keys (fitted, with the mandatory ticks), yaw knots, hidden spans, stance / look / hand / state
-events and extents.
+event), tracks, px keys (fitted, with the mandatory ticks), yaw knots, hidden spans, stance / look / hand / state events
+and extents (every clip inside the 30 × 16 culling box; the tallest is `aftermath`, top 15.2 b). Known clip-side
+items for AP-RC2 are listed in §7.
 
 ## 5. Manifest and objectives
 
@@ -123,7 +153,9 @@ rotations (R5), the R3 residual ≤ 0.25 b, hood swing ≥ 100°, upright top �
 −0.2 b outside hidden spans, every part top ≤ −0.1 b at each hidden-span start (R9), no root travel, events inside the
 clip, client-interpolation step checks (RIGLIB), the radial culling overhang, coverage ≥ 100 % within 3 b for CROUCH,
 UPRIGHT, HOOP, CROUCH_OVER and CRAWL (R7). Budgets: 49 / 56 parts, atlas ≤ 0.9 M px (R13), elements at rest
-P1 ≤ 7000 / P3 ≤ 8000 (R14). Suite: `S:ap/rigtests/test_ap_rig.py [--rebuild]` (static checks, mcsim runtime of spawn /
+P1 ≤ 7000 / P3 ≤ 8000 (R14). AP-R3 state: 0.876 M px in 239 sprites (body 300 k, head 193 k, hands 159 k, limbs 118 k,
+tail 78 k, shared 28 k); elements at rest P1 5664 / P3 4743 (body 1582 / 1484, head 892 / 1061, limbs 2060 / 1296,
+hands 724 / 548, tail 406 / 354); 101 models, 325 items. Suite: `S:ap/rigtests/test_ap_rig.py [--rebuild]` (static checks, mcsim runtime of spawn /
 tick / looks / park / kill, determinism).
 
 ## 7. Deviations and decisions (R1)
@@ -138,3 +170,27 @@ tick / looks / park / kill, determinism).
 - The rigid-skeleton fit moved a few CROUCH bind joints from the measured crouch table (hair roots and `hem_a`
   ≤ 0.38 b, the pose-only `clav_a` 0.68 b, the tail joints re-spaced); `skeleton.joints` lists the values used.
 - Notes for other stages: `S:ap/requests/rig.md`; the AP-R2 work list: `S:ap/rigwork/r1_worklist.md`.
+
+## 7b. AP-R3 integration (decisions and open items)
+
+- **Atlas.** The merged regions painted 1.017 M px. Cut to 0.876 M with the R13 densities: unused sprites dropped
+  (`g_shell`, `p1_leg`, `p3_robe`, `p1_cone`, `p3_cone`, `p1_core`; the empty model's particle is `g_plate`), the limb
+  wraps to 32 px/b (`l1_arm` 192², `l3_arm` 128 × 240, `l1_leg` 128 × 192), the body sac / calyx / hook / plate cards
+  and the P1 claws / petals, P3 fork / curl rosettes / C tips to 40 or 32 px/b, the P3 mask to 64 px/b.
+- **Seams fixed.** P3 chin-to-chest strand in front of the B arm; P1 drapes in front of the front legs; a shared 1.0 b
+  A wrist (forearm paddle tapered, claw palm / cuff widened); P1 foot cones out of the leg root base; coplanar hull
+  ledges between abdomen / chest (P1) and chest / shoulders (P3). Cross-region z-fighting scan: 0 coplanar pairs in
+  the rest, crawl and rear-up poses.
+- **Plant height.** The R2 claw stands on its tips 0.59 b under the wrist; `tg()` lifts A plants to ≥ 0.4 b (RC1
+  planted them at 0.35 for the R1 claw).
+- **Open (geometry / joints):** the P1 A upper arm still crosses the pauldron from the side (a joint matter: the A root
+  and elbow are frozen); the P3 tail sheath shows as a pale dome where tail_1 leaves the robe back; the P3 crawl strands
+  rest on / cut into the B curl hands (a CRAWL hair pose for RC2); the P1 cowl underside reads as stacked ledges in the
+  rear-up.
+- **Open (clips, AP-RC2):** floor dips with the real geometry (outputs of `S:ap/rigwork/r3/tools/ck.mjs` and
+  `tailfloor.mjs` in `S:ap/rigwork/r3/ck_r3.txt`, `tailfloor_r3.txt`): the P1 drapes in `rotation` t80-83 (−1.4 b),
+  the P3 tail root sheath in the low upright poses (`revival` t72, `spikes` t8, `death` t55, `tail_p3` t40, `shells`
+  t47, `aftermath` t186: −0.2 … −0.8 b, under the robe), `move_strike_p3` t62-65 (the slam window, by design), the
+  P3 hem in `aftermath` t12 / `tail_p3` t42 / `death` t82, the P1 chest and leg roots 0.2-0.3 b under in the plunges,
+  slams and `crawl_p1`; keys/t mean 19.9 (> 15); R17 secondary motion; the A plants.
+
