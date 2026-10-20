@@ -44,6 +44,6 @@ data merge entity 524c4b4d-415a-4400-8000-00000000002b {start_interpolation:0,in
 data merge entity 524c4b4d-415a-4400-8000-00000000002c {start_interpolation:0,interpolation_duration:24,transformation:{translation:[0.00841f,5.69969f,-0.07377f],left_rotation:[0.73747f,-0.00775f,-0.00044f,0.67533f],scale:[1.4f,1.4f,1.4f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-415a-4400-8000-00000000002d {start_interpolation:0,interpolation_duration:9,transformation:{translation:[0.04255f,7.28988f,0.15376f],left_rotation:[0.86246f,-0.00713f,-0.0206f,0.50565f],scale:[1.4f,1.4f,1.4f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-415a-4400-8000-00000000002e {start_interpolation:0,interpolation_duration:11,transformation:{translation:[0.11849f,8.60781f,0.85117f],left_rotation:[0.85883f,-0.01434f,-0.02049f,0.51165f],scale:[1.3f,1.3f,1.3f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-415a-4400-8000-00000000002f {start_interpolation:0,interpolation_duration:80,transformation:{translation:[0f,-5.7f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-415a-4400-8000-00000000002f {start_interpolation:0,interpolation_duration:80,transformation:{translation:[0f,-5.7f,0f],left_rotation:[-0.30071f,0f,0f,0.95372f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
 scoreboard players set @s azRigFl 1
 scoreboard players reset @s azRigQx

@@ -15,14 +15,14 @@ data modify storage rlk:mboss px.o.tail3_x set value 1.438d
 data modify storage rlk:mboss px.o.tail3_z set value -13.332d
 data modify storage rlk:mboss px.top.tail3 set value 2.186f
 data merge entity 524c4b4d-415a-4400-8000-000000000047 {height:2.186f}
-data modify storage rlk:mboss px.o.tail4_x set value 2.983d
-data modify storage rlk:mboss px.o.tail4_z set value -16.896d
-data modify storage rlk:mboss px.top.tail4 set value 2.383f
-data merge entity 524c4b4d-415a-4400-8000-000000000048 {height:2.383f}
+data modify storage rlk:mboss px.o.tail4_x set value 2.974d
+data modify storage rlk:mboss px.o.tail4_z set value -16.888d
+data modify storage rlk:mboss px.top.tail4 set value 2.463f
+data merge entity 524c4b4d-415a-4400-8000-000000000048 {height:2.463f}
 data modify storage rlk:mboss px.o.paw_l_x set value 2.706d
 data modify storage rlk:mboss px.o.paw_l_z set value 3.016d
-data modify storage rlk:mboss px.top.paw_l set value 3.056f
-data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:3.056f}
+data modify storage rlk:mboss px.top.paw_l set value 3.055f
+data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:3.055f}
 data modify storage rlk:mboss px.o.paw_r_x set value -3.316d
 data modify storage rlk:mboss px.o.paw_r_z set value 2.763d
 data modify storage rlk:mboss px.top.paw_r set value 2.8f

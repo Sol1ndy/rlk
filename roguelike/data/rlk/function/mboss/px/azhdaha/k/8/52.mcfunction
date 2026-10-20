@@ -7,10 +7,6 @@ data modify storage rlk:mboss px.o.chest_x set value 0d
 data modify storage rlk:mboss px.o.chest_z set value 0.377d
 data modify storage rlk:mboss px.top.chest set value 8.06f
 data merge entity 524c4b4d-415a-4400-8000-000000000042 {height:8.06f}
-data modify storage rlk:mboss px.o.belly_x set value 0d
-data modify storage rlk:mboss px.o.belly_z set value -1.29d
-data modify storage rlk:mboss px.top.belly set value 6.066f
-data merge entity 524c4b4d-415a-4400-8000-000000000043 {height:6.066f}
 data modify storage rlk:mboss px.o.tail2_x set value 0d
 data modify storage rlk:mboss px.o.tail2_z set value -9.351d
 data modify storage rlk:mboss px.top.tail2 set value 2.335f

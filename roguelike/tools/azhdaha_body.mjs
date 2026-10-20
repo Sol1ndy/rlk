@@ -13,7 +13,7 @@ import {loft, slab, crossCards, rockBox, toUnits, retex, stroke, sdPoly, registe
 import {PART_SCALE, J, PLATE_LEAN, NECK_TILT} from './azhdaha_pose.mjs';
 import {q, rot} from './mboss_rig_math.mjs';
 import {cardX, cardZ, abox, faceEl} from './mboss_model_lib.mjs';
-import {PAL, LOOK_PAL, C, clamp, smooth, mix, lift, sink, scale, N, creamPx, platePx, goldPx, spriteSize, onRect, TRANSPARENT, bevelLight, cells, ramp} from './azhdaha_materials.mjs';
+import {PAL, LOOK_PAL, C, clamp, smooth, mix, lift, sink, scale, N, creamPx, platePx, goldPx, spriteSize, onRect, TRANSPARENT, bevelLight, cells, ramp, SKIN, skinPx as tzHide} from './azhdaha_materials.mjs';
 
 export const REGION = 'body';
 export const PARTS = [
@@ -122,11 +122,11 @@ function cullHidden(groups) {
 // light-corrected hide / cream tiles by their azimuth.
 // BODY rows: [z, top (spine line), bottom, half width, height of the widest line, box (0 round .. 1 square corners)].
 const BODY = [
-  [-3.08, 3.68, 2.28, 1.85, 2.98, .2], [-2.78, 3.97, 2.0, 2.28, 2.98, .22], [-2.42, 4.13, 1.83, 2.52, 2.96, .22],
-  [-2.0, 4.25, 1.7, 2.66, 2.94, .2], [-1.3, 4.3, 1.56, 2.76, 2.92, .2],
-  [-.5, 4.24, 1.46, 2.82, 2.9, .18], [.3, 4.18, 1.42, 2.84, 2.88, .18], [1.1, 4.1, 1.45, 2.8, 2.88, .18],
-  [1.8, 3.98, 1.6, 2.68, 2.9, .18], [2.5, 3.8, 1.86, 2.48, 2.94, .18], [3.2, 3.58, 2.14, 2.2, 2.96, .16],
-  [3.85, 3.38, 2.4, 1.82, 2.96, .12], [4.45, 3.2, 2.58, 1.4, 2.94, .08], [5.0, 3.05, 2.7, .96, 2.92, .04], [5.4, 2.98, 2.76, .66, 2.9, 0],
+  [-3.08, 3.68, 2.28, 1.85, 3.0, .2], [-2.78, 3.97, 2.0, 2.28, 3.06, .22], [-2.42, 4.13, 1.83, 2.52, 3.1, .22],
+  [-2.0, 4.25, 1.7, 2.66, 3.08, .2], [-1.3, 4.3, 1.56, 2.76, 2.96, .2],
+  [-.5, 4.24, 1.46, 2.82, 2.74, .18], [.3, 4.18, 1.42, 2.84, 2.62, .18], [1.1, 4.1, 1.45, 2.8, 2.68, .18],
+  [1.8, 3.98, 1.6, 2.68, 2.84, .18], [2.5, 3.8, 1.86, 2.48, 2.96, .18], [3.2, 3.58, 2.14, 2.2, 3.0, .16],
+  [3.85, 3.38, 2.4, 1.78, 2.96, .12], [4.3, 3.24, 2.56, 1.28, 2.92, .08], [4.6, 3.14, 2.64, .9, 2.9, .04], [4.9, 3.05, 2.72, .6, 2.88, 0],
 ];
 const catmull = (p0, p1, p2, p3, t) => .5 * (2 * p1 + (p2 - p0) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (3 * p1 - p0 - 3 * p2 + p3) * t * t * t);
 function bodyAt(z) {
@@ -143,7 +143,7 @@ const tuck = (P, z) => { const [lo, hi] = OWN[P], d = z <= lo - 1e-6 ? lo - z : 
 const BARRELS = {
   chest: {bone: 'chest', zs: [-3.08, -2.94, -2.78, -2.6, -2.4, -2.16, -1.88, -1.42, -1.0, -.6, -.1], caps: '-', seed: 11, W: 256, H: 96},
   belly: {bone: 'spine1', zs: [-2.3, -1.65, -1.0, -.45, .25, .95, 1.6, 2.1, 2.7], seed: 23, W: 256, H: 128},
-  pelvis: {bone: 'pelvis', zs: [.7, 1.15, 1.6, 2.05, 2.5, 2.9, 3.27, 3.62, 3.96, 4.28, 4.6, 4.9, 5.17, 5.4], caps: '+', seed: 37, W: 256, H: 112},
+  pelvis: {bone: 'pelvis', zs: [.7, 1.15, 1.6, 2.05, 2.5, 2.9, 3.27, 3.62, 3.96, 4.25, 4.48, 4.62], caps: '+', seed: 37, W: 256, H: 112},
 };
 // the section of barrel P at world z: {r: [e1+, e2+, e1-, e2-], cy, box}
 // the belly runs 0.008 b inside the common hull and recesses its cross quads by half a stagger step more, so where its
@@ -180,14 +180,14 @@ for (const j of LEDGE_C) registerTile('tz_lc' + j, 32, 32, 32);
 const WRAP_N = 9;                                        // wrap slots: facets k = 0..8
 // Post-process of a barrel-like z-loft: wrap u -> compact slots, the right-hand plastron facets turned so their u runs
 // upward like the left ones, every ledge / cap retextured to the light-corrected tile of its azimuth class.
-function finishBarrel(els, wrap, cyAt, nyAt, cream = th => Math.sin(th * D2R) < -.2) {
+function finishBarrel(els, wrap, cyAt, nyAt, cream = (th, zp) => Math.sin(th * D2R) < -.2) {
   for (const e of els) {
     const [fname, face] = Object.entries(e.faces)[0], tex = face.texture.slice(1);
     if (fname === 'north' || fname === 'south') {
       const pts = elPoints(e), m = [0, 1, 2].map(i => pts.reduce((s, p) => s + p[i], 0) / pts.length), dx = m[0], dy = m[1] - cyAt(m[2]);
       const th = Math.atan2(dy, dx) / D2R, rr = Math.hypot(dx, dy), sn = rr < .45 ? 0 : nyAt(th, m[2]);
       const j = Math.max(0, Math.min(8, Math.round((sn + 1) * 4)));
-      face.texture = '#' + (cream(th) && rr >= .45 ? 'tz_lc' + Math.min(4, j) : 'tz_lh' + Math.max(2, j));
+      face.texture = '#' + (cream(th, m[2]) && rr >= .45 ? 'tz_lc' + Math.min(4, j) : 'tz_lh' + Math.max(2, j));
       face.uv = [0, 0, 16, 16];
     } else if (tex === wrap) {
       const k = Math.floor(Math.min(face.uv[0], face.uv[2]) + 1e-3);
@@ -204,10 +204,14 @@ function barrel(P, look = '') {
   const {bone, caps = '', seed} = BARRELS[P], wrap = 'tw_' + P, s = sfx(look), c = J[bone];
   registerWrap(wrap);
   const st = barrelSt(P);
-  const tex = k => (k <= 8 ? wrap : k === 12 ? 'tz_plb' + s : (k === 9 || k === 15) ? 'tz_pl1' + s : 'tz_pl' + s);
-  const els = restagger(loft('z', st, {tex: k => tex(k), caps, seed}), 'z', BASE[P]);
+  // R3b (r3_critique 7.1): behind the haunches (pelvis sections from world z 3.0) the underside is dark hide, not plastron:
+  // its cream ledges stacked up as white bricks beside the rump skirt
+  const rumpZ = 3.0, rump = i => P === 'pelvis' && (st[i].a + st[i + 1].a) / 2 + c[2] > rumpZ;
+  const tex = (k, i) => (k <= 8 ? wrap : rump(i) ? 'tz_lh' + Math.max(2, Math.round((Math.sin(k * 22.5 * D2R) + 1) * 4)) : k === 12 ? 'tz_plb' + s : (k === 9 || k === 15) ? 'tz_pl1' + s : 'tz_pl' + s);
+  const els = restagger(loft('z', st, {tex: (k, th, i) => tex(k, i), caps, seed}), 'z', BASE[P]);
   const local = BARRELS[P].local;
-  return finishBarrel(els, wrap, zp => (local ? secAt(P, zp).cy : bodyAt(zp + c[2])[3] - c[1]), (th, zp) => smoothNy(P, th, local ? zp : zp + c[2]));
+  return finishBarrel(els, wrap, zp => (local ? secAt(P, zp).cy : bodyAt(zp + c[2])[3] - c[1]), (th, zp) => smoothNy(P, th, local ? zp : zp + c[2]),
+    (th, zp) => Math.sin(th * D2R) < -.2 && !(P === 'pelvis' && zp + c[2] > rumpZ - .1));
 }
 const chest = look => barrel('chest', look), belly = look => barrel('belly', look), pelvis = look => barrel('pelvis', look);
 
@@ -218,10 +222,12 @@ const chest = look => barrel('chest', look), belly = look => barrel('belly', loo
 // joint into the back of the head (the head region's atlas J.head); painted and light-corrected like the torso.
 const vlen = v => Math.hypot(...v);
 const NL1 = vlen(J.neck2.map((x, i) => x - J.neck1[i])), NL2 = vlen(J.head.map((x, i) => x - J.neck2[i]));
-const NA1 = [1.05, -1.3 * NL1], NA2 = [.42, -1.35 * NL2];
+// R3b (r3_critique 3.2): neck1 starts .55 b behind its joint (was 1.05) with a flatter top, so it tops out under the hump
+// (<= 4.0 b at rest) instead of standing up as a pale dome between the horns
+const NA1 = [.55, -1.3 * NL1], NA2 = [.42, -1.35 * NL2];
 BARRELS.neck1 = {bone: 'neck1', local: true, tilt: NECK_TILT.neck1, neck: true, caps: '+', seed: 41, W: 128, H: 48,
   zs: [0, 1, 2, 3, 4].map(i => NA1[0] + (NA1[1] - NA1[0]) * i / 4),
-  sec: a => { const t = Math.max(0, Math.min(1, (NA1[0] - a) / (NA1[0] - NA1[1]))), w = 1.58 - .2 * t, h = 1.0 - .2 * t; return {r: [w, h, w, h], cy: .08 * (1 - t), box: .12}; }};
+  sec: a => { const t = Math.max(0, Math.min(1, (NA1[0] - a) / (NA1[0] - NA1[1]))), w = 1.58 - .2 * t, h = 1.0 - .2 * t, hu = .74 - .08 * t; return {r: [w, hu, w, h], cy: 0, box: .12}; }};
 BARRELS.neck2 = {bone: 'neck2', local: true, tilt: NECK_TILT.neck2, neck: true, caps: '+', seed: 43, W: 128, H: 48,
   zs: [0, 1, 2, 3, 4].map(i => NA2[0] + (NA2[1] - NA2[0]) * i / 4),
   sec: a => { const t = Math.max(0, Math.min(1, (NA2[0] - a) / (NA2[0] - NA2[1]))), w = 1.38 - .33 * t, h = .84 - .18 * t; return {r: [w, h, w, h], cy: 0, box: .12}; }};
@@ -231,32 +237,20 @@ const neck1 = () => barrel('neck1'), neck2 = () => barrel('neck2');
 // Hide (v3 f0720 / f1170 close-ups): smooth warm grey-brown skin, not pebbly: big soft light / dark masses, a fine grain,
 // faint wrinkle lines, a few low warts on the shoulders and the rump (u, v in px at 32 ppb). Lifted one step over the
 // footage (game light is 0.4-1.0 of the albedo).
-const SKIN = ramp(['#9A8A6E', '#837358', '#6E5F48', '#5A4D3B', '#463C2E', '#30291F']);
-const hideR = SKIN;
-function tzHide(u, v, {seed = 3, base = .36, warts = 0} = {}) {
-  const m1 = N.e(u * .012 + seed, v * .012), m2 = N.a(u * .035 + seed * 3, v * .035), m3 = N.c(u * .25 + seed, v * .25);
-  let t = base + .22 * (m1 - .5) + .1 * (m2 - .5) + .035 * (m3 - .5);
-  // wrinkles: thin wavy lines, slightly darker with a lit lip above
-  const w = Math.abs(N.f(u * .022 + seed, v * .06) - .5);
-  if (w < .012) t += .07 * (1 - w / .012); else if (w < .022) t -= .025 * (1 - (w - .012) / .01);
-  let col = SKIN(clamp(t, .03, .97));
-  if (warts > 0) {
-    const c = cells(u / 11, v / 11, seed + 9, 0, .8), cl = cells((u - 1.5) / 11, (v - 1.5) / 11, seed + 9, 0, .8);
-    if (c.id < warts && c.d1 < .3) col = SKIN(clamp(t - .9 * (cl.d1 - c.d1) + .06 * c.d1 / .3, .03, .97));
-  }
-  return mix(col, SKIN(.15), .12 * smooth(.6, .9, N.b(u * .05 + seed, v * .05)));     // pale dust
-}
+// (the skin ramp SKIN and its painter tzHide = materials skinPx, shared with the legs' upper arm and haunch masses)
 // Scutes: the band of big domed scales along the hide / plastron boundary (v3 f1170 / f0720: dark grey-brown cobbles,
 // two staggered rows, densest behind the shoulder and in front of the hip). z, h in blocks along the body and up from
 // the band's foot; returns null between scales.
 function scutePx(z, h, dens = 1) {
-  const row = Math.floor(h / .22), zz = z / .4 + .5 * row, c = cells(zz, (h - row * .22) / .22 + row, 17, 0, .4);
-  if (c.id > dens || h < 0 || h > .44) return null;
-  const r = .5 + .12 * c.id, e = c.d1 / r;
+  // R3b (r3_critique 3.1 a): big rounded grey plates (0.3-0.4 b) with a lit top edge and a soft shaded foot, two staggered
+  // rows; the seams a step darker, never a black outline
+  const RH = .32, row = Math.floor(h / RH), zz = z / .42 + .5 * row, c = cells(zz, (h - row * RH) / RH + row, 17, 0, .35);
+  if (c.id > dens || h < 0 || h > 2 * RH) return null;
+  const r = .52 + .1 * c.id, e = c.d1 / r;
   if (e > 1) return null;
-  const cl = cells(zz + .06, (h - row * .22 - .03) / .22 + row, 17, 0, .4), lit = cl.d1 - c.d1;
-  let col = mix(C('#8A7864'), C('#433729'), clamp(.4 - 3 * lit + .55 * e * e));
-  if (e > .8) col = mix(col, C('#241C15'), (e - .8) / .2 * .9);
+  const cu = cells(zz, (h - row * RH - .07) / RH + row, 17, 0, .35), lit = clamp((cu.d1 - c.d1) * 6);
+  let col = mix(C('#ADA18B'), C('#6E6352'), clamp(.42 - .55 * lit + .4 * e * e));
+  if (e > .86) col = mix(col, C('#5A5042'), (e - .86) / .14 * .55);
   return col;
 }
 // Painted glyphs: broad soft reddish-brown bands (v3 f0720 hip, v3 f1170 behind the shoulder): a two-turn square spiral
@@ -295,6 +289,7 @@ function barrelPainter(P) {
     const ao = !torso ? 0 : Math.max(Math.exp(-(((z + 2.1) / .9) ** 2) - ((y - 3.0) / .8) ** 2), Math.exp(-(((z - 2.5) / 1.0) ** 2) - ((y - 2.7) / .8) ** 2));
     col = mix(col, SKIN(.82), .35 * ao * side);
     if (torso) col = mix(col, SKIN(.12), .18 * Math.exp(-(((z - .2) / 1.1) ** 2) - ((y - 3.35) / .45) ** 2) * side);
+    if (!torso) col = mix(col, mix(C('#452C22'), C('#3A251D'), N.c(U * .05, V * .05)), .75 * smooth(.15, .7, Math.sin(th * D2R)));   // R3b: the dark ruff ground
     const g = torso ? glyphAt(P, z, y) : 0;
     if (g && side > .25) col = mix(col, mix(C('#7A4A33'), C('#6A3E2A'), N.c(z * 3, y * 3)), .72 * g);
     // the scute row along the boundary; under it the crease where the plastron starts (cream below)
@@ -313,7 +308,7 @@ function barrelPainter(P) {
 // lights them, v9 f0330; Hydro a faint blue). Painted pale: the plastron faces down and the game lights it at the
 // ambient 0.4 only.
 const BELLY = ramp(['#E6E1CC', '#D2CCB3', '#B9B399', '#9A947C', '#77725E', '#55513F']);
-function foldPx(look, n, beads = false) {
+function foldPx(look, n, beads = false, dk = 0) {
   const L = look ? LOOK_PAL[look] : null, R = BELLY;
   return (s, t) => {
     const v = t * 64, i = Math.min(n - 1, Math.floor(s * n)), x = s * n - i;
@@ -321,7 +316,7 @@ function foldPx(look, n, beads = false) {
     let tt = .1 - .1 * lit + .14 * smooth(.3, 0, x) + .05 * (N.b(s * 3 + i, v * .05) - .5) + .04 * (N.e(s * 7 + i, v * .2) - .5);
     const p = cells(x * 2.2 + i * 3, v / 18, 5 + i, 0, .7);
     if (p.d1 < .3 && p.id > .62) tt -= .07 * (1 - p.d1 / .3);
-    let col = R(clamp(tt, 0, .95));
+    let col = R(clamp(tt + dk, 0, .95));
     if (x < .08) col = mix(col, R(.8), .7 * (1 - x / .08));
     if (beads && x > .66) {
       // a row of round knobs (0.12 b) along the top of the roll
@@ -337,7 +332,11 @@ function foldPx(look, n, beads = false) {
 }
 // light-corrected ledge tiles: the hide / cream seen on a ledge (facing along the body: the game gives it F(0)),
 // scaled to the light the smooth surface there would get (never brighter than the albedo: no light stripes)
-const ledgePx = (j, cream) => (s, t) => scale(cream ? BELLY(clamp(.12 + .1 * N.b(s * 4 + j, t * 4), 0, 1)) : tzHide(s * 32 + 9 * j, t * 32 + 50), Math.min(1, LIGHTK(j / 4 - 1, 0)));
+// R3b (r3_critique 3.1 c): hide ledges are brightened to the light of the surface they stand in for (up to x 1.45),
+// so a back-facing step on the rump reads as the facet beside it instead of a dark slat
+// (the hide albedo darkened toward the spine as the wrap is, so a ledge and its facet carry the same paint)
+const ledgePx = (j, cream) => (s, t) => scale(cream ? BELLY(clamp(.12 + .1 * N.b(s * 4 + j, t * 4), 0, 1)) : mix(tzHide(s * 32 + 9 * j, t * 32 + 50), SKIN(.8), .3 * smooth(.6, .95, j / 4 - 1)),
+  Math.min(cream ? 1 : 1.25, LIGHTK(j / 4 - 1, 0)));
 
 // ---- apron (model.md §3.2; r1_critique 3.1): the chest's big cream stone shield ------------------------------------------------
 // A convex bell 3.6 b wide hanging from the throat (its top tucked 0.8 b up inside the neck, so a raised head uncovers it)
@@ -347,12 +346,12 @@ const ledgePx = (j, cream) => (s, t) => scale(cream ? BELLY(clamp(.12 + .1 * N.b
 // whose origin is J.apron, world [0, 2.2, -2.8]).
 // The glyph: dense thin vertical zigzag grooves, a central spine with a diamond, square-meander hooks; the lower half
 // carries round pebble bumps and the lobed hem; a small gold drop spike hangs at the bottom centre.
-const AP = {u0: 0, u1: 2.05, v0: -1.8, v1: .86};
+const AP = {u0: 0, u1: 2.05, v0: -1.55, v1: .86};   // (R3b, r3_critique 3.3: the hem 0.25 b higher)
 const AZ0 = -.3;                                         // the centre strip's mid-plane (apron frame z; world z -3.1)
 const AP_STRIPS = [[0, .66, 0], [.66, 1.4, 22.5], [1.4, 2.05, 45]];
 const AP_FOLD = -.78;                                    // the band split (apron frame v)
 const lobe = u => { const k = Math.round(u / .41), d = (u - k * .41) / .205; return .075 * Math.sqrt(Math.max(0, 1 - d * d)); };
-const apronHem = u => -1.7 + .5 * Math.pow(Math.min(1, u / 2.05), 2.2) - lobe(u);
+const apronHem = u => -1.45 + .45 * Math.pow(Math.min(1, u / 2.05), 2.2) - lobe(u);
 const apronW = v => 1.22 + .83 * smooth(.6, -.5, v);
 const apronSd = (u, v) => Math.max(u - apronW(v), v - (.84 - .1 * Math.min(1, u / 1.22) ** 2), apronHem(u) - v);
 function apronEls(sprite, {tint = false, glow = false} = {}) {
@@ -372,7 +371,7 @@ function apronEls(sprite, {tint = false, glow = false} = {}) {
   }
   const els = [...half, ...mirrorX(half)];
   // the gold drop spike hanging under the centre lobe (added after the mirror: it sits on the midline)
-  if (!glow) els.push(...blade([.005, apronHem(0) + .06, AZ0 - .15], 'z', 0, .42, 3, true));
+  if (!glow) els.push(...blade([.005, apronHem(0) + .06, AZ0 - .15], 'z', 0, .32, 3, true));
   return els;
 }
 // glyph polylines (half apron, u >= 0): zigzag grooves, the centre spine, V folds and meander hooks
@@ -386,7 +385,7 @@ const AP_LINES = [
   [[.95, .4], [.95, -.18], [1.12, -.18], [1.12, -.42], [.86, -.42], ...zig(.86, -.42, -1.12, .05, .3).slice(1)],
   sway(1.3, .12, -1.38, .07, 1.1),
   zig(1.66, -.28, -1.12, .065, .42, 1),
-  meander(1.52, .34, .18), meander(1.86, -.6, .11), meander(.6, -1.62, .1),
+  meander(1.52, .34, .18), meander(1.86, -.6, .11), meander(.6, -1.34, .1),
 ].map(pts => stroke(pts, () => 0));
 const apronLine = (u, v) => Math.min(...AP_LINES.map(S => S.near(u, v).d));
 function apronBumps(u, v) {
@@ -427,7 +426,7 @@ const apronMask = (u, v) => { if (apronSd(u, v) > 0) return null; const d = apro
 // straight leaf (the central row), 4-5 feathers whose tip bends outward (side rows; mirrored on the left), with a dark
 // mid-rib and amber chevron veins (v4 f0900).
 const BLADES = [
-  {kind: 's', tip: .2, w: .38}, {kind: 's', tip: .12, w: .34, orange: true}, {kind: 's', tip: .28, w: .4},
+  {kind: 's', tip: .2, w: .38}, {kind: 's', tip: .12, w: .34}, {kind: 's', tip: .28, w: .4},
   {kind: 'f', w: .42}, {kind: 'f', w: .36, bend: .16, orange: true}, {kind: 'f', w: .34, bend: .24},
 ];
 const SHEET = {cw: 64, ch: 128, n: BLADES.length};
@@ -439,26 +438,21 @@ const BL = BLADES.map(b => {
   const S = stroke(pts, t => b.w * AS * bladeW(b, t));
   return {...b, S, sd: (x, y) => S.sd(x * AS, y)};
 });
+// R3b (r3_critique 4.2 / 4.4): dark umber obsidian blades (one ramp step darker), a single ridge (one half lit, one
+// shaded), a 1-2 px greyish rim, no leaf veins; the orange base only on the side-row feather cell (about every third
+// plate), <= 30 % of its height, and never under the Cryo / Electro looks (their deep stone instead).
 function bladeColour(b, x, y, look) {
   const d = b.sd(x, y);
   if (d > 0) return null;
   const n = b.S.near(x * AS, y), across = Math.abs(n.s) / Math.max(1e-3, b.w * AS * bladeW(b, n.t));
   const LP = look ? LOOK_PAL[look] : null;
   // Cryo / Electro: the stone stays dark (the deep end of the look ramp); only the rim and a ridge glint glow
-  const R = LP ? (t => LP.stone(.45 + .55 * t)) : PAL.plate;
+  const R = LP ? (t => LP.stone(.45 + .55 * t)) : (t => PAL.plate(clamp(.14 + .86 * t)));
   let c = platePx(x * 60, y * 120, R);
-  // a central ridge (one half lit, one shaded) and feather grain toward the tip
-  c = n.s > 0 ? mix(c, R(.12), .45 * (1 - across)) : mix(c, R(.8), .4 * (1 - across));
-  if (across < (b.kind === 'f' ? .07 : .05)) c = mix(c, R(.95), .65);                       // the dark mid-rib
-  if (Math.abs(((n.t * 8 + across * 1.6) % 1) - .5) < .045 && across > .28) c = mix(c, R(.9), .3);
-  if (!LP) {
-    // amber veins: chevrons rising from the rib on the faces, streaks along the ridge on the profiles (v4 f0900)
-    if (b.kind === 'f') { const ph = ((n.t * 6.5 - across * 1.5) % 1 + 1) % 1;
-      if (across > .1 && across < .82 && n.t > .05 && n.t < .82 && Math.abs(ph - .5) < .075) c = mix(c, PAL.plateOr(.2 + .5 * n.t), .7 * (1 - .8 * n.t));
-    } else if (across > .12 && across < .5 && Math.abs(((across * 5 + n.t * .6) % 1) - .5) < .06 && n.t > .08 && n.t < .7) c = mix(c, PAL.plateOr(.35 + .4 * n.t), .45 * (1 - n.t));
-  }
-  if (b.orange && y < .45) c = mix(c, PAL.plateOr(.1 + 1.4 * y), smooth(.45, .1, y));
-  if (d > -.012) c = LP ? LP.glow(.12) : mix(c, PAL.plate(0), .6);          // rim: greyish highlight / element glow
+  c = n.s > 0 ? mix(c, R(.15), .4 * (1 - across)) : mix(c, R(.85), .35 * (1 - across));
+  if (across < .04) c = mix(c, n.s > 0 ? R(.05) : R(.95), .5);                      // the ridge line
+  if (b.orange && !LP && y < .3) c = mix(c, PAL.plateOr(.2 + 1.6 * y), .8 * smooth(.3, .06, y));
+  if (d > -.014) c = LP ? LP.glow(.12) : mix(c, C('#8C8078'), .55);                // rim: greyish sheen / element glow
   else if (LP && d > -.03) c = mix(c, LP.glow(.5), .45);
   if (LP && across < .045 && n.t > .3) c = mix(c, LP.glow(.35), .5);
   return c;
@@ -482,80 +476,92 @@ function plate(spr, [x, y, z], L, ks, kf, splay = 0, wf = 1, flip = false) {
 // Plate layout per group in WORLD coordinates (rest, before the group lean): [x, base y, z, L, side cell, front cell,
 // splay, front width]; entries with |x| > 0.1 are mirrored. Bases sit about 0.25 b inside the hide.
 const G = {
-  neck: {base: 'plN', g: 'neck', list: [[.02, 3.2, -3.05, 2.3, 0, 3, 0, 1], [.55, 3.12, -2.95, 2.1, 2, 4, -22.5, 1], [1.05, 2.88, -2.8, 1.9, 1, 5, -45, .9],
-    [1.4, 2.5, -2.62, 1.5, 0, 5, -45, .8]]},
-  sh: {base: 'plS', g: 'sh', list: [[.03, 4.1, -2.3, 3.2, 0, 3, 0, 1.15], [-.04, 4.0, -2.85, 1.8, 1, 3, 0, 1], [.72, 4.05, -1.75, 3.15, 2, 4, -22.5, 1.15],
-    [1.45, 3.78, -1.95, 2.5, 1, 5, -45, 1.1]]},
-  mid: {base: 'plM', g: 'mid', list: [[.05, 4.1, .1, 3.15, 2, 3, 0, 1.1], [-.05, 4.12, -.6, 1.9, 1, 3, 0, 1], [.75, 4.0, .45, 2.95, 0, 4, -22.5, 1.15],
-    [1.5, 3.72, .2, 2.3, 1, 5, -45, 1.05]]},
+  // R3b (r3_critique 3.2): the ruff planted on the neck top from 0.2 b behind the crown blades, radiating back and out
+  neck: {base: 'plN', g: 'neck', list: [[.02, 2.98, -3.42, 1.7, 0, 3, 0, .95], [-.03, 3.12, -2.85, 2.2, 2, 3, 0, 1], [.5, 2.92, -3.25, 1.75, 2, 4, -22.5, .95],
+    [.95, 2.78, -3.02, 1.85, 1, 5, -45, .9], [1.38, 2.45, -2.66, 1.45, 0, 5, -45, .8]]},
+  // R3b (r3_critique 4.1): a saw-tooth crest: the tall feathers over the shoulders (7.3 b, z -1.5) and mid-back (7.0 b,
+  // z +1.0) with a deep notch between them (the side rows shortened to 6.0-6.3 b tips at z -1.0 and 0), small plates
+  // (0.9-1.1 b) low on the flanks between the rows
+  sh: {base: 'plS', g: 'sh', list: [[.03, 4.1, -2.3, 3.2, 0, 3, 0, 1.15], [-.04, 4.0, -2.85, 1.8, 1, 3, 0, 1], [.72, 4.05, -1.75, 2.35, 2, 4, -22.5, 1.05],
+    [1.45, 3.78, -1.95, 2.3, 1, 5, -45, 1.0], [1.95, 3.42, -2.55, 1.05, 0, 5, -45, .8]]},
+  mid: {base: 'plM', g: 'mid', list: [[.05, 4.1, .1, 3.15, 2, 3, 0, 1.1], [-.05, 4.12, -.95, 2.55, 1, 3, 0, 1], [.75, 4.0, .45, 2.2, 0, 4, -22.5, 1.0],
+    [1.5, 3.72, .2, 2.1, 1, 5, -45, 1.0], [2.15, 3.3, -.95, 1.1, 2, 5, -45, .8], [2.2, 3.25, 1.05, .95, 0, 5, -45, .8]]},
   hip: {base: 'plH', g: 'hip', list: [[-.09, 3.82, 1.3, 2.75, 0, 3, 0, 1.1], [.03, 3.62, 2.4, 2.4, 2, 3, 0, 1], [-.03, 3.4, 3.65, 2.0, 1, 3, 0, .9],
-    [.09, 3.15, 4.4, 1.7, 0, 3, 0, .8], [.7, 3.7, 2.2, 2.3, 2, 4, -22.5, 1], [.68, 3.45, 3.3, 1.8, 1, 5, -22.5, .9], [1.35, 3.45, 2.6, 1.6, 0, 5, -45, .9]]},
+    [.09, 3.15, 4.4, 1.7, 0, 3, 0, .8], [.7, 3.7, 2.2, 2.3, 2, 4, -22.5, 1], [.68, 3.45, 3.3, 1.8, 1, 5, -22.5, .9], [1.35, 3.45, 2.6, 1.6, 0, 5, -45, .9],
+    [1.75, 3.15, 3.55, .9, 1, 5, -45, .75]]},
 };
 function plateGroup(key, spr) {
   const {base, g, list} = G[key], B = J[base], Ri = q([-PLATE_LEAN[g], 0, 0]), els = [];
-  for (const [x, y, z, L, ks, kf, sp, wf] of list) for (const sx of Math.abs(x) > .1 ? [1, -1] : [1]) {
-    const p = rot(Ri, [sx * x - B[0], y - B[1], z - B[2]]);
-    els.push(...plate(spr, p, L, ks, kf, sx * sp, wf, sx < 0));
-  }
+  list.forEach(([x, y, z, L, ks, kf, sp, wf], i) => { for (const sx of Math.abs(x) > .1 ? [1, -1] : [1]) {
+    // the left copy is not a mirror twin: 0.1-0.2 b along z and +-10 % in length (R3b, r3_critique 4.1)
+    const dz = sx < 0 ? (hash(i, key.length, 3) < .5 ? -1 : 1) * (.1 + .1 * hash(i, 7)) : 0, kL = sx < 0 ? 1 + .2 * (hash(i, key.length, 5) - .5) : 1;
+    const p = rot(Ri, [sx * x - B[0], y - B[1], z + dz - B[2]]);
+    els.push(...plate(spr, p, L * kL, ks, kf, sx * sp, wf, sx < 0));
+  } });
   return els;
 }
 
-// ---- gold crystals (model.md §3.6; r1_critique 3.4): trident / bird clusters along the crest's lower edge ---------------------
-// One cluster = 1-3 slender gold blades fanned from one root: some turned outward about Z (they read as the spikes
-// radiating from the shoulders in the front view, v4 f0900), some tipped back about X (the spikes pointing up and back
-// through the crest in the side view, v8 f2256). Each blade is a crossed pair of cards along its own axis (a side card,
-// plane x, and a front card, plane z, both carrying the blade's rotation), so it has a solid needle silhouette from
-// every side instead of a flat painted fan. Sheet: 4 cells of 48 x 128 (aspect 3:8): 0 a pointed blade, 1 a blade with a
-// side barb (the trident's prong), 2 a slender needle, 3 the broad shoulder spike. Gold ramp, a lit and a shaded half
-// either side of the bright ridge, darker amber edges.
-const SHARD_CELLS = [{w: .42}, {w: .38, barb: true}, {w: .3}, {w: .46, facet: true}];
-const SAS = .375;  // shard cell aspect (width / height): broad leaf blades, 0.2-0.5 b wide (v3 f0720, f1170)
-const shardW = (t, s) => s.w * (t < .2 ? .6 + .4 * t / .2 : Math.pow((1 - t) / .8, .85)) + .004;
+// ---- gold crystals (model.md §3.6; r1_critique 3.4; R3b r3_critique 4.3): trident / bird clusters along the crest's
+// lower edge, 9 a side. One cluster = a big broad blade turned out 22.5 degrees about Z plus two prongs fanned forward
+// and back about X (the trident in the side view, v3 f0720 / f1170). A blade is 0.5-0.7 b wide and 1.0-1.7 b long:
+// two crossed cut-out cards along its axis (a side card, plane x, and a front card, plane z) over a flat core box 0.12 b
+// thick (lit gold faces, darker edges), so it has a broad faceted silhouette and a solid edge from every side.
+// Sheet: 4 cells of 64 x 128 (aspect .5): 0 the broad lozenge blade, 1 the prong with a side barb, 2 a slender blade,
+// 3 the broad bevelled blade; a lit half gold(.05-.2) and a shaded half gold(.5-.65) either side of the bright ridge,
+// dark amber edges.
+const SHARD_CELLS = [{w: .47, wide: .16}, {w: .4, barb: true, wide: .2}, {w: .3, wide: .2}, {w: .48, facet: true, wide: .14}];
+const SAS = .5;    // shard cell aspect (width / height): the blade's painted width is up to 0.94 of the cell (0.47 L)
+const shardW = (t, s) => s.w * (t < s.wide ? .55 + .45 * Math.sin(t / s.wide * Math.PI / 2) : Math.pow((1 - t) / (1 - s.wide), 1.1)) + .004;
 const SHC = SHARD_CELLS.map(s => {
   const S = stroke(Array.from({length: 9}, (_, i) => [.5 * SAS, .02 + .96 * i / 8]), t => SAS * shardW(t, s));
-  const B = s.barb ? stroke([[.55 * SAS, .4], [.86 * SAS, .62]], t => SAS * .11 * (1 - t) + .003) : null;
+  const B = s.barb ? stroke([[.55 * SAS, .36], [.9 * SAS, .66]], t => SAS * .13 * (1 - t) + .003) : null;
   return {...s, S, B, sd: (x, y) => Math.min(S.sd(x * SAS, y), B ? B.sd(x * SAS, y) : 9)};
 });
 function shardColour(k, x, y) {
   const s = SHC[k], d = s.sd(x, y);
   if (d > 0) return null;
   const onB = s.B && s.B.sd(x * SAS, y) < s.S.sd(x * SAS, y), n = (onB ? s.B : s.S).near(x * SAS, y), lit = n.s > 0;
-  let c = goldPx(lit ? .08 + .22 * n.t : .45 + .2 * n.t, x * 20, y * 80);
-  if (s.facet && Math.abs(n.s) > .45 * SAS * shardW(n.t, s)) c = mix(c, PAL.gold(lit ? .2 : .7), .5);   // two bevel facets a side
-  if (d > -.007) c = PAL.gold(lit ? .62 : .85);                    // darker amber edges
-  else if (Math.abs(n.s) < .005 && n.t < .95) c = PAL.gold(0);     // the bright ridge
+  const across = Math.abs(n.s) / Math.max(1e-3, SAS * shardW(n.t, s));
+  let c = goldPx(lit ? .05 + .15 * n.t + .05 * across : .5 + .15 * n.t, x * 20, y * 80);
+  if (s.facet && across > .55) c = mix(c, PAL.gold(lit ? .22 : .72), .55);          // a bevel facet a side
+  if (d > -.012) c = PAL.gold(lit ? .7 : .88);                     // dark amber edges
+  else if (across < .06 && n.t < .96) c = PAL.gold(0);             // the bright ridge
   return c;
 }
 const shardSheet = (s, t) => { const k = Math.min(3, Math.floor(s * 4)); return shardColour(k, s * 4 - k, 1 - t) || TRANSPARENT; };
 const shardUV = (els, k) => { for (const e of els) for (const f of Object.values(e.faces)) if (f.texture === '#shards') { const [a, b, c2, d] = f.uv; f.uv = [k * 4 + a / 4, b, k * 4 + c2 / 4, d].map(v => +v.toFixed(4)); } return els; };
 // One blade from the root [x, y, z]: axis 'z' (deg < 0 tips toward +X) or 'x' (deg > 0 tips back, +Z), length L, cell k.
-// down: the blade hangs from its root (the apron's drop spike).
-function blade([x, y, z], axis, deg, L, k, down = false) {
+// down: the blade hangs from its root (the apron's drop spike). core: the flat gold core box under the side card.
+function blade([x, y, z], axis, deg, L, k, down = false, core = !down) {
   const w = L * SAS / 2, rot = deg ? [axis, deg, [x, y, z]] : undefined, Y0 = down ? y - L : y, Y1 = down ? y : y + L, uvr = down ? [0, 1, 1, 0] : [0, 0, 1, 1];
-  return shardUV([cardX('shards', x, {Z0: z - w, Z1: z + w, Y0, Y1}, {rot, uvr}), cardZ('shards', z, {X0: x - w, X1: x + w, Y0, Y1}, {rot, uvr})], k);
+  const els = shardUV([cardX('shards', x, {Z0: z - w, Z1: z + w, Y0, Y1}, {rot, uvr}), cardZ('shards', z, {X0: x - w, X1: x + w, Y0, Y1}, {rot, uvr})], k);
+  if (core) { const cw = w * .62 * SHARD_CELLS[k].w / .47;
+    els.push(rockBox([x - .06, y + .02, z - cw], [x + .06, y + L * .5, z + cw], {all: 'gold_dk', left: 'gold', right: 'gold'}, {rot, seed: x * 7 + z * 3})); }
+  return els;
 }
-// [x, y, z, [[axis, deg, L, cell], ...]]: world rest positions of the right-hand roots (mirrored), about 0.2 b inside
-// the hide; the tips reach 4.7-5.3 b (model.md §1: shoulder crystal tips 0.67 H) and stay within the crystal parts' R1 reach
-// (PART_SCALE crys_*: x <= 3.3 b / 3.0 b at the hips), inside the shoulder span of the fore legs.
+// the hull's flank x at (y, z) (rest, world): the crystal roots sit 0.22 b inside it
+const hullX = (y, z) => { const [top, bot, hw, cy] = bodyAt(z), b = y >= cy ? top - cy : cy - bot; return hw * Math.sqrt(Math.max(0, 1 - ((y - cy) / b) ** 2)); };
+// clusters [y, z, big blade length, turn-out (deg about Z)]: world rest roots of the right-hand side (mirrored); the
+// shoulder clusters reach 5.0-5.4 b, the mid and hip ones root lower on the flank (3.2-3.7 b) so they read in front of
+// the plates from the side; all inside the crystal parts' reach (PART_SCALE crys_*: 3.3 b / 3.0 b at the hips).
 const CRYS = {
-  sh: {base: 'plS', list: [
-    [1.85, 3.86, -2.0, [['z', -45, 1.7, 3], ['x', 22.5, 1.35, 1], ['z', -22.5, 1.15, 2]]],
-    [1.72, 4.0, -1.05, [['z', -22.5, 1.7, 1], ['x', 45, 1.2, 0], ['z', -45, 1.0, 2]]],
-    [2.3, 3.4, -2.62, [['z', -45, 1.1, 0], ['z', -22.5, .85, 2]]],
-    [1.55, 4.02, -2.6, [['z', -22.5, 1.3, 2], ['x', 22.5, .95, 0]]]]},
-  mid: {base: 'plM', list: [
-    [2.0, 3.78, .0, [['z', -45, 1.45, 1], ['x', 22.5, 1.25, 0], ['z', -22.5, 1.0, 2]]],
-    [1.78, 3.9, 1.0, [['z', -22.5, 1.4, 0], ['x', 45, 1.1, 2]]],
-    [2.4, 3.2, .62, [['z', -45, 1.0, 2]]]]},
-  hip: {base: 'plH', list: [
-    [1.86, 3.48, 2.1, [['z', -45, 1.3, 1], ['x', 22.5, 1.15, 0]]],
-    [1.6, 3.4, 3.1, [['z', -22.5, 1.2, 0], ['x', 45, 1.0, 2]]],
-    [2.12, 3.0, 2.8, [['z', -45, .95, 2]]]]},
+  sh: {base: 'plS', list: [[3.9, -2.2, 1.75, -22.5], [3.7, -1.3, 1.7, -22.5], [3.3, -2.8, 1.3, -45]]},
+  mid: {base: 'plM', list: [[3.62, -.4, 1.7, -22.5], [3.58, .6, 1.8, -22.5], [3.25, 1.45, 1.3, -45]]},
+  hip: {base: 'plH', list: [[3.42, 2.15, 1.6, -22.5], [3.32, 3.05, 1.4, -22.5], [3.15, 3.8, 1.1, -45]]},
 };
 function crystalGroup(g) {
   const {base, list} = CRYS[g], B = J[base], els = [];
-  for (const [x, y, z, blades] of list) for (const s of [1, -1]) for (const [ax, deg, L, k] of blades)
-    els.push(...blade([s * x - B[0], y - B[1], z - B[2]], ax, ax === 'z' ? s * deg : deg, L, k));
+  list.forEach(([y, z, L, out], i) => {
+    const x0 = hullX(y, z) - .22;
+    // asymmetric pairs: the left cluster sits 0.12 b further back and 8 % shorter or longer (no mirrored twins)
+    for (const sd of [1, -1]) {
+      const zz = z + (sd < 0 ? .12 : 0), k = sd < 0 ? (i % 2 ? .92 : 1.08) : 1, R = [sd * x0 - B[0], y - B[1], zz - B[2]];
+      els.push(...blade(R, 'z', sd * out, L * k, (i + (sd < 0)) % 2 ? 3 : 0));
+      // the prongs splay forward and back about X, a little outside the big blade so they read beside it from the side
+      els.push(...blade([R[0] + sd * .14, R[1] - .05, R[2] - .2], 'x', -45, L * .6 * k, 1));
+      els.push(...blade([R[0] + sd * .18, R[1] - .08, R[2] + .22], 'x', 45, L * .66 * k, i % 2 ? 2 : 1));
+    }
+  });
   return els;
 }
 
@@ -600,9 +606,9 @@ export function sprites() {
   S.plates = [SHEET.cw * SHEET.n, SHEET.ch, plateSheet(null), false];
   S.plates_cryo = [SHEET.cw * SHEET.n, SHEET.ch, plateSheet('cryo'), false];
   S.plates_electro = [SHEET.cw * SHEET.n, SHEET.ch, plateSheet('electro'), false];
-  S.shards = [192, 128, shardSheet, false];
+  S.shards = [256, 128, shardSheet, false];
   for (const P of Object.keys(BARRELS)) S['tw_' + P] = [BARRELS[P].W, BARRELS[P].H, barrelPainter(P), false];
-  for (const l of [null, 'hydro', 'pyro']) { S['tz_pl' + sfx(l)] = [64, 64, foldPx(l, 1), false]; S['tz_pl1' + sfx(l)] = [64, 64, foldPx(l, 1, true), false]; S['tz_plb' + sfx(l)] = [64, 64, foldPx(l, 3), false]; }
+  for (const l of [null, 'hydro', 'pyro']) { S['tz_pl' + sfx(l)] = [64, 64, foldPx(l, 1, false, .1), false]; S['tz_pl1' + sfx(l)] = [64, 64, foldPx(l, 1, true, .2), false]; S['tz_plb' + sfx(l)] = [64, 64, foldPx(l, 3), false]; }
   for (const j of LEDGE_H) S['tz_lh' + j] = [32, 32, ledgePx(j, false), false];
   for (const j of LEDGE_C) S['tz_lc' + j] = [32, 32, ledgePx(j, true), false];
   return S;

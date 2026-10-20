@@ -1,8 +1,8 @@
 # Clip stomp_hr (id 21) tick 16: the proxy columns that moved.
-data modify storage rlk:mboss px.o.head_x set value -0.08d
-data modify storage rlk:mboss px.o.head_z set value 4.495d
-data modify storage rlk:mboss px.top.head set value 3.183f
-data merge entity 524c4b4d-415a-4400-8000-000000000041 {height:3.183f}
+data modify storage rlk:mboss px.o.head_x set value -0.081d
+data modify storage rlk:mboss px.o.head_z set value 4.49d
+data modify storage rlk:mboss px.top.head set value 3.176f
+data merge entity 524c4b4d-415a-4400-8000-000000000041 {height:3.176f}
 data modify storage rlk:mboss px.o.tail1_x set value 0.194d
 data modify storage rlk:mboss px.o.tail1_z set value -5.856d
 data modify storage rlk:mboss px.top.tail1 set value 4.379f

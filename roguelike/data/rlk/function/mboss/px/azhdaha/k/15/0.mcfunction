@@ -37,26 +37,26 @@ scoreboard players set #pxU6 mb 1
 function rlk:mboss/px/azhdaha/ev/6
 data modify storage rlk:mboss px.o.tail3_x set value -0.61d
 data modify storage rlk:mboss px.o.tail3_z set value -13.627d
-data modify storage rlk:mboss px.top.tail3 set value 2.943f
-data merge entity 524c4b4d-415a-4400-8000-000000000047 {height:2.943f}
+data modify storage rlk:mboss px.top.tail3 set value 2.946f
+data merge entity 524c4b4d-415a-4400-8000-000000000047 {height:2.946f}
 scoreboard players set #pxU7 mb 1
 function rlk:mboss/px/azhdaha/ev/7
-data modify storage rlk:mboss px.o.tail4_x set value -1.459d
-data modify storage rlk:mboss px.o.tail4_z set value -17.338d
+data modify storage rlk:mboss px.o.tail4_x set value -1.461d
+data modify storage rlk:mboss px.o.tail4_z set value -17.343d
 data modify storage rlk:mboss px.top.tail4 set value 3.567f
 data merge entity 524c4b4d-415a-4400-8000-000000000048 {height:3.567f}
 scoreboard players set #pxU8 mb 1
 function rlk:mboss/px/azhdaha/ev/8
 data modify storage rlk:mboss px.o.paw_l_x set value 3.15d
 data modify storage rlk:mboss px.o.paw_l_z set value 2.301d
-data modify storage rlk:mboss px.top.paw_l set value 3.299f
-data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:3.299f}
+data modify storage rlk:mboss px.top.paw_l set value 3.269f
+data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:3.269f}
 scoreboard players set #pxU9 mb 1
 function rlk:mboss/px/azhdaha/ev/9
 data modify storage rlk:mboss px.o.paw_r_x set value -3.15d
 data modify storage rlk:mboss px.o.paw_r_z set value 1.972d
-data modify storage rlk:mboss px.top.paw_r set value 3.192f
-data merge entity 524c4b4d-415a-4400-8000-00000000004a {height:3.192f}
+data modify storage rlk:mboss px.top.paw_r set value 3.146f
+data merge entity 524c4b4d-415a-4400-8000-00000000004a {height:3.146f}
 scoreboard players set #pxU10 mb 1
 function rlk:mboss/px/azhdaha/ev/10
 data modify storage rlk:mboss px.o.foot_l_x set value 2.5d

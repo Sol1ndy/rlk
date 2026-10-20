@@ -14,7 +14,7 @@
 // Region interface: see azhdaha_body.mjs. Segment frames (azhdaha_pose.mjs solve): the joint at the origin, the segment
 // along +Z (back), up = +Y (the dorsal ridge), the ventral face -Y; the tip continues t8's frame from its end. The skirt
 // frame is the pelvis frame moved to the tail root.
-import {loft, slab, toUnits, stroke, registerTile, registerWrap, rockBox, hash} from './azhdaha_shape.mjs';
+import {loft, slab, toUnits, stroke, registerTile, registerWrap, rockBox, hash, mirrorX} from './azhdaha_shape.mjs';
 import {PART_SCALE, TAIL_LEN, TAIL_PARTS} from './azhdaha_pose.mjs';
 import {PAL, LOOK_PAL, C, clamp, smooth, mix, sink, lift, N, TRANSPARENT, creamPx, cells, onRect, r16} from './azhdaha_materials.mjs';
 import {cardX, cardZ, faceEl} from './mboss_model_lib.mjs';
@@ -51,6 +51,8 @@ for (const l of ['', '_cryo', '_electro']) { registerTile('tailskin' + l, 64, 64
 // the ventral face: a wrap-round sprite (u = around the 16 facets, v = along the segment); the cream facets are k = 9..15
 registerWrap('tailbelly'); registerTile('tailbelly', 256, 128, 40);
 const VENTRAL = th => Math.sin(th * Math.PI / 180) < -.5;      // facets k = 10..14
+// (R3b, r3_critique 7.2: from t3 on only k = 11..13 are cream, so the band seen from the side is <= 0.15 b, not a plank)
+const VENTRAL_N = th => Math.sin(th * Math.PI / 180) < -.85;
 
 // ---- body segments ---------------------------------------------------------------------------------------------------------
 function core(i, look) {
@@ -64,11 +66,14 @@ function core(i, look) {
   // a collar sunk in the previous segment (or the rump), three equal sections (each takes the profile at its middle,
   // so the taper steps by ~4 % only and needs no ledge rings), then a narrowed, capped end that tucks into the next
   // segment's collar: at a 25-30 degree curl the outer side shows a crease, not a protruding lip or an open end
+  // (R3b, r3_critique 7.2: the tucked end narrower and shorter (.72 x, .2 b) so no box corner of it shows past the next
+  // collar on the outside of a 25-30 degree bend)
   const st = [{a: -.4, r: prof(s0, .97)}, {a: 0, r: prof(s0, 1.02)}, {a: L / 3, r: prof(s0 + L / 3)}, {a: L * 2 / 3, r: prof(s0 + L * 2 / 3)},
-    {a: L - .08, r: prof(s1)}, {a: L + .28, r: prof(s1, .84)}];
+    {a: L - .1, r: prof(s1)}, {a: L + .2, r: prof(s1, .72)}];
   for (const s of st) s.box = .12;
+  const V = i >= 2 ? VENTRAL_N : VENTRAL;
   // (the cap, hidden in the next collar, takes one dark tile: its ring quads overlap near the axis)
-  return loft('z', st, {n: 16, ledges: false, caps: '+', ledgeTex: 'tailskin' + sfx(look), tex: (k, th) => (VENTRAL(th) ? 'tailbelly' : 'tailskin' + sfx(look)), seed: 201 + i * 7});
+  return loft('z', st, {n: 16, ledges: false, caps: '+', ledgeTex: 'tailskin' + sfx(look), tex: (k, th) => (V(th) ? 'tailbelly' : 'tailskin' + sfx(look)), seed: 201 + i * 7});
 }
 
 // ---- blades (dark umber, orange bases): one sheet of 4 cells, 64 x 64 each ----------------------------------------------------
@@ -80,13 +85,15 @@ const BL = [
   {p: [[.05, .1], [.35, .45], [.75, .9]], w: .16, pw: 1.1},     // 3 small jagged spur (branch stubs, distal)
 ].map(b => ({...b, S: stroke(Array.from({length: 17}, (_, i) => { const t = i / 16; return [0, 1].map(k => (1 - t) ** 2 * b.p[0][k] + 2 * (1 - t) * t * b.p[1][k] + t * t * b.p[2][k]); }), t => b.w * (1 - t) ** b.pw + .006)}));
 // A blade of shape k, size S (blocks), its base at `base` on the plane X = base[0]; rot = [axis, deg] about the base.
-function blade(look, k, base, S, {rot = null, half = .055, edge} = {}) {
+function blade(look, k, base, S, {rot = null, half = .055, edge, down = false} = {}) {
   const spr = 'tblades' + sfx(look), [x, y, z] = base, b = BL[k];
-  const rect = {u0: z - b.p[0][0] * S, u1: z + (1 - b.p[0][0]) * S, v0: y - b.p[0][1] * S, v1: y + (1 - b.p[0][1]) * S};
-  const sd = (u, v) => b.S.sd((u - rect.u0) / S, (v - rect.v0) / S) * S;
+  // down: the shape mirrored about its base line, pointing down (the ventral-edge row)
+  const rect = down ? {u0: z - b.p[0][0] * S, u1: z + (1 - b.p[0][0]) * S, v0: y - (1 - b.p[0][1]) * S, v1: y + b.p[0][1] * S}
+    : {u0: z - b.p[0][0] * S, u1: z + (1 - b.p[0][0]) * S, v0: y - b.p[0][1] * S, v1: y + (1 - b.p[0][1]) * S};
+  const sd = down ? (u, v) => b.S.sd((u - rect.u0) / S, (y - v) / S + b.p[0][1]) * S : (u, v) => b.S.sd((u - rect.u0) / S, (v - rect.v0) / S) * S;
   const els = slab({plane: 'x', at: x, rect, sd, half, sprite: spr, edge: edge || 'tailskin' + sfx(look), cell: Math.max(.07, S / 9), core: S > .35, inset: .7,
     rot: rot ? [rot[0], rot[1], base] : null});
-  for (const e of els) for (const f of Object.values(e.faces)) if (f.texture === '#' + spr) { const [a, bb, c2, d] = f.uv; f.uv = [k * 4 + a / 4, bb, k * 4 + c2 / 4, d].map(v => +v.toFixed(4)); }
+  for (const e of els) for (const f of Object.values(e.faces)) if (f.texture === '#' + spr) { const [a, bb, c2, d] = f.uv; f.uv = (down ? [k * 4 + a / 4, d, k * 4 + c2 / 4, bb] : [k * 4 + a / 4, bb, k * 4 + c2 / 4, d]).map(v => +v.toFixed(4)); }
   return els;
 }
 // per body segment: the ridge row [frac along, size, shape]; the two side rows of the V-fan [frac, size] (upper flank,
@@ -107,6 +114,12 @@ function spikes(i, look) {
     const s = CUM[i] + f * L, w = at(PW, s), u = at(PU, s);
     els.push(...blade(look, (i + (side > 0 ? 0 : 1)) % 2, [side * w * .55, u * .5, f * L], S * (side > 0 ? 1 : .9), {rot: ['z', -side * 45], half: .05}));
   }
+  // R3b (r3_critique 7.2): a lateral row along each ventral edge, pointing down-out and back (sizes alternating .5 / .8 b on
+  // t2..t5), so the convex side of the loop is ragged with dark blades too instead of a straight cream stripe
+  if (i >= 1) [[.32, i % 2 ? .8 : .5], [.78, i % 2 ? .5 : .8]].forEach(([f, S0], j) => { for (const side of [1, -1]) {
+    const s = CUM[i] + f * L, w = at(PW, s), d = at(PD, s), S = S0 * (1 - .1 * (i - 1));
+    els.push(...blade(look, 2 + (j % 2), [side * w * .8, -d * .45, f * L], S, {rot: ['z', side * 45], half: .04, down: true}));
+  } });
   for (const [f, S] of FLANK[i]) for (const side of [1, -1]) {
     const s = CUM[i] + f * L, w = at(PW, s), u = at(PU, s);
     // a long plate on the flank, leaning out 45 degrees, pointing back over the next joint
@@ -118,11 +131,12 @@ function spikes(i, look) {
 // ---- the branch: knots, stubs, twigs, leaf clusters ------------------------------------------------------------------------
 // leaf clusters per branch part (5 = t6, 6 = t7, 7 = t8, 8 = tip): [z frac, angle round the axis (deg, 270 = ventral),
 // out (blocks from the axis), size, sprite cell, twig]
+// (R3b, r3_critique 7.3: 8 clusters on twigs, mostly on the top and outer sides, 0.4-0.6 b of bare branch between them)
 const LEAVES = {
-  5: [[.45, 200, .4, .85, 0, 1], [.85, 320, .45, .95, 1, 1]],
-  6: [[.15, 255, .45, 1.0, 1, 1], [.45, 35, .38, .85, 0, 0], [.65, 290, .5, 1.05, 0, 1], [.9, 150, .48, 1.0, 1, 1]],
-  7: [[.1, 225, .5, 1.05, 0, 1], [.35, 315, .5, 1.1, 1, 1], [.55, 95, .32, .9, 1, 0], [.75, 200, .48, 1.05, 0, 1], [.95, 330, .45, 1.0, 1, 1]],
-  8: [[.15, 250, .38, 1.1, 1, 0], [.45, 30, .32, 1.0, 0, 0], [.7, 150, .34, 1.0, 1, 0], [.95, 275, .3, 1.15, 0, 0]],
+  5: [[.75, 320, .48, .95, 1, 1]],
+  6: [[.3, 250, .5, 1.0, 1, 1], [.85, 35, .46, .95, 0, 1]],
+  7: [[.35, 205, .5, 1.05, 0, 1], [.9, 320, .48, 1.0, 1, 1]],
+  8: [[.3, 255, .4, 1.1, 1, 0], [.72, 60, .34, 1.0, 0, 0], [.98, 285, .3, 1.15, 0, 0]],
 };
 const LEAF_SPR = l => 'leaf' + sfx(l || 'geo');
 // one cluster: three crossed cut-out cards (front, side, flat), each turned a little for an irregular bush
@@ -169,24 +183,30 @@ function tipPart(look) {
     ...branchBits(8, look, .9)];
 }
 
-// ---- the rump skirt (pelvis frame at the tail root) --------------------------------------------------------------------------
-// The bell outline in the skirt's plane (u = X, v = Y from the tail joint): 1.9 b wide at the top, 3.0 b at the
-// hem, a lobed (scalloped) hem ~2.05 b below the joint. sd < 0 inside (not exact, monotone enough for the core cells).
-const SK = {rect: {u0: -1.6, u1: 1.6, v0: -1.8, v1: .15}, top: .1, bot: -1.74, z: .3, tilt: 22.5};
-const skHalf = v => .95 + .55 * clamp((SK.top - v) / (SK.top - SK.bot)) ** 1.4;
-const skHem = u => SK.bot + .13 * (1 - Math.cos(Math.min(Math.abs(u), 1.45) / .5 * Math.PI)) / 2 + .1 * smooth(1.1, 1.5, Math.abs(u));
-const skSd = (u, v) => Math.max(Math.abs(u) - skHalf(v), v - SK.top, skHem(u) - v, Math.hypot(Math.max(0, Math.abs(u) - skHalf(v) + .25), Math.max(0, skHem(u) + .25 - v)) - .25);
+// ---- the rump skirt (pelvis frame at the tail root, tilted SKIRT_TILT bottom-forward: azhdaha_pose.mjs) ---------------------
+// R3b (r3_critique 7.1): a convex cream bell hung from inside the tail root down to ~0.4 b above the floor between the
+// hind legs (v3 f1560), 3.0 b wide at its lobed hem: two strips a side (the back face and a side face turned 45 degrees
+// about Y, wrapping forward round the rump), painted alpha cards on both faces, no box cores (the R2 plate's
+// core read as a white plank from the side, its rounded cream mass as a pile of white bricks). The bell outline in
+// UNROLLED coordinates (u = arc length from the midline, v = Y from the tail joint); sd < 0 inside.
+const SK = {rect: {u0: 0, u1: 1.75, v0: -3.1, v1: .15}, top: .1, bot: -2.95, z: .4};
+const SK_STRIPS = [[0, .56, 0], [.56, 1.75, 45]];
+const skHalf = v => 1.12 + .5 * clamp((SK.top - v) / (SK.top - SK.bot)) ** 1.3;
+const skLobe = u => { const k = Math.round(u / .44), d = (u - k * .44) / .22; return .085 * Math.sqrt(Math.max(0, 1 - d * d)); };
+const skHem = u => SK.bot + .22 * smooth(.9, 1.65, Math.abs(u)) - skLobe(Math.abs(u));
+const skSd = (u, v) => Math.max(Math.abs(u) - skHalf(v), v - SK.top, skHem(u) - v);
 function skirt() {
-  // a thick cream plate hung from the tail joint, the bottom tucked 22.5 degrees forward under the rump; the painted
-  // card on its back face carries the exact bell outline, the veins and the lobed hem (v3 f1560)
-  const plate = slab({plane: 'z', at: SK.z, rect: SK.rect, sd: skSd, half: .22, sprite: 'tskirt', edge: 'cream', cell: .16, inset: .8, cards: '+', rot: ['x', SK.tilt, [0, 0, SK.z]]});
-  // the rounded mass in front of the plate (the side view reads a full rump, not a hanging board); its back stays
-  // in front of the tilted plate, its front inside the haunches
-  // R3 seam: the mass's top reaches 0.1-0.15 b into the pelvis hull at every station (its skipped top facets stay
-  // inside), and its front end is capped: from above-behind no gap opened between the rump and the skirt
-  const mass = loft('z', [{a: SK.z - .42, r: [.95, .62, .95, .45], c: [0, -.7]}, {a: SK.z - .75, r: [1.22, .82, 1.22, .6], c: [0, -1.02]},
-    {a: SK.z - 1.45, r: [1.18, .62, 1.18, .55], c: [0, -.98]}], {n: 16, tex: (k, th) => 'cream', caps: '-', seed: 621, ledges: true, skip: (k, th) => Math.sin(th * Math.PI / 180) > .7});
-  return [...plate, ...mass];
+  const half = [];
+  let px = 0, pz = SK.z;
+  for (const [u0, u1, deg] of SK_STRIPS) {
+    const shift = u0 - px, rect = {u0: SK.rect.u0 - shift, u1: SK.rect.u1 - shift, v0: SK.rect.v0, v1: SK.rect.v1};
+    half.push(...slab({plane: 'z', at: pz, rect, sd: (X, v) => skSd(X + shift, v), half: .015, sprite: 'tskirt', core: false, cards: 'both', eps: .012,
+      clip: {u0: px, u1: px + (u1 - u0)}, rot: deg ? ['y', -deg, [px, 0, pz]] : null}));
+    px += (u1 - u0) * Math.cos(deg * Math.PI / 180); pz -= (u1 - u0) * Math.sin(deg * Math.PI / 180);
+  }
+  // a dark hide seal hidden inside t1 / the pelvis end: closes the view up under the tail root between the strips
+  const seal = rockBox([-.9, -.6, -.35], [.9, .05, .28], 'tailskin');
+  return [...half, ...mirrorX(half), seal];
 }
 
 // ---- region exports ---------------------------------------------------------------------------------------------------------
@@ -215,7 +235,7 @@ const glowOf = look => (look ? LOOK_PAL[look].glow : null);
 function tailskin(look) {
   const R = stoneOf(look), G = glowOf(look);
   return (s, t) => {
-    const cc = cells(s * 6, t * 3.2, 41, 0, .7);
+    const cc = cells(s * 6 + .35 * N.b(s * 3, t * 3), t * 3.2 + .3 * N.d(s * 4, t * 2), 41, 0, .95);   // (R3b: irregular, no brick courses)
     const k = clamp(1 - cc.d1 * 1.25);
     let c = R(.5 + .2 * (cc.id - .5) - .16 * k + .1 * (N.a(s * 9, t * 9) - .5));
     if (!look && cc.id > .8) c = mix(c, PAL.plateOr(.75), .35 * k);                   // a few amber-based plates (v3 f0705)
@@ -260,23 +280,25 @@ function skirtPaint() {
     const d = skSd(u, v);
     if (d > 0) return null;
     const ax = Math.abs(u), hw = skHalf(v), t = clamp((SK.top - v) / (SK.top - SK.bot));
-    let c = mix(creamPx(u * 48 + 300, v * 48, PAL.cream, .8), PAL.cream(.42), .35);
-    c = mix(c, PAL.cream(.72), .7 * smooth(.45, 1, ax / hw));
-    c = mix(c, PAL.cream(.6), .3 * smooth(.35, .9, t));
+    let c = mix(creamPx(u * 48 + 300, v * 48, PAL.cream, .8), PAL.cream(.45), .4);
+    c = mix(c, PAL.cream(.72), .65 * smooth(.45, 1, ax / hw));                      // darker round the sides
+    c = mix(c, PAL.cream(.62), .35 * smooth(.35, .95, t));                          // and toward the hem
     const hem = skHem(u), lobe = v - hem;
-    if (lobe < .3) {
+    if (lobe < .32) {
       // pebble lobes: lit tops, dark seams between them
-      const k = lobe / .3, seam = Math.abs(((u + 1.45) / .5) % 1 - .5);
-      c = mix(c, PAL.cream(.3 + .4 * (1 - k)), .55);
-      if (seam > .44 || (lobe > .27 && lobe < .3)) c = sink(c, .35);
+      const k = lobe / .32, seam = Math.abs(((ax + .22) / .44) % 1 - .5);
+      c = mix(c, PAL.cream(.3 + .4 * (1 - k)), .5);
+      if (seam > .45 || (lobe > .29 && lobe < .32)) c = sink(c, .32);
     }
-    if (d > -.035) c = sink(c, .3);
-    // veins
-    const fork = v < -.95 ? Math.abs(ax - (-.95 - v) * .75) : 9, mid = v >= -1.0 ? ax : 9, chev = Math.abs(v + .55 + ax * .5);
-    const dv = Math.min(mid / .03, fork / .034, ax < .8 ? chev / .026 : 9);
-    if (dv < 1 && lobe > .32) c = mix(PAL.gold(.25), PAL.gold(.55), dv);
-    else if (dv < 1.8 && lobe > .32) c = mix(c, PAL.gold(.85), .35 * (1.8 - dv));
-    return c;
+    if (d > -.03) c = sink(c, .3);
+    // veins: the gold midrib forks into a Y with a chevron above the fork (v3 f1560)
+    const fork = v < -1.7 ? Math.abs(ax - (-1.7 - v) * .7) : 9, mid = v >= -1.75 ? ax : 9, chev = Math.abs(v + 1.0 + ax * .5);
+    const dv = Math.min(mid / .035, fork / .04, ax < .9 ? chev / .03 : 9);
+    if (dv < 1 && lobe > .34) c = mix(PAL.gold(.25), PAL.gold(.55), dv);
+    else if (dv < 1.8 && lobe > .34) c = mix(c, PAL.gold(.85), .35 * (1.8 - dv));
+    // the side strips (bent 45 degrees at u 0.56) are the dark rump hide: seen from the side they read as a cream
+    // plank otherwise; the cream bell is the centre strip, seen from behind and below
+    return mix(c, PAL.hide(.7), .85 * smooth(.5, .7, ax));
   };
 }
 // bark: near-black brown with long grain, knot rings, small gold flecks (v3 f1683); Cryo / Electro: cold dark with
@@ -295,15 +317,15 @@ function tbark(look) {
 // leaf sprays (alpha cut, two variants side by side): drooping twigs from the top centre with leaves along them and
 // gaps between (v3 f1683): Geo autumn leaves; Cryo slim crystal shards; Electro 5-petal blossoms with sparks
 const SPRAYS = [0, 1].map(v => {
-  const tw = [[.5, .9, .14 + .06 * v, .3], [.5, .9, .5 + .05 * v, .06], [.5, .9, .86 - .05 * v, .32], [.5, .9, .3 + .1 * v, .62], [.5, .9, .72, .64 - .08 * v]];
+  const tw = [[.5, .9, .14 + .06 * v, .3], [.5, .9, .52 + .05 * v, .08], [.5, .9, .86 - .05 * v, .32]];
   const leaves = [];
   tw.forEach(([x0, y0, x1, y1], j) => {
-    const n = 8 + (j % 2);
+    const n = 5 + (j % 2);
     for (let i = 1; i <= n; i++) {
       const t = i / n, sag = .12 * Math.sin(t * Math.PI) * (j % 2 ? 1 : -1);
       const x = x0 + (x1 - x0) * t + sag * .3, y = y0 + (y1 - y0) * t - Math.abs(sag) * .4;
       const dir = Math.atan2(y1 - y0, x1 - x0) + (hash(v, j, i) - .5) * 1.6 + (i % 2 ? .5 : -.5);
-      leaves.push({x: x + (hash(v, j, i, 6) - .5) * .1, y: y + (hash(v, j, i, 7) - .5) * .1, a: dir, s: .1 + .06 * hash(v, j, i, 2), h: hash(v, j, i, 3), d: hash(v, j, i, 4)});
+      leaves.push({x: x + (hash(v, j, i, 6) - .5) * .1, y: y + (hash(v, j, i, 7) - .5) * .1, a: dir, s: .14 + .07 * hash(v, j, i, 2), h: hash(v, j, i, 3), d: hash(v, j, i, 4)});
     }
   });
   leaves.sort((a, b) => a.d - b.d);           // painted back to front
@@ -343,7 +365,7 @@ function leafCluster(look) {
   };
 }
 export function sprites() {
-  const S = {tailbelly: [256, 128, tailbelly(), false], tskirt: [r16((SK.rect.u1 - SK.rect.u0) * 48), r16((SK.rect.v1 - SK.rect.v0) * 48), onRect(SK.rect, skirtPaint()), false]};
+  const S = {tailbelly: [256, 128, tailbelly(), false], tskirt: [r16((SK.rect.u1 - SK.rect.u0) * 56), r16((SK.rect.v1 - SK.rect.v0) * 48), onRect(SK.rect, skirtPaint()), false]};
   for (const look of [null, ...TLOOKS]) {
     S['tailskin' + sfx(look)] = [64, 64, tailskin(look), false];
     S['tblades' + sfx(look)] = [256, 64, bladeSheet(look), false];

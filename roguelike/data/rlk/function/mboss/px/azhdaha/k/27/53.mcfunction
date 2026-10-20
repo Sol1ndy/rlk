@@ -1,4 +1,8 @@
 # Clip tail_slam (id 27) tick 53: the proxy columns that moved.
+data modify storage rlk:mboss px.o.tail2_x set value 1.118d
+data modify storage rlk:mboss px.o.tail2_z set value -10.017d
+data modify storage rlk:mboss px.top.tail2 set value 3.776f
+data merge entity 524c4b4d-415a-4400-8000-000000000046 {height:3.776f}
 data modify storage rlk:mboss px.o.tail3_x set value 2.258d
 data modify storage rlk:mboss px.o.tail3_z set value -13.426d
 data modify storage rlk:mboss px.top.tail3 set value 3.641f

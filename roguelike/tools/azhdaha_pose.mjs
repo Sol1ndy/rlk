@@ -61,11 +61,11 @@ const mx = v => [-v[0], v[1], v[2]];
 export const PART_SCALE = {
   chest: 3.0, belly: 3.0, pelvis: 2.8, neck1: 2.0, neck2: 2.0, apron: 1.8, glow_apron: 1.8,
   plates_neck: 2.0, plates_sh: 2.2, plates_mid: 2.2, plates_hip: 2.0, crys_sh: 2.2, crys_mid: 2.2, crys_hip: 2.0,
-  head: 2.2, jaw: 2.0, eyes: 1.0, horn_l: 2.0, horn_r: 2.0, beard1: 1.4, beard2: 1.4,
+  head: 2.2, jaw: 2.0, eyes: 1.0, horn_l: 2.7, horn_r: 2.7, beard1: 1.4, beard2: 1.4,
   uarm_l: 1.8, bracer_l: 1.6, paw_l: 1.4, uarm_r: 1.8, bracer_r: 1.6, paw_r: 1.4,
   thigh_l: 2.0, gaiter_l: 1.6, foot_l: 1.4, thigh_r: 2.0, gaiter_r: 1.6, foot_r: 1.4,
   glow_bracer_l: 1.6, glow_bracer_r: 1.6, glow_gaiter_l: 1.4, glow_gaiter_r: 1.4,
-  t1: 1.9, t2: 1.7, t3: 1.6, t4: 1.5, t5: 1.4, t6: 1.4, t7: 1.4, t8: 1.4, tip: 1.3, tail_skirt: 1.8,
+  t1: 1.9, t2: 1.7, t3: 1.6, t4: 1.5, t5: 1.4, t6: 1.4, t7: 1.4, t8: 1.4, tip: 1.3, tail_skirt: 2.2,
 };
 // Rest lean of each plate group (deg, top toward the back): the plates are authored upright in the group frame and the
 // group leans them back; the flare channels stand them up (bristle).
@@ -79,6 +79,13 @@ export const PLATE_SPLAY = .012;
 export const NECK_TILT = {neck1: Math.atan2(J.neck1[1] - J.neck2[1], J.neck1[2] - J.neck2[2]) * 180 / Math.PI,
   neck2: Math.atan2(J.neck2[1] - J.head[1], J.neck2[2] - J.head[2]) * 180 / Math.PI};
 export const TAIL_PARTS = ['t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 'tip'];
+// R3b (r3_critique 7.1): the rump skirt hangs to ~0.25 b above the floor between the hind legs, its frame tilted SKIRT_TILT
+// degrees bottom-forward under the rump (so from the side it reads as the rump's cream underside, mostly behind the haunch); a stone flap hinged at the tail root: where a pose would push its hem into the floor (the rear-ups, the
+// crouches) it swings back about its top edge just enough to stay SKIRT_FLOOR above it. SKIRT_HEM: its visible hem
+// (skirt frame: samples along the lobed hem of the flat centre strip and the two side strips bent round 45 degrees).
+export const SKIRT_TILT = 35, SKIRT_FLOOR = .04, SKIRT_HANG = 50;
+export const SKIRT_HEM = [[0, -3.04, .4], [.22, -2.95, .4], [.56, -3.02, .4], [.8, -3.03, .64], [1.01, -2.94, .85], [1.19, -2.84, 1.03], [1.4, -2.81, 1.24]]
+  .flatMap(([x, y, z]) => x ? [[x, y, z], [-x, y, z]] : [[x, y, z]]);
 // tSweep share per segment (sum 1), root-weighted: the root leads a whip and the distal tail stays nearly straight
 // (R2 critique 5.7); the bake-time lag of motion.md §2.4 goes on top in the clip stage.
 export const TAIL_SWEEP = [.3, .2, .15, .11, .08, .07, .05, .04];
@@ -168,10 +175,35 @@ export function solve(p, {prev = null} = {}) {
     T = add(T, rot(Qt, [0, 0, TAIL_LEN[i]]));
   }
   part('tip', T, Qt);
-  part('tail_skirt', at(Bp, J.t1), Bp.q);              // the cream rump plate under the tail root (tail region)
+  part('tail_skirt', at(Bp, J.t1), mul(Bp.q, q([SKIRT_TILT, 0, 0])));   // the cream rump bell under the tail root (tail region)
   // root: offset and rotation about ROOT_PIVOT (applied to everything, the limb targets included: they are root-frame)
   const R0 = q(p.rot);
   for (const v of Object.values(o)) { v.t = add(add(ROOT_PIVOT, rot(R0, sub(v.t, ROOT_PIVOT))), p.pos); v.q = mul(R0, v.q); }
+  {
+    // the skirt flap: where a pose would push its hem into the floor it first swings (<= 30 deg, the way it already leans:
+    // forward under the belly in the rear-ups, back in the crouches), then folds up into the tail root (its length and its
+    // wrap depth scaled down to >= 0.05: in the deep rear-ups the tail root itself is on the floor), so it never lies flat on the floor in a rear-up; no swing or fold while the rig sinks through the floor (the limit
+    // fades out between root y -0.6 and -1.0, where the floor checks stop: the rig is sinking)
+    const sk = o.tail_skirt, low = (Q, k = 1) => Math.min(...SKIRT_HEM.map(h => sk.t[1] + rot(Q, [h[0], k * h[1] * sk.s[1], k * h[2] * sk.s[2]])[1]));
+    const fade = Math.max(0, Math.min(1, (p.pos[1] + 1) / .4));
+    // it hangs: never more than SKIRT_HANG degrees from the vertical (a rear-up would otherwise lift it out flat)
+    { const d = rot(sk.q, [0, -1, 0]), a = Math.atan2(-d[2], -d[1]) * 180 / Math.PI;
+      if (fade > 0 && Math.abs(a) > SKIRT_HANG) sk.q = mul(sk.q, q([-(a - Math.sign(a) * SKIRT_HANG) * fade, 0, 0])); }
+    if (fade > 0 && low(sk.q) < SKIRT_FLOOR) {
+      // (the swing stops at SKIRT_HANG from the vertical too: past it the flap folds instead of lying out flat)
+      const d = rot(sk.q, [0, -1, 0]), a = Math.abs(Math.atan2(-d[2], -d[1]) * 180 / Math.PI);
+      const sg = rot(sk.q, SKIRT_HEM[0])[2] < 0 ? 1 : -1, lim = Math.max(0, Math.min(30, SKIRT_HANG + .5 - a)) * fade;
+      let lo = 0, hi = lim;
+      for (let i = 0; i < 30; i++) { const m = (lo + hi) / 2; if (low(mul(sk.q, q([sg * m, 0, 0]))) < SKIRT_FLOOR) lo = m; else hi = m; }
+      sk.q = mul(sk.q, q([sg * hi, 0, 0]));
+      if (low(sk.q) < SKIRT_FLOOR) {
+        let klo = .05, khi = 1;
+        for (let i = 0; i < 30; i++) { const k = (klo + khi) / 2; if (low(sk.q, k) < SKIRT_FLOOR) khi = k; else klo = k; }
+        const k = 1 - fade * (1 - klo);
+        sk.s = [sk.s[0], sk.s[1] * k, sk.s[2] * k];
+      }
+    }
+  }
   // visibility (scale about each part's own joint: hidden parts collapse in place)
   for (const [nm, v] of Object.entries(o)) {
     const k = p.vis * (TAIL_PARTS.includes(nm) ? p.visTail : p.visBody);

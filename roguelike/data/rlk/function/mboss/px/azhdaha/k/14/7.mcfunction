@@ -1,8 +1,8 @@
 # Clip charge_coil (id 14) tick 7: the proxy columns that moved.
-data modify storage rlk:mboss px.o.head_x set value -0.198d
-data modify storage rlk:mboss px.o.head_z set value 4.646d
-data modify storage rlk:mboss px.top.head set value 3.511f
-data merge entity 524c4b4d-415a-4400-8000-000000000041 {height:3.511f}
+data modify storage rlk:mboss px.o.head_x set value -0.197d
+data modify storage rlk:mboss px.o.head_z set value 4.64d
+data modify storage rlk:mboss px.top.head set value 3.496f
+data merge entity 524c4b4d-415a-4400-8000-000000000041 {height:3.496f}
 data modify storage rlk:mboss px.o.chest_x set value -0.023d
 data modify storage rlk:mboss px.o.chest_z set value 2.103d
 data modify storage rlk:mboss px.top.chest set value 4.663f
@@ -21,5 +21,5 @@ data modify storage rlk:mboss px.top.tail3 set value 10.268f
 data merge entity 524c4b4d-415a-4400-8000-000000000047 {height:10.268f}
 data modify storage rlk:mboss px.o.paw_r_x set value -3.15d
 data modify storage rlk:mboss px.o.paw_r_z set value 2.95d
-data modify storage rlk:mboss px.top.paw_r set value 3.016f
-data merge entity 524c4b4d-415a-4400-8000-00000000004a {height:3.016f}
+data modify storage rlk:mboss px.top.paw_r set value 2.992f
+data merge entity 524c4b4d-415a-4400-8000-00000000004a {height:2.992f}

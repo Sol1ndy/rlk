@@ -72,6 +72,23 @@ export function hidePx(u, v, {ramp: R = PAL.hide, cell = 9, seed = 3, per = 0, w
   if (warm) col = mix(col, C('#7E6A4C'), warm * N.d(u * .05, v * .05));
   return col;
 }
+// Torso skin (body region; R3b: shared with the legs' masses): smooth warm grey-brown skin with big soft light / dark
+// masses, a fine grain, faint wrinkles, optional low warts (u, v in px at 32 ppb).
+// R3b (r3_critique 3.4): one ramp step darker and a touch greener (it read khaki next to the plastron at distance)
+export const SKIN = ramp(['#8A7F64', '#736A50', '#605842', '#4E4736', '#3C372A', '#29251C']);
+export function skinPx(u, v, {seed = 3, base = .36, warts = 0} = {}) {
+  const m1 = N.e(u * .012 + seed, v * .012), m2 = N.a(u * .035 + seed * 3, v * .035), m3 = N.c(u * .25 + seed, v * .25);
+  let t = base + .22 * (m1 - .5) + .1 * (m2 - .5) + .035 * (m3 - .5);
+  // wrinkles: thin wavy lines, slightly darker with a lit lip above
+  const w = Math.abs(N.f(u * .022 + seed, v * .06) - .5);
+  if (w < .012) t += .07 * (1 - w / .012); else if (w < .022) t -= .025 * (1 - (w - .012) / .01);
+  let col = SKIN(clamp(t, .03, .97));
+  if (warts > 0) {
+    const c = cells(u / 11, v / 11, seed + 9, 0, .8), cl = cells((u - 1.5) / 11, (v - 1.5) / 11, seed + 9, 0, .8);
+    if (c.id < warts && c.d1 < .3) col = SKIN(clamp(t - .9 * (cl.d1 - c.d1) + .06 * c.d1 / .3, .03, .97));
+  }
+  return mix(col, SKIN(.15), .12 * smooth(.6, .9, N.b(u * .05 + seed, v * .05)));     // pale dust
+}
 // Cream stone: smooth with faint cracks and grain.
 export function creamPx(u, v, R = PAL.cream, k = 1) {
   let col = R(.2 + .14 * N.b(u * .05, v * .05) + .06 * (N.e(u * .3, v * .3) - .5));

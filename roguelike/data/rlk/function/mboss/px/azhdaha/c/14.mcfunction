@@ -1,3 +1,3 @@
-# Clip charge_coil: the key of tick #pxT (binary tree over the 18 key ticks).
-execute if score #pxT mb matches 0..12 run return run function rlk:mboss/px/azhdaha/t/14_0_12
-execute if score #pxT mb matches 13..25 run return run function rlk:mboss/px/azhdaha/t/14_13_25
+# Clip charge_coil: the key of tick #pxT (binary tree over the 17 key ticks).
+execute if score #pxT mb matches 0..11 run return run function rlk:mboss/px/azhdaha/t/14_0_11
+execute if score #pxT mb matches 12..25 run return run function rlk:mboss/px/azhdaha/t/14_12_25
