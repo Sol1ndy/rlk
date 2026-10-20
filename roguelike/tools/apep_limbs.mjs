@@ -524,8 +524,8 @@ function p3(seg) {
         const x = sd * r0 * .45;
         els.push(bladeZ(x, -t * L, h, sd, sd > 0 ? -dz : dz, LEAF, LEAF_D, {w: 1.8, tilt: 22.5}));
       }
-      // two blades across (plane x) so the arm is leafy from the side as well
-      for (const [t, h, sd] of up ? [[.3, .9, 1], [.66, .78, -1]] : [[.36, .8, -1]]) {
+      // blades across (plane x, alternately fanned) so the arm is leafy from the side as well
+      for (const [t, h, sd] of up ? [[.12, .95, -1], [.3, .9, 1], [.5, .85, -1], [.66, .78, 1]] : [[.14, .88, 1], [.36, .8, -1], [.6, .7, 1]]) {
         els.push(card2('x', 0, {u0: -.2 * h * 1.4, u1: .2 * h * 1.4, v0: -t * L - h, v1: -t * L}, LEAF, LEAF_D, ['x', sd * 22.5, [0, -t * L, 0]]));
       }
       if (!up) els.push(...cone([-(r0 - .02), -.12, 0], .13, .45, 'p3_gold', {axis: 'x', sign: -1, seed: 440}));
