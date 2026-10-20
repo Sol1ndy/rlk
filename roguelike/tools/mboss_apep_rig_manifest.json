@@ -895,7 +895,7 @@
       "model": "tail_2_p1",
       "brightness": 13,
       "scale": 1.1,
-      "elements": 72,
+      "elements": 75,
       "parent": "tail_1",
       "tol_tp": 0.03,
       "reach": 1.65,
@@ -913,7 +913,7 @@
       "model": "tail_3_p1",
       "brightness": 13,
       "scale": 1.1,
-      "elements": 37,
+      "elements": 38,
       "parent": "tail_2",
       "tol_tp": 0.03,
       "reach": 1.65,
@@ -931,7 +931,7 @@
       "model": "tail_4_p1",
       "brightness": 13,
       "scale": 1.1,
-      "elements": 39,
+      "elements": 42,
       "parent": "tail_3",
       "tol_tp": 0.03,
       "reach": 1.65,
@@ -949,7 +949,7 @@
       "model": "tail_5_p1",
       "brightness": 13,
       "scale": 1.1,
-      "elements": 41,
+      "elements": 42,
       "parent": "tail_4",
       "tol_tp": 0.03,
       "reach": 1.65,
@@ -985,7 +985,7 @@
       "model": "tail_7_p1",
       "brightness": 13,
       "scale": 1.1,
-      "elements": 44,
+      "elements": 45,
       "parent": "tail_6",
       "tol_tp": 0.03,
       "reach": 1.65,
@@ -1003,7 +1003,7 @@
       "model": "tail_tip_p1",
       "brightness": 13,
       "scale": 1,
-      "elements": 47,
+      "elements": 49,
       "parent": "tail_7",
       "tol_tp": 0.03,
       "reach": 1.5,
@@ -2636,7 +2636,7 @@
           "worst": 2.48
         },
         "UPRIGHT": {
-          "points": 341,
+          "points": 343,
           "covered": 1,
           "worst": 2.23
         },
@@ -2651,7 +2651,7 @@
           "worst": 2.33
         },
         "CRAWL": {
-          "points": 635,
+          "points": 633,
           "covered": 1,
           "worst": 2.4
         }
@@ -27588,8 +27588,8 @@
     "atlas_px": 306432,
     "atlas_budget": 900000,
     "elements_shown_rest": {
-      "p1": 3860,
-      "p3": 3567
+      "p1": 3871,
+      "p3": 3575
     },
     "elements_budget": {
       "p1": 7000,
@@ -30505,8 +30505,8 @@
       "p3": 8000
     },
     "visible_rest": {
-      "p1": 3860,
-      "p3": 3567
+      "p1": 3871,
+      "p3": 3575
     },
     "per_region": {
       "body": {
@@ -30526,8 +30526,8 @@
         "p3": 280
       },
       "tail": {
-        "p1": 393,
-        "p3": 344
+        "p1": 404,
+        "p3": 352
       }
     },
     "per_part": {
@@ -30692,31 +30692,31 @@
         "p3": 71
       },
       "tail_2": {
-        "p1": 72,
-        "p3": 72
+        "p1": 75,
+        "p3": 74
       },
       "tail_3": {
-        "p1": 37,
-        "p3": 37
+        "p1": 38,
+        "p3": 39
       },
       "tail_4": {
-        "p1": 39,
+        "p1": 42,
         "p3": 40
       },
       "tail_5": {
-        "p1": 41,
-        "p3": 40
-      },
-      "tail_6": {
         "p1": 42,
         "p3": 42
       },
+      "tail_6": {
+        "p1": 42,
+        "p3": 43
+      },
       "tail_7": {
-        "p1": 44,
-        "p3": 35
+        "p1": 45,
+        "p3": 36
       },
       "tail_tip": {
-        "p1": 47,
+        "p1": 49,
         "p3": 7
       },
       "beads_l": {
