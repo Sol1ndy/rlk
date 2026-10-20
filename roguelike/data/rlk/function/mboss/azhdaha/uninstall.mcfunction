@@ -1,8 +1,8 @@
 # Hook uninstall (no executor; every enabled module): the rig (real or stand-in), the kit, the module
 # entities, objectives and storage; the entrance glow chain.
-function rlk:mboss/azhdaha/rig_stub/kill
-function rlk:mboss/azhdaha/rig_stub/uninstall
-function rlk:mboss/azhdaha/kstub/uninstall
+function rlk:mboss/azhdaha/rig/kill
+function rlk:mboss/azhdaha/rig/uninstall
+function rlk:mboss/azhdaha/fx/uninstall
 kill @e[tag=rlk_mb_az_ap]
 kill @e[tag=rlk_mb_az_seal]
 kill @e[tag=rlk_mb_az_pat]

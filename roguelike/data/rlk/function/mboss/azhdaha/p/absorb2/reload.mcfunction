@@ -3,6 +3,6 @@ execute if score #azPT mb matches ..41 run function rlk:mboss/azhdaha/svc/phase_
 function rlk:mboss/azhdaha/look/tail
 function rlk:mboss/azhdaha/arena/look_tail
 function rlk:mboss/azhdaha/svc/cine_off
-function rlk:mboss/azhdaha/rig_stub/glow/gold_off
+function rlk:mboss/azhdaha/rig/glow/gold_off
 function rlk:mboss/azhdaha/px/normal
 function rlk:mboss/azhdaha/p/end

@@ -15,4 +15,4 @@ function rlk:mboss/hz/ring {r0:0,r:40,tell:20,dmg:80}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_p20w5
 data modify storage rlk:mboss az.tl set value {id:4,r0:40,r1:180,w:35,tell:20,dur:5,nd:2,hold:3}
 execute store result storage rlk:mboss az.tl.el int 1 run scoreboard players get #azE mb
-function rlk:mboss/azhdaha/kstub/tele/wave
+function rlk:mboss/azhdaha/fx/tele/wave with storage rlk:mboss az.tl

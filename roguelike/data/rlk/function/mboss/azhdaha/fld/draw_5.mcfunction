@@ -2,5 +2,5 @@
 execute store result storage rlk:mboss az.f5.left int 1 run scoreboard players operation #azX mb = #azFE5 mb
 scoreboard players operation #azX mb -= #azClk mb
 execute store result storage rlk:mboss az.f5.left int 1 run scoreboard players get #azX mb
-execute if data storage rlk:mboss az.f5{sh:0} run function rlk:mboss/azhdaha/kstub/tele/field
-execute if data storage rlk:mboss az.f5{sh:1} run function rlk:mboss/azhdaha/kstub/tele/strip
+execute if data storage rlk:mboss az.f5{sh:0} run function rlk:mboss/azhdaha/fld/kdisc with storage rlk:mboss az.f5
+execute if data storage rlk:mboss az.f5{sh:1} run function rlk:mboss/azhdaha/fld/kstrip with storage rlk:mboss az.f5

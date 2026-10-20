@@ -2,7 +2,7 @@
 # (full life, no new orbs); else roar_rear and the cast slot (cast/leg at its t0, #azCT = the roar_rear tick).
 scoreboard players set #azCH mb 0
 execute if score #azCastFirst mb matches 1 if score #azLeg mb matches 2 if score #azBgL mb matches 31 run scoreboard players set #azCH mb 1
-execute if score #azCH mb matches 1 run function rlk:mboss/azhdaha/rig_stub/play/roar_low
+execute if score #azCH mb matches 1 run function rlk:mboss/azhdaha/rig/play/roar_low
 execute if score #azCH mb matches 1 run function rlk:mboss/azhdaha/p/orbs/refresh
-execute if score #azCH mb matches 0 run function rlk:mboss/azhdaha/rig_stub/play/roar_rear
+execute if score #azCH mb matches 0 run function rlk:mboss/azhdaha/rig/play/roar_rear
 execute if score #azCH mb matches 0 run function rlk:mboss/azhdaha/cast/leg

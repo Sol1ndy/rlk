@@ -1,1 +1,1 @@
-function rlk:mboss/azhdaha/kstub/hud/banner_end
+function rlk:mboss/azhdaha/fx/hud/banner_end

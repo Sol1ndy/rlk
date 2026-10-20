@@ -1,4 +1,4 @@
 # Seal stele 0 shatters into chunks.
-execute at @e[type=minecraft:item_display,tag=rlk_mb_az_seal_s0] run function rlk:mboss/azhdaha/kstub/p/stele_shatter
-execute at @e[type=minecraft:item_display,tag=rlk_mb_az_seal_s0] run function rlk:mboss/azhdaha/kstub/snd/stele_break
+execute at @e[type=minecraft:item_display,tag=rlk_mb_az_seal_s0] run function rlk:mboss/azhdaha/fx/p/stele_shatter
+execute at @e[type=minecraft:item_display,tag=rlk_mb_az_seal_s0] run function rlk:mboss/azhdaha/fx/snd/stele_break
 kill @e[type=minecraft:item_display,tag=rlk_mb_az_seal_s0]

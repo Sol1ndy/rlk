@@ -8,5 +8,5 @@ kill @e[tag=rlk_mb_az_seal]
 kill @e[tag=rlk_mb_az_pat]
 kill @e[type=minecraft:marker,tag=rlk_mb_az_kept]
 data remove storage rlk:mboss az
-function rlk:mboss/azhdaha/kstub/clear
-function rlk:mboss/azhdaha/kstub/hud/clear
+function rlk:mboss/azhdaha/fx/clear
+function rlk:mboss/azhdaha/fx/hud/clear

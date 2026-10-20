@@ -26,5 +26,5 @@ function rlk:mboss/px/azhdaha/ev/10
 function rlk:mboss/px/azhdaha/ev/11
 function rlk:mboss/px/azhdaha/ev/12
 data modify storage rlk:mboss push set value [{f0:-38,f1:26,hw:28,px:"",top:0},{f0:26,f1:54,hw:16,px:"head",top:35}]
-execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/azhdaha/rig_stub/state/normal
+execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/azhdaha/rig/state/normal
 execute as @e[type=minecraft:husk,tag=rlk_mb_body,tag=rlk_mb_pxinv,limit=1] run function rlk:mboss/px/inv_off

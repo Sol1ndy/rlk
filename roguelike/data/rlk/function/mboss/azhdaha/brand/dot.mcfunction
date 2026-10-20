@@ -6,7 +6,7 @@ execute if score @s azBrE matches 4 if score @s azBrS matches 3.. run scoreboard
 scoreboard players operation #mbDotEl mb = @s azBrE
 scoreboard players set #mbDotLethal mb 0
 function rlk:mboss/pl_dot
-function rlk:mboss/azhdaha/kstub/snd/brand_tick
+function rlk:mboss/azhdaha/fx/snd/brand_tick
 scoreboard players remove @s azBrT 1
 # Cryo: a tick without a new Cryo strike since the previous tick drops one stack (3 -> 2 -> 1)
 execute if score @s azBrE matches 4 unless score #azBrCs mb matches 1 if score @s azBrS matches 2.. run scoreboard players remove @s azBrS 1

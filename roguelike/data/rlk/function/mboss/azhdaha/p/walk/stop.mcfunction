@@ -1,2 +1,2 @@
 scoreboard players set #azWk mb 1
-function rlk:mboss/azhdaha/rig_stub/play/walk_stop
+function rlk:mboss/azhdaha/rig/play/walk_stop

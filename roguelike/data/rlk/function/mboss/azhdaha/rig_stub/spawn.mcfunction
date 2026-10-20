@@ -10,7 +10,7 @@ summon minecraft:item_display ^0 ^2.15 ^5.95 {Tags:["rlk_room","rlk_mb_aux","rlk
 execute unless score @s azRigLegs matches 0..2 run scoreboard players set @s azRigLegs 0
 execute unless score @s azRigTail matches 0..2 run scoreboard players set @s azRigTail 0
 execute unless score @s azRigState matches 0..2 run scoreboard players set @s azRigState 0
-scoreboard players set @s azRigC 1000
+scoreboard players set @s azRigC 0
 scoreboard players set @s azRigT -1
 scoreboard players set @s azRigF 0
 function rlk:mboss/azhdaha/rig_stub/look_apply

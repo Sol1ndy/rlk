@@ -1,2 +1,2 @@
 # slide #azPT 158
-function rlk:mboss/azhdaha/kstub/snd/slide_wave
+function rlk:mboss/azhdaha/fx/snd/slide_wave

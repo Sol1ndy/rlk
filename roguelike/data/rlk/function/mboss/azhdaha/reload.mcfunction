@@ -24,8 +24,8 @@ scoreboard players set #azAft12 mb 0
 scoreboard players set #azAft13 mb 0
 scoreboard players set #azAft14 mb 0
 scoreboard players set #azAft15 mb 0
-function rlk:mboss/azhdaha/rig_stub/init
-function rlk:mboss/azhdaha/rig_stub/spawn
+function rlk:mboss/azhdaha/rig/init
+function rlk:mboss/azhdaha/rig/spawn
 function rlk:mboss/azhdaha/look/apply
 execute if score #mbSt mb matches 0 run function rlk:mboss/azhdaha/intro/done
 # (the framework re-spawned the proxies before this hook, cm.md 5.7; px.set survives: re-state the own state)

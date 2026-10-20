@@ -1,2 +1,2 @@
 # absorb2 #azPT 52
-function rlk:mboss/azhdaha/rig_stub/play/roar_rear
+function rlk:mboss/azhdaha/rig/play/roar_rear
