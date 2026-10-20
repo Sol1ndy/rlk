@@ -480,7 +480,7 @@ function p1(seg) {
         [.86, R(.56, .57, .53, .56), [.01, 0]],
         [1.0, R(.6, .62, .57, .6), [0, 0]],
         [1.13, R(.65, .67, .62, .65), [0, 0]],                                                 // the root base over the petal foot
-      ], LEG1, 1, rimBark, {seed: 370 + k * 10, caps: ''}));
+      ], LEG1, 1, rimBark, {seed: 370 + k * 10, caps: '+'}));                                  // closed under the foot
       // the knee guard on the outer side: a pointed dark leaf plate with thickness, its top standing out
       els.push(...leafPlate('x', .6 * k, {u0: -.32 * k, u1: .32 * k, v0: -.66 * k, v1: .24 * k}, ['z', -22.5, [.6 * k, -.66 * k, 0]]));
       return els;
@@ -517,7 +517,7 @@ function p3(seg) {
       const els = shell(L, [up ? -.08 : -.05], [
         [.5, [r0, r0 - .02, r0, r0 - .02], [0, 0]],
         [up ? 1.05 : 1.03, [r0 - .03, r0 - .05, r0 - .03, r0 - .05], [0, 0]],
-      ], ARM3, 2, rimP3, {seed: 400 + (up ? 0 : 20), caps: up ? '' : '-'});
+      ], ARM3, 2, rimP3, {seed: 400 + (up ? 0 : 20), caps: up ? '' : '-+'});
       const B = up ? [[.02, 1.15, 1, .03], [.2, 1.08, -1, .08], [.42, 1.05, 1, .05], [.6, .98, -1, .1], [.78, .8, 1, .04]]
         : [[.04, 1.05, -1, .06], [.24, 1.0, 1, .03], [.46, .92, -1, .08], [.64, .82, 1, .05], [.8, .66, -1, .02]];
       for (const [t, h, sd, dz] of B) {
@@ -542,7 +542,7 @@ function p3(seg) {
       const els = shell(L, [up ? -.1 : -.06], [
         [.5, [rt, rf, ru, rb], [0, 0]],
         [up ? 1.05 : 1.03, [rt - .04, rf - .03, ru - .04, rb - .03], [0, 0]],
-      ], ARM3, 0, rimP3, {seed: 460 + (up ? 0 : 20), caps: up ? '' : '-'});
+      ], ARM3, 0, rimP3, {seed: 460 + (up ? 0 : 20), caps: up ? '' : '-+'});
       for (const [t0, t1, dz] of [[-.06, .6, .08], [.4, 1.04, .045]]) {
         els.push(card2('z', rb + dz, {u0: -(ru + .06), u1: rt + .1, v0: -t1 * L, v1: -t0 * L}, CARA, CARA));
       }
@@ -568,7 +568,7 @@ function p3(seg) {
       const els = shell(L, [up ? -.1 : -.06], [
         [.5, [r0, r0 - .04, r0 - .04, r0 - .04], [0, 0]],
         [up ? 1.05 : 1.03, [r0 - .06, r0 - .09, r0 - .09, r0 - .09], [0, 0]],
-      ], ARM3, 1, rimP3, {seed: 500 + (up ? 0 : 20), caps: up ? '' : '-'});
+      ], ARM3, 1, rimP3, {seed: 500 + (up ? 0 : 20), caps: up ? '' : '-+'});
       for (let i = 0; i < 3; i++) {
         const t = -.02 + i * .32, y0 = -t * L, h = (up ? .58 : .55) * L * (1 - .06 * i), r = r0 - .03 * i, z0 = -(r + .04), sh = (i % 2) ? .08 : -.05;
         els.push(card2('z', z0, {u0: -.3 + sh, u1: .78 + sh, v0: y0 - h, v1: y0}, LEAFW, LEAF_U, ['y', -22.5, [-.3 + sh, y0, z0]]));
