@@ -1,1 +1,18 @@
 # GENERATED: the after() targets written in this run, by id.
+execute if score #azAftX mb matches 1 run return run function rlk:mboss/azhdaha/xl/chin_impact/hydro_hit
+execute if score #azAftX mb matches 2 run return run function rlk:mboss/azhdaha/xl/chin_impact/pyro_go
+execute if score #azAftX mb matches 3 run return run function rlk:mboss/azhdaha/xl/chin_impact/pyro_apex
+execute if score #azAftX mb matches 4 run return run function rlk:mboss/azhdaha/xl/chin_impact/pyro_land
+execute if score #azAftX mb matches 5 run return run function rlk:mboss/azhdaha/xl/jump_wave2/pyro_go
+execute if score #azAftX mb matches 6 run return run function rlk:mboss/azhdaha/xl/jump_wave2/pyro_apex
+execute if score #azAftX mb matches 7 run return run function rlk:mboss/azhdaha/xl/jump_wave2/pyro_land
+execute if score #azAftX mb matches 8 run return run function rlk:mboss/azhdaha/xl/stomp_w3/pyro_go
+execute if score #azAftX mb matches 9 run return run function rlk:mboss/azhdaha/xl/stomp_w3/pyro_apex
+execute if score #azAftX mb matches 10 run return run function rlk:mboss/azhdaha/xl/stomp_w3/pyro_land
+execute if score #azAftX mb matches 11 run return run function rlk:mboss/azhdaha/xl/stomp3_s3/pyro_go
+execute if score #azAftX mb matches 12 run return run function rlk:mboss/azhdaha/xl/stomp3_s3/pyro_apex
+execute if score #azAftX mb matches 13 run return run function rlk:mboss/azhdaha/xl/stomp3_s3/pyro_land
+execute if score #azAftX mb matches 14 run return run function rlk:mboss/azhdaha/xl/jump_land/hydro_go
+execute if score #azAftX mb matches 15 run return run function rlk:mboss/azhdaha/xl/stomp_w1/hydro_go
+execute if score #azAftX mb matches 16 run return run function rlk:mboss/azhdaha/xl/stomp3_s1/hydro_go
+execute if score #azAftX mb matches 17 run return run function rlk:mboss/azhdaha/p/firefield/amb
