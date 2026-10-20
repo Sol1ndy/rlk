@@ -1,5 +1,4 @@
-# The death (WORKING STUB, S1-MOD), clip tick 0: the first line, the music stops with a sting.
+# The death (plan 5 D), clip tick 0: the first line, the sting (the framework stopped the music).
 function rlk:mboss/line/say {t:"난… 사라지지 않아!",c:"#F2B53A",gap:2,hold:50,snd:2}
-function rlk:mboss/music/stop
-playsound minecraft:block.beacon.deactivate hostile @a[tag=player] ~ ~ ~ 1 0.6 0.33
 function rlk:mboss/azhdaha/fx/snd/death_sting
+playsound minecraft:entity.ravager.hurt hostile @a[tag=player] ~ ~ ~ 0.8 0.5 0.27

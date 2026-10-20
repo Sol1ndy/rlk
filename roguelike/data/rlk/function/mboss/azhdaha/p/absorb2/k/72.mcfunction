@@ -3,3 +3,5 @@ function rlk:mboss/line/say {t:"이 곳이 네놈들이 묻힐 곳이다! 받거
 function rlk:mboss/azhdaha/fx/snd/absorb_roar
 function rlk:mboss/azhdaha/svc/cine_off
 function rlk:mboss/azhdaha/px/normal
+function rlk:mboss/azhdaha/fx/p/shock_dome {r:80}
+function rlk:mboss/azhdaha/fx/snd/roar_ring
