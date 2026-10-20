@@ -25,7 +25,7 @@
 import {rockBox, toUnits, mirrorX, stroke, sdUnion, sdPoly} from './mboss_shape_lib.mjs';
 import {faceEl, faceOfDir, rotA} from './mboss_model_lib.mjs';
 import {PART_SCALE} from './apep_pose.mjs';
-import {PAL, C, clamp, smooth, mix, N as NS, lift, sink, autoSlot, sprite, r16, TRANSPARENT} from './apep_materials.mjs';
+import {PAL, C, clamp, smooth, mix, N as NS, lift, sink, autoSlot, sprite, r16, ramp, TRANSPARENT} from './apep_materials.mjs';
 
 export const REGION = 'hands';
 export const PARTS = ['a_hand_l', 'a_hand_r', 'b_hand_l', 'b_hand_r', 'c_hand_l', 'c_hand_r'];
@@ -57,7 +57,7 @@ const edgeTile = (name, R, v0, v1, forms) => { if (!SP[name]) SP[name] = sprite(
 // half = half thickness, off = the mid-plane's offset along the band normal (a cover plate on a base sheet). Cards on both faces show the sprite (alpha-cut); core boxes (the eroded shape) carry the edge
 // tile on their sides. Interior band ends overlap by the bevel wedge so the joints never open. Frames of the bands are
 // pushed to `frames` (for attachments: frame.X(a, s, h) = the posed point before the band's rotation, frame.rot).
-function sheet({o = [0, 0, 0], U, R, N = null, rect, sd, tex, edge, bands, cell = .07, inset = .55, eps = .01, seed = 0, shade = false, frames = null, anchor = 0}) {
+function sheet({o = [0, 0, 0], U, R, N = null, rect, sd, tex, texM = null, edge, bands, cell = .07, inset = .55, eps = .01, seed = 0, shade = false, frames = null, anchor = 0}) {
   U = AXV(U); R = AXV(R); N = N ? AXV(N) : crs(U, R);
   if (bands[0].s < rect.s0 - 1e-9) throw new Error('sheet: first band before the sprite rect');
   const els = [];
@@ -96,10 +96,12 @@ function sheet({o = [0, 0, 0], U, R, N = null, rect, sd, tex, edge, bands, cell 
     if (amin < amax) {
       amin = Math.max(rect.a0, amin - da); amax = Math.min(rect.a1, amax + da);
       const fn = p => { const d = sub(p, Pk), a = dot(d, U), s = s0 + dot(d, Db); return [16 * (a - rect.a0) / (rect.a1 - rect.a0), 16 * (rect.s1 - s) / (rect.s1 - rect.s0)]; };
-      const card = (hh, dirs) => faceEl([X(amin, sa, hh), X(amax, sz, hh)], Object.fromEntries(dirs.map(d => [faceOfDir(d), {tex, fn}])), {rot, shade});
-      if (b.core === false) els.push(card(0, [Nb, sc(Nb, -1)]));
+      // the +N card shows tex, the -N card texM (the leaf's underside; default the same sprite)
+      const card = (hh, dirs) => faceEl([X(amin, sa, hh), X(amax, sz, hh)], Object.fromEntries(dirs.map(([d, tx]) => [faceOfDir(d), {tex: tx, fn}])), {rot, shade});
+      const tM = texM || tex;
+      if (b.core === false) els.push(card(0, [[Nb, tex], [sc(Nb, -1), tM]]));
       else {
-        els.push(card(h + eps, [Nb]), card(-h - eps, [sc(Nb, -1)]));
+        els.push(card(h + eps, [[Nb, tex]]), card(-h - eps, [[sc(Nb, -1), tM]]));
         const er = inset * cell, na = Math.max(1, Math.round((amax - amin) / cell)), ns = Math.max(1, Math.round((sz - sa) / cell));
         const ca = (amax - amin) / na, cs = (sz - sa) / ns;
         const inside = Array.from({length: ns}, (_, j) => Array.from({length: na}, (_, i) => sd(amin + (i + .5) * ca, sa + (j + .5) * cs) < -er));
@@ -124,6 +126,12 @@ function sheet({o = [0, 0, 0], U, R, N = null, rect, sd, tex, edge, bands, cell 
 const boxOn = (f, a0, a1, s0, s1, h0, h1, tex, seed = 0) => rockBox(f.X(a0, s0, h0), f.X(a1, s1, h1), tex, {rot: f.rot, seed});
 const posed = (f, p) => (f.rot ? add(f.rot[2], rotA(f.rot[0], f.rot[1], sub(p, f.rot[2]))) : p);
 const frameAt = (frames, s) => frames.find(f => s >= f.s0 - 1e-9 && s <= f.s1 + 1e-9) || frames[frames.length - 1];
+
+// scale a finished element list by f about the point c (blocks, hand frame): grows a hand without touching its part scale
+const scaleEls = (els, f, c = [0, 0, 0]) => {
+  const m = v => v.map((x, i) => { const ci = i === 0 ? 8 - c[0] : 8 + c[i]; return Math.round((ci + (x - ci) * f) * 1e4) / 1e4; });
+  return els.map(e => { const o = {...e, from: m(e.from), to: m(e.to)}; if (e.rotation) o.rotation = {...e.rotation, origin: m(e.rotation.origin)}; return o; });
+};
 
 // ---- square spikes (the cones) --------------------------------------------------------------------------------------------
 // Four triangle cards leaning 22.5 degrees round axis A ('x' | 'y' | 'z', dir +-1) from the base centre c; base half
@@ -203,7 +211,7 @@ const bladeShape = (L, W, phi = 0, {m = .4, r0 = .7, p = 1.4, q = .9, hook = 0} 
   };
 };
 // [a, s at the knuckle, fan (deg toward +a), length, half width, hook]
-const FING = [[.25, .4, 9, .74, .15, -.05], [-.03, .47, -5, .94, .17, 0], [-.31, .41, -19, .84, .16, .05]];
+const FING = [[.25, .28, 7, 1.16, .15, -.05], [-.03, .31, -4, 1.24, .17, 0], [-.31, .27, -15, 1.1, .16, .05]];
 const clawParts = k => {
   const F = FING.map(([a0, s0, deg, L, W, hook]) => { const sd = bladeShape(L * k, W, deg * D2R, {hook}); return {a0, s0, deg, L: L * k, sd: (a, s) => sd(a - a0, s - s0)}; });
   const palm = sdPoly([[-.18, -.3], [.14, -.3], [.24, .2], [.3, .55], [-.46, .55], [-.4, .18]]);
@@ -232,26 +240,34 @@ const clawPaint = (F, sd, top) => (a, s) => {
   return c;
 };
 const EDGE_P1 = () => edgeTile('h_edge_p1d', PAL.p1_bark, .5, .8, 'p1');
+// the planted claw is drawn along the forearm: the forearm reaches the wrist heading ~30 degrees forward of +X (CROUCH), so
+// the flat design (fingers along +s) is turned by CLAW_TURN toward -a (the model's -Z is the boss's front) before it is cut
+// into bands along X
+const CLAW_TURN = -30 * D2R;
+const turnFlat = (f, th = CLAW_TURN) => { const c = Math.cos(th), n = Math.sin(th); return (a, s) => f(a * c - s * n, a * n + s * c); };
+const turnPt = (a, s, th = CLAW_TURN) => { const c = Math.cos(th), n = Math.sin(th); return [a * c + s * n, -a * n + s * c]; };
 function clawPlanted() {
-  const {F, sd, cover, cuff} = clawParts(1);
-  const rect = {a0: -.82, a1: .6, s0: -.34, s1: 1.46};
-  const tex = sheetSprite('h_claw', rect, clawPaint(F, sd, false), 48, 'p1');
-  const texC = sheetSprite('h_clawc', {...rect, s1: .82}, clawPaint(F, cover, true), 48, 'p1');
-  const texK = sheetSprite('h_clawk', {...rect, s1: .2}, clawPaint(F, cuff, true), 48, 'p1');
+  const {F, sd: sd0, cover: cover0, cuff: cuff0} = clawParts(1);
+  const sd = turnFlat(sd0), cover = turnFlat(cover0), cuff = turnFlat(cuff0);
+  const rect = {a0: -1.2, a1: .8, s0: -.5, s1: 1.45};
+  const tex = sheetSprite('h_claw', rect, turnFlat(clawPaint(F, sd0, false)), 48, 'p1');
+  const texC = sheetSprite('h_clawc', {...rect, s1: .9}, turnFlat(clawPaint(F, cover0, true)), 48, 'p1');
+  const texK = sheetSprite('h_clawk', {...rect, s1: .3}, turnFlat(clawPaint(F, cuff0, true)), 48, 'p1');
   const edge = EDGE_P1();
-  const B = [[-.3, 45, .1], [.06, 22.5, .085], [.32, 0, .068]];
+  const B = [[-.5, 45, .1], [.02, 22.5, .085], [.3, 0, .068]];
   const o = [0, -.02, 0], fr = [];
-  const els = sheet({o, U: '+z', R: '+x', rect, sd, tex, edge, seed: 401, cell: .07, inset: .9, bands: B.map(([s, ang, half]) => ({s, ang, half}))});
-  els.push(...sheet({o, U: '+z', R: '+x', rect: {...rect, s1: .82}, sd: cover, tex: texC, edge, seed: 405, frames: fr, cell: .08, inset: .8,
-    bands: B.filter(b => b[0] < .8).map(([s, ang, half]) => ({s, ang, half: .03, off: half + .036}))}));
-  els.push(...sheet({o, U: '+z', R: '+x', rect: {...rect, s1: .2}, sd: cuff, tex: texK, edge, seed: 406, cell: .09, inset: .8,
-    bands: B.filter(b => b[0] < .2).map(([s, ang, half]) => ({s, ang, half: .028, off: half + .1}))}));
-  // the square gold gem in a raised dark frame on the back of the hand, the gold cone on a dark collar on the cuff
-  const sg = .42, fg = frameAt(fr, sg), hh = fg.h + .008;
-  els.push(boxOn(fg, -.15, .15, sg - .14, sg + .14, hh, hh + .05, 'g_plate', 402), boxOn(fg, -.095, .095, sg - .095, sg + .095, hh + .05, hh + .1, 'p1_gem', 403));
-  const sc0 = -.02, fc = frameAt(fr, sc0), top = posed(fc, fc.X(-.02, sc0, fc.h + .1));
-  els.push(rockBox([top[0] - .14, top[1] - .03, top[2] - .14], [top[0] + .14, top[1] + .05, top[2] + .14], 'g_plate', {seed: 404}));
-  els.push(...spike([top[0], top[1] + .05, top[2]], .13, spikeSprite('h_spk_gold1', PAL.p1_gold, 'p1')));
+  const els = sheet({o, U: '+z', R: '+x', rect, sd, tex, edge, seed: 401, cell: .075, inset: 1.3, bands: B.map(([s, ang, half]) => ({s, ang, half}))});
+  els.push(...sheet({o, U: '+z', R: '+x', rect: {...rect, s1: .9}, sd: cover, tex: texC, edge, seed: 405, frames: fr, cell: .08, inset: .8,
+    bands: B.filter(b => b[0] < .9).map(([s, ang, half]) => ({s, ang, half: .03, off: half + .036}))}));
+  els.push(...sheet({o, U: '+z', R: '+x', rect: {...rect, s1: .3}, sd: cuff, tex: texK, edge, seed: 406, cell: .09, inset: .8,
+    bands: B.filter(b => b[0] < .3).map(([s, ang, half]) => ({s, ang, half: .028, off: half + .1}))}));
+  // the square gold gem in a raised dark frame on the knuckles, the gold cone on a dark collar on the back of the wrist
+  // (it stands out of the forearm's end, v1 f290)
+  const [ag, sg] = turnPt(-.03, .54), fg = frameAt(fr, sg), hh = fg.h + .008;
+  els.push(boxOn(fg, ag - .15, ag + .15, sg - .14, sg + .14, hh, hh + .05, 'g_plate', 402), boxOn(fg, ag - .095, ag + .095, sg - .095, sg + .095, hh + .05, hh + .1, 'p1_gem', 403));
+  const [ac, sc0] = turnPt(-.06, .22), fc = frameAt(fr, sc0), top = posed(fc, fc.X(ac, sc0, fc.h + .04));
+  els.push(rockBox([top[0] - .16, top[1] - .03, top[2] - .16], [top[0] + .16, top[1] + .05, top[2] + .16], 'g_plate', {seed: 404}));
+  els.push(...spike([top[0], top[1] + .05, top[2]], .155, spikeSprite('h_spk_gold1', PAL.p1_gold, 'p1')));
   return els;
 }
 // the raised claw: the hand hooked down like a bird head (v2 f417): the back of the hand runs on out of the forearm and
@@ -276,53 +292,61 @@ function clawRaised() {
 }
 
 // ---- B / C phase 1: the petal hand ------------------------------------------------------------------------------------------
-// one petal: flat coords along its run R (s from the ankle out), across U, normal +Y; W = the widest half width
-const petalW = (t, W) => (t < 0 || t > 1 ? -1 : W * Math.pow(Math.sin(Math.PI * (.16 + .84 * t)), .62));
+// one petal: flat coords along its run R (s from the ankle out), across U, normal +Y; W = the widest half width. Broad and
+// spoon-like (v2 f2076 / f417): widest past the middle, a blunt rounded end with a small point
+const petalW = (t, W) => (t < 0 || t > 1 ? -1 : W * Math.pow(Math.sin(Math.PI * (.14 + .86 * t)), .42));
 const petalShape = (L, W, phi = 0) => {
   const cs = Math.cos(phi), sn = Math.sin(phi);
   return (a, s) => { const u = a * cs - s * sn, v = a * sn + s * cs, t = (v - .02) / L, out = t < 0 ? -t * L : t > 1 ? (t - 1) * L : 0; return out > 0 ? Math.max(out, Math.abs(u) - Math.max(0, petalW(clamp(t), W))) : Math.abs(u) - petalW(t, W); };
+};
+// the narrow lanceolate shape of leaf blades, bracts and tips (P3) and the raised petal ridge
+const lanceW = (t, W) => (t < 0 || t > 1 ? -1 : W * Math.pow(Math.sin(Math.PI * (.16 + .84 * t)), .62));
+const tipShape = (L, W, phi = 0) => {
+  const cs = Math.cos(phi), sn = Math.sin(phi);
+  return (a, s) => { const u = a * cs - s * sn, v = a * sn + s * cs, t = (v - .02) / L, out = t < 0 ? -t * L : t > 1 ? (t - 1) * L : 0; return out > 0 ? Math.max(out, Math.abs(u) - Math.max(0, lanceW(clamp(t), W))) : Math.abs(u) - lanceW(t, W); };
 };
 // petal runs per direction: [U, R] with the normal forced to +Y (mirrored runs reuse the sprite)
 const RUNS = {f: ['+x', '-z'], b: ['-x', '+z'], l: ['+z', '+x'], r: ['+z', '-x']};
 function petalFoot(k, back, curl) {
   // k = size (B 1.0, C 0.83); back = the petals point back (+Z: the rear feet); curl = cupped up (the lifted foot)
-  const L = 1.06 * k, edge = edgeTile('h_edge_p1', PAL.p1_bark, .3, .55, 'p1'), els = [];
-  const fwd = back ? 'b' : 'f', fr = [], cz = (back ? .22 : -.22) * k;
+  const L = 1.04 * k, edge = edgeTile('h_edge_p1', PAL.p1_bark, .3, .55, 'p1'), els = [];
+  const fwd = back ? 'b' : 'f', fr = [], cz = (back ? .2 : -.2) * k;
   // [run, phi (deg, toward +a), W, mid-plane lift of the root (layering)]
-  const P = [[fwd, 0, .29, .03], [fwd, 38, .26, .015], [fwd, -38, .26, .015], ['l', back ? 22 : -22, .23, 0], ['r', back ? 22 : -22, .23, 0]];
+  const P = [[fwd, 0, .34, .03], [fwd, 40, .3, .015], [fwd, -40, .3, .015], ['l', back ? 24 : -24, .27, 0], ['r', back ? 24 : -24, .27, 0]];
   for (const [run, phiDeg, W0, dy] of P) {
     const phi = phiDeg * D2R, W = W0 * k, cs = Math.cos(phi);
     const sd = petalShape(L, W, phi), ext = L * cs + W * Math.abs(Math.sin(phi)) + .04;
     const rect = {a0: -(W + L * Math.abs(Math.sin(phi)) + .04), a1: W + L * Math.abs(Math.sin(phi)) + .04, s0: 0, s1: ext};
     const ax = {a: 0, s: .02, da: Math.sin(phi), ds: cs, L};
-    const name = `h_petal${k < 1 ? 'c' : 'b'}${phiDeg ? (Math.abs(phiDeg) === 38 ? '_d' : '_s') : ''}`;
+    const name = `h_petal${k < 1 ? 'c' : 'b'}${phiDeg ? (Math.abs(phiDeg) === 40 ? '_d' : '_s') : ''}`;
     // one sprite per petal kind: the mirrored runs (right side) reuse the left one through a negative phi on the same U
     const sdS = phiDeg < 0 ? petalShape(L, W, -phi) : sd;
     const tex = sheetSprite(name, rect, petalPaint(sdS, phiDeg < 0 ? {...ax, da: -ax.da} : ax, {seed: k < 1 ? 'd' : 'c'}), 48, 'p1');
     const [U, R] = RUNS[run];
     const mirrorU = phiDeg < 0;   // mirror the across axis instead of the sprite
     const f = x => x * ext;
+    // open: the root drops steeply out of the ankle collar, the petal flattens onto the floor, the tip turns up
     const bands = curl
       ? [{s: 0, ang: 22.5, half: .05}, {s: f(.24), ang: -22.5, half: .05}, {s: f(.44), ang: -67.5, half: .045}, {s: f(.68), ang: -90, half: .04}]
-      : [{s: 0, ang: 0, half: .05}, {s: f(.3), ang: 22.5, half: .05}, {s: f(.56), ang: 45, half: .045}, {s: f(.8), ang: -22.5, half: .04}];
-    // the root height: the lowest joint (open) 0.02 b over the floor 0.4 b under the wrist
+      : [{s: 0, ang: 45, half: .05}, {s: f(.22), ang: 22.5, half: .05}, {s: f(.46), ang: 0, half: .045}, {s: f(.8), ang: -22.5, half: .04}];
+    // the root height: the lowest joint 0.02 b over the floor 0.4 b under the wrist
     let drop = 0, low = 0; for (let i = 0; i < bands.length; i++) { const L_ = (i + 1 < bands.length ? bands[i + 1].s : ext) - bands[i].s; drop += L_ * Math.sin(bands[i].ang * D2R); low = Math.max(low, drop); }
     const y = curl ? -.12 + dy : -.38 + .06 + low + dy;
     const Uu = mirrorU ? sc(AXV(U), -1) : U;
-    els.push(...sheet({o: [0, y, cz], U: Uu, R, N: '+y', rect, sd: sdS, tex, edge, bands, seed: 421 + els.length, frames: fr}));
-    // the raised centre plate (the petal's convex middle and its vein): a narrower, shorter petal laid on top
-    const sdC = petalShape(.74 * L, .5 * W, phiDeg < 0 ? -phi : phi);
-    const texC = sheetSprite(name + '_c', rect, petalPaint(sdC, phiDeg < 0 ? {...ax, da: -ax.da, L: .74 * L} : {...ax, L: .74 * L}, {seed: k < 1 ? 'd' : 'c', base: .03, root: .3, soft: true}), 48, 'p1');
-    els.push(...sheet({o: [0, y, cz], U: Uu, R, N: '+y', rect, sd: sdC, tex: texC, edge, cell: .09, seed: 471 + els.length, bands: bands.map(b => ({...b, half: .026, off: b.half + .032}))}));
+    els.push(...sheet({o: [0, y, cz], U: Uu, R, N: '+y', rect, sd: sdS, tex, edge, bands, seed: 421 + els.length, frames: fr, cell: .08}));
+    // the raised centre ridge (the petal's convex middle and its vein): a narrow blade laid along the petal's axis
+    const sdC = tipShape(.8 * L, .32 * W, phiDeg < 0 ? -phi : phi);
+    const texC = sheetSprite(name + '_c', rect, petalPaint(sdC, phiDeg < 0 ? {...ax, da: -ax.da, L: .8 * L} : {...ax, L: .8 * L}, {seed: k < 1 ? 'd' : 'c', base: .02, root: .3, soft: true}), 48, 'p1');
+    els.push(...sheet({o: [0, y, cz], U: Uu, R, N: '+y', rect, sd: sdC, tex: texC, edge, cell: .1, seed: 471 + els.length, bands: bands.map(b => ({...b, half: .022, off: b.half + .026}))}));
   }
-  // the ankle: a dark collar ring under the cream-gold cone, a pale palm disc closing the centre between the petal roots
-  const cc = cz + (back ? .16 : -.16) * k;
+  // the ankle: a pale palm disc closing the centre between the petal roots, a dark collar ring under the cream-gold cone
+  const cc = cz + (back ? .14 : -.14) * k;
   const disc = (a, s) => Math.hypot(a, s) - .3 * k;
   els.push(...sheet({o: [0, curl ? -.02 : .0, cz], U: '+x', R: '-z', N: '+y', rect: {a0: -.32 * k, a1: .32 * k, s0: -.32 * k, s1: .32 * k}, sd: disc,
     tex: sheetSprite(`h_palm${k < 1 ? 'c' : 'b'}`, {a0: -.32 * k, a1: .32 * k, s0: -.32 * k, s1: .32 * k}, petalPaint(disc, {a: 0, s: -.3 * k, da: 0, ds: 1, L: .6 * k}, {root: .01, base: .2}), 48, 'p1'),
-    edge, bands: [{s: -.32 * k, ang: 0, half: .05}], seed: 431}));
-  els.push(rockBox([-.13 * k, .03, cc - .13 * k], [.13 * k, .1, cc + .13 * k], 'g_plate', {seed: 432}));
-  els.push(...spike([0, .1, cc], .13 * k, spikeSprite('h_spk_cream1', PAL.p1_cone, 'p1')));
+    edge, bands: [{s: -.32 * k, ang: 0, half: .05}], seed: 431, cell: .1}));
+  els.push(rockBox([-.14 * k, .03, cc - .14 * k], [.14 * k, .1, cc + .14 * k], 'g_plate', {seed: 432}));
+  els.push(...spike([0, .1, cc], .14 * k, spikeSprite('h_spk_cream1', PAL.p1_cone, 'p1')));
   return els;
 }
 
@@ -374,60 +398,98 @@ const lineLeafPaint = (sd, axis, {R = PAL.p3_lime, base = .12, tip = null, glyph
 // three long pointed blades fanned from the arm's end (up, up-out, out) + a small lower blade, the gold tip cone on top
 function forkP3() {
   const els = [], edge = edgeTile('h_edge_p3', PAL.p3_lime, .35, .6, 'p3');
-  const BL = [[8, .8, .13, -.05, 1], [36, .92, .15, 0, 1], [64, .78, .13, .05, -1], [102, .42, .1, .09, -1]];
+  const BL = [[8, .84, .14, -.05, 1], [36, .96, .16, 0, 1], [64, .8, .14, .05, -1], [102, .44, .1, .09, -1]];
   for (const [deg, L, W, dz, curl] of BL) {
-    const p = deg * D2R, axis = stroke([[0, .02], [Math.sin(p) * L, .02 + Math.cos(p) * L]], () => 0), sd = petalShape(L, W, p);
+    const p = deg * D2R, axis = stroke([[0, .02], [Math.sin(p) * L, .02 + Math.cos(p) * L]], () => 0), sd = tipShape(L, W, p);
     const hi = Math.max(.12, Math.cos(p) * L + W * Math.sin(p) + .06), lo = Math.min(-.12, Math.cos(p) * L - W);
     const rect = {a0: -W - .04, a1: Math.sin(p) * L + W + .05, s0: lo, s1: hi};
-    const tex = sheetSprite(`h_fork${deg}`, rect, lineLeafPaint(sd, axis, {R: PAL.p3_lime, base: .1, tip: PAL.p3_rim(.15)}), 48, 'p3');
-    // blades that run up bend about X (their tips curl toward the viewer); blades that run out bend about Y (sweep back)
-    if (deg < 45) els.push(...sheet({o: [0, -.02, dz], U: '+x', R: '+y', rect, sd, tex, edge, seed: 411 + deg,
+    const top = lineLeafPaint(sd, axis, {R: PAL.p3_leafhand, base: .14, tip: PAL.p3_rim(.15)}), under = lineLeafPaint(sd, axis, {R: P3_UNDER, base: .2});
+    // blades that run up bend about X (their tips curl toward the viewer; the front is the -N card); blades that run out
+    // bend about Y (sweep back; the front is the +N card); the backs are the pale undersides
+    if (deg < 45) els.push(...sheet({o: [0, -.02, dz], U: '+x', R: '+y', rect, sd, tex: sheetSprite(`h_fork${deg}_b`, rect, under, 24, 'p3'), texM: sheetSprite(`h_fork${deg}`, rect, top, 48, 'p3'), edge, seed: 411 + deg,
       bands: [{s: rect.s0, ang: 0, half: .04}, {s: hi * .55, ang: 22.5 * curl, half: .035}, {s: hi * .82, ang: 45 * curl, half: .025}]}));
     else {
-      const rx = {a0: rect.s0, a1: rect.s1, s0: rect.a0, s1: rect.a1};
-      els.push(...sheet({o: [0, -.02, dz], U: '+y', R: '+x', rect: rx, sd: (a, s) => sd(s, a), tex: sheetSprite(`h_forkx${deg}`, rx, (a, s) => lineLeafPaint(sd, axis, {R: PAL.p3_lime, base: .1, tip: PAL.p3_rim(.15)})(s, a), 48, 'p3'), edge, seed: 417 + deg,
+      const rx = {a0: rect.s0, a1: rect.s1, s0: rect.a0, s1: rect.a1}, T = f => (a, s) => f(s, a);
+      els.push(...sheet({o: [0, -.02, dz], U: '+y', R: '+x', rect: rx, sd: (a, s) => sd(s, a), tex: sheetSprite(`h_forkx${deg}`, rx, T(top), 48, 'p3'), texM: sheetSprite(`h_forkx${deg}_b`, rx, T(under), 24, 'p3'), edge, seed: 417 + deg,
         bands: [{s: rx.s0, ang: 0, half: .04}, {s: rx.s1 * .5, ang: 22.5, half: .035}, {s: rx.s1 * .8, ang: 45, half: .025}]}));
     }
   }
-  els.push(rockBox([-.13, -.16, -.12], [.13, .08, .13], 'p3_lime', {seed: 413}));
-  els.push(...spike([.1, .1, -.1], .085, spikeSprite('h_spk_gold3', PAL.p3_cone_gold, 'p3')));
-  return els;
+  // the wrist: a small core wrapped by two pointed bracts (front and back) that clasp the blade roots
+  els.push(rockBox([-.1, -.14, -.1], [.1, .05, .1], 'p3_lime', {seed: 413}));
+  const BR = tipLeaf(.5, .17, 0, 0, -.28), rBr = {a0: -.2, a1: .2, s0: -.28, s1: .24};
+  const brT = sheetSprite('h_fork_br', rBr, lineLeafPaint(BR.sd, BR.axis, {R: PAL.p3_lime, base: .22}), 32, 'p3');
+  for (const [z, sg] of [[-.135, 1], [.135, -1]]) els.push(...sheet({o: [.01, 0, z], U: '+x', R: '+y', rect: rBr, sd: BR.sd, tex: brT, edge, seed: 414, anchor: 1,
+    bands: [{s: rBr.s0, ang: 0, half: .025}, {s: -.02, ang: -22.5 * sg, half: .022}]}));
+  els.push(...spike([.1, .1, -.1], .095, spikeSprite('h_spk_gold3', PAL.p3_cone_gold, 'p3')));
+  return scaleEls(els, 1.18);
 }
 
-// ---- B phase 3 open: two palmate yellow leaves over the white-grey forked under-leaf (UPRIGHT; sheets face the front) ------
-const LEAF1 = palmate([.35, -.25], [[-24, 1.18, .32], [8, 1.48, .37], [40, 1.4, .36], [70, 1.16, .31]], [[.35, -.3], [-.05, .35], [.5, .85], [1.3, .68], [1.45, .05]]);
-const LEAF2 = palmate([1.05, 0], [[18, 1.05, .3], [48, 1.24, .33], [80, 1.04, .29]], [[1.05, -.03], [1.05, .6], [1.75, .6], [1.8, 0]]);
-const FIN = (() => {
-  const a = stroke([[.5, -.14], [1.65, 0], [2.6, .3]], t => .3 * Math.sin(Math.PI * Math.min(1, .22 + .78 * t)) + .01);
-  const b = stroke([[1.55, -.1], [2.15, -.3], [2.58, -.42]], t => .17 * Math.sin(Math.PI * Math.min(1, .25 + .75 * t)) + .01);
-  return {sd: sdUnion(a.sd, b.sd), a};
+// ---- B phase 3 open: the big lobed leaf hand (UPRIGHT; the arm comes in along -X, the boss's front is -Z) --------------
+// model_p3 §2.3 item 16, v6 f480 (z_v6_0480_rhand), v5 f1074, v5 f1908: butter-yellow palmate leaves over a white-grey
+// under-leaf that sticks out past the lobes as a forked pointed fin. The front leaf (5 lobes, up -> out) is cupped: its
+// lower part leans back so the palm faces forward-up, the lobe tips curl toward the viewer. The outer leaf (3 lobes) and
+// the under-leaf run outward and sweep back. Every leaf has a pale grey-lilac underside (from behind the hand reads grey,
+// v5 f1908); the gold cone stands on the wrist.
+const P3_UNDER = ramp(['#F1F0F4', '#DCDBE3', '#C4C3CC', '#A8A8B2', '#8A8A94', '#62626C']);
+// front leaf: flat a = X, s = Y (U +x, R +y; its front is the -N card)
+const LEAF1 = palmate([.34, -.22], [[-32, 1.0, .29], [-2, 1.34, .34], [28, 1.44, .36], [58, 1.32, .34], [88, 1.06, .3]],
+  [[.34, -.32], [-.06, .28], [.3, .78], [1.0, .74], [1.3, .22], [1.22, -.32]]);
+// outer leaf: flat a = Y, s = X (U +y, R +x; its front is the +N card)
+const LEAF2 = palmate([.04, .95], [[-38, .98, .3], [-4, 1.3, .35], [32, 1.08, .31]], [[.04, .85], [-.42, 1.35], [.05, 1.8], [.5, 1.4]]);
+// the under-leaf: flat a = Y, s = X; a long blade forked at the tip (the upper tip curving up), two lower serrations
+const UNDER = (() => {
+  const a = stroke([[-.12, .12], [-.22, 1.2], [-.1, 2.05], [.2, 2.7]], t => .42 * Math.sin(Math.PI * Math.min(1, .18 + .82 * t)) ** .8 + .012);
+  const b = stroke([[-.3, 1.7], [-.56, 2.2], [-.72, 2.48]], t => .2 * Math.sin(Math.PI * Math.min(1, .22 + .78 * t)) + .01);
+  const c = stroke([[-.34, 1.05], [-.66, 1.42], [-.8, 1.62]], t => .13 * Math.sin(Math.PI * Math.min(1, .25 + .75 * t)) + .01);
+  return {sd: sdUnion(a.sd, b.sd, c.sd), a};
 })();
-const finPaint = (a, s) => {
-  const d = FIN.sd(a, s); if (d > 0) return null;
-  const n = FIN.a.near(a, s);
-  let v = .08 + .2 * clamp(n.d / .3) + .1 * (NS.e(a * 6, s * 6) - .5) + .08 * n.t;
-  let c = PAL.p3_pale(clamp(v));
-  if (n.d < .015 && n.t < .95) c = mix(c, PAL.p3_pale(.6), .7);
-  else { const vs = Math.abs(((n.t * 9 - n.d * 4) % 1 + 1) % 1 - .5); if (vs < .05 && n.d < .25) c = mix(c, PAL.p3_pale(.5), .45); }
-  if (d > -.025) c = mix(c, PAL.p3_line(.7), .9); else if (d > -.05) c = lift(c, .4);
+// the pale underside of a palmate leaf: lilac grey, darker veins along the lobes, the outline
+function undersidePaint(P, {R = P3_UNDER} = {}) {
+  return (a, s) => {
+    const d = P.sd(a, s); if (d > 0) return null;
+    const ra = a - P.b[0], rs = s - P.b[1], r = Math.hypot(ra, rs);
+    let bx = Infinity, bt = 0;
+    for (const l of P.L) { const da = Math.sin(l.p), ds = Math.cos(l.p), t = (ra * da + rs * ds) / l.len, x = Math.abs(ra * ds - rs * da); if (x < bx && t > -.05) { bx = x; bt = t; } }
+    let v = .22 + .14 * clamp(r / 1.4) + .08 * (NS.e(a * 5, s * 5) - .5) + .1 * clamp(bx / .32);
+    let c = R(clamp(v));
+    if (bx < .03 && bt > .02 && bt < .92) c = mix(c, R(.62), .7);                       // the raised rib
+    else { const side = Math.abs(((bt * 6 - bx * 3.5) % 1 + 1) % 1 - .5); if (side < .035 && bx < .24 && bt > .12 && bt < .9) c = mix(c, R(.55), .4); }
+    if (r < .2) c = mix(c, PAL.p3_lime(.35), .5);
+    if (d > -.024) c = mix(c, PAL.p3_line(.7), .9); else if (d > -.05) c = mix(c, R(.1), .5);
+    return c;
+  };
+}
+// the under-leaf: front white-grey with a lime-yellow flush at its base and grey veins, back lilac grey
+const underPaint = back => (a, s) => {
+  const d = UNDER.sd(a, s); if (d > 0) return null;
+  const n = UNDER.a.near(a, s), R = back ? P3_UNDER : PAL.p3_pale;
+  let v = (back ? .2 : .06) + .18 * clamp(n.d / .36) + .08 * (NS.e(a * 6, s * 6) - .5) + .06 * n.t;
+  let c = R(clamp(v));
+  if (!back && n.t < .35) c = mix(c, PAL.p3_leafhand(.25), .55 * clamp((.35 - n.t) / .25));
+  if (n.d < .016 && n.t < .96) c = mix(c, R(.6), .7);
+  else { const vs = Math.abs(((n.t * 10 - n.d * 4) % 1 + 1) % 1 - .5); if (vs < .045 && n.d < .3) c = mix(c, R(.5), .45); }
+  if (d > -.024) c = mix(c, PAL.p3_line(.7), .9); else if (d > -.05) c = lift(c, .4);
   return c;
 };
 function openP3() {
   const els = [], edgeY = edgeTile('h_edge_p3y', PAL.p3_leafhand, .4, .7, 'p3'), edgeG = edgeTile('h_edge_p3g', PAL.p3_pale, .35, .6, 'p3');
-  const R1 = {a0: -.55, a1: 1.86, s0: -.45, s1: 1.45}, R2 = {a0: .8, a1: 2.5, s0: -.45, s1: 1.32}, RF = {a0: .15, a1: 2.66, s0: -.64, s1: .62};
-  // the under-leaf fin behind, its forked tip out past the lobes
-  els.push(...sheet({o: [0, 0, .17], U: '+x', R: '+y', rect: RF, sd: FIN.sd, tex: sheetSprite('h_underleaf', RF, finPaint, 48, 'p3'), edge: edgeG, seed: 451, cell: .1,
-    bands: [{s: RF.s0, ang: -22.5, half: .03}]}));
-  // the outer leaf, a little behind, lobes up and out; the leaves and the fin lean back (the palm faces forward-up and
-  // catches the light; one plane each, so no fold seam crosses the lobes)
-  els.push(...sheet({o: [0, 0, .04], U: '+x', R: '+y', rect: R2, sd: LEAF2.sd, tex: sheetSprite('h_leaf2', R2, lobedPaint(LEAF2), 56, 'p3'), edge: edgeY, seed: 452, cell: .1,
-    bands: [{s: R2.s0, ang: -22.5, half: .04}]}));
-  // the front leaf
-  els.push(...sheet({o: [0, 0, -.1], U: '+x', R: '+y', rect: R1, sd: LEAF1.sd, tex: sheetSprite('h_leaf1', R1, lobedPaint(LEAF1), 56, 'p3'), edge: edgeY, seed: 453, cell: .1,
-    bands: [{s: R1.s0, ang: -22.5, half: .045}]}));
-  els.push(rockBox([-.18, -.2, -.17], [.3, .14, .17], 'p3_lime', {seed: 454}));
-  els.push(...spike([.04, .14, -.02], .09, spikeSprite('h_spk_gold3', PAL.p3_cone_gold, 'p3')));
-  return els;
+  const R1 = {a0: -.62, a1: 1.86, s0: -.46, s1: 1.2}, R2 = {a0: -.68, a1: .82, s0: .62, s1: 2.32}, RF = {a0: -.96, a1: .5, s0: .02, s1: 2.76};
+  // the under-leaf behind, sweeping back as it runs out (its front is the +N card)
+  els.push(...sheet({o: [0, -.02, .2], U: '+y', R: '+x', rect: RF, sd: UNDER.sd, tex: sheetSprite('h_underleaf', RF, underPaint(false), 48, 'p3'),
+    texM: sheetSprite('h_underleaf_b', RF, underPaint(true), 48, 'p3'), edge: edgeG, seed: 451, cell: .1,
+    bands: [{s: RF.s0, ang: 0, half: .03}, {s: 1.25, ang: 22.5, half: .03}, {s: 1.8, ang: 45, half: .025}, {s: 2.3, ang: 67.5, half: .022}]}));
+  // the outer leaf: three lobes out past the front leaf, sweeping back with the under-leaf
+  els.push(...sheet({o: [0, .02, .06], U: '+y', R: '+x', rect: R2, sd: LEAF2.sd, tex: sheetSprite('h_leaf2', R2, lobedPaint(LEAF2), 56, 'p3'),
+    texM: sheetSprite('h_leaf2_b', R2, undersidePaint(LEAF2), 40, 'p3'), edge: edgeY, seed: 452, cell: .1,
+    bands: [{s: R2.s0, ang: 0, half: .04}, {s: 1.25, ang: 22.5, half: .035}, {s: 1.8, ang: 45, half: .03}]}));
+  // the front leaf, cupped: the palm leans back, the lobe tips curl forward (its front is the -N card)
+  els.push(...sheet({o: [0, 0, -.13], U: '+x', R: '+y', rect: R1, sd: LEAF1.sd, tex: sheetSprite('h_leaf1_b', R1, undersidePaint(LEAF1), 40, 'p3'),
+    texM: sheetSprite('h_leaf1', R1, lobedPaint(LEAF1), 56, 'p3'), edge: edgeY, seed: 453, cell: .1, anchor: 1,
+    bands: [{s: R1.s0, ang: -22.5, half: .045}, {s: .28, ang: 0, half: .045}, {s: .72, ang: 22.5, half: .04}, {s: 1.0, ang: 45, half: .035}]}));
+  // the wrist: a lime collar with the gold cone on top
+  els.push(rockBox([-.2, -.2, -.18], [.24, .16, .2], 'p3_lime', {seed: 454}));
+  els.push(...spike([.02, .16, -.02], .11, spikeSprite('h_spk_gold3', PAL.p3_cone_gold, 'p3')));
+  return scaleEls(els, 1.1);
 }
 
 // ---- B phase 3 curl: the fiddlehead foot (UPRIGHT world axes; the crawl wrist 0.4 b over the water) -------------------------
@@ -451,9 +513,10 @@ const frondPaint = (L, W) => {
   };
 };
 // a broad leaf with three rounded lobes at its end (rolled into the fiddlehead foot)
+// (it narrows toward the rolled end, so the curled walls read as tongues round a ball rather than the sides of a box)
 const rollSd = (L, W) => {
-  const lobes = [-.62, 0, .62].map(x => sdCircleF(x * W, L - .1 - Math.abs(x) * .08, .36 * W));
-  return (a, s) => { const w = W * (.78 + .22 * Math.sin(Math.PI * clamp(s / L) * .9)) * (1 + .06 * Math.sin(s * 19)); return Math.min(Math.max(Math.abs(a) - w, s - (L - .12), -s), ...lobes.map(f => f(a, s))); };
+  const lobes = [-.42, 0, .42].map(x => sdCircleF(x * W, L - .1 - Math.abs(x) * .1, .3 * W));
+  return (a, s) => { const t = clamp(s / L); const w = W * (.8 + .2 * Math.sin(Math.PI * t * .9)) * (1 - .42 * clamp((t - .45) / .55) ** 1.3) * (1 + .06 * Math.sin(s * 19)); return Math.min(Math.max(Math.abs(a) - w, s - (L - .12), -s), ...lobes.map(f => f(a, s))); };
 };
 const sdCircleF = (cx, cy, r) => (a, s) => Math.hypot(a - cx, s - cy) - r;
 const rollPaint = (L, W) => {
@@ -477,56 +540,77 @@ const rosLeaf = (L, W, phi) => { const sd = rollSd(L, W), cs = Math.cos(phi), sn
 function curlB() {
   const els = [], edge = edgeTile('h_edge_p3y', PAL.p3_leafhand, .4, .7, 'p3');
   const RING = [
-    {L: 1.0, W: .34, phi: 12, y: -.12, name: 'h_ros_o', bands: [[0, 22.5, .055], [.24, -22.5, .05], [.44, -67.5, .045], [.64, -112.5, .04], [.82, -135, .035]]},
-    {L: .8, W: .27, phi: -24, y: -.05, name: 'h_ros_i', bands: [[0, 0, .045], [.16, -45, .04], [.36, -90, .035], [.56, -135, .03]]},
+    {L: 1.0, W: .34, phi: 12, y: -.12, name: 'h_ros_o', bands: [[0, 22.5, .055], [.26, -22.5, .05], [.5, -45, .045], [.72, -67.5, .04]]},
+    {L: .86, W: .28, phi: -24, y: -.05, name: 'h_ros_i', bands: [[0, -22.5, .045], [.2, -45, .04], [.44, -67.5, .035], [.68, -90, .03]]},
   ];
-  for (const r of RING) {
-    const p = r.phi * D2R, ext = r.L * Math.cos(p) + r.W * Math.abs(Math.sin(p)) + .06, wd = r.W + r.L * Math.abs(Math.sin(p)) + .06;
-    const rect = {a0: -wd, a1: wd, s0: 0, s1: ext}, sd = rosLeaf(r.L, r.W, p);
-    const rp = rollPaint(r.L, r.W), cs = Math.cos(p), sn = Math.sin(p);
-    const tex = sheetSprite(r.name, rect, (a, s) => rp(a * cs - s * sn, a * sn + s * cs), 48, 'p3');
-    for (const run of ['f', 'l', 'b', 'r']) {
-      const [U, R] = RUNS[run];
-      els.push(...sheet({o: [0, r.y, 0], U, R, N: '+y', rect, sd, tex, edge, seed: 441 + els.length,
-        bands: r.bands.map(([f, ang, half]) => ({s: f * ext, ang, half}))}));
-    }
+  // the outer leaves differ per direction (the front one longest, the back one short and tight) so the ball is not square
+  const KR = {f: 1.14, l: .94, b: .78, r: 1.04};
+  for (const r of RING) for (const run of ['f', 'l', 'b', 'r']) {
+    const k = r.name === 'h_ros_o' ? KR[run] : 1, L = r.L * k;
+    const p = r.phi * D2R, ext = L * Math.cos(p) + r.W * Math.abs(Math.sin(p)) + .06, wd = r.W + L * Math.abs(Math.sin(p)) + .06;
+    const rect = {a0: -wd, a1: wd, s0: 0, s1: ext}, sd = rosLeaf(L, r.W, p);
+    const rp = rollPaint(L, r.W), cs = Math.cos(p), sn = Math.sin(p);
+    const tex = sheetSprite(k === 1 ? r.name : `${r.name}_${run}`, rect, (a, s) => rp(a * cs - s * sn, a * sn + s * cs), 48, 'p3');
+    const [U, R] = RUNS[run];
+    els.push(...sheet({o: [0, r.y, 0], U, R, N: '+y', rect, sd, tex, edge, seed: 441 + els.length,
+      bands: r.bands.map(([f, ang, half]) => ({s: f * ext, ang, half}))}));
   }
   els.push(rockBox([-.17, -.16, -.15], [.19, .14, .19], 'p3_lime', {seed: 442}));
   els.push(...spike([.02, .14, -.05], .1, spikeSprite('h_spk_cream3', PAL.p3_cone, 'p3')));
   return els;
 }
 
-// ---- C phase 3 curl: the cupped leaf (UPRIGHT; the bowl's convex face to the front, two pointed tips rising) ----------------
-// the square-spiral glyph (a meander) on the bowl's front, an inner pale leaf behind, the cream cone pointing out (v5 f588)
+// ---- C phase 3 curl: the folded leaf hand (UPRIGHT; v5 f588, v6 f480 z_v6_0480_rhand) ------------------------------------
+// a tulip of leaves round the wrist: the front bowl leaf rolled under at its foot (the canoe of v5 f588) carrying the
+// square-spiral glyph, two tall pointed tips rising behind it (the outer one taller), a side leaf on each side flaring at
+// the foot and curling in at the top, a back leaf, a pale under-leaf showing inside; yellow-lime outside, pale lilac grey
+// inside; the cream cone points out and down. Lowest point 0.35 b under the wrist (the crawl wrist is 0.4 b up).
 const GLYPH = (() => {
   const pts = [[0, 0]]; let x = 0, y = 0; const st = [[1, 0], [0, 1], [-1, 0], [0, -1]];
   for (let i = 0; i < 7; i++) { const n = Math.ceil((i + 1) / 2), [dx, dy] = st[i % 4]; x += dx * n; y += dy * n; pts.push([x, y]); }
-  return stroke(pts.map(([px, py]) => [.14 + px * .064, -.26 + py * .064]), () => .024);
+  return stroke(pts.map(([px, py]) => [.12 + px * .07, -.08 + py * .07]), () => .026);
 })();
-const glyphOn = (c, a, s) => { const g = GLYPH.sd(a, s); if (g < 0) return mix(PAL.p3_line(.55), c, .12); if (g < .022) return mix(c, C('#F4F2B0'), .5); return c; };
-const CUP = (() => {
-  const bowl = (a, s) => { const t = clamp((s + .58) / .72), w = .42 * Math.pow(Math.sin(Math.PI * (.1 + .55 * t)), .55); return Math.max(Math.abs(a - .14) - w, -s - .58, s - .14); };
-  const tipL = petalShape(.66, .2, -10 * D2R), tipR = petalShape(.92, .22, 12 * D2R);
-  return {sd: sdUnion(bowl, (a, s) => tipL(a + .12, s - .02), (a, s) => tipR(a - .4, s)), axis: stroke([[.14, -.58], [.14, .05], [.42, .8]], () => 0)};
+const glyphOn = (c, a, s) => { const g = GLYPH.sd(a, s); if (g < 0) return mix(PAL.p3_line(.55), c, .12); if (g < .024) return mix(c, C('#F4F2B0'), .5); return c; };
+const BOWL = (() => {
+  const sd = (a, s) => { const t = (s + .42) / .82; if (t < 0) return Math.max(-t * .82, Math.abs(a - .08) - .44); if (t > 1) return (t - 1) * .82; const w = .5 * Math.pow(Math.sin(Math.PI * (.3 + .7 * t)), .6) + .005; return Math.abs(a - .08) - w; };
+  return {sd, axis: stroke([[.08, -.42], [.08, .4]], () => 0)};
 })();
-const INNER = (() => { const t = petalShape(1.1, .28, 4 * D2R); return {sd: (a, s) => t(a - .14, s + .32), axis: stroke([[.14, -.32], [.2, .8]], () => 0)}; })();
-const WALL = (() => { const t = petalShape(.78, .2, 0); return {sd: (a, s) => t(a - .2, s + .42), axis: stroke([[.2, -.42], [.2, .38]], () => 0)}; })();
+const tipLeaf = (L, W, phi, a0, s0) => { const sd = tipShape(L, W, phi * D2R); return {sd: (a, s) => sd(a - a0, s - s0), axis: stroke([[a0, s0], [a0 + Math.sin(phi * D2R) * L, s0 + Math.cos(phi * D2R) * L]], () => 0)}; };
+const TIP_I = tipLeaf(1.02, .21, -10, -.2, -.12), TIP_O = tipLeaf(1.3, .23, 9, .36, -.12);
+const SIDE = tipLeaf(.9, .4, 90, -.32, 0), BACKL = tipLeaf(.92, .36, 0, .08, -.36);
+const INNER = tipLeaf(1.0, .3, 4, .1, -.2);
 function curlC() {
   const els = [], edge = edgeTile('h_edge_p3y', PAL.p3_leafhand, .4, .7, 'p3');
-  const rect = {a0: -.36, a1: .72, s0: -.6, s1: .95}, rI = {a0: -.2, a1: .5, s0: -.34, s1: .84}, rW = {a0: -.04, a1: .44, s0: -.44, s1: .4};
-  // the inner leaf (pale lime) shows in the notch between the tips
-  els.push(...sheet({o: [0, .08, -.1], U: '+x', R: '+y', rect: rI, sd: INNER.sd, tex: sheetSprite('h_cup_in', rI, lineLeafPaint(INNER.sd, INNER.axis, {R: PAL.p3_rim, base: .05, tip: C('#F2EE7A')}), 48, 'p3'), edge, seed: 463,
-    bands: [{s: rI.s0, ang: 0, half: .035}, {s: .35, ang: -22.5, half: .03}]}));
-  // the bowl: its bottom swings forward under the wrist, the face is upright, the tips lean back a little
-  els.push(...sheet({o: [0, .08, -.26], U: '+x', R: '+y', rect, sd: CUP.sd, tex: sheetSprite('h_cup', rect, lineLeafPaint(CUP.sd, CUP.axis, {R: PAL.p3_leafhand, base: .08, tip: C('#F2EE7A'), glyph: true}), 56, 'p3'), edge, seed: 461, anchor: 2,
-    bands: [{s: -.6, ang: 45, half: .045}, {s: -.38, ang: 22.5, half: .045}, {s: -.1, ang: 0, half: .045}, {s: .32, ang: -22.5, half: .035}]}));
-  // the side walls of the cup, leaning in at the top
-  const tW = sheetSprite('h_cup_wall', rW, lineLeafPaint(WALL.sd, WALL.axis, {R: PAL.p3_leafhand, base: .14, tip: C('#F2EE7A')}), 48, 'p3');
-  for (const [x, N] of [[.58, '+x'], [-.3, '-x']]) els.push(...sheet({o: [x, .08, -.24], U: '+z', R: '+y', N, rect: rW, sd: WALL.sd, tex: tW, edge, seed: 465,
-    bands: [{s: rW.s0, ang: 0, half: .035}, {s: .02, ang: 22.5, half: .03}]}));
+  const yel = (L, o = {}) => lineLeafPaint(L.sd, L.axis, {R: PAL.p3_leafhand, base: .08, tip: C('#F2EE7A'), ...o});
+  const pale = L => lineLeafPaint(L.sd, L.axis, {R: P3_UNDER, base: .16});
+  // the back leaf (outside to the back) and the pale inner leaf
+  const rB = {a0: -.34, a1: .5, s0: -.36, s1: .6};
+  els.push(...sheet({o: [0, 0, .3], U: '+x', R: '+y', rect: rB, sd: BACKL.sd, tex: sheetSprite('h_cupb_o', rB, yel(BACKL, {base: .16}), 40, 'p3'),
+    texM: sheetSprite('h_cupb_i', rB, pale(BACKL), 32, 'p3'), edge, seed: 466, anchor: 2,
+    bands: [{s: rB.s0, ang: -45, half: .03}, {s: -.18, ang: -22.5, half: .03}, {s: .05, ang: 0, half: .03}, {s: .38, ang: -22.5, half: .025}]}));
+  const rI = {a0: -.24, a1: .48, s0: -.2, s1: .84};
+  els.push(...sheet({o: [0, 0, .15], U: '+x', R: '+y', rect: rI, sd: INNER.sd, tex: sheetSprite('h_cup_in', rI, pale(INNER), 40, 'p3'), edge, seed: 463,
+    bands: [{s: rI.s0, ang: 0, half: .025}, {s: .4, ang: -22.5, half: .022}]}));
+  // the two tall tips: pale-based fronts, yellow ends, yellow-lime backs; they lean back above the bowl
+  for (const [T, nm, rr, sd0] of [[TIP_I, 'i', {a0: -.6, a1: .1, s0: -.12, s1: .92}, 467], [TIP_O, 'o', {a0: .1, a1: .82, s0: -.12, s1: 1.2}, 468]]) {
+    const front = (a, s) => { const c = yel(T)(a, s); if (!c) return c; const t = (s + .12) / 1.1; return t < .45 ? mix(c, P3_UNDER(.18), .55 * clamp((.45 - t) / .3)) : c; };
+    els.push(...sheet({o: [0, 0, .06], U: '+x', R: '+y', rect: rr, sd: T.sd, tex: sheetSprite(`h_ctip${nm}_b`, rr, yel(T, {base: .2}), 32, 'p3'),
+      texM: sheetSprite(`h_ctip${nm}`, rr, front, 48, 'p3'), edge, seed: sd0, bands: [{s: rr.s0, ang: 0, half: .03}, {s: .38, ang: -22.5, half: .028}, {s: .74, ang: 0, half: .024}]}));
+  }
+  // the side walls: a leaf wrapped round each side of the cup from the bowl to the back leaf (it runs front -> back and
+  // bends about Y, so it shows a broad face from the front quarter), its point rising in the middle (+N = +X)
+  const rS = {a0: -.34, a1: .6, s0: -.42, s1: .42};
+  const texSo = sheetSprite('h_cups_o', rS, yel(SIDE), 40, 'p3'), texSi = sheetSprite('h_cups_i', rS, pale(SIDE), 32, 'p3');
+  for (const [x, sg] of [[.6, -1], [-.44, 1]]) els.push(...sheet({o: [x, 0, 0], U: '+y', R: '+z', rect: rS, sd: SIDE.sd, tex: sg < 0 ? texSo : texSi, texM: sg < 0 ? texSi : texSo, edge, seed: 465, anchor: 2,
+    bands: [{s: rS.s0, ang: 45 * sg, half: .028}, {s: -.26, ang: 22.5 * sg, half: .028}, {s: -.1, ang: 0, half: .028}, {s: .12, ang: -22.5 * sg, half: .028}, {s: .27, ang: -45 * sg, half: .026}]}));
+  // the front bowl with the glyph, rolled under at its foot (anchored at its upright band)
+  const rect = {a0: -.44, a1: .6, s0: -.42, s1: .42};
+  els.push(...sheet({o: [0, -.08, -.3], U: '+x', R: '+y', rect, sd: BOWL.sd, tex: sheetSprite('h_cup_i', rect, lineLeafPaint(BOWL.sd, BOWL.axis, {R: PAL.p3_lime, base: .3}), 32, 'p3'),
+    texM: sheetSprite('h_cup', rect, yel(BOWL, {glyph: true}), 56, 'p3'), edge, seed: 461, anchor: 3,
+    bands: [{s: -.42, ang: 67.5, half: .04}, {s: -.28, ang: 45, half: .04}, {s: -.1, ang: 22.5, half: .04}, {s: .08, ang: 0, half: .04}, {s: .26, ang: -22.5, half: .035}]}));
   els.push(rockBox([-.15, -.13, -.13], [.17, .12, .15], 'p3_lime', {seed: 462}));
-  els.push(...spike([.5, -.34, -.3], .08, spikeSprite('h_spk_cream3', PAL.p3_cone, 'p3'), {axis: 'x', dir: 1}));
-  return els;
+  els.push(...spike([.6, -.24, -.12], .09, spikeSprite('h_spk_cream3', PAL.p3_cone, 'p3'), {axis: 'x', dir: 1}));
+  return scaleEls(els, 1.2, [0, -.3, 0]);
 }
 
 // ---- region interface ------------------------------------------------------------------------------------------------------
