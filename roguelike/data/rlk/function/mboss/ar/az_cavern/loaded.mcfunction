@@ -1,5 +1,38 @@
-# 1 when the box corners and the centre of az_cavern are loaded, else fail.
-execute in minecraft:overworld unless loaded 280 201 -32 run return fail
-execute in minecraft:overworld unless loaded 360 201 48 run return fail
+# 1 when every chunk of the box of az_cavern is loaded (the centre first), else fail.
 execute in minecraft:overworld unless loaded 320 201 8 run return fail
+execute in minecraft:overworld unless loaded 280 201 -32 run return fail
+execute in minecraft:overworld unless loaded 280 201 -16 run return fail
+execute in minecraft:overworld unless loaded 280 201 0 run return fail
+execute in minecraft:overworld unless loaded 280 201 16 run return fail
+execute in minecraft:overworld unless loaded 280 201 32 run return fail
+execute in minecraft:overworld unless loaded 280 201 48 run return fail
+execute in minecraft:overworld unless loaded 288 201 -32 run return fail
+execute in minecraft:overworld unless loaded 288 201 -16 run return fail
+execute in minecraft:overworld unless loaded 288 201 0 run return fail
+execute in minecraft:overworld unless loaded 288 201 16 run return fail
+execute in minecraft:overworld unless loaded 288 201 32 run return fail
+execute in minecraft:overworld unless loaded 288 201 48 run return fail
+execute in minecraft:overworld unless loaded 304 201 -32 run return fail
+execute in minecraft:overworld unless loaded 304 201 -16 run return fail
+execute in minecraft:overworld unless loaded 304 201 0 run return fail
+execute in minecraft:overworld unless loaded 304 201 16 run return fail
+execute in minecraft:overworld unless loaded 304 201 32 run return fail
+execute in minecraft:overworld unless loaded 304 201 48 run return fail
+execute in minecraft:overworld unless loaded 320 201 -32 run return fail
+execute in minecraft:overworld unless loaded 320 201 -16 run return fail
+execute in minecraft:overworld unless loaded 320 201 16 run return fail
+execute in minecraft:overworld unless loaded 320 201 32 run return fail
+execute in minecraft:overworld unless loaded 320 201 48 run return fail
+execute in minecraft:overworld unless loaded 336 201 -32 run return fail
+execute in minecraft:overworld unless loaded 336 201 -16 run return fail
+execute in minecraft:overworld unless loaded 336 201 0 run return fail
+execute in minecraft:overworld unless loaded 336 201 16 run return fail
+execute in minecraft:overworld unless loaded 336 201 32 run return fail
+execute in minecraft:overworld unless loaded 336 201 48 run return fail
+execute in minecraft:overworld unless loaded 352 201 -32 run return fail
+execute in minecraft:overworld unless loaded 352 201 -16 run return fail
+execute in minecraft:overworld unless loaded 352 201 0 run return fail
+execute in minecraft:overworld unless loaded 352 201 16 run return fail
+execute in minecraft:overworld unless loaded 352 201 32 run return fail
+execute in minecraft:overworld unless loaded 352 201 48 run return fail
 return 1

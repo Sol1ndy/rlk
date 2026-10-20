@@ -50,6 +50,16 @@ RES_KEYS = {str(k) for k in range(9)} | {'*'}
 PLAZA_BOX = (-24, 190, -24, 23, 240, 23)
 
 
+# Block rectangles (x0, z0, x1, z1) force-loaded outside the chapter arenas (F:load, F:room/setup, the plaza of
+# F:mboss/arena): a chapter arena box (load_registry) may not share a chunk with them.
+FIXED_FORCELOADS = {
+    'dungeon (room/setup)': (-64, -64, 63, 63),
+    'lobby (load)': (80, 14, 134, 64),
+    'item room (load)': (104, 4, 104, 4),
+    'plaza (mboss arena)': (176, -16, 223, 31),
+}
+
+
 def load_registry():
     """The registry (schema v2), validated: unique ids / n across mid-boss and chapter entries, the chapter-entry rules of
     scratchpad az/contract/cm.md 2.2 and the arena entries of 2.3."""
@@ -58,6 +68,8 @@ def load_registry():
     arenas = data.get('arenas', {})
     assert 'plaza' not in arenas, 'arenas{} never holds the plaza (it is the top-level arena)'
     arn = set()
+    # chunk rectangles (cx0, cz0, cx1, cz1) a chapter arena's forceload must never touch: its fl_off would release them
+    fl_taken = {f'fixed forceload {k}': tuple(v >> 4 for v in r) for k, r in FIXED_FORCELOADS.items()}
     for aid, a in arenas.items():
         assert isinstance(a.get('n'), int) and a['n'] >= 1 and a['n'] not in arn, f'arena {aid}: n must be unique and >= 1'
         arn.add(a['n'])
@@ -66,6 +78,13 @@ def load_registry():
         assert a['looks'], f'arena {aid}: looks[] is empty'
         bx = a['box']
         assert bx['x0'] <= a['cx'] <= bx['x1'] and bx['z0'] <= a['cz'] <= bx['z1'] and bx['y0'] < a['cy'] <= bx['y1'], aid
+        ch = (bx['x0'] >> 4, bx['z0'] >> 4, bx['x1'] >> 4, bx['z1'] >> 4)
+        nch = (ch[2] - ch[0] + 1) * (ch[3] - ch[1] + 1)
+        assert nch <= 256, f'arena {aid}: the box spans {nch} chunks (one forceload add takes at most 256)'
+        for oid, o in fl_taken.items():
+            assert ch[2] < o[0] or o[2] < ch[0] or ch[3] < o[1] or o[3] < ch[1], \
+                f'arena {aid}: the box chunks overlap those of {oid} (releasing one forceload would release the other)'
+        fl_taken[f'arena {aid}'] = ch
     for b in data['boss']:
         assert b['id'] not in ids, 'duplicate id ' + b['id']
         assert b['n'] not in ns, 'duplicate n %d' % b['n']

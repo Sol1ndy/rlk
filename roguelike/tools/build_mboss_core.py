@@ -940,6 +940,7 @@ scoreboard players set #mbPart mb 0
 scoreboard players set #mbPx mb 0
 scoreboard players set #mbLost mb 0
 scoreboard players set #cbWait mb 0
+scoreboard players set #mbNoRx mb 0
 data remove storage rlk:mboss px
 data remove storage rlk:mboss push
 data remove storage rlk:mboss lv
@@ -2718,11 +2719,12 @@ def ar_texts(aid, a):
                        f'execute in minecraft:overworld unless loaded {cx} {cy} {cz} run return fail\n'
                        'return 1')
     else:
-        t['loaded'] = (f'# 1 when the box corners and the centre of {aid} are loaded, else fail.\n'
-                       f'execute in minecraft:overworld unless loaded {x0} {cy} {z0} run return fail\n'
-                       f'execute in minecraft:overworld unless loaded {x1} {cy} {z1} run return fail\n'
-                       f'execute in minecraft:overworld unless loaded {cx} {cy} {cz} run return fail\n'
-                       'return 1')
+        # every chunk of the box (forced chunks load in no fixed order: a job must not start on a half-loaded box)
+        cols = [(cx, cz)] + [(max(x0, i * 16), max(z0, j * 16)) for i in range(x0 >> 4, (x1 >> 4) + 1)
+                             for j in range(z0 >> 4, (z1 >> 4) + 1) if (i, j) != (cx >> 4, cz >> 4)]
+        t['loaded'] = (f'# 1 when every chunk of the box of {aid} is loaded (the centre first), else fail.\n'
+                       + ''.join(f'execute in minecraft:overworld unless loaded {x} {cy} {z} run return fail\n' for x, z in cols)
+                       + 'return 1')
     if aid == 'plaza':
         t['ensure'] = '# The plaza (legacy arena generator: arena/ensure, stamp "plaza@2").\nexecute in minecraft:overworld run return run function rlk:mboss/arena/ensure'
         t['test'] = T.join([f'''
@@ -3083,10 +3085,13 @@ execute as @a[tag=player,limit=1] at @s run function rlk:mboss/pl_dot2
 function rlk:mboss/pl_dot_end
 ''')
 w('pl_dot_end', '''
-# Every pl_dot input is reset after the call, refused or not (a stale value never leaks into the next caller).
+# Every pl_dot input is reset after the call, refused or not (a stale value never leaks into the next caller). A one-shot
+# #mbNoRx the caller set for this tick is spent here too (pl_dot never runs a player reaction), so it cannot reach the
+# next direct mboss/hurt.
 scoreboard players set #mbDotPct mb 0
 scoreboard players set #mbDotEl mb 0
 scoreboard players set #mbDotLethal mb 0
+scoreboard players set #mbNoRx mb 0
 ''')
 w('pl_dot2', '''
 # @s = player (modelled on F:player/hurt_elem).
@@ -3424,6 +3429,10 @@ def px_manifest(b):
         merged = {k: stub[k] for k in G if k in stub}
         clips = list(stub['clips'])
     merged['clips'] = [c for c in clips if not c['name'].startswith('dbg_')]
+    # a stub fallback clip merged beside the real clips must not reuse a real clip id (the px dispatch is keyed by id)
+    cids = [c['id'] for c in merged['clips']]
+    dup = sorted({i for i in cids if cids.count(i) > 1})
+    assert not dup, f'{b["id"]}: clip id(s) {dup} used by two clips of the merged manifest (real + stub fallback clips need distinct ids)'
     lay = merged['proxies']['layout']
     assert 1 <= len(lay) <= 16, f'{b["id"]}: {len(lay)} proxies (at most 16)'
     pxb = int(b.get('pxBase', 65))
@@ -3828,11 +3837,14 @@ w('push/ring', '''
 # {r,to,kb} (as anything, at the centre; cm.md 13.5 / N18): a push-only ring. A player whose body is within r (tenths,
 # horizontal) is moved radially outward to the distance to (tenths, to >= r) on its bearing over kb ticks (1..10; the
 # collision-checked pull glide, no facing turn); a player at the centre goes toward the arena start. Skipped when the
-# landing point is inside a live disc / ring / line hazard. No damage, no hit event, not dodgeable.
+# landing point is inside a live disc / ring / line hazard. No damage, no hit event, not dodgeable. r <= 320 and to <= 600
+# (larger values are clamped: the squared distances stay inside int32, every offset beyond 32 b is outside the ring).
 $scoreboard players set #prR mb $(r)
 $scoreboard players set #prTo mb $(to)
 $scoreboard players set #prKb mb $(kb)
 execute unless entity @e[tag=rlk_body,limit=1] run return 0
+execute if score #prR mb matches 321.. run scoreboard players set #prR mb 320
+execute if score #prTo mb matches 601.. run scoreboard players set #prTo mb 600
 execute if score #prTo mb < #prR mb run scoreboard players operation #prTo mb = #prR mb
 execute if score #prKb mb matches ..0 run scoreboard players set #prKb mb 1
 execute if score #prKb mb matches 11.. run scoreboard players set #prKb mb 10
@@ -3846,8 +3858,8 @@ scoreboard players operation #qx mb = #pbx mb
 scoreboard players operation #qx mb -= #qcx mb
 scoreboard players operation #qz mb = #pbz mb
 scoreboard players operation #qz mb -= #qcz mb
-execute unless score #qx mb matches -40000..40000 run return 0
-execute unless score #qz mb matches -40000..40000 run return 0
+execute unless score #qx mb matches -32000..32000 run return 0
+execute unless score #qz mb matches -32000..32000 run return 0
 scoreboard players operation #n mb = #qx mb
 scoreboard players operation #n mb *= #qx mb
 scoreboard players operation #t mb = #qz mb
@@ -3864,13 +3876,17 @@ execute if score #pd mb matches ..49 run return 0
 function rlk:mboss/push/ring_land
 ''')
 w('push/ring_start', '''
-# A player at the centre: the bearing toward the arena arrival spot (cur.start) instead.
+# A player at the centre: the bearing toward the arena arrival spot (cur.start) instead. Only the bearing counts
+# (ring_land divides by the length), so the offset is taken in units of 4 mb: up to 128 b on x / z without overflow.
 execute store result score #qx mb run data get storage rlk:mboss cur.start.x 1000
 execute store result score #qz mb run data get storage rlk:mboss cur.start.z 1000
 scoreboard players operation #qx mb -= #qcx mb
 scoreboard players operation #qz mb -= #qcz mb
-execute unless score #qx mb matches -40000..40000 run return 0
-execute unless score #qz mb matches -40000..40000 run return 0
+scoreboard players set #t mb 4
+scoreboard players operation #qx mb /= #t mb
+scoreboard players operation #qz mb /= #t mb
+execute unless score #qx mb matches -32000..32000 run return 0
+execute unless score #qz mb matches -32000..32000 run return 0
 scoreboard players operation #n mb = #qx mb
 scoreboard players operation #n mb *= #qx mb
 scoreboard players operation #t mb = #qz mb
