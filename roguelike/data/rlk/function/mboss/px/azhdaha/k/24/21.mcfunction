@@ -1,8 +1,8 @@
 # Clip feint (id 24) tick 21: the proxy columns that moved.
 data modify storage rlk:mboss px.o.head_x set value -0.49d
-data modify storage rlk:mboss px.o.head_z set value 4.833d
-data modify storage rlk:mboss px.top.head set value 4.179f
-data merge entity 524c4b4d-415a-4400-8000-000000000041 {height:4.179f}
+data modify storage rlk:mboss px.o.head_z set value 4.831d
+data modify storage rlk:mboss px.top.head set value 4.171f
+data merge entity 524c4b4d-415a-4400-8000-000000000041 {height:4.171f}
 data modify storage rlk:mboss px.o.chest_x set value -0.281d
 data modify storage rlk:mboss px.o.chest_z set value 2.08d
 data modify storage rlk:mboss px.top.chest set value 4.849f

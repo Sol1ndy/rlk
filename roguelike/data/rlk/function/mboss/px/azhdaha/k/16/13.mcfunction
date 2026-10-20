@@ -1,6 +1,6 @@
 # Clip charge_stop (id 16) tick 13: the proxy columns that moved.
 data modify storage rlk:mboss px.o.head_x set value -1.035d
-data modify storage rlk:mboss px.o.head_z set value 4.55d
+data modify storage rlk:mboss px.o.head_z set value 4.549d
 data modify storage rlk:mboss px.top.head set value 3.436f
 data merge entity 524c4b4d-415a-4400-8000-000000000041 {height:3.436f}
 data modify storage rlk:mboss px.o.chest_x set value -0.701d
@@ -29,12 +29,12 @@ data modify storage rlk:mboss px.top.tail4 set value 8.777f
 data merge entity 524c4b4d-415a-4400-8000-000000000048 {height:8.777f}
 data modify storage rlk:mboss px.o.paw_l_x set value 3.184d
 data modify storage rlk:mboss px.o.paw_l_z set value 3.068d
-data modify storage rlk:mboss px.top.paw_l set value 3.131f
-data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:3.131f}
+data modify storage rlk:mboss px.top.paw_l set value 3.081f
+data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:3.081f}
 data modify storage rlk:mboss px.o.paw_r_x set value -3.256d
 data modify storage rlk:mboss px.o.paw_r_z set value 3.677d
-data modify storage rlk:mboss px.top.paw_r set value 3.135f
-data merge entity 524c4b4d-415a-4400-8000-00000000004a {height:3.135f}
+data modify storage rlk:mboss px.top.paw_r set value 3.06f
+data merge entity 524c4b4d-415a-4400-8000-00000000004a {height:3.06f}
 data modify storage rlk:mboss px.o.foot_l_x set value 3.132d
 data modify storage rlk:mboss px.o.foot_l_z set value -2.06d
 data modify storage rlk:mboss px.top.foot_l set value 3.114f

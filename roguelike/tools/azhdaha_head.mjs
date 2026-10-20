@@ -170,14 +170,15 @@ function mspike(plane, w, L, k, rotDeg, side) {
 // shield half plate: serrated top edge (the closed mouth line, overlapping the mask's lower edge), a broad rounded V to
 // the chin (v2 f0870, v2 f0750: a wide U with a blunt point)
 const beakTopW = u => mouthY(u) + .04 + .1 * Math.max(0, 1 - Math.abs(((u * 3.9 + .5) % 1 + 1) % 1 - .5) * 3.2);
-const BEAK_W = [[0, mouthY(0) + .2], [.76, mouthY(.76) + .2], [.78, 1.22], [.73, .96], [.62, .7], [.45, .47], [.23, .31], [0, .25]];
+// (R3b, r3_critique 2.3: a broad V narrowing evenly from 0.55 b half-width at the mouth line to 0.1 b at the chin)
+const BEAK_W = [[0, mouthY(0) + .2], [.62, mouthY(.62) + .2], [.62, 1.16], [.38, .72], [.11, .27], [0, .25]];
 const BEAK_P = inF(JJ, BEAK_W), beakPoly = sdPoly(BEAK_P);
 const beakSd = (u, v) => Math.max(beakPoly(u, v), v + JJ[1] - beakTopW(u));
 // The lower jaw behind the shield is a V wedge too: two cream cheek plates (x = +-JSIDE_X at the lip line, leaning
 // in 22.5 deg toward the chin so they stay inside the shield's outline from the front) over a tilted underside plate
 // rising 22.5 deg from the chin to the throat. (z, y) of the cheek outline are AUTHORING coordinates on the plate
 // before the lean (the lean shortens heights by cos 22.5 about the lip line JSIDE_TOP).
-const JSIDE_X = .7, JSIDE_TOP = 1.2, LEAN = Math.cos(22.5 * D2R);
+const JSIDE_X = .56, JSIDE_TOP = 1.2, LEAN = Math.cos(22.5 * D2R);   // (R3b: narrower, inside the V beak)
 const underY = z => .3 + (z + 4.5) * Math.tan(22.5 * D2R);                      // the underside line (world y at z)
 const unlean = y => JSIDE_TOP + (y - JSIDE_TOP) / LEAN;                          // world y -> plate y before the lean
 const JSIDE_W = [[-4.36, 1.17], [-3.75, 1.2], [-3.28, 1.18], [-3.2, 1.02], [-3.24, unlean(underY(-3.24) - .04)],
@@ -241,11 +242,14 @@ function spline(P, n = 8) {
 }
 // the sleeve band: from its rounded lower end beside the mouth (the dome knob sits on its outer face just behind the end)
 // back and up round the C to the sleeve mouth at the top; broadest round the knob (model.md 0.75 b), 0.6 b at the mouth
-const SLEEVE_C = spline([[-1.24, -.93], [-1.05, -.81], [-.86, -.68], [-.57, -.45], [-.29, -.15], [-.08, .22], [.03, .62], [.02, 1.0], [-.05, 1.27], [-.1, 1.42]], 8);
-const SLEEVE_W = t => (t < .3 ? .74 + .33 * t : .84 - .32 * (t - .3)), SLEEVE_H = .17;
-// the dark horn: out of the sleeve mouth, up and curling forward; 0.46 b at the mouth to a fine tip
-const DHORN_C = spline([[-.11, 1.3], [-.13, 1.68], [-.2, 2.04], [-.34, 2.35], [-.52, 2.57], [-.72, 2.69], [-.9, 2.73]], 10);
-const DHORN_W = t => .46 * (1 - t) ** .9 + .035;
+// (R3b, r3_critique 2.2: the gold ends at brow height, 0.3 b lower than R2; the band 0.44 b thick)
+const SLEEVE_C = spline([[-1.24, -.93], [-1.05, -.81], [-.86, -.68], [-.57, -.45], [-.29, -.15], [-.08, .22], [.02, .62], [.0, .95], [-.04, 1.12]], 8);
+const SLEEVE_W = t => (t < .3 ? .74 + .33 * t : .84 - .3 * (t - .3)), SLEEVE_H = .22;
+// the dark horn (R3b, r3_critique 2.2): out of the sleeve mouth it rises up and back 2.8 b along the curve (the tallest
+// element of the head, top 5.6-5.8 b), 0.5 b at the mouth; only its last 0.3 b curls forward. In this plane +u is back
+// and OUTWARD (the C plane is yawed 53 deg), so the tips flare a little outward in the front view instead of leaning in.
+const DHORN_C = spline([[-.05, .98], [-.01, 1.45], [.1, 1.95], [.22, 2.45], [.32, 2.92], [.38, 3.32], [.36, 3.6], [.27, 3.76]], 8);
+const DHORN_W = t => .5 * (1 - t) ** .9 + .035;
 const SLV = stroke(SLEEVE_C, t => SLEEVE_W(t) / 2), DHS = stroke(DHORN_C, t => DHORN_W(t) / 2);
 // point at arc length l (blocks) along a polyline, and its unit direction
 function along(pts, l) {
@@ -255,7 +259,10 @@ function along(pts, l) {
     l -= d;
   }
 }
-const KNOB = along(SLEEVE_C, .14).p, KNOB_R = .25;          // the dome stud (u, v) on the band's outer face
+// the knob (R3b, r3_critique 2.2): a gold BALL at the band's lower end, about as wide as the band, pointing forward and
+// down beside the beak (v3 f2280): its centre just past the end along the band's axis
+const KNOB_DIR = (() => { const [a, b] = SLEEVE_C, l = Math.hypot(a[0] - b[0], a[1] - b[1]); return [(a[0] - b[0]) / l, (a[1] - b[1]) / l]; })();
+const KNOB = [SLEEVE_C[0][0] + .08 * KNOB_DIR[0], SLEEVE_C[0][1] + .08 * KNOB_DIR[1]], KNOB_R = .3;
 const DH_RECT = rectOf(DHORN_C, .24);   // (the horn part reaches 3 b up: the card stays inside)
 // dark horn half thickness at height v (the horn rises monotonically): the arc fraction of the nearest centre point
 const dhT = v => { let best = 0, bd = 9; DHORN_C.forEach((p, i) => { const d = Math.abs(p[1] - v); if (d < bd) { bd = d; best = i; } }); return DHS.near(DHORN_C[best][0], DHORN_C[best][1]).t; };
@@ -335,17 +342,18 @@ function horn() {
     const arc = Array.from({length: 13}, (_, i) => { const f = (-90 + i * 15) * D2R; return [0, 1].map(k => e0[k] + R * (-Math.cos(f) * d[k] + Math.sin(f) * nl[k])); });
     els.push(...chain(arc, {w: () => .13, h: (t, r) => SLEEVE_H + .038 + (r % 2) * .01, tex: 'gold', ext: .03, seed: 15}));
   }
-  // a thinner inner lip along the concave edge, proud of the outer face only
-  const LIP = offset(SLEEVE_C, t => SLEEVE_W(t) / 2 - .02);
-  els.push(...chain(LIP.slice(6, -3), {w: () => .07, h: (t, r) => SLEEVE_H + .02 + (r % 2) * .006, tex: 'gold', ext: .02, seed: 13}));
+  // the inner edge bevelled like the outer one: a rounded rim chain proud of both faces along the concave edge
+  const LIP = offset(SLEEVE_C, t => SLEEVE_W(t) / 2 - .05);
+  els.push(...chain(LIP.slice(5, -2), {w: () => .11, h: (t, r) => SLEEVE_H + .03 + (r % 2) * .007, tex: 'gold_dk', ext: .02, seed: 13}));
   // the sleeve mouth: a gold collar at the top end, the dark horn grows out of it
   const top = SLEEVE_C[SLEEVE_C.length - 1];
   els.push(rockBox([-SLEEVE_H - .07, top[1] - .21, top[0] - .31], [SLEEVE_H + .07, top[1] + .025, top[0] + .31], 'gold', {seed: 21, rot: ['x', -22.5, [0, top[1], top[0]]]}));
-  // the knob: a gold dome stud on the band's outer face just behind the rounded end (a 16-gon base, two octagon tiers)
-  const kc = [0, KNOB[1], KNOB[0]];
-  els.push(...ngon('x', kc, KNOB_R, SLEEVE_H - .005, SLEEVE_H + .08, 'knob', {n: 16, seed: 61}),
-    ...ngon('x', kc, KNOB_R * .8, SLEEVE_H + .07, SLEEVE_H + .15, 'knob', {phase: 22.5, seed: 63}),
-    ...ngon('x', kc, KNOB_R * .5, SLEEVE_H + .14, SLEEVE_H + .2, 'knob', {seed: 65}));
+  // the knob: a ball from three crossed octagonal prisms (across the band, along it and upright), so its outline is round
+  // from the front, the side and below; a smaller cap a little forward of it
+  const kc = [0, KNOB[1], KNOB[0]], R = KNOB_R;
+  els.push(...ngon('x', kc, R, -R * .82, R * .82, 'knob', {seed: 61}),
+    ...ngon('z', kc, R * .97, kc[2] - R * .84, kc[2] + R * .8, 'knob', {phase: 22.5, seed: 63}),
+    ...ngon('y', kc, R * .93, kc[1] - R * .86, kc[1] + R * .82, 'knob', {seed: 65}));
   // the dark horn: painted cards (the exact curled outline, shaded) on both faces over an octagonal tapering core
   const hv = tb => { const v = DH_RECT.v1 - Math.min(1, tb + 1 / 12) * (DH_RECT.v1 - DH_RECT.v0); return .42 * DHORN_W(dhT(v)) + .01; };
   // (clipped at the collar: the horn grows out of the sleeve mouth, its round foot stays inside)
@@ -373,11 +381,16 @@ const BEARDS = {
 for (const b of Object.values(BEARDS)) { b.Pf = inF(b.f, b.P); b.sd = sdPoly(b.Pf); b.R = rectOf(b.Pf); }
 function bib(name) {
   const {f, zw, sd, R} = BEARDS[name], at = zw - f[2];
-  const front = slab({plane: 'z', at, rect: {u0: -BIB_F - .05, u1: BIB_F + .05, v0: R.v0, v1: R.v1}, sd: (u, v) => sd(Math.abs(u), v), half: .06,
-    sprite: name + 'f', edge: 'cream', cell: .07});
-  const side = slab({plane: 'z', at, rect: {u0: BIB_F, u1: R.u1, v0: R.v0, v1: R.v1}, sd, half: .06, sprite: name + 's', edge: 'cream', cell: .07,
+  // (R3b, r3_critique 2.4: alpha-cut cards only, the serrated hem painted on them; the 0.07 b core cells stair-stepped the
+  // outline. 0.04 b of thickness along the straight top edge only.)
+  const front = slab({plane: 'z', at, rect: {u0: -BIB_F - .05, u1: BIB_F + .05, v0: R.v0, v1: R.v1}, sd: (u, v) => sd(Math.abs(u), v), half: .03,
+    sprite: name + 'f', core: false});
+  const side = slab({plane: 'z', at, rect: {u0: BIB_F, u1: R.u1, v0: R.v0, v1: R.v1}, sd, half: .03, sprite: name + 's', core: false,
     rot: ['y', -45, [BIB_F, 0, at]]});
-  return [...front, ...side, ...mirrorX(side)];
+  const top = BEARDS[name].Pf[0][1];
+  const lip = [rockBox([-BIB_F, top - .05, at - .03], [BIB_F, top, at + .03], 'cream', {seed: 3})];
+  const lipS = [rockBox([BIB_F, top - .05, at - .03], [R.u1 - .04, top, at + .03], 'cream', {seed: 5, rot: ['y', -45, [BIB_F, 0, at]]})];
+  return [...front, ...side, ...mirrorX(side), ...lip, ...lipS, ...mirrorX(lipS)];
 }
 
 // ---- region exports ------------------------------------------------------------------------------------------------------------
@@ -540,13 +553,14 @@ function eyePaint(s, t) {
   const a = (u - EYE.u) / (EYE.len / 2), off = y - eyeY(u), hh = EYE.h / 2 * (1 - a * a) ** .6 * (a < 0 ? 1 - .25 * -a : 1);
   if (Math.abs(a) > 1 || Math.abs(off) > hh) return TRANSPARENT;
   const e = Math.max(Math.abs(off) / Math.max(hh, 1e-3), Math.abs(a) ** 2);
-  return e < .3 ? PAL.eye(.12) : e < .65 ? PAL.eye(.25 + (e - .3) * .6) : PAL.eye(.46 + (e - .65) * .9);
+  // (R3b, r3_critique 2.6: saturated red #F04352 with a hot #FFE0E0 core line and a thin #C81A2C halo, no pink)
+  return e < .2 ? PAL.eye(0) : e < .82 ? PAL.eye(.38 + (e - .2) * .06) : PAL.eye(.6);
 }
-// the sleeve faces: a bright gold outer rim band (convex side), the orange-brown face with a stepped meander groove, a
-// thin gold inner edge; light from above (the upper end lighter), the inner card a shade deeper
-const meander = (p, q) => {
+// the sleeve faces (R3b, r3_critique 2.1): overwhelmingly bright gold: a lit field gold(.15-.45) graded from the lit top
+// to a deeper underside, thin low-contrast orange-brown inlay lines (1-2 px, <= 12 % of the face), a bright outer rim
+// band, a darker bevelled inner lip; the inner card a shade deeper
+const meander = (p, q, lw = .045) => {
   // one cell of a square-key line (p along 0..1, q across 0..1)
-  const lw = .09;
   const seg = [[.1, .15, .1, .85], [.1, .85, .9, .85], [.9, .85, .9, .35], [.9, .35, .45, .35], [.45, .35, .45, .6]];
   return seg.some(([x0, y0, x1, y1]) => p >= Math.min(x0, x1) - lw && p <= Math.max(x0, x1) + lw && q >= Math.min(y0, y1) - lw && q <= Math.max(y0, y1) + lw);
 };
@@ -555,23 +569,17 @@ function sleevePaint(inner) {
     const d = SLV.sd(u, v);
     if (d > 0) return null;
     const n = SLV.near(u, v), w = SLEEVE_W(n.t) / 2, a = n.s / w;              // a: -1 (convex, outer rim) .. +1 (concave edge)
-    const light = .12 * clamp((v + .9) / 2.2) - .1 * (inner ? 1 : 0);
+    const lit = clamp((v + 1.0) / 2.1), deep = inner ? .08 : 0;                // 0 at the lower end .. 1 at the mouth
     let c;
-    if (n.t < .002 && n.d > Math.abs(n.s) + .01) {
-      // the rounded lower end: the bright rim wraps round it, the face inside it plain (the dome stud sits there)
-      const edge = -d;
-      if (edge < .15) c = goldPx(.12 - light + .1 * (edge / .15), u * 70, v * 70);
-      else c = mix(PAL.gold(.62 - light), PAL.inlay(.05), .5);
-      if (Math.abs(edge - .15) < .02) c = PAL.inlay(.8);
-    } else if (a < -.5) c = goldPx(.12 - light + .12 * (a + 1), u * 70, v * 70);
-    else if (a > .72) c = goldPx(.3 - light, u * 70, v * 70);
+    if (a < -.55) c = goldPx(.06 + .12 * (1 - lit) + deep, u * 70, v * 70);      // the bright outer rim
+    else if (a > .7) c = mix(PAL.gold(.5 + .12 * (1 - lit) + deep), PAL.inlay(.2), .25);   // the darker inner lip
     else {
-      c = mix(PAL.gold(.6 - light), PAL.inlay(0), .32 + .2 * (a + .5));
-      const L = n.t * SLV.L, p = ((L / .34) % 1 + 1) % 1, q = (a + .42) / 1.08;
-      if (n.t > .12 && n.t < .96 && q > 0 && q < 1 && meander(p, q)) c = PAL.inlay(.62 - light);
-      if (Math.abs(a + .5) < .05 || Math.abs(a - .72) < .05) c = PAL.inlay(.8);    // grooves bounding the face
+      c = goldPx(.16 + .28 * (1 - lit) + deep + .05 * Math.abs(a), u * 70, v * 70);
+      const L = n.t * SLV.L, p = ((L / .34) % 1 + 1) % 1, q = (a + .45) / 1.1;
+      if (n.t > .1 && n.t < .97 && q > 0 && q < 1 && meander(p, q)) c = mix(c, PAL.inlay(.05), .75);
+      if (Math.abs(a + .55) < .025 || Math.abs(a - .7) < .025) c = mix(c, PAL.inlay(.2), .7);   // fine grooves bounding the face
     }
-    if (d > -.018) c = sink(c, .3);
+    if (d > -.014) c = sink(c, .25);
     return c;
   };
 }

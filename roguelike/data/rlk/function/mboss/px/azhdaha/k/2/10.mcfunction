@@ -5,8 +5,8 @@ data modify storage rlk:mboss px.top.tail4 set value 11.646f
 data merge entity 524c4b4d-415a-4400-8000-000000000048 {height:11.646f}
 data modify storage rlk:mboss px.o.paw_l_x set value 3.15d
 data modify storage rlk:mboss px.o.paw_l_z set value 3.313d
-data modify storage rlk:mboss px.top.paw_l set value 3.035f
-data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:3.035f}
+data modify storage rlk:mboss px.top.paw_l set value 3.01f
+data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:3.01f}
 data modify storage rlk:mboss px.o.foot_l_x set value 2.5d
 data modify storage rlk:mboss px.o.foot_l_z set value -2.728d
 data modify storage rlk:mboss px.top.foot_l set value 3.069f

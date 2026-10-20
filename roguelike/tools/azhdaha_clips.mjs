@@ -109,8 +109,9 @@ export const TAIL_WHIP = [-9, -10, 1, 6, 9, 4, 0, -3];
 // TAIL_FLAT the slam impact (straight back along the floor, the branch lifted at the end); TAIL_BRACE the rear-up
 // third leg (relative to a pelvis pitched up 45-55: the root segment lifts back to the floor line); TAIL_CAST the
 // scorpion cast (the root raised, the column vertical, the branch curled forward over the shoulders, v7 A1);
-// TAIL_TUCK the dive (following the body into the hole).
-export const TAIL_HIGH = [46, 22, 12, 8, 6, 4, 4, 6];
+// TAIL_TUCK the dive (following the body into the hole). (R3b: TAIL_HIGH's branch t5-t8 curls a little further over
+// the back, so the raised tip of tail_whip / tail_slam stays inside its 18 b culling box: it overshot by 0.2-0.4 b)
+export const TAIL_HIGH = [46, 22, 12, 10, 10, 11, 13, 15];
 export const TAIL_FLAT = [-12, -9, -2, 3, 5, 3, 6, 12];
 export const TAIL_BRACE = [46, 4, -2, 0, 4, 8, 10, 14];
 export const TAIL_CAST = [44, 30, 18, 12, 30, 34, 30, 26];
@@ -190,7 +191,9 @@ function hull() {
   return HULL;
 }
 const lowOf = (o, names) => { let m = Infinity; for (const n of names) { if (o[n].s[0] < 1e-4) continue; for (const pt of hull()[n]) m = Math.min(m, pointOf(o, n, pt)[1]); } return m; };
-const GROUPS = {head: ['head', 'jaw', 'eyes', 'horn_l', 'horn_r'], beard: ['beard1', 'beard2'], apron: ['apron', 'glow_apron'], body: ['chest', 'belly', 'pelvis', 'tail_skirt', 'neck1', 'neck2'],
+// (R3b: the rump skirt is not in the body group: it is a flap hinged at the tail root that swings clear of the floor itself,
+// azhdaha_pose.mjs SKIRT_FLOOR)
+const GROUPS = {head: ['head', 'jaw', 'eyes', 'horn_l', 'horn_r'], beard: ['beard1', 'beard2'], apron: ['apron', 'glow_apron'], body: ['chest', 'belly', 'pelvis', 'neck1', 'neck2'],
   bl: ['bracer_l', 'glow_bracer_l'], br: ['bracer_r', 'glow_bracer_r']};
 // the body underside on the floor: the root is raised by what the torso sinks below it (before the feet are solved, so the
 // planted feet stay put); returns the raise
@@ -520,9 +523,14 @@ S.push(turnClip('turn180', -180, [[12, 'A', -18], [18, 'B', -45], [24, 'A', -78]
 // ---- the rear-up family (roar_rear, chin_slam, intro, landslide wave 6, absorb ends): the pelvis pitches up about the hip
 // line, the hind feet stay planted, the fore paws leave the floor with the chest (keyed in the root frame), the tail root
 // braces on the floor as a third leg.
-const REAR = (deg, o = {}) => ({pelvis: [deg, 0, 0], spine: [deg * .1, 0, 0], chest: [deg * .07, 0, 0], ...ups(TAIL_BRACE, Math.min(1, deg / 50)), ...o});
+// (R3b, r3_critique 3.3 / 10: the apron swings toward the vertical as the chest rears, so the glyph panel covers the rearing
+// chest down toward the belly instead of lying flat under the jaw)
+const REAR = (deg, o = {}) => ({pelvis: [deg, 0, 0], spine: [deg * .1, 0, 0], chest: [deg * .07, 0, 0], apron: [-.8 * deg, 0, 0], ...ups(TAIL_BRACE, Math.min(1, deg / 50)), ...o});
 // fore wrists folded up and out at chest height (root frame) for a pelvis pitch of about 40-60
 const FORE_UP = (y = 5.6, z = -3.0, x = 3.3, e = [-55, 0, -10]) => fore([x, y, z], e);
+// (R3b, r3_critique 10: in the roar_rear / intro rear-ups the fores hang down and a little forward from the shoulders with
+// the paws curled (chest-frame offsets [1.5, -1.65, 1.9] / [1.45, -1.85, 1.7]: about 2.4 b below the shoulder in the world),
+// the bracers within ~30 degrees of the body axis, no longer raised across the throat and the face)
 
 // ---- intro (150): sealed crouch, eyes 25, rise 30, rear-up roar, cracks 50 / 70, drop, land 116, low roar 120, blast 130 ---------
 {
@@ -534,8 +542,8 @@ const FORE_UP = (y = 5.6, z = -3.0, x = 3.3, e = [-55, 0, -10]) => fore([x, y, z
     [119, {pos: [0, -.32, 0], chest: [-3, 0, 0], head: [-6, 0, 0]}, 'o'],
     [124, {pos: [0, -.25, 0], chest: [2, 0, 0], neck1: [6, 0, 0], neck2: [4, 0, 0], head: [22, 0, 0], jaw: 50, pelvis: [-3, 0, 0]}, 'o'],
     [134, {jaw: 46}], [140, {jaw: 12, head: [6, 0, 0], neck1: [2, 0, 0]}], [150, {pos: [0, 0, 0], chest: [0, 0, 0], neck1: [0, 0, 0], neck2: [0, 0, 0], head: [0, 0, 0], jaw: 3, pelvis: [0, 0, 0], flS: 0, flM: 0}]],
-    feet: {fl: [W(0, 'fl'), W(32, 'fl'), Sf(40, [1.3, -2.1, .9], [-20, 0, -14]), Sf(108, [1.3, -2.1, .9], [-20, 0, -14]), W(116, 'fl', 0, {ease: 'i'})],
-      fr: [W(0, 'fr'), W(32, 'fr'), Sf(41, [1.3, -2.1, .9], [-20, 0, -14]), Sf(108, [1.3, -2.1, .9], [-20, 0, -14]), W(116, 'fr', 0, {ease: 'i'})]},
+    feet: {fl: [W(0, 'fl'), W(32, 'fl'), Sf(40, [1.45, -1.85, 1.7], [-32, 0, -12]), Sf(108, [1.45, -1.85, 1.7], [-32, 0, -12]), W(116, 'fl', 0, {ease: 'i'})],
+      fr: [W(0, 'fr'), W(32, 'fr'), Sf(41, [1.45, -1.85, 1.7], [-32, 0, -12]), Sf(108, [1.45, -1.85, 1.7], [-32, 0, -12]), W(116, 'fr', 0, {ease: 'i'})]},
     over: [tremor(58, 100, 1.6, 4, [['chest', [1]], ['head', [1.2, .6]], ['jaw', 2]]), tremor(124, 136, 1.2, 4, [['head', [1]], ['jaw', 2]])],
     lag: {pelvis: 2}, note: 'sealed crouch, still (0-30); a dip, then the rear-up (pelvis +48, 32-56) with the fores folded at chest height; the rear-up roar held with a tremor (58-100); the drop to all fours, fores landing at 116; the low roar (jaw 50, head thrust up) 120-136; settle into idle by 150'});
 }
@@ -555,8 +563,8 @@ const FORE_UP = (y = 5.6, z = -3.0, x = 3.3, e = [-55, 0, -10]) => fore([x, y, z
     [20, top, 'o'], [74, {...top, jaw: 40}], [76, {...top, jaw: 30}],
     [89, {...REAR(2, {neck1: [-3, 0, 0], neck2: [0, 0, 0], head: [-6, 0, 0], jaw: 10, flS: 6, flM: 6, flN: 4, flH: 4}), ...ups(TAIL_REST, .9)}, 'i'],
     [92, {pos: [0, -.35, 0], chest: [-3, 0, 0], head: [-9, 0, 0]}, 'o'], [100, {pos: [0, 0, 0], pelvis: [0, 0, 0], spine: [0, 0, 0], chest: [0, 0, 0], neck1: [0, 0, 0], head: [0, 0, 0], jaw: 3, flS: 0, flM: 0, flN: 0, flH: 0, ...tailUp(TAIL_REST)}]],
-    feet: {fl: [W(0, 'fl'), W(8, 'fl'), Sf(13, [1.4, -2.0, 1.0], [-25, 0, -18]), Sf(84, [1.4, -2.0, 1.0], [-25, 0, -18]), W(90, 'fl', 0, {ease: 'i'})],
-      fr: [W(0, 'fr'), W(8, 'fr'), Sf(14, [1.4, -2.0, 1.0], [-25, 0, -18]), Sf(84, [1.4, -2.0, 1.0], [-25, 0, -18]), W(90, 'fr', 0, {ease: 'i'})]},
+    feet: {fl: [W(0, 'fl'), W(8, 'fl'), Sf(13, [1.5, -1.65, 1.9], [-35, 0, -14]), Sf(84, [1.5, -1.65, 1.9], [-35, 0, -14]), W(90, 'fl', 0, {ease: 'i'})],
+      fr: [W(0, 'fr'), W(8, 'fr'), Sf(14, [1.5, -1.65, 1.9], [-35, 0, -14]), Sf(84, [1.5, -1.65, 1.9], [-35, 0, -14]), W(90, 'fr', 0, {ease: 'i'})]},
     over: [tremor(22, 74, 1.5, 4, [['chest', [1]], ['head', [1, .6]], ['jaw', 2]]), tremor(92, 100, 2.5, 8, [['head', [0, 1]]])],
     lag: {pelvis: 2}, anchors: {roar: ['nose']}, note: 'load (root -0.3, head down, tail pressed), the rise 8-20 (pelvis +55, the fores leave the floor at 12 and fold up and out at chest height, head thrown back, jaw 46), roar at 20, the hold with a 4-t tremor and the tail braced, the drop 76-89, fores land at 90, compression, a head shake'});
 }

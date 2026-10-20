@@ -16,21 +16,21 @@ data modify storage rlk:mboss px.o.tail2_z set value -10.075d
 data modify storage rlk:mboss px.top.tail2 set value 3.046f
 data merge entity 524c4b4d-415a-4400-8000-000000000046 {height:3.046f}
 data modify storage rlk:mboss px.o.tail3_x set value -0.261d
-data modify storage rlk:mboss px.o.tail3_z set value -13.615d
-data modify storage rlk:mboss px.top.tail3 set value 2.435f
-data merge entity 524c4b4d-415a-4400-8000-000000000047 {height:2.435f}
-data modify storage rlk:mboss px.o.tail4_x set value -1.011d
-data modify storage rlk:mboss px.o.tail4_z set value -17.281d
-data modify storage rlk:mboss px.top.tail4 set value 3.194f
-data merge entity 524c4b4d-415a-4400-8000-000000000048 {height:3.194f}
+data modify storage rlk:mboss px.o.tail3_z set value -13.616d
+data modify storage rlk:mboss px.top.tail3 set value 2.442f
+data merge entity 524c4b4d-415a-4400-8000-000000000047 {height:2.442f}
+data modify storage rlk:mboss px.o.tail4_x set value -1.019d
+data modify storage rlk:mboss px.o.tail4_z set value -17.306d
+data modify storage rlk:mboss px.top.tail4 set value 3.162f
+data merge entity 524c4b4d-415a-4400-8000-000000000048 {height:3.162f}
 data modify storage rlk:mboss px.o.paw_l_x set value 3.15d
 data modify storage rlk:mboss px.o.paw_l_z set value 2.735d
-data modify storage rlk:mboss px.top.paw_l set value 3.35f
-data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:3.35f}
+data modify storage rlk:mboss px.top.paw_l set value 3.336f
+data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:3.336f}
 data modify storage rlk:mboss px.o.paw_r_x set value -3.15d
 data modify storage rlk:mboss px.o.paw_r_z set value 2.301d
-data modify storage rlk:mboss px.top.paw_r set value 3.3f
-data merge entity 524c4b4d-415a-4400-8000-00000000004a {height:3.3f}
+data modify storage rlk:mboss px.top.paw_r set value 3.268f
+data merge entity 524c4b4d-415a-4400-8000-00000000004a {height:3.268f}
 data modify storage rlk:mboss px.o.foot_l_x set value 2.5d
 data modify storage rlk:mboss px.o.foot_l_z set value -1.85d
 data modify storage rlk:mboss px.top.foot_l set value 2.92f

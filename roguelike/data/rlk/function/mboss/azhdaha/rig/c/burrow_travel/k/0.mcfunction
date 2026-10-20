@@ -44,7 +44,7 @@ data merge entity 524c4b4d-415a-4400-8000-00000000002b {start_interpolation:0,in
 data merge entity 524c4b4d-415a-4400-8000-00000000002c {start_interpolation:0,interpolation_duration:20,transformation:{translation:[0f,1.85704f,-5.95627f],left_rotation:[0.99966f,0f,0f,0.02618f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-415a-4400-8000-00000000002d {start_interpolation:0,interpolation_duration:20,transformation:{translation:[0f,1.94078f,-4.35847f],left_rotation:[0.98769f,0f,0f,-0.15643f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-415a-4400-8000-00000000002e {start_interpolation:0,interpolation_duration:20,transformation:{translation:[0f,1.47725f,-2.93188f],left_rotation:[0.98769f,0f,0f,-0.15643f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-415a-4400-8000-00000000002f {start_interpolation:0,interpolation_duration:20,transformation:{translation:[0f,-6.15f,-4.75f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-415a-4400-8000-00000000002f {start_interpolation:0,interpolation_duration:20,transformation:{translation:[0f,-6.15f,-4.75f],left_rotation:[-0.30071f,0f,0f,0.95372f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
 scoreboard players set @s azRigFl 2
 scoreboard players reset @s azRigQx
 function rlk:mboss/azhdaha/rig/state/burrowed

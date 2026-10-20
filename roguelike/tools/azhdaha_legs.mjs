@@ -20,7 +20,7 @@
 // closed by cut-out DISCS instead (one quad per quadrant showing an alpha-cut n-gon sprite that meets the facets).
 import {loft, rockBox, toUnits, mirrorX, stroke, bez, registerTile, registerWrap, hash} from './azhdaha_shape.mjs';
 import {PART_SCALE, ARM, LEG, J} from './azhdaha_pose.mjs';
-import {PAL, LOOK_PAL, TILES, C, clamp, smooth, mix, lift, sink, scale, N, TRANSPARENT, ramp, hidePx} from './azhdaha_materials.mjs';
+import {PAL, LOOK_PAL, TILES, C, clamp, smooth, mix, lift, sink, scale, N, TRANSPARENT, ramp, hidePx, SKIN, skinPx} from './azhdaha_materials.mjs';
 import {cardX, cardZ, faceEl, faceOfDir} from './mboss_model_lib.mjs';
 
 export const REGION = 'legs';
@@ -41,6 +41,7 @@ for (const l of ALL.map(sfx)) {
 }
 for (const n of ['bracer_mask', 'gaiter_mask']) registerWrap(n);
 registerTile('crystal', 32, 32, 48);
+for (const n of ['crys_lit', 'crys_side', 'crys_dk']) registerTile(n, 16, 32, 48);
 const add = (a, b) => a.map((x, i) => x + b[i]), sc = (v, s) => v.map(x => x * s), dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 
 // ---- solids: facet lofts closed by cut-out discs -----------------------------------------------------------------------
@@ -96,7 +97,7 @@ function solid(axis, st, {n = 16, tex, discTex, seed = 0, caps = '-+', skip = nu
 // averaged over the yaw.
 const FL = ny => (ny >= 0 ? .62 + .38 * ny : .62 + .22 * ny);
 const LIGHT = (nySmooth, nyFace) => clamp(FL(nySmooth) / FL(nyFace), .55, 1.6);
-function baked(name, st, {axis = 'y', n = 16, W = 128, H = 64, seed = 1, per = 9}) {
+function baked(name, st, {axis = 'y', n = 16, W = 128, H = 64, seed = 1, per = 9, albedo: alb = null, D = 32, tiles = false}) {
   const {A: AX, e1, e2} = FRAME[axis];
   const S = sections(st), A = st.map(x => x.a), aMax = Math.max(...A), aMin = Math.min(...A);
   const lerp = (x, y, f) => x + (y - x) * f;
@@ -122,28 +123,50 @@ function baked(name, st, {axis = 'y', n = 16, W = 128, H = 64, seed = 1, per = 9
   discs.push({a: S[0].a0, sec: S[0], side: sideOf(-dir), cap: -dir}, {a: S[S.length - 1].a1, sec: S[S.length - 1], side: sideOf(dir), cap: dir});
   discs.forEach((d, i) => { d.sprite = `${name}_d${i}`; });
   registerWrap(name);
-  const albedo = (x, y) => hidePx(x, y, {per, cell: W / per, seed});
+  const albedo = (x, y, nn) => (alb ? alb(x, y, nn) : hidePx(x, y, {per, cell: W / per, seed}));
+  // tiles: the loft's own ledge rings and caps (straight geometric edges, no alpha-cut disc outlines) retextured to the
+  // body's light-corrected hide tiles by the smooth surface's up component (azhdaha_body tz_lh2..8; no sprite of its own)
+  const AXF = {x: ['east', 'west'], y: ['up', 'down'], z: ['north', 'south']}[axis], C0 = st[0].c || [0, 0];
+  const retile = E => E.map(e => {
+    const fs = Object.keys(e.faces);
+    if (fs.length !== 1 || !AXF.includes(fs[0])) return e;
+    const P = elPoints(e), m = [0, 1, 2].map(i => P.reduce((t, p) => t + p[i], 0) / P.length), a = dot(m, AX), u = dot(m, e1) - C0[0], v = dot(m, e2) - C0[1];
+    const ny = Math.hypot(u, v) < .25 ? 0 : normal(Math.atan2(v, u) * 180 / Math.PI, a).ny, j = Math.max(2, Math.min(8, Math.round((ny + 1) * 4)));
+    const f = e.faces[fs[0]];
+    return {...e, faces: {[fs[0]]: {...f, texture: '#tz_lh' + j, uv: [0, 0, 16, 16]}}};
+  });
   return {
     name, W, H,
-    els: () => [...loft(axis, st, {n, tex: name, ledges: false, caps: '', seed}), ...discs.flatMap(d => disc(axis, d.a, d.sec.r, d.sec.c, d.sprite, d.side, n))],
+    els: () => (tiles ? retile(loft(axis, st, {n, tex: name, ledges: true, caps: '-+', seed}))
+      : [...loft(axis, st, {n, tex: name, ledges: false, caps: '', seed}), ...discs.flatMap(d => disc(axis, d.a, d.sec.r, d.sec.c, d.sprite, d.side, n))]),
     sprites: () => {
       // a facet's own normal is its azimuth k (flat), the smooth one turns continuously across it
       const out = {[name]: [W, H, (u, v) => { const k = Math.floor(u * n) % n, thk = k * 360 / n, th = (u * n - .5) * 360 / n, nn = normal(th, aOf(v));
-        const nyFace = Math.cos(thk * Math.PI / 180) * e1[1] + Math.sin(thk * Math.PI / 180) * e2[1]; return scale(albedo(u * W, v * H), LIGHT(nn.ny, nyFace)); }, false]};
-      for (const d of discs) {
+        const nyFace = Math.cos(thk * Math.PI / 180) * e1[1] + Math.sin(thk * Math.PI / 180) * e2[1]; return scale(albedo(u * W, v * H, nn), LIGHT(nn.ny, nyFace)); }, false]};
+      for (const d of tiles ? [] : discs) {
         const k = 1 / Math.cos(Math.PI / n), R = d.sec.r.map(x => x * k);
-        out[d.sprite] = [32, 32, (u, v) => {
+        out[d.sprite] = [D, D, (u, v) => {
           if (ngonEdge(u, v, n) < 0) return TRANSPARENT;
           const p = 2 * u - 1, q = 1 - 2 * v, x = p * (p >= 0 ? R[0] : R[2]), y = q * (q >= 0 ? R[1] : R[3]);
           const th = Math.atan2(y, x) * 180 / Math.PI, side = normal(th, d.a);
           const capN = d.cap ? d.cap * AX[1] : 0, rho = Math.min(1, Math.hypot(p, q));
           const ny = d.cap ? lerp(capN, side.ny, rho * rho) : side.ny, nyFace = (d.side === '+' ? 1 : -1) * AX[1];
-          return scale(albedo(64 + x * 24, 64 + y * 24), LIGHT(ny, nyFace));
+          return scale(albedo(64 + x * 32, 64 + y * 32, {ny, nf: side.nf}), LIGHT(ny, nyFace));
         }, false];
       }
       return out;
     },
   };
+}
+// A-frame sample points of an element (corners, centre, edge midpoints) after its rotation (as azhdaha_body elPoints)
+function elPoints(e) {
+  const lo = [8 - e.to[0], e.from[1] - 8, e.from[2] - 8], hi = [8 - e.from[0], e.to[1] - 8, e.to[2] - 8], pts = [];
+  for (const x of [lo[0], (lo[0] + hi[0]) / 2, hi[0]]) for (const y of [lo[1], (lo[1] + hi[1]) / 2, hi[1]]) for (const z of [lo[2], (lo[2] + hi[2]) / 2, hi[2]]) pts.push([x, y, z]);
+  if (!e.rotation) return pts;
+  const {axis, angle, origin} = e.rotation, O = [8 - origin[0], origin[1] - 8, origin[2] - 8], g = (axis === 'x' ? angle : -angle) * Math.PI / 180, c = Math.cos(g), s = Math.sin(g);
+  return pts.map(([x, y, z]) => { const q = [x - O[0], y - O[1], z - O[2]];
+    const r = axis === 'x' ? [q[0], q[1] * c - q[2] * s, q[1] * s + q[2] * c] : axis === 'y' ? [q[0] * c + q[2] * s, q[1], -q[0] * s + q[2] * c] : [q[0] * c - q[1] * s, q[0] * s + q[1] * c, q[2]];
+    return [r[0] + O[0], r[1] + O[1], r[2] + O[2]]; });
 }
 // zero-thickness facet elements made two-sided (the crown staves are seen from inside over the upper arm)
 const OPP = {north: 'south', south: 'north', east: 'west', west: 'east', up: 'down', down: 'up'};
@@ -181,44 +204,71 @@ function claw(kind, [x, y, z], look) {
 }
 
 // ---- fore leg -----------------------------------------------------------------------------------------------------------------
-// Upper arm (rest-aligned, origin at the shoulder): the muscle mass bulges out above the bracer and sinks into its crown.
-// Stations: a = height below the shoulder, r = [outer +X, front -Z, inner -X, back +Z], c = [x, forward].
-// R3 seam: the R2 top cap (r .42 at a +.32 over r .76 at +.06) stood up to 1 b out of the hump as a lidded knob. The
-// stations above the joint now lean in (c x -.75 / -.5) so the prisms above y 3.72 stay inside the flank (a loft
-// prism takes its stations' midpoint profile), and the mass bulges out of the flank from y 3.55 down.
-const UARM = [{a: .3, r: [.3, .35, .3, .35], c: [-.75, .02]}, {a: .12, r: [.45, .55, .45, .55], c: [-.5, .04]}, {a: -.05, r: [.65, .72, .6, .72], c: [-.1, .05]},
-  {a: -.3, r: [.92, .9, .74, .88], c: [.34, .07]},
-  {a: -.75, r: [.93, .86, .74, .84], c: [.48, .1]}, {a: -1.15, r: [.76, .74, .68, .74], c: [.64, .13]}, {a: -1.5, r: [.6, .6, .56, .6], c: [.7, .15]}];
-const UARM_B = baked('uarm_hide', UARM, {seed: 61, W: 128, H: 48});
-const uarm = () => UARM_B.els();
+// R3b (r3_critique 3.1 b, 6.1): the upper-arm and haunch MASSES as "bi-lofts": the same ellipsoid lofted twice, once along z
+// (its outline round from the front / back) and once along x (round from the side), each inscribed in the other's
+// silhouette, so the mass reads rounded from both views (a single loft is a stepped drum seen across its axis).
+// Light-corrected wraps + discs (baked) painted with the torso's skin (materials skinPx), umber toward the top and back.
+// ell: {c: [x, y, z] centre (part frame), x: [inner, outer], y: [down, up], z: [front, back]} radii; ts: station params.
+const sq1 = t => Math.sqrt(Math.max(0, 1 - t * t));
+// Each loft is INSCRIBED in the ellipsoid: a loft section takes the mean of its two stations, so the station scales are
+// chosen to keep every section inside sqrt(1 - t^2) over its whole length (narrow central section, scale 0.99), and each
+// loft's flat-sided sections then stay inside the other loft's round (circumscribed 16-gon) outline: the front view shows
+// the z-loft's round outline over the x-loft's smooth front facets, the side view the reverse. ts / ks: station params.
+const TSM = [-.95, -.6, -.15, .15, .6, .95], KSM = [0, .61, .989, .989, .61, 0];
+function ellStations(axis, E, ts = TSM, ks = KSM, box = .1) {
+  const [cx, cy, cz] = E.c;
+  return ts.map((t, i) => {
+    const k = Math.max(.04, ks[i]);
+    if (axis === 'z') return {a: cz + t * (t < 0 ? E.z[0] : E.z[1]), r: [E.x[1] * k, E.y[1] * k, E.x[0] * k, E.y[0] * k], c: [cx, cy], box};
+    return {a: cx + t * (t < 0 ? E.x[0] : E.x[1]), r: [E.z[0] * k, E.y[1] * k, E.z[1] * k, E.y[0] * k], c: [-cz, cy], box};
+  });
+}
+// skin albedo of the masses: the torso skin (warts), darker umber toward the top and the back (v3 f1560 haunches)
+const massAlbedo = (seed, umber) => (x, y, nn) => {
+  let c = skinPx(x * 1.3 + seed * 37, y * 1.3, {seed, warts: .45});
+  if (nn) c = mix(c, mix(SKIN(.85), C('#4A3528'), .5), umber * clamp(.35 * nn.ny + .45 * Math.max(0, -nn.nf) + .1));
+  return c;
+};
+// (the x-lofts start inside the body: their inner end is buried)
+const TSX = TSM.slice(1), KSX = KSM.slice(1);
+// Upper arm (rest-aligned, origin at the shoulder [2.25, 3.6, -2.05]): one big shoulder muscle about 2.6 b across, centred
+// 0.4 b outside and 0.5 b below the joint: its top slopes up into the hump, it overhangs the bracer crown by ~0.2 b in
+// the front view and sinks into the crown below.
+const UARM_E = {c: [.42, -.5, -.08], x: [.95, 1.3], y: [.88, 1.08], z: [1.0, .92]};
+const UARM_Z = baked('uarm_hz', ellStations('z', UARM_E), {axis: 'z', seed: 61, W: 128, H: 64, albedo: massAlbedo(61, .35), tiles: true});
+const UARM_X = baked('uarm_hx', ellStations('x', UARM_E, TSX, KSX), {axis: 'x', seed: 63, W: 128, H: 64, albedo: massAlbedo(63, .35), tiles: true});
+const uarm = () => [...UARM_Z.els(), ...UARM_X.els()];
 // Bracer (bone-aligned, origin at the elbow, the column down to the wrist at -ARM[1]): a regular octagon (8 staves),
 // the body r .78 from the elbow down, a flared foot rim r .86; above, the crown band of ragged pointed stave tips
 // (cut-out wrap sprite, two-sided). The 8-sided wrap sprite carries the carved lines and the gold studs.
 const BR_TOP = .08, BR_BOT = -ARM[1] - .24, BR_FLARE = -ARM[1] + .32, BR_TEETH = .13;
-const BRACER = [{a: BR_TOP, r: .78}, {a: BR_FLARE + .3, r: .78}, {a: BR_FLARE - .05, r: .85}, {a: BR_BOT, r: .9}];
-const CROWN = {top: .46, bot: .04, r: .83};
+// (R3b, r3_critique 5.1: a near-straight column, body r .74, foot r .8 (was .78 / .9); the crown teeth taller and dark)
+const BRACER = [{a: BR_TOP, r: .74}, {a: BR_FLARE + .3, r: .74}, {a: BR_FLARE - .05, r: .78}, {a: BR_BOT, r: .8}];
+const CROWN = {top: .6, bot: .04, r: .79};
 function bracer(look) {
   const s = sfx(look);
   // the foot rim is serrated (cut-out points over the claws, v2 f0600 / v4 f1680): the bottom lid sits above the points
   const els = solid('y', BRACER, {n: 8, tex: 'bracer' + s, discTex: 'disc8_pawstone' + s, seed: 71, caps: ''});
-  els.push(...disc('y', BR_BOT + BR_TEETH, .9 * .97, [0, 0], 'disc8_pawstone' + s, '-', 8));
+  els.push(...disc('y', BR_BOT + BR_TEETH, .8 * .97, [0, 0], 'disc8_pawstone' + s, '-', 8));
   els.push(...twoSided(loft('y', [{a: CROWN.top, r: CROWN.r}, {a: CROWN.bot, r: CROWN.r}], {n: 8, tex: 'crown' + s, ledges: false, seed: 73})));
   els.push(...disc('y', BR_TOP - .015, CROWN.r, [0, 0], 'disc8_pawstone' + s, '+-', 8));
   els.push(...elbowCrystals());
   return els;
 }
-// Amber hexagonal prisms: two crossed cut-out cards (the side profile and the face-on card) round a core box, all
-// leaning back (+Z) by `lean` degrees (45: the elbow crystals, painted side card; 22.5: the near-upright heel spur).
-// (Element rotation +deg about X tips the top toward +Z, the back; R1 tilted the face card and box forward by mistake.)
-function prism([x, y, z], L, w, lean = 45) {
-  const els = [], P = [x, y, z];
-  if (lean === 45) els.push(cardX('crystal_lean', x, {Z0: z - .15 * L, Z1: z + .85 * L, Y0: y, Y1: y + .85 * L}));
-  else els.push(cardX('crystal_up', x, {Z0: z - w / 2, Z1: z + w / 2, Y0: y, Y1: y + L}, {rot: ['x', lean, P]}));
-  els.push(cardZ('crystal_up', z, {X0: x - w / 2, X1: x + w / 2, Y0: y, Y1: y + L}, {rot: ['x', lean, P]}));
-  els.push(rockBox([x - w * .3, y, z - w * .3], [x + w * .3, y + L * .8, z + w * .3], 'crystal', {rot: ['x', lean, P]}));
-  return els;
+// Amber crystal prisms (R3b, r3_critique 5.2 / 6.2): a SOLID core at the full width (0.3-0.4 b square, 0.78 of the
+// length) with three-tone facets (the faces turned up / forward lit #FFD98A, the sides amber #E07A2A, the faces turned
+// down / back red-brown #7E3014), a narrower capping box and two crossed cut-out cards that carry the pointed tip and a
+// lit ridge; all leaning back (+Z) by `lean` degrees (45: the elbow crystals; 22.5: the heel spur).
+function prism([x, y, z], L, w, lean = 45, seed = 0) {
+  const P = [x, y, z], rot = ['x', lean, P], h = w / 2;
+  return [
+    rockBox([x - h, y - .06, z - h], [x + h, y + L * .72, z + h], {all: 'crys_side', up: 'crys_lit', front: 'crys_lit', back: 'crys_dk', down: 'crys_dk'}, {rot, seed: seed + 1}),
+    cardX('crystal_up', x, {Z0: z - h * 1.3, Z1: z + h * 1.3, Y0: y, Y1: y + L}, {rot}),
+    cardZ('crystal_up', z, {X0: x - h * 1.3, X1: x + h * 1.3, Y0: y, Y1: y + L}, {rot}),
+  ];
 }
-const elbowCrystals = () => [...prism([.3, .05, .62], 1.0, .3), ...prism([-.12, .12, .66], .88, .28), ...prism([.62, -.25, .42], .78, .26), ...prism([.08, -.32, .74], .66, .24)];
+// lengths 1.1 / 1.25 / 0.9 / 1.0 b, 0.32-0.38 b thick (v3 f0720 / f1170)
+const elbowCrystals = () => [...prism([.3, .05, .62], 1.1, .36, 45, 1), ...prism([-.12, .12, .66], 1.25, .38, 45, 5), ...prism([.62, -.25, .42], .9, .32, 45, 9), ...prism([.08, -.32, .74], 1.0, .34, 45, 13)];
 // Paw (origin at the wrist, sole at -0.5): the pale knuckle pad under the bracer rim, 4 toes (octagonal knuckles) with
 // the 4 talons, the dew claw high on the inner side.
 const PAW = [{a: .44, r: [.48, .08, .48, .28], c: [0, -.2]}, {a: .16, r: [.76, .24, .76, .3], c: [0, -.2]}, {a: -.55, r: [.92, .26, .92, .3], c: [0, -.2]}];
@@ -236,41 +286,47 @@ function paw(look) {
 }
 
 // ---- hind leg -----------------------------------------------------------------------------------------------------------------
-// Haunch (rest-aligned, origin at the hip): a big rounded mass lofted ACROSS the body (x, from inside the pelvis out to the
-// lateral bulge), so its side outline is the smooth 16-gon; it hides the knee and the shin, and its underside sits on the
-// gaiter collar (the hock is hip-relative (0.5, -1.5, 0.45)). Stations: a = x, r = [front, up, back, down], c = [fwd, up].
-// The lateral bulge sits low (centre ~2.3 b up) so its top runs into the flank instead of standing out as a wheel.
-// R3 seam: the inner stations' tops (r up .9 / 1.1 / .97) stood 0.15-0.3 b out of the flank above the bulge as a knob;
-// they now stay under the hull's flank (y 3.40 at x 2.15, 3.19 at x 2.55), so the haunch's top runs into the flank.
-const THIGH = [{a: -.55, r: [.9, .8, .9, .8], c: [-.05, -.5]}, {a: .15, r: [1.12, .95, 1.08, .95], c: [-.05, -.55]}, {a: .55, r: [1.1, .8, 1.06, .96], c: [-.05, -.61]},
-  {a: .82, r: [1.0, .8, .97, .9], c: [-.05, -.68]}, {a: 1.03, r: [.86, .64, .84, .8], c: [-.05, -.74]}, {a: 1.2, r: [.66, .5, .64, .62], c: [-.05, -.79]},
-  {a: 1.32, r: [.44, .34, .43, .42], c: [-.05, -.82]}, {a: 1.39, r: [.22, .18, .22, .2], c: [-.05, -.83]}];
-const THIGH_B = baked('thigh_hide', THIGH, {axis: 'x', seed: 91, W: 128, H: 48});
-const thigh = () => THIGH_B.els();
+// Haunch (rest-aligned, origin at the hip [2.0, 3.0, 2.45]; R3b, r3_critique 6.1): a teardrop from two overlapping
+// masses: the big haunch (half buried in the pelvis, outer edge <= 3.0 b from the midline, top merged into the flank) as a
+// bi-loft, and the knee mass at its front-lower end (an x-loft, round from the side) about 0.6 b ahead of the gaiter top;
+// the thick shin runs back and down from the knee to the hock under it.
+const HAUNCH_E = {c: [.3, -.42, .15], x: [.85, .7], y: [.95, .94], z: [1.05, 1.02]};
+const KNEE_E = {c: [.3, -1.0, -.62], x: [.45, .52], y: [.5, .45], z: [.48, .5]};
+const THIGH_Z = baked('thigh_hz', ellStations('z', HAUNCH_E), {axis: 'z', seed: 91, W: 128, H: 64, albedo: massAlbedo(91, .55), tiles: true});
+const THIGH_X = baked('thigh_hx', ellStations('x', HAUNCH_E, TSX, KSX), {axis: 'x', seed: 93, W: 128, H: 64, albedo: massAlbedo(93, .55), tiles: true});
+const KNEE_X = baked('thigh_kx', ellStations('x', KNEE_E, TSX, KSX), {axis: 'x', seed: 95, W: 96, H: 32, albedo: massAlbedo(95, .45), tiles: true});
+const thigh = () => [...THIGH_Z.els(), ...THIGH_X.els(), ...KNEE_X.els()];
 // Shin (bone-aligned, origin at the knee, down to the hock at -LEG[1]): an octagonal hide limb.
-const shin = () => solid('y', [{a: .3, r: .42}, {a: -.55, r: .42}, {a: -.62, r: .36}, {a: -LEG[1] - .1, r: .34}], {n: 8, tex: 'hide', discTex: 'disc8_hide', seed: 101});
+// (R3b: >= 1.1 b thick, so the cuff is no neck under the haunch)
+const shin = () => solid('y', [{a: .2, r: .42}, {a: -.55, r: .5}, {a: -LEG[1] + .1, r: .6}, {a: -LEG[1] - .15, r: .6}], {n: 8, tex: 'hide', discTex: 'disc8_hide', seed: 101});
 // Foot (origin at the hock, 1.5 b up; sole at -1.5): the gaiter column. Collar a +.22 .. -.3 (dark carved stone, the
 // spur and two gold knobs at the back), core r .6 (the dark grooves), 4 rings, the plinth, 3 toes + 1.
-const RING = {top: -.32, h: .17, gap: .055, n: 4, r0: .675, dr: .016};
+// R3b (r3_critique 6.1 / 6.3): the rings widen toward the floor (r .64 -> .76, an elephant foot), each 0.06 b proud of
+// the groove core, and the column leans its top 0.14 b forward over the flat plinth (the stations step forward ring by
+// ring), so the hock reads behind the gaiter top; the plinth flares to r .86.
+const RING = {top: -.32, h: .17, gap: .055, n: 4, r0: .64, dr: .04};
 RING.bot = RING.top - RING.n * RING.h - (RING.n - 1) * RING.gap;
-const RING_ST = (() => { const out = []; for (let k = 0; k < RING.n; k++) { const a = RING.top - k * (RING.h + RING.gap), r = RING.r0 + RING.dr * k; out.push({a, r}, {a: a - RING.h, r}); } return out; })();
+const LEAN = a => +(.14 * clamp((a - RING.bot) / (.24 - RING.bot))).toFixed(4);
+const RING_ST = (() => { const out = []; for (let k = 0; k < RING.n; k++) { const a = RING.top - k * (RING.h + RING.gap), r = RING.r0 + RING.dr * k; out.push({a, r, c: [0, LEAN(a)]}, {a: a - RING.h, r, c: [0, LEAN(a)]}); } return out; })();
 const ringSec = i => i % 2 === 1;   // the odd sections of RING_ST are the grooves (the core shows there)
-const COLLAR = [{a: .24, r: [.76, .7, .72, .84]}, {a: -.3, r: [.76, .7, .72, .84]}];
-const PLINTH = [{a: RING.bot + .03, r: [.8, .74, .76, .7], c: [0, .02]}, {a: -1.47, r: [.82, .78, .78, .72], c: [0, .04]}];
+const COLLAR = [{a: .24, r: [.76, .7, .72, .84], c: [0, LEAN(.24)]}, {a: -.3, r: [.76, .7, .72, .84], c: [0, LEAN(-.3)]}];
+const PLINTH = [{a: RING.bot + .03, r: [.8, .76, .78, .74], c: [0, .02]}, {a: -1.47, r: [.86, .84, .84, .8], c: [0, .04]}];
 const HTOES = [[.47, -.84], [0, -.9], [-.47, -.84]];
 function foot(look) {
   const s = sfx(look), els = [];
   els.push(...solid('y', COLLAR, {tex: 'collar' + s, discTex: 'disc16_pawstone' + s, seed: 105}));
-  els.push(...prism([0, .06, .66], .95, .32, 22.5));
-  for (const x of [-.3, .3]) els.push(rockBox([x - .07, -.14, .8], [x + .07, 0, .9], 'gold', {seed: 7 + x}));
-  els.push(...loft('y', [{a: .16, r: .62}, {a: RING.bot - .02, r: .62}], {tex: 'gcore' + s, ledges: false, seed: 107}));
+  // the heel spur: a faceted crystal cone on the back of the gaiter top, 0.34 b thick, 0.85 b long (the gold studs are
+  // painted flush on the collar, collarPaint)
+  els.push(...prism([0, -.04, .7], .85, .34, 22.5, 17));
+  els.push(...loft('y', [{a: .16, r: .6, c: [0, LEAN(.16)]}, ...RING_ST.map(t => ({...t, r: t.r - .06})), {a: RING.bot - .02, r: RING.r0 + RING.dr * (RING.n - 1) - .06, c: [0, 0]}],
+    {tex: 'gcore' + s, ledges: false, seed: 107}));
   // the rings: one loft over all ring stations (the wrap sprite runs down the whole column), grooves left out; each ring
   // gets an up disc (seen from above) and a down disc (seen when the foot is lifted), except where collar / plinth cover
   els.push(...loft('y', RING_ST, {tex: 'gaiter' + s, ledges: false, seed: 109, skip: (k, th, i) => ringSec(i)}));
   for (let k = 0; k < RING.n; k++) {
     const a = RING.top - k * (RING.h + RING.gap), r = RING.r0 + RING.dr * k;
-    if (k > 0) els.push(...disc('y', a, r, [0, 0], 'disc16_toestone' + s, '+'));
-    if (k < RING.n - 1) els.push(...disc('y', a - RING.h, r, [0, 0], 'disc16_toestone' + s, '-'));
+    if (k > 0) els.push(...disc('y', a, r, [0, LEAN(a)], 'disc16_toestone' + s, '+'));
+    if (k < RING.n - 1) els.push(...disc('y', a - RING.h, r, [0, LEAN(a)], 'disc16_toestone' + s, '-'));
   }
   els.push(...solid('y', PLINTH, {tex: 'plinth' + s, discTex: 'disc16_toestone' + s, seed: 111}));
   HTOES.forEach(([x, front], i) => {
@@ -327,7 +383,7 @@ const TIP = {null: ramp(['#C9BFAE', '#A89E8C', '#7E7466', '#554C43']), hydro: ra
 // (u .75); v from the top of the loft down. Carved lines are dark grooves with a lit lower lip (Geo) or the element glow.
 const glowOf = look => (look ? LOOK_PAL[look].glow : null);
 // bracer body (a BR_TOP .. BR_BOT): x / y in blocks round the octagon / down the column
-const BR_H = BR_TOP - BR_BOT, BR_C = 8 * 2 * .78 * Math.tan(Math.PI / 8);
+const BR_H = BR_TOP - BR_BOT, BR_C = 8 * 2 * .74 * Math.tan(Math.PI / 8);
 function bracerLine(u, v) {
   const x = u * BR_C, y = v * BR_H;
   let d = Math.min(Math.abs(y - .22), Math.abs(y - (BR_H - .5)));                     // rim lines (top, above the flare)
@@ -373,7 +429,7 @@ function bracerPaint(look) {
 // crown: 8 stave tips above the body, cut out to ragged points (height .42 b round the octagon)
 const CR_H = CROWN.top - CROWN.bot;
 function crownTop(s) {
-  const k = Math.floor(s * 8) % 8, f = (s * 8) % 1, peak = .3 + .4 * hash(k, 3), H = .22 + .2 * hash(k, 7);
+  const k = Math.floor(s * 8) % 8, f = (s * 8) % 1, peak = .3 + .4 * hash(k, 3), H = .3 + .2 * hash(k, 7) + (k >= 5 ? .06 : 0);
   const tooth = H * Math.max(0, 1 - Math.abs(f - peak) / (.42 + .1 * hash(k, 11)));
   const notch = .04 * Math.sin(f * 17 + k);
   return .1 + tooth + notch;                                                           // height above the crown bottom
@@ -385,7 +441,8 @@ function crownPaint(look) {
     if (y > top) return TRANSPARENT;
     let c = R(t0 - .04 + .16 * (N.a(s * 30, y * 8) - .5));
     c = mix(c, R(.08), .2 * smooth(.3, 0, Math.abs(f - .35)));
-    if (top - y < .035) c = lift(c, .35);                                               // lit broken edge
+    c = mix(c, R(.97), .75 * smooth(.14, .34, y));                                     // the teeth darken to #24150F (v3 f2100)
+    if (top - y < .03) c = lift(c, .22);                                                // lit broken edge
     if (f < .035 || f > .965) c = sink(c, .5);
     if (G && Math.abs(y - .12) < .018) c = G(.2);
     return c;
@@ -455,6 +512,11 @@ function collarPaint(look) {
     const ln = Math.abs(y - (.36 + .03 * Math.sin(s * Math.PI * 12)));
     if (ln < .012) c = G ? G(.2) : sink(c, .45);
     else if (ln < .022 && !G) c = lift(c, .12);
+    for (const su of [.705, .795]) {                                                   // two flush gold studs at the back
+      const r = Math.hypot((s - su) * 4.6, y - .2);
+      if (r < .06) c = PAL.gold(clamp(.2 + r * 5 - (y - .2) * 4));
+      else if (r < .075) c = sink(c, .5);
+    }
     return c;
   };
 }
@@ -509,9 +571,18 @@ function clawKite(kind, look) {
   };
 }
 function crystalCard(lean) {
+  if (!lean) return (s, t) => {
+    const y = 1 - t, x = Math.abs(s - .5) * 2, w = y < .62 ? .98 : .98 * (1 - y) / .38;
+    if (x > w || y < 0) return TRANSPARENT;
+    const a = x / Math.max(w, .02);
+    let c = PAL.crystal(clamp(.12 + .55 * a * a + .2 * (1 - y) * (1 - a) + .05 * (N.a(s * 6, t * 10) - .5)));
+    if (a < .12) c = lift(c, .35);                                                       // the lit ridge
+    if (a > .86) c = PAL.crystal(.85);                                                   // the dark rim
+    return c;
+  };
   return (s, t) => {
     const y = 1 - t, x = lean ? s - .15 - .7 * y : s - .5;
-    const w = .22 * (y < .78 ? 1 : (1 - y) / .22);
+    const w = lean ? .22 * (y < .78 ? 1 : (1 - y) / .22) : .47 * (y < .7 ? 1 : (1 - y) / .3);
     if (Math.abs(x) > w || y < 0) return TRANSPARENT;
     let c = PAL.crystal(clamp(.9 - y * .95));
     if (x > 0) c = sink(c, .18);
@@ -527,7 +598,7 @@ export function sprites() {
     S['bracer' + s] = [256, 112, bracerPaint(look), false];
     S['crown' + s] = [128, 32, crownPaint(look), false];
     S['gaiter' + s] = [256, 48, gaiterPaint(look), false];
-    S['plinth' + s] = [256, 32, plinthPaint(look), false];
+    S['plinth' + s] = [look ? 128 : 256, 32, plinthPaint(look), false];   // (R3b: the element looks at half width: atlas room for the masses)
     S['collar' + s] = [128, 32, collarPaint(look), false];
     S['toestone' + s] = [64, 64, toestone(look), false];
     S['gcore' + s] = [32, 32, gcore(look), false];
@@ -538,12 +609,15 @@ export function sprites() {
     S['disc16_toestone' + s] = [48, 48, discPaint(16, toestone(look)), false];
     S['disc8_toestone' + s] = [32, 32, discPaint(8, toestone(look)), false];
   }
-  Object.assign(S, UARM_B.sprites(), THIGH_B.sprites());
+  Object.assign(S, UARM_Z.sprites(), UARM_X.sprites(), THIGH_Z.sprites(), THIGH_X.sprites(), KNEE_X.sprites());
   S.disc8_hide = [32, 32, discPaint(8, TILES.hide[3]), false];
   S.bracer_mask = [256, 112, linesMask(bracerLine), true];
   S.gaiter_mask = [256, 48, linesMask(gaiterLine, .009), true];
   S.crystal_lean = [32, 64, crystalCard(true), false];
   S.crystal_up = [32, 64, crystalCard(false), false];
   S.crystal = [32, 32, (u, v) => PAL.crystal(.3 + .4 * v), false];
+  S.crys_lit = [16, 32, (u, v) => mix(PAL.crystal(.04 + .14 * v + .06 * (N.a(u * 4, v * 8) - .5)), C('#FFF2C8'), .25 * smooth(.3, 0, Math.abs(u - .35))), false];
+  S.crys_side = [16, 32, (u, v) => PAL.crystal(.42 + .14 * v + .08 * (N.b(u * 4, v * 8) - .5)), false];
+  S.crys_dk = [16, 32, (u, v) => PAL.crystal(.78 + .16 * v + .06 * (N.c(u * 4, v * 8) - .5)), false];
   return S;
 }

@@ -1,10 +1,12 @@
-# 야타용왕 (Azhdaha · 봉인된 바위 용의 왕) rig: API contract (stage R3a)
+# 야타용왕 (Azhdaha · 봉인된 바위 용의 왕) rig: API contract (stage R3b)
 
 This is the contract between the Azhdaha display-entity rig and the chapter-1 boss module (not written yet). Stage R1
 delivered the model, the skeleton, the element looks, the body states and the hit-proxy points; R2 refined the four
 regions in parallel; R3 integrated them (seams, the RIGLIB shared libraries, the fixed UUID table, per-region budgets,
 the root-offset rule, `look/petrify` and `glow/gold_*`; §11). R3a authored the 41 motion clips of plan.md §3 and wrote
-the manifest in schema v1 (`az/contract/manifest.md`; §6, §7, §12); the R1 static poses survive as `dbg_*` clips. Binding decisions: scratchpad `az/plan.md` "Rig decisions" R1-R11, Rig decision
+the manifest in schema v1 (`az/contract/manifest.md`; §6, §7, §12); the R1 static poses survive as `dbg_*` clips. R3b
+polished the model from `rigwork/r3_critique.md` and fixed poses without changing a clip name, length, event tick or
+the manifest schema (§13). Binding decisions: scratchpad `az/plan.md` "Rig decisions" R1-R11, Rig decision
 changes 1-3, §3 and the change notes; `az/contract/manifest.md`; references `az/understand/model.md`, `motion.md`,
 `rigtech.md`.
 
@@ -18,10 +20,10 @@ tail in parallel (plan.md R9):
 | `azhdaha_clips.mjs` | R3a: the binding clip table `CLIP_TABLE` (name, played / authored length, loop / next, RETIME knots, events at played ticks), the clip specs (key poses, foot plans, overlays, springs, hidden spans, states, anchors) baked by `bake()` into dense per-played-tick keys, `MIRRORS` (the `_r` clips derived from the `_l` ones), `RESPAWN_CLIP`, `TRACK_CLIPS`, `DEFAULT_POSE`, the tail curves (`TAIL_*`, `PILLAR_ROOT`), the `dbg_*` poses, helpers `tailUp`, `fore`, `hind` |
 | `azhdaha_geometry.mjs` | thin aggregator: `PARTS`, `partModels()`, `LOOKS`, `TINTED`, `LOOK_BRIGHT` over the four region modules |
 | `azhdaha_paint.mjs` | thin aggregator: `azhdahaSprites(keep)`, `spriteRegions()`, `paintAzhdahaTextures()`, `spriteId()`, the 1.2 M px atlas budget |
-| `azhdaha_head.mjs` | head (V-wedge mask plates, brow ledges and wings, keel blade, a two-rank crown of gold-rimmed blades and crest fins, cheek guards, the ear plates 回 on their mounts, rounded skull, palate, upper teeth), jaw (V chin shield over a V-wedge lower jaw: cheek plates, underside, mouth floor, teeth, fangs, tongue), eyes (slits), horns (broad gold sleeve band bent into a C, rim wrapped round its rounded lower end, meander face, dome stud knob, carded dark horn), beard bibs |
-| `azhdaha_body.mjs` | chest / belly / pelvis, neck, apron (+ glow overlay), the four dorsal plate groups, the three gold crystal groups |
-| `azhdaha_legs.mjs` | upper arms, engraved octagonal bracers (ragged crown, painted gold studs, amber elbow crystals), paws (knuckles, 4 talons, dew claw), haunches, shins (`gaiter_*`), the ribbed gaiter columns on `foot_*` (collar, heel spur, rings, plinth, 3 + 1 talons), the four leg glow overlays |
-| `azhdaha_tail.mjs` | t1..t8 (a broad lens-section body: cream ventral face with the gold midrib and chevrons, dark scale-plated flanks, the ridge blades, the V-fan side rows and the flank plates; collared, capped joints), the gnarled leafy branch t6..t8 and the tip (thorns, twigs, leaf sprays / blossoms), `tail_skirt` (the cream rump plate under the tail root, rigid with the pelvis), the tail's per-part culling boxes (`CULL_BOX`) |
+| `azhdaha_head.mjs` | head (V-wedge mask plates, brow ledges and wings, keel blade, a two-rank crown of gold-rimmed blades and crest fins, cheek guards, the ear plates 回 on their mounts, rounded skull, palate, upper teeth), jaw (V chin shield over a V-wedge lower jaw: cheek plates, underside, mouth floor, teeth, fangs, tongue), eyes (slits), horns (broad gold sleeve band bent into a C, gold-first meander inlay, bright outer rim and a dark inner lip, the ball knob at the band's lower end, the long dark horn flaring outward), beard bibs (card-only layers with thin top lips) |
+| `azhdaha_body.mjs` | chest / belly / pelvis (sagging hide bands, scute rows, the rump ending inside t1), neck, apron (+ glow overlay), the four dorsal plate groups (saw-tooth profiles, left/right jitter), the three gold crystal groups (broad trident blades with solid cores) |
+| `azhdaha_legs.mjs` | upper arms (round shoulder masses), engraved octagonal bracers (ragged dark crown, painted flush gold studs, solid amber elbow crystals), paws (knuckles, 4 talons, dew claw), haunches (round haunch + knee masses), shins (`gaiter_*`), the ribbed gaiter columns on `foot_*` (collar, crystal heel spur, forward-leaning rings, flared plinth, 3 + 1 talons), the four leg glow overlays |
+| `azhdaha_tail.mjs` | t1..t8 (a broad lens-section body: cream ventral face with the gold midrib and chevrons, dark scale-plated flanks, the ridge blades, the V-fan side rows and the flank plates; collared, capped joints), the gnarled leafy branch t6..t8 and the tip (thorns, twigs, leaf sprays / blossoms), `tail_skirt` (R3b: the cream rump bell under the tail root, a flap hinged at t1, §13), the tail's per-part culling boxes (`CULL_BOX`) |
 | `azhdaha_shape.mjs` | R3: the 3-line re-export shim of the shared `mboss_shape_lib.mjs` (RIGLIB; loft, slab, crossCards, rockBox, retex, mirrorX, tile UV registry); the region modules keep their imports |
 | `azhdaha_materials.mjs` | shared palette ramps (model.md §4) and the shared tile sprites (hide, cream, plate, gold, horn, mouth; the R1 tiles no model uses any more, `hide_lg hide_dk talon bark* dark`, stay defined but are not painted) |
 
@@ -94,8 +96,8 @@ body, on the floor under the centre of the four feet). Call them `as` the anchor
   apron glow_apron plates_neck plates_sh plates_mid plates_hip crys_sh crys_mid crys_hip`), legs 16 (`uarm_* bracer_*
   paw_* thigh_* gaiter_* foot_*` x2 and `glow_bracer_* glow_gaiter_*`), tail 10 (`t1..t8 tip tail_skirt`; the skirt rides
   the pelvis at the tail root, hidden with the body, and flashes with the `rear` group).
-- Per tick: 47 `tp` (follow) + dispatch + the keys of the current clip. Elements shown at once: 4 335 at rest in Geo,
-  at most 4 465 (Hydro legs + Geo tail) over the 9 look combinations; the build fails above 8 000 (rigtech.md §2.2:
+- Per tick: 47 `tp` (follow) + dispatch + the keys of the current clip. Elements shown at once (R3b): 5 618 at rest in Geo,
+  at most 5 748 (Hydro legs + Geo tail) over the 9 look combinations; the build fails above 8 000 (rigtech.md §2.2:
   6-8 k visible is the client budget).
 
 ## 3. Body states (plan.md R7, rigtech.md §4, contract §4.6)
@@ -267,16 +269,17 @@ width `w` and top margin from `layout`; its top is 0 (hidden) when the bone is a
   0x01-0x3F); part names outside the tag space above; at most 16 hit proxies.
 - Per-region budgets (plan.md §3.1, atlas px rebalanced by change note 1), fail when exceeded:
 
-  | region | parts | sprite px | R3 use |
-  |---|---|---|---|
-  | head | 8 | 0.24 M | 7 parts, 0.187 M |
-  | body | 14 | 0.42 M | 14 parts, 0.397 M |
-  | legs | 16 | 0.32 M | 16 parts, 0.314 M |
-  | tail | 10 | 0.16 M | 10 parts, 0.146 M |
-  | shared material tiles | - | 0.06 M | 0.053 M |
-  | total | 48 (cap 56) | 1.2 M | 47 parts, 1.097 M px, 154 sprites |
+  | region | parts | sprite px | R3 use | R3b use |
+  |---|---|---|---|---|
+  | head | 8 | 0.24 M | 7 parts, 0.187 M | 7 parts, 0.182 M |
+  | body | 14 | 0.42 M | 14 parts, 0.397 M | 14 parts, 0.400 M |
+  | legs | 16 | 0.32 M | 16 parts, 0.314 M | 16 parts, 0.306 M |
+  | tail | 10 | 0.16 M | 10 parts, 0.146 M | 10 parts, 0.149 M |
+  | shared material tiles | - | 0.06 M | 0.053 M | 0.053 M |
+  | total | 48 (cap 56) | 1.2 M | 47 parts, 1.097 M px, 154 sprites | 47 parts, 1.09 M px, 137 sprites |
 
-- Elements shown at once <= 8 000 in every look combination (R3: 4 465 max).
+- Elements shown at once <= 8 000 in every look combination (R3: 4 465 max; R3b: 5 748 max, hydro / geo; 11 626
+  elements in all models, 5 618 shown at rest).
 - `checkBounds` on every model (all coordinates within -16..32: reach 1.5 x scale from the joint).
 - Every pose of every clip: no root x travel and no root yaw; a root z offset only on ticks where no body (non-tail)
   part is shown (Rig decision change 1, recorded as `root_z`); the soles of the paws and feet at or above the floor
@@ -321,7 +324,7 @@ height and glide, the charge glide, the burrow travel (module).
   frames must use the tilted frame.
 - Plate groups: the bristle widens a group across X with its flare (`PLATE_SPLAY`), so the side rows roll outward.
 - Gold crystals: slender blades as crossed card pairs along each blade's axis (sprite `shards`, 4 cells of 48 x 128),
-  1-3 per cluster, within the R1 crystal part reach.
+  1-3 per cluster, within the R1 crystal part reach. (R3b: broad trident blades, §13.)
 
 ## 11. R3 integration notes
 
@@ -355,3 +358,53 @@ height and glide, the charge glide, the burrow travel (module).
   should move contract §6.1, the stub and the checker to the real numbers (or the rig re-pins them).
 - The limb stretch reaches 1.08-1.10 at a few transition ticks (turn90 / turn180 steps, the roar and intro landings,
   the chin slam rear) and 1.12 in `dbg_rear_up` (reach 0.27 short: a static R1 pose).
+
+## 13. R3b notes (rig polish from `rigwork/r3_critique.md`)
+
+Clip names, lengths, event ticks and the manifest schema are unchanged; the manifest's poses, tracks, proxies and
+extents follow the new geometry and poses. Renders: scratchpad `az/rigwork/r3b/U2_sheet.jpg` (the U1 layout) and
+`az/rigwork/r3b/P1_before_after.jpg` (the critique's P1 items, before = `r3crit/out`).
+
+- Body (`azhdaha_body.mjs`): the flank's widest line sags from the shoulder to mid-body and rises to the groin (the
+  hide bands follow it instead of level rings); darker, greener hide ramp (`SKIN`, now in `azhdaha_materials.mjs` with
+  `skinPx`, shared with the legs); the scute rows and the plastron rolls repainted darker; hide ledges darkened like
+  the wrap; the rump tapers to end inside t1 and its underside behind the haunches is hide (no cream ledges there);
+  neck1's top stays under the hump (max y 3.96 b vs the chest top 4.29 b); the neck ruff plates sit further forward.
+  Gold crystals: 9 clusters of broad trident blades (0.47-0.62 b across, two-tone gold with a ridge line, a solid
+  core to half length), each with two side prongs at -45 / +45 degrees, rooted 0.22 b inside the hull, left / right
+  copies jittered. Plates: saw-tooth edges, the orange only on the tips of one cell, a ridge line and greyish rims,
+  small extra plates, left / right length and position jitter. Apron: hem lifted at the sides, the meander moved up.
+- Legs (`azhdaha_legs.mjs`): the shoulder (`uarm_*`) and haunch (`thigh_*`) are round masses (the same ellipsoid
+  lofted along z and along x with inscribed stations, ledges retextured to light-corrected tiles), a knee mass on the
+  haunch, a thicker shin; elbow crystals and the heel spur are solid amber prisms with facet cards; the gold cube studs
+  are gone (flush painted studs on the collar); the bracer narrower (r 0.74-0.8) with a taller dark crown; the gaiter
+  rings lean forward and widen downward to a flared plinth.
+- Head (`azhdaha_head.mjs`): the horn sleeve is shorter with gold-first meander inlay, a bright rim and a dark inner
+  lip; the ball knob sits at the band's lower end; the dark horn is longer (top 5.9 b at rest) and flares outward
+  (`PART_SCALE` horn_l / horn_r 2.0 -> 2.7); the beak is a V; narrower jaw cheeks; the beards are card-only layers with
+  thin top lips; saturated eye paint.
+- Tail (`azhdaha_tail.mjs`): the segment cores end tucked inside the next segment; a ventral blade row (mirrored
+  downward blades) on t2..t5; a narrower cream band and irregular scute cells; 8 leaf clusters with bigger sprays.
+  `tail_skirt` (`PART_SCALE` 1.8 -> 2.2) is a lobed bell of bent card strips (the cream centre strip with the gold Y
+  vein, the side strips bent 45 degrees and painted as dark rump hide so that they do not read as a cream plank from
+  the side) with a dark seal box inside t1, hung SKIRT_TILT = 35 degrees bottom-forward under the rump.
+- The skirt flap (`azhdaha_pose.mjs`, after the root transform): it hangs at most `SKIRT_HANG` = 50 degrees from the
+  vertical; where its hem (`SKIRT_HEM`, samples along the lobed hem of all three strips) would go below
+  `SKIRT_FLOOR` = 0.04 b it swings (<= 30 degrees, the way it already leans), then folds into the tail root (its
+  length and wrap depth scaled down to >= 0.05); the guard fades out between root y -0.6 and -1.0 (sinking clips).
+  The skirt is no longer in the clip baker's floor-guard body group (`GROUPS.body`), so it never lifts the root.
+- Poses (`azhdaha_clips.mjs`): `REAR()` swings the apron by -0.8 x the pelvis pitch, so it hangs and covers the
+  rearing chest; the roar_rear / intro fores hang down and a little forward from the shoulders (chest-frame wrist
+  offsets [1.5, -1.65, 1.9] / [1.45, -1.85, 1.7], paws curled), the bracers within ~30 degrees of the body axis and
+  clear of the head from the side; `TAIL_HIGH`'s branch (t5-t8) curls further over the back so the raised tip of
+  tail_whip_l / _r and tail_slam stays inside its 18 b culling box (it overshot by 0.19 / 0.38 b). No culling
+  warnings remain.
+- Floor (`rigwork/r3b/tools/ck.mjs`, every played tick of every clip, the skirt by its hem samples): the skirt no
+  longer touches the floor in any clip (it dipped up to 0.9 b in the rear-ups before the fold); the R3a bracer rim
+  contacts in the turns, the whip and the charge coil are gone with the narrower bracer. Left: the chin slam jaw
+  (0.16 b on played 36-39, the contact span), jump_slam paw_l 0.14 b at t6 (the crouch), burrow_dive foot_r 0.23 b
+  at t17 (the dive), p3_sink paw_r 0.11 b at t11, and soles at -0.06 b in a few charge_run / jump_slam ticks.
+- head_up: the beard ends about 1 b ahead of the apron when the head rises; the throat between them shows the neck's
+  cream underside ledges, not the dark hide (`rigwork/r3b/out/zz_throat.jpg`).
+- Atlas 1.09 M px (head 0.182, body 0.400, legs 0.306, tail 0.149, shared 0.053 of the change-note-2 shares 0.24 /
+  0.42 / 0.32 / 0.16 / 0.06); elements shown max 5 748 / 8 000.

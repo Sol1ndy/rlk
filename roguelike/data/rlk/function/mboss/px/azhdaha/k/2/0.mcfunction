@@ -49,8 +49,8 @@ scoreboard players set #pxU8 mb 1
 function rlk:mboss/px/azhdaha/ev/8
 data modify storage rlk:mboss px.o.paw_l_x set value 3.15d
 data modify storage rlk:mboss px.o.paw_l_z set value 3.65d
-data modify storage rlk:mboss px.top.paw_l set value 2.854f
-data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:2.854f}
+data modify storage rlk:mboss px.top.paw_l set value 2.819f
+data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:2.819f}
 scoreboard players set #pxU9 mb 1
 function rlk:mboss/px/azhdaha/ev/9
 data modify storage rlk:mboss px.o.paw_r_x set value -3.15d
