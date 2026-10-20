@@ -211,12 +211,13 @@ def emit_jump(g):
              ['# P2 tick (#azPT = the jump_slam clip tick)'], t0=0)
     g.pw(key, 'cancel', [
         '# P2 cut (any executor; selectors): markers, a leap in the air (the body back on the floor), the jump proxy state',
-        '# (not while dying: the framework set the proxies dead), the two kit front rings.',
+        '# (not while dying: the framework set the proxies dead). A kit front ring already drawn runs out by itself (<= 9 t,',
+        '# like the front preset; pause / death / test cut clear the kit telegraphs; wire F5 allows no tele/wave_end).',
         f'kill @e[tag={tag}]',
         f'execute if score #azLeap mb matches 1 as {BODY} run function rlk:mboss/mv/stop',
         f'execute if score #azLeap mb matches 1 as {BODY} at @s run tp @s ~ {CY} ~',
         f'execute if score #azPx mb matches 1 unless score #mbSt mb matches 2 run {g.px("normal")}',
-        'scoreboard players set #azLeap mb 0', A.K.tele_wave_end(0), A.K.tele_wave_end(1)])
+        'scoreboard players set #azLeap mb 0'])
 
 
 # ================================================================================================ P3
