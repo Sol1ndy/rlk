@@ -29,7 +29,7 @@
 import {loft, slab, rockBox, toUnits, mirrorX, stroke, sdUnion, registerWrap, registerTile} from './mboss_shape_lib.mjs';
 import {PART_SCALE} from './apep_pose.mjs';
 import {PAL, C, clamp, smooth, mix, N, lift, sink, grey, autoSlot, sprite, onRect, onRectY, spriteSize, r16, sdLeaf, cone, ball, cells, secC, SLOT, TRANSPARENT} from './apep_materials.mjs';
-import {cardZ, cardX} from './mboss_model_lib.mjs';
+import {cardZ, cardX, solveUV} from './mboss_model_lib.mjs';
 
 export const REGION = 'body';
 export const PARTS = ['abdomen', 'hem_a', 'hem_b', 'chest', 'shoulders', 'core', 'crys_low', 'crys_back', 'mantle_l_a', 'mantle_r_a', 'mantle_l_b', 'mantle_r_b'];
@@ -119,6 +119,57 @@ function ledgesToWrap(els, name, axis, n, aMin, aMax) {
     f.uv = [16 * (k + .3) / n, 16 * t - .05, 16 * (k + .7) / n, 16 * t + .05].map(v => Math.round(clamp(v, 0, 16) * 1e4) / 1e4);
     delete f.rotation;
   }
+  return els;
+}
+// ---- projected faces: re-texture chosen faces with per-face cells of one new sprite, each cell painted at the face's true
+// (rotated) position, so a painter in part coordinates (blocks about the joint) shows unbroken across faces of any
+// orientation (the dome tiers seen face-on, caps). select(e, faceName, face) -> bool; paint(P) -> rgba.
+const FACE_CORNERS = (face, [x0, y0, z0], [x1, y1, z1]) => ({
+  north: [[x1, y1, z0], [x0, y1, z0], [x0, y0, z0], [x1, y0, z0]], south: [[x0, y1, z1], [x1, y1, z1], [x1, y0, z1], [x0, y0, z1]],
+  east: [[x1, y1, z1], [x1, y1, z0], [x1, y0, z0], [x1, y0, z1]], west: [[x0, y1, z0], [x0, y1, z1], [x0, y0, z1], [x0, y0, z0]],
+  up: [[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]], down: [[x0, y0, z1], [x1, y0, z1], [x1, y0, z0], [x0, y0, z0]]})[face];
+// model point -> part point (blocks, A-frame) with the element's rotation applied
+function elPoint(e, p) {
+  const c = [8 - p[0], p[1] - 8, p[2] - 8];
+  if (!e.rotation) return c;
+  const {axis, angle, origin} = e.rotation, O = [8 - origin[0], origin[1] - 8, origin[2] - 8], g = (axis === 'x' ? angle : -angle) * D2R, cs = Math.cos(g), sn = Math.sin(g);
+  const q = sub3(c, O), r = axis === 'x' ? [q[0], q[1] * cs - q[2] * sn, q[1] * sn + q[2] * cs] : axis === 'y' ? [q[0] * cs + q[2] * sn, q[1], -q[0] * sn + q[2] * cs] : [q[0] * cs - q[1] * sn, q[0] * sn + q[1] * cs, q[2]];
+  return [r[0] + O[0], r[1] + O[1], r[2] + O[2]];
+}
+function projectFaces(els, select, name, paint, {ppb = 32, W = 128, forms = 'p1'} = {}) {
+  const cells = [];
+  for (const e of els) for (const [fn, f] of Object.entries(e.faces)) {
+    if (!select(e, fn, f)) continue;
+    const C = FACE_CORNERS(fn, e.from, e.to), A = sub3(C[1], C[0]), B = sub3(C[3], C[0]);
+    const la = Math.hypot(...A), lb = Math.hypot(...B);
+    cells.push({e, fn, f, C, A, B, w: Math.max(2, Math.ceil(la * ppb)) + 2, h: Math.max(2, Math.ceil(lb * ppb)) + 2});
+  }
+  if (!cells.length) return els;
+  // shelf packing
+  let x = 0, y = 0, rowH = 0;
+  for (const c of cells) {
+    if (x + c.w > W) { x = 0; y += rowH; rowH = 0; }
+    c.x = x; c.y = y; x += c.w; rowH = Math.max(rowH, c.h);
+  }
+  const H = Math.max(16, Math.ceil((y + rowH) / 16) * 16);
+  for (const c of cells) {
+    const U0 = 16 * (c.x + 1) / W, V0 = 16 * (c.y + 1) / H, U1 = 16 * (c.x + c.w - 1) / W, V1 = 16 * (c.y + c.h - 1) / H;
+    const la2 = dot3(c.A, c.A), lb2 = dot3(c.B, c.B);
+    const fnUV = p => { const d = sub3(p, c.C[0]); return [U0 + (U1 - U0) * dot3(d, c.A) / la2, V0 + (V1 - V0) * dot3(d, c.B) / lb2]; };
+    const [uv, r] = solveUV(c.fn, c.e.from, c.e.to, fnUV);
+    c.f.texture = '#' + name; c.f.uv = uv;
+    if (r) c.f.rotation = r; else delete c.f.rotation;
+  }
+  // the sprite: each pixel inside a cell -> the face point (cell margins clamp to the face edge)
+  const grid = new Int32Array(W * H).fill(-1);
+  cells.forEach((c, i) => { for (let j = 0; j < c.h; j++) for (let k = 0; k < c.w; k++) grid[(c.y + j) * W + c.x + k] = i; });
+  SP[name] = sprite(W, H, ppb, (s, t) => {
+    const px = Math.min(W - 1, Math.floor(s * W)), py = Math.min(H - 1, Math.floor(t * H)), i = grid[py * W + px];
+    if (i < 0) return TRANSPARENT;
+    const c = cells[i], a = clamp((px + .5 - c.x - 1) / (c.w - 2)), b = clamp((py + .5 - c.y - 1) / (c.h - 2));
+    const p = [0, 1, 2].map(k => c.C[0][k] + c.A[k] * a + c.B[k] * b);
+    return paint(elPoint(c.e, p)) || TRANSPARENT;
+  }, forms, 'body');
   return els;
 }
 // Station rows -> loft stations about a joint J. z-loft rows: [z, half width, top y, bottom y, centre y, box?, centre x?]
@@ -215,22 +266,6 @@ function leafPlate(spriteName, sd, {plane, at, cu, cv, hu, hv, so = 1, half = .0
 }
 
 // ---- shoulders (joint J_SH): the hump, the dorsal plates, the bark pauldrons, the hooks + gems, the flank plates -------------
-const PAUL_R = {u0: -1, u1: 1, v0: -1, v1: 1};
-// pauldron plates: lobed rounded shells; pale bark with wood-grain contour swirls round two centres and a dark outline
-const sdPauldron = (u, v) => { const r = Math.hypot(u / .97, v / .93), a = Math.atan2(v, u), lobe = v < -.2 ? .06 * Math.cos(a * 7) : 0; return (r - 1 + lobe) * .95; };
-function pauldronPaint(u, v, {seed = 0} = {}) {
-  const d = sdPauldron(u, v);
-  if (d > 0) return null;
-  const c1 = [-.25 + .1 * seed, .1], c2 = [.45, -.35];
-  const r1 = Math.hypot(u - c1[0], (v - c1[1]) * 1.2), r2 = Math.hypot(u - c2[0], v - c2[1]);
-  const sw = Math.min(Math.abs(Math.sin((r1 * 5.2 + .5 * N.d(u * 2 + seed, v * 2)) * Math.PI)), Math.abs(Math.sin((r2 * 6.5 + .4 * N.c(u * 2, v * 2 + seed)) * Math.PI)) + (r2 > .55 ? 1 : 0));
-  let t = .14 + .1 * (N.e(u * 3 + seed, v * 3) - .5) + .18 * smooth(.2, -1, v) + .1 * smooth(-.4, -.9, d);
-  let c = BARK(clamp(t, 0, .9));
-  if (sw < .09) c = mix(c, LINE(.35), .55 * (1 - sw / .09));
-  if (d > -.1) c = mix(c, BARK(.55), smooth(-.1, -.04, d));
-  if (d > -.045) c = LINE(.75);
-  return c;
-}
 // the hook: the dark shoulder plate curling forward into a hook over the gem (v1 f315, v2 f870); shape coords (z, y)
 const HOOK = stroke([[.55, .55], [.0, .72], [-.55, .62], [-.92, .3], [-1.0, -.12], [-.82, -.45], [-.55, -.6]], t => .34 - .22 * t);
 const HOOK_R = {u0: -1.4, u1: .95, v0: -.95, v1: 1.1};
@@ -242,74 +277,99 @@ const hookPaint = (u, v) => {
   else if (n.d > hw - .04) c = C('#8E967F');
   return c;
 };
-// pale bark shell paint (pauldrons): cream-grey with big irregular wood-grain contour bands and a dark outline at the rim
-// (z, y world; a = the dome axis; r01 = 0 at the rim .. 1 at the top of the dome)
-function barkShell(z, y, a, r01) {
-  const f = Math.hypot((z + 1.6) * 1.1, (y - 3.05) * 1.35) + .45 * N.d(z * .9, y * .9) + .2 * r01;
-  const band = Math.abs(((f * 3.1) % 1 + 1) % 1 - .5);
-  let t = .16 + .1 * (N.e(z * 2, y * 2) - .5) + .2 * smooth(3.3, 2.3, y) - .08 * r01;
+// pauldron domes: lofts along x bulging out of the flank, so the side view (v2 f870) sees a smooth lumpy outline and the
+// tiers between the stations read as the wood-grain contour lines (painted dark at each tier edge, the ledges take that
+// colour). Each station: [t (0 base .. 1 apex), k (radius factor), dz, dy (the tier centre drifts: a lumpy, swirled dome)];
+// r = [front, up, back, down] half extents at the base (z toward the front is -z: e1 = -z), x0 / x1 base / apex.
+const PAULD = [
+  // the shoulder cap the A arm and the B leg grow out of (the A root 1.55, 3.66, -0.93; the B root 1.23, 2.85, -1.36): its
+  // tiers drift forward-up, so the contour rings swirl toward the hook
+  {z: -1.45, y: 3.3, r: [1.1, .76, 1.06, .86], x0: 1.1, x1: 2.3, s: 0,
+    T: [[0, 1, 0, 0], [.36, .9, -.12, .05], [.62, .72, -.26, .1], [.84, .48, -.36, .13], [1, .18, -.4, .14]]},
+  // the lower lobe over the B leg's top, layered under the cap's lower rim, its tiers drifting back-down
+  {z: -2.0, y: 2.55, r: [.7, .5, .8, .48], x0: 1.32, x1: 2.24, s: 1,
+    T: [[0, 1, 0, 0], [.48, .84, .1, -.04], [.8, .54, .18, -.06], [1, .18, .2, -.06]]},
+];
+// bark paint on a dome: mid grey-cream, a dark contour line at every tier edge plus noise-warped grain loops between
+// them, darker toward the bottom, a dark outline at the base where the dome meets the hull (t = 0 base .. 1 apex)
+function barkDomePaint(D, z, y, t, s) {
+  const T = D.T, edges = T.slice(1).map(r => r[0]);
+  let de = 9;
+  for (const e of edges) de = Math.min(de, Math.abs(t - e));
+  const f = t * 3.2 + .7 * N.d(z * .9 + D.s * 3, y * .9) + .2 * N.a(z * 3, y * 3);
+  const band = Math.abs(((f % 1) + 1) % 1 - .5);
+  let tt = .3 + .1 * (N.e(z * 2.4, y * 2.4 + D.s) - .5) + .2 * smooth(.2, -.8, s) - .1 * smooth(.6, 1, t);
+  let c = BARK(clamp(tt, 0, .9));
+  if (band < .045) c = mix(c, LINE(.3), .55 * (1 - band / .045));
+  else if (band < .1) c = mix(c, BARK(.55), .4 * (1 - (band - .045) / .055));
+  if (de < .05) c = mix(c, LINE(.45), .75 * smooth(.05, .015, de));
+  if (t < .1) c = mix(c, LINE(.75), smooth(.1, .03, t));
+  return c;
+}
+// the dome seen face-on (its tiers and cap): rings between the section outlines (the loft's midpoint profiles), pale with
+// noise-warped grain, a dark contour line along the outer edge of every ring, the dark outline round the base
+function domeSecs(D) {
+  const T = D.T, out = [];
+  for (let i = 0; i < T.length - 1; i++) {
+    const m = (j, k) => (T[i][j] + T[i + 1][j]) / 2;
+    out.push({k: m(1), z: D.z + m(2), y: D.y + m(3)});
+  }
+  return out;
+}
+function barkSidePaint(D, secs, z, y) {
+  const rho = S => { const dz = z - S.z, dy = y - S.y; return Math.hypot(dz / ((dz < 0 ? D.r[0] : D.r[2]) * S.k), dy / ((dy > 0 ? D.r[1] : D.r[3]) * S.k)); };
+  let ring = -1, edge = 9;
+  for (let i = 0; i < secs.length; i++) { const r = rho(secs[i]); if (r <= 1.02) { ring = i; edge = (1 - r) * secs[i].k * .8; } }
+  const g = Math.hypot((z - D.z) / (D.r[0] + D.r[2]), (y - D.y) / (D.r[1] + D.r[3])) * 5 + 1.1 * N.d(z * 1.1 + D.s * 3, y * 1.1) + .35 * N.a(z * 4, y * 4);
+  const band = Math.abs(((g % 1) + 1) % 1 - .5);
+  let t = .17 + .1 * (N.e(z * 2.4, y * 2.4 + D.s) - .5) + .16 * smooth(D.y + .2, D.y - D.r[3], y) - .03 * Math.max(0, ring);
   let c = BARK(clamp(t, 0, .9));
-  if (band < .055) c = mix(c, LINE(.3), .5 * (1 - band / .055));
-  else if (band < .1) c = mix(c, BARK(.02), .35 * (1 - (band - .055) / .045));
-  if (r01 < .07) c = mix(c, LINE(.7), smooth(.07, .02, r01));
+  if (band < .04) c = mix(c, LINE(.3), .4 * (1 - band / .04));
+  if (edge < .06) c = mix(c, LINE(ring <= 0 ? .75 : .45), (ring <= 0 ? .9 : .7) * smooth(.06, .02, edge));
   return c;
 }
-// a pauldron lobe (normalised, the tongue pointing down): bark with a contour band and a dark outline
-function pauldronLobe(u, v) {
-  const d = sdTongue(u, v);
-  if (d > 0) return null;
-  let c = BARK(clamp(.26 + .08 * (N.c(u * 3, v * 3) - .5) + .14 * smooth(.6, -.9, v), 0, .9));
-  const band = Math.abs(Math.hypot(u, v - .9) * 1.7 % 1 - .5);
-  if (band < .06 && v < .7) c = mix(c, LINE(.35), .45);
-  if (d > -.1) c = LINE(.72);
-  return c;
+function barkDome(name, J, D) {
+  const L = D.x1 - D.x0, secs = domeSecs(D);
+  const st = D.T.map(([t, k, dz, dy]) => ({a: D.x0 + t * L - J[0], r: D.r.map(v => Math.max(.04, v * k)), c: [-(D.z + dz - J[2]), D.y + dy - J[1]], box: .03}));
+  const els = wrapLoft(name, 'x', st, (th, a, p) => barkDomePaint(D, p[2] + J[2], p[1] + J[1], (a + J[0] - D.x0) / L, sinD(th)),
+    {n: 16, caps: '+', seed: 524 + D.s, ppb: 32, forms: 'p1', ledgeTex: 'g_shell', ledgeWrap: false});
+  return projectFaces(els, (e, fn, f) => f.texture === '#g_shell', name + '_side', P => barkSidePaint(D, secs, P[2] + J[2], P[1] + J[1]));
 }
+// element counts per group (the r2 render loop prints them)
+export const ELDBG = {};
+const grp = (label, arr) => { ELDBG[label] = (ELDBG[label] || 0) + arr.length; return arr; };
 function shouldersP1() {
   const J = J_SH, els = [];
   // the hull (front hump), from under the cowl to the chest
-  els.push(...wrapLoft('p1_hump_wrap', 'z', hullSt(J, [-2.55, -2.2, -1.75, -1.3, -.85, -.3, .02], -9, -.3), (th, a) => p1Hull('sh')(th, a + J[2]), {caps: '-', seed: 521, forms: 'p1', ppb: 36}));
+  els.push(...grp('sh1_hump', wrapLoft('p1_hump_wrap', 'z', hullSt(J, [-2.55, -2.2, -1.75, -1.3, -.85, -.3, .02], -9, -.3), (th, a) => p1Hull('sh')(th, a + J[2]), {caps: '-', seed: 521, forms: 'p1', ppb: 36})));
   // dorsal shingle plates: rows along the spine, 3 across (the centre flat / pitched, the sides rolled 22.5 / 45 deg)
   const ps = card('p1_plate_y', UR, (u, v) => p1PlatePaint(u, -v), 40, 'p1', 'unique', 'y');
   const pz = card('p1_plate_z', UR, p1PlatePaint, 40, 'p1');
   for (const [z, pitch] of [[-2.1, -22.5], [-1.55, 0], [-1.0, 0], [-.45, 22.5]]) {
     const y0 = hullTop(0, z) + .04;
-    els.push(...leafPlate(ps, sdTongue, {plane: 'y', at: y0 - J[1], cu: 0, cv: z - J[2], hu: .52, hv: .5, so: -1, rot: pitch ? ['x', pitch, [0, y0 - J[1], z - J[2]]] : null, cards: '+'}));
+    els.push(...grp('sh1_dorsal', leafPlate(ps, sdTongue, {plane: 'y', at: y0 - J[1], cu: 0, cv: z - J[2], hu: .52, hv: .5, so: -1, rot: pitch ? ['x', pitch, [0, y0 - J[1], z - J[2]]] : null, cards: '+'})));
     for (const s of [1, -1]) {
       const x = .82 * s, y1 = hullTop(x, z + .1) + .03;
       const half = leafPlate(ps, sdTongue, {plane: 'y', at: y1 - J[1], cu: x, cv: z + .12 - J[2], hu: .46, hv: .48, so: -1, rot: ['z', -22.5 * s, [x, y1 - J[1], z + .12 - J[2]]], cards: '+'});
-      els.push(...half);
+      els.push(...grp('sh1_dorsal', half));
       // flank plates (plane x, leaning in 45 deg), pointing back-down
       const xf = (hullAt(z + .2).w - .32) * s, yf = hullAt(z + .2).cy + .62;
-      els.push(...leafPlate(pz, sdTongue, {plane: 'x', at: xf, cu: z + .2 - J[2], cv: yf - J[1], hu: .42, hv: .4, so: 1, rot: ['z', 45 * s, [xf, yf - J[1], z + .2 - J[2]]], cards: s > 0 ? '+' : '-'}));
+      els.push(...grp('sh1_flank', leafPlate(pz, sdTongue, {plane: 'x', at: xf, cu: z + .2 - J[2], cv: yf - J[1], hu: .42, hv: .4, so: 1, rot: ['z', 45 * s, [xf, yf - J[1], z + .2 - J[2]]], cards: s > 0 ? '+' : '-'})));
     }
   }
-  // the pale bark pauldron (v2 f870: a big pale shell capping the B-leg root under the A-arm root, wood-grain contour
-  // bands, a dark outline): a lofted dome bulging out of the flank + two lobed plates layering its lower edge
+  // the pale bark pauldron (v2 f870: a big pale lumpy shell capping the B-leg root under the A-arm root, wood-grain
+  // contour swirls, a dark outline): three overlapping domes bulging out of the flank (lofts along x), the big upper
+  // dome and two lower lobes layered over its lower rim, each painted with contour rings round its own apex
   const half = [];
-  // the shell: a z-loft (its outline round in the front view, tapering front and back), inner facets dropped (in the hull)
-  const PD = [
-    // z      out   up    in    down  cx    cy
-    [-2.78, .16, .3, .1, .26, 1.45, 2.86], [-2.5, .44, .62, .2, .55, 1.47, 2.88], [-2.08, .6, .8, .3, .7, 1.5, 2.9],
-    [-1.55, .63, .84, .3, .74, 1.52, 2.9], [-1.02, .54, .74, .28, .66, 1.5, 2.92], [-.62, .22, .38, .12, .32, 1.47, 2.95]];
-  const pst = PD.map(([z, o, up, i, d, cx, cy]) => ({a: z - J[2], r: [o, up, i, d], c: [cx - J[0], cy - J[1]], box: .06}));
-  const zA = PD[0][0], zB = PD[PD.length - 1][0];
-  half.push(...wrapLoft('p1_pauld_wrap', 'z', pst, (th, a, p) => {
-    const z = a + J[2], e = Math.min((cosD(th) + .42) / .5, (z - zA) / .32, (zB - z) / .32);
-    return barkShell(z, p[1] + J[1], 0, clamp(e));
-  }, {caps: '-+', ledgeTex: 'g_shell', seed: 524, ppb: 40, skip: (k, th) => cosD(th) < -.45}));
-  // the lobed lower edge flaring out like a skirt: three rounded bark lobes (pointing down), dark outline
-  const pl = card('p1_pauld_lobe', UR, (u, v) => pauldronLobe(u, v), 40, 'p1');
-  for (const [cz, cy, x, hz, hy] of [[-2.32, 2.2, 1.9, .34, .36], [-1.76, 2.1, 1.98, .38, .4], [-1.18, 2.18, 1.92, .34, .36]]) {
-    half.push(...leafPlate(pl, sdTongue, {plane: 'x', at: x, cu: cz - J[2], cv: cy - J[1], hu: hz, hv: hy, half: .045, core: true, edge: 'g_shell', cell: .09, rot: ['z', -22.5, [x, cy - J[1], cz - J[2]]]}));
-  }
+  PAULD.forEach((D, i) => half.push(...grp('sh1_pauld', barkDome(`p1_pauld${i}`, J, D))));
   // the hook + gem: a dark curl in front of the pauldron, the square gem in a raised dark frame facing out-forward
   const hs = card('p1_hook', HOOK_R, hookPaint, 48, 'p1');
-  const hz0 = -2.35 - J[2], hy0 = 3.05 - J[1];
-  half.push(...slab({plane: 'x', at: 1.62, rect: {u0: hz0 + HOOK_R.u0 * .7, u1: hz0 + HOOK_R.u1 * .7, v0: hy0 + HOOK_R.v0 * .7, v1: hy0 + HOOK_R.v1 * .7},
-    sd: (u, v) => HOOK.sd((u - hz0) / .7, (v - hy0) / .7) * .7, half: .09, sprite: hs, edge: 'g_plate', cell: .08, rot: ['y', 22.5, [1.62, hy0, hz0]]}));
-  const gz = -2.42 - J[2], gy = 2.98 - J[1];
-  half.push(rockBox([1.6, gy - .2, gz - .2], [1.82, gy + .2, gz + .2], 'g_plate', {seed: 522, rot: ['y', 22.5, [1.7, gy, gz]]}));
-  half.push(rockBox([1.74, gy - .14, gz - .14], [1.9, gy + .14, gz + .14], 'p1_gem', {seed: 523, rot: ['y', 22.5, [1.7, gy, gz]]}));
+  const hz0 = -2.5 - J[2], hy0 = 3.28 - J[1], hx = 1.98, HK = .8;
+  half.push(...slab({plane: 'x', at: hx, rect: {u0: hz0 + HOOK_R.u0 * HK, u1: hz0 + HOOK_R.u1 * HK, v0: hy0 + HOOK_R.v0 * HK, v1: hy0 + HOOK_R.v1 * HK},
+    sd: (u, v) => HOOK.sd((u - hz0) / HK, (v - hy0) / HK) * HK, half: .09, sprite: hs, edge: 'g_plate', cell: .08, rot: ['y', 22.5, [hx, hy0, hz0]]}));
+  const gz = -2.62 - J[2], gy = 3.22 - J[1], gx = 1.98;
+  half.push(rockBox([gx - .12, gy - .21, gz - .21], [gx + .12, gy + .21, gz + .21], 'g_plate', {seed: 522, rot: ['y', 22.5, [gx, gy, gz]]}));
+  half.push(rockBox([gx, gy - .14, gz - .14], [gx + .2, gy + .14, gz + .14], 'p1_gem', {seed: 523, rot: ['y', 22.5, [gx, gy, gz]]}));
   // dark hanging plates over the flank behind the pauldron (over the C-leg root), pointed tips down
   const hp = pz;
   for (const [cz, cy, hz, hy] of [[-.15, 3.25, .42, .85], [.45, 3.1, .4, .8]]) {
@@ -541,13 +601,14 @@ function torsoSt(J, ys, o0, o1, grow = 0) {
 // ---- P3 paint ---------------------------------------------------------------------------------------------------------------
 const BOT = PAL.p3_bottle, LIME = PAL.p3_lime, PALE = PAL.p3_pale, L3 = PAL.p3_line;
 // glossy bottle-green dorsal plates (rounded leaves in rows pointing down), near-black rims, a lime line highlight
-function p3Back(U, V, seed = 41) {
-  const sh = shingle(U, V, .5, .44, seed, .3);
-  let t = .58 + .1 * (sh.id - .5) + .1 * (N.a(U * 3, V * 3) - .5) - .25 * smooth(.5, 0, sh.fv) * 0;
-  t += .22 * smooth(.3, 0, sh.fv);                                   // the shadow under the plate above
-  t -= .22 * smooth(.5, .2, Math.abs(sh.fu - .38 - .1 * sh.fv)) * (1 - sh.fv);   // the glossy highlight streak
-  let c = BOT(clamp(t, .1, .98));
-  if (sh.inside && sh.e < .045) c = sh.e < .022 ? BOT(.98) : mix(PAL.p3_rim(.45), BOT(.5), .3);
+function p3Back(U, V, seed = 41, big = 1) {
+  const sh = shingle(U, V, .78 * big, .64 * big, seed, .3);
+  let t = .56 + .1 * (sh.id - .5) + .08 * (N.a(U * 2, V * 2) - .5);
+  t += .26 * smooth(.32, 0, sh.fv);                                  // the shadow under the plate above
+  t -= .26 * smooth(.42, .12, Math.abs(sh.fu - .36 - .12 * sh.fv)) * smooth(.15, .45, sh.fv) * (1 - .6 * sh.fv);   // glossy streak
+  t -= .1 * smooth(.6, 1, sh.fv) * smooth(.25, .05, Math.abs(sh.fu - .5));                                        // the lit tip
+  let c = BOT(clamp(t, .08, .98));
+  if (sh.inside && sh.e < .05) c = sh.e < .024 ? BOT(.98) : mix(PAL.p3_rim(.5), BOT(.55), .35);
   if (!sh.inside) c = BOT(1);
   return c;
 }
@@ -577,6 +638,7 @@ function bandLoft(name, axis, st, ks, painter, {n = 16, ppb = 40, forms = 'p3'} 
   if (!SP[name]) {
     const per = Math.max(...st.map(s => { const r = arr4(s.r); return Math.PI / 2 * (Math.hypot(r[0], r[1]) + Math.hypot(r[1], r[2]) + Math.hypot(r[2], r[3]) + Math.hypot(r[3], r[0])) / Math.SQRT2; }));
     const w = Math.min(512, Math.max(16, Math.ceil(per * m / n * ppb / 16) * 16)), h = r16(L * ppb);
+    registerWrap(name);
     SP[name] = sprite(w, h, ppb, (s, t) => {
       const j = Math.min(m - 1, Math.floor(s * m)), k = ks[j], th = (k - .5 + (s * m - j)) * 360 / n;
       const a = axis === 'y' ? aMax - t * L : aMin + t * L, S = secAt(st, a), [x, y] = secPt(S, th);
@@ -595,17 +657,24 @@ function bandLoft(name, axis, st, ks, painter, {n = 16, ppb = 40, forms = 'p3'} 
 // ---- rib-blades: pale grey curved blades hugging the ribcage from the sternum edge round the side to the back, sloping
 // down (v6 f480, model_p3 §2.2 item 8): band lofts a little outside the chest; wood-grain swirls, a dark outline, a lime
 // stripe on the upper edge, the front end curling up beside the sternum.
-const RIBS3 = [[4.98, 4.42, .17], [4.56, 3.98, .16], [4.14, 3.58, .14]];
+const RIBS3 = [[5.04, 4.38, .21], [4.6, 3.94, .2], [4.16, 3.52, .18]];
+// t = 0 at the sternum's edge (72 deg) .. 1 at the back (-60 deg); the blade dips toward the sternum like a rib, rises to
+// the flank and slopes down round to the back
+const ribT = th => clamp((72 - th) / 132), ribYc = ([yf, yb], t) => (t < .3 ? yf - .2 * (1 - t / .3) ** 2 : yf + (yb - yf) * Math.pow((t - .3) / .7, 1.25));
 function ribBlade(th, y, [yf, yb, w0]) {
-  const t = clamp((92 - th) / 140), yc = yf + (yb - yf) * t * (.6 + .4 * t) + .07 * smooth(.12, 0, t), hw = w0 * (1 - .65 * t) + .02 * smooth(.9, 1, t);
+  th = ((th + 180) % 360 + 360) % 360 - 180;
+  const t = ribT(th), yc = ribYc([yf, yb], t), hw = w0 * (1 - .55 * t) + .02 * smooth(.9, 1, t);
   const d = Math.abs(y - yc) - hw;
-  if (d > 0 || t >= 1 || th > 96) return null;
-  const e = -d;
-  let c = PALE(clamp(.12 + .12 * t + .1 * (N.d(th * .06, y * 4) - .5) + .12 * smooth(0, hw, y - yc + hw * .3) * 0, 0, .9));
-  const grain = Math.abs((((y - yc) / hw * 2.2 + th * .02 + N.a(th * .03, y * 3)) % 1 + 1) % 1 - .5);
-  if (grain < .07) c = mix(c, PALE(.6), .35);
-  if (y > yc + hw - .045 && t < .85) c = mix(c, PAL.p3_rim(.4), .8);              // the lime upper edge
-  if (e < .025) c = L3(.75);
+  if (d > 0 || t >= 1 || th > 74) return null;
+  const e = -d, f = (y - yc) / hw;                                         // -1 lower edge .. 1 upper edge
+  // pale grey-white bark blade, lit along the upper half (it rolls outward), grain lines along it, a lime upper rim,
+  // a dark outline; the front end brightens where the sternum glow catches it
+  let c = PALE(clamp(.06 + .12 * t + .3 * smooth(.2, -1, f) + .1 * (N.d(th * .06, y * 4) - .5) - .06 * smooth(.25, 0, t), 0, .9));
+  const grain = Math.abs((((f * 1.6 + th * .018 + .6 * N.a(th * .03, y * 3)) % 1) + 1) % 1 - .5);
+  if (grain < .06) c = mix(c, PALE(.66), .45);
+  if (f < -.7) c = mix(c, PALE(.8), .5 * smooth(-.7, -.95, f));                     // the shaded lower lip
+  if (f > .62 && t < .88) c = mix(c, PAL.p3_rim(.35 + .3 * t), .8 * smooth(.62, .8, f));          // the lime upper edge
+  if (e < .03) c = L3(.75);
   return c;
 }
 function chestP3() {
@@ -613,8 +682,11 @@ function chestP3() {
   els.push(...wrapLoft('p3_chest_wrap', 'y', torsoSt(J, [3.0, 3.3, 3.7, 4.1, 4.5, 4.85, 5.15], 3.3, 4.85), (th, a) => p3Torso(th, a + J[1], 'ch'), {forms: 'p3', seed: 591, ppb: 36}));
   const half = [];
   RIBS3.forEach(([yf, yb, w0], i) => {
-    const y0 = yb - w0 - .08, y1 = yf + w0 + .1, ym = (y0 + y1) / 2, h = torsoAt(ym), g = .06 + .02 * i;
-    const st = [y0, y1].map(y => ({a: y - J[1], r: [h.w + g, h.fr + g, h.w + g, h.bk + g], c: [0, -(h.cz - J[2])]}));
+    // one band per blade: its section radii follow the torso at the blade's own height in each quadrant (high at the
+    // sternum, lower at the side, lowest at the back), a little outside the chest so the blades shingle over it
+    const g = .07 + .03 * i, ys = ribYc([yf, yb], ribT(0)), hf = torsoAt(yf - .12), hs = torsoAt(ys), hb = torsoAt(yb);
+    const y0 = Math.min(yb, yf - .2) - w0 - .1, y1 = yf + w0 + .12;
+    const st = [y0, y1].map(y => ({a: y - J[1], r: [hs.w + g, hf.fr + g, hs.w + g, hb.bk + g], c: [0, -(hs.cz - J[2])]}));
     half.push(...bandLoft(`p3_rib${i}`, 'y', st, [13, 14, 15, 0, 1, 2, 3, 4], (th, a) => ribBlade(th, a + J[1], [yf, yb, w0])));
   });
   els.push(...half, ...mirrorEls(half));
@@ -707,54 +779,120 @@ function robePanel(th, y, {diamonds = []} = {}) {
   if (s < 0) c = mix(c, BOT(.92), smooth(0, -.2, s));
   return c;
 }
+// key rows [a, ...values] (a descending or ascending) -> rows every ~step along a (linear between the keys), so the loft
+// steps between its sections stay small on the tapering robe
+function fineRows(rows, step) {
+  const out = [rows[0]];
+  for (let i = 1; i < rows.length; i++) {
+    const r0 = rows[i - 1], r1 = rows[i], n = Math.max(1, Math.round(Math.abs(r1[0] - r0[0]) / step));
+    for (let k = 1; k <= n; k++) out.push(r0.map((v, j) => v + (r1[j] - v) * k / n));
+  }
+  return out;
+}
 function abdomenP3() {
   const J = J3_ABD;
-  const rows = [[3.5, .7, .62, .7], [3.1, .68, .6, .68], [2.5, .7, .62, .7], [1.9, .76, .68, .76], [1.35, .84, .75, .82], [.95, .9, .8, .88]];
+  const rows = fineRows([[3.5, .7, .62, .7], [3.1, .68, .6, .68], [2.5, .7, .62, .7], [1.9, .76, .68, .76], [1.35, .84, .75, .82], [.95, .9, .8, .88]], .32);
   const st = rows.map(([y, w, fr, bk]) => ({a: y - J[1], r: [w, fr, w, bk], c: [0, -(.07 - J[2])], box: .1}));
   return wrapLoft('p3_stem_wrap', 'y', st, (th, a) => robePanel(th, a + J[1], {diamonds: [2.9, 2.25, 1.62]}), {forms: 'p3', seed: 561, caps: '+', ppb: 32});
 }
-// hem flaps: pointed dark teal leaves with an olive-gold edge and midrib (both sides painted)
-const FLAP_R = UR;
-const flapSd = (u, v) => sdLeaf(0, -1, .95, .9, {p: .7})(u, v);
-function flapPaint(u, v) {
-  const d = flapSd(u, v);
-  if (d > 0) return null;
-  let c = ROBE(clamp(.42 + .14 * (N.a(u * 5, v * 5) - .5) - .12 * v, 0, 1));
-  const vein = Math.abs(((v * 2 + Math.abs(u) * 1.6) % 1 + 1) % 1 - .5);
-  if (vein < .04 && Math.abs(u) > .08) c = mix(c, C('#7F8345'), .4);
-  if (Math.abs(u) < .05) c = mix(c, C('#C9C27A'), .55);
-  if (d > -.09) c = mix(c, C('#C9C27A'), .75);
-  return c;
+// ---- hem flaps: pointed dark teal leaves with an olive-gold edge and midrib, painted along a direction inside a card.
+// leafAlong: a leaf from the root (ru, rv) toward phi (deg in the card's (u, v)), length L, half width W (rounded root,
+// pointed tip). flapAlong: the painter for it. Both sides of every flap are painted (R11: no open faces toward the water).
+function leafCoords(ru, rv, phi, L, W) {
+  const c = cosD(phi), s = sinD(phi);
+  return (u, v) => { const du = u - ru, dv = v - rv; return [(du * c + dv * s) / L, (-du * s + dv * c) / W]; };
 }
-// hem_a (bone frame 'y': -Y down the bone; the joint 0.55 in front of the stem axis): the lower robe, a cone widening down,
-// and three pointed flaps over its front
+function leafAlong(ru, rv, phi, L, W, {p = .75, base = .5} = {}) {
+  const lc = leafCoords(ru, rv, phi, L, W);
+  return (u, v) => {
+    const [a, t] = lc(u, v);
+    const half = a < .28 ? Math.sqrt(Math.max(0, 1 - ((.28 - a) / .28) ** 2)) : a < base ? 1 : Math.pow(Math.max(0, (1 - a) / (1 - base)), p);
+    return Math.max((Math.abs(t) - half) * W, -a * L, (a - 1) * L);
+  };
+}
+function flapAlong(ru, rv, phi, L, W, opt = {}) {
+  const sd = leafAlong(ru, rv, phi, L, W, opt), lc = leafCoords(ru, rv, phi, L, W);
+  return (u, v) => {
+    const d = sd(u, v);
+    if (d > 0) return null;
+    const [a, t] = lc(u, v);
+    let c = ROBE(clamp(.4 + .14 * (N.a(u * 4, v * 4) - .5) + .12 * a + .1 * smooth(.3, 1, Math.abs(t)), 0, 1));
+    const vein = Math.abs(((a * 3.4 + Math.abs(t) * 1.3) % 1 + 1) % 1 - .5);
+    if (vein < .045 && Math.abs(t) > .12) c = mix(c, C('#7F8345'), .45);        // olive side veins
+    if (Math.abs(t) < .07 * (1 - .4 * a)) c = mix(c, C('#C9C27A'), .6);          // the olive-gold midrib
+    if (d > -.05) c = mix(c, C('#C9C27A'), .8);                                  // the olive-gold edge
+    return c;
+  };
+}
+// one flap: a horizontal (plane y) card over rect R (u = X, v = Z) at height y, tilted by rot (one axis, the 22.5 grid)
+function flap(name, R, y, painter, sd, rot, ppb = 40) {
+  const sp = card(name, R, painter, ppb, 'p3', 'unique', 'y');
+  return slab({plane: 'y', at: y, rect: R, sd, half: .03, sprite: sp, edge: 'g_plate', cell: .1, core: false, cards: '+', rot});
+}
+// the bounding rect of a leaf sd (sampled), padded; clamped to the model bounds of the part (+-1.5 x scale, a margin)
+function sdRect(sd, R, lim, pad = .04) {
+  let u0 = 9, u1 = -9, v0 = 9, v1 = -9;
+  for (let i = 0; i <= 120; i++) for (let j = 0; j <= 120; j++) {
+    const u = R.u0 + (R.u1 - R.u0) * i / 120, v = R.v0 + (R.v1 - R.v0) * j / 120;
+    if (sd(u, v) < 0) { u0 = Math.min(u0, u); u1 = Math.max(u1, u); v0 = Math.min(v0, v); v1 = Math.max(v1, v); }
+  }
+  const c = x => clamp(x, -lim, lim);
+  return {u0: c(u0 - pad), u1: c(u1 + pad), v0: c(v0 - pad), v1: c(v1 + pad)};
+}
+// hem_a (bone frame 'y': -Y down the bone, model +Z = back; the section centre e2 = -0.55 puts the robe axis at model
+// z +0.55, under the stem): the lower robe, a cone widening down and running 0.35 b past the hem_b joint (so the
+// hem_a -> hem_b bend stays closed in the crawl, where the chain folds 68 deg), and three pointed flaps hanging over its
+// front, their tops on the cone, their tips swinging out 22.5 deg over the hem
 function hemAP3() {
-  const els = [], cz = -.55;
-  const st = [[.25, .74], [-.45, .86], [-1.0, .98], [-1.42, 1.06]].map(([y, r]) => ({a: y, r: [r, r * .88, r, r * .92], c: [0, cz]}));
+  const els = [], AZ = .55;
+  const st = fineRows([[.25, .74], [-.45, .86], [-1.0, .98], [-1.42, 1.06], [-1.77, 1.1]], .26).map(([y, r]) => ({a: y, r: [r, r * .88, r, r * .92], c: [0, -AZ]}));
   els.push(...wrapLoft('p3_hema_wrap', 'y', st, (th, a) => robePanel(th, a + 2.69, {diamonds: []}), {forms: 'p3', seed: 571, ppb: 32}));
-  const fs = card('p3_hemflap', FLAP_R, flapPaint, 40, 'p3');
-  for (const [x, ry, h] of [[0, 0, .6], [.46, 22.5, .52], [-.46, -22.5, .52]]) {
-    const z = -.86 - .55 + .55, y = -1.0;
-    els.push(...leafPlate(fs, flapSd, {plane: 'z', at: -.87 + (x ? .1 : 0), cu: x, cv: y, hu: .26, hv: h, half: .03, core: false, rot: ry ? ['y', -ry, [x, y, -.87]] : null}));
-    void z;
+  // the flaps: cards (plane z) on the cone's front, the painter in (X, Y) with the leaf pointing down (-v)
+  const FR = {u0: -.42, u1: .42, v0: -1.3, v1: .08};
+  const fsd = leafAlong(0, 0, -90, 1.25, .36), fs = card('p3_hemflap_a', FR, flapAlong(0, 0, -90, 1.25, .36), 40, 'p3');
+  for (const [x, y0, ry] of [[0, -.42, 0], [.56, -.55, 1], [-.56, -.55, -1]]) {
+    // the cone's front at the flap top (radius .9 there), the side flaps on the cone's shoulders a little further back
+    const zf = AZ - .9 * .88 * (ry ? .86 : 1) - .03;
+    const rect = {u0: x + FR.u0, u1: x + FR.u1, v0: y0 + FR.v0, v1: y0 + FR.v1};
+    els.push(...slab({plane: 'z', at: zf, rect, sd: (u, v) => fsd(u - x, v - y0), half: .02, sprite: fs, edge: 'g_plate', cell: .1, core: false, cards: '-',
+      rot: ['x', 22.5, [x, y0, zf]]}));
   }
   return els;
 }
-// hem_b (bone frame 'y', 1.3 b down to the water): the hem flare and the pointed flaps splayed onto the water in six
-// directions (model_p3 item 12; v6 f480), each flap tilted out 45 deg so the hem reads as a star from above
+// hem_b (bone frame 'y', the joint 1.3 b over the water, model +Z = back, the robe axis at model z +0.85): the hem flare
+// (closed below) and seven pointed dark flaps splayed round it onto the water (model_p3 item 12; v6 f480, v5 f1074): two
+// to the sides, two to the back diagonals, one straight back, two to the front diagonals (hem_a's hanging flaps fill the
+// front). Each flap is a horizontal card rooted under the flare's rim, drooping 22.5 deg about one axis, so it grows out of
+// the flare and its tip reaches the water. Model bounds +-2.55 (scale 1.7). In the crawl (the bone folded back along
+// the floor: world y = 0.72 + 0.52 y + 0.85 z) the side / back flaps fan over the hips; the front-diagonal tips dip
+// into the water.
+const HEMB_AZ = .85;
 function hemBP3() {
-  const els = [], cz = -.85;
-  const st = [[.12, 1.0], [-.5, 1.18], [-.95, 1.36], [-1.13, 1.42]].map(([y, r]) => ({a: y, r, c: [0, cz]}));
-  els.push(...wrapLoft('p3_hemb_wrap', 'y', st, (th, a) => robePanel(th, a + 1.3, {}), {forms: 'p3', seed: 581, ppb: 28}));
-  const fs = card('p3_hemflap', FLAP_R, flapPaint, 40, 'p3');
-  // front / back flaps (plane z, tilted 45 about x), side flaps (plane x, tilted 45 about z), four diagonal flaps upright
-  const R = 1.42, yb = -1.05;
-  els.push(...leafPlate(fs, flapSd, {plane: 'z', at: cz - R, cu: 0, cv: yb - .5, hu: .34, hv: .62, so: 1, half: .03, rot: ['x', -45, [0, yb, cz - R]]}));
-  els.push(...leafPlate(fs, flapSd, {plane: 'z', at: cz + R, cu: 0, cv: yb - .5, hu: .34, hv: .62, so: 1, half: .03, rot: ['x', 45, [0, yb, cz + R]]}));
-  for (const s of [1, -1]) els.push(...leafPlate(fs, flapSd, {plane: 'x', at: s * R, cu: cz, cv: yb - .5, hu: .34, hv: .62, so: 1, half: .03, rot: ['z', -45 * s, [s * R, yb, cz]]}));
-  for (const [sx, sz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) {
-    const x = sx * R * .74, z = cz + sz * R * .74;
-    els.push(...leafPlate(fs, flapSd, {plane: 'z', at: z, cu: x, cv: yb - .32, hu: .3, hv: .52, so: 1, half: .03, rot: ['y', sx * sz * 45, [x, 0, z]]}));
+  const els = [], AZ = HEMB_AZ;
+  const rows = fineRows([[.3, .96, .86, .92], [-.1, 1.02, .9, .96], [-.5, 1.18, .92, 1.02], [-.85, 1.32, .88, 1.04], [-1.1, 1.4, .8, 1.0]], .16);
+  const st = rows.map(([y, w, fr, bk]) => ({a: y, r: [w, fr, w, bk], c: [0, -AZ], box: .05}));
+  els.push(...wrapLoft('p3_hemb_wrap', 'y', st, (th, a) => robePanel(th, a + 1.3, {}), {forms: 'p3', seed: 581, ppb: 28, caps: '+'}));
+  const LIM = 1.5 * PART_SCALE.hem_b - .03;
+  // [azimuth phi (deg in model (X, Z): 0 = +X, 90 = +Z back), root height y, root inset (x the rim radius), L, W, rot]
+  const FL = [
+    {phi: 0, y: -.85, k: .9, L: 1.3, W: .44, rot: ['z', -22.5]},
+    {phi: 42, y: -.9, k: .86, L: 1.15, W: .4, rot: ['x', 22.5]},
+    {phi: -48, y: -.92, k: .86, L: 1.15, W: .38, rot: ['x', -22.5]},
+  ];
+  const rimR = (phi, y) => { const s = secAt(st, y); return [s.r[0] * cosD(phi), AZ + (sinD(phi) >= 0 ? s.r[3] : s.r[1]) * sinD(phi)]; };
+  const half = [];
+  FL.forEach(({phi, y, k, L, W, rot}, i) => {
+    const [rx, rz] = rimR(phi, y).map((v, j) => (j ? AZ + (v - AZ) * k : v * k));
+    const sd = leafAlong(rx, rz, phi, L, W, {p: .7, base: .42});
+    const R = sdRect(sd, {u0: -3, u1: 3, v0: -3, v1: 3}, LIM);
+    half.push(...flap(`p3_hemflap_${i}`, R, y, flapAlong(rx, rz, phi, L, W, {p: .7, base: .42}), sd, [rot[0], rot[1], [rx, y, rz]]));
+  });
+  els.push(...half, ...mirrorEls(half));
+  // the back flap (one, on the midline)
+  {
+    const phi = 90, y = -.95, [rx, rz0] = rimR(phi, y), rz = AZ + (rz0 - AZ) * .86, L = .8, W = .36;
+    const sd = leafAlong(rx, rz, phi, L, W, {p: .7, base: .42}), R = sdRect(sd, {u0: -3, u1: 3, v0: -3, v1: 3}, LIM);
+    els.push(...flap('p3_hemflap_b', R, y, flapAlong(rx, rz, phi, L, W, {p: .7, base: .42}), sd, ['x', 22.5, [rx, y, rz]]));
   }
   return els;
 }
@@ -764,7 +902,13 @@ function hemBP3() {
 // segments at 0 / 22.5 / 45 deg, each a slab clipped from the one leaf outline so the sprite runs on unbroken. Outer face
 // dark (slot plate), inner face pale with cream leaf-scale rows (slot shell, model.md item 34), a light rim on the outer
 // face (slot band_a: pale in P1, mint-lime in P3).
-const mantleSd = (L, W) => sdLeaf(0, -L, .05, W, {p: .62});
+// the leaf outline along -Y: a broad rounded root (0.65 W), widest a third of the way out, a long pointed tip
+const mantleSd = (L, W) => (u, v) => {
+  const a = -v / L;
+  if (a < -.03 || a > 1) return Math.max(Math.abs(u) - W, a < 0 ? -a * L : (a - 1) * L);
+  const half = W * (a < .32 ? .66 + .34 * Math.sin(a / .32 * Math.PI / 2) : Math.pow(Math.max(0, Math.cos((a - .32) / .68 * Math.PI / 2)), .85));
+  return Math.abs(u) - half;
+};
 function mantleOut(L, W) {
   const sd = mantleSd(L, W);
   return (u, v) => {
@@ -784,12 +928,15 @@ function mantleIn(L, W) {
   return (u, v) => {
     const d = sd(u, v);
     if (d > 0) return null;
-    // rows of cream leaf scales with dark wedges toward the rib
-    const sc = shingle(Math.abs(u) + .02, -v, .2, .17, 31, .1);
-    let g = .9 - .25 * smooth(.25, 1, sc.fv) + .04 * (sc.id - .5);
-    if (!sc.inside || sc.e < .012) g = .5;
-    if (Math.abs(u) < .03) g = .42;
-    if (d > -.035) g = .38;
+    // the pale veined underside (model.md item 9 / 34): cream, a raised midrib, paired side veins sweeping to the tip,
+    // soft cupping shade toward the rim, a few fine cream scale arcs near the root
+    const a = -v / L, au = Math.abs(u) / W;
+    let g = .86 - .14 * smooth(.3, 1, au) - .06 * a + .04 * (N.b(u * 6, v * 4) - .5);
+    const vein = Math.abs(((a * 7 - au * 1.6) % 1 + 1) % 1 - .5);
+    if (vein < .05 && au > .1 && au < .85) g -= .14 * (1 - vein / .05);
+    if (au < .07) g = .62 + .2 * smooth(.07, 0, au);
+    if (a < .3) { const arc = Math.abs(((Math.hypot(u * 2.2, a * 3) * 3) % 1) - .5); if (arc < .06) g -= .08; }
+    if (d > -.035) g = .4;
     return grey(g);
   };
 }
@@ -798,7 +945,8 @@ function mantleRim(L, W) {
   return (u, v) => { const d = sd(u, v); if (d > 0 || d < -.06) return null; return grey(.95 - 3 * Math.abs(d + .03)); };
 }
 function mantle(L, W, tag) {
-  const segs = [[0, .42], [.42, .72], [.72, 1]].map(([a, b]) => [a * L, b * L]), ang = [0, 22.5, 45];
+  // four segments bent -22.5 / 0 / 22.5 / 45 deg about x: the root droops, the blade arcs and the tip curls toward -Z
+  const segs = [[0, .26], [.26, .52], [.52, .76], [.76, 1]].map(([a, b]) => [a * L, b * L]), ang = [-22.5, 0, 22.5, 45];
   const rect = {u0: -W - .05, u1: W + .05, v0: -L - .05, v1: .1};
   const so = card(`g_flap_${tag}`, rect, mantleOut(L, W), 32, 'both', 'tinted'), si = card(`g_flapin_${tag}`, rect, mantleIn(L, W), 32, 'both', 'tinted');
   const sr = card(`g_flaprim_${tag}`, rect, mantleRim(L, W), 32, 'both', 'tinted');
@@ -806,7 +954,7 @@ function mantle(L, W, tag) {
   let y = 0, z = 0;                                       // the start of the current segment after the earlier bends
   segs.forEach(([s0, s1], i) => {
     const dy = y + s0, th = ang[i], R = {...rect, v0: rect.v0 + dy, v1: rect.v1 + dy};
-    const clip = {v0: -s1 + dy - (i < 2 ? .03 : .06), v1: -s0 + dy + (i ? .03 : .1)};
+    const clip = {v0: -s1 + dy - (i < segs.length - 1 ? .03 : .06), v1: -s0 + dy + (i ? .03 : .1)};
     const sdf = (u, v) => sd(u, v - dy), rot = th ? ['x', th, [0, y, z]] : null;
     els.push(...slab({plane: 'z', at: z, rect: R, sd: sdf, half: .05, sprite: so, edge: 'g_plate', cell: .1, cards: '-', clip, rot}));
     els.push(...slab({plane: 'z', at: z, rect: R, sd: sdf, half: .05, sprite: si, edge: 'g_plate', cell: .1, cards: '+', core: false, clip, rot}));
@@ -835,7 +983,7 @@ export function models() {
   // the mantle: one model per flap for both forms (tinted per form by its slots)
   const rimSlot = els => { for (const e of els) for (const f of Object.values(e.faces)) if (f.rim) { delete f.rim; f.tintindex = SLOT.band_a; } return els; };
   const um = (els, n) => toUnits(rimSlot(autoSlot(els)), PART_SCALE[n]);
-  const ma = um(mantle(1.95, .56, 'a'), 'mantle_l_a'), mb = um(mantle(1.8, .5, 'b'), 'mantle_l_b');
+  const ma = um(mantle(2.25, .42, 'a'), 'mantle_l_a'), mb = um(mantle(1.95, .37, 'b'), 'mantle_l_b');
   Object.assign(out, {mantle_l_a: ma, mantle_r_a: mirrorX(ma), mantle_l_b: mb, mantle_r_b: mirrorX(mb)});
   return (built = out);
 }
