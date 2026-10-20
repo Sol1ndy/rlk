@@ -13,6 +13,6 @@ function rlk:mboss/butterfly/dew/clear
 scoreboard players set #bfSt mb 7
 function rlk:mboss/butterfly/rig/prop/clear
 function rlk:mboss/butterfly/rig/play/death
-# the kit: its ground decals go (the hazards are already cleared)
+# the kit: its ground decals go (a safety net: the patterns draw none since the telegraph rule 10-20)
 function rlk:mboss/butterfly/fx/tele/clear
 function rlk:mboss/butterfly/seq_h/death/start

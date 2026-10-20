@@ -1,6 +1,5 @@
 # sweep_g clip tick 18
 execute if entity @e[type=minecraft:marker,tag=rlk_mb_gd_p11h,scores={mbHzHit=1..}] run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_gd_p11h] mbHzHit 1
-kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p11b0]
 execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p11w2] run data merge entity @s {start_interpolation:0,interpolation_duration:4,transformation:{scale:[0.984f,0.01f,0.04f]}}
 function rlk:mboss/guardian/p/sweep_g/s3
 execute at @s rotated as @s rotated ~ 0 positioned ^-0.6 ^0.4 ^4.8 positioned ^1.217 ^-0.037 ^-0.681 run summon minecraft:block_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p11","rlk_mb_gd_q11c","rlk_mb_gd_q11c_0"],block_state:{id:"minecraft:red_stained_glass"},brightness:{sky:15,block:15},view_range:0.7f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,transformation:{translation:[-0.086f,0.021f,-0.116f],left_rotation:[0.116f,-0.124f,-0.415f,0.894f],scale:[0.168f,0.168f,0.168f],right_rotation:[0f,0f,0f,1f]}}

@@ -1,4 +1,4 @@
-# [c_rocks] @s = a waiting slab, at it: its clock mbT (-10 at the decal, 0 at the burst); it rises at 2, then
+# [c_rocks] @s = a waiting slab, at it: its clock mbT (-10 when its burst is placed, 0 at the burst); it rises at 2, then
 # drips tuff dust every 4 t while it hovers.
 scoreboard players add @s mbT 1
 execute if score @s mbT matches 2 run return run function rlk:mboss/fieldgen/p/rock/rk_rise

@@ -3,4 +3,3 @@ kill @e[tag=rlk_mb_gd_p11]
 execute at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~ 0
 function rlk:mboss/guardian/rig/play/sweep
 function rlk:mboss/guardian/p/sweep_g/slices
-execute at @s rotated as @s rotated ~ 0 run function rlk:mboss/guardian/p/sweep_g/rim0

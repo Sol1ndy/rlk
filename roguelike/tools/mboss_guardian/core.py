@@ -40,8 +40,8 @@ GROGGY = 220                                  # K13
 NEXT_AFTER_CHAOS = (4, 5)                     # normal patterns before the next guard pair
 OPENING = (3, 4)
 VOICE_CD, VOICE_GUARD_CD = 400, 600
-INTRO_TELL, INTRO_CLIP = 16, 20               # intro clock: ground telegraph, entrance clip start (was 26: the plant's
-INTRO_IMPACT = INTRO_CLIP + ev('entrance', 'impact')   # telegraph 24 -> 18 t, user tuning "선딜 좀 짧게")
+INTRO_TELL, INTRO_CLIP = 16, 20               # intro clock: sky glint + the plant hazard (quiet), entrance clip start (was
+INTRO_IMPACT = INTRO_CLIP + ev('entrance', 'impact')   # 26: glint -> plant 24 -> 18 t, user tuning "선딜 좀 짧게")
 INTRO_DONE = 60                               # the fight starts 26 t after the plant, as before
 INTRO_R = 3.6                                 # plant disc radius (was 3.0; hit areas x1.2)
 AREA = 1.2                                    # linear scale of the hit areas and their fx (user tuning)
@@ -194,7 +194,7 @@ class Core:
             f'execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run {F("intro/setup")}'])
         self.w('intro_tick', [
             '# Hook intro_tick (@s = body, #mbT = 1.. intro clock; untargetable until intro_end).',
-            f'# {INTRO_TELL}: ground telegraph ({INTRO_IMPACT - INTRO_TELL} t) + glint; {INTRO_CLIP}: entrance clip (impact at clip tick '
+            f'# {INTRO_TELL}: sky glint + the plant hazard (quiet, {INTRO_IMPACT - INTRO_TELL} t); {INTRO_CLIP}: entrance clip (impact at clip tick '
             f'{ev("entrance", "impact")} = intro {INTRO_IMPACT}); {INTRO_DONE}: fight.',
             '# The rig is not ticked before the clip starts, so the hidden parts stay hidden.',
             at_t('#mbT', INTRO_TELL, F('intro/tell')),
@@ -347,9 +347,11 @@ class Core:
             self.R('spawn_hidden'),
             F('hud/sub_intro')])
         self.w('intro/tell', [
-            '# Entrance telegraph (K19, >= 12 t, a deliberate deviation from the PDF\'s "no sign"): a ground disc where the',
-            '# spear will plant (right-front of her, clip grip ^-0.62 ^ ^0.7) and a glint high above it.',
-            sc_set('#hzSfx', 0), sc_set('#hzKB', KB['default']),
+            '# Entrance tell (K19, >= 12 t): a glint high above the spot where the spear will plant (right-front of her, clip',
+            '# grip ^-0.62 ^ ^0.7), then the spear falls from 7 b (intro/fall, intro/trail). Telegraph rule (10-20): no ground',
+            '# marker (the PDF: she appears "어떤 표시도 남기지 않은 상태에서"), so the plant disc is quiet (#hzQuiet 1: no',
+            '# framework outline, no strike flash); the plant\'s own impact (intro/impact) shows the area.',
+            sc_set('#hzSfx', 0), sc_set('#hzKB', KB['default']), sc_set('#hzQuiet', 1),
             f'execute {plant} positioned ~ {CY} ~ run {g.hz_disc(INTRO_R, INTRO_IMPACT - INTRO_TELL, DMG["entrance"])}',
             f'execute {plant} run ' + g.card('star', '^ ^7.4 ^', bb='center', spin=90, s0=0.2, s1=1.4, life=14, fade=6),
             f'execute {plant} run ' + g.sound('block.amethyst_block.chime', 1.0, 1.8),
@@ -663,7 +665,7 @@ class Core:
         disc = lambda t, pos, rot: at_t('#gdT', t, g.card('ring', pos, rot=rot, spin=140, s0=0.5, s1=3.4, life=10, fade=4))
         self.w('guard/entry', [
             '# @s = body, guard clock 1..50: baton twirl, vertical spin discs (16-35), gold ground ring (35), settle.',
-            '# Discs and ring are telegraphs only (no damage, K24).',
+            '# Discs and ring are visuals only (no damage, K24; the ring is in the footage, m2 2.4-2.9 s).',
             R('face/track'),
             at_t('#gdT', 6, g.sound('item.trident.riptide_1', 0.6, 0.9)),
             at_t('#gdT', 11, g.sound('entity.player.attack.sweep', 0.6, 0.7)),

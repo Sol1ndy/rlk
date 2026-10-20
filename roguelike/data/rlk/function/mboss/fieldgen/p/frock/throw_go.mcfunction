@@ -8,6 +8,6 @@ scoreboard players set #pjKB mb 3
 scoreboard players set #pjWall mb 1
 scoreboard players set #pjShape mb 1
 scoreboard players operation #pjGrp mb = #mbGrp mb
-execute at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p12tl,limit=1] feet run function rlk:mboss/pj/launch {spd:15,life:24,dmg:80,hr:12}
+execute at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p12tl,limit=1] feet run function rlk:mboss/pj/launch {spd:15,life:24,dmg:120,hr:12}
 execute at @s rotated as @s run function rlk:mboss/fieldgen/fx/p/slab_throw
 function rlk:mboss/fieldgen/fx/snd/slab_throw

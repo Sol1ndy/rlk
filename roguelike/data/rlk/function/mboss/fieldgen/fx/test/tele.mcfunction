@@ -8,6 +8,8 @@ execute positioned ^ ^ ^11 run function rlk:mboss/fieldgen/fx/tele/ring {r0:15,r
 execute positioned ^6 ^ ^12 run function rlk:mboss/fieldgen/fx/tele/sector {r:45,a:90,tell:40,el:9,hold:3}
 execute positioned ^-6 ^ ^12 run function rlk:mboss/fieldgen/fx/tele/sector {r:40,a:45,tell:40,el:0,hold:3}
 execute positioned ^ ^ ^3 run function rlk:mboss/fieldgen/fx/tele/line {len:60,w:20,back:0,tell:40,el:5,hold:3}
+execute positioned ^9 ^ ^5 run function rlk:mboss/fieldgen/fx/tele/rim {r:28,tell:40,el:6,hold:3}
+execute positioned ^-9 ^ ^5 run function rlk:mboss/fieldgen/fx/tele/dark {r0:8,r:28,grow:6,tell:40,hold:0}
 execute positioned ^ ^ ^20 run function rlk:mboss/fieldgen/fx/tele/wave {r0:25,r1:120,w:25,tell:40,dur:17,el:9,hold:2}
 execute positioned ^-8 ^ ^20 run function rlk:mboss/fieldgen/fx/tele/mline {id:0,len:58,w:8,back:-28,tell:24,el:5,hold:60}
 scoreboard players set #fkMT mb 0

@@ -2,9 +2,10 @@
 # Demo "blast" events (as the anchor; #fkDT = the demo tick).
 execute if score #fkDT mb matches 0 at @s rotated as @s rotated ~ 0 positioned ~ ~7.8 ~ run function rlk:mboss/fieldgen/fx/p/core_spark
 execute if score #fkDT mb matches 0 at @s rotated as @s rotated ~ 0 positioned ~ ~7.8 ~ run function rlk:mboss/fieldgen/fx/snd/core_spark
+execute if score #fkDT mb matches 3 at @s rotated as @s rotated ~ 0 run function rlk:mboss/fieldgen/fx/tele/rim {r:120,tell:45,el:6,hold:3}
 execute if score #fkDT mb matches 5 at @s rotated as @s rotated ~ 0 positioned ~ ~7.8 ~ run function rlk:mboss/fieldgen/fx/p/core_lift
 execute if score #fkDT mb matches 5 at @s rotated as @s rotated ~ 0 positioned ~ ~7.8 ~ run function rlk:mboss/fieldgen/fx/snd/core_lift
-execute if score #fkDT mb matches 7 at @s rotated as @s rotated ~ 0 run function rlk:mboss/fieldgen/fx/p/dark_disc {r0:3.5,r:12,grow:26,life:42}
+execute if score #fkDT mb matches 7 at @s rotated as @s rotated ~ 0 run function rlk:mboss/fieldgen/fx/tele/dark {r0:35,r:120,grow:26,tell:41,hold:0}
 execute if score #fkDT mb matches 29 at @s rotated as @s rotated ~ 0 positioned ~ ~7.8 ~ run function rlk:mboss/fieldgen/fx/p/up_beam
 execute if score #fkDT mb matches 29 at @s rotated as @s rotated ~ 0 positioned ~ ~7.8 ~ run function rlk:mboss/fieldgen/fx/snd/up_beam
 execute if score #fkDT mb matches 36 at @s rotated as @s rotated ~ 0 run function rlk:mboss/fieldgen/fx/p/rim_flare {r:12}

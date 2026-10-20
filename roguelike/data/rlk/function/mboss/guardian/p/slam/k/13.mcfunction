@@ -1,4 +1,5 @@
 # slam tick 13 (@s = body, at the body).
+execute as @e[type=minecraft:item_display,tag=rlk_mb_gd_p3ring] run data merge entity @s {start_interpolation:0,interpolation_duration:6,transformation:{translation:[0f,0f,0f],left_rotation:[-0.4056f,0.5792f,0.5792f,0.4056f],scale:[13.9535f,13.9535f,13.9535f],right_rotation:[0f,0f,0f,1f]}}
 execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-1.74 ^0.08 ^4.04 0 0 0 0 1 force @a[tag=player]
 execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^4.13 ^0.08 ^-2.47 0 0 0 0 1 force @a[tag=player]
 execute rotated as @s rotated ~ 0 positioned ^ ^ ^3.5 positioned ~ 201 ~ run particle minecraft:dust{color:[0.93f,0.7f,0.27f],scale:0.9} ^-1.02 ^0.08 ^0.13 0 0 0 0 1 force @a[tag=player]

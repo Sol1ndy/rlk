@@ -3,20 +3,23 @@
 human form, the heal orbs vanishing, the groggy after it). Owner: the wing-pattern author (with seq_b.py).
 
 Binding: scratchpad mb2/plan.md (Stage-2 decisions) and mb2/spec/B1..B5_*.md; the effect engine is the fx kit
-(bf_fx_api.md: g.fx / snd / kcard / tele_* / kprop); vanilla sounds only. Every damaging hit has a ground decal (kit
-tele/*) paired with its framework hazard in the same tick (same tell, #hzQuiet 1, sfx 0) at least 10 t ahead, or is a
-projectile that carries its own warning (B2 crescents: a decal at the target from the swing; B4 orbs: the wrap/charge
-and the slow glowing orb). Locked ground targets clamp to the walk disc r 20.3 (wx/u/lockw, plan Q8); every point her
-body moves to clamps to r 16.5 (wx/u/clamp_b, plan Q9), the release point to r 16; the core tick also leashes the body
-at r 16.5 in butterfly form (wx/u/btick).
+(bf_fx_api.md: g.fx / snd / kcard / kprop); vanilla sounds only. The telegraph rule (user, 10-20: a ground telegraph only
+where the reference footage shows one; scratchpad tele/bf/audit.md): every damaging hit is a quiet framework hazard
+(#hzQuiet 1: no outline, no strike flash; sfx 0) with NO ground decal, read from her motion and sound at least 10 t
+ahead (B1 bank + swoop, B3 V-up + dive, B5 caption + cup), or a projectile that carries its own warning (B2 crescents
+flying in, B4 orbs: the wrap / charge, the slow glowing orb, its stop and pulse before the burst); each hit draws its
+own impact visual. The one ground visual kept ahead of a hit is B3's red flame line under her glide (the footage's
+trail, TRIM: its disc decal is gone). Locked ground targets clamp to the walk disc r 20.3 (wx/u/lockw, plan Q8);
+every point her body moves to clamps to r 16.5 (wx/u/clamp_b, plan Q9), the release point to r 16; the core tick also
+leashes the body at r 16.5 in butterfly form (wx/u/btick).
 
 Clock: #bfPT = the clip tick (the core plays the clip at clock 0). Event ticks come from the rig manifest
 (tools/mboss_butterfly_rig_manifest.json) by their Stage-2 names, with the played Stage-2 ticks as defaults.
 
 Wind-up tuning (user "선딜 좀 줄이고", plan.md "User feedback after the 10-18 release"): the clips play through the rig's
 RETIME (butterfly_clips.mjs, about 25 % shorter wind-ups, the strikes at full speed), so every event is the played
-tick; a spec tick that is not an event is mapped with api.rt(clip, authored tick), and the telegraphs longer than the
-10 t floor are about 25 % shorter (api.tell_rt).
+tick; a spec tick that is not an event is mapped with api.rt(clip, authored tick), and the aim locks / hazard tells
+longer than the 10 t floor are about 25 % shorter (api.tell_rt).
 """
 import math
 
@@ -32,7 +35,7 @@ L_STRIKE, L_BARRAGE, L_SWEEP, L_COCO, L_RELEASE = (clip_len(c) for c in ('wing_s
 B1_HIT = ev_or('wing_strike', 'hit', 11)
 B1_DIVE = ev_or('wing_strike', 'dive', 4)
 B1_TELL = tell_rt(12)                           # 10 (12 before the tuning)
-B1_LOCK = B1_HIT - B1_TELL                      # 1: lock L / H, the lane + arc decals
+B1_LOCK = B1_HIT - B1_TELL                      # 1: lock L / H, the lane + arc hazards
 B1_GLIDE = B1_HIT - 7                           # 4: the swoop glide S -> H, 7 t (= the dive)
 B1_LANE = (10.0, 3.5)                           # lane from her spot along the aim (her swoop path)
 B1_ARC = (4.0, 60)                              # sector r 4, +-60 at L (the plan's front arc)
@@ -48,7 +51,7 @@ B2_KEEP = 9.0                                   # between the swings she glides 
 B2_FAN = (0, 30, -30, 60, -60)                  # fan yaw of crescent i (her left +)
 B2_CROSS = [(0.0, 0.0), (1.8, 0.0), (-1.8, 0.0), (3.6, 0.0), (-3.6, 0.0)]   # odd swings: across the aim (x = her left)
 B2_LONG = [(0.0, 0.0), (0.0, 1.8), (0.0, -1.8), (0.0, 3.6), (0.0, -3.6)]    # even swings: along the aim
-B2_R = 1.2                                      # splash radius (the decal and the projectile's hit sphere)
+B2_R = 1.2                                      # splash radius (the projectile's hit sphere)
 B2_SPAWN_R, B2_SPAWN_Y = 2.4, 3.6               # wing-root launch points (body frame)
 B2_OUT, B2_PITCH = 3.0, 35.0                    # fan-out: 3 b at 0.6 b/t, rising 35 degrees
 B2_ARC = 0.4                                    # the dive curves 0.4 b over its straight line (mv/leap)
@@ -62,6 +65,10 @@ B3_TELL, B3_ACT = tell_rt(12), 5                # tell 10 (12 before the tuning)
 B3_LOCK = B3_FAN - B3_TELL                      # 11
 B3_TRAIL = [B3_GLIDE + 1 + 2 * i for i in range(4)]  # 27 29 31 33: trail segments (strike +10, act 8)
 B3_SIDE = 4.5                                   # the low glide to her right
+B3_TRAIL_TELL = 10                              # a trail segment strikes (flares) 10 t after it is laid
+B3_EMBER_LIFE, B3_EMBER_FADE = B3_TRAIL_TELL + 1, 3  # its red ember line lasts to the flare (fix round F3: the
+#   footage's lines show ~6-8 t, v3 13.35-13.60; life 18 outlived the flare by 8 t), shrinking over its last 3 t
+B3_EMBER = dict(s0=1.6, s1=2.0, col='#E04040')   # the ember streak card (flat on the floor, '~ 90')
 
 # ---- B4 달빛 축복 (coco, played): wrap 3, orb1 14, ball 22, ball_open 30, orb2 34 (authored 5 / 19 / 30 / 42 / 46; the rig's
 # prop/pod at the core anchor 22-29)
@@ -126,18 +133,18 @@ def bf(v):
     return ' '.join('^' + L.num(round(float(c), 3), 3) for c in v)
 
 
-def hz_tele(g, prefix, shape, size, tell, dmg, el=EL_DENDRO, hold=3, **opts):
-    """One framework hazard and its kit decal, created in the same context and tick with the same tell (#hzQuiet 1:
-    the decal replaces the framework particles; sfx 0: the pattern composes its own sounds)."""
+def hz_q(g, prefix, shape, size, tell, dmg, el=EL_DENDRO, **opts):
+    """One quiet framework hazard without any ground telegraph (the telegraph rule, 10-20: the footage shows none for
+    her): #hzQuiet 1 (no outline, no strike flash), sfx 0 (the pattern composes its own sounds and impact visual)."""
     lines = list(g.hz_opts(sfx=0, quiet=1, el=el, **opts))
     if shape == 'disc':
-        lines += [prefix + g.hz_disc(size, tell, dmg), prefix + g.tele_disc(size, tell, el=el, hold=hold)]
+        lines += [prefix + g.hz_disc(size, tell, dmg)]
     elif shape == 'sector':
         r, a = size
-        lines += [prefix + g.hz_sector(r, a, tell, dmg), prefix + g.tele_sector(r, a, tell, el=el, hold=hold)]
+        lines += [prefix + g.hz_sector(r, a, tell, dmg)]
     elif shape == 'line':
         ln, wd = size
-        lines += [prefix + g.hz_line(ln, wd, tell, dmg), prefix + g.tele_line(ln, wd, tell, el=el, hold=hold, back=opts.get('back') or 0.0)]
+        lines += [prefix + g.hz_line(ln, wd, tell, dmg)]
     else:
         raise ValueError(shape)
     return lines
@@ -160,7 +167,8 @@ def emit(g):
 def b1(g):
     """B1 우아한 날개 / 날개 치기 (Dendro, spec B1_wing_strike.md): bank 0-4 drifting in, lock at 1 (L under the player,
     H = L + 2 b along the aim and 1.2 b to her right), the lane 10 x 3.5 from her spot + the arc r 4 +-60 at L in one
-    volley group (tell 10), the swoop glide to H 4-11, the wing-edge hit at 11, the ground slash band, the trailing
+    volley group (tell 10, quiet: no decal; footage v2 35.25-35.93: none, the slash band only with the hit), the swoop
+    glide to H 4-11, the wing-edge hit at 11, the ground slash band, the trailing
     vertical crescent, the climb and the flutter back to the hover (played ticks; bank 0-8, lock 3, tell 12, hit 15
     before the tuning)."""
     R, k, pid = g.rig, K_STRIKE, 11
@@ -173,8 +181,8 @@ def b1(g):
     tl.span(0, B1_GLIDE - 1, A.bstep('toward', 0.15))
     tl.at(rt('wing_strike', 1), g.sound('entity.ender_dragon.flap', 0.5, 1.8))
     # t3: the aim lock: L (walk disc), her yaw S -> L, S (lane origin), H (swoop end, body clamp), the volley group
-    lane = hz_tele(g, f'execute at {S_} run ', 'line', B1_LANE, B1_TELL, DMG['b1'], kb=KB['default'], grp=True)
-    arc = hz_tele(g, f'execute at {L_} run ', 'sector', B1_ARC, B1_TELL, DMG['b1'], kb=KB['default'], grp=True)
+    lane = hz_q(g, f'execute at {S_} run ', 'line', B1_LANE, B1_TELL, DMG['b1'], kb=KB['default'], grp=True)
+    arc = hz_q(g, f'execute at {L_} run ', 'sector', B1_ARC, B1_TELL, DMG['b1'], kb=KB['default'], grp=True)
     tl.at(B1_LOCK, '# the aim lock: L on the floor under the player (walk disc), her yaw S -> L, the swoop end H',
           f'kill @e[type=minecraft:marker,tag={l_}]', f'kill @e[type=minecraft:marker,tag={s_}]', f'kill @e[type=minecraft:marker,tag={h_}]',
           R('face/player'), A.lockw(), g.keep(l_, 'rlk_mb_bf_lock'),
@@ -269,12 +277,13 @@ def b2_dive_table():
 
 def b2(g):
     """B2 화염 날개의 습격 / 날개탄 (Pyro, spec B2_wing_barrage.md): four swings; at each swing s the player's spot L is locked
-    (walk disc) and 5 targets T_i are set in a row (odd swings across the aim, even swings along it, 1.8 b apart) with
-    a Pyro ground marker each; crescent i is a REAL projectile (framework pj, a fire_claw prop): it leaves her wing root
+    (walk disc) and 5 targets T_i are set in a row (odd swings across the aim, even swings along it, 1.8 b apart), with
+    no ground marker (the telegraph rule; footage v3 8.30-10.16: the floor is clear until the splashes, the crescents
+    are seen flying in); crescent i is a REAL projectile (framework pj, a fire_claw prop): it leaves her wing root
     at s+2+i, fans out and rises for 5 t at 0.6 b/t, then dives on a curved path onto T_i. Its dive time D is measured
     in game at the swing from the distance it has to cover (D = (L + 4 h) / 0.7 b/t, 7..60 t: review fix F1, the plan's
-    0.6-0.75 b/t dives at any range), and the same D drives its decal (the fill reaches the rim on the landing tick
-    s+2+i+5+D), its dive, its landing and its pj life. Harmless in the air, it hits on landing (a sphere r 1.2 under the
+    0.6-0.75 b/t dives at any range), and the same D drives its landing tick s+2+i+5+D (the marker's mbT), its dive,
+    its landing and its pj life. Harmless in the air, it hits on landing (a sphere r 1.2 under the
     prop = the splash on the floor), DMG['b2'] (35 %) Pyro, KB 2; the 5 crescents of a swing share a volley group: one hit per swing
     at most. Each crescent leaves a short flame tail drawn along its actual flight (review fix F4). Between the swings
     she glides in at 0.3 b/t while beyond 9 b (the plan: she keeps 6-8 b for the Pyro patterns)."""
@@ -287,21 +296,6 @@ def b2(g):
     tl = TL(g, k)
     t0 = -B2_LEAD
     table = b2_dive_table()
-    # the decal of a crescent: tell W = its landing - now (at the swing 2 + i + 5 + D; after a pause what is left)
-    w_lo, w_hi = 1, B2_SPAWN + B2_N - 1 + B2_UP + B2_DMAX
-    for w in range(w_lo, w_hi + 1):
-        g.pw(k, f'tele/{w}', [g.tele_disc(B2_R, w, el=EL_PYRO, hold=3)])
-
-    def tele_node(lo, hi):
-        if hi - lo <= 3:
-            return [f'execute if score #bp12W mb matches {w} run return run {g.fn(f"p/{k}/tele/{w}")}' for w in range(lo, hi + 1)]
-        mid = (lo + hi) // 2
-        for a, b in ((lo, mid), (mid + 1, hi)):
-            g.pw(k, f'tele/d{a}_{b}', tele_node(a, b))
-        return [f'execute if score #bp12W mb matches {lo}..{mid} run return run {g.fn(f"p/{k}/tele/d{lo}_{mid}")}',
-                f'execute if score #bp12W mb matches {mid + 1}..{hi} run return run {g.fn(f"p/{k}/tele/d{mid + 1}_{hi}")}']
-    g.pw(k, 'tele/pick', ['# #bp12W = the tell (ticks): the Pyro ground decal r 1.2 of a crescent\'s landing point, here.']
-         + tele_node(w_lo, w_hi))
     far = f'execute unless entity @e[tag=rlk_body,distance=..{L.num(B2_KEEP)},limit=1] run {A.bstep("toward", 0.3)}'
     tl.span(t0, B2_SWINGS[0] - B2_WIND - 1, far)
     for kk, s in enumerate(B2_SWINGS, 1):
@@ -315,8 +309,8 @@ def b2(g):
         tl.span(w0 + 1, s - 1, R('face/track'))
         rows = B2_CROSS if kk % 2 else B2_LONG
         lines = [f'# SWING {kk}: lock L (walk disc), her yaw S -> L, the 5 targets ({"across" if kk % 2 else "along"} the aim), each',
-                 '# crescent\'s dive time from its distance and its Pyro ground marker (fill = landing tick), the volley group of',
-                 '# the swing, the flame sheet and the launch roar.',
+                 '# crescent\'s dive time from its distance and its landing clock (no ground marker: the telegraph rule), the',
+                 '# volley group of the swing, the flame sheet and the launch roar.',
                  R('face/player'), f'kill @e[type=minecraft:marker,tag={l_}]', f'kill @e[type=minecraft:marker,tag={t_}s{kk}]',
                  A.lockw(), g.keep(l_, 'rlk_mb_bf_lock'), f'execute at @s facing entity {L_} feet run tp @s ~ ~ ~ ~ 0', g.GRP_NEW]
         for i, (x, z) in enumerate(rows):
@@ -355,7 +349,7 @@ def b2(g):
             # the dive time of crescent (kk, i): L^2 (tenths^2) from the fan-out end (here) to the marker + 0.65 b
             g.pw(k, f'dive{kk}{i}', [
                 f'# @s = body, positioned at the fan-out end of crescent {i} of swing {kk}: #bp12D{kk}{i} = its dive time (from the',
-                '# straight distance to its landing point), its landing clock on the marker (mbT), the decal.',
+                '# straight distance to its landing point), its landing clock on the marker (mbT).',
                 f'execute store result score #bp12X mb run data get entity {T} Pos[0] 10',
                 'summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_help","rlk_mb_bf_p12h"]}',
                 'execute store result score #t mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_bf_p12h,limit=1] Pos[0] 10',
@@ -375,8 +369,7 @@ def b2(g):
                 + [f'execute if score #bp12X mb matches {q}.. run scoreboard players set #bp12D{kk}{i} mb {D}' for q, D in table]
                 + [f'scoreboard players operation #bp12W mb = #bp12D{kk}{i} mb', f'scoreboard players add #bp12W mb {B2_SPAWN + i + B2_UP}',
                    f'scoreboard players operation @e[type=minecraft:marker,tag={tag}] mbT = #bp12W mb',
-                   f'scoreboard players operation @e[type=minecraft:marker,tag={tag}] mbT += #bfPT mb',
-                   f'execute at {T} run function {NS}p/{k}/tele/pick'])
+                   f'scoreboard players operation @e[type=minecraft:marker,tag={tag}] mbT += #bfPT mb'])
             g.pw(k, f'spawn{kk}{i}', [
                 f'# @s = body: fire crescent {i} of swing {kk} at her wing root ({B2_FAN[i]} degrees), a pj prop (harmless until it',
                 '# lands; the swing\'s volley group), then the fan-out glide (5 t, rising); the dive starts in fly at age 5.',
@@ -436,14 +429,6 @@ def b2(g):
         f'execute store result score #bp12P mb run data get entity {X} Rotation[1]',
         f'execute if score #bp12P mb matches 0.. rotated as {X} positioned ^ ^ ^-0.7 rotated ~ ~-90 run {tail}',
         f'execute if score #bp12P mb matches ..-1 rotated as {X} positioned ^ ^ ^-0.7 rotated ~ ~90 run {tail}'])
-    g.pw(k, 'resume', ['# The fight runs again after a pause (core resume hook): every landing marker still waiting gets its decal back',
-                       '# with the tell it has left (its landing clock mbT - #bfPT; the pause cleared the decals; review fix FX-1).',
-                       f'execute as @e[type=minecraft:marker,tag={t_}] at @s run function {NS}p/{k}/redraw'])
-    g.pw(k, 'redraw', ['# @s = a landing marker: it lands when #bfPT reaches its mbT; the module tick after this hook counts #bfPT',
-                       '# up once more, so the landing is mbT - #bfPT - 1 ticks from now.',
-                       'scoreboard players operation #bp12W mb = @s mbT', 'scoreboard players operation #bp12W mb -= #bfPT mb',
-                       'scoreboard players remove #bp12W mb 1',
-                       f'execute if score #bp12W mb matches {w_lo}.. run function {NS}p/{k}/tele/pick'])
     tl.write([f'# B2 화염 날개의 습격 (clip wing_barrage: swings {B2_SWINGS}; lead {B2_LEAD}). Crescent i of a swing s: spawn s+{B2_SPAWN}+i,',
               f'# fan-out {B2_UP} t, curved dive of D = (L + {L.num(4 * B2_ARC)}) / {L.num(B2_VMAX)} t ({B2_DMIN}..{B2_DMAX}), lands s+{B2_SPAWN}+i+{B2_UP}+D on its',
               f'# marker ({DMG["b2"]} % Pyro each, one hit per swing); the end once the clip is over and every crescent has landed.'],
@@ -464,9 +449,14 @@ def b2(g):
 def b3(g):
     """B3 날개 휩쓸개 / 날갯짓 (Pyro, spec B3_flap_dive.md): two big flaps and the rise, the lock at fan-10 (the slam point P
     up to 3 b toward the player and 2.5 b short of them, the aim at the player), the 180 degree flame fan r 4.5 (2.5
-    tall, active 5 t, 90 %) telegraphed 10 t (12 before the tuning), the head-first dive glide to P, the slam, the eruption, then the low
-    glide 4.5 b to her right leaving 4 flame-trail segments (r 1, tell 10, act 8, 30 %, two volley groups: at most 2
-    touches) whose flares are the hz_vis strike events."""
+    tall, active 5 t, 90 %) 10 t after the lock (12 before the tuning; quiet: no decal, footage v3 12.33-13.07: none,
+    read from the V-up, the downstroke and the dive), the head-first dive glide to P, the slam, the eruption, then the
+    low glide 4.5 b to her right leaving 4 flame-trail segments (r 1, tell 10, act 8, 30 %, two volley groups: at most 2
+    touches) whose flares are the hz_vis strike events. Each segment's only ground visual ahead of its flare is the red
+    ember line she lays down (the footage's flame line, v3 13.30-13.68; TRIM: its disc decal is gone), alive up to the
+    flare (life B3_EMBER_LIFE = tell + 1; fix round F3). The ember lines are B3's own pause / resume business (fix round
+    F1): the pause drops those of the live segments (an fx card ages by game time through the freeze) and the resume lays
+    them again with the ticks left, so no segment strikes after a pause with nothing on the floor."""
     R, k, pid = g.rig, K_SWEEP, 13
     p_, gl_ = 'rlk_mb_bf_p13p', 'rlk_mb_bf_p13g'
     P_, G_ = M(p_), M(gl_)
@@ -484,10 +474,10 @@ def b3(g):
     tl.at(rt('flap_dive', 6), '# downstroke 1', BODY + 'run ' + g.particle('small_flame', '^ ^2.5 ^', (3.0, 0.3, 0.6), 0.01, 6),
           g.sound('entity.ender_dragon.flap', 0.8, 1.2))
     tl.at(rt('flap_dive', 13), g.sound('entity.ender_dragon.flap', 0.6, 1.5))
-    fan = hz_tele(g, f'execute at {P_} run ', 'sector', (4.5, 90), B3_TELL, DMG['b3'], el=EL_PYRO, hold=B3_ACT,
-                  act=B3_ACT, y1=2.5, kb=KB['default'])
+    fan = hz_q(g, f'execute at {P_} run ', 'sector', (4.5, 90), B3_TELL, DMG['b3'], el=EL_PYRO,
+               act=B3_ACT, y1=2.5, kb=KB['default'])
     tl.at(B3_LOCK, '# the lock: the slam point P (dest 3 b, 2.5 b short of the player; body clamp), the aim at the player,',
-          '# the flame fan (half disc r 4.5 ahead of P, 2.5 tall, active 5 t) with its Pyro decal',
+          '# the flame fan (half disc r 4.5 ahead of P, 2.5 tall, active 5 t; quiet: no decal)',
           f'kill @e[type=minecraft:marker,tag={p_}]', R('face/player'), g.dest(3.0, 2.5), g.keep(p_),
           f'execute as {P_} run {A.clamp_body()}',
           f'execute as {P_} at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ {CY} ~ ~ 0',
@@ -519,10 +509,12 @@ def b3(g):
           g.sound('block.fire.ambient', 0.5, 0.8))
     for i, t in enumerate(B3_TRAIL):
         seg = ([g.GRP_NEW] if i in (0, 2) else [])
-        seg += hz_tele(g, f'execute positioned ~ {CY} ~ rotated as @s rotated ~ 0 run ', 'disc', 1.0, 10, DMG['b3t'], el=EL_PYRO,
-                       hold=8, act=8, kb=KB['none'], vis=pid * 10 + 1, grp=True)
-        tl.at(t, f'# flame-trail segment {i + 1} under her (group {1 if i < 2 else 2}): a dark ember line, the flare 10 t later',
-              *seg, BODY + 'positioned ~ ~0.05 ~ run ' + g.kcard('streak', '~ ~ ~', '~ 90', s0=1.6, s1=2.0, life=18, fade=6, col='#E04040'),
+        seg += hz_q(g, f'execute positioned ~ {CY} ~ rotated as @s rotated ~ 0 run ', 'disc', 1.0, B3_TRAIL_TELL, DMG['b3t'],
+                    el=EL_PYRO, act=8, kb=KB['none'], vis=pid * 10 + 1, grp=True)
+        tl.at(t, f'# flame-trail segment {i + 1} under her (group {1 if i < 2 else 2}): the red ember line (the footage\'s flame line,',
+              f'# the only ground visual before its flare: TRIM, no disc decal) up to the flare {B3_TRAIL_TELL} t later',
+              *seg, BODY + 'positioned ~ ~0.05 ~ run ' + g.kcard('streak', '~ ~ ~', '~ 90', life=B3_EMBER_LIFE, fade=B3_EMBER_FADE,
+                                                                 **B3_EMBER),
               g.dust(A.hexrgb('#8C5436'), 1.2, f'~ ~0.1 ~', (0.4, 0.02, 0.4), 4))
     tl.at(B3_TRAIL[1], g.sound('block.fire.ambient', 0.4, 1.1))
     g.pw(k, 'vis', ['# hz_vis of the flame-trail segments (@s = the hazard marker, at it): the flare on the strike (#hzEv 1).',
@@ -543,6 +535,25 @@ def b3(g):
               f'# trail {B3_TRAIL} strike +10 act 8, two groups).'], ['# B3 tick.'])
     g.pw(k, 'cancel', ['# Remove what B3 owns (its markers; the hazards go with lib_clear).',
                        f'kill @e[type=minecraft:marker,tag={p_}]', f'kill @e[type=minecraft:marker,tag={gl_}]'])
+    # the trail's ember lines through a pause (fix round F1): @s = a live segment hazard (hz_vis pid*10+1, still in its tell)
+    live = f'execute as @e[type=minecraft:marker,tag=rlk_mb_hzq,scores={{mbHzV={pid * 10 + 1}}}] if score @s mbHzT < @s mbHzW at @s '
+    ember = g.kcard('streak', '~ ~ ~', '~ 90', life=B3_EMBER_LIFE, fade=B3_EMBER_FADE, **{**B3_EMBER, 's0': B3_EMBER['s1']})  # full size
+    args = ember[ember.index('{'):]
+    g.pw(k, 'pause', ['# The fight froze (@s = body): the red ember line of every live trail segment goes (an fx card ages by game',
+                      '# time, so it would be gone or nearly gone at the resume); p/<key>/resume lays it again.',
+                      live + 'positioned ~ ~0.05 ~ run kill @e[type=minecraft:item_display,tag=rlk_bk,distance=..0.05]'])
+    g.pw(k, 'resume', ['# The fight runs again (@s = body, before this tick\'s hz/all): every live trail segment gets its red ember line',
+                       '# back, alive up to its flare (the ticks left + 1).',
+                       live + f'rotated as @s rotated ~ 0 positioned ~ ~0.05 ~ run {g.fn(f"p/{k}/ember")}'])
+    g.pw(k, 'ember', ['# @s = a live trail segment hazard, at its floor point + 0.05, its yaw. The strike comes mbHzW - mbHzT - 1 ticks',
+                      '# from now (the resume hook runs before this tick\'s hz/all); storage rlk:mboss bfr = the card\'s macro args.',
+                      'scoreboard players operation #bfX mb = @s mbHzW', 'scoreboard players operation #bfX mb -= @s mbHzT',
+                      'scoreboard players remove #bfX mb 1',
+                      'execute if score #bfX mb matches ..0 run return 0',
+                      f'data modify storage rlk:mboss bfr set value {args}',
+                      'scoreboard players add #bfX mb 1',
+                      'execute store result storage rlk:mboss bfr.life int 1 run scoreboard players get #bfX mb',
+                      f'function {A.K.FN}card with storage rlk:mboss bfr'])
 
 
 # ---------------------------------------------------------------------------------------------
@@ -550,8 +561,10 @@ def b4(g):
     """B4 달빛 축복 / 2단 코코볼 (Dendro, spec B4_coco.md): the wing-wrap charge, orb 1 at orb1 (her chest, ahead) and orb 2
     at orb2 (her right side), the cocoon ball between. Each orb is a framework pj (a kit sphere prop with two spinning
     gyroscope rings, or the rig's orb prop once it exists) flying 0.25 b/t and steering 9 degrees/t toward the player
-    for its 40 t life (contact: DMG['b4'], 100 % Dendro, KB 2, it pops); then it stops, a burst decal r 2.8 fills under it and
-    10 t later the radial ground blades burst (the same 100 %, KB 3) in the orb's own volley group: one hit per orb."""
+    for its 40 t life (contact: DMG['b4'], 100 % Dendro, KB 2, it pops); then it stops and pulses (a beacon chime) and
+    10 t later the radial ground blades burst r 2.8 under it (the same 100 %, KB 3) in the orb's own volley group: one
+    hit per orb. No ground marker (the telegraph rule; footage v3 21.30-22.87: no shadow ring under the flying orbs, no
+    marker before the bursts): the orb itself, its hum, its stop and pulse are the warning."""
     R, k, pid = g.rig, K_COCO, 14
     o_, r_, n_, v_ = 'rlk_mb_bf_p14o', 'rlk_mb_bf_p14r', 'rlk_mb_bf_p14n', 'rlk_mb_bf_p14v'
     rig_orb, rig_pod = g.prop('orb'), g.prop('pod')
@@ -584,7 +597,7 @@ def b4(g):
           g.sound('entity.ender_dragon.flap', 0.5, 1.5))
     tl.at(B4_END, g.end())
     tl.write([f'# B4 달빛 축복 (clip coco: wrap {B4_WRAP}, orbs {B4_ORBS}, ball {B4_BALL}-{B4_OPEN}; orb pj {B4_SPD} b/t, steer 9/t for',
-              f'# {B4_STEER} t, burst decal r {B4_BURST} at +{B4_STEER}, burst +{B4_LIFE}; end {B4_END} or earlier once both orbs are gone).'],
+              f'# {B4_STEER} t, burst hazard r {B4_BURST} at +{B4_STEER} (quiet), burst +{B4_LIFE}; end {B4_END} or earlier once both orbs are gone).'],
              ['# B4 tick: the orbs steer (pj props; the module tick runs before pj/all moves them).',
               f'execute if entity @e[type=minecraft:item_display,tag={o_},limit=1] as @e[type=minecraft:item_display,tag={o_}] at @s run {g.fn(f"p/{k}/orb")}',
               f'execute if score #bfPT mb matches {L_COCO + 1}.. unless entity @e[type=minecraft:item_display,tag={o_},limit=1] run return run {g.end()}'])
@@ -623,10 +636,10 @@ def b4(g):
                                f'execute if score @s mbT matches ..{B4_STEER - 1} positioned ^ ^ ^{L.num(B4_SPD)} as @e[type=minecraft:item_display,tag={v_}{n}] run tp @s ~ ~ ~',
                                f'execute if score @s mbT matches {B4_STEER}.. as @e[type=minecraft:item_display,tag={r_}{n}a,limit=1] rotated as @s run tp @s ~ ~ ~ ~6 ~',
                                f'execute if score @s mbT matches {B4_STEER}.. as @e[type=minecraft:item_display,tag={r_}{n}b,limit=1] rotated as @s run tp @s ~ ~ ~ ~-5 ~'])
-    burst = hz_tele(g, f'execute positioned ~ {CY} ~ run ', 'disc', B4_BURST, B4_LIFE - B4_STEER, DMG['b4'], kb=KB['default'])
+    burst = hz_q(g, f'execute positioned ~ {CY} ~ run ', 'disc', B4_BURST, B4_LIFE - B4_STEER, DMG['b4'], kb=KB['default'])
     g.pw(k, 'orb', [
         f'# @s = an orb, at it (module tick). Age mbT: homing 1..{B4_STEER - 1} (9 degrees/t), its pj life ends at {B4_STEER}',
-        f'# (pj_end keeps it as a still prop), the burst decal + hazard at {B4_STEER} in its group, pulses, the burst at {B4_LIFE}.',
+        f'# (pj_end keeps it as a still prop), the burst hazard at {B4_STEER} in its group (quiet), pulses, the burst at {B4_LIFE}.',
         'scoreboard players add @s mbT 1',
         f'execute if score @s mbT matches 1..{B4_STEER - 1} run ' + g.pj_steer(9),
         *[f'execute if entity @s[tag={o_}{n}] run {g.fn(f"p/{k}/follow{n}")}' for n in range(len(B4_ORBS))],
@@ -634,16 +647,15 @@ def b4(g):
         f'execute if score @s mbT matches ..{B4_STEER} if score #bfM mb matches 0 run ' + g.dust(A.LIME_PALE, 1.0, '~ ~ ~', (0.4, 0.4, 0.4), 3),
         f'execute if score @s mbT matches ..{B4_STEER} if score #bfM mb matches 0 run ' + g.particle('end_rod', '~ ~ ~', (0.3, 0.3, 0.3), 0.01, 1),
         'scoreboard players operation #bfM mb = @s mbT', 'scoreboard players operation #bfM mb %= #bfK10 mb',
-        f'execute if score @s mbT matches ..{B4_STEER - 1} if score #bfM mb matches 0 run {g.fn(f"p/{k}/shadow")}',
+        '# every 10 t of flight: its hum (no shadow ring on the floor: the telegraph rule)',
+        f'execute if score @s mbT matches ..{B4_STEER - 1} if score #bfM mb matches 0 run {g.snd("orb_fly")}',
         f'execute if score @s mbT matches {B4_STEER} rotated ~ 0 run {g.fn(f"p/{k}/burst_tell")}',
         *[f'execute if score @s mbT matches {t} run data merge entity @s {{start_interpolation:0,interpolation_duration:3,'
           f'transformation:{{scale:[{s}f,{s}f,{s}f]}}}}' for t, s in ((B4_STEER + 1, 1.95), (B4_STEER + 4, 1.7), (B4_STEER + 7, 1.95))],
         f'execute if score @s mbT matches {B4_LIFE} run {g.fn(f"p/{k}/burst")}'])
-    g.pw(k, 'shadow', ['# Every 10 t of flight: a lime shadow ring on the floor under the orb (it reads the depth), its hum.',
-                       f'execute positioned ~ {CY} ~ run ' + g.dust(A.LIME, 0.8, '~ ~0.1 ~', (0.45, 0.0, 0.45), 10),
-                       g.snd('orb_fly')])
     g.pw(k, 'burst_tell', ['# @s = orb at the end of its homing (its pj ends in pj/all this tick: released, harmless): the burst',
-                           f'# hazard r {L.num(B4_BURST)} on the floor under it in its own volley group (one hit per orb), the decal.',
+                           f'# hazard r {L.num(B4_BURST)} on the floor under it in its own volley group (one hit per orb; quiet: no',
+                           '# decal), the beacon chime as it stops (its pulses follow on the orb itself).',
                            *g.hz_opts(), 'scoreboard players operation #hzGrp mb = @s mbPjG', *burst,
                            g.sound('block.beacon.power_select', 0.4, 1.9)])
     g.pw(k, 'burst', ['# @s = orb, its burst tick (the hazard strikes now): the radial ground blades, the airy boom; gone.',
@@ -669,8 +681,9 @@ def b4(g):
 def b5(g):
     """B5 달빛 해제 / 강화 해제 (Dendro, service 15; spec B5_release.md): at 0 the release point R = the player's spot + 4 b
     outward from the arena centre (toward her side when the player stands on the centre), clamped to r 16; the swoop
-    glide to R (3-14, at most 1.2 b/t), the whirl with the lime star flare and slash streaks, the cup (the dome decal r 10
-    and its hazard, tell 17: dodge by > 10.3 b from R or a dash at E), the ground flash, the cyan X glint, the gyroscope
+    glide to R (3-14, at most 1.2 b/t), the whirl with the lime star flare and slash streaks, the cup (the dome hazard r
+    10, tell 17, quiet: no decal and no safe-line ring, footage v3 33.60-36.27 / v4 replay: none; dodge by > 10.3 b from
+    R or a dash at E), the ground flash under her (the footage's, marking the centre), the cyan X glint, the gyroscope
     ring cage, the pod, the detonation E at 40 (DMG['b5'], 130 % Dendro, KB 4 radial), the tendrils, the embers, the wing shards and
     shatter, the landing (played ticks; the swoop 5-14, the cup 31, tell 22, E 53 before the tuning).
     The core: the caption at 0, the flat look, the revert to human form and the groggy."""
@@ -748,8 +761,8 @@ def b5(g):
     tl.at(rt('release', 24), g.sound('entity.breeze.whirl', 0.5, 1.4))
     tl.at(rt('release', 28), g.sound('entity.breeze.whirl', 0.5, 1.5))
     tl.at(whirl[-1], g.sound('entity.player.attack.sweep', 0.4, 1.6))
-    dome = hz_tele(g, f'execute at {R_} run ', 'disc', B5_R, B5_DET - B5_CUP, DMG['b5'], kb=KB['heavy'], hold=4)
-    tl.at(B5_CUP, f'# the cup: the dome r {L.num(B5_R)} at R, telegraphed {B5_DET - B5_CUP} t (the decal and the hazard), the charge',
+    dome = hz_q(g, f'execute at {R_} run ', 'disc', B5_R, B5_DET - B5_CUP, DMG['b5'], kb=KB['heavy'])
+    tl.at(B5_CUP, f'# the cup: the dome r {L.num(B5_R)} at R, its hazard {B5_DET - B5_CUP} t ahead (quiet: no decal), the charge',
           *dome, at_b(core('cup')) + g.kcard('glow', bb='center', s0=1.0, s1=1.8, life=8, fade=3, col='#D8F2BC'),
           g.sound('block.respawn_anchor.charge', 0.7, 1.2), g.sound('block.beacon.activate', 0.6, 1.6))
     tl.at(B5_FLASH, '# the ground flash: a lime mist cone from the floor at R',
@@ -763,10 +776,6 @@ def b5(g):
     tl.at(B5_RINGS, '# the gyroscope ring cage r 4 (refreshed 3 t later)', at_b(core('rings')) + g.fx('rel_cage'),
           g.sound('block.conduit.activate', 0.5, 1.4))
     tl.at(rt('release', 41), at_b(core('rings')) + g.fx('rel_cage'), g.sound('block.respawn_anchor.charge', 0.6, 1.5))
-    safe = [f'execute at {R_} run ' + g.particle('end_rod', f'~{L.num(10.5 * math.sin(math.radians(a)), 2)} ~0.3 ~{L.num(10.5 * math.cos(math.radians(a)), 2)}',
-                                                  (0, 0, 0), 0, 1) for a in range(0, 360, 15)]
-    for t in (rt('release', 41), rt('release', 47)):
-        tl.at(t, '# the safe line just outside the dome (r 10.5)', *safe)
     tl.at(B5_WRAP, '# the wings wrap into the pod (the rig\'s pod prop at the core anchor until the snap, rig API section 6.1):',
           '# the core glow grows inside it, inward streaks; pressure builds',
           *([f'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_prop_pod]', at_b(core('wrap')) + rig_pod] if rig_pod else []),

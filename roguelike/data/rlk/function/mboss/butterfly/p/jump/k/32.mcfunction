@@ -9,6 +9,4 @@ scoreboard players set #hzKB mb 4
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p2b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p2b,limit=1] rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/hz/disc {r:25,tell:10,dmg:70}
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p2b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p2b,limit=1] rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/butterfly/fx/tele/disc {r:25,tell:10,el:7,hold:3}
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p2b,limit=1] run function rlk:mboss/butterfly/fx/card {kind:"glint",pos:"~ ~3 ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.3,s1:0.8,move:"0f,0f,0f",life:10,fade:3,col:15072200}
 execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p2b,limit=1] run playsound minecraft:block.amethyst_cluster.hit hostile @a[tag=player] ~ ~ ~ 0.45 1.8 0.15

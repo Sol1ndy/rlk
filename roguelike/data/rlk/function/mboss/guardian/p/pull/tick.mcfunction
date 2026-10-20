@@ -36,7 +36,6 @@ execute if score #gdPT mb matches 30 if score #gp4Ok mb matches 1 run function r
 execute if score #gdPT mb matches 31 if score #gp4Ok mb matches 1 run function rlk:mboss/guardian/p/pull/k/31
 execute if score #gdPT mb matches 32 run function rlk:mboss/guardian/p/pull/k/32
 execute if score #gdPT mb matches 36 if score #gp4Ok mb matches 1.. run function rlk:mboss/guardian/p/pull/k/36
-execute if score #gdPT mb matches 37 if score #gp4Ok mb matches 1.. run function rlk:mboss/guardian/p/pull/k/37
 execute if score #gdPT mb matches 38 if score #gp4Ok mb matches 1.. run function rlk:mboss/guardian/p/pull/k/38
 execute if score #gdPT mb matches 41 if score #gp4Ok mb matches 1.. run function rlk:mboss/guardian/p/pull/k/41
 execute if score #gdPT mb matches 44 if score #gp4Ok mb matches 1.. run function rlk:mboss/guardian/p/pull/k/44

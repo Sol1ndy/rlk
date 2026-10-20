@@ -1,6 +1,7 @@
 # @s = body (clip tick 34). U = the player now; D = 6.6 b from U, 75 deg round it from her side
 # (random side, the other one when outside the arena, then clamped); a 8.4 x 2.7 b lane from D
-# through U strikes at 46 (knockback 4 along it); she flies to D over 8 t.
+# through U strikes at 46 (knockback 4 along it; quiet, no ground telegraph); she flies to D over
+# 8 t facing U.
 kill @e[type=minecraft:marker,tag=rlk_mb_gd_p1u,limit=1]
 kill @e[type=minecraft:marker,tag=rlk_mb_gd_p1d,limit=1]
 execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ 201 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p1","rlk_mb_gd_p1u"]}
@@ -12,7 +13,6 @@ execute as @e[type=minecraft:marker,tag=rlk_mb_gd_p1d,limit=1] run function rlk:
 execute as @e[type=minecraft:marker,tag=rlk_mb_gd_p1d,limit=1] at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_gd_p1u,limit=1] feet run tp @s ~ ~ ~ ~ 0
 scoreboard players set #hzKB mb 4
 scoreboard players set #hzSfx mb 0
-scoreboard players set #hzVis mb 12
 scoreboard players set #hzLinger mb 4
 scoreboard players set #hzQuiet mb 1
 execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p1d,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p1d,limit=1] run function rlk:mboss/hz/line {len:84,w:27,tell:12,dmg:115}

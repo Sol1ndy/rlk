@@ -313,9 +313,9 @@ class Core:
         self.w('pause', [
             '# Hook pause (the fight froze: player dead / reviving / selection screen / no body). Death ends 달빛 고치 and',
             '# 달빛 축복 받음 (plan "cleared on death"); the running pattern may drop what would hang (its optional pause).',
-            '# The kit\'s ground decals go (the frozen hazards keep their framework markers; the decals would run on and',
-            '# flash early), so does a kit screen flash / pop still on the title line (only while one is up: vBig, so a',
-            '# selection screen\'s own title is left alone); a dead or reviving player clears the kit cards.',
+            '# The kit\'s ground decals go (a safety net: under the telegraph rule (10-20) the patterns draw none), so does a',
+            '# kit screen flash / pop still on the title line (only while one is up: vBig, so a selection screen\'s own',
+            '# title is left alone); a dead or reviving player clears the kit cards.',
             sc_set('#bfFlash', 0),
             f'function {K.FN}tele/clear',
             f'execute if entity @a[tag=player,scores={{vBig=1..}}] run {g.khud("flash_end")}',
@@ -323,32 +323,12 @@ class Core:
             f'execute if entity @a[tag=player,scores={{rnDie=1..}}] run {F("coc/clear_hud")}',
             F('p/pause_d')])
         self.w('resume', [
-            '# Hook resume (the fight runs again; module timers live in the body tick and simply continue). The pause hook',
-            '# cleared the kit\'s ground decals of the frozen hazards: every quiet hazard still in its tell gets its decal',
-            '# back with the tell it has left, so no strike lands without a telegraph (review fix FX-1); the running',
-            '# pattern redraws what is not a framework hazard (its optional p/<key>/resume, e.g. B2\'s landing markers).',
-            f'execute as @e[type=minecraft:marker,tag=rlk_mb_hz,tag=rlk_mb_hzq] if score @s mbHzT < @s mbHzW at @s rotated as @s run {F("u/redraw")}',
+            '# Hook resume (the fight runs again; module timers live in the body tick and simply continue). No kit decal',
+            '# to redraw: under the telegraph rule (10-20) no butterfly hazard has one (the player reads her motion and',
+            '# sound; the hazards are quiet, #hzQuiet 1), so the old decal redraw of the frozen quiet hazards (review fix',
+            '# FX-1) is gone. The running pattern restores what it owns (its optional p/<key>/resume: B3 lays the red ember',
+            '# line of its live flame-trail segments again, the only ground telegraph she keeps).',
             F('p/resume_d')])
-        rd = ['# @s = a quiet hazard marker in its tell, at / rotated as it: its kit decal again, from its scores (tenths of a block,',
-              '# the element colour mbHzE; hold 3). The resume hook runs before this tick\'s hz/all, which still counts mbHzT up',
-              '# once: the strike comes mbHzW - mbHzT - 1 ticks from now, the decal\'s tell. Storage rlk:mboss bfr = the macro args.',
-              'scoreboard players operation #bfX mb = @s mbHzW', 'scoreboard players operation #bfX mb -= @s mbHzT',
-              'scoreboard players remove #bfX mb 1',
-              'execute if score #bfX mb matches ..0 run return 0',
-              'execute store result storage rlk:mboss bfr.tell int 1 run scoreboard players get #bfX mb',
-              'execute store result storage rlk:mboss bfr.el int 1 run scoreboard players get @s mbHzE',
-              'data modify storage rlk:mboss bfr.hold set value 3',
-              'execute store result storage rlk:mboss bfr.r int 0.01 run scoreboard players get @s mbHzR',
-              'execute store result storage rlk:mboss bfr.r0 int 0.01 run scoreboard players get @s mbHzR0',
-              'execute store result storage rlk:mboss bfr.a int 1 run scoreboard players get @s mbHzAng',
-              'execute store result storage rlk:mboss bfr.len int 0.01 run scoreboard players get @s mbHzR',
-              'execute store result storage rlk:mboss bfr.w int 0.02 run scoreboard players get @s mbHzC',
-              'execute store result storage rlk:mboss bfr.back int 0.01 run scoreboard players get @s mbHzR0',
-              f'execute if score @s mbHzK matches 1 run return run function {K.FN}tele/disc with storage rlk:mboss bfr',
-              f'execute if score @s mbHzK matches 2 run return run function {K.FN}tele/ring with storage rlk:mboss bfr',
-              f'execute if score @s mbHzK matches 3 run return run function {K.FN}tele/sector with storage rlk:mboss bfr',
-              f'execute if score @s mbHzK matches 4 run return run function {K.FN}tele/line with storage rlk:mboss bfr']
-        self.w("u/redraw", rd)
         self.w('cleanup', [
             '# Hook cleanup (no executor; idempotent; fight end, abort, run end, map change, wipe, uninstall): module',
             '# fake players back to their defaults, 달빛 고치 / 달빛 축복 받음 off, every kit card and both kit HUD badges',
@@ -364,7 +344,8 @@ class Core:
             f'function {K.FN}uninstall',
             'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_dew]',
             'kill @e[tag=rlk_mb_bf_fx]',
-            '# the module\'s scratch storage (heal-orb spawn args, the decal redraw args; review fix perf-4)',
+            '# the module\'s scratch storage (heal-orb spawn args; bfr: B3\'s ember redraw args, the decal redraw args',
+            '# in builds before the telegraph rule 10-20; review fix perf-4)',
             'data remove storage rlk:mboss bfd',
             'data remove storage rlk:mboss bfr']
             + [f'scoreboard objectives remove {o}' for o in A.RIG_OBJECTIVES])
@@ -1136,7 +1117,7 @@ class Core:
             sc_set('#bfSt', ST['dead']),
             R('prop/clear'),
             g.play('death'),
-            '# the kit: its ground decals go (the hazards are already cleared)',
+            '# the kit: its ground decals go (a safety net: the patterns draw none since the telegraph rule 10-20)',
             f'function {K.FN}tele/clear',
             F('seq_h/death/start')])                   # [seq_h: human author] S4 visuals and sounds
         lines = ['# Hook death_tick (@s = body, #mbT = 1.. until cur.death): the clip runs while the rig ticks; it must NOT tick',

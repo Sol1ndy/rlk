@@ -1,7 +1,7 @@
 # barrage clock 52
 # SWING 3: lock L (walk disc), her yaw S -> L, the 5 targets (across the aim), each
-# crescent's dive time from its distance and its Pyro ground marker (fill = landing tick), the volley group of
-# the swing, the flame sheet and the launch roar.
+# crescent's dive time from its distance and its landing clock (no ground marker: the telegraph rule), the
+# volley group of the swing, the flame sheet and the launch roar.
 function rlk:mboss/butterfly/rig/face/player
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p12l]
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p12ts3]
