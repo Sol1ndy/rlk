@@ -218,7 +218,7 @@
       "model": "uarm_l",
       "brightness": 13,
       "scale": 1.8,
-      "elements": 110
+      "elements": 128
     },
     {
       "name": "bracer_l",
@@ -248,7 +248,7 @@
       "model": "uarm_r",
       "brightness": 13,
       "scale": 1.8,
-      "elements": 110
+      "elements": 128
     },
     {
       "name": "bracer_r",
@@ -278,7 +278,7 @@
       "model": "thigh_l",
       "brightness": 13,
       "scale": 2,
-      "elements": 152
+      "elements": 148
     },
     {
       "name": "gaiter_l",
@@ -308,7 +308,7 @@
       "model": "thigh_r",
       "brightness": 13,
       "scale": 2,
-      "elements": 152
+      "elements": 148
     },
     {
       "name": "gaiter_r",
@@ -468,7 +468,7 @@
       "model": "tail_skirt",
       "brightness": 13,
       "scale": 1.8,
-      "elements": 43
+      "elements": 60
     }
   ],
   "shadow": {
@@ -3590,9 +3590,9 @@
     "parts": 47,
     "part_budget": "44-48 (cap 56)",
     "models": 92,
-    "elements_all_models": 9818,
-    "elements_shown_rest": 4290,
-    "atlas_px": 1129984,
+    "elements_all_models": 9863,
+    "elements_shown_rest": 4335,
+    "atlas_px": 1133056,
     "atlas_budget": 1200000
   },
   "objectives": {
@@ -3604,5 +3604,5 @@
     "azRigTail": "tail look: 0 geo, 1 cryo, 2 electro",
     "azRigState": "body state: 0 normal, 1 burrowed, 2 tail-only"
   },
-  "textures": 159
+  "textures": 162
 }

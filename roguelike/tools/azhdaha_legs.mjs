@@ -183,7 +183,11 @@ function claw(kind, [x, y, z], look) {
 // ---- fore leg -----------------------------------------------------------------------------------------------------------------
 // Upper arm (rest-aligned, origin at the shoulder): the muscle mass bulges out above the bracer and sinks into its crown.
 // Stations: a = height below the shoulder, r = [outer +X, front -Z, inner -X, back +Z], c = [x, forward].
-const UARM = [{a: .32, r: [.42, .46, .4, .46], c: [.1, .02]}, {a: .06, r: [.76, .78, .64, .76], c: [.2, .05]}, {a: -.3, r: [.92, .9, .74, .88], c: [.34, .07]},
+// R3 seam: the R2 top cap (r .42 at a +.32 over r .76 at +.06) stood up to 1 b out of the hump as a lidded knob. The
+// stations above the joint now lean in (c x -.75 / -.5) so the prisms above y 3.72 stay inside the flank (a loft
+// prism takes its stations' midpoint profile), and the mass bulges out of the flank from y 3.55 down.
+const UARM = [{a: .3, r: [.3, .35, .3, .35], c: [-.75, .02]}, {a: .12, r: [.45, .55, .45, .55], c: [-.5, .04]}, {a: -.05, r: [.65, .72, .6, .72], c: [-.1, .05]},
+  {a: -.3, r: [.92, .9, .74, .88], c: [.34, .07]},
   {a: -.75, r: [.93, .86, .74, .84], c: [.48, .1]}, {a: -1.15, r: [.76, .74, .68, .74], c: [.64, .13]}, {a: -1.5, r: [.6, .6, .56, .6], c: [.7, .15]}];
 const UARM_B = baked('uarm_hide', UARM, {seed: 61, W: 128, H: 48});
 const uarm = () => UARM_B.els();
@@ -236,7 +240,9 @@ function paw(look) {
 // lateral bulge), so its side outline is the smooth 16-gon; it hides the knee and the shin, and its underside sits on the
 // gaiter collar (the hock is hip-relative (0.5, -1.5, 0.45)). Stations: a = x, r = [front, up, back, down], c = [fwd, up].
 // The lateral bulge sits low (centre ~2.3 b up) so its top runs into the flank instead of standing out as a wheel.
-const THIGH = [{a: -.55, r: [.9, .9, .9, .8], c: [-.05, -.5]}, {a: .15, r: [1.12, 1.1, 1.08, .95], c: [-.05, -.55]}, {a: .55, r: [1.1, .97, 1.06, .96], c: [-.05, -.61]},
+// R3 seam: the inner stations' tops (r up .9 / 1.1 / .97) stood 0.15-0.3 b out of the flank above the bulge as a knob;
+// they now stay under the hull's flank (y 3.40 at x 2.15, 3.19 at x 2.55), so the haunch's top runs into the flank.
+const THIGH = [{a: -.55, r: [.9, .8, .9, .8], c: [-.05, -.5]}, {a: .15, r: [1.12, .95, 1.08, .95], c: [-.05, -.55]}, {a: .55, r: [1.1, .8, 1.06, .96], c: [-.05, -.61]},
   {a: .82, r: [1.0, .8, .97, .9], c: [-.05, -.68]}, {a: 1.03, r: [.86, .64, .84, .8], c: [-.05, -.74]}, {a: 1.2, r: [.66, .5, .64, .62], c: [-.05, -.79]},
   {a: 1.32, r: [.44, .34, .43, .42], c: [-.05, -.82]}, {a: 1.39, r: [.22, .18, .22, .2], c: [-.05, -.83]}];
 const THIGH_B = baked('thigh_hide', THIGH, {axis: 'x', seed: 91, W: 128, H: 48});

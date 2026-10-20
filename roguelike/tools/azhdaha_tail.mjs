@@ -182,8 +182,10 @@ function skirt() {
   const plate = slab({plane: 'z', at: SK.z, rect: SK.rect, sd: skSd, half: .22, sprite: 'tskirt', edge: 'cream', cell: .16, inset: .8, cards: '+', rot: ['x', SK.tilt, [0, 0, SK.z]]});
   // the rounded mass in front of the plate (the side view reads a full rump, not a hanging board); its back stays
   // in front of the tilted plate, its front inside the haunches
-  const mass = loft('z', [{a: SK.z - .42, r: [.95, .5, .95, .45], c: [0, -.7]}, {a: SK.z - .75, r: [1.22, .62, 1.22, .6], c: [0, -1.02]},
-    {a: SK.z - 1.45, r: [1.18, .6, 1.18, .55], c: [0, -.98]}], {n: 16, tex: (k, th) => 'cream', caps: '', seed: 621, ledges: true, skip: (k, th) => Math.sin(th * Math.PI / 180) > .7});
+  // R3 seam: the mass's top reaches 0.1-0.15 b into the pelvis hull at every station (its skipped top facets stay
+  // inside), and its front end is capped: from above-behind no gap opened between the rump and the skirt
+  const mass = loft('z', [{a: SK.z - .42, r: [.95, .62, .95, .45], c: [0, -.7]}, {a: SK.z - .75, r: [1.22, .82, 1.22, .6], c: [0, -1.02]},
+    {a: SK.z - 1.45, r: [1.18, .62, 1.18, .55], c: [0, -.98]}], {n: 16, tex: (k, th) => 'cream', caps: '-', seed: 621, ledges: true, skip: (k, th) => Math.sin(th * Math.PI / 180) > .7});
   return [...plate, ...mass];
 }
 
