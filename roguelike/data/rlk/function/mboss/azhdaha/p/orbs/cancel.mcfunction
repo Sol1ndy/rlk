@@ -1,2 +1,2 @@
-# STUB (S1-MOD, s2.md 2.1): 격류 범람 (orbs, id 31); the S2 author replaces this file.
-# nothing of its own lingers (selectors only, idempotent)
+# The cast was cut before the hand-over: nothing of it may stay (orbs in bg slot L live on).
+execute unless score #azBgL mb matches 31 run function rlk:mboss/azhdaha/p/orbs/kill

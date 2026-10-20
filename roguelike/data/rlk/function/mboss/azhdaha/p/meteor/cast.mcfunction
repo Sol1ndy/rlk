@@ -1,1 +1,3 @@
-# STUB (S1-MOD, s2.md 2.1): 운석 낙하 (meteor, id 32); the S2 author replaces this file.
+# 32 cast (s2.md 6): the cast clock #azCT = the roar_rear tick; R = roar (t20). Seal t27, big t55, small t64-94.
+kill @e[tag=rlk_mb_az_p32]
+scoreboard players set #aq32G mb 0

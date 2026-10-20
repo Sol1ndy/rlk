@@ -1,3 +1,3 @@
-# STUB (S1-MOD, s2.md 2.1): 운석 낙하 (meteor, id 32); the S2 author replaces this file.
-# the cast slot clock #azCT = the roar_rear clip tick
-execute if score #azCT mb matches 94.. run function rlk:mboss/azhdaha/cast/end
+# 32 ctick (#azCT): the timeline; the cast slot ends after the last small meteor (t94).
+execute if score #azCT mb matches 27..66 run return run function rlk:mboss/azhdaha/p/meteor/ckd/27_66
+execute if score #azCT mb matches 70..94 run return run function rlk:mboss/azhdaha/p/meteor/ckd/70_94

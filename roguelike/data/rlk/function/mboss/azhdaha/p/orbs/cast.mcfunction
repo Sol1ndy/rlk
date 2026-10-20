@@ -1,1 +1,1 @@
-# STUB (S1-MOD, s2.md 2.1): 격류 범람 (orbs, id 31); the S2 author replaces this file.
+# 31 cast (s2.md 6): roar_rear t0 (the host plays it). The orbs spawn at drop - 2 in ctick.
