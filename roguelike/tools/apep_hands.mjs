@@ -250,9 +250,9 @@ function clawPlanted() {
   const {F, sd: sd0, cover: cover0, cuff: cuff0} = clawParts(1);
   const sd = turnFlat(sd0), cover = turnFlat(cover0), cuff = turnFlat(cuff0);
   const rect = {a0: -1.2, a1: .8, s0: -.5, s1: 1.45};
-  const tex = sheetSprite('h_claw', rect, turnFlat(clawPaint(F, sd0, false)), 48, 'p1');
-  const texC = sheetSprite('h_clawc', {...rect, s1: .9}, turnFlat(clawPaint(F, cover0, true)), 48, 'p1');
-  const texK = sheetSprite('h_clawk', {...rect, s1: .3}, turnFlat(clawPaint(F, cuff0, true)), 48, 'p1');
+  const tex = sheetSprite('h_claw', rect, turnFlat(clawPaint(F, sd0, false)), 40, 'p1');
+  const texC = sheetSprite('h_clawc', {...rect, s1: .9}, turnFlat(clawPaint(F, cover0, true)), 40, 'p1');
+  const texK = sheetSprite('h_clawk', {...rect, s1: .3}, turnFlat(clawPaint(F, cuff0, true)), 40, 'p1');
   const edge = EDGE_P1();
   const B = [[-.5, 45, .1], [.02, 22.5, .085], [.3, 0, .068]];
   const o = [0, -.02, 0], fr = [];
@@ -275,8 +275,8 @@ function clawPlanted() {
 function clawRaised() {
   const k = .78, {F, sd, cover} = clawParts(k);
   const rect = {a0: -.72, a1: .56, s0: -.3, s1: 1.26};
-  const tex = sheetSprite('h_claw_r', rect, clawPaint(F, sd, false), 48, 'p1');
-  const texC = sheetSprite('h_clawc_r', {...rect, s1: .82}, clawPaint(F, cover, true), 48, 'p1');
+  const tex = sheetSprite('h_claw_r', rect, clawPaint(F, sd, false), 40, 'p1');
+  const texC = sheetSprite('h_clawc_r', {...rect, s1: .82}, clawPaint(F, cover, true), 40, 'p1');
   const edge = EDGE_P1();
   const B = [[-.3, -22.5, .1], [.12, 22.5, .09], [.36, 67.5, .075], [.58, 112.5, .06], [.88, 135, .05]];
   const o = [0, .1, 0], fr = [];
@@ -323,7 +323,7 @@ function petalFoot(k, back, curl) {
     const name = `h_petal${k < 1 ? 'c' : 'b'}${phiDeg ? (Math.abs(phiDeg) === 40 ? '_d' : '_s') : ''}`;
     // one sprite per petal kind: the mirrored runs (right side) reuse the left one through a negative phi on the same U
     const sdS = phiDeg < 0 ? petalShape(L, W, -phi) : sd;
-    const tex = sheetSprite(name, rect, petalPaint(sdS, phiDeg < 0 ? {...ax, da: -ax.da} : ax, {seed: k < 1 ? 'd' : 'c'}), 48, 'p1');
+    const tex = sheetSprite(name, rect, petalPaint(sdS, phiDeg < 0 ? {...ax, da: -ax.da} : ax, {seed: k < 1 ? 'd' : 'c'}), 40, 'p1');
     const [U, R] = RUNS[run];
     const mirrorU = phiDeg < 0;   // mirror the across axis instead of the sprite
     const f = x => x * ext;
@@ -345,7 +345,7 @@ function petalFoot(k, back, curl) {
   const cc = cz + (back ? .14 : -.14) * k;
   const disc = (a, s) => Math.hypot(a, s) - .3 * k;
   els.push(...sheet({o: [0, curl ? -.02 : .0, cz], U: '+x', R: '-z', N: '+y', rect: {a0: -.32 * k, a1: .32 * k, s0: -.32 * k, s1: .32 * k}, sd: disc,
-    tex: sheetSprite(`h_palm${k < 1 ? 'c' : 'b'}`, {a0: -.32 * k, a1: .32 * k, s0: -.32 * k, s1: .32 * k}, petalPaint(disc, {a: 0, s: -.3 * k, da: 0, ds: 1, L: .6 * k}, {root: .01, base: .2}), 48, 'p1'),
+    tex: sheetSprite(`h_palm${k < 1 ? 'c' : 'b'}`, {a0: -.32 * k, a1: .32 * k, s0: -.32 * k, s1: .32 * k}, petalPaint(disc, {a: 0, s: -.3 * k, da: 0, ds: 1, L: .6 * k}, {root: .01, base: .2}), 40, 'p1'),
     edge, bands: [{s: -.32 * k, ang: 0, half: .05}], seed: 431, cell: .1}));
   els.push(rockBox([-.14 * k, .03, cc - .14 * k], [.14 * k, .1, cc + .14 * k], 'g_plate', {seed: 432}));
   els.push(...spike([0, .1, cc], .14 * k, spikeSprite('h_spk_cream1', PAL.p1_cone, 'p1')));
@@ -408,11 +408,11 @@ function forkP3() {
     const top = lineLeafPaint(sd, axis, {R: PAL.p3_leafhand, base: .14, tip: PAL.p3_rim(.15)}), under = lineLeafPaint(sd, axis, {R: P3_UNDER, base: .2});
     // blades that run up bend about X (their tips curl toward the viewer; the front is the -N card); blades that run out
     // bend about Y (sweep back; the front is the +N card); the backs are the pale undersides
-    if (deg < 45) els.push(...sheet({o: [0, -.02, dz], U: '+x', R: '+y', rect, sd, tex: sheetSprite(`h_fork${deg}_b`, rect, under, 24, 'p3'), texM: sheetSprite(`h_fork${deg}`, rect, top, 48, 'p3'), edge, seed: 411 + deg,
+    if (deg < 45) els.push(...sheet({o: [0, -.02, dz], U: '+x', R: '+y', rect, sd, tex: sheetSprite(`h_fork${deg}_b`, rect, under, 24, 'p3'), texM: sheetSprite(`h_fork${deg}`, rect, top, 40, 'p3'), edge, seed: 411 + deg,
       bands: [{s: rect.s0, ang: 0, half: .04}, {s: hi * .55, ang: 22.5 * curl, half: .035}, {s: hi * .82, ang: 45 * curl, half: .025}]}));
     else {
       const rx = {a0: rect.s0, a1: rect.s1, s0: rect.a0, s1: rect.a1}, T = f => (a, s) => f(s, a);
-      els.push(...sheet({o: [0, -.02, dz], U: '+y', R: '+x', rect: rx, sd: (a, s) => sd(s, a), tex: sheetSprite(`h_forkx${deg}`, rx, T(top), 48, 'p3'), texM: sheetSprite(`h_forkx${deg}_b`, rx, T(under), 24, 'p3'), edge, seed: 417 + deg,
+      els.push(...sheet({o: [0, -.02, dz], U: '+y', R: '+x', rect: rx, sd: (a, s) => sd(s, a), tex: sheetSprite(`h_forkx${deg}`, rx, T(top), 40, 'p3'), texM: sheetSprite(`h_forkx${deg}_b`, rx, T(under), 24, 'p3'), edge, seed: 417 + deg,
         bands: [{s: rx.s0, ang: 0, half: .04}, {s: rx.s1 * .5, ang: 22.5, half: .035}, {s: rx.s1 * .8, ang: 45, half: .025}]}));
     }
   }
@@ -557,7 +557,7 @@ function curlB() {
     const p = r.phi * D2R, ext = L * Math.cos(p) + r.W * Math.abs(Math.sin(p)) + .06, wd = r.W + L * Math.abs(Math.sin(p)) + .06;
     const rect = {a0: -wd, a1: wd, s0: 0, s1: ext}, sd = rosLeaf(L, r.W, p);
     const rp = rollPaint(L, r.W), cs = Math.cos(p), sn = Math.sin(p);
-    const tex = sheetSprite(k === 1 ? r.name : `${r.name}_${run}`, rect, (a, s) => rp(a * cs - s * sn, a * sn + s * cs), 48, 'p3');
+    const tex = sheetSprite(k === 1 ? r.name : `${r.name}_${run}`, rect, (a, s) => rp(a * cs - s * sn, a * sn + s * cs), 40, 'p3');
     const [U, R] = RUNS[run];
     els.push(...sheet({o: [0, r.y, 0], U, R, N: '+y', rect, sd, tex, edge, seed: 441 + els.length,
       bands: r.bands.map(([f, ang, half]) => ({s: f * ext, ang, half}))}));
@@ -602,7 +602,7 @@ function curlC() {
   for (const [T, nm, rr, sd0] of [[TIP_I, 'i', {a0: -.6, a1: .1, s0: -.12, s1: .92}, 467], [TIP_O, 'o', {a0: .1, a1: .82, s0: -.12, s1: 1.2}, 468]]) {
     const front = (a, s) => { const c = yel(T)(a, s); if (!c) return c; const t = (s + .12) / 1.1; return t < .45 ? mix(c, P3_UNDER(.18), .55 * clamp((.45 - t) / .3)) : c; };
     els.push(...sheet({o: [0, 0, .06], U: '+x', R: '+y', rect: rr, sd: T.sd, tex: sheetSprite(`h_ctip${nm}_b`, rr, yel(T, {base: .2}), 32, 'p3'),
-      texM: sheetSprite(`h_ctip${nm}`, rr, front, 48, 'p3'), edge, seed: sd0, bands: [{s: rr.s0, ang: 0, half: .03}, {s: .38, ang: -22.5, half: .028}, {s: .74, ang: 0, half: .024}]}));
+      texM: sheetSprite(`h_ctip${nm}`, rr, front, 40, 'p3'), edge, seed: sd0, bands: [{s: rr.s0, ang: 0, half: .03}, {s: .38, ang: -22.5, half: .028}, {s: .74, ang: 0, half: .024}]}));
   }
   // the side walls: a leaf wrapped round each side of the cup from the bowl to the back leaf (it runs front -> back and
   // bends about Y, so it shows a broad face from the front quarter), its point rising in the middle (+N = +X)

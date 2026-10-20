@@ -222,7 +222,11 @@ const mix = (a, b, u, o = {}) => finish(Object.assign(lerpPose(a, b, u), both(o)
 // the phase-1 bind wrists (left) and an IK wrist target; hr = [0, 0, 0] marks a lifted hand
 const WB = {a: [4.8, .6, -2.4], b: [2.4, .4, -3.0], c: [2.9, .4, 2.5]};
 const Z = [0, 0, 0];
-const tg = (L, x, y, z, hr = null) => ({[`tg_${L}_l`]: [x, y, z], ...(hr ? {[`hr_${L}_l`]: hr} : {})});
+// AP-R3: the R2 planted claw stands on its finger tips 0.59 b under the wrist (rest wrist 0.6 b), so an A wrist planted
+// lower than 0.4 b would push the tips under the -0.2 b floor allowance; the R1-claw plant height 0.35 is lifted to 0.4
+// here (RC2: re-key the A plants for the R2 claw).
+const A_PLANT_MIN = .4;
+const tg = (L, x, y, z, hr = null) => ({[`tg_${L}_l`]: [x, L === 'a' ? Math.max(y, A_PLANT_MIN) : y, z], ...(hr ? {[`hr_${L}_l`]: hr} : {})});
 const tgR = (L, x, y, z, hr = 'keep') => ({[`tg_${L}_r`]: [x, y, z], [`hr_${L}_r`]: hr});
 // A phase-1 rear of strength r (0 = the crouch, 1 = the thorax stood up as in UPRIGHT) with the hood kept over the head:
 // the UPRIGHT body angles scaled by r, the head pitched to a total of `head` degrees (0 = level as in the crouch,

@@ -1,2 +1,0 @@
-execute if score @s apRigT matches ..83 run return run function rlk:mboss/apep/rig/c/hands/b/81_83
-function rlk:mboss/apep/rig/c/hands/b/84_87

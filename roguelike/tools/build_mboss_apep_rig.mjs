@@ -87,7 +87,7 @@ for (const [name, els] of Object.entries(models)) {
   const used = [...new Set(els.flatMap(e => Object.values(e.faces).map(f => f.texture.slice(1))))];
   for (const u of used) if (!spriteRecs[u]) throw new Error(`model ${name}: unknown sprite ${u}`);
   for (const e of els) for (const f of Object.values(e.faces)) if (f.tintindex === undefined) untinted++;
-  const tex = used.length ? used : ['g_shell'];
+  const tex = used.length ? used : ['g_plate'];
   json(path.join(modelDir, name + '.json'), {ambientocclusion: false, textures: {...Object.fromEntries(used.map(t => [t, spriteId(t)])), particle: spriteId(tex[0])}, elements: els});
 }
 if (untinted) throw new Error(`${untinted} faces without a tintindex (plan R12: every painted face is tinted)`);

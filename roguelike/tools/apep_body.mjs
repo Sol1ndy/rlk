@@ -343,8 +343,8 @@ function shouldersP1() {
   // the hull (front hump), from under the cowl to the chest
   els.push(...grp('sh1_hump', wrapLoft('p1_hump_wrap', 'z', hullSt(J, [-2.55, -2.2, -1.75, -1.3, -.85, -.3, .02], -9, -.3), (th, a) => p1Hull('sh')(th, a + J[2]), {caps: '-', seed: 521, forms: 'p1', ppb: 32})));
   // dorsal shingle plates: rows along the spine, 3 across (the centre flat / pitched, the sides rolled 22.5 / 45 deg)
-  const ps = card('p1_plate_y', UR, (u, v) => p1PlatePaint(u, -v), 40, 'p1', 'unique', 'y');
-  const pz = card('p1_plate_z', UR, p1PlatePaint, 40, 'p1');
+  const ps = card('p1_plate_y', UR, (u, v) => p1PlatePaint(u, -v), 32, 'p1', 'unique', 'y');
+  const pz = card('p1_plate_z', UR, p1PlatePaint, 32, 'p1');
   for (const [z, pitch] of [[-2.1, -22.5], [-1.55, 0], [-1.0, 0], [-.45, 22.5]]) {
     const y0 = hullTop(0, z) + .04;
     els.push(...grp('sh1_dorsal', leafPlate(ps, sdTongue, {plane: 'y', at: y0 - J[1], cu: 0, cv: z - J[2], hu: .52, hv: .5, so: -1, rot: pitch ? ['x', pitch, [0, y0 - J[1], z - J[2]]] : null, cards: '+'})));
@@ -363,7 +363,7 @@ function shouldersP1() {
   const half = [];
   PAULD.forEach((D, i) => half.push(...grp('sh1_pauld', barkDome(`p1_pauld${i}`, J, D))));
   // the hook + gem: a dark curl in front of the pauldron, the square gem in a raised dark frame facing out-forward
-  const hs = card('p1_hook', HOOK_R, hookPaint, 40, 'p1');
+  const hs = card('p1_hook', HOOK_R, hookPaint, 32, 'p1');
   const hz0 = -2.5 - J[2], hy0 = 3.28 - J[1], hx = 1.98, HK = .8;
   half.push(...slab({plane: 'x', at: hx, rect: {u0: hz0 + HOOK_R.u0 * HK, u1: hz0 + HOOK_R.u1 * HK, v0: hy0 + HOOK_R.v0 * HK, v1: hy0 + HOOK_R.v1 * HK},
     sd: (u, v) => HOOK.sd((u - hz0) / HK, (v - hy0) / HK) * HK, half: .035, sprite: hs, edge: 'g_plate', cell: .08, core: false, rot: ['y', 45, [hx, hy0, hz0]]}));
@@ -466,7 +466,7 @@ function chestP1() {
   // the calyx round the sac
   const zs = [-1.18, -.92, -.66, -.45, -.3];
   const st = zs.map(z => { const d = z - SAC.c[2], r = Math.sqrt(Math.max(.02, SAC.r * SAC.r - d * d)) + .1; return {a: z - J[2], r: [r, r, r, r], c: [SAC.c[0] - J[0], SAC.c[1] - J[1]]}; });
-  els.push(...wrapLoft('p1_calyx', 'z', st, (th, a) => calyxPaint(th, a + J[2]), {caps: '+', ledgeTex: 'g_shell', seed: 512, forms: 'p1', ppb: 40,
+  els.push(...wrapLoft('p1_calyx', 'z', st, (th, a) => calyxPaint(th, a + J[2]), {caps: '+', ledgeTex: 'g_shell', seed: 512, forms: 'p1', ppb: 32,
     skip: k => !(k >= 7 || k <= 1)}));
   return els;
 }
@@ -504,15 +504,15 @@ function coreP1() {
   // lofted across (axis x): the two views that matter (the front, and from below in the rear-up) see facets, not ledges
   const ts = [-.97, -.8, -.45, 0, .45, .8, .97];
   const st = ts.map(t => ({a: c[0] + t * SAC.r, r: SAC.r * Math.sqrt(1 - t * t), c: [-c[2], c[1]]}));
-  return wrapLoft('p1_sac', 'x', st, (th, a, p) => sacPaint(nrm3(sub3(p, c))), {caps: '-+', ledgeTex: 'p1_core', seed: 531, forms: 'p1', light: false, ppb: 40});
+  return wrapLoft('p1_sac', 'x', st, (th, a, p) => sacPaint(nrm3(sub3(p, c))), {caps: '-+', ledgeTex: 'p1_core', seed: 531, forms: 'p1', light: false, ppb: 32});
 }
 // ---- abdomen (joint J_ABD): the rear body hull, back plates rising into spiky leaf points (v1 f720), belly scales ----------
 function abdomenP1() {
   const J = J_ABD, els = [];
   els.push(...wrapLoft('p1_abd_wrap', 'z', hullSt(J, [.62, .95, 1.4, 1.9, 2.45, 2.95], .95, 3.2), (th, a) => p1Hull('ab')(th, a + J[2]), {caps: '+', seed: 501, forms: 'p1'}));
   // two rows of back plates, the rear ones lifting into points (plane y, pitched up at the back) + flank points
-  const ps = card('p1_plate_y', UR, (u, v) => p1PlatePaint(u, -v), 40, 'p1', 'unique', 'y');
-  const pz = card('p1_plate_z', UR, p1PlatePaint, 40, 'p1');
+  const ps = card('p1_plate_y', UR, (u, v) => p1PlatePaint(u, -v), 32, 'p1', 'unique', 'y');
+  const pz = card('p1_plate_z', UR, p1PlatePaint, 32, 'p1');
   for (const [z, pitch, hu, hv] of [[1.2, 22.5, .5, .5], [1.85, 22.5, .44, .5], [2.45, 45, .36, .46]]) {
     const y0 = hullTop(0, z) + .03;
     els.push(...leafPlate(ps, sdTongue, {plane: 'y', at: y0 - J[1], cu: 0, cv: z - J[2], hu, hv, so: -1, rot: ['x', -pitch, [0, y0 - J[1], z - .2 - J[2]]], cards: 'both', core: true, half: .04, cell: .12}));

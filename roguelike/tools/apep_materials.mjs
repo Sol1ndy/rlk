@@ -129,22 +129,15 @@ export function plateGrey(u, v, {rows = 4, cols = 3, seed = 5} = {}) {
 // name -> [w, h, ppb, painter (u, v in 0..1), forms, region]. Grey tiles are tinted per form by their slot.
 const T = (w, h, ppb, fn, forms = 'both', region = 'shared') => ({w, h, ppb, fn, forms, region});
 export const TILES = {
-  g_shell: T(128, 128, 32, per((u, v) => shellGrey(u, v), 1)),
   g_plate: T(128, 128, 32, per((u, v) => plateGrey(u, v), 1)),
   p1_gold: T(32, 64, 48, (u, v) => PAL.p1_gold(clamp(.15 + .55 * v + .25 * Math.abs(u - .5) * 2 - .1 * N.b(u * 8, v * 8))), 'p1'),
-  p1_cone: T(32, 32, 48, (u, v) => PAL.p1_cone(clamp(.2 + .5 * v + .2 * Math.abs(u - .5) * 2)), 'p1'),
-  p1_leg: T(64, 128, 32, (u, v) => { const t = smooth(.3, .85, v); const a = PAL.p1_slate(.45 + .2 * N.a(u * 8, v * 8)), b = PAL.p1_bark(.3 + .25 * N.b(u * 6, v * 10)); let c = mix(a, b, t); const g = Math.abs(Math.sin((u * 3 + .4 * N.c(u * 3, v * 5)) * Math.PI)); if (g < .07) c = sink(c, .35); return c; }, 'p1', 'limbs'),
   p3_gold: T(32, 64, 48, (u, v) => PAL.p3_cone_gold(clamp(.15 + .55 * v + .25 * Math.abs(u - .5) * 2 - .1 * N.b(u * 8, v * 8))), 'p3'),
-  p3_cone: T(32, 32, 48, (u, v) => PAL.p3_cone(clamp(.2 + .5 * v + .2 * Math.abs(u - .5) * 2)), 'p3'),
   p1_gem: T(32, 32, 48, (u, v) => { const f = Math.hypot(u - .35, v - .3); return PAL.p1_gem(clamp(.05 + 1.1 * f + .08 * N.a(u * 6, v * 6))); }, 'p1'),
-  p1_core: T(32, 32, 48, (u, v) => { const f = Math.hypot(u - .45, v - .4); const vein = Math.abs(Math.sin((u * 5 + 2 * N.a(u * 3, v * 3)) * Math.PI)); return PAL.p1_core(clamp(.05 + .9 * f + (vein < .08 ? .35 : 0) + .06 * N.b(u * 8, v * 8))); }, 'p1', 'body'),
   p3_gem: T(32, 32, 48, (u, v) => { const f = Math.hypot(u - .35, v - .3); return PAL.p3_gem(clamp(.05 + 1.1 * f + .08 * N.a(u * 6, v * 6))); }, 'p3'),
   p3_emerald: T(32, 32, 48, (u, v) => { const f = Math.abs(u - .5) + Math.abs(v - .5); return PAL.p3_emerald(clamp(.1 + .9 * f + .1 * N.a(u * 6, v * 6))); }, 'p3'),
   p3_lime: T(64, 64, 32, per((u, v) => { const c = cells(u * 3, v * 2, 21, 3, .5); let col = PAL.p3_lime(.25 + .3 * c.id + .15 * (v - .5)); const vein = Math.abs(((u * 6 + .3 * Math.sin(v * 9)) % 1) - .5); if (vein < .04) col = mix(col, PAL.p3_line(.3), .55); if (c.d2 - c.d1 < .06) col = mix(col, PAL.p3_line(.5), .7); return col; }, 1), 'p3'),
-  p3_robe: T(64, 128, 32, per((u, v) => { let col = PAL.p3_robe(.35 + .2 * N.a(u * 6, v * 6)); const cu = Math.abs(Math.sin((u * 3 + Math.sin(v * 12) * .2) * Math.PI)); if (cu < .06) col = mix(col, C('#C9C27A'), .75); else if (cu < .12) col = mix(col, C('#7F8345'), .6); const d = Math.abs(u - .5) * 1.4 + Math.abs(((v * 4) % 1) - .5); if (d < .14) col = mix(col, C('#F2F4EE'), .9); return col; }, 1), 'p3', 'body'),
 };
 for (const [n, t] of Object.entries(TILES)) registerTile(n, t.w, t.h, t.ppb);
-registerWrap('p1_leg');
 export const tileSprites = () => Object.fromEntries(Object.entries(TILES).map(([n, t]) => [n, {w: t.w, h: t.h, ppb: t.ppb, fn: t.fn, translucent: false, forms: t.forms, region: t.region, use: TINTED_SPRITES[n] ? 'tinted' : 'unique'}]));
 
 // ---- sprite helpers ------------------------------------------------------------------------------------------------------

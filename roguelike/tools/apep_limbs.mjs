@@ -413,9 +413,9 @@ function leafPlate(plane, at, kr, rot, spr = PLATE1, edge = 'l1_rimd') {
   return slab({plane, at, rect: kr, sd, half: .04, sprite: spr, edge, cell: .09, inset: .8, rot});
 }
 // ---- sprites -----------------------------------------------------------------------------------------------------------------
-const ARM1 = wrapSprite('l1_arm', 256, 128, 2, p1ArmPaint, 'p1');
-const LEG1 = wrapSprite('l1_leg', 128, 96, 3, p1LegPaint, 'p1');
-const ARM3 = wrapSprite('l3_arm', 160, 96, 3, p3ArmPaint, 'p3');
+const ARM1 = wrapSprite('l1_arm', 192, 96, 2, p1ArmPaint, 'p1');
+const LEG1 = wrapSprite('l1_leg', 128, 64, 3, p1LegPaint, 'p1');
+const ARM3 = wrapSprite('l3_arm', 128, 80, 3, p3ArmPaint, 'p3');
 const LEAF = card('l3_leaf', LEAF_R, 64, leafPaint(PAL.p3_lime, PAL.p3_line), 'p3');
 const LEAF_U = card('l3_leafu', LEAF_R, 48, leafPaint(t => mix(mix(PAL.p3_pale(t * .55), LILAC, .25), C('#FAFAF6'), .25), t => mix(PAL.p3_line(t), LILAC, .45)), 'p3');
 const LEAF_D = card('l3_leafd', LEAF_R, 48, leafPaint(PAL.p3_bottle, PAL.p3_line, {dark: true}), 'p3');

@@ -225,13 +225,13 @@ function maskPaint(u, v) {
   return lineOut(c, d, .03, PAL.p3_line(.45));
 }
 function faceP3() {
-  const f = FORM_POINTS.face.p3[1], sp = card('p3_mask', MASK_R, maskPaint, 72, 'p3');
+  const f = FORM_POINTS.face.p3[1], sp = card('p3_mask', MASK_R, maskPaint, 64, 'p3');
   const rect = {u0: MASK_R.u0, u1: MASK_R.u1, v0: f[1] + MASK_R.v0, v1: f[1] + MASK_R.v1};
   const els = slab({plane: 'z', at: f[2], rect, sd: (u, v) => maskSd(u, v - f[1]), half: .06, sprite: sp, edge: 'p3_gold', cell: .1});
   // slightly domed: the middle of the face stands 0.07 b proud as a second layer of the same painting
   const k = .7, inner = (u, v) => Math.hypot(u / (.8 * k), (v - .08) / (.95 * k)) - 1;
   els.push(...slab({plane: 'z', at: f[2] - .1, rect: {u0: -.6, u1: .6, v0: f[1] - .62, v1: f[1] + .78}, sd: (u, v) => inner(u, v - f[1]) * .6, half: .025, cards: '-', core: false,
-    sprite: card('p3_mask_in', {u0: -.6, u1: .6, v0: -.62, v1: .78}, (u, v) => (inner(u, v) > 0 ? null : maskPaint(u, v)), 72, 'p3')}));
+    sprite: card('p3_mask_in', {u0: -.6, u1: .6, v0: -.62, v1: .78}, (u, v) => (inner(u, v) > 0 ? null : maskPaint(u, v)), 64, 'p3')}));
   return els;
 }
 // ================================================= plate rings ================================================================
