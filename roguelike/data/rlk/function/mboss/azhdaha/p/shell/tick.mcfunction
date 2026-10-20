@@ -1,3 +1,3 @@
-# STUB (S1-MOD, s2.md 2.1): 번개의 가루 (shell, id 44); the S2 author replaces this file.
-# keeps time only
-execute if score #azPT mb matches 145.. run function rlk:mboss/azhdaha/p/end
+# 44 tick (#azPT = the tail_cast tick).
+execute if score #azPT mb matches 12..78 run return run function rlk:mboss/azhdaha/p/shell/kd/12_78
+execute if score #azPT mb matches 79..143 run return run function rlk:mboss/azhdaha/p/shell/kd/79_143

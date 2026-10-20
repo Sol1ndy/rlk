@@ -247,7 +247,22 @@ def emit(core):
     # weighted pick
     def wt(p, ph, z):
         o = WEIGHT_OVERRIDE.get(p.id, {}).get(ph, {})
+        # REQ pt-1 (S2-T, requests/pt.md): a pattern replaced in a phase outside its own phases (P4 -> 45 / 46 in phase
+        # 3) keeps its weights there, so ai/go can swap in the replacement (else 45 / 46 are never picked).
+        if ph not in p.phases and any(q.replaces == p.id and ph in q.phases for q in pats):
+            return int(o.get(z, p.phase_weight.get(ph, p.weight).get(z, 0)))
         return int(o.get(z, p.w_in(ph, z)))
+    def swap_in(p, q):
+        # the execute conditions under which ai/go turns a pick of p into its replacement q (with a trailing space)
+        cond = []
+        if q.phases != p.phases:
+            cond.append(f'if score #azPh mb matches {min(q.phases)}..{max(q.phases)}')
+        if q.elem:
+            cond.append(f'if score #az{"Leg" if q.elem[0] == "leg" else "Tail"} mb matches {q.elem[1]}')
+        if q.id == 10:
+            cond.append('if score #azPaw mb matches 1..2')
+        return ' '.join(cond) + ' '
+
     cand = ['# @s = body: candidate weights #azC<id> (x2, so a repeat of P2 counts half) in the current phase and zone, the',
             '# gates, the cooldowns, the element pair, no immediate repeat.']
     for p in picks:
@@ -266,16 +281,7 @@ def emit(core):
             cand.append(f'execute unless score #az{"Leg" if side == "leg" else "Tail"} mb matches {el} run scoreboard players set #azC{p.id} mb 0')
         eff = [p] + [q for q in pats if q.replaces == p.id]
         for q in eff:
-            gate_pre = ''
-            if q is not p:
-                cond = []
-                if q.phases != p.phases:
-                    cond.append(f'if score #azPh mb matches {min(q.phases)}..{max(q.phases)}')
-                if q.elem:
-                    cond.append(f'if score #az{"Leg" if q.elem[0] == "leg" else "Tail"} mb matches {q.elem[1]}')
-                if q.id == 10:
-                    cond.append('if score #azPaw mb matches 1..2')
-                gate_pre = ' '.join(cond) + ' '
+            gate_pre = '' if q is p else swap_in(p, q)
             for gt in q.gates:
                 cond = {'anchor8': 'unless score #azA8 mb matches 1', 'front35': 'unless score #azF35 mb matches 1',
                         'exit': 'unless score #azExit mb matches 1',
@@ -297,12 +303,15 @@ def emit(core):
                         f'scoreboard players set #azC{p.id} mb 0')
         else:
             cand.append(f'execute if score #azLast mb matches {p.id} run scoreboard players set #azC{p.id} mb 0')
+        # REQ pa-3 / pt-1 (I2a: one rule): no immediate repeat of a replacement. ai/go swaps a replacement in after the
+        # pick, so #azLast holds the replacement's id (45 / 46 for P4, 10 for a fore-paw P5 in phase 3); while its
+        # swap-in condition holds, the replaced pattern would become it again, so its weight is 0.
+        for q in pats:
+            if q.replaces == p.id:
+                cand.append(f'execute if score #azLast mb matches {q.id} {swap_in(p, q)}run '
+                            f'scoreboard players set #azC{p.id} mb 0')
         if p.id == 6:
             cand.append('scoreboard players set #azC6 mb 0')
-        if p.id == 5:
-            # REQ pa-3: in phase 3 a fore-paw P5 becomes P5b (10) in ai/go, so right after a 10 it would repeat 10
-            cand.append('execute if score #azLast mb matches 10 if score #azPh mb matches 3 if score #azPaw mb matches 1..2 run '
-                        'scoreboard players set #azC5 mb 0')
     cand += [sc('#azCn', 0)] + [f'scoreboard players operation #azCn mb += #azC{p.id} mb' for p in picks]
     w('ai/cand', cand)
     draw = ['# #azR = 0..#azCn-1 -> the candidate whose weight range holds it.', sc('#azPick', 0)]

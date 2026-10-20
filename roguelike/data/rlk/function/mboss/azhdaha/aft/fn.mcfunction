@@ -16,3 +16,11 @@ execute if score #azAftX mb matches 14 run return run function rlk:mboss/azhdaha
 execute if score #azAftX mb matches 15 run return run function rlk:mboss/azhdaha/xl/stomp_w1/hydro_go
 execute if score #azAftX mb matches 16 run return run function rlk:mboss/azhdaha/xl/stomp3_s1/hydro_go
 execute if score #azAftX mb matches 17 run return run function rlk:mboss/azhdaha/p/firefield/amb
+execute if score #azAftX mb matches 18 run return run function rlk:mboss/azhdaha/p/icespike/hail_amb
+execute if score #azAftX mb matches 19 run return run function rlk:mboss/azhdaha/xt/cring/step
+execute if score #azAftX mb matches 20 run return run function rlk:mboss/azhdaha/xt/cring/go
+execute if score #azAftX mb matches 21 run return run function rlk:mboss/azhdaha/xt/whip_sweep/hail
+execute if score #azAftX mb matches 22 run return run function rlk:mboss/azhdaha/xt/whip_end/strip
+execute if score #azAftX mb matches 23 run return run function rlk:mboss/azhdaha/xt/whip_end/arc
+execute if score #azAftX mb matches 24 run return run function rlk:mboss/azhdaha/xt/tailslam_impact/cryo_strip
+execute if score #azAftX mb matches 25 run return run function rlk:mboss/azhdaha/xt/tailslam_impact/electro_strip

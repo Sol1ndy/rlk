@@ -1,2 +1,3 @@
-# STUB (S1-MOD, s2.md 2.1): 천동만상 – 얼음 가시 (icespike, id 45); the S2 author replaces this file.
-# nothing of its own lingers (selectors only, idempotent)
+# Spikes, field markers and pending bursts go (selectors only); the glow ends.
+kill @e[tag=rlk_mb_az_p45]
+function rlk:mboss/azhdaha/rig/glow/gold_off

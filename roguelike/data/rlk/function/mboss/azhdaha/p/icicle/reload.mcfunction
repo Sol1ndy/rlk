@@ -1,2 +1,3 @@
-# STUB (S1-MOD, s2.md 2.1): 쏟아지는 천화 (icicle, id 43); the S2 author replaces this file.
-# /reload while the emitter lives in its bg slot: nothing to re-make
+# /reload with the emitter in bg slot T: the sphere is re-made; a lance in flight is lost (its hazard too).
+scoreboard players set #aq43L mb 0
+function rlk:mboss/azhdaha/p/icicle/sphere

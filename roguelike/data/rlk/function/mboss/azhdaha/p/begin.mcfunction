@@ -46,8 +46,8 @@ execute if score #azPat mb matches 32 run scoreboard players set #azPLen mb 94
 execute if score #azPat mb matches 41 run scoreboard players set #azPLen mb 429
 execute if score #azPat mb matches 42 run scoreboard players set #azPLen mb 429
 execute if score #azPat mb matches 43 run scoreboard players set #azPLen mb 34
-execute if score #azPat mb matches 44 run scoreboard players set #azPLen mb 145
-execute if score #azPat mb matches 45 run scoreboard players set #azPLen mb 100
+execute if score #azPat mb matches 44 run scoreboard players set #azPLen mb 143
+execute if score #azPat mb matches 45 run scoreboard players set #azPLen mb 88
 execute if score #azPat mb matches 46 run scoreboard players set #azPLen mb 140
 execute if score #azPat mb matches 20 run scoreboard players set #azPLen mb 243
 execute if score #azPat mb matches 21 run scoreboard players set #azPLen mb 176

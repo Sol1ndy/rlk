@@ -1,1 +1,4 @@
-# STUB (S1-MOD, s2.md 2.1): 쏟아지는 천화 (icicle, id 43); the S2 author replaces this file.
+# The emitter is cancelled (a queued transition, death, cleanup, test stop): sphere, lance, aim and
+# any lance hazard in flight go.
+kill @e[tag=rlk_mb_az_p43]
+scoreboard players set #aq43L mb 0
