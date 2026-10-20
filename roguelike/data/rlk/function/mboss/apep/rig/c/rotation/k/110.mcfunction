@@ -4,6 +4,5 @@ data merge entity 524c4b4d-4150-4400-8000-000000000019 {start_interpolation:0,in
 data merge entity 524c4b4d-4150-4400-8000-00000000001a {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-4.8f,0.9136f,2.4f],left_rotation:[0f,0f,0f,1f],scale:[0.95f,0.95f,0.95f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4150-4400-8000-00000000001f {start_interpolation:0,interpolation_duration:2,transformation:{translation:[2.3832f,0.4f,2.8992f],left_rotation:[0f,0f,0f,1f],scale:[1.8f,1.8f,1.8f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4150-4400-8000-000000000020 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-2.3832f,0.4f,2.8992f],left_rotation:[0f,0f,0f,1f],scale:[1.8f,1.8f,1.8f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4150-4400-8000-00000000002e {start_interpolation:0,interpolation_duration:1,transformation:{translation:[1.48f,0.50456f,-9.82305f],left_rotation:[0.04501f,-0.05964f,-0.0021f,0.9972f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
 function rlk:mboss/apep/rig/hand/a_hand_l/p1_planted
 function rlk:mboss/apep/rig/hand/a_hand_r/p1_planted

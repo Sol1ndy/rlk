@@ -1,4 +1,4 @@
 # tail_p1x2: 127 t, then idle_p1. @s = rig anchor.
 execute if score @s apRigT matches 127.. run return run function rlk:mboss/apep/rig/start/idle_p1
-execute if score @s apRigT matches ..64 run return run function rlk:mboss/apep/rig/c/tail_p1x2/b/0_64
-function rlk:mboss/apep/rig/c/tail_p1x2/b/65_126
+execute if score @s apRigT matches ..65 run return run function rlk:mboss/apep/rig/c/tail_p1x2/b/0_65
+function rlk:mboss/apep/rig/c/tail_p1x2/b/66_126

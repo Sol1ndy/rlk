@@ -17,7 +17,5 @@ data merge entity 524c4b4d-4150-4400-8000-00000000001a {start_interpolation:0,in
 data merge entity 524c4b4d-4150-4400-8000-00000000001f {start_interpolation:0,interpolation_duration:1,transformation:{translation:[2.3f,0.75f,2.4f],left_rotation:[0f,0f,0f,1f],scale:[1.62f,1.62f,1.62f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4150-4400-8000-000000000020 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-2.3f,0.75f,2.4f],left_rotation:[0f,0f,0f,1f],scale:[1.62f,1.62f,1.62f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4150-4400-8000-000000000027 {start_interpolation:0,interpolation_duration:5,transformation:{translation:[0f,1.87132f,-2.36306f],left_rotation:[-0.43499f,0f,0f,0.90044f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4150-4400-8000-000000000029 {start_interpolation:0,interpolation_duration:5,transformation:{translation:[0f,0.17061f,-3.98944f],left_rotation:[0.00099f,0f,0f,1f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4150-4400-8000-00000000002a {start_interpolation:0,interpolation_duration:5,transformation:{translation:[0f,0.17289f,-5.14711f],left_rotation:[0.13732f,-0.12955f,-0.02715f,0.98164f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
 scoreboard players set @s apRigFy 7
 scoreboard players reset @s apRigQx

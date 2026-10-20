@@ -11,4 +11,5 @@ data merge entity 524c4b4d-4150-4400-8000-000000000020 {start_interpolation:0,in
 data merge entity 524c4b4d-4150-4400-8000-000000000025 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[3f,0.5f,1.4f],left_rotation:[0.00005f,-0.00002f,0.00002f,1f],scale:[1.2f,1.2f,1.2f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4150-4400-8000-000000000026 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-3f,0.5f,1.4f],left_rotation:[0.00005f,0.00002f,-0.00002f,1f],scale:[1.2f,1.2f,1.2f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4150-4400-8000-000000000027 {start_interpolation:0,interpolation_duration:3,transformation:{translation:[0f,0.16612f,-0.70326f],left_rotation:[0.04208f,0.00818f,-0.01022f,0.99903f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000002d {start_interpolation:0,interpolation_duration:2,transformation:{translation:[3.55489f,0.58984f,-4.1369f],left_rotation:[0.24303f,-0.94202f,-0.17591f,0.15028f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
 function rlk:mboss/apep/rig/hands/p3_curl

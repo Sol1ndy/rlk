@@ -3,6 +3,7 @@ data merge entity 524c4b4d-4150-4400-8000-000000000015 {start_interpolation:0,in
 data merge entity 524c4b4d-4150-4400-8000-000000000016 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-1.55f,2.30263f,1.00959f],left_rotation:[-0.02306f,0.08701f,-0.61827f,0.7808f],scale:[2f,2f,2f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4150-4400-8000-000000000023 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[2.6678f,1.67046f,-1.76142f],left_rotation:[0.27486f,-0.02831f,0.28416f,0.9181f],scale:[1.6f,1.6f,1.6f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4150-4400-8000-000000000024 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-2.6678f,1.67046f,-1.76142f],left_rotation:[0.27486f,0.02831f,-0.28416f,0.9181f],scale:[1.6f,1.6f,1.6f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4150-4400-8000-00000000002d {start_interpolation:0,interpolation_duration:2,transformation:{translation:[1.19f,2.21538f,-8.5291f],left_rotation:[0.28743f,-0.12268f,-0.03833f,0.94914f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000002d {start_interpolation:0,interpolation_duration:2,transformation:{translation:[1.19f,0.17064f,-9.08633f],left_rotation:[0.00083f,-0.12852f,-0.00124f,0.99171f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000002e {start_interpolation:0,interpolation_duration:2,transformation:{translation:[1.48f,0.17216f,-10.18638f],left_rotation:[-0.00027f,-0.05968f,0.00061f,0.99822f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
 scoreboard players set @s apRigFy 21
 scoreboard players reset @s apRigQx

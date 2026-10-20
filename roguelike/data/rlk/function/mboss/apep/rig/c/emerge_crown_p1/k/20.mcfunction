@@ -14,9 +14,6 @@ data merge entity 524c4b4d-4150-4400-8000-000000000020 {start_interpolation:0,in
 data merge entity 524c4b4d-4150-4400-8000-000000000025 {start_interpolation:0,interpolation_duration:10,transformation:{translation:[2.9f,0.4f,-1.6f],left_rotation:[0f,0f,0f,1f],scale:[1.2f,1.2f,1.2f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4150-4400-8000-000000000026 {start_interpolation:0,interpolation_duration:10,transformation:{translation:[-2.9f,0.4f,-1.6f],left_rotation:[0f,0f,0f,1f],scale:[1.2f,1.2f,1.2f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4150-4400-8000-000000000028 {start_interpolation:0,interpolation_duration:10,transformation:{translation:[0f,0.95132f,-3.09306f],left_rotation:[-0.35065f,0f,0f,0.93651f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4150-4400-8000-000000000029 {start_interpolation:0,interpolation_duration:10,transformation:{translation:[0f,0.17061f,-3.98944f],left_rotation:[0.00099f,0f,0f,1f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4150-4400-8000-00000000002c {start_interpolation:0,interpolation_duration:10,transformation:{translation:[0.69f,0.84623f,-7.25355f],left_rotation:[0.17166f,-0.2246f,-0.03817f,0.95845f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4150-4400-8000-00000000002d {start_interpolation:0,interpolation_duration:10,transformation:{translation:[1.19f,1.19777f,-8.20046f],left_rotation:[0.16621f,-0.12652f,-0.02265f,0.97768f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
 function rlk:mboss/apep/rig/look/tint/none
 scoreboard players set @s apRigFy 0
 scoreboard players reset @s apRigQx

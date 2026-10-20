@@ -177,8 +177,10 @@ function finish(p) {
 // Floor guard: the tail, the hem chain and the P1 drapes keep every joint at or above a floor height (the rest pose's
 // own heights: the tail lies at 0.19-0.27 b with its model 0.45 b below the line). Each segment, from the root, turns by
 // the smallest angle (pitch for the tail / hem, roll outward for the drapes) that lifts its end there. Only lifts.
+// (counter: a tail segment turned up by the guard turns the next one back by the same angle, so the tail settles onto
+// the floor after the kink instead of rising along the slope of the lifted segment)
 const GUARD = [
-  {bones: ['tail_1', 'tail_2', 'tail_3', 'tail_4', 'tail_5', 'tail_6', 'tail_7', 'tail_tip'], ax: 0, sg: -1, y: .17},
+  {bones: ['tail_1', 'tail_2', 'tail_3', 'tail_4', 'tail_5', 'tail_6', 'tail_7', 'tail_tip'], ax: 0, sg: -1, y: .17, counter: true},
   {bones: ['hem_a', 'hem_b'], ax: 0, sg: -1, y: .14},
   {bones: ['hair_l_1', 'hair_l_2'], ax: 2, sg: 1, y: .18}, {bones: ['hair_r_1', 'hair_r_2'], ax: 2, sg: -1, y: .18},
 ];
@@ -186,10 +188,13 @@ const GUARD = [
 // between keys: a blend that dips stays continuous instead of jumping sides); the key poses use the preferred
 // direction first.
 function floorGuard(p, nearest = false, ref = null) {
-  for (const {bones, ax, sg, y} of GUARD) for (const b of bones) {
+  for (const {bones, ax, sg, y, counter} of GUARD) { let prevD = 0; for (const b of bones) {
     const end = () => carry(solve(p), b, BONE[b].tip)[1];
+    if (counter && prevD) p[b] = p[b].map((v, i) => (i === ax ? v - prevD : v));
+    prevD = 0;
+    const b0 = p[b][ax];
     if (end() >= y - 1e-3) continue;
-    const base = p[b].slice(), set = d => { p[b] = base.slice(); p[b][ax] += d; };
+    const base = p[b].slice(), set = d => { p[b] = base.slice(); p[b][ax] += d; prevD = p[b][ax] - b0; };
     // the preferred direction first, then the other; if neither reaches the floor height, the highest end of either
     const sol = [];
     for (const dir of [sg, -sg]) {
@@ -202,7 +207,7 @@ function floorGuard(p, nearest = false, ref = null) {
     const cost = d => (ref ? Math.abs(base[ax] + d - ref[b][ax]) : Math.abs(d));
     if (sol.length) set(sol.reduce((a, d) => (cost(d) < cost(a) ? d : a)));
     else { let best = [-1e9, 0]; for (let d = -75; d <= 75; d += 5) { set(d); const e = end(); if (e > best[0]) best = [e, d]; } set(best[1]); }
-  }
+  } }
   return p;
 }
 // a full pose: the base with both-sided overrides (left channels mirror to the right unless the right one is given)
@@ -298,17 +303,20 @@ const SPRAWL = def('SPRAWL', P(C0, {pelT: [0, -1.1, 0], pelvis: [0, 0, 22], ches
 const PUSHUP = def('PUSHUP', P(C0, {pelT: [0, -.35, 0], pelvis: [8, 0, 8], chest: [4, 0, 2], neck: [-4, 0, 0], head: [-2, 0, 0], ...tg('a', 5.0, .4, -2.0), ...tg('b', 2.3, .4, -2.6)}));
 // tail: pitch - raises a back-pointing segment; yaw + swings it to the boss's left (tSweep spreads a yaw over the chain)
 const TAIL_S = def('TAIL_S', P(C0, {pelT: [0, .15, 0], pelvis: [-5, 0, 0], chest: [2, 0, 0], neck: [-4, 0, 0], head: [-2, 0, 0],
-  tail_1: [-55, 0, 0], tail_2: [40, 0, 0], tail_3: [-30, 0, 0], tail_4: [22, 0, 0], tail_5: [-10, 0, 0], tail_6: [10, 0, 0], tail_7: [10, 0, 0], tail_tip: [12, 0, 0]}));
-// swing 1 turns the anchor clockwise (+ yaw, toward the boss's right): the tail cocks to the boss's LEFT and lags there
+  // a tall S over the back (v2 f980-f1019): the segments climb at 55-65 deg, the last three curl forward (tip ~10 b)
+  tail_1: [-107, 0, 0], tail_2: [-1, 0, 0], tail_3: [38, 0, 0], tail_4: [41, 0, 0], tail_5: [-16, 0, 0], tail_6: [-29, 0, 0], tail_7: [-26, 0, 0], tail_tip: [-24, 0, 0]}));
+// swing 1 turns the anchor clockwise (+ yaw, toward the boss's right): the tail cocks raised to the boss's LEFT (v2 f1036)
+// and lags there
 const tailYaw = (base, lift, yaws, o = {}) => P(base, {...Object.fromEntries(['tail_1', 'tail_2', 'tail_3', 'tail_4', 'tail_5', 'tail_6', 'tail_7', 'tail_tip'].map((k, i) => [k, [i ? lift[1] ?? 0 : lift[0], yaws[i] ?? 0, 0]])), ...o});
 const BRACE = {pelT: [0, -.25, 0], pelvis: [-4, 0, 0], ...tg('a', 5.2, .4, -2.0), ...tg('b', 2.6, .4, -3.0), ...tg('c', 3.2, .4, 2.7)};
-const TAIL_COCK = def('TAIL_COCK', tailYaw(C0, [-38, 6], [34, 22, 18, 14, 10, 8, 6, 6], {...BRACE, pelvis: [-4, -10, 0], chest: [0, 8, 0]}));
+const TAIL_COCK = def('TAIL_COCK', tailYaw(C0, [-60, -10], [34, 22, 18, 14, 10, 8, 6, 6], {...BRACE, pelvis: [-4, -10, 0], chest: [0, 8, 0]}));
 const TAIL_WHIP = def('TAIL_WHIP', tailYaw(C0, [-12, 2], [28, 14, 10, 6, 4, 2, 0, 0], {...BRACE, pelvis: [-4, 4, 0], chest: [0, -4, 0]}));
 const TAIL_FOLLOW = def('TAIL_FOLLOW', tailYaw(C0, [-8, 2], [-30, -14, -10, -8, -6, -4, -2, -2], {...BRACE, pelvis: [-4, 8, 0], chest: [0, -8, 0]}));
-const TAIL_COCK2 = def('TAIL_COCK2', tailYaw(C0, [-38, 6], [-34, -22, -18, -14, -10, -8, -6, -6], {...BRACE, pelvis: [-4, 10, 0], chest: [0, -8, 0]}));
+const TAIL_COCK2 = def('TAIL_COCK2', tailYaw(C0, [-60, -10], [-34, -22, -18, -14, -10, -8, -6, -6], {...BRACE, pelvis: [-4, 10, 0], chest: [0, -8, 0]}));
 const TAIL_WHIP2 = def('TAIL_WHIP2', tailYaw(C0, [-10, 2], [-28, -14, -10, -6, -4, -2, 0, 0], {...BRACE, pelvis: [-4, -4, 0], chest: [0, 4, 0]}));
 const TAIL_FOLLOW2 = def('TAIL_FOLLOW2', tailYaw(C0, [-6, 2], [30, 14, 10, 8, 6, 4, 2, 2], {...BRACE, pelvis: [-4, -8, 0], chest: [0, 8, 0]}));
-const TAIL_REST = def('TAIL_REST', P(SPRAWL, {pelvis: [0, 0, 8], tail_1: [6, 0, 0], hair_r_1: [0, 0, 0], hair_r_2: [0, 0, 0]}));   // (drapes: its own guard)
+// (the right drapes keep the swing's side of the roll: -32 / -52 clears the floor; the guard's own pick runs out of range)
+const TAIL_REST = def('TAIL_REST', P(SPRAWL, {pelvis: [0, 0, 8], tail_1: [6, 0, 0], hair_r_1: [0, 0, -32], hair_r_2: [0, 0, -52]}));
 // the melee combo (4 segments)
 const SWEEP_BACK = def('SWEEP_BACK', P(C0, {...rear(.15, {head: -4}), chest: [rear(.15).chest[0], 18, 0], shoulders: [rear(.15).shoulders[0], 8, 0], ...tgR('a', -4.8, 1.6, 1.8, Z), ...tg('a', 4.8, .6, -2.4)}));
 const SWEEP_THRU = def('SWEEP_THRU', P(C0, {pelT: [0, -.3, -.2], pelvis: [-4, 0, 0], chest: [-4, -22, 0], shoulders: [0, -8, 0], ...tgR('a', 2.6, 1.0, -5.6, Z), ...tg('a', 4.8, .6, -2.4)}));
@@ -409,10 +417,10 @@ const SURF_AIM = def('SURF_AIM', P(W0, {pelT: [0, .2, 0], pelvis: [10, 0, 0], ch
 const SURF_FIRE = def('SURF_FIRE', P(W0, {pelT: [0, -.2, -.3], pelvis: [-4, 0, 0], chest: [-4, 0, 0], neck: [6, 0, 0], head: [2, 0, 0]}));
 // the P3 crawl gait base (A raised, model_p3 §3: "A stays raised"), and the low crouch with the tail cocked (tail_p3)
 const CRAWL_A = def('CRAWL_A', P(W0, {pelT: [0, .1, 0], ...tg('a', 4.0, 3.8, -2.4, Z)}));
-const P3_COCK = def('P3_COCK', tailYaw(W0, [-34, 8], [34, 22, 18, 14, 10, 8, 6, 6], {pelT: [0, -.5, 0], pelvis: [-6, -10, 0], chest: [-4, 8, 0], neck: [6, 0, 0], head: [6, 0, 0]}));
+const P3_COCK = def('P3_COCK', tailYaw(W0, [-55, -8], [34, 22, 18, 14, 10, 8, 6, 6], {pelT: [0, -.5, 0], pelvis: [-6, -10, 0], chest: [-4, 8, 0], neck: [6, 0, 0], head: [6, 0, 0]}));
 const P3_WHIP = def('P3_WHIP', tailYaw(W0, [-10, 2], [28, 14, 10, 6, 4, 2, 0, 0], {pelT: [0, -.5, 0], pelvis: [-6, 4, 0], chest: [-4, -4, 0]}));
 const P3_FOLLOW = def('P3_FOLLOW', tailYaw(W0, [-6, 2], [-30, -14, -10, -8, -6, -4, -2, -2], {pelT: [0, -.4, 0], pelvis: [-5, 8, 0], chest: [-4, -8, 0]}));
-const P3_COCK2 = def('P3_COCK2', tailYaw(W0, [-30, 6], [-34, -22, -18, -14, -10, -8, -6, -6], {pelT: [0, -.6, -.4], pelvis: [-8, 10, 0], chest: [-4, -8, 0], neck: [6, 0, 0], head: [6, 0, 0]}));
+const P3_COCK2 = def('P3_COCK2', tailYaw(W0, [-50, -8], [-34, -22, -18, -14, -10, -8, -6, -6], {pelT: [0, -.6, -.4], pelvis: [-8, 10, 0], chest: [-4, -8, 0], neck: [6, 0, 0], head: [6, 0, 0]}));
 const P3_WHIP2 = def('P3_WHIP2', tailYaw(W0, [-4, 2], [-28, -14, -10, -6, -4, -2, 0, 0], {pelT: [0, -.6, -.4], pelvis: [-8, -4, 0], chest: [-4, 4, 0]}));
 const P3_FOLLOW2 = def('P3_FOLLOW2', tailYaw(W0, [-2, 2], [30, 14, 10, 8, 6, 4, 2, 2], {pelT: [0, -.5, -.2], pelvis: [-6, -8, 0], chest: [-4, 8, 0]}));
 // the unfold (stand_p3, v6 f522-f600): the head lifts first and the hood swings back while the body is still low
@@ -507,8 +515,12 @@ const SCOIL_LOW2 = def('SCOIL_LOW2', finish(Object.assign(deep(SCOIL_LOW), Objec
 const BELLY_TAILUP = def('BELLY_TAILUP', P(BELLY_FLOP, {tCurl: 10, tLift: -62}));
 // the ring opening after the slam (61 -> 65): the tail uncurls while it swings out sideways (tSweep), so no tail segment
 // turns more than ~110 deg per tick (a straight uncurl in 4 t either exceeds that or passes 3-6 b under the floor)
-const HOOP_DOWN = Object.assign(withRot(HOOP, [-360, 0, 0]), {pos: [0, 1.0, 0]}), FLOP_SW = withRot(P(BELLY_FLOP, {tSweep: 45}), [-360, 0, 0]);
-const RING_OPEN_A = Object.assign(lerpPose(HOOP_DOWN, FLOP_SW, .25), {tCurl: -18, tLift: -10, tSweep: 160});
+// The wheel rolls on the water (v5 f936-f954): from 55 the roll is keyed per tick with the height that keeps the ring's
+// lowest joint 0.3 b over the floor (the roll pivot is not the ring's centre, so a plain blend bobs 0.2-1.4 b).
+const groundY = p => { const o = solve(p); return Math.min(...BONES.filter(b => b.name !== 'root').map(b => (b.tip ? carry(o, b.name, b.tip) : o[b.name].t)[1])); };
+const wheelAt = deg => { const p = withRot(HOOP, [deg, 0, 0]); p.pos = [0, +(0.3 - groundY(p)).toFixed(3), 0]; return p; };
+const HOOP_DOWN = wheelAt(-360), FLOP_SW = withRot(P(BELLY_FLOP, {tSweep: 45}), [-360, 0, 0]);
+const RING_OPEN_A = Object.assign(lerpPose(HOOP_DOWN, FLOP_SW, .25), {tCurl: -18, tLift: -10, tSweep: 175});
 const RING_OPEN_B = Object.assign(lerpPose(HOOP_DOWN, FLOP_SW, .75), {tCurl: -2, tLift: 10, tSweep: 120});
 
 // ==== CLIP_KEYS: the motion of every clip on the played timeline (events: CLIP_TABLE) ==================================
@@ -590,9 +602,9 @@ export const CLIP_KEYS = {
   // 이동 돌진 (v5 12.45): fold 0-7, mound 8, sink (follow_y) and travel hidden 16-41, burst 44, hoop 44-49, the wheel roll
   // 49-61 (keyed root pitch -360), slam 61, the tail lands 65, the 360-degree ground whip 66-72 (the anchor), rise, stand
   move_strike_p3: () => [K(0, UPRIGHT), K(4, HUNCH_MID, 'io'), K(7, CRAWL, 'o'), K(10, MOUND, 'i'), K(15, MOUND), K(41, MOUND), K(44, BURST_P3, 'o'), K(49, Object.assign(deep(HOOP), {pos: [0, 1.2, 0]}), 'o'),
-    K(55, Object.assign(withRot(HOOP, [-180, 0, 0]), {pos: [0, 2.2, 0]}), 'l'), K(61, Object.assign(withRot(HOOP, [-360, 0, 0]), {pos: [0, 1.0, 0]}), 'l'),
+    ...[55, 56, 57, 58, 59, 60, 61].map(t => K(t, wheelAt(-180 - 30 * (t - 55)), 'l')),
     // the ring opens sideways: the tail half swings out to the boss's left (62-64) and lands trailing there at the tail
-    // event (65), ready for the ground whip (FLOOR_SKIP: it grazes under the water for 2-3 ticks under the slam splash)
+    // event (65), ready for the ground whip (FLOOR_SKIP: it grazes up to ~2 b under the water at 62-63, under the slam splash)
     K(62, RING_OPEN_A, 'l'), K(64, RING_OPEN_B, 'l'), K(65, withRot(TAIL_SWEEP, [-360, 0, 0]), 'l'), K(69, withRot(TAIL_SWEEP, [-360, 0, 0]), 'io'),
     K(72, withRot(TAIL_SWEEP, [-360, 0, 0])), K(78, withRot(CRAWL, [-360, 0, 0]), 'o'), K(85, withRot(CRAWL, [-360, 0, 0])), K(88, withRot(MID, [-360, 0, 0]), 'io'),
     K(91, withRot(UPRIGHT, [-360, 0, 0]), 'o'), K(92, withRot(UPRIGHT, [-360, 0, 0]))],
@@ -612,7 +624,7 @@ export const CLIP_KEYS = {
   surface_p3: () => [K(0, SURF_DOWN), K(4, SURF_AIM, 'o'), K(9, SURF_AIM), K(10, SURF_FIRE, 'i'), K(13, SURF_FIRE), K(24, CRAWL, 'io'), K(40, CRAWL)],
   // 생명의 꼬리 P3 (v6 2.50): low crouch with the tail cocked left (3), swing 1 14-21 (the anchor +200), rise into the
   // tall S-coil (24-36), lunge down (36-40), cock right, swing 2 46-53 (reverse, low), rise 57-86 into UPRIGHT
-  tail_p3: () => [K(0, CRAWL), K(3, P3_COCK, 'o'), K(11, P3_COCK), K(15, P3_WHIP, 'i'), K(19, P3_WHIP), K(23, P3_FOLLOW, 'o'), K(30, SCOIL, 'io'), K(34, SCOIL), K(40, SCOIL_LOW2, 'io'),
+  tail_p3: () => [K(0, CRAWL), K(3, mix(CRAWL, P3_COCK, .7), 'o'), K(7, P3_COCK, 'io'), K(11, P3_COCK), K(15, P3_WHIP, 'i'), K(19, P3_WHIP), K(23, P3_FOLLOW, 'o'), K(30, SCOIL, 'io'), K(34, SCOIL), K(40, SCOIL_LOW2, 'io'),
     K(43, P3_COCK2, 'io'), K(47, P3_WHIP2, 'i'), K(51, P3_WHIP2), K(55, P3_FOLLOW2, 'o'), K(57, P3_FOLLOW2), K(64, UNF_4, 'io'), K(72, UNF_8), K(79, UNF_11), K(86, UPRIGHT, 'o'),
     K(87, UPRIGHT)],
   // 생명의 나선 (v6 8.75): dark curl (4-10), rise, V + light column (14), arms wide while the seed-orbs gather (19),
