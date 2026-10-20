@@ -1,23 +1,28 @@
 // LIMBS region of the 아펩의 오아시스 파수꾼 rig (plan R4 parts 22-39 minus the hands, 48-49; model_p3.md §0 item 2: the six
 // phase-3 arms ARE the six phase-1 limbs): the upper and lower segments of the three limb pairs and the bead vines.
-//   A (a_up, a_lo)   P1 the long pale shell arms (model.md §3.3): overlapping pale shell plates with dark contour rims (a
-//                    beetle leg / folded leaf), a raised inner panel, rows of cream leaf scales on the inner face, the
-//                    shoulder plate darkening into the hump; the forearm broadens into a paddle toward the claw (v1 f290)
-//                    P3 the raised "antler" arms: a slim shell clad in lime leaf blades on both sides (dark backs), a gold
-//                    elbow cone, a white bell vine along the upper arm (model_p3 §2.3 items 13-14, v6 f480)
-//   B (b_up, b_lo)   P1 the front legs (model.md §3.4): dark armour plates on the upper leg fading to pale bark at the
-//                    foot, overlapping leaf plates, a knee guard turned out, an ankle cuff over the petal foot
-//                    P3 the middle arms: a tall section, the dark glossy carapace on the top and back with a lime rim
-//                    (v5 f1908), lime leaf scales in front with grey-lilac under-leaves, a gold elbow cone
-//   C (c_up, c_lo)   P1 the rear legs (as B, smaller) | P3 the lower arms: broad, shaggy with flared lime leaf scales over
-//                    a pale shell, white bell vines over the hips (v6 f480)
-//   beads            P3 only: two thin dark-green vines with rows of white lily-of-the-valley bells and small leaflets
+//   A (a_up, a_lo)   P1 the long pale shell arms (model.md §3.3, v1 f285 / f290, v2 f960 / f2076): one flattened shell per
+//                    segment arching up along the bone, painted with nested U "wood-grain" contours in long panels, the
+//                    shoulder root under a dark slate tongue (the hump colour), rows of cream leaf scales on the inner face,
+//                    pale pointed shell plates laid over the top (the overlapping leaf shells); the forearm broadens into
+//                    a paddle toward the claw
+//                    P3 the raised "antler" arms: a leaf-painted shell clad in broad lime blades on both sides (dark backs)
+//                    and across, a gold elbow cone, a white bell vine along the upper arm (model_p3 §2.3 items 13-14)
+//   B (b_up, b_lo)   P1 the front legs (model.md §3.4): a dark armour shell with painted plate tongues and two leaf plates
+//                    on the upper leg, the knee band and a knee guard, the lower leg's dark tongues over pale bark flaring
+//                    into a root base over the petal foot
+//                    P3 the middle arms: a thick leaf-painted shell, the dark glossy carapace plates on the back with the
+//                    lime rim (v5 f1908), big broad lime leaves wrapped over the top-front, a pale under-leaf fringe, a gold
+//                    elbow cone
+//   C (c_up, c_lo)   P1 the rear legs (as B, smaller) | P3 the lower arms: thick, big lime leaves over the front and top,
+//                    dark-backed leaves behind, a pale under-leaf fringe, white bell vines over the hips (v6 f480)
+//   beads            P3 only: three bowed dark-green vines with rows of white lily-of-the-valley bells and small leaflets
 //                    (P1: the empty model)
-// Construction. Every segment is a chain of PLATES: short 16-gon prisms (one loft section each) about the bone, each a
-// little inside its neighbour, with a dark rim cap at the step (the plate edges). Each plate shows one row of a WRAP
-// sprite (u = round the bone, v = along the plate), so the paint knows the facet angle: theta 0 = model +X, 90 = model
-// front (-Z), 180 = -X, -90 = back. Overlays (leaf blades, carapace plates, knee guards) are two-sided cards with a
-// front and a back sprite on one element.
+// Construction. Segments are SHELLS (shell(): one loft along the bone whose sections keep a constant profile and step a
+// little, the steps closed by ledges) or chains of PLATES (plates(): overlapping lofts, used for the knee band), each
+// showing one row of a WRAP sprite (u = round the bone, v = along the segment), so the paint knows the facet angle: theta
+// 0 = model +X, 90 = model front (-Z), 180 = -X, -90 = back. Overlays (leaf blades, leaves, carapace plates) are
+// two-sided cards with a front and a back sprite on one element; the P1 shell / armour plates are slabs (cards over a core
+// of boxes).
 // Frames (apep_pose FRAMES): every limb segment is authored in its bone frame 'y': model -Y along the bone from the joint
 // toward the next joint, model -Z toward the world front at the reference stance (P1 CROUCH, P3 UPRIGHT). Measured axes
 // (left side): P1 a_up +X up-out, a_lo +X out-up, b_up +X up-out, b_lo +X out, c_up +X up, c_lo +X out; P3 a_* +X
@@ -168,7 +173,7 @@ function p1ArmPaint(th, v, row) {
     if (i < 0) { i = P.length - 1; past = true; }
     const a1 = P[i] - ARCH / L + arch, a0 = i ? P[i - 1] - ARCH / L + arch : -9;
     const root = (t - a0) * L;
-    let k = .22 + .05 * nz + .34 * shade;
+    let k = .25 + .05 * nz + .38 * shade;
     const sw = Math.abs(Math.sin((N.c(th / 55 + row, t * 2) * 6 + th / 90) * Math.PI));   // faint grain swirls
     if (sw < .06) k += .07 * (1 - sw / .06);
     if (ath > PE) {
@@ -201,7 +206,7 @@ function p1ArmPaint(th, v, row) {
     if (row === 0) {
       // the shoulder plate: dark slate over the root, its tongue reaching down the top face to t ~ 0.42, a light bevel
       // stripe along the top and a dark outline with a light lip along the tongue's edge
-      const tg = .44 - .3 * Math.pow(ath / SEAM, 1.6);
+      const tg = .56 - .34 * Math.pow(ath / SEAM, 1.6);
       if (t < tg) {
         let sl = PAL.p1_slate(clamp(.42 + .1 * nz + .3 * shade + .12 * (1 - smooth(0, .25, t))));
         if (Math.abs(th - 20) < 9 && t < tg - .08) sl = mix(sl, PAL.p1_slate(.02), .5 * (1 - Math.abs(th - 20) / 9));
@@ -213,7 +218,7 @@ function p1ArmPaint(th, v, row) {
     }
   }
   if (t > T1 - .025) c = mix(PAL.p1_bark(.85), PAL.p1_line(.8), .5);                 // the end rim
-  return mix(c, PAL.p1_slate(.08), .2);                                              // the grey-green cast of the arm shell
+  return mix(c, PAL.p1_slate(.1), .26);                                              // the grey-green cast of the arm shell
 }
 // Legs (B / C, model.md §3.4: dark armour on the upper leg fading to pale bark at the foot, v1 f315, v2 f870 / f2076).
 // Each segment is ONE shell (a few sections, a gentle taper / flare); the plates are painted on it. Rows (v along the
@@ -344,8 +349,8 @@ const caraPaint = (u, v) => {
   if (d > 0) return null;
   const t = clamp(-v), top = .5 - .12 * Math.pow(t, 3), nz = N.d(u * 5, v * 5) - .5;
   let c = PAL.p3_bottle(clamp(.6 + .12 * nz - .3 * line(u - .15, .1)));
-  if (top - u < .07) c = PAL.p3_rim(clamp(.1 + 2 * (top - u)));
-  else if (top - u < .1) c = PAL.p3_line(.6);
+  if (top - u < .12) c = PAL.p3_rim(clamp(.04 + 2.2 * (top - u)));                     // the lime rim (v5 f1908)
+  else if (top - u < .15) c = PAL.p3_line(.6);
   if (d > -.025) c = mix(c, PAL.p3_bottle(1), .8);
   if (t > .02 && t < .07) c = lift(c, .2);
   return c;
@@ -383,6 +388,18 @@ const platePaint = (u, v) => {
   if (Math.abs(u) < .015 && v < -.15) c = mix(c, PAL.p1_slate(.85), .5);
   return c;
 };
+// the P1 pale shell plate (A arm overlays, v1 f290): pale bark, two nested contour lines following the pointed outline, a
+// light bevel inside the dark outline, shaded toward the tip
+const platePalePaint = (u, v) => {
+  const d = plateSd(u, v);
+  if (d > 0) return null;
+  const nz = N.c(u * 6, v * 6) - .5, t = clamp(-v);
+  let c = bark(.16 + .1 * nz + .22 * t + .18 * Math.abs(u) / .4);
+  for (const dc of [.07, .14]) if (Math.abs(-d - dc - .01 * Math.sin(v * 17)) < .009) c = mix(c, PAL.p1_line(.55), .7);
+  if (d > -.025) c = mix(PAL.p1_bark(.85), PAL.p1_line(.8), .6);
+  else if (d > -.05) c = lift(c, .3);
+  return mix(c, PAL.p1_slate(.08), .2);
+};
 // rim tiles (plate steps and caps)
 const rimP1 = tile('l1_rim', 32, 32, 32, (s, t) => mix(PAL.p1_bark(.62), PAL.p1_line(.55), .5 + .5 * Math.sin(t * 9 + s * 3)), 'p1');
 const rimP1d = tile('l1_rimd', 32, 32, 32, (s, t) => mix(PAL.p1_slate(.95), PAL.p1_slate(.7), .5 + .5 * Math.sin(t * 9 + s * 3)), 'p1');
@@ -391,9 +408,9 @@ const rimP3 = tile('l3_rim', 32, 32, 32, (s, t) => mix(PAL.p3_line(.85), PAL.p3_
 
 // a pointed dark leaf plate with thickness (the P1 leg overlays): a slab with the plate sprite on both faces over a core
 // of boxes, plane 'x' (u = Z) or 'z' (u = X), the tip at v0
-function leafPlate(plane, at, kr, rot) {
+function leafPlate(plane, at, kr, rot, spr = PLATE1, edge = 'l1_rimd') {
   const sd = (u, v) => plateSd((u - (kr.u0 + kr.u1) / 2) * PLATE_R.u1 * 2 / (kr.u1 - kr.u0), (v - kr.v1) / (kr.v1 - kr.v0)) * (kr.v1 - kr.v0);
-  return slab({plane, at, rect: kr, sd, half: .04, sprite: PLATE1, edge: 'l1_rimd', cell: .09, inset: .8, rot});
+  return slab({plane, at, rect: kr, sd, half: .04, sprite: spr, edge, cell: .09, inset: .8, rot});
 }
 // ---- sprites -----------------------------------------------------------------------------------------------------------------
 const ARM1 = wrapSprite('l1_arm', 256, 128, 2, p1ArmPaint, 'p1');
@@ -408,7 +425,10 @@ const LEAFW_D = card('l3_leafwd', BROAD_R, 48, broadPaint(PAL.p3_bottle, PAL.p3_
 // the pale under-leaf turned sideways (pointing -u: the fringe hanging under the B / C arms)
 const paleLeaf = leafPaint(t => mix(mix(PAL.p3_pale(t * .55), LILAC, .25), C('#FAFAF6'), .25), t => mix(PAL.p3_line(t), LILAC, .45));
 const LEAF_UD = card('l3_leafud', {u0: -1, u1: 0, v0: -.22, v1: .22}, 48, (u, v) => paleLeaf(v * .2 / .22, u), 'p3');
+// its back (seen from behind the arm): a shaded grey-green
+const LEAF_UDB = card('l3_leafudb', {u0: -1, u1: 0, v0: -.22, v1: .22}, 32, (u, v) => { const c = paleLeaf(v * .2 / .22, u); return c && mix(c, PAL.p3_line(.7), .55); }, 'p3');
 const PLATE1 = card('l1_plate', PLATE_R, 48, platePaint, 'p1');
+const PLATE1P = card('l1_platep', PLATE_R, 48, platePalePaint, 'p1');
 const BUD = tile('l3_bud', 16, 16, 64, (s, t) => { const r = Math.hypot(s - .5, t - .45); let c = PAL.p3_beads(clamp(.02 + .5 * r + .25 * t * t)); if (t > .82) c = PAL.p3_beads(.55); return c; }, 'p3');
 const VINE = tile('l3_vine', 16, 16, 64, (s, t) => PAL.p3_beads(clamp(.78 + .15 * Math.sin(t * 12 + s * 4))), 'p3');
 
@@ -427,7 +447,9 @@ function p1(seg) {
       [.68, [.31, .55, .25, .53], [.14, 0]],
       [.86, [.31, .57, .25, .55], [.1, 0]],
       [1.03, [.31, .58, .24, .56], [.05, 0]],                // the elbow end over the forearm root
-    ], ARM1, 0, rimP1, {seed: 300});
+    ], ARM1, 0, rimP1, {seed: 300}).concat(
+      // a pale shell plate laid over the top of the arch, its tip toward the elbow (the overlapping leaf shells)
+      leafPlate('x', .52, {u0: -.46, u1: .46, v0: -.8 * L, v1: -.34 * L}, null, PLATE1P, 'l1_rim'));
     case 'a_lo': return shell(L, ARM_T[1], [
       [.18, [.29, .53, .22, .51], [.06, 0]],
       [.36, [.29, .56, .22, .54], [.09, 0]],
@@ -435,7 +457,10 @@ function p1(seg) {
       [.74, [.27, .62, .2, .6], [.08, 0]],
       [.88, [.26, .65, .19, .63], [.05, 0]],
       [1.02, [.25, .67, .18, .65], [.03, 0]],                // the paddle under the claw
-    ], ARM1, 1, rimP1, {seed: 320});
+    ], ARM1, 1, rimP1, {seed: 320}).concat(
+      // two pale shell plates over the forearm's top, overlapping toward the claw
+      leafPlate('x', .44, {u0: -.5, u1: .5, v0: -.5 * L, v1: -.02 * L}, null, PLATE1P, 'l1_rim'),
+      leafPlate('x', .4, {u0: -.56, u1: .56, v0: -.9 * L, v1: -.46 * L}, null, PLATE1P, 'l1_rim'));
     case 'b_up': case 'c_up': {
       // the upper leg: one dark armour shell (the plates painted on it, a slight taper) and two pointed leaf plates laid
       // over its top / outer side and its front (the layered armour of model.md §3.4)
@@ -526,10 +551,11 @@ function p3(seg) {
         const v = [[0, 1, 0], [.06, .9, .05], [.03, 1.04, -.03]][(i + (up ? 0 : 1)) % 3];
         const t = -.03 + i * .33 + v[0], y0 = -t * L, h = .62 * L * v[1], u0 = -.22 + v[2];
         els.push(card2('z', z0 - .014 * (i % 2), {u0, u1: u0 + 1.05 * k, v0: y0 - h, v1: y0}, LEAFW, LEAF_U, ['y', -22.5, [u0, y0, z0 - .014 * (i % 2)]]));
-        // two pale under-leaves per lime leaf, hanging below the front edge
-        for (const [dt, dl] of [[.04, 0], [.2, .08]]) {
+        // two pale under-leaves per lime leaf hanging below the front edge (sizes and fold angles vary; the second one sits
+        // in its own plane so the two never share a face plane)
+        for (const [dt, dl, dw, ang, dz] of [[.04, (i % 2) * .1, 0, 22.5, .03], [.21, .12 - (i % 2) * .1, .06, 45, .05]]) {
           const yu = y0 - dt * L, uu = -(ru - .25);
-          els.push(card2('z', z0 + .03, {u0: uu - .6 - dl, u1: uu, v0: yu - .38, v1: yu}, LEAF_UD, LEAF_UD, ['y', 22.5, [uu, yu, z0 + .03]], {shade: false}));
+          els.push(card2('z', z0 + dz, {u0: uu - .58 - dl, u1: uu, v0: yu - .36 - dw, v1: yu}, LEAF_UD, LEAF_UDB, ['y', ang, [uu, yu, z0 + dz]], {shade: false}));
         }
       }
       if (!up) els.push(...cone([rt - .06, -.12, .05], .14, .5, 'p3_gold', {axis: 'x', sign: 1, seed: 480}));
@@ -546,7 +572,7 @@ function p3(seg) {
       for (let i = 0; i < 3; i++) {
         const t = -.02 + i * .32, y0 = -t * L, h = (up ? .58 : .55) * L * (1 - .06 * i), r = r0 - .03 * i, z0 = -(r + .04), sh = (i % 2) ? .08 : -.05;
         els.push(card2('z', z0, {u0: -.3 + sh, u1: .78 + sh, v0: y0 - h, v1: y0}, LEAFW, LEAF_U, ['y', -22.5, [-.3 + sh, y0, z0]]));
-        els.push(card2('z', z0 + .03, {u0: -(r + .45), u1: -(r - .25), v0: y0 - .1 * L - .36, v1: y0 - .1 * L}, LEAF_UD, LEAF_UD, ['y', 22.5, [-(r - .25), y0 - .1 * L, z0 + .03]], {shade: false}));
+        els.push(card2('z', z0 + .03, {u0: -(r + .45), u1: -(r - .25), v0: y0 - .1 * L - .36, v1: y0 - .1 * L}, LEAF_UD, LEAF_UDB, ['y', 22.5, [-(r - .25), y0 - .1 * L, z0 + .03]], {shade: false}));
         if (i < 2) els.push(card2('z', r + .03, {u0: -.42 - sh, u1: .42 - sh, v0: y0 - h * .9, v1: y0 - .04}, LEAFW_D, LEAFW_D, ['x', -22.5, [0, y0 - .04, r + .03]]));
       }
       if (up) els.push(...bellVine(.14, -(r0 + .05), -.1 * L, -.85 * L, {n: 5, out: [0, 1], seed: 3}));
