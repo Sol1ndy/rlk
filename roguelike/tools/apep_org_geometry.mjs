@@ -10,7 +10,7 @@
 // Element rotations stay single-axis on the 22.5 degree grid.
 import {abox, cardZ, cardX, cardY, faceEl, faceOfDir, lathe, annulus, checkBounds, r4, rotA} from './mboss_model_lib.mjs';
 import {loft, slab, crossCards, toUnits, mirrorX, retex, rockBox, stroke} from './mboss_shape_lib.mjs';
-import {SH, HOOD as NHOOD, NURT, nurtW, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01} from './apep_org_paint.mjs';
+import {SH, HOOD as NHOOD, NURT, nurtW, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, stalkSkin, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01} from './apep_org_paint.mjs';
 
 export {checkBounds};
 export const RIDE_Y = 2.0;           // the husk passenger point above its feet (org manifest passenger.ride_y)
@@ -170,8 +170,10 @@ function tube(P0, plane, r, tex, {knot = 3, seed = 0, sub = 2} = {}) {
 // v along the root by arc length: the grain runs on), plus a two-sided skin card in the plane with the smooth tapered
 // silhouette (half width 1.1 r): the outline reads smooth from the front and the back, the boxes give the volume.
 // sprite: the skin's sprite name (registered here, ppb px per block); end: the last box's far face shown (a cut tip)
-const ROOT_TILE = {he_rootS: 4, he_vineS: 64 / 24};    // the side sprite's length in blocks (v repeats)
-function rootLimb(sprite, plane, c, P0, r, {side = 'he_rootS', k = .85, sub = 3, ppb = 16, R, owner = 'heart', skin = 1.1, end = false, kin = null} = {}) {
+const ROOT_TILE = {he_rootS: 4, he_vineS: 64 / 24, st_sideS: 4};    // the side sprite's length in blocks (v repeats)
+function rootLimb(sprite, plane, c, P0, r, {side = 'he_rootS', k = .85, sub = 3, ppb = 16, R, owner = 'heart', skin = 1.1, end = false, kin = null, style = null, skinAt = 'mid'} = {}) {
+  // skinAt 'faces': two skin cards on the limb's flat sides (at the widest box's half thickness) instead of one in its
+  // middle plane: a flat blade (the stalks) shows its painted face from the side; the boxes keep only their edges
   // (with a skin card the boxes stay inside its outline in the plane: kin = their in-plane share of r)
   if (kin === null) kin = sprite ? .82 : 1;
   const P = [];
@@ -199,7 +201,7 @@ function rootLimb(sprite, plane, c, P0, r, {side = 'he_rootS', k = .85, sub = 3,
     const lo = M.map((x, q) => x - half[q]), hi = M.map((x, q) => x + half[q]);
     const span = Math.min(1, 2 * h / TL), v0 = ((arc / TL) % 1) * (1 - span), vk = span / (2 * h);
     const faces = {};
-    for (const nAx of [oAx, nIdx]) for (const sg of [1, -1]) {
+    for (const nAx of skinAt === 'faces' && sprite ? [oAx] : [oAx, nIdx]) for (const sg of [1, -1]) {
       const dir = [0, 0, 0]; dir[nAx] = sg;
       const acr = nAx === oAx ? nIdx : oAx, up = rotA(ax, best.g, dir)[1] > .5;      // a face looking up: the darker grain
       faces[faceOfDir(dir)] = {tex: up ? side + 'U' : side, fn: X => [16 * (X[acr] - lo[acr]) / (hi[acr] - lo[acr]), 16 * (v0 + (X[best.dAx] - lo[best.dAx]) * vk)]};
@@ -213,8 +215,9 @@ function rootLimb(sprite, plane, c, P0, r, {side = 'he_rootS', k = .85, sub = 3,
     const st = stroke(P, t => r(t) * skin), pad = Math.max(...Array.from({length: 11}, (_, q) => r(q / 10))) * skin + .04;
     const us = P.map(p => p[0]), vs = P.map(p => p[1]);
     const rect = {u0: Math.min(...us) - pad, u1: Math.max(...us) + pad, v0: Math.min(...vs) - pad, v1: Math.max(...vs) + pad};
-    skinSprite(sprite, rect, st, t => r(t) * skin, ppb, owner, R, plane === 'xy' ? 'z' : 'x');
-    els.push(plane === 'xy' ? cardZ(sprite, c, {X0: rect.u0, X1: rect.u1, Y0: rect.v0, Y1: rect.v1}) : cardX(sprite, c, {Z0: rect.u0, Z1: rect.u1, Y0: rect.v0, Y1: rect.v1}));
+    skinSprite(sprite, rect, st, t => r(t) * skin, ppb, owner, R, plane === 'xy' ? 'z' : 'x', style);
+    const at = skinAt === 'faces' ? [1, -1].map(sg => c + sg * (k * Math.max(...Array.from({length: 11}, (_, q) => r(q / 10))) + .012)) : [c];
+    for (const x of at) els.push(plane === 'xy' ? cardZ(sprite, x, {X0: rect.u0, X1: rect.u1, Y0: rect.v0, Y1: rect.v1}) : cardX(sprite, x, {Z0: rect.u0, Z1: rect.u1, Y0: rect.v0, Y1: rect.v1}));
   }
   return els;
 }
@@ -779,15 +782,27 @@ function domeDecor() {
   return els;
 }
 function wallBlade() {
-  // a slightly cupped blade: three strips (the side ones turned 22.5 degrees), the midrib as a thin box
-  const R = SH.wa_blade.rect, W = R.u1 - R.u0, H = R.v1 - R.v0, w3 = W / 3;
-  return [quad('wa_blade', [-w3 / 2, H, 0], [w3, 0, 0], [0, -H, 0], {uvr: [1 / 3, 0, 2 / 3, 1]}),
-    quad('wa_blade', [w3 / 2, H, 0], [w3, 0, 0], [0, -H, 0], {uvr: [2 / 3, 0, 1, 1], rot: ['y', -22.5, [w3 / 2, 0, 0]]}),
-    quad('wa_blade', [-w3 * 1.5, H, 0], [w3, 0, 0], [0, -H, 0], {uvr: [0, 0, 1 / 3, 1], rot: ['y', 22.5, [-w3 / 2, 0, 0]]})];
+  // a cupped leaf: three strips up to 2.0 b (the side ones turned 22.5 degrees back), the tip above it one strip leaning
+  // out 22.5 degrees (the leaf's top curling over)
+  const R = SH.wa_blade.rect, W = R.u1 - R.u0, H = R.v1 - R.v0, w3 = W / 3, h1 = 2.0, vb = (H - h1) / H;
+  return [quad('wa_blade', [-w3 / 2, h1, 0], [w3, 0, 0], [0, -h1, 0], {uvr: [1 / 3, vb, 2 / 3, 1]}),
+    quad('wa_blade', [w3 / 2, h1, 0], [w3, 0, 0], [0, -h1, 0], {uvr: [2 / 3, vb, 1, 1], rot: ['y', -22.5, [w3 / 2, 0, 0]]}),
+    quad('wa_blade', [-w3 * 1.5, h1, 0], [w3, 0, 0], [0, -h1, 0], {uvr: [0, vb, 1 / 3, 1], rot: ['y', 22.5, [-w3 / 2, 0, 0]]}),
+    quad('wa_blade', [-W / 2, H + .02, 0], [W, 0, 0], [0, -(H - h1) - .04, 0], {uvr: [0, 0, 1, vb + .014], rot: ['x', 22.5, [0, h1, 0]]})];
 }
-const stalkLow = () => loft('y', stops([-.4, .3, 1.0, 1.7, 2.3, 2.7], [.56, .5, .46, .43, .41, .4]), {n: 16, tex: 'st_bark', ledgeTex: 'st_bark_l', caps: '-+', seed: 47});
-const stalkHigh = () => loft('y', stops([-.05, .6, 1.2, 1.7, 2.1], [.4, .38, .35, .31, .28]), {n: 16, tex: 'st_bark', ledgeTex: 'st_bark_l', caps: '-+', seed: 53});
-const stalkTip = () => [...shapeSlab('s_hook', 'st_hook', 'x', 0, {half: .17, cell: .1, inset: .5, edge: 'st_bark'}), ...spike('st_cone', [0, 1.3, -.3], [0, 1, 0], .3, .16, ['x', 45])];
+// the 생명의 손 stalk (v1 f1320 / f1344): a pale flattened shell blade ~1 b wide rising from the ground and bending
+// forward (-Z) into a scythe-like hook, in three segments (the slam bends them at the joints): root limbs in the Y-Z
+// plane (boxes + skin card, the blade 1.6x wider than thick) with a dark slate back edge and veins (stalkSkin)
+const STALK = {
+  low: [[[.02, -.4], [.08, .4], [.12, 1.2], [.07, 2.0], [-.02, 2.72]], t => .58 - .13 * t],
+  high: [[[0, -.06], [-.04, .65], [-.16, 1.3], [-.36, 1.85], [-.52, 2.12]], t => .44 - .1 * t],
+  tip: [[[0, -.04], [.02, .45], [-.06, .9], [-.28, 1.24], [-.55, 1.26], [-.7, 1.08], [-.72, .9]], t => .34 * (1 - .82 * t) + .02],
+};
+const stalkLimb = (key, ppb) => rootLimb('st_sk_' + key, 'yz', 0, STALK[key][0], STALK[key][1], {side: 'st_sideS', k: .78, sub: 3, ppb, owner: 'stalk', R: PAL.stalk, style: stalkSkin, end: key === 'tip', skinAt: 'faces', skin: 1.04, kin: .96});
+const STALK_ELS = {low: stalkLimb('low', 15), high: stalkLimb('high', 15), tip: stalkLimb('tip', 20)};
+const stalkLow = () => STALK_ELS.low;
+const stalkHigh = () => STALK_ELS.high;
+const stalkTip = () => [...STALK_ELS.tip, ...spike('st_cone', [0, 1.2, -.42], [0, 1, 0], .3, .16, ['x', 45])];
 const seedModel = () => [...crossCards('se_seed', [0, .17, 0], .26, .34, {y0: -.17, three: true}), quad('se_seed', [-.13, .02, .17], [.26, 0, 0], [0, 0, -.34])];
 
 // ================================================================================================================
@@ -895,9 +910,9 @@ export const ORG = {
     displays: [D('wall_blade', {pivot: 'feet', frame: 'object', scale: 2.0, looks: {idle: 'wall_blade_idle'}, def: 'idle', models: {wall_blade_idle: wallBlade}, note: 'translucent yellow-green blade 0.9 x 2.86, midrib, two windows'})]},
   stalk: {type: 'object', kind: 'fixed_set', count: 4, height: [5.5, 6.0], tag: 'rlk_mb_ap_stalk', cull: [14, 7],
     displays: [
-      D('stalk_low', {idxs: [0x20, 0x23, 0x26, 0x29], pivot: 'feet', joint: [0, 0, 0], scale: 1.9, bright: 13, looks: {idle: 'stalk_low_idle'}, def: 'idle', models: {stalk_low_idle: stalkLow}}),
-      D('stalk_high', {idxs: [0x21, 0x24, 0x27, 0x2A], pivot: 'feet', parent: 'stalk_low', joint: [0, 2.62, 0], scale: 1.5, bright: 13, looks: {idle: 'stalk_high_idle'}, def: 'idle', models: {stalk_high_idle: stalkHigh}}),
-      D('stalk_tip', {idxs: [0x22, 0x25, 0x28, 0x2B], pivot: 'feet', parent: 'stalk_high', joint: [0, 2.02, 0], scale: 1.1, looks: {idle: 'stalk_tip_idle'}, def: 'idle', models: {stalk_tip_idle: stalkTip}, note: 'hooked tip + small gold cone'}),
+      D('stalk_low', {idxs: [0x20, 0x23, 0x26, 0x29], pivot: 'feet', joint: [0, 0, 0], scale: 2.3, bright: 13, looks: {idle: 'stalk_low_idle'}, def: 'idle', models: {stalk_low_idle: stalkLow}}),
+      D('stalk_high', {idxs: [0x21, 0x24, 0x27, 0x2A], pivot: 'feet', parent: 'stalk_low', joint: [0, 2.62, 0], scale: 1.8, bright: 13, looks: {idle: 'stalk_high_idle'}, def: 'idle', models: {stalk_high_idle: stalkHigh}}),
+      D('stalk_tip', {idxs: [0x22, 0x25, 0x28, 0x2B], pivot: 'feet', parent: 'stalk_high', joint: [0, 2.02, 0], scale: 1.25, looks: {idle: 'stalk_tip_idle'}, def: 'idle', models: {stalk_tip_idle: stalkTip}, note: 'hooked tip + small gold cone'}),
     ]},
   seed: {type: 'object', kind: 'single', tag: 'rlk_mb_ap_seed', cull: [1, 1],
     displays: [D('seed', {idx: 0x30, pivot: 'feet', bright: 15, looks: {idle: 'seed_idle'}, def: 'idle', models: {seed_idle: seedModel}, note: 'glowing golden seed at the death spot'})]},

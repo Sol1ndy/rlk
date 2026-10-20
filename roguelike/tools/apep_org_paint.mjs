@@ -213,8 +213,10 @@ export const SH = {
   h_stem: SHP({u0: -.3, u1: .3, v0: -6.2, v1: .1}, sdUnion(stroke([[0, 0], [.06, -1.5], [-.08, -3.0], [.07, -4.5], [-.02, -6.1]], t => .08).sd,
     stroke([[.02, -1.0], [.2, -1.25], [.24, -1.45]], t => .03 - .02 * t).sd, stroke([[-.04, -3.6], [-.22, -3.85], [-.25, -4.0]], t => .03 - .02 * t).sd)),
   // the Heart cradle: a knobbly root finger (radial plane: u = distance from the centre, v = height) and a tall root arm
-  wa_blade: SHP({u0: -.5, u1: .5, v0: 0, v1: 2.86}, (u, v) => { const t = clamp(v / 2.86), w = .46 * Math.sin(Math.PI * Math.pow(t, .8)) ** .8 + .01, c = .1 * Math.sin(t * 3.2);
-    const blade = Math.abs(u - c) - w, win = (cx, cy) => Math.hypot((u - c - cx) / .1, (v - cy) / .3) - 1; return Math.max(blade, -Math.min(win(-.2, 1.35), win(.2, 1.85)) * .1); }),
+  // the 둥지 wall blade (v4 f798 / f768): a broad translucent leaf 1.1 x 2.86, widest a little under half way, a pointed
+  // tip leaning to one side (u across, v up from the ground)
+  wa_blade: SHP({u0: -.6, u1: .6, v0: 0, v1: 2.86}, (u, v) => { const t = clamp(v / 2.86), c = .12 * Math.sin(t * 2.6) + .1 * t * t, w = .55 * Math.sin(Math.PI * Math.pow(t, .78)) ** .62 + .02 * (1 - t);
+    return Math.abs(u - c) - w; }),
   // 생명의 손 stalk: the hooked tip in profile (x plane: u = Z, v = Y, tip frame from the joint up)
   s_hook: SHP({u0: -.75, u1: .5, v0: -.1, v1: 1.55}, sdUnion(stroke(bez([0, 0], [.08, .9], [-.3, 1.3], 14).concat([[-.55, 1.22], [-.64, 1.02]]), t => .26 - .2 * t).sd,
     stroke([[-.3, 1.3], [-.12, 1.46], [.08, 1.42]], t => .09 - .06 * t).sd)),
@@ -258,13 +260,6 @@ function shellPx(u, v) {     // 파괴: dark armour plates with pale grey bands 
   const band = Math.min(fx, 1 - fx);
   if (band < .09) c = mix(c, PAL.destr(.12), .75 * (1 - band / .09));
   if (Math.min(fy, 1 - fy) < .06) c = sink(c, .3);
-  return c;
-}
-function stalkPx(u, v) {     // summoned stalk: pale grey shell with dark branching veins
-  let c = PAL.stalk(.22 + .12 * (N.b(u * 6, v * 6) - .5) + .1 * v);
-  const vein = Math.abs(N.e(u * 5 + v * 1.5, v * 7) - .5);
-  if (vein < .022) c = mix(c, C('#47504A'), .8 * (1 - vein / .022));
-  else if (vein < .04) c = mix(c, PAL.stalk(.6), .25);
   return c;
 }
 // glow ball (u, v over the sprite; r 0..1 from the centre)
@@ -469,9 +464,10 @@ add('he_rootSU', 16, 32, darker(rootSidePx(PAL.root), .66), 'heart');
 add('he_vineSU', 16, 32, darker(rootSidePx(PAL.vineL), .7), 'heart');
 // the skin card of a root limb: the smooth tapered silhouette (stroke st, half width w(t)), a rounded gradient across
 // it (the side toward the upper left lit), a dark outline, grain along; registered by the geometry per root
-export function skinSprite(name, rect, st, w, ppb, owner, R = PAL.root, plane = 'z') {
+export function skinSprite(name, rect, st, w, ppb, owner, R = PAL.root, plane = 'z', style = null) {
   shapeSprite(name, {rect, sd: st.sd}, ppb, owner, (u, v) => {
     const n = st.near(u, v), hw = Math.max(1e-3, w(n.t)), x = clamp(n.d / hw), side = n.s > 0 ? 1 : -1;
+    if (style) return style(n, x, side);
     let c = R(.24 + .3 * x * x - .08 * side * x + .1 * (N.c(n.t * 12, x * 2 + side) - .5));
     const g = Math.abs(N.a(n.t * 20, x * 3 * side + 5) - .5); if (g < .03) c = sink(c, .25);
     if (x > .86) c = sink(c, .35 * smooth(.86, 1, x));
@@ -507,12 +503,37 @@ add('do_rim', 64, 16, (s, t) => A(mix([250, 255, 200, 255], PAL.dome(.15), t), c
 shapeSprite('do_sprout', SH.do_sprout, 40, 'dome', (u, v) => shadeShape(SH.do_sprout.sd, u, v, PAL.dome, {t0: .25, edge: .01, w: .04}));
 
 // 둥지 wall blade (8 k)
-shapeSprite('wa_blade', SH.wa_blade, 34, 'wall', (u, v) => { const d = -SH.wa_blade.sd(u, v), c0 = .1 * Math.sin(clamp(v / 2.86) * 3.2); const mid = Math.abs(u - c0) < .025;
-  return A(mix(PAL.lime(.22 + .15 * clamp(v / 2.86)), mid ? PAL.lime(.7) : PAL.lime(0), mid ? .8 : .5 * smooth(.04, 0, d)), clamp(.58 + .32 * smooth(.05, 0, d) + (mid ? .25 : 0))); }, {translucent: true});
+// the blade's paint: lime glass (alpha ~0.6), a bright rim, a darker midrib and arched side veins, paler 'windows' between
+// the veins near the middle, the colour deepening toward the base
+shapeSprite('wa_blade', SH.wa_blade, 34, 'wall', (u, v) => {
+  const t = clamp(v / 2.86), c = .12 * Math.sin(t * 2.6) + .1 * t * t, x = u - c, d = -SH.wa_blade.sd(u, v), w = d + Math.abs(x);
+  const WB = ramp(['#F8FFB0', '#E4F684', '#CDEA62', '#AED24A', '#8CB638', '#6A9228']);
+  let col = mix(WB(.15), WB(.4), .6 * smooth(.5, 0, t)), a = .56 + .1 * smooth(.4, 0, t);
+  // side veins: arcs leaving the midrib upward and out, every ~0.32 b
+  const k = (v - Math.abs(x) * .9) / .32, vk = Math.abs(k - Math.round(k)) * .32;
+  const vein = vk < .022 && Math.abs(x) > .04 && d > .05;
+  const win = !vein && Math.abs(x) > .08 && d > .1 && vk > .07 && t > .15 && t < .85;
+  if (win) { col = mix(col, [236, 255, 170, 255], .35); a -= .12; }
+  if (vein) { col = mix(col, WB(.62), .55); a += .1; }
+  if (Math.abs(x) < .03 + .02 * (1 - t)) { col = mix(col, WB(.72), .6); a += .16; }
+  if (d < .045) { col = mix(col, [245, 255, 190, 255], .7 * smooth(.045, .01, d)); a = .86; }
+  return A(col, clamp(a));
+}, {translucent: true});
 
 // 생명의 손 stalks (16 k)
-add('st_bark', 64, 64, stalkPx, 'stalk');
-shapeSprite('st_hook', SH.s_hook, 36, 'stalk', (u, v) => { const b = bevel(SH.s_hook.sd, u, v, .1); let c = stalkPx((u + 1) * .6, v * .5); if (b.lit > 0) c = mix(c, PAL.stalk(0), .3 * b.rim * b.lit); else c = mix(c, PAL.stalk(.8), .35 * b.rim * -b.lit); if (-b.d < .015) c = sink(c, .35); return c; });
+// the 생명의 손 stalk skin (v1 f1320 / f1344): a pale grey-white shell blade, a dark slate band along its back (outer)
+// edge, two long dark veins following it, a fine dark outline; the side sprites of its boxes in the same pale
+export const stalkSkin = (n, x, side) => {
+  const R = PAL.stalk, back = side > 0;
+  let c = R(.02 + .16 * x * x + .06 * (N.b(n.t * 9, x * 2 + side) - .5) + .04 * n.t);
+  if (back && x > .62) c = mix(c, C('#4F574E'), .85 * smooth(.62, .76, x));
+  const v1 = Math.abs(x - (back ? .4 : .55) - .05 * Math.sin(n.t * 9)) < .035, v2 = !back && Math.abs(x - .22 - .04 * Math.sin(n.t * 13 + 1)) < .025 && n.t > .2;
+  if (v1 || v2) c = mix(c, C('#5C655B'), .7);
+  if (x > .93) c = mix(c, C('#3A413A'), .8);
+  return c;
+};
+add('st_sideS', 32, 64, (s, t) => { const x = Math.abs(s - .5) * 2; let c = PAL.stalk(.16 + .26 * x * x + .06 * (N.b(s * 3, t * 9) - .5)); if (x > .9) c = mix(c, C('#4F574E'), .6); return c; }, 'stalk');
+add('st_sideSU', 16, 32, (s, t) => { const x = Math.abs(s - .5) * 2, c = PAL.stalk(.3 + .2 * x * x); return [c[0] * .7, c[1] * .7, c[2] * .7, 255]; }, 'stalk');
 add('st_cone', 16, 16, (s, t) => PAL.gold(.15 + .55 * t + (s > .5 ? .15 : 0)), 'stalk');
 
 // the death seed (2 k)
@@ -528,7 +549,6 @@ add('pr_hood_l', 16, 16, (s, t) => ledgeOf(PAL.hood(.2)), 'pred');
 add('pr_bowl_l', 16, 16, (s, t) => A(ledgeOf(PAL.fin(.3)), .75), 'pred', true);
 add('pr_face_l', 16, 16, (s, t) => ledgeOf(PAL.fin(.3)), 'pred');
 add('he_root_l', 16, 16, (s, t) => ledgeOf(PAL.root(.4 + .2 * N.c(s * 3, t * 3))), 'heart');
-add('st_bark_l', 16, 16, (s, t) => ledgeOf(PAL.stalk(.3 + .1 * N.b(s * 3, t * 3))), 'stalk');
 // loft tiles / wraps: texel density per block for the tileUV windows; wraps map u = facet k / n, v along the loft
 for (const n of ['gu_drapeW', 'gu_sheath', 'gu_bud', 'ne_cap', 'de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
 registerTile('he_rootS', 32, 64, 16);
@@ -536,7 +556,8 @@ registerTile('he_vineS', 16, 64, 24);
 registerTile('he_rootSU', 16, 32, 8);
 registerTile('he_vineSU', 16, 32, 12);
 registerTile('bo_stemT', 16, 16, 64);
-registerTile('st_bark', 64, 64, 22);
+registerTile('st_sideS', 32, 64, 16);
+registerTile('st_sideSU', 16, 32, 8);
 
 export const orgSprites = () => Object.fromEntries(Object.entries(S).map(([k, [w, h, fn, tr]]) => [k, [w, h, fn, tr]]));
 export const spriteOwner = () => Object.fromEntries(Object.entries(S).map(([k, v]) => [k, v[4]]));

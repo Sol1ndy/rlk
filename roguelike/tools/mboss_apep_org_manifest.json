@@ -1927,7 +1927,7 @@
             0,
             0
           ],
-          "elements": 3,
+          "elements": 4,
           "note": "translucent yellow-green blade 0.9 x 2.86, midrib, two windows"
         }
       ],
@@ -1965,7 +1965,7 @@
         "elements": 60,
         "px": 8000
       },
-      "elements": 3,
+      "elements": 4,
       "px": 5376,
       "functions": {
         "spawn": "rlk:mboss/apep/om/wall/spawn",
@@ -1992,7 +1992,7 @@
           },
           "default_look": "idle",
           "brightness": 13,
-          "scale": 1.9,
+          "scale": 2.3,
           "pivot": "feet",
           "idxs": [
             32,
@@ -2005,7 +2005,7 @@
             0,
             0
           ],
-          "elements": 178
+          "elements": 14
         },
         {
           "name": "stalk_high",
@@ -2016,7 +2016,7 @@
           },
           "default_look": "idle",
           "brightness": 13,
-          "scale": 1.5,
+          "scale": 1.8,
           "pivot": "feet",
           "idxs": [
             33,
@@ -2030,7 +2030,7 @@
             2.62,
             0
           ],
-          "elements": 146
+          "elements": 14
         },
         {
           "name": "stalk_tip",
@@ -2041,7 +2041,7 @@
           },
           "default_look": "idle",
           "brightness": 14,
-          "scale": 1.1,
+          "scale": 1.25,
           "pivot": "feet",
           "idxs": [
             34,
@@ -2055,7 +2055,7 @@
             4.64,
             0
           ],
-          "elements": 12,
+          "elements": 22,
           "note": "hooked tip + small gold cone"
         }
       ],
@@ -2115,8 +2115,8 @@
         "elements": 400,
         "px": 16000
       },
-      "elements": 336,
-      "px": 7680,
+      "elements": 50,
+      "px": 8448,
       "reach": 6,
       "functions": {
         "spawn": "rlk:mboss/apep/om/stalk/spawn {i} (positioned at the root, facing the lock)",
@@ -2168,7 +2168,7 @@
     "px_total": 200000,
     "organism_elements": 500,
     "heart_elements": 800,
-    "px": 136960
+    "px": 137728
   },
   "sprites": {
     "bo_petal": {
@@ -2471,14 +2471,14 @@
       "h": 112,
       "owner": "wall"
     },
-    "st_bark": {
-      "w": 64,
+    "st_sideS": {
+      "w": 32,
       "h": 64,
       "owner": "stalk"
     },
-    "st_hook": {
-      "w": 48,
-      "h": 64,
+    "st_sideSU": {
+      "w": 16,
+      "h": 32,
       "owner": "stalk"
     },
     "st_cone": {
@@ -2536,11 +2536,6 @@
       "h": 16,
       "owner": "heart"
     },
-    "st_bark_l": {
-      "w": 16,
-      "h": 16,
-      "owner": "stalk"
-    },
     "bo_bellF": {
       "w": 32,
       "h": 112,
@@ -2595,6 +2590,21 @@
       "w": 96,
       "h": 112,
       "owner": "dome"
+    },
+    "st_sk_low": {
+      "w": 32,
+      "h": 80,
+      "owner": "stalk"
+    },
+    "st_sk_high": {
+      "w": 32,
+      "h": 48,
+      "owner": "stalk"
+    },
+    "st_sk_tip": {
+      "w": 32,
+      "h": 48,
+      "owner": "stalk"
     }
   },
   "functions": {
