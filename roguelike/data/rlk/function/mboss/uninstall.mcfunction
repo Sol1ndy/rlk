@@ -30,6 +30,7 @@ data remove storage rlk:mboss cbg
 data remove storage rlk:mboss tch
 data remove storage rlk:mboss pxq
 data remove storage rlk:mboss arsw
+data remove storage rlk:mboss plp
 data remove storage rlk:mboss arjob
 data remove storage rlk:mboss built_az_cavern
 data remove storage rlk:mboss built_cp_test

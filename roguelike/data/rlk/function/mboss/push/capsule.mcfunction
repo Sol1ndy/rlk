@@ -11,8 +11,9 @@ execute if entity @a[tag=player,scores={vMap=1}] run return 0
 execute if entity @a[tag=player,scores={dashMoveT=1..}] run return 0
 execute unless data storage rlk:mboss push[0] run return 0
 execute unless function rlk:mboss/mv/local run return 0
-execute store result score #pbx mb run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000
-execute store result score #pbz mb run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000
+scoreboard players operation #pbx mb = #mbPX mb
+scoreboard players operation #pbz mb = #mbPZ mb
 scoreboard players set #puDone mb 0
 data modify storage rlk:mboss pq set from storage rlk:mboss push
 function rlk:mboss/push/cap_loop
+execute if score #puDone mb matches 1 run scoreboard players set #mbPlG mb -1
