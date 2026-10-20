@@ -26,6 +26,10 @@ data remove storage rlk:mboss cbyid
 data remove storage rlk:mboss cprep
 data remove storage rlk:mboss cbpeek
 data remove storage rlk:mboss cbl
+data remove storage rlk:mboss cbg
+data remove storage rlk:mboss tch
+data remove storage rlk:mboss pxq
+data remove storage rlk:mboss arsw
 data remove storage rlk:mboss arjob
 data remove storage rlk:mboss built_az_cavern
 data remove storage rlk:mboss built_cp_test

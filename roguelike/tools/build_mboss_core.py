@@ -285,6 +285,10 @@ data remove storage rlk:mboss cbyid
 data remove storage rlk:mboss cprep
 data remove storage rlk:mboss cbpeek
 data remove storage rlk:mboss cbl
+data remove storage rlk:mboss cbg
+data remove storage rlk:mboss tch
+data remove storage rlk:mboss pxq
+data remove storage rlk:mboss arsw
 data remove storage rlk:mboss arjob
 ''' + ''.join(f'data remove storage rlk:mboss built_{aid}\n' for aid, _ in ARENAS if aid != 'plaza')
   + '\n'.join(f'scoreboard objectives remove {o}' for o in OBJECTIVES))
@@ -945,8 +949,10 @@ w('cleanup', '''
 # Never teleports the player (callers that end a run move the player themselves).
 function rlk:mboss/cleanup_fight
 function rlk:mboss/forget
-# chapter arenas (AZ-CM): their forceload goes (cb/pp/<id> adds it again at the next entrance build); barrier bands
-''' + ''.join(f'execute in minecraft:overworld run function rlk:mboss/ar/{aid}/fl_off\n' for aid, _ in ARENAS if aid != 'plaza')
+# chapter arenas (AZ-CM): a running job of one ends, then its forceload goes (cb/pp/<id> adds it again at the next
+# entrance build); barrier bands
+''' + ''.join(f'execute if data storage rlk:mboss arjob{{aid:"{aid}"}} run function rlk:mboss/arena/abort\n'
+              f'execute in minecraft:overworld run function rlk:mboss/ar/{aid}/fl_off\n' for aid, _ in ARENAS if aid != 'plaza')
   + ''.join(f'execute in minecraft:overworld run function rlk:mboss/arena/{aid}/sweep {{y0:{a["sweep"]["y0"]},y1:{a["sweep"]["y1"]}}}\n'
             for aid, a in ARENAS if aid != 'plaza' and 'sweep' in a))
 SWEEP_PLAZA = '''
@@ -964,6 +970,22 @@ function rlk:mboss/ar/sweep
 
 # =============================================================================================
 # World tick, pause, out of bounds, state shells, death
+w('world_cm_pre', '''
+# From mboss/world in a chapter fight (#mbMode 1), before the libraries and the module tick: out of bounds of the
+# chapter arena (#mbAr >= 1; the plaza's is called by world directly), the body push request cleared (a per-tick
+# request: set again by the module tick, cm.md 13.5), the lockv ring buffer (mv/lockv), proxy clicks polled.
+execute if score #mbAr mb matches 1.. if score #mbOn mb matches 1 unless entity @a[tag=player,scores={devMode=1}] as @e[tag=rlk_body,limit=1] at @s run function rlk:mboss/ar/oob
+scoreboard players set #mbPushOn mb 0
+function rlk:mboss/mv/lv_sample
+execute if score #mbPx mb matches 1 run function rlk:mboss/px/poll
+''')
+w('world_cm_post', '''
+# From mboss/world in a chapter fight (#mbMode 1), after the module tick (and the rig tick inside it): the proxies
+# follow the shown pose, the body push (#mbPushOn set by the module this tick), the music clock.
+execute if score #mbPx mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/px/tick
+execute if score #mbPushOn mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s rotated as @s run function rlk:mboss/push/capsule
+execute if score #mbMusPh mb matches 1.. run function rlk:mboss/music/tick
+''')
 w('main', '''
 # From rlk:tick, only while #mbLive mb is 1 (set by mboss/start and mboss/reload, cleared by cleanup_fight and
 # here), so outside a fight the server never scans for mid-boss entities. No body any more (killed, /kill,
@@ -971,8 +993,6 @@ w('main', '''
 # Low gravity is a per-tick request: cleared here, set again by the running module's tick (#mbLowG mb 1), so a
 # paused fight, a missing player or body, the intro, the death sequence and every exit path drop it at once.
 scoreboard players set #mbLowG mb 0
-# chapter mode (AZ-CM): the body push is a per-tick request too (#mbPushOn: set again by the module tick)
-scoreboard players set #mbPushOn mb 0
 execute if entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run return run function rlk:mboss/world
 function rlk:mboss/cleanup_aux
 function rlk:mboss/bars_hide
@@ -993,16 +1013,14 @@ execute if entity @a[tag=player,scores={pkMode=1..}] run scoreboard players set 
 execute unless entity @e[tag=rlk_body,limit=1] run scoreboard players set #mbP mb 1
 execute if score #mbP mb matches 1 run return run function rlk:mboss/pause_tick
 execute if score #mbPause mb matches 1 run function rlk:mboss/resume
-execute if score #mbOn mb matches 1 unless entity @a[tag=player,scores={devMode=1}] as @e[tag=rlk_body,limit=1] at @s run function rlk:mboss/ar/oob
-# chapter mode (AZ-CM): the lockv ring buffer of the player's body (mv/lockv), proxy clicks polled every tick
-execute if score #mbMode mb matches 1 run function rlk:mboss/mv/lv_sample
-execute if score #mbPx mb matches 1 run function rlk:mboss/px/poll
+execute unless score #mbAr mb matches 1.. if score #mbOn mb matches 1 unless entity @a[tag=player,scores={devMode=1}] as @e[tag=rlk_body,limit=1] at @s run function rlk:mboss/ar/plaza/oob
+# chapter fights only (AZ-CM, #mbMode 1; a mid-boss tick pays these two checks): the chapter arena's out of bounds,
+# the per-tick push request cleared, the lockv ring buffer, proxy clicks (world_cm_pre); after the module tick the
+# proxies follow the shown pose, the body push, the music clock (world_cm_post)
+execute if score #mbMode mb matches 1 run function rlk:mboss/world_cm_pre
 execute if score #mbMvOn mb matches 1 run function rlk:mboss/mv/all
 execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/body_tick
-# after the module tick (and the rig tick inside it): proxies follow the shown pose; the body push; the music clock
-execute if score #mbPx mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/px/tick
-execute if score #mbPushOn mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s rotated as @s run function rlk:mboss/push/capsule
-execute if score #mbMusPh mb matches 1.. run function rlk:mboss/music/tick
+execute if score #mbMode mb matches 1 run function rlk:mboss/world_cm_post
 execute if score #mbHzOn mb matches 1 run function rlk:mboss/hz/all
 execute if score #mbPjOn mb matches 1 run function rlk:mboss/pj/all
 execute if score #mbPlOn mb matches 1 run function rlk:mboss/pull/all
@@ -1349,17 +1367,24 @@ bossbar set rlk:mboss name [{text:"Lv.",color:"#FFD86B",bold:true},{score:{name:
 scoreboard players operation #buHp bu = @s mhpC
 scoreboard players operation #buMax bu = @s mhpM
 execute if score #mbSt mb matches 0 if score #mbT mb matches ..29 run function rlk:mboss/bars_ramp
-execute if score #mbRamp mb matches 1.. run function rlk:mboss/bars_repool
+# chapter fights (AZ-CM): the repool refill, the bossui options back to 0 before d/bars (bars_cm)
+execute if score #mbMode mb matches 1 run function rlk:mboss/bars_cm
 scoreboard players set #buSub bu 0
 scoreboard players set #buSubMax bu 1
 scoreboard players set #buSubCol bu 0
-# bossui options (tools/build_bossbar.py), 0 = the default look: #buHpCol HP colour code, #buNoNum 1 = no numbers
-scoreboard players set #buHpCol bu 0
-scoreboard players set #buNoNum bu 0
 function rlk:mboss/d/bars
 function rlk:bossui/draw
 bossbar set rlk:mboss_state name {nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""}
 bossbar set rlk:mboss_sub name {nbt:"sub[]",storage:"rlk:mboss",interpret:true,separator:""}
+''')
+w('bars_cm', '''
+# From mboss/bars in a chapter fight (#mbMode 1): after mboss/repool the new pool's bar refills over 30 t (#mbRamp);
+# the bossui options (tools/build_bossbar.py), 0 = the default look, are reset before d/bars every call (cm.md 11):
+# #buHpCol HP colour code, #buNoNum 1 = no numbers. (bossui/draw also resets both after every draw, so a mid-boss
+# fight, which never sets them, and Raiden always draw the M0 line.)
+execute if score #mbRamp mb matches 1.. run function rlk:mboss/bars_repool
+scoreboard players set #buHpCol bu 0
+scoreboard players set #buNoNum bu 0
 ''')
 w('bars_ramp', '''
 # Intro: the HP bar fills over 1.5 s.
@@ -2384,10 +2409,9 @@ execute unless block ~ ~1 ~ #rlk:dash_pass run return fail
 return 1
 '''
 w('mv/ok', '''
-# At a proposed feet position: inside the fight arena's safe disc (safe - 0.5 b from the axis) with free feet and head
-# (F:mboss/ar/<aid>/ok; the plaza's is the M0 text).
-return run function rlk:mboss/ar/ok
-''')
+# At a proposed feet position: inside the fight arena's safe disc (safe - 0.5 b from the axis) with free feet and head.
+# A chapter arena (#mbAr >= 1) through F:mboss/ar/<aid>/ok; the plaza's lines (the M0 text, = ar/plaza/ok) follow inline.
+execute if score #mbAr mb matches 1.. run return run function rlk:mboss/ar/ok''' + OK_PLAZA.split('head.', 1)[1])
 w('mv/step', '''
 # @s steps {d} blocks forward (decimal, e.g. {d:0.4}) when the spot is free and inside the safe disc.
 $execute at @s rotated as @s rotated ~ 0 positioned ^ ^ ^$(d) if function rlk:mboss/mv/ok run tp @s ~ ~ ~
@@ -2407,16 +2431,19 @@ execute at @s positioned ~ @CY@ ~ unless entity @e[tag=rlk_mb_arena,distance=..@
 execute at @s facing entity @e[tag=rlk_mb_arena,limit=1] feet rotated ~ 0 positioned ^ ^ ^0.45 run tp @s ~ ~ ~
 '''
 w('mv/leash', '''
-# @s = body (automatic every fight tick unless #mbNoLeash mb 1): the fight arena's leash (F:mboss/ar/<aid>/leash).
-function rlk:mboss/ar/leash
-''')
+# @s = body (automatic every fight tick unless #mbNoLeash mb 1): the fight arena's leash. A chapter arena (#mbAr >= 1)
+# through F:mboss/ar/<aid>/leash; the plaza's lines (the M0 text, = ar/plaza/leash) follow inline.
+execute if score #mbAr mb matches 1.. run return run function rlk:mboss/ar/leash''' + LEASH_PLAZA.split('at once.', 1)[1])
 w('mv/home', '''
 execute at @e[tag=rlk_mb_arena,limit=1] run tp @s ~ ~ ~
 execute at @s run particle minecraft:poof ~ ~1 ~ 0.4 0.8 0.4 0.02 12 force @a[tag=player]
 ''')
 w('mv/clamp', '''
 # @s (e.g. a destination marker) is pulled toward the arena axis until it is inside the fight arena's safe disc.
-function rlk:mboss/ar/clamp
+# A chapter arena (#mbAr >= 1) through F:mboss/ar/<aid>/clamp; the plaza's lines (= ar/plaza/clamp) follow inline.
+execute if score #mbAr mb matches 1.. run return run function rlk:mboss/ar/clamp
+scoreboard players set #cl mb 0
+function rlk:mboss/ar/plaza/clamp_step
 ''')
 w('mv/clamp_step', '''
 function rlk:mboss/ar/clamp_step
@@ -2480,6 +2507,9 @@ execute unless score #active room matches 1 run function rlk:run/save_pos
 function rlk:lobby/leave
 scoreboard players set #mbTest mb 1
 scoreboard players set #mbLock mb 0
+# a chapter test's forced chapter boss and auto gate press end here (every boss map of this test is the run's)
+scoreboard players set #cbForce mb 0
+scoreboard players set #cbAuto mb 0
 scoreboard players set #active room 1
 scoreboard players operation #chapter room = #mbReqCh mb
 scoreboard players set #mapIdx room 2
@@ -2561,6 +2591,9 @@ w('test/defeat', '''
 execute unless data storage rlk:mboss tlast.id run data modify storage rlk:mboss tlast set value {id:"proto",ch:1}
 execute if data storage rlk:mboss cur.id run data modify storage rlk:mboss tlast.id set from storage rlk:mboss cur.id
 execute unless data storage rlk:mboss tlast.ch run data modify storage rlk:mboss tlast.ch set value 1
+# the wording and the replay link follow the fight that just ended (a chapter session can reach a mid-boss and back)
+execute if data storage rlk:mboss cur{kind:"chapter"} run data modify storage rlk:mboss tlast.cb set value 1b
+execute if data storage rlk:mboss cur.id unless data storage rlk:mboss cur{kind:"chapter"} run data remove storage rlk:mboss tlast.cb
 function rlk:mboss/test/end
 title @s times 10 40 15
 title @s subtitle {text:"로비로 돌아왔습니다",color:"gray"}
@@ -2579,12 +2612,22 @@ w('test/won', '\n'.join([
     '# (test/start_ch), with this fight\'s id.',
     '$data modify storage rlk:mboss tlast.id set value "$(id)"',
     'execute unless data storage rlk:mboss tlast.ch run data modify storage rlk:mboss tlast.ch set value 1',
-    '# chapter tests (tlast.cb, test/chapter_ch): the chapter wording and replay link',
-    'execute if data storage rlk:mboss tlast{cb:1b} if score #mbKilled mb matches 1 run return run function rlk:mboss/test/cwon_msg with storage rlk:mboss tlast',
-    'execute if data storage rlk:mboss tlast{cb:1b} run return run tellraw @a[tag=player] ' + CTT + gray('취소되었습니다(보상 없음). 문이 다시 나타났습니다. ') + ','
-    + link('/function rlk:mboss/test/stop', '[로비로]') + ']',
+    '# the wording follows this fight (cur.kind; cur is always there), not the session: a chapter test can go on to a',
+    '# mid-boss of the next chapter and back (tlast.cb is kept for test/defeat)',
+    'execute if data storage rlk:mboss cur{kind:"chapter"} run data modify storage rlk:mboss tlast.cb set value 1b',
+    'execute unless data storage rlk:mboss cur{kind:"chapter"} run data remove storage rlk:mboss tlast.cb',
+    'execute if data storage rlk:mboss cur{kind:"chapter"} run return run function rlk:mboss/test/cwon',
     'execute if score #mbKilled mb matches 1 run function rlk:mboss/test/won_msg with storage rlk:mboss tlast',
     'execute unless score #mbKilled mb matches 1 run tellraw @a[tag=player] ' + TT + gray('취소되었습니다(보상 없음). ') + ','
+    + link('/function rlk:mboss/test/stop', '[로비로]') + ']']))
+w('test/cwon', '\n'.join([
+    '# From test/won after a chapter fight (killed or cancelled): the forced routing and the auto gate press end with the',
+    '# fight (cm.md 4.1; a cancelled gate needs neither: cb/gate and cb/start never read #cbForce), so the rest of the',
+    '# session (k_chapter -> the next chapter\'s boss map) routes as in a run. The chapter wording and replay link.',
+    'scoreboard players set #cbForce mb 0',
+    'scoreboard players set #cbAuto mb 0',
+    'execute if score #mbKilled mb matches 1 run return run function rlk:mboss/test/cwon_msg with storage rlk:mboss tlast',
+    'tellraw @a[tag=player] ' + CTT + gray('취소되었습니다(보상 없음). 문이 다시 나타났습니다. ') + ','
     + link('/function rlk:mboss/test/stop', '[로비로]') + ']']))
 w('test/won_msg', '$tellraw @a[tag=player] ' + TT + gray('처치! 문 자리에 아이템 상자가 떨어졌습니다(누르면 아이템 선택). ') + ',' + REPLAY
   + ',' + gray(' ') + ',' + link('/function rlk:mboss/test/stop', '[로비로]') + ']')
@@ -2670,11 +2713,16 @@ def ar_texts(aid, a):
                   'function rlk:mboss/safe_start with storage rlk:mboss cur.start')
     t['fl_on'] = f'# Forceload the box of {aid} (idempotent).\nexecute in minecraft:overworld run forceload add {fl}'
     t['fl_off'] = f'# Release the forceload of the box of {aid}.\nexecute in minecraft:overworld run forceload remove {fl}'
-    t['loaded'] = (f'# 1 when the box corners and the centre of {aid} are loaded, else fail.\n'
-                   f'execute in minecraft:overworld unless loaded {x0} {cy} {z0} run return fail\n'
-                   f'execute in minecraft:overworld unless loaded {x1} {cy} {z1} run return fail\n'
-                   f'execute in minecraft:overworld unless loaded {cx} {cy} {cz} run return fail\n'
-                   'return 1')
+    if aid == 'plaza':      # M0 mboss/start's test (the centre; the plaza forceload covers the whole box), cm.md 6.2
+        t['loaded'] = (f'# 1 when the centre of the plaza is loaded (the M0 test of mboss/start), else fail.\n'
+                       f'execute in minecraft:overworld unless loaded {cx} {cy} {cz} run return fail\n'
+                       'return 1')
+    else:
+        t['loaded'] = (f'# 1 when the box corners and the centre of {aid} are loaded, else fail.\n'
+                       f'execute in minecraft:overworld unless loaded {x0} {cy} {z0} run return fail\n'
+                       f'execute in minecraft:overworld unless loaded {x1} {cy} {z1} run return fail\n'
+                       f'execute in minecraft:overworld unless loaded {cx} {cy} {cz} run return fail\n'
+                       'return 1')
     if aid == 'plaza':
         t['ensure'] = '# The plaza (legacy arena generator: arena/ensure, stamp "plaza@2").\nexecute in minecraft:overworld run return run function rlk:mboss/arena/ensure'
         t['test'] = T.join([f'''
@@ -2689,13 +2737,14 @@ tellraw @s ''', gray('경기장을 다시 지었습니다. 돌아가기: ') + ',
         t['ensure'] = (f'# 1 when {aid} is built in its default look and loaded; else fail and a sliced job runs (arena generator).\n'
                        f'execute in minecraft:overworld run return run function rlk:mboss/arena/{aid}/ensure')
         t['test'] = T.join([f'''
-# Rebuild {aid} (a sliced job) and look at it from its arrival spot (outside a run). Back: /function rlk:lobby/go
+# Rebuild {aid} (a sliced job) and look at it from its arrival spot (outside a run; the job's done releases the
+# forceload again, outside a run). Back: /function rlk:lobby/go
 execute if score #active room matches 1 run return run tellraw @s ''', gray('런 중에는 쓸 수 없습니다.') + f''']
 function {P}fl_on
 execute in minecraft:overworld run function rlk:mboss/arena/{aid}/rebuild
 execute in minecraft:overworld run tp @s {L.num(st['x'])} {L.num(st['y'])} {L.num(st['z'])} {L.num(st['yaw'])} {L.num(st['pitch'])}
 function rlk:view/sync
-tellraw @s ''', gray(f'경기장 {aid} 을(를) 다시 짓는 중입니다(여러 틱). 돌아가기: ') + ',' + link('/function rlk:lobby/go') + ']'])
+tellraw @s ''', gray(f'경기장 {aid} 을(를) 다시 짓는 중입니다(여러 틱; 다 지으면 강제 로드를 풉니다). 돌아가기: ') + ',' + link('/function rlk:lobby/go') + ']'])
     return t
 
 
@@ -2762,7 +2811,9 @@ function rlk:mboss/floor
     w(f'cb/g/{b["id"]}', f'''
 # The gate of {b["id"]} was pressed (@s = the object marker, at it; the zone tagged rlk_cbz): forceload again (a cancelled
 # cb/won released it; the chunks load during the 30-t delay), the object goes, the zone fight starts, the gate texts.
+# A press (by hand or by test/cwait) ends the test's auto press, so a gate that comes back is never pressed again for you.
 scoreboard players set #cbWait mb 0
+scoreboard players set #cbAuto mb 0
 execute in minecraft:overworld run function rlk:mboss/ar/{a["aid"]}/fl_on
 function rlk:room/obj/kill_group
 execute as @e[tag=rlk_zone,tag=rlk_cbz,limit=1] at @s run function rlk:room/combat_start
@@ -2856,6 +2907,10 @@ w('cb/won', '\n'.join([
     'execute if score #mbWas mb matches 1 as @a[tag=player,limit=1] run function rlk:mboss/tp_out']
     + [f'execute if score #mbAr mb matches {a["n"]} in minecraft:overworld run function rlk:mboss/arena/{aid}/sweep {{y0:{a["sweep"]["y0"]},y1:{a["sweep"]["y1"]}}}'
        for aid, a in ARENAS if aid != 'plaza' and 'sweep' in a]
+    + ['# a running job of the fight arena (a module look swap, a rebuild) ends before its forceload goes: without the',
+       '# chunks it would only wait, refuse every gate press for 200 t and abort (cm.md 12); ensure restarts it at the next press']
+    + [f'execute if score #mbAr mb matches {a["n"]} if data storage rlk:mboss arjob{{aid:"{aid}"}} run function rlk:mboss/arena/abort'
+       for aid, a in ARENAS if aid != 'plaza']
     + ['execute in minecraft:overworld run function rlk:mboss/ar/fl_off',
        'execute if score #mbKilled mb matches 1 run return run function rlk:mboss/cb/won_kill',
        'function rlk:mboss/cb/won_cancel',

@@ -12,16 +12,14 @@ execute if entity @a[tag=player,scores={pkMode=1..}] run scoreboard players set 
 execute unless entity @e[tag=rlk_body,limit=1] run scoreboard players set #mbP mb 1
 execute if score #mbP mb matches 1 run return run function rlk:mboss/pause_tick
 execute if score #mbPause mb matches 1 run function rlk:mboss/resume
-execute if score #mbOn mb matches 1 unless entity @a[tag=player,scores={devMode=1}] as @e[tag=rlk_body,limit=1] at @s run function rlk:mboss/ar/oob
-# chapter mode (AZ-CM): the lockv ring buffer of the player's body (mv/lockv), proxy clicks polled every tick
-execute if score #mbMode mb matches 1 run function rlk:mboss/mv/lv_sample
-execute if score #mbPx mb matches 1 run function rlk:mboss/px/poll
+execute unless score #mbAr mb matches 1.. if score #mbOn mb matches 1 unless entity @a[tag=player,scores={devMode=1}] as @e[tag=rlk_body,limit=1] at @s run function rlk:mboss/ar/plaza/oob
+# chapter fights only (AZ-CM, #mbMode 1; a mid-boss tick pays these two checks): the chapter arena's out of bounds,
+# the per-tick push request cleared, the lockv ring buffer, proxy clicks (world_cm_pre); after the module tick the
+# proxies follow the shown pose, the body push, the music clock (world_cm_post)
+execute if score #mbMode mb matches 1 run function rlk:mboss/world_cm_pre
 execute if score #mbMvOn mb matches 1 run function rlk:mboss/mv/all
 execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/body_tick
-# after the module tick (and the rig tick inside it): proxies follow the shown pose; the body push; the music clock
-execute if score #mbPx mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/px/tick
-execute if score #mbPushOn mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s rotated as @s run function rlk:mboss/push/capsule
-execute if score #mbMusPh mb matches 1.. run function rlk:mboss/music/tick
+execute if score #mbMode mb matches 1 run function rlk:mboss/world_cm_post
 execute if score #mbHzOn mb matches 1 run function rlk:mboss/hz/all
 execute if score #mbPjOn mb matches 1 run function rlk:mboss/pj/all
 execute if score #mbPlOn mb matches 1 run function rlk:mboss/pull/all

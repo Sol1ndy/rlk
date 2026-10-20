@@ -3,6 +3,9 @@
 execute unless data storage rlk:mboss tlast.id run data modify storage rlk:mboss tlast set value {id:"proto",ch:1}
 execute if data storage rlk:mboss cur.id run data modify storage rlk:mboss tlast.id set from storage rlk:mboss cur.id
 execute unless data storage rlk:mboss tlast.ch run data modify storage rlk:mboss tlast.ch set value 1
+# the wording and the replay link follow the fight that just ended (a chapter session can reach a mid-boss and back)
+execute if data storage rlk:mboss cur{kind:"chapter"} run data modify storage rlk:mboss tlast.cb set value 1b
+execute if data storage rlk:mboss cur.id unless data storage rlk:mboss cur{kind:"chapter"} run data remove storage rlk:mboss tlast.cb
 function rlk:mboss/test/end
 title @s times 10 40 15
 title @s subtitle {text:"로비로 돌아왔습니다",color:"gray"}

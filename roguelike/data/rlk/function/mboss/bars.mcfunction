@@ -10,13 +10,11 @@ bossbar set rlk:mboss name [{text:"Lv.",color:"#FFD86B",bold:true},{score:{name:
 scoreboard players operation #buHp bu = @s mhpC
 scoreboard players operation #buMax bu = @s mhpM
 execute if score #mbSt mb matches 0 if score #mbT mb matches ..29 run function rlk:mboss/bars_ramp
-execute if score #mbRamp mb matches 1.. run function rlk:mboss/bars_repool
+# chapter fights (AZ-CM): the repool refill, the bossui options back to 0 before d/bars (bars_cm)
+execute if score #mbMode mb matches 1 run function rlk:mboss/bars_cm
 scoreboard players set #buSub bu 0
 scoreboard players set #buSubMax bu 1
 scoreboard players set #buSubCol bu 0
-# bossui options (tools/build_bossbar.py), 0 = the default look: #buHpCol HP colour code, #buNoNum 1 = no numbers
-scoreboard players set #buHpCol bu 0
-scoreboard players set #buNoNum bu 0
 function rlk:mboss/d/bars
 function rlk:bossui/draw
 bossbar set rlk:mboss_state name {nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""}

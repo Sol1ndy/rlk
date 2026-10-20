@@ -725,7 +725,7 @@
 5. 처치(`room/combat_clear` → `cb/clear` → `cb/won`): 경기장에 남은 골드를 거두고 던전으로 돌아오고, 경기장 고정을 풀고, **다음 챕터 오브젝트**(`room/obj/k_chapter`). 보상은 나루카미와 같은 **보스 경제**: 골드 = 무작위(`#mobGoldMin`~`#mobGoldMax`) × 챕터 × **15**(`#bossGoldMul`), 사파이어 조각 **2개**(`#bossSapphire`), **아이템 상자 없음**. 몸에 `miniboss` 태그가 없어서 `combat/gold_drop` 의 중간보스 배율(`#mbGoldMul` · `#mbSap`)은 타지 않는다.
 6. 처치가 아닌 끝(`/kill`, 소환 실패, 리로드로 몸 유실, `test/abort`): 보상 없이 취소되고 **같은 `cprep`** 으로 문이 다시 선다(문 글자 · 맵별 굴림 그대로). 다시 누르면 다시 싸운다.
 7. 패배 경로 `mboss/cb/lose`(모듈이 부르는 목표 실패): `#mbLost 1` 후 플레이어 체력 0 = 일반 사망 경로(런 실패, 테스트면 `test/defeat`). 로노바 부활은 그대로 적용된다.
-- 멈춤 · 경기장 밖 · 정리는 중간보스와 같다. 정리(`cleanup_fight`)는 `#mbMode 0` · 바닥 · 연출 · 밀어내기 · 체력 나눔 · 이벤트 · 음악 · `px` / `push` / `lv` 저장소까지 지우고, 경기장 고정은 `cb/won` · `mboss/cleanup`(맵 이동 · 런 끝 · `room/wipe`) · `cb/remove`(`room/remove`) · `mboss/uninstall` 이 푼다.
+- 멈춤 · 경기장 밖 · 정리는 중간보스와 같다. 정리(`cleanup_fight`)는 `#mbMode 0` · 바닥 · 연출 · 밀어내기 · 체력 나눔 · 이벤트 · 음악 · `px` / `push` / `lv` 저장소까지 지우고, 경기장 고정은 `cb/won` · `mboss/cleanup`(맵 이동 · 런 끝 · `room/wipe`) · `cb/remove`(`room/remove`) · `mboss/uninstall` 이 푼다. 그 경기장의 나누어 짓기 작업(모듈의 모습 바꾸기 · 다시 짓기)이 도는 중에 전투가 끝나면 `cb/won` · `mboss/cleanup` 이 고정을 풀기 **전에** 작업을 멈춘다(`arena/abort`: 청크 없이 200틱 기다리며 문을 "준비 중"으로 막다가 버려지던 일이 없음). 다음에 문을 누르면 `ensure` 가 고정을 다시 걸고 다시 짓는다.
 
 ### 레지스트리 v2 (`tools/mboss_registry.json`)
 - 항목에 `kind`("mid" 기본 / "chapter"). 챕터 항목만: `ch`(배정 챕터 목록), `route`(실제로 그 챕터를 가져갈지), `arena`(경기장 id), `music`, `res`(원소별 저항), `phases`(체력 나눔 %, 합 100), `px`(판정 프록시), `pxBase`(프록시 UUID 아래 바이트 시작), `shield`(클릭 판정 상자). 켜진 `route:true` 항목 둘이 같은 챕터를 가질 수 없다(`mboss_lib.load_registry` 가 막음).
@@ -733,18 +733,20 @@
 - 저장소: 중간보스는 `reg[]` · `byid`, 챕터 보스는 `creg[]` · `cbyid`(+ `#mbCN`). 중간보스 뽑기는 챕터 보스를 절대 보지 않는다.
 
 ### 경기장 (`tools/build_mboss_arena.py` → `mboss/arena/<aid>/*`, 코어 → `mboss/ar/<aid>/*`)
-- 예전에 상수로 박혀 있던 경기장 함수(경기장 밖 판정 · 쓸기 · 걷기 판정 · 끌어오기 · 고정 등)는 경기장마다 `mboss/ar/<aid>/<fn>` 이 되고 `mboss/ar/<fn>` 이 `#mbAr` 로 고른다. **광장 쪽은 M0 의 글자 그대로**라 중간보스 전투는 바뀌지 않는다(시험 `ident.py`).
+- 예전에 상수로 박혀 있던 경기장 함수(경기장 밖 판정 · 쓸기 · 걷기 판정 · 끌어오기 · 고정 · 불림 확인 등)는 경기장마다 `mboss/ar/<aid>/<fn>` 이 되고 `mboss/ar/<fn>` 이 `#mbAr` 로 고른다. **광장 쪽은 M0 의 글자 그대로**라(`loaded` 도 M0 `start` 의 가운데 한 점 검사 그대로, 챕터 경기장만 모서리 두 점 + 가운데) 중간보스 전투는 바뀌지 않는다(시험 `ident.py` 2b). 매 틱 · 자주 부르는 것은 디스패처를 거치지 않는다: `mboss/world` 는 광장의 `ar/plaza/oob` 를 바로 부르고, `mv/leash` · `mv/ok` · `mv/clamp` 는 첫 줄(`#mbAr` 1 이상이면 `ar/<fn>` 으로) 뒤에 광장 줄을 그대로 품는다(`ident.py` 2c).
 - 챕터 경기장은 **나누어 짓는다**: 한 번에 하나의 작업(`#mbArBuild` = 남은 조각 수, `rlk:mboss arjob`), 틱마다 한 조각(`arena/job_tick`, `schedule 1t replace`, 청크가 안 불렸으면 기다리고 200틱 넘으면 포기), 조각 ≤ 40 · fill 하나 ≤ 32 768 블록 · 조각 하나 ≤ 8 000 명령. 끝나면 도장 `built_<aid>` = `"<aid>@<ver>:<모습>"` + 표지 블록 확인.
 - `ensure` 는 작업이 없고 · 청크가 불렸고 · 도장이 기본 모습이고 · 표지 블록이 맞을 때만 1. 아니면 실패하면서 필요한 작업을 건다(판 번호가 다르면 다 짓기, 모습만 다르면 기본 모습으로 바꾸는 작업, 불리지 않았으면 확인 작업). 모듈은 전투 중에 `arena/<aid>/look/<모습>` 으로 모습을 바꿀 수 있다(바뀐 블록만).
 - `cp_test`: 지름 25 의 둥근 시험장(매끄러운 돌 바닥 · 돌벽돌 담), 모습 두 개 `plain`(기본) · `lit`(바닥 고리가 금 블록, 빛 층 9 → 15). 입구는 나루카미의 현관 크기 + 문 방 하나.
 - 장식 소품(`rlk_mb_arena_prop`)은 모듈이 전투 시작 · 모습을 바꿀 때 소환하고 틀이 `cleanup_aux` · `mboss/init` 에서 지운다.
+- 개발용 보기 `/function rlk:mboss/ar/<aid>/test`(런 밖): 고정을 걸고 다시 지은 뒤, 작업이 끝나면(`arena/<aid>/done` · `vdone`, `#active room` · `#mbLive` 가 1 이 아닐 때) 고정을 스스로 푼다(로비로 돌아가도 청크가 붙잡혀 있지 않음). 런 안의 입구 준비 고정은 그대로 전투까지 간다.
 
 ### 틀 기능 (챕터 보스용, 중간보스에는 꺼짐)
 - **체력 나눔** `mboss/repool {pct}`: 전체 체력 `#mbTot` 중 `pct`% 를 지금 단계의 체력으로(넘침 없는 곱, 30틱 동안 보스바가 차오름). 첫 단계는 `phases[0]`, `test/level` 은 새 `#mbTot` 에 지금 나눔을 다시 적용. **바닥** `#mbFloor`(모듈이 정하는 체력 바닥, `cb/inc/<id>` → 모듈 `incoming` → `mboss/floor`): 바닥까지만 깎이고 `#mbFloorHit 1`(바닥 이하가 되는 타격), `#mbFloorRaw` = 잘리기 전 피해. 진짜 피해는 바닥을 무시. **제목 바꾸기** `mboss/title {title,sub,color}`.
 - **원소별 저항** `res`(`{"0":30,"5":30,"*":10}` 꼴): 몸(`rlk_mb_resel`, `mbRes0..8`)과 보조 오브젝트(`#auxResEl` · `#auxResElV`)에서 `combat/apply` 가 타격 원소의 값을 `mres` 로(`mboss/res_pre`). 중간보스는 그대로 `mres` 하나.
 - **판정 프록시**(`px:true`): 보스 모양을 따라 다니는 interaction 최대 16개(고정 UUID = 보스 블록 + `pxBase + k`, 태그 `rlk_mb_px`, 살아 있을 때만 `rlk_mob`, 숨긴 것은 8칸 아래). 리그 매니페스트(스키마 1: 진짜 리그 것이 있으면 그것, 없으면 모듈의 대역 매니페스트; cproto 는 고정 파일 `tools/mboss_cproto_rig_manifest.json`)의 클립 · 키에서 `mboss/px/<id>/**` 가 생성되어, 리그가 보여 주는 클립 · 틱에 맞춰 0.15칸 넘게 움직인 기둥만 옮기고 높이를 바꾼다. 상태 묶음 `px/state {set:"<이름>"}`(매니페스트의 `states`; `inv` · `dead` 는 꼭 있음, 시작은 `inv`, 쓰러질 때 `dead`, 모르는 이름은 경고만). 몸은 크기 0.1 허스크(`rlk_mb_big` · `rlk_mb_noshield`). 프록시를 맞히면 `px/hit` 가 그 자리에서 몸에 대한 `combat/apply` 로 바꾸고(숫자는 프록시 자리에 뜸, `#mbPart` = 맞은 프록시), **공격 하나 = 몸에 한 번**(`#atkSeq tmp` + 게임 시간: 범위 공격이 프록시 여럿과 몸을 함께 잡아도 한 번, 같은 틱의 원소 반응 · 지속 피해 · 달 반응은 각자 한 번). 프록시 클릭은 매 틱 읽고 멈춘 동안은 버린다.
 - **음악** `mboss/music/set {ph}`: 레지스트리 `music."<ph>"` 의 바닐라 `music.*` 이벤트를 `record` 분류로 플레이어 자리에서(입체 음향 아님). `len`(틱)마다 처음부터 다시, 100틱마다 바닐라 배경 음악 끄기, 단계가 바뀌면 앞 곡을 끄고 새 곡(겹치지 않음), 멈추면 끄고(단계는 기억) 다시 시작하면 처음부터, 쓰러짐 · 정리 · `uninstall` 에서 끔. 길이는 26.3 의 에셋 색인(34)에서 잼: `music.end` = `the_end.ogg` 39 889 699 샘플 / 44 100 Hz = 904.53초 → **18 090틱**, `music.dragon` = `boss.ogg` 15 177 058 샘플 → 344.15초 → **6 883틱**.
-- **보스바** 옵션(`tools/build_bossbar.py`): `#buHpCol bu`(0 = 기본 #E0484B, 1~9 = 아랫줄 색 번호, 10 = 금 #EDCF63) · `#buNoNum bu`(1 = 숫자 없음). `mboss/bars` 가 `d/bars` 앞에서 0 으로 두고 `bossui/draw` 가 그리고 나서 0 으로 되돌리므로 나루카미 · 중간보스의 줄은 M0 와 바이트 단위로 같다.
+- **보스바** 옵션(`tools/build_bossbar.py`): `#buHpCol bu`(0 = 기본 #E0484B, 1~9 = 아랫줄 색 번호, 10 = 금 #EDCF63) · `#buNoNum bu`(1 = 숫자 없음). 챕터 전투에서는 `mboss/bars` 가 `d/bars` 앞에서 0 으로 두고(`mboss/bars_cm`, 체력 나눔 차오름과 함께 `#mbMode 1` 일 때만), `bossui/draw` 는 그릴 때마다 끝에 0 으로 되돌리므로 옵션을 쓰지 않는 나루카미 · 중간보스의 줄은 M0 와 바이트 단위로 같다. 색은 검사 한 번(`1..10` 이 아니면 기본 색, 맞으면 `bossui/hp_col` 의 열 줄)이라 옵션을 안 쓰는 쪽은 그리기마다 M0 보다 명령 6개(모의기 셈: 색 검사 · 숫자 호출 · 되돌리기 둘)만 더 든다.
+- **중간보스가 내는 비용**: 챕터 전용 매 틱 줄은 `mboss/world` 의 두 문(`#mbMode 1` 이면 `world_cm_pre`: 챕터 경기장 밖 판정 · `#mbPushOn` 지우기 · 예측 조준 기록 · 프록시 클릭, 몸 틱 뒤 `world_cm_post`: 프록시 따라가기 · 밀어내기 캡슐 · 음악 시계) 뒤에 있고, `mboss/main` 은 M0 글자 그대로다. 모의기(같은 시드, 1200틱, 6틱마다 타격)에서 중간보스 한 틱은 M0 보다 명령 약 5개(약 2%)를 더 쓴다(전에는 16~18개): `world` 의 문 둘, `bars` 의 문 하나, `mv/leash` 의 `#mbAr` 검사 하나, 타격마다 `combat/apply` 의 자기 태그 검사 셋. 그 밖에 몹마다 매 틱 `mob/shield_ensure` 의 `rlk_mb_noshield` 검사 하나, 공격마다 `#atkSeq` 더하기 하나(다섯 곳), 나비아 장미탄 한 발마다 명령 둘(`pellet_go`). 행동은 바뀌지 않는다(`test_m0diff.py`).
 - **플레이어 쪽 도우미**(`mboss_lib` 호출 도우미가 함께 있음): 마스크 바닥 공격 `hz/mask {tell,dmg}`(종류 6: 안전한 원(`rlk_mb_hzsafe`, `#hzR0` + 0.3칸, 수평) 밖 전부, 반지름 제한 없음, 안전 묶음 `#hzSafeG`) · 맞음 / 피함 이벤트(`#mbHitEv` `#mbHitEl` `#mbHitSh` `#mbHitRA` `#mbHitSrc`, `#mbDodgeEv` `#mbDodgeOk`: 한 번 치는 12틱 이상 예고 · 투사체만) · 지속 피해 `mboss/pl_dot`(최대 체력의 ‰, 방어 무시, 대시 무적 무시, 수호 → 원소 보호막(같은 원소 250%), 기본은 1 남김) · 반응 없음(`#hzNR` `#pjNR` `#mbNoRx` → `player/take_damage` 가 `element/player_hit` 를 건너뜀) · 몸 밀어내기 캡슐(`#mbPushOn`, 0.6칸/틱, 대시 · 사망 · 선택 · 지도 중 안 함) · 밀어내는 고리 `push/ring {r,to,kb}`(0.1칸 단위, 피해 없음, 바닥 공격 위로는 안 밂) · 예측 조준 `mv/lockv {lead}`(5틱 속도, 대시 틱 건너뜀, 280 mb/틱 상한, 걷는 반지름 안으로) · 몸 기준 좌표 `mv/local` · 연출 `cine/start|end`(그동안 플레이어 피해 거부) · `hz/extend {n}` · `#pjNoDodge`.
 - 생성 순서: 코어 → 경기장(광장 + 모든 `arenas{}`; 테마 모듈이 없으면 대역) → `build_cboss_rooms.py`(`room/cboss/**`, 테마의 `entrance_layout()`) → proto → **`build_mboss_cproto.py`**(`mboss/cproto/**` + 대역 매니페스트) → 리그들 → guardian → … → `check_mboss_pack.py`. 코어는 커밋된 리그 매니페스트를 읽으므로 매니페스트가 바뀌는 커밋은 다시 만든 `mboss/px/**` 도 함께 커밋한다(두 번째 생성이 다르면 `gen_check.py` 가 실패).
 
@@ -752,7 +754,8 @@
 머리 · 꼬리 두 프록시(`core` 폭 2 · `tail` 폭 1.2), 클립 4개(`idle` · `sweep` 꼬리 휘두르기 · `sink` 가라앉기 · `rise`), 두 단계(60% / 40%, 1단계 바닥 → 2단계 체력 · 제목 · 음악 · 20틱 연출), 패턴 셋(예측 조준 강타 · 밀어내는 고리 · 마스크). 모든 틀 기능을 한 번씩 쓰는 모듈 예시이고, 입구는 `cp_test` 의 것.
 
 ### 시험 명령
-- `/function rlk:mboss/test/chapter {id:"cproto"}`(첫 배정 챕터, 없으면 1) · `test/chapter_ch {id:"cproto",ch:2}`: 'player' 태그 · `room/setup` · 진행 중인 런 없음 · 난이도 쉬움 이상. 그 챕터의 진짜 보스 맵(`#cbForce`)을 만들고 문 앞에 세운 뒤, 경기장 작업이 끝나면 문을 자동으로 누른다(`#cbAuto`, 300틱 넘으면 "직접 누르세요").
+- `/function rlk:mboss/test/chapter {id:"cproto"}`(첫 배정 챕터, 없으면 1) · `test/chapter_ch {id:"cproto",ch:2}`: 'player' 태그 · `room/setup` · 진행 중인 런 없음 · 난이도 쉬움 이상. 그 챕터의 진짜 보스 맵(`#cbForce`)을 만들고 문 앞에 세운 뒤, 경기장 작업이 끝나면 문을 자동으로 누른다(`#cbAuto`, 300틱 넘으면 "직접 누르세요"). 문을 직접 누르면(어떤 누름이든 `cb/g/<id>`) 자동 누르기는 끝난다(취소로 문이 돌아와도 대신 누르지 않음).
+- 챕터 전투가 끝나면(처치든 취소든) `test/won` → `test/cwon` 이 `#cbForce` · `#cbAuto` 를 0 으로 둔다: 처치 뒤 다음 챕터 오브젝트로 계속 가는 테스트에서 다음 보스 맵은 런과 똑같이 정해지고, 취소된 문은 그대로 다시 누를 수 있다. 문구(챕터 / 중간보스)와 `[다시 하기]` 는 세션이 아니라 **방금 끝난 전투**(`cur.kind`)를 따른다(`test/won` · `test/defeat`). 챕터 테스트 중에 시작한 중간보스 테스트(`test/start_ch`)도 `#cbForce` · `#cbAuto` 를 지운다.
 - `test/lose`(패배 경로) · 공통 `test/kill` · `test/abort` · `test/pattern {id:N}`(cproto: 1 마스크, 2 지속 피해, 3 고리, 4 예측 조준, 5 좌표, 6 못 피하는 투사체, 7 연출, 8 / 9 모습 lit / plain, 10 패배, 11 2단계, 20~23 프록시 상태, 30 밀어내기, 31~33 클립, 40 제목, 41 / 42 음악, 50 보조 저항, 60 늘이기) · `test/level` · `test/stop`. `#cbForce` · `#cbAuto` · `cprep` 은 `run/start` · `run/end` · `test/stop`(→ `cb/run_reset`)이 지운다.
 - 쓰러지면 "챕터 보스 테스트 실패" + `[다시 하기]`(같은 보스 · 같은 챕터의 `test/chapter_ch`), 처치하면 다음 챕터 오브젝트 + `[다시 하기]` · `[로비로]`.
 
@@ -768,16 +771,18 @@
 | `room/obj/k_cboss` · `k_cboss2` · `k_cboss3` · `k_cboss_fb` | 새 파일(문 오브젝트) |
 | `room/combat_clear` | 종류 9 + `data.cboss` 이면 `mboss/cb/clear` |
 | `combat/gold_drop` | 중간보스 배율 줄 `@s[tag=rlk_mb_body]` → `@s[tag=rlk_mb_body,tag=miniboss]` |
-| `combat/apply` | 맨 앞: 프록시 → `mboss/px/hit`, 큰 몸 → `mboss/px/dup`; 원소 훅 앞: `rlk_mb_resel` → `mboss/res_pre` |
+| `combat/apply` | Raiden 오브젝트 줄 다음(8번 줄 뒤): 프록시 → `mboss/px/hit`, 큰 몸 → `mboss/px/dup`; 원소 훅 앞: `rlk_mb_resel` → `mboss/res_pre` |
 | `combat/melee_begin` · `clear_atkflags` · `element/rx_run` · `element/lunar/hit` · `element/dot` | 맨 앞 `#atkSeq tmp` +1 |
 | `player/take_damage` | `element/player_hit` 줄에 `unless score #mbNRNow mb matches 1` |
 | `mob/shield_ensure` | `rlk_mb_noshield` 이면 방패 없음 |
-| `char/navia/pellet` | 프록시는 빼고, 프록시에 닿은 탄은 몸에 셈 |
+| `char/navia/pellet_go` | 탄 한 발이 끝난 뒤(발수 세기 앞) 두 줄: 프록시에 닿았으면 몸에 한 번, 프록시는 세지 않음(`char/navia/pellet` 은 M0 그대로) |
 | `room/map_mobs` | 미니맵에서 프록시 제외 |
 | `room/remove` | `mboss/cb/remove` |
 | `run/start` · `run/end` | `mboss/cb/run_reset` |
 | `char/arlecchino/skill_hit` | 대상 쪽 기록 감사(아래): 피해 뒤 프록시의 `rlk_hit` 를 몸으로(`mboss/px/to_body`) |
-| `bossui/draw` · `bossui/nums` | `tools/build_bossbar.py` 로 다시 생성(`#buHpCol` · `#buNoNum`) |
+| `bossui/draw` · `bossui/nums` · `bossui/hp_col` | `tools/build_bossbar.py` 로 다시 생성(`#buHpCol` · `#buNoNum`) |
+
+이 표의 고친 줄은 글자 그대로 `az/tests_cm/baseline/shared_edits.diff` 에 고정되어 있다(`ident.py` 4d: M0 대비 0줄 문맥 diff 가 다르면 실패, 표를 바꾼 뒤에만 `--save`).
 
 ### 대상 쪽 기록 감사 (프록시에 남는 상태, cm.md 9.6절)
 `combat/apply` 밖에서 `@e[tag=rlk_hit]` · 거리 선택자 · 조준한 몹에 쓰는 상태는 몸이 아닌 프록시에 남는다. 모두 찾아 몸으로 옮기거나 받아들였다(`test_px.py` 10절 · 5절이 확인).
@@ -800,6 +805,7 @@
 - 대상 쪽 기록은 거리 선택자로 쓰는 것이 많아 줄마다 고치는 대신 생성 함수 `px/db` 한 곳에서 옮긴다(공용 파일 수정은 아를레키노 한 줄).
 - `push/cap_one` 은 `pq[0]{px:""}` 가 바닐라 NBT 경로가 아니어서(검사기 `check_nbtpath`) 캡슐을 `pc` 로 복사해 비교한다.
 - 문 오브젝트는 `cprep` 이 없어도 레지스트리 기록으로 선다(`k_cboss_fb`, 보스 맵에 문이 없는 일이 없음).
+- 검토 뒤 고친 점(scratchpad `az/contract/cm.md` 20절 변경 기록 1~12): 위의 테스트 상태 · 끝난 전투의 작업 멈춤 · 자동 누르기 · 개발용 보기 고정 · `uninstall` 이 `cbg` · `tch` · `pxq` · `arsw` 도 지움 · 매 틱 비용 · 보스바 색 검사 · 광장 `loaded` · 나비아 줄 위치 · 공용 파일 표(`combat/apply` 자리, 아를레키노 · `k_cboss_fb` 줄)와 아펩이 그대로 돌릴 수 있는 `test_chapter.py`(레지스트리에서 기대값을 읽음).
 - 테마 모듈이 없는 경기장(`az_cavern`, 이 가지)은 대역 함수만 만들고 도장 `"<aid>@0:stub"`.
 - 선택 사항(cm.md 5.10): `mboss/cb/peek`(그 챕터의 보스 맵이 갈 챕터 보스를 `cbpeek` 에)은 생성하지만, `room/end_boss` · `room/gen_title` 은 고치지 않았다("보스전" 표시 그대로).
 - 입구 장식처럼 전투 밖에서 움직이는 것은 모듈 `prep` 이 시작하는 스스로 다시 예약하는 함수 사슬(cproto: `cproto/glow`, 10틱, 소품이 없어지면 멈춤, 모듈 `uninstall` 이 `schedule clear`).
@@ -810,7 +816,7 @@
 음악: 경기장 어디에서나 소리 크기가 같은지(`record` 분류, 입체 음향 아님) · 18 090 / 6 883틱 뒤 끊김 없이 처음부터 다시 나오는지 · 바닐라 배경 음악이 끼어들지 않는지. 안 되면(계약의 대안) `music_disc.*` 를 음량 4 로 다시 고정하며 틀기.
 
 ### 시험 (스크래치패드 `az/tests_cm/`)
-`run_all.sh <worktree>/roguelike` 가 챕터 보스 시험 셋(`test_chapter.py` 라우팅 · 입구 · 문 · 소환 · 보상 · 취소 · 패배 · 체력 나눔 · 시험 명령 · 음악 · 모습 · 정리 · 나루카미, `test_px.py` 판정 프록시, `test_fw_az.py` 도우미), M0 시험(`mb/int_tests` · `mb2/tests` · `mb2/fxtests` · `mb3/tests`), `gen_check.py`(생성 순서 · 두 번 · 거꾸로 · 소유 경로), `ident.py`(가디언 · 나비 · 역장 · proto 출력과 광장 · 공용 파일이 M0 039b911 과 같음), 검사기 다섯 개(`baseline/` 대비 새 발견만 실패)를 돌린다.
+`run_all.sh <worktree>/roguelike` 가 챕터 보스 시험 셋(`test_chapter.py` 라우팅 · 입구 · 문 · 소환 · 보상 · 취소 · 패배 · 체력 나눔 · 시험 명령 · 음악 · 모습 · 정리 · 나루카미 · 검토 뒤 고친 점, 모든 기대값을 시험하는 트리의 레지스트리에서 읽어 아펩 가지에서도 그대로 돔; `test_px.py` 판정 프록시, `test_fw_az.py` 도우미), M0 시험(`mb/int_tests` · `mb2/tests` · `mb2/fxtests` · `mb3/tests`), `gen_check.py`(생성 순서 · 두 번 · 거꾸로 · 소유 경로), `ident.py`(가디언 · 나비 · 역장 · proto 출력과 광장이 M0 039b911 과 같음, 공용 파일 수정의 내용 고정), `test_m0diff.py`(M0 묶음과 이 트리에서 같은 시드로 중간보스 넷의 싸움 · 처치 · 취소 · 멈춤 · 리로드를 돌려 틱마다 기록 · 로그 · 끝 상태가 같은지, 틱당 명령 증가 한도, 보스바 줄), 검사기 다섯 개(`baseline/` 대비 새 발견만 실패)를 돌린다.
 
 ## 13. 시점 (`view/`) — 1인칭 / 숄더뷰 / F5 위쪽 시점
 설정 방의 **시점** 버튼으로 1인칭 → 숄더뷰 → F5 위쪽 시점 순서로 바뀝니다(처음엔 F5 위쪽 시점). 명령: `/function rlk:view/mode {m:1}`(숄더뷰) · `{m:2}`(F5 위쪽 시점) · `/function rlk:view/off`(1인칭).

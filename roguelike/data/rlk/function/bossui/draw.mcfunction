@@ -18,16 +18,8 @@ scoreboard players operation #empty bu -= #tr bu
 execute if score #empty bu matches ..-1 run scoreboard players set #empty bu 0
 scoreboard players operation #len bu = #fill bu
 execute unless score #buHpCol bu matches 1..10 run function rlk:bossui/run_hp {col:"#E0484B"}
-execute if score #buHpCol bu matches 1 run function rlk:bossui/run_hp {col:"#C58BFF"}
-execute if score #buHpCol bu matches 2 run function rlk:bossui/run_hp {col:"#FF8A3D"}
-execute if score #buHpCol bu matches 3 run function rlk:bossui/run_hp {col:"#4FB8FF"}
-execute if score #buHpCol bu matches 4 run function rlk:bossui/run_hp {col:"#9FE8F5"}
-execute if score #buHpCol bu matches 5 run function rlk:bossui/run_hp {col:"#F2C14E"}
-execute if score #buHpCol bu matches 6 run function rlk:bossui/run_hp {col:"#6FE3C1"}
-execute if score #buHpCol bu matches 7 run function rlk:bossui/run_hp {col:"#A5D94A"}
-execute if score #buHpCol bu matches 8 run function rlk:bossui/run_hp {col:"#E8C35A"}
-execute if score #buHpCol bu matches 9 run function rlk:bossui/run_hp {col:"#7BD88F"}
-execute if score #buHpCol bu matches 10 run function rlk:bossui/run_hp {col:"#EDCF63"}
+# #buHpCol 1..10: the coloured HP run (bossui/hp_col; a caller without the option pays this one test)
+execute if score #buHpCol bu matches 1..10 run function rlk:bossui/hp_col
 scoreboard players operation #len bu = #white bu
 function rlk:bossui/run_hp {col:"#FFFFFF"}
 scoreboard players operation #len bu = #empty bu

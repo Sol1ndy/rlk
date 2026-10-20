@@ -191,9 +191,12 @@ draw += ['execute if score #tr bu < #fill bu run scoreboard players operation #t
          'scoreboard players operation #empty bu -= #tr bu',
          'execute if score #empty bu matches ..-1 run scoreboard players set #empty bu 0',
          'scoreboard players operation #len bu = #fill bu',
-         f'execute unless score #buHpCol bu matches 1..10 run function rlk:bossui/run_hp {{col:"{HP_COLOR}"}}']
-draw += [f'execute if score #buHpCol bu matches {k} run function rlk:bossui/run_hp {{col:"{c}"}}'
-         for k, c in list(SUB_COLORS.items()) + [(10, HP_GOLD)]]
+         f'execute unless score #buHpCol bu matches 1..10 run function rlk:bossui/run_hp {{col:"{HP_COLOR}"}}',
+         '# #buHpCol 1..10: the coloured HP run (bossui/hp_col; a caller without the option pays this one test)',
+         'execute if score #buHpCol bu matches 1..10 run function rlk:bossui/hp_col']
+write('hp_col', ['# The HP run of bossui/draw in the #buHpCol colour (1..9 = SUB_COLORS, 10 = gold); #len bu = the HP fill.']
+      + [f'execute if score #buHpCol bu matches {k} run return run function rlk:bossui/run_hp {{col:"{c}"}}'
+         for k, c in list(SUB_COLORS.items()) + [(10, HP_GOLD)]])
 draw += [
          'scoreboard players operation #len bu = #white bu',
          f'function rlk:bossui/run_hp {{col:"{TRAIL_COLOR}"}}',

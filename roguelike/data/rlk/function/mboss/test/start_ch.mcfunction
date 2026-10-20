@@ -19,6 +19,9 @@ execute unless score #active room matches 1 run function rlk:run/save_pos
 function rlk:lobby/leave
 scoreboard players set #mbTest mb 1
 scoreboard players set #mbLock mb 0
+# a chapter test's forced chapter boss and auto gate press end here (every boss map of this test is the run's)
+scoreboard players set #cbForce mb 0
+scoreboard players set #cbAuto mb 0
 scoreboard players set #active room 1
 scoreboard players operation #chapter room = #mbReqCh mb
 scoreboard players set #mapIdx room 2

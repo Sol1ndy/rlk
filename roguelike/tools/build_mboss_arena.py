@@ -425,8 +425,12 @@ def write_chapter_arenas(out):
             print(f'WARN theme {a["theme"]} missing: stub arena {aid}')
             out.write(P + 'ensure', [f'# STUB (theme module tools/mboss_arena_{a["theme"]}.py missing): nothing is built; the stamp says so.',
                                      f'data modify storage rlk:mboss built_{aid} set value "{aid}@0:stub"', 'return 1'])
-            for fn in ('build', 'rebuild', 'clear', 'done'):
+            for fn in ('build', 'clear', 'done'):
                 out.write(P + fn, [f'# STUB (theme module tools/mboss_arena_{a["theme"]}.py missing): no-op.'])
+            # the dev view (ar/<aid>/test: fl_on + rebuild) builds nothing here, so its forceload goes at once outside a run
+            out.write(P + 'rebuild', [f'# STUB (theme module tools/mboss_arena_{a["theme"]}.py missing): nothing is built; outside a run the',
+                                      '# forceload the dev view added goes again.',
+                                      f'execute unless score #active room matches 1 unless score #mbLive mb matches 1 run function rlk:mboss/ar/{aid}/fl_off'])
             out.write(P + 'sweep', [f'# STUB (theme module tools/mboss_arena_{a["theme"]}.py missing): no-op ({{y0,y1}} kept).',
                                     '$data modify storage rlk:mboss arsw set value {y0:$(y0),y1:$(y1)}'])
             continue
@@ -469,9 +473,13 @@ def write_chapter_arenas(out):
                                   f'function {F}build'])
         out.write(P + 'verify', [f'# The stamp of {aid} is right but the box is not loaded: a 1-slice job that waits for the chunks, then checks',
                                  '# the sentinel (done -> stamp kept; wrong -> a full build).'] + start('verify', look0, 1))
-        out.write(P + 'vdone', [f'# Verify job of {aid}: the chunks are loaded.',
+        # outside a run and a fight (the dev view ar/<aid>/test) a finished job releases the forceload it needed; inside a
+        # run the entrance prep's forceload stays for the fight (cb/won, mboss/cleanup, cb/remove release it)
+        idle = 'unless score #active room matches 1 unless score #mbLive mb matches 1'
+        out.write(P + 'vdone', [f'# Verify job of {aid}: the chunks are loaded. Outside a run, the forceload goes when nothing is rebuilt.',
                                 'scoreboard players set #mbArBuild mb 0', 'data remove storage rlk:mboss arjob',
-                                f'execute unless block {sx} {sy} {sz} {sb} run function {F}build'])
+                                f'execute unless block {sx} {sy} {sz} {sb} run function {F}build',
+                                f'execute if score #mbArBuild mb matches 0 {idle} run function rlk:mboss/ar/{aid}/fl_off'])
         out.write(P + 'clear', [f'# Air over the box of {aid} when it is loaded (room/remove -> cb/remove), and no stamp.',
                                 f'execute if data storage rlk:mboss arjob{{aid:"{aid}"}} run function rlk:mboss/arena/abort',
                                 f'data remove storage rlk:mboss built_{aid}',
@@ -482,11 +490,14 @@ def write_chapter_arenas(out):
                                 f'execute unless function rlk:mboss/ar/{aid}/loaded run return fail']
                   + [f'$fill {x0} $(y0) {z} {x1} $(y1) {z} minecraft:air replace minecraft:barrier' for z, x0, x1 in rows] + ['return 1'])
         out.write(P + 'done', [f'# (macro arjob) The last slice of a job of {aid}: the stamp of the look just built, the sentinel check (a wrong',
-                               '# sentinel restarts one full build: #arRedo).',
+                               '# sentinel restarts one full build: #arRedo). Outside a run (the dev view) the forceload goes once it is built.',
                                'scoreboard players set #mbArBuild mb 0',
                                'data remove storage rlk:mboss arjob',
                                f'$data modify storage rlk:mboss built_{aid} set value "{aid}@{ver}:$(look)"',
-                               f'execute if block {sx} {sy} {sz} {sb} run return run scoreboard players set #arRedo mb 0',
+                               'scoreboard players set #arOk mb 0',
+                               f'execute if block {sx} {sy} {sz} {sb} run scoreboard players set #arOk mb 1',
+                               f'execute if score #arOk mb matches 1 {idle} run function rlk:mboss/ar/{aid}/fl_off',
+                               'execute if score #arOk mb matches 1 run return run scoreboard players set #arRedo mb 0',
                                f'data remove storage rlk:mboss built_{aid}',
                                'execute if score #arRedo mb matches 1 run return run scoreboard players set #arRedo mb 0',
                                'scoreboard players set #arRedo mb 1',
