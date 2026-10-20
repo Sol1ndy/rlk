@@ -1,6 +1,5 @@
-# Hook resume (the fight runs again; module timers live in the body tick and simply continue). The pause hook
-# cleared the kit's ground decals of the frozen hazards: every quiet hazard still in its tell gets its decal
-# back with the tell it has left, so no strike lands without a telegraph (review fix FX-1); the running
-# pattern redraws what is not a framework hazard (its optional p/<key>/resume, e.g. B2's landing markers).
-execute as @e[type=minecraft:marker,tag=rlk_mb_hz,tag=rlk_mb_hzq] if score @s mbHzT < @s mbHzW at @s rotated as @s run function rlk:mboss/butterfly/u/redraw
+# Hook resume (the fight runs again; module timers live in the body tick and simply continue). Nothing to
+# redraw: under the telegraph rule (10-20) no butterfly hazard has a ground decal (the player reads her motion
+# and sound; the hazards are quiet, #hzQuiet 1), so the old decal redraw of the frozen quiet hazards (review
+# fix FX-1) is gone. The running pattern may restore what it owns (its optional p/<key>/resume).
 function rlk:mboss/butterfly/p/resume_d

@@ -90,7 +90,8 @@ def rt(clip, t):
 
 
 def tell_rt(t):
-    """A telegraph length after the wind-up tuning: about 25 % shorter, never under the 10 t floor (plan.md)."""
+    """A tell length (aim lock / hazard creation -> strike) after the wind-up tuning: about 25 % shorter, never under
+    the 10 t floor (plan.md). Since the telegraph rule (10-20) no ground decal shows it: the player reads the motion."""
     return max(10, int(math.floor(0.75 * t + 0.5)))
 
 
@@ -190,8 +191,8 @@ class Pattern:
     clip    the rig clip the core plays at clock 0 (#bfPT 0 = clip tick 0)
     bands   range bands the bag may pick it in: subset of ('melee', 'mid', 'far')
     el      element of its hits (1 pyro, 7 dendro): butterfly patterns switch the wing look to it before they start
-    lead    ticks before the clip: start runs at #bfPT = -lead (telegraphs that must begin before the clip's first
-            motion, e.g. H1's hit 1 at clip tick 8 with a 10 t telegraph -> lead 2)
+    lead    ticks before the clip: start runs at #bfPT = -lead (a tell that must begin before the clip's first
+            motion, e.g. H1's hit 1 at clip tick 8 with its body tell 10 t ahead -> lead 2)
     close   blocks: human melee patterns burst-run to this distance before the start, None = no
     recover idle ticks after it ends before the next decision
     max_len safety end: the core finishes the pattern at this #bfPT even if it never called p/end
@@ -364,7 +365,9 @@ class Gen:
     snd = staticmethod(K.snd)                # sound recipe fx/snd/<name>
     kprop = staticmethod(K.prop)             # as @s = a module-owned item_display: the kit look fx/prop/<name>
     khud = staticmethod(K.hud)               # fx/hud/<name> (badges, actionbar notices, pops, screen flashes)
-    tele_disc = staticmethod(K.tele_disc)    # ground telegraph decals (visual only; pair with hz/* + #hzQuiet 1)
+    # ground telegraph decals (visual only; pair with hz/* + #hzQuiet 1). Unused by the butterfly's patterns since the
+    # telegraph rule (10-20: a ground telegraph only where the reference footage shows one, and it shows none for her)
+    tele_disc = staticmethod(K.tele_disc)
     tele_ring = staticmethod(K.tele_ring)
     tele_sector = staticmethod(K.tele_sector)
     tele_line = staticmethod(K.tele_line)

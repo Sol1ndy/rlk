@@ -1,4 +1,4 @@
-# H4 광폭한 진공 (clip vacuum). The glint 5: the yaw locked, the lane decal to the wall; the stomp 12;
+# H4 광폭한 진공 (clip vacuum). The glint 5: the yaw locked (no lane decal: the telegraph rule); the stomp 12;
 # the blade at 13 (pj blade hr 1.5, 0.75 b/t -> 0.75, 60 t, no homing; it outlives the
 # pattern: p/vacuum/blades from the core ai/state); the backflip 14-30, the landing 34; 1.2 Dendro.
 function rlk:mboss/butterfly/rig/face/player
