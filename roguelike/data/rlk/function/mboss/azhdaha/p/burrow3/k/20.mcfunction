@@ -1,0 +1,6 @@
+# burrow3 #azPT 20
+execute if score #azET mb matches 1 run function rlk:mboss/azhdaha/fx/p/dig/1
+execute if score #azET mb matches 2 run function rlk:mboss/azhdaha/fx/p/dig/2
+execute if score #azET mb matches 3 run function rlk:mboss/azhdaha/fx/p/dig/3
+execute if score #azET mb matches 4 run function rlk:mboss/azhdaha/fx/p/dig/4
+execute if score #azET mb matches 5 run function rlk:mboss/azhdaha/fx/p/dig/5

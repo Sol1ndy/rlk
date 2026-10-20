@@ -1,4 +1,4 @@
 # slide #azPT 40
-scoreboard players set #azNoPush mb 1
-function rlk:mboss/azhdaha/rig/face/track
 function rlk:mboss/azhdaha/rig/play/landslide
+playsound minecraft:entity.ender_dragon.growl hostile @a[tag=player] ~ ~ ~ 0.7 0.55 0.23
+playsound minecraft:entity.ravager.ambient hostile @a[tag=player] ~ ~ ~ 0.8 0.5 0.27

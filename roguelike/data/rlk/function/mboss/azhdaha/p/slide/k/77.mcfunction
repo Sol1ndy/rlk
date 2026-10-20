@@ -1,6 +1,4 @@
 # slide #azPT 77
-scoreboard players set #azNoPush mb 1
-function rlk:mboss/azhdaha/rig/face/track
 function rlk:mboss/grp_new
 kill @e[type=minecraft:marker,tag=rlk_mb_az_p20w1]
 scoreboard players operation #hzGrp mb = #mbGrp mb
