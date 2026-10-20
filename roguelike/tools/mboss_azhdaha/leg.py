@@ -33,7 +33,8 @@ PATTERNS = [
               cooldown=600, recover=30, max_len=90, length=82, gates=('no_live', 'no_bg'),
               hooks=('cast', 'ctick', 'refresh', 'bgtick', 'cancel_bg', 'reload')),
     A.Pattern(32, 'meteor', '운석 낙하', 'cast', None, phases=(2, 3), elem=('leg', 1), phase_weight={2: EVERY2, 3: EVERY1},
-              cooldown=600, recover=30, max_len=110, length=M['end'], gates=('no_live', 'field_area'), hooks=('cast', 'ctick')),
+              cooldown=600, recover=30, max_len=110, length=M['end'], gates=('no_live', 'field_area'),
+              hooks=('cast', 'ctick', 'resume')),
 ]
 PAT_TAGS = ['rlk_room', 'rlk_mb_aux', 'rlk_mb_az_pat']
 
@@ -402,6 +403,23 @@ def meteor(g):
     tl.write(['# 32 cast (s2.md 6): the cast clock #azCT = the roar_rear tick; R = roar (t20). Seal t27, big t55, small t64-94.'],
              [f'# 32 ctick (#azCT): the timeline; the cast slot ends after the last small meteor (t{M["end"]}).'],
              t0=0, start='cast', tick='ctick')
+    # resume (s2.md 12): the kit dropped every attack telegraph at the pause; the keep seal and the air halos come back
+    # with their remaining tell (the hazards were frozen with the clocks)
+    res = ['# Resume: the seal8 (keep) and the live small-meteor halos again, each with its remaining tell (cast clock).',
+           f'execute if score #azCT mb matches {M["seal"]}..{M["big"] - 1} at {mk(big)} run {F(f"p/{key}/re_seal")}']
+    for k, t in enumerate(M['small']):
+        res.append(f'execute if score #azCT mb matches {t - M["small_tell"]}..{t - 1} at {mk(f"rlk_mb_az_p32m{k}")} run '
+                   f'{F(f"p/{key}/re_halo{k}")}')
+        g.pw(key, f're_halo{k}', [f'scoreboard players set #aq32X mb {t}', 'scoreboard players operation #aq32X mb -= #azCT mb',
+                                  f'data modify storage rlk:mboss az.tl set value {{r:{int(round(M["small_r"] * 10))},'
+                                  f'h:{int(round(M["halo_h"] * 10))},tell:1,el:1,hold:2}}',
+                                  'execute store result storage rlk:mboss az.tl.tell int 1 run scoreboard players get #aq32X mb',
+                                  f'function {K.FN}tele/halo with storage rlk:mboss az.tl'])
+    g.pw(key, 'resume', res)
+    g.pw(key, 're_seal', [f'scoreboard players set #aq32X mb {M["big"]}', 'scoreboard players operation #aq32X mb -= #azCT mb',
+                          f'data modify storage rlk:mboss az.tl set value {{r:{int(round(M["big_r"] * 10))},tell:1,el:1,hold:3}}',
+                          'execute store result storage rlk:mboss az.tl.tell int 1 run scoreboard players get #aq32X mb',
+                          f'function {K.FN}tele/seal8 with storage rlk:mboss az.tl'])
     g.pw(key, 'cancel', ['# The cast was cut (test, reload, a new cast): its markers, props and live hazards go (selectors only).',
                          'kill @e[tag=rlk_mb_az_p32]',
                          f'execute as {mks("rlk_mb_az_p32h")} at @s run function rlk:mboss/hz/expire'])
