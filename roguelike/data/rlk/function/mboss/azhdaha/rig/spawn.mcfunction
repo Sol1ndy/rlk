@@ -1,7 +1,7 @@
 # @s = rig anchor (the boss body, on the floor under the centre of the four feet), positioned and rotated where the
 # boss should appear. Kills old parts, summons the 47 parts in the rest pose (+ the shadow helper), re-applies the
-# stored element looks (azRigLegs, azRigTail) and the body state (azRigState), and queues rest, or the clip that holds the
-# stored state (burrowed: burrowed, tail-only: tail_only).
+# stored element looks (azRigLegs, azRigTail) and the body state (azRigState: its visibility, follow list and shadow), and
+# queues the clip that holds that state (normal: idle, burrowed: burrow_travel, tail-only: tail_pillar).
 function rlk:mboss/azhdaha/rig/init
 function rlk:mboss/azhdaha/rig/kill
 execute unless score @s azRigLegs matches 0..2 run scoreboard players set @s azRigLegs 0
@@ -57,10 +57,11 @@ summon minecraft:item_display ~ ~ ~ {UUID:[I;1380731725,1096434688,-2147483648,4
 summon minecraft:item_display ~ ~ ~ {UUID:[I;1380731725,1096434688,-2147483648,64],Tags:["rlk_room","rlk_mb_aux","rlk_mb_azhdaha_part","rlk_mb_az_shadow"],billboard:"fixed",item_display:"none",teleport_duration:1,view_range:3f,width:30f,height:12f,shadow_radius:4.5f,shadow_strength:.8f,item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/azhdaha/empty"}}}
 scoreboard players set @s azRigT -1
 scoreboard players set @s azRigF 0
-scoreboard players set @s azRigC 0
-execute if score @s azRigState matches 1 run scoreboard players set @s azRigC 9
-execute if score @s azRigState matches 2 run scoreboard players set @s azRigC 10
+execute if score @s azRigState matches 0 run scoreboard players set @s azRigC 0
+execute if score @s azRigState matches 1 run scoreboard players set @s azRigC 29
+execute if score @s azRigState matches 2 run scoreboard players set @s azRigC 36
 function rlk:mboss/azhdaha/rig/look_apply
+execute if score @s azRigState matches 0 run function rlk:mboss/azhdaha/rig/state/normal
 execute if score @s azRigState matches 1 run function rlk:mboss/azhdaha/rig/state/burrowed
 execute if score @s azRigState matches 2 run function rlk:mboss/azhdaha/rig/state/tail_only
-execute rotated as @s rotated ~ 0 run function rlk:mboss/azhdaha/rig/follow
+execute rotated as @s rotated ~ 0 run function rlk:mboss/azhdaha/rig/follow_now

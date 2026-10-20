@@ -1,4 +1,4 @@
-# Tail-only (phase-3 sink): the body parts at scale 0, the tail chain shown by the tail clips. @s = rig anchor.
+# Tail-only (the phase-3 pillar): the body parts at scale 0, the tail chain shown by the tail clips, only the tail follows. @s = rig anchor.
 scoreboard players set @s azRigState 2
 data merge entity 524c4b4d-415a-4400-8000-000000000001 {start_interpolation:0,interpolation_duration:0,transformation:{scale:[0f,0f,0f]}}
 data merge entity 524c4b4d-415a-4400-8000-000000000002 {start_interpolation:0,interpolation_duration:0,transformation:{scale:[0f,0f,0f]}}
@@ -38,3 +38,6 @@ data merge entity 524c4b4d-415a-4400-8000-000000000023 {start_interpolation:0,in
 data merge entity 524c4b4d-415a-4400-8000-000000000024 {start_interpolation:0,interpolation_duration:0,transformation:{scale:[0f,0f,0f]}}
 data merge entity 524c4b4d-415a-4400-8000-000000000025 {start_interpolation:0,interpolation_duration:0,transformation:{scale:[0f,0f,0f]}}
 data merge entity 524c4b4d-415a-4400-8000-00000000002f {start_interpolation:0,interpolation_duration:0,transformation:{scale:[0f,0f,0f]}}
+scoreboard players set @s azRigFl 1
+scoreboard players reset @s azRigQx
+data merge entity 524c4b4d-415a-4400-8000-000000000040 {shadow_radius:1.2f}

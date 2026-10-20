@@ -190,17 +190,17 @@ export const pointOf = (o, n, pt) => { const v = o[n]; return add(v.t, rot(v.q, 
 
 // ---- hit proxies (rigtech.md §3.3: ground-anchored interaction columns on the bones) -----------------------------------
 // [name, part, point in the part frame (blocks), w, top above the point (blocks), state flags]. tail_only = vulnerable
-// in the phase-3 tail-only state. The ORDER is the proxy UUID order (cm.md §14: low byte 0x41 + position): the 12 names of
-// the D0 layout keep their bytes (head 0x41 ... foot_r 0x4C); tail5 (added in R2, the crown) is appended at 0x4D, inside
-// cm.md's reserved 0x4D-0x50.
+// in the phase-3 tail-only state. The ORDER is the proxy UUID order (cm.md §14: low byte 0x41 + position) and the bones,
+// widths and top margins are the frozen layout of contract manifest.md §6.1 (R3a: 12 columns, the tail columns on t1, t3,
+// t5, t7; R3's tail5 on the tip is gone). The points: the head, paw and foot points are chosen so the rest columns are the
+// §6.1 rest numbers; the tail points sit mid-segment (tail4 at the far end of t7, the crown column in the tail-only pillar).
 export const PROXIES = [
-  ['head', 'head', [0, -.6, -1.0], 2.8, 1.6, ''], ['chest', 'chest', [0, 0, -.4], 4.6, 1.5, ''], ['belly', 'belly', [0, 0, .2], 4.6, 1.5, ''],
+  ['head', 'head', [0, -.6, -.6], 2.8, 1.6, ''], ['chest', 'chest', [0, 0, -.4], 4.6, 1.5, ''], ['belly', 'belly', [0, 0, .2], 4.6, 1.5, ''],
   ['hips', 'pelvis', [0, 0, 1.0], 4.4, 1.2, ''],
-  ['tail1', 't2', [0, 0, .6], 2.6, 1.3, 'tail_only'], ['tail2', 't4', [0, 0, .6], 2.0, 1.0, 'tail_only'],
-  ['tail3', 't6', [0, 0, .5], 1.6, .9, 'tail_only'], ['tail4', 't8', [0, 0, .4], 1.6, .9, 'tail_only'],
-  ['paw_l', 'paw_l', [0, -.3, -.5], 1.8, 2.6, ''], ['paw_r', 'paw_r', [0, -.3, -.5], 1.8, 2.6, ''],
-  ['foot_l', 'foot_l', [0, -1.15, -.5], 1.8, 2.6, ''], ['foot_r', 'foot_r', [0, -1.15, -.5], 1.8, 2.6, ''],
-  ['tail5', 'tip', [0, 0, .5], 1.8, 1.0, 'tail_only'],
+  ['tail1', 't1', [0, 0, 1.2], 2.6, 1.2, 'tail_only'], ['tail2', 't3', [0, 0, 1.0], 2.2, 1.0, 'tail_only'],
+  ['tail3', 't5', [0, 0, .9], 1.8, .9, 'tail_only'], ['tail4', 't7', [0, 0, 1.5], 1.4, .8, 'tail_only'],
+  ['paw_l', 'paw_l', [0, -.3, -.55], 1.8, 2.6, ''], ['paw_r', 'paw_r', [0, -.3, -.55], 1.8, 2.6, ''],
+  ['foot_l', 'foot_l', [0, -1.18, -.35], 1.8, 2.6, ''], ['foot_r', 'foot_r', [0, -1.18, -.35], 1.8, 2.6, ''],
 ];
 // Proxy columns for a solved pose: {name: {x, z, base, top, w}} (rig frame; base = max(0, the point's floor
 // projection), top = the bone point's height + its top margin). A part hidden by vis (scale 0) reports hidden: true.

@@ -1,10 +1,10 @@
-# 야타용왕 (Azhdaha · 봉인된 바위 용의 왕) rig: API contract (stage R3)
+# 야타용왕 (Azhdaha · 봉인된 바위 용의 왕) rig: API contract (stage R3a)
 
 This is the contract between the Azhdaha display-entity rig and the chapter-1 boss module (not written yet). Stage R1
 delivered the model, the skeleton, the element looks, the body states and the hit-proxy points; R2 refined the four
 regions in parallel; R3 integrated them (seams, the RIGLIB shared libraries, the fixed UUID table, per-region budgets,
-the root-offset rule, `look/petrify` and `glow/gold_*`; §11). The motion clips of `motion.md` §6 come in R3a (the clips
-listed in §6 are static debug poses). Binding decisions: scratchpad `az/plan.md` "Rig decisions" R1-R11, Rig decision
+the root-offset rule, `look/petrify` and `glow/gold_*`; §11). R3a authored the 41 motion clips of plan.md §3 and wrote
+the manifest in schema v1 (`az/contract/manifest.md`; §6, §7, §12); the R1 static poses survive as `dbg_*` clips. Binding decisions: scratchpad `az/plan.md` "Rig decisions" R1-R11, Rig decision
 changes 1-3, §3 and the change notes; `az/contract/manifest.md`; references `az/understand/model.md`, `motion.md`,
 `rigtech.md`.
 
@@ -14,8 +14,8 @@ tail in parallel (plan.md R9):
 | file | owns |
 |---|---|
 | `build_mboss_azhdaha_rig.mjs` | parts list check, the fixed UUID name table, per-region and total budgets, RP write (models, item definitions, tinted overlays, the sprites some model uses), clip compile, pose checks, API functions, hit-proxy points, manifest |
-| `azhdaha_pose.mjs` | the skeleton `J` (rest joints, H = 7.0 b), `PART_SCALE`, `solve()` (FK of the spine / neck / head / jaw / beard / apron, plate-group flare, two-bone foot IK of the four legs, the tail chain), `toDisplay()`, `PROXIES` / `proxyPoints()` |
-| `azhdaha_clips.mjs` | `DEFAULT_POSE` (the idle stance), the debug poses (`CLIPS`), `RETIME` (empty), pose helpers `tailUp`, `fore`, `hind` |
+| `azhdaha_pose.mjs` | the skeleton `J` (rest joints, H = 7.0 b), `PART_SCALE`, `solve()` (FK of the spine / neck / head / jaw / beard / apron, plate-group flare, two-bone foot IK of the four legs, the tail chain), `toDisplay()`, `PROXIES` (the 12 columns of the contract, R3a) / `proxyPoints()` |
+| `azhdaha_clips.mjs` | R3a: the binding clip table `CLIP_TABLE` (name, played / authored length, loop / next, RETIME knots, events at played ticks), the clip specs (key poses, foot plans, overlays, springs, hidden spans, states, anchors) baked by `bake()` into dense per-played-tick keys, `MIRRORS` (the `_r` clips derived from the `_l` ones), `RESPAWN_CLIP`, `TRACK_CLIPS`, `DEFAULT_POSE`, the tail curves (`TAIL_*`, `PILLAR_ROOT`), the `dbg_*` poses, helpers `tailUp`, `fore`, `hind` |
 | `azhdaha_geometry.mjs` | thin aggregator: `PARTS`, `partModels()`, `LOOKS`, `TINTED`, `LOOK_BRIGHT` over the four region modules |
 | `azhdaha_paint.mjs` | thin aggregator: `azhdahaSprites(keep)`, `spriteRegions()`, `paintAzhdahaTextures()`, `spriteId()`, the 1.2 M px atlas budget |
 | `azhdaha_head.mjs` | head (V-wedge mask plates, brow ledges and wings, keel blade, a two-rank crown of gold-rimmed blades and crest fins, cheek guards, the ear plates 回 on their mounts, rounded skull, palate, upper teeth), jaw (V chin shield over a V-wedge lower jaw: cheek plates, underside, mouth floor, teeth, fangs, tongue), eyes (slits), horns (broad gold sleeve band bent into a C, rim wrapped round its rounded lower end, meander face, dome stud knob, carded dark horn), beard bibs |
@@ -60,9 +60,9 @@ body, on the floor under the centre of the four feet). Call them `as` the anchor
 | function | when | what |
 |---|---|---|
 | `init` | load (idempotent) | Adds the objectives (§7). |
-| `spawn` | boss spawn, respawn | Kills old parts, summons the 47 parts in the rest pose plus the shadow helper, re-applies the stored looks and body state, and queues `rest`, or the looping clip that holds the stored state (burrowed: `burrowed`, tail-only: `tail_only`; manifest `states.respawn_clip`), so a respawn never shows a hidden body (R3). |
-| `tick` | every tick | Respawns missing parts, follows the anchor (position + yaw), advances the clip, runs the hit flash. |
-| `play/<clip>` | any time | Plays a clip from tick 0 at the next `tick`. |
+| `spawn` | boss spawn, respawn | Kills old parts, summons the 47 parts in the rest pose plus the shadow helper, re-applies the stored looks and body state (visibility, follow list, shadow radius), and queues the looping clip that holds that state: normal `idle`, burrowed `burrow_travel`, tail-only `tail_pillar` (manifest `rig_states.respawn_clip`), so a respawn never shows a hidden body. |
+| `tick` | every tick | Respawns missing parts, follows the anchor (position + yaw; only the parts of the state's follow list, skipped while the anchor has not moved), advances the clip, runs the hit flash. |
+| `play/<clip>` | any time | Plays a clip from tick 0 at the next `tick` (the 41 clips of §6; `play/dbg_<pose>` for the 8 static debug poses, manifest `functions.play_dbg`). A clip that ends with `next` chains into it; one without `next` (`tail_pillar_sink`, `death`) holds its last pose. |
 | `start/<clip>` | internal | Chains into a clip now. |
 | `face/player`, `face/track`, `face/set {yaw}` | AI | Anchor yaw (track: at most 2 degrees per call: a slow, heavy turn). |
 | `look/legs/<geo\|hydro\|pyro>` | phase 2 absorb | Legs channel: bracers, paws, the gaiter columns (`foot_*`), apron, belly cracks, glow overlays. Stored in `azRigLegs`. |
@@ -70,7 +70,8 @@ body, on the floor under the centre of the four feet). Call them `as` the anchor
 | `look_apply` | after respawn | Re-applies both stored looks. |
 | `look/petrify` | death (t96) | Death seal: both channels back to geo (stored), every part 3 levels darker (block and sky), a 12-tick gold rim pulse on the horns and crystals (`azRigF`). A respawn shows the base looks at full brightness: call it again. |
 | `glow/gold_on`, `glow/gold_off` | the 천동만상 tell, the absorbs | The gold parts (horns, the three crystal groups) from matte 13 to 15 and back. Not stored (re-call after a respawn). |
-| `state/normal`, `state/burrowed`, `state/tail_only` | burrow, phase 3 | Records the body state (`azRigState`) and hides what must not show (§3). |
+| `state/normal`, `state/burrowed`, `state/tail_only` | burrow, phase 3 | Records the body state (`azRigState`), hides what must not show, sets the follow list and the shadow radius (§3). The clips call them themselves at their state ticks (§6 `state`), so the module only needs them outside a clip. |
+| `follow`, `follow_now` | internal / state changes | The RIGLIB follow (`createRigFollow`): `follow_now` drops the static-skip cache first. |
 | `flash/<head\|front\|rear\|tail>` | `on_hit` | 3-tick warm outline on one part group only (never all 46 parts, rigtech.md §2.6). |
 | `kill`, `uninstall` | cleanup | Remove the parts / the parts and the objectives. |
 
@@ -97,18 +98,19 @@ body, on the floor under the centre of the four feet). Call them `as` the anchor
   at most 4 465 (Hydro legs + Geo tail) over the 9 look combinations; the build fails above 8 000 (rigtech.md §2.2:
   6-8 k visible is the client budget).
 
-## 3. Body states (plan.md R7, rigtech.md §4)
+## 3. Body states (plan.md R7, rigtech.md §4, contract §4.6)
 
-| state | id | clip pose | mask |
-|---|---|---|---|
-| normal | 0 | any | none |
-| burrowed | 1 | root sunk (`pos` y -7.5, see `burrowed`) | every part at scale 0 (`visBody 0`, `visTail 0`) |
-| tail-only | 2 | the root pitched nose-down 90 and sunk (`pos` y -11.15, `rot` -90: `TAIL_PILLAR_ROOT`), so the tail rises at the anchor's x / z (t1 and most of t2 under the floor, the crown at ~11 b) (`tail_only`) | every non-tail part at scale 0 (`visBody 0`) |
+| state | id | follow list (`azRigFl`) | shadow | respawn clip | what shows |
+|---|---|---|---|---|---|
+| normal | 0 | `all` (47 parts) | 4.5 | `idle` | what the clip keys show |
+| burrowed | 1 | `none` | 0 | `burrow_travel` | nothing: every part at scale 0 (the clip keeps them there, root -9 b) |
+| tail-only | 2 | `tail` (`t1..t8 tip`) | 1.2 | `tail_pillar` | the tail chain only: every non-tail part at scale 0; the root sunk (`PILLAR_ROOT`, y -8.55) and offset by the root z of Rig decision change 1 (`root_z` +4.75 b, local frame) so the tail root lies under the anchor and the column rises straight out of the floor to ~12 b, the crown nodding forward |
 
 The anchor (husk body) never goes into blocks: the clips sink the **rig** below the opaque arena floor. The floor
-under the burrow must be opaque full blocks (rigtech.md §4.1). The tail-only state keeps the tail look. A respawn
-(missing parts at `tick`) restores the stored state with its clip (`spawn`): R3a keeps one looping clip per hidden state
-(`state` burrowed / tail_only), or the build fails.
+under the burrow must be opaque full blocks (rigtech.md §4.1). The tail-only state keeps the tail look. The parts
+outside the follow list are not teleported (static follow skip, RIGLIB), so a burrowed or tail-only boss costs no
+`tp` for its hidden parts. Hidden spans are exact per tick (§6 `hidden`; more parts may hide inside a span, never
+fewer), and a looping clip per hidden state exists (the respawn clip), or the build fails.
 
 ## 4. Element looks (plan.md R6, model.md §4.2)
 
@@ -148,8 +150,10 @@ stands the plates up), `flK` plate scale, `fwL fwR` wrist targets and `fpL fpR` 
 `hfL hfR` foot eulers (root frame: planted feet stay put while the body rears), `t1..t8` tail eulers (pitch - raises a
 segment) plus `tLift tCurl tSweep tTwist` (`tSweep` is spread root-weighted by `TAIL_SWEEP` .30 .20 .15 .11 .08 .07
 .05 .04: the root leads, the distal tail stays nearly straight), `vis visBody visTail`. The tail curl constants live in
-`azhdaha_clips.mjs`: `TAIL_REST` (idle arc), `TAIL_LOOP`, `TAIL_LOW`, `TAIL_WHIP`, `TAIL_PILLAR` (+ `TAIL_PILLAR_ROOT`);
-authored bends stay at 30 degrees per joint or less. Clips carry no horizontal root travel and no root
+`azhdaha_clips.mjs`: `TAIL_REST` (idle arc), `TAIL_LOOP`, `TAIL_LOW`, `TAIL_WHIP`, R3a's `TAIL_HIGH` (the slam
+raise), `TAIL_FLAT` (the slam impact), `TAIL_BRACE` (the rear-up third leg), `TAIL_CAST` (the scorpion cast),
+`TAIL_TUCK` (the dive), `TAIL_PILLAR` (+ `PILLAR_ROOT`); authored bends stay at 30 degrees per joint or less except
+the pillar's t1 (+90 about the pelvis). Clips carry no horizontal root travel and no root
 yaw (the module moves and turns the anchor). The legs are solved by two-bone IK at bake time with the rest bend as
 the pole (`ik()` with `prevV` continuity across frames). Leg parts (R2): `uarm_*` / `thigh_*` turn with their bone
 relative to its rest direction (rest-aligned masses); `bracer_*` (elbow -> wrist) and `gaiter_*` (the shin, knee ->
@@ -157,49 +161,105 @@ hock) are bone-aligned columns; `paw_*` / `foot_*` sit at the wrist / hock with 
 `foot_*` is the near-vertical ribbed gaiter column (the metatarsus) plus the toes, so a planted hind foot keeps
 `hfL/hfR` near [0,0,0] and a lifted one hangs the column from the hock. Soles: `SOLE` = paw -0.5, foot -1.5 (part frame).
 
-## 6. Clips (R1: static debug poses)
+## 6. Clips (R3a: plan.md §3, motion.md §5)
 
-| clip | state | what |
-|---|---|---|
-| `rest` | normal | DEFAULT_POSE: idle stance, head low, the tail in a big arc over the back, the leafy tip over the mid-back at ~10 b (v3 23.6 s) |
-| `head_up` | normal | the neck raised, the face forward (v1 f2130) |
-| `roar` | normal | jaw 45, head thrust up |
-| `rear_up` | normal | roar_rear peak: pelvis +45, fore paws at chest height, tail braced on the floor |
-| `stomp_lift` | normal | stomp_fl hang: the front rises and rolls away, the left elbow high, the bracer a hanging column, wrist 2.4 b |
-| `whip_mid` | normal | the tail just off the floor, swept 110 to the left (root-weighted); the throat apron swings forward 12 (R3: its hem hangs 0.06 b above the floor at rest, the 0.2 b crouch would sink it) |
-| `loop` | normal | the phase-3 tail loop / shells carry (v8 f2280: top ~11.7 b, the tip over the shoulders) |
-| `tail_low` | normal | the tail laid out behind (v3 f1680) |
-| `burrow` | normal | burrow dive mid-sink: root -3.4, nose down 22 |
-| `burrowed` | burrowed | root -7.5, every part hidden |
-| `tail_only` | tail_only | the phase-3 pillar at the anchor: body hidden, the tail rising from the floor in a slight S to ~12 b, the crown nodding forward |
+41 clips at played length (authored length in brackets: the wind-ups of plan.md §3 are cut by 25 % with RETIME knots
+`authored>played`; every key is baked per played tick, so RETIME is already in the keys and the module only reads the
+played ticks). Events are played ticks and match the table of plan.md §3 / contract §5 exactly (the build checks it).
+`hidden` spans are inclusive played ticks (`all`: every part, `body`: every non-tail part); `state` calls the state
+function at that tick; `root_z` spans `[t0-t1 dz]` (local frame, + = forward); `yaw` is the anchor yaw the module
+applies over the clip (the schedule per played tick is in the manifest; + = clockwise, toward the boss's right);
+`tracks`: `tail_root` / `tail_tip` per tick (manifest `clips[].tracks`).
 
-Each is a 2-tick loop (46 keys at tick 0). The motion clips of motion.md §6 replace this list in a later stage.
+| clip | len (authored) | then | events (played tick) | RETIME | hidden | other |
+|---|---|---|---|---|---|---|
+| `idle` | 80 (80) | loop | snarl 30 |  |  |  |
+| `walk` | 40 (40) | loop | lh 0, lf 10, rh 20, rf 30 |  |  |  |
+| `walk_stop` | 16 (16) | idle | plant 4 |  |  |  |
+| `turn45_l` | 24 (24) | idle | plant_1 10, plant_2 17, yaw0 4, yaw1 18 |  |  | yaw -45 |
+| `turn45_r` | 24 (24) | idle | plant_1 10, plant_2 17, yaw0 4, yaw1 18 |  |  | yaw +45; mirror of `turn45_l` |
+| `turn90_l` | 36 (36) | idle | plant_1 12, plant_2 18, plant_3 24, plant_4 30, yaw0 6, yaw1 30 |  |  | yaw -90 |
+| `turn90_r` | 36 (36) | idle | plant_1 12, plant_2 18, plant_3 24, plant_4 30, yaw0 6, yaw1 30 |  |  | yaw +90; mirror of `turn90_l` |
+| `turn180` | 60 (60) | idle | plant_1 12, plant_2 18, plant_3 24, plant_4 30, plant_5 36, plant_6 42, plant_7 48, plant_8 54, yaw0 6, yaw1 54 |  |  | yaw -180 |
+| `intro` | 150 (150) | idle | eyes 25, rise 30, crack1 50, crack2 70, seal 112, land 116, roar 120, blast 130 |  |  |  |
+| `pose_ref` | 20 (20) | loop |  |  |  |  |
+| `roar_low` | 40 (50) | idle | roar 8, blast 10 | 0>0 10>8 50>40 |  |  |
+| `roar_rear` | 82 (100) | idle | rise 8, roar 20, drop 62, land 74 | 0>0 20>20 76>62 100>82 |  |  |
+| `chin_slam` | 65 (84) | idle | lift 2, rear 14, top 23, drop 32, impact 35 | 0>0 47>35 84>65 |  |  |
+| `jump_slam` | 53 (60) | idle | crouch 0, takeoff 6, apex 13, land 21, wave2 32 | 0>0 28>21 60>53 |  |  |
+| `charge_coil` | 26 (34) | charge_run | coil 6, launch 24 | 0>0 32>24 34>26 |  |  |
+| `charge_run` | 12 (12) | loop | plant 6 |  |  |  |
+| `charge_stop` | 21 (24) | idle | skid 0, stop 8 | 0>0 8>8 24>21 |  |  |
+| `spikes` | 40 (48) | idle | brace 0, launch 14, launch_last 20, gold_on 0, gold_off 22 | 0>0 18>14 24>20 48>40 |  |  |
+| `stomp_fl` | 63 (72) | idle | lift 5, slam 13, w1 17, w2 32, w3 47 | 0>0 22>17 52>47 72>63 |  |  |
+| `stomp_fr` | 63 (72) | idle | lift 5, slam 13, w1 17, w2 32, w3 47 | 0>0 22>17 52>47 72>63 |  | mirror of `stomp_fl` |
+| `stomp_hl` | 63 (72) | idle | lift 5, slam 13, w1 17, w2 32, w3 47 | 0>0 22>17 52>47 72>63 |  |  |
+| `stomp_hr` | 63 (72) | idle | lift 5, slam 13, w1 17, w2 32, w3 47 | 0>0 22>17 52>47 72>63 |  | mirror of `stomp_hl` |
+| `stomp3_fl` | 85 (90) | idle | lift 3, s1 17, s2 40, s3 63 | 0>0 22>17 90>85 |  |  |
+| `stomp3_fr` | 85 (90) | idle | lift 3, s1 17, s2 40, s3 63 | 0>0 22>17 90>85 |  | mirror of `stomp3_fl` |
+| `feint` | 50 (56) | idle | sway 0, swayback 12, drop 18, burst 22 | 0>0 22>22 56>50 |  |  |
+| `tail_whip_l` | 64 (64) | idle | raise 0, cock 12, pivot 20, sweep 23, sweep_end 31, erupt 33, settle 42 |  |  | yaw +115; tracks |
+| `tail_whip_r` | 64 (64) | idle | raise 0, cock 12, pivot 20, sweep 23, sweep_end 31, erupt 33, settle 42 |  |  | yaw -115; mirror of `tail_whip_l`; tracks |
+| `tail_slam` | 70 (90) | idle | raise 0, hold 9, slam 36, impact 39, spikes 41 | 0>0 52>39 58>45 90>70 |  | tracks |
+| `burrow_dive` | 40 (44) | burrow_travel | snarl 3, dive 14, under 40 | 0>0 18>14 44>40 |  | state 40 burrowed |
+| `burrow_travel` | 20 (20) | loop |  |  | 0-19 all |  |
+| `burrow_breach` | 36 (36) | burrow_travel | ring 0, burst 8, hit 10, under 30 |  | 0-7 all, 30-35 all | state 8 normal, 30 burrowed |
+| `burrow_emerge` | 53 (56) | idle | rumble 0, burst 8, fore 24, out 38, shake 40 | 0>0 40>40 56>53 | 0-23 all | state 24 normal |
+| `landslide` | 203 (270) | idle | tell 0, w1 57, w2 77, w3 98, w4 118, w5 139, rear 159, w6 179, end 203 | 0>0 76>57 104>77 132>98 156>118 186>139 212>159 240>179 270>203 |  |  |
+| `absorb` | 94 (108) | idle | press 0, rise 46, burst 47, stamp1 62, stamp2 86, gold_on 0, gold_off 60 | 0>0 12>12 60>46 108>94 |  |  |
+| `absorb_p3` | 52 (70) | idle | orb 0, burst 42, gather 42, gold_on 0, gold_off 50 | 0>0 60>42 70>52 |  |  |
+| `p3_sink` | 66 (80) | tail_pillar | sink 8, under 40, tail 40, pillar 58 | 0>0 8>8 50>40 80>66 | 40-65 body | state 40 tail_only; root_z 40-65 +4.75; tracks |
+| `tail_pillar` | 80 (80) | loop | pulse 0, pulse2 40 |  | 0-79 body | root_z 0-79 +4.75; tracks |
+| `tail_pillar_strike` | 24 (24) | tail_pillar | strike 10 |  | 0-23 body | root_z 0-23 +4.75; tracks |
+| `tail_pillar_sink` | 20 (20) | hold | gone 18 |  | 0-17 body, 18-19 all | state 18 burrowed; root_z 0-19 +4.75; tracks |
+| `tail_cast` | 34 (40) | idle | raise 0, charge 12, fire 18, lower 26 | 0>0 24>18 40>34 |  | tracks |
+| `death` | 120 (120) | hold | stagger 0, chin 34, tail 66, last 80, head 92, still 96 |  |  |  |
+
+Debug poses (R1, 2-tick loops, not in the module's table): `dbg_rest dbg_head_up dbg_roar dbg_rear_up dbg_stomp_lift
+dbg_whip_mid dbg_loop dbg_tail_low`.
+
+How the clips are made (`azhdaha_clips.mjs bake`): key poses at authored ticks with per-key easing, per-channel lag
+(the pelvis / head trail the chest), a per-segment tail delay (`tailLag`: the tip arrives last), overlays (breath,
+tremors, sways, gait functions), springs on the beards and the apron, then the feet:
+`W` world-planted (counter-rotated by the anchor yaw schedule and compensated for the root), `K` body-key wrist /
+hock targets, `R` riding the root, `F` gait functions, `S` hanging offsets from the shoulder / hip (rear-ups, the
+air). The root never travels in x / z and never yaws (the module moves and turns the anchor); `pos y` and pitch /
+roll only. A floor guard lifts the body (`bodyLift`) or the part (neck, beards, apron, wrists, tail) where a pose
+would cut the floor, except inside a clip's `contact` span (the chin slam, the absorb press, the death collapse:
+<= 0.22 b) and while airborne (`jump_slam` 7-20: the module raises the anchor). The `_r` clips are exact mirrors of
+the `_l` ones (x negated, yaw negated, the anchors and tracks mirrored).
 
 ## 7. Manifest and objectives
 
-`tools/mboss_azhdaha_rig_manifest.json` (still the R1 layout; the schema v1 migration of `az/contract/manifest.md` §10
-is R3a): `parts` (name, region, uuid, `idx` = the UUID low byte, tag, model, brightness, scale, elements), `shadow`,
-`uuids` (block, ints, the part table, shadow, proxies, props), `clips` (id, len, loop, next, events, keys, state,
-world `extents`, `root_z` spans `[t0, t1, dz]` (local, + forward; empty in every debug pose), `cull_overhang` when a
-pose leaves its culling box, `px` = hit-proxy points at tick 0, the events and the last tick), `looks` (per channel:
-objective, ids, item per part and look, brightness, functions; `gold`, `eyes`, `functions` petrify / glow_on /
-glow_off), `tinted_items`, `states`, `flash_groups`, `proxies` (`layout`: name, bone, point, column width, top margin,
-tail-only flag; `rest`: the rest points), `skeleton`, `culling`, `rest_extents`, `budgets` (parts, models, elements
-all / shown at rest / shown max and per look, atlas px, sprites, `regions` {parts, px, budgets, elements at rest}),
-`objectives`. The extents (and the culling overhang) come from the corners of each part's rotated model box, so they
-are conservative: at rest they read y -0.25 while the lowest real vertex (the gaiter plinth) sits at -0.03.
+`tools/mboss_azhdaha_rig_manifest.json`, schema 1 (`az/contract/manifest.md`): `schema`, `boss`, `source` (`rig`),
+`runtime` (namespace, clip / tick / state / look objectives), `functions` (init, spawn, tick, kill, uninstall,
+look_apply, `play` per clip, `play_dbg`, `face`, `state`, `look_legs`, `look_tail`, petrify, glow_on / glow_off,
+`flash`, follow, follow_now), `parts`, `shadow`, `uuids`, `skeleton`, `rest_anchors` (contract local frame: x left,
+z forward, so the rig's z is negated: nose, head column / front, chest, hips, tail root, the four soles, back),
+`torso_hw` 3.0, `proxies` (`layout`, `rest`, `rest_pose`, `note`), `states` and `capsules` (contract §4), `rig_states`
+(ids, `respawn_clip`, `follow_list`, the RIGLIB follow lists / fixed shadow / static skip), `flash_groups`, `looks`,
+`tinted_items`, `clips`, `culling` {30, 12, 3}, `culling_per_part`, `rest_extents`, `budgets`, `objectives`,
+`textures`.
+
+Per clip: `id name len authored loop next mirror_of retime events` (played ticks), `anchors` ({event: [[x, y, z] per
+named point]} in the local frame at that played tick: `impact`, `nose`, `chin`, `paw` (the planted foot of
+`plants`), `tip_end`, `back`, `launch_1..4`, `tail_root`, `tail_tip`), `tracks` (tail clips, §6), `px` (`lerp: true`,
+`keys` {"<t>": {proxy: [x, z, top]}}: every proxy in every key, keys at 0 and len-1 and wherever the linear
+interpolation of the per-tick points would miss by more than 0.1 b; `top` = the column top above the floor, 0 =
+hidden), `yaw` (per played tick or null), `hidden`, `root_z`, `state`, `extents` (world box over the clip; null when
+nothing shows, `burrow_travel`), `cull_overhang`, `keyFiles`, `keys`, `note`.
 
 Objectives: `azRigC` clip id, `azRigT` clip tick, `azRigF` flash countdown, `azRigY` face scratch, `azRigLegs`,
-`azRigTail`, `azRigState`.
+`azRigTail`, `azRigState`, `azRigFl` follow list (0 all, 1 tail, 2 none) and `azRigQ`, `azRigQx/y/z/w` (the RIGLIB
+static-skip cache).
 
-Hit proxies (plan.md R5, rigtech.md §3.3): 13 ground-anchored columns, in UUID order — `head chest belly hips
-tail1..tail4 paw_l paw_r foot_l foot_r tail5` (0x41 ... 0x4D; the 12 names of the D0 layout keep cm.md §14's bytes,
-`tail5` is appended in the reserved 0x4D-0x50) — each `{x, z}` (the bone point projected on the floor, rig frame: +x
-= the boss left, -z = its front), `base`, `top`, `w`; `hidden: true` when the bone is at scale 0 or the column's top
-is under the floor. The tail columns sit on t2, t4, t6, t8 and the tip (the leafy crown, the phase-3 target) and are
-flagged for the tail-only state. R3 check (`rigwork/r3/tools/proxycheck.mjs`): every point lies inside its part, and
-in every debug pose 100 % of the footprint outline is within 3.0 b of a live column edge (worst 1.9 b, rear_up).
-The framework side (interaction entities, `combat/apply` routing, dedupe) is a later stage.
+Hit proxies (plan.md R5, contract §6.1): the 12 ground-anchored columns of the contract, in UUID order `head chest
+belly hips tail1..tail4 paw_l paw_r foot_l foot_r` (0x41 ... 0x4C), on the bones head, chest, belly, pelvis, t1, t3,
+t5, t7, paw_l/r, foot_l/r (R3's `tail5` on the tip is gone). `proxies.rest` keeps the contract's pinned rest numbers
+(the module's stub reads them; `api.P_TAIL_LANE` uses `tail2`), `proxies.rest_pose` the real points of the idle pose;
+for tail1..tail4 the two differ (§12). A column is the bone point projected on the floor (local frame) with its
+width `w` and top margin from `layout`; its top is 0 (hidden) when the bone is at scale 0 or under the floor. The framework side
+(interaction entities, `combat/apply` routing, dedupe) is a later stage.
 
 ## 8. Build checks and budgets
 
@@ -220,15 +280,23 @@ The framework side (interaction entities, `combat/apply` routing, dedupe) is a l
 - `checkBounds` on every model (all coordinates within -16..32: reach 1.5 x scale from the joint).
 - Every pose of every clip: no root x travel and no root yaw; a root z offset only on ticks where no body (non-tail)
   part is shown (Rig decision change 1, recorded as `root_z`); the soles of the paws and feet at or above the floor
-  unless the root is sunk; the tail-only state shows no non-tail part; events inside 0..len; the culling-box overhang
-  (radial `cullOverhang`: the box does not turn with the yaw; buried points do not count) is recorded (warning) per
-  clip. Rotation step checks of the shared compiler (120 degrees per tick / key).
+  unless the root is sunk, the clip is airborne (`floorFree`) or hidden; the hidden spans exact per tick; the
+  tail-only state shows no non-tail part; the events equal the binding table; the culling-box overhang (radial
+  `cullOverhang`: the box does not turn with the yaw; buried points do not count) is recorded (warning) per clip.
+  Rotation step checks of the shared compiler (120 degrees per tick / key).
+- Contract checks: the chin slam's head column top <= 3.5 b on played 35-55; the tail-only columns stack on the
+  anchor (<= 0.3 b) on the pillar ticks; every `TRACK_CLIPS` clip has tracks of `len` entries; the mirrors equal their
+  source mirrored (<= 0.08 b).
 - Gold parts at 13 and in no look channel; the eyes at 15 in every look; a looping clip per hidden body state (the
   respawn clip).
 - Runtime suite (scratchpad `az/tests_rig/test_az_rig.py`, mcsim over the generated functions): the UUID table and
   budgets of the manifest, spawn / respawn of the 47 parts + shadow, the follow, every clip to its end with its tick-0
   pose equal to the exact debug pose, the clip states, the 9 look combinations and their respawn, the body states and
-  their respawn, the flash groups, `glow/gold_*`, `look/petrify`, the root-offset rule, uninstall (R3: 157 checks).
+  their respawn, the flash groups, `glow/gold_*`, `look/petrify`, the root-offset rule, uninstall; R3a adds the v1
+  manifest, the idle queued at spawn, every clip run to its end (state switches, follow lists, the hand-over, loop or
+  hold, the gold glow), the tick-0 keys against the debug poses of their targets, the hidden spans per tick, the state
+  lists and shadow radii, the respawn clips (604 checks). The module's `tests_mod/check_az_manifest.py` (S1-MOD)
+  passes against this manifest (3 317 checks).
 - Sprites: sides multiples of 16 and <= 512; only the sprites some model uses are painted and registered.
 - Every look item exists; every tinted item points at a model.
 
@@ -236,7 +304,8 @@ The framework side (interaction entities, `combat/apply` routing, dedupe) is a l
 
 The element sigils, brands, floor glyphs, rocks, meteors, water orbs, ice spikes, lightning, the absorb vortex, the
 burrow crater and rubble, the dust (fx kit); the seal steles (arena props); the interaction hit proxies and the body
-solidity push (framework); the motion clips (later stage).
+solidity push (framework); the anchor's motion: walking speed, the turn yaw (the clips carry the schedule), the jump's
+height and glide, the charge glide, the burrow travel (module).
 
 ## 10. Body region notes (R2)
 
@@ -268,6 +337,21 @@ solidity push (framework); the motion clips (later stage).
   slam (jaw / beards / apron 0.2 b and the paws 0.7 b into the floor at root -0.25 tilted 10 nose-down), the brace
   crouch (head pitched -20 at root -0.35: the jaw 1.1 b down), the charge coil and the stomp_hl lift (pelvis -3: the
   apron and the jaw 0.2 b down) need the head / neck lifted or the wrist targets raised; roar_rear at pelvis +55 needs
-  the tail chain raised (t2..t8 0.5-1.4 b into the floor with the rear_up tail curl). The hit-proxy layout has 13
-  entries (tail5 at 0x4D) while `az/contract/manifest.md` §6.1 / §6.2 still list 12: the v1 migration adds `tail5`
-  (layout, `states.normal` and `states.tail_only`) with S1-MOD.
+  the tail chain raised (t2..t8 0.5-1.4 b into the floor with the rear_up tail curl). R3a went back to the
+  contract's 12 proxies (tail5 dropped, §7).
+
+## 12. R3a notes (clip authoring)
+
+- Key-pose strips per clip next to the footage frames: scratchpad `az/rigwork/r3a/strip_<clip>.jpg` (top: footage at
+  the authored tick; below: the rig at the matching played ticks and the events, 3/4 front and side, the anchor yaw
+  applied; `tools/strip.py`), numeric checks `tools/ck.mjs` (floor per shown part, IK reach and stretch, the chin
+  column, the pillar stack), the debug dp `rigwork/r3a/dbg` (`build.sh`).
+- Floor contacts left on purpose: the chin slam jaw (0.16 b on played 36-39), the absorb press and the death
+  collapse (inside their `contact` spans); the fore bracer rims touch the floor by up to 0.14 b in the turns, the
+  whip and the charge coil (the wrist lift is capped so the paws do not leave the floor).
+- Things the rig cannot know: the landslide turns the anchor in the module during 0-45, the planted feet then slide
+  with it; the jump's air poses assume the module's leap height; the charge run assumes the 1.0 b/t glide.
+- `proxies.rest` stays pinned to the contract numbers for tail1..tail4 while `rest_pose` has the real points; S1-MOD
+  should move contract §6.1, the stub and the checker to the real numbers (or the rig re-pins them).
+- The limb stretch reaches 1.08-1.10 at a few transition ticks (turn90 / turn180 steps, the roar and intro landings,
+  the chin slam rear) and 1.12 in `dbg_rear_up` (reach 0.27 short: a static R1 pose).

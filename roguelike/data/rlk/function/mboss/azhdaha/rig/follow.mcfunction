@@ -1,49 +1,13 @@
-# Parts (and the shadow helper) follow the executor position and yaw (run rotated as the anchor, pitch 0).
-tp 524c4b4d-415a-4400-8000-000000000001 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000002 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000003 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000004 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000005 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000006 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000007 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000008 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000009 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000000a ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000000b ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000000c ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000000d ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000000e ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000000f ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000010 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000011 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000012 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000013 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000014 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000015 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000016 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000017 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000018 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000019 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000001a ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000001b ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000001c ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000001d ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000001e ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000001f ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000020 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000021 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000022 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000023 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000024 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000025 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000026 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000027 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000028 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000029 ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000002a ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000002b ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000002c ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000002d ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000002e ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-00000000002f ~ ~ ~ ~ ~
-tp 524c4b4d-415a-4400-8000-000000000040 ~ ~ ~ ~ ~
+# Parts (and the shadow helper) follow the anchor position and yaw (run as and rotated as the anchor, pitch 0); the list is the body state's (azRigFl: 0 all, 1 tail, 2 none), skipped while the anchor stands still.
+execute store result score #x azRigQ run data get entity @s Pos[0] 100
+execute store result score #y azRigQ run data get entity @s Pos[1] 100
+execute store result score #z azRigQ run data get entity @s Pos[2] 100
+execute store result score #w azRigQ run data get entity @s Rotation[0] 100
+execute if score #x azRigQ = @s azRigQx if score #y azRigQ = @s azRigQy if score #z azRigQ = @s azRigQz if score #w azRigQ = @s azRigQw run return 0
+scoreboard players operation @s azRigQx = #x azRigQ
+scoreboard players operation @s azRigQy = #y azRigQ
+scoreboard players operation @s azRigQz = #z azRigQ
+scoreboard players operation @s azRigQw = #w azRigQ
+execute if score @s azRigFl matches 1 run return run function rlk:mboss/azhdaha/rig/follow/tail
+execute if score @s azRigFl matches 2 run return run function rlk:mboss/azhdaha/rig/follow/none
+function rlk:mboss/azhdaha/rig/follow/all
