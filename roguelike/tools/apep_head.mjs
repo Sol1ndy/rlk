@@ -1,25 +1,39 @@
 // HEAD region of the 아펩의 오아시스 파수꾼 rig (plan R4 parts 9-17): neck, head, face, hood, crown and the four hair parts.
-//   neck      P1 the dark plate neck | P3 neck + the grey-green collar
-//   head      P1 the skull base (inside the cowl) | P3 the skull behind the mask + the lime leaf scarf under the chin
-//   face      P1 the closed pale bud-skull + the two pale-gold crescents on the cowl front (model.md §3.1)
-//             | P3 the glowing oval mask 1.6 x 1.9 (centre (0, 6.9, -0.9) in the UPRIGHT stance) with the gold lily
-//             emblem and the lime vein lines (model_p3 §2.1 item 1). The looks p3_idle / p3_charge (orange-gold, w1 f127) /
-//             p3_dim are ONE model under three constant colours (apep_materials FACE_MUL); `hidden` is the empty model
-//   hood      the cowl, authored once as it sits over the skull in the CROUCH stance for both forms (the hood_hinge
-//             swings it back ~107 deg in the UPRIGHT stance: its front tip becomes the 8.5 b peak behind the face).
-//             P1 dark slate plates, ear flares, the mid-face cone and the gold V | P3 bottle-green carapace, the
-//             lime-gold front gem in a raised frame, emerald shards
-//   crown     P1 the gold crown cone + leaf sprig + lime seed bulb on the cowl top | P3 the fan of gold leaves framing
-//             the top of the face, the glowing bud at its centre, the brow emeralds (it rides the hood's front edge)
-//   hair_<s>_1/2   P1 the dark drapes from the cowl sides to the ground | P3 the hair strands to the waist. The hair hangs
-//             from the HOOD (not from the head as the plan R2 tree draws it): the swing of the hood carries the hair roots from the cowl sides
-//             (crouch) to the hood sides beside the face (upright), which the residual table needs (≤ 0.25 b).
+//   neck      P1 the dark plate neck | P3 a slim neck under the collar ruff: two rings of pale grey petals drooping over the
+//             chest (short at the back, which turns up under the hood's rear edge in the crawl)
+//   head      P1 the skull base (the back of the head; the bud-skull stands in front of it) | P3 the skull behind the mask
+//             + the lime leaf scarf: broad leaves rooted on the mask's lower rim, drooping over the chin and the ruff
+//   face      P1 the closed pale bud-skull (petals round a bud, seen from below and in the rear-up) + the two pale-gold
+//             crescents on the cowl's brow lobes (model.md §3.1) | P3 the glowing oval mask 1.6 x 1.9 (centre (0, 6.9, -0.9)
+//             in the UPRIGHT stance): the rosette (pale leaves fanning down with dark lime outlines and midribs, radiating
+//             veins, darker rim) and the gold lily emblem (a drop-shaped bud between two curled fronds, a trefoil above);
+//             the middle stands 0.07 b proud as a second layer (model_p3 §2.1 item 1). The looks p3_idle / p3_charge
+//             (orange-gold, w1 f127) / p3_dim are ONE model under three constant colours (apep_materials FACE_MUL);
+//             `hidden` is the empty model
+//   hood      the cowl, authored once as it sits over the skull in the CROUCH stance for both forms (the hood_hinge swings it
+//             back ~107 deg in the UPRIGHT stance: its front tip becomes the 8.5 b peak behind the face).
+//             P1 rows of dark slate leaf plates (a rounded dome, top 4.4 b), broad ear flares, pale bark cheek guards, the
+//             pointed face shield with the mid-face crystal, the gold V and the dark brow lobes | P3 bottle-green / grey
+//             carapace rows with lime rims and grey peel, the dark visor over the mask top, the jagged leaf crest at the
+//             peak (it hooks down from the carapace tip in the crawl), dark horns, the brow emeralds, emerald shards and
+//             the square lime-gold gem in its raised frame on the ridge (the crawl's front gem)
+//   crown     P1 the gold crown cone + two cream-gold sprigs + the lime seed bulb on the cowl top | P3 the glowing bud with a
+//             3D fan of gold leaves (nine leaning toward the face, six leaning back over the hood) round the top of the face
+//   hair_<s>_1/2   P1 broad dark ribbons from under the ear flares, out over the long arms and down to the ground, the
+//             ends splayed (one-sided, R18) | P3 per side an outer dark strand with a lime streak sweeping out from the hood
+//             top past the face, a second dark strand from the chin to the chest, and an inner lime strand along the mask
+//             edge to the chest. The hair hangs from the HOOD (not from the head as the plan R2 tree draws it): the swing of
+//             the hood carries the hair roots from the cowl sides (crouch) to the hood sides beside the face (upright), which
+//             the residual table needs (<= 0.25 b).
+// Strands, petals, leaves and the crest are RIBBONS: centrelines designed in world space at the part's authoring stance,
+// split into flat painted panels, each in the single-axis 22.5-degree element plane closest to the wanted facing that keeps
+// the card inside the model bounds (ribbon() below).
 // Region interface: see apep_body.mjs. P1 parts in world axes about the joint at the CROUCH stance, P3 at the UPRIGHT
 // stance (solved here from apep_clips STANCES so the offsets follow the skeleton); the hair in its bone frame 'y'.
-import {loft, slab, rockBox, crossCards, toUnits, mirrorX, stroke, sdUnion, registerTile} from './mboss_shape_lib.mjs';
+import {loft, slab, toUnits, mirrorX, stroke, registerTile} from './mboss_shape_lib.mjs';
 import {PART_SCALE, J, solve, FORM_POINTS, modelFrames, modelPoint} from './apep_pose.mjs';
 import {STANCES} from './apep_clips.mjs';
-import {PAL, C, clamp, mix, N, lift, sink, grey, autoSlot, sprite, onRect, onRectY, spriteSize, sdLeaf, cone, ball, TRANSPARENT} from './apep_materials.mjs';
+import {PAL, C, clamp, mix, N, lift, sink, autoSlot, sprite, onRect, onRectY, spriteSize, sdLeaf, ball, TRANSPARENT} from './apep_materials.mjs';
 import {cardZ, rotA} from './mboss_model_lib.mjs';
 import {rot, add} from './mboss_rig_math.mjs';
 const invQ = Q => [-Q[0], -Q[1], -Q[2], Q[3]];
@@ -38,7 +52,6 @@ const oneSided = (els, keep) => { for (const e of els) for (const f of Object.ke
 const sub = (a, b) => a.map((v, i) => v - b[i]);
 const dist = (a, b) => Math.hypot(...sub(a, b));
 const oU = solve(STANCES.UPRIGHT);
-const UJ = n => oU[n].t;
 // the P1 face front: the shield and brow lobes are the hood's, turned 22.5 deg about x round SHIELD_PIV (hood frame); the
 // face part's crescents sit on the lobes, so they use the same turn about the same point carried into the face frame
 const HOOD2FACE = sub(J.hood_hinge, J.face);
@@ -59,7 +72,7 @@ function crystal(name, b, w, h, ramp, {lean = 0, forms = 'p1', ppb = 64, seed = 
     if (v < .05) c = ramp(.9);
     return c;
   };
-  const sF = card(`${name}_f`, R, paint(1), ppb, forms), sS = card(`${name}_s`, R, paint(-1), ppb, forms);
+  const sF = card(`${name}_f`, R, paint(1), ppb, forms);
   const tanL = Math.tan(22.5 * D2R);
   const els = slab({plane: 'z', at: b[2], rect: {u0: b[0] + R.u0, u1: b[0] + R.u1, v0: b[1] + R.v0, v1: b[1] + R.v1}, sd: (u, v) => sdF(u - b[0], v - b[1]), half: .03, sprite: sF, edge: edge || sF, cell: .05, rot: lean ? ['x', -22.5, b] : null});
   // side card (plane x): the same outline sheared forward by the lean (u = z, toward -z with height)
@@ -67,17 +80,15 @@ function crystal(name, b, w, h, ramp, {lean = 0, forms = 'p1', ppb = 64, seed = 
   const sdS = (u, v) => sdF((u - b[2]) + (lean ? tanL * (v - b[1]) : 0), v - b[1]);
   const sS2 = card(`${name}_x`, {u0: RS.u0 - b[2], u1: RS.u1 - b[2], v0: -.02, v1: h}, (u, v) => paint(-1)(u + (lean ? tanL * v : 0), v), ppb, forms);
   els.push(...slab({plane: 'x', at: b[0], rect: RS, sd: sdS, half: .012, sprite: sS2, core: false}));
-  void sS; void seed;
+  void seed;
   return els;
 }
 
 // ---- tiles ------------------------------------------------------------------------------------------------------------------
 tile('p1_bud', 64, 64, 48, (u, v) => { const r = ((u * 5 + .4 * Math.sin(v * 7)) % 1 + 1) % 1; let c = PAL.p1_bark(clamp(.05 + .3 * v + .1 * (N.a(u * 8, v * 8) - .5))); if (r < .07) c = PAL.p1_line(.55); return c; }, 'p1');
 tile('p1_inner', 32, 32, 32, (u, v) => sink(PAL.p1_slate(.62 + .2 * N.a(u * 6, v * 6)), .4), 'p1');
-tile('p3_inner', 32, 32, 32, (u, v) => { let c = sink(PAL.p3_bottle(.6 + .2 * N.b(u * 6, v * 6)), .3); if (Math.abs(((u * 3 + v) % 1) - .5) < .04) c = mix(c, PAL.p3_rim(.5), .5); return c; }, 'p3');
 tile('p1_seed', 16, 16, 32, (u, v) => PAL.p1_core(clamp(.15 + .4 * Math.hypot(u - .5, v - .5))), 'p1');
 tile('p3_bud', 32, 32, 32, (u, v) => PAL.p3_bud(clamp(.05 + .5 * Math.hypot(u - .5, v - .5) + .1 * N.c(u * 6, v * 6))), 'p3');
-tile('p3_collar', 32, 32, 32, (u, v) => { let c = mix(PAL.p3_pale(.55), PAL.p3_bottle(.4), .45 + .2 * N.d(u * 5, v * 5)); if ((u * 6) % 1 < .1) c = sink(c, .2); return c; }, 'p3');
 
 // ================================================= neck, head =================================================================
 function neckP1() { const L = dist(J.head, J.neck); return loft('z', [{a: .3, r: .7}, {a: -L * .5, r: [.66, .62, .66, .58]}, {a: -L - .25, r: [.62, .58, .62, .55]}], {tex: 'g_plate', seed: 801}); }
@@ -108,10 +119,6 @@ function neckP3() {
 tile('hd_p3_ruffedge', 16, 16, 32, (u, v) => PAL.p3_pale(clamp(.45 + .1 * N.b(u * 4, v * 4))), 'p3');
 // the skull base: only the back of the head (the bud-skull stands in front of it, under the cowl, seen from below / reared)
 function headP1() { return loft('z', [{a: .25, r: [.66, .56, .66, .52]}, {a: -.35, r: [.66, .58, .66, .55], c: [0, -.02]}, {a: -.72, r: [.42, .4, .42, .36], c: [0, -.06]}], {tex: 'p1_inner', caps: '-+', seed: 811}); }
-// the P3 skull: behind the mask, from the chin to the face top; the leaf scarf wraps the chin and throat
-const SCARF_R = {u0: -.82, u1: .82, v0: -.42, v1: .3};
-const scarfSd = (u, v) => { const outer = Math.hypot(u / .8, (v - .3) / .7) - 1, inner = Math.hypot(u / .52, (v - .32) / .42) - 1; return Math.max(outer, -inner); };
-const scarfPaint = (u, v) => { const d = scarfSd(u, v); if (d > 0) return null; let c = PAL.p3_lime(clamp(.15 + .25 * (N.a(u * 7, v * 7) - .5) + .3 * (-v))); const lf = Math.abs(((Math.atan2(v - .3, u) * 3) % 1 + 1) % 1 - .5); if (lf < .05) c = mix(c, PAL.p3_line(.4), .6); return lineOut(c, d, .03, PAL.p3_line(.6)); };
 // the lime leaf scarf: broad lime leaves wrapping the chin under the mask's lower edge and hanging over the ruff
 const scarfLeafPaint = ({t, s, d}) => {
   let c = PAL.p3_lime(clamp(.18 + .3 * t + .15 * Math.abs(s) + .06 * (N.a(t * 8, s * 3) - .5)));
@@ -125,7 +132,7 @@ function headP3() {
   const fr = partFrame('head', 'p3', oU);
   // leaves rooted on the lower mask rim (the mask: 1.6 x 1.9 about (0, 6.9), front at z -0.97), drooping over the chin
   for (const [i, [x0, y0, x1, y1, wk]] of [[0, 6.22, 0, 5.55, .2], [.3, 6.25, .48, 5.62, .17], [-.3, 6.25, -.48, 5.62, .17], [.55, 6.38, .82, 5.85, .14], [-.55, 6.38, -.82, 5.85, .14]].entries()) {
-    const zr = -1.0 - .02 * i, pts = [[x0, y0, zr], [(x0 + x1) / 2, (y0 + y1) / 2 - .03, zr - .1], [x1, y1, zr - .06]];
+    const zr = -1.12 - .02 * i, pts = [[x0, y0, zr], [(x0 + x1) / 2, (y0 + y1) / 2 - .03, zr - .08], [x1, y1, zr - .04]];
     const w = t => wk * Math.pow(Math.sin(Math.PI * Math.min(1, .1 + t * .9)), .75) + .01;
     els.push(...ribbon(`p3_scarf${i}`, fr, pts, w, {cuts: [0, 1], face: () => [x1 * .3, .25, -1], paint: scarfLeafPaint, ppb: 40, forms: 'p3', half: .025, edge: 'p3_lime'}));
   }
@@ -323,16 +330,16 @@ tile('hd_p1_hedge', 16, 16, 32, (u, v) => PAL.p1_slate(clamp(.12 + .1 * N.b(u * 
 const P1_ROWS = [
   // back row (tucked under the crest, tongues toward the back), the crest (a keeled octagon: the crown cone sits on its
   // ridge) and the rows stepping down to the face; each row stays inside the one before it (the tongues lie on top)
-  {z0: -.15, z1: .42, tongue: .18, r: [.98, .6, .98, .3], c: [0, -.25], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'round'},
-  {z0: .12, z1: -.5, tongue: .28, r: [1.28, .775, 1.28, .45], c: [0, -.25], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'tip'},
-  {z0: -.42, z1: -.92, tongue: .26, r: [1.19, .7, 1.19, .48], c: [0, -.27], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'split'},
-  {z0: -.84, z1: -1.28, tongue: .24, r: [1.07, .58, 1.07, .5], c: [0, -.32], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'tip'},
+  {z0: -.15, z1: .42, tongue: .18, r: [.92, .7, .92, .3], c: [0, -.25], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'round'},
+  {z0: .12, z1: -.5, tongue: .28, r: [1.2, .88, 1.2, .45], c: [0, -.25], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'tip'},
+  {z0: -.42, z1: -.92, tongue: .26, r: [1.12, .8, 1.12, .48], c: [0, -.27], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'split'},
+  {z0: -.84, z1: -1.28, tongue: .24, r: [1.02, .66, 1.02, .5], c: [0, -.32], n: 8, phase: 22.5, ks: [-1, 0, 1, 2, 3, 4], shape: 'tip'},
   {z0: -1.2, z1: -1.56, tongue: .22, r: [.96, .55, .96, .5], c: [0, -.36], ks: [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9], shape: 'split'},
   {z0: -1.5, z1: -1.82, tongue: .16, r: [.76, .4, .76, .48], c: [0, -.42], ks: [0, 1, 2, 3, 4, 5, 6, 7, 8], shape: 'round'},
 ];
 // the inner volume under the plates (fills the steps; its underside is the dark lining seen in the rear-up)
-const P1_CORE = [{a: .5, r: [.84, .48, .84, .2], c: [0, -.25]}, {a: .05, r: [1.1, .62, 1.1, .36], c: [0, -.25]}, {a: -.5, r: [1.06, .58, 1.06, .4], c: [0, -.27]},
-  {a: -.9, r: [.95, .5, .95, .42], c: [0, -.32]}, {a: -1.25, r: [.84, .44, .84, .44], c: [0, -.36]}, {a: -1.55, r: [.64, .3, .64, .42], c: [0, -.42]}, {a: -1.82, r: [.46, .16, .46, .3], c: [0, -.5]}];
+const P1_CORE = [{a: .5, r: [.8, .58, .8, .2], c: [0, -.25]}, {a: .05, r: [1.03, .72, 1.03, .36], c: [0, -.25]}, {a: -.5, r: [1.0, .68, 1.0, .4], c: [0, -.27]},
+  {a: -.9, r: [.9, .57, .9, .42], c: [0, -.32]}, {a: -1.25, r: [.84, .44, .84, .44], c: [0, -.36]}, {a: -1.55, r: [.64, .3, .64, .42], c: [0, -.42]}, {a: -1.82, r: [.46, .16, .46, .3], c: [0, -.5]}];
 // ear flare (plane z, turned 22.5 deg about x so it faces forward-up): a leaf sweeping out and up from the dome side
 const EAR1_R = {u0: .78, u1: 2.36, v0: -.16, v1: 1.12};
 const EAR1_W = t => .28 * Math.pow(Math.sin(Math.PI * Math.min(1, .2 + t * .82)), .65) + .012;
@@ -488,8 +495,10 @@ function hoodP3() {
   els.push(...frontPlate('hd_p3_arch', -1.16, 7.6, archSd, archPaint, {box: [-1.1, 1.1, 6.9, 8.6]}));
   const wall = slab({plane: 'x', at: 1.02, rect: WALL_R, sd: wallSd, half: .03, sprite: card('hd_p3_wall', WALL_R, wallPaint, 32, 'p3'), edge: 'hd_p3_lining', cell: .07});
   els.push(...wall, ...mirrorX(wall));
-  els.push(...frontPlate('hd_p3_horns', -.82, 8.2, hornSd, hornPaint, {box: [-2.15, 2.15, 7.45, 8.95]}));
-  els.push(...frontPlate('hd_p3_browgem', -1.36, GEM[1], browGemSd, browGemPaint, {box: [-1.22, 1.22, GEM[1] - .27, GEM[1] + .27], half: .07, edge: 'p3_emerald', ppb: 64}));
+  const horn = frontPlate('hd_p3_horns', -.82, 8.2, hornSd, hornPaint, {box: [.5, 2.15, 7.45, 8.95]});
+  els.push(...horn, ...mirrorX(horn));
+  const bgem = frontPlate('hd_p3_browgem', -1.36, GEM[1], browGemSd, browGemPaint, {box: [GEM[0] - GEM[2] - .03, GEM[0] + GEM[2] + .03, GEM[1] - .27, GEM[1] + .27], half: .07, edge: 'p3_emerald', ppb: 64});
+  els.push(...bgem, ...mirrorX(bgem));
   // the square lime-gold gem (a diamond pointing forward) in its raised dark frame on the carapace ridge near the front
   // (v6 f90; upright it faces back from the top of the hood), emerald shards along the crest / back
   const GEM_C = [0, -.2, -1.92], dia = r => (u, v) => (Math.abs(u) + Math.abs(v - GEM_C[2])) - r;
@@ -688,14 +697,14 @@ function ribbon(name, fr, world, w, {cuts = [0, 1], face = () => [0, 0, -1], sid
 // span the part covers when a strand crosses the joint
 const HAIR_P3 = {
   outer: {seg: [1], lime: false, cuts: [0, .3, .62, 1],
-    w: t => .02 + .22 * Math.pow(Math.sin(Math.PI * Math.min(1, .06 + t * .9)), .9) * (1 - .3 * t),
+    w: t => .02 + .26 * Math.pow(Math.sin(Math.PI * Math.min(1, .06 + t * .9)), .9) * (1 - .3 * t),
     pts: [[.36, 8.48, -.8], [.76, 8.3, -1.06], [1.16, 7.86, -1.22], [1.43, 7.2, -1.26], [1.53, 6.5, -1.2], [1.5, 5.82, -1.12]]},
   outer2: {seg: [2], lime: false, cuts: [0, .5, 1],
-    w: t => .02 + .17 * Math.pow(Math.sin(Math.PI * Math.min(1, .1 + t * .9)), .8),
+    w: t => .02 + .2 * Math.pow(Math.sin(Math.PI * Math.min(1, .1 + t * .9)), .8),
     pts: [[1.28, 6.12, -1.14], [1.5, 5.5, -1.08], [1.76, 4.88, -.98], [1.92, 4.3, -.9]]},
   inner: {seg: [1, 2], lime: true, cut: 4,
-    w: t => .04 + .15 * Math.pow(Math.sin(Math.PI * Math.min(1, .08 + t * .95)), .5),
-    pts: [[.6, 8.02, -1.12], [.86, 7.56, -1.27], [.98, 6.9, -1.32], [.93, 6.3, -1.34], [.9, 5.96, -1.35],
+    w: t => .04 + .17 * Math.pow(Math.sin(Math.PI * Math.min(1, .08 + t * .95)), .5),
+    pts: [[.6, 8.02, -1.14], [.86, 7.56, -1.31], [.98, 6.9, -1.36], [.93, 6.3, -1.37], [.9, 5.96, -1.37],
       [.98, 5.45, -1.34], [1.13, 4.9, -1.26], [1.26, 4.35, -1.12]]},
 };
 const hairP3Paint = lime => ({t, s, d}) => {
@@ -767,4 +776,4 @@ export const FORM_MODELS = {
 export const FACE_ITEMS = {p1_bud: {model: 'face_p1_bud', form: 'p1'}, p3_idle: {model: 'face_p3', form: 'p3', face: 'p3_idle'},
   p3_charge: {model: 'face_p3', form: 'p3', face: 'p3_charge'}, p3_dim: {model: 'face_p3', form: 'p3', face: 'p3_dim'}, hidden: null};
 export function sprites() { models(); return {...SP}; }
-void [C, sdUnion, UJ, grey];
+

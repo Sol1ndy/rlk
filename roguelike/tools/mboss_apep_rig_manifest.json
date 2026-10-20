@@ -15963,7 +15963,7 @@
           10.18
         ],
         [
-          -1.62,
+          -1.64,
           4.5
         ]
       ],
@@ -16161,7 +16161,7 @@
           10.18
         ],
         [
-          -1.62,
+          -1.64,
           4.5
         ]
       ],
@@ -16354,7 +16354,7 @@
           10.18
         ],
         [
-          -1.62,
+          -1.64,
           4.5
         ]
       ],
@@ -22232,7 +22232,7 @@
           10.18
         ],
         [
-          -1.62,
+          -1.64,
           4.5
         ]
       ],
@@ -25724,7 +25724,7 @@
           10.18
         ],
         [
-          -1.62,
+          -1.64,
           4.5
         ]
       ],
@@ -27585,11 +27585,11 @@
     "models": 94,
     "hand_models": 20,
     "items": 325,
-    "atlas_px": 407808,
+    "atlas_px": 387584,
     "atlas_budget": 900000,
     "elements_shown_rest": {
       "p1": 3767,
-      "p3": 3581
+      "p3": 3597
     },
     "elements_budget": {
       "p1": 7000,
@@ -27602,7 +27602,7 @@
       },
       "head": {
         "parts": 9,
-        "px": 219904
+        "px": 199680
       },
       "limbs": {
         "parts": 14,
@@ -27645,7 +27645,7 @@
     "apRigQz": "static skip: last z",
     "apRigQw": "static skip: last yaw"
   },
-  "textures": 151,
+  "textures": 146,
   "stances": {
     "objective": "apRigStance",
     "ids": {
@@ -29919,12 +29919,12 @@
   },
   "sprites": {
     "budget": 900000,
-    "total": 407808,
+    "total": 387584,
     "regions": {
       "body": 47360,
       "shared": 46080,
       "tail": 19200,
-      "head": 219904,
+      "head": 199680,
       "hands": 64000,
       "limbs": 11264
     },
@@ -30060,16 +30060,6 @@
         "forms": "p1"
       },
       {
-        "name": "hd_p1_brow_s",
-        "region": "head",
-        "w": 32,
-        "h": 48,
-        "px": 1536,
-        "px_per_b": 64,
-        "use": "unique",
-        "forms": "p1"
-      },
-      {
         "name": "hd_p1_brow_x",
         "region": "head",
         "w": 48,
@@ -30101,16 +30091,6 @@
       },
       {
         "name": "hd_p1_crown_f",
-        "region": "head",
-        "w": 48,
-        "h": 64,
-        "px": 3072,
-        "px_per_b": 64,
-        "use": "unique",
-        "forms": "p1"
-      },
-      {
-        "name": "hd_p1_crown_s",
         "region": "head",
         "w": 48,
         "h": 64,
@@ -30332,9 +30312,9 @@
       {
         "name": "hd_p3_browgem",
         "region": "head",
-        "w": 160,
+        "w": 32,
         "h": 48,
-        "px": 7680,
+        "px": 1536,
         "px_per_b": 64,
         "use": "unique",
         "forms": "p3"
@@ -30582,9 +30562,9 @@
       {
         "name": "hd_p3_horns",
         "region": "head",
-        "w": 176,
+        "w": 80,
         "h": 64,
-        "px": 11264,
+        "px": 5120,
         "px_per_b": 40,
         "use": "unique",
         "forms": "p3"
@@ -30711,16 +30691,6 @@
       },
       {
         "name": "hd_p3_shard_f",
-        "region": "head",
-        "w": 16,
-        "h": 16,
-        "px": 256,
-        "px_per_b": 48,
-        "use": "unique",
-        "forms": "p3"
-      },
-      {
-        "name": "hd_p3_shard_s",
         "region": "head",
         "w": 16,
         "h": 16,
@@ -30990,16 +30960,6 @@
         "forms": "p3"
       },
       {
-        "name": "p3_collar",
-        "region": "head",
-        "w": 32,
-        "h": 32,
-        "px": 1024,
-        "px_per_b": 32,
-        "use": "unique",
-        "forms": "p3"
-      },
-      {
         "name": "p3_cone",
         "region": "shared",
         "w": 32,
@@ -31162,16 +31122,6 @@
       {
         "name": "p3_hemflap",
         "region": "body",
-        "w": 32,
-        "h": 32,
-        "px": 1024,
-        "px_per_b": 32,
-        "use": "unique",
-        "forms": "p3"
-      },
-      {
-        "name": "p3_inner",
-        "region": "head",
         "w": 32,
         "h": 32,
         "px": 1024,
@@ -31392,9 +31342,9 @@
       {
         "name": "p3_scarf3_0",
         "region": "head",
-        "w": 32,
+        "w": 16,
         "h": 32,
-        "px": 1024,
+        "px": 512,
         "px_per_b": 40,
         "use": "unique",
         "forms": "p3"
@@ -31402,9 +31352,9 @@
       {
         "name": "p3_scarf4_0",
         "region": "head",
-        "w": 32,
+        "w": 16,
         "h": 32,
-        "px": 1024,
+        "px": 512,
         "px_per_b": 40,
         "use": "unique",
         "forms": "p3"
@@ -31456,7 +31406,7 @@
     },
     "visible_rest": {
       "p1": 3767,
-      "p3": 3581
+      "p3": 3597
     },
     "per_region": {
       "body": {
@@ -31465,7 +31415,7 @@
       },
       "head": {
         "p1": 892,
-        "p3": 1053
+        "p3": 1069
       },
       "limbs": {
         "p1": 1336,
@@ -31527,7 +31477,7 @@
       },
       "hood": {
         "p1": 480,
-        "p3": 401
+        "p3": 409
       },
       "crown": {
         "p1": 119,
@@ -31535,19 +31485,19 @@
       },
       "hair_l_1": {
         "p1": 2,
-        "p3": 56
+        "p3": 57
       },
       "hair_r_1": {
         "p1": 2,
-        "p3": 56
+        "p3": 57
       },
       "hair_l_2": {
         "p1": 3,
-        "p3": 35
+        "p3": 38
       },
       "hair_r_2": {
         "p1": 3,
-        "p3": 35
+        "p3": 38
       },
       "mantle_l_a": {
         "p1": 11,
