@@ -183,14 +183,14 @@
           "pivot": "centre",
           "offset": [
             0,
-            -1.099,
-            0.266
+            -1.007,
+            0.397
           ],
           "overlay": false,
           "joint": [
             0,
-            0.901,
-            -0.266
+            0.993,
+            -0.397
           ],
           "elements": 10,
           "note": "the petal crown at the bag neck (scale 0 while a bell); the glow is painted emissive"
@@ -303,7 +303,7 @@
         "px": 14000
       },
       "elements": 123,
-      "px": 11776,
+      "px": 12288,
       "functions": {
         "spawn": "rlk:mboss/apep/om/basic/spawn",
         "tick": "rlk:mboss/apep/om/basic/tick",
@@ -2334,7 +2334,7 @@
     "px_total": 200000,
     "organism_elements": 500,
     "heart_elements": 800,
-    "px": 140800
+    "px": 141312
   },
   "sprites": {
     "bo_petal": {
@@ -2588,8 +2588,8 @@
       "owner": "heart"
     },
     "bo_bellF": {
-      "w": 32,
-      "h": 112,
+      "w": 64,
+      "h": 64,
       "owner": "basic"
     },
     "bo_bagF": {

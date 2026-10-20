@@ -275,8 +275,8 @@ export function evenStations(a0, a1, rOf, da, dr, n0 = 400) {
 export const smooth01 = x => { const t = Math.min(1, Math.max(0, x)); return t * t * (3 - 2 * t); };
 // (v4 f2310 / v3 f900: an egg standing on its narrow end - the waist r .3 at y .14 over the skirt, widest .4 at y .66,
 // a tall round top at 1.16; the skirt flares from r .29 at y .2 to the lobed hem r .49 on the ground)
-export const bellR = y => (y < .66 ? .3 + .1 * Math.sin(Math.PI / 2 * smooth01((y - .14) / .52)) : .4 * Math.sqrt(Math.max(0, 1 - ((y - .66) / .5) ** 2)));
-export const skirtR = y => (y > .1 ? .28 + .4 * (.32 - y) : .368 + (.1 - y));
+export const bellR = y => (y < .44 ? .3 + .115 * Math.sin(Math.PI / 2 * smooth01((y - .14) / .3)) : .415 * Math.max(0, 1 - ((y - .44) / .72) ** 2.2) ** .55);
+export const skirtR = y => (y > .1 ? .28 + .4 * (.32 - y) : .368 + 2.414 * (.1 - y));
 // the bell's facet body (apep_org_geometry facetBody): pale cream-grey facets, a milky top, faint grey creases along
 // the facet edges (v4 f186: the soft grey lines between the large facets); cls 1 = the skirt faces with a rounded lobe
 // cut into the hem and darker lobe rims, cls 2 = the dark underside
@@ -301,10 +301,10 @@ export function bellFacetPx({el, cls}, s, t, d) {
   return el > 80 && cls === 0 ? mix(c, PAL.bell(0), .3 * smooth(.45, .1, Math.hypot(s - .5, t - .5))) : c;
 }
 // the bag (v3 f900): a pear lying along z, the round belly behind (+z), the neck forward; level axis at y BAG.y
-export const BAG = {zc: .13, a: .45, R: .45, y: .45, z0: -.62};
+export const BAG = {zc: .13, a: .45, R: .45, y: .45, z0: -.78};
 export const bagR = z => {
   const e = z0 => BAG.R * Math.sqrt(Math.max(0, 1 - ((z0 - BAG.zc) / BAG.a) ** 2));
-  return z >= -.12 ? e(z) : .085 + (e(-.12) - .085) * smooth01((z - BAG.z0) / (-.12 - BAG.z0)) ** 1.5;
+  return z >= -.12 ? e(z) : .07 + (e(-.12) - .07) * smooth01((z - BAG.z0) / (-.12 - BAG.z0)) ** 1.5;
 };
 // loft ledges / caps face up: the game's up-face light is ~1.4x the side faces', so their tone is painted darker
 const ledgeOf = (c, k = .7) => [c[0] * k, c[1] * k, c[2] * k, 255];

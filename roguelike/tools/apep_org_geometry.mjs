@@ -442,7 +442,7 @@ const BELL_FACES = (() => {
   const body = polyFaces([...facetPlanes(revSupport(bellR, .14, 1.16), {el: [-22.5, 0, 22.5, 45, 67.5, 90]}), {n: [0, -1, 0], h: -.14, az: 0, el: -90}]);
   const ring = (rf, y0, y1, el, cls) => polyFaces([...facetPlanes(revSupport(rf, y0, y1), {el: [el]}), {n: [0, 1, 0], h: y1, az: 0, el: 90, hidden: true}, {n: [0, -1, 0], h: -y0, az: 0, el: -90, hidden: true}])
     .filter(f => !f.hidden).map(f => ({...f, skirt: cls}));
-  const skirt = [...ring(skirtR, .1, .32, 22.5, 1), ...ring(skirtR, 0, .1, 45, 4)];
+  const skirt = [...ring(skirtR, .1, .32, 22.5, 1), ...ring(skirtR, 0, .1, 67.5, 4)];
   return facetBody('bo_bellF', [...body, ...skirt], {owner: 'basic', paint: bellFacetPx, cls: f => (f.skirt || (f.el < -80 ? 2 : 0)), tint: true, ppb: 72, flat: f => f.el < -80});
 })();
 function bellModel() {
@@ -459,17 +459,17 @@ const bellModelX = () => [...BELL_FACES[1]];
 // joint sits on the neck tip, its +Y along the neck)
 export const BAG_POSE = (() => {
   const r = 35, P = (y, z) => rotA('x', r, [0, y, z]);
-  let lo = Infinity; for (let i = 0; i <= 60; i++) { const z = -.62 + 1.2 * i / 60; for (let j = 0; j < 16; j++) lo = Math.min(lo, P(BAG.y + bagR(z) * Math.sin(j * Math.PI / 8), z)[1]); }
-  const t = r4(-lo + .01), tip = P(BAG.y, -.64);
+  let lo = Infinity; for (let i = 0; i <= 60; i++) { const z = BAG.z0 + (.58 - BAG.z0) * i / 60; for (let j = 0; j < 16; j++) lo = Math.min(lo, P(BAG.y + bagR(z) * Math.sin(j * Math.PI / 8), z)[1]); }
+  const t = r4(-lo + .01), tip = P(BAG.y, BAG.z0 - .02);
   return {r, t, crown: [0, r4(tip[1] + t), r4(tip[2])], crownR: -(90 - r)};
 })();
 const BAG_FACES = (() => {
-  const faces = polyFaces(facetPlanes(revSupport(z => bagR(z) + .01, -.62, .575, 'z', BAG.y), {axis: 'z', el: [-90, -67.5, -45, -22.5, 0, 22.5, 45, 67.5, 90]}));
+  const faces = polyFaces(facetPlanes(revSupport(z => bagR(z) + .01, BAG.z0, .575, 'z', BAG.y), {axis: 'z', el: [-90, -67.5, -45, -22.5, 0, 22.5, 45, 67.5, 90]}));
   return facetBody('bo_bagF', faces, {owner: 'basic', paint: bellFacetPx, cls: () => 3, tint: true, ppb: 84});
 })();
 function bagModel() {
   const els = [...BAG_FACES[0]];
-  els.push(...tint(loft('z', [{a: -.6, r: .1, c: [0, BAG.y]}, {a: -.55, r: .1, c: [0, BAG.y]}], {n: 8, tex: 'bo_stemT', caps: ''})));
+  els.push(...tint(loft('z', [{a: BAG.z0 + .02, r: .085, c: [0, BAG.y]}, {a: BAG.z0 + .07, r: .085, c: [0, BAG.y]}], {n: 8, tex: 'bo_stemT', caps: ''})));
   return els;
 }
 const bagModelX = () => [...BAG_FACES[1]];
@@ -477,8 +477,8 @@ const bagModelX = () => [...BAG_FACES[1]];
 function crownModel(open) {
   // 4 broad crumpled petals leaning out of the neck (more when open) + 2 small ones between; open adds the lime glow
   const els = [];
-  for (let k = 0; k < 4; k++) els.push(open ? tangentCard('bo_petal', k * 90, .05, .3, .3, .32, {tilt: 45, pivot: 'bottom'}) : tangentCard('bo_petal', k * 90, .06, .3, .26, .32));
-  for (const th of [45, 135, 225, 315]) els.push(tangentCard('bo_petal', th, .07, .24, .22, .26));
+  for (let k = 0; k < 4; k++) els.push(open ? tangentCard('bo_petal', k * 90, .05, .42, .42, .44, {tilt: 45, pivot: 'bottom'}) : tangentCard('bo_petal', k * 90, .06, .4, .38, .42, {tilt: 22.5, pivot: 'bottom'}));
+  for (const th of [45, 135, 225, 315]) els.push(tangentCard('bo_petal', th, .07, .32, .3, .34));
   if (open) els.push(...crossCards('bo_glow', [0, .1, 0], .3, .3, {y0: -.15}));
   return els;
 }
