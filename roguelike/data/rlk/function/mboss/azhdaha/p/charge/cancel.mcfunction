@@ -1,2 +1,8 @@
-# STUB (S1-MOD, s2.md 2.1): 바위 용왕의 돌진 (charge, id 3); the S2 author replaces this file.
-# nothing of its own lingers (selectors only, idempotent)
+# P3 cut (any executor): the hit disc and the run / skid / end state.
+kill @e[type=minecraft:marker,tag=rlk_mb_az_p3h]
+scoreboard players set #aq3R mb 0
+scoreboard players set #aq3N mb 0
+scoreboard players set #aq3H mb 0
+scoreboard players set #aq3K mb 0
+scoreboard players set #aq3E mb 0
+scoreboard players set #aq3X mb 0

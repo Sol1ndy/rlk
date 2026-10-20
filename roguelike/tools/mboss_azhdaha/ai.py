@@ -299,6 +299,10 @@ def emit(core):
             cand.append(f'execute if score #azLast mb matches {p.id} run scoreboard players set #azC{p.id} mb 0')
         if p.id == 6:
             cand.append('scoreboard players set #azC6 mb 0')
+        if p.id == 5:
+            # REQ pa-3: in phase 3 a fore-paw P5 becomes P5b (10) in ai/go, so right after a 10 it would repeat 10
+            cand.append('execute if score #azLast mb matches 10 if score #azPh mb matches 3 if score #azPaw mb matches 1..2 run '
+                        'scoreboard players set #azC5 mb 0')
     cand += [sc('#azCn', 0)] + [f'scoreboard players operation #azCn mb += #azC{p.id} mb' for p in picks]
     w('ai/cand', cand)
     draw = ['# #azR = 0..#azCn-1 -> the candidate whose weight range holds it.', sc('#azPick', 0)]

@@ -1027,7 +1027,7 @@ class Gen:
             lines += ring
         tl.at(made, *lines)
         if strike - 1 >= made:
-            # REQ ps-1 (S2-S, requests/ps.md): K.fxe converts blocks to tenths itself; the front got r0 / r1 / w x 100
+            # REQ ps-1 / pa-1 (one fix): K.fxe takes blocks and converts to tenths itself (tenths gave a 10x front)
             tl.at(strike - 1, *(([] if tele == 'keep' else ring)
                                 + _flat([self.fxe('front', el, r0=r0, r1=r1, w=band, dur=n)])))
         for k, r in enumerate(radii, 1):

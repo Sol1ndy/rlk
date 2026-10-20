@@ -85,6 +85,7 @@ execute if score #azPh mb matches 3 if score #azZone mb matches 8 run scoreboard
 execute if score #azLeg mb matches 1 if score #azPh mb matches 2.. if score #azFldA mb matches 150.. run scoreboard players set #azC5 mb 0
 execute if score #azPh mb matches 3..3 if score #azPaw mb matches 1..2 if score #azLeg mb matches 1 if score #azPh mb matches 2.. if score #azFldA mb matches 150.. run scoreboard players set #azC5 mb 0
 execute if score #azLast mb matches 5 if score #azRepN mb matches 2.. run scoreboard players set #azC5 mb 0
+execute if score #azLast mb matches 10 if score #azPh mb matches 3 if score #azPaw mb matches 1..2 run scoreboard players set #azC5 mb 0
 scoreboard players set #azC6 mb 0
 execute if score #azLast mb matches 6 run scoreboard players set #azC6 mb 0
 scoreboard players set #azC6 mb 0

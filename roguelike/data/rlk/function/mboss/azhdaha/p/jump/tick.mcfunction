@@ -1,3 +1,3 @@
-# STUB (S1-MOD, s2.md 2.1): 바위 분쇄 충돌 (jump, id 2); the S2 author replaces this file.
-# keeps time only
-execute if score #azPT mb matches 53.. run function rlk:mboss/azhdaha/p/end
+# P2 tick (#azPT = the jump_slam clip tick)
+execute if score #azPT mb matches 1..20 run return run function rlk:mboss/azhdaha/p/jump/kd/1_20
+execute if score #azPT mb matches 21..53 run return run function rlk:mboss/azhdaha/p/jump/kd/21_53
