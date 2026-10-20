@@ -473,21 +473,40 @@ add('de_beak', 16, 16, glowPx(PAL.dface, .4), 'destr');
 add('de_rim', 32, 16, (s, t) => mix(PAL.dface(.35), PAL.destr(.1), .35 + .4 * t + .05 * Math.sin(s * 40)), 'destr');
 
 // 포식성 predatory (20 k)
-add('pr_hood', 64, 64, (s, t) => { let c = PAL.hood(.12 + .1 * (N.a(s * 6, t * 6) - .5) + .12 * smooth(.6, 1, Math.abs(s - .5) * 2));
-  const wav = Math.abs(Math.sin(s * Math.PI * 7 + Math.sin(t * Math.PI * 5) * 1.2)); if (wav < .12) c = mix(c, PAL.hood(.6), .55 * (1 - wav / .12)); return c; }, 'pred');
-add('pr_bowl', 64, 32, (s, t) => A(mix(PAL.fin(.15 + .2 * t), PAL.lime(.25), .3 * smooth(.85, 1, Math.abs(s - .5) * 2)), clamp(.62 + .3 * smooth(.85, 1, Math.abs(s - .5) * 2) + .2 * smooth(.85, 1, t))), 'pred', true);
-shapeSprite('pr_horn', SH.p_horn, 48, 'pred', (u, v) => { let c = mix(C('#C9CBBE'), C('#8E9188'), clamp(v / .62) * .6 + (u > 0 ? .25 : 0)); if (-SH.p_horn.sd(u, v) < .01) c = mix(c, C('#5A5E56'), .6); return c; });
+// the solid body facets (pred_solidF; s across, t along the face toward the snout / down): the fish hood pale sage
+// cream with wavy grey-green stripes along the back, greener underneath; the bud's ogive and the pod's lid cream with
+// pale petal seams; the face ball smooth sage green
+export function predSolidPx({el, n, f}, s, t, d) {
+  const part = f.part, x = Math.abs(s - .5) * 2;
+  if (part === 'face') { let c = PAL.fin(.3 + .12 * (n[1] < 0 ? -n[1] : -.4 * n[1]) + .05 * (N.a(s * 4 + el, t * 4) - .5)); if (d < .02) c = mix(c, PAL.fin(.45), .3); return c; }
+  if (part === 'fish') {
+    let c = PAL.hood(.1 + .06 * (N.a(s * 5 + el, t * 5) - .5) + .1 * x * x);
+    if (Math.abs(Math.sin(s * Math.PI * 2.2 + Math.sin(t * 6 + el) * .7)) < .1) c = mix(c, PAL.fin(.45), .4);
+    if (n[1] < -.2) c = mix(c, PAL.fin(.3), .6);
+    if (d < .016) c = mix(c, PAL.hood(.35), .35);
+    return c;
+  }
+  let c = PAL.hood(.08 + .08 * t + .05 * (N.a(s * 5 + el, t * 5) - .5));
+  if (d < .02) c = mix(c, PAL.hood(.4), .45 * smooth(.02, .006, d));
+  if (x < .06 && el < 80) c = mix(c, PAL.hood(0), .4);
+  return c;
+}
+// the glassy parts (pred_glassF): translucent green, a bright lime rim along the facet edges, denser toward the bottom
+export function predGlassPx({n}, s, t, d) {
+  const rim = smooth(.035, 0, d);
+  return A(mix(PAL.fin(.18 + .1 * Math.max(0, -n[1])), PAL.lime(.05), .55 * rim), clamp(.42 + .12 * Math.max(0, -n[1]) + .3 * rim));
+}
+shapeSprite('pr_horn', SH.p_horn, 40, 'pred', (u, v) => { let c = mix(C('#C9CBBE'), C('#8E9188'), clamp(v / .62) * .6 + (u > 0 ? .25 : 0)); if (-SH.p_horn.sd(u, v) < .01) c = mix(c, C('#5A5E56'), .6); return c; });
 shapeSprite('pr_hornS', SH.p_hornS, 48, 'pred', (u, v) => mix(C('#C9CBBE'), C('#8E9188'), clamp(v / .32) * .6 + (u > 0 ? .25 : 0)));
 shapeSprite('pr_fin', SH.p_finL, 40, 'pred', (u, v) => { const d = -SH.p_finL.sd(u, v); return A(mix(PAL.fin(.3), PAL.lime(.1), smooth(.04, 0, d)), clamp(.6 + .35 * smooth(.04, 0, d))); }, {translucent: true});
 shapeSprite('pr_sepal', SH.p_sepal, 48, 'pred', (u, v) => { const d = -SH.p_sepal.sd(u, v); return A(mix(PAL.fin(.25), PAL.lime(.1), smooth(.03, 0, d)), clamp(.65 + .3 * smooth(.03, 0, d))); }, {translucent: true});
-shapeSprite('pr_tail', SH.p_tail, 36, 'pred', (u, v) => { const d = -SH.p_tail.sd(u, v); return A(mix(PAL.fin(.3), PAL.lime(.1), smooth(.04, 0, d)), clamp(.6 + .35 * smooth(.04, 0, d))); }, {translucent: true});
+shapeSprite('pr_tail', SH.p_tail, 30, 'pred', (u, v) => { const d = -SH.p_tail.sd(u, v); return A(mix(PAL.fin(.3), PAL.lime(.1), smooth(.04, 0, d)), clamp(.6 + .35 * smooth(.04, 0, d))); }, {translucent: true});
 add('pr_eye', 16, 16, (s, t) => { const r = Math.hypot(s - .5, t - .5) * 2; if (r > 1) return TRANSPARENT; return r < .42 ? C('#0B1414') : r < .6 ? PAL.eye(.05) : r < .86 ? PAL.eye(.75) : PAL.eye(.3); }, 'pred');
-add('pr_core', 32, 32, glowPx(PAL.core, .2), 'pred');
+add('pr_core', 16, 16, glowPx(PAL.core, .2), 'pred');
 add('pr_gem', 16, 16, (s, t) => { const d = Math.abs(s - .5) + Math.abs(t - .5) * .7; return d > .5 ? TRANSPARENT : PAL.gem(clamp(.08 + (s < .5 ? .1 : .4) + (t > .5 ? .2 : 0))); }, 'pred');
 shapeSprite('pr_flare', SH.p_flare, 48, 'pred', (u, v) => A(mix(C('#FFFFF2'), PAL.lime(0), clamp(v / .55) * .6), 1));
 shapeSprite('pr_petal', SH.p_petal, 40, 'pred', (u, v) => { let c = shadeShape(SH.p_petal.sd, u, v, PAL.hood, {t0: .14, edge: .012, w: .06});
   const st = Math.abs(Math.sin(u * 14 + v * 3)); if (st < .1) c = mix(c, PAL.hood(.55), .45); return c; });
-add('pr_face', 32, 32, (s, t) => { let c = PAL.fin(.22 + .28 * t + .06 * (N.a(s * 5, t * 5) - .5)); const w = Math.abs(Math.sin(s * Math.PI * 8 + Math.sin(t * 6))); if (w < .1) c = mix(c, PAL.fin(.6), .35); return c; }, 'pred');
 
 // the Heart of the Oasis (40 k): the bulb is painted as grey values and tinted per look (idle / egg / withered / blaze)
 // the Heart bulb's facet faces (apep_org_geometry BULB_FACES): grey values (tinted per look), alpha ~0.86, a soft
@@ -593,12 +612,9 @@ add('st_cone', 16, 16, (s, t) => PAL.gold(.15 + .55 * t + (s > .5 ? .15 : 0)), '
 shapeSprite('se_seed', SH.se_seed, 64, 'seed', (u, v) => { const d = -SH.se_seed.sd(u, v); return mix(PAL.gold(.25), PAL.gold(0), .6 * smooth(.08, 0, Math.hypot(u + .04, v - .22))) ; });
 
 // ledge / cap tones of the lofts (darker: they face up)
-add('pr_hood_l', 16, 16, (s, t) => ledgeOf(PAL.hood(.2)), 'pred');
-add('pr_bowl_l', 16, 16, (s, t) => A(ledgeOf(PAL.fin(.3)), .75), 'pred', true);
-add('pr_face_l', 16, 16, (s, t) => ledgeOf(PAL.fin(.3)), 'pred');
 add('he_root_l', 16, 16, (s, t) => ledgeOf(PAL.root(.4 + .2 * N.c(s * 3, t * 3))), 'heart');
 // loft tiles / wraps: texel density per block for the tileUV windows; wraps map u = facet k / n, v along the loft
-for (const n of ['pr_hood', 'pr_bowl', 'pr_face', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
+for (const n of ['nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
 registerTile('he_rootS', 32, 64, 16);
 registerTile('he_vineS', 16, 64, 24);
 registerTile('he_rootSU', 16, 32, 8);

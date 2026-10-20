@@ -10,7 +10,7 @@
 // Element rotations stay single-axis on the 22.5 degree grid.
 import {abox, cardZ, cardX, cardY, faceEl, faceOfDir, lathe, annulus, checkBounds, r4, rotA} from './mboss_model_lib.mjs';
 import {loft, slab, crossCards, toUnits, mirrorX, retex, rockBox, stroke} from './mboss_shape_lib.mjs';
-import {SH, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, stalkSkin, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01, guardFacetPx, nestFacetPx, destrFacetPx, RIB, nurtRibPx, nurtHoodPx, hoodKeep, hoodNear} from './apep_org_paint.mjs';
+import {SH, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, stalkSkin, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01, guardFacetPx, nestFacetPx, destrFacetPx, predSolidPx, predGlassPx, RIB, nurtRibPx, nurtHoodPx, hoodKeep, hoodNear} from './apep_org_paint.mjs';
 
 export {checkBounds};
 export const RIDE_Y = 2.0;           // the husk passenger point above its feet (org manifest passenger.ride_y)
@@ -688,18 +688,48 @@ function destrFace() {
 // a high rounded back and a flat underside where the translucent bowl hangs (profile leaf(s), s = 0 snout .. 1 tail)
 const FISH = {z0: -1.25, z1: 1.2, w: .54, top: .6, bot: .12};
 const leaf = z => { const s = Math.min(1, Math.max(0, (z - FISH.z0) / (FISH.z1 - FISH.z0))); return s < .42 ? Math.sin(Math.PI / 2 * s / .42) ** 1.4 : Math.sin(Math.PI / 2 * (1 - s) / .58) ** .9; };
-const FISH_U = [0, .04, .1, .19, .3, .43, .57, .71, .83, .93, 1];
-const fishZ = FISH_U.map(u => FISH.z0 + u * (FISH.z1 - FISH.z0));
 const topAt = z => FISH.top * leaf(z) + .02;
+// a body of z stations with an elliptic section (x half width, y above / below): sec(z) -> {w, top, bot, y}
+const zBodyPts = (z0, z1, sec, th0 = 0, th1 = 2 * Math.PI) => { const P = [];
+  for (let i = 0; i <= 40; i++) { const z = z0 + (z1 - z0) * i / 40, q = sec(z); for (let j = 0; j <= 32; j++) { const th = th0 + (th1 - th0) * j / 32, sn = Math.sin(th);
+    P.push([q.w * Math.cos(th), (q.y || 0) + (sn >= 0 ? q.top : q.bot) * sn, z]); } }
+  return P; };
+const yBodyPts = (rings, extra = []) => [...ringPts(rings), ...extra];
+const PRED_ELZ = [-67.5, -45, -22.5, 0, 22.5, 45, 67.5];
+// (v4 f2070 / f2400 / f1920 / f1956 / f2175) the body's solid parts as facet bodies sharing one opaque sprite: the
+// fish hood (round Z), the bud's cream ogive and the pod's lid (round Y), the closed face ball (round Z); the glassy
+// parts share one translucent sprite: the jaw bowl (round Z, jaw frame), the bud's star bowl and the pod's lower lobe.
+// Diagonal faces ride body_x (turned 45 degrees about Z for the fish / face, about Y for the bud / pod) and jaw_x
+const PRED_SOLID = (() => {
+  const tag = (fs, part) => fs.map(f => ({...f, part}));
+  const fish = tag(polyFaces(facetPlanes(pointSupport(zBodyPts(FISH.z0, FISH.z1, z => { const L = leaf(z); return {w: FISH.w * L + .015, top: FISH.top * L + .015, bot: FISH.bot * L + .015}; })), {axis: 'z', el: PRED_ELZ})), 'fish');
+  const budR = y => .76 * Math.cos(Math.PI / 2 * Math.min(1, y / 1.02)) ** .85 + .02;
+  const bud = tag(polyFaces(facetPlanes(pointSupport(yBodyPts([0, .2, .4, .58, .74, .87, .97].map(y => [y, budR(y)]), [[0, 1.04, 0]])), {el: [-90, 0, 22.5, 45, 67.5, 90]})).filter(f => f.el > -80), 'bud');
+  const sph = (c, R, k, n = 9) => Array.from({length: n + 1}, (_, i) => { const a = -Math.PI / 2 + Math.PI * i / n; return [c + R * k * Math.sin(a), R * Math.cos(a) + .01]; }).filter(([, r]) => r > .02);
+  const pod = tag(polyFaces(facetPlanes(pointSupport(yBodyPts(sph(1.02, .72, 1.12), [[0, 1.02 + .81, 0], [0, 1.02 - .81, 0]])), {el: [-90, -67.5, -45, -22.5, 0, 22.5, 45, 67.5, 90]})), 'pod');
+  const face = tag(polyFaces(facetPlanes(pointSupport(zBodyPts(-.6, .62, z => { const r = Math.sqrt(Math.max(0, .66 * .66 - (z - .02) ** 2)) + .01; return {w: r, top: r * 1.04, bot: r}; })),
+    {axis: 'z', el: [-90, ...PRED_ELZ, 90]})), 'face');
+  return facetBody('pr_solidF', [...fish, ...bud, ...pod, ...face], {owner: 'pred', paint: predSolidPx, cls: f => f.part + (f.n[1] < -.2 ? 'u' : '') + f.el, ppb: 23, maxPx: 28, split: f => f.part});
+})();
+const PRED_GLASS = (() => {
+  const tag = (fs, part) => fs.map(f => ({...f, part}));
+  // the jaw bowl (jaw frame: the hinge at body z +0.4): the lower half of an ellipsoid under the hood, its flat top hidden
+  const jaw = tag(polyFaces(facetPlanes(pointSupport(zBodyPts(FISH.z0 + .04, FISH.z1 - .06, z => { const L = leaf(z); return {w: FISH.w * L * .9 + .02, top: 0, bot: .5 * L + .03}; }, Math.PI, 2 * Math.PI)
+    .map(([x, y, z]) => [x, y - .02, z - .4])), {axis: 'z', el: PRED_ELZ})).filter(f => f.n[1] < .3), 'jaw');
+  const bowlR = y => .7 * (1 - Math.pow(-y / .95, 1.15)) + .02;
+  const bud = tag(polyFaces(facetPlanes(pointSupport(yBodyPts([0, -.2, -.4, -.6, -.78].map(y => [y, bowlR(y)]), [[0, -.97, 0]])), {el: [-90, -67.5, -45, -22.5, 0, 90]})).filter(f => f.el < 80), 'bud');
+  const pts = []; for (let i = 0; i <= 10; i++) { const a = -Math.PI / 2 + Math.PI * i / 10, y = -.43 + .87 * Math.sin(a), r = .87 * Math.cos(a) + .01; if (r > .02) pts.push([y, r]); }
+  const pod = tag(polyFaces(facetPlanes(pointSupport(yBodyPts(pts, [[0, .44, 0], [0, -1.3, 0]])), {el: [-90, -67.5, -45, -22.5, 0, 22.5, 45, 67.5, 90]})), 'pod');
+  return facetBody('pr_glassF', [...jaw, ...bud, ...pod], {owner: 'pred', paint: predGlassPx, cls: f => f.part + f.el, ppb: 20, maxPx: 28, translucent: true, aa: true, split: f => f.part});
+})();
 function predFish(flare) {
-  const st = fishZ.map(a => { const L = leaf(a); return {a, r: [FISH.w * L + .02, FISH.top * L + .02, FISH.w * L + .02, FISH.bot * L + .02], c: [0, 0], box: -.3}; });
-  const els = [...loft('z', st, {n: 16, tex: 'pr_hood', ledgeTex: 'pr_hood_l', caps: '-+', seed: 23})];
+  const els = [...PRED_SOLID.fish[0]];
   for (const [z, big] of [[-.3, 1], [.18, 1], [.62, 0]]) {
     const y = topAt(z) - .08, sp = big ? 'pr_horn' : 'pr_hornS', H = big ? .67 : .36, W = big ? .4 : .24;
     els.push(quad(sp, [-W / 2, y + H - .05, z], [W, 0, 0], [0, -H, 0], {rot: ['x', 22.5, [0, y, z]]}), quad(sp, [0, y + H - .05, z - W / 2], [0, 0, W], [0, -H, 0], {rot: ['x', 22.5, [0, y, z]]}));
   }
-  const ew = FISH.w * leaf(-.62) + .03;
-  for (const s of [1, -1]) els.push(quad('pr_eye', [s * ew, .26, -.73], [0, 0, .22], [0, -.22, 0]));
+  const ew = FISH.w * leaf(-.62) + .04;
+  for (const s of [1, -1]) els.push(quad('pr_eye', [s * ew, .27, -.74], [0, 0, .22], [0, -.22, 0]));
   if (flare) {
     for (const [dir, rot] of [[[0, 1, 0]], [[1, 0, 0]], [[-1, 0, 0]], [[0, 1, 0], ['z', 45]], [[0, 1, 0], ['z', -45]], [[0, -1, 0], ['z', 45]], [[0, -1, 0], ['z', -45]]])
       for (const z of [-.55, -.1]) els.push(...spike('pr_flare', [dir[0] * .3, dir[1] * .25, z], dir, .55, .14, rot ? rot : undefined));
@@ -708,9 +738,7 @@ function predFish(flare) {
 }
 function predJaw() {
   // the translucent bowl under the hood (hinge frame: hinge at body z +0.4), two bottom sepals, the long front fin + gem
-  const z0 = -.4, zs = [0, .1, .3, .55, .78, .95].map(u => FISH.z0 + .04 + u * (FISH.z1 - FISH.z0 - .1));
-  const st = zs.map(a => { const L = leaf(a); return {a: a + z0, r: [FISH.w * L * .9 + .02, .04, FISH.w * L * .9 + .02, .5 * L + .03], c: [0, -.02]}; });
-  const els = [...loft('z', st, {n: 8, tex: 'pr_bowl', ledgeTex: 'pr_bowl_l', caps: '-+', seed: 29})];
+  const z0 = -.4, els = [...PRED_GLASS.jaw[0]];
   for (const s of [1, -1]) els.push(quad('pr_sepal', [s * .25 - .07, -.94, -.2 + z0], [.14, 0, 0], [0, .62, 0], {rot: ['z', s * 22.5, [s * .25, -.32, -.2 + z0]]}));
   els.push(quad('pr_fin', [.34, -.12, -.62 + z0], [.24, 0, 0], [0, 0, -1.15], {rot: ['y', -22.5, [.46, -.12, -.62 + z0]]}));
   els.push(abox([.38, -.2, -.72 + z0], [.56, -.04, -.56 + z0], 'pr_gem'));
@@ -718,11 +746,10 @@ function predJaw() {
 }
 const predTail = () => [quad('pr_tail', [0, .5, -.04], [0, 0, .94], [0, -1.0, 0])];
 const predCore = () => glowBall([0, 0, 0], .28, 'pr_core');
-// the bud (empowered): a diamond 2.1 x 1.6 - a cream ogive of eight petal facets closing to a point (a short horn on
-// top, four petals leaning in), over a translucent green star bowl tapering to the lower point, eight sepals at the rim
+// the bud (empowered): a diamond 2.1 x 1.6 - a cream ogive of petal facets closing to a point (a short horn on top, four
+// petals leaning in), over a translucent green star bowl tapering to the lower point, eight sepals at the rim
 function predBud() {
-  const els = [...loft('y', stops([0, .2, .4, .58, .74, .87, .97, 1.02], [0, .2, .4, .58, .74, .87, .97, 1.02].map(y => .76 * Math.cos(Math.PI / 2 * Math.min(1, y / 1.02)) ** .85 + .02)), {n: 16, tex: 'pr_hood', ledgeTex: 'pr_hood_l', caps: '-', seed: 61}),
-    ...loft('y', prof(-.95, 0, 5, y => .7 * (1 - Math.pow(-y / .95, 1.15)) + .02), {n: 8, tex: 'pr_bowl', ledgeTex: 'pr_bowl_l', caps: '', seed: 62})];
+  const els = [...PRED_SOLID.bud[0], ...PRED_GLASS.bud[0]];
   for (let k = 0; k < 4; k++) els.push(tangentCard('pr_petal', k * 90, .7, .82, .82, .84, {tilt: -22.5, pivot: 'bottom'}));
   els.push(...shift(crossCards('pr_horn', [0, 0, 0], .26, .44, {y0: 0}), [0, .9, 0]));
   for (let k = 0; k < 8; k++) els.push(radialCard('pr_sepal', k * 45 + 22.5, .45, 1.02, -.42, .06));
@@ -731,20 +758,16 @@ function predBud() {
 // the pod (inflated, 3.5 b): a tall double-lobed clam - the round translucent lower lobe holding the core, the cream lid
 // lobe closed on top of it at a waist (centre frame: the floor at y -1.3)
 function predPod() {
-  // sphere-like lobes in equal latitude steps (smooth outlines): the lower lobe 16-sided, the lid 8-sided
-  const lat = (c, R, n, k = 1) => Array.from({length: n + 1}, (_, i) => { const th = -Math.PI / 2 + Math.PI * i / n; return {a: c + R * k * Math.sin(th), r: R * Math.cos(th) + .04}; });
-  const els = [...loft('y', lat(-.43, .87, 8), {n: 16, tex: 'pr_bowl', ledgeTex: 'pr_bowl_l', caps: '-+', seed: 63}),
-    ...loft('y', lat(1.02, .72, 7, 1.12), {n: 8, tex: 'pr_hood', ledgeTex: 'pr_hood_l', caps: '-+', seed: 64})];
-  els.push(...shift(crossCards('pr_horn', [0, 0, 0], .3, .5, {y0: 0}), [0, 1.8, 0]));
-  return els;
+  return [...PRED_GLASS.pod[0], ...PRED_SOLID.pod[0], ...shift(crossCards('pr_horn', [0, 0, 0], .3, .5, {y0: 0}), [0, 1.8, 0])];
 }
 function predFace() {
-  const els = [...loft('z', prof(-.62, .5, 6, z => { const t = (z + .62) / 1.12; return .75 * Math.sin(Math.PI * Math.min(1, .15 + t * .85)) ** .5 + .02; }), {n: 16, tex: 'pr_face', ledgeTex: 'pr_face_l', caps: '-+', seed: 37})];
+  const els = [...PRED_SOLID.face[0]];
   els.push(...crossCards('pr_horn', [0, .66, -.1], .34, .6, {y0: 0}));
-  els.push(abox([-.16, -.52, -.6], [.16, -.2, -.5], 'pr_gem', {rot: ['z', 45, [0, -.36, -.55]]}));
-  els.push(quad('pr_eye', [-.08, .3, -.66], [.16, 0, 0], [0, -.16, 0]));
+  els.push(abox([-.13, -.5, -.63], [.13, -.24, -.55], 'pr_gem', {rot: ['z', 45, [0, -.37, -.59]]}));
+  els.push(quad('pr_eye', [-.1, .1, -.62], [.2, 0, 0], [0, -.2, 0]));
   return els;
 }
+const predBodyX = look => (look === 'bud' ? [...PRED_SOLID.bud[1], ...PRED_GLASS.bud[1]] : look === 'pod' ? [...PRED_GLASS.pod[1], ...PRED_SOLID.pod[1]] : look === 'face' ? PRED_SOLID.face[1] : PRED_SOLID.fish[1]);
 
 // ================================================================================================================
 // the Heart of the Oasis: lemon bulb (looks by tint), root cradle (pedestal / full), two root arms, glow tips, vine
@@ -981,7 +1004,12 @@ export const ORG = {
       D('body', {pivot: 'centre', joint: [0, 1.3, 0], scale: 1.6, looks: {fish: 'pred_body_fish', fish_flare: 'pred_body_fish_flare', bud: 'pred_body_bud', pod: 'pred_body_pod', face: 'pred_body_face'}, def: 'fish',
         models: {pred_body_fish: () => predFish(false), pred_body_fish_flare: () => predFish(true), pred_body_bud: predBud, pred_body_pod: predPod, pred_body_face: predFace},
         note: 'fish = the leaf-shark hood; bud / pod / face are their own models (jaw and fin hidden)'}),
+      // the diagonal facets of body (turned 45 degrees about its Z for the fish / face, about its Y for the bud / pod)
+      D('body_x', {pivot: 'centre', parent: 'body', scale: 1.6, follow: look => (look === 'bud' || look === 'pod' ? [0, 45, 0] : [0, 0, 45]), lookOf: 'body', twinOf: 'body',
+        looks: Object.fromEntries(['fish', 'fish_flare', 'bud', 'pod', 'face'].map(l => [l, 'pred_bodyx_' + l])), def: 'fish',
+        models: Object.fromEntries(['fish', 'fish_flare', 'bud', 'pod', 'face'].map(l => ['pred_bodyx_' + l, () => predBodyX(l)])), note: 'the diagonal facets of body'}),
       D('jaw', {pivot: 'centre', parent: 'body', joint: [0, -.02, .4], scale: 1.6, looks: {idle: 'pred_jaw_idle'}, def: 'idle', models: {pred_jaw_idle: predJaw}, note: 'the translucent bowl, sepals and the long front fin; hinge behind the middle'}),
+      D('jaw_x', {pivot: 'centre', parent: 'jaw', scale: 1.6, follow: () => [0, 0, 45], lookOf: 'jaw', twinOf: 'jaw', looks: {idle: 'pred_jawx_idle'}, def: 'idle', models: {pred_jawx_idle: () => PRED_GLASS.jaw[1]}, note: 'the diagonal facets of the jaw bowl'}),
       D('fin', {pivot: 'centre', parent: 'body', joint: [0, .02, 1.12], looks: {idle: 'pred_fin_idle'}, def: 'idle', models: {pred_fin_idle: predTail}, note: 'the tail fin; yaw +-25 in pred_swim'}),
       D('core', {pivot: 'centre', parent: 'body', joint: [0, -.08, -.2], bright: 15, looks: {on: 'pred_core_on'}, def: 'on', models: {pred_core_on: predCore}}),
     ]},

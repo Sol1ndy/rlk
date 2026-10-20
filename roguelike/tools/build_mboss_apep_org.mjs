@@ -374,10 +374,13 @@ if (dbg) {
       }
       dput(`${owner}/${c.name}/${t}`, lines);
     });
-    const R = objXf(owner, restFrame(owner));
-    for (const d of o.displays) for (const [look, item] of Object.entries(d.looks)) {
-      if (!shown(written(R[d.name]))) continue;
-      dput(`${owner}/rest/${d.name}/${look}`, [summonDisplay({tags: ['om_dbg', 'om_' + owner, 'om_' + d.name], item, bright: d.bright, xf: written(R[d.name])})]);
+    // a display at rest in each look, with its twins (the diagonal facets) in the same look
+    for (const d of o.displays.filter(x => !x.twinOf)) for (const look of Object.keys(d.looks)) {
+      const W = solve(owner, poseAt(owner, {name: 'rest', len: 0, keys: [[0, {[d.name]: {look}}]]}, 0));
+      const R = objXf(owner, Object.fromEntries(Object.entries(W).map(([n, w]) => [n, {...displayXf(owner, n, w), look: w.look}])));
+      const lines = [d, ...o.displays.filter(x => x.twinOf === d.name)].filter(x => shown(written(R[x.name])))
+        .map(x => summonDisplay({tags: ['om_dbg', 'om_' + owner, 'om_' + x.name], item: x.looks[R[x.name].look], bright: x.bright, xf: written(R[x.name])}));
+      if (lines.length) dput(`${owner}/rest/${d.name}/${look}`, lines);
     }
   }
   // the Heart spawn states
