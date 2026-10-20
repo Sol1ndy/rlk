@@ -8,6 +8,7 @@ execute if score #fkThold mb matches ..-1 run scoreboard players set #fkThold mb
 data modify storage rlk:fgkit t merge value {c1:13793804,c2:15771962,c3:16771232,tg:"rlk_fk_c",tpd:0}
 execute if score #fkTEl mb matches 0 run data modify storage rlk:fgkit t merge value {c1:15020106,c2:16737396,c3:16758980}
 execute if score #fkTEl mb matches 5 run data modify storage rlk:fgkit t merge value {c1:13793804,c2:15771962,c3:16771232}
+execute if score #fkTEl mb matches 6 run data modify storage rlk:fgkit t merge value {c1:15713638,c2:16178326,c3:16643277}
 execute if score #fkTEl mb matches 9 run data modify storage rlk:fgkit t merge value {c1:7358172,c2:10651890,c3:15524607}
 scoreboard players operation #fkLife mb = #fkTell mb
 scoreboard players operation #fkLife mb += #fkThold mb

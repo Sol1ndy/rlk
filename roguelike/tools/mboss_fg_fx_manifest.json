@@ -948,8 +948,8 @@
   },
   "column_base": {
    "args": [],
-   "doc": "C1 / C2 slam point (13 t) without the column: the floor glow and the base flare at the locked point while the rig's own gold column falls under the gliding device. At the floor point.",
-   "cards": 2
+   "doc": "C1 / C2 slam point: the late base flare where the rig's gold column meets the floor (the footage's flare at the column foot, v1 9.10, about 5 t before the impact). At the floor point.",
+   "cards": 1
   },
   "plunge": {
    "args": [],
@@ -1030,16 +1030,6 @@
    "doc": "C5 +5 \"번쩍\": a gold flame burst around the core as it lifts. At the core.",
    "cards": 6
   },
-  "dark_disc": {
-   "args": [
-    "r0",
-    "r",
-    "grow",
-    "life"
-   ],
-   "doc": "C5 / F1: the dark floor disc grows from {r0} to {r} blocks over {grow} ticks and stays to {life} (the video marker: the floor about 25-35 % darker, amber rim). At the floor point; pair with the Geo tele_disc for the timing.",
-   "cards": 1
-  },
   "up_beam": {
    "args": [],
    "doc": "C5 +29..+40: the upward gold beam from the raised core with crawling arcs. At the core.",
@@ -1115,6 +1105,11 @@
    "args": [],
    "doc": "C6 / F2: a short white-gold streak behind a flying slab (call every 2 t at the slab prop, rotated along its flight).",
    "cards": 1
+  },
+  "slab_glint": {
+   "args": [],
+   "doc": "C6 / F2 throw tell (10 t before the throw, when the feet are locked): the hovering slab flares on itself, a gold glow and a white-gold glint on the slab, not on the floor (telegraph rule 10-20: the throw lanes are gone). At the slab.",
+   "cards": 2
   },
   "slab_impact": {
    "args": [],
@@ -1214,8 +1209,8 @@
   },
   "erupt_tell": {
    "args": [],
-   "doc": "F1 감소 영역: a dark disc r 2.8 fades in over 6 t (15 t lead; pair with tele_disc el 9). At the zone floor point.",
-   "cards": 1
+   "doc": "F1 감소 영역: dark dust settling over a zone as its dark disc appears (the disc itself is the telegraph decal tele/dark r 2.8, 15 t lead). At the zone floor point.",
+   "cards": 0
   },
   "erupt": {
    "args": [],
@@ -1416,6 +1411,11 @@
    "#E5304A",
    "#FF6474",
    "#FFB8C4"
+  ],
+  "6": [
+   "#EFC566",
+   "#F6DC96",
+   "#FDF4CD"
   ]
  },
  "demos": {

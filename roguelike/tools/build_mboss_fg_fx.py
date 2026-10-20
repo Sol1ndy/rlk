@@ -14,8 +14,12 @@ in the module core). Parts, all regenerated on every run:
      The ager phase is fixed against the butterfly kit (its review perf-2): stages are counted from gametime + 1, so a
      card's main interpolation starts in the server tick after its spawn and the client animates it.
   2. Ground telegraph decals: disc, ring, sector, line, the expanding wave ring (synced to a hz/ring + hz/resize
-     front) and the moving line for the lasers (re-aimed per tick). Palettes: 5 Geo (amber), 9 field (violet),
-     0 physical; anything else draws Geo.
+     front), the moving line for the lasers (re-aimed per tick), the rim-only disc and the dark floor disc.
+     Palettes: 5 Geo (amber), 9 field (violet), 0 physical, 6 the pale-gold rim; anything else draws Geo.
+     Telegraph rule (10-20, user): the module draws a ground decal only where the reference footage shows a marker on
+     the floor before the hit (C5 지면 충격: tele/rim + tele/dark; F1 감소 영역: tele/dark; the C1 / C2 slam point: the
+     base flare p/column_base); every other attack is read from the boss's motion and sound. The other shapes stay in
+     the kit's API (test/tele) but the field generator no longer calls them.
   3. A vanilla sound recipe library: fx/snd/<name>, mechanical / brass layers (anvil, chain, piston, vault, beacon,
      respawn anchor, amethyst, crafter, breeze...), with the per-layer minimum volume rule of mboss_lib.
   4. The HUD: font rlk:mboss_fg (U+E700-E7FF) with the 역장 badge, 20 meter pips (empty / full / just counted), the
@@ -125,7 +129,10 @@ SMOKE = rgb('#E2E8EC')
 # marble; the baked dark outline carries them on the pink centre)
 TELE_COL = {5: (rgb('#D27A0C'), rgb('#F0A93A'), rgb('#FFE8A0')),
             9: (rgb('#7046DC'), rgb('#A288F2'), rgb('#ECE2FF')),
-            0: (rgb('#E5304A'), rgb('#FF6474'), rgb('#FFB8C4'))}
+            0: (rgb('#E5304A'), rgb('#FF6474'), rgb('#FFB8C4')),
+            # 6: the pale-gold rim of 지면 충격 (C5; v4 2.70-4.95: a thin pale-gold rim at the final radius, the only
+            # line on the floor; telegraph rule 10-20): drawn by tele/rim (no fill), flashing pale on the blast
+            6: (rgb('#EFC566'), rgb('#F6DC96'), RIM_PALE)}
 TELE_DEFAULT = 5
 
 # ----------------------------------------------------------------------------- kinds
@@ -520,6 +527,21 @@ def tele_disc(r, tell, el=5, hold=3):
     """Disc telegraph decal of radius r blocks; the progress fill reaches the rim `tell` ticks after the call
     (the framework hz/* strike tick when created in the same tick with the same tell)."""
     return f'function {FN}tele/disc {{r:{_tenths(r)},tell:{int(tell)},el:{int(el)},hold:{int(hold)}}}'
+
+
+def tele_rim(r, tell, el=6, hold=3):
+    """Rim-only disc telegraph decal (tele/disc without its fill / progress edge): the static rim of radius r, flashing
+    on the strike tick (call + tell). Default palette 6 = the pale-gold rim of 지면 충격 (C5, telegraph rule 10-20)."""
+    return f'function {FN}tele/rim {{r:{_tenths(r)},tell:{int(tell)},el:{int(el)},hold:{int(hold)}}}'
+
+
+def tele_dark(r0, r, tell, grow, hold=0):
+    """The dark floor disc decal (erupt_disc: the floor about 35 % darker, an amber rim, gold cracks; the footage's own
+    ground marker of 감소 영역 F1 and 지면 충격 C5, telegraph rule 10-20): its radius grows r0 -> r blocks over `grow` ticks
+    from the tick after the call and it stays to the strike (call + tell) + hold. Painted colours, no flash; a
+    telegraph card (TCAP, cleared by tele/clear, so a pause redraw draws it again with the ticks left)."""
+    return (f'function {FN}tele/dark {{r0:{_tenths(r0)},r:{_tenths(r)},grow:{int(grow)},tell:{int(tell)},'
+            f'hold:{int(hold)}}}')
 
 
 def tele_ring(r0, r, tell, el=5, hold=3):
@@ -985,13 +1007,13 @@ def _p_column_tell():
             part('end_rod', '~ ~1.5 ~', (0.15, 1.2, 0.15), 0.02, 8)]
 
 
-@preset('column_base', 'C1 / C2 slam point (13 t) without the column: the floor glow and the base flare at the locked '
-        'point while the rig\'s own gold column falls under the gliding device. At the floor point.')
+@preset('column_base', 'C1 / C2 slam point: the late base flare where the rig\'s gold column meets the floor (the footage\'s '
+        'flare at the column foot, v1 9.10, about 5 t before the impact). At the floor point.')
 def _p_column_base():
-    # review FID-5 (mb3 fix round): the rig draws the column under the device; this marks only where the slam lands
-    return [card('glow', '~ ~0.04 ~', '~ 90', s0=0.6, s1=2.6, life=15, fade=3, col=GOLD),
-            card('spark', '~ ~0.3 ~', bb='center', spin=60, s0=0.3, s1=1.6, life=6, fade=3, dly=9),
-            part('end_rod', '~ ~0.4 ~', (0.3, 0.2, 0.3), 0.02, 4)]
+    # review FID-5 (mb3 fix round): the rig draws the column under the device. Telegraph rule 10-20 (the footage shows no
+    # area marker for the slam, only the face-down core's column): the 15 t floor glow at the not yet reached lock and
+    # the end rods are gone; the base flare stays (called 12 t into the slam, 5 t before its impact)
+    return [card('spark', '~ ~0.3 ~', bb='center', spin=60, s0=0.3, s1=1.6, life=6, fade=3)]
 
 
 @preset('plunge', 'C1 / C2 plunge (3-4 t): speed lines streaming up past the dropping device. At the ring centre.')
@@ -1142,13 +1164,6 @@ def _p_core_lift():
     return out
 
 
-@preset('dark_disc', 'C5 / F1: the dark floor disc grows from {r0} to {r} blocks over {grow} ticks and stays to {life} '
-        '(the video marker: the floor about 25-35 % darker, amber rim). At the floor point; pair with the Geo '
-        'tele_disc for the timing.', ('r0', 'r', 'grow', 'life'))
-def _p_dark_disc():
-    return ['$' + card('erupt_disc', '~ ~0.025 ~', '~ 0', s0='$(r0)', s1='$(r)', life='$(life)', fade=3, dur='$(grow)')]
-
-
 @preset('up_beam', 'C5 +29..+40: the upward gold beam from the raised core with crawling arcs. At the core.')
 def _p_up_beam():
     return [card('column', '~ ~ ~', '~ 0', s0=(0.3, 8.0, 0.3), s1=(1.3, 9.0, 1.3), life=11, fade=3, dur=3,
@@ -1162,8 +1177,16 @@ def _p_up_beam():
 @preset('rim_flare', 'C5 +36..+41: the rim at the final radius {r} flares bright (last warning). At the floor centre.',
         ('r',))
 def _p_rim_flare():
-    return ['$' + card('ripple', '~ ~0.07 ~', '~ 90', spin=20, s0='$(r)', s1='$(r)', life=7, fade=3, col=RIM_PALE),
-            '$' + card('ripple', '~ ~0.08 ~', '~ 90', spin=-25, s0='$(r)', s1='$(r)', life=6, fade=3,
+    # the ripple sprite is 1 b across at scale 1 (a -0.5..0.5), so a ring of radius r needs the scale 2 r (telegraph rule
+    # 10-20: with the fill decal gone the flare must sit on the kept rim; it was drawn at r / 2)
+    return [f'$data modify storage {STO} fl.r set value $(r)d',
+            f'execute store result storage {STO} fl.d double 0.02 run data get storage {STO} fl.r 100',
+            f'function {FN}p/e/rim_flare with storage {STO} fl']
+
+
+def _p_e_rim_flare():
+    return ['$' + card('ripple', '~ ~0.07 ~', '~ 90', spin=20, s0='$(d)', s1='$(d)', life=7, fade=3, col=RIM_PALE),
+            '$' + card('ripple', '~ ~0.08 ~', '~ 90', spin=-25, s0='$(d)', s1='$(d)', life=6, fade=3,
                        col=rgb('#F9E6C2'), dly=1)]
 
 
@@ -1301,6 +1324,15 @@ def _p_slab_throw():
 def _p_slab_trail():
     return [card('streak', '^ ^ ^-0.8', '~90 0', s0=1.4, s1=0.6, life=5, fade=3, col=rgb('#FDE59E')),
             part('end_rod', '~ ~ ~', (0.1, 0.1, 0.1), 0.01, 1)]
+
+
+@preset('slab_glint', 'C6 / F2 throw tell (10 t before the throw, when the feet are locked): the hovering slab flares on '
+        'itself, a gold glow and a white-gold glint on the slab, not on the floor (telegraph rule 10-20: the throw lanes '
+        'are gone). At the slab.')
+def _p_slab_glint():
+    return [card('glow', bb='center', s0=1.4, s1=2.8, life=10, fade=4, col=GOLD),
+            card('glint', bb='center', spin=90, s0=0.4, s1=2.4, life=7, fade=3, col=GOLD_WHITE),
+            part('electric_spark', '~ ~ ~', (0.6, 0.2, 0.6), 0.1, 6)]
 
 
 @preset('slab_impact', 'C6 / F2: a slab crashes onto the floor (dust, chunks, a gold glow). At the floor point.')
@@ -1508,11 +1540,12 @@ def _p_wave_fire():
 
 
 # --- field: 감소 영역 eruptions
-@preset('erupt_tell', 'F1 감소 영역: a dark disc r 2.8 fades in over 6 t (15 t lead; pair with tele_disc el 9). At the zone '
-        'floor point.')
+@preset('erupt_tell', 'F1 감소 영역: dark dust settling over a zone as its dark disc appears (the disc itself is the '
+        'telegraph decal tele/dark r 2.8, 15 t lead). At the zone floor point.')
 def _p_erupt_tell():
-    return [card('erupt_disc', '~ ~0.025 ~', '~ 0', s0=0.8, s1=2.8, life=16, fade=1, dur=6),
-            dust(rgb('#3A2C24'), 1.2, '~ ~0.2 ~', (1.2, 0.05, 1.2), 6)]
+    # telegraph rule 10-20: the dark disc (the footage's marker) moved to tele/dark (a decal card, at the zone's true radius:
+    # the erupt_disc sprite is 1 b across at scale 1, so the old s1 2.8 drew r 1.4); the violet tele_disc is gone
+    return [dust(rgb('#3A2C24'), 1.2, '~ ~0.2 ~', (1.2, 0.05, 1.2), 6)]
 
 
 @preset('erupt', 'F1 eruption r 2.8: the gold burst mound with floor chunks, a crack ring, flung rocks and dust. At the '
@@ -1900,7 +1933,7 @@ def engine(W):
                       *[f'scoreboard objectives remove {o}' for o in OBJECTIVES],
                       *[f'scoreboard players reset {s} mb' for s in fake],
                       f'data remove storage {STO} a', f'data remove storage {STO} t', f'data remove storage {STO} w',
-                      f'data remove storage {STO} hud', f'data remove storage {STO} ax',
+                      f'data remove storage {STO} hud', f'data remove storage {STO} ax', f'data remove storage {STO} fl',
                       f'schedule clear {E}world', f'schedule clear {FN}hud/e/unflash', f'schedule clear {FN}test/e/tick',
                       f'schedule clear {FN}test/e/mturn']
                 + ([f'function {STUB_RIG}uninstall'] if rig_mode() == 'stub' else []))
@@ -1978,6 +2011,52 @@ def telegraphs(W):
         '# Internal (macro, storage t): the progress fill (0 -> r) under the static rim.',
         *mk('t_fill', '~ ~0.03 ~', '0.02f,1f,0.02f', '$(r)f,1f,$(r)f', 'c2'),
         *mk('$(rim)', '~ ~0.045 ~', '$(r)f,1f,$(r)f', '$(r)f,1f,$(r)f', 'c1'),
+    ])
+    # rim only (telegraph rule 10-20: 지면 충격 C5 keeps the footage's thin pale-gold rim, without the fill / progress edge)
+    W.w('tele/rim', [
+        '# Rim-only disc telegraph decal: {r:<radius, tenths>, tell, el, hold}. tele/disc without its progress fill: the',
+        '# static rim (thick under r 2.5), flashing on the strike tick (call + tell), gone hold ticks later. Positioned on',
+        '# the floor point. Palette 6 = the pale-gold rim of 지면 충격 (C5). 1 card.',
+        *head(['$scoreboard players set #fkTr mb $(r)']),
+        'execute if score #fkTr mb matches ..1 run scoreboard players set #fkTr mb 2',
+        f'execute store result storage {STO} t.r float 0.1 run scoreboard players get #fkTr mb',
+        f'data modify storage {STO} t.rim set value "t_rim"',
+        f'execute if score #fkTr mb matches ..25 run data modify storage {STO} t.rim set value "t_rim_s"',
+        f'function {T}rim with storage {STO} t',
+    ])
+    W.w('tele/e/rim', [
+        '# Internal (macro, storage t): the static rim.',
+        *mk('$(rim)', '~ ~0.045 ~', '$(r)f,1f,$(r)f', '$(r)f,1f,$(r)f', 'c1'),
+    ])
+    # the dark floor disc (the footage's own marker of 감소 영역 F1 and 지면 충격 C5) as a decal card: cleared on a pause with
+    # the other decals and redrawn by the pattern with the ticks left; the erupt_disc sprite is 1 b across at scale 1
+    W.w('tele/dark', [
+        '# The dark floor disc decal (erupt_disc: the floor about 35 % darker, an amber rim, gold cracks): {r0, r (radii,',
+        '# tenths), grow (ticks), tell, hold}. Positioned on the floor point. Its radius grows r0 -> r over grow ticks from',
+        '# the tick after the call; it stays to the strike (call + tell) + hold. Painted colours, no flash. A telegraph',
+        f'# card (counted in the {TCAP} cap, removed by tele/clear). 1 card.',
+        f'execute if score #fkTN mb matches {TCAP - TSKIP}.. run return 0',
+        '$scoreboard players set #fkTell mb $(tell)',
+        'scoreboard players set #fkTEl mb 5',
+        '$scoreboard players set #fkThold mb $(hold)',
+        '$scoreboard players set #fkTr0 mb $(r0)',
+        '$scoreboard players set #fkTr mb $(r)',
+        '$scoreboard players set #fkTd mb $(grow)',
+        f'function {T}prep',
+        'execute if score #fkTr mb matches ..1 run scoreboard players set #fkTr mb 2',
+        'execute if score #fkTr0 mb matches ..0 run scoreboard players set #fkTr0 mb 1',
+        'execute if score #fkTr0 mb > #fkTr mb run scoreboard players operation #fkTr0 mb = #fkTr mb',
+        '# the card scale is the diameter (2 r)',
+        f'execute store result storage {STO} t.d float 0.2 run scoreboard players get #fkTr mb',
+        f'execute store result storage {STO} t.d0 float 0.2 run scoreboard players get #fkTr0 mb',
+        'execute if score #fkTd mb matches ..0 run scoreboard players set #fkTd mb 1',
+        'scoreboard players operation #fkDur mb = #fkTd mb',
+        f'data modify storage {STO} t.cw set value {WHITE}',
+        f'function {T}dark with storage {STO} t',
+    ])
+    W.w('tele/e/dark', [
+        '# Internal (macro, storage t): the dark disc, diameter d0 -> d over #fkDur ticks.',
+        *mk('erupt_disc', '~ ~0.025 ~', '$(d0)f,1f,$(d0)f', '$(d)f,1f,$(d)f', 'cw', flash=False),
     ])
     # ring
     W.w('tele/ring', [
@@ -2345,12 +2424,16 @@ def presets_dp(W):
                      f'execute if score #fkN mb matches {SOFT}.. run return 0']
         W.w(f'p/{name}', head + lines)
     W.w('p/e/wave_band', ['# Internal (macro, storage rlk:fgkit w): the 16 band segments of p/wave_band.'] + _p_e_wave_band())
+    W.w('p/e/rim_flare', ['# Internal (macro, storage rlk:fgkit fl: d = the ring\'s diameter): the two ripples of p/rim_flare.']
+        + _p_e_rim_flare())
 
 
 def preset_cards(name):
     """fx cards a preset spawns (card / cardx lines; the wave band's internal macro counts its 16 segments)"""
     if name == 'wave_band':
         return 16
+    if name == 'rim_flare':
+        return 2
     return sum(1 for l in PRESETS[name][2]() if f'{FN}card' in l)
 
 
@@ -2399,7 +2482,7 @@ DEMOS = {
         [(53 + 2 * k, 'line%d' % k, snd('missile_impact')) for k in range(5)]),
     'blast': ('coreup', 'coreup', [
         (0, 'coreup', fx('core_spark')), (0, 'coreup', snd('core_spark')), (5, 'coreup', fx('core_lift')),
-        (5, 'coreup', snd('core_lift')), (7, 'floor', fx('dark_disc', r0=3.5, r=12.0, grow=26, life=42)),
+        (5, 'coreup', snd('core_lift')), (3, 'floor', tele_rim(12.0, 45)), (7, 'floor', tele_dark(3.5, 12.0, 41, 26)),
         (29, 'coreup', fx('up_beam')), (29, 'coreup', snd('up_beam')), (36, 'floor', fx('rim_flare', r=12.0)),
         (41, 'floor', fx('column_down', h=H_CORE_UP)), (41, 'floor', snd('column_down')), (44, 'floor', fx('floor_hit')),
         (48, 'floor', fx('blast', r=12.0)), (48, 'floor', fx('rocks')), (48, 'floor', snd('blast')),
@@ -2422,13 +2505,13 @@ DEMOS = {
     'waves': ('field', 'wave', [
         (0, 'corefield', fx('wave_charge', t=24)), (0, 'corefield', snd('wave_charge')), (8, 'corefield', fx('wave_pulse')),
         (16, 'corefield', fx('wave_pulse')), (14, 'corefield', snd('wave_charge2')),
-        (0, 'floor', tele_wave(2.5, 21.0, 2.5, 24, 34)), (24, 'floor', fx('wave_beam', h=H_CORE_F)),
+        (24, 'floor', fx('wave_beam', h=H_CORE_F)),
         (24, 'floor', snd('wave_beam')), (25, 'floor', fx('wave_burst')), (25, 'floor', snd('wave_burst')),
         (23, 'floor', fx('wave_band', r0=25, r1=210, w=25, dur=34))] +
         [(24 + 3 * k, 'floor', fx('wave_fire', r=round(2.5 + 0.55 * 3 * k, 2))) for k in range(11)]),
     'erupt': ('field', 'field_erupt', [
-        (0, 'zone0', fx('erupt_tell')), (0, 'zone0', tele_disc(2.8, 15, 9)), (0, 'zone0', snd('erupt_tell')),
-        (0, 'zone1', fx('erupt_tell')), (0, 'zone1', tele_disc(2.8, 15, 9)),
+        (0, 'zone0', fx('erupt_tell')), (0, 'zone0', tele_dark(0.8, 2.8, 15, 6)), (0, 'zone0', snd('erupt_tell')),
+        (0, 'zone1', fx('erupt_tell')), (0, 'zone1', tele_dark(0.8, 2.8, 15, 6)),
         (15, 'zone0', fx('erupt')), (15, 'zone1', fx('erupt')), (15, 'zone0', snd('erupt')),
         (18, 'zone0', fx('debris')), (18, 'zone1', fx('debris')), (40, 'zone0', snd('debris_land'))]),
     'break': ('field', 'break', [
@@ -2491,6 +2574,8 @@ def tests(W):
                       'execute positioned ^6 ^ ^12 run ' + tele_sector(4.5, 90, 40, 9),
                       'execute positioned ^-6 ^ ^12 run ' + tele_sector(4.0, 45, 40, 0),
                       'execute positioned ^ ^ ^3 run ' + tele_line(6.0, 2.0, 40, 5),
+                      'execute positioned ^9 ^ ^5 run ' + tele_rim(2.8, 40),
+                      'execute positioned ^-9 ^ ^5 run ' + tele_dark(0.8, 2.8, 40, 6),
                       'execute positioned ^ ^ ^20 run ' + tele_wave(2.5, 12.0, 2.5, 40, 17),
                       'execute positioned ^-8 ^ ^20 run ' + tele_mline(0, 5.8, 0.8, 24, 5, hold=60, back=-2.8),
                       'scoreboard players set #fkMT mb 0',

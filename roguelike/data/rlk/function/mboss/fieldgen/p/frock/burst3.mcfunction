@@ -1,6 +1,6 @@
-# Burst 4 decal (@s = body): the arc point 51 deg off the bearing to the player (side #fq12S), at the
-# player's distance from the device (2.5-18 b), in the walk disc; the quiet hazard + the violet decal; the
-# slab, hidden until the strike.
+# Burst 4 (@s = body; it strikes in 10 t): the arc point 51 deg off the bearing to the player (side
+# #fq12S), at the player's distance from the device (2.5-18 b), in the walk disc; the quiet hazard (no decal:
+# telegraph rule 10-20), the resonate sound there; the slab, hidden until the strike.
 function rlk:mboss/mv/dist
 scoreboard players operation #fq12D mb = #mbDist mb
 execute if score #fq12D mb matches ..24 run scoreboard players set #fq12D mb 25
@@ -16,9 +16,8 @@ scoreboard players set #hzSfx mb 0
 scoreboard players set #hzVis mb 121
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzY1 mb 12
-execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p12w,limit=1] run function rlk:mboss/hz/disc {r:18,tell:10,dmg:70}
+execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p12w,limit=1] run function rlk:mboss/hz/disc {r:18,tell:10,dmg:105}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_fg_p12z
-execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p12w,limit=1] rotated ~ 0 run function rlk:mboss/fieldgen/fx/tele/disc {r:18,tell:10,el:9,hold:3}
 execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p12w,limit=1] run playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 0.3 1.4 0.1
 execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p12w,limit=1] run summon minecraft:item_display ~ ~0.45 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_fg_pat","rlk_mb_fg_p12","rlk_mb_fg_p12s","rlk_mb_fg_pnew"],teleport_duration:12}
 execute as @e[type=minecraft:item_display,tag=rlk_mb_fg_pnew] run function rlk:mboss/fieldgen/fx/prop/slab

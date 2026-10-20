@@ -7,8 +7,10 @@ Layout (every file is plain Python, stdlib only; copied from tools/mboss_butterf
     api.py       shared, stable: score names, damage coefficients, ranges, colours, the HUD glyph table (font
                  rlk:mboss_fg of the fx kit), the rig clip table (read from tools/mboss_fieldgen_rig_manifest.json, the
                  rig generator's; required), the Pattern record, the Gen writer helpers, the TL
-                 timeline and the shared 파쇄 helper (rocks) that pattern modules use, and the fx kit's call builders
+                 timeline and the shared 파쇄 helper (c_rocks) that pattern modules use, and the fx kit's call builders
                  (api.K; Gen.fx, snd, kcard, kprop, klook, khud, tele_*). Pattern authors read it; they do not edit it.
+                 Telegraph rule (10-20, user): a ground decal only where the reference footage shows one (C5, F1, the
+                 C1 / C2 slam's base flare); every other attack is read from the boss's motion and sound.
     core.py      everything that is not a pattern: the 17 framework hooks, the state machine (entrance, the cruise
                  rotation with its range-band bag, the field trigger, the field sequence: warp, 「인력 충격파」 x3, field
                  patterns, closing waves, pack-up), the 20-hit break meter (counting rules, HUD, crack stages), the

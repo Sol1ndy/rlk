@@ -1,5 +1,4 @@
 # C6 파쇄 (clip tower_throw; @s = body): bursts [55, 61, 67, 73, 79, 85, 91, 97], throws [100, 108, 116, 124, 132], revert 140.
-scoreboard players set #fq6Pz mb 0
 scoreboard players set #fq6SH mb 0
 execute store result score #fq6S mb run random value 0..1
 execute if score #fq6S mb matches 0 run scoreboard players set #fq6S mb -1
