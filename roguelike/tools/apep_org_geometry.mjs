@@ -9,8 +9,8 @@
 // are authored in the object frame and shifted by their joint here; frame 'joint' models are authored round the joint.
 // Element rotations stay single-axis on the 22.5 degree grid.
 import {abox, cardZ, cardX, cardY, faceEl, faceOfDir, lathe, annulus, checkBounds, r4, rotA} from './mboss_model_lib.mjs';
-import {loft, slab, crossCards, toUnits, mirrorX, retex, rockBox, stroke} from './mboss_shape_lib.mjs';
-import {SH, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, stalkSkin, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01, guardFacetPx, nestFacetPx, destrFacetPx, predSolidPx, predGlassPx, RIB, nurtRibPx, nurtHoodPx, hoodKeep, hoodNear} from './apep_org_paint.mjs';
+import {loft, slab, crossCards, toUnits, mirrorX, rockBox, stroke} from './mboss_shape_lib.mjs';
+import {SH, addSprite, skinSprite, stalkSkin, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01, guardFacetPx, nestFacetPx, destrFacetPx, predSolidPx, predGlassPx, RIB, nurtRibPx, nurtHoodPx, hoodKeep, hoodNear} from './apep_org_paint.mjs';
 
 export {checkBounds};
 export const RIDE_Y = 2.0;           // the husk passenger point above its feet (org manifest passenger.ride_y)
@@ -25,9 +25,6 @@ const shift = (els, [dx, dy, dz]) => els.map(e => {
 const tint = els => els.map(e => ({...e, faces: Object.fromEntries(Object.entries(e.faces).map(([k, f]) => [k, {...f, tintindex: 0}]))}));
 // unshaded faces (no game face shading): the painted tones carry the light, so loft ledges blend into the surface
 const flat = els => els.map(e => ({...e, shade: false}));
-// stations from profile functions: a0..a1 in n steps; r(a) number or [e1+, e2+, e1-, e2-]; c(a) -> [c1, c2]
-const prof = (a0, a1, n, r, c = null, box = 0) => Array.from({length: n + 1}, (_, i) => { const a = a0 + (a1 - a0) * i / n; return {a, r: r(a), c: c ? c(a) : [0, 0], box}; });
-const stops = (as, rs, cs = null) => as.map((a, i) => ({a, r: rs[i], c: cs ? cs[i] : [0, 0]}));
 // a two-sided card in an axis-aligned plane: corner P0 (blocks), edge vectors du (sprite s) and dv (sprite t, t = 0 at
 // P0), both axis-aligned; rot = one element rotation [axis, deg, pivot]. Any in-plane sprite orientation (solveUV).
 function quad(sprite, P0, du, dv, {rot, uvr = [0, 0, 1, 1], tint: tn = false} = {}) {
@@ -84,16 +81,6 @@ function mirrorZ(els) {
     return out;
   });
 }
-// a slab of a shared shape standing in the radial plane at azimuth th (shape u = the distance from the axis, v = height):
-// quadrants 90 / 180 are built directly (u = +X / +Z), 270 and 0 as mirror images of 90 and 180
-function radialSlab(name, sprite, th, opt = {}) {
-  th = ((th % 360) + 360) % 360;
-  const [b] = baseAz(th);
-  if (b === 270) return mirrorX(radialSlab(name, sprite, 360 - th, opt));
-  if (b === 0) return mirrorZ(radialSlab(name, sprite, (540 - th) % 360, opt));
-  const [, g] = baseAz(th);
-  return shapeSlab(name, sprite, b === 90 ? 'z' : 'x', 0, {...opt, rot: g ? ['y', g, [0, 0, 0]] : null});
-}
 // a 3-box rounded orb (glow balls): reads round at the sizes used here
 const orb = (c, r, tex) => [abox([c[0] - r, c[1] - r * .62, c[2] - r * .62], [c[0] + r, c[1] + r * .62, c[2] + r * .62], tex),
   abox([c[0] - r * .62, c[1] - r, c[2] - r * .62], [c[0] + r * .62, c[1] + r, c[2] + r * .62], tex), abox([c[0] - r * .62, c[1] - r * .62, c[2] - r], [c[0] + r * .62, c[1] + r * .62, c[2] + r], tex)];
@@ -117,33 +104,6 @@ function spike(sprite, P, dir, L, w, rot) {
   return [mk(o1), mk(o2)];
 }
 
-// a vertical two-sided panel centred at c, w wide along the azimuth phi (deg: 0 = across X, facing -Z; the 22.5 grid),
-// h tall; sprite rows v0..v1 top to bottom (twisted ribbons: one panel per segment, phi stepping round)
-function vpanel(sprite, c, w, h, phi, v0 = 0, v1 = 1, tn = false) {
-  phi = Math.round(phi / 22.5) * 22.5; phi = ((phi % 180) + 270) % 180 - 90;    // the grid, -90 .. 90
-  const base = Math.abs(phi) <= 45 ? 0 : 90, g = base ? (phi > 0 ? phi - 90 : phi + 90) : phi;
-  const P0 = base ? [c[0], c[1] + h / 2, c[2] - w / 2] : [c[0] - w / 2, c[1] + h / 2, c[2]], du = base ? [0, 0, w] : [w, 0, 0];
-  return quad(sprite, P0, du, [0, -h, 0], {rot: g ? ['y', g, c] : undefined, uvr: [0, v0, 1, v1], tint: tn});
-}
-// a two-sided strip from A to B (points in the Y-Z plane at x = c0, [y, z]), W wide across X: the strip direction is
-// snapped to the 22.5 degree grid (one rotation about X round its middle); sprite rows v0 (at A) .. v1 (at B)
-function stripYZ(sprite, A, B, W, v0, v1, {x = 0, ext = .02} = {}) {
-  const dy = B[0] - A[0], dz = B[1] - A[1], L = Math.hypot(dy, dz) + 2 * ext, t = [0, dy / Math.hypot(dy, dz), dz / Math.hypot(dy, dz)];
-  let best = null;
-  for (const d of [[0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]) for (const g of [0, 22.5, -22.5, 45, -45]) {
-    const r = rotA('x', g, d), e = Math.hypot(r[1] - t[1], r[2] - t[2]);
-    if (!best || e < best.e - 1e-9 || (Math.abs(e - best.e) < 1e-9 && Math.abs(g) < Math.abs(best.g))) best = {d, g, e};
-  }
-  const m = [x, (A[0] + B[0]) / 2, (A[1] + B[1]) / 2], dv = best.d.map(v => v * L);
-  const P0 = [m[0] - W / 2, m[1] - dv[1] / 2, m[2] - dv[2] / 2];
-  return quad(sprite, P0, [W, 0, 0], dv, {rot: best.g ? ['x', best.g, m] : undefined, uvr: [0, v0, 1, v1]});
-}
-// a polyline of strips (pts [y, z]), the sprite running along its whole length
-function stripChain(sprite, pts, W, opt = {}) {
-  const seg = pts.slice(1).map((p, i) => Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1])), tot = seg.reduce((a, b) => a + b, 0);
-  let acc = 0;
-  return seg.map((l, i) => { const e = stripYZ(sprite, pts[i], pts[i + 1], W, acc / tot, (acc + l) / tot, opt); acc += l; return e; });
-}
 
 // a knobbly root: square boxes along a polyline P (3D points) lying in a plane x = const ('yz', boxes turned about X) or
 // z = const ('xy', turned about Z); each box follows its segment's direction snapped to the 22.5 degree grid, overlapping
@@ -229,34 +189,7 @@ function rootLimb(sprite, plane, c, P0, r, {side = 'he_rootS', k = .85, sub = 3,
   }
   return els;
 }
-// points of a root in a plane: 2D [u, v] -> 3D (xy: [u, v, c]; yz: [c, u, v]... u along the plane's first axis)
-const inPlane = (plane, c, pts) => pts.map(([a, b]) => (plane === 'xy' ? [a, b, c] : [c, a, b]));
 
-// a lit loft (apep_org_paint.mjs PROF): the stations of the profile, the facets on its wrap (u squeezed into the facet
-// part of the sprite), every ledge and cap retextured to the swatch of its light factor litK(smooth normal, face
-// normal) at its axial band: the steps shade like one smooth surface
-const LEDGE_FACES = {y: ['up', 'down'], z: ['north', 'south'], x: ['east', 'west']};
-const FACE_NY = {up: 1, down: -1};
-function litLoft(name, {caps = '', seed = 0, skip, tint: tn = false, stations} = {}) {
-  const p = PROF[name], F = LFR[p.axis], fw = facetFrac(name), g = p.g ?? .8;
-  // inscribed: the section polygons' vertices on the profile (the facets inside it), so the silhouette cards cover
-  // the stair notches and nothing pokes out past the smooth outline
-  const ins = p.inscribe ? Math.cos(Math.PI / p.n) : 1;
-  const st = (stations || p.as).map(a => { const s = p.sec(a), r = Array.isArray(s.r) ? s.r.map(x => x * ins) : s.r * ins; return {a, ...s, r}; });
-  const els = loft(p.axis, st, {n: p.n, tex: name, ledgeTex: name, caps, seed, skip, tint: tn});
-  for (const e of els) {
-    const [fname, face] = Object.entries(e.faces)[0];
-    if (!LEDGE_FACES[p.axis].includes(fname)) { face.uv = [face.uv[0] * fw, face.uv[1], face.uv[2] * fw, face.uv[3]].map(r4); continue; }
-    const m = [0, 1, 2].map(i => (e.from[i] + e.to[i]) / 2), c = [8 - m[0], m[1] - 8, m[2] - 8];
-    let P = c;
-    if (e.rotation) { const o = e.rotation.origin, O = [8 - o[0], o[1] - 8, o[2] - 8], deg = e.rotation.axis === 'x' ? e.rotation.angle : -e.rotation.angle;
-      P = rotA(e.rotation.axis, deg, c.map((x, i) => x - O[i])).map((x, i) => x + O[i]); }
-    const dot = v => P[0] * v[0] + P[1] * v[1] + P[2] * v[2], a = dot(F.A), cc = p.sec(a).c || [0, 0];
-    const th = Math.atan2(dot(F.e2) - cc[1], dot(F.e1) - cc[0]) / D2R;
-    face.uv = swatchUV(name, litK(smoothNy(p, th, a), FACE_NY[fname] || 0, g), a);
-  }
-  return els;
-}
 
 // ================================================================================================================
 // facet bodies: convex polyhedra whose face normals sit on the rotation grid (azimuths 90 k in a display's frame,
@@ -416,23 +349,6 @@ export const revSupport = (rf, a0, a1, axis = 'y', yc = 0) => n => {
 // ================================================================================================================
 // 기본 basic: bell (melee, walks) / bag (ranged, lying), a petal crown at the bag neck, the 수호 shield overlay
 // ================================================================================================================
-// silhouette cards of an inscribed 8-facet lit 'y' loft (PROF card): two-sided cards through the axis along the four
-// vertex lines (22.5 + 45k degrees, on the rotation grid), each the smooth profile (two mirrored halves of the card
-// region). The vertices lie on the profile, so a card never pokes through a facet; seen face-on the cards fill the
-// stair notches of the stepped outline, so the silhouette reads smooth from any side
-function silCards(name, {tint: tn = false} = {}) {
-  const p = PROF[name], a0 = Math.min(...p.as), a1 = Math.max(...p.as), R = p.card.R, uv = cardUV(name), els = [];
-  if (p.n !== 8 || !p.inscribe) throw new Error('silCards: inscribed 8-facet lofts only');
-  for (let k = 0; k < 4; k++) {
-    const psi = 22.5 + k * 45, base = Math.round(psi / 90) * 90, g = psi - base;
-    const d = base % 180 === 0 ? [1, 0, 0] : [0, 0, 1];
-    for (const sg of [1, -1]) {
-      const e = quad(name, [0, a1, 0], d.map(x => x * sg * R), [0, a0 - a1, 0], {rot: g ? ['y', g, [0, 0, 0]] : undefined, uvr: [uv[0] / 16, 0, 1, 1], tint: tn});
-      els.push(e);
-    }
-  }
-  return els;
-}
 // bell (1.15 b, 1.35 with the stem; v4 f186 / f2310 / v3 f900): a facet body round the smooth bell (bellR: an egg on its
 // narrow end, widest at two thirds of its height, a tall round top): 8 azimuths x elevations -22.5 .. 67.5 + the top,
 // the dark underside at y .14; the skirt is two more rings of 8 faces: the hanging lobes (elevation 22.5, y .32 -> .1,

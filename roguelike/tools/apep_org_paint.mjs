@@ -16,7 +16,6 @@ export {C, clamp, smooth, mix};
 export const spriteId = name => 'rlk:mboss/apep_om/' + name;
 const ramp = list => { const cs = list.map(C); return t => { const x = clamp(t) * (cs.length - 1), i = Math.min(cs.length - 2, Math.floor(x)); return mix(cs[i], cs[i + 1], x - i); }; };
 const A = (c, a) => [c[0], c[1], c[2], Math.round(clamp(a) * 255)];
-const lift = (c, k) => mix(c, [255, 255, 250, 255], clamp(k));
 const sink = (c, k) => mix(c, [14, 20, 16, 255], clamp(k));
 const N = {a: fbm(11), b: fbm(23), c: fbm(37), d: fbm(41), e: fbm(53)};
 const h1 = x => { const s = Math.sin(x * 127.1) * 43758.5453; return s - Math.floor(s); };
@@ -44,92 +43,6 @@ export const PAL = {
   gold: ramp(['#FFF6C2', '#F9E48A', '#EDCB5A', '#D6AC3C', '#B08A2C', '#7C601E']),
   black: ramp(['#4A4E46', '#34382F', '#24271F', '#181A14', '#0E100C']),
 };
-
-// ---- the item-display light and light-corrected lofts -------------------------------------------------------------
-// (the Azhdaha R2 torso method, azhdaha_body.mjs): F(ny) = the item-display light (two world-fixed lights, ambient 0.4;
-// minecraft entity lighting) averaged over the yaw, for a unit normal with up component ny. A stepped loft's vertical
-// facets get F(0) and its ledges F(+-1) (up ledges 1.6x brighter than the facets: the terraced bands of AP-ORG1). A lit
-// loft paints every facet and ledge albedo x B(ny of the smooth surface there) / F(ny of the face), B = the smooth
-// shading at contrast g (1 = full), so the steps shade like one smooth body: no light stripes, a lit top, a dim belly.
-const nrm3 = v => { const l = Math.hypot(...v); return v.map(x => x / l); };
-const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-const ML0 = nrm3([.2, 1, -.7]), ML1 = nrm3([-.2, 1, .7]);
-const mcShade = n => Math.min(1, .6 * (Math.max(0, dot3(n, ML0)) + Math.max(0, dot3(n, ML1))) + .4);
-const FLT = Array.from({length: 201}, (_, i) => { const ny = -1 + i / 100, h = Math.sqrt(Math.max(0, 1 - ny * ny)); let s = 0;
-  for (let j = 0; j < 72; j++) { const a = j * Math.PI / 36; s += mcShade([h * Math.cos(a), ny, h * Math.sin(a)]); } return s / 72; });
-export const FL = ny => { const x = (Math.max(-1, Math.min(1, ny)) + 1) * 100, i = Math.min(199, Math.floor(x)); return FLT[i] + (FLT[i + 1] - FLT[i]) * (x - i); };
-export const litB = (ny, g) => FL(0) * (1 + g * (FL(ny) / FL(0) - 1));
-export const litK = (nyS, nyF, g) => litB(nyS, g) / FL(nyF);
-// loft frames (mboss_shape_lib): A along the loft, theta measured from e1 toward e2
-export const LFR = {z: {A: [0, 0, 1], e1: [1, 0, 0], e2: [0, 1, 0]}, y: {A: [0, 1, 0], e1: [1, 0, 0], e2: [0, 0, -1]}, x: {A: [1, 0, 0], e1: [0, 0, -1], e2: [0, 1, 0]}};
-const suppSec = (st, th) => { const c = Math.cos(th * D2R_), s = Math.sin(th * D2R_), r = Array.isArray(st.r) ? st.r : [st.r, st.r, st.r, st.r];
-  const a = c >= 0 ? r[0] : r[2], b = s >= 0 ? r[1] : r[3], ell = Math.hypot(a * c, b * s); return ell + (st.box || 0) * (Math.abs(a * c) + Math.abs(b * s) - ell); };
-const D2R_ = Math.PI / 180;
-// Lit loft profiles: name -> {axis, n, sec(a) -> {r, c, box}, as (station positions), g (contrast), W, H (facet wrap px),
-// albedo(u, v) (u round the facets 0..1, v along the wrap 0..1: from the top for 'y' lofts, from a0 for 'z' / 'x'),
-// owner, translucent}. The sprite is the facet wrap (W px) plus a swatch column (SWW px) of 4 px cells: the ledge and
-// cap colours, albedo of a v band x a quantised K (KQ levels).
-export const PROF = {};
-export const SWW = 16, KQ = {n: 16, k0: .4, dk: .08};
-const profV = (p, a) => { const a0 = Math.min(...p.as), a1 = Math.max(...p.as); return p.axis === 'y' ? (a1 - a) / (a1 - a0) : (a - a0) / (a1 - a0); };
-const profA = (p, v) => { const a0 = Math.min(...p.as), a1 = Math.max(...p.as); return p.axis === 'y' ? a1 - v * (a1 - a0) : a0 + v * (a1 - a0); };
-// the support distance (with the centre offset) of the smooth surface at azimuth th, axial a
-const hAt = (p, th, a) => { const s = p.sec(a), F = LFR[p.axis], c = s.c || [0, 0]; return suppSec(s, th) + c[0] * Math.cos(th * D2R_) + c[1] * Math.sin(th * D2R_); };
-export function smoothNy(p, th, a) {
-  const F = LFR[p.axis], da = .02 * (Math.max(...p.as) - Math.min(...p.as)) + 1e-3;
-  const lo = Math.min(...p.as), hi = Math.max(...p.as), a0 = Math.max(lo, a - da), a1 = Math.min(hi, a + da);
-  const ha = (hAt(p, th, a1) - hAt(p, th, a0)) / Math.max(1e-6, a1 - a0);
-  const ry = F.e1[1] * Math.cos(th * D2R_) + F.e2[1] * Math.sin(th * D2R_);
-  return (ry - ha * F.A[1]) / Math.hypot(1, ha);
-}
-export const facetNy = (p, th) => { const F = LFR[p.axis]; return F.e1[1] * Math.cos(th * D2R_) + F.e2[1] * Math.sin(th * D2R_); };
-const kIndex = K => Math.max(0, Math.min(KQ.n - 1, Math.round((K - KQ.k0) / KQ.dk)));
-const nBands = p => Math.max(1, Math.floor((SWW / 4) * (p.H / 4) / KQ.n));
-// the swatch cell UV (0..16 over the whole sprite) for a ledge / cap with factor K at axial a
-export function swatchUV(name, K, a) {
-  const p = PROF[name], nb = nBands(p), iv = Math.max(0, Math.min(nb - 1, Math.floor(profV(p, a) * nb))), idx = iv * KQ.n + kIndex(K);
-  const cols = SWW / 4, cx = idx % cols, cy = Math.floor(idx / cols), W = spriteW(p);
-  const u0 = (p.W + cx * 4 + 1) / W * 16, v0 = (cy * 4 + 1) / p.H * 16;
-  return [u0, v0, u0 + 2 / W * 16, v0 + 2 / p.H * 16].map(x => Math.round(x * 1e4) / 1e4);
-}
-export const spriteW = p => p.W + SWW + (p.card ? p.card.P : 0);
-export const facetFrac = name => PROF[name].W / spriteW(PROF[name]);
-// the profile card region (silhouette cards, y lofts): u 0..1 = the distance 0 .. card.R from the axis, v as the wrap
-export const cardUV = name => { const p = PROF[name], W = spriteW(p); return [(p.W + SWW) / W * 16, 0, 16, 16]; };
-const clampRGB = (c, k) => [Math.min(255, c[0] * k), Math.min(255, c[1] * k), Math.min(255, c[2] * k), c[3] ?? 255];
-// the card's half width: the polyline through the outer corners of the stepped outline (a section's vertex radius is
-// the mean of its two station radii; a station's corner is the larger of the two sections there)
-function cardR(p, a) {
-  const as = p.as, rs = as.map(x => { const r = p.sec(x).r; return Array.isArray(r) ? r[0] : r; }), vr = as.slice(1).map((x, i) => (rs[i] + rs[i + 1]) / 2);
-  const cs = as.map((x, i) => Math.max(i > 0 ? vr[i - 1] : 0, i < vr.length ? vr[i] : 0));
-  const lo = as[0] < as[as.length - 1];
-  for (let i = 0; i < as.length - 1; i++) { const x0 = as[i], x1 = as[i + 1]; if ((a - x0) * (a - x1) <= 0) { const u = (a - x0) / (x1 - x0 || 1); return cs[i] + (cs[i + 1] - cs[i]) * u; } }
-  return 0;
-}
-function litPainter(name) {
-  const p = PROF[name], W = spriteW(p), fw = p.W / W, sw = (p.W + SWW) / W, nb = nBands(p), g = p.g ?? .8, pre = p.pre ?? 1;
-  const meanBand = Array.from({length: nb}, (_, iv) => { const v = (iv + .5) / nb, acc = [0, 0, 0, 0]; for (let j = 0; j < 16; j++) { const c = p.albedo((j + .5) / 16, v); for (let q = 0; q < 4; q++) acc[q] += (c[q] ?? 255) / 16; } return acc; });
-  return (s, t) => {
-    if (s < fw) {
-      const u = s / fw, th = (u * p.n - .5) * 360 / p.n, k = Math.floor(u * p.n), thF = k * 360 / p.n, a = profA(p, t);
-      const c = p.albedo(u, t);
-      if (!c || c[3] === 0) return c || TRANSPARENT;
-      return clampRGB(c, pre * litK(smoothNy(p, th, a), facetNy(p, thF), g));
-    }
-    if (s >= sw) {
-      // the silhouette card: inside the smooth profile (half width at the card's azimuth = the support there), the
-      // colour of a facet at the silhouette, a touch darker (the soft grey outline of the reference bells)
-      const x = (s - sw) / (1 - sw) * p.card.R, a = profA(p, t), r = cardR(p, a);
-      if (x > r) return TRANSPARENT;
-      const c = p.albedo(p.card.u ?? .06, t);
-      if (!c || c[3] === 0) return TRANSPARENT;
-      return clampRGB(c, pre * (p.card.k ?? .92) * litK(smoothNy(p, p.card.th ?? 0, a), 0, g));
-    }
-    const px = Math.floor((s - fw) * W), py = Math.floor(t * p.H), idx = Math.floor(py / 4) * (SWW / 4) + Math.floor(px / 4), iv = Math.floor(idx / KQ.n), iK = idx % KQ.n;
-    if (iv >= nb) return meanBand[nb - 1];
-    return clampRGB(meanBand[iv], pre * (KQ.k0 + iK * KQ.dk));
-  };
-}
 
 // ---- sprite helpers -------------------------------------------------------------------------------------------------
 export const r16 = x => Math.min(512, Math.max(16, Math.ceil(x / 16) * 16));
@@ -212,33 +125,6 @@ export const SH = {
 };
 
 // ---- tile / wrap sprites (loft facets) ------------------------------------------------------------------------------
-// bell wrap (u around 0..1, v top 0 .. bottom 1 of the loft): large faint facet diamonds (model_p3 §9: "faint large facets")
-function bellPx(u, v) {
-  const x = u * 6, y = v * 2.4, a = Math.floor(x + y), b = Math.floor(x - y), fa = (x + y) - a, fb = (x - y) - b;
-  const id = h1(a * 7.3 + b * 3.1);
-  let t = .08 + .12 * id + .26 * smooth(.25, 1, v) + .04 * (N.a(u * 9, v * 9) - .5);
-  const seam = Math.min(fa, 1 - fa, fb, 1 - fb);
-  if (seam < .04) t += .06 * (1 - seam / .04);
-  let c = PAL.bell(t);
-  c = mix(c, PAL.bell(0), .25 * (1 - smooth(0, .35, v)));                  // milky top
-  if (v > .96) c = mix(c, PAL.bell(.85), .6);                             // rim line at the bottom
-  return c;
-}
-// the bag wrap (loft along z: v from the back 0 .. the neck 1): the same facets + gathered folds toward the neck
-function bagPx(u, v) {     // v 0 = the neck .. 1 = the round back
-  let c = bellPx(u, .1 + v * .85);
-  const fold = Math.abs(Math.sin(u * Math.PI * 10 + v * 2));
-  if (v < .3) c = mix(c, PAL.bell(.6), .35 * smooth(.3, 0, v) * (1 - fold));
-  return c;
-}
-const tealPx = (u, v, k = 0) => { let c = PAL.teal(.35 + .3 * (N.b(u * 6, v * 12) - .5) + k); const g = Math.abs(Math.sin(u * Math.PI * 8)); if (g < .08) c = sink(c, .25); return c; };
-// a ribbon strap with pale rims along both edges (u across 0..1)
-const ribbonPx = (u, v, R = PAL.teal, rim = PAL.pale, rw = .14, ra = .9) => {
-  const e = Math.min(u, 1 - u);
-  let c = R(.35 + .18 * (N.c(u * 4, v * 20) - .5) + .1 * Math.sin(v * 9));
-  if (e < rw) c = mix(c, rim(.1 + .2 * e / rw), ra * smooth(rw, rw * .35, e));
-  return c;
-};
 // glow ball (u, v over the sprite; r 0..1 from the centre)
 // a glow disc (glowBall): a white-hot core, the colour ramp outward, a slightly darker rim (cutout: no soft alpha)
 const glowPx = (R, core = .35) => (u, v) => { const r = Math.hypot(u - .5, v - .5) * 2; if (r > .98) return TRANSPARENT;
@@ -254,20 +140,6 @@ const shapeSprite = (name, shape, ppb, owner, fn, {plane = 'z', translucent = fa
   const {rect} = shape, w = Math.max(min, r16((rect.u1 - rect.u0) * ppb)), h = Math.max(min, r16((rect.v1 - rect.v0) * ppb));
   add(name, w, h, onRect(rect, (u, v) => (shape.sd(u, v) > 0 ? null : fn(u, v)), plane), owner, translucent);
 };
-// a lit loft profile and its sprite (facet wrap + swatch column); the geometry builds the loft with litLoft(name)
-function litProfile(name, p) {
-  PROF[name] = p;
-  registerWrap(name);
-  add(name, spriteW(p), p.H, litPainter(name), p.owner, !!p.translucent);
-}
-// stations sampled along a profile with steps bounded in both the axis (da) and the radius (dr): the stair outline of
-// a dome then has even steps (no wide terraces where the surface turns flat)
-export function evenStations(a0, a1, rOf, da, dr, n0 = 400) {
-  const out = [a0]; let last = a0, lr = rOf(a0);
-  for (let i = 1; i <= n0; i++) { const a = a0 + (a1 - a0) * i / n0, r = rOf(a); if (Math.abs(a - last) >= da || Math.abs(r - lr) >= dr) { out.push(a); last = a; lr = r; } }
-  if (Math.abs(out[out.length - 1] - a1) > 1e-6) { if (Math.abs(out[out.length - 1] - a1) < da * .35) out.pop(); out.push(a1); }
-  return out.map(x => Math.round(x * 1e4) / 1e4);
-}
 
 // 기본 basic (14 k): the bell and the bag are lit lofts (profiles shared with the geometry)
 // the bell (v4 f186 / f2310: a pale ghost-bell 1.15 b, the sides nearly straight, widest low, a round top): the dome
