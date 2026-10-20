@@ -35,3 +35,4 @@ execute rotated ~318 0 positioned ^ ^0.76 ^4.08 run particle minecraft:dust{colo
 execute rotated ~315 0 positioned ^ ^2.165 ^5.04 run particle minecraft:dust{color:[0.89f,0.52f,0.99f],scale:1.2} ~ ~ ~ 0.05 0.05 0.05 0 1 force @a[tag=player]
 particle minecraft:dust{color:[1f,1f,0.99f],scale:2.6} ~ ~1 ~ 0.5 1.2 0.5 0 30 force @a[tag=player]
 particle minecraft:end_rod ~ ~1 ~ 0.3 0.6 0.3 0.25 14 force @a[tag=player]
+function rlk:mboss/guardian/p/fail/ring3

@@ -2,23 +2,23 @@
 
 Sources: patterns.md §3-§4, m1.md 0-9.5 s, plan.md K2/K4/K16/K17/K23, critic C23. Clips `thrust`
 (79 t) and `javelin` (67 t), both played with ~25 % shorter wind-ups (guardian_clips.mjs RETIME; the
-authored source ticks of the fx below go through api.rt); every hit lands on the clip's event tick and
-is telegraphed >= 10 t. Hit areas are x1.2 the source sizes (user tuning, plan.md).
+authored source ticks of the fx below go through api.rt); every hit lands on the clip's event tick, >= 10 t
+after a readable tell of the clip (12 t for thrust 2). Hit areas are x1.2 the source sizes (user tuning, plan.md).
 
 P1 공간 찌르기  (melee / mid; played ticks, authored ones in brackets)
   0-10   wind-up, she tracks the player; a gold lightning streak grows along the shaft from 3 and
          reaches past the blade by 11 (#FCF5AE / #CDB37E / #9D8650); rising shimmer from 5.
-  11 [16] aim locked on the player (T). A gold lane decal (9.3 x 2.9 b, filling up for 10 t) starts at
-         her coil spot C, 7.5 b behind T on the line T -> her, so after the 3 b lunge the rig's
-         spear tip (4.46 b ahead of her at the hit) lands on T. She turns 5.7 deg left so the
-         tip, held right of her centre line, runs down the lane.
+  11 [16] aim locked on the player (T): she stops turning. The 9.3 x 2.9 b lane starts at her coil spot
+         C, 7.5 b behind T on the line T -> her, so after the 3 b lunge the rig's spear tip (4.46 b
+         ahead of her at the hit) lands on T. She turns 5.7 deg left so the tip, held right of her
+         centre line, runs down the lane.
   14     white-gold glint at the tip; 15-16 lens streak through the spear.
   15-19  coil: she drifts back to C;  19 -> 21 lunge 3 b;  21 [28] HIT 1 (100 %): burst sphere r 1.8,
          shock ring, gold / dark cubes, rock debris.
   31-33  she rises (rig) and backs off;  34 the second aim is locked on the player (U) and she flies
          to D, 6.6 b from U and 75 deg round it (the other side if that is outside the arena), so
-         the second thrust comes from a new direction (PDF "전방위", C23). An 8.4 x 2.7 b lane from D
-         through U fills for 12 t.
+         the second thrust comes from a new direction (PDF "전방위", C23), facing U while she glides.
+         An 8.4 x 2.7 b lane from D through U strikes 12 t later.
   40-43  dive charge;  44 -> 46 dash 6 b along the lane;  46 [58] HIT 2 (115 %, knockback 4 along
          the lane, K16); the dive streak lingers to 52.  53 landing, 60-74 flourish and twirl, 79 idle.
 
@@ -27,9 +27,9 @@ P2 공간 투창  (mid / far)
          vanishes in a gold slash flash.
   10-19  the glyph: a gold concave 4-point star (1.2 -> 0.55 b, spinning) at her right-front, chest
          height (L), compressing into a spinning ring 16-20; glittery chimes.
-  17 [24] aim locked (K23 + K4: 10 t before the hit, 3 t before the beam): a 1.2 b lane from L to the
-         arena edge fills for 10 t.
-  20     vertical white-gold beam through the glyph (the last telegraph) and a larger re-flash.
+  17 [24] aim locked (K23 + K4: 10 t before the hit, 3 t before the beam): she stops turning; a 1.2 b
+         lane from L to the arena edge strikes 10 t later.
+  20     vertical white-gold beam through the glyph (the last tell before the throw) and a larger re-flash.
   22     the spear re-forms in her raised hand;  26 release: white-gold explosion at L, launch disc
          facing the lane, the attack line (voice/attack).
   27 [36] HIT (130 %, resolved over 27-28): the lane strikes at once; the visual spear (rig
@@ -38,9 +38,13 @@ P2 공간 투창  (mid / far)
   49     it flies back butt first to her hand (50-52), stands up and is caught overhead at 54 (the rig
          spear returns); 57-61 twirl, 67 idle.
 
-Telegraph decals: block_display lanes owned by these patterns (hz_vis ids 11, 12, 21; the
-framework particles are switched off with #hzQuiet): a translucent gold fill, gold rims and an
-amber bar that grows to the far end exactly when the hit lands, then a white flash.
+Telegraph rule (10-20, plan.md): the footage shows no ground marker before these hits (m1 0.20-3.15 s:
+the streak on the spear, the glint, the hover and dive; m1 6.00-7.65 s: the air glyph, the vertical beam,
+the launch disc), so the three lanes have no ground telegraph: quiet hazards (#hzQuiet 1: no framework
+outline, no strike flash) and no module decal. The player reads the wind-up pose and its sounds, the
+streak and glint on the spear (P1), the rise and the glide to the dive spot (P1 thrust 2), the glyph and
+the beam in the air (P2); each hit shows its area with its own impact fx (hit_fx, the dive streak, the
+javelin's lane streak and debris).
 Spear-relative fx use p12_spear.json (the rig's spear grip / tip / butt per clip tick, measured by
 p12_measure.py from the rig generator's --debug-dp poses).
 
@@ -75,7 +79,7 @@ SAFE_R = 18.5            # mv/ok: the body stays inside this disc around the are
 WALK_R = 21              # the javelin lane runs to this radius (the wall ring starts at 22)
 # User tuning (plan.md "공격 선딜 좀 짧게 하고 공격 범위를 좀 늘려봐"): the clips play with ~25 % shorter wind-ups
 # (guardian_clips.mjs RETIME; authored ticks below go through rt()) and every hit area is ~20 % larger.
-TELL1, TELL2, TELL_JAV = 10, 12, 10     # lane telegraphs (were 12, 16, 12; floor 10 t)
+TELL1, TELL2, TELL_JAV = 10, 12, 10     # aim lock -> hit (were 12, 16, 12; floor 10 t); no ground telegraph (10-20)
 AREA = 1.2              # linear scale of the hit areas and their impact fx
 TIP_R = 1.8             # the burst sphere at the spear tip past the target (was 1.5)
 JAV_W = 1.2             # javelin lane width (was 1.0; the framework's lane widths are whole tenths)
@@ -260,74 +264,6 @@ def cubes(tl, pid, name, t, cubes_spec, anchor, life, cond=None):
 
 
 # ---------------------------------------------------------------------------------------------
-# lane decals (hz_vis): translucent gold fill, gold rims and caps, an amber bar that grows to the
-# far end over the tell, a white flash on the strike, gone with the hazard.
-def decal_parts(pid, vis, w, length):
-    """Summon lines (as the hazard marker, at it, rotated as it) for a w x length lane; length None =
-    set later from #gp2Len (tenths). Every part gets rlk_mb_gd_dnew for the shared orientation tp."""
-    base = ('rlk_room', 'rlk_mb_aux', 'rlk_mb_hzfx', f'rlk_mb_gd_p{pid}', f'rlk_mb_gd_p{pid}d', 'rlk_mb_gd_dnew')
-    ln = length if length is not None else 1.0
-    hw = w / 2
-    parts = [
-        ('fill', 'minecraft:yellow_stained_glass', (-hw, 0.012, 0.0), (w, 0.02, ln)),
-        ('rim', 'minecraft:gold_block', (hw - 0.04, 0.008, 0.0), (0.08, 0.045, ln)),
-        ('rim', 'minecraft:gold_block', (-hw - 0.04, 0.008, 0.0), (0.08, 0.045, ln)),
-        ('cap0', 'minecraft:gold_block', (-hw - 0.04, 0.008, 0.0), (w + 0.08, 0.045, 0.08)),
-        ('cap1', 'minecraft:gold_block', (-hw - 0.04, 0.008, ln - 0.08), (w + 0.08, 0.045, 0.08)),
-        ('bar', 'minecraft:orange_stained_glass', (-hw + 0.06, 0.034, 0.0), (w - 0.12, 0.012, 0.02)),
-    ]
-    out = []
-    for role, block, tr, sc in parts:
-        nbt = (f'{{Tags:{tags(*base, f"rlk_mb_gd_p{pid}{role}")},block_state:{{id:"{block}"}},'
-               f'brightness:{{sky:15,block:15}},view_range:1.5f,shadow_radius:0f,teleport_duration:0,'
-               f'interpolation_duration:0,transformation:{tf(tr, (0, 0, 0, 1), sc)}}}')
-        out.append(f'summon minecraft:block_display ~ ~ ~ {nbt}')
-    return out
-
-
-def decal_files(g, key, pid, lanes):
-    """lanes = {vis id: (w, length or None)}. Writes p/<key>/vis and the per-lane create functions."""
-    sel = f'@e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}d]'
-    vis = [f'# hz_vis of the {key} lanes (@s = hazard marker, at it, rotated as it = the locked aim).',
-           f'# #hzEv 0 create / 1 strike / 2 end; the decal parts carry the hazard id in mbHzI.',
-           f'scoreboard players operation #gp{pid}I mb = @s mbHzI']
-    for vid in lanes:
-        vis.append(f'execute if score #hzEv mb matches 0 if score @s mbHzV matches {vid} run function {NS}p/{key}/dk{vid}')
-    vis += [f'execute if score #hzEv mb matches 1 as {sel} if score @s mbHzI = #gp{pid}I mb run function {NS}p/{key}/dflash',
-            f'execute if score #hzEv mb matches 2 as {sel} if score @s mbHzI = #gp{pid}I mb run kill @s']
-    g.pw(key, 'vis', vis)
-    for vid, (w, length) in lanes.items():
-        lines = [f'# Lane decal {vid}: {w} b wide' + (f', {length} b long.' if length else ', length #gp2Len (tenths).')]
-        lines += decal_parts(pid, vid, w, length)
-        if length is None:
-            new = '@e[type=minecraft:block_display,tag=rlk_mb_gd_dnew,tag={}]'
-            lines += [f'execute as {new.format(f"rlk_mb_gd_p{pid}{r}")} store result entity @s transformation.scale[2] float 0.1 '
-                      f'run scoreboard players get #gp2Len mb' for r in ('fill', 'rim')]
-            lines += [f'scoreboard players operation #gp2C mb = #gp2Len mb', 'scoreboard players remove #gp2C mb 1',
-                      f'execute as {new.format(f"rlk_mb_gd_p{pid}cap1")} store result entity @s transformation.translation[2] float 0.1 '
-                      f'run scoreboard players get #gp2C mb']
-        lines += ['tp @e[type=minecraft:block_display,tag=rlk_mb_gd_dnew] ~ ~ ~ ~ 0',
-                  'scoreboard players operation @e[type=minecraft:block_display,tag=rlk_mb_gd_dnew] mbHzI = @s mbHzI',
-                  'tag @e[type=minecraft:block_display,tag=rlk_mb_gd_dnew] remove rlk_mb_gd_dnew']
-        g.pw(key, f'dk{vid}', lines)
-    g.pw(key, 'dflash', [
-        '# Strike (@s = a decal part of the striking lane): the amber bar goes, the fill flashes white.',
-        f'execute if entity @s[tag=rlk_mb_gd_p{pid}bar] run return run kill @s',
-        f'execute if entity @s[tag=rlk_mb_gd_p{pid}fill] run data merge entity @s {{block_state:{{id:"minecraft:white_stained_glass"}}}}'])
-
-
-def bar_grow(pid, w, length, ticks):
-    """Pattern-tick line (the tick after the decal appeared): the amber bar grows to the far end in
-    `ticks` ticks (client interpolation). length None = from #gp2Len."""
-    sel = f'@e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}bar]'
-    if length is not None:
-        end = tf((-w / 2 + 0.06, 0.034, 0.0), (0, 0, 0, 1), (w - 0.12, 0.012, length))
-        return [f'execute as {sel} run data merge entity @s {{start_interpolation:0,interpolation_duration:{ticks},transformation:{end}}}']
-    return [f'execute as {sel} store result entity @s transformation.scale[2] float 0.1 run scoreboard players get #gp2Len mb',
-            f'execute as {sel} run data merge entity @s {{start_interpolation:0,interpolation_duration:{ticks}}}']
-
-
-# ---------------------------------------------------------------------------------------------
 def emit(g):
     thrust(g)
     javelin(g)
@@ -347,7 +283,7 @@ def thrust(g):
     tl = TL(g, k)
     h1, h2 = ev(k, 'hit1'), ev(k, 'hit2')
     rise, dive, land, flo = ev(k, 'rise'), ev(k, 'dive'), ev(k, 'land'), ev(k, 'flourish')
-    lock1, lock2 = h1 - TELL1, h2 - TELL2                 # K4 (tuned): 10 t and 12 t lane telegraphs
+    lock1, lock2 = h1 - TELL1, h2 - TELL2                 # K4 (tuned): aim locks 10 t and 12 t before the hits
     end = clip_len(k)
     tip1, tip2 = sp(k, h1), sp(k, h2)
     yaw1 = math.degrees(math.atan2(tip1[0], tip1[2]))     # turn so the off-centre tip runs down the lane
@@ -386,16 +322,16 @@ def thrust(g):
     tl.at(lock1, g.fn('p/thrust/lock1'))
     g.pw(k, 'lock1', [
         f'# @s = body (clip tick {lock1}). T = the player now; C = {n3(reach1)} b from T toward her (clamped into',
-        f'# the arena) = where she coils; a {lane1[0]} x {lane1[1]} b lane from C through T strikes at clip tick {h1}.',
+        f'# the arena) = where she coils; a {lane1[0]} x {lane1[1]} b lane from C through T strikes at clip tick {h1} (quiet:',
+        '# no ground telegraph, rule 10-20; she stops tracking now and the spear streak, glint and coil are the tell).',
         'kill @e[type=minecraft:marker,tag=rlk_mb_gd_p1]',
         f'execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ {CY} ~ {mk("t")}',
         f'execute at {T} facing entity @s feet rotated ~ 0 positioned ^ ^ ^{n3(reach1)} run summon minecraft:marker ~ {CY} ~ {mk("c")}',
         f'execute as {C} run function rlk:mboss/mv/clamp',
         f'execute as {C} at @s facing entity {T} feet run tp @s ~ ~ ~ ~ 0',
-        *g.hz_opts(sfx=0, vis=11, quiet=1, linger=4, kb=KB['default']),
+        *g.hz_opts(sfx=0, quiet=1, linger=4, kb=KB['default']),
         f'execute at {C} rotated as {C} run ' + g.hz_line(lane1[0], lane1[1], h1 - lock1, DMG['p1a']),
         f'execute rotated as {C} run tp @s ~ ~ ~ ~{n3(yaw1)} 0'])
-    tl.at(lock1 + 1, *bar_grow(pid, lane1[1], lane1[0], h1 - lock1 - 1))
 
     # -- glint (19), lens streak (20-21)
     gl = sp(k, ev(k, 'glint'))
@@ -445,7 +381,8 @@ def thrust(g):
     g.pw(k, 'lock2', [
         f'# @s = body (clip tick {lock2}). U = the player now; D = {dive_r} b from U, {side} deg round it from her side',
         f'# (random side, the other one when outside the arena, then clamped); a {lane2[0]} x {lane2[1]} b lane from D',
-        f'# through U strikes at {h2} (knockback {KB["p1b"]} along it); she flies to D over {dive - lock2} t.',
+        f'# through U strikes at {h2} (knockback {KB["p1b"]} along it; quiet, no ground telegraph); she flies to D over',
+        f'# {dive - lock2} t facing U.',
         f'kill {U}', f'kill {D}',
         f'execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ {CY} ~ {mk("u")}',
         'execute store result score #gp1S mb run random value 0..1',
@@ -454,14 +391,13 @@ def thrust(g):
         f'execute as {D} at @s unless entity @e[type=minecraft:marker,tag=rlk_mb_arena,distance=..{SAFE_R}] run function {NS}p/thrust/flip',
         f'execute as {D} run function rlk:mboss/mv/clamp',
         f'execute as {D} at @s facing entity {U} feet run tp @s ~ ~ ~ ~ 0',
-        *g.hz_opts(sfx=0, vis=12, quiet=1, linger=4, kb=KB['p1b']),
+        *g.hz_opts(sfx=0, quiet=1, linger=4, kb=KB['p1b']),
         f'execute at {D} rotated as {D} run ' + g.hz_line(lane2[0], lane2[1], h2 - lock2, DMG['p1b']),
         f'execute positioned as {D} run function rlk:mboss/mv/glide {{t:{dive - lock2}}}'])
     g.pw(k, 'flip', [
         '# @s = the dive marker D, outside the arena: the other side of U.',
         f'execute if score #gp1S mb matches 0 at {U} facing entity {BODYSEL} feet rotated ~-{side} 0 positioned ^ ^ ^{dive_r} run tp @s ~ {CY} ~',
         f'execute if score #gp1S mb matches 1 at {U} facing entity {BODYSEL} feet rotated ~{side} 0 positioned ^ ^ ^{dive_r} run tp @s ~ {CY} ~'])
-    tl.at(lock2 + 1, *bar_grow(pid, lane2[1], lane2[0], h2 - lock2 - 1))
     tl.span(lock2, dive - 1, f'execute at @s facing entity {U} feet run tp @s ~ ~ ~ ~ 0')
     tl.at(rt(k, 46), g.sound('entity.phantom.flap', 0.45, 0.8))
     tl.at(dive, f'execute rotated as {D} run tp @s ~ ~ ~ ~{n3(yaw2)} 0')
@@ -513,19 +449,18 @@ def thrust(g):
 
     tl.write([
         f'# P1 공간 찌르기 start (@s = body, #gdPT 0). Clip thrust ({end} t): glow 4, glint 19, hit1 {h1}, rise 38,',
-        f'# dive 54, hit2 {h2}, land 65, flourish 72. Lanes: {lane1[0]} x {lane1[1]} b from {lock1} (tell {h1 - lock1}),',
-        f'# {lane2[0]} x {lane2[1]} b from {lock2} (tell {h2 - lock2}); damage {DMG["p1a"]} % / {DMG["p1b"]} % (KB {KB["p1b"]}).',
+        f'# dive 54, hit2 {h2}, land 65, flourish 72. Lanes (quiet, no ground telegraph): {lane1[0]} x {lane1[1]} b locked at',
+        f'# {lock1} (hit {h1 - lock1} t later), {lane2[0]} x {lane2[1]} b locked at {lock2} (hit {h2 - lock2} t later); damage {DMG["p1a"]} % /',
+        f'# {DMG["p1b"]} % (KB {KB["p1b"]}).',
         'kill @e[tag=rlk_mb_gd_p1]',
         g.rig('face/player'),
         g.play(k)], [
         '# P1 tick (@s = body, at it, #gdPT = clip tick 1..): per-tick lines in p/thrust/k/<t>.'])
-    decal_files(g, k, pid, {11: (lane1[1], lane1[0]), 12: (lane2[1], lane2[0])})
     g.pw(k, 'cancel', [
-        '# P1 cancel (any executor): markers, lane decals and cubes by tag; a glide of the body stops.',
+        '# P1 cancel (any executor): markers and cubes by tag; a glide of the body stops.',
         'kill @e[tag=rlk_mb_gd_p1]',
         'execute as @e[type=minecraft:husk,tag=rlk_mb_body,tag=rlk_mb_mv] run function rlk:mboss/mv/stop',
-        'scoreboard players set #gp1S mb 0',
-        'scoreboard players set #gp1I mb 0'])
+        'scoreboard players set #gp1S mb 0'])
 
 
 def hit_fx(g, centre, big=False):
@@ -596,7 +531,8 @@ def javelin(g):
                f'{{len:{v},w:{round(JAV_W * 10)},tell:{launch - lock},dmg:{DMG["p2"]}}}' for v in range(20, 441, 10)]
     g.pw(k, 'lock', [
         f'# @s = body (clip tick {lock}). T = the player now; she faces it; A = the glyph point {Lp} aimed at T',
-        f'# (pitch 0). A {JAV_W:g} b lane from A to the arena edge (r {WALK_R}) strikes at {launch} for 2 t (K23).',
+        f'# (pitch 0). A {JAV_W:g} b lane from A to the arena edge (r {WALK_R}) strikes at {launch} for 2 t (K23; quiet,',
+        '# no ground telegraph: the glyph and the beam in the air are the tell).',
         'kill @e[type=minecraft:marker,tag=rlk_mb_gd_p2]',
         f'execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ {CY} ~ {mk("t")}',
         f'execute at @s facing entity {T} feet run tp @s ~ ~ ~ ~ 0',
@@ -604,12 +540,12 @@ def javelin(g):
         f'execute as {A} at @s facing entity {T} feet run tp @s ~ ~ ~ ~ 0',
         'scoreboard players set #gp2Len mb 0',
         f'execute {AT_A} positioned ~ {CY} ~ run function {NS}p/javelin/edge',
-        '# whole blocks (the decal and the hazard use the same length), 2..44 b',
+        '# whole blocks (the hazard, the streak and the debris use the same length), 2..44 b',
         'scoreboard players add #gp2Len mb 5', 'scoreboard players operation #gp2Len mb /= #c10 mb',
         'scoreboard players operation #gp2Len mb *= #c10 mb',
         'execute if score #gp2Len mb matches ..19 run scoreboard players set #gp2Len mb 20',
         'execute if score #gp2Len mb matches 441.. run scoreboard players set #gp2Len mb 440',
-        *g.hz_opts(sfx=0, vis=21, quiet=1, linger=4, act=2, kb=KB['light']),
+        *g.hz_opts(sfx=0, quiet=1, linger=4, act=2, kb=KB['light']),
         *buckets,
         'function rlk:mboss/opts_reset'])
     g.pw(k, 'edge', [
@@ -617,7 +553,6 @@ def javelin(g):
         'scoreboard players add #gp2Len mb 5',
         'execute if score #gp2Len mb matches 440.. run return 0',
         f'execute positioned ^ ^ ^0.5 if entity @e[type=minecraft:marker,tag=rlk_mb_arena,distance=..{WALK_R}] run function {NS}p/javelin/edge'])
-    tl.at(lock + 1, *bar_grow(pid, JAV_W, None, launch - lock - 1))
 
     # -- beam (28) and re-flash, rematerialise (31)
     tl.at(beam,
@@ -722,15 +657,14 @@ def javelin(g):
     tl.write([
         f'# P2 공간 투창 start (@s = body, #gdPT 0). Clip javelin ({end} t): spin 0, vanish {vanish}, glyph {glyph},',
         f'# beam {beam}, rematerialise {remat}, release {rel}, launch {launch}, return {ret}, catch {catch}. Lane locked at {lock}',
-        f'# (tell {launch - lock}), {JAV_W:g} b wide to the arena edge, {DMG["p2"]} % over {launch}-{launch + 1}; the flying spear is visual.',
+        f'# (quiet, no ground telegraph; hit {launch - lock} t later), {JAV_W:g} b wide to the arena edge, {DMG["p2"]} % over {launch}-{launch + 1};',
+        '# the flying spear is visual.',
         'kill @e[tag=rlk_mb_gd_p2]',
         g.rig('face/player'),
         g.play(k)], [
         '# P2 tick (@s = body, at it, #gdPT = clip tick 1..): per-tick lines in p/javelin/k/<t>.'])
-    decal_files(g, k, pid, {21: (JAV_W, None)})
     g.pw(k, 'cancel', [
-        '# P2 cancel (any executor): the prop (also while it is a projectile), markers, decals, cubes by tag.',
+        '# P2 cancel (any executor): the prop (also while it is a projectile), markers, cubes by tag.',
         'kill @e[tag=rlk_mb_gd_p2]',
         'scoreboard players set #gp2Len mb 0',
-        'scoreboard players set #gp2S mb 0',
-        'scoreboard players set #gp2I mb 0'])
+        'scoreboard players set #gp2S mb 0'])

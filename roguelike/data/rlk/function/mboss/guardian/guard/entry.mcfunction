@@ -1,5 +1,5 @@
 # @s = body, guard clock 1..50: baton twirl, vertical spin discs (16-35), gold ground ring (35), settle.
-# Discs and ring are telegraphs only (no damage, K24).
+# Discs and ring are visuals only (no damage, K24; the ring is in the footage, m2 2.4-2.9 s).
 function rlk:mboss/guardian/rig/face/track
 execute if score #gdT mb matches 6 run playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.6 0.9 0.2
 execute if score #gdT mb matches 11 run playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 0.6 0.7 0.2

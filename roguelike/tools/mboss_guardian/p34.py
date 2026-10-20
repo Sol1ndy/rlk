@@ -12,8 +12,10 @@ Played ticks below.
 
 P3 (clip `slam`, 64 t, melee: the core closes to 3 b first)
   0-6   raise; she keeps turning to the player (<= 12 deg/t), gold streak along the spear tip
-  7     aim locked: ground ring r 6 centred 3.5 b ahead (K25 x1.2), thin gold ring decal + amber fill,
-        hazard disc r 6, tell 13 -> hit at 20 (1.6, K17); ring chime
+  7     aim locked: ground ring r 6 centred 3.5 b ahead (K25 x1.2): a thin gold ring decal that appears at 40 %
+        and widens to the rim in 5 t (m1 11.42-11.70 s) + a faint amber fill; hazard disc r 6 (quiet: the
+        footage ring is the only ground telegraph, no framework outline or strike flash), tell 13 -> hit at
+        20 (1.6, K17); ring chime
   8     charge (beacon power-select + respawn-anchor charge); 9-15 lens glints on the raised blade
   16-19 downswing gold streak; 20 impact: vertical gold pillar, white-gold flash over the ring,
         shock ring, burst, radial gold crystal blades (21-38), gold cubes + dark rock chunks
@@ -32,7 +34,15 @@ P4 (clips `pull` 32 t, then `swing` 46 t from tick 36; every band: melee at weig
         reviving, selection screen, map view): no swings, the pattern ends at 32.
   36    swing clip (K15: relocation -> wind-up 12 t); two 360 hazards r 6.8, tell 15: swing 1
         forehand at 51, swing 2 backhand (tilted, thicker) at 64, 1.2 each; gold crescents that
-        follow the measured spear-tip angles, dark cubes and gold sparkles in the trail
+        follow the measured spear-tip angles, dark cubes and gold sparkles in the trail. No ground
+        telegraph (rule 10-20: m1 22.00-24.30 s shows none): quiet hazards; the player reads the
+        relocation, the swing clip (spear laid behind her shoulders, wing raised, riptide at 36), the
+        hold glint with chime and power-select at 41 and the riptide + knockback sounds 2 t before
+        each swing; the crescents and the dust ring show the area at the hit.
+
+Telegraph rule (10-20, plan.md): a hazard keeps a ground telegraph only when the footage shows one before
+the hit. P3 keeps its thin gold ring + faint amber fill (m1 11.42-12.25 s), trimmed to what the footage
+shows (no framework outline / progress outline / strike flash); P4's swings have none.
 """
 import math
 import random
@@ -42,7 +52,7 @@ from .api import Pattern, ev, clip_len, rt, inv, DMG, KB, CY, GOLD, GOLD_PALE, G
 from . import p34_fx as X
 
 SWING_GAP = 12        # relocation -> swing clip start (K15: 10-14 t)
-SWING_TELL = 15       # swing hazard telegraph (was 20; user tuning: wind-ups ~25 % shorter, floor 10 t)
+SWING_TELL = 15       # swing clip start -> swing 1 = the quiet hazard's tell (was 20; wind-ups ~25 % shorter, floor 10 t)
 AREA = 1.2            # linear scale of the hit areas and their fx (user tuning: ~20 % larger)
 PULL_LEN = clip_len('pull')
 RELOC = ev('pull', 'relocate')
@@ -132,6 +142,7 @@ def emit(g):
 # P3 공간을 집행하는 시련
 SLAM_HZ = 3.5                      # disc centre ahead (K25)
 SLAM_R = 6.0                       # K25 r 5, x1.2 (user tuning)
+RING0, RING_GROW = 0.4, 5          # the ring decal appears at 40 % of its size and reaches the rim 5 t later (m1 11.42-11.70 s)
 TIP_PLANT = (0.0, 0.0, 3.1)        # planted spear tip (rig: 0, -0.24, 3.09) on the floor
 TIP_OVER = (-0.26, 6.82, 0.30)     # blade tip while held overhead (12-21)
 RAISE = {2: (-3.59, 1.71, 1.08), 3: (-3.86, 2.42, 0.96), 4: (-3.93, 2.80, 0.90), 5: (-3.49, 4.11, 0.89),
@@ -200,22 +211,27 @@ def slam(g):
     for t in sorted(raise_p)[1:]:
         tl.at(t, *streak(g, raise_p, t, GOLD_PALE, 0.8, 4))
 
-    # ---- ring: telegraph + hazard (disc r 6 at 3.5 b, tell 13, 1.6)
+    # ---- ring: telegraph + hazard (disc r 6 at 3.5 b, tell 13, 1.6); the footage ring is the telegraph (quiet hazard)
     tl.at(ring,
           f'# Aim locked: disc r {X.L.num(SLAM_R)} centred {SLAM_HZ} b ahead (K25 x1.2), ring lead {imp - ring} t -> hit on the impact (clip {imp}).',
+          '# Quiet (rule 10-20): the module ring (vis 31) is the only ground telegraph, as in the footage.',
           'scoreboard players set #hzSfx mb 0',
+          'scoreboard players set #hzQuiet mb 1',
           f'scoreboard players set #hzVis mb {3 * 10 + 1}',
           f'scoreboard players set #hzKB mb {KB["default"]}',
           f'execute {at_hz} run {g.hz_disc(SLAM_R, imp - ring, DMG["p3"])}',
           f'execute {at_hz} run ' + g.sound('block.amethyst_block.chime', 0.8, 1.2),
           f'execute {at_hz} run ' + g.sound('block.amethyst_block.resonate', 0.5, 1.5))
-    # the ring decal (summoned by vis at the marker) widens a little and turns slowly
-    tl.at(ring + 1, X.merge('@e[type=minecraft:item_display,tag=rlk_mb_gd_p3ring]',
-                            X.tf((0, 0, 0), X.qmul(X.yaw_q(110), X.FLAT_UP), S_RING), imp - ring - 2))
+    # the ring decal (summoned by vis at the marker at RING0 of its size) widens to the rim in RING_GROW t (m1 11.42 ->
+    # 11.70 s), then keeps turning slowly until the strike; the faint amber fill grows with it
+    sel_ring = '@e[type=minecraft:item_display,tag=rlk_mb_gd_p3ring]'
+    tl.at(ring + 1, X.merge(sel_ring, X.tf((0, 0, 0), X.qmul(X.yaw_q(50), X.FLAT_UP), S_RING), RING_GROW))
+    tl.at(ring + 1 + RING_GROW, X.merge(sel_ring, X.tf((0, 0, 0), X.qmul(X.yaw_q(110), X.FLAT_UP), S_RING), imp - ring - 2 - RING_GROW))
     fill = [disc_points(rng, SLAM_R - 0.25, 17) for _ in range(3)]
     for t in range(ring, imp, 2):
         pts = fill[(t // 2) % 3]
-        tl.at(t, *[f'execute {at_hz} run ' + g.dust(AMBER, 0.9, f'^{X.L.num(round(x, 2))} ^0.08 ^{X.L.num(round(z, 2))}', (0, 0, 0), 1)
+        grow = min(1.0, RING0 + (1 - RING0) * (t - ring) / RING_GROW)
+        tl.at(t, *[f'execute {at_hz} run ' + g.dust(AMBER, 0.9, f'^{X.L.num(round(x * grow, 2))} ^0.08 ^{X.L.num(round(z * grow, 2))}', (0, 0, 0), 1)
                    for x, z in pts])
 
     # ---- 11-21: charge, lens glints on the raised blade
@@ -368,10 +384,11 @@ def slam(g):
     g.pw(k, 'tick', tick)
     g.pw(k, 'vis', [
         '# hz_vis of the slam disc (@s = hazard marker on the floor, rotated = aim; #hzEv 0 create / 1 strike / 2 end):',
-        f'# a thin gold ring decal (Navia ring card, ring at r {X.L.num(SLAM_R)}) that widens and turns until the strike.',
+        f'# a thin gold ring decal (Navia ring card, ring at r {X.L.num(SLAM_R)} when full) that appears at {RING0:g} of its size,',
+        f'# widens to the rim in {RING_GROW} t and turns until the strike (the slam\'s only ground telegraph, rule 10-20).',
         f'execute if score #hzEv mb matches 0 run summon minecraft:item_display ~ ~0.04 ~ {{{X.tags(*p3tags("rlk_mb_hzfx", "rlk_mb_gd_p3ring"))},'
         f'billboard:"fixed",{X.BRIGHT},view_range:3f,shadow_radius:0f,teleport_duration:0,interpolation_duration:0,'
-        f'{X.tf((0, 0, 0), X.FLAT_UP, S_RING * 0.86)},item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{X.card_model("ring")}"}}}}}}',
+        f'{X.tf((0, 0, 0), X.FLAT_UP, S_RING * RING0)},item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{X.card_model("ring")}"}}}}}}',
         'execute if score #hzEv mb matches 1.. run kill @e[type=minecraft:item_display,tag=rlk_mb_gd_p3ring]'])
     g.pw(k, 'cancel', [
         '# P3 cancel (any executor): every display of the slam carries rlk_mb_gd_p3 (hazards go with lib_clear).',
@@ -565,18 +582,13 @@ def pull(g):
           f'# Swing clip ({SWING_LEN} t): wind-up 0-5, hold 5-{ev("swing", "swing1") - 1}, swing 1 at clip {ev("swing", "swing1")} (= {s1}), '
           f'swing 2 at clip {ev("swing", "swing2")} (= {s2}); hazards r {X.L.num(SWING_R)}, tell {tell}.',
           g.play('swing'),
-          'scoreboard players set #hzSfx mb 0', 'scoreboard players set #hzAct mb 3',
-          f'scoreboard players set #hzVis mb {4 * 10 + 1}',
+          '# quiet (rule 10-20: no ground marker in the footage); the swing clip, the hold glint and the sounds are the tell',
+          'scoreboard players set #hzSfx mb 0', 'scoreboard players set #hzAct mb 3', 'scoreboard players set #hzQuiet mb 1',
           f'execute positioned ~ {CY} ~ {BODY} run {g.hz_sector(SWING_R, 180, tell, DMG["p4"])}',
           g.sound('item.trident.riptide_1', 0.4, 0.8))
     tl.at(s2 - tell,
-          'scoreboard players set #hzSfx mb 0', 'scoreboard players set #hzAct mb 3',
-          f'scoreboard players set #hzVis mb {4 * 10 + 2}',
+          'scoreboard players set #hzSfx mb 0', 'scoreboard players set #hzAct mb 3', 'scoreboard players set #hzQuiet mb 1',
           f'execute positioned ~ {CY} ~ {BODY} run {g.hz_sector(SWING_R, 180, tell, DMG["p4"])}')
-    S_RING = 2 * SWING_R / 0.86
-    for kk, t0 in ((1, SWING_AT), (2, s2 - tell)):
-        tl.at(t0 + 1, X.merge(f'@e[type=minecraft:item_display,tag=rlk_mb_gd_p4r{kk}]',
-                              X.tf((0, 0, 0), X.qmul(X.yaw_q(-100 if kk == 1 else 100), X.FLAT_UP), S_RING), tell - 2))
     # hold: gold glint and motes on the spear behind her shoulders
     hold = SWING_AT + rt('swing', 5)
     tl.at(hold, f'execute {BODY} run ' + g.card('star', P(*HOLD_TIP), bb='center', spin=60, s0=0.2, s1=1.4, life=8, fade=3),
@@ -702,23 +714,13 @@ def pull(g):
         'title @a[tag=player] times 0 1 2',
         'title @a[tag=player] title ""',
         'execute as @a[tag=player] if score #on view matches 1 if score #vmode view matches 2 if entity @e[tag=rlk_vseat,limit=1] run function rlk:view/xhair'])
-    S_RING = 2 * SWING_R / 0.86
-    vis = [f'# hz_vis of the swing hazards (@s = marker at her feet; 41 swing 1, 42 swing 2): a gold ring decal at r {X.L.num(SWING_R)}',
-           '# that turns (opposite ways for the two swings) until its strike.']
-    for kk in (1, 2):
-        vis.append(f'execute if score @s mbHzV matches {40 + kk} if score #hzEv mb matches 0 run summon minecraft:item_display ~ ~0.05 ~ '
-                   f'{{{X.tags(*p4tags("rlk_mb_hzfx", f"rlk_mb_gd_p4r{kk}"))},billboard:"fixed",{X.BRIGHT},view_range:3f,shadow_radius:0f,'
-                   f'teleport_duration:0,interpolation_duration:0,{X.tf((0, 0, 0), X.FLAT_UP, S_RING * 0.9)},'
-                   f'item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{X.card_model("ring")}"}}}}}}')
-        vis.append(f'execute if score @s mbHzV matches {40 + kk} if score #hzEv mb matches 1.. run kill @e[type=minecraft:item_display,tag=rlk_mb_gd_p4r{kk}]')
-    g.pw(k, 'vis', vis)
     g.pw(k, 'pause', [
         '# The fight froze (player dead or reviving; @s = body): the screen overlay goes now; the frames go on from',
         '# the clock after the resume.',
         g.fn('p/pull/scr_end')])
     g.pw(k, 'cancel', [
-        '# P4 cancel (any executor): every entity of the pattern carries rlk_mb_gd_p4 (cage, cubes, crescents, ring',
-        '# decals); the pull point and hazards go with lib_clear; the screen overlay ends if it runs.',
+        '# P4 cancel (any executor): every entity of the pattern carries rlk_mb_gd_p4 (cage, cubes, crescents); the pull',
+        '# point and hazards go with lib_clear; the screen overlay ends if it runs.',
         f'kill @e[tag={P4TAG}]',
         f'execute if score #gdPT mb matches {SCR_FIRST}..{SCR_LAST} run {g.fn("p/pull/scr_end")}',
         'scoreboard players set #gp4Ok mb 0'])
