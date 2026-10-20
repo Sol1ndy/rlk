@@ -369,7 +369,7 @@ function bellModel() {
 }
 const bellModelX = () => [...BELL_FACES[1]];
 // the bag (v3 f900): a facet body round the pear lying along Z (bagR: the round belly behind, the neck forward, its
-// axis level at y BAG.y), 8 azimuths round Z x elevations toward the ends; the clips pitch the bulb 20 degrees so the
+// axis level at y BAG.y), 8 azimuths round Z x elevations toward the ends; the clips pitch the bulb 35 degrees so the
 // neck lifts (BAG_POSE); the drawstring ring at the neck. Its diagonal faces ride bulb_x rolled 45 degrees about Z.
 // (v3 f900: the neck raised about 35 degrees; t lifts the lowest point of the pitched bag to the floor; the crown
 // joint sits on the neck tip, its +Y along the neck)
