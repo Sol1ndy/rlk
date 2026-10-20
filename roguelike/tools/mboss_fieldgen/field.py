@@ -73,7 +73,10 @@ F1_LOCK = ev_or('field_erupt', 'lock', 12)
 F1_GAPS = (0, 50, 80, 98, 119, 148, 159, 198, 209)      # decals 22 72 102 120 141 170 181 220 231, strikes + 15
 F1_EVENTS = [F1_ACT + d for d in F1_GAPS]               # the decal ticks (each event's discs are made together)
 F1_TELL = 15
-F1_DARK_R0, F1_FADE_IN = 0.8, 6                         # the dark disc grows r 0.8 -> 2.8 over 6 t (the footage's fade-in)
+F1_R = 2.8                                              # a zone's radius (hazard and its dark disc)
+F1_DARK_R0, F1_FADE_IN = F1_R, 1                        # the dark disc at full size from its first tick (fix round F2: the
+#   footage's discs appear at full size within 1-2 frames, v3 3.25 -> 3.30 and 10.70; the r 0.8 -> 2.8 growth over 6 t
+#   under-stated the hit area)
 F1_STRIKES = [t + F1_TELL for t in F1_EVENTS]           # 37 87 117 135 156 185 196 235 246 (gaps 11-50)
 F1_END = F1_ACT + 238                                   # 260: the last eruption + the tilt
 F1_OFF = F1_ACT + 184                                   # 206: the link beams off
@@ -212,9 +215,9 @@ def fzone(g):
     player's feet (a standing player is inside it, 0.1-1.1 b from its edge), the others 2-8 b, random yaws, inside
     the walk disc; all discs of an event are one volley group made in one tick (one hit per event). Each disc: the
     dark disc decal (tele/dark: the footage's marker, v3 3.30 -> 4.03 and 10.70 -> 11.43, a dark translucent disc with
-    a thin amber rim, fading in over 6 t and held to the strike; telegraph rule 10-20 dropped the violet tele_disc and
-    its progress fill) with the dark dust (p/erupt_tell); the gold eruption, then hovering debris; one tell /
-    eruption sound per event (on its first disc)."""
+    a thin amber rim, at full size r 2.8 from its first tick (as in the footage; fix round F2) and held to the strike;
+    telegraph rule 10-20 dropped the violet tele_disc and its progress fill) with the dark dust (p/erupt_tell); the
+    gold eruption, then hovering debris; one tell / eruption sound per event (on its first disc)."""
     key, tl, pid = 'fzone', TL(g, 'fzone'), 11
     D, Z, FST = 'rlk_mb_fg_p11d', 'rlk_mb_fg_p11z', 'rlk_mb_fg_p11f'
     g.pw(key, 'event', [
@@ -240,17 +243,17 @@ def fzone(g):
         f'function {NS}p/{key}/place with storage rlk:mboss fg.fz',
         f'execute as @e[type=minecraft:marker,tag={D}] run {g.clamp_walk()}',
         *g.hz_opts(kb=KB['default'], grp=True, quiet=1, sfx=0, vis=111),
-        ex(mk, g.hz_disc(2.8, F1_TELL, DMG['f1'])),
+        ex(mk, g.hz_disc(F1_R, F1_TELL, DMG['f1'])),
         g.tag_last_hz(Z),
         ex('if score #fq11F mb matches 1', g.tag_last_hz(FST)),
-        ex(mk + ' rotated ~ 0', g.tele_dark(F1_DARK_R0, 2.8, F1_TELL, F1_FADE_IN)),
+        ex(mk + ' rotated ~ 0', g.tele_dark(F1_DARK_R0, F1_R, F1_TELL, F1_FADE_IN)),
         ex(mk, g.fx('erupt_tell')),
         ex('if score #fq11F mb matches 1 ' + mk, g.snd('erupt_tell')),
         'scoreboard players set #fq11F mb 0',
         f'kill @e[type=minecraft:marker,tag={D}]'])
     g.pw(key, 'place', [f'$execute at {PLAYER} rotated $(a) 0 positioned ^ ^ ^$(d) run summon minecraft:marker ~ {CY} ~ '
                         f'{{Tags:[{tags(pid, D)}]}}'])
-    rd_dark(g, key, 'rd', 2.8)
+    rd_dark(g, key, 'rd', F1_R)
     redraw = redraw_fns(g, key, pid, [(Z, 'rd')])
     # activation (spec F1 section 4)
     tl.at(0, body_rot(MEDAL_E, g.fx('spark')), body_rot(MEDAL_G, g.fx('spark')),

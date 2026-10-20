@@ -65,6 +65,10 @@ B3_TELL, B3_ACT = tell_rt(12), 5                # tell 10 (12 before the tuning)
 B3_LOCK = B3_FAN - B3_TELL                      # 11
 B3_TRAIL = [B3_GLIDE + 1 + 2 * i for i in range(4)]  # 27 29 31 33: trail segments (strike +10, act 8)
 B3_SIDE = 4.5                                   # the low glide to her right
+B3_TRAIL_TELL = 10                              # a trail segment strikes (flares) 10 t after it is laid
+B3_EMBER_LIFE, B3_EMBER_FADE = B3_TRAIL_TELL + 1, 3  # its red ember line lasts to the flare (fix round F3: the
+#   footage's lines show ~6-8 t, v3 13.35-13.60; life 18 outlived the flare by 8 t), shrinking over its last 3 t
+B3_EMBER = dict(s0=1.6, s1=2.0, col='#E04040')   # the ember streak card (flat on the floor, '~ 90')
 
 # ---- B4 달빛 축복 (coco, played): wrap 3, orb1 14, ball 22, ball_open 30, orb2 34 (authored 5 / 19 / 30 / 42 / 46; the rig's
 # prop/pod at the core anchor 22-29)
@@ -449,7 +453,10 @@ def b3(g):
     read from the V-up, the downstroke and the dive), the head-first dive glide to P, the slam, the eruption, then the
     low glide 4.5 b to her right leaving 4 flame-trail segments (r 1, tell 10, act 8, 30 %, two volley groups: at most 2
     touches) whose flares are the hz_vis strike events. Each segment's only ground visual ahead of its flare is the red
-    ember line she lays down (the footage's flame line, v3 13.30-13.68; TRIM: its disc decal is gone)."""
+    ember line she lays down (the footage's flame line, v3 13.30-13.68; TRIM: its disc decal is gone), alive up to the
+    flare (life B3_EMBER_LIFE = tell + 1; fix round F3). The ember lines are B3's own pause / resume business (fix round
+    F1): the pause drops those of the live segments (an fx card ages by game time through the freeze) and the resume lays
+    them again with the ticks left, so no segment strikes after a pause with nothing on the floor."""
     R, k, pid = g.rig, K_SWEEP, 13
     p_, gl_ = 'rlk_mb_bf_p13p', 'rlk_mb_bf_p13g'
     P_, G_ = M(p_), M(gl_)
@@ -502,11 +509,12 @@ def b3(g):
           g.sound('block.fire.ambient', 0.5, 0.8))
     for i, t in enumerate(B3_TRAIL):
         seg = ([g.GRP_NEW] if i in (0, 2) else [])
-        seg += hz_q(g, f'execute positioned ~ {CY} ~ rotated as @s rotated ~ 0 run ', 'disc', 1.0, 10, DMG['b3t'], el=EL_PYRO,
-                    act=8, kb=KB['none'], vis=pid * 10 + 1, grp=True)
+        seg += hz_q(g, f'execute positioned ~ {CY} ~ rotated as @s rotated ~ 0 run ', 'disc', 1.0, B3_TRAIL_TELL, DMG['b3t'],
+                    el=EL_PYRO, act=8, kb=KB['none'], vis=pid * 10 + 1, grp=True)
         tl.at(t, f'# flame-trail segment {i + 1} under her (group {1 if i < 2 else 2}): the red ember line (the footage\'s flame line,',
-              '# the only ground visual before its flare: TRIM, no disc decal), the flare 10 t later',
-              *seg, BODY + 'positioned ~ ~0.05 ~ run ' + g.kcard('streak', '~ ~ ~', '~ 90', s0=1.6, s1=2.0, life=18, fade=6, col='#E04040'),
+              f'# the only ground visual before its flare: TRIM, no disc decal) up to the flare {B3_TRAIL_TELL} t later',
+              *seg, BODY + 'positioned ~ ~0.05 ~ run ' + g.kcard('streak', '~ ~ ~', '~ 90', life=B3_EMBER_LIFE, fade=B3_EMBER_FADE,
+                                                                 **B3_EMBER),
               g.dust(A.hexrgb('#8C5436'), 1.2, f'~ ~0.1 ~', (0.4, 0.02, 0.4), 4))
     tl.at(B3_TRAIL[1], g.sound('block.fire.ambient', 0.4, 1.1))
     g.pw(k, 'vis', ['# hz_vis of the flame-trail segments (@s = the hazard marker, at it): the flare on the strike (#hzEv 1).',
@@ -527,6 +535,25 @@ def b3(g):
               f'# trail {B3_TRAIL} strike +10 act 8, two groups).'], ['# B3 tick.'])
     g.pw(k, 'cancel', ['# Remove what B3 owns (its markers; the hazards go with lib_clear).',
                        f'kill @e[type=minecraft:marker,tag={p_}]', f'kill @e[type=minecraft:marker,tag={gl_}]'])
+    # the trail's ember lines through a pause (fix round F1): @s = a live segment hazard (hz_vis pid*10+1, still in its tell)
+    live = f'execute as @e[type=minecraft:marker,tag=rlk_mb_hzq,scores={{mbHzV={pid * 10 + 1}}}] if score @s mbHzT < @s mbHzW at @s '
+    ember = g.kcard('streak', '~ ~ ~', '~ 90', life=B3_EMBER_LIFE, fade=B3_EMBER_FADE, **{**B3_EMBER, 's0': B3_EMBER['s1']})  # full size
+    args = ember[ember.index('{'):]
+    g.pw(k, 'pause', ['# The fight froze (@s = body): the red ember line of every live trail segment goes (an fx card ages by game',
+                      '# time, so it would be gone or nearly gone at the resume); p/<key>/resume lays it again.',
+                      live + 'positioned ~ ~0.05 ~ run kill @e[type=minecraft:item_display,tag=rlk_bk,distance=..0.05]'])
+    g.pw(k, 'resume', ['# The fight runs again (@s = body, before this tick\'s hz/all): every live trail segment gets its red ember line',
+                       '# back, alive up to its flare (the ticks left + 1).',
+                       live + f'rotated as @s rotated ~ 0 positioned ~ ~0.05 ~ run {g.fn(f"p/{k}/ember")}'])
+    g.pw(k, 'ember', ['# @s = a live trail segment hazard, at its floor point + 0.05, its yaw. The strike comes mbHzW - mbHzT - 1 ticks',
+                      '# from now (the resume hook runs before this tick\'s hz/all); storage rlk:mboss bfr = the card\'s macro args.',
+                      'scoreboard players operation #bfX mb = @s mbHzW', 'scoreboard players operation #bfX mb -= @s mbHzT',
+                      'scoreboard players remove #bfX mb 1',
+                      'execute if score #bfX mb matches ..0 run return 0',
+                      f'data modify storage rlk:mboss bfr set value {args}',
+                      'scoreboard players add #bfX mb 1',
+                      'execute store result storage rlk:mboss bfr.life int 1 run scoreboard players get #bfX mb',
+                      f'function {A.K.FN}card with storage rlk:mboss bfr'])
 
 
 # ---------------------------------------------------------------------------------------------

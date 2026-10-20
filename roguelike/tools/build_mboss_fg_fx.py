@@ -2510,8 +2510,8 @@ DEMOS = {
         (23, 'floor', fx('wave_band', r0=25, r1=210, w=25, dur=34))] +
         [(24 + 3 * k, 'floor', fx('wave_fire', r=round(2.5 + 0.55 * 3 * k, 2))) for k in range(11)]),
     'erupt': ('field', 'field_erupt', [
-        (0, 'zone0', fx('erupt_tell')), (0, 'zone0', tele_dark(0.8, 2.8, 15, 6)), (0, 'zone0', snd('erupt_tell')),
-        (0, 'zone1', fx('erupt_tell')), (0, 'zone1', tele_dark(0.8, 2.8, 15, 6)),
+        (0, 'zone0', fx('erupt_tell')), (0, 'zone0', tele_dark(2.8, 2.8, 15, 1)), (0, 'zone0', snd('erupt_tell')),
+        (0, 'zone1', fx('erupt_tell')), (0, 'zone1', tele_dark(2.8, 2.8, 15, 1)),
         (15, 'zone0', fx('erupt')), (15, 'zone1', fx('erupt')), (15, 'zone0', snd('erupt')),
         (18, 'zone0', fx('debris')), (18, 'zone1', fx('debris')), (40, 'zone0', snd('debris_land'))]),
     'break': ('field', 'break', [

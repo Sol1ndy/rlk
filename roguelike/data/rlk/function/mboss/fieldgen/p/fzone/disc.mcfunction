@@ -12,7 +12,7 @@ scoreboard players set #hzQuiet mb 1
 execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p11d,limit=1] run function rlk:mboss/hz/disc {r:28,tell:15,dmg:75}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_fg_p11z
 execute if score #fq11F mb matches 1 as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_fg_p11f
-execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p11d,limit=1] rotated ~ 0 run function rlk:mboss/fieldgen/fx/tele/dark {r0:8,r:28,grow:6,tell:15,hold:0}
+execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p11d,limit=1] rotated ~ 0 run function rlk:mboss/fieldgen/fx/tele/dark {r0:28,r:28,grow:1,tell:15,hold:0}
 execute at @e[type=minecraft:marker,tag=rlk_mb_fg_p11d,limit=1] run function rlk:mboss/fieldgen/fx/p/erupt_tell
 execute if score #fq11F mb matches 1 at @e[type=minecraft:marker,tag=rlk_mb_fg_p11d,limit=1] run function rlk:mboss/fieldgen/fx/snd/erupt_tell
 scoreboard players set #fq11F mb 0

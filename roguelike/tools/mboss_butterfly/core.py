@@ -323,10 +323,11 @@ class Core:
             f'execute if entity @a[tag=player,scores={{rnDie=1..}}] run {F("coc/clear_hud")}',
             F('p/pause_d')])
         self.w('resume', [
-            '# Hook resume (the fight runs again; module timers live in the body tick and simply continue). Nothing to',
-            '# redraw: under the telegraph rule (10-20) no butterfly hazard has a ground decal (the player reads her motion',
-            '# and sound; the hazards are quiet, #hzQuiet 1), so the old decal redraw of the frozen quiet hazards (review',
-            '# fix FX-1) is gone. The running pattern may restore what it owns (its optional p/<key>/resume).',
+            '# Hook resume (the fight runs again; module timers live in the body tick and simply continue). No kit decal',
+            '# to redraw: under the telegraph rule (10-20) no butterfly hazard has one (the player reads her motion and',
+            '# sound; the hazards are quiet, #hzQuiet 1), so the old decal redraw of the frozen quiet hazards (review fix',
+            '# FX-1) is gone. The running pattern restores what it owns (its optional p/<key>/resume: B3 lays the red ember',
+            '# line of its live flame-trail segments again, the only ground telegraph she keeps).',
             F('p/resume_d')])
         self.w('cleanup', [
             '# Hook cleanup (no executor; idempotent; fight end, abort, run end, map change, wipe, uninstall): module',
@@ -343,8 +344,8 @@ class Core:
             f'function {K.FN}uninstall',
             'kill @e[type=minecraft:item_display,tag=rlk_mb_bf_dew]',
             'kill @e[tag=rlk_mb_bf_fx]',
-            '# the module\'s scratch storage (heal-orb spawn args; bfr: the decal redraw args of builds before the',
-            '# telegraph rule 10-20, removed from worlds that still hold it; review fix perf-4)',
+            '# the module\'s scratch storage (heal-orb spawn args; bfr: B3\'s ember redraw args, the decal redraw args',
+            '# in builds before the telegraph rule 10-20; review fix perf-4)',
             'data remove storage rlk:mboss bfd',
             'data remove storage rlk:mboss bfr']
             + [f'scoreboard objectives remove {o}' for o in A.RIG_OBJECTIVES])
