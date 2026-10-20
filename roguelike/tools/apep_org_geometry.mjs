@@ -10,7 +10,7 @@
 // Element rotations stay single-axis on the 22.5 degree grid.
 import {abox, cardZ, cardX, cardY, faceEl, faceOfDir, lathe, annulus, checkBounds, r4, rotA} from './mboss_model_lib.mjs';
 import {loft, slab, crossCards, toUnits, mirrorX, retex, rockBox, stroke} from './mboss_shape_lib.mjs';
-import {SH, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, stalkSkin, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01, guardFacetPx, nestFacetPx, RIB, nurtRibPx, nurtHoodPx, hoodKeep, hoodNear} from './apep_org_paint.mjs';
+import {SH, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, stalkSkin, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01, guardFacetPx, nestFacetPx, destrFacetPx, RIB, nurtRibPx, nurtHoodPx, hoodKeep, hoodNear} from './apep_org_paint.mjs';
 
 export {checkBounds};
 export const RIDE_Y = 2.0;           // the husk passenger point above its feet (org manifest passenger.ride_y)
@@ -652,25 +652,33 @@ const nestWing = () => shapeSlab('w_wing', 'ne_wing', 'z', 0, {half: .03, cell: 
 // ================================================================================================================
 // 파괴 destruction: the armoured ball (open front), its glowing face + beak; the split husk
 // ================================================================================================================
-const BALL = {z: [-.44, -.36, -.26, -.14, -.02, .1, .22, .34, .45, .54, .6], R: .6};
-function destrShell(husk) {
-  const st = BALL.z.map(z => ({a: z, r: Math.sqrt(Math.max(.0025, BALL.R * BALL.R - z * z)) * (z === -.44 ? 1 : 1)}));
-  if (husk) {
-    // two half shells, split along x and pushed apart, the halves tipped open
-    const half = side => loft('z', st, {n: 16, tex: 'de_shell', ledgeTex: 'de_shell_l', caps: '+', tint: true, skip: k => (side > 0 ? (k > 4 && k < 12) : (k < 4 || k > 12))});
-    return [...shift(half(1), [.12, 0, 0]), ...shift(half(-1), [-.12, 0, 0])];
-  }
-  const els = [...loft('z', st, {n: 16, tex: 'de_shell', ledgeTex: 'de_shell_l', caps: '+', seed: 17}), ...annulus('z', [0, 0, 0], -.44, .3, .41, '-', 'de_rim', {n: 16, stagger: .002})];
-  // 12 cone spikes on the axis-aligned and 45-degree directions (none on the open front)
-  const S = (dir, rot) => spike('de_spike', dir.map(x => x * .5), dir, .46, .26, rot);
+// (v4 f1140 / f1200): a dark olive armour ball r .6 (a facet body round Z, 8 azimuths x 22.5 degree elevations; the
+// diagonal faces on shell_x, the shell rolled 45 degrees about Z), open in front where the glowing face sits in a pale
+// rim, 13 dark cone spikes. Both looks share the tinted sprite (normal = white tint): the husk is the shell split
+// along X, the halves pushed apart, no spikes
+const BALL_R = .6;
+const BALL_FACES = (() => {
+  const faces = polyFaces(facetPlanes(revSupport(z => Math.sqrt(Math.max(0, BALL_R * BALL_R - z * z)), -BALL_R, BALL_R, 'z'), {axis: 'z', el: [-45, -22.5, 0, 22.5, 45, 67.5, 90],
+    extra: [{n: [0, 0, -1], h: .42, az: 0, el: -90, front: true}]})).filter(f => !f.front);
+  return facetBody('de_shellF', faces, {owner: 'destr', paint: destrFacetPx, cls: f => (f.el > 80 ? 2 : f.el < -40 ? 1 : 0), tint: true, ppb: 48, maxPx: 32,
+    split: f => (f.c[0] > .01 ? 'p' : f.c[0] < -.01 ? 'n' : 'z')});
+})();
+const HUSK_DX = .12;
+function destrShell(husk, half = 0) {
+  const G = BALL_FACES, T = v => (half ? rotA('z', -45, v) : v);
+  if (husk) return [...shift(G.p[half], T([HUSK_DX, 0, 0])), ...shift(G.n[half], T([-HUSK_DX, 0, 0]))];
+  const els = [...G.p[half], ...G.n[half], ...(G.z ? G.z[half] : [])];
+  if (half) return els;
+  els.push(...tint(annulus('z', [0, 0, 0], -.425, .35, .45, '-', 'de_rim', {n: 16, stagger: .002})));
+  // 13 cone spikes on the axis-aligned and 45-degree directions (none on the open front)
+  const S = (dir, rot) => tint(spike('de_spike', dir.map(x => x * .5), dir, .5, .24, rot));
   els.push(...S([0, 1, 0]), ...S([0, -1, 0]), ...S([1, 0, 0]), ...S([-1, 0, 0]), ...S([0, 0, 1]));
   for (const [dir, rot] of [[[0, 1, 0], ['x', 45]], [[0, -1, 0], ['x', -45]], [[0, 1, 0], ['z', 45]], [[0, 1, 0], ['z', -45]], [[0, -1, 0], ['z', 45]], [[0, -1, 0], ['z', -45]], [[1, 0, 0], ['y', -45]], [[-1, 0, 0], ['y', 45]]])
     els.push(...S(dir, rot));
   return els;
 }
 function destrFace() {
-  return [cardZ('de_face', -.38, {X0: -.4, X1: .4, Y0: -.4, Y1: .4}),
-    ...loft('z', stops([-.38, -.46, -.53], [.09, .07, .02]), {n: 8, tex: 'de_beak', caps: '+', seed: 19})];
+  return [cardZ('de_face', -.39, {X0: -.39, X1: .39, Y0: -.39, Y1: .39}), ...glowBall([0, 0, -.4], .1, 'de_beak')];
 }
 
 // ================================================================================================================
@@ -961,7 +969,11 @@ export const ORG = {
   destr: {type: 'kind', id: 5, name: '파괴', hover: 0, hp_bar_y: 1.75, shield: {w: 1.3, h: 1.3}, size: {d: 1.2, spikes: 0.2, beak: 0.4},
     displays: [
       D('shell', {pivot: 'centre', joint: [0, .62, 0], spinAxis: 'x', looks: {normal: 'destr_shell_normal', husk: 'destr_shell_husk'}, def: 'normal',
-        models: {destr_shell_normal: () => destrShell(false), destr_shell_m_husk: () => destrShell(true)}, items: {destr_shell_husk: ['destr_shell_m_husk', 0x3A3833]}}),
+        models: {destr_shell_m_normal: () => destrShell(false), destr_shell_m_husk: () => destrShell(true)}, items: {destr_shell_normal: ['destr_shell_m_normal', 0xFFFFFF], destr_shell_husk: ['destr_shell_m_husk', 0x3A3833]},
+        note: 'facet-body armour ball r 0.6 open in front, pale rim, 13 cone spikes; husk = the shell split along X (tinted black)'}),
+      D('shell_x', {pivot: 'centre', parent: 'shell', follow: () => [0, 0, 45], lookOf: 'shell', twinOf: 'shell', looks: {normal: 'destr_shellx_normal', husk: 'destr_shellx_husk'}, def: 'normal',
+        models: {destr_shellx_m_normal: () => destrShell(false, 1), destr_shellx_m_husk: () => destrShell(true, 1)}, items: {destr_shellx_normal: ['destr_shellx_m_normal', 0xFFFFFF], destr_shellx_husk: ['destr_shellx_m_husk', 0x3A3833]},
+        note: 'the diagonal facets of shell (shell rolled 45 degrees about its Z)'}),
       D('face', {pivot: 'centre', joint: [0, .62, 0], spinAxis: 'x', bright: 15, looks: {on: 'destr_face_on'}, def: 'on', models: {destr_face_on: destrFace}, note: 'pulse scale'}),
     ]},
   pred: {type: 'kind', id: 6, name: '포식성', hover: 1.2, hp_bar_y: 2.75, shield: {w: 1.6, h: 1.6}, size: {fish: [2.5, 1.3], bud: [2.1, 1.6], pod: [3.5, 1.8]},

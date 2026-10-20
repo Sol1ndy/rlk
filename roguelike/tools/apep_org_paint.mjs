@@ -239,14 +239,6 @@ const ribbonPx = (u, v, R = PAL.teal, rim = PAL.pale, rw = .14, ra = .9) => {
   if (e < rw) c = mix(c, rim(.1 + .2 * e / rw), ra * smooth(rw, rw * .35, e));
   return c;
 };
-function shellPx(u, v) {     // 파괴: dark armour plates with pale grey bands at the seams
-  const x = u * 8, y = v * 4, fx = x - Math.floor(x), fy = y - Math.floor(y);
-  let c = PAL.destr(.3 + .14 * (N.d(u * 12, v * 12) - .5) + .08 * h1(Math.floor(x) * 3 + Math.floor(y) * 11));
-  const band = Math.min(fx, 1 - fx);
-  if (band < .09) c = mix(c, PAL.destr(.12), .75 * (1 - band / .09));
-  if (Math.min(fy, 1 - fy) < .06) c = sink(c, .3);
-  return c;
-}
 // glow ball (u, v over the sprite; r 0..1 from the centre)
 // a glow disc (glowBall): a white-hot core, the colour ramp outward, a slightly darker rim (cutout: no soft alpha)
 const glowPx = (R, core = .35) => (u, v) => { const r = Math.hypot(u - .5, v - .5) * 2; if (r > .98) return TRANSPARENT;
@@ -467,11 +459,18 @@ add('ne_orb', 16, 16, glowPx(PAL.core, .25), 'nest');
 shapeSprite('ne_drop', SH.w_drop, 64, 'nest', (u, v) => shadeShape(SH.w_drop.sd, u, v, PAL.gem, {t0: .15, edge: .006, w: .03}));
 
 // 파괴 destruction (8 k)
-add('de_shell', 64, 32, shellPx, 'destr');
+// the shell facets (tinted: normal white, husk black): dark olive grey, lighter toward the top, darker round the
+// mouth; soft dark seams, a few pale scratches
+export function destrFacetPx({el, cls, n}, s, t, d) {
+  let c = PAL.destr(.38 - .12 * n[1] + (cls === 1 ? .1 : 0) + .06 * (N.d(s * 5 + el, t * 5 + n[0] * 3) - .5));
+  if (d < .02) c = mix(c, PAL.destr(.6), .45 * smooth(.02, .005, d));
+  if (Math.abs(Math.sin(s * 23 + t * 7 + el)) < .03 && N.a(s * 3 + el, t * 3) > .55) c = mix(c, PAL.destr(.1), .4);
+  return c;
+}
 shapeSprite('de_spike', SH.d_spike, 64, 'destr', (u, v) => { let c = PAL.destr(.7 - .4 * clamp(v / .26) + (u > 0 ? .1 : -.05)); if (-SH.d_spike.sd(u, v) < .006) c = sink(c, .4); return c; });
 add('de_face', 32, 32, (s, t) => { const r = Math.hypot(s - .5, t - .5) * 2; if (r > 1) return TRANSPARENT; return PAL.dface(clamp(.05 + .5 * smooth(.3, 1, r) - .15 * Math.cos(Math.atan2(t - .5, s - .5) * 6) * smooth(.6, .9, r))); }, 'destr');
-add('de_beak', 16, 16, (s, t) => PAL.dface(.2 + .5 * t), 'destr');
-add('de_rim', 32, 16, (s, t) => PAL.destr(.1 + .2 * t + .05 * Math.sin(s * 40)), 'destr');
+add('de_beak', 16, 16, glowPx(PAL.dface, .4), 'destr');
+add('de_rim', 32, 16, (s, t) => mix(PAL.dface(.35), PAL.destr(.1), .35 + .4 * t + .05 * Math.sin(s * 40)), 'destr');
 
 // 포식성 predatory (20 k)
 add('pr_hood', 64, 64, (s, t) => { let c = PAL.hood(.12 + .1 * (N.a(s * 6, t * 6) - .5) + .12 * smooth(.6, 1, Math.abs(s - .5) * 2));
@@ -594,13 +593,12 @@ add('st_cone', 16, 16, (s, t) => PAL.gold(.15 + .55 * t + (s > .5 ? .15 : 0)), '
 shapeSprite('se_seed', SH.se_seed, 64, 'seed', (u, v) => { const d = -SH.se_seed.sd(u, v); return mix(PAL.gold(.25), PAL.gold(0), .6 * smooth(.08, 0, Math.hypot(u + .04, v - .22))) ; });
 
 // ledge / cap tones of the lofts (darker: they face up)
-add('de_shell_l', 16, 16, (s, t) => ledgeOf(PAL.destr(.32)), 'destr');
 add('pr_hood_l', 16, 16, (s, t) => ledgeOf(PAL.hood(.2)), 'pred');
 add('pr_bowl_l', 16, 16, (s, t) => A(ledgeOf(PAL.fin(.3)), .75), 'pred', true);
 add('pr_face_l', 16, 16, (s, t) => ledgeOf(PAL.fin(.3)), 'pred');
 add('he_root_l', 16, 16, (s, t) => ledgeOf(PAL.root(.4 + .2 * N.c(s * 3, t * 3))), 'heart');
 // loft tiles / wraps: texel density per block for the tileUV windows; wraps map u = facet k / n, v along the loft
-for (const n of ['de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
+for (const n of ['pr_hood', 'pr_bowl', 'pr_face', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
 registerTile('he_rootS', 32, 64, 16);
 registerTile('he_vineS', 16, 64, 24);
 registerTile('he_rootSU', 16, 32, 8);

@@ -896,7 +896,35 @@
             0.62,
             0
           ],
-          "elements": 376
+          "elements": 67,
+          "note": "facet-body armour ball r 0.6 open in front, pale rim, 13 cone spikes; husk = the shell split along X (tinted black)"
+        },
+        {
+          "name": "shell_x",
+          "tag": "rlk_ap_om_shell_x",
+          "model": "destr_shellx_normal",
+          "looks": {
+            "normal": "destr_shellx_normal",
+            "husk": "destr_shellx_husk"
+          },
+          "default_look": "normal",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "centre",
+          "offset": [
+            0,
+            -1.38,
+            0
+          ],
+          "overlay": false,
+          "parent": "shell",
+          "joint": [
+            0,
+            0.62,
+            0
+          ],
+          "elements": 24,
+          "note": "the diagonal facets of shell (shell rolled 45 degrees about its Z)"
         },
         {
           "name": "face",
@@ -920,7 +948,7 @@
             0.62,
             0
           ],
-          "elements": 34,
+          "elements": 8,
           "note": "pulse scale"
         }
       ],
@@ -932,7 +960,7 @@
           "loop": true,
           "next": null,
           "events": {},
-          "keys": 12,
+          "keys": 18,
           "key_files": 6,
           "note": "rolls on its side (face to the left), one turn per 32 t"
         },
@@ -950,7 +978,7 @@
             "pulse_5": 36,
             "fast": 36
           },
-          "keys": 63,
+          "keys": 86,
           "key_files": 43,
           "note": "upright, face to the Heart; pulses every 9 t, every 4 t from 36"
         },
@@ -961,7 +989,7 @@
           "loop": false,
           "next": "destr_blast",
           "events": {},
-          "keys": 5,
+          "keys": 7,
           "key_files": 4,
           "note": "shrinks white-hot"
         },
@@ -974,7 +1002,7 @@
           "events": {
             "blast": 1
           },
-          "keys": 3,
+          "keys": 5,
           "key_files": 2,
           "note": "flash; the split husk at 1 (the module then plays org_die)"
         },
@@ -987,7 +1015,7 @@
           "events": {
             "gone": 10
           },
-          "keys": 11,
+          "keys": 21,
           "key_files": 10,
           "note": "the blackened split husk tumbles back to the ground and fades"
         }
@@ -996,8 +1024,8 @@
         "elements": 500,
         "px": 8000
       },
-      "elements": 410,
-      "px": 4608,
+      "elements": 99,
+      "px": 4352,
       "functions": {
         "spawn": "rlk:mboss/apep/om/destr/spawn",
         "tick": "rlk:mboss/apep/om/destr/tick",
@@ -2250,7 +2278,7 @@
     "px_total": 200000,
     "organism_elements": 500,
     "heart_elements": 800,
-    "px": 139264
+    "px": 139008
   },
   "sprites": {
     "bo_petal": {
@@ -2347,11 +2375,6 @@
       "w": 16,
       "h": 16,
       "owner": "nest"
-    },
-    "de_shell": {
-      "w": 64,
-      "h": 32,
-      "owner": "destr"
     },
     "de_spike": {
       "w": 16,
@@ -2518,11 +2541,6 @@
       "h": 32,
       "owner": "seed"
     },
-    "de_shell_l": {
-      "w": 16,
-      "h": 16,
-      "owner": "destr"
-    },
     "pr_hood_l": {
       "w": 16,
       "h": 16,
@@ -2577,6 +2595,11 @@
       "w": 32,
       "h": 160,
       "owner": "nest"
+    },
+    "de_shellF": {
+      "w": 32,
+      "h": 64,
+      "owner": "destr"
     },
     "he_bulbF": {
       "w": 128,
@@ -2646,6 +2669,6 @@
     "kill": "rlk:mboss/apep/om/kill",
     "kill_all": "rlk:mboss/apep/om/kill_all",
     "init": "rlk:mboss/apep/om/init",
-    "files": 1756
+    "files": 1758
   }
 }
