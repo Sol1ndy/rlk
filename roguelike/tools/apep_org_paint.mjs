@@ -484,13 +484,26 @@ shapeSprite('he_sprout', SH.h_sprout, 48, 'heart', (u, v) => shadeShape(SH.h_spr
 shapeSprite('he_stem', SH.h_stem, 20, 'heart', (u, v) => shadeShape(SH.h_stem.sd, u, v, PAL.vine, {t0: .4, edge: .015, w: .04, rimLit: .3}));
 
 // 소생의 찬가 domes (24 k)
-add('do_shell', 64, 64, (s, t) => { const seam = Math.pow(Math.abs(Math.cos(s * Math.PI * 4)), 30); const hex = Math.abs(Math.sin(s * Math.PI * 16 + t * 3)) < .05 ? .08 : 0;
-  return A(mix(PAL.dome(.35), PAL.dome(0), .5 * seam + .3 * smooth(.7, 1, t)), clamp(.16 + .16 * seam + hex + .18 * smooth(.85, 1, t))); }, 'dome', true);
-add('do_vine', 128, 64, (s, t) => { const x = s * 8, y = t * 4, wav = Math.abs(y - 2 - .9 * Math.sin(x * Math.PI * .5) - .4 * Math.sin(x * 3.1));
-  const leaf = (fx, fy) => Math.hypot((x - fx) * 2.2, (y - fy) * 4) < .5; let on = wav < .07;
-  for (let k = 0; k < 8; k++) { const fx = k + .5, fy = 2 + .9 * Math.sin(fx * Math.PI * .5) + .4 * Math.sin(fx * 3.1); if (leaf(fx + .22, fy - .28) || leaf(fx - .2, fy + .3)) on = true; }
-  if (!on) return TRANSPARENT; return PAL.dome(.15 + .25 * (N.a(x, y) - .5)); }, 'dome');
-add('do_rim', 64, 16, (s, t) => A(mix(PAL.dome(0), PAL.dome(.3), t), clamp(.95 - .7 * t)), 'dome', true);
+// the dome's facet faces (apep_org_geometry DOME_FACES; s right, t down the face, d blocks to its edge): translucent
+// lime (alpha ~0.24), brighter toward the base, faint lighter seams; light leaf sprigs (w1 f184 / f330) rising from the
+// base ring through the next one, three variants (cls) round the dome
+export function domeFacetPx({el, cls, w, f}, s, t, d) {
+  const ys = f.poly.map(p => p[1]), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const low = el < 30, x = (s - .5) * w, y = y1 - t * (y1 - y0);          // y: the height above the base
+  let c = mix(PAL.dome(.22), PAL.dome(.06), .6 * smooth(1.2, 0, y)), a = .22 + .12 * smooth(1.0, 0, y) + .04 * smooth(.08, 0, d);
+  if (d < .05) c = mix(c, PAL.dome(0), .3);
+  if (low) {
+    // a sprig: a stem wandering up from the base, leaves alternating along it
+    const ph = cls * 2.1, sx = .55 * Math.sin(y * 1.3 + ph) * (w / 3.6) + (cls - 1) * .35, dx = x - sx;
+    const top = 2.7 - .45 * cls, stem = Math.abs(dx) < .04 && y < top;
+    let leaf = false;
+    for (let k = 0; k < 7; k++) { const ly = .3 + k * .36 + .1 * cls, side = k % 2 ? 1 : -1, lx = sx + side * .19, u = (x - lx) * side, v = y - ly - .1;
+      if (ly < top - .1 && Math.hypot(u / .2, (v - .25 * u) / .085) < 1) leaf = true; }
+    if (stem || leaf) { c = mix(PAL.dome(0), [250, 255, 210, 255], .45); a = .78 * (1 - .45 * smooth(1.2, top, y)) + .12; }
+  }
+  return A(c, a);
+}
+add('do_rim', 64, 16, (s, t) => A(mix([250, 255, 200, 255], PAL.dome(.15), t), clamp(.85 - .55 * t)), 'dome', true);
 shapeSprite('do_sprout', SH.do_sprout, 40, 'dome', (u, v) => shadeShape(SH.do_sprout.sd, u, v, PAL.dome, {t0: .25, edge: .01, w: .04}));
 
 // 둥지 wall blade (8 k)
@@ -517,7 +530,7 @@ add('pr_face_l', 16, 16, (s, t) => ledgeOf(PAL.fin(.3)), 'pred');
 add('he_root_l', 16, 16, (s, t) => ledgeOf(PAL.root(.4 + .2 * N.c(s * 3, t * 3))), 'heart');
 add('st_bark_l', 16, 16, (s, t) => ledgeOf(PAL.stalk(.3 + .1 * N.b(s * 3, t * 3))), 'stalk');
 // loft tiles / wraps: texel density per block for the tileUV windows; wraps map u = facet k / n, v along the loft
-for (const n of ['gu_drapeW', 'gu_sheath', 'gu_bud', 'ne_cap', 'de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'do_shell', 'do_vine', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
+for (const n of ['gu_drapeW', 'gu_sheath', 'gu_bud', 'ne_cap', 'de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
 registerTile('he_rootS', 32, 64, 16);
 registerTile('he_vineS', 16, 64, 24);
 registerTile('he_rootSU', 16, 32, 8);

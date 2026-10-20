@@ -1752,8 +1752,8 @@
             0,
             0
           ],
-          "elements": 376,
-          "note": "two-sided shell, alpha <= 0.35"
+          "elements": 29,
+          "note": "translucent facet hemisphere r 4.45 (alpha <= 0.35, two-sided); its tilted faces at 22.5 / 45 / 67.5 degrees on dome_shell_b / dome_decor / dome_shell_c"
         },
         {
           "name": "dome_decor",
@@ -1771,13 +1771,64 @@
             19,
             21
           ],
+          "parent": "dome_shell",
           "joint": [
             0,
             0,
             0
           ],
-          "elements": 98,
-          "note": "cutout vine band, bright base rim, sprout on top"
+          "elements": 46,
+          "note": "the shell faces turned 45 degrees + the bright base rim and the sprout on top (the shell turned 45 degrees)"
+        },
+        {
+          "name": "dome_shell_b",
+          "tag": "rlk_mb_ap_dome_shell_b",
+          "model": "dome_shellb_idle",
+          "looks": {
+            "idle": "dome_shellb_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 3.3,
+          "pivot": "feet",
+          "idxs": [
+            22,
+            23,
+            24
+          ],
+          "parent": "dome_shell",
+          "joint": [
+            0,
+            0,
+            0
+          ],
+          "elements": 12,
+          "note": "the diagonal facets of dome_shell (dome_shell turned 22.5 degrees)"
+        },
+        {
+          "name": "dome_shell_c",
+          "tag": "rlk_mb_ap_dome_shell_c",
+          "model": "dome_shellc_idle",
+          "looks": {
+            "idle": "dome_shellc_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 3.3,
+          "pivot": "feet",
+          "idxs": [
+            25,
+            26,
+            27
+          ],
+          "parent": "dome_shell",
+          "joint": [
+            0,
+            0,
+            0
+          ],
+          "elements": 12,
+          "note": "the diagonal facets of dome_shell (dome_shell turned 67.5 degrees)"
         }
       ],
       "clips": [
@@ -1790,10 +1841,12 @@
           "events": {},
           "displays": [
             "dome_shell",
-            "dome_decor"
+            "dome_decor",
+            "dome_shell_b",
+            "dome_shell_c"
           ],
-          "keys": 18,
-          "key_files": 18,
+          "keys": 36,
+          "key_files": 36,
           "note": "grows up from the footprint, a small overshoot"
         },
         {
@@ -1805,10 +1858,12 @@
           "events": {},
           "displays": [
             "dome_shell",
-            "dome_decor"
+            "dome_decor",
+            "dome_shell_b",
+            "dome_shell_c"
           ],
-          "keys": 3,
-          "key_files": 3,
+          "keys": 4,
+          "key_files": 4,
           "note": "a faint breath"
         },
         {
@@ -1820,10 +1875,12 @@
           "events": {},
           "displays": [
             "dome_shell",
-            "dome_decor"
+            "dome_decor",
+            "dome_shell_b",
+            "dome_shell_c"
           ],
-          "keys": 12,
-          "key_files": 12,
+          "keys": 24,
+          "key_files": 24,
           "note": "swells and pops (shards: kit)"
         }
       ],
@@ -1831,8 +1888,8 @@
         "elements": 500,
         "px": 24000
       },
-      "elements": 474,
-      "px": 14336,
+      "elements": 99,
+      "px": 12800,
       "functions": {
         "spawn": "rlk:mboss/apep/om/dome/spawn {i}",
         "play": "rlk:mboss/apep/om/dome/play {i,clip}",
@@ -2111,7 +2168,7 @@
     "px_total": 200000,
     "organism_elements": 500,
     "heart_elements": 800,
-    "px": 138496
+    "px": 136960
   },
   "sprites": {
     "bo_petal": {
@@ -2399,16 +2456,6 @@
       "h": 128,
       "owner": "heart"
     },
-    "do_shell": {
-      "w": 64,
-      "h": 64,
-      "owner": "dome"
-    },
-    "do_vine": {
-      "w": 128,
-      "h": 64,
-      "owner": "dome"
-    },
     "do_rim": {
       "w": 64,
       "h": 16,
@@ -2543,6 +2590,11 @@
       "w": 16,
       "h": 48,
       "owner": "heart"
+    },
+    "do_shellF": {
+      "w": 96,
+      "h": 112,
+      "owner": "dome"
     }
   },
   "functions": {
@@ -2552,6 +2604,6 @@
     "kill": "rlk:mboss/apep/om/kill",
     "kill_all": "rlk:mboss/apep/om/kill_all",
     "init": "rlk:mboss/apep/om/init",
-    "files": 1690
+    "files": 1747
   }
 }

@@ -10,7 +10,7 @@
 // Element rotations stay single-axis on the 22.5 degree grid.
 import {abox, cardZ, cardX, cardY, faceEl, faceOfDir, lathe, annulus, checkBounds, r4, rotA} from './mboss_model_lib.mjs';
 import {loft, slab, crossCards, toUnits, mirrorX, retex, rockBox, stroke} from './mboss_shape_lib.mjs';
-import {SH, HOOD as NHOOD, NURT, nurtW, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, PAL, bellFacetPx, bulbFacetPx, bellR, skirtR, BAG, bagR, smooth01} from './apep_org_paint.mjs';
+import {SH, HOOD as NHOOD, NURT, nurtW, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01} from './apep_org_paint.mjs';
 
 export {checkBounds};
 export const RIDE_Y = 2.0;           // the husk passenger point above its feet (org manifest passenger.ride_y)
@@ -333,9 +333,15 @@ function faceCard(f, frame = null, down = [0, -1, 0]) {
 // faces sharing a mask (the same polygon and paint class, mirrored masks reuse it flipped) share a cell.
 // paint({el, n, cls}, s, t, d = blocks to the polygon edge) -> rgba; flat(face) = an 8 px mask (one-colour faces)
 const isCardinal = f => Math.abs(f.el) > 89.9 || Math.abs(((f.az % 90) + 90) % 90) < 1e-6;
-export function facetBody(name, faces, {owner, ppb = 64, paint, cls = () => 0, tint: tn = false, down = null, flat = null, translucent = false, maxPx = 64, aa = false} = {}) {
+// turns: the display turns the faces are split over (azimuth mod 90 of a tilted face; the end caps and, with vertMain,
+// the faces parallel to the axis ride the first display: one rotation about the axis turns them)
+export function facetBody(name, faces, {owner, ppb = 64, paint, cls = () => 0, tint: tn = false, down = null, flat = null, translucent = false, maxPx = 64, aa = false, turns = [0, 45], vertMain = false} = {}) {
   const dnOf = f => down || ((f.axis || 'y') === 'z' ? [0, 0, -1] : [0, -1, 0]);
-  const cards = faces.map(f => ({f, half: isCardinal(f) ? 0 : 1, card: faceCard(f, isCardinal(f) ? null : {axis: f.axis || 'y', deg: 45}, dnOf(f))}));
+  // (a display turned by +tu about the axis shows, cardinal in its own frame, the faces at azimuth -tu mod 90)
+  const turnOf = f => (Math.abs(f.el) > 89.9 || (vertMain && Math.abs(f.el) < 1e-6) ? 0 : Math.round(((90 - (((f.az % 90) + 90) % 90)) % 90) * 10) / 10);
+  const cards = faces.map(f => { const tu = turnOf(f), half = turns.indexOf(tu);
+    if (half < 0) throw new Error(`${name}: face az ${f.az} el ${f.el} needs a display turned ${tu}`);
+    return {f, half, card: faceCard(f, tu ? {axis: f.axis || 'y', deg: tu} : null, dnOf(f))}; });
   const keyOf = (Q, f) => cls(f) + '|' + Q.map(([a, b]) => a.toFixed(3) + ',' + b.toFixed(3)).join(';');
   const canon = Q => { const k = Q.map(([a, b]) => [Math.round(a * 1000), Math.round(b * 1000)]); const i0 = k.reduce((m, p, i) => (p[0] < k[m][0] || (p[0] === k[m][0] && p[1] < k[m][1]) ? i : m), 0);
     const r = [...k.slice(i0), ...k.slice(0, i0)]; const r2 = [r[0], ...r.slice(1).reverse()]; return JSON.stringify(r) < JSON.stringify(r2) ? JSON.stringify(r) : JSON.stringify(r2); };
@@ -375,10 +381,10 @@ export function facetBody(name, faces, {owner, ppb = 64, paint, cls = () => 0, t
     // one layer (no doubled seam, no stairs); opaque bodies cut binary masks half a pixel past the edge (no gaps)
     if (sd > px * (aa ? .5 : .6)) return [0, 0, 0, 0];
     const c = paint({el: m.card.el, n: m.f.n, cls: m.cls, w: card.w, h: card.h, f: m.f}, s, t, Math.max(0, -sd));
-    if (aa) { const cov = Math.max(0, Math.min(1, .5 - sd / px)); return [c[0], c[1], c[2], Math.round((c[3] ?? 255) * cov)]; }
+    if (aa) { const cov = Math.max(0, Math.min(1, .7 - sd / px)); return [c[0], c[1], c[2], Math.round((c[3] ?? 255) * cov)]; }
     return c;
   }, owner, translucent);
-  const els = [[], []];
+  const els = turns.map(() => []);
   for (const c of cards) {
     const m = masks[c.mi], u0 = m.px0 / SW, u1 = (m.px0 + m.pw) / SW, v0 = m.py0 / SH_, v1 = (m.py0 + m.ph) / SH_;
     els[c.half].push(quad(name, c.card.P0, c.card.du, c.card.dv, {rot: c.card.rot, uvr: [c.flip ? u1 : u0, v0, c.flip ? u0 : u1, v1], tint: tn}));
@@ -754,22 +760,22 @@ const vineStem = () => [quad('he_stem', [-.3, .1, 0], [.6, 0, 0], [0, -6.3, 0]),
 // ================================================================================================================
 // domes, wall blade, stalks, seed
 // ================================================================================================================
-// the dome: a hemisphere-like shell r 4.45, h 4.22 in 8 bands of equal latitude steps (tall near the ground, thin near
-// the top), each a two-sided 16-gon ring, the steps closed by two-sided annuli, a small cap on top
-const DOME = Array.from({length: 8}, (_, i) => { const a0 = i * 11.25 * D2R, a1 = (i + 1) * 11.25 * D2R, am = (a0 + a1) / 2;
-  return [r4(4.22 * Math.sin(a0)), r4(4.22 * Math.sin(a1)), r4(4.45 * Math.cos(am) + .02)]; });
-function domeShell() {
-  const els = [];
-  for (const [y0, y1, r] of DOME) els.push(...band([0, 0, 0], r, y0, y1, 'do_shell'));
-  for (let i = 0; i < DOME.length - 1; i++) els.push(...annulus('y', [0, 0, 0], DOME[i][1], DOME[i + 1][2] - .01, DOME[i][2], '+-', 'do_shell', {n: 16, stagger: .003}));
-  els.push(...annulus('y', [0, 0, 0], DOME[DOME.length - 1][1], 0, DOME[DOME.length - 1][2], '+-', 'do_shell', {n: 8, stagger: .003}));
-  return els;
-}
+// the dome (v5 f1590, w1 f184 / f330): a translucent lime hemisphere r 4.45 as a facet body of 16 azimuths x elevations
+// 0 / 22.5 / 45 / 67.5 + the top, every face a two-sided card (seen from inside too) painted with the light leaf
+// sprigs rising from the base; the tilted faces ride three more displays turned 22.5 / 45 / 67.5 degrees (dome_decor is
+// the 45 one and also carries the bright base rim and the sprout on top)
+const DOME_R = 4.45, DOME_TURNS = [0, 22.5, 45, 67.5];
+const DOME_FACES = (() => {
+  const az = Array.from({length: 16}, (_, k) => k * 22.5);
+  const faces = polyFaces([...facetPlanes(revSupport(y => Math.sqrt(Math.max(0, DOME_R * DOME_R - y * y)), 0, DOME_R), {az, el: [0, 22.5, 45, 67.5, 90]}), {n: [0, -1, 0], h: 0, az: 0, el: -90, hidden: true}]).filter(f => !f.hidden);
+  return facetBody('do_shellF', faces, {owner: 'dome', paint: domeFacetPx, translucent: true, aa: true, ppb: 17, maxPx: 64, turns: DOME_TURNS, vertMain: true,
+    cls: f => (Math.abs(f.el) > 89 ? 0 : Math.round(f.az / 22.5) % 3)});
+})();
+const domeShell = () => DOME_FACES[0];
 function domeDecor() {
-  const els = [];
-  for (const [y0, y1, r] of DOME.slice(0, 2)) els.push(...band([0, 0, 0], r - .05, y0, y1, 'do_vine'));
-  els.push(...band([0, 0, 0], 4.47, 0, .32, 'do_rim'));
-  els.push(...crossCards('do_sprout', [0, 4.18, 0], .6, .7, {y0: 0}));
+  const els = [...DOME_FACES[2]];
+  els.push(...band([0, 0, 0], DOME_R + .03, 0, .26, 'do_rim'));
+  els.push(...crossCards('do_sprout', [0, DOME_R - .12, 0], .5, .58, {y0: 0}));
   return els;
 }
 function wallBlade() {
@@ -804,6 +810,7 @@ function twin(par, name, rot, model, build, o = {}) {
   return D(name, {pivot: par.pivot, frame: par.frame, parent: par.name, joint: [0, 0, 0], scale: par.scale, bright: par.bright, follow: () => rot, lookOf: par.name,
     looks, def: par.def, models, items, twinOf: par.name, note: `the diagonal facets of ${par.name} (${par.name} turned ${rot.find(x => x)} degrees)`, ...o});
 }
+const DOME_SHELL = D('dome_shell', {idxs: [0x10, 0x12, 0x14], pivot: 'feet', frame: 'object', scale: 3.3, looks: {idle: 'dome_shell_idle'}, def: 'idle', models: {dome_shell_idle: domeShell}, note: 'translucent facet hemisphere r 4.45 (alpha <= 0.35, two-sided); its tilted faces at 22.5 / 45 / 67.5 degrees on dome_shell_b / dome_decor / dome_shell_c'});
 const HEART_BULB = D('heart_bulb', {idx: 0x00, pivot: 'centre', joint: [0, 1.6, 0], scale: 1.2, bright: 15, looks: {idle: 'heart_bulb_idle', egg_gold: 'heart_bulb_egg_gold', egg_green: 'heart_bulb_egg_green', withered: 'heart_bulb_withered', blaze: 'heart_bulb_blaze'}, def: 'idle',
   models: {heart_bulb_m: heartBulb}, items: {heart_bulb_idle: ['heart_bulb_m', 0xDCEB5C], heart_bulb_egg_gold: ['heart_bulb_m', 0xF5CF4A], heart_bulb_egg_green: ['heart_bulb_m', 0xA8D850],
     heart_bulb_withered: ['heart_bulb_m', 0x8A8258], heart_bulb_blaze: ['heart_bulb_m', 0xFFFCD8]},
@@ -879,8 +886,10 @@ export const ORG = {
     ]},
   dome: {type: 'object', kind: 'fixed_set', count: 3, radius: 4.5, tag: 'rlk_mb_ap_dome', cull: [10, 5],
     displays: [
-      D('dome_shell', {idxs: [0x10, 0x12, 0x14], pivot: 'feet', frame: 'object', scale: 3.3, looks: {idle: 'dome_shell_idle'}, def: 'idle', models: {dome_shell_idle: domeShell}, note: 'two-sided shell, alpha <= 0.35'}),
-      D('dome_decor', {idxs: [0x11, 0x13, 0x15], pivot: 'feet', frame: 'object', scale: 3.3, looks: {idle: 'dome_decor_idle'}, def: 'idle', models: {dome_decor_idle: domeDecor}, note: 'cutout vine band, bright base rim, sprout on top'}),
+      DOME_SHELL,
+      twin(DOME_SHELL, 'dome_decor', [0, 45, 0], 'dome_decor_idle', domeDecor, {idxs: [0x11, 0x13, 0x15], looks: {idle: 'dome_decor_idle'}, items: {}, note: 'the shell faces turned 45 degrees + the bright base rim and the sprout on top (the shell turned 45 degrees)'}),
+      twin(DOME_SHELL, 'dome_shell_b', [0, 22.5, 0], 'dome_shellb_idle', () => DOME_FACES[1], {idxs: [0x16, 0x17, 0x18], looks: {idle: 'dome_shellb_idle'}, items: {}}),
+      twin(DOME_SHELL, 'dome_shell_c', [0, 67.5, 0], 'dome_shellc_idle', () => DOME_FACES[3], {idxs: [0x19, 0x1A, 0x1B], looks: {idle: 'dome_shellc_idle'}, items: {}}),
     ]},
   wall: {type: 'object', kind: 'multi', max: 15, tag: 'rlk_mb_ap_wall', cull: [2, 3.2], blocks: {block: 'minecraft:barrier', y: [201, 202], place: 'replace air'},
     displays: [D('wall_blade', {pivot: 'feet', frame: 'object', scale: 2.0, looks: {idle: 'wall_blade_idle'}, def: 'idle', models: {wall_blade_idle: wallBlade}, note: 'translucent yellow-green blade 0.9 x 2.86, midrib, two windows'})]},

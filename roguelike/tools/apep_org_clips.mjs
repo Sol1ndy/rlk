@@ -165,11 +165,11 @@ export const CLIPS = {
       keys: [[0, {heart_cradle: {t: [0, 0, 0]}, heart_arms: {t: [0, 0, 0]}, heart_tips: {t: [0, 0, 0]}}], [10, sunk, 'i']]}),
   ],
   dome: [
-    C('dome_rise', 10, {next: 'dome_idle', displays: ['dome_shell', 'dome_decor'], note: 'grows up from the footprint, a small overshoot',
-      keys: [[0, {dome_shell: {s: [.35, .02, .35]}, dome_decor: {s: [.35, .02, .35]}}], [5, {dome_shell: {s: [1.05, .72, 1.05]}, dome_decor: {s: [1.05, .7, 1.05]}}, 'o'],
-        [8, {dome_shell: {s: [1.01, 1.05, 1.01]}, dome_decor: {s: [1.01, 1.05, 1.01]}}], [10, {dome_shell: {s: S(1)}, dome_decor: {s: S(1)}}]]}),
-    C('dome_idle', 40, {loop: true, displays: ['dome_shell', 'dome_decor'], note: 'a faint breath', keys: wave(40, 10, t => ({dome_shell: {s: S(1)}, dome_decor: {s: S(1 + .012 * Math.sin(PI2 * t / 40))}}))}),
-    C('dome_pop', 6, {displays: ['dome_shell', 'dome_decor'], note: 'swells and pops (shards: kit)', keys: [[0, {dome_shell: {s: S(1)}, dome_decor: {s: S(1)}}], [2, {dome_shell: {s: S(1.07)}, dome_decor: {s: S(1.07)}}, 'o'], [6, {dome_shell: {s: 0}, dome_decor: {s: 0}}, 'i']]}),
+    // (dome_decor, dome_shell_b and dome_shell_c are the shell's twins: they copy its transform)
+    C('dome_rise', 10, {next: 'dome_idle', displays: ['dome_shell'], note: 'grows up from the footprint, a small overshoot',
+      keys: [[0, {dome_shell: {s: [.35, .02, .35]}}], [5, {dome_shell: {s: [1.05, .71, 1.05]}}, 'o'], [8, {dome_shell: {s: [1.01, 1.05, 1.01]}}], [10, {dome_shell: {s: S(1)}}]]}),
+    C('dome_idle', 40, {loop: true, displays: ['dome_shell'], note: 'a faint breath', keys: wave(40, 10, t => ({dome_shell: {s: S(1 + .01 * Math.sin(PI2 * t / 40))}}))}),
+    C('dome_pop', 6, {displays: ['dome_shell'], note: 'swells and pops (shards: kit)', keys: [[0, {dome_shell: {s: S(1)}}], [2, {dome_shell: {s: S(1.07)}}, 'o'], [6, {dome_shell: {s: 0}}, 'i']]}),
   ],
   wall: [
     C('wall_rise', 5, {displays: ['wall_blade'], note: 'shoots up from the ground', keys: [[0, {wall_blade: {s: [.6, .05, .6]}}], [3, {wall_blade: {s: [1, 1.08, 1]}}, 'o'], [5, {wall_blade: {s: S(1)}}]]}),
@@ -188,7 +188,7 @@ export const CLIPS = {
   seed: [],
 };
 // twins (the diagonal facets of a facet body, geometry twin()) run every clip their parent runs and share its forced looks
-export const withTwins = (owner, list) => list && list.flatMap(n => [n, ...ORG[owner].displays.filter(d => d.twinOf === n).map(d => d.name)]);
+export const withTwins = (owner, list) => list && [...new Set(list.flatMap(n => [n, ...ORG[owner].displays.filter(d => d.twinOf === n).map(d => d.name)]))];
 for (const [o, cs] of Object.entries(CLIPS)) for (const c of cs) { if (c.displays) c.displays = withTwins(o, c.displays); if (c.force) c.force = withTwins(o, c.force); }
 // frozen ids (stub order): kinds then objects, clips in table order
 let NEXT_ID = 0;
