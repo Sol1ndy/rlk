@@ -188,47 +188,89 @@ const leafPaint = (sd, ax, {R = PAL.p3_leafhand, line = PAL.p3_line, rim = PAL.p
 };
 
 // ---- A phase 1: the claw (flat coords a = Z across, s = X outward from the wrist; normal +Y) ---------------------------------
-// three broad lobed fingers fanned from the knuckle line over a palm that starts under the forearm's end, and the
-// back-of-hand shell plate with a tongue over each finger root (the overlapping pale plates of model.md §3.3)
-const FING = [[.24, .5, 2], [-.05, .53, -7], [-.33, .48, -16]];   // [a, s at the knuckle, fan (deg toward +a)]
-const clawParts = k => {
-  const F = FING.map(([a0, s0, deg]) => { const sd = petalShape(.86 * k, .175, deg * D2R); return {a0, s0, deg, L: .86 * k, sd: (a, s) => sd(a - a0, s - s0)}; });
-  const palm = sdPoly([[-.2, -.2], [.12, -.2], [.22, .25], [.27, .6], [-.44, .6], [-.4, .22]]);
-  const T = FING.map(([a0, s0, deg]) => { const sd = petalShape(.3 * k + .06, .1, deg * D2R); return (a, s) => sd(a - a0, s - s0 + .1); });
-  const back = sdPoly([[-.27, .1], [.25, .1], [.3, .46], [-.38, .46]]);
-  return {F, sd: sdUnion((a, s) => palm(a, s) - .05, ...F.map(f => f.sd)), cover: sdUnion((a, s) => back(a, s) - .05, ...T)};
+// three long pointed fingers fanned from the knuckle line over a palm that starts under the forearm's end, a back-of-hand
+// shell plate with a knuckle tongue over each finger root, and a wrist cuff plate over the palm root: the overlapping pale
+// plates with dark contour rims of model.md §3.3 (v1 f285 / f290, v2 f2076: long flat blades, sharp tips, deep notches)
+// a pointed blade: widest at m (fraction of L), the root r0 x W wide; the end a point (q = 1 straight, q < 1 rounded);
+// hook bends the centre line sideways near the tip (fraction of L at the tip)
+const bladeW = (t, W, m, r0, p, q) => (t < 0 || t > 1 ? -1 : t < m ? W * (r0 + (1 - r0) * Math.sin(Math.PI / 2 * t / m) ** .9) : W * Math.max(0, 1 - ((t - m) / (1 - m)) ** p) ** q);
+const bladeShape = (L, W, phi = 0, {m = .4, r0 = .7, p = 1.4, q = .9, hook = 0} = {}) => {
+  const cs = Math.cos(phi), sn = Math.sin(phi);
+  return (a, s) => {
+    const v = a * sn + s * cs, t = v / L, u = a * cs - s * sn - hook * L * clamp((t - .55) / .45) ** 2;
+    const out = t < 0 ? -v : t > 1 ? v - L : 0, w = bladeW(clamp(t), W, m, r0, p, q);
+    return out > 0 ? Math.max(out, Math.abs(u) - Math.max(0, w)) : Math.abs(u) - w;
+  };
 };
-// pale bark: fingers with a lit / shaded crease along their axis, contour rings on the palm and the cover plate
+// [a, s at the knuckle, fan (deg toward +a), length, half width, hook]
+const FING = [[.25, .4, 9, .74, .15, -.05], [-.03, .47, -5, .94, .17, 0], [-.31, .41, -19, .84, .16, .05]];
+const clawParts = k => {
+  const F = FING.map(([a0, s0, deg, L, W, hook]) => { const sd = bladeShape(L * k, W, deg * D2R, {hook}); return {a0, s0, deg, L: L * k, sd: (a, s) => sd(a - a0, s - s0)}; });
+  const palm = sdPoly([[-.18, -.3], [.14, -.3], [.24, .2], [.3, .55], [-.46, .55], [-.4, .18]]);
+  const T = FING.map(([a0, s0, deg, , W]) => { const sd = bladeShape(.3 * k + .08, .7 * W, deg * D2R, {m: .3, r0: .9, p: 2, q: .6}); return (a, s) => sd(a - a0, s - s0 + .12); });
+  const back = sdPoly([[-.25, .02], [.22, .02], [.28, .4], [-.37, .4]]);
+  const cuff = sdPoly([[-.17, -.24], [.13, -.24], [.2, .12], [-.26, .12]]);
+  return {F, sd: sdUnion((a, s) => palm(a, s) - .05, ...F.map(f => f.sd)), cover: sdUnion((a, s) => back(a, s) - .05, ...T), cuff: (a, s) => cuff(a, s) - .05};
+};
+// pale bark: each finger folded along its axis (a lit half, a shaded half, a dark crease), contour lines running inside
+// the outline (the plate rims), rings on the palm and the plates, the root shaded under the forearm
 const clawPaint = (F, sd, top) => (a, s) => {
   const d = sd(a, s); if (d > 0) return null;
   let best = null;
   for (const f of F) { const p = f.deg * D2R, ra = a - f.a0, rs = s - f.s0, t = (ra * Math.sin(p) + rs * Math.cos(p)) / f.L, x = ra * Math.cos(p) - rs * Math.sin(p); if (t > -.1 && (!best || Math.abs(x) < Math.abs(best.x))) best = {t, x}; }
-  let v = (top ? .08 : .16) + .08 * (NS.a(a * 7, s * 7) - .5) + .2 * clamp((.05 - s) / .3);
-  if (!top && best && best.t > 0 && s > .5) {
+  let v = (top ? .06 : .14) + .07 * (NS.a(a * 7, s * 7) - .5) + .22 * clamp((.0 - s) / .3);
+  if (!top && best && best.t > .02 && s > .45) {
     const w = Math.max(.03, Math.abs(best.x) - d), xn = clamp(best.x / w, -1, 1);
-    v += .16 * xn * xn + .1 * clamp((best.t - .7) / .3);
-    if (xn > 0 && xn < .14) v -= .1; else if (xn <= 0 && xn > -.14) v += .1;
-  } else { const r = Math.hypot(a * 1.25 + .05, s - .28), ring = Math.abs(((r * 10 + .7 * NS.b(a * 3, s * 3)) % 1) - .5); if (ring < .07 && r > .06) v += .13; }
+    v += xn < 0 ? .03 + .1 * xn * xn : .2 + .06 * xn;                  // the lit half (-x of the axis) and the shaded half
+    v += .08 * clamp((best.t - .75) / .25);
+    if (Math.abs(xn) < .09 && best.t < .9) v += .16;                     // the crease
+  } else { const r = Math.hypot(a * 1.2 + .05, s - .22), ring = Math.abs(((r * 9 + .8 * NS.b(a * 3, s * 3)) % 1) - .5); if (ring < .06 && r > .07) v += .14; }
   let c = PAL.p1_bark(clamp(v));
-  if (d > -.026) c = mix(c, PAL.p1_line(.8), .92); else if (d > -.05) c = lift(c, .3);
+  if (d > -.026) c = mix(c, PAL.p1_line(.8), .92);
+  else if (d > -.048) c = lift(c, .32);
+  else if (Math.abs(d + .095) < .011) c = mix(c, PAL.p1_bark(.85), .6);   // the inner contour rim
   return c;
 };
-function clawP1(raised) {
-  const k = raised ? .6 : 1, {F, sd, cover} = clawParts(k);
-  const rect = {a0: -.8, a1: .62, s0: -.2, s1: raised ? 1.05 : 1.4};
-  const tex = sheetSprite(raised ? 'h_claw_r' : 'h_claw', rect, clawPaint(F, sd, false), 48, 'p1');
-  const texC = sheetSprite(raised ? 'h_clawc_r' : 'h_clawc', {...rect, s1: .8}, clawPaint(F, cover, true), 48, 'p1');
-  const edge = edgeTile('h_edge_p1', PAL.p1_bark, .3, .55, 'p1');
-  const B = raised ? [[-.2, 0, .1], [.2, 45, .085], [.42, 90, .065], [.66, 135, .05]] : [[-.2, 45, .1], [.3, 22.5, .08], [.52, 0, .065]];
-  const o = [0, raised ? .12 : -.06, 0], fr = [];
-  const els = sheet({o, U: '+z', R: '+x', rect, sd, tex, edge, seed: 401, cell: .06, inset: .9, bands: B.map(([s, ang, half]) => ({s, ang, half}))});
-  els.push(...sheet({o, U: '+z', R: '+x', rect: {...rect, s1: .8}, sd: cover, tex: texC, edge, seed: 405, frames: fr, cell: .07, inset: .8,
+const EDGE_P1 = () => edgeTile('h_edge_p1d', PAL.p1_bark, .5, .8, 'p1');
+function clawPlanted() {
+  const {F, sd, cover, cuff} = clawParts(1);
+  const rect = {a0: -.82, a1: .6, s0: -.34, s1: 1.46};
+  const tex = sheetSprite('h_claw', rect, clawPaint(F, sd, false), 48, 'p1');
+  const texC = sheetSprite('h_clawc', {...rect, s1: .82}, clawPaint(F, cover, true), 48, 'p1');
+  const texK = sheetSprite('h_clawk', {...rect, s1: .2}, clawPaint(F, cuff, true), 48, 'p1');
+  const edge = EDGE_P1();
+  const B = [[-.3, 45, .1], [.06, 22.5, .085], [.32, 0, .068]];
+  const o = [0, -.02, 0], fr = [];
+  const els = sheet({o, U: '+z', R: '+x', rect, sd, tex, edge, seed: 401, cell: .07, inset: .9, bands: B.map(([s, ang, half]) => ({s, ang, half}))});
+  els.push(...sheet({o, U: '+z', R: '+x', rect: {...rect, s1: .82}, sd: cover, tex: texC, edge, seed: 405, frames: fr, cell: .08, inset: .8,
     bands: B.filter(b => b[0] < .8).map(([s, ang, half]) => ({s, ang, half: .03, off: half + .036}))}));
-  // the square gold gem in a raised dark frame on the back of the hand, the gold cone on a dark collar at the forearm's end
-  const sg = raised ? .12 : .44, fg = frameAt(fr, sg), hh = fg.h + .008;
+  els.push(...sheet({o, U: '+z', R: '+x', rect: {...rect, s1: .2}, sd: cuff, tex: texK, edge, seed: 406, cell: .09, inset: .8,
+    bands: B.filter(b => b[0] < .2).map(([s, ang, half]) => ({s, ang, half: .028, off: half + .1}))}));
+  // the square gold gem in a raised dark frame on the back of the hand, the gold cone on a dark collar on the cuff
+  const sg = .42, fg = frameAt(fr, sg), hh = fg.h + .008;
   els.push(boxOn(fg, -.15, .15, sg - .14, sg + .14, hh, hh + .05, 'g_plate', 402), boxOn(fg, -.095, .095, sg - .095, sg + .095, hh + .05, hh + .1, 'p1_gem', 403));
-  const sc0 = raised ? -.08 : .22, fc = frameAt(fr, sc0), top = posed(fc, fc.X(.02, sc0, fc.h));
-  els.push(rockBox([top[0] - .13, top[1] - .03, top[2] - .13], [top[0] + .13, top[1] + .05, top[2] + .13], 'g_plate', {seed: 404}));
+  const sc0 = -.02, fc = frameAt(fr, sc0), top = posed(fc, fc.X(-.02, sc0, fc.h + .1));
+  els.push(rockBox([top[0] - .14, top[1] - .03, top[2] - .14], [top[0] + .14, top[1] + .05, top[2] + .14], 'g_plate', {seed: 404}));
+  els.push(...spike([top[0], top[1] + .05, top[2]], .13, spikeSprite('h_spk_gold1', PAL.p1_gold, 'p1')));
+  return els;
+}
+// the raised claw: the hand hooked down like a bird head (v2 f417): the back of the hand runs on out of the forearm and
+// rolls over the knuckles, the three fingers hang down and curl in; the gem sits on the crown of the roll like an eye
+function clawRaised() {
+  const k = .78, {F, sd, cover} = clawParts(k);
+  const rect = {a0: -.72, a1: .56, s0: -.3, s1: 1.26};
+  const tex = sheetSprite('h_claw_r', rect, clawPaint(F, sd, false), 48, 'p1');
+  const texC = sheetSprite('h_clawc_r', {...rect, s1: .82}, clawPaint(F, cover, true), 48, 'p1');
+  const edge = EDGE_P1();
+  const B = [[-.3, -22.5, .1], [.12, 22.5, .09], [.36, 67.5, .075], [.58, 112.5, .06], [.88, 135, .05]];
+  const o = [0, .1, 0], fr = [];
+  const els = sheet({o, U: '+z', R: '+x', rect, sd, tex, edge, seed: 407, cell: .07, inset: .9, bands: B.map(([s, ang, half]) => ({s, ang, half}))});
+  els.push(...sheet({o, U: '+z', R: '+x', rect: {...rect, s1: .82}, sd: cover, tex: texC, edge, seed: 408, frames: fr, cell: .08, inset: .8,
+    bands: B.filter(b => b[0] < .8).map(([s, ang, half]) => ({s, ang, half: .03, off: half + .036}))}));
+  const sg = .3, fg = frameAt(fr, sg), hh = fg.h + .008;
+  els.push(boxOn(fg, -.15, .15, sg - .13, sg + .13, hh, hh + .05, 'g_plate', 409), boxOn(fg, -.095, .095, sg - .09, sg + .09, hh + .05, hh + .1, 'p1_gem', 410));
+  const sc0 = -.12, fc = frameAt(fr, sc0), top = posed(fc, fc.X(-.02, sc0, fc.h + .04));
+  els.push(rockBox([top[0] - .13, top[1] - .03, top[2] - .13], [top[0] + .13, top[1] + .05, top[2] + .13], 'g_plate', {seed: 411}));
   els.push(...spike([top[0], top[1] + .05, top[2]], .12, spikeSprite('h_spk_gold1', PAL.p1_gold, 'p1')));
   return els;
 }
@@ -489,7 +531,7 @@ function curlC() {
 
 // ---- region interface ------------------------------------------------------------------------------------------------------
 const BUILD = {
-  a: {p1_planted: () => clawP1(false), p1_raised: () => clawP1(true), p3_fork: forkP3},
+  a: {p1_planted: clawPlanted, p1_raised: clawRaised, p3_fork: forkP3},
   b: {p1_open: () => petalFoot(1, false, false), p1_curl: () => petalFoot(1, false, true), p3_curl: curlB, p3_open: openP3},
   c: {p1_open: () => petalFoot(.83, true, false), p1_curl: () => petalFoot(.83, true, true), p3_curl: curlC},
 };
