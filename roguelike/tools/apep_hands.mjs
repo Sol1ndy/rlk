@@ -256,7 +256,7 @@ function clawPlanted() {
   const edge = EDGE_P1();
   const B = [[-.5, 45, .1], [.02, 22.5, .085], [.3, 0, .068]];
   const o = [0, -.02, 0], fr = [];
-  const els = sheet({o, U: '+z', R: '+x', rect, sd, tex, edge, seed: 401, cell: .075, inset: 1.3, bands: B.map(([s, ang, half]) => ({s, ang, half}))});
+  const els = sheet({o, U: '+z', R: '+x', rect, sd, tex, edge: edgeTile('h_edge_p1l', PAL.p1_line, .35, .6, 'p1'), seed: 401, cell: .075, inset: 1.3, bands: B.map(([s, ang, half]) => ({s, ang, half}))});
   els.push(...sheet({o, U: '+z', R: '+x', rect: {...rect, s1: .9}, sd: cover, tex: texC, edge, seed: 405, frames: fr, cell: .08, inset: .8,
     bands: B.filter(b => b[0] < .9).map(([s, ang, half]) => ({s, ang, half: .03, off: half + .036}))}));
   els.push(...sheet({o, U: '+z', R: '+x', rect: {...rect, s1: .3}, sd: cuff, tex: texK, edge, seed: 406, cell: .09, inset: .8,
@@ -280,7 +280,7 @@ function clawRaised() {
   const edge = EDGE_P1();
   const B = [[-.3, -22.5, .1], [.12, 22.5, .09], [.36, 67.5, .075], [.58, 112.5, .06], [.88, 135, .05]];
   const o = [0, .1, 0], fr = [];
-  const els = sheet({o, U: '+z', R: '+x', rect, sd, tex, edge, seed: 407, cell: .07, inset: .9, bands: B.map(([s, ang, half]) => ({s, ang, half}))});
+  const els = sheet({o, U: '+z', R: '+x', rect, sd, tex, edge: edgeTile('h_edge_p1l', PAL.p1_line, .35, .6, 'p1'), seed: 407, cell: .07, inset: .9, bands: B.map(([s, ang, half]) => ({s, ang, half}))});
   els.push(...sheet({o, U: '+z', R: '+x', rect: {...rect, s1: .82}, sd: cover, tex: texC, edge, seed: 408, frames: fr, cell: .08, inset: .8,
     bands: B.filter(b => b[0] < .8).map(([s, ang, half]) => ({s, ang, half: .03, off: half + .036}))}));
   const sg = .3, fg = frameAt(fr, sg), hh = fg.h + .008;
@@ -309,10 +309,12 @@ const tipShape = (L, W, phi = 0) => {
 const RUNS = {f: ['+x', '-z'], b: ['-x', '+z'], l: ['+z', '+x'], r: ['+z', '-x']};
 function petalFoot(k, back, curl) {
   // k = size (B 1.0, C 0.83); back = the petals point back (+Z: the rear feet); curl = cupped up (the lifted foot)
-  const L = 1.04 * k, edge = edgeTile('h_edge_p1', PAL.p1_bark, .3, .55, 'p1'), els = [];
+  // the core sides read as the petals' dark contour from low views (v2 f2076: dark outlines), not as pale steps
+  const L = 1.04 * k, edge = edgeTile('h_edge_p1l', PAL.p1_line, .35, .6, 'p1'), els = [];
   const fwd = back ? 'b' : 'f', fr = [], cz = (back ? .2 : -.2) * k;
   // [run, phi (deg, toward +a), W, mid-plane lift of the root (layering)]
-  const P = [[fwd, 0, .34, .03], [fwd, 40, .3, .015], [fwd, -40, .3, .015], ['l', back ? 24 : -24, .27, 0], ['r', back ? 24 : -24, .27, 0]];
+  // (the three forward petals share a frame: distinct root lifts keep their overlapping roots from z-fighting)
+  const P = [[fwd, 0, .34, .075], [fwd, 40, .3, .015], [fwd, -40, .3, .037], ['l', back ? 24 : -24, .27, 0], ['r', back ? 24 : -24, .27, .022]];
   for (const [run, phiDeg, W0, dy] of P) {
     const phi = phiDeg * D2R, W = W0 * k, cs = Math.cos(phi);
     const sd = petalShape(L, W, phi), ext = L * cs + W * Math.abs(Math.sin(phi)) + .04;
@@ -333,11 +335,11 @@ function petalFoot(k, back, curl) {
     let drop = 0, low = 0; for (let i = 0; i < bands.length; i++) { const L_ = (i + 1 < bands.length ? bands[i + 1].s : ext) - bands[i].s; drop += L_ * Math.sin(bands[i].ang * D2R); low = Math.max(low, drop); }
     const y = curl ? -.12 + dy : -.38 + .06 + low + dy;
     const Uu = mirrorU ? sc(AXV(U), -1) : U;
-    els.push(...sheet({o: [0, y, cz], U: Uu, R, N: '+y', rect, sd: sdS, tex, edge, bands, seed: 421 + els.length, frames: fr, cell: .08}));
+    els.push(...sheet({o: [0, y, cz], U: Uu, R, N: '+y', rect, sd: sdS, tex, edge, bands, seed: 421 + els.length, frames: fr, cell: .08, inset: 1.0}));
     // the raised centre ridge (the petal's convex middle and its vein): a narrow blade laid along the petal's axis
     const sdC = tipShape(.8 * L, .32 * W, phiDeg < 0 ? -phi : phi);
-    const texC = sheetSprite(name + '_c', rect, petalPaint(sdC, phiDeg < 0 ? {...ax, da: -ax.da, L: .8 * L} : {...ax, L: .8 * L}, {seed: k < 1 ? 'd' : 'c', base: .02, root: .3, soft: true}), 48, 'p1');
-    els.push(...sheet({o: [0, y, cz], U: Uu, R, N: '+y', rect, sd: sdC, tex: texC, edge, cell: .1, seed: 471 + els.length, bands: bands.map(b => ({...b, half: .022, off: b.half + .026}))}));
+    const texC = sheetSprite(name + '_c', rect, petalPaint(sdC, phiDeg < 0 ? {...ax, da: -ax.da, L: .8 * L} : {...ax, L: .8 * L}, {seed: k < 1 ? 'd' : 'c', base: .02, root: .3, soft: true}), 32, 'p1');
+    els.push(...sheet({o: [0, y, cz], U: Uu, R, N: '+y', rect, sd: sdC, tex: texC, edge: edgeTile('h_edge_p1', PAL.p1_bark, .3, .55, 'p1'), cell: .1, seed: 471 + els.length, bands: bands.map(b => ({...b, half: .022, off: b.half + .026}))}));
   }
   // the ankle: a pale palm disc closing the centre between the petal roots, a dark collar ring under the cream-gold cone
   const cc = cz + (back ? .14 : -.14) * k;
@@ -397,7 +399,7 @@ const lineLeafPaint = (sd, axis, {R = PAL.p3_lime, base = .12, tip = null, glyph
 // ---- A phase 3: the forked leafy tip (UPRIGHT: the arm runs up and out, 30 deg off vertical) ----------------------------------
 // three long pointed blades fanned from the arm's end (up, up-out, out) + a small lower blade, the gold tip cone on top
 function forkP3() {
-  const els = [], edge = edgeTile('h_edge_p3', PAL.p3_lime, .35, .6, 'p3');
+  const els = [], edge = edgeTile('h_edge_p3', PAL.p3_line, .12, .38, 'p3');
   const BL = [[8, .84, .14, -.05, 1], [36, .96, .16, 0, 1], [64, .8, .14, .05, -1], [102, .44, .1, .09, -1]];
   for (const [deg, L, W, dz, curl] of BL) {
     const p = deg * D2R, axis = stroke([[0, .02], [Math.sin(p) * L, .02 + Math.cos(p) * L]], () => 0), sd = tipShape(L, W, p);
@@ -415,10 +417,10 @@ function forkP3() {
     }
   }
   // the wrist: a small core wrapped by two pointed bracts (front and back) that clasp the blade roots
-  els.push(rockBox([-.1, -.14, -.1], [.1, .05, .1], 'p3_lime', {seed: 413}));
+  els.push(rockBox([-.09, -.14, -.085], [.09, .05, .085], 'p3_lime', {seed: 413}));
   const BR = tipLeaf(.5, .17, 0, 0, -.28), rBr = {a0: -.2, a1: .2, s0: -.28, s1: .24};
   const brT = sheetSprite('h_fork_br', rBr, lineLeafPaint(BR.sd, BR.axis, {R: PAL.p3_lime, base: .22}), 32, 'p3');
-  for (const [z, sg] of [[-.135, 1], [.135, -1]]) els.push(...sheet({o: [.01, 0, z], U: '+x', R: '+y', rect: rBr, sd: BR.sd, tex: brT, edge, seed: 414, anchor: 1,
+  for (const [z, sg] of [[-.15, 1], [.16, -1]]) els.push(...sheet({o: [.01, 0, z], U: '+x', R: '+y', rect: rBr, sd: BR.sd, tex: brT, edge, seed: 414, anchor: 1,
     bands: [{s: rBr.s0, ang: 0, half: .025}, {s: -.02, ang: -22.5 * sg, half: .022}]}));
   els.push(...spike([.1, .1, -.1], .095, spikeSprite('h_spk_gold3', PAL.p3_cone_gold, 'p3')));
   return scaleEls(els, 1.18);
@@ -472,11 +474,11 @@ const underPaint = back => (a, s) => {
   return c;
 };
 function openP3() {
-  const els = [], edgeY = edgeTile('h_edge_p3y', PAL.p3_leafhand, .4, .7, 'p3'), edgeG = edgeTile('h_edge_p3g', PAL.p3_pale, .35, .6, 'p3');
+  const els = [], edgeY = edgeTile('h_edge_p3y', PAL.p3_line, .12, .38, 'p3'), edgeG = edgeTile('h_edge_p3g', PAL.p3_pale, .55, .78, 'p3');
   const R1 = {a0: -.62, a1: 1.86, s0: -.46, s1: 1.2}, R2 = {a0: -.68, a1: .82, s0: .62, s1: 2.32}, RF = {a0: -.96, a1: .5, s0: .02, s1: 2.76};
   // the under-leaf behind, sweeping back as it runs out (its front is the +N card)
   els.push(...sheet({o: [0, -.02, .2], U: '+y', R: '+x', rect: RF, sd: UNDER.sd, tex: sheetSprite('h_underleaf', RF, underPaint(false), 48, 'p3'),
-    texM: sheetSprite('h_underleaf_b', RF, underPaint(true), 48, 'p3'), edge: edgeG, seed: 451, cell: .1,
+    texM: sheetSprite('h_underleaf_b', RF, underPaint(true), 32, 'p3'), edge: edgeG, seed: 451, cell: .1,
     bands: [{s: RF.s0, ang: 0, half: .03}, {s: 1.25, ang: 22.5, half: .03}, {s: 1.8, ang: 45, half: .025}, {s: 2.3, ang: 67.5, half: .022}]}));
   // the outer leaf: three lobes out past the front leaf, sweeping back with the under-leaf
   els.push(...sheet({o: [0, .02, .06], U: '+y', R: '+x', rect: R2, sd: LEAF2.sd, tex: sheetSprite('h_leaf2', R2, lobedPaint(LEAF2), 56, 'p3'),
@@ -486,8 +488,13 @@ function openP3() {
   els.push(...sheet({o: [0, 0, -.13], U: '+x', R: '+y', rect: R1, sd: LEAF1.sd, tex: sheetSprite('h_leaf1_b', R1, undersidePaint(LEAF1), 40, 'p3'),
     texM: sheetSprite('h_leaf1', R1, lobedPaint(LEAF1), 56, 'p3'), edge: edgeY, seed: 453, cell: .1, anchor: 1,
     bands: [{s: R1.s0, ang: -22.5, half: .045}, {s: .28, ang: 0, half: .045}, {s: .72, ang: 22.5, half: .04}, {s: 1.0, ang: 45, half: .035}]}));
-  // the wrist: a lime collar with the gold cone on top
-  els.push(rockBox([-.2, -.2, -.18], [.24, .16, .2], 'p3_lime', {seed: 454}));
+  // the wrist: a small core clasped by two lime bracts (front and back) where the leaves spring, the gold cone on top
+  els.push(rockBox([-.14, -.15, -.12], [.18, .1, .16], 'p3_lime', {seed: 454}));
+  // (the bract shape and sprite are the fork's: tipLeaf(.5, .17) over the same rect)
+  const BR = tipLeaf(.5, .17, 0, 0, -.28), rBr = {a0: -.2, a1: .2, s0: -.28, s1: .24}, edgeL = edgeTile('h_edge_p3', PAL.p3_line, .12, .38, 'p3');
+  const brT = sheetSprite('h_fork_br', rBr, lineLeafPaint(BR.sd, BR.axis, {R: PAL.p3_lime, base: .22}), 32, 'p3');
+  for (const [z, sg] of [[-.17, 1], [.1, -1]]) els.push(...sheet({o: [.03, 0, z], U: '+x', R: '+y', rect: rBr, sd: BR.sd, tex: brT, edge: edgeL, seed: 455, anchor: 1,
+    bands: [{s: rBr.s0, ang: 0, half: .025}, {s: -.02, ang: -22.5 * sg, half: .022}]}));
   els.push(...spike([.02, .16, -.02], .11, spikeSprite('h_spk_gold3', PAL.p3_cone_gold, 'p3')));
   return scaleEls(els, 1.1);
 }
@@ -538,7 +545,7 @@ const rollPaint = (L, W) => {
 // (a leafy ball, v6 f528 / f165): an outer ring of four big leaves and an inner ring of four smaller, tighter ones
 const rosLeaf = (L, W, phi) => { const sd = rollSd(L, W), cs = Math.cos(phi), sn = Math.sin(phi); return (a, s) => sd(a * cs - s * sn, a * sn + s * cs); };
 function curlB() {
-  const els = [], edge = edgeTile('h_edge_p3y', PAL.p3_leafhand, .4, .7, 'p3');
+  const els = [], edge = edgeTile('h_edge_p3y', PAL.p3_line, .12, .38, 'p3');
   const RING = [
     {L: 1.0, W: .34, phi: 12, y: -.12, name: 'h_ros_o', bands: [[0, 22.5, .055], [.26, -22.5, .05], [.5, -45, .045], [.72, -67.5, .04]]},
     {L: .86, W: .28, phi: -24, y: -.05, name: 'h_ros_i', bands: [[0, -22.5, .045], [.2, -45, .04], [.44, -67.5, .035], [.68, -90, .03]]},
@@ -580,7 +587,7 @@ const TIP_I = tipLeaf(1.02, .21, -10, -.2, -.12), TIP_O = tipLeaf(1.3, .23, 9, .
 const SIDE = tipLeaf(.9, .4, 90, -.32, 0), BACKL = tipLeaf(.92, .36, 0, .08, -.36);
 const INNER = tipLeaf(1.0, .3, 4, .1, -.2);
 function curlC() {
-  const els = [], edge = edgeTile('h_edge_p3y', PAL.p3_leafhand, .4, .7, 'p3');
+  const els = [], edge = edgeTile('h_edge_p3y', PAL.p3_line, .12, .38, 'p3');
   const yel = (L, o = {}) => lineLeafPaint(L.sd, L.axis, {R: PAL.p3_leafhand, base: .08, tip: C('#F2EE7A'), ...o});
   const pale = L => lineLeafPaint(L.sd, L.axis, {R: P3_UNDER, base: .16});
   // the back leaf (outside to the back) and the pale inner leaf
@@ -608,7 +615,7 @@ function curlC() {
   els.push(...sheet({o: [0, -.08, -.3], U: '+x', R: '+y', rect, sd: BOWL.sd, tex: sheetSprite('h_cup_i', rect, lineLeafPaint(BOWL.sd, BOWL.axis, {R: PAL.p3_lime, base: .3}), 32, 'p3'),
     texM: sheetSprite('h_cup', rect, yel(BOWL, {glyph: true}), 56, 'p3'), edge, seed: 461, anchor: 3,
     bands: [{s: -.42, ang: 67.5, half: .04}, {s: -.28, ang: 45, half: .04}, {s: -.1, ang: 22.5, half: .04}, {s: .08, ang: 0, half: .04}, {s: .26, ang: -22.5, half: .035}]}));
-  els.push(rockBox([-.15, -.13, -.13], [.17, .12, .15], 'p3_lime', {seed: 462}));
+  els.push(rockBox([-.15, -.115, -.13], [.17, .12, .15], 'p3_lime', {seed: 462}));
   els.push(...spike([.6, -.24, -.12], .09, spikeSprite('h_spk_cream3', PAL.p3_cone, 'p3'), {axis: 'x', dir: 1}));
   return scaleEls(els, 1.2, [0, -.3, 0]);
 }
