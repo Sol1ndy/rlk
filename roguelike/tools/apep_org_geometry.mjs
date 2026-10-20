@@ -10,7 +10,7 @@
 // Element rotations stay single-axis on the 22.5 degree grid.
 import {abox, cardZ, cardX, cardY, faceEl, faceOfDir, lathe, annulus, checkBounds, r4, rotA} from './mboss_model_lib.mjs';
 import {loft, slab, crossCards, toUnits, mirrorX, retex, rockBox, stroke} from './mboss_shape_lib.mjs';
-import {SH, HOOD as NHOOD, NURT, nurtW, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, stalkSkin, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01, guardFacetPx, RIB} from './apep_org_paint.mjs';
+import {SH, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, stalkSkin, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01, guardFacetPx, RIB, nurtRibPx, nurtHoodPx, hoodKeep, hoodNear} from './apep_org_paint.mjs';
 
 export {checkBounds};
 export const RIDE_Y = 2.0;           // the husk passenger point above its feet (org manifest passenger.ride_y)
@@ -97,6 +97,14 @@ function radialSlab(name, sprite, th, opt = {}) {
 // a 3-box rounded orb (glow balls): reads round at the sizes used here
 const orb = (c, r, tex) => [abox([c[0] - r, c[1] - r * .62, c[2] - r * .62], [c[0] + r, c[1] + r * .62, c[2] + r * .62], tex),
   abox([c[0] - r * .62, c[1] - r, c[2] - r * .62], [c[0] + r * .62, c[1] + r, c[2] + r * .62], tex), abox([c[0] - r * .62, c[1] - r * .62, c[2] - r], [c[0] + r * .62, c[1] + r * .62, c[2] + r], tex)];
+// a glowing ball: seven glow discs through the centre (the three axis planes, the two vertical diagonals, two tilted
+// 45 degrees): round from every side, bright at the core
+function glowBall(c, r, sprite) {
+  const [x, y, z] = c, d = 2 * r;
+  return [quad(sprite, [x - r, y + r, z], [d, 0, 0], [0, -d, 0]), quad(sprite, [x, y + r, z - r], [0, 0, d], [0, -d, 0]), quad(sprite, [x - r, y, z - r], [d, 0, 0], [0, 0, d]),
+    quad(sprite, [x - r, y + r, z], [d, 0, 0], [0, -d, 0], {rot: ['y', 45, c]}), quad(sprite, [x, y + r, z - r], [0, 0, d], [0, -d, 0], {rot: ['y', 45, c]}),
+    quad(sprite, [x - r, y, z - r], [d, 0, 0], [0, 0, d], {rot: ['x', 45, c]}), quad(sprite, [x - r, y, z - r], [d, 0, 0], [0, 0, d], {rot: ['x', -45, c]})];
+}
 // a two-sided ring band (lathe outward + inward) round the y axis
 const band = (c, r, y0, y1, tex, n = 16) => [...lathe('y', c, [{a: [y0, y1], r, tex}], {vFrom: y1, vTo: y0, n}), ...lathe('y', c, [{a: [y0, y1], r: r - .004, tex}], {vFrom: y1, vTo: y0, n, inward: true})];
 // a cone spike as two crossed triangle cards along an axis-aligned direction dir from base point P (length L, width w);
@@ -338,7 +346,8 @@ function faceCard(f, frame = null, down = [0, -1, 0]) {
 const isCardinal = f => Math.abs(f.el) > 89.9 || Math.abs(((f.az % 90) + 90) % 90) < 1e-6;
 // turns: the display turns the faces are split over (azimuth mod 90 of a tilted face; the end caps and, with vertMain,
 // the faces parallel to the axis ride the first display: one rotation about the axis turns them)
-export function facetBody(name, faces, {owner, ppb = 64, paint, cls = () => 0, tint: tn = false, down = null, flat = null, translucent = false, maxPx = 64, aa = false, turns = [0, 45], vertMain = false} = {}) {
+// split(face) -> key: the elements grouped by key ({key: [half 0, half 1, ..]}; several looks sharing one sprite)
+export function facetBody(name, faces, {owner, ppb = 64, paint, cls = () => 0, tint: tn = false, down = null, flat = null, translucent = false, maxPx = 64, aa = false, turns = [0, 45], vertMain = false, split = null} = {}) {
   const dnOf = f => down || ((f.axis || 'y') === 'z' ? [0, 0, -1] : [0, -1, 0]);
   // (a display turned by +tu about the axis shows, cardinal in its own frame, the faces at azimuth -tu mod 90)
   const turnOf = f => (Math.abs(f.el) > 89.9 || (vertMain && Math.abs(f.el) < 1e-6) ? 0 : Math.round(((90 - (((f.az % 90) + 90) % 90)) % 90) * 10) / 10);
@@ -387,12 +396,13 @@ export function facetBody(name, faces, {owner, ppb = 64, paint, cls = () => 0, t
     if (aa) { const cov = Math.max(0, Math.min(1, .7 - sd / px)); return [c[0], c[1], c[2], Math.round((c[3] ?? 255) * cov)]; }
     return c;
   }, owner, translucent);
-  const els = turns.map(() => []);
+  const els = turns.map(() => []), groups = {};
   for (const c of cards) {
     const m = masks[c.mi], u0 = m.px0 / SW, u1 = (m.px0 + m.pw) / SW, v0 = m.py0 / SH_, v1 = (m.py0 + m.ph) / SH_;
-    els[c.half].push(quad(name, c.card.P0, c.card.du, c.card.dv, {rot: c.card.rot, uvr: [c.flip ? u1 : u0, v0, c.flip ? u0 : u1, v1], tint: tn}));
+    const e = quad(name, c.card.P0, c.card.du, c.card.dv, {rot: c.card.rot, uvr: [c.flip ? u1 : u0, v0, c.flip ? u0 : u1, v1], tint: tn});
+    if (split) (groups[split(c.f)] ||= turns.map(() => []))[c.half].push(e); else els[c.half].push(e);
   }
-  return els;
+  return split ? groups : els;
 }
 // the support function of a point cloud (any convex hull: lumpy, non-symmetric bodies)
 export const pointSupport = P => n => { let m = -Infinity; for (const p of P) { const v = p[0] * n[0] + p[1] * n[1] + p[2] * n[2]; if (v > m) m = v; } return m; };
@@ -484,47 +494,87 @@ function shieldModel() {
 // ================================================================================================================
 // 양육 nurturing: S ribbon stalk + fronds + gold shard, the hood cap, the orb, the immune ring overlay
 // ================================================================================================================
-// the stalk (v3 f1240 / f1300): one broad leaf ribbon rising in a half twist (vertical panels, the azimuth stepping
-// 22.5 degrees per panel, each showing its slice of the unrolled ribbon sprite, whose alpha draws the smooth edges),
-// leaning back a little and forward again under the hood; a second short sweep at the base, pale fronds splayed on
-// the ground, the gold shard high on its left
-const nurtC = y => [.05 * Math.sin(Math.PI * y / 1.4), y, .1 * Math.sin(Math.PI * y / 2.4) - .04];
-function ribbonPanel(sprite, c, wp, h, phi, v0, v1, W) {
-  const e = vpanel(sprite, c, wp, h, phi, v0, v1);
-  // narrow the card's u window to its width (the sprite spans W)
-  const u0 = .5 - wp / (2 * W), u1 = .5 + wp / (2 * W);
-  for (const f of Object.values(e.faces)) { const [a, b2, c2, d] = f.uv, lo = Math.min(a, c2), hi = Math.max(a, c2), m = x => r4(lo + (x - lo) / ((hi - lo) || 1) * (hi - lo) * (u1 - u0) + 16 * u0 * 0 + (x - lo) * 0);
-    const map = x => r4(16 * u0 + (x - lo) / ((hi - lo) || 1) * 16 * (u1 - u0)); f.uv = [map(a), b2, map(c2), d]; }
-  return e;
-}
-function nurtStalk() {
-  const els = [], N = 9, T = NURT.top;
-  for (let i = 0; i < N; i++) {
-    const y0 = T * i / N, y1 = T * (i + 1) / N, ym = (y0 + y1) / 2, h = y1 - y0 + .04;
-    let wp = 0; for (let k = 0; k <= 8; k++) wp = Math.max(wp, nurtW(y0 + (y1 - y0) * k / 8));
-    els.push(ribbonPanel('nu_rib', nurtC(ym), wp + .02, h, -22.5 * i, 1 - y1 / T - .02 / T, 1 - y0 / T + .02 / T, NURT.W));
+// a twisted ribbon as vertical panels, one per step up its length, each turned (on the 22.5 degree grid) to the
+// ribbon's width direction there and showing its own cell of an atlas sprite: the ribbon's cross-sections over the step
+// projected onto it (u across, y up), so the panel stair never shows and the outline stays smooth however the
+// centreline wanders. spec: c(y) -> [x, z] the centreline, W(y) the width, phi(y) the width direction (deg from +X toward
+// +Z), y0 .. y1 in n steps, ppb, paint(v, y, e, side) (v -1 .. 1 across, e = blocks to the nearer edge)
+const catmull = (ks, vs) => y => { const n = ks.length; if (y <= ks[0]) return vs[0]; if (y >= ks[n - 1]) return vs[n - 1];
+  let i = 0; while (y > ks[i + 1]) i++; const t = (y - ks[i]) / (ks[i + 1] - ks[i]), p0 = vs[Math.max(0, i - 1)], p1 = vs[i], p2 = vs[i + 1], p3 = vs[Math.min(n - 1, i + 2)];
+  return .5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t); };
+function ribbonAtlas(name, {c, W, phi, y0, y1, n, ppb, paint, owner}) {
+  const ov = .006, cells = [], E0 = [[1, 0, 0], [0, 0, 1]];
+  const edge = (y, sg) => { const [x, z] = c(y), a = phi(y) * D2R, h = W(y) / 2; return [x + sg * h * Math.cos(a), y, z + sg * h * Math.sin(a)]; };
+  for (let k = 0; k < n; k++) {
+    const ya = y0 + (y1 - y0) * k / n - ov, yb = y0 + (y1 - y0) * (k + 1) / n + ov, ym = (ya + yb) / 2, [cx, cz] = c(ym);
+    const ph = Math.round(phi(ym) / 22.5) * 22.5, want = [Math.cos(ph * D2R), 0, Math.sin(ph * D2R)];
+    let best = null;
+    for (const e0 of E0) for (const g of [0, 22.5, -22.5, 45, -45]) { const e = rotA('y', g, e0), d = Math.abs(e[0] * want[0] + e[2] * want[2]); if (!best || d > best.d + 1e-9) best = {e0, g, e, d}; }
+    const {e0, g, e} = best, uOf = P => (P[0] - cx) * e[0] + (P[2] - cz) * e[2];
+    let lo = Infinity, hi = -Infinity;
+    for (let i = 0; i <= 12; i++) { const y = ya + (yb - ya) * i / 12; for (const sg of [-1, 1]) { const u = uOf(edge(y, sg)); lo = Math.min(lo, u); hi = Math.max(hi, u); } }
+    lo -= .02; hi += .02;
+    cells.push({ya, yb, cx, cz, e0, g, e, lo, hi, uOf, pw: Math.max(4, Math.round((hi - lo) * ppb)), ph: Math.max(4, Math.round((yb - ya) * ppb))});
   }
-  // the base sweep: a short ribbon turned 90 degrees, leaning out
-  els.push(quad('nu_base', [.05, .62, -.02], [0, 0, .42], [0, -.62, 0], {rot: ['z', -22.5, [.05, 0, .19]]}));
+  // shelf-pack the cells (rows of the sprite)
+  const SW = Math.min(256, Math.max(16, Math.ceil(Math.max(...cells.map(q => q.pw)) * 2 / 16) * 16));
+  let x = 0, yy = 0, shelf = 0;
+  for (const q of cells) { if (x + q.pw > SW) { x = 0; yy += shelf; shelf = 0; } q.px0 = x; q.py0 = yy; x += q.pw; shelf = Math.max(shelf, q.ph); }
+  const SH_ = Math.max(16, Math.ceil((yy + shelf) / 16) * 16), grid = new Int32Array(SW * SH_).fill(-1);
+  cells.forEach((q, i) => { for (let b = q.py0; b < q.py0 + q.ph; b++) for (let a = q.px0; a < q.px0 + q.pw; a++) grid[b * SW + a] = i; });
+  addSprite(name, SW, SH_, (S0, T0) => {
+    const X = Math.min(SW - 1, Math.floor(S0 * SW)), Y = Math.min(SH_ - 1, Math.floor(T0 * SH_)), i = grid[Y * SW + X];
+    if (i < 0) return [0, 0, 0, 0];
+    const q = cells[i], u = q.lo + (S0 * SW - q.px0) / q.pw * (q.hi - q.lo), y = q.yb - (T0 * SH_ - q.py0) / q.ph * (q.yb - q.ya);
+    const um = q.uOf(edge(y, -1)), up = q.uOf(edge(y, 1));
+    if (u < Math.min(um, up) || u > Math.max(um, up)) return [0, 0, 0, 0];
+    const v = Math.abs(up - um) < 1e-6 ? 0 : 2 * (u - um) / (up - um) - 1;
+    return paint(v, y, (1 - Math.abs(v)) * W(y) / 2);
+  }, owner);
+  return cells.map(q => {
+    const um = (q.lo + q.hi) / 2, w = q.hi - q.lo, h = q.yb - q.ya, M = [q.cx + q.e[0] * um, (q.ya + q.yb) / 2, q.cz + q.e[2] * um];
+    const P0 = [M[0] - q.e0[0] * w / 2, q.yb, M[2] - q.e0[2] * w / 2];
+    return quad(name, P0, q.e0.map(v => v * w), [0, -h, 0], {rot: q.g ? ['y', q.g, M] : undefined, uvr: [q.px0 / SW, q.py0 / SH_, (q.px0 + q.pw) / SW, (q.py0 + q.ph) / SH_]});
+  });
+}
+// the stalk (v3 f1300 / f1240): one broad slate-teal ribbon with white rims rising from a fan of pale fronds in an S:
+// broad and face-on at the foot, sweeping out to the organism's left while it narrows and turns edge-on (half a twist
+// by the top), back over the axis and up the back into the hood; the gold shard on the hood's right flank
+// (the twist runs through the narrow waist, y .55 .. 1.4: a vertical panel can only follow the twist in 22.5 degree
+// kinks, whose edge mismatch scales with the width; the broad foot and top stay flat, their centreline moving in plane)
+const NRIB = {c: (() => { const ks = [0, .45, .9, 1.25, 1.6, 1.95, 2.16], fx = catmull(ks, [0, .18, .34, .32, .16, .02, 0]), fz = catmull(ks, [-.04, -.04, -.01, .04, .1, .17, .21]); return y => [fx(y), fz(y)]; })(),
+  W: catmull([0, .3, .6, .95, 1.3, 1.75, 2.16], [.7, .58, .44, .3, .4, .5, .48]), phi: y => 180 * smooth01((y - .55) / .85)};
+const NRIB_ELS = ribbonAtlas('nu_ribA', {...NRIB, y0: 0, y1: 2.16, n: 20, ppb: 60, paint: nurtRibPx, owner: 'nurt'});
+function nurtStalk() {
+  const els = [...NRIB_ELS];
   for (let k = 0; k < 6; k++) {
-    const th = [0, 67.5, 112.5, 180, 247.5, 292.5][k], [b, g] = baseAz(th), d = unitAz(b), tg = tanAz(b);
+    const th = [0, 45, 90, 157.5, 270, 315][k], L = [.8, .7, .62, .5, .62, .72][k], [b, g] = baseAz(th), d = unitAz(b), tg = tanAz(b);
     // a frond lying outward on the ground, tip slightly raised (cardinal ones tilted 22.5 up)
-    const L = .62, w = .22, P0 = [d[0] * .1 - tg[0] * w / 2, .03, d[2] * .1 - tg[2] * w / 2];
+    const w = .24, P0 = [d[0] * .08 - tg[0] * w / 2, .03, d[2] * .08 - tg[2] * w / 2];
     let rot = g ? ['y', g, [0, 0, 0]] : null;
-    if (!g) { const axis = Math.abs(d[2]) > .5 ? 'x' : 'z'; rot = [axis, axis === 'x' ? (d[2] < 0 ? 22.5 : -22.5) : (d[0] > 0 ? 22.5 : -22.5), [d[0] * .1, .03, d[2] * .1]]; }
+    if (!g) { const axis = Math.abs(d[2]) > .5 ? 'x' : 'z'; rot = [axis, axis === 'x' ? (d[2] < 0 ? 22.5 : -22.5) : (d[0] > 0 ? 22.5 : -22.5), [d[0] * .08, .03, d[2] * .08]]; }
     els.push(quad('nu_frond', P0.map((x, i) => x + d[i] * L), [tg[0] * w, 0, tg[2] * w], [-d[0] * L, 0, -d[2] * L], {rot}));
   }
-  els.push(...crossCards('nu_gem', [.22, 1.78, .14], .2, .34, {y0: -.17}));
   return els;
 }
-// the hood: a cream leaf bent over the top like a drooping tulip (strips along an arc in the Y-Z plane, the leaf outline
-// in the sprite), its edges curled down (two crescent cheeks); tilt = the hood lifted open toward the targets
-function nurtCap(t) {
-  const els = stripChain('nu_hoodL', NHOOD[t ? 'tilt' : 'idle'], .64);
-  for (const x of [.25, -.25]) els.push(...shapeSlab(t ? 'n_cheekT' : 'n_cheek', t ? 'nu_cheekT' : 'nu_cheek', 'x', x, {half: .015, core: false}));
-  return els;
-}
-const nurtOrb = () => [...orb([0, 0, 0], .15, 'nu_orb'), ...crossCards('nu_orb', [0, 0, 0], .44, .44, {y0: -.22})];
+// the hood (cap frame, round its joint): a cream bonnet over the orb - a facet body round an egg tilted 25 degrees
+// forward-down with a pointed tulip tip at the front, cut open underneath and at the lower front (the cut drawn by the
+// masks in 3D: nurtHoodPx); tilt = the opening lifted toward the targets. Diagonal faces on cap_x
+const HOOD_C = [0, 0, -.14];
+const HOOD_FACES = (() => {
+  const P = [], tl = 30 * D2R;
+  for (let i = 1; i < 12; i++) for (let j = 0; j < 24; j++) { const a = Math.PI * i / 12, b = 2 * Math.PI * j / 24;
+    const x = .34 * Math.sin(a) * Math.cos(b), y = .3 * Math.cos(a), z = .52 * Math.sin(a) * Math.sin(b);
+    P.push([HOOD_C[0] + x, HOOD_C[1] + y * Math.cos(tl) + z * Math.sin(tl), HOOD_C[2] + z * Math.cos(tl) - y * Math.sin(tl)]); }
+  P.push([0, .3, -.12], [0, -.42, -.62]);
+  const body = polyFaces(facetPlanes(pointSupport(P), {el: [-90, -67.5, -45, -22.5, 0, 22.5, 45, 67.5, 90]}));
+  // both looks in one sprite: faces clear of either cut share their cell
+  const faces = ['idle', 'tilt'].flatMap(look => body.filter(f => hoodKeep(f, look)).map(f => ({...f, look, i: body.indexOf(f), cut: hoodNear(f)})));
+  return facetBody('nu_hoodF', faces, {owner: 'nurt', paint: nurtHoodPx, cls: f => (f.cut ? f.look + f.i : 'f' + f.i), ppb: 36, maxPx: 24, split: f => f.look});
+})();
+const nurtCap = look => [...HOOD_FACES[look][0], ...crossCards('nu_gem', [-.36, -.06, -.06], .18, .36, {y0: -.18})];
+const nurtCapX = look => HOOD_FACES[look][1];
+const nurtOrb = () => glowBall([0, 0, 0], .19, 'nu_orb');
 const nurtRing = () => band([0, 0, 0], 1.3, 0, .5, 'nu_ring');
 
 // ================================================================================================================
@@ -577,7 +627,7 @@ function guardBud() {
 }
 const guardBudX = () => BUD_FACES[1];
 const guardWisp = () => [...shapeSlab('g_wisp', 'gu_wisp', 'z', 0, {half: .05, cell: .08, inset: .5, edge: 'gu_wisp'}), ...shapeSlab('g_wisp', 'gu_wisp', 'x', 0, {half: .04, core: false})];
-const guardOrb = () => [...orb([0, 0, 0], .2, 'gu_orb'), ...crossCards('gu_orb', [0, 0, 0], .6, .6, {y0: -.3})];
+const guardOrb = () => glowBall([0, 0, 0], .26, 'gu_orb');
 
 // ================================================================================================================
 // 둥지 nesting: the pointed cap with the eye, two sepal wings (children of the cap)
@@ -586,7 +636,7 @@ function nestCap() {
   const els = [...loft('y', stops([.1, .26, .42, .58, .72, .86, .98, 1.12], [.3, .29, .25, .19, .13, .08, .045, .02]).map(s => ({...s, c: [0, -.04]})), {n: 16, tex: 'ne_cap', ledgeTex: 'ne_cap_l', caps: '-', seed: 11}),
     ...loft('y', stops([-.3, -.1, .12], [.17, .21, .22]).map(s => ({...s, c: [0, -.08]})), {n: 8, tex: 'ne_cap', ledgeTex: 'ne_cap_l', caps: '-', seed: 13})];
   els.push(...shapeSlab('w_ring', 'ne_ring', 'z', -.17, {half: .035, cell: .04, inset: .4}));
-  els.push(...orb([0, 0, -.13], .12, 'ne_orb'));
+  els.push(...glowBall([0, 0, -.13], .14, 'ne_orb'));
   els.push(quad('ne_drop', [-.07, -.24, -.19], [.14, 0, 0], [0, -.22, 0]));
   for (let k = 0; k < 8; k++) els.push(radialCard('ne_thorn', k * 45 + 22.5, .24, .34, .02, .14));
   return els;
@@ -653,7 +703,7 @@ function predJaw() {
   return els;
 }
 const predTail = () => [quad('pr_tail', [0, .5, -.04], [0, 0, .94], [0, -1.0, 0])];
-const predCore = () => [...orb([0, 0, 0], .22, 'pr_core'), ...crossCards('pr_core', [0, 0, 0], .6, .6, {y0: -.3})];
+const predCore = () => glowBall([0, 0, 0], .28, 'pr_core');
 // the bud (empowered): a diamond 2.1 x 1.6 - a cream ogive of eight petal facets closing to a point (a short horn on
 // top, four petals leaning in), over a translucent green star bowl tapering to the lower point, eight sepals at the rim
 function predBud() {
@@ -875,8 +925,12 @@ export const ORG = {
     ]},
   nurt: {type: 'kind', id: 2, name: '양육', hover: 0, hp_bar_y: 2.8, shield: {w: 1.4, h: 2.6}, size: {h: 2.4},
     displays: [
-      D('stalk', {pivot: 'feet', frame: 'object', scale: 1.6, looks: {idle: 'nurt_stalk_idle'}, def: 'idle', models: {nurt_stalk_idle: nurtStalk}, note: 'S-curved dark-teal ribbon with pale rims, fronds, the gold shard'}),
-      D('cap', {pivot: 'centre', joint: [0, 2.18, .06], looks: {idle: 'nurt_cap_idle', tilt: 'nurt_cap_tilt'}, def: 'idle', models: {nurt_cap_idle: () => nurtCap(false), nurt_cap_tilt: () => nurtCap(true)}, note: 'cream hood-leaf; tilt = the hood lifted open'}),
+      D('stalk', {pivot: 'feet', frame: 'object', scale: 1.6, looks: {idle: 'nurt_stalk_idle'}, def: 'idle', models: {nurt_stalk_idle: nurtStalk}, note: 'S-curved twisting slate-teal ribbon with white rims (atlas panels), pale fronds on the ground'}),
+      D('cap', {pivot: 'centre', joint: [0, 2.18, .06], looks: {idle: 'nurt_cap_idle', tilt: 'nurt_cap_tilt'}, def: 'idle', models: {nurt_cap_idle: () => nurtCap('idle'), nurt_cap_tilt: () => nurtCap('tilt')},
+        note: 'cream bonnet hood (a facet body cut open underneath, the tulip tip in front) + the gold shard; tilt = the opening lifted toward the targets'}),
+      // the hood's diagonal facets (the cap turned 45 degrees about its Y)
+      D('cap_x', {pivot: 'centre', parent: 'cap', follow: () => [0, 45, 0], lookOf: 'cap', twinOf: 'cap', looks: {idle: 'nurt_capx_idle', tilt: 'nurt_capx_tilt'}, def: 'idle',
+        models: {nurt_capx_idle: () => nurtCapX('idle'), nurt_capx_tilt: () => nurtCapX('tilt')}, note: 'the diagonal facets of cap (cap turned 45 degrees)'}),
       D('orb', {pivot: 'centre', joint: [0, 2.06, -.4], bright: 15, looks: {on: 'nurt_orb_on'}, def: 'on', models: {nurt_orb_on: nurtOrb}, note: 'pulse'}),
       D('ring', {pivot: 'feet', frame: 'object', overlay: true, looks: {on: 'nurt_ring_on'}, def: 'on', models: {nurt_ring_on: nurtRing}, note: 'translucent cylinder r 1.3, h 0.5, only while immune (om/nurt/ring/on|off)'}),
     ]},

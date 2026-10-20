@@ -154,14 +154,6 @@ function shadeShape(sd, u, v, R, {t0 = .3, rimLit = .25, rimDark = .25, edge = .
 // ---- 2D shapes (blocks) shared with the geometry ---------------------------------------------------------------------
 // Each: {rect: {u0, u1, v0, v1}, sd(u, v)}. Plane conventions in the comments; the geometry passes plane / at.
 const SHP = (rect, sd) => ({rect, sd});
-// the 양육 hood arcs ([y, z] round the cap joint; the geometry lays strips along them, the cheeks follow them inward)
-export const HOOD = {
-  idle: [[-.06, .1], [.16, .08], [.32, -.04], [.38, -.22], [.32, -.42], [.16, -.58], [-.06, -.66], [-.22, -.62]],
-  tilt: [[-.06, .1], [.18, .06], [.36, -.08], [.44, -.28], [.42, -.48], [.32, -.66], [.16, -.78], [.02, -.8]],
-};
-// the inner offset of an arc (toward the curl) as [u = z, v = y] points
-const hoodIn = (P, k) => P.map(([y, z], i) => { const j = Math.min(P.length - 1, i + 1), m = Math.max(0, i - 1), ty = P[j][0] - P[m][0], tz = P[j][1] - P[m][1], L = Math.hypot(ty, tz);
-  return [z - k * ty / L, y + k * tz / L]; });
 const sdLens = (w, h, y0 = 0) => (u, v) => { const R = (h * h / 4 + w * w / 4) / w, c = R - w / 2; return Math.max(Math.hypot(u - c, v - y0 - h / 2), Math.hypot(u + c, v - y0 - h / 2)) - R; };
 const pts = (...a) => a;
 export const SH = {
@@ -177,12 +169,7 @@ export const SH = {
   b_pane: SHP({u0: -.31, u1: .31, v0: 0, v1: 1.42}, sdLens(.6, 1.4, .01)),
   b_lcrown: SHP({u0: -.24, u1: .24, v0: 0, v1: .26}, sdUnion(sdLens(.11, .25, 0), (u, v) => sdLens(.1, .22, 0)(u * .8 + v * .6 - .02, -u * .6 + v * .8 + .04),
     (u, v) => sdLens(.1, .22, 0)(u * .8 - v * .6 + .02, u * .6 + v * .8 + .04))),
-  // 양육: the S ribbon in profile (x plane: u = Z, v = Y) and its lower twist face-on (z plane: u = X)
-  // the hood leaf in profile (x plane, cap frame: joint at the origin; it arches forward over the orb) and face-on
-  // the hood cheeks (plane 'x': u = Z, v = Y round the cap joint): a crescent just inside the arc
-  n_cheek: SHP({u0: -.8, u1: .2, v0: -.5, v1: .5}, stroke(hoodIn(HOOD.idle, .08).slice(1, -1), t => .02 + .06 * Math.sin(Math.PI * t)).sd),
-  n_cheekT: SHP({u0: -.9, u1: .2, v0: -.4, v1: .55}, stroke(hoodIn(HOOD.tilt, .08).slice(1, -1), t => .02 + .06 * Math.sin(Math.PI * t)).sd),
-  n_base: SHP({u0: -.21, u1: .21, v0: 0, v1: .56}, sdLens(.42, .56, 0)),
+  // 양육: a frond of the stalk's foot (lying on the ground: u across, v out)
   n_frond: SHP({u0: -.11, u1: .11, v0: 0, v1: .56}, sdLens(.2, .56, 0)),
   // 수호: the death wisp
   g_wisp: SHP({u0: -.5, u1: .5, v0: 0, v1: 1.7}, sdUnion(stroke([[0, 0], [.08, .4], [-.06, .8], [.04, 1.1]], t => .14 - .08 * t).sd,
@@ -261,7 +248,9 @@ function shellPx(u, v) {     // 파괴: dark armour plates with pale grey bands 
   return c;
 }
 // glow ball (u, v over the sprite; r 0..1 from the centre)
-const glowPx = (R, core = .35) => (u, v) => { const r = Math.hypot(u - .5, v - .5) * 2; return r > 1 ? TRANSPARENT : mix(R(0), R(.45), smooth(core, 1, r)); };
+// a glow disc (glowBall): a white-hot core, the colour ramp outward, a slightly darker rim (cutout: no soft alpha)
+const glowPx = (R, core = .35) => (u, v) => { const r = Math.hypot(u - .5, v - .5) * 2; if (r > .98) return TRANSPARENT;
+  return mix(mix([255, 255, 240, 255], R(.05), smooth(0, core, r)), R(.4), smooth(core, 1, r) ** 1.5); };
 
 // ---- the sprites ------------------------------------------------------------------------------------------------------
 // [w, h, painter (s, t in 0..1), translucent, owner]
@@ -338,37 +327,46 @@ add('bo_bubble', 32, 16, (s, t) => A(mix(PAL.lime(.05), PAL.lime(.35), t), clamp
 shapeSprite('bo_lcrown', SH.b_lcrown, 64, 'basic', (u, v) => shadeShape(SH.b_lcrown.sd, u, v, PAL.gem, {t0: .2, edge: .006, w: .02, line: .5}));
 
 // 양육 nurturing (16 k)
-// the 양육 ribbon (v3 f1240 / f1300): one broad dark-teal leaf ribbon with white rims, swept wide at its base, narrow
-// where it twists, broad again under the hood; the sprite is the ribbon unrolled (u = across, W blocks; v = from its top
-// NURT.top down to the floor), each twisted panel shows its slice
-export const NURT = {top: 2.12, W: .66};
-export const nurtW = y => .27 + .33 * Math.pow(smooth01(1 - y / .75), 1.4) + .18 * smooth01((y - .95) / .75) - .06 * smooth01((y - 1.85) / .3);
-add('nu_rib', 32, 144, (s, t) => {
-  const y = NURT.top * (1 - t), x = (s - .5) * NURT.W, hw = nurtW(y) / 2, e = hw - Math.abs(x);
-  if (e < 0) return TRANSPARENT;
-  let c = PAL.teal(.42 + .12 * (x / hw) + .06 * (N.c(s * 3, t * 30) - .5) + .08 * Math.sin(y * 7 + x * 9) * smooth(.04, .1, e));
-  const vein = Math.abs(Math.sin((x / hw) * 3.2 + y * 1.5)); if (vein < .07 && e > .05) c = mix(c, PAL.teal(.2), .35);
-  if (e < .034) c = mix(c, PAL.pale(.08 + 1.5 * e), .9 * smooth(.034, .012, e));
+// the ribbon (apep_org_geometry ribbonAtlas: v -1 .. 1 across, e = blocks to the nearer edge): slate teal shaded across,
+// faint veins along it, white rims; the foot pales into streaks where it splits into the fronds
+export function nurtRibPx(v, y, e) {
+  let c = mix(PAL.teal(.36 + .12 * v + .05 * (N.c(v * 3, y * 9) - .5)), C('#3A5868'), .35);
+  if (Math.abs(Math.sin(v * 5.5 + y * 1.3)) < .07 && e > .06) c = mix(c, PAL.teal(.62), .35);
+  if (y < .3) c = mix(c, PAL.pale(.25 + .2 * Math.abs(Math.sin(v * 9))), .6 * smooth(.3, 0, y));
+  if (e < .055) c = mix(c, PAL.pale(.04 + 2 * e), .95 * smooth(.055, .025, e));
   return c;
-}, 'nurt');
-// the hood leaf along its arc (s across, t from the stalk to the drooping tip): narrow at the stalk, broad, a round tip
-add('nu_hoodL', 32, 64, (s, t) => {
-  const x = Math.abs(s - .5) * 2, hw = t < .6 ? .42 + .58 * smooth(0, .6, t) : Math.sqrt(Math.max(0, 1 - ((t - .6) / .4) ** 2));
-  if (x > hw) return TRANSPARENT;
-  const e = (hw - x) / Math.max(.05, hw);
-  let c = PAL.hood(.12 + .14 * (1 - e) + .05 * (N.a(s * 6, t * 12) - .5) - .06 * smooth(.5, 1, t));
-  if (Math.abs(Math.sin((x * .8 + t) * 15)) < .07 && e > .15) c = mix(c, PAL.hood(.4), .3);   // veins
-  if (x < .04) c = mix(c, PAL.hood(.38), .4);                                               // midrib
-  if (e < .1) c = mix(c, PAL.hood(.65), .7);                                               // rim
+}
+// the hood (cap frame): the opening cut through the egg - below a plane facing down-front (idle 35 degrees forward of
+// straight down, tilt 55), less a pointed tongue hanging at the front centre (the tulip tip)
+const HOOD_CUT = {idle: {n: [0, -Math.cos(35 * Math.PI / 180), -Math.sin(35 * Math.PI / 180)], d0: .03, tongue: .64}, tilt: {n: [0, -Math.cos(55 * Math.PI / 180), -Math.sin(55 * Math.PI / 180)], d0: -.02, tongue: .42}};
+const HOOD_C = [0, 0, -.14];
+const hoodCut = (P, look) => { const k = HOOD_CUT[look], q = [P[0] - HOOD_C[0], P[1] - HOOD_C[1], P[2] - HOOD_C[2]];
+  return q[0] * k.n[0] + q[1] * k.n[1] + q[2] * k.n[2] - k.d0 - k.tongue * Math.max(0, 1 - Math.abs(q[0]) / .17) ** 1.3 * smooth(0, -.35, q[2]); };
+// the world position of a facet texel (the mask's vertices map to the face polygon's; an affine map)
+export function texelPos({mask: Q, f}, s, t) {
+  let best = null;
+  for (let i = 1; i < Q.length; i++) for (let j = i + 1; j < Q.length; j++) { const ar = (Q[i][0] - Q[0][0]) * (Q[j][1] - Q[0][1]) - (Q[j][0] - Q[0][0]) * (Q[i][1] - Q[0][1]); if (!best || Math.abs(ar) > Math.abs(best.ar)) best = {i, j, ar}; }
+  const {i, j, ar} = best, ds = s - Q[0][0], dt = t - Q[0][1];
+  const a = (ds * (Q[j][1] - Q[0][1]) - dt * (Q[j][0] - Q[0][0])) / ar, b = (dt * (Q[i][0] - Q[0][0]) - ds * (Q[i][1] - Q[0][1])) / ar, P = f.poly;
+  return [0, 1, 2].map(k => P[0][k] + a * (P[i][k] - P[0][k]) + b * (P[j][k] - P[0][k]));
+}
+// a hood face is built when any of its corners, edge midpoints or centre stays
+const facePts = f => { const P = f.poly; return [...P, ...P.map((p, i) => p.map((x, k) => (x + P[(i + 1) % P.length][k]) / 2)), f.c]; };
+export const hoodKeep = (f, look) => facePts(f).some(p => hoodCut(p, look) < 0);
+// a face the cut of either look comes near (its own cell per look)
+export const hoodNear = f => facePts(f).some(p => hoodCut(p, 'idle') > -.06 || hoodCut(p, 'tilt') > -.06);
+export function nurtHoodPx(info, s, t, d) {
+  const look = info.f.look, P = texelPos(info, s, t), g = hoodCut(P, look);
+  if (g > 0) return TRANSPARENT;
+  const q = [P[0] - HOOD_C[0], P[1] - HOOD_C[1], P[2] - HOOD_C[2]], vein = Math.abs(Math.sin(Math.atan2(q[0], q[2] - .25) * 7 + q[1] * 4));
+  let c = PAL.hood(.1 + .08 * (N.a(q[0] * 9, q[1] * 9 + q[2] * 5) - .5) + .1 * smooth(.1, -.25, q[1]) + (vein < .08 ? .1 : 0));
+  if (-g < .03) c = mix(c, [250, 250, 236, 255], .75 * smooth(.03, .01, -g));
   return c;
-}, 'nurt');
-shapeSprite('nu_cheek', SH.n_cheek, 40, 'nurt', (u, v) => shadeShape(SH.n_cheek.sd, u, v, PAL.hood, {t0: .3, edge: .008, w: .03, rimDark: .4}));
-shapeSprite('nu_cheekT', SH.n_cheekT, 40, 'nurt', (u, v) => shadeShape(SH.n_cheekT.sd, u, v, PAL.hood, {t0: .3, edge: .008, w: .03, rimDark: .4}));
-shapeSprite('nu_base', SH.n_base, 40, 'nurt', (u, v) => { const b = bevel(SH.n_base.sd, u, v, .06); if (b.d > 0) return null; let c = PAL.teal(.38 + .25 * smooth(.5, 0, v) + .05 * (N.b(u * 9, v * 9) - .5));
-  if (-b.d < .035) c = mix(c, PAL.pale(.15), .9); return c; });
-shapeSprite('nu_frond', SH.n_frond, 40, 'nurt', (u, v) => { let c = shadeShape(SH.n_frond.sd, u, v, PAL.pale, {t0: .18, edge: .008, w: .03}); if (Math.abs(u) < .01) c = mix(c, PAL.pale(.5), .5); return c; });
+}
+shapeSprite('nu_frond', SH.n_frond, 40, 'nurt', (u, v) => { let c = shadeShape(SH.n_frond.sd, u, v, PAL.pale, {t0: .14, edge: .008, w: .03}); if (!c) return null;
+  if (Math.abs(Math.sin(u * 60 + v * 4)) < .12) c = mix(c, PAL.teal(.25), .35); if (Math.abs(u) < .012) c = mix(c, PAL.teal(.4), .45); return c; });
 add('nu_gem', 16, 16, (s, t) => { const d = Math.abs(s - .5) + Math.abs(t - .5); return d > .5 ? TRANSPARENT : PAL.gem(clamp(.1 + .7 * (s > .5 ? .6 : .2) * (t > .5 ? 1.2 : .6) + .2 * d)); }, 'nurt');
-add('nu_orb', 16, 16, glowPx(PAL.core, .2), 'nurt');
+add('nu_orb', 32, 32, glowPx(PAL.core, .2), 'nurt');
 add('nu_ring', 64, 16, (s, t) => A(mix(PAL.lime(0), PAL.lime(.35), t), clamp(.16 + .62 * smooth(.3, 0, t) + .22 * smooth(.7, 1, t) + .06 * Math.sin(s * Math.PI * 16) ** 8)), 'nurt', true);
 
 // 수호 guarding (16 k)
@@ -439,14 +437,14 @@ add('gu_spike', 16, 32, (s, t) => (Math.abs(s - .5) > .5 * t + .04 ? TRANSPARENT
 shapeSprite('gu_wisp', SH.g_wisp, 28, 'guard', (u, v) => { let c = PAL.black(.4 + .3 * (N.a(u * 6, v * 6) - .5)); if (-SH.g_wisp.sd(u, v) < .012) c = mix(c, C('#8E2A1E'), .5); return c; });
 // the gold crystal: a lit upper-left facet, a darker right half
 add('gu_gem', 16, 16, (s, t) => PAL.gem(clamp(.08 + (s > .55 ? .4 : 0) + (t > .6 ? .2 : 0) + (Math.abs(s - .55) < .07 ? .3 : 0))), 'guard');
-add('gu_orb', 16, 16, glowPx(PAL.core, .15), 'guard');
+add('gu_orb', 32, 32, glowPx(PAL.core, .15), 'guard');
 
 // 둥지 nesting (12 k)
 add('ne_cap', 64, 32, (s, t) => { let c = tealPx(s, t, -.06 + .1 * t); if (t > .9) c = mix(c, PAL.pale(.4), .5); return c; }, 'nest');
 shapeSprite('ne_wing', SH.w_wing, 48, 'nest', (u, v) => { const b = bevel(SH.w_wing.sd, u, v, .05); let c = mix(PAL.pale(.2), C('#9DB3B0'), .45 * smooth(.2, .8, u));
   if (u > 1.0) c = mix(c, PAL.hood(.1), .7 * smooth(1.0, 1.1, u)); if (b.lit < 0) c = mix(c, PAL.teal(.3), .35 * b.rim); if (-b.d < .01) c = mix(c, PAL.pale(.75), .6); return c; });
 shapeSprite('ne_ring', SH.w_ring, 64, 'nest', (u, v) => { const r = Math.hypot(u, v); let c = PAL.pale(.08 + .3 * smooth(.14, .24, r)); if (Math.abs(r - .19) > .04) c = mix(c, PAL.pale(.6), .4); return c; });
-add('ne_orb', 16, 16, glowPx(PAL.core, .25), 'nest');
+add('ne_orb', 32, 32, glowPx(PAL.core, .25), 'nest');
 shapeSprite('ne_drop', SH.w_drop, 64, 'nest', (u, v) => shadeShape(SH.w_drop.sd, u, v, PAL.gem, {t0: .15, edge: .006, w: .03}));
 add('ne_thorn', 16, 16, (s, t) => (Math.abs(s - .5) > .5 * t ? TRANSPARENT : PAL.teal(.5 + .3 * t)), 'nest');
 
@@ -467,7 +465,7 @@ shapeSprite('pr_fin', SH.p_finL, 40, 'pred', (u, v) => { const d = -SH.p_finL.sd
 shapeSprite('pr_sepal', SH.p_sepal, 48, 'pred', (u, v) => { const d = -SH.p_sepal.sd(u, v); return A(mix(PAL.fin(.25), PAL.lime(.1), smooth(.03, 0, d)), clamp(.65 + .3 * smooth(.03, 0, d))); }, {translucent: true});
 shapeSprite('pr_tail', SH.p_tail, 36, 'pred', (u, v) => { const d = -SH.p_tail.sd(u, v); return A(mix(PAL.fin(.3), PAL.lime(.1), smooth(.04, 0, d)), clamp(.6 + .35 * smooth(.04, 0, d))); }, {translucent: true});
 add('pr_eye', 16, 16, (s, t) => { const r = Math.hypot(s - .5, t - .5) * 2; if (r > 1) return TRANSPARENT; return r < .42 ? C('#0B1414') : r < .6 ? PAL.eye(.05) : r < .86 ? PAL.eye(.75) : PAL.eye(.3); }, 'pred');
-add('pr_core', 16, 16, glowPx(PAL.core, .2), 'pred');
+add('pr_core', 32, 32, glowPx(PAL.core, .2), 'pred');
 add('pr_gem', 16, 16, (s, t) => { const d = Math.abs(s - .5) + Math.abs(t - .5) * .7; return d > .5 ? TRANSPARENT : PAL.gem(clamp(.08 + (s < .5 ? .1 : .4) + (t > .5 ? .2 : 0))); }, 'pred');
 shapeSprite('pr_flare', SH.p_flare, 48, 'pred', (u, v) => A(mix(C('#FFFFF2'), PAL.lime(0), clamp(v / .55) * .6), 1));
 shapeSprite('pr_petal', SH.p_petal, 40, 'pred', (u, v) => { let c = shadeShape(SH.p_petal.sd, u, v, PAL.hood, {t0: .14, edge: .012, w: .06});

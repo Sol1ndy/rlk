@@ -351,8 +351,8 @@
             0,
             0
           ],
-          "elements": 18,
-          "note": "S-curved dark-teal ribbon with pale rims, fronds, the gold shard"
+          "elements": 26,
+          "note": "S-curved twisting slate-teal ribbon with white rims (atlas panels), pale fronds on the ground"
         },
         {
           "name": "cap",
@@ -377,8 +377,35 @@
             2.18,
             0.06
           ],
-          "elements": 11,
-          "note": "cream hood-leaf; tilt = the hood lifted open"
+          "elements": 25,
+          "note": "cream bonnet hood (a facet body cut open underneath, the tulip tip in front) + the gold shard; tilt = the opening lifted toward the targets"
+        },
+        {
+          "name": "cap_x",
+          "tag": "rlk_ap_om_cap_x",
+          "model": "nurt_capx_idle",
+          "looks": {
+            "idle": "nurt_capx_idle",
+            "tilt": "nurt_capx_tilt"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "centre",
+          "offset": [
+            0,
+            0.18,
+            -0.06
+          ],
+          "overlay": false,
+          "parent": "cap",
+          "joint": [
+            0,
+            2.18,
+            0.06
+          ],
+          "elements": 22,
+          "note": "the diagonal facets of cap (cap turned 45 degrees)"
         },
         {
           "name": "orb",
@@ -402,7 +429,7 @@
             2.06,
             -0.4
           ],
-          "elements": 5,
+          "elements": 7,
           "note": "pulse"
         },
         {
@@ -439,7 +466,7 @@
           "loop": true,
           "next": null,
           "events": {},
-          "keys": 16,
+          "keys": 21,
           "key_files": 10,
           "note": "stalk sway, the hood nods with a lag, the orb breathes"
         },
@@ -453,8 +480,8 @@
             "tilt": 0,
             "tethers": 8
           },
-          "keys": 25,
-          "key_files": 13,
+          "keys": 36,
+          "key_files": 14,
           "note": "the hood tilts toward the targets 0-8 and opens (tilt), the orb flares at 8"
         },
         {
@@ -466,7 +493,7 @@
           "events": {
             "gone": 17
           },
-          "keys": 34,
+          "keys": 46,
           "key_files": 17,
           "note": "the orb bursts, the ring goes, the stalk droops and the hood falls, shrink to nothing"
         }
@@ -475,8 +502,8 @@
         "elements": 500,
         "px": 16000
       },
-      "elements": 66,
-      "px": 14336,
+      "elements": 112,
+      "px": 15872,
       "functions": {
         "spawn": "rlk:mboss/apep/om/nurt/spawn",
         "tick": "rlk:mboss/apep/om/nurt/tick",
@@ -581,7 +608,7 @@
             5.05,
             0
           ],
-          "elements": 5,
+          "elements": 7,
           "note": "bobs 0.6-0.8 above the tip"
         }
       ],
@@ -632,8 +659,8 @@
         "elements": 500,
         "px": 16000
       },
-      "elements": 83,
-      "px": 11008,
+      "elements": 85,
+      "px": 11776,
       "functions": {
         "spawn": "rlk:mboss/apep/om/guard/spawn",
         "tick": "rlk:mboss/apep/om/guard/tick",
@@ -681,7 +708,7 @@
             1.3,
             0
           ],
-          "elements": 288,
+          "elements": 292,
           "note": "cap + the orb eye (painted emissive)"
         },
         {
@@ -792,8 +819,8 @@
         "elements": 500,
         "px": 12000
       },
-      "elements": 342,
-      "px": 9216,
+      "elements": 346,
+      "px": 9984,
       "functions": {
         "spawn": "rlk:mboss/apep/om/nest/spawn",
         "tick": "rlk:mboss/apep/om/nest/tick",
@@ -1084,7 +1111,7 @@
             1.22,
             -0.2
           ],
-          "elements": 5
+          "elements": 7
         }
       ],
       "clips": [
@@ -1197,8 +1224,8 @@
         "elements": 500,
         "px": 20000
       },
-      "elements": 478,
-      "px": 16640,
+      "elements": 480,
+      "px": 17408,
       "functions": {
         "spawn": "rlk:mboss/apep/om/pred/spawn",
         "tick": "rlk:mboss/apep/om/pred/tick",
@@ -2197,7 +2224,7 @@
     "px_total": 200000,
     "organism_elements": 500,
     "heart_elements": 800,
-    "px": 133632
+    "px": 137472
   },
   "sprites": {
     "bo_petal": {
@@ -2230,31 +2257,6 @@
       "h": 32,
       "owner": "basic"
     },
-    "nu_rib": {
-      "w": 32,
-      "h": 144,
-      "owner": "nurt"
-    },
-    "nu_hoodL": {
-      "w": 32,
-      "h": 64,
-      "owner": "nurt"
-    },
-    "nu_cheek": {
-      "w": 48,
-      "h": 48,
-      "owner": "nurt"
-    },
-    "nu_cheekT": {
-      "w": 48,
-      "h": 48,
-      "owner": "nurt"
-    },
-    "nu_base": {
-      "w": 32,
-      "h": 32,
-      "owner": "nurt"
-    },
     "nu_frond": {
       "w": 16,
       "h": 32,
@@ -2266,8 +2268,8 @@
       "owner": "nurt"
     },
     "nu_orb": {
-      "w": 16,
-      "h": 16,
+      "w": 32,
+      "h": 32,
       "owner": "nurt"
     },
     "nu_ring": {
@@ -2296,8 +2298,8 @@
       "owner": "guard"
     },
     "gu_orb": {
-      "w": 16,
-      "h": 16,
+      "w": 32,
+      "h": 32,
       "owner": "guard"
     },
     "ne_cap": {
@@ -2316,8 +2318,8 @@
       "owner": "nest"
     },
     "ne_orb": {
-      "w": 16,
-      "h": 16,
+      "w": 32,
+      "h": 32,
       "owner": "nest"
     },
     "ne_drop": {
@@ -2396,8 +2398,8 @@
       "owner": "pred"
     },
     "pr_core": {
-      "w": 16,
-      "h": 16,
+      "w": 32,
+      "h": 32,
       "owner": "pred"
     },
     "pr_gem": {
@@ -2540,6 +2542,16 @@
       "h": 144,
       "owner": "basic"
     },
+    "nu_ribA": {
+      "w": 96,
+      "h": 64,
+      "owner": "nurt"
+    },
+    "nu_hoodF": {
+      "w": 144,
+      "h": 48,
+      "owner": "nurt"
+    },
     "gu_sheathF": {
       "w": 48,
       "h": 48,
@@ -2618,6 +2630,6 @@
     "kill": "rlk:mboss/apep/om/kill",
     "kill_all": "rlk:mboss/apep/om/kill_all",
     "init": "rlk:mboss/apep/om/init",
-    "files": 1750
+    "files": 1755
   }
 }
