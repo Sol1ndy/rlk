@@ -1,4 +1,9 @@
 # GENERATED: the resume hook of every active pattern (main, cast, bg L / T, the B3 special).
+execute if score #azPat mb matches 9 unless score #azPNew mb matches 1 run function rlk:mboss/azhdaha/p/burrow/resume
+execute if score #azCast mb matches 9 run function rlk:mboss/azhdaha/p/burrow/resume
+execute if score #azBgL mb matches 9 run function rlk:mboss/azhdaha/p/burrow/resume
+execute if score #azBgT mb matches 9 run function rlk:mboss/azhdaha/p/burrow/resume
+execute if score #azB3Sp mb matches 9 run function rlk:mboss/azhdaha/p/burrow/resume
 execute if score #azPat mb matches 31 unless score #azPNew mb matches 1 run function rlk:mboss/azhdaha/p/orbs/resume
 execute if score #azCast mb matches 31 run function rlk:mboss/azhdaha/p/orbs/resume
 execute if score #azBgL mb matches 31 run function rlk:mboss/azhdaha/p/orbs/resume

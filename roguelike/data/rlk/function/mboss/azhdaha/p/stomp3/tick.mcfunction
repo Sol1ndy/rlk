@@ -1,3 +1,4 @@
-# STUB (S1-MOD, s2.md 2.1): 산명곡응 – 연속 발구르기 (stomp3, id 10); the S2 author replaces this file.
-# keeps time only
-execute if score #azPT mb matches 85.. run function rlk:mboss/azhdaha/p/end
+# 산명곡응 – 연속 발구르기 (stomp3, id 10) - tick
+scoreboard players set #azPLen mb 85
+execute if score #azPT mb matches 3..44 run return run function rlk:mboss/azhdaha/p/stomp3/kd/3_44
+execute if score #azPT mb matches 45..85 run return run function rlk:mboss/azhdaha/p/stomp3/kd/45_85

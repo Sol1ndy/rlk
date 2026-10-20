@@ -15,7 +15,7 @@ execute if score #azPat mb matches 10 run scoreboard players set #azPMax mb 100
 execute if score #azPat mb matches 6 run scoreboard players set #azPMax mb 60
 execute if score #azPat mb matches 7 run scoreboard players set #azPMax mb 80
 execute if score #azPat mb matches 8 run scoreboard players set #azPMax mb 85
-execute if score #azPat mb matches 9 run scoreboard players set #azPMax mb 300
+execute if score #azPat mb matches 9 run scoreboard players set #azPMax mb 320
 execute if score #azPat mb matches 31 run scoreboard players set #azPMax mb 90
 execute if score #azPat mb matches 32 run scoreboard players set #azPMax mb 110
 execute if score #azPat mb matches 41 run scoreboard players set #azPMax mb 433

@@ -1,2 +1,3 @@
-# STUB (S1-MOD, s2.md 2.1): 산명곡응 (stomp, id 5); the S2 author replaces this file.
-# nothing of its own lingers (selectors only, idempotent)
+# cancel P5: its hazards (rlk_mb_az_p5h) expire, its markers and props go
+execute as @e[type=minecraft:marker,tag=rlk_mb_hz,tag=rlk_mb_az_p5h] at @s rotated as @s run function rlk:mboss/hz/expire
+kill @e[tag=rlk_mb_az_p5m]

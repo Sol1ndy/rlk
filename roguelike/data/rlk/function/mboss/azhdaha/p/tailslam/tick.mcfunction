@@ -1,3 +1,4 @@
-# STUB (S1-MOD, s2.md 2.1): 꼬리찍기 (tailslam, id 8); the S2 author replaces this file.
-# keeps time only
-execute if score #azPT mb matches 70.. run function rlk:mboss/azhdaha/p/end
+# 꼬리찍기 (tailslam, id 8) - tick
+scoreboard players set #azPLen mb 70
+execute if score #azPT mb matches 1..7 run return run function rlk:mboss/azhdaha/p/tailslam/kd/1_7
+execute if score #azPT mb matches 8..70 run return run function rlk:mboss/azhdaha/p/tailslam/kd/8_70
