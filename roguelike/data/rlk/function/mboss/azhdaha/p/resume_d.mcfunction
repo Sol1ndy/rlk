@@ -14,3 +14,13 @@ execute if score #azCast mb matches 42 run function rlk:mboss/azhdaha/p/bolt/res
 execute if score #azBgL mb matches 42 run function rlk:mboss/azhdaha/p/bolt/resume
 execute if score #azBgT mb matches 42 run function rlk:mboss/azhdaha/p/bolt/resume
 execute if score #azB3Sp mb matches 42 run function rlk:mboss/azhdaha/p/bolt/resume
+execute if score #azPat mb matches 45 unless score #azPNew mb matches 1 run function rlk:mboss/azhdaha/p/icespike/resume
+execute if score #azCast mb matches 45 run function rlk:mboss/azhdaha/p/icespike/resume
+execute if score #azBgL mb matches 45 run function rlk:mboss/azhdaha/p/icespike/resume
+execute if score #azBgT mb matches 45 run function rlk:mboss/azhdaha/p/icespike/resume
+execute if score #azB3Sp mb matches 45 run function rlk:mboss/azhdaha/p/icespike/resume
+execute if score #azPat mb matches 46 unless score #azPNew mb matches 1 run function rlk:mboss/azhdaha/p/elspike/resume
+execute if score #azCast mb matches 46 run function rlk:mboss/azhdaha/p/elspike/resume
+execute if score #azBgL mb matches 46 run function rlk:mboss/azhdaha/p/elspike/resume
+execute if score #azBgT mb matches 46 run function rlk:mboss/azhdaha/p/elspike/resume
+execute if score #azB3Sp mb matches 46 run function rlk:mboss/azhdaha/p/elspike/resume

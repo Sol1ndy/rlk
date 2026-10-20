@@ -67,8 +67,18 @@ execute if score #azPh mb matches 2 if score #azZone mb matches 5 run scoreboard
 execute if score #azPh mb matches 2 if score #azZone mb matches 6 run scoreboard players set #azC4 mb 4
 execute if score #azPh mb matches 2 if score #azZone mb matches 7 run scoreboard players set #azC4 mb 4
 execute if score #azPh mb matches 2 if score #azZone mb matches 8 run scoreboard players set #azC4 mb 2
+execute if score #azPh mb matches 3 if score #azZone mb matches 1 run scoreboard players set #azC4 mb 4
+execute if score #azPh mb matches 3 if score #azZone mb matches 2 run scoreboard players set #azC4 mb 6
+execute if score #azPh mb matches 3 if score #azZone mb matches 3 run scoreboard players set #azC4 mb 6
+execute if score #azPh mb matches 3 if score #azZone mb matches 4 run scoreboard players set #azC4 mb 4
+execute if score #azPh mb matches 3 if score #azZone mb matches 5 run scoreboard players set #azC4 mb 4
+execute if score #azPh mb matches 3 if score #azZone mb matches 6 run scoreboard players set #azC4 mb 4
+execute if score #azPh mb matches 3 if score #azZone mb matches 7 run scoreboard players set #azC4 mb 4
+execute if score #azPh mb matches 3 if score #azZone mb matches 8 run scoreboard players set #azC4 mb 2
 execute if score #azPh mb matches 3..3 if score #azTail mb matches 4 if score #azFldA mb matches 150.. run scoreboard players set #azC4 mb 0
 execute if score #azLast mb matches 4 run scoreboard players set #azC4 mb 0
+execute if score #azLast mb matches 45 run scoreboard players set #azC4 mb 0
+execute if score #azLast mb matches 46 run scoreboard players set #azC4 mb 0
 scoreboard players set #azC5 mb 0
 execute if score #azPh mb matches 1 if score #azZone mb matches 1 run scoreboard players set #azC5 mb 2
 execute if score #azPh mb matches 1 if score #azZone mb matches 4 run scoreboard players set #azC5 mb 4

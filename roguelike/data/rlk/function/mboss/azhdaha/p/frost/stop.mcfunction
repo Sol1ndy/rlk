@@ -1,1 +1,4 @@
-# STUB (S1-MOD, s2.md 2.1): 서리 습격 (frost, id 41); the S2 author replaces this file.
+# B3_BURST: the special stops (its last burst landed at 364).
+kill @e[type=minecraft:item_display,tag=rlk_mb_az_p41]
+kill @e[type=minecraft:marker,tag=rlk_mb_az_p41c]
+scoreboard players set #aq41B mb 0

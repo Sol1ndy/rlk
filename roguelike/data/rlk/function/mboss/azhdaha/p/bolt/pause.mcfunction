@@ -1,1 +1,3 @@
-# STUB (S1-MOD, s2.md 2.1): 벼락 습격 (bolt, id 42); the S2 author replaces this file.
+# Pause: the sub-line part goes (the decals are cleared by the core).
+data remove storage rlk:mboss az.subx
+scoreboard players set #azHudQ mb 1

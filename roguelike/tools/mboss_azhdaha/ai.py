@@ -247,6 +247,10 @@ def emit(core):
     # weighted pick
     def wt(p, ph, z):
         o = WEIGHT_OVERRIDE.get(p.id, {}).get(ph, {})
+        # REQ pt-1 (S2-T, requests/pt.md): a pattern replaced in a phase outside its own phases (P4 -> 45 / 46 in phase
+        # 3) keeps its weights there, so ai/go can swap in the replacement (else 45 / 46 are never picked).
+        if ph not in p.phases and any(q.replaces == p.id and ph in q.phases for q in pats):
+            return int(o.get(z, p.phase_weight.get(ph, p.weight).get(z, 0)))
         return int(o.get(z, p.w_in(ph, z)))
     cand = ['# @s = body: candidate weights #azC<id> (x2, so a repeat of P2 counts half) in the current phase and zone, the',
             '# gates, the cooldowns, the element pair, no immediate repeat.']
@@ -297,6 +301,10 @@ def emit(core):
                         f'scoreboard players set #azC{p.id} mb 0')
         else:
             cand.append(f'execute if score #azLast mb matches {p.id} run scoreboard players set #azC{p.id} mb 0')
+            # REQ pt-1: no immediate repeat of a pure replacement either (45 / 46 hold #azLast after ai/go swapped them in)
+            for q in pats:
+                if q.replaces == p.id and not set(q.phases) & set(p.phases):
+                    cand.append(f'execute if score #azLast mb matches {q.id} run scoreboard players set #azC{p.id} mb 0')
         if p.id == 6:
             cand.append('scoreboard players set #azC6 mb 0')
     cand += [sc('#azCn', 0)] + [f'scoreboard players operation #azCn mb += #azC{p.id} mb' for p in picks]

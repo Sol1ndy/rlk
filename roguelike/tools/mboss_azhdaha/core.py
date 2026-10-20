@@ -1093,11 +1093,15 @@ class Core:
             tick.append(f'execute if score #azAft{k} mb matches 1.. if score #azClk mb >= #azAftT{k} mb run {F(f"aft/run_{k}")}')
         self.w('aft/tick', tick)
         for k in range(16):
+            # REQ pt-2 (S2-T, requests/pt.md): the due marker leaves its slot tag before the target runs, so a target
+            # that schedules again (a per-tick chain) can take the freed slot k without its new marker being killed here.
             self.w(f'aft/run_{k}', [f'scoreboard players operation #azAftX mb = #azAft{k} mb', sc(f'#azAft{k}', 0),
                                     'scoreboard players remove #azAftN mb 1',
-                                    f'execute at @e[type=minecraft:marker,tag=rlk_az_aft{k},limit=1] rotated as '
-                                    f'@e[type=minecraft:marker,tag=rlk_az_aft{k},limit=1] run {F("aft/fn")}',
-                                    f'kill @e[type=minecraft:marker,tag=rlk_az_aft{k}]'])
+                                    f'tag @e[type=minecraft:marker,tag=rlk_az_aft{k}] add rlk_az_aftrun',
+                                    f'tag @e[type=minecraft:marker,tag=rlk_az_aftrun] remove rlk_az_aft{k}',
+                                    'execute at @e[type=minecraft:marker,tag=rlk_az_aftrun,limit=1] rotated as '
+                                    f'@e[type=minecraft:marker,tag=rlk_az_aftrun,limit=1] run {F("aft/fn")}',
+                                    'kill @e[type=minecraft:marker,tag=rlk_az_aftrun]'])
         fn = ['# GENERATED: the after() targets written in this run, by id.']
         fn += [f'execute if score #azAftX mb matches {i} run return run {F(rel)}' for rel, i in sorted(A.AFTER.items(), key=lambda kv: kv[1])]
         self.w('aft/fn', fn)
