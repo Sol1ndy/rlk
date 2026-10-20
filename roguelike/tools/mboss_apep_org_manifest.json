@@ -515,7 +515,7 @@
           },
           "default_look": "spire",
           "brightness": 14,
-          "scale": 1.6,
+          "scale": 1.75,
           "pivot": "mid",
           "offset": [
             0,
@@ -528,7 +528,36 @@
             2.2,
             0
           ],
-          "elements": 291
+          "elements": 54,
+          "note": "facet-body teal sheath with grey-blue scale lobes and a gold crystal, two pale helix ribbons to 4.4 / 4.1 b; bud = teal ogive hood over a pale flared drape; wisp = the black death wisp"
+        },
+        {
+          "name": "spire_x",
+          "tag": "rlk_ap_om_spire_x",
+          "model": "guard_spirex_spire",
+          "looks": {
+            "spire": "guard_spirex_spire",
+            "bud": "guard_spirex_bud",
+            "wisp": "guard_spirex_wisp"
+          },
+          "default_look": "spire",
+          "brightness": 14,
+          "scale": 1.75,
+          "pivot": "mid",
+          "offset": [
+            0,
+            0.2,
+            0
+          ],
+          "overlay": false,
+          "parent": "spire",
+          "joint": [
+            0,
+            2.2,
+            0
+          ],
+          "elements": 24,
+          "note": "the diagonal facets of spire (spire turned 45 degrees; empty in the wisp look)"
         },
         {
           "name": "orb",
@@ -564,7 +593,7 @@
           "loop": true,
           "next": null,
           "events": {},
-          "keys": 16,
+          "keys": 20,
           "key_files": 14,
           "note": "the orb bobs and turns; the spire sways a little"
         },
@@ -581,7 +610,7 @@
             "regrow_end": 24,
             "shields": 30
           },
-          "keys": 41,
+          "keys": 62,
           "key_files": 25,
           "note": "collapse 0-7, bud 7-16 (glowing slit), regrow 16-24, the orb flares at the shields"
         },
@@ -594,7 +623,7 @@
           "events": {
             "gone": 17
           },
-          "keys": 13,
+          "keys": 24,
           "key_files": 11,
           "note": "shudder, the black wisp at 3 (red embers: kit), fades up"
         }
@@ -603,8 +632,8 @@
         "elements": 500,
         "px": 16000
       },
-      "elements": 296,
-      "px": 15104,
+      "elements": 83,
+      "px": 11008,
       "functions": {
         "spawn": "rlk:mboss/apep/om/guard/spawn",
         "tick": "rlk:mboss/apep/om/guard/tick",
@@ -2168,7 +2197,7 @@
     "px_total": 200000,
     "organism_elements": 500,
     "heart_elements": 800,
-    "px": 137728
+    "px": 133632
   },
   "sprites": {
     "bo_petal": {
@@ -2246,33 +2275,13 @@
       "h": 16,
       "owner": "nurt"
     },
-    "gu_rib": {
-      "w": 16,
-      "h": 128,
-      "owner": "guard"
-    },
-    "gu_sheath": {
-      "w": 64,
-      "h": 32,
-      "owner": "guard"
-    },
-    "gu_lobe": {
-      "w": 32,
-      "h": 32,
-      "owner": "guard"
-    },
-    "gu_drapeW": {
+    "gu_ribT": {
       "w": 64,
       "h": 64,
       "owner": "guard"
     },
-    "gu_drape": {
-      "w": 32,
-      "h": 48,
-      "owner": "guard"
-    },
-    "gu_bud": {
-      "w": 48,
+    "gu_spike": {
+      "w": 16,
       "h": 32,
       "owner": "guard"
     },
@@ -2496,21 +2505,6 @@
       "h": 16,
       "owner": "nest"
     },
-    "gu_sheath_l": {
-      "w": 16,
-      "h": 16,
-      "owner": "guard"
-    },
-    "gu_bud_l": {
-      "w": 16,
-      "h": 16,
-      "owner": "guard"
-    },
-    "gu_drape_l": {
-      "w": 16,
-      "h": 16,
-      "owner": "guard"
-    },
     "de_shell_l": {
       "w": 16,
       "h": 16,
@@ -2545,6 +2539,16 @@
       "w": 32,
       "h": 144,
       "owner": "basic"
+    },
+    "gu_sheathF": {
+      "w": 48,
+      "h": 48,
+      "owner": "guard"
+    },
+    "gu_budF": {
+      "w": 32,
+      "h": 64,
+      "owner": "guard"
     },
     "he_bulbF": {
       "w": 128,
@@ -2614,6 +2618,6 @@
     "kill": "rlk:mboss/apep/om/kill",
     "kill_all": "rlk:mboss/apep/om/kill_all",
     "init": "rlk:mboss/apep/om/init",
-    "files": 1747
+    "files": 1750
   }
 }

@@ -184,11 +184,9 @@ export const SH = {
   n_cheekT: SHP({u0: -.9, u1: .2, v0: -.4, v1: .55}, stroke(hoodIn(HOOD.tilt, .08).slice(1, -1), t => .02 + .06 * Math.sin(Math.PI * t)).sd),
   n_base: SHP({u0: -.21, u1: .21, v0: 0, v1: .56}, sdLens(.42, .56, 0)),
   n_frond: SHP({u0: -.11, u1: .11, v0: 0, v1: .56}, sdLens(.2, .56, 0)),
-  // 수호: two helix ribbons (u across, v up; shape centre wanders sideways), the hem lobe, the death wisp
-  g_lobe: SHP({u0: .14, u1: .62, v0: 0, v1: .34}, stroke(bez([.2, .32], [.3, .02], [.56, .05], 10), t => .09 - .05 * t).sd),
+  // 수호: the death wisp
   g_wisp: SHP({u0: -.5, u1: .5, v0: 0, v1: 1.7}, sdUnion(stroke([[0, 0], [.08, .4], [-.06, .8], [.04, 1.1]], t => .14 - .08 * t).sd,
     stroke([[.04, 1.1], [-.14, 1.3], [-.3, 1.62]], t => .05 - .04 * t).sd, stroke([[.04, 1.1], [.2, 1.32], [.38, 1.58]], t => .05 - .04 * t).sd)),
-  g_drape: SHP({u0: -.42, u1: .42, v0: 0, v1: 1.3}, (u, v) => { const w = .26 + .14 * (1 - v / 1.3), sc = .035 * Math.cos(u * 26); return Math.max(Math.abs(u) - w, -(v - .02 - sc), v - 1.3); }),
   // 둥지: a sepal wing in front view (z plane, wing frame: hinge at the origin, +u = outward), the eye ring
   w_wing: SHP({u0: -.06, u1: 1.36, v0: -.8, v1: .4}, sdUnion(stroke([[0, 0], [.22, .22], [.48, .28], [.74, .14], [.94, -.12], [1.06, -.42]], t => .13 - .07 * t).sd,
     stroke([[1.06, -.42], [1.18, -.6], [1.3, -.56]], t => .07 - .04 * t).sd, stroke([[1.04, -.4], [1.0, -.64], [1.08, -.74]], t => .06 - .035 * t).sd,
@@ -374,33 +372,73 @@ add('nu_orb', 16, 16, glowPx(PAL.core, .2), 'nurt');
 add('nu_ring', 64, 16, (s, t) => A(mix(PAL.lime(0), PAL.lime(.35), t), clamp(.16 + .62 * smooth(.3, 0, t) + .22 * smooth(.7, 1, t) + .06 * Math.sin(s * Math.PI * 16) ** 8)), 'nurt', true);
 
 // 수호 guarding (16 k)
-const ribPale = (sd, k = 0) => (u, v) => { const b = bevel(sd, u, v, .08); let c = PAL.pale(.14 + .14 * (N.b(u * 4, v * 3) - .5) + k);
-  if (b.lit < -.1) c = mix(c, PAL.teal(.25), .45 * b.rim); else if (b.lit > 0) c = mix(c, PAL.pale(0), .4 * b.rim * b.lit); if (-b.d < .012) c = mix(c, PAL.pale(.7), .6); return c; };
-// the helix ribbons (s across, t from the tip 0 to the base 1): pale with a grey-teal shade on one half, a fine dark
-// edge, narrowing to a point over the top tenth
-add('gu_rib', 16, 128, (s, t) => {
-  const x = (s - .5) * 2, hw = t < .14 ? Math.sqrt(t / .14) : 1;
-  if (Math.abs(x) > hw) return TRANSPARENT;
-  const e = hw - Math.abs(x);
-  let c = PAL.pale(.12 + .08 * (N.b(s * 3, t * 30) - .5) + .1 * smooth(.2, 1, x));
-  if (x > .35) c = mix(c, PAL.teal(.2), .35 * smooth(.35, .9, x));
-  if (e < .16) c = mix(c, PAL.pale(.62), .7 * smooth(.16, .04, e));
+// the spire ribbons (apep_org_geometry ribbon): a tile per helix panel (8 px wide each): tile 0 = the band crossing the
+// panel diagonally (rising RIB.q / (RIB.q + RIB.k) of the panel height toward s = 0, RIB.k / (RIB.q + RIB.k) thick),
+// tiles 1 .. nT = the taper to the tip. Pale white-grey, a grey-teal shade toward the under edge, a bright upper rim
+export const RIB = {q: 1.05, k: 2.7, nT: 6, tiles: 8};
+add('gu_ribT', 64, 64, (S0, T0) => {
+  const j = Math.min(RIB.tiles - 1, Math.floor(S0 * RIB.tiles)), s = S0 * RIB.tiles - j;
+  if (j > RIB.nT) return TRANSPARENT;
+  const a = RIB.q / (RIB.q + RIB.k), b = RIB.k / (RIB.q + RIB.k), tc = .5 - (.5 - s) * a;
+  const f = j ? Math.pow(Math.max(0, 1 - (j - 1 + 1 - s) / RIB.nT), .75) : 1;
+  const p = (T0 - tc) / (b / 2);
+  if (Math.abs(p) > f) return TRANSPARENT;
+  const pn = p / Math.max(f, .25);
+  let c = PAL.pale(.02 + .2 * smooth(-.2, 1, pn) + .05 * (N.b(s * 2 + j * 3, pn * 2) - .5));
+  c = mix(c, PAL.teal(.05), .22 * smooth(.25, 1, pn));
+  if (pn < -.62) c = mix(c, [252, 253, 248, 255], .7 * smooth(-.62, -.86, pn));
+  if (Math.abs(pn) > .9) c = mix(c, PAL.pale(.55), .55);
   return c;
 }, 'guard');
-add('gu_sheath', 64, 32, (s, t) => { let c = tealPx(s, t, .12 * t); const sc = Math.abs(Math.sin(s * Math.PI * 6)); if (t > .82) c = mix(c, PAL.pale(.45), smooth(.82, .95, t) * (1 - sc * .5)); return c; }, 'guard');
-shapeSprite('gu_lobe', SH.g_lobe, 56, 'guard', (u, v) => shadeShape(SH.g_lobe.sd, u, v, ramp(['#C8D2D6', '#A4B2BA', '#84949E', '#66767E', '#4A585E']), {t0: .25, edge: .01, w: .04}));
-// the bud's drape wrap (u round 8 facets, v top 0 .. hem 1): pale folds, a wavy hem cut into soft lobes at the bottom
-add('gu_drapeW', 64, 64, (s, t) => {
-  const f = (s * 8) % 1, x = Math.abs(f - .5) * 2, hem = .9 + .07 * Math.cos(f * Math.PI * 2) - .03 * Math.cos(f * Math.PI * 6);
-  if (t > hem) return TRANSPARENT;
-  let c = PAL.pale(.1 + .16 * Math.abs(Math.sin(s * Math.PI * 24 + t * 2)) ** 2 + .12 * smooth(.3, 1, t) + .06 * x);
-  if (hem - t < .03) c = mix(c, PAL.pale(.55), .6);
+// the sheath, hood and drape facet bodies (apep_org_geometry guardSpire / guardBud): y = the height of the texel (the t
+// axis runs down the face), x across from the face's centre line; cls 0 = the sheath (dark teal, pale grey-blue scale
+// lobes in two staggered rows round the foot: row 1 centred on each face, row 2 on the seams, the halves meeting across
+// them), 1 = the hood (teal, pale seams), 2 = the drape (pale, soft vertical folds), 3 = the hem ring (rounded tongues
+// with V notches), 9 = the undersides
+const GB = ramp(['#D6DFE0', '#B6C5CA', '#94A8AF', '#72888F', '#536870']);
+// the s range of a mask polygon at height t (normalised card coordinates)
+const spanAt = (Q, t) => { let lo = 1, hi = 0; for (let i = 0; i < Q.length; i++) { const [s0, t0] = Q[i], [s1, t1] = Q[(i + 1) % Q.length];
+  if ((t - t0) * (t - t1) > 0 || t0 === t1) continue; const s = s0 + (s1 - s0) * (t - t0) / (t1 - t0); lo = Math.min(lo, s); hi = Math.max(hi, s); } return hi > lo ? [lo, hi] : [.5, .5]; };
+export function guardFacetPx({el, cls, w, f, mask}, s, t, d) {
+  if (cls === 9) return PAL.teal(.82);
+  const ys = f.poly.map(p => p[1]), y1 = Math.max(...ys), y0 = Math.min(...ys), y = y1 - t * (y1 - y0);
+  const [sl, sr] = spanAt(mask, t), hw = (sr - sl) / 2 * w, x = (s - (sl + sr) / 2) * w, side = hw - Math.abs(x);
+  if (cls === 0) {
+    const arch = (cx, cy, rx, ry) => (y < cy ? Math.abs(x - cx) / rx : Math.hypot((x - cx) / rx, (y - cy) / ry));
+    // (row 3: smaller lobes on the face centres higher up, half hidden under row 2)
+    const q1 = arch(0, .04, .19, .34), q2 = Math.min(arch(-hw, .2, .18, .38), arch(hw, .2, .18, .38)), q3 = arch(0, .42, .13, .3);
+    const lob = (q, y0, top) => mix(GB(clamp(.18 + .45 * (1 - (y - y0) / (top - y0)))), GB(.08), .25 * smooth(.45, 0, q) * smooth(y0, top, y));
+    if (q1 < 1) return q1 > .87 ? PAL.teal(.66) : lob(q1, -.05, .38);
+    if (q2 < 1) return q2 > .88 ? PAL.teal(.66) : lob(q2, .05, .58);
+    if (q3 < 1) return q3 > .86 ? PAL.teal(.66) : mix(lob(q3, .3, .72), PAL.teal(.3), .35);
+    let c = PAL.teal(.44 + .1 * el / 67.5 - .1 * smooth(.3, 1.1, y) + .07 * (N.b(x * 6 + el, y * 5) - .5));
+    if (side < .022) c = mix(c, PAL.teal(.12), .55 * smooth(.022, .005, side));
+    return c;
+  }
+  if (cls === 1) {
+    // the closed bud's petal edges: on every face a pale crescent from its lower left corner sweeping up to the right
+    // toward the tip; the petal under it (right of the line) a shade darker
+    const xn = x / Math.max(.01, hw), u = clamp((y - .84) / 1.12), xl = -.95 + 1.55 * Math.sqrt(u), dl = (xn - xl) * hw;
+    let c = PAL.teal(.38 + .12 * el / 67.5 + .05 * (N.b(x * 6 + el, y * 5) - .5) + (dl > 0 ? .07 + .05 * smooth(0, .12, dl) : 0));
+    if (Math.abs(dl) < .02 && u < .97) c = mix(c, PAL.pale(.15), .85 * smooth(.02, .008, Math.abs(dl)));
+    if (y < .9) c = mix(c, PAL.teal(.75), .5 * smooth(.9, .85, y));
+    return c;
+  }
+  // soft cloth folds (two per face, the troughs grey-blue), the shade under the hood
+  const xn = x / Math.max(.01, hw), fold = .5 + .5 * Math.cos(xn * Math.PI * 2 + .6 + .3 * y);
+  let c = mix(PAL.pale(.06 + .2 * fold * fold + .16 * smooth(.62, .92, y)), C('#A8BCC6'), .18 + .2 * fold);
+  if (cls === 3) {
+    const xn = Math.abs(x) / Math.max(.01, hw), hem = 1 - .5 * xn * xn;
+    if (xn > .9 - .12 * t || t > hem) return TRANSPARENT;
+    if (Math.min((.9 - .12 * t - xn) * hw, (hem - t) * .15) < .018) c = mix(c, PAL.pale(0), .7);
+  }
+  if (side < .015) c = mix(c, PAL.pale(.45), .35);
   return c;
-}, 'guard');
-shapeSprite('gu_drape', SH.g_drape, 32, 'guard', (u, v) => { let c = PAL.pale(.12 + .1 * Math.abs(Math.sin(u * 18)) + .2 * smooth(.4, 0, v)); if (-SH.g_drape.sd(u, v) < .02) c = mix(c, PAL.pale(.6), .5); return c; });
-add('gu_bud', 48, 32, (s, t) => { let c = tealPx(s, t, -.04); const slit = Math.abs(s - .25) < .02 && t > .25 && t < .85; if (slit) c = PAL.core(.1); else if (Math.abs(s - .25) < .045 && t > .2 && t < .9) c = mix(c, PAL.core(.3), .5); return c; }, 'guard');
+}
+add('gu_spike', 16, 32, (s, t) => (Math.abs(s - .5) > .5 * t + .04 ? TRANSPARENT : PAL.teal(.25 + .35 * t + (s > .5 ? .1 : 0))), 'guard');
 shapeSprite('gu_wisp', SH.g_wisp, 28, 'guard', (u, v) => { let c = PAL.black(.4 + .3 * (N.a(u * 6, v * 6) - .5)); if (-SH.g_wisp.sd(u, v) < .012) c = mix(c, C('#8E2A1E'), .5); return c; });
-add('gu_gem', 16, 16, (s, t) => { const d = Math.abs(s - .5) * 1.2 + Math.abs(t - .5); return d > .55 ? TRANSPARENT : PAL.gem(clamp(.05 + (s < .5 ? .1 : .45) + (t > .5 ? .25 : 0))); }, 'guard');
+// the gold crystal: a lit upper-left facet, a darker right half
+add('gu_gem', 16, 16, (s, t) => PAL.gem(clamp(.08 + (s > .55 ? .4 : 0) + (t > .6 ? .2 : 0) + (Math.abs(s - .55) < .07 ? .3 : 0))), 'guard');
 add('gu_orb', 16, 16, glowPx(PAL.core, .15), 'guard');
 
 // 둥지 nesting (12 k)
@@ -541,16 +579,13 @@ shapeSprite('se_seed', SH.se_seed, 64, 'seed', (u, v) => { const d = -SH.se_seed
 
 // ledge / cap tones of the lofts (darker: they face up)
 add('ne_cap_l', 16, 16, (s, t) => ledgeOf(PAL.teal(.42)), 'nest');
-add('gu_sheath_l', 16, 16, (s, t) => ledgeOf(PAL.teal(.42)), 'guard');
-add('gu_bud_l', 16, 16, (s, t) => ledgeOf(PAL.teal(.36)), 'guard');
-add('gu_drape_l', 16, 16, (s, t) => ledgeOf(PAL.pale(.2)), 'guard');
 add('de_shell_l', 16, 16, (s, t) => ledgeOf(PAL.destr(.32)), 'destr');
 add('pr_hood_l', 16, 16, (s, t) => ledgeOf(PAL.hood(.2)), 'pred');
 add('pr_bowl_l', 16, 16, (s, t) => A(ledgeOf(PAL.fin(.3)), .75), 'pred', true);
 add('pr_face_l', 16, 16, (s, t) => ledgeOf(PAL.fin(.3)), 'pred');
 add('he_root_l', 16, 16, (s, t) => ledgeOf(PAL.root(.4 + .2 * N.c(s * 3, t * 3))), 'heart');
 // loft tiles / wraps: texel density per block for the tileUV windows; wraps map u = facet k / n, v along the loft
-for (const n of ['gu_drapeW', 'gu_sheath', 'gu_bud', 'ne_cap', 'de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
+for (const n of ['ne_cap', 'de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
 registerTile('he_rootS', 32, 64, 16);
 registerTile('he_vineS', 16, 64, 24);
 registerTile('he_rootSU', 16, 32, 8);

@@ -10,7 +10,7 @@
 // Element rotations stay single-axis on the 22.5 degree grid.
 import {abox, cardZ, cardX, cardY, faceEl, faceOfDir, lathe, annulus, checkBounds, r4, rotA} from './mboss_model_lib.mjs';
 import {loft, slab, crossCards, toUnits, mirrorX, retex, rockBox, stroke} from './mboss_shape_lib.mjs';
-import {SH, HOOD as NHOOD, NURT, nurtW, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, stalkSkin, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01} from './apep_org_paint.mjs';
+import {SH, HOOD as NHOOD, NURT, nurtW, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, stalkSkin, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01, guardFacetPx, RIB} from './apep_org_paint.mjs';
 
 export {checkBounds};
 export const RIDE_Y = 2.0;           // the husk passenger point above its feet (org manifest passenger.ride_y)
@@ -383,7 +383,7 @@ export function facetBody(name, faces, {owner, ppb = 64, paint, cls = () => 0, t
     // aa (translucent bodies): the edge pixels carry their coverage as alpha, so two faces meeting at an edge sum to
     // one layer (no doubled seam, no stairs); opaque bodies cut binary masks half a pixel past the edge (no gaps)
     if (sd > px * (aa ? .5 : .6)) return [0, 0, 0, 0];
-    const c = paint({el: m.card.el, n: m.f.n, cls: m.cls, w: card.w, h: card.h, f: m.f}, s, t, Math.max(0, -sd));
+    const c = paint({el: m.card.el, n: m.f.n, cls: m.cls, w: card.w, h: card.h, f: m.f, mask: card.mask}, s, t, Math.max(0, -sd));
     if (aa) { const cov = Math.max(0, Math.min(1, .7 - sd / px)); return [c[0], c[1], c[2], Math.round((c[3] ?? 255) * cov)]; }
     return c;
   }, owner, translucent);
@@ -530,33 +530,52 @@ const nurtRing = () => band([0, 0, 0], 1.3, 0, .5, 'nu_ring');
 // ================================================================================================================
 // 수호 guarding: helix spire (spire / bud / wisp looks, mid pivot) + the hovering orb
 // ================================================================================================================
-const SHEATH = {y: [0, .2, .42, .62, .8, .95], r: [.38, .36, .33, .28, .21, .13]};
-function guardBase() {
-  const els = [...loft('y', stops(SHEATH.y, SHEATH.r), {n: 16, tex: 'gu_sheath', ledgeTex: 'gu_sheath_l', caps: '-+', seed: 7})];
-  for (let k = 0; k < 8; k++) els.push(radialCard('gu_lobe', k * 45 + 22.5, .14, .62, 0, .34));
-  els.push(abox([-.12, .3, -.42], [.12, .58, -.32], 'gu_gem', {rot: ['x', -22.5, [0, .44, -.37]]}));
-  return els;
+// (v3 f2088 / sheet 07 base): a dark-teal calyx sheath 1.45 b tall, two staggered rows of pale grey-blue scale lobes
+// round its foot and a gold crystal in front, out of which two broad pale ribbons wind round each other in a double
+// helix (about two turns) to two sharp points at 4.4 / 4.1 b. The sheath is a facet body round a vase (8 azimuths; the
+// diagonal faces on spire_x, the spire turned 45 degrees)
+const ringPts = (rings, apex) => { const P = []; for (const [y, r] of rings) for (let j = 0; j < 32; j++) { const a = j * Math.PI / 16; P.push([r * Math.cos(a), y, r * Math.sin(a)]); } if (apex) P.push(apex); return P; };
+const GUARD_EL = [-90, 0, 22.5, 45, 67.5, 90];
+const SHEATH_FACES = (() => {
+  const faces = polyFaces(facetPlanes(pointSupport(ringPts([[0, .44], [.1, .45], [.3, .435], [.55, .39], [.8, .32], [1.04, .23], [1.27, .13]], [0, 1.54, 0])), {el: GUARD_EL}));
+  return facetBody('gu_sheathF', faces, {owner: 'guard', paint: guardFacetPx, cls: f => (f.el < -80 ? 9 : 0), ppb: 46, maxPx: 40, flat: f => f.el < -80});
+})();
+// the ribbons: a helical band wrapped round a 16-gon cylinder of radius r(y) (one vertical tangent panel per 22.5
+// degree step; the band crosses each panel diagonally). Each step rises RIB.q r and the band is RIB.k r tall, so every
+// panel shows the same tile of gu_ribT (the band, pale with a grey under edge and bright upper rim) scaled to it; the
+// last RIB.nT panels show the taper tiles (the band narrowing to its point). r shrinks up the spire and widens a little
+// at the very top, so the two tips part
+const ribR = y => .27 - .13 * smooth01((y - .9) / 2.3) - .04 * smooth01((y - 2.9) / .8) + .06 * smooth01((y - 3.6) / .7);
+function ribbon(ph, y0, y1) {
+  const steps = []; let y = y0;
+  for (let k = 0; ; k++) { const r = ribR(y), dy = RIB.q * r; if (y + dy > y1 + 1e-9) break; steps.push({k, y, r, dy}); y += dy; }
+  const n = steps.length, tw = Math.tan(11.25 * D2R);
+  return steps.map(({k, y: yb, r, dy}, i) => {
+    const j = Math.max(0, i - (n - RIB.nT - 1)), Hp = dy + RIB.k * r, yc = yb + dy / 2;
+    return tangentCard('gu_ribT', ph + 22.5 * k, r, yc + Hp / 2, 2 * r * tw * 1.05, Hp, {uvr: [j / RIB.tiles, 0, (j + 1) / RIB.tiles, 1]});
+  });
 }
-// the spire: three pale ribbons in a loose triple helix round the axis (a tangent panel per segment), converging and
-// narrowing to points at the top
-const HELIX = [{th0: 0, y0: .5, y1: 4.42, n: 40, w: .42}, {th0: 180, y0: .5, y1: 4.1, n: 36, w: .38}];
+const RIB_ELS = [...ribbon(0, .62, 4.42), ...ribbon(180, .62, 4.1)];
 function guardSpire() {
-  const els = guardBase();
-  for (const R of HELIX) for (let i = 0; i < R.n; i++) {
-    const t = (i + .5) / R.n, y = R.y0 + t * (R.y1 - R.y0), h = (R.y1 - R.y0) / R.n, th = R.th0 + 360 * 1.05 * (y - .5) / 3.9;
-    const r = .3 * (1 - .8 * smooth01((y - .5) / 3.9)) + .03, w = R.w * (1 - .5 * t) + .03;
-    els.push(vpanel('gu_rib', [r * Math.cos(th * D2R), y, r * Math.sin(th * D2R)], w, h + .025, -(th + 90) + 22.5 * 0, 1 - (i + 1) / R.n, 1 - i / R.n));
-  }
-  return els;
+  return [...SHEATH_FACES[0], ...RIB_ELS, abox([-.13, .52, -.43], [.13, .72, -.37], 'gu_gem', {rot: ['x', -22.5, [0, .62, -.4]]})];
 }
+const guardSpireX = () => SHEATH_FACES[1];
+// the bud (v4 f560, ~2 b): a teal ogive hood with pale seams and a thin spike over a pale drape (three stacked frustum
+// rings flaring to the hem: upright, 22.5 and 45 degrees out; the hem ring cut into rounded tongues), the gold gem in
+// front of the drape. Both facet bodies share one sprite; their diagonal faces ride spire_x
+const BUD_FACES = (() => {
+  const hood = polyFaces(facetPlanes(pointSupport(ringPts([[.84, .47], [1.0, .465], [1.2, .41], [1.4, .33], [1.58, .24], [1.74, .15], [1.88, .07]], [0, 1.99, 0])), {el: GUARD_EL})).map(f => ({...f, part: 'hood'}));
+  const ring = (rf, y0, y1, el, part) => polyFaces([...facetPlanes(revSupport(rf, y0, y1), {el: [el]}), {n: [0, 1, 0], h: y1, az: 0, el: 90, hidden: true}, {n: [0, -1, 0], h: -y0, az: 0, el: -90, hidden: true}])
+    .filter(f => !f.hidden).map(f => ({...f, part}));
+  const t1 = Math.tan(22.5 * D2R), rA = .44, rB = rA + .3 * t1;
+  const drape = [...ring(() => rA, .45, .94, 0, 'drape'), ...ring(y => rA + (.45 - y) * t1, .15, .45, 22.5, 'drape'), ...ring(y => rB + (.15 - y), 0, .15, 45, 'hem')];
+  const cls = f => (f.el < -80 ? 9 : f.part === 'hood' ? 1 : f.part === 'hem' ? 3 : 2);
+  return facetBody('gu_budF', [...hood, ...drape], {owner: 'guard', paint: guardFacetPx, cls, ppb: 40, maxPx: 40, flat: f => f.el < -80});
+})();
 function guardBud() {
-  // the teal pointed hood over a pale drape flaring to a wavy hem (a wrap loft), the hem lobes and the gold gem in front
-  const els = [...loft('y', stops([.95, 1.2, 1.45, 1.65, 1.82, 1.95, 2.04], [.44, .41, .35, .27, .18, .1, .03]), {n: 16, tex: 'gu_bud', ledgeTex: 'gu_bud_l', caps: '-+', seed: 9}),
-    ...loft('y', stops([0, .14, .32, .55, .8, 1.05], [.7, .6, .51, .45, .42, .4]), {n: 8, tex: 'gu_drapeW', ledgeTex: 'gu_drape_l', caps: '', seed: 10})];
-  for (let k = 0; k < 8; k++) els.push(radialCard('gu_lobe', k * 45 + 22.5, .3, .78, 0, .3));
-  els.push(abox([-.13, .24, -.62], [.13, .5, -.5], 'gu_gem', {rot: ['x', -22.5, [0, .37, -.56]]}));
-  return els;
+  return [...BUD_FACES[0], ...spike('gu_spike', [0, 1.9, 0], [0, 1, 0], .3, .08), abox([-.12, .24, -.54], [.12, .42, -.48], 'gu_gem', {rot: ['x', -22.5, [0, .33, -.51]]})];
 }
+const guardBudX = () => BUD_FACES[1];
 const guardWisp = () => [...shapeSlab('g_wisp', 'gu_wisp', 'z', 0, {half: .05, cell: .08, inset: .5, edge: 'gu_wisp'}), ...shapeSlab('g_wisp', 'gu_wisp', 'x', 0, {half: .04, core: false})];
 const guardOrb = () => [...orb([0, 0, 0], .2, 'gu_orb'), ...crossCards('gu_orb', [0, 0, 0], .6, .6, {y0: -.3})];
 
@@ -863,8 +882,13 @@ export const ORG = {
     ]},
   guard: {type: 'kind', id: 3, name: '수호', hover: 0, hp_bar_y: 3.0, shield: {w: 1.4, h: 3.0}, size: {h: 4.4, bud: 2.0, orb_d: 0.4},
     displays: [
-      D('spire', {pivot: 'mid', frame: 'object', scale: 1.6, joint: [0, 2.2, 0], looks: {spire: 'guard_spire_spire', bud: 'guard_spire_bud', wisp: 'guard_spire_wisp'}, def: 'spire',
-        models: {guard_spire_spire: guardSpire, guard_spire_bud: guardBud, guard_spire_wisp: guardWisp}}),
+      D('spire', {pivot: 'mid', frame: 'object', scale: 1.75, joint: [0, 2.2, 0], looks: {spire: 'guard_spire_spire', bud: 'guard_spire_bud', wisp: 'guard_spire_wisp'}, def: 'spire',
+        models: {guard_spire_spire: guardSpire, guard_spire_bud: guardBud, guard_spire_wisp: guardWisp},
+        note: 'facet-body teal sheath with grey-blue scale lobes and a gold crystal, two pale helix ribbons to 4.4 / 4.1 b; bud = teal ogive hood over a pale flared drape; wisp = the black death wisp'}),
+      // the diagonal facets of the sheath / hood / drape (the spire turned 45 degrees about its Y; empty in the wisp look)
+      D('spire_x', {pivot: 'mid', frame: 'object', parent: 'spire', scale: 1.75, follow: () => [0, 45, 0], lookOf: 'spire', twinOf: 'spire',
+        looks: {spire: 'guard_spirex_spire', bud: 'guard_spirex_bud', wisp: 'guard_spirex_wisp'}, def: 'spire',
+        models: {guard_spirex_spire: guardSpireX, guard_spirex_bud: guardBudX, guard_spirex_wisp: () => []}, note: 'the diagonal facets of spire (spire turned 45 degrees; empty in the wisp look)'}),
       D('orb', {pivot: 'mid', joint: [0, 5.05, 0], bright: 15, looks: {on: 'guard_orb_on'}, def: 'on', models: {guard_orb_on: guardOrb}, note: 'bobs 0.6-0.8 above the tip'}),
     ]},
   nest: {type: 'kind', id: 4, name: '둥지', hover: 1.0, hp_bar_y: 2.75, shield: {w: 1.6, h: 2.2}, size: {w: 2.2, h: 1.3},
