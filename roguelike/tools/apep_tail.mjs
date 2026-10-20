@@ -192,7 +192,8 @@ function straps(i, f, {za = null, zb = null, shape = prof} = {}) {
 // front slides under the previous ring's cut-out scale tips (no shared planes). The straps start under tail_2's last ring.
 // The root ring carries a frill of pale pointed leaf fins (radial planes through the axis) where the tail leaves the body.
 const SH_T = .014, STRAP_Z1 = .56;
-const SH_RINGS = [[0, -.22, .26], [0, .16, .62], [0, .52, .98], [0, .88, 1.31], [1, -.1, .36], [1, .24, .66], [1, .52, .92]];
+// (each ring starts under the cut-out band of the one before: its notches begin 0.75 of the way along it)
+const SH_RINGS = [[0, -.22, .26], [0, .12, .6], [0, .46, .94], [0, .8, 1.31], [1, -.1, .36], [1, .22, .66], [1, .52, .92]];
 const SH_A = j => .47 - .015 * j, SH_B = j => .42 - .026 * j;
 // the plate on facet k of a ring over z0..z1, painted with the scale strip (column kk of 16)
 function shPlate({k, z0, z1, F, kk, t = SH_T, tex = 'g_tail_a'}) {
@@ -232,11 +233,27 @@ function fin({phi, z0, z1, r0, r1, cell, t = .022, tex = 'g_tail_a'}) {
   return faceEl([[c[0] - hx, c[1] - hy, z0], [c[0] + hx, c[1] + hy, z1]], faces, {rot: th ? ['z', th, [0, 0, (z0 + z1) / 2]] : undefined});
 }
 // the frill: down, the two lower diagonals, the sides and two small upper-side fins
-const FRILL = [[270, -.02, .8, .2, .96, 0], [225, .02, .8, .22, .95, 1], [315, .02, .8, .22, .95, 2], [180, .08, .74, .24, .88, 3], [0, .08, .74, .24, .88, 1],
-  [157.5, .14, .62, .26, .72, 2], [22.5, .14, .62, .26, .72, 3]];
+const FRILL = [[270, -.02, .8, .2, .96, 0], [225, .02, .8, .22, .95, 1], [315, .02, .8, .22, .95, 2], [180, .08, .74, .24, .88, 2], [0, .08, .74, .24, .88, 1],
+  [157.5, .14, .62, .26, .72, 2], [22.5, .14, .62, .26, .72, 0]];
 const frill = () => FRILL.map(([phi, z0, z1, r0, r1, cell]) => fin({phi, z0, z1, r0, r1, cell}));
+// two pale lance leaves lying on the root ring's side facets (axis-aligned, so they can tilt) and lifting 22.5 deg off
+// the sheath toward their tips, like the raised pale leaves where the tail leaves the body (v2 f1290); frill cell 3
+const ROOT_LEAVES = [{k: 0, z0: .06, L: .56, w: .22}, {k: 8, z0: .06, L: .56, w: .22}];
+function rootLeaves() {
+  const tex = 'g_tail_a', t = .01;
+  return ROOT_LEAVES.map(({k, z0, L, w}) => {
+    const F = facet(SH_A(0), SH_B(0), k), h = F.h + .012, z1 = z0 + L;
+    const uOf = P => 12 + 4 * clamp((P[2] - z0) / L);
+    if (k === 4) {
+      const face = {tex, fn: P => [uOf(P), FR0 + FRH * clamp((P[0] + w) / (2 * w))]};
+      return faceEl([[-w, h - t / 2, z0], [w, h + t / 2, z1]], {up: face, down: face}, {rot: ['x', -22.5, [0, h, z0]]});
+    }
+    const sx = k === 0 ? 1 : -1, face = {tex, fn: P => [uOf(P), FR0 + FRH * clamp((P[1] + w) / (2 * w))]};
+    return faceEl([[sx * h - t / 2, -w, z0], [sx * h + t / 2, w, z1]], {left: face, right: face}, {rot: ['y', sx * 22.5, [sx * h, 0, z0]]});
+  });
+}
 const BACK = .2;
-const segment = (i, f, shape = prof) => (i === 0 ? [...sheath(0), ...frill()]
+const segment = (i, f, shape = prof) => (i === 0 ? [...sheath(0), ...frill(), ...rootLeaves()]
   : i === 1 ? [...sheath(1), ...straps(1, f, {za: STRAP_Z1, shape})] : straps(i, f, {za: i === 0 ? -BACK : null, shape}));
 // ---- tail_7 in P3 and the tips -------------------------------------------------------------------------------------------------
 const ST = S0[7], S7 = S0[6];
@@ -376,7 +393,7 @@ function scaleHit(x, y) {
 function sheathPaint(x, y) {
   const s = scaleHit(x, y);
   if (!s) {
-    if (y > .62) return TRANSPARENT;
+    if (y > .75) return TRANSPARENT;
     return grey(clamp(.9 + .05 * (pn(N.b, x, y, 10, 3) - .5)));
   }
   let g = .58 + .07 * (pn(N.c, x, y, 12, 4) - .5) + .1 * (s.jit - .5) - .08 * smooth(.45, 1, s.sy) + .05 * smooth(.2, -.8, s.sx);
@@ -412,7 +429,19 @@ function paleExtra(u, v) {
   const py = v * TH;
   if (py < 272) return sheathPaint(u, (py - 240) / 32);
   const c = Math.floor(u * 4);
-  return frillPaint(c, u * 4 - c, 1 - (py - 272) / 32);
+  return c === 3 ? lancePaint(u * 4 - 3, (py - 272) / 32) : frillPaint(c, u * 4 - c, 1 - (py - 272) / 32);
+}
+// the lance leaf (frill cell 3; zz along it 0 base .. 1 tip, x across 0..1): rounded base, widest at a third, a long
+// jagged point; pale with a shaded half, a grey midrib and side veins, the dark outline
+function lancePaint(zz, x) {
+  const ax = x - .5, w = .46 * Math.pow(Math.max(0, Math.sin(Math.PI * Math.pow(Math.min(zz, 1), .7))), .8) * (1 + .1 * Math.sin(zz * 31));
+  if (zz < .02 || Math.abs(ax) >= w) return TRANSPARENT;
+  const epx = (w - Math.abs(ax)) * 32;
+  let g = .87 + .04 * (pn(N.b, zz, x, 5, 3) - .5) - (ax > 0 ? .09 : 0);
+  if (Math.abs(ax) < .022) g = .62;
+  else if (Math.abs(((zz - Math.abs(ax) * .9) * 8) % 1 - .5) < .07 && Math.abs(ax) < w * .8) g -= .1;
+  if (epx < 1.3) g = .3;
+  return grey(clamp(g));
 }
 const paleTile = (u, v) => {
   if (v * TH >= 5 * RH) return paleExtra(u, v);
