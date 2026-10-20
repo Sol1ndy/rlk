@@ -495,7 +495,7 @@ function hoodP3() {
   els.push(...frontPlate('hd_p3_arch', -1.16, 7.6, archSd, archPaint, {box: [-1.1, 1.1, 6.9, 8.6]}));
   const wall = slab({plane: 'x', at: 1.02, rect: WALL_R, sd: wallSd, half: .03, sprite: card('hd_p3_wall', WALL_R, wallPaint, 32, 'p3'), edge: 'hd_p3_lining', cell: .07});
   els.push(...wall, ...mirrorX(wall));
-  const horn = frontPlate('hd_p3_horns', -.82, 8.2, hornSd, hornPaint, {box: [.5, 2.15, 7.45, 8.95]});
+  const horn = frontPlate('hd_p3_horns', -.82, 8.2, hornSd, hornPaint, {box: [.5, 2.15, 7.45, 8.9]});
   els.push(...horn, ...mirrorX(horn));
   const bgem = frontPlate('hd_p3_browgem', -1.36, GEM[1], browGemSd, browGemPaint, {box: [GEM[0] - GEM[2] - .03, GEM[0] + GEM[2] + .03, GEM[1] - .27, GEM[1] + .27], half: .07, edge: 'p3_emerald', ppb: 64});
   els.push(...bgem, ...mirrorX(bgem));
@@ -510,7 +510,7 @@ function hoodP3() {
   // the jagged leaf crest at the peak, curling forward over the visor top (upright) / hooking down from the carapace tip (crawl)
   const frH = partFrame('hood', 'p3', oU), saw = t => 1 - .35 * Math.abs(((t * 5) % 1) - .5) * 2;
   const crestPaint = ({t, s, d}) => { let c = PAL.p3_bottle(clamp(.78 + .1 * t + .05 * (N.c(t * 9, s * 3) - .5))); if (s > .45) c = mix(c, PAL.p3_rim(.45), .6); if (Math.abs(s) < .08 && t < .9) c = mix(c, PAL.p3_bottle(.95), .5); if (d < .014) c = PAL.p3_bottle(.98); return c; };
-  els.push(...ribbon('hd_p3_crest', frH, [[0, 8.3, -.05], [0, 8.58, -.42], [0, 8.66, -.84], [0, 8.56, -1.22], [0, 8.34, -1.44]], t => (.06 + .14 * Math.pow(Math.sin(Math.PI * Math.min(1, .15 + t * .9)), .7)) * saw(t),
+  els.push(...ribbon('hd_p3_crest', frH, [[0, 8.28, -.05], [0, 8.52, -.42], [0, 8.58, -.84], [0, 8.5, -1.22], [0, 8.3, -1.44]], t => (.06 + .13 * Math.pow(Math.sin(Math.PI * Math.min(1, .15 + t * .9)), .7)) * saw(t),
     {cuts: [0, .5, 1], face: () => [1, 0, 0], side: () => [0, 1, 0], paint: crestPaint, ppb: 48, forms: 'p3', half: .035, edge: 'hd_p3_hairout'}));
   for (const sx of [1, -1]) els.push(...ribbon(`hd_p3_crest_${sx > 0 ? 'l' : 'r'}`, frH, [[sx * .14, 8.2, -.2], [sx * .2, 8.42, -.55], [sx * .24, 8.48, -.92], [sx * .26, 8.36, -1.2]], t => (.04 + .1 * Math.pow(Math.sin(Math.PI * Math.min(1, .15 + t * .9)), .7)) * saw(t),
     {cuts: [0, 1], face: () => [1, .3 * sx, 0], side: () => [0, 1, 0], paint: crestPaint, ppb: 48, forms: 'p3', half: .03, edge: 'hd_p3_hairout'}));
