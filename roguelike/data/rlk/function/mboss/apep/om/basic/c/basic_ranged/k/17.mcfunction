@@ -1,2 +1,2 @@
-execute on passengers if entity @s[tag=rlk_ap_om_crown] run data merge entity @s {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,-1.29f,0.45f],left_rotation:[0.57358f,0f,0f,0.81915f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+execute on passengers if entity @s[tag=rlk_ap_om_crown] run data merge entity @s {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,-1.0985f,0.2661f],left_rotation:[0.46175f,0f,0f,0.88701f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
 execute on passengers if entity @s[tag=rlk_ap_om_crown] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/apep_om/basic_crown_closed"

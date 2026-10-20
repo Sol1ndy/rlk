@@ -47,16 +47,18 @@ export const CLIPS = {
     C('basic_melee', 14, {next: 'basic_bob', events: {hit: 10}, note: 'lean back 0-5, bump 0.4 forward, hit 10, settle',
       keys: [[0, {bulb: {s: S(1), t: [0, 0, 0], r: [0, 0, 0]}}], [5, {bulb: {s: sq(.94), t: [0, 0, .06], r: [14, 0, 0]}}, 'o'], [9, {bulb: {s: sq(1.08), t: [0, .04, -.36], r: [-20, 0, 0]}}, 'i'],
         [10, {bulb: {s: sq(.96), t: [0, 0, -.42], r: [-24, 0, 0]}}], [14, {bulb: {s: S(1), t: [0, 0, 0], r: [0, 0, 0]}}, 'o']]}),
-    C('basic_lie', 10, {events: {bag: 10}, note: 'bell -> bag: tips forward 0-9, the bag model at 10 (cut), crown out',
-      keys: [[0, {bulb: {s: S(1), t: [0, 0, 0], r: [0, 0, 0]}, crown: {s: 0}}], [3, {bulb: {s: sq(.94), r: [8, 0, 0]}}], [9, {bulb: {s: S(1), t: [0, .4, -.2], r: [-78, 0, 0]}}, 'i'],
-        [10, {bulb: {s: [1.06, .94, 1.06], t: [0, BP.t, 0], r: [BP.r, 0, 0], look: 'bag'}, crown: {s: .8, r: [BP.crownR, 0, 0], look: 'closed'}}]]}),
+    C('basic_lie', 10, {events: {bag: 10}, note: 'bell -> bag: bows 0-3, tips over backward 3-9 (the skirt becomes the neck), the bag model at 10 (cut), crown out',
+      keys: [[0, {bulb: {s: S(1), t: [0, 0, 0], r: [0, 0, 0]}, crown: {s: 0}}], [3, {bulb: {s: sq(.94), r: [-8, 0, 0]}}], [9, {bulb: {s: S(1), t: [0, .42, .12], r: [66, 0, 0]}}, 'i'],
+        [10, {bulb: {s: [1.03, 1.03, .95], t: [0, BP.t, 0], r: [BP.r, 0, 0], look: 'bag'}, crown: {s: .8, r: [BP.crownR, 0, 0], look: 'closed'}}]]}),
     C('basic_ranged', 20, {events: {open: 0, fire: 12}, note: 'bag: squash 0-3, crown glow 3, petals open 5-12, launch 12, recoil, close 14-20',
-      keys: [[0, {bulb: {s: S(1), t: [0, BP.t, 0], r: [BP.r, 0, 0]}, crown: {s: 1, r: [BP.crownR, 0, 0], look: 'closed'}}], [3, {bulb: {s: [1.05, .93, 1.05]}, crown: {s: .92, look: 'open'}}],
-        [6, {bulb: {s: [.98, 1.04, .98]}, crown: {s: 1.08}}, 'o'], [11, {crown: {s: 1.22, r: [BP.crownR + 4, 0, 0]}}], [12, {bulb: {s: [1.02, .98, 1.02]}, crown: {s: 1.28}}],
-        [13, {bulb: {s: [.96, 1.04, .96], t: [0, BP.t, .1]}, crown: {r: [BP.crownR + 14, 0, 0]}}, 'o'], [16, {bulb: {s: S(1), t: [0, BP.t, 0]}, crown: {s: 1.0, r: [BP.crownR, 0, 0]}}],
+      // (the bag's scales keep x = y: bulb_x, the bag's diagonal facets, is the bulb rolled 45 degrees about the bag axis)
+      keys: [[0, {bulb: {s: S(1), t: [0, BP.t, 0], r: [BP.r, 0, 0], look: 'bag'}, crown: {s: 1, r: [BP.crownR, 0, 0], look: 'closed'}}], [3, {bulb: {s: [1.04, 1.04, .93]}, crown: {s: .92, look: 'open'}}],
+        [6, {bulb: {s: [.98, .98, 1.05]}, crown: {s: 1.08}}, 'o'], [11, {crown: {s: 1.22, r: [BP.crownR + 4, 0, 0]}}], [12, {bulb: {s: [1.02, 1.02, .97]}, crown: {s: 1.28}}],
+        [13, {bulb: {s: [.97, .97, 1.05], t: [0, BP.t, .1]}, crown: {r: [BP.crownR + 14, 0, 0]}}, 'o'], [16, {bulb: {s: S(1), t: [0, BP.t, 0]}, crown: {s: 1.0, r: [BP.crownR, 0, 0]}}],
         [17, {crown: {look: 'closed'}}], [20, {}]]}),
     C('org_die', 10, {events: {gone: 10}, force: ['bulb'], note: 'dying look (the bag keeps its form), squash, shrink to nothing',
-      keys: [[0, {bulb: {look: 'dying'}}], [3, {bulb: {s: [1.12, .72, 1.12]}, crown: {s: 0}, shield: {s: 0}}, 'o'], [7, {bulb: {s: S(.5), t: [0, -.05, 0]}}], [10, {bulb: {s: 0, t: [0, -.1, 0]}}, 'i']]}),
+      // (uniform scales: the clip serves the bell and the bag, whose diagonal halves turn about Y / Z)
+      keys: [[0, {bulb: {look: 'dying'}}], [3, {bulb: {s: S(1.1)}, crown: {s: 0}, shield: {s: 0}}, 'o'], [7, {bulb: {s: S(.5), t: [0, -.05, 0]}}], [10, {bulb: {s: 0, t: [0, -.1, 0]}}, 'i']]}),
   ],
   nurt: [
     C('nurt_idle', 40, {loop: true, breaks: [4], note: 'stalk sway, the hood nods with a lag, the orb breathes',
@@ -216,6 +218,8 @@ export function poseAt(owner, c, t, ks = clipKeys(owner, c)) {
   const p = sampleClip(c, t, ks, {defaults: defaults(owner), discrete: ORG[owner].displays.map(d => d.name + '.look')});
   const out = {};
   for (const d of ORG[owner].displays) out[d.name] = {t: p[d.name + '.t'], r: p[d.name + '.r'], s: p[d.name + '.s'], spin: p[d.name + '.spin'], look: p[d.name + '.look']};
+  // a display with lookOf shows its leader's look (the same look names)
+  for (const d of ORG[owner].displays) if (d.lookOf) out[d.name].look = out[d.lookOf].look;
   return out;
 }
 const AXQ = (axis, deg) => q(axis === 'x' ? [deg, 0, 0] : axis === 'y' ? [0, deg, 0] : [0, 0, deg]);
@@ -223,6 +227,9 @@ const AXQ = (axis, deg) => q(axis === 'x' ? [deg, 0, 0] : axis === 'y' ? [0, deg
 export function solve(owner, pose) {
   const W = {};
   for (const d of ORG[owner].displays) {
+    // a follow display copies its parent's transform (scale included) turned by follow(look) in the parent's frame; the
+    // parent's scales must commute with that turn (x = z for a turn about Y, x = y for one about Z: clipCheck)
+    if (d.follow) { const par = W[d.parent], look = pose[d.name].look; W[d.name] = {t: par.t, q: mul(par.q, q(d.follow(look))), k: par.k, s: par.s.slice(), look}; continue; }
     const P = pose[d.name], par = d.parent ? W[d.parent] : {t: [0, 0, 0], q: [0, 0, 0, 1], k: 1};
     let R = q(P.r);
     if (d.spinAxis || P.spin) R = mul(AXQ(d.spinAxis || 'x', P.spin || 0), R);

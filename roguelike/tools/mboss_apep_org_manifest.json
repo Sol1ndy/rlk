@@ -105,7 +105,69 @@
             0,
             0
           ],
-          "elements": 279
+          "elements": 40
+        },
+        {
+          "name": "bulb_x",
+          "tag": "rlk_ap_om_bulb_x",
+          "model": "basic_bulbx_bell",
+          "looks": {
+            "bell": "basic_bulbx_bell",
+            "bag": "basic_bulbx_bag",
+            "buffed": "basic_bulbx_buffed",
+            "bag_buffed": "basic_bulbx_bag_buffed",
+            "dying": "basic_bulbx_dying",
+            "bag_dying": "basic_bulbx_bag_dying"
+          },
+          "default_look": "bell",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "feet",
+          "offset": [
+            0,
+            -2,
+            0
+          ],
+          "overlay": false,
+          "parent": "bulb",
+          "joint": [
+            0,
+            0,
+            0
+          ],
+          "elements": 28,
+          "note": "the bell's facets on the diagonal azimuths: the bulb turned 45 degrees about its Y (empty in the other form)"
+        },
+        {
+          "name": "bulb_y",
+          "tag": "rlk_ap_om_bulb_y",
+          "model": "basic_bulby_bell",
+          "looks": {
+            "bell": "basic_bulby_bell",
+            "bag": "basic_bulby_bag",
+            "buffed": "basic_bulby_buffed",
+            "bag_buffed": "basic_bulby_bag_buffed",
+            "dying": "basic_bulby_dying",
+            "bag_dying": "basic_bulby_bag_dying"
+          },
+          "default_look": "bell",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "feet",
+          "offset": [
+            0,
+            -2,
+            0
+          ],
+          "overlay": false,
+          "parent": "bulb",
+          "joint": [
+            0,
+            0,
+            0
+          ],
+          "elements": 24,
+          "note": "the bag's facets on the diagonal azimuths: the bulb turned 45 degrees about the bag axis Z (empty in the other form)"
         },
         {
           "name": "crown",
@@ -121,16 +183,16 @@
           "pivot": "centre",
           "offset": [
             0,
-            -1.29,
-            0.45
+            -1.099,
+            0.266
           ],
           "overlay": false,
           "joint": [
             0,
-            0.71,
-            -0.45
+            0.901,
+            -0.266
           ],
-          "elements": 8,
+          "elements": 10,
           "note": "the petal crown at the bag neck (scale 0 while a bell); the glow is painted emissive"
         },
         {
@@ -167,7 +229,7 @@
           "loop": false,
           "next": "basic_bob",
           "events": {},
-          "keys": 11,
+          "keys": 29,
           "key_files": 9,
           "note": "emergence pop 0.85 -> 1.06 -> 1 (the spawn scale-in)"
         },
@@ -178,7 +240,7 @@
           "loop": true,
           "next": null,
           "events": {},
-          "keys": 14,
+          "keys": 38,
           "key_files": 12,
           "note": "two hop-slides: squash 0.92 / stretch 1.1, up 0.15"
         },
@@ -191,7 +253,7 @@
           "events": {
             "hit": 10
           },
-          "keys": 14,
+          "keys": 38,
           "key_files": 12,
           "note": "lean back 0-5, bump 0.4 forward, hit 10, settle"
         },
@@ -204,9 +266,9 @@
           "events": {
             "bag": 10
           },
-          "keys": 12,
+          "keys": 30,
           "key_files": 9,
-          "note": "bell -> bag: tips forward 0-9, the bag model at 10 (cut), crown out"
+          "note": "bell -> bag: bows 0-3, tips over backward 3-9 (the skirt becomes the neck), the bag model at 10 (cut), crown out"
         },
         {
           "id": 4,
@@ -218,7 +280,7 @@
             "open": 0,
             "fire": 12
           },
-          "keys": 21,
+          "keys": 35,
           "key_files": 13,
           "note": "bag: squash 0-3, crown glow 3, petals open 5-12, launch 12, recoil, close 14-20"
         },
@@ -231,7 +293,7 @@
           "events": {
             "gone": 10
           },
-          "keys": 17,
+          "keys": 32,
           "key_files": 9,
           "note": "dying look (the bag keeps its form), squash, shrink to nothing"
         }
@@ -240,8 +302,8 @@
         "elements": 500,
         "px": 14000
       },
-      "elements": 308,
-      "px": 12032,
+      "elements": 123,
+      "px": 11776,
       "functions": {
         "spawn": "rlk:mboss/apep/om/basic/spawn",
         "tick": "rlk:mboss/apep/om/basic/tick",
@@ -289,7 +351,7 @@
             0,
             0
           ],
-          "elements": 36,
+          "elements": 18,
           "note": "S-curved dark-teal ribbon with pale rims, fronds, the gold shard"
         },
         {
@@ -413,8 +475,8 @@
         "elements": 500,
         "px": 16000
       },
-      "elements": 84,
-      "px": 12800,
+      "elements": 66,
+      "px": 14336,
       "functions": {
         "spawn": "rlk:mboss/apep/om/nurt/spawn",
         "tick": "rlk:mboss/apep/om/nurt/tick",
@@ -2013,40 +2075,20 @@
     "px_total": 200000,
     "organism_elements": 500,
     "heart_elements": 800,
-    "px": 116992
+    "px": 118272
   },
   "sprites": {
-    "bo_bell": {
-      "w": 96,
-      "h": 48,
-      "owner": "basic"
-    },
-    "bo_skirt": {
-      "w": 96,
-      "h": 32,
-      "owner": "basic"
-    },
-    "bo_in": {
-      "w": 16,
-      "h": 16,
-      "owner": "basic"
-    },
-    "bo_bell_l": {
-      "w": 16,
-      "h": 16,
-      "owner": "basic"
-    },
-    "bo_stem": {
-      "w": 16,
-      "h": 32,
-      "owner": "basic"
-    },
     "bo_petal": {
       "w": 32,
       "h": 32,
       "owner": "basic"
     },
     "bo_glow": {
+      "w": 16,
+      "h": 16,
+      "owner": "basic"
+    },
+    "bo_stemT": {
       "w": 16,
       "h": 16,
       "owner": "basic"
@@ -2068,12 +2110,7 @@
     },
     "nu_rib": {
       "w": 32,
-      "h": 64,
-      "owner": "nurt"
-    },
-    "nu_ribB": {
-      "w": 16,
-      "h": 64,
+      "h": 144,
       "owner": "nurt"
     },
     "nu_hoodL": {
@@ -2420,6 +2457,16 @@
       "w": 16,
       "h": 16,
       "owner": "stalk"
+    },
+    "bo_bellF": {
+      "w": 32,
+      "h": 112,
+      "owner": "basic"
+    },
+    "bo_bagF": {
+      "w": 32,
+      "h": 144,
+      "owner": "basic"
     }
   },
   "functions": {
@@ -2429,6 +2476,6 @@
     "kill": "rlk:mboss/apep/om/kill",
     "kill_all": "rlk:mboss/apep/om/kill_all",
     "init": "rlk:mboss/apep/om/init",
-    "files": 1673
+    "files": 1685
   }
 }

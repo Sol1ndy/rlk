@@ -95,7 +95,11 @@ const TOL = {t: .012, s: .015, rDefault: 1.0, r: {}};
 function clipFrames(owner, c) {
   const ks = clipKeys(owner, c);
   return Array.from({length: c.len + 1}, (_, t) => {
-    const W = solve(owner, poseAt(owner, c, t, ks));
+    const P = poseAt(owner, c, t, ks), W = solve(owner, P);
+    // a follow display (a turned copy of its parent) needs parent scales that commute with its turn
+    for (const d of ORG[owner].displays.filter(x => x.follow)) { const f = d.follow(P[d.name].look), s = W[d.parent].s, i = f[1] ? 2 : f[2] ? 1 : 0;
+      if (!models[items[d.looks[P[d.name].look]].model].els.length) continue;
+      if (Math.abs(s[0] - s[i]) > 1e-6 && Math.max(...s) > 1e-6) errors.push(`${owner}/${c.name} t${t}: ${d.parent} scale ${s.map(x => x.toFixed(3))} does not commute with ${d.name}'s turn ${f}`); }
     return Object.fromEntries(Object.entries(W).map(([n, w]) => [n, {...displayXf(owner, n, w), look: w.look}]));
   });
 }
