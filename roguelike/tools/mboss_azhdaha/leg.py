@@ -3,7 +3,7 @@ fire rule, p/firefield/on_brand) and the leg-element addon bodies AZ:xl/** (Hydr
 host patterns' ADDON_POINTS (plan.md 4.5-4.7, 5 rows 31-33, Change note 1; s2.md 6, 9, 10, 17, 18).
 
 Telegraphs (Change note 1, the 10-20 rule): *keep* only 32's big seal (seal8 r 5.2, tell 28) and the P1 Hydro geyser
-swirl (tele/disc r 3.0, tell 22); every other hazard draws no ground decal: 31 = the orb props, 32's small meteors = the
+swirl (the outline-only tele/disc_o r 3.0, tell 22); every other hazard draws no ground decal: 31 = the orb props, 32's small meteors = the
 air halo + the falling prop, the Pyro lumps = the lump props in flight (26 t), the Hydro blades = the blade props inside
 the host's strike group. Every hit plays its impact preset at the hit tick.
 
@@ -87,17 +87,19 @@ def utils(g):
     lr, lf = H.LUMP['r'], H.LUMP['field']
     g.xw('u/lump_dress', ['# @s = a lump prop (kit prop/lump), hidden (scale 0) until its launch.', K.prop('lump'),
                           'data merge entity @s {transformation:{scale:[0f,0f,0f]}}'])
-    g.xw('u/lump_hz', [f'# Positioned at a lump target: disc r {n(lr)}, tell {H.LUMP["flight"]} (the flight), Pyro, the current volley group.']
-         + g.hz_opts(el=1, grp=True) + [L.hz_disc(lr, H.LUMP['flight'], A.DMG['x_lump'])])
     half = H.LUMP['flight'] // 2
-    g.xw('u/lump_fly', [f'# @s = a lump prop, at its target: glides there over {H.LUMP["flight"]} t (teleport_duration) on a',
-                        f'# two-segment arc (translation up {n(H.LUMP["apex"])} b over {half} t, down at the apex call).',
-                        f'data merge entity @s {{teleport_duration:{min(59, H.LUMP["flight"])},start_interpolation:0,'
-                        f'interpolation_duration:{half},transformation:{{translation:[0f,{n(H.LUMP["apex"])}f,0f],scale:[1f,1f,1f]}}}}',
-                        'tp @s ~ ~0.5 ~'])
-    g.xw('u/lump_down', ['# @s = a lump prop past its apex.',
-                         f'data merge entity @s {{start_interpolation:0,interpolation_duration:{H.LUMP["flight"] - half},'
-                         'transformation:{translation:[0f,0f,0f]}}'])
+    for i in range(3):
+        fl = H.LUMP['flight'] + H.LUMP['stagger'] * i          # lump i's own flight (I2 perf stagger)
+        g.xw(f'u/lump_hz{i}', [f'# Positioned at lump target {i}: disc r {n(lr)}, tell {fl} (its flight), Pyro, the current volley group.']
+             + g.hz_opts(el=1, grp=True) + [L.hz_disc(lr, fl, A.DMG['x_lump'])])
+        g.xw(f'u/lump_fly{i}', [f'# @s = lump prop {i}, at its target: glides there over {fl} t (teleport_duration) on a',
+                                f'# two-segment arc (translation up {n(H.LUMP["apex"])} b over {half} t, down at the apex call).',
+                                f'data merge entity @s {{teleport_duration:{min(59, fl)},start_interpolation:0,'
+                                f'interpolation_duration:{half},transformation:{{translation:[0f,{n(H.LUMP["apex"])}f,0f],scale:[1f,1f,1f]}}}}',
+                                'tp @s ~ ~0.5 ~'])
+        g.xw(f'u/lump_down{i}', [f'# @s = lump prop {i} past its apex.',
+                                 f'data merge entity @s {{start_interpolation:0,interpolation_duration:{fl - half},'
+                                 'transformation:{translation:[0f,0f,0f]}}'])
     g.xw('u/lump_land', ['# Positioned at a lump target on landing: the fireball and its fire field (plan 4.6).',
                          K.fxe('impact', 1), g.sound('entity.generic.explode', 0.5, 1.3), g.sound('block.lava.pop', 1.0, 0.8),
                          g.field('fire', lf[0], lf[1], A.DMG['fire'], el=1), F('p/firefield/amb_on')])
@@ -119,7 +121,7 @@ def utils(g):
 # =============================================================================================== addon bodies
 def geyser(g):
     """chin/impact Hydro: the geyser disc r 3.0 on a random side 5-7 b off the impact, perpendicular to the crack line;
-    *keep* decal (the water swirl, tele/disc rim) and hazard from the call (E - 12), hit E + 10 (tell 22)."""
+    *keep* decal (the water swirl, the outline-only tele/disc_o) and hazard from the call (E - 12), hit E + 10 (tell 22)."""
     gy = H.GEYSER
     lines = ['# chin/impact Hydro (plan 4.6; Change note 1: keep, the swirl from the call). As the body at the impact point,',
              '# rotated = the crack line: a random side and distance 5-7 b (local x = perpendicular).',
@@ -137,7 +139,7 @@ def geyser(g):
     g.xw('chin_impact/hydro_at', ['# At the geyser spot: own volley group, Hydro, the swirl decal = the hazard (r, tell).',
                                   g.GRP_NEW] + g.hz_opts(el=2, grp=True) + [
         L.hz_disc(gy['r'], gy['tell'], A.DMG['x_geyser']),
-        K.tele_disc(gy['r'], gy['tell'], el=2, nd=0, hold=3),
+        K.tele_disc(gy['r'], gy['tell'], el=2, nd=0, hold=3, fill=0),
         g.sound('block.bubble_column.whirlpool_inside', 0.9, 1.1)] + g.after(gy['tell'], 'xl/chin_impact/hydro_hit'))
     g.xw('chin_impact/hydro_hit', ['# The geyser erupts (the hit tick): column, stream ring, sounds.',
                                    K.fx('geyser'), K.fxe('dust_ring', 2, r=gy['r']),
@@ -175,15 +177,21 @@ def lumps(g, point):
                f'tag @e[type=minecraft:marker,tag=rlk_mb_az_xnt] add {pre}',
                f'tag @e[type=minecraft:marker,tag=rlk_mb_az_xnt] add {pre}t',
                'tag @e[type=minecraft:marker,tag=rlk_mb_az_xnt] remove rlk_mb_az_xnt']
-    go += [f'execute as {mks(pre + "t")} run {F("xl/u/clear_lump")}',
-           f'execute as {mks(pre + "t")} at @s run {F("xl/u/lump_hz")}']
-    go += [f'execute as {mk(f"{pre}p{i}", "item_display")} at {mk(f"{pre}t{i}")} run {F("xl/u/lump_fly")}' for i in range(3)]
+    go += [f'execute as {mks(pre + "t")} run {F("xl/u/clear_lump")}']
+    go += [f'execute as {mk(f"{pre}t{i}")} at @s run {F(f"xl/u/lump_hz{i}")}' for i in range(3)]
+    go += [f'execute as {mk(f"{pre}p{i}", "item_display")} at {mk(f"{pre}t{i}")} run {F(f"xl/u/lump_fly{i}")}' for i in range(3)]
     go += [g.sound('item.firecharge.use', 1.0, 0.7), g.sound('entity.blaze.shoot', 0.7, 0.6)]
-    go += g.after(H.LUMP['flight'] // 2, f'xl/{pk}/pyro_apex') + g.after(H.LUMP['flight'], f'xl/{pk}/pyro_land')
+    go += g.after(H.LUMP['flight'] // 2, f'xl/{pk}/pyro_apex') + g.after(H.LUMP['flight'], f'xl/{pk}/pyro_land0')
     g.xw(f'{pk}/pyro_go', go)
-    g.xw(f'{pk}/pyro_apex', ['# The lumps pass their apex.', f'execute as {mks(pre + "p", "item_display")} run {F("xl/u/lump_down")}'])
-    g.xw(f'{pk}/pyro_land', [f'# Landing (t{land}): fireball + fire field at every target, then the props and targets go.',
-                             f'execute as {mks(pre + "t")} at @s run {F("xl/u/lump_land")}', f'kill @e[tag={pre}]'])
+    g.xw(f'{pk}/pyro_apex', ['# The lumps pass their apex.']
+         + [f'execute as {mk(f"{pre}p{i}", "item_display")} run {F(f"xl/u/lump_down{i}")}' for i in range(3)])
+    st = H.LUMP['stagger']
+    for i in range(3):
+        g.xw(f'{pk}/pyro_land{i}', [f'# Landing of lump {i} (t{land + st * i}): its fireball + fire field, then its prop and target go'
+                                    + (f'; lump {i + 1} lands {st} t later (I2 perf stagger).' if i < 2 else '.'),
+                                    f'execute as {mk(f"{pre}t{i}")} at @s run {F("xl/u/lump_land")}',
+                                    f'kill @e[tag={pre}p{i}]', f'kill @e[tag={pre}t{i}]']
+             + (g.after(st, f'xl/{pk}/pyro_land{i + 1}') if i < 2 else [f'kill @e[tag={pre}]']))
 
 
 def blades(g, point):
@@ -198,7 +206,8 @@ def blades(g, point):
     go = [f'# Launch: {b["n"]} blades radially (blade 0 toward the player) from r {n(b["r0"])}, {n(b["up"])} b up.']
     for k in range(b['n']):
         go.append(f'execute rotated ~{n(360.0 * k / b["n"])} 0 positioned ^ ^{n(b["up"])} ^{n(b["r0"])} run {F("xl/u/blade")}')
-    go += [K.fxe('dust_ring', 2, r=b['r0'] + 1.0), g.sound('entity.player.splash.high_speed', 0.9, 1.2),
+    # I2 (perf probe): the water splash at the blades' root (the host already plays its own impact + dust ring)
+    go += [K.fx('splash'), g.sound('entity.player.splash.high_speed', 0.9, 1.2),
            g.sound('item.trident.riptide_1', 0.6, 1.5)]
     g.xw(f'{pk}/hydro_go', go)
 
@@ -280,7 +289,9 @@ def orbs(g):
            f'execute if score #azBgLT mb >= #aq31X mb run {F(f"p/{key}/end")}']
     g.pw(key, 'bgtick', bt)
     g.pw(key, 'amb', ['# Ribbons every 2 t at each orb, the loop at the orb nearest the player every 20 t.']
-         + g.every(O['rib'], f'execute as {mks(tag_d, "item_display")} at @s run {F(f"p/{key}/rib")}', clock='#azBgLT')
+         # I2 (perf probe): each orb keeps its ribbon every 2 t, the even orbs on even ticks and the odd ones on odd ticks
+         + [ln for k in range(4) for ln in g.every(O['rib'], f'execute as {mk(f"{tag_d}{k}", "item_display")} at @s run '
+                                                              f'{F(f"p/{key}/rib")}', start=k % O['rib'], clock='#azBgLT')]
          + g.every(O['loop'], f'execute at {PLAYER} at @e[type=minecraft:item_display,tag={tag_d},sort=nearest,limit=1] run {K.snd("orb_loop")}',
                    start=5, clock='#azBgLT'))
     g.pw(key, 'rib', ['# @s = an orb prop: the ribbon at its centre height.',
@@ -353,7 +364,7 @@ def meteor(g):
                          f'tell {M["big"] - M["seal"]}).', g.GRP_NEW]
          + g.hz_opts(el=1, kb=A.KB['o32_big'], grp=True)
          + [L.hz_disc(M['big_r'], M['big'] - M['seal'], A.DMG['o32_big']), g.tag_last_hz('rlk_mb_az_p32h'),
-            K.tele_seal8(M['big_r'], M['big'] - M['seal'], el=1, hold=3), K.snd('meteor_glyph')])
+            K.tele_seal8(M['big_r'], M['big'] - M['seal'], el=1, hold=3, fill=0), K.snd('meteor_glyph')])
     tl.at(M['big'] - M['big_fall'], f'execute at {mk(big)} run {K.fx("meteor_big", h=M["big_h"])}',
           f'execute at {mk(big)} run {K.snd("meteor_fall")}')
     tl.at(M['big'], f'execute at {mk(big)} run {F(f"p/{key}/big_hit")}', f'kill {mk(big)}')
@@ -419,7 +430,7 @@ def meteor(g):
     g.pw(key, 're_seal', [f'scoreboard players set #aq32X mb {M["big"]}', 'scoreboard players operation #aq32X mb -= #azCT mb',
                           f'data modify storage rlk:mboss az.tl set value {{r:{int(round(M["big_r"] * 10))},tell:1,el:1,hold:3}}',
                           'execute store result storage rlk:mboss az.tl.tell int 1 run scoreboard players get #aq32X mb',
-                          f'function {K.FN}tele/seal8 with storage rlk:mboss az.tl'])
+                          f'function {K.FN}tele/seal8_o with storage rlk:mboss az.tl'])
     g.pw(key, 'cancel', ['# The cast was cut (test, reload, a new cast): its markers, props and live hazards go (selectors only).',
                          'kill @e[tag=rlk_mb_az_p32]',
                          f'execute as {mks("rlk_mb_az_p32h")} at @s run function rlk:mboss/hz/expire'])

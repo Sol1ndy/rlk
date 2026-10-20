@@ -7,7 +7,7 @@ data modify storage rlk:mboss px.o.chest_x set value -0.073d
 data modify storage rlk:mboss px.o.chest_z set value 2.078d
 data modify storage rlk:mboss px.top.chest set value 5.013f
 data merge entity 524c4b4d-415a-4400-8000-000000000042 {height:5.013f}
-data modify storage rlk:mboss px.o.paw_l_x set value 3.494d
-data modify storage rlk:mboss px.o.paw_l_z set value 3.125d
-data modify storage rlk:mboss px.top.paw_l set value 4.992f
-data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:4.992f}
+data modify storage rlk:mboss px.o.paw_l_x set value 3.501d
+data modify storage rlk:mboss px.o.paw_l_z set value 3.128d
+data modify storage rlk:mboss px.top.paw_l set value 5.033f
+data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:5.033f}

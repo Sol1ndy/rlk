@@ -1,6 +1,6 @@
 # Positioned at the centre: the heptagram (keep, r 7.5, tell 22) and its hazard disc (same size and
 # tell), Cryo (the tail element) + a stack, own volley group; the draw sound.
-function rlk:mboss/azhdaha/fx/tele/heptagram {r:75,tell:22,el:4,hold:3}
+function rlk:mboss/azhdaha/fx/tele/heptagram_o {r:75,tell:22,el:4,hold:3}
 function rlk:mboss/azhdaha/fx/snd/frost_draw
 scoreboard players operation #aq41B mb = #azB3T mb
 scoreboard players add #aq41B mb 22

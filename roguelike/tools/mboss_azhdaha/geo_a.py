@@ -2,7 +2,7 @@
 18). Writes AZ:p/{chin,jump,charge,spikes}/** only.
 
 Telegraph rule (plan Change note 1, the 10-20 user rule): only the P4 spike landings keep a ground decal (the zig-zag
-crack ring tele/disc r 1.6, 14 t before each landing); every other hazard here is quiet and drawn by nothing before its
+crack ring, the outline-only tele/disc_o r 1.6, 14 t before each landing); every other hazard here is quiet and drawn by nothing before its
 hit: the readable tell is the clip pose + its sound (P1 rear-up and roar, P2 take-off, P3 coil and growl) or the visible
 prop (P4 the planted spikes glowing from t64). Every hit has its impact visual on the hit tick.
 
@@ -321,7 +321,7 @@ def emit_spikes(g):
         g.pw(key, f'land{k}', [f'# At point {k + 1} (t{made}): the landing ring (kept decal, Change note 1) + its hazard, one group.'] + grp
              + g.hz_opts() + ['scoreboard players operation #hzGrp mb = #aq4G mb'] + g.el_ground()
              + [L.hz_disc(P4['r_land'], P4['mark'], A.DMG['p4_land']), g.tag_last_hz('rlk_mb_az_p4h')]
-             + g.ktele('disc', 'ground', r=P4['r_land'], tell=P4['mark'], nd=0, hold=3))
+             + g.ktele('disc_o', 'ground', r=P4['r_land'], tell=P4['mark'], nd=0, hold=3))
         tl.at(made, f'{H.at_m(tp)} run {g.fn(f"p/{key}/land{k}")}')
         tl.at(tl_k - P4['fall'], f'{H.at_m(tp)} run {g.fx("shard_fall", h=P4["fall_h"])}')
         g.pw(key, f'plant{k}', [f'# At point {k + 1} (t{tl_k}): the landing burst and the planted spike.']
@@ -395,7 +395,7 @@ def emit_spikes(g):
           '# redrawn with the ticks they have left (the clock and the hazards were frozen with the fight).']
     for k, (tp, tl_k) in enumerate(zip(PT_TAGS, P4['land'])):
         g.pw(key, f'redraw{k}', [f'scoreboard players set #aq4R mb {tl_k}', 'scoreboard players operation #aq4R mb -= #azPT mb']
-             + _redraw_tell(g, 'ground', 'disc', r=P4['r_land'], tell=P4['mark'], nd=0, hold=3))
+             + _redraw_tell(g, 'ground', 'disc_o', r=P4['r_land'], tell=P4['mark'], nd=0, hold=3))
         rs.append(f'execute if score #azPT mb matches {tl_k - P4["mark"]}..{tl_k - 1} {H.at_m(tp)[len("execute "):]} run '
                   f'{g.fn(f"p/{key}/redraw{k}")}')
     g.pw(key, 'resume', rs)

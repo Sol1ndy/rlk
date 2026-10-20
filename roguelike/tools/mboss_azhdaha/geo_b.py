@@ -391,7 +391,7 @@ def emit_burrow(g):
     # --- rock rings (keep: the chevron ring outline from the decision, tell 19) under lockv lead 6, own groups
     g.pw(key, 'ring_at', ['# At a ring point: the hazard r 3.4 (own group) + its kit ring outline (keep), the ring sound, the shaft']
          + hz(g, pid, L.hz_disc(c['ring_r'], c['ring_tell'], D['ring']), el=5, grp='new', extra=('rlk_mb_az_p9ring',))
-         + [K.tele_disc(c['ring_r'], c['ring_tell'], el=5), g.snd('burrow_ring'), g.fx('light_shaft')])
+         + [K.tele_disc(c['ring_r'], c['ring_tell'], el=5, fill=0), g.snd('burrow_ring'), g.fx('light_shaft')])
     g.pw(key, 'ring_hit', ['# At a ring point at its hit: the rock lands', g.snd('burrow_rock')] + A._flat([g.fxe('impact', 5)])
          + [g.fx('dust')])
     for i, t in enumerate(c['ring_t']):
@@ -522,7 +522,7 @@ def emit_burrow(g):
                               'execute if score #t mb matches ..0 run return 0',
                               f'data modify storage rlk:mboss az.tl set value {{r:{int(round(c["ring_r"] * 10))},el:5,nd:0,hold:3}}',
                               'execute store result storage rlk:mboss az.tl.tell int 1 run scoreboard players get #t mb',
-                              (f'function {K.FN}tele/disc with storage rlk:mboss az.tl' if A.KIT else K._c('tele/disc'))])
+                              (f'function {K.FN}tele/disc_o with storage rlk:mboss az.tl' if A.KIT else K._c('tele/disc'))])
     g.pw(key, 'cancel', cancel_lines(pid, [
         '# the body comes back up (fight state only: death sets its own proxy state)',
         f'execute if score #mbSt mb matches 1 run {g.px("normal")}',

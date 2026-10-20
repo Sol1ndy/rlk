@@ -450,8 +450,8 @@ class KitStub:
         return self._c('uninstall')
 
     # telegraphs (blocks in; the kit converts to tenths)
-    def tele_disc(self, r, tell, el=5, nd=0, hold=3):
-        return self._c('tele/disc', r=r, tell=tell, el=el, nd=nd)
+    def tele_disc(self, r, tell, el=5, nd=0, hold=3, fill=1):
+        return self._c('tele/disc' if fill else 'tele/disc_o', r=r, tell=tell, el=el, nd=nd)
 
     def tele_ring(self, r0, r, tell, el=5, nd=0, hold=3):
         return self._c('tele/ring', r0=r0, r=r, tell=tell, el=el, nd=nd)
@@ -489,17 +489,17 @@ class KitStub:
     def tele_mline_end(self, id):   # noqa: A002
         return self._c('tele/mline_end', id=id)
 
-    def tele_heptagram(self, r, tell, el=4, hold=3):
-        return self._c('tele/heptagram', r=r, tell=tell, el=el)
+    def tele_heptagram(self, r, tell, el=4, hold=3, fill=1):
+        return self._c('tele/heptagram' if fill else 'tele/heptagram_o', r=r, tell=tell, el=el)
 
-    def tele_hexagram(self, r, tell, el=3, hold=3):
-        return self._c('tele/hexagram', r=r, tell=tell, el=el)
+    def tele_hexagram(self, r, tell, el=3, hold=3, fill=1):
+        return self._c('tele/hexagram' if fill else 'tele/hexagram_o', r=r, tell=tell, el=el)
 
-    def tele_starseal(self, r, tell, el=4, hold=3):
-        return self._c('tele/starseal', r=r, tell=tell, el=el)
+    def tele_starseal(self, r, tell, el=4, hold=3, fill=1):
+        return self._c('tele/starseal' if fill else 'tele/starseal_o', r=r, tell=tell, el=el)
 
-    def tele_seal8(self, r, tell, el=1, hold=3):
-        return self._c('tele/seal8', r=r, tell=tell, el=el)
+    def tele_seal8(self, r, tell, el=1, hold=3, fill=1):
+        return self._c('tele/seal8' if fill else 'tele/seal8_o', r=r, tell=tell, el=el)
 
     def tele_mask_wash(self, r, tell, hold=3):
         return self._c('tele/mask_wash', r=r, tell=tell)
@@ -1215,3 +1215,4 @@ class TL:
 # =============================================================================================
 # Per-author helpers, re-exported (s2.md 1). Each stage adds only its own line.
 from .h_core import *  # noqa: E402,F401,F403
+from .h_ps import *  # noqa: E402,F401,F403  (REQ ps-2)

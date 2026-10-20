@@ -118,6 +118,7 @@ fg kit, with its first-tick fix). A dead or reviving player clears every card by
 | function | args (tenths, ticks) | cards | drawn at | used by |
 |---|---|---|---|---|
 | `tele/disc` | `{r, tell, el, nd, hold}` | 2 | floor point | all |
+| `tele/disc_o` | the same arguments; outline only (the rim, no progress fill; plan Change note 1 "keep (trim)", I2 requests Rpa-2 / Rpb-1 / Rpl-3); Python `tele_disc(..., fill=0)` | 1 | floor point | P4 landing rings, P9 rock rings, the P1 Hydro geyser swirl |
 | `tele/ring` | `{r0, r, tell, el, nd, hold}` | 3 | floor point | P2, P5 outlines |
 | `tele/sector` | `{r, a, tell, el, nd, hold}` — `a` = half-angle 1..180, drawn in **7.5° steps** (a fan of 15° cards), `a ≥ 175` = a disc | ≤ 26 | apex, rotated = aim | P1 crack fan |
 | `tele/wedge` | `{r0, r1, a0, a1, tell, el, nd, hold}` — annular sector between `a0 < a1` (degrees relative to the executor's yaw, Minecraft sense: + = clockwise from above; `a1 − a0` ≤ 180), radii `r0..r1` | ≤ 14 | apex, rotated = reference yaw | P7 swept wedges (§3.1) |
@@ -131,6 +132,7 @@ fg kit, with its first-tick fix). A dead or reviving player clears every card by
 | `tele/hexagram` | `{r, tell, el, hold}` + the 번개 rune | ≤ 5 | floor centre | 46 |
 | `tele/starseal` | `{r, tell, el, hold}` white star seal + rune | ≤ 4 | floor centre | 45 |
 | `tele/seal8` | `{r, tell, el, hold}` two squares + 火 runes | ≤ 5 | floor centre | 32 |
+| `tele/heptagram_o` `tele/hexagram_o` `tele/starseal_o` `tele/seal8_o` | the same arguments as the plain seal; the seal art + rim, no progress fill (Change note 1 "keep (trim)", I2 request Rpt-3); Python `tele_<seal>(..., fill=0)` | 2 | floor centre | 41, 46, 45, 32 (every keep row uses these) |
 | `tele/mask_wash` | `{r, tell, hold}` one floor-wide violet card over radius `r` | 1 | arena centre | 42 |
 | `tele/safe_rim` | `{id, r, tell, hold}` (id 0-5) green rim with the glyph on the same card | 1 | safe-circle centre | 42 (round 1 = 1 wash + 5 rims = 6 cards, the §10 / plan §2.4 cap) |
 | `tele/safe_beam` | `{id}` a particle column on rim `id` (lives with the rim) | 0 | — | 42 |

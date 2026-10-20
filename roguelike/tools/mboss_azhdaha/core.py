@@ -1058,15 +1058,13 @@ class Core:
             f'execute as @e[type=minecraft:marker,tag=rlk_mb_az_orbc,limit=1] at @s facing entity {BODY} feet rotated ~ 0 positioned ^ ^ ^0.2 run tp @s ~ ~ ~'])
         self.w('orb/step', [
             '# @s = an orb marker: angle += omega; at the centre + r (sin, cos) of the angle (plain tp of the marker and its',
-            '# hazard); the band rides high while #azOrbHigh 1 (transitions, absorbs) or in the head-lane eye (S2-L refines).',
+            '# hazard). The band (normal / high / harmless) is set right after this by the caller (31: p/orbs/band, REQ pl-2).',
             'scoreboard players operation @s azS += @s azPT',
             'execute store result storage rlk:mboss az.ob.a float 0.01 run scoreboard players get @s azS',
             'execute store result storage rlk:mboss az.ob.r double 0.001 run scoreboard players get @s azT',
             f'execute at @e[type=minecraft:marker,tag=rlk_mb_az_orbc,limit=1] run function {NS}orb/place with storage rlk:mboss az.ob',
             f'scoreboard players operation #azX mb = @s azF',
-            f'execute at @s as @e[type=minecraft:marker,tag=rlk_mb_az_orbhz] if score @s mbHzI = #azX mb run tp @s ~ ~ ~',
-            f'execute if score #azOrbHigh mb matches 1 as @e[type=minecraft:marker,tag=rlk_mb_az_orbhz] if score @s mbHzI = #azX mb run '
-            'scoreboard players set @s mbHzY0 2600'])
+            f'execute at @s as @e[type=minecraft:marker,tag=rlk_mb_az_orbhz] if score @s mbHzI = #azX mb run tp @s ~ ~ ~'])
         self.w('orb/place', ['$execute rotated $(a) 0 positioned ^ ^ ^$(r) run tp @s ~ ~ ~'])
 
     # -----------------------------------------------------------------------------------------
@@ -1123,7 +1121,8 @@ class Core:
                 if el in A.LEG_BODY:
                     rel = f'xl/{pk}/{el}'
                     if g.has(rel):
-                        lines.append(f'execute if score #azPh mb matches 2.. if score #azLeg mb matches {A.LEG_BODY[el]} run return run {F(rel)}')
+                        # REQ pl-1 (I2a): no 'return' here, so in phase 3 the tail body of the same point runs after the leg one
+                        lines.append(f'execute if score #azPh mb matches 2.. if score #azLeg mb matches {A.LEG_BODY[el]} run {F(rel)}')
                 else:
                     rel = f'xt/{pk}/{el}'
                     if g.has(rel):
@@ -1160,9 +1159,9 @@ class Core:
     def phases_looks(self):
         F, g = self.F, self.g
         self.w('svc/phase_1', ['# Phase 1 (Geo).', sc('#azPh', 1), sc('#azE', 5), sc('#azET', 5), F('svc/floor_f1'), sc('#azHudQ', 1)])
-        p2 = ['# Phase 2 (absorb 1 at t94): the leg element on the ground hazards (#azE), floor F2, music "2", the brand banner',
-              '# (once per fight).', sc('#azPh', 2), 'scoreboard players operation #azE mb = #azLeg mb', sc('#azET', 5),
-              F('svc/floor_f2'), g.music(2), F('svc/banner_brand'), sc('#azHudQ', 1)]
+        p2 = ['# Phase 2 (absorb 1 at t94): the leg element on the ground hazards (#azE), floor F2, music "2". The brand banner',
+              '# (once per fight) is shown by absorb 1 at its roar, when gameplay resumes (REQ ps-3; plan 4.4).', sc('#azPh', 2),
+              'scoreboard players operation #azE mb = #azLeg mb', sc('#azET', 5), F('svc/floor_f2'), g.music(2), sc('#azHudQ', 1)]
         p3 = ['# Phase 3 (absorb 2 burst t42): + the tail element (#azET), #mbFloor 1 until the B3 surfacing.', sc('#azPh', 3),
               'scoreboard players operation #azE mb = #azLeg mb', 'scoreboard players operation #azET mb = #azTail mb',
               F('svc/floor_1'), sc('#azHudQ', 1)]
@@ -1452,8 +1451,8 @@ class Core:
             run.append(f'execute if score #azTst mb matches {90 + i} run return run {F(f"test/pair_{i}")}')
         run += [f'execute if score #azTst mb matches 99 run return run {F("test/cut")}', F('test/help')]
         self.w('test/run', run)
-        self.w('test/p2', ['# Phase 2 at once (no sequence): the legs look, the arena, floor F2, music 2.', F('test/cut'),
-                           g.phase(2), g.look_legs(), g.arena_look('leg'), F('svc/floor_f2')])
+        self.w('test/p2', ['# Phase 2 at once (no sequence): the legs look, the arena, floor F2, music 2, the brand banner.',
+                           F('test/cut'), g.phase(2), g.look_legs(), g.arena_look('leg'), F('svc/floor_f2'), g.banner('brand')])
         self.w('test/p3', ['# Phase 3 surfaced at once: both looks, the arena, floor 0.', F('test/cut'), g.phase(3), g.look_legs(),
                            g.look_tail(), g.arena_look('tail'), F('svc/floor_0')])
         self.w('test/p3_tail', ['# Phase 3 at tail-up (the B3 frame at B3_TAILUP, the special starts).', F('test/p3'), F('svc/floor_1'),

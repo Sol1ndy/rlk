@@ -591,6 +591,9 @@ TELE_ARGS = {
     'wave_end': ('id',), 'mline': ('id', 'len', 'w', 'back', 'tell', 'el', 'nd', 'hold'), 'mline_aim': ('id',),
     'mline_turn': ('id', 'd'), 'mline_end': ('id',), 'heptagram': ('r', 'tell', 'el', 'hold'),
     'hexagram': ('r', 'tell', 'el', 'hold'), 'starseal': ('r', 'tell', 'el', 'hold'), 'seal8': ('r', 'tell', 'el', 'hold'),
+    # outline-only variants (plan Change note 1 "keep (trim)": no progress fill; requests Rpa-2 / Rpt-3), same arguments
+    'disc_o': ('r', 'tell', 'el', 'nd', 'hold'), 'heptagram_o': ('r', 'tell', 'el', 'hold'),
+    'hexagram_o': ('r', 'tell', 'el', 'hold'), 'starseal_o': ('r', 'tell', 'el', 'hold'), 'seal8_o': ('r', 'tell', 'el', 'hold'),
     'mask_wash': ('r', 'tell', 'hold'), 'safe_rim': ('id', 'r', 'tell', 'hold'), 'safe_beam': ('id',),
     'safe_end': ('id',), 'crater': ('r', 'tell', 'hold'), 'halo': ('r', 'h', 'tell', 'el', 'hold'),
     'glyph_circle': ('r', 'tell', 'hold'),
@@ -612,9 +615,10 @@ def tele(shape, **args):
     return f'function {FN}tele/{shape} {{{body}}}'
 
 
-def tele_disc(r, tell, el=5, nd=0, hold=3):
-    """Disc decal of radius r blocks; the fill reaches the rim `tell` ticks after the call (pair with hz/disc)."""
-    return tele('disc', r=r, tell=tell, el=el, nd=nd, hold=hold)
+def tele_disc(r, tell, el=5, nd=0, hold=3, fill=1):
+    """Disc decal of radius r blocks; the fill reaches the rim `tell` ticks after the call (pair with hz/disc).
+    fill=0: the outline-only variant tele/disc_o (the rim alone, flashing on the hit; same arguments)."""
+    return tele('disc' if fill else 'disc_o', r=r, tell=tell, el=el, nd=nd, hold=hold)
 
 
 def tele_ring(r0, r, tell, el=5, nd=0, hold=3):
@@ -677,20 +681,24 @@ def tele_mline_end(mid):
     return tele('mline_end', id=mid)
 
 
-def tele_heptagram(r, tell, el=4, hold=3):
-    return tele('heptagram', r=r, tell=tell, el=el, hold=hold)
+def tele_heptagram(r, tell, el=4, hold=3, fill=1):
+    """fill=0: the outline-only variant tele/heptagram_o (the seal art + rim, no progress fill; same arguments)."""
+    return tele('heptagram' if fill else 'heptagram_o', r=r, tell=tell, el=el, hold=hold)
 
 
-def tele_hexagram(r, tell, el=3, hold=3):
-    return tele('hexagram', r=r, tell=tell, el=el, hold=hold)
+def tele_hexagram(r, tell, el=3, hold=3, fill=1):
+    """fill=0: the outline-only variant tele/hexagram_o (the seal art + rim, no progress fill; same arguments)."""
+    return tele('hexagram' if fill else 'hexagram_o', r=r, tell=tell, el=el, hold=hold)
 
 
-def tele_starseal(r, tell, el=4, hold=3):
-    return tele('starseal', r=r, tell=tell, el=el, hold=hold)
+def tele_starseal(r, tell, el=4, hold=3, fill=1):
+    """fill=0: the outline-only variant tele/starseal_o (the seal art + rim, no progress fill; same arguments)."""
+    return tele('starseal' if fill else 'starseal_o', r=r, tell=tell, el=el, hold=hold)
 
 
-def tele_seal8(r, tell, el=1, hold=3):
-    return tele('seal8', r=r, tell=tell, el=el, hold=hold)
+def tele_seal8(r, tell, el=1, hold=3, fill=1):
+    """fill=0: the outline-only variant tele/seal8_o (the seal art + rim, no progress fill; same arguments)."""
+    return tele('seal8' if fill else 'seal8_o', r=r, tell=tell, el=el, hold=hold)
 
 
 def tele_mask_wash(r, tell, hold=3):
@@ -2244,6 +2252,24 @@ def telegraphs(W):
         *mk('t_fill', '~ ~0.035 ~', '0.02f,1f,0.02f', '$(r)f,1f,$(r)f', '$(c2)'),
         *mk('$(rim)', '~ ~0.045 ~', '$(r)f,1f,$(r)f', '$(r)f,1f,$(r)f', '$(c1)'),
     ])
+    # outline-only disc (Change note 1 "keep (trim)", requests Rpa-2 / Rpb-1 / Rpl-3): the static rim alone
+    W.w('tele/disc_o', [
+        '# Outline-only disc telegraph (plan Change note 1 "keep (trim)": no progress fill): the same arguments as',
+        '# tele/disc {r, tell, el, nd, hold}; the static rim (+ the undodgeable card with nd) flashes on call + tell.',
+        '# 1 card (+1 with nd).',
+        *head(['$scoreboard players set #akTr mb $(r)']),
+        'execute if score #akTr mb matches ..1 run scoreboard players set #akTr mb 2',
+        store('r', '#akTr', 0.1),
+        f'data modify storage {STO} t.rim set value "t_rim"',
+        f'execute if score #akTr mb matches ..25 run data modify storage {STO} t.rim set value "t_rim_s"',
+        f'function {T}disc_o with storage {STO} t',
+        f'data modify storage {STO} t.gz set value 0f', *glyph_size('#akTr', 45),
+        f'execute if score #akTnd mb matches 1.. run function {T}glyph with storage {STO} t',
+    ])
+    W.w('tele/e/disc_o', [
+        '# Internal (macro, storage t): the static rim alone.',
+        *mk('$(rim)', '~ ~0.045 ~', '$(r)f,1f,$(r)f', '$(r)f,1f,$(r)f', '$(c1)'),
+    ])
     # ---- ring
     W.w('tele/ring', [
         '# Ring telegraph decal (safe hole inside r0): {r0, r (tenths), tell, el, nd, hold}. Positioned on the floor',
@@ -2689,12 +2715,29 @@ def telegraphs(W):
             f'data modify storage {STO} t.art set value "{kind}"',
             f'function {T}seal with storage {STO} t',
         ])
+        W.w(f'tele/{name}_o', [
+            f'# {doc}, outline only (plan Change note 1 "keep (trim)": the seal lines + rune, no progress fill): the',
+            f'# same arguments as tele/{name} {{r, tell, el, hold}}. The art pops in at r, the rim marks the hit radius;',
+            '# both flash on the hit. 2 cards.',
+            *head(['$scoreboard players set #akTr mb $(r)'], nd=0),
+            'execute if score #akTr mb matches ..1 run scoreboard players set #akTr mb 2',
+            store('r', '#akTr', 0.1), store('r9', '#akTr', 0.085),
+            f'data modify storage {STO} t.art set value "{kind}"',
+            f'function {T}seal_o with storage {STO} t',
+        ])
     W.w('tele/e/seal', [
         '# Internal (macro, storage t): the seal art (pops 0.85 r -> r over 4 t), the fill and the rim.',
         'scoreboard players set #akDur mb 4',
         *mk('$(art)', '~ ~0.04 ~', '$(r9)f,1f,$(r9)f', '$(r)f,1f,$(r)f', '$(c3)', flash='16777215'),
         'scoreboard players operation #akDur mb = #akTell mb', 'scoreboard players remove #akDur mb 1',
         *mk('t_fill', '~ ~0.035 ~', '0.02f,1f,0.02f', '$(r)f,1f,$(r)f', '$(c2)'),
+        *mk('t_rim', '~ ~0.045 ~', '$(r)f,1f,$(r)f', '$(r)f,1f,$(r)f', '$(c1)'),
+    ])
+    W.w('tele/e/seal_o', [
+        '# Internal (macro, storage t): the seal art (pops 0.85 r -> r over 4 t) and the rim, no fill.',
+        'scoreboard players set #akDur mb 4',
+        *mk('$(art)', '~ ~0.04 ~', '$(r9)f,1f,$(r9)f', '$(r)f,1f,$(r)f', '$(c3)', flash='16777215'),
+        'scoreboard players operation #akDur mb = #akTell mb', 'scoreboard players remove #akDur mb 1',
         *mk('t_rim', '~ ~0.045 ~', '$(r)f,1f,$(r)f', '$(r)f,1f,$(r)f', '$(c1)'),
     ])
     # ---- 42: mask wash and safe circles

@@ -218,7 +218,7 @@ def frost(g):
     g.pw(key, 'make', [
         f'# Positioned at the centre: the heptagram (keep, r {FROST_R}, tell {FROST_BURST}) and its hazard disc (same size and',
         '# tell), Cryo (the tail element) + a stack, own volley group; the draw sound.',
-        K.tele_heptagram(FROST_R, FROST_BURST, el=4, hold=3), K.snd('frost_draw'),
+        K.tele_heptagram(FROST_R, FROST_BURST, el=4, hold=3, fill=0), K.snd('frost_draw'),
         'scoreboard players operation #aq41B mb = #azB3T mb', f'scoreboard players add #aq41B mb {FROST_BURST}',
         *hz(g, V41), L.hz_disc(FROST_R, FROST_BURST, DMG['o41']), g.tag_last_hz('rlk_mb_az_p41')])
     g.pw(key, 'comet', [
@@ -239,7 +239,7 @@ def frost(g):
                          f'kill @e[tag=rlk_mb_az_p41]', sc('#aq41B', 0)])
     g.pw(key, 'reload', ['# /reload inside the B3: everything of ours is gone (aux entities); the schedule goes on from #azB3T',
                          '# (a circle cut mid-way never strikes).'] + clear)
-    prep, call = H.tele_dyn('heptagram', {'tell': '#aq41W'}, r=FROST_R, el=4, hold=3)
+    prep, call = H.tele_dyn('heptagram_o', {'tell': '#aq41W'}, r=FROST_R, el=4, hold=3)
     g.pw(key, 'resume', ['# Resume: the live circle\'s heptagram again with its remaining tell (the core cleared the decals).',
                          'scoreboard players operation #aq41W mb = #aq41B mb', 'scoreboard players operation #aq41W mb -= #azB3T mb',
                          f'execute unless score #aq41W mb matches 1..{FROST_BURST} run return 0'] + prep + [f'execute at {C41} run {call}'])
@@ -605,7 +605,7 @@ def icespike(g):
     for i, b in enumerate(ICE_BURST):
         tell = b - ICE_FIELDS
         g.pw(key, f'f{i}', [f'# Positioned at F{i + 1}: the star seal (keep) and its burst disc r {ICE_R}, tell {tell}, own group.',
-                            K.tele_starseal(ICE_R, tell, el=4, hold=3), *hz(g, V45), L.hz_disc(ICE_R, tell, DMG['o45']),
+                            K.tele_starseal(ICE_R, tell, el=4, hold=3, fill=0), *hz(g, V45), L.hz_disc(ICE_R, tell, DMG['o45']),
                             g.tag_last_hz('rlk_mb_az_p45')])
     g.pw(key, 'hail', [f'# Positioned at F1 / F2 1 t after its burst: the hail field (N6) r {ICE_R} / {ICE_HAIL} t (never stacks Cryo); the',
                        '# hail keeps falling in it (one ambience chain for every live 45 hail field, every 8 t).',
@@ -627,7 +627,7 @@ def icespike(g):
                          g.glow(False)])
     res = ['# Resume: the star seals of the pending bursts again with their remaining tells.']
     for i, b in enumerate(ICE_BURST):
-        prep, call = H.tele_dyn('starseal', {'tell': '#aq45W'}, r=ICE_R, el=4, hold=3)
+        prep, call = H.tele_dyn('starseal_o', {'tell': '#aq45W'}, r=ICE_R, el=4, hold=3)
         res += [sc('#aq45W', b), 'scoreboard players operation #aq45W mb -= #azPT mb'] + prep
         res.append(f'execute if score #azPT mb matches {ICE_FIELDS}.. if score #aq45W mb matches 1.. at {f45(i)} run {call}')
     g.pw(key, 'resume', res)
@@ -666,7 +666,7 @@ def elspike(g):
     g.pw(key, 'hex1', ['# t26: the hexagram at the predictive lock (lead 10); it stays to the end of the pattern.',
                        *g.lockv(10), *H.keep_lock('rlk_mb_az_p46h', 'rlk_mb_az_p46'),
                        f'execute as {H46} run {g.clamp_walk()}',
-                       f'execute at {H46} run {K.tele_hexagram(HEX_R, LUMP_HIT[0] - HEX_T, el=3, hold=EL_END - LUMP_HIT[0])}',
+                       f'execute at {H46} run {K.tele_hexagram(HEX_R, LUMP_HIT[0] - HEX_T, el=3, hold=EL_END - LUMP_HIT[0], fill=0)}',
                        f'execute at {H46} run {K.snd("hex_draw")}'])
     for i, t in enumerate(LUMP_HIT):
         grp = 'new' if i in (0, 2, 4, 5) else 'join:#aq46G'
@@ -686,7 +686,7 @@ def elspike(g):
                f'execute at {H.sel(lk)} positioned ~ ~{num(LUMP_H)} ~ run {g.sound("block.amethyst_block.resonate", 0.7, 1.5)}'])
         g.pw(key, f'hex_{i}', [f'# A new hexagram under the player (lump {i + 1}): to the end of the pattern.',
                                f'kill @e[type={MK},tag=rlk_mb_az_p46h]', g.lockp(), *H.keep_lock('rlk_mb_az_p46h', 'rlk_mb_az_p46'),
-                               f'execute at {H46} run {K.tele_hexagram(HEX_R, LUMP_LOCK, el=3, hold=EL_END - t)}',
+                               f'execute at {H46} run {K.tele_hexagram(HEX_R, LUMP_LOCK, el=3, hold=EL_END - t, fill=0)}',
                                f'execute at {H46} run {K.snd("hex_draw")}'])
     g.pw(key, 'vis', [f'execute if score #hzEv mb matches 1 if score @s mbHzV matches {V46} run {F("p/elspike/impact")}',
                       f'execute if score #hzEv mb matches 1 if score @s mbHzV matches {VX_BOLT} run {F("xt/bolt_fx")}',
@@ -694,7 +694,7 @@ def elspike(g):
     g.pw(key, 'impact', [K.fxe('impact', 3), K.snd('hex_impact')])
     g.pw(key, 'cancel', ['# The hexagram marker, locks, lumps, spikes and pending lumps go (selectors only); the glow ends.',
                          'kill @e[tag=rlk_mb_az_p46]', g.glow(False)])
-    prep, call = H.tele_dyn('hexagram', {'hold': '#aq46W'}, r=HEX_R, tell=1, el=3)
+    prep, call = H.tele_dyn('hexagram_o', {'hold': '#aq46W'}, r=HEX_R, tell=1, el=3)
     g.pw(key, 'resume', ['# Resume: the live hexagram again (it stays to the end of the pattern).',
                          sc('#aq46W', EL_END), 'scoreboard players operation #aq46W mb -= #azPT mb',
                          f'execute unless score #azPT mb matches {HEX_T}..{EL_END - 2} run return 0'] + prep + [f'execute at {H46} run {call}'])

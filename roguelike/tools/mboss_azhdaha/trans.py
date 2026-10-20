@@ -223,22 +223,24 @@ def absorb1(g):
     # pawing the ground (the stamps: left fore, then right)
     for ev_, (x, z) in (('stamp1', fl), ('stamp2', fr)):
         tl.at(ABS1_EV[ev_], *H.at_local(x, z, _leg(lambda e: K.fxe('footfall', e))), *_leg(lambda e: K.snde('footfall', e)))
-    # t94: phase 2 (floor F2, music 2, the brand banner), roar_rear + the leg special (its cast clock 0)
+    # t94: phase 2 (floor F2, music 2), roar_rear + the leg special (its cast clock 0)
     tl.at(ABS1, g.phase(2), g.play('roar_rear'), g.cast_leg())
-    tl.at(R, g.line(LINE_ABS1), K.snd('absorb_roar'), g.cine(False), g.px('normal'))
+    # the roar: cine ends, gameplay resumes, so the brand banner (once per fight; REQ ps-3) replaces the absorb banner here
+    tl.at(R, g.line(LINE_ABS1), K.snd('absorb_roar'), g.cine(False), g.px('normal'), g.banner('brand'))
     for dt in H.roar_rings(1):
         tl.at(R + dt, K.fx('shock_dome', r=8.0 + dt / 4), K.snd('roar_ring'))
     tl.at(ABS1 + ROAR_EV['land'], *H.at_local(*fl, _leg(lambda e: K.fxe('footfall', e))),
           *H.at_local(*fr, _leg(lambda e: K.fxe('footfall', e))), *_leg(lambda e: K.snde('footfall', e)))
     tl.at(ABS1_END, g.end())
     tl.write([f'# 21 absorb 1 (S2-S; plan 5 T2, 4.4): cine + untargetable; the vortex and sigils of the leg element; burst',
-              f'# {ABS1_BURST}: the legs look, the arena, the push ring r 8; {ABS1}: phase 2 (floor F2, music 2, the brand banner),',
-              f'# roar_rear + the leg special; roar {R}: the line, the dome rings, cine ends.'],
+              f'# {ABS1_BURST}: the legs look, the arena, the push ring r 8; {ABS1}: phase 2 (floor F2, music 2), roar_rear + the',
+              f'# leg special; roar {R}: the line, the brand banner, the dome rings, cine ends.'],
              [f'# {key} tick.'])
     g.pw(key, 'cancel', ['# Immediate cleanup: the cine and the gold glow end.', g.cine(False), g.glow(False)])
     g.pw(key, 'reload', ['# /reload inside absorb 1: it finishes at once (plan 4.3): the looks, phase 2, targetable again.',
                          f'execute if score #azPT mb matches ..{ABS1 - 1} run {g.phase(2)}',
-                         g.look_legs(), g.arena_look('leg'), g.cine(False), g.glow(False), g.px('normal'), g.end()])
+                         g.look_legs(), g.arena_look('leg'), g.cine(False), g.glow(False), g.px('normal'), g.banner('brand'),
+                         g.end()])
 
 
 # ============================================================================================ 22 absorb 2

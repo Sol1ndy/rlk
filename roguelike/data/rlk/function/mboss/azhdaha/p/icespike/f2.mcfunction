@@ -1,5 +1,5 @@
 # Positioned at F3: the star seal (keep) and its burst disc r 4.0, tell 54, own group.
-function rlk:mboss/azhdaha/fx/tele/starseal {r:40,tell:54,el:4,hold:3}
+function rlk:mboss/azhdaha/fx/tele/starseal_o {r:40,tell:54,el:4,hold:3}
 function rlk:mboss/grp_new
 scoreboard players operation #hzGrp mb = #mbGrp mb
 scoreboard players set #hzKB mb 3

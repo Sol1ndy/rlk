@@ -8,5 +8,5 @@ scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzNR mb 1
 function rlk:mboss/hz/disc {r:52,tell:28,dmg:140}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_p32h
-function rlk:mboss/azhdaha/fx/tele/seal8 {r:52,tell:28,el:1,hold:3}
+function rlk:mboss/azhdaha/fx/tele/seal8_o {r:52,tell:28,el:1,hold:3}
 function rlk:mboss/azhdaha/fx/snd/meteor_glyph

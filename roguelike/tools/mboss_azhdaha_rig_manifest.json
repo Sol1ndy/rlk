@@ -35492,9 +35492,9 @@
               11.655
             ],
             "paw_l": [
-              3.17,
-              2.953,
-              2.84
+              3.228,
+              2.961,
+              2.955
             ],
             "paw_r": [
               -3.15,
@@ -35554,9 +35554,9 @@
               11.625
             ],
             "paw_l": [
-              3.315,
-              3.027,
-              3.601
+              3.358,
+              3.044,
+              3.807
             ],
             "paw_r": [
               -3.15,
@@ -35616,9 +35616,9 @@
               11.597
             ],
             "paw_l": [
-              3.388,
-              3.07,
-              4.125
+              3.418,
+              3.081,
+              4.287
             ],
             "paw_r": [
               -3.15,
@@ -35678,9 +35678,9 @@
               11.553
             ],
             "paw_l": [
-              3.494,
-              3.125,
-              4.992
+              3.501,
+              3.128,
+              5.033
             ],
             "paw_r": [
               -3.15,
@@ -35740,9 +35740,9 @@
               11.539
             ],
             "paw_l": [
-              3.518,
-              3.136,
-              5.205
+              3.519,
+              3.137,
+              5.211
             ],
             "paw_r": [
               -3.15,
@@ -37146,7 +37146,7 @@
       ],
       "cull_overhang": null,
       "keyFiles": 60,
-      "keys": 1130,
+      "keys": 1132,
       "note": "weight shift to the right 0-6, the left fore lifts 6-15 to the hang (wrist 2.95 b, elbow high, the front rolled away, head turned to the foot), hang 15-17, the slam 17-22 = wave 1, compression and a shiver, two shoulder pushes for waves 2 / 3 at 37 / 52, recover"
     },
     {
@@ -37320,9 +37320,9 @@
               11.655
             ],
             "paw_r": [
-              -3.17,
-              2.953,
-              2.84
+              -3.228,
+              2.961,
+              2.955
             ],
             "paw_l": [
               3.15,
@@ -37382,9 +37382,9 @@
               11.625
             ],
             "paw_r": [
-              -3.315,
-              3.027,
-              3.601
+              -3.358,
+              3.044,
+              3.807
             ],
             "paw_l": [
               3.15,
@@ -37444,9 +37444,9 @@
               11.597
             ],
             "paw_r": [
-              -3.388,
-              3.07,
-              4.125
+              -3.418,
+              3.081,
+              4.287
             ],
             "paw_l": [
               3.15,
@@ -37506,9 +37506,9 @@
               11.553
             ],
             "paw_r": [
-              -3.494,
-              3.125,
-              4.992
+              -3.501,
+              3.128,
+              5.033
             ],
             "paw_l": [
               3.15,
@@ -37568,9 +37568,9 @@
               11.539
             ],
             "paw_r": [
-              -3.518,
-              3.136,
-              5.205
+              -3.519,
+              3.137,
+              5.211
             ],
             "paw_l": [
               3.15,
@@ -38974,7 +38974,7 @@
       ],
       "cull_overhang": null,
       "keyFiles": 60,
-      "keys": 1130,
+      "keys": 1132,
       "note": "mirror of stomp_fl: weight shift to the right 0-6, the left fore lifts 6-15 to the hang (wrist 2.95 b, elbow high, the front rolled away, head turned to the foot), hang 15-17, the slam 17-22 = wave 1, compression and a shiver, two shoulder pushes for waves 2 / 3 at 37 / 52, recover",
       "mirror_check": 0
     },
@@ -39159,9 +39159,9 @@
               2.8
             ],
             "foot_l": [
-              2.5,
+              2.505,
               -2.55,
-              2.92
+              2.94
             ],
             "foot_r": [
               -2.5,
@@ -39221,9 +39221,9 @@
               2.8
             ],
             "foot_l": [
-              2.5,
+              2.552,
               -2.55,
-              2.92
+              3.037
             ],
             "foot_r": [
               -2.5,
@@ -39283,9 +39283,9 @@
               2.8
             ],
             "foot_l": [
-              2.515,
-              -2.551,
-              2.94
+              2.585,
+              -2.558,
+              3.138
             ],
             "foot_r": [
               -2.5,
@@ -39345,9 +39345,9 @@
               2.8
             ],
             "foot_l": [
-              2.573,
-              -2.568,
-              3.09
+              2.642,
+              -2.585,
+              3.372
             ],
             "foot_r": [
               -2.5,
@@ -39407,9 +39407,9 @@
               2.8
             ],
             "foot_l": [
-              2.768,
-              -2.656,
-              3.868
+              2.79,
+              -2.665,
+              4.039
             ],
             "foot_r": [
               -2.5,
@@ -39469,9 +39469,9 @@
               2.8
             ],
             "foot_l": [
-              2.81,
-              -2.677,
-              4.073
+              2.819,
+              -2.681,
+              4.166
             ],
             "foot_r": [
               -2.5,
@@ -39531,9 +39531,9 @@
               2.8
             ],
             "foot_l": [
-              2.833,
-              -2.689,
-              4.19
+              2.834,
+              -2.69,
+              4.218
             ],
             "foot_r": [
               -2.5,
@@ -41113,7 +41113,7 @@
       ],
       "cull_overhang": null,
       "keyFiles": 60,
-      "keys": 1253,
+      "keys": 1254,
       "note": "the hind variant: the pelvis rolls away, the left hock lifts knee-high (2.65 b) with the foot curled, the tail swings to the other side as a counterweight; the slam at 22, two haunch pushes for waves 2 / 3"
     },
     {
@@ -41297,9 +41297,9 @@
               2.8
             ],
             "foot_r": [
-              -2.5,
+              -2.505,
               -2.55,
-              2.92
+              2.94
             ],
             "foot_l": [
               2.5,
@@ -41359,9 +41359,9 @@
               2.8
             ],
             "foot_r": [
-              -2.5,
+              -2.552,
               -2.55,
-              2.92
+              3.037
             ],
             "foot_l": [
               2.5,
@@ -41421,9 +41421,9 @@
               2.8
             ],
             "foot_r": [
-              -2.515,
-              -2.551,
-              2.94
+              -2.585,
+              -2.558,
+              3.138
             ],
             "foot_l": [
               2.5,
@@ -41483,9 +41483,9 @@
               2.8
             ],
             "foot_r": [
-              -2.573,
-              -2.568,
-              3.09
+              -2.642,
+              -2.585,
+              3.372
             ],
             "foot_l": [
               2.5,
@@ -41545,9 +41545,9 @@
               2.8
             ],
             "foot_r": [
-              -2.768,
-              -2.656,
-              3.868
+              -2.79,
+              -2.665,
+              4.039
             ],
             "foot_l": [
               2.5,
@@ -41607,9 +41607,9 @@
               2.8
             ],
             "foot_r": [
-              -2.81,
-              -2.677,
-              4.073
+              -2.819,
+              -2.681,
+              4.166
             ],
             "foot_l": [
               2.5,
@@ -41669,9 +41669,9 @@
               2.8
             ],
             "foot_r": [
-              -2.833,
-              -2.689,
-              4.19
+              -2.834,
+              -2.69,
+              4.218
             ],
             "foot_l": [
               2.5,
@@ -43251,7 +43251,7 @@
       ],
       "cull_overhang": null,
       "keyFiles": 60,
-      "keys": 1253,
+      "keys": 1254,
       "note": "mirror of stomp_hl: the hind variant: the pelvis rolls away, the left hock lifts knee-high (2.65 b) with the foot curled, the tail swings to the other side as a counterweight; the slam at 22, two haunch pushes for waves 2 / 3",
       "mirror_check": 0
     },

@@ -23,15 +23,17 @@ tag @e[type=minecraft:marker,tag=rlk_mb_az_xnt] add rlk_mb_az_xlt
 tag @e[type=minecraft:marker,tag=rlk_mb_az_xnt] add rlk_mb_az_xltt
 tag @e[type=minecraft:marker,tag=rlk_mb_az_xnt] remove rlk_mb_az_xnt
 execute as @e[type=minecraft:marker,tag=rlk_mb_az_xltt] run function rlk:mboss/azhdaha/xl/u/clear_lump
-execute as @e[type=minecraft:marker,tag=rlk_mb_az_xltt] at @s run function rlk:mboss/azhdaha/xl/u/lump_hz
-execute as @e[type=minecraft:item_display,tag=rlk_mb_az_xltp0,limit=1] at @e[type=minecraft:marker,tag=rlk_mb_az_xltt0,limit=1] run function rlk:mboss/azhdaha/xl/u/lump_fly
-execute as @e[type=minecraft:item_display,tag=rlk_mb_az_xltp1,limit=1] at @e[type=minecraft:marker,tag=rlk_mb_az_xltt1,limit=1] run function rlk:mboss/azhdaha/xl/u/lump_fly
-execute as @e[type=minecraft:item_display,tag=rlk_mb_az_xltp2,limit=1] at @e[type=minecraft:marker,tag=rlk_mb_az_xltt2,limit=1] run function rlk:mboss/azhdaha/xl/u/lump_fly
+execute as @e[type=minecraft:marker,tag=rlk_mb_az_xltt0,limit=1] at @s run function rlk:mboss/azhdaha/xl/u/lump_hz0
+execute as @e[type=minecraft:marker,tag=rlk_mb_az_xltt1,limit=1] at @s run function rlk:mboss/azhdaha/xl/u/lump_hz1
+execute as @e[type=minecraft:marker,tag=rlk_mb_az_xltt2,limit=1] at @s run function rlk:mboss/azhdaha/xl/u/lump_hz2
+execute as @e[type=minecraft:item_display,tag=rlk_mb_az_xltp0,limit=1] at @e[type=minecraft:marker,tag=rlk_mb_az_xltt0,limit=1] run function rlk:mboss/azhdaha/xl/u/lump_fly0
+execute as @e[type=minecraft:item_display,tag=rlk_mb_az_xltp1,limit=1] at @e[type=minecraft:marker,tag=rlk_mb_az_xltt1,limit=1] run function rlk:mboss/azhdaha/xl/u/lump_fly1
+execute as @e[type=minecraft:item_display,tag=rlk_mb_az_xltp2,limit=1] at @e[type=minecraft:marker,tag=rlk_mb_az_xltt2,limit=1] run function rlk:mboss/azhdaha/xl/u/lump_fly2
 playsound minecraft:item.firecharge.use hostile @a[tag=player] ~ ~ ~ 1 0.7 0.33
 playsound minecraft:entity.blaze.shoot hostile @a[tag=player] ~ ~ ~ 0.7 0.6 0.23
-scoreboard players set #azAftF mb 12
+scoreboard players set #azAftF mb 18
 scoreboard players set #azAftD mb 13
 function rlk:mboss/azhdaha/aft/new
-scoreboard players set #azAftF mb 13
+scoreboard players set #azAftF mb 19
 scoreboard players set #azAftD mb 26
 function rlk:mboss/azhdaha/aft/new

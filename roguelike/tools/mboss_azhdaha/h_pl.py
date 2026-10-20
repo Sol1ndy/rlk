@@ -48,7 +48,9 @@ FIRE = dict(rule_r=4.5, rule_life=160, extend_r=4.0, amb=10, snd=20)
 
 # ------------------------------------------------------------------------------------------------- addon bodies (4.6)
 GEYSER = dict(r=3.0, side=(5.0, 7.0), hit=10, tell=22)  # hit E + 10, decal + hazard from the call (E - 12)
-LUMP = dict(r=2.2, flight=26, field=(4.0, 160), lead=8, rnd=(7, 14), apex=5.0,
+# I2 (perf probe, plan 8.1 <= 3000 commands / tick): lump i lands `stagger` x i ticks after lump 0 (its hazard's tell is
+# its own flight), so the three fireballs + fire fields of a volley never run in one tick.
+LUMP = dict(r=2.2, flight=26, field=(4.0, 160), lead=8, rnd=(7, 14), apex=5.0, stagger=1,
             launch={'chin/impact': 8, 'jump/wave2': 0, 'stomp/w3': 2, 'stomp3/s3': 2})
 BLADE = dict(n=8, r0=2.0, spd=2.0, life=6, hr=1.6, up=0.9, launch=4,
              points=('jump/land', 'stomp/w1', 'stomp3/s1'))

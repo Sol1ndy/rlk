@@ -669,7 +669,7 @@ const FORE_UP = (y = 5.6, z = -3.0, x = 3.3, e = [-55, 0, -10]) => fore([x, y, z
   const push = (a) => [[a - 3, {chest: [-1, 0, 1], pos: [0, -.1, 0]}], [a, {chest: [-4, 0, 1], pos: [0, -.2, 0], head: [-6, -4, 0], jaw: 14}, 'i'], [a + 4, {chest: [-1, 0, 1], pos: [0, -.1, 0], head: [-3, -4, 0], jaw: 8}, 'o']];
   S.push({name: 'stomp_fl', keys: [[0, {}], [6, shift, 'io'], [15, hang, 'o'], [17, {...hang, fwL: [3.5, 3.05, -2.88]}], [22, slam, 'i'], [26, {...slam, pos: [0, -.14, 0], chest: [-2, 0, 1], head: [-3, -5, 0]}, 'o'],
     ...push(37), ...push(52), [72, {rot: [0, 0, 0], pos: [0, 0, 0], chest: [0, 0, 0], neck1: [0, 0, 0], neck2: [0, 0, 0], head: [0, 0, 0], jaw: 3, flS: 0, flM: 0}, 'io']],
-    feet: {fl: [W(0, 'fl'), W(6, 'fl'), Kf(15, {ease: 'o'}), Kf(17), Wp(22, F_(3.3, .5, -2.55), {ease: 'i'}), Wp(60, F_(3.3, .5, -2.55)), W(68, 'fl', 0, {lift: .2})]},
+    feet: {fl: [W(0, 'fl'), W(4, 'fl'), Kf(15, {ease: 'o'}), Kf(17), Wp(22, F_(3.3, .5, -2.55), {ease: 'i'}), Wp(60, F_(3.3, .5, -2.55)), W(68, 'fl', 0, {lift: .2})]},
     over: [tremor(22, 30, 1.5, 3, [['chest', [.6]], ['flM', 2], ['flS', 2]])], lag: {pelvis: 2, head: 1},
     anchors: {slam: ['paw'], w1: ['paw'], w2: ['paw'], w3: ['paw']}, plants: {slam: 'fl', w1: 'fl', w2: 'fl', w3: 'fl'},
     note: 'weight shift to the right 0-6, the left fore lifts 6-15 to the hang (wrist 2.95 b, elbow high, the front rolled away, head turned to the foot), hang 15-17, the slam 17-22 = wave 1, compression and a shiver, two shoulder pushes for waves 2 / 3 at 37 / 52, recover'});
@@ -680,7 +680,7 @@ const FORE_UP = (y = 5.6, z = -3.0, x = 3.3, e = [-55, 0, -10]) => fore([x, y, z
     [34, {pelvis: [1, 0, 1], pos: [0, -.08, 0]}], [37, {pelvis: [3, 0, 1], pos: [0, -.18, 0], jaw: 12}, 'i'], [41, {pelvis: [1, 0, 1], pos: [0, -.08, 0], jaw: 6}, 'o'],
     [49, {pelvis: [1, 0, 1], pos: [0, -.08, 0]}], [52, {pelvis: [3, 0, 1], pos: [0, -.18, 0], jaw: 12}, 'i'], [56, {pelvis: [1, 0, 1], pos: [0, -.08, 0], jaw: 6}, 'o'],
     [72, {rot: [0, 0, 0], pos: [0, 0, 0], pelvis: [0, 0, 0], spine: [0, 0, 0], neck1: [0, 0, 0], neck2: [0, 0, 0], head: [0, 0, 0], jaw: 3, tSweep: 0, flH: 0, flM: 0}, 'io']],
-    feet: {hl: [W(0, 'hl'), W(6, 'hl'), Kf(15, {ease: 'o'}), Kf(17), Wp(22, F_(2.55, 1.5, 2.85), {ease: 'i'}), Wp(60, F_(2.55, 1.5, 2.85)), W(68, 'hl', 0, {lift: .15})]},
+    feet: {hl: [W(0, 'hl'), W(2, 'hl'), Kf(15, {ease: 'o', lift: .12}), Kf(17), Wp(22, F_(2.55, 1.5, 2.85), {ease: 'i'}), Wp(60, F_(2.55, 1.5, 2.85)), W(68, 'hl', 0, {lift: .15})]},
     over: [tremor(22, 30, 1.5, 3, [['pelvis', [.6]], ['flH', 2], ['flM', 2]])], lag: {head: 2}, tailLag: 2,
     anchors: {slam: ['paw'], w1: ['paw'], w2: ['paw'], w3: ['paw']}, plants: {slam: 'hl', w1: 'hl', w2: 'hl', w3: 'hl'},
     note: 'the hind variant: the pelvis rolls away, the left hock lifts knee-high (2.65 b) with the foot curled, the tail swings to the other side as a counterweight; the slam at 22, two haunch pushes for waves 2 / 3'});

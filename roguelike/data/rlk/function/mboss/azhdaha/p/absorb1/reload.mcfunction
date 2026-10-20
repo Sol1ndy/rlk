@@ -5,4 +5,5 @@ function rlk:mboss/azhdaha/arena/look_leg
 function rlk:mboss/azhdaha/svc/cine_off
 function rlk:mboss/azhdaha/rig/glow/gold_off
 function rlk:mboss/azhdaha/px/normal
+function rlk:mboss/azhdaha/svc/banner_brand
 function rlk:mboss/azhdaha/p/end
