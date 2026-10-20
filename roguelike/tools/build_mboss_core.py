@@ -289,6 +289,7 @@ data remove storage rlk:mboss cbg
 data remove storage rlk:mboss tch
 data remove storage rlk:mboss pxq
 data remove storage rlk:mboss arsw
+data remove storage rlk:mboss plp
 data remove storage rlk:mboss arjob
 ''' + ''.join(f'data remove storage rlk:mboss built_{aid}\n' for aid, _ in ARENAS if aid != 'plaza')
   + '\n'.join(f'scoreboard objectives remove {o}' for o in OBJECTIVES))
@@ -950,10 +951,9 @@ w('cleanup', '''
 # Never teleports the player (callers that end a run move the player themselves).
 function rlk:mboss/cleanup_fight
 function rlk:mboss/forget
-# chapter arenas (AZ-CM): a running job of one ends, then its forceload goes (cb/pp/<id> adds it again at the next
-# entrance build); barrier bands
-''' + ''.join(f'execute if data storage rlk:mboss arjob{{aid:"{aid}"}} run function rlk:mboss/arena/abort\n'
-              f'execute in minecraft:overworld run function rlk:mboss/ar/{aid}/fl_off\n' for aid, _ in ARENAS if aid != 'plaza')
+# chapter arenas (AZ-CM): their forceload goes (ar/<aid>/fl_off aborts a running job of that arena first; cb/pp/<id>
+# adds the forceload again at the next entrance build); barrier bands
+''' + ''.join(f'execute in minecraft:overworld run function rlk:mboss/ar/{aid}/fl_off\n' for aid, _ in ARENAS if aid != 'plaza')
   + ''.join(f'execute in minecraft:overworld run function rlk:mboss/arena/{aid}/sweep {{y0:{a["sweep"]["y0"]},y1:{a["sweep"]["y1"]}}}\n'
             for aid, a in ARENAS if aid != 'plaza' and 'sweep' in a))
 SWEEP_PLAZA = '''
@@ -2711,9 +2711,17 @@ def ar_texts(aid, a):
     t['tp_in'] = (f'# @s = player: back to the arrival spot (cur.start) of the fight in {aid}, the avatar and the fall marker follow.\n'
                   'function rlk:mboss/tp_start with storage rlk:mboss cur.start\n'
                   'function rlk:view/sync\n'
-                  'function rlk:mboss/safe_start with storage rlk:mboss cur.start')
+                  'function rlk:mboss/safe_start with storage rlk:mboss cur.start'
+                  + ('' if aid == 'plaza' else '\n# the player moved: the per-tick body position cache (mv/plpos) reads again\n'
+                     'scoreboard players set #mbPlG mb -1'))
     t['fl_on'] = f'# Forceload the box of {aid} (idempotent).\nexecute in minecraft:overworld run forceload add {fl}'
-    t['fl_off'] = f'# Release the forceload of the box of {aid}.\nexecute in minecraft:overworld run forceload remove {fl}'
+    if aid == 'plaza':
+        t['fl_off'] = f'# Release the forceload of the box of {aid}.\nexecute in minecraft:overworld run forceload remove {fl}'
+    else:   # CM-REVIEW PERF-2: a job of this arena never outlives its chunks (it would wait 200 t, then abort)
+        t['fl_off'] = (f'# Release the forceload of the box of {aid}; a running job of {aid} is aborted first (without the chunks it\n'
+                       '# would only wait 200 t, refuse every gate press, then abort and force a full rebuild; cm.md 12).\n'
+                       f'execute if data storage rlk:mboss arjob{{aid:"{aid}"}} run function rlk:mboss/arena/abort\n'
+                       f'execute in minecraft:overworld run forceload remove {fl}')
     if aid == 'plaza':      # M0 mboss/start's test (the centre; the plaza forceload covers the whole box), cm.md 6.2
         t['loaded'] = (f'# 1 when the centre of the plaza is loaded (the M0 test of mboss/start), else fail.\n'
                        f'execute in minecraft:overworld unless loaded {cx} {cy} {cz} run return fail\n'
@@ -2909,11 +2917,10 @@ w('cb/won', '\n'.join([
     'execute if score #mbWas mb matches 1 as @a[tag=player,limit=1] run function rlk:mboss/tp_out']
     + [f'execute if score #mbAr mb matches {a["n"]} in minecraft:overworld run function rlk:mboss/arena/{aid}/sweep {{y0:{a["sweep"]["y0"]},y1:{a["sweep"]["y1"]}}}'
        for aid, a in ARENAS if aid != 'plaza' and 'sweep' in a]
-    + ['# a running job of the fight arena (a module look swap, a rebuild) ends before its forceload goes: without the',
-       '# chunks it would only wait, refuse every gate press for 200 t and abort (cm.md 12); ensure restarts it at the next press']
-    + [f'execute if score #mbAr mb matches {a["n"]} if data storage rlk:mboss arjob{{aid:"{aid}"}} run function rlk:mboss/arena/abort'
-       for aid, a in ARENAS if aid != 'plaza']
-    + ['execute in minecraft:overworld run function rlk:mboss/ar/fl_off',
+    + ['# the forceload goes; ar/<aid>/fl_off first aborts a running job of the fight arena (a module look swap, a rebuild:',
+       '# without the chunks it would only wait and refuse every gate press for 200 t; cm.md 12); ensure restarts it at the',
+       '# next press',
+       'execute in minecraft:overworld run function rlk:mboss/ar/fl_off',
        'execute if score #mbKilled mb matches 1 run return run function rlk:mboss/cb/won_kill',
        'function rlk:mboss/cb/won_cancel',
        'return 0']))
@@ -3137,8 +3144,9 @@ scoreboard players operation @s mbHzRI *= #t mb
 w('hz/hit_mask', '''
 # @s = a mask hazard inside its active window (height band passed): safe when the body is near a safe marker of its group.
 scoreboard players set #hzSafe mb 0
-execute store result score #bx mb run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000
-execute store result score #bz mb run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000
+execute unless function rlk:mboss/mv/plpos run return 0
+scoreboard players operation #bx mb = #mbPX mb
+scoreboard players operation #bz mb = #mbPZ mb
 scoreboard players operation #hzG2 mb = @s mbHzSG
 scoreboard players operation #hzRI2 mb = @s mbHzRI
 execute as @e[type=minecraft:marker,tag=rlk_mb_hzsafe] if score @s mbHzSG = #hzG2 mb run function rlk:mboss/hz/mask_one
@@ -3174,9 +3182,9 @@ w('mv/lv_sample', '''
 # From mboss/world (chapter fights, live and unpaused): the lockv ring buffer rlk:mboss lv[0..5] (oldest .. newest) of
 # the player's body x / z in milliblocks; a tick while the player dashes (dashMoveT >= 1) is skipped (cm.md 13.1).
 execute if entity @a[tag=player,scores={dashMoveT=1..},limit=1] run return 0
-execute unless entity @e[tag=rlk_body,limit=1] run return 0
-execute store result score #lx mb run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000
-execute store result score #lz mb run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000
+execute unless function rlk:mboss/mv/plpos run return 0
+scoreboard players operation #lx mb = #mbPX mb
+scoreboard players operation #lz mb = #mbPZ mb
 execute unless data storage rlk:mboss lv[5] run function rlk:mboss/mv/lv_fill
 data modify storage rlk:mboss lv append value {x:0,z:0}
 data remove storage rlk:mboss lv[0]
@@ -3200,9 +3208,9 @@ w('mv/lockv', '\n'.join([
     '# #mbVx #mbVz = v, #mbV = |v|; the old rlk_mb_lock marker dies and a new one (rlk_room rlk_mb_aux rlk_mb_lock) stands at',
     '# the player + v x lead, y = the arena centre, pulled inside walk - 0.7 (ar/clampw). A module that keeps the marker',
     '# removes rlk_mb_lock from it (the next lockv kills a tagged one).',
-    'execute unless entity @e[tag=rlk_body,limit=1] run return fail',
-    'execute store result score #lx mb run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000',
-    'execute store result score #lz mb run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000',
+    'execute unless function rlk:mboss/mv/plpos run return fail',
+    'scoreboard players operation #lx mb = #mbPX mb',
+    'scoreboard players operation #lz mb = #mbPZ mb',
     'execute unless data storage rlk:mboss lv[5] run function rlk:mboss/mv/lv_fill',
     'execute store result score #mbVx mb run data get storage rlk:mboss lv[5].x',
     'execute store result score #t mb run data get storage rlk:mboss lv[0].x',
@@ -3247,12 +3255,26 @@ scoreboard players operation #mbVz mb *= #c280 mb
 scoreboard players operation #mbVz mb /= #mbV mb
 scoreboard players set #mbV mb 280
 ''')
+w('mv/plpos', '''
+# (anywhere; cm.md 13.2, CM-REVIEW PERF-4) #mbPX / #mbPZ mb = the player's body x / z in milliblocks, read from the body
+# (a player: every entity NBT read saves the whole player) once per game tick, in one read (Pos -> rlk:mboss plp); later
+# calls in the same tick reuse it. Fails when there is no body. A chapter-runtime teleport of the player in the tick
+# (push/capsule, the chapter arena's tp_in) sets #mbPlG -1, so the next call reads again.
+execute store result score #plG mb run time query gametime
+execute if score #plG mb = #mbPlG mb run return 1
+execute unless entity @e[tag=rlk_body,limit=1] run return fail
+data modify storage rlk:mboss plp set from entity @e[tag=rlk_body,limit=1] Pos
+execute store result score #mbPX mb run data get storage rlk:mboss plp[0] 1000
+execute store result score #mbPZ mb run data get storage rlk:mboss plp[2] 1000
+scoreboard players operation #mbPlG mb = #plG mb
+return 1
+''')
 w('mv/local', '''
 # As the anchor (the body; cm.md 13.2): #mbLf / #mbLs mb = the player's body in the anchor frame, milliblocks (f forward
 # along the anchor yaw, s = the anchor's left), the hz/hit projection on an exact forward axis (no trigonometry).
 scoreboard players set #mbLf mb 0
 scoreboard players set #mbLs mb 0
-execute unless entity @e[tag=rlk_body,limit=1] run return fail
+execute unless function rlk:mboss/mv/plpos run return fail
 execute at @s rotated as @s rotated ~ 0 positioned ^ ^ ^1 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_lcax"]}
 execute store result score #ox mb run data get entity @s Pos[0] 1000
 execute store result score #oz mb run data get entity @s Pos[2] 1000
@@ -3261,8 +3283,8 @@ execute store result score #fz mb run data get entity @e[type=minecraft:marker,t
 kill @e[type=minecraft:marker,tag=rlk_mb_lcax]
 scoreboard players operation #fx mb -= #ox mb
 scoreboard players operation #fz mb -= #oz mb
-execute store result score #dx mb run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000
-execute store result score #dz mb run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000
+scoreboard players operation #dx mb = #mbPX mb
+scoreboard players operation #dz mb = #mbPZ mb
 scoreboard players operation #dx mb -= #ox mb
 scoreboard players operation #dz mb -= #oz mb
 scoreboard players operation #mbLf mb = #dx mb
@@ -3664,11 +3686,12 @@ execute if entity @a[tag=player,scores={vMap=1}] run return 0
 execute if entity @a[tag=player,scores={dashMoveT=1..}] run return 0
 execute unless data storage rlk:mboss push[0] run return 0
 execute unless function rlk:mboss/mv/local run return 0
-execute store result score #pbx mb run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000
-execute store result score #pbz mb run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000
+scoreboard players operation #pbx mb = #mbPX mb
+scoreboard players operation #pbz mb = #mbPZ mb
 scoreboard players set #puDone mb 0
 data modify storage rlk:mboss pq set from storage rlk:mboss push
 function rlk:mboss/push/cap_loop
+execute if score #puDone mb matches 1 run scoreboard players set #mbPlG mb -1
 ''')
 w('push/cap_loop', '''
 execute if score #puDone mb matches 1 run return 0
@@ -3852,8 +3875,9 @@ summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_prc"]}
 execute store result score #qcx mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_prc,limit=1] Pos[0] 1000
 execute store result score #qcz mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_prc,limit=1] Pos[2] 1000
 kill @e[type=minecraft:marker,tag=rlk_mb_prc]
-execute store result score #pbx mb run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000
-execute store result score #pbz mb run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000
+execute unless function rlk:mboss/mv/plpos run return 0
+scoreboard players operation #pbx mb = #mbPX mb
+scoreboard players operation #pbz mb = #mbPZ mb
 scoreboard players operation #qx mb = #pbx mb
 scoreboard players operation #qx mb -= #qcx mb
 scoreboard players operation #qz mb = #pbz mb

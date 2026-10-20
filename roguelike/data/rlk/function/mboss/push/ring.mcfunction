@@ -16,8 +16,9 @@ summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_prc"]}
 execute store result score #qcx mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_prc,limit=1] Pos[0] 1000
 execute store result score #qcz mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_prc,limit=1] Pos[2] 1000
 kill @e[type=minecraft:marker,tag=rlk_mb_prc]
-execute store result score #pbx mb run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000
-execute store result score #pbz mb run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000
+execute unless function rlk:mboss/mv/plpos run return 0
+scoreboard players operation #pbx mb = #mbPX mb
+scoreboard players operation #pbz mb = #mbPZ mb
 scoreboard players operation #qx mb = #pbx mb
 scoreboard players operation #qx mb -= #qcx mb
 scoreboard players operation #qz mb = #pbz mb

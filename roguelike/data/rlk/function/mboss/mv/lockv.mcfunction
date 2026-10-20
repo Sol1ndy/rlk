@@ -2,9 +2,9 @@
 # #mbVx #mbVz = v, #mbV = |v|; the old rlk_mb_lock marker dies and a new one (rlk_room rlk_mb_aux rlk_mb_lock) stands at
 # the player + v x lead, y = the arena centre, pulled inside walk - 0.7 (ar/clampw). A module that keeps the marker
 # removes rlk_mb_lock from it (the next lockv kills a tagged one).
-execute unless entity @e[tag=rlk_body,limit=1] run return fail
-execute store result score #lx mb run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000
-execute store result score #lz mb run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000
+execute unless function rlk:mboss/mv/plpos run return fail
+scoreboard players operation #lx mb = #mbPX mb
+scoreboard players operation #lz mb = #mbPZ mb
 execute unless data storage rlk:mboss lv[5] run function rlk:mboss/mv/lv_fill
 execute store result score #mbVx mb run data get storage rlk:mboss lv[5].x
 execute store result score #t mb run data get storage rlk:mboss lv[0].x
