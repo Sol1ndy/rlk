@@ -24,13 +24,11 @@ scoreboard players set #hzKB mb 3
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p11s,limit=1] run function rlk:mboss/hz/line {len:100,w:35,tell:10,dmg:70}
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p11s,limit=1] run function rlk:mboss/butterfly/fx/tele/line {len:100,w:35,back:0,tell:10,el:7,hold:3}
 scoreboard players operation #hzGrp mb = #mbGrp mb
 scoreboard players set #hzEl mb 7
 scoreboard players set #hzKB mb 3
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p11l,limit=1] run function rlk:mboss/hz/sector {r:40,a:60,tell:10,dmg:70}
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p11l,limit=1] run function rlk:mboss/butterfly/fx/tele/sector {r:40,a:60,tell:10,el:7,hold:3}
 # the Dendro tell cue
 playsound minecraft:block.amethyst_block.resonate hostile @a[tag=player] ~ ~ ~ 0.35 1.6 0.12

@@ -1,4 +1,3 @@
-# Markers A / B; the kit decals (only this pattern has any while it runs).
+# Markers A / B (the hazards go with lib_clear; no ground decal to clear: the telegraph rule).
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p1a]
 kill @e[type=minecraft:marker,tag=rlk_mb_bf_p1b]
-function rlk:mboss/butterfly/fx/tele/clear

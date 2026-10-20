@@ -10,7 +10,10 @@ the module core). Four parts, all regenerated on every run:
      minecraft:custom_model_data tint (default white), so painted sprites keep their video colours and the
      neutral ones take any colour per spawn. Hard caps: CAP fx cards and TCAP telegraph cards alive at once.
   2. Ground telegraph decals (disc, ring, sector, line / lane): a dark outline around a saturated rim and a
-     translucent progress fill whose bright edge reaches the rim exactly on the hit tick, then a flash.
+     translucent progress fill whose bright edge reaches the rim exactly on the hit tick, then a flash. The module's
+     patterns draw none since the user's telegraph rule (10-20: a ground telegraph only where the reference footage
+     shows one, and the footage shows none for her; scratchpad tele/bf/audit.md); the API and its sprites stay (the
+     pause / death hooks still clear them as a safety net).
   3. A vanilla sound recipe library: fx/snd/<name>, layered playsound lines with pitch, volume and the
      per-layer minimum volume of mboss_lib.sound (no creature voices).
   4. The HUD: font rlk:mboss_bf (U+E600-E6FF) with the 달빛 고치 debuff badge, the reward-buff badge, big

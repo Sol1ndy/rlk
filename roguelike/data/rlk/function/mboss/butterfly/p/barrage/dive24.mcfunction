@@ -1,5 +1,5 @@
 # @s = body, positioned at the fan-out end of crescent 4 of swing 2: #bp12D24 = its dive time (from the
-# straight distance to its landing point), its landing clock on the marker (mbT), the decal.
+# straight distance to its landing point), its landing clock on the marker (mbT).
 execute store result score #bp12X mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_bf_p12t24,limit=1] Pos[0] 10
 summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_help","rlk_mb_bf_p12h"]}
 execute store result score #t mb run data get entity @e[type=minecraft:marker,tag=rlk_mb_bf_p12h,limit=1] Pos[0] 10
@@ -75,4 +75,3 @@ scoreboard players operation #bp12W mb = #bp12D24 mb
 scoreboard players add #bp12W mb 11
 scoreboard players operation @e[type=minecraft:marker,tag=rlk_mb_bf_p12t24] mbT = #bp12W mb
 scoreboard players operation @e[type=minecraft:marker,tag=rlk_mb_bf_p12t24] mbT += #bfPT mb
-execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p12t24,limit=1] run function rlk:mboss/butterfly/p/barrage/tele/pick
