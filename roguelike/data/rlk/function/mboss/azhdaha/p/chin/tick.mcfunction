@@ -1,3 +1,3 @@
-# STUB (S1-MOD, s2.md 2.1): 갈라지는 봉인의 땅 (chin, id 1); the S2 author replaces this file.
-# keeps time only
-execute if score #azPT mb matches 65.. run function rlk:mboss/azhdaha/p/end
+# P1 tick (#azPT = the chin_slam clip tick)
+execute if score #azPT mb matches 0..6 run return run function rlk:mboss/azhdaha/p/chin/kd/0_6
+execute if score #azPT mb matches 7..65 run return run function rlk:mboss/azhdaha/p/chin/kd/7_65

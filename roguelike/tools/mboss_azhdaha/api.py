@@ -1027,8 +1027,9 @@ class Gen:
             lines += ring
         tl.at(made, *lines)
         if strike - 1 >= made:
+            # REQ pa-1: K.fxe takes blocks and converts to tenths itself (it was given tenths: a 10x front)
             tl.at(strike - 1, *(([] if tele == 'keep' else ring)
-                                + _flat([self.fxe('front', el, r0=int(r0 * 10), r1=int(r1 * 10), w=int(band * 10), dur=n)])))
+                                + _flat([self.fxe('front', el, r0=r0, r1=r1, w=band, dur=n)])))
         for k, r in enumerate(radii, 1):
             tl.at(strike + k, f'execute as @e[type=minecraft:marker,tag={tag}] run '
                               f'{L.hz_resize(r, max(0.0, r - band))}')
