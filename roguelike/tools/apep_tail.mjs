@@ -16,16 +16,26 @@
 //     authoring frame against the previous one (the previous frame parallel-transported across the bend) is folded into
 //     the phase. Each segment's slats run 0.14 b past its end joint (filling the wedge on the outside of a bend);
 //     neighbouring segments sit 0.012 b apart in radius (odd segments inside) so the overlaps never share a plane.
-//     tail_1 starts 0.2 b inside the abdomen.
-//   * Paint: two grey tiles tinted per form (g_tail_a pale, g_tail_b dark; 64 x 32 px: u along the strap, 4 px per
-//     facet, 16 facets per period; v across the strap): the dark outline at both strap edges, a lit band and a sheen line
-//     on the pale strap with faint wood-grain swirls and segment lines (v6w.md: segmented), a lit centre ridge on the dark
-//     one. Slat ends and sides show the outline rows.
+//     tail_1 starts 0.2 b inside the abdomen (under its sheath).
+//   * THE ROOT SHEATH (v2 f1260 / f1275 / f1290, v5 f1890, MP3 §3 item 8): tail_1 and tail_2 up to z 0.92 wear 7 rings of
+//     shingled scale plates (16 facet plates per ring, round 0.94 x 0.84 b at the root flattening to 0.76 x 0.53 b),
+//     each ring smaller than the one before by more than the plate thickness so it slides under the previous ring's
+//     cut-out scale tips; the straps start under the last ring. A frill of 7 pale jagged leaf fins (radial planes)
+//     stands round the root where the tail leaves the body (the pale flaps of v2 f1260).
+//   * Paint: two grey tiles tinted per form (g_tail_a pale, g_tail_b dark; 128 x 304 px). Rows 0-191: four alpha-cut band
+//     variants (u along the strap, 8 px per facet, 16 facets per period; the slat ends slant with the strap edge); 192-239:
+//     a solid strip (v across the strap) for the scroll and the whip: the dark outline at both strap edges, a lit band
+//     and a sheen line on the pale strap with faint wood-grain swirls, a lit centre ridge on the dark one. g_tail_a
+//     240-271: the sheath ring (two staggered rows of six pointed grey shield scales with outlines, lit front bevels,
+//     white studs and cracks on the pale ground, the back row's tips cut out); 272-303: four frill leaves. g_tail_b
+//     240-271: the scythe crescent (272-303 clear).
 //   tail_7    P1 = the plain segment; P3 = tail_7_p3: the pale strap ends in a leaf point and the dark one closes, the
 //             dark whip (a flattened taper) emerging from inside them.
-//   tail_tip  P1 (v2 f1260 / f1245): the pale strap rolls up into a scroll at the end while the dark strap leaves it as
-//             a long scythe blade, forward under the scroll then hooking back along the ground beside the tail. P3
-//             (v6 f140, v5 f1875): the dark whip runs on to a point 1.45 b past the tip joint (2.2 b of whip in all).
+//   tail_tip  P1 (v2 f1260 / f1275 / f1245): the pale strap ramps off the tail top and rolls forward and under into a
+//             spiral scroll (outer turn r 0.21 b + an inner 3/4 turn), resting just over the ground; the dark strap ends
+//             under it and the scythe blade (an alpha-cut crescent card standing on its edge, 2 b long) runs back from
+//             under the scroll along the ground beside the tail, angled 22.5 deg away from it. P3 (v6 f140, v5 f1875):
+//             the dark whip runs on to a point 1.45 b past the tip joint (2.2 b of whip in all).
 // Frames (apep_pose FRAMES): every tail part is authored in its bone frame 'z' at the CROUCH stance (+Z along the
 // segment toward the next joint, +Y = world up made perpendicular; the joint at the origin) and serves both forms.
 // Region interface: see apep_body.mjs.
@@ -109,11 +119,17 @@ function facet(a, b, k, step = 22.5) {
   const v0 = vert(k - 1), v1 = vert(k), e = [-nrm(k)[1], nrm(k)[0]], m = [(v0[0] + v1[0]) / 2, (v0[1] + v1[1]) / 2];
   return {h: h(k), c: m[0] * e[0] + m[1] * e[1], len: Math.hypot(v1[0] - v0[0], v1[1] - v0[1])};
 }
-// The strap tiles (64 x 160 px, u along the strap: one 4 px column per facet, 16 per period): rows 0-127 hold four
-// alpha-cut BAND variants of 32 px, each a parallelogram whose start and end edges slant by DV[r] of the row per facet
-// column, so a slat's ends follow the strap's diagonal edge instead of stepping; rows 128-159 are a solid strip (v across
+// The strap tiles (128 px wide, u along the strap: one 8 px column per facet, 16 per period): rows 0-191 hold four
+// alpha-cut BAND variants of RH px, each a parallelogram whose start and end edges slant by DV[r] of the row per facet
+// column, so a slat's ends follow the strap's diagonal edge instead of stepping; rows 192-239 are a solid strip (v across
 // the strap) for the scroll and the whip. A strap of half-width d (deg) slants by 22.5 / (2 d + 22.5) of its slat.
-const DV = [.15, .2, .3, .45], ROWU = 3.2, SOLID = 12.8;
+// tile layout (both strap tiles, TW x TH px, v in 0..16 units = PXV per px): rows 0-191 the four band variants (RH px each),
+// 192-239 the solid strip, then g_tail_a: 240-271 the root-sheath scale ring, 272-303 four frill leaves (32 x 32);
+// g_tail_b: 240-271 the scythe blade (272-303 clear). VS keeps the small v offsets of the 240 px layout on the same pixel rows.
+const TW = 128, RH = 48, TH = 304, PXV = 16 / TH, VS = 240 / TH;
+const DV = [.15, .2, .3, .45], ROWU = RH * PXV, SOLID = 4 * ROWU, SH0 = 240 * PXV, SHH = 32 * PXV, FR0 = 272 * PXV, FRH = 32 * PXV, BL0 = 240 * PXV, BLH = 32 * PXV;
+// a texel that is transparent in both tiles (the top-left corner of frill cell 0 / above the blade's root)
+const CLEAR = [.06, FR0 + .06];
 const rowOf = d => { const x = 22.5 / (2 * d + 22.5); return DV.reduce((b, v, i) => (Math.abs(v - x) < Math.abs(DV[b] - x) ? i : b), 0); };
 // One slat: a thin plate on facet k over local z0..z1 (clipped from the full slat Z0..Z1 = the strap crossing plus half
 // a facet's slant at each end), band row `row`; inset (b) from the tube surface. Unrotated configuration psi (a multiple
@@ -135,8 +151,8 @@ function slat({k, z0, z1, Z0, Z1, row, F, t, tex, inset = 0, step = 22.5}) {
   const vOf = P => (row < 0 ? SOLID + ROWU * clamp(pe(P)) : row * ROWU + ROWU * (P[2] - Z0) / (Z1 - Z0));
   const uOf = P => (row < 0 ? ke + clamp((P[2] - Z0) / (Z1 - Z0)) : ke + clamp(pe(P)));
   const face = {tex, fn: P => [uOf(P), vOf(P)]};
-  const side = {tex, fn: P => [row < 0 ? uOf(P) : ke + (pe(P) > .5 ? .94 : .04) + .02 * clamp(pn_(P)), row < 0 ? SOLID + .1 + .2 * clamp(pn_(P)) : vOf(P)]};
-  const end = {tex, fn: P => (row < 0 ? [ke + .1 + .2 * clamp(pn_(P)), vOf(P)] : [ke + .85 + .1 * clamp(pe(P)), row * ROWU + .02 + .03 * clamp(pn_(P))])};
+  const side = {tex, fn: P => [row < 0 ? uOf(P) : ke + (pe(P) > .5 ? .94 : .04) + .02 * clamp(pn_(P)), row < 0 ? SOLID + (.1 + .2 * clamp(pn_(P))) * VS : vOf(P)]};
+  const end = {tex, fn: P => (row < 0 ? [ke + .1 + .2 * clamp(pn_(P)), vOf(P)] : [ke + .85 + .1 * clamp(pe(P)), row * ROWU + (.02 + .03 * clamp(pn_(P))) * VS])};
   const faces = {[NAME[n.join()]]: face, [NAME[n.map(x => -x).join()]]: face, [NAME[e.join()]]: side, [NAME[e.map(x => -x).join()]]: side, front: end, back: end};
   return faceEl([lo, hi], faces, {rot: th ? ['z', th, [0, 0, (z0 + z1) / 2]] : undefined});
 }
@@ -172,8 +188,59 @@ function straps(i, f, {za = null, zb = null, shape = prof} = {}) {
   }
   return els;
 }
+// ---- the root sheath (v2 f1260 / f1290, v5 f1890) -----------------------------------------------------------------------------
+// tail_1 and most of tail_2 wear rings of shingled scale plates: 16 facet plates per ring on that ring's ellipse (round at
+// the root, flattening toward the ribbon), each ring smaller than the one before by more than the plate thickness, so its
+// front slides under the previous ring's cut-out scale tips (no shared planes). The straps start under tail_2's last ring.
+// The root ring carries a frill of pale pointed leaf fins (radial planes through the axis) where the tail leaves the body.
+const SH_T = .014, STRAP_Z1 = .56;
+const SH_RINGS = [[0, -.22, .26], [0, .16, .62], [0, .52, .98], [0, .88, 1.36], [1, -.1, .36], [1, .24, .66], [1, .52, .92]];
+const SH_A = j => .47 - .015 * j, SH_B = j => .42 - .026 * j;
+// the plate on facet k of a ring over z0..z1, painted with the scale strip (column kk of 16)
+function shPlate({k, z0, z1, F, kk, t = SH_T, tex = 'g_tail_a'}) {
+  const deg = ((k * 22.5) % 360 + 360) % 360;
+  let th = ((deg + 45) % 90) - 45;
+  const psi = Math.round(deg - th);
+  if (Math.abs(th) < 1e-6) th = 0;
+  const n = [Math.round(Math.cos(psi * D2R)), Math.round(Math.sin(psi * D2R))], e = [-n[1], n[0]];
+  const r = F.h - t / 2, hl = F.len / 2 + .006, c = [n[0] * r + e[0] * F.c, n[1] * r + e[1] * F.c];
+  const hx = Math.abs(n[0]) * t / 2 + Math.abs(e[0]) * hl, hy = Math.abs(n[1]) * t / 2 + Math.abs(e[1]) * hl;
+  const pe = P => clamp(((P[0] - c[0]) * e[0] + (P[1] - c[1]) * e[1]) / (2 * hl) + .5), pz = P => clamp((P[2] - z0) / (z1 - z0));
+  const face = {tex, fn: P => [kk + pe(P), SH0 + SHH * pz(P)]};
+  const side = {tex, fn: P => [kk + (pe(P) > .5 ? .97 : .03), SH0 + SHH * pz(P) * .6]};
+  const end = {tex, fn: () => CLEAR};
+  const faces = {[NAME[n.join()]]: face, [NAME[n.map(x => -x).join()]]: face, [NAME[e.join()]]: side, [NAME[e.map(x => -x).join()]]: side, front: end, back: end};
+  return faceEl([[c[0] - hx, c[1] - hy, z0], [c[0] + hx, c[1] + hy, z1]], faces, {rot: th ? ['z', th, [0, 0, (z0 + z1) / 2]] : undefined});
+}
+function sheath(i) {
+  const els = [];
+  SH_RINGS.forEach(([p, z0, z1], j) => {
+    if (p === i) for (let k = 0; k < 16; k++) els.push(shPlate({k, z0, z1, F: facet(SH_A(j), SH_B(j), k), kk: (k + 3 * j) % 16}));
+  });
+  return els;
+}
+// a leaf fin in the radial plane at angle phi (deg from +X toward +Y): z0..z1 along the axis, r0..r1 out from it; both large
+// faces show frill leaf `cell` (u along z, v outward), every thin face is clear
+function fin({phi, z0, z1, r0, r1, cell, t = .022, tex = 'g_tail_a'}) {
+  const deg = ((phi % 360) + 360) % 360;
+  let th = ((deg + 45) % 90) - 45;
+  const psi = Math.round(deg - th);
+  if (Math.abs(th) < 1e-6) th = 0;
+  const n = [Math.round(Math.cos(psi * D2R)), Math.round(Math.sin(psi * D2R))], e = [-n[1], n[0]];
+  const rm = (r0 + r1) / 2, hr = (r1 - r0) / 2, c = [n[0] * rm, n[1] * rm];
+  const hx = Math.abs(n[0]) * hr + Math.abs(e[0]) * t / 2, hy = Math.abs(n[1]) * hr + Math.abs(e[1]) * t / 2;
+  const face = {tex, fn: P => [4 * cell + 4 * clamp((P[2] - z0) / (z1 - z0)), FR0 + FRH * (1 - clamp(((P[0] * n[0] + P[1] * n[1]) - r0) / (r1 - r0)))]};
+  const clear = {tex, fn: () => CLEAR};
+  const faces = {[NAME[n.join()]]: clear, [NAME[n.map(x => -x).join()]]: clear, [NAME[e.join()]]: face, [NAME[e.map(x => -x).join()]]: face, front: clear, back: clear};
+  return faceEl([[c[0] - hx, c[1] - hy, z0], [c[0] + hx, c[1] + hy, z1]], faces, {rot: th ? ['z', th, [0, 0, (z0 + z1) / 2]] : undefined});
+}
+// the frill: down, the two lower diagonals, the sides and two small upper-side fins
+const FRILL = [[270, -.02, .9, .2, 1.08, 0], [225, .02, .82, .22, .98, 1], [315, .02, .82, .22, .98, 2], [180, .08, .74, .24, .88, 3], [0, .08, .74, .24, .88, 1],
+  [157.5, .14, .62, .26, .72, 2], [22.5, .14, .62, .26, .72, 3]];
+const frill = () => FRILL.map(([phi, z0, z1, r0, r1, cell]) => fin({phi, z0, z1, r0, r1, cell}));
 const BACK = .2;
-const segment = (i, f, shape = prof) => straps(i, f, {za: i === 0 ? -BACK : null, shape});
+const segment = (i, f, shape = prof) => (i === 0 ? [...sheath(0), ...frill()]
+  : i === 1 ? [...sheath(1), ...straps(1, f, {za: STRAP_Z1, shape})] : straps(i, f, {za: i === 0 ? -BACK : null, shape}));
 // ---- tail_7 in P3 and the tips -------------------------------------------------------------------------------------------------
 const ST = S0[7], S7 = S0[6];
 // P3: in tail_7 the pale strap narrows to a leaf point (z 0.25 .. 0.8) and the dark one closes after it (.. 0.98) round
@@ -192,8 +259,8 @@ function flatPiece({z0, z1, deg, w, t, tex, u0, u1}) {
   const n = [Math.round(Math.cos(psi * D2R)), Math.round(Math.sin(psi * D2R))], e = [-n[1], n[0]];
   const hx = Math.abs(n[0]) * t / 2 + Math.abs(e[0]) * w / 2, hy = Math.abs(n[1]) * t / 2 + Math.abs(e[1]) * w / 2;
   const uOf = P => u0 + (u1 - u0) * (P[2] - z0) / (z1 - z0), across = P => clamp((P[0] * e[0] + P[1] * e[1]) / w + .5);
-  const face = {tex, fn: P => [uOf(P), SOLID + ROWU * across(P)]}, rim = {tex, fn: P => [uOf(P), SOLID + .1 + .15 * clamp((P[0] * n[0] + P[1] * n[1]) / t + .5)]};
-  const end = {tex, fn: P => [u0 + .2 * across(P), SOLID + .1 + .15 * clamp((P[0] * n[0] + P[1] * n[1]) / t + .5)]};
+  const face = {tex, fn: P => [uOf(P), SOLID + ROWU * across(P)]}, rim = {tex, fn: P => [uOf(P), SOLID + (.1 + .15 * clamp((P[0] * n[0] + P[1] * n[1]) / t + .5)) * VS]};
+  const end = {tex, fn: P => [u0 + .2 * across(P), SOLID + (.1 + .15 * clamp((P[0] * n[0] + P[1] * n[1]) / t + .5)) * VS]};
   const faces = {[NAME[n.join()]]: face, [NAME[n.map(x => -x).join()]]: face, [NAME[e.join()]]: rim, [NAME[e.map(x => -x).join()]]: rim, front: end, back: end};
   return faceEl([[-hx, -hy, z0], [hx, hy, z1]], faces, {rot: th ? ['z', th, [0, 0, (z0 + z1) / 2]] : undefined});
 }
@@ -214,68 +281,72 @@ function tipP3() {
 }
 // P1: the straps run on to the scroll (pale to CURL_Z, the dark one a little further under it)
 const p1TipShape = s => { const z = s - ST, p = prof(s); return {...p, dA: z < CURL_Z ? p.dA : 0, dB: z < CURL_Z + .1 ? p.dB : 0}; };
-// the scroll: the pale strap's end rolled up and back over the tail end (a spiral about the X axis, radius 0.2 -> 0.085
-// b over 292 deg): one short plate per 22.5 deg, each tangent to the spiral (rotations about X on the 22.5 grid)
+// the scroll (v2 f1260 / f1275): the pale strap leaves the top of the tail end, ramps up 22.5 deg and rolls forward and
+// under into a spiral about the X axis: an outer turn of radius SC_R (over the top, down the front, back along the ground,
+// up behind) and an inner 3/4 turn closing to 0.07 b; its lowest point 0.02 b over the ground at CROUCH. One plate per
+// 22.5 deg chord, the chords centred on the 22.5 grid so every plate turns about X by a grid angle; the rims (the spiral
+// seen from the side) carry the strap's dark outline.
+const SC_R = .21, SC_C = [-.17 + SC_R, .66];
+const scR = a => (a <= 270 ? SC_R : SC_R - (SC_R - .07) * (a - 270) / 270);
+const scP = a => [SC_C[0] + scR(a) * Math.cos(a * D2R), SC_C[1] + scR(a) * Math.sin(a * D2R)];
+function scrollPlate(P0, P1, w, h, u, tex) {
+  const ctr = [0, (P0[0] + P1[0]) / 2, (P0[1] + P1[1]) / 2], len = Math.hypot(P1[0] - P0[0], P1[1] - P0[1]) * 1.1 + .006;
+  const al = Math.round(Math.atan2(P1[0] - P0[0], P1[1] - P0[1]) / D2R / 22.5) * 22.5, q = Math.round(al / 90), th = al - q * 90, alongZ = ((q % 2) + 2) % 2 === 0;
+  const lo = alongZ ? [-w / 2, ctr[1] - h / 2, ctr[2] - len / 2] : [-w / 2, ctr[1] - len / 2, ctr[2] - h / 2];
+  const hi = alongZ ? [w / 2, ctr[1] + h / 2, ctr[2] + len / 2] : [w / 2, ctr[1] + len / 2, ctr[2] + h / 2];
+  const along = P => clamp((alongZ ? (P[2] - ctr[2]) : (P[1] - ctr[1])) / len + .5);
+  const face = {tex, fn: P => [u + .55 * along(P), SOLID + ROWU * clamp((P[0] + w / 2) / w)]};
+  const rim = {tex, fn: P => [u + .55 * along(P), SOLID + .15 * VS]};
+  const ends = {tex, fn: P => [u, SOLID + ROWU * clamp((P[0] + w / 2) / w)]};
+  const faces = alongZ ? {up: face, down: face, left: rim, right: rim, front: ends, back: ends} : {front: face, back: face, left: rim, right: rim, up: ends, down: ends};
+  return faceEl([lo, hi], faces, {rot: th ? ['x', -th, ctr] : undefined});
+}
 function scroll() {
-  const els = [], p = prof(LT + CURL_Z), w0 = 2 * p.a * .78, h = .022, tex = 'g_tail_a', R0 = .2, kb = Math.log(.2 / .085) / (292.5 * D2R);
-  const C = [p.b + R0 - .01, CURL_Z];
-  for (let k = 0; k <= 13; k++) {
-    const aDeg = k * 22.5, a = aDeg * D2R, R = R0 * Math.exp(-kb * a), w = w0 * (1 - .03 * k);
-    const ctr = [0, C[0] - R * Math.cos(a), C[1] + R * Math.sin(a)], len = 2 * R * Math.sin(11.25 * D2R) * 1.3;
-    const q = Math.round(aDeg / 90), th = aDeg - q * 90, alongZ = q % 2 === 0;
-    const lo = alongZ ? [-w / 2, ctr[1] - h, ctr[2] - len / 2] : [-w / 2, ctr[1] - len / 2, ctr[2] - h];
-    const hi = alongZ ? [w / 2, ctr[1] + h, ctr[2] + len / 2] : [w / 2, ctr[1] + len / 2, ctr[2] + h];
-    // u along the strap (k), v across it (X): the same tile as the straps
-    const u = 4 + k * .55, face = {tex, fn: P => [u + (alongZ ? (P[2] - ctr[2]) : (P[1] - ctr[1])) / len * .55, SOLID + ROWU * clamp((P[0] + w / 2) / w)]};
-    const rim = {tex, fn: P => [u + (alongZ ? (P[2] - ctr[2]) : (P[1] - ctr[1])) / len * .55, SOLID + .15]};
-    const ends = {tex, fn: P => [u, SOLID + ROWU * clamp((P[0] + w / 2) / w)]};
-    const faces = alongZ ? {up: face, down: face, left: rim, right: rim, front: ends, back: ends} : {front: face, back: face, left: rim, right: rim, up: ends, down: ends};
-    els.push(faceEl([lo, hi], faces, {rot: th ? ['x', -th, ctr] : undefined}));
+  const els = [], p = prof(LT + CURL_Z), w0 = 2 * p.a * .8, tex = 'g_tail_a';
+  // the ramp from the strap end on the tail top to the outer turn
+  const a0 = -56.25, S = scP(a0);
+  els.push(scrollPlate([p.b - .012, CURL_Z - .04], S, w0, .03, 1, tex));
+  for (let k = 0, a = a0; a < 540 - 1e-6; k++, a += 22.5) {
+    const w = w0 * (1 - .12 * Math.max(0, a - 270) / 270), h = a < 270 ? .032 : .026;
+    els.push(scrollPlate(scP(a), scP(a + 22.5), w, h, 2 + (k * .55) % 12, tex));
   }
   return els;
 }
-// the scythe blade (v2 f1260): a dark crescent standing on its edge beside the tail (x 0.1), from under the scroll's
-// front, back along the ground to a point 1.35 b behind the tip joint, the upper edge convex. A chain of short pieces
-// along the crescent's centre line (u = Z, v = Y), each turned about X onto the 22.5-degree grid, its height tapering.
-const BLADE_PTS = [[.66, -.02], [.62, -.1], [.45, -.15], [.2, -.17], [-.15, -.165], [-.5, -.15], [-.85, -.12], [-1.12, -.085], [-1.36, -.04]];
-const bladeH = t => .2 * Math.min(1, .45 + 3 * t) * Math.pow(1 - t, .75) + .012;
+// the scythe blade (v2 f1260 / f1275 / f1230): a dark crescent standing on its edge beside the tail end (x 0.2), from under
+// the scroll back along the ground to a point 2 b behind it, angled 22.5 deg away from the tail (the hook seen from above,
+// v2 f1245). One thin card: both large faces show the alpha-cut crescent of g_tail_b rows 240-271 (u along the blade, v
+// down its 0.5 b height; bottom edge 0.02 b over the ground at CROUCH, the tip lifting 0.17 b), every thin face clear.
+const BL_LEN = 2.0, BL_Z0 = .56, BL_X = -.2, BL_Y0 = -.21, BL_H = .5;
 function blade() {
-  const els = [], seg = [];
-  let L = 0;
-  for (let i = 0; i + 1 < BLADE_PTS.length; i++) { const [a, b] = [BLADE_PTS[i], BLADE_PTS[i + 1]], l = Math.hypot(b[0] - a[0], b[1] - a[1]); seg.push({a, b, l, l0: L}); L += l; }
-  const tex = 'g_tail_b', hx = .03;
-  for (const g of seg) {
-    const n = Math.max(1, Math.round(g.l / .11));
-    for (let j = 0; j < n; j++) {
-      const f0 = j / n, f1 = (j + 1) / n, fm = (f0 + f1) / 2, t = (g.l0 + fm * g.l) / L;
-      const zc = g.a[0] + (g.b[0] - g.a[0]) * fm, yc = g.a[1] + (g.b[1] - g.a[1]) * fm, len = g.l / n * 1.18, h = bladeH(t);
-      // direction from +Z toward +Y (deg), on the grid; base box along Z (q even) or along Y (q odd)
-      const al = Math.atan2(g.b[1] - g.a[1], g.b[0] - g.a[0]) / D2R, qd = Math.round(al / 22.5) * 22.5, q = Math.round(qd / 90), th = qd - 90 * q, alongZ = ((q % 2) + 2) % 2 === 0;
-      const ctr = [.1, yc, zc];
-      const lo = alongZ ? [ctr[0] - hx, yc - h / 2, zc - len / 2] : [ctr[0] - hx, yc - len / 2, zc - h / 2];
-      const hi = alongZ ? [ctr[0] + hx, yc + h / 2, zc + len / 2] : [ctr[0] + hx, yc + len / 2, zc + h / 2];
-      // the blade faces: u along the crescent, v across its height (the solid strip: dark rim, lit centre)
-      const across = P => clamp(alongZ ? (P[1] - yc) / h + .5 : (P[2] - zc) / h + .5), along = P => 1 + 14 * clamp((alongZ ? P[2] - zc : P[1] - yc) / len * .9 + fm) * .1 + 12 * t;
-      const face = {tex, fn: P => [Math.min(15.9, along(P)), SOLID + ROWU * across(P)]};
-      const rim = {tex, fn: P => [Math.min(15.9, along(P)), SOLID + .05 + .1 * clamp((P[0] - ctr[0]) / (2 * hx) + .5)]};
-      const end = {tex, fn: P => [1 + 12 * t, SOLID + ROWU * across(P)]};
-      const faces = alongZ ? {left: face, right: face, up: rim, down: rim, front: end, back: end} : {left: face, right: face, front: rim, back: rim, up: end, down: end};
-      els.push(faceEl([lo, hi], faces, {rot: th ? ['x', -th, ctr] : undefined}));
-    }
-  }
-  return els;
+  const tex = 'g_tail_b', t = .04;
+  const face = {tex, fn: P => [16 * clamp((BL_Z0 - P[2]) / BL_LEN), BL0 + BLH * clamp((BL_Y0 + BL_H - P[1]) / BL_H)]};
+  const clear = {tex, fn: () => CLEAR};
+  return [faceEl([[BL_X - t / 2, BL_Y0, BL_Z0 - BL_LEN], [BL_X + t / 2, BL_Y0 + BL_H, BL_Z0]], {left: face, right: face, up: clear, down: clear, front: clear, back: clear},
+    {rot: ['y', -22.5, [BL_X, 0, BL_Z0]]})];
+}
+// the blade crescent (X 0 at the scroll .. 1 at the point; Y 0 top .. 1 bottom of the 0.5 b cell): a straight-ish lower
+// edge rising toward the point, a convex back, dark slate with a sheen band, a pale cutting edge along the top, outline
+function bladePaint(X, Y) {
+  const zb = X * BL_LEN, yb = (1 - Y) * BL_H, q = zb / BL_LEN;
+  const bot = .04 + .17 * Math.pow(q, 2.2), h = .3 * Math.pow(Math.max(0, 1 - q), .7) * Math.min(1, .5 + 2.5 * zb), top = bot + h;
+  if (yb < bot || yb > top) return TRANSPARENT;
+  const dpx = Math.min(yb - bot, top - yb) * 64, fy = (yb - bot) / Math.max(h, 1e-3);
+  let g = .38 + .04 * (pn(N.e, X, Y, 9, 2) - .5) + .1 * smooth(.45, .8, fy) - .05 * smooth(.3, 0, fy);
+  if ((top - yb) * 64 < 3.4 && q < .97) g = .68 - .1 * q;                                 // the pale cutting edge
+  if (dpx < 1.2 || (BL_LEN - zb) * 64 < 1) g = .16;
+  return grey(clamp(g));
 }
 function tipP1() {
   return [...straps(7, 'p1', {zb: CURL_Z + .1, shape: p1TipShape}), ...scroll(),
     ...blade()];
 }
-// ---- paint (64 x 160 grey tiles: the band rows and the solid strip, see DV) ----------------------------------------------------
+// ---- paint (128 x 304 grey tiles: the band rows, the solid strip, the sheath, frill and blade rows; see DV / TH) ------------
 const TAU = Math.PI * 2;
 const pn = (f, u, v, ku, kv) => f(Math.cos(TAU * u) * ku / 6 + 7, Math.sin(TAU * u) * ku / 6 + v * kv);   // periodic in u
 // tile pixel -> (u along the strap 0..1, x across it 0..1, epx = distance to the strap edge in px) or null (cut away)
-const TW = 128, RH = 48, TH = 5 * RH;
 function bandAt(u, v) {
   const py = v * TH;
+  if (py >= 5 * RH) return null;
   if (py >= 4 * RH) { const x = (py - 4 * RH) / RH; return {u, x, epx: Math.min(x, 1 - x) * RH}; }
   const r = Math.floor(py / RH), vv = (py - RH * r) / RH, uu = (u * 16) % 1, dv = DV[r];
   const es = vv - dv * uu, ee = 1 - dv + dv * uu - vv;
@@ -284,7 +355,70 @@ function bandAt(u, v) {
 }
 // the pale strap (x across 0..1): a lit band near one edge, a cel shadow band along the other (the strap rolls a little
 // at its edges, v2 f1135), a thin sheen line, wood-grain contour swirls in the middle (P1 bark), the dark cel outline
+// the root-sheath ring (x round the ring 0..1, 16 facets, 8 scales per painted row; y along the ring 0 front .. 1 back):
+// two staggered rows of pointed shield scales (grey fill, dark outline, a lit front bevel, a white stud on some, a crack
+// on others) on the pale ground; behind the back row's tips the plate is cut away so the next ring shows through
+const hsh = (i, j) => { let n = (Math.imul(i, 73856093) ^ Math.imul(j, 19349663)) >>> 0; n = Math.imul(n ^ (n >>> 13), 1274126177) >>> 0; return ((n ^ (n >>> 16)) >>> 0) / 4294967296; };
+const SC_N = 6, SC_ROWS = [{y0: -.08, y1: .62, off: 0}, {y0: .38, y1: .995, off: .5}];
+function scaleHit(x, y) {
+  for (let r = 0; r < SC_ROWS.length; r++) {
+    const {y0, y1, off} = SC_ROWS[r], X = x * SC_N - off, i = Math.round(X), sy = (y - y0) / (y1 - y0);
+    for (const ii of [i - 1, i, i + 1]) {
+      const id = ((ii % SC_N) + SC_N) % SC_N, jit = hsh(id, r), cx = ii + .1 * (hsh(id, r + 7) - .5), sx = X - cx - .12 * (hsh(id, r + 3) - .5) * Math.max(0, sy - .3);
+      if (sy <= 0 || sy >= 1) continue;
+      const f1 = sy < .2 ? Math.sqrt(1 - ((.2 - sy) / .2) ** 2) : 1, f2 = Math.pow(1 - sy, .75) / .846;
+      const w = (.45 + .05 * jit) * f1 * f2;
+      if (Math.abs(sx) < w) {
+        const epx = Math.min((w - Math.abs(sx)) * 128 / SC_N, sy * (y1 - y0) * 32 * 1.6, (1 - sy) * (y1 - y0) * 32 * 2);
+        return {r, id, sx: sx / (w + 1e-6), sy, epx, jit, fpx: sy * (y1 - y0) * 32};
+      }
+    }
+  }
+  return null;
+}
+function sheathPaint(x, y) {
+  const s = scaleHit(x, y);
+  if (!s) {
+    if (y > .62) return TRANSPARENT;
+    return grey(clamp(.9 + .05 * (pn(N.b, x, y, 10, 3) - .5)));
+  }
+  let g = .58 + .07 * (pn(N.c, x, y, 12, 4) - .5) + .1 * (s.jit - .5) - .08 * smooth(.45, 1, s.sy) + .05 * smooth(.2, -.8, s.sx);
+  if (s.fpx > 1.2 && s.fpx < 3.2 && Math.abs(s.sx) < .8) g += .14;                       // the lit front bevel
+  if (s.jit < .3 && Math.hypot(s.sx * 4.2, (s.sy - .28) * 9) < 1) g = .97;              // a white stud
+  if (s.jit > .7 && Math.abs(s.sx - .25 * (s.sy - .5) - .15) < .07 && s.sy > .35 && s.sy < .8) g = .38;   // a crack
+  if (s.epx < 1.3) g = .26;
+  return grey(clamp(g));
+}
+// a frill leaf (cell 0..3; zz along the tail 0..1, rr outward 0..1): a swept, jagged spike from the base inside the sheath to
+// the tip out and back, pale with a grey shade along its lower edge, a midrib and the dark outline
+function frillPaint(cell, zz, rr) {
+  const P0 = [.2, .05], P1 = [.42 + .04 * cell, .5 - .03 * cell], P2 = [.97, .93 - .06 * (cell % 2)];
+  let best = 9, bt = 0;
+  for (let k = 0; k <= 40; k++) {
+    const t = k / 40, bx = (1 - t) ** 2 * P0[0] + 2 * (1 - t) * t * P1[0] + t * t * P2[0], by = (1 - t) ** 2 * P0[1] + 2 * (1 - t) * t * P1[1] + t * t * P2[1];
+    const d = Math.hypot(zz - bx, rr - by);
+    if (d < best) { best = d; bt = t; }
+  }
+  const w = (.24 + .02 * cell) * Math.pow(1 - bt, .85) * (1 + .22 * Math.sin(bt * 19 + cell * 2.1)) + .008;
+  const base = rr < .24 && zz > .04 && zz < .5;
+  const d = best - w;
+  if (d > 0 && !base) return TRANSPARENT;
+  const epx = base ? 9 : -d * 32;
+  let g = .87 + .04 * (pn(N.a, zz, rr, 6, 3) - .5);
+  if (rr < .05 + .9 * zz * zz - .02) g -= .12;                                              // the shaded lower side
+  if (best < .018 && bt > .08 && bt < .9) g = .64;                                          // the midrib
+  if (epx < 1.3) g = .3;
+  return grey(clamp(g));
+}
+// the pale tile's extra rows: the sheath ring (240-271) and the frill leaves (272-303)
+function paleExtra(u, v) {
+  const py = v * TH;
+  if (py < 272) return sheathPaint(u, (py - 240) / 32);
+  const c = Math.floor(u * 4);
+  return frillPaint(c, u * 4 - c, 1 - (py - 272) / 32);
+}
 const paleTile = (u, v) => {
+  if (v * TH >= 5 * RH) return paleExtra(u, v);
   const b = bandAt(u, v);
   if (!b) return TRANSPARENT;
   const {x, epx} = b;
@@ -301,6 +435,7 @@ const paleTile = (u, v) => {
 };
 // the dark strap: a lit centre ridge, darker margins and the outline
 const darkTile = (u, v) => {
+  if (v * TH >= 5 * RH) return v * TH < 272 ? bladePaint(u, (v * TH - 240) / 32) : TRANSPARENT;
   const b = bandAt(u, v);
   if (!b) return TRANSPARENT;
   const {x, epx} = b, ex = Math.min(x, 1 - x);
@@ -330,5 +465,5 @@ export function sprites() {
     g_tail_b: sprite(TW, TH, 32, darkTile, 'both', 'tail', {use: 'tinted'}),
   };
 }
-export const NOTES = {tail_1: 'two straps wound round a flattened 16-facet tube (pale band_a, dark band_b), one model per segment for both forms (slot tints); the twist runs on the arc length, continuous over the joints',
-  tail_7: 'P3 model tail_7_p3: the straps end round the emerging dark whip', tail_tip: 'P1 pale scroll + dark scythe blade; P3 dark whip'};
+export const NOTES = {tail_1: 'root sheath: 4 rings of shingled scale plates + a frill of 7 pale leaf fins; tail_2: 3 more rings over the strap start; tail_3..7: two straps wound round a flattened 16-facet tube (pale band_a, dark band_b), one model per segment for both forms (slot tints); the twist runs on the arc length, continuous over the joints',
+  tail_7: 'P3 model tail_7_p3: the straps end round the emerging dark whip', tail_tip: 'P1 pale spiral scroll + dark alpha-cut scythe crescent; P3 dark whip'};
