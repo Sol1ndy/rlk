@@ -436,9 +436,10 @@ function p1Hull(kind) {
     const X = arcX(th, z);
     let c;
     if (kind === 'ab') c = fishScales(X, z, true);
-    else if (z < -1.62) c = fishScales(X, z);
+    else if (z < -1.62) c = mix(scl(fishScales(X, z), .55 + .4 * smooth(-2.3, -1.62, z)), SLATE(.7), .5 * smooth(-1.9, -2.5, z));   // the neck underside, in the cowl's shadow
     else c = Math.abs(X) < .34 && z > -.62 && z < .75 ? crackedShell(X, z) : ribUnder(X, z);
     if (s > -.5) c = mix(c, LINE(.8), smooth(-.5, -.42, s) * .8);
+    if (kind === 'sh') c = scl(c, 1 - .5 * smooth(-2.25, -2.55, z));       // the front end under the cowl: in shadow
     return c;
   };
 }
@@ -924,7 +925,7 @@ function mantleOut(L, W) {
     const d = sd(u, v);
     if (d > 0) return null;
     const t = -v / L;
-    let g = .5 + .08 * (N.a(u * 5, v * 3) - .5) - .12 * t + .1 * smooth(.3, 0, Math.abs(u) / W);
+    let g = .42 + .08 * (N.a(u * 5, v * 3) - .5) - .1 * t + .1 * smooth(.3, 0, Math.abs(u) / W);
     const vein = Math.abs(((v * 2.6 + Math.abs(u) * 2.2) % 1 + 1) % 1 - .5);
     if (vein < .045 && Math.abs(u) > .06) g -= .1;
     if (Math.abs(u) < .03) g -= .14; else if (Math.abs(u) < .06) g += .08;
