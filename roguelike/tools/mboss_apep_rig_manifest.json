@@ -553,7 +553,7 @@
       "model": "a_up_l_p1",
       "brightness": 13,
       "scale": 2,
-      "elements": 132,
+      "elements": 209,
       "parent": "clav_a_l",
       "tol_tp": 0.03,
       "reach": 3,
@@ -571,7 +571,7 @@
       "model": "a_up_r_p1",
       "brightness": 13,
       "scale": 2,
-      "elements": 132,
+      "elements": 209,
       "parent": "clav_a_r",
       "tol_tp": 0.03,
       "reach": 3,
@@ -589,7 +589,7 @@
       "model": "a_lo_l_p1",
       "brightness": 13,
       "scale": 2.1,
-      "elements": 132,
+      "elements": 207,
       "parent": "a_up_l",
       "tol_tp": 0.03,
       "reach": 3.15,
@@ -607,7 +607,7 @@
       "model": "a_lo_r_p1",
       "brightness": 13,
       "scale": 2.1,
-      "elements": 132,
+      "elements": 207,
       "parent": "a_up_r",
       "tol_tp": 0.03,
       "reach": 3.15,
@@ -661,7 +661,7 @@
       "model": "b_up_l_p1",
       "brightness": 13,
       "scale": 1.5,
-      "elements": 99,
+      "elements": 62,
       "parent": "shoulders",
       "tol_tp": 0.03,
       "reach": 2.25,
@@ -679,7 +679,7 @@
       "model": "b_up_r_p1",
       "brightness": 13,
       "scale": 1.5,
-      "elements": 99,
+      "elements": 62,
       "parent": "shoulders",
       "tol_tp": 0.03,
       "reach": 2.25,
@@ -697,7 +697,7 @@
       "model": "b_lo_l_p1",
       "brightness": 13,
       "scale": 1.5,
-      "elements": 134,
+      "elements": 216,
       "parent": "b_up_l",
       "tol_tp": 0.03,
       "reach": 2.25,
@@ -715,7 +715,7 @@
       "model": "b_lo_r_p1",
       "brightness": 13,
       "scale": 1.5,
-      "elements": 134,
+      "elements": 216,
       "parent": "b_up_r",
       "tol_tp": 0.03,
       "reach": 2.25,
@@ -769,7 +769,7 @@
       "model": "c_up_l_p1",
       "brightness": 13,
       "scale": 1.4,
-      "elements": 99,
+      "elements": 60,
       "parent": "pelvis",
       "tol_tp": 0.03,
       "reach": 2.1,
@@ -787,7 +787,7 @@
       "model": "c_up_r_p1",
       "brightness": 13,
       "scale": 1.4,
-      "elements": 99,
+      "elements": 60,
       "parent": "pelvis",
       "tol_tp": 0.03,
       "reach": 2.1,
@@ -805,7 +805,7 @@
       "model": "c_lo_l_p1",
       "brightness": 13,
       "scale": 1.6,
-      "elements": 134,
+      "elements": 214,
       "parent": "c_up_l",
       "tol_tp": 0.03,
       "reach": 2.4,
@@ -823,7 +823,7 @@
       "model": "c_lo_r_p1",
       "brightness": 13,
       "scale": 1.6,
-      "elements": 134,
+      "elements": 214,
       "parent": "c_up_r",
       "tol_tp": 0.03,
       "reach": 2.4,
@@ -1021,7 +1021,7 @@
       "model": "beads_l_p1",
       "brightness": 14,
       "scale": 1.6,
-      "elements": 67,
+      "elements": 93,
       "parent": "b_up_l",
       "tol_tp": 0.03,
       "reach": 2.4,
@@ -1039,7 +1039,7 @@
       "model": "beads_r_p1",
       "brightness": 14,
       "scale": 1.6,
-      "elements": 67,
+      "elements": 93,
       "parent": "b_up_r",
       "tol_tp": 0.03,
       "reach": 2.4,
@@ -2631,12 +2631,12 @@
       ],
       "result": {
         "CROUCH": {
-          "points": 706,
+          "points": 645,
           "covered": 1,
-          "worst": 2.48
+          "worst": 2.49
         },
         "UPRIGHT": {
-          "points": 343,
+          "points": 344,
           "covered": 1,
           "worst": 2.26
         },
@@ -2646,12 +2646,12 @@
           "worst": 1.69
         },
         "CROUCH_OVER": {
-          "points": 337,
+          "points": 342,
           "covered": 1,
           "worst": 2.33
         },
         "CRAWL": {
-          "points": 613,
+          "points": 609,
           "covered": 1,
           "worst": 2.36
         }
@@ -16519,10 +16519,10 @@
       "extents": [
         [
           -5.06,
-          5.06
+          5.07
         ],
         [
-          -0.22,
+          -0.18,
           5.21
         ],
         [
@@ -20619,7 +20619,7 @@
           7.03
         ],
         [
-          -6.22,
+          -6.18,
           10.18
         ],
         [
@@ -23107,7 +23107,7 @@
           7.01
         ],
         [
-          -6.22,
+          -6.18,
           10.18
         ],
         [
@@ -23312,10 +23312,10 @@
       "extents": [
         [
           -5.06,
-          5.06
+          5.07
         ],
         [
-          -0.22,
+          -0.18,
           5.21
         ],
         [
@@ -27516,7 +27516,7 @@
           6.98
         ],
         [
-          -6.22,
+          -6.18,
           10.18
         ],
         [
@@ -27585,11 +27585,11 @@
     "models": 94,
     "hand_models": 20,
     "items": 325,
-    "atlas_px": 326144,
+    "atlas_px": 416000,
     "atlas_budget": 900000,
     "elements_shown_rest": {
-      "p1": 3808,
-      "p3": 3598
+      "p1": 4284,
+      "p3": 3170
     },
     "elements_budget": {
       "p1": 7000,
@@ -27606,7 +27606,7 @@
       },
       "limbs": {
         "parts": 14,
-        "px": 89600
+        "px": 179456
       },
       "hands": {
         "parts": 6,
@@ -27645,7 +27645,7 @@
     "apRigQz": "static skip: last z",
     "apRigQw": "static skip: last yaw"
   },
-  "textures": 71,
+  "textures": 75,
   "stances": {
     "objective": "apRigStance",
     "ids": {
@@ -29919,13 +29919,13 @@
   },
   "sprites": {
     "budget": 900000,
-    "total": 326144,
+    "total": 416000,
     "regions": {
       "body": 47360,
       "head": 59904,
       "shared": 46080,
       "tail": 19200,
-      "limbs": 89600,
+      "limbs": 179456,
       "hands": 64000
     },
     "ledger": [
@@ -30062,9 +30062,9 @@
       {
         "name": "l1_arm",
         "region": "limbs",
-        "w": 128,
-        "h": 192,
-        "px": 24576,
+        "w": 256,
+        "h": 256,
+        "px": 65536,
         "px_per_b": 32,
         "use": "unique",
         "forms": "p1"
@@ -30073,8 +30073,8 @@
         "name": "l1_leg",
         "region": "limbs",
         "w": 128,
-        "h": 192,
-        "px": 24576,
+        "h": 288,
+        "px": 36864,
         "px_per_b": 32,
         "use": "unique",
         "forms": "p1"
@@ -30100,6 +30100,16 @@
         "forms": "p1"
       },
       {
+        "name": "l1_rimb",
+        "region": "limbs",
+        "w": 32,
+        "h": 32,
+        "px": 1024,
+        "px_per_b": 32,
+        "use": "unique",
+        "forms": "p1"
+      },
+      {
         "name": "l1_rimd",
         "region": "limbs",
         "w": 32,
@@ -30108,6 +30118,16 @@
         "px_per_b": 32,
         "use": "unique",
         "forms": "p1"
+      },
+      {
+        "name": "l3_arm",
+        "region": "limbs",
+        "w": 160,
+        "h": 288,
+        "px": 46080,
+        "px_per_b": 32,
+        "use": "unique",
+        "forms": "p3"
       },
       {
         "name": "l3_bleaf",
@@ -30170,12 +30190,32 @@
         "forms": "p3"
       },
       {
-        "name": "l3_plate",
+        "name": "l3_leafud",
         "region": "limbs",
-        "w": 128,
-        "h": 144,
-        "px": 18432,
-        "px_per_b": 32,
+        "w": 48,
+        "h": 32,
+        "px": 1536,
+        "px_per_b": 48,
+        "use": "unique",
+        "forms": "p3"
+      },
+      {
+        "name": "l3_leafw",
+        "region": "limbs",
+        "w": 64,
+        "h": 64,
+        "px": 4096,
+        "px_per_b": 64,
+        "use": "unique",
+        "forms": "p3"
+      },
+      {
+        "name": "l3_leafwd",
+        "region": "limbs",
+        "w": 48,
+        "h": 48,
+        "px": 2304,
+        "px_per_b": 48,
         "use": "unique",
         "forms": "p3"
       },
@@ -30655,8 +30695,8 @@
       "p3": 8000
     },
     "visible_rest": {
-      "p1": 3808,
-      "p3": 3598
+      "p1": 4284,
+      "p3": 3170
     },
     "per_region": {
       "body": {
@@ -30668,8 +30708,8 @@
         "p3": 898
       },
       "limbs": {
-        "p1": 1460,
-        "p3": 1614
+        "p1": 1936,
+        "p3": 1186
       },
       "hands": {
         "p1": 368,
@@ -30766,20 +30806,20 @@
         "p3": 11
       },
       "a_up_l": {
-        "p1": 132,
-        "p3": 127
+        "p1": 209,
+        "p3": 79
       },
       "a_up_r": {
-        "p1": 132,
-        "p3": 127
+        "p1": 209,
+        "p3": 79
       },
       "a_lo_l": {
-        "p1": 132,
-        "p3": 136
+        "p1": 207,
+        "p3": 104
       },
       "a_lo_r": {
-        "p1": 132,
-        "p3": 136
+        "p1": 207,
+        "p3": 104
       },
       "a_hand_l": {
         "p1": 56,
@@ -30790,20 +30830,20 @@
         "p3": 40
       },
       "b_up_l": {
-        "p1": 99,
-        "p3": 107
+        "p1": 62,
+        "p3": 59
       },
       "b_up_r": {
-        "p1": 99,
-        "p3": 107
+        "p1": 62,
+        "p3": 59
       },
       "b_lo_l": {
-        "p1": 134,
-        "p3": 140
+        "p1": 216,
+        "p3": 109
       },
       "b_lo_r": {
-        "p1": 134,
-        "p3": 140
+        "p1": 216,
+        "p3": 109
       },
       "b_hand_l": {
         "p1": 69,
@@ -30814,20 +30854,20 @@
         "p3": 53
       },
       "c_up_l": {
-        "p1": 99,
-        "p3": 125
+        "p1": 60,
+        "p3": 76
       },
       "c_up_r": {
-        "p1": 99,
-        "p3": 125
+        "p1": 60,
+        "p3": 76
       },
       "c_lo_l": {
-        "p1": 134,
-        "p3": 105
+        "p1": 214,
+        "p3": 73
       },
       "c_lo_r": {
-        "p1": 134,
-        "p3": 105
+        "p1": 214,
+        "p3": 73
       },
       "c_hand_l": {
         "p1": 59,
@@ -30871,22 +30911,22 @@
       },
       "beads_l": {
         "p1": 0,
-        "p3": 67
+        "p3": 93
       },
       "beads_r": {
         "p1": 0,
-        "p3": 67
+        "p3": 93
       }
     },
     "densest": [
       "hood",
       "chest",
-      "face",
-      "core",
-      "crys_back",
-      "shoulders",
       "b_lo_l",
-      "b_lo_r"
+      "b_lo_r",
+      "c_lo_l",
+      "c_lo_r",
+      "a_up_l",
+      "a_up_r"
     ]
   },
   "follow": {
