@@ -20,7 +20,7 @@ export const PARTS = [
   ['chest', 'chest', 13], ['belly', 'belly', 13], ['pelvis', 'pelvis', 13], ['neck1', 'neck1', 13], ['neck2', 'neck2', 13],
   ['apron', 'apron', 13], ['glow_apron', 'empty', 15],
   ['plates_neck', 'plates_neck', 13], ['plates_sh', 'plates_sh', 13], ['plates_mid', 'plates_mid', 13], ['plates_hip', 'plates_hip', 13],
-  ['crys_sh', 'crys_sh', 14], ['crys_mid', 'crys_mid', 14], ['crys_hip', 'crys_hip', 14],
+  ['crys_sh', 'crys_sh', 13], ['crys_mid', 'crys_mid', 13], ['crys_hip', 'crys_hip', 13],
 ];
 const U = (part, els) => toUnits(els, PART_SCALE[part]);
 const sfx = look => (look ? '_' + look : '');

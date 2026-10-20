@@ -27,7 +27,7 @@ import {cardZ} from './mboss_model_lib.mjs';
 
 export const REGION = 'head';
 export const PARTS = [
-  ['head', 'head', 13], ['jaw', 'jaw', 13], ['eyes', 'eyes', 15], ['horn_l', 'horn_l', 14], ['horn_r', 'horn_r', 14],
+  ['head', 'head', 13], ['jaw', 'jaw', 13], ['eyes', 'eyes', 15], ['horn_l', 'horn_l', 13], ['horn_r', 'horn_r', 13],
   ['beard1', 'beard1', 13], ['beard2', 'beard2', 13],
 ];
 registerTile('mask', 64, 64, 48);

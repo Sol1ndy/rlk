@@ -29,12 +29,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {paintAzhdahaTextures, spriteId, azhdahaSpriteSizes, ATLAS_BUDGET} from './azhdaha_paint.mjs';
+import {paintAzhdahaTextures, spriteId, azhdahaSprites, azhdahaSpriteSizes, spriteRegions, ATLAS_BUDGET} from './azhdaha_paint.mjs';
 import {partModels, checkBounds, PARTS, LOOKS, TINTED, LOOK_BRIGHT, EMPTY, REGION_OF, CULL_BOX} from './azhdaha_geometry.mjs';
 import {solve, toDisplay, PART_SCALE, TAIL_PARTS, proxyPoints, PROXIES, pointOf, J, SOLE} from './azhdaha_pose.mjs';
 import {CLIPS, accumulate, sampleClip as sample, restPose} from './azhdaha_clips.mjs';
 import {add, rot} from './mboss_rig_math.mjs';
-import {createRigCompiler, nbt, summonPart, summonShadow, createRigFollow} from './mboss_rig_compile.mjs';
+import {createRigCompiler, nbt, summonPart, summonShadow, createRigFollow, cullOverhang} from './mboss_rig_compile.mjs';
 import {abox} from './mboss_model_lib.mjs';
 import {png} from './weapon_paint.mjs';
 
@@ -56,7 +56,44 @@ const assets = path.join(rp, 'assets/rlk');
 if (PARTS.length > 56) throw new Error(`${PARTS.length} parts: the hard cap is 56`);
 if (PARTS.length < 44 || PARTS.length > 48) console.warn(`warn: ${PARTS.length} parts, outside the 44-48 budget`);
 for (const [n] of PARTS) if (!PART_SCALE[n]) throw new Error(`part ${n} has no display scale`);
-const PART_INDEX = Object.fromEntries(PARTS.map(([n], i) => [n, i + 1]));
+// Part names stay out of the module's rlk_mb_az_* tag space (contract manifest.md §3, s2.md §12) and the rig's own tags
+// (rlk_mb_az_shadow, rlk_mb_az_face, rlk_mb_az_g_<region>).
+for (const [n] of PARTS) {
+  if (!/^[a-z][a-z0-9_]*$/.test(n)) throw new Error(`part name ${n}: lower-case letters, digits and _`);
+  if (/^(p\d|x|ap_|fld|lock|kept|pat|orbc|seal|g_)/.test(n) || ['shadow', 'face'].includes(n)) throw new Error(`part name ${n} collides with the module / rig tag space`);
+}
+// Per-region budgets (plan.md §3.1; atlas px rebalanced by plan change note 1): parts and painted sprite px per region,
+// the material tiles shared by several regions as their own line. The totals (R3 part cap, R8 atlas) are asserted too.
+const REGION_BUDGET = {head: {parts: 8, px: .24e6}, body: {parts: 14, px: .42e6}, legs: {parts: 16, px: .32e6}, tail: {parts: 10, px: .16e6}, shared: {parts: 0, px: .06e6}};
+const regionParts = Object.fromEntries(Object.keys(REGION_BUDGET).map(r => [r, PARTS.filter(p => p[3] === r).length]));
+for (const [r, k] of Object.entries(regionParts)) if (k > REGION_BUDGET[r].parts) throw new Error(`region ${r}: ${k} parts (budget ${REGION_BUDGET[r].parts})`);
+for (const [n, , , r] of PARTS) if (!REGION_BUDGET[r] || r === 'shared') throw new Error(`part ${n}: unknown region ${r}`);
+// Fixed, append-only part name -> UUID low byte (Rig decision change 3; contract cm.md §14): R1's order head 1 ... tip 46,
+// then the parts added in R2 in R3's merge order (tail_skirt 47). Never renumber or reuse an index; a new part takes the
+// next free one. Parts 0x01-0x3F; 0x40 is the shadow helper, 0x41-0x50 the hit proxies (pose PROXIES order), 0x60-0x8F
+// module props.
+const UUID_INDEX = {
+  head: 1, jaw: 2, eyes: 3, horn_l: 4, horn_r: 5, beard1: 6, beard2: 7,
+  chest: 8, belly: 9, pelvis: 10, neck1: 11, neck2: 12, apron: 13, glow_apron: 14,
+  plates_neck: 15, plates_sh: 16, plates_mid: 17, plates_hip: 18, crys_sh: 19, crys_mid: 20, crys_hip: 21,
+  uarm_l: 22, bracer_l: 23, paw_l: 24, uarm_r: 25, bracer_r: 26, paw_r: 27,
+  thigh_l: 28, gaiter_l: 29, foot_l: 30, thigh_r: 31, gaiter_r: 32, foot_r: 33,
+  glow_bracer_l: 34, glow_bracer_r: 35, glow_gaiter_l: 36, glow_gaiter_r: 37,
+  t1: 38, t2: 39, t3: 40, t4: 41, t5: 42, t6: 43, t7: 44, t8: 45, tip: 46,
+  tail_skirt: 47,
+};
+const PROXY_BASE = 0x41, SHADOW_INDEX = 0x40;
+{
+  const seen = new Map();
+  for (const [n, i] of Object.entries(UUID_INDEX)) {
+    if (!(Number.isInteger(i) && i >= 1 && i <= 0x3F)) throw new Error(`UUID table: ${n} -> ${i} outside 0x01-0x3F`);
+    if (seen.has(i)) throw new Error(`UUID table: ${n} and ${seen.get(i)} share index ${i}`);
+    seen.set(i, n);
+  }
+  for (const [n] of PARTS) if (!UUID_INDEX[n]) throw new Error(`part ${n} has no UUID index: append it to UUID_INDEX (next free ${Math.max(...seen.keys()) + 1})`);
+  if (PROXIES.length > 16) throw new Error(`${PROXIES.length} hit proxies: at most 16 (cm.md pxBase + 15)`);
+}
+const PART_INDEX = Object.fromEntries(PARTS.map(([n]) => [n, UUID_INDEX[n]]));
 const uuidOf = n => `524c4b4d-415a-4400-8000-${PART_INDEX[n].toString(16).padStart(12, '0')}`;
 const uuidInts = n => `[I;1380731725,1096434688,-2147483648,${PART_INDEX[n]}]`;
 const SHADOW_UUID = '524c4b4d-415a-4400-8000-000000000040', SHADOW_INTS = '[I;1380731725,1096434688,-2147483648,64]';
@@ -65,13 +102,18 @@ const CULL = {width: 30, height: 12}, VIEW_RANGE = 3;
 const cullOf = n => CULL_BOX[n] || CULL;   // per-part boxes (the distal tail: azhdaha_tail.mjs CULL_BOX)
 
 // ---- resource pack: textures, models, item definitions ---------------------------------------------------------------------
-const sprites = flag('--no-paint') ? null : paintAzhdahaTextures(rp, arg('--paint') ? arg('--paint').split(',') : null);
+const ALL_SPRITES = Object.keys(azhdahaSprites());     // every defined sprite (constructed before the models, as always)
 const models = partModels();
 for (const [name, els] of Object.entries(models)) checkBounds(name, els);
+// only the sprites some model shows are painted and enter the atlas (R3: 7 R1 material tiles and one ledge sprite
+// were left unused by the R2 regions)
+const USED = new Set(Object.values(models).flatMap(els => els.flatMap(e => Object.values(e.faces).map(f => f.texture.slice(1)))));
+const unusedSprites = ALL_SPRITES.filter(n => !USED.has(n));
+const sprites = flag('--no-paint') ? null : paintAzhdahaTextures(rp, arg('--paint') ? arg('--paint').split(',') : null, USED);
 const modelDir = path.join(assets, 'models/item/mboss/azhdaha'), itemDir = path.join(assets, 'items/mboss/azhdaha');
 fs.rmSync(modelDir, {recursive: true, force: true});
 fs.rmSync(itemDir, {recursive: true, force: true});
-const spriteTable = azhdahaSpriteSizes();
+const spriteTable = azhdahaSpriteSizes(USED);
 for (const [name, els] of Object.entries(models)) {
   const used = [...new Set(els.flatMap(e => Object.values(e.faces).map(f => f.texture.slice(1))))];
   for (const u of used) if (!spriteTable[u]) throw new Error(`model ${name}: unknown sprite ${u}`);
@@ -95,7 +137,20 @@ for (const [n, [w, h]] of Object.entries(spriteTable)) {
   atlasPx += w * h;
 }
 if (atlasPx > ATLAS_BUDGET) throw new Error(`Azhdaha sprites use ${atlasPx} px of the atlas (budget ${ATLAS_BUDGET / 1e6} M)`);
+const SPRITE_REGION = spriteRegions();
+const regionPx = Object.fromEntries(Object.keys(REGION_BUDGET).map(r => [r, 0]));
+for (const [n, [w, h]] of Object.entries(spriteTable)) regionPx[SPRITE_REGION[n]] += w * h;
+for (const [r, px] of Object.entries(regionPx)) if (px > REGION_BUDGET[r].px) throw new Error(`region ${r}: ${px} sprite px (budget ${REGION_BUDGET[r].px / 1e6} M)`);
 const elementCount = Object.fromEntries(Object.entries(models).map(([n, e]) => [n, e.length]));
+// Elements shown at once (client cost, rigtech.md §2.2: about 6-8 k for a detailed dragon) in every look combination.
+const ELEMENT_BUDGET = 8000;
+const itemElements = item => elementCount[item] ?? elementCount[(TINTED[item] || [])[0]] ?? 0;
+const shownIn = (lg, tl) => PARTS.reduce((a, [n, m]) => a + itemElements((LOOKS.legs[n] || {})[lg] || (LOOKS.tail[n] || {})[tl] || m), 0);
+const elementsByLook = {};
+for (const lg of ['geo', 'hydro', 'pyro']) for (const tl of ['geo', 'cryo', 'electro']) elementsByLook[`${lg}_${tl}`] = shownIn(lg, tl);
+const elementsMax = Math.max(...Object.values(elementsByLook));
+if (elementsMax > ELEMENT_BUDGET) throw new Error(`${elementsMax} elements shown at once (budget ${ELEMENT_BUDGET}): ${JSON.stringify(elementsByLook)}`);
+const regionElements = Object.fromEntries(['head', 'body', 'legs', 'tail'].map(r => [r, PARTS.filter(p => p[3] === r).reduce((a, [, m]) => a + (elementCount[m] || 0), 0)]));
 
 // ---- clip sampling, per-pose checks -------------------------------------------------------------------------------------------
 function frame(clip, t, ks, prev) {
@@ -123,18 +178,27 @@ function partCorners(o, n, model) {
   return out;
 }
 const MODEL_OF_PART = Object.fromEntries(PARTS.map(([n, m]) => [n, m === EMPTY ? null : m]));
-// Pose checks (every frame of every clip): no horizontal root travel; every shown part inside the culling box (x/z
-// within +-15, y below 12 above the anchor); the soles of the planted feet on or above the floor unless the clip is
-// buried (pos y < 0); the tail-only state hides every non-tail part.
+// Pose checks (every frame of every clip): no horizontal root travel and no root yaw (the module moves and turns the
+// anchor), except the root z offset of a hidden body (Rig decision change 1: allowed only on ticks where no body part,
+// i.e. no non-tail part, is shown); every shown part inside its culling box (the radial check of the shared
+// cullOverhang: the box is world-aligned and does not turn with the yaw; buried points do not count); the soles of the
+// planted feet on or above the floor unless the clip is buried (pos y < 0); the tail-only state hides every non-tail part.
+const BODY_PARTS = PARTS.map(([n]) => n).filter(n => !TAIL_PARTS.includes(n));
 function poseChecks(c, frames) {
-  const out = [], over = {};
+  const out = [], over = {}, rootZ = [];
   let ext = [[Infinity, -Infinity], [Infinity, -Infinity], [Infinity, -Infinity]];
   frames.forEach((f, t) => {
-    if (Math.abs(f.p.pos[0]) > 1e-9 || Math.abs(f.p.pos[2]) > 1e-9) out.push(`${c.name} t${t}: root travel (x/z must be 0)`);
+    if (Math.abs(f.p.pos[0]) > 1e-9) out.push(`${c.name} t${t}: root x travel ${f.p.pos[0]} (must be 0)`);
+    if (Math.abs(f.p.rot[1]) > 1e-9) out.push(`${c.name} t${t}: root yaw ${f.p.rot[1]} (must be 0: the module turns the anchor)`);
+    if (Math.abs(f.p.pos[2]) > 1e-9) {
+      const shown = BODY_PARTS.filter(n => f.o[n].s[0] > 1e-4);
+      if (shown.length) out.push(`${c.name} t${t}: root z offset ${f.p.pos[2]} while body parts are shown (${shown.slice(0, 3).join(', ')}...; Rig decision change 1)`);
+      rootZ.push([t, +(-f.p.pos[2]).toFixed(3)]);
+    }
     for (const [n] of PARTS) for (const P of partCorners(f.o, n, MODEL_OF_PART[n])) {
       for (let i = 0; i < 3; i++) { ext[i][0] = Math.min(ext[i][0], P[i]); ext[i][1] = Math.max(ext[i][1], P[i]); }
-      // culling-box overhang (blocks past the box): recorded, not fatal (the box is plan.md R4's fixed 30 x 12)
-      const cb = cullOf(n), o = Math.max(Math.abs(P[0]) - cb.width / 2, Math.abs(P[2]) - cb.width / 2, P[1] - cb.height);
+      // culling-box overhang (blocks past the box): recorded, not fatal (the box is plan.md R4's 30 x 12, per part for the distal tail)
+      const o = cullOverhang(P, cullOf(n));
       if (o > 0) over[n] = Math.max(over[n] || 0, +o.toFixed(2));
     }
     if (f.p.pos[1] >= -.01) for (const n of ['paw_l', 'paw_r', 'foot_l', 'foot_r']) {
@@ -144,7 +208,10 @@ function poseChecks(c, frames) {
     if (c.state === 'tail_only') for (const [n] of PARTS) if (!TAIL_PARTS.includes(n) && f.o[n].s[0] > 1e-4) out.push(`${c.name} t${t}: ${n} shown in the tail-only state`);
   });
   for (const [e, t] of Object.entries(c.events || {})) if (!(t >= 0 && t <= c.len)) out.push(`${c.name}: event ${e} at ${t} outside 0..${c.len}`);
-  return {errors: out, over, extents: ext.map(([a, b]) => [+a.toFixed(2), +b.toFixed(2)])};
+  // root_z spans [t0, t1, dz] (inclusive; dz in the local frame, + = forward; contract manifest.md §4.7)
+  const spans = [];
+  for (const [t, dz] of rootZ) { const s = spans[spans.length - 1]; if (s && s[1] === t - 1 && s[2] === dz) s[1] = t; else spans.push([t, t, dz]); }
+  return {errors: out, over, rootZ: spans, extents: ext.map(([a, b]) => [+a.toFixed(2), +b.toFixed(2)])};
 }
 
 // ---- compile clips --------------------------------------------------------------------------------------------------------------
@@ -178,7 +245,7 @@ for (const c of CLIPS) {
   r.warns.forEach(w => warns.add(w));
   const evTicks = [...new Set([0, ...Object.values(c.events || {}), c.len])].sort((a, b) => a - b);
   if (Object.keys(chk.over).length) warns.add(`${c.name}: outside the culling box (${CULL.width} x ${CULL.height}; per part for the distal tail) by ${JSON.stringify(chk.over)}`);
-  clipInfo.push({...r.info, state: c.state || 'normal', extents: chk.extents, ...(Object.keys(chk.over).length ? {cull_overhang: chk.over} : {}), px: pxTrack(frames, evTicks)});
+  clipInfo.push({...r.info, state: c.state || 'normal', extents: chk.extents, root_z: chk.rootZ, ...(Object.keys(chk.over).length ? {cull_overhang: chk.over} : {}), px: pxTrack(frames, evTicks)});
 }
 if (poseErrors.length) {
   const msg = `pose checks:\n  ` + poseErrors.slice(0, 60).join('\n  ') + (poseErrors.length > 60 ? `\n  ... ${poseErrors.length} in all` : '');
@@ -202,16 +269,23 @@ const setPose = (pose, dur = 0) => PARTS.map(([n]) => `data merge entity ${uuidO
 const stored = ['execute unless score @s azRigLegs matches 0..2 run scoreboard players set @s azRigLegs 0',
   'execute unless score @s azRigTail matches 0..2 run scoreboard players set @s azRigTail 0',
   'execute unless score @s azRigState matches 0..2 run scoreboard players set @s azRigState 0'];
+// The clip a (re)spawn queues per stored body state: rest, or the looping clip that holds the hidden state (a respawn
+// restores the state, contract manifest.md §4.6; queuing rest would show the body again at its tick-0 key).
+const STATE_CLIP = {burrowed: CLIPS.find(c => c.state === 'burrowed' && c.loop), tail_only: CLIPS.find(c => c.state === 'tail_only' && c.loop)};
+for (const [s, c] of Object.entries(STATE_CLIP)) if (!c) throw new Error(`no looping clip holds the body state ${s} (a respawn needs one)`);
 fn('spawn', ['# @s = rig anchor (the boss body, on the floor under the centre of the four feet), positioned and rotated where the',
-  `# boss should appear. Kills old parts, summons the ${PARTS.length} parts in the rest pose (+ the shadow helper), queues rest and`,
-  '# re-applies the stored element looks (azRigLegs, azRigTail) and the body state (azRigState).',
+  `# boss should appear. Kills old parts, summons the ${PARTS.length} parts in the rest pose (+ the shadow helper), re-applies the`,
+  '# stored element looks (azRigLegs, azRigTail) and the body state (azRigState), and queues rest, or the clip that holds the',
+  `# stored state (burrowed: ${STATE_CLIP.burrowed.name}, tail-only: ${STATE_CLIP.tail_only.name}).`,
   `function ${NS}/init`, `function ${NS}/kill`, ...stored, ...PARTS.map(p => summon(p, REST[p[0]])), shadowSummon,
   'scoreboard players set @s azRigT -1', 'scoreboard players set @s azRigF 0', `scoreboard players set @s azRigC ${byName.rest.id}`,
+  `execute if score @s azRigState matches 1 run scoreboard players set @s azRigC ${STATE_CLIP.burrowed.id}`,
+  `execute if score @s azRigState matches 2 run scoreboard players set @s azRigC ${STATE_CLIP.tail_only.id}`,
   `function ${NS}/look_apply`, `execute if score @s azRigState matches 1 run function ${NS}/state/burrowed`, `execute if score @s azRigState matches 2 run function ${NS}/state/tail_only`,
   `execute rotated as @s rotated ~ 0 run function ${NS}/follow`]);
 createRigFollow({ns: NS, obj: 'azRig', fn, uuidOf: n => (n === 'shadow' ? SHADOW_UUID : uuidOf(n)), lists: {all: PARTS.map(([n]) => n)}, fixed: ['shadow'],
   comment: '# Parts (and the shadow helper) follow the executor position and yaw (run rotated as the anchor, pitch 0).'}).write();
-fn('tick', ['# @s = rig anchor, at its feet. Once per game tick. Missing parts respawn in the rest pose (stored looks and state kept).',
+fn('tick', ['# @s = rig anchor, at its feet. Once per game tick. Missing parts respawn (stored looks and body state kept; see spawn).',
   `execute unless entity ${uuidOf('chest')} run function ${NS}/spawn`,
   `execute rotated as @s rotated ~ 0 run function ${NS}/follow`,
   'scoreboard players add @s azRigT 1',
@@ -248,9 +322,31 @@ const GROUPS = {head: ['head', 'jaw', 'horn_l', 'horn_r'], front: ['chest', 'nec
 for (const [g, list] of Object.entries(GROUPS)) {
   fn(`flash/${g}`, [`# Hit feedback on the ${g} group: a warm white outline for 3 ticks. @s = rig anchor.`, 'scoreboard players set @s azRigF 4', ...list.map(n => `data merge entity ${uuidOf(n)} {Glowing:1b,glow_color_override:16774620}`)]);
 }
-const ALL_FLASH = Object.values(GROUPS).flat();
+// Gold (plan.md §3.5, contract manifest.md §7): the horns and the gold crystal clusters are matte (block 13, like the
+// hide) in every phase; glow/gold_on lifts them to 15 for the 천동만상 tell and the absorbs, glow/gold_off restores 13.
+// The eyes stay red at 15 in every look. No look channel touches these parts, so their level is always the base level.
+const GOLD = ['horn_l', 'horn_r', 'crys_sh', 'crys_mid', 'crys_hip'];
+const GOLD_RIM = 16762960;    // #FFC850, the petrify rim pulse
+for (const n of GOLD) {
+  if (BASE_BRIGHT[n] !== 13) throw new Error(`gold part ${n}: brightness ${BASE_BRIGHT[n]}, matte gold is 13`);
+  if (LOOKS.legs[n] || LOOKS.tail[n]) throw new Error(`gold part ${n} is in a look channel (glow/gold_off restores the base level)`);
+}
+if (BASE_BRIGHT.eyes !== 15 || Object.values(LOOK_BRIGHT).some(ch => Object.values(ch).some(l => 'eyes' in l))) throw new Error('the eyes stay at 15 in every look');
+fn('glow/gold_on', ['# Gold flare (the 천동만상 tell, the absorbs): horns and gold crystals 13 -> 15. Not stored: re-call after a respawn. @s = rig anchor.',
+  ...GOLD.map(n => `data merge entity ${uuidOf(n)} {brightness:{block:15,sky:15}}`)]);
+fn('glow/gold_off', ['# Gold back to matte (13). @s = rig anchor.', ...GOLD.map(n => `data merge entity ${uuidOf(n)} {brightness:{block:${BASE_BRIGHT[n]},sky:15}}`)]);
+// Death seal (plan.md §3.5 / §5 death t96): both channels back to the base (geo) looks and stored so, every part 3 levels
+// darker (block and sky, so the dimming shows by day as well), and a gold rim pulse on the gold parts for 12 ticks
+// (the hit-flash countdown azRigF ends it through flash_off).
+fn('look/petrify', ['# Death seal: the base looks at brightness -3 and a 12-tick gold rim pulse. A respawn restores the base looks at full',
+  '# brightness (call look/petrify again). @s = rig anchor.',
+  `function ${NS}/look/legs/geo`, `function ${NS}/look/tail/geo`,
+  ...PARTS.map(([n]) => `data merge entity ${uuidOf(n)} {brightness:{block:${BASE_BRIGHT[n] - 3},sky:12}}`),
+  ...GOLD.map(n => `data merge entity ${uuidOf(n)} {Glowing:1b,glow_color_override:${GOLD_RIM}}`),
+  'scoreboard players set @s azRigF 13']);
+const ALL_FLASH = [...new Set([...Object.values(GROUPS).flat(), ...GOLD])];
 fn('flash_tick', ['scoreboard players remove @s azRigF 1', `execute if score @s azRigF matches 0 run function ${NS}/flash_off`]);
-fn('flash_off', ['# End of the hit flash. @s = rig anchor.', ...ALL_FLASH.map(n => `data merge entity ${uuidOf(n)} {Glowing:0b}`)]);
+fn('flash_off', ['# End of the hit flash (and of the petrify rim pulse). @s = rig anchor.', ...ALL_FLASH.map(n => `data merge entity ${uuidOf(n)} {Glowing:0b}`)]);
 compiler.writeFace({marker: 'rlk_mb_az_face', maxDeg: 2});
 
 // ---- manifest ---------------------------------------------------------------------------------------------------------------
@@ -259,12 +355,18 @@ const manifestPath = path.join(here, 'mboss_azhdaha_rig_manifest.json');
 const lastTextures = (() => { try { return JSON.parse(fs.readFileSync(manifestPath, 'utf8')).textures; } catch { return undefined; } })();
 const shownElements = PARTS.reduce((a, [, m]) => a + (elementCount[m] || 0), 0);
 json(manifestPath, {
-  parts: PARTS.map(([n, m, b, r]) => ({name: n, region: r, uuid: uuidOf(n), tag: 'rlk_mb_az_' + n, model: m, brightness: b, scale: PART_SCALE[n], elements: elementCount[m]})),
+  parts: PARTS.map(([n, m, b, r]) => ({name: n, region: r, uuid: uuidOf(n), idx: PART_INDEX[n], tag: 'rlk_mb_az_' + n, model: m, brightness: b, scale: PART_SCALE[n], elements: elementCount[m]})),
   shadow: {uuid: SHADOW_UUID, tag: 'rlk_mb_az_shadow', shadow_radius: 4.5, note: 'empty-model helper under the anchor, not a rig part'},
+  uuids: {block: '524c4b4d-415a-4400-8000-0000000000', ints: [1380731725, 1096434688, -2147483648], parts: UUID_INDEX, shadow: SHADOW_INDEX,
+    proxies: Object.fromEntries(PROXIES.map(([nm], k) => [nm, PROXY_BASE + k])), props: {seal_prism: 0x80, crater: 0x81},
+    note: 'Rig decision change 3 / cm.md §14: the part table is fixed and append-only; proxies take 0x41 + their position in proxies.layout'},
   clips: clipInfo,
-  looks: Object.fromEntries(Object.entries(LOOK_IDS).map(([ch, ids]) => [ch, {objective: obj[ch], ids, parts: LOOKS[ch], brightness: LOOK_BRIGHT[ch], functions: Object.fromEntries(Object.keys(ids).map(l => [l, `${NS}/look/${ch}/${l}`]))}])),
+  looks: {...Object.fromEntries(Object.entries(LOOK_IDS).map(([ch, ids]) => [ch, {objective: obj[ch], ids, parts: LOOKS[ch], brightness: LOOK_BRIGHT[ch], functions: Object.fromEntries(Object.keys(ids).map(l => [l, `${NS}/look/${ch}/${l}`]))}])),
+    gold: {parts: GOLD, brightness: 13, glow: 15}, eyes: {part: 'eyes', brightness: 15},
+    functions: {petrify: `${NS}/look/petrify`, glow_on: `${NS}/glow/gold_on`, glow_off: `${NS}/glow/gold_off`}},
   tinted_items: Object.fromEntries(Object.entries(TINTED).map(([k, [m, c]]) => [k, {model: m, tint: '#' + c.toString(16).padStart(6, '0')}])),
-  states: {objective: 'azRigState', ids: {normal: 0, burrowed: 1, tail_only: 2}, functions: {normal: `${NS}/state/normal`, burrowed: `${NS}/state/burrowed`, tail_only: `${NS}/state/tail_only`}},
+  states: {objective: 'azRigState', ids: {normal: 0, burrowed: 1, tail_only: 2}, functions: {normal: `${NS}/state/normal`, burrowed: `${NS}/state/burrowed`, tail_only: `${NS}/state/tail_only`},
+    respawn_clip: {normal: 'rest', burrowed: STATE_CLIP.burrowed.name, tail_only: STATE_CLIP.tail_only.name}},
   flash_groups: GROUPS,
   proxies: {layout: PROXIES.map(([name, part, at, w, top, flags]) => ({name, part, point: at, w, top_margin: top, tail_only: flags === 'tail_only'})), rest: proxyPoints(restO),
     note: 'ground-anchored interaction columns (rigtech.md §3.3): x/z = the bone point projected on the floor (rig frame, +x = the boss left, -z = its front), base/top = the column; per clip in clips[].px at the events'},
@@ -272,7 +374,9 @@ json(manifestPath, {
   culling: {width: CULL.width, height: CULL.height, view_range: VIEW_RANGE, per_part: CULL_BOX},
   rest_extents: extents.rest,
   budgets: {parts: PARTS.length, part_budget: '44-48 (cap 56)', models: Object.keys(models).length, elements_all_models: Object.values(elementCount).reduce((a, b) => a + b, 0),
-    elements_shown_rest: shownElements, atlas_px: atlasPx, atlas_budget: ATLAS_BUDGET},
+    elements_shown_rest: shownElements, elements_shown_max: elementsMax, elements_shown_by_look: elementsByLook, element_budget: ELEMENT_BUDGET, atlas_px: atlasPx, atlas_budget: ATLAS_BUDGET,
+    sprites: Object.keys(spriteTable).length,
+    regions: Object.fromEntries(Object.entries(REGION_BUDGET).map(([r, b]) => [r, {parts: regionParts[r], parts_budget: b.parts, px: regionPx[r], px_budget: b.px, ...(regionElements[r] !== undefined ? {elements_rest: regionElements[r]} : {})}]))},
   objectives: {azRigC: 'current clip id (anchor)', azRigT: 'tick within the clip (anchor; -1 = queued by play)', azRigF: 'hit flash countdown', azRigY: 'face/track scratch',
     azRigLegs: 'legs look: 0 geo, 1 hydro, 2 pyro', azRigTail: 'tail look: 0 geo, 1 cryo, 2 electro', azRigState: 'body state: 0 normal, 1 burrowed, 2 tail-only'},
   textures: sprites ? sprites.length : (typeof lastTextures === 'number' ? lastTextures : 'not repainted'),
@@ -281,6 +385,8 @@ for (const w of [...warns].slice(0, 40)) console.warn('warn:', w);
 const files = clipInfo.reduce((a, c) => a + c.keyFiles, 0);
 console.log(`Built the Azhdaha rig: ${PARTS.length} parts, ${CLIPS.length} clips, ${files} key files, ${clipInfo.reduce((a, c) => a + c.keys, 0)} part keys, ${Object.keys(models).length} models (${Object.values(elementCount).reduce((a, b) => a + b, 0)} elements, ${shownElements} shown at rest), ${Object.keys(spriteTable).length} sprites (${(atlasPx / 1e6).toFixed(2)} M px)${warns.size ? `, ${warns.size} warnings` : ''}.`);
 console.log(`rest extents x ${extents.rest[0]}, y ${extents.rest[1]}, z ${extents.rest[2]}`);
+console.log(`budgets: ${Object.entries(REGION_BUDGET).map(([r, b]) => `${r} ${regionParts[r]}/${b.parts} parts ${(regionPx[r] / 1e6).toFixed(3)}/${b.px / 1e6} M px`).join('; ')}; ` +
+  `elements shown max ${elementsMax}/${ELEMENT_BUDGET} (${Object.entries(elementsByLook).sort((x, y) => y[1] - x[1])[0][0]})` + (unusedSprites.length ? `; ${unusedSprites.length} unused sprites not painted (${unusedSprites.join(' ')})` : ''));
 if (debugDp) {
   const link = path.join(debugDp, 'data/rlk/function/mboss/azhdaha/rig');
   fs.rmSync(link, {recursive: true, force: true});

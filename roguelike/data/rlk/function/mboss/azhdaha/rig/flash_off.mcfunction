@@ -1,4 +1,4 @@
-# End of the hit flash. @s = rig anchor.
+# End of the hit flash (and of the petrify rim pulse). @s = rig anchor.
 data merge entity 524c4b4d-415a-4400-8000-000000000001 {Glowing:0b}
 data merge entity 524c4b4d-415a-4400-8000-000000000002 {Glowing:0b}
 data merge entity 524c4b4d-415a-4400-8000-000000000004 {Glowing:0b}
@@ -31,3 +31,6 @@ data merge entity 524c4b4d-415a-4400-8000-00000000002b {Glowing:0b}
 data merge entity 524c4b4d-415a-4400-8000-00000000002c {Glowing:0b}
 data merge entity 524c4b4d-415a-4400-8000-00000000002d {Glowing:0b}
 data merge entity 524c4b4d-415a-4400-8000-00000000002e {Glowing:0b}
+data merge entity 524c4b4d-415a-4400-8000-000000000013 {Glowing:0b}
+data merge entity 524c4b4d-415a-4400-8000-000000000014 {Glowing:0b}
+data merge entity 524c4b4d-415a-4400-8000-000000000015 {Glowing:0b}

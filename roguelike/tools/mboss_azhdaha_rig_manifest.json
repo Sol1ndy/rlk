@@ -4,6 +4,7 @@
       "name": "head",
       "region": "head",
       "uuid": "524c4b4d-415a-4400-8000-000000000001",
+      "idx": 1,
       "tag": "rlk_mb_az_head",
       "model": "head",
       "brightness": 13,
@@ -14,6 +15,7 @@
       "name": "jaw",
       "region": "head",
       "uuid": "524c4b4d-415a-4400-8000-000000000002",
+      "idx": 2,
       "tag": "rlk_mb_az_jaw",
       "model": "jaw",
       "brightness": 13,
@@ -24,6 +26,7 @@
       "name": "eyes",
       "region": "head",
       "uuid": "524c4b4d-415a-4400-8000-000000000003",
+      "idx": 3,
       "tag": "rlk_mb_az_eyes",
       "model": "eyes",
       "brightness": 15,
@@ -34,9 +37,10 @@
       "name": "horn_l",
       "region": "head",
       "uuid": "524c4b4d-415a-4400-8000-000000000004",
+      "idx": 4,
       "tag": "rlk_mb_az_horn_l",
       "model": "horn_l",
-      "brightness": 14,
+      "brightness": 13,
       "scale": 2,
       "elements": 79
     },
@@ -44,9 +48,10 @@
       "name": "horn_r",
       "region": "head",
       "uuid": "524c4b4d-415a-4400-8000-000000000005",
+      "idx": 5,
       "tag": "rlk_mb_az_horn_r",
       "model": "horn_r",
-      "brightness": 14,
+      "brightness": 13,
       "scale": 2,
       "elements": 79
     },
@@ -54,6 +59,7 @@
       "name": "beard1",
       "region": "head",
       "uuid": "524c4b4d-415a-4400-8000-000000000006",
+      "idx": 6,
       "tag": "rlk_mb_az_beard1",
       "model": "beard1",
       "brightness": 13,
@@ -64,6 +70,7 @@
       "name": "beard2",
       "region": "head",
       "uuid": "524c4b4d-415a-4400-8000-000000000007",
+      "idx": 7,
       "tag": "rlk_mb_az_beard2",
       "model": "beard2",
       "brightness": 13,
@@ -74,6 +81,7 @@
       "name": "chest",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-000000000008",
+      "idx": 8,
       "tag": "rlk_mb_az_chest",
       "model": "chest",
       "brightness": 13,
@@ -84,6 +92,7 @@
       "name": "belly",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-000000000009",
+      "idx": 9,
       "tag": "rlk_mb_az_belly",
       "model": "belly",
       "brightness": 13,
@@ -94,6 +103,7 @@
       "name": "pelvis",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-00000000000a",
+      "idx": 10,
       "tag": "rlk_mb_az_pelvis",
       "model": "pelvis",
       "brightness": 13,
@@ -104,6 +114,7 @@
       "name": "neck1",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-00000000000b",
+      "idx": 11,
       "tag": "rlk_mb_az_neck1",
       "model": "neck1",
       "brightness": 13,
@@ -114,6 +125,7 @@
       "name": "neck2",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-00000000000c",
+      "idx": 12,
       "tag": "rlk_mb_az_neck2",
       "model": "neck2",
       "brightness": 13,
@@ -124,6 +136,7 @@
       "name": "apron",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-00000000000d",
+      "idx": 13,
       "tag": "rlk_mb_az_apron",
       "model": "apron",
       "brightness": 13,
@@ -134,6 +147,7 @@
       "name": "glow_apron",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-00000000000e",
+      "idx": 14,
       "tag": "rlk_mb_az_glow_apron",
       "model": "empty",
       "brightness": 15,
@@ -144,6 +158,7 @@
       "name": "plates_neck",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-00000000000f",
+      "idx": 15,
       "tag": "rlk_mb_az_plates_neck",
       "model": "plates_neck",
       "brightness": 13,
@@ -154,6 +169,7 @@
       "name": "plates_sh",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-000000000010",
+      "idx": 16,
       "tag": "rlk_mb_az_plates_sh",
       "model": "plates_sh",
       "brightness": 13,
@@ -164,6 +180,7 @@
       "name": "plates_mid",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-000000000011",
+      "idx": 17,
       "tag": "rlk_mb_az_plates_mid",
       "model": "plates_mid",
       "brightness": 13,
@@ -174,6 +191,7 @@
       "name": "plates_hip",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-000000000012",
+      "idx": 18,
       "tag": "rlk_mb_az_plates_hip",
       "model": "plates_hip",
       "brightness": 13,
@@ -184,9 +202,10 @@
       "name": "crys_sh",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-000000000013",
+      "idx": 19,
       "tag": "rlk_mb_az_crys_sh",
       "model": "crys_sh",
-      "brightness": 14,
+      "brightness": 13,
       "scale": 2.2,
       "elements": 40
     },
@@ -194,9 +213,10 @@
       "name": "crys_mid",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-000000000014",
+      "idx": 20,
       "tag": "rlk_mb_az_crys_mid",
       "model": "crys_mid",
-      "brightness": 14,
+      "brightness": 13,
       "scale": 2.2,
       "elements": 24
     },
@@ -204,9 +224,10 @@
       "name": "crys_hip",
       "region": "body",
       "uuid": "524c4b4d-415a-4400-8000-000000000015",
+      "idx": 21,
       "tag": "rlk_mb_az_crys_hip",
       "model": "crys_hip",
-      "brightness": 14,
+      "brightness": 13,
       "scale": 2,
       "elements": 20
     },
@@ -214,6 +235,7 @@
       "name": "uarm_l",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-000000000016",
+      "idx": 22,
       "tag": "rlk_mb_az_uarm_l",
       "model": "uarm_l",
       "brightness": 13,
@@ -224,6 +246,7 @@
       "name": "bracer_l",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-000000000017",
+      "idx": 23,
       "tag": "rlk_mb_az_bracer_l",
       "model": "bracer_l",
       "brightness": 13,
@@ -234,6 +257,7 @@
       "name": "paw_l",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-000000000018",
+      "idx": 24,
       "tag": "rlk_mb_az_paw_l",
       "model": "paw_l",
       "brightness": 13,
@@ -244,6 +268,7 @@
       "name": "uarm_r",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-000000000019",
+      "idx": 25,
       "tag": "rlk_mb_az_uarm_r",
       "model": "uarm_r",
       "brightness": 13,
@@ -254,6 +279,7 @@
       "name": "bracer_r",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-00000000001a",
+      "idx": 26,
       "tag": "rlk_mb_az_bracer_r",
       "model": "bracer_r",
       "brightness": 13,
@@ -264,6 +290,7 @@
       "name": "paw_r",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-00000000001b",
+      "idx": 27,
       "tag": "rlk_mb_az_paw_r",
       "model": "paw_r",
       "brightness": 13,
@@ -274,6 +301,7 @@
       "name": "thigh_l",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-00000000001c",
+      "idx": 28,
       "tag": "rlk_mb_az_thigh_l",
       "model": "thigh_l",
       "brightness": 13,
@@ -284,6 +312,7 @@
       "name": "gaiter_l",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-00000000001d",
+      "idx": 29,
       "tag": "rlk_mb_az_gaiter_l",
       "model": "gaiter_l",
       "brightness": 13,
@@ -294,6 +323,7 @@
       "name": "foot_l",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-00000000001e",
+      "idx": 30,
       "tag": "rlk_mb_az_foot_l",
       "model": "foot_l",
       "brightness": 13,
@@ -304,6 +334,7 @@
       "name": "thigh_r",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-00000000001f",
+      "idx": 31,
       "tag": "rlk_mb_az_thigh_r",
       "model": "thigh_r",
       "brightness": 13,
@@ -314,6 +345,7 @@
       "name": "gaiter_r",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-000000000020",
+      "idx": 32,
       "tag": "rlk_mb_az_gaiter_r",
       "model": "gaiter_r",
       "brightness": 13,
@@ -324,6 +356,7 @@
       "name": "foot_r",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-000000000021",
+      "idx": 33,
       "tag": "rlk_mb_az_foot_r",
       "model": "foot_r",
       "brightness": 13,
@@ -334,6 +367,7 @@
       "name": "glow_bracer_l",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-000000000022",
+      "idx": 34,
       "tag": "rlk_mb_az_glow_bracer_l",
       "model": "empty",
       "brightness": 15,
@@ -344,6 +378,7 @@
       "name": "glow_bracer_r",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-000000000023",
+      "idx": 35,
       "tag": "rlk_mb_az_glow_bracer_r",
       "model": "empty",
       "brightness": 15,
@@ -354,6 +389,7 @@
       "name": "glow_gaiter_l",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-000000000024",
+      "idx": 36,
       "tag": "rlk_mb_az_glow_gaiter_l",
       "model": "empty",
       "brightness": 15,
@@ -364,6 +400,7 @@
       "name": "glow_gaiter_r",
       "region": "legs",
       "uuid": "524c4b4d-415a-4400-8000-000000000025",
+      "idx": 37,
       "tag": "rlk_mb_az_glow_gaiter_r",
       "model": "empty",
       "brightness": 15,
@@ -374,6 +411,7 @@
       "name": "t1",
       "region": "tail",
       "uuid": "524c4b4d-415a-4400-8000-000000000026",
+      "idx": 38,
       "tag": "rlk_mb_az_t1",
       "model": "t1",
       "brightness": 13,
@@ -384,6 +422,7 @@
       "name": "t2",
       "region": "tail",
       "uuid": "524c4b4d-415a-4400-8000-000000000027",
+      "idx": 39,
       "tag": "rlk_mb_az_t2",
       "model": "t2",
       "brightness": 13,
@@ -394,6 +433,7 @@
       "name": "t3",
       "region": "tail",
       "uuid": "524c4b4d-415a-4400-8000-000000000028",
+      "idx": 40,
       "tag": "rlk_mb_az_t3",
       "model": "t3",
       "brightness": 13,
@@ -404,6 +444,7 @@
       "name": "t4",
       "region": "tail",
       "uuid": "524c4b4d-415a-4400-8000-000000000029",
+      "idx": 41,
       "tag": "rlk_mb_az_t4",
       "model": "t4",
       "brightness": 13,
@@ -414,6 +455,7 @@
       "name": "t5",
       "region": "tail",
       "uuid": "524c4b4d-415a-4400-8000-00000000002a",
+      "idx": 42,
       "tag": "rlk_mb_az_t5",
       "model": "t5",
       "brightness": 13,
@@ -424,6 +466,7 @@
       "name": "t6",
       "region": "tail",
       "uuid": "524c4b4d-415a-4400-8000-00000000002b",
+      "idx": 43,
       "tag": "rlk_mb_az_t6",
       "model": "t6",
       "brightness": 14,
@@ -434,6 +477,7 @@
       "name": "t7",
       "region": "tail",
       "uuid": "524c4b4d-415a-4400-8000-00000000002c",
+      "idx": 44,
       "tag": "rlk_mb_az_t7",
       "model": "t7",
       "brightness": 14,
@@ -444,6 +488,7 @@
       "name": "t8",
       "region": "tail",
       "uuid": "524c4b4d-415a-4400-8000-00000000002d",
+      "idx": 45,
       "tag": "rlk_mb_az_t8",
       "model": "t8",
       "brightness": 14,
@@ -454,6 +499,7 @@
       "name": "tip",
       "region": "tail",
       "uuid": "524c4b4d-415a-4400-8000-00000000002e",
+      "idx": 46,
       "tag": "rlk_mb_az_tip",
       "model": "tip",
       "brightness": 14,
@@ -464,6 +510,7 @@
       "name": "tail_skirt",
       "region": "tail",
       "uuid": "524c4b4d-415a-4400-8000-00000000002f",
+      "idx": 47,
       "tag": "rlk_mb_az_tail_skirt",
       "model": "tail_skirt",
       "brightness": 13,
@@ -476,6 +523,84 @@
     "tag": "rlk_mb_az_shadow",
     "shadow_radius": 4.5,
     "note": "empty-model helper under the anchor, not a rig part"
+  },
+  "uuids": {
+    "block": "524c4b4d-415a-4400-8000-0000000000",
+    "ints": [
+      1380731725,
+      1096434688,
+      -2147483648
+    ],
+    "parts": {
+      "head": 1,
+      "jaw": 2,
+      "eyes": 3,
+      "horn_l": 4,
+      "horn_r": 5,
+      "beard1": 6,
+      "beard2": 7,
+      "chest": 8,
+      "belly": 9,
+      "pelvis": 10,
+      "neck1": 11,
+      "neck2": 12,
+      "apron": 13,
+      "glow_apron": 14,
+      "plates_neck": 15,
+      "plates_sh": 16,
+      "plates_mid": 17,
+      "plates_hip": 18,
+      "crys_sh": 19,
+      "crys_mid": 20,
+      "crys_hip": 21,
+      "uarm_l": 22,
+      "bracer_l": 23,
+      "paw_l": 24,
+      "uarm_r": 25,
+      "bracer_r": 26,
+      "paw_r": 27,
+      "thigh_l": 28,
+      "gaiter_l": 29,
+      "foot_l": 30,
+      "thigh_r": 31,
+      "gaiter_r": 32,
+      "foot_r": 33,
+      "glow_bracer_l": 34,
+      "glow_bracer_r": 35,
+      "glow_gaiter_l": 36,
+      "glow_gaiter_r": 37,
+      "t1": 38,
+      "t2": 39,
+      "t3": 40,
+      "t4": 41,
+      "t5": 42,
+      "t6": 43,
+      "t7": 44,
+      "t8": 45,
+      "tip": 46,
+      "tail_skirt": 47
+    },
+    "shadow": 64,
+    "proxies": {
+      "head": 65,
+      "chest": 66,
+      "belly": 67,
+      "hips": 68,
+      "tail1": 69,
+      "tail2": 70,
+      "tail3": 71,
+      "tail4": 72,
+      "paw_l": 73,
+      "paw_r": 74,
+      "foot_l": 75,
+      "foot_r": 76,
+      "tail5": 77
+    },
+    "props": {
+      "seal_prism": 128,
+      "crater": 129
+    },
+    "note": "Rig decision change 3 / cm.md §14: the part table is fixed and append-only; proxies take 0x41 + their position in proxies.layout"
   },
   "clips": [
     {
@@ -503,6 +628,7 @@
           9.42
         ]
       ],
+      "root_z": [],
       "px": {
         "0": {
           "head": {
@@ -561,13 +687,6 @@
             "top": 11.72,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 2.46,
-            "base": 8.32,
-            "top": 11.32,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -594,6 +713,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 2.46,
+            "base": 8.32,
+            "top": 11.32,
             "w": 1.8
           }
         },
@@ -654,13 +780,6 @@
             "top": 11.72,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 2.46,
-            "base": 8.32,
-            "top": 11.32,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -687,6 +806,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 2.46,
+            "base": 8.32,
+            "top": 11.32,
             "w": 1.8
           }
         }
@@ -717,6 +843,7 @@
           9.42
         ]
       ],
+      "root_z": [],
       "px": {
         "0": {
           "head": {
@@ -775,13 +902,6 @@
             "top": 11.72,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 2.46,
-            "base": 8.32,
-            "top": 11.32,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -808,6 +928,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 2.46,
+            "base": 8.32,
+            "top": 11.32,
             "w": 1.8
           }
         },
@@ -868,13 +995,6 @@
             "top": 11.72,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 2.46,
-            "base": 8.32,
-            "top": 11.32,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -901,6 +1021,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 2.46,
+            "base": 8.32,
+            "top": 11.32,
             "w": 1.8
           }
         }
@@ -931,6 +1058,7 @@
           9.42
         ]
       ],
+      "root_z": [],
       "px": {
         "0": {
           "head": {
@@ -989,13 +1117,6 @@
             "top": 11.72,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 2.46,
-            "base": 8.32,
-            "top": 11.32,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -1022,6 +1143,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 2.46,
+            "base": 8.32,
+            "top": 11.32,
             "w": 1.8
           }
         },
@@ -1082,13 +1210,6 @@
             "top": 11.72,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 2.46,
-            "base": 8.32,
-            "top": 11.32,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -1115,6 +1236,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 2.46,
+            "base": 8.32,
+            "top": 11.32,
             "w": 1.8
           }
         }
@@ -1145,6 +1273,7 @@
           19.75
         ]
       ],
+      "root_z": [],
       "px": {
         "0": {
           "head": {
@@ -1203,13 +1332,6 @@
             "top": 2.61,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 18.42,
-            "base": 0.68,
-            "top": 3.68,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 2.78,
             "z": -3.78,
@@ -1236,6 +1358,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 18.42,
+            "base": 0.68,
+            "top": 3.68,
             "w": 1.8
           }
         },
@@ -1296,13 +1425,6 @@
             "top": 2.61,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 18.42,
-            "base": 0.68,
-            "top": 3.68,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 2.78,
             "z": -3.78,
@@ -1329,6 +1451,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 18.42,
+            "base": 0.68,
+            "top": 3.68,
             "w": 1.8
           }
         }
@@ -1359,6 +1488,7 @@
           9.63
         ]
       ],
+      "root_z": [],
       "px": {
         "0": {
           "head": {
@@ -1417,13 +1547,6 @@
             "top": 11.62,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 2.84,
-            "base": 8.31,
-            "top": 11.31,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.45,
             "z": -3.03,
@@ -1450,6 +1573,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 2.84,
+            "base": 8.31,
+            "top": 11.31,
             "w": 1.8
           }
         },
@@ -1510,13 +1640,6 @@
             "top": 11.62,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 2.84,
-            "base": 8.31,
-            "top": 11.31,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.45,
             "z": -3.03,
@@ -1544,6 +1667,13 @@
             "base": 0,
             "top": 2.95,
             "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 2.84,
+            "base": 8.31,
+            "top": 11.31,
+            "w": 1.8
           }
         }
       }
@@ -1557,7 +1687,7 @@
       "events": {},
       "keyFiles": 1,
       "keys": 47,
-      "note": "tail whip mid-sweep: the tail flat on the floor, swept 110 to the left (root-weighted)",
+      "note": "tail whip mid-sweep: the tail flat on the floor, swept 110 to the left (root-weighted); the throat apron swings forward 12 (R3: it hangs to 0.06 b at rest, so the 0.2 b crouch put its hem 0.14 b into the floor)",
       "state": "normal",
       "extents": [
         [
@@ -1573,6 +1703,7 @@
           10.34
         ]
       ],
+      "root_z": [],
       "px": {
         "0": {
           "head": {
@@ -1631,13 +1762,6 @@
             "top": 2.44,
             "w": 1.6
           },
-          "tail5": {
-            "x": 12.52,
-            "z": 8.66,
-            "base": 0,
-            "top": 2.75,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -1664,6 +1788,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 12.52,
+            "z": 8.66,
+            "base": 0,
+            "top": 2.75,
             "w": 1.8
           }
         },
@@ -1724,13 +1855,6 @@
             "top": 2.44,
             "w": 1.6
           },
-          "tail5": {
-            "x": 12.52,
-            "z": 8.66,
-            "base": 0,
-            "top": 2.75,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -1757,6 +1881,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 12.52,
+            "z": 8.66,
+            "base": 0,
+            "top": 2.75,
             "w": 1.8
           }
         }
@@ -1787,6 +1918,7 @@
           8.62
         ]
       ],
+      "root_z": [],
       "px": {
         "0": {
           "head": {
@@ -1845,13 +1977,6 @@
             "top": 11.5,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 0.95,
-            "base": 8.05,
-            "top": 11.05,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -1878,6 +2003,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 0.95,
+            "base": 8.05,
+            "top": 11.05,
             "w": 1.8
           }
         },
@@ -1938,13 +2070,6 @@
             "top": 11.5,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 0.95,
-            "base": 8.05,
-            "top": 11.05,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -1971,6 +2096,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 0.95,
+            "base": 8.05,
+            "top": 11.05,
             "w": 1.8
           }
         }
@@ -2001,6 +2133,7 @@
           20.58
         ]
       ],
+      "root_z": [],
       "px": {
         "0": {
           "head": {
@@ -2059,13 +2192,6 @@
             "top": 1.99,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 19.54,
-            "base": 0,
-            "top": 2.2,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -2092,6 +2218,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 19.54,
+            "base": 0,
+            "top": 2.2,
             "w": 1.8
           }
         },
@@ -2152,13 +2285,6 @@
             "top": 1.99,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 19.54,
-            "base": 0,
-            "top": 2.2,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -2185,6 +2311,13 @@
             "z": 2.4,
             "base": 0,
             "top": 2.95,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 19.54,
+            "base": 0,
+            "top": 2.2,
             "w": 1.8
           }
         }
@@ -2215,6 +2348,7 @@
           20.16
         ]
       ],
+      "root_z": [],
       "px": {
         "0": {
           "head": {
@@ -2274,13 +2408,6 @@
             "top": 4.76,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 18.88,
-            "base": 2.59,
-            "top": 5.59,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -1.69,
@@ -2309,6 +2436,13 @@
             "z": 3.17,
             "base": 0,
             "top": 0.48,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 18.88,
+            "base": 2.59,
+            "top": 5.59,
             "w": 1.8
           }
         },
@@ -2370,13 +2504,6 @@
             "top": 4.76,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 18.88,
-            "base": 2.59,
-            "top": 5.59,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": -1.69,
@@ -2405,6 +2532,13 @@
             "z": 3.17,
             "base": 0,
             "top": 0.48,
+            "w": 1.8
+          },
+          "tail5": {
+            "x": 0,
+            "z": 18.88,
+            "base": 2.59,
+            "top": 5.59,
             "w": 1.8
           }
         }
@@ -2435,6 +2569,7 @@
           null
         ]
       ],
+      "root_z": [],
       "px": {
         "0": {
           "head": {
@@ -2501,14 +2636,6 @@
             "w": 1.6,
             "hidden": true
           },
-          "tail5": {
-            "x": 0,
-            "z": 2.46,
-            "base": 0.82,
-            "top": 3.82,
-            "w": 1.8,
-            "hidden": true
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -2538,6 +2665,14 @@
             "z": 2.4,
             "base": 0,
             "top": -4.55,
+            "w": 1.8,
+            "hidden": true
+          },
+          "tail5": {
+            "x": 0,
+            "z": 2.46,
+            "base": 0.82,
+            "top": 3.82,
             "w": 1.8,
             "hidden": true
           }
@@ -2607,14 +2742,6 @@
             "w": 1.6,
             "hidden": true
           },
-          "tail5": {
-            "x": 0,
-            "z": 2.46,
-            "base": 0.82,
-            "top": 3.82,
-            "w": 1.8,
-            "hidden": true
-          },
           "paw_l": {
             "x": 3.15,
             "z": -2.9,
@@ -2644,6 +2771,14 @@
             "z": 2.4,
             "base": 0,
             "top": -4.55,
+            "w": 1.8,
+            "hidden": true
+          },
+          "tail5": {
+            "x": 0,
+            "z": 2.46,
+            "base": 0.82,
+            "top": 3.82,
             "w": 1.8,
             "hidden": true
           }
@@ -2675,6 +2810,7 @@
           2.78
         ]
       ],
+      "root_z": [],
       "px": {
         "0": {
           "head": {
@@ -2737,13 +2873,6 @@
             "top": 10.1,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 0.6,
-            "base": 8.64,
-            "top": 11.64,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": 3,
@@ -2775,6 +2904,13 @@
             "top": -3.75,
             "w": 1.8,
             "hidden": true
+          },
+          "tail5": {
+            "x": 0,
+            "z": 0.6,
+            "base": 8.64,
+            "top": 11.64,
+            "w": 1.8
           }
         },
         "2": {
@@ -2838,13 +2974,6 @@
             "top": 10.1,
             "w": 1.6
           },
-          "tail5": {
-            "x": 0,
-            "z": 0.6,
-            "base": 8.64,
-            "top": 11.64,
-            "w": 1.8
-          },
           "paw_l": {
             "x": 3.15,
             "z": 3,
@@ -2876,6 +3005,13 @@
             "top": -3.75,
             "w": 1.8,
             "hidden": true
+          },
+          "tail5": {
+            "x": 0,
+            "z": 0.6,
+            "base": 8.64,
+            "top": 11.64,
+            "w": 1.8
           }
         }
       }
@@ -3078,6 +3214,26 @@
         "cryo": "rlk:mboss/azhdaha/rig/look/tail/cryo",
         "electro": "rlk:mboss/azhdaha/rig/look/tail/electro"
       }
+    },
+    "gold": {
+      "parts": [
+        "horn_l",
+        "horn_r",
+        "crys_sh",
+        "crys_mid",
+        "crys_hip"
+      ],
+      "brightness": 13,
+      "glow": 15
+    },
+    "eyes": {
+      "part": "eyes",
+      "brightness": 15
+    },
+    "functions": {
+      "petrify": "rlk:mboss/azhdaha/rig/look/petrify",
+      "glow_on": "rlk:mboss/azhdaha/rig/glow/gold_on",
+      "glow_off": "rlk:mboss/azhdaha/rig/glow/gold_off"
     }
   },
   "tinted_items": {
@@ -3133,6 +3289,11 @@
       "normal": "rlk:mboss/azhdaha/rig/state/normal",
       "burrowed": "rlk:mboss/azhdaha/rig/state/burrowed",
       "tail_only": "rlk:mboss/azhdaha/rig/state/tail_only"
+    },
+    "respawn_clip": {
+      "normal": "rest",
+      "burrowed": "burrowed",
+      "tail_only": "tail_only"
     }
   },
   "flash_groups": {
@@ -3276,18 +3437,6 @@
         "tail_only": true
       },
       {
-        "name": "tail5",
-        "part": "tip",
-        "point": [
-          0,
-          0,
-          0.5
-        ],
-        "w": 1.8,
-        "top_margin": 1,
-        "tail_only": true
-      },
-      {
         "name": "paw_l",
         "part": "paw_l",
         "point": [
@@ -3334,6 +3483,18 @@
         "w": 1.8,
         "top_margin": 2.6,
         "tail_only": false
+      },
+      {
+        "name": "tail5",
+        "part": "tip",
+        "point": [
+          0,
+          0,
+          0.5
+        ],
+        "w": 1.8,
+        "top_margin": 1,
+        "tail_only": true
       }
     ],
     "rest": {
@@ -3393,13 +3554,6 @@
         "top": 11.72,
         "w": 1.6
       },
-      "tail5": {
-        "x": 0,
-        "z": 2.46,
-        "base": 8.32,
-        "top": 11.32,
-        "w": 1.8
-      },
       "paw_l": {
         "x": 3.15,
         "z": -2.9,
@@ -3426,6 +3580,13 @@
         "z": 2.4,
         "base": 0,
         "top": 2.95,
+        "w": 1.8
+      },
+      "tail5": {
+        "x": 0,
+        "z": 2.46,
+        "base": 8.32,
+        "top": 11.32,
         "w": 1.8
       }
     },
@@ -3592,8 +3753,58 @@
     "models": 92,
     "elements_all_models": 9863,
     "elements_shown_rest": 4335,
-    "atlas_px": 1133056,
-    "atlas_budget": 1200000
+    "elements_shown_max": 4465,
+    "elements_shown_by_look": {
+      "geo_geo": 4335,
+      "geo_cryo": 4335,
+      "geo_electro": 4335,
+      "hydro_geo": 4465,
+      "hydro_cryo": 4465,
+      "hydro_electro": 4465,
+      "pyro_geo": 4465,
+      "pyro_cryo": 4465,
+      "pyro_electro": 4465
+    },
+    "element_budget": 8000,
+    "atlas_px": 1097984,
+    "atlas_budget": 1200000,
+    "sprites": 154,
+    "regions": {
+      "head": {
+        "parts": 7,
+        "parts_budget": 8,
+        "px": 187392,
+        "px_budget": 240000,
+        "elements_rest": 590
+      },
+      "body": {
+        "parts": 14,
+        "parts_budget": 14,
+        "px": 397312,
+        "px_budget": 420000,
+        "elements_rest": 1441
+      },
+      "legs": {
+        "parts": 16,
+        "parts_budget": 16,
+        "px": 313600,
+        "px_budget": 320000,
+        "elements_rest": 1256
+      },
+      "tail": {
+        "parts": 10,
+        "parts_budget": 10,
+        "px": 146432,
+        "px_budget": 160000,
+        "elements_rest": 1048
+      },
+      "shared": {
+        "parts": 0,
+        "parts_budget": 0,
+        "px": 53248,
+        "px_budget": 60000
+      }
+    }
   },
   "objectives": {
     "azRigC": "current clip id (anchor)",
@@ -3604,5 +3815,5 @@
     "azRigTail": "tail look: 0 geo, 1 cryo, 2 electro",
     "azRigState": "body state: 0 normal, 1 burrowed, 2 tail-only"
   },
-  "textures": 162
+  "textures": 154
 }
