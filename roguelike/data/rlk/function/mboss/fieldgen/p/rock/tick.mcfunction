@@ -1,5 +1,4 @@
 # rock tick.
-execute if score #fq6Pz mb matches 1 run function rlk:mboss/fieldgen/p/rock/resume
 execute if score #fgPT mb matches 1..11 run execute at @s unless entity @e[tag=rlk_body,distance=..5] run function rlk:mboss/fieldgen/u/toward {d:0.2}
 execute if score #fgPT mb matches 1..140 run function rlk:mboss/fieldgen/rig/face/track
 execute as @e[type=minecraft:item_display,tag=rlk_mb_fg_p6s] at @s run function rlk:mboss/fieldgen/p/rock/rk_slab

@@ -2,7 +2,6 @@
 # Demo "waves" events (as the anchor; #fkDT = the demo tick).
 execute if score #fkDT mb matches 0 at @s rotated as @s rotated ~ 0 positioned ~ ~3.84 ~ run function rlk:mboss/fieldgen/fx/p/wave_charge {t:24}
 execute if score #fkDT mb matches 0 at @s rotated as @s rotated ~ 0 positioned ~ ~3.84 ~ run function rlk:mboss/fieldgen/fx/snd/wave_charge
-execute if score #fkDT mb matches 0 at @s rotated as @s rotated ~ 0 run function rlk:mboss/fieldgen/fx/tele/wave {r0:25,r1:210,w:25,tell:24,dur:34,el:9,hold:2}
 execute if score #fkDT mb matches 8 at @s rotated as @s rotated ~ 0 positioned ~ ~3.84 ~ run function rlk:mboss/fieldgen/fx/p/wave_pulse
 execute if score #fkDT mb matches 14 at @s rotated as @s rotated ~ 0 positioned ~ ~3.84 ~ run function rlk:mboss/fieldgen/fx/snd/wave_charge2
 execute if score #fkDT mb matches 16 at @s rotated as @s rotated ~ 0 positioned ~ ~3.84 ~ run function rlk:mboss/fieldgen/fx/p/wave_pulse

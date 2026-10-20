@@ -1,9 +1,10 @@
-# @s = a live front after a pause: not struck yet -> the ring decal with the remaining charge; expanding -> the
-# fire band from its next radius (the band moves from the tick after the call, so it meets the hazard).
+# @s = a live front after a pause: not struck yet -> nothing (no ground decal: telegraph rule 10-20; its band is
+# drawn 1 t before the strike by the timeline); expanding -> the fire band from its next radius (the band moves
+# from the tick after the call, so it meets the hazard).
 scoreboard players operation #fgX mb = @s mbHzW
 scoreboard players operation #fgX mb -= @s mbHzT
 scoreboard players remove #fgX mb 1
-execute if score #fgX mb matches 1.. run return run function rlk:mboss/fieldgen/p/waves/rd_tell
+execute if score #fgX mb matches 1.. run return 0
 scoreboard players operation #fgX mb = @s mbHzT
 scoreboard players operation #fgX mb -= @s mbHzW
 scoreboard players add #fgX mb 2

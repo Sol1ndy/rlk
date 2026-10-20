@@ -49,6 +49,7 @@ data remove storage rlk:fgkit t
 data remove storage rlk:fgkit w
 data remove storage rlk:fgkit hud
 data remove storage rlk:fgkit ax
+data remove storage rlk:fgkit fl
 schedule clear rlk:mboss/fieldgen/fx/e/world
 schedule clear rlk:mboss/fieldgen/fx/hud/e/unflash
 schedule clear rlk:mboss/fieldgen/fx/test/e/tick

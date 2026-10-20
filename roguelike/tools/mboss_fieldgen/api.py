@@ -98,16 +98,19 @@ def part_sel(name):
 # during the opening waves, which a jump clears), so they went down; the cruise patterns a walking player cannot simply
 # walk out of (C1 bombs, the slams, C4, C6) went up. Was: c1 80 / c1s 140, c2 140, c4 90, c6 130 / 110, f1 120,
 # f2 130 / 110, wave 120.
+# 10-20 user: x1.5 ("역장 발생 장치의 계수를 많이 올려야될 것 같아"): every coefficient times 1.5 (was c1 100 / c1s 180,
+# c2 180, c3 50, c4 110, c5 220, c6 150 / c6s 120, f1 50, f2 70 / f2s 80, wave 50); the re-run of the fairness sim:
+# scratchpad tele/fg/sim, plan.md "Fix round" / fg_contract.md section 21.
 DMG = {
-    'c1': 100, 'c1s': 180,         # C1 일점 상쇄: each bomb (one hit per volley group of 4) / the finisher slam
-    'c2': 180,                     # C2 내려찍기: slam r 5 (the same slam as C1's finisher)
-    'c3': 50,                      # C3 코어: per beam touch (one volley group, re-armed every 10 t)
-    'c4': 110,                     # C4 바위 폭탄: each missile (2 volley groups of 5)
-    'c5': 220,                     # C5 지면 충격: the full-area blast
-    'c6': 150, 'c6s': 120,         # C6 파쇄: each floor burst / each slab throw
-    'f1': 50,                      # F1 감소 영역 (field): each eruption (one hit per event)
-    'f2': 70, 'f2s': 80,           # F2 파쇄 (field): bursts / slabs
-    'wave': 50,                    # 「인력 충격파」: each front
+    'c1': 150, 'c1s': 270,         # C1 일점 상쇄: each bomb (one hit per volley group of 4) / the finisher slam
+    'c2': 270,                     # C2 내려찍기: slam r 5 (the same slam as C1's finisher)
+    'c3': 75,                      # C3 코어: per beam touch (one volley group, re-armed every 10 t)
+    'c4': 165,                     # C4 바위 폭탄: each missile (2 volley groups of 5)
+    'c5': 330,                     # C5 지면 충격: the full-area blast
+    'c6': 225, 'c6s': 180,         # C6 파쇄: each floor burst / each slab throw
+    'f1': 75,                      # F1 감소 영역 (field): each eruption (one hit per event)
+    'f2': 105, 'f2s': 120,         # F2 파쇄 (field): bursts / slabs
+    'wave': 75,                    # 「인력 충격파」: each front
 }
 KB = {'default': 3, 'light': 2, 'heavy': 4, 'none': 0}
 
@@ -351,8 +354,10 @@ class Gen:
 
     # -- the fx kit (THE effect engine; fg_fx_api.md). Every helper returns one function line (fx/...) to run in the
     # executor context the kit documents: positioned at the event point (floor points at the floor top), rotated as
-    # the aim. Pair every kit telegraph with its framework hazard made in the same tick with the same tell, and
-    # g.hz_opts(quiet=1) (+ sfx=0 when the kit recipes give the sound), so the framework outline does not double it.
+    # the aim. Every hazard is made with g.hz_opts(quiet=1) (+ sfx=0 when the kit recipes give the sound): no framework
+    # outline or strike flash. Telegraph rule (10-20, user): a ground decal (tele_*) only where the reference footage
+    # shows a marker on the floor before the hit, made in the same tick with the same tell as its hazard; every other
+    # attack is read from the boss's motion and sound (scratchpad tele/fg/audit.md, fg_contract.md section 21).
     kit = K
     fx = staticmethod(K.fx)                  # preset fx/p/<name>, e.g. g.fx('slam'), g.fx('bomb_drop', h=3.8)
     snd = staticmethod(K.snd)                # sound recipe fx/snd/<name>, e.g. g.snd('slam')
@@ -369,6 +374,8 @@ class Gen:
     tele_mline_aim = staticmethod(K.tele_mline_aim)
     tele_mline_turn = staticmethod(K.tele_mline_turn)
     tele_mline_end = staticmethod(K.tele_mline_end)
+    tele_rim = staticmethod(K.tele_rim)      # rim-only disc (C5 지면 충격, palette 6 pale gold; telegraph rule 10-20)
+    tele_dark = staticmethod(K.tele_dark)    # the dark floor disc decal (F1 감소 영역, C5 지면 충격)
     TELE_CLEAR = f'function {K.FN}tele/clear'   # every kit decal (the core runs it on pause, break, death, test cuts)
 
     @staticmethod
@@ -479,107 +486,18 @@ class TL:
 
 
 # =============================================================================================
-# Shared stub helper: the walking floor bursts, the lifted slabs and the slab throws of 파쇄 (C6 rock in cruise,
-# F2 frock in the field form). Pattern authors may replace it by their own code (writes only p/<key>/**).
-def rocks(g, tl, key, pid, burst0, n_burst=8, gap=6, throw0=None, n_throw=5, throw_gap=8, dmg=130, dmg_s=110):
-    """Register on the TL `tl` of pattern `key` (id pid): n_burst floor bursts walking onto the player, the first
-    striking at clock burst0 and then every `gap` t (each hz/disc r 1.8, tell 10, jumpable #hzY1 1.2, heavy KB, made
-    10 t ahead at the walker marker: the first 6 b from the player on the device's side, each next 2.5 b toward the
-    player's current position); a slab rises at every burst (tuff display, up 4 b over 15 t); from throw0 one slab
-    every throw_gap t flies at the player's locked feet (dmg-0 tell_line 10 t ahead, then a blade pj at 1.5 b/t,
-    hr c_blade_hr(1.45): the framework blade reaches hr + its pad (review FW-1), so hr is not the reach). Unthrown
-    slabs crumble in the pattern's end / cancel (they carry rlk_mb_fg_pat). Returns the clock by which the last slab
-    has landed. Tags rlk_mb_fg_p<pid>w (walker), p<pid>s (slab), p<pid>f (flying slab), p<pid>t<j> (throw locks)."""
-    W, S = f'rlk_mb_fg_p{pid}w', f'rlk_mb_fg_p{pid}s'
-    walker = f'@e[type=minecraft:marker,tag={W},limit=1]'
-    body = '@e[type=minecraft:husk,tag=rlk_mb_body,limit=1]'
-    tags = f'"rlk_room","rlk_mb_aux","rlk_mb_fg_pat","rlk_mb_fg_p{pid}"'
-    throw0 = throw0 if throw0 is not None else burst0 + 40
-    assert n_throw <= n_burst and throw0 >= burst0 + gap * (n_throw - 1) + 16, (throw0, burst0)
-    g.pw(key, 'walker', [
-        f'# The burst walker {W}: on the floor 6 b from the player toward the device, inside the walk disc.',
-        f'kill @e[type=minecraft:marker,tag={W}]',
-        f'execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ {CY} ~ {{Tags:[{tags},"{W}"]}}',
-        f'execute as {walker} at @s facing entity {body} feet rotated ~ 0 positioned ^ ^ ^6 run tp @s ~ ~ ~',
-        f'execute as {walker} run {g.clamp_walk()}'])
-    g.pw(key, 'burst', [
-        '# One floor burst at the walker (10 t telegraph, jumpable), its slab (hidden until the strike), then the',
-        '# walker steps 2.5 b toward the player (onto the player when closer).',
-        f'scoreboard players add #fq{pid}K mb 1',
-        g.hz_opts(kb=KB['heavy'], y1=1.2, vis=pid * 10 + 1),
-        f'execute at {walker} run {g.hz_disc(1.8, 10, dmg)}',
-        f'execute at {walker} run summon minecraft:item_display ~ ~0.45 ~ {{Tags:[{tags},"{S}","rlk_mb_fg_pnew"],'
-        'teleport_duration:15,brightness:{block:12,sky:15},item:{id:"minecraft:tuff",count:1},'
-        'transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f]}}',
-        'scoreboard players set @e[type=minecraft:item_display,tag=rlk_mb_fg_pnew] mbT -10',
-        f'scoreboard players operation @e[type=minecraft:item_display,tag=rlk_mb_fg_pnew] mbS = #fq{pid}K mb',
-        'tag @e[type=minecraft:item_display,tag=rlk_mb_fg_pnew] remove rlk_mb_fg_pnew',
-        f'execute as {walker} at @e[tag=rlk_body,limit=1] if entity @s[distance=..2.5] run return run tp @s ~ {CY} ~',
-        f'execute as {walker} at @s facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 positioned ^ ^ ^2.5 run tp @s ~ {CY} ~'])
-    g.pw(key, 'slabs', [
-        '# Every waiting slab of this pattern (from its tick): its own clock mbT; 0 = its burst struck: it rises 4 b.',
-        f'execute as @e[type=minecraft:item_display,tag={S}] at @s run function {NS}p/{key}/slab'])
-    g.pw(key, 'slab', [
-        'scoreboard players add @s mbT 1',
-        'execute if score @s mbT matches 0 run data merge entity @s {start_interpolation:0,interpolation_duration:12,'
-        'transformation:{translation:[0f,0f,0f],left_rotation:[0.08f,0.2f,0f,0.976f],right_rotation:[0f,0f,0f,1f],scale:[2.2f,0.9f,0.6f]}}',
-        'execute if score @s mbT matches 0 run tp @s ~ ~4 ~',
-        'execute if score @s mbT matches 0 run ' + g.particle('block{block_state:"minecraft:tuff"}', '~ ~ ~', (0.6, 0.2, 0.6), 0, 12),
-        'scoreboard players operation #fgM mb = @s mbT',
-        'scoreboard players operation #fgM mb %= #fgK4 mb',
-        'execute if score @s mbT matches 1.. if score #fgM mb matches 0 run ' + g.particle('falling_dust{block_state:"minecraft:tuff"}', '~ ~-0.3 ~', (0.5, 0.1, 0.5), 0, 1)])
-    g.pw(key, 'tl_line', [
-        '# @s = the slab about to be thrown: the throw line from its floor point toward the locked feet (dmg 0, 10 t).',
-        'function rlk:mboss/mv/dist',
-        'execute store result storage rlk:mboss fg.tl.len int 1 run scoreboard players get #mbDist mb',
-        'data modify storage rlk:mboss fg.tl merge value {w:24,tell:10,dmg:0}',
-        f'execute positioned ~ {CY} ~ facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p{pid}tl,limit=1] feet run function rlk:mboss/hz/line with storage rlk:mboss fg.tl'])
-    g.pw(key, 'throw_go', [
-        '# @s = the slab: a blade projectile at the locked feet (its own volley group).',
-        f'scoreboard players set @s mbId {pid}',
-        f'tag @s remove {S}',
-        f'tag @s add rlk_mb_fg_p{pid}f',
-        'data merge entity @s {teleport_duration:1}',
-        g.pj_opts(shape=1, kb=KB['default'], wall=1, grp=True),
-        f'execute at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_fg_p{pid}tl,limit=1] feet run {g.pj_launch(1.5, 24, dmg_s, c_blade_hr(1.45))}',
-        g.sound('entity.breeze.shoot', 0.9, 0.6), g.sound('block.tuff.break', 1.0, 0.7)])
-    for j in range(n_throw):
-        T = f'rlk_mb_fg_p{pid}t{j}'
-        g.pw(key, f'throw_tell{j}', [
-            f'# Throw {j + 1} tell (@s = body): lock the player\'s feet ({T}) and draw the line from slab {j + 1}.',
-            g.lockp(), g.keep(T),
-            f'tag @e[type=minecraft:marker,tag={T}] add rlk_mb_fg_p{pid}tl',
-            f'execute as @e[type=minecraft:item_display,tag={S},scores={{mbS={j + 1}}},limit=1] at @s run function {NS}p/{key}/tl_line',
-            f'tag @e[type=minecraft:marker,tag={T}] remove rlk_mb_fg_p{pid}tl'])
-        g.pw(key, f'throw{j}', [
-            f'# Throw {j + 1}: slab {j + 1} flies at lock {T}.',
-            g.GRP_NEW,
-            f'tag @e[type=minecraft:marker,tag={T}] add rlk_mb_fg_p{pid}tl',
-            f'execute as @e[type=minecraft:item_display,tag={S},scores={{mbS={j + 1}}},limit=1] run function {NS}p/{key}/throw_go',
-            f'kill @e[type=minecraft:marker,tag={T}]'])
-    g.pw(key, 'pj_end', [
-        '# A thrown slab ends (#pjEv 1 floor / wall, 2 life): it shatters. A hit (4) lets it fly on (default, harmless).',
-        'execute if score #pjEv mb matches 1..2 at @s run ' + g.particle('block{block_state:"minecraft:tuff"}', '~ ~ ~', (0.6, 0.3, 0.6), 0, 16),
-        'execute if score #pjEv mb matches 1..2 at @s run ' + g.sound('block.tuff.break', 1.2, 0.6),
-        'execute if score #pjEv mb matches 1..2 run scoreboard players set #pjKeep mb 0'])
-    tl.at(burst0 - 11, f'scoreboard players set #fq{pid}K mb 0', f'function {NS}p/{key}/walker')
-    for k in range(n_burst):
-        tl.at(burst0 + gap * k - 10, f'function {NS}p/{key}/burst')
-    for j in range(n_throw):
-        tl.at(throw0 + throw_gap * j - 10, f'function {NS}p/{key}/throw_tell{j}')
-        tl.at(throw0 + throw_gap * j, f'function {NS}p/{key}/throw{j}')
-    return throw0 + throw_gap * (n_throw - 1) + 26
-
-
+# The stage-1 stub helper rocks() (non-quiet bursts with a dmg-0 throw line + kit lane) was removed with the
+# telegraph rule (10-20): C6 uses c_rocks below, F2 its own code in field.py. rocks_cancel stays (field.py).
 def rocks_cancel(pid):
-    """Lines that remove everything rocks() made (cancel / end)."""
+    """Lines that remove a 파쇄 run's entities (tags rlk_mb_fg_p<pid>*: slabs, walker, locks) at its cancel / end."""
     return [f'kill @e[tag=rlk_mb_fg_p{pid}]', f'kill @e[type=minecraft:marker,tag=rlk_mb_fg_p{pid}w]']
 
 
 # =============================================================================================
 # [c_: cruise author] Shared helpers of the stage-2 cruise patterns (cruise.py, seq_c.py). Appended here, nothing
-# above is changed; field.py may use them too (c_rocks is the 파쇄 of C6 and of F2, c_redraw the decal redraw after a
-# pause). Scratchpad mb3/fg_contract.md section 16.
+# above is changed; field.py may use them too (c_rocks is the 파쇄 of C6). Scratchpad mb3/fg_contract.md section 16.
+# (c_redraw, the generic decal redraw after a pause, went with the telegraph rule 10-20: only C5 keeps a decal and
+# redraws it itself, cruise.burst.)
 
 def c_clip(clip, key, default=None):
     """An extra field of a rig clip in the manifest (the real rig's laser 'orbit', tower_throw / frock 'bursts' and
@@ -625,67 +543,36 @@ def c_blade_hr(reach):
     return max(0.1, math.floor((reach - c_blade_pad()) * 10 + 0.5 + 1e-9) / 10)
 
 
-def c_redraw(g, key, vis_lo, vis_hi, el=5, hold=3):
-    """The decal redraw after a pause (butterfly review FX-1: the core's pause hook clears every kit decal and the
-    quiet hazards keep running their tell without one). Writes p/<key>/redraw (any executor; call it on the first
-    pattern tick after a resume) and p/<key>/redraw1: each live quiet hazard of the pattern whose hz_vis id is in
-    vis_lo..vis_hi and that has not struck yet gets its kit decal again (disc, ring or line from the marker's own
-    sizes), with the ticks it has left as the tell, so the fill still reaches the rim on its strike tick. Returns the
-    function line."""
-    fn = f'function {NS}p/{key}/'
-    g.pw(key, 'redraw', [
-        f'# [c_redraw] After a pause (the core cleared every kit decal): each live quiet hazard of this pattern (hz_vis',
-        f'# {vis_lo}..{vis_hi}) that has not struck yet gets its decal again with the ticks it has left (review FX-1).',
-        f'execute as @e[type=minecraft:marker,tag=rlk_mb_hzq,scores={{mbHzV={vis_lo}..{vis_hi}}}] if score @s mbHzT < @s mbHzW '
-        f'at @s run {fn}redraw1'])
-    g.pw(key, 'redraw1', [
-        '# @s = a quiet hazard marker, at it. The ticks to its strike are mbHzW - mbHzT - 1 in the module tick (hz/all',
-        '# advances mbHzT after it); the sizes come from its scores (milliblocks -> tenths of a block).',
-        'scoreboard players operation #fgX mb = @s mbHzW',
-        'scoreboard players operation #fgX mb -= @s mbHzT',
-        'scoreboard players remove #fgX mb 1',
-        'execute if score #fgX mb matches ..0 run return 0',
-        'execute store result storage rlk:mboss fg.rd.tell int 1 run scoreboard players get #fgX mb',
-        'execute store result storage rlk:mboss fg.rd.r int 0.01 run scoreboard players get @s mbHzR',
-        'execute store result storage rlk:mboss fg.rd.len int 0.01 run scoreboard players get @s mbHzR',
-        'execute store result storage rlk:mboss fg.rd.r0 int 0.01 run scoreboard players get @s mbHzR0',
-        'execute store result storage rlk:mboss fg.rd.back int 0.01 run scoreboard players get @s mbHzR0',
-        'execute store result storage rlk:mboss fg.rd.w int 0.02 run scoreboard players get @s mbHzC',
-        f'data modify storage rlk:mboss fg.rd merge value {{el:{int(el)},hold:{int(hold)}}}',
-        f'execute if score @s mbHzK matches 1 rotated ~ 0 run function {K.FN}tele/disc with storage rlk:mboss fg.rd',
-        f'execute if score @s mbHzK matches 2 rotated ~ 0 run function {K.FN}tele/ring with storage rlk:mboss fg.rd',
-        f'execute if score @s mbHzK matches 4 rotated as @s rotated ~ 0 run function {K.FN}tele/line with storage rlk:mboss fg.rd'])
-    return f'{fn}redraw'
-
-
 C_ROCK_LIFT = (4.0, 5.0, 6.0, 4.5, 5.5, 4.0, 5.0, 6.0)     # how high each torn-out slab rises (b)
-C_ROCK_LINE_W = 2.4                                         # throw-line width: +-1.5 b with the pad, the blade reach
 
 
 def c_rocks(g, tl, key, pid, bursts, throws, dmg, dmg_s, el=5, pair=2, cap=2, reach=1.45, init_t=0,
             d_min=2.5, d_max=18.0):
     """파쇄 (C6 rock, F2 frock), spec C6 section 5 (Q7: the arc walker, the last bursts in one volley group, a cap on
-    slab hits), registered on the TL `tl` of pattern `key` (id pid), writing only p/<key>/rk_*, pj_end and the
-    redraw-able hazards:
+    slab hits), registered on the TL `tl` of pattern `key` (id pid), writing only p/<key>/rk_* and pj_end (`el`, the
+    decal palette, is unused since the telegraph rule 10-20 left the bursts and throws without a ground decal):
 
     - init_t: the sweep side sigma = +-1 (#fq<pid>S) is drawn and the slab-hit count #fq<pid>SH reset;
     - burst k strikes at bursts[k]: 10 t before, it is placed at the player's current distance D from the body
       (clamped d_min..d_max), at the bearing to the player turned by sigma * 90 (n - 1 - k) / (n - 1) degrees (the
       sweep crosses the device's front and ends on the player's feet), pulled into the walk disc; hz/disc r 1.8,
-      tell 10, feet up to 1.2 b (a jump can clear it), heavy KB, coefficient dmg, quiet + silent, hz_vis pid*10+1, a
-      kit tele_disc of palette el; the last `pair` bursts share one volley group (all made before its first strike);
-      a slab (kit prop slab, hidden) waits at the point and tears out 2 t after the strike (C_ROCK_LIFT b up, 12 t);
+      tell 10, feet up to 1.2 b (a jump can clear it), heavy KB, coefficient dmg, quiet + silent, hz_vis pid*10+1, no
+      ground decal (telegraph rule 10-20: the footage's bursts erupt from clean floor; the read is the chain walking
+      onto the player and the positional resonate sound); the last `pair` bursts share one volley group (all made
+      before its first strike); a slab (kit prop slab, hidden) waits at the point and tears out 2 t after the strike
+      (C_ROCK_LIFT b up, 12 t);
     - throw j (slab j + 1) at throws[j]: 10 t before, the player's feet are locked (lockp, kept rlk_mb_fg_p<pid>t<j>)
-      and a dmg-0 throw line (hz/line w 2.4, hz_vis pid*10+2) + kit tele_line runs from the slab's floor point to
-      them; at the throw a blade pj (1.5 b/t, life 24, half width c_blade_hr(reach): total reach `reach`, its own
-      volley group, KB 3, coefficient dmg_s) flies at the lock; pj_end shatters it on the floor (ev 1 / 2) and counts
-      an undodged hit (ev 4) in #fq<pid>SH: once `cap` slabs have hit, every later throw crumbles instead (the tell
-      and the launch both check);
+      and the slab itself flares (kit p/slab_glint) with a chain clink: no lane on the floor (telegraph rule 10-20;
+      the footage's slabs are flung with streaks only); at the throw a blade pj (1.5 b/t, life 24, half width
+      c_blade_hr(reach): total reach `reach`, its own volley group, KB 3, coefficient dmg_s) flies at the lock;
+      pj_end shatters it on the floor (ev 1 / 2) and counts an undodged hit (ev 4) in #fq<pid>SH: once `cap` slabs
+      have hit, every later throw crumbles instead (the tell and the launch both check);
     - tags rlk_mb_fg_p<pid> + w (walker), s (waiting slab, mbS = its burst 1..n), f (flying), t<j> / tl (locks).
 
     Returns a dict: 'tick' (lines for the pattern's extra_tick: the slab ager and the flying trail), 'vis' (lines for
     the pattern's vis function: the burst fx on #hzEv 1), 'crumble' (the function line that shatters every slab still
-    waiting), 'cancel' (lines that remove everything), 'done' (the clock by which the last slab has landed)."""
+    waiting), 'cancel' (lines that remove everything), 'done' (the clock by which the last slab has landed), 'hr' (the
+    blade half width), 'vis_ids' ((the bursts' hz_vis id,))."""
     n, m = len(bursts), len(throws)
     assert 2 <= n <= len(C_ROCK_LIFT) and 1 <= m <= n and 1 <= pair <= n, (n, m, pair)
     assert all(b - 10 > init_t for b in bursts) and all(t - 10 > init_t for t in throws), (bursts, throws)
@@ -700,7 +587,7 @@ def c_rocks(g, tl, key, pid, bursts, throws, dmg, dmg_s, el=5, pair=2, cap=2, re
     tags = f'"rlk_room","rlk_mb_aux","rlk_mb_fg_pat","{base}"'
     slab = lambda j: f'@e[type=minecraft:item_display,tag={S},scores={{mbS={j + 1}}},limit=1]'   # noqa: E731
     hr = c_blade_hr(reach)
-    v_burst, v_line = pid * 10 + 1, pid * 10 + 2
+    v_burst = pid * 10 + 1
     hidden = 'transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f]}'
     g.pw(key, 'rk_place', [
         '# [c_rocks] Macro {a, d} (@s = body, at it): the burst point d b from the body at the bearing to the player turned',
@@ -725,7 +612,6 @@ def c_rocks(g, tl, key, pid, bursts, throws, dmg, dmg_s, el=5, pair=2, cap=2, re
             lines.append(Gen.GRP_NEW)
         lines += L.hz_opts(kb=KB['heavy'], y1=1.2, vis=v_burst, quiet=1, sfx=0, grp=grp)
         lines += [f'execute at {walker} run {L.hz_disc(1.8, 10, dmg)}',
-                  f'execute at {walker} rotated ~ 0 run {K.tele_disc(1.8, 10, el)}',
                   f'execute at {walker} run {L.sound("block.amethyst_block.resonate", 0.3, 1.4)}',
                   f'execute at {walker} run summon minecraft:item_display ~ ~0.45 ~ {{Tags:[{tags},"{S}","rlk_mb_fg_pnew"],'
                   f'teleport_duration:12,brightness:{{block:15,sky:15}},{hidden}}}',
@@ -745,7 +631,7 @@ def c_rocks(g, tl, key, pid, bursts, throws, dmg, dmg_s, el=5, pair=2, cap=2, re
     rise += [f'execute if score @s mbS matches {k + 1} run tp @s ~ ~{L.num(C_ROCK_LIFT[k])} ~' for k in range(n)]
     g.pw(key, 'rk_rise', rise)
     g.pw(key, 'rk_slab', [
-        '# [c_rocks] @s = a waiting slab, at it: its clock mbT (-10 at the decal, 0 at the burst); it rises at 2, then',
+        '# [c_rocks] @s = a waiting slab, at it: its clock mbT (-10 when its burst is placed, 0 at the burst); it rises at 2, then',
         '# drips tuff dust every 4 t while it hovers.',
         'scoreboard players add @s mbT 1',
         f'execute if score @s mbT matches 2 run return run {fn("rk_rise")}',
@@ -758,17 +644,10 @@ def c_rocks(g, tl, key, pid, bursts, throws, dmg, dmg_s, el=5, pair=2, cap=2, re
     g.pw(key, 'rk_crumble', ['# [c_rocks] Every slab still waiting crumbles.',
                              f'execute as @e[type=minecraft:item_display,tag={S}] at @s run {fn("rk_shatter")}'])
     g.pw(key, 'rk_tl', [
-        '# [c_rocks] @s = the slab about to be thrown, at it: the dmg-0 throw line from its floor point toward the locked',
-        f'# feet ({TLT}), 1 b past them, w {L.num(C_ROCK_LINE_W)} (the blade reach), 10 t; the kit lane on it.',
-        'function rlk:mboss/mv/dist',
-        'scoreboard players add #mbDist mb 10',
-        'execute store result storage rlk:mboss fg.tl.len int 1 run scoreboard players get #mbDist mb',
-        f'data modify storage rlk:mboss fg.tl merge value {{w:{int(round(C_ROCK_LINE_W * 10))},tell:10,dmg:0,back:0,el:{int(el)},hold:3}}',
-        *L.hz_opts(quiet=1, sfx=0, vis=v_line),
-        f'execute positioned ~ {CY} ~ facing entity @e[type=minecraft:marker,tag={TLT},limit=1] feet rotated ~ 0 run '
-        'function rlk:mboss/hz/line with storage rlk:mboss fg.tl',
-        f'execute positioned ~ {CY} ~ facing entity @e[type=minecraft:marker,tag={TLT},limit=1] feet rotated ~ 0 run '
-        f'function {K.FN}tele/line with storage rlk:mboss fg.tl',
+        '# [c_rocks] @s = the slab about to be thrown, at it (its throw in 10 t): it flares on itself (kit p/slab_glint)',
+        '# with a chain clink. No lane or line on the floor (telegraph rule 10-20: the footage\'s slabs are flung with',
+        '# streaks only); the read is the glowing slab, this flare and the throw\'s streaks.',
+        K.fx('slab_glint'),
         L.sound('block.chain.hit', 0.5, 0.8)])
     g.pw(key, 'rk_go', [
         f'# [c_rocks] @s = the slab: a blade projectile at the locked feet ({TLT}), 1.5 b/t, life 24, half width {L.num(hr)}',
@@ -784,13 +663,11 @@ def c_rocks(g, tl, key, pid, bursts, throws, dmg, dmg_s, el=5, pair=2, cap=2, re
         T = f'{base}t{j}'
         g.pw(key, f'rk_tt{j}', [
             f'# [c_rocks] Throw {j + 1}/{m} tell (@s = body; the throw in 10 t): unless {cap} slabs have hit already, lock the',
-            f'# player\'s feet ({T}) and draw the line from slab {j + 1}.',
+            f'# player\'s feet ({T}); slab {j + 1} flares.',
             f'execute if score #fq{pid}SH mb matches {cap}.. run return run execute as {slab(j)} at @s run {fn("rk_shatter")}',
             f'execute unless entity {slab(j)} run return 0',
             Gen.lockp(), *Gen.keep(T),
-            f'tag @e[type=minecraft:marker,tag={T}] add {TLT}',
-            f'execute as {slab(j)} at @s run {fn("rk_tl")}',
-            f'tag @e[type=minecraft:marker,tag={T}] remove {TLT}'])
+            f'execute as {slab(j)} at @s run {fn("rk_tl")}'])
         g.pw(key, f'rk_th{j}', [
             f'# [c_rocks] Throw {j + 1}/{m} (@s = body): slab {j + 1} flies at {T} (unless the cap was reached: it crumbles).',
             f'execute if score #fq{pid}SH mb matches {cap}.. run return run execute as {slab(j)} at @s run {fn("rk_shatter")}',
@@ -819,7 +696,7 @@ def c_rocks(g, tl, key, pid, bursts, throws, dmg, dmg_s, el=5, pair=2, cap=2, re
     cancel = [f'kill @e[tag={base}]', f'kill @e[type=minecraft:marker,tag={W}]'] + \
              [f'kill @e[type=minecraft:marker,tag={base}t{j}]' for j in range(m)]
     return {'tick': tick, 'vis': vis, 'crumble': fn('rk_crumble'), 'cancel': cancel, 'done': throws[-1] + 26,
-            'hr': hr, 'vis_ids': (v_burst, v_line)}
+            'hr': hr, 'vis_ids': (v_burst,)}
 
 
 # =============================================================================================
