@@ -83,7 +83,10 @@ def build():
     for rel in A.AFTER:
         assert g.has(rel), f'after() target {rel} was not written'
     core.stubs()
-    SR.emit(g, A.MAN)
+    SR.emit(g, A.MAN, functions=A.stub_rig_needed())
+    if A.REAL_RIG and A.KIT:
+        # I1 (plan 7.5 step 3): with the real rig and the kit merged, the real az_cavern theme must be in use too
+        assert not A.THEME_STUBBED, 'I1: the az_cavern theme module is missing (api._THEME_FALLBACK in use)'
     removed = clean(out)
     pxs = px_target_stubs()
     normal = [p for p in pats if p.kind == 'normal']
@@ -110,6 +113,10 @@ def build():
         print('  note: ' + n)
     for clip, event, default in sorted(set(A.EV_FALLBACKS)):
         print(f'  note: manifest clip {clip} has no event {event!r}; using tick {default}')
+    if A.REAL_RIG:
+        fb = A.fallback_list()
+        print(f'  fallbacks (real rig lacks): clips {fb["clips"] or "none"}; events {[e[:2] for e in fb["events"]] or "none"}; '
+              f'rig functions {fb["rig_functions"] or "none"}; stand-in rig_stub/ {"written" if A.stub_rig_needed() else "not written"}')
 
 
 PX_MARK = '# LOCAL STUB (S1-MOD, tools/mboss_azhdaha/core.py)'

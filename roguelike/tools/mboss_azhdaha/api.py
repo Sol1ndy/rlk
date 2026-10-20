@@ -195,10 +195,22 @@ def play_fn(clip):
 
 
 def rig_tick_lines():
-    """The rig tick of the module tick (last): the real rig's tick + the stub chain (fallback clips), or the stub's."""
+    """The rig tick of the module tick (last): the real rig's tick (+ the stub chain while some clip still comes from
+    the stub manifest, FALLBACKS), or the stub's."""
     if REAL_RIG:
-        return [f'function {NS}rig/tick', f'function {NS}rig_stub/chain']
+        return [f'function {NS}rig/tick'] + ([f'function {NS}rig_stub/chain'] if FALLBACKS else [])
     return [f'function {NS}rig_stub/tick']
+
+
+def stub_rig_needed():
+    """I1-WIRE: the stand-in rig AZ:rig_stub/** is written only while something still needs it (no real rig, a clip
+    from the stub manifest, or a rig API function the real rig lacks). Valid after the emit (RIG_STUBBED fills there)."""
+    return (not REAL_RIG) or bool(FALLBACKS) or bool(RIG_STUBBED)
+
+
+def fallback_list():
+    """What the real rig manifest v1 / rig still lacks (plan 7.3 I1-WIRE; the I2b build asserts it is empty)."""
+    return {'clips': sorted(FALLBACKS), 'events': sorted(set(EV_FALLBACKS)), 'rig_functions': sorted(RIG_STUBBED)}
 
 
 def ev(clip, event):
@@ -336,7 +348,8 @@ B3_PILLAR = 66
 B3_TAILSINK = 335
 B3_GONE = 353
 B3_MOUND = (353, 380)
-B3_EMERGE_DECAL = 360
+B3_EMERGE_HZ = 360         # the emergence burst hazard is made here (internal tell 28); NO decal (Change note 1:
+                           # B3_EMERGE_DECAL is retired, the dust mound of B3_MOUND is the readable tell)
 B3_EMERGE = 380
 B3_BURST = 388
 B3_OUT = 418
@@ -964,13 +977,19 @@ class Gen:
 
     # -- N10 fronts
     def wave(self, tl, strike, r0, r1, spd, band, tell, dmg, nd=0, el='ground', grp='new', low=0.7, ease=None, wid=0,
-             tag=None, kb=None):
-        """N10 on the TL `tl`: at strike - tell a hz/ring {r0:0, r:r0} (the slam disc) + the kit tele/wave {id:wid};
+             tag=None, kb=None, tele='none'):
+        """N10 on the TL `tl`: at strike - tell a hz/ring {r0:0, r:r0} (the slam disc, quiet: no framework outline);
         from the strike the front grows each tick (r = r0 + spd k, or the ease knots [(dt, r), ...] linearly) with the
         hazard's inner edge band behind it (hz/resize every tick), the kit front preset 1 t before the strike. Asserts
         band >= the per-tick advance (plan rule 5). grp 'new' (its own volley group), 'ctx' (#azCtxGrp: addon bodies),
-        'cur' (the current #mbGrp) or None. Returns the last front tick."""
+        'cur' (the current #mbGrp) or None. Returns the last front tick.
+        tele (plan Change note 1, the 10-20 telegraph rule): 'none' (default; every N10 front of plan 5 is a *none* row:
+        P2, P5, P5b, T1, the Cryo rings) draws no pre-strike decal: the kit tele/wave {id:wid} ring is called 1 t before
+        the strike with tell 1 and nd 0, so only the travelling front (the hazard's own visual) shows; 'keep' = the old pairing
+        (the tele/wave fill from strike - tell). `tell` stays the hazard's internal tell (N7 #mbDodgeOk, the brand's
+        perfect dodge); the readable tell of a *none* row is its clip pose / sound (TABLE tell_src)."""
         assert tell >= 12, tell
+        assert tele in ('none', 'keep'), tele
         radii = []
         if ease:
             pts = [(0, r0)] + [(int(dt), float(r)) for dt, r in ease]
@@ -1001,11 +1020,15 @@ class Gen:
             lines.append('scoreboard players operation #hzGrp mb = #azCtxGrp mb')
         lines += (self.el_ground() if el == 'ground' else self.el_tail() if el == 'tail' else self.el(el))
         lines += [L.hz_ring(0, r0, tell, dmg), self.tag_last_hz(tag)]
-        lines += self.ktele('wave', el, id=wid, r0=r0, r1=r1, w=band, tell=tell, dur=n, nd=(2 if nd and low else nd),
-                            hold=3)
+        # 'none': the plain ring (nd 0: the shared undodgeable look lost its users, Change note 1 on plan rule 6)
+        ring = self.ktele('wave', el, id=wid, r0=r0, r1=r1, w=band, tell=(tell if tele == 'keep' else 1), dur=n,
+                          nd=((2 if nd and low else nd) if tele == 'keep' else 0), hold=3)
+        if tele == 'keep':
+            lines += ring
         tl.at(made, *lines)
         if strike - 1 >= made:
-            tl.at(strike - 1, *_flat([self.fxe('front', el, r0=int(r0 * 10), r1=int(r1 * 10), w=int(band * 10), dur=n)]))
+            tl.at(strike - 1, *(([] if tele == 'keep' else ring)
+                                + _flat([self.fxe('front', el, r0=int(r0 * 10), r1=int(r1 * 10), w=int(band * 10), dur=n)])))
         for k, r in enumerate(radii, 1):
             tl.at(strike + k, f'execute as @e[type=minecraft:marker,tag={tag}] run '
                               f'{L.hz_resize(r, max(0.0, r - band))}')

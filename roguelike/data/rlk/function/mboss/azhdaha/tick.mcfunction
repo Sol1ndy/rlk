@@ -26,6 +26,5 @@ function rlk:mboss/azhdaha/hud/tick
 execute if score #azQ4 mb matches 0 run function rlk:mboss/azhdaha/arena/tick
 execute if score #azYawC mb matches 1.. run function rlk:mboss/azhdaha/yaw/tick
 function rlk:mboss/azhdaha/rig/tick
-function rlk:mboss/azhdaha/rig_stub/chain
 scoreboard players set #azNoPush mb 0
 scoreboard players set #azNoTurn mb 0

@@ -124,23 +124,29 @@ REST_ANCHORS = {
     'foot_hl': (2.5, 0.0, -2.55), 'foot_hr': (-2.5, 0.0, -2.55), 'back': (0.0, 4.0, -0.2),
 }
 TORSO_HW = 3.0
-# proxies.layout (manifest.md 6.1): name, R1 part, R1 bone-local point (rig frame), w, top margin, flash, tail_only,
-# rest [x, z, top] (local)
+# proxies.layout (manifest.md 6.1): name, R1 part, bone-local point (rig frame; the R3a rig's points since I1), w, top
+# margin, flash, tail_only, rest [x, z, top] (local; the pinned contract columns = proxies.rest of the real rig)
 PROXY_LAYOUT = [
-    ('head', 'head', [0, -0.6, -1], 2.8, 1.6, 'head', False, [0.0, 4.3, 3.05]),
+    ('head', 'head', [0, -0.6, -0.6], 2.8, 1.6, 'head', False, [0.0, 4.3, 3.05]),
     ('chest', 'chest', [0, 0, -0.4], 4.6, 1.5, 'front', False, [0.0, 2.1, 4.85]),
     ('belly', 'belly', [0, 0, 0.2], 4.6, 1.5, 'rear', False, [0.0, -0.5, 4.85]),
     ('hips', 'pelvis', [0, 0, 1], 4.4, 1.2, 'rear', False, [0.0, -3.4, 4.2]),
-    ('tail1', 't1', [0, 0, 1.6], 2.6, 1.2, 'tail', True, [0.0, -6.35, 3.94]),
+    ('tail1', 't1', [0, 0, 1.2], 2.6, 1.2, 'tail', True, [0.0, -6.35, 3.94]),
     ('tail2', 't3', [0, 0, 1], 2.2, 1.0, 'tail', True, [0.0, -10.12, 3.9]),
     ('tail3', 't5', [0, 0, 0.9], 1.8, 0.9, 'tail', True, [0.0, -12.86, 5.81]),
-    ('tail4', 't7', [0, 0, 1], 1.4, 0.8, 'tail', True, [0.0, -11.9, 8.51]),
-    ('paw_l', 'paw_l', [0, -0.3, -0.5], 1.8, 2.6, 'front', False, [3.15, 2.95, 2.8]),
-    ('paw_r', 'paw_r', [0, -0.3, -0.5], 1.8, 2.6, 'front', False, [-3.15, 2.95, 2.8]),
-    ('foot_l', 'foot_l', [0, -0.4, -0.5], 1.8, 2.6, 'rear', False, [2.5, -2.55, 2.92]),
-    ('foot_r', 'foot_r', [0, -0.4, -0.5], 1.8, 2.6, 'rear', False, [-2.5, -2.55, 2.92]),
+    ('tail4', 't7', [0, 0, 1.5], 1.4, 0.8, 'tail', True, [0.0, -11.9, 8.51]),
+    ('paw_l', 'paw_l', [0, -0.3, -0.55], 1.8, 2.6, 'front', False, [3.15, 2.95, 2.8]),
+    ('paw_r', 'paw_r', [0, -0.3, -0.55], 1.8, 2.6, 'front', False, [-3.15, 2.95, 2.8]),
+    ('foot_l', 'foot_l', [0, -1.18, -0.35], 1.8, 2.6, 'rear', False, [2.5, -2.55, 2.92]),
+    ('foot_r', 'foot_r', [0, -1.18, -0.35], 1.8, 2.6, 'rear', False, [-2.5, -2.55, 2.92]),
 ]
 PROXIES = [p[0] for p in PROXY_LAYOUT]
+# proxies.rest_pose (manifest.md 6.1, I1): the R3a idle columns [x, z, top] (the tail is curled up over the back in idle;
+# the body columns equal `rest`). The stub keeps `rest` for its own px keys; the real rig's per-clip px rule the runtime.
+REST_POSE = {'head': [0.0, 4.3, 3.05], 'chest': [0.0, 2.1, 4.85], 'belly': [0.0, -0.5, 4.85], 'hips': [0.0, -3.4, 4.2],
+             'tail1': [0.0, -5.863, 4.5], 'tail2': [0.0, -8.59, 7.209], 'tail3': [0.0, -7.898, 10.434],
+             'tail4': [0.0, -4.458, 11.736], 'paw_l': [3.15, 2.95, 2.8], 'paw_r': [-3.15, 2.95, 2.8],
+             'foot_l': [2.5, -2.55, 2.92], 'foot_r': [-2.5, -2.55, 2.92]}
 TAIL_PX = ('tail1', 'tail2', 'tail3', 'tail4')
 BODY_PX = tuple(p for p in PROXIES if p not in TAIL_PX)
 PILLAR_TOPS = {'tail1': 2.8, 'tail2': 4.8, 'tail3': 6.8, 'tail4': 8.8}    # tail-only: stacked at the anchor
@@ -451,7 +457,7 @@ def _globals(ns):
         'skeleton': copy.deepcopy(SKELETON),
         'rest_anchors': {k: _pt(v) for k, v in REST_ANCHORS.items()},
         'torso_hw': TORSO_HW,
-        'proxies': {'layout': layout, 'rest': _rest_key()},
+        'proxies': {'layout': layout, 'rest': _rest_key(), 'rest_pose': copy.deepcopy(REST_POSE)},
         'states': copy.deepcopy(STATES),
         'capsules': copy.deepcopy(CAPSULES),
         'flash_groups': copy.deepcopy(FLASH_GROUPS),
@@ -580,12 +586,15 @@ def _sel(name):
     return f'@e[type=minecraft:item_display,tag=rlk_mb_az_{name},tag={TAG},limit=1]'
 
 
-def emit(g, merged=None):
+def emit(g, merged=None, functions=True):
     """Write the stub manifest JSON and F:mboss/azhdaha/rig_stub/**. g = api.Gen; merged = api.MAN (for the clip ids
-    of the stub clips the module uses: their ids are the merged table's)."""
+    of the stub clips the module uses: their ids are the merged table's). functions=False (I1-WIRE: the real rig serves
+    every clip and function, api.stub_rig_needed()): only the JSON, no rig_stub/** (the module's clean removes it)."""
     from . import api as A
     sm = stub_manifest()
     A.STUB_MANIFEST.write_text(dumps(sm), encoding='utf-8')
+    if not functions:
+        return
     man = merged or A.MAN
     ids = {c['name']: c['id'] for c in man['clips']}
     stub_clips = [c for c in man['clips'] if c['id'] >= STUB_ID0]

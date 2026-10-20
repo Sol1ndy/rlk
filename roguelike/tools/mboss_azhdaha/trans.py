@@ -66,9 +66,8 @@ def slide(g):
           f'execute if score #aq20W mb matches 1 run {g.play("walk")}',
           f'execute unless score #aq20W mb matches 1 run {g.play("idle")}',
           'scoreboard players set #mbNoLeash mb 1',
-          # persistent rims: r 18 (waves 1-5) bright, the wall (wave 6 reaches everywhere) dim
-          A.K.tele_ring(17.6, 18.0, SLIDE_END - 5, 5, nd=2, hold=3),
-          A.K.tele_ring(A.WALK - 0.6, A.WALK, SLIDE_END - 5, 5, nd=2, hold=3),
+          # no rim rings (plan Change note 1: T1 is a *none* row; the banner, the typed lines, the cue and the lift
+          # poses are the tell)
           A.K.snd('slide_lift'))
     tl.at(30, f'execute if score #aq20W mb matches 1 run {g.play("walk_stop")}')
     tl.span(0, SLIDE_LEAD + 45, 'scoreboard players set #azNoPush mb 1', g.face('track'))
@@ -87,7 +86,7 @@ def slide(g):
     tl.at(SLIDE_EV['rear'], g.line(LINES_T1['rear']))
     tl.at(SLIDE_END, 'scoreboard players set #mbNoLeash mb 0', g.end())
     tl.write(['# 20 파멸의 산사태 (WORKING STUB, S1-MOD): t0 the walk to <= 2 b of the centre (30 t), the clip at '
-              f'{SLIDE_LEAD}; fronts at {WAVES} and wave 6 at {WAVE6} (nododge, low 0.7, outlines 20 t); end {SLIDE_END}.'],
+              f'{SLIDE_LEAD}; fronts at {WAVES} and wave 6 at {WAVE6} (nododge, low 0.7, internal tell 20, no pre-strike decal: Change note 1); end {SLIDE_END}.'],
              [f'# {key} tick (#azPT).'])
     g.pw(key, 'cue', ['# The jump cue: "점프!" on the sub-line 12 t + a bell (plan 5 T1 tells).',
                       'scoreboard players set #azCue mb 12', A.K.hud('cue_jump'), A.K.snd('jump_cue'),
@@ -149,7 +148,7 @@ def burrow3(g):
     tl.at(B.B3_GLIDE[0], f'execute at {ARENA_M} run function rlk:mboss/mv/glide {{t:{B.B3_GLIDE[1] - B.B3_GLIDE[0]}}}')
     tl.at(B.B3_TAILUP, g.px('tail_only'), 'scoreboard players set #azBur mb 1', g.b3_special('start'), A.K.snd('b3_rise'))
     tl.at(B.B3_TAILSINK, g.play('tail_pillar_sink'), g.px('inv'))
-    tl.at(B.B3_EMERGE_DECAL, f'execute at {ARENA_M} run function {NS}p/{key}/emerge')
+    tl.at(B.B3_EMERGE_HZ, f'execute at {ARENA_M} run function {NS}p/{key}/emerge')
     tl.at(B.B3_EMERGE, g.play('burrow_emerge'))
     tl.at(B.B3_BURST, g.b3_special('stop'), f'{centre}{A.K.fx("emerge_spikes", r=52)}', A.K.snd('b3_emerge'))
     # the surfacing ends the transition (tr/done: #azTr 0, the FLANK skip, the cooldown): the fight is on again for the
@@ -159,17 +158,17 @@ def burrow3(g):
     tl.at(B.B3_END, 'scoreboard players set #mbNoLeash mb 0', g.end())
     tl.write([f'# 23 the B3 frame (WORKING STUB, S1-MOD; s2.md 7): #azB3T = #azPT; dig, inv {B.B3_INV}, the hidden glide to the',
               f'# centre {B.B3_GLIDE}, tail-up {B.B3_TAILUP} (tail_only, #azBur 1, the special starts), sink {B.B3_TAILSINK}, emergence',
-              f'# decal {B.B3_EMERGE_DECAL}, burst {B.B3_BURST} (the special stops), out {B.B3_OUT} (normal, floor 0), end {B.B3_END}.'],
+              f'# hazard {B.B3_EMERGE_HZ} (no decal), burst {B.B3_BURST} (the special stops), out {B.B3_OUT} (normal, floor 0), end {B.B3_END}.'],
              [f'# {key} tick: the B3 clock, the special\'s tick in the tail window.',
               'scoreboard players operation #azB3T mb = #azPT mb',
               'scoreboard players set #azNoPush mb 1',
               f'execute if score #azPT mb matches {B.B3_TAILUP + 1}..{B.B3_BURST - 1} run {g.b3_special("tick")}'],
              extra_tick=())
-    g.pw(key, 'emerge', [f'# The emergence decal and burst at the centre: disc r 5.2, tell {B.B3_BURST - B.B3_EMERGE_DECAL},',
+    g.pw(key, 'emerge', [f'# The emergence burst at the centre: disc r 5.2, internal tell {B.B3_BURST - B.B3_EMERGE_HZ}, no decal',
+                         '# (plan Change note 1: the dust mound of B3_MOUND is the tell),',
                          '# the leg element + brand, dodgeable (step away from the surfacing spot).',
                          g.GRP_NEW] + g.hz_opts(grp=True, kb=A.KB['heavy']) + g.el_ground()
-         + [L.hz_disc(5.2, B.B3_BURST - B.B3_EMERGE_DECAL, A.DMG['b3_emerge']), g.tag_last_hz('rlk_mb_az_p23e')]
-         + g.ktele('disc', 'ground', r=5.2, tell=B.B3_BURST - B.B3_EMERGE_DECAL, nd=0, hold=4))
+         + [L.hz_disc(5.2, B.B3_BURST - B.B3_EMERGE_HZ, A.DMG['b3_emerge']), g.tag_last_hz('rlk_mb_az_p23e')])
     g.pw(key, 'last', ['# HP 1 at the surfacing: "마지막 일격!" (the next hit kills through the normal path).',
                        'scoreboard players set #azLastHit mb 1', 'scoreboard players set #azHudQ mb 1', g.glow(True)])
     g.pw(key, 'cancel', ['# The special is cancelled, the burrow state ends (selectors only).', g.b3_special('cancel'),
@@ -193,7 +192,7 @@ def burrow3(g):
          f'execute if score #azPT mb matches {B.B3_TAILUP}..{B.B3_OUT - 1} run scoreboard players set #azBur mb 1',
          f'execute if score #azPT mb matches {B.B3_TAILUP}..{B.B3_BURST - 1} if score #azB3Sp mb matches 1.. run {g.b3_special("reload")}',
          f'execute if score #azPT mb matches {B.B3_TAILUP}..{B.B3_BURST - 1} unless score #azB3Sp mb matches 1.. run {g.b3_special("start")}',
-         f'execute if score #azPT mb matches {B.B3_EMERGE_DECAL}..{B.B3_BURST - 1} at {ARENA_M} run function {NS}p/{key}/emerge']
+         f'execute if score #azPT mb matches {B.B3_EMERGE_HZ}..{B.B3_BURST - 1} at {ARENA_M} run function {NS}p/{key}/emerge']
     g.pw(key, 'reload', r)
 
 
