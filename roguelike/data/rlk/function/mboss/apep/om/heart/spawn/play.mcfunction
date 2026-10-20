@@ -5,6 +5,10 @@ summon minecraft:item_display ~ ~ ~ {UUID:[I;1380731725,1095780352,-2147483648,0
 rotate 524c4b4d-4150-4800-8000-000000000000 ~ 0
 scoreboard players set 524c4b4d-4150-4800-8000-000000000000 apOI -1
 scoreboard players set 524c4b4d-4150-4800-8000-000000000000 apOC 0
+summon minecraft:item_display ~ ~ ~ {UUID:[I;1380731725,1095780352,-2147483648,9],Tags:["rlk_room","rlk_mb_aux","rlk_ap_om","rlk_ap_om_obj","rlk_mb_ap_heart_bulb_x"],billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:2,view_range:3f,width:9f,height:30f,shadow_radius:0f,brightness:{block:15,sky:15},transformation:{translation:[0f,1.6f,0f],left_rotation:[0f,-0.38268f,0f,0.92388f],scale:[1.2f,1.2f,1.2f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/apep_om/heart_bulb_x_idle"}}}
+rotate 524c4b4d-4150-4800-8000-000000000009 ~ 0
+scoreboard players set 524c4b4d-4150-4800-8000-000000000009 apOI -1
+scoreboard players set 524c4b4d-4150-4800-8000-000000000009 apOC 0
 summon minecraft:item_display ~ ~ ~ {UUID:[I;1380731725,1095780352,-2147483648,1],Tags:["rlk_room","rlk_mb_aux","rlk_ap_om","rlk_ap_om_obj","rlk_mb_ap_heart_cradle"],billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:2,view_range:3f,width:9f,height:30f,shadow_radius:0f,brightness:{block:14,sky:15},transformation:{translation:[0f,0.9f,0f],left_rotation:[0f,0f,0f,1f],scale:[2.2f,2.2f,2.2f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:mboss/apep_om/heart_cradle_full"}}}
 rotate 524c4b4d-4150-4800-8000-000000000001 ~ 0
 scoreboard players set 524c4b4d-4150-4800-8000-000000000001 apOI -1

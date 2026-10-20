@@ -38,6 +38,7 @@ export const PAL = {
   root: ramp(['#8A7C48', '#6A5E36', '#52482A', '#3E3720', '#2D2817', '#1D1A0F']),         // heart_root
   tip: ramp(['#FFFCC4', '#FBEF6C', '#E9DB58', '#D8CA4E', '#B8AD44', '#8C8432']),          // heart_tip
   vine: ramp(['#5E6E44', '#475634', '#364428', '#28321D', '#1B2214', '#10150C']),
+  vineL: ramp(['#D2E0A6', '#ADC283', '#88A062', '#667E48', '#485E34', '#2E3E22']),     // the vine hand (v2 f2200)
   stalk: ramp(['#ECEEE6', '#D6D9CF', '#BDC2B4', '#9FA698', '#7E867A', '#5C6458']),        // p3_pale
   dome: ramp(['#F6FFDA', '#E2F8AA', '#C4EC7A', '#A0D656', '#7CB63C', '#5A902A']),
   gold: ramp(['#FFF6C2', '#F9E48A', '#EDCB5A', '#D6AC3C', '#B08A2C', '#7C601E']),
@@ -259,13 +260,6 @@ function shellPx(u, v) {     // 파괴: dark armour plates with pale grey bands 
   if (Math.min(fy, 1 - fy) < .06) c = sink(c, .3);
   return c;
 }
-function rootPx(u, v) {      // Heart roots: knobbly dark bark with long grain and pale knots
-  const g = N.c(u * 5, v * 18), k = N.d(u * 14, v * 14);
-  let c = PAL.root(.42 + .3 * (g - .5) + .12 * (N.a(u * 30, v * 3) - .5));
-  if (Math.abs(g - .5) < .025) c = sink(c, .45);
-  if (k > .72) c = mix(c, PAL.root(.12), .55 * smooth(.72, .85, k));
-  return c;
-}
 function stalkPx(u, v) {     // summoned stalk: pale grey shell with dark branching veins
   let c = PAL.stalk(.22 + .12 * (N.b(u * 6, v * 6) - .5) + .1 * v);
   const vein = Math.abs(N.e(u * 5 + v * 1.5, v * 7) - .5);
@@ -448,20 +442,42 @@ shapeSprite('pr_petal', SH.p_petal, 40, 'pred', (u, v) => { let c = shadeShape(S
 add('pr_face', 32, 32, (s, t) => { let c = PAL.fin(.22 + .28 * t + .06 * (N.a(s * 5, t * 5) - .5)); const w = Math.abs(Math.sin(s * Math.PI * 8 + Math.sin(t * 6))); if (w < .1) c = mix(c, PAL.fin(.6), .35); return c; }, 'pred');
 
 // the Heart of the Oasis (40 k): the bulb is painted as grey values and tinted per look (idle / egg / withered / blaze)
-add('he_bulb', 128, 64, (s, t) => {
-  const rib = Math.pow(Math.abs(Math.cos(s * Math.PI * 6)), 6);                     // 6 soft vertical ribs
-  const spec = smooth(.16, .02, Math.hypot((s - .32) * 2.4, (t - .28) * 1.3));        // the big specular band, upper left
-  let g = .9 + .07 * (N.a(s * 8, t * 6) - .5) - .12 * rib + .1 * smooth(.6, 1, Math.abs(t - .5) * 2);
-  const swirl = Math.abs(Math.sin(s * Math.PI * 4 + t * 6 + 1.2)) < .1 && t > .2 && t < .8;
-  if (swirl) g -= .1;
-  g = clamp(g + .35 * spec);
-  return A([255 * g, 255 * g, 255 * g, 255], .86);
-}, 'heart', true);
+// the Heart bulb's facet faces (apep_org_geometry BULB_FACES): grey values (tinted per look), alpha ~0.86, a soft
+// darker rib along every facet edge, a lighter milky middle; cls 1-3 = the faces toward the upper left (the specular
+// band of v3 f270 / v4 f1650): whiter, the brightest with a white streak along the face
+export function bulbFacetPx({cls, w, h}, s, t, d) {
+  const e = smooth(.11, 0, d), mid = smooth(.5, 0, Math.hypot(s - .5, t - .5));
+  let g = .9 + .04 * mid + [0, .03, .06, .09][cls] - .015 * e + .025 * (N.a(s * 5 + w, t * 5 + h) - .5);
+  if (cls === 3) g += .08 * smooth(.16, 0, Math.abs((s - .5) * .8 + (t - .5) * .6));
+  g = clamp(g);
+  return A([255 * g, 255 * g, 252 * g, 255], .87);
+}
 add('he_swirl', 32, 32, (s, t) => { const x = s - .5, y = t - .5, r = Math.hypot(x, y) * 2, a = Math.atan2(y, x); if (r > 1) return TRANSPARENT;
   const arm = Math.abs(Math.sin(a * 2 + r * 7)); return A([200, 200, 196, 255], clamp(.5 * smooth(.25, 0, arm) * smooth(1, .4, r))); }, 'heart', true);
-add('he_root', 32, 64, rootPx, 'heart');
-add('he_vine', 32, 32, (s, t) => { let c = PAL.vine(.25 + .25 * (N.c(s * 4, t * 12) - .5)); if (Math.abs(N.a(s * 3, t * 9) - .5) < .03) c = mix(c, PAL.vine(0), .5); return c; }, 'heart');
-const rootCard = sd => (u, v) => { const b = bevel(sd, u, v, .12); let c = rootPx(u * .45, v * .3); if (b.lit > 0) c = mix(c, PAL.root(.1), .45 * b.rim * b.lit); else c = sink(c, .35 * b.rim * -b.lit); if (-b.d < .02) c = sink(c, .4); return c; };
+// the box faces of a root limb (apep_org_geometry rootLimb): u across the face (a rounded gradient, lit middle, dark
+// edges), v along the root (long grain, a few pale knots)
+const rootSidePx = R => (s, t) => { const x = Math.abs(s - .5) * 2, g = Math.abs(N.a(s * 2.5 + 7, t * 16) - .5);
+  let c = R(.26 + .3 * x * x + .12 * (N.c(s * 2, t * 9) - .5));
+  if (g < .035) c = sink(c, .28 * (1 - g / .035));
+  if (N.d(s * 5 + 3, t * 7) > .8) c = mix(c, R(.1), .35);
+  return c; };
+add('he_rootS', 32, 64, rootSidePx(PAL.root), 'heart');
+add('he_vineS', 16, 64, rootSidePx(PAL.vineL), 'heart');
+// the faces of a root limb that look up (the game lights them 1.6x the sides): the same grain, darker
+const darker = (f, k) => (s, t) => { const c = f(s, t); return [c[0] * k, c[1] * k, c[2] * k, c[3] ?? 255]; };
+add('he_rootSU', 16, 32, darker(rootSidePx(PAL.root), .66), 'heart');
+add('he_vineSU', 16, 32, darker(rootSidePx(PAL.vineL), .7), 'heart');
+// the skin card of a root limb: the smooth tapered silhouette (stroke st, half width w(t)), a rounded gradient across
+// it (the side toward the upper left lit), a dark outline, grain along; registered by the geometry per root
+export function skinSprite(name, rect, st, w, ppb, owner, R = PAL.root, plane = 'z') {
+  shapeSprite(name, {rect, sd: st.sd}, ppb, owner, (u, v) => {
+    const n = st.near(u, v), hw = Math.max(1e-3, w(n.t)), x = clamp(n.d / hw), side = n.s > 0 ? 1 : -1;
+    let c = R(.24 + .3 * x * x - .08 * side * x + .1 * (N.c(n.t * 12, x * 2 + side) - .5));
+    const g = Math.abs(N.a(n.t * 20, x * 3 * side + 5) - .5); if (g < .03) c = sink(c, .25);
+    if (x > .86) c = sink(c, .35 * smooth(.86, 1, x));
+    return c;
+  }, {plane});
+}
 shapeSprite('he_tip', SH.h_tip, 64, 'heart', (u, v) => { const d = -SH.h_tip.sd(u, v); return mix(PAL.tip(.05 + .3 * clamp(v / .62)), PAL.tip(0), smooth(.05, 0, d) * .5); });
 shapeSprite('he_petal', SH.h_petal, 48, 'heart', (u, v) => shadeShape(SH.h_petal.sd, u, v, PAL.pale, {t0: .1, edge: .01, w: .05}));
 shapeSprite('he_sprout', SH.h_sprout, 48, 'heart', (u, v) => shadeShape(SH.h_sprout.sd, u, v, PAL.gold, {t0: .2, edge: .008, w: .03}));
@@ -498,14 +514,15 @@ add('de_shell_l', 16, 16, (s, t) => ledgeOf(PAL.destr(.32)), 'destr');
 add('pr_hood_l', 16, 16, (s, t) => ledgeOf(PAL.hood(.2)), 'pred');
 add('pr_bowl_l', 16, 16, (s, t) => A(ledgeOf(PAL.fin(.3)), .75), 'pred', true);
 add('pr_face_l', 16, 16, (s, t) => ledgeOf(PAL.fin(.3)), 'pred');
-add('he_bulb_l', 16, 16, (s, t) => A([190, 190, 186, 255], .86), 'heart', true);
 add('he_root_l', 16, 16, (s, t) => ledgeOf(PAL.root(.4 + .2 * N.c(s * 3, t * 3))), 'heart');
 add('st_bark_l', 16, 16, (s, t) => ledgeOf(PAL.stalk(.3 + .1 * N.b(s * 3, t * 3))), 'stalk');
 // loft tiles / wraps: texel density per block for the tileUV windows; wraps map u = facet k / n, v along the loft
-for (const n of ['gu_drapeW', 'gu_sheath', 'gu_bud', 'ne_cap', 'de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'he_bulb', 'do_shell', 'do_vine', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
-registerTile('he_root', 32, 64, 28);
+for (const n of ['gu_drapeW', 'gu_sheath', 'gu_bud', 'ne_cap', 'de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'do_shell', 'do_vine', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
+registerTile('he_rootS', 32, 64, 16);
+registerTile('he_vineS', 16, 64, 24);
+registerTile('he_rootSU', 16, 32, 8);
+registerTile('he_vineSU', 16, 32, 12);
 registerTile('bo_stemT', 16, 16, 64);
-registerTile('he_vine', 32, 32, 40);
 registerTile('st_bark', 64, 64, 22);
 
 export const orgSprites = () => Object.fromEntries(Object.entries(S).map(([k, [w, h, fn, tr]]) => [k, [w, h, fn, tr]]));

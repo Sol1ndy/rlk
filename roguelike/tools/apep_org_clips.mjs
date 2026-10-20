@@ -187,6 +187,9 @@ export const CLIPS = {
   ],
   seed: [],
 };
+// twins (the diagonal facets of a facet body, geometry twin()) run every clip their parent runs and share its forced looks
+export const withTwins = (owner, list) => list && list.flatMap(n => [n, ...ORG[owner].displays.filter(d => d.twinOf === n).map(d => d.name)]);
+for (const [o, cs] of Object.entries(CLIPS)) for (const c of cs) { if (c.displays) c.displays = withTwins(o, c.displays); if (c.force) c.force = withTwins(o, c.force); }
 // frozen ids (stub order): kinds then objects, clips in table order
 let NEXT_ID = 0;
 for (const o of ['basic', 'nurt', 'guard', 'nest', 'destr', 'pred', 'heart', 'dome', 'wall', 'stalk', 'seed']) for (const c of CLIPS[o]) c.id = NEXT_ID++;
@@ -200,6 +203,8 @@ export const SPAWN = {
       vine_hand: ['heart_drop', 30], ...Object.fromEntries(STEMS.map(d => [d, ['heart_drop', 30]]))}},
   },
 };
+
+for (const st of Object.values(SPAWN.heart)) for (const d of ORG.heart.displays) if (d.twinOf) st.from[d.name] = st.from[d.twinOf];
 
 // ---- sampling ---------------------------------------------------------------------------------------------------------
 const vec3 = v => (typeof v === 'number' ? [v, v, v] : v);

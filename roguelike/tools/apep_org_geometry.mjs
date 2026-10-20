@@ -9,8 +9,8 @@
 // are authored in the object frame and shifted by their joint here; frame 'joint' models are authored round the joint.
 // Element rotations stay single-axis on the 22.5 degree grid.
 import {abox, cardZ, cardX, cardY, faceEl, faceOfDir, lathe, annulus, checkBounds, r4, rotA} from './mboss_model_lib.mjs';
-import {loft, slab, crossCards, toUnits, mirrorX, retex, rockBox} from './mboss_shape_lib.mjs';
-import {SH, HOOD as NHOOD, NURT, nurtW, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, bellFacetPx, bellR, skirtR, BAG, bagR, smooth01} from './apep_org_paint.mjs';
+import {loft, slab, crossCards, toUnits, mirrorX, retex, rockBox, stroke} from './mboss_shape_lib.mjs';
+import {SH, HOOD as NHOOD, NURT, nurtW, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, PAL, bellFacetPx, bulbFacetPx, bellR, skirtR, BAG, bagR, smooth01} from './apep_org_paint.mjs';
 
 export {checkBounds};
 export const RIDE_Y = 2.0;           // the husk passenger point above its feet (org manifest passenger.ride_y)
@@ -164,6 +164,60 @@ function tube(P0, plane, r, tex, {knot = 3, seed = 0, sub = 2} = {}) {
   }
   return els;
 }
+// a smooth tapered root limb in a vertical plane ('xy': z = c, 2D points [x, y]; 'yz': x = c, points [z, y]): a chain of
+// boxes along the Catmull-Rom centreline (each turned about the plane normal to its segment, snapped to the 22.5 grid),
+// half width r(t) in the plane and k r(t) across it, the faces painted with the rounded side sprite (u across the face,
+// v along the root by arc length: the grain runs on), plus a two-sided skin card in the plane with the smooth tapered
+// silhouette (half width 1.1 r): the outline reads smooth from the front and the back, the boxes give the volume.
+// sprite: the skin's sprite name (registered here, ppb px per block); end: the last box's far face shown (a cut tip)
+const ROOT_TILE = {he_rootS: 4, he_vineS: 64 / 24};    // the side sprite's length in blocks (v repeats)
+function rootLimb(sprite, plane, c, P0, r, {side = 'he_rootS', k = .85, sub = 3, ppb = 16, R, owner = 'heart', skin = 1.1, end = false, kin = null} = {}) {
+  // (with a skin card the boxes stay inside its outline in the plane: kin = their in-plane share of r)
+  if (kin === null) kin = sprite ? .82 : 1;
+  const P = [];
+  for (let i = 0; i < P0.length - 1; i++) for (let j = 0; j < sub; j++) {
+    const t = j / sub, a = P0[Math.max(0, i - 1)], b = P0[i], cc = P0[i + 1], d = P0[Math.min(P0.length - 1, i + 2)];
+    P.push([0, 1].map(q => .5 * (2 * b[q] + (-a[q] + cc[q]) * t + (2 * a[q] - 5 * b[q] + 4 * cc[q] - d[q]) * t * t + (-a[q] + 3 * b[q] - 3 * cc[q] + d[q]) * t * t * t)));
+  }
+  P.push(P0[P0.length - 1]);
+  const segL = P.slice(1).map((p, i) => Math.hypot(p[0] - P[i][0], p[1] - P[i][1])), Ltot = segL.reduce((x, y) => x + y, 0), TL = ROOT_TILE[side];
+  // 3D: plane 'xy' -> [u, v, c] (normal Z, rotations about z); 'yz' -> [c, v, u] (normal X, rotations about x)
+  const to3 = ([u, v]) => (plane === 'xy' ? [u, v, c] : [c, v, u]), ax = plane === 'xy' ? 'z' : 'x', nIdx = plane === 'xy' ? 2 : 0, uIdx = plane === 'xy' ? 0 : 2;
+  const els = [];
+  let arc = 0;
+  for (let i = 0; i < P.length - 1; i++) {
+    const A = to3(P[i]), B = to3(P[i + 1]), L = segL[i], t3 = A.map((x, q) => (B[q] - x) / L);
+    let best = null;
+    for (const dAx of [uIdx, 1]) for (const g of [0, 22.5, -22.5, 45, -45]) {
+      const d = [0, 0, 0]; d[dAx] = 1; const qv = rotA(ax, g, d);
+      const e = Math.min(Math.hypot(qv[0] - t3[0], qv[1] - t3[1], qv[2] - t3[2]), Math.hypot(qv[0] + t3[0], qv[1] + t3[1], qv[2] + t3[2]));
+      if (!best || e < best.e - 1e-9) best = {dAx, g, e};
+    }
+    const tm = (arc + L / 2) / Ltot, rr = r(tm), M = A.map((x, q) => (x + B[q]) / 2), h = L / 2 + rr * .22;
+    const oAx = best.dAx === 1 ? uIdx : 1;          // the other in-plane axis
+    const half = [0, 0, 0]; half[best.dAx] = h; half[oAx] = rr * kin; half[nIdx] = rr * k;
+    const lo = M.map((x, q) => x - half[q]), hi = M.map((x, q) => x + half[q]);
+    const span = Math.min(1, 2 * h / TL), v0 = ((arc / TL) % 1) * (1 - span), vk = span / (2 * h);
+    const faces = {};
+    for (const nAx of [oAx, nIdx]) for (const sg of [1, -1]) {
+      const dir = [0, 0, 0]; dir[nAx] = sg;
+      const acr = nAx === oAx ? nIdx : oAx, up = rotA(ax, best.g, dir)[1] > .5;      // a face looking up: the darker grain
+      faces[faceOfDir(dir)] = {tex: up ? side + 'U' : side, fn: X => [16 * (X[acr] - lo[acr]) / (hi[acr] - lo[acr]), 16 * (v0 + (X[best.dAx] - lo[best.dAx]) * vk)]};
+    }
+    if (end && i === P.length - 2) { const dir = [0, 0, 0]; const tq = rotA(ax, -best.g, t3); dir[best.dAx] = tq[best.dAx] > 0 ? 1 : -1; faces[faceOfDir(dir)] = {tex: side, uv: [4, 14, 12, 16]}; }
+    els.push(faceEl([lo, hi], faces, {rot: best.g ? [ax, best.g, M] : undefined}));
+    arc += L;
+  }
+  // the skin card
+  if (sprite) {
+    const st = stroke(P, t => r(t) * skin), pad = Math.max(...Array.from({length: 11}, (_, q) => r(q / 10))) * skin + .04;
+    const us = P.map(p => p[0]), vs = P.map(p => p[1]);
+    const rect = {u0: Math.min(...us) - pad, u1: Math.max(...us) + pad, v0: Math.min(...vs) - pad, v1: Math.max(...vs) + pad};
+    skinSprite(sprite, rect, st, t => r(t) * skin, ppb, owner, R, plane === 'xy' ? 'z' : 'x');
+    els.push(plane === 'xy' ? cardZ(sprite, c, {X0: rect.u0, X1: rect.u1, Y0: rect.v0, Y1: rect.v1}) : cardX(sprite, c, {Z0: rect.u0, Z1: rect.u1, Y0: rect.v0, Y1: rect.v1}));
+  }
+  return els;
+}
 // points of a root in a plane: 2D [u, v] -> 3D (xy: [u, v, c]; yz: [c, u, v]... u along the plane's first axis)
 const inPlane = (plane, c, pts) => pts.map(([a, b]) => (plane === 'xy' ? [a, b, c] : [c, a, b]));
 
@@ -279,7 +333,7 @@ function faceCard(f, frame = null, down = [0, -1, 0]) {
 // faces sharing a mask (the same polygon and paint class, mirrored masks reuse it flipped) share a cell.
 // paint({el, n, cls}, s, t, d = blocks to the polygon edge) -> rgba; flat(face) = an 8 px mask (one-colour faces)
 const isCardinal = f => Math.abs(f.el) > 89.9 || Math.abs(((f.az % 90) + 90) % 90) < 1e-6;
-export function facetBody(name, faces, {owner, ppb = 64, paint, cls = () => 0, tint: tn = false, down = null, flat = null} = {}) {
+export function facetBody(name, faces, {owner, ppb = 64, paint, cls = () => 0, tint: tn = false, down = null, flat = null, translucent = false, maxPx = 64, aa = false} = {}) {
   const dnOf = f => down || ((f.axis || 'y') === 'z' ? [0, 0, -1] : [0, -1, 0]);
   const cards = faces.map(f => ({f, half: isCardinal(f) ? 0 : 1, card: faceCard(f, isCardinal(f) ? null : {axis: f.axis || 'y', deg: 45}, dnOf(f))}));
   const keyOf = (Q, f) => cls(f) + '|' + Q.map(([a, b]) => a.toFixed(3) + ',' + b.toFixed(3)).join(';');
@@ -294,7 +348,7 @@ export function facetBody(name, faces, {owner, ppb = 64, paint, cls = () => 0, t
   }
 
   // pack the masks (shelves; each mask at `ppb` px per block, at least 8 px a side) into one sprite (sides multiples of 16)
-  for (const m of masks) { const k = flat && flat(m.f) ? 8 / Math.max(m.card.w, m.card.h) : ppb; m.pw = Math.max(8, Math.min(64, Math.round(m.card.w * k))); m.ph = Math.max(8, Math.min(64, Math.round(m.card.h * k))); }
+  for (const m of masks) { const k = flat && flat(m.f) ? 8 / Math.max(m.card.w, m.card.h) : ppb; m.pw = Math.max(8, Math.min(maxPx, Math.round(m.card.w * k))); m.ph = Math.max(8, Math.min(maxPx, Math.round(m.card.h * k))); }
   const order = masks.map((m, i) => i).sort((i, j) => masks[j].ph - masks[i].ph || i - j);
   // the sprite width (a multiple of 16) giving the smallest sprite
   const pack = SWc => { let x = 0, y = 0, shelf = 0; const at = []; for (const i of order) { const m = masks[i]; if (x + m.pw > SWc) { x = 0; y += shelf; shelf = 0; } at[i] = [x, y]; x += m.pw; shelf = Math.max(shelf, m.ph); } return {at, H: Math.max(16, Math.ceil((y + shelf) / 16) * 16)}; };
@@ -317,9 +371,13 @@ export function facetBody(name, faces, {owner, ppb = 64, paint, cls = () => 0, t
       dmin = Math.min(dmin, Math.hypot(px - ax - u * ex, py - ay - u * ey)); if (cr < 0) pos = false; if (cr > 0) neg = false;
     }
     const sd = (pos || neg) ? -dmin : dmin, px = Math.max(card.w / m.pw, card.h / m.ph);
-    if (sd > px * .6) return [0, 0, 0, 0];
-    return paint({el: m.card.el, n: m.f.n, cls: m.cls, w: card.w, h: card.h}, s, t, Math.max(0, -sd));
-  }, owner);
+    // aa (translucent bodies): the edge pixels carry their coverage as alpha, so two faces meeting at an edge sum to
+    // one layer (no doubled seam, no stairs); opaque bodies cut binary masks half a pixel past the edge (no gaps)
+    if (sd > px * (aa ? .5 : .6)) return [0, 0, 0, 0];
+    const c = paint({el: m.card.el, n: m.f.n, cls: m.cls, w: card.w, h: card.h, f: m.f}, s, t, Math.max(0, -sd));
+    if (aa) { const cov = Math.max(0, Math.min(1, .5 - sd / px)); return [c[0], c[1], c[2], Math.round((c[3] ?? 255) * cov)]; }
+    return c;
+  }, owner, translucent);
   const els = [[], []];
   for (const c of cards) {
     const m = masks[c.mi], u0 = m.px0 / SW, u1 = (m.px0 + m.pw) / SW, v0 = m.py0 / SH_, v1 = (m.py0 + m.ph) / SH_;
@@ -327,6 +385,8 @@ export function facetBody(name, faces, {owner, ppb = 64, paint, cls = () => 0, t
   }
   return els;
 }
+// the support function of a point cloud (any convex hull: lumpy, non-symmetric bodies)
+export const pointSupport = P => n => { let m = -Infinity; for (const p of P) { const v = p[0] * n[0] + p[1] * n[1] + p[2] * n[2]; if (v > m) m = v; } return m; };
 // the support function of a body of revolution about 'y' (radius rf(a), a in [a0, a1]) or 'z' (centre height yc)
 export const revSupport = (rf, a0, a1, axis = 'y', yc = 0) => n => {
   const A = axis === 'y' ? n[1] : n[2], hz = axis === 'y' ? Math.hypot(n[0], n[2]) : Math.hypot(n[0], n[1]);
@@ -598,67 +658,98 @@ function predFace() {
 // the Heart of the Oasis: lemon bulb (looks by tint), root cradle (pedestal / full), two root arms, glow tips, vine
 // hand (idle / wrap) and four vine stem segments
 // ================================================================================================================
+// the bulb (v3 f270 / v4 f1650 / sheet 08): a translucent glowing lemon lying along Z, 3.2 x 2.6 x 2.3, a facet body
+// round a lumpy lemon point cloud (pointed ends, soft lobes): 8 azimuths x the 22.5 elevations; the faces facing the
+// upper left carry the white specular band (cls 1-3), every facet edge a soft darker rib line; grey values tinted per
+// look. The diagonal faces ride heart_bulb_x (the bulb turned 45 degrees about its Y). Three crossed swirl cards inside.
 const LEMON = {L: 1.6, W: 1.3, H: 1.15};
+const lemonF = a => { const t = Math.min(1, Math.abs(a) / LEMON.L); return Math.pow(Math.max(0, 1 - t * t), .6) * (1 - .45 * Math.pow(t, 6)); };
+const LEMON_PTS = (() => { const P = [];
+  for (let i = 0; i <= 64; i++) { const z = -LEMON.L + 2 * LEMON.L * i / 64, f = lemonF(z);
+    for (let j = 0; j < 48; j++) { const th = j * 2 * Math.PI / 48, lump = 1 + .045 * Math.sin(3 * th + 1.1 * z) + .03 * Math.cos(2 * th - .9 * z + .4);
+      P.push([LEMON.W * f * lump * Math.cos(th), LEMON.H * f * lump * Math.sin(th) * (Math.sin(th) < 0 ? .93 : 1), z]); } }
+  return P; })();
+const SPEC = (() => { const v = [-.5, .8, -.35], l = Math.hypot(...v); return v.map(x => x / l); })();
+const BULB_FACES = facetBody('he_bulbF', polyFaces(facetPlanes(pointSupport(LEMON_PTS), {el: [-90, -67.5, -45, -22.5, 0, 22.5, 45, 67.5, 90]})),
+  {owner: 'heart', paint: bulbFacetPx, tint: true, translucent: true, aa: true, ppb: 23, maxPx: 40,
+    cls: f => { const k = f.n[0] * SPEC[0] + f.n[1] * SPEC[1] + f.n[2] * SPEC[2]; return k > .86 ? 3 : k > .66 ? 2 : k > .42 ? 1 : 0; }});
 function heartBulb() {
-  const z = [-1.6, -1.5, -1.36, -1.16, -.9, -.56, -.18, .2, .58, .92, 1.18, 1.38, 1.52, 1.6];
-  const f = a => { const t = Math.abs(a) / LEMON.L; return Math.pow(Math.max(0, 1 - t * t), .62) * (1 - .55 * Math.pow(t, 6)) + .035; };
-  const els = [...loft('z', z.map(a => ({a, r: [LEMON.W * f(a), LEMON.H * f(a), LEMON.W * f(a), LEMON.H * f(a)]})), {n: 16, tex: 'he_bulb', ledgeTex: 'he_bulb_l', caps: '-+', tint: true, seed: 41})];
-  els.push(...tint([cardZ('he_swirl', 0, {X0: -.9, X1: .9, Y0: -.85, Y1: .85}), cardX('he_swirl', 0, {Z0: -1.1, Z1: 1.1, Y0: -.8, Y1: .8}), cardY('he_swirl', 0, {X0: -.9, X1: .9, Z0: -1.1, Z1: 1.1})]));
+  const els = [...BULB_FACES[0]];
+  els.push(...tint([cardZ('he_swirl', 0, {X0: -.8, X1: .8, Y0: -.75, Y1: .75}), cardX('he_swirl', 0, {Z0: -1.0, Z1: 1.0, Y0: -.7, Y1: .7}), cardY('he_swirl', 0, {X0: -.8, X1: .8, Z0: -1.0, Z1: 1.0})]));
   return els;
 }
-// the cradle: a low dark mound and six knobbly root fingers splaying into the turf and gripping the bulb's flanks and
-// ends (planes through the bulb axis, offset so none is a mirror of another); pedestal adds pale petal clumps + sprouts
-const FINGERS = [
-  ['xy', .35, [[2.35, -.05], [1.95, .25], [1.6, .66], [1.46, 1.12], [1.42, 1.6], [1.3, 2.1]]],
-  ['xy', -.6, [[2.2, -.05], [1.85, .3], [1.55, .72], [1.44, 1.2], [1.36, 1.7], [1.18, 2.02]]],
-  ['xy', .55, [[-2.25, -.05], [-1.9, .28], [-1.58, .7], [-1.45, 1.15], [-1.38, 1.62], [-1.2, 1.98]]],
-  ['xy', -.3, [[-2.4, -.05], [-2.0, .22], [-1.62, .62], [-1.47, 1.1], [-1.43, 1.55], [-1.32, 2.06]]],
-  ['yz', -.5, [[-.05, 2.6], [.3, 2.15], [.72, 1.8], [1.2, 1.66], [1.6, 1.5], [1.9, 1.3]]].map(x => x),
-  ['yz', .45, [[-.05, -2.55], [.28, -2.1], [.7, -1.78], [1.15, -1.66], [1.56, -1.52], [1.86, -1.32]]],
+const heartBulbX = () => [...BULB_FACES[1]];
+// the cradle (v3 f0 / f270, v4 f1650): a low dark mound and six root fingers - each rises from a foot splayed into the
+// turf (r 2.2-2.6), thickest at its knee beside the bulb's lower flank, and climbs the flank to grip it; three shapes,
+// each also mirrored to the other side (planes through the bulb axis, offset so no two coincide); two short roots at the
+// lemon's ends. pedestal adds pale petal clumps + gold sprouts (v2 f2340). Root limbs: rootLimb (boxes + skin card).
+const fingerR = r0 => t => .05 + (r0 - .05) * Math.sin(Math.PI * Math.min(1, .18 + t * .95)) ** .7 * (1 - .55 * t);
+const FINGER_SHAPES = [
+  // [2D points (x outward, y up), half width (t), plane offset, mirrored-copy offset]
+  [[[2.55, -.04], [2.15, .12], [1.72, .42], [1.5, .92], [1.47, 1.45], [1.36, 1.98], [1.1, 2.38]], fingerR(.2), .38, -.62],
+  [[[2.3, -.04], [1.95, .2], [1.66, .55], [1.52, 1.05], [1.42, 1.6], [1.2, 2.05]], fingerR(.18), -.66, .5],
+  [[[2.05, -.04], [1.8, .1], [1.55, .36], [1.44, .78], [1.38, 1.2]], fingerR(.16), .02, -.1],
 ];
+const END_ROOT = [[[2.62, -.04], [2.2, .14], [1.84, .44], [1.68, .82], [1.7, 1.22]], fingerR(.17)];
+// (the root limbs register their skin sprites: built once at load, before the sprites are painted)
+const CRADLE_ROOTS = (() => { const els = [];
+  FINGER_SHAPES.forEach(([pts, r, c1, c2], i) => {
+    const one = rootLimb('he_skF' + i, 'xy', 0, pts, r, {R: PAL.root, ppb: 14});
+    els.push(...shift(one, [0, 0, c1]), ...shift(mirrorX(one), [0, 0, c2]));
+  });
+  const end = rootLimb('he_skE', 'yz', 0, END_ROOT[0], END_ROOT[1], {R: PAL.root, ppb: 14});
+  els.push(...shift(end, [-.42, 0, 0]), ...shift(mirrorZ(end), [.36, 0, 0]));
+  return els; })();
 function heartCradle(pedestal) {
-  const els = [...loft('y', prof(0, .55, 4, y => 1.45 * Math.sqrt(Math.max(0, 1 - (y / .58) ** 2)) + .03), {n: 16, tex: 'he_root', ledgeTex: 'he_root_l', caps: '+', seed: 43})];
-  FINGERS.forEach(([pl, c, pts], i) => els.push(...tube(inPlane(pl, c, pts), pl, t => .19 - .12 * t, 'he_root', {seed: 50 + i * 11})));
+  const els = [...loft('y', [{a: 0, r: 1.15}, {a: .22, r: 1.02}, {a: .4, r: .8}, {a: .54, r: .42}], {n: 16, tex: 'he_rootS', ledgeTex: 'he_root_l', caps: '+', seed: 43}), ...CRADLE_ROOTS];
   if (pedestal) {
     for (let k = 0; k < 6; k++) { const a = (k * 60 + 15) * D2R; els.push(...crossCards('he_petal', [Math.sin(a) * .9, .42, -Math.cos(a) * .9], .56, .34, {y0: 0})); }
     for (const a of [20, 140, 260]) els.push(...crossCards('he_sprout', [Math.sin(a * D2R) * .45, .5, -Math.cos(a * D2R) * .45], .24, .7, {y0: 0}));
   }
   return els;
 }
-// the two tall root arms rising at the bulb's sides and curling over its top (one taller), two shorter side roots;
-// the glow tips sit on their ends (heart_tips)
-const ARMS = [
-  ['xy', .25, [[1.55, .1], [1.88, .95], [1.98, 1.85], [1.84, 2.75], [1.5, 3.5], [1.0, 4.02], [.45, 4.24], [.02, 4.12], [-.18, 3.84]], .22],
-  ['xy', -.4, [[-1.5, .1], [-1.82, .9], [-1.88, 1.75], [-1.7, 2.55], [-1.32, 3.2], [-.82, 3.62], [-.34, 3.74], [.02, 3.55]], .2],
-  ['yz', .3, [[.1, 1.75], [.8, 2.02], [1.55, 2.05], [2.15, 1.85], [2.5, 1.55]], .14],
-  ['yz', -.55, [[.1, -1.7], [.75, -2.0], [1.4, -2.02], [1.9, -1.84]], .13],
-];
-const heartArms = () => ARMS.flatMap(([pl, c, pts, r0], i) => tube(inPlane(pl, c, pts), pl, t => r0 * (1 - .7 * t) + .03, 'he_root', {seed: 90 + i * 13}));
+// the two tall root arms (v4 f1650 / v3 f270): rising beside the bulb's flanks, bowing out, then curling over its top
+// toward the middle (one shape, mirrored, offset in z), two shorter roots beside the lemon's ends; the glow tips
+// (heart_tips) sit on their ends (ARM_TIPS)
+const ARM = [[[1.62, -.05], [1.9, .8], [2.04, 1.7], [1.95, 2.6], [1.62, 3.38], [1.1, 3.92], [.5, 4.18], [.04, 4.1], [-.2, 3.86]], t => .07 + .25 * Math.pow(1 - t, 1.3)];
+// the second arm: lower (3.6 b), its tip curling back outward over the bulb's shoulder
+const ARM2 = [[[1.55, -.05], [1.86, .75], [1.98, 1.6], [1.86, 2.45], [1.52, 3.12], [1.08, 3.52], [.72, 3.6], [.56, 3.4], [.66, 3.2]], t => .065 + .22 * Math.pow(1 - t, 1.3)];
+const SIDE = [[[.12, 1.62], [.5, 1.98], [1.0, 2.2], [1.55, 2.2], [2.05, 2.0], [2.45, 1.68]].map(([y, z]) => [z, y]), t => .06 + .13 * Math.pow(1 - t, 1.2)];
+const ARM_SET = [['xy', .28, false], ['xy', -.42, true], ['yz', .32, false], ['yz', -.5, true]];
+const ARM_ELS = (() => { const arm = rootLimb('he_skA', 'xy', 0, ARM[0], ARM[1], {R: PAL.root, ppb: 13}), arm2 = rootLimb('he_skA2', 'xy', 0, ARM2[0], ARM2[1], {R: PAL.root, ppb: 13});
+  const side = rootLimb('he_skS', 'yz', 0, SIDE[0], SIDE[1], {R: PAL.root, ppb: 13});
+  return [...shift(arm, [0, 0, .28]), ...shift(mirrorX(arm2), [0, 0, -.42]), ...shift(side, [.32, 0, 0]), ...shift(mirrorZ(side), [-.5, 0, 0])]; })();
+const heartArms = () => ARM_ELS;
+// the arm tip points (object frame): the tall arms' ends, half way up, and the side roots' ends
+const ARM_TIPS = (() => { const e = ARM[0][ARM[0].length - 1], m = ARM[0][5], e2 = ARM2[0][ARM2[0].length - 1], m2 = ARM2[0][4], se = SIDE[0][SIDE[0].length - 1];
+  return {main: [[e[0], e[1], .28], [-e2[0], e2[1], -.42]], mid: [[m[0], m[1], .28], [-m2[0], m2[1], -.42]], side: [[.32, se[1], se[0]], [-.5, se[1], -se[0]]]}; })();
 function heartTips() {
   const els = [];
-  ARMS.forEach(([pl, c, pts], i) => { const P = inPlane(pl, c, pts), e = P[P.length - 1], k = i < 2 ? 1.1 : .75;
-    els.push(...crossCards('he_tip', [e[0], e[1] + .05, e[2]], .34 * k, .66 * k, {y0: 0})); });
-  // a second flame half way up each tall arm, smaller ones on the finger tips
-  for (const i of [0, 1]) { const P = inPlane(ARMS[i][0], ARMS[i][1], ARMS[i][2]), m = P[5]; els.push(...crossCards('he_tip', [m[0], m[1] + .1, m[2]], .28, .52, {y0: 0})); }
-  for (const i of [0, 3, 4]) { const [pl, c, pts] = FINGERS[i], e = inPlane(pl, c, pts)[5]; els.push(...crossCards('he_tip', [e[0], e[1] + .02, e[2]], .2, .4, {y0: 0})); }
+  for (const p of ARM_TIPS.main) els.push(...crossCards('he_tip', [p[0], p[1] + .02, p[2]], .38, .74, {y0: 0}));
+  for (const p of ARM_TIPS.mid) els.push(...crossCards('he_tip', [p[0], p[1] + .08, p[2]], .28, .52, {y0: 0}));
+  for (const p of ARM_TIPS.side) els.push(...crossCards('he_tip', [p[0], p[1] + .02, p[2]], .26, .5, {y0: 0}));
+  // small flames on the gripping fingers' tips
+  for (const [pts, , c1, c2] of FINGER_SHAPES.slice(0, 2)) { const e = pts[pts.length - 1]; els.push(...crossCards('he_tip', [e[0], e[1], c1], .18, .36, {y0: 0}), ...crossCards('he_tip', [-e[0], e[1], c2], .18, .36, {y0: 0})); }
   return els;
 }
 // the vine hand (joint = the wrist just above the upright egg's top): six vine fingers hugging the egg (half axes .91 x
 // 1.12 at pose scale 0.7, its centre 1.24 below the wrist) from the crown over the shoulder to below the equator, the
 // tips curling in; wrap = the grip closed tighter and further down
 function vineHand(wrap) {
-  const els = [rockBox([-.13, -.12, -.13], [.13, .16, .13], 'he_vine', {seed: 3})];
-  const A = .95, B = 1.16, C = -1.24, phiEnd = wrap ? 2.25 : 1.95;
+  const els = [rockBox([-.12, -.1, -.12], [.12, .18, .12], 'he_vineS', {seed: 3})];
+  const A = .97, B = 1.18, C = -1.24, phiEnd = wrap ? 2.3 : 1.9;
+  // a sage-green tendril from the wrist over the egg's crown and shoulder to the flank, its tip flicking out (v2 f2200)
   const finger = (k, off, sgn, plane) => {
-    const pts = [];
-    for (let i = 0; i <= 4; i++) { const ph = .12 + (phiEnd - .12) * i / 4 + (i === 4 ? .1 : 0), rr = i === 4 ? .9 : 1;
-      pts.push([sgn * A * Math.sin(ph) * rr * (1 + .03 * k), C + B * Math.cos(ph) * rr]); }
-    return tube(inPlane(plane, off, pts.map(([u, v]) => (plane === 'xy' ? [u, v] : [v, u]))), plane, t => .075 - .04 * t, 'he_vine', {knot: 0, sub: 1, seed: 7 + k});
+    const pts = [[0, 0]];
+    for (let i = 1; i <= 5; i++) { const ph = .1 + (phiEnd - .1) * i / 5; pts.push([sgn * A * Math.sin(ph) * (1 + .03 * k), C + B * Math.cos(ph)]); }
+    const e = pts[pts.length - 1], ph = phiEnd + (wrap ? .25 : .4);
+    pts.push([sgn * (A * Math.sin(ph) + (wrap ? .02 : .16)), C + B * Math.cos(ph) - .06]);
+    return rootLimb(null, plane, off, pts, t => .085 - .05 * t, {side: 'he_vineS', k: .9, sub: 2, end: true});
   };
-  els.push(...finger(0, .12, 1, 'xy'), ...finger(1, -.28, 1, 'xy'), ...finger(2, .3, -1, 'xy'), ...finger(3, -.1, -1, 'xy'), ...finger(4, .2, 1, 'yz'), ...finger(5, -.15, -1, 'yz'));
+  els.push(...finger(0, .12, 1, 'xy'), ...finger(1, -.3, 1, 'xy'), ...finger(2, .3, -1, 'xy'), ...finger(3, -.12, -1, 'xy'), ...finger(4, .22, 1, 'yz'), ...finger(5, -.16, -1, 'yz'));
   return els;
 }
-const vineStem = () => [quad('he_stem', [-.3, .1, 0], [.6, 0, 0], [0, -6.3, 0]), quad('he_stem', [0, .1, -.3], [0, 0, .6], [0, -6.3, 0]), abox([-.07, -6.2, -.07], [.07, .05, .07], 'he_root')];
+const vineStem = () => [quad('he_stem', [-.3, .1, 0], [.6, 0, 0], [0, -6.3, 0]), quad('he_stem', [0, .1, -.3], [0, 0, .6], [0, -6.3, 0]), abox([-.07, -6.2, -.07], [.07, .05, .07], 'he_vineS')];
 
 // ================================================================================================================
 // domes, wall blade, stalks, seed
@@ -699,6 +790,24 @@ const seedModel = () => [...crossCards('se_seed', [0, .17, 0], .26, .34, {y0: -.
 // display: {name, scale, pivot, joint [x,y,z] (rest, in the parent frame), parent, frame ('object' | 'joint'), bright,
 //   looks {look: item}, def, overlay, models {model: () => elements}, cull [w, h] (fixed objects), note}
 const D = (name, o) => ({name, parent: null, frame: 'joint', overlay: false, bright: 14, scale: 1, pivot: 'feet', joint: [0, 0, 0], ...o});
+// the twin of a facet-body display: the body's diagonal faces on a display that copies `par` (its clip transform, scale
+// and look) turned by rot in par's frame; model / item names: the parent's item with `key` inserted (heart_bulb_idle ->
+// heart_bulbx_idle), the same tints. Its parent's clip scales must commute with the turn (the builder checks).
+function twin(par, name, rot, model, build, o = {}) {
+  const looks = {}, items = {}, models = {[model]: build};
+  for (const [look, item] of Object.entries(par.looks)) {
+    const it = name + '_' + look;
+    looks[look] = it;
+    const pi = par.items && par.items[item];
+    items[it] = [model, pi ? pi[1] : null];
+  }
+  return D(name, {pivot: par.pivot, frame: par.frame, parent: par.name, joint: [0, 0, 0], scale: par.scale, bright: par.bright, follow: () => rot, lookOf: par.name,
+    looks, def: par.def, models, items, twinOf: par.name, note: `the diagonal facets of ${par.name} (${par.name} turned ${rot.find(x => x)} degrees)`, ...o});
+}
+const HEART_BULB = D('heart_bulb', {idx: 0x00, pivot: 'centre', joint: [0, 1.6, 0], scale: 1.2, bright: 15, looks: {idle: 'heart_bulb_idle', egg_gold: 'heart_bulb_egg_gold', egg_green: 'heart_bulb_egg_green', withered: 'heart_bulb_withered', blaze: 'heart_bulb_blaze'}, def: 'idle',
+  models: {heart_bulb_m: heartBulb}, items: {heart_bulb_idle: ['heart_bulb_m', 0xDCEB5C], heart_bulb_egg_gold: ['heart_bulb_m', 0xF5CF4A], heart_bulb_egg_green: ['heart_bulb_m', 0xA8D850],
+    heart_bulb_withered: ['heart_bulb_m', 0x8A8258], heart_bulb_blaze: ['heart_bulb_m', 0xFFFCD8]},
+  note: 'translucent lemon seed 3.2 x 2.6 x 2.3 (a facet body; its diagonal faces on heart_bulb_x), alpha ~0.86; the arrival egg = this model at scale 0.7, pitch 90 (upright)'});
 export const ORG = {
   basic: {type: 'kind', id: 1, name: '기본', hover: 0, hp_bar_y: 1.6, shield: {w: 1.2, h: 1.6}, size: {h: 1.15, h_stem: 1.35, d: 0.9, bag: [1.43, 1.31]},
     displays: [
@@ -712,7 +821,7 @@ export const ORG = {
       // 45 degrees about its Y; bulb_y = the bag's, the bulb rolled 45 degrees about the bag axis Z; each shows its leader's
       // look (an empty model in the other form)
       ...[['bulb_x', [0, 45, 0], 'bell'], ['bulb_y', [0, 0, 45], 'bag']].map(([nm, rot, form]) => { const L = l => (l.startsWith('bag') ? 'bag' : 'bell'), m = f => (f === form ? `basic_${nm.replace('_', '')}_m_${form}` : 'basic_bulbxy_m_none');
-        return D(nm, {pivot: 'feet', frame: 'object', parent: 'bulb', follow: () => rot, lookOf: 'bulb',
+        return D(nm, {pivot: 'feet', frame: 'object', parent: 'bulb', follow: () => rot, lookOf: 'bulb', twinOf: 'bulb',
           looks: Object.fromEntries(['bell', 'bag', 'buffed', 'bag_buffed', 'dying', 'bag_dying'].map(l => [l, `basic_${nm.replace('_', '')}_${l}`])), def: 'bell',
           variants: {bag: {buffed: 'bag_buffed'}, dying: {bag: 'bag_dying', bag_buffed: 'bag_dying'}},
           models: form === 'bell' ? {basic_bulbx_m_bell: bellModelX, basic_bulbxy_m_none: () => []} : {basic_bulby_m_bag: bagModelX},
@@ -759,10 +868,8 @@ export const ORG = {
     ]},
   heart: {type: 'object', kind: 'single', tag: 'rlk_mb_ap_heart', cull: [9, 30],
     displays: [
-      D('heart_bulb', {idx: 0x00, pivot: 'centre', joint: [0, 1.6, 0], scale: 1.2, bright: 15, looks: {idle: 'heart_bulb_idle', egg_gold: 'heart_bulb_egg_gold', egg_green: 'heart_bulb_egg_green', withered: 'heart_bulb_withered', blaze: 'heart_bulb_blaze'}, def: 'idle',
-        models: {heart_bulb_m: heartBulb}, items: {heart_bulb_idle: ['heart_bulb_m', 0xDCEB5C], heart_bulb_egg_gold: ['heart_bulb_m', 0xF5CF4A], heart_bulb_egg_green: ['heart_bulb_m', 0xA8D850],
-          heart_bulb_withered: ['heart_bulb_m', 0x8A8258], heart_bulb_blaze: ['heart_bulb_m', 0xFFFCD8]},
-        note: 'translucent lemon seed 3.2 x 2.6 x 2.3, alpha ~0.86; the arrival egg = this model at scale 0.7, pitch 90 (upright)'}),
+      HEART_BULB,
+      twin(HEART_BULB, 'heart_bulb_x', [0, 45, 0], 'heart_bulbx_m', heartBulbX, {idx: 0x09}),
       D('heart_cradle', {idx: 0x01, pivot: 'mid', frame: 'object', joint: [0, .9, 0], scale: 2.2, looks: {pedestal: 'heart_cradle_pedestal', full: 'heart_cradle_full'}, def: 'pedestal',
         models: {heart_cradle_pedestal: () => heartCradle(true), heart_cradle_full: () => heartCradle(false)}, note: '5 knobbly root fingers + the mound; pedestal adds pale petal clumps + 3 gold sprouts'}),
       D('heart_arms', {idx: 0x02, pivot: 'mid', frame: 'object', joint: [0, 2.1, 0], scale: 2.2, looks: {idle: 'heart_arms_idle'}, def: 'idle', models: {heart_arms_idle: heartArms}, note: 'two root arms curling over the bulb to 4.0-4.3 b'}),

@@ -1220,8 +1220,34 @@
             1.6,
             0
           ],
-          "elements": 437,
-          "note": "translucent lemon seed 3.2 x 2.6 x 2.3, alpha ~0.86; the arrival egg = this model at scale 0.7, pitch 90 (upright)"
+          "elements": 33,
+          "note": "translucent lemon seed 3.2 x 2.6 x 2.3 (a facet body; its diagonal faces on heart_bulb_x), alpha ~0.86; the arrival egg = this model at scale 0.7, pitch 90 (upright)"
+        },
+        {
+          "name": "heart_bulb_x",
+          "tag": "rlk_mb_ap_heart_bulb_x",
+          "model": "heart_bulb_x_idle",
+          "looks": {
+            "idle": "heart_bulb_x_idle",
+            "egg_gold": "heart_bulb_x_egg_gold",
+            "egg_green": "heart_bulb_x_egg_green",
+            "withered": "heart_bulb_x_withered",
+            "blaze": "heart_bulb_x_blaze"
+          },
+          "default_look": "idle",
+          "brightness": 15,
+          "scale": 1.2,
+          "pivot": "centre",
+          "idx": 9,
+          "uuid": "524c4b4d-4150-4800-8000-000000000009",
+          "parent": "heart_bulb",
+          "joint": [
+            0,
+            1.6,
+            0
+          ],
+          "elements": 28,
+          "note": "the diagonal facets of heart_bulb (heart_bulb turned 45 degrees)"
         },
         {
           "name": "heart_cradle",
@@ -1242,7 +1268,7 @@
             0.9,
             0
           ],
-          "elements": 225,
+          "elements": 237,
           "note": "5 knobbly root fingers + the mound; pedestal adds pale petal clumps + 3 gold sprouts"
         },
         {
@@ -1263,7 +1289,7 @@
             2.1,
             0
           ],
-          "elements": 56,
+          "elements": 82,
           "note": "two root arms curling over the bulb to 4.0-4.3 b"
         },
         {
@@ -1284,7 +1310,7 @@
             2.1,
             0
           ],
-          "elements": 18,
+          "elements": 20,
           "note": "leaf-flame sprouts, swaying"
         },
         {
@@ -1306,7 +1332,7 @@
             11.2,
             0
           ],
-          "elements": 25
+          "elements": 73
         },
         {
           "name": "vine_stem_0",
@@ -1409,13 +1435,14 @@
           "events": {},
           "displays": [
             "heart_bulb",
+            "heart_bulb_x",
             "vine_hand",
             "vine_stem_0",
             "vine_stem_1",
             "vine_stem_2",
             "vine_stem_3"
           ],
-          "keys": 74,
+          "keys": 91,
           "key_files": 74,
           "note": "the egg hangs in the canopy (hang canopy_y), swaying"
         },
@@ -1428,13 +1455,14 @@
           "events": {},
           "displays": [
             "heart_bulb",
+            "heart_bulb_x",
             "vine_hand",
             "vine_stem_0",
             "vine_stem_1",
             "vine_stem_2",
             "vine_stem_3"
           ],
-          "keys": 58,
+          "keys": 71,
           "key_files": 58,
           "note": "drawn up from the entrance height (9 b) into the canopy"
         },
@@ -1447,13 +1475,14 @@
           "events": {},
           "displays": [
             "heart_bulb",
+            "heart_bulb_x",
             "vine_hand",
             "vine_stem_0",
             "vine_stem_1",
             "vine_stem_2",
             "vine_stem_3"
           ],
-          "keys": 56,
+          "keys": 66,
           "key_files": 56,
           "note": "lowered from the canopy to the lowered height, swaying 1-2 b and calming"
         },
@@ -1470,6 +1499,7 @@
           },
           "displays": [
             "heart_bulb",
+            "heart_bulb_x",
             "vine_hand",
             "vine_stem_0",
             "vine_stem_1",
@@ -1478,7 +1508,7 @@
             "heart_cradle",
             "heart_tips"
           ],
-          "keys": 102,
+          "keys": 113,
           "key_files": 102,
           "note": "released at 0, falls 0-5, lands 6 (pitches to lying, 0.7 -> 1, squash), settles; the hand rises away; the cradle full at 6"
         },
@@ -1491,9 +1521,10 @@
           "events": {},
           "displays": [
             "heart_bulb",
+            "heart_bulb_x",
             "heart_tips"
           ],
-          "keys": 9,
+          "keys": 13,
           "key_files": 9,
           "note": "the bulb breathes 1.00 <-> 1.03, the sprouts sway"
         },
@@ -1506,9 +1537,10 @@
           "events": {},
           "displays": [
             "heart_bulb",
+            "heart_bulb_x",
             "heart_tips"
           ],
-          "keys": 6,
+          "keys": 9,
           "key_files": 6,
           "note": "a flinch"
         },
@@ -1521,9 +1553,10 @@
           "events": {},
           "displays": [
             "heart_bulb",
+            "heart_bulb_x",
             "heart_tips"
           ],
-          "keys": 6,
+          "keys": 9,
           "key_files": 6,
           "note": "a bright swell"
         },
@@ -1536,9 +1569,10 @@
           "events": {},
           "displays": [
             "heart_bulb",
+            "heart_bulb_x",
             "heart_tips"
           ],
-          "keys": 9,
+          "keys": 12,
           "key_files": 9,
           "note": "the withered look at 0, sags and shrinks a little, the sprouts droop"
         },
@@ -1551,9 +1585,10 @@
           "events": {},
           "displays": [
             "heart_bulb",
+            "heart_bulb_x",
             "heart_tips"
           ],
-          "keys": 8,
+          "keys": 12,
           "key_files": 8,
           "note": "blazes (CS 0-24): bright look, swelling pulses"
         },
@@ -1566,13 +1601,14 @@
           "events": {},
           "displays": [
             "heart_bulb",
+            "heart_bulb_x",
             "vine_hand",
             "vine_stem_0",
             "vine_stem_1",
             "vine_stem_2",
             "vine_stem_3"
           ],
-          "keys": 80,
+          "keys": 98,
           "key_files": 80,
           "note": "golden egg lifts out of the cradle (0-30) to hang cs_y, the vine hand comes down 20-40 and wraps at 40"
         },
@@ -1613,8 +1649,8 @@
         "elements": 800,
         "px": 40000
       },
-      "elements": 773,
-      "px": 18176,
+      "elements": 485,
+      "px": 38400,
       "states": {
         "entrance": {
           "function": "rlk:mboss/apep/om/heart/spawn/entrance",
@@ -2075,7 +2111,7 @@
     "px_total": 200000,
     "organism_elements": 500,
     "heart_elements": 800,
-    "px": 118272
+    "px": 138496
   },
   "sprites": {
     "bo_petal": {
@@ -2318,23 +2354,28 @@
       "h": 32,
       "owner": "pred"
     },
-    "he_bulb": {
-      "w": 128,
-      "h": 64,
-      "owner": "heart"
-    },
     "he_swirl": {
       "w": 32,
       "h": 32,
       "owner": "heart"
     },
-    "he_root": {
+    "he_rootS": {
       "w": 32,
       "h": 64,
       "owner": "heart"
     },
-    "he_vine": {
-      "w": 32,
+    "he_vineS": {
+      "w": 16,
+      "h": 64,
+      "owner": "heart"
+    },
+    "he_rootSU": {
+      "w": 16,
+      "h": 32,
+      "owner": "heart"
+    },
+    "he_vineSU": {
+      "w": 16,
       "h": 32,
       "owner": "heart"
     },
@@ -2443,11 +2484,6 @@
       "h": 16,
       "owner": "pred"
     },
-    "he_bulb_l": {
-      "w": 16,
-      "h": 16,
-      "owner": "heart"
-    },
     "he_root_l": {
       "w": 16,
       "h": 16,
@@ -2467,6 +2503,46 @@
       "w": 32,
       "h": 144,
       "owner": "basic"
+    },
+    "he_bulbF": {
+      "w": 128,
+      "h": 128,
+      "owner": "heart"
+    },
+    "he_skF0": {
+      "w": 32,
+      "h": 48,
+      "owner": "heart"
+    },
+    "he_skF1": {
+      "w": 32,
+      "h": 48,
+      "owner": "heart"
+    },
+    "he_skF2": {
+      "w": 16,
+      "h": 32,
+      "owner": "heart"
+    },
+    "he_skE": {
+      "w": 32,
+      "h": 32,
+      "owner": "heart"
+    },
+    "he_skA": {
+      "w": 48,
+      "h": 80,
+      "owner": "heart"
+    },
+    "he_skA2": {
+      "w": 32,
+      "h": 64,
+      "owner": "heart"
+    },
+    "he_skS": {
+      "w": 16,
+      "h": 48,
+      "owner": "heart"
     }
   },
   "functions": {
@@ -2476,6 +2552,6 @@
     "kill": "rlk:mboss/apep/om/kill",
     "kill_all": "rlk:mboss/apep/om/kill_all",
     "init": "rlk:mboss/apep/om/init",
-    "files": 1685
+    "files": 1690
   }
 }

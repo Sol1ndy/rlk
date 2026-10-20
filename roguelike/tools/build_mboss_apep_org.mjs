@@ -23,7 +23,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {ORG, KINDS, OBJECTS, RIDE_Y, allModels, allItems, checkBounds, restJoint} from './apep_org_geometry.mjs';
 import {paintOrgTextures, spriteId, spriteSizes, spriteOwner} from './apep_org_paint.mjs';
-import {CLIPS, SPAWN, HANG, clipKeys, poseAt, solve, displayXf} from './apep_org_clips.mjs';
+import {CLIPS, SPAWN, HANG, clipKeys, poseAt, solve, displayXf, withTwins} from './apep_org_clips.mjs';
 import {createRigCompiler, nbt, written, shown} from './mboss_rig_compile.mjs';
 import {qAngle} from './mboss_rig_math.mjs';
 
@@ -176,12 +176,23 @@ function compileObjectClip(owner, c) {
   const frames = clipFrames(owner, c);
   let keys = 0, files = 0;
   const nextC = c.next ? CLIPS[owner].find(x => x.name === c.next) : null;
-  for (const name of ds) {
-    const d = o.displays.find(x => x.name === name), byTick = new Map(), addL = (t, l) => { if (!byTick.has(t)) byTick.set(t, []); byTick.get(t).push(l); };
+  // a twin of a single object (the bulb's diagonal facets) has no clock of its own: its keys ride its parent's key
+  // functions, addressed by UUID (one clock less per tick)
+  const riding = d => d.twinOf && o.kind === 'single';
+  const keyLines = new Map();
+  const linesOf = name => { if (!keyLines.has(name)) keyLines.set(name, new Map()); return keyLines.get(name); };
+  for (const name of [...ds].sort((x, y) => (riding(o.displays.find(q => q.name === x)) ? 1 : 0) - (riding(o.displays.find(q => q.name === y)) ? 1 : 0))) {
+    const d = o.displays.find(x => x.name === name), rides = riding(d), byTick = linesOf(rides ? d.twinOf : name);
+    const sel = rides ? uuidOf(d.idx) : '@s', addL = (t, l) => { if (!byTick.has(t)) byTick.set(t, []); byTick.get(t).push(l); };
     const {seq, out} = displaySegments(compiler, name, frames, c);
-    for (const [a, b] of out) { addL(a, `data merge entity @s ${xfNbt(written(seq[b]), b - a)}`); keys++; }
-    frames.forEach((f, t) => { if ((t > 0 && f[name].look !== frames[t - 1][name].look) || (t === 0 && (c.force || []).includes(name))) for (const l of lookLines(owner, d, f[name].look, 'execute ').map(x => x.replace(/^execute run /, ''))) addL(t, l); });
+    for (const [a, b] of out) { addL(a, `data merge entity ${sel} ${xfNbt(written(seq[b]), b - a)}`); keys++; }
+    frames.forEach((f, t) => { if ((t > 0 && f[name].look !== frames[t - 1][name].look) || (t === 0 && (c.force || []).includes(name))) for (const l of lookLines(owner, d, f[name].look, rides ? `execute as ${sel} ` : 'execute ').map(x => x.replace(/^execute run /, ''))) addL(t, l); });
     stepCheck(owner, c, name, seq);
+  }
+  for (const name of ds) {
+    const d = o.displays.find(x => x.name === name);
+    if (riding(d)) continue;
+    const byTick = linesOf(name);
     const ticks = [...byTick.keys()].sort((x, y) => x - y);
     for (const t of ticks) fn(`${owner}/c/${c.name}/${name}/k/${t}`, byTick.get(t));
     files += ticks.length;
@@ -268,29 +279,33 @@ for (const owner of OBJECTS) {
   const o = ORG[owner];
   allFrames[owner] = {};
   for (const c of CLIPS[owner]) allFrames[owner][c.name] = compileObjectClip(owner, c);
+  const rides = d => d.twinOf && o.kind === 'single';
   for (const d of o.displays) {
     const cs = CLIPS[owner].filter(c => (c.displays || o.displays.map(x => x.name)).includes(d.name));
-    if (!cs.length) continue;
+    if (!cs.length || rides(d)) continue;
     fn(`${owner}/d/${d.name}/run`, [`# ${owner} ${d.name}: its clip (apOI) at tick apOC. @s = the display.`, ...tree(`${owner}/d/${d.name}/t`, 'apOI', cs.map(c => [c.id, `${NS}/${owner}/c/${c.name}/${d.name}/run`]))]);
     fn(`${owner}/d/${d.name}/tick`, [`# ${owner} ${d.name}: apply tick apOC of clip apOI, then advance. @s = the display.`, `function ${NS}/${owner}/d/${d.name}/run`, 'scoreboard players add @s apOC 1']);
   }
-  const looksFn = (d, sel, inst) => { for (const look of Object.keys(d.looks)) {
-    const br = owner === 'heart' && d.name === 'heart_bulb' ? (look === 'withered' ? 10 : 15) : null;
-    fn(`${owner}/look/${inst}${d.name}/${look}`, [`# ${owner} ${d.name}: look ${look}.`, `data modify entity ${sel} item.components."minecraft:item_model" set value "${itemId(d.looks[look])}"`, ...(br ? [`data merge entity ${sel} {brightness:{block:${br},sky:15}}`] : [])]);
+  // a display's look (and its twins' with it: they show the leader's look)
+  const looksFn = (d, sel, inst, twinSel = () => null) => { for (const look of Object.keys(d.looks)) {
+    const br = owner === 'heart' && (d.twinOf || d.name) === 'heart_bulb' ? (look === 'withered' ? 10 : 15) : null;
+    const set = (x, item) => [`data modify entity ${x} item.components."minecraft:item_model" set value "${itemId(item)}"`, ...(br ? [`data merge entity ${x} {brightness:{block:${br},sky:15}}`] : [])];
+    const tw = d.twinOf ? [] : o.displays.filter(t => t.twinOf === d.name).flatMap(t => set(twinSel(t), t.looks[look]));
+    fn(`${owner}/look/${inst}${d.name}/${look}`, [`# ${owner} ${d.name}: look ${look}${tw.length ? ' (and its twin)' : ''}.`, ...set(sel, d.looks[look]), ...tw]);
   } };
   if (o.kind === 'single' || o.kind === 'fixed_set') {
     const n = o.kind === 'single' ? 1 : o.count, idxOf = (d, k) => (o.kind === 'single' ? d.idx : d.idxs[k]);
     const inst = k => (o.kind === 'single' ? '' : `i${k}/`);
     const tickLines = [];
-    for (let k = 0; k < n; k++) for (const d of o.displays) if (CLIPS[owner].some(c => (c.displays || []).includes(d.name)))
+    for (let k = 0; k < n; k++) for (const d of o.displays) if (!rides(d) && CLIPS[owner].some(c => (c.displays || []).includes(d.name)))
       tickLines.push(`execute as ${uuidOf(idxOf(d, k))} if score @s apOI matches 0.. run function ${NS}/${owner}/d/${d.name}/tick`);
     if (tickLines.length) fn(`${owner}/tick`, [`# Once per tick while the ${owner} exists: each display runs its own clip. Any executor.`, ...tickLines]);
     for (let k = 0; k < n; k++) {
       const I = inst(k), at = o.kind === 'single' ? '' : ` ${k}`;
       for (const c of CLIPS[owner]) fn(`${owner}/${I}play/${c.name}`, [`# Play ${c.name} on the ${owner}${at} (${(c.displays || []).join(', ')}) from tick 0 at the next ${owner}/tick. Any executor.`,
-        ...(c.displays || []).flatMap(dn => { const u = uuidOf(idxOf(o.displays.find(x => x.name === dn), k)); return [`scoreboard players set ${u} apOI ${c.id}`, `scoreboard players set ${u} apOC 0`]; })]);
+        ...(c.displays || []).filter(dn => !rides(o.displays.find(x => x.name === dn))).flatMap(dn => { const u = uuidOf(idxOf(o.displays.find(x => x.name === dn), k)); return [`scoreboard players set ${u} apOI ${c.id}`, `scoreboard players set ${u} apOC 0`]; })]);
       fn(`${owner}/${I}kill`, [`# Remove the ${owner}${at} displays${owner === 'heart' ? ' and the Heart marker' : ''}.`, ...(owner === 'heart' ? ['kill @e[type=minecraft:marker,tag=rlk_mb_ap_heart]'] : []), ...o.displays.map(d => `kill ${uuidOf(idxOf(d, k))}`)]);
-      for (const d of o.displays) looksFn(d, uuidOf(idxOf(d, k)), I);
+      for (const d of o.displays) looksFn(d, uuidOf(idxOf(d, k)), I, t => uuidOf(idxOf(t, k)));
     }
     if (o.kind === 'fixed_set') {
       fn(`${owner}/spawn`, [`# function ${NS}/${owner}/spawn {i:<0..${n - 1}>} at the ${owner} spot, rotated as wanted.`, `$function ${NS}/${owner}/i$(i)/spawn`]);
@@ -310,8 +325,8 @@ for (const owner of OBJECTS) {
       lines.push(summonDisplay({uuid: d.idx, tags: objTags('heart', d), item: d.looks[f.look], bright: f.look === 'withered' ? 10 : d.bright, xf: written(f), cull: o.cull, view: 3}));
       lines.push(`rotate ${uuidOf(d.idx)} ~ 0`, `scoreboard players set ${uuidOf(d.idx)} apOI -1`, `scoreboard players set ${uuidOf(d.idx)} apOC 0`);
     }
-    const loopOn = state === 'canopy' ? ['heart_hang', CLIPS.heart.find(c => c.name === 'heart_hang').displays] : state === 'play' ? ['heart_idle', ['heart_bulb', 'heart_tips']] : null;
-    if (loopOn) { const id = CLIPS.heart.find(c => c.name === loopOn[0]).id; for (const dn of loopOn[1]) lines.push(`scoreboard players set ${uuidOf(o.displays.find(x => x.name === dn).idx)} apOI ${id}`); }
+    const loopOn = state === 'canopy' ? ['heart_hang', CLIPS.heart.find(c => c.name === 'heart_hang').displays] : state === 'play' ? ['heart_idle', withTwins('heart', ['heart_bulb', 'heart_tips'])] : null;
+    if (loopOn) { const id = CLIPS.heart.find(c => c.name === loopOn[0]).id; for (const dn of loopOn[1]) { const d = o.displays.find(x => x.name === dn); if (!d.twinOf) lines.push(`scoreboard players set ${uuidOf(d.idx)} apOI ${id}`); } }
     fn(`heart/spawn/${state}`, lines);
   }
 }

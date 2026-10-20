@@ -1,4 +1,4 @@
-# Play heart_drop on the heart (heart_bulb, vine_hand, vine_stem_0, vine_stem_1, vine_stem_2, vine_stem_3, heart_cradle, heart_tips) from tick 0 at the next heart/tick. Any executor.
+# Play heart_drop on the heart (heart_bulb, heart_bulb_x, vine_hand, vine_stem_0, vine_stem_1, vine_stem_2, vine_stem_3, heart_cradle, heart_tips) from tick 0 at the next heart/tick. Any executor.
 scoreboard players set 524c4b4d-4150-4800-8000-000000000000 apOI 32
 scoreboard players set 524c4b4d-4150-4800-8000-000000000000 apOC 0
 scoreboard players set 524c4b4d-4150-4800-8000-000000000004 apOI 32
