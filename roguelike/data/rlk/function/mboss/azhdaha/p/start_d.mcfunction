@@ -1,0 +1,24 @@
+# GENERATED: the running pattern's start, by #azPat.
+execute if score #azPat mb matches 1 run return run function rlk:mboss/azhdaha/p/chin/start
+execute if score #azPat mb matches 2 run return run function rlk:mboss/azhdaha/p/jump/start
+execute if score #azPat mb matches 3 run return run function rlk:mboss/azhdaha/p/charge/start
+execute if score #azPat mb matches 4 run return run function rlk:mboss/azhdaha/p/spikes/start
+execute if score #azPat mb matches 5 run return run function rlk:mboss/azhdaha/p/stomp/start
+execute if score #azPat mb matches 10 run return run function rlk:mboss/azhdaha/p/stomp3/start
+execute if score #azPat mb matches 6 run return run function rlk:mboss/azhdaha/p/feint/start
+execute if score #azPat mb matches 7 run return run function rlk:mboss/azhdaha/p/whip/start
+execute if score #azPat mb matches 8 run return run function rlk:mboss/azhdaha/p/tailslam/start
+execute if score #azPat mb matches 9 run return run function rlk:mboss/azhdaha/p/burrow/start
+execute if score #azPat mb matches 41 run return run function rlk:mboss/azhdaha/p/frost/start
+execute if score #azPat mb matches 42 run return run function rlk:mboss/azhdaha/p/bolt/start
+execute if score #azPat mb matches 43 run return run function rlk:mboss/azhdaha/p/icicle/start
+execute if score #azPat mb matches 44 run return run function rlk:mboss/azhdaha/p/shell/start
+execute if score #azPat mb matches 45 run return run function rlk:mboss/azhdaha/p/icespike/start
+execute if score #azPat mb matches 46 run return run function rlk:mboss/azhdaha/p/elspike/start
+execute if score #azPat mb matches 20 run return run function rlk:mboss/azhdaha/p/slide/start
+execute if score #azPat mb matches 21 run return run function rlk:mboss/azhdaha/p/absorb1/start
+execute if score #azPat mb matches 22 run return run function rlk:mboss/azhdaha/p/absorb2/start
+execute if score #azPat mb matches 23 run return run function rlk:mboss/azhdaha/p/burrow3/start
+execute if score #azPat mb matches 27 run return run function rlk:mboss/azhdaha/p/turn/start
+execute if score #azPat mb matches 28 run return run function rlk:mboss/azhdaha/p/walk/start
+execute if score #azPat mb matches 30 run return run function rlk:mboss/azhdaha/p/cast_host/start
