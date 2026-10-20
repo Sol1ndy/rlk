@@ -708,8 +708,34 @@
             1.3,
             0
           ],
-          "elements": 292,
-          "note": "cap + the orb eye (painted emissive)"
+          "elements": 43,
+          "note": "facet-body onion cap with a long spire, the keyhole outline, the orb eye (painted emissive) in its pale ring, the gold drop"
+        },
+        {
+          "name": "cap_x",
+          "tag": "rlk_ap_om_cap_x",
+          "model": "nest_capx_idle",
+          "looks": {
+            "idle": "nest_capx_idle"
+          },
+          "default_look": "idle",
+          "brightness": 14,
+          "scale": 1,
+          "pivot": "centre",
+          "offset": [
+            0,
+            -0.7,
+            0
+          ],
+          "overlay": false,
+          "parent": "cap",
+          "joint": [
+            0,
+            1.3,
+            0
+          ],
+          "elements": 16,
+          "note": "the diagonal facets of cap (cap turned 45 degrees)"
         },
         {
           "name": "wing_l",
@@ -770,7 +796,7 @@
           "loop": true,
           "next": null,
           "events": {},
-          "keys": 30,
+          "keys": 36,
           "key_files": 12,
           "note": "wings flap V (up 28) <-> wide arch (down 14), the body bobs"
         },
@@ -783,7 +809,7 @@
           "events": {
             "walls": 12
           },
-          "keys": 24,
+          "keys": 28,
           "key_files": 10,
           "note": "the wings curl up into a vertical loop round the orb, the body rises"
         },
@@ -797,7 +823,7 @@
             "out": 0,
             "in": 3
           },
-          "keys": 18,
+          "keys": 24,
           "key_files": 6,
           "note": "out 0-2 (the module moves the husk at 3), back in 3-6"
         },
@@ -810,7 +836,7 @@
           "events": {
             "gone": 12
           },
-          "keys": 34,
+          "keys": 45,
           "key_files": 12,
           "note": "the wings droop, it falls to the ground and shrinks"
         }
@@ -819,8 +845,8 @@
         "elements": 500,
         "px": 12000
       },
-      "elements": 346,
-      "px": 9984,
+      "elements": 113,
+      "px": 11776,
       "functions": {
         "spawn": "rlk:mboss/apep/om/nest/spawn",
         "tick": "rlk:mboss/apep/om/nest/tick",
@@ -2224,7 +2250,7 @@
     "px_total": 200000,
     "organism_elements": 500,
     "heart_elements": 800,
-    "px": 137472
+    "px": 139264
   },
   "sprites": {
     "bo_petal": {
@@ -2302,11 +2328,6 @@
       "h": 32,
       "owner": "guard"
     },
-    "ne_cap": {
-      "w": 64,
-      "h": 32,
-      "owner": "nest"
-    },
     "ne_wing": {
       "w": 80,
       "h": 64,
@@ -2318,16 +2339,11 @@
       "owner": "nest"
     },
     "ne_orb": {
-      "w": 32,
-      "h": 32,
-      "owner": "nest"
-    },
-    "ne_drop": {
       "w": 16,
       "h": 16,
       "owner": "nest"
     },
-    "ne_thorn": {
+    "ne_drop": {
       "w": 16,
       "h": 16,
       "owner": "nest"
@@ -2502,11 +2518,6 @@
       "h": 32,
       "owner": "seed"
     },
-    "ne_cap_l": {
-      "w": 16,
-      "h": 16,
-      "owner": "nest"
-    },
     "de_shell_l": {
       "w": 16,
       "h": 16,
@@ -2561,6 +2572,11 @@
       "w": 32,
       "h": 64,
       "owner": "guard"
+    },
+    "ne_capF": {
+      "w": 32,
+      "h": 160,
+      "owner": "nest"
     },
     "he_bulbF": {
       "w": 128,
@@ -2630,6 +2646,6 @@
     "kill": "rlk:mboss/apep/om/kill",
     "kill_all": "rlk:mboss/apep/om/kill_all",
     "init": "rlk:mboss/apep/om/init",
-    "files": 1755
+    "files": 1756
   }
 }

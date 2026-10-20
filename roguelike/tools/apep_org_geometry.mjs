@@ -10,7 +10,7 @@
 // Element rotations stay single-axis on the 22.5 degree grid.
 import {abox, cardZ, cardX, cardY, faceEl, faceOfDir, lathe, annulus, checkBounds, r4, rotA} from './mboss_model_lib.mjs';
 import {loft, slab, crossCards, toUnits, mirrorX, retex, rockBox, stroke} from './mboss_shape_lib.mjs';
-import {SH, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, stalkSkin, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01, guardFacetPx, RIB, nurtRibPx, nurtHoodPx, hoodKeep, hoodNear} from './apep_org_paint.mjs';
+import {SH, PROF, LFR, swatchUV, facetFrac, cardUV, smoothNy, litK, addSprite, skinSprite, stalkSkin, PAL, bellFacetPx, bulbFacetPx, domeFacetPx, bellR, skirtR, BAG, bagR, smooth01, guardFacetPx, nestFacetPx, RIB, nurtRibPx, nurtHoodPx, hoodKeep, hoodNear} from './apep_org_paint.mjs';
 
 export {checkBounds};
 export const RIDE_Y = 2.0;           // the husk passenger point above its feet (org manifest passenger.ride_y)
@@ -632,15 +632,21 @@ const guardOrb = () => glowBall([0, 0, 0], .26, 'gu_orb');
 // ================================================================================================================
 // 둥지 nesting: the pointed cap with the eye, two sepal wings (children of the cap)
 // ================================================================================================================
+// (v4 f900 / f840): a blue-teal onion body drawn up into a long sharp spire (a facet body, 8 azimuths: the diagonal
+// faces on cap_x), the pale keyhole outline painted round the eye and up the front (nestFacetPx), the glowing eye orb
+// set into the front low down inside a pale ring, a gold drop hanging under it
+const NEST_FACES = (() => {
+  const faces = polyFaces(facetPlanes(pointSupport(ringPts([[-.34, .1], [-.27, .21], [-.14, .29], [.02, .315], [.16, .3], [.32, .25], [.5, .175], [.7, .1], [.88, .05]], [0, 1.12, .02])), {el: [-90, -45, -22.5, 0, 22.5, 45, 67.5, 90]}));
+  return facetBody('ne_capF', faces, {owner: 'nest', paint: nestFacetPx, cls: f => (f.el < -80 ? 9 : [315, 0, 45].includes(f.az) && f.el < 80 ? 100 + f.az + f.el : 0), ppb: 40, maxPx: 40, flat: f => f.el < -80});
+})();
 function nestCap() {
-  const els = [...loft('y', stops([.1, .26, .42, .58, .72, .86, .98, 1.12], [.3, .29, .25, .19, .13, .08, .045, .02]).map(s => ({...s, c: [0, -.04]})), {n: 16, tex: 'ne_cap', ledgeTex: 'ne_cap_l', caps: '-', seed: 11}),
-    ...loft('y', stops([-.3, -.1, .12], [.17, .21, .22]).map(s => ({...s, c: [0, -.08]})), {n: 8, tex: 'ne_cap', ledgeTex: 'ne_cap_l', caps: '-', seed: 13})];
-  els.push(...shapeSlab('w_ring', 'ne_ring', 'z', -.17, {half: .035, cell: .04, inset: .4}));
-  els.push(...glowBall([0, 0, -.13], .14, 'ne_orb'));
-  els.push(quad('ne_drop', [-.07, -.24, -.19], [.14, 0, 0], [0, -.22, 0]));
-  for (let k = 0; k < 8; k++) els.push(radialCard('ne_thorn', k * 45 + 22.5, .24, .34, .02, .14));
+  const els = [...NEST_FACES[0]];
+  els.push(...shapeSlab('w_ring', 'ne_ring', 'z', -.33, {half: .03, cell: .04, inset: .4}));
+  els.push(...glowBall([0, -.02, -.32], .17, 'ne_orb'));
+  els.push(quad('ne_drop', [-.07, -.27, -.37], [.14, 0, 0], [0, -.22, 0]));
   return els;
 }
+const nestCapX = () => NEST_FACES[1];
 const nestWing = () => shapeSlab('w_wing', 'ne_wing', 'z', 0, {half: .03, cell: .05, inset: .5});
 
 // ================================================================================================================
@@ -947,7 +953,8 @@ export const ORG = {
     ]},
   nest: {type: 'kind', id: 4, name: '둥지', hover: 1.0, hp_bar_y: 2.75, shield: {w: 1.6, h: 2.2}, size: {w: 2.2, h: 1.3},
     displays: [
-      D('cap', {pivot: 'centre', joint: [0, 1.3, 0], looks: {idle: 'nest_cap_idle'}, def: 'idle', models: {nest_cap_idle: nestCap}, note: 'cap + the orb eye (painted emissive)'}),
+      D('cap', {pivot: 'centre', joint: [0, 1.3, 0], looks: {idle: 'nest_cap_idle'}, def: 'idle', models: {nest_cap_idle: nestCap}, note: 'facet-body onion cap with a long spire, the keyhole outline, the orb eye (painted emissive) in its pale ring, the gold drop'}),
+      D('cap_x', {pivot: 'centre', parent: 'cap', follow: () => [0, 45, 0], lookOf: 'cap', twinOf: 'cap', looks: {idle: 'nest_capx_idle'}, def: 'idle', models: {nest_capx_idle: nestCapX}, note: 'the diagonal facets of cap (cap turned 45 degrees)'}),
       D('wing_l', {pivot: 'centre', parent: 'cap', joint: [.17, .02, .02], looks: {idle: 'nest_wing_l_idle'}, def: 'idle', models: {nest_wing_l_idle: nestWing}}),
       D('wing_r', {pivot: 'centre', parent: 'cap', joint: [-.17, .02, .02], looks: {idle: 'nest_wing_r_idle'}, def: 'idle', models: {nest_wing_r_idle: () => mirrorX(nestWing())}}),
     ]},

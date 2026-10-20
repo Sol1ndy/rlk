@@ -440,13 +440,31 @@ add('gu_gem', 16, 16, (s, t) => PAL.gem(clamp(.08 + (s > .55 ? .4 : 0) + (t > .6
 add('gu_orb', 32, 32, glowPx(PAL.core, .15), 'guard');
 
 // 둥지 nesting (12 k)
-add('ne_cap', 64, 32, (s, t) => { let c = tealPx(s, t, -.06 + .1 * t); if (t > .9) c = mix(c, PAL.pale(.4), .5); return c; }, 'nest');
-shapeSprite('ne_wing', SH.w_wing, 48, 'nest', (u, v) => { const b = bevel(SH.w_wing.sd, u, v, .05); let c = mix(PAL.pale(.2), C('#9DB3B0'), .45 * smooth(.2, .8, u));
-  if (u > 1.0) c = mix(c, PAL.hood(.1), .7 * smooth(1.0, 1.1, u)); if (b.lit < 0) c = mix(c, PAL.teal(.3), .35 * b.rim); if (-b.d < .01) c = mix(c, PAL.pale(.75), .6); return c; });
+// the cap facets (cap frame): blue teal, lighter up the spire, soft pale seams; the front faces carry the keyhole - a
+// pale outline round the eye (r .25) running up into two lines that meet at the spire tip, the inside a lighter teal
+const NT = ramp(['#7FAAB0', '#5A8790', '#426A74', '#30525C', '#223E46', '#142A30']);
+export function nestFacetPx(info, s, t, d) {
+  if (info.cls === 9) return NT(.85);
+  const P = texelPos(info, s, t), [x, y, z] = P;
+  let c = NT(.42 - .16 * smooth(-.1, .9, y) + .1 * smooth(.1, -.3, y) + .06 * (N.b(x * 7 + z * 5, y * 6) - .5));
+  if (d < .018) c = mix(c, NT(.15), .4);
+  if (z < -.05) {
+    const circ = Math.hypot(x, y + .02) - .25, w = .16 * clamp(1 - (y - .05) / .95), tri = y > .05 ? Math.abs(x) - w : 1, sd = Math.min(circ, tri);
+    if (sd < 0) c = mix(c, NT(.2), .5);
+    if (Math.abs(sd) < .024) c = mix(c, PAL.pale(.06), .85 * smooth(.024, .01, Math.abs(sd)));
+  }
+  return c;
+}
+// the wing (front view, u out from the hinge): pale blue-grey, a darker grey-teal band along it with fine feather lines,
+// pale lit edges, the split tip fading to pale yellow-green leaflets
+shapeSprite('ne_wing', SH.w_wing, 48, 'nest', (u, v) => { const b = bevel(SH.w_wing.sd, u, v, .05), e = -b.d;
+  let c = mix(PAL.pale(.16), C('#93AAB2'), .5 * smooth(.08, .0, Math.abs(e - .07)) + .15);
+  if (Math.abs(Math.sin(e * 90)) < .2 && e > .03) c = mix(c, C('#6E8890'), .3);
+  if (u > .95) c = mix(c, PAL.lime(.08), .75 * smooth(.95, 1.15, u));
+  if (b.lit < 0) c = mix(c, PAL.teal(.35), .3 * b.rim); if (e < .012) c = mix(c, PAL.pale(.02), .7); return c; });
 shapeSprite('ne_ring', SH.w_ring, 64, 'nest', (u, v) => { const r = Math.hypot(u, v); let c = PAL.pale(.08 + .3 * smooth(.14, .24, r)); if (Math.abs(r - .19) > .04) c = mix(c, PAL.pale(.6), .4); return c; });
-add('ne_orb', 32, 32, glowPx(PAL.core, .25), 'nest');
+add('ne_orb', 16, 16, glowPx(PAL.core, .25), 'nest');
 shapeSprite('ne_drop', SH.w_drop, 64, 'nest', (u, v) => shadeShape(SH.w_drop.sd, u, v, PAL.gem, {t0: .15, edge: .006, w: .03}));
-add('ne_thorn', 16, 16, (s, t) => (Math.abs(s - .5) > .5 * t ? TRANSPARENT : PAL.teal(.5 + .3 * t)), 'nest');
 
 // 파괴 destruction (8 k)
 add('de_shell', 64, 32, shellPx, 'destr');
@@ -576,14 +594,13 @@ add('st_cone', 16, 16, (s, t) => PAL.gold(.15 + .55 * t + (s > .5 ? .15 : 0)), '
 shapeSprite('se_seed', SH.se_seed, 64, 'seed', (u, v) => { const d = -SH.se_seed.sd(u, v); return mix(PAL.gold(.25), PAL.gold(0), .6 * smooth(.08, 0, Math.hypot(u + .04, v - .22))) ; });
 
 // ledge / cap tones of the lofts (darker: they face up)
-add('ne_cap_l', 16, 16, (s, t) => ledgeOf(PAL.teal(.42)), 'nest');
 add('de_shell_l', 16, 16, (s, t) => ledgeOf(PAL.destr(.32)), 'destr');
 add('pr_hood_l', 16, 16, (s, t) => ledgeOf(PAL.hood(.2)), 'pred');
 add('pr_bowl_l', 16, 16, (s, t) => A(ledgeOf(PAL.fin(.3)), .75), 'pred', true);
 add('pr_face_l', 16, 16, (s, t) => ledgeOf(PAL.fin(.3)), 'pred');
 add('he_root_l', 16, 16, (s, t) => ledgeOf(PAL.root(.4 + .2 * N.c(s * 3, t * 3))), 'heart');
 // loft tiles / wraps: texel density per block for the tileUV windows; wraps map u = facet k / n, v along the loft
-for (const n of ['ne_cap', 'de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
+for (const n of ['de_shell', 'pr_hood', 'pr_bowl', 'pr_face', 'nu_ring', 'bo_bubble', 'do_rim', 'de_rim']) registerWrap(n);
 registerTile('he_rootS', 32, 64, 16);
 registerTile('he_vineS', 16, 64, 24);
 registerTile('he_rootSU', 16, 32, 8);
