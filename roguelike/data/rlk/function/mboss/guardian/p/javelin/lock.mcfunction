@@ -1,5 +1,6 @@
 # @s = body (clip tick 17). T = the player now; she faces it; A = the glyph point ^-0.9 ^1.5 ^1.2 aimed at T
-# (pitch 0). A 1.2 b lane from A to the arena edge (r 21) strikes at 27 for 2 t (K23).
+# (pitch 0). A 1.2 b lane from A to the arena edge (r 21) strikes at 27 for 2 t (K23; quiet,
+# no ground telegraph: the glyph and the beam in the air are the tell).
 kill @e[type=minecraft:marker,tag=rlk_mb_gd_p2]
 execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ 201 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_gd_p2","rlk_mb_gd_p2t"]}
 execute at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_gd_p2t,limit=1] feet run tp @s ~ ~ ~ ~ 0
@@ -7,7 +8,7 @@ execute at @s rotated as @s rotated ~ 0 positioned ^-0.9 ^1.5 ^1.2 run summon mi
 execute as @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] at @s facing entity @e[type=minecraft:marker,tag=rlk_mb_gd_p2t,limit=1] feet run tp @s ~ ~ ~ ~ 0
 scoreboard players set #gp2Len mb 0
 execute at @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] positioned ~ 201 ~ run function rlk:mboss/guardian/p/javelin/edge
-# whole blocks (the decal and the hazard use the same length), 2..44 b
+# whole blocks (the hazard, the streak and the debris use the same length), 2..44 b
 scoreboard players add #gp2Len mb 5
 scoreboard players operation #gp2Len mb /= #c10 mb
 scoreboard players operation #gp2Len mb *= #c10 mb
@@ -16,7 +17,6 @@ execute if score #gp2Len mb matches 441.. run scoreboard players set #gp2Len mb 
 scoreboard players set #hzAct mb 2
 scoreboard players set #hzKB mb 2
 scoreboard players set #hzSfx mb 0
-scoreboard players set #hzVis mb 21
 scoreboard players set #hzLinger mb 4
 scoreboard players set #hzQuiet mb 1
 execute if score #gp2Len mb matches 20 at @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_gd_p2a,limit=1] positioned ~ 201 ~ run function rlk:mboss/hz/line {len:20,w:12,tell:10,dmg:130}

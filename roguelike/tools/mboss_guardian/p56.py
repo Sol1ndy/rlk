@@ -3,7 +3,10 @@
 Sources: patterns.md §7, §8.1-8.8, §9.4-9.5, m1.md F (26.45-31.5 s), m2.md (clips A/B), m4.md, plan.md K4,
 K6, K12, K16, K17, K26. Clips `flyslam` (91 t), `sweep` (39 t), `sweep_e` (45 t); the fail spears run on the
 chaos fail clock (T0 = timer full) while the core plays chaos_fail / chaos_land / chaos_raise. Every hit lands
-on a clip event (or the fail schedule) and is telegraphed >= 10 t. User tuning (plan.md): the clips play with
+on a clip event (or the fail schedule), >= 10 t after a readable tell. Telegraph rule (10-20, plan.md): only the
+fly-slam ring (m1 27.42-28.62 s) and the fail spears' red star (m4 1.55-4.55 s) are ground telegraphs, both
+trimmed to what the footage shows; the sweeps have none (m2: read the chest sigil, the wind-up and the sounds).
+Every hazard here is quiet (#hzQuiet 1: no framework outline, no strike flash). User tuning (plan.md): the clips play with
 ~25 % shorter wind-ups (guardian_clips.mjs RETIME; authored ticks of the fx go through api.rt / api.inv), the fail
 schedule runs x0.75, and every hit area (with its decal and fx) is ~20 % larger. Played ticks below.
 
@@ -17,7 +20,7 @@ P5 하늘을 심판하는 자  (far)
          28 gold rim bars grow r 1 -> 5.5 over 16-21 (m1 27.48-27.73 s), a translucent amber glow fill and a star.
   16     hazard: disc r 5.5, 180 %, strikes at 31 (15 t, the clip impact). She is untargetable 16-30.
   18-29  the body (hitbox) glides under the ring (she flies over it, trailing cubes); 20-28 gold 4-point
-         sparkles and gold dust fall onto the centre; a progress circle reaches the rim at the strike;
+         sparkles and gold dust fall onto the centre (no progress circle: the footage ring has none);
          23 falling whistle.
   29-31  descent pillar from the sky onto the ring centre;  31 IMPACT: white flash of the rim, burst,
          shock ring, gold and rock debris, tumbling gold / dark cubes, boom + iron door crash.
@@ -30,13 +33,16 @@ P6 sweeps (service, started by the core from guard mode; the blade is synced to 
   from the rig poses, p56_spear.json), so a player on her left is hit first and one on her right last;
   one hit per sweep across the slices (a hit or an i-frame dodge on one slice consumes the others).
   Gold (11, timeout): sweep clip; 200 deg front arc r 6 from her left to her right, slices at 15-19
-  (front at 17, m2 hit at timeout+23 before the tuning), 165 %, knockback 3. Gold rim bars (flash white as the
-  blade passes), a progress arc, 9 riptide swell, layered gold crescent ribbon (#CC9C3C / #E4B43C / #FCFC84 /
-  white) + two crescent cards, a row of vertical gold crystal spikes along the arc edge, gold and rock
-  chips, dark-red cubes; sweep whoosh 15, crunch 17 (dripstone, basalt, quiet explode).
-  Enchanted (12, record complete R = clip 0): sweep_e clip; same arc in the recorded element: enchant line
-  through her and along the spear + waist ring burst at 3-4 (beacon thump, short sonic charge), element
-  glow on the wind-up, slices at 16-22 (front at 18), 250 % + the element, knockback 4; element crescent
+  (front at 17, m2 hit at timeout+23 before the tuning), 165 %, knockback 3. No ground telegraph (m2 8.20-9.60 s
+  shows none): the guard-end gold swell, the chest sigil (power-select) 4 t before the end, the wind-up with
+  the spear cocked behind her right shoulder and a 9 riptide swell are the tell; at the slices a layered gold
+  crescent ribbon (#CC9C3C / #E4B43C / #FCFC84 / white) + two crescent cards, a row of vertical gold crystal
+  spikes along the arc edge, gold and rock chips, dark-red cubes; sweep whoosh 15, crunch 17 (dripstone,
+  basalt, quiet explode).
+  Enchanted (12, record complete R = clip 0): sweep_e clip; same arc in the recorded element, no ground
+  telegraph (m2 14.82-15.95 s, 23.95-25.20 s): enchant line through her and along the spear + waist ring burst
+  at 3-4 (beacon thump, short sonic charge), element glow on the wind-up, slices at 16-22 (front at 18),
+  250 % + the element, knockback 4; element crescent
   ribbon and strike fx inside the arc (electro forked bolts and violet shards, pyro flame bursts, hydro
   splashes, cryo ice shards), lingering ground fx to R+37; element sounds.
 
@@ -47,12 +53,13 @@ schedule x0.75)
           from her chest; forming roar (respawn anchor, beacon, amethyst, sonic charge).
   19+23j  the giant red copy of her spear grows out of the column point-down (tip 3.8 b above the
           target); the red concave 4-point star decal (crimson fill, black rim, pink streaks) centred on
-          the target, one arm toward the arena centre, side arms opening +-3.2 -> +-11.4 b in 6 t;
-          hazard: disc r 3.4 (K12 cylinder x1.2), 220 %, the star's element, strikes at 37+23j (18 t).
-          Spear 1 says the attack line.
+          the target, one arm toward the arena centre, side arms opening +-3.2 -> +-11.4 b in 6 t (the
+          only ground telegraph, as in m4: no damage ring, no progress); hazard (quiet): disc r 3.4 (K12
+          cylinder x1.2), 220 %, the star's element, strikes at 37+23j (18 t). Spear 1 says the attack line.
   27-30   hang drone; 28 (+2 for blue) the spear turns from red to the star colour (gold; blue via
           violet; element colours), chime;  33 pre-drop whistle.
-  37+23j  drop in 1 t + IMPACT: flash column, starburst rays; 38 dome of light (r 1.75); 39 the X of
+  37+23j  drop in 1 t + IMPACT: flash column, starburst rays, a flat ring of the star colour at the hit radius
+          r 3.4 (37 and 39: the impact shows the area the decal did not); 38 dome of light (r 1.75); 39 the X of
           crossed light beams, spike field (gold +-8 b) / ice-water splash (+-4.8 b) / flames / sparks,
           rock debris and cubes, per-kind blast sounds; residue (crimson floor + gold or blue cracks)
           to ~+33; the spear stays planted 20 t, then dissolves upward (57) and is gone at 67+23j.
@@ -262,12 +269,7 @@ def flyslam(g):
             tl.at(t, g.particle(BLACK_BLK, f'~ ~{n3(py - 0.4)} ~', (0.2, 0.3, 0.2), 0, 2),
                   g.dust(GOLD, 1.0, f'~ ~{n3(py + 0.8)} ~', (0.3, 0.3, 0.3), 2))
 
-    # -- 22-40: progress circle reaching the rim at the strike; 26-38 falling sparkles; 31 whistle
-    for t in range(ring + 1, imp, 3):
-        r = R * (t - ring) / (imp - ring)
-        n = max(8, int(2 * math.pi * r / 0.7))
-        tl.at(t, *[f'execute {ATM} positioned {loc(polar(360 * j / n, r, 0.12))} run ' + g.dust(GOLD_PALE, 0.8, '~ ~ ~', (0, 0, 0), 1)
-                   for j in range(n)])
+    # -- 26-38 falling sparkles; 31 whistle (no progress circle: the footage ring has none, rule 10-20)
     for t in range(W(26), W(39), 2):
         a, rr, h = rnd.uniform(0, 360), rnd.uniform(0.2, 1.8) * K5, rnd.uniform(6.5, 8.5)
         p = polar(a, rr, h)
@@ -373,15 +375,6 @@ SLAB_BLK = {0: ('minecraft:yellow_stained_glass', 'minecraft:white_stained_glass
             2: ('minecraft:light_blue_stained_glass', 'minecraft:white_stained_glass'),
             3: ('minecraft:magenta_stained_glass', 'minecraft:white_stained_glass'),
             4: ('minecraft:white_stained_glass', 'minecraft:light_blue_stained_glass')}
-# Rim of the sweep: opaque saturated bars on a black under-bar (a dark outline 0.06 b wide), so the full extent
-# reads from the first tick on the white marble and on the pink centre star alike (glass rims vanished there).
-RIM_BLK = {0: 'minecraft:gold_block', 1: 'minecraft:orange_concrete', 2: 'minecraft:blue_concrete',
-           3: 'minecraft:purple_concrete', 4: 'minecraft:light_blue_concrete'}
-RIM_OUT = 'minecraft:black_concrete'
-# progress arc: saturated, darker than the element palette (pale cyan / pale gold vanish on marble), with a dark
-# companion row just outside it
-ARC_COL = {0: (0.90, 0.52, 0.06), 1: (1.0, 0.38, 0.10), 2: (0.10, 0.36, 0.95), 3: (0.62, 0.22, 0.95), 4: (0.05, 0.62, 0.82)}
-ARC_DARK = (0.10, 0.06, 0.08)
 EL_SHARD = {1: 'minecraft:orange_stained_glass', 2: 'minecraft:light_blue_stained_glass',
             3: 'minecraft:purple_stained_glass', 4: 'minecraft:packed_ice'}
 
@@ -422,30 +415,13 @@ def sweep(g, gold):
         else:
             etl[e].setdefault(t, []).extend(lines)
 
-    # -- rim decal (per element): 20 arc bars at r 5 from +100 to -100 deg + the two edge spokes; each
-    #    arc bar carries the tag of the slice whose blade passes over it (it flashes white then)
+    # -- no ground telegraph (rule 10-20: m2 shows none before the sweeps); slice_of(th) = the slice whose blade
+    #    passes over the arc angle th (the crescent slabs of each slice)
     def slice_of(th):
         for i, (t, a0, a1) in enumerate(slices):
             if a0 >= th >= a1:
                 return i
         return len(slices) - 1
-
-    for e in els:
-        rim = [f'# Rim decal of the sweep (@s = body, at it, rotated as it): {RIM_BLK[e]} on a black outline.']
-        for i in range(20):
-            th = 95 - 10 * i
-            tr, q, sc = X.bar_tf(th, SW_R + 0.01, 1.0 * SW_K, 0.27, 0.03, 0.008)
-            rim.append(X.bd(RIM_OUT, tr, q, sc, X.base_tags(pid, f'rlk_mb_gd_p{pid}b', f'rlk_mb_gd_p{pid}o', 'rlk_mb_gd_bnew')))
-            tr, q, sc = X.bar_tf(th, SW_R - 0.05, 0.95 * SW_K, 0.15, 0.045, 0.02)
-            rim.append(X.bd(RIM_BLK[e], tr, q, sc, X.base_tags(pid, f'rlk_mb_gd_p{pid}b', f'rlk_mb_gd_p{pid}b{slice_of(th)}', 'rlk_mb_gd_bnew')))
-        for th in (100, -100):
-            tr, q, sc = X.spoke_tf(th, 0.75, SW_R + 0.05, 0.26, 0.03, 0.008)
-            rim.append(X.bd(RIM_OUT, tr, q, sc, X.base_tags(pid, f'rlk_mb_gd_p{pid}b', f'rlk_mb_gd_p{pid}o', 'rlk_mb_gd_bnew')))
-            tr, q, sc = X.spoke_tf(th, 0.8, SW_R, 0.14, 0.045, 0.02)
-            rim.append(X.bd(RIM_BLK[e], tr, q, sc, X.base_tags(pid, f'rlk_mb_gd_p{pid}b', f'rlk_mb_gd_p{pid}e', 'rlk_mb_gd_bnew')))
-        rim += ['tp @e[type=minecraft:block_display,tag=rlk_mb_gd_bnew] ~ ~ ~ ~ 0',
-                'tag @e[type=minecraft:block_display,tag=rlk_mb_gd_bnew] remove rlk_mb_gd_bnew']
-        g.pw(key, f'rim{e}', rim)
 
     # -- slices: one sector hazard per blade slice, struck on the tick the blade passes
     st = [f'# @s = body: {len(slices)} blade slices of the 200 deg arc r {SW_R} (strike ticks {first}-{last}).']
@@ -462,18 +438,6 @@ def sweep(g, gold):
     # -- one hit per sweep: a hit (or a dodge) on any slice consumes the rest (body tick runs before hz/all)
     tl.span(first + 1, last + 1, f'execute if entity {SL.replace("]", ",scores={mbHzHit=1..}]")} run scoreboard players set {SL.replace(",limit=1", "")} mbHzHit 1')
 
-    # -- progress arc (telegraph timing): a saturated arc with a dark row just outside it, growing from her to
-    #    the rim; it reaches the rim at the end of the tell (the tick before the first slice strikes)
-    tell_end = first - 1
-    for t in sorted(set(range(2, tell_end, 2)) | {tell_end}):
-        r = SW_R * t / tell_end
-        n = max(6, int(math.radians(200) * r / 0.55))
-        for e in els:
-            eat(t, e, *[f'execute {BODY} positioned {loc(polar(100 - 200 * j / (n - 1), r, 0.1))} run '
-                       + g.dust(ARC_COL[e], 0.95, '~ ~ ~', (0, 0, 0), 1) for j in range(n)],
-                *[f'execute {BODY} positioned {loc(polar(100 - 200 * (j + 0.5) / (n - 1), r + 0.16, 0.08))} run '
-                  + g.dust(ARC_DARK, 0.7, '~ ~ ~', (0, 0, 0), 1) for j in range(0, n - 1, 2)])
-
     # -- wind-up: glow on the spear head
     for t in range(1 if gold else ev(clip, 'windup'), first):
         hd = sp(clip, t, 'head')
@@ -483,8 +447,7 @@ def sweep(g, gold):
     # -- per slice strike fx (per element)
     for i, (t, a0, a1) in enumerate(slices):
         for e in els:
-            fx = [f'# Slice {i} (clip tick {t}, {a0} -> {a1} deg){"" if gold else ", element " + str(e)}: blade fx.',
-                  f'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}b{i}] run data merge entity @s {{block_state:{{id:"minecraft:white_concrete"}}}}']
+            fx = [f'# Slice {i} (clip tick {t}, {a0} -> {a1} deg){"" if gold else ", element " + str(e)}: blade fx.']
             # the crescent body: translucent slabs at waist height (higher on her left), white-hot outer edge
             for th in range(95, -96, -10):
                 if slice_of(th) != i:
@@ -515,11 +478,9 @@ def sweep(g, gold):
                 fx += element_strike(g, rnd, e, a0, a1, SW_K)
             g.pw(key, f's{i}' if gold else f's{i}_{e}', fx)
             tl.at(t, g.fn(f'p/{key}/s{i}') if gold else f'execute if score #gdSwEl mb matches {e} run {g.fn(f"p/{key}/s{i}_{e}")}')
-        tl.at(t + 3, f'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}b{i}]')
         tl.at(t + 1, f'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}w{i}] run data merge entity @s '
                      f'{{start_interpolation:0,interpolation_duration:4,transformation:{{scale:[{n3(0.82 * SW_K)}f,0.01f,0.04f]}}}}')
         tl.at(t + 5, f'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}w{i}]')
-    tl.at(last + 3, f'kill @e[type=minecraft:block_display,tag=rlk_mb_gd_p{pid}b]')
 
     if gold:
         # gold crescent cards following the blade (roll 180 = a left-to-right swing, spin + = to her right)
@@ -579,13 +540,9 @@ def sweep(g, gold):
             FACE,
             g.play(clip),
             g.fn(f'p/{key}/slices')]
-    if gold:
-        head.append(f'execute {BODY} run {g.fn(f"p/{key}/rim0")}')
-    else:
-        head += [f'execute if score #gdSwEl mb matches {e} {BODY} run {g.fn(f"p/{key}/rim{e}")}' for e in els]
     tl.at(end, g.end())
     tl.write(head, [f'# {what} tick (@s = body, #gdPT = clip tick).'])
-    g.pw(key, 'cancel', [f'# {what} cancel (any executor): rim bars, cubes, its slice hazards.',
+    g.pw(key, 'cancel', [f'# {what} cancel (any executor): slabs, cubes, its slice hazards.',
                          f'kill @e[tag=rlk_mb_gd_p{pid}]'])
 
 
@@ -654,7 +611,7 @@ TINT2 = {6: 'hydro'}
 DECAL_W = 1.3 * AREA              # half width of the star arms at the centre (x1.2 with the disc)
 # readable on the pink centre star and the white marble: opaque crimson fill, black rim (a pink rim vanished there)
 DECAL_FILL, DECAL_RIM = 'minecraft:red_concrete', 'minecraft:black_concrete'
-RING_N = 24                       # bars of the damage ring at FAIL_R
+HIT_RING_N = 36                   # dust points of the flat impact ring at FAIL_R (0.6 b apart)
 DECAL_FB = (4.5 * AREA, 7.5 * AREA)   # half length of the front/back arm pair, decal -> decal + 6
 DECAL_SS = (2.7 * AREA, 9.5 * AREA)   # half length of the side arm pair (m4: +-2.7 -> > +-9 in 6 t), x1.2
 
@@ -679,7 +636,16 @@ def fail(g):
                 g.particle('end_rod', '~ ~1 ~', (0.3, 0.6, 0.3), 0.25, 14)]
         if style == 'gold':
             hit.append(g.card('burst', '~ ~1.4 ~', bb='center', spin=20, s0=1.0, s1=4.8, life=6, fade=3))
+        hit.append(F(f'ring{kind}'))
         g.pw(k, f'hit{kind}', hit)
+        # impact ring: the hit radius flat on the floor in the star colour (an impact visual, not a telegraph: the
+        # star decal is the footage's only ground marker and is ~23 b across, the hit is r FAIL_R); at the hit and
+        # again with the blast (+2)
+        g.pw(k, f'ring{kind}', [f'# Impact ring (kind {kind}) at the hit radius r {FAIL_R:g}, on the floor.']
+             + [f'execute positioned {loc(polar(360 * m / HIT_RING_N, FAIL_R, 0.12))} run ' + g.dust(mid, 1.6, '~ ~ ~', (0.03, 0, 0.03), 1)
+                for m in range(HIT_RING_N)]
+             + [f'execute positioned {loc(polar(360 * (m + 0.5) / HIT_RING_N, FAIL_R - 0.2, 0.1))} run ' + g.dust(core, 1.1, '~ ~ ~', (0.03, 0, 0.03), 1)
+                for m in range(0, HIT_RING_N, 2)])
         # dome of light r 1.45 x1.2
         DR = 1.45 * AREA
         dome = [f'# Dome of light (kind {kind}), r {DR:.2f} (m4 2.9 b wide and tall, x1.2 with the disc).']
@@ -693,7 +659,8 @@ def fail(g):
             dome.append(g.card('glow', '~ ~0.9 ~', bb='center', s0=2.4, s1=3.4, life=4, fade=2))
         g.pw(k, f'dome{kind}', dome)
         # blast: X beams, spike field / splash / flames / sparks, rocks
-        bl = [f'# Blast of a kind-{kind} spear ({style}): X of crossed light beams, field, debris.']
+        bl = [f'# Blast of a kind-{kind} spear ({style}): X of crossed light beams, field, debris, the impact ring again.',
+              F(f'ring{kind}')]
         hc, tilt, L = 2.4 * AREA, 28, 10.0
         for sgn in (1, -1):
             q = qaxis((0, 0, 1), -sgn * tilt)
@@ -847,10 +814,10 @@ def fail(g):
         at(FAIL_COL + 2, *[f'execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_p13c{j}_{m},limit=1] run data merge entity @s '
                            f'{{start_interpolation:0,interpolation_duration:2,transformation:{full}}}' for m, _, full in colsum[3:]])
         # 25: decal + hazard + the giant red spear
-        dec = [f'# Spear {j + 1} (T0+{FAIL_DECAL + b}): the hazard (disc r {FAIL_R}, {DMG["fail"]} %, the star\'s element), the red',
-               '# concave 4-point star decal on the player (front arm toward the arena centre) and the giant red spear',
-               '# growing out of the column, point down, its tip 3.8 b above the target.',
-               *g.hz_opts(sfx=0, kb=KB['default'], linger=2)]
+        dec = [f'# Spear {j + 1} (T0+{FAIL_DECAL + b}): the hazard (disc r {FAIL_R}, {DMG["fail"]} %, the star\'s element; quiet), the red',
+               '# concave 4-point star decal on the player (front arm toward the arena centre: the only ground telegraph, as',
+               '# in m4, rule 10-20) and the giant red spear growing out of the column, point down, its tip 3.8 b above the target.',
+               *g.hz_opts(sfx=0, kb=KB['default'], linger=2, quiet=1)]
         for kind in range(1, 7):
             if kind <= 4:
                 dec.append(f'execute if score {KS} mb matches {kind} run scoreboard players set #hzEl mb {kind}')
@@ -865,12 +832,6 @@ def fail(g):
             dec.append(f'execute at {T} run summon minecraft:block_display ~ ~ ~ {{Tags:{tags(*X.base_tags(pid, f"rlk_mb_gd_p13d{j}", f"rlk_mb_gd_p13d{j}{nm}", "rlk_mb_gd_p13dnew"))},'
                        f'block_state:{{id:"{blk}"}},brightness:{{sky:15,block:15}},view_range:2f,shadow_radius:0f,teleport_duration:0,'
                        f'interpolation_duration:0,transformation:{tf(tr, rL, rS, rR)}}}')
-        # the damage disc itself: a crimson ring at r FAIL_R on a black outline (the star's diagonals end inside it)
-        for m in range(RING_N):
-            th = 360 * m / RING_N
-            for blk, rr, ww, hh, yy in ((DECAL_RIM, FAIL_R + 0.07, 0.3, 0.02, 0.05), (DECAL_FILL, FAIL_R, 0.15, 0.025, 0.062)):
-                tr, q, sc = X.bar_tf(th, rr + ww / 2, 2 * math.pi * FAIL_R / RING_N + 0.06, ww, hh, yy)
-                dec.append(f'execute at {T} run ' + X.bd(blk, tr, q, sc, X.base_tags(pid, f'rlk_mb_gd_p13d{j}', 'rlk_mb_gd_p13dnew')))
         dec += [f'execute {ATT} run tp @e[type=minecraft:block_display,tag=rlk_mb_gd_p13dnew] ~ ~ ~ ~ 0',
                 'tag @e[type=minecraft:block_display,tag=rlk_mb_gd_p13dnew] remove rlk_mb_gd_p13dnew',
                 f'execute {ATT} positioned ~ ~11.9 ~ run {g.rig("prop/spear")}',

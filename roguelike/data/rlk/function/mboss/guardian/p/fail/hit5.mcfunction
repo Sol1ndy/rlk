@@ -36,3 +36,4 @@ execute rotated ~315 0 positioned ^ ^2.165 ^5.04 run particle minecraft:dust{col
 particle minecraft:dust{color:[1f,1f,0.99f],scale:2.6} ~ ~1 ~ 0.5 1.2 0.5 0 30 force @a[tag=player]
 particle minecraft:end_rod ~ ~1 ~ 0.3 0.6 0.3 0.25 14 force @a[tag=player]
 function rlk:fx/nv/card {kind:"burst",pos:"~ ~1.4 ~",rot:"~ ~",bb:"center",roll:0,spin:20,s0:1,s1:4.8,move:"0f,0f,0f",life:6,fade:3}
+function rlk:mboss/guardian/p/fail/ring5

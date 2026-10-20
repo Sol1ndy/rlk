@@ -6,7 +6,7 @@ Not a pattern module (it is not in PATTERN_MODULES); p56.py imports it. Plain Py
                small binary dispatch tree on #gdPT (a tick runs a handful of score tests, not every line)
     geometry   n3/fl/loc, vectors, quaternions, display transformation SNBT
     cubes      irregular tumbling block_display cubes (mixed sizes, tilts, colours, drift, timing)
-    bars       thin block_display bars on an arc or a ring (floor rims of the telegraphs)
+    bars       thin block_display bars on an arc or a ring (the fly-slam ring rim, the sweep crescent slabs)
     rhombus    a flat block_display diamond (the arms of the fail-spear star decal)
 
 Every entity these helpers summon carries rlk_room, rlk_mb_aux and the pattern tag
@@ -219,20 +219,13 @@ def cubes(tl, pid, name, t, specs, anchor, life, cond=''):
 
 
 # ---------------------------------------------------------------------------------------------
-# floor bars (telegraph rims)
+# floor bars (the P5 ring rim, the sweep slabs)
 def bar_tf(theta, r, ln, w, h, y):
     """A bar tangent to the circle of radius r at angle theta (0 = forward, + = her left), centred on
     it radially; ln along the tangent, w radial width, h height, bottom at y."""
     q = qaxis((0, 1, 0), theta)
     tr = qrot(q, (-ln / 2, y, r - w / 2))
     return tr, q, (ln, h, w)
-
-
-def spoke_tf(theta, r0, r1, w, h, y):
-    """A radial bar along angle theta from r0 to r1."""
-    q = qaxis((0, 1, 0), theta)
-    tr = qrot(q, (-w / 2, y, r0))
-    return tr, q, (w, h, r1 - r0)
 
 
 def bd(block, tr, q, sc, tagl, bright=15, extra=''):
