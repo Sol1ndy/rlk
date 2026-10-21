@@ -1,0 +1,6 @@
+data merge entity 524c4b4d-4150-4400-8000-00000000000a {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,4.52574f,1.82792f],left_rotation:[0.0349f,0f,0f,0.99939f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000000b {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,4.88695f,1.8231f],left_rotation:[0.0349f,0f,0f,0.99939f],scale:[2.1f,2.1f,2.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000025 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[2.9f,0.4f,-1.6f],left_rotation:[0f,0f,0f,1f],scale:[1.2f,1.2f,1.2f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000026 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-2.9f,0.4f,-1.6f],left_rotation:[0f,0f,0f,1f],scale:[1.2f,1.2f,1.2f],right_rotation:[0f,0f,0f,1f]}}
+scoreboard players set @s apRigFy 2
+scoreboard players reset @s apRigQx

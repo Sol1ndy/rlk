@@ -1,0 +1,6 @@
+data merge entity 524c4b4d-4150-4400-8000-000000000001 {start_interpolation:0,interpolation_duration:9,transformation:{translation:[-0.04326f,2.14066f,-1.14f],left_rotation:[-0.0746f,0.00238f,-0.03174f,0.99671f],scale:[1.4f,1.4f,1.4f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000007 {start_interpolation:0,interpolation_duration:6,transformation:{translation:[0.03479f,4.03967f,0.7431f],left_rotation:[-0.00378f,0.00004f,-0.0109f,0.99993f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000026 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-3.17716f,0.95433f,-2.5f],left_rotation:[0f,0f,0f,1f],scale:[1.14f,1.14f,1.14f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000002d {start_interpolation:0,interpolation_duration:12,transformation:{translation:[1.01419f,0.18044f,-8.8f],left_rotation:[0.00059f,-0.12861f,-0.0348f,0.99108f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000030 {start_interpolation:0,interpolation_duration:6,transformation:{translation:[-1.44097f,3.20527f,1.65922f],left_rotation:[0.25709f,0.35047f,0.00656f,0.90057f],scale:[1.6f,1.6f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:mboss/apep/rig/hand/c_hand_r/p1_curl

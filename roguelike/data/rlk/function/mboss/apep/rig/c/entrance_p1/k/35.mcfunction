@@ -1,0 +1,10 @@
+data merge entity 524c4b4d-4150-4400-8000-000000000002 {start_interpolation:0,interpolation_duration:3,transformation:{translation:[0f,1.22772f,0.29624f],left_rotation:[0.27076f,0f,0f,0.96265f],scale:[1.7f,1.7f,1.7f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000016 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-1.55f,5.20738f,0.47662f],left_rotation:[-0.47023f,-0.39485f,-0.77543f,0.14729f],scale:[2f,2f,2f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000018 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-2.89044f,6.64849f,-0.58237f],left_rotation:[-0.51274f,0.38064f,-0.04644f,0.76815f],scale:[2.1f,2.1f,2.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000001a {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-1.78622f,6.1301f,1.46786f],left_rotation:[-0.58139f,0.28576f,-0.18186f,0.73976f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000001f {start_interpolation:0,interpolation_duration:2,transformation:{translation:[2.17405f,1.5598f,2.02737f],left_rotation:[0.0074f,0.10509f,0.00471f,0.99442f],scale:[1.8f,1.8f,1.8f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000020 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-2.17405f,1.5598f,2.02737f],left_rotation:[0.0074f,-0.10509f,-0.00471f,0.99442f],scale:[1.8f,1.8f,1.8f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000027 {start_interpolation:0,interpolation_duration:3,transformation:{translation:[0f,1.63417f,-1.53393f],left_rotation:[-0.43499f,0f,0f,0.90044f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000028 {start_interpolation:0,interpolation_duration:3,transformation:{translation:[0f,0.71417f,-2.26393f],left_rotation:[-0.23391f,0f,0f,0.97226f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:mboss/apep/rig/hand/b_hand_l/p1_curl
+function rlk:mboss/apep/rig/hand/b_hand_r/p1_curl
