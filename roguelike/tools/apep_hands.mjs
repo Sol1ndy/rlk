@@ -315,7 +315,9 @@ function petalFoot(k, back, curl) {
   const fwd = back ? 'b' : 'f', fr = [], cz = (back ? .2 : -.2) * k;
   // [run, phi (deg, toward +a), W, mid-plane lift of the root (layering)]
   // (the three forward petals share a frame: distinct root lifts keep their overlapping roots from z-fighting)
-  const P = [[fwd, 0, .34, .075], [fwd, 40, .3, .015], [fwd, -40, .3, .037], ['l', back ? 24 : -24, .27, 0], ['r', back ? 24 : -24, .27, .022]];
+  // AP-R3b: the petals ~22 % broader (v2 f2076 / f2040: big rounded closed-lotus petals; at game distance the R2 petals
+  // read as a small spiky crown round the ankle)
+  const P = [[fwd, 0, .42, .075], [fwd, 40, .37, .015], [fwd, -40, .37, .037], ['l', back ? 24 : -24, .33, 0], ['r', back ? 24 : -24, .33, .022]];
   for (const [run, phiDeg, W0, dy] of P) {
     const phi = phiDeg * D2R, W = W0 * k, cs = Math.cos(phi);
     const sd = petalShape(L, W, phi), ext = L * cs + W * Math.abs(Math.sin(phi)) + .04;

@@ -150,8 +150,14 @@ const SEAM = 122, PE = 80, ARCH = .38, SPAN = .7;
 export const ARM_T = [[-.1, 1.03], [-.08, 1.02]];                  // per row: the bone fraction at v = 0 and v = 1
 // the panels of a row: the bone fraction of each panel's tip (its arch on the top face)
 const ARM_PANELS = [[.97], [.56, .99]];
-function p1ArmPaint(th, v, row) {
-  const ath = Math.abs(th), [T0, T1] = ARM_T[row], L = row ? LEN.a_lo : LEN.a_up, t = T0 + v * (T1 - T0);
+// AP-R3b: the shell's broad face is turned to the front (model -Z, theta 90) over most of both segments, so the player's
+// camera sees the broad blade (v2 f2076); the paint follows: theta is shifted by ARM_TURN(row, t) (90 where the section is
+// wide along X, 0 at the shoulder root and at the wrist, where the section stays wide front-back for the claw).
+export const ARM_TURN = (row, t) => (row === 0 ? smooth(.2, .45, t) : 1 - smooth(.76, .94, t));
+function p1ArmPaint(th0, v, row) {
+  const [T0, T1] = ARM_T[row], L = row ? LEN.a_lo : LEN.a_up, t = T0 + v * (T1 - T0);
+  let th = th0 - 90 * ARM_TURN(row, t); if (th <= -180) th += 360;
+  const ath = Math.abs(th);
   const nz = N.a(th / 40 + row * 3, t * 3) - .5;
   const shade = smooth(48, 118, ath);
   let c;
@@ -218,7 +224,8 @@ function p1ArmPaint(th, v, row) {
     }
   }
   if (t > T1 - .025) c = mix(PAL.p1_bark(.85), PAL.p1_line(.8), .5);                 // the end rim
-  return mix(c, PAL.p1_slate(.1), .26);                                              // the grey-green cast of the arm shell
+  // the grey-green cast of the arm shell (AP-R3b: deeper, v2 f2076 reads mid grey-green, not cream; the inner scales paler)
+  return ath > SEAM + 3 ? mix(c, PAL.p1_slate(.22), .3) : mix(c, PAL.p1_slate(.3), .42);
 }
 // Legs (B / C, model.md §3.4: dark armour on the upper leg fading to pale bark at the foot, v1 f315, v2 f870 / f2076).
 // Each segment is ONE shell (a few sections, a gentle taper / flare); the plates are painted on it. Rows (v along the
@@ -440,27 +447,31 @@ function p1(seg) {
     // the flattened shell arm: radii [top, front edge, under, back edge], one loft per segment whose sections step out a
     // little toward the claw (each step a thin ledge: the overlap of two shell plates); the upper arm's end flares over
     // the forearm's root at the elbow; the forearm broadens into the paddle under the claw
+    // AP-R3b: the sections turn from wide front-back (radii [top, front, under, back]) at the shoulder root to wide along
+    // X (up-out, seen from the front) by mid-arm, and back to the shared 1.0 b front-back wrist at the claw (ARM_TURN)
     case 'a_up': return shell(L, ARM_T[0], [
-      [.15, [.34, .46, .28, .44], [.02, 0]],                 // the shoulder root (under the hump)
-      [.32, [.33, .5, .27, .48], [.08, 0]],                  // the section centres arch up (+X) along the segment
-      [.5, [.32, .53, .26, .51], [.13, 0]],
-      [.68, [.31, .55, .25, .53], [.14, 0]],
-      [.86, [.31, .57, .25, .55], [.1, 0]],
-      [1.03, [.31, .58, .24, .56], [.05, 0]],                // the elbow end over the forearm root
+      [.15, [.35, .45, .29, .43], [.02, 0]],                 // the shoulder root (under the hump)
+      [.3, [.42, .4, .36, .38], [.06, 0]],
+      [.44, [.5, .34, .44, .32], [.1, 0]],
+      [.6, [.55, .31, .49, .29], [.11, 0]],
+      [.78, [.57, .3, .51, .28], [.09, 0]],
+      [.92, [.58, .3, .52, .28], [.06, 0]],
+      [1.03, [.58, .3, .52, .28], [.04, 0]],                 // the elbow end over the forearm root
     ], ARM1, 0, rimP1, {seed: 300}).concat(
-      // a pale shell plate laid over the top of the arch, its tip toward the elbow (the overlapping leaf shells)
-      leafPlate('x', .52, {u0: -.46, u1: .46, v0: -.8 * L, v1: -.34 * L}, null, PLATE1P, 'l1_rim'));
+      // a pale shell plate laid over the broad face, its tip toward the elbow (the overlapping leaf shells)
+      leafPlate('z', -.39, {u0: -.36, u1: .56, v0: -.8 * L, v1: -.38 * L}, null, PLATE1P, 'l1_rim'));
     case 'a_lo': return shell(L, ARM_T[1], [
-      [.18, [.29, .53, .22, .51], [.06, 0]],
-      [.36, [.29, .56, .22, .54], [.09, 0]],
-      [.56, [.28, .59, .21, .57], [.1, 0]],                  // the second panel (the overlap past the bone middle)
-      [.74, [.27, .62, .2, .6], [.08, 0]],
-      [.88, [.26, .58, .19, .56], [.05, 0]],
+      [.18, [.55, .3, .49, .28], [.05, 0]],
+      [.36, [.6, .3, .52, .28], [.07, 0]],
+      [.56, [.62, .3, .54, .28], [.08, 0]],                  // the second panel (the overlap past the bone middle)
+      [.72, [.58, .31, .5, .29], [.07, 0]],
+      [.82, [.48, .37, .41, .35], [.05, 0]],                 // the wrist turn
+      [.92, [.34, .45, .27, .44], [.04, 0]],
       [1.02, [.24, .5, .17, .49], [.03, 0]],                 // AP-R3: tapers to the shared 1.0 b wrist over the claw
     ], ARM1, 1, rimP1, {seed: 320}).concat(
-      // two pale shell plates over the forearm's top, overlapping toward the claw
-      leafPlate('x', .44, {u0: -.5, u1: .5, v0: -.5 * L, v1: -.02 * L}, null, PLATE1P, 'l1_rim'),
-      leafPlate('x', .4, {u0: -.56, u1: .56, v0: -.9 * L, v1: -.46 * L}, null, PLATE1P, 'l1_rim'));
+      // two pale shell plates over the forearm's broad face, overlapping toward the claw
+      leafPlate('z', -.43, {u0: -.4, u1: .6, v0: -.5 * L, v1: -.04 * L}, null, PLATE1P, 'l1_rim'),
+      leafPlate('z', -.375, {u0: -.42, u1: .62, v0: -.74 * L, v1: -.44 * L}, null, PLATE1P, 'l1_rim'));
     case 'b_up': case 'c_up': {
       // the upper leg: one dark armour shell (the plates painted on it, a slight taper) and two pointed leaf plates laid
       // over its top / outer side and its front (the layered armour of model.md §3.4)

@@ -369,7 +369,11 @@ function shouldersP1() {
     sd: (u, v) => HOOK.sd((u - hz0) / HK, (v - hy0) / HK) * HK, half: .035, sprite: hs, edge: 'g_plate', cell: .08, core: false, rot: ['y', 45, [hx, hy0, hz0]]}));
   const gz = -2.62 - J[2], gy = 3.22 - J[1], gx = 1.98;
   half.push(rockBox([gx - .12, gy - .21, gz - .21], [gx + .12, gy + .21, gz + .21], 'g_plate', {seed: 522, rot: ['y', 45, [gx, gy, gz]]}));
-  half.push(rockBox([gx, gy - .14, gz - .14], [gx + .2, gy + .14, gz + .14], 'p1_gem', {seed: 523, rot: ['y', 45, [gx, gy, gz]]}));
+  // AP-R3b: the gem as a stepped cut stone (three tiers) standing out of the frame, so its faces catch the light in steps
+  // instead of reading as a flat yellow square in a black box (v1 f315)
+  half.push(rockBox([gx, gy - .16, gz - .16], [gx + .17, gy + .16, gz + .16], 'p1_gem', {seed: 523, rot: ['y', 45, [gx, gy, gz]]}));
+  half.push(rockBox([gx + .1, gy - .1, gz - .1], [gx + .25, gy + .1, gz + .1], 'p1_gem', {seed: 524, rot: ['y', 45, [gx, gy, gz]]}));
+  half.push(rockBox([gx + .2, gy - .045, gz - .045], [gx + .3, gy + .045, gz + .045], 'p1_gem', {seed: 525, rot: ['y', 45, [gx, gy, gz]]}));
   // dark hanging plates over the flank behind the pauldron (over the C-leg root), pointed tips down
   const hp = pz;
   for (const [cz, cy, hz, hy] of [[-.15, 3.25, .42, .85], [.45, 3.1, .4, .8]]) {
@@ -502,7 +506,8 @@ function sacPaint(d) {
 function coreP1() {
   const J = J_CORE, c = sub3(SAC.c, J);
   // lofted across (axis x): the two views that matter (the front, and from below in the rear-up) see facets, not ledges
-  const ts = [-.97, -.8, -.45, 0, .45, .8, .97];
+  // AP-R3b: 12 segments (was 6): the outline from the front reads as a round bulb, not a stepped barrel with flat ends
+  const ts = [-.985, -.93, -.83, -.69, -.5, -.26, 0, .26, .5, .69, .83, .93, .985];
   const st = ts.map(t => ({a: c[0] + t * SAC.r, r: SAC.r * Math.sqrt(1 - t * t), c: [-c[2], c[1]]}));
   return wrapLoft('p1_sac', 'x', st, (th, a, p) => sacPaint(nrm3(sub3(p, c))), {caps: '-+', ledgeTex: 'p1_core', seed: 531, forms: 'p1', light: false, ppb: 32});
 }
