@@ -194,3 +194,20 @@ tick / looks / park / kill, determinism).
   P3 hem in `aftermath` t12 / `tail_p3` t42 / `death` t82, the P1 chest and leg roots 0.2-0.3 b under in the plunges,
   slams and `crawl_p1`; keys/t mean 19.9 (> 15); R17 secondary motion; the A plants.
 
+
+## 7c. AP-R3b critique fixes (region files only)
+
+Critique and results: `S:ap/rigwork/r3_critique.md`; U2 sheet `S:ap/rigwork/r3b/U2_sheet.jpg`, before / after
+`S:ap/rigwork/r3b/P1_before_after.jpg`.
+- **Crawl beak (head).** The P3 crown keeps only its back layer of six leaves (the front layer hid behind the visor
+  upright and stuck out as gold fangs under the carapace in the crawl); the hood gets a beak keel under the carapace
+  front (z -1.2 to the tip), closing the crawl front. Upright the keel is behind the visor's top band, above the mask.
+- **P1 A arms (limbs).** The shell sections are broad toward the front (wide along X) from mid upper arm to the wrist
+  turn (`ARM_TURN` in `apep_limbs.mjs`), so the player's camera sees broad grey-green blades (v2 f2076); the wrist keeps
+  the shared 1.0 b front-back width at the claw.
+- **Body.** The P1 core sac is a 12-segment round bulb; the shoulder hook gem a stepped cut stone.
+- **Hands / limbs.** The planted P1 petal feet are larger (petals 1.2 k long, ~22 % broader); the lower legs' root base
+  flares less (0.6 b).
+- Budgets: elements at rest P1 6002 / P3 4720 (body 1778 / 1484, head 892 / 1038, limbs 2150 / 1296, hands 776 / 548,
+  tail 406 / 354); atlas 0.867 M px in 230 sprites. Open model items: `r3_critique.md` (H2 hood back, T1 tail sheath,
+  H3 bud-skull, L2 leg cuffs, T2 / T3 tail straps).
