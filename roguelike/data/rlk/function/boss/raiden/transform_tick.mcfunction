@@ -1,5 +1,4 @@
 # Phase 1, as the boss: the transformation timeline on rdTime (plan B.2 row T).
-execute if score @s rdTime matches 1 at @s rotated as @s run scoreboard players operation @s rdRigL = @s rdAnim
 execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/rig/start/transform
 execute if score @s rdTime matches 1 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..1.5] at @s run function rlk:boss/raiden/fx/blink_out
 execute if score @s rdTime matches 2 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..1.5] run function rlk:boss/raiden/fx/blink_in

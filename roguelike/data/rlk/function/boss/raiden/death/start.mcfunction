@@ -5,7 +5,6 @@ scoreboard players set @s rdDeathTime 0
 scoreboard players set @s mhpC 0
 scoreboard players set @s rdPat 0
 scoreboard players set @s rdTime 0
-scoreboard players set @s rdAnim 0
 scoreboard players set @s rdBlink 0
 scoreboard players set @s rdWalk 0
 scoreboard players set @s rdGo 0
@@ -17,7 +16,6 @@ kill @e[tag=rlk_rd_tmp]
 function rlk:boss/raiden/hazard/clear
 kill @e[tag=rlk_rd_dome]
 kill @e[tag=rlk_rd_sfx]
-kill @e[tag=rlk_rd_slam_hand]
 kill @e[tag=rlk_rd_clap]
 kill @e[tag=rlk_rd_shadow]
 execute on passengers run kill @s
@@ -27,6 +25,4 @@ function rlk:boss/raiden/bars_hide
 function rlk:boss/raiden/caption/clear
 function rlk:boss/raiden/line/nothing
 playsound minecraft:entity.iron_golem.death hostile @a[tag=player] ~ ~ ~ .7 .7 .3
-# The temporary rig/legacy_anim bridge follows rdAnim: keep it from replacing the clip (S3 drops this line with it).
-scoreboard players operation @s rdRigL = @s rdAnim
 function rlk:boss/raiden/rig/start/death

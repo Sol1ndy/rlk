@@ -12,7 +12,6 @@ execute as @e[tag=rlk_rd_object] at @s run function rlk:boss/raiden/object/tick
 execute as @e[tag=rlk_rd_hazard] at @s run function rlk:boss/raiden/hazard/tick
 function rlk:boss/raiden/hazard/vfx_world
 execute as @e[tag=rlk_rd_dome] at @s run function rlk:boss/raiden/dome_tick
-execute as @e[tag=rlk_rd_slam_hand] at @s run function rlk:boss/raiden/rig/target_slam_tick
 function rlk:boss/raiden/vfx/world
 function rlk:boss/raiden/object_vfx/world
 function rlk:boss/raiden/orb/world

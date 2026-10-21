@@ -62,28 +62,6 @@
    "notes": "forks reach v=0.1..0.9; ends fade over 5% of u; tight halo (safe on top of decals)"
   },
   {
-   "name": "bolt_after_a",
-   "texture": "rlk:raiden/fxg/bolt_after_a",
-   "w": 512,
-   "h": 128,
-   "kind": "strip",
-   "along": "u",
-   "core": "same path as bolt_a",
-   "use": "afterglow of bolt_a",
-   "notes": ""
-  },
-  {
-   "name": "bolt_fade_a",
-   "texture": "rlk:raiden/fxg/bolt_fade_a",
-   "w": 512,
-   "h": 128,
-   "kind": "strip",
-   "along": "u",
-   "core": "same path as bolt_a",
-   "use": "final fade of bolt_a (embers)",
-   "notes": ""
-  },
-  {
    "name": "bolt_after_c",
    "texture": "rlk:raiden/fxg/bolt_after_c",
    "w": 512,
@@ -95,41 +73,8 @@
    "notes": ""
   },
   {
-   "name": "bolt_fade_c",
-   "texture": "rlk:raiden/fxg/bolt_fade_c",
-   "w": 512,
-   "h": 128,
-   "kind": "strip",
-   "along": "u",
-   "core": "same path as bolt_c",
-   "use": "final fade of bolt_c (embers)",
-   "notes": ""
-  },
-  {
    "name": "blade_a",
    "texture": "rlk:raiden/fxg/blade_a",
-   "w": 512,
-   "h": 64,
-   "kind": "strip",
-   "along": "u",
-   "core": "v=0.5+-0.08, r~1.3px",
-   "use": "blade-hugging bolt along a weapon edge (u = hilt -> tip); long low lightning walls",
-   "notes": "tight glow; short frequent forks"
-  },
-  {
-   "name": "blade_b",
-   "texture": "rlk:raiden/fxg/blade_b",
-   "w": 512,
-   "h": 64,
-   "kind": "strip",
-   "along": "u",
-   "core": "v=0.5+-0.08, r~1.3px",
-   "use": "blade-hugging bolt along a weapon edge (u = hilt -> tip); long low lightning walls",
-   "notes": "tight glow; short frequent forks"
-  },
-  {
-   "name": "blade_c",
-   "texture": "rlk:raiden/fxg/blade_c",
    "w": 512,
    "h": 64,
    "kind": "strip",
@@ -170,28 +115,6 @@
    "core": "v=0.5+-0.10, tight glow, no halo",
    "use": "crackle laid on top of another translucent card (decal edges)",
    "notes": "alpha >= 0.1 only near the core, so it does not hide what lies under it"
-  },
-  {
-   "name": "blade_trail_a",
-   "texture": "rlk:raiden/fxg/blade_trail_a",
-   "w": 512,
-   "h": 64,
-   "kind": "strip",
-   "along": "u",
-   "core": "u=0 newest/brightest, fades to u=1",
-   "use": "slash/afterimage trail behind a moving blade",
-   "notes": "afterglow palette"
-  },
-  {
-   "name": "blade_trail_b",
-   "texture": "rlk:raiden/fxg/blade_trail_b",
-   "w": 512,
-   "h": 64,
-   "kind": "strip",
-   "along": "u",
-   "core": "u=0 newest/brightest, fades to u=1",
-   "use": "slash/afterimage trail behind a moving blade",
-   "notes": "afterglow palette"
   },
   {
    "name": "vbolt_a",
@@ -359,17 +282,6 @@
    "notes": ""
   },
   {
-   "name": "rift_b",
-   "texture": "rlk:raiden/fxg/rift_b",
-   "w": 512,
-   "h": 64,
-   "kind": "strip",
-   "along": "u",
-   "core": "v=0.5 thin white tear in a dark void band",
-   "use": "rift / cut ribbon, teleport tears",
-   "notes": ""
-  },
-  {
    "name": "shockwave",
    "texture": "rlk:raiden/fxg/shockwave",
    "w": 256,
@@ -469,17 +381,6 @@
    "notes": ""
   },
   {
-   "name": "charge_spark",
-   "texture": "rlk:raiden/fxg/charge_spark",
-   "w": 64,
-   "h": 128,
-   "kind": "column",
-   "along": "v",
-   "core": "base at (0.5, 0.95), rises to v~0.12",
-   "use": "small rising charge spark",
-   "notes": ""
-  },
-  {
    "name": "glow_soft",
    "texture": "rlk:raiden/fxg/glow_soft",
    "w": 64,
@@ -488,17 +389,6 @@
    "along": "radial",
    "core": "centre",
    "use": "plain soft glow",
-   "notes": ""
-  },
-  {
-   "name": "glow_strip",
-   "texture": "rlk:raiden/fxg/glow_strip",
-   "w": 256,
-   "h": 32,
-   "kind": "strip",
-   "along": "u",
-   "core": "v=0.5",
-   "use": "plain soft beam glow",
    "notes": ""
   },
   {
@@ -590,84 +480,6 @@
    "notes": "kit sprite (build_raiden_hazard_vfx.py scales it per hazard)"
   },
   {
-   "name": "rig_katana_a",
-   "texture": "rlk:raiden/fxg/rig_katana_a",
-   "w": 224,
-   "h": 112,
-   "kind": "blade",
-   "along": "u",
-   "core": "edge bolt hugs the giant-katana edge; card = model y 9.6..32.0 (u, hilt->tip) x model x 2.6..12.0 (v, edge side first)",
-   "use": "blade-plane sheath card of fx_weapon/katana_*",
-   "notes": "spine crackle at the spine side, tip fork + bloom; the blade body hides the middle",
-   "card": {
-    "model_x": [
-     2.6,
-     12.0
-    ],
-    "model_y": [
-     9.6,
-     32.0
-    ]
-   }
-  },
-  {
-   "name": "rig_katana_b",
-   "texture": "rlk:raiden/fxg/rig_katana_b",
-   "w": 224,
-   "h": 112,
-   "kind": "blade",
-   "along": "u",
-   "core": "edge bolt hugs the giant-katana edge; card = model y 9.6..32.0 (u, hilt->tip) x model x 2.6..12.0 (v, edge side first)",
-   "use": "blade-plane sheath card of fx_weapon/katana_*",
-   "notes": "spine crackle at the spine side, tip fork + bloom; the blade body hides the middle",
-   "card": {
-    "model_x": [
-     2.6,
-     12.0
-    ],
-    "model_y": [
-     9.6,
-     32.0
-    ]
-   }
-  },
-  {
-   "name": "rig_palm",
-   "texture": "rlk:raiden/fxg/rig_palm",
-   "w": 128,
-   "h": 144,
-   "kind": "palm",
-   "along": "v",
-   "core": "arcs from fingertips ((5.25, -3.4), (7.08, -4.8), (8.97, -4.8), (10.8, -3.4)) and the thumb into palm centre (8.0, 4.2); card = model x 1.6..14.4 (u) x model y 8.0..-6.4 (v, wrist first)",
-   "use": "palm-parallel charge card of fx_weapon/palm_*",
-   "notes": "fingertips symmetric about x=8: mirror u for the other flicker frame",
-   "card": {
-    "model_x": [
-     1.6,
-     14.4
-    ],
-    "model_y": [
-     -6.4,
-     8.0
-    ],
-    "centre": [
-     8.0,
-     4.2
-    ]
-   }
-  },
-  {
-   "name": "rig_crown",
-   "texture": "rlk:raiden/fxg/rig_crown",
-   "w": 192,
-   "h": 192,
-   "kind": "radial",
-   "along": "radial",
-   "core": "bolts from r~0.09w to 0.36..0.47w, broken ring r=0.31w",
-   "use": "palm release crown (fx_weapon/palm_*_release_*)",
-   "notes": "dark centre; rotate/mirror the uv for the second flicker frame"
-  },
-  {
    "name": "rig_shard",
    "texture": "rlk:raiden/fxg/rig_shard",
    "w": 48,
@@ -679,17 +491,6 @@
    "notes": ""
   },
   {
-   "name": "obj_swing_band",
-   "texture": "rlk:raiden/fxg/obj_swing_band",
-   "w": 512,
-   "h": 64,
-   "kind": "strip",
-   "along": "u",
-   "core": "line v=0.27 (u=0) -> 0.73 (u=1), brightest near u~0.9",
-   "use": "illusion swing ribbon (u = swing start -> blade end)",
-   "notes": "u=0 oldest (dissolving tail), u=1 newest; map onto chord cards spanning 0.9 block of height"
-  },
-  {
    "name": "obj_wave_band",
    "texture": "rlk:raiden/fxg/obj_wave_band",
    "w": 512,
@@ -699,17 +500,6 @@
    "core": "v=0.5 white core, lens envelope sin(pi*u)",
    "use": "flying sword-wave front band (chord cards along the crescent edge)",
    "notes": "layered glow, crackle along the core, cyan sparks"
-  },
-  {
-   "name": "obj_wave_fade",
-   "texture": "rlk:raiden/fxg/obj_wave_fade",
-   "w": 512,
-   "h": 64,
-   "kind": "strip",
-   "along": "u",
-   "core": "v=0.5, lens envelope",
-   "use": "afterglow of obj_wave_band",
-   "notes": "dissolving purple with embers"
   },
   {
    "name": "obj_shard",

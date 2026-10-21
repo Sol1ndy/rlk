@@ -15,9 +15,6 @@ def write(name, lines):
     p.write_text((lines.strip() if isinstance(lines,str) else '\n'.join(lines))+'\n',encoding='utf-8')
 def call(name): return 'function rlk:boss/raiden/'+name
 def at(t,cmd): return cmd if cmd.startswith('#') else f'execute if score @s rdTime matches {t} at @s rotated as @s run {cmd}'
-def anim(n): return f'scoreboard players set @s rdAnim {n}'
-def haz(shape,tell,dmg,life=None):
-    return call('hazard/create')+f' {{shape:{shape},tell:{tell},damage:{dmg},life:{life or tell+10}}}'
 def sound(event,vol=1,pitch=.8):
     return f'playsound minecraft:{event} hostile @a[tag=player] ~ ~ ~ {vol} {pitch} 0.3'
 def caption(text):
@@ -50,43 +47,23 @@ RAGE_HIT = 60
 EXHAUST = 300
 # Transformation: scatter to the centre, then the transformation burst/clip.
 TRANSFORM_FX = 1
-TRANSFORM_LEN = 52
+TRANSFORM_LEN = 60              # the bar's fallback; tenma.T_LEN is the real length
 # Close-range patterns and their reach: chosen farther than `start` blocks from the player (or nearer than
 # REACH_MIN), she blinks to REACH_SPOT blocks in front of them (no walking, plan A.2) before the clock starts.
 # The per-pattern reach tables are REACH / REACH_SPOT / REACH_MIN in shogun.py / tenma.py (merged in build()); the
 # Shogun rows blink inside their own timelines instead.
 
-objectives = ['rd','rdPhase','rdPat','rdTime','rdAnim','rdRage','rdShield','rdCycle','rdCool','rdPrev','rdTurns','rdHitCD','rdObjKind','rdObjId','rdObjHP','rdReal','rdOAge','rdPTime','rdShape','rdWind','rdHAge','rdHLife','rdDamage','rdHHit','rdFX','rdFZ','rdHId','rdVId','rdUltUsed','rdWalk','rdWalkDir','rdBlink','rdCam','rdDeath','rdDeathTime','rdHidden','rdGo','rdNext','rdWpn']
+objectives = ['rd','rdPhase','rdPat','rdTime','rdRage','rdShield','rdCycle','rdCool','rdPrev','rdTurns','rdHitCD','rdObjKind','rdObjId','rdObjHP','rdReal','rdOAge','rdPTime','rdShape','rdWind','rdHAge','rdHLife','rdDamage','rdHHit','rdFX','rdFZ','rdHId','rdVId','rdUltUsed','rdWalk','rdWalkDir','rdBlink','rdCam','rdDeath','rdDeathTime','rdHidden','rdGo','rdNext','rdWpn']
 
 # ---- Pattern timeline helpers (shogun.py / tenma.py) -----------------------------
 patterns = {}  # id -> timeline lines, filled by shogun.build() / tenma.build()
 def pattern(i,title):
     lines=[at('1',caption(title))];patterns[i]=lines;return lines
-def event(lines,t,*commands):
-    # Fast strike keys reach contact after 2 ticks (heavy 3) + interpolation 1.
-    # Begin each clip just before the danger volume lands, not on the damage tick.
-    for cmd in commands:
-        n=int(cmd.rsplit(' ',1)[1]) if cmd.startswith('scoreboard players set @s rdAnim ') else -1
-        lead=4 if n in (15,17) else 3 if n in (3,4,6,8,11,13) else 0
-        lines.append(at(str(max(1,t-lead)),cmd))
-def end(lines,t):event(lines,t,call('finish'))
+def end(lines,t): lines.append(at(str(t),call('finish')))
 face='execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet'
 flat='execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0'
 target='execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ run '
 center='execute at @e[tag=rlk_raiden_arena,limit=1] run '
-# Tells: every telegraphed strike gets W extra ticks over the old 8-13 (so at least
-# 12 ticks = 0.6 s; eyes 18), then 4-7 ticks of recovery before the next wind-up.
-# Every wind clip (slash/thrust 6, cast 10, sweep/clap/slam 8, judgment 14) reaches its
-# hold pose and simply holds it longer before the strike clip starts 3-4 ticks ahead.
-W=4
-def tell(t): return max(t+W,12)
-
-def gated(lines,t,cond,*commands):
-    # event() with an extra score condition (e.g. a random follow-up).
-    for cmd in commands:
-        n=int(cmd.rsplit(' ',1)[1]) if cmd.startswith('scoreboard players set @s rdAnim ') else -1
-        lead=4 if n in (15,17) else 3 if n in (3,4,6,8,11,13) else 0
-        lines.append(f'execute if score @s rdTime matches {max(1,t-lead)} {cond} at @s rotated as @s run {cmd}')
 
 
 def _rng(r): return r.replace('..', '~')
@@ -136,7 +113,6 @@ scoreboard players set @s rdNext 0
 scoreboard players set @s rdTime 0
 scoreboard players set @s rdRage 0
 scoreboard players set @s rdCool 40
-scoreboard players set @s rdAnim 0
 scoreboard players set @s rdHitCD 0
 function rlk:boss/raiden/sg/reload
 function rlk:boss/raiden/rig/spawn
@@ -182,6 +158,8 @@ function rlk:boss/raiden/illusion/cleanup
 kill @e[tag=rlk_raiden_aux]
 kill @e[tag=rlk_rd_tmp]
 function rlk:boss/raiden/bars_hide
+# A fight stopped mid-Tenma (test/stop, run end, uninstall) gives the arena its Shogun floor back.
+execute if entity @e[tag=rlk_raiden_arena,limit=1] run function rlk:room/raiden/look_shogun
 ''')
     write('bars_hide','''
 # Boss bars are server-global: hide them whenever no fight is shown (also from rlk:tick).
@@ -204,7 +182,6 @@ execute as @e[tag=rlk_rd_object] at @s run function rlk:boss/raiden/object/tick
 execute as @e[tag=rlk_rd_hazard] at @s run function rlk:boss/raiden/hazard/tick
 function rlk:boss/raiden/hazard/vfx_world
 execute as @e[tag=rlk_rd_dome] at @s run function rlk:boss/raiden/dome_tick
-execute as @e[tag=rlk_rd_slam_hand] at @s run function rlk:boss/raiden/rig/target_slam_tick
 function rlk:boss/raiden/vfx/world
 function rlk:boss/raiden/object_vfx/world
 function rlk:boss/raiden/orb/world
@@ -215,7 +192,6 @@ function rlk:boss/raiden/camera/release_all
 kill @e[tag=rlk_rd_clap]
 kill @e[tag=rlk_rd_shadow]
 function rlk:boss/raiden/caption/clear
-function rlk:boss/raiden/judgment_rig/cleanup
 function rlk:boss/raiden/illusion/cleanup
 function rlk:boss/raiden/movement/cleanup
 scoreboard players set @e[tag=rlk_raiden] rdBlink 0
@@ -227,7 +203,6 @@ kill @e[tag=rlk_rd_tmp]
 function rlk:boss/raiden/rig/prop/clear
 function rlk:boss/raiden/object/clear
 kill @e[tag=rlk_rd_dome]
-kill @e[tag=rlk_rd_slam_hand]
 kill @e[tag=rlk_rd_sfx]
 function rlk:boss/raiden/object_vfx/clear
 function rlk:boss/raiden/hazard/vfx_world
@@ -235,7 +210,6 @@ execute as @e[tag=rlk_raiden,scores={rdDeath=0}] run function rlk:boss/raiden/sg
 scoreboard players set @e[tag=rlk_raiden] rdPat 0
 scoreboard players set @e[tag=rlk_raiden] rdTime 0
 scoreboard players set @e[tag=rlk_raiden] rdCool 60
-scoreboard players set @e[tag=rlk_raiden] rdAnim 0
 '''+'\n'.join(shogun.ON_PAUSE+tenma.ON_PAUSE))
     write('tick',f'''
 # @s=real living boss; the invisible body owns damage, the displays own appearance.
@@ -283,7 +257,6 @@ function rlk:boss/raiden/bars
 # Between patterns (no walking, plan A.2): face the player, then choose. A queued rear check keeps her facing.
 execute unless score @s rdSgRearQ matches 1 at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
 execute unless score @s rdSgRearQ matches 1 at @s rotated as @s run tp @s ~ ~ ~ ~ 0
-scoreboard players set @s rdAnim 0
 execute if score @s rdCool matches ..0 at @s run function rlk:boss/raiden/choose
 ''')
     # Phase-2 shuffle bag (tenma.BAG): every move once before any repeats, in random order; a refilled bag never starts
@@ -351,7 +324,6 @@ scoreboard players set @s rdGo 0
     ])
     write('close_done',[
         'scoreboard players set @s rdGo 0',
-        'scoreboard players set @s rdAnim 0',
         'execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet',
         'execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0',
     ])
@@ -361,7 +333,6 @@ function rlk:boss/raiden/camera/release_all
 kill @e[tag=rlk_rd_clap]
 kill @e[tag=rlk_rd_shadow]
 function rlk:boss/raiden/caption/pattern_end
-function rlk:boss/raiden/judgment_rig/cleanup
 function rlk:boss/raiden/hazard/finish
 kill @e[tag=rlk_rd_sg]
 scoreboard players set @s rdBlink 0
@@ -370,7 +341,6 @@ scoreboard players set @s rdGo 0
 kill @e[tag=rlk_rd_blink_dest]
 scoreboard players set @s rdPat 0
 scoreboard players set @s rdTime 0
-scoreboard players set @s rdAnim 0
 scoreboard players set @s rdCool 16
 function rlk:boss/raiden/object/clear
 kill @e[tag=rlk_rd_dome]

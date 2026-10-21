@@ -2,7 +2,6 @@ scoreboard objectives add rd dummy
 scoreboard objectives add rdPhase dummy
 scoreboard objectives add rdPat dummy
 scoreboard objectives add rdTime dummy
-scoreboard objectives add rdAnim dummy
 scoreboard objectives add rdRage dummy
 scoreboard objectives add rdShield dummy
 scoreboard objectives add rdCycle dummy

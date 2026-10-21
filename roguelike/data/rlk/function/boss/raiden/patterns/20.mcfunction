@@ -4,7 +4,6 @@ execute if score @s rdTime matches 1 at @s rotated as @s run scoreboard players 
 execute if score @s rdTime matches 1 at @s rotated as @s run execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
 execute if score @s rdTime matches 1 at @s rotated as @s run execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
 execute if score @s rdTime matches 1 at @s rotated as @s run execute positioned ~ ~2.6 ~ run function rlk:boss/raiden/fx/star
-execute if score @s rdTime matches 8 at @s rotated as @s run scoreboard players operation @s rdRigL = @s rdAnim
 execute if score @s rdTime matches 8 at @s rotated as @s run function rlk:boss/raiden/rig/start/t_spin_throw
 execute if score @s rdTime matches 8 at @s rotated as @s run function rlk:boss/raiden/hazard/new {k:2,a:2000,b:7000,c:0,d:-1000,e:53290000,f:2890000,tol:300,tell:12,dmg:18,life:23,ev:10,max:1,grp:0,dk:0,dl:0,kb:0,sv:6,snd:1,nd:0,jp:0,det:0,lf:0,fv:0}
 execute if score @s rdTime matches ..19 run return 0

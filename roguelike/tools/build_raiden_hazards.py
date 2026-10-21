@@ -4,11 +4,10 @@ strike and travelling displays, the FX cues) are written by build_raiden_hazard_
 
 Runtime entry points (all under rlk:boss/raiden/hazard/):
   new {k,a..f,tol,tell,dmg,life,ev,max,grp,dk,dl,kb,sv,snd,nd,jp,det,lf,fv}   v2 hazard here, yaw = execution yaw (pitch 0)
-  create {shape,tell,damage,life}       legacy preset s1..s14 (yaw copied from @s, as the release did)
   tick (as the marker; world calls it), expire (as the marker), finish (kills the non-detached hazards),
   clear (kills every hazard and kit display), vfx_world (orphaned visuals, the FX card clock), setup (objectives)
 Per-hazard scores (milliblocks unless noted):
-  rdShape preset id or 20 + rdHK · rdHK kind (raiden_kit.KINDS) · rdWind tell · rdDamage · rdHLife · rdHAge
+  rdShape 20 + rdHK · rdHK kind (raiden_kit.KINDS) · rdWind tell · rdDamage · rdHLife · rdHAge
   rdHHit hits so far · rdHMax max hits (0 = no limit) · rdHEv hit interval for follow/field · rdHTol pad
   rdHA..rdHF shape parameters, per kind:
     disk / field / follow / safe_dome  A r, E (r + tol)^2 (safe_dome: r^2), B follow speed (micro-blocks per tick)
@@ -17,7 +16,6 @@ Per-hazard scores (milliblocks unless noted):
     sweep      A r0, B v (micro-blocks per tick), C band, D sin(half)*1000, E cos(half)*1000, F travel ticks
     slab       A d0, B v, C half width, D depth, E height, F travel ticks
     orb        A d0, B v, C r, D r + tol, E height of the card, F travel ticks
-    fan        A len, B half width (legacy preset 9: rays at -40/-20/0/20/40)
   rdHGrp hit-sharing group · rdHDk decal id (raiden_kit.DECALS) · rdHDl decal life · rdHKb knock-back steps
   rdHSv strike id (raiden_kit.STRIKES) or the segment count of a sweep · rdHSnd impact sound (1, 2 = + thunder)
   rdFX / rdFZ frozen forward vector · rdHId serial (rdVId of its displays) · mlv boss level
@@ -29,7 +27,7 @@ from pathlib import Path
 import math
 import shutil
 
-from raiden_kit import KINDS, SHAPE_BASE, PRESETS, PRESET_FAN, STRIKE_IDS, arc_strike, hz_args
+from raiden_kit import KINDS, SHAPE_BASE, STRIKE_IDS, arc_strike, hz_args
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "data/rlk/function/boss/raiden/hazard"
@@ -82,37 +80,6 @@ write('new', [
     f'$data modify entity {NEW} data.fv set value $(fv)',
     f'function {H}born',
 ])
-write('create', [
-    '# Legacy preset (the release encounter): {shape:1..14, tell, damage, life}. Yaw is copied from @s as before.',
-    'execute unless score #rdKitV rd matches %d run function %ssetup' % (KIT_VERSION, H),
-    'summon minecraft:marker ~ ~ ~ {Tags:["rlk_rd_hazard","rlk_raiden_aux","rlk_room","rlk_rd_hnew"]}',
-    f'data modify entity {NEW} Rotation set from entity @s Rotation',
-    f'data modify entity {NEW} Rotation[1] set value 0f',
-    f'$scoreboard players set {NEW} rdShape $(shape)',
-    f'$scoreboard players set {NEW} rdWind $(tell)',
-    f'$scoreboard players set {NEW} rdDamage $(damage)',
-    f'$scoreboard players set {NEW} rdHLife $(life)',
-    f'$function {H}preset/s$(shape)',
-    f'function {H}born',
-])
-for sid, (kind, p) in PRESETS.items():
-    args = hz_args(kind if kind != 'fan' else 'fan', 1, 0, tol=0.0, sound=True,
-                   strike={1: 'arc72', 4: 'arc72', 9: 'fan'}.get(sid), **p)
-    big = sid in (4, 5, 6, 7, 8, 12, 14)
-    lines = [f'# Legacy shape s{sid} = {kind} {p} (tol 0, quiet; exact release hit volume).']
-    for o, k in MACRO_KEYS:
-        if k in ('tell', 'dmg', 'life'):
-            continue
-        v = args[k]
-        if k == 'snd':
-            v = 2 if big else 1
-        if k == 'max':
-            v = 1
-        lines.append(sset(o, v))
-    if kind == 'sweep':
-        lines.append(f'tag {NEW} add rlk_rd_jump')
-    write(f'preset/s{sid}', lines)
-
 write('born', [
     '# Common creation tail (as the creator): age -1 so the world tick that follows makes it 0 this tick.',
     f'tag {NEW} add rlk_rd_hazard',
@@ -408,29 +375,6 @@ write('k/orb', [
     'scoreboard players operation #rdT rd *= @s rdHD',
     'execute if score #rdQ rd <= #rdT rd run scoreboard players set #rdHit rd 1',
 ])
-fan = ['# Legacy preset 9: five rays len x width at -40/-20/0/20/40 degrees.']
-for a in PRESET_FAN:
-    c, s = round(math.cos(math.radians(a)) * 1000), round(math.sin(math.radians(a)) * 1000)
-    fan += [f'scoreboard players set #rdCos rd {c}', f'scoreboard players set #rdSin rd {s}', f'function {H}k/fan_ray']
-write('k/fan', fan)
-write('k/fan_ray', [
-    'scoreboard players operation #rdRayF rd = #rdFwd rd',
-    'scoreboard players operation #rdRayF rd *= #rdCos rd',
-    'scoreboard players operation #rdT rd = #rdSide rd',
-    'scoreboard players operation #rdT rd *= #rdSin rd',
-    'scoreboard players operation #rdRayF rd += #rdT rd',
-    'scoreboard players operation #rdRayF rd /= #rdK1000 rd',
-    'execute if score #rdRayF rd matches ..-1 run return 0',
-    'execute if score #rdRayF rd > @s rdHA run return 0',
-    'scoreboard players operation #rdRayS rd = #rdSide rd',
-    'scoreboard players operation #rdRayS rd *= #rdCos rd',
-    'scoreboard players operation #rdT rd = #rdFwd rd',
-    'scoreboard players operation #rdT rd *= #rdSin rd',
-    'scoreboard players operation #rdRayS rd -= #rdT rd',
-    'scoreboard players operation #rdRayS rd /= #rdK1000 rd',
-    'execute if score #rdRayS rd matches ..-1 run scoreboard players operation #rdRayS rd *= #rdNeg rd',
-    'execute if score #rdRayS rd <= @s rdHB run scoreboard players set #rdHit rd 1',
-])
 write('k/safe_dome', [
     '# 만겁: inside the dome (r, no pad) takes the hazard damage; anywhere else is fatal. Jumping does not help.',
     f'execute if score #rdR2 rd <= @s rdHE run return run function {H}land',
@@ -485,5 +429,5 @@ write('kb', [
 
 from build_raiden_hazard_vfx import build as build_display_vfx
 build_display_vfx(ROOT, OUT)
-print(f"Generated the v2 hazard engine: {len(KINDS)} kinds, {len(PRESETS)} legacy presets, "
+print(f"Generated the v2 hazard engine: {len(KINDS)} kinds, "
       f"{len(list(OUT.rglob('*.mcfunction')))} functions.")

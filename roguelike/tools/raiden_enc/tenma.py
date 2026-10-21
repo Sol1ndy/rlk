@@ -10,8 +10,6 @@ Conventions of this module
   rig/start/<clip> at rdTime s, which puts clip tick e on rdTime s + e - 1; every pattern starts its clip at 1, so the
   clip events of rd/rig_api (binding, plan §C.5) land on the §B ticks. 17 and 20 open with a short lead (4 / 7 t: the
   voice line and a glint) before the clip, so their first big or close hit gets the R1 cue time (plan_table_tenma.json).
-- The temporary rig/legacy_anim bridge follows rdAnim; this module never sets rdAnim and copies it into rdRigL with
-  every clip call (SYNC), so the bridge cannot replace a Tenma clip. S3 drops SYNC together with legacy_anim.
 - Hazards and FX come from the kit (raiden_kit.hz / fx / snd / decal). Floor decals only where the footage has one:
   the glaive bomb ring (11, 20), the 단절 band (19), the shadow pool (13) and the vajra base rings (14, state decals).
 - Every transient entity summoned here carries rlk_room, rlk_raiden_aux, rlk_rd_tmp and rlk_rd_tm; ON_FINISH removes
@@ -25,7 +23,6 @@ from .lines import VOICE2
 
 T_LEN = 60                      # transformation length (armor_start); core.TRANSFORM_LEN (52) only scales the bar
 TAGS = '"rlk_room","rlk_raiden_aux","rlk_rd_tmp","rlk_rd_tm"'
-SYNC = 'scoreboard players operation @s rdRigL = @s rdAnim'
 SPOT = 'rlk_rd_tm_spot'
 AT_SPOT = f'execute at @e[tag={SPOT},limit=1] run '
 AT_POOL = 'execute at @e[tag=rlk_rd_hazard,scores={rdHK=8},limit=1] run '
@@ -83,7 +80,7 @@ def span(p, a, b, cmd):
 
 
 def clip(name):
-    return [SYNC, call('rig/start/' + name)]
+    return [call('rig/start/' + name)]
 
 
 def mk(tag):
@@ -150,7 +147,7 @@ def lifecycle():
         'scoreboard players set @s rdBlink 0', 'kill @e[tag=rlk_rd_blink_dest]',
         call('illusion/cleanup'), call('movement/cleanup')] + clear + [
         'scoreboard players set @s rdPhase 1', 'scoreboard players set @s rdPat 0', 'scoreboard players set @s rdTime 0',
-        'scoreboard players add @s rdCycle 1', 'scoreboard players set @s rdAnim 0', SYNC,
+        'scoreboard players add @s rdCycle 1', 
         'tag @s remove rlk_rd_tm_rear', 'scoreboard players set @s rdTmChain 0', face, flat,
         call('line/eternal'), 'scoreboard players set #rdCapPat rd 0', sound('block.beacon.activate', .8, .6)])
     # T 변신 (B-08): blink to the centre, the travelling floor ring (jump it), the sky crackle locks one pillar on the
@@ -219,7 +216,7 @@ execute unless score @s rdPat matches 15 if score @s rdShield matches ..0 run fu
         '# choose consumes rlk_rd_switch_due (rd/s2_notes.md §3.2.1).',
         'attribute @s minecraft:scale base set 1.2', 'kill @e[tag=rlk_rd_tm]', 'scoreboard players set @s rdPhase 0',
         'scoreboard players set @s rdRage 0', 'tag @s add rlk_rd_switch_due', 'tag @s remove rlk_rd_tm_rear', call('finish'),
-        'scoreboard players set @s rdCool 20', 'function rlk:room/raiden/look_shogun', SYNC,
+        'scoreboard players set @s rdCool 20', 'function rlk:room/raiden/look_shogun',
         'execute if score @s rdRigW matches 1 run ' + call('rig/play/idle_polearm'),
         'execute unless score @s rdRigW matches 1 run ' + call('rig/play/idle_sword')])
     write('shield_hit', '''
@@ -238,7 +235,7 @@ execute if score #dmg tmp matches ..0 run scoreboard players set #dmg tmp 1
         f'execute if score #tfm tmp matches 1 run scoreboard players set #rdDrain rd {DRAIN_REACTION}',
         'scoreboard players operation @s rdShield -= #rdDrain rd',
         f'scoreboard players set @s rdHitCD {SHIELD_CD}'])
-    write('tm/idle', ['# @s = the boss in phase 2: the hover idle (also after a pause).', SYNC, call('rig/play/t_idle')])
+    write('tm/idle', ['# @s = the boss in phase 2: the hover idle (also after a pause).', call('rig/play/t_idle')])
     write('tm/after', [
         '# @s = the boss when a phase-2 pattern ends (finish, ON_FINISH): the idle clip, the rear-cone check for 20',
         '# (+-60 deg of her back, <= 9 b: three discs inscribed in the cone) and the 40 % chain after 16 (17 or 11, cool 4).',
@@ -452,7 +449,7 @@ def p15():
                            'scoreboard players set @a[tag=player] energy 0'])
     write('tm/mg/flower', [
         '# @s = the boss: the 추모의 꽃다발 at the centre (hit target: 1 electro / 4 other hits, its gauge above it) and the prompt.',
-        center + obj(3, 'remembrance_flower', 4, 1, .05), 'kill @e[tag=rlk_rd_orb_body]',
+        center + obj(3, 'prop/flower', 4, 1, .05), 'kill @e[tag=rlk_rd_orb_body]',
         center + call('rig/prop/flower')] + tagnew('rlk_rd_tm_flower') + [center + snd('mangeop_flower'), call('judgment_hint')])
     write('judgment_hint', [
         '# The real game\'s prompt for 만겁 (instant kill), R2 allow-list.',

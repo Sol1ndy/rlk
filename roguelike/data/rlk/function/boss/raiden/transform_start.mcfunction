@@ -17,8 +17,6 @@ scoreboard players set @s rdPhase 1
 scoreboard players set @s rdPat 0
 scoreboard players set @s rdTime 0
 scoreboard players add @s rdCycle 1
-scoreboard players set @s rdAnim 0
-scoreboard players operation @s rdRigL = @s rdAnim
 tag @s remove rlk_rd_tm_rear
 scoreboard players set @s rdTmChain 0
 execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet

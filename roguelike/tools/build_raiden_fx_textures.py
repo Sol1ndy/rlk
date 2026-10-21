@@ -1634,12 +1634,12 @@ def catalogue():
         C.append(entry(f"bolt_{v}", 512, 128, "strip", "u", "v=0.5, zig-zag core r~1.5px within v=0.33..0.67",
                        "hot lightning bolt (floor bolts, horizontal strikes, tall walls, long arcs)", lambda s=s: tex_bolt(s),
                        "forks reach v=0.1..0.9; ends fade over 5% of u; tight halo (safe on top of decals)"))
-    for v, s in (("a", 11), ("c", 37)):
+    # S3: bolt_after_a, bolt_fade_a / _c, blade_b / _c, blade_trail_*, rift_b, charge_spark, glow_strip, the rig_katana /
+    # rig_palm / rig_crown cards and the illusion swing / wave-fade bands lost their last model and are not painted.
+    for v, s in (("c", 37),):
         C.append(entry(f"bolt_after_{v}", 512, 128, "strip", "u", "same path as bolt_" + v,
                        "afterglow of bolt_" + v, lambda s=s: tex_bolt(s, "after")))
-        C.append(entry(f"bolt_fade_{v}", 512, 128, "strip", "u", "same path as bolt_" + v,
-                       "final fade of bolt_" + v + " (embers)", lambda s=s: tex_bolt(s, "fade")))
-    for v, s in zip("abc", (61, 67, 71)):
+    for v, s in zip("a", (61,)):
         C.append(entry(f"blade_{v}", 512, 64, "strip", "u", "v=0.5+-0.08, r~1.3px",
                        "blade-hugging bolt along a weapon edge (u = hilt -> tip); long low lightning walls",
                        lambda s=s: tex_blade(s), "tight glow; short frequent forks"))
@@ -1647,9 +1647,6 @@ def catalogue():
         C.append(entry(f"rim_crackle_{v}", 512, 64, "strip", "u", "v=0.5+-0.10, tight glow, no halo",
                        "crackle laid on top of another translucent card (decal edges)", lambda s=s: tex_rim_crackle(s),
                        "alpha >= 0.1 only near the core, so it does not hide what lies under it"))
-    for v, s in zip("ab", (81, 83)):
-        C.append(entry(f"blade_trail_{v}", 512, 64, "strip", "u", "u=0 newest/brightest, fades to u=1",
-                       "slash/afterimage trail behind a moving blade", lambda s=s: tex_blade_trail(s), "afterglow palette"))
     for v, s in zip("abc", (101, 107, 113)):
         C.append(entry(f"vbolt_{v}", 128, 512, "column", "v", "u=0.5, top v=0 -> small impact bloom v~0.96",
                        "vertical strike bolt (2-4 crossed vertical cards ~2.5 wide)", lambda s=s: tex_vbolt(s),
@@ -1672,7 +1669,7 @@ def catalogue():
                    "lightning crescent slash", lambda: tex_crescent(193, True)))
     C.append(entry("slash_wave", 512, 128, "strip", "u", "edge at v~0.30, tail toward v~0.9",
                    "straight slash wave / sword beam (travels toward -v)", lambda: tex_slash_wave(197)))
-    for v, s in zip("ab", (211, 223)):
+    for v, s in zip("a", (211,)):
         C.append(entry(f"rift_{v}", 512, 64, "strip", "u", "v=0.5 thin white tear in a dark void band",
                        "rift / cut ribbon, teleport tears", lambda s=s: tex_rift(s)))
     C.append(entry("shockwave", 256, 256, "radial", "radial", "leading edge r=0.46*w, tail inward to ~0.28*w",
@@ -1690,39 +1687,14 @@ def catalogue():
                    lambda: tex_scorch_strip(263)))
     C.append(entry("spark", 32, 32, "radial", "radial", "centre", "spark dot", tex_spark))
     C.append(entry("glint", 64, 64, "radial", "radial", "centre", "four-point star glint (armour shards)", tex_glint))
-    C.append(entry("charge_spark", 64, 128, "column", "v", "base at (0.5, 0.95), rises to v~0.12",
-                   "small rising charge spark", lambda: tex_charge_spark(269)))
     C.append(entry("glow_soft", 64, 64, "radial", "radial", "centre", "plain soft glow", tex_glow_soft))
-    C.append(entry("glow_strip", 256, 32, "strip", "u", "v=0.5", "plain soft beam glow", tex_glow_strip))
     C += kit_entries()
-    # rig (boss body) sprites, see build_raiden_rig.mjs
-    for v, s in zip("ab", (307, 311)):
-        C.append(dict(entry(f"rig_katana_{v}", RIG_KW, RIG_KH, "blade", "u",
-                       f"edge bolt hugs the giant-katana edge; card = model y {RIG_KY0}..{RIG_KY1} (u, hilt->tip) x "
-                       f"model x {RIG_KX0}..{RIG_KX1} (v, edge side first)",
-                       "blade-plane sheath card of fx_weapon/katana_*", lambda s=s: tex_rig_katana(s),
-                       "spine crackle at the spine side, tip fork + bloom; the blade body hides the middle"),
-                      card=dict(model_x=[RIG_KX0, RIG_KX1], model_y=[RIG_KY0, RIG_KY1])))
-    C.append(dict(entry("rig_palm", RIG_PW, RIG_PH, "palm", "v",
-                   f"arcs from fingertips {RIG_TIPS} and the thumb into palm centre {RIG_PALM_C}; card = model x "
-                   f"{RIG_PX0}..{RIG_PX1} (u) x model y {RIG_PY1}..{RIG_PY0} (v, wrist first)",
-                   "palm-parallel charge card of fx_weapon/palm_*", lambda: tex_rig_palm(313),
-                   "fingertips symmetric about x=8: mirror u for the other flicker frame"),
-                  card=dict(model_x=[RIG_PX0, RIG_PX1], model_y=[RIG_PY0, RIG_PY1], centre=list(RIG_PALM_C))))
-    C.append(entry("rig_crown", 192, 192, "radial", "radial", "bolts from r~0.09w to 0.36..0.47w, broken ring r=0.31w",
-                   "palm release crown (fx_weapon/palm_*_release_*)", lambda: tex_rig_crown(317),
-                   "dark centre; rotate/mirror the uv for the second flicker frame"))
     C.append(entry("rig_shard", 48, 128, "column", "v", "lens tips at v=0.03/0.97, widest at v~0.39, ridge u~0.5",
                    "translucent crystal splinter (death_shard_*)", lambda: tex_rig_shard(331)))
     # object / blink / orb sprites (build_raiden_object_vfx.py, build_raiden_movement.py, build_raiden_orb.py)
-    C.append(entry("obj_swing_band", 512, 64, "strip", "u", "line v=0.27 (u=0) -> 0.73 (u=1), brightest near u~0.9",
-                   "illusion swing ribbon (u = swing start -> blade end)", lambda: tex_obj_swing_band(401),
-                   "u=0 oldest (dissolving tail), u=1 newest; map onto chord cards spanning 0.9 block of height"))
     C.append(entry("obj_wave_band", 512, 64, "strip", "u", "v=0.5 white core, lens envelope sin(pi*u)",
                    "flying sword-wave front band (chord cards along the crescent edge)",
                    lambda: tex_obj_wave_band(409), "layered glow, crackle along the core, cyan sparks"))
-    C.append(entry("obj_wave_fade", 512, 64, "strip", "u", "v=0.5, lens envelope", "afterglow of obj_wave_band",
-                   lambda: tex_obj_wave_band(409, True), "dissolving purple with embers"))
     C.append(entry("obj_shard", 64, 64, "strip", "u", "tip at u~0.93, body u 0.42..0.93, streak toward u=0",
                    "flying electro shard (break bursts)", lambda: tex_obj_shard(433)))
     return C

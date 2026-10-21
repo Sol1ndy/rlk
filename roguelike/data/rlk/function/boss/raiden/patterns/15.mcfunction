@@ -1,5 +1,4 @@
 # Pattern names intentionally stay out of the boss bar.
-execute if score @s rdTime matches 1 at @s rotated as @s run scoreboard players operation @s rdRigL = @s rdAnim
 execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/rig/start/t_vanish
 execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/line/mangeop
 execute if score @s rdTime matches 1 at @s rotated as @s run scoreboard players set @s rdUltUsed 1

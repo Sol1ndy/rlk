@@ -1,12 +1,11 @@
 # Pattern names intentionally stay out of the boss bar.
-execute if score @s rdTime matches 1 at @s rotated as @s run scoreboard players operation @s rdRigL = @s rdAnim
 execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/rig/start/t_combo3
 execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/line/cleave_all
 execute if score @s rdTime matches 1 at @s rotated as @s run execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
 execute if score @s rdTime matches 1 at @s rotated as @s run execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
 execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/hazard/new {k:2,a:2500,b:7500,c:985,d:-174,e:60840000,f:4840000,tol:300,tell:13,dmg:19,life:24,ev:10,max:1,grp:0,dk:0,dl:0,kb:0,sv:5,snd:1,nd:0,jp:0,det:0,lf:0,fv:0}
-execute if score @s rdTime matches ..13 run return 0
 execute if score @s rdTime matches 14 at @s rotated as @s run function rlk:boss/raiden/fx/snd/glaive_sweep
+execute if score @s rdTime matches ..14 run return 0
 execute if score @s rdTime matches 15 at @s rotated as @s run execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
 execute if score @s rdTime matches 15 at @s rotated as @s run execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
 execute if score @s rdTime matches 15 at @s rotated as @s run function rlk:boss/raiden/hazard/new {k:2,a:2500,b:7500,c:985,d:-174,e:60840000,f:4840000,tol:300,tell:11,dmg:19,life:22,ev:10,max:1,grp:0,dk:0,dl:0,kb:0,sv:5,snd:1,nd:0,jp:0,det:0,lf:0,fv:0}

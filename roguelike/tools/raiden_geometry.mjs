@@ -321,7 +321,8 @@ export const PROPS = {
   clone_slash_glow: {model: 'prop/clone_slash_glow', scale: 1, lift: 1.375, note: 'revealed clone, follow-through'},
 };
 // Legacy item ids the release encounter still uses, served by the restyled props (item definitions only).
-export const LEGACY_ITEMS = {electro_orb: 'prop/eye_orb', lightning_stake: 'prop/vajra', remembrance_flower: 'prop/flower', support_hand_l: 'prop/clap_hand_l', support_hand_r: 'prop/clap_hand_r'};
+// Item ids the S1-S2 bridge served over the prop models (electro_orb ... support_hand_*): deleted from the pack (S3).
+export const FORMER_ITEMS = ['electro_orb', 'lightning_stake', 'remembrance_flower', 'support_hand_l', 'support_hand_r'];
 
 // body hull points (A-frame units) over both looks, for the floor lift in solve
 let BODY_HULL = null;

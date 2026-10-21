@@ -8,9 +8,9 @@
 // Writes
 //   RP  assets/rlk/textures/raiden/rig/*.png (raiden_paint.mjs) + item atlas entries;
 //       assets/rlk/models/item/raiden/** and assets/rlk/items/raiden/** except fx_* and the illusion models
-//       (parts, looks, props, the legacy item ids served by the props)
-//   DP  data/rlk/function/boss/raiden/rig/** (rebuilt from scratch on every run) and the three legacy
-//       boss/raiden/judgment_rig/{start,tick,cleanup} shims (the judgment rig is removed, plan §B.2 15)
+//       (parts, looks, props)
+//   DP  data/rlk/function/boss/raiden/rig/** (rebuilt from scratch on every run); it also deletes the former
+//       boss/raiden/judgment_rig/** shims (the judgment rig is removed, plan §B.2 15)
 //   tools/raiden_rig_manifest.json (manifest v2: parts, looks, states, clips with events, props, px ledger, budgets)
 //
 // Runtime (contract: tools/raiden_rig_api.md):
@@ -19,12 +19,11 @@
 //   * rig/play/<clip> queues a clip (tick 0 at the next rig/tick); the clips carry the form: a clip of the other form
 //     switches the state at its tick 0, transform / t_collapse switch it at their form tick.
 //   * rig/state/{shogun,tenma,hidden}, rig/look/{sword,polearm,tenma}, rig/flash, rig/kill, rig/face/*, rig/prop/<kind>.
-//   * rig/legacy_anim (temporary, plan §C.3) maps the release encounter's rdAnim ids onto the new clips; S3 removes it.
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {paintRaidenTextures, raidenSprites, spriteId, PROP_SPRITES} from './raiden_paint.mjs';
-import {PARTS, PART_NAMES, BODY, TENMA_PARTS, PART_SCALE, allModels, LOOK_MODELS, PROPS, PROP_TINTS, LEGACY_ITEMS, solve, toDisplay, modelPoints} from './raiden_geometry.mjs';
+import {PARTS, PART_NAMES, BODY, TENMA_PARTS, PART_SCALE, allModels, LOOK_MODELS, PROPS, PROP_TINTS, FORMER_ITEMS, solve, toDisplay, modelPoints} from './raiden_geometry.mjs';
 import {CLIPS, CLIP_BY_NAME, C5, accumulate, sampleClip, restPose, loopStart} from './raiden_clips.mjs';
 import {add, rot, slerp, lerp, qAngle, len, sub} from './mboss_rig_math.mjs';
 import {createRigCompiler, createRigFollow, nbt, written, summonPart, cullOverhang} from './mboss_rig_compile.mjs';
@@ -99,7 +98,7 @@ for (const [name, els] of Object.entries(models)) {
   if (!tinted) json(path.join(itemDir, name + '.json'), {model: {type: 'minecraft:model', model: 'rlk:item/raiden/' + name}});
 }
 for (const [item, [m, rgb]] of Object.entries(PROP_TINTS)) json(path.join(itemDir, item + '.json'), {model: {type: 'minecraft:model', model: 'rlk:item/raiden/' + m, tints: [{type: 'minecraft:constant', value: rgb}]}});
-for (const [item, m] of Object.entries(LEGACY_ITEMS)) json(path.join(itemDir, item + '.json'), {model: {type: 'minecraft:model', model: 'rlk:item/raiden/' + m}});
+for (const item of FORMER_ITEMS) fs.rmSync(path.join(itemDir, item + '.json'), {force: true});   // the S1-S2 legacy item ids
 const unusedSprites = Object.keys(spriteTable).filter(n => !usedSprites.has(n));
 if (unusedSprites.length) throw new Error(`painted but unused sprites: ${unusedSprites.join(', ')}`);
 // px ledger (plan §C.6): rig sprites <= 0.45 M, props <= 0.25 M
@@ -313,9 +312,9 @@ follow.write();
 const restD = which => { const o = solve(restPose(which)); return Object.fromEntries(PART_NAMES.map(n => [n, toDisplay(n, o[n])])); };
 const REST = {s: restD('s'), t: restD('t')};
 const swap = (part, model) => `data modify entity ${uuidOf(part)} item.components."minecraft:item_model" set value "${itemId(model)}"`;
-const OBJ = ['rdRigC', 'rdRigT', 'rdRigY', 'rdRigS', 'rdRigW', 'rdRigF', 'rdRigL', 'rdRigP', ...follow.objectives];
+const OBJ = ['rdRigC', 'rdRigT', 'rdRigY', 'rdRigS', 'rdRigW', 'rdRigF', ...follow.objectives];
 fn('init', ['# Rig objectives (safe on every load). rdRigC clip id, rdRigT clip tick, rdRigS state (0 shogun, 1 tenma, 2 hidden),',
-  '# rdRigW weapon (0 sword, 1 polearm), rdRigF hit flash, rdRigL / rdRigP the legacy rdAnim / rdPhase seen, rdRigY face scratch.',
+  '# rdRigW weapon (0 sword, 1 polearm), rdRigF hit flash, rdRigY face scratch.',
   ...OBJ.map(o => `scoreboard objectives add ${o} dummy`)]);
 const TAGS = n => ['rlk_room', 'rlk_raiden_part', 'rlk_raiden_aux', 'rlk_rd_' + n];
 const summon = (n, which) => summonPart({uuid: uuidInts(n), tags: TAGS(n), item: itemId(PARTS.find(p => p[0] === n)[1]), brightness: PARTS.find(p => p[0] === n)[2],
@@ -329,14 +328,13 @@ fn('spawn', ['# @s = the boss (the anchor), at its feet. Summons the 30 parts (f
   'execute if score @s rdRigS matches 2 run scoreboard players set @s rdRigS 0',
   `execute if score @s rdRigS matches 1 run function ${NS}/spawn_tenma`,
   `execute unless score @s rdRigS matches 1 run function ${NS}/spawn_shogun`,
-  'scoreboard players set @s rdRigF 0', 'scoreboard players operation @s rdRigL = @s rdAnim', 'scoreboard players operation @s rdRigP = @s rdPhase',
+  'scoreboard players set @s rdRigF 0',
   `execute rotated as @s rotated ~ 0 run function ${NS}/follow_now`]);
 fn('spawn_shogun', ['# Internal (spawn): the Shogun rest pose, the stored weapon, idle.', ...PART_NAMES.map(n => summon(n, 's')),
   `function ${NS}/state/shogun`, `execute if score @s rdRigW matches 1 run function ${NS}/play/idle_polearm`, `execute unless score @s rdRigW matches 1 run function ${NS}/play/idle_sword`]);
 fn('spawn_tenma', ['# Internal (spawn): the Tenma rest pose, idle.', ...PART_NAMES.map(n => summon(n, 't')), `function ${NS}/state/tenma`, `function ${NS}/play/t_idle`]);
 fn('tick', ['# @s = the boss (the anchor), at its feet, once per game tick. Missing parts respawn.',
   `execute unless entity ${uuidOf('body')} run function ${NS}/spawn`,
-  `function ${NS}/legacy_anim`,
   `execute rotated as @s rotated ~ 0 run function ${NS}/follow`,
   'execute if score @s rdRigF matches 1.. run scoreboard players remove @s rdRigF 1',
   `execute if score @s rdRigF matches 0 run function ${NS}/flash_off`,
@@ -381,57 +379,8 @@ for (const [kind, P] of Object.entries(PROPS)) {
 }
 fn('prop/clear', ['# Removes every rig prop.', 'kill @e[type=item_display,tag=rlk_rd_prop]']);
 
-// ---- legacy bridge (temporary, plan §C.3; S3 removes it with the presets) ------------------------------------------------------
-// The release encounter sets rdAnim (0..24) and rdPhase; this maps them onto the new clips once per change. [shogun, tenma]
-// clip per old id; '=' continues the clip the matching wind-up id started.
-const LEGACY = {0: ['idle', 't_idle'], 1: ['idle', 't_idle'], 2: ['iai_near', 't_iai'], 3: ['=iai_near', '=t_iai'], 4: ['combo5', 't_combo3'],
-  5: ['p_lance', 't_rush'], 6: ['=p_lance', '=t_rush'], 7: ['cast', 't_summon'], 8: ['=cast', '=t_summon'], 9: ['transform', 'transform'],
-  10: ['combo5', 't_combo3'], 11: ['=combo5', '=t_combo3'], 12: ['cast', 't_summon'], 13: ['=cast', '=t_summon'], 14: ['cast', 't_seed'], 15: ['=cast', '=t_seed'],
-  16: ['cast', 't_vanish'], 17: ['=cast', '=t_vanish'], 18: ['stagger', 'stagger'], 19: ['death', 'death'], 20: ['p_twirl_slam', 't_spin_throw'],
-  21: ['iai_dash', 't_rush'], 22: ['exhausted', 'exhausted'], 23: ['t_collapse', 't_collapse'], 24: ['recover', 'recover']};
-const legacyPlay = name => name === 'idle' ? [`execute if score @s rdRigW matches 1 run return run function ${NS}/play/idle_polearm`, `function ${NS}/play/idle_sword`]
-  : name.startsWith('=') ? [`execute unless score @s rdRigC matches ${CLIP_ID[name.slice(1)]} run function ${NS}/play/${name.slice(1)}`] : [`function ${NS}/play/${name}`];
-for (const [id, pair] of Object.entries(LEGACY)) for (const nm of pair) if (nm !== 'idle' && !(nm.replace('=', '') in CLIP_ID)) throw new Error(`legacy ${id}: unknown clip ${nm}`);
-fn('legacy_anim', ['# TEMPORARY (plan §C.3, removed in S3): the release encounter drives the rig through rdAnim / rdPhase. @s = the boss.',
-  '# rig_hide (release encounter) moves the parts away: refresh the follow cache while it is in force.',
-  'execute if score @s rdHidden matches 1.. run scoreboard players reset @s rdRigQx',
-  'execute if score @s rdAnim = @s rdRigL if score @s rdPhase = @s rdRigP run return 0',
-  `function ${NS}/legacy/changed`]);
-fn('legacy/changed', ['# TEMPORARY: a new rdAnim or rdPhase. The form follows rdPhase (2 Tenma; 0 / 3 Shogun; 1 keeps the transform clip\'s).',
-  `execute unless score @s rdPhase = @s rdRigP if score @s rdPhase matches 2 unless score @s rdAnim matches 9 run function ${NS}/state/tenma`,
-  `execute unless score @s rdPhase = @s rdRigP if score @s rdPhase matches 0 run function ${NS}/state/shogun`,
-  'scoreboard players operation @s rdRigP = @s rdPhase',
-  'execute if score @s rdAnim = @s rdRigL run return 0',
-  'scoreboard players operation @s rdRigL = @s rdAnim',
-  `execute if score @s rdPhase matches 2 run return run function ${NS}/legacy/tenma`,
-  `function ${NS}/legacy/shogun`]);
-for (const [form, k] of [['shogun', 0], ['tenma', 1]]) {
-  const lines = [`# TEMPORARY: rdAnim -> ${form} clip.`];
-  for (const [id, pair] of Object.entries(LEGACY)) {
-    const pl = legacyPlay(pair[k]);
-    if (pl.length === 1) lines.push(`execute if score @s rdAnim matches ${id} run return run ${pl[0]}`);
-    else { fn(`legacy/${form}_${id}`, pl); lines.push(`execute if score @s rdAnim matches ${id} run return run function ${NS}/legacy/${form}_${id}`); }
-  }
-  fn(`legacy/${form}`, lines);
-}
-// the release P13 slam hand (shadow/lock, world): kept until S2-TENMA replaces 흉장의 수안 · 추적; the prop slam palm
-const SLAM_CONTACT = 12, f6 = x => (Math.abs(x) < 5e-7 ? 0 : x).toFixed(6) + 'f';
-const slamPose = (y, s) => `{translation:[0f,${f6(y)},0f],left_rotation:[0.7071068f,0f,0f,0.7071068f],scale:[${f6(s)},${f6(s)},${f6(s)}],right_rotation:[0f,0f,0f,1f]}`;
-const slamAt = (age, dur, y, s) => `execute if score @s rdRigT matches ${age} run data merge entity @s {interpolation_duration:${dur},start_interpolation:0,transformation:${slamPose(y, s)}}`;
-const SLAM_S = 3.2, SLAM_FLOOR = .3;
-fn('target_slam_spawn', ['# TEMPORARY (release P13): a pale palm falls onto the fixed ground point (no damage here). Positioned at the point.',
-  'tag @e[tag=rlk_rd_slam_new] remove rlk_rd_slam_new',
-  `summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_slam_hand","rlk_rd_slam_new"],billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:0,view_range:2.5f,width:16f,height:20f,shadow_radius:0f,brightness:{block:15,sky:15},transformation:${slamPose(7, .01)},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId('prop/slam_palm')}"}}}`,
-  'scoreboard players set @e[tag=rlk_rd_slam_new,limit=1] rdRigT -1', 'tag @e[tag=rlk_rd_slam_new] remove rlk_rd_slam_new']);
-fn('target_slam_tick', ['# TEMPORARY (release P13). @s = one falling palm at its ground point; rdRigT is its age.',
-  'execute unless entity @e[tag=rlk_raiden,scores={rdPhase=2,rdPat=13},limit=1] run return run kill @s', 'scoreboard players add @s rdRigT 1',
-  slamAt(1, 4, 7, SLAM_S), slamAt(SLAM_CONTACT - 7, 4, 7.4, SLAM_S), slamAt(SLAM_CONTACT - 3, 3, SLAM_FLOOR, SLAM_S), slamAt(SLAM_CONTACT + 1, 2, SLAM_FLOOR + .4, SLAM_S),
-  slamAt(SLAM_CONTACT + 5, 6, SLAM_FLOOR + .9, 0), `execute if score @s rdRigT matches ${SLAM_CONTACT + 14}.. run kill @s`]);
-// the removed judgment rig: no-op shims for the release encounter's calls (S2-TENMA drops the calls)
-const jDir = path.join(FN_ROOT, 'judgment_rig');
-fs.rmSync(jDir, {recursive: true, force: true});
-for (const n of ['start', 'tick', 'cleanup']) put(path.join(jDir, n + '.mcfunction'),
-  `# TEMPORARY shim: the 만겁 judgment rig (rift, puppet arm, katana, camera lock) was removed (rd/plan.md §B.2 15, §F.2.1).\n# The release encounter still calls judgment_rig/${n}; S2-TENMA drops the call and S3 deletes this file.`);
+// ---- removed shims (S3): the legacy rdAnim bridge, the release P13 slam hand and the judgment_rig stand-ins ------------------
+fs.rmSync(path.join(FN_ROOT, 'judgment_rig'), {recursive: true, force: true});
 
 // ---- manifest v2 ---------------------------------------------------------------------------------------------------------------
 const manifestPath = path.join(here, 'raiden_rig_manifest.json');
@@ -445,11 +394,9 @@ json(manifestPath, {
   clips: clipInfo,
   follow: follow.info(),
   props: Object.fromEntries(Object.entries(PROPS).map(([k, P]) => [k, {...P, item: itemId(P.model), function: `${NS}/prop/${k}`}])),
-  legacy_items: Object.fromEntries(Object.entries(LEGACY_ITEMS).map(([k, v]) => [itemId(k), itemId(v)])),
-  legacy_anim: Object.fromEntries(Object.entries(LEGACY).map(([id, [s, t]]) => [id, {shogun: s, tenma: t}])),
   objectives: Object.fromEntries(OBJ.map(o => [o, o])),
   functions: {init: `${NS}/init`, spawn: `${NS}/spawn`, tick: `${NS}/tick`, play: `${NS}/play/<clip>`, start: `${NS}/start/<clip>`, state: `${NS}/state/{shogun,tenma,hidden}`,
-    look: `${NS}/look/{sword,polearm,tenma}`, flash: `${NS}/flash`, kill: `${NS}/kill`, face: `${NS}/face/{player,track,set}`, prop: `${NS}/prop/<kind>`, legacy: `${NS}/legacy_anim`},
+    look: `${NS}/look/{sword,polearm,tenma}`, flash: `${NS}/flash`, kill: `${NS}/kill`, face: `${NS}/face/{player,track,set}`, prop: `${NS}/prop/<kind>`},
   px: {rig: px.rig, props: px.props, total: px.rig + px.props, sprites: ledger},
   elements: {shogun_sword: shogunEls, shogun_polearm: shogunElsP, tenma: tenmaEls},
   budgets: {parts: [PARTS.length, 34], key_files: keyFiles, rig_files: fnFiles.files, rig_bytes: fnFiles.bytes, models: Object.keys(models).length,

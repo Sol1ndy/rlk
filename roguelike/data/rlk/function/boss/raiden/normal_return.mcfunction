@@ -9,6 +9,5 @@ tag @s remove rlk_rd_tm_rear
 function rlk:boss/raiden/finish
 scoreboard players set @s rdCool 20
 function rlk:room/raiden/look_shogun
-scoreboard players operation @s rdRigL = @s rdAnim
 execute if score @s rdRigW matches 1 run function rlk:boss/raiden/rig/play/idle_polearm
 execute unless score @s rdRigW matches 1 run function rlk:boss/raiden/rig/play/idle_sword

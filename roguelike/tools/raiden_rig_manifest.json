@@ -1525,115 +1525,6 @@
       "function": "rlk:boss/raiden/rig/prop/clone_slash_glow"
     }
   },
-  "legacy_items": {
-    "rlk:raiden/electro_orb": "rlk:raiden/prop/eye_orb",
-    "rlk:raiden/lightning_stake": "rlk:raiden/prop/vajra",
-    "rlk:raiden/remembrance_flower": "rlk:raiden/prop/flower",
-    "rlk:raiden/support_hand_l": "rlk:raiden/prop/clap_hand_l",
-    "rlk:raiden/support_hand_r": "rlk:raiden/prop/clap_hand_r"
-  },
-  "legacy_anim": {
-    "0": {
-      "shogun": "idle",
-      "tenma": "t_idle"
-    },
-    "1": {
-      "shogun": "idle",
-      "tenma": "t_idle"
-    },
-    "2": {
-      "shogun": "iai_near",
-      "tenma": "t_iai"
-    },
-    "3": {
-      "shogun": "=iai_near",
-      "tenma": "=t_iai"
-    },
-    "4": {
-      "shogun": "combo5",
-      "tenma": "t_combo3"
-    },
-    "5": {
-      "shogun": "p_lance",
-      "tenma": "t_rush"
-    },
-    "6": {
-      "shogun": "=p_lance",
-      "tenma": "=t_rush"
-    },
-    "7": {
-      "shogun": "cast",
-      "tenma": "t_summon"
-    },
-    "8": {
-      "shogun": "=cast",
-      "tenma": "=t_summon"
-    },
-    "9": {
-      "shogun": "transform",
-      "tenma": "transform"
-    },
-    "10": {
-      "shogun": "combo5",
-      "tenma": "t_combo3"
-    },
-    "11": {
-      "shogun": "=combo5",
-      "tenma": "=t_combo3"
-    },
-    "12": {
-      "shogun": "cast",
-      "tenma": "t_summon"
-    },
-    "13": {
-      "shogun": "=cast",
-      "tenma": "=t_summon"
-    },
-    "14": {
-      "shogun": "cast",
-      "tenma": "t_seed"
-    },
-    "15": {
-      "shogun": "=cast",
-      "tenma": "=t_seed"
-    },
-    "16": {
-      "shogun": "cast",
-      "tenma": "t_vanish"
-    },
-    "17": {
-      "shogun": "=cast",
-      "tenma": "=t_vanish"
-    },
-    "18": {
-      "shogun": "stagger",
-      "tenma": "stagger"
-    },
-    "19": {
-      "shogun": "death",
-      "tenma": "death"
-    },
-    "20": {
-      "shogun": "p_twirl_slam",
-      "tenma": "t_spin_throw"
-    },
-    "21": {
-      "shogun": "iai_dash",
-      "tenma": "t_rush"
-    },
-    "22": {
-      "shogun": "exhausted",
-      "tenma": "exhausted"
-    },
-    "23": {
-      "shogun": "t_collapse",
-      "tenma": "t_collapse"
-    },
-    "24": {
-      "shogun": "recover",
-      "tenma": "recover"
-    }
-  },
   "objectives": {
     "rdRigC": "rdRigC",
     "rdRigT": "rdRigT",
@@ -1641,8 +1532,6 @@
     "rdRigS": "rdRigS",
     "rdRigW": "rdRigW",
     "rdRigF": "rdRigF",
-    "rdRigL": "rdRigL",
-    "rdRigP": "rdRigP",
     "rdRigFl": "rdRigFl",
     "rdRigQ": "rdRigQ",
     "rdRigQx": "rdRigQx",
@@ -1661,8 +1550,7 @@
     "flash": "rlk:boss/raiden/rig/flash",
     "kill": "rlk:boss/raiden/rig/kill",
     "face": "rlk:boss/raiden/rig/face/{player,track,set}",
-    "prop": "rlk:boss/raiden/rig/prop/<kind>",
-    "legacy": "rlk:boss/raiden/rig/legacy_anim"
+    "prop": "rlk:boss/raiden/rig/prop/<kind>"
   },
   "px": {
     "rig": 145664,
@@ -1732,8 +1620,8 @@
       34
     ],
     "key_files": 491,
-    "rig_files": 744,
-    "rig_bytes": 2807548,
+    "rig_files": 736,
+    "rig_bytes": 2797994,
     "models": 55,
     "culling": {
       "width": 16,

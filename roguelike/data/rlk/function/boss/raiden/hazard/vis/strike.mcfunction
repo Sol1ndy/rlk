@@ -10,7 +10,6 @@ execute if score @s rdHSv matches 6 run function rlk:boss/raiden/hazard/vis/sv/6
 execute if score @s rdHSv matches 7 run function rlk:boss/raiden/hazard/vis/sv/7
 execute if score @s rdHSv matches 8 run function rlk:boss/raiden/hazard/vis/sv/8
 execute if score @s rdHSv matches 9 run function rlk:boss/raiden/hazard/vis/sv/9
-execute if score @s rdHSv matches 10 run function rlk:boss/raiden/hazard/vis/sv/10
 scoreboard players operation #rdSx rd = @s rdHA
 execute if score @s rdHK matches 2 run scoreboard players operation #rdSx rd = @s rdHB
 scoreboard players operation #rdSz rd = #rdSx rd

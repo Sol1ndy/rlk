@@ -8,6 +8,4 @@ execute if score @s rdRigS matches 2 run scoreboard players set @s rdRigS 0
 execute if score @s rdRigS matches 1 run function rlk:boss/raiden/rig/spawn_tenma
 execute unless score @s rdRigS matches 1 run function rlk:boss/raiden/rig/spawn_shogun
 scoreboard players set @s rdRigF 0
-scoreboard players operation @s rdRigL = @s rdAnim
-scoreboard players operation @s rdRigP = @s rdPhase
 execute rotated as @s rotated ~ 0 run function rlk:boss/raiden/rig/follow_now

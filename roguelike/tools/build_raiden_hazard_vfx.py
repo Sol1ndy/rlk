@@ -304,11 +304,6 @@ def models():
     ring_walls(m, 1.0, 0.0, 0.5, ["rim_crackle_a", "rim_crackle_c"])
     bolts_radial(m, [0, 90, 180, 270], 0.15, 0.9, 0.14, 0.07, ["bolt_c", "bolt_a"])
     M["st_field"] = m
-    m = Model(STRIKE_YU)                                         # legacy fan, unit = 18 b
-    for i, a in enumerate((-45, -22.5, 0, 22.5, 45)):
-        strip(m, polar(0.03, a), polar(0.98, a), 0.07, "bolt_" + ABC[i % 3], y=0.07)
-        strip(m, polar(0.04, a), polar(0.97, a), 0, "blade_" + ABC[(i + 1) % 3], wall=(0.15, 1.65))
-    M["st_fan"] = m
 
     # ---- travelling cards (yu 1)
     for v, (cr, flip) in enumerate((("crackle_a", False), ("crackle_b", True))):
@@ -337,10 +332,6 @@ def models():
     m = Model()
     m.card((0, 0, 0), "z", "+x", "-y", 2.5, 2.5, "chakra_b")   # billboard hoop / halo / twirl ring, radius 1
     M["fx_hoop"] = m
-    m = Model()
-    radial(m, 2.5, "chakra_a", 0.04)
-    radial(m, 2.2, "chakra_b", 0.06, flip=True)
-    M["fx_vortex"] = m
     m = Model(4)
     radial(m, 2 / 0.92, "shockwave", 0.05)
     for k, ang in enumerate((0.0, 45.0, -45.0)):
@@ -383,10 +374,6 @@ def models():
     m = Model()
     m.card((0, 0, 0), "z", "+x", "-y", 1.0, 1.0, "flash")
     M["fx_flash"] = m
-    # ---- compatibility: raiden_enc/tenma.py's shadow summons fx_hazard/after_3 (scale 2, old 8 + world/2 convention)
-    m = Model()                                                  # world = 2 u here: pool radius 1.8 b, 0.02 b up
-    radial(m, 2.0, "dk_pool", 0.01)
-    M["after_3"] = m
     return M
 
 
@@ -660,7 +647,6 @@ def build(root, out):
         'blink_out': card('fx_flash', 5, y=1.0, s0=(1.6, 2.2, 1.6), s1=(0.3, 2.6, 0.3), d=4, color=0xB48CFF, billboard="center"),
         'blink_in': card('fx_flash', 5, y=1.0, s0=(0.3, 2.6, 0.3), s1=(1.4, 1.8, 1.4), d=3, color=0xB48CFF, billboard="center"),
         'switch_hoop': card('fx_hoop', 10, y=1.2, s0=(1.25, 1.25, 1.25), color=DARK, billboard="center"),
-        'switch_vortex': card('fx_vortex', 16, s0=(0.6, 1, 0.6), s1=(4.5, 1, 4.5), d=12, color=0xC6A6FF),
         'switch_burst': card('fx_dome', 10, s0=(1, 4, 1), s1=(6, 4, 6), d=4)
         + card('fx_ring', 10, s0=(1, 1, 1), s1=(6.5, 1, 6.5), d=5),
         'bolt': card('fx_bolt', 7, s0=(1.2, 8, 1.2)) + card('fx_ring', 8, s0=(0.5, 1, 0.5), s1=(3, 1, 3), d=4),

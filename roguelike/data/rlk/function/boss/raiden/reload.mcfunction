@@ -16,7 +16,6 @@ scoreboard players set @s rdNext 0
 scoreboard players set @s rdTime 0
 scoreboard players set @s rdRage 0
 scoreboard players set @s rdCool 40
-scoreboard players set @s rdAnim 0
 scoreboard players set @s rdHitCD 0
 function rlk:boss/raiden/sg/reload
 function rlk:boss/raiden/rig/spawn

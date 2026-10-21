@@ -27,12 +27,10 @@ launch tick; the server test uses the same start tick and speed, so no per-tick 
          the engine knock-back path; never a tp), lift (kb +2 steps; the engine has no vertical push), hits=n (max hits,
          0 = unlimited; default 1, follow / field 0), every=t, detached (survives hazard/finish), group (all hazards of the current group share one
          hit: call hz_group() first), tol=0.3, strike=None|'burst'|'bolt'|'arc'|'slash'|'wall'|'field'|'none', sound
-  Presets: the release's `hazard/create {shape:1..14,tell,damage,life}` still works (s1..s14 map onto the kinds with
-  tol 0, quiet, so the old encounter keeps its exact timelines until S3 removes them).
 
 FX CUES (D.1): fx(cue) -> `function rlk:boss/raiden/fx/<cue>` plays the cue's vanilla sound recipe (SOUNDS) and, for
 the cues below, summons timed cards (they need no cleanup; `kill @e[tag=rlk_rd_fx]` clears them):
-  star (4-point star + 1 b ring flash), blink_out / blink_in, switch_hoop / switch_vortex / switch_burst (27 / 28),
+  star (4-point star + 1 b ring flash), blink_out / blink_in, switch_hoop / switch_burst (27 / 28; the vortex is the rig prop),
   bolt / bolt_big (sky bolt + shock ring), crystal, parry (gold waist crescent), counter_cue (black line),
   guard_shatter (burst + gold light pillar, 100 t), eye_spawn (cyan sky beam), eye_break, eye_blast, musou_slash,
   glaive_throw (pink beam), bomb (flash + ink), iai_charge, danjeol_halo, danjeol_column, clap_star, shadow_palm,
@@ -44,7 +42,7 @@ State decals (not hazards): decal('ring'|'rings3'|'disc_pale'|'band'|'pool'|'aur
   fx/decal/d<k> {sx,sz,life} (tags rlk_rd_sdecal, rlk_rd_sdecal_<kind>; life 99999 = until killed); decal('tint',
   life=..) -> the whole-field tint card (24.6 b radius at the execution point; run it at the arena centre).
 
-Runtime contract (rdsim reads it): rdShape = preset id 1..14 or 20 + kind id; rdWind = tell; rdDamage; rdHLife; rdHId;
+Runtime contract (rdsim reads it): rdShape = 20 + kind id; rdWind = tell; rdDamage; rdHLife; rdHId;
 tags rlk_rd_quiet / rlk_rd_nododge / rlk_rd_jump / rlk_rd_detached / rlk_rd_lift; decal displays rlk_rd_decal +
 rlk_rd_decal_<kind> with rdVId = rdHId; strike displays rlk_rd_strike; #rdNoDodge rd is 1 around a nododge hurt.
 Lifecycle: function rlk:boss/raiden/hazard/finish kills every hazard that is not detached (call it from `finish`);
@@ -54,8 +52,8 @@ import math
 
 NS = 'rlk:boss/raiden/'
 KINDS = {'disk': 1, 'annulus': 2, 'rect': 3, 'to_wall': 4, 'sweep': 5, 'slab': 6, 'orb': 7, 'follow': 8,
-         'field': 9, 'safe_dome': 10, 'fan': 11}
-SHAPE_BASE = 20                     # rdShape of a v2 hazard = 20 + kind (1..14 are the legacy presets)
+         'field': 9, 'safe_dome': 10}
+SHAPE_BASE = 20                     # rdShape of a hazard = 20 + kind (1..14 were the release presets, removed in S3)
 TRAVEL = (5, 6, 7)
 ARENA_WALL_R = 24.0
 SEG_DEG = 15                        # one ring segment card per 15 degrees (24 per full ring)
@@ -86,7 +84,6 @@ STRIKES = {
     7: ('slash', 'st_slash', 'st_slash_af'),
     8: ('wall', 'st_wall', 'st_slash_af'),
     9: ('field', 'st_field', 'st_field'),
-    10: ('fan', 'st_fan', 'st_fan'),
 }
 STRIKE_IDS = {v[0]: k for k, v in STRIKES.items()}
 STRIKE_YU = 8                       # strike models: 1 model y unit = 8 blocks (display scale y)
@@ -95,24 +92,6 @@ STRIKE_LIFE = 10
 FLASH = {9: 0xC8B6EA, 8: 0xEDE4FF}
 AFTER_AT, AFTER_TINT, FADE_AT, FADE_TINT = 7, 0xA898D8, 4, 0x6A5A98
 
-# Legacy presets s1..s14 of the release (build_raiden_hazards.py) -> kind and parameters (blocks, tol 0).
-PRESETS = {
-    1: ('annulus', dict(r=6, rmin=0, half=60)),
-    2: ('rect', dict(len=12, wid=2.2)),
-    3: ('disk', dict(r=3)),
-    4: ('annulus', dict(r=12, rmin=0, half=70)),
-    5: ('rect', dict(len=20, wid=3.6)),
-    6: ('disk', dict(r=5)),
-    7: ('rect', dict(len=8, wid=8)),
-    8: ('disk', dict(r=6)),
-    9: ('fan', dict(len=18, wid=0.9)),
-    10: ('rect', dict(len=18, wid=7)),
-    11: ('sweep', dict(r0=2.7, v=30 / 57, band=1.4, half=180, reach=32.7)),
-    12: ('disk', dict(r=12)),
-    13: ('rect', dict(len=22, wid=2.4)),
-    14: ('disk', dict(r=19)),
-}
-PRESET_FAN = (-40, -20, 0, 20, 40)
 
 # D.1 vanilla sound recipes: cue -> [(event, volume, pitch)] (every id is in the 26.3 sound_event registry; the kit
 # test checks them against S:rd/tests/sound_ids.txt).
@@ -235,8 +214,6 @@ def hz_args(kind, tell, dmg, *, r=0.0, rmin=0.0, half=180.0, len=0.0, wid=0.0, o
         a, b, c, e = _mb(d0), int(round(v * 1e6)), _mb(r), _mb(y)
         d = _mb(r + tol)
         travel = int(math.ceil(max(0.0, reach - d0) / v - 1e-9))
-    elif kind == 'fan':
-        a, b = _mb(len), _mb(wid / 2)
     if kind == 'follow':
         b = int(round(v * 1e6))
     if travel:
@@ -245,8 +222,8 @@ def hz_args(kind, tell, dmg, *, r=0.0, rmin=0.0, half=180.0, len=0.0, wid=0.0, o
         assert kind not in ('follow', 'field'), f'{kind} needs life'
         life = tell + (travel + 1 if travel else 11)
     if strike is None:
-        strike = {'disk': 'burst', 'annulus': arc_strike(half), 'rect': 'slash', 'to_wall': 'wall', 'field': 'field',
-                  'fan': 'fan'}.get(kind, 'none')
+        strike = {'disk': 'burst', 'annulus': arc_strike(half), 'rect': 'slash', 'to_wall': 'wall',
+                  'field': 'field'}.get(kind, 'none')
     sv = 0 if strike == 'none' else STRIKE_IDS[strike]
     if kind in ('sweep', 'slab', 'orb'):
         sv = seg if kind == 'sweep' else 1

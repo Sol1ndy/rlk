@@ -25,6 +25,5 @@ execute if score @s rdHK matches 6 run function rlk:boss/raiden/hazard/k/slab
 execute if score @s rdHK matches 7 run function rlk:boss/raiden/hazard/k/orb
 execute if score @s rdHK matches 8 run function rlk:boss/raiden/hazard/k/follow
 execute if score @s rdHK matches 9 run function rlk:boss/raiden/hazard/k/field
-execute if score @s rdHK matches 11 run function rlk:boss/raiden/hazard/k/fan
 execute if score @s rdHK matches 4 run function rlk:boss/raiden/hazard/k/rect
 execute if score #rdHit rd matches 1 run function rlk:boss/raiden/hazard/land

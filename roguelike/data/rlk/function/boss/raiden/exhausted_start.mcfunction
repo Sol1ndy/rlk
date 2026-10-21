@@ -23,5 +23,4 @@ scoreboard players set @a[tag=player] ttlT 65
 scoreboard players set #rdCap rd 1
 playsound minecraft:entity.iron_golem.death hostile @a[tag=player] ~ ~ ~ 0.8 0.72 0.3
 execute at @s run function rlk:boss/raiden/vfx/armor_break
-scoreboard players operation @s rdRigL = @s rdAnim
 function rlk:boss/raiden/rig/start/t_collapse

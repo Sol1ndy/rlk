@@ -1,9 +1,9 @@
-"""Display-only lightning for Narukami eyes, stakes and the illusion challenge.
+"""Display-only lightning for Narukami eyes, stakes and object break bursts.
 
 Generate independently of the encounter controller. Object IDs may be reused
 by later patterns, so persistent effects follow a separate unique owner serial.
-Illusion cues are identical for the real and the fake illusions (only the number
-of slashes tells them apart); each slash adds a swing arc and a flying sword wave.
+The illusion cue / swing / sword-wave cards of the release's 찰나의 포영 are retired (S3): the
+rework's clones are rig props and their volleys are kit slabs.
 
 Every model is a handful of flat painted cards (raiden_obj_cards.py) using the
 gradient sprites of build_raiden_fx_textures.py (rlk:raiden/fxg/*):
@@ -12,15 +12,6 @@ gradient sprites of build_raiden_fx_textures.py (rlk:raiden/fxg/*):
           leaping off every fin and spark dots; the two frames swap tilt and sprites.
   stake   spiralling current (pillar_*) on four crossed planes through the stake,
           arcs jumping over its cap and two lightning forks; frames alternate.
-  cue     warn_slash: one thin crackling glint (blade_a, cool tint) on two crossed
-          planes along the cut; strike_slash: hot forked bolt over a soft beam glow.
-  swing   a curved ribbon of chord cards (obj_swing_band: bright newest end, gradient
-          tail back to the swing start, the cut dropping slightly) over a flat
-          blade-light crescent, with a flare where the blade leaves the arc;
-          swing_fade: purple afterglow trail (blade_trail_*).
-  wave    layered crescent: flat crescent_b sheet, a lens-shaped front band of chord
-          cards (obj_wave_band) with a dimmer wider band behind it, two lightning
-          tails and spark dots; wave_fade dissolves (obj_wave_fade, bolt_fade_*).
   break   radial flash on crossed planes, impact sparks, a burst ring, flying shards
           (obj_shard) and a strike from above; *_fade keeps a wider dim residue.
           flower_break is the cyan-tinted petal variant; hit reuses object_break small.
@@ -137,138 +128,6 @@ def stake(variant):
     return m
 
 
-# --------------------------------------------------------------------------- illusion cue
-CUE_C = (0.0, 1.38, 0.38)     # the glint runs from (-1.13, 0.83) to (1.13, 1.93) at z 0.38
-
-
-def cue(contact):
-    m = new()
-    if not contact:
-        m.tint = TINT_WARN
-        m.card(CUE_C, 'z', '+x', '-y', 2.6, 0.30, 'blade_a', FULL, ('z', 22.5), True)
-        m.card(CUE_C, 'y', '+x', '+z', 2.6, 0.30, 'blade_b', FULL, ('z', 22.5), True)
-        return m
-    back = (CUE_C[0], CUE_C[1], CUE_C[2] - 0.03)
-    m.card(back, 'z', '+x', '-y', 2.75, 0.36, 'glow_strip', FULL, ('z', 22.5))
-    m.card(CUE_C, 'z', '+x', '-y', 2.6, 0.62, 'bolt_a', FULL, ('z', 22.5))
-    m.card(CUE_C, 'y', '+x', '+z', 2.6, 0.42, 'blade_c', FULL, ('z', 22.5))
-    for s in (-1, 1):
-        spark(m, (s * 1.18, CUE_C[1] + s * 0.50, CUE_C[2] + 0.02), 0.34)
-    return m
-
-
-# --------------------------------------------------------------------------- swing arc
-SWING_R = 1.85
-SWING_TOP = 1.863     # ribbon card top; obj_swing_band's line runs v 0.27 -> 0.73 (y 1.62 -> 1.20)
-SWING_H = 0.9
-CHORDS = 9            # vertices at -101.25 + 22.5 k: every chord lies at a multiple of 22.5 deg
-
-
-def swing(fade):
-    m = new()
-    half = 2 * SWING_R * math.sin(math.radians(11.25))
-    for k in range(CHORDS):
-        phi = -90.0 + 22.5 * k                       # chord midpoint direction
-        mid = polar(SWING_R * math.cos(math.radians(11.25)), phi)
-        u0, u1 = 16 * k / CHORDS, 16 * (k + 1) / CHORDS
-        if not fade:
-            m.vcard((mid[0], SWING_TOP - SWING_H / 2, mid[2]), phi + 90, half + 0.01, SWING_H, 'obj_swing_band',
-                    (u0, 0, u1, 16))
-        else:
-            # level afterglow trail, stepped down with the cut (u=0 of blade_trail = newest)
-            y = 1.62 - 0.42 * (k + 0.5) / CHORDS
-            m.vcard((mid[0], y, mid[2]), phi + 90, half + 0.01, 0.42, 'blade_trail_a', (16 - u0, 0, 16 - u1, 16))
-    H = SWING_R / 0.94
-    if not fade:
-        m.hcard((0.0, 1.41, H / 2), 90.0, 2 * H, H, 'crescent_a')
-        tip = polar(SWING_R, 103.0, 1.2)
-        m.crossed(tip, 0.75, 'flash', planes=2)
-        m.anchored((0.06, 0.86), tip, 'z', '+x', '-y', 0.7, 0.35, 'arc_b', FULL, ('z', 22.5))
-    else:
-        m.tint = TINT_SHEET_FADE
-        m.hcard((0.0, 1.40, H / 2 - 0.1), 90.0, 2 * H * 1.04, H * 1.04, 'crescent_a', FULL, True)
-    return m
-
-
-# --------------------------------------------------------------------------- flying sword wave
-WAVE_Y = 1.18
-WAVE_W, WAVE_D = 3.47, 1.38            # crescent card: tips at x = +-1.55, sagitta 0.9
-WAVE_APEX = 0.62
-WAVE_PIVOT = WAVE_APEX - 0.94 * WAVE_D
-
-
-def wave_edge(phi):
-    """Plan-view point of the crescent's cutting edge at texture angle phi (deg)."""
-    p = math.radians(phi)
-    return (0.94 * math.sin(p) * WAVE_W / 2, WAVE_PIVOT + 0.94 * math.cos(p) * WAVE_D)
-
-
-def wave_chords(grow=1.0, back=0.0):
-    """Edge polyline whose chords point exactly at 45/67.5/90/112.5/135 deg: the tangent
-    lines of the edge at those directions, cut at their intersections and at the tips
-    (phi = +-70). Scaled by `grow` about the apex, then moved `back`.
-    Returns [(center (x, z), theta, length, x0, x1)]."""
-    A, B = 0.94 * WAVE_W / 2, 0.94 * WAVE_D
-    lines = []
-    for theta in (45.0, 67.5, 90.0, 112.5, 135.0):
-        phi = math.atan(-A / (B * math.tan(math.radians(theta)))) if theta != 90.0 else 0.0
-        p = wave_edge(math.degrees(phi))
-        lines.append((p, (math.sin(math.radians(theta)), math.cos(math.radians(theta))), theta))
-
-    def meet(l1, l2):
-        (p, d), (q, e) = (l1[0], l1[1]), (l2[0], l2[1])
-        det = d[0] * -e[1] - d[1] * -e[0]
-        t = ((q[0] - p[0]) * -e[1] - (q[1] - p[1]) * -e[0]) / det
-        return (p[0] + d[0] * t, p[1] + d[1] * t)
-
-    def foot(l, pt):
-        (p, d) = l[0], l[1]
-        t = (pt[0] - p[0]) * d[0] + (pt[1] - p[1]) * d[1]
-        return (p[0] + d[0] * t, p[1] + d[1] * t)
-    verts = [foot(lines[0], wave_edge(-70.0))]
-    verts += [meet(a, b) for a, b in zip(lines, lines[1:])]
-    verts.append(foot(lines[-1], wave_edge(70.0)))
-    verts = [(x * grow, WAVE_APEX + (z - WAVE_APEX) * grow - back) for x, z in verts]
-    out = []
-    for (a, b), line in zip(zip(verts, verts[1:]), lines):
-        L = math.dist(a, b) + 0.02
-        out.append((((a[0] + b[0]) / 2, (a[1] + b[1]) / 2), line[2], L, a[0], b[0]))
-    return out
-
-
-def wave(fade):
-    m = new()
-    if not fade:
-        m.hcard((0.0, WAVE_Y - 0.02, WAVE_PIVOT + WAVE_D / 2), 90.0, WAVE_W, WAVE_D, 'crescent_b')
-    else:
-        m.tint = TINT_RESIDUE
-        m.hcard((0.0, WAVE_Y - 0.02, WAVE_PIVOT + WAVE_D / 2 - 0.15), 90.0, WAVE_W * 1.06, WAVE_D * 1.1, 'crescent_a',
-                FULL, True)
-    layers = [(1.0, 0.0, 0.70, 'obj_wave_fade' if fade else 'obj_wave_band')]
-    if not fade:
-        layers.insert(0, (1.12, 0.16, 0.95, 'obj_wave_fade'))     # wider, dimmer purple layer behind
-    for grow, back, height, tex in layers:
-        chords = wave_chords(grow, back)
-        span = chords[-1][4]
-        for (cx, cz), q, L, x0, x1 in chords:
-            u0 = 16 * (x0 / span + 1) / 2
-            u1 = 16 * (x1 / span + 1) / 2
-            m.vcard((cx, WAVE_Y, cz), q, L, height, tex, (u0, 0, u1, 16))
-    tails = ('bolt_fade_a', 'bolt_fade_c') if fade else ('blade_b', 'bolt_c')
-    for side in (-1, 1):
-        x = side * 0.55
-        for normal, k in (('x', 0), ('y', 1)):
-            tex = tails[(k + (side > 0)) % 2]
-            vax = '-y' if normal == 'x' else '+x'
-            m.card((x, WAVE_Y + 0.08, -0.45), normal, '-z', vax, 1.75, 0.34 if k == 0 else 0.28, tex,
-                   mirror(FULL, side > 0), ('z' if normal == 'x' else 'x', 0.0), fade)
-    if not fade:
-        for k, (phi, dy) in enumerate(((-52, 0.22), (-18, -0.2), (14, 0.26), (48, -0.16))):
-            x, z = wave_edge(phi)
-            spark(m, (x * 1.04, WAVE_Y + dy, z + 0.08), 0.26 if k % 2 else 0.3)
-    return m
-
-
 # --------------------------------------------------------------------------- break / hit bursts
 BURST_Y = 0.9
 
@@ -330,12 +189,6 @@ def build_models():
     for v in (0, 1):
         put(f'eye_{v}', eye(v))
         put(f'stake_{v}', stake(v))
-    put('warn_slash', cue(False))
-    put('strike_slash', cue(True))
-    put('swing', swing(False))
-    put('swing_fade', swing(True))
-    put('wave', wave(False))
-    put('wave_fade', wave(True))
     for flower in (False, True):
         base = 'flower_break' if flower else 'object_break'
         put(base, burst(flower, False))
@@ -372,7 +225,12 @@ def spawn(name, kind, owned=True, life=0, roll=0):
     return lines
 
 
-(OUT / 'cross.mcfunction').unlink(missing_ok=True)  # retired real-illusion X cue
+# Retired outputs (the release illusion's X cue, then the S3 removal of the illusion cue / swing / wave cards).
+for retired in ('cross', 'illusion_cue', 'slash', 'slash_xa', 'slash_xb', 'cue_tick'):
+    (OUT / (retired + '.mcfunction')).unlink(missing_ok=True)
+for retired in ('warn_slash', 'strike_slash', 'swing', 'swing_fade', 'wave', 'wave_fade'):
+    for kind in ('models/item', 'items'):
+        (RP / 'assets/rlk' / kind / 'raiden' / FOLDER / (retired + '.json')).unlink(missing_ok=True)
 write('init', [f'scoreboard objectives add {name} dummy' for name in
                ['rdOvId', 'rdOvKind', 'rdOvAge', 'rdOvLife']])
 write('create', [
@@ -384,27 +242,6 @@ write('create', [
 ])
 write('eye', spawn('eye_0', 1))
 write('stake', spawn('stake_0', 2))
-cue_lines = ['$scoreboard players set @e[tag=rlk_rd_ofnew] rdOvLife $(life)' if line.endswith(' rdOvLife 0') else line
-             for line in spawn('warn_slash', 5)]
-assert any(line.startswith('$') for line in cue_lines)
-write('illusion_cue', [
-    '# As an illusion facing the arena centre, {life:<ticks until its slash>}. Identical',
-    '# for the real and the fake illusions; it disappears with its owner.',
-] + cue_lines)
-swing_lines = spawn('swing', 6, owned=False, life=4)
-wave_lines = spawn('wave', 7, owned=False, life=5)
-wave_lines.insert(-1, 'data merge entity @e[tag=rlk_rd_ofnew,limit=1] {teleport_duration:1}')
-write('slash', [
-    '# As the slashing illusion at its feet, facing the centre: swing arc + flying wave.',
-] + swing_lines + wave_lines)
-# The real illusion's X: two quick diagonal strokes (rolled swing arc + wave each).
-for suffix, roll in (('a', 38), ('b', -38)):
-    xs = spawn('swing', 6, owned=False, life=4, roll=roll)
-    xw = spawn('wave', 7, owned=False, life=5, roll=roll)
-    xw.insert(-1, 'data merge entity @e[tag=rlk_rd_ofnew,limit=1] {teleport_duration:1}')
-    write('slash_x' + suffix, [
-        f'# As the REAL illusion facing the centre: one diagonal stroke of its X slash (roll {roll}).',
-    ] + xs + xw)
 write('break', [
     '# Detached burst survives its destroyed owner for nine ticks, then disappears.',
     'execute if score @s rdObjKind matches 3 run function rlk:boss/raiden/object_vfx/flower_break',
@@ -423,16 +260,9 @@ write('owner', [
     'execute as @e[tag=rlk_rd_object] if score @s rdOvId = #rdOvOwner rd run scoreboard players set #rdOvExists rd 1',
 ])
 setmodel = lambda name: 'data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_object/' + name + '"'
-write('cue_tick', [
-    'scoreboard players operation #rdOvLeft rd = @s rdOvLife',
-    'scoreboard players operation #rdOvLeft rd -= @s rdOvAge',
-    'execute if score #rdOvLeft rd matches 3 run ' + setmodel('strike_slash'),
-])
 write('tick', [
     'execute if score @s rdOvKind matches 1..2 run function rlk:boss/raiden/object_vfx/owner',
-    'execute if score @s rdOvKind matches 5 run function rlk:boss/raiden/object_vfx/owner',
     'execute if score @s rdOvKind matches 1..2 if score #rdOvExists rd matches 0 run return run kill @s',
-    'execute if score @s rdOvKind matches 5 if score #rdOvExists rd matches 0 run return run kill @s',
     'scoreboard players add @s rdOvAge 1',
     'execute if score @s rdOvLife matches 1.. if score @s rdOvAge >= @s rdOvLife run return run kill @s',
     'scoreboard players operation #rdOvFrame rd = @s rdOvAge',
@@ -442,14 +272,8 @@ write('tick', [
     'execute if score @s rdOvKind matches 1 if score #rdOvFrame rd matches 4 run ' + setmodel('eye_1'),
     'execute if score @s rdOvKind matches 2 if score #rdOvFrame rd matches 0 run ' + setmodel('stake_0'),
     'execute if score @s rdOvKind matches 2 if score #rdOvFrame rd matches 4 run ' + setmodel('stake_1'),
-    # Illusion cue (5) charges for its last three ticks; it dies on the slash tick.
-    'execute if score @s rdOvKind matches 5 run function rlk:boss/raiden/object_vfx/cue_tick',
-    # Swing arc (6) fades; the sword wave (7) flies 5.5 blocks a tick to the line's end.
-    'execute if score @s rdOvKind matches 6 if score @s rdOvAge matches 2 run ' + setmodel('swing_fade'),
-    'execute if score @s rdOvKind matches 7 if score @s rdOvAge matches 1.. run tp @s ^ ^ ^5.5',
-    'execute if score @s rdOvKind matches 7 if score @s rdOvAge matches 3 run ' + setmodel('wave_fade'),
     'execute if score @s rdOvKind matches 3 if score @s rdOvAge matches 3 run ' + setmodel('object_break_fade'),
     'execute if score @s rdOvKind matches 4 if score @s rdOvAge matches 3 run ' + setmodel('flower_break_fade'),
 ])
-print(f'Generated {len(STATS)} painted-card object lightning models (eyes, stakes, illusion cue/swing/wave, '
+print(f'Generated {len(STATS)} painted-card object lightning models (eyes, stakes, '
       f'break bursts; {min(n for _, n in STATS)}-{max(n for _, n in STATS)} cards each).')

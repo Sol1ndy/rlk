@@ -14,7 +14,7 @@ authoring.
 |---|---|
 | `rig/init` | objectives (safe on every load) |
 | `rig/spawn` | kills and summons the 30 parts (fixed UUIDs `524c4b4d-5244-4900-8000-0000000000NN`, tag `rlk_raiden_part` + `rlk_rd_<part>`) in the rest pose of the stored state and queues its idle clip. `rig/tick` calls it when a part is missing. |
-| `rig/tick` | once per game tick, `at @s`: respawn if missing, `legacy_anim` (temporary), follow, flash countdown, clip step. Does nothing but follow while hidden. |
+| `rig/tick` | once per game tick, `at @s`: respawn if missing, follow, flash countdown, clip step. Does nothing but follow while hidden. |
 | `rig/play/<clip>` | queue a clip: its tick 0 is applied by the next `rig/tick` (so event tick *e* lands on the *e*-th `rig/tick` after the call, counting that first one as 0). |
 | `rig/start/<clip>` | apply tick 0 now (same game tick), then continue from `rig/tick`. |
 | `rig/state/{shogun,tenma,hidden}` | form switch (models + follow list). `hidden` scales every part to 0 where it stands (no teleport, never below the floor) and stops the clip; the next `play`/`start` shows the rig again (each clip's tick 0 enforces its own state). |
@@ -25,7 +25,7 @@ authoring.
 | `rig/kill` | remove every part (death cleanup); `rig/cleanup` is the old name of the same call. Props go with `rig/prop/clear`. |
 
 Objectives: `rdRigC` clip id, `rdRigT` clip tick (-1 = queued), `rdRigS` state (0 Shogun, 1 Tenma, 2 hidden),
-`rdRigW` weapon, `rdRigF` flash, `rdRigL`/`rdRigP` legacy bridge, `rdRigFl`/`rdRigQ*` follow cache, `rdRigY` scratch.
+`rdRigW` weapon, `rdRigF` flash, `rdRigFl`/`rdRigQ*` follow cache, `rdRigY` scratch.
 
 ## Clips (manifest `clips`; ticks are played clip ticks — the encounter takes its hit ticks from these)
 
@@ -90,22 +90,20 @@ Non-looping clips hold their last pose until the next `play`. The glaive is not 
 - Props (manifest `props`): `eye_orb`, `blade_eye`, `musou_orb`, `vajra`, `flower` (≈ 2 b), `dome` (r 8 b at scale 8,
   grow it by its scale), `clap_l`/`clap_r` (4.5 b translucent hands), `slam_palm`, `glaive_planted`, `seed`, `hoop`,
   `vortex`, `clone_ready`/`clone_slash` (+`_glow`; pivot 1.375 b above the feet, the function lifts it).
-- Legacy item ids still used by the release encounter (`electro_orb`, `lightning_stake`, `remembrance_flower`,
-  `support_hand_l/r`) are item definitions over the new prop models (manifest `legacy_items`).
+- The encounter puts props on screen through `object/create {model:"prop/<model>"}` (eyes, clones, the flower) or
+  `rig/prop/<kind>`; the release's item ids (`electro_orb`, `lightning_stake`, `remembrance_flower`, `support_hand_*`)
+  were deleted in S3 together with the bridge below.
 
-## Temporary bridge (removed in S3)
+## Removed in S3
 
-`rig/legacy_anim` maps the release encounter's 25 `rdAnim` ids × `rdPhase` to the clips (manifest `legacy_anim`;
-`=clip` means "keep it if it already plays"). `judgment_rig/{start,tick,cleanup}` are empty shims; the old judgment
-frames and `build_raiden_judgment_rig.mjs` are gone. `rig/target_slam_spawn|tick` serve release P13 with
-`prop/slam_palm`.
-**Request to S2 (core.py, not owned here):** `rig_hide` still teleports the parts 60 b down; replace it with
-`rig/state/hidden` and drop `rig_shown` (the next `rig/play` shows the rig).
+The temporary S1-S2 bridge is gone: `rig/legacy_anim` and `rig/legacy/*` (the release's `rdAnim` ids), the
+`judgment_rig/{start,tick,cleanup}` shims (the generator deletes the folder) and `rig/target_slam_*` (release P13).
+The encounter calls only `rig/play/<clip>` / `rig/start/<clip>` and hides her with `rig/state/hidden`.
 
 ## Tests
 
 `python3 S/rd/tests/test_raiden.py <roguelike> -k rig` (`S/rd/tests/rig_tests.py`): manifest v2 against the plan's
 §C.5 table (lengths, loops, event ticks), parts/UUIDs, every called function exists, no negative score amounts, no
-downward teleports, legacy ids in both forms, all 45 clips run in rdsim, hidden/show/Tenma/death/kill/respawn,
+downward teleports, the S3 shim removal, all 45 clips run in rdsim, hidden/show/Tenma/death/kill/respawn,
 no part below y 201. Renders: `S/rd/renders/rig_*.jpg|png` (debug poses `--debug-dp`: `rd_dbg/<clip>/<t>`,
 `rd_dbg/props`, `rd_dbg/dome`, `rd_dbg/weapon_{sword,polearm}`, `rd_dbg/rest_{s,t}`).
