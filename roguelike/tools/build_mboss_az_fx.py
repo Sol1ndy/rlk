@@ -473,6 +473,9 @@ def build_font(rp):
         providers.append({'type': 'bitmap', 'file': f'rlk:font/{FONT_NAME}/{name}.png', 'ascent': ascent,
                           'height': height, 'chars': [chr(cp)]})
     providers.append({'type': 'space', 'advances': {chr(k): v for k, v in SPACES.items()}})
+    # Banner text components put the kit glyph first and the Korean text after it in one list, so the
+    # text inherits this font: fall back to the default font for every char the kit does not draw.
+    providers.append({'type': 'reference', 'id': 'minecraft:default'})
     font_path.parent.mkdir(parents=True, exist_ok=True)
     font_path.write_text(json.dumps({'providers': providers}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     return len(GLYPHS)

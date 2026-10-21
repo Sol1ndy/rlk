@@ -296,6 +296,9 @@ def build_font(rp):
         providers.append({'type': 'bitmap', 'file': f'rlk:font/mboss_bf/{name}.png', 'ascent': ascent,
                           'height': height, 'chars': [chr(cp)]})
     providers.append({'type': 'space', 'advances': {chr(k): v for k, v in SPACES.items()}})
+    # Banner text components put the kit glyph first and the Korean text after it in one list, so the
+    # text inherits this font: fall back to the default font for every char the kit does not draw.
+    providers.append({'type': 'reference', 'id': 'minecraft:default'})
     ours = [g[0] for g in GLYPHS.values()] + list(SPACES)
     assert all(0xE600 <= c <= 0xE6FF for c in ours) and len(set(ours)) == len(ours)
     clash = font_used_elsewhere(rp, font_path)
