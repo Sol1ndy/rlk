@@ -27,6 +27,8 @@ launch tick; the server test uses the same start tick and speed, so no per-tick 
          the engine knock-back path; never a tp), lift (kb +2 steps; the engine has no vertical push), hits=n (max hits,
          0 = unlimited; default 1, follow / field 0), every=t, detached (survives hazard/finish), group (all hazards of the current group share one
          hit: call hz_group() first), tol=0.3, strike=None|'burst'|'bolt'|'arc'|'slash'|'wall'|'field'|'none', sound,
+         wave=None|'/'|'\\'|'-' (slab only, rd-sync: the card is a crescent sword wave of light, its chord tilted 45 deg
+         rising to her left '/', to her right '\\' (as the player sees it: / and \\), or level '-', instead of the slab wall),
          sm=None|'lr'|'rl'|'chop'|'thrust'|'rise' (strike motion, rd-sync: the strike follows the swing that makes the hit:
          'lr' / 'rl' sweeps into place from her left / right side of the hazard's yaw (SM_SWEEP degrees, the blade's trail),
          'chop' drops in from above, 'thrust' runs out from the origin along the yaw, 'rise' grows up from the floor)
@@ -95,6 +97,10 @@ STRIKE_LIFE = 10
 # interpolation. id 0 = the plain expand.
 STRIKE_MOTION = {'lr': 1, 'rl': 2, 'chop': 3, 'thrust': 4, 'rise': 5}
 SM_SWEEP = 50                       # degrees the sweep strikes start off their centre line
+# Crescent sword waves on slab hazards (rd-sync): rdHSv 2 / 3 / 4 = chord rising to her left (/ from the player),
+# to her right (\), level. The crescent's edge radius is WAVE_R * the slab's half width, its centre WAVE_Y up.
+WAVES = {'/': 2, '\\': 3, '-': 4}
+WAVE_R, WAVE_Y = 1.08, 2.6
 # strike frames by remaining life (rdHLife counts down): colour (custom_model_data tint) or the after model
 FLASH = {9: 0xC8B6EA, 8: 0xEDE4FF}
 AFTER_AT, AFTER_TINT, FADE_AT, FADE_TINT = 7, 0xA898D8, 4, 0x6A5A98
@@ -186,7 +192,7 @@ def seg_count(half):
 def hz_args(kind, tell, dmg, *, r=0.0, rmin=0.0, half=180.0, len=0.0, wid=0.0, off=0.0, r0=0.0, v=0.0, band=1.0,
             d0=0.0, w=0.0, depth=1.0, height=2.5, reach=None, y=0.8, every=10, hits=None, decal=None, dlife=0,
             nododge=False, jump=False, kb=0.0, lift=False, detached=False, group=False, life=None, strike=None,
-            sound=True, tol=0.3, sm=None):
+            sound=True, tol=0.3, sm=None, wave=None):
     """Macro compound for hazard/new (all values integers: milliblocks, micro-blocks per tick for speeds)."""
     k = KINDS[kind]
     if hits is None:
@@ -234,6 +240,8 @@ def hz_args(kind, tell, dmg, *, r=0.0, rmin=0.0, half=180.0, len=0.0, wid=0.0, o
     sv = 0 if strike == 'none' else STRIKE_IDS[strike]
     if kind in ('sweep', 'slab', 'orb'):
         sv = seg if kind == 'sweep' else 1
+        if kind == 'slab' and wave:
+            sv = WAVES[wave]
     dk = 0
     if decal:
         dk = DECAL_IDS[decal]

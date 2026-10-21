@@ -29,7 +29,7 @@ import shutil
 import sys
 
 from build_raiden_fx_textures import catalogue, build_fx_textures, TEX_SUBDIR, NS, KIT_QEXT
-from raiden_kit import (DECALS, DECAL_INTRO, STRIKES, STRIKE_YU, STRIKE_LIFE, SM_SWEEP, FLASH, AFTER_AT, AFTER_TINT, FADE_AT,
+from raiden_kit import (DECALS, DECAL_INTRO, STRIKES, STRIKE_YU, STRIKE_LIFE, SM_SWEEP, WAVE_R, WAVE_Y, FLASH, AFTER_AT, AFTER_TINT, FADE_AT,
                         FADE_TINT, SOUNDS, SEG_DEG, KINDS)
 
 FX = {c["name"] for c in catalogue()}
@@ -316,6 +316,14 @@ def models():
     m.card((0, 0.5, -0.02), "z", "-y", "+x", 1, 0.9, "obj_wave_band")
     m.card((0, 0.02, -0.5), "y", "+x", "-z", 1, 1, "tr_band")
     M["tr_slab"] = m
+    # crescent sword wave (rd-sync, 찰나의 포영): crescent_a facing the travel direction, its edge radius 1 unit with the
+    # model origin at the bright arc's centroid (0.75 of the card height above the pivot; the display rolls the crescent
+    # +-45 deg about it); a smaller copy 0.25 units behind trails it. Display scale = edge radius in blocks.
+    m = Model()
+    Hc = 1 / 0.94
+    for k, (z, s) in enumerate(((-0.25, 0.86), (0.0, 1.0))):
+        m.card((0, -0.25 * Hc * s, z), "z", "+x", "-y", 2 * Hc * s, Hc * s, "crescent_a")
+    M["tr_wave"] = m
     m = Model()                                                  # orb: flat electric disc radius 1
     radial(m, 2.5, "chakra_a", 0.0)
     radial(m, 1.0, "orb_core", 0.02)
@@ -603,18 +611,30 @@ def build(root, out):
              "rlk_rd_vnew"], mid("tr_seg_" + v), nbt_tf(tz="$(tz0)", sx="$(cx0)", sz="$(bz)"),
             custom='{d:$(d),to:' + nbt_tf(tz="$(tz1)", sx="$(cx1)", sz="$(bz)") + '}'),
             f'tp {VNEW} ~ ~ ~ ~ 0', f'tag {VNEW} add rlk_rd_vown', 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'])
+    roll = lambda deg: f'[0f,0f,{math.sin(math.radians(deg) / 2):.5f}f,{math.cos(math.radians(deg) / 2):.5f}f]'
     write("vis/travel_slab", [
         'scoreboard players operation #rdSx rd = @s rdHC',
         'scoreboard players operation #rdSx rd += @s rdHC',
         'execute store result storage rlk:rd v.sx float 0.001 run scoreboard players get #rdSx rd',
         'execute store result storage rlk:rd v.sy float 0.001 run scoreboard players get @s rdHE',
         'execute store result storage rlk:rd v.sz float 0.001 run scoreboard players get @s rdHD',
+        'data modify storage rlk:rd v.m set value "tr_slab"',
+        'data modify storage rlk:rd v.ty set value 0f',
+        'data modify storage rlk:rd v.lr set value "[0f,0f,0f,1f]"',
+        '# rdHSv 2..4 (rd-sync): a crescent sword wave rolled 45 deg up to her left / right, or level, scaled to the half width',
+        'execute if score @s rdHSv matches 2.. run data modify storage rlk:rd v.m set value "tr_wave"',
+        f'execute if score @s rdHSv matches 2.. run data modify storage rlk:rd v.ty set value {WAVE_Y}f',
+        f'execute if score @s rdHSv matches 2.. store result storage rlk:rd v.sx float {WAVE_R / 1000:.6f} run scoreboard players get @s rdHC',
+        'execute if score @s rdHSv matches 2.. run data modify storage rlk:rd v.sy set from storage rlk:rd v.sx',
+        'execute if score @s rdHSv matches 2.. run data modify storage rlk:rd v.sz set from storage rlk:rd v.sx',
+        f'execute if score @s rdHSv matches 2 run data modify storage rlk:rd v.lr set value "{roll(45)}"',
+        f'execute if score @s rdHSv matches 3 run data modify storage rlk:rd v.lr set value "{roll(-45)}"',
         f'function {H}vis/slab_summon with storage rlk:rd v',
         f'tp {VNEW} ~ ~ ~ ~ 0', f'tag {VNEW} add rlk_rd_vown', 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'])
     write("vis/slab_summon", ['$' + display(
         ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxa", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
-         "rlk_rd_vnew"], mid("tr_slab"), nbt_tf(tz="$(tz0)", sx="$(sx)", sy="$(sy)", sz="$(sz)"),
-        custom='{d:$(d),to:' + nbt_tf(tz="$(tz1)", sx="$(sx)", sy="$(sy)", sz="$(sz)") + '}')])
+         "rlk_rd_vnew"], MODEL_NS + "$(m)", nbt_tf(ty="$(ty)", tz="$(tz0)", sx="$(sx)", sy="$(sy)", sz="$(sz)", lr="$(lr)"),
+        custom='{d:$(d),to:' + nbt_tf(ty="$(ty)", tz="$(tz1)", sx="$(sx)", sy="$(sy)", sz="$(sz)", lr="$(lr)") + '}')])
     write("vis/travel_orb", [
         'execute store result storage rlk:rd v.sx float 0.001 run scoreboard players get @s rdHC',
         'execute store result storage rlk:rd v.ty float 0.001 run scoreboard players get @s rdHE',
