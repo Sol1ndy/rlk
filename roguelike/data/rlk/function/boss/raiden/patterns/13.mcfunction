@@ -7,7 +7,7 @@ execute if score @s rdTime matches 8 at @s rotated as @s run function rlk:boss/r
 execute if score @s rdTime matches 9 at @s rotated as @s run execute as @e[tag=rlk_rd_tm_seed] at @e[tag=rlk_body,limit=1] run tp @s ~ ~0.4 ~
 execute if score @s rdTime matches ..11 run return 0
 execute if score @s rdTime matches 12 at @s rotated as @s run kill @e[tag=rlk_rd_tm_seed]
-execute if score @s rdTime matches 12 at @s rotated as @s run execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ run function rlk:boss/raiden/hazard/new {k:8,a:1500,b:320000,c:0,d:0,e:3240000,f:0,tol:300,tell:16,dmg:4,life:57,ev:20,max:0,grp:0,dk:6,dl:0,kb:0,sv:0,snd:1,nd:0,jp:0,det:0,lf:0,fv:0.32}
+execute if score @s rdTime matches 12 at @s rotated as @s run execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ run function rlk:boss/raiden/hazard/new {k:8,a:1500,b:320000,c:0,d:0,e:3240000,f:0,tol:300,tell:16,dmg:4,life:57,ev:20,max:0,grp:0,dk:6,dl:0,kb:0,sv:0,sm:0,snd:1,nd:0,jp:0,det:0,lf:0,fv:0.32}
 execute if score @s rdTime matches 12 at @s rotated as @s run execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ run function rlk:boss/raiden/fx/crystal
 execute if score @s rdTime matches 12 at @s rotated as @s run execute at @e[tag=rlk_rd_hazard,scores={rdHK=8},limit=1] run function rlk:boss/raiden/fx/snd/shadow_loop
 execute if score @s rdTime matches 32 at @s rotated as @s run execute at @e[tag=rlk_rd_hazard,scores={rdHK=8},limit=1] run function rlk:boss/raiden/fx/snd/shadow_loop

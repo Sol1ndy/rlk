@@ -29,7 +29,7 @@ import shutil
 import sys
 
 from build_raiden_fx_textures import catalogue, build_fx_textures, TEX_SUBDIR, NS, KIT_QEXT
-from raiden_kit import (DECALS, DECAL_INTRO, STRIKES, STRIKE_YU, STRIKE_LIFE, FLASH, AFTER_AT, AFTER_TINT, FADE_AT,
+from raiden_kit import (DECALS, DECAL_INTRO, STRIKES, STRIKE_YU, STRIKE_LIFE, SM_SWEEP, WAVE_R, WAVE_Y, FLASH, AFTER_AT, AFTER_TINT, FADE_AT,
                         FADE_TINT, SOUNDS, SEG_DEG, KINDS)
 
 FX = {c["name"] for c in catalogue()}
@@ -316,6 +316,14 @@ def models():
     m.card((0, 0.5, -0.02), "z", "-y", "+x", 1, 0.9, "obj_wave_band")
     m.card((0, 0.02, -0.5), "y", "+x", "-z", 1, 1, "tr_band")
     M["tr_slab"] = m
+    # crescent sword wave (rd-sync, 찰나의 포영): crescent_a facing the travel direction, its edge radius 1 unit with the
+    # model origin at the bright arc's centroid (0.75 of the card height above the pivot; the display rolls the crescent
+    # +-45 deg about it); a smaller copy 0.25 units behind trails it. Display scale = edge radius in blocks.
+    m = Model()
+    Hc = 1 / 0.94
+    for k, (z, s) in enumerate(((-0.25, 0.86), (0.0, 1.0))):
+        m.card((0, -0.25 * Hc * s, z), "z", "+x", "-y", 2 * Hc * s, Hc * s, "crescent_a")
+    M["tr_wave"] = m
     m = Model()                                                  # orb: flat electric disc radius 1
     radial(m, 2.5, "chakra_a", 0.0)
     radial(m, 1.0, "orb_core", 0.02)
@@ -396,8 +404,8 @@ def save_models(rp, M):
 
 
 # --------------------------------------------------------------------------- datapack side
-def nbt_tf(tx="0", ty="0", tz="0", sx="1", sy="1", sz="1"):
-    return (f'{{translation:[{tx}f,{ty}f,{tz}f],left_rotation:[0f,0f,0f,1f],scale:[{sx}f,{sy}f,{sz}f],'
+def nbt_tf(tx="0", ty="0", tz="0", sx="1", sy="1", sz="1", lr="[0f,0f,0f,1f]"):
+    return (f'{{translation:[{tx}f,{ty}f,{tz}f],left_rotation:{lr},scale:[{sx}f,{sy}f,{sz}f],'
             f'right_rotation:[0f,1f,0f,0f]}}')
 
 
@@ -520,8 +528,9 @@ def build(root, out):
 
     # strike: storage rlk:rd v {m, a, sx, sz, tz, sx0, sz0, d}
     st = ['# @s = hazard at its origin. The strike visual of a static hazard, sized to it (life 10: flash, flicker,',
-          '# residue, fade). Field crackle stays bound to the hazard instead.',
-          'data modify storage rlk:rd v set value {tz:0f,d:1}']
+          '# residue, fade). Field crackle stays bound to the hazard instead. rdHSm (rd-sync) starts it where the swing',
+          '# came from: swept in from one side, dropped from above, run out from the origin or grown up from the floor.',
+          'data modify storage rlk:rd v set value {tz:0f,d:1,ty0:0f,sy0:%sf,lr0:"[0f,0f,0f,1f]"}' % STRIKE_YU]
     for sv, (_, hot, after) in STRIKES.items():
         st.append(f'execute if score @s rdHSv matches {sv} run function {H}vis/sv/{sv}')
         write(f"vis/sv/{sv}", [f'data modify storage rlk:rd v.m set value "{hot}"',
@@ -536,6 +545,7 @@ def build(root, out):
         'execute store result storage rlk:rd v.sx0 float 0.00075 run scoreboard players get #rdSx rd',
         'execute store result storage rlk:rd v.sz0 float 0.00075 run scoreboard players get #rdSz rd',
         'execute if score @s rdHK matches 3..4 run function %svis/strike_full' % H,
+        f'execute if score @s rdHSm matches 1.. run function {H}vis/strike_motion',
         f'execute if score @s rdHK matches {KINDS["field"]} run function {H}vis/field_summon with storage rlk:rd v',
         f'execute unless score @s rdHK matches {KINDS["field"]} run function {H}vis/strike_summon with storage rlk:rd v',
         f'tp {VNEW} ~ ~ ~ ~ 0',
@@ -547,9 +557,20 @@ def build(root, out):
     write("vis/strike_full", ['# rect / to_wall: no expand (a slash is instant along its whole length)',
                               'data modify storage rlk:rd v.sx0 set from storage rlk:rd v.sx',
                               'data modify storage rlk:rd v.sz0 set from storage rlk:rd v.sz'])
+    half = math.radians(SM_SWEEP) / 2
+    qs = {1: f'[0f,{math.sin(half):.5f}f,0f,{math.cos(half):.5f}f]', 2: f'[0f,{-math.sin(half):.5f}f,0f,{math.cos(half):.5f}f]'}
+    write("vis/strike_motion", [
+        '# rdHSm 1 / 2: the strike starts turned SM_SWEEP deg toward her left / right (model +X = her left) and sweeps',
+        '# into place behind the blade; 3 drops 1 b; 4 runs out from the origin (rect / to_wall); 5 grows up from the floor.',
+        f"execute if score @s rdHSm matches 1 run data modify storage rlk:rd v.lr0 set value \"{qs[1]}\"",
+        f"execute if score @s rdHSm matches 2 run data modify storage rlk:rd v.lr0 set value \"{qs[2]}\"",
+        'execute if score @s rdHSm matches 3 run data modify storage rlk:rd v.ty0 set value 1.0f',
+        'execute if score @s rdHSm matches 4 store result storage rlk:rd v.sz0 float 0.00015 run scoreboard players get #rdSz rd',
+        f'execute if score @s rdHSm matches 5 run data modify storage rlk:rd v.sy0 set value {STRIKE_YU * 0.15:.2f}f',
+    ])
     write("vis/strike_summon", ['$' + display(
         ["rlk_rd_fx", "rlk_rd_strike", "rlk_rd_fxa", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew"],
-        MODEL_NS + "$(m)", nbt_tf(tz="$(tz)", sx="$(sx0)", sy=str(STRIKE_YU), sz="$(sz0)"),
+        MODEL_NS + "$(m)", nbt_tf(ty="$(ty0)", tz="$(tz)", sx="$(sx0)", sy="$(sy0)", sz="$(sz0)", lr="$(lr0)"),
         custom='{d:3,after:"' + MODEL_NS + '$(a)",fade:' + str(FADE_TINT) + ',to:' +
                nbt_tf(tz="$(tz)", sx="$(sx)", sy=str(STRIKE_YU), sz="$(sz)") + '}')])
     write("vis/field_summon", ['$' + display(
@@ -590,18 +611,30 @@ def build(root, out):
              "rlk_rd_vnew"], mid("tr_seg_" + v), nbt_tf(tz="$(tz0)", sx="$(cx0)", sz="$(bz)"),
             custom='{d:$(d),to:' + nbt_tf(tz="$(tz1)", sx="$(cx1)", sz="$(bz)") + '}'),
             f'tp {VNEW} ~ ~ ~ ~ 0', f'tag {VNEW} add rlk_rd_vown', 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'])
+    roll = lambda deg: f'[0f,0f,{math.sin(math.radians(deg) / 2):.5f}f,{math.cos(math.radians(deg) / 2):.5f}f]'
     write("vis/travel_slab", [
         'scoreboard players operation #rdSx rd = @s rdHC',
         'scoreboard players operation #rdSx rd += @s rdHC',
         'execute store result storage rlk:rd v.sx float 0.001 run scoreboard players get #rdSx rd',
         'execute store result storage rlk:rd v.sy float 0.001 run scoreboard players get @s rdHE',
         'execute store result storage rlk:rd v.sz float 0.001 run scoreboard players get @s rdHD',
+        'data modify storage rlk:rd v.m set value "tr_slab"',
+        'data modify storage rlk:rd v.ty set value 0f',
+        'data modify storage rlk:rd v.lr set value "[0f,0f,0f,1f]"',
+        '# rdHSv 2..4 (rd-sync): a crescent sword wave rolled 45 deg up to her left / right, or level, scaled to the half width',
+        'execute if score @s rdHSv matches 2.. run data modify storage rlk:rd v.m set value "tr_wave"',
+        f'execute if score @s rdHSv matches 2.. run data modify storage rlk:rd v.ty set value {WAVE_Y}f',
+        f'execute if score @s rdHSv matches 2.. store result storage rlk:rd v.sx float {WAVE_R / 1000:.6f} run scoreboard players get @s rdHC',
+        'execute if score @s rdHSv matches 2.. run data modify storage rlk:rd v.sy set from storage rlk:rd v.sx',
+        'execute if score @s rdHSv matches 2.. run data modify storage rlk:rd v.sz set from storage rlk:rd v.sx',
+        f'execute if score @s rdHSv matches 2 run data modify storage rlk:rd v.lr set value "{roll(45)}"',
+        f'execute if score @s rdHSv matches 3 run data modify storage rlk:rd v.lr set value "{roll(-45)}"',
         f'function {H}vis/slab_summon with storage rlk:rd v',
         f'tp {VNEW} ~ ~ ~ ~ 0', f'tag {VNEW} add rlk_rd_vown', 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'])
     write("vis/slab_summon", ['$' + display(
         ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxa", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
-         "rlk_rd_vnew"], mid("tr_slab"), nbt_tf(tz="$(tz0)", sx="$(sx)", sy="$(sy)", sz="$(sz)"),
-        custom='{d:$(d),to:' + nbt_tf(tz="$(tz1)", sx="$(sx)", sy="$(sy)", sz="$(sz)") + '}')])
+         "rlk_rd_vnew"], MODEL_NS + "$(m)", nbt_tf(ty="$(ty)", tz="$(tz0)", sx="$(sx)", sy="$(sy)", sz="$(sz)", lr="$(lr)"),
+        custom='{d:$(d),to:' + nbt_tf(ty="$(ty)", tz="$(tz1)", sx="$(sx)", sy="$(sy)", sz="$(sz)", lr="$(lr)") + '}')])
     write("vis/travel_orb", [
         'execute store result storage rlk:rd v.sx float 0.001 run scoreboard players get @s rdHC',
         'execute store result storage rlk:rd v.ty float 0.001 run scoreboard players get @s rdHE',
@@ -674,6 +707,8 @@ def build(root, out):
         'mangeop_dome': card('fx_ring', 8, s0=(1, 1, 1), s1=(8, 1, 8), d=8, color=0xBFE8FF),
         'mangeop_slash': card('fx_crescent', 8, y=2.5, s0=(6, 1, 6), s1=(24, 1, 24), d=6, color=PALE)
         + card('fx_flash', 6, y=2.5, s0=(10, 10, 10), billboard="center"),
+        'mangeop_clash': card('fx_burst', 8, s0=(2, 2, 2), s1=(7, 7, 7), d=3, color=0xF4ECFF, billboard="center")
+        + card('fx_star', 8, s0=(1.5, 1.5, 1.5), s1=(5, 5, 5), d=2, color=0xFFFFFF, billboard="center"),
         'transform_burst': card('fx_dome', 12, s0=(1, 4, 1), s1=(7, 4, 7), d=5),
     }
     for cue in SOUNDS:
@@ -703,7 +738,7 @@ def build(root, out):
         wfx(f"decal/d{dk}", [f'# State decal {kt} ({model}): {{sx, sz}} blocks, {{life}} ticks (99999 = until killed).',
                              '$' + summon, c[1], f'$scoreboard players set {VNEW} rdHLife $(life)', c[3]])
     c = card('dk_tint', 0, s0=(24.6, 1, 24.6))
-    wfx("decal/tint", ['# Whole-field tint (time stop, 만겁): a uniform 35 % violet over the arena floor (r 24.6: its edge is under the wall), {life} ticks.',
+    wfx("decal/tint", ['# Whole-field tint (time stop, 만겁): a uniform 35 % violet over the arena floor (r 24.6, soft edge over the open water), {life} ticks.',
                        '# Run it at the arena centre.',
                        c[0].replace('"rlk_rd_fx",', '"rlk_rd_fx","rlk_rd_sdecal","rlk_rd_sdecal_tint",'), c[1],
                        f'$scoreboard players set {VNEW} rdHLife $(life)', c[3]])

@@ -1,5 +1,5 @@
-# As the boss: four spots 13 b from the player, 90 deg apart, diagonal to her bearing; sky pillars there.
+# As the boss: four spots on a ring of radius 13 about the arena centre, 90 deg apart, 45 deg off the bearing of
+# the player from the centre; sky pillars there.
 kill @e[tag=rlk_rd_ilspot]
-execute at @e[tag=rlk_body,limit=1] facing entity @s feet rotated ~45 0 positioned ~ 201 ~ run function rlk:boss/raiden/illusion/spots
-execute as @e[tag=rlk_rd_ilspot] at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..20] facing entity @s feet rotated ~ 0 positioned ^ ^ ^20 run tp @s ~ ~ ~
+execute at @e[tag=rlk_raiden_arena,limit=1] facing entity @e[tag=rlk_body,limit=1] feet rotated ~45 0 run function rlk:boss/raiden/illusion/spots
 execute as @e[tag=rlk_rd_ilspot] at @s run function rlk:boss/raiden/fx/bolt

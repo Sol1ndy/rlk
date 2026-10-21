@@ -117,6 +117,28 @@
    "notes": "alpha >= 0.1 only near the core, so it does not hide what lies under it"
   },
   {
+   "name": "blade_trail_a",
+   "texture": "rlk:raiden/fxg/blade_trail_a",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "u=0 newest/brightest, fades to u=1",
+   "use": "slash/afterimage trail behind a moving blade",
+   "notes": "afterglow palette"
+  },
+  {
+   "name": "blade_trail_b",
+   "texture": "rlk:raiden/fxg/blade_trail_b",
+   "w": 512,
+   "h": 64,
+   "kind": "strip",
+   "along": "u",
+   "core": "u=0 newest/brightest, fades to u=1",
+   "use": "slash/afterimage trail behind a moving blade",
+   "notes": "afterglow palette"
+  },
+  {
    "name": "vbolt_a",
    "texture": "rlk:raiden/fxg/vbolt_a",
    "w": 128,
@@ -389,6 +411,17 @@
    "along": "radial",
    "core": "centre",
    "use": "plain soft glow",
+   "notes": ""
+  },
+  {
+   "name": "glow_strip",
+   "texture": "rlk:raiden/fxg/glow_strip",
+   "w": 256,
+   "h": 32,
+   "kind": "strip",
+   "along": "u",
+   "core": "v=0.5",
+   "use": "plain soft beam glow",
    "notes": ""
   },
   {

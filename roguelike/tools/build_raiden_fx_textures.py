@@ -1316,7 +1316,7 @@ def tex_dk_tint():
 
     def f(x, y):
         r = math.hypot(x - n / 2, y - n / 2) / (n / 2)
-        return 0.36 * smooth(1.0, 0.975, r)       # nearly hard edge: the card reaches 24.6 b, under the wall
+        return 0.36 * smooth(1.0, 0.82, r)        # soft edge: the arena has no wall any more, the card fades out over open water
     img = Img(n, n)
     img.over(TINT_FILL, sample_fn(n, n, f, 1), 1.0)
     return img
@@ -1634,8 +1634,9 @@ def catalogue():
         C.append(entry(f"bolt_{v}", 512, 128, "strip", "u", "v=0.5, zig-zag core r~1.5px within v=0.33..0.67",
                        "hot lightning bolt (floor bolts, horizontal strikes, tall walls, long arcs)", lambda s=s: tex_bolt(s),
                        "forks reach v=0.1..0.9; ends fade over 5% of u; tight halo (safe on top of decals)"))
-    # S3: bolt_after_a, bolt_fade_a / _c, blade_b / _c, blade_trail_*, rift_b, charge_spark, glow_strip, the rig_katana /
-    # rig_palm / rig_crown cards and the illusion swing / wave-fade bands lost their last model and are not painted.
+    # S3: bolt_after_a, bolt_fade_a / _c, blade_b / _c, rift_b, charge_spark, the rig_katana / rig_palm / rig_crown cards
+    # and the illusion swing / wave-fade bands lost their last model and are not painted. blade_trail_a / _b and
+    # glow_strip came back with the 만겁 katana (build_raiden_judgment_rig.mjs, 10-22a).
     for v, s in (("c", 37),):
         C.append(entry(f"bolt_after_{v}", 512, 128, "strip", "u", "same path as bolt_" + v,
                        "afterglow of bolt_" + v, lambda s=s: tex_bolt(s, "after")))
@@ -1647,6 +1648,9 @@ def catalogue():
         C.append(entry(f"rim_crackle_{v}", 512, 64, "strip", "u", "v=0.5+-0.10, tight glow, no halo",
                        "crackle laid on top of another translucent card (decal edges)", lambda s=s: tex_rim_crackle(s),
                        "alpha >= 0.1 only near the core, so it does not hide what lies under it"))
+    for v, s in zip("ab", (81, 83)):
+        C.append(entry(f"blade_trail_{v}", 512, 64, "strip", "u", "u=0 newest/brightest, fades to u=1",
+                       "slash/afterimage trail behind a moving blade", lambda s=s: tex_blade_trail(s), "afterglow palette"))
     for v, s in zip("abc", (101, 107, 113)):
         C.append(entry(f"vbolt_{v}", 128, 512, "column", "v", "u=0.5, top v=0 -> small impact bloom v~0.96",
                        "vertical strike bolt (2-4 crossed vertical cards ~2.5 wide)", lambda s=s: tex_vbolt(s),
@@ -1688,6 +1692,7 @@ def catalogue():
     C.append(entry("spark", 32, 32, "radial", "radial", "centre", "spark dot", tex_spark))
     C.append(entry("glint", 64, 64, "radial", "radial", "centre", "four-point star glint (armour shards)", tex_glint))
     C.append(entry("glow_soft", 64, 64, "radial", "radial", "centre", "plain soft glow", tex_glow_soft))
+    C.append(entry("glow_strip", 256, 32, "strip", "u", "v=0.5", "plain soft beam glow", tex_glow_strip))
     C += kit_entries()
     C.append(entry("rig_shard", 48, 128, "column", "v", "lens tips at v=0.03/0.97, widest at v~0.39, ridge u~0.5",
                    "translucent crystal splinter (death_shard_*)", lambda: tex_rig_shard(331)))

@@ -192,6 +192,7 @@ execute as @e[tag=rlk_rd_object] at @s run function rlk:boss/raiden/object/tick
 execute if entity @e[tag=rlk_rd_hazard,limit=1] run function rlk:boss/raiden/hazard/body
 execute as @e[tag=rlk_rd_hazard] at @s rotated as @s run function rlk:boss/raiden/hazard/tick_at
 function rlk:boss/raiden/hazard/vfx_world
+execute if entity @e[tag=rlk_rd_move_fx,limit=1] run function rlk:boss/raiden/movement/world
 execute as @e[tag=rlk_rd_dome] at @s run function rlk:boss/raiden/dome_tick
 function rlk:boss/raiden/vfx/world
 function rlk:boss/raiden/object_vfx/world

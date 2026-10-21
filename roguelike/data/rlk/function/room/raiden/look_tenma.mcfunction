@@ -1,49 +1,5 @@
-# Tenma floor look (dark blue-violet), rows of the arena circle; called by the transformation.
-fill -5 200 -24 4 200 -24 minecraft:blue_terracotta replace minecraft:prismarine
-fill -8 200 -23 7 200 -23 minecraft:blue_terracotta replace minecraft:prismarine
-fill -11 200 -22 10 200 -22 minecraft:blue_terracotta replace minecraft:prismarine
-fill -12 200 -21 11 200 -21 minecraft:blue_terracotta replace minecraft:prismarine
-fill -14 200 -20 13 200 -20 minecraft:blue_terracotta replace minecraft:prismarine
-fill -15 200 -19 14 200 -19 minecraft:blue_terracotta replace minecraft:prismarine
-fill -16 200 -18 15 200 -18 minecraft:blue_terracotta replace minecraft:prismarine
-fill -17 200 -17 16 200 -17 minecraft:blue_terracotta replace minecraft:prismarine
-fill -18 200 -16 17 200 -16 minecraft:blue_terracotta replace minecraft:prismarine
-fill -19 200 -15 18 200 -15 minecraft:blue_terracotta replace minecraft:prismarine
-fill -20 200 -14 19 200 -14 minecraft:blue_terracotta replace minecraft:prismarine
-fill -20 200 -13 19 200 -13 minecraft:blue_terracotta replace minecraft:prismarine
-fill -21 200 -12 20 200 -12 minecraft:blue_terracotta replace minecraft:prismarine
-fill -22 200 -11 21 200 -11 minecraft:blue_terracotta replace minecraft:prismarine
-fill -22 200 -10 21 200 -10 minecraft:blue_terracotta replace minecraft:prismarine
-fill -22 200 -9 21 200 -9 minecraft:blue_terracotta replace minecraft:prismarine
-fill -23 200 -8 22 200 -8 minecraft:blue_terracotta replace minecraft:prismarine
-fill -23 200 -7 22 200 -7 minecraft:blue_terracotta replace minecraft:prismarine
-fill -23 200 -6 22 200 -6 minecraft:blue_terracotta replace minecraft:prismarine
-fill -24 200 -5 23 200 -5 minecraft:blue_terracotta replace minecraft:prismarine
-fill -24 200 -4 23 200 -4 minecraft:blue_terracotta replace minecraft:prismarine
-fill -24 200 -3 23 200 -3 minecraft:blue_terracotta replace minecraft:prismarine
-fill -24 200 -2 23 200 -2 minecraft:blue_terracotta replace minecraft:prismarine
-fill -24 200 -1 23 200 -1 minecraft:blue_terracotta replace minecraft:prismarine
-fill -24 200 0 23 200 0 minecraft:blue_terracotta replace minecraft:prismarine
-fill -24 200 1 23 200 1 minecraft:blue_terracotta replace minecraft:prismarine
-fill -24 200 2 23 200 2 minecraft:blue_terracotta replace minecraft:prismarine
-fill -24 200 3 23 200 3 minecraft:blue_terracotta replace minecraft:prismarine
-fill -24 200 4 23 200 4 minecraft:blue_terracotta replace minecraft:prismarine
-fill -23 200 5 22 200 5 minecraft:blue_terracotta replace minecraft:prismarine
-fill -23 200 6 22 200 6 minecraft:blue_terracotta replace minecraft:prismarine
-fill -23 200 7 22 200 7 minecraft:blue_terracotta replace minecraft:prismarine
-fill -22 200 8 21 200 8 minecraft:blue_terracotta replace minecraft:prismarine
-fill -22 200 9 21 200 9 minecraft:blue_terracotta replace minecraft:prismarine
-fill -22 200 10 21 200 10 minecraft:blue_terracotta replace minecraft:prismarine
-fill -21 200 11 20 200 11 minecraft:blue_terracotta replace minecraft:prismarine
-fill -20 200 12 19 200 12 minecraft:blue_terracotta replace minecraft:prismarine
-fill -20 200 13 19 200 13 minecraft:blue_terracotta replace minecraft:prismarine
-fill -19 200 14 18 200 14 minecraft:blue_terracotta replace minecraft:prismarine
-fill -18 200 15 17 200 15 minecraft:blue_terracotta replace minecraft:prismarine
-fill -17 200 16 16 200 16 minecraft:blue_terracotta replace minecraft:prismarine
-fill -16 200 17 15 200 17 minecraft:blue_terracotta replace minecraft:prismarine
-fill -15 200 18 14 200 18 minecraft:blue_terracotta replace minecraft:prismarine
-fill -14 200 19 13 200 19 minecraft:blue_terracotta replace minecraft:prismarine
-fill -12 200 20 11 200 20 minecraft:blue_terracotta replace minecraft:prismarine
-fill -11 200 21 10 200 21 minecraft:blue_terracotta replace minecraft:prismarine
-fill -8 200 22 7 200 22 minecraft:blue_terracotta replace minecraft:prismarine
-fill -5 200 23 4 200 23 minecraft:blue_terracotta replace minecraft:prismarine
+# Tenma look: the near water turns dark blue-violet (one replace fill per block type, y 200 only); called by the transformation.
+fill -47 200 -47 46 200 46 minecraft:light_blue_concrete replace minecraft:light_blue_concrete_powder strict
+fill -47 200 -47 46 200 46 minecraft:blue_concrete_powder replace minecraft:cyan_concrete_powder strict
+fill -47 200 -47 46 200 46 minecraft:blue_concrete replace minecraft:cyan_concrete strict
+fill -47 200 -47 46 200 46 minecraft:lapis_block replace minecraft:prismarine strict

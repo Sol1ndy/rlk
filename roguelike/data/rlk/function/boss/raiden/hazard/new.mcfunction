@@ -1,5 +1,5 @@
 # v2 hazard (raiden_kit.hz). Position = here, yaw = the execution yaw, pitch flattened.
-execute unless score #rdKitV rd matches 3 run function rlk:boss/raiden/hazard/setup
+execute unless score #rdKitV rd matches 4 run function rlk:boss/raiden/hazard/setup
 summon minecraft:marker ~ ~ ~ {Tags:["rlk_rd_hazard","rlk_raiden_aux","rlk_room","rlk_rd_hnew"]}
 tp @e[tag=rlk_rd_hnew,limit=1] ~ ~ ~ ~ 0
 $scoreboard players set @e[tag=rlk_rd_hnew,limit=1] rdHK $(k)
@@ -21,6 +21,7 @@ $scoreboard players set @e[tag=rlk_rd_hnew,limit=1] rdHDl $(dl)
 $scoreboard players set @e[tag=rlk_rd_hnew,limit=1] rdHKb $(kb)
 $scoreboard players set @e[tag=rlk_rd_hnew,limit=1] rdHSv $(sv)
 $scoreboard players set @e[tag=rlk_rd_hnew,limit=1] rdHSnd $(snd)
+$scoreboard players set @e[tag=rlk_rd_hnew,limit=1] rdHSm $(sm)
 scoreboard players operation @e[tag=rlk_rd_hnew,limit=1] rdShape = @e[tag=rlk_rd_hnew,limit=1] rdHK
 scoreboard players add @e[tag=rlk_rd_hnew,limit=1] rdShape 20
 $scoreboard players set #rdFlag rd $(nd)

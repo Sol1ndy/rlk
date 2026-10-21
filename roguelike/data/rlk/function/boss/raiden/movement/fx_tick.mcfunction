@@ -1,0 +1,23 @@
+# One frame per tick: the scatter plays 0 -> 5, the reform 5 -> 0; gone after the sixth.
+scoreboard players add @s rdMvAge 1
+execute if score @s rdMvAge matches 6.. run return run kill @s
+execute if entity @s[tag=!rlk_rd_mv_t] if score @s rdMvKind matches 1 if score @s rdMvAge matches 1 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/shogun_1"
+execute if entity @s[tag=!rlk_rd_mv_t] if score @s rdMvKind matches 2 if score @s rdMvAge matches 1 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/shogun_4"
+execute if entity @s[tag=!rlk_rd_mv_t] if score @s rdMvKind matches 1 if score @s rdMvAge matches 2 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/shogun_2"
+execute if entity @s[tag=!rlk_rd_mv_t] if score @s rdMvKind matches 2 if score @s rdMvAge matches 2 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/shogun_3"
+execute if entity @s[tag=!rlk_rd_mv_t] if score @s rdMvKind matches 1 if score @s rdMvAge matches 3 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/shogun_3"
+execute if entity @s[tag=!rlk_rd_mv_t] if score @s rdMvKind matches 2 if score @s rdMvAge matches 3 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/shogun_2"
+execute if entity @s[tag=!rlk_rd_mv_t] if score @s rdMvKind matches 1 if score @s rdMvAge matches 4 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/shogun_4"
+execute if entity @s[tag=!rlk_rd_mv_t] if score @s rdMvKind matches 2 if score @s rdMvAge matches 4 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/shogun_1"
+execute if entity @s[tag=!rlk_rd_mv_t] if score @s rdMvKind matches 1 if score @s rdMvAge matches 5 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/shogun_5"
+execute if entity @s[tag=!rlk_rd_mv_t] if score @s rdMvKind matches 2 if score @s rdMvAge matches 5 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/shogun_0"
+execute if entity @s[tag=rlk_rd_mv_t] if score @s rdMvKind matches 1 if score @s rdMvAge matches 1 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/tenma_1"
+execute if entity @s[tag=rlk_rd_mv_t] if score @s rdMvKind matches 2 if score @s rdMvAge matches 1 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/tenma_4"
+execute if entity @s[tag=rlk_rd_mv_t] if score @s rdMvKind matches 1 if score @s rdMvAge matches 2 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/tenma_2"
+execute if entity @s[tag=rlk_rd_mv_t] if score @s rdMvKind matches 2 if score @s rdMvAge matches 2 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/tenma_3"
+execute if entity @s[tag=rlk_rd_mv_t] if score @s rdMvKind matches 1 if score @s rdMvAge matches 3 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/tenma_3"
+execute if entity @s[tag=rlk_rd_mv_t] if score @s rdMvKind matches 2 if score @s rdMvAge matches 3 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/tenma_2"
+execute if entity @s[tag=rlk_rd_mv_t] if score @s rdMvKind matches 1 if score @s rdMvAge matches 4 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/tenma_4"
+execute if entity @s[tag=rlk_rd_mv_t] if score @s rdMvKind matches 2 if score @s rdMvAge matches 4 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/tenma_1"
+execute if entity @s[tag=rlk_rd_mv_t] if score @s rdMvKind matches 1 if score @s rdMvAge matches 5 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/tenma_5"
+execute if entity @s[tag=rlk_rd_mv_t] if score @s rdMvKind matches 2 if score @s rdMvAge matches 5 run return run data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_movement/tenma_0"

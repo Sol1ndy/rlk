@@ -29,16 +29,23 @@ steps = [
     # painted gradient lightning sprites (rlk:raiden/fxg/*) used by the effect generators below
     ["python3", "build_raiden_fx_textures.py", "--resourcepack", rp],
     ["python3", "build_raiden_encounter.py"],
+    # the arena's backdrop panels (stars, mist ring, vortex, wisps: rlk:raiden/arena/*); the arena imports their layout
+    ["python3", "build_raiden_backdrop.py", "--resourcepack", rp],
     ["python3", "build_raiden_arena.py"],
     ["python3", "build_raiden_cinematic.py"],
     ["python3", "build_raiden_hazards.py", "--resourcepack", rp],
-    ["python3", "build_raiden_movement.py", "--resourcepack", rp],
     ["python3", "build_raiden_object_vfx.py", "--resourcepack", rp],
     ["python3", "build_raiden_orb.py", "--resourcepack", rp],
     ["python3", "build_raiden_signature_vfx.py", "--resourcepack", rp],
     ["python3", "build_raiden_illusions.py", "--resourcepack", rp],
-    # the rig (it also deletes the former judgment_rig/ shims; the judgment rig generator is gone)
+    # the rig (parts, clips, props)
     node + ["build_raiden_rig.mjs", "--resourcepack", rp] + (["--skin", str(args.skin.resolve())] if args.skin else []),
+    # the blinks: the Tenma silhouette follows the rig's puppet (its rest outline in the manifest), so after the rig
+    ["python3", "build_raiden_movement.py", "--resourcepack", rp],
+    # the 만겁 sky rift and giant arm (needs the materials' armour swatches and the fxg strips above)
+    node + ["build_raiden_judgment_rig.mjs", "--resourcepack", rp],
+    # the 찰나의 포영 clone figures: tinted copies of the rig's part models (so after the rig) and their pose functions
+    node + ["build_raiden_clones.mjs", "--resourcepack", rp],
     # last: boss/raiden/uninstall lists every objective / boss bar / storage key the outputs above create
     ["python3", "build_raiden_uninstall.py"],
 ]

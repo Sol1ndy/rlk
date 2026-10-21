@@ -309,9 +309,9 @@
       "brightness": 14,
       "group": "tenma",
       "scale": [
-        1,
-        1,
-        1
+        1.25,
+        1.25,
+        1.25
       ]
     },
     {
@@ -335,9 +335,9 @@
       "brightness": 14,
       "group": "tenma",
       "scale": [
-        1,
-        1,
-        1
+        1.25,
+        1.25,
+        1.25
       ]
     },
     {
@@ -361,9 +361,9 @@
       "brightness": 14,
       "group": "tenma",
       "scale": [
-        1,
-        1,
-        1
+        1.25,
+        1.25,
+        1.25
       ]
     },
     {
@@ -374,9 +374,9 @@
       "brightness": 14,
       "group": "tenma",
       "scale": [
-        1,
-        1,
-        1
+        2.4,
+        2.4,
+        2.4
       ]
     },
     {
@@ -387,9 +387,9 @@
       "brightness": 14,
       "group": "tenma",
       "scale": [
-        1,
-        1,
-        1
+        2.4,
+        2.4,
+        2.4
       ]
     }
   ],
@@ -532,10 +532,10 @@
         "hit1": 18,
         "hit2": 24
       },
-      "keyFiles": 13,
-      "keys": 258,
-      "note": "far 뇌명: iai stance, star flash 6, dash cut 18 (the pattern moves her 9 b), end crescent 24",
-      "knots": 14,
+      "keyFiles": 12,
+      "keys": 199,
+      "note": "far 뇌명: iai stance, star flash 6, the draw crosses her facing at 18 left to right (dash cut; the pattern moves her 9 b), end crescent 24 right to left",
+      "knots": 13,
       "form": "shogun",
       "loopFrom": null,
       "formSwitch": null,
@@ -552,10 +552,10 @@
         "hit1": 22,
         "hit2": 28
       },
-      "keyFiles": 12,
-      "keys": 229,
-      "note": "near 뇌명: draw at 22, rising crescent 28 (the pattern blends back to idle)",
-      "knots": 13,
+      "keyFiles": 14,
+      "keys": 275,
+      "note": "near 뇌명: the draw crosses her facing at 22 left to right, the rising cut passes chest height in front at 27-28 (the pattern blends back to idle)",
+      "knots": 15,
       "form": "shogun",
       "loopFrom": null,
       "formSwitch": null,
@@ -574,10 +574,10 @@
         "s4": 50,
         "s5": 64
       },
-      "keyFiles": 29,
-      "keys": 707,
-      "note": "sword 5-hit chain: V 12, right cut 22, stab 34, wide cut 50, overhead 64",
-      "knots": 30,
+      "keyFiles": 26,
+      "keys": 576,
+      "note": "sword 5-hit chain: V 12, cut left to right through +20 at 22, stab 34, wide cut right to left through -20 at 50, overhead 64",
+      "knots": 27,
       "form": "shogun",
       "loopFrom": null,
       "formSwitch": null,
@@ -595,10 +595,10 @@
         "d3": 18,
         "wave": 34
       },
-      "keyFiles": 18,
-      "keys": 368,
-      "note": "뇌전이 이끈 번개: flicks launch discs 6/10/18, wind-up 26-32, low wave 34",
-      "knots": 19,
+      "keyFiles": 20,
+      "keys": 400,
+      "note": "뇌전이 이끈 번개: flicks launch discs 6/10/18, wind-up 26-32, the low wave leaves the blade as the draw crosses her facing at 34",
+      "knots": 21,
       "form": "shogun",
       "loopFrom": null,
       "formSwitch": null,
@@ -613,10 +613,10 @@
         "cue": 0,
         "hit": 14
       },
-      "keyFiles": 7,
-      "keys": 114,
+      "keyFiles": 8,
+      "keys": 125,
       "note": "판결의 검: reverse thrust straight behind her at 14 (yaw locked by the pattern)",
-      "knots": 8,
+      "knots": 9,
       "form": "shogun",
       "loopFrom": null,
       "formSwitch": null,
@@ -635,10 +635,10 @@
         "slash": 130,
         "end": 160
       },
-      "keyFiles": 17,
-      "keys": 365,
+      "keyFiles": 18,
+      "keys": 366,
       "note": "몽상의 일심: embeds the blink-in (appear 6), blade to the sky 10-100, iai 110, giant slash 130",
-      "knots": 18,
+      "knots": 19,
       "form": "shogun",
       "loopFrom": null,
       "formSwitch": null,
@@ -687,10 +687,10 @@
         "bolts": 24,
         "lunge": 40
       },
-      "keyFiles": 25,
-      "keys": 723,
-      "note": "in-guard counter (sword): spin 6-14 (burst 12), floor bolts 24, lunge 40",
-      "knots": 26,
+      "keyFiles": 24,
+      "keys": 696,
+      "note": "in-guard counter (sword): spin 5-13 (the blade passes her facing at the burst 12), floor bolts 24, lunge 40",
+      "knots": 25,
       "form": "shogun",
       "loopFrom": null,
       "formSwitch": null,
@@ -706,10 +706,10 @@
         "star": 8,
         "sweep": 18
       },
-      "keyFiles": 7,
-      "keys": 130,
-      "note": "in-guard counter (polearm): star 8, wide sweep 18",
-      "knots": 8,
+      "keyFiles": 10,
+      "keys": 196,
+      "note": "in-guard counter (polearm): star 8, wide sweep across her facing (right to left) 18",
+      "knots": 11,
       "form": "shogun",
       "loopFrom": null,
       "formSwitch": null,
@@ -790,10 +790,10 @@
         "h3": 42,
         "h4": 56
       },
-      "keyFiles": 23,
-      "keys": 477,
-      "note": "원류 4단: sweeps 22 / 32, chop 42, leaping slam 56 (bolt field 82 is the pattern's)",
-      "knots": 24,
+      "keyFiles": 28,
+      "keys": 548,
+      "note": "원류 4단: sweeps across her facing 22 (right to left) / 32 (left to right), chop 42, leaping slam 56 (bolt field 82 is the pattern's)",
+      "knots": 29,
       "form": "shogun",
       "loopFrom": null,
       "formSwitch": null,
@@ -809,10 +809,10 @@
         "glow": 6,
         "hit": 14
       },
-      "keyFiles": 6,
-      "keys": 152,
-      "note": "원거리 창: raise 0, tip glow 6 (aim lock), lance 14",
-      "knots": 7,
+      "keyFiles": 7,
+      "keys": 163,
+      "note": "원거리 창: raise 0, tip glow 6 (aim lock), held 11, the lance thrust down into 14",
+      "knots": 8,
       "form": "shogun",
       "loopFrom": null,
       "formSwitch": null,
@@ -869,10 +869,10 @@
         "ring": 34,
         "lunge": 52
       },
-      "keyFiles": 20,
-      "keys": 527,
-      "note": "번개돌진 콤보: hip 0, star 8, zig-zag dash 14, ring spin 28-36 (ring 34), crouch 40, lunge 52",
-      "knots": 21,
+      "keyFiles": 23,
+      "keys": 595,
+      "note": "번개돌진 콤보: hip 0, star 8, zig-zag dash 14, ring spin 29-38 (ring 34 mid-spin), crouch 41-47, fast lunge 52",
+      "knots": 24,
       "form": "shogun",
       "loopFrom": null,
       "formSwitch": null,
@@ -888,10 +888,10 @@
         "h1": 16,
         "h2": 26
       },
-      "keyFiles": 16,
-      "keys": 255,
-      "note": "창 뒤 견제: twirl 3-12, rear sweeps 16 / 26",
-      "knots": 17,
+      "keyFiles": 17,
+      "keys": 234,
+      "note": "창 뒤 견제: twirl 3-12, rear sweeps straight behind her 16 (her left to right) / 26 (back)",
+      "knots": 18,
       "form": "shogun",
       "loopFrom": null,
       "formSwitch": null,
@@ -958,7 +958,7 @@
         "form": 50
       },
       "keyFiles": 9,
-      "keys": 219,
+      "keys": 218,
       "note": "변신: rise 4-20 (float 1 b), ring 20, pillars 44, the Tenma form appears from 49 (look switch at 50)",
       "knots": 11,
       "form": "shogun",
@@ -990,7 +990,7 @@
       "loop": true,
       "events": {},
       "keyFiles": 4,
-      "keys": 117,
+      "keys": 113,
       "note": "float bob +-0.2, arm drift",
       "knots": 5,
       "form": "tenma",
@@ -1046,10 +1046,10 @@
         "throw": 54,
         "reform": 62
       },
-      "keyFiles": 32,
-      "keys": 496,
-      "note": "백안지륜: sweeps 14 / 26, cock 42, throw 54 (glaive hidden until 62), re-forms 62-70",
-      "knots": 33,
+      "keyFiles": 26,
+      "keys": 402,
+      "note": "백안지륜: sweeps across her facing 14 (right to left) / 26 (left to right), cock 42, released 51 (the pattern flies it, landing at the throw event 54; hidden until 62), re-forms 62-70",
+      "knots": 28,
       "form": "tenma",
       "loopFrom": null,
       "formSwitch": null,
@@ -1065,10 +1065,10 @@
         "spin": 13,
         "throw": 31
       },
-      "keyFiles": 30,
-      "keys": 688,
-      "note": "초월의 악요개안: glint 0, full spin 5-21 (spin 13), throw 31 (glaive back 39-46)",
-      "knots": 31,
+      "keyFiles": 26,
+      "keys": 612,
+      "note": "초월의 악요개안: glint 0, the glaive swung back behind her 5, a full spin to her left 5-21 whose tip crosses her facing (the player) at the spin hit 13; released 28 (flown by the pattern, landing at the throw event 31; glaive back 39-46)",
+      "knots": 28,
       "form": "tenma",
       "loopFrom": null,
       "formSwitch": null,
@@ -1084,10 +1084,10 @@
         "flash": 10,
         "hit": 22
       },
-      "keyFiles": 13,
-      "keys": 384,
-      "note": "신속한 발도: crouch 0-10, flash 10, the 360 degree draw 22-28 (hit 22)",
-      "knots": 14,
+      "keyFiles": 16,
+      "keys": 459,
+      "note": "신속한 발도: crouch 0-10, flash 10, drawn to her right 20, a 360 degree spin to her left 20-28 whose tip crosses her facing at the hit 22",
+      "knots": 17,
       "form": "tenma",
       "loopFrom": null,
       "formSwitch": null,
@@ -1103,10 +1103,10 @@
         "swing1": 8,
         "swing2": 53
       },
-      "keyFiles": 26,
-      "keys": 430,
-      "note": "궤멸의 검기: glint 0, overhead swing 8 (slabs), low sweep 53 (wave)",
-      "knots": 27,
+      "keyFiles": 28,
+      "keys": 451,
+      "note": "궤멸의 검기: glint 0, overhead swing 8 (slabs), low sweep across her facing right to left 53 (wave)",
+      "knots": 29,
       "form": "tenma",
       "loopFrom": null,
       "formSwitch": null,
@@ -1123,10 +1123,10 @@
         "band": 24,
         "slam": 64
       },
-      "keyFiles": 20,
-      "keys": 316,
+      "keyFiles": 18,
+      "keys": 284,
       "note": "단절: halo 6, raise 10-24, held overhead, slam 64",
-      "knots": 21,
+      "knots": 19,
       "form": "tenma",
       "loopFrom": null,
       "formSwitch": null,
@@ -1213,7 +1213,7 @@
         "appear": 0
       },
       "keyFiles": 3,
-      "keys": 88,
+      "keys": 86,
       "note": "만겁: reappear 0",
       "knots": 4,
       "form": "tenma",
@@ -1234,10 +1234,10 @@
         "b2": 34,
         "b3": 40
       },
-      "keyFiles": 21,
-      "keys": 404,
-      "note": "강력한 돌진: glint 0, flash 13, rush 23 (the pattern moves her), barrage 28 / 34 / 40",
-      "knots": 22,
+      "keyFiles": 27,
+      "keys": 515,
+      "note": "강력한 돌진: glint 0, flash 13, rush 23 (the pattern moves her), barrage: across her facing 28 (right to left), 34 (left to right), overhead slam 40",
+      "knots": 28,
       "form": "tenma",
       "loopFrom": null,
       "formSwitch": null,
@@ -1437,10 +1437,44 @@
       "function": "rlk:boss/raiden/rig/prop/flower"
     },
     "dome": {
-      "model": "prop/dome",
+      "model": "prop/dome_0",
+      "parts": [
+        {
+          "model": "prop/dome_0",
+          "yaw": 0
+        },
+        {
+          "model": "prop/dome_1",
+          "yaw": -11.25
+        },
+        {
+          "model": "prop/dome_2",
+          "yaw": -22.5
+        },
+        {
+          "model": "prop/dome_3",
+          "yaw": -33.75
+        },
+        {
+          "model": "prop/dome_4",
+          "yaw": -45
+        },
+        {
+          "model": "prop/dome_5",
+          "yaw": -56.25
+        },
+        {
+          "model": "prop/dome_6",
+          "yaw": -67.5
+        },
+        {
+          "model": "prop/dome_7",
+          "yaw": -78.75
+        }
+      ],
       "scale": 8,
-      "note": "safe dome r 8 b (glass, outer and inner facets), floor pivot; animate the scale to grow it",
-      "item": "rlk:raiden/prop/dome",
+      "note": "safe dome r 8 b: 8 displays (one closed double-sided bubble), floor pivot; animate the scale of every rlk_rd_prop_dome to grow it",
+      "item": "rlk:raiden/prop/dome_0",
       "function": "rlk:boss/raiden/rig/prop/dome"
     },
     "clap_l": {
@@ -1553,9 +1587,9 @@
     "prop": "rlk:boss/raiden/rig/prop/<kind>"
   },
   "px": {
-    "rig": 145664,
-    "props": 57344,
-    "total": 203008,
+    "rig": 208896,
+    "props": 115712,
+    "total": 324608,
     "sprites": {
       "sw_ink": 256,
       "sw_violet": 256,
@@ -1567,13 +1601,16 @@
       "sw_golddk": 256,
       "sw_lacquersh": 256,
       "sw_lacquerdk": 256,
-      "sw_tan": 256,
-      "sw_tandk": 256,
       "sw_shaft": 256,
       "sw_suit": 256,
       "sw_glow": 256,
       "sw_white": 256,
       "sw_electro": 256,
+      "sw_jointdk": 256,
+      "sw_lacquer": 256,
+      "sw_discrim": 256,
+      "sw_bladespine": 256,
+      "sw_bronzedk": 256,
       "sleeve_pale": 8192,
       "sleeve_dark": 8192,
       "drape": 16384,
@@ -1590,19 +1627,39 @@
       "aura_ring": 16384,
       "lacquer": 4096,
       "sigil": 4096,
-      "gauntlet": 4096,
       "glaive_blade": 16384,
-      "glaive_shaft": 1024,
+      "glaive_shaft": 256,
       "glaive_guard": 4096,
+      "glaive_glow": 4096,
+      "kunai": 2048,
       "disc": 16384,
-      "horn": 2048,
-      "dagger": 2048,
+      "disc_back": 1024,
+      "halo_ring": 16384,
+      "horn": 8192,
+      "lac_lame": 1024,
+      "lac_lame_sig": 1024,
+      "lac_joint": 256,
+      "lac_hand": 256,
+      "lac_palm": 1024,
+      "lac_shell": 16384,
+      "lac_shell2": 4096,
+      "lac_cop": 4096,
+      "lac_guard": 8192,
+      "bronze": 1024,
+      "bronze_palm": 1024,
+      "bronze_jewel": 1024,
+      "jewel": 256,
       "tasset": 2048,
       "plate_pale": 2048,
       "orb_eye": 4096,
       "crystal": 8192,
       "petal": 4096,
-      "dome_glass": 4096,
+      "orb_dark": 1024,
+      "dome_r0": 8192,
+      "dome_r1": 16384,
+      "dome_r2": 16384,
+      "dome_r3": 16384,
+      "dome_cap": 4096,
       "clap_facet": 4096,
       "hoop": 16384,
       "vortex": 16384,
@@ -1612,17 +1669,200 @@
   "elements": {
     "shogun_sword": 65,
     "shogun_polearm": 68,
-    "tenma": 775
+    "tenma": 595
+  },
+  "tenma_ghost": {
+    "note": "Tenma rest pose (rig frame: +X her left, +Y up, -Z forward, blocks): polylines and thicknesses of the puppet for the blink silhouettes",
+    "limbs": [
+      {
+        "points": [
+          [
+            -1.5,
+            4.05,
+            0.55
+          ],
+          [
+            -3.024,
+            2.828,
+            0.981
+          ],
+          [
+            -1.963,
+            2.073,
+            -0.801
+          ]
+        ],
+        "thickness": 0.55
+      },
+      {
+        "points": [
+          [
+            -0.827,
+            4.734,
+            -0.352
+          ],
+          [
+            -2.684,
+            3.245,
+            0.174
+          ]
+        ],
+        "thickness": 0.9
+      },
+      {
+        "points": [
+          [
+            -3.848,
+            2.603,
+            -0.368
+          ],
+          [
+            0.139,
+            1.303,
+            -1.408
+          ]
+        ],
+        "thickness": 0.12
+      },
+      {
+        "points": [
+          [
+            0.139,
+            1.303,
+            -1.408
+          ],
+          [
+            1.492,
+            1.081,
+            -1.83
+          ],
+          [
+            2.573,
+            0.586,
+            -2.067
+          ]
+        ],
+        "thickness": 0.26
+      },
+      {
+        "points": [
+          [
+            0.42,
+            2.62,
+            0.36
+          ],
+          [
+            1.013,
+            3.74,
+            0.65
+          ],
+          [
+            1.235,
+            5.589,
+            0.428
+          ]
+        ],
+        "thickness": 0.16
+      },
+      {
+        "points": [
+          [
+            0.48,
+            2.44,
+            0.4
+          ],
+          [
+            1.594,
+            3.052,
+            0.672
+          ],
+          [
+            2.715,
+            3.873,
+            0.149
+          ]
+        ],
+        "thickness": 0.16
+      },
+      {
+        "points": [
+          [
+            0.46,
+            2.26,
+            0.36
+          ],
+          [
+            1.741,
+            2.19,
+            0.569
+          ],
+          [
+            2.937,
+            2.62,
+            -0.198
+          ]
+        ],
+        "thickness": 0.16
+      },
+      {
+        "points": [
+          [
+            1.274,
+            1.256,
+            -0.426
+          ],
+          [
+            0.994,
+            0.811,
+            -1.831
+          ],
+          [
+            0.8,
+            0.642,
+            -2.86
+          ]
+        ],
+        "thickness": 0.55
+      },
+      {
+        "points": [
+          [
+            -1.274,
+            1.256,
+            -0.426
+          ],
+          [
+            -0.994,
+            0.811,
+            -1.831
+          ],
+          [
+            -0.8,
+            0.642,
+            -2.86
+          ]
+        ],
+        "thickness": 0.55
+      }
+    ],
+    "disc": {
+      "centre": [
+        0,
+        2.877,
+        0.38
+      ],
+      "radius": 0.78
+    }
   },
   "budgets": {
     "parts": [
       30,
       34
     ],
-    "key_files": 491,
-    "rig_files": 736,
-    "rig_bytes": 2797994,
-    "models": 55,
+    "key_files": 504,
+    "rig_files": 751,
+    "rig_bytes": 2820924,
+    "models": 62,
     "culling": {
       "width": 16,
       "height": 10

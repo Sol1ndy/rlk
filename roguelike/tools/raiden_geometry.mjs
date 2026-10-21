@@ -10,8 +10,11 @@
 // aura), Tenma 14 (disc, g_upper, g_fore, g_hand, glaive, glaive_fx, ra1_up/ra1_fo .. ra3_up/ra3_fo, gaunt_l, gaunt_r).
 // The braid shows in both forms; the other Shogun extras hide in the Tenma form (pose sS = 0) and the Tenma parts in
 // the Shogun form (pose tS = 0).
-import {abox, cardZ, cardX, cardY, lathe, turned, mirrorModel, checkBounds, r4} from './mboss_model_lib.mjs';
+// The Tenma parts' models (the puppet armour) are built in raiden_tenma_models.mjs.
+import {abox, cardZ, cardX, cardY, lathe, turned, knob, mirrorModel, checkBounds, r4, faceEl, faceOfDir, rotA, vadd, vsub, vsc, vdot, D2R} from './mboss_model_lib.mjs';
 import {add, sub, times, len, unit, mul, q, rot, aimQ, ik, basisQ, cross, dot, perp, steadyPerp, toDisplayT, toDisplayQ} from './mboss_rig_math.mjs';
+import {tenmaModels, GHOST} from './raiden_tenma_models.mjs';
+export {GHOST};
 
 // ---- part table ---------------------------------------------------------------------------------------------------------
 // [name, default item model (shogun look), block brightness, group]
@@ -39,7 +42,8 @@ export const PART_SCALE = {
   right_leg: LEG, right_shin: LEG, left_leg: LEG, left_shin: LEG,
   braid: [1, 1, 1], drape: [1, 1, 1], weapon: [1, 1, 1], weapon_fx: [1, 1, 1], halo: [1.25, 1.25, 1.25], aura: [2.4, 2.4, 2.4],
   disc: [1, 1, 1], g_upper: [1.5, 1.5, 1.5], g_fore: [1.5, 1.5, 1.5], g_hand: [1.4, 1.4, 1.4], glaive: [3.6, 3.6, 3.6], glaive_fx: [3.6, 3.6, 3.6],
-  ra1_up: [1, 1, 1], ra1_fo: [1, 1, 1], ra2_up: [1, 1, 1], ra2_fo: [1, 1, 1], ra3_up: [1, 1, 1], ra3_fo: [1, 1, 1], gaunt_l: [1, 1, 1], gaunt_r: [1, 1, 1],
+  ra1_up: [1, 1, 1], ra1_fo: [1.25, 1.25, 1.25], ra2_up: [1, 1, 1], ra2_fo: [1.25, 1.25, 1.25], ra3_up: [1, 1, 1], ra3_fo: [1.25, 1.25, 1.25],
+  gaunt_l: [2.4, 2.4, 2.4], gaunt_r: [2.4, 2.4, 2.4],
 };
 
 // ---- skin boxes (model space, the old rig's layout) ---------------------------------------------------------------------
@@ -71,9 +75,6 @@ const crossCards = (sprite, c, w, h, y0) => [cardZ(sprite, c[2], {X0: c[0] - w /
   cardX(sprite, c[0], {Z0: c[2] - w / 2, Z1: c[2] + w / 2, Y0: c[1] + y0, Y1: c[1] + y0 + h})];
 const sq = (sprite, c, s, plane = 'z', opt = {}) => (plane === 'z' ? cardZ(sprite, c[2], {X0: c[0] - s / 2, X1: c[0] + s / 2, Y0: c[1] - s / 2, Y1: c[1] + s / 2}, opt)
   : cardX(sprite, c[0], {Z0: c[2] - s / 2, Z1: c[2] + s / 2, Y0: c[1] - s / 2, Y1: c[1] + s / 2}, opt));
-const LIMB_V = {vFrom: 0, vTo: 1, n: 8};
-// Light ball joint: an 8-facet turned sphere in 4 bands (the shared knob() is 12 x 16 facets).
-const ballJ = (c, R, tex, ledge, n = 8) => turned('y', c, [-R, -R * .72, 0, R * .72, R], a => R * Math.sqrt(Math.max(.05, 1 - (a / R) ** 2)), tex, ledge, {vFrom: R, vTo: -R, n}, '-+');
 
 // Kimono sleeve round the upper arm (A-frame, arm box X +-2, Z +-2, Y -4..2): an outer panel flaring away from the body,
 // front and back panels; side +1 = her left arm. Long = the right sleeve (to Y -17), else to Y -13.
@@ -151,73 +152,16 @@ function shogunModels() {
   return M;
 }
 
-// ---- Tenma parts -------------------------------------------------------------------------------------------------------------
-// A limb segment hanging along -Y from a ball joint: turned taper in lacquer, a joint ring, optional sigils.
-function limb(L, r0, r1, {ball = 0, sig = false, ring = true, n = 8} = {}) {
-  const st = [0, 1, 2, 3].map(i => -L + L * i / 3);
-  const els = [...turned('y', [0, 0, 0], st, y => r1 + (r0 - r1) * (y + L) / L, 'lacquer', 'sw_lacquersh', {...LIMB_V, n}, '-+')];
-  if (ball) els.push(...ballJ([0, 0, 0], ball, 'lacquer', 'sw_lacquersh', n));
-  if (ring) els.push(abox([-r1 * 1.08, -L + .2, -r1 * 1.08], [r1 * 1.08, -L + 1.1, r1 * 1.08], {all: 'sw_lacquerdk'}));
-  if (sig) els.push(cardZ('sigil', -r0 * 1.02 - .05, {X0: -r0 * .9, X1: r0 * .9, Y0: -L * .55, Y1: -L * .3}), cardX('sigil', r0 * 1.02 + .05, {Z0: -r0 * .9, Z1: r0 * .9, Y0: -L * .6, Y1: -L * .35}));
-  return els;
-}
-// A lacquer hand hanging along -Y from the wrist; kind 'fist' (grips a shaft along X at Y -5.6), 'open', 'claw', 'dagger'.
+// ---- Tenma parts: raiden_tenma_models.mjs (the puppet armour, 10-22c). puppetHand stays for the slam palm prop. ----------
+// A lacquer hand hanging along -Y from the wrist; kind 'open' (the slam palm prop).
 function puppetHand(kind, s = 1) {
   const e = [abox([-2.6 * s, -6.2 * s, -1.3 * s], [2.6 * s, 0, 1.3 * s], {all: 'lacquer', front: 'sw_lacquersh', back: 'sw_lacquersh'})];
   e.push(cardZ('sigil', -1.36 * s, {X0: -1.5 * s, X1: 1.5 * s, Y0: -4.6 * s, Y1: -1.6 * s}));
   for (let i = 0; i < 4; i++) {
     const x = (-1.95 + i * 1.3) * s, w = .55 * s;
-    if (kind === 'fist' || kind === 'dagger') e.push(abox([x - w, -8.6 * s, -1.4 * s], [x + w, -6.2 * s, 1.5 * s], {all: 'lacquer', down: 'sw_lacquersh'}),
-      abox([x - w, -8.9 * s, 1.0 * s], [x + w, -7.4 * s, 3.0 * s], 'sw_lacquersh'));
-    else if (kind === 'open') e.push(abox([x - w, -(10.2 - Math.abs(i - 1.5) * .9) * s, -.9 * s], [x + w, -6.2 * s, .9 * s], {all: 'lacquer', down: 'sw_lacquerdk'}));
-    else e.push(abox([x - w, -9.0 * s, -.9 * s], [x + w, -6.2 * s, .9 * s], 'lacquer'), abox([x - w * .8, -10.4 * s, -2.6 * s], [x + w * .8, -8.6 * s, -.4 * s], {all: 'sw_lacquersh', front: 'sw_glow'}));
+    e.push(abox([x - w, -(10.2 - Math.abs(i - 1.5) * .9) * s, -.9 * s], [x + w, -6.2 * s, .9 * s], {all: 'lacquer', down: 'sw_lacquerdk'}));
   }
   e.push(abox([2.4 * s, -4.4 * s, -1.6 * s], [3.6 * s, -1 * s, .6 * s], 'sw_lacquersh'), abox([2.6 * s, -6.6 * s, -2.4 * s], [3.4 * s, -4.4 * s, -.8 * s], 'lacquer'));
-  return e;
-}
-function tenmaModels() {
-  const M = {};
-  // disc halo: dark disc 1.7 b, tomoe-eye emblem, thin outer ring; two crescent horns behind the head, up and out
-  M.disc = [cardZ('disc', 0, {X0: -13.6, X1: 13.6, Y0: -13.6, Y1: 13.6}), abox([-1.2, -1.2, .1], [1.2, 1.2, 1.4], 'sw_ink'),
-    cardZ('horn', -.4, {X0: -7.6, X1: -2.2, Y0: 9.0, Y1: 18.6}, {rot: ['z', 22.5, [-4.9, 9, -.4]], flipU: true}),
-    cardZ('horn', -.4, {X0: 2.2, X1: 7.6, Y0: 9.0, Y1: 18.6}, {rot: ['z', -22.5, [4.9, 9, -.4]]})];
-  // giant left arm (scale 1.5: upper and forearm 2 b = 21.3 units, r ~0.3 b) and the gripping fist (scale 1.4)
-  M.g_upper = limb(21.3, 3.4, 2.9, {ball: 3.9, ring: true, n: 16});
-  M.g_fore = [...limb(21.3, 2.9, 2.3, {ball: 3.0, sig: true, n: 16}), abox([-3.0, -16, -3.0], [3.0, -14.6, 3.0], 'sw_lacquerdk')];
-  M.g_hand = puppetHand('fist', 1.3);
-  // glaive (scale 3.6): shaft along +Y from the grip (butt -7.1 .. tip 21.8 units = 6.5 b), single-edged curved blade toward
-  // +X in the Z = 0 plane (2.2 b), round pink guard ornament
-  M.glaive = [abox([-.3, -7.1, -.3], [.3, 11.8, .3], 'glaive_shaft'),
-    ...[-7, -1.7, 5, 10.3].map(y => abox([-.42, y, -.42], [.42, y + .4, .42], 'sw_gold')),
-    cardZ('glaive_guard', 0, {X0: -1.25, X1: 1.25, Y0: 10.5, Y1: 13}), cardX('glaive_guard', 0, {Z0: -1.25, Z1: 1.25, Y0: 10.5, Y1: 13}),
-    cardZ('glaive_blade', .05, {X0: -.33, X1: 2.83, Y0: 11.8, Y1: 21.8}), cardZ('glaive_blade', -.05, {X0: -.33, X1: 2.83, Y0: 11.8, Y1: 21.8}),
-    abox([-.17, 11.8, -.15], [.42, 20, .15], 'sw_ink')];
-  M.glaive_fx = [cardZ('weapon_glow', -.13, {X0: 1, X1: 3.8, Y0: 11.3, Y1: 22.2}), cardX('weapon_glow', 2.2, {Z0: -1.5, Z1: 1.5, Y0: 11.3, Y1: 22.2})];
-  // three thin right arms: upper 1.3 b (20.8 units), forearm-with-hand 1.0 + 0.6 b
-  M.ra_up = limb(20.8, 1.35, 1.1, {ball: 1.7});
-  // the dagger arm's spearhead points on past the fist (up while the forearm points up)
-  M.ra1_fo = [...limb(12, 1.1, .9, {ball: 1.3, sig: true}), ...puppetHand('dagger', .55).map(e => shiftY(e, -12)),
-    abox([-.3, -18.6, -.3], [.3, -15.6, .3], 'sw_shaft'), abox([-.7, -18.9, -.7], [.7, -18.5, .7], 'sw_gold'),
-    cardZ('dagger', 0, {X0: -1.4, X1: 1.4, Y0: -23.8, Y1: -18.6}, {flipU: false}), cardX('dagger', 0, {Z0: -1.4, Z1: 1.4, Y0: -23.8, Y1: -18.6})];
-  M.ra2_fo = [...limb(12, 1.1, .9, {ball: 1.3}), ...puppetHand('open', .55).map(e => shiftY(e, -12))];
-  M.ra3_fo = [...limb(12, 1.1, .9, {ball: 1.3, sig: true}), ...puppetHand('claw', .55).map(e => shiftY(e, -12))];
-  // tan gauntlets: palm up, fingers forward (-Z), 1.3 b wide, violet sigil on the palm; pivot at the palm centre
-  M.gaunt_l = gauntlet();
-  M.gaunt_r = mirrorModel(gauntlet());
-  return M;
-}
-const shiftY = (e, dy) => ({...e, from: [e.from[0], r4(e.from[1] + dy), e.from[2]], to: [e.to[0], r4(e.to[1] + dy), e.to[2]],
-  ...(e.rotation ? {rotation: {...e.rotation, origin: [e.rotation.origin[0], r4(e.rotation.origin[1] + dy), e.rotation.origin[2]]}} : {})});
-function gauntlet() {
-  const T = {all: 'gauntlet', up: 'sw_tan', down: 'sw_tandk'};
-  const e = [abox([-6.4, -1.6, -5.6], [6.4, 1.4, 5.8], T), cardY('sigil', 1.45, {X0: -3.6, X1: 3.6, Z0: -3.4, Z1: 3.4}),
-    abox([-5.2, -2.0, 5.2], [5.2, 1.0, 9.6], {all: 'gauntlet', back: 'sw_tandk'}), abox([-5.6, -2.2, 8.2], [5.6, 1.4, 9.2], 'sw_tandk')];
-  for (let i = 0; i < 4; i++) {
-    const x = -4.8 + i * 3.2, L = [7.2, 8.4, 8.0, 6.4][i];
-    e.push(abox([x - 1.25, -1.2, -5.6 - L * .55], [x + 1.25, 1.2, -5.4], T), abox([x - 1.15, -.6, -5.6 - L], [x + 1.15, 2.6, -5.6 - L * .55], T),
-      abox([x - 1.0, 2.6, -5.6 - L - .2], [x + 1.0, 3.6, -5.6 - L * .62], 'sw_tandk'));
-  }
-  e.push(abox([6.2, -1.2, -3.6], [8.6, 1.2, 1.6], T), abox([7.6, -.8, -7.2], [9.6, 2.4, -3.4], T));
   return e;
 }
 
@@ -238,18 +182,17 @@ function propModels() {
   for (const [x, , z, h, w, r] of spikes) for (const pl of ['z', 'x']) M['prop/vajra'].push(pl === 'z'
     ? cardZ('crystal', z, {X0: x - w / 2, X1: x + w / 2, Y0: 1.4, Y1: 1.4 + h}, r ? {rot: [r[0], r[1], [x, 1.4, z]]} : {})
     : cardX('crystal', x, {Z0: z - w / 2, Z1: z + w / 2, Y0: 1.4, Y1: 1.4 + h}, r ? {rot: [r[0], r[1], [x, 1.4, z]]} : {}));
-  // remembrance flower: magenta lotus round a dark orb (scale 1.2), floor pivot
-  M['prop/flower'] = [...ballJ([0, 6.2, 0], 3.2, 'sw_ink', 'sw_deep'), abox([-.6, 0, -.6], [.6, 3, .6], 'sw_violet')];
+  // remembrance flower: magenta lotus round a dark orb (scale 1.2), floor pivot; the orb is a round turned ball (its
+  // band ledges are round orb_dark discs, never square plates)
+  M['prop/flower'] = [...knob('y', [0, 6.2, 0], 3.2, 'sw_ink', 'orb_dark'), abox([-.6, 0, -.6], [.6, 3, .6], 'sw_violet')];
   for (let k = 0; k < 8; k++) {
     const a = k * 45, r = 4.6, x = Math.sin(a * Math.PI / 180) * r, z = -Math.cos(a * Math.PI / 180) * r;
     const el = k % 2 === 0 ? cardZ('petal', z, {X0: x - 3, X1: x + 3, Y0: 2, Y1: 10}) : cardX('petal', x, {Z0: z - 3, Z1: z + 3, Y0: 2, Y1: 10});
     if (k % 2) { const e2 = cardZ('petal', 0, {X0: -3, X1: 3, Y0: 2, Y1: 10}, {rot: ['y', k === 1 || k === 5 ? 45 : -45, [0, 6, 0]]}); M['prop/flower'].push(shiftXZ(e2, x, z)); }
     else M['prop/flower'].push(el);
   }
-  // safe dome r 8 b (scale 8: 1 unit = 0.5 b): glass hemisphere, outer and inner facets
-  const at = [0, 4, 8, 11.5, 14, 15.6, 16];
-  const secs = at.slice(1).map((y, i) => ({a: [at[i], y], r: 16 * Math.cos(Math.asin(Math.min(1, ((at[i] + y) / 2) / 16))), tex: 'dome_glass'}));
-  M['prop/dome'] = [...lathe('y', [0, 0, 0], secs, {vFrom: 0, vTo: 1, n: 16}), ...lathe('y', [0, 0, 0], secs, {vFrom: 0, vTo: 1, n: 16, inward: true})];
+  // safe dome r 8 b (scale 8: 1 unit = 0.5 b): DOME.PARTS display parts, see domeModels()
+  Object.assign(M, domeModels());
   // clap hands: translucent faceted violet hands, 4.5 b at scale 3.6 (palm toward +X for the left hand)
   M['prop/clap_hand_l'] = clapHand();
   M['prop/clap_hand_r'] = mirrorModel(clapHand());
@@ -259,9 +202,9 @@ function propModels() {
   M['prop/glaive_planted'] = [abox([-.35, .4, -.35], [.35, 20, .35], 'glaive_shaft', {rot: ['x', 22.5, [0, 0, 0]]}),
     abox([-.5, 6, -.5], [.5, 6.45, .5], 'sw_gold', {rot: ['x', 22.5, [0, 0, 0]]}), abox([-.5, 14, -.5], [.5, 14.45, .5], 'sw_gold', {rot: ['x', 22.5, [0, 0, 0]]}),
     cardZ('glaive_guard', 0, {X0: -1.5, X1: 1.5, Y0: .6, Y1: 3.6}, {rot: ['x', 22.5, [0, 0, 0]]}),
-    cardZ('glaive_blade', .06, {X0: -.4, X1: 3.4, Y0: .4, Y1: 3.2}, {rot: ['x', 22.5, [0, 0, 0]], uvr: [0, .78, 1, 1]})];
+    cardZ('glaive_blade', .06, {X0: -.7, X1: 2.9, Y0: -1.6, Y1: 3.2}, {rot: ['x', 22.5, [0, 0, 0]], uvr: [0, 1, 1, .6]})];   // the blade's root (habaki up), on into the floor
   // shadow seed: dark orb with an eye (scale 1)
-  M['prop/seed'] = [...ballJ([0, 0, 0], 3.4, 'sw_ink', 'sw_deep'), ...crossCards('sigil', [0, 0, 0], 6, 4, -2)];
+  M['prop/seed'] = [...knob('y', [0, 0, 0], 3.4, 'sw_ink', 'orb_dark'), ...crossCards('sigil', [0, 0, 0], 6, 4, -2)];
   // weapon switch: dark vertical hoop (scale 2 -> 3 b) and the vortex disc at her feet (scale 3)
   M['prop/hoop'] = [cardZ('hoop', 0, {X0: -12, X1: 12, Y0: 0, Y1: 24}), cardX('hoop', 0, {Z0: -12, Z1: 12, Y0: 0, Y1: 24})];
   M['prop/vortex'] = [cardY('vortex', .4, {X0: -15, X1: 15, Z0: -15, Z1: 15})];
@@ -269,6 +212,53 @@ function propModels() {
   // tinted items give the dark smoky clone and the glowing revealed one (PROP_TINTS)
   M['prop/clone_ready'] = clone('ready');
   M['prop/clone_slash'] = clone('slash');
+  return M;
+}
+// ---- the 만겁 safe dome (plan §C.2: r 8 b). One closed, double-sided polyhedron spread over DOME.PARTS item displays (each
+// turned by DOME.yaw(j) on its entity Rotation, so the scale merges of the pattern keep working): a part holds the four
+// cardinal gores (azimuth 0 / 90 / 180 / 270 of its own frame), so 8 parts give 32 azimuths. A gore is 4 rows of flat
+// facets turned up 0 / 22.5 / 45 / 67.5 degrees about the gore's tangent (single-axis element rotations; the 67.5 row is
+// authored flat and turned back 22.5) and part 0 carries the polygonal cap. The rows are the circumscribed profile of the
+// sphere (tangent at 0, 22.5, ..., 90 degrees), so neighbouring rows share their edges exactly; a facet is an isosceles
+// trapezoid drawn on its bounding rectangle, and its sprite slice cuts the trapezoid (alpha 0 outside), so neighbouring
+// gores meet edge to edge. Every facet has an outward and an inward face (seen from outside and from inside the dome).
+// Row r uses sprite dome_r<r> (DOME.PARTS slices across, part j = slice j: the faint pattern is 90 degrees periodic and
+// continuous over the seams), the cap dome_cap (raiden_paint.mjs paints both from DOME).
+export const DOME = (() => {
+  const R = 16, N = 32, PARTS = 8, half = Math.PI / N, k = R / Math.cos(11.25 * D2R);
+  const V = [[R, 0], ...[11.25, 33.75, 56.25, 78.75].map(p => [k * Math.cos(p * D2R), k * Math.sin(p * D2R)])];
+  const rows = [0, 1, 2, 3].map(i => {
+    const [ra, ya] = V[i], [rb, yb] = V[i + 1];
+    return {beta: 22.5 * i, ra, ya, rb, yb, wa: 2 * ra * Math.tan(half), wb: 2 * rb * Math.tan(half), L: Math.hypot(ra - rb, yb - ya)};
+  });
+  return {R, N, PARTS, rows, cap: {y: V[4][1], r: V[4][0], c: V[4][0] / Math.cos(half)}, yaw: j => -360 / N * j,
+    model: j => 'prop/dome_' + j, sprite: r => 'dome_r' + r};
+})();
+function domeModels() {
+  const {PARTS, rows, cap} = DOME, dirs = [[0, 0, -1], [1, 0, 0], [0, 0, 1], [-1, 0, 0]], up = [0, 1, 0], M = {};
+  for (let j = 0; j < PARTS; j++) {
+    const els = [];
+    for (let g = 0; g < 4; g++) {
+      const d = dirs[g], t = dirs[(g + 1) % 4], axis = t[0] ? 'x' : 'z', inw = vsc(d, -1);
+      rows.forEach((row, r) => {
+        const {beta, ra, ya, rb, yb, wa, L} = row, flat = beta > 45, along = flat ? inw : up, ang = flat ? 22.5 : beta;
+        const O = vadd([0, ya, 0], vsc(d, ra));
+        const sg = !ang ? 0 : vdot(rotA(axis, 10, along), flat ? up : inw) > 0 ? 1 : -1;
+        // the turned facet must land on the profile: its top edge midpoint at (rb, yb)
+        const top = vadd(O, rotA(axis, sg * ang, vsc(along, L)));
+        if (Math.abs(vdot(top, d) - rb) > 1e-6 || Math.abs(top[1] - yb) > 1e-6) throw new Error(`dome facet g${g} r${r} misses the profile`);
+        const fn = X => { const rel = vsub(X, O); return [16 * (j + .5 + vdot(rel, t) / wa) / PARTS, 16 * (1 - vdot(rel, along) / L)]; };
+        const P = (s, l) => vadd(O, vadd(vsc(t, s), vsc(along, l)));
+        const out = flat ? 'up' : faceOfDir(d), inn = flat ? 'down' : faceOfDir(inw), tex = DOME.sprite(r);
+        els.push(faceEl([P(-wa / 2, 0), P(wa / 2, L)], {[out]: {tex, fn}, [inn]: {tex, fn}}, {shade: false, rot: ang ? [axis, sg * ang, O] : undefined}));
+      });
+    }
+    if (j === 0) {
+      const c = cap.c, fn = X => [16 * (.5 + X[0] / (2 * c)), 16 * (.5 + X[2] / (2 * c))];
+      els.push(faceEl([[-c, cap.y, -c], [c, cap.y, c]], {up: {tex: 'dome_cap', fn}, down: {tex: 'dome_cap', fn}}, {shade: false}));
+    }
+    M[DOME.model(j)] = els;
+  }
   return M;
 }
 const shiftXZ = (e, dx, dz) => ({...e, from: [r4(e.from[0] - dx), e.from[1], r4(e.from[2] + dz)], to: [r4(e.to[0] - dx), e.to[1], r4(e.to[2] + dz)],
@@ -307,7 +297,8 @@ export const PROPS = {
   musou_orb: {model: 'prop/musou_orb', scale: 1.4, note: 'Musou crystal orb, centred'},
   vajra: {model: 'prop/vajra', scale: 2.5, note: 'vajra spike bundle 3.5 b tall, base at the pivot (floor)'},
   flower: {model: 'prop/flower', scale: 2.2, note: 'remembrance flower (lotus + dark orb, about 2 b tall), floor pivot'},
-  dome: {model: 'prop/dome', scale: 8, note: 'safe dome r 8 b (glass, outer and inner facets), floor pivot; animate the scale to grow it'},
+  dome: {model: DOME.model(0), parts: Array.from({length: DOME.PARTS}, (_, j) => ({model: DOME.model(j), yaw: DOME.yaw(j)})), scale: 8,
+    note: `safe dome r 8 b: ${DOME.PARTS} displays (one closed double-sided bubble), floor pivot; animate the scale of every rlk_rd_prop_dome to grow it`},
   clap_l: {model: 'prop/clap_hand_l', scale: 3.6, note: 'left clap hand (palm toward +X of the display), 4.5 b'},
   clap_r: {model: 'prop/clap_hand_r', scale: 3.6, note: 'right clap hand (palm toward -X), 4.5 b'},
   slam_palm: {model: 'prop/slam_palm', scale: 3.2, note: 'pale open hand hanging from the pivot (fingers -Y); turn it palm down'},
@@ -359,7 +350,7 @@ export const SK = {
   drape: [0, .14, .14],                                    // root frame from the hip: back of the obi
   halo: [0, .62, .40],                                     // torso frame from the hip: behind the upper back
   disc: [0, .98, .38],                                     // torso frame from the hip: behind the head
-  gRoot: [-1.25, 2.55, .6], gU: 2.0, gF: 2.0, gWrist: .62,  // giant arm root (root frame from the floor point), lengths, wrist -> grip
+  gRoot: [-1.5, 3.05, .55], gU: 2.0, gF: 2.0, gWrist: .62,  // giant arm root (root frame from the floor point; 10-22c: higher, the shoulder over her head), lengths, wrist -> grip
   raRoot: [[.42, 1.62, .36], [.48, 1.44, .40], [.46, 1.26, .36]], raU: 1.3, raF: .94,
 };
 export const mirrorE = e => [e[0], -e[1], -e[2]];
@@ -369,10 +360,12 @@ const SOLE = [[-1, -1], [-1, 1], [1, -1], [1, 1]].map(([a, b]) => [a * 2.22 * LE
 const DRAPE_LEN = 15.4 / 16;
 const sideE = (e, side) => (side > 0 ? e : mirrorE(e));
 export const ROOT_PIVOT = [0, HIP_Y, 0];
+// the gauntlet pivots never come lower than this (their tilted hull reaches 0.43 b below the pivot; the floor rule keeps 0.3 b)
+const GAUNT_MIN = .9;
 
 // A weapon whose ends would reach below the floor is tipped up about the grip (the katana tip 1.3 b along +Y, the
 // polearm spike 1.48 b along -Y): the smallest rotation that keeps both ends 0.05 b above the floor.
-const W_ENDS = [[1.31, 1, .22], [1.49, -1, .1]], G_ENDS = [[4.95, 1, .9], [1.62, -1, .2]];
+const W_ENDS = [[1.31, 1, .22], [1.49, -1, .1]];
 function groundBlade(g, Q, ends = W_ENDS) {
   let out = Q;
   for (const [L, sgn, clear] of ends) {
@@ -383,6 +376,32 @@ function groundBlade(g, Q, ends = W_ENDS) {
     const ax = cross(d, d2), sa = len(ax), ca = dot(d, d2);
     if (sa < 1e-9) continue;
     const ang = Math.atan2(sa, ca), u = times(ax, 1 / sa), sn = Math.sin(ang / 2);
+    out = mul([u[0] * sn, u[1] * sn, u[2] * sn, Math.cos(ang / 2)], out);
+  }
+  return out;
+}
+// The naginata is lifted by its own hull (the glaive and its edge glow at full size, the same corner points the builder's
+// floor check uses): the smallest turns about the grip that keep every point 0.05 b above the floor, so a low sweep or a
+// slam runs the blade down to the floor instead of stopping 0.9 b above it (10-22c).
+let G_HULL = null;
+function glaiveHull() {
+  if (!G_HULL) {
+    const M = tenmaModels(), k = PART_SCALE.glaive[0] / 16;
+    G_HULL = [...modelPoints(M.glaive), ...modelPoints(M.glaive_fx)].map(P => P.map(x => x * k));
+  }
+  return G_HULL;
+}
+function groundHull(g, Q, clear = .05) {
+  let out = Q;
+  for (let it = 0; it < 6; it++) {
+    let low = null, ly = Infinity;
+    for (const P of glaiveHull()) { const y = g[1] + rot(out, P)[1]; if (y < ly) { ly = y; low = P; } }
+    if (ly >= clear - 1e-4) break;
+    const L = len(low), d = times(rot(out, low), 1 / L), minY = (clear + 1e-3 - g[1]) / L;
+    const h = [d[0], 0, d[2]], hl = len(h) || 1e-6, sy = Math.min(1, minY), cy = Math.sqrt(Math.max(0, 1 - sy * sy));
+    const d2 = [h[0] / hl * cy, sy, h[2] / hl * cy], ax = cross(d, d2), sa = len(ax);
+    if (sa < 1e-9) break;
+    const ang = Math.atan2(sa, dot(d, d2)), u = times(ax, 1 / sa), sn = Math.sin(ang / 2);
     out = mul([u[0] * sn, u[1] * sn, u[2] * sn, Math.cos(ang / 2)], out);
   }
   return out;
@@ -447,7 +466,9 @@ export function solve(p, prev = null) {
   const atRoot = v => rot(R0, v);
   // giant arm: the glaive grip point gH and orientation glv (root frame); the fist's X runs along the shaft, its +Y toward
   // the arm root; IK root -> wrist with the elbow pole gPole
-  const gq = groundBlade(add(atRoot(p.gH), [0, p.pos[1], 0]), mul(R0, p.glv), G_ENDS), shaft = rot(gq, [0, 1, 0]);
+  // (the float bob, applied below, is counted: the blade never dips into the floor at the bottom of the bob)
+  const bobY = .2 * Math.sin((p.ph || 0) * 2 * Math.PI) * p.tBob;
+  const gq = groundHull(add(atRoot(p.gH), [0, p.pos[1] + bobY, 0]), mul(R0, p.glv)), shaft = rot(gq, [0, 1, 0]);
   const gH = atRoot(p.gH), gRoot = atRoot(SK.gRoot);
   // the fist's +Y (toward the wrist) turns toward the arm root, kept continuous across frames (no one-tick roll flips)
   const up = steadyPerp(sub(gRoot, gH), shaft, prev && prev.gUp, [0, 1, 0]);
@@ -482,7 +503,7 @@ export function solve(p, prev = null) {
     for (const v of Object.values(o)) { v.t = add(c, times(sub(v.t, c), p.vis)); v.s = times(v.s, p.vis); }
   }
   o.aura.t = [o.aura.t[0], 0, o.aura.t[2]];                // the guard ring stays on the floor
-  for (const g of ['gaunt_l', 'gaunt_r']) o[g].t = [o[g].t[0], Math.max(o[g].t[1], .58), o[g].t[2]];   // gauntlets >= 0.3 b clear
+  for (const g of ['gaunt_l', 'gaunt_r']) o[g].t = [o[g].t[0], Math.max(o[g].t[1], GAUNT_MIN), o[g].t[2]];   // gauntlets >= 0.3 b clear
   Object.defineProperty(o, '_grip', {value: add(add(grip.right, p.pos), bob), enumerable: false});
   Object.defineProperty(o, '_prev', {value: {gUp: up, gV: sol.v}, enumerable: false});
   return o;
