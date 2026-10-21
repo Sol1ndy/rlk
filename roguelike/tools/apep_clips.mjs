@@ -1,4 +1,4 @@
-// Clips of the 아펩의 오아시스 파수꾼 rig (stage AP-RC1, clips v1): DEFAULT_POSE (= the CROUCH stance, the bind pose), the
+// Clips of the 아펩의 오아시스 파수꾼 rig (stage AP-RC2, clips v2): DEFAULT_POSE (= the CROUCH stance, the bind pose), the
 // two stance rest poses (STANCES, frozen with the skeleton), the binding clip table of ap_contract.md §0.4.10 (names,
 // lengths, authored lengths, RETIME knots, events, hidden spans, stances, px sets, look / hand events, yaw knots, required
 // anchors and tracks: CLIP_TABLE, copied from the AP-SPEC stub, never re-ticked without a change note), the pose library
@@ -87,6 +87,10 @@ export const STANCE_FORM_REF = {CROUCH: 'p1', UPRIGHT: 'p3'};
   const oU = solve(STANCES.UPRIGHT), hf = {};
   for (const s of SIDES) for (const L of LIMBS) hf[`hf_${L}_${s}`] = eulerOf(oU[`${L}_hand_${s}`].R);
   STANCES.CRAWL = {...structuredClone(STANCES.CROUCH), ...hf};
+  // the crawl hair (AP-RC2): the P3 strands swept back and out off the B forearms and curl hands they hung through in
+  // the CROUCH hair pose (R3 open item; hair edges through the B / C arm faces 1742 -> 0 per side, fewer through the
+  // hood and chest, the strand tips 0.23 b above the water at rest and no new dips in the clips that leave the crawl)
+  Object.assign(STANCES.CRAWL, {hair_l_1: [-16, 0, -15], hair_l_2: [-40, 0, 10], hair_r_1: [-16, 0, 15], hair_r_2: [-40, 0, -10]});
   // UPRIGHT keeps its FK arms (ik 0); its IK targets are set to its own FK wrists and its hand eulers to the crawl's, so
   // a stance blend lerps the targets wrist to wrist and the hands keep one world orientation (nothing changes at rest)
   for (const s of SIDES) for (const L of LIMBS) STANCES.UPRIGHT[`tg_${L}_${s}`] = oU[`${L}_hand_${s}`].t.slice();
@@ -259,7 +263,8 @@ function guardChain(p, {ax, sg, y, counter}, bones, nearest, ref, form, along = 
 // PROBE holds a few model extremes per part (left side; the right mirrors) and form in BIND space (carry() places them):
 // farthest-point samples of the R3 model corners from the joint plus the lowest corners at the reference stance
 // (rigwork/rc2/tools/probes.mjs; re-derive after a geometry change). PROBE_YM is each part's model floor (its rest low
-// less 0.05, at most -0.08; -0.15 for the hair, cloth lying on the ground). The clip assembly lifts the body (pelT y, at most BODY_LIFT) when the hull / sheath probes
+// less 0.05, at most -0.08; the hair -0.5 / -0.3: cloth may lie in the water, a drape held out flat reads worse). The clip
+// assembly lifts the body (pelT y, at most BODY_LIFT) when the hull / sheath probes
 // dip under BODY_YM, turns the hem and hair chains (floorGuard with the form) and raises an IK leg's wrist (at most
 // LEG_LIFT) when its lower-leg flare dips under its floor.
 const PROBE = {
@@ -286,8 +291,8 @@ const PROBE = {
   },
 };
 const PROBE_YM = {
-  p1: {hair_l_1: -.15, hair_l_2: -.15, hem_a: -.08, hem_b: -.08, b_lo_l: -.09, c_lo_l: -.09},
-  p3: {hair_l_1: -.15, hair_l_2: -.15, hem_a: -.08, hem_b: -.43, b_lo_l: -.15, c_lo_l: -.08},
+  p1: {hair_l_1: -.5, hair_l_2: -.5, hem_a: -.08, hem_b: -.08, b_lo_l: -.09, c_lo_l: -.09},
+  p3: {hair_l_1: -.3, hair_l_2: -.3, hem_a: -.08, hem_b: -.43, b_lo_l: -.15, c_lo_l: -.08},
 };
 const BODY_PROBE = {p1: ['chest', 'shoulders', 'abdomen'], p3: ['tail_1', 'abdomen']}, BODY_YM = -.12, BODY_LIFT = .45, LEG_LIFT = .12;
 // the floor envelope's rate: degrees (chain turns) and blocks (body height, leg wrists) per tick
@@ -434,7 +439,7 @@ const DOUBLE_SLAM = def('DOUBLE_SLAM', P(C0, {pelT: [0, -.3, -.8], pelvis: [-15,
 const TWIST = def('TWIST', P(C0, {pelT: [0, -.3, 0], pelvis: [-3, -8, 0], chest: [0, -18, 0], shoulders: [0, -8, 0], ...tg('a', 5.0, 1.2, 1.4, Z), ...tgR('a', -3.6, 1.2, -4.6, Z)}));
 const SPIN_OUT = def('SPIN_OUT', P(C0, {pelT: [0, -.25, 0], chest: [0, 10, 0], ...tg('a', 6.0, 1.0, -.6, Z), ...tg('b', 3.4, .9, -2.6, Z), tSweep: 25, mantle_l_a: [0, 0, 30]}));
 const TALLEST = def('TALLEST', P(C0, {...rear(1.0, {head: -15, y: 1.0, lean: -6}), ...tg('a', 4.4, 8.6, -.6, Z), ...tg('b', 2.6, 7.2, -1.6, Z), ...tg('c', 2.7, .4, .6)}));
-const SLAM_FAR = def('SLAM_FAR', P(C0, {pelT: [0, -.3, -1.6], pelvis: [-22, 0, 0], chest: [-12, 0, 0], neck: [10, 0, 0], head: [12, 0, 0],
+const SLAM_FAR = def('SLAM_FAR', P(C0, {pelT: [0, -.3, -1.6], pelvis: [-22, 0, 0], chest: [-12, 0, 0], neck: [10, 0, 0], head: [12, 0, 0], tail_1: [17, 0, 0],
   ...tg('a', 2.2, A_PLANT, -6.2), ...tg('b', 1.6, .4, -5.2), ...tg('c', 2.9, .4, 1.8)}));
 const STAGGER = def('STAGGER', P(C0, {pelT: [0, -.35, .2], pelvis: [-3, 0, -6], chest: [-4, 0, -4], neck: [18, 0, 0], head: [14, 0, 0], ...tg('a', 4.6, .6, -2.0)}));
 const STAGGER2 = def('STAGGER2', P(STAGGER, {pelvis: [-4, 0, 7], chest: [-5, 0, 4]}));
@@ -667,14 +672,15 @@ export const CLIP_KEYS = {
   hands: () => [K(0, CROUCH), K(5, SPREAD, 'o'), K(16, SWIRL), K(24, SWIRL2), K(27, OVERHEAD, 'io'), K(30, PLUNGE, 'i'), K(36, PLUNGE_DEEP, 'o'), K(60, PLUNGE_DEEP),
     ...[62, 69, 75, 82].flatMap(s => [K(s, PLUNGE_DIP, 'i'), K(s + 3, PLUNGE_DEEP, 'o')]), K(100, CROSS, 'io'), K(108, CROSS_PULL), K(118, FLOWER, 'o'), K(124, FLOWER),
     K(134, CROUCH_LOW, 'i'), K(140, CROUCH, 'o')],
-  // 발광하는 파수꾼 (v1 34.60): arms lift, coil into the spiral column (36), slam 1 (47), re-rear, slam 2 (70), leap (77),
+  // 발광하는 파수꾼 (v1 34.60): arms lift, coil into the spiral column (36), slam 1 (47), re-rear straight out of the slam
+  // (52-65: readable 18 t before slam 2, plan §14 10-20 rule), slam 2 (70), leap (77),
   // apex (83), head-first dive (90), slam 3 (101), settle
-  glow_slams: () => [K(0, CROUCH), K(9, ARMS_LIFT, 'o'), K(23, COIL), K(36, COLUMN, 'o'), K(42, COLUMN2), K(45, COLUMN_REL, 'o'), K(47, SLAM, 'i'), K(52, SLAM), K(60, CROUCH, 'io'), K(65, REAR, 'o'),
+  glow_slams: () => [K(0, CROUCH), K(9, ARMS_LIFT, 'o'), K(23, COIL), K(36, COLUMN, 'o'), K(42, COLUMN2), K(45, COLUMN_REL, 'o'), K(47, SLAM, 'i'), K(52, SLAM), K(57, HALF, 'io'), K(65, ARMSUP, 'o'),
     K(70, SLAM, 'i'), K(73, SLAM), K(75, CROUCH_LOAD, 'io'), K(77, LEAP_UP, 'o'), K(83, AIR, 'o'), K(90, AIR), K(97, DIVEDOWN, 'i'), K(101, SLAM, 'i'), K(108, SLAM),
     K(121, CROUCH, 'o'), K(131, CROUCH)],
   // 초목이 시든 풍경 (v2 6.75): from the hooded figure, arms up 0-8, rears over the player, sways while the disc fills,
   // crashes sideways at 40, spins on the ground 47-71 (the anchor), sprawls, pushes up, stands
-  rotation: () => [K(0, HOODED), K(8, ARMSUP, 'o'), K(18, LEAN, 'o'), K(26, LEAN_L), K(33, LEAN_R), K(39, LEAN), K(44, CRASH, 'i'), K(47, CRASH), K(59, CRASH_B), K(71, CRASH),
+  rotation: () => [K(0, HOODED), K(8, ARMSUP, 'o'), K(18, LEAN, 'o'), K(26, LEAN_L), K(32, LEAN_R), K(36, LEAN), K(40, CRASH, 'i'), K(47, CRASH), K(59, CRASH_B), K(71, CRASH),
     K(80, SPRAWL, 'o'), K(92, PUSHUP), K(100, HALF, 'o'), K(115, CROUCH), K(130, CROUCH)],
   // 생명의 꼬리 x2 (v2 15.73): brace, the tail rises into an S, cocks to the left (23), swing 1 28-35 (the anchor turns
   // +200: the tail lags, then whips through), recoil, cock to the right (48), swing 2 52-59 (reverse), sprawl, rise
@@ -1023,7 +1029,7 @@ export const CLIPS_REAL = CLIP_TABLE.map(t => {
   if (c.form === 'p1') c.hand_events = autoHands(c, c.keys);
   if (EXTRA_HANDS[c.name]) c.hand_events = [...EXTRA_HANDS[c.name], ...(c.hand_events || [])].sort((x, y) => x[0] - y[0]);
   for (const ev of c.hand_events || []) if (ev[0] < 0 || ev[0] > c.len) throw new Error(`clip ${c.name}: hand event ${ev} outside the clip`);
-  c.note = `AP-RC1 keys ${c.keys.map(k => k[0]).join(' ')}`;
+  c.note = `AP-RC2 keys ${c.keys.map(k => k[0]).join(' ')}`;
   return c;
 });
 
