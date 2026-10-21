@@ -239,7 +239,13 @@ def emit_mstrike(g, p):
 SH = 'shells'
 Q3 = dict(ring=ev(SH, 'ring'), lit=ev(SH, 'lit'), lock1=ev(SH, 'lock1'), launch=ev(SH, 'launch'), hit1=ev(SH, 'hit1'),
           cool=ev(SH, 'cool'), lock2=ev(SH, 'lock2'), lock3=ev(SH, 'lock3'), hit2=ev(SH, 'hit2'), hit3=ev(SH, 'hit3'),
-          end=A.clip_len(SH), lag=6, every=2, r1=3.6, r23=3.0, lead2=8, hover=10.0, streak=6, release=97)
+          end=A.clip_len(SH), lag=6, every=2, r1=3.6, r23=3.0, lead2=8, hover=5.0, slide=4, low=0.3, streak=6, release=97)
+# AP-FIX RV-02: shells 2 / 3 (none rows) read from their lock: the q3_lock sound at the point, the shell slides from its
+# hover over the boss to 5 b over the point (4 t, inside the shoulder camera's view, was 10 b), then falls onto it (9 t,
+# the streak trail from where it is 6 t before the hit); 14 t from the lock to the hit.
+_t23 = Q3['hit2'] - Q3['lock2']
+assert _t23 == Q3['hit3'] - Q3['lock3']
+Q3['streak_h'] = round(Q3['hover'] - (Q3['hover'] - Q3['low']) * (_t23 - Q3['streak'] - Q3['slide']) / (_t23 - 1 - Q3['slide']), 1)
 Q3['tell1'] = Q3['hit1'] - Q3['lock1']                      # 12
 Q3['tell2'] = Q3['hit2'] - Q3['lock2']                      # 14
 Q3['tell3'] = Q3['hit3'] - Q3['lock3']                      # 14
@@ -279,9 +285,12 @@ def emit_shells(g, p):
           f'execute at {m1(L1)} run {K.fx("spores")}', f'execute at {m1(L1)} run {K.snd("q3_impact1")}')
     tl.at(Q3['lock2'], g.fn(f'p/{key}/lock2'))
     tl.at(Q3['lock3'], g.fn(f'p/{key}/lock3'))
-    for k, (lk, hit) in enumerate(((L2, Q3['hit2']), (L3, Q3['hit3'])), start=2):
-        tl.at(hit - Q3['streak'], f'kill {dsel(SHELL + str(k))}',
-              f'execute at {m1(lk)} run {K.fx("shell_streak", h=Q3["hover"])}')
+    for k, (lk, lck, hit) in enumerate(((L2, Q3['lock2'], Q3['hit2']), (L3, Q3['lock3'], Q3['hit3'])), start=2):
+        fall = (hit - 1) - (lck + Q3['slide'])
+        tl.at(lck + Q3['slide'], f'execute as {dsel(SHELL + str(k))} run data merge entity @s {{teleport_duration:{fall}}}',
+              f'execute at {m1(lk)} positioned ~ ~{num(Q3["low"])} ~ as {dsel(SHELL + str(k))} run tp @s ~ ~ ~')
+        tl.at(hit - Q3['streak'], f'execute at {m1(lk)} run {K.fx("shell_streak", h=Q3["streak_h"])}')
+        tl.at(hit - 1, f'kill {dsel(SHELL + str(k))}')
         tl.at(hit, f'execute at {m1(lk)} run {K.fx("shell_burst")}', f'execute at {m1(lk)} run {K.snd("q3_impact2")}')
     tl.at(Q3['release'], Gen.release())
     g.pw(key, 'ring_on', ['# t10: the target ring (keep row: the pale disc the footage shows under the player) at the feet of 6 t',
@@ -313,12 +322,13 @@ def emit_shells(g, p):
     for k, (lk, lockl, tell) in enumerate(((L2, Gen.lockv(Q3['lead2']), Q3['tell2']), (L3, [Gen.lockp()], Q3['tell3'])), start=2):
         lines = [f'# t{Q3["lock" + str(k)]}: lock {k} ({"lockv lead 8" if k == 2 else "lockp"}); shell {k} r {Q3["r23"]} (tell {tell}, '
                  f'{A.DMG["q3_23"]} %), quiet (none row);',
-                 '# the hovering shell moves over its point (10 b up) and stays there to the streak.',
-                 *lockl, *Gen.keep(lk)]
+                 f'# the q3_lock sound at the point; the hovering shell slides to {num(Q3["hover"])} b over it ({Q3["slide"]} t), then falls onto it',
+                 f'# (AP-FIX RV-02: the readable cue {tell} t before the hit, no floor decal).',
+                 *lockl, *Gen.keep(lk), f'execute at {m1(lk)} run {K.snd("q3_lock")}']
         if k == 2:
             lines += [Gen.GRP_NEW, f'scoreboard players operation #apq{pid}G mb = #mbGrp mb']
         lines += [f'execute at {m1(lk)} run {g.fn(f"p/{key}/hz{k}")}',
-                  f'execute as {dsel(SHELL + str(k))} run data merge entity @s {{teleport_duration:3}}',
+                  f'execute as {dsel(SHELL + str(k))} run data merge entity @s {{teleport_duration:{Q3["slide"]}}}',
                   f'execute at {m1(lk)} positioned ~ ~{num(Q3["hover"])} ~ as {dsel(SHELL + str(k))} run tp @s ~ ~ ~']
         g.pw(key, f'lock{k}', lines)
         g.pw(key, f'hz{k}', [*Gen.hz_opts(), f'scoreboard players operation #hzGrp mb = #apq{pid}G mb',
@@ -422,7 +432,7 @@ def emit_surface(g, p):
 TP = 'tail_p3'
 Q4 = dict(crouch=A.clip_len('crouch_p3'), walk=A.P3_WALK['max'], walk_spd=A.P3_WALK['spd'], far=A.Q4_FAR,
           cock=ev(TP, 'cock'), s1=ev(TP, 'swing1'), coil=ev(TP, 'coil'), s2=ev(TP, 'swing2'), end=A.clip_len(TP),
-          lane1=2, lane2=32, lunge=(36, 40), reach=12.0, y1_1=3.0, y1_2=2.0, tip=11, shower=53, release=54)
+          lane1=2, lane2=32, lunge=(36, 40), lunge_gap=4.0, reach=12.0, y1_1=3.0, y1_2=2.0, tip=11, shower=53, release=54)
 assert (Q4['cock'], Q4['s1'], Q4['coil'], Q4['s2'], Q4['end'], Q4['crouch']) == (3, 14, 36, 46, 87, 8), Q4
 SW1 = A.wedges(TP, Q4['s1'], Q4['s1'] + 7, Q4['reach'], swept=True)     # 8 wedges t14-21 (swept: RP1-3, AP-I2)
 SW2 = A.wedges(TP, Q4['s2'], Q4['s2'] + 7, Q4['reach'], swept=True)     # 8 wedges t46-53 (reverse)
@@ -483,18 +493,20 @@ def emit_tail3(g, p):
             g.pw(key, f'{name}_{w["t"]}', hz(L.hz_sector(Q4['reach'], half_angle(w), w['t'] - made, A.DMG[dmg]), tag=f'{T_}h',
                                             grp=True, y1=y1, kb=KB4, kbdir=0))
         g.pw(key, name, lines)
-    g.pw(key, 'lunge_pt', [
-        '# t32: the lunge end E (3.5 b toward the player, shorter when the player is closer; clamp r 16) and the swing-2',
-        '# frame there (the start facing kept: the wedges of swing 2 are where the body will stand).',
-        f'kill {mall(EK)}', f'kill {mall(FR2)}', f'execute at @s run {marker(pid, EK)}',
-        f'execute at @s if entity {near(PLAYER, 99)} unless entity {near(PLAYER, 5.5)} as {m1(EK)} at @s facing entity {PLAYER} feet '
-        'rotated ~ 0 run tp @s ^ ^ ^3.5',
-        f'execute at @s if entity {near(PLAYER, 5.5)} unless entity {near(PLAYER, 4.5)} as {m1(EK)} at @s facing entity {PLAYER} feet '
-        'rotated ~ 0 run tp @s ^ ^ ^2.5',
-        f'execute at @s if entity {near(PLAYER, 4.5)} unless entity {near(PLAYER, 3.5)} as {m1(EK)} at @s facing entity {PLAYER} feet '
-        'rotated ~ 0 run tp @s ^ ^ ^1.5',
-        f'execute as {m1(EK)} run {Gen.clamp("glide")}',
-        f'execute at {m1(EK)} run {marker(pid, FR2)}', f'execute as {m1(FR2)} at @s rotated as {m1(FR)} run tp @s ~ ~ ~ ~ 0'])
+    lunge = [f'# t32: the lunge end E toward the player, {Q4["lunge_gap"]} b short of it (AP-FIX RV-01: the swing-2 lane starts about',
+             '# 3 b out from the tail root, so a player the lunge reached would stand inside the body; 0.5-b steps, at most 3.5 b;',
+             '# clamp r 16), and the swing-2 frame there (the start facing kept: the wedges of swing 2 are where the body will stand).',
+             f'kill {mall(EK)}', f'kill {mall(FR2)}', f'execute at @s run {marker(pid, EK)}']
+    gap = Q4['lunge_gap']
+    for i in range(7):                      # L = 3.5, 3.0, ..., 0.5 for d in (gap + L, gap + L + 0.5]; d > gap + 3.5 -> 3.5
+        L_ = 3.5 - 0.5 * i
+        lo = gap + L_
+        hi = 99 if i == 0 else lo + 0.5
+        lunge.append(f'execute at @s if entity {near(PLAYER, hi)} unless entity {near(PLAYER, lo)} as {m1(EK)} at @s facing entity '
+                     f'{PLAYER} feet rotated ~ 0 run tp @s ^ ^ ^{num(L_, 1)}')
+    lunge += [f'execute as {m1(EK)} run {Gen.clamp("glide")}',
+              f'execute at {m1(EK)} run {marker(pid, FR2)}', f'execute as {m1(FR2)} at @s rotated as {m1(FR)} run tp @s ~ ~ ~ ~ 0']
+    g.pw(key, 'lunge_pt', lunge)
     o = f'#apq{pid}O'
     walk_on = f'execute if score #apq{pid} mb matches 1'
     start = [f'# {p.label} ({p.key}, id {pid}; plan 8.3 Q4): crouch_p3 (the core plays it at 0), the walk opener when the player',

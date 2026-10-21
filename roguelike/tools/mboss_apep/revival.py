@@ -55,7 +55,7 @@ T1 = dict(chunks=(20, 30), park=45, cradle=45, lower=50, drop=100, land=100 + A.
 assert T1['land'] == 106 and T1['marks'] + 20 == T1['end'], T1
 # the failure strike (plan 3.4) and the CS (plan 7.7)
 FAIL = dict(strike=20, end=A.FAIL_LEN)
-CS = dict(white=24, cradle_gone=30, revival=32, ember=64, green=76, flash=80, burst=92, reveal=132, targetable=150,
+CS = dict(white=24, cradle_gone=30, revival=32, ember=64, green=76, flash=A.CS_HEAL_T, burst=92, reveal=132, targetable=150,
           end=A.CS_LEN, whiteout_hold=28)
 TWIG = A.EMBER_TWIG
 EMBER_LEN = math.dist(TWIG[:3], (CX, CY + EGG_CS_Y, CZ))
@@ -323,9 +323,14 @@ def emit(g):
         F('org/burst_all'), F('org/clear'), F('wall/clear'), Gen.svc('lib_clear'),
         f'function {NS}om/heart/play/heart_wither',
         f'execute {AT_CEN} run {fx("shock_ring")}', f'execute {AT_CEN} run {snd("fail_strike")}',
-        K.hud('title', g='fail', t=T['fail_title'], c=A.WARN_HEX, s=T['fail_line'], hold=50),
-        Gen.line(T['fail_line'], A.WARN_HEX, 80), Gen.set_len(A.FAIL_LEN),
+        f'execute if score #apq40L mb matches 0 run {F("p/fail/warn")}',
+        f'execute if score #apq40L mb matches 1 run {K.hud("title", g="fail", t=T["fail_title"], c=A.WARN_HEX, s="", hold=50)}',
+        Gen.set_len(A.FAIL_LEN),
         f'execute if score #apq40L mb matches 1 run {Gen.svc("lose")}'])
+    g.pw('fail', 'warn', [HEAD, '# Strike 1 only: the title with the instant-kill warning and the red line (the lose shows 「소생 실패」 alone;',
+                          '# AP-FIX RV-09).',
+                          K.hud('title', g='fail', t=T['fail_title'], c=A.WARN_HEX, s=T['fail_line'], hold=50),
+                          Gen.line(T['fail_line'], A.WARN_HEX, 80)])
     g.pw('fail', 'strike', [HEAD, '# The wither: 25 % max HP, non-lethal, undodgeable (a DoT), no player-side reaction.',
                             'scoreboard players set #mbNoRx mb 1', *Gen.pl_dot(A.DMG_PM['fail1'], 7, 0)])
     g.pw('fail', 'restart', [HEAD, '# The stage again: 2700, wave 1, the clocks and the time-out reset; the Heart back to its idle look.',
@@ -343,7 +348,7 @@ def emit(g):
     cs = [Gen.at(t, f'execute {AT_BULB} run {fx("gold_drip")}') for t in range(3, CS['white'] + 1, 3)]
     cs += [Gen.at(CS['white'], F('p/cs/white')), Gen.at(CS['white'], f'function {NS}om/heart/play/heart_lift'),
            Gen.at(CS['cradle_gone'], F('p/cs/cradle_gone')),
-           Gen.at(CS['revival'], Gen.play('revival')),
+           Gen.at(CS['revival'], F('p/cs/rise')),
            Gen.at(CS['ember'], f'execute positioned {n(TWIG[0])} {n(TWIG[1])} {n(TWIG[2])} facing {n(CX)} {n(CY + EGG_CS_Y)} {n(CZ)} run '
                   f'{fx("ember_arc", len=round(EMBER_LEN, 1), h=3.0)}'),
            Gen.at(CS['ember'], f'execute positioned {n(TWIG[0])} {n(TWIG[1])} {n(TWIG[2])} run {snd("cs_ember")}'),
@@ -361,7 +366,8 @@ def emit(g):
         HEAD, '# The CS (plan 7.7, 192 t): the progress is full: every organism wilts (the green pulse ring; no progress), walls and',
         '# libraries cleared, cine; the success line; the Heart blazes (0-24, gold dripping), then lifts out of the cradle (heart_lift);',
         f'# t{CS["white"]} the white-out ({CS["whiteout_hold"]} t held): the lush arena, the body unparked (hidden), the phase-3 pool, the p3 look',
-        f'# UPRIGHT, the push ring; t{CS["cradle_gone"]} the cradle gone; t{CS["revival"]} the rig revival (hidden to t92); t{CS["ember"]} the 「불씨」 ember;',
+        f'# UPRIGHT (the rig stays parked), the push ring; t{CS["cradle_gone"]} the cradle gone; t{CS["revival"]} the body unparked with the rig',
+        f'# revival in the same tick (hidden to t92; AP-FIX RV-07); t{CS["ember"]} the 「불씨」 ember;',
         f'# t{CS["green"]} the egg turns green in the wrapping hand; t{CS["flash"]} the green flash + the 25 % heal; t{CS["burst"]} the Warden bursts out',
         f'# (the orb fades into it); t{CS["reveal"]} the phase-3 title + music 3; t{CS["targetable"]} cine off; t{CS["end"]} phase 3.',
         Gen.svc('phase_cs'), sc('#apStage', 0), F('org/burst_all'), F('org/clear'), F('wall/clear'), Gen.svc('lib_clear'),
@@ -369,11 +375,25 @@ def emit(g):
         K.hud('title', g='success', t=T['cs_done'], c=A.HEART_HEX, s='', hold=14),
         f'execute {AT_CEN} run {fx("wilt_ring")}', f'execute {AT_CEN} run {snd("cs_complete")}',
         f'function {NS}om/heart/play/heart_blaze', Gen.set_len(A.CS_LEN)])
-    g.pw('cs', 'white', [HEAD, f'# t{CS["white"]} the white-out: the lush arena + props, the dressing gone, the stage markers gone, the body unparked',
-                         '# at the centre (hidden), the phase-3 pool, the p3 look UPRIGHT, the push ring (8 -> 12 b).',
+    g.pw('cs', 'white', [HEAD, f'# t{CS["white"]} the white-out: the lush arena + props, the dressing gone, the stage markers gone, the phase-3',
+                         f'# pool, the push ring (8 -> 12 b). The body and its rig stay parked until t{CS["revival"]} (p/cs/rise; AP-FIX RV-07: an',
+                         '# unparked rig would stand in full view while the white fades in).',
                          K.hud('whiteout', hold=CS['whiteout_hold']), K.dress('clear'), Gen.svc('arena_lush'), F('org/marks_kill'),
-                         Gen.svc('unpark'), Gen.svc('repool_p3'), Gen.svc('look_p3'),
-                         f'execute as {BODY} run function {A.rig_fn("stance/upright")}', Gen.svc('push_ring_cs')])
+                         Gen.svc('repool_p3'), Gen.svc('push_ring_cs')])
+    g.pw('cs', 'rise', [HEAD, f'# t{CS["revival"]}: the body unparked at the centre, the p3 look UPRIGHT and the rig revival clip in the same tick',
+                        '# (the clip hides every part from its key 0, so the unparked pose is never shown; AP-FIX RV-07).',
+                        Gen.svc('unpark'), Gen.svc('look_p3'), f'execute as {BODY} run function {A.rig_fn("stance/upright")}',
+                        Gen.play('revival')])
+    # AP-FIX RV-10: a pause in the CS drops the title overlay (core pause: hud/flash_end); the resume re-sends the white-out
+    # with the ticks left (white held to t{white + 4 + hold}, then the 8-t fade) and the green flash while it runs.
+    wo_end = CS['white'] + 4 + CS['whiteout_hold']
+    cs_resume = [HEAD, f'# Resume in the CS (AP-FIX RV-10): the white-out again with the ticks left (white to t{wo_end}, fade to t{wo_end + 8}),',
+                 f'# the green flash at t{CS["flash"]}..{CS["flash"] + 3}.']
+    for t in range(CS['white'], wo_end):
+        cs_resume.append(f'execute if score #apPT mb matches {t} run return run {K.hud("whiteout", hold=max(1, wo_end - 4 - t))}')
+    cs_resume.append(f'execute if score #apPT mb matches {wo_end}..{wo_end + 7} run return run {K.hud("whiteout", hold=1)}')
+    cs_resume.append(f'execute if score #apPT mb matches {CS["flash"]}..{CS["flash"] + 3} run return run {K.hud("flash_green")}')
+    g.pw('cs', 'resume', cs_resume)
     g.pw('cs', 'cradle_gone', [HEAD, '# Under the white: the cradle, the arms and the sprouts go (the egg hangs in the vine hand from here).']
          + [f'kill {UU[d]}' for d in ('heart_cradle', 'heart_arms', 'heart_tips')])
     g.pw('cs', 'green', [HEAD, f'# t{CS["green"]}: the vine hand wraps the egg; it turns green.',

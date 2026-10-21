@@ -11,7 +11,7 @@ execute if score #apPT mb matches 24 run execute positioned 440 202.6 8 run func
 execute if score #apPT mb matches 24 run function rlk:boss/apep/p/cs/white
 execute if score #apPT mb matches 24 run function rlk:boss/apep/om/heart/play/heart_lift
 execute if score #apPT mb matches 30 run function rlk:boss/apep/p/cs/cradle_gone
-execute if score #apPT mb matches 32 run function rlk:boss/apep/play/revival
+execute if score #apPT mb matches 32 run function rlk:boss/apep/p/cs/rise
 execute if score #apPT mb matches 64 run execute positioned 432.6 203.5 -19.6 facing 440 212.2 8 run function rlk:boss/apep/fx/p/ember_arc {len:299,h:30}
 execute if score #apPT mb matches 64 run execute positioned 432.6 203.5 -19.6 run function rlk:boss/apep/fx/snd/cs_ember
 execute if score #apPT mb matches 76 run function rlk:boss/apep/p/cs/green

@@ -2,7 +2,8 @@
 # The CS (plan 7.7, 192 t): the progress is full: every organism wilts (the green pulse ring; no progress), walls and
 # libraries cleared, cine; the success line; the Heart blazes (0-24, gold dripping), then lifts out of the cradle (heart_lift);
 # t24 the white-out (28 t held): the lush arena, the body unparked (hidden), the phase-3 pool, the p3 look
-# UPRIGHT, the push ring; t30 the cradle gone; t32 the rig revival (hidden to t92); t64 the 「불씨」 ember;
+# UPRIGHT (the rig stays parked), the push ring; t30 the cradle gone; t32 the body unparked with the rig
+# revival in the same tick (hidden to t92; AP-FIX RV-07); t64 the 「불씨」 ember;
 # t76 the egg turns green in the wrapping hand; t80 the green flash + the 25 % heal; t92 the Warden bursts out
 # (the orb fades into it); t132 the phase-3 title + music 3; t150 cine off; t192 phase 3.
 function rlk:boss/apep/svc/phase_cs

@@ -15,7 +15,7 @@ function rlk:boss/apep/svc/lib_clear
 function rlk:boss/apep/om/heart/play/heart_wither
 execute positioned 440 201 8 run function rlk:boss/apep/fx/p/shock_ring
 execute positioned 440 201 8 run function rlk:boss/apep/fx/snd/fail_strike
-function rlk:boss/apep/fx/hud/title {g:"fail",t:"「소생 실패」",c:"#C36E5A",s:"다시 한 번 실패하면 쓰러집니다",hold:50}
-function rlk:mboss/line/say {t:"다시 한 번 실패하면 쓰러집니다",c:"#C36E5A",gap:2,hold:80,snd:2}
+execute if score #apq40L mb matches 0 run function rlk:boss/apep/p/fail/warn
+execute if score #apq40L mb matches 1 run function rlk:boss/apep/fx/hud/title {g:"fail",t:"「소생 실패」",c:"#C36E5A",s:"",hold:50}
 scoreboard players set #apPLen mb 60
 execute if score #apq40L mb matches 1 run function rlk:boss/apep/svc/lose
