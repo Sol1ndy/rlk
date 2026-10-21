@@ -198,6 +198,7 @@ w('init', '\n'.join(
        'execute unless score #mbHealAmt mb matches 0.. run scoreboard players set #mbHealAmt mb 0',
        'execute unless score #mbGrpN mb matches 0.. run scoreboard players set #mbGrpN mb 0',
        'execute unless score #mbGrpL mb matches 0.. run scoreboard players set #mbGrpL mb 0',
+       'execute unless score #mbGrpL2 mb matches 0.. run scoreboard players set #mbGrpL2 mb 0',
        '# Low gravity requested by the running module (#mbLowG 1; mboss/main clears it every tick, the module tick sets it',
        '# again; rlk:tick syncs the attribute modifiers through mboss/lowg_on|off). Hazard re-arm clock (hz/all).',
        'execute unless score #mbLowG mb matches 0..1 run scoreboard players set #mbLowG mb 0',
@@ -1584,6 +1585,8 @@ scoreboard players set @s mbHzT -1
 scoreboard players set @s mbHzHit 0
 # a member made after its volley group already landed its hit is harmless from the start (#mbGrpL, grp_mark)
 execute if score @s mbHzG matches 1.. if score @s mbHzG = #mbGrpL mb run scoreboard players set @s mbHzHit 1
+# ... also when a #hzRearm hazard's hit overwrote #mbGrpL since (#mbGrpL2 = the last group landed by a one-shot hit)
+execute if score @s mbHzG matches 1.. if score @s mbHzG = #mbGrpL2 mb run scoreboard players set @s mbHzHit 1
 scoreboard players operation @s mbHzL = @s mbHzW
 scoreboard players operation @s mbHzL += @s mbHzA
 scoreboard players operation @s mbHzL += #hzLinger mb
@@ -2046,6 +2049,7 @@ scoreboard players operation @s mbPjG = #pjGrp mb
 scoreboard players operation @s mbPjND = #pjNoDodge mb
 scoreboard players operation @s mbPjNR = #pjNR mb
 execute if score @s mbPjG matches 1.. if score @s mbPjG = #mbGrpL mb run scoreboard players set @s mbPjHit 1
+execute if score @s mbPjG matches 1.. if score @s mbPjG = #mbGrpL2 mb run scoreboard players set @s mbPjHit 1
 execute if score @s mbPjR matches 41.. run scoreboard players set @s mbPjR 40
 execute if score @s mbPjR matches ..0 run scoreboard players set @s mbPjR 1
 tp @s ~ ~ ~ ~ ~
@@ -2118,7 +2122,10 @@ w('grp_mark', '''
 # #g mb = a volley group that just landed a hit: its hazards and props stop testing for hits (the strike
 # visuals and the flights go on). #mbGrpL remembers it, so a member made later (hz/init, pj/launch) starts harmless:
 # one hit per group even when a member is created after the hit (e.g. a burst made at a prop's life end).
+# #mbGrpL2 is the same for one-shot hits only: a #hzRearm hazard (a lingering field ticking every 10 t) that lands next
+# overwrites #mbGrpL but not #mbGrpL2, so a later member of the earlier one-shot group still starts harmless.
 scoreboard players operation #mbGrpL mb = #g mb
+execute unless score @s mbHzRA matches 1.. run scoreboard players operation #mbGrpL2 mb = #g mb
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzG = #g mb run scoreboard players set @s mbHzHit 1
 # #hzRearm members of the group re-arm together (one hit per re-arm period for the whole group)
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzG = #g mb if score @s mbHzRA matches 1.. run function rlk:mboss/hz/rearm_at
