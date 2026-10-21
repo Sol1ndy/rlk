@@ -3,4 +3,4 @@ execute if score @s rdRigT matches 53.. run return run scoreboard players set @s
 execute if score @s rdRigT matches ..24 run return run function rlk:boss/raiden/rig/c/t_rush/b/0_24
 execute if score @s rdRigT matches ..32 run return run function rlk:boss/raiden/rig/c/t_rush/b/25_32
 execute if score @s rdRigT matches ..39 run return run function rlk:boss/raiden/rig/c/t_rush/b/33_39
-execute if score @s rdRigT matches ..51 run return run function rlk:boss/raiden/rig/c/t_rush/b/40_51
+execute if score @s rdRigT matches ..46 run return run function rlk:boss/raiden/rig/c/t_rush/b/40_46

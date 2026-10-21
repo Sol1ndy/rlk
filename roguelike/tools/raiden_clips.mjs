@@ -56,16 +56,16 @@ const K = (t, pose, ease = 'l') => [t, pose, ease];
 
 // ---- default pose: the Shogun idle with the katana (sword look) --------------------------------------------------------
 const W_IDLE = blade([-.35, -.5, -.79], [0, -1, .3]);          // katana low on her right, tip down and forward near the floor
-const G_IDLE = glaive([-1, -.06, -.12], [0, 1, -.2]);           // glaive across the front at hip height, blade to her right
+const G_IDLE = glaive([-.92, -.3, -.24], [0, .95, -.3]);        // glaive held low across the front, the blade down by the floor on her left
 export const DEFAULT_POSE = {
   pos: [0, 0, 0], rot: [0, 0, 0], torso: [0, 0, 0], head: [-6, 0, 0],
   armL: [2, 0, 7], armR: [10, 0, 9], elbowL: 10, elbowR: 16,
   legL: [0, 0, 3], legR: [-3, 0, 5], kneeL: 0, kneeR: 6,
   braid: [-5, 0, 0], drape: [-3, 0, 0], drapeF: 1, halo: [0, 0, 0], haloS: 1, aura: 0,
   wpn: W_IDLE, wS: 1, wfx: 0, sS: 1, tS: 0, bob: 0, tBob: 0, vis: 1,
-  disc: [0, 0, 0], gH: [-1.6, .78, -1.05], glv: G_IDLE, gPole: [-1, -.35, .25], glvS: 1, gfx: 0,
+  disc: [0, 0, 0], gH: [-2.0, 1.0, -.85], glv: G_IDLE, gPole: [-1, -.9, .2], glvS: 1, gfx: 0,
   rU1: [.45, .85, .22], rF1: [.12, 1, -.12], rU2: [.82, .45, .2], rF2: [.75, .55, -.35], rU3: [.92, -.05, .15], rF3: [.78, .28, -.5],
-  gtL: [.95, -.3, -1.25], gtR: [-.95, -.3, -1.25], gtLe: [-6, 8, -6], gtRe: [-6, 8, -6],
+  gtL: [1.05, -.25, -1.55], gtR: [-1.05, -.25, -1.55], gtLe: [-18, 10, -4], gtRe: [-18, 10, -4],
   form: 's',
 };
 export const DISCRETE = ['form'];
@@ -145,8 +145,8 @@ const PB_C_RL = withBlade(PB_MID, [200, -6], [-90, 0]);                         
 
 // Tenma base: floating core figure, the giant arm holding the glaive across the front, the fan of thin arms
 const T_IDLE = {form: 't', pos: [0, 1, 0], rot: [0, 0, 0], torso: [0, 0, 0], head: [-6, 0, 0], armL: [12, 0, 22], armR: [12, 0, 22], elbowL: 24, elbowR: 24,
-  legL: [10, 0, 4], legR: [4, 0, 4], kneeL: 16, kneeR: 8, braid: [-10, 0, 0], sS: 0, tS: 1, vis: 1, disc: [0, 0, 0], glvS: 1, gfx: 0,
-  gH: [-1.6, .78, -1.05], glv: G_IDLE, gPole: [-1, -.35, .25]};
+  legL: [10, 0, 4], legR: [4, 0, 4], kneeL: 16, kneeR: 8, braid: [-10, 0, 0], sS: 0, tS: 1, vis: 1, disc: [0, 0, 0], glvS: 1, gfx: .45,
+  gH: [-2.0, 1.0, -.85], glv: G_IDLE, gPole: [-1, -.9, .2]};
 // glaive positions
 const G_HIGH_L = glaive([.35, .55, .75], [0, 0, -1]);           // raised high on her left, blade back-up (sweep wind-up)
 const G_FRONT_R = glaive([-1, .05, -.55], [0, 1, 0]);           // swept across to her right-front
@@ -325,7 +325,7 @@ export const CLIPS = [
     note: 'death: recoil 4, kneel 14, slump to 48 (the Tenma parts fall away; the look is kept)'},
   // ---- Tenma ----
   {name: 't_idle', len: 60, loop: true, form: 't', keys: [K(0, {...T_IDLE, tBob: 1}), K(30, {...T_IDLE, tBob: 1, rU1: [.5, .82, .26], rU2: [.85, .42, .24], rF2: [.7, .6, -.3],
-    gH: [-1.6, .84, -1.0], head: [-4, 4, 0], armL: [14, 0, 24], armR: [10, 0, 20]}, 'io'), K(60, {...T_IDLE, tBob: 1}, 'io')], note: 'float bob +-0.2, arm drift'},
+    gH: [-2.0, 1.06, -.8], head: [-4, 4, 0], armL: [14, 0, 24], armR: [10, 0, 20]}, 'io'), K(60, {...T_IDLE, tBob: 1}, 'io')], note: 'float bob +-0.2, arm drift'},
   {name: 't_blink_out', len: 6, form: 't', events: {gone: 4}, keys: [K(0, {}), K(2, {vis: .9, torso: [-10, 0, 0]}), K(4, {vis: 0}, 'i'), K(6, {vis: 0})], note: 'Tenma dissolve, gone 4'},
   {name: 't_blink_in', len: 10, form: 't', events: {appear: 0, settle: 8}, keys: [K(0, {...T_IDLE, vis: 0, torso: [-12, 0, 0]}), K(3, {vis: 1}, 'o'), K(8, {...T_IDLE}, 'io'), K(10, {...T_IDLE})],
     note: 'Tenma reappear (pink streak), settle 8'},
@@ -336,7 +336,7 @@ export const CLIPS = [
     K(42, {...T_IDLE, torso: [0, -16, 0], gH: [-1.7, 2.2, .4], glv: G_COCK, gfx: 1}, 'o'), K(48, {...T_IDLE, torso: [-4, -20, 0], gH: [-1.8, 2.3, .6], glv: G_COCK, gfx: 1}),
     K(50, {...G_THROW_MID, gfx: 1}, 'i'), K(51, {...G_THROW, glvS: 0, gfx: 0}),
     K(54, {...G_THROW, glvS: 0, gfx: 0}, 'o'),
-    K(62, {...T_IDLE, gH: [-1.6, .78, -1.05], glvS: 0}), K(70, {...T_IDLE, glvS: 1}, 'o')],
+    K(62, {...T_IDLE, gH: [-2.0, 1.0, -.85], glvS: 0}), K(70, {...T_IDLE, glvS: 1}, 'o')],
     note: '백안지륜: sweeps across her facing 14 (right to left) / 26 (left to right), cock 42, released 51 (the pattern flies it, landing at the throw event 54; hidden until 62), re-forms 62-70'},
   {name: 't_spin_throw', len: 46, form: 't', events: {glint: 0, spin: 13, throw: 31}, keys: [
     K(0, {...T_IDLE, gfx: .8}), K(5, {...G_BACK, gfx: 1}, 'o'),

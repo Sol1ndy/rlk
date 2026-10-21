@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {paintRaidenTextures, raidenSprites, spriteId, PROP_SPRITES} from './raiden_paint.mjs';
-import {PARTS, PART_NAMES, BODY, TENMA_PARTS, PART_SCALE, allModels, LOOK_MODELS, PROPS, PROP_TINTS, FORMER_ITEMS, solve, toDisplay, modelPoints} from './raiden_geometry.mjs';
+import {PARTS, PART_NAMES, BODY, TENMA_PARTS, PART_SCALE, allModels, LOOK_MODELS, PROPS, PROP_TINTS, FORMER_ITEMS, GHOST, solve, toDisplay, modelPoints} from './raiden_geometry.mjs';
 import {CLIPS, CLIP_BY_NAME, C5, accumulate, sampleClip, restPose, loopStart} from './raiden_clips.mjs';
 import {add, rot, slerp, lerp, qAngle, len, sub} from './mboss_rig_math.mjs';
 import {createRigCompiler, createRigFollow, nbt, written, summonPart, cullOverhang} from './mboss_rig_compile.mjs';
@@ -382,6 +382,14 @@ for (const [kind, P] of Object.entries(PROPS)) {
 }
 fn('prop/clear', ['# Removes every rig prop.', 'kill @e[type=item_display,tag=rlk_rd_prop]']);
 
+// the Tenma puppet's rest outline for the blink silhouettes (build_raiden_movement.py): rig frame, blocks, float included
+const tenmaGhost = (() => {
+  const o = solve(restPose('t'));
+  const P = (n, pt) => { const v = o[n], k = PART_SCALE[n].map(x => x / 16); return add(v.t, rot(v.q, [pt[0] * k[0], pt[1] * k[1], pt[2] * k[2]])).map(x => +x.toFixed(3)); };
+  return {note: 'Tenma rest pose (rig frame: +X her left, +Y up, -Z forward, blocks): polylines and thicknesses of the puppet for the blink silhouettes',
+    limbs: GHOST.limbs.map(l => ({points: l.pts.map(([n, pt]) => P(n, pt)), thickness: l.th})), disc: {centre: P(GHOST.disc.part, [0, 0, 0]), radius: GHOST.disc.radius}};
+})();
+
 // ---- manifest v2 ---------------------------------------------------------------------------------------------------------------
 const manifestPath = path.join(here, 'raiden_rig_manifest.json');
 const fnFiles = (() => { let n = 0, b = 0; const walk = d => { for (const f of fs.readdirSync(d, {withFileTypes: true})) { const p = path.join(d, f.name); if (f.isDirectory()) walk(p); else { n++; b += fs.statSync(p).size; } } }; walk(rigDir); return {files: n, bytes: b}; })();
@@ -399,6 +407,7 @@ json(manifestPath, {
     look: `${NS}/look/{sword,polearm,tenma}`, flash: `${NS}/flash`, kill: `${NS}/kill`, face: `${NS}/face/{player,track,set}`, prop: `${NS}/prop/<kind>`},
   px: {rig: px.rig, props: px.props, total: px.rig + px.props, sprites: ledger},
   elements: {shogun_sword: shogunEls, shogun_polearm: shogunElsP, tenma: tenmaEls},
+  tenma_ghost: tenmaGhost,
   budgets: {parts: [PARTS.length, 34], key_files: keyFiles, rig_files: fnFiles.files, rig_bytes: fnFiles.bytes, models: Object.keys(models).length,
     culling: CULL, view_range: VIEW_RANGE, cull_overhang_ticks: cullWarn.length},
 });

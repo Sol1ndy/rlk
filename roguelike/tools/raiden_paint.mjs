@@ -1,6 +1,7 @@
 // Painted sprites of the Raiden rig (마가츠 미타케 나루카미노 미코토): the Shogun extras (sleeves, drape, braid, obi knot,
-// flower, halo arch, katana, polearm, guard aura), the Tenma form (lacquer puppet arms, eye sigils, tan gauntlets,
-// glaive, disc halo, horns, dagger, tassets, the dark Tenma skin) and the props (eye orb, vajra crystal, lotus,
+// flower, halo arch, katana, polearm, guard aura), the Tenma form (10-22c armour: lacquer lames, outline plates with
+// tomoe / eye sigils, joint lacquer, bronze gauntlets, the naginata blade, shaft and edge glow, kunai, disc halo, ring,
+// horns; tassets, the dark Tenma skin) and the props (eye orb, vajra crystal, lotus,
 // dome glass, clap facets, switch hoop and vortex). Scratchpad rd/plan.md §C.1, §C.2, §C.6 (rig sprites <= 0.45 M px,
 // props <= 0.25 M px); palette from rd/footage/{A,B}_catalog.md "Model".
 //
@@ -12,7 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
-import {paintSpriteSet, C, mix, clamp, smooth, fbm, TRANSPARENT} from './mboss_paint_lib.mjs';
+import {paintSpriteSet, C, mix, clamp, smooth, fbm, TRANSPARENT, Path, Shape, spline, onCard, sdPoly, sdEllipse} from './mboss_paint_lib.mjs';
 import {DOME} from './raiden_geometry.mjs';
 
 export const SPRITE_DIR = 'assets/rlk/textures/raiden/rig';
@@ -34,8 +35,10 @@ const swatch = (c, k = .06) => (u, v) => { const n = n1(u * 5.3, v * 5.3) - .5; 
 const SWATCHES = {
   sw_ink: P.ink, sw_violet: P.violet, sw_deep: P.deep, sw_plum: P.plum, sw_pale: P.pale,
   sw_paleshade: P.paleShade, sw_gold: P.gold, sw_golddk: P.goldDk, sw_lacquersh: P.lacquerSh,
-  sw_lacquerdk: P.lacquerDk, sw_tan: P.tan, sw_tandk: P.tanBand, sw_shaft: P.shaft, sw_suit: P.suit, sw_glow: P.lilacRim,
+  sw_lacquerdk: P.lacquerDk, sw_shaft: P.shaft, sw_suit: P.suit, sw_glow: P.lilacRim,
   sw_white: P.flash, sw_electro: P.electro,
+  // Tenma puppet (10-22c): dark joint lacquer, plain lacquer lids, the disc rim, the blade spine, dark bronze bands
+  sw_jointdk: C('#55367e'), sw_lacquer: C('#d6b0e6'), sw_discrim: C('#6a44a6'), sw_bladespine: C('#2a1240'), sw_bronzedk: C('#5e432c'),
 };
 
 // ---- Shogun -----------------------------------------------------------------------------------------------------------
@@ -201,34 +204,6 @@ const sigil = (u, v) => {
   if (r < .42) return A(mix(P.electro, P.flash, .3), 1);
   return A(mix(P.deep, P.electro, .5), .95);
 };
-// Tan gauntlet tile with darker horizontal bands.
-const gauntlet = (u, v) => {
-  const sh = Math.cos((u - .5) * Math.PI) ** .7, n = n3(u * 5, v * 5) - .5;
-  let c = mix(P.tanDk, P.tan, clamp(.3 + .7 * sh + n * .2));
-  const band = (v * 4) % 1;
-  if (band < .12) c = mix(c, P.tanBand, .75);
-  return [...c.slice(0, 3), 255];
-};
-// Glaive blade (alpha cut, 64 x 256): a long single-edged curved blade, dark violet body, glowing magenta edge line.
-const glaiveBlade = (u, v) => {
-  const t = 1 - v, spine = .22 + .18 * t * t;                              // spine curves toward +u
-  const w = (.5 - .14 * t) * (t > .86 ? Math.sqrt(clamp((1 - t) / .14)) : 1);
-  const x = u - spine;
-  if (x < 0 || x > w) return T;
-  const s = x / w;                                                          // 0 spine .. 1 edge
-  let c = mix(C('#7a34b8'), C('#c060e8'), s * .8 + .1 * n1(u * 3, v * 9));
-  if (s > .82) c = mix(P.magenta, P.pink, (s - .82) / .18);                  // edge line
-  if (s < .07) c = mix(P.deep, P.ink, .5);
-  if (Math.abs(s - .38) < .025 && t < .8) c = mix(P.magenta, c, .4);       // fuller line
-  return [...c.slice(0, 3), 255];
-};
-// Glaive shaft tile: dark violet with a magenta pinstripe (wraps round the shaft, v along it).
-const glaiveShaft = (u, v) => {
-  let c = mix(P.ink, P.shaft, .5 + .5 * Math.cos((u - .4) * Math.PI));
-  if (Math.abs(u - .5) < .05) c = mix(P.magenta, c, .3);
-  if (Math.abs(((v * 4) % 1) - .5) < .05) c = mix(P.gold, P.goldDk, .5);
-  return [...c.slice(0, 3), 255];
-};
 // Round pink guard ornament (alpha cut): ring with three tomoe, dark core.
 const glaiveGuard = (u, v) => {
   const x = (u - .5) * 2, y = (v - .5) * 2, r = Math.hypot(x, y), a = Math.atan2(y, x);
@@ -238,37 +213,6 @@ const glaiveGuard = (u, v) => {
   const tomoe = Math.sin(a * 3 + r * 6) > .5;
   return [...(tomoe ? P.pink : mix(P.deep, P.magenta, .25)).slice(0, 3), 255];
 };
-// Disc halo (alpha cut, 128 x 128): dark disc with a thin outer ring and a violet tomoe-eye emblem at the centre.
-const disc = (u, v) => {
-  const x = (u - .5) * 2, y = (v - .5) * 2, r = Math.hypot(x, y), a = Math.atan2(y, x);
-  if (r > 1) return T;
-  if (r > .93) return [...mix(P.electro, P.lilacRim, .5).slice(0, 3), 255];
-  if (r > .88) return [...P.ink.slice(0, 3), 255];
-  let c = mix(C('#1a1430'), C('#2a1f48'), .5 + .5 * Math.cos(r * 9));
-  if (Math.abs(r - .62) < .015) c = mix(P.electro, c, .4);
-  if (r < .42) {
-    const sw = Math.sin(a * 3 - r * 10) > .35 && r > .12;
-    c = sw ? mix(P.electro, P.lilacRim, .4) : mix(P.deep, P.ink, .4);
-    if (r < .12) c = P.flash;
-  }
-  return [...c.slice(0, 3), 255];
-};
-// Crescent horn (alpha cut): dark curved horn with a violet rim.
-const horn = (u, v) => {
-  const t = 1 - v, cx = .25 + .45 * t * t, w = .22 * (1 - t) + .02;
-  const x = u - cx;
-  if (Math.abs(x) > w || t > .98) return T;
-  const rim = Math.abs(x) > w - .05;
-  return [...(rim ? P.violet : mix(P.ink, P.dark, .5)).slice(0, 3), 255];
-};
-// Short dagger / spearhead (alpha cut), point up.
-const dagger = (u, v) => {
-  const t = 1 - v, x = Math.abs(u - .5);
-  if (t < .3) return x < .1 ? [...P.shaft.slice(0, 3), 255] : x < .3 && t > .24 ? [...P.gold.slice(0, 3), 255] : T;
-  const w = .32 * (1 - (t - .3) / .7) ** .7;
-  if (x > w) return T;
-  return [...mix(P.lilacRim, P.flash, 1 - x / Math.max(w, 1e-3)).slice(0, 3), 255];
-};
 // Tasset plate (alpha cut): dark plate, violet glow line, gold rim; pale variant for hip / leg plates.
 const plate = pale => (u, v) => {
   const x = Math.abs(u - .5), w = .48 - .1 * v;
@@ -276,6 +220,194 @@ const plate = pale => (u, v) => {
   let c = pale ? mix(C('#b8acd0'), C('#ece6f6'), .3 + .5 * Math.cos(x * Math.PI)) : mix(P.ink, P.dark, .4 + .4 * Math.cos(x * Math.PI));
   if (w - x < .05 || v > .92) c = pale ? P.paleShade : P.goldDk;
   if (!pale && x < .03 && v > .1 && v < .85) c = P.electro;
+  return [...c.slice(0, 3), 255];
+};
+
+// ---- Tenma puppet armour (10-22c): lacquered lames, outline plates, bronze gauntlets, the naginata, disc and horns ------
+// Pink-lavender lacquer (the refs' giant arm and thin arms) with a dark violet joint lacquer; bronze for the gauntlets.
+const LQ = {hi: C('#f3dcfa'), lt: C('#dcb2ef'), mid: C('#c391e0'), sh: C('#9563c4'), dk: C('#6a3fa0'), rim: C('#4a2878'),
+  sig: C('#4a2585'), sigHi: C('#a87cff'), sigCore: C('#2a1048')};
+const BZ = {hi: C('#ecd2a4'), lt: C('#d6b282'), mid: C('#bf966a'), sh: C('#94704c'), dk: C('#6a4c32'), line: C('#4e3622')};
+const wrapPi = a => Math.atan2(Math.sin(a), Math.cos(a));
+// Mitsudomoe (three commas) of radius 1 about the origin: 1 inside a comma, else 0. spin: +1 / -1
+function tomoe(x, y, spin = 1) {
+  const r = Math.hypot(x, y), th = Math.atan2(y, x) * spin;
+  for (let k = 0; k < 3; k++) {
+    const a0 = k * 2 * Math.PI / 3, hx = .5 * Math.cos(a0), hy = .5 * Math.sin(a0) * spin;
+    if (Math.hypot(x - hx, y - hy) < .27) return 1;                                       // the head
+    const phi = wrapPi(th - a0);                                                         // the tail trails behind it
+    if (phi < 0 && phi > -2.4) { const f = -phi / 2.4, rc = .5 + .36 * f, hw = .27 * (1 - f) ** 1.2; if (Math.abs(r - rc) < hw) return 1; }
+  }
+  return 0;
+}
+// Circular tomoe sigil of radius R at (cx, cy) in the painter's units: 0 = outside, else a colour.
+function tomoeSigil(x, y, cx, cy, R) {
+  const dx = (x - cx) / R, dy = (y - cy) / R, r = Math.hypot(dx, dy);
+  if (r > 1) return null;
+  if (r > .86) return mix(LQ.sig, LQ.sigHi, .25);
+  if (r > .78) return LQ.sigHi;
+  return tomoe(dx / .78, dy / .78) ? mix(LQ.sig, LQ.sigCore, .3) : mix(LQ.sigHi, LQ.lt, .35);
+}
+// Lacquer body colour at depth d (0 at the outline, 1 well inside) and height h (0 bottom .. 1 top): a rounded bevel
+// (highlight just inside the rim, darker toward the lower edge).
+function lacquerAt(d, h, n = 0) {
+  const bev = smooth(0, .22, d);
+  let c = mix(LQ.sh, LQ.mid, clamp(.35 + .65 * h + n));
+  c = mix(c, LQ.lt, clamp(.45 * h + .1));
+  if (d < .07) return mix(LQ.rim, LQ.dk, d / .07);
+  if (d < .16) return mix(LQ.hi, c, (d - .07) / .09 * .6);
+  return mix(c, LQ.sh, (1 - bev) * .3);
+}
+// One lame (a plate of the bands): rim on top, a rolled highlight under it, the body darkening toward the lower edge
+// where it tucks under the next lame; sig adds the tomoe sigil.
+const lacLame = sig => (u, v) => {
+  const n = n2(u * 5, v * 5) - .5;
+  let c;
+  if (v < .07) c = LQ.rim;
+  else if (v < .17) c = mix(LQ.hi, LQ.lt, (v - .07) / .1);
+  else if (v < .84) c = mix(LQ.lt, LQ.mid, (v - .17) / .67 + n * .25);
+  else if (v < .95) c = mix(LQ.sh, LQ.dk, (v - .84) / .11);
+  else c = LQ.rim;
+  const e = Math.abs(u - .5) * 2;
+  c = mix(c, LQ.sh, smooth(.82, 1, e) * .35);
+  if (sig) { const t = tomoeSigil(u, v, .5, .52, .3); if (t) c = t; }
+  return [...c.slice(0, 3), 255];
+};
+// Joint lacquer (balls, knobs): dark violet with a soft sheen band.
+const lacJoint = (u, v) => {
+  const n = n3(u * 4, v * 4) - .5;
+  const c = mix(C('#5a3a8e'), C('#9a72cc'), clamp(.55 - .5 * Math.abs(v - .32) * 2 + n * .3));
+  return [...c.slice(0, 3), 255];
+};
+// Hands and fingers: lacquer with soft edges; palm with a small eye.
+const lacHand = palm => (u, v) => {
+  const e = Math.max(Math.abs(u - .5), Math.abs(v - .5)) * 2, n = n1(u * 6, v * 6) - .5;
+  let c = mix(LQ.lt, LQ.mid, clamp(v * .8 + n * .3));
+  c = mix(c, LQ.sh, smooth(.7, 1, e) * .55);
+  if (palm) { const x = (u - .5) * 2, y = (v - .5) * 2.4, eye = Math.abs(y) < .45 * Math.cos(x * Math.PI / 2) && Math.abs(x) < .8;
+    if (eye) c = Math.hypot(x, y) < .25 ? LQ.sigCore : mix(LQ.sig, LQ.sigHi, .5); }
+  return [...c.slice(0, 3), 255];
+};
+// Outline plates (alpha cut) on the unrolled width of a curved shell. P(x, y) gives the signed distance to the outline
+// (negative inside) in normalised units (x -1..1 across, y -1 bottom .. 1 top); deco(x, y, d) may return a colour.
+const outlinePlate = (sd, deco, {rim = .055} = {}) => (u, v) => {
+  const x = (u - .5) * 2, y = 1 - 2 * v, d = -sd(x, y);
+  if (d < 0) return T;
+  const n = n2(u * 6, v * 6) - .5;
+  let c = lacquerAt(clamp(d / .5), (y + 1) / 2, n * .2);
+  if (d < rim) c = mix(LQ.rim, LQ.dk, d / rim);
+  else if (d < rim + .06) c = mix(LQ.hi, c, (d - rim) / .06 * .5);
+  else if (Math.abs(d - .2) < .014) c = mix(c, LQ.dk, .7);               // engraved inner border
+  const o = deco && deco(x, y, d);
+  return [...(o || c).slice(0, 3), 255];
+};
+// shapes (signed distance, normalised): the great pauldron (a tall shield, a crest above the shoulder swept outward),
+// the plate under it, the elbow cop (round fan), the vambrace guard (long, rounded top, pointed bottom)
+const sdPauldron = (x, y) => {
+  // x -1 (inner, toward her) .. 1 (outer, her right); y -1 (toward the elbow) .. 1 (over the shoulder)
+  const body = sdEllipse(.05, -.08, .97, .86)(x, y);
+  const crest = sdPoly([[-.35, .45], [.2, .72], [.62, 1.0], [.93, .55], [.9, .1], [-.1, .2]])(x, y);
+  const tail = sdPoly([[-.55, -.5], [.55, -.55], [.12, -1.0], [-.1, -1.0]])(x, y);
+  return Math.min(body, crest, tail);
+};
+const sdShell2 = (x, y) => { const hw = y > -.3 ? .96 : .96 * Math.sqrt(clamp(1 - ((-.3 - y) / .72) ** 2)); return Math.max(Math.abs(x) - hw, y - .97, -1 - y) * .5; };
+const sdCop = (x, y) => Math.hypot(x * .98, y * 1.02) - .97;
+const sdGuard = (x, y) => { const hw = y > .55 ? .9 * Math.sqrt(clamp(1 - ((y - .55) / .44) ** 2)) : y > -.4 ? .92 : .92 * (1 + (y + .4) / .6); return Math.max(Math.abs(x) - hw, -1 - y, y - 1) * .5; };
+const eyeAt = (x, y, cx, cy, w, h) => { const dx = (x - cx) / w, dy = (y - cy) / h, edge = .6 * Math.cos(dx * Math.PI / 2) - Math.abs(dy);
+  if (Math.abs(dx) > 1 || edge < 0) return null; if (edge < .12) return LQ.sigHi; const r = Math.hypot(dx, dy * 1.4); return r < .2 ? LQ.sigCore : r < .38 ? mix(LQ.sigHi, LQ.hi, .3) : LQ.sig; };
+const pauldron = outlinePlate(sdPauldron, (x, y, d) => tomoeSigil(x, y, .08, .02, .4) || (Math.abs(Math.hypot(x - .08, y - .02) - .5) < .022 ? LQ.dk : null)
+  || (Math.abs(y - .58 - .3 * x) < .02 && x > -.1 && x < .75 ? LQ.dk : null));
+const shell2 = outlinePlate(sdShell2, (x, y) => (Math.abs(y + .1) < .03 && Math.abs(x) < .7 ? LQ.dk : null), {rim: .07});
+const cop = outlinePlate(sdCop, (x, y, d) => { const r = Math.hypot(x, y); if (r < .3) return eyeAt(x, y, 0, 0, .3, .3) || mix(LQ.dk, LQ.sh, .4);
+  return (Math.abs(Math.sin(Math.atan2(y, x) * 4)) < .05 && r > .4 && r < .8) ? LQ.dk : null; }, {rim: .08});
+const guard = outlinePlate(sdGuard, (x, y) => eyeAt(x, y, 0, .35, .62, .34) || (Math.abs(x) < .02 && y < .0 && y > -.75 ? LQ.dk : null));
+// Bronze (gauntlets): warm tan metal, darker toward the lower edge, engraved border; the palm with rings; the cuff plate
+// with a violet jewel.
+const bronze = kind => (u, v) => {
+  const n = n3(u * 7, v * 7) - .5, e = Math.max(Math.abs(u - .5), Math.abs(v - .5)) * 2;
+  let c = mix(BZ.lt, BZ.mid, clamp(v * .9 + n * .35));
+  if (v < .12) c = mix(BZ.hi, c, v / .12);
+  c = mix(c, BZ.sh, smooth(.72, 1, e) * .6);
+  if (Math.abs(e - .78) < .035) c = mix(c, BZ.line, .55);
+  if (kind === 'palm') { const r = Math.hypot(u - .5, (v - .5) * 1.15) * 2; if (Math.abs(r - .62) < .04 || Math.abs(r - .4) < .03) c = mix(c, BZ.line, .5); }
+  if (kind === 'jewel') { const r = Math.hypot((u - .5) * 1.6, v - .5) * 2; if (r < .5) c = r < .18 ? C('#f2dcff') : mix(C('#b070ff'), C('#5a22a8'), r / .5); else if (r < .6) c = BZ.dk; }
+  return [...c.slice(0, 3), 255];
+};
+const jewel = (u, v) => { const r = Math.hypot(u - .42, v - .38) * 2; return [...mix(C('#f4e4ff'), C('#8a3ff0'), clamp(r * 1.4)).slice(0, 3), 255]; };
+// The naginata blade (alpha cut) on its card X -1.2..4.4, Y 10..22.2 (card units, +x = the edge): a broad curved blade,
+// the edge convex and swept up to the tip at (1.0, 21.9); dark violet by the spine, a fuller, magenta toward the edge,
+// a glowing pink-white edge line; gold habaki at the base.
+const BLADE = {X0: -.7, X1: 2.9, Y0: 10.2, Y1: 22.0};
+const bladeSpine = new Path(spline([[-.5, 10.3], [-.6, 13.5], [-.55, 16.6], [-.25, 19.4], [.35, 21.95]], 10));
+const bladeEdge = new Path(spline([[.95, 10.3], [1.55, 11.1], [1.6, 13.5], [1.85, 16.6], [2.3, 19.0], [2.5, 20.1, 'c'], [.35, 21.95]], 10));
+const bladeShape = new Shape([...bladeSpine.p, ...[...bladeEdge.p].reverse()]);
+const glaiveBlade = onCard(BLADE, (x, y) => {
+  const sd = bladeShape.sd(x, y);
+  if (sd > 0) return null;
+  const ds = bladeSpine.near(x, y).d, de = bladeEdge.near(x, y).d, f = ds / (ds + de);       // 0 spine .. 1 edge
+  const t = clamp((y - 10.3) / 11.6), n = n1(x * 1.3, y * .9) - .5;
+  let c = mix(C('#3a1466'), C('#8a34c8'), clamp(f * 1.5 + n * .15));
+  if (f > .5) c = mix(c, C('#e050f0'), (f - .5) / .32);
+  if (f > .82) c = mix(C('#ff5ad8'), C('#ffb6ee'), (f - .82) / .12);
+  if (de < .16) c = mix(C('#fff0fb'), C('#ffb6ee'), de / .16);                            // white-hot edge line
+  if (Math.abs(f - .3) < .035 && t < .78) c = mix(c, C('#a874e8'), .7);                    // fuller
+  if (ds < .1) c = mix(c, C('#14081f'), .6);
+  const crack = f > .6 && Math.abs(((y * 1.6 + 3 * n1(x * 2, y * 1.5)) % 1) - .5) < .025;
+  if (crack) c = mix(c, C('#ffe8fb'), .7);
+  if (y < 10.9) c = mix(C('#e2bc68'), C('#9a7434'), clamp((10.9 - y) / .6));                // habaki
+  return [...c.slice(0, 3), 255];
+});
+// Shaft lacquer (wraps the octagonal shaft; constant along it): violet-black with a sheen and a thin magenta line.
+const glaiveShaft = (u, v) => {
+  let c = mix(C('#140c22'), C('#3a2560'), clamp(1 - Math.abs(u - .32) * 3));
+  if (Math.abs(u - .74) < .05) c = mix(C('#d04ac8'), c, .35);
+  return [...c.slice(0, 3), 255];
+};
+// Edge glow of the naginata (glow card along the edge): crackling magenta lightning with a soft pink halo.
+const glaiveGlow = (u, v) => {
+  const cx = .42 + .1 * Math.sin(v * 37) + .05 * Math.sin(v * 91 + 2), d = Math.abs(u - cx);
+  const fork = Math.abs(u - (cx + .22 * Math.sin(v * 11))) < .025 && Math.sin(v * 17) > .55;
+  const core = clamp(1 - d / .05), glow = clamp(1 - d / .48) ** 2, fade = smooth(0, .06, v) * smooth(1, .92, v);
+  return A(mix(C('#ff4fd8'), C('#fff0fb'), core), (core + .5 * glow + (fork ? .75 : 0)) * fade);
+};
+// Kunai (alpha cut, card from the fist (v 0) to the point (v 1)): a leaf blade, dark violet ridge, pink-lilac edges.
+const kunai = (u, v) => {
+  const x = Math.abs(u - .5) * 2, w = v < .12 ? .26 : .9 * Math.sin(Math.PI * clamp((v - .12) / .88) ** .55) * (1 - clamp((v - .12) / .88)) ** .35 + .02;
+  if (x > w || v > .995) return T;
+  if (v < .12) return [...mix(C('#d9b061'), C('#8a6630'), v / .12).slice(0, 3), 255];
+  const s = x / Math.max(w, 1e-3);
+  return [...(s < .14 ? C('#2a1440') : mix(C('#6a32a8'), C('#ffc2f0'), s ** 1.6)).slice(0, 3), 255];
+};
+// Disc halo (alpha cut, 128 x 128): dark indigo disc, a glowing violet ring, the tomoe-eye emblem, a pale rim.
+const disc = (u, v) => {
+  const x = (u - .5) * 2, y = (v - .5) * 2, r = Math.hypot(x, y);
+  if (r > 1) return T;
+  if (r > .93) return [...mix(C('#c7a4ff'), C('#8a5ae0'), (r - .93) / .07).slice(0, 3), 255];
+  if (r > .88) return [...C('#120a20').slice(0, 3), 255];
+  let c = mix(C('#140d26'), C('#2c1d4e'), .5 + .5 * Math.cos(r * 7));
+  if (Math.abs(r - .66) < .045) c = mix(C('#b98cff'), C('#6a3cc8'), Math.abs(r - .66) / .045);
+  if (r < .56) c = tomoe(x / .5, -y / .5) && r < .5 ? mix(C('#e6d0ff'), C('#a070ff'), r / .5) : mix(C('#2a1450'), C('#120a22'), r / .56);
+  if (r < .08) c = C('#fff4ff');
+  return [...c.slice(0, 3), 255];
+};
+// The disc's dark back (alpha cut round).
+const discBack = (u, v) => (Math.hypot(u - .5, v - .5) > .5 ? T : [...mix(C('#0e0818'), C('#22163c'), Math.hypot(u - .5, v - .5) * 2).slice(0, 3), 255]);
+// Thin glowing ring round the disc (glow, 128 x 128) with a few sparks.
+const haloRing = (u, v) => {
+  const x = (u - .5) * 2, y = (v - .5) * 2, r = Math.hypot(x, y), a = Math.atan2(y, x), d = Math.abs(r - .93);
+  const spark = Math.abs(Math.sin(a * 9 + 1)) > .985 && Math.abs(r - .93) < .06;
+  if (d > .07 && !spark) return T;
+  return A(mix(C('#b48cff'), C('#f4e8ff'), clamp(1 - d / .02)), spark ? .9 : clamp(1 - d / .07) ** 1.4);
+};
+// Crescent horn (alpha cut; the right one, u from the disc outward): an arc bulging outward from her shoulder to
+// above her head, a dark violet body with a glowing inner edge.
+const hornPath = new Path(spline([[.2, .98], [.62, .8], [.86, .5], [.78, .2], [.4, .02]], 10));
+const horn = (u, v) => {
+  const nr = hornPath.near(u, v), w = .14 * (1 - nr.t) ** .7 + .012;
+  if (nr.d > w) return T;
+  const inner = nr.s * (hornPath.at(nr.t)[2] > 0 ? 1 : 1) < 0;   // the concave (inner) side
+  const k = nr.d / w;
+  const c = !inner && k > .45 ? mix(C('#b682ff'), C('#f4e8ff'), (k - .45) / .55) : mix(C('#3a1c66'), C('#8a54e0'), k);
   return [...c.slice(0, 3), 255];
 };
 
@@ -422,9 +554,14 @@ export function raidenSprites(rp) {
     halo_eye: [64, 64, haloEye, true], tomoe_orb: [32, 32, tomoeOrb, true], thread: [16, 64, thread, true],
     katana_blade: [32, 128, katanaBlade, false], polearm_blade: [64, 128, polearmBlade, false], weapon_glow: [32, 128, weaponGlow, true],
     aura_ring: [128, 128, auraRing, true],
-    lacquer: [64, 64, lacquer, false], sigil: [64, 64, sigil, true], gauntlet: [64, 64, gauntlet, false],
-    glaive_blade: [64, 256, glaiveBlade, false], glaive_shaft: [16, 64, glaiveShaft, false], glaive_guard: [64, 64, glaiveGuard, false],
-    disc: [128, 128, disc, false], horn: [32, 64, horn, false], dagger: [32, 64, dagger, false],
+    lacquer: [64, 64, lacquer, false], sigil: [64, 64, sigil, true],
+    glaive_blade: [64, 256, glaiveBlade, false], glaive_shaft: [16, 16, glaiveShaft, false], glaive_guard: [64, 64, glaiveGuard, false],
+    glaive_glow: [32, 128, glaiveGlow, true], kunai: [32, 64, kunai, false],
+    disc: [128, 128, disc, false], disc_back: [32, 32, discBack, false], halo_ring: [128, 128, haloRing, true], horn: [64, 128, horn, false],
+    lac_lame: [32, 32, lacLame(false), false], lac_lame_sig: [32, 32, lacLame(true), false], lac_joint: [16, 16, lacJoint, false],
+    lac_hand: [16, 16, lacHand(false), false], lac_palm: [32, 32, lacHand(true), false],
+    lac_shell: [128, 128, pauldron, false], lac_shell2: [64, 64, shell2, false], lac_cop: [64, 64, cop, false], lac_guard: [64, 128, guard, false],
+    bronze: [32, 32, bronze(''), false], bronze_palm: [32, 32, bronze('palm'), false], bronze_jewel: [32, 32, bronze('jewel'), false], jewel: [16, 16, jewel, false],
     tasset: [32, 64, plate(false), false], plate_pale: [32, 64, plate(true), false],
     orb_eye: [64, 64, orbEye, true], crystal: [64, 128, crystal, true], petal: [64, 64, petal, false], orb_dark: [32, 32, orbDark, false],
     dome_r0: [256, 32, domeRow(0), true], dome_r1: [256, 64, domeRow(1), true], dome_r2: [256, 64, domeRow(2), true], dome_r3: [256, 64, domeRow(3), true],

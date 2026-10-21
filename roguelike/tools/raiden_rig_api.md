@@ -1,7 +1,8 @@
 # Raiden rig API (S1-RIG, rd/plan.md §C)
 
 Generator: `node tools/build_raiden_rig.mjs --resourcepack <unpacked pack> [--debug-dp <dir>] [--no-paint]`
-(sources `raiden_geometry.mjs`, `raiden_clips.mjs`, `raiden_paint.mjs`; shared RIGLIB untouched). Everything under
+(sources `raiden_geometry.mjs`, `raiden_tenma_models.mjs` (the Tenma puppet armour), `raiden_clips.mjs`, `raiden_paint.mjs`;
+shared RIGLIB untouched). Everything under
 `data/rlk/function/boss/raiden/rig/`, `tools/raiden_rig_manifest.json` and the pack's `models|items/raiden/*`
 (except `fx_*`) and `textures/raiden/rig/*` is generated: change the sources and rebuild.
 The build throws on a floor dip (any shown element of a part or prop below the feet at a compiled tick), a step
@@ -92,7 +93,19 @@ compiled poses (`--debug-dp`).
   tomoe orbs behind her; `aura` is a flat floor ring shown by `guard` / `counter_*`.
 - Tenma: core figure floats about 1 b up. **The giant arm and its glaive are on her right, the three thin arms
   fan out on her left** (as in footage `frames/B/B_v7_06.90`, `B_v9_03.30`; the plan text says "giant left arm",
-  which reads the footage from the viewer's side). Gauntlet hands hover low in front, palms up, ≥ 0.58 b.
+  which reads the footage from the viewer's side). Gauntlet hands hover low in front, palms up (pivots ≥ 0.9 b, every
+  point ≥ 0.3 b clear).
+- Tenma armour (10-22c, `raiden_tenma_models.mjs`): lilac lacquer lames (`ring()` bands of thick plates), a crested
+  tomoe pauldron over the front of the giant upper arm (its shoulder root now over her head, `SK.gRoot`), elbow cop and
+  vambrace plates, a lacquer fist round the shaft; the naginata keeps its grip, length and tip (about [1, 21.9] model
+  units at scale 3.6, 4.9 b out) with a long curved blade and a glowing edge, and is lifted off the floor by its own
+  hull (glaive + edge glow, float bob counted), so low sweeps and slams run the blade down to 0.05 b; three segmented
+  thin arms (forearms scale 1.25) with splayed hands and a kunai; bronze gauntlets (scale 2.4) with three-joint
+  fingers, palm eyes and wrist jewels; the disc halo with a glowing ring and two crescent horns. The rest pose holds
+  the glaive low across her front, the blade down by the floor on her left. Element and px budgets: manifest
+  `elements` / `px`.
+- `tenma_ghost` (manifest): the puppet's rest outline (polylines + thickness, the disc), solved by this generator;
+  `build_raiden_movement.py` builds the Tenma blink silhouette from it, so it runs after the rig (`build_raiden_all.py`).
 - Props (manifest `props`): `eye_orb`, `blade_eye`, `musou_orb`, `vajra`, `flower` (≈ 2 b), `dome` (r 8 b at scale 8:
   `rig/prop/dome` summons its 8 displays `prop/dome_0..7` on fixed yaws (entity Rotation), one closed double-sided
   bubble; grow it by a uniform scale merge on every `rlk_rd_prop_dome` display, never by left_rotation), `clap_l`/`clap_r` (4.5 b translucent hands), `slam_palm`, `glaive_planted`, `seed`, `hoop`,

@@ -32,13 +32,14 @@ steps = [
     ["python3", "build_raiden_arena.py"],
     ["python3", "build_raiden_cinematic.py"],
     ["python3", "build_raiden_hazards.py", "--resourcepack", rp],
-    ["python3", "build_raiden_movement.py", "--resourcepack", rp],
     ["python3", "build_raiden_object_vfx.py", "--resourcepack", rp],
     ["python3", "build_raiden_orb.py", "--resourcepack", rp],
     ["python3", "build_raiden_signature_vfx.py", "--resourcepack", rp],
     ["python3", "build_raiden_illusions.py", "--resourcepack", rp],
     # the rig (parts, clips, props)
     node + ["build_raiden_rig.mjs", "--resourcepack", rp] + (["--skin", str(args.skin.resolve())] if args.skin else []),
+    # the blinks: the Tenma silhouette follows the rig's puppet (its rest outline in the manifest), so after the rig
+    ["python3", "build_raiden_movement.py", "--resourcepack", rp],
     # the 만겁 sky rift and giant arm (needs the materials' armour swatches and the fxg strips above)
     node + ["build_raiden_judgment_rig.mjs", "--resourcepack", rp],
     # the 찰나의 포영 clone figures: tinted copies of the rig's part models (so after the rig) and their pose functions

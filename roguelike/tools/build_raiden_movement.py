@@ -19,7 +19,9 @@ floor); the next clip shows it again (blink_in / t_blink_in when no pattern clip
     movement/cleanup       pause / exhausted / death: no destination marker, no blink, no art.
 
 Pack: assets/rlk/{models,items}/raiden/fx_movement/{shogun,tenma}_0..5 (frame 0 whole, frame 5 scattered), built from
-the shared RGBA swatches rlk:raiden/fx/* (build_raiden_materials.py); no new texture.
+the shared RGBA swatches rlk:raiden/fx/* (build_raiden_materials.py); no new texture. The Tenma silhouette's puppet
+outline is read from tools/raiden_rig_manifest.json (`tenma_ghost`, written by build_raiden_rig.mjs), so run this after
+the rig (build_raiden_all.py does).
 """
 from pathlib import Path
 import argparse
@@ -40,16 +42,16 @@ BODY = [((0, 2.09, 0), (.61, .61, .58)), ((0, 1.38, 0), (.62, .84, .34)), ((-.49
 FIT = 0.86
 TENMA_LIFT = 1.0
 G = lambda p: (p[0], p[1], -p[2])                  # rig rest point -> ghost frame
-TENMA_LIMBS = [  # (polyline in rig rest coordinates, thickness b)
-    ([(-1.25, 3.55, .6), (-3.0, 2.59, .67), (-1.52, 2.23, -.63)], .34),          # giant arm: shoulder ball, elbow, fist
-    ([(-3.18, 1.87, -.86), (3.27, 1.8, -1.7)], .12),                              # the glaive across the front
-    ([(.42, 2.62, .36), (1.01, 3.74, .65), (1.15, 4.85, .52)], .16),              # thin arms, fanned up on her left
-    ([(.48, 2.44, .4), (1.59, 3.05, .67), (2.44, 3.67, .28)], .16),
-    ([(.46, 2.26, .36), (1.74, 2.19, .57), (2.65, 2.52, -.01)], .16),
-]
-DISC = ((0, 2.95, -.40), .85)                 # disc halo behind her head (centre, radius)
-GAUNTLETS = [(.95, .7, 1.25), (-.95, .7, 1.25)]
+# The Tenma puppet (giant arm with its pauldron, the naginata, the thin arms, the gauntlets, the disc halo) comes from
+# the rig itself: build_raiden_rig.mjs solves its rest pose and writes the outline polylines (rig frame, blocks) to the
+# manifest (`tenma_ghost`), so the silhouette follows the model (10-22c armour). build_raiden_all.py runs this step
+# after the rig.
+MANIFEST = Path(__file__).resolve().parent / 'raiden_rig_manifest.json'
 
+
+def tenma_outline():
+    g = json.loads(MANIFEST.read_text(encoding='utf-8'))['tenma_ghost']
+    return [(l['points'], l['thickness']) for l in g['limbs']], (G(g['disc']['centre']), g['disc']['radius'])
 
 def box(center, extent, color):
     return {'from': [round(8 + (center[i] - extent[i] / 2) * 16 / SCALE, 5) for i in range(3)],
@@ -105,7 +107,8 @@ def ghost(frame, tenma=False):
                 mesh.append(box(tail, [ext[0] * .34, .026, .38 + amount * .7], 'glow' if frame >= 4 else 'violet'))
     if tenma:
         # the puppet's limbs break into the same fragments, piece by piece along each limb
-        for li, (pts, thick) in enumerate(TENMA_LIMBS):
+        limbs, ((cx, cy, cz), r) = tenma_outline()
+        for li, (pts, thick) in enumerate(limbs):
             pts = [G(p) for p in pts]
             for a, b in zip(pts, pts[1:]):
                 n = max(2, math.ceil(math.dist(a, b) / .24))
@@ -121,17 +124,12 @@ def ghost(frame, tenma=False):
                     if j % 3 == 1 and amount > 0:
                         mesh.append(box([pos[0], pos[1], pos[2] - .3 - amount * .5], [ext[0] * .3, .024, .4 + amount * .6],
                                         'glow' if frame >= 4 else 'violet'))
-        (cx, cy, cz), r = DISC
         for k in range(12):
             a = math.radians(30 * k)
             seed = (k * 7) % 23
             shift = scatter(seed, 1 if k % 2 else -1, amount * .7)
             pos = [cx + r * math.cos(a) + shift[0], cy + r * math.sin(a) + shift[1], cz + shift[2]]
             mesh.append(box(pos, [.3 * (1 - .5 * amount), .3 * (1 - .5 * amount), .06], 'void' if frame < 4 else 'afterglow'))
-        for k, g in enumerate(GAUNTLETS):
-            shift = scatter(9 + 5 * k, 1 if k else -1, amount)
-            mesh.append(box([g[i] + shift[i] for i in range(3)], [.7 * (1 - .5 * amount), .32, .5 * (1 - .5 * amount)],
-                            'shadow' if frame < 4 else 'afterglow'))
     # the charged head / weapon silhouette is broken into jagged seams, never a ball
     for sign in (-1, 1):
         y = 1.40 * FIT + lift

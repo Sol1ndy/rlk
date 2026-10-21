@@ -43,9 +43,12 @@ layout = dict(
     n=2, boss_id="narukami",
     zones=[zone(1, 0, (-6, 24, 5, 39), (0, 32), foyer_cells),
            zone(2, 9, (-24, -24, 23, 23), (0, 0), arena_cells)],
+    # tm: the native door draw lays a polished-diorite trim row at y = tm over the doorway (the wall cap of the normal
+    # 10-high rooms, y 210). The Narukami wall ends at y 207, so at 210 the trim floated in the sky above the gate; it
+    # goes under the foyer floor instead (y 199, under the y 200 floor), out of sight.
     doors=[dict(a=1, b=2, x0=-2, x1=1, z0=23, z1=24, mx=0, mz=24,
                 ya=0, yb=180, h=0, y0=201, y1=205, l0=206, l1=207,
-                my=201, tx0=-2, tx1=1, tz0=24, tz1=24, tm=210)],
+                my=201, tx0=-2, tx1=1, tz0=24, tz1=24, tm=199)],
     spawn=dict(x=0, z=33, yaw=180), spot=dict(x=0, z=33),
     arena=dict(x=0, y=201, z=0, radius=23, safe_radius=21))
 
