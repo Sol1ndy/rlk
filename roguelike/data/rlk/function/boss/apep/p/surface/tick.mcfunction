@@ -1,6 +1,6 @@
-# STUB (AP-CORE, ap_contract 1.3): 수면 포격 (surface, id 36); the pattern stage replaces this file.
-# keeps time only (the clip of each step at its clock; no hazards)
-execute if score #apPT mb matches 30 run function rlk:boss/apep/p/surface/to_lock
-execute if score #apPT mb matches 36 run function rlk:boss/apep/play/surface_p3
-execute if score #apPT mb matches 49 run function rlk:boss/apep/p/release
-execute if score #apPT mb matches 90.. run function rlk:boss/apep/p/end
+# 수면 포격 (surface, id 36; plan 8.3). tick (#apq36T = the pattern tick after the prelude).
+scoreboard players operation #apq36T mb = #apPT mb
+scoreboard players operation #apq36T mb -= #apq36O mb
+execute if score #apq36T mb matches 90.. run return run function rlk:boss/apep/p/surface/done
+execute if score #apq36T mb matches 0..28 run return run function rlk:boss/apep/p/surface/kd/0_28
+execute if score #apq36T mb matches 29..49 run return run function rlk:boss/apep/p/surface/kd/29_49

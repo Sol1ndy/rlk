@@ -13,11 +13,11 @@ execute if score #apPid mb matches 4 run scoreboard players set #apPMax mb 150
 execute if score #apPid mb matches 5 run scoreboard players set #apPMax mb 150
 execute if score #apPid mb matches 6 run scoreboard players set #apPMax mb 200
 execute if score #apPid mb matches 7 run scoreboard players set #apPMax mb 60
-execute if score #apPid mb matches 31 run scoreboard players set #apPMax mb 120
-execute if score #apPid mb matches 33 run scoreboard players set #apPMax mb 130
-execute if score #apPid mb matches 34 run scoreboard players set #apPMax mb 135
-execute if score #apPid mb matches 35 run scoreboard players set #apPMax mb 90
-execute if score #apPid mb matches 36 run scoreboard players set #apPMax mb 110
+execute if score #apPid mb matches 31 run scoreboard players set #apPMax mb 126
+execute if score #apPid mb matches 33 run scoreboard players set #apPMax mb 147
+execute if score #apPid mb matches 34 run scoreboard players set #apPMax mb 145
+execute if score #apPid mb matches 35 run scoreboard players set #apPMax mb 106
+execute if score #apPid mb matches 36 run scoreboard players set #apPMax mb 124
 execute if score #apPid mb matches 32 run scoreboard players set #apPMax mb 312
 execute if score #apPid mb matches 20 run scoreboard players set #apPMax mb 140
 execute if score #apPid mb matches 40 run scoreboard players set #apPMax mb 64

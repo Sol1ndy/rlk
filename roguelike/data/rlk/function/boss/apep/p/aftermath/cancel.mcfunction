@@ -1,4 +1,6 @@
-# STUB (AP-CORE, ap_contract 1.3): 종말의 여파 (aftermath, id 32); the pattern stage AP-P3 replaces this file.
-# the domes and fields go (dome/clear); nothing else lingers.
+# 종말의 여파 (aftermath, id 32; plan 8.3 Q2 / 7.8).
+# Cut / cancelled (pause -> resume, reload, death, tests; any executor): the domes, the masks, the
+# footprints and the banner go.
 function rlk:boss/apep/dome/clear
 kill @e[tag=rlk_mb_ap_p32]
+function rlk:boss/apep/fx/hud/banner_end

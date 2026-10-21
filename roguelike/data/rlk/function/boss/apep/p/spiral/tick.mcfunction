@@ -1,4 +1,6 @@
-# STUB (AP-CORE, ap_contract 1.3): 생명의 나선 (spiral, id 35); the pattern stage replaces this file.
-# keeps time only (the clip of each step at its clock; no hazards)
-execute if score #apPT mb matches 65 run function rlk:boss/apep/p/release
-execute if score #apPT mb matches 72.. run function rlk:boss/apep/p/end
+# 생명의 나선 (spiral, id 35; plan 8.3). tick (#apq35T = the clip tick).
+scoreboard players operation #apq35T mb = #apPT mb
+scoreboard players operation #apq35T mb -= #apq35O mb
+execute if score #apq35T mb matches 72.. run return run function rlk:boss/apep/p/spiral/done
+execute if score #apq35T mb matches 0..26 run return run function rlk:boss/apep/p/spiral/kd/0_26
+execute if score #apq35T mb matches 27..65 run return run function rlk:boss/apep/p/spiral/kd/27_65
