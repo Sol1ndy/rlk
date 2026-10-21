@@ -1,9 +1,5 @@
 # Clip landslide (id 32) tick 18: the proxy columns that moved.
-data modify storage rlk:mboss px.o.tail4_x set value -0.48d
-data modify storage rlk:mboss px.o.tail4_z set value -4.458d
-data modify storage rlk:mboss px.top.tail4 set value 11.601f
-data merge entity 524c4b4d-415a-4400-8000-000000000048 {height:11.601f}
-data modify storage rlk:mboss px.o.paw_r_x set value -3.227d
-data modify storage rlk:mboss px.o.paw_r_z set value 2.994d
-data modify storage rlk:mboss px.top.paw_r set value 2.981f
-data merge entity 524c4b4d-415a-4400-8000-00000000004a {height:2.981f}
+data modify storage rlk:mboss px.o.paw_r_x set value -3.342d
+data modify storage rlk:mboss px.o.paw_r_z set value 3.077d
+data modify storage rlk:mboss px.top.paw_r set value 3.764f
+data merge entity 524c4b4d-415a-4400-8000-00000000004a {height:3.764f}

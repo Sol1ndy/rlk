@@ -310,7 +310,8 @@ export function bake(S) {
   const ks = accumulate(src);
   const wrapA = x => (T.loop ? ((x % A) + A) % A : clamp(x, 0, A));
   const at = x => sampleClip(src, wrapA(x), ks);
-  const lag = S.lag || {}, tailLag = S.tailLag ?? 1.5;
+  // tailLag: a number, or a function of the authored tick (a lag that changes over the clip; FIX FID-2: tail_slam)
+  const lag = S.lag || {}, tailLagOf = typeof S.tailLag === 'function' ? S.tailLag : (() => S.tailLag ?? 1.5);
   const yawAt = p => (S.yaw ? S.yaw[clamp(Math.round(p), 0, S.yaw.length - 1)] : 0);
   const poses = [];
   for (let p = 0; p <= L; p++) {
@@ -318,6 +319,7 @@ export function bake(S) {
     const P = at(a);
     for (const [ch, l] of Object.entries(lag)) if (l) P[ch] = structuredClone(at(a - l)[ch]);
     // the tail chain: segment i carries the tail channels of authored time a - tailLag * i
+    const tailLag = tailLagOf(a);
     for (let i = 0; i < 8; i++) P['t' + (i + 1)] = segEuler(i && tailLag ? at(a - tailLag * i) : P, i);
     for (const c of TAIL_CH) P[c] = 0;
     for (const f of S.over || []) f(a, P, p);
@@ -604,7 +606,8 @@ const FORE_UP = (y = 5.6, z = -3.0, x = 3.3, e = [-55, 0, -10]) => fore([x, y, z
     [43, {pos: [0, -.3, 0], flS: 4, flM: 4, flH: 4}, 'o'], [60, {pos: [0, 0, 0], rot: [0, 0, 0], pelvis: [0, 0, 0], neck1: [0, 0, 0], neck2: [0, 0, 0], head: [0, 0, 0], jaw: 3, flS: 0, flM: 0, flH: 0, ...tailUp(TAIL_REST)}, 'io']],
     feet: {fl: [W(0, 'fl'), W(7, 'fl'), Sf(12, [.95, -2.6, -1.3], [-30, 0, 0]), Sf(25, [1.0, -2.85, -.9], [-10, 0, 0]), Wp(28, F_(3.3, .5, -2.6), {ease: 'i'}), Wp(46, F_(3.3, .5, -2.6)), W(52, 'fl', 0, {lift: .25})],
       fr: [W(0, 'fr'), W(7, 'fr'), Sf(12, [.95, -2.6, -1.3], [-30, 0, 0]), Sf(25, [1.0, -2.85, -.9], [-10, 0, 0]), Wp(28, F_(-3.3, .5, -2.6), {ease: 'i'}), Wp(48, F_(-3.3, .5, -2.6)), W(54, 'fr', 0, {lift: .25})],
-      hl: [W(0, 'hl'), W(8, 'hl'), Sf(12, [.5, -1.0, 1.3], [30, 0, 0]), Sf(30, [.5, -1.1, 1.0], [24, 0, 0]), Sf(36, [.5, -1.3, .6], [10, 0, 0]), W(39, 'hl', 0, {ease: 'i'})],
+      // (FIX FID-3) the left hind stays up after the fore landing (the wave-2 cue: it comes down on wave 2 at 39 = played 32)
+      hl: [W(0, 'hl'), W(8, 'hl'), Sf(12, [.5, -1.0, 1.3], [30, 0, 0]), Sf(28, [.5, -.6, 1.1], [26, 0, 0]), Sf(35, [.5, -.5, .8], [18, 0, 0]), W(39, 'hl', 0, {ease: 'i'})],
       hr: [W(0, 'hr'), W(8, 'hr'), Sf(12, [.5, -1.0, 1.3], [30, 0, 0]), Sf(30, [.5, -1.1, 1.0], [24, 0, 0]), Sf(36, [.5, -1.3, .6], [10, 0, 0]), W(39, 'hr', 0, {ease: 'i'})]},
     lag: {head: 1, pelvis: 1}, anchors: {land: ['nose'], wave2: ['nose']},
     note: 'deep crouch 0-6 (root -0.55), the front lifts and the hinds push at 8 (take-off), the body pitched up +16 rising, level at the apex, nose down falling with the fores reaching; the fores and chest land at 28 (wave 1, compression), the rear comes down with a heave, the hinds land at 39 (wave 2); settle, the head up last'});
@@ -744,12 +747,18 @@ const FORE_UP = (y = 5.6, z = -3.0, x = 3.3, e = [-55, 0, -10]) => fore([x, y, z
 // straight back along the rear axis, impact 52, the spikes 54, the drag 30 degrees aside and lift 58-70, settle (v3 J, P8).
 {
   const high = {pos: [0, -.06, 0], rot: [-3, 0, 0], pelvis: [2, 0, 0], neck1: [2, 0, 0], head: [-2, 0, 0], jaw: 6, flH: 8, flM: 4, ...ups(TAIL_HIGH)};
-  const hit = {pos: [0, -.18, 0], rot: [-1, 0, 0], pelvis: [-4, 0, 0], neck1: [4, 0, 0], head: [2, 0, 0], jaw: 14, flH: 14, flM: 8, ...ups(TAIL_FLAT)};
+  // (FIX FID-2) the slam pose lays the distal tail flat too (TAIL_FLAT keeps the last joints up 6 / 12 deg: t8 and the tip
+  // hung ~0.9 / 1.4 b over the floor at the impact)
+  const hit = {pos: [0, -.18, 0], rot: [-1, 0, 0], pelvis: [-4, 0, 0], neck1: [4, 0, 0], head: [2, 0, 0], jaw: 14, flH: 14, flM: 8,
+    ...ups(TAIL_FLAT.map((v, i) => (i === 5 ? 1 : i === 6 ? -2 : i === 7 ? -12 : v)))};
   S.push({name: 'tail_slam', keys: [[0, {}], [12, high, 'o'], [44, {...high, ...ups(TAIL_HIGH, 1.06)}], [48, {...high, pelvis: [3, 0, 0], ...ups(TAIL_HIGH, 1.1), jaw: 10}, 'io'],
     [52, hit, 'i'], [55, {...hit, pos: [0, -.12, 0], ...ups(TAIL_FLAT.map((v, i) => v + (i > 1 ? 4 : 1)))}, 'o'], [58, {...hit, pos: [0, -.1, 0], jaw: 8}, 'io'],
     [70, {pos: [0, -.04, 0], pelvis: [0, 0, 0], rot: [0, 0, 0], neck1: [2, 0, 0], head: [0, 0, 0], jaw: 5, flH: 4, flM: 2, tSweep: 30, tLift: 10, ...ups(TAIL_LOW, .8)}, 'io'],
     [90, {pos: [0, 0, 0], neck1: [0, 0, 0], jaw: 3, flH: 0, flM: 0, tSweep: 0, tLift: 0, ...tailUp(TAIL_REST)}, 'io']],
-    tailLag: 1.2, lag: {head: 2},
+    // (FIX FID-2) the follow-through lag (1.2 per segment) made the tip land 3 t after the impact event: the lag runs out
+    // over the hold (40 -> 48, the tail still), the slam 48 -> 52 is one stiff pole so every segment meets the floor at the
+    // impact (52 = played 39), and the lag comes back slowly over the drag (58 -> 78; < 1/7 per tick, no segment runs back)
+    tailLag: a => (a <= 40 ? 1.2 : a < 48 ? 1.2 * (48 - a) / 8 : a <= 58 ? 0 : a < 78 ? 1.2 * (a - 58) / 20 : 1.2), lag: {head: 2},
     over: [tremor(14, 47, 2.5, 4, [['t6', [1, 1.5]], ['t7', [1.5, 2]], ['t8', [2, 2.5]]])],
     anchors: {slam: ['tail_root', 'tail_tip'], impact: ['tail_root', 'tail_tip'], spikes: ['tail_root', 'tail_tip']},
     note: 'the tail rises high over the rump 0-12 (a near straight pole, the tip ~12 b up, the body leaning onto the fores), held 12-48 with the tip quivering, slammed 48-52 straight back along the floor (impact 52), a bounce, the spikes 54, dragged 30 degrees aside and lifted 58-70, settled by 90'});
@@ -820,14 +829,19 @@ const SHOW = {visBody: 1, visTail: 1};
     [246, {pos: [0, -.42, 0], chest: [-3, 0, 0], jaw: 14, flS: 12, flM: 10, flN: 8, flH: 8, flK: 1.03}, 'o'],
     [270, {pos: [0, -.06, 0], rot: [0, 0, 0], chest: [0, 0, 0], neck1: [-2, 0, 0], head: [-3, 0, 0], jaw: 4, flS: 0, flM: 0, flN: 0, flH: 0, flK: 1}, 'io']];
   // fore paws per wave (K = carried by the channel set in the overlay below)
-  const fl = [W(0, 'fl'), W(64, 'fl'), Kf(72, {ease: 'o'}), Wp(76, F_(3.3, .5, -2.6), {ease: 'i'}), Wp(105, F_(3.3, .5, -2.6)), Kf(125, {ease: 'o'}), Wp(132, F_(3.3, .5, -2.55), {ease: 'i'}),
-    Wp(157, F_(3.3, .5, -2.55)), Kf(179, {ease: 'o'}), Wp(186, F_(3.3, .5, -2.6), {ease: 'i'}), Wp(197, F_(3.3, .5, -2.6)), Sf(203, [1.5, -2.0, 1.1], [-25, 0, -20]), Sf(238, [1.5, -2.0, 1.1], [-25, 0, -20]), W(240, 'fl', 0, {ease: 'i'})];
-  const fr = [W(0, 'fr'), W(20, 'fr'), Kf(30, {ease: 'o'}), W(40, 'fr', 0, {ease: 'io'}), W(64, 'fr'), Kf(72, {ease: 'o'}), Wp(76, F_(-3.3, .5, -2.6), {ease: 'i'}), Wp(78, F_(-3.3, .5, -2.6)),
-    Kf(97, {ease: 'o'}), Wp(104, F_(-3.3, .5, -2.55), {ease: 'i'}), Wp(133, F_(-3.3, .5, -2.55)), Kf(150, {ease: 'o'}), Wp(156, F_(-3.3, .5, -2.6), {ease: 'i'}), Wp(197, F_(-3.3, .5, -2.6)), Sf(203, [1.5, -2.0, 1.1], [-25, 0, -20]), Sf(238, [1.5, -2.0, 1.1], [-25, 0, -20]), W(240, 'fr', 0, {ease: 'i'})];
+  // (FIX FID-5) the tell lifts the right fore off the floor (wrist 2.2 b, the paw ~0.8 b up) 25-35 (played 19-26);
+  // (FIX FID-6 / FAIR-12) each wave's fore leaves the floor on the previous wave's slam (+1) and is high within ~6
+  // authored (~4.5 played) ticks, held up to its own slam: every lift spans the whole 20-21 t between the waves
+  const fl = [W(0, 'fl'), W(64, 'fl'), Kf(72, {ease: 'o'}), Wp(76, F_(3.3, .5, -2.6), {ease: 'i'}), Wp(105, F_(3.3, .5, -2.6)), Kf(111, {ease: 'o'}), Kf(125),
+    Wp(132, F_(3.3, .5, -2.55), {ease: 'i'}), Wp(157, F_(3.3, .5, -2.55)), Kf(163, {ease: 'o'}), Kf(179), Wp(186, F_(3.3, .5, -2.6), {ease: 'i'}), Wp(197, F_(3.3, .5, -2.6)),
+    Sf(203, [1.5, -2.0, 1.1], [-25, 0, -20]), Sf(238, [1.5, -2.0, 1.1], [-25, 0, -20]), W(240, 'fl', 0, {ease: 'i'})];
+  const fr = [W(0, 'fr'), W(20, 'fr'), Kf(26, {ease: 'o'}), Kf(34), W(40, 'fr', 0, {ease: 'io'}), W(64, 'fr'), Kf(72, {ease: 'o'}), Wp(76, F_(-3.3, .5, -2.6), {ease: 'i'}), Wp(77, F_(-3.3, .5, -2.6)),
+    Kf(83, {ease: 'o'}), Kf(97), Wp(104, F_(-3.3, .5, -2.55), {ease: 'i'}), Wp(133, F_(-3.3, .5, -2.55)), Kf(139, {ease: 'o'}), Kf(150), Wp(156, F_(-3.3, .5, -2.6), {ease: 'i'}),
+    Wp(197, F_(-3.3, .5, -2.6)), Sf(203, [1.5, -2.0, 1.1], [-25, 0, -20]), Sf(238, [1.5, -2.0, 1.1], [-25, 0, -20]), W(240, 'fr', 0, {ease: 'i'})];
   const hr = [W(0, 'hr'), W(36, 'hr'), Wp(46, F_(-2.6, 2.3, 2.7), {ease: 'o'}), W(56, 'hr', 0, {ease: 'io'})];
   const paws = (a, P) => {
-    if (a < 60) { P.fwR = [-3.4, 1.3, -2.6]; P.fpR = [-20, 0, 0]; }
-    else if (a < 90) { P.fwL = BOTH[0]; P.fwR = BOTH[1]; P.fpL = [-25, 0, 0]; P.fpR = [-25, 0, 0]; }
+    if (a < 60) { P.fwR = [-3.45, 2.2, -2.75]; P.fpR = [-28, 0, 0]; }
+    else if (a < 77) { P.fwL = BOTH[0]; P.fwR = BOTH[1]; P.fpL = [-25, 0, 0]; P.fpR = [-25, 0, 0]; }
     else if (a < 200) { P.fwL = LIFT_L; P.fwR = LIFT_R; P.fpL = [-30, 0, 0]; P.fpR = [-30, 0, 0]; }
   };
   S.push({name: 'landslide', keys, feet: {fl, fr, hr}, over: [paws, tremor(214, 236, 1.5, 4, [['chest', [1]], ['head', [1, .6]], ['jaw', 2]]),
