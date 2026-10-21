@@ -1,4 +1,4 @@
-# t79: lock 2 (lockv lead 8); shell 2 r 3.0 (tell 14, 130 %), quiet (none row);
+# t79: lock 2 (lockv lead 8); shell 2 r 3.0 (tell 14, 45 %), quiet (none row);
 # the q3_lock sound at the point; the hovering shell slides to 5 b over it (4 t), then falls onto it
 # (AP-FIX RV-02: the readable cue 14 t before the hit, no floor decal).
 kill @e[type=minecraft:marker,tag=rlk_mb_ap_lock]

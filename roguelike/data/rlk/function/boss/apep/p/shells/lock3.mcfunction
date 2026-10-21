@@ -1,4 +1,4 @@
-# t82: lock 3 (lockp); shell 3 r 3.0 (tell 14, 130 %), quiet (none row);
+# t82: lock 3 (lockp); shell 3 r 3.0 (tell 14, 45 %), quiet (none row);
 # the q3_lock sound at the point; the hovering shell slides to 5 b over it (4 t), then falls onto it
 # (AP-FIX RV-02: the readable cue 14 t before the hit, no floor decal).
 function rlk:boss/apep/u/lockp

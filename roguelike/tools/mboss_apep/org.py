@@ -9,7 +9,7 @@ step_flat) and om/face turns the passengers (a tp of a passenger would dismount 
 
 Every spawn (waves, the time-out, tests 23-28 through the waves' own path) is a 20 t spawn marker (kit spawn_marker) and
 then a 10 t emergence (rlk_mb_inv: untargetable until solid). Kills: the module reads rlk_mb_broken (aux/take) and pays
-the progress (+325 basic / +1400 the others, api.REV) at once, the energy particles (char/particles el 7; 파괴 n 4), the
+the progress (api.REV basic_kill / kill: +300 basic / +1300 the others since AP-FIX) at once, the energy particles (char/particles el 7; 파괴 n 4), the
 kind's death clip, then removes the husk and its passengers (no XP / gold / heal orbs: aux kills pay none; never a
 true_hit). Swallowed basics and a 파괴 that blew pay nothing.
 
@@ -208,7 +208,7 @@ def emit(g):
     # ---------------------------------------------------------------- kills and removal
     g.w('org/broke', [
         HEAD, '# @s = an organism the player broke (rlk_mb_broken from aux/take, or the 양육\'s self-destruct): dying (untargetable),',
-        '# its slot / socket freed; the progress at once (+325 basic / +1400 the others; never for a 파괴 that blew), the energy',
+        '# its slot / socket freed; the progress at once (api.REV basic_kill / kill; never for a 파괴 that blew), the energy',
         '# particles, the kind\'s death (clip, fx, links, shields).',
         'tag @s add rlk_mb_ap_dying', 'tag @s add rlk_mb_inv', es('apT', 0),
         'tag @s remove rlk_mb_ap_tok', 'tag @s remove rlk_mb_ap_sk0', 'tag @s remove rlk_mb_ap_sk1', 'tag @s remove rlk_mb_ap_sk2',
@@ -545,7 +545,7 @@ def emit(g):
         'scoreboard players operation #apY mb *= #apZ mb', 'scoreboard players operation #apY mb /= #c100 mb',
         'scoreboard players operation @s mhpC -= #apY mb', F('org/nurt/imm'),
         f'execute if score @s mhpC matches ..0 run {F("org/nurt/selfd")}'])
-    g.w('org/nurt/selfd', ['# "자멸": the module break (aux/broke); org/broke pays +1400 next tick and plays the self-destruct.',
+    g.w('org/nurt/selfd', ['# "자멸": the module break (aux/broke); org/broke pays REV kill next tick and plays the self-destruct.',
                            'tag @s add rlk_mb_ap_selfd', 'tag @s remove rlk_mb_ap_imm', 'function rlk:mboss/aux/broke'])
     g.w('org/nurt/die', ['# @s = a 양육 broken (killed, or its self-destruct): nurt_die (17 t); its basics lose the buff.',
                          om('nurt', 'play/nurt_die'), 'tag @s remove rlk_mb_ap_imm',

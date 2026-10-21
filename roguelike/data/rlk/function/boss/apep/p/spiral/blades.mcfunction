@@ -1,5 +1,5 @@
 # t52: two low leaf-blade lanes crossing the player's spot (+-35 deg about the boss -> player
-# line), each a line 14.0 x 2.2 b (#hzY1 0.7: jumpable), tell 12, 60 %, one volley group;
+# line), each a line 14.0 x 2.2 b (#hzY1 0.7: jumpable), tell 12, 24 %, one volley group;
 # quiet (none row): the blades stand glowing at the lane starts from now to the skim (the readable tell).
 function rlk:boss/apep/u/lockp
 kill @e[type=minecraft:marker,tag=rlk_mb_ap_p35p]

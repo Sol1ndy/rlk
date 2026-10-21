@@ -1,5 +1,5 @@
 # @s = body (t32, hidden): the burst point L = the predictive lock (lead 10) clamped to r 16;
-# the burst hazard r 4.2 (tell 12, 140 %) with its keep decal (the rosette ring,
+# the burst hazard r 4.2 (tell 12, 56 %) with its keep decal (the rosette ring,
 # plan 14: the leaf ring the footage shows 12 t before the burst) and the airborne rosette.
 kill @e[type=minecraft:marker,tag=rlk_mb_ap_lock]
 function rlk:mboss/mv/lockv {lead:10}

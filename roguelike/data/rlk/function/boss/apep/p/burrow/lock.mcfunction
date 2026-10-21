@@ -1,6 +1,6 @@
 # @s = body (t32, hidden): the lock is fixed: the anchor under it (head on the lock, clamp r 18), facing
 # it; the burst disc r 4.2 on the head point, tell 12 (keep row: the shadow is the marker, no ring),
-# KB 3 outward, height 0-4, 120 %.
+# KB 3 outward, height 0-4, 108 %.
 kill @e[type=minecraft:marker,tag=rlk_mb_ap_lock]
 function rlk:mboss/mv/lockv {lead:10}
 tag @e[type=minecraft:marker,tag=rlk_mb_lock] add rlk_mb_ap_lock
@@ -20,7 +20,7 @@ scoreboard players set #hzKBDir mb 0
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzY1 mb 40
-execute at @e[type=minecraft:marker,tag=rlk_mb_ap_p1b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_ap_p1b,limit=1] run function rlk:mboss/hz/disc {r:42,tell:12,dmg:120}
+execute at @e[type=minecraft:marker,tag=rlk_mb_ap_p1b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_ap_p1b,limit=1] run function rlk:mboss/hz/disc {r:42,tell:12,dmg:108}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_ap_p1
 execute at @e[type=minecraft:marker,tag=rlk_mb_ap_p1b,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_ap_p1b,limit=1] run function rlk:boss/apep/fx/snd/p1_ring
 kill @e[type=minecraft:marker,tag=rlk_mb_ap_p1g]

@@ -263,18 +263,21 @@ def org_clip(owner, name):
 # =============================================================================================
 # Balance tables (plan 9.3 / 7.6.2 / 9.4 / 9.5). % of the base hit (coefficient x 100); only the balance fixer (AP-FIX)
 # changes values. raw = floor(0.18 x pct) against the reference player (plan 9.2). Phase-3 rows include the x1.25 bump.
+# AP-FIX balance (one pass, apfair on the sim of record, plan 9.7; S:ap/balance/analysis.txt): P1 x0.9 / P2 x0.85 / P4 x0.65
+# / P6 x0.55 (the 4-hit combo was 85 % of max HP for one cast; gate 60 %), P3 / P5 kept; phase 3 x0.35-0.4 on every row
+# (the rates were 2.1-2.6x the Guardian's; the x1.25 bump is inside these numbers); organisms kept.
 DMG = {
-    'p1_burst': 120, 'p1_sweep': 140,
-    'p2_plunge': 80, 'p2_strip': 100,
+    'p1_burst': 108, 'p1_sweep': 125,
+    'p2_plunge': 67, 'p2_strip': 85,
     'p3_slam1': 110, 'p3_slam2': 110, 'p3_slam3': 130, 'p3_carpet': 30, 'p3_wheel': 15,
-    'p4': 130,
+    'p4': 85,
     'p5_1': 130, 'p5_2': 140,
-    'p6_1': 100, 'p6_2': 120, 'p6_3': 90, 'p6_4': 140,
-    'q1_burst': 140, 'q1_slam': 150,
-    'q3_1': 150, 'q3_23': 130,
-    'q3s_splash': 80, 'q3s_shell': 130,
-    'q4_1': 150, 'q4_2': 160,
-    'q5_volley': 120, 'q5_blade': 60,
+    'p6_1': 55, 'p6_2': 67, 'p6_3': 50, 'p6_4': 77,
+    'q1_burst': 56, 'q1_slam': 60,
+    'q3_1': 52, 'q3_23': 45,
+    'q3s_splash': 32, 'q3s_shell': 52,
+    'q4_1': 52, 'q4_2': 56,
+    'q5_volley': 48, 'q5_blade': 24,
     'o1': 25, 'o1_buffed': 30, 'o2': 34, 'o2_buffed': 42,
     'o6_burst': 35, 'o6_chain1': 67, 'o6_chain2': 34, 'o6_chain3': 20, 'o6_chain4': 13, 'o6_single': 34,
     'o7': 67,
@@ -288,8 +291,8 @@ ORG_PM = {'basic': 17, 'guard': 34, 'destr': 21, 'pred': 26, 'nest': 26, 'nurt':
 ORG_RES = {'dendro': 20, 'other': 10}                       # U2: organisms Dendro 20 %, the rest 10 %
 BOSS_RES = {'dendro': 30, 'other': 10}                      # U2: the body (registry res)
 REV = {                                                     # plan 7.6.2 / 9.5 (the solo economy); AP-REV owns the use
-    'start': 2700, 'win': 10000, 'basic_kill': 325, 'kill': 1400,
-    'basic_hit': 60, 'buffed_hit': 120, 'destr_blast': 1400,
+    'start': 2700, 'win': 10000, 'basic_kill': 300, 'kill': 1300,       # AP-FIX balance: was 325 / 1400 and 60 / 120
+    'basic_hit': 54, 'buffed_hit': 108, 'destr_blast': 1400,
     'slots': 3, 'cap': 6, 'wave_clock': 600, 'wave_left': 1,
     'timeout': 2000, 'timeout_every': 600, 'timeout_alive': 1, 'warn_lead': 0,
     'fail_strikes': 2, 'fail_restart': 2700,

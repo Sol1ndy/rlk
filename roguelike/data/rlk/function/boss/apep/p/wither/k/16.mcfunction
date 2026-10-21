@@ -10,6 +10,6 @@ scoreboard players set #hzKBDir mb 0
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzY1 mb 30
-execute at @s positioned ~ 201 ~ run function rlk:mboss/hz/disc {r:90,tell:24,dmg:130}
+execute at @s positioned ~ 201 ~ run function rlk:mboss/hz/disc {r:90,tell:24,dmg:85}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_ap_p4
 execute at @s run function rlk:boss/apep/fx/snd/p4_hum

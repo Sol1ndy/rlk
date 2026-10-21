@@ -1,6 +1,6 @@
 # As the frame marker (the start facing of tail_p3 moved to the lunge end), at it: the
 # per-tick swept wedges of swing 2 (plan 7.11 rule 3; api.wedges from the manifest's
-# tail track x the yaw schedule), r 12.0, height to 2.0 b, heavy KB away, 160 %, one volley group;
+# tail track x the yaw schedule), r 12.0, height to 2.0 b, heavy KB away, 56 %, one volley group;
 # quiet (none row: the crouch / cock + tail-tip flash, the S-coil + lunge are the tell).
 function rlk:mboss/grp_new
 execute positioned ^-1.858 ^0 ^-1.717 positioned ~ 201 ~ rotated ~86.69 0 run function rlk:boss/apep/p/tail3/sw2_46

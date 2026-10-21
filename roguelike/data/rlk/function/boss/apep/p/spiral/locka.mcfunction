@@ -1,5 +1,5 @@
 # t37: lock A = the floor under the player (lockp, no lead); 6 landing points (the lock + 5 on r 3.4,
-# a random turn), each a disc r 2.0 (tell 12, 120 %), quiet (none row: the orbs flare now and
+# a random turn), each a disc r 2.0 (tell 12, 48 %), quiet (none row: the orbs flare now and
 # fly visibly); volleys A and B share one volley group. The landing markers pair with the orbs by apL.
 function rlk:boss/apep/u/lockp
 kill @e[type=minecraft:marker,tag=rlk_mb_ap_p35a]

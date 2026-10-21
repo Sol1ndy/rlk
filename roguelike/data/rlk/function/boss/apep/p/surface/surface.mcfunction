@@ -1,5 +1,5 @@
 # @s = body (t36): the surfacing splash (impact visual), the charge; lock L at the player; the shell r
-# 3.0 (tell 12, 130 %) with its keep decal (the pale disc under the player); the
+# 3.0 (tell 12, 52 %) with its keep decal (the pale disc under the player); the
 # light band length (muzzle -> L) for t46.
 execute at @s positioned ~ 201 ~ run function rlk:boss/apep/fx/p/surface_splash
 execute at @s positioned ~ 201 ~ run function rlk:boss/apep/fx/p/water_splash

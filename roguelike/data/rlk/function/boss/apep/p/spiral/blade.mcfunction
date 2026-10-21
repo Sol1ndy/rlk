@@ -11,5 +11,5 @@ scoreboard players set #hzEl mb 7
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzY1 mb 7
-function rlk:mboss/hz/line {len:140,w:22,tell:12,dmg:60}
+function rlk:mboss/hz/line {len:140,w:22,tell:12,dmg:24}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_ap_p35h

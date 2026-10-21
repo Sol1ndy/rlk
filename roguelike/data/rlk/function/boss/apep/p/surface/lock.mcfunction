@@ -1,5 +1,5 @@
 # @s = body (t26, hidden): the surfacing point = 9.0 b from the player toward the boss (lockb, clamp r 14);
-# the surfacing splash r 3.6 (tell 10, 80 %) with its keep decal (the leaf ring
+# the surfacing splash r 3.6 (tell 10, 32 %) with its keep decal (the leaf ring
 # the footage shows at the surfacing spot) and the circling leaves.
 function rlk:boss/apep/u/lockb {d:9}
 kill @e[type=minecraft:marker,tag=rlk_mb_ap_p36u]
