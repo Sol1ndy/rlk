@@ -65,6 +65,7 @@ bossbar set rlk:narukami style progress
 bossbar set rlk:narukami_state style progress
 function rlk:boss/raiden/bars_hide
 scoreboard players set #rd100 rd 100
+scoreboard players set #rd10000 rd 10000
 scoreboard players set #rd4 rd 4
 scoreboard players set #rd2 rd 2
 scoreboard players set #rd3 rd 3

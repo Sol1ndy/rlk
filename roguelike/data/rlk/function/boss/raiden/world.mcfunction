@@ -9,6 +9,7 @@ execute if entity @a[tag=player,scores={pkMode=1..}] run return run function rlk
 execute unless entity @e[tag=rlk_body,limit=1] run return 0
 execute as @e[tag=rlk_raiden,limit=1] at @s run function rlk:boss/raiden/tick
 execute as @e[tag=rlk_rd_object] at @s run function rlk:boss/raiden/object/tick
+execute if entity @e[tag=rlk_rd_hazard,limit=1] run function rlk:boss/raiden/hazard/body
 execute as @e[tag=rlk_rd_hazard] at @s run function rlk:boss/raiden/hazard/tick
 function rlk:boss/raiden/hazard/vfx_world
 execute as @e[tag=rlk_rd_dome] at @s run function rlk:boss/raiden/dome_tick

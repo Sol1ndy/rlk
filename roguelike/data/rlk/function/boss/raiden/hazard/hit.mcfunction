@@ -1,19 +1,17 @@
 # @s = hazard at its origin. Body feet (rlk_body) relative to the origin; R2 only for radial kinds.
 scoreboard players set #rdHit rd 0
 execute unless entity @e[tag=rlk_body,distance=..46,limit=1] run return 0
-execute store result score #rdDX rd run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000
-execute store result score #rdDZ rd run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000
-execute store result score #rdOX rd run data get entity @s Pos[0] 1000
-execute store result score #rdOZ rd run data get entity @s Pos[2] 1000
-scoreboard players operation #rdDX rd -= #rdOX rd
-scoreboard players operation #rdDZ rd -= #rdOZ rd
+# S3 perf: the body position is read once per tick (hazard/body, from world) and the origin is cached at init.
+scoreboard players operation #rdDX rd = #rdBX rd
+scoreboard players operation #rdDZ rd = #rdBZ rd
+scoreboard players operation #rdDX rd -= @s rdHOX
+scoreboard players operation #rdDZ rd -= @s rdHOZ
 execute if score @s rdHK matches 1..2 run function rlk:boss/raiden/hazard/r2
 execute if score @s rdHK matches 5 run function rlk:boss/raiden/hazard/r2
 execute if score @s rdHK matches 8..10 run function rlk:boss/raiden/hazard/r2
 execute if score @s rdHK matches 10 run return run function rlk:boss/raiden/hazard/k/safe_dome
-execute store result score #rdDY rd run data get entity @e[tag=rlk_body,limit=1] Pos[1] 1000
-execute store result score #rdOY rd run data get entity @s Pos[1] 1000
-scoreboard players operation #rdDY rd -= #rdOY rd
+scoreboard players operation #rdDY rd = #rdBY rd
+scoreboard players operation #rdDY rd -= @s rdHOY
 execute unless score #rdDY rd matches -500..3500 run return 0
 execute if entity @s[tag=rlk_rd_jump] unless score #rdDY rd matches -500..750 run return 0
 execute unless score @s rdHK matches 1 unless score @s rdHK matches 5 unless score @s rdHK matches 8..9 run function rlk:boss/raiden/hazard/fs

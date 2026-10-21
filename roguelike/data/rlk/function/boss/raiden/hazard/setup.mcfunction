@@ -15,6 +15,9 @@ scoreboard objectives add rdHDl dummy
 scoreboard objectives add rdHKb dummy
 scoreboard objectives add rdHSv dummy
 scoreboard objectives add rdHSnd dummy
+scoreboard objectives add rdHOX dummy
+scoreboard objectives add rdHOY dummy
+scoreboard objectives add rdHOZ dummy
 scoreboard players set #rdOne rd 1
 scoreboard players set #rdK1000 rd 1000
-scoreboard players set #rdKitV rd 2
+scoreboard players set #rdKitV rd 3

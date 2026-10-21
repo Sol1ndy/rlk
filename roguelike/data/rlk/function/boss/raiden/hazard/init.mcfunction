@@ -10,6 +10,10 @@ scoreboard players operation @s rdHLife > #rdMinLife rd
 execute positioned ^ ^ ^1 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_rd_haxis","rlk_raiden_aux","rlk_room"]}
 execute store result score #rdOX rd run data get entity @s Pos[0] 1000
 execute store result score #rdOZ rd run data get entity @s Pos[2] 1000
+# S3 perf: the origin is cached (rdHOX/Y/Z, milliblocks); only the follow kind moves and refreshes it.
+scoreboard players operation @s rdHOX = #rdOX rd
+scoreboard players operation @s rdHOZ = #rdOZ rd
+execute store result score @s rdHOY run data get entity @s Pos[1] 1000
 execute store result score @s rdFX run data get entity @e[tag=rlk_rd_haxis,limit=1] Pos[0] 1000
 execute store result score @s rdFZ run data get entity @e[tag=rlk_rd_haxis,limit=1] Pos[2] 1000
 scoreboard players operation @s rdFX -= #rdOX rd

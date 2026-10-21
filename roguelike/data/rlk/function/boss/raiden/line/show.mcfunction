@@ -1,4 +1,7 @@
-# One typing step of a boss line (macro: t text, c colour, s stay, f fade, n ttlT, e 1 = the last step).
+# One typing step of a boss line (macro: t text, c colour, s stay, f fade, n ttlT, e 1 = the last step,
+# g ticks to the next step).
+scoreboard players operation #rdLineN rd = #rdLineT rd
+$scoreboard players add #rdLineN rd $(g)
 # One plain, quiet tick per step (same sound and pitch every time).
 $title @a[tag=player] times 0 $(s) $(f)
 $title @a[tag=player] subtitle {text:"$(t)",color:"$(c)",bold:true}

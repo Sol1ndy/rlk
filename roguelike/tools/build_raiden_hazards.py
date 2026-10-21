@@ -37,8 +37,8 @@ if OUT.exists():
 OUT.mkdir(parents=True, exist_ok=True)
 NEW = '@e[tag=rlk_rd_hnew,limit=1]'
 OBJECTIVES = ['rdHK', 'rdHA', 'rdHB', 'rdHC', 'rdHD', 'rdHE', 'rdHF', 'rdHTol', 'rdHEv', 'rdHMax', 'rdHGrp', 'rdHDk',
-              'rdHDl', 'rdHKb', 'rdHSv', 'rdHSnd']
-KIT_VERSION = 2
+              'rdHDl', 'rdHKb', 'rdHSv', 'rdHSnd', 'rdHOX', 'rdHOY', 'rdHOZ']
+KIT_VERSION = 3
 
 
 def write(name, lines):
@@ -103,6 +103,10 @@ write('init', [
     'execute positioned ^ ^ ^1 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_rd_haxis","rlk_raiden_aux","rlk_room"]}',
     'execute store result score #rdOX rd run data get entity @s Pos[0] 1000',
     'execute store result score #rdOZ rd run data get entity @s Pos[2] 1000',
+    '# S3 perf: the origin is cached (rdHOX/Y/Z, milliblocks); only the follow kind moves and refreshes it.',
+    'scoreboard players operation @s rdHOX = #rdOX rd',
+    'scoreboard players operation @s rdHOZ = #rdOZ rd',
+    'execute store result score @s rdHOY run data get entity @s Pos[1] 1000',
     'execute store result score @s rdFX run data get entity @e[tag=rlk_rd_haxis,limit=1] Pos[0] 1000',
     'execute store result score @s rdFZ run data get entity @e[tag=rlk_rd_haxis,limit=1] Pos[2] 1000',
     'scoreboard players operation @s rdFX -= #rdOX rd',
@@ -226,12 +230,10 @@ write('k/follow_move', [
     '# @s = follow hazard. Horizontal chase (pitch 0) at data.fv blocks per tick; snaps when closer than one step.',
     'execute unless entity @e[tag=rlk_body,limit=1] run return 0',
     'execute store result score #rdT rd run data get entity @s data.fv 1000',
-    'execute store result score #rdPX rd run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000',
-    'execute store result score #rdPZ rd run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000',
-    'execute store result score #rdOX rd run data get entity @s Pos[0] 1000',
-    'execute store result score #rdOZ rd run data get entity @s Pos[2] 1000',
-    'scoreboard players operation #rdPX rd -= #rdOX rd',
-    'scoreboard players operation #rdPZ rd -= #rdOZ rd',
+    'scoreboard players operation #rdPX rd = #rdBX rd',
+    'scoreboard players operation #rdPZ rd = #rdBZ rd',
+    'scoreboard players operation #rdPX rd -= @s rdHOX',
+    'scoreboard players operation #rdPZ rd -= @s rdHOZ',
     'scoreboard players operation #rdR2 rd = #rdPX rd',
     'scoreboard players operation #rdR2 rd *= #rdPX rd',
     'scoreboard players operation #rdC rd = #rdPZ rd',
@@ -243,6 +245,10 @@ write('k/follow_move', [
     f'execute if score #rdR2 rd > #rdC rd facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 run function {H}k/follow_step with entity @s data',
     'scoreboard players operation #rdOwner rd = @s rdHId',
     'execute at @s as @e[tag=rlk_rd_hvis,distance=..3] if score @s rdVId = #rdOwner rd run tp @s ~ ~ ~',
+    '# the cached origin follows the marker',
+    'execute store result score @s rdHOX run data get entity @s Pos[0] 1000',
+    'execute store result score @s rdHOY run data get entity @s Pos[1] 1000',
+    'execute store result score @s rdHOZ run data get entity @s Pos[2] 1000',
 ])
 write('k/follow_step', ['$tp @s ^ ^ ^$(fv)'])
 write('k/follow_snap', [
@@ -279,23 +285,27 @@ write('fs', [
     'execute if score #rdAbsSide rd matches ..-1 run scoreboard players operation #rdAbsSide rd *= #rdNeg rd',
 ])
 K = KINDS
+write('body', [
+    '# World, once per tick before the hazards tick: the body (rlk_body) feet in milliblocks for hazard/hit.',
+    'execute store result score #rdBX rd run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000',
+    'execute store result score #rdBY rd run data get entity @e[tag=rlk_body,limit=1] Pos[1] 1000',
+    'execute store result score #rdBZ rd run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000',
+])
 write('hit', [
     '# @s = hazard at its origin. Body feet (rlk_body) relative to the origin; R2 only for radial kinds.',
     'scoreboard players set #rdHit rd 0',
     'execute unless entity @e[tag=rlk_body,distance=..46,limit=1] run return 0',
-    'execute store result score #rdDX rd run data get entity @e[tag=rlk_body,limit=1] Pos[0] 1000',
-    'execute store result score #rdDZ rd run data get entity @e[tag=rlk_body,limit=1] Pos[2] 1000',
-    'execute store result score #rdOX rd run data get entity @s Pos[0] 1000',
-    'execute store result score #rdOZ rd run data get entity @s Pos[2] 1000',
-    'scoreboard players operation #rdDX rd -= #rdOX rd',
-    'scoreboard players operation #rdDZ rd -= #rdOZ rd',
+    '# S3 perf: the body position is read once per tick (hazard/body, from world) and the origin is cached at init.',
+    'scoreboard players operation #rdDX rd = #rdBX rd',
+    'scoreboard players operation #rdDZ rd = #rdBZ rd',
+    'scoreboard players operation #rdDX rd -= @s rdHOX',
+    'scoreboard players operation #rdDZ rd -= @s rdHOZ',
     f'execute if score @s rdHK matches 1..2 run function {H}r2',
     f'execute if score @s rdHK matches 5 run function {H}r2',
     f'execute if score @s rdHK matches 8..10 run function {H}r2',
     f'execute if score @s rdHK matches {K["safe_dome"]} run return run function {H}k/safe_dome',
-    'execute store result score #rdDY rd run data get entity @e[tag=rlk_body,limit=1] Pos[1] 1000',
-    'execute store result score #rdOY rd run data get entity @s Pos[1] 1000',
-    'scoreboard players operation #rdDY rd -= #rdOY rd',
+    'scoreboard players operation #rdDY rd = #rdBY rd',
+    'scoreboard players operation #rdDY rd -= @s rdHOY',
     'execute unless score #rdDY rd matches -500..3500 run return 0',
     'execute if entity @s[tag=rlk_rd_jump] unless score #rdDY rd matches -500..750 run return 0',
     f'execute unless score @s rdHK matches 1 unless score @s rdHK matches 5 unless score @s rdHK matches 8..9 run function {H}fs',

@@ -75,12 +75,18 @@ title @a[tag=player] subtitle ""
 scoreboard players set @a[tag=player,scores={ttlT=1..}] ttlT 0
 scoreboard players set @a[tag=player,scores={vBig=1..}] vBig 0
 ''')
-    tick_lines = ['# Advances the boss line in progress (#rdLine id, #rdLineT age); called from tick.',
+    # S3 perf: line/show stores the tick of the next typing step (#rdLineN), so between steps the tick returns after
+    # three commands instead of testing every step of every line.
+    tick_lines = ['# Advances the boss line in progress (#rdLine id, #rdLineT age, #rdLineN next step); called from tick.',
                   'execute unless score #rdLine rd matches 1.. run return 0',
-                  'scoreboard players add #rdLineT rd 1']
+                  'scoreboard players add #rdLineT rd 1',
+                  'execute unless score #rdLineT rd = #rdLineN rd run return 0']
     # One typing step = one call of the macro line/show (S2-SHOGUN: no per-step files).
     write('line/show', [
-        '# One typing step of a boss line (macro: t text, c colour, s stay, f fade, n ttlT, e 1 = the last step).',
+        '# One typing step of a boss line (macro: t text, c colour, s stay, f fade, n ttlT, e 1 = the last step,',
+        '# g ticks to the next step).',
+        'scoreboard players operation #rdLineN rd = #rdLineT rd',
+        '$scoreboard players add #rdLineN rd $(g)',
         '# One plain, quiet tick per step (same sound and pitch every time).',
         '$title @a[tag=player] times 0 $(s) $(f)',
         '$title @a[tag=player] subtitle {text:"$(t)",color:"$(c)",bold:true}',
@@ -93,13 +99,14 @@ scoreboard players set @a[tag=player,scores={vBig=1..}] vBig 0
     for key, (steps, gap, colour, hold) in LINES.items():
         steps = typed(steps) if isinstance(steps, str) else steps
         lid = LINE_IDS[key]
-        write('line/'+key, [f'scoreboard players set #rdLine rd {lid}', 'scoreboard players set #rdLineT rd -1'])
+        write('line/'+key, [f'scoreboard players set #rdLine rd {lid}', 'scoreboard players set #rdLineT rd -1',
+                            'scoreboard players set #rdLineN rd 0'])
         for k, text in enumerate(steps):
             last = k == len(steps)-1
             stay = hold if last else gap+6
             fade = 12 if last else 0
             assert '"' not in text and '\\' not in text, text
-            args = f'{{t:"{text}",c:"{colour}",s:{stay},f:{fade},n:{stay + fade},e:{int(last)}}}'
+            args = f'{{t:"{text}",c:"{colour}",s:{stay},f:{fade},n:{stay + fade},e:{int(last)},g:{gap}}}'
             tick_lines.append(f'execute if score #rdLine rd matches {lid} if score #rdLineT rd matches {k*gap} run function rlk:boss/raiden/line/show {args}')
     write('line/tick', tick_lines)
     write('caption/pattern_end','''

@@ -39,6 +39,11 @@ FLOWER_BREAK = 190
 DRAIN_DEFAULT = 2
 DRAIN = {1:6, 4:6, 2:3, 5:3, 6:3, 7:4}
 DRAIN_REACTION = 1
+# S3 balance pass (plan B.1): the rework's timelines are longer and quieter than the release's (R1 cue times, the 16 t
+# idle between moves, single-blast eyes, 찰나의 포영 / 몽상의 일심), so a standing player takes about half the
+# release's damage per minute at the same raw hit values. Every DODGEABLE hit of the phase is scaled by this percent
+# in `hurt` (raw table values unchanged; undodgeable hits keep their raw value so the dodger column stays bounded).
+BALANCE_PCT = {0: 170, 2: 139}
 # Malice energy: normal-phase ticks before the transformation (45 s, was 30 s).
 RAGE_MAX = 900
 # Like the original, every hit the boss lands also feeds the malice gauge (+3 s).
@@ -90,7 +95,7 @@ def build(shogun, tenma):
         'bossbar set rlk:narukami color white','bossbar set rlk:narukami_state color white',
         'bossbar set rlk:narukami style progress','bossbar set rlk:narukami_state style progress',
         call('bars_hide'),
-        'scoreboard players set #rd100 rd 100','scoreboard players set #rd4 rd 4',
+        'scoreboard players set #rd100 rd 100','scoreboard players set #rd10000 rd 10000','scoreboard players set #rd4 rd 4',
         'scoreboard players set #rd2 rd 2','scoreboard players set #rd3 rd 3','scoreboard players set #rd10 rd 10',
         call('camera/release_all'), call('rig/init'), call('vfx/init'), call('object_vfx/init'), call('movement/init'), 'kill @e[tag=rlk_raiden_aux]',
         'execute as @e[tag=rlk_raiden] at @s run '+call('reload')])
@@ -181,6 +186,7 @@ execute if entity @a[tag=player,scores={pkMode=1..}] run return run function rlk
 execute unless entity @e[tag=rlk_body,limit=1] run return 0
 execute as @e[tag=rlk_raiden,limit=1] at @s run function rlk:boss/raiden/tick
 execute as @e[tag=rlk_rd_object] at @s run function rlk:boss/raiden/object/tick
+execute if entity @e[tag=rlk_rd_hazard,limit=1] run function rlk:boss/raiden/hazard/body
 execute as @e[tag=rlk_rd_hazard] at @s run function rlk:boss/raiden/hazard/tick
 function rlk:boss/raiden/hazard/vfx_world
 execute as @e[tag=rlk_rd_dome] at @s run function rlk:boss/raiden/dome_tick
@@ -407,10 +413,14 @@ scoreboard players set @s rdRage {RAGE_MAX}
 execute unless entity @a[tag=player,scores={dead=0},limit=1] run return 0
 execute if entity @a[tag=player,scores={rnDie=1..}] run return 0
 execute if entity @a[tag=player,scores={pkMode=1..}] run return 0
-# Boss damage multiplier (load: #bossDmgMul %), on top of the mob level scaling. Every
-# hazard and the shadow bites set #cmDmg fresh before calling this.
+# Boss damage multiplier (load: #bossDmgMul %) times the phase balance (S3, plan B.1: dodgeable hits only), on top of
+# the mob level scaling. Every hazard sets #cmDmg fresh before calling this.
+scoreboard players set #rdBal rd 100
+execute unless score #rdNoDodge rd matches 1 if entity @e[tag=rlk_raiden,scores={rdPhase=0},limit=1] run scoreboard players set #rdBal rd '''+str(BALANCE_PCT[0])+'''
+execute unless score #rdNoDodge rd matches 1 if entity @e[tag=rlk_raiden,scores={rdPhase=2},limit=1] run scoreboard players set #rdBal rd '''+str(BALANCE_PCT[2])+'''
 scoreboard players operation #cmDmg tmp *= #bossDmgMul tmp
-scoreboard players operation #cmDmg tmp /= #100 tmp
+scoreboard players operation #cmDmg tmp *= #rdBal rd
+scoreboard players operation #cmDmg tmp /= #rd10000 rd
 function rlk:cm/hit_pl
 # A hit that lands (not dodged) feeds the malice gauge, like the original.
 execute unless score #dodged tmp matches 1 as @e[tag=rlk_raiden,scores={rdPhase=0,rdDeath=0},limit=1] run scoreboard players add @s rdRage '''+str(RAGE_HIT)+'''

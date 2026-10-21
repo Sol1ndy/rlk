@@ -1,5 +1,5 @@
 # v2 hazard (raiden_kit.hz). Position = here, yaw = the execution yaw, pitch flattened.
-execute unless score #rdKitV rd matches 2 run function rlk:boss/raiden/hazard/setup
+execute unless score #rdKitV rd matches 3 run function rlk:boss/raiden/hazard/setup
 summon minecraft:marker ~ ~ ~ {Tags:["rlk_rd_hazard","rlk_raiden_aux","rlk_room","rlk_rd_hnew"]}
 tp @e[tag=rlk_rd_hnew,limit=1] ~ ~ ~ ~ 0
 $scoreboard players set @e[tag=rlk_rd_hnew,limit=1] rdHK $(k)
