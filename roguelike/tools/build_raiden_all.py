@@ -41,6 +41,8 @@ steps = [
     node + ["build_raiden_rig.mjs", "--resourcepack", rp] + (["--skin", str(args.skin.resolve())] if args.skin else []),
     # the 만겁 sky rift and giant arm (needs the materials' armour swatches and the fxg strips above)
     node + ["build_raiden_judgment_rig.mjs", "--resourcepack", rp],
+    # the 찰나의 포영 clone figures: tinted copies of the rig's part models (so after the rig) and their pose functions
+    node + ["build_raiden_clones.mjs", "--resourcepack", rp],
     # last: boss/raiden/uninstall lists every objective / boss bar / storage key the outputs above create
     ["python3", "build_raiden_uninstall.py"],
 ]

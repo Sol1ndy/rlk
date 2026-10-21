@@ -1,6 +1,7 @@
 # @s = hazard at its origin. The strike visual of a static hazard, sized to it (life 10: flash, flicker,
-# residue, fade). Field crackle stays bound to the hazard instead.
-data modify storage rlk:rd v set value {tz:0f,d:1}
+# residue, fade). Field crackle stays bound to the hazard instead. rdHSm (rd-sync) starts it where the swing
+# came from: swept in from one side, dropped from above, run out from the origin or grown up from the floor.
+data modify storage rlk:rd v set value {tz:0f,d:1,ty0:0f,sy0:8f,lr0:"[0f,0f,0f,1f]"}
 execute if score @s rdHSv matches 1 run function rlk:boss/raiden/hazard/vis/sv/1
 execute if score @s rdHSv matches 2 run function rlk:boss/raiden/hazard/vis/sv/2
 execute if score @s rdHSv matches 3 run function rlk:boss/raiden/hazard/vis/sv/3
@@ -19,6 +20,7 @@ execute store result storage rlk:rd v.sz float 0.001 run scoreboard players get 
 execute store result storage rlk:rd v.sx0 float 0.00075 run scoreboard players get #rdSx rd
 execute store result storage rlk:rd v.sz0 float 0.00075 run scoreboard players get #rdSz rd
 execute if score @s rdHK matches 3..4 run function rlk:boss/raiden/hazard/vis/strike_full
+execute if score @s rdHSm matches 1.. run function rlk:boss/raiden/hazard/vis/strike_motion
 execute if score @s rdHK matches 9 run function rlk:boss/raiden/hazard/vis/field_summon with storage rlk:rd v
 execute unless score @s rdHK matches 9 run function rlk:boss/raiden/hazard/vis/strike_summon with storage rlk:rd v
 tp @e[tag=rlk_rd_vnew,limit=1] ~ ~ ~ ~ 0

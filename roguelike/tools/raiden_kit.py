@@ -26,7 +26,12 @@ launch tick; the server test uses the same start tick and speed, so no per-tick 
          nododge (dash i-frames ignored), jump (vertical band -0.5..+0.75), kb=<blocks> (push away from the origin through
          the engine knock-back path; never a tp), lift (kb +2 steps; the engine has no vertical push), hits=n (max hits,
          0 = unlimited; default 1, follow / field 0), every=t, detached (survives hazard/finish), group (all hazards of the current group share one
-         hit: call hz_group() first), tol=0.3, strike=None|'burst'|'bolt'|'arc'|'slash'|'wall'|'field'|'none', sound
+         hit: call hz_group() first), tol=0.3, strike=None|'burst'|'bolt'|'arc'|'slash'|'wall'|'field'|'none', sound,
+         wave=None|'/'|'\\'|'-' (slab only, rd-sync: the card is a crescent sword wave of light, its chord tilted 45 deg
+         rising to her left '/', to her right '\\' (as the player sees it: / and \\), or level '-', instead of the slab wall),
+         sm=None|'lr'|'rl'|'chop'|'thrust'|'rise' (strike motion, rd-sync: the strike follows the swing that makes the hit:
+         'lr' / 'rl' sweeps into place from her left / right side of the hazard's yaw (SM_SWEEP degrees, the blade's trail),
+         'chop' drops in from above, 'thrust' runs out from the origin along the yaw, 'rise' grows up from the floor)
 
 FX CUES (D.1): fx(cue) -> `function rlk:boss/raiden/fx/<cue>` plays the cue's vanilla sound recipe (SOUNDS) and, for
 the cues below, summons timed cards (they need no cleanup; `kill @e[tag=rlk_rd_fx]` clears them):
@@ -89,6 +94,14 @@ STRIKES = {
 STRIKE_IDS = {v[0]: k for k, v in STRIKES.items()}
 STRIKE_YU = 8                       # strike models: 1 model y unit = 8 blocks (display scale y)
 STRIKE_LIFE = 10
+# Strike motions (rd-sync): the strike visual starts where the swing came from and reaches its final pose in its 3 t
+# interpolation. id 0 = the plain expand.
+STRIKE_MOTION = {'lr': 1, 'rl': 2, 'chop': 3, 'thrust': 4, 'rise': 5}
+SM_SWEEP = 50                       # degrees the sweep strikes start off their centre line
+# Crescent sword waves on slab hazards (rd-sync): rdHSv 2 / 3 / 4 = chord rising to her left (/ from the player),
+# to her right (\), level. The crescent's edge radius is WAVE_R * the slab's half width, its centre WAVE_Y up.
+WAVES = {'/': 2, '\\': 3, '-': 4}
+WAVE_R, WAVE_Y = 1.08, 2.6
 # strike frames by remaining life (rdHLife counts down): colour (custom_model_data tint) or the after model
 FLASH = {9: 0xC8B6EA, 8: 0xEDE4FF}
 AFTER_AT, AFTER_TINT, FADE_AT, FADE_TINT = 7, 0xA898D8, 4, 0x6A5A98
@@ -186,7 +199,7 @@ def seg_count(half):
 def hz_args(kind, tell, dmg, *, r=0.0, rmin=0.0, half=180.0, len=0.0, wid=0.0, off=0.0, r0=0.0, v=0.0, band=1.0,
             d0=0.0, w=0.0, depth=1.0, height=2.5, reach=None, y=0.8, every=10, hits=None, decal=None, dlife=0,
             nododge=False, jump=False, kb=0.0, lift=False, detached=False, group=False, life=None, strike=None,
-            sound=True, tol=0.3):
+            sound=True, tol=0.3, sm=None, wave=None):
     """Macro compound for hazard/new (all values integers: milliblocks, micro-blocks per tick for speeds)."""
     k = KINDS[kind]
     if hits is None:
@@ -234,6 +247,8 @@ def hz_args(kind, tell, dmg, *, r=0.0, rmin=0.0, half=180.0, len=0.0, wid=0.0, o
     sv = 0 if strike == 'none' else STRIKE_IDS[strike]
     if kind in ('sweep', 'slab', 'orb'):
         sv = seg if kind == 'sweep' else 1
+        if kind == 'slab' and wave:
+            sv = WAVES[wave]
     dk = 0
     if decal:
         dk = DECAL_IDS[decal]
@@ -245,8 +260,10 @@ def hz_args(kind, tell, dmg, *, r=0.0, rmin=0.0, half=180.0, len=0.0, wid=0.0, o
         while 0.1 * kbsteps * (kbsteps + 1) / 2 < kb:
             kbsteps += 1
         kbsteps += 2 if lift else 0
+    assert sm is None or sm in STRIKE_MOTION, sm
     return dict(k=k, a=a, b=b, c=c, d=d, e=e, f=f, tol=_mb(tol), tell=tell, dmg=dmg, life=life, ev=max(1, every),
-                max=hits, grp=1 if group else 0, dk=dk, dl=dlife, kb=kbsteps, sv=sv, snd=1 if sound else 0,
+                max=hits, grp=1 if group else 0, dk=dk, dl=dlife, kb=kbsteps, sv=sv, sm=STRIKE_MOTION.get(sm, 0),
+                snd=1 if sound else 0,
                 nd=1 if nododge else 0, jp=1 if jump else 0, det=1 if detached else 0, lf=1 if lift else 0,
                 fv=_f(v) if kind == 'follow' else '0')
 

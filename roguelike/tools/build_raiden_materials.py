@@ -35,6 +35,8 @@ PALETTE = {
     "blade_core": (156, 120, 224, 255),
     "grip_dark": (44, 30, 66, 255),
     "nail_glow": (199, 125, 255, 255),
+    # the blink scatter silhouette's blue slices (build_raiden_movement.py; restored with the release's blink art)
+    "blue": (61, 64, 199, 148),
 }
 
 
@@ -48,8 +50,8 @@ def png(path, rgba):
 
 
 # Swatches of the release's dome / puppet-arm models; nothing uses them since S3, so they are pruned (the judgment rig's
-# armour swatches came back with the 만겁 arm, 10-22a).
-RETIRED = ("blue", "floor", "shield_glass", "shield_mist", "hand_dull", "hand_dull_dark")
+# armour swatches came back with the 만겁 arm, 10-22a; "blue" came back with the release blink art).
+RETIRED = ("floor", "shield_glass", "shield_mist", "hand_dull", "hand_dull_dark")
 
 
 def build_materials(resourcepack):

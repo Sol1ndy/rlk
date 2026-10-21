@@ -371,11 +371,11 @@ def build_guard():
         '# Sword counter: black line (cue) + shield block, spin 12 (disk r 3), floor bolts 24 (rect 8 x 1.5, aimed 12),',
         '# lunge 40 (rect 8 x 2, re-aimed 28).',
         play('counter_sword'), fx('counter_cue'), 'playsound minecraft:item.shield.block hostile @a[tag=player] ~ ~ ~ 1 1.4 0.2',
-        hz('disk', 12, 8, r=3)])
+        hz('disk', 12, 8, r=3, sm='lr')])
     write('sg/counter_p0', [
         '# Polearm counter: cue, star 8, wide sweep 18 (disk r 4.5).',
         play('counter_spear'), fx('counter_cue'), 'playsound minecraft:item.shield.block hostile @a[tag=player] ~ ~ ~ 1 1.4 0.2',
-        hz('disk', 18, 12, r=4.5)])
+        hz('disk', 18, 12, r=4.5, sm='rl')])
     write('sg/counter_tick', [
         '# Pattern 9, every guard tick while a counter runs (c = rdSgCt - 2; c0 = the first boss tick after the parry).',
         'scoreboard players add @s rdSgCt 1',
@@ -385,9 +385,9 @@ def build_guard():
         'execute if score @s rdSgCk matches 0 if score @s rdSgCt matches 48.. run function rlk:boss/raiden/sg/counter_end',
         'execute if score @s rdSgCk matches 1 if score @s rdSgCt matches 10 at @s rotated as @s run ' + up(1.6, fwd(0.8, fx('star'))),
         'execute if score @s rdSgCk matches 1 if score @s rdSgCt matches 28.. run function rlk:boss/raiden/sg/counter_end'])
-    write('sg/counter_s12', [face, flat, 'execute at @s rotated as @s run ' + hz('rect', 12, 8, len=8, wid=1.5),
+    write('sg/counter_s12', [face, flat, 'execute at @s rotated as @s run ' + hz('rect', 12, 8, len=8, wid=1.5, sm='chop'),
                              'execute at @s run playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 0.9 1.2 0.2'])
-    write('sg/counter_s28', [face, flat, 'execute at @s rotated as @s run ' + hz('rect', 12, 12, len=8, wid=2),
+    write('sg/counter_s28', [face, flat, 'execute at @s rotated as @s run ' + hz('rect', 12, 12, len=8, wid=2, sm='thrust'),
                              'execute at @s run ' + snd('iai_charge')])
     write('sg/counter_end', ['scoreboard players set @s rdSgCt 0', play('guard')])
     write('sg/guard_break', [
@@ -498,25 +498,27 @@ def build_patterns():
     p.at(0, from_player(0, 5.5) + BLINK_TO, cond=FAR)
     p.at(0, play('iai_near'), cond=NEAR)
     p.at(12, *FACE, play('iai_dash'), snd('iai_charge'), cond=FAR)
-    p.at(18, *FACE, up(1.2, fwd(0.6, fx('star'))), hz('rect', 12, 14, len=10, wid=3),
-         *at_point(9, hz('annulus', 18, 13, r=4, half=70)), cond=FAR)
+    # rd-sync: the strikes follow the draw (left to right across her facing) and the end crescent (right to left).
+    p.at(18, *FACE, up(1.2, fwd(0.6, fx('star'))), hz('rect', 12, 14, len=10, wid=3, sm='lr'),
+         *at_point(9, hz('annulus', 18, 13, r=4, half=70, sm='rl')), cond=FAR)
     for t in range(28, 36):
         p.at(t, step(1.125), cond=FAR)
     p.at(28, snd('rush'), cond=FAR)
-    p.at(10, *FACE, up(1.2, fwd(0.6, fx('star'))), hz('rect', 12, 14, len=9, wid=2), hz('rect', 18, 13, len=4, wid=2),
-         cond=NEAR)
+    p.at(10, *FACE, up(1.2, fwd(0.6, fx('star'))), hz('rect', 12, 14, len=9, wid=2, sm='lr'),
+         hz('rect', 18, 13, len=4, wid=2, sm='rise'), cond=NEAR)
     p.at(40, call('finish'), cond=NEAR)
     p.at(66, call('finish'), cond=FAR)
 
     # ---- 8 5단 콤보 (A-05): V 12, right cut 22, stab 34, wide cut 50, overhead 64.
     p = TL(8)
     p.at(0, play('combo5'), up(1.1, fwd(0.8, fx('star'))), hz_group(),
-         hz('rect', 12, 8, len=6, wid=1.2, yawoff=-25, group=True), hz('rect', 12, 8, len=6, wid=1.2, yawoff=25, group=True))
+         hz('rect', 12, 8, len=6, wid=1.2, yawoff=-25, group=True, sm='chop'),
+         hz('rect', 12, 8, len=6, wid=1.2, yawoff=25, group=True, sm='chop'))
     p.at(4, step(0.75))
     p.at(5, step(0.75))
-    p.at(12, *FACE, snd('twirl_beat'), hz('rect', 10, 8, len=9, wid=1.5, yawoff=20))
+    p.at(12, *FACE, snd('twirl_beat'), hz('rect', 10, 8, len=9, wid=1.5, yawoff=20, sm='lr'))
     p.at(22, *FACE, snd('twirl_beat'), fwd(2, hz('disk', 12, 9, r=2.5)))
-    p.at(34, *FACE, snd('twirl_beat'), hz('rect', 16, 12, len=10, wid=2, yawoff=-20))
+    p.at(34, *FACE, snd('twirl_beat'), hz('rect', 16, 12, len=10, wid=2, yawoff=-20, sm='rl'))
     p.at(50, *FACE, snd('twirl_beat'), fwd(2.5, hz('disk', 14, 13, r=3)))
     p.at(74, call('finish'))
 
@@ -546,9 +548,10 @@ def build_patterns():
 
     # ---- 7 몽상의 일심 (A-09): blink to the centre (the clip embeds the blink-in), 8 rim orbs, darkening, field slash.
     p = TL(7)
-    p.at(0, fx('blink_out'), play('musou'), line('calm'), 'scoreboard players set @s rdBlink 24',
+    # rd-sync: the release's scatter where she stood, the reform at the centre (whole at 6 = the clip's appear).
+    p.at(0, call('movement/depart'), play('musou'), line('calm'), 'scoreboard players set @s rdBlink 24',
          center + 'tp @s ~ ~ ~', *FACE)
-    p.at(6, fx('blink_in'))
+    p.at(1, call('movement/arrive'))
     p.at(10, sg('musou_orbs'))
     p.at(20, up(2.4, fx('star')))
     for k in range(8):
@@ -556,7 +559,7 @@ def build_patterns():
              f'execute as @e[tag=rlk_rd_sgorb,scores={{rdSgDx={k}}}] at @s run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.7 1.4 0.2')
         p.at(50 + 8 * k, f'kill @e[tag=rlk_rd_sgorbp,scores={{rdSgDx={k}}}]')
     p.at(110, center + fx('musou_dark', life=50), line('sever_one'), center + 'execute positioned ~ ~1.5 ~ run ' + fx('crystal'),
-         center + hz('disk', 20, 30, r=19))
+         center + hz('disk', 20, 30, r=19, sm='lr'))
     p.at(130, center + fx('musou_slash'))
     for t, yaw in ((136, 30), (144, 150), (152, 270)):
         p.at(t, center + f'execute rotated {yaw} 0 positioned ^ ^ ^-9 run ' + fx('crystal_line', len=18))
@@ -579,15 +582,16 @@ def build_patterns():
     # ---- 25 판결의 검 (A-03): reactive, sword; straight behind her (yaw + 180, locked at the cue).
     p = TL(25)
     p.at(0, play('rear_iai'), line('verdict'), snd('iai_charge'), up(1.2, fx('star')),
-         hz('rect', 14, 15, len=12, wid=1.6, yawoff=180))
+         hz('rect', 14, 15, len=12, wid=1.6, yawoff=180, sm='thrust'))
     p.at(10, 'execute rotated ~180 0 run ' + up(1.0, fwd(1.5, fx('star'))))
     p.at(14, 'execute rotated ~180 0 run ' + fx('crystal_line', len=12))
     p.at(30, call('finish'))
 
     # ---- 26 창 뒤 견제 (A-12): reactive, polearm; two rear sweeps; hit 1's band on the floor warns of hit 2.
     p = TL(26)
-    p.at(0, play('p_rear'), fx('twirl', life=16), hz('annulus', 16, 10, r=5.8, rmin=4.2, half=100, yawoff=180),
-         hz('annulus', 26, 12, r=5.8, rmin=4.2, half=100, yawoff=180))
+    # rd-sync: sweep 1 passes behind her from her left to her right (right to left in the rear hazard's frame), 2 back.
+    p.at(0, play('p_rear'), fx('twirl', life=16), hz('annulus', 16, 10, r=5.8, rmin=4.2, half=100, yawoff=180, sm='rl'),
+         hz('annulus', 26, 12, r=5.8, rmin=4.2, half=100, yawoff=180, sm='lr'))
     p.at(6, snd('twirl_beat'))
     p.at(12, snd('twirl_beat'))
     p.at(36, call('finish'))
@@ -597,11 +601,11 @@ def build_patterns():
     p = TL(1)
     p.at(0, from_player(2.5, 0) + BLINK_TO, sg('slow_line'))
     p.at(6, *FACE, play('p_4hit'))
-    p.at(10, *FACE, hz('annulus', 18, 9, r=5.5, half=90))
+    p.at(10, *FACE, hz('annulus', 18, 9, r=5.5, half=90, sm='rl'))
     p.at(16, up(2.2, fwd(1.0, fx('star'))))
-    p.at(28, *FACE, snd('twirl_beat'), hz('annulus', 10, 9, r=5.5, half=90))
-    p.at(38, *FACE, snd('twirl_beat'), hz('rect', 10, 10, len=6, wid=1.5))
-    p.at(48, *FACE, snd('twirl_beat'), hz('rect', 14, 15, len=3, wid=15, off=2))
+    p.at(28, *FACE, snd('twirl_beat'), hz('annulus', 10, 9, r=5.5, half=90, sm='lr'))
+    p.at(38, *FACE, snd('twirl_beat'), hz('rect', 10, 10, len=6, wid=1.5, sm='chop'))
+    p.at(48, *FACE, snd('twirl_beat'), hz('rect', 14, 15, len=3, wid=15, off=2, sm='chop'))
     p.at(62, snd('bomb_tell'), hz_group(), *[f'execute positioned ^{x:g} ^ ^{z:g} run ' + hz('disk', 20, 8, r=1.2, group=True)
                                               for x, z in FIELD])
     p.at(90, 'scoreboard players set @s rdSgV 0',
@@ -615,7 +619,7 @@ def build_patterns():
     # ---- 21 수천수만의 염원 (A-15): blink to the player's right, a 40 t twirl, then the undodgeable slam.
     p = TL(21)
     p.at(0, from_player(-4.5, 0) + BLINK_TO)
-    p.at(10, *FACE, play('p_twirl_slam'), line('return_dust'), fx('twirl', life=36), hz('disk', 40, 22, r=6.5, nododge=True))
+    p.at(10, *FACE, play('p_twirl_slam'), line('return_dust'), fx('twirl', life=36), hz('disk', 40, 22, r=6.5, nododge=True, sm='chop'))
     for t in range(16, 47, 6):
         p.at(t, snd('twirl_beat'))
     p.at(48, up(1.8, fx('star')))
@@ -625,11 +629,11 @@ def build_patterns():
     p = TL(22)
     p.at(0, play('p_twirl_dash'), line('shadow_world'), fx('twirl', life=15))
     p.at(6, snd('twirl_beat'))
-    p.at(12, *FACE, snd('star'), hz('rect', 8, 12, len=11, wid=2))
+    p.at(12, *FACE, snd('star'), hz('rect', 8, 12, len=11, wid=2, sm='thrust'))
     for t0, lock, hit in ((19, 22, 32), (31, 34, 44)):
         for t in range(t0, t0 + 4):
             p.at(t, step(2.75))
-        p.at(lock, *FACE, snd('star'), hz('rect', hit - lock, 12, len=11, wid=2))
+        p.at(lock, *FACE, snd('star'), hz('rect', hit - lock, 12, len=11, wid=2, sm='thrust'))
     for t in range(43, 47):
         p.at(t, step(2.75))
     p.at(58, call('finish'))
@@ -637,12 +641,12 @@ def build_patterns():
     # ---- 23 번개돌진 콤보 (A-17): zig-zag dash to the player, weak ring, crouch + column, lunge.
     p = TL(23)
     p.at(0, play('p_zigzag'), line('noemyeong'))
-    p.at(6, *FACE, hz('rect', 8, 12, len=9, wid=2))
+    p.at(6, *FACE, hz('rect', 8, 12, len=9, wid=2, sm='thrust'))
     p.at(8, up(1.2, fwd(0.6, fx('star'))))
     for t in range(11, 15):
         p.at(t, 'execute unless entity @e[tag=rlk_body,distance=..2.5,limit=1] run ' + step(2.0))
-    p.at(22, up(1.0, fx('star')), hz('disk', 12, 6, r=4.5))
-    p.at(40, *FACE, fx('bolt'), hz('rect', 12, 14, len=5, wid=2))
+    p.at(22, up(1.0, fx('star')), hz('disk', 12, 6, r=4.5, sm='lr'))
+    p.at(40, *FACE, fx('bolt'), hz('rect', 12, 14, len=5, wid=2, sm='thrust'))
     p.at(64, call('finish'))
 
     # ---- 24 원거리 창 (A-14): blink to 7 b from the player, raise, tip glow (aim lock), lance.
@@ -664,5 +668,5 @@ def build_patterns():
     p.at(GUARD_LEN, play('karatake'), line('end_it'), fx('blink_out'), cond=K)
     for t in range(GUARD_LEN, GUARD_LEN + 6):
         p.at(t, step(-1.0), cond=K)
-    p.at(GUARD_LEN + 10, *FACE, snd('iai_charge'), hz('rect', 20, 24, len=14, wid=3), cond=K)
+    p.at(GUARD_LEN + 10, *FACE, snd('iai_charge'), hz('rect', 20, 24, len=14, wid=3, sm='chop'), cond=K)
     p.at(GUARD_LEN + 32, call('finish'))

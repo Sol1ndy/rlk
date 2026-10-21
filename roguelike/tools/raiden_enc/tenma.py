@@ -155,8 +155,8 @@ def lifecycle():
     # player and five more round the arena, the burst, the form and the title (clip `transform`: ring 20, pillars 44,
     # form 50).
     t = []
-    ev(t, 1, clip('transform'), 'execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..1.5] at @s run ' + fx('blink_out'))
-    ev(t, 2, 'execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..1.5] run ' + fx('blink_in'),
+    ev(t, 1, clip('transform'), 'execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..1.5] at @s run ' + call('movement/depart'))
+    ev(t, 2, 'execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..1.5] run ' + call('movement/arrive'),
        'execute at @e[tag=rlk_raiden_arena,limit=1] run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet', flat)
     ev(t, 19, hz('sweep', 1, 14, r0=2, v=1.0, band=1.4, half=180, jump=True))
     ev(t, 20, snd('transform_ring'))
@@ -255,10 +255,13 @@ execute if score #dmg tmp matches ..0 run scoreboard players set #dmg tmp 1
 
 # ---------------------------------------------------------------------------------------------------------------------
 def throw_bomb(p, lock, bomb_decal):
-    """11 / 20: cock-back + aim lock at `lock` (cue), the thrown glaive lands 12 t later (disk r 3) and stays planted;
+    """11 / 20: cock-back + aim lock at `lock` (cue), the glaive leaves her hand at lock + 9 (clip release, rd-sync) and
+    flies to the spot, landing 12 t after the lock (disk r 3) and staying planted;
     the bomb ring (decal, 12 t) at `bomb_decal`, the bomb (disk r 3.5) 12 t after it."""
     ev(p, lock, f'kill @e[tag={SPOT}]', target + mk(SPOT), face, flat, AT_SPOT + hz('disk', 12, 18, r=3),
        sound('item.trident.riptide_1', .7, 1.3))
+    ev(p, lock + 9, call('tm/glaive_fly'))
+    ev(p, lock + 10, call('tm/glaive_fly2'))
     ev(p, lock + 12, call('tm/glaive_land'))
     ev(p, bomb_decal, AT_SPOT + hz('disk', 12, 20, r=3.5, decal='ring'), AT_SPOT + snd('bomb_tell'))
     ev(p, bomb_decal + 12, AT_SPOT + fx('bomb'), 'kill @e[tag=rlk_rd_tm_glaive]', f'kill @e[tag={SPOT}]')
@@ -268,14 +271,28 @@ def p11():
     # 몽상 • 염원이 깃든 백안지륜 (B-09): two glaive sweeps (annulus 2.5-7.5, +-100 deg), the throw, the planted glaive
     # bursts 50 t after it landed. Clip t_combo3: raise 0, sw1 14, sw2 26, cock 42, throw 54, reform 62.
     p = pattern(11, '몽상 • 염원이 깃든 백안지륜')
-    ev(p, 1, clip('t_combo3'), call('line/cleave_all'), face, flat, hz('annulus', 13, 19, r=7.5, rmin=2.5, half=100))
+    ev(p, 1, clip('t_combo3'), call('line/cleave_all'), face, flat, hz('annulus', 13, 19, r=7.5, rmin=2.5, half=100, sm='rl'))
     ev(p, 14, snd('glaive_sweep'))
-    ev(p, 15, face, flat, hz('annulus', 11, 19, r=7.5, rmin=2.5, half=100))
+    ev(p, 15, face, flat, hz('annulus', 11, 19, r=7.5, rmin=2.5, half=100, sm='lr'))
     ev(p, 26, snd('glaive_sweep'))
     throw_bomb(p, 42, 92)
     end(p, 108)
+    write('tm/glaive_fly', [
+        '# @s = the boss at the release (lock + 9; t_combo3 51, t_spin_throw 28 hide her glaive): the thrown glaive leaves',
+        '# her hand tip first, aimed down at the locked spot (rd-sync: release 3 t before the landing).',
+        'kill @e[tag=rlk_rd_tm_flyer]',
+        'execute positioned ^-1.0 ^2.4 ^1.8 run summon minecraft:item_display ~ ~ ~ {Tags:[%s,"rlk_rd_tm_flyer"],billboard:"fixed",'
+        'item_display:"none",teleport_duration:2,interpolation_duration:0,view_range:3f,width:10f,height:10f,shadow_radius:0f,'
+        'brightness:{block:15,sky:15},transformation:{translation:[0f,0f,-4.4f],left_rotation:[0.7071068f,0f,0f,0.7071068f],'
+        'scale:[3.6f,3.6f,3.6f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":'
+        '"rlk:raiden/glaive"}}}' % TAGS,
+        f'execute as @e[tag=rlk_rd_tm_flyer] at @s run tp @s ~ ~ ~ facing entity @e[tag={SPOT},limit=1] feet',
+        snd('glaive_sweep')])
+    write('tm/glaive_fly2', ['# @s = the boss, lock + 10: the glaive flies onto the spot in 2 t (teleport interpolation).',
+                             f'execute as @e[tag=rlk_rd_tm_flyer] at @e[tag={SPOT},limit=1] run tp @s ~ ~0.5 ~'])
     write('tm/glaive_land', [
         '# @s = the boss: the thrown glaive lands on the locked spot (pink beam) and stays planted (prop cut at the floor).',
+        'kill @e[tag=rlk_rd_tm_flyer]',
         AT_SPOT + fx('glaive_throw'),
         f'execute at @e[tag={SPOT},limit=1] facing entity @s feet rotated ~180 0 run ' + call('rig/prop/glaive_planted')]
         + tagnew('rlk_rd_tm_glaive'))
@@ -288,7 +305,7 @@ def p20():
     p = pattern(20, '몽상 • 초월의 악요개안')
     ev(p, 1, call('line/foolish'), 'scoreboard players set @s rdTmCD 300', face, flat,
        'execute positioned ~ ~2.6 ~ run ' + fx('star'))
-    ev(p, 9, clip('t_spin_throw'), hz('annulus', 12, 18, r=7, rmin=2, half=180))
+    ev(p, 9, clip('t_spin_throw'), hz('annulus', 12, 18, r=7, rmin=2, half=180, sm='rl'))
     ev(p, 21, snd('glaive_sweep'))
     throw_bomb(p, 27, 77)
     end(p, 93)
@@ -298,7 +315,7 @@ def p16():
     # 번개 신의 신속한 발도 (B-10): crouch charge, the orb flash 10, the 360 deg disc slash r 12 at 22 (dash i-frames
     # dodge it). Clip t_iai: crouch 0, flash 10, hit 22.
     p = pattern(16, '번개 신의 신속한 발도')
-    ev(p, 1, clip('t_iai'), face, flat, fx('iai_charge'), hz('disk', 21, 30, r=12))
+    ev(p, 1, clip('t_iai'), face, flat, fx('iai_charge'), hz('disk', 21, 30, r=12, sm='rl'))
     ev(p, 10, 'execute positioned ^ ^1.2 ^1.2 run ' + fx('star'))
     ev(p, 22, snd('iai_hit'))
     ev(p, 23, fx('crystal_ring', r=6))
@@ -312,7 +329,7 @@ def p19():
     ev(p, 1, clip('t_danjeol'), face, flat)
     ev(p, 6, fx('danjeol_halo'), call('line/sever'))
     ev(p, 16, fx('danjeol_column'))
-    ev(p, 24, face, flat, hz('to_wall', 40, 34, wid=5, decal='band'), snd('danjeol_band'))
+    ev(p, 24, face, flat, hz('to_wall', 40, 34, wid=5, decal='band', sm='chop'), snd('danjeol_band'))
     ev(p, 64, snd('danjeol_slam'), hz('field', 2, 3, r=4.5, every=10, life=43, detached=True))
     end(p, 70)
 
@@ -555,8 +572,8 @@ def p18():
         f'execute as @e[tag={SPOT},limit=1] at @s unless entity @e[tag=rlk_raiden_arena,distance=..20] at @e[tag=rlk_raiden_arena,limit=1] facing entity @s feet positioned ^ ^ ^20 run tp @s ~ ~ ~',
         f'execute at @s run tp @s ~ ~ ~ facing entity @e[tag={SPOT},limit=1] feet', flat,
         'execute positioned ^ ^1.4 ^1 run ' + fx('star'),
-        AT_SPOT + hz('disk', 15, 14, r=7, nododge=True), AT_SPOT + hz('disk', 21, 14, r=7, nododge=True),
-        AT_SPOT + hz('disk', 27, 14, r=7, nododge=True),
+        AT_SPOT + hz('disk', 15, 14, r=7, nododge=True, sm='rl'), AT_SPOT + hz('disk', 21, 14, r=7, nododge=True, sm='lr'),
+        AT_SPOT + hz('disk', 27, 14, r=7, nododge=True, sm='chop'),
         'execute store result score #rdTmSX rd run data get entity @s Pos[0] 1000',
         'execute store result score #rdTmSZ rd run data get entity @s Pos[2] 1000',
         f'execute store result score #rdTmDX rd run data get entity @e[tag={SPOT},limit=1] Pos[0] 1000',
