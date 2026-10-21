@@ -1,179 +1,1745 @@
 {
-  "parts": 52,
-  "phase": {
-    "0": "normal",
-    "1": "transforming",
-    "2": "Baleful Shadowlord",
-    "3": "exhausted"
+  "schema": 2,
+  "note": "Raiden rig (rd/plan.md §C). Clip events are played ticks of the clip; the pattern code takes its hit ticks from them.",
+  "parts": [
+    {
+      "name": "head",
+      "uuid": "524c4b4d-5244-4900-8000-000000000001",
+      "tag": "rlk_rd_head",
+      "model": "head",
+      "brightness": 13,
+      "group": "body",
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ]
+    },
+    {
+      "name": "body",
+      "uuid": "524c4b4d-5244-4900-8000-000000000002",
+      "tag": "rlk_rd_body",
+      "model": "body",
+      "brightness": 13,
+      "group": "body",
+      "scale": [
+        0.9,
+        1,
+        0.85
+      ]
+    },
+    {
+      "name": "right_arm",
+      "uuid": "524c4b4d-5244-4900-8000-000000000003",
+      "tag": "rlk_rd_right_arm",
+      "model": "right_arm",
+      "brightness": 13,
+      "group": "body",
+      "scale": [
+        0.72,
+        1.05,
+        0.72
+      ]
+    },
+    {
+      "name": "right_forearm",
+      "uuid": "524c4b4d-5244-4900-8000-000000000004",
+      "tag": "rlk_rd_right_forearm",
+      "model": "right_forearm",
+      "brightness": 13,
+      "group": "body",
+      "scale": [
+        0.72,
+        1.05,
+        0.72
+      ]
+    },
+    {
+      "name": "left_arm",
+      "uuid": "524c4b4d-5244-4900-8000-000000000005",
+      "tag": "rlk_rd_left_arm",
+      "model": "left_arm",
+      "brightness": 13,
+      "group": "body",
+      "scale": [
+        0.72,
+        1.05,
+        0.72
+      ]
+    },
+    {
+      "name": "left_forearm",
+      "uuid": "524c4b4d-5244-4900-8000-000000000006",
+      "tag": "rlk_rd_left_forearm",
+      "model": "left_forearm",
+      "brightness": 13,
+      "group": "body",
+      "scale": [
+        0.72,
+        1.05,
+        0.72
+      ]
+    },
+    {
+      "name": "right_leg",
+      "uuid": "524c4b4d-5244-4900-8000-000000000007",
+      "tag": "rlk_rd_right_leg",
+      "model": "right_leg",
+      "brightness": 13,
+      "group": "body",
+      "scale": [
+        0.8,
+        1.15,
+        0.8
+      ]
+    },
+    {
+      "name": "right_shin",
+      "uuid": "524c4b4d-5244-4900-8000-000000000008",
+      "tag": "rlk_rd_right_shin",
+      "model": "right_shin",
+      "brightness": 13,
+      "group": "body",
+      "scale": [
+        0.8,
+        1.15,
+        0.8
+      ]
+    },
+    {
+      "name": "left_leg",
+      "uuid": "524c4b4d-5244-4900-8000-000000000009",
+      "tag": "rlk_rd_left_leg",
+      "model": "left_leg",
+      "brightness": 13,
+      "group": "body",
+      "scale": [
+        0.8,
+        1.15,
+        0.8
+      ]
+    },
+    {
+      "name": "left_shin",
+      "uuid": "524c4b4d-5244-4900-8000-00000000000a",
+      "tag": "rlk_rd_left_shin",
+      "model": "left_shin",
+      "brightness": 13,
+      "group": "body",
+      "scale": [
+        0.8,
+        1.15,
+        0.8
+      ]
+    },
+    {
+      "name": "braid",
+      "uuid": "524c4b4d-5244-4900-8000-00000000000b",
+      "tag": "rlk_rd_braid",
+      "model": "braid",
+      "brightness": 13,
+      "group": "shared",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "drape",
+      "uuid": "524c4b4d-5244-4900-8000-00000000000c",
+      "tag": "rlk_rd_drape",
+      "model": "drape",
+      "brightness": 13,
+      "group": "shogun",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "weapon",
+      "uuid": "524c4b4d-5244-4900-8000-00000000000d",
+      "tag": "rlk_rd_weapon",
+      "model": "katana",
+      "brightness": 15,
+      "group": "shogun",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "weapon_fx",
+      "uuid": "524c4b4d-5244-4900-8000-00000000000e",
+      "tag": "rlk_rd_weapon_fx",
+      "model": "katana_fx",
+      "brightness": 15,
+      "group": "shogun",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "halo",
+      "uuid": "524c4b4d-5244-4900-8000-00000000000f",
+      "tag": "rlk_rd_halo",
+      "model": "halo",
+      "brightness": 15,
+      "group": "shogun",
+      "scale": [
+        1.25,
+        1.25,
+        1.25
+      ]
+    },
+    {
+      "name": "aura",
+      "uuid": "524c4b4d-5244-4900-8000-000000000010",
+      "tag": "rlk_rd_aura",
+      "model": "aura",
+      "brightness": 15,
+      "group": "shogun",
+      "scale": [
+        2.4,
+        2.4,
+        2.4
+      ]
+    },
+    {
+      "name": "disc",
+      "uuid": "524c4b4d-5244-4900-8000-000000000011",
+      "tag": "rlk_rd_disc",
+      "model": "disc",
+      "brightness": 14,
+      "group": "tenma",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "g_upper",
+      "uuid": "524c4b4d-5244-4900-8000-000000000012",
+      "tag": "rlk_rd_g_upper",
+      "model": "g_upper",
+      "brightness": 14,
+      "group": "tenma",
+      "scale": [
+        1.5,
+        1.5,
+        1.5
+      ]
+    },
+    {
+      "name": "g_fore",
+      "uuid": "524c4b4d-5244-4900-8000-000000000013",
+      "tag": "rlk_rd_g_fore",
+      "model": "g_fore",
+      "brightness": 14,
+      "group": "tenma",
+      "scale": [
+        1.5,
+        1.5,
+        1.5
+      ]
+    },
+    {
+      "name": "g_hand",
+      "uuid": "524c4b4d-5244-4900-8000-000000000014",
+      "tag": "rlk_rd_g_hand",
+      "model": "g_hand",
+      "brightness": 14,
+      "group": "tenma",
+      "scale": [
+        1.4,
+        1.4,
+        1.4
+      ]
+    },
+    {
+      "name": "glaive",
+      "uuid": "524c4b4d-5244-4900-8000-000000000015",
+      "tag": "rlk_rd_glaive",
+      "model": "glaive",
+      "brightness": 14,
+      "group": "tenma",
+      "scale": [
+        3.6,
+        3.6,
+        3.6
+      ]
+    },
+    {
+      "name": "glaive_fx",
+      "uuid": "524c4b4d-5244-4900-8000-000000000016",
+      "tag": "rlk_rd_glaive_fx",
+      "model": "glaive_fx",
+      "brightness": 15,
+      "group": "tenma",
+      "scale": [
+        3.6,
+        3.6,
+        3.6
+      ]
+    },
+    {
+      "name": "ra1_up",
+      "uuid": "524c4b4d-5244-4900-8000-000000000017",
+      "tag": "rlk_rd_ra1_up",
+      "model": "ra_up",
+      "brightness": 14,
+      "group": "tenma",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "ra1_fo",
+      "uuid": "524c4b4d-5244-4900-8000-000000000018",
+      "tag": "rlk_rd_ra1_fo",
+      "model": "ra1_fo",
+      "brightness": 14,
+      "group": "tenma",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "ra2_up",
+      "uuid": "524c4b4d-5244-4900-8000-000000000019",
+      "tag": "rlk_rd_ra2_up",
+      "model": "ra_up",
+      "brightness": 14,
+      "group": "tenma",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "ra2_fo",
+      "uuid": "524c4b4d-5244-4900-8000-00000000001a",
+      "tag": "rlk_rd_ra2_fo",
+      "model": "ra2_fo",
+      "brightness": 14,
+      "group": "tenma",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "ra3_up",
+      "uuid": "524c4b4d-5244-4900-8000-00000000001b",
+      "tag": "rlk_rd_ra3_up",
+      "model": "ra_up",
+      "brightness": 14,
+      "group": "tenma",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "ra3_fo",
+      "uuid": "524c4b4d-5244-4900-8000-00000000001c",
+      "tag": "rlk_rd_ra3_fo",
+      "model": "ra3_fo",
+      "brightness": 14,
+      "group": "tenma",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "gaunt_l",
+      "uuid": "524c4b4d-5244-4900-8000-00000000001d",
+      "tag": "rlk_rd_gaunt_l",
+      "model": "gaunt_l",
+      "brightness": 14,
+      "group": "tenma",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "gaunt_r",
+      "uuid": "524c4b4d-5244-4900-8000-00000000001e",
+      "tag": "rlk_rd_gaunt_r",
+      "model": "gaunt_r",
+      "brightness": 14,
+      "group": "tenma",
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "looks": {
+    "sword": {
+      "head": "head",
+      "body": "body",
+      "right_arm": "right_arm",
+      "right_forearm": "right_forearm",
+      "left_arm": "left_arm",
+      "left_forearm": "left_forearm",
+      "right_leg": "right_leg",
+      "right_shin": "right_shin",
+      "left_leg": "left_leg",
+      "left_shin": "left_shin",
+      "weapon": "katana",
+      "weapon_fx": "katana_fx"
+    },
+    "polearm": {
+      "head": "head",
+      "body": "body",
+      "right_arm": "right_arm",
+      "right_forearm": "right_forearm",
+      "left_arm": "left_arm",
+      "left_forearm": "left_forearm",
+      "right_leg": "right_leg",
+      "right_shin": "right_shin",
+      "left_leg": "left_leg",
+      "left_shin": "left_shin",
+      "weapon": "polearm",
+      "weapon_fx": "polearm_fx"
+    },
+    "tenma": {
+      "head": "t_head",
+      "body": "t_body",
+      "right_arm": "t_right_arm",
+      "right_forearm": "t_right_forearm",
+      "left_arm": "t_left_arm",
+      "left_forearm": "t_left_forearm",
+      "right_leg": "t_right_leg",
+      "right_shin": "t_right_shin",
+      "left_leg": "t_left_leg",
+      "left_shin": "t_left_shin"
+    }
   },
-  "armSilhouette": "two skin arms; one big lilac sword arm (main_r) gripping the pale violet giant katana; four smaller lilac auxiliary arms fanned behind the shoulders (rear_* upper pair, rear2_* lower pair); two dull bronze-grey support hands (support_r, main_l) cradling a dull-tinted Raiden from below",
-  "palette": {
-    "armour": "arm_lilac plates, arm_shade sides, arm_deep joints, gold_dull trims, arm_tomoe/gold_dull tomoe discs",
-    "katana": "blade_pale body, blade_edge cutting edge on model -X, blade_core fuller and spine on +X, grip_dark grip, gold_dull tsuba/habaki/wraps",
-    "support": "hand_dull, hand_dull_dark, nail_glow nails and seams",
-    "raiden": "skin/ribbon *_dull copies tinted #A098AC while the armour is at least half formed"
+  "states": {
+    "shogun": {
+      "id": 0,
+      "follow": "shogun",
+      "idle": [
+        "idle_sword",
+        "idle_polearm"
+      ]
+    },
+    "tenma": {
+      "id": 1,
+      "follow": "tenma",
+      "idle": "t_idle"
+    },
+    "hidden": {
+      "id": 2,
+      "follow": "all",
+      "note": "all parts at scale 0; the next play shows the rig"
+    }
   },
-  "blades": "Every blade frame is authored as (tip, edge); the edge (model -X) faces the direction of travel in all cuts. Rotation keys (giant_weapon, *_hand) are slerped.",
-  "lightning": {
-    "weaponDisplays": 8,
-    "palmDisplays": 5,
-    "chakraDisplays": 1,
-    "materials": "painted gradient sprites (rlk:raiden/fxg/*: rig_katana, blade, rim_crackle, blade_trail, rig_palm, chakra, orb_core, rig_crown, arc, vbolt, charge_spark) on flat crossed cards",
-    "hands": "exact hand pivot/rotation/scale; charge, inward focus, contact release; smaller rear hands never emit large release crowns; the clap charge sits on the two support hands",
-    "chakra": "sparse outer-rim forks; idle intermittent, charged attacks sustained; empty centre preserves face visibility"
-  },
-  "targetSlam": "dull support hand, palm down; grows from age 1, falls from age 9, contacts the ground at hazard age 12, removed at age 26",
   "clips": [
     {
       "id": 0,
-      "name": "idle",
-      "length": 40,
-      "loop": true
+      "name": "idle_sword",
+      "len": 40,
+      "loop": true,
+      "events": {},
+      "keyFiles": 4,
+      "keys": 63,
+      "note": "Shogun idle, katana low on her right",
+      "knots": 5,
+      "form": "shogun",
+      "loopFrom": 0,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 1,
-      "name": "walk",
-      "length": 18,
-      "loop": true
+      "name": "idle_polearm",
+      "len": 40,
+      "loop": true,
+      "events": {},
+      "keyFiles": 4,
+      "keys": 63,
+      "note": "Shogun idle, polearm slanted, blade low",
+      "knots": 5,
+      "form": "shogun",
+      "loopFrom": 0,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 2,
-      "name": "slash_wind",
-      "length": 5,
-      "loop": false
+      "name": "blink_out",
+      "len": 6,
+      "loop": false,
+      "events": {
+        "gone": 4
+      },
+      "keyFiles": 2,
+      "keys": 59,
+      "note": "dissolve: crouch, then gone at 4",
+      "knots": 4,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 3,
-      "name": "slash_a",
-      "length": 7,
-      "loop": false
+      "name": "blink_in",
+      "len": 10,
+      "loop": false,
+      "events": {
+        "appear": 0,
+        "settle": 8
+      },
+      "keyFiles": 2,
+      "keys": 57,
+      "note": "reappear in a forward lean, settle at 8",
+      "knots": 4,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 4,
-      "name": "slash_b",
-      "length": 7,
-      "loop": false
+      "name": "iai_dash",
+      "len": 36,
+      "loop": false,
+      "events": {
+        "stance": 0,
+        "flash": 6,
+        "hit1": 18,
+        "hit2": 24
+      },
+      "keyFiles": 13,
+      "keys": 258,
+      "note": "far 뇌명: iai stance, star flash 6, dash cut 18 (the pattern moves her 9 b), end crescent 24",
+      "knots": 14,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 5,
-      "name": "thrust_wind",
-      "length": 5,
-      "loop": false
+      "name": "iai_near",
+      "len": 28,
+      "loop": false,
+      "events": {
+        "raise": 0,
+        "flash": 10,
+        "hit1": 22,
+        "hit2": 28
+      },
+      "keyFiles": 12,
+      "keys": 229,
+      "note": "near 뇌명: draw at 22, rising crescent 28 (the pattern blends back to idle)",
+      "knots": 13,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 6,
-      "name": "thrust",
-      "length": 9,
-      "loop": false
+      "name": "combo5",
+      "len": 74,
+      "loop": false,
+      "events": {
+        "cue": 0,
+        "s1": 12,
+        "s2": 22,
+        "s3": 34,
+        "s4": 50,
+        "s5": 64
+      },
+      "keyFiles": 29,
+      "keys": 707,
+      "note": "sword 5-hit chain: V 12, right cut 22, stab 34, wide cut 50, overhead 64",
+      "knots": 30,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 7,
-      "name": "cast_wind",
-      "length": 6,
-      "loop": false
+      "name": "disc_cast",
+      "len": 40,
+      "loop": false,
+      "events": {
+        "cue": 0,
+        "d1": 6,
+        "d2": 10,
+        "d3": 18,
+        "wave": 34
+      },
+      "keyFiles": 18,
+      "keys": 368,
+      "note": "뇌전이 이끈 번개: flicks launch discs 6/10/18, wind-up 26-32, low wave 34",
+      "knots": 19,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 8,
-      "name": "cast",
-      "length": 9,
-      "loop": false
+      "name": "rear_iai",
+      "len": 30,
+      "loop": false,
+      "events": {
+        "cue": 0,
+        "hit": 14
+      },
+      "keyFiles": 7,
+      "keys": 114,
+      "note": "판결의 검: reverse thrust straight behind her at 14 (yaw locked by the pattern)",
+      "knots": 8,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 9,
-      "name": "transform",
-      "length": 46,
-      "loop": false
+      "name": "musou",
+      "len": 166,
+      "loop": false,
+      "events": {
+        "appear": 6,
+        "raise": 10,
+        "arc": 20,
+        "dark": 110,
+        "slash": 130,
+        "end": 160
+      },
+      "keyFiles": 17,
+      "keys": 365,
+      "note": "몽상의 일심: embeds the blink-in (appear 6), blade to the sky 10-100, iai 110, giant slash 130",
+      "knots": 18,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 10,
-      "name": "arm_sweep_wind",
-      "length": 6,
-      "loop": false
+      "name": "guard",
+      "len": 20,
+      "loop": true,
+      "events": {},
+      "keyFiles": 4,
+      "keys": 78,
+      "note": "번개 배리어 stance: blade upright across the front, floor aura on",
+      "knots": 5,
+      "form": "shogun",
+      "loopFrom": 0,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 11,
-      "name": "arm_sweep",
-      "length": 9,
-      "loop": false
+      "name": "parry",
+      "len": 6,
+      "loop": false,
+      "events": {
+        "flash": 1
+      },
+      "keyFiles": 1,
+      "keys": 30,
+      "note": "deflect flash at 1; returns to the guard pose",
+      "knots": 2,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 12,
-      "name": "clap_wind",
-      "length": 8,
-      "loop": false
+      "name": "counter_sword",
+      "len": 46,
+      "loop": false,
+      "events": {
+        "cue": 0,
+        "burst": 12,
+        "bolts": 24,
+        "lunge": 40
+      },
+      "keyFiles": 25,
+      "keys": 723,
+      "note": "in-guard counter (sword): spin 6-14 (burst 12), floor bolts 24, lunge 40",
+      "knots": 26,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 13,
-      "name": "clap",
-      "length": 9,
-      "loop": false
+      "name": "counter_spear",
+      "len": 26,
+      "loop": false,
+      "events": {
+        "cue": 0,
+        "star": 8,
+        "sweep": 18
+      },
+      "keyFiles": 7,
+      "keys": 130,
+      "note": "in-guard counter (polearm): star 8, wide sweep 18",
+      "knots": 8,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 14,
-      "name": "slam_wind",
-      "length": 8,
-      "loop": false
+      "name": "karatake",
+      "len": 32,
+      "loop": false,
+      "events": {
+        "retreat": 0,
+        "raise": 10,
+        "hit": 30
+      },
+      "keyFiles": 6,
+      "keys": 123,
+      "note": "카라타케: retreat 0, raise 10, two-handed slash 30",
+      "knots": 7,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 15,
-      "name": "slam",
-      "length": 12,
-      "loop": false
+      "name": "switch_sword",
+      "len": 34,
+      "loop": false,
+      "events": {
+        "hoop": 2,
+        "vortex": 8,
+        "burst": 20,
+        "swap": 22
+      },
+      "keyFiles": 7,
+      "keys": 144,
+      "note": "무기 변경 (검): raise 2 (hoop), vortex 8, burst 20, model swap to the katana 22",
+      "knots": 8,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": {
+        "22": "sword"
+      }
     },
     {
       "id": 16,
-      "name": "judgment_wind",
-      "length": 9,
-      "loop": false
+      "name": "switch_polearm",
+      "len": 32,
+      "loop": false,
+      "events": {
+        "hoop": 0,
+        "burst": 20,
+        "swap": 22
+      },
+      "keyFiles": 8,
+      "keys": 171,
+      "note": "무기 변경 (창): hoop 0, burst 20, model swap to the polearm 22",
+      "knots": 9,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": {
+        "22": "polearm"
+      }
     },
     {
       "id": 17,
-      "name": "judgment",
-      "length": 15,
-      "loop": false
+      "name": "p_4hit",
+      "len": 76,
+      "loop": false,
+      "events": {
+        "raise": 4,
+        "star": 10,
+        "h1": 22,
+        "h2": 32,
+        "h3": 42,
+        "h4": 56
+      },
+      "keyFiles": 23,
+      "keys": 477,
+      "note": "원류 4단: sweeps 22 / 32, chop 42, leaping slam 56 (bolt field 82 is the pattern's)",
+      "knots": 24,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 18,
-      "name": "stagger",
-      "length": 30,
-      "loop": false
+      "name": "p_lance",
+      "len": 24,
+      "loop": false,
+      "events": {
+        "raise": 0,
+        "glow": 6,
+        "hit": 14
+      },
+      "keyFiles": 6,
+      "keys": 152,
+      "note": "원거리 창: raise 0, tip glow 6 (aim lock), lance 14",
+      "knots": 7,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 19,
-      "name": "death",
-      "length": 48,
-      "loop": false
+      "name": "p_twirl_slam",
+      "len": 52,
+      "loop": false,
+      "events": {
+        "twirl": 0,
+        "flash": 38,
+        "hit": 40
+      },
+      "keyFiles": 19,
+      "keys": 172,
+      "note": "수천수만의 염원: overhead twirl 4-37 (90 degrees per 3 t), flash 38, slam 40",
+      "knots": 20,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 20,
-      "name": "spin",
-      "length": 12,
-      "loop": true
+      "name": "p_twirl_dash",
+      "len": 58,
+      "loop": false,
+      "events": {
+        "twirl": 0,
+        "d1": 20,
+        "d2": 32,
+        "d3": 44
+      },
+      "keyFiles": 22,
+      "keys": 485,
+      "note": "돌진 3콤보: twirl 3-15, dash thrusts 20 / 32 / 44 (the pattern moves her)",
+      "knots": 23,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 21,
-      "name": "dash",
-      "length": 10,
-      "loop": true
+      "name": "p_zigzag",
+      "len": 64,
+      "loop": false,
+      "events": {
+        "hip": 0,
+        "star": 8,
+        "dash": 14,
+        "ring": 34,
+        "lunge": 52
+      },
+      "keyFiles": 20,
+      "keys": 527,
+      "note": "번개돌진 콤보: hip 0, star 8, zig-zag dash 14, ring spin 28-36 (ring 34), crouch 40, lunge 52",
+      "knots": 21,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 22,
-      "name": "exhausted",
-      "length": 60,
-      "loop": true
+      "name": "p_rear",
+      "len": 36,
+      "loop": false,
+      "events": {
+        "twirl": 0,
+        "h1": 16,
+        "h2": 26
+      },
+      "keyFiles": 16,
+      "keys": 255,
+      "note": "창 뒤 견제: twirl 3-12, rear sweeps 16 / 26",
+      "knots": 17,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 23,
-      "name": "collapse",
-      "length": 46,
-      "loop": false
+      "name": "cast",
+      "len": 20,
+      "loop": false,
+      "events": {
+        "cast": 8
+      },
+      "keyFiles": 5,
+      "keys": 89,
+      "note": "cast gesture (eyes, field lightning, blade eyes): left hand raised at 8",
+      "knots": 6,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     },
     {
       "id": 24,
+      "name": "stagger",
+      "len": 60,
+      "loop": false,
+      "events": {},
+      "keyFiles": 8,
+      "keys": 168,
+      "note": "stagger 20 t into a 40 t kneeling loop (20-60)",
+      "knots": 9,
+      "form": "shogun",
+      "loopFrom": 20,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 25,
+      "name": "stun_recover",
+      "len": 24,
+      "loop": false,
+      "events": {
+        "burst": 24
+      },
+      "keyFiles": 8,
+      "keys": 196,
+      "note": "rise from the stagger; recovery burst 24",
+      "knots": 9,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 26,
+      "name": "transform",
+      "len": 60,
+      "loop": false,
+      "events": {
+        "rise": 4,
+        "ring": 20,
+        "pillars": 44,
+        "form": 50
+      },
+      "keyFiles": 9,
+      "keys": 219,
+      "note": "변신: rise 4-20 (float 1 b), ring 20, pillars 44, the Tenma form appears from 49 (look switch at 50)",
+      "knots": 11,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": {
+        "50": "tenma"
+      },
+      "weaponSwap": null
+    },
+    {
+      "id": 27,
+      "name": "death",
+      "len": 48,
+      "loop": false,
+      "events": {},
+      "keyFiles": 6,
+      "keys": 165,
+      "note": "death: recoil 4, kneel 14, slump to 48 (the Tenma parts fall away; the look is kept)",
+      "knots": 7,
+      "form": "keep",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 28,
+      "name": "t_idle",
+      "len": 60,
+      "loop": true,
+      "events": {},
+      "keyFiles": 4,
+      "keys": 117,
+      "note": "float bob +-0.2, arm drift",
+      "knots": 5,
+      "form": "tenma",
+      "loopFrom": 0,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 29,
+      "name": "t_blink_out",
+      "len": 6,
+      "loop": false,
+      "events": {
+        "gone": 4
+      },
+      "keyFiles": 2,
+      "keys": 59,
+      "note": "Tenma dissolve, gone 4",
+      "knots": 4,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 30,
+      "name": "t_blink_in",
+      "len": 10,
+      "loop": false,
+      "events": {
+        "appear": 0,
+        "settle": 8
+      },
+      "keyFiles": 2,
+      "keys": 41,
+      "note": "Tenma reappear (pink streak), settle 8",
+      "knots": 4,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 31,
+      "name": "t_combo3",
+      "len": 70,
+      "loop": false,
+      "events": {
+        "raise": 0,
+        "sw1": 14,
+        "sw2": 26,
+        "cock": 42,
+        "throw": 54,
+        "reform": 62
+      },
+      "keyFiles": 32,
+      "keys": 496,
+      "note": "백안지륜: sweeps 14 / 26, cock 42, throw 54 (glaive hidden until 62), re-forms 62-70",
+      "knots": 33,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 32,
+      "name": "t_spin_throw",
+      "len": 46,
+      "loop": false,
+      "events": {
+        "glint": 0,
+        "spin": 13,
+        "throw": 31
+      },
+      "keyFiles": 30,
+      "keys": 688,
+      "note": "초월의 악요개안: glint 0, full spin 5-21 (spin 13), throw 31 (glaive back 39-46)",
+      "knots": 31,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 33,
+      "name": "t_iai",
+      "len": 40,
+      "loop": false,
+      "events": {
+        "crouch": 0,
+        "flash": 10,
+        "hit": 22
+      },
+      "keyFiles": 13,
+      "keys": 384,
+      "note": "신속한 발도: crouch 0-10, flash 10, the 360 degree draw 22-28 (hit 22)",
+      "knots": 14,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 34,
+      "name": "t_waves",
+      "len": 70,
+      "loop": false,
+      "events": {
+        "glint": 0,
+        "swing1": 8,
+        "swing2": 53
+      },
+      "keyFiles": 26,
+      "keys": 430,
+      "note": "궤멸의 검기: glint 0, overhead swing 8 (slabs), low sweep 53 (wave)",
+      "knots": 27,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 35,
+      "name": "t_danjeol",
+      "len": 80,
+      "loop": false,
+      "events": {
+        "halo": 6,
+        "raise": 10,
+        "band": 24,
+        "slam": 64
+      },
+      "keyFiles": 20,
+      "keys": 316,
+      "note": "단절: halo 6, raise 10-24, held overhead, slam 64",
+      "knots": 21,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 36,
+      "name": "t_summon",
+      "len": 24,
+      "loop": false,
+      "events": {
+        "sphere": 4,
+        "throw": 16
+      },
+      "keyFiles": 4,
+      "keys": 36,
+      "note": "흉장의 수안 (clap): sphere 4, throw 16",
+      "knots": 6,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 37,
+      "name": "t_seed",
+      "len": 20,
+      "loop": false,
+      "events": {
+        "twirl": 0,
+        "throw": 8
+      },
+      "keyFiles": 3,
+      "keys": 34,
+      "note": "흉장의 수안 (shadow): twirl 0, throw 8",
+      "knots": 5,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 38,
+      "name": "t_vajra",
+      "len": 30,
+      "loop": false,
+      "events": {
+        "hurl": 6,
+        "hurl2": 12,
+        "hurl3": 18
+      },
+      "keyFiles": 7,
+      "keys": 48,
+      "note": "금강괴멸파: the right arms hurl the vajras 6 / 12 / 18",
+      "knots": 9,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 39,
+      "name": "t_vanish",
+      "len": 14,
+      "loop": false,
+      "events": {
+        "gone": 14
+      },
+      "keyFiles": 3,
+      "keys": 88,
+      "note": "만겁: vanish (gone 14)",
+      "knots": 4,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 40,
+      "name": "t_reform",
+      "len": 20,
+      "loop": false,
+      "events": {
+        "appear": 0
+      },
+      "keyFiles": 3,
+      "keys": 88,
+      "note": "만겁: reappear 0",
+      "knots": 4,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 41,
+      "name": "t_rush",
+      "len": 52,
+      "loop": false,
+      "events": {
+        "glint": 0,
+        "flash": 13,
+        "rush": 23,
+        "b1": 28,
+        "b2": 34,
+        "b3": 40
+      },
+      "keyFiles": 21,
+      "keys": 404,
+      "note": "강력한 돌진: glint 0, flash 13, rush 23 (the pattern moves her), barrage 28 / 34 / 40",
+      "knots": 22,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 42,
+      "name": "t_collapse",
+      "len": 46,
+      "loop": false,
+      "events": {
+        "form": 20,
+        "kneel": 46
+      },
+      "keyFiles": 6,
+      "keys": 169,
+      "note": "armour broken: the puppet falls away, she drops and the Shogun look returns at 20, kneels 46",
+      "knots": 8,
+      "form": "tenma",
+      "loopFrom": null,
+      "formSwitch": {
+        "20": "shogun"
+      },
+      "weaponSwap": null
+    },
+    {
+      "id": 43,
+      "name": "exhausted",
+      "len": 60,
+      "loop": true,
+      "events": {},
+      "keyFiles": 4,
+      "keys": 78,
+      "note": "kneeling, breathing",
+      "knots": 5,
+      "form": "shogun",
+      "loopFrom": 0,
+      "formSwitch": null,
+      "weaponSwap": null
+    },
+    {
+      "id": 44,
       "name": "recover",
-      "length": 28,
-      "loop": false
+      "len": 28,
+      "loop": false,
+      "events": {},
+      "keyFiles": 3,
+      "keys": 84,
+      "note": "stands up from the kneel",
+      "knots": 4,
+      "form": "shogun",
+      "loopFrom": null,
+      "formSwitch": null,
+      "weaponSwap": null
     }
   ],
-  "integration": "Call rig/init from load, rig/spawn and rig/tick as the real boss at its feet. rdAnim selects a state; private rdRigT resets on rdAnim/rdPhase changes. rig/select/<clip> also applies rig/skin_dull or rig/skin_normal for the current rdPhase. rig/flash is optional body-hit feedback. rig/cleanup deletes all parts. Supplied skin remains byte-identical."
+  "follow": {
+    "lists": {
+      "shogun": {
+        "id": 0,
+        "parts": [
+          "head",
+          "body",
+          "right_arm",
+          "right_forearm",
+          "left_arm",
+          "left_forearm",
+          "right_leg",
+          "right_shin",
+          "left_leg",
+          "left_shin",
+          "braid",
+          "drape",
+          "weapon",
+          "weapon_fx",
+          "halo",
+          "aura"
+        ]
+      },
+      "tenma": {
+        "id": 1,
+        "parts": [
+          "head",
+          "body",
+          "right_arm",
+          "right_forearm",
+          "left_arm",
+          "left_forearm",
+          "right_leg",
+          "right_shin",
+          "left_leg",
+          "left_shin",
+          "braid",
+          "disc",
+          "g_upper",
+          "g_fore",
+          "g_hand",
+          "glaive",
+          "glaive_fx",
+          "ra1_up",
+          "ra1_fo",
+          "ra2_up",
+          "ra2_fo",
+          "ra3_up",
+          "ra3_fo",
+          "gaunt_l",
+          "gaunt_r"
+        ]
+      },
+      "all": {
+        "id": 2,
+        "parts": [
+          "head",
+          "body",
+          "right_arm",
+          "right_forearm",
+          "left_arm",
+          "left_forearm",
+          "right_leg",
+          "right_shin",
+          "left_leg",
+          "left_shin",
+          "braid",
+          "drape",
+          "weapon",
+          "weapon_fx",
+          "halo",
+          "aura",
+          "disc",
+          "g_upper",
+          "g_fore",
+          "g_hand",
+          "glaive",
+          "glaive_fx",
+          "ra1_up",
+          "ra1_fo",
+          "ra2_up",
+          "ra2_fo",
+          "ra3_up",
+          "ra3_fo",
+          "gaunt_l",
+          "gaunt_r"
+        ]
+      }
+    },
+    "fixed": [],
+    "sink": [],
+    "static_skip": true,
+    "objectives": [
+      "rdRigFl",
+      "rdRigQ",
+      "rdRigQx",
+      "rdRigQy",
+      "rdRigQz",
+      "rdRigQw"
+    ],
+    "functions": {
+      "follow": "rlk:boss/raiden/rig/follow",
+      "follow_now": "rlk:boss/raiden/rig/follow_now"
+    }
+  },
+  "props": {
+    "eye_orb": {
+      "model": "prop/eye_orb",
+      "scale": 1,
+      "note": "eye orb (10 single / 4 multi); centre 0.77 b above the pivot",
+      "item": "rlk:raiden/prop/eye_orb",
+      "function": "rlk:boss/raiden/rig/prop/eye_orb"
+    },
+    "blade_eye": {
+      "model": "prop/blade_eye",
+      "scale": 1.2,
+      "billboard": "center",
+      "note": "blade-eye sigil (6b), 1.2 b wide, centred",
+      "item": "rlk:raiden/prop/blade_eye",
+      "function": "rlk:boss/raiden/rig/prop/blade_eye"
+    },
+    "musou_orb": {
+      "model": "prop/musou_orb",
+      "scale": 1.4,
+      "note": "Musou crystal orb, centred",
+      "item": "rlk:raiden/prop/musou_orb",
+      "function": "rlk:boss/raiden/rig/prop/musou_orb"
+    },
+    "vajra": {
+      "model": "prop/vajra",
+      "scale": 2.5,
+      "note": "vajra spike bundle 3.5 b tall, base at the pivot (floor)",
+      "item": "rlk:raiden/prop/vajra",
+      "function": "rlk:boss/raiden/rig/prop/vajra"
+    },
+    "flower": {
+      "model": "prop/flower",
+      "scale": 2.2,
+      "note": "remembrance flower (lotus + dark orb, about 2 b tall), floor pivot",
+      "item": "rlk:raiden/prop/flower",
+      "function": "rlk:boss/raiden/rig/prop/flower"
+    },
+    "dome": {
+      "model": "prop/dome",
+      "scale": 8,
+      "note": "safe dome r 8 b (glass, outer and inner facets), floor pivot; animate the scale to grow it",
+      "item": "rlk:raiden/prop/dome",
+      "function": "rlk:boss/raiden/rig/prop/dome"
+    },
+    "clap_l": {
+      "model": "prop/clap_hand_l",
+      "scale": 3.6,
+      "note": "left clap hand (palm toward +X of the display), 4.5 b",
+      "item": "rlk:raiden/prop/clap_hand_l",
+      "function": "rlk:boss/raiden/rig/prop/clap_l"
+    },
+    "clap_r": {
+      "model": "prop/clap_hand_r",
+      "scale": 3.6,
+      "note": "right clap hand (palm toward -X), 4.5 b",
+      "item": "rlk:raiden/prop/clap_hand_r",
+      "function": "rlk:boss/raiden/rig/prop/clap_r"
+    },
+    "slam_palm": {
+      "model": "prop/slam_palm",
+      "scale": 3.2,
+      "note": "pale open hand hanging from the pivot (fingers -Y); turn it palm down",
+      "item": "rlk:raiden/prop/slam_palm",
+      "function": "rlk:boss/raiden/rig/prop/slam_palm"
+    },
+    "glaive_planted": {
+      "model": "prop/glaive_planted",
+      "scale": 3,
+      "note": "planted glaive rising from the floor at 22.5 degrees, blade buried",
+      "item": "rlk:raiden/prop/glaive_planted",
+      "function": "rlk:boss/raiden/rig/prop/glaive_planted"
+    },
+    "seed": {
+      "model": "prop/seed",
+      "scale": 1,
+      "note": "shadow seed: dark orb with an eye, centred",
+      "item": "rlk:raiden/prop/seed",
+      "function": "rlk:boss/raiden/rig/prop/seed"
+    },
+    "hoop": {
+      "model": "prop/hoop",
+      "scale": 2,
+      "note": "switch hoop, 3 b, standing on the pivot",
+      "item": "rlk:raiden/prop/hoop",
+      "function": "rlk:boss/raiden/rig/prop/hoop"
+    },
+    "vortex": {
+      "model": "prop/vortex",
+      "scale": 3,
+      "note": "switch vortex disc r 2.8 b on the floor",
+      "item": "rlk:raiden/prop/vortex",
+      "function": "rlk:boss/raiden/rig/prop/vortex"
+    },
+    "clone_ready": {
+      "model": "prop/clone_ready_dark",
+      "scale": 1,
+      "lift": 1.375,
+      "note": "dark clone, sword raised (2 b tall at scale 1, boss scale); pivot at the waist, 1.375 b above the feet",
+      "item": "rlk:raiden/prop/clone_ready_dark",
+      "function": "rlk:boss/raiden/rig/prop/clone_ready"
+    },
+    "clone_slash": {
+      "model": "prop/clone_slash_dark",
+      "scale": 1,
+      "lift": 1.375,
+      "note": "dark clone, follow-through",
+      "item": "rlk:raiden/prop/clone_slash_dark",
+      "function": "rlk:boss/raiden/rig/prop/clone_slash"
+    },
+    "clone_ready_glow": {
+      "model": "prop/clone_ready_glow",
+      "scale": 1,
+      "lift": 1.375,
+      "note": "revealed (glowing) clone, sword raised",
+      "item": "rlk:raiden/prop/clone_ready_glow",
+      "function": "rlk:boss/raiden/rig/prop/clone_ready_glow"
+    },
+    "clone_slash_glow": {
+      "model": "prop/clone_slash_glow",
+      "scale": 1,
+      "lift": 1.375,
+      "note": "revealed clone, follow-through",
+      "item": "rlk:raiden/prop/clone_slash_glow",
+      "function": "rlk:boss/raiden/rig/prop/clone_slash_glow"
+    }
+  },
+  "legacy_items": {
+    "rlk:raiden/electro_orb": "rlk:raiden/prop/eye_orb",
+    "rlk:raiden/lightning_stake": "rlk:raiden/prop/vajra",
+    "rlk:raiden/remembrance_flower": "rlk:raiden/prop/flower",
+    "rlk:raiden/support_hand_l": "rlk:raiden/prop/clap_hand_l",
+    "rlk:raiden/support_hand_r": "rlk:raiden/prop/clap_hand_r"
+  },
+  "legacy_anim": {
+    "0": {
+      "shogun": "idle",
+      "tenma": "t_idle"
+    },
+    "1": {
+      "shogun": "idle",
+      "tenma": "t_idle"
+    },
+    "2": {
+      "shogun": "iai_near",
+      "tenma": "t_iai"
+    },
+    "3": {
+      "shogun": "=iai_near",
+      "tenma": "=t_iai"
+    },
+    "4": {
+      "shogun": "combo5",
+      "tenma": "t_combo3"
+    },
+    "5": {
+      "shogun": "p_lance",
+      "tenma": "t_rush"
+    },
+    "6": {
+      "shogun": "=p_lance",
+      "tenma": "=t_rush"
+    },
+    "7": {
+      "shogun": "cast",
+      "tenma": "t_summon"
+    },
+    "8": {
+      "shogun": "=cast",
+      "tenma": "=t_summon"
+    },
+    "9": {
+      "shogun": "transform",
+      "tenma": "transform"
+    },
+    "10": {
+      "shogun": "combo5",
+      "tenma": "t_combo3"
+    },
+    "11": {
+      "shogun": "=combo5",
+      "tenma": "=t_combo3"
+    },
+    "12": {
+      "shogun": "cast",
+      "tenma": "t_summon"
+    },
+    "13": {
+      "shogun": "=cast",
+      "tenma": "=t_summon"
+    },
+    "14": {
+      "shogun": "cast",
+      "tenma": "t_seed"
+    },
+    "15": {
+      "shogun": "=cast",
+      "tenma": "=t_seed"
+    },
+    "16": {
+      "shogun": "cast",
+      "tenma": "t_vanish"
+    },
+    "17": {
+      "shogun": "=cast",
+      "tenma": "=t_vanish"
+    },
+    "18": {
+      "shogun": "stagger",
+      "tenma": "stagger"
+    },
+    "19": {
+      "shogun": "death",
+      "tenma": "death"
+    },
+    "20": {
+      "shogun": "p_twirl_slam",
+      "tenma": "t_spin_throw"
+    },
+    "21": {
+      "shogun": "iai_dash",
+      "tenma": "t_rush"
+    },
+    "22": {
+      "shogun": "exhausted",
+      "tenma": "exhausted"
+    },
+    "23": {
+      "shogun": "t_collapse",
+      "tenma": "t_collapse"
+    },
+    "24": {
+      "shogun": "recover",
+      "tenma": "recover"
+    }
+  },
+  "objectives": {
+    "rdRigC": "rdRigC",
+    "rdRigT": "rdRigT",
+    "rdRigY": "rdRigY",
+    "rdRigS": "rdRigS",
+    "rdRigW": "rdRigW",
+    "rdRigF": "rdRigF",
+    "rdRigL": "rdRigL",
+    "rdRigP": "rdRigP",
+    "rdRigFl": "rdRigFl",
+    "rdRigQ": "rdRigQ",
+    "rdRigQx": "rdRigQx",
+    "rdRigQy": "rdRigQy",
+    "rdRigQz": "rdRigQz",
+    "rdRigQw": "rdRigQw"
+  },
+  "functions": {
+    "init": "rlk:boss/raiden/rig/init",
+    "spawn": "rlk:boss/raiden/rig/spawn",
+    "tick": "rlk:boss/raiden/rig/tick",
+    "play": "rlk:boss/raiden/rig/play/<clip>",
+    "start": "rlk:boss/raiden/rig/start/<clip>",
+    "state": "rlk:boss/raiden/rig/state/{shogun,tenma,hidden}",
+    "look": "rlk:boss/raiden/rig/look/{sword,polearm,tenma}",
+    "flash": "rlk:boss/raiden/rig/flash",
+    "kill": "rlk:boss/raiden/rig/kill",
+    "face": "rlk:boss/raiden/rig/face/{player,track,set}",
+    "prop": "rlk:boss/raiden/rig/prop/<kind>",
+    "legacy": "rlk:boss/raiden/rig/legacy_anim"
+  },
+  "px": {
+    "rig": 145664,
+    "props": 57344,
+    "total": 203008,
+    "sprites": {
+      "sw_ink": 256,
+      "sw_violet": 256,
+      "sw_deep": 256,
+      "sw_plum": 256,
+      "sw_pale": 256,
+      "sw_paleshade": 256,
+      "sw_gold": 256,
+      "sw_golddk": 256,
+      "sw_lacquersh": 256,
+      "sw_lacquerdk": 256,
+      "sw_tan": 256,
+      "sw_tandk": 256,
+      "sw_shaft": 256,
+      "sw_suit": 256,
+      "sw_glow": 256,
+      "sw_white": 256,
+      "sw_electro": 256,
+      "sleeve_pale": 8192,
+      "sleeve_dark": 8192,
+      "drape": 16384,
+      "braid": 4096,
+      "flower": 1024,
+      "obi_knot": 1024,
+      "tassel": 1024,
+      "halo_eye": 4096,
+      "tomoe_orb": 1024,
+      "thread": 1024,
+      "katana_blade": 4096,
+      "polearm_blade": 8192,
+      "weapon_glow": 4096,
+      "aura_ring": 16384,
+      "lacquer": 4096,
+      "sigil": 4096,
+      "gauntlet": 4096,
+      "glaive_blade": 16384,
+      "glaive_shaft": 1024,
+      "glaive_guard": 4096,
+      "disc": 16384,
+      "horn": 2048,
+      "dagger": 2048,
+      "tasset": 2048,
+      "plate_pale": 2048,
+      "orb_eye": 4096,
+      "crystal": 8192,
+      "petal": 4096,
+      "dome_glass": 4096,
+      "clap_facet": 4096,
+      "hoop": 16384,
+      "vortex": 16384,
+      "skin_tenma": 4096
+    }
+  },
+  "elements": {
+    "shogun_sword": 65,
+    "shogun_polearm": 68,
+    "tenma": 775
+  },
+  "budgets": {
+    "parts": [
+      30,
+      34
+    ],
+    "key_files": 491,
+    "rig_files": 744,
+    "rig_bytes": 2807548,
+    "models": 55,
+    "culling": {
+      "width": 16,
+      "height": 10
+    },
+    "view_range": 3,
+    "cull_overhang_ticks": 0
+  }
 }

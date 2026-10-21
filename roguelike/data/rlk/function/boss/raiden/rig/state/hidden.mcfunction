@@ -1,0 +1,36 @@
+# Hidden (blinks, 찰나의 포영, 만겁): every part at scale 0 where it stands (never moved below the floor) and no clip
+# runs; the parts keep following the boss. The next rig/play shows the rig again (its tick 0 sets the clip's state). @s = the boss.
+scoreboard players set @s rdRigS 2
+scoreboard players set @s rdRigFl 2
+scoreboard players reset @s rdRigQx
+scoreboard players set @s rdRigT 0
+data modify entity 524c4b4d-5244-4900-8000-000000000001 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000002 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000003 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000004 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000005 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000006 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000007 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000008 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000009 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-00000000000a transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-00000000000b transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-00000000000c transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-00000000000d transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-00000000000e transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-00000000000f transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000010 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000011 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000012 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000013 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000014 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000015 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000016 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000017 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000018 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-000000000019 transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-00000000001a transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-00000000001b transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-00000000001c transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-00000000001d transformation.scale set value [0f,0f,0f]
+data modify entity 524c4b4d-5244-4900-8000-00000000001e transformation.scale set value [0f,0f,0f]
