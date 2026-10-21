@@ -27,9 +27,9 @@ Outputs (owned; stale files in these places are removed):
                  assets/rlk/items/mboss/az_kit/<kind>.json          item definitions, custom_model_data tint
                  assets/minecraft/atlases/items.json                adds rlk:mboss/az_kit/* (merges)
                  assets/rlk/font/mboss_az.json + textures/font/mboss_az/*
-  datapack       data/rlk/function/mboss/azhdaha/fx/{card,cardx,look,clear,uninstall}
-                 data/rlk/function/mboss/azhdaha/fx/{e,p,tele,snd,hud,prop,test}/**
-                 (every other file under mboss/azhdaha/fx/ belongs to the module core and is left alone)
+  datapack       data/rlk/function/boss/azhdaha/fx/{card,cardx,look,clear,uninstall}
+                 data/rlk/function/boss/azhdaha/fx/{e,p,tele,snd,hud,prop,test}/**
+                 (every other file under boss/azhdaha/fx/ belongs to the module core and is left alone)
   manifest       tools/mboss_az_fx_manifest.json
 
 No hook in a shared file: the engine ages its cards from a self-rescheduling function (schedule ... 1t replace).
@@ -52,9 +52,11 @@ HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 import mboss_az_fx_paint as P  # noqa: E402
+import mboss_lib as L  # noqa: E402
 
-FN = 'rlk:mboss/azhdaha/fx/'
-FDIR = 'data/rlk/function/mboss/azhdaha/fx'
+ROOT = L.fn_root_of('azhdaha')         # the module's function root (registry fn: boss/azhdaha, user 10-22)
+FN = f'rlk:{ROOT}/fx/'
+FDIR = f'data/rlk/function/{ROOT}/fx'
 NS_TEX = 'rlk:mboss/az_kit/'           # textures, models (rlk:item/mboss/az_kit/*) and item ids
 TEXDIR = 'mboss/az_kit'
 FONT = 'rlk:mboss_az'
@@ -3535,7 +3537,7 @@ def demo_where(where):
 
 def tests(W):
     t = ['# Every fx kind in rows in front of the executor (3 s each):',
-         '# /execute as @p at @s rotated ~ 0 run function rlk:mboss/azhdaha/fx/test/kinds']
+         f'# /execute as @p at @s rotated ~ 0 run function {FN}test/kinds']
     for i, kind in enumerate(FX_KINDS):
         row, colm = divmod(i, 8)
         x = 5.25 - 1.5 * colm
@@ -3548,7 +3550,7 @@ def tests(W):
     W.w('test/kinds', t)
     tl = ['# One telegraph of each shape (tell 40 t) around the executor: discs in every el palette, the nd looks,',
           '# a ring, sectors, a wedge union, lines, a flank strip, a front, a moving line turning for 84 t, the seals:',
-          '# /execute as @p at @s rotated ~ 0 run function rlk:mboss/azhdaha/fx/test/tele']
+          f'# /execute as @p at @s rotated ~ 0 run function {FN}test/tele']
     for el in range(0, 6):
         tl.append(f'execute positioned ^{num(7.5 - 3 * el)} ^ ^5 run ' + tele_disc(1.3, 40, el))
     tl += ['execute positioned ^6 ^ ^10 run ' + tele_disc(2.0, 40, 5, 1),
@@ -3586,7 +3588,7 @@ def tests(W):
                                  for n in list(PRESETS) + list(EPRESETS)) + ']'])
     pr = ['# Every prop look on a row of temporary item_displays in front of the executor (removed after 10 s by the',
           '# kit ager: they carry the card tags):',
-          '# /execute as @p at @s rotated ~ 0 run function rlk:mboss/azhdaha/fx/test/props']
+          f'# /execute as @p at @s rotated ~ 0 run function {FN}test/props']
     names = list(PROPS) + [f'{n}/{e}' for n, (_d, _r, mem, _b, _s) in PFAM.items() for e in mem]
     for i, n in enumerate(names):
         row, colm = divmod(i, 8)
@@ -3601,7 +3603,7 @@ def tests(W):
                       '$scoreboard players set #akA mb $(ph)',
                       f'execute if score #akA mb matches ..1 run data modify storage {STO} dm.g set value 5'])
     W.w('test/stage', ['# Spawn the demo stand-in anchor (a vanilla marker tagged rlk_ak_demo) 12 b in front of the executor,',
-                       '# facing it. /execute as @p at @s rotated ~ 0 run function rlk:mboss/azhdaha/fx/test/stage, then',
+                       f'# facing it. /execute as @p at @s rotated ~ 0 run function {FN}test/stage, then',
                        '# test/demo/<name>. test/stop removes it.',
                        f'function {FN}test/stop',
                        'execute positioned ^ ^ ^12 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_ak_demo","rlk_room","rlk_mb_aux"]}',

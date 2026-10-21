@@ -44,8 +44,11 @@ const rp = arg('--resourcepack') && path.resolve(arg('--resourcepack'));
 if (!rp) throw new Error('--resourcepack <unpacked pack> is required');
 const put = (p, s) => { fs.mkdirSync(path.dirname(p), {recursive: true}); fs.writeFileSync(p, s.endsWith('\n') ? s : s + '\n'); };
 const json = (p, o) => put(p, JSON.stringify(o, null, 2));
-const NS = 'rlk:mboss/apep/rig';
-const rigDir = path.join(dp, 'data/rlk/function/mboss/apep/rig');
+// The module's function root (registry "fn", as tools/mboss_lib.fn_root; user 10-22: chapter bosses live under
+// boss/<id>). Only the functions move: tags, scores and the resource-pack paths keep their mboss names.
+const FN_ROOT = (JSON.parse(fs.readFileSync(path.join(here, 'mboss_registry.json'), 'utf8')).boss.find(b => b.id === 'apep') || {}).fn || 'mboss/apep';
+const NS = `rlk:${FN_ROOT}/rig`;
+const rigDir = path.join(dp, `data/rlk/function/${FN_ROOT}/rig`);
 fs.rmSync(rigDir, {recursive: true, force: true});
 const fn = (n, lines) => put(path.join(rigDir, n + '.mcfunction'), (Array.isArray(lines) ? lines : [lines]).join('\n'));
 const assets = path.join(rp, 'assets/rlk');
@@ -642,7 +645,7 @@ if (flag('--part-extents')) for (const [st, f, o] of [['CROUCH', 'p1', REF.CROUC
 }
 if (flag('--residuals')) for (const r of residuals) console.log(`  ${r.joint.padEnd(22)} ${r.d.toFixed(3)}  fk [${r.fk}] target [${r.target}]`);
 if (debugDp) {
-  const link = path.join(debugDp, 'data/rlk/function/mboss/apep/rig');
+  const link = path.join(debugDp, `data/rlk/function/${FN_ROOT}/rig`);
   fs.rmSync(link, {recursive: true, force: true});
   fs.mkdirSync(path.dirname(link), {recursive: true});
   fs.symlinkSync(rigDir, link);

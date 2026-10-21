@@ -3,4 +3,4 @@
 data remove storage rlk:mboss cprep.azhdaha
 execute in minecraft:overworld run function rlk:mboss/ar/az_cavern/fl_on
 execute in minecraft:overworld run function rlk:mboss/ar/az_cavern/ensure
-function rlk:mboss/azhdaha/prep
+function rlk:boss/azhdaha/prep

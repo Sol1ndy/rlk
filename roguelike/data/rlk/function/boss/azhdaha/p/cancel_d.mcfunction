@@ -1,0 +1,26 @@
+# GENERATED: the running pattern's cancel, by #azPat.
+execute if score #azPat mb matches 1 run return run function rlk:boss/azhdaha/p/chin/cancel
+execute if score #azPat mb matches 2 run return run function rlk:boss/azhdaha/p/jump/cancel
+execute if score #azPat mb matches 3 run return run function rlk:boss/azhdaha/p/charge/cancel
+execute if score #azPat mb matches 4 run return run function rlk:boss/azhdaha/p/spikes/cancel
+execute if score #azPat mb matches 5 run return run function rlk:boss/azhdaha/p/stomp/cancel
+execute if score #azPat mb matches 10 run return run function rlk:boss/azhdaha/p/stomp3/cancel
+execute if score #azPat mb matches 6 run return run function rlk:boss/azhdaha/p/feint/cancel
+execute if score #azPat mb matches 7 run return run function rlk:boss/azhdaha/p/whip/cancel
+execute if score #azPat mb matches 8 run return run function rlk:boss/azhdaha/p/tailslam/cancel
+execute if score #azPat mb matches 9 run return run function rlk:boss/azhdaha/p/burrow/cancel
+execute if score #azPat mb matches 31 run return run function rlk:boss/azhdaha/p/orbs/cancel
+execute if score #azPat mb matches 32 run return run function rlk:boss/azhdaha/p/meteor/cancel
+execute if score #azPat mb matches 41 run return run function rlk:boss/azhdaha/p/frost/cancel
+execute if score #azPat mb matches 42 run return run function rlk:boss/azhdaha/p/bolt/cancel
+execute if score #azPat mb matches 43 run return run function rlk:boss/azhdaha/p/icicle/cancel
+execute if score #azPat mb matches 44 run return run function rlk:boss/azhdaha/p/shell/cancel
+execute if score #azPat mb matches 45 run return run function rlk:boss/azhdaha/p/icespike/cancel
+execute if score #azPat mb matches 46 run return run function rlk:boss/azhdaha/p/elspike/cancel
+execute if score #azPat mb matches 20 run return run function rlk:boss/azhdaha/p/slide/cancel
+execute if score #azPat mb matches 21 run return run function rlk:boss/azhdaha/p/absorb1/cancel
+execute if score #azPat mb matches 22 run return run function rlk:boss/azhdaha/p/absorb2/cancel
+execute if score #azPat mb matches 23 run return run function rlk:boss/azhdaha/p/burrow3/cancel
+execute if score #azPat mb matches 27 run return run function rlk:boss/azhdaha/p/turn/cancel
+execute if score #azPat mb matches 28 run return run function rlk:boss/azhdaha/p/walk/cancel
+execute if score #azPat mb matches 30 run return run function rlk:boss/azhdaha/p/cast_host/cancel

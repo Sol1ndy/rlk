@@ -1,0 +1,4 @@
+# stalk stalk_low: its clip (apOI) at tick apOC. @s = the display.
+execute if score @s apOI matches 46 run return run function rlk:boss/apep/om/stalk/c/leg_rise/stalk_low/run
+execute if score @s apOI matches 47 run return run function rlk:boss/apep/om/stalk/c/leg_slam/stalk_low/run
+execute if score @s apOI matches 48 run return run function rlk:boss/apep/om/stalk/c/leg_sink/stalk_low/run

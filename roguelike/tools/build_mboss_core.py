@@ -1502,20 +1502,20 @@ scoreboard players set @a[tag=player,scores={ttlT=1..}] ttlT 0
 for hook in L.HOOKS:
     args = L.MACRO_HOOKS.get(hook)
     if hook in L.ALL_MODULE_HOOKS:
-        lines = [f'# GENERATED dispatcher: rlk:mboss/<id>/{hook} of every enabled mid-boss module (none needs to be running).']
-        lines += [f'function rlk:mboss/{b["id"]}/{hook}' for b in BOSSES]
+        lines = [f'# GENERATED dispatcher: rlk:<fn root>/{hook} of every enabled boss module (none needs to be running).']
+        lines += [f'function rlk:{L.fn_root(b)}/{hook}' for b in BOSSES]
         out.write('mboss/d/' + hook, '\n'.join(lines))
         continue
-    lines = [f'# GENERATED dispatcher: rlk:mboss/<id>/{hook} of the running mid-boss (#mbId mb = registry n).']
+    lines = [f'# GENERATED dispatcher: rlk:<fn root>/{hook} of the running boss (#mbId mb = registry n).']
     for b in BOSSES:
         if args:
             argtxt = '{' + ','.join(f'{a}:$({a})' for a in args) + '}'
-            lines.append(f'$execute if score #mbId mb matches {b["n"]} run return run function rlk:mboss/{b["id"]}/{hook} {argtxt}')
+            lines.append(f'$execute if score #mbId mb matches {b["n"]} run return run function rlk:{L.fn_root(b)}/{hook} {argtxt}')
         elif hook == 'incoming' and b.get('kind', 'mid') == 'chapter':
             # chapter bosses: the module's incoming, then the framework floor (mboss/floor, cm.md 7.2)
             lines.append(f'execute if score #mbId mb matches {b["n"]} run return run function rlk:mboss/cb/inc/{b["id"]}')
         else:
-            lines.append(f'execute if score #mbId mb matches {b["n"]} run return run function rlk:mboss/{b["id"]}/{hook}')
+            lines.append(f'execute if score #mbId mb matches {b["n"]} run return run function rlk:{L.fn_root(b)}/{hook}')
     if args:
         lines.append('$scoreboard players set #mbReqT mb $(' + args[0] + ')')
     out.write('mboss/d/' + hook, '\n'.join(lines))
@@ -2836,11 +2836,11 @@ for b in CHAPS:
 data remove storage rlk:mboss cprep.{b["id"]}
 execute in minecraft:overworld run function rlk:mboss/ar/{a["aid"]}/fl_on
 execute in minecraft:overworld run function rlk:mboss/ar/{a["aid"]}/ensure
-function rlk:mboss/{b["id"]}/prep
+function rlk:{L.fn_root(b)}/prep
 ''')
     w(f'cb/inc/{b["id"]}', f'''
 # @s = the body inside combat/apply_mods: the module's incoming hook, then the framework floor (#mbFloor, cm.md 7.2).
-function rlk:mboss/{b["id"]}/incoming
+function rlk:{L.fn_root(b)}/incoming
 function rlk:mboss/floor
 ''')
     w(f'cb/g/{b["id"]}', f'''
@@ -3517,6 +3517,18 @@ w('test/chelp', 'tellraw @s ' + CTT + gray('명령: ') + ',' + link('/function r
   + gray(' 챕터 보스 시험 · ') + ',' + link('/function rlk:mboss/test/chapter_ch {id:"cproto",ch:2}', 'chapter_ch {id,ch}') + ','
   + gray(' 챕터 지정 · ') + ',' + link('/function rlk:mboss/test/lose', 'lose') + ',' + gray(' 패배 경로 · kill / abort / pattern / lock / level / stop 공통') + ']')
 
+# Chapter-boss test aliases rlk:boss/test/<cmd> (user 10-22: the chapter bosses live under boss/<id>, so their test
+# commands read rlk:boss/test/...): each forwards its macro arguments to the engine's rlk:mboss/test/<cmd>, which stays
+# the one implementation (mid-boss and chapter-boss tests share it). boss/test is reserved in the registry (fn roots).
+BOSS_TEST_ALIASES = [('chapter', '{id:"$(id)"}'), ('chapter_ch', '{id:"$(id)",ch:$(ch)}'), ('pattern', '{id:$(id)}'),
+                     ('lock', '{id:$(id)}'), ('kill', ''), ('abort', ''), ('lose', ''), ('level', '{lv:$(lv)}'), ('stop', '')]
+out_bt = L.Out(owned_dirs=['boss/test'])
+for cmd, args in BOSS_TEST_ALIASES:
+    out_bt.write(f'boss/test/{cmd}', [
+        f'# /function rlk:boss/test/{cmd}{" " + args.replace("$(", "<").replace(")", ">") if args else ""}: the chapter-boss alias of '
+        f'rlk:mboss/test/{cmd} (same arguments).',
+        f'{"$" if args else ""}function rlk:mboss/test/{cmd}{" " + args if args else ""}'])
+
 # ---------------------------------------------------------------------------------------------
 # Hit proxies (cm.md 9): the runtime of every proxy boss (registry px:true) compiled from its rig manifest (schema v1):
 # the real T:mboss_<id>_rig_manifest.json ("source": "rig") merged per clip with the stub T:mboss_<id>/stub_rig_manifest.json
@@ -3663,7 +3675,7 @@ def px_build(b):
         vis = sd.get('vis')
         if vis:
             st_fns = fns.get('state') if isinstance(fns, dict) else None
-            vfn = (st_fns.get(vis) if isinstance(st_fns, dict) else None) or (m['runtime'].get('ns', f'rlk:mboss/{bid}/rig/') + 'state/' + vis)
+            vfn = (st_fns.get(vis) if isinstance(st_fns, dict) else None) or (m['runtime'].get('ns', f'rlk:{L.fn_root_of(bid, REG)}/rig/') + 'state/' + vis)
             # always the literal call (the output never depends on which generator ran first): the rig / the module's
             # stand-in rig provides it (manifest.md 8), check_mboss_pack reports it when it is missing
             lines.append(f'execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function {vfn}')
@@ -4062,7 +4074,7 @@ $function rlk:mboss/pull/start {t:$(t)}
 for p in sorted(L.MB.glob('*.mcfunction')):
     if p.stem not in CORE_TOP:
         p.unlink()
-removed = out.clean()
-print(f'mboss core: {len(out.written)} functions, {len(MIDS)} registered mid-bosses '
+removed = out.clean() + out_bt.clean()
+print(f'mboss core: {len(out.written)} functions + {len(out_bt.written)} boss/test aliases, {len(MIDS)} registered mid-bosses '
       f'({", ".join(b["id"] for b in MIDS)}), {len(CHAPS)} chapter bosses ({", ".join(b["id"] for b in CHAPS) or "none"}), '
       f'{len(ARENAS)} arenas, {removed} stale removed.')

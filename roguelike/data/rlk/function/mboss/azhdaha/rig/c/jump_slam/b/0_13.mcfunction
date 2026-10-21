@@ -1,2 +1,0 @@
-execute if score @s azRigT matches ..7 run return run function rlk:mboss/azhdaha/rig/c/jump_slam/b/0_7
-function rlk:mboss/azhdaha/rig/c/jump_slam/b/8_13

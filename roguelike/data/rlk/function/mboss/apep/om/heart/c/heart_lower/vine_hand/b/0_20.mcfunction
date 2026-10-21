@@ -1,5 +1,0 @@
-execute if score @s apOC matches 0 run return run function rlk:mboss/apep/om/heart/c/heart_lower/vine_hand/k/0
-execute if score @s apOC matches 5 run return run function rlk:mboss/apep/om/heart/c/heart_lower/vine_hand/k/5
-execute if score @s apOC matches 10 run return run function rlk:mboss/apep/om/heart/c/heart_lower/vine_hand/k/10
-execute if score @s apOC matches 15 run return run function rlk:mboss/apep/om/heart/c/heart_lower/vine_hand/k/15
-execute if score @s apOC matches 20 run return run function rlk:mboss/apep/om/heart/c/heart_lower/vine_hand/k/20

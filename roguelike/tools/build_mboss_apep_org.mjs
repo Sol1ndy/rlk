@@ -35,8 +35,11 @@ const rp = arg('--resourcepack') && path.resolve(arg('--resourcepack'));
 if (!rp) throw new Error('--resourcepack <unpacked pack> is required');
 const put = (p, s) => { fs.mkdirSync(path.dirname(p), {recursive: true}); fs.writeFileSync(p, s.endsWith('\n') ? s : s + '\n'); };
 const json = (p, o) => put(p, JSON.stringify(o, null, 2));
-const NS = 'rlk:mboss/apep/om';
-const fnDir = path.join(dp, 'data/rlk/function/mboss/apep/om');
+// The module's function root (registry "fn", as tools/mboss_lib.fn_root; user 10-22: chapter bosses live under
+// boss/<id>). Only the functions move: tags, scores and the resource-pack paths keep their mboss names.
+const FN_ROOT = (JSON.parse(fs.readFileSync(path.join(here, 'mboss_registry.json'), 'utf8')).boss.find(b => b.id === 'apep') || {}).fn || 'mboss/apep';
+const NS = `rlk:${FN_ROOT}/om`;
+const fnDir = path.join(dp, `data/rlk/function/${FN_ROOT}/om`);
 fs.rmSync(fnDir, {recursive: true, force: true});
 const FILES = new Map();
 const fn = (n, lines) => { if (FILES.has(n)) throw new Error('function written twice: ' + n); const L = Array.isArray(lines) ? lines : [lines]; FILES.set(n, L.length); put(path.join(fnDir, n + '.mcfunction'), L.join('\n')); };
@@ -403,7 +406,7 @@ const dispRec = (owner, d) => ({name: d.name, tag: ORG[owner].type === 'kind' ? 
   joint: r3(restJoint(owner, d.name)), elements: Math.max(...Object.values(d.looks).map(it => models[items[it].model].els.length)), ...(d.note ? {note: d.note} : {})});
 const manifest = {
   schema: 1, boss: 'apep', source: 'org', manifest: 'org', generator: 'tools/build_mboss_apep_org.mjs',
-  runtime: {ns: 'rlk:mboss/apep/om/', kind_obj: 'apK', clip_obj: 'apOI', tick_obj: 'apOC', note: 'organisms: the husk holds apOI / apOC (om/<kind>/tick as the husk applies tick apOC then advances); objects: every display holds its own apOI / apOC (-1 = stopped), om/<object>/tick runs them'},
+  runtime: {ns: `${NS}/`, kind_obj: 'apK', clip_obj: 'apOI', tick_obj: 'apOC', note: 'organisms: the husk holds apOI / apOC (om/<kind>/tick as the husk applies tick apOC then advances); objects: every display holds its own apOI / apOC (-1 = stopped), om/<object>/tick runs them'},
   uuids: {block: UUID_BLOCK, ints: UUID_INTS},
   objectives: {apK: 'organism kind id (kinds.<k>.id)', apS: 'organism state', apT: 'state clock', apL: 'link id (buffed basic -> its 양육)', apShd: 'shield pool', apOC: 'org clip clock (the tick applied at the next tick call)', apOI: 'org clip id (clips[].id; -1 = a stopped object display)', apSock: 'Heart socket (0-2, -1 none)', apTok: 'attack token'},
   passenger: {ride_y: RIDE_Y, tag_prefix: 'rlk_ap_om_', tags: BASE_TAGS, face: 'rotate', key: 'execute on passengers if entity @s[tag=rlk_ap_om_<display>] run data merge entity @s {..}',

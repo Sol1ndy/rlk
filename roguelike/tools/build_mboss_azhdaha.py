@@ -4,7 +4,7 @@
     python3 tools/build_mboss_azhdaha.py
 
 Registry entry: tools/mboss_registry.json id "azhdaha", n 10, kind chapter, arena az_cavern (cm.md 2). Writes
-F:mboss/azhdaha/** except the rig's AZ:rig/** (tools/build_mboss_azhdaha_rig.mjs, wip/az-rig) and the kit's owned paths
+F:boss/azhdaha/** except the rig's AZ:rig/** (tools/build_mboss_azhdaha_rig.mjs, wip/az-rig) and the kit's owned paths
 (tools/build_mboss_az_fx.py, the manifest "owned" list), and deletes stale files only in what it owns, so the
 generators run in any order and twice without a change.
 

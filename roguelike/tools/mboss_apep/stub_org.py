@@ -5,6 +5,7 @@ stub_org_manifest.json, written by emit()). Dropped at AP-I1 (plan 10 AP-I1 "stu
 """
 import json
 from pathlib import Path
+import mboss_lib as L
 
 from .stub_rig import flat_events
 
@@ -167,7 +168,7 @@ def build_org():
             'clips': [], 'budget': {'elements': 40, 'px': 2000}, 'elements': 0, 'px': 0}
     return {
         'schema': 1, 'boss': 'apep', 'source': 'stub', 'manifest': 'org',
-        'runtime': {'ns': 'rlk:mboss/apep/om/', 'kind_obj': 'apK', 'clip_obj': 'apOI', 'tick_obj': 'apOC'},
+        'runtime': {'ns': f'rlk:{L.fn_root_of("apep")}/om/', 'kind_obj': 'apK', 'clip_obj': 'apOI', 'tick_obj': 'apOC'},
         'uuids': {'block': OBLOCK, 'ints': ORG_INTS},
         'objectives': {'apK': 'organism kind id (kinds.<k>.id)', 'apS': 'organism state', 'apT': 'state clock',
                        'apL': 'link id (buffed basic -> its 양육)', 'apShd': 'shield pool', 'apOC': 'org clip clock',

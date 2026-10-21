@@ -7,7 +7,7 @@
 // Writes
 //   RP  assets/rlk/textures/mboss/azhdaha/*.png (azhdaha_paint.mjs) + item atlas entries
 //       assets/rlk/models/item/mboss/azhdaha/*.json, assets/rlk/items/mboss/azhdaha/*.json (models + tinted overlays)
-//   DP  data/rlk/function/mboss/azhdaha/rig/** (owned by this generator, rebuilt from scratch on every run)
+//   DP  data/rlk/function/boss/azhdaha/rig/** (the registry fn root; owned by this generator, rebuilt on every run)
 //   tools/mboss_azhdaha_rig_manifest.json (schema v1 of scratchpad az/contract/manifest.md: the 41 clips with their events,
 //       anchors, tail tracks, proxy-column keys, yaw schedules, hidden spans, root offsets and states; parts, UUIDs, looks,
 //       the framework's proxy layout, state sets and push capsules, budgets, objectives)
@@ -51,8 +51,11 @@ const rp = arg('--resourcepack') && path.resolve(arg('--resourcepack'));
 if (!rp) throw new Error('--resourcepack <unpacked pack> is required');
 const put = (p, s) => { fs.mkdirSync(path.dirname(p), {recursive: true}); fs.writeFileSync(p, s.endsWith('\n') ? s : s + '\n'); };
 const json = (p, o) => put(p, JSON.stringify(o, null, 2));
-const NS = 'rlk:mboss/azhdaha/rig';
-const rigDir = path.join(dp, 'data/rlk/function/mboss/azhdaha/rig');
+// The module's function root (registry "fn", as tools/mboss_lib.fn_root; user 10-22: chapter bosses live under
+// boss/<id>). Only the functions move: tags, scores and the resource-pack paths keep their mboss names.
+const FN_ROOT = (JSON.parse(fs.readFileSync(path.join(here, 'mboss_registry.json'), 'utf8')).boss.find(b => b.id === 'azhdaha') || {}).fn || 'mboss/azhdaha';
+const NS = `rlk:${FN_ROOT}/rig`;
+const rigDir = path.join(dp, `data/rlk/function/${FN_ROOT}/rig`);
 fs.rmSync(rigDir, {recursive: true, force: true});
 const fn = (n, lines) => put(path.join(rigDir, n + '.mcfunction'), (Array.isArray(lines) ? lines : [lines]).join('\n'));
 const assets = path.join(rp, 'assets/rlk');
@@ -580,7 +583,7 @@ console.log(`rest extents x ${extents.idle[0]}, y ${extents.idle[1]}, z ${extent
 console.log(`budgets: ${Object.entries(REGION_BUDGET).map(([r, b]) => `${r} ${regionParts[r]}/${b.parts} parts ${(regionPx[r] / 1e6).toFixed(3)}/${b.px / 1e6} M px`).join('; ')}; ` +
   `elements shown max ${elementsMax}/${ELEMENT_BUDGET} (${Object.entries(elementsByLook).sort((x, y) => y[1] - x[1])[0][0]})` + (unusedSprites.length ? `; ${unusedSprites.length} unused sprites not painted (${unusedSprites.join(' ')})` : ''));
 if (debugDp) {
-  const link = path.join(debugDp, 'data/rlk/function/mboss/azhdaha/rig');
+  const link = path.join(debugDp, `data/rlk/function/${FN_ROOT}/rig`);
   fs.rmSync(link, {recursive: true, force: true});
   fs.mkdirSync(path.dirname(link), {recursive: true});
   fs.symlinkSync(rigDir, link);

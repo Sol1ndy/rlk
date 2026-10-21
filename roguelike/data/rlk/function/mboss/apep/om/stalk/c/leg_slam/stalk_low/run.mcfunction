@@ -1,8 +1,0 @@
-# stalk clip leg_slam (id 47) on stalk_low: 6 t, then stops. @s = the display; apOC = the tick to apply now.
-execute if score @s apOC matches 7.. run return run scoreboard players set @s apOI -1
-execute if score @s apOC matches 0 run return run function rlk:mboss/apep/om/stalk/c/leg_slam/stalk_low/k/0
-execute if score @s apOC matches 1 run return run function rlk:mboss/apep/om/stalk/c/leg_slam/stalk_low/k/1
-execute if score @s apOC matches 2 run return run function rlk:mboss/apep/om/stalk/c/leg_slam/stalk_low/k/2
-execute if score @s apOC matches 3 run return run function rlk:mboss/apep/om/stalk/c/leg_slam/stalk_low/k/3
-execute if score @s apOC matches 4 run return run function rlk:mboss/apep/om/stalk/c/leg_slam/stalk_low/k/4
-execute if score @s apOC matches 5 run return run function rlk:mboss/apep/om/stalk/c/leg_slam/stalk_low/k/5

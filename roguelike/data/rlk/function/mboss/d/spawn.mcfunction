@@ -1,8 +1,8 @@
-# GENERATED dispatcher: rlk:mboss/<id>/spawn of the running mid-boss (#mbId mb = registry n).
+# GENERATED dispatcher: rlk:<fn root>/spawn of the running boss (#mbId mb = registry n).
 execute if score #mbId mb matches 1 run return run function rlk:mboss/guardian/spawn
 execute if score #mbId mb matches 2 run return run function rlk:mboss/butterfly/spawn
 execute if score #mbId mb matches 3 run return run function rlk:mboss/fieldgen/spawn
 execute if score #mbId mb matches 99 run return run function rlk:mboss/proto/spawn
 execute if score #mbId mb matches 98 run return run function rlk:mboss/cproto/spawn
-execute if score #mbId mb matches 10 run return run function rlk:mboss/azhdaha/spawn
-execute if score #mbId mb matches 11 run return run function rlk:mboss/apep/spawn
+execute if score #mbId mb matches 10 run return run function rlk:boss/azhdaha/spawn
+execute if score #mbId mb matches 11 run return run function rlk:boss/apep/spawn

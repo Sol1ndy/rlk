@@ -32,9 +32,9 @@ Outputs (owned; stale files in these places are removed):
                  assets/rlk/items/mboss/ap_kit/<kind>.json          item definitions, custom_model_data tint
                  assets/minecraft/atlases/items.json                adds rlk:mboss/ap_kit/* (merges)
                  assets/rlk/font/mboss_ap.json + textures/font/mboss_ap/*.png
-  datapack       data/rlk/function/mboss/apep/fx/{card,cardx,look,clear,uninstall}
-                 data/rlk/function/mboss/apep/fx/{e,p,tele,dress,snd,hud,prop,test}/**
-                 (every other file under mboss/apep/fx/ belongs to the module core and is left alone)
+  datapack       data/rlk/function/boss/apep/fx/{card,cardx,look,clear,uninstall}
+                 data/rlk/function/boss/apep/fx/{e,p,tele,dress,snd,hud,prop,test}/**
+                 (every other file under boss/apep/fx/ belongs to the module core and is left alone)
   manifest       tools/mboss_ap_fx_manifest.json
 
 No hook in a shared file: the engine ages its cards from a self-rescheduling function (schedule ... 1t replace).
@@ -56,9 +56,11 @@ HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 import mboss_ap_fx_paint as P  # noqa: E402
+import mboss_lib as L  # noqa: E402
 
-FN = 'rlk:mboss/apep/fx/'
-FDIR = 'data/rlk/function/mboss/apep/fx'
+ROOT = L.fn_root_of('apep')            # the module's function root (registry fn: boss/apep, user 10-22)
+FN = f'rlk:{ROOT}/fx/'
+FDIR = f'data/rlk/function/{ROOT}/fx'
 NS_TEX = 'rlk:mboss/ap_kit/'           # textures, models (rlk:item/mboss/ap_kit/*) and item ids
 TEXDIR = 'mboss/ap_kit'
 FG_TEX = 'rlk:mboss/fg_kit/'           # the field generator kit's sprites (referenced, never written)
@@ -3179,7 +3181,7 @@ def demo_where(where):
 
 def tests(W):
     t = ['# Every fx kind in rows in front of the executor (3 s each):',
-         '# /execute as @p at @s rotated ~ 0 run function rlk:mboss/apep/fx/test/kinds']
+         f'# /execute as @p at @s rotated ~ 0 run function {FN}test/kinds']
     for i, kind in enumerate(FX_KINDS):
         row, colm = divmod(i, 7)
         x = 4.5 - 1.5 * colm
@@ -3192,7 +3194,7 @@ def tests(W):
     W.w('test/kinds', t)
     W.w('test/tele', ['# One telegraph of each shape and palette around the executor (tell 40 t), the wave ring, a wedge',
                       '# stack, the crack strip, the wash with a safe rim, a moving ring and a wall spot:',
-                      '# /execute as @p at @s rotated ~ 0 run function rlk:mboss/apep/fx/test/tele',
+                      f'# /execute as @p at @s rotated ~ 0 run function {FN}test/tele',
                       'execute positioned ^4 ^ ^5 run ' + tele_disc(2.8, 40, 7),
                       'execute positioned ^-4 ^ ^5 run ' + tele_disc(1.5, 40, 20, nd=2),
                       'execute positioned ^ ^ ^11 run ' + tele_disc(3.5, 40, 23),
@@ -3229,7 +3231,7 @@ def tests(W):
                                  for n in PRESETS) + ']'])
     W.w('test/stage', ['# Spawn the demo stand-in 9 b in front of the executor, facing it: a marker anchor and a vanilla stand-in',
                        '# (a big dripleaf display) on it, plus three dome markers for the flood demo. No rig calls.',
-                       '# /execute as @p at @s rotated ~ 0 run function rlk:mboss/apep/fx/test/stage, then test/demo/<name>.',
+                       f'# /execute as @p at @s rotated ~ 0 run function {FN}test/stage, then test/demo/<name>.',
                        f'function {FN}test/stop',
                        'execute positioned ^ ^ ^9 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_wk_demo","rlk_room","rlk_mb_aux"]}',
                        'execute as @e[type=minecraft:marker,tag=rlk_wk_demo,limit=1] at @s facing entity @p feet run tp @s ~ ~ ~ ~ 0',

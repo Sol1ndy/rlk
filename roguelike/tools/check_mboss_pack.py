@@ -3,10 +3,12 @@
 
     python3 tools/check_mboss_pack.py
 
-- every enabled registry entry has a module F:mboss/<id>/ with every contract hook (mboss_lib.HOOKS);
+- every enabled registry entry has a module F:<fn root>/ (mboss_lib.fn_root: mboss/<id>, or boss/<id> for a chapter
+  boss with "fn") with every contract hook (mboss_lib.HOOKS);
   macro hooks are macro functions, the others are not
 - every generated dispatcher F:mboss/d/<hook> calls existing module functions
-- every literal "function rlk:..." reference in F:mboss/** resolves; $(...) suffixed references
+- every literal "function rlk:..." reference in F:mboss/**, the chapter-boss roots F:boss/<id>/** and the test aliases
+  F:boss/test/** resolves; $(...) suffixed references
   (hz/p/c|r|b, pj/h) have their whole numeric family present
 - '$' lines carry $(...) and $(...) appears only in '$' lines
 - registry ids/numbers are unique and the arena constants agree with the generated arena
@@ -16,7 +18,7 @@
   its theme module is missing) and the full F:mboss/ar/<aid>/* set; no $(var) inside a function path (dynamic
   references only as a numeric suffix family, which must be contiguous); every proxy key file
   F:mboss/px/<id>/k/<clip>/<t> is reached by its clip's dispatch tree (no orphan from an older manifest); every
-  function path under F:mboss and F:room/cboss is a valid lower-case resource location
+  function path under F:mboss, the boss/<id> roots, F:boss/test and F:room/cboss is a valid lower-case resource location
 Exit code 1 on any problem.
 """
 import re
@@ -36,7 +38,7 @@ def is_macro(rel):
 for b in L.enabled_bosses(REG):
     hooks = L.HOOKS + (L.CHAPTER_HOOKS if b.get('kind', 'mid') == 'chapter' else [])
     for h in hooks:
-        rel = f'mboss/{b["id"]}/{h}'
+        rel = f'{L.fn_root(b)}/{h}'
         if rel not in funcs:
             problems.append(f'{b["id"]}: missing hook {rel}')
             continue
@@ -47,7 +49,10 @@ for h in L.HOOKS:
     rel = f'mboss/d/{h}'
     if rel not in funcs:
         problems.append(f'missing dispatcher {rel}')
-for p in sorted((FN / 'mboss').rglob('*.mcfunction')):
+# every tree the framework and its modules generate: F:mboss/**, each module root outside it (boss/<id>), the aliases
+ROOTS = ['mboss'] + sorted({L.fn_root(b) for b in REG['boss'] if not L.fn_root(b).startswith('mboss/')}) + ['boss/test']
+SCAN = [p for r in ROOTS if (FN / r).exists() for p in sorted((FN / r).rglob('*.mcfunction'))]
+for p in SCAN:
     rel = p.relative_to(FN).with_suffix('').as_posix()
     for i, line in enumerate(p.read_text(encoding='utf-8').split('\n'), 1):
         s = line.strip()
@@ -99,7 +104,7 @@ for aid, a in L.arenas(REG):
     want = f'{aid}@{a["ver"]}:{a["looks"][0]}' if L.theme_module(a['theme']) else f'{aid}@0:stub'
     if not e.exists() or want not in e.read_text(encoding='utf-8'):
         problems.append(f'arena {aid}: F:mboss/arena/{aid}/ensure missing or without the stamp {want}')
-for p in sorted((FN / 'mboss').rglob('*.mcfunction')) + sorted((FN / 'room/cboss').rglob('*.mcfunction')):
+for p in SCAN + sorted((FN / 'room/cboss').rglob('*.mcfunction')):
     rel = p.relative_to(FN).with_suffix('').as_posix()
     for i, line in enumerate(p.read_text(encoding='utf-8').split('\n'), 1):
         if re.search(r'function rlk:[a-z0-9_./-]*\$\(\w+\)[a-z0-9_./-]', line):
@@ -115,7 +120,7 @@ for b in chaps:
             reached |= set(re.findall(r'function rlk:(' + re.escape(base) + r'k/\d+/\d+)\b', (FN / (f + '.mcfunction')).read_text(encoding='utf-8')))
     for k in sorted(keys - reached):
         problems.append(f'{k}: proxy key file not reached by its clip dispatch (stale output?)')
-for p in sorted((FN / 'mboss').rglob('*.mcfunction')) + sorted((FN / 'room/cboss').rglob('*.mcfunction')):
+for p in SCAN + sorted((FN / 'room/cboss').rglob('*.mcfunction')):
     rel = p.relative_to(FN).with_suffix('').as_posix()
     if not re.fullmatch(r'[a-z0-9_./-]+', rel):
         problems.append(f'{rel}: not a valid function resource location (lower case a-z 0-9 _ . / - only)')

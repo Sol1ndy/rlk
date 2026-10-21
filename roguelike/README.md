@@ -508,7 +508,7 @@
 - `mboss/arena/ensure` 가 판 번호(`rlk:mboss built` = `"plaza@2"`)와 가운데 블록을 보고 다를 때만 다시 짓는다(전투 시작 때 · `room/setup` 이 된 뒤 `/reload` 때). 강제로 다시 짓기: `/execute in minecraft:overworld run function rlk:mboss/arena/rebuild`, 보러 가기: `/function rlk:mboss/test/arena`(런 밖에서).
 
 ### 등록 · 모듈 (`tools/mboss_registry.json`)
-- 중간보스 하나 = 레지스트리 항목 하나 + 모듈 폴더 `mboss/<id>/`(자기 생성기 `tools/build_mboss_<id>.py`). 항목: `id` `n`(고정 번호, 디스패처용) `enabled` `w`(뽑기 가중치, 0 = 테스트 전용) `minCh/maxCh` `name/sub/color` `el`(공격 원소) `hp/xp/atk/lvAdd/dmgMul` `goldMul/sap/picks` `scale` `hit{w,h}`(클릭 판정) `intro/death`(연출 최대 틱) `deathSnd`(기본 true: 쓰러질 때 틀이 위더 죽는 소리를 냄, false 면 모듈이 자기 소리를 냄) `icon`.
+- 중간보스 하나 = 레지스트리 항목 하나 + 모듈 폴더 `mboss/<id>/`(자기 생성기 `tools/build_mboss_<id>.py`; 모듈 폴더는 항목의 `fn` 이 정하고 기본은 `mboss/<id>`, 챕터 보스는 `boss/<id>` — 아래 "챕터 보스"). 항목: `id` `n`(고정 번호, 디스패처용) `enabled` `w`(뽑기 가중치, 0 = 테스트 전용) `minCh/maxCh` `name/sub/color` `el`(공격 원소) `hp/xp/atk/lvAdd/dmgMul` `goldMul/sap/picks` `scale` `hit{w,h}`(클릭 판정) `intro/death`(연출 최대 틱) `deathSnd`(기본 true: 쓰러질 때 틀이 위더 죽는 소리를 냄, false 면 모듈이 자기 소리를 냄) `icon`.
 - 뽑기: 이번 판에 아직 안 만난 · 챕터 범위 안 · 가중치 1 이상 → 만난 것 허용 → 챕터 무시 → 첫 항목 순. 테스트는 `#mbForce mb`(번호)로 고정.
 - 등록된 항목: `guardian`(n 1, 가중치 10), `butterfly`(n 2, 가중치 10), `fieldgen`(n 3, 가중치 10), `proto`(n 99, 가중치 0 = 테스트 전용). 셋 다 1~99챕터라 한 판의 첫 중간보스는 셋 중 하나가 같은 확률로, 그다음은 아직 안 만난 쪽에서 나온다.
 - 모듈이 채우는 훅(전부 있어야 함, 빈 함수 가능): `spawn intro_tick tick on_hit aux_hit incoming pause resume death_start death_tick cleanup reload bars hz_vis pj_end test uninstall`. 생성된 디스패처 `mboss/d/<훅>` 이 `#mbId` 로 모듈을 부른다(`uninstall` 만은 등록된 모든 모듈을 부른다: 모듈이 만든 점수판 등을 지움). 훅마다의 호출 맥락 · 라이브러리 인자는 생성된 `mboss/*` 함수의 머리 주석에 있고, `tools/build_mboss_proto.py` 가 모든 훅을 채운 예시 모듈이다.
@@ -774,6 +774,9 @@
 
 챕터 마지막 **보스 맵**에서 나루카미 대신 나오는 **챕터 보스**의 틀. 중간보스 틀(위 "중간보스") 위에 얹혀서, 등록 · 경기장 · 문 · 보상 · 정리만 다르고 바닥 공격 · 투사체 · 이동 · 보스바 같은 라이브러리는 그대로 쓴다. 첫 챕터 보스는 **야타용왕**(`azhdaha`, 1챕터)이다. 검증(VERIFY)을 마치고 `enabled:true` · `route:true` 가 되어 **1챕터의 보스 맵은 야타용왕**으로 간다(아래 "야타용왕"). 3챕터 보스 **아펩의 오아시스 파수꾼**(`apep`, `ch [3]`)은 켜져 있지만 `route:false` 라 테스트 명령으로만 나오고(아래 "아펩"), 2챕터 · 3챕터 · 4챕터 이후의 보스 맵은 아직 나루카미다. 틀 점검용 **시험용 수호자**(`cproto`, 어느 챕터에도 배정되지 않음)도 테스트 명령으로만 나온다.
 
+
+**모듈 위치**: 챕터 보스 모듈의 함수는 `rlk:boss/<id>/`(야타용왕 `boss/azhdaha/`, 아펩 `boss/apep/`; 나루카미는 원래부터 `boss/raiden/`)에 있다. 레지스트리 항목의 `"fn": "boss/<id>"` 가 그 뿌리를 정하고(없으면 `mboss/<id>`, `tools/mboss_lib.py` 의 `fn_root` / `fn_root_of`), 코어의 디스패처 · `cb/pp` · `cb/inc` · 판정 프록시의 리그 호출 · 모듈 생성기 · 효과 도구 · 리그 / 생명체 모델 생성기 · `check_mboss_pack.py` 가 모두 그 값을 읽는다. 함수만 옮겼고 엔티티 태그 · 점수판 · 저장소 · 리소스팩 경로(`rlk:mboss/azhdaha/…` 아이템 모델 등)는 그대로라 기존 월드가 그대로 돈다. 공용 엔진(`mboss/` 코어 · `cb/` · `hz/` · `px/` · `mv/` · `test/` …)과 중간보스 셋 · `proto` · `cproto` 는 `mboss/` 에 남는다. `boss/raiden` 과 `boss/test` 는 예약(레지스트리 검사).
+
 ### 진행
 1. 보스 맵을 만들 때 `room/pick/boss` → `mboss/cb/route`: 레지스트리에서 그 챕터에 배정된(`ch`) **켜진 + `route:true`** 챕터 보스가 있으면 그 보스의 입구 배치(`room/cboss/<id>/layout`), 없으면 나루카미(`room/raiden/layout`). 테스트는 `#cbForce mb`(레지스트리 번호, `#mbTest 1` 일 때만)로 고정하고, 어느 경로도 `#mbForce` 를 건드리지 않는다.
 2. 입구: 구역 1(현관) + 구역 2(종류 9 = 보스 구역, 가운데에 문). 보스 구역을 지을 때(`room/cboss/<id>/build`) `mboss/cb/prep` → `cb/pp/<id>`: 맵마다 새 `rlk:mboss cprep.<id>`(문 글자 · 제목 · 모듈의 맵별 상태), 그 보스 경기장의 청크 고정(forceload), 나누어 짓기 작업 시작(아래 "경기장"), 그리고 모듈의 `prep` 훅(문 글자, 비석 장식 등).
@@ -819,7 +822,7 @@
 ### 시험용 수호자 `cproto` (`tools/build_mboss_cproto.py`)
 머리 · 꼬리 두 프록시(`core` 폭 2 · `tail` 폭 1.2), 클립 4개(`idle` · `sweep` 꼬리 휘두르기 · `sink` 가라앉기 · `rise`), 두 단계(60% / 40%, 1단계 바닥 → 2단계 체력 · 제목 · 음악 · 20틱 연출), 패턴 셋(예측 조준 강타 · 밀어내는 고리 · 마스크). 모든 틀 기능을 한 번씩 쓰는 모듈 예시이고, 입구는 `cp_test` 의 것.
 
-### 아펩의 오아시스 파수꾼 `apep` (3챕터, `tools/build_mboss_apep.py`, AP-CORE 틀)
+### 아펩의 오아시스 파수꾼 `apep` (`boss/apep/`, 3챕터, `tools/build_mboss_apep.py`, AP-CORE 틀)
 레지스트리 n 11 · 경기장 `ap_oasis`(n 2) · 체력 290 · 공격 12 × 150% · 저항 풀 30% / 나머지 10%(`res {"7":30,"*":10}`) · 체력 나눔 53 / 47% · 프록시 11개(`pxBase` 65) + 몸통 클릭 판정(`shield`) · 음악 세 단계(바닐라 무작위 곡 묶음: 깊은 어둠 · 영혼 모래 골짜기 · 무성한 동굴). `route:false` 라 런에서는 3챕터가 아직 나루카미로 가고, `/function rlk:mboss/test/chapter {id:"apep"}` 로만 싸운다(AP-I2 에서 `route:true`).
 - 진행: 등장 E(110틱, 무적, 심장이 덩굴손에 매달렸다 끌어올려짐) → **1단계**(53%, 바닥 1%) → 바닥에 닿으면 다음 결정 때 **T1 소생 단계 진입**(136틱: 땅속으로 가라앉아 경기장 30칸 위에 숨김 = `parked` 프록시 · 크기 0.1 · `#mbNoLeash 1`, 가운데에 「오아시스의 심장」, 진행도 27%, 음악 2) → **2단계 = 소생 단계**(보스 피해 없음; 증식 생명체 물결: 기본 4 + 수호 · 둥지 · 양육 · 포식성, 처치 +3.25% / +14%, 기본의 심장 공격 −0.6%(강화 −1.2%), 동시 공격 3 · 최대 6마리 · 30초마다 또는 1마리 이하일 때 다음 물결, 100초 뒤 경고와 파괴 생명체(−14%); 0% 가 되면 「소생 실패」: 최대 체력 25% 를 잃고(죽지 않음) 27% 1물결부터 다시, 두 번째는 패배) → 100% 에서 **CS**(192틱: 모든 생명체 시듦, 흰 화면 속에 경기장이 무성한 모습 · 47% 체력 · 3단계 모습, 80틱에 최대 체력 25% 회복, 132틱에 제목 「기원 오아시스 파수꾼」 · 음악 3) → **3단계**(47%, 바닥 0) → 쓰러짐 D(120틱) → `cb/won`.
 - 패턴 id = 시험 id(`test/pattern {id:N}`, 필요한 단계로 먼저 넘어감): 1~6 P1~P6, 8 R + P4, 9 P6 4타, 20 T1, 21 / 22 심장 ±25%, 23 기본 4마리, 24~28 수호 · 둥지 · 양육 · 포식성 · 파괴, 29 시간 초과, 30 CS 거쳐 3단계, 31~35 Q1~Q5(32 = 종말의 여파 첫 시전, 37 = 치명적인 나중 시전), 36 수면 포격, 40 / 41 소생 실패 1 / 2, 60 CS 만, 61 자세 바꾸기, 99 대기, 그 밖은 도움말.
@@ -833,6 +836,7 @@
 - 챕터 전투가 끝나면(처치든 취소든) `test/won` → `test/cwon` 이 `#cbForce` · `#cbAuto` 를 0 으로 둔다: 처치 뒤 다음 챕터 오브젝트로 계속 가는 테스트에서 다음 보스 맵은 런과 똑같이 정해지고, 취소된 문은 그대로 다시 누를 수 있다. 문구(챕터 / 중간보스)와 `[다시 하기]` 는 세션이 아니라 **방금 끝난 전투**(`cur.kind`)를 따른다(`test/won` · `test/defeat`). 챕터 테스트 중에 시작한 중간보스 테스트(`test/start_ch`)도 `#cbForce` · `#cbAuto` 를 지운다.
 - `test/lose`(패배 경로) · 공통 `test/kill` · `test/abort` · `test/pattern {id:N}`(cproto: 1 마스크, 2 지속 피해, 3 고리, 4 예측 조준, 5 좌표, 6 못 피하는 투사체, 7 연출, 8 / 9 모습 lit / plain, 10 패배, 11 2단계, 20~23 프록시 상태, 30 밀어내기, 31~33 클립, 40 제목, 41 / 42 음악, 50 보조 저항, 60 늘이기) · `test/level` · `test/stop`. `#cbForce` · `#cbAuto` · `cprep` 은 `run/start` · `run/end` · `test/stop`(→ `cb/run_reset`)이 지운다.
 - 쓰러지면 "챕터 보스 테스트 실패" + `[다시 하기]`(같은 보스 · 같은 챕터의 `test/chapter_ch`), 처치하면 다음 챕터 오브젝트 + `[다시 하기]` · `[로비로]`.
+- **챕터 보스용 별칭** `rlk:boss/test/<명령>`: `chapter {id}` · `chapter_ch {id,ch}` · `pattern {id}` · `lock {id}` · `kill` · `abort` · `lose` · `level {lv}` · `stop` 은 같은 인자를 그대로 엔진의 `rlk:mboss/test/<명령>` 으로 넘긴다(구현은 하나, 코어 생성기가 `boss/test/` 를 씀). 예: `/function rlk:boss/test/chapter {id:"apep"}`, `/function rlk:boss/test/pattern {id:31}`.
 
 ### 고친 공용 파일 (scratchpad `az/contract/cm.md` 16절)
 | 파일 | 고친 곳 |
@@ -893,11 +897,11 @@
 ### 시험 (스크래치패드 `az/tests_cm/`)
 `run_all.sh <worktree>/roguelike` 가 챕터 보스 시험 셋(`test_chapter.py` 라우팅 · 입구 · 문 · 소환 · 보상 · 취소 · 패배 · 체력 나눔 · 시험 명령 · 음악 · 모습 · 정리 · 나루카미 · 검토 뒤 고친 점, 모든 기대값을 시험하는 트리의 레지스트리에서 읽어 아펩 가지에서도 그대로 돔; `test_px.py` 판정 프록시, `test_fw_az.py` 도우미), M0 시험(`mb/int_tests` · `mb2/tests` · `mb2/fxtests` · `mb3/tests`), `gen_check.py`(생성 순서 · 두 번 · 거꾸로 · 소유 경로), `ident.py`(가디언 · 나비 · 역장 · proto 출력과 광장이 M0 039b911 과 같음, 공용 파일 수정의 내용 고정), `test_m0diff.py`(M0 묶음과 이 트리에서 같은 시드로 중간보스 넷의 싸움 · 처치 · 취소 · 멈춤 · 리로드를 돌려 틱마다 기록 · 로그 · 끝 상태가 같은지, 틱당 명령 증가 한도, 보스바 줄), 검사기 다섯 개(`baseline/` 대비 새 발견만 실패)를 돌린다.
 
-## 야타용왕 (`mboss/azhdaha/`, 챕터 1 보스 · `tools/build_mboss_azhdaha.py`)
+## 야타용왕 (`boss/azhdaha/`, 챕터 1 보스 · `tools/build_mboss_azhdaha.py`)
 원신의 야타용왕(아즈다하). 챕터 모드(AZ-CM)의 첫 챕터 보스로, 레지스트리 `azhdaha`(n 10, `kind` chapter, `ch [1]`,
 경기장 `az_cavern`, 1레벨 체력 135(FIX 밸런스: 1챕터 L6 에서 약 1355, 세 구간 약 452씩), 기본 공격 12 × `dmgMul` 140%, 몸 크기 0.1(큰 몸은 판정 기둥 `px` 12개, `pxBase`
 65), 등장 상한 160틱 · 사망 140틱, `deathSnd` false, `enabled` true, **`route` true**: 1챕터 보스 맵이 야타용왕이다). 런 없이 바로
-싸우려면 `/function rlk:mboss/test/chapter {id:"azhdaha"}`. 보상은 챕터 보스 경제(금화 × `#bossGoldMul` × 챕터,
+싸우려면 `/function rlk:boss/test/chapter {id:"azhdaha"}`(= `rlk:mboss/test/chapter`). 보상은 챕터 보스 경제(금화 × `#bossGoldMul` × 챕터,
 사파이어 조각 2개, 아이템 상자 없음).
 
 #### 플레이어용 요약 (어떻게 싸우나)
@@ -984,7 +988,7 @@
   전환 메시지 "야타용왕이 곧 … 원소의 힘을 흡수합니다…"와 낙인 안내 띠는 그대로).
 - 보스바 아래 줄: 전투 중 이번 페이즈의 남은 체력(바위 → 다리 → 꼬리 색), 전환 중 단계 진행(금색), B3 꼬리 창 남은 시간.
 
-#### 테스트 명령 (`/function rlk:mboss/test/pattern {id:N}`)
+#### 테스트 명령 (`/function rlk:boss/test/pattern {id:N}`)
 1-9 P1-P9 · 10 P5b · 20 산사태 · 21 흡수 1 · 22 흡수 2 · 23 B3 · 24 처치 · 25 B3 꼬리 하강부터 · 26 등장 다시 · 31 / 32 물 구체 /
 운석 · 33 불 장판 · 41 / 42 서리 / 벼락(B3, 꼬리 원소 바꿈) · 43-46 꼬리 패턴 · 60 2페이즈 · 61 3페이즈(꼬리 기둥) · 62 3페이즈 ·
 70 낙인 · 71 낙인 해제 · 72 결정 · 80 체력 = 바닥 + 1 · 90-93 원소 조합 고정 · 99 멈춤. `test/lock {id}` 는 그 패턴만.

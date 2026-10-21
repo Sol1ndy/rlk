@@ -4,7 +4,7 @@
  "source": "stub",
  "apep": 1,
  "runtime": {
-  "ns": "rlk:mboss/apep/rig_stub/",
+  "ns": "rlk:boss/apep/rig_stub/",
   "clip_obj": "apRigC",
   "tick_obj": "apRigT",
   "state_obj": "apRigState",
@@ -19,144 +19,144 @@
   "park_obj": "apRigPark"
  },
  "functions": {
-  "init": "rlk:mboss/apep/rig_stub/init",
-  "spawn": "rlk:mboss/apep/rig_stub/spawn",
-  "tick": "rlk:mboss/apep/rig_stub/tick",
-  "kill": "rlk:mboss/apep/rig_stub/kill",
-  "uninstall": "rlk:mboss/apep/rig_stub/uninstall",
-  "look_apply": "rlk:mboss/apep/rig_stub/look_apply",
+  "init": "rlk:boss/apep/rig_stub/init",
+  "spawn": "rlk:boss/apep/rig_stub/spawn",
+  "tick": "rlk:boss/apep/rig_stub/tick",
+  "kill": "rlk:boss/apep/rig_stub/kill",
+  "uninstall": "rlk:boss/apep/rig_stub/uninstall",
+  "look_apply": "rlk:boss/apep/rig_stub/look_apply",
   "play": {
-   "entrance_p1": "rlk:mboss/apep/rig_stub/play/entrance_p1",
-   "idle_p1": "rlk:mboss/apep/rig_stub/play/idle_p1",
-   "turn_p1": "rlk:mboss/apep/rig_stub/play/turn_p1",
-   "turn_p1_step": "rlk:mboss/apep/rig_stub/play/turn_p1_step",
-   "crawl_p1": "rlk:mboss/apep/rig_stub/play/crawl_p1",
-   "crawl_stop_p1": "rlk:mboss/apep/rig_stub/play/crawl_stop_p1",
-   "walk_p1": "rlk:mboss/apep/rig_stub/play/walk_p1",
-   "burrow_strike": "rlk:mboss/apep/rig_stub/play/burrow_strike",
-   "sink_p1": "rlk:mboss/apep/rig_stub/play/sink_p1",
-   "emerge_on_p1": "rlk:mboss/apep/rig_stub/play/emerge_on_p1",
-   "burrow_in_p1": "rlk:mboss/apep/rig_stub/play/burrow_in_p1",
-   "emerge_crown_p1": "rlk:mboss/apep/rig_stub/play/emerge_crown_p1",
-   "hands": "rlk:mboss/apep/rig_stub/play/hands",
-   "glow_slams": "rlk:mboss/apep/rig_stub/play/glow_slams",
-   "rotation": "rlk:mboss/apep/rig_stub/play/rotation",
-   "tail_p1x2": "rlk:mboss/apep/rig_stub/play/tail_p1x2",
-   "combo_a": "rlk:mboss/apep/rig_stub/play/combo_a",
-   "combo_b": "rlk:mboss/apep/rig_stub/play/combo_b",
-   "combo_c": "rlk:mboss/apep/rig_stub/play/combo_c",
-   "combo_d": "rlk:mboss/apep/rig_stub/play/combo_d",
-   "combo_end": "rlk:mboss/apep/rig_stub/play/combo_end",
-   "sink_revive": "rlk:mboss/apep/rig_stub/play/sink_revive",
-   "revival": "rlk:mboss/apep/rig_stub/play/revival",
-   "idle_p3": "rlk:mboss/apep/rig_stub/play/idle_p3",
-   "turn_p3": "rlk:mboss/apep/rig_stub/play/turn_p3",
-   "walk_p3": "rlk:mboss/apep/rig_stub/play/walk_p3",
-   "crouch_p3": "rlk:mboss/apep/rig_stub/play/crouch_p3",
-   "stand_p3": "rlk:mboss/apep/rig_stub/play/stand_p3",
-   "move_strike_p3": "rlk:mboss/apep/rig_stub/play/move_strike_p3",
-   "aftermath": "rlk:mboss/apep/rig_stub/play/aftermath",
-   "shells": "rlk:mboss/apep/rig_stub/play/shells",
-   "sink_p3": "rlk:mboss/apep/rig_stub/play/sink_p3",
-   "surface_p3": "rlk:mboss/apep/rig_stub/play/surface_p3",
-   "tail_p3": "rlk:mboss/apep/rig_stub/play/tail_p3",
-   "spikes": "rlk:mboss/apep/rig_stub/play/spikes",
-   "death": "rlk:mboss/apep/rig_stub/play/death"
+   "entrance_p1": "rlk:boss/apep/rig_stub/play/entrance_p1",
+   "idle_p1": "rlk:boss/apep/rig_stub/play/idle_p1",
+   "turn_p1": "rlk:boss/apep/rig_stub/play/turn_p1",
+   "turn_p1_step": "rlk:boss/apep/rig_stub/play/turn_p1_step",
+   "crawl_p1": "rlk:boss/apep/rig_stub/play/crawl_p1",
+   "crawl_stop_p1": "rlk:boss/apep/rig_stub/play/crawl_stop_p1",
+   "walk_p1": "rlk:boss/apep/rig_stub/play/walk_p1",
+   "burrow_strike": "rlk:boss/apep/rig_stub/play/burrow_strike",
+   "sink_p1": "rlk:boss/apep/rig_stub/play/sink_p1",
+   "emerge_on_p1": "rlk:boss/apep/rig_stub/play/emerge_on_p1",
+   "burrow_in_p1": "rlk:boss/apep/rig_stub/play/burrow_in_p1",
+   "emerge_crown_p1": "rlk:boss/apep/rig_stub/play/emerge_crown_p1",
+   "hands": "rlk:boss/apep/rig_stub/play/hands",
+   "glow_slams": "rlk:boss/apep/rig_stub/play/glow_slams",
+   "rotation": "rlk:boss/apep/rig_stub/play/rotation",
+   "tail_p1x2": "rlk:boss/apep/rig_stub/play/tail_p1x2",
+   "combo_a": "rlk:boss/apep/rig_stub/play/combo_a",
+   "combo_b": "rlk:boss/apep/rig_stub/play/combo_b",
+   "combo_c": "rlk:boss/apep/rig_stub/play/combo_c",
+   "combo_d": "rlk:boss/apep/rig_stub/play/combo_d",
+   "combo_end": "rlk:boss/apep/rig_stub/play/combo_end",
+   "sink_revive": "rlk:boss/apep/rig_stub/play/sink_revive",
+   "revival": "rlk:boss/apep/rig_stub/play/revival",
+   "idle_p3": "rlk:boss/apep/rig_stub/play/idle_p3",
+   "turn_p3": "rlk:boss/apep/rig_stub/play/turn_p3",
+   "walk_p3": "rlk:boss/apep/rig_stub/play/walk_p3",
+   "crouch_p3": "rlk:boss/apep/rig_stub/play/crouch_p3",
+   "stand_p3": "rlk:boss/apep/rig_stub/play/stand_p3",
+   "move_strike_p3": "rlk:boss/apep/rig_stub/play/move_strike_p3",
+   "aftermath": "rlk:boss/apep/rig_stub/play/aftermath",
+   "shells": "rlk:boss/apep/rig_stub/play/shells",
+   "sink_p3": "rlk:boss/apep/rig_stub/play/sink_p3",
+   "surface_p3": "rlk:boss/apep/rig_stub/play/surface_p3",
+   "tail_p3": "rlk:boss/apep/rig_stub/play/tail_p3",
+   "spikes": "rlk:boss/apep/rig_stub/play/spikes",
+   "death": "rlk:boss/apep/rig_stub/play/death"
   },
   "face": {
-   "player": "rlk:mboss/apep/rig_stub/face/player",
-   "track": "rlk:mboss/apep/rig_stub/face/track",
-   "set": "rlk:mboss/apep/rig_stub/face/set"
+   "player": "rlk:boss/apep/rig_stub/face/player",
+   "track": "rlk:boss/apep/rig_stub/face/track",
+   "set": "rlk:boss/apep/rig_stub/face/set"
   },
   "state": {
-   "normal": "rlk:mboss/apep/rig_stub/state/normal",
-   "burrowed": "rlk:mboss/apep/rig_stub/state/burrowed"
+   "normal": "rlk:boss/apep/rig_stub/state/normal",
+   "burrowed": "rlk:boss/apep/rig_stub/state/burrowed"
   },
   "flash": {
-   "head": "rlk:mboss/apep/rig_stub/flash/head",
-   "body": "rlk:mboss/apep/rig_stub/flash/body",
-   "front": "rlk:mboss/apep/rig_stub/flash/front",
-   "rear": "rlk:mboss/apep/rig_stub/flash/rear",
-   "tail": "rlk:mboss/apep/rig_stub/flash/tail",
-   "arms": "rlk:mboss/apep/rig_stub/flash/arms"
+   "head": "rlk:boss/apep/rig_stub/flash/head",
+   "body": "rlk:boss/apep/rig_stub/flash/body",
+   "front": "rlk:boss/apep/rig_stub/flash/front",
+   "rear": "rlk:boss/apep/rig_stub/flash/rear",
+   "tail": "rlk:boss/apep/rig_stub/flash/tail",
+   "arms": "rlk:boss/apep/rig_stub/flash/arms"
   },
-  "park": "rlk:mboss/apep/rig_stub/park",
-  "unpark": "rlk:mboss/apep/rig_stub/unpark",
+  "park": "rlk:boss/apep/rig_stub/park",
+  "unpark": "rlk:boss/apep/rig_stub/unpark",
   "stance": {
-   "CROUCH": "rlk:mboss/apep/rig_stub/stance/crouch",
-   "UPRIGHT": "rlk:mboss/apep/rig_stub/stance/upright"
+   "CROUCH": "rlk:boss/apep/rig_stub/stance/crouch",
+   "UPRIGHT": "rlk:boss/apep/rig_stub/stance/upright"
   },
   "hands": {
-   "p1_rest": "rlk:mboss/apep/rig_stub/hands/p1_rest",
-   "p1_lift": "rlk:mboss/apep/rig_stub/hands/p1_lift",
-   "p3_open": "rlk:mboss/apep/rig_stub/hands/p3_open",
-   "p3_curl": "rlk:mboss/apep/rig_stub/hands/p3_curl"
+   "p1_rest": "rlk:boss/apep/rig_stub/hands/p1_rest",
+   "p1_lift": "rlk:boss/apep/rig_stub/hands/p1_lift",
+   "p3_open": "rlk:boss/apep/rig_stub/hands/p3_open",
+   "p3_curl": "rlk:boss/apep/rig_stub/hands/p3_curl"
   },
   "hand": {
    "a_hand_l": {
-    "p1_planted": "rlk:mboss/apep/rig_stub/hand/a_hand_l/p1_planted",
-    "p1_raised": "rlk:mboss/apep/rig_stub/hand/a_hand_l/p1_raised",
-    "p3_fork": "rlk:mboss/apep/rig_stub/hand/a_hand_l/p3_fork"
+    "p1_planted": "rlk:boss/apep/rig_stub/hand/a_hand_l/p1_planted",
+    "p1_raised": "rlk:boss/apep/rig_stub/hand/a_hand_l/p1_raised",
+    "p3_fork": "rlk:boss/apep/rig_stub/hand/a_hand_l/p3_fork"
    },
    "a_hand_r": {
-    "p1_planted": "rlk:mboss/apep/rig_stub/hand/a_hand_r/p1_planted",
-    "p1_raised": "rlk:mboss/apep/rig_stub/hand/a_hand_r/p1_raised",
-    "p3_fork": "rlk:mboss/apep/rig_stub/hand/a_hand_r/p3_fork"
+    "p1_planted": "rlk:boss/apep/rig_stub/hand/a_hand_r/p1_planted",
+    "p1_raised": "rlk:boss/apep/rig_stub/hand/a_hand_r/p1_raised",
+    "p3_fork": "rlk:boss/apep/rig_stub/hand/a_hand_r/p3_fork"
    },
    "b_hand_l": {
-    "p1_open": "rlk:mboss/apep/rig_stub/hand/b_hand_l/p1_open",
-    "p1_curl": "rlk:mboss/apep/rig_stub/hand/b_hand_l/p1_curl",
-    "p3_curl": "rlk:mboss/apep/rig_stub/hand/b_hand_l/p3_curl",
-    "p3_open": "rlk:mboss/apep/rig_stub/hand/b_hand_l/p3_open"
+    "p1_open": "rlk:boss/apep/rig_stub/hand/b_hand_l/p1_open",
+    "p1_curl": "rlk:boss/apep/rig_stub/hand/b_hand_l/p1_curl",
+    "p3_curl": "rlk:boss/apep/rig_stub/hand/b_hand_l/p3_curl",
+    "p3_open": "rlk:boss/apep/rig_stub/hand/b_hand_l/p3_open"
    },
    "b_hand_r": {
-    "p1_open": "rlk:mboss/apep/rig_stub/hand/b_hand_r/p1_open",
-    "p1_curl": "rlk:mboss/apep/rig_stub/hand/b_hand_r/p1_curl",
-    "p3_curl": "rlk:mboss/apep/rig_stub/hand/b_hand_r/p3_curl",
-    "p3_open": "rlk:mboss/apep/rig_stub/hand/b_hand_r/p3_open"
+    "p1_open": "rlk:boss/apep/rig_stub/hand/b_hand_r/p1_open",
+    "p1_curl": "rlk:boss/apep/rig_stub/hand/b_hand_r/p1_curl",
+    "p3_curl": "rlk:boss/apep/rig_stub/hand/b_hand_r/p3_curl",
+    "p3_open": "rlk:boss/apep/rig_stub/hand/b_hand_r/p3_open"
    },
    "c_hand_l": {
-    "p1_open": "rlk:mboss/apep/rig_stub/hand/c_hand_l/p1_open",
-    "p1_curl": "rlk:mboss/apep/rig_stub/hand/c_hand_l/p1_curl",
-    "p3_curl": "rlk:mboss/apep/rig_stub/hand/c_hand_l/p3_curl"
+    "p1_open": "rlk:boss/apep/rig_stub/hand/c_hand_l/p1_open",
+    "p1_curl": "rlk:boss/apep/rig_stub/hand/c_hand_l/p1_curl",
+    "p3_curl": "rlk:boss/apep/rig_stub/hand/c_hand_l/p3_curl"
    },
    "c_hand_r": {
-    "p1_open": "rlk:mboss/apep/rig_stub/hand/c_hand_r/p1_open",
-    "p1_curl": "rlk:mboss/apep/rig_stub/hand/c_hand_r/p1_curl",
-    "p3_curl": "rlk:mboss/apep/rig_stub/hand/c_hand_r/p3_curl"
+    "p1_open": "rlk:boss/apep/rig_stub/hand/c_hand_r/p1_open",
+    "p1_curl": "rlk:boss/apep/rig_stub/hand/c_hand_r/p1_curl",
+    "p3_curl": "rlk:boss/apep/rig_stub/hand/c_hand_r/p3_curl"
    }
   },
   "look": {
    "form": {
-    "p1": "rlk:mboss/apep/rig_stub/look/form/p1",
-    "p3": "rlk:mboss/apep/rig_stub/look/form/p3"
+    "p1": "rlk:boss/apep/rig_stub/look/form/p1",
+    "p3": "rlk:boss/apep/rig_stub/look/form/p3"
    },
    "face": {
-    "p1_bud": "rlk:mboss/apep/rig_stub/look/face/p1_bud",
-    "p3_idle": "rlk:mboss/apep/rig_stub/look/face/p3_idle",
-    "p3_charge": "rlk:mboss/apep/rig_stub/look/face/p3_charge",
-    "p3_dim": "rlk:mboss/apep/rig_stub/look/face/p3_dim",
-    "hidden": "rlk:mboss/apep/rig_stub/look/face/hidden"
+    "p1_bud": "rlk:boss/apep/rig_stub/look/face/p1_bud",
+    "p3_idle": "rlk:boss/apep/rig_stub/look/face/p3_idle",
+    "p3_charge": "rlk:boss/apep/rig_stub/look/face/p3_charge",
+    "p3_dim": "rlk:boss/apep/rig_stub/look/face/p3_dim",
+    "hidden": "rlk:boss/apep/rig_stub/look/face/hidden"
    },
    "core": {
-    "p1_bulb": "rlk:mboss/apep/rig_stub/look/core/p1_bulb",
-    "p3_sternum": "rlk:mboss/apep/rig_stub/look/core/p3_sternum"
+    "p1_bulb": "rlk:boss/apep/rig_stub/look/core/p1_bulb",
+    "p3_sternum": "rlk:boss/apep/rig_stub/look/core/p3_sternum"
    },
    "core_glow": {
-    "idle": "rlk:mboss/apep/rig_stub/look/core_glow/idle",
-    "lit": "rlk:mboss/apep/rig_stub/look/core_glow/lit"
+    "idle": "rlk:boss/apep/rig_stub/look/core_glow/idle",
+    "lit": "rlk:boss/apep/rig_stub/look/core_glow/lit"
    },
    "tint": {
-    "none": "rlk:mboss/apep/rig_stub/look/tint/none",
-    "p1_dark": "rlk:mboss/apep/rig_stub/look/tint/p1_dark",
-    "p1_brown": "rlk:mboss/apep/rig_stub/look/tint/p1_brown",
-    "withered": "rlk:mboss/apep/rig_stub/look/tint/withered",
-    "p3_dim": "rlk:mboss/apep/rig_stub/look/tint/p3_dim"
+    "none": "rlk:boss/apep/rig_stub/look/tint/none",
+    "p1_dark": "rlk:boss/apep/rig_stub/look/tint/p1_dark",
+    "p1_brown": "rlk:boss/apep/rig_stub/look/tint/p1_brown",
+    "withered": "rlk:boss/apep/rig_stub/look/tint/withered",
+    "p3_dim": "rlk:boss/apep/rig_stub/look/tint/p3_dim"
    }
   },
   "bright": {
-   "13": "rlk:mboss/apep/rig_stub/bright/13",
-   "15": "rlk:mboss/apep/rig_stub/bright/15"
+   "13": "rlk:boss/apep/rig_stub/bright/13",
+   "15": "rlk:boss/apep/rig_stub/bright/15"
   }
  },
  "parts": [
@@ -2094,8 +2094,8 @@
     }
    },
    "functions": {
-    "p1": "rlk:mboss/apep/rig_stub/look/form/p1",
-    "p3": "rlk:mboss/apep/rig_stub/look/form/p3"
+    "p1": "rlk:boss/apep/rig_stub/look/form/p1",
+    "p3": "rlk:boss/apep/rig_stub/look/form/p3"
    }
   },
   "face": {
@@ -2117,11 +2117,11 @@
     }
    },
    "functions": {
-    "p1_bud": "rlk:mboss/apep/rig_stub/look/face/p1_bud",
-    "p3_idle": "rlk:mboss/apep/rig_stub/look/face/p3_idle",
-    "p3_charge": "rlk:mboss/apep/rig_stub/look/face/p3_charge",
-    "p3_dim": "rlk:mboss/apep/rig_stub/look/face/p3_dim",
-    "hidden": "rlk:mboss/apep/rig_stub/look/face/hidden"
+    "p1_bud": "rlk:boss/apep/rig_stub/look/face/p1_bud",
+    "p3_idle": "rlk:boss/apep/rig_stub/look/face/p3_idle",
+    "p3_charge": "rlk:boss/apep/rig_stub/look/face/p3_charge",
+    "p3_dim": "rlk:boss/apep/rig_stub/look/face/p3_dim",
+    "hidden": "rlk:boss/apep/rig_stub/look/face/hidden"
    }
   },
   "core": {
@@ -2137,8 +2137,8 @@
     }
    },
    "functions": {
-    "p1_bulb": "rlk:mboss/apep/rig_stub/look/core/p1_bulb",
-    "p3_sternum": "rlk:mboss/apep/rig_stub/look/core/p3_sternum"
+    "p1_bulb": "rlk:boss/apep/rig_stub/look/core/p1_bulb",
+    "p3_sternum": "rlk:boss/apep/rig_stub/look/core/p3_sternum"
    }
   },
   "core_glow": {
@@ -2156,8 +2156,8 @@
     }
    },
    "functions": {
-    "idle": "rlk:mboss/apep/rig_stub/look/core_glow/idle",
-    "lit": "rlk:mboss/apep/rig_stub/look/core_glow/lit"
+    "idle": "rlk:boss/apep/rig_stub/look/core_glow/idle",
+    "lit": "rlk:boss/apep/rig_stub/look/core_glow/lit"
    }
   },
   "tint": {
@@ -2191,11 +2191,11 @@
    },
    "item_pattern": "{model}_t{id}",
    "functions": {
-    "none": "rlk:mboss/apep/rig_stub/look/tint/none",
-    "p1_dark": "rlk:mboss/apep/rig_stub/look/tint/p1_dark",
-    "p1_brown": "rlk:mboss/apep/rig_stub/look/tint/p1_brown",
-    "withered": "rlk:mboss/apep/rig_stub/look/tint/withered",
-    "p3_dim": "rlk:mboss/apep/rig_stub/look/tint/p3_dim"
+    "none": "rlk:boss/apep/rig_stub/look/tint/none",
+    "p1_dark": "rlk:boss/apep/rig_stub/look/tint/p1_dark",
+    "p1_brown": "rlk:boss/apep/rig_stub/look/tint/p1_brown",
+    "withered": "rlk:boss/apep/rig_stub/look/tint/withered",
+    "p3_dim": "rlk:boss/apep/rig_stub/look/tint/p3_dim"
    }
   },
   "bright": {
@@ -2258,8 +2258,8 @@
     }
    },
    "functions": {
-    "13": "rlk:mboss/apep/rig_stub/bright/13",
-    "15": "rlk:mboss/apep/rig_stub/bright/15"
+    "13": "rlk:boss/apep/rig_stub/bright/13",
+    "15": "rlk:boss/apep/rig_stub/bright/15"
    }
   }
  },
@@ -15199,8 +15199,8 @@
    "p3_curl": 3
   },
   "functions": {
-   "set": "rlk:mboss/apep/rig_stub/hands/<set>",
-   "part": "rlk:mboss/apep/rig_stub/hand/<part>/<variant>"
+   "set": "rlk:boss/apep/rig_stub/hands/<set>",
+   "part": "rlk:boss/apep/rig_stub/hand/<part>/<variant>"
   },
   "pulse": {
    "from": 0.9,

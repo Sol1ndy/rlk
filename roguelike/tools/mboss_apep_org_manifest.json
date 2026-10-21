@@ -5,7 +5,7 @@
   "manifest": "org",
   "generator": "tools/build_mboss_apep_org.mjs",
   "runtime": {
-    "ns": "rlk:mboss/apep/om/",
+    "ns": "rlk:boss/apep/om/",
     "kind_obj": "apK",
     "clip_obj": "apOI",
     "tick_obj": "apOC",
@@ -305,14 +305,14 @@
       "elements": 123,
       "px": 12288,
       "functions": {
-        "spawn": "rlk:mboss/apep/om/basic/spawn",
-        "tick": "rlk:mboss/apep/om/basic/tick",
-        "kill": "rlk:mboss/apep/om/basic/kill",
-        "play": "rlk:mboss/apep/om/basic/play/<clip>",
-        "start": "rlk:mboss/apep/om/basic/start/<clip>",
-        "look": "rlk:mboss/apep/om/basic/look/<display>/<look>",
-        "bars": "rlk:mboss/apep/om/basic/bars",
-        "shield": "rlk:mboss/apep/om/basic/shield/on|off"
+        "spawn": "rlk:boss/apep/om/basic/spawn",
+        "tick": "rlk:boss/apep/om/basic/tick",
+        "kill": "rlk:boss/apep/om/basic/kill",
+        "play": "rlk:boss/apep/om/basic/play/<clip>",
+        "start": "rlk:boss/apep/om/basic/start/<clip>",
+        "look": "rlk:boss/apep/om/basic/look/<display>/<look>",
+        "bars": "rlk:boss/apep/om/basic/bars",
+        "shield": "rlk:boss/apep/om/basic/shield/on|off"
       }
     },
     "nurt": {
@@ -505,14 +505,14 @@
       "elements": 112,
       "px": 15872,
       "functions": {
-        "spawn": "rlk:mboss/apep/om/nurt/spawn",
-        "tick": "rlk:mboss/apep/om/nurt/tick",
-        "kill": "rlk:mboss/apep/om/nurt/kill",
-        "play": "rlk:mboss/apep/om/nurt/play/<clip>",
-        "start": "rlk:mboss/apep/om/nurt/start/<clip>",
-        "look": "rlk:mboss/apep/om/nurt/look/<display>/<look>",
-        "bars": "rlk:mboss/apep/om/nurt/bars",
-        "ring": "rlk:mboss/apep/om/nurt/ring/on|off"
+        "spawn": "rlk:boss/apep/om/nurt/spawn",
+        "tick": "rlk:boss/apep/om/nurt/tick",
+        "kill": "rlk:boss/apep/om/nurt/kill",
+        "play": "rlk:boss/apep/om/nurt/play/<clip>",
+        "start": "rlk:boss/apep/om/nurt/start/<clip>",
+        "look": "rlk:boss/apep/om/nurt/look/<display>/<look>",
+        "bars": "rlk:boss/apep/om/nurt/bars",
+        "ring": "rlk:boss/apep/om/nurt/ring/on|off"
       }
     },
     "guard": {
@@ -662,13 +662,13 @@
       "elements": 85,
       "px": 11776,
       "functions": {
-        "spawn": "rlk:mboss/apep/om/guard/spawn",
-        "tick": "rlk:mboss/apep/om/guard/tick",
-        "kill": "rlk:mboss/apep/om/guard/kill",
-        "play": "rlk:mboss/apep/om/guard/play/<clip>",
-        "start": "rlk:mboss/apep/om/guard/start/<clip>",
-        "look": "rlk:mboss/apep/om/guard/look/<display>/<look>",
-        "bars": "rlk:mboss/apep/om/guard/bars"
+        "spawn": "rlk:boss/apep/om/guard/spawn",
+        "tick": "rlk:boss/apep/om/guard/tick",
+        "kill": "rlk:boss/apep/om/guard/kill",
+        "play": "rlk:boss/apep/om/guard/play/<clip>",
+        "start": "rlk:boss/apep/om/guard/start/<clip>",
+        "look": "rlk:boss/apep/om/guard/look/<display>/<look>",
+        "bars": "rlk:boss/apep/om/guard/bars"
       }
     },
     "nest": {
@@ -848,13 +848,13 @@
       "elements": 113,
       "px": 11776,
       "functions": {
-        "spawn": "rlk:mboss/apep/om/nest/spawn",
-        "tick": "rlk:mboss/apep/om/nest/tick",
-        "kill": "rlk:mboss/apep/om/nest/kill",
-        "play": "rlk:mboss/apep/om/nest/play/<clip>",
-        "start": "rlk:mboss/apep/om/nest/start/<clip>",
-        "look": "rlk:mboss/apep/om/nest/look/<display>/<look>",
-        "bars": "rlk:mboss/apep/om/nest/bars"
+        "spawn": "rlk:boss/apep/om/nest/spawn",
+        "tick": "rlk:boss/apep/om/nest/tick",
+        "kill": "rlk:boss/apep/om/nest/kill",
+        "play": "rlk:boss/apep/om/nest/play/<clip>",
+        "start": "rlk:boss/apep/om/nest/start/<clip>",
+        "look": "rlk:boss/apep/om/nest/look/<display>/<look>",
+        "bars": "rlk:boss/apep/om/nest/bars"
       }
     },
     "destr": {
@@ -1027,13 +1027,13 @@
       "elements": 99,
       "px": 4352,
       "functions": {
-        "spawn": "rlk:mboss/apep/om/destr/spawn",
-        "tick": "rlk:mboss/apep/om/destr/tick",
-        "kill": "rlk:mboss/apep/om/destr/kill",
-        "play": "rlk:mboss/apep/om/destr/play/<clip>",
-        "start": "rlk:mboss/apep/om/destr/start/<clip>",
-        "look": "rlk:mboss/apep/om/destr/look/<display>/<look>",
-        "bars": "rlk:mboss/apep/om/destr/bars"
+        "spawn": "rlk:boss/apep/om/destr/spawn",
+        "tick": "rlk:boss/apep/om/destr/tick",
+        "kill": "rlk:boss/apep/om/destr/kill",
+        "play": "rlk:boss/apep/om/destr/play/<clip>",
+        "start": "rlk:boss/apep/om/destr/start/<clip>",
+        "look": "rlk:boss/apep/om/destr/look/<display>/<look>",
+        "bars": "rlk:boss/apep/om/destr/bars"
       }
     },
     "pred": {
@@ -1337,14 +1337,14 @@
       "elements": 165,
       "px": 19200,
       "functions": {
-        "spawn": "rlk:mboss/apep/om/pred/spawn",
-        "tick": "rlk:mboss/apep/om/pred/tick",
-        "kill": "rlk:mboss/apep/om/pred/kill",
-        "play": "rlk:mboss/apep/om/pred/play/<clip>",
-        "start": "rlk:mboss/apep/om/pred/start/<clip>",
-        "look": "rlk:mboss/apep/om/pred/look/<display>/<look>",
-        "bars": "rlk:mboss/apep/om/pred/bars",
-        "form": "rlk:mboss/apep/om/pred/form/<fish|bud|pod|face>"
+        "spawn": "rlk:boss/apep/om/pred/spawn",
+        "tick": "rlk:boss/apep/om/pred/tick",
+        "kill": "rlk:boss/apep/om/pred/kill",
+        "play": "rlk:boss/apep/om/pred/play/<clip>",
+        "start": "rlk:boss/apep/om/pred/start/<clip>",
+        "look": "rlk:boss/apep/om/pred/look/<display>/<look>",
+        "bars": "rlk:boss/apep/om/pred/bars",
+        "form": "rlk:boss/apep/om/pred/form/<fish|bud|pod|face>"
       }
     }
   },
@@ -1819,15 +1819,15 @@
       "px": 38400,
       "states": {
         "entrance": {
-          "function": "rlk:mboss/apep/om/heart/spawn/entrance",
+          "function": "rlk:boss/apep/om/heart/spawn/entrance",
           "note": "E: the egg held by the vine hand at the entrance height, the cradle under the floor"
         },
         "canopy": {
-          "function": "rlk:mboss/apep/om/heart/spawn/canopy",
+          "function": "rlk:boss/apep/om/heart/spawn/canopy",
           "note": "phase 1 (and a reload in P1): hanging in the canopy"
         },
         "play": {
-          "function": "rlk:mboss/apep/om/heart/spawn/play",
+          "function": "rlk:boss/apep/om/heart/spawn/play",
           "note": "phase 2 (and a reload in T1 / P2): lying in the full cradle; the hand and the stems gone"
         }
       },
@@ -1884,11 +1884,11 @@
         "arms_h": 4.3
       },
       "functions": {
-        "spawn": "rlk:mboss/apep/om/heart/spawn/<entrance|canopy|play>",
-        "tick": "rlk:mboss/apep/om/heart/tick",
-        "play": "rlk:mboss/apep/om/heart/play/<clip>",
-        "look": "rlk:mboss/apep/om/heart/look/<display>/<look>",
-        "kill": "rlk:mboss/apep/om/heart/kill"
+        "spawn": "rlk:boss/apep/om/heart/spawn/<entrance|canopy|play>",
+        "tick": "rlk:boss/apep/om/heart/tick",
+        "play": "rlk:boss/apep/om/heart/play/<clip>",
+        "look": "rlk:boss/apep/om/heart/look/<display>/<look>",
+        "kill": "rlk:boss/apep/om/heart/kill"
       }
     },
     "dome": {
@@ -2057,11 +2057,11 @@
       "elements": 99,
       "px": 12800,
       "functions": {
-        "spawn": "rlk:mboss/apep/om/dome/spawn {i}",
-        "play": "rlk:mboss/apep/om/dome/play {i,clip}",
-        "tick": "rlk:mboss/apep/om/dome/tick",
-        "kill": "rlk:mboss/apep/om/dome/i<k>/kill",
-        "kill_all": "rlk:mboss/apep/om/dome/kill_all"
+        "spawn": "rlk:boss/apep/om/dome/spawn {i}",
+        "play": "rlk:boss/apep/om/dome/play {i,clip}",
+        "tick": "rlk:boss/apep/om/dome/tick",
+        "kill": "rlk:boss/apep/om/dome/i<k>/kill",
+        "kill_all": "rlk:boss/apep/om/dome/kill_all"
       }
     },
     "wall": {
@@ -2134,10 +2134,10 @@
       "elements": 4,
       "px": 5376,
       "functions": {
-        "spawn": "rlk:mboss/apep/om/wall/spawn",
-        "tick": "rlk:mboss/apep/om/wall/tick",
-        "play": "rlk:mboss/apep/om/wall/play/<clip> (as the blade)",
-        "kill_all": "rlk:mboss/apep/om/wall/kill_all"
+        "spawn": "rlk:boss/apep/om/wall/spawn",
+        "tick": "rlk:boss/apep/om/wall/tick",
+        "play": "rlk:boss/apep/om/wall/play/<clip> (as the blade)",
+        "kill_all": "rlk:boss/apep/om/wall/kill_all"
       }
     },
     "stalk": {
@@ -2285,10 +2285,10 @@
       "px": 8448,
       "reach": 6,
       "functions": {
-        "spawn": "rlk:mboss/apep/om/stalk/spawn {i} (positioned at the root, facing the lock)",
-        "play": "rlk:mboss/apep/om/stalk/play {i,clip}",
-        "tick": "rlk:mboss/apep/om/stalk/tick",
-        "kill_all": "rlk:mboss/apep/om/stalk/kill_all"
+        "spawn": "rlk:boss/apep/om/stalk/spawn {i} (positioned at the root, facing the lock)",
+        "play": "rlk:boss/apep/om/stalk/play {i,clip}",
+        "tick": "rlk:boss/apep/om/stalk/tick",
+        "kill_all": "rlk:boss/apep/om/stalk/kill_all"
       }
     },
     "seed": {
@@ -2325,8 +2325,8 @@
       "elements": 4,
       "px": 1024,
       "functions": {
-        "spawn": "rlk:mboss/apep/om/seed/spawn",
-        "kill": "rlk:mboss/apep/om/seed/kill"
+        "spawn": "rlk:boss/apep/om/seed/spawn",
+        "kill": "rlk:boss/apep/om/seed/kill"
       }
     }
   },
@@ -2699,12 +2699,12 @@
     }
   },
   "functions": {
-    "face": "rlk:mboss/apep/om/face",
-    "tick": "rlk:mboss/apep/om/tick",
-    "objects_tick": "rlk:mboss/apep/om/objects_tick",
-    "kill": "rlk:mboss/apep/om/kill",
-    "kill_all": "rlk:mboss/apep/om/kill_all",
-    "init": "rlk:mboss/apep/om/init",
+    "face": "rlk:boss/apep/om/face",
+    "tick": "rlk:boss/apep/om/tick",
+    "objects_tick": "rlk:boss/apep/om/objects_tick",
+    "kill": "rlk:boss/apep/om/kill",
+    "kill_all": "rlk:boss/apep/om/kill_all",
+    "init": "rlk:boss/apep/om/init",
     "files": 1767
   }
 }

@@ -7,86 +7,86 @@
   "state_obj": "azRigState",
   "legs_obj": "azRigLegs",
   "tail_obj": "azRigTail",
-  "ns": "rlk:mboss/azhdaha/rig_stub/"
+  "ns": "rlk:boss/azhdaha/rig_stub/"
  },
  "functions": {
-  "init": "rlk:mboss/azhdaha/rig_stub/init",
-  "spawn": "rlk:mboss/azhdaha/rig_stub/spawn",
-  "tick": "rlk:mboss/azhdaha/rig_stub/tick",
-  "kill": "rlk:mboss/azhdaha/rig_stub/kill",
-  "uninstall": "rlk:mboss/azhdaha/rig_stub/uninstall",
-  "look_apply": "rlk:mboss/azhdaha/rig_stub/look_apply",
+  "init": "rlk:boss/azhdaha/rig_stub/init",
+  "spawn": "rlk:boss/azhdaha/rig_stub/spawn",
+  "tick": "rlk:boss/azhdaha/rig_stub/tick",
+  "kill": "rlk:boss/azhdaha/rig_stub/kill",
+  "uninstall": "rlk:boss/azhdaha/rig_stub/uninstall",
+  "look_apply": "rlk:boss/azhdaha/rig_stub/look_apply",
   "play": {
-   "idle": "rlk:mboss/azhdaha/rig_stub/play/idle",
-   "walk": "rlk:mboss/azhdaha/rig_stub/play/walk",
-   "walk_stop": "rlk:mboss/azhdaha/rig_stub/play/walk_stop",
-   "turn45_l": "rlk:mboss/azhdaha/rig_stub/play/turn45_l",
-   "turn45_r": "rlk:mboss/azhdaha/rig_stub/play/turn45_r",
-   "turn90_l": "rlk:mboss/azhdaha/rig_stub/play/turn90_l",
-   "turn90_r": "rlk:mboss/azhdaha/rig_stub/play/turn90_r",
-   "turn180": "rlk:mboss/azhdaha/rig_stub/play/turn180",
-   "intro": "rlk:mboss/azhdaha/rig_stub/play/intro",
-   "pose_ref": "rlk:mboss/azhdaha/rig_stub/play/pose_ref",
-   "roar_low": "rlk:mboss/azhdaha/rig_stub/play/roar_low",
-   "roar_rear": "rlk:mboss/azhdaha/rig_stub/play/roar_rear",
-   "chin_slam": "rlk:mboss/azhdaha/rig_stub/play/chin_slam",
-   "jump_slam": "rlk:mboss/azhdaha/rig_stub/play/jump_slam",
-   "charge_coil": "rlk:mboss/azhdaha/rig_stub/play/charge_coil",
-   "charge_run": "rlk:mboss/azhdaha/rig_stub/play/charge_run",
-   "charge_stop": "rlk:mboss/azhdaha/rig_stub/play/charge_stop",
-   "spikes": "rlk:mboss/azhdaha/rig_stub/play/spikes",
-   "stomp_fl": "rlk:mboss/azhdaha/rig_stub/play/stomp_fl",
-   "stomp_fr": "rlk:mboss/azhdaha/rig_stub/play/stomp_fr",
-   "stomp_hl": "rlk:mboss/azhdaha/rig_stub/play/stomp_hl",
-   "stomp_hr": "rlk:mboss/azhdaha/rig_stub/play/stomp_hr",
-   "stomp3_fl": "rlk:mboss/azhdaha/rig_stub/play/stomp3_fl",
-   "stomp3_fr": "rlk:mboss/azhdaha/rig_stub/play/stomp3_fr",
-   "feint": "rlk:mboss/azhdaha/rig_stub/play/feint",
-   "tail_whip_l": "rlk:mboss/azhdaha/rig_stub/play/tail_whip_l",
-   "tail_whip_r": "rlk:mboss/azhdaha/rig_stub/play/tail_whip_r",
-   "tail_slam": "rlk:mboss/azhdaha/rig_stub/play/tail_slam",
-   "burrow_dive": "rlk:mboss/azhdaha/rig_stub/play/burrow_dive",
-   "burrow_travel": "rlk:mboss/azhdaha/rig_stub/play/burrow_travel",
-   "burrow_breach": "rlk:mboss/azhdaha/rig_stub/play/burrow_breach",
-   "burrow_emerge": "rlk:mboss/azhdaha/rig_stub/play/burrow_emerge",
-   "landslide": "rlk:mboss/azhdaha/rig_stub/play/landslide",
-   "absorb": "rlk:mboss/azhdaha/rig_stub/play/absorb",
-   "absorb_p3": "rlk:mboss/azhdaha/rig_stub/play/absorb_p3",
-   "p3_sink": "rlk:mboss/azhdaha/rig_stub/play/p3_sink",
-   "tail_pillar": "rlk:mboss/azhdaha/rig_stub/play/tail_pillar",
-   "tail_pillar_strike": "rlk:mboss/azhdaha/rig_stub/play/tail_pillar_strike",
-   "tail_pillar_sink": "rlk:mboss/azhdaha/rig_stub/play/tail_pillar_sink",
-   "tail_cast": "rlk:mboss/azhdaha/rig_stub/play/tail_cast",
-   "death": "rlk:mboss/azhdaha/rig_stub/play/death"
+   "idle": "rlk:boss/azhdaha/rig_stub/play/idle",
+   "walk": "rlk:boss/azhdaha/rig_stub/play/walk",
+   "walk_stop": "rlk:boss/azhdaha/rig_stub/play/walk_stop",
+   "turn45_l": "rlk:boss/azhdaha/rig_stub/play/turn45_l",
+   "turn45_r": "rlk:boss/azhdaha/rig_stub/play/turn45_r",
+   "turn90_l": "rlk:boss/azhdaha/rig_stub/play/turn90_l",
+   "turn90_r": "rlk:boss/azhdaha/rig_stub/play/turn90_r",
+   "turn180": "rlk:boss/azhdaha/rig_stub/play/turn180",
+   "intro": "rlk:boss/azhdaha/rig_stub/play/intro",
+   "pose_ref": "rlk:boss/azhdaha/rig_stub/play/pose_ref",
+   "roar_low": "rlk:boss/azhdaha/rig_stub/play/roar_low",
+   "roar_rear": "rlk:boss/azhdaha/rig_stub/play/roar_rear",
+   "chin_slam": "rlk:boss/azhdaha/rig_stub/play/chin_slam",
+   "jump_slam": "rlk:boss/azhdaha/rig_stub/play/jump_slam",
+   "charge_coil": "rlk:boss/azhdaha/rig_stub/play/charge_coil",
+   "charge_run": "rlk:boss/azhdaha/rig_stub/play/charge_run",
+   "charge_stop": "rlk:boss/azhdaha/rig_stub/play/charge_stop",
+   "spikes": "rlk:boss/azhdaha/rig_stub/play/spikes",
+   "stomp_fl": "rlk:boss/azhdaha/rig_stub/play/stomp_fl",
+   "stomp_fr": "rlk:boss/azhdaha/rig_stub/play/stomp_fr",
+   "stomp_hl": "rlk:boss/azhdaha/rig_stub/play/stomp_hl",
+   "stomp_hr": "rlk:boss/azhdaha/rig_stub/play/stomp_hr",
+   "stomp3_fl": "rlk:boss/azhdaha/rig_stub/play/stomp3_fl",
+   "stomp3_fr": "rlk:boss/azhdaha/rig_stub/play/stomp3_fr",
+   "feint": "rlk:boss/azhdaha/rig_stub/play/feint",
+   "tail_whip_l": "rlk:boss/azhdaha/rig_stub/play/tail_whip_l",
+   "tail_whip_r": "rlk:boss/azhdaha/rig_stub/play/tail_whip_r",
+   "tail_slam": "rlk:boss/azhdaha/rig_stub/play/tail_slam",
+   "burrow_dive": "rlk:boss/azhdaha/rig_stub/play/burrow_dive",
+   "burrow_travel": "rlk:boss/azhdaha/rig_stub/play/burrow_travel",
+   "burrow_breach": "rlk:boss/azhdaha/rig_stub/play/burrow_breach",
+   "burrow_emerge": "rlk:boss/azhdaha/rig_stub/play/burrow_emerge",
+   "landslide": "rlk:boss/azhdaha/rig_stub/play/landslide",
+   "absorb": "rlk:boss/azhdaha/rig_stub/play/absorb",
+   "absorb_p3": "rlk:boss/azhdaha/rig_stub/play/absorb_p3",
+   "p3_sink": "rlk:boss/azhdaha/rig_stub/play/p3_sink",
+   "tail_pillar": "rlk:boss/azhdaha/rig_stub/play/tail_pillar",
+   "tail_pillar_strike": "rlk:boss/azhdaha/rig_stub/play/tail_pillar_strike",
+   "tail_pillar_sink": "rlk:boss/azhdaha/rig_stub/play/tail_pillar_sink",
+   "tail_cast": "rlk:boss/azhdaha/rig_stub/play/tail_cast",
+   "death": "rlk:boss/azhdaha/rig_stub/play/death"
   },
   "face": {
-   "player": "rlk:mboss/azhdaha/rig_stub/face/player",
-   "track": "rlk:mboss/azhdaha/rig_stub/face/track",
-   "set": "rlk:mboss/azhdaha/rig_stub/face/set"
+   "player": "rlk:boss/azhdaha/rig_stub/face/player",
+   "track": "rlk:boss/azhdaha/rig_stub/face/track",
+   "set": "rlk:boss/azhdaha/rig_stub/face/set"
   },
   "state": {
-   "normal": "rlk:mboss/azhdaha/rig_stub/state/normal",
-   "burrowed": "rlk:mboss/azhdaha/rig_stub/state/burrowed",
-   "tail_only": "rlk:mboss/azhdaha/rig_stub/state/tail_only"
+   "normal": "rlk:boss/azhdaha/rig_stub/state/normal",
+   "burrowed": "rlk:boss/azhdaha/rig_stub/state/burrowed",
+   "tail_only": "rlk:boss/azhdaha/rig_stub/state/tail_only"
   },
   "look_legs": {
-   "geo": "rlk:mboss/azhdaha/rig_stub/look/legs/geo",
-   "hydro": "rlk:mboss/azhdaha/rig_stub/look/legs/hydro",
-   "pyro": "rlk:mboss/azhdaha/rig_stub/look/legs/pyro"
+   "geo": "rlk:boss/azhdaha/rig_stub/look/legs/geo",
+   "hydro": "rlk:boss/azhdaha/rig_stub/look/legs/hydro",
+   "pyro": "rlk:boss/azhdaha/rig_stub/look/legs/pyro"
   },
   "look_tail": {
-   "geo": "rlk:mboss/azhdaha/rig_stub/look/tail/geo",
-   "cryo": "rlk:mboss/azhdaha/rig_stub/look/tail/cryo",
-   "electro": "rlk:mboss/azhdaha/rig_stub/look/tail/electro"
+   "geo": "rlk:boss/azhdaha/rig_stub/look/tail/geo",
+   "cryo": "rlk:boss/azhdaha/rig_stub/look/tail/cryo",
+   "electro": "rlk:boss/azhdaha/rig_stub/look/tail/electro"
   },
-  "petrify": "rlk:mboss/azhdaha/rig_stub/look/petrify",
-  "glow_on": "rlk:mboss/azhdaha/rig_stub/glow/gold_on",
-  "glow_off": "rlk:mboss/azhdaha/rig_stub/glow/gold_off",
+  "petrify": "rlk:boss/azhdaha/rig_stub/look/petrify",
+  "glow_on": "rlk:boss/azhdaha/rig_stub/glow/gold_on",
+  "glow_off": "rlk:boss/azhdaha/rig_stub/glow/gold_off",
   "flash": {
-   "head": "rlk:mboss/azhdaha/rig_stub/flash/head",
-   "front": "rlk:mboss/azhdaha/rig_stub/flash/front",
-   "rear": "rlk:mboss/azhdaha/rig_stub/flash/rear",
-   "tail": "rlk:mboss/azhdaha/rig_stub/flash/tail"
+   "head": "rlk:boss/azhdaha/rig_stub/flash/head",
+   "front": "rlk:boss/azhdaha/rig_stub/flash/front",
+   "rear": "rlk:boss/azhdaha/rig_stub/flash/rear",
+   "tail": "rlk:boss/azhdaha/rig_stub/flash/tail"
   }
  },
  "parts": [
@@ -1047,18 +1047,18 @@
   },
   "functions": {
    "legs": {
-    "geo": "rlk:mboss/azhdaha/rig_stub/look/legs/geo",
-    "hydro": "rlk:mboss/azhdaha/rig_stub/look/legs/hydro",
-    "pyro": "rlk:mboss/azhdaha/rig_stub/look/legs/pyro"
+    "geo": "rlk:boss/azhdaha/rig_stub/look/legs/geo",
+    "hydro": "rlk:boss/azhdaha/rig_stub/look/legs/hydro",
+    "pyro": "rlk:boss/azhdaha/rig_stub/look/legs/pyro"
    },
    "tail": {
-    "geo": "rlk:mboss/azhdaha/rig_stub/look/tail/geo",
-    "cryo": "rlk:mboss/azhdaha/rig_stub/look/tail/cryo",
-    "electro": "rlk:mboss/azhdaha/rig_stub/look/tail/electro"
+    "geo": "rlk:boss/azhdaha/rig_stub/look/tail/geo",
+    "cryo": "rlk:boss/azhdaha/rig_stub/look/tail/cryo",
+    "electro": "rlk:boss/azhdaha/rig_stub/look/tail/electro"
    },
-   "petrify": "rlk:mboss/azhdaha/rig_stub/look/petrify",
-   "glow_on": "rlk:mboss/azhdaha/rig_stub/glow/gold_on",
-   "glow_off": "rlk:mboss/azhdaha/rig_stub/glow/gold_off"
+   "petrify": "rlk:boss/azhdaha/rig_stub/look/petrify",
+   "glow_on": "rlk:boss/azhdaha/rig_stub/glow/gold_on",
+   "glow_off": "rlk:boss/azhdaha/rig_stub/glow/gold_off"
   }
  },
  "culling": {

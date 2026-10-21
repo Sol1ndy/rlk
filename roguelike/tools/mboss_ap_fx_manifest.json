@@ -1,7 +1,7 @@
 {
  "generator": "tools/build_mboss_ap_fx.py",
  "api": "scratchpad ap/ap_fx_api.md",
- "functions": "rlk:mboss/apep/fx/",
+ "functions": "rlk:boss/apep/fx/",
  "item_models": "rlk:mboss/ap_kit/",
  "font": "rlk:mboss_ap",
  "font_range": [
@@ -11,21 +11,21 @@
  "storage": "rlk:apkit",
  "owned": {
   "dirs": [
-   "data/rlk/function/mboss/apep/fx/e",
-   "data/rlk/function/mboss/apep/fx/p",
-   "data/rlk/function/mboss/apep/fx/tele",
-   "data/rlk/function/mboss/apep/fx/dress",
-   "data/rlk/function/mboss/apep/fx/snd",
-   "data/rlk/function/mboss/apep/fx/hud",
-   "data/rlk/function/mboss/apep/fx/prop",
-   "data/rlk/function/mboss/apep/fx/test"
+   "data/rlk/function/boss/apep/fx/e",
+   "data/rlk/function/boss/apep/fx/p",
+   "data/rlk/function/boss/apep/fx/tele",
+   "data/rlk/function/boss/apep/fx/dress",
+   "data/rlk/function/boss/apep/fx/snd",
+   "data/rlk/function/boss/apep/fx/hud",
+   "data/rlk/function/boss/apep/fx/prop",
+   "data/rlk/function/boss/apep/fx/test"
   ],
   "files": [
-   "data/rlk/function/mboss/apep/fx/card.mcfunction",
-   "data/rlk/function/mboss/apep/fx/cardx.mcfunction",
-   "data/rlk/function/mboss/apep/fx/look.mcfunction",
-   "data/rlk/function/mboss/apep/fx/clear.mcfunction",
-   "data/rlk/function/mboss/apep/fx/uninstall.mcfunction"
+   "data/rlk/function/boss/apep/fx/card.mcfunction",
+   "data/rlk/function/boss/apep/fx/cardx.mcfunction",
+   "data/rlk/function/boss/apep/fx/look.mcfunction",
+   "data/rlk/function/boss/apep/fx/clear.mcfunction",
+   "data/rlk/function/boss/apep/fx/uninstall.mcfunction"
   ],
   "rp": [
    "assets/rlk/textures/mboss/ap_kit",

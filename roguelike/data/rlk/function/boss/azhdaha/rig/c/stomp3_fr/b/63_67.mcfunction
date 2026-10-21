@@ -1,0 +1,5 @@
+execute if score @s azRigT matches 63 run return run function rlk:boss/azhdaha/rig/c/stomp3_fr/k/63
+execute if score @s azRigT matches 64 run return run function rlk:boss/azhdaha/rig/c/stomp3_fr/k/64
+execute if score @s azRigT matches 65 run return run function rlk:boss/azhdaha/rig/c/stomp3_fr/k/65
+execute if score @s azRigT matches 66 run return run function rlk:boss/azhdaha/rig/c/stomp3_fr/k/66
+execute if score @s azRigT matches 67 run return run function rlk:boss/azhdaha/rig/c/stomp3_fr/k/67

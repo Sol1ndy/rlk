@@ -1,26 +1,26 @@
 {
  "generator": "tools/build_mboss_az_fx.py",
  "api": "scratchpad az/az_fx_api.md (tools-side copy: tools/az_fx_api.md)",
- "functions": "rlk:mboss/azhdaha/fx/",
+ "functions": "rlk:boss/azhdaha/fx/",
  "item_models": "rlk:mboss/az_kit/",
  "font": "rlk:mboss_az",
  "storage": "rlk:azkit",
  "owned": {
   "dirs": [
-   "data/rlk/function/mboss/azhdaha/fx/e",
-   "data/rlk/function/mboss/azhdaha/fx/p",
-   "data/rlk/function/mboss/azhdaha/fx/tele",
-   "data/rlk/function/mboss/azhdaha/fx/snd",
-   "data/rlk/function/mboss/azhdaha/fx/hud",
-   "data/rlk/function/mboss/azhdaha/fx/prop",
-   "data/rlk/function/mboss/azhdaha/fx/test"
+   "data/rlk/function/boss/azhdaha/fx/e",
+   "data/rlk/function/boss/azhdaha/fx/p",
+   "data/rlk/function/boss/azhdaha/fx/tele",
+   "data/rlk/function/boss/azhdaha/fx/snd",
+   "data/rlk/function/boss/azhdaha/fx/hud",
+   "data/rlk/function/boss/azhdaha/fx/prop",
+   "data/rlk/function/boss/azhdaha/fx/test"
   ],
   "files": [
-   "data/rlk/function/mboss/azhdaha/fx/card.mcfunction",
-   "data/rlk/function/mboss/azhdaha/fx/cardx.mcfunction",
-   "data/rlk/function/mboss/azhdaha/fx/look.mcfunction",
-   "data/rlk/function/mboss/azhdaha/fx/clear.mcfunction",
-   "data/rlk/function/mboss/azhdaha/fx/uninstall.mcfunction"
+   "data/rlk/function/boss/azhdaha/fx/card.mcfunction",
+   "data/rlk/function/boss/azhdaha/fx/cardx.mcfunction",
+   "data/rlk/function/boss/azhdaha/fx/look.mcfunction",
+   "data/rlk/function/boss/azhdaha/fx/clear.mcfunction",
+   "data/rlk/function/boss/azhdaha/fx/uninstall.mcfunction"
   ],
   "rp": [
    "assets/rlk/textures/mboss/az_kit",

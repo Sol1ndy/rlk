@@ -4,7 +4,7 @@
     python3 tools/build_mboss_apep.py
 
 Registry entry: tools/mboss_registry.json id "apep", n 11, kind chapter, ch [3], arena ap_oasis (n 2) (cm.md 2; the
-scratchpad ap/ap_contract.md 0.3.6). Writes F:mboss/apep/** except the rig's AP:rig/** (tools/build_mboss_apep_rig.mjs,
+scratchpad ap/ap_contract.md 0.3.6). Writes F:boss/apep/** except the rig's AP:rig/** (tools/build_mboss_apep_rig.mjs,
 wip/ap-rig), the org generator's AP:om/** (wip/ap-org) and the kit's owned paths (tools/build_mboss_ap_fx.py, the
 manifest "owned" list), and deletes stale files only in what it owns, so the generators run in any order and twice
 without a change.

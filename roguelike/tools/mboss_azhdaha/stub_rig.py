@@ -19,7 +19,7 @@ migration of section 10). Owner S1-MOD. Two jobs:
 
 2. RUNTIME (emit(g), called by core.build): writes T:mboss_azhdaha/stub_rig_manifest.json (the framework compiles the
    hit proxies, capsules and state sets from it while no v1 rig manifest exists, cm.md 9.2) and the stand-in rig
-   F:mboss/azhdaha/rig_stub/** with the rig API of manifest.md section 7 (init, spawn, tick, kill, uninstall,
+   F:boss/azhdaha/rig_stub/** with the rig API of manifest.md section 7 (init, spawn, tick, kill, uninstall,
    look_apply, play/<clip>, face/{player,track,set}, state/<normal|burrowed|tail_only>, look/legs/<geo|hydro|pyro>,
    look/tail/<geo|cryo|electro>, look/petrify, glow/gold_on|off, flash/<head|front|rear|tail>) + chain (loop / next of
    stub clips while a real rig ticks). Clips keep time only (azRigC / azRigT exactly as the R1 rig, so the
@@ -27,18 +27,19 @@ migration of section 10). Owner S1-MOD. Two jobs:
    head, a log tail) that follows the anchor, hides in the burrow states and stands the tail up in the tail-only
    state, so a test fight in game is readable.
 
-The module calls the real rig (F:mboss/azhdaha/rig/**) for every API function the real rig provides and this stub for
+The module calls the real rig (F:boss/azhdaha/rig/**) for every API function the real rig provides and this stub for
 the rest (api.rig_fn); play/<clip> goes to the real rig only for clips the real v1 manifest has (api.play_fn). The I2b
 build asserts that no clip falls back (api.FALLBACKS empty).
 """
 import copy
 import json
 import math
+import mboss_lib as L
 
 SCHEMA = 1
 BOSS = 'azhdaha'
-NS_RIG = 'rlk:mboss/azhdaha/rig/'
-NS_STUB = 'rlk:mboss/azhdaha/rig_stub/'
+NS_RIG = f'rlk:{L.fn_root_of(BOSS)}/rig/'          # the module root from the registry (boss/azhdaha)
+NS_STUB = f'rlk:{L.fn_root_of(BOSS)}/rig_stub/'
 STUB_ID0 = 1000                       # stub clip ids (never a rig id, cm.md 9.2)
 UUID_BLOCK = '524c4b4d-415a-4400-8000-0000000000'
 UUID_INTS = [1380731725, 1096434688, -2147483648]
@@ -557,7 +558,7 @@ def dumps(m):
 
 
 # =============================================================================================
-# The stand-in runtime F:mboss/azhdaha/rig_stub/**
+# The stand-in runtime F:boss/azhdaha/rig_stub/**
 TAG = 'rlk_mb_azs'
 FIG = {   # stand-in part -> (item, scale (x, y, z), local offset (s, y, f) from the anchor, flash group)
     'sbody': ('minecraft:tuff', (5.4, 3.2, 8.6), (0.0, 2.9, -0.3), 'front'),
@@ -587,7 +588,7 @@ def _sel(name):
 
 
 def emit(g, merged=None, functions=True):
-    """Write the stub manifest JSON and F:mboss/azhdaha/rig_stub/**. g = api.Gen; merged = api.MAN (for the clip ids
+    """Write the stub manifest JSON and F:boss/azhdaha/rig_stub/**. g = api.Gen; merged = api.MAN (for the clip ids
     of the stub clips the module uses: their ids are the merged table's). functions=False (I1-WIRE: the real rig serves
     every clip and function, api.stub_rig_needed()): only the JSON, no rig_stub/** (the module's clean removes it)."""
     from . import api as A

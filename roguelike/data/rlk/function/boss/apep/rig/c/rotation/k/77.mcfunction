@@ -1,0 +1,11 @@
+data merge entity 524c4b4d-4150-4400-8000-00000000000e {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.94978f,1.38038f,2.69295f],left_rotation:[-0.06543f,-0.03264f,0.44246f,0.8938f],scale:[1.2f,1.2f,1.2f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000000f {start_interpolation:0,interpolation_duration:1,transformation:{translation:[2.09169f,1.59665f,2.34949f],left_rotation:[0.20615f,0.09176f,0.4585f,0.85957f],scale:[1.2f,1.2f,1.2f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000012 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-1.67499f,2.10157f,0.71162f],left_rotation:[-0.20637f,-0.67686f,-0.48884f,0.51021f],scale:[1.7f,1.7f,1.7f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000017 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[3.12254f,2.31423f,1.14649f],left_rotation:[-0.0354f,-0.01802f,0.47636f,0.87836f],scale:[2.1f,2.1f,2.1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000019 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[5.27694f,1.02012f,1.35139f],left_rotation:[0f,0f,0f,1f],scale:[0.95f,0.95f,0.95f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000001f {start_interpolation:0,interpolation_duration:1,transformation:{translation:[3.312f,0.69239f,3.42134f],left_rotation:[0f,0f,0f,1f],scale:[1.71f,1.71f,1.71f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000025 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[3.6f,0.55556f,-2.9f],left_rotation:[0f,0f,0f,1f],scale:[1.14f,1.14f,1.14f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000002d {start_interpolation:0,interpolation_duration:8,transformation:{translation:[1.71414f,0.41053f,-9.03388f],left_rotation:[0.00881f,-0.12861f,0.14404f,0.98114f],scale:[1.1f,1.1f,1.1f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:boss/apep/rig/hand/a_hand_l/p1_planted
+function rlk:boss/apep/rig/hand/b_hand_l/p1_open
+function rlk:boss/apep/rig/hand/c_hand_l/p1_open

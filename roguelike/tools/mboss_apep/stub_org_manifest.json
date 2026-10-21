@@ -4,7 +4,7 @@
  "source": "stub",
  "manifest": "org",
  "runtime": {
-  "ns": "rlk:mboss/apep/om/",
+  "ns": "rlk:boss/apep/om/",
   "kind_obj": "apK",
   "clip_obj": "apOI",
   "tick_obj": "apOC"

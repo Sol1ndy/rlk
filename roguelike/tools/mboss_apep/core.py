@@ -4,7 +4,7 @@ the main slot and its services, the play wrappers (yaw schedules) and the px-set
 the rig manifest), capsules (the push request), the body park, the bars (incl. the Heart bar's frame), music, pause /
 reload / cleanup / uninstall per phase (plan 7.2), the arena props and looks, the test commands, the kit stand-ins.
 
-Owns F:mboss/apep/** except rig/** (the rig generator), om/** (the org generator) and the kit's owned paths
+Owns F:boss/apep/** except rig/** (the rig generator), om/** (the org generator) and the kit's owned paths
 (ap_fx_api.md 0.1); every owned file not written in this run is deleted, so a second run and any generator order give
 the same bytes.
 """
@@ -19,7 +19,7 @@ from . import stub_org as SO
 from .api import L, K, Gen, TL
 
 NS = A.NS
-OWN_TOP = 'mboss/' + A.ID
+OWN_TOP = A.ROOT                      # boss/apep (registry fn)
 BODY, PLAYER, ARENA_M, HEART_M = A.BODY, A.PLAYER, A.ARENA_M, A.HEART_M
 CY = A.CY
 HUD_EVERY = 4
@@ -117,7 +117,7 @@ class KitOwned:
 
 
 def foreign():
-    """Paths under F:mboss/apep/ that other generators own: the rig's rig/, the org generator's om/, the kit's owned
+    """Paths under F:boss/apep/ that other generators own: the rig's rig/, the org generator's om/, the kit's owned
     dirs / files (ap_fx_api.md 0.1; the kit manifest's "owned" when it exists). Returns (dirs, files)."""
     dirs = {'rig', 'om'} | {f'fx/{d}' for d in KitOwned.DIRS}
     files = {f'fx/{f}' for f in KitOwned.FILES}

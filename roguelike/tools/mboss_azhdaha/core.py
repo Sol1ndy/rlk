@@ -5,7 +5,7 @@ and the timers (N13), the push request (N12), the HUD, the music / cine / proxy-
 props and element looks (N17), pause / reload / cleanup / uninstall, the test commands, the local stubs of missing
 framework functions (cmstub/) and of the kit (kstub/). See __init__.py for the package layout; s2.md is the contract.
 
-Owns F:mboss/azhdaha/** except rig/** (the rig generator, wip/az-rig) and the kit's paths (fx.md 0.1:
+Owns F:boss/azhdaha/** except rig/** (the rig generator, wip/az-rig) and the kit's paths (fx.md 0.1:
 fx/{card,cardx,look,clear,uninstall} and fx/{e,p,tele,snd,hud,prop,test}/**); every file it owns that it did not write
 in this run is deleted, so a second run and any generator order give the same bytes.
 """
@@ -20,7 +20,7 @@ from . import stub_rig as SR
 from .api import L, K, Gen, TL
 
 NS = A.NS
-OWN_TOP = 'mboss/' + A.ID
+OWN_TOP = A.ROOT                      # boss/azhdaha (registry fn)
 BODY, PLAYER, ARENA_M = A.BODY, A.PLAYER, A.ARENA_M
 CY = A.CY
 INTRO_LEN = A.clip_len('intro')
@@ -147,7 +147,7 @@ def px_target_stubs():
 
 
 def foreign():
-    """Paths under F:mboss/azhdaha/ that other generators own (relative, no extension): the rig's rig/ and the kit's
+    """Paths under F:boss/azhdaha/ that other generators own (relative, no extension): the rig's rig/ and the kit's
     owned dirs / files (fx.md 0.1; the kit manifest's "owned" when it exists). Returns (dirs, files)."""
     dirs = {'rig'} | {f'fx/{d}' for d in KitOwned.DIRS}
     files = {f'fx/{f}' for f in KitOwned.FILES}

@@ -15,7 +15,7 @@ FN = ROOT / 'data/rlk/function'
 MB = FN / 'mboss'
 REGISTRY = ROOT / 'tools/mboss_registry.json'
 
-# Hooks every boss module implements as F:mboss/<id>/<hook>.mcfunction (stubs allowed).
+# Hooks every boss module implements as F:<fn root>/<hook>.mcfunction (fn_root: mboss/<id> or the entry's "fn"; stubs allowed).
 # 'test' is a macro hook ({id:N}); the rest take no arguments. 'uninstall' is dispatched to every enabled
 # module (not only the running one): it removes what the module itself created (e.g. its rig objectives).
 HOOKS = ['spawn', 'intro_tick', 'tick', 'on_hit', 'aux_hit', 'incoming', 'pause', 'resume',
@@ -140,6 +140,15 @@ def load_registry():
         assert ic is None or (isinstance(ic, dict) and 'item' in ic and 'model' in ic), f'{b["id"]}: icon must be {{item, model}}'
         for k in ('minCh', 'maxCh', 'name', 'sub', 'color', 'el'):
             assert k in b, f'{b["id"]}: missing {k}'
+    roots = {}
+    for b in data['boss']:
+        r = fn_root(b)
+        if 'fn' in b:
+            assert r in (f'mboss/{b["id"]}', f'boss/{b["id"]}'), f'{b["id"]}: fn must be mboss/<id> or boss/<id>, not {r}'
+            assert r != f'boss/{b["id"]}' or b.get('kind', 'mid') == 'chapter', f'{b["id"]}: only chapter bosses live under boss/'
+        assert r not in FN_ROOT_RESERVED, f'{b["id"]}: fn {r} is reserved'
+        assert r not in roots, f'{b["id"]}: fn {r} is also the root of {roots.get(r)}'
+        roots[r] = b['id']
     claimed = {}
     for b in data['boss']:
         if b.get('kind', 'mid') == 'chapter' and b.get('enabled', True) and b.get('route', True):
@@ -147,6 +156,31 @@ def load_registry():
                 assert c not in claimed, f'chapter {c} routed to both {claimed[c]} and {b["id"]}'
                 claimed[c] = b['id']
     return data
+
+
+# Function roots of the boss modules (F:<root>/<hook>). A registry entry may name its own root with "fn"; without it the
+# module lives at mboss/<id> (the mid-bosses, proto, cproto). The chapter bosses live under boss/<id> (user 10-22:
+# "중간보스가 아닌데" - Azhdaha boss/azhdaha, Apep boss/apep, beside Raiden's own boss/raiden). Only the function root
+# moves: entity tags, scoreboards, storage and resource-pack paths keep their mboss names, so saved worlds keep working.
+FN_ROOT_RESERVED = {'boss/raiden', 'boss/test'}   # Raiden's own module (not a registry boss) and the test aliases
+
+
+def fn_root(b):
+    """The function root of registry entry b, relative to F: (no slashes at the ends): b.fn or mboss/<id>."""
+    return b.get('fn') or f'mboss/{b["id"]}'
+
+
+def fn_root_of(bid, reg=None):
+    """The function root of the registry entry with id bid (mboss/<bid> when the registry has no such entry: a module
+    generator that runs before its registry entry exists keeps the default root)."""
+    try:
+        data = reg or json.loads(REGISTRY.read_text(encoding='utf-8'))
+    except FileNotFoundError:
+        return f'mboss/{bid}'
+    for b in data.get('boss', []):
+        if b['id'] == bid:
+            return fn_root(b)
+    return f'mboss/{bid}'
 
 
 def enabled_bosses(reg=None):

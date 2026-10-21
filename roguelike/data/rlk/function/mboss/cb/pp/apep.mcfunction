@@ -3,4 +3,4 @@
 data remove storage rlk:mboss cprep.apep
 execute in minecraft:overworld run function rlk:mboss/ar/ap_oasis/fl_on
 execute in minecraft:overworld run function rlk:mboss/ar/ap_oasis/ensure
-function rlk:mboss/apep/prep
+function rlk:boss/apep/prep

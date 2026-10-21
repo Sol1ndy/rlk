@@ -11,14 +11,14 @@ Units: Python helpers take blocks / ticks / degrees; the framework boundary is t
 Three things may be missing while the stages run in parallel; each has a clearly marked local fallback that switches
 off by itself when the real thing lands (the build prints every fallback in use):
 - the framework (AZ-CM, wip/az-cm, cm.md): fw(rel) returns the real function line when F:mboss/<rel> exists in the
-  tree (the core generator runs before this module), else a LOCAL STUB F:mboss/azhdaha/cmstub/<rel> written by the core
+  tree (the core generator runs before this module), else a LOCAL STUB F:boss/azhdaha/cmstub/<rel> written by the core
   (CMSTUBS); the registry entry (REG_STUB = plan.md 1.6 while tools/mboss_registry.json lacks "azhdaha") and the
   arena (ARENA_STUB = cm.md 2.3 while mboss_lib has no arena_of / the registry no arenas);
 - the rig (wip/az-rig, R3a): the manifest is the real v1 rig manifest merged with the stub manifest of stub_rig.py
   (FALLBACKS = the clips taken from the stub; the I2b build asserts it is empty), the rig API functions are the real
-  rig's where F:mboss/azhdaha/rig/<fn> exists, else the stub rig's (rig_stub/**);
+  rig's where F:boss/azhdaha/rig/<fn> exists, else the stub rig's (rig_stub/**);
 - the kit (wip/az-fx, S1-FX, fx.md): K is the kit's Python API when tools/build_mboss_az_fx.py exists, else KitStub with
-  the same signatures, whose every call is a module-owned empty function F:mboss/azhdaha/kstub/<kit path> (I1-WIRE
+  the same signatures, whose every call is a module-owned empty function F:boss/azhdaha/kstub/<kit path> (I1-WIRE
   switches to the kit by merging it; nothing here changes).
 """
 from pathlib import Path
@@ -35,9 +35,12 @@ import mboss_lib as L  # noqa: E402
 from . import stub_rig as SR  # noqa: E402
 
 ID = 'azhdaha'
-NS = f'rlk:mboss/{ID}/'
+# The module's function root (registry "fn", mboss_lib.fn_root; user 10-22: chapter bosses live under boss/<id>).
+# Only functions move: tags, scores, storage and resource-pack paths keep their mboss / az names.
+ROOT = L.fn_root_of(ID)
+NS = f'rlk:{ROOT}/'
 N = 10
-FDIR = L.FN / 'mboss' / ID
+FDIR = L.FN / ROOT
 
 # =============================================================================================
 # Registry entry and arena (cm.md 2; plan.md 1.6). LOCAL STUBS while AZ-CM has not landed.
@@ -152,7 +155,7 @@ CM_SEC = {'cb/body': '5.5', 'px/state': '9.3', 'px/spawn': '9.3', 'mv/lockv': '1
 
 def fw(rel, args=None):
     """The line `function rlk:mboss/<rel> [args]` of a framework function (cm.md), or of its local stub
-    F:mboss/azhdaha/cmstub/<rel with / -> _> when the tree has no such function yet (CMSTUBS)."""
+    F:boss/azhdaha/cmstub/<rel with / -> _> when the tree has no such function yet (CMSTUBS)."""
     a = f' {args}' if args else ''
     if fw_has(rel):
         return f'function rlk:mboss/{rel}{a}'
@@ -415,7 +418,7 @@ def addon_test_ctx(point, pos, yaw, scores=None):
 
 # =============================================================================================
 # The kit (S1-FX, fx.md): its Python API when present, else KitStub (same signatures; every call = an empty
-# module-owned function F:mboss/azhdaha/kstub/<kit path>, written by the core for the paths used)
+# module-owned function F:boss/azhdaha/kstub/<kit path>, written by the core for the paths used)
 class KitStub:
     """No-op stand-in of `import build_mboss_az_fx as K` (fx.md section 9) until I1. Every builder returns ONE
     function line (valid after `execute ... run`); the core writes the empty kstub/<path> functions used."""
@@ -683,7 +686,7 @@ COMMANDS = {'execute', 'function', 'scoreboard', 'data', 'tag', 'kill', 'summon'
 
 
 class Gen:
-    """Writer handed to every emit(gen) (s2.md 5.2). Paths are relative to F:mboss/azhdaha/."""
+    """Writer handed to every emit(gen) (s2.md 5.2). Paths are relative to the module root F:<ROOT>/ (boss/azhdaha)."""
 
     def __init__(self, out):
         self.out = out
@@ -699,7 +702,7 @@ class Gen:
             assert ln.startswith('#') or cmd in COMMANDS, f'{rel}: not a command line: {ln!r}'
             assert not re.search(r'scoreboard players (set|add|remove|operation) [#@][^ ]+ -?\d+( |$)', ln), \
                 f'{rel}: scoreboard line without an objective: {ln!r}'
-        self.out.write(f'mboss/{ID}/{rel}', flat)
+        self.out.write(f'{ROOT}/{rel}', flat)
         self.files.add(rel)
 
     def pw(self, key, name, lines):
@@ -1098,7 +1101,7 @@ class Gen:
                 f'@e[type=minecraft:marker,tag=rlk_az_ctx,limit=1] run function {NS}x/{d["key"]}']
 
     def after(self, delay, rel):
-        """N13: run F:mboss/azhdaha/<rel> `delay` module ticks later, as the body at this position / rotation."""
+        """N13: run F:boss/azhdaha/<rel> `delay` module ticks later, as the body at this position / rotation."""
         assert 1 <= delay <= 2000, delay
         own = OWN_KEYS.get(self.owner)
         if own is not None:

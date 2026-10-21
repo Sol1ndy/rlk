@@ -12,7 +12,7 @@ Three parts may still be missing while the stages run in parallel; each has a ma
 itself when the real part lands (the build prints every one in use):
 - the rig (wip/ap-rig, AP-I1 / AP-I2): the manifest is the real one ("schema": 1, "source": "rig") merged per clip with
   the stub of stub_rig.py (FALLBACKS = the clips taken from the stub, ids >= 1000; AP-I2 asserts none); the rig API is
-  the real rig's where F:mboss/apep/rig/<fn> exists, else the stand-in AP:rig_stub/** (rig_fn, play_fn);
+  the real rig's where F:boss/apep/rig/<fn> exists, else the stand-in AP:rig_stub/** (rig_fn, play_fn);
 - the org manifest (wip/ap-org, AP-I1): T:mboss_apep_org_manifest.json when present, else stub_org.py's;
 - the kit (wip/ap-fx, AP-I1): K = the kit's Python API (`import build_mboss_ap_fx`) when present, else KitStub with the
   ap_fx_api.md 0.10 signatures, whose every call is an empty module-owned function AP:kstub/<kit path>;
@@ -33,9 +33,12 @@ from . import stub_rig as SR  # noqa: E402
 from . import stub_org as SO  # noqa: E402
 
 ID = 'apep'
-NS = f'rlk:mboss/{ID}/'
+# The module's function root (registry "fn", mboss_lib.fn_root; user 10-22: chapter bosses live under boss/<id>).
+# Only functions move: tags, scores, storage and resource-pack paths keep their mboss / ap names.
+ROOT = L.fn_root_of(ID)
+NS = f'rlk:{ROOT}/'
 N = 11
-FDIR = L.FN / 'mboss' / ID
+FDIR = L.FN / ROOT
 
 # =============================================================================================
 # Registry entry and arena (plan 3.7; ap_contract 0.3.6; cm.md 2)
@@ -633,7 +636,7 @@ COMMANDS = {'execute', 'function', 'scoreboard', 'data', 'tag', 'kill', 'summon'
 
 
 class Gen:
-    """Writer handed to every emit(gen) (ap_contract 1.4). Paths are relative to F:mboss/apep/."""
+    """Writer handed to every emit(gen) (ap_contract 1.4). Paths are relative to F:boss/apep/."""
 
     def __init__(self, out):
         self.out = out
@@ -660,7 +663,7 @@ class Gen:
             assert ln.startswith('#') or cmd in COMMANDS, f'{rel}: not a command line: {ln!r}'
             assert not re.search(r'scoreboard players (set|add|remove|operation) [#@][^ ]+ -?\d+( |$)', ln), \
                 f'{rel}: scoreboard line without an objective: {ln!r}'
-        self.out.write(f'mboss/{ID}/{rel}', flat)
+        self.out.write(f'{ROOT}/{rel}', flat)
         self.files.add(rel)
 
     def pw(self, key, name, lines):

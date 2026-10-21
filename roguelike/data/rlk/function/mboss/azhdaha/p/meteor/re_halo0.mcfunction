@@ -1,5 +1,0 @@
-scoreboard players set #aq32X mb 64
-scoreboard players operation #aq32X mb -= #azCT mb
-data modify storage rlk:mboss az.tl set value {r:28,h:30,tell:1,el:1,hold:2}
-execute store result storage rlk:mboss az.tl.tell int 1 run scoreboard players get #aq32X mb
-function rlk:mboss/azhdaha/fx/tele/halo with storage rlk:mboss az.tl

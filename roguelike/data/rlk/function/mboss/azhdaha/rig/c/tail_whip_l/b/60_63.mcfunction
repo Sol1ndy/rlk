@@ -1,4 +1,0 @@
-execute if score @s azRigT matches 60 run return run function rlk:mboss/azhdaha/rig/c/tail_whip_l/k/60
-execute if score @s azRigT matches 61 run return run function rlk:mboss/azhdaha/rig/c/tail_whip_l/k/61
-execute if score @s azRigT matches 62 run return run function rlk:mboss/azhdaha/rig/c/tail_whip_l/k/62
-execute if score @s azRigT matches 63 run return run function rlk:mboss/azhdaha/rig/c/tail_whip_l/k/63

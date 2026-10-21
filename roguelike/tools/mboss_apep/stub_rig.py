@@ -13,7 +13,7 @@ Two jobs:
 
 2. RUNTIME (emit(g), called by core.build): writes T:mboss_apep/stub_rig_manifest.json (the framework compiles the hit
    proxies, the px state sets and the capsules from it while no real rig manifest exists, cm.md 9.2) and the stand-in
-   rig F:mboss/apep/rig_stub/** with the rig API of ap_contract 0.4.9 (init spawn tick kill uninstall look_apply,
+   rig F:boss/apep/rig_stub/** with the rig API of ap_contract 0.4.9 (init spawn tick kill uninstall look_apply,
    play/<clip>, face/{player,track,set}, state/{normal,burrowed}, flash/<group>, park / unpark, stance/{crouch,upright},
    hands/<set>, look/<channel>/<look>, bright/{13,15}). Clips keep time exactly as a real rig (apRigC / apRigT; loop,
    next, hold) and apply their stance / look / hand events and visibility switches as scores, so the framework's
@@ -25,6 +25,7 @@ real rig for the clips its manifest has (api.play_fn). AP-I2 asserts that no cli
 """
 import json
 from pathlib import Path
+import mboss_lib as L
 
 HERE = Path(__file__).resolve().parent
 STUB_ID0 = 1000          # stub clip ids (never a rig id: cm.md 9.2 / change note 22.6)
@@ -32,7 +33,7 @@ STUB_ID0 = 1000          # stub clip ids (never a rig id: cm.md 9.2 / change not
 # ------------------------------------------------------------------------------------------------ rig
 BLOCK = '524c4b4d-4150-4400-8000-0000000000'
 RIG_INTS = [1380731725, 1095779328, -2147483648]
-NS = 'rlk:mboss/apep/rig/'
+NS = f'rlk:{L.fn_root_of("apep")}/rig/'           # the module root from the registry (boss/apep)
 
 # (name, region, parent, scale, brightness p1, brightness p3); order = the append-only idx table (0x00 ..), plan R4.
 PARTS = [
