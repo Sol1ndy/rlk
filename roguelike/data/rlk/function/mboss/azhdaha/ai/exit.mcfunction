@@ -6,7 +6,7 @@ scoreboard players set #azExit mb 0
 scoreboard players operation #azX mb = #azSt mb
 execute if score #azX mb matches ..-1 run scoreboard players operation #azX mb *= #cm1 mb
 scoreboard players operation #azY mb = #azFt mb
-scoreboard players remove #azY mb -48
+scoreboard players add #azY mb 48
 execute if score #azY mb matches ..0 run scoreboard players set #azY mb 0
 scoreboard players operation #azZ mb = #azX mb
 scoreboard players operation #azZ mb *= #azX mb

@@ -19,6 +19,17 @@ tail stay the patterns' business, plan 4.12 FLANK rule / anti-stall).
 """
 from . import api as A
 
+
+def sub(name, v):
+    """`scoreboard players remove name mb v` with a non-negative literal (the game rejects a negative add/remove
+    amount and the whole function then fails to load)."""
+    v = int(v)
+    return f'scoreboard players {"remove" if v >= 0 else "add"} {name} mb {abs(v)}'
+
+
+def add(name, v):
+    return sub(name, -int(v))
+
 # the balance fixer: {pattern id: {phase: {zone: w}}}. FIX balance pass (Change note 5), FAIR-21's weights in phases
 # 1-3: P1 head_near 4 -> 2 and head_mid 2 -> 1, P4 head_near 2 -> 1, P5 head_near 1 -> 0 and paw 5 -> 6, P2 flank_near
 # 1 -> 2 (toward the plan 6.2 positional row; the sim still misses it, see the change note).
@@ -93,9 +104,9 @@ def emit(core):
             f'execute if score #azDist2 mb matches {(int(A.BAND_MID * T10) + 1) ** 2}.. run scoreboard players set #azBand mb 3',
             sc('#azPawD2', 999999), sc('#azPaw', 1)]
     for k, (x, _, z) in paw.items():
-        samp += [f'scoreboard players operation #azX mb = #azSt mb', f'scoreboard players remove #azX mb {int(round(x * T10))}',
+        samp += [f'scoreboard players operation #azX mb = #azSt mb', sub('#azX', round(x * T10)),
                  'scoreboard players operation #azX mb *= #azX mb',
-                 f'scoreboard players operation #azY mb = #azFt mb', f'scoreboard players remove #azY mb {int(round(z * T10))}',
+                 f'scoreboard players operation #azY mb = #azFt mb', sub('#azY', round(z * T10)),
                  'scoreboard players operation #azY mb *= #azY mb', 'scoreboard players operation #azX mb += #azY mb',
                  f'execute if score #azX mb < #azPawD2 mb run scoreboard players set #azPaw mb {k}',
                  'execute if score #azX mb < #azPawD2 mb run scoreboard players operation #azPawD2 mb = #azX mb']
@@ -105,9 +116,9 @@ def emit(core):
     samp += [
         '# the head cone: f >= 3.6 and 10|s| <= 10 x 4 + 6 (f - 3.6) (blocks x 1000)',
         sc('#azHd', 0),
-        'scoreboard players operation #azX mb = #azF mb', f'scoreboard players remove #azX mb {hf}',
+        'scoreboard players operation #azX mb = #azF mb', sub('#azX', hf),
         f'scoreboard players set #azY mb {int(round(c1 * 10))}', 'scoreboard players operation #azX mb *= #azY mb',
-        f'scoreboard players add #azX mb {mb(c0) * 10}',
+        add('#azX', mb(c0) * 10),
         'scoreboard players operation #azY mb = #azAs mb', 'scoreboard players operation #azY mb *= #c10 mb',
         f'execute if score #azF mb matches {hf}.. if score #azY mb <= #azX mb run scoreboard players set #azHd mb 1',
         '# the zone: PAW first (2.8 b of a paw / foot, or under the body), HEAD, TAIL, FLANK',
@@ -170,7 +181,7 @@ def emit(core):
         sc('#azExit', 0),
         '# (1) |s| when behind the rump, else hypot(|s|, f - tail_f)',
         'scoreboard players operation #azX mb = #azSt mb', 'execute if score #azX mb matches ..-1 run scoreboard players operation #azX mb *= #cm1 mb',
-        'scoreboard players operation #azY mb = #azFt mb', f'scoreboard players remove #azY mb {tf10}',
+        'scoreboard players operation #azY mb = #azFt mb', sub('#azY', tf10),
         'execute if score #azY mb matches ..0 run scoreboard players set #azY mb 0',
         'scoreboard players operation #azZ mb = #azX mb', 'scoreboard players operation #azZ mb *= #azX mb',
         'scoreboard players operation #azY mb *= #azY mb', 'scoreboard players operation #azZ mb += #azY mb',

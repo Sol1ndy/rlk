@@ -33,7 +33,7 @@ scoreboard players operation #azX mb += #azY mb
 execute if score #azX mb < #azPawD2 mb run scoreboard players set #azPaw mb 1
 execute if score #azX mb < #azPawD2 mb run scoreboard players operation #azPawD2 mb = #azX mb
 scoreboard players operation #azX mb = #azSt mb
-scoreboard players remove #azX mb -32
+scoreboard players add #azX mb 32
 scoreboard players operation #azX mb *= #azX mb
 scoreboard players operation #azY mb = #azFt mb
 scoreboard players remove #azY mb 24
@@ -45,16 +45,16 @@ scoreboard players operation #azX mb = #azSt mb
 scoreboard players remove #azX mb 25
 scoreboard players operation #azX mb *= #azX mb
 scoreboard players operation #azY mb = #azFt mb
-scoreboard players remove #azY mb -29
+scoreboard players add #azY mb 29
 scoreboard players operation #azY mb *= #azY mb
 scoreboard players operation #azX mb += #azY mb
 execute if score #azX mb < #azPawD2 mb run scoreboard players set #azPaw mb 3
 execute if score #azX mb < #azPawD2 mb run scoreboard players operation #azPawD2 mb = #azX mb
 scoreboard players operation #azX mb = #azSt mb
-scoreboard players remove #azX mb -25
+scoreboard players add #azX mb 25
 scoreboard players operation #azX mb *= #azX mb
 scoreboard players operation #azY mb = #azFt mb
-scoreboard players remove #azY mb -29
+scoreboard players add #azY mb 29
 scoreboard players operation #azY mb *= #azY mb
 scoreboard players operation #azX mb += #azY mb
 execute if score #azX mb < #azPawD2 mb run scoreboard players set #azPaw mb 4
