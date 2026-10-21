@@ -1,1 +1,0 @@
-execute as @e[tag=rlk_rd_clap] run data merge entity @s {interpolation_duration:5,start_interpolation:0,transformation:{translation:[0f,2.4f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}

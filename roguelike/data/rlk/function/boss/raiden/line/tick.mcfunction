@@ -136,3 +136,6 @@ execute if score #rdLine rd matches 26 if score #rdLineT rd matches 10 run funct
 execute if score #rdLine rd matches 26 if score #rdLineT rd matches 12 run function rlk:boss/raiden/line/show {t:"이 눈으로 속세를 꿰뚫어",c:"#d7b4ff",s:8,f:0,n:8,e:0}
 execute if score #rdLine rd matches 26 if score #rdLineT rd matches 14 run function rlk:boss/raiden/line/show {t:"이 눈으로 속세를 꿰뚫어 보리",c:"#d7b4ff",s:8,f:0,n:8,e:0}
 execute if score #rdLine rd matches 26 if score #rdLineT rd matches 16 run function rlk:boss/raiden/line/show {t:"이 눈으로 속세를 꿰뚫어 보리.",c:"#d7b4ff",s:24,f:12,n:36,e:1}
+execute if score #rdLine rd matches 27 if score #rdLineT rd matches 0 run function rlk:boss/raiden/line/show {t:"어리",c:"#e6a3ff",s:9,f:0,n:9,e:0}
+execute if score #rdLine rd matches 27 if score #rdLineT rd matches 3 run function rlk:boss/raiden/line/show {t:"어리석군",c:"#e6a3ff",s:9,f:0,n:9,e:0}
+execute if score #rdLine rd matches 27 if score #rdLineT rd matches 6 run function rlk:boss/raiden/line/show {t:"어리석군.",c:"#e6a3ff",s:22,f:12,n:34,e:1}

@@ -17,3 +17,5 @@ scoreboard players set @s rdCool 16
 function rlk:boss/raiden/object/clear
 kill @e[tag=rlk_rd_dome]
 execute if score @s rdPhase matches 0 run function rlk:boss/raiden/sg/finish
+kill @e[tag=rlk_rd_tm]
+execute if score @s rdPhase matches 2 run function rlk:boss/raiden/tm/after

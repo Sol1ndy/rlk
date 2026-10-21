@@ -18,7 +18,7 @@ execute if score @s rdGo matches 1.. if score @s rdPat matches 1..28 run functio
 # Phase-0 timelines run from rdTime 0 (the choose tick); phase-2 timelines from rdTime 1 (as in the release).
 execute if score @s rdGo matches 0 if score @s rdPat matches 1..10 run function rlk:boss/raiden/normal_dispatch
 execute if score @s rdGo matches 0 if score @s rdPat matches 21..28 run function rlk:boss/raiden/normal_dispatch
-execute if score @s rdGo matches 0 if score @s rdPat matches 11..18 if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch
+execute if score @s rdGo matches 0 if score @s rdPat matches 11..20 if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch
 execute if score @s rdPat matches 99 if score @s rdTime matches 60.. run function rlk:boss/raiden/finish
 # Stuns (rdPat 98: real clone found, single eye broken, guard broken), shogun.py.
 execute if score @s rdPat matches 98 run function rlk:boss/raiden/sg/stun_tick
@@ -34,12 +34,9 @@ execute unless score @s rdPhase matches 0 if score @s rdSgFx matches 1.. run fun
 # first hidden tick; the first visible tick queues the form's idle clip unless a clip is already queued.
 scoreboard players set #rdHide rd 0
 execute if score @s rdPat matches 5 if score #rdIlStep rd matches 1..2 run scoreboard players set #rdHide rd 1
-execute if score @s rdPat matches 15 if score @s rdTime matches 26.. run scoreboard players set #rdHide rd 1
 execute if score #rdHide rd matches 1 unless score @s rdHidden matches 1 run function rlk:boss/raiden/sg/rig_hide
 execute if score #rdHide rd matches 0 if score @s rdHidden matches 1.. run function rlk:boss/raiden/sg/rig_show
 execute if score #rdHide rd matches 0 at @s run function rlk:boss/raiden/rig/tick
 execute if score #rdHide rd matches 1 at @s rotated as @s rotated ~ 0 run function rlk:boss/raiden/rig/follow
-execute if score @s rdPat matches 15 run function rlk:boss/raiden/judgment_rig/tick
-execute if score @s rdPat matches 15 if score @s rdTime matches 80..173 run function rlk:boss/raiden/camera/try_start
-execute if score @s rdPat matches 15 if score @s rdTime matches 174 run function rlk:boss/raiden/camera/release_all
+
 function rlk:boss/raiden/bars

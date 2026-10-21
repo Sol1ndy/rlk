@@ -24,3 +24,6 @@ scoreboard players set @e[tag=rlk_raiden] rdPat 0
 scoreboard players set @e[tag=rlk_raiden] rdTime 0
 scoreboard players set @e[tag=rlk_raiden] rdCool 60
 scoreboard players set @e[tag=rlk_raiden] rdAnim 0
+kill @e[tag=rlk_rd_tmp]
+function rlk:boss/raiden/hazard/clear
+execute as @e[tag=rlk_raiden,scores={rdPhase=2,rdDeath=0}] at @s run function rlk:boss/raiden/tm/idle
