@@ -1732,31 +1732,6 @@ def glyph_safe(x, y):
     return hexc('#1E5A2A') + (0.6,) if r < 0.78 else CLEAR
 
 
-# "점프!" drawn with strokes (x -1..1 across, y -0.5..0.5): ㅈ ㅓ / ㅁ (점), ㅍ / ㅡ (프), !
-JUMP_STROKES = [
-    [(-0.95, 0.42), (-0.62, 0.42)], [(-0.78, 0.42), (-0.95, 0.08)], [(-0.78, 0.42), (-0.6, 0.08)],     # ㅈ
-    [(-0.42, 0.48), (-0.42, 0.02)], [(-0.58, 0.26), (-0.42, 0.26)],                                      # ㅓ
-    [(-0.9, -0.08), (-0.48, -0.08), (-0.48, -0.46), (-0.9, -0.46), (-0.9, -0.08)],                       # ㅁ
-    [(-0.15, 0.44), (0.42, 0.44)], [(-0.05, 0.44), (-0.05, 0.1)], [(0.32, 0.44), (0.32, 0.1)],
-    [(-0.18, 0.1), (0.45, 0.1)],                                                                          # ㅍ
-    [(-0.22, -0.2), (0.5, -0.2)],                                                                         # ㅡ
-    [(0.8, 0.46), (0.8, -0.12)], [(0.8, -0.38), (0.8, -0.42)]]                                            # !
-JUMP_LINES = make_lines(JUMP_STROKES)
-
-
-def glyph_jump(x, y):
-    """The "점프!" big cue (title line, 12 t at each landslide wave - 8): bold gold-white strokes with a dark outline and
-    an amber glow, a double up-chevron underneath."""
-    yy = y / 0.5 * 0.5
-    d = lines_dist(x, yy, JUMP_LINES, 0.1)
-    if d < 0.05:
-        return mix('#FFFFFF', '#FFE8A0', d / 0.05) + (1.0,)
-    if d < 0.085:
-        return (0.1, 0.05, 0.02, 1.0)
-    g = 0.5 * math.exp(-((d - 0.085) / 0.06) ** 2)
-    return hexc('#FF8A3D') + (g,) if g > 0.04 else CLEAR
-
-
 def glyph_chevron(x, y):
     """Jump chevron (a double up-chevron; the low-band / jumpable cue and the nd 2 look on the HUD)."""
     d = 9.0

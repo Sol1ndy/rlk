@@ -347,23 +347,20 @@ def bolt(g):
         f'@e[type={MK},tag=rlk_mb_az_fld,distance=..6,sort=nearest,limit=1] feet rotated ~ 0 run tp @s ^ ^ ^-4',
         g.clamp_body(24.0)])
     g.pw(key, 'mv', ['$tp @s ^ ^ ^$(d)'])
-    # the sub-line "안전 지대 N칸" (distance to the nearest circle edge, R0 + 0.3) and the chime inside
+    # the chime when the player steps inside a safe circle (no sub-line text: user rule 10-21, no in-game tips; the
+    # "안전 지대 N칸" line of plan 4.11 was removed)
     for nm, r0 in (('dist_a', 3.2), ('dist_b', 2.8)):
-        g.pw(key, nm, [f'# The nearest safe circle from the player\'s feet: 0 inside (R0 {r0} + 0.3), else whole blocks to its edge.']
-             + [f'execute at {PLAYER} if entity @e[type={MK},tag={SAFE},distance=..{num(r0 + 0.3 + k, 2)}] run return run '
-                f'scoreboard players set #aq42D mb {k}' for k in range(0, 46)])
-    g.pw(key, 'hud', ['# Every 2 t of a marker window: the sub-line part (rlk:mboss az.subx, s2.md 16) and the chime inside.',
-                      sc('#aq42D', 99), f'execute if score #aq42J mb matches 3 run {F("p/bolt/dist_b")}',
+        g.pw(key, nm, [f'# Inside a safe circle at the player\'s feet (R0 {r0} + 0.3): #aq42D 0, else 1.', sc('#aq42D', 1),
+                       f'execute at {PLAYER} if entity @e[type={MK},tag={SAFE},distance=..{num(r0 + 0.3, 2)}] run '
+                       'scoreboard players set #aq42D mb 0'])
+    g.pw(key, 'hud', ['# Every 2 t of a marker window: the chime when the player steps inside a safe circle.',
+                      f'execute if score #aq42J mb matches 3 run {F("p/bolt/dist_b")}',
                       f'execute unless score #aq42J mb matches 3 run {F("p/bolt/dist_a")}',
                       'execute if score #aq42D mb = #aq42Dp mb run return 0',
                       'scoreboard players operation #aq42Dp mb = #aq42D mb',
                       f'execute if score #aq42D mb matches 0 run {F("p/bolt/hud_in")}',
-                      f'execute if score #aq42D mb matches 1.. run {F("p/bolt/hud_out")}', sc('#azHudQ', 1)])
-    g.pw(key, 'hud_in', ['data modify storage rlk:mboss az.subx set value [{text:"  안전 지대 안",color:"#2FCF5E",bold:true}]',
-                         f'execute unless score #aq42In mb matches 1 at {PLAYER} run {K.snd("safe_chime")}', sc('#aq42In', 1)])
-    g.pw(key, 'hud_out', ['execute store result storage rlk:mboss az.p42.n int 1 run scoreboard players get #aq42D mb',
-                          f'function {NS}p/bolt/hud_txt with storage rlk:mboss az.p42', sc('#aq42In', 0)])
-    g.pw(key, 'hud_txt', ['$data modify storage rlk:mboss az.subx set value [{text:"  안전 지대 $(n)칸",color:"#C58BFF",bold:true}]'])
+                      f'execute if score #aq42D mb matches 1.. run {sc("#aq42In", 0)}'])
+    g.pw(key, 'hud_in', [f'execute unless score #aq42In mb matches 1 at {PLAYER} run {K.snd("safe_chime")}', sc('#aq42In', 1)])
     for i in range(6):
         bt = f'rlk_mb_az_p42b{i}'
         g.pw(key, f'sky_{i}', [f'# Sky bolt {i + 1}: a disc r {SKY_R} at the player\'s feet now, tell {SKY_TELL}, 0.5 + brand, KB 2,',

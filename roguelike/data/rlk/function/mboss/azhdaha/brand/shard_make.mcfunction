@@ -10,4 +10,3 @@ tag @e[type=minecraft:item_display,tag=rlk_az_shnew] remove rlk_az_shnew
 scoreboard players operation #azShCd mb = #azClk mb
 scoreboard players add #azShCd mb 300
 function rlk:mboss/azhdaha/fx/snd/shard_spawn
-execute unless score #azShHint mb matches 1 run function rlk:mboss/azhdaha/brand/shard_hint

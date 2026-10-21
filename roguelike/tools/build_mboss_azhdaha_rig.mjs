@@ -266,15 +266,20 @@ for (const [name] of CLIP_TABLE) if (!byName[name]) throw new Error(`clip ${name
 CLIP_TABLE.forEach(([name], i) => { if (byName[name].id !== i) throw new Error(`clip ${name}: id ${byName[name].id}, the table order wants ${i}`); });
 // commands a clip runs on its own ticks (extraLines of the compiler, after the keys): the recorded body state (contract
 // §4.6; a state at t = len applies at the hand-over, i.e. on the next clip's tick 0 through its stateCalls), the follow list
-// of each hidden span (selected at its first tick; the full list again on its last tick, one tick before the parts show),
-// the list of tick 0, and the gold flare of the gold_on / gold_off events (glow/gold_*).
+// of each hidden span (selected at its first tick; the full list again two ticks before its last tick), the list of tick
+// 0, and the gold flare of the gold_on / gold_off events (glow/gold_*).
+// Why two ticks (a real-client timing, 10-21c): the key of tick b already starts the parts' scale-up toward tick b + 1
+// (interpolation 1), and the follow runs at the start of the rig tick, so a list selected at b moved the parts only at
+// b + 1 (teleport_duration 1: they arrived at b + 2). The client then showed the surfacing body for a tick or two where
+// the parts were left (the dive spot, the pre-B3 spot) and slid it over. Selected at b - 2, the follow at b - 1 moves
+// the still invisible parts, and they sit on the anchor when they scale up.
 function clipLines(c) {
   const at = new Map(), add = (t, ...l) => { if (t < 0 || t > c.len) return; if (!at.has(t)) at.set(t, []); at.get(t).push(...l); };
   const sp0 = (c.hidden || []).find(([a]) => a === 0);
   add(0, ...F.listLines(sp0 ? (sp0[2] === 'body' ? 'tail' : 'none') : 'all'));
   for (const [a, b, kind] of c.hidden || []) {
     if (a > 0) add(a, ...F.listLines(kind === 'body' ? 'tail' : 'none'));
-    if (b < c.len - 1) add(b, ...F.listLines('all'));
+    if (b < c.len - 1) add(Math.max(a, b - 2), ...F.listLines('all'));
   }
   for (const [t, st] of [...(c.state || []), ...(c.stateCalls || [])]) if (t < c.len) add(t, `function ${NS}/state/${st}`);
   for (const [ev, what] of c.gold || []) add(c.events[ev], `function ${NS}/glow/gold_${what}`);
@@ -458,7 +463,10 @@ fn('look_apply', ['# Re-applies the stored looks azRigLegs and azRigTail (after 
 const hideParts = list => list.map(n => `data merge entity ${uuidOf(n)} {start_interpolation:0,interpolation_duration:0,transformation:{scale:[0f,0f,0f]}}`);
 const nonTail = PARTS.map(([n]) => n).filter(n => !TAIL_PARTS.includes(n));
 const shadowR = r => `data merge entity ${SHADOW_UUID} {shadow_radius:${r}f}`;
-fn('state/normal', ['# Normal body state (the clip keys show every part). @s = rig anchor.', 'scoreboard players set @s azRigState 0', ...F.listLines('all'), shadowR(SHADOW_R)]);
+fn('state/normal', ['# Normal body state (the clip keys show every part). @s = rig anchor. The parts are brought to the anchor at once',
+  '# (follow_now): a module state change (a cancelled burrow, px/state normal) shows them right after this.',
+  'scoreboard players set @s azRigState 0', ...F.listLines('all'), shadowR(SHADOW_R),
+  `execute at @s rotated as @s rotated ~ 0 run function ${NS}/follow_now`]);
 fn('state/burrowed', ['# Burrowed (underground): every part at scale 0 until a clip shows them, no follow, no shadow. @s = rig anchor.', 'scoreboard players set @s azRigState 1',
   ...hideParts(PARTS.map(([n]) => n)), ...F.listLines('none'), shadowR(0)]);
 fn('state/tail_only', ['# Tail-only (the phase-3 pillar): the body parts at scale 0, the tail chain shown by the tail clips, only the tail follows. @s = rig anchor.',

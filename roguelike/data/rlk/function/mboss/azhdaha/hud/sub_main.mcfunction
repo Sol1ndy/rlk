@@ -1,14 +1,8 @@
 execute if score #azLastHit mb matches 1 run return run data modify storage rlk:mboss sub append value {text:"마지막 일격!",color:"#FFD27A",bold:true}
-execute if score #azCue mb matches 1.. run return run data modify storage rlk:mboss sub append value {text:"점프!",color:"#FFFFFF",bold:true}
-execute if score #azBur mb matches 1 if score #azTail mb matches 3 run return run data modify storage rlk:mboss sub append value {text:"꼬리만 공격할 수 있습니다",color:"#C58BFF",bold:true}
-execute if score #azBur mb matches 1 if score #azTail mb matches 4 run return run data modify storage rlk:mboss sub append value {text:"꼬리만 공격할 수 있습니다",color:"#9FE8F5",bold:true}
 execute if score #azTr mb matches 1.. if score #azTrN mb matches 1 if score #azLeg mb matches 1 run return run data modify storage rlk:mboss sub append value {text:"야타용왕이 곧 불 원소의 힘을 흡수합니다…",color:"#FF8A3D",bold:true}
 execute if score #azTr mb matches 1.. if score #azTrN mb matches 1 if score #azLeg mb matches 2 run return run data modify storage rlk:mboss sub append value {text:"야타용왕이 곧 물 원소의 힘을 흡수합니다…",color:"#4FB8FF",bold:true}
 execute if score #azTr mb matches 1.. if score #azTrN mb matches 2 if score #azTail mb matches 3 run return run data modify storage rlk:mboss sub append value {text:"야타용왕이 곧 번개 원소의 힘을 흡수합니다…",color:"#C58BFF",bold:true}
 execute if score #azTr mb matches 1.. if score #azTrN mb matches 2 if score #azTail mb matches 4 run return run data modify storage rlk:mboss sub append value {text:"야타용왕이 곧 얼음 원소의 힘을 흡수합니다…",color:"#9FE8F5",bold:true}
-execute if score #azHint mb matches 1 if score #azHintT mb > #azClk mb run return run data modify storage rlk:mboss sub append value {text:"꼬리를 높이 들면: 머리 정면으로 들어가거나 꼬리 반대편으로 넘어가세요",color:"#FFE3A8",bold:false}
-execute if score #azHint mb matches 2 if score #azHintT mb > #azClk mb run return run data modify storage rlk:mboss sub append value {text:"옆구리 금지 — 머리 정면 · 꼬리 끝",color:"#FFE3A8",bold:false}
-execute if score #azHint mb matches 3 if score #azHintT mb > #azClk mb run return run data modify storage rlk:mboss sub append value {text:"응결 결정 — 주우면 보호막",color:"#FFE3A8",bold:false}
 execute if score #azPat mb matches 1 run return run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"갈라지는 봉인의 땅",color:"#F2E2B0",bold:false}]
 execute if score #azPat mb matches 2 run return run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"바위 분쇄 충돌",color:"#F2E2B0",bold:false}]
 execute if score #azPat mb matches 3 run return run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"바위 용왕의 돌진",color:"#F2E2B0",bold:false}]

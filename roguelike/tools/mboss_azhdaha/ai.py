@@ -61,11 +61,10 @@ WALK_SPD = 0.13
 WALK_MAX = 40
 WALK_CHANCE = 25               # % of the decisions in the far band that walk first
 FAR_WALK = A.BAND_MID          # beyond 15 b
+# The boss's own voice lines (plan 4.13). No advice lines (user rule 10-21: the game shows no tips on how to fight; the
+# flank / whip / shard hints of plan 4.11 / 4.13 were removed).
 LINES = {'p2': '갈라져라! 부서져라!', 'p39': '모락스…!! 빚을 청산할 때가 왔다!', 'p7': '버러지 같은 것들! 교활한 놈!',
-         'tail': '가루로… 만들어주마! 흙으로… 돌아가라!',
-         'flank1': '옆구리는 위험합니다 — 머리 정면 · 꼬리 끝으로', 'flank1f': '옆구리는 위험합니다 — 머리 정면 · 꼬리 끝으로 · 대시로 바깥쪽으로'}
-HINTS = {1: '꼬리를 높이 들면: 머리 정면으로 들어가거나 꼬리 반대편으로 넘어가세요', 2: '옆구리 금지 — 머리 정면 · 꼬리 끝',
-         3: '응결 결정 — 주우면 보호막'}
+         'tail': '가루로… 만들어주마! 흙으로… 돌아가라!'}
 
 MB = 1000                      # milliblocks
 T10 = 10                       # tenths
@@ -259,19 +258,8 @@ def emit(core):
         f'execute if score #azA8 mb matches 1 if score #azZone mb matches 7 run return run {F("ai/flank_p8")}',
         f'return run {F("ai/flank_p2")}'])
     for pid, nm in ((6, 'p6'), (7, 'p7'), (8, 'p8'), (2, 'p2')):
-        w(f'ai/flank_{nm}', [f'# The FLANK rule picks P{pid}.', sc('#azPick', pid), F('ai/punish'), F('ai/go'), 'return 1'])
+        w(f'ai/flank_{nm}', [f'# The FLANK rule picks P{pid}.', sc('#azPick', pid), F('ai/go'), 'return 1'])
     w('ai/flank_col', ['# 10 %: the FLANK-near column.', sc('#azZone', 4), F('ai/pick_z'), 'return 1'])
-    w('ai/punish', [
-        '# A flank punishment: the first types the hint (the first feint adds "대시로 바깥쪽으로"); the second within 30 s shows',
-        '# "옆구리 금지 — 머리 정면 · 꼬리 끝" on the sub-line for 5 s.',
-        f'execute unless score #azFlN mb matches 1.. if score #azPick mb matches 6 run {g.line(LINES["flank1f"])}',
-        f'execute unless score #azFlN mb matches 1.. unless score #azPick mb matches 6 run {g.line(LINES["flank1"])}',
-        'scoreboard players add #azFlN mb 1',
-        'scoreboard players operation #azX mb = #azClk mb', 'scoreboard players operation #azX mb -= #azFlC mb',
-        f'execute if score #azFlN mb matches 2.. if score #azX mb matches ..600 run {F("ai/punish_hint")}',
-        'scoreboard players operation #azFlC mb = #azClk mb'])
-    w('ai/punish_hint', [sc('#azHint', 2), 'scoreboard players operation #azHintT mb = #azClk mb',
-                         'scoreboard players add #azHintT mb 100', sc('#azHudQ', 1)])
 
     # weighted pick
     def wt(p, ph, z):
@@ -402,12 +390,9 @@ def emit(core):
                    'execute if score #azPick mb matches 3 run scoreboard players set #azL39 mb 1',
                    'execute if score #azPick mb matches 9 run scoreboard players set #azL39 mb 1',
                    f'execute if score #azPick mb matches 7 unless score #azL7 mb = #azPh mb run {g.line(LINES["p7"])}',
-                   f'execute if score #azPick mb matches 7 unless score #azL7h mb matches 1 run {F("ai/hint_whip")}',
                    'execute if score #azPick mb matches 7 run scoreboard players operation #azL7 mb = #azPh mb',
                    f'execute if score #azPick mb matches 43..44 unless score #azLT mb matches 1 run {g.line(LINES["tail"])}',
                    'execute if score #azPick mb matches 43..44 run scoreboard players set #azLT mb 1'])
-    w('ai/hint_whip', [sc('#azL7h', 1), sc('#azHint', 1), 'scoreboard players operation #azHintT mb = #azClk mb',
-                       'scoreboard players add #azHintT mb 100', sc('#azHudQ', 1)])
 
     # requests and locks
     w('ai/req', ['# A test request (#azReq = pattern / service id; #azReqT = a start clock for services that support it).',

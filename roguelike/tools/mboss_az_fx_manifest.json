@@ -2599,7 +2599,6 @@
   "slide_lift": "T1 lift (fore + hind paw rise): heavy step and deepslate.",
   "slide_wave": "T1 waves 1-5: a wide boom (volume 2 = heard across the arena), basalt, crystal, falling stone.",
   "slide_wave6": "T1 wave 6 (the whole arena): the wave layers + the warden emerging.",
-  "jump_cue": "The \"점프!\" bell (wave - 8).",
   "absorb_roar": "Absorb roar (roar_rear): growl and roar.",
   "roar_ring": "One roar shock-dome ring.",
   "msg_chime": "The transition message: resonating bell and a charge.",
@@ -2679,8 +2678,6 @@
  "hud": {
   "functions": [
    "banner_end",
-   "cue_jump",
-   "cue_end",
    "flash_white",
    "flash_gold",
    "flash_amber",
@@ -2720,7 +2717,6 @@
   "fl_gold": "U+E811",
   "fl_amber": "U+E812",
   "fl_violet": "U+E813",
-  "jump": "U+E820",
   "chevron": "U+E821",
   "hui": "U+E822",
   "orn_l": "U+E840",

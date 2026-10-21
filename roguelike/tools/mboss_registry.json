@@ -27,7 +27,7 @@
     "start": {"x": 200.5, "y": 201.0, "z": 25.5, "yaw": 180.0, "pitch": 0.0}
   },
   "arenas": {
-    "az_cavern": {"n": 1, "theme": "az_cavern", "ver": 1, "cx": 320, "cy": 201, "cz": 8, "r": 33, "walk": 28, "safe": 26,
+    "az_cavern": {"n": 1, "theme": "az_cavern", "ver": 2, "cx": 320, "cy": 201, "cz": 8, "r": 33, "walk": 28, "safe": 26,
                   "start": {"x": 320.5, "y": 201.0, "z": 34.5, "yaw": 180.0, "pitch": 0.0},
                   "box": {"x0": 280, "y0": 190, "z0": -32, "x1": 360, "y1": 240, "z1": 48},
                   "looks": ["default"], "oob": {"y0": 198, "y1": 237}},

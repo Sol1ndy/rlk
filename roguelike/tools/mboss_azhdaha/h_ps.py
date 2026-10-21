@@ -52,7 +52,7 @@ def slide_waves():
         big = k == 6
         out.append(dict(k=k, ev=e, strike=SLIDE_LEAD + e, r0=4.0, r1=30.0 if big else 18.0, spd=4.0 if big else 3.0,
                         band=4.5 if big else 3.5, dmg='t1_wave6' if big else 't1_wave', paws=_PAW[k],
-                        tell_t=tell_t, tell_src=src, cue=10 if big else 8))
+                        tell_t=tell_t, tell_src=src))
     return out
 
 

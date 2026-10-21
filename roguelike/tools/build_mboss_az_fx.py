@@ -16,8 +16,8 @@ Parts, all regenerated on every run:
      lanes), heptagram, hexagram, starseal, seal8, mask_wash + safe_rim / safe_beam / safe_end, crater, halo; the
      field pool (field, strip, field_end, field_clear).
   3. Vanilla sound recipes fx/snd/<name> (+ element families), with the per-layer minimum volume rule of mboss_lib.
-  4. The HUD: font rlk:mboss_az (U+E800-E8FF): badges, element icons, flashes, the "점프!" cue, the 回 mark, banner
-     ornaments; the transition / absorb / brand banners and the title-line cues.
+  4. The HUD: font rlk:mboss_az (U+E800-E8FF): badges, element icons, flashes, the 回 mark, banner ornaments; the
+     transition / absorb / brand banners and the title-line flashes (no jump prompt: user 10-21).
   5. Presets fx/p/<name> (+ element families fx/p/<name>/<el> with a dispatcher), prop looks fx/prop/<name>, the
      in-game test functions and one demo per plan §5 pattern on a vanilla stand-in anchor.
 
@@ -382,7 +382,6 @@ GLYPHS = {
     'fl_gold':   (0xE811, ('#F9DFAD', 0.55), (16, 9), 144, 69),
     'fl_amber':  (0xE812, ('#E6A55F', 0.45), (16, 9), 144, 69),
     'fl_violet': (0xE813, ('#8F64E8', 0.45), (16, 9), 144, 69),
-    'jump':      (0xE820, P.glyph_jump, (128, 64), 32, 22),
     'chevron':   (0xE821, P.glyph_chevron, (36, 36), 9, 8),
     'hui':       (0xE822, P.glyph_hui, (36, 36), 9, 8),
     'orn_l':     (0xE840, P.glyph_orn(1), (64, 32), 8, 7),
@@ -1043,7 +1042,6 @@ SOUNDS = {
                     [('entity.generic.explode', 2.0, 0.5), ('block.basalt.break', 1.0, 0.6),
                      ('block.amethyst_cluster.break', 1.0, 0.7), ('block.pointed_dripstone.land', 1.0, 0.8),
                      ('entity.warden.emerge', 1.0, 0.8)]),
-    'jump_cue': ('The "점프!" bell (wave - 8).', [('block.note_block.bell', 1.0, 1.2)]),
     # T2 / T3 absorbs, roar, the message
     'absorb_roar': ('Absorb roar (roar_rear): growl and roar.',
                     [('entity.ender_dragon.growl', 1.0, 0.55), ('entity.ravager.roar', 1.0, 0.5)]),
@@ -3070,7 +3068,7 @@ def sounds(W):
 
 
 # ----------------------------------------------------------------------------- HUD
-HUD_FUNCS = ('banner_end', 'cue_jump', 'cue_end', 'flash_white', 'flash_gold', 'flash_amber', 'flash_violet', 'flash_end',
+HUD_FUNCS = ('banner_end', 'flash_white', 'flash_gold', 'flash_amber', 'flash_violet', 'flash_end',
              'clear')
 HFAM = ('banner_tr', 'banner_ab', 'banner_ab2', 'banner_brand')
 TXT = '#F4E8CD'
@@ -3117,23 +3115,16 @@ def hud_funcs(W):
                             'execute unless score #akPe mb matches 1..4 run return 0'] + static_dispatch(f'{H}{kind}', 1, 4))
     W.w('hud/banner_end', ['# Drop a banner early (cancel, cut-scene end).', 'title @a[tag=player] actionbar ""',
                            'scoreboard players set @a[tag=player] hudHold 0'])
-    W.w('hud/cue_jump', ['# The "점프!" cue on the title line for 12 t (landslide waves - 8; the kit\'s big glyph); vBig rests',
-                         '# the F5 crosshair title. Pair with snd/jump_cue.',
-                         'scoreboard players set @a[tag=player] vBig 14',
-                         'title @a[tag=player] times 0 9 3',
-                         'title @a[tag=player] title [' + gl('jump', ',shadow_color:0') + ']'])
-    W.w('hud/cue_end', ['# Drop the jump cue at once.', 'scoreboard players set @a[tag=player] vBig 0',
-                        'title @a[tag=player] times 0 1 2', 'title @a[tag=player] title ""'])
     for name, g, t in (('flash_white', 'fl_white', '0 2 5'), ('flash_gold', 'fl_gold', '1 3 8'),
                        ('flash_amber', 'fl_amber', '0 3 8'), ('flash_violet', 'fl_violet', '1 4 9')):
         W.w(f'hud/{name}', ['# Full-screen flat flash on the title line (any view mode); vBig rests the F5 crosshair.',
                             'scoreboard players set @a[tag=player] vBig 16',
                             f'title @a[tag=player] times {t}',
                             'title @a[tag=player] title [' + gl(g, ',shadow_color:0') + ',' + gls(SP_NEG1) + ']'])
-    W.w('hud/flash_end', ['# Drop a title overlay (flash, jump cue) at once (pause, cancel).',
+    W.w('hud/flash_end', ['# Drop a title overlay (flash) at once (pause, cancel).',
                           'scoreboard players set @a[tag=player] vBig 0',
                           'title @a[tag=player] times 0 1 2', 'title @a[tag=player] title ""'])
-    W.w('hud/clear', ['# Every banner, cue and flash off (fight end, death, abort, uninstall).',
+    W.w('hud/clear', ['# Every banner and flash off (fight end, death, abort, uninstall).',
                       'title @a[tag=player] actionbar ""', 'scoreboard players set @a[tag=player] hudHold 0',
                       'scoreboard players set @a[tag=player] vBig 0', 'title @a[tag=player] times 0 1 2',
                       'title @a[tag=player] title ""'])
@@ -3359,7 +3350,6 @@ def _demo_t1():
     for k, (s, r1, w, dur, _c) in enumerate(waves):
         ev += [(s - 20, 'a', tele_wave(k, 4.0, r1, w, 20, dur, G, 2, 2)),
                (s - 1, 'a', fxe('front', G, r0=4.0, r1=r1, w=w, dur=dur)),
-               (s - 8, 'p', hud('cue_jump')), (s - 8, 'p', snd('jump_cue')),
                (s, 'a', snd('slide_wave6' if k == 5 else 'slide_wave'))]
     return 203, ev
 
@@ -3587,8 +3577,8 @@ def tests(W):
                         ''.join(f',{{"text":"[{n}/{e}] ","color":"#C8D8F0","click_event":{{"action":"run_command",'
                                 f'"command":"/execute at @s run function {FN}snd/{n}/{e}"}}}}'
                                 for n, (_r, mem) in SFAM.items() for e in mem) + ']'])
-    W.w('test/hud', ['# The banners, the jump cue and a flash in sequence (run during a fight to see them over the HUD).',
-                     hude('banner_tr', 2), hud('cue_jump')])
+    W.w('test/hud', ['# The banners and a flash in sequence (run during a fight to see them over the HUD).',
+                     hude('banner_tr', 2), hud('flash_gold')])
     W.w('test/presets', ['# Click through the presets (tellraw list; family presets in Geo, macro presets with test values).',
                          'tellraw @s [{"text":"야타용왕 fx: ","color":"#F2B53A"}' +
                          ''.join(f',{{"text":"[{n}] ","color":"#F5E0A0","click_event":{{"action":"run_command",'

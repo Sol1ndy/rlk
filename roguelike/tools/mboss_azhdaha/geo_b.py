@@ -451,9 +451,12 @@ def emit_burrow(g):
     tl.at(t_r + c['rock_tell'], f'execute at @e[type={MK},tag=rlk_mb_az_p9rk] run {g.fx("dust")}',
           f'execute at @e[type={MK},tag=rlk_mb_az_p9rk] run {g.snd("burrow_rock")}',
           'kill @e[tag=rlk_mb_az_p9rp]', 'kill @e[tag=rlk_mb_az_p9rk]')
-    # --- surfacing rushes: the breach point 6 b from the player toward the anchor (rush 2 with the edge flag: the
-    #     centre), the lane toward the player; the mound / bulge / rumble there for 20 t (the readable tell), then
-    #     burrow_breach so its `hit` is the first hit; the disc r 3.0 rides the body 20 t at 0.6 b/t
+    # --- underground rushes: the breach point 6 b from the player toward the anchor (rush 2 with the edge flag: the
+    #     centre), the lane toward the player; the mound / bulge / rumble there for 20 t (the readable tell), then the
+    #     burst at the breach clock's `burst` and the disc r 3.0 riding the hidden body 20 t at 0.6 b/t from its `hit`.
+    #     The body stays underground (burrow_travel: every part at scale 0): no half-surfaced boss (user 10-21: the
+    #     burrow_breach surfacing read as the boss stuck half-buried); the travelling dust mound and the earth thrown up
+    #     along the lane are the visible threat (plan Change note 1 requirement for the rushes).
     g.pw(key, 'rush_pick', [
         '# @s = body: the breach point (rush #aq9N) and the rush hazard there (own group, tell 20, 21 t of hits)',
         'kill @e[tag=rlk_mb_az_p9b]',
@@ -471,11 +474,14 @@ def emit_burrow(g):
     g.pw(key, 'rush_tell', ['# At the breach point during the 20-t tell: the bulge / dust plume and the rumble',
                             g.fx('mound'), g.fx('dust'), g.sound('block.rooted_dirt.break', 1.0, 0.5),
                             g.sound('entity.warden.dig', 0.8, 0.5)])
-    g.pw(key, 'rush_go', ['# @s = body: to the breach point, facing the lane; burrow_breach (hidden until its burst)',
-                          f'execute at {sel("b")} rotated as {sel("b")} run tp @s ~ ~ ~ ~ 0', g.play('burrow_breach')])
-    g.pw(key, 'rush_step', ['# @s = body: 0.6 b/t along the lane (inside the arena), the rush disc rides the body',
+    g.pw(key, 'rush_go', ['# @s = body (hidden, burrow_travel): to the breach point, facing the lane. The rig stays underground.',
+                          f'execute at {sel("b")} rotated as {sel("b")} run tp @s ~ ~ ~ ~ 0'])
+    g.pw(key, 'rush_step', ['# @s = body (hidden): 0.6 b/t along the lane (inside the arena), the rush disc rides the body;',
+                            '# the travelling mound: earth thrown up over the body every tick (vanilla particles, no fx cards)',
                             f'execute at @s positioned ^ ^ ^{c["rush_spd"]} if function rlk:mboss/mv/ok run tp @s ~ ~ ~',
                             f'execute at @s as @e[type={MK},tag=rlk_mb_az_p9rush] run tp @s ~ ~ ~',
+                            'execute at @s run ' + g.particle('block{block_state:"minecraft:rooted_dirt"}', '~ ~0.3 ~', (1.1, 0.25, 1.1), 0.15, 14),
+                            'execute at @s run ' + g.particle('block{block_state:"minecraft:tuff"}', '~ ~0.2 ~', (0.9, 0.2, 0.9), 0.1, 8),
                             '# (FIX STATE-2 / STATE-14) the dust trail every other tick (3 cards each, life 14)',
                             'scoreboard players operation #aq9Q mb = #azPT mb', 'scoreboard players operation #aq9Q mb %= #c2 mb',
                             f'execute if score #aq9Q mb matches 0 at @s run {g.fx("dust")}'])

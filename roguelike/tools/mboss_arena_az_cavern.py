@@ -5,8 +5,9 @@ writes files. The arena generator (tools/build_mboss_arena.py) imports `arena_la
 generator (tools/build_cboss_rooms.py) imports `entrance_layout`; the boss module imports `props` and `POINTS`.
 
 The cavern (plan §2.2): a dark rock bed under the Dragon-Queller tree. Walk disc r 28 of full opaque floor blocks at
-y 200 (tuff, polished tuff, smooth basalt, mud, packed mud, andesite pebbles, mossy cobblestone at the rim, a smooth-basalt
-rock bed under the centre and yellow-terracotta Geo cracks) over a solid bowl (y 192..199 under r <= 20, the burrow sink
+y 200 (tuff, polished tuff, smooth basalt, muddy mangrove roots (never mud: no partial-height floor), packed mud,
+andesite pebbles, mossy cobblestone at the rim, a smooth-basalt rock bed under the centre and yellow-terracotta Geo
+cracks) over a solid bowl (y 192..199 under r <= 20, the burrow sink
 depth); a rough rock wall 28 < d <= 33 of tilted tuff / deepslate / smooth-basalt / dripstone strata whose face never
 steps back below y 208 (no ledge a player can climb, no reachable cell beyond d 29.2, so nobody walks out of the oob
 band) with the barrier cap filling every open ring cell at y 208..215; a vault (apex ~238, y 214 at r 30) roughened by
@@ -52,6 +53,11 @@ LIGHT = 'minecraft:light[level=9]'
 SENTINEL = ((CX, 195, CZ), 'minecraft:smooth_basalt')
 
 B = 'minecraft:'
+# The dark wet floor patches: a FULL block. Never minecraft:mud (collision top 14/16): a body standing on it has its
+# feet 0.125 below the floor plane, so a horizontal move onto a neighbouring full block (the player dash samples its
+# faces from feet + 0.2) put the feet inside that block and the entity fell through it (the avatar sunk one block, legs
+# in the floor), and the push / knockback / pull steps (feet + 0.0001) refused every move from it (10-21c).
+MUD = 'muddy_mangrove_roots'
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -422,7 +428,7 @@ def _floor(x, z, d):
     if n1 > 0.74:
         return B + 'smooth_basalt'
     if n1 > 0.58 and n2 > 0.62:
-        return B + 'mud'
+        return B + MUD
     if n2 < 0.1:
         return B + 'packed_mud'
     if n1 > 0.45:
@@ -691,12 +697,12 @@ def _build_full():
                 blocks[c] = B + 'water'
             else:
                 h = _mix(x, z, 151)
-                blocks[c] = B + ('mossy_cobblestone' if h < 0.5 else 'mud' if h < 0.75 else 'tuff')
+                blocks[c] = B + ('mossy_cobblestone' if h < 0.5 else MUD if h < 0.75 else 'tuff')
     for (x, z), (d, b) in pol.items():         # pool edges: wet mud / moss on the walk side
         if d <= WALK and any(blocks.get((x + dx, 200, z + dz)) == B + 'water'
                              for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1))):
             if (x, z) not in CRACKS:
-                blocks[(x, 200, z)] = B + ('mud' if _mix(x, z, 152) < 0.5 else 'mossy_cobblestone')
+                blocks[(x, 200, z)] = B + (MUD if _mix(x, z, 152) < 0.5 else 'mossy_cobblestone')
 
     # 10. rock materials: exposed rock gets the strata, hidden rock plain tuff
     nonop = {B + n for n in NON_OPAQUE}
