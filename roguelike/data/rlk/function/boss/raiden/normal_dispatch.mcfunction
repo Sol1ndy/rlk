@@ -5,3 +5,14 @@ execute if score @s rdPat matches 4 run function rlk:boss/raiden/patterns/4
 execute if score @s rdPat matches 5 run function rlk:boss/raiden/patterns/5
 execute if score @s rdPat matches 6 run function rlk:boss/raiden/patterns/6
 execute if score @s rdPat matches 7 run function rlk:boss/raiden/patterns/7
+execute if score @s rdPat matches 8 run function rlk:boss/raiden/patterns/8
+execute if score @s rdPat matches 9 run function rlk:boss/raiden/patterns/9
+execute if score @s rdPat matches 10 run function rlk:boss/raiden/patterns/10
+execute if score @s rdPat matches 21 run function rlk:boss/raiden/patterns/21
+execute if score @s rdPat matches 22 run function rlk:boss/raiden/patterns/22
+execute if score @s rdPat matches 23 run function rlk:boss/raiden/patterns/23
+execute if score @s rdPat matches 24 run function rlk:boss/raiden/patterns/24
+execute if score @s rdPat matches 25 run function rlk:boss/raiden/patterns/25
+execute if score @s rdPat matches 26 run function rlk:boss/raiden/patterns/26
+execute if score @s rdPat matches 27 run function rlk:boss/raiden/patterns/27
+execute if score @s rdPat matches 28 run function rlk:boss/raiden/patterns/28

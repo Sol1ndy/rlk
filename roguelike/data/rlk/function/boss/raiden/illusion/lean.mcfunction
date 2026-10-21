@@ -1,1 +1,0 @@
-execute as @e[type=minecraft:item_display,tag=rlk_rd_ilvis] run data merge entity @s {interpolation_duration:3,start_interpolation:0,transformation:{translation:[0.000000f,1.164355f,0.290306f],left_rotation:[0.121869f,0.000000f,0.000000f,0.992546f],scale:[2.400000f,2.400000f,2.400000f],right_rotation:[0f,0f,0f,1f]}}

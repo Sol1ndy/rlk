@@ -1,4 +1,5 @@
-# rdPat 5 without illusion state (e.g. state reset mid-pattern): reform and move on.
+# rdPat 5 without clone state: reappear where she is and move on.
 function rlk:boss/raiden/illusion/reset
-execute at @s run function rlk:boss/raiden/illusion/reform
+function rlk:boss/raiden/rig/play/blink_in
+execute at @s run function rlk:boss/raiden/fx/blink_in
 function rlk:boss/raiden/finish
