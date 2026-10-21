@@ -1,4 +1,4 @@
-function rlk:boss/raiden/cleanup
+function rlk:boss/raiden/uninstall
 kill @e[tag=rlk_raiden]
 # 중간보스: 전투 정리 · 보스바 · 점수 · 경기장 청크 고정 해제
 function rlk:mboss/uninstall
