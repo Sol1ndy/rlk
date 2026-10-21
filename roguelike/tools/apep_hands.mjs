@@ -311,11 +311,15 @@ const RUNS = {f: ['+x', '-z'], b: ['-x', '+z'], l: ['+z', '+x'], r: ['+z', '-x']
 function petalFoot(k, back, curl) {
   // k = size (B 1.0, C 0.83); back = the petals point back (+Z: the rear feet); curl = cupped up (the lifted foot)
   // the core sides read as the petals' dark contour from low views (v2 f2076: dark outlines), not as pale steps
-  const L = 1.04 * k, edge = edgeTile('h_edge_p1l', PAL.p1_line, .35, .6, 'p1'), els = [];
+  const L = (curl ? 1.04 : 1.2) * k, edge = edgeTile('h_edge_p1l', PAL.p1_line, .35, .6, 'p1'), els = [];   // AP-R3b: 1.04 -> 1.2 (the feet read small beside the leg's root base)
   const fwd = back ? 'b' : 'f', fr = [], cz = (back ? .2 : -.2) * k;
   // [run, phi (deg, toward +a), W, mid-plane lift of the root (layering)]
   // (the three forward petals share a frame: distinct root lifts keep their overlapping roots from z-fighting)
-  const P = [[fwd, 0, .34, .075], [fwd, 40, .3, .015], [fwd, -40, .3, .037], ['l', back ? 24 : -24, .27, 0], ['r', back ? 24 : -24, .27, .022]];
+  // AP-R3b: the petals ~22 % broader (v2 f2076 / f2040: big rounded closed-lotus petals; at game distance the R2 petals
+  // read as a small spiky crown round the ankle)
+  // (the cupped foot of the lifted leg keeps the R2 size: its upright petals would overlap where the lifts cannot part them)
+  const P = curl ? [[fwd, 0, .34, .075], [fwd, 40, .3, .015], [fwd, -40, .3, .037], ['l', back ? 24 : -24, .27, 0], ['r', back ? 24 : -24, .27, .022]]
+    : [[fwd, 0, .42, .075], [fwd, 40, .37, .015], [fwd, -40, .37, .037], ['l', back ? 24 : -24, .33, 0], ['r', back ? 24 : -24, .33, .022]];
   for (const [run, phiDeg, W0, dy] of P) {
     const phi = phiDeg * D2R, W = W0 * k, cs = Math.cos(phi);
     const sd = petalShape(L, W, phi), ext = L * cs + W * Math.abs(Math.sin(phi)) + .04;
@@ -336,11 +340,14 @@ function petalFoot(k, back, curl) {
     let drop = 0, low = 0; for (let i = 0; i < bands.length; i++) { const L_ = (i + 1 < bands.length ? bands[i + 1].s : ext) - bands[i].s; drop += L_ * Math.sin(bands[i].ang * D2R); low = Math.max(low, drop); }
     const y = curl ? -.12 + dy : -.38 + .06 + low + dy;
     const Uu = mirrorU ? sc(AXV(U), -1) : U;
-    els.push(...sheet({o: [0, y, cz], U: Uu, R, N: '+y', rect, sd: sdS, tex, edge, bands, seed: 421 + els.length, frames: fr, cell: .08, inset: 1.0}));
+    // AP-R3b: the broader petals overlap further, so each petal also steps along its run by its lift (the curled foot's
+    // upright bands, where a lift in y no longer separates the planes)
+    const st = sc(AXV(R), curl ? 0 : dy * .6), o = [st[0], y + st[1], cz + st[2]];
+    els.push(...sheet({o, U: Uu, R, N: '+y', rect, sd: sdS, tex, edge, bands, seed: 421 + els.length, frames: fr, cell: .08, inset: 1.0}));
     // the raised centre ridge (the petal's convex middle and its vein): a narrow blade laid along the petal's axis
     const sdC = tipShape(.8 * L, .32 * W, phiDeg < 0 ? -phi : phi);
     const texC = sheetSprite(name + '_c', rect, petalPaint(sdC, phiDeg < 0 ? {...ax, da: -ax.da, L: .8 * L} : {...ax, L: .8 * L}, {seed: k < 1 ? 'd' : 'c', base: .02, root: .3, soft: true}), 32, 'p1');
-    els.push(...sheet({o: [0, y, cz], U: Uu, R, N: '+y', rect, sd: sdC, tex: texC, edge: edgeTile('h_edge_p1', PAL.p1_bark, .3, .55, 'p1'), cell: .1, seed: 471 + els.length, bands: bands.map(b => ({...b, half: .022, off: b.half + .026}))}));
+    els.push(...sheet({o, U: Uu, R, N: '+y', rect, sd: sdC, tex: texC, edge: edgeTile('h_edge_p1', PAL.p1_bark, .3, .55, 'p1'), cell: .1, seed: 471 + els.length, bands: bands.map(b => ({...b, half: .022, off: b.half + .026}))}));
   }
   // the ankle: a pale palm disc closing the centre between the petal roots, a dark collar ring under the cream-gold cone
   const cc = cz + (back ? .14 : -.14) * k;

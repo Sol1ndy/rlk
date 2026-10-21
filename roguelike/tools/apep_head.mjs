@@ -491,6 +491,12 @@ function hoodP3() {
   P3_ROWS.forEach((row, i) => els.push(...plateRing({...row, half: .045, edge: 'hd_p3_hedge', name: `hd_p3_hp${i}`, forms: 'p3',
     paintOf: k => ((k === 1 || k === 2) && i === 4 ? ['l', P3PL(true, false)] : (k === 1 || k === 2) && i > 0 && i < 4 ? ['g', P3PL(false, (k === 1 && i === 1) || (k === 2 && i === 3), 1)] : ['', P3PL(false, k === 0 && i === 2)])})));
   els.push(...loft('z', P3_CORE, {tex: 'hd_p3_lining', caps: '+', seed: 861, skip: (k, th) => Math.sin(th * D2R) < -.3}));
+  // AP-R3b: the beak keel. In the crawl (CROUCH) the visor frame hangs under the carapace front as a tilted lower jaw and
+  // the gap between them read as an open maw; this keel (the lower half of a loft from z -1.2 to the tip) closes it from
+  // the carapace's lower edge down to just above the frame, so the crawl front is one closed beak (v6 f90). Upright it
+  // lies behind the frame's top band, above the mask top (z <= -1.2 is H >= 7.95), so the face window stays clear.
+  const KEEL = [[-1.2, .66, -.88, .48], [-1.45, .58, -.9, .52], [-1.7, .42, -.92, .6], [-1.92, .38, -.92, .56], [-2.1, .06, -.92, .2]];
+  els.push(...loft('z', KEEL.map(([a, rx, cy, ry]) => ({a, r: [rx, .06, rx, ry], c: [0, cy]})), {tex: 'hd_p3_lining', seed: 867, skip: (k, th) => Math.sin(th * D2R) > -.15}));
   // the veil frame round the mask (>= 0.2 b in front of it), the horns behind its upper corners, the brow emeralds
   els.push(...frontPlate('hd_p3_arch', -1.16, 7.6, archSd, archPaint, {box: [-1.1, 1.1, 6.9, 8.6]}));
   const wall = slab({plane: 'x', at: 1.02, rect: WALL_R, sd: wallSd, half: .03, sprite: card('hd_p3_wall', WALL_R, wallPaint, 32, 'p3'), edge: 'hd_p3_lining', cell: .07});
@@ -577,17 +583,20 @@ const crownLeafPaint = ({t, s, d}) => {
 function crownP3() {
   const F = FORM_POINTS.crown.p3[1], fr = partFrame('crown', 'p3', oU), Fw = add(fr.O, [0, 1, 2].map(j => fr.ax[0][j] * F[0] + fr.ax[1][j] * F[1] + fr.ax[2][j] * F[2]));
   const els = [...ball(F, .19, 'p3_bud', {seed: 861, n: 8})];
-  const leaf = (tag, phi, lean, L, w0) => {
+  const leaf = (tag, phi, lean, L, w0, r0 = .1) => {
     const dir = [Math.sin(phi * D2R) * Math.cos(lean * D2R), Math.cos(phi * D2R) * Math.cos(lean * D2R), Math.sin(lean * D2R)];   // world; lean > 0 = back
     const side = [Math.cos(phi * D2R), -Math.sin(phi * D2R), 0];
     const P = k => add(Fw, dir.map((v, j) => v * k));
-    const pts = [P(.1), add(P(.1 + L * .5), side.map(v => v * .03 * Math.sign(phi || 1))), add(P(.1 + L), side.map(v => v * .1 * Math.sign(phi || 1)))];
+    const pts = [P(r0), add(P(r0 + L * .5), side.map(v => v * .03 * Math.sign(phi || 1))), add(P(r0 + L), side.map(v => v * .1 * Math.sign(phi || 1)))];
     const w = t => w0 * Math.pow(Math.sin(Math.PI * Math.min(1, .06 + t * .94)), .85) + .008;
     const nrm = [dir[1] * side[2] - dir[2] * side[1], dir[2] * side[0] - dir[0] * side[2], dir[0] * side[1] - dir[1] * side[0]];   // across the leaf plane
     els.push(...ribbon(`hd_p3_crown_${tag}`, fr, pts, w, {face: () => nrm, paint: crownLeafPaint, ppb: 56, forms: 'p3', half: .018, edge: 'p3_gold'}));
   };
-  [-96, -72, -48, -24, 0, 24, 48, 72, 96].forEach((phi, i) => leaf(`f${i}`, phi, -15, Math.abs(phi) > 50 ? .9 : Math.abs(phi) > 20 ? .82 : .76, .13));
-  [-84, -60, -36, 36, 60, 84].forEach((phi, i) => leaf(`b${i}`, phi, 35, Math.abs(phi) > 70 ? .82 : .76, .11));
+  // AP-R3b: the front layer (nine leaves leaning toward the face) is gone: upright the visor frame hid it, and in the crawl
+  // (the head pitched down under the carapace) it stuck out under the carapace front as a fringe of gold fangs (v6 f90
+  // shows a closed beak). The back layer leans further back (the middle pair 55 deg), so in the crawl it tucks up inside the
+  // carapace instead of poking out past its tip, and upright it rises over the hood (w2 f436)
+  [-84, -60, -40, 40, 60, 84].forEach((phi, i) => leaf(`b${i}`, phi, Math.abs(phi) < 50 ? 55 : 40, Math.abs(phi) > 70 ? .86 : .8, .12, Math.abs(phi) < 50 ? .17 : .1));   // the middle pair starts off the midline (their cards share a plane)
   return els;
 }
 // ================================================= ribbons (strands designed in world space) ===================================
