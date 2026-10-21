@@ -1,4 +1,4 @@
-# STUB (AP-CORE, ap_contract 1.6): the revival stage; AP-REV replaces this file.
-# E: the Heart (egg look) hangs 9 b above the centre in the vine hand (a display; rlk_mb_aux).
-kill @e[tag=rlk_mb_ap_heartd]
-summon minecraft:item_display 440 210 8 {Tags:["rlk_room","rlk_mb_aux","rlk_mb_ap_heartd"],billboard:"fixed",brightness:{block:15,sky:15},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[2f,2f,2f]},item:{id:"minecraft:sniffer_egg",count:1}}
+# AP-REV (plan 7.5-7.7, 3.4): the revival stage.
+# E t0 (seq/entrance/setup): the Heart's entrance state at the centre: the upright egg (scale 0.7) held by
+# the vine hand 9 b up, the cradle under the floor (summons the marker rlk_mb_ap_heart too).
+execute positioned 440 201 8 rotated 0 0 run function rlk:boss/apep/om/heart/spawn/entrance

@@ -1,4 +1,3 @@
-# STUB (AP-CORE, ap_contract 1.6): the revival stage; AP-REV replaces this file.
-# The Heart marker and its displays go (idempotent, any executor).
-kill @e[type=minecraft:marker,tag=rlk_mb_ap_heart]
-kill @e[tag=rlk_mb_ap_heartd]
+# AP-REV (plan 7.5-7.7, 3.4): the revival stage.
+# The Heart marker and every Heart display go (idempotent, any executor).
+function rlk:boss/apep/om/heart/kill
