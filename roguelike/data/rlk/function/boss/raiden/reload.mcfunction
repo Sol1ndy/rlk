@@ -1,4 +1,4 @@
-# A reload cancels pending danger volumes; it never refills boss health.
+# A reload cancels pending danger volumes; it never refills boss health (the weapon and the switch after-effect stay).
 execute if score @s rdDeath matches 1 run return run kill @s
 scoreboard players set @s rdDeath 0
 scoreboard players set @s rdDeathTime 0
@@ -18,4 +18,6 @@ scoreboard players set @s rdRage 0
 scoreboard players set @s rdCool 40
 scoreboard players set @s rdAnim 0
 scoreboard players set @s rdHitCD 0
+function rlk:boss/raiden/sg/reload
 function rlk:boss/raiden/rig/spawn
+function rlk:boss/raiden/sg/look

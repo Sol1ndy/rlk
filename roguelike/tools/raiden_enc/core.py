@@ -1,7 +1,9 @@
 """Raiden encounter core: helpers, balance constants, lifecycle, AI host (bag/choose/finish), damage in/out,
 objects, blink helpers and the boss test commands. Owner: S2-SHOGUN (plan rd/plan.md E.0); the phase modules
 (shogun.py, tenma.py) hand their bag, reach and tick/choose hooks in as data, so this file never names a phase-2 move.
-Split out of the old monolithic build_raiden_encounter.py by S0 with byte-identical output.
+Split out of the old monolithic build_raiden_encounter.py by S0 with byte-identical output; S2-SHOGUN: no walking
+(idle 16 t, blink-only close-in), phase-0 timelines run from rdTime 0, the rig hides through rig/state/hidden, and the
+phase-0 AI (shogun.py, F:boss/raiden/sg/) is called through the sg/* hooks.
 """
 from pathlib import Path
 
@@ -49,15 +51,12 @@ EXHAUST = 300
 # Transformation: scatter to the centre, then the transformation burst/clip.
 TRANSFORM_FX = 1
 TRANSFORM_LEN = 52
-# Close-range patterns and their reach: chosen farther than `start` blocks from the
-# player, she dashes at them (or scatter-blinks in front of them beyond CLOSE_BLINK)
-# until within `stop`, and only then starts; a dash pinned on the arena rim or timing out
-# scatter-blinks beside the player instead. Ranged patterns (3 뇌명, 4, 6, 7, 12-15) start
-# where she stands; 18 발도 돌진 reaches about 20 blocks (its line, or dash + sweep).
-# The per-pattern reach tables are REACH in shogun.py / tenma.py (merged in build()).
-CLOSE_BLINK, CLOSE_MAX, CLOSE_STEP = 18, 45, (0.55, 0.65)
+# Close-range patterns and their reach: chosen farther than `start` blocks from the player (or nearer than
+# REACH_MIN), she blinks to REACH_SPOT blocks in front of them (no walking, plan A.2) before the clock starts.
+# The per-pattern reach tables are REACH / REACH_SPOT / REACH_MIN in shogun.py / tenma.py (merged in build()); the
+# Shogun rows blink inside their own timelines instead.
 
-objectives = ['rd','rdPhase','rdPat','rdTime','rdAnim','rdRage','rdShield','rdCycle','rdCool','rdPrev','rdTurns','rdHitCD','rdObjKind','rdObjId','rdObjHP','rdReal','rdOAge','rdPTime','rdShape','rdWind','rdHAge','rdHLife','rdDamage','rdHHit','rdFX','rdFZ','rdHId','rdVId','rdUltUsed','rdWalk','rdWalkDir','rdBlink','rdCam','rdDeath','rdDeathTime','rdHidden','rdGo','rdNext']
+objectives = ['rd','rdPhase','rdPat','rdTime','rdAnim','rdRage','rdShield','rdCycle','rdCool','rdPrev','rdTurns','rdHitCD','rdObjKind','rdObjId','rdObjHP','rdReal','rdOAge','rdPTime','rdShape','rdWind','rdHAge','rdHLife','rdDamage','rdHHit','rdFX','rdFZ','rdHId','rdVId','rdUltUsed','rdWalk','rdWalkDir','rdBlink','rdCam','rdDeath','rdDeathTime','rdHidden','rdGo','rdNext','rdWpn']
 
 # ---- Pattern timeline helpers (shogun.py / tenma.py) -----------------------------
 patterns = {}  # id -> timeline lines, filled by shogun.build() / tenma.build()
@@ -96,8 +95,14 @@ def _rng(r): return r.replace('..', '~')
 def build(shogun, tenma):
     """Write the core functions. shogun / tenma: the phase modules. Data they hand in (M1 seams, rd/s2_notes.md §3):
     BAG, REACH, TICK_HIDE, TICK_TAIL, CHOOSE_RULES (tenma), IDS (pattern id ranges of the phase, e.g. ['1..7']),
-    OBJECTIVES (extra scoreboard objectives), ON_PAUSE / ON_FINISH (commands appended to pause / finish)."""
+    OBJECTIVES (extra scoreboard objectives), ON_PAUSE / ON_FINISH (commands appended to pause / finish), and the
+    optional close-in dicts REACH_SPOT {pid: d} (land d blocks in front of the player, toward her) and REACH_MIN
+    {pid: lo} (also reposition when the player is nearer than lo). The phase-0 AI (bags, range fit, forced and
+    reactive picks, guard, stuns, after-effects) lives in shogun.py under F:boss/raiden/sg/; core calls it through
+    sg/{setup,reload,pause,choose,picked,incoming,tick,fx_off,stun_tick,rig_hide,rig_show,idle_clip}."""
     REACH = {**shogun.REACH, **tenma.REACH}
+    REACH_SPOT = {**getattr(shogun, 'REACH_SPOT', {}), **getattr(tenma, 'REACH_SPOT', {})}
+    REACH_MIN = {**getattr(shogun, 'REACH_MIN', {}), **getattr(tenma, 'REACH_MIN', {})}
     S_IDS, T_IDS = list(shogun.IDS), list(tenma.IDS)
     HI = max(int(r.split('..')[-1]) for r in S_IDS + T_IDS)
     write('init',[f'scoreboard objectives add {v} dummy' for v in objectives + shogun.OBJECTIVES + tenma.OBJECTIVES]+[
@@ -109,10 +114,11 @@ def build(shogun, tenma):
         'bossbar set rlk:narukami style progress','bossbar set rlk:narukami_state style progress',
         call('bars_hide'),
         'scoreboard players set #rd100 rd 100','scoreboard players set #rd4 rd 4',
+        'scoreboard players set #rd2 rd 2','scoreboard players set #rd3 rd 3','scoreboard players set #rd10 rd 10',
         call('camera/release_all'), call('rig/init'), call('vfx/init'), call('object_vfx/init'), call('movement/init'), 'kill @e[tag=rlk_raiden_aux]',
         'execute as @e[tag=rlk_raiden] at @s run '+call('reload')])
     write('reload','''
-# A reload cancels pending danger volumes; it never refills boss health.
+# A reload cancels pending danger volumes; it never refills boss health (the weapon and the switch after-effect stay).
 execute if score @s rdDeath matches 1 run return run kill @s
 scoreboard players set @s rdDeath 0
 scoreboard players set @s rdDeathTime 0
@@ -132,7 +138,9 @@ scoreboard players set @s rdRage 0
 scoreboard players set @s rdCool 40
 scoreboard players set @s rdAnim 0
 scoreboard players set @s rdHitCD 0
+function rlk:boss/raiden/sg/reload
 function rlk:boss/raiden/rig/spawn
+function rlk:boss/raiden/sg/look
 ''')
     write('spawn','''
 # Room boss spawn, position = arena center. One encounter is active at a time.
@@ -151,6 +159,8 @@ attribute @s minecraft:explosion_knockback_resistance base set 1
 scoreboard players set @s rdCycle 0
 scoreboard players set @s rdPrev 0
 scoreboard players set @s rdTurns 0
+# A new fight: random weapon (sword / polearm, 50/50), no switch after-effect yet (plan A.1, A.2).
+function rlk:boss/raiden/sg/setup
 function rlk:boss/raiden/reload
 bossbar set rlk:narukami players @a[tag=player]
 bossbar set rlk:narukami visible true
@@ -158,7 +168,7 @@ bossbar set rlk:narukami_state players @a[tag=player]
 bossbar set rlk:narukami_state visible true
 scoreboard players set #rdBar rd 1
 title @a[tag=player] times 8 60 16
-title @a[tag=player] subtitle {text:"바닥의 보랏빛 예고를 보고 회피하세요",color:"white"}
+title @a[tag=player] subtitle {text:"라이덴의 이나즈마 전하",color:"white"}
 title @a[tag=player] title {text:"마가츠 미타케 나루카미노 미코토",color:"light_purple",bold:true}
 scoreboard players set @a[tag=player] vBig 84
 scoreboard players set @a[tag=player] ttlT 84
@@ -170,6 +180,7 @@ function rlk:boss/raiden/camera/release_all
 function rlk:boss/raiden/caption/clear
 function rlk:boss/raiden/illusion/cleanup
 kill @e[tag=rlk_raiden_aux]
+kill @e[tag=rlk_rd_tmp]
 function rlk:boss/raiden/bars_hide
 ''')
     write('bars_hide','''
@@ -197,9 +208,9 @@ execute as @e[tag=rlk_rd_slam_hand] at @s run function rlk:boss/raiden/rig/targe
 function rlk:boss/raiden/vfx/world
 function rlk:boss/raiden/object_vfx/world
 function rlk:boss/raiden/orb/world
-function rlk:boss/raiden/movement/world
 ''')
     write('pause','''
+# World (no @s): the player died, a run death is pending or the level-up screen is open. Runs every such tick.
 function rlk:boss/raiden/camera/release_all
 kill @e[tag=rlk_rd_clap]
 kill @e[tag=rlk_rd_shadow]
@@ -210,13 +221,17 @@ function rlk:boss/raiden/movement/cleanup
 scoreboard players set @e[tag=rlk_raiden] rdBlink 0
 scoreboard players set @e[tag=rlk_raiden] rdWalk 0
 scoreboard players set @e[tag=rlk_raiden] rdGo 0
-kill @e[tag=rlk_rd_hazard]
+# Kit: every hazard and kit display (cue cards, decals); every pattern-scoped entity of both stages; rig props.
+function rlk:boss/raiden/hazard/clear
+kill @e[tag=rlk_rd_tmp]
+function rlk:boss/raiden/rig/prop/clear
 function rlk:boss/raiden/object/clear
 kill @e[tag=rlk_rd_dome]
 kill @e[tag=rlk_rd_slam_hand]
 kill @e[tag=rlk_rd_sfx]
 function rlk:boss/raiden/object_vfx/clear
 function rlk:boss/raiden/hazard/vfx_world
+execute as @e[tag=rlk_raiden,scores={rdDeath=0}] run function rlk:boss/raiden/sg/pause
 scoreboard players set @e[tag=rlk_raiden] rdPat 0
 scoreboard players set @e[tag=rlk_raiden] rdTime 0
 scoreboard players set @e[tag=rlk_raiden] rdCool 60
@@ -230,86 +245,71 @@ execute if score @s rdHitCD matches 1.. run scoreboard players remove @s rdHitCD
 execute if score @s rdCool matches 1.. run scoreboard players remove @s rdCool 1
 scoreboard players add @s rdTime 1
 execute if score @s rdPhase matches 0 run scoreboard players add @s rdRage 1
-# A full gauge waits for the running pattern (and any blink) to finish, then the
-# boss transforms where it stands.
-execute if score @s rdPhase matches 0 if score @s rdRage matches {RAGE_MAX}.. if score @s rdPat matches 0 unless score @s rdBlink matches 1.. run function rlk:boss/raiden/transform_start
+# A full gauge waits for the running pattern (and any blink) to finish, then the boss transforms where she stands.
+# The forced follow-ups (몽상의 일심 after 찰나의 포영, the multi eye after the single eye) come first.
+execute if score @s rdPhase matches 0 if score @s rdRage matches {RAGE_MAX}.. if score @s rdPat matches 0 unless score @s rdBlink matches 1.. unless score @s rdNext matches 7 unless score @s rdSgEye matches 1.. run function rlk:boss/raiden/transform_start
 execute if score @s rdPhase matches 1 run function rlk:boss/raiden/transform_tick
 execute if score @s rdPhase matches 2 run function rlk:boss/raiden/armor_tick
 execute if score @s rdPhase matches 3 run function rlk:boss/raiden/exhausted_tick
 execute if score @s rdPhase matches 0 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
 execute if score @s rdPhase matches 2 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
-# Close-range patterns first close the distance (rdGo); their clock waits at 0 meanwhile.
+# A pattern that must close in first blinks (rdGo); its clock waits at 0 meanwhile.
 execute if score @s rdGo matches 1.. if score @s rdPat matches 1..{HI} run function rlk:boss/raiden/close_in
-# Timelines start on the tick after choose: rdTime 1 is every pattern's first frame.
-'''+''.join(f'execute if score @s rdPat matches {r} if score @s rdTime matches 1.. run function rlk:boss/raiden/normal_dispatch\n' for r in S_IDS)
-   +''.join(f'execute if score @s rdPat matches {r} if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch\n' for r in T_IDS)+f'''execute if score @s rdPat matches 99 if score @s rdTime matches 60.. run function rlk:boss/raiden/finish
-# Found the real illusion: a 10 s stun owned by the illusion generator.
-execute if score @s rdPat matches 98 run function rlk:boss/raiden/illusion/stun_tick
+# Phase-0 timelines run from rdTime 0 (the choose tick); phase-2 timelines from rdTime 1 (as in the release).
+'''+''.join(f'execute if score @s rdGo matches 0 if score @s rdPat matches {r} run function rlk:boss/raiden/normal_dispatch\n' for r in S_IDS)
+   +''.join(f'execute if score @s rdGo matches 0 if score @s rdPat matches {r} if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch\n' for r in T_IDS)+f'''execute if score @s rdPat matches 99 if score @s rdTime matches 60.. run function rlk:boss/raiden/finish
+# Stuns (rdPat 98: real clone found, single eye broken, guard broken), shogun.py.
+execute if score @s rdPat matches 98 run function rlk:boss/raiden/sg/stun_tick
 # Keep the body on the disc without snapping: slide back toward the centre, and only
-# scatter-blink home if it is somehow far outside. Tracking uses the avatar, never the camera.
+# blink home if it is somehow far outside. Tracking uses the avatar, never the camera.
 execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..21] at @s facing entity @e[tag=rlk_raiden_arena,limit=1] feet rotated ~ 0 positioned ^ ^ ^0.45 run tp @s ~ ~ ~
 execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..26] unless score @s rdBlink matches 1.. run function rlk:boss/raiden/movement/blink_to
 execute if score @s rdBlink matches 1.. run function rlk:boss/raiden/movement/blink_tick
-# Hide the physical rig while illusions, scattering, or the aerial-arm ultimate are active.
+# Phase-0 per-tick state (rear-hit memory, counter cooldown, the switch after-effects); off in every other phase.
+execute if score @s rdPhase matches 0 run function rlk:boss/raiden/sg/tick
+execute unless score @s rdPhase matches 0 if score @s rdSgFx matches 1.. run function rlk:boss/raiden/sg/fx_off
+# Rig visibility: #rdHide 1 hides every part (rig/state/hidden, scale 0 where they stand; never moved) on the
+# first hidden tick; the first visible tick queues the form's idle clip unless a clip is already queued.
 scoreboard players set #rdHide rd 0
-execute if score @s rdBlink matches 1.. run scoreboard players set #rdHide rd 1
 '''+'\n'.join(shogun.TICK_HIDE+tenma.TICK_HIDE)+'''
+execute if score #rdHide rd matches 1 unless score @s rdHidden matches 1 run function rlk:boss/raiden/sg/rig_hide
+execute if score #rdHide rd matches 0 if score @s rdHidden matches 1.. run function rlk:boss/raiden/sg/rig_show
 execute if score #rdHide rd matches 0 at @s run function rlk:boss/raiden/rig/tick
-execute if score #rdHide rd matches 1 run function rlk:boss/raiden/rig_hide
-execute if score #rdHide rd matches 0 if score @s rdHidden matches 1.. run function rlk:boss/raiden/rig_shown
+execute if score #rdHide rd matches 1 at @s rotated as @s rotated ~ 0 run function rlk:boss/raiden/rig/follow
 '''+'\n'.join(tenma.TICK_TAIL)+'''
 function rlk:boss/raiden/bars
 ''')
-    write('rig_hide','''
-# As boss, at its position before any relocation this tick. Parts wait under the floor
-# with teleport_duration 0, so the reappearance frame snaps instead of sliding up/across.
-execute unless score @s rdHidden matches 1 as @e[tag=rlk_raiden_part] run data merge entity @s {teleport_duration:0}
-scoreboard players set @s rdHidden 1
-tp @e[tag=rlk_raiden_part] ~ ~-60 ~
-''')
-    write('rig_shown','''
-# 1 = first visible frame (rig/tick already snapped the parts); 2 = restore 1-tick smoothing.
-execute if score @s rdHidden matches 2.. as @e[tag=rlk_raiden_part] run data merge entity @s {teleport_duration:1}
-execute if score @s rdHidden matches 2.. run return run scoreboard players set @s rdHidden 0
-scoreboard players set @s rdHidden 2
-''')
     write('idle','''
-execute if score @s rdWalk matches 1.. run return run function rlk:boss/raiden/movement/walk_tick
-execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
-execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
+# Between patterns (no walking, plan A.2): face the player, then choose. A queued rear check keeps her facing.
+execute unless score @s rdSgRearQ matches 1 at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
+execute unless score @s rdSgRearQ matches 1 at @s rotated as @s run tp @s ~ ~ ~ ~ 0
 scoreboard players set @s rdAnim 0
-execute if score @s rdPhase matches 0 at @s unless entity @e[tag=rlk_body,distance=..5] rotated as @s run function rlk:boss/raiden/approach
 execute if score @s rdCool matches ..0 at @s run function rlk:boss/raiden/choose
 ''')
-    write('approach','''
-scoreboard players set @s rdAnim 1
-execute rotated as @s positioned ^ ^ ^0.17 if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless block ~ ~-1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] run tp @s ~ ~ ~
-''')
-    # Shuffle bag per phase: every move appears once before any repeats, in random order;
-    # a refilled bag never starts with the move just used. The ultimate (15) is not in the
-    # bag: it comes on the fourth armoured move (below), at most once per transformation.
-    BAGS = {0: shogun.BAG, 2: tenma.BAG}
-    for ph, moves in BAGS.items():
-        write(f'bag/count_{ph}', ['scoreboard players set #rdCnt rd 0'] +
-              [f'execute if score #rdB{i} rd matches 1 run scoreboard players add #rdCnt rd 1' for i in moves])
-        write(f'bag/fill_{ph}', [f'scoreboard players set #rdB{i} rd 1' for i in moves] +
-              [f'execute if score @s rdPrev matches {i} run scoreboard players set #rdB{i} rd 0' for i in moves] +
-              [call(f'bag/count_{ph}')])
-        write(f'bag/draw_{ph}', ['# As the boss: draw one move from the bag into rdPat.', call(f'bag/count_{ph}'),
-              f'execute if score #rdCnt rd matches 0 run '+call(f'bag/fill_{ph}'),
-              'execute store result score #rdR rd run random value 0..9999',
-              'scoreboard players operation #rdR rd %= #rdCnt rd',
-              'scoreboard players add #rdR rd 1',
-              'scoreboard players set #rdPick rd 0'] +
-              sum(([f'execute if score #rdPick rd matches 0 if score #rdB{i} rd matches 1 run scoreboard players remove #rdR rd 1',
-                    f'execute if score #rdPick rd matches 0 if score #rdB{i} rd matches 1 if score #rdR rd matches 0 run scoreboard players set #rdPick rd {i}']
-                   for i in moves), []) +
-              ['scoreboard players operation @s rdPat = #rdPick rd'])
+    # Phase-2 shuffle bag (tenma.BAG): every move once before any repeats, in random order; a refilled bag never starts
+    # with the move just used. The phase-0 bags (one per weapon, with the range fit) are shogun.py's (sg/draw_*).
+    T_BAG = tenma.BAG
+    write('bag/count_2', ['scoreboard players set #rdCnt rd 0'] +
+          [f'execute if score #rdB{i} rd matches 1 run scoreboard players add #rdCnt rd 1' for i in T_BAG])
+    write('bag/fill_2', [f'scoreboard players set #rdB{i} rd 1' for i in T_BAG] +
+          [f'execute if score @s rdPrev matches {i} run scoreboard players set #rdB{i} rd 0' for i in T_BAG] +
+          [call('bag/count_2')])
+    write('bag/draw_2', ['# As the boss: draw one move from the bag into rdPat.', call('bag/count_2'),
+          'execute if score #rdCnt rd matches 0 run '+call('bag/fill_2'),
+          'execute store result score #rdR rd run random value 0..9999',
+          'scoreboard players operation #rdR rd %= #rdCnt rd',
+          'scoreboard players add #rdR rd 1',
+          'scoreboard players set #rdPick rd 0'] +
+          sum(([f'execute if score #rdPick rd matches 0 if score #rdB{i} rd matches 1 run scoreboard players remove #rdR rd 1',
+                f'execute if score #rdPick rd matches 0 if score #rdB{i} rd matches 1 if score #rdR rd matches 0 run scoreboard players set #rdPick rd {i}']
+               for i in T_BAG), []) +
+          ['scoreboard players operation @s rdPat = #rdPick rd'])
     write('choose','''
-execute if score @s rdPhase matches 0 run function rlk:boss/raiden/bag/draw_0
+# As the boss at its feet (idle, rdCool 0). Phase 0: forced picks, reactive rear checks, then the weapon bag with
+# the range fit (shogun.py sg/choose). Phase 2: the Tenma bag and tenma.CHOOSE_RULES.
+scoreboard players set @s rdPat 0
+execute if score @s rdPhase matches 0 run function rlk:boss/raiden/sg/choose
 execute if score @s rdPhase matches 2 run function rlk:boss/raiden/bag/draw_2
-# 몽상의 일심 always follows an illusion round that was not broken (illusion/fail_end).
-execute if score @s rdPhase matches 0 if score @s rdNext matches 1..7 run scoreboard players operation @s rdPat = @s rdNext
 scoreboard players set @s rdNext 0
 scoreboard players add @s rdTurns 1
 scoreboard players operation #rdTurn rd = @s rdTurns
@@ -319,42 +319,35 @@ scoreboard players operation #rdTurn rd %= #rd4 rd
 '''+''.join(f'execute if score @s rdPhase matches {ph} if score #rd{h} rd matches {r} run scoreboard players operation @s rdPat = #rd{h} rd\n'
             for h in ('Lock', 'Force') for ph, ids in ((0, S_IDS), (2, T_IDS)) for r in ids)+'''execute if score @s rdPat = #rdForce rd run scoreboard players set #rdForce rd 0
 # Whatever finally runs (bag, forced follow-up, ultimate, test hook) leaves the bag.
-'''+'\n'.join(f'execute if score @s rdPat matches {i} run scoreboard players set #rdB{i} rd 0' for i in BAGS[0]+BAGS[2])+'''
+execute if score @s rdPhase matches 0 run function rlk:boss/raiden/sg/picked
+'''+'\n'.join(f'execute if score @s rdPhase matches 2 if score @s rdPat matches {i} run scoreboard players set #rdB{i} rd 0' for i in T_BAG)+'''
 scoreboard players operation @s rdPrev = @s rdPat
 scoreboard players set @s rdTime 0
-execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
-execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
-# A close-range pattern chosen while the player is out of its reach: close in first.
+# Face the player; the rear checks (25, 26) strike straight behind her, so they keep her facing.
+execute unless score @s rdPat matches 25..26 at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
+execute unless score @s rdPat matches 25..26 at @s rotated as @s run tp @s ~ ~ ~ ~ 0
+# A pattern chosen while the player is out of its reach (REACH start) or too near (REACH_MIN) blinks first.
 scoreboard players set @s rdGo 0
-'''+'\n'.join(f'execute if score @s rdPat matches {i} at @s unless entity @e[tag=rlk_body,distance=..{start}] run scoreboard players set @s rdGo 1' for i,(start,stop) in REACH.items())+'''
+'''+'\n'.join(f'execute if score @s rdPat matches {i} at @s unless entity @e[tag=rlk_body,distance=..{start}] run scoreboard players set @s rdGo 1' for i,(start,stop) in REACH.items())+'\n'
+   +'\n'.join(f'execute if score @s rdPat matches {i} at @s if entity @e[tag=rlk_body,distance=..{lo}] run scoreboard players set @s rdGo 1' for i,lo in REACH_MIN.items())+'''
 ''')
-    # Close-in: dash at the player; scatter-blink in front of them when far away.
+    # Close-in: blink only (no walking, plan A.2): land REACH_SPOT[pid] (default: REACH stop - 1.5, at least 2) blocks
+    # in front of the player, toward her, clamped to radius 20; the pattern clock starts when the blink is over.
+    spots = {i: REACH_SPOT.get(i, max(2.0, stop - 1.5)) for i, (start, stop) in REACH.items()}
+    for i, lo in REACH_MIN.items():
+        spots.setdefault(i, REACH_SPOT.get(i, lo + 2))
     write('close_in',[
-        '# As the boss with a chosen close-range pattern (rdGo 1..): the clock stays at 0.',
+        '# As the boss with a chosen pattern that closes in first (rdGo 1..): the clock stays at 0 until the blink is over.',
         'scoreboard players set @s rdTime 0',
         'scoreboard players add @s rdGo 1',
-        'execute if score @s rdBlink matches 1.. run return 0',
-        '# A blink taken because the dash was pinned or timed out: start where she landed.',
-        'execute if score @s rdGo matches 100.. run return run function rlk:boss/raiden/close_done',
-        'execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet',
-        'execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0',
-        f'execute if score @s rdGo matches 2 at @s unless entity @e[tag=rlk_body,distance=..{CLOSE_BLINK}] run return run function rlk:boss/raiden/movement/blink_start',
-        'scoreboard players set #rdNear rd 0']+[
-        f'execute if score @s rdPat matches {i} at @s if entity @e[tag=rlk_body,distance=..{stop}] run scoreboard players set #rdNear rd 1' for i,(start,stop) in REACH.items()]+[
-        'execute if score #rdNear rd matches 1 run return run function rlk:boss/raiden/close_done',
-        f'execute if score @s rdGo matches {CLOSE_MAX}.. run return run function rlk:boss/raiden/close_blink',
-        'scoreboard players set @s rdAnim 21',
-        'scoreboard players set #rdStep rd 0',
-        f'execute if score @s rdPhase matches 0 at @s rotated as @s positioned ^ ^ ^{CLOSE_STEP[0]} if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] store success score #rdStep rd run tp @s ~ ~ ~',
-        f'execute if score @s rdPhase matches 2 at @s rotated as @s positioned ^ ^ ^{CLOSE_STEP[1]} if block ~ ~ ~ minecraft:air if block ~ ~1 ~ minecraft:air unless entity @e[tag=rlk_raiden_arena,distance=20.5..] store success score #rdStep rd run tp @s ~ ~ ~',
-        '# Pinned (the straight line to the player leaves the arena disc, or a block is in the way).',
-        'execute if score #rdStep rd matches 0 run return run function rlk:boss/raiden/close_blink',
-        'execute if score @s rdGo matches 3 at @s run playsound minecraft:item.trident.riptide_1 hostile @a[tag=player] ~ ~ ~ 0.5 1.3 0.2',
+        'execute if score @s rdGo matches 2 run return run function rlk:boss/raiden/close_blink',
+        'execute unless score @s rdBlink matches 1.. run function rlk:boss/raiden/close_done',
     ])
     write('close_blink',[
-        '# Dash pinned on the rim or timed out: scatter-blink beside the player, then start.',
-        'scoreboard players set @s rdGo 100',
-        'function rlk:boss/raiden/movement/blink_start',
+        '# The destination marker in front of the player (toward her), then the blink (movement/blink_to clamps it).',
+        'kill @e[tag=rlk_rd_blink_dest]']+[
+        f'execute if score @s rdPat matches {i} at @e[tag=rlk_body,limit=1] facing entity @s feet rotated ~ 0 positioned ^ ^ ^{d:g} positioned ~ 201 ~ run function rlk:boss/raiden/movement/blink_to' for i, d in spots.items()]+[
+        'execute unless score @s rdBlink matches 1.. run function rlk:boss/raiden/movement/blink_start',
     ])
     write('close_done',[
         'scoreboard players set @s rdGo 0',
@@ -363,26 +356,26 @@ scoreboard players set @s rdGo 0
         'execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0',
     ])
     write('finish','''
+# As the boss: the pattern is over. Non-detached hazards go (kit hazard/finish), pattern props go.
 function rlk:boss/raiden/camera/release_all
 kill @e[tag=rlk_rd_clap]
 kill @e[tag=rlk_rd_shadow]
 function rlk:boss/raiden/caption/pattern_end
 function rlk:boss/raiden/judgment_rig/cleanup
+function rlk:boss/raiden/hazard/finish
+kill @e[tag=rlk_rd_sg]
 scoreboard players set @s rdBlink 0
 scoreboard players set @s rdWalk 0
 scoreboard players set @s rdGo 0
 kill @e[tag=rlk_rd_blink_dest]
-scoreboard players operation #rdWalkTurn rd = @s rdTurns
-scoreboard players set #rd2 rd 2
-scoreboard players operation #rdWalkTurn rd %= #rd2 rd
-execute if score #rdWalkTurn rd matches 0 run function rlk:boss/raiden/movement/walk_start
 scoreboard players set @s rdPat 0
 scoreboard players set @s rdTime 0
 scoreboard players set @s rdAnim 0
-scoreboard players set @s rdCool 10
+scoreboard players set @s rdCool 16
 function rlk:boss/raiden/object/clear
 kill @e[tag=rlk_rd_dome]
 '''+'\n'.join(shogun.ON_FINISH+tenma.ON_FINISH))
+    T_LEN = getattr(tenma, 'T_LEN', TRANSFORM_LEN)      # S2-TENMA: the transformation length (60 since S2)
     write('bars',f'''
 function rlk:boss/raiden/line/tick
 execute if score #rdCap rd matches 1 unless entity @a[tag=player,scores={{ttlT=1..}}] run function rlk:boss/raiden/caption/expire
@@ -403,7 +396,7 @@ execute if score @s rdPhase matches 0 run scoreboard players operation #buSub bu
 execute if score @s rdPhase matches 0 run scoreboard players set #buSubMax bu {RAGE_MAX}
 execute if score @s rdPhase matches 0 run scoreboard players set #buSubCol bu 8
 execute if score @s rdPhase matches 1 run scoreboard players operation #buSub bu = @s rdTime
-execute if score @s rdPhase matches 1 run scoreboard players set #buSubMax bu {TRANSFORM_LEN}
+execute if score @s rdPhase matches 1 run scoreboard players set #buSubMax bu {T_LEN}
 execute if score @s rdPhase matches 1 run scoreboard players set #buSubCol bu 1
 execute if score @s rdPhase matches 2 run scoreboard players operation #buSub bu = @s rdShield
 execute if score @s rdPhase matches 2 run scoreboard players set #buSubMax bu {SHIELD_MAX}
@@ -417,6 +410,8 @@ bossbar set rlk:narukami_state name {{nbt:"line[]",storage:"rlk:bu",interpret:tr
     write('incoming','''
 # Called after normal damage/defense modifiers, before damage is deducted.
 execute if score #dmg tmp matches ..0 run return 0
+# Phase 0: rear-hit memory, the guard parry (번개 배리어) and the guard-break stun x1.5 (shogun.py).
+execute if score @s rdPhase matches 0 run function rlk:boss/raiden/sg/incoming
 execute if score @s rdPhase matches 2 run function rlk:boss/raiden/shield_hit
 execute if score @s rdPhase matches 3 run scoreboard players operation #dmg tmp += #dmg tmp
 # Guarantee the first transformation cannot be skipped by one enormous hit.
@@ -449,8 +444,8 @@ function rlk:cm/hit_pl
 execute unless score #dodged tmp matches 1 as @e[tag=rlk_raiden,scores={rdPhase=0,rdDeath=0},limit=1] run scoreboard players add @s rdRage '''+str(RAGE_HIT)+'''
 ''')
     write('blink_relocate','''
-# Hidden middle of a scatter blink. A movement/blink_to marker wins; otherwise reform
-# 5 blocks ahead of the player, or 5 blocks from the player toward the centre.
+# Hidden middle of a blink (movement/blink_tick). A destination marker wins; otherwise reform 5 blocks ahead of the
+# player, or 5 blocks from the player toward the centre.
 execute if entity @e[tag=rlk_rd_blink_dest,limit=1] run return run function rlk:boss/raiden/blink_dest
 execute at @e[tag=rlk_body,limit=1] rotated as @e[tag=rlk_body,limit=1] rotated ~ 0 positioned ^ ^ ^5 positioned ~ 201 ~ run tp @s ~ ~ ~
 execute at @e[tag=rlk_raiden_arena,limit=1] unless entity @s[distance=..20] at @e[tag=rlk_body,limit=1] facing entity @e[tag=rlk_raiden_arena,limit=1] feet rotated ~ 0 positioned ^ ^ ^5 positioned ~ 201 ~ run tp @s ~ ~ ~
@@ -466,8 +461,9 @@ execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
 ''')
     write('blink',[call('movement/blink_start')])
     write('object/create','''
-# At the desired ground point, as boss; kinds: 1 eye,2 illusion,3 flower,4 stake.
-summon minecraft:husk ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_object","rlk_rd_objnew","rlk_mob","rlk_mapv"],NoAI:1b,NoGravity:1b,Silent:1b,PersistenceRequired:1b,CanPickUpLoot:0b,IsBaby:0b,DeathLootTable:"minecraft:empty",active_effects:[{id:"minecraft:invisibility",duration:-1,amplifier:0,show_particles:0b}]}
+# At the desired ground point, as boss; kinds: 1 eye (id 10 = the single eye, 1..3 the multi eyes), 2 clone,
+# 3 flower, 4 stake. Pattern-scoped: rlk_rd_tmp (pause) and object/clear (finish).
+summon minecraft:husk ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_tmp","rlk_rd_object","rlk_rd_objnew","rlk_mob","rlk_mapv"],NoAI:1b,NoGravity:1b,Silent:1b,PersistenceRequired:1b,CanPickUpLoot:0b,IsBaby:0b,DeathLootTable:"minecraft:empty",active_effects:[{id:"minecraft:invisibility",duration:-1,amplifier:0,show_particles:0b}]}
 $scoreboard players set @e[tag=rlk_rd_objnew] rdObjKind $(kind)
 $scoreboard players set @e[tag=rlk_rd_objnew] rdObjId $(id)
 $scoreboard players set @e[tag=rlk_rd_objnew] rdObjHP $(hp)
@@ -484,7 +480,7 @@ execute as @e[tag=rlk_rd_objnew] run data modify entity @s Health set value 1024
 execute as @e[tag=rlk_rd_objnew] run attribute @s minecraft:attack_damage base set 0
 execute as @e[tag=rlk_rd_objnew] run attribute @s minecraft:knockback_resistance base set 1
 team join rlk_cam @e[tag=rlk_rd_objnew]
-$summon minecraft:item_display ~ ~$(y) ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_objvisual","rlk_rd_visnew"],item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/$(model)"}},item_display:"none",brightness:{sky:15,block:15},view_range:2f,transformation:{translation:[0f,0f,0f],scale:[1f,1f,1f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f]}}
+$summon minecraft:item_display ~ ~$(y) ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_tmp","rlk_rd_objvisual","rlk_rd_visnew"],item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/$(model)"}},item_display:"none",brightness:{sky:15,block:15},view_range:2f,transformation:{translation:[0f,0f,0f],scale:[1f,1f,1f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f]}}
 $scoreboard players set @e[tag=rlk_rd_visnew] rdObjId $(id)
 tag @e[tag=rlk_rd_visnew] remove rlk_rd_visnew
 execute as @e[tag=rlk_rd_objnew,scores={rdObjKind=4}] run tag @s remove rlk_mob
@@ -518,12 +514,14 @@ execute if score @s rdObjKind matches 3 run function rlk:boss/raiden/orb/remove
 execute at @s run function rlk:boss/raiden/object_vfx/break
 scoreboard players operation #rdObjectId rd = @s rdObjId
 execute as @e[tag=rlk_rd_objvisual] if score @s rdObjId = #rdObjectId rd run kill @s
-# An eye's armed danger circle disappears as soon as the eye is destroyed.
-execute if score @s rdObjKind matches 1 at @s run kill @e[tag=rlk_rd_hazard,distance=..0.2]
+# An eye's armed danger circle disappears as soon as the eye is destroyed (its disk becomes the pocket).
+execute if score @s rdObjKind matches 1 at @s as @e[tag=rlk_rd_hazard,distance=..0.2] run function rlk:boss/raiden/hazard/expire
 execute if score @s rdObjKind matches 1 run scoreboard players remove @e[tag=rlk_raiden] rdRage 50
 execute as @e[tag=rlk_raiden,scores={rdRage=..-1}] run scoreboard players set @s rdRage 0
+# The single eye (id 10): 「간파했군.」 and the stun (shogun.py); a multi eye loses its glow.
+execute if score @s rdObjKind matches 1 at @s run function rlk:boss/raiden/sg/eye_break
 execute if score @s rdObjKind matches 3 at @s run function rlk:boss/raiden/dome_create
-# As the broken illusion object, before it is removed (build_raiden_illusions.py).
+# As the broken clone object, before it is removed (build_raiden_illusions.py).
 execute if score @s rdObjKind matches 2 at @s run function rlk:boss/raiden/illusion/on_break
 kill @s
 ''')
@@ -532,6 +530,7 @@ function rlk:boss/raiden/orb/clear
 kill @e[tag=rlk_rd_object]
 kill @e[tag=rlk_rd_objvisual]
 ''')
+
     # ---- Boss test: fight only Narukami in the real boss room, no run needed ----------
     T='[{text:"[보스 테스트] ",color:"light_purple",bold:true},'
     def cmd_link(command,label=None,color='yellow'):
@@ -623,10 +622,12 @@ execute unless score @s rdPat matches 0 run function rlk:boss/raiden/pause
 execute unless score @s rdPhase matches 1 run scoreboard players set @s rdCool 2
 ''')
     write('test/to_normal','''
-# @s = boss in phase 1/2/3: drop the armor state without the exhausted break.
+# @s = boss in phase 1/2/3: drop the armor state without the exhausted break. A test keeps the weapon: the forced
+# switch that normal_return queues (tag rlk_rd_switch_due) is dropped again.
 kill @e[tag=rlk_rd_hazard]
 function rlk:boss/raiden/hazard/vfx_world
 function rlk:boss/raiden/normal_return
+tag @s remove rlk_rd_switch_due
 ''')
     write('test/level','''
 # /function rlk:boss/raiden/test/level {lv:N}: set the boss level and refill its scaled HP.

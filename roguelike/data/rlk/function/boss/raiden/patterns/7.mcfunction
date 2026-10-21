@@ -1,27 +1,44 @@
-# Pattern names intentionally stay out of the boss bar.
-execute if score @s rdTime matches 1 at @s rotated as @s run function rlk:boss/raiden/line/calm
-execute if score @s rdTime matches 1 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run function rlk:boss/raiden/movement/blink_to
-execute if score @s rdTime matches 1 at @s rotated as @s run playsound minecraft:entity.warden.sonic_charge hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.3
-execute if score @s rdTime matches 10 at @s rotated as @s run scoreboard players set @s rdAnim 7
-execute if score @s rdTime matches 12 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run function rlk:boss/raiden/hazard/create {shape:14,tell:30,damage:30,life:40}
-execute if score @s rdTime matches 10 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 0 0 positioned ^ ^ ^21 run function rlk:boss/raiden/hazard/create {shape:3,tell:32,damage:10,life:42}
-execute if score @s rdTime matches 10 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 0 0 positioned ^ ^ ^21 run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2
-execute if score @s rdTime matches 12 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 45 0 positioned ^ ^ ^21 run function rlk:boss/raiden/hazard/create {shape:3,tell:30,damage:10,life:40}
-execute if score @s rdTime matches 12 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 45 0 positioned ^ ^ ^21 run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2
-execute if score @s rdTime matches 14 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 90 0 positioned ^ ^ ^21 run function rlk:boss/raiden/hazard/create {shape:3,tell:28,damage:10,life:38}
-execute if score @s rdTime matches 14 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 90 0 positioned ^ ^ ^21 run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2
-execute if score @s rdTime matches 16 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 135 0 positioned ^ ^ ^21 run function rlk:boss/raiden/hazard/create {shape:3,tell:26,damage:10,life:36}
-execute if score @s rdTime matches 16 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 135 0 positioned ^ ^ ^21 run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2
-execute if score @s rdTime matches 18 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 180 0 positioned ^ ^ ^21 run function rlk:boss/raiden/hazard/create {shape:3,tell:24,damage:10,life:34}
-execute if score @s rdTime matches 18 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 180 0 positioned ^ ^ ^21 run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2
-execute if score @s rdTime matches 20 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 225 0 positioned ^ ^ ^21 run function rlk:boss/raiden/hazard/create {shape:3,tell:22,damage:10,life:32}
-execute if score @s rdTime matches 20 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 225 0 positioned ^ ^ ^21 run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2
-execute if score @s rdTime matches 22 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 270 0 positioned ^ ^ ^21 run function rlk:boss/raiden/hazard/create {shape:3,tell:20,damage:10,life:30}
-execute if score @s rdTime matches 22 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 270 0 positioned ^ ^ ^21 run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2
-execute if score @s rdTime matches 24 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 315 0 positioned ^ ^ ^21 run function rlk:boss/raiden/hazard/create {shape:3,tell:18,damage:10,life:28}
-execute if score @s rdTime matches 24 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 315 0 positioned ^ ^ ^21 run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.6 1.4 0.2
-execute if score @s rdTime matches 38 at @s rotated as @s run function rlk:boss/raiden/line/sever_one
-execute if score @s rdTime matches 40 at @s rotated as @s run playsound minecraft:block.beacon.deactivate hostile @a[tag=player] ~ ~ ~ 0.9 0.5 0.3
-execute if score @s rdTime matches 39 at @s rotated as @s run scoreboard players set @s rdAnim 8
-execute if score @s rdTime matches 42 at @s rotated as @s run playsound minecraft:entity.lightning_bolt.thunder hostile @a[tag=player] ~ ~ ~ 0.9 0.85 0.3
-execute if score @s rdTime matches 52 at @s rotated as @s run function rlk:boss/raiden/finish
+execute if score @s rdTime matches 0 at @s rotated as @s run function rlk:boss/raiden/fx/blink_out
+execute if score @s rdTime matches 0 at @s rotated as @s run function rlk:boss/raiden/rig/play/musou
+execute if score @s rdTime matches 0 at @s rotated as @s run function rlk:boss/raiden/line/calm
+execute if score @s rdTime matches 0 at @s rotated as @s run scoreboard players set @s rdBlink 24
+execute if score @s rdTime matches 0 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run tp @s ~ ~ ~
+execute if score @s rdTime matches 0 at @s rotated as @s run execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
+execute if score @s rdTime matches 0 at @s rotated as @s run execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
+execute if score @s rdTime matches 6 at @s rotated as @s run function rlk:boss/raiden/fx/blink_in
+execute if score @s rdTime matches 10 at @s rotated as @s run function rlk:boss/raiden/sg/musou_orbs
+execute if score @s rdTime matches 20 at @s rotated as @s run execute positioned ~ ~2.4 ~ run function rlk:boss/raiden/fx/star
+execute if score @s rdTime matches 30 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=0}] at @s run function rlk:boss/raiden/hazard/new {k:1,a:4000,b:0,c:0,d:0,e:18490000,f:0,tol:300,tell:20,dmg:10,life:31,ev:10,max:1,grp:0,dk:3,dl:0,kb:0,sv:1,snd:1,nd:0,jp:0,det:0,lf:0,fv:0}
+execute if score @s rdTime matches 30 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=0}] at @s run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.7 1.4 0.2
+execute if score @s rdTime matches 50 at @s rotated as @s run kill @e[tag=rlk_rd_sgorbp,scores={rdSgDx=0}]
+execute if score @s rdTime matches 38 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=1}] at @s run function rlk:boss/raiden/hazard/new {k:1,a:4000,b:0,c:0,d:0,e:18490000,f:0,tol:300,tell:20,dmg:10,life:31,ev:10,max:1,grp:0,dk:3,dl:0,kb:0,sv:1,snd:1,nd:0,jp:0,det:0,lf:0,fv:0}
+execute if score @s rdTime matches 38 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=1}] at @s run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.7 1.4 0.2
+execute if score @s rdTime matches 58 at @s rotated as @s run kill @e[tag=rlk_rd_sgorbp,scores={rdSgDx=1}]
+execute if score @s rdTime matches 46 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=2}] at @s run function rlk:boss/raiden/hazard/new {k:1,a:4000,b:0,c:0,d:0,e:18490000,f:0,tol:300,tell:20,dmg:10,life:31,ev:10,max:1,grp:0,dk:3,dl:0,kb:0,sv:1,snd:1,nd:0,jp:0,det:0,lf:0,fv:0}
+execute if score @s rdTime matches 46 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=2}] at @s run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.7 1.4 0.2
+execute if score @s rdTime matches 66 at @s rotated as @s run kill @e[tag=rlk_rd_sgorbp,scores={rdSgDx=2}]
+execute if score @s rdTime matches 54 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=3}] at @s run function rlk:boss/raiden/hazard/new {k:1,a:4000,b:0,c:0,d:0,e:18490000,f:0,tol:300,tell:20,dmg:10,life:31,ev:10,max:1,grp:0,dk:3,dl:0,kb:0,sv:1,snd:1,nd:0,jp:0,det:0,lf:0,fv:0}
+execute if score @s rdTime matches 54 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=3}] at @s run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.7 1.4 0.2
+execute if score @s rdTime matches 74 at @s rotated as @s run kill @e[tag=rlk_rd_sgorbp,scores={rdSgDx=3}]
+execute if score @s rdTime matches 62 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=4}] at @s run function rlk:boss/raiden/hazard/new {k:1,a:4000,b:0,c:0,d:0,e:18490000,f:0,tol:300,tell:20,dmg:10,life:31,ev:10,max:1,grp:0,dk:3,dl:0,kb:0,sv:1,snd:1,nd:0,jp:0,det:0,lf:0,fv:0}
+execute if score @s rdTime matches 62 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=4}] at @s run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.7 1.4 0.2
+execute if score @s rdTime matches 82 at @s rotated as @s run kill @e[tag=rlk_rd_sgorbp,scores={rdSgDx=4}]
+execute if score @s rdTime matches 70 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=5}] at @s run function rlk:boss/raiden/hazard/new {k:1,a:4000,b:0,c:0,d:0,e:18490000,f:0,tol:300,tell:20,dmg:10,life:31,ev:10,max:1,grp:0,dk:3,dl:0,kb:0,sv:1,snd:1,nd:0,jp:0,det:0,lf:0,fv:0}
+execute if score @s rdTime matches 70 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=5}] at @s run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.7 1.4 0.2
+execute if score @s rdTime matches 90 at @s rotated as @s run kill @e[tag=rlk_rd_sgorbp,scores={rdSgDx=5}]
+execute if score @s rdTime matches 78 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=6}] at @s run function rlk:boss/raiden/hazard/new {k:1,a:4000,b:0,c:0,d:0,e:18490000,f:0,tol:300,tell:20,dmg:10,life:31,ev:10,max:1,grp:0,dk:3,dl:0,kb:0,sv:1,snd:1,nd:0,jp:0,det:0,lf:0,fv:0}
+execute if score @s rdTime matches 78 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=6}] at @s run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.7 1.4 0.2
+execute if score @s rdTime matches 98 at @s rotated as @s run kill @e[tag=rlk_rd_sgorbp,scores={rdSgDx=6}]
+execute if score @s rdTime matches 86 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=7}] at @s run function rlk:boss/raiden/hazard/new {k:1,a:4000,b:0,c:0,d:0,e:18490000,f:0,tol:300,tell:20,dmg:10,life:31,ev:10,max:1,grp:0,dk:3,dl:0,kb:0,sv:1,snd:1,nd:0,jp:0,det:0,lf:0,fv:0}
+execute if score @s rdTime matches 86 at @s rotated as @s run execute as @e[tag=rlk_rd_sgorb,scores={rdSgDx=7}] at @s run playsound minecraft:block.respawn_anchor.set_spawn hostile @a[tag=player] ~ ~ ~ 0.7 1.4 0.2
+execute if score @s rdTime matches 106 at @s rotated as @s run kill @e[tag=rlk_rd_sgorbp,scores={rdSgDx=7}]
+execute if score @s rdTime matches 110 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run function rlk:boss/raiden/fx/musou_dark {life:50}
+execute if score @s rdTime matches 110 at @s rotated as @s run function rlk:boss/raiden/line/sever_one
+execute if score @s rdTime matches 110 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute positioned ~ ~1.5 ~ run function rlk:boss/raiden/fx/crystal
+execute if score @s rdTime matches 110 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run function rlk:boss/raiden/hazard/new {k:1,a:19000,b:0,c:0,d:0,e:372490000,f:0,tol:300,tell:20,dmg:30,life:31,ev:10,max:1,grp:0,dk:0,dl:0,kb:0,sv:1,snd:1,nd:0,jp:0,det:0,lf:0,fv:0}
+execute if score @s rdTime matches 130 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run function rlk:boss/raiden/fx/musou_slash
+execute if score @s rdTime matches 136 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 30 0 positioned ^ ^ ^-9 run function rlk:boss/raiden/fx/crystal_line {len:18}
+execute if score @s rdTime matches 144 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 150 0 positioned ^ ^ ^-9 run function rlk:boss/raiden/fx/crystal_line {len:18}
+execute if score @s rdTime matches 152 at @s rotated as @s run execute at @e[tag=rlk_raiden_arena,limit=1] run execute rotated 270 0 positioned ^ ^ ^-9 run function rlk:boss/raiden/fx/crystal_line {len:18}
+execute if score @s rdTime matches 160 at @s rotated as @s run execute positioned ~ ~1.6 ~ run function rlk:boss/raiden/fx/star
+execute if score @s rdTime matches 166 at @s rotated as @s run function rlk:boss/raiden/finish

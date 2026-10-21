@@ -16,4 +16,3 @@ execute as @e[tag=rlk_rd_slam_hand] at @s run function rlk:boss/raiden/rig/targe
 function rlk:boss/raiden/vfx/world
 function rlk:boss/raiden/object_vfx/world
 function rlk:boss/raiden/orb/world
-function rlk:boss/raiden/movement/world

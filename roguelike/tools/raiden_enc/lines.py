@@ -1,4 +1,6 @@
-"""Raiden voice lines (typed subtitles) and the caption state. Owner: S2-SHOGUN (plan rd/plan.md E.0, D.2)."""
+"""Raiden voice lines (typed subtitles) and the caption state. Owner: S2-SHOGUN (plan rd/plan.md E.0, D.2).
+「번개여, 나의 호령을 따르라.」 (command) is now the sword switch (27); the Shogun keys of plan D.2 are appended.
+"""
 from .core import write
 
 def typed(text):
@@ -42,6 +44,16 @@ LINES = {
     'sever': ('단절!', 2, VOICE2, 20),
     'goemyeol': ('궤멸하라!', 3, VOICE2, 24),
     'pierce': ('뚫려라!', 2, VOICE2, 20),
+    # S2-SHOGUN (plan D.2, wiki lines): appended, so the ids of the keys above stay.
+    'too_slow': ('너무 느리군.', 3, VOICE, 20),
+    'verdict': ('판결은 내려졌다.', 2, VOICE, 22),
+    'return_dust': ('번개와 함께 흙으로 돌아가라.', 2, VOICE, 22),
+    'shadow_world': ('속세는 그림자와 같지.', 2, VOICE, 22),
+    'mock': ('가소롭군.', 3, VOICE, 22),
+    'end_it': ('슬슬 끝내지.', 3, VOICE, 22),
+    'absurd': ('터무니 없군.', 3, VOICE, 22),
+    'musang': ('무상의 진!', 3, VOICE, 22),
+    'gaze': ('이 눈으로 속세를 꿰뚫어 보리.', 2, VOICE, 24),
 }
 LINE_IDS = {k: i for i, k in enumerate(LINES, 1)}
 
@@ -66,6 +78,18 @@ scoreboard players set @a[tag=player,scores={vBig=1..}] vBig 0
     tick_lines = ['# Advances the boss line in progress (#rdLine id, #rdLineT age); called from tick.',
                   'execute unless score #rdLine rd matches 1.. run return 0',
                   'scoreboard players add #rdLineT rd 1']
+    # One typing step = one call of the macro line/show (S2-SHOGUN: no per-step files).
+    write('line/show', [
+        '# One typing step of a boss line (macro: t text, c colour, s stay, f fade, n ttlT, e 1 = the last step).',
+        '# One plain, quiet tick per step (same sound and pitch every time).',
+        '$title @a[tag=player] times 0 $(s) $(f)',
+        '$title @a[tag=player] subtitle {text:"$(t)",color:"$(c)",bold:true}',
+        'execute as @a[tag=player] run function rlk:view/ttl_blank',
+        '$scoreboard players set @a[tag=player] ttlT $(n)',
+        'scoreboard players set #rdCap rd 1', 'scoreboard players set #rdCapPat rd 1',
+        'execute as @a[tag=player] at @s run playsound minecraft:block.note_block.hat voice @s ~ ~ ~ .3 1 0',
+        '$scoreboard players set #rdSgLineEnd rd $(e)',
+        'execute if score #rdSgLineEnd rd matches 1 run scoreboard players set #rdLine rd 0'])
     for key, (steps, gap, colour, hold) in LINES.items():
         steps = typed(steps) if isinstance(steps, str) else steps
         lid = LINE_IDS[key]
@@ -73,17 +97,10 @@ scoreboard players set @a[tag=player,scores={vBig=1..}] vBig 0
         for k, text in enumerate(steps):
             last = k == len(steps)-1
             stay = hold if last else gap+6
-            # One plain, quiet tick per step (same sound and pitch every time).
-            frame = [f'title @a[tag=player] times 0 {stay} {12 if last else 0}',
-                     'title @a[tag=player] subtitle {text:"'+text+'",color:"'+colour+'",bold:true}',
-                     'execute as @a[tag=player] run function rlk:view/ttl_blank',
-                     f'scoreboard players set @a[tag=player] ttlT {stay+(12 if last else 0)}',
-                     'scoreboard players set #rdCap rd 1', 'scoreboard players set #rdCapPat rd 1',
-                     'execute as @a[tag=player] at @s run playsound minecraft:block.note_block.hat voice @s ~ ~ ~ .3 1 0']
-            if last:
-                frame.append('scoreboard players set #rdLine rd 0')
-            write(f'line/{key}_{k}', frame)
-            tick_lines.append(f'execute if score #rdLine rd matches {lid} if score #rdLineT rd matches {k*gap} run function rlk:boss/raiden/line/{key}_{k}')
+            fade = 12 if last else 0
+            assert '"' not in text and '\\' not in text, text
+            args = f'{{t:"{text}",c:"{colour}",s:{stay},f:{fade},n:{stay + fade},e:{int(last)}}}'
+            tick_lines.append(f'execute if score #rdLine rd matches {lid} if score #rdLineT rd matches {k*gap} run function rlk:boss/raiden/line/show {args}')
     write('line/tick', tick_lines)
     write('caption/pattern_end','''
 execute if score #rdCapPat rd matches 1 run function rlk:boss/raiden/caption/clear

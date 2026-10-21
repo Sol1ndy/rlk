@@ -36,6 +36,23 @@ scoreboard objectives add rdDeathTime dummy
 scoreboard objectives add rdHidden dummy
 scoreboard objectives add rdGo dummy
 scoreboard objectives add rdNext dummy
+scoreboard objectives add rdWpn dummy
+scoreboard objectives add rdSgFx dummy
+scoreboard objectives add rdSgFxT dummy
+scoreboard objectives add rdSgGs dummy
+scoreboard objectives add rdSgGm dummy
+scoreboard objectives add rdSgGp dummy
+scoreboard objectives add rdSgCt dummy
+scoreboard objectives add rdSgCk dummy
+scoreboard objectives add rdSgCcd dummy
+scoreboard objectives add rdSgGd dummy
+scoreboard objectives add rdSgEye dummy
+scoreboard objectives add rdSgRearT dummy
+scoreboard objectives add rdSgRearCD dummy
+scoreboard objectives add rdSgRearQ dummy
+scoreboard objectives add rdSgStun dummy
+scoreboard objectives add rdSgV dummy
+scoreboard objectives add rdSgDx dummy
 bossbar add rlk:narukami {text:"마가츠 미타케 나루카미노 미코토",color:"light_purple"}
 bossbar add rlk:narukami_state {text:"악연의 에너지",color:"light_purple"}
 # Resource-pack boss bar (tools/build_bossbar.py): white bars are transparent, the
@@ -47,6 +64,9 @@ bossbar set rlk:narukami_state style progress
 function rlk:boss/raiden/bars_hide
 scoreboard players set #rd100 rd 100
 scoreboard players set #rd4 rd 4
+scoreboard players set #rd2 rd 2
+scoreboard players set #rd3 rd 3
+scoreboard players set #rd10 rd 10
 function rlk:boss/raiden/camera/release_all
 function rlk:boss/raiden/rig/init
 function rlk:boss/raiden/vfx/init
