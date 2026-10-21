@@ -11,9 +11,6 @@ scoreboard players set #mbCritDmgAdd mb 50
 scoreboard players set #mbHealPct mb 100
 scoreboard players set #bfCure mb 0
 scoreboard players set #bkCureP mb 0
-# the hint "달빛 고치 — 체력 15% 회복하면 해제" still typing or held on the subtitle line goes now: its steps would blank the reward pop
-# below and it would stay 3 s after the cure (review fix FX-3)
-execute if score #mbLn mb matches 1 if data storage rlk:mboss {ln:{t:"달빛 고치 — 체력 15% 회복하면 해제"}} run function rlk:mboss/line/clear
 execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:mboss/butterfly/wx/cure/start
 function rlk:mboss/butterfly/fx/hud/coc_off
 function rlk:mboss/butterfly/fx/hud/buff_on

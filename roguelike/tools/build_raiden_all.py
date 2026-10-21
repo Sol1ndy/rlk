@@ -37,8 +37,10 @@ steps = [
     ["python3", "build_raiden_orb.py", "--resourcepack", rp],
     ["python3", "build_raiden_signature_vfx.py", "--resourcepack", rp],
     ["python3", "build_raiden_illusions.py", "--resourcepack", rp],
+    # the rig (it also deletes the former judgment_rig/ shims; the judgment rig generator is gone)
     node + ["build_raiden_rig.mjs", "--resourcepack", rp] + (["--skin", str(args.skin.resolve())] if args.skin else []),
-    node + ["build_raiden_judgment_rig.mjs", "--resourcepack", rp],
+    # last: boss/raiden/uninstall lists every objective / boss bar / storage key the outputs above create
+    ["python3", "build_raiden_uninstall.py"],
 ]
 for step in steps:
     if step[0] == "python3":

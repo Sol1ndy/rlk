@@ -1,7 +1,7 @@
 # @s = body: the 20th count broke the field (역장 붕괴). Every threat goes (hazards, props, pulls, glides:
 # lib_clear; the running pattern, waves included: p/cancel), the meter / low gravity / the damage cut end, the
 # field state ends; the break plays (40 t: bubble, burst at 5, tilt, wobble, sink), then groggy 200 t.
-# The kit: every decal goes (tele/clear), the banner if it still shows, the meter / low-gravity icon / hint
+# The kit: every decal goes (tele/clear), the banner if it still shows, the meter / low-gravity icon
 # (field/drop -> hud/kit_off); " · 그로기" on the name line from here to the end of the recovery.
 scoreboard players set #fgBrkQ mb 0
 # the device low in the closing wave_drop (read before p/cancel clears the clock): the grounded break_low (FID-1)

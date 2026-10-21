@@ -27,7 +27,7 @@
     "start": {"x": 200.5, "y": 201.0, "z": 25.5, "yaw": 180.0, "pitch": 0.0}
   },
   "arenas": {
-    "az_cavern": {"n": 1, "theme": "az_cavern", "ver": 1, "cx": 320, "cy": 201, "cz": 8, "r": 33, "walk": 28, "safe": 26,
+    "az_cavern": {"n": 1, "theme": "az_cavern", "ver": 2, "cx": 320, "cy": 201, "cz": 8, "r": 33, "walk": 28, "safe": 26,
                   "start": {"x": 320.5, "y": 201.0, "z": 34.5, "yaw": 180.0, "pitch": 0.0},
                   "box": {"x0": 280, "y0": 190, "z0": -32, "x1": 360, "y1": 240, "z1": 48},
                   "looks": ["default"], "oob": {"y0": 198, "y1": 237}},
@@ -79,9 +79,9 @@
       "icon": {"item": "minecraft:lodestone", "model": "minecraft:lodestone"}
     },
     {
-      "id": "azhdaha", "n": 10, "kind": "chapter", "ch": [1], "route": false, "enabled": false, "w": 0,
+      "id": "azhdaha", "n": 10, "kind": "chapter", "ch": [1], "route": true, "enabled": true, "w": 0,
       "minCh": 1, "maxCh": 1, "name": "야타용왕", "sub": "봉인된 바위 용의 왕", "color": "#F2B53A", "el": 5,
-      "hp": 260, "xp": 40, "atk": 12, "lvAdd": 0, "dmgMul": 140, "goldMul": 1, "sap": 0, "picks": 0,
+      "hp": 135, "xp": 40, "atk": 12, "lvAdd": 0, "dmgMul": 140, "goldMul": 1, "sap": 0, "picks": 0,
       "scale": 0.1, "px": true, "pxBase": 65, "intro": 160, "death": 140, "deathSnd": false,
       "arena": "az_cavern", "theme": "az_cavern", "res": {"0": 30, "5": 30, "*": 10}, "phases": [100],
       "music": {"1": {"ev": "minecraft:music.end", "len": 18090}, "2": {"ev": "minecraft:music.dragon", "len": 6883}},

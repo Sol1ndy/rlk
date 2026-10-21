@@ -22,6 +22,6 @@ execute if score #bfSt mb matches 5 if score #bfPick mb matches 14 run data modi
 execute if score #bfSt mb matches 1..2 if score #bfPick mb matches 15 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"달빛 해제",color:"#D9F5A8"}]
 execute if score #bfSt mb matches 5 if score #bfPick mb matches 15 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"달빛 해제",color:"#D9F5A8"}]
 execute if score #bfSt mb matches 1..2 if score #bfPick mb matches 20 run data modify storage rlk:mboss sub set value [{text:"패턴  ",color:"#A8A8A8"},{text:"변신",color:"#E8858A"}]
-execute if score #bfSt mb matches 3 run data modify storage rlk:mboss sub set value [{text:"그로기  ",color:"#9FE8A0",bold:true},{text:"공격할 기회",color:"#C8E8C8"}]
+execute if score #bfSt mb matches 3 run data modify storage rlk:mboss sub set value [{text:"그로기",color:"#9FE8A0",bold:true}]
 execute if score #bfSt mb matches 4 run data modify storage rlk:mboss sub set value [{text:"그로기  ",color:"#9FE8A0",bold:true},{text:"다시 일어선다",color:"#C8E8C8"}]
 function rlk:mboss/butterfly/fx/hud/put_sub

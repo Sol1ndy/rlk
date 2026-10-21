@@ -1,0 +1,13597 @@
+{
+ "schema": 1,
+ "boss": "azhdaha",
+ "runtime": {
+  "clip_obj": "azRigC",
+  "tick_obj": "azRigT",
+  "state_obj": "azRigState",
+  "legs_obj": "azRigLegs",
+  "tail_obj": "azRigTail",
+  "ns": "rlk:mboss/azhdaha/rig_stub/"
+ },
+ "functions": {
+  "init": "rlk:mboss/azhdaha/rig_stub/init",
+  "spawn": "rlk:mboss/azhdaha/rig_stub/spawn",
+  "tick": "rlk:mboss/azhdaha/rig_stub/tick",
+  "kill": "rlk:mboss/azhdaha/rig_stub/kill",
+  "uninstall": "rlk:mboss/azhdaha/rig_stub/uninstall",
+  "look_apply": "rlk:mboss/azhdaha/rig_stub/look_apply",
+  "play": {
+   "idle": "rlk:mboss/azhdaha/rig_stub/play/idle",
+   "walk": "rlk:mboss/azhdaha/rig_stub/play/walk",
+   "walk_stop": "rlk:mboss/azhdaha/rig_stub/play/walk_stop",
+   "turn45_l": "rlk:mboss/azhdaha/rig_stub/play/turn45_l",
+   "turn45_r": "rlk:mboss/azhdaha/rig_stub/play/turn45_r",
+   "turn90_l": "rlk:mboss/azhdaha/rig_stub/play/turn90_l",
+   "turn90_r": "rlk:mboss/azhdaha/rig_stub/play/turn90_r",
+   "turn180": "rlk:mboss/azhdaha/rig_stub/play/turn180",
+   "intro": "rlk:mboss/azhdaha/rig_stub/play/intro",
+   "pose_ref": "rlk:mboss/azhdaha/rig_stub/play/pose_ref",
+   "roar_low": "rlk:mboss/azhdaha/rig_stub/play/roar_low",
+   "roar_rear": "rlk:mboss/azhdaha/rig_stub/play/roar_rear",
+   "chin_slam": "rlk:mboss/azhdaha/rig_stub/play/chin_slam",
+   "jump_slam": "rlk:mboss/azhdaha/rig_stub/play/jump_slam",
+   "charge_coil": "rlk:mboss/azhdaha/rig_stub/play/charge_coil",
+   "charge_run": "rlk:mboss/azhdaha/rig_stub/play/charge_run",
+   "charge_stop": "rlk:mboss/azhdaha/rig_stub/play/charge_stop",
+   "spikes": "rlk:mboss/azhdaha/rig_stub/play/spikes",
+   "stomp_fl": "rlk:mboss/azhdaha/rig_stub/play/stomp_fl",
+   "stomp_fr": "rlk:mboss/azhdaha/rig_stub/play/stomp_fr",
+   "stomp_hl": "rlk:mboss/azhdaha/rig_stub/play/stomp_hl",
+   "stomp_hr": "rlk:mboss/azhdaha/rig_stub/play/stomp_hr",
+   "stomp3_fl": "rlk:mboss/azhdaha/rig_stub/play/stomp3_fl",
+   "stomp3_fr": "rlk:mboss/azhdaha/rig_stub/play/stomp3_fr",
+   "feint": "rlk:mboss/azhdaha/rig_stub/play/feint",
+   "tail_whip_l": "rlk:mboss/azhdaha/rig_stub/play/tail_whip_l",
+   "tail_whip_r": "rlk:mboss/azhdaha/rig_stub/play/tail_whip_r",
+   "tail_slam": "rlk:mboss/azhdaha/rig_stub/play/tail_slam",
+   "burrow_dive": "rlk:mboss/azhdaha/rig_stub/play/burrow_dive",
+   "burrow_travel": "rlk:mboss/azhdaha/rig_stub/play/burrow_travel",
+   "burrow_breach": "rlk:mboss/azhdaha/rig_stub/play/burrow_breach",
+   "burrow_emerge": "rlk:mboss/azhdaha/rig_stub/play/burrow_emerge",
+   "landslide": "rlk:mboss/azhdaha/rig_stub/play/landslide",
+   "absorb": "rlk:mboss/azhdaha/rig_stub/play/absorb",
+   "absorb_p3": "rlk:mboss/azhdaha/rig_stub/play/absorb_p3",
+   "p3_sink": "rlk:mboss/azhdaha/rig_stub/play/p3_sink",
+   "tail_pillar": "rlk:mboss/azhdaha/rig_stub/play/tail_pillar",
+   "tail_pillar_strike": "rlk:mboss/azhdaha/rig_stub/play/tail_pillar_strike",
+   "tail_pillar_sink": "rlk:mboss/azhdaha/rig_stub/play/tail_pillar_sink",
+   "tail_cast": "rlk:mboss/azhdaha/rig_stub/play/tail_cast",
+   "death": "rlk:mboss/azhdaha/rig_stub/play/death"
+  },
+  "face": {
+   "player": "rlk:mboss/azhdaha/rig_stub/face/player",
+   "track": "rlk:mboss/azhdaha/rig_stub/face/track",
+   "set": "rlk:mboss/azhdaha/rig_stub/face/set"
+  },
+  "state": {
+   "normal": "rlk:mboss/azhdaha/rig_stub/state/normal",
+   "burrowed": "rlk:mboss/azhdaha/rig_stub/state/burrowed",
+   "tail_only": "rlk:mboss/azhdaha/rig_stub/state/tail_only"
+  },
+  "look_legs": {
+   "geo": "rlk:mboss/azhdaha/rig_stub/look/legs/geo",
+   "hydro": "rlk:mboss/azhdaha/rig_stub/look/legs/hydro",
+   "pyro": "rlk:mboss/azhdaha/rig_stub/look/legs/pyro"
+  },
+  "look_tail": {
+   "geo": "rlk:mboss/azhdaha/rig_stub/look/tail/geo",
+   "cryo": "rlk:mboss/azhdaha/rig_stub/look/tail/cryo",
+   "electro": "rlk:mboss/azhdaha/rig_stub/look/tail/electro"
+  },
+  "petrify": "rlk:mboss/azhdaha/rig_stub/look/petrify",
+  "glow_on": "rlk:mboss/azhdaha/rig_stub/glow/gold_on",
+  "glow_off": "rlk:mboss/azhdaha/rig_stub/glow/gold_off",
+  "flash": {
+   "head": "rlk:mboss/azhdaha/rig_stub/flash/head",
+   "front": "rlk:mboss/azhdaha/rig_stub/flash/front",
+   "rear": "rlk:mboss/azhdaha/rig_stub/flash/rear",
+   "tail": "rlk:mboss/azhdaha/rig_stub/flash/tail"
+  }
+ },
+ "parts": [
+  {
+   "name": "head",
+   "region": "head",
+   "idx": 1,
+   "uuid": "524c4b4d-415a-4400-8000-000000000001",
+   "tag": "rlk_mb_az_head"
+  },
+  {
+   "name": "jaw",
+   "region": "head",
+   "idx": 2,
+   "uuid": "524c4b4d-415a-4400-8000-000000000002",
+   "tag": "rlk_mb_az_jaw"
+  },
+  {
+   "name": "eyes",
+   "region": "head",
+   "idx": 3,
+   "uuid": "524c4b4d-415a-4400-8000-000000000003",
+   "tag": "rlk_mb_az_eyes"
+  },
+  {
+   "name": "horn_l",
+   "region": "head",
+   "idx": 4,
+   "uuid": "524c4b4d-415a-4400-8000-000000000004",
+   "tag": "rlk_mb_az_horn_l"
+  },
+  {
+   "name": "horn_r",
+   "region": "head",
+   "idx": 5,
+   "uuid": "524c4b4d-415a-4400-8000-000000000005",
+   "tag": "rlk_mb_az_horn_r"
+  },
+  {
+   "name": "beard1",
+   "region": "head",
+   "idx": 6,
+   "uuid": "524c4b4d-415a-4400-8000-000000000006",
+   "tag": "rlk_mb_az_beard1"
+  },
+  {
+   "name": "beard2",
+   "region": "head",
+   "idx": 7,
+   "uuid": "524c4b4d-415a-4400-8000-000000000007",
+   "tag": "rlk_mb_az_beard2"
+  },
+  {
+   "name": "chest",
+   "region": "body",
+   "idx": 8,
+   "uuid": "524c4b4d-415a-4400-8000-000000000008",
+   "tag": "rlk_mb_az_chest"
+  },
+  {
+   "name": "belly",
+   "region": "body",
+   "idx": 9,
+   "uuid": "524c4b4d-415a-4400-8000-000000000009",
+   "tag": "rlk_mb_az_belly"
+  },
+  {
+   "name": "pelvis",
+   "region": "body",
+   "idx": 10,
+   "uuid": "524c4b4d-415a-4400-8000-00000000000a",
+   "tag": "rlk_mb_az_pelvis"
+  },
+  {
+   "name": "neck1",
+   "region": "body",
+   "idx": 11,
+   "uuid": "524c4b4d-415a-4400-8000-00000000000b",
+   "tag": "rlk_mb_az_neck1"
+  },
+  {
+   "name": "neck2",
+   "region": "body",
+   "idx": 12,
+   "uuid": "524c4b4d-415a-4400-8000-00000000000c",
+   "tag": "rlk_mb_az_neck2"
+  },
+  {
+   "name": "apron",
+   "region": "body",
+   "idx": 13,
+   "uuid": "524c4b4d-415a-4400-8000-00000000000d",
+   "tag": "rlk_mb_az_apron"
+  },
+  {
+   "name": "glow_apron",
+   "region": "body",
+   "idx": 14,
+   "uuid": "524c4b4d-415a-4400-8000-00000000000e",
+   "tag": "rlk_mb_az_glow_apron"
+  },
+  {
+   "name": "plates_neck",
+   "region": "body",
+   "idx": 15,
+   "uuid": "524c4b4d-415a-4400-8000-00000000000f",
+   "tag": "rlk_mb_az_plates_neck"
+  },
+  {
+   "name": "plates_sh",
+   "region": "body",
+   "idx": 16,
+   "uuid": "524c4b4d-415a-4400-8000-000000000010",
+   "tag": "rlk_mb_az_plates_sh"
+  },
+  {
+   "name": "plates_mid",
+   "region": "body",
+   "idx": 17,
+   "uuid": "524c4b4d-415a-4400-8000-000000000011",
+   "tag": "rlk_mb_az_plates_mid"
+  },
+  {
+   "name": "plates_hip",
+   "region": "body",
+   "idx": 18,
+   "uuid": "524c4b4d-415a-4400-8000-000000000012",
+   "tag": "rlk_mb_az_plates_hip"
+  },
+  {
+   "name": "crys_sh",
+   "region": "body",
+   "idx": 19,
+   "uuid": "524c4b4d-415a-4400-8000-000000000013",
+   "tag": "rlk_mb_az_crys_sh"
+  },
+  {
+   "name": "crys_mid",
+   "region": "body",
+   "idx": 20,
+   "uuid": "524c4b4d-415a-4400-8000-000000000014",
+   "tag": "rlk_mb_az_crys_mid"
+  },
+  {
+   "name": "crys_hip",
+   "region": "body",
+   "idx": 21,
+   "uuid": "524c4b4d-415a-4400-8000-000000000015",
+   "tag": "rlk_mb_az_crys_hip"
+  },
+  {
+   "name": "uarm_l",
+   "region": "legs",
+   "idx": 22,
+   "uuid": "524c4b4d-415a-4400-8000-000000000016",
+   "tag": "rlk_mb_az_uarm_l"
+  },
+  {
+   "name": "bracer_l",
+   "region": "legs",
+   "idx": 23,
+   "uuid": "524c4b4d-415a-4400-8000-000000000017",
+   "tag": "rlk_mb_az_bracer_l"
+  },
+  {
+   "name": "paw_l",
+   "region": "legs",
+   "idx": 24,
+   "uuid": "524c4b4d-415a-4400-8000-000000000018",
+   "tag": "rlk_mb_az_paw_l"
+  },
+  {
+   "name": "uarm_r",
+   "region": "legs",
+   "idx": 25,
+   "uuid": "524c4b4d-415a-4400-8000-000000000019",
+   "tag": "rlk_mb_az_uarm_r"
+  },
+  {
+   "name": "bracer_r",
+   "region": "legs",
+   "idx": 26,
+   "uuid": "524c4b4d-415a-4400-8000-00000000001a",
+   "tag": "rlk_mb_az_bracer_r"
+  },
+  {
+   "name": "paw_r",
+   "region": "legs",
+   "idx": 27,
+   "uuid": "524c4b4d-415a-4400-8000-00000000001b",
+   "tag": "rlk_mb_az_paw_r"
+  },
+  {
+   "name": "thigh_l",
+   "region": "legs",
+   "idx": 28,
+   "uuid": "524c4b4d-415a-4400-8000-00000000001c",
+   "tag": "rlk_mb_az_thigh_l"
+  },
+  {
+   "name": "gaiter_l",
+   "region": "legs",
+   "idx": 29,
+   "uuid": "524c4b4d-415a-4400-8000-00000000001d",
+   "tag": "rlk_mb_az_gaiter_l"
+  },
+  {
+   "name": "foot_l",
+   "region": "legs",
+   "idx": 30,
+   "uuid": "524c4b4d-415a-4400-8000-00000000001e",
+   "tag": "rlk_mb_az_foot_l"
+  },
+  {
+   "name": "thigh_r",
+   "region": "legs",
+   "idx": 31,
+   "uuid": "524c4b4d-415a-4400-8000-00000000001f",
+   "tag": "rlk_mb_az_thigh_r"
+  },
+  {
+   "name": "gaiter_r",
+   "region": "legs",
+   "idx": 32,
+   "uuid": "524c4b4d-415a-4400-8000-000000000020",
+   "tag": "rlk_mb_az_gaiter_r"
+  },
+  {
+   "name": "foot_r",
+   "region": "legs",
+   "idx": 33,
+   "uuid": "524c4b4d-415a-4400-8000-000000000021",
+   "tag": "rlk_mb_az_foot_r"
+  },
+  {
+   "name": "glow_bracer_l",
+   "region": "legs",
+   "idx": 34,
+   "uuid": "524c4b4d-415a-4400-8000-000000000022",
+   "tag": "rlk_mb_az_glow_bracer_l"
+  },
+  {
+   "name": "glow_bracer_r",
+   "region": "legs",
+   "idx": 35,
+   "uuid": "524c4b4d-415a-4400-8000-000000000023",
+   "tag": "rlk_mb_az_glow_bracer_r"
+  },
+  {
+   "name": "glow_gaiter_l",
+   "region": "legs",
+   "idx": 36,
+   "uuid": "524c4b4d-415a-4400-8000-000000000024",
+   "tag": "rlk_mb_az_glow_gaiter_l"
+  },
+  {
+   "name": "glow_gaiter_r",
+   "region": "legs",
+   "idx": 37,
+   "uuid": "524c4b4d-415a-4400-8000-000000000025",
+   "tag": "rlk_mb_az_glow_gaiter_r"
+  },
+  {
+   "name": "t1",
+   "region": "tail",
+   "idx": 38,
+   "uuid": "524c4b4d-415a-4400-8000-000000000026",
+   "tag": "rlk_mb_az_t1"
+  },
+  {
+   "name": "t2",
+   "region": "tail",
+   "idx": 39,
+   "uuid": "524c4b4d-415a-4400-8000-000000000027",
+   "tag": "rlk_mb_az_t2"
+  },
+  {
+   "name": "t3",
+   "region": "tail",
+   "idx": 40,
+   "uuid": "524c4b4d-415a-4400-8000-000000000028",
+   "tag": "rlk_mb_az_t3"
+  },
+  {
+   "name": "t4",
+   "region": "tail",
+   "idx": 41,
+   "uuid": "524c4b4d-415a-4400-8000-000000000029",
+   "tag": "rlk_mb_az_t4"
+  },
+  {
+   "name": "t5",
+   "region": "tail",
+   "idx": 42,
+   "uuid": "524c4b4d-415a-4400-8000-00000000002a",
+   "tag": "rlk_mb_az_t5"
+  },
+  {
+   "name": "t6",
+   "region": "tail",
+   "idx": 43,
+   "uuid": "524c4b4d-415a-4400-8000-00000000002b",
+   "tag": "rlk_mb_az_t6"
+  },
+  {
+   "name": "t7",
+   "region": "tail",
+   "idx": 44,
+   "uuid": "524c4b4d-415a-4400-8000-00000000002c",
+   "tag": "rlk_mb_az_t7"
+  },
+  {
+   "name": "t8",
+   "region": "tail",
+   "idx": 45,
+   "uuid": "524c4b4d-415a-4400-8000-00000000002d",
+   "tag": "rlk_mb_az_t8"
+  },
+  {
+   "name": "tip",
+   "region": "tail",
+   "idx": 46,
+   "uuid": "524c4b4d-415a-4400-8000-00000000002e",
+   "tag": "rlk_mb_az_tip"
+  }
+ ],
+ "uuids": {
+  "block": "524c4b4d-415a-4400-8000-0000000000",
+  "ints": [
+   1380731725,
+   1096434688,
+   -2147483648
+  ],
+  "parts": {
+   "head": 1,
+   "jaw": 2,
+   "eyes": 3,
+   "horn_l": 4,
+   "horn_r": 5,
+   "beard1": 6,
+   "beard2": 7,
+   "chest": 8,
+   "belly": 9,
+   "pelvis": 10,
+   "neck1": 11,
+   "neck2": 12,
+   "apron": 13,
+   "glow_apron": 14,
+   "plates_neck": 15,
+   "plates_sh": 16,
+   "plates_mid": 17,
+   "plates_hip": 18,
+   "crys_sh": 19,
+   "crys_mid": 20,
+   "crys_hip": 21,
+   "uarm_l": 22,
+   "bracer_l": 23,
+   "paw_l": 24,
+   "uarm_r": 25,
+   "bracer_r": 26,
+   "paw_r": 27,
+   "thigh_l": 28,
+   "gaiter_l": 29,
+   "foot_l": 30,
+   "thigh_r": 31,
+   "gaiter_r": 32,
+   "foot_r": 33,
+   "glow_bracer_l": 34,
+   "glow_bracer_r": 35,
+   "glow_gaiter_l": 36,
+   "glow_gaiter_r": 37,
+   "t1": 38,
+   "t2": 39,
+   "t3": 40,
+   "t4": 41,
+   "t5": 42,
+   "t6": 43,
+   "t7": 44,
+   "t8": 45,
+   "tip": 46
+  },
+  "shadow": 64,
+  "proxies": {
+   "head": 65,
+   "chest": 66,
+   "belly": 67,
+   "hips": 68,
+   "tail1": 69,
+   "tail2": 70,
+   "tail3": 71,
+   "tail4": 72,
+   "paw_l": 73,
+   "paw_r": 74,
+   "foot_l": 75,
+   "foot_r": 76
+  },
+  "props": {
+   "seal_prism": 128,
+   "crater": 129
+  }
+ },
+ "skeleton": {
+  "joints": {
+   "pelvis": [
+    0,
+    3,
+    2.4
+   ],
+   "spine1": [
+    0,
+    3.35,
+    0.3
+   ],
+   "chest": [
+    0,
+    3.35,
+    -1.7
+   ],
+   "neck1": [
+    0,
+    3.05,
+    -2.55
+   ],
+   "neck2": [
+    0,
+    2.6,
+    -3.05
+   ],
+   "head": [
+    0,
+    2.05,
+    -3.3
+   ],
+   "jaw": [
+    0,
+    1.3,
+    -3.6
+   ],
+   "t1": [
+    0,
+    2.85,
+    4.75
+   ],
+   "shoulder": [
+    2.3,
+    3.25,
+    -2.15
+   ],
+   "wrist": [
+    3.15,
+    0.5,
+    -2.45
+   ],
+   "hip": [
+    2,
+    3,
+    2.45
+   ],
+   "hock": [
+    2.5,
+    0.72,
+    3.05
+   ]
+  },
+  "scale_H": 7,
+  "frame": "rig (+x left, +y up, +z back)"
+ },
+ "rest_anchors": {
+  "nose": [
+   0.0,
+   0.85,
+   5.5
+  ],
+  "head_col": [
+   0.0,
+   0.0,
+   4.3
+  ],
+  "head_front": [
+   0.0,
+   0.0,
+   6.8
+  ],
+  "chest": [
+   0.0,
+   0.0,
+   2.1
+  ],
+  "hips": [
+   0.0,
+   0.0,
+   -3.4
+  ],
+  "tail_root": [
+   0.0,
+   2.85,
+   -4.75
+  ],
+  "paw_fl": [
+   3.15,
+   0.0,
+   2.95
+  ],
+  "paw_fr": [
+   -3.15,
+   0.0,
+   2.95
+  ],
+  "foot_hl": [
+   2.5,
+   0.0,
+   -2.55
+  ],
+  "foot_hr": [
+   -2.5,
+   0.0,
+   -2.55
+  ],
+  "back": [
+   0.0,
+   4.0,
+   -0.2
+  ]
+ },
+ "torso_hw": 3.0,
+ "proxies": {
+  "layout": [
+   {
+    "name": "head",
+    "part": "head",
+    "point": [
+     0,
+     -0.6,
+     -0.6
+    ],
+    "w": 2.8,
+    "top_margin": 1.6,
+    "tail_only": false,
+    "idx": 65,
+    "uuid": "524c4b4d-415a-4400-8000-000000000041",
+    "flash": "head"
+   },
+   {
+    "name": "chest",
+    "part": "chest",
+    "point": [
+     0,
+     0,
+     -0.4
+    ],
+    "w": 4.6,
+    "top_margin": 1.5,
+    "tail_only": false,
+    "idx": 66,
+    "uuid": "524c4b4d-415a-4400-8000-000000000042",
+    "flash": "front"
+   },
+   {
+    "name": "belly",
+    "part": "belly",
+    "point": [
+     0,
+     0,
+     0.2
+    ],
+    "w": 4.6,
+    "top_margin": 1.5,
+    "tail_only": false,
+    "idx": 67,
+    "uuid": "524c4b4d-415a-4400-8000-000000000043",
+    "flash": "rear"
+   },
+   {
+    "name": "hips",
+    "part": "pelvis",
+    "point": [
+     0,
+     0,
+     1
+    ],
+    "w": 4.4,
+    "top_margin": 1.2,
+    "tail_only": false,
+    "idx": 68,
+    "uuid": "524c4b4d-415a-4400-8000-000000000044",
+    "flash": "rear"
+   },
+   {
+    "name": "tail1",
+    "part": "t1",
+    "point": [
+     0,
+     0,
+     1.2
+    ],
+    "w": 2.6,
+    "top_margin": 1.2,
+    "tail_only": true,
+    "idx": 69,
+    "uuid": "524c4b4d-415a-4400-8000-000000000045",
+    "flash": "tail"
+   },
+   {
+    "name": "tail2",
+    "part": "t3",
+    "point": [
+     0,
+     0,
+     1
+    ],
+    "w": 2.2,
+    "top_margin": 1.0,
+    "tail_only": true,
+    "idx": 70,
+    "uuid": "524c4b4d-415a-4400-8000-000000000046",
+    "flash": "tail"
+   },
+   {
+    "name": "tail3",
+    "part": "t5",
+    "point": [
+     0,
+     0,
+     0.9
+    ],
+    "w": 1.8,
+    "top_margin": 0.9,
+    "tail_only": true,
+    "idx": 71,
+    "uuid": "524c4b4d-415a-4400-8000-000000000047",
+    "flash": "tail"
+   },
+   {
+    "name": "tail4",
+    "part": "t7",
+    "point": [
+     0,
+     0,
+     1.5
+    ],
+    "w": 1.4,
+    "top_margin": 0.8,
+    "tail_only": true,
+    "idx": 72,
+    "uuid": "524c4b4d-415a-4400-8000-000000000048",
+    "flash": "tail"
+   },
+   {
+    "name": "paw_l",
+    "part": "paw_l",
+    "point": [
+     0,
+     -0.3,
+     -0.55
+    ],
+    "w": 1.8,
+    "top_margin": 2.6,
+    "tail_only": false,
+    "idx": 73,
+    "uuid": "524c4b4d-415a-4400-8000-000000000049",
+    "flash": "front"
+   },
+   {
+    "name": "paw_r",
+    "part": "paw_r",
+    "point": [
+     0,
+     -0.3,
+     -0.55
+    ],
+    "w": 1.8,
+    "top_margin": 2.6,
+    "tail_only": false,
+    "idx": 74,
+    "uuid": "524c4b4d-415a-4400-8000-00000000004a",
+    "flash": "front"
+   },
+   {
+    "name": "foot_l",
+    "part": "foot_l",
+    "point": [
+     0,
+     -1.18,
+     -0.35
+    ],
+    "w": 1.8,
+    "top_margin": 2.6,
+    "tail_only": false,
+    "idx": 75,
+    "uuid": "524c4b4d-415a-4400-8000-00000000004b",
+    "flash": "rear"
+   },
+   {
+    "name": "foot_r",
+    "part": "foot_r",
+    "point": [
+     0,
+     -1.18,
+     -0.35
+    ],
+    "w": 1.8,
+    "top_margin": 2.6,
+    "tail_only": false,
+    "idx": 76,
+    "uuid": "524c4b4d-415a-4400-8000-00000000004c",
+    "flash": "rear"
+   }
+  ],
+  "rest": {
+   "head": [
+    0.0,
+    4.3,
+    3.05
+   ],
+   "chest": [
+    0.0,
+    2.1,
+    4.85
+   ],
+   "belly": [
+    0.0,
+    -0.5,
+    4.85
+   ],
+   "hips": [
+    0.0,
+    -3.4,
+    4.2
+   ],
+   "tail1": [
+    0.0,
+    -6.35,
+    3.94
+   ],
+   "tail2": [
+    0.0,
+    -10.12,
+    3.9
+   ],
+   "tail3": [
+    0.0,
+    -12.86,
+    5.81
+   ],
+   "tail4": [
+    0.0,
+    -11.9,
+    8.51
+   ],
+   "paw_l": [
+    3.15,
+    2.95,
+    2.8
+   ],
+   "paw_r": [
+    -3.15,
+    2.95,
+    2.8
+   ],
+   "foot_l": [
+    2.5,
+    -2.55,
+    2.92
+   ],
+   "foot_r": [
+    -2.5,
+    -2.55,
+    2.92
+   ]
+  },
+  "rest_pose": {
+   "head": [
+    0.0,
+    4.3,
+    3.05
+   ],
+   "chest": [
+    0.0,
+    2.1,
+    4.85
+   ],
+   "belly": [
+    0.0,
+    -0.5,
+    4.85
+   ],
+   "hips": [
+    0.0,
+    -3.4,
+    4.2
+   ],
+   "tail1": [
+    0.0,
+    -5.863,
+    4.5
+   ],
+   "tail2": [
+    0.0,
+    -8.59,
+    7.209
+   ],
+   "tail3": [
+    0.0,
+    -7.898,
+    10.434
+   ],
+   "tail4": [
+    0.0,
+    -4.458,
+    11.736
+   ],
+   "paw_l": [
+    3.15,
+    2.95,
+    2.8
+   ],
+   "paw_r": [
+    -3.15,
+    2.95,
+    2.8
+   ],
+   "foot_l": [
+    2.5,
+    -2.55,
+    2.92
+   ],
+   "foot_r": [
+    -2.5,
+    -2.55,
+    2.92
+   ]
+  }
+ },
+ "states": {
+  "normal": {
+   "px": [
+    "head",
+    "chest",
+    "belly",
+    "hips",
+    "tail1",
+    "tail2",
+    "tail3",
+    "tail4",
+    "paw_l",
+    "paw_r",
+    "foot_l",
+    "foot_r"
+   ],
+   "vis": "normal",
+   "inv": false,
+   "capsules": [
+    "torso",
+    "head"
+   ]
+  },
+  "jump": {
+   "px": [],
+   "vis": null,
+   "inv": false,
+   "capsules": []
+  },
+  "inv": {
+   "px": [],
+   "vis": null,
+   "inv": true,
+   "capsules": []
+  },
+  "tail_only": {
+   "px": [
+    "tail1",
+    "tail2",
+    "tail3",
+    "tail4"
+   ],
+   "vis": "tail_only",
+   "inv": false,
+   "capsules": []
+  },
+  "dead": {
+   "px": [],
+   "vis": null,
+   "inv": true,
+   "capsules": []
+  }
+ },
+ "capsules": {
+  "torso": {
+   "f0": -3.8,
+   "f1": 2.6,
+   "hw": 2.8
+  },
+  "head": {
+   "f0": 2.6,
+   "f1": 5.4,
+   "hw": 1.6,
+   "px": "head",
+   "top_max": 3.5
+  }
+ },
+ "flash_groups": {
+  "head": [
+   "head",
+   "jaw",
+   "horn_l",
+   "horn_r"
+  ],
+  "front": [
+   "chest",
+   "neck1",
+   "neck2",
+   "apron",
+   "uarm_l",
+   "uarm_r",
+   "bracer_l",
+   "bracer_r",
+   "paw_l",
+   "paw_r"
+  ],
+  "rear": [
+   "belly",
+   "pelvis",
+   "thigh_l",
+   "thigh_r",
+   "gaiter_l",
+   "gaiter_r",
+   "foot_l",
+   "foot_r"
+  ],
+  "tail": [
+   "t1",
+   "t2",
+   "t3",
+   "t4",
+   "t5",
+   "t6",
+   "t7",
+   "t8",
+   "tip"
+  ]
+ },
+ "looks": {
+  "legs": {
+   "objective": "azRigLegs",
+   "ids": {
+    "geo": 0,
+    "hydro": 1,
+    "pyro": 2
+   }
+  },
+  "tail": {
+   "objective": "azRigTail",
+   "ids": {
+    "geo": 0,
+    "cryo": 1,
+    "electro": 2
+   }
+  },
+  "functions": {
+   "legs": {
+    "geo": "rlk:mboss/azhdaha/rig_stub/look/legs/geo",
+    "hydro": "rlk:mboss/azhdaha/rig_stub/look/legs/hydro",
+    "pyro": "rlk:mboss/azhdaha/rig_stub/look/legs/pyro"
+   },
+   "tail": {
+    "geo": "rlk:mboss/azhdaha/rig_stub/look/tail/geo",
+    "cryo": "rlk:mboss/azhdaha/rig_stub/look/tail/cryo",
+    "electro": "rlk:mboss/azhdaha/rig_stub/look/tail/electro"
+   },
+   "petrify": "rlk:mboss/azhdaha/rig_stub/look/petrify",
+   "glow_on": "rlk:mboss/azhdaha/rig_stub/glow/gold_on",
+   "glow_off": "rlk:mboss/azhdaha/rig_stub/glow/gold_off"
+  }
+ },
+ "culling": {
+  "width": 30,
+  "height": 12,
+  "view_range": 3
+ },
+ "rest_extents": [
+  [
+   -4.09,
+   4.09
+  ],
+  [
+   -0.35,
+   8.27
+  ],
+  [
+   -5.3,
+   13.53
+  ]
+ ],
+ "budgets": {
+  "parts": 46,
+  "part_budget": "44-48 (cap 56)",
+  "atlas_px": 947200,
+  "atlas_budget": 1200000,
+  "regions": {
+   "head": {
+    "parts": 8,
+    "px": 300000
+   },
+   "body": {
+    "parts": 14,
+    "px": 300000
+   },
+   "legs": {
+    "parts": 16,
+    "px": 320000
+   },
+   "tail": {
+    "parts": 10,
+    "px": 280000
+   }
+  }
+ },
+ "objectives": {
+  "azRigC": "current clip id (anchor)",
+  "azRigT": "tick within the clip (anchor; -1 = queued by play)",
+  "azRigF": "hit flash countdown",
+  "azRigY": "face/track scratch",
+  "azRigLegs": "legs look: 0 geo, 1 hydro, 2 pyro",
+  "azRigTail": "tail look: 0 geo, 1 cryo, 2 electro",
+  "azRigState": "body state: 0 normal, 1 burrowed, 2 tail-only"
+ },
+ "source": "stub",
+ "clips": [
+  {
+   "id": 1000,
+   "name": "idle",
+   "len": 80,
+   "authored": 80,
+   "loop": true,
+   "next": null,
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "snarl": 30
+   },
+   "anchors": {},
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "79": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1001,
+   "name": "walk",
+   "len": 40,
+   "authored": 40,
+   "loop": true,
+   "next": null,
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "lh": 0,
+    "lf": 10,
+    "rh": 20,
+    "rf": 30
+   },
+   "anchors": {
+    "lh": {
+     "paw": [
+      2.5,
+      0.0,
+      -2.55
+     ]
+    },
+    "lf": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "rh": {
+     "paw": [
+      -2.5,
+      0.0,
+      -2.55
+     ]
+    },
+    "rf": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "39": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1002,
+   "name": "walk_stop",
+   "len": 16,
+   "authored": 16,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "plant": 4
+   },
+   "anchors": {
+    "plant": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "15": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1003,
+   "name": "turn45_l",
+   "len": 24,
+   "authored": 24,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "plant_1": 10,
+    "plant_2": 17,
+    "yaw0": 4,
+    "yaw1": 18
+   },
+   "anchors": {
+    "plant_1": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "plant_2": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "23": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    -0.66,
+    -2.49,
+    -5.31,
+    -8.92,
+    -13.12,
+    -17.71,
+    -22.5,
+    -27.29,
+    -31.88,
+    -36.08,
+    -39.69,
+    -42.51,
+    -44.34,
+    -45.0,
+    -45.0,
+    -45.0,
+    -45.0,
+    -45.0,
+    -45.0
+   ],
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1004,
+   "name": "turn45_r",
+   "len": 24,
+   "authored": 24,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": "turn45_l",
+   "retime": [],
+   "events": {
+    "plant_1": 10,
+    "plant_2": 17,
+    "yaw0": 4,
+    "yaw1": 18
+   },
+   "anchors": {
+    "plant_1": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "plant_2": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "23": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.66,
+    2.49,
+    5.31,
+    8.92,
+    13.12,
+    17.71,
+    22.5,
+    27.29,
+    31.88,
+    36.08,
+    39.69,
+    42.51,
+    44.34,
+    45.0,
+    45.0,
+    45.0,
+    45.0,
+    45.0,
+    45.0
+   ],
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1005,
+   "name": "turn90_l",
+   "len": 36,
+   "authored": 36,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "plant_1": 12,
+    "plant_2": 18,
+    "plant_3": 24,
+    "plant_4": 30,
+    "yaw0": 6,
+    "yaw1": 30
+   },
+   "anchors": {
+    "plant_1": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "plant_2": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "plant_3": {
+     "paw": [
+      2.5,
+      0.0,
+      -2.55
+     ]
+    },
+    "plant_4": {
+     "paw": [
+      -2.5,
+      0.0,
+      -2.55
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "35": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    -0.46,
+    -1.77,
+    -3.87,
+    -6.67,
+    -10.09,
+    -14.06,
+    -18.5,
+    -23.33,
+    -28.48,
+    -33.85,
+    -39.39,
+    -45.0,
+    -50.61,
+    -56.15,
+    -61.52,
+    -66.67,
+    -71.5,
+    -75.94,
+    -79.91,
+    -83.33,
+    -86.13,
+    -88.23,
+    -89.54,
+    -90.0,
+    -90.0,
+    -90.0,
+    -90.0,
+    -90.0,
+    -90.0
+   ],
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1006,
+   "name": "turn90_r",
+   "len": 36,
+   "authored": 36,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": "turn90_l",
+   "retime": [],
+   "events": {
+    "plant_1": 12,
+    "plant_2": 18,
+    "plant_3": 24,
+    "plant_4": 30,
+    "yaw0": 6,
+    "yaw1": 30
+   },
+   "anchors": {
+    "plant_1": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "plant_2": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "plant_3": {
+     "paw": [
+      -2.5,
+      0.0,
+      -2.55
+     ]
+    },
+    "plant_4": {
+     "paw": [
+      2.5,
+      0.0,
+      -2.55
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "35": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.46,
+    1.77,
+    3.87,
+    6.67,
+    10.09,
+    14.06,
+    18.5,
+    23.33,
+    28.48,
+    33.85,
+    39.39,
+    45.0,
+    50.61,
+    56.15,
+    61.52,
+    66.67,
+    71.5,
+    75.94,
+    79.91,
+    83.33,
+    86.13,
+    88.23,
+    89.54,
+    90.0,
+    90.0,
+    90.0,
+    90.0,
+    90.0,
+    90.0
+   ],
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1007,
+   "name": "turn180",
+   "len": 60,
+   "authored": 60,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "plant_1": 12,
+    "plant_2": 18,
+    "plant_3": 24,
+    "plant_4": 30,
+    "plant_5": 36,
+    "plant_6": 42,
+    "plant_7": 48,
+    "plant_8": 54,
+    "yaw0": 6,
+    "yaw1": 54
+   },
+   "anchors": {
+    "plant_1": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "plant_2": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "plant_3": {
+     "paw": [
+      2.5,
+      0.0,
+      -2.55
+     ]
+    },
+    "plant_4": {
+     "paw": [
+      -2.5,
+      0.0,
+      -2.55
+     ]
+    },
+    "plant_5": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "plant_6": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "plant_7": {
+     "paw": [
+      2.5,
+      0.0,
+      -2.55
+     ]
+    },
+    "plant_8": {
+     "paw": [
+      -2.5,
+      0.0,
+      -2.55
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "59": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    -0.23,
+    -0.91,
+    -2.02,
+    -3.54,
+    -5.45,
+    -7.73,
+    -10.37,
+    -13.33,
+    -16.61,
+    -20.18,
+    -24.03,
+    -28.12,
+    -32.46,
+    -37.01,
+    -41.75,
+    -46.67,
+    -51.74,
+    -56.95,
+    -62.28,
+    -67.71,
+    -73.21,
+    -78.78,
+    -84.38,
+    -90.0,
+    -95.62,
+    -101.22,
+    -106.79,
+    -112.29,
+    -117.72,
+    -123.05,
+    -128.26,
+    -133.33,
+    -138.25,
+    -142.99,
+    -147.54,
+    -151.88,
+    -155.97,
+    -159.82,
+    -163.39,
+    -166.67,
+    -169.63,
+    -172.27,
+    -174.55,
+    -176.46,
+    -177.98,
+    -179.09,
+    -179.77,
+    -180.0,
+    -180.0,
+    -180.0,
+    -180.0,
+    -180.0,
+    -180.0
+   ],
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1008,
+   "name": "intro",
+   "len": 150,
+   "authored": 150,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "eyes": 25,
+    "rise": 30,
+    "crack1": 50,
+    "crack2": 70,
+    "seal": 112,
+    "land": 116,
+    "roar": 120,
+    "blast": 130
+   },
+   "anchors": {},
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "149": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1009,
+   "name": "pose_ref",
+   "len": 20,
+   "authored": 20,
+   "loop": true,
+   "next": null,
+   "mirror_of": null,
+   "retime": [],
+   "events": {},
+   "anchors": {},
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "19": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1010,
+   "name": "roar_low",
+   "len": 40,
+   "authored": 50,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     10,
+     8
+    ],
+    [
+     50,
+     40
+    ]
+   ],
+   "events": {
+    "roar": 8,
+    "blast": 10
+   },
+   "anchors": {
+    "roar": {
+     "nose": [
+      0.0,
+      0.85,
+      5.5
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "39": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1011,
+   "name": "roar_rear",
+   "len": 82,
+   "authored": 100,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     20,
+     20
+    ],
+    [
+     76,
+     62
+    ],
+    [
+     100,
+     82
+    ]
+   ],
+   "events": {
+    "rise": 8,
+    "roar": 20,
+    "drop": 62,
+    "land": 74
+   },
+   "anchors": {
+    "roar": {
+     "nose": [
+      0.0,
+      0.85,
+      5.5
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "81": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1012,
+   "name": "chin_slam",
+   "len": 65,
+   "authored": 84,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     47,
+     35
+    ],
+    [
+     84,
+     65
+    ]
+   ],
+   "events": {
+    "lift": 2,
+    "rear": 14,
+    "top": 23,
+    "drop": 32,
+    "impact": 35
+   },
+   "anchors": {
+    "impact": {
+     "impact": [
+      0.0,
+      0.0,
+      6.5
+     ],
+     "nose": [
+      0.0,
+      0.85,
+      5.5
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "64": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1013,
+   "name": "jump_slam",
+   "len": 53,
+   "authored": 60,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     28,
+     21
+    ],
+    [
+     60,
+     53
+    ]
+   ],
+   "events": {
+    "crouch": 0,
+    "takeoff": 6,
+    "apex": 13,
+    "land": 21,
+    "wave2": 32
+   },
+   "anchors": {
+    "land": {
+     "nose": [
+      0.0,
+      0.85,
+      5.5
+     ]
+    },
+    "wave2": {
+     "nose": [
+      0.0,
+      0.85,
+      5.5
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "52": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1014,
+   "name": "charge_coil",
+   "len": 26,
+   "authored": 34,
+   "loop": false,
+   "next": "charge_run",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     34,
+     26
+    ]
+   ],
+   "events": {
+    "coil": 6,
+    "launch": 24
+   },
+   "anchors": {},
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "25": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1015,
+   "name": "charge_run",
+   "len": 12,
+   "authored": 12,
+   "loop": true,
+   "next": null,
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "plant": 6
+   },
+   "anchors": {},
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "11": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1016,
+   "name": "charge_stop",
+   "len": 21,
+   "authored": 24,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     8,
+     8
+    ],
+    [
+     24,
+     21
+    ]
+   ],
+   "events": {
+    "skid": 0,
+    "stop": 8
+   },
+   "anchors": {},
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "20": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1017,
+   "name": "spikes",
+   "len": 40,
+   "authored": 48,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     18,
+     14
+    ],
+    [
+     24,
+     20
+    ],
+    [
+     48,
+     40
+    ]
+   ],
+   "events": {
+    "brace": 0,
+    "launch": 14,
+    "launch_last": 20,
+    "gold_on": 0,
+    "gold_off": 22
+   },
+   "anchors": {
+    "launch": {
+     "launch_1": [
+      0.9,
+      4.4,
+      1.2
+     ],
+     "launch_2": [
+      -0.9,
+      4.4,
+      0.3
+     ],
+     "launch_3": [
+      0.9,
+      4.4,
+      -0.7
+     ],
+     "launch_4": [
+      -0.9,
+      4.4,
+      -1.6
+     ]
+    },
+    "launch_last": {
+     "launch_4": [
+      -0.9,
+      4.4,
+      -1.6
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "39": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1018,
+   "name": "stomp_fl",
+   "len": 63,
+   "authored": 72,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     22,
+     17
+    ],
+    [
+     52,
+     47
+    ],
+    [
+     72,
+     63
+    ]
+   ],
+   "events": {
+    "lift": 5,
+    "slam": 13,
+    "w1": 17,
+    "w2": 32,
+    "w3": 47
+   },
+   "anchors": {
+    "slam": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "w1": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "w2": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "w3": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "62": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1019,
+   "name": "stomp_fr",
+   "len": 63,
+   "authored": 72,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": "stomp_fl",
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     22,
+     17
+    ],
+    [
+     52,
+     47
+    ],
+    [
+     72,
+     63
+    ]
+   ],
+   "events": {
+    "lift": 5,
+    "slam": 13,
+    "w1": 17,
+    "w2": 32,
+    "w3": 47
+   },
+   "anchors": {
+    "slam": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "w1": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "w2": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "w3": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "62": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1020,
+   "name": "stomp_hl",
+   "len": 63,
+   "authored": 72,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     22,
+     17
+    ],
+    [
+     52,
+     47
+    ],
+    [
+     72,
+     63
+    ]
+   ],
+   "events": {
+    "lift": 5,
+    "slam": 13,
+    "w1": 17,
+    "w2": 32,
+    "w3": 47
+   },
+   "anchors": {
+    "slam": {
+     "paw": [
+      2.5,
+      0.0,
+      -2.55
+     ]
+    },
+    "w1": {
+     "paw": [
+      2.5,
+      0.0,
+      -2.55
+     ]
+    },
+    "w2": {
+     "paw": [
+      2.5,
+      0.0,
+      -2.55
+     ]
+    },
+    "w3": {
+     "paw": [
+      2.5,
+      0.0,
+      -2.55
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "62": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1021,
+   "name": "stomp_hr",
+   "len": 63,
+   "authored": 72,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": "stomp_hl",
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     22,
+     17
+    ],
+    [
+     52,
+     47
+    ],
+    [
+     72,
+     63
+    ]
+   ],
+   "events": {
+    "lift": 5,
+    "slam": 13,
+    "w1": 17,
+    "w2": 32,
+    "w3": 47
+   },
+   "anchors": {
+    "slam": {
+     "paw": [
+      -2.5,
+      0.0,
+      -2.55
+     ]
+    },
+    "w1": {
+     "paw": [
+      -2.5,
+      0.0,
+      -2.55
+     ]
+    },
+    "w2": {
+     "paw": [
+      -2.5,
+      0.0,
+      -2.55
+     ]
+    },
+    "w3": {
+     "paw": [
+      -2.5,
+      0.0,
+      -2.55
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "62": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1022,
+   "name": "stomp3_fl",
+   "len": 85,
+   "authored": 90,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     22,
+     17
+    ],
+    [
+     90,
+     85
+    ]
+   ],
+   "events": {
+    "lift": 3,
+    "s1": 17,
+    "s2": 40,
+    "s3": 63
+   },
+   "anchors": {
+    "s1": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "s2": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "s3": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "84": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1023,
+   "name": "stomp3_fr",
+   "len": 85,
+   "authored": 90,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": "stomp3_fl",
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     22,
+     17
+    ],
+    [
+     90,
+     85
+    ]
+   ],
+   "events": {
+    "lift": 3,
+    "s1": 17,
+    "s2": 40,
+    "s3": 63
+   },
+   "anchors": {
+    "s1": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "s2": {
+     "paw": [
+      3.15,
+      0.0,
+      2.95
+     ]
+    },
+    "s3": {
+     "paw": [
+      -3.15,
+      0.0,
+      2.95
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "84": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1024,
+   "name": "feint",
+   "len": 50,
+   "authored": 56,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     22,
+     22
+    ],
+    [
+     56,
+     50
+    ]
+   ],
+   "events": {
+    "sway": 0,
+    "swayback": 12,
+    "drop": 18,
+    "burst": 22
+   },
+   "anchors": {
+    "burst": {
+     "nose": [
+      0.0,
+      0.85,
+      5.5
+     ],
+     "tail_root": [
+      0.0,
+      2.85,
+      -4.75
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "49": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1025,
+   "name": "tail_whip_l",
+   "len": 64,
+   "authored": 64,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "raise": 0,
+    "cock": 12,
+    "pivot": 20,
+    "sweep": 23,
+    "sweep_end": 31,
+    "erupt": 33,
+    "settle": 42
+   },
+   "anchors": {
+    "sweep": {
+     "tail_root": [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     "tail_tip": [
+      0.0,
+      1.0,
+      -16.75
+     ]
+    },
+    "sweep_end": {
+     "tail_root": [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     "tail_tip": [
+      0.0,
+      1.0,
+      -16.75
+     ]
+    },
+    "erupt": {
+     "tail_root": [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     "tail_tip": [
+      0.0,
+      1.0,
+      -16.75
+     ]
+    }
+   },
+   "tracks": {
+    "tail_root": [
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ]
+    ],
+    "tail_tip": [
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ]
+    ]
+   },
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "63": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    2.68,
+    10.02,
+    21.0,
+    34.56,
+    49.68,
+    65.32,
+    80.44,
+    94.0,
+    104.98,
+    112.32,
+    115.0,
+    116.09,
+    118.5,
+    120.91,
+    122.0,
+    121.61,
+    120.61,
+    119.24,
+    117.76,
+    116.39,
+    115.39,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0,
+    115.0
+   ],
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1026,
+   "name": "tail_whip_r",
+   "len": 64,
+   "authored": 64,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": "tail_whip_l",
+   "retime": [],
+   "events": {
+    "raise": 0,
+    "cock": 12,
+    "pivot": 20,
+    "sweep": 23,
+    "sweep_end": 31,
+    "erupt": 33,
+    "settle": 42
+   },
+   "anchors": {
+    "sweep": {
+     "tail_root": [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     "tail_tip": [
+      0.0,
+      1.0,
+      -16.75
+     ]
+    },
+    "sweep_end": {
+     "tail_root": [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     "tail_tip": [
+      0.0,
+      1.0,
+      -16.75
+     ]
+    },
+    "erupt": {
+     "tail_root": [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     "tail_tip": [
+      0.0,
+      1.0,
+      -16.75
+     ]
+    }
+   },
+   "tracks": {
+    "tail_root": [
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ]
+    ],
+    "tail_tip": [
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ]
+    ]
+   },
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "63": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    -2.68,
+    -10.02,
+    -21.0,
+    -34.56,
+    -49.68,
+    -65.32,
+    -80.44,
+    -94.0,
+    -104.98,
+    -112.32,
+    -115.0,
+    -116.09,
+    -118.5,
+    -120.91,
+    -122.0,
+    -121.61,
+    -120.61,
+    -119.24,
+    -117.76,
+    -116.39,
+    -115.39,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0,
+    -115.0
+   ],
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1027,
+   "name": "tail_slam",
+   "len": 70,
+   "authored": 90,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     52,
+     39
+    ],
+    [
+     58,
+     45
+    ],
+    [
+     90,
+     70
+    ]
+   ],
+   "events": {
+    "raise": 0,
+    "hold": 9,
+    "slam": 36,
+    "impact": 39,
+    "spikes": 41
+   },
+   "anchors": {
+    "slam": {
+     "tail_root": [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     "tail_tip": [
+      0.0,
+      12.85,
+      -6.75
+     ]
+    },
+    "impact": {
+     "tail_root": [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     "tail_tip": [
+      0.0,
+      0.0,
+      -17.75
+     ]
+    },
+    "spikes": {
+     "tail_root": [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     "tail_tip": [
+      0.0,
+      0.0,
+      -17.75
+     ]
+    }
+   },
+   "tracks": {
+    "tail_root": [
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ]
+    ],
+    "tail_tip": [
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.406,
+      -16.407
+     ],
+     [
+      0.0,
+      2.495,
+      -15.488
+     ],
+     [
+      0.0,
+      4.072,
+      -14.157
+     ],
+     [
+      0.0,
+      5.942,
+      -12.58
+     ],
+     [
+      0.0,
+      7.908,
+      -10.92
+     ],
+     [
+      0.0,
+      9.778,
+      -9.343
+     ],
+     [
+      0.0,
+      11.355,
+      -8.012
+     ],
+     [
+      0.0,
+      12.444,
+      -7.093
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      12.85,
+      -6.75
+     ],
+     [
+      0.0,
+      9.519,
+      -9.602
+     ],
+     [
+      0.0,
+      3.331,
+      -14.898
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.0,
+      -17.75
+     ],
+     [
+      0.0,
+      0.034,
+      -17.716
+     ],
+     [
+      0.0,
+      0.126,
+      -17.624
+     ],
+     [
+      0.0,
+      0.259,
+      -17.491
+     ],
+     [
+      0.0,
+      0.417,
+      -17.333
+     ],
+     [
+      0.0,
+      0.583,
+      -17.167
+     ],
+     [
+      0.0,
+      0.741,
+      -17.009
+     ],
+     [
+      0.0,
+      0.874,
+      -16.876
+     ],
+     [
+      0.0,
+      0.966,
+      -16.784
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ]
+    ]
+   },
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "69": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1028,
+   "name": "burrow_dive",
+   "len": 40,
+   "authored": 44,
+   "loop": false,
+   "next": "burrow_travel",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     18,
+     14
+    ],
+    [
+     44,
+     40
+    ]
+   ],
+   "events": {
+    "snarl": 3,
+    "dive": 14,
+    "under": 40
+   },
+   "anchors": {},
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "39": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": [
+    [
+     40,
+     "burrowed"
+    ]
+   ]
+  },
+  {
+   "id": 1029,
+   "name": "burrow_travel",
+   "len": 20,
+   "authored": 20,
+   "loop": true,
+   "next": null,
+   "mirror_of": null,
+   "retime": [],
+   "events": {},
+   "anchors": {},
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       0.0
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       0.0
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       0.0
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ]
+     },
+     "19": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       0.0
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       0.0
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       0.0
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [
+    [
+     0,
+     19,
+     "all"
+    ]
+   ],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1030,
+   "name": "burrow_breach",
+   "len": 36,
+   "authored": 36,
+   "loop": false,
+   "next": "burrow_travel",
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "ring": 0,
+    "burst": 8,
+    "hit": 10,
+    "under": 30
+   },
+   "anchors": {},
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       0.0
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       0.0
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       0.0
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ]
+     },
+     "7": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       0.0
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       0.0
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       0.0
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ]
+     },
+     "8": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "29": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "30": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       0.0
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       0.0
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       0.0
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ]
+     },
+     "35": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       0.0
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       0.0
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       0.0
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [
+    [
+     0,
+     7,
+     "all"
+    ],
+    [
+     30,
+     35,
+     "all"
+    ]
+   ],
+   "root_z": [],
+   "state": [
+    [
+     8,
+     "normal"
+    ],
+    [
+     30,
+     "burrowed"
+    ]
+   ]
+  },
+  {
+   "id": 1031,
+   "name": "burrow_emerge",
+   "len": 53,
+   "authored": 56,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     56,
+     53
+    ]
+   ],
+   "events": {
+    "rumble": 0,
+    "burst": 8,
+    "fore": 24,
+    "out": 38,
+    "shake": 40
+   },
+   "anchors": {},
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       0.0
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       0.0
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       0.0
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ]
+     },
+     "23": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       0.0
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       0.0
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       0.0
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ]
+     },
+     "24": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "52": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [
+    [
+     0,
+     23,
+     "all"
+    ]
+   ],
+   "root_z": [],
+   "state": [
+    [
+     24,
+     "normal"
+    ]
+   ]
+  },
+  {
+   "id": 1032,
+   "name": "landslide",
+   "len": 203,
+   "authored": 270,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     76,
+     57
+    ],
+    [
+     104,
+     77
+    ],
+    [
+     132,
+     98
+    ],
+    [
+     156,
+     118
+    ],
+    [
+     186,
+     139
+    ],
+    [
+     212,
+     159
+    ],
+    [
+     240,
+     179
+    ],
+    [
+     270,
+     203
+    ]
+   ],
+   "events": {
+    "tell": 0,
+    "w1": 57,
+    "w2": 77,
+    "w3": 98,
+    "w4": 118,
+    "w5": 139,
+    "rear": 159,
+    "w6": 179,
+    "end": 203
+   },
+   "anchors": {},
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "202": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1033,
+   "name": "absorb",
+   "len": 94,
+   "authored": 108,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     12,
+     12
+    ],
+    [
+     60,
+     46
+    ],
+    [
+     108,
+     94
+    ]
+   ],
+   "events": {
+    "press": 0,
+    "rise": 46,
+    "burst": 47,
+    "stamp1": 62,
+    "stamp2": 86,
+    "gold_on": 0,
+    "gold_off": 60
+   },
+   "anchors": {
+    "burst": {
+     "back": [
+      0.0,
+      4.0,
+      -0.2
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "93": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1034,
+   "name": "absorb_p3",
+   "len": 52,
+   "authored": 70,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     60,
+     42
+    ],
+    [
+     70,
+     52
+    ]
+   ],
+   "events": {
+    "orb": 0,
+    "burst": 42,
+    "gather": 42,
+    "gold_on": 0,
+    "gold_off": 50
+   },
+   "anchors": {
+    "burst": {
+     "back": [
+      0.0,
+      4.0,
+      -0.2
+     ]
+    }
+   },
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "51": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1035,
+   "name": "p3_sink",
+   "len": 66,
+   "authored": 80,
+   "loop": false,
+   "next": "tail_pillar",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     8,
+     8
+    ],
+    [
+     50,
+     40
+    ],
+    [
+     80,
+     66
+    ]
+   ],
+   "events": {
+    "sink": 8,
+    "under": 40,
+    "tail": 40,
+    "pillar": 58
+   },
+   "anchors": {
+    "pillar": {
+     "tail_root": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tail_tip": [
+      0.0,
+      8.8,
+      0.0
+     ]
+    }
+   },
+   "tracks": {
+    "tail_root": [
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.843,
+      -4.75
+     ],
+     [
+      0.0,
+      2.822,
+      -4.75
+     ],
+     [
+      0.0,
+      2.788,
+      -4.75
+     ],
+     [
+      0.0,
+      2.742,
+      -4.75
+     ],
+     [
+      0.0,
+      2.685,
+      -4.75
+     ],
+     [
+      0.0,
+      2.616,
+      -4.75
+     ],
+     [
+      0.0,
+      2.538,
+      -4.75
+     ],
+     [
+      0.0,
+      2.45,
+      -4.75
+     ],
+     [
+      0.0,
+      2.353,
+      -4.75
+     ],
+     [
+      0.0,
+      2.248,
+      -4.75
+     ],
+     [
+      0.0,
+      2.137,
+      -4.75
+     ],
+     [
+      0.0,
+      2.018,
+      -4.75
+     ],
+     [
+      0.0,
+      1.894,
+      -4.75
+     ],
+     [
+      0.0,
+      1.765,
+      -4.75
+     ],
+     [
+      0.0,
+      1.632,
+      -4.75
+     ],
+     [
+      0.0,
+      1.495,
+      -4.75
+     ],
+     [
+      0.0,
+      1.355,
+      -4.75
+     ],
+     [
+      0.0,
+      1.213,
+      -4.75
+     ],
+     [
+      0.0,
+      1.069,
+      -4.75
+     ],
+     [
+      0.0,
+      0.925,
+      -4.75
+     ],
+     [
+      0.0,
+      0.781,
+      -4.75
+     ],
+     [
+      0.0,
+      0.637,
+      -4.75
+     ],
+     [
+      0.0,
+      0.495,
+      -4.75
+     ],
+     [
+      0.0,
+      0.355,
+      -4.75
+     ],
+     [
+      0.0,
+      0.218,
+      -4.75
+     ],
+     [
+      0.0,
+      0.085,
+      -4.75
+     ],
+     [
+      0.0,
+      -0.044,
+      -4.75
+     ],
+     [
+      0.0,
+      -0.168,
+      -4.75
+     ],
+     [
+      0.0,
+      -0.287,
+      -4.75
+     ],
+     [
+      0.0,
+      -0.398,
+      -4.75
+     ],
+     [
+      0.0,
+      -0.503,
+      -4.75
+     ],
+     [
+      0.0,
+      -0.6,
+      -4.75
+     ],
+     [
+      0.0,
+      -0.688,
+      -4.75
+     ],
+     [
+      0.0,
+      -0.766,
+      -4.75
+     ],
+     [
+      0.0,
+      -0.835,
+      -4.75
+     ],
+     [
+      0.0,
+      -0.892,
+      -4.75
+     ],
+     [
+      0.0,
+      -0.938,
+      -4.75
+     ],
+     [
+      0.0,
+      -0.972,
+      -4.75
+     ],
+     [
+      0.0,
+      -0.993,
+      -4.75
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "tail_tip": [
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      0.998,
+      -16.75
+     ],
+     [
+      0.0,
+      0.993,
+      -16.75
+     ],
+     [
+      0.0,
+      0.984,
+      -16.75
+     ],
+     [
+      0.0,
+      0.972,
+      -16.75
+     ],
+     [
+      0.0,
+      0.957,
+      -16.75
+     ],
+     [
+      0.0,
+      0.939,
+      -16.75
+     ],
+     [
+      0.0,
+      0.919,
+      -16.75
+     ],
+     [
+      0.0,
+      0.896,
+      -16.75
+     ],
+     [
+      0.0,
+      0.871,
+      -16.75
+     ],
+     [
+      0.0,
+      0.844,
+      -16.75
+     ],
+     [
+      0.0,
+      0.815,
+      -16.75
+     ],
+     [
+      0.0,
+      0.784,
+      -16.75
+     ],
+     [
+      0.0,
+      0.752,
+      -16.75
+     ],
+     [
+      0.0,
+      0.718,
+      -16.75
+     ],
+     [
+      0.0,
+      0.684,
+      -16.75
+     ],
+     [
+      0.0,
+      0.648,
+      -16.75
+     ],
+     [
+      0.0,
+      0.612,
+      -16.75
+     ],
+     [
+      0.0,
+      0.575,
+      -16.75
+     ],
+     [
+      0.0,
+      0.537,
+      -16.75
+     ],
+     [
+      0.0,
+      0.5,
+      -16.75
+     ],
+     [
+      0.0,
+      0.463,
+      -16.75
+     ],
+     [
+      0.0,
+      0.425,
+      -16.75
+     ],
+     [
+      0.0,
+      0.388,
+      -16.75
+     ],
+     [
+      0.0,
+      0.352,
+      -16.75
+     ],
+     [
+      0.0,
+      0.316,
+      -16.75
+     ],
+     [
+      0.0,
+      0.282,
+      -16.75
+     ],
+     [
+      0.0,
+      0.248,
+      -16.75
+     ],
+     [
+      0.0,
+      0.216,
+      -16.75
+     ],
+     [
+      0.0,
+      0.185,
+      -16.75
+     ],
+     [
+      0.0,
+      0.156,
+      -16.75
+     ],
+     [
+      0.0,
+      0.129,
+      -16.75
+     ],
+     [
+      0.0,
+      0.104,
+      -16.75
+     ],
+     [
+      0.0,
+      0.081,
+      -16.75
+     ],
+     [
+      0.0,
+      0.061,
+      -16.75
+     ],
+     [
+      0.0,
+      0.043,
+      -16.75
+     ],
+     [
+      0.0,
+      0.028,
+      -16.75
+     ],
+     [
+      0.0,
+      0.016,
+      -16.75
+     ],
+     [
+      0.0,
+      0.007,
+      -16.75
+     ],
+     [
+      0.0,
+      0.002,
+      -16.75
+     ],
+     [
+      0.0,
+      0.5,
+      0.0
+     ],
+     [
+      0.0,
+      0.574,
+      0.0
+     ],
+     [
+      0.0,
+      0.785,
+      0.0
+     ],
+     [
+      0.0,
+      1.115,
+      0.0
+     ],
+     [
+      0.0,
+      1.547,
+      0.0
+     ],
+     [
+      0.0,
+      2.066,
+      0.0
+     ],
+     [
+      0.0,
+      2.652,
+      0.0
+     ],
+     [
+      0.0,
+      3.289,
+      0.0
+     ],
+     [
+      0.0,
+      3.961,
+      0.0
+     ],
+     [
+      0.0,
+      4.65,
+      0.0
+     ],
+     [
+      0.0,
+      5.339,
+      0.0
+     ],
+     [
+      0.0,
+      6.011,
+      0.0
+     ],
+     [
+      0.0,
+      6.648,
+      0.0
+     ],
+     [
+      0.0,
+      7.234,
+      0.0
+     ],
+     [
+      0.0,
+      7.753,
+      0.0
+     ],
+     [
+      0.0,
+      8.185,
+      0.0
+     ],
+     [
+      0.0,
+      8.515,
+      0.0
+     ],
+     [
+      0.0,
+      8.726,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ]
+    ]
+   },
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "39": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "40": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       0.0,
+       2.8
+      ],
+      "tail2": [
+       0.0,
+       0.0,
+       4.8
+      ],
+      "tail3": [
+       0.0,
+       0.0,
+       6.8
+      ],
+      "tail4": [
+       0.0,
+       0.0,
+       8.8
+      ]
+     },
+     "65": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       0.0,
+       2.8
+      ],
+      "tail2": [
+       0.0,
+       0.0,
+       4.8
+      ],
+      "tail3": [
+       0.0,
+       0.0,
+       6.8
+      ],
+      "tail4": [
+       0.0,
+       0.0,
+       8.8
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [
+    [
+     40,
+     65,
+     "body"
+    ]
+   ],
+   "root_z": [
+    [
+     40,
+     65,
+     4.75
+    ]
+   ],
+   "state": [
+    [
+     40,
+     "tail_only"
+    ]
+   ]
+  },
+  {
+   "id": 1036,
+   "name": "tail_pillar",
+   "len": 80,
+   "authored": 80,
+   "loop": true,
+   "next": null,
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "pulse": 0,
+    "pulse2": 40
+   },
+   "anchors": {},
+   "tracks": {
+    "tail_root": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "tail_tip": [
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ]
+    ]
+   },
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       0.0,
+       2.8
+      ],
+      "tail2": [
+       0.0,
+       0.0,
+       4.8
+      ],
+      "tail3": [
+       0.0,
+       0.0,
+       6.8
+      ],
+      "tail4": [
+       0.0,
+       0.0,
+       8.8
+      ]
+     },
+     "79": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       0.0,
+       2.8
+      ],
+      "tail2": [
+       0.0,
+       0.0,
+       4.8
+      ],
+      "tail3": [
+       0.0,
+       0.0,
+       6.8
+      ],
+      "tail4": [
+       0.0,
+       0.0,
+       8.8
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [
+    [
+     0,
+     79,
+     "body"
+    ]
+   ],
+   "root_z": [
+    [
+     0,
+     79,
+     4.75
+    ]
+   ],
+   "state": []
+  },
+  {
+   "id": 1037,
+   "name": "tail_pillar_strike",
+   "len": 24,
+   "authored": 24,
+   "loop": false,
+   "next": "tail_pillar",
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "strike": 10
+   },
+   "anchors": {
+    "strike": {
+     "tail_tip": [
+      0.0,
+      8.5,
+      1.0
+     ]
+    }
+   },
+   "tracks": {
+    "tail_root": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "tail_tip": [
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.792,
+      0.028
+     ],
+     [
+      0.0,
+      8.769,
+      0.104
+     ],
+     [
+      0.0,
+      8.735,
+      0.216
+     ],
+     [
+      0.0,
+      8.694,
+      0.352
+     ],
+     [
+      0.0,
+      8.65,
+      0.5
+     ],
+     [
+      0.0,
+      8.606,
+      0.648
+     ],
+     [
+      0.0,
+      8.565,
+      0.784
+     ],
+     [
+      0.0,
+      8.531,
+      0.896
+     ],
+     [
+      0.0,
+      8.508,
+      0.972
+     ],
+     [
+      0.0,
+      8.5,
+      1.0
+     ],
+     [
+      0.0,
+      8.505,
+      0.983
+     ],
+     [
+      0.0,
+      8.519,
+      0.936
+     ],
+     [
+      0.0,
+      8.541,
+      0.865
+     ],
+     [
+      0.0,
+      8.568,
+      0.774
+     ],
+     [
+      0.0,
+      8.599,
+      0.67
+     ],
+     [
+      0.0,
+      8.633,
+      0.558
+     ],
+     [
+      0.0,
+      8.667,
+      0.442
+     ],
+     [
+      0.0,
+      8.701,
+      0.33
+     ],
+     [
+      0.0,
+      8.732,
+      0.226
+     ],
+     [
+      0.0,
+      8.759,
+      0.135
+     ],
+     [
+      0.0,
+      8.781,
+      0.064
+     ],
+     [
+      0.0,
+      8.795,
+      0.017
+     ],
+     [
+      0.0,
+      8.8,
+      0.0
+     ]
+    ]
+   },
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       0.0,
+       2.8
+      ],
+      "tail2": [
+       0.0,
+       0.0,
+       4.8
+      ],
+      "tail3": [
+       0.0,
+       0.0,
+       6.8
+      ],
+      "tail4": [
+       0.0,
+       0.0,
+       8.8
+      ]
+     },
+     "23": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       0.0,
+       2.8
+      ],
+      "tail2": [
+       0.0,
+       0.0,
+       4.8
+      ],
+      "tail3": [
+       0.0,
+       0.0,
+       6.8
+      ],
+      "tail4": [
+       0.0,
+       0.0,
+       8.8
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [
+    [
+     0,
+     23,
+     "body"
+    ]
+   ],
+   "root_z": [
+    [
+     0,
+     23,
+     4.75
+    ]
+   ],
+   "state": []
+  },
+  {
+   "id": 1038,
+   "name": "tail_pillar_sink",
+   "len": 20,
+   "authored": 20,
+   "loop": false,
+   "next": null,
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "gone": 18
+   },
+   "anchors": {},
+   "tracks": {
+    "tail_root": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "tail_tip": [
+     [
+      0.0,
+      8.8,
+      0.0
+     ],
+     [
+      0.0,
+      8.722,
+      0.0
+     ],
+     [
+      0.0,
+      8.498,
+      0.0
+     ],
+     [
+      0.0,
+      8.148,
+      0.0
+     ],
+     [
+      0.0,
+      7.689,
+      0.0
+     ],
+     [
+      0.0,
+      7.14,
+      0.0
+     ],
+     [
+      0.0,
+      6.519,
+      0.0
+     ],
+     [
+      0.0,
+      5.843,
+      0.0
+     ],
+     [
+      0.0,
+      5.13,
+      0.0
+     ],
+     [
+      0.0,
+      4.4,
+      0.0
+     ],
+     [
+      0.0,
+      3.67,
+      0.0
+     ],
+     [
+      0.0,
+      2.957,
+      0.0
+     ],
+     [
+      0.0,
+      2.281,
+      0.0
+     ],
+     [
+      0.0,
+      1.66,
+      0.0
+     ],
+     [
+      0.0,
+      1.111,
+      0.0
+     ],
+     [
+      0.0,
+      0.652,
+      0.0
+     ],
+     [
+      0.0,
+      0.302,
+      0.0
+     ],
+     [
+      0.0,
+      0.078,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ]
+    ]
+   },
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       0.0,
+       2.8
+      ],
+      "tail2": [
+       0.0,
+       0.0,
+       4.8
+      ],
+      "tail3": [
+       0.0,
+       0.0,
+       6.8
+      ],
+      "tail4": [
+       0.0,
+       0.0,
+       8.8
+      ]
+     },
+     "17": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       0.0,
+       2.8
+      ],
+      "tail2": [
+       0.0,
+       0.0,
+       4.8
+      ],
+      "tail3": [
+       0.0,
+       0.0,
+       6.8
+      ],
+      "tail4": [
+       0.0,
+       0.0,
+       8.8
+      ]
+     },
+     "18": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       0.0
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       0.0
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       0.0
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ]
+     },
+     "19": {
+      "head": [
+       0.0,
+       4.3,
+       0.0
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       0.0
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       0.0
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       0.0
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       0.0
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       0.0
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       0.0
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       0.0
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       0.0
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       0.0
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       0.0
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       0.0
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [
+    [
+     0,
+     17,
+     "body"
+    ],
+    [
+     18,
+     19,
+     "all"
+    ]
+   ],
+   "root_z": [
+    [
+     0,
+     19,
+     4.75
+    ]
+   ],
+   "state": [
+    [
+     18,
+     "burrowed"
+    ]
+   ]
+  },
+  {
+   "id": 1039,
+   "name": "tail_cast",
+   "len": 34,
+   "authored": 40,
+   "loop": false,
+   "next": "idle",
+   "mirror_of": null,
+   "retime": [
+    [
+     0,
+     0
+    ],
+    [
+     24,
+     18
+    ],
+    [
+     40,
+     34
+    ]
+   ],
+   "events": {
+    "raise": 0,
+    "charge": 12,
+    "fire": 18,
+    "lower": 26
+   },
+   "anchors": {
+    "charge": {
+     "tail_tip": [
+      0.0,
+      9.0,
+      -3.0
+     ]
+    },
+    "fire": {
+     "tail_tip": [
+      0.0,
+      9.0,
+      -3.0
+     ]
+    }
+   },
+   "tracks": {
+    "tail_root": [
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ],
+     [
+      0.0,
+      2.85,
+      -4.75
+     ]
+    ],
+    "tail_tip": [
+     [
+      0.0,
+      1.0,
+      -16.75
+     ],
+     [
+      0.0,
+      1.157,
+      -16.479
+     ],
+     [
+      0.0,
+      1.593,
+      -15.731
+     ],
+     [
+      0.0,
+      2.25,
+      -14.602
+     ],
+     [
+      0.0,
+      3.074,
+      -13.185
+     ],
+     [
+      0.0,
+      4.009,
+      -11.578
+     ],
+     [
+      0.0,
+      5.0,
+      -9.875
+     ],
+     [
+      0.0,
+      5.991,
+      -8.172
+     ],
+     [
+      0.0,
+      6.926,
+      -6.565
+     ],
+     [
+      0.0,
+      7.75,
+      -5.148
+     ],
+     [
+      0.0,
+      8.407,
+      -4.019
+     ],
+     [
+      0.0,
+      8.843,
+      -3.271
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      9.0,
+      -3.0
+     ],
+     [
+      0.0,
+      8.557,
+      -3.762
+     ],
+     [
+      0.0,
+      7.414,
+      -5.726
+     ],
+     [
+      0.0,
+      5.851,
+      -8.412
+     ],
+     [
+      0.0,
+      4.149,
+      -11.338
+     ],
+     [
+      0.0,
+      2.586,
+      -14.024
+     ],
+     [
+      0.0,
+      1.443,
+      -15.988
+     ],
+     [
+      0.0,
+      1.0,
+      -16.75
+     ]
+    ]
+   },
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "33": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  },
+  {
+   "id": 1040,
+   "name": "death",
+   "len": 120,
+   "authored": 120,
+   "loop": false,
+   "next": null,
+   "mirror_of": null,
+   "retime": [],
+   "events": {
+    "stagger": 0,
+    "chin": 34,
+    "tail": 66,
+    "last": 80,
+    "head": 92,
+    "still": 96
+   },
+   "anchors": {},
+   "tracks": {},
+   "px": {
+    "lerp": true,
+    "keys": {
+     "0": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     },
+     "119": {
+      "head": [
+       0.0,
+       4.3,
+       3.05
+      ],
+      "chest": [
+       0.0,
+       2.1,
+       4.85
+      ],
+      "belly": [
+       0.0,
+       -0.5,
+       4.85
+      ],
+      "hips": [
+       0.0,
+       -3.4,
+       4.2
+      ],
+      "tail1": [
+       0.0,
+       -6.35,
+       3.94
+      ],
+      "tail2": [
+       0.0,
+       -10.12,
+       3.9
+      ],
+      "tail3": [
+       0.0,
+       -12.86,
+       5.81
+      ],
+      "tail4": [
+       0.0,
+       -11.9,
+       8.51
+      ],
+      "paw_l": [
+       3.15,
+       2.95,
+       2.8
+      ],
+      "paw_r": [
+       -3.15,
+       2.95,
+       2.8
+      ],
+      "foot_l": [
+       2.5,
+       -2.55,
+       2.92
+      ],
+      "foot_r": [
+       -2.5,
+       -2.55,
+       2.92
+      ]
+     }
+    }
+   },
+   "yaw": null,
+   "hidden": [],
+   "root_z": [],
+   "state": []
+  }
+ ],
+ "fallbacks": [
+  "idle",
+  "walk",
+  "walk_stop",
+  "turn45_l",
+  "turn45_r",
+  "turn90_l",
+  "turn90_r",
+  "turn180",
+  "intro",
+  "pose_ref",
+  "roar_low",
+  "roar_rear",
+  "chin_slam",
+  "jump_slam",
+  "charge_coil",
+  "charge_run",
+  "charge_stop",
+  "spikes",
+  "stomp_fl",
+  "stomp_fr",
+  "stomp_hl",
+  "stomp_hr",
+  "stomp3_fl",
+  "stomp3_fr",
+  "feint",
+  "tail_whip_l",
+  "tail_whip_r",
+  "tail_slam",
+  "burrow_dive",
+  "burrow_travel",
+  "burrow_breach",
+  "burrow_emerge",
+  "landslide",
+  "absorb",
+  "absorb_p3",
+  "p3_sink",
+  "tail_pillar",
+  "tail_pillar_strike",
+  "tail_pillar_sink",
+  "tail_cast",
+  "death"
+ ]
+}

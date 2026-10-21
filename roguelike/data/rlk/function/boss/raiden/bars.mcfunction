@@ -17,7 +17,7 @@ execute if score @s rdPhase matches 0 run scoreboard players operation #buSub bu
 execute if score @s rdPhase matches 0 run scoreboard players set #buSubMax bu 900
 execute if score @s rdPhase matches 0 run scoreboard players set #buSubCol bu 8
 execute if score @s rdPhase matches 1 run scoreboard players operation #buSub bu = @s rdTime
-execute if score @s rdPhase matches 1 run scoreboard players set #buSubMax bu 52
+execute if score @s rdPhase matches 1 run scoreboard players set #buSubMax bu 60
 execute if score @s rdPhase matches 1 run scoreboard players set #buSubCol bu 1
 execute if score @s rdPhase matches 2 run scoreboard players operation #buSub bu = @s rdShield
 execute if score @s rdPhase matches 2 run scoreboard players set #buSubMax bu 750

@@ -4,4 +4,5 @@ execute if score #mbId mb matches 2 run return run function rlk:mboss/butterfly/
 execute if score #mbId mb matches 3 run return run function rlk:mboss/fieldgen/reload
 execute if score #mbId mb matches 99 run return run function rlk:mboss/proto/reload
 execute if score #mbId mb matches 98 run return run function rlk:mboss/cproto/reload
+execute if score #mbId mb matches 10 run return run function rlk:mboss/azhdaha/reload
 execute if score #mbId mb matches 11 run return run function rlk:mboss/apep/reload

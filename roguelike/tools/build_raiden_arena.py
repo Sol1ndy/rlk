@@ -96,14 +96,21 @@ arena = [
 for c in arena_cells:
     arena.append(f'fill {c["x0"]} 201 {c["z0"]} {c["x1"]} 230 {c["z1"]} minecraft:air strict')
 
+# Floor look (rd/plan.md D.3, footage B-08): the Shogun fights on a teal floor (prismarine, animated); the
+# transformation turns it dark blue-violet (look_tenma) and the return / the death turn it back (look_shogun).
+FLOOR_SHOGUN, FLOOR_TENMA = 'minecraft:prismarine', 'minecraft:blue_terracotta'
+look = {'shogun': ['# Shogun floor look (teal), rows of the arena circle; called by normal_return and death/finish.'],
+        'tenma': ['# Tenma floor look (dark blue-violet), rows of the arena circle; called by the transformation.']}
 for z in range(-24, 24):
     # Use block centers for a symmetric circle around the integer marker location.
     floor = [x for x in range(-24, 24) if (x+.5)**2 + (z+.5)**2 <= 24**2]
     wall = [x for x in floor if (x+.5)**2 + (z+.5)**2 > 23**2]
     for x0, x1 in row_spans(floor):
         arena.append(f'fill {x0} 199 {z} {x1} 199 {z} minecraft:polished_blackstone')
-        arena.append(f'fill {x0} 200 {z} {x1} 200 {z} minecraft:light_gray_concrete')
+        arena.append(f'fill {x0} 200 {z} {x1} 200 {z} {FLOOR_SHOGUN}')
         arena.append(f'fill {x0} 218 {z} {x1} 218 {z} minecraft:light[level=15]')
+        look['tenma'].append(f'fill {x0} 200 {z} {x1} 200 {z} {FLOOR_TENMA} replace {FLOOR_SHOGUN}')
+        look['shogun'].append(f'fill {x0} 200 {z} {x1} 200 {z} {FLOOR_SHOGUN} replace {FLOOR_TENMA}')
     for x0, x1 in row_spans(wall):
         arena.append(f'fill {x0} 201 {z} {x1} 207 {z} minecraft:polished_blackstone')
 
@@ -113,4 +120,6 @@ arena += [
     'summon minecraft:marker 0 201 0 {Tags:["rlk_room","rlk_raiden_arena"],data:{boss_id:"narukami",radius:23,safe_radius:21}}',
 ]
 write("arena", arena)
+write("look_shogun", look['shogun'])
+write("look_tenma", look['tenma'])
 print(f"Generated Narukami arena: radius 23, center (0,201,0), {len(arena_cells)} cleanup cells.")

@@ -296,6 +296,9 @@ def build_font(rp):
         providers.append({'type': 'bitmap', 'file': f'rlk:font/mboss_bf/{name}.png', 'ascent': ascent,
                           'height': height, 'chars': [chr(cp)]})
     providers.append({'type': 'space', 'advances': {chr(k): v for k, v in SPACES.items()}})
+    # Banner text components put the kit glyph first and the Korean text after it in one list, so the
+    # text inherits this font: fall back to the default font for every char the kit does not draw.
+    providers.append({'type': 'reference', 'id': 'minecraft:default'})
     ours = [g[0] for g in GLYPHS.values()] + list(SPACES)
     assert all(0xE600 <= c <= 0xE6FF for c in ours) and len(set(ours)) == len(ours)
     clash = font_used_elsewhere(rp, font_path)
@@ -1738,10 +1741,10 @@ def hud_funcs(W):
                           f'data modify storage rlk:mboss extra append from storage {STO} hud.ex[]'])
     W.w('hud/put_sub', ['# Append badge + label(s) to the boss-bar third line (rlk:mboss sub), after the module\'s own text.',
                         f'data modify storage rlk:mboss sub append from storage {STO} hud.sub[]'])
-    W.w('hud/ab_coc', ['# One-shot actionbar notice (2 s) for every player: the badge and the hint. Holds the regular',
-                       '# actionbar HUD (hudHold) meanwhile.',
+    W.w('hud/ab_coc', ['# One-shot actionbar notice (2 s) for every player: the badge, the debuff and its numbers (no cure',
+                       '# advice: 10-21 user rule). Holds the regular actionbar HUD (hudHold) meanwhile.',
                        'title @a[tag=player] actionbar [' + gl('coc') + ',{text:" 달빛 고치",color:"#E8A0A6",bold:true},'
-                       '{text:" — 체력 15% 회복하면 해제 · 피해 −50% · 치명타 −100% · 받는 치유 −40%",color:"#C9A3A6"}]',
+                       '{text:" — 피해 −50% · 치명타 −100% · 받는 치유 −40%",color:"#C9A3A6"}]',
                        'scoreboard players set @a[tag=player] hudHold 40'])
     W.w('hud/ab_buff', ['# One-shot actionbar notice (2 s): the reward badge and its numbers.',
                         'title @a[tag=player] actionbar [' + gl('buff') + ',{text:" 달빛 축복 받음",color:"#F2D27A",bold:true},'

@@ -1,0 +1,17 @@
+# @s = body: due timers run as the body at their marker, rotated as it.
+execute if score #azAft0 mb matches 1.. if score #azClk mb >= #azAftT0 mb run function rlk:mboss/azhdaha/aft/run_0
+execute if score #azAft1 mb matches 1.. if score #azClk mb >= #azAftT1 mb run function rlk:mboss/azhdaha/aft/run_1
+execute if score #azAft2 mb matches 1.. if score #azClk mb >= #azAftT2 mb run function rlk:mboss/azhdaha/aft/run_2
+execute if score #azAft3 mb matches 1.. if score #azClk mb >= #azAftT3 mb run function rlk:mboss/azhdaha/aft/run_3
+execute if score #azAft4 mb matches 1.. if score #azClk mb >= #azAftT4 mb run function rlk:mboss/azhdaha/aft/run_4
+execute if score #azAft5 mb matches 1.. if score #azClk mb >= #azAftT5 mb run function rlk:mboss/azhdaha/aft/run_5
+execute if score #azAft6 mb matches 1.. if score #azClk mb >= #azAftT6 mb run function rlk:mboss/azhdaha/aft/run_6
+execute if score #azAft7 mb matches 1.. if score #azClk mb >= #azAftT7 mb run function rlk:mboss/azhdaha/aft/run_7
+execute if score #azAft8 mb matches 1.. if score #azClk mb >= #azAftT8 mb run function rlk:mboss/azhdaha/aft/run_8
+execute if score #azAft9 mb matches 1.. if score #azClk mb >= #azAftT9 mb run function rlk:mboss/azhdaha/aft/run_9
+execute if score #azAft10 mb matches 1.. if score #azClk mb >= #azAftT10 mb run function rlk:mboss/azhdaha/aft/run_10
+execute if score #azAft11 mb matches 1.. if score #azClk mb >= #azAftT11 mb run function rlk:mboss/azhdaha/aft/run_11
+execute if score #azAft12 mb matches 1.. if score #azClk mb >= #azAftT12 mb run function rlk:mboss/azhdaha/aft/run_12
+execute if score #azAft13 mb matches 1.. if score #azClk mb >= #azAftT13 mb run function rlk:mboss/azhdaha/aft/run_13
+execute if score #azAft14 mb matches 1.. if score #azClk mb >= #azAftT14 mb run function rlk:mboss/azhdaha/aft/run_14
+execute if score #azAft15 mb matches 1.. if score #azClk mb >= #azAftT15 mb run function rlk:mboss/azhdaha/aft/run_15

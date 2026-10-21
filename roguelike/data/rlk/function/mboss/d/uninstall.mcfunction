@@ -4,4 +4,5 @@ function rlk:mboss/butterfly/uninstall
 function rlk:mboss/fieldgen/uninstall
 function rlk:mboss/proto/uninstall
 function rlk:mboss/cproto/uninstall
+function rlk:mboss/azhdaha/uninstall
 function rlk:mboss/apep/uninstall

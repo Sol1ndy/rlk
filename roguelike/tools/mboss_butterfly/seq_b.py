@@ -196,7 +196,7 @@ def debuff(g):
     g.w(f'{WX}/coc/fx', ['# At the player\'s feet (the core\'s coc/apply_pl): a maroon / salmon dust spiral rising 0.3 -> 2.2 b around',
                          '# the body, the debuff recipe and a curse chime; the kit\'s cards only around the shoulder-view avatar (rlk_av).',
                          '# In first person rlk_body is the player itself and the camera-facing cards would sit on the eyes (a maroon',
-                         '# screen wash): only the closing swirl ring on the floor (fix PL-1; the title line belongs to the hint caption).',
+                         '# screen wash): only the closing swirl ring on the floor (fix PL-1).',
                          *pts,
                          f'execute if entity @e[tag=rlk_av,limit=1] run function {NS}{WX}/coc/fx3',
                          'execute unless entity @e[tag=rlk_av,limit=1] run ' + g.kcard('ripple', '~ ~0.06 ~', '~ 90', spin=-120, s0=4.0,

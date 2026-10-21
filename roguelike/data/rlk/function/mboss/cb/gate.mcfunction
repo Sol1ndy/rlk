@@ -11,5 +11,6 @@ execute if score #mbArBuild mb matches 1.. run return run tellraw @a[tag=player]
 data modify storage rlk:mboss cbg set value ""
 data modify storage rlk:mboss cbg set from entity @e[tag=rlk_cbz,limit=1] data.boss_id
 execute if data storage rlk:mboss {cbg:"cproto"} run return run function rlk:mboss/cb/g/cproto
+execute if data storage rlk:mboss {cbg:"azhdaha"} run return run function rlk:mboss/cb/g/azhdaha
 execute if data storage rlk:mboss {cbg:"apep"} run return run function rlk:mboss/cb/g/apep
 tag @e[tag=rlk_cbz] remove rlk_cbz

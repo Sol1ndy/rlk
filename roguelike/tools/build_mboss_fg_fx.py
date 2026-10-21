@@ -418,6 +418,9 @@ def build_font(rp):
         providers.append({'type': 'bitmap', 'file': f'rlk:font/{FONT_NAME}/{name}.png', 'ascent': ascent,
                           'height': height, 'chars': [chr(cp)]})
     providers.append({'type': 'space', 'advances': {chr(k): v for k, v in SPACES.items()}})
+    # Banner text components put the kit glyph first and the Korean text after it in one list, so the
+    # text inherits this font: fall back to the default font for every char the kit does not draw.
+    providers.append({'type': 'reference', 'id': 'minecraft:default'})
     font_path.parent.mkdir(parents=True, exist_ok=True)
     font_path.write_text(json.dumps({'providers': providers}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     return len(GLYPHS)
@@ -2275,7 +2278,7 @@ def sounds(W):
             [sound_line(*l) for l in layers])
 
 
-HUD_FUNCS = ('meter_open', 'meter_close', 'meter', 'meter_n', 'meter_hit', 'hint_on', 'hint_off', 'lowg_on', 'lowg_off',
+HUD_FUNCS = ('meter_open', 'meter_close', 'meter', 'meter_n', 'meter_hit', 'lowg_on', 'lowg_off',
              'groggy_on', 'groggy_off', 'clear', 'put_extra', 'put_sub', 'banner_field', 'banner_end', 'ab_lowg',
              'pop_break', 'pop_lowg', 'flash_white', 'flash_gold', 'flash_violet', 'flash_amber', 'flash_end')
 METER_LABEL = '#C9B6F2'
@@ -2325,9 +2328,6 @@ def hud_funcs(W):
                                  f'execute if entity @s[type=!minecraft:player] run function {RIG()}crack/{st}'])
     W.w('hud/e/unflash', ['# 4 t after a count: the white pip turns gold (bumps #fkHudV for the module).',
                           'scoreboard players set #fkMF mb 0', f'function {H}e/rebuild'])
-    W.w('hud/hint_on', ['# Add the first-field hint "코어를 공격해 역장을 깨뜨리세요" after the meter on the sub-line.',
-                        f'data modify storage {STO} hud.hint set value 1b', f'function {H}e/rebuild'])
-    W.w('hud/hint_off', [f'data modify storage {STO} hud.hint set value 0b', f'function {H}e/rebuild'])
     W.w('hud/lowg_on', ['# Low gravity is on: the low-gravity icon on the name line.',
                         f'data modify storage {STO} hud.lowg set value 1b', f'function {H}e/rebuild'])
     W.w('hud/lowg_off', [f'data modify storage {STO} hud.lowg set value 0b', f'function {H}e/rebuild'])
@@ -2335,9 +2335,9 @@ def hud_funcs(W):
                           f'data modify storage {STO} hud.grog set value 1b', f'function {H}e/rebuild'])
     W.w('hud/groggy_off', [f'data modify storage {STO} hud.grog set value 0b', f'function {H}e/rebuild'])
     W.w('hud/clear', ['# Every flag off (fight end, death, abort, uninstall).',
-                      f'data modify storage {STO} hud merge value {{open:0b,lowg:0b,grog:0b,hint:0b}}',
+                      f'data modify storage {STO} hud merge value {{open:0b,lowg:0b,grog:0b}}',
                       'scoreboard players set #fkMF mb 0', f'function {H}e/rebuild'])
-    rb = ['# Storage rlk:fgkit hud.ex (name-line suffix) and hud.sub (sub-line: badge, 역장, 20 pips, N/20, hint) from',
+    rb = ['# Storage rlk:fgkit hud.ex (name-line suffix) and hud.sub (sub-line: badge, 역장, 20 pips, N/20) from',
           '# the flags and #fkM / #fkMF. Bumps #fkHudV mb: a module that rebuilds its lines only on change should also',
           '# rebuild when #fkHudV changed (the pip flash ends 4 t after a count, from a schedule).',
           'execute if score #fkM mb matches ..-1 run scoreboard players set #fkM mb 0',
@@ -2366,8 +2366,6 @@ def hud_funcs(W):
            f'data modify storage {STO} hud.sub append from storage {STO} hud.pc',
            f'data modify storage {STO} hud.sub append value {{text:"  "}}',
            f'data modify storage {STO} hud.sub append from storage {STO} hud.nc',
-           f'execute if data storage {STO} hud{{hint:1b}} run data modify storage {STO} hud.sub append value '
-           '{text:"   코어를 공격해 역장을 깨뜨리세요",color:"#B9AEDA"}',
            f'function {H}e/bump']
     W.w('hud/e/rebuild', rb)
     W.w('hud/e/bump', ['scoreboard players add #fkHudV mb 1'])
@@ -2375,7 +2373,7 @@ def hud_funcs(W):
                           '# (after it resets rlk:mboss extra). Same as the component',
                           f'# {{nbt:"hud.ex[]",storage:"{STO}",interpret:true,separator:""}}.',
                           f'data modify storage rlk:mboss extra append from storage {STO} hud.ex[]'])
-    W.w('hud/put_sub', ['# Append the meter (badge, 역장, 20 pips, N/20, hint) to the boss-bar third line (rlk:mboss sub),',
+    W.w('hud/put_sub', ['# Append the meter (badge, 역장, 20 pips, N/20) to the boss-bar third line (rlk:mboss sub),',
                         '# after the module\'s own text.',
                         f'data modify storage rlk:mboss sub append from storage {STO} hud.sub[]'])
     red, white = '#FC5050', '#F4F0FF'
@@ -2389,9 +2387,9 @@ def hud_funcs(W):
                              f'function {H}pop_lowg', f'function {FN}snd/field_banner'])
     W.w('hud/banner_end', ['# Drop the banner early (cancel, break).', 'title @a[tag=player] actionbar ""',
                            'scoreboard players set @a[tag=player] hudHold 0'])
-    W.w('hud/ab_lowg', ['# One-shot actionbar notice (2 s): low gravity and what it means.',
+    W.w('hud/ab_lowg', ['# One-shot actionbar notice (2 s): low gravity and its effects (no how-to-dodge advice: 10-21 user rule).',
                         f'title @a[tag=player] actionbar [{gl("lowg")},{{text:" 중력 감소",color:"#C9B6F2",bold:true}},'
-                        '{text:" — 점프 강화 · 낙하 피해 감소 · 충격파는 점프로 피하기",color:"#B9AEDA"}]',
+                        '{text:" — 점프 강화 · 낙하 피해 감소",color:"#B9AEDA"}]',
                         'scoreboard players set @a[tag=player] hudHold 40'])
     for name, g, t in (('pop_break', 'break_big', '2 18 8'), ('pop_lowg', 'lowg_big', '3 24 8')):
         W.w(f'hud/{name}', ['# The big glyph pops on the title line and fades; the F5 crosshair title rests (vBig).',

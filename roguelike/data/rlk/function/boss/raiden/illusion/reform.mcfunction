@@ -1,5 +1,8 @@
-# As the boss at its (new) feet: face the player and play the arrival art. The rig
-# stays hidden (rdPat 5) until the art has formed, then finish/stagger shows it.
-tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
-execute rotated as @s run tp @s ~ ~ ~ ~ 0
-function rlk:boss/raiden/movement/arrive
+# As the boss: on the real clone's spot (or where she is without one), facing the player; the rig shows again.
+execute as @e[tag=rlk_rd_illusion,scores={rdReal=1},limit=1] at @s run tp @e[tag=rlk_raiden,limit=1] ~ ~ ~
+execute at @s run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet
+execute at @s rotated as @s run tp @s ~ ~ ~ ~ 0
+execute as @e[tag=rlk_rd_illusion] at @s run function rlk:boss/raiden/illusion/vanish
+function rlk:boss/raiden/rig/play/blink_in
+execute at @s run function rlk:boss/raiden/fx/blink_in
+scoreboard players set #rdIlStep rd 3
