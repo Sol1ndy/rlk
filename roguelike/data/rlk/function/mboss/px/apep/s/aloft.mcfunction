@@ -24,5 +24,5 @@ function rlk:mboss/px/apep/ev/9
 function rlk:mboss/px/apep/ev/10
 function rlk:mboss/px/apep/ev/11
 data modify storage rlk:mboss push set value []
-execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/apep/rig_stub/state/normal
+execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/apep/rig/state/normal
 execute as @e[type=minecraft:husk,tag=rlk_mb_body,tag=rlk_mb_pxinv,limit=1] run function rlk:mboss/px/inv_off

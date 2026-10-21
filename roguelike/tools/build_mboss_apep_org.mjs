@@ -308,8 +308,13 @@ for (const owner of OBJECTS) {
       for (const d of o.displays) looksFn(d, uuidOf(idxOf(d, k)), I, t => uuidOf(idxOf(t, k)));
     }
     if (o.kind === 'fixed_set') {
-      fn(`${owner}/spawn`, [`# function ${NS}/${owner}/spawn {i:<0..${n - 1}>} at the ${owner} spot, rotated as wanted.`, `$function ${NS}/${owner}/i$(i)/spawn`]);
-      fn(`${owner}/play`, [`# function ${NS}/${owner}/play {i:<0..${n - 1}>,clip:"<clip>"}.`, `$function ${NS}/${owner}/i$(i)/play/$(clip)`]);
+      // literal dispatch lines (check_mboss_pack: no $(var) inside a function path)
+      const ks = Array.from({length: n}, (_, k) => k);
+      fn(`${owner}/spawn`, [`# function ${NS}/${owner}/spawn {i:<0..${n - 1}>} at the ${owner} spot, rotated as wanted.`, '$scoreboard players set #apOmI mb $(i)',
+        ...ks.map(k => `execute if score #apOmI mb matches ${k} run return run function ${NS}/${owner}/i${k}/spawn`)]);
+      fn(`${owner}/play`, [`# function ${NS}/${owner}/play {i:<0..${n - 1}>,clip:"<clip>"}.`, '$scoreboard players set #apOmI mb $(i)',
+        '$data modify storage rlk:mboss apomc set value "$(clip)"',
+        ...ks.flatMap(k => CLIPS[owner].map(c => `execute if score #apOmI mb matches ${k} if data storage rlk:mboss {apomc:"${c.name}"} run return run function ${NS}/${owner}/i${k}/play/${c.name}`))]);
       fn(`${owner}/kill_all`, [`# Remove every ${owner} display.`, ...Array.from({length: n}, (_, k) => `function ${NS}/${owner}/i${k}/kill`)]);
     }
   }

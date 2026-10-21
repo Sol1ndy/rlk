@@ -1,5 +1,5 @@
-# Play walk_p1 (36 t, clip id 1006) from its tick 0 (@s = the body). The
+# Play walk_p1 (36 t, clip id 6) from its tick 0 (@s = the body). The
 # px sets of the clip follow it (pxs/tick reads the rig clock); the stance / looks / hands are the rig's.
-function rlk:mboss/apep/rig_stub/play/walk_p1
+function rlk:mboss/apep/rig/play/walk_p1
 scoreboard players set #apYawC mb 0
 scoreboard players set #apYawS mb 1

@@ -1,3 +1,3 @@
-# Proxy a_r live: on the anchor floor, rlk_mob (targetable).
-data modify storage rlk:mboss px.o.a_r_y set value 0.0d
+# Proxy b_l live: on the anchor floor, rlk_mob (targetable).
+data modify storage rlk:mboss px.o.b_l_y set value 0.0d
 tag 524c4b4d-4150-4400-8000-000000000047 add rlk_mob

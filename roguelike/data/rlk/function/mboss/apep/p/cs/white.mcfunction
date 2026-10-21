@@ -6,5 +6,5 @@ function rlk:mboss/apep/heart/clear
 function rlk:mboss/apep/svc/unpark
 function rlk:mboss/apep/svc/repool_p3
 function rlk:mboss/apep/svc/look_p3
-execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run function rlk:mboss/apep/rig_stub/stance/upright
+execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run function rlk:mboss/apep/rig/stance/upright
 function rlk:mboss/apep/svc/push_ring_cs

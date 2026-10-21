@@ -6,7 +6,7 @@ function rlk:mboss/apep/wall/clear
 execute if score #apPark mb matches 1 run function rlk:mboss/apep/svc/unpark
 execute unless score #mbPoolPct mb matches 53 run function rlk:mboss/apep/svc/repool_p1
 function rlk:mboss/apep/svc/look_p1
-function rlk:mboss/apep/rig_stub/stance/crouch
+function rlk:mboss/apep/rig/stance/crouch
 function rlk:mboss/apep/play/idle_p1
 function rlk:mboss/apep/svc/phase_1
 function rlk:mboss/apep/px/p1

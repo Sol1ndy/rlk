@@ -10,7 +10,7 @@ execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run tp @s 440 201 8 0
 function rlk:mboss/apep/svc/arena_lush
 execute unless score #mbPoolPct mb matches 47 run function rlk:mboss/apep/svc/repool_p3
 function rlk:mboss/apep/svc/look_p3
-function rlk:mboss/apep/rig_stub/stance/upright
+function rlk:mboss/apep/rig/stance/upright
 function rlk:mboss/apep/play/idle_p3
 function rlk:mboss/apep/svc/title_p3
 execute unless score #mbMusPh mb matches 3 run function rlk:mboss/apep/svc/music_3

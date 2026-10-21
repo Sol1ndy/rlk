@@ -1,8 +1,8 @@
 # Hook uninstall (no executor; every enabled module): the rig (real or stand-in), the kit, the module entities,
 # objectives and storage.
-function rlk:mboss/apep/rig_stub/kill
-function rlk:mboss/apep/rig_stub/uninstall
-function rlk:mboss/apep/kstub/uninstall
+function rlk:mboss/apep/rig/kill
+function rlk:mboss/apep/rig/uninstall
+function rlk:mboss/apep/fx/uninstall
 function rlk:mboss/apep/wall/clear
 kill @e[tag=rlk_mb_ap_pat]
 kill @e[tag=rlk_mb_ap_kept]

@@ -3,7 +3,7 @@ execute store result score #apTot mb run scoreboard players get #mbTot mb
 function rlk:mboss/intro_end
 function rlk:mboss/apep/seq/entrance/done
 function rlk:mboss/apep/svc/phase_1
-function rlk:mboss/apep/rig_stub/stance/crouch
+function rlk:mboss/apep/rig/stance/crouch
 function rlk:mboss/apep/svc/look_p1
 function rlk:mboss/apep/play/idle_p1
 function rlk:mboss/apep/px/p1

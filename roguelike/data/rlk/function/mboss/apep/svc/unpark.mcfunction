@@ -3,5 +3,5 @@
 scoreboard players set #apPark mb 0
 scoreboard players set #mbNoLeash mb 0
 execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run tp @s 440 201 8 0 0
-execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/apep/rig_stub/unpark
+execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:mboss/apep/rig/unpark
 function rlk:mboss/apep/px/inv

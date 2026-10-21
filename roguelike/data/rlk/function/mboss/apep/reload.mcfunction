@@ -6,8 +6,8 @@
 function rlk:mboss/apep/ai/consts
 scoreboard players set #apHide mb -1
 execute as @e[tag=rlk_mb_mv] run function rlk:mboss/mv/stop
-function rlk:mboss/apep/rig_stub/init
-function rlk:mboss/apep/rig_stub/spawn
+function rlk:mboss/apep/rig/init
+function rlk:mboss/apep/rig/spawn
 execute if score #apPid mb matches 32 run function rlk:mboss/apep/aft/cancel
 execute if score #mbSt mb matches 0 run return run function rlk:mboss/apep/intro/done
 execute if score #apPh mb matches 15 run return run function rlk:mboss/apep/ph/ready_2

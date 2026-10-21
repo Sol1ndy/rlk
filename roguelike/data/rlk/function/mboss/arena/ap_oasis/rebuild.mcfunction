@@ -1,3 +1,4 @@
-# STUB (theme module tools/mboss_arena_ap_oasis.py missing): nothing is built; outside a run the
-# forceload the dev view added goes again.
-execute unless score #active room matches 1 unless score #mbLive mb matches 1 run function rlk:mboss/ar/ap_oasis/fl_off
+# Dev / test: drop the stamp of ap_oasis and build it again (a running job of another arena blocks it).
+execute if score #mbArBuild mb matches 1.. run return fail
+data remove storage rlk:mboss built_ap_oasis
+function rlk:mboss/arena/ap_oasis/build

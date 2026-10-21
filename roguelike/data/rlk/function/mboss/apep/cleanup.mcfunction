@@ -24,6 +24,6 @@ kill @e[tag=rlk_mb_ar_ap_oasis]
 kill @e[type=minecraft:husk,tag=rlk_mb_ap_org]
 function rlk:mboss/apep/ai/vars
 data remove storage rlk:mboss ap
-function rlk:mboss/apep/kstub/clear
-function rlk:mboss/apep/kstub/hud/clear
-function rlk:mboss/apep/kstub/dress/clear
+function rlk:mboss/apep/fx/clear
+function rlk:mboss/apep/fx/hud/clear
+function rlk:mboss/apep/fx/dress/clear

@@ -12,8 +12,8 @@ kill 524c4b4d-4150-4400-8000-000000000048
 kill 524c4b4d-4150-4400-8000-000000000049
 kill 524c4b4d-4150-4400-8000-00000000004a
 kill 524c4b4d-4150-4400-8000-00000000004b
-execute unless data storage rlk:mboss px.o run data modify storage rlk:mboss px.o set value {head_x:0d,head_y:-8d,head_z:3.4d,chest_x:0d,chest_y:-8d,chest_z:0d,abd_x:0d,abd_y:-8d,abd_z:-2d,tail_a_x:0.2d,tail_a_y:-8d,tail_a_z:-6d,tail_b_x:1.3d,tail_b_y:-8d,tail_b_z:-9.3d,a_l_x:5.3d,a_l_y:-8d,a_l_z:2.6d,a_r_x:-5.3d,a_r_y:-8d,a_r_z:2.6d,b_l_x:2.5d,b_l_y:-8d,b_l_z:3.6d,b_r_x:-2.5d,b_r_y:-8d,b_r_z:3.6d,c_l_x:3d,c_l_y:-8d,c_l_z:-3d,c_r_x:-3d,c_r_y:-8d,c_r_z:-3d}
-execute unless data storage rlk:mboss px.top run data modify storage rlk:mboss px.top set value {head:4.5f,chest:5f,abd:4f,tail_a:2f,tail_b:2f,a_l:2.5f,a_r:2.5f,b_l:3f,b_r:3f,c_l:3f,c_r:3f}
+execute unless data storage rlk:mboss px.o run data modify storage rlk:mboss px.o set value {head_x:0d,head_y:-8d,head_z:3.35d,chest_x:0d,chest_y:-8d,chest_z:0.05d,abd_x:0d,abd_y:-8d,abd_z:-2d,tail_a_x:0.2d,tail_a_y:-8d,tail_a_z:-6.1d,tail_b_x:1.35d,tail_b_y:-8d,tail_b_z:-9.4d,a_l_x:5.1d,a_l_y:-8d,a_l_z:2.5d,b_l_x:2.45d,b_l_y:-8d,b_l_z:3.4d,c_l_x:2.95d,c_l_y:-8d,c_l_z:-2.75d,a_r_x:-5.1d,a_r_y:-8d,a_r_z:2.5d,b_r_x:-2.45d,b_r_y:-8d,b_r_z:3.4d,c_r_x:-2.95d,c_r_y:-8d,c_r_z:-2.75d}
+execute unless data storage rlk:mboss px.top run data modify storage rlk:mboss px.top set value {head:4.5f,chest:4.95f,abd:4f,tail_a:2f,tail_b:2f,a_l:2.3f,b_l:3f,c_l:3f,a_r:2.3f,b_r:3f,c_r:3f}
 execute unless data storage rlk:mboss px.set run data modify storage rlk:mboss px.set set value "inv"
 execute at @s rotated as @s rotated ~ 0 positioned ^ ^-8 ^ run summon minecraft:interaction ~ ~ ~ {UUID:[I;1380731725,1095779328,-2147483648,65],Tags:["rlk_room","rlk_mb_aux","boss","rlk_mb_px","rlk_mb_px_head"],width:2.8f,height:1.0f,response:false}
 scoreboard players set 524c4b4d-4150-4400-8000-000000000041 mbPart 1
@@ -57,30 +57,30 @@ scoreboard players set #pxU6 mb 0
 execute if score #t mb matches 31.. run scoreboard players set #pxU6 mb 1
 execute if score #t mb matches ..10 run scoreboard players set #t mb 10
 execute store result entity 524c4b4d-4150-4400-8000-000000000046 height float 0.01 run scoreboard players get #t mb
-execute at @s rotated as @s rotated ~ 0 positioned ^ ^-8 ^ run summon minecraft:interaction ~ ~ ~ {UUID:[I;1380731725,1095779328,-2147483648,71],Tags:["rlk_room","rlk_mb_aux","boss","rlk_mb_px","rlk_mb_px_a_r"],width:1.8f,height:1.0f,response:false}
+execute at @s rotated as @s rotated ~ 0 positioned ^ ^-8 ^ run summon minecraft:interaction ~ ~ ~ {UUID:[I;1380731725,1095779328,-2147483648,71],Tags:["rlk_room","rlk_mb_aux","boss","rlk_mb_px","rlk_mb_px_b_l"],width:2.2f,height:1.0f,response:false}
 scoreboard players set 524c4b4d-4150-4400-8000-000000000047 mbPart 7
-execute store result score #t mb run data get storage rlk:mboss px.top.a_r 100
+execute store result score #t mb run data get storage rlk:mboss px.top.b_l 100
 scoreboard players set #pxU7 mb 0
 execute if score #t mb matches 31.. run scoreboard players set #pxU7 mb 1
 execute if score #t mb matches ..10 run scoreboard players set #t mb 10
 execute store result entity 524c4b4d-4150-4400-8000-000000000047 height float 0.01 run scoreboard players get #t mb
-execute at @s rotated as @s rotated ~ 0 positioned ^ ^-8 ^ run summon minecraft:interaction ~ ~ ~ {UUID:[I;1380731725,1095779328,-2147483648,72],Tags:["rlk_room","rlk_mb_aux","boss","rlk_mb_px","rlk_mb_px_b_l"],width:2.2f,height:1.0f,response:false}
+execute at @s rotated as @s rotated ~ 0 positioned ^ ^-8 ^ run summon minecraft:interaction ~ ~ ~ {UUID:[I;1380731725,1095779328,-2147483648,72],Tags:["rlk_room","rlk_mb_aux","boss","rlk_mb_px","rlk_mb_px_c_l"],width:1.8f,height:1.0f,response:false}
 scoreboard players set 524c4b4d-4150-4400-8000-000000000048 mbPart 8
-execute store result score #t mb run data get storage rlk:mboss px.top.b_l 100
+execute store result score #t mb run data get storage rlk:mboss px.top.c_l 100
 scoreboard players set #pxU8 mb 0
 execute if score #t mb matches 31.. run scoreboard players set #pxU8 mb 1
 execute if score #t mb matches ..10 run scoreboard players set #t mb 10
 execute store result entity 524c4b4d-4150-4400-8000-000000000048 height float 0.01 run scoreboard players get #t mb
-execute at @s rotated as @s rotated ~ 0 positioned ^ ^-8 ^ run summon minecraft:interaction ~ ~ ~ {UUID:[I;1380731725,1095779328,-2147483648,73],Tags:["rlk_room","rlk_mb_aux","boss","rlk_mb_px","rlk_mb_px_b_r"],width:2.2f,height:1.0f,response:false}
+execute at @s rotated as @s rotated ~ 0 positioned ^ ^-8 ^ run summon minecraft:interaction ~ ~ ~ {UUID:[I;1380731725,1095779328,-2147483648,73],Tags:["rlk_room","rlk_mb_aux","boss","rlk_mb_px","rlk_mb_px_a_r"],width:1.8f,height:1.0f,response:false}
 scoreboard players set 524c4b4d-4150-4400-8000-000000000049 mbPart 9
-execute store result score #t mb run data get storage rlk:mboss px.top.b_r 100
+execute store result score #t mb run data get storage rlk:mboss px.top.a_r 100
 scoreboard players set #pxU9 mb 0
 execute if score #t mb matches 31.. run scoreboard players set #pxU9 mb 1
 execute if score #t mb matches ..10 run scoreboard players set #t mb 10
 execute store result entity 524c4b4d-4150-4400-8000-000000000049 height float 0.01 run scoreboard players get #t mb
-execute at @s rotated as @s rotated ~ 0 positioned ^ ^-8 ^ run summon minecraft:interaction ~ ~ ~ {UUID:[I;1380731725,1095779328,-2147483648,74],Tags:["rlk_room","rlk_mb_aux","boss","rlk_mb_px","rlk_mb_px_c_l"],width:1.8f,height:1.0f,response:false}
+execute at @s rotated as @s rotated ~ 0 positioned ^ ^-8 ^ run summon minecraft:interaction ~ ~ ~ {UUID:[I;1380731725,1095779328,-2147483648,74],Tags:["rlk_room","rlk_mb_aux","boss","rlk_mb_px","rlk_mb_px_b_r"],width:2.2f,height:1.0f,response:false}
 scoreboard players set 524c4b4d-4150-4400-8000-00000000004a mbPart 10
-execute store result score #t mb run data get storage rlk:mboss px.top.c_l 100
+execute store result score #t mb run data get storage rlk:mboss px.top.b_r 100
 scoreboard players set #pxU10 mb 0
 execute if score #t mb matches 31.. run scoreboard players set #pxU10 mb 1
 execute if score #t mb matches ..10 run scoreboard players set #t mb 10

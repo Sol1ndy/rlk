@@ -13,6 +13,6 @@ execute if score #apPid mb matches 1.. run function rlk:mboss/apep/p/run
 execute if score #apYawC mb matches 1.. run function rlk:mboss/apep/yaw/tick
 function rlk:mboss/apep/push/req
 function rlk:mboss/apep/hud/tick
-function rlk:mboss/apep/rig_stub/tick
+function rlk:mboss/apep/rig/tick
 function rlk:mboss/apep/pxs/tick
 scoreboard players set #apNoPush mb 0

@@ -1,8 +1,8 @@
-# Play move_strike_p3 (92 t, clip id 1028) from its tick 0 (@s = the body). The
+# Play move_strike_p3 (92 t, clip id 28) from its tick 0 (@s = the body). The
 # px sets of the clip follow it (pxs/tick reads the rig clock); the stance / looks / hands are the rig's.
-function rlk:mboss/apep/rig_stub/play/move_strike_p3
+function rlk:mboss/apep/rig/play/move_strike_p3
 # the yaw schedule of the manifest turns the anchor (sign #apYawS: -1 mirrors it)
-scoreboard players set #apYawC mb 1028
+scoreboard players set #apYawC mb 28
 scoreboard players operation #apYawSg mb = #apYawS mb
 scoreboard players set #apYawS mb 1
 scoreboard players set #apYawT mb -1

@@ -4,10 +4,10 @@ function rlk:mboss/apep/ai/consts
 function rlk:mboss/apep/ai/vars
 scoreboard players set #apHide mb -1
 scoreboard players set #apPh mb 0
-function rlk:mboss/apep/rig_stub/init
-function rlk:mboss/apep/rig_stub/spawn
+function rlk:mboss/apep/rig/init
+function rlk:mboss/apep/rig/spawn
 function rlk:mboss/apep/svc/look_p1
-function rlk:mboss/apep/rig_stub/stance/crouch
+function rlk:mboss/apep/rig/stance/crouch
 function rlk:mboss/apep/u/hide_off
 function rlk:mboss/apep/arena/props_kill
 function rlk:mboss/apep/arena/props_withered

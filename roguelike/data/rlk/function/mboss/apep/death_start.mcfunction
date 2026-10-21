@@ -4,8 +4,8 @@ function rlk:mboss/apep/p/cancel
 function rlk:mboss/apep/dome/clear
 function rlk:mboss/apep/wall/clear
 function rlk:mboss/apep/org/clear
-function rlk:mboss/apep/kstub/tele/clear
-function rlk:mboss/apep/kstub/hud/clear
+function rlk:mboss/apep/fx/tele/clear
+function rlk:mboss/apep/fx/hud/clear
 function rlk:mboss/apep/svc/cine_on
 scoreboard players set #mbFloor mb 0
 scoreboard players set #apTr mb 0
