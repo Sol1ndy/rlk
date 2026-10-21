@@ -1,3 +1,3 @@
-# STUB (AP-CORE, ap_contract 1.3): 증폭의 풀 (shells, id 33); the pattern stage replaces this file.
-# nothing of its own lingers (selectors only, idempotent)
+# Cut (any executor): its markers, the ball and the shells go; the ring decal ends.
 kill @e[tag=rlk_mb_ap_p33]
+function rlk:boss/apep/fx/tele/mring_end {id:0}
