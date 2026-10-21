@@ -9,8 +9,8 @@
 //   RP  assets/rlk/textures/raiden/rig/*.png (raiden_paint.mjs) + item atlas entries;
 //       assets/rlk/models/item/raiden/** and assets/rlk/items/raiden/** except fx_* and the illusion models
 //       (parts, looks, props)
-//   DP  data/rlk/function/boss/raiden/rig/** (rebuilt from scratch on every run); it also deletes the former
-//       boss/raiden/judgment_rig/** shims (the judgment rig is removed, plan §B.2 15)
+//   DP  data/rlk/function/boss/raiden/rig/** (rebuilt from scratch on every run); judgment/ and judgment_rig/ belong to
+//       build_raiden_judgment_rig.mjs (the 만겁 rift and arm, restored 10-22a)
 //   tools/raiden_rig_manifest.json (manifest v2: parts, looks, states, clips with events, props, px ledger, budgets)
 //
 // Runtime (contract: tools/raiden_rig_api.md):
@@ -73,15 +73,15 @@ const spriteTable = raidenSprites(rp);
 if (!flag('--no-paint')) paintRaidenTextures(rp);
 const models = allModels();
 const modelDir = path.join(assets, 'models/item/raiden'), itemDir = path.join(assets, 'items/raiden');
-// Former outputs of this generator and of the removed judgment rig (build_raiden_judgment_rig.mjs): dropped. The
+// Former outputs of this generator and of the release rig (the old armour, katana and puppet items): dropped. The
 // fx_* trees belong to the kit generators except fx_weapon (only the old rig made it); illusion* is the illusions
-// generator's.
+// generator's, judgment/ the 만겁 rig's (build_raiden_judgment_rig.mjs).
 const FORMER = ['armor', 'chakra', 'crown', 'ribbon', 'ribbon_dull', 'katana', 'polearm', 'giant_katana', 'puppet_upper', 'puppet_forearm',
   ...['open', 'closed', 'claw'].flatMap(k => [`puppet_hand_${k}`, `puppet_hand_${k}_l`]), 'support_upper', 'support_forearm', 'support_hand_r', 'support_hand_l',
   'electro_orb', 'lightning_stake', 'remembrance_flower', 'death_shard_0', 'death_shard_1', 'death_shard_2', ...BODY.flatMap(n => [n, n + '_dull'])];
 for (const d of [modelDir, itemDir]) {
   for (const n of FORMER) fs.rmSync(path.join(d, n + '.json'), {force: true});
-  for (const sub of ['judgment', 'fx_weapon', 'prop']) fs.rmSync(path.join(d, sub), {recursive: true, force: true});
+  for (const sub of ['fx_weapon', 'prop']) fs.rmSync(path.join(d, sub), {recursive: true, force: true});
   for (const f of fs.existsSync(d) ? fs.readdirSync(d) : []) if (/^t_.*\.json$/.test(f) || /^(g_|ra\d|gaunt|glaive|disc|halo|aura|braid|drape|katana|polearm)/.test(f)) fs.rmSync(path.join(d, f), {force: true});
 }
 const usedSprites = new Set();
@@ -370,17 +370,17 @@ fn('flash_off', ['# Internal: end of the hit flash.', 'scoreboard players reset 
 compiler.writeFace({marker: 'rlk_rd_face', maxDeg: 12});
 // props (separate entities, never rig parts): tags rlk_room, rlk_raiden_aux, rlk_rd_prop, rlk_rd_prop_<kind>, rlk_rd_prop_new (this call)
 const f4 = x => String(+x.toFixed(4));
+const propSummon = (kind, P, model, rotation = '') => `summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_prop","rlk_rd_prop_${kind}","rlk_rd_prop_new"],${rotation}billboard:"${P.billboard || 'fixed'}",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:3f,width:${P.scale > 4 ? 20 : 8}f,height:${P.scale > 4 ? 12 : 8}f,shadow_radius:0f,brightness:{block:15,sky:15},transformation:{translation:[0f,${f4(P.lift || 0)}f,0f],left_rotation:[0f,0f,0f,1f],scale:[${f4(P.scale)}f,${f4(P.scale)}f,${f4(P.scale)}f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId(model)}"}}}`;
 for (const [kind, P] of Object.entries(PROPS)) {
-  const s = f4(P.scale);
-  fn(`prop/${kind}`, [`# Summons the prop ${kind}: ${P.note}. At the execution position, facing the execution yaw.`,
-    'tag @e[tag=rlk_rd_prop_new] remove rlk_rd_prop_new',
-    `summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_raiden_aux","rlk_rd_prop","rlk_rd_prop_${kind}","rlk_rd_prop_new"],billboard:"${P.billboard || 'fixed'}",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:3f,width:${P.scale > 4 ? 20 : 8}f,height:${P.scale > 4 ? 12 : 8}f,shadow_radius:0f,brightness:{block:15,sky:15},transformation:{translation:[0f,${f4(P.lift || 0)}f,0f],left_rotation:[0f,0f,0f,1f],scale:[${s}f,${s}f,${s}f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId(P.model)}"}}}`,
-    'execute rotated ~ 0 run tp @e[type=item_display,tag=rlk_rd_prop_new] ~ ~ ~ ~ 0']);
+  // a multi-part prop (the dome) puts each part on its own fixed yaw (entity Rotation) and ignores the execution yaw
+  fn(`prop/${kind}`, P.parts
+    ? [`# Summons the prop ${kind}: ${P.note}. At the execution position (rotationally symmetric: the execution yaw is not used).`,
+      'tag @e[tag=rlk_rd_prop_new] remove rlk_rd_prop_new', ...P.parts.map(q => propSummon(kind, P, q.model, `Rotation:[${f4(((q.yaw % 360) + 360) % 360)}f,0f],`))]
+    : [`# Summons the prop ${kind}: ${P.note}. At the execution position, facing the execution yaw.`,
+      'tag @e[tag=rlk_rd_prop_new] remove rlk_rd_prop_new', propSummon(kind, P, P.model),
+      'execute rotated ~ 0 run tp @e[type=item_display,tag=rlk_rd_prop_new] ~ ~ ~ ~ 0']);
 }
 fn('prop/clear', ['# Removes every rig prop.', 'kill @e[type=item_display,tag=rlk_rd_prop]']);
-
-// ---- removed shims (S3): the legacy rdAnim bridge, the release P13 slam hand and the judgment_rig stand-ins ------------------
-fs.rmSync(path.join(FN_ROOT, 'judgment_rig'), {recursive: true, force: true});
 
 // ---- manifest v2 ---------------------------------------------------------------------------------------------------------------
 const manifestPath = path.join(here, 'raiden_rig_manifest.json');
@@ -417,5 +417,5 @@ if (debugDp) {
   const grid = Object.entries(PROPS).filter(([k]) => k !== 'dome');
   putDebug('rd_dbg/props', grid.map(([k, P], i) => { const x = (i % 5) * 4.2 - 8.4, z = Math.floor(i / 5) * 5 - 5, s2 = f4(P.scale);
     return `summon minecraft:item_display ~${f4(x)} ~ ~${f4(z)} {Tags:["rd_prop_${k}"],item_display:"none",brightness:{block:15,sky:15},transformation:{translation:[0f,${f4(P.lift || (['eye_orb', 'seed', 'musou_orb', 'blade_eye'].includes(k) ? 1 : P.model.includes('clap') || k === 'slam_palm' ? 2.4 : 0))}f,0f],left_rotation:[0f,0f,0f,1f],scale:[${s2}f,${s2}f,${s2}f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId(P.model)}"}}}`; }));
-  putDebug('rd_dbg/dome', [`summon minecraft:item_display ~ ~ ~ {Tags:["rd_prop_dome"],item_display:"none",brightness:{block:15,sky:15},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[8f,8f,8f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId('prop/dome')}"}}}`]);
+  putDebug('rd_dbg/dome', PROPS.dome.parts.map(q => `summon minecraft:item_display ~ ~ ~ {Tags:["rd_prop_dome"],Rotation:[${f4(((q.yaw % 360) + 360) % 360)}f,0f],item_display:"none",brightness:{block:15,sky:15},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[8f,8f,8f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"${itemId(q.model)}"}}}`));
 }

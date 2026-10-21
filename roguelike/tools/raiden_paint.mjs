@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import {paintSpriteSet, C, mix, clamp, smooth, fbm, TRANSPARENT} from './mboss_paint_lib.mjs';
+import {DOME} from './raiden_geometry.mjs';
 
 export const SPRITE_DIR = 'assets/rlk/textures/raiden/rig';
 export const spriteId = n => 'rlk:raiden/rig/' + n;
@@ -300,10 +301,52 @@ const petal = (u, v) => {
   if (Math.abs(x) > w || t < .02) return T;
   return [...mix(C('#a02a8a'), P.pink, t * .7 + .2 * (1 - Math.abs(x) / Math.max(w, 1e-3))).slice(0, 3), 255];
 };
-// Dome glass (glow tile): faint violet-white with a brighter rim band (v) and hex shimmer.
-const domeGlass = (u, v) => {
-  const hex = Math.abs(((u * 8 + (Math.floor(v * 8) % 2) * .5) % 1) - .5) < .04 || Math.abs(((v * 8) % 1) - .5) < .04;
-  return A(mix(C('#b48cff'), P.flash, v * .5), .18 + (hex ? .22 : 0) + .25 * smooth(.8, 1, v));
+// 만겁 safe dome (glow): the footage's pale blue-violet bubble (B-17), see-through everywhere: a faint tint (alpha
+// ~0.15), soft white cloud patches and two thin drifting light bands, brighter and denser where it meets the floor (the
+// soft rim) and a little toward the crown. The look is a function of the point on the sphere (a = azimuth in turns of the
+// 90-degree period, e = elevation 0..1), so it runs on across the facet seams (DOME in raiden_geometry.mjs).
+const dA = fbm(71), dC = fbm(79);
+const DOME_TINT = C('#b2bcff'), DOME_LILAC = C('#d0b8ff'), DOME_WHITE = C('#f8f4ff');
+// soft cloud patches: [a, e, angular size in radians], repeated every 90 degrees of azimuth (nearest copy)
+const DOME_CLOUDS = [[.04, .10, .30], [.33, .28, .24], [.63, .06, .26], [.82, .40, .25], [.18, .55, .21], [.52, .66, .22],
+  [.93, .78, .17], [.40, .93, .15], [.70, .24, .14], [.10, .86, .14], [.27, .02, .12], [.60, .45, .12]];
+const domeLook = (a, e) => {
+  const lat = e * Math.PI / 2;
+  let cloud = 0;
+  for (const [ab, eb, size] of DOME_CLOUDS) {
+    const dphi = (((a - ab + .5) % 1 + 1) % 1 - .5) * Math.PI / 2, lb = eb * Math.PI / 2;
+    // stretched along the azimuth (drifting bands, footage), edges broken up by noise
+    const du = Math.cos((lat + lb) / 2) * dphi, dv = 1.9 * (lat - lb), d = Math.hypot(du, dv);
+    if (d > size * 1.7) continue;
+    const warp = dA(4 * du + 7 * ab, 4 * dv + 11 * eb) - .5;
+    cloud = Math.max(cloud, smooth(1.05, .2, d / size + 1.1 * warp));
+  }
+  const wob = .05 * (dC(3 * a + 2, 2 * e + 7) - .5);
+  const band = Math.max(0, 1 - Math.abs(e - .47 - wob) / .01);
+  const rim = 1 - smooth(0, .1, e), crown = smooth(.82, 1, e);
+  const c = mix(mix(DOME_TINT, DOME_LILAC, .35 + .3 * Math.sin(2 * Math.PI * a)), DOME_WHITE, clamp(.12 + .75 * cloud + .5 * band + .75 * rim + .25 * crown));
+  return A(c, .2 + .3 * cloud + .14 * band + .4 * rim * rim + .06 * crown);
+};
+// Row r: DOME.PARTS slices (part j = slice j), u across the facet's bounding rectangle (its bottom width), v from the top
+// edge (0) to the bottom edge (1); outside the trapezoid (plus half a texel, so neighbours meet without a gap) alpha 0.
+const domeRow = r => (u, v) => {
+  const {ra, ya, rb, yb, wa, wb} = DOME.rows[r], n = DOME.PARTS, j = Math.min(n - 1, Math.floor(u * n)), s = u * n - j - .5;
+  const l = 1 - v, w = wa + (wb - wa) * l, x = s * wa;
+  if (Math.abs(x) > w / 2 + wa * .5 / 32) return T;
+  const frac = clamp(x / w, -.5, .5), rho = ra + (rb - ra) * l, y = ya + (yb - ya) * l;
+  return domeLook(((j + .5 + frac) / n) % 1, Math.atan2(y, rho) / (Math.PI / 2));
+};
+// Cap (part 0, horizontal at the crown): the DOME.N-gon of the profile's top edge; sprite (u, v) = A-frame (X, Z).
+const domeCap = (u, v) => {
+  const {c, r, y} = DOME.cap, X = (u - .5) * 2 * c, Z = (v - .5) * 2 * c, rho = Math.hypot(X, Z), step = 2 * Math.PI / DOME.N;
+  const al = Math.atan2(X, -Z), ak = Math.round(al / step) * step;
+  if (rho * Math.cos(al - ak) > r + c / 64) return T;
+  return domeLook((((al / (Math.PI / 2) + 1 / 16) % 1) + 1) % 1, Math.atan2(y, rho) / (Math.PI / 2));
+};
+// Dark orb of the flower and the shadow seed: the round ledge discs of the turned ball (opaque, alpha-cut circle).
+const orbDark = (u, v) => {
+  const r = Math.hypot(u - .5, v - .5) * 2;
+  return r > .98 ? T : [...mix(P.ink, P.deep, .25 + .55 * smooth(.55, .98, r)).slice(0, 3), 255];
 };
 // Clap hand facets (glow tile): translucent faceted violet.
 const clapFacet = (u, v) => {
@@ -383,7 +426,9 @@ export function raidenSprites(rp) {
     glaive_blade: [64, 256, glaiveBlade, false], glaive_shaft: [16, 64, glaiveShaft, false], glaive_guard: [64, 64, glaiveGuard, false],
     disc: [128, 128, disc, false], horn: [32, 64, horn, false], dagger: [32, 64, dagger, false],
     tasset: [32, 64, plate(false), false], plate_pale: [32, 64, plate(true), false],
-    orb_eye: [64, 64, orbEye, true], crystal: [64, 128, crystal, true], petal: [64, 64, petal, false], dome_glass: [64, 64, domeGlass, true],
+    orb_eye: [64, 64, orbEye, true], crystal: [64, 128, crystal, true], petal: [64, 64, petal, false], orb_dark: [32, 32, orbDark, false],
+    dome_r0: [256, 32, domeRow(0), true], dome_r1: [256, 64, domeRow(1), true], dome_r2: [256, 64, domeRow(2), true], dome_r3: [256, 64, domeRow(3), true],
+    dome_cap: [64, 64, domeCap, true],
     clap_facet: [64, 64, clapFacet, true], hoop: [128, 128, hoop, true], vortex: [128, 128, vortex, true],
   });
   const skin = rp && path.join(rp, 'assets/rlk/textures/raiden/skin.png');
@@ -391,7 +436,7 @@ export function raidenSprites(rp) {
   return S;
 }
 // Rig sprite px by group (plan §C.6 ledger): props are the prop_* families, everything else is the rig.
-export const PROP_SPRITES = new Set(['orb_eye', 'crystal', 'petal', 'dome_glass', 'clap_facet', 'hoop', 'vortex']);
+export const PROP_SPRITES = new Set(['orb_eye', 'crystal', 'petal', 'orb_dark', 'dome_r0', 'dome_r1', 'dome_r2', 'dome_r3', 'dome_cap', 'clap_facet', 'hoop', 'vortex']);
 export function paintRaidenTextures(rp, only = null) {
   const sprites = raidenSprites(rp);
   // skin_tenma samples the skin per texel: paint it without supersampling blur (nearest) by painting at 1x.

@@ -34,8 +34,9 @@ the cues below, summons timed cards (they need no cleanup; `kill @e[tag=rlk_rd_f
   bolt / bolt_big (sky bolt + shock ring), crystal, parry (gold waist crescent), counter_cue (black line),
   guard_shatter (burst + gold light pillar, 100 t), eye_spawn (cyan sky beam), eye_break, eye_blast, musou_slash,
   glaive_throw (pink beam), bomb (flash + ink), iai_charge, danjeol_halo, danjeol_column, clap_star, shadow_palm,
-  vajra_pulse, mangeop_dome, mangeop_slash, transform_burst; with macro arguments: twirl {life} (polearm ring; call
-  fx/snd/twirl_beat every 6 t), eye_glow {r,life} (cyan danger dome), crystal_line {len}, crystal_ring {r},
+  vajra_pulse, mangeop_dome, mangeop_slash, mangeop_clash (the 만겁 katana meets the dome), transform_burst; with
+  macro arguments: twirl {life} (polearm ring; call fx/snd/twirl_beat every 6 t), eye_glow {r,life} (cyan danger
+  dome), crystal_line {len}, crystal_ring {r},
   musou_dark {life} / mangeop_tint {life} (whole-field tint, run at the arena centre). Every other SOUNDS key is a
   sound-only cue. snd(cue) plays only the recipe.
 State decals (not hazards): decal('ring'|'rings3'|'disc_pale'|'band'|'pool'|'aura'|'stagger', r=.., life=..) ->
@@ -146,6 +147,12 @@ SOUNDS = {
     'mangeop_dome': [('block.beacon.power_select', 1.0, 1.6), ('block.glass.place', 1.0, 1.0)],
     'mangeop_slash': [('entity.lightning_bolt.thunder', 1.0, 1.0), ('entity.warden.sonic_boom', 1.0, 0.6)],
     'mangeop_shatter': [('block.glass.break', 1.0, 0.9), ('block.glass.break', 0.9, 1.1), ('block.glass.break', 0.8, 1.3)],
+    # the 만겁 rift and arm (build_raiden_judgment_rig.mjs; the release's calamity sounds, d765bab)
+    'mangeop_rift': [('block.beacon.ambient', 0.9, 0.5), ('block.glass.break', 0.6, 0.5)],
+    'mangeop_void': [('block.portal.ambient', 0.9, 0.55), ('entity.wither.ambient', 0.6, 0.5)],
+    'mangeop_clash': [('entity.player.attack.sweep', 1.0, 0.55), ('entity.iron_golem.attack', 1.0, 0.65), ('entity.generic.explode', 0.65, 0.7)],
+    'mangeop_crack': [('block.respawn_anchor.deplete', 0.6, 1.3), ('entity.iron_golem.damage', 0.6, 1.2)],
+    'mangeop_close': [('block.beacon.deactivate', 0.8, 1.1)],
     'rush': [('item.trident.riptide_3', 1.0, 1.0)],
     'barrage': [('entity.player.attack.sweep', 1.0, 0.9), ('entity.player.attack.sweep', 0.9, 1.2)],
     'transform_ring': [('entity.lightning_bolt.thunder', 1.0, 1.0)],

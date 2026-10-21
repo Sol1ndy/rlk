@@ -24,6 +24,17 @@ PALETTE = {
     "glow": (181, 118, 255, 30),
     "afterglow": (144, 96, 230, 64),
     "pearl": (235, 213, 255, 224),
+    # opaque armour / katana swatches of the 만겁 arm (build_raiden_judgment_rig.mjs)
+    "arm_lilac": (201, 182, 236, 255),
+    "arm_shade": (154, 130, 207, 255),
+    "arm_deep": (75, 45, 122, 255),
+    "arm_tomoe": (58, 37, 96, 255),
+    "gold_dull": (184, 154, 94, 255),
+    "blade_pale": (215, 198, 247, 255),
+    "blade_edge": (245, 240, 255, 255),
+    "blade_core": (156, 120, 224, 255),
+    "grip_dark": (44, 30, 66, 255),
+    "nail_glow": (199, 125, 255, 255),
 }
 
 
@@ -36,9 +47,9 @@ def png(path, rgba):
                      chunk(b"IDAT", zlib.compress(rows, 9)) + chunk(b"IEND", b""))
 
 
-# Swatches of the release's dome / judgment rig / puppet-arm models; nothing uses them since S3, so they are pruned.
-RETIRED = ("blue", "floor", "shield_glass", "shield_mist", "arm_lilac", "arm_shade", "arm_deep", "arm_tomoe", "gold_dull",
-           "blade_pale", "blade_edge", "blade_core", "grip_dark", "hand_dull", "hand_dull_dark", "nail_glow")
+# Swatches of the release's dome / puppet-arm models; nothing uses them since S3, so they are pruned (the judgment rig's
+# armour swatches came back with the 만겁 arm, 10-22a).
+RETIRED = ("blue", "floor", "shield_glass", "shield_mist", "hand_dull", "hand_dull_dark")
 
 
 def build_materials(resourcepack):

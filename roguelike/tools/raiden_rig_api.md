@@ -87,8 +87,9 @@ Non-looping clips hold their last pose until the next `play`. The glaive is not 
 - Tenma: core figure floats about 1 b up. **The giant arm and its glaive are on her right, the three thin arms
   fan out on her left** (as in footage `frames/B/B_v7_06.90`, `B_v9_03.30`; the plan text says "giant left arm",
   which reads the footage from the viewer's side). Gauntlet hands hover low in front, palms up, ≥ 0.58 b.
-- Props (manifest `props`): `eye_orb`, `blade_eye`, `musou_orb`, `vajra`, `flower` (≈ 2 b), `dome` (r 8 b at scale 8,
-  grow it by its scale), `clap_l`/`clap_r` (4.5 b translucent hands), `slam_palm`, `glaive_planted`, `seed`, `hoop`,
+- Props (manifest `props`): `eye_orb`, `blade_eye`, `musou_orb`, `vajra`, `flower` (≈ 2 b), `dome` (r 8 b at scale 8:
+  `rig/prop/dome` summons its 8 displays `prop/dome_0..7` on fixed yaws (entity Rotation), one closed double-sided
+  bubble; grow it by a uniform scale merge on every `rlk_rd_prop_dome` display, never by left_rotation), `clap_l`/`clap_r` (4.5 b translucent hands), `slam_palm`, `glaive_planted`, `seed`, `hoop`,
   `vortex`, `clone_ready`/`clone_slash` (+`_glow`; pivot 1.375 b above the feet, the function lifts it).
 - The encounter puts props on screen through `object/create {model:"prop/<model>"}` (eyes, clones, the flower) or
   `rig/prop/<kind>`; the release's item ids (`electro_orb`, `lightning_stake`, `remembrance_flower`, `support_hand_*`)
@@ -96,14 +97,16 @@ Non-looping clips hold their last pose until the next `play`. The glaive is not 
 
 ## Removed in S3
 
-The temporary S1-S2 bridge is gone: `rig/legacy_anim` and `rig/legacy/*` (the release's `rdAnim` ids), the
-`judgment_rig/{start,tick,cleanup}` shims (the generator deletes the folder) and `rig/target_slam_*` (release P13).
+The temporary S1-S2 bridge is gone: `rig/legacy_anim` and `rig/legacy/*` (the release's `rdAnim` ids), the S3
+`judgment_rig` shims and `rig/target_slam_*` (release P13). Since 10-22a `judgment_rig/` is the 만겁 sky rift and arm
+again, owned by `build_raiden_judgment_rig.mjs` (run after this generator; `start` at the arena centre facing the
+player, `tick` as the boss from p15, `clash` on the hit, `cleanup`).
 The encounter calls only `rig/play/<clip>` / `rig/start/<clip>` and hides her with `rig/state/hidden`.
 
 ## Tests
 
 `python3 S/rd/tests/test_raiden.py <roguelike> -k rig` (`S/rd/tests/rig_tests.py`): manifest v2 against the plan's
 §C.5 table (lengths, loops, event ticks), parts/UUIDs, every called function exists, no negative score amounts, no
-downward teleports, the S3 shim removal, all 45 clips run in rdsim, hidden/show/Tenma/death/kill/respawn,
+downward teleports, the S3 shim removal, the restored 만겁 rig (start / tick / clash, tags, no teleports), all 45 clips run in rdsim, hidden/show/Tenma/death/kill/respawn,
 no part below y 201. Renders: `S/rd/renders/rig_*.jpg|png` (debug poses `--debug-dp`: `rd_dbg/<clip>/<t>`,
 `rd_dbg/props`, `rd_dbg/dome`, `rd_dbg/weapon_{sword,polearm}`, `rd_dbg/rest_{s,t}`).

@@ -1437,10 +1437,44 @@
       "function": "rlk:boss/raiden/rig/prop/flower"
     },
     "dome": {
-      "model": "prop/dome",
+      "model": "prop/dome_0",
+      "parts": [
+        {
+          "model": "prop/dome_0",
+          "yaw": 0
+        },
+        {
+          "model": "prop/dome_1",
+          "yaw": -11.25
+        },
+        {
+          "model": "prop/dome_2",
+          "yaw": -22.5
+        },
+        {
+          "model": "prop/dome_3",
+          "yaw": -33.75
+        },
+        {
+          "model": "prop/dome_4",
+          "yaw": -45
+        },
+        {
+          "model": "prop/dome_5",
+          "yaw": -56.25
+        },
+        {
+          "model": "prop/dome_6",
+          "yaw": -67.5
+        },
+        {
+          "model": "prop/dome_7",
+          "yaw": -78.75
+        }
+      ],
       "scale": 8,
-      "note": "safe dome r 8 b (glass, outer and inner facets), floor pivot; animate the scale to grow it",
-      "item": "rlk:raiden/prop/dome",
+      "note": "safe dome r 8 b: 8 displays (one closed double-sided bubble), floor pivot; animate the scale of every rlk_rd_prop_dome to grow it",
+      "item": "rlk:raiden/prop/dome_0",
       "function": "rlk:boss/raiden/rig/prop/dome"
     },
     "clap_l": {
@@ -1554,8 +1588,8 @@
   },
   "px": {
     "rig": 145664,
-    "props": 57344,
-    "total": 203008,
+    "props": 115712,
+    "total": 261376,
     "sprites": {
       "sw_ink": 256,
       "sw_violet": 256,
@@ -1602,7 +1636,12 @@
       "orb_eye": 4096,
       "crystal": 8192,
       "petal": 4096,
-      "dome_glass": 4096,
+      "orb_dark": 1024,
+      "dome_r0": 8192,
+      "dome_r1": 16384,
+      "dome_r2": 16384,
+      "dome_r3": 16384,
+      "dome_cap": 4096,
       "clap_facet": 4096,
       "hoop": 16384,
       "vortex": 16384,
@@ -1621,8 +1660,8 @@
     ],
     "key_files": 491,
     "rig_files": 736,
-    "rig_bytes": 2797994,
-    "models": 55,
+    "rig_bytes": 2801645,
+    "models": 62,
     "culling": {
       "width": 16,
       "height": 10

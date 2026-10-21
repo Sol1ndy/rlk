@@ -430,22 +430,38 @@ def p14():
         '$execute at @e[tag=rlk_raiden_arena,limit=1] positioned ~$(x) ~ ~$(z) run ' + decal('ring', r=2.5, life=0).replace('life:0', 'life:$(life)')])
 
 
+# 만겁 sky rift and arm (build_raiden_judgment_rig.mjs: T0 56, key frames to 190, the katana meets the dome on 152)
+MG_RIFT, MG_RIG_END = 56, 190
+MG_BOLTS = [(154, 13, -9), (157, -15, 4), (161, 6, 16), (165, -9, -14)]
+
+
 def p15():
-    # 만겁 (B-17), footage version: she vanishes (immune, hidden, burst energy 0), the arena tints, the flower appears at
-    # the centre with the real-game prompt; 1 electro or 4 other hits raise the dome (r 8); the beam 140, the arena-wide
-    # slash 152 kills everyone outside the dome; the dome cracks and shatters, she reappears at the centre. No camera
-    # lock (plan §F.2.1). Clips t_vanish (gone 14), t_reform (appear 0).
+    # 만겁 (B-17 + the user's reference video S:rd/src/user_refs/mangeop_ref.mp4): she vanishes (immune, hidden, burst
+    # energy 0), the arena tints, the flower appears at the centre with the real-game prompt; 1 electro or 4 other hits
+    # raise the dome (r 8). The sky tears open on the far side of the flower from the player (56: a slit that gapes into
+    # a starry void by 78), a giant armoured arm draws a katana out of it (84..), holds it back to the left (146) and cuts
+    # left -> right: on 152 the blade strikes the dome edge-first (the clash) while the arena-wide slash kills everyone
+    # outside it; violet bolts fall round the arena, the dome cracks (160) and shatters (176) as the rift collapses
+    # (178..188), she reappears at the centre (184). The camera stays free (the rig faces the player instead; the
+    # release's camera lock is not restored). Clips t_vanish (gone 14), t_reform (appear 0).
     p = pattern(15, '만겁')
     ev(p, 1, clip('t_vanish'), call('line/mangeop'), 'scoreboard players set @s rdUltUsed 1', face, flat, fx('iai_charge'))
     ev(p, 14, call('tm/mg/vanish'))
     ev(p, 18, center + fx('mangeop_tint', life=160))
     ev(p, 40, call('tm/mg/flower'))
     ev(p, 42, center + fx('danjeol_column'))
+    ev(p, MG_RIFT, 'execute at @e[tag=rlk_raiden_arena,limit=1] facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 run '
+       + call('judgment_rig/start'), center + snd('mangeop_rift'))
+    span(p, MG_RIFT + 1, MG_RIG_END, call('judgment_rig/tick'))
+    ev(p, 74, center + snd('mangeop_void'))
     ev(p, 140, center + fx('eye_spawn'))
     ev(p, 151, call('tm/mg/strike'))
     ev(p, 152, call('tm/mg/slash'))
+    for t, x, z in MG_BOLTS:
+        ev(p, t, center + f'execute positioned ~{x} ~ ~{z} run ' + fx('bolt_big'))
     ev(p, 160, call('tm/mg/crack'))
     ev(p, 176, call('tm/mg/shatter'))
+    ev(p, 178, center + snd('mangeop_close'))
     ev(p, 184, call('tm/mg/reform'))
     end(p, 196)
     write('tm/mg/vanish', ['# @s = the boss: the flash and she is gone (rdPat 15 keeps her immune); every burst gauge empties.',
@@ -467,12 +483,15 @@ def p15():
         'execute at @e[tag=rlk_rd_dome,limit=1] run ' + hz('safe_dome', 1, 1, r=8, nododge=True),
         'execute unless entity @e[tag=rlk_rd_dome,limit=1] at @e[tag=rlk_raiden_arena,limit=1] run ' + hz('safe_dome', 1, 1, r=0.001, nododge=True)])
     write('tm/mg/slash', [
-        '# @s = the boss, tick 152: the screen-wide crescent; a held dome cracks a quarter of the armour. The flower is spent.',
+        '# @s = the boss, tick 152: the screen-wide crescent; the katana strikes a held dome (the clash at the blade), which',
+        '# cracks a quarter of the armour. The flower is spent.',
         center + fx('mangeop_slash'),
+        'execute if entity @e[tag=rlk_rd_dome,limit=1] run ' + call('judgment_rig/clash'),
         f'execute if entity @e[tag=rlk_rd_dome,limit=1] run scoreboard players remove @s rdShield {FLOWER_BREAK}',
         call('object/clear')])
     write('tm/mg/crack', ['# @s = the boss: the dome cracks under the slash (a short shudder).',
                           'execute at @e[tag=rlk_rd_dome,limit=1] run ' + snd('crystal'),
+                          'execute at @e[tag=rlk_rd_dome,limit=1] run ' + snd('mangeop_crack'),
                           'execute as @e[tag=rlk_rd_tm_dome] run data merge entity @s {start_interpolation:0,interpolation_duration:2,transformation:%s}' % (ID_TF % (8.4, 8.4, 8.4)),
                           ])
     write('tm/mg/shatter', ['# @s = the boss: the dome shatters, the flower goes.',
@@ -483,12 +502,12 @@ def p15():
                            'execute at @e[tag=rlk_raiden_arena,limit=1] run tp @s ~ ~ ~ facing entity @e[tag=rlk_body,limit=1] feet',
                            flat, 'execute at @s run ' + fx('blink_in')] + clip('t_reform'))
     write('dome_create', [
-        '# As the broken flower, at it: the safe dome r 8 grows from the flower in 8 t (dome_tick, rig prop model).',
+        '# As the broken flower, at it: the safe dome r 8 grows from the flower in 8 t (dome_tick). The bubble is the rig prop',
+        '# (rig/prop/dome: 8 displays on fixed yaws, one closed double-sided shell); it starts at a tenth of its size.',
         'kill @e[tag=rlk_rd_dome]', 'kill @e[tag=rlk_rd_tm_dome]',
         'summon minecraft:marker ~ ~ ~ {Tags:[%s,"rlk_rd_dome"]}' % TAGS,
-        'scoreboard players set @e[tag=rlk_rd_dome] rdTime 0',
-        'summon minecraft:item_display ~ ~ ~ {Tags:[%s,"rlk_rd_tm_dome"],billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:1,view_range:3f,width:20f,height:12f,shadow_radius:0f,brightness:{block:15,sky:15},transformation:%s,item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/prop/dome"}}}'
-        % (TAGS, ID_TF % (0.8, 0.8, 0.8)),
+        'scoreboard players set @e[tag=rlk_rd_dome] rdTime 0'] + prop('dome', 'rlk_rd_tm_dome') + [
+        'execute as @e[tag=rlk_rd_tm_dome] run data merge entity @s {transformation:%s}' % (ID_TF % (0.8, 0.8, 0.8)),
         fx('mangeop_dome')])
     write('dome_tick', [
         '# As the dome marker (world): grow the dome on its first tick; a stray marker goes after 300 t.',

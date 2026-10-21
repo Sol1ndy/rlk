@@ -10,7 +10,7 @@
 // aura), Tenma 14 (disc, g_upper, g_fore, g_hand, glaive, glaive_fx, ra1_up/ra1_fo .. ra3_up/ra3_fo, gaunt_l, gaunt_r).
 // The braid shows in both forms; the other Shogun extras hide in the Tenma form (pose sS = 0) and the Tenma parts in
 // the Shogun form (pose tS = 0).
-import {abox, cardZ, cardX, cardY, lathe, turned, mirrorModel, checkBounds, r4} from './mboss_model_lib.mjs';
+import {abox, cardZ, cardX, cardY, lathe, turned, knob, mirrorModel, checkBounds, r4, faceEl, faceOfDir, rotA, vadd, vsub, vsc, vdot, D2R} from './mboss_model_lib.mjs';
 import {add, sub, times, len, unit, mul, q, rot, aimQ, ik, basisQ, cross, dot, perp, steadyPerp, toDisplayT, toDisplayQ} from './mboss_rig_math.mjs';
 
 // ---- part table ---------------------------------------------------------------------------------------------------------
@@ -238,18 +238,17 @@ function propModels() {
   for (const [x, , z, h, w, r] of spikes) for (const pl of ['z', 'x']) M['prop/vajra'].push(pl === 'z'
     ? cardZ('crystal', z, {X0: x - w / 2, X1: x + w / 2, Y0: 1.4, Y1: 1.4 + h}, r ? {rot: [r[0], r[1], [x, 1.4, z]]} : {})
     : cardX('crystal', x, {Z0: z - w / 2, Z1: z + w / 2, Y0: 1.4, Y1: 1.4 + h}, r ? {rot: [r[0], r[1], [x, 1.4, z]]} : {}));
-  // remembrance flower: magenta lotus round a dark orb (scale 1.2), floor pivot
-  M['prop/flower'] = [...ballJ([0, 6.2, 0], 3.2, 'sw_ink', 'sw_deep'), abox([-.6, 0, -.6], [.6, 3, .6], 'sw_violet')];
+  // remembrance flower: magenta lotus round a dark orb (scale 1.2), floor pivot; the orb is a round turned ball (its
+  // band ledges are round orb_dark discs, never square plates)
+  M['prop/flower'] = [...knob('y', [0, 6.2, 0], 3.2, 'sw_ink', 'orb_dark'), abox([-.6, 0, -.6], [.6, 3, .6], 'sw_violet')];
   for (let k = 0; k < 8; k++) {
     const a = k * 45, r = 4.6, x = Math.sin(a * Math.PI / 180) * r, z = -Math.cos(a * Math.PI / 180) * r;
     const el = k % 2 === 0 ? cardZ('petal', z, {X0: x - 3, X1: x + 3, Y0: 2, Y1: 10}) : cardX('petal', x, {Z0: z - 3, Z1: z + 3, Y0: 2, Y1: 10});
     if (k % 2) { const e2 = cardZ('petal', 0, {X0: -3, X1: 3, Y0: 2, Y1: 10}, {rot: ['y', k === 1 || k === 5 ? 45 : -45, [0, 6, 0]]}); M['prop/flower'].push(shiftXZ(e2, x, z)); }
     else M['prop/flower'].push(el);
   }
-  // safe dome r 8 b (scale 8: 1 unit = 0.5 b): glass hemisphere, outer and inner facets
-  const at = [0, 4, 8, 11.5, 14, 15.6, 16];
-  const secs = at.slice(1).map((y, i) => ({a: [at[i], y], r: 16 * Math.cos(Math.asin(Math.min(1, ((at[i] + y) / 2) / 16))), tex: 'dome_glass'}));
-  M['prop/dome'] = [...lathe('y', [0, 0, 0], secs, {vFrom: 0, vTo: 1, n: 16}), ...lathe('y', [0, 0, 0], secs, {vFrom: 0, vTo: 1, n: 16, inward: true})];
+  // safe dome r 8 b (scale 8: 1 unit = 0.5 b): DOME.PARTS display parts, see domeModels()
+  Object.assign(M, domeModels());
   // clap hands: translucent faceted violet hands, 4.5 b at scale 3.6 (palm toward +X for the left hand)
   M['prop/clap_hand_l'] = clapHand();
   M['prop/clap_hand_r'] = mirrorModel(clapHand());
@@ -261,7 +260,7 @@ function propModels() {
     cardZ('glaive_guard', 0, {X0: -1.5, X1: 1.5, Y0: .6, Y1: 3.6}, {rot: ['x', 22.5, [0, 0, 0]]}),
     cardZ('glaive_blade', .06, {X0: -.4, X1: 3.4, Y0: .4, Y1: 3.2}, {rot: ['x', 22.5, [0, 0, 0]], uvr: [0, .78, 1, 1]})];
   // shadow seed: dark orb with an eye (scale 1)
-  M['prop/seed'] = [...ballJ([0, 0, 0], 3.4, 'sw_ink', 'sw_deep'), ...crossCards('sigil', [0, 0, 0], 6, 4, -2)];
+  M['prop/seed'] = [...knob('y', [0, 0, 0], 3.4, 'sw_ink', 'orb_dark'), ...crossCards('sigil', [0, 0, 0], 6, 4, -2)];
   // weapon switch: dark vertical hoop (scale 2 -> 3 b) and the vortex disc at her feet (scale 3)
   M['prop/hoop'] = [cardZ('hoop', 0, {X0: -12, X1: 12, Y0: 0, Y1: 24}), cardX('hoop', 0, {Z0: -12, Z1: 12, Y0: 0, Y1: 24})];
   M['prop/vortex'] = [cardY('vortex', .4, {X0: -15, X1: 15, Z0: -15, Z1: 15})];
@@ -269,6 +268,53 @@ function propModels() {
   // tinted items give the dark smoky clone and the glowing revealed one (PROP_TINTS)
   M['prop/clone_ready'] = clone('ready');
   M['prop/clone_slash'] = clone('slash');
+  return M;
+}
+// ---- the 만겁 safe dome (plan §C.2: r 8 b). One closed, double-sided polyhedron spread over DOME.PARTS item displays (each
+// turned by DOME.yaw(j) on its entity Rotation, so the scale merges of the pattern keep working): a part holds the four
+// cardinal gores (azimuth 0 / 90 / 180 / 270 of its own frame), so 8 parts give 32 azimuths. A gore is 4 rows of flat
+// facets turned up 0 / 22.5 / 45 / 67.5 degrees about the gore's tangent (single-axis element rotations; the 67.5 row is
+// authored flat and turned back 22.5) and part 0 carries the polygonal cap. The rows are the circumscribed profile of the
+// sphere (tangent at 0, 22.5, ..., 90 degrees), so neighbouring rows share their edges exactly; a facet is an isosceles
+// trapezoid drawn on its bounding rectangle, and its sprite slice cuts the trapezoid (alpha 0 outside), so neighbouring
+// gores meet edge to edge. Every facet has an outward and an inward face (seen from outside and from inside the dome).
+// Row r uses sprite dome_r<r> (DOME.PARTS slices across, part j = slice j: the faint pattern is 90 degrees periodic and
+// continuous over the seams), the cap dome_cap (raiden_paint.mjs paints both from DOME).
+export const DOME = (() => {
+  const R = 16, N = 32, PARTS = 8, half = Math.PI / N, k = R / Math.cos(11.25 * D2R);
+  const V = [[R, 0], ...[11.25, 33.75, 56.25, 78.75].map(p => [k * Math.cos(p * D2R), k * Math.sin(p * D2R)])];
+  const rows = [0, 1, 2, 3].map(i => {
+    const [ra, ya] = V[i], [rb, yb] = V[i + 1];
+    return {beta: 22.5 * i, ra, ya, rb, yb, wa: 2 * ra * Math.tan(half), wb: 2 * rb * Math.tan(half), L: Math.hypot(ra - rb, yb - ya)};
+  });
+  return {R, N, PARTS, rows, cap: {y: V[4][1], r: V[4][0], c: V[4][0] / Math.cos(half)}, yaw: j => -360 / N * j,
+    model: j => 'prop/dome_' + j, sprite: r => 'dome_r' + r};
+})();
+function domeModels() {
+  const {PARTS, rows, cap} = DOME, dirs = [[0, 0, -1], [1, 0, 0], [0, 0, 1], [-1, 0, 0]], up = [0, 1, 0], M = {};
+  for (let j = 0; j < PARTS; j++) {
+    const els = [];
+    for (let g = 0; g < 4; g++) {
+      const d = dirs[g], t = dirs[(g + 1) % 4], axis = t[0] ? 'x' : 'z', inw = vsc(d, -1);
+      rows.forEach((row, r) => {
+        const {beta, ra, ya, rb, yb, wa, L} = row, flat = beta > 45, along = flat ? inw : up, ang = flat ? 22.5 : beta;
+        const O = vadd([0, ya, 0], vsc(d, ra));
+        const sg = !ang ? 0 : vdot(rotA(axis, 10, along), flat ? up : inw) > 0 ? 1 : -1;
+        // the turned facet must land on the profile: its top edge midpoint at (rb, yb)
+        const top = vadd(O, rotA(axis, sg * ang, vsc(along, L)));
+        if (Math.abs(vdot(top, d) - rb) > 1e-6 || Math.abs(top[1] - yb) > 1e-6) throw new Error(`dome facet g${g} r${r} misses the profile`);
+        const fn = X => { const rel = vsub(X, O); return [16 * (j + .5 + vdot(rel, t) / wa) / PARTS, 16 * (1 - vdot(rel, along) / L)]; };
+        const P = (s, l) => vadd(O, vadd(vsc(t, s), vsc(along, l)));
+        const out = flat ? 'up' : faceOfDir(d), inn = flat ? 'down' : faceOfDir(inw), tex = DOME.sprite(r);
+        els.push(faceEl([P(-wa / 2, 0), P(wa / 2, L)], {[out]: {tex, fn}, [inn]: {tex, fn}}, {shade: false, rot: ang ? [axis, sg * ang, O] : undefined}));
+      });
+    }
+    if (j === 0) {
+      const c = cap.c, fn = X => [16 * (.5 + X[0] / (2 * c)), 16 * (.5 + X[2] / (2 * c))];
+      els.push(faceEl([[-c, cap.y, -c], [c, cap.y, c]], {up: {tex: 'dome_cap', fn}, down: {tex: 'dome_cap', fn}}, {shade: false}));
+    }
+    M[DOME.model(j)] = els;
+  }
   return M;
 }
 const shiftXZ = (e, dx, dz) => ({...e, from: [r4(e.from[0] - dx), e.from[1], r4(e.from[2] + dz)], to: [r4(e.to[0] - dx), e.to[1], r4(e.to[2] + dz)],
@@ -307,7 +353,8 @@ export const PROPS = {
   musou_orb: {model: 'prop/musou_orb', scale: 1.4, note: 'Musou crystal orb, centred'},
   vajra: {model: 'prop/vajra', scale: 2.5, note: 'vajra spike bundle 3.5 b tall, base at the pivot (floor)'},
   flower: {model: 'prop/flower', scale: 2.2, note: 'remembrance flower (lotus + dark orb, about 2 b tall), floor pivot'},
-  dome: {model: 'prop/dome', scale: 8, note: 'safe dome r 8 b (glass, outer and inner facets), floor pivot; animate the scale to grow it'},
+  dome: {model: DOME.model(0), parts: Array.from({length: DOME.PARTS}, (_, j) => ({model: DOME.model(j), yaw: DOME.yaw(j)})), scale: 8,
+    note: `safe dome r 8 b: ${DOME.PARTS} displays (one closed double-sided bubble), floor pivot; animate the scale of every rlk_rd_prop_dome to grow it`},
   clap_l: {model: 'prop/clap_hand_l', scale: 3.6, note: 'left clap hand (palm toward +X of the display), 4.5 b'},
   clap_r: {model: 'prop/clap_hand_r', scale: 3.6, note: 'right clap hand (palm toward -X), 4.5 b'},
   slam_palm: {model: 'prop/slam_palm', scale: 3.2, note: 'pale open hand hanging from the pivot (fingers -Y); turn it palm down'},
