@@ -1,4 +1,3 @@
-# STUB (AP-CORE, ap_contract 1.3): 초목이 시든 풍경 (wither, id 4); the pattern stage replaces this file.
-# keeps time only (the clip of each step at its clock; no hazards)
-execute if score #apPT mb matches 72 run function rlk:boss/apep/p/release
-execute if score #apPT mb matches 130.. run function rlk:boss/apep/p/end
+# P4 tick (#apPT = the rotation clip tick)
+execute if score #apPT mb matches 16..57 run return run function rlk:boss/apep/p/wither/kd/16_57
+execute if score #apPT mb matches 59..130 run return run function rlk:boss/apep/p/wither/kd/59_130

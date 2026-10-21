@@ -1,4 +1,3 @@
-# STUB (AP-CORE, ap_contract 1.3): 생명의 손 (hands, id 2); the pattern stage replaces this file.
-# keeps time only (the clip of each step at its clock; no hazards)
-execute if score #apPT mb matches 100 run function rlk:boss/apep/p/release
-execute if score #apPT mb matches 140.. run function rlk:boss/apep/p/end
+# P2 tick (#apPT = the hands clip tick; -9..0 the pre-turn)
+execute if score #apPT mb matches 0..61 run return run function rlk:boss/apep/p/hands/kd/0_61
+execute if score #apPT mb matches 62..140 run return run function rlk:boss/apep/p/hands/kd/62_140

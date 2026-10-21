@@ -1,3 +1,2 @@
-# STUB (AP-CORE, ap_contract 1.6): the pattern stage AP-P1 replaces this file.
-# E is over (or skipped): the Heart prop drawn up (idempotent).
+# AP-P1 (plan 8.1 E): E is over (or skipped: /reload, the tests): the Heart prop drawn up (idempotent).
 function rlk:boss/apep/heart/p1_up
