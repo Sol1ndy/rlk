@@ -316,6 +316,7 @@ PH = {'E': 0, 'P1': 1, 'T1': 15, 'P2': 2, 'CS': 25, 'P3': 3, 'D': 9}
 POOL = {1: int(BOSS['phases'][0]), 3: int(BOSS['phases'][1])}             # 53 / 47 % of #mbTot
 FLOOR_PCT_P1 = 1                                                           # 1 % of the P1 pool (plan 7.2)
 T1_LEN, CS_LEN, FAIL_LEN = 136, 192, 60                                    # plan 7.5, 7.7, 3.4
+CS_HEAL_T = 80                     # the CS heal tick (plan 7.7, Q25): revival's flash; a reload in the CS before it heals at once
 E_LEN = clip_len('entrance_p1')                                            # 110 = registry intro
 D_LEN = clip_len('death')                                                  # 120 <= registry death 140
 assert E_LEN <= int(BOSS['intro']) and D_LEN <= int(BOSS['death']), (E_LEN, D_LEN)

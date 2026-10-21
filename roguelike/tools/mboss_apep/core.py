@@ -428,13 +428,15 @@ class Core:
             '# Heart, domes, walls\' markers, props, proxies). Scores survive; the state is re-derived from them (plan 7.2):',
             '#   E -> the end of E; P1 -> the rig again, the pattern cancelled; T1 -> phase 2 ready; P2 -> the stage keeps its',
             '#   progress / wave / clock / strikes, the Heart and the wave again, parked; CS -> phase 3 ready; P3 -> the rig',
-            '#   again (UPRIGHT), the pattern cancelled, a running Q2 cancelled (300 t).',
+            '#   again (UPRIGHT), the pattern cancelled, a running Q2 cancelled (300 t). A reload in the CS before its heal',
+            '#   (t80) gives the heal at once (AP-FIX RV-13), so the jump to phase 3 never skips it.',
             F('ai/consts'), sc('#apHide', -1),
             'execute as @e[tag=rlk_mb_mv] run function rlk:mboss/mv/stop',
             f'function {A.rig_fn("init")}', f'function {A.rig_fn("spawn")}',
             f'execute if score #apPid mb matches 32 run {F("aft/cancel")}',
             f'execute if score #mbSt mb matches 0 run return run {F("intro/done")}',
             f'execute if score #apPh mb matches 15 run return run {F("ph/ready_2")}',
+            f'execute if score #apPh mb matches 25 if score #apPT mb matches ..{A.CS_HEAL_T - 1} run {F("svc/heal_cs")}',
             f'execute if score #apPh mb matches 25 run return run {F("ph/ready_3")}',
             f'execute if score #apPh mb matches 2 run return run {F("rl/p2")}',
             f'execute if score #apPh mb matches 3 run return run {F("rl/p3")}',
@@ -452,11 +454,14 @@ class Core:
                          F('p/cancel'), F('svc/look_p3'), f'function {A.rig_fn("stance/upright")}', g.play('idle_p3'),
                          F('px/restate'), F('arena/props_now'), sc('#apCool', 20), sc('#apHudQ', 1)])
         self.w('bars', ['# Hook bars (@s = body, every tick in intro / fight): the under-bar (hud/bar); phase 2 the Heart bar.', F('hud/bar')])
-        vis = ['# Hook hz_vis (@s = hazard marker, #hzEv 0 create / 1 strike / 2 end): routed by mbHzV / 10 = the pattern id.',
-               'scoreboard players operation #apV mb = @s mbHzV', 'scoreboard players operation #apV mb /= #c10 mb']
-        vis += [f'execute if score #apV mb matches {p.id} run return run {F(f"p/{p.key}/vis")}' for p in self.with_hook('vis')]
+        vis = ['# Hook hz_vis (@s = hazard marker, #hzEv 0 create / 1 strike / 2 end): routed by mbHzV / 10 = the pattern id.']
+        routes = [f'execute if score #apV mb matches {p.id} run return run {F(f"p/{p.key}/vis")}' for p in self.with_hook('vis')]
         if g.has('org/vis'):
-            vis.append(f'execute if score #apV mb matches 70..79 run return run {F("org/vis")}')
+            routes.append(f'execute if score #apV mb matches 70..79 run return run {F("org/vis")}')
+        if routes:
+            vis += ['scoreboard players operation #apV mb = @s mbHzV', 'scoreboard players operation #apV mb /= #c10 mb'] + routes
+        else:
+            vis.append('# No pattern has a vis hook: nothing to route (AP-FIX RV-12: no per-event computation).')
         self.w('hz_vis', vis)
         pj = ['# Hook pj_end (@s = prop, #pjEv, #pjKeep): routed by the prop\'s pattern tag rlk_mb_ap_p<id> (organisms: rlk_mb_ap_opj).']
         pj += [f'execute if entity @s[tag=rlk_mb_ap_p{p.id}] run return run {F(f"p/{p.key}/pj_end")}' for p in self.with_hook('pj_end')]
@@ -478,7 +483,8 @@ class Core:
                 f'model2:"{m2}",l1:{l1},l2:{l2},l3:{l3},n:{A.N}}}')
         lines = ['# Hook prep (cm.md 5.3; @s = the kind-9 zone marker, at it; once per entrance build; cb/pp/apep cleared',
                  '# cprep.apep first): the gate texts (ap_contract 0.6.7), the title / sub of the gate press, the two gate crystals',
-                 '# (theme entrance_layout glyphs; rlk_room props: room/clear removes them).',
+                 '# (theme entrance_layout glyphs; rlk_room props: room/clear removes them) in the kit look fx/prop/gate_crystal',
+                 '# (AP-FIX RV-06; the model\'s foot is its origin, so it stands on the floor).',
                  f'data modify storage rlk:mboss cprep.apep.gate set value {gate}',
                  f'data modify storage rlk:mboss cprep.apep.title set value {txt(A.BOSS["name"], A.GOLD_HEX, True)}',
                  f'data modify storage rlk:mboss cprep.apep.sub set value {txt(A.BOSS["sub"], "#E8E2D0")}',
@@ -488,8 +494,10 @@ class Core:
         for name, (x, y, z, yaw) in sorted(A.ENTRANCE_GLYPHS.items()):
             lines.append(f'summon minecraft:item_display ~{L.num(x)} {L.num(y)} ~{L.num(z)} {{Tags:["rlk_room","rlk_mb_ap_gate"],'
                          f'Rotation:[{L.num(float(yaw))}f,0f],billboard:"fixed",brightness:{{block:15,sky:15}},'
-                         'transformation:{translation:[0f,0.6f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],'
+                         'transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],'
                          'scale:[1.2f,1.2f,1.2f]},item:{id:"minecraft:emerald",count:1}}')
+        if A.ENTRANCE_GLYPHS:
+            lines.append(f'execute as @e[type=minecraft:item_display,tag=rlk_mb_ap_gate,distance=..48] run {K.prop("gate_crystal")}')
         self.w('prep', lines)
 
     # -----------------------------------------------------------------------------------------
