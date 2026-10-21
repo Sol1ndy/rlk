@@ -1,0 +1,5 @@
+execute on passengers if entity @s[tag=rlk_ap_om_spire] run data merge entity @s {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,-0.94f,0f],left_rotation:[0f,0f,0f,1f],scale:[1.75f,0.84f,1.75f],right_rotation:[0f,0f,0f,1f]}}
+execute on passengers if entity @s[tag=rlk_ap_om_spire] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/apep_om/guard_spire_spire"
+execute on passengers if entity @s[tag=rlk_ap_om_spire_x] run data merge entity @s {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,-0.94f,0f],left_rotation:[0f,-0.38268f,0f,0.92388f],scale:[1.75f,0.84f,1.75f],right_rotation:[0f,0f,0f,1f]}}
+execute on passengers if entity @s[tag=rlk_ap_om_spire_x] run data modify entity @s item.components."minecraft:item_model" set value "rlk:mboss/apep_om/guard_spirex_spire"
+execute on passengers if entity @s[tag=rlk_ap_om_orb] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,1.09766f,0f],left_rotation:[0f,0f,0f,1f],scale:[0.84688f,0.84688f,0.84688f],right_rotation:[0f,0f,0f,1f]}}

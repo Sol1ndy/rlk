@@ -1,0 +1,3 @@
+# Start org_spawn now: tick 0 applied immediately, basic/tick continues with tick 1. @s = the husk.
+function rlk:mboss/apep/om/basic/c/org_spawn/enter
+scoreboard players set @s apOC 1
