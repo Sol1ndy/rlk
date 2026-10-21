@@ -1,3 +1,3 @@
-# STUB (AP-CORE, ap_contract 1.3): 발광하는 파수꾼 (glow, id 3); the pattern stage replaces this file.
-# nothing of its own lingers (selectors only, idempotent)
+# 발광하는 파수꾼 cut (any executor; idempotent): its markers, hazards and props go.
 kill @e[tag=rlk_mb_ap_p3]
+execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run function rlk:mboss/mv/stop

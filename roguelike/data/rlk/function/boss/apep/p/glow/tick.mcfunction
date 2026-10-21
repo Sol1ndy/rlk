@@ -1,8 +1,4 @@
-# STUB (AP-CORE, ap_contract 1.3): 발광하는 파수꾼 (glow, id 3); the pattern stage replaces this file.
-# keeps time only (the clip of each step at its clock; no hazards)
-execute if score #apPT mb matches 39 run execute at @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] run tp @s ~ 201 ~
-execute if score #apPT mb matches 44 run function rlk:boss/apep/play/emerge_crown_p1
-execute if score #apPT mb matches 84..93 run function rlk:mboss/mv/turn {max:6}
-execute if score #apPT mb matches 94 run function rlk:boss/apep/play/glow_slams
-execute if score #apPT mb matches 200 run function rlk:boss/apep/p/release
-execute if score #apPT mb matches 225.. run function rlk:boss/apep/p/end
+# P3 tick (#apPT: burrow_in_p1 0-22, hidden, emerge_crown_p1 44-83, glow_slams 94-224); the live wheels first.
+execute as @e[type=minecraft:item_display,tag=rlk_mb_ap_p3w] at @s run function rlk:boss/apep/p/glow/wheel
+execute if score #apPT mb matches 5..147 run return run function rlk:boss/apep/p/glow/kd/5_147
+execute if score #apPT mb matches 148..225 run return run function rlk:boss/apep/p/glow/kd/148_225
