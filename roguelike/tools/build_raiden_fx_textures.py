@@ -44,13 +44,12 @@ UV CONVENTIONS (texture x = u = left->right, texture y = v = top->bottom):
            bright cutting edge is the outer arc of radius 0.94*h (v=0.06 at the
            apex), spanning +-72 deg around straight up; the gradient tail trails
            inward toward the pivot. Card: width 2H, depth H, H = edge radius / 0.94.
-  decal    top-view floor decal; u = world +x (local left/right), v = world +z
-           (local forward). Hazard decals are symmetry pieces, see DECALS / DECAL_SYM.
+  decal    top-view floor decal; u = world +x (local left/right), v = world +z (local forward).
   quarter  ring quadrant: circle centre at the texture's top-left corner (u=0,v=0);
            mirror it (uv [16,0,0,16] etc.) for the other quadrants.
 
 CATALOGUE (all sizes are multiples of 16 so the atlas keeps its mipmap levels;
-total ~5.4 Mpx)
+total ~2.5 Mpx after the S1-KIT reclaim: tele_* / charged_* / ringq_* and unused sprites are gone)
   bolt_a..bolt_d        512x128 strip   hot bolt: jagged zig-zag white core (r~1.5px),
                                          3 levels of forks, violet glow, tight halo,
                                          1-2 cyan sparks. Floor bolts, horizontal
@@ -77,18 +76,16 @@ total ~5.4 Mpx)
                                          up to apex v~0.2 and down to (0.94,0.86).
   chakra_a/_b           256x256 radial  ring of electricity, radius 0.40*w, crackling
                                          arcs in/out of the ring, transparent centre.
-  orb_rim               256x256 radial  eye/orb electric rim: smooth bright rim at
-                                         0.37*w + crackles + soft inner gradient.
   orb_core              128x128 radial  soft radial glow, white centre -> violet.
-  crescent_a            512x256 crescent clean blade-light crescent (bright edge,
+  crescent_a            352x176 crescent clean blade-light crescent (bright edge,
                                          lavender->violet gradient tail inward).
-  crescent_b            512x256 crescent crescent with a jagged bolt along its edge.
+  crescent_b            352x176 crescent crescent with a jagged bolt along its edge.
   slash_wave            512x128 strip   straight slash wave: bright leading edge at
                                          v~0.3 (moving toward -v), lens-shaped gradient
                                          tail toward v~0.9, tapered ends.
   rift_a/_b             512x64  strip   rift/cut ribbon: thin white jagged tear along
                                          u inside a dark void band with violet lips.
-  shockwave             512x512 radial  annulus: bright leading edge at r=0.46*w,
+  shockwave             256x256 radial  annulus: bright leading edge at r=0.46*w,
                                          soft trailing gradient inward to ~0.28*w.
   crackle_a/_b          512x64  strip   vertical lightning wall band (v=0 top, v=1 floor,
                                          floor glow line at v~0.93), chainable along u,
@@ -102,9 +99,10 @@ total ~5.4 Mpx)
   charge_spark          64x128  column  small rising spark, base at (0.5, 0.95).
   glow_soft             64x64   radial  plain soft round glow (lavender->violet).
   glow_strip            256x32  strip   plain soft beam glow along u.
-  tele_<s>, charged_<s> decal           hazard telegraph / charged decal pieces of hazard
-  (tele_9_<0|25|50>)                     shape s (fan rays per slant); see DECALS.
-  ringq_<k>             quarter         expanding-ring band for ring radius RING_R[k].
+  dk_ring, dk_ring_s    quarter         kit ring decals (thin r >= 6 / bold r < 6), unit radius, faint inner fill.
+  dk_rings3, dk_disc    quarter         3 concentric rings (Musou orbs) / pale disc with a brighter rim (A-02).
+  dk_band 64x256, dk_pool 256, dk_tint 64, tr_band 32x256: band decal, smoky pool, field tint, ring-segment
+                                         band; see the "kit decals and travelling bands" section.
   rig_katana_a/_b       224x112 blade   boss blade sheath in the blade plane (u = model y 9.6..32 hilt->tip,
                                          v = model x 2.6..12 edge side first): edge bolt following the
                                          giant-katana outline, spine crackle, tip fork (build_raiden_rig.mjs).
@@ -115,10 +113,7 @@ total ~5.4 Mpx)
                                          end, line descending v 0.27 -> 0.73 (build_raiden_object_vfx.py).
   obj_wave_band/_fade   512x64  strip   sword-wave front: lens band, white core at v=0.5, layered
                                          glow + core crackle / dissolving purple afterglow.
-  obj_frag_a/_b/_fade   128x32  strip   blink silhouette strip: glowing top edge (v=0.2), dim bottom
-                                         edge (v=0.8), ragged ends (build_raiden_movement.py).
   obj_shard             64x64   strip   flying shard: tip at u~0.93, motion streak toward u=0.
-  obj_gauge_on/_off     64x64   quarter orb gauge quadrant arc r=0.74*w, 9..81 deg (build_raiden_orb.py).
 """
 from pathlib import Path
 import argparse
@@ -133,90 +128,11 @@ NS = "rlk:raiden/fxg/"
 TEX_SUBDIR = "assets/rlk/textures/raiden/fxg"
 CATALOGUE_JSON = Path(__file__).resolve().parent / "raiden_fx_textures.json"
 
-# --------------------------------------------------------------------------- tables
-# Hazard shapes (local frame: +z forward from the origin, x sideways). Must equal the
-# hit volumes in build_raiden_hazards.py; build_raiden_hazard_vfx.py asserts this.
-HAZARD_SHAPES = {
-    1: dict(kind="sector", r=6, half=60),
-    2: dict(kind="rect", length=12, width=2.2),
-    3: dict(kind="disk", r=3),
-    4: dict(kind="sector", r=12, half=70),
-    5: dict(kind="rect", length=20, width=3.6),
-    6: dict(kind="disk", r=5),
-    7: dict(kind="rect", length=8, width=8),
-    8: dict(kind="disk", r=6),
-    9: dict(kind="fan", length=18, width=0.9, angles=(-40, -20, 0, 20, 40)),
-    10: dict(kind="rect", length=18, width=7),
-    11: dict(kind="annulus", r0=1.3, r1=2.7),
-    12: dict(kind="disk", r=12),
-    13: dict(kind="rect", length=22, width=2.4),
-    14: dict(kind="disk", r=19),
-}
-# Hazard decals are painted only once per symmetry piece and mirrored by the cards, which
-# doubles the texel density for the same memory (all >= 32 texels/block):
-#   half  rects/sectors: texture covers x >= 0, the x < 0 half is the u-mirrored card;
-#   quad  disks/annulus: texture covers x >= 0, z >= 0, mirrored into all four quadrants;
-#   ray   the five fan rays: one card per ray turned by the nearest allowed 22.5-deg step,
-#         the remaining 0 / 2.5 / 5 deg slant is painted into the texture (mirror u for -).
-DECAL_SYM = {1: "half", 2: "half", 3: "quad", 4: "half", 5: "half", 6: "quad", 7: "half", 8: "quad",
-             9: "ray", 10: "half", 11: "quad", 12: "quad", 13: "half", 14: "quad"}
-DECAL_TPB = {1: 36, 2: 36, 3: 40, 4: 32, 5: 34, 6: 38, 7: 36, 8: 36, 9: 32, 10: 32, 11: 40, 12: 32, 13: 32, 14: 20}
-FAN_SLANTS = (0.0, 2.5, 5.0)
-MARGIN = 0.9
-
-
-def decal_rect(shape, geom=None):
-    """Painted world rectangle (x0, x1, z0, z1) of a decal piece (see DECAL_SYM)."""
-    g = geom or HAZARD_SHAPES[shape]
-    m = MARGIN
-    k = g["kind"]
-    if k == "sector":
-        return (0.0, g["r"] * math.sin(math.radians(g["half"])) + m, -m, g["r"] + m)
-    if k == "rect":
-        return (0.0, g["width"] / 2 + m, -m, g["length"] + m)
-    if k == "disk":
-        return (0.0, g["r"] + m, 0.0, g["r"] + m)
-    if k == "annulus":
-        return (0.0, g["r1"] + m, 0.0, g["r1"] + m)
-    if k == "fan":            # one ray, slanted toward +x by angles[0] degrees
-        a = math.radians(g["angles"][0])
-        hw = g["width"] / 2
-        return (-hw - m, g["length"] * math.sin(a) + hw + m, -m, g["length"] + m)
-    raise ValueError(k)
-
-
-DECALS = {}
-for _s in HAZARD_SHAPES:
-    if DECAL_SYM[_s] == "ray":
-        pieces = [(f"_{int(sl * 10)}", dict(HAZARD_SHAPES[_s], angles=(sl,))) for sl in FAN_SLANTS]
-    else:
-        pieces = [("", None)]
-    for _suffix, _geom in pieces:
-        _x0, _x1, _z0, _z1 = decal_rect(_s, _geom)
-        _w = int(math.ceil((_x1 - _x0) * DECAL_TPB[_s] / 16.0)) * 16
-        _h = int(math.ceil((_z1 - _z0) * DECAL_TPB[_s] / 16.0)) * 16
-        for _kind in ("tele", "charged"):
-            DECALS[f"{_kind}_{_s}{_suffix}"] = dict(shape=_s, sym=DECAL_SYM[_s], w=_w, h=_h, x0=_x0, x1=_x1, z0=_z0, z1=_z1,
-                                                     geom=_geom)
-
-# Expanding ring (hazard shape 11): band radius r +- 0.7, r = 2 .. RING_END over RING_FRAMES
-# ticks (about 0.53 blocks/tick), far enough to cross the whole arena from an outer stake.
-# Quarter textures are painted for these centre radii; a frame uses the nearest one scaled
-# by r/RING_R[k].
+# --------------------------------------------------------------------------- legacy constants
+# Legacy hazard preset s11 (the expanding stake ring of the release encounter): band radius 2 .. RING_END over
+# RING_FRAMES ticks. raiden_enc/tenma.py imports these two for its timeline until S3 removes the preset; the
+# ring itself is now drawn by the segment cards of build_raiden_hazard_vfx.py (sprite tr_band).
 RING_END, RING_FRAMES = 32, 58
-RING_R = [2.3, 2.9, 3.6, 4.5, 5.6, 7.0, 8.8, 11.0, 13.8, 17.2, 21.5, 26.8, 31.0]
-RING_HALF = 0.7
-RING_PAD = 0.9
-
-
-def ring_extent(k):
-    """World half-size covered by quarter texture k (circle centre at the corner)."""
-    return RING_R[k] + RING_HALF + RING_PAD
-
-
-def ring_px(k):
-    # 24 texels/block, capped so the outermost (mostly transparent) quarters stay small.
-    return min(576, max(64, int(math.ceil(ring_extent(k) * 24 / 16.0)) * 16))
 
 # --------------------------------------------------------------------------- palettes
 EMAX = 2.5
@@ -932,36 +848,6 @@ def radial_field(w, h, fn):
     return out
 
 
-def tex_orb_rim(seed):
-    w = h = 256
-    rng = random.Random(seed)
-    R = 0.37 * w
-    nz = WaveNoise(seed, 5, 2.0)
-    G = GAUSS
-
-    def f(r, th):
-        d = (r - R) / 3.2
-        q = d * d
-        rim = 0.95 * G[int(q * 256)] if q < 9 else 0.0
-        d2 = (r - R) / 11.0
-        q2 = d2 * d2
-        glow = 0.45 * G[int(q2 * 256)] if q2 < 9 else 0.0
-        inner = 0.32 * smooth(R * 0.2, R, r) * (1.0 if r < R else 0.0) * (0.75 + 0.25 * nz(th * 3, r * 0.05))
-        return rim + glow + inner
-    base = radial_field(w, h, f)
-    paths = []
-    for _ in range(9):
-        a = rng.uniform(0, 6.28)
-        da = rng.uniform(0.18, 0.4)
-        out = rng.choice((1, 1, -1))
-        p0 = (w / 2 + R * math.cos(a), h / 2 + R * math.sin(a))
-        p2 = (w / 2 + R * math.cos(a + da), h / 2 + R * math.sin(a + da))
-        mid = a + da / 2
-        p1 = (w / 2 + (R + out * rng.uniform(10, 24)) * math.cos(mid), h / 2 + (R + out * rng.uniform(10, 24)) * math.sin(mid))
-        paths.append(attrib(jag_curve(rng, bezier(p0, p1, p2, 6), 2), 1.2, 0.8, 0.9, 0.6, rng, 0.3))
-    return render_bolt(w, h, paths, (), glow=(2.3, 2.0, 0.55), halo=(5.0, 6.0, 0.28), extra=base)
-
-
 def tex_orb_core():
     w = h = 128
 
@@ -1137,8 +1023,12 @@ def tex_scorch_strip(seed):
 # --------------------------------------------------------------------------- crescents / slashes / rifts
 
 
+CRESCENT_W, CRESCENT_H = 352, 176       # S1-KIT reclaim (was 512 x 256); same uv convention
+
+
 def tex_crescent(seed, bolt):
-    w, h = 512, 256
+    w, h = CRESCENT_W, CRESCENT_H
+    s = h / 256.0
     rng = random.Random(seed)
     cx, cy = w / 2, h * 1.0
     R = 0.94 * h
@@ -1156,28 +1046,28 @@ def tex_crescent(seed, bolt):
         env = (1 - u * u) ** 1.3
         thick = h * (0.06 + 0.30 * env)
         d = r - R * (1 - 0.03 * u * u)
-        q = (d / (1.6 + 2.2 * env)) ** 2
+        q = (d / ((1.6 + 2.2 * env) * max(s, 0.8))) ** 2
         edge = (1.05 * G[int(q * 256)] if q < 9 else 0.0) * (0.35 + 0.65 * env)
-        q = (d / (6 + 8 * env)) ** 2
+        q = (d / ((6 + 8 * env) * s)) ** 2
         glow = 0.4 * env * G[int(q * 256)] if q < 9 else 0.0
         body = 0.0
         if d < 0:
             t = -d / thick
             if t < 1.6:
-                streak = 0.7 + 0.3 * nz(phi * 22, r * 0.06)
+                streak = 0.7 + 0.3 * nz(phi * 22, r * 0.06 / s)
                 body = 0.62 * env * math.exp(-2.2 * t) * streak
         return edge + glow + body
     E = sample_fn(w, h, f, 1)
     if not bolt:
         img = Img(w, h)
-        img.over(ELECTRO, E, 1.0, window(w, h, 6, 6))
+        img.over(ELECTRO, E, 1.0, window(w, h, 5, 5))
         return img
     base = [(cx + R * 0.985 * math.sin(p), cy - R * 0.985 * math.cos(p)) for p in [-phimax * 0.92 + 2 * phimax * 0.92 * i / 24 for i in range(25)]]
     main = jag_curve(rng, base, 3, (0.35, 0.3, 0.22))
-    paths = [attrib(main, 1.8, 1.8, 1.0, 1.0, rng, 0.3, 0.06)]
-    add_branches(rng, paths, main, 1.6, 0.85, 2, 9, length=(0.03, 0.08), bounds=(4, w - 4, 4, h - 4))
-    sp = spark_points(rng, main, 4, (8, 24))
-    return render_bolt(w, h, paths, sp, glow=(2.3, 2.5, 0.6), halo=(5.5, 8.0, 0.3), extra=E.d)
+    paths = [attrib(main, 1.5, 1.5, 1.0, 1.0, rng, 0.3, 0.06)]
+    add_branches(rng, paths, main, 1.3, 0.85, 2, 9, length=(0.03, 0.08), bounds=(3, w - 3, 3, h - 3))
+    sp = spark_points(rng, main, 4, (6, 17))
+    return render_bolt(w, h, paths, sp, glow=(2.0, 2.0, 0.6), halo=(4.0, 5.5, 0.3), extra=E.d)
 
 
 def tex_slash_wave(seed):
@@ -1239,7 +1129,8 @@ def over_img(dst, src):
 
 
 def tex_shockwave(seed):
-    w = h = 512
+    """256 x 256 (S1-KIT reclaim; was 512): bright leading edge at r = 0.46 w, soft tail inward."""
+    w = h = 256
     R = 0.46 * w
     nz = WaveNoise(seed, 6, 1.0)
     G = GAUSS
@@ -1248,19 +1139,19 @@ def tex_shockwave(seed):
         dx, dy = x - w / 2, y - h / 2
         r = math.hypot(dx, dy)
         d = r - R
-        q = (d / 2.6) ** 2
+        q = (d / 1.5) ** 2
         edge = 1.0 * G[int(q * 256)] if q < 9 else 0.0
-        q = (d / 9.0) ** 2
+        q = (d / 4.8) ** 2
         glow = 0.42 * G[int(q * 256)] if q < 9 else 0.0
         body = 0.0
         if d < 0:
             t = -d / (0.18 * w)
             if t < 2.0:
                 th = math.atan2(dy, dx)
-                body = 0.55 * math.exp(-2.0 * t) * (0.65 + 0.35 * nz(th * 30, r * 0.05))
+                body = 0.55 * math.exp(-2.0 * t) * (0.65 + 0.35 * nz(th * 30, r * 0.1))
         return edge + glow + body
     img = Img(w, h)
-    img.over(ELECTRO, sample_fn(w, h, f, 2), 1.0, window(w, h, 8, 8))
+    img.over(ELECTRO, sample_fn(w, h, f, 1), 1.0, window(w, h, 5, 5))
     return img
 
 
@@ -1280,351 +1171,187 @@ def tex_crackle(seed):
     win = (window(w, h, w * 0.04, 3)[0], [smooth(0, 4, y + 0.5) for y in range(h)])
     return render_bolt(w, h, paths, sp, glow=(2.1, 1.6, 0.6), halo=(3.0, 3.0, 0.14), extra=floor, win=win)
 
-# --------------------------------------------------------------------------- hazard decals
+# --------------------------------------------------------------------------- kit decals and travelling bands
+# S1-KIT (plan rd/plan.md B.3, C.6). The only floor decals left are outline-like kit decals; every one is a UNIT
+# sprite (radius 1 / width 1 x length 1) that build_raiden_hazard_vfx.py scales by the display transformation.
+#   quarter  circle centre at texel (0, 0), radius 1 at KIT_QEXT * (1 / 1.12) of the side; mirrored into 4 cards.
+#   dk_ring     thin bright ring (radius >= 6 b)        dk_ring_s  bolder ring + faint fill (radius < 6 b, stagger)
+#   dk_rings3   3 concentric thin rings + violet fill (Musou orbs, footage A-09)
+#   dk_disc     pale lavender fill, brighter rim (field lightning A-02)
+#   dk_band     64 x 256 strip: u across the band (two edge lines at u 0.07 / 0.93), v along it (stretched)
+#   dk_pool     256 x 256 centred dark smoky blot with a magenta rim (B-15 shadow pool / grown disc)
+#   dk_tint     64 x 64 centred uniform violet, 35 % alpha, soft edge (time-stop / 만겁 field tint)
+#   tr_band     32 x 256 ring-segment band: u along the chord (periodic, seamless), v across: bright front at
+#               v ~0.05, violet tail fading to v = 1 (the expanding ring / wave cards, 24 per full ring)
+KIT_QEXT = 1.12
+KIT_DECALS = {
+    "dk_ring": dict(w=256, h=256, kind="quarter", use="ring decal r >= 6 (eyes r 12)"),
+    "dk_ring_s": dict(w=128, h=128, kind="quarter", use="ring decal r < 6 (eye 5, bomb 3.5, recovery 4.5, vajra 2.5, stagger)"),
+    "dk_rings3": dict(w=256, h=256, kind="quarter", use="rings3 decal (Musou orbs r 4)"),
+    "dk_disc": dict(w=128, h=128, kind="quarter", use="disc_pale decal (field lightning r 2.5)"),
+    "dk_band": dict(w=64, h=256, kind="band", use="band decal (단절 w 5, to the wall)"),
+    "dk_pool": dict(w=256, h=256, kind="radial", use="pool decal (shadow r 1.5 -> grown 4.5)"),
+    "dk_tint": dict(w=64, h=64, kind="radial", use="tint (whole-field darkening)"),
+    "tr_band": dict(w=32, h=256, kind="segment", use="travelling ring / wave segment card"),
+}
+VIOLET_FILL = solid((92, 46, 176))
+SHADOW_FILL = solid((18, 6, 34))
+TINT_FILL = solid((58, 30, 112))
+PALE = ramp([(0.0, (200, 186, 255, 0)), (0.05, (200, 186, 255, 0)), (0.12, (206, 192, 255, 34)),
+             (0.30, (222, 212, 255, 92)), (0.6, (238, 232, 255, 176)), (1.0, (255, 255, 255, 236))])
 
 
-def sd_box(x, z, hx, hz):
-    qx, qz = abs(x) - hx, abs(z) - hz
-    ox, oz = max(qx, 0.0), max(qz, 0.0)
-    return math.hypot(ox, oz) + min(max(qx, qz), 0.0)
-
-
-def sd_seg(x, z, ax, az, bx, bz):
-    dx, dz = bx - ax, bz - az
-    L2 = dx * dx + dz * dz
-    t = ((x - ax) * dx + (z - az) * dz) / L2 if L2 > 0 else 0.0
-    t = 0.0 if t < 0 else (1.0 if t > 1 else t)
-    return math.hypot(x - ax - t * dx, z - az - t * dz)
-
-
-def shape_sdf(g):
-    k = g["kind"]
-    if k == "disk":
-        r = g["r"]
-        return lambda x, z: math.hypot(x, z) - r
-    if k == "annulus":
-        rm, hw = (g["r0"] + g["r1"]) / 2, (g["r1"] - g["r0"]) / 2
-        return lambda x, z: abs(math.hypot(x, z) - rm) - hw
-    if k == "rect":
-        L, hw = g["length"], g["width"] / 2
-        return lambda x, z: sd_box(x, z - L / 2, hw, L / 2)
-    if k == "sector":
-        r, a = g["r"], math.radians(g["half"])
-        cs, cc = math.sin(a), math.cos(a)
-
-        def f(x, z):
-            px = abs(x)
-            l = math.hypot(px, z) - r
-            t = px * cs + z * cc
-            t = 0.0 if t < 0 else (r if t > r else t)
-            m = math.hypot(px - cs * t, z - cc * t)
-            sgn = 1.0 if cc * px - cs * z > 0 else -1.0
-            return max(l, m * sgn)
-        return f
-    if k == "fan":
-        L, hw = g["length"], g["width"] / 2
-        rots = [(math.cos(math.radians(a)), math.sin(math.radians(a))) for a in g["angles"]]
-
-        def f(x, z):
-            best = 1e9
-            for c, s in rots:
-                # rotate (x, z) by -angle: ray direction (sin a, cos a)
-                lx = x * c - z * s
-                lz = x * s + z * c
-                v = sd_box(lx, lz - L / 2, hw, L / 2)
-                if v < best:
-                    best = v
-            return best
-        return f
-    raise ValueError(k)
-
-
-def chevron(cx, cz, ux, uz, half, depth):
-    """Chevron polyline pointing along (ux, uz) with its tip at (cx, cz)."""
-    px, pz = uz, -ux
-    return [(cx - ux * depth + px * half, cz - uz * depth + pz * half), (cx, cz), (cx - ux * depth - px * half, cz - uz * depth - pz * half)]
-
-
-def shape_marks(g):
-    """(centre polylines, chevron polylines, rings[(r, weight)]) in world units."""
-    k = g["kind"]
-    lines, chev, rings = [], [], []
-    if k == "rect":
-        L, w = g["length"], g["width"]
-        lines.append([(0, 0.45), (0, L - 0.45)])
-        hw = min(0.62, w * 0.28)
-        for z in range(2, int(L), 3):
-            chev.append(chevron(0, z, 0, 1, hw, min(0.42, hw * 0.75)))
-    elif k == "sector":
-        r, a = g["r"], g["half"]
-        lines.append([(0, 0.5), (0, r - 0.35)])
-        for ang in (-a * 0.55, a * 0.55):
-            s, c = math.sin(math.radians(ang)), math.cos(math.radians(ang))
-            chev.append([(s * r * 0.22, c * r * 0.22), (s * (r - 0.6), c * (r - 0.6))])
-        for f in (0.42, 0.72):
-            hw = 0.5 if r < 8 else 0.8
-            chev.append(chevron(0, r * f, 0, 1, hw, hw * 0.7))
-        rings.append((r * 0.57, 0.45, -a, a))
-    elif k == "fan":
-        L = g["length"]
-        for ang in g["angles"]:
-            s, c = math.sin(math.radians(ang)), math.cos(math.radians(ang))
-            lines.append([(s * 0.6, c * 0.6), (s * (L - 0.4), c * (L - 0.4))])
-            for z in (5, 11, 16):
-                chev.append(chevron(s * z, c * z, s, c, 0.3, 0.26))
-    elif k == "disk":
-        r = g["r"]
-        rings.append((r * 0.5, 0.55, -180, 180))
-        tick = min(1.4, r * 0.24)
-        for ang in (0, 90, 180, 270):
-            s, c = math.sin(math.radians(ang)), math.cos(math.radians(ang))
-            lines.append([(s * (r - tick), c * (r - tick)), (s * (r - 0.12), c * (r - 0.12))])
-        cr = min(0.6, r * 0.12)
-        lines.append([(-cr, 0), (cr, 0)])
-        lines.append([(0, -cr), (0, cr)])
-    elif k == "annulus":
-        rings.append(((g["r0"] + g["r1"]) / 2, 0.6, -180, 180))
-    return lines, chev, rings
-
-
-def marks_distance(lines, chev, rings):
-    segs = {}
-
-    def prep(polys):
-        key = id(polys)
-        if key not in segs:
-            out = []
-            for poly in polys:
-                for (ax, az), (bx, bz) in zip(poly, poly[1:]):
-                    out.append((min(ax, bx) - 4, max(ax, bx) + 4, min(az, bz) - 4, max(az, bz) + 4, ax, az, bx, bz))
-            segs[key] = out
-        return segs[key]
-
-    def dl(x, z, polys):
-        best = 4.0
-        for xa, xb, za, zb, ax, az, bx, bz in prep(polys):
-            if x < xa or x > xb or z < za or z > zb:
-                continue
-            v = sd_seg(x, z, ax, az, bx, bz)
-            if v < best:
-                best = v
-        return best
-
-    def dr(x, z):
-        best, wbest = 1e9, 0.0
-        for r, wgt, a0, a1 in rings:
-            ang = math.degrees(math.atan2(x, z))
-            if a0 <= ang <= a1:
-                v = abs(math.hypot(x, z) - r)
-            else:
-                continue
-            if v < best:
-                best, wbest = v, wgt
-        return best, wbest
-    return dl, dr
-
-
-def shape_outline(g):
-    """Boundary polylines (world units) used for the charged crackle."""
-    k = g["kind"]
-    if k == "disk":
-        return [circle_pts(0, 0, g["r"], max(24, int(g["r"] * 10)))]
-    if k == "annulus":
-        return [circle_pts(0, 0, g["r0"], 20), circle_pts(0, 0, g["r1"], 32)]
-    if k == "rect":
-        L, hw = g["length"], g["width"] / 2
-        return [[(-hw, 0), (-hw, L), (hw, L), (hw, 0), (-hw, 0)]]
-    if k == "sector":
-        r, a = g["r"], math.radians(g["half"])
-        arc = [(r * math.sin(-a + 2 * a * i / 24), r * math.cos(-a + 2 * a * i / 24)) for i in range(25)]
-        return [[(0, 0)] + arc + [(0, 0)]]
-    if k == "fan":
-        L, hw = g["length"], g["width"] / 2
-        out = []
-        for ang in g["angles"]:
-            c, s_ = math.cos(math.radians(ang)), math.sin(math.radians(ang))
-            for side in (-hw, hw):
-                out.append([(s_ * z + c * side, c * z - s_ * side) for z in (2.0, L)])
-        return out
-    return []
-
-
-def shape_veins(g, rng):
-    """Faint interior lightning veins: list of (start, end, band) in world units."""
-    k = g["kind"]
-    out = []
-    if k == "rect":
-        L, hw = g["length"], g["width"] / 2
-        for i in range(2 if hw < 1.5 else 3):
-            x = (i - (1 if hw >= 1.5 else 0.5)) * hw * 0.55
-            out.append(((x, 0.4), (x + rng.uniform(-0.2, 0.2) * hw, L - 0.4), hw * 0.35))
-    elif k == "sector":
-        r, a = g["r"], g["half"]
-        for i in range(4):
-            ang = math.radians(-a * 0.8 + 1.6 * a * (i + rng.uniform(0.2, 0.8)) / 4)
-            out.append(((0.0, 0.3), (r * 0.93 * math.sin(ang), r * 0.93 * math.cos(ang)), r * 0.07))
-    elif k == "disk":
-        r = g["r"]
-        for i in range(7):
-            ang = 2 * math.pi * (i + rng.uniform(0.1, 0.9)) / 7
-            r0 = r * rng.uniform(0.08, 0.2)
-            out.append(((r0 * math.sin(ang), r0 * math.cos(ang)), (r * 0.92 * math.sin(ang + 0.15), r * 0.92 * math.cos(ang + 0.15)), r * 0.07))
-    elif k == "fan":
-        L = g["length"]
-        for ang in g["angles"]:
-            c, s_ = math.cos(math.radians(ang)), math.sin(math.radians(ang))
-            out.append(((s_ * 0.8, c * 0.8), (s_ * (L - 0.5), c * (L - 0.5)), 0.2))
-    elif k == "annulus":
-        rm = (g["r0"] + g["r1"]) / 2
-        for i in range(4):
-            a0 = 2 * math.pi * i / 4 + rng.uniform(0, 0.5)
-            out.append(((rm * math.sin(a0), rm * math.cos(a0)), (rm * math.sin(a0 + 1.4), rm * math.cos(a0 + 1.4)), 0.25))
-    return out
-
-
-def table(fn, lo, hi, n=2048):
-    """Tabulate fn over [lo, hi] -> (values, lo, scale) for fast per-pixel lookups."""
-    step = (hi - lo) / (n - 1)
-    return [fn(lo + i * step) for i in range(n)], lo, (n - 1) / (hi - lo)
-
-
-def gauss(d, sig):
+def _gs(d, sig):
     q = (d / sig) ** 2
-    return math.exp(-q) if q < 30 else 0.0
+    return GAUSS[int(q * 256)] if q < 9 else 0.0
 
 
-def tex_decal(name):
-    """Hazard telegraph decal. Deliberately LOW-FREQUENCY: every feature is at least ~2 texels
-    wide so nearest-neighbour magnification at the player's feet stays smooth; the crisp
-    electric detail of charge/strike frames comes from separate high-resolution bolt cards."""
-    spec = DECALS[name]
-    g = spec["geom"] or HAZARD_SHAPES[spec["shape"]]
-    charged = name.startswith("charged")
-    w, h = spec["w"], spec["h"]
-    x0, x1, z0, z1 = spec["x0"], spec["x1"], spec["z0"], spec["z1"]
-    sx, sz = (x1 - x0) / w, (z1 - z0) / h
-    ppb = 1.0 / sx            # texels per block
-    sdf = shape_sdf(g)
-    lines, chev, rings = shape_marks(g)
-    dl, dr = marks_distance(lines, chev, rings)
-    vn = ValueNoise(spec["shape"] * 13 + 5)
-    rng = random.Random(spec["shape"] * 31 + len(name) + (7 if charged else 0))
-
-    def world(i, j):
-        return x0 + i * sx, z0 + j * sz
-
-    def pix(x, z):
-        return (x - x0) / sx, (z - z0) / sz
-    # faint interior veins (soft, >= 3 texels wide)
-    veins = []
-    for (ax, az), (bx, bz), band in shape_veins(g, rng):
-        pts = walk(rng, pix(ax, az), pix(bx, bz), max(2.0, band * ppb), (0.5, 1.4), 55, 0.3, 1, 0.0, 0.0)
-        veins.append(attrib(pts, 1.25, 1.0, 0.75, 0.45, rng, 0.45, 0.1))
-        add_branches(rng, veins, pts, 1.15, 0.65, 1, 2, length=(0.06, 0.16), bounds=(2, w - 2, 2, h - 2))
-    VE = render_fields(w, h, veins, (2.0, 2.5), (5.0, 5.0))
-    CLOUD = sample_fn(w, h, lambda i, j: vn.fbm(world(i, j)[0] / 1.7, world(i, j)[1] / 1.7, 3), 4).d
-    S = sample_fn(w, h, lambda i, j: sdf(*world(i, j)), 2).d
-    DL = sample_fn(w, h, lambda i, j: min(4.0, dl(*world(i, j), lines)), 2).d
-    DC = sample_fn(w, h, lambda i, j: min(4.0, dl(*world(i, j), chev)), 2).d if chev else None
-    DR = sample_fn(w, h, lambda i, j: min(4.0, dr(*world(i, j))[0]), 2).d if rings else None
-
-    core = max(0.075, 2.3 / ppb)
-    lcore = max(0.06, 1.9 / ppb)
-    # fan rays overlap near the origin (where the boss stands): fade each ray's rim there
-    APEX = (sample_fn(w, h, lambda i, j: smooth(0.3, 2.6, math.hypot(*world(i, j))), 4).d
-            if g["kind"] == "fan" else None)
-    if charged:
-        U = table(lambda s: smooth(0.03, -0.16, s) * (0.30 + 0.16 * gauss(s, 1.2)), -8, 4)
-        RC = table(lambda s: 1.12 * gauss(s, core) + 0.62 * gauss(s, 0.26), -8, 4)
-        RO = table(lambda s: 0.40 * gauss(s, 0.6) if s > 0 else 0.55 * gauss(s, 1.1), -8, 4)
-    else:
-        U = table(lambda s: smooth(0.03, -0.16, s) * (0.27 + 0.17 * gauss(s, 0.9)), -8, 4)
-        RC = table(lambda s: 1.0 * gauss(s, core) + 0.55 * gauss(s, 0.22), -8, 4)
-        RO = table(lambda s: 0.28 * gauss(s, 0.45) if s > 0 else 0.36 * gauss(s, 0.75), -8, 4)
-    CIN = table(lambda s: smooth(-0.05, -0.38, s), -8, 4)
-    INS = table(lambda s: smooth(0.03, -0.14, s), -8, 4)
-    LL = table(lambda d: 0.85 * gauss(d, lcore) + 0.32 * gauss(d, 0.2), 0, 4)
-    LC = table(lambda d: 0.62 * gauss(d, lcore) + 0.26 * gauss(d, 0.22), 0, 4)
-    LR = table(lambda d: 0.42 * gauss(d, lcore * 0.9) + 0.2 * gauss(d, 0.18), 0, 4)
-    n1 = 2047
-    Ut, ulo, uk = U
-    RCt, _, _ = RC
-    ROt, _, _ = RO
-    CINt, _, _ = CIN
-    INSt, _, _ = INS
-    LLt, _, lk = LL
-    LCt, LRt = LC[0], LR[0]
-    kl = 1.25 if charged else 1.0
-    km = 1.3 if charged else 1.0
-    kv = 0.8 if charged else 0.5
-    under, fil, rim, line, mark = [], [], [], [], []
-    for idx in range(w * h):
-        si = int((S[idx] - ulo) * uk)
-        si = 0 if si < 0 else (n1 if si > n1 else si)
-        cl = CLOUD[idx]
-        ap = 1.0 if APEX is None else APEX[idx]
-        under.append(Ut[si] * (0.85 + 0.3 * cl) * (0.4 + 0.6 * ap))
-        fil.append(INSt[si] * VE[idx] * kv)
-        rim.append((RCt[si] * (0.86 + 0.22 * cl) + ROt[si]) * ap)
-        cin = CINt[si]
-        di = int(DL[idx] * lk)
-        line.append(LLt[di if di < n1 else n1] * cin * kl)
-        m = 0.0
-        if DC is not None:
-            di = int(DC[idx] * lk)
-            m = LCt[di if di < n1 else n1]
-        if DR is not None:
-            di = int(DR[idx] * lk)
-            v = LRt[di if di < n1 else n1]
-            if v > m:
-                m = v
-        mark.append(m * cin * km)
-    wx, wy = window(w, h, 3, 3)
-    if spec["sym"] in ("half", "quad"):      # mirror seams must stay unfaded
-        wx = [1.0 if x < w / 2 else v for x, v in enumerate(wx)]
-    if spec["sym"] == "quad":
-        wy = [1.0 if y < h / 2 else v for y, v in enumerate(wy)]
-    win = (wx, wy)
-    img = Img(w, h)
-    img.over(solid((40, 16, 84) if charged else (24, 8, 46)), under, 1.0, win)
-    img.over(ELECTRO if charged else TELE, rim, 1.0, win)
-    img.over(ELECTRO, fil, 1.0, win)
-    img.over(ELECTRO if charged else LINE, mark, 1.0, win)
-    img.over(ELECTRO if charged else LINE, line, 1.0, win)
-    return img
+def _quarter(n, fn, ds=1):
+    sc = KIT_QEXT / n
+    return sample_fn(n, n, lambda i, j: fn(math.hypot(i * sc, j * sc), math.atan2(j * sc, i * sc)), ds)
 
 
-def tex_ring_quarter(k):
-    """Quarter of the expanding ring band for centre radius RING_R[k]; circle centre at (0, 0)."""
-    n = ring_px(k)
-    ext = ring_extent(k)
-    r0 = RING_R[k]
-    sc = ext / n
-    nz = WaveNoise(500 + k, 6, 1.0)
-    G = GAUSS
-    lead = r0 + RING_HALF
-    trail = r0 - RING_HALF
-    edge = max(0.1, 3.0 * sc)        # >= 3 texels: smooth when the band passes under the player
+def _qwin(n, m=3):
+    wx = [smooth(0, m, n - x - 0.5) for x in range(n)]
+    return wx, wx
 
-    def gs(d, sig):
-        q = (d / sig) ** 2
-        return G[int(q * 256)] if q < 9 else 0.0
 
-    def f(i, j):
-        x, z = i * sc, j * sc
-        r = math.hypot(x, z)
-        th = math.atan2(z, x)
-        e = 1.05 * gs(r - lead, edge) + 0.5 * gs(r - lead, 0.24) + (0.25 * gs(r - lead, 0.42) if r > lead else 0.0)
-        if trail - 0.3 < r < lead:
-            t = (lead - r) / (2 * RING_HALF)
-            e += 0.58 * math.exp(-1.6 * t) * (0.9 + 0.1 * nz(th * r0 * 0.6, r * 0.5))
-        e += 0.38 * gs(r - trail, edge * 0.8) + 0.16 * gs(r - trail, 0.18)
-        return e
-    E = sample_fn(n, n, f, 1)
+def tex_dk_ring(bold):
+    n = 128 if bold else 256
+    nz = WaveNoise(611 if bold else 607, 6, 1.0)
+    core, glow, fill = (0.030, 0.085, 0.20) if bold else (0.011, 0.036, 0.16)
+
+    def rim(r, th):
+        mod = 0.86 + 0.14 * nz(th * 40, r * 9)
+        return (0.92 * _gs(r - 1.0, core) + 0.50 * _gs(r - 1.0, glow) * mod)
+
+    def body(r, th):
+        if r >= 1.0:
+            return 0.0
+        return fill * smooth(0.72, 0.985, r) * (0.85 + 0.15 * nz(th * 18, r * 5))
     img = Img(n, n)
-    wx = [smooth(0, 3, n - x - 0.5) for x in range(n)]
-    img.over(ELECTRO, E, 1.0, (wx, wx))
+    win = _qwin(n)
+    img.over(VIOLET_FILL, _quarter(n, body), 1.0, win)
+    img.over(ELECTRO, _quarter(n, rim), 1.0, win)
     return img
+
+
+def tex_dk_rings3():
+    n = 256
+    nz = WaveNoise(613, 6, 1.0)
+    rings = ((1.0, 1.0), (0.69, 0.86), (0.38, 0.72))
+
+    def rim(r, th):
+        mod = 0.85 + 0.15 * nz(th * 36, r * 7)
+        return sum(a * (1.0 * _gs(r - rr, 0.011) + 0.40 * _gs(r - rr, 0.034)) for rr, a in rings) * mod
+
+    def body(r, th):
+        return 0.0 if r >= 1.0 else 0.26 * smooth(1.0, 0.94, r) * (0.8 + 0.2 * nz(th * 12, r * 4))
+    img = Img(n, n)
+    win = _qwin(n)
+    img.over(VIOLET_FILL, _quarter(n, body), 1.0, win)
+    img.over(ELECTRO, _quarter(n, rim), 1.0, win)
+    return img
+
+
+def tex_dk_disc():
+    n = 128
+    nz = WaveNoise(617, 6, 1.0)
+
+    def f(r, th):
+        if r > 1.08:
+            return 0.0
+        fill = 0.23 * smooth(1.04, 0.97, r) * (0.9 + 0.1 * nz(th * 10, r * 6))
+        return fill + 0.42 * _gs(r - 0.985, 0.022) + 0.14 * _gs(r - 0.985, 0.06)
+    img = Img(n, n)
+    img.over(PALE, _quarter(n, f), 1.0, _qwin(n))
+    return img
+
+
+def tex_dk_band():
+    w, h = 64, 256
+    nz = WaveNoise(619, 6, 1.0)
+
+    def f(x, y):
+        u = (x + 0.5) / w
+        e = min(abs(u - 0.07), abs(u - 0.93))
+        lines = 1.0 * _gs(e, 0.022) + 0.32 * _gs(e, 0.06)
+        fill = 0.17 * (0.85 + 0.15 * nz(x * 0.2, y * 0.08)) if 0.07 <= u <= 0.93 else 0.0
+        return lines * (0.88 + 0.12 * nz(y * 0.12, x * 0.05)) + fill
+    img = Img(w, h)
+    img.over(PALE, sample_fn(w, h, f, 1), 1.0, window(w, h, 2, 6))
+    return img
+
+
+def tex_dk_pool():
+    n = 256
+    vn = ValueNoise(623, 32)
+
+    def edge(th):
+        return 0.80 + 0.16 * vn.fbm(math.cos(th) * 2.2 + 3, math.sin(th) * 2.2 + 3, 3)
+
+    def dark(x, y):
+        dx, dy = (x - n / 2) / (n / 2), (y - n / 2) / (n / 2)
+        r, th = math.hypot(dx, dy), math.atan2(dy, dx)
+        re = edge(th)
+        if r > re + 0.08:
+            return 0.0
+        smoke = 0.72 + 0.28 * vn.fbm(dx * 3.1 + 7, dy * 3.1 + 1, 4)
+        return 0.88 * smooth(re + 0.06, re - 0.18, r) * smoke
+
+    def rim(x, y):
+        dx, dy = (x - n / 2) / (n / 2), (y - n / 2) / (n / 2)
+        r, th = math.hypot(dx, dy), math.atan2(dy, dx)
+        re = edge(th)
+        return 0.55 * _gs(r - re + 0.04, 0.035) * (0.6 + 0.4 * vn.fbm(th * 3 + 11, 2.0, 2))
+    img = Img(n, n)
+    win = window(n, n, 4, 4)
+    img.over(SHADOW_FILL, sample_fn(n, n, dark, 2), 1.0, win)
+    img.over(TELE, sample_fn(n, n, rim, 2), 1.0, win)
+    return img
+
+
+def tex_dk_tint():
+    n = 64
+
+    def f(x, y):
+        r = math.hypot(x - n / 2, y - n / 2) / (n / 2)
+        return 0.36 * smooth(1.0, 0.975, r)       # nearly hard edge: the card reaches 24.6 b, under the wall
+    img = Img(n, n)
+    img.over(TINT_FILL, sample_fn(n, n, f, 1), 1.0)
+    return img
+
+
+def tex_tr_band():
+    w, h = 32, 256
+    rng = random.Random(631)
+    ph = [rng.uniform(0, 6.283) for _ in range(4)]
+
+    def f(x, y):
+        u = (x + 0.5) / w
+        t = (y + 0.5) / h
+        wisp = 0.78 + 0.12 * math.sin(2 * math.pi * u + ph[0] + 9 * t) + 0.10 * math.sin(4 * math.pi * u + ph[1] - 15 * t)
+        front = 1.1 * _gs(t - 0.05, 0.02) + 0.55 * _gs(t - 0.05, 0.07)
+        tail = 0.82 * math.exp(-1.7 * max(0.0, t - 0.05)) * wisp if t > 0.03 else 0.0
+        return (front + tail) * smooth(1.0, 0.86, t) * smooth(0.0, 0.02, t)
+    img = Img(w, h)
+    img.over(ELECTRO, sample_fn(w, h, f, 1), 1.0)
+    return img
+
+
+def kit_entries():
+    fns = {"dk_ring": lambda: tex_dk_ring(False), "dk_ring_s": lambda: tex_dk_ring(True), "dk_rings3": tex_dk_rings3,
+           "dk_disc": tex_dk_disc, "dk_band": tex_dk_band, "dk_pool": tex_dk_pool, "dk_tint": tex_dk_tint,
+           "tr_band": tex_tr_band}
+    out = []
+    for name, spec in KIT_DECALS.items():
+        core = {"quarter": f"circle centre at texel (0,0), unit radius at {1 / KIT_QEXT:.4f} of the side",
+                "band": "u across (edge lines at u 0.07 / 0.93), v along the band",
+                "radial": "centred at (0.5, 0.5), unit radius = half the side",
+                "segment": "u along the chord (periodic), v across: front at v 0.05, tail to v 1"}[spec["kind"]]
+        out.append(entry(name, spec["w"], spec["h"], spec["kind"], "radial" if spec["kind"] != "band" else "v", core,
+                         spec["use"], fns[name], "kit sprite (build_raiden_hazard_vfx.py scales it per hazard)"))
+    return out
 
 # --------------------------------------------------------------------------- rig (boss body) sprites
 # Painted for build_raiden_rig.mjs (fx_weapon/* and death_shard_* models). Card rectangles are in
@@ -1865,53 +1592,6 @@ def tex_obj_wave_band(seed, fade=False):
     return render_bolt(w, h, paths, sp, glow=(2.0, 1.2, 0.5), halo=(3.0, 2.0, 0.12), extra=E.d, win=win)
 
 
-OBJ_FRAG_BODY = ramp([(0.0, (40, 14, 84, 0)), (0.2, (44, 16, 92, 40)), (0.6, (62, 28, 128, 120)),
-                      (1.0, (92, 52, 170, 150)), (2.5, (92, 52, 170, 150))])
-
-
-def tex_obj_frag(seed, fade=False):
-    """Blink silhouette strip (u across the body, v top -> bottom): translucent deep-violet body
-    with a glowing top edge (white core) and a dimmer bottom edge, ragged dissolving ends, faint
-    horizontal streaks and a short lightning seam; fade: afterglow colours, more dissolved."""
-    w, h = 128, 32
-    rng = random.Random(seed)
-    vn = ValueNoise(seed + 21)
-    top, bot = h * 0.2, h * 0.8
-
-    def mask(x, y):
-        t = (x + 0.5) / w
-        n = vn.fbm(x / 9.0, y / 5.0, 3)
-        end = smooth(0.0, 0.16 + 0.08 * n, t) * smooth(0.0, 0.16 - 0.08 * n, 1 - t)
-        if fade:
-            end *= 0.35 + 0.65 * smooth(-0.25, 0.35, n * 1.7 + 0.1)
-        return end
-
-    def body(x, y):
-        yy = y + 0.5
-        inside = smooth(top - 1.5, top + 1.0, yy) * (1 - smooth(bot - 1.0, bot + 1.5, yy))
-        grad = 0.75 + 0.35 * (1 - (yy - top) / (bot - top))
-        streak = 0.85 + 0.15 * math.sin(yy * 1.3 + 2.0 * vn.at(x / 14.0, yy / 2.0))
-        return inside * grad * streak * mask(x, y) * (0.7 if fade else 1.0)
-
-    def edge(x, y):
-        yy = y + 0.5
-        dash = 0.75 + 0.25 * math.sin(x * 0.21 + 3 * vn.at(x / 11.0, 1.3))
-        e = 1.05 * _obj_g(((yy - top) / 0.95) ** 2) + 0.42 * _obj_g(((yy - top) / 2.6) ** 2)
-        e += 0.5 * _obj_g(((yy - bot) / 0.85) ** 2) + 0.22 * _obj_g(((yy - bot) / 2.2) ** 2)
-        return e * mask(x, y) * dash * (0.62 if fade else 1.0)
-    win = window(w, h, 3, 2)
-    img = Img(w, h)
-    img.over(OBJ_FRAG_BODY if not fade else solid((54, 24, 104)), sample_fn(w, h, body, 1),
-             1.0 if not fade else 0.55, win)
-    img.over(ELECTRO if not fade else AFTER, sample_fn(w, h, edge, 1), 1.0, win)
-    if not fade:
-        x0 = rng.uniform(0.25, 0.6) * w
-        pts = jag(rng, (x0, top), (x0 + rng.uniform(10, 26), bot), 4, (0.3, 0.25, 0.2, 0.15))
-        over_img(img, render_bolt(w, h, [attrib(pts, 0.6, 0.45, 0.85, 0.6, rng, 0.2)], (), glow=(1.8, 0.8, 0.45),
-                                  halo=(2.5, 1.5, 0.1), win=win))
-    return img
-
-
 def tex_obj_shard(seed):
     """Flying electro shard: u = flight direction (tip at u~0.93), a faceted diamond with a white
     leading edge and lavender -> violet body, and a fading motion streak toward u=0."""
@@ -1940,37 +1620,6 @@ def tex_obj_shard(seed):
     img.over(ELECTRO, sample_fn(w, h, f, 1), 1.0, window(w, h, 3, 3))
     return img
 
-
-OBJ_GAUGE_SHADOW = solid((22, 10, 44))
-
-
-def tex_obj_gauge(lit):
-    """Orb gauge quarter (circle centre at texel (0,0), side = 0.5 local blocks): an arc at
-    radius 0.74*w spanning 9..81 deg over a dark underlay; lit = cyan-white, else dim violet."""
-    w = h = 64
-    R = 0.74 * w
-    a0, a1 = math.radians(9), math.radians(81)
-
-    def arcd(x, y):
-        x += 0.5
-        y += 0.5
-        th = math.atan2(y, x)
-        if a0 <= th <= a1:
-            return abs(math.hypot(x, y) - R)
-        a = a0 if th < a0 else a1
-        return math.hypot(x - R * math.cos(a), y - R * math.sin(a))
-
-    under = sample_fn(w, h, lambda x, y: 0.72 * smooth(-1.0, 1.0, 5.2 - arcd(x, y)), 1)
-    if lit:
-        E = sample_fn(w, h, lambda x, y: 1.1 * smooth(-0.7, 0.7, 1.3 - arcd(x, y)) +
-                      0.55 * _obj_g((arcd(x, y) / 3.4) ** 2), 1)
-    else:
-        E = sample_fn(w, h, lambda x, y: 0.75 * _obj_g((arcd(x, y) / 1.7) ** 2) + 0.25 * _obj_g((arcd(x, y) / 3.5) ** 2), 1)
-    win = ([1.0] * w, [1.0] * h)
-    img = Img(w, h)
-    img.over(OBJ_GAUGE_SHADOW, under, 1.0, win)
-    img.over(CYAN if lit else AFTER, E, 1.0, win)
-    return img
 
 # --------------------------------------------------------------------------- catalogue
 
@@ -2016,19 +1665,17 @@ def catalogue():
     for v, s in zip("ab", (171, 173)):
         C.append(entry(f"chakra_{v}", 256, 256, "radial", "radial", "ring radius 0.40*w",
                        "circular chakra / halo ring of electricity", lambda s=s: tex_chakra(s)))
-    C.append(entry("orb_rim", 256, 256, "radial", "radial", "rim radius 0.37*w", "eye/orb electric rim",
-                   lambda: tex_orb_rim(181)))
     C.append(entry("orb_core", 128, 128, "radial", "radial", "centre", "eye/orb core glow", tex_orb_core))
-    C.append(entry("crescent_a", 512, 256, "crescent", "arc", "outer edge r=0.94*h around pivot (0.5,1.0), +-72deg",
+    C.append(entry("crescent_a", CRESCENT_W, CRESCENT_H, "crescent", "arc", "outer edge r=0.94*h around pivot (0.5,1.0), +-72deg",
                    "clean sword-light crescent / slash wave", lambda: tex_crescent(191, False)))
-    C.append(entry("crescent_b", 512, 256, "crescent", "arc", "as crescent_a + bolt along the edge",
+    C.append(entry("crescent_b", CRESCENT_W, CRESCENT_H, "crescent", "arc", "as crescent_a + bolt along the edge",
                    "lightning crescent slash", lambda: tex_crescent(193, True)))
     C.append(entry("slash_wave", 512, 128, "strip", "u", "edge at v~0.30, tail toward v~0.9",
                    "straight slash wave / sword beam (travels toward -v)", lambda: tex_slash_wave(197)))
     for v, s in zip("ab", (211, 223)):
         C.append(entry(f"rift_{v}", 512, 64, "strip", "u", "v=0.5 thin white tear in a dark void band",
                        "rift / cut ribbon, teleport tears", lambda s=s: tex_rift(s)))
-    C.append(entry("shockwave", 512, 512, "radial", "radial", "leading edge r=0.46*w, tail inward to ~0.28*w",
+    C.append(entry("shockwave", 256, 256, "radial", "radial", "leading edge r=0.46*w, tail inward to ~0.28*w",
                    "expanding ring / shockwave (scale the card)", lambda: tex_shockwave(229)))
     for v, s in zip("ab", (233, 239)):
         C.append(entry(f"crackle_{v}", 512, 64, "strip", "u", "band v=0.22..0.86, floor glow at v=0.93",
@@ -2047,17 +1694,7 @@ def catalogue():
                    "small rising charge spark", lambda: tex_charge_spark(269)))
     C.append(entry("glow_soft", 64, 64, "radial", "radial", "centre", "plain soft glow", tex_glow_soft))
     C.append(entry("glow_strip", 256, 32, "strip", "u", "v=0.5", "plain soft beam glow", tex_glow_strip))
-    for name, spec in DECALS.items():
-        g = HAZARD_SHAPES[spec["shape"]]
-        C.append(entry(name, spec["w"], spec["h"], "decal", "world",
-                       f"{spec['sym']} piece: world x {spec['x0']:.3f}..{spec['x1']:.3f}, z {spec['z0']:.3f}..{spec['z1']:.3f}",
-                       ("charged (white-hot) " if name.startswith("charged") else "warning ") + f"telegraph of hazard shape {spec['shape']} ({g['kind']})",
-                       lambda name=name: tex_decal(name), "hazard-specific; u = local x, v = local forward z; mirrored by the cards"))
-    for k in range(len(RING_R)):
-        n = ring_px(k)
-        C.append(entry(f"ringq_{k}", n, n, "quarter", "radial",
-                       f"circle centre at (0,0); band radius {RING_R[k]}+-{RING_HALF} of {ring_extent(k):.3f} blocks per texture side",
-                       "expanding ring quadrant (hazard shape 11)", lambda k=k: tex_ring_quarter(k)))
+    C += kit_entries()
     # rig (boss body) sprites, see build_raiden_rig.mjs
     for v, s in zip("ab", (307, 311)):
         C.append(dict(entry(f"rig_katana_{v}", RIG_KW, RIG_KH, "blade", "u",
@@ -2086,19 +1723,8 @@ def catalogue():
                    lambda: tex_obj_wave_band(409), "layered glow, crackle along the core, cyan sparks"))
     C.append(entry("obj_wave_fade", 512, 64, "strip", "u", "v=0.5, lens envelope", "afterglow of obj_wave_band",
                    lambda: tex_obj_wave_band(409, True), "dissolving purple with embers"))
-    for v, s in zip("ab", (419, 421)):
-        C.append(entry(f"obj_frag_{v}", 128, 32, "strip", "u", "glowing top edge v=0.2, dim bottom edge v=0.8",
-                       "blink silhouette strip (u across the body, v top -> bottom)", lambda s=s: tex_obj_frag(s),
-                       "ragged dissolving ends, short lightning seam"))
-    C.append(entry("obj_frag_fade", 128, 32, "strip", "u", "as obj_frag_*", "dissolving blink strip (afterglow)",
-                   lambda: tex_obj_frag(431, True)))
     C.append(entry("obj_shard", 64, 64, "strip", "u", "tip at u~0.93, body u 0.42..0.93, streak toward u=0",
                    "flying electro shard (break bursts)", lambda: tex_obj_shard(433)))
-    C.append(entry("obj_gauge_on", 64, 64, "quarter", "radial", "arc r=0.74*w over 9..81 deg, centre at texel (0,0)",
-                   "lit remembrance-orb gauge quadrant (side = 0.5 local blocks)", lambda: tex_obj_gauge(True),
-                   "mirror the uv for the other quadrants"))
-    C.append(entry("obj_gauge_off", 64, 64, "quarter", "radial", "as obj_gauge_on", "spent orb gauge quadrant",
-                   lambda: tex_obj_gauge(False)))
     return C
 
 
@@ -2126,7 +1752,7 @@ def write_catalogue_json(path=CATALOGUE_JSON):
                 "magnified sampling is nearest-neighbour: >= ~32 texels per block for things seen up close",
                 "vertical faces may receive entity diffuse light 0.5..0.74 (up faces 1.0)"],
             "textures": [{k: v for k, v in c.items() if k != "fn"} for c in catalogue()],
-            "hazard_decals": DECALS, "ring_radii": RING_R, "ring_half": RING_HALF, "ring_pad": RING_PAD}
+            "kit_decals": KIT_DECALS, "kit_quarter_extent": KIT_QEXT}
     path.write_text(json.dumps(data, indent=1) + "\n", encoding="utf-8")
 
 

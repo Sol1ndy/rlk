@@ -1,81 +1,50 @@
-"""Native display meshes for all thirteen Narukami hazard volumes.
+"""Display side of the Narukami hazard / FX kit v2 (plan rd/plan.md B.0, B.3, C.6, D.1; owner S1-KIT).
 
-Called by build_raiden_hazards.py. One owned display holds a whole warning or
-strike. The hit generator remains the authority for positions, yaw, timing,
-and the jumpable ring radius; this file only rebuilds model/item JSON in the
-resource pack (the datapack functions it writes are unchanged).
+Called by build_raiden_hazards.py (build(ROOT, OUT)). Writes
+  RP   assets/rlk/models/item/raiden/fx_hazard/*  + items/raiden/fx_hazard/*   (unit-size meshes, tintable)
+  DP   boss/raiden/hazard/vis/*   hazard-bound visuals: decal, strike, travelling cards, small impacts
+       boss/raiden/hazard/vfx_world + fx_*   the display clock (orphans, one-shot interpolation, countdown frames)
+       boss/raiden/fx/*            D.1 cues (visual + vanilla sound recipe), fx/snd/*, fx/decal/* (state decals)
 
-Every mesh is a handful of flat textured cards (zero-thickness elements with a
-face on each side, shade off) using the painted gradient sprites of
-build_raiden_fx_textures.py (rlk:raiden/fxg/*):
-  warning  feathered telegraph decal tele_<s>: dark underlay, magenta/violet rim
-           with inner glow, bright centre line, soft chevrons, faint inner veins.
-           Decals are mirrored symmetry pieces (half / quadrant / one card per fan
-           ray) so they hold >= 32 texels per block.
-  charge   white-hot decal charged_<s>, dimmed by a constant item tint on the first
-           of the two steps; the second step adds crisp boundary crackle strips;
-           both add rising charge sparks standing on the boundary.
-  strike   area flash (charged decal, or for disks a centred shockwave ring whose
-           bright edge is the hit radius plus an impact flash), jagged floor bolts
-           (bolt_a/b/c, one variant per flicker frame), crossed vertical bolts
-           (pillars split at 2.4 blocks, lightning walls) and blade-light crescents;
-           the two flicker frames mirror the sprites and dim the area by tint.
-  after    afterglow bolts (bolt_after_c, vbolt_after_c) over scorch streaks;
-  fade     dissolving embers (bolt_fade_c) over the scorch.
-  ring     exact +-0.7 band: four mirrored quarter textures + 16 low crackle
-           walls (all below 0.75 so jumping visibly clears it).
-Layer heights: decal 0.02 < crackle 0.045 < scorch 0.065 < floor bolts 0.09+ (each
->= 0.02 apart). Vanilla sorts translucent quads by centroid and writes depth, so
-overlay sprites keep tight halos (see the texture library notes).
-Model coordinates: model = 8 + world/2 (display scale 32; right_rotation cancels
-the item flip, so model +z = hazard forward). All cards stay inside -16..32 and
-only use single-axis Y rotations of 0/+-22.5/+-45 degrees.
+MESHES. Every mesh is unit-size and scaled per hazard by the display transformation (no per-size models):
+  model coordinate = 8 + 16 * u for x and z (u in units: radius 1, or width 1 x length 1 along +z),
+  model y = 8 + 16 * (blocks / yu): decals and travelling cards yu = 1, strike meshes yu = 8 (display scale y = yu).
+  right_rotation [0,1,0,0] cancels the item flip, so model +z = the hazard's forward. Cards are flat (zero thickness),
+  faces on both sides, shade off, tintindex 0: the item definition tints them with minecraft:custom_model_data
+  (index 0, default white), which the frames use for flicker / residue / fade without extra models.
+  Layer heights: decal 0.02 < strike area 0.03 < floor bolts 0.07+ (>= 0.02 apart, translucent sort by centroid).
+
+DISPLAY CLOCK (vfx_world, every tick after the hazards):
+  rlk_rd_hvis   bound to a hazard (decal, travelling cards, field crackle): it sits exactly on the hazard origin, so a
+                visual with no hazard within 0.05 b is an orphan and is killed (pause / transform kill the markers).
+  rlk_rd_fx     free-running timed card (strike visuals, cues, state decals): rdHLife counts down, killed at 0; strike
+                frames by remaining life (raiden_kit.FLASH / AFTER_AT / FADE_AT).
+  rlk_rd_fxa    one-shot interpolation: the tick after its summon, transformation := custom_data.to over custom_data.d
+                ticks (travelling cards launch this way exactly on the hazard's launch tick; rings expand in).
 """
 from pathlib import Path
 import json
 import math
+import shutil
 import sys
 
-from build_raiden_fx_textures import (HAZARD_SHAPES, DECALS, DECAL_SYM, RING_R, RING_HALF, RING_END, RING_FRAMES, ring_extent, shape_outline,
-                                      build_fx_textures, catalogue, TEX_SUBDIR, NS)
-
-SCALE = 32
-# Display culling width (blocks) for hazard meshes: the outermost ring frame must fit.
-CULL_W = 2*math.ceil(ring_extent(len(RING_R)-1)*RING_END/RING_R[-1])+2
-# Shapes 13 (illusion sword wave) and 14 (몽상의 일심 disk) are appended; shapes 1-12 keep
-# their hit volumes.
-SHAPES = range(1, 15)
-LINES = {2: (12, 2.2), 5: (20, 3.6), 7: (8, 8), 10: (18, 7), 13: (22, 2.4)}
-DISKS = {3: 3, 6: 5, 8: 6, 12: 12, 14: 19}
-SECTORS = {1: (6, 60), 4: (12, 70)}
-for _s, (_L, _W) in LINES.items():
-    assert HAZARD_SHAPES[_s] == dict(kind="rect", length=_L, width=_W), _s
-for _s, _r in DISKS.items():
-    assert HAZARD_SHAPES[_s] == dict(kind="disk", r=_r), _s
-for _s, (_r, _a) in SECTORS.items():
-    assert HAZARD_SHAPES[_s] == dict(kind="sector", r=_r, half=_a), _s
-assert HAZARD_SHAPES[9]["angles"] == (-40, -20, 0, 20, 40) and HAZARD_SHAPES[9]["length"] == 18
-assert HAZARD_SHAPES[11] == dict(kind="annulus", r0=1.3, r1=2.7)
+from build_raiden_fx_textures import catalogue, build_fx_textures, TEX_SUBDIR, NS, KIT_QEXT
+from raiden_kit import (DECALS, DECAL_INTRO, STRIKES, STRIKE_YU, STRIKE_LIFE, FLASH, AFTER_AT, AFTER_TINT, FADE_AT,
+                        FADE_TINT, SOUNDS, SEG_DEG, KINDS)
 
 FX = {c["name"] for c in catalogue()}
 ALLOWED = (-45.0, -22.5, 0.0, 22.5, 45.0)
 AXES = {"+x": (0, 1), "-x": (0, -1), "+y": (1, 1), "-y": (1, -1), "+z": (2, 1), "-z": (2, -1)}
 FACE_PAIR = {0: ("east", "west"), 1: ("up", "down"), 2: ("south", "north")}
-# Constant item tints (multiply RGB only): dim first charge step and the flicker decay.
-# Card heights: decal < crackle < scorch < floor bolts (>= 0.02 apart against z-fighting).
-Y_DECAL = 0.02
-Y_CRACKLE = 0.045
-Y_SCORCH = 0.065
-Y_BOLT = 0.09
-TINT_CHARGE0 = 0xC8B6EA
-TINT_FLASH1 = 0xDCD0F2
-TINT_FLASH2 = 0xA897D2
-TINT_RESIDUE = 0x8C74BE
 ABC = "abc"
+H = "rlk:boss/raiden/hazard/"
+F = "rlk:boss/raiden/fx/"
+MODEL_NS = "rlk:raiden/fx_hazard/"
+WHITE = 0xFFFFFF
+SEG_CHORD = 2 * math.tan(math.radians(SEG_DEG / 2)) * 1.08      # chord / radius of one ring card (8 % overlap)
 
 
 def face_corners(face, lo, hi):
-    """TL, TR, BR, BL of a face seen from outside (vanilla FaceInfo vertex order)."""
     x0, y0, z0 = lo
     x1, y1, z1 = hi
     return {
@@ -89,8 +58,7 @@ def face_corners(face, lo, hi):
 
 
 def solve_uv(face, lo, hi, fn):
-    """Face uv [u1,v1,u2,v2] + rotation so that every corner shows fn(corner) (vanilla
-    rule: corner i takes the (i - rotation/90)-th entry of (u1v1, u2v1, u2v2, u1v2))."""
+    """Face uv [u1,v1,u2,v2] + rotation so that every corner shows fn(corner) (vanilla FaceInfo order)."""
     D = [fn(c) for c in face_corners(face, lo, hi)]
     for k in range(4):
         u = [D[(j + k) % 4] for j in range(4)]
@@ -101,10 +69,12 @@ def solve_uv(face, lo, hi, fn):
 
 
 class Model:
-    def __init__(self):
+    """Unit mesh: x/z in units (model 8 + 16 u), y in blocks / yu."""
+
+    def __init__(self, yu=1.0):
+        self.yu = yu
         self.textures = {}
         self.elements = []
-        self.tint = None
 
     def var(self, name):
         assert name in FX, name
@@ -116,18 +86,19 @@ class Model:
         self.textures[k] = tid
         return k
 
-    def card(self, center, normal, uaxis, vaxis, su, sv, tex, angle=0.0, uv=(0, 0, 16, 16), tint=False):
-        """Flat card centred on `center` (world, hazard frame) lying across `normal` ('x'|'y'|'z').
-        Texture u runs from uv[0] at the -uaxis edge to uv[2] at the +uaxis edge (likewise v);
-        `angle` turns the whole card about +Y (positive = from +z toward +x)."""
+    def card(self, center, normal, uaxis, vaxis, su, sv, tex, angle=0.0, uv=(0, 0, 16, 16), origin=None):
+        """Flat card centred on center = (x units, y blocks, z units), lying across `normal`; texture u runs from uv[0]
+        at the -uaxis edge to uv[2] at the +uaxis edge (likewise v). su / sv are in units (y extents in blocks).
+        `angle` turns it about +Y around `origin` (default its centre)."""
         n = "xyz".index(normal)
         ua, us = AXES[uaxis]
         va, vs = AXES[vaxis]
         assert len({n, ua, va}) == 3, (normal, uaxis, vaxis)
-        c = [8 + v * 16 / SCALE for v in center]
+        scale = (16.0, 16.0 / self.yu, 16.0)
+        c = [8 + center[i] * scale[i] for i in range(3)]
         half = [0.0, 0.0, 0.0]
-        half[ua] = su * 8 / SCALE
-        half[va] = sv * 8 / SCALE
+        half[ua] = su * scale[ua] / 2
+        half[va] = sv * scale[va] / 2
         lo = [round(c[i] - half[i], 4) for i in range(3)]
         hi = [round(c[i] + half[i], 4) for i in range(3)]
         assert all(-16 <= v <= 32 for v in lo + hi), (tex, lo, hi)
@@ -140,16 +111,15 @@ class Model:
         faces = {}
         for f in FACE_PAIR[n]:
             fuv, rot = solve_uv(f, lo, hi, fn)
-            spec = {"texture": "#" + var, "uv": fuv}
+            spec = {"texture": "#" + var, "uv": fuv, "tintindex": 0}
             if rot:
                 spec["rotation"] = rot
-            if tint:
-                spec["tintindex"] = 0
             faces[f] = spec
         el = {"from": lo, "to": hi, "shade": False, "faces": faces}
         if angle:
             assert angle in ALLOWED, angle
-            el["rotation"] = {"origin": [round(v, 4) for v in c], "axis": "y", "angle": angle}
+            o = c if origin is None else [8 + origin[i] * scale[i] for i in range(3)]
+            el["rotation"] = {"origin": [round(v, 4) for v in o], "axis": "y", "angle": angle}
         self.elements.append(el)
 
     def json(self):
@@ -158,11 +128,9 @@ class Model:
             tex["particle"] = next(iter(self.textures.values()))
         return {"ambientocclusion": False, "gui_light": "front", "textures": tex, "elements": self.elements}
 
-# --------------------------------------------------------------------------- placement helpers
-
 
 def heading(theta):
-    """Direction theta (deg, from +z toward +x) -> (u axis, v axis, element Y angle), or None."""
+    """Direction theta (deg, from +z toward +x) -> (u axis along it, v axis across, element Y angle)."""
     for base, ua, va in ((0, "+z", "-x"), (90, "+x", "+z"), (180, "-z", "+x"), (-90, "-x", "-z")):
         a = (theta - base + 180) % 360 - 180
         for al in ALLOWED:
@@ -171,361 +139,289 @@ def heading(theta):
     return None
 
 
-def strip(m, p0, p1, width, tex, y=0.06, wall=None, uv=(0, 0, 16, 16), maxjog=0.35, tint=False):
-    """Card along p0 -> p1 (x, z). wall=None: lying flat at height y, `width` across.
-    wall=(y0, y1): standing vertical on the segment (texture v = top -> bottom).
-    Directions that are not multiples of 22.5 deg are split into quantised pieces that
-    follow the exact segment (lateral jog per piece <= maxjog); u is split to match."""
-    dx, dz = p1[0] - p0[0], p1[1] - p0[1]
-    L = math.hypot(dx, dz)
-    theta = math.degrees(math.atan2(dx, dz))
-    q = round(theta / 22.5) * 22.5
-    dev = math.radians(abs(theta - q))
-    n = 1 if dev < 1e-6 else max(1, math.ceil(L * math.sin(dev) / maxjog))
-    for i in range(n):
-        a = (p0[0] + dx * i / n, p0[1] + dz * i / n)
-        b = (p0[0] + dx * (i + 1) / n, p0[1] + dz * (i + 1) / n)
-        ua, va, ang = heading(q)
-        seg = L / n * math.cos(dev) + (0.18 if n > 1 else 0.0)
-        cx, cz = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
-        u0 = uv[0] + (uv[2] - uv[0]) * i / n
-        u1 = uv[0] + (uv[2] - uv[0]) * (i + 1) / n
-        if wall is None:
-            m.card((cx, y, cz), "y", ua, va, seg, width, tex, ang, (u0, uv[1], u1, uv[3]), tint)
-        else:
-            y0, y1 = wall
-            m.card((cx, (y0 + y1) / 2, cz), "x" if ua in ("+z", "-z") else "z", ua, "-y", seg, y1 - y0, tex, ang,
-                   (u0, uv[1], u1, uv[3]), tint)
-
-
-def radial(m, x, z, size, tex, y, tint=False, flip=False):
-    m.card((x, y, z), "y", "+x", "+z", size, size, tex, 0, (16, 0, 0, 16) if flip else (0, 0, 16, 16), tint)
-
-
-PILLAR_SPLIT = 2.4
-
-
-def pillar(m, x, z, y0, height, width, texs, planes=4, flip=0):
-    """Crossed vertical cards (planes along z, x, then the two diagonals) sharing one axis.
-    Tall pillars are cut at PILLAR_SPLIT: vanilla sorts translucent quads by centroid and
-    writes depth, and a low segment (centroid near eye height) sorts after the floor cards
-    instead of hiding them; the diagonal planes only exist above the cut."""
-    spec = (("+z", "x", 0.0), ("+x", "z", 0.0), ("+z", "x", 45.0), ("+z", "x", -45.0))
-    cut = y0 + PILLAR_SPLIT
-    split = height > 5.5
-    for k in range(planes):
-        ua, normal, ang = spec[k]
-        uv = (16, 0, 0, 16) if (k + flip) % 2 else (0, 0, 16, 16)
-        tex = texs[k % len(texs)]
-        if not split:
-            m.card((x, y0 + height / 2, z), normal, ua, "-y", width, height, tex, ang, uv)
-            continue
-        vcut = 16 * (y0 + height - cut) / height
-        m.card((x, (cut + y0 + height) / 2, z), normal, ua, "-y", width, y0 + height - cut, tex, ang,
-               (uv[0], 0, uv[2], vcut))
-        if k < 2:
-            m.card((x, (y0 + cut) / 2, z), normal, ua, "-y", width, cut - y0, tex, ang, (uv[0], vcut, uv[2], 16))
-
-
-def decal(m, shape, kind, y=Y_DECAL, tint=None):
-    """Telegraph decal from its mirrored symmetry pieces (see DECAL_SYM in the texture library)."""
-    t = tint is not None
-    if t:
-        m.tint = tint
-    sym = DECAL_SYM[shape]
-    if sym == "ray":
-        for a in HAZARD_SHAPES[shape]["angles"]:
-            q = round(a / 22.5) * 22.5
-            d = a - q
-            name = f"{kind}_{shape}_{int(round(abs(d) * 10))}"
-            spec = DECALS[name]
-            sgn = 1 if d >= 0 else -1           # the texture is painted for a +slant; mirror u for -
-            cx, cz = sgn * (spec["x0"] + spec["x1"]) / 2, (spec["z0"] + spec["z1"]) / 2
-            c, s_ = math.cos(math.radians(q)), math.sin(math.radians(q))
-            # rotate the card about its own centre by q, centre placed so local (0,0) = hazard origin
-            m.card((cx * c + cz * s_, y, -cx * s_ + cz * c), "y", "+x", "+z", spec["x1"] - spec["x0"],
-                   spec["z1"] - spec["z0"], name, q, (0, 0, 16, 16) if sgn > 0 else (16, 0, 0, 16), t)
-        return
-    name = f"{kind}_{shape}"
-    d = DECALS[name]
-    cx, cz = (d["x0"] + d["x1"]) / 2, (d["z0"] + d["z1"]) / 2
-    sx, sz = d["x1"] - d["x0"], d["z1"] - d["z0"]
-    for mx in (1, -1):
-        for mz in ((1, -1) if sym == "quad" else (1,)):
-            uv = (0 if mx > 0 else 16, 0 if mz > 0 else 16, 16 if mx > 0 else 0, 16 if mz > 0 else 0)
-            m.card((mx * cx, y, mz * cz), "y", "+x", "+z", sx, sz, name, 0, uv, t)
-
-
-def crescent(m, R, y, tex, flip=False, z0=0.0, tint=False):
-    """Blade-light crescent lying flat, pivot at (0, z0), cutting edge radius R bulging forward (+z)."""
-    H = R / 0.94
-    m.card((0, y, z0 + H / 2), "y", "+x", "-z", 2 * H, H, tex, 0, (16, 0, 0, 16) if flip else (0, 0, 16, 16), tint)
-
-
-def outline_points(shape, spacing, limit):
-    pts = []
-    for poly in shape_outline(HAZARD_SHAPES[shape]):
-        acc = spacing / 2
-        for a, b in zip(poly, poly[1:]):
-            L = math.dist(a, b)
-            while acc < L:
-                t = acc / L
-                pts.append((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t))
-                acc += spacing
-            acc -= L
-    if len(pts) > limit:
-        step = len(pts) / limit
-        pts = [pts[int(i * step)] for i in range(limit)]
-    return pts
-
-
-def charge_sparks(m, shape, phase):
-    g = HAZARD_SHAPES[shape]
-    perim = sum(math.dist(a, b) for poly in shape_outline(g) for a, b in zip(poly, poly[1:]))
-    count = 10 if phase else 7
-    pts = outline_points(shape, max(1.0, perim / count), count)
-    h = 0.62 if phase == 0 else 1.0
-    for i, (x, z) in enumerate(pts):
-        hh = h * (0.8 + 0.4 * ((i * 7919) % 5) / 4)
-        planes = (("+z", "x"), ("+x", "z"))
-        for k, (ua, normal) in enumerate(planes):
-            uv = (16, 0, 0, 16) if (i + k + phase) % 2 else (0, 0, 16, 16)
-            m.card((x, hh / 2, z), normal, ua, "-y", hh * 0.5, hh, "charge_spark", 0, uv)
-
-def edge_segments(shape):
-    """Boundary pieces (world x,z pairs) for crisp crackle strips; circles become chords whose
-    directions are multiples of 22.5 deg, so each chord is a single card."""
-    g = HAZARD_SHAPES[shape]
-    k = g["kind"]
-    segs = []
-    if k == "rect":
-        L, hw = g["length"], g["width"] / 2
-        n = max(1, math.ceil(L / 7))
-        for x in (-hw, hw):
-            segs += [((x, L * i / n), (x, L * (i + 1) / n)) for i in range(n)]
-        segs += [((-hw, 0), (hw, 0)), ((-hw, L), (hw, L))]
-    elif k in ("disk", "annulus"):
-        for r in ((g["r"],) if k == "disk" else (g["r0"], g["r1"])):
-            n = 16 if r >= 3 else 8
-            half = 180 / n
-            re = r * 2 / (1 + math.cos(math.radians(half)))
-            segs += [(polar(re, 360 * i / n - half), polar(re, 360 * i / n + half)) for i in range(n)]
-    elif k == "sector":
-        r, a = g["r"], g["half"]
-        segs += [((0, 0), polar(r, -a)), ((0, 0), polar(r, a))]
-        re = r * 2 / (1 + math.cos(math.radians(11.25)))
-        k = int((a - 11.25) // 22.5)
-        segs += [(polar(re, 22.5 * i - 11.25), polar(re, 22.5 * i + 11.25)) for i in range(-k, k + 1)]
-        edge = 22.5 * k + 11.25
-        if a - edge > 1.0:
-            segs += [(polar(r, edge), polar(r, a)), (polar(r, -a), polar(r, -edge))]
-    elif k == "fan":
-        segs += [(polar(0.8, a), polar(g["length"] - 0.3, a)) for a in g["angles"]]
-    return segs
-
-
-def edge_crackle(m, shape, v):
-    width = 0.75 if shape in (4, 5, 9, 10, 12, 13) else 0.55
-    for i, (a, b) in enumerate(edge_segments(shape)):
-        tex = "rim_crackle_" + ABC[(i + v) % 3]
-        uv = (16, 0, 0, 16) if (i + v) % 2 else (0, 0, 16, 16)
-        strip(m, a, b, width, tex, y=Y_CRACKLE, uv=uv, maxjog=0.4)
-
-
-# --------------------------------------------------------------------------- frames
-
-
-class Style:
-    """What one strike-family frame draws. v = flicker index (0, 1, 2); kind = hot|after|fade."""
-
-    def __init__(self, kind, v=2):
-        self.kind, self.v = kind, v
-        self.hot = kind == "hot"
-        if self.hot:
-            self.bolt = "bolt_" + ABC[v]
-            self.alt = "bolt_" + ABC[(v + 1) % 3]
-            self.vbolts = ["vbolt_" + ABC[(v + k) % 3] for k in range(3)]
-        else:
-            self.bolt = self.alt = "bolt_" + kind + "_c"
-            self.vbolts = ["vbolt_after_c"] if kind == "after" else []
-        # flicker frames mirror the same sprites differently; after/fade reuse frame 2's mapping
-        self.flip_v = v == 1 and self.hot
-        self.flip_u = v == 2 or not self.hot
-
-    def uv(self):
-        u0, u1 = (16, 0) if self.flip_u else (0, 16)
-        v0, v1 = (16, 0) if self.flip_v else (0, 16)
-        return (u0, v0, u1, v1)
-
-
-def floor_bolt(m, st, p0, p1, width, layer, alt=False, maxjog=0.35):
-    """Bolt lying on the floor; afterglow frames add a scorch streak beneath it."""
-    y = Y_BOLT + 0.025 * layer
-    if not st.hot:
-        strip(m, p0, p1, width * 0.55, "scorch_strip", y=Y_SCORCH, maxjog=maxjog)
-    strip(m, p0, p1, width, st.alt if alt else st.bolt, y=y, uv=st.uv(), maxjog=maxjog)
-
-
-def wall_bolt(m, st, p0, p1, y0, y1, alt=False, maxjog=0.35):
-    """Vertical bolt standing over the decal. Hot frames use the tight-glow blade sprites so the
-    depth-writing footprint stays small; the afterglow keeps the wide dissolving residue."""
-    if st.kind == "fade":
-        return
-    # match the sprite's aspect: long low walls take the 8:1 blade strip, tall ones the 4:1 bolt
-    long_low = math.dist(p0, p1) / (y1 - y0) > 5
-    if st.hot:
-        tex = ("blade_" if long_low else "bolt_") + ABC[(st.v + (1 if alt else 0)) % 3]
-    else:
-        tex = st.bolt
-    strip(m, p0, p1, 0, tex, wall=(y0, y1), uv=st.uv(), maxjog=maxjog)
-
-
-def column(m, st, x, z, y0, height, width, planes=4):
-    if not st.vbolts:
-        return
-    pillar(m, x, z, y0, height, width, st.vbolts, planes, st.v)
-
-
-def area(m, st, shape):
-    """Area flash of a strike frame. Disks use single centred cards (shockwave ring whose bright
-    edge is the hit radius + impact flash) instead of their four mirrored decal quadrants: a
-    quadrant sorted after a centred overlay would be hidden under it (vanilla depth writes)."""
-    if not st.hot:
-        return
-    tint = (None, TINT_FLASH1, TINT_FLASH2)[st.v]
-    if shape in DISKS:
-        r = DISKS[shape]
-        radial(m, 0, 0, r / 0.46, "shockwave", Y_DECAL, tint is not None, st.v == 1)
-        radial(m, 0, 0, {3: 6.0, 6: 5.0, 8: 5.5, 12: 8.0, 14: 11.0}[shape], "flash", Y_DECAL + 0.045, flip=st.v == 2)
-        m.tint = tint
-    else:
-        decal(m, shape, "charged", Y_DECAL, tint)
-    if st.v == 0 and shape not in (9, 12, 14):
-        edge_crackle(m, shape, 1)
-
-
 def polar(r, ang):
     return (r * math.sin(math.radians(ang)), r * math.cos(math.radians(ang)))
 
 
-def strike(shape, st):
-    m = Model()
-    area(m, st, shape)
-    if shape in SECTORS:
-        r, half = SECTORS[shape]
-        angs = (-45, 0, 45) if shape == 1 else (-45, -22.5, 0, 22.5, 45)
-        for i, a in enumerate(angs):
-            floor_bolt(m, st, polar(0.4, a), polar(r - 0.25, a), 1.5 if shape == 1 else 2.4, i, i % 2 == 1)
-        if st.hot:
-            top, low = ("crescent_b", "crescent_a") if st.v != 1 else ("crescent_a", "crescent_b")
-            crescent(m, r, 1.05 if shape == 1 else 1.6, top, st.v == 2)
-            crescent(m, r * 0.82, 0.45 if shape == 1 else 0.7, low, st.v != 0)
-        elif st.kind == "after":
-            # the slash leaves a dim, sinking blade-light residue for the afterglow ticks
-            crescent(m, r * 0.9, 0.3, "crescent_a", True, tint=True)
-            m.tint = TINT_RESIDUE
-        if shape == 4:
-            for i, a in enumerate((-35, 0, 35)):
-                x, z = polar(r * 0.86, a)
-                column(m, st, x, z, 0.0, 3.4, 1.6, 2)
-    elif shape in DISKS:
-        r = DISKS[shape]
-        dirs = (0, 90, 180, 270) if shape == 3 else (0, 45, 90, 135, 180, 225, 270, 315)
-        width = {3: 1.0, 6: 1.4, 8: 1.5, 12: 2.4, 14: 3.0}[shape]
-        for i, a in enumerate(dirs):
-            floor_bolt(m, st, polar(min(0.6, r * 0.08), a), polar(r - 0.25, a), width, i, i % 2 == 1)
-        if shape != 6:
-            height, w = {3: (9.5, 2.8), 8: (7.0, 2.6), 12: (10.0, 3.4), 14: (12.0, 4.0)}[shape]
-            column(m, st, 0, 0, 0.0, height, w, 4)
-        if shape == 6:
-            for a in (45, 135, 225, 315):
-                x, z = polar(2.6, a)
-                column(m, st, x, z, 0.0, 2.8, 1.3, 2)
-        if shape == 12:
-            for k in range(6):
-                x, z = polar(7.2, 30 + 60 * k)
-                column(m, st, x, z, 0.0, 4.6, 1.8, 2)
-        if shape == 14:
-            for k in range(8):
-                x, z = polar(11.5, 22.5 + 45 * k)
-                column(m, st, x, z, 0.0, 6.0, 2.2, 2)
-        if st.kind == "after":
-            radial(m, 0, 0, r * 0.9, "scorch", Y_CRACKLE)
-    elif shape == 9:
-        L = 18
-        for i, a in enumerate((-40, -20, 0, 20, 40)):
-            floor_bolt(m, st, polar(0.5, a), polar(L - 0.4, a), 1.2, i % 2, i % 2 == 1, maxjog=0.5)
-            if st.hot:
-                wall_bolt(m, st, polar(0.6, a), polar(L - 0.6, a), 0.15, 1.65, i % 2 == 0, maxjog=0.5)
-        if st.hot:
-            radial(m, 0, 0.4, 3.2, "flash", 0.12)
-    elif shape in (2, 13):
-        L, W = LINES[shape]
-        floor_bolt(m, st, (0, 0.2), (0, L - 0.2), W, 0)
-        wall_bolt(m, st, (0, 0.3), (0, L - 0.3), 0.25 if shape == 2 else 0.3, 2.15 if shape == 2 else 1.9, True)
-        if st.hot:
-            strip(m, (0, 0.3), (0, L - 0.1), 0.75, "blade_" + ABC[st.v], y=1.2 if shape == 2 else 1.0, uv=st.uv())
-            if shape == 2:
-                pillar(m, 0, L - 0.2, 0.1, 2.2, 2.2, ["flash"], 2)
-            else:
-                # forward-bulging sword-wave crescents along the corridor
-                for i, z in enumerate((2.4, 7.9, 13.4, 18.9)):
-                    crescent(m, 1.45, 1.0 + 0.04 * i, "crescent_" + "ab"[(i + st.v) % 2], (i + st.v) % 2 == 1, z)
-    elif shape == 5:
-        L, W = LINES[5]
-        floor_bolt(m, st, (0, 0.2), (0, L - 0.2), W, 0)
-        floor_bolt(m, st, (0.9 if st.v % 2 else -0.9, 0.6), (0, L - 0.6), 2.4, 1, True)
-        wall_bolt(m, st, (0, 0.4), (0, L - 0.4), 0.3, 2.7, True)
-        if st.hot:
-            strip(m, (0, 0.15), (0, L - 0.15), 0, "slash_wave", wall=(0.15, 4.5), uv=(16, 0, 0, 16) if st.v == 1 else (0, 0, 16, 16))
-        for z in (5, 10, 15):
-            column(m, st, 0, z, 0.0, 3.6, 1.6, 2)
-    elif shape == 7:
-        L, W = LINES[7]
-        for i, z in enumerate((1.2, 3.2, 4.8, 6.8)):
-            wall_bolt(m, st, (-W / 2 + 0.1, z), (W / 2 - 0.1, z), 0.15, 2.7, i % 2 == 1)
-        for i, z in enumerate((2.2, 5.8)):
-            floor_bolt(m, st, (-W / 2 + 0.2, z), (W / 2 - 0.2, z), 2.2, i, i == 1)
-        column(m, st, 0, 4, 0.0, 6.5, 2.4, 4)
-        if st.hot:
-            radial(m, 0, 4, 4.5, "flash", 0.12)
-    elif shape == 10:
-        L, W = LINES[10]
-        for i, x in enumerate((-2.4, 0, 2.4)):
-            floor_bolt(m, st, (x, 0.2), (x, L - 0.2), 2.2, i, i == 1)
-        if st.kind != "fade":
-            for i, z in enumerate((3, 9, 15)):
-                arc = "arc_" + "ab"[(i + st.v) % 2] if st.hot else "crackle_" + "ab"[i % 2]
-                strip(m, (-W / 2 - 0.2, z), (W / 2 + 0.2, z), 0, arc, wall=(0.0, 2.6 if st.hot else 0.8))
-        if st.hot:
-            for i, z in enumerate((1.6, 7.6, 13.6)):
-                crescent(m, 3.55, 0.95 + 0.04 * i, "crescent_" + "ba"[(i + st.v) % 2], (i + st.v) % 2 == 1, z)
-    return m
+def strip(m, p0, p1, width, tex, y=0.06, wall=None, uv=(0, 0, 16, 16)):
+    """Card along p0 -> p1 (x, z units; direction a multiple of 22.5 deg). wall=None: flat at height y (blocks),
+    `width` units across; wall=(y0, y1) blocks: standing on the segment (texture v top -> bottom)."""
+    dx, dz = p1[0] - p0[0], p1[1] - p0[1]
+    L = math.hypot(dx, dz)
+    theta = math.degrees(math.atan2(dx, dz))
+    q = round(theta / 22.5) * 22.5
+    assert abs(theta - q) < 1e-3, theta
+    ua, va, ang = heading(q)
+    cx, cz = (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2
+    if wall is None:
+        m.card((cx, y, cz), "y", ua, va, L, width, tex, ang, uv)
+    else:
+        y0, y1 = wall
+        m.card((cx, (y0 + y1) / 2, cz), "x" if ua in ("+z", "-z") else "z", ua, "-y", L, y1 - y0, tex, ang, uv)
 
 
-def ring(frame):
-    """Ring band of radius r +- 0.7 (exact damage band) at frame 0..RING_FRAMES-1."""
-    m = Model()
-    r = 2 + (RING_END - 2) * frame / (RING_FRAMES - 1)
-    k = min(range(len(RING_R)), key=lambda i: abs(math.log(r / RING_R[i])))
-    E = ring_extent(k) * r / RING_R[k]
+def quarters(m, tex, y, ext=KIT_QEXT, r=1.0):
+    """Quarter-texture circle (centre at texel 0,0), radius r units: 4 mirrored cards."""
+    e = ext * r
     for sx in (1, -1):
         for sz in (1, -1):
-            # circle centre at the texture's (0,0) corner; mirror the uv for each quadrant
-            m.card((sx * E / 2, 0.05, sz * E / 2), "y", "+x", "+z", E, E, f"ringq_{k}", 0,
+            m.card((sx * e / 2, y, sz * e / 2), "y", "+x", "+z", e, e, tex, 0,
                    (0 if sx > 0 else 16, 0 if sz > 0 else 16, 16 if sx > 0 else 0, 16 if sz > 0 else 0))
-    chord = 2 * r * math.tan(math.radians(11.25)) * 1.12
-    for i in range(16):
-        a = 22.5 * i
-        x, z = polar(r, a)
-        tang = a + 90
-        ua, va, ang = heading((tang + 180) % 360 - 180)
-        tex = "crackle_" + "ab"[(i + frame) % 2]
-        uv = (16, 0, 0, 16) if (i + frame // 2) % 2 else (0, 0, 16, 16)
-        m.card((x, 0.36, z), "x" if ua in ("+z", "-z") else "z", ua, "-y", chord, 0.72, tex, ang, uv)
-    return m
 
-# --------------------------------------------------------------------------- build
+
+def radial(m, size, tex, y, flip=False, x=0.0, z=0.0):
+    m.card((x, y, z), "y", "+x", "+z", size, size, tex, 0, (16, 0, 0, 16) if flip else (0, 0, 16, 16))
+
+
+def pillar(m, x, z, y0, height, width, texs, planes=4, split=2.4):
+    """Crossed vertical cards (width in units, heights in blocks); tall ones are cut at y0 + split so the low part's
+    centroid sorts after the floor cards."""
+    spec = (("+z", "x", 0.0), ("+x", "z", 0.0), ("+z", "x", 45.0), ("+z", "x", -45.0))
+    cut = y0 + split
+    for k in range(planes):
+        ua, normal, ang = spec[k]
+        uv = (16, 0, 0, 16) if k % 2 else (0, 0, 16, 16)
+        tex = texs[k % len(texs)]
+        if height <= split + 1.0:
+            m.card((x, y0 + height / 2, z), normal, ua, "-y", width, height, tex, ang, uv)
+            continue
+        vcut = 16 * (y0 + height - cut) / height
+        m.card((x, (cut + y0 + height) / 2, z), normal, ua, "-y", width, y0 + height - cut, tex, ang, (uv[0], 0, uv[2], vcut))
+        if k < 2:
+            m.card((x, (y0 + cut) / 2, z), normal, ua, "-y", width, cut - y0, tex, ang, (uv[0], vcut, uv[2], 16))
+
+
+def crescent(m, y, tex, theta=0.0, scale=1.0, crop=1.0, flip=False):
+    """Blade-light crescent lying flat: pivot at the origin, bright edge radius `scale` units toward theta (a multiple
+    of 22.5); crop < 1 keeps the central part (narrower arc)."""
+    Hh = scale / 0.94
+    base = round(theta / 90) * 90
+    rest = theta - base
+    ua_v = {0: ("+x", "-z"), 90: ("-z", "-x"), 180: ("-x", "+z"), -90: ("+z", "+x"), 270: ("+z", "+x")}[int(base) if base != -180 else 180]
+    cx, cz = polar(Hh / 2, base)
+    du = 8 * crop
+    uv = (8 - du, 0, 8 + du, 16)
+    if flip:
+        uv = (uv[2], 0, uv[0], 16)
+    m.card((cx, y, cz), "y", ua_v[0], ua_v[1], 2 * Hh * crop, Hh, tex, rest, uv, origin=(0, y, 0))
+
+
+def bolts_radial(m, angles, r0, r1, width, y, texs):
+    for i, a in enumerate(angles):
+        strip(m, polar(r0, a), polar(r1, a), width, texs[i % len(texs)], y=y,
+              uv=(16, 0, 0, 16) if i % 2 else (0, 0, 16, 16))
+
+
+def ring_walls(m, r, y0, y1, texs, n=8):
+    for i in range(n):
+        a = 360 / n * i
+        half = 180 / n
+        p0, p1 = polar(r, a - half), polar(r, a + half)
+        strip(m, p0, p1, 0, texs[i % len(texs)], wall=(y0, y1), uv=(16, 0, 0, 16) if i % 2 else (0, 0, 16, 16))
+
+
+# --------------------------------------------------------------------------- meshes
+def models():
+    M = {}
+    # ---- B.3 decals (yu 1; unit radius / unit band)
+    for name, tex in (("dk_ring", "dk_ring"), ("dk_ring_s", "dk_ring_s"), ("dk_rings3", "dk_rings3"), ("dk_disc", "dk_disc")):
+        m = Model()
+        quarters(m, tex, 0.02)
+        M[name] = m
+    m = Model()
+    m.card((0, 0.02, 0.5), "y", "+x", "+z", 1, 1, "dk_band")
+    M["dk_band"] = m
+    m = Model()
+    radial(m, 2 / 0.9, "dk_pool", 0.02)
+    M["dk_pool"] = m
+    m = Model()
+    quarters(m, "dk_ring_s", 0.02)
+    ring_walls(m, 1.0, 0.0, 0.32, ["rim_crackle_a", "rim_crackle_b"])
+    M["dk_aura"] = m
+    m = Model()
+    radial(m, 2 / 0.9, "dk_pool", 0.02)
+    quarters(m, "dk_ring_s", 0.04)
+    M["dk_stagger"] = m
+    m = Model()
+    radial(m, 2.0, "dk_tint", 0.05)
+    M["dk_tint"] = m
+
+    # ---- strike meshes (yu 8)
+    def burst(bolt):
+        m = Model(STRIKE_YU)
+        radial(m, 2 / 0.92, "shockwave", 0.03)
+        radial(m, 1.0, "flash", 0.05, flip=bolt)
+        bolts_radial(m, [45 * i for i in range(8)], 0.08, 0.95, 0.16, 0.07, ["bolt_a", "bolt_b"])
+        if bolt:
+            pillar(m, 0, 0, 0.0, 10.0, 0.5, ["vbolt_a", "vbolt_b", "vbolt_c"], 4)
+        else:
+            pillar(m, 0, 0, 0.0, 2.2, 0.4, ["vbolt_b", "vbolt_c"], 2)
+        return m
+    M["st_burst"] = burst(False)
+    M["st_bolt"] = burst(True)
+    m = Model(STRIKE_YU)
+    radial(m, 2 / 0.88 * 0.95, "scorch", 0.03)
+    bolts_radial(m, [45 * i + 22.5 for i in range(0, 8, 2)], 0.1, 0.85, 0.18, 0.07, ["bolt_after_c"])
+    M["st_burst_af"] = m
+    for name, half in (("st_arc45", 45), ("st_arc72", 72), ("st_arc112", 112.5), ("st_arc180", 180)):
+        m = Model(STRIKE_YU)
+        if half == 45:
+            crescent(m, 1.0, "crescent_b", crop=0.75)
+            crescent(m, 0.4, "crescent_a", scale=0.85, crop=0.75, flip=True)
+        elif half == 72:
+            crescent(m, 1.0, "crescent_b")
+            crescent(m, 0.4, "crescent_a", scale=0.85, flip=True)
+        elif half == 112.5:
+            for i, t in enumerate((-45.0, 45.0)):
+                crescent(m, 1.0 + 0.04 * i, "crescent_b", theta=t)
+            crescent(m, 0.4, "crescent_a", scale=0.85, flip=True)
+        else:
+            for i, t in enumerate((0, 90, 180, -90)):
+                crescent(m, 0.9 + 0.04 * i, "crescent_b" if i % 2 == 0 else "crescent_a", theta=t)
+        rays = [a for a in (-112.5, -90, -67.5, -45, -22.5, 0, 22.5, 45, 67.5, 90, 112.5) if abs(a) <= half - 10] \
+            if half < 180 else [45 * i for i in range(8)]
+        rays = rays[::2] if len(rays) > 5 else rays
+        bolts_radial(m, rays, 0.1, 0.92, 0.12, 0.07, ["bolt_a", "bolt_c"])
+        M[name] = m
+    m = Model(STRIKE_YU)                                         # rect: x in [-0.5, 0.5], z in [0, 1]
+    strip(m, (0, 0.02), (0, 0.98), 0.55, "bolt_a", y=0.07)
+    strip(m, (0, 0.03), (0, 0.97), 0, "blade_a", wall=(0.3, 2.0))
+    strip(m, (0, 0.02), (0, 0.98), 1.0, "slash_wave", y=1.1)
+    M["st_slash"] = m
+    m = Model(STRIKE_YU)
+    strip(m, (0, 0.02), (0, 0.98), 0.6, "scorch_strip", y=0.03)
+    strip(m, (0, 0.04), (0, 0.96), 0.45, "bolt_after_c", y=0.07)
+    M["st_slash_af"] = m
+    m = Model(STRIKE_YU)                                         # 단절 slam: wall of light along the band
+    strip(m, (0, 0.01), (0, 0.99), 0.6, "bolt_b", y=0.07)
+    for x in (-0.42, 0.42):
+        strip(m, (x, 0.01), (x, 0.99), 0, "slash_wave", wall=(0.0, 4.5))
+    for z in (0.15, 0.4, 0.65, 0.9):
+        pillar(m, 0, z, 0.0, 7.0, 0.5, ["vbolt_a", "vbolt_b"], 2)
+    M["st_wall"] = m
+    m = Model(STRIKE_YU)                                         # field: cracked glowing floor + low crackle rim
+    radial(m, 2 / 0.88, "scorch", 0.03)
+    ring_walls(m, 1.0, 0.0, 0.5, ["rim_crackle_a", "rim_crackle_c"])
+    bolts_radial(m, [0, 90, 180, 270], 0.15, 0.9, 0.14, 0.07, ["bolt_c", "bolt_a"])
+    M["st_field"] = m
+    m = Model(STRIKE_YU)                                         # legacy fan, unit = 18 b
+    for i, a in enumerate((-45, -22.5, 0, 22.5, 45)):
+        strip(m, polar(0.03, a), polar(0.98, a), 0.07, "bolt_" + ABC[i % 3], y=0.07)
+        strip(m, polar(0.04, a), polar(0.97, a), 0, "blade_" + ABC[(i + 1) % 3], wall=(0.15, 1.65))
+    M["st_fan"] = m
+
+    # ---- travelling cards (yu 1)
+    for v, (cr, flip) in enumerate((("crackle_a", False), ("crackle_b", True))):
+        m = Model()                                              # x along the chord, z in [-1, 0] (front at 0)
+        m.card((0, 0.05, -0.5), "y", "+x", "-z", 1, 1, "tr_band", 0, (16, 0, 0, 16) if flip else (0, 0, 16, 16))
+        m.card((0, 0.35, -0.12), "z", "+x", "-y", 1, 0.7, cr, 0, (16, 0, 0, 16) if flip else (0, 0, 16, 16))
+        M["tr_seg_" + "ab"[v]] = m
+    m = Model()                                                  # slab: wall at z 0, footprint z in [-1, 0]; y unit = height
+    m.card((0, 0.5, 0), "z", "+x", "-y", 1, 1, "crackle_a")
+    m.card((0, 0.5, -0.02), "z", "-y", "+x", 1, 0.9, "obj_wave_band")
+    m.card((0, 0.02, -0.5), "y", "+x", "-z", 1, 1, "tr_band")
+    M["tr_slab"] = m
+    m = Model()                                                  # orb: flat electric disc radius 1
+    radial(m, 2.5, "chakra_a", 0.0)
+    radial(m, 1.0, "orb_core", 0.02)
+    m.card((0, 0, 0), "z", "+x", "-y", 1.6, 1.6, "chakra_b")
+    M["tr_orb"] = m
+
+    # ---- cue cards (fx/*)
+    m = Model()
+    m.card((0, 0, 0), "z", "+x", "-y", 1.0, 1.0, "glint")      # billboard star, 1 b
+    M["fx_star"] = m
+    m = Model()
+    radial(m, 2 / 0.92, "shockwave", 0.03)
+    M["fx_ring"] = m
+    m = Model()
+    m.card((0, 0, 0), "z", "+x", "-y", 2.5, 2.5, "chakra_b")   # billboard hoop / halo / twirl ring, radius 1
+    M["fx_hoop"] = m
+    m = Model()
+    radial(m, 2.5, "chakra_a", 0.04)
+    radial(m, 2.2, "chakra_b", 0.06, flip=True)
+    M["fx_vortex"] = m
+    m = Model(4)
+    radial(m, 2 / 0.92, "shockwave", 0.05)
+    for k, ang in enumerate((0.0, 45.0, -45.0)):
+        m.card((0, 2.0, 0), "x", "+z", "-y", 2.0, 4.0, "flash", ang)
+    m.card((0, 2.0, 0), "z", "+x", "-y", 2.0, 4.0, "flash")
+    m.card((0, 2.0, 0), "z", "+x", "-y", 2.0, 4.0, "chakra_b")
+    M["fx_dome"] = m
+    m = Model(8)
+    pillar(m, 0, 0, 0.0, 12.0, 2.2, ["pillar_a", "pillar_b"], 4)
+    M["fx_pillar"] = m
+    m = Model(8)
+    pillar(m, 0, 0, 0.0, 11.0, 1.0, ["vbolt_a", "vbolt_b", "vbolt_c"], 4)
+    radial(m, 1.2, "flash", 0.05)
+    M["fx_bolt"] = m
+    m = Model(4)                                                 # crystal line: x in [-0.5, 0.5], z in [0, 1]
+    for i in range(9):
+        z = 0.06 + 0.11 * i
+        x = (-0.2, 0.15, -0.05, 0.25, -0.25, 0.05, 0.2, -0.15, 0.0)[i]
+        h = (1.6, 2.3, 1.2, 2.0, 1.5, 2.6, 1.4, 2.1, 1.8)[i]
+        m.card((x, h / 2, z), "x", "+z", "-y", 0.09, h, "rig_shard", (22.5, -22.5, 0.0)[i % 3])
+        m.card((x, h / 2, z), "z", "+x", "-y", 0.18, h, "rig_shard")
+    M["fx_crystal_line"] = m
+    m = Model(4)
+    for i in range(12):
+        x, z = polar(1.0, 30 * i)
+        h = (1.5, 2.2, 1.2, 1.9)[i % 4]
+        m.card((x, h / 2, z), "x", "+z", "-y", 0.16, h, "rig_shard", (22.5, -22.5, 45.0, 0.0)[i % 4])
+        m.card((x, h / 2, z), "z", "+x", "-y", 0.16, h, "rig_shard")
+    M["fx_crystal_ring"] = m
+    m = Model()
+    crescent(m, 0.0, "crescent_a")
+    M["fx_crescent"] = m
+    m = Model()
+    m.card((0, 0, 0), "z", "-y", "+x", 2.4, 0.3, "rift_a")     # billboard dark vertical line (u along the height)
+    M["fx_line"] = m
+    m = Model()
+    m.card((0, 0, 0), "z", "+x", "-y", 2.0, 2.0, "impact_sparks")
+    m.card((0, 0, 0), "z", "+x", "-y", 1.4, 1.4, "flash")
+    M["fx_burst"] = m
+    m = Model()
+    m.card((0, 0, 0), "z", "+x", "-y", 1.0, 1.0, "flash")
+    M["fx_flash"] = m
+    # ---- compatibility: raiden_enc/tenma.py's shadow summons fx_hazard/after_3 (scale 2, old 8 + world/2 convention)
+    m = Model()                                                  # world = 2 u here: pool radius 1.8 b, 0.02 b up
+    radial(m, 2.0, "dk_pool", 0.01)
+    M["after_3"] = m
+    return M
+
+
+TINTED_DEFAULT = WHITE
+
+
+def save_models(rp, M):
+    modeldir = rp / "assets/rlk/models/item/raiden/fx_hazard"
+    itemdir = rp / "assets/rlk/items/raiden/fx_hazard"
+    for d in (modeldir, itemdir):
+        if d.exists():
+            shutil.rmtree(d)        # this generator owns fx_hazard (drops the 165 v1 frames)
+        d.mkdir(parents=True, exist_ok=True)
+    for name, m in M.items():
+        (modeldir / (name + ".json")).write_text(json.dumps(m.json(), separators=(",", ":")) + "\n", encoding="utf-8")
+        node = {"type": "minecraft:model", "model": "rlk:item/raiden/fx_hazard/" + name,
+                "tints": [{"type": "minecraft:custom_model_data", "index": 0, "default": TINTED_DEFAULT}]}
+        (itemdir / (name + ".json")).write_text(json.dumps({"model": node}, separators=(",", ":")) + "\n", encoding="utf-8")
+    return len(M), max(len(m.elements) for m in M.values())
+
+
+# --------------------------------------------------------------------------- datapack side
+def nbt_tf(tx="0", ty="0", tz="0", sx="1", sy="1", sz="1"):
+    return (f'{{translation:[{tx}f,{ty}f,{tz}f],left_rotation:[0f,0f,0f,1f],scale:[{sx}f,{sy}f,{sz}f],'
+            f'right_rotation:[0f,1f,0f,0f]}}')
+
+
+def display(tags, model, tf, *, custom=None, color=WHITE, billboard="fixed", tp_dur=0, view=2):
+    comps = f'"minecraft:item_model":"{model}","minecraft:custom_model_data":{{colors:[{color}]}}'
+    if custom:
+        comps += f',"minecraft:custom_data":{custom}'
+    tl = ",".join(f'"{t}"' for t in tags)
+    return (f'summon minecraft:item_display ~ ~ ~ {{Tags:[{tl}],billboard:"{billboard}",item_display:"none",'
+            f'view_range:{view}f,width:0f,height:0f,shadow_radius:0f,brightness:{{block:15,sky:15}},interpolation_duration:0,'
+            f'teleport_duration:{tp_dur},transformation:{tf},item:{{id:"minecraft:paper",count:1,components:{{{comps}}}}}}}')
 
 
 def build(root, out):
@@ -537,158 +433,297 @@ def build(root, out):
     texdir = rp / TEX_SUBDIR
     if not all((texdir / (n + ".png")).exists() for n in FX):
         build_fx_textures(rp)
-    modeldir = rp / "assets/rlk/models/item/raiden/fx_hazard"
-    itemdir = rp / "assets/rlk/items/raiden/fx_hazard"
-    modeldir.mkdir(parents=True, exist_ok=True)
-    itemdir.mkdir(parents=True, exist_ok=True)
+    M = models()
+    nmodels, maxel = save_models(rp, M)
+    fxdir = root / "data/rlk/function/boss/raiden/fx"
+    if fxdir.exists():
+        shutil.rmtree(fxdir)
 
-    def write(name, lines):
-        path = out / (name + ".mcfunction")
+    def write(name, lines, base=out):
+        path = base / (name + ".mcfunction")
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    stats = {"models": 0, "max": 0}
+    def wfx(name, lines):
+        write(name, lines, fxdir)
 
-    def save(name, model):
-        (modeldir / (name + ".json")).write_text(json.dumps(model.json(), separators=(",", ":")) + "\n", encoding="utf-8")
-        node = {"type": "minecraft:model", "model": "rlk:item/raiden/fx_hazard/" + name}
-        if model.tint is not None:
-            node["tints"] = [{"type": "minecraft:constant", "value": model.tint}]
-        (itemdir / (name + ".json")).write_text(json.dumps({"model": node}, separators=(",", ":")) + "\n", encoding="utf-8")
-        stats["models"] += 1
-        if len(model.elements) > stats["max"]:
-            stats["max"], stats["maxname"] = len(model.elements), name
+    def mid(name):
+        assert name in M, name
+        return MODEL_NS + name
 
-    for shape in SHAPES:
-        m = Model()
-        decal(m, shape, "tele")
-        save(f"warning_{shape}", m)
-        for phase in (0, 1):
-            m = Model()
-            decal(m, shape, "charged", Y_DECAL, TINT_CHARGE0 if phase == 0 else None)
-            if phase:
-                edge_crackle(m, shape, 0)
-            charge_sparks(m, shape, phase)
-            save(f"charge_{shape}_{phase}", m)
-        if shape != 11:
-            save(f"strike_{shape}", strike(shape, Style("hot", 0)))
-            save(f"strike_{shape}_1", strike(shape, Style("hot", 1)))
-            save(f"strike_{shape}_2", strike(shape, Style("hot", 2)))
-            save(f"after_{shape}", strike(shape, Style("after")))
-            save(f"after_{shape}_fade", strike(shape, Style("fade")))
-    for frame in range(RING_FRAMES):
-        save(f"ring_{frame:02}", ring(frame))
+    OWN = 'scoreboard players operation #rdOwner rd = @s rdHId'
+    VNEW = '@e[tag=rlk_rd_vnew,limit=1]'
+    # ---------------------------------------------------------------- the display clock
+    write("vfx_world", [
+        '# Every tick after the hazards (and from pause / transform after killing them).',
+        f'execute if entity @e[tag=rlk_rd_hvis,limit=1] run function {H}vis/orphans',
+        f'execute if entity @e[tag=rlk_rd_fx,limit=1] run function {H}fx_tick',
+        f'execute if entity @e[tag=rlk_rd_fxa,tag=!rlk_rd_fxnew,limit=1] as @e[tag=rlk_rd_fxa,tag=!rlk_rd_fxnew] run function {H}fx_anim',
+        'tag @e[tag=rlk_rd_fxnew] remove rlk_rd_fxnew',
+    ])
+    write("vis/orphans", [
+        '# A hazard-bound display sits exactly on its hazard origin; one without a hazard there is an orphan.',
+        'tag @e[tag=rlk_rd_hvis] add rlk_rd_orph',
+        'execute as @e[tag=rlk_rd_hazard] at @s run tag @e[tag=rlk_rd_orph,distance=..0.05] remove rlk_rd_orph',
+        'kill @e[tag=rlk_rd_orph]',
+    ])
+    write("fx_anim", [
+        '# One-shot interpolation, the tick after the summon (travelling cards: exactly the launch tick).',
+        'data modify entity @s transformation set from entity @s item.components."minecraft:custom_data".to',
+        'data modify entity @s interpolation_duration set from entity @s item.components."minecraft:custom_data".d',
+        'data modify entity @s start_interpolation set value 0',
+        'tag @s remove rlk_rd_fxa',
+    ])
+    cm = 'item.components."minecraft:custom_model_data".colors[0]'
+    write("fx_tick", [
+        '# Timed cards: countdown (not on their summon tick), kill at 0, strike frames by remaining life.',
+        'scoreboard players remove @e[tag=rlk_rd_fx,tag=!rlk_rd_fxnew] rdHLife 1',
+        'kill @e[tag=rlk_rd_fx,scores={rdHLife=..0}]',
+    ] + [f'execute as @e[tag=rlk_rd_strike,tag=rlk_rd_fx,scores={{rdHLife={life}}}] run data modify entity @s {cm} set value {col}'
+         for life, col in sorted(FLASH.items(), reverse=True)] + [
+        f'execute as @e[tag=rlk_rd_strike,tag=rlk_rd_fx,scores={{rdHLife={AFTER_AT}}}] run function {H}fx_after',
+        f'execute as @e[tag=rlk_rd_fx,scores={{rdHLife={FADE_AT}}}] run function {H}fx_fade',
+    ])
+    write("fx_after", [
+        'data modify entity @s item.components."minecraft:item_model" set from entity @s item.components."minecraft:custom_data".after',
+        f'data modify entity @s {cm} set value {AFTER_TINT}',
+    ])
+    write("fx_fade", [f'data modify entity @s {cm} set from entity @s item.components."minecraft:custom_data".fade'])
 
-    owned='@e[type=minecraft:item_display,tag=rlk_rd_hvfx]'
-    new='@e[tag=rlk_rd_vnew,limit=1]'
-    modelset=lambda name: 'data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_hazard/'+name+'"'
-    write("vfx_init",[
-        '# One display per fixed hazard origin; all geometry is in its local coordinates.',
-        '# Native ItemDisplayRenderer applies Y=180deg after display transformations.',
-        '# Right-rotate 180deg to cancel that item-only flip: mesh +Z now equals ^ ^ ^forward.',
-        'scoreboard players add #rdHazardSerial rd 1',
-        'scoreboard players operation @s rdHId = #rdHazardSerial rd',
-        '# Culling box: wide enough for the outermost ring frame (radius RING_END plus its band).',
-        'summon minecraft:item_display ~ ~ ~ {Tags:["rlk_rd_hvfx","rlk_rd_vnew","rlk_raiden_aux","rlk_room"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",interpolation_duration:0,teleport_duration:0,view_range:3f,width:'+str(CULL_W)+'f,height:22f,shadow_radius:0f,brightness:{block:15,sky:15},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[32f,32f,32f],right_rotation:[0f,1f,0f,0f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/fx_hazard/warning_1"}}}',
-        f'data modify entity {new} Rotation set from entity @s Rotation',
-        f'scoreboard players operation {new} rdVId = @s rdHId',
-        f'scoreboard players operation {new} rdShape = @s rdShape',
-        f'scoreboard players set {new} rdWind 0',
-        f'scoreboard players set {new} rdHAge 0',
-        f'execute as {new} run function rlk:boss/raiden/hazard/vfx_warning',
+    # ---------------------------------------------------------------- hazard-bound visuals
+    # decal: storage rlk:rd v {m, kt, sx, sz, sx0, sz0, tz, d}
+    dec = ['# @s = hazard at its origin (rotated as it). The B.3 decal, sized to the hazard; rings open with an expand.',
+           'data modify storage rlk:rd v set value {tz:0f,d:1}']
+    for dk, (kt, model, sizing) in DECALS.items():
+        dec.append(f'execute if score @s rdHDk matches {dk} run function {H}vis/dk/{dk}')
+        write(f"vis/dk/{dk}", [f'data modify storage rlk:rd v.m set value "{model}"',
+                               f'data modify storage rlk:rd v.kt set value "{kt}"',
+                               f'data modify storage rlk:rd v.d set value {DECAL_INTRO.get(dk, 1)}'])
+    dec += [
+        '# radius: annulus = r (B); every other radial kind = A. band: width 2B x length A (rect / to_wall), offset C.',
+        'scoreboard players operation #rdSx rd = @s rdHA',
+        'execute if score @s rdHK matches 2 run scoreboard players operation #rdSx rd = @s rdHB',
+        'scoreboard players operation #rdSz rd = #rdSx rd',
+        f'execute if score @s rdHDk matches 5 run function {H}vis/decal_band',
+        'execute store result storage rlk:rd v.sx float 0.001 run scoreboard players get #rdSx rd',
+        'execute store result storage rlk:rd v.sz float 0.001 run scoreboard players get #rdSz rd',
+        'execute store result storage rlk:rd v.sx0 float 0.001 run scoreboard players get #rdSx rd',
+        'execute store result storage rlk:rd v.sz0 float 0.001 run scoreboard players get #rdSz rd',
+    ] + [f'execute if score @s rdHDk matches {dk} store result storage rlk:rd v.sx0 float 0.00025 run scoreboard players get #rdSx rd'
+         for dk in DECAL_INTRO] + [
+        f'execute if score @s rdHDk matches {dk} store result storage rlk:rd v.sz0 float 0.00025 run scoreboard players get #rdSz rd'
+        for dk in DECAL_INTRO] + [
+        f'function {H}vis/decal_summon with storage rlk:rd v',
+        f'tp {VNEW} ~ ~ ~ ~ 0',
+        f'scoreboard players operation {VNEW} rdVId = @s rdHId',
         'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew',
+    ]
+    write("vis/decal", dec)
+    write("vis/decal_band", [
+        'scoreboard players operation #rdSx rd = @s rdHB',
+        'scoreboard players operation #rdSx rd += @s rdHB',
+        'scoreboard players operation #rdSz rd = @s rdHA',
+        'execute if score @s rdHK matches 3..4 store result storage rlk:rd v.tz float 0.001 run scoreboard players get @s rdHC',
     ])
-    write("vfx_warning",[f'execute if score @s rdShape matches {s} run {modelset("warning_"+str(s))}' for s in SHAPES])
-    write("charge",[
-        '# Four ticks before impact: charged borders, no full-path strike yet.',
-        'scoreboard players operation #rdVfxOwner rd = @s rdHId',
-        'scoreboard players set #rdChargeFrame rd 0',
-        'execute if score #rdUntil rd matches 1..2 run scoreboard players set #rdChargeFrame rd 1',
-        f'execute as {owned} if score @s rdVId = #rdVfxOwner rd run function rlk:boss/raiden/hazard/vfx_charge',
+    write("vis/decal_summon", ['$' + display(
+        ["rlk_rd_hvis", "rlk_rd_decal", "rlk_rd_decal_$(kt)", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew", "rlk_rd_fxa",
+         "rlk_rd_fxnew"], MODEL_NS + "$(m)", nbt_tf(tz="$(tz)", sx="$(sx0)", sz="$(sz0)"),
+        custom='{d:$(d),to:' + nbt_tf(tz="$(tz)", sx="$(sx)", sz="$(sz)") + '}', tp_dur=1)])
+    write("vis/decal_off", [OWN, 'execute as @e[tag=rlk_rd_decal,distance=..0.05] if score @s rdVId = #rdOwner rd run kill @s'])
+
+    # strike: storage rlk:rd v {m, a, sx, sz, tz, sx0, sz0, d}
+    st = ['# @s = hazard at its origin. The strike visual of a static hazard, sized to it (life 10: flash, flicker,',
+          '# residue, fade). Field crackle stays bound to the hazard instead.',
+          'data modify storage rlk:rd v set value {tz:0f,d:1}']
+    for sv, (_, hot, after) in STRIKES.items():
+        st.append(f'execute if score @s rdHSv matches {sv} run function {H}vis/sv/{sv}')
+        write(f"vis/sv/{sv}", [f'data modify storage rlk:rd v.m set value "{hot}"',
+                               f'data modify storage rlk:rd v.a set value "{after}"'])
+    st += [
+        'scoreboard players operation #rdSx rd = @s rdHA',
+        'execute if score @s rdHK matches 2 run scoreboard players operation #rdSx rd = @s rdHB',
+        'scoreboard players operation #rdSz rd = #rdSx rd',
+        f'execute if score @s rdHK matches 3..4 run function {H}vis/decal_band',
+        'execute store result storage rlk:rd v.sx float 0.001 run scoreboard players get #rdSx rd',
+        'execute store result storage rlk:rd v.sz float 0.001 run scoreboard players get #rdSz rd',
+        'execute store result storage rlk:rd v.sx0 float 0.00075 run scoreboard players get #rdSx rd',
+        'execute store result storage rlk:rd v.sz0 float 0.00075 run scoreboard players get #rdSz rd',
+        'execute if score @s rdHK matches 3..4 run function %svis/strike_full' % H,
+        f'execute if score @s rdHK matches {KINDS["field"]} run function {H}vis/field_summon with storage rlk:rd v',
+        f'execute unless score @s rdHK matches {KINDS["field"]} run function {H}vis/strike_summon with storage rlk:rd v',
+        f'tp {VNEW} ~ ~ ~ ~ 0',
+        f'scoreboard players set {VNEW} rdHLife {STRIKE_LIFE}',
+        f'scoreboard players operation {VNEW} rdVId = @s rdHId',
+        'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew',
+    ]
+    write("vis/strike", st)
+    write("vis/strike_full", ['# rect / to_wall: no expand (a slash is instant along its whole length)',
+                              'data modify storage rlk:rd v.sx0 set from storage rlk:rd v.sx',
+                              'data modify storage rlk:rd v.sz0 set from storage rlk:rd v.sz'])
+    write("vis/strike_summon", ['$' + display(
+        ["rlk_rd_fx", "rlk_rd_strike", "rlk_rd_fxa", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew"],
+        MODEL_NS + "$(m)", nbt_tf(tz="$(tz)", sx="$(sx0)", sy=str(STRIKE_YU), sz="$(sz0)"),
+        custom='{d:3,after:"' + MODEL_NS + '$(a)",fade:' + str(FADE_TINT) + ',to:' +
+               nbt_tf(tz="$(tz)", sx="$(sx)", sy=str(STRIKE_YU), sz="$(sz)") + '}')])
+    write("vis/field_summon", ['$' + display(
+        ["rlk_rd_hvis", "rlk_rd_strike", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew"],
+        MODEL_NS + "$(m)", nbt_tf(sx="$(sx)", sy=str(STRIKE_YU), sz="$(sz)"))])
+
+    # travelling cards
+    tr = ['# @s = travelling hazard, one tick before its launch: summon its cards at the start state; the display clock',
+          '# gives them their ONE interpolation (to the end state over F ticks) on the launch tick.',
+          'execute store result storage rlk:rd v.d int 1 run scoreboard players get @s rdHF',
+          'scoreboard players operation #rdR1 rd = @s rdHB',
+          'scoreboard players operation #rdR1 rd *= @s rdHF',
+          'scoreboard players operation #rdR1 rd /= #rdK1000 rd',
+          'scoreboard players operation #rdR1 rd += @s rdHA',
+          'execute store result storage rlk:rd v.tz0 float 0.001 run scoreboard players get @s rdHA',
+          'execute store result storage rlk:rd v.tz1 float 0.001 run scoreboard players get #rdR1 rd',
+          f'execute if score @s rdHK matches {KINDS["sweep"]} run function {H}vis/travel_sweep',
+          f'execute if score @s rdHK matches {KINDS["slab"]} run function {H}vis/travel_slab',
+          f'execute if score @s rdHK matches {KINDS["orb"]} run function {H}vis/travel_orb',
+          'scoreboard players operation @e[tag=rlk_rd_vown] rdVId = @s rdHId',
+          'tag @e[tag=rlk_rd_vown] remove rlk_rd_vown']
+    write("vis/travel", tr)
+    chord_k = round(SEG_CHORD, 6)
+    write("vis/travel_sweep", [
+        f'execute store result storage rlk:rd v.cx0 float {chord_k / 1000:.9f} run scoreboard players get @s rdHA',
+        f'execute store result storage rlk:rd v.cx1 float {chord_k / 1000:.9f} run scoreboard players get #rdR1 rd',
+        'execute store result storage rlk:rd v.bz float 0.001 run scoreboard players get @s rdHC',
+    ] + [f'execute if score @s rdHSv matches {n} run function {H}vis/seg/n{n}' for n in [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 24]])
+    for n in [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 24]:
+        ks = list(range(24)) if n == 24 else list(range(-(n // 2), n // 2 + 1))
+        lines = [f'# {n} ring cards, {SEG_DEG} deg apart, centred on the yaw.']
+        for k in ks:
+            lines.append(f'execute rotated ~{k * SEG_DEG} 0 run function {H}vis/seg_{"ab"[k % 2]} with storage rlk:rd v')
+        write(f"vis/seg/n{n}", lines)
+    for v in "ab":
+        write(f"vis/seg_{v}", ['$' + display(
+            ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxa", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
+             "rlk_rd_vnew"], mid("tr_seg_" + v), nbt_tf(tz="$(tz0)", sx="$(cx0)", sz="$(bz)"),
+            custom='{d:$(d),to:' + nbt_tf(tz="$(tz1)", sx="$(cx1)", sz="$(bz)") + '}'),
+            f'tp {VNEW} ~ ~ ~ ~ 0', f'tag {VNEW} add rlk_rd_vown', 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'])
+    write("vis/travel_slab", [
+        'scoreboard players operation #rdSx rd = @s rdHC',
+        'scoreboard players operation #rdSx rd += @s rdHC',
+        'execute store result storage rlk:rd v.sx float 0.001 run scoreboard players get #rdSx rd',
+        'execute store result storage rlk:rd v.sy float 0.001 run scoreboard players get @s rdHE',
+        'execute store result storage rlk:rd v.sz float 0.001 run scoreboard players get @s rdHD',
+        f'function {H}vis/slab_summon with storage rlk:rd v',
+        f'tp {VNEW} ~ ~ ~ ~ 0', f'tag {VNEW} add rlk_rd_vown', 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'])
+    write("vis/slab_summon", ['$' + display(
+        ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxa", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
+         "rlk_rd_vnew"], mid("tr_slab"), nbt_tf(tz="$(tz0)", sx="$(sx)", sy="$(sy)", sz="$(sz)"),
+        custom='{d:$(d),to:' + nbt_tf(tz="$(tz1)", sx="$(sx)", sy="$(sy)", sz="$(sz)") + '}')])
+    write("vis/travel_orb", [
+        'execute store result storage rlk:rd v.sx float 0.001 run scoreboard players get @s rdHC',
+        'execute store result storage rlk:rd v.ty float 0.001 run scoreboard players get @s rdHE',
+        f'function {H}vis/orb_summon with storage rlk:rd v',
+        f'tp {VNEW} ~ ~ ~ ~ 0', f'tag {VNEW} add rlk_rd_vown', 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'])
+    write("vis/orb_summon", ['$' + display(
+        ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxa", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
+         "rlk_rd_vnew"], mid("tr_orb"), nbt_tf(ty="$(ty)", tz="$(tz0)", sx="$(sx)", sz="$(sx)"),
+        custom='{d:$(d),to:' + nbt_tf(ty="$(ty)", tz="$(tz1)", sx="$(sx)", sz="$(sx)") + '}')])
+    write("vis/impact", [
+        '# At the body: a travelling / follow / field hazard reached the player (dodged or not).',
+        display(["rlk_rd_fx", "rlk_rd_strike", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew"],
+                mid("fx_burst"), nbt_tf(ty="1", sx="1.4", sy="1.4", sz="1.4"), billboard="center",
+                custom='{after:"' + mid("fx_flash") + f'",fade:{FADE_TINT}}}'),
+        f'scoreboard players set {VNEW} rdHLife 6',
+        'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew',
+        'playsound minecraft:entity.lightning_bolt.impact hostile @a[tag=player] ~ ~ ~ 0.35 1.8 0.1',
     ])
-    write("vfx_charge",['scoreboard players set @s rdWind 2']+[
-        f'execute if score @s rdShape matches {s} if score #rdChargeFrame rd matches {p} run {modelset(f"charge_{s}_{p}")}'
-        for s in SHAPES for p in (0,1)
-    ])
-    write("warning",['# Warning display persists; no repeated particle burst or entity allocation.'])
-    for shape in SHAPES:
-        write(f"warning/s{shape}",['# Mesh: rlk:raiden/fx_hazard/warning_'+str(shape)])
-    write("strike",[
-        'scoreboard players operation #rdVfxOwner rd = @s rdHId',
-        f'execute as {owned} if score @s rdVId = #rdVfxOwner rd run function rlk:boss/raiden/hazard/vfx_strike',
-        'playsound minecraft:entity.lightning_bolt.impact hostile @a[tag=player] ~ ~ ~ 0.50 1.25 0.2',
-        'execute if score @s rdShape matches 4..8 run playsound minecraft:entity.lightning_bolt.thunder hostile @a[tag=player] ~ ~ ~ 0.60 1.35 0.25',
-        'execute if score @s rdShape matches 12 run playsound minecraft:entity.lightning_bolt.thunder hostile @a[tag=player] ~ ~ ~ 0.55 1.5 0.25',
-        'function rlk:boss/raiden/hazard/hit',
-    ])
-    write("vfx_strike",[
-        '# Whole path flashes on the exact damage tick; this is instantaneous lightning.',
-        'scoreboard players set @s rdWind 1',
-        'scoreboard players set @s rdHAge -1',
-    ]+[f'execute if score @s rdShape matches {s} run {modelset("strike_"+str(s))}' for s in SHAPES if s!=11])
-    for phase in (1,2):
-        write(f"vfx_flash_{phase}",[
-            '# The whole area remains lit; only branch topology changes, not hit travel.',
-        ]+[f'execute if score @s rdShape matches {s} run {modelset(f"strike_{s}_{phase}")}' for s in SHAPES if s!=11])
-    write("vfx_after",[f'execute if score @s rdShape matches {s} run {modelset("after_"+str(s))}' for s in SHAPES if s!=11])
-    write("vfx_fade",[f'execute if score @s rdShape matches {s} run {modelset("after_"+str(s)+"_fade")}' for s in SHAPES if s!=11])
-    for shape in SHAPES:
-        if shape!=11:
-            write(f"strike/s{shape}",['# Strike mesh is selected by vfx_strike on the owning display.'])
-    for frame in range(RING_FRAMES):
-        write(f"ring/f{frame:02}",[
-            f'# Exact ring radius {2+(RING_END-2)*frame/(RING_FRAMES-1):.6f}; visible band half-width0.7.',
-            'scoreboard players operation #rdVfxOwner rd = @s rdHId',
-            f'execute as {owned} if score @s rdVId = #rdVfxOwner rd run {modelset("ring_"+f"{frame:02}")}',
-        ])
-    write("ring_tick",[
-        'scoreboard players operation #rdElapsed rd = @s rdHAge',
-        'scoreboard players operation #rdElapsed rd -= @s rdWind',
-        f'execute if score #rdElapsed rd matches {RING_FRAMES}.. run return run function rlk:boss/raiden/hazard/expire',
-        f'execute unless score #rdElapsed rd matches 0..{RING_FRAMES-1} run return 0',
-        '# Every damage radius receives its matching model in the same tick.',
-        'function rlk:boss/raiden/hazard/ring_draw',
-        'execute if score #rdElapsed rd matches 0 run playsound minecraft:entity.lightning_bolt.impact hostile @a[tag=player] ~ ~ ~ 0.35 1.6 0.2',
-        'execute unless score @s rdHHit matches 1 run function rlk:boss/raiden/hazard/hit',
-    ])
-    write("vfx_world",[
-        '# Call after hazard updates and from pause: removes canceled/orphan effects immediately.',
-        f'execute as {owned} run function rlk:boss/raiden/hazard/vfx_tick',
-    ])
-    write("expire",[
-        f'# Cancel the display and its parent together; the ring ends at frame{RING_FRAMES}.',
-        'scoreboard players operation #rdVfxOwner rd = @s rdHId',
-        f'execute as {owned} if score @s rdVId = #rdVfxOwner rd run kill @s',
-        'kill @s',
-    ])
-    write("vfx_tick",[
-        'scoreboard players operation #rdVfxOwner rd = @s rdVId',
-        'scoreboard players set #rdVfxExists rd 0',
-        'execute as @e[tag=rlk_rd_hazard] if score @s rdHId = #rdVfxOwner rd run scoreboard players set #rdVfxExists rd 1',
-        'execute if score #rdVfxExists rd matches 0 run return run kill @s',
-        'execute unless score @s rdWind matches 1 run return 0',
-        'scoreboard players add @s rdHAge 1',
-        'execute if score @s rdHAge matches 1 run function rlk:boss/raiden/hazard/vfx_flash_1',
-        'execute if score @s rdHAge matches 2 run function rlk:boss/raiden/hazard/vfx_flash_2',
-        'execute if score @s rdHAge matches 3 run function rlk:boss/raiden/hazard/vfx_after',
-        'execute if score @s rdHAge matches 6 run function rlk:boss/raiden/hazard/vfx_fade',
-        'execute if score @s rdHAge matches 9.. run kill @s',
-    ])
-    # The base generator owns the damage math and lifecycle. Attach creation
-    # only after forward-axis caching, preserving its original command order.
-    initpath=out/"init.mcfunction"
-    original=initpath.read_text(encoding="utf-8")
-    original=original.replace('function rlk:boss/raiden/hazard/warning\n',
-                              'function rlk:boss/raiden/hazard/vfx_init\n')
-    initpath.write_text(original,encoding="utf-8")
-    tickpath=out/"tick_at.mcfunction"
-    original=tickpath.read_text(encoding="utf-8")
-    original=original.replace('run return run kill @s',
-                              'run return run function rlk:boss/raiden/hazard/expire')
-    original=original.replace('scoreboard players operation #rdMod rd = @s rdHAge',
-                              'scoreboard players operation #rdUntil rd = @s rdWind\n'
-                              'scoreboard players operation #rdUntil rd -= @s rdHAge\n'
-                              'execute if score #rdUntil rd matches 1..4 run function rlk:boss/raiden/hazard/charge\n'
-                              'scoreboard players operation #rdMod rd = @s rdHAge')
-    tickpath.write_text(original,encoding="utf-8")
-    print(f"Built {stats['models']} textured display meshes (largest {stats['maxname']}: {stats['max']} cards): 13 gradient telegraph decals, 26 charge frames, 36 strike frames, 24 afterglows, {RING_FRAMES} exact ring frames.")
+
+    # ---------------------------------------------------------------- D.1 cues (fx/<cue>) and sounds (fx/snd/<cue>)
+    def snd_lines(cue):
+        return [f'playsound minecraft:{ev} hostile @a[tag=player] ~ ~ ~ {vol} {pit} 0.25' for ev, vol, pit in SOUNDS[cue]]
+
+    for cue in SOUNDS:
+        wfx(f"snd/{cue}", [f'# D.1 sound recipe "{cue}" (vanilla only).'] + snd_lines(cue))
+
+    def card(model, life, *, y=0.0, s0=(1, 1, 1), s1=None, d=4, color=WHITE, billboard="fixed", fade=None):
+        tags = ["rlk_rd_fx", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew"] + (["rlk_rd_fxa"] if s1 else [])
+        custom = []
+        if s1:
+            custom.append(f'd:{d},to:' + nbt_tf(ty=f"{y:g}", sx=f"{s1[0]:g}", sy=f"{s1[1]:g}", sz=f"{s1[2]:g}"))
+        if fade is not None:
+            custom.append(f'fade:{fade}')
+        return [display(tags, mid(model), nbt_tf(ty=f"{y:g}", sx=f"{s0[0]:g}", sy=f"{s0[1]:g}", sz=f"{s0[2]:g}"),
+                        custom='{' + ','.join(custom) + '}' if custom else None, color=color, billboard=billboard),
+                f'tp {VNEW} ~ ~ ~ ~ 0', f'scoreboard players set {VNEW} rdHLife {life}',
+                'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew']
+
+    DARK, GOLD, CYAN, PINK, PALE = 0x4A3270, 0xFFD27A, 0x9FE6FF, 0xFFA8E8, 0xE8E0FF
+    CUES = {
+        'star': card('fx_star', 8, s0=(0.4, 0.4, 0.4), s1=(1.3, 1.3, 1.3), d=2, billboard="center")
+        + card('fx_ring', 8, s0=(0.2, 1, 0.2), s1=(1, 1, 1), d=4),
+        'blink_out': card('fx_flash', 5, y=1.0, s0=(1.6, 2.2, 1.6), s1=(0.3, 2.6, 0.3), d=4, color=0xB48CFF, billboard="center"),
+        'blink_in': card('fx_flash', 5, y=1.0, s0=(0.3, 2.6, 0.3), s1=(1.4, 1.8, 1.4), d=3, color=0xB48CFF, billboard="center"),
+        'switch_hoop': card('fx_hoop', 10, y=1.2, s0=(1.25, 1.25, 1.25), color=DARK, billboard="center"),
+        'switch_vortex': card('fx_vortex', 16, s0=(0.6, 1, 0.6), s1=(4.5, 1, 4.5), d=12, color=0xC6A6FF),
+        'switch_burst': card('fx_dome', 10, s0=(1, 4, 1), s1=(6, 4, 6), d=4)
+        + card('fx_ring', 10, s0=(1, 1, 1), s1=(6.5, 1, 6.5), d=5),
+        'bolt': card('fx_bolt', 7, s0=(1.2, 8, 1.2)) + card('fx_ring', 8, s0=(0.5, 1, 0.5), s1=(3, 1, 3), d=4),
+        'bolt_big': card('fx_bolt', 8, s0=(2.4, 8, 2.4)) + card('fx_ring', 10, s0=(1, 1, 1), s1=(6, 1, 6), d=5),
+        'crystal': card('fx_crystal_ring', 14, s0=(2.5, 4, 2.5), s1=(3, 4, 3), d=3),
+        'parry': card('fx_crescent', 6, y=1.0, s0=(1.2, 1, 1.2), color=GOLD),
+        'counter_cue': card('fx_line', 10, y=1.2, s0=(1, 1, 1), color=0x24123C, billboard="center"),
+        'guard_shatter': card('fx_burst', 8, y=1.2, s0=(1.5, 1.5, 1.5), s1=(3.2, 3.2, 3.2), d=4, billboard="center")
+        + card('fx_pillar', 100, s0=(1.6, 8, 1.6), color=GOLD),
+        'eye_spawn': card('fx_pillar', 10, s0=(0.7, 8, 0.7), color=CYAN),
+        'eye_break': card('fx_burst', 10, s0=(1, 1, 1), s1=(3.4, 3.4, 3.4), d=4, color=0xFFD6F4, billboard="center"),
+        'eye_blast': card('fx_dome', 10, s0=(2, 4, 2), s1=(5, 4, 5), d=4, color=0xD8B8FF),
+        'musou_slash': card('fx_crescent', 12, y=1.6, s0=(4, 1, 4), s1=(19, 1, 19), d=6, color=PALE)
+        + card('fx_flash', 8, y=2.0, s0=(6, 6, 6), billboard="center"),
+        'glaive_throw': card('fx_pillar', 6, s0=(0.5, 8, 0.5), color=PINK),
+        'bomb': card('fx_burst', 8, y=1.0, s0=(1.2, 1.2, 1.2), s1=(3.5, 3.5, 3.5), d=3, billboard="center")
+        + card('dk_pool', 14, s0=(1, 1, 1), s1=(3.5, 1, 3.5), d=4),
+        'iai_charge': card('fx_ring', 8, y=1.0, s0=(1.2, 1, 1.2), s1=(0.2, 1, 0.2), d=8, color=PALE),
+        'danjeol_halo': card('fx_hoop', 14, y=2.6, s0=(0.6, 0.6, 0.6), s1=(1.4, 1.4, 1.4), d=4, color=PALE, billboard="center"),
+        'danjeol_column': card('fx_pillar', 30, s0=(1.4, 8, 1.4), color=0xC8A8FF),
+        'clap_star': card('fx_star', 14, s0=(0.5, 0.5, 0.5), s1=(1.6, 1.6, 1.6), d=3, color=0xFFE8FF, billboard="center"),
+        'shadow_palm': card('dk_pool', 12, s0=(2, 1, 2), s1=(5, 1, 5), d=4)
+        + card('fx_burst', 6, y=0.8, s0=(2.5, 2.5, 2.5), color=0xB070FF, billboard="center"),
+        'vajra_pulse': card('fx_flash', 4, y=3.6, s0=(1.4, 1.4, 1.4), billboard="center"),
+        'mangeop_dome': card('fx_ring', 8, s0=(1, 1, 1), s1=(8, 1, 8), d=8, color=0xBFE8FF),
+        'mangeop_slash': card('fx_crescent', 8, y=2.5, s0=(6, 1, 6), s1=(24, 1, 24), d=6, color=PALE)
+        + card('fx_flash', 6, y=2.5, s0=(10, 10, 10), billboard="center"),
+        'transform_burst': card('fx_dome', 12, s0=(1, 4, 1), s1=(7, 4, 7), d=5),
+    }
+    for cue in SOUNDS:
+        wfx(cue, [f'# D.1 cue "{cue}": visual (if any) + sound recipe. Run it at the cue spot.'] +
+            CUES.get(cue, []) + [f'function {F}snd/{cue}'])
+    # cues with a run-time size or life (macro)
+    tw = card('fx_hoop', 0, y=1.8, s0=(0.75, 0.75, 0.75), color=0xF2E8FF, billboard="center")
+    wfx("twirl", ['# Polearm twirl: the bright vertical ring (1.5 b) for {life} ticks; call fx/snd/twirl_beat every 6 t.',
+                  tw[0], tw[1], f'$scoreboard players set {VNEW} rdHLife $(life)', tw[3], f'function {F}snd/twirl'])
+    eg = card('fx_dome', 0, s0=(1, 4, 1), color=CYAN)
+    wfx("eye_glow", ['# Cyan dome glow (danger) over a surviving eye: {r} blocks, {life} ticks.',
+                     '$' + eg[0].replace('scale:[1f,4f,1f]', 'scale:[$(r)f,4f,$(r)f]'), eg[1],
+                     f'$scoreboard players set {VNEW} rdHLife $(life)', eg[3], f'function {F}snd/eye_glow'])
+    cl = card('fx_crystal_line', 0, s0=(1.6, 4, 1))
+    wfx("crystal_line", ['# Crystal wall along the yaw: {len} blocks long, 1.6 wide (판결의 검, 26 hit 2).',
+                         '$' + cl[0].replace('scale:[1.6f,4f,1f]', 'scale:[1.6f,4f,$(len)f]'), cl[1],
+                         f'scoreboard players set {VNEW} rdHLife 16', cl[3], f'function {F}snd/crystal'])
+    cr = card('fx_crystal_ring', 0, s0=(1, 4, 1))
+    wfx("crystal_ring", ['# Crystal spikes on a circle of radius {r} (수천수만의 염원, transformation).',
+                         '$' + cr[0].replace('scale:[1f,4f,1f]', 'scale:[$(r)f,4f,$(r)f]'), cr[1],
+                         f'scoreboard players set {VNEW} rdHLife 16', cr[3], f'function {F}snd/crystal'])
+    # state decals (not hazards) and the field tint
+    for dk, (kt, model, sizing) in DECALS.items():
+        c = card(model, 0, s0=(1, 1, 1))
+        summon = c[0].replace('"rlk_rd_fx",', f'"rlk_rd_fx","rlk_rd_sdecal","rlk_rd_sdecal_{kt}",')
+        summon = summon.replace('scale:[1f,1f,1f]', 'scale:[$(sx)f,1f,$(sz)f]')
+        wfx(f"decal/d{dk}", [f'# State decal {kt} ({model}): {{sx, sz}} blocks, {{life}} ticks (99999 = until killed).',
+                             '$' + summon, c[1], f'$scoreboard players set {VNEW} rdHLife $(life)', c[3]])
+    c = card('dk_tint', 0, s0=(24.6, 1, 24.6))
+    wfx("decal/tint", ['# Whole-field tint (time stop, 만겁): a uniform 35 % violet over the arena floor (r 24.6: its edge is under the wall), {life} ticks.',
+                       '# Run it at the arena centre.',
+                       c[0].replace('"rlk_rd_fx",', '"rlk_rd_fx","rlk_rd_sdecal","rlk_rd_sdecal_tint",'), c[1],
+                       f'$scoreboard players set {VNEW} rdHLife $(life)', c[3]])
+    wfx("musou_dark", ['# Time-stop darkening: the field tint for {life} ticks + the sonic charge. Run at the arena centre.',
+                       f'$function {F}decal/tint {{life:$(life)}}', f'function {F}snd/musou_dark'])
+    wfx("mangeop_tint", ['# 만겁 arena tint for {life} ticks. Run at the arena centre.',
+                         f'$function {F}decal/tint {{life:$(life)}}', f'function {F}snd/mangeop_tint'])
+    print(f"Built {nmodels} unit display meshes (largest {maxel} cards), {len(SOUNDS)} sound recipes, "
+          f"{len(CUES) + 6} visual cues.")

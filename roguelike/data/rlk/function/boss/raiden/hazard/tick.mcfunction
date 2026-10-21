@@ -1,2 +1,2 @@
-# Root only needs to select the marker; position and rotation belong to it.
+# World: execute as @e[tag=rlk_rd_hazard] at @s run function ...hazard/tick
 execute at @s rotated as @s run function rlk:boss/raiden/hazard/tick_at

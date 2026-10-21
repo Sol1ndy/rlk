@@ -442,7 +442,8 @@ for k, (bolt, ring) in enumerate((('vbolt_b', 'flash'), ('vbolt_c', 'impact_spar
     m.hcard((0, .05, 0), 45, 3.0, 3.0, 'scorch')
     save(RP, 'fx_signature', 'sky_bolt_'+str(k), m)
 
-write('init', [f'scoreboard objectives add {n} dummy' for n in ['rdSfxAge', 'rdSfxLife', 'rdSfxKind', 'rdSfxStyle']])
+write('init', [f'scoreboard objectives add {n} dummy' for n in ['rdSfxAge', 'rdSfxLife', 'rdSfxKind', 'rdSfxStyle']] +
+      ['# Hazard / FX kit v2 objectives (build_raiden_hazards.py).', 'function rlk:boss/raiden/hazard/setup'])
 write('dome_create', spawn('dome', 1, 260))
 write('judgment_warning', spawn('judgment_warning', 2, 125))
 write('judgment_strike', spawn('judgment_strike_0', 3, 12, [
