@@ -1,5 +1,7 @@
 # One hit per prop. Event 4 with #pjKeep 1 preset (the prop pierces and flies on, harmless from now);
 # the hook sets #pjKeep mb 0 to end the flight here (pj/tick removes the prop after this sub-step).
+# AP-FW (cm.md 13.7): refused while #mbCine 1 without being consumed (no event; the prop can still hit after the cine).
+execute if score #mbCine mb matches 1 run return 0
 scoreboard players set @s mbPjHit 1
 scoreboard players operation #mbHitPct mb = @s mbPjD
 scoreboard players operation #cmEl tmp = @s mbPjE

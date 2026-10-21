@@ -424,7 +424,8 @@ def write_chapter_arenas(out):
         if L.theme_module(a['theme']) is None:
             print(f'WARN theme {a["theme"]} missing: stub arena {aid}')
             out.write(P + 'ensure', [f'# STUB (theme module tools/mboss_arena_{a["theme"]}.py missing): nothing is built; the stamp says so.',
-                                     f'data modify storage rlk:mboss built_{aid} set value "{aid}@0:stub"', 'return 1'])
+                                     f'data modify storage rlk:mboss built_{aid} set value "{aid}@0:stub"',
+                                     f'data modify storage rlk:mboss look_{aid} set value "{look0}"', 'return 1'])
             for fn in ('build', 'clear', 'done'):
                 out.write(P + fn, [f'# STUB (theme module tools/mboss_arena_{a["theme"]}.py missing): no-op.'])
             # the dev view (ar/<aid>/test: fl_on + rebuild) builds nothing here, so its forceload goes at once outside a run
@@ -466,8 +467,12 @@ def write_chapter_arenas(out):
                     f'data modify storage rlk:mboss arjob set value {{aid:"{aid}",kind:"{kind}",look:"{look}",i:0,n:{nsl},wait:0}}',
                     f'scoreboard players set #mbArBuild mb {nsl}',
                     'schedule function rlk:mboss/arena/job_tick 1t replace']
-        out.write(P + 'build', [f'# Start a full build job of {aid} ({n} slices, one per tick; the stamp goes until done).']
-                  + start('build', look0, n)[:1] + [f'data remove storage rlk:mboss built_{aid}'] + start('build', look0, n)[1:])
+        # look_<aid> (AP-FW, APEP-07): the look the arena shows, or the one a running job turns it into (set when a build or
+        # look job starts, kept by done; gone after an abort or a clear), so a module reads it during a job too
+        setlook = lambda lk: f'data modify storage rlk:mboss look_{aid} set value "{lk}"'
+        out.write(P + 'build', [f'# Start a full build job of {aid} ({n} slices, one per tick; the stamp goes until done; look_{aid} = "{look0}").']
+                  + start('build', look0, n)[:1] + [f'data remove storage rlk:mboss built_{aid}'] + start('build', look0, n)[1:]
+                  + [setlook(look0)])
         out.write(P + 'rebuild', [f'# Dev / test: drop the stamp of {aid} and build it again (a running job of another arena blocks it).',
                                   f'execute if score #mbArBuild mb matches 1.. run return fail', f'data remove storage rlk:mboss built_{aid}',
                                   f'function {F}build'])
@@ -480,9 +485,10 @@ def write_chapter_arenas(out):
                                 'scoreboard players set #mbArBuild mb 0', 'data remove storage rlk:mboss arjob',
                                 f'execute unless block {sx} {sy} {sz} {sb} run function {F}build',
                                 f'execute if score #mbArBuild mb matches 0 {idle} run function rlk:mboss/ar/{aid}/fl_off'])
-        out.write(P + 'clear', [f'# Air over the box of {aid} when it is loaded (room/remove -> cb/remove), and no stamp.',
+        out.write(P + 'clear', [f'# Air over the box of {aid} when it is loaded (room/remove -> cb/remove), and no stamp (no look record).',
                                 f'execute if data storage rlk:mboss arjob{{aid:"{aid}"}} run function rlk:mboss/arena/abort',
                                 f'data remove storage rlk:mboss built_{aid}',
+                                f'data remove storage rlk:mboss look_{aid}',
                                 f'execute unless function rlk:mboss/ar/{aid}/loaded run return fail'] + em['clear'] + ['return 1'])
         rows = sweep_rows(a)
         out.write(P + 'sweep', [f'# {{y0,y1}} (absolute y): barriers -> air in {len(rows)} row spans inside walk - 0.5 of {aid} (never a',
@@ -494,6 +500,7 @@ def write_chapter_arenas(out):
                                'scoreboard players set #mbArBuild mb 0',
                                'data remove storage rlk:mboss arjob',
                                f'$data modify storage rlk:mboss built_{aid} set value "{aid}@{ver}:$(look)"',
+                               f'$data modify storage rlk:mboss look_{aid} set value "$(look)"',
                                'scoreboard players set #arOk mb 0',
                                f'execute if block {sx} {sy} {sz} {sb} run scoreboard players set #arOk mb 1',
                                f'execute if score #arOk mb matches 1 {idle} run function rlk:mboss/ar/{aid}/fl_off',
@@ -504,9 +511,10 @@ def write_chapter_arenas(out):
                                f'function {F}build'])
         for look, groups in em['looks'].items():
             m = len(groups)
-            out.write(P + f'look/{look}', [f'# Start the look job "{look}" of {aid} ({m} slices; the stamp goes until done stamps "{aid}@{ver}:{look}").',
+            out.write(P + f'look/{look}', [f'# Start the look job "{look}" of {aid} ({m} slices; the stamp goes until done stamps "{aid}@{ver}:{look}";',
+                                           f'# look_{aid} = "{look}" from now on).',
                                            'execute if score #mbArBuild mb matches 1.. run return fail',
-                                           f'data remove storage rlk:mboss built_{aid}'] + start('look', look, m)[1:])
+                                           f'data remove storage rlk:mboss built_{aid}'] + start('look', look, m)[1:] + [setlook(look)])
             for i, cmds in enumerate(groups):
                 tail = [f'function {F}done with storage rlk:mboss arjob'] if i == m - 1 else []
                 out.write(P + f'l/{look}/{i}', [f'# GENERATED look slice {i + 1}/{m} of {aid} -> {look}.'] + cmds + tail)
@@ -535,8 +543,10 @@ def write_chapter_arenas(out):
               + [f'execute if data storage rlk:mboss arjob{{aid:"{aid}"}} in minecraft:overworld run function rlk:mboss/arena/{aid}/tick' for aid, _ in real]
               + ['execute unless data storage rlk:mboss arjob run scoreboard players set #mbArBuild mb 0',
                  'execute if score #mbArBuild mb matches 1.. run schedule function rlk:mboss/arena/job_tick 1t replace'])
-    out.write('mboss/arena/abort', ['# Drop the running arena job (cb/remove, uninstall, a 200-t chunk wait): no job, the half-built arena loses its stamp.']
+    out.write('mboss/arena/abort', ['# Drop the running arena job (cb/remove, uninstall, a 200-t chunk wait): no job, the half-built arena loses its stamp',
+                                    '# and its look record (look_<aid>: a half-swapped look is no look).']
               + [f'execute if data storage rlk:mboss arjob{{aid:"{aid}"}} run data remove storage rlk:mboss built_{aid}' for aid, _ in real]
+              + [f'execute if data storage rlk:mboss arjob{{aid:"{aid}"}} run data remove storage rlk:mboss look_{aid}' for aid, _ in real]
               + ['scoreboard players set #mbArBuild mb 0', 'data remove storage rlk:mboss arjob', 'schedule clear rlk:mboss/arena/job_tick'])
     out.write('mboss/arena/clear_all', ['# Every arena cleared (the plaza and every chapter arena; when loaded). Not called by the game files.',
                                         'function rlk:mboss/arena/clear']

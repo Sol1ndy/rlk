@@ -32,6 +32,7 @@ scoreboard players set #mbPx mb 0
 scoreboard players set #mbLost mb 0
 scoreboard players set #cbWait mb 0
 scoreboard players set #mbNoRx mb 0
+scoreboard players reset #hzPmL mb
 data remove storage rlk:mboss px
 data remove storage rlk:mboss push
 data remove storage rlk:mboss lv

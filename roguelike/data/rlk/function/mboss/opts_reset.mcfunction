@@ -32,3 +32,5 @@ scoreboard players set #pjNoDodge mb 0
 scoreboard players set #pjNR mb 0
 scoreboard players set #auxResEl mb -1
 scoreboard players set #auxResElV mb 0
+# AP-FW (cm.md 13.11): per-mille hazard option (#hzPmL is spent by hz/init_pm and reset by cleanup_fight)
+scoreboard players reset #hzPm mb

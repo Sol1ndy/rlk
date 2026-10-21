@@ -19,6 +19,7 @@ scoreboard players set @s mbHzRT 0
 # chapter mode (AZ-CM): no player-side reaction; the mask's safe group (0 = this hazard's own id, set below)
 scoreboard players operation @s mbHzNR = #hzNR mb
 scoreboard players operation @s mbHzSG = #hzSafeG mb
+execute if score #hzPm mb matches 1.. run function rlk:mboss/hz/init_pm
 scoreboard players operation @s mbHzCol = @s mbHzE
 execute if score #hzCol mb matches 0.. run scoreboard players operation @s mbHzCol = #hzCol mb
 execute if score #hzQuiet mb matches 1 run tag @s add rlk_mb_hzq
@@ -34,7 +35,7 @@ scoreboard players operation @s mbHzL += #hzLinger mb
 scoreboard players add #hzId mb 1
 scoreboard players operation @s mbHzI = #hzId mb
 scoreboard players operation #hzLast mb = #hzId mb
-execute if score @s mbHzSG matches ..0 run scoreboard players operation @s mbHzSG = @s mbHzI
+execute if score @s mbHzSG matches 0 run scoreboard players operation @s mbHzSG = @s mbHzI
 scoreboard players operation @s mbHzY0 = #hzY0 mb
 scoreboard players operation @s mbHzY0 *= #c100 mb
 scoreboard players operation @s mbHzY1 = #hzY1 mb

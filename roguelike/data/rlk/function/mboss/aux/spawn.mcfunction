@@ -12,3 +12,6 @@ scoreboard players set #auxHpPct mb 0
 scoreboard players set #auxRes mb 0
 scoreboard players set #auxResEl mb -1
 scoreboard players set #auxResElV mb 0
+scoreboard players reset #auxShW mb
+scoreboard players reset #auxShH mb
+scoreboard players reset #auxHbY mb

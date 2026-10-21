@@ -11,3 +11,6 @@ execute unless score @s mhpM matches 1.. run scoreboard players set @s mhpM 1
 scoreboard players operation @s mhpC = @s mhpM
 scoreboard players operation @s mres = #auxRes mb
 execute if score #auxResEl mb matches 0..8 run function rlk:mboss/aux/res_el
+# AP-FW (cm.md 13.12): the click shield size and the HP-bar height of this aux (one-shot options of aux/spawn)
+execute if score #auxShW mb matches 1.. run function rlk:mboss/aux/shield_pre
+execute if score #auxHbY mb matches -100..100 run function rlk:mboss/aux/hb_y

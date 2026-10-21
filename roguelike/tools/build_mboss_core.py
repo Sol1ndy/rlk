@@ -96,6 +96,8 @@ PER_ENTITY = [
     # projectile no-dodge / no-reaction, the hit-proxy index
     'mbRes0', 'mbRes1', 'mbRes2', 'mbRes3', 'mbRes4', 'mbRes5', 'mbRes6', 'mbRes7', 'mbRes8',
     'mbHzNR', 'mbHzSG', 'mbPjND', 'mbPjNR', 'mbPart',
+    # AP-FW (cm.md 13.11): per-mille hazards (pl_dot per mille, lethal flag)
+    'mbHzPm', 'mbHzPmL',
 ]
 OBJECTIVES = ['mb', 'mres', 'pkMb'] + PER_ENTITY
 
@@ -291,7 +293,7 @@ data remove storage rlk:mboss pxq
 data remove storage rlk:mboss arsw
 data remove storage rlk:mboss plp
 data remove storage rlk:mboss arjob
-''' + ''.join(f'data remove storage rlk:mboss built_{aid}\n' for aid, _ in ARENAS if aid != 'plaza')
+''' + ''.join(f'data remove storage rlk:mboss built_{aid}\ndata remove storage rlk:mboss look_{aid}\n' for aid, _ in ARENAS if aid != 'plaza')
   + '\n'.join(f'scoreboard objectives remove {o}' for o in OBJECTIVES))
 
 w('opts_reset', '''
@@ -329,6 +331,8 @@ scoreboard players set #pjNoDodge mb 0
 scoreboard players set #pjNR mb 0
 scoreboard players set #auxResEl mb -1
 scoreboard players set #auxResElV mb 0
+# AP-FW (cm.md 13.11): per-mille hazard option (#hzPmL is spent by hz/init_pm and reset by cleanup_fight)
+scoreboard players reset #hzPm mb
 ''')
 
 # =============================================================================================
@@ -942,6 +946,7 @@ scoreboard players set #mbPx mb 0
 scoreboard players set #mbLost mb 0
 scoreboard players set #cbWait mb 0
 scoreboard players set #mbNoRx mb 0
+scoreboard players reset #hzPmL mb
 data remove storage rlk:mboss px
 data remove storage rlk:mboss push
 data remove storage rlk:mboss lv
@@ -1305,6 +1310,9 @@ scoreboard players set #auxHpPct mb 0
 scoreboard players set #auxRes mb 0
 scoreboard players set #auxResEl mb -1
 scoreboard players set #auxResElV mb 0
+scoreboard players reset #auxShW mb
+scoreboard players reset #auxShH mb
+scoreboard players reset #auxHbY mb
 ''')
 w('aux/setup', '''
 attribute @s minecraft:attack_damage base set 0
@@ -1320,6 +1328,9 @@ execute unless score @s mhpM matches 1.. run scoreboard players set @s mhpM 1
 scoreboard players operation @s mhpC = @s mhpM
 scoreboard players operation @s mres = #auxRes mb
 execute if score #auxResEl mb matches 0..8 run function rlk:mboss/aux/res_el
+# AP-FW (cm.md 13.12): the click shield size and the HP-bar height of this aux (one-shot options of aux/spawn)
+execute if score #auxShW mb matches 1.. run function rlk:mboss/aux/shield_pre
+execute if score #auxHbY mb matches -100..100 run function rlk:mboss/aux/hb_y
 ''')
 w('aux/pool_pct', '''
 # #auxHp mb = body max HP x #auxHpPct / 100 (1..100 %, overflow-safe; no body = #auxHp unchanged).
@@ -1575,6 +1586,7 @@ scoreboard players set @s mbHzRT 0
 # chapter mode (AZ-CM): no player-side reaction; the mask's safe group (0 = this hazard's own id, set below)
 scoreboard players operation @s mbHzNR = #hzNR mb
 scoreboard players operation @s mbHzSG = #hzSafeG mb
+execute if score #hzPm mb matches 1.. run function rlk:mboss/hz/init_pm
 scoreboard players operation @s mbHzCol = @s mbHzE
 execute if score #hzCol mb matches 0.. run scoreboard players operation @s mbHzCol = #hzCol mb
 execute if score #hzQuiet mb matches 1 run tag @s add rlk_mb_hzq
@@ -1590,7 +1602,7 @@ scoreboard players operation @s mbHzL += #hzLinger mb
 scoreboard players add #hzId mb 1
 scoreboard players operation @s mbHzI = #hzId mb
 scoreboard players operation #hzLast mb = #hzId mb
-execute if score @s mbHzSG matches ..0 run scoreboard players operation @s mbHzSG = @s mbHzI
+execute if score @s mbHzSG matches 0 run scoreboard players operation @s mbHzSG = @s mbHzI
 scoreboard players operation @s mbHzY0 = #hzY0 mb
 scoreboard players operation @s mbHzY0 *= #c100 mb
 scoreboard players operation @s mbHzY1 = #hzY1 mb
@@ -1894,9 +1906,13 @@ execute if score #r2 mb > @s mbHzRI run function rlk:mboss/hz/hurt
 w('hz/hurt', '''
 # One hit per hazard: a dodge (dash i-frames) also consumes it. #hzRearm hazards arm again mbHzRA ticks later;
 # #hzNoDodge hazards ignore the dash i-frames (mboss/hurt with #mbNoDodge 1).
+# AP-FW (cm.md 13.7, 13.11): refused while #mbCine 1 without being consumed (it can still hit after the cine); a
+# per-mille hazard (#hzPm) hits through mboss/pl_dot (hz/hurt_pm).
+execute if score #mbCine mb matches 1 run return 0
 scoreboard players set @s mbHzHit 1
 execute if score @s mbHzRA matches 1.. run function rlk:mboss/hz/rearm_at
 scoreboard players set #hzHit mb 1
+execute if score @s mbHzPm matches 1.. run return run function rlk:mboss/hz/hurt_pm
 scoreboard players operation #mbHitPct mb = @s mbHzD
 scoreboard players operation #cmEl tmp = @s mbHzE
 scoreboard players operation #mbKB mb = @s mbHzB
@@ -2161,6 +2177,8 @@ execute store result entity @s Rotation[1] float 0.01 run scoreboard players get
 w('pj/hit', '''
 # One hit per prop. Event 4 with #pjKeep 1 preset (the prop pierces and flies on, harmless from now);
 # the hook sets #pjKeep mb 0 to end the flight here (pj/tick removes the prop after this sub-step).
+# AP-FW (cm.md 13.7): refused while #mbCine 1 without being consumed (no event; the prop can still hit after the cine).
+execute if score #mbCine mb matches 1 run return 0
 scoreboard players set @s mbPjHit 1
 scoreboard players operation #mbHitPct mb = @s mbPjD
 scoreboard players operation #cmEl tmp = @s mbPjE
@@ -3178,6 +3196,85 @@ w('hz/extend', '''
 $scoreboard players add @s mbHzA $(n)
 $scoreboard players add @s mbHzL $(n)
 ''')
+# AP-FW (2026-10-21, cm.md 13.6, 13.11, 13.12): the framework gaps Apep's FN list left after AZ-CM.
+w('hz/safe_new', '''
+# A new mask safe group in #mbSafeG mb (cm.md 13.6, APEP-04): -1, -2, ... (back to -1 after -999 999), a number space of
+# its own: hazard ids (mbHzI, also the default group of a mask made with #hzSafeG 0) are >= 1, so neither a mask of
+# another group nor an expiring mask ever matches it. Copy it into #hzSafeG before each mask of the group
+# (L.hz_opts(safe_g='cur')) and into mbHzSG of the group's safe markers; the module removes those markers itself.
+scoreboard players remove #mbSafeN mb 1
+execute unless score #mbSafeN mb matches -999999..-1 run scoreboard players set #mbSafeN mb -1
+scoreboard players operation #mbSafeG mb = #mbSafeN mb
+''')
+w('hz/init_pm', '''
+# @s = a new hazard made with #hzPm mb (cm.md 13.11): its hit takes mbHzPm per mille (1..1000) of the player's max HP
+# through mboss/pl_dot; lethal unless #hzPmL mb 0 (unset = 1), which is spent here.
+scoreboard players operation @s mbHzPm = #hzPm mb
+execute if score @s mbHzPm matches 1001.. run scoreboard players set @s mbHzPm 1000
+scoreboard players set @s mbHzPmL 1
+execute if score #hzPmL mb matches 0 run scoreboard players set @s mbHzPmL 0
+scoreboard players reset #hzPmL mb
+''')
+w('hz/hurt_pm', '''
+# @s = a per-mille hazard (cm.md 13.11) that reached the player; hz/hurt has marked it hit (and re-armed it). The hit is a
+# mboss/pl_dot of mbHzPm per mille of the player's max HP (the hazard's element for the shields, lethal per mbHzPmL; no
+# defence, no level factor, no player-side reaction, no knockback) instead of mboss/hurt. Without #hzNoDodge the dash
+# i-frames dodge it (#dodged 1, a dodge event; consumed as any hazard hit). Hit / dodge events and the volley group as
+# mboss/hurt (source 1); refused while dead, reviving, selecting or with the boss dying (as mboss/hurt).
+scoreboard players set #dodged tmp 0
+scoreboard players set #mbSrcIn mb 1
+execute unless entity @a[tag=player,scores={dead=0},limit=1] run return 0
+execute if entity @a[tag=player,scores={rnDie=1..}] run return 0
+execute if entity @a[tag=player,scores={pkMode=1..}] run return 0
+execute if score #mbSt mb matches 2 run return 0
+execute if score @s mbHzND matches 0 as @a[tag=player,scores={dashInvT=1..},limit=1] at @e[tag=rlk_body,limit=1] positioned ~ ~1.62 ~ run function rlk:player/dash_iframe
+execute if score #dodged tmp matches 1 run return run function rlk:mboss/hurt_dodge
+scoreboard players set #mbShIn mb 0
+execute if entity @a[tag=player,scores={shieldHP=1..},limit=1] run scoreboard players set #mbShIn mb 1
+execute if entity @a[tag=player,scores={gShield=1..},limit=1] run scoreboard players set #mbShIn mb 1
+scoreboard players operation #mbDotPct mb = @s mbHzPm
+scoreboard players operation #mbDotEl mb = @s mbHzE
+scoreboard players operation #mbDotLethal mb = @s mbHzPmL
+function rlk:mboss/pl_dot
+scoreboard players operation #cmEl tmp = @s mbHzE
+function rlk:mboss/hurt_ev
+scoreboard players operation #g mb = @s mbHzG
+execute if score #g mb matches 1.. run function rlk:mboss/grp_mark
+''')
+w('aux/shield_pre', '''
+# @s = a new aux made with #auxShW mb (aux/setup, cm.md 13.12): its click shield made now, #auxShW x #auxShH tenths of a
+# block (#auxShH unset = 22), linked by msid and marked synced, so mob/shield_ensure keeps it (no 1.2 x 2.2 default).
+execute unless score @s msid matches 1.. run scoreboard players add #msidC tmp 1
+execute unless score @s msid matches 1.. run scoreboard players operation @s msid = #msidC tmp
+summon minecraft:interaction ~ ~ ~ {Tags:["rlk_mshield","rlk_msync","rlk_mb_shnew"],width:1.2f,height:2.2f,response:false}
+scoreboard players operation @e[type=minecraft:interaction,tag=rlk_mb_shnew,limit=1] msid = @s msid
+execute store result entity @e[type=minecraft:interaction,tag=rlk_mb_shnew,limit=1] width float 0.1 run scoreboard players get #auxShW mb
+execute if score #auxShH mb matches 1.. store result entity @e[type=minecraft:interaction,tag=rlk_mb_shnew,limit=1] height float 0.1 run scoreboard players get #auxShH mb
+tag @e[type=minecraft:interaction,tag=rlk_mb_shnew] remove rlk_mb_shnew
+''')
+w('aux/hb_y', '''
+# @s = a new aux made with #auxHbY mb (aux/setup after mob/setup, cm.md 13.12): its HP-bar passengers (mob/hb_spawn: bar,
+# fill, number at 0.25 b, level 0.43 b, icon 0.82 b) moved up by #auxHbY tenths of a block (negative = down).
+scoreboard players operation #t mb = #auxHbY mb
+scoreboard players operation #t mb *= #c10 mb
+scoreboard players add #t mb 25
+execute on passengers if entity @s[tag=rlk_hb_bg] store result entity @s transformation.translation[1] float 0.01 run scoreboard players get #t mb
+execute on passengers if entity @s[tag=rlk_hb_fg] store result entity @s transformation.translation[1] float 0.01 run scoreboard players get #t mb
+execute on passengers if entity @s[tag=rlk_hb_num] store result entity @s transformation.translation[1] float 0.01 run scoreboard players get #t mb
+scoreboard players add #t mb 18
+execute on passengers if entity @s[tag=rlk_hb_lv] store result entity @s transformation.translation[1] float 0.01 run scoreboard players get #t mb
+scoreboard players add #t mb 39
+execute on passengers if entity @s[tag=rlk_hb_icon] store result entity @s transformation.translation[1] float 0.01 run scoreboard players get #t mb
+''')
+w('mv/step_flat', '''
+# {spd} (blocks per call, a decimal: L.step_flat; cm.md 13.12) as @s = a ground walker (an aux husk, a marker), rotated =
+# its heading (the caller faces the target: execute as <e> at @s facing entity <target> feet run function
+# rlk:mboss/mv/step_flat {spd:0.3}): turns to the heading (yaw only), steps forward, stands on the fight arena's floor
+# (the y of its rlk_mb_arena marker), is pulled inside walk - 0.7 (ar/clampw). No collision test: the arena floor is flat.
+$execute rotated ~ 0 positioned ^ ^ ^$(spd) run tp @s ~ ~ ~ ~ 0
+execute store result entity @s Pos[1] double 0.001 run data get entity @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] Pos[1] 1000
+function rlk:mboss/ar/clampw
+''')
 w('mv/lv_sample', '''
 # From mboss/world (chapter fights, live and unpaused): the lockv ring buffer rlk:mboss lv[0..5] (oldest .. newest) of
 # the player's body x / z in milliblocks; a tick while the player dashes (dashMoveT >= 1) is skipped (cm.md 13.1).
@@ -3451,6 +3548,12 @@ def px_manifest(b):
         merged = {k: stub[k] for k in G if k in stub}
         clips = list(stub['clips'])
     merged['clips'] = [c for c in clips if not c['name'].startswith('dbg_')]
+    # AP-FW (APEP-09, manifest.md 1): a stub clip that falls back beside a real rig manifest carries an id >= 1000 (never a
+    # rig id, so the rig's clip_obj can never select it by accident); the build fails otherwise
+    if real and stub:
+        low = sorted(c['name'] for c in merged['clips'] if c['name'] not in have and int(c['id']) < 1000)
+        assert not low, (f'{b["id"]}: stub fallback clip(s) {low} merged beside the real rig manifest need ids >= 1000 '
+                         '(manifest.md 1: stub ids are 1000 + k, never a rig id)')
     # a stub fallback clip merged beside the real clips must not reuse a real clip id (the px dispatch is keyed by id)
     cids = [c['id'] for c in merged['clips']]
     dup = sorted({i for i in cids if cids.count(i) > 1})

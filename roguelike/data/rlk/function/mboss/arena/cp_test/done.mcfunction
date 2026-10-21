@@ -3,6 +3,7 @@
 scoreboard players set #mbArBuild mb 0
 data remove storage rlk:mboss arjob
 $data modify storage rlk:mboss built_cp_test set value "cp_test@1:$(look)"
+$data modify storage rlk:mboss look_cp_test set value "$(look)"
 scoreboard players set #arOk mb 0
 execute if block 540 199 8 minecraft:polished_deepslate run scoreboard players set #arOk mb 1
 execute if score #arOk mb matches 1 unless score #active room matches 1 unless score #mbLive mb matches 1 run function rlk:mboss/ar/cp_test/fl_off

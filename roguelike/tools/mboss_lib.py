@@ -60,6 +60,27 @@ FIXED_FORCELOADS = {
 }
 
 
+# Vanilla music events a chapter boss may name (cm.md 10; sounds.json of 26.3, asset index 34): event -> the length of
+# every track it can play, in ticks (rounded down; measured from the .ogg files, AP-FW 2026-10-21). An event with several
+# tracks is a random pool: every playsound picks one, so a loop period shorter than its longest track would cut the picked
+# track (APEP-08). A pool's `len` is therefore 0 (play once) or a re-pick period >= its longest track (music_len).
+MUSIC_TRACKS = {
+    'minecraft:music.end': [18090],
+    'minecraft:music.dragon': [6883],
+    'minecraft:music.overworld.deep_dark': [6870, 6068],
+    'minecraft:music.nether.soul_sand_valley': [5600, 5189, 6076, 6376, 4789],
+    'minecraft:music.overworld.lush_caves': [6627, 4031, 5923, 6881, 4104, 6859, 5617, 5210, 5571, 5502, 6400, 5935, 6254,
+                                             6492, 4595],
+}
+
+
+def music_len(ev):
+    """The registry `len` that repeats event ev without ever cutting a track: the track length of a single-track event
+    (an exact loop), the longest track of a pool (a re-pick period: each replay picks a new random track; a shorter track
+    leaves a silence until the period ends, as vanilla's own music gaps)."""
+    return max(MUSIC_TRACKS[ev])
+
+
 def load_registry():
     """The registry (schema v2), validated: unique ids / n across mid-boss and chapter entries, the chapter-entry rules of
     scratchpad az/contract/cm.md 2.2 and the arena entries of 2.3."""
@@ -110,6 +131,10 @@ def load_registry():
         assert sum(b.get('phases', [100])) <= 100 and all(1 <= p <= 100 for p in b.get('phases', [100])), b['id']
         for ph, m in b.get('music', {}).items():
             assert ph in {str(k) for k in range(1, 10)} and m['ev'].startswith('minecraft:') and int(m['len']) >= 0, b['id']
+            tr = MUSIC_TRACKS.get(m['ev'], [])
+            assert not (len(tr) > 1 and 1 <= int(m['len']) < max(tr)), \
+                (f'{b["id"]}: music {ph} {m["ev"]} is a pool of {len(tr)} tracks (up to {max(tr or [0])} t): len {m["len"]} would cut '
+                 f'the picked track; use 0 (play once) or a re-pick period >= {max(tr or [0])} (mboss_lib.music_len, cm.md 10)')
         assert 0 <= int(b.get('pxBase', 65)) <= 240, b['id']
         ic = b.get('icon')
         assert ic is None or (isinstance(ic, dict) and 'item' in ic and 'model' in ic), f'{b["id"]}: icon must be {{item, model}}'
@@ -268,23 +293,33 @@ def _tenths(v):
 
 def hz_opts(act=None, el=None, kb=None, kbdir=None, y0=None, y1=None, r0=None, back=None,
             sfx=None, vis=None, col=None, linger=None, quiet=None, grp=False, nododge=None, rearm=None,
-            norx=None, safe_g=None):
+            norx=None, safe_g=None, pm=None, pm_lethal=None):
     """Lines that set the one-shot options of the next hazard (reset after each create).
     grp=True: the hazard joins the current volley group #mbGrp (grp_new): one hit per group.
     nododge=1: dash i-frames do not help (#hzNoDodge). rearm=N: a hit disarms it for N ticks only (#hzRearm;
     with a volley group the whole group re-arms together: at most one hit per N ticks).
     Chapter mode (AZ-CM): norx=1: no player-side element reaction from its hit (#hzNR); safe_g=G: the safe group of a
-    mask hazard (#hzSafeG, 0 = its own id)."""
+    mask hazard (#hzSafeG, 0 = its own id; 'cur' = the group of the last hz/safe_new, #mbSafeG, cm.md 13.6).
+    AP-FW: pm=N: the hit takes N per mille of the player's max HP through mboss/pl_dot instead of a % of the boss hit
+    (#hzPm, 1..1000); pm_lethal=0: that hit never kills (#hzPmL; default 1 = lethal; only with pm), cm.md 13.11."""
     out = []
     if grp:
         out.append('scoreboard players operation #hzGrp mb = #mbGrp mb')
     if norx is not None:
         assert int(norx) in (0, 1)
-    if safe_g is not None:
+    if safe_g == 'cur':
+        out.append('scoreboard players operation #hzSafeG mb = #mbSafeG mb')
+        safe_g = None
+    elif safe_g is not None:
         assert int(safe_g) >= 0
+    if pm is not None:
+        assert 1 <= int(pm) <= 1000
+    if pm_lethal is not None:
+        assert pm is not None and int(pm_lethal) in (0, 1)
     pairs = [('#hzAct', act), ('#hzEl', el), ('#hzKB', kb), ('#hzKBDir', kbdir), ('#hzSfx', sfx),
              ('#hzVis', vis), ('#hzCol', col), ('#hzLinger', linger), ('#hzQuiet', quiet),
-             ('#hzNoDodge', nododge), ('#hzRearm', rearm), ('#hzNR', norx), ('#hzSafeG', safe_g)]
+             ('#hzNoDodge', nododge), ('#hzRearm', rearm), ('#hzNR', norx), ('#hzSafeG', safe_g),
+             ('#hzPm', pm), ('#hzPmL', pm_lethal)]
     for k, v in pairs:
         if v is not None:
             out.append(f'scoreboard players set {k} mb {int(v)}')
@@ -383,6 +418,35 @@ def hz_mask(r0, tell, dmg):
     assert 0 < r0 <= 40 and tell >= 1 and dmg >= 0
     return [f'scoreboard players set #hzR0 mb {_tenths(r0)}',
             f'function rlk:mboss/hz/mask {{tell:{int(tell)},dmg:{int(dmg)}}}']
+
+
+def hz_safe_new():
+    """A new mask safe group in #mbSafeG mb (negative ids, never a hazard id; cm.md 13.6). Then hz_opts(safe_g='cur')
+    before each mask of the group and `scoreboard players operation <markers> mbHzSG = #mbSafeG mb` on its safe markers."""
+    return 'function rlk:mboss/hz/safe_new'
+
+
+def aux_opts(shield_w=None, shield_h=None, bar_y=None):
+    """One-shot options of the next aux/spawn (AP-FW, cm.md 13.12, Apep FN-29), blocks: the click shield's width / height
+    (default 1.2 x 2.2) and the HP bar's height offset (+ up)."""
+    out = []
+    if shield_w is not None:
+        assert 0.1 <= shield_w <= 12
+        out.append(f'scoreboard players set #auxShW mb {_tenths(shield_w)}')
+    if shield_h is not None:
+        assert shield_w is not None and 0.1 <= shield_h <= 12
+        out.append(f'scoreboard players set #auxShH mb {_tenths(shield_h)}')
+    if bar_y is not None:
+        assert -10 <= bar_y <= 10 and _tenths(bar_y) != 0
+        out.append(f'scoreboard players set #auxHbY mb {_tenths(bar_y)}')
+    return out
+
+
+def step_flat(spd):
+    """As a ground walker, rotated = its heading (facing the target): one step of spd blocks, y on the fight arena's floor,
+    inside walk - 0.7 (mboss/mv/step_flat, cm.md 13.12, Apep FN-30)."""
+    assert 0 < spd <= 2
+    return f'function rlk:mboss/mv/step_flat {{spd:{num(spd, 3)}}}'
 
 
 def hz_extend(n):

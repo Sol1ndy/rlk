@@ -75,6 +75,8 @@ scoreboard objectives add mbHzSG dummy
 scoreboard objectives add mbPjND dummy
 scoreboard objectives add mbPjNR dummy
 scoreboard objectives add mbPart dummy
+scoreboard objectives add mbHzPm dummy
+scoreboard objectives add mbHzPmL dummy
 bossbar add rlk:mboss {text:"중간보스"}
 bossbar add rlk:mboss_state {text:""}
 bossbar add rlk:mboss_sub {text:""}

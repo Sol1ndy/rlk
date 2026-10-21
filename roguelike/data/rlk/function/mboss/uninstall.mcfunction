@@ -33,7 +33,9 @@ data remove storage rlk:mboss arsw
 data remove storage rlk:mboss plp
 data remove storage rlk:mboss arjob
 data remove storage rlk:mboss built_az_cavern
+data remove storage rlk:mboss look_az_cavern
 data remove storage rlk:mboss built_cp_test
+data remove storage rlk:mboss look_cp_test
 scoreboard objectives remove mb
 scoreboard objectives remove mres
 scoreboard objectives remove pkMb
@@ -109,3 +111,5 @@ scoreboard objectives remove mbHzSG
 scoreboard objectives remove mbPjND
 scoreboard objectives remove mbPjNR
 scoreboard objectives remove mbPart
+scoreboard objectives remove mbHzPm
+scoreboard objectives remove mbHzPmL
