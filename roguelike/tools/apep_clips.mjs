@@ -20,7 +20,7 @@
 // motion: a phase-1 hand lifted >= 0.3 b shows its lifted variant (p1_raised / p1_curl), swapped with the 0.9 -> 1 pulse.
 import {accumulate as acc, sampleClip as sampleShared} from './mboss_rig_clips.mjs';
 import {J, LIMB_C, SIDES, LIMBS, BONES, BONE, mirrorE, solve, eulerOf, carry} from './apep_pose.mjs';
-import {mul, q} from './mboss_rig_math.mjs';
+import {mul, q, rot, sub, add, cross, dot, len, times} from './mboss_rig_math.mjs';
 
 const mx = v => [-v[0], v[1], v[2]];
 const Z3 = [0, 0, 0];
@@ -813,6 +813,99 @@ function autoHands(c, keys) {
   return ev.sort((x, y) => x[0] - y[0] || x[1].localeCompare(y[1]));
 }
 
+// ==== R17 secondary motion (AP-RC2) ======================================================================================
+// The soft parts follow the body with inertia: each chain bone's tip is a damped spring follower (damping SEC_DAMP per
+// tick, stiffness k: a lag of 2-4 t, an overshoot after a stop, the whip of the second segment that follows the lagging
+// first) of where the keyed pose puts it, in the world (the anchor-yaw schedules included, so the anchor spins and the
+// tail swings drag and fling the soft parts; FLING adds the spin's centrifugal pull). The follower's offset turns the
+// bone (the smallest turn that moves its tip there, at most max degrees); it is keyed per tick where it shows (>
+// SEC_MIN deg) and faded out over the last SEC_FADE ticks of a clip, so a chained clip starts from the keyed pose.
+// Loops run three cycles and keep the last (periodic). The floor pass runs after it.
+const SECONDARY = [
+  {bones: ['mantle_l_a', 'mantle_l_b'], k: .32, max: 12}, {bones: ['mantle_r_a', 'mantle_r_b'], k: .32, max: 12},
+  {bones: ['hair_l_1', 'hair_l_2'], k: .24, max: 18}, {bones: ['hair_r_1', 'hair_r_2'], k: .24, max: 18},
+  {bones: ['hem_a', 'hem_b'], k: .26, max: 14, axes: [0]},   // (pitch only: the floor guard turns the hem in pitch)
+  {bones: ['beads_l'], k: .18, max: 24, form: 'p3'}, {bones: ['beads_r'], k: .18, max: 24, form: 'p3'},
+];
+const SEC_DAMP = .82, SEC_K2 = .75, SEC_FLING = .9, SEC_MIN = 2, SEC_FADE = 8;
+// rig frame (forward -Z) -> the world as the anchor's yaw turns it (Minecraft yaw, degrees); toRigV is the inverse for vectors
+const yawRot = (v, yaw, inv = false) => { const a = (inv ? 1 : -1) * yaw * Math.PI / 180, c = Math.cos(a), s = Math.sin(a); return [v[0] * c + v[2] * s, v[1], -v[0] * s + v[2] * c]; };
+const toWorld = (P, yaw) => yawRot([P[0], P[1], -P[2]], yaw);
+const toRigV = (v, yaw) => { const w = yawRot(v, yaw, true); return [w[0], w[1], -w[2]]; };
+const axisAngleQ = (ax, ang) => { const s = Math.sin(ang / 2); return [ax[0] * s, ax[1] * s, ax[2] * s, Math.cos(ang / 2)]; };
+const qInv = Q => [-Q[0], -Q[1], -Q[2], Q[3]];
+const wrap180 = x => ((x + 540) % 360) - 180;
+function secondary(c, keys) {
+  const chains = SECONDARY.filter(ch => !ch.form || ch.form === c.form);
+  const N = c.len + 1, ks = acc({keys}, DEFAULT_POSE), yawD = denseYaw(c);
+  const plain = Array.from({length: N}, (_, t) => { const p = sampleShared({keys}, t, ks, {defaults: DEFAULT_POSE}); delete p.ph; return p; });
+  const yawAt = t => (yawD ? yawD[Math.min(t, yawD.length - 1)] : 0);
+  const sk = {sink: sinkKnots(c)}, off = (t => t)(Object.fromEntries(chains.flatMap(ch => ch.bones).map(b => [b, Array.from({length: N}, () => [0, 0, 0])])));
+  const reset = t => (c.hidden || []).some(([a, b]) => t >= a && t <= b) || sinkAt(sk, t) < -.01;
+  const cycles = c.loop ? 3 : 1;
+  for (const ch of chains) {
+    const st = ch.bones.map(() => ({Y: null, V: [0, 0, 0]}));
+    for (let u = 0; u < cycles * c.len + (c.loop ? 0 : 1); u++) {
+      const t = c.loop ? u % c.len : u, rec = u >= (cycles - 1) * c.len || !c.loop;
+      const p = deep(plain[t]);
+      if (reset(t)) { st.forEach(x => { x.Y = null; x.V = [0, 0, 0]; }); continue; }
+      const yaw = yawAt(t), w = yawD ? (yawAt(t) - yawAt(Math.max(0, t - 1))) * Math.PI / 180 : 0;
+      ch.bones.forEach((b, i) => {
+        const o = solve(p), X = carry(o, b, BONE[b].tip), Xw = toWorld(X, yaw), S = st[i];
+        if (!S.Y) S.Y = Xw.slice();
+        else {
+          const k = ch.k * (i ? SEC_K2 : 1), fl = [Xw[0], 0, Xw[2]].map(v => v * w * w * SEC_FLING);
+          S.V = add(add(times(S.V, SEC_DAMP), times(sub(Xw, S.Y), k)), fl);
+          S.Y = add(S.Y, S.V);
+        }
+        // the follower's offset as the smallest turn of the bone about its joint (in the rig frame)
+        const d = sub(X, o[b].t), sR = toRigV(sub(S.Y, Xw), yaw), dd = dot(d, d);
+        const perp = sub(sR, times(d, dot(sR, d) / dd)), ax = cross(d, perp), al = len(ax);
+        let E = p[b];
+        if (al > 1e-6) {
+          const ang = Math.min(ch.max * Math.PI / 180, len(perp) / Math.sqrt(dd));
+          const R1 = mul(axisAngleQ(times(ax, 1 / al), ang), o[b].R);
+          const e1 = eulerOf(mul(qInv(o[BONE[b].parent].R), R1));
+          E = e1.map((v, j) => (ch.axes && !ch.axes.includes(j) ? p[b][j] : p[b][j] + wrap180(v - p[b][j])));
+        }
+        if (rec) off[b][t] = E.map((v, j) => v - p[b][j]);
+        p[b] = E;
+      });
+    }
+    if (c.loop) for (const b of ch.bones) off[b][c.len] = off[b][0].slice();
+  }
+  // fade-out at the end of a non-looping clip, then key every tick where an offset shows
+  if (!c.loop) for (const b of Object.keys(off)) for (let t = 0; t < N; t++) { const f = Math.min(1, (c.len - t) / SEC_FADE), g = f * f * (3 - 2 * f); off[b][t] = off[b][t].map(v => v * g); }
+  const live = new Uint8Array(N);
+  for (const b of Object.keys(off)) for (let t = 0; t < N; t++) if (off[b][t].some(v => Math.abs(v) > SEC_MIN)) live[t] = 1;
+  const adds = [];
+  for (let t = 0; t < N; t++) {
+    if (!(live[t] || live[t - 1] || live[t + 1])) continue;
+    const p = deep(plain[t]);
+    for (const b of Object.keys(off)) p[b] = p[b].map((v, j) => +(v + off[b][t][j]).toFixed(2));
+    const kk = keys.find(x => x[0] === t);
+    if (kk) kk[1] = p; else adds.push([t, p, 'l']);
+  }
+  if (adds.length) { keys.push(...adds); keys.sort((x, y) => x[0] - y[0]); }
+}
+
+// Eased segments as linear pieces (AP-RC2): an eased segment of L >= EASE_MIN ticks becomes n = L / 4 (2-4) linear pieces
+// through its own eased values at whole ticks, so the speed still builds and settles (slow - fast - slow for 'io',
+// accelerating into an impact for 'i') while the client's linear interpolation follows it with a few keys per part
+// instead of one per tick; the path through the poses is unchanged.
+const EASE_MIN = 4;
+function easeKnots(keys) {
+  const out = [keys[0]];
+  for (let i = 1; i < keys.length; i++) {
+    const [t0, p0] = keys[i - 1], [t1, p1, e = 'io'] = keys[i], L = t1 - t0;
+    if (e === 'l' || L < EASE_MIN) { out.push(keys[i]); continue; }
+    const n = Math.min(4, Math.max(2, Math.round(L / 4)));
+    for (let k = 1; k < n; k++) { const tk = t0 + Math.round(L * k / n); if (tk > out[out.length - 1][0] && tk < t1) out.push([tk, lerpPose(p0, p1, EASEF[e]((tk - t0) / L)), 'l']); }
+    out.push([t1, p1, 'l']);
+  }
+  return out;
+}
+
 // ==== assembly ==========================================================================================================
 // Keys: the clip's CLIP_KEYS (full poses), the hidden spans as vis keys (inserted as sampled poses so the motion is not
 // disturbed), a last key at len. Self-checks (thrown at import): keys inside 0..len, strictly increasing, the first at
@@ -846,6 +939,7 @@ function buildKeys(c) {
     for (const [t, p, e, o] of extra) { const k = keys.find(x => x[0] === t); if (k) Object.assign(k[1], deep(o)); else keys.push([t, floorGuard(Object.assign(p, deep(o)), true), e]); }
     keys.sort((x, y) => x[0] - y[0]);
   }
+  keys = easeKnots(keys);
   // hand eulers: each key's triple is re-expressed (wraps and the (p + 180, 180 - y, r + 180) twin) closest to the previous
   // key's, so the channel blend never takes the long way round (before the floor pass samples the blend, and again after)
   const near = (e, ref) => {
@@ -859,6 +953,7 @@ function buildKeys(c) {
   };
   const nearFix = () => { for (let i = 1; i < keys.length; i++) for (const k of Object.keys(keys[i][1])) if (k.startsWith('hf_')) keys[i][1][k] = near(keys[i][1][k], keys[i - 1][1][k]); };
   nearFix();
+  secondary(c, keys);
   // Floor pass: the key poses are guarded at their joints (finish), but the channel blend between them and the R2 models
   // beyond the joints can still dip under the floor (a drape rolled outward one way at one key and the other way at the
   // next passes through the floor). The timing of the motion is kept exactly (the corrections are keyed per tick).

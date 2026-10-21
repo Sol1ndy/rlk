@@ -1,8 +1,6 @@
 data merge entity 524c4b4d-4150-4400-8000-000000000001 {start_interpolation:0,interpolation_duration:15,transformation:{translation:[0f,0.8461f,-0.63328f],left_rotation:[0.50128f,0f,0f,0.86529f],scale:[1.4f,1.4f,1.4f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4150-4400-8000-000000000002 {start_interpolation:0,interpolation_duration:15,transformation:{translation:[0f,0.14114f,-1.86268f],left_rotation:[0.89724f,0f,0f,0.44154f],scale:[1.7f,1.7f,1.7f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4150-4400-8000-000000000015 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[1.55f,1.9424f,1.67518f],left_rotation:[0.20168f,-0.23829f,0.66946f,0.67406f],scale:[2f,2f,2f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4150-4400-8000-000000000016 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-1.55f,1.9424f,1.67518f],left_rotation:[-0.20168f,-0.23829f,0.66946f,-0.67406f],scale:[2f,2f,2f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4150-4400-8000-000000000021 {start_interpolation:0,interpolation_duration:15,transformation:{translation:[1.14f,1.22952f,-0.55919f],left_rotation:[0.52504f,-0.16695f,0.51185f,0.65914f],scale:[1.4f,1.4f,1.4f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4150-4400-8000-000000000022 {start_interpolation:0,interpolation_duration:15,transformation:{translation:[-1.14f,1.22952f,-0.55919f],left_rotation:[0.52504f,0.16695f,-0.51185f,0.65914f],scale:[1.4f,1.4f,1.4f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000013 {start_interpolation:0,interpolation_duration:15,transformation:{translation:[1.17561f,2.37198f,0.78927f],left_rotation:[0.08454f,-0.7064f,-0.57704f,-0.40109f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000014 {start_interpolation:0,interpolation_duration:15,transformation:{translation:[-1.17561f,2.37198f,0.78927f],left_rotation:[-0.08454f,-0.7064f,-0.57704f,0.40109f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
 scoreboard players set @s apRigFy 4
 scoreboard players reset @s apRigQx

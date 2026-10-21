@@ -1,2 +1,0 @@
-execute if score @s apRigT matches ..97 run return run function rlk:mboss/apep/rig/c/death/b/91_97
-function rlk:mboss/apep/rig/c/death/b/98_104

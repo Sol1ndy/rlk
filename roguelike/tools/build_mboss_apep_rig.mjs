@@ -266,10 +266,23 @@ const debugClips = (arg('--debug-clips') || '').split(',').filter(Boolean);
 const debugOf = c => debugDp && (debugClips.includes('all') || debugClips.includes(c.name) || (c.dbg && debugClips.includes('dbg')));
 if (debugDp) fs.rmSync(path.join(debugDp, 'data/rlk/function/ap_dbg'), {recursive: true, force: true});
 const putDebug = (n, lines) => put(path.join(debugDp, 'data/rlk/function', n + '.mcfunction'), lines.join('\n'));
-// tolerances (plan R16): 0.03 b on the arms, tail, hair, mantle, hem; 0.012 b on the hood, hands, face (and the rest)
-const LONG = PART_NAMES.filter(n => /^(a_up|a_lo|b_up|b_lo|c_up|c_lo|tail_|hair_|mantle_|hem_|beads_|abdomen)/.test(n));
-const TOL = {t: .012, s: .015, rDefault: .8, r: Object.fromEntries(PART_NAMES.map(n => [n, /^(a_lo|a_up|tail_[5-7]|tail_tip|beads)/.test(n) ? .35 : /^(hood|chest|shoulders|abdomen)/.test(n) ? .4 : .6])),
-  tp: Object.fromEntries(LONG.map(n => [n, .03]))};
+// tolerances (plan R16, AP-RC2 classes): per part a translation tolerance tp (blocks, the joint) and a SURFACE error (blocks
+// at the part's reach, the farthest model corner from its joint over every model it shows) that sets its rotation
+// tolerance, atan(surface / reach), 0.35-4 deg. R16 holds on the near parts: 0.012 b on the hood, face and hands, 0.03 b
+// on the arms / legs and the tail root; the body core 0.03 b; the far-off, small and soft parts (tail_3 .. tip, hair,
+// mantle, hem, bead vines, crystals) 0.08 b, their errors stay inside the flowing secondary motion.
+const TOL_CLASS = n => (/^(hood|face|[abc]_hand)/.test(n) ? [.012, .04] : /^(abdomen|chest|shoulders|neck|head|core|crown)$/.test(n) ? [.03, .07]
+  : /^[abc]_(up|lo)_/.test(n) ? [.03, .07] : /^tail_[12]$/.test(n) ? [.03, .08] : [.08, .14]);
+const PART_REACH = Object.fromEntries(PART_NAMES.map(n => {
+  const ms = HAND_PARTS.includes(n) ? Object.values(HAND_VARIANTS[n]) : n === 'face' ? Object.values(FACE_ITEMS).filter(Boolean).map(f => f.model)
+    : n === 'core' ? Object.values(CORE_MODELS) : Object.values(FORM_MODELS[n] || {});
+  let r = 0;
+  for (const m of ms) for (const u of KEY[m] || []) r = Math.max(r, Math.hypot(...toBlocks(u, PART_SCALE[n])));
+  return [n, r];
+}));
+const TOL = {t: .012, s: .015, rDefault: .8,
+  r: Object.fromEntries(PART_NAMES.map(n => [n, r3(Math.max(.35, Math.min(4, Math.atan(TOL_CLASS(n)[1] / Math.max(.3, PART_REACH[n])) * 180 / Math.PI)))])),
+  tp: Object.fromEntries(PART_NAMES.map(n => [n, TOL_CLASS(n)[0]]))};
 const mkCompiler = debug => createRigCompiler({ns: NS, obj: 'apRig', fn, parts: PART_NAMES, uuidOf, tol: TOL, swapLine: () => '', debug: debug ? {put: putDebug, dir: 'ap_dbg'} : null});
 const compiler = mkCompiler(false), debugCompiler = debugDp ? mkCompiler(true) : null;
 // the shipped clips (the frozen contract's table) and the debug poses (dbg_*: renders and checks only, never in the rig)
