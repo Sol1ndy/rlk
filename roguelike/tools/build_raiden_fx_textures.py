@@ -8,7 +8,7 @@ assets/minecraft/atlases/items.json and prunes fxg sprites it no longer paints
 (other atlas entries are never touched). The machine-readable catalogue is
 tools/raiden_fx_textures.json (name, texture, w, h, kind, along, core, use, notes,
 plus the hazard decal rectangles); JS generators should read that file.
-Run alone: python tools/build_raiden_fx_textures.py --resourcepack <rp> [--only a,b]
+Run alone: python tools/build_raiden_fx_textures.py --resourcepack <rp> [--only a,b*] [--list]
 
 LOOK. Electro palette with real gradients: white-hot core (#FFFFFF) -> pale lavender
 (#EBDDFF) -> violet (#B07CFF) -> deep purple (#5B2BB8) -> transparent, with sparing
@@ -2172,12 +2172,55 @@ def build_fx_textures(resourcepack, only=None, quiet=False):
     return cat
 
 
+def resolve_only(spec, cat=None):
+    """--only value -> set of sprite names. Comma list of names or fnmatch globs ("ringq_*,tele_1?");
+    every item must match at least one catalogue sprite (a typo used to paint nothing silently)."""
+    import fnmatch
+    all_names = [c["name"] for c in (cat or catalogue())]
+    out, missing = set(), []
+    for pat in (p.strip() for p in spec.split(",")):
+        if not pat:
+            continue
+        hit = [n for n in all_names if fnmatch.fnmatchcase(n, pat)]
+        if not hit:
+            missing.append(pat)
+        out.update(hit)
+    if missing:
+        raise SystemExit(f"--only: no sprite matches {missing}; names: python3 {Path(__file__).name} --list")
+    return out
+
+
+def px_ledger(cat=None, only=None):
+    """Print every sprite (name, size, px) and the per-family totals (family = name up to the first '_')."""
+    cat = cat or catalogue()
+    fam, total = {}, 0
+    for c in cat:
+        if only and c["name"] not in only:
+            continue
+        px = c["w"] * c["h"]
+        total += px
+        f = c["name"].split("_")[0]
+        n, s = fam.get(f, (0, 0))
+        fam[f] = (n + 1, s + px)
+        print(f"  {c['name']:<24} {c['w']:>4} x {c['h']:<4} {px / 1e6:7.3f} M px")
+    print("families (count, M px):")
+    for f, (n, s) in sorted(fam.items(), key=lambda kv: -kv[1][1]):
+        print(f"  {f:<16} {n:>3}  {s / 1e6:6.3f}")
+    print(f"total {sum(n for n, _ in fam.values())} sprites, {total / 1e6:.3f} M px (rlk:raiden/fxg)")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--resourcepack", type=Path, default=Path(__file__).resolve().parents[2] / "resourcepack")
-    parser.add_argument("--only", help="comma list of texture names (development)")
+    parser.add_argument("--only", help="comma list of texture names or globs, e.g. ringq_*,tele_3 (development: "
+                                       "repaints just those sprites, keeps every other sprite and atlas entry)")
     parser.add_argument("--catalogue", action="store_true", help="only rewrite tools/raiden_fx_textures.json")
+    parser.add_argument("--list", action="store_true", help="print the sprite px ledger (with --only: just those) and exit")
     a = parser.parse_args()
+    only = resolve_only(a.only) if a.only else None
+    if a.list:
+        px_ledger(only=only)
+        raise SystemExit(0)
     write_catalogue_json()
     if not a.catalogue:
-        build_fx_textures(a.resourcepack, set(a.only.split(",")) if a.only else None)
+        build_fx_textures(a.resourcepack, only)
