@@ -1,2 +1,0 @@
-execute if score @s apRigT matches ..53 run return run function rlk:mboss/apep/rig/c/tail_p1x2/b/51_53
-function rlk:mboss/apep/rig/c/tail_p1x2/b/54_57

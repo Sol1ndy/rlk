@@ -186,28 +186,131 @@ const GUARD = [
 ];
 // nearest = the smallest turn in either direction, or with ref the solution closest to ref's angle (the floor pass
 // between keys: a blend that dips stays continuous instead of jumping sides); the key poses use the preferred
-// direction first.
-function floorGuard(p, nearest = false, ref = null) {
-  for (const {bones, ax, sg, y, counter} of GUARD) { let prevD = 0; for (const b of bones) {
-    const end = () => carry(solve(p), b, BONE[b].tip)[1];
+// direction first. With a form (the clip assembly, AP-RC2) the chains' model probes count too (PROBE below): a part's
+// probe points must stay at or above its model floor YM as well as its joint end at y.
+function floorGuard(p, nearest = false, ref = null, form = null) {
+  for (const g of GUARD) {
+    guardChain(p, g, g.bones, nearest, ref, form);
+    // with probes: a chain whose later segment still dips (a drape pressed into the ground beside the body) turns its
+    // first segment against the whole chain's probes, then the later segments again
+    if (form && g.bones.length > 1 && chainProbes(form, g.bones[0]) && chainLow(p, g, form) < g.y - .02) {
+      guardChain(p, g, [g.bones[0]], nearest, ref, form, g.bones);
+      guardChain(p, g, g.bones.slice(1), nearest, ref, form);
+    }
+  }
+  return p;
+}
+// the chains with model probes: the hem and the hair (the tail models stay within the joint guard's margin)
+const chainProbes = (form, b) => (form && /^(hem|hair)_/.test(b) ? probesOf(form, b) : null);
+const probeEnd = (o, b, form, y) => {
+  let v = carry(o, b, BONE[b].tip)[1];
+  const pr = chainProbes(form, b), ym = pr && PROBE_YM[form][b.replace(/_r(_|$)/, '_l$1')];
+  if (pr) for (const P of pr) v = Math.min(v, carry(o, b, P)[1] - ym + y);
+  return v;
+};
+const chainLow = (p, g, form) => { const o = solve(p); return Math.min(...g.bones.map(b => probeEnd(o, b, form, g.y))); };
+function guardChain(p, {ax, sg, y, counter}, bones, nearest, ref, form, along = null) {
+  { let prevD = 0; for (const b of bones) {
+    const pr = form && (along || chainProbes(form, b));
+    const end = () => { const o = solve(p); return Math.min(...(along || [b]).map(x => probeEnd(o, x, form, y))); };
     if (counter && prevD) p[b] = p[b].map((v, i) => (i === ax ? v - prevD : v));
     prevD = 0;
     const b0 = p[b][ax];
-    if (end() >= y - 1e-3) continue;
+    const e0 = end();
+    if (e0 >= y - (ref && pr ? .05 : 1e-3)) continue;   // (per tick: a marginal dip stays, no flicker of the guard)
     const base = p[b].slice(), set = d => { p[b] = base.slice(); p[b][ax] += d; prevD = p[b][ax] - b0; };
+    // per tick (ref = the previous tick's guarded pose): if the previous angle still clears the floor, the smallest
+    // fraction of the way back to it that does (the guard releases smoothly and never jumps sides between ticks)
+    if (ref && pr) {
+      const dR = ref[b][ax] - base[ax];
+      set(dR);
+      if (Math.abs(dR) > 1e-6 && end() >= y) {
+        // (scanned, not bisected: a wide drape rolled a little can dip further before it rises)
+        let m = .1; for (; m < 1; m += .1) { set(dR * m); if (end() >= y) break; }
+        set(dR * Math.min(1, m));
+        continue;
+      }
+      set(0);
+    }
     // the preferred direction first, then the other; if neither reaches the floor height, the highest end of either
-    const sol = [];
+    // (with probes: within 30 deg, and only for a real gain, since a probe next to the joint cannot be lifted by a turn)
+    const sol = [], R = pr ? Math.min(150, Math.max(45, ref ? Math.abs(ref[b][ax] - base[ax]) + 30 : 0)) : 75;
     for (const dir of [sg, -sg]) {
-      set(dir * 75); if (end() < y) continue;
-      let lo = 0, hi = 75;
+      set(dir * R); if (end() < y) continue;
+      let lo = 0, hi = R;
       for (let i = 0; i < 9; i++) { const m = (lo + hi) / 2; set(dir * m); if (end() >= y) hi = m; else lo = m; }
       sol.push(dir * Math.round(hi * 10) / 10);
       if (!nearest) break;
     }
     const cost = d => (ref ? Math.abs(base[ax] + d - ref[b][ax]) : Math.abs(d));
-    if (sol.length) set(sol.reduce((a, d) => (cost(d) < cost(a) ? d : a)));
-    else { let best = [-1e9, 0]; for (let d = -75; d <= 75; d += 5) { set(d); const e = end(); if (e > best[0]) best = [e, d]; } set(best[1]); }
+    let pick = null;
+    if (sol.length) pick = sol.reduce((a, d) => (cost(d) < cost(a) ? d : a));
+    else {
+      const W = pr ? 30 : 75;
+      let best = [e0, 0]; for (let d = -W; d <= W; d += 5) { set(d); const e = end(); if (e > best[0] + (pr ? .05 : 0)) best = [e, d]; } pick = best[1];
+    }
+    set(pick);
   } }
+  return p;
+}
+// ---- the model floor (AP-RC2) -------------------------------------------------------------------------------------------
+// The joint guard keeps the chains' joints over the floor, but the R2 models reach past their joints: the P1 drapes splay
+// on the ground beside the bone, the P3 hem flaps, the flared leg roots, the P1 hull underside, the P3 tail-root sheath.
+// PROBE holds a few model extremes per part (left side; the right mirrors) and form in BIND space (carry() places them):
+// farthest-point samples of the R3 model corners from the joint plus the lowest corners at the reference stance
+// (rigwork/rc2/tools/probes.mjs; re-derive after a geometry change). PROBE_YM is each part's model floor (its rest low
+// less 0.05, at most -0.08; -0.15 for the hair, cloth lying on the ground). The clip assembly lifts the body (pelT y, at most BODY_LIFT) when the hull / sheath probes
+// dip under BODY_YM, turns the hem and hair chains (floorGuard with the form) and raises an IK leg's wrist (at most
+// LEG_LIFT) when its lower-leg flare dips under its floor.
+const PROBE = {
+  p1: {
+    hair_l_1: [[2.64, 1.99, -3.1], [.74, 3.31, -2.54], [1.52, 2.84, -3.45], [1.82, 3.64, -2.54], [2.31, 3.09, -3.11], [1.86, 1.75, -3.44], [.99, 2.49, -3.38], [2.07, 2.83, -3.38]],
+    hair_l_2: [[3.22, .19, -4.28], [2.1, 2.02, -3.68], [2.97, 1.11, -3.46], [2.8, 2.12, -3.39], [2.27, 1.01, -3.76], [2.57, .36, -4.01], [3.23, .14, -3.67], [3.18, .44, -3.76], [2.77, .47, -3.64]],
+    hem_a: [[.2, .66, .89], [-.65, 2.09, 1.16], [.65, 2.09, 1.16], [-.3, .84, .96], [.2, 2.17, 1.13], [-.28, 2.24, 1.18]],
+    hem_b: [[.2, .08, 1.93], [-.65, .72, .96], [.65, .72, .96], [.2, .73, .87], [-.19, .2, 1.81], [-.2, .73, .87]],
+    chest: [[.16, .91, -1.18], [-.46, 4.15, 1.25], [1.67, 3.49, -.72], [-1.58, 2.81, -.72], [1.08, 2.62, 1.25], [-.52, 4.48, -.72], [-.16, .91, -.94]],
+    shoulders: [[-1.99, 2.38, .85], [2.55, 4.16, -2], [-1.22, 2.52, -3.33], [1.88, 2.34, .85], [-.52, 4.84, -.89], [.64, 2.23, -1.32], [1.78, 2.09, -2.14], [1.32, 2.09, -2.14], [-1.32, 2.09, -2.14]],
+    abdomen: [[.36, 3.88, 2.75], [-1.39, 2.85, .62], [1.39, 2.85, .62], [-.38, 4.3, 1.17], [-.75, 2.56, 2.44], [.75, 2.56, 1.88], [.23, 2.29, 2.43], [.23, 2.29, 2.95], [-.23, 2.29, 2.43]],
+    b_lo_l: [[2.52, .43, -3.71], [3.19, 2.12, -2.03], [1.78, 1.67, -2.64], [2.29, .43, -2.35], [2.98, 1.52, -2.94], [2.2, 1.95, -1.81], [2.31, -.04, -2.47]],
+    c_lo_l: [[3.08, 0, 2.01], [2.45, 2.52, 2.33], [3.06, 1.26, 2.68], [3.48, 2.38, 1.58], [2.6, 1.65, 1.53], [2.61, .27, 3.06], [2.67, -.04, 2.08]],
+  },
+  p3: {
+    hair_l_1: [[2.19, 1.68, -2.72], [.02, 3.93, -3.31], [.74, 2.31, -3.6], [1.54, 3.85, -3.2], [1.9, 2.67, -3.19], [1.16, 1.43, -2.97], [1.69, 1.53, -2.74]],
+    hair_l_2: [[2.61, .16, -3.03], [1.12, 1.72, -3.07], [2.21, 1.95, -2.6], [1.55, .63, -3.02], [2.32, 1.17, -3.08], [1.76, 1.5, -2.84], [2.12, .09, -3.28], [1.58, .06, -3.18]],
+    hem_a: [[.23, .13, 2.39], [-.17, 2.39, 1.06], [.98, .51, .19], [-.98, .51, .19], [-1, 1.04, 1.7], [.77, 1.54, 2.05], [-.23, .13, 2.39], [-.65, .16, 2.22], [.65, .16, 2.22]],
+    hem_b: [[1.74, 1.98, 3.06], [-2.41, .39, 2.25], [.25, .86, .66], [-.71, 1.98, 3.06], [1.59, -.38, 1.68], [-.61, -.38, 1.68], [.61, -.38, 1.68], [-1.59, -.38, 1.68], [2.41, .39, 2.25]],
+    tail_1: [[.43, 1.39, 3.74], [-.68, 1.96, 2.38], [.41, 2.7, 2.93], [-.66, 2.08, 3.5], [.01, 1.17, 2.64], [.66, 1.95, 2.37], [-.1, 1.15, 3.43], [.27, 1.19, 3.49]],
+    abdomen: [[-.75, 2.31, 3.17], [.61, 2.66, .5], [.73, 1.77, 2.16], [-.71, 2.38, 1.49], [.44, 3.08, 1.83], [.54, 2.51, 3.25], [.87, 1.67, 2.85], [.87, 2.06, 3.04], [.56, 1.27, 2.66]],
+    b_lo_l: [[2.34, .22, -3.76], [2.78, 1.95, -1.89], [2.29, 2.21, -3.35], [2.52, .42, -2.25], [1.97, 1.24, -2.82], [2.82, 1.29, -3.34], [2.15, 1.62, -1.75], [2.22, 1.11, -1.85], [2.46, 1.38, -1.89]],
+    c_lo_l: [[3.54, .37, 2.74], [1.91, 1.78, 1.48], [2.06, .94, 2.89], [3.42, 1.84, 2.27], [2.64, .89, 1.76], [2.51, 2.44, 2.28], [2.78, .02, 2.05], [2.53, .27, 2.47]],
+  },
+};
+const PROBE_YM = {
+  p1: {hair_l_1: -.15, hair_l_2: -.15, hem_a: -.08, hem_b: -.08, b_lo_l: -.09, c_lo_l: -.09},
+  p3: {hair_l_1: -.15, hair_l_2: -.15, hem_a: -.08, hem_b: -.43, b_lo_l: -.15, c_lo_l: -.08},
+};
+const BODY_PROBE = {p1: ['chest', 'shoulders', 'abdomen'], p3: ['tail_1', 'abdomen']}, BODY_YM = -.12, BODY_LIFT = .45, LEG_LIFT = .12;
+// the floor envelope's rate: degrees (chain turns) and blocks (body height, leg wrists) per tick
+const FLOOR_RATE = {a: 14, h: .06};
+const PROBE_R = {};
+function probesOf(form, n) {
+  const k = form + n;
+  if (!(k in PROBE_R)) { const l = n.replace(/_r(_|$)/, '_l$1'), P = PROBE[form][l]; PROBE_R[k] = P ? (l === n ? P : P.map(mx)) : null; }
+  return PROBE_R[k];
+}
+const probeLow = (o, form, n) => { let v = Infinity; for (const P of probesOf(form, n) || []) v = Math.min(v, carry(o, n, P)[1]); return v; };
+// the model floor of a full pose for one form (keys and the per-tick floor pass of the clip assembly)
+function modelFloor(p, form, nearest = false, ref = null) {
+  let o = solve(p);
+  const body = Math.min(...BODY_PROBE[form].map(n => probeLow(o, form, n)));
+  if (body < BODY_YM) { p.pelT = [p.pelT[0], p.pelT[1] + Math.min(BODY_LIFT, BODY_YM - body), p.pelT[2]]; o = null; }
+  floorGuard(p, nearest, ref, form);
+  for (const s of SIDES) for (const L of ['b', 'c']) {
+    if ((p[`ik_${L}_${s}`] ?? 0) < .5) continue;
+    o = o || solve(p);
+    const n = `${L}_lo_${s}`, lo = probeLow(o, form, n), ym = PROBE_YM[form][`${L}_lo_l`];
+    if (lo < ym) { const k = `tg_${L}_${s}`; p[k] = [p[k][0], p[k][1] + Math.min(LEG_LIFT, ym - lo), p[k][2]]; o = null; }
+  }
   return p;
 }
 // a full pose: the base with both-sided overrides (left channels mirror to the right unless the right one is given)
@@ -222,11 +325,10 @@ const mix = (a, b, u, o = {}) => finish(Object.assign(lerpPose(a, b, u), both(o)
 // the phase-1 bind wrists (left) and an IK wrist target; hr = [0, 0, 0] marks a lifted hand
 const WB = {a: [4.8, .6, -2.4], b: [2.4, .4, -3.0], c: [2.9, .4, 2.5]};
 const Z = [0, 0, 0];
-// AP-R3: the R2 planted claw stands on its finger tips 0.59 b under the wrist (rest wrist 0.6 b), so an A wrist planted
-// lower than 0.4 b would push the tips under the -0.2 b floor allowance; the R1-claw plant height 0.35 is lifted to 0.4
-// here (RC2: re-key the A plants for the R2 claw).
-const A_PLANT_MIN = .4;
-const tg = (L, x, y, z, hr = null) => ({[`tg_${L}_l`]: [x, L === 'a' ? Math.max(y, A_PLANT_MIN) : y, z], ...(hr ? {[`hr_${L}_l`]: hr} : {})});
+// A planted phase-1 A wrist sits at 0.6 b (AP-RC2: the R2 claw stands on its finger tips 0.59 b under the wrist, the
+// rest height); B / C plant at 0.4 (the petal feet), the phase-3 forks at 0.4-0.45.
+const A_PLANT = .6;
+const tg = (L, x, y, z, hr = null) => ({[`tg_${L}_l`]: [x, y, z], ...(hr ? {[`hr_${L}_l`]: hr} : {})});
 const tgR = (L, x, y, z, hr = 'keep') => ({[`tg_${L}_r`]: [x, y, z], [`hr_${L}_r`]: hr});
 // A phase-1 rear of strength r (0 = the crouch, 1 = the thorax stood up as in UPRIGHT) with the hood kept over the head:
 // the UPRIGHT body angles scaled by r, the head pitched to a total of `head` degrees (0 = level as in the crouch,
@@ -251,28 +353,28 @@ const def = (name, p) => { POSES[name] = p; return p; };
 const CROUCH = def('CROUCH', deep(C0));
 const CROUCH_IN = def('CROUCH_IN', P(C0, {pelT: [0, -.1, 0], pelvis: [-1.5, 0, 0], chest: [1.5, 0, 0], neck: [1, 0, 0], head: [1.5, 0, 0], tail_2: [2, 0, 0], mantle_l_a: [0, 0, -3]}));
 const LOW = def('LOW', P(C0, {pelT: [0, -.45, .1], pelvis: [-3, 0, 0], chest: [-3, 0, 0], neck: [4, 0, 0], head: [3, 0, 0], tail_1: [3, 0, 0], mantle_l_a: [0, 0, -6]}));
-const CROUCH_LOW = def('CROUCH_LOW', P(C0, {pelT: [0, -.6, .1], pelvis: [-2, 0, 0], chest: [-2, 0, 0], neck: [5, 0, 0], head: [6, 0, 0], ...tg('a', 5.1, .4, -2.2), ...tg('b', 2.6, .4, -3.1), ...tg('c', 3.1, .4, 2.6)}));
+const CROUCH_LOW = def('CROUCH_LOW', P(C0, {pelT: [0, -.6, .1], pelvis: [-2, 0, 0], chest: [-2, 0, 0], neck: [5, 0, 0], head: [6, 0, 0], ...tg('a', 5.1, A_PLANT, -2.2), ...tg('b', 2.6, .4, -3.1), ...tg('c', 3.1, .4, 2.6)}));
 const HALF = def('HALF', P(C0, {...rear(.3, {head: -4}), ...tg('b', 2.3, .4, -2.4), ...tg('c', 2.9, .4, 1.6), ...tg('a', 3.7, 1.5, -1.9, Z)}));
 const REAR = def('REAR', P(C0, {...rear(.45, {head: -12}), ...tg('b', 2.5, 1.4, -2.8, Z), ...tg('c', 2.9, .4, 1.3), ...tg('a', 4.4, 4.6, -2.0, Z)}));
 const DIVE = def('DIVE', P(C0, {pelT: [0, -.35, -.25], pelvis: [-20, 0, 0], chest: [-10, 0, 0], shoulders: [-4, 0, 0], neck: [10, 0, 0], head: [14, 0, 0], tail_1: [10, 0, 0],
-  ...tg('a', 3.0, .4, -4.6), ...tg('b', 2.3, .4, -3.5)}));
+  ...tg('a', 3.0, A_PLANT, -4.6), ...tg('b', 2.3, .4, -3.5)}));
 const SPLAY = def('SPLAY', P(C0, {pelT: [0, -1.2, 0], pelvis: [-5, 0, 0], chest: [-4, 0, 0], neck: [6, 0, 0], head: [6, 0, 0], tail_1: [12, 0, 0],
-  ...tg('a', 5.9, .35, -1.6), ...tg('b', 3.4, .35, -3.1), ...tg('c', 3.7, .35, 2.7), mantle_l_a: [0, 0, -15], mantle_l_b: [0, 0, -10]}));
+  ...tg('a', 5.9, A_PLANT, -1.6), ...tg('b', 3.4, .35, -3.1), ...tg('c', 3.7, .35, 2.7), mantle_l_a: [0, 0, -15], mantle_l_b: [0, 0, -10]}));
 const EMERGE = def('EMERGE', P(C0, {...rear(.55, {head: 20, y: -.3}), ...tg('a', 2.4, 1.6, -1.2, Z), ...tg('b', 1.9, 1.5, -1.8, Z), ...tg('c', 2.5, .4, 1.1)}));
 const ERUPT = def('ERUPT', P(C0, {...rear(.95, {head: -25, y: 1.3, tail: -10}), ...tg('a', 2.4, 9.2, .6, Z), ...tg('b', 2.6, 3.2, -1.8, Z), ...tg('c', 2.4, 1.3, .2, Z), mantle_l_a: [0, 0, 30]}));
 const LOOM = def('LOOM', P(C0, {...rear(.75, {head: -22, lean: 14, y: .5}), ...tg('b', 2.4, 7.0, -3.4, Z), ...tg('a', 5.2, 5.4, -2.2, Z), ...tg('c', 2.9, .4, 1.2)}));
 const LOOM_WIND = def('LOOM_WIND', P(LOOM, {chest: [LOOM.chest[0], 16, 0], shoulders: [LOOM.shoulders[0], 8, 0], ...tg('a', 4.2, 3.6, .9, Z), ...tgR('a', -5.0, 2.8, 1.6, Z)}));
 const LUNGE = def('LUNGE', P(C0, {pelT: [0, -.7, -.5], pelvis: [-12, 0, 0], chest: [-6, -16, 0], shoulders: [0, -6, 0], neck: [8, 0, 0], head: [8, 0, 0], tail_1: [6, 0, 0],
   ...tg('a', 5.0, 1.2, -3.0, Z), ...tgR('a', 2.0, 1.2, -5.4, Z), ...tg('b', 2.6, .9, -1.6, Z), ...tg('c', 2.8, 1.0, 3.8, Z)}));
-const LAND = def('LAND', P(C0, {pelT: [0, -.6, 0], pelvis: [-6, 0, 0], chest: [-4, 0, 0], neck: [6, 0, 0], head: [5, 0, 0], ...tg('a', 5.4, .4, -2.2), ...tg('b', 2.8, .4, -3.1), ...tg('c', 3.3, .4, 2.6)}));
+const LAND = def('LAND', P(C0, {pelT: [0, -.6, 0], pelvis: [-6, 0, 0], chest: [-4, 0, 0], neck: [6, 0, 0], head: [5, 0, 0], ...tg('a', 5.4, A_PLANT, -2.2), ...tg('b', 2.8, .4, -3.1), ...tg('c', 3.3, .4, 2.6)}));
 const SPREAD = def('SPREAD', P(C0, {...rear(.35, {head: -10}), ...tg('a', 6.0, 2.8, -.8, Z), ...tg('b', 2.5, .4, -2.5), ...tg('c', 2.9, .4, 1.5), mantle_l_a: [0, 25, 15]}));
 const SWIRL = def('SWIRL', P(SPREAD, {chest: [SPREAD.chest[0], -12, 0], shoulders: [SPREAD.shoulders[0], -10, 0], ...tg('a', 5.0, 3.4, 1.8, Z), ...tgR('a', -4.4, 3.0, -3.8, Z), mantle_l_a: [0, 35, 30], mantle_r_a: [0, -10, -5]}));
 const OVERHEAD = def('OVERHEAD', P(C0, {...rear(.62, {head: -22, y: .45}), ...tg('a', .7, 8.4, -2.4, Z), ...tg('b', 2.4, 2.2, -2.6, Z), ...tg('c', 2.9, .4, 1.0)}));
 const PLUNGE = def('PLUNGE', P(C0, {pelT: [0, -.5, -.3], pelvis: [-16, 0, 0], chest: [-12, 0, 0], shoulders: [-6, 0, 0], neck: [14, 0, 0], head: [14, 0, 0], tail_1: [6, 0, 0],
-  ...tg('a', 1.1, .35, -4.4), ...tg('b', 2.1, .4, -2.9), ...tg('c', 2.9, .4, 2.3)}));
+  ...tg('a', 1.1, A_PLANT, -4.4), ...tg('b', 2.1, .4, -2.9), ...tg('c', 2.9, .4, 2.3)}));
 const PLUNGE_DEEP = def('PLUNGE_DEEP', P(PLUNGE, {pelT: [0, -.52, -.2], pelvis: [-18, 0, 0], chest: [-12, 0, 0], head: [16, 0, 0]}));
 const PLUNGE_DIP = def('PLUNGE_DIP', P(PLUNGE_DEEP, {pelT: [0, -.56, -.25], chest: [-15, 0, 0], neck: [17, 0, 0]}));
-const CROSS = def('CROSS', P(C0, {...rear(.5, {head: -8}), ...tg('a', 1.2, .35, -4.2), ...tg('b', 2.4, .4, -2.4), ...tg('c', 2.9, .4, 1.3), mantle_l_a: [0, 0, 60], mantle_l_b: [0, 0, 20]}));
+const CROSS = def('CROSS', P(C0, {...rear(.5, {head: -8}), ...tg('a', 1.2, A_PLANT, -4.2), ...tg('b', 2.4, .4, -2.4), ...tg('c', 2.9, .4, 1.3), mantle_l_a: [0, 0, 60], mantle_l_b: [0, 0, 20]}));
 const FLOWER = def('FLOWER', P(C0, {...rear(.95, {head: -18, y: .9, lean: -5}), ...tg('a', 3.4, 7.6, -1.2, Z), ...tg('b', 2.8, 3.6, -2.2, Z), ...tg('c', 2.8, .4, .8),
   mantle_l_a: [-20, 0, 70], mantle_l_b: [0, 0, 30]}));
 const COLUMN = def('COLUMN', (() => {
@@ -282,7 +384,7 @@ const COLUMN = def('COLUMN', (() => {
   return finish(p);
 })());
 const SLAM = def('SLAM', P(C0, {pelT: [0, -.55, -.4], pelvis: [-18, 0, 0], chest: [-12, 0, 0], shoulders: [-6, 0, 0], neck: [12, 0, 0], head: [12, 0, 0], tail_1: [8, 0, 0],
-  ...tg('a', 2.4, .35, -4.9), ...tg('b', 2.5, .4, -3.5), ...tg('c', 3.0, .4, 2.4)}));
+  ...tg('a', 2.4, A_PLANT, -4.9), ...tg('b', 2.5, .4, -3.5), ...tg('c', 3.0, .4, 2.4)}));
 const CROUCH_LOAD = def('CROUCH_LOAD', P(C0, {pelT: [0, -.75, .1], pelvis: [4, 0, 0], chest: [2, 0, 0], neck: [-3, 0, 0], head: [-4, 0, 0], tail_1: [4, 0, 0]}));
 const LEAP_UP = def('LEAP_UP', P(C0, {...rear(.4, {head: -10, y: 2.0}), ...tg('a', 4.0, 4.0, -1.5, Z), ...tg('b', 2.2, 2.4, -2.2, Z), ...tg('c', 2.6, 2.0, 2.0, Z)}));
 const AIR = def('AIR', P(C0, {pelT: [0, 4.6, 0], pelvis: [8, 0, 0], chest: [-4, 0, 0], neck: [-4, 0, 0], head: [-4, 0, 0], tCurl: 10,
@@ -297,14 +399,15 @@ const HOODED = def('HOODED', P(C0, {...rear(.9, {head: -12, y: -.2}), ...tg('a',
 const HOODED_SWAY = def('HOODED_SWAY', P(HOODED, {pelvis: [HOODED.pelvis[0], 0, 3], neck: [HOODED.neck[0], 0, -3]}));
 // sideways crash to its right (roll + tips the top toward the boss's right): the right limbs on the ground, the left flung up
 const CRASH = def('CRASH', P(C0, {pelT: [0, -.55, 0], pelvis: [0, 0, 46], chest: [-4, 0, 8], neck: [4, 0, 0], tSweep: -30,
-  ...tg('a', 2.6, 4.2, -3.2, Z), ...tgR('a', -6.2, .4, -1.8), ...tg('b', 3.0, 3.0, -2.6, Z), ...tgR('b', -3.4, .4, -3.0), ...tg('c', 3.0, 2.6, 2.2, Z), ...tgR('c', -3.6, .4, 2.6),
+  ...tg('a', 2.6, 4.2, -3.2, Z), ...tgR('a', -6.2, A_PLANT, -1.8), ...tg('b', 3.0, 3.0, -2.6, Z), ...tgR('b', -3.8, .4, -3.6), ...tg('c', 3.0, 2.6, 2.2, Z), ...tgR('c', -3.6, .4, 2.6),
   mantle_l_a: [0, 0, 40], mantle_l_b: [0, 0, 20]}));
-const CRASH_B = def('CRASH_B', P(CRASH, {chest: [-8, 0, 12], tSweep: -45, tg_a_l: [3.4, 4.6, -1.6], tg_a_r: [-6.4, .4, .2]}));
+const CRASH_B = def('CRASH_B', P(CRASH, {chest: [-8, 0, 12], tSweep: -45, tg_a_l: [3.4, 4.6, -1.6], tg_a_r: [-6.4, A_PLANT, .2]}));
 // (the right drapes roll the same way as in the crash, so the blend from the crash stays over the floor; the guard's
 // preferred outward roll folds them into an S here)
-const SPRAWL = def('SPRAWL', P(C0, {pelT: [0, -1.1, 0], pelvis: [0, 0, 22], chest: [-3, 0, 4], ...tg('a', 5.8, .4, -1.4), ...tg('b', 3.3, .4, -3.2), ...tg('c', 3.6, .4, 2.9),
+const SPRAWL = def('SPRAWL', P(C0, {pelT: [0, -1.1, 0], pelvis: [0, 0, 22], chest: [-3, 0, 4], ...tg('a', 5.8, A_PLANT, -1.4), ...tg('b', 3.5, .4, -3.6), ...tg('c', 3.6, .4, 2.9),
+  ...tgR('b', -3.3, .4, -2.6), ...tgR('c', -4.0, .4, 3.5),
   hair_r_1: [0, 0, 30], hair_r_2: [0, 0, 46]}));
-const PUSHUP = def('PUSHUP', P(C0, {pelT: [0, -.35, 0], pelvis: [8, 0, 8], chest: [4, 0, 2], neck: [-4, 0, 0], head: [-2, 0, 0], ...tg('a', 5.0, .4, -2.0), ...tg('b', 2.3, .4, -2.6)}));
+const PUSHUP = def('PUSHUP', P(C0, {pelT: [0, -.35, 0], pelvis: [8, 0, 8], chest: [4, 0, 2], neck: [-4, 0, 0], head: [-2, 0, 0], ...tg('a', 5.0, A_PLANT, -2.0), ...tg('b', 2.3, .4, -2.6)}));
 // tail: pitch - raises a back-pointing segment; yaw + swings it to the boss's left (tSweep spreads a yaw over the chain)
 const TAIL_S = def('TAIL_S', P(C0, {pelT: [0, .15, 0], pelvis: [-5, 0, 0], chest: [2, 0, 0], neck: [-4, 0, 0], head: [-2, 0, 0],
   // a tall S over the back (v2 f980-f1019): the segments climb at 55-65 deg, the last three curl forward (tip ~10 b)
@@ -312,7 +415,7 @@ const TAIL_S = def('TAIL_S', P(C0, {pelT: [0, .15, 0], pelvis: [-5, 0, 0], chest
 // swing 1 turns the anchor clockwise (+ yaw, toward the boss's right): the tail cocks raised to the boss's LEFT (v2 f1036)
 // and lags there
 const tailYaw = (base, lift, yaws, o = {}) => P(base, {...Object.fromEntries(['tail_1', 'tail_2', 'tail_3', 'tail_4', 'tail_5', 'tail_6', 'tail_7', 'tail_tip'].map((k, i) => [k, [i ? lift[1] ?? 0 : lift[0], yaws[i] ?? 0, 0]])), ...o});
-const BRACE = {pelT: [0, -.25, 0], pelvis: [-4, 0, 0], ...tg('a', 5.2, .4, -2.0), ...tg('b', 2.6, .4, -3.0), ...tg('c', 3.2, .4, 2.7)};
+const BRACE = {pelT: [0, -.25, 0], pelvis: [-4, 0, 0], ...tg('a', 5.2, A_PLANT, -2.0), ...tg('b', 2.6, .4, -3.0), ...tg('c', 3.2, .4, 2.7)};
 const TAIL_COCK = def('TAIL_COCK', tailYaw(C0, [-60, -10], [34, 22, 18, 14, 10, 8, 6, 6], {...BRACE, pelvis: [-4, -10, 0], chest: [0, 8, 0]}));
 const TAIL_WHIP = def('TAIL_WHIP', tailYaw(C0, [-12, 2], [28, 14, 10, 6, 4, 2, 0, 0], {...BRACE, pelvis: [-4, 4, 0], chest: [0, -4, 0]}));
 const TAIL_FOLLOW = def('TAIL_FOLLOW', tailYaw(C0, [-8, 2], [-30, -14, -10, -8, -6, -4, -2, -2], {...BRACE, pelvis: [-4, 8, 0], chest: [0, -8, 0]}));
@@ -327,12 +430,12 @@ const SWEEP_THRU = def('SWEEP_THRU', P(C0, {pelT: [0, -.3, -.2], pelvis: [-4, 0,
 const SWEEP_END = def('SWEEP_END', P(C0, {pelT: [0, -.3, -.1], chest: [-2, -28, 0], ...tgR('a', 5.2, 1.0, -2.4, Z), ...tg('a', 5.0, .6, -1.6)}));
 const COMBO_HIGH = def('COMBO_HIGH', P(C0, {...rear(.95, {head: -20, y: .6}), ...tg('b', 2.0, 7.6, -2.0, Z), ...tg('a', 4.0, 7.0, -1.0, Z), ...tg('c', 2.8, .4, .9)}));
 const DOUBLE_SLAM = def('DOUBLE_SLAM', P(C0, {pelT: [0, -.3, -.8], pelvis: [-15, 0, 0], chest: [-12, 0, 0], shoulders: [-4, 0, 0], neck: [10, 0, 0], head: [10, 0, 0],
-  ...tg('b', 1.3, .4, -4.4), ...tg('a', 2.2, .35, -5.0), ...tg('c', 2.9, .4, 1.8)}));
+  ...tg('b', 1.3, .4, -4.4), ...tg('a', 2.2, A_PLANT, -5.0), ...tg('c', 2.9, .4, 1.8)}));
 const TWIST = def('TWIST', P(C0, {pelT: [0, -.3, 0], pelvis: [-3, -8, 0], chest: [0, -18, 0], shoulders: [0, -8, 0], ...tg('a', 5.0, 1.2, 1.4, Z), ...tgR('a', -3.6, 1.2, -4.6, Z)}));
 const SPIN_OUT = def('SPIN_OUT', P(C0, {pelT: [0, -.25, 0], chest: [0, 10, 0], ...tg('a', 6.0, 1.0, -.6, Z), ...tg('b', 3.4, .9, -2.6, Z), tSweep: 25, mantle_l_a: [0, 0, 30]}));
 const TALLEST = def('TALLEST', P(C0, {...rear(1.0, {head: -15, y: 1.0, lean: -6}), ...tg('a', 4.4, 8.6, -.6, Z), ...tg('b', 2.6, 7.2, -1.6, Z), ...tg('c', 2.7, .4, .6)}));
 const SLAM_FAR = def('SLAM_FAR', P(C0, {pelT: [0, -.3, -1.6], pelvis: [-22, 0, 0], chest: [-12, 0, 0], neck: [10, 0, 0], head: [12, 0, 0],
-  ...tg('a', 2.2, .35, -6.2), ...tg('b', 1.6, .4, -5.2), ...tg('c', 2.9, .4, 1.8)}));
+  ...tg('a', 2.2, A_PLANT, -6.2), ...tg('b', 1.6, .4, -5.2), ...tg('c', 2.9, .4, 1.8)}));
 const STAGGER = def('STAGGER', P(C0, {pelT: [0, -.35, .2], pelvis: [-3, 0, -6], chest: [-4, 0, -4], neck: [18, 0, 0], head: [14, 0, 0], ...tg('a', 4.6, .6, -2.0)}));
 const STAGGER2 = def('STAGGER2', P(STAGGER, {pelvis: [-4, 0, 7], chest: [-5, 0, 4]}));
 const ROAR = def('ROAR', P(C0, {...rear(.4, {head: 16}), ...tg('a', 5.6, 1.8, -1.4, Z), ...tg('b', 2.4, .4, -2.5), ...tg('c', 2.9, .4, 1.5), mantle_l_a: [0, 20, 20]}));
@@ -385,7 +488,7 @@ const SCOIL = def('SCOIL', Pd(U0K, {pelT: [0, -.2, .1], pelvis: [-12, 0, 6], che
   a_up_l: [0, -8, -6], b_up_l: [0, -10, -6]}));
 const SCOIL_LOW = def('SCOIL_LOW', Pd(SCOIL, {pelT: [0, -.6, -.4], pelvis: [-18, 0, -6], chest: [-12, 0, 0], neck: [6, 0, 0], head: [8, 0, 0], tail_1: [12, 0, 0]}));
 // CURL (spikes t4, v6 f540): a dark low curl, the hood half over, arms wrapped in, tail coiled
-const CURL = def('CURL', Pd(U0K, {pelT: [0, -1.0, -.3], pelvis: [-12, 0, 0], chest: [-14, 0, 0], shoulders: [-8, 0, 0], neck: [-6, 0, 0], head: [-14, 0, 0], hood_hinge: [-45, 0, 0],
+const CURL = def('CURL', Pd(U0K, {pelT: [0, -.8, -.3], pelvis: [-27, 0, 0], chest: [-6, 0, 0], shoulders: [-8, 0, 0], neck: [-6, 0, 0], head: [-14, 0, 0], hood_hinge: [-45, 0, 0],
   a_up_l: [0, 34, -40], a_lo_l: [0, 0, -40], b_up_l: [0, 30, -40], b_lo_l: [0, 20, 20], tSweep: 40}));
 // BALL (v5 f2094, the shell launch): every limb and plate wrapped round the body, a curled ball of leaves
 const BALL = def('BALL', Pd(CURL, {pelT: [0, .5, 0], hood_hinge: [20, 0, 0], a_up_l: [0, 10, -10], a_lo_l: [0, 0, -20], b_up_l: [0, 10, -12], b_lo_l: [0, 10, 20], mantle_l_a: [0, 0, -20]}));
@@ -413,7 +516,7 @@ const REACH_P3 = def('REACH_P3', (() => { const p = Pd(HUNCH, {pelT: [0, .3, 0],
 const HIT_SNAP = def('HIT_SNAP', Pd(U0, {pelvis: [6, 0, 0], chest: [6, 0, 0], neck: [-10, 0, 0], head: [18, 0, 0], hood_hinge: [8, 0, 0], a_up_l: [0, -10, 10], b_up_l: [0, -16, 8]}));
 const DROOP = def('DROOP', Pd(U0K, {pelT: [0, -.4, -.1], pelvis: [-8, 0, 0], chest: [-8, 0, 0], shoulders: [-6, 0, 0], neck: [-6, 0, 0], head: [-26, 0, 0], hood_hinge: [-20, 0, 0],
   a_up_l: [0, 8, -30], a_lo_l: [0, 0, -16], b_up_l: [0, 8, -22], b_lo_l: [0, 0, -10]}));
-const KNEEL = def('KNEEL', Pd(DROOP, {pelT: [0, -.85, -.2], pelvis: [-6, 0, 0], chest: [-6, 0, 0], head: [-10, 0, 0], hood_hinge: [-20, 0, 0], b_up_l: [0, 0, 8], a_up_l: [0, 0, 6]}, {tg_c_l: [3.0, .5, -1.4]}));
+const KNEEL = def('KNEEL', Pd(DROOP, {pelT: [0, -.6, -.2], pelvis: [-14, 0, 0], chest: [-6, 0, 0], head: [-10, 0, 0], hood_hinge: [-20, 0, 0], b_up_l: [0, 0, 8], a_up_l: [0, 0, 6]}, {tg_c_l: [3.0, .5, -1.4]}));
 const FALLEN = def('FALLEN', P(W0, {pelT: [0, -1.3, -.6], pelvis: [-8, 0, 0], chest: [-8, 0, 0], neck: [5, 0, 0], head: [10, 0, 0],
   ...tg('a', 5.9, .45, -1.6), ...tg('b', 3.5, .45, -3.0), ...tg('c', 3.7, .45, 2.7), mantle_l_a: [0, 0, -15], tSweep: 20}));
 // the surfacing shot (surface_p3): the crawl with the hood raised at the player, then the thrust
@@ -520,9 +623,10 @@ const BELLY_TAILUP = def('BELLY_TAILUP', P(BELLY_FLOP, {tCurl: 10, tLift: -62}))
 // the ring opening after the slam (61 -> 65): the tail uncurls while it swings out sideways (tSweep), so no tail segment
 // turns more than ~110 deg per tick (a straight uncurl in 4 t either exceeds that or passes 3-6 b under the floor)
 // The wheel rolls on the water (v5 f936-f954): from 55 the roll is keyed per tick with the height that keeps the ring's
-// lowest joint 0.3 b over the floor (the roll pivot is not the ring's centre, so a plain blend bobs 0.2-1.4 b).
+// lowest joint 0.62 b over the floor, the R2 tail-root sheath and plates clear of the water (the roll pivot is not the
+// ring's centre, so a plain blend bobs 0.2-1.4 b).
 const groundY = p => { const o = solve(p); return Math.min(...BONES.filter(b => b.name !== 'root').map(b => (b.tip ? carry(o, b.name, b.tip) : o[b.name].t)[1])); };
-const wheelAt = deg => { const p = withRot(HOOP, [deg, 0, 0]); p.pos = [0, +(0.3 - groundY(p)).toFixed(3), 0]; return p; };
+const wheelAt = deg => { const p = withRot(HOOP, [deg, 0, 0]); p.pos = [0, +(0.62 - groundY(p)).toFixed(3), 0]; return p; };
 const HOOP_DOWN = wheelAt(-360), FLOP_SW = withRot(P(BELLY_FLOP, {tSweep: 45}), [-360, 0, 0]);
 const RING_OPEN_A = Object.assign(lerpPose(HOOP_DOWN, FLOP_SW, .25), {tCurl: -18, tLift: -10, tSweep: 175});
 const RING_OPEN_B = Object.assign(lerpPose(HOOP_DOWN, FLOP_SW, .75), {tCurl: -2, tLift: 10, tSweep: 120});
@@ -608,7 +712,9 @@ export const CLIP_KEYS = {
   move_strike_p3: () => [K(0, UPRIGHT), K(4, HUNCH_MID, 'io'), K(7, CRAWL, 'o'), K(10, MOUND, 'i'), K(15, MOUND), K(41, MOUND), K(44, BURST_P3, 'o'), K(49, Object.assign(deep(HOOP), {pos: [0, 1.2, 0]}), 'o'),
     ...[55, 56, 57, 58, 59, 60, 61].map(t => K(t, wheelAt(-180 - 30 * (t - 55)), 'l')),
     // the ring opens sideways: the tail half swings out to the boss's left (62-64) and lands trailing there at the tail
-    // event (65), ready for the ground whip (FLOOR_SKIP: it grazes up to ~2 b under the water at 62-63, under the slam splash)
+    // event (65), ready for the ground whip (FLOOR_SKIP: it grazes up to ~2.5 b under the water at 62-64, inside the
+    // belly-flop splash of the slam (plan §8.3 Q1 fx); no 4-tick opening of the under-curled ring stays over the floor
+    // within 120 deg per tick: a straight uncurl passes 3-6 b under it, a lifted one more)
     K(62, RING_OPEN_A, 'l'), K(64, RING_OPEN_B, 'l'), K(65, withRot(TAIL_SWEEP, [-360, 0, 0]), 'l'), K(69, withRot(TAIL_SWEEP, [-360, 0, 0]), 'io'),
     K(72, withRot(TAIL_SWEEP, [-360, 0, 0])), K(78, withRot(CRAWL, [-360, 0, 0]), 'o'), K(85, withRot(CRAWL, [-360, 0, 0])), K(88, withRot(MID, [-360, 0, 0]), 'io'),
     K(91, withRot(UPRIGHT, [-360, 0, 0]), 'o'), K(92, withRot(UPRIGHT, [-360, 0, 0]))],
@@ -641,7 +747,7 @@ export const CLIP_KEYS = {
     K(82, FALLEN, 'i'), K(100, FALLEN), K(119, FALLEN), K(120, FALLEN)],
 };
 // spans the floor pass leaves alone (see the clip's keys)
-const FLOOR_SKIP = {move_strike_p3: [[61, 65]]};
+const FLOOR_SKIP = {move_strike_p3: [[62, 64]]};
 // first-segment blends (the compiler's minimum first segment; a clip entered from any pose eases in over these ticks)
 const BLEND = {combo_end: 10, death: 6, idle_p1: 4, idle_p3: 6, crawl_stop_p1: 4};
 // hand / look events beyond the stub (plan R8 / R12): the revival keeps the crawl hands and the face covered until the
@@ -753,28 +859,49 @@ function buildKeys(c) {
   };
   const nearFix = () => { for (let i = 1; i < keys.length; i++) for (const k of Object.keys(keys[i][1])) if (k.startsWith('hf_')) keys[i][1][k] = near(keys[i][1][k], keys[i - 1][1][k]); };
   nearFix();
-  // Floor pass: both ends of a key segment are guarded, but the channel blend between them can still carry a guarded
-  // chain (tail, hem, drapes) under its floor height (a drape rolled outward one way at one key and the other way at
-  // the next passes through the floor). Every segment whose blended pose needs the guard is re-keyed on each of its
-  // ticks with the guarded sample (linear between ticks), so the timing of the motion is kept exactly.
+  // Floor pass: the key poses are guarded at their joints (finish), but the channel blend between them and the R2 models
+  // beyond the joints can still dip under the floor (a drape rolled outward one way at one key and the other way at the
+  // next passes through the floor). The timing of the motion is kept exactly (the corrections are keyed per tick).
   {
     // (ticks with the burrow sink under way are skipped: parts are meant to be under the floor there)
-    const GB = GUARD.flatMap(g => g.bones), sk = {sink: sinkKnots(c)}, skip = [...(c.hidden || []), ...(FLOOR_SKIP[c.name] || [])];
+    // AP-RC2: every visible tick is guarded (modelFloor with the clip's form, continuous from the previous tick); the
+    // correction of each guarded channel (the chains, the body height, the IK leg wrists) against the plain blend is
+    // then smoothed into an envelope that changes by at most FLOOR_RATE per tick (it starts a little early and lets go
+    // late, so a lift never pops), and every tick where it is not zero is keyed (one plain tick either side).
+    const sk = {sink: sinkKnots(c)}, skip = [...(c.hidden || []), ...(FLOOR_SKIP[c.name] || [])];
     const hidF = t => skip.some(([a, b]) => t >= a && t <= b) || sinkAt(sk, t) < 0;
-    const ks = acc({keys}, DEFAULT_POSE), adds = [];
-    for (let i = 1; i < keys.length; i++) {
-      const [t0, p0] = keys[i - 1], [t1, p1] = keys[i], seg = [];
-      if (GB.every(b => JSON.stringify(p0[b]) === JSON.stringify(p1[b]))) continue;   // a hold of the guarded chains
-      let need = false, ref = p0;
-      for (let t = t0 + 1; t < t1; t++) {
-        if (hidF(t)) continue;
-        const p = sampleShared({keys}, t, ks, {defaults: DEFAULT_POSE}); delete p.ph;
-        const g = floorGuard(deep(p), true, ref);
-        ref = g;
-        if (GB.some(b => g[b].some((v, j) => Math.abs(v - p[b][j]) > .5))) need = true;
-        seg.push([t, g, 'l']);
+    const GC = [...GUARD.flatMap(g => g.bones), 'pelT', ...SIDES.flatMap(s => ['b', 'c'].map(L => `tg_${L}_${s}`))];
+    const ks = acc({keys}, DEFAULT_POSE), N = c.len + 1;
+    const plain = Array.from({length: N}, (_, t) => { const p = sampleShared({keys}, t, ks, {defaults: DEFAULT_POSE}); delete p.ph; return p; });
+    const delta = {};
+    for (const ch of GC) delta[ch] = [0, 1, 2].map(() => new Float64Array(N));
+    let ref = null;
+    for (let t = 0; t < N; t++) {
+      if (hidF(t)) { ref = null; continue; }
+      const g = modelFloor(deep(plain[t]), c.form, true, ref);
+      ref = g;
+      for (const ch of GC) for (let j = 0; j < 3; j++) delta[ch][j][t] = g[ch][j] - plain[t][ch][j];
+    }
+    const live = new Uint8Array(N);
+    for (const ch of GC) for (let j = 0; j < 3; j++) {
+      const d = delta[ch][j], R = /^(pelT|tg_)/.test(ch) ? FLOOR_RATE.h : FLOOR_RATE.a, eps = /^(pelT|tg_)/.test(ch) ? .005 : .2;
+      if (!d.some(v => Math.abs(v) > eps)) continue;
+      const env = new Float64Array(N);
+      for (let t = 0; t < N; t++) {
+        let hi = 0, lo = 0;
+        for (let u = 0; u < N; u++) { const w = R * Math.abs(u - t); if (d[u] > 0) hi = Math.max(hi, d[u] - w); else lo = Math.min(lo, d[u] + w); }
+        env[t] = hi + lo;
       }
-      if (need) adds.push(...seg);
+      delta[ch][j] = env;
+      for (let t = 0; t < N; t++) if (Math.abs(env[t]) > eps) live[t] = 1;
+    }
+    const adds = [];
+    for (let t = 0; t < N; t++) {
+      if (!(live[t] || live[t - 1] || live[t + 1])) continue;
+      const p = deep(plain[t]);
+      for (const ch of GC) p[ch] = p[ch].map((v, j) => v + delta[ch][j][t]);
+      const k = keys.find(x => x[0] === t);
+      if (k) k[1] = p; else adds.push([t, p, 'l']);
     }
     if (adds.length) { keys.push(...adds); keys.sort((x, y) => x[0] - y[0]); }
   }
@@ -808,7 +935,7 @@ export const CLIPS_REAL = CLIP_TABLE.map(t => {
 // ==== debug poses (static 2-tick loops; dbg_<name>, ignored by the module): the coverage-gate poses, the views and the
 // pose glossary (dbg_g_<pose>) for the key-pose renders =====================================================================
 const dbg = (name, form, p, note, s = 'CROUCH', hands = []) => ({name: 'dbg_' + name, form, len: 2, loop: true, next: null, events: {}, stance: [s, s],
-  px_sets: [[0, form === 'p1' ? 'p1' : 'p3c']], keys: [[0, deep(p)], [2, {}]], note, dbg: true,
+  px_sets: [[0, form === 'p1' ? 'p1' : 'p3c']], keys: [[0, modelFloor(deep(p), form)], [2, {}]], note, dbg: true,
   hand_events: form === 'p1' ? autoHands({len: 2}, [[0, p]]) : hands});
 const GLOSSARY_P3 = ['UPRIGHT', 'CRAWL', 'HUNCH', 'MOUND', 'HOOP', 'SCOIL', 'CURL', 'BALL', 'V', 'CROUCH_OVER', 'BELLY_FLOP', 'KNEEL', 'FALLEN', 'SEATED_LIT', 'ALOFT', 'BLAST',
   'T_WIDE', 'THRUST', 'LAUNCH', 'P3_COCK', 'P3_WHIP', 'SURF_AIM', 'WHIRL', 'UNF_4', 'UNF_8', 'DROOP', 'HIT_SNAP', 'REACH_P3', 'TAIL_SWEEP', 'BURST_P3'];
