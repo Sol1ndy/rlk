@@ -3,11 +3,11 @@
 # tail track x the yaw schedule), r 12.0, height to 2.0 b, heavy KB away, 160 %, one volley group;
 # quiet (none row: the crouch / cock + tail-tip flash, the S-coil + lunge are the tell).
 function rlk:mboss/grp_new
-execute positioned ^0.181 ^0 ^2.524 positioned ~ 201 ~ rotated ~-55.15 0 run function rlk:boss/apep/p/tail3/sw2_46
-execute positioned ^1.373 ^0 ^2.117 positioned ~ 201 ~ rotated ~-60.72 0 run function rlk:boss/apep/p/tail3/sw2_47
-execute positioned ^2.139 ^0 ^1.339 positioned ~ 201 ~ rotated ~-81.01 0 run function rlk:boss/apep/p/tail3/sw2_48
-execute positioned ^2.504 ^0 ^0.31 positioned ~ 201 ~ rotated ~-106.01 0 run function rlk:boss/apep/p/tail3/sw2_49
-execute positioned ^2.4 ^0 ^-0.778 positioned ~ 201 ~ rotated ~-131.01 0 run function rlk:boss/apep/p/tail3/sw2_50
-execute positioned ^1.847 ^0 ^-1.719 positioned ~ 201 ~ rotated ~-156.01 0 run function rlk:boss/apep/p/tail3/sw2_51
-execute positioned ^0.931 ^0 ^-2.423 positioned ~ 201 ~ rotated ~-168.14 0 run function rlk:boss/apep/p/tail3/sw2_52
-execute positioned ^-0.23 ^0 ^-2.66 positioned ~ 201 ~ rotated ~-149.86 0 run function rlk:boss/apep/p/tail3/sw2_53
+execute positioned ^-1.858 ^0 ^-1.717 positioned ~ 201 ~ rotated ~86.69 0 run function rlk:boss/apep/p/tail3/sw2_46
+execute positioned ^-2.5 ^0 ^-0.339 positioned ~ 201 ~ rotated ~75.53 0 run function rlk:boss/apep/p/tail3/sw2_47
+execute positioned ^-2.315 ^0 ^1.004 positioned ~ 201 ~ rotated ~48.87 0 run function rlk:boss/apep/p/tail3/sw2_48
+execute positioned ^-1.461 ^0 ^2.057 positioned ~ 201 ~ rotated ~17.7 0 run function rlk:boss/apep/p/tail3/sw2_49
+execute positioned ^-0.186 ^0 ^2.517 positioned ~ 201 ~ rotated ~-13.47 0 run function rlk:boss/apep/p/tail3/sw2_50
+execute positioned ^1.144 ^0 ^2.249 positioned ~ 201 ~ rotated ~-44.63 0 run function rlk:boss/apep/p/tail3/sw2_51
+execute positioned ^1.702 ^0 ^1.96 positioned ~ 201 ~ rotated ~-56.74 0 run function rlk:boss/apep/p/tail3/sw2_52
+execute positioned ^2.186 ^0 ^1.534 positioned ~ 201 ~ rotated ~-28.71 0 run function rlk:boss/apep/p/tail3/sw2_53
