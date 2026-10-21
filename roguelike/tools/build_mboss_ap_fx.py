@@ -963,6 +963,8 @@ SOUNDS = {
     'q3_launch': S('Q3 t35: the launch.', L('entity.breeze.shoot', V, 0.8), L('item.crossbow.shoot', V, 0.5)),
     'q3_impact1': S('Q3 t45: shell 1.', L('entity.generic.explode', V, 1.2), L('block.beacon.deactivate', V, 1.5),
                     L('block.big_dripleaf.break')),
+    'q3_lock': S('Q3 t79 / 82: lock 2 / 3, at the target point (AP-FIX RV-02: the readable cue 14 t before the hit).',
+                 L('block.beacon.power_select', V, 1.6), L('entity.breeze.charge', V, 1.2)),
     'q3_impact2': S('Q3 t93 / 96: shells 2 / 3.', L('entity.dragon_fireball.explode', 0.5, 1.4)),
     'q3s_surface': S('Q3s t36: the surfacing.', L('block.mud.break'), L('entity.player.splash', V, 0.6),
                      L('block.azalea_leaves.break')),

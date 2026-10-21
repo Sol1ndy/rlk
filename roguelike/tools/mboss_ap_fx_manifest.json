@@ -4040,6 +4040,21 @@
     ]
    ]
   },
+  "q3_lock": {
+   "use": "Q3 t79 / 82: lock 2 / 3, at the target point (AP-FIX RV-02: the readable cue 14 t before the hit).",
+   "layers": [
+    [
+     "block.beacon.power_select",
+     0.8,
+     1.6
+    ],
+    [
+     "entity.breeze.charge",
+     0.8,
+     1.2
+    ]
+   ]
+  },
   "q3_impact2": {
    "use": "Q3 t93 / 96: shells 2 / 3.",
    "layers": [
