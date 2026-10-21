@@ -14,10 +14,10 @@ execute if score @s rdPhase matches 3 run function rlk:boss/raiden/exhausted_tic
 execute if score @s rdPhase matches 0 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
 execute if score @s rdPhase matches 2 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
 # Close-range patterns first close the distance (rdGo); their clock waits at 0 meanwhile.
-execute if score @s rdGo matches 1.. if score @s rdPat matches 1..18 run function rlk:boss/raiden/close_in
+execute if score @s rdGo matches 1.. if score @s rdPat matches 1..20 run function rlk:boss/raiden/close_in
 # Timelines start on the tick after choose: rdTime 1 is every pattern's first frame.
 execute if score @s rdPat matches 1..7 if score @s rdTime matches 1.. run function rlk:boss/raiden/normal_dispatch
-execute if score @s rdPat matches 11..18 if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch
+execute if score @s rdPat matches 11..20 if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch
 execute if score @s rdPat matches 99 if score @s rdTime matches 60.. run function rlk:boss/raiden/finish
 # Found the real illusion: a 10 s stun owned by the illusion generator.
 execute if score @s rdPat matches 98 run function rlk:boss/raiden/illusion/stun_tick
@@ -30,11 +30,8 @@ execute if score @s rdBlink matches 1.. run function rlk:boss/raiden/movement/bl
 scoreboard players set #rdHide rd 0
 execute if score @s rdBlink matches 1.. run scoreboard players set #rdHide rd 1
 execute if score @s rdPat matches 5 if score @s rdTime matches 1.. run scoreboard players set #rdHide rd 1
-execute if score @s rdPat matches 15 if score @s rdTime matches 26.. run scoreboard players set #rdHide rd 1
 execute if score #rdHide rd matches 0 at @s run function rlk:boss/raiden/rig/tick
 execute if score #rdHide rd matches 1 run function rlk:boss/raiden/rig_hide
 execute if score #rdHide rd matches 0 if score @s rdHidden matches 1.. run function rlk:boss/raiden/rig_shown
-execute if score @s rdPat matches 15 run function rlk:boss/raiden/judgment_rig/tick
-execute if score @s rdPat matches 15 if score @s rdTime matches 80..173 run function rlk:boss/raiden/camera/try_start
-execute if score @s rdPat matches 15 if score @s rdTime matches 174 run function rlk:boss/raiden/camera/release_all
+
 function rlk:boss/raiden/bars

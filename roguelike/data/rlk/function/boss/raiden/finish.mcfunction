@@ -17,3 +17,5 @@ scoreboard players set @s rdAnim 0
 scoreboard players set @s rdCool 10
 function rlk:boss/raiden/object/clear
 kill @e[tag=rlk_rd_dome]
+kill @e[tag=rlk_rd_tm]
+execute if score @s rdPhase matches 2 run function rlk:boss/raiden/tm/after

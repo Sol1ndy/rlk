@@ -10,10 +10,9 @@ execute if score @s rdGo matches 2 at @s unless entity @e[tag=rlk_body,distance=
 scoreboard players set #rdNear rd 0
 execute if score @s rdPat matches 1 at @s if entity @e[tag=rlk_body,distance=..4] run scoreboard players set #rdNear rd 1
 execute if score @s rdPat matches 2 at @s if entity @e[tag=rlk_body,distance=..13] run scoreboard players set #rdNear rd 1
-execute if score @s rdPat matches 11 at @s if entity @e[tag=rlk_body,distance=..8] run scoreboard players set #rdNear rd 1
-execute if score @s rdPat matches 16 at @s if entity @e[tag=rlk_body,distance=..9] run scoreboard players set #rdNear rd 1
-execute if score @s rdPat matches 17 at @s if entity @e[tag=rlk_body,distance=..12] run scoreboard players set #rdNear rd 1
-execute if score @s rdPat matches 18 at @s if entity @e[tag=rlk_body,distance=..17] run scoreboard players set #rdNear rd 1
+execute if score @s rdPat matches 11 at @s if entity @e[tag=rlk_body,distance=..4] run scoreboard players set #rdNear rd 1
+execute if score @s rdPat matches 16 at @s if entity @e[tag=rlk_body,distance=..5] run scoreboard players set #rdNear rd 1
+execute if score @s rdPat matches 19 at @s if entity @e[tag=rlk_body,distance=..10] run scoreboard players set #rdNear rd 1
 execute if score #rdNear rd matches 1 run return run function rlk:boss/raiden/close_done
 execute if score @s rdGo matches 45.. run return run function rlk:boss/raiden/close_blink
 scoreboard players set @s rdAnim 21

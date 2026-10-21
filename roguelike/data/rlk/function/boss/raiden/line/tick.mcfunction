@@ -89,3 +89,6 @@ execute if score #rdLine rd matches 16 if score #rdLineT rd matches 6 run functi
 execute if score #rdLine rd matches 17 if score #rdLineT rd matches 0 run function rlk:boss/raiden/line/pierce_0
 execute if score #rdLine rd matches 17 if score #rdLineT rd matches 2 run function rlk:boss/raiden/line/pierce_1
 execute if score #rdLine rd matches 17 if score #rdLineT rd matches 4 run function rlk:boss/raiden/line/pierce_2
+execute if score #rdLine rd matches 18 if score #rdLineT rd matches 0 run function rlk:boss/raiden/line/foolish_0
+execute if score #rdLine rd matches 18 if score #rdLineT rd matches 3 run function rlk:boss/raiden/line/foolish_1
+execute if score #rdLine rd matches 18 if score #rdLineT rd matches 6 run function rlk:boss/raiden/line/foolish_2

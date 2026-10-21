@@ -17,6 +17,6 @@ execute if score #rdPick rd matches 0 if score #rdB16 rd matches 1 run scoreboar
 execute if score #rdPick rd matches 0 if score #rdB16 rd matches 1 if score #rdR rd matches 0 run scoreboard players set #rdPick rd 16
 execute if score #rdPick rd matches 0 if score #rdB17 rd matches 1 run scoreboard players remove #rdR rd 1
 execute if score #rdPick rd matches 0 if score #rdB17 rd matches 1 if score #rdR rd matches 0 run scoreboard players set #rdPick rd 17
-execute if score #rdPick rd matches 0 if score #rdB18 rd matches 1 run scoreboard players remove #rdR rd 1
-execute if score #rdPick rd matches 0 if score #rdB18 rd matches 1 if score #rdR rd matches 0 run scoreboard players set #rdPick rd 18
+execute if score #rdPick rd matches 0 if score #rdB19 rd matches 1 run scoreboard players remove #rdR rd 1
+execute if score #rdPick rd matches 0 if score #rdB19 rd matches 1 if score #rdR rd matches 0 run scoreboard players set #rdPick rd 19
 scoreboard players operation @s rdPat = #rdPick rd
