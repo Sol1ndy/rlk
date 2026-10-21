@@ -153,7 +153,7 @@ LINE_HEX = '#F2E2B0'                      # typed captions (mechanics only: a ma
 
 # HUD glyphs of the kit font rlk:mboss_fg (U+E700-E7FF; the kit owns the font, K.GLYPHS): the field badge E700, the
 # pips E701 empty / E702 full / E703 just counted, the big break badge E704, the 2 px group-gap space E7F1, the "N/20"
-# digits E720-E72A (K.digits). The meter line itself (badge, 역장, pips, digits, the first-field hint) is the kit's
+# digits E720-E72A (K.digits). The meter line itself (badge, 역장, pips, digits) is the kit's
 # hud/put_sub; the core writes only the break line's badge.
 FONT = K.FONT
 GLYPH = {'badge': K.glyph('badge'), 'pip_empty': K.glyph('pip0'), 'pip_full': K.glyph('pip1'), 'pip_new': K.glyph('pip2'),

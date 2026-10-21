@@ -1741,10 +1741,10 @@ def hud_funcs(W):
                           f'data modify storage rlk:mboss extra append from storage {STO} hud.ex[]'])
     W.w('hud/put_sub', ['# Append badge + label(s) to the boss-bar third line (rlk:mboss sub), after the module\'s own text.',
                         f'data modify storage rlk:mboss sub append from storage {STO} hud.sub[]'])
-    W.w('hud/ab_coc', ['# One-shot actionbar notice (2 s) for every player: the badge and the hint. Holds the regular',
-                       '# actionbar HUD (hudHold) meanwhile.',
+    W.w('hud/ab_coc', ['# One-shot actionbar notice (2 s) for every player: the badge, the debuff and its numbers (no cure',
+                       '# advice: 10-21 user rule). Holds the regular actionbar HUD (hudHold) meanwhile.',
                        'title @a[tag=player] actionbar [' + gl('coc') + ',{text:" 달빛 고치",color:"#E8A0A6",bold:true},'
-                       '{text:" — 체력 15% 회복하면 해제 · 피해 −50% · 치명타 −100% · 받는 치유 −40%",color:"#C9A3A6"}]',
+                       '{text:" — 피해 −50% · 치명타 −100% · 받는 치유 −40%",color:"#C9A3A6"}]',
                        'scoreboard players set @a[tag=player] hudHold 40'])
     W.w('hud/ab_buff', ['# One-shot actionbar notice (2 s): the reward badge and its numbers.',
                         'title @a[tag=player] actionbar [' + gl('buff') + ',{text:" 달빛 축복 받음",color:"#F2D27A",bold:true},'

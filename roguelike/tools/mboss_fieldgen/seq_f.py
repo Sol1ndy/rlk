@@ -141,14 +141,15 @@ def field_fns(g, C):
         '# S1 the banner (@s = body; field/banner, low gravity from here): the first floating pebbles at the player\'s feet',
         '# (the kit\'s banner, icon and sound are the core\'s hud calls).',
         f'execute at {PLAYER} run ' + g.fx('pebbles')])
-    note = C.BANNER_T + (C.FIN_BANNER - C.FIN_UNFOLD)        # #fgHintT when the banner's 80 t hold ends
+    note = C.BANNER_T + (C.FIN_BANNER - C.FIN_UNFOLD)        # #fgFirstT when the banner's 80 t hold ends
+    assert note <= C.FIRST_T, (note, C.FIRST_T)             # the core's first-field clock must still be counting then
     g.w(f'{SEQ}/field/tick', [
         '# The field ambience (@s = body, every module tick while #fgField >= 1; frozen with the fight): pebbles at the',
         '# player\'s feet every 20 t while low gravity holds (never at the eyes; not during the waves: their fire bands,',
         '# three at once with the triple front, need the kit\'s card room, and a pebble card lives up to 66 t), the violet crackle under the core every',
         '# 20 t in the field form (not during the waves: their own fx), the field drone every 40 t, the settle\'s gold',
         f'# streaks {STREAKS[0]} / {STREAKS[1]} t after the opening (#fgCool from {SETTLE}), the first field\'s low-gravity notice',
-        '# when the banner\'s hold ends (spec S5: what low gravity means, the waves are jumped).',
+        '# when the banner\'s hold ends (spec S5: what low gravity does).',
         'scoreboard players operation #fgM mb = #fgClk mb',
         'scoreboard players operation #fgM mb %= #fgK20 mb',
         f'execute if score #fgLowG mb matches 1 if score #fgM mb matches 0 unless score #fgPat mb matches 21 at {PLAYER} run '
@@ -160,7 +161,7 @@ def field_fns(g, C):
         'execute if score #fgField mb matches 2..4 if score #fgM mb matches 20 run ' + g.snd('field_hum'),
         *[ex(f'if score #fgField mb matches 2 if score #fgPat mb matches 0 if score #fgCool mb matches {SETTLE - s + 1}',
              floor(g.fx('gold_streaks'))) for s in STREAKS],
-        f'execute if score #fgFN mb matches 1 if score #fgHintT mb matches {note} if score #fgLowG mb matches 1 run ' + g.khud('ab_lowg')])
+        f'execute if score #fgFN mb matches 1 if score #fgFirstT mb matches {note} if score #fgLowG mb matches 1 run ' + g.khud('ab_lowg')])
 
 
 # =============================================================================================

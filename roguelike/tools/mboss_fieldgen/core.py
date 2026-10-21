@@ -40,7 +40,7 @@ FIELD_T = 400                                 # field patterns stretch (checked 
 GROGGY = 200                                  # after the break
 CUT = 60                                      # % damage the boss takes while the field is up ("모든 저항 증가")
 ICD = 6                                       # at most one meter count per 6 t (gametime)
-HINT_T = 120                                  # the first field's hint on the sub-line
+FIRST_T = 120                                 # the first field's clock #fgFirstT counts this far from the unfold (seq_f's notice)
 KEEP_MIN, KEEP_MAX = 6, 10                    # cruise idle: keep 6-10 b from the player
 TURN_C, TURN_F = 4, 3                         # idle tracking, degrees per tick (the device turns slowly)
 INTRO_CLIP = 1                                # intro tick of the entrance clip's tick 0 (played in intro/setup)
@@ -84,7 +84,6 @@ ST = {'idle': 0, 'pattern': 1, 'groggy': 3, 'recover': 4, 'break': 6, 'dead': 7}
 FLD = {'cruise': 0, 'warp': 1, 'open': 2, 'patterns': 3, 'close': 4, 'pack': 5}
 GOLD_HEX, VIOLET_HEX = A.GOLD_HEX, A.VIOLET_HEX
 BANNER = '중력이 감소하고 점프 능력이 향상됩니다'
-HINT = '코어를 공격해 역장을 깨뜨리세요'
 BANNER_T = 80                                 # the kit's field banner holds the actionbar this long (hud/banner_field)
 # The kit's hud/meter_hit cracks the core bubble itself at counts 5 / 10 / 15 (<RIG>crack/<n> as the body): the kit
 # and the core drive the same rig (rig/), so the core calls crack only for a stage the kit skipped (test 31's +5
@@ -242,7 +241,7 @@ class Core:
              '# field stage #fgField: 0 cruise 1 warp 2 opening waves 3 field patterns 4 closing waves 5 pack-up.']
         v += [sc_set(k, 0) for k in ('#fgSt', '#fgT', '#fgMv', '#fgLast', '#fgPick', '#fgReq', '#fgReqK', '#fgPat', '#fgPNew',
                                      '#fgPT', '#fgPEnd', '#fgPMax', '#fgPLen', '#fgPRel', '#fgPDone', '#fgPCol', '#fgClk',
-                                     '#fgFlash', '#fgTst', '#fgDist', '#fgField', '#fgFT', '#fgFN', '#fgHintT', '#fgCruN',
+                                     '#fgFlash', '#fgTst', '#fgDist', '#fgField', '#fgFT', '#fgFN', '#fgFirstT', '#fgCruN',
                                      '#fgOpen', '#fgBrk', '#fgBrkFx', '#fgBrkQ', '#fgCrack', '#fgLowG', '#fgWvK', '#fgTri',
                                      '#fgHudV', '#fgBanF', '#fgBrkLo')]
         v += [sc_set('#fgCool', 30), sc_set('#fgBand', 2), sc_set('#fgCruLim', FIRST_FIELD_N), sc_set('#fgBrkT', -1000000),
@@ -360,7 +359,7 @@ class Core:
             '# Hook cleanup (no executor; idempotent; fight end, abort, run end, map change, wipe, uninstall): module',
             '# fake players back to their defaults (the meter, the field, low gravity: the framework\'s player_reset clears',
             '# #mbLowG, rlk:tick removes the modifiers), the module\'s storage, every kit card and the kit\'s HUD flags',
-            '# (meter, low gravity, groggy, hint), the field banner if it still shows. Module entities carry rlk_mb_aux.',
+            '# (meter, low gravity, groggy), the field banner if it still shows. Module entities carry rlk_mb_aux.',
             F('hud/banner_cut'),
             F('ai/vars'),
             'data remove storage rlk:mboss fg',
@@ -705,19 +704,19 @@ class Core:
         self.w('field/open', [
             f'# Field opening clock {FIN_UNFOLD} (@s = body): the unfold; targetable again; the meter opens at 0/{A.METER_N} (crack 0;',
             '# the kit\'s meter on the sub-line), the field look, the field hitbox, the field damage cut',
-            f'# ({CUT} %), the first field\'s hint for {HINT_T} t (the kit\'s hint_on / hint_off). Idempotent (fix round FG-S2): a',
-            '# meter already open (a reload or test cut of the opening after the unfold, a test request inside the field)',
-            '# keeps its count, its field number and its hint; only the look, the hitbox and the lines are applied again.',
+            f'# ({CUT} %), the first field\'s clock #fgFirstT from 0. No hint on the lines (10-21 user rule: no how-to-fight',
+            '# advice). Idempotent (fix round FG-S2): a meter already open (a reload or test cut of the opening after the',
+            '# unfold, a test request inside the field) keeps its count, its field number and its clock; only the look, the',
+            '# hitbox and the lines are applied again.',
             'tag @s remove rlk_mb_inv',
             f'execute if score #fgOpen mb matches 1 run return run {F("field/reopen")}',
             sc_set('#fgOpen', 1), sc_set('#fgBrk', 0), sc_set('#fgBrkT', -1000000), sc_set('#fgBrkFx', 0), sc_set('#fgBrkQ', 0),
             sc_set('#fgCrack', 0), R('crack/0'), g.look('field'), F('form/hitbox_f'),
-            'scoreboard players add #fgFN mb 1', sc_set('#fgHintT', 0),
+            'scoreboard players add #fgFN mb 1', sc_set('#fgFirstT', 0),
             K.hud('meter_open'),
-            f'execute if score #fgFN mb matches 1 run {K.hud("hint_on")}',
             F('seq_f/unfold'), F('hud/refresh')])  # [seq_f: field author]
         self.w('field/reopen', ['# field/open with the meter open already (fix round FG-S2): no second count reset, field number,',
-                                '# hint or unfold fx; the rig look, the field hitbox and the lines again.',
+                                '# clock or unfold fx; the rig look, the field hitbox and the lines again.',
                                 g.look('field'), F('form/hitbox_f'), F('hud/refresh')])
         self.w('field/banner', [
             f'# Field opening clock {FIN_BANNER}: low gravity (#fgLowG -> #mbLowG every tick), the kit\'s banner "{BANNER}"',
@@ -733,8 +732,8 @@ class Core:
             g.say(BANNER, '#D9C8FF', 1, 50, 1),
             F('seq_f/banner')])  # [seq_f: field author]
         self.w('field/close', [
-            '# The pack-up begins (@s = body): the meter closes, low gravity and the damage cut end (the kit\'s meter, icon',
-            '# and hint leave the lines), the idle look.',
+            '# The pack-up begins (@s = body): the meter closes, low gravity and the damage cut end (the kit\'s meter and',
+            '# icon leave the lines), the idle look.',
             sc_set('#fgOpen', 0), sc_set('#fgLowG', 0), F('hud/kit_off'),
             f'execute unless score #fgPat mb matches 22 run {g.look("idle")}',  # [seq_f: field author] the pack-up's look/idle is at its dock (Q14)
             F('hud/refresh')])
@@ -768,11 +767,10 @@ class Core:
             '# Instant cruise (tests, the reload of a pack-up): meter / low gravity off, the cruise form, crack 0.',
             F('field/close'), F('field/drop'), g.form('cruise'), g.play('idle_cruise'), sc_set('#fgCrack', 0), R('crack/0')])
         self.w('field/tick', [
-            '# @s = body, every module tick while #fgField >= 1: the field-pattern clock, the first field\'s hint, the field',
+            '# @s = body, every module tick while #fgField >= 1: the field-pattern clock, the first field\'s clock, the field',
             '# ambience (seq_f/field/tick: the pebbles around the player while low gravity holds, ...).',  # [seq_f: field author]
             f'execute if score #fgField mb matches {FLD["patterns"]} run scoreboard players add #fgFT mb 1',
-            f'execute if score #fgOpen mb matches 1 if score #fgHintT mb matches ..{HINT_T} run scoreboard players add #fgHintT mb 1',
-            f'execute if score #fgHintT mb matches {HINT_T} if score #fgFN mb matches 1 run {F("hud/hint_end")}',
+            f'execute if score #fgOpen mb matches 1 if score #fgFirstT mb matches ..{FIRST_T} run scoreboard players add #fgFirstT mb 1',
             F('seq_f/field/tick')])  # [seq_f: field author] the field ambience, the settle, the first field's notice
 
     # -----------------------------------------------------------------------------------------
@@ -826,7 +824,7 @@ class Core:
             f'# @s = body: the {A.METER_N}th count broke the field (역장 붕괴). Every threat goes (hazards, props, pulls, glides:',
             '# lib_clear; the running pattern, waves included: p/cancel), the meter / low gravity / the damage cut end, the',
             f'# field state ends; the break plays ({BRK_LEN} t: bubble, burst at {BRK_BURST}, tilt, wobble, sink), then groggy {GROGGY} t.',
-            '# The kit: every decal goes (tele/clear), the banner if it still shows, the meter / low-gravity icon / hint',
+            '# The kit: every decal goes (tele/clear), the banner if it still shows, the meter / low-gravity icon',
             '# (field/drop -> hud/kit_off); " · 그로기" on the name line from here to the end of the recovery.',
             sc_set('#fgBrkQ', 0),
             '# the device low in the closing wave_drop (read before p/cancel clears the clock): the grounded break_low (FID-1)',
@@ -907,7 +905,7 @@ class Core:
             '# Hook death_start (@s = body; hazards, props, pull and movement already cleared, bars hidden). The pattern goes,',
             '# the field ends (meter, low gravity, cut). The death clip: the seam flickers out, the halo and the drill pods',
             '# fall, the ring sinks tilted 40 degrees, then it scales out. Mechanical sounds only (deathSnd false).',
-            '# The kit: every decal goes, the banner if it still shows, every HUD flag off (meter, low gravity, hint, groggy).',
+            '# The kit: every decal goes, the banner if it still shows, every HUD flag off (meter, low gravity, groggy).',
             F('p/cancel'),
             f'function {KF}tele/clear',
             F('hud/banner_cut'),
@@ -938,7 +936,7 @@ class Core:
             K.hud('put_extra')])
         sub = ['# Third line: what the device is doing. While the meter is open the core writes only the running field',
                '# pattern ("패턴  <label>") and the kit\'s put_sub appends the meter: badge, 역장, the 20 pips in groups of five',
-               '# (the newest one white for 4 t), the "n/20" digits and the first field\'s hint (font rlk:mboss_fg).',
+               '# (the newest one white for 4 t) and the "n/20" digits (font rlk:mboss_fg).',
                'execute if score #mbSt mb matches 0 run data modify storage rlk:mboss sub set value []',
                'execute if score #mbSt mb matches 0 run return 0',
                f'data modify storage rlk:mboss sub set value [{{text:"순항",color:"{GOLD_HEX}",bold:true}}]',
@@ -949,7 +947,8 @@ class Core:
                        f'[{{text:"패턴  ",color:"#A8A8A8"}},{{text:"{p.label}",color:"{"#C9B8F5" if p.state == "f" else "#F2E2B0"}"}}]')
         sub += [f'execute if score #fgSt mb matches {ST["break"]} run data modify storage rlk:mboss sub set value '
                 f'[{{text:"{A.GLYPH["break"]}",font:"{A.FONT}",color:"white"}},{{text:" 역장 붕괴",color:"#FFE7A0",bold:true}}]',
-                f'execute if score #fgSt mb matches {ST["groggy"]} run data modify storage rlk:mboss sub set value [{{text:"그로기  ",color:"#9FE8A0",bold:true}},{{text:"공격할 기회",color:"#C8E8C8"}}]',
+                # groggy: the state name only (10-21 user rule: no how-to-fight advice such as "공격할 기회" on the lines)
+                f'execute if score #fgSt mb matches {ST["groggy"]} run data modify storage rlk:mboss sub set value [{{text:"그로기",color:"#9FE8A0",bold:true}}]',
                 f'execute if score #fgSt mb matches {ST["recover"]} run data modify storage rlk:mboss sub set value [{{text:"그로기  ",color:"#9FE8A0",bold:true}},{{text:"다시 떠오른다",color:"#C8E8C8"}}]',
                 f'execute if score #fgOpen mb matches 1 run {K.hud("put_sub")}']
         self.w('hud/sub', sub)
@@ -957,13 +956,11 @@ class Core:
                                '# its HUD components: #fkHudV, compared every module tick).',
                                F('hud/extra'), F('hud/sub'),
                                'scoreboard players operation #fgHudV mb = #fkHudV mb'])
-        self.w('hud/kit_off', ['# The field is over (the pack-up, the break, a reload, a test): the kit\'s meter, low-gravity icon and hint',
+        self.w('hud/kit_off', ['# The field is over (the pack-up, the break, a reload, a test): the kit\'s meter and low-gravity icon',
                                '# leave the lines (only the flags still on: each kit call rebuilds its components; the caller refreshes',
                                '# the lines).',
                                f'execute if data storage {K.STO} hud{{open:1b}} run {K.hud("meter_close")}',
-                               f'execute if data storage {K.STO} hud{{lowg:1b}} run {K.hud("lowg_off")}',
-                               f'execute if data storage {K.STO} hud{{hint:1b}} run {K.hud("hint_off")}'])
-        self.w('hud/hint_end', [f'# The first field\'s hint has shown {HINT_T} t: off.', K.hud('hint_off'), F('hud/refresh')])
+                               f'execute if data storage {K.STO} hud{{lowg:1b}} run {K.hud("lowg_off")}'])
         self.w('hud/groggy_on', ['# " · 그로기" on the name line (the break and groggy; ai/enter drops it).',
                                  f'execute unless data storage {K.STO} hud{{grog:1b}} run {K.hud("groggy_on")}'])
         self.w('hud/banner_cut', [

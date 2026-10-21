@@ -1,7 +1,7 @@
 # At the player's feet (the core's coc/apply_pl): a maroon / salmon dust spiral rising 0.3 -> 2.2 b around
 # the body, the debuff recipe and a curse chime; the kit's cards only around the shoulder-view avatar (rlk_av).
 # In first person rlk_body is the player itself and the camera-facing cards would sit on the eyes (a maroon
-# screen wash): only the closing swirl ring on the floor (fix PL-1; the title line belongs to the hint caption).
+# screen wash): only the closing swirl ring on the floor (fix PL-1).
 particle minecraft:dust{color:[0.549f,0.322f,0.361f],scale:1.1} ~0 ~0.3 ~0.35 0 0 0 0 1 force @a[tag=player]
 particle minecraft:dust{color:[0.91f,0.522f,0.541f],scale:1.1} ~0.22 ~0.43 ~0.33 0 0 0 0 1 force @a[tag=player]
 particle minecraft:dust{color:[0.549f,0.322f,0.361f],scale:1.1} ~0.42 ~0.55 ~0.17 0 0 0 0 1 force @a[tag=player]

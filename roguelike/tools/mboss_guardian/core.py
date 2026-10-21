@@ -1317,8 +1317,9 @@ class Core:
         self.w('hud/sub_chaos', csub)
         self.w('hud/sub_fail', [F('hud/extra'),
                                 'data modify storage rlk:mboss sub set value [{text:"파괴 실패  ",color:"#E06A5A",bold:true},{text:"거대한 창이 떨어진다",color:"#E8B8B8"}]'])
+        # groggy: the state name only (10-21 user rule: no how-to-fight advice such as "공격할 기회" on the lines)
         self.w('hud/sub_groggy', [F('hud/extra'),
-                                  'data modify storage rlk:mboss sub set value [{text:"그로기  ",color:"#9FE8A0",bold:true},{text:"공격할 기회",color:"#C8E8C8"}]'])
+                                  'data modify storage rlk:mboss sub set value [{text:"그로기",color:"#9FE8A0",bold:true}]'])
         bg = ['# @s = body: the leading element\'s record progress (count x 100 / needed) in its colour; gold time left',
               '# before the first counted hit.',
               sc_set('#gdBest', -1), sc_set('#gdBestE', 0)]
