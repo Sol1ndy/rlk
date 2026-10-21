@@ -75,7 +75,7 @@
       "icon": {"item": "minecraft:lodestone", "model": "minecraft:lodestone"}
     },
     {
-      "id": "azhdaha", "n": 10, "kind": "chapter", "ch": [1], "route": false, "enabled": true, "w": 0,
+      "id": "azhdaha", "n": 10, "kind": "chapter", "ch": [1], "route": true, "enabled": true, "w": 0,
       "minCh": 1, "maxCh": 1, "name": "야타용왕", "sub": "봉인된 바위 용의 왕", "color": "#F2B53A", "el": 5,
       "hp": 135, "xp": 40, "atk": 12, "lvAdd": 0, "dmgMul": 140, "goldMul": 1, "sap": 0, "picks": 0,
       "scale": 0.1, "px": true, "pxBase": 65, "intro": 160, "death": 140, "deathSnd": false,
