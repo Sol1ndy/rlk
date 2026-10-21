@@ -17,7 +17,7 @@ scoreboard players set #hzNR mb 1
 scoreboard players operation #hzGrp mb = #aq46G mb
 scoreboard players operation #hzEl mb = #azET mb
 scoreboard players operation #pjEl mb = #azET mb
-execute at @e[type=minecraft:marker,tag=rlk_mb_az_p46l1,limit=1] run function rlk:mboss/hz/disc {r:30,tell:13,dmg:70}
+execute at @e[type=minecraft:marker,tag=rlk_mb_az_p46l1,limit=1] run function rlk:mboss/hz/disc {r:30,tell:13,dmg:50}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_p46
 execute at @e[type=minecraft:marker,tag=rlk_mb_az_p46l1,limit=1] run summon minecraft:item_display ~ ~12 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_az_pat","rlk_mb_az_p46","rlk_mb_az_p46p1"],teleport_duration:1}
 execute as @e[type=minecraft:item_display,tag=rlk_mb_az_p46p1] run function rlk:mboss/azhdaha/fx/prop/elump

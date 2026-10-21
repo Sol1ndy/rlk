@@ -12,7 +12,7 @@ scoreboard players set #hzNR mb 1
 scoreboard players operation #hzGrp mb = #axtG mb
 scoreboard players operation #hzEl mb = #azET mb
 scoreboard players operation #pjEl mb = #azET mb
-execute positioned ^ ^ ^4 run function rlk:mboss/hz/disc {r:18,tell:15,dmg:60}
+execute positioned ^ ^ ^4 run function rlk:mboss/hz/disc {r:18,tell:15,dmg:50}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
 scoreboard players set #hzKB mb 3
 scoreboard players set #hzSfx mb 0
@@ -22,7 +22,7 @@ scoreboard players set #hzNR mb 1
 scoreboard players operation #hzGrp mb = #axtG mb
 scoreboard players operation #hzEl mb = #azET mb
 scoreboard players operation #pjEl mb = #azET mb
-execute positioned ^ ^ ^8 run function rlk:mboss/hz/disc {r:18,tell:15,dmg:60}
+execute positioned ^ ^ ^8 run function rlk:mboss/hz/disc {r:18,tell:15,dmg:50}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
 scoreboard players set #hzKB mb 3
 scoreboard players set #hzSfx mb 0
@@ -32,7 +32,7 @@ scoreboard players set #hzNR mb 1
 scoreboard players operation #hzGrp mb = #axtG mb
 scoreboard players operation #hzEl mb = #azET mb
 scoreboard players operation #pjEl mb = #azET mb
-execute positioned ^ ^ ^12 run function rlk:mboss/hz/disc {r:18,tell:15,dmg:60}
+execute positioned ^ ^ ^12 run function rlk:mboss/hz/disc {r:18,tell:15,dmg:50}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
 scoreboard players set #hzKB mb 3
 scoreboard players set #hzSfx mb 0
@@ -42,9 +42,9 @@ scoreboard players set #hzNR mb 1
 scoreboard players operation #hzGrp mb = #axtG mb
 scoreboard players operation #hzEl mb = #azET mb
 scoreboard players operation #pjEl mb = #azET mb
-function rlk:mboss/hz/line {len:120,w:24,tell:25,dmg:60}
+function rlk:mboss/hz/line {len:120,w:24,tell:25,dmg:50}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
-scoreboard players set #azAftF mb 47
+scoreboard players set #azAftF mb 48
 scoreboard players set #azAftD mb 27
 function rlk:mboss/azhdaha/aft/new
 scoreboard players set #axtArc mb 0

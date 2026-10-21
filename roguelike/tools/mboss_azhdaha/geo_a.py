@@ -97,7 +97,8 @@ def emit_chin(g):
         tl.at(t, 'function rlk:mboss/mv/turn {max:4}')
     tl.at(P1['roar'], g.snd('chin_rear'))
     tl.at(P1['lock'], g.fn(f'p/{key}/lock'), f'{H.at_m(ti)} run {g.fn(f"p/{key}/hz")}')
-    tl.at(P1['impact'] - A.ADDON_LEAD, f'{H.at_m(ti)} run {g.fn(f"p/{key}/ax")}')
+    tl.at(P1['impact'] - A.ADDON_LEAD, f'{H.at_m(ti)} run {g.fn(f"p/{key}/ax")}',
+          'scoreboard players set #azNoPush mb 1')                      # (FIX perf) the addon tick: no body push
     tl.at(P1['impact'], f'{H.at_m(ti)} run {g.fn(f"p/{key}/fx")}')
     tl.at(P1['impact'] + 1, f'{H.at_m(ti)} run {g.fn(f"p/{key}/fx2")}')
     tl.at(P1['release'], g.release())
@@ -180,7 +181,9 @@ def emit_jump(g):
     # take-off, the leap, the landing
     tl.at(P2['takeoff'], g.snd('jump_takeoff'), g.px('jump'), 'scoreboard players set #azLeap mb 1',
           f'execute at {H.sel_m(tl_)} run function rlk:mboss/mv/leap {{t:{P2["air"]},h:{int(round(P2["apex"] * 10))}}}')
-    tl.span(P2['takeoff'], P2['land'], 'scoreboard players set #azNoPush mb 1')
+    # (FIX perf) no body push from the takeoff through the second wave: the landing waves, their rings and the addons
+    # share these ticks (the body stands still on its landing disc meanwhile)
+    tl.span(P2['takeoff'], P2['wave2'], 'scoreboard players set #azNoPush mb 1')
     tl.span(P2['takeoff'] + 1, P2['land'] - 1, f'function rlk:mboss/mv/turn {{max:{P2["turn"]}}}')
     tl.at(P2['land'] - A.ADDON_LEAD, f'execute at {H.sel_m(tl_)} facing entity {PLAYER} feet rotated ~ 0 run {g.fn(f"p/{key}/ax_land")}')
     tl.at(P2['wave2'] - A.ADDON_LEAD, f'execute at {H.sel_m(tl_)} facing entity {PLAYER} feet rotated ~ 0 run {g.fn(f"p/{key}/ax_wave2")}')

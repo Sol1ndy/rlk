@@ -7,6 +7,6 @@ execute as @e[type=minecraft:marker,tag=rlk_mb_az_xcr,scores={azT=4}] run functi
 execute as @e[type=minecraft:marker,tag=rlk_mb_az_xcr,scores={azT=5}] run function rlk:mboss/hz/resize {r:52,r0:38,w:0}
 execute as @e[type=minecraft:marker,tag=rlk_mb_az_xcr,scores={azT=6}] run function rlk:mboss/hz/resize {r:60,r0:45,w:0}
 tag @e[type=minecraft:marker,tag=rlk_mb_az_xcr,scores={azT=6..}] remove rlk_mb_az_xcr
-execute if entity @e[type=minecraft:marker,tag=rlk_mb_az_xcr,limit=1] run scoreboard players set #azAftF mb 44
+execute if entity @e[type=minecraft:marker,tag=rlk_mb_az_xcr,limit=1] run scoreboard players set #azAftF mb 45
 execute if entity @e[type=minecraft:marker,tag=rlk_mb_az_xcr,limit=1] run scoreboard players set #azAftD mb 1
 execute if entity @e[type=minecraft:marker,tag=rlk_mb_az_xcr,limit=1] run function rlk:mboss/azhdaha/aft/new

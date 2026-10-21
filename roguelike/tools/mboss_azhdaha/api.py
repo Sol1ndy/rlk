@@ -301,17 +301,18 @@ WHIP_HEAD_LANE = 65.0                             # the hazard ends 65 degrees f
 
 
 # =============================================================================================
-# Balance tables (plan.md 6.3 / s2.md 5.1). % of the base hit; only the balance fixer changes values.
+# Balance tables (plan.md 6.3 / s2.md 5.1). % of the base hit; only the balance fixer changes values. FIX balance pass
+# (plan Change note 5): set by the fairness sim of record against plan 6.2 (brand_pm sits at pl_dot's 1-HP floor).
 DMG = {
-    'p1': 140, 'p2_land': 110, 'p2_wave2': 110, 'p3': 180, 'p4_land': 90, 'p4_blast': 90, 'p5': 90, 'p5b': 90,
-    'p6_strip': 120, 'p6_end': 60, 'p7_sweep': 150, 'p7_erupt': 80, 'p8': 140,
-    'p9_ring': 90, 'p9_rock': 60, 'p9_rush': 110, 'p9_burst': 150, 'p9_run': 130,
-    't1_wave': 80, 't1_wave6': 100, 'b3_emerge': 140,
-    'o31': 35, 'o32_big': 140, 'o32_small': 80, 'fire': 20, 'hail': 15,
-    'o41': 90, 'o42': 120, 'o42_sky': 50, 'o43': 70, 'o44': 60, 'o45': 100, 'o46': 70,
-    'x_geyser': 80, 'x_blade': 50, 'x_lump': 60, 'x_cring': 60, 'x_bolt': 60, 'x_wall': 80, 'x_hail': 15,
-    'x_wline': 60, 'x_estrip': 20, 'x_strip': 15,
-    'brand_pm': 30, 'shard_pm': 120,
+    'p1': 48, 'p2_land': 44, 'p2_wave2': 44, 'p3': 158, 'p4_land': 34, 'p4_blast': 34, 'p5': 36, 'p5b': 36,
+    'p6_strip': 101, 'p6_end': 50, 'p7_sweep': 129, 'p7_erupt': 71, 'p8': 122,
+    'p9_ring': 50, 'p9_rock': 29, 'p9_rush': 58, 'p9_burst': 79, 'p9_run': 45,
+    't1_wave': 71, 't1_wave6': 86, 'b3_emerge': 122,
+    'o31': 29, 'o32_big': 110, 'o32_small': 66, 'fire': 8, 'hail': 13,
+    'o41': 79, 'o42': 101, 'o42_sky': 44, 'o43': 40, 'o44': 58, 'o45': 40, 'o46': 50,
+    'x_geyser': 71, 'x_blade': 90, 'x_lump': 30, 'x_cring': 50, 'x_bolt': 50, 'x_wall': 71, 'x_hail': 13,
+    'x_wline': 50, 'x_estrip': 16, 'x_strip': 13,
+    'brand_pm': 5, 'shard_pm': 120,
 }
 KB = {'default': 3, 'light': 2, 'heavy': 4, 'none': 0, 'p6_out': 4, 'p7_tan': 4, 'p8_side': 3, 'o32_big': 3, 'o42_sky': 2}
 ADDON_LEAD = 12

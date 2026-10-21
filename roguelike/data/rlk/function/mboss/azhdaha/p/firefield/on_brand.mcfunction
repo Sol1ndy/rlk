@@ -11,5 +11,5 @@ execute if score #aq33X mb matches 0 if score #azF5 mb matches 1 as @e[type=mine
 execute if score #aq33X mb matches 0 if score #azF6 mb matches 1 as @e[type=minecraft:marker,tag=rlk_mb_az_fld6,distance=..4,limit=1] run function rlk:mboss/azhdaha/p/firefield/ext
 execute if score #aq33X mb matches 0 if score #azF7 mb matches 1 as @e[type=minecraft:marker,tag=rlk_mb_az_fld7,distance=..4,limit=1] run function rlk:mboss/azhdaha/p/firefield/ext
 # (FIX FAIR-22) a new field at most every 100 t (#aq33C = the module tick it may come again); extending stays
-execute if score #aq33X mb matches 0 unless score #aq33C mb > #azClk mb run function rlk:mboss/azhdaha/p/firefield/new
+execute if score #aq33X mb matches 0 unless score #aq33C mb > #azClk mb run function rlk:mboss/azhdaha/p/firefield/arm
 function rlk:mboss/azhdaha/p/firefield/amb_on

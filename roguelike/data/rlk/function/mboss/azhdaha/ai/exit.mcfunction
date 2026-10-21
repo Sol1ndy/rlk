@@ -21,8 +21,7 @@ scoreboard players operation #azZ mb *= #azFt mb
 scoreboard players operation #azY mb -= #azZ mb
 execute if score #azY mb matches ..720000 if score #azFt mb matches 0.. run scoreboard players set #azExit mb 1
 # (3) beyond the tip: the anchor distance >= tip - R
-scoreboard players operation #azZ mb = #azDist mb
-scoreboard players operation #azZ mb *= #azDist mb
+scoreboard players operation #azZ mb = #azDist2 mb
 execute if score #azZ mb matches 9702.. run scoreboard players set #azExit mb 1
 # (FIX FAIR-13) lingering fields block the exits: with >= 60 b2 of fields and one within 8 b of the
 # player, no exit counts (the FLANK rule then takes P8 / P2, never the undodgeable sweep into fire)

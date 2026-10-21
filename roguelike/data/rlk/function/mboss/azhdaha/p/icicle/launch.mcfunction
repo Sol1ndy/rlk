@@ -69,7 +69,7 @@ scoreboard players operation #aq43SZ mb *= #c10 mb
 scoreboard players operation #aq43SZ mb /= #aq43F mb
 execute store result storage rlk:mboss az.p43.v.z double 0.001 run scoreboard players get #aq43SZ mb
 scoreboard players operation #aq43L mb = #aq43F mb
-data modify storage rlk:mboss az.p43.hz set value {r:16,dmg:70}
+data modify storage rlk:mboss az.p43.hz set value {r:16,dmg:40}
 execute store result storage rlk:mboss az.p43.hz.tell int 1 run scoreboard players get #aq43F mb
 function rlk:mboss/grp_new
 scoreboard players operation #hzGrp mb = #mbGrp mb

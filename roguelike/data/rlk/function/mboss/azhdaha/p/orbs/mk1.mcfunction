@@ -9,7 +9,7 @@ scoreboard players set #hzEl mb 2
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzNR mb 1
-data modify storage rlk:mboss az.orb set value {tag:"rlk_mb_az_p31o1",ring:2,a:13500,r:10500,w:240,hr:13,y0:0,y1:22,dmg:35,grp:1}
+data modify storage rlk:mboss az.orb set value {tag:"rlk_mb_az_p31o1",ring:2,a:13500,r:10500,w:240,hr:13,y0:0,y1:22,dmg:29,grp:1}
 execute store result storage rlk:mboss az.orb.a int 1 run scoreboard players get #aq31Q mb
 function rlk:mboss/azhdaha/orb/spawn with storage rlk:mboss az.orb
 tag @e[type=minecraft:marker,tag=rlk_mb_az_p31o1] add rlk_mb_az_p31o

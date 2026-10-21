@@ -11,10 +11,10 @@ scoreboard players set #hzNR mb 1
 scoreboard players set #hzY1 mb 7
 scoreboard players operation #hzEl mb = #azET mb
 scoreboard players operation #pjEl mb = #azET mb
-function rlk:mboss/hz/ring {r0:0,r:15,tell:14,dmg:60}
+function rlk:mboss/hz/ring {r0:0,r:15,tell:14,dmg:50}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_xcr
 execute as @e[type=minecraft:marker,tag=rlk_mb_az_xcr] if score @s mbHzI = #hzLast mb run scoreboard players set @s azT 0
-scoreboard players set #azAftF mb 45
+scoreboard players set #azAftF mb 46
 scoreboard players set #azAftD mb 13
 function rlk:mboss/azhdaha/aft/new

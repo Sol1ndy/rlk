@@ -5,7 +5,7 @@ scoreboard players set #hzEl mb 2
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzNR mb 1
-function rlk:mboss/hz/disc {r:30,tell:22,dmg:80}
+function rlk:mboss/hz/disc {r:30,tell:22,dmg:71}
 function rlk:mboss/azhdaha/fx/tele/swirl_o {r:30,tell:22,el:2,nd:0,hold:3}
 playsound minecraft:block.bubble_column.whirlpool_inside hostile @a[tag=player] ~ ~ ~ 0.9 1.1 0.3
 # (FIX STATE-3) the keep spot and its due tick stay until the hit, so a resume redraws the swirl (xl/resume)

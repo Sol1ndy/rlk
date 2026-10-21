@@ -5,4 +5,4 @@ scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzNR mb 1
 scoreboard players operation #hzGrp mb = #axlLG mb
-function rlk:mboss/hz/disc {r:22,tell:26,dmg:60}
+function rlk:mboss/hz/disc {r:22,tell:26,dmg:30}

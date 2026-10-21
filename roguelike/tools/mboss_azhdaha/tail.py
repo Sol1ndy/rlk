@@ -485,8 +485,11 @@ def icicle(g):
                       f'execute if score #aq43L mb matches 0 run kill @e[type={MK},tag=rlk_mb_az_p43a]'])
     g.pw(key, 'mv', ['$tp @s ~$(x) ~$(y) ~$(z)'])
     g.pw(key, 'vis', [f'execute if score #hzEv mb matches 1 if score @s mbHzV matches {V43} run {F("p/icicle/impact")}'])
-    g.pw(key, 'impact', [K.fx('frost_burst', r=ICICLE_R), g.sound('block.glass.break', 1.0, 1.0),
-                         g.sound('entity.generic.explode', 0.4, 1.4)])
+    g.pw(key, 'impact', ['# (FIX perf, STATE-14) the frost burst only while < 44 kit fx cards live (the 64 cap less two bursts): a',
+                         '# 43 impact on the tick of another pattern\'s hit visuals (45 eruption, P1 impact, rings) sheds its',
+                         '# flourish instead of cutting theirs; the shatter sounds always play.',
+                         f'execute unless score #akN mb matches 44.. run {K.fx("frost_burst", r=ICICLE_R)}',
+                         g.sound('block.glass.break', 1.0, 1.0), g.sound('entity.generic.explode', 0.4, 1.4)])
     g.pw(key, 'cancel', ['# The main-slot part stops (selectors only); the emitter stays when it already holds bg slot T.',
                          'execute if score #azBgT mb matches 43 run return 0', 'kill @e[tag=rlk_mb_az_p43]', sc('#aq43L', 0)])
     g.pw(key, 'cancel_bg', ['# The emitter is cancelled (a queued transition, death, cleanup, test stop): sphere, lance, aim and',

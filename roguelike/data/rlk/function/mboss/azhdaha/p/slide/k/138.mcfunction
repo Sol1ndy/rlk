@@ -16,7 +16,7 @@ scoreboard players set #hzNR mb 1
 scoreboard players set #hzY1 mb 7
 scoreboard players operation #hzEl mb = #azE mb
 scoreboard players operation #pjEl mb = #azE mb
-function rlk:mboss/hz/ring {r0:0,r:40,tell:20,dmg:80}
+function rlk:mboss/hz/ring {r0:0,r:40,tell:20,dmg:71}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_p20w4
 scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p20w4,limit=1] mb 3000
 execute if score #azTrN mb matches 2 run function rlk:mboss/line/say {t:"천 년의 원한을 어찌 갚을까!",c:"#F2B53A",gap:2,hold:50,snd:2}

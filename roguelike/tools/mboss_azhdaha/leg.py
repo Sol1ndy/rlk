@@ -479,13 +479,16 @@ def firefield(g):
         on.append(f'execute if score #aq33X mb matches 0 if score #azF{i} mb matches {A.FIELD_FAM["fire"]} as '
                   f'@e[type=minecraft:marker,tag=rlk_mb_az_fld{i},distance=..{n(fr["extend_r"])},limit=1] run {F(f"p/{key}/ext")}')
     on += [f'# (FIX FAIR-22) a new field at most every {fr["rule_cd"]} t (#aq33C = the module tick it may come again); extending stays',
-           f'execute if score #aq33X mb matches 0 unless score #aq33C mb > #azClk mb run {F(f"p/{key}/new")}', F(f'p/{key}/amb_on')]
+           f'execute if score #aq33X mb matches 0 unless score #aq33C mb > #azClk mb run {F(f"p/{key}/arm")}', F(f'p/{key}/amb_on')]
     g.pw(key, 'on_brand', on)
+    g.pw(key, 'arm', ['# (FIX perf) the new field one tick after the branding hit (that tick carries the hit, the brand and the',
+                      '# pattern\'s own work), here at the same floor point; the next one no sooner than rule_cd ticks later.',
+                      'scoreboard players operation #aq33C mb = #azClk mb', f'scoreboard players add #aq33C mb {fr["rule_cd"]}']
+         + g.after(1, f'p/{key}/new'))
     g.pw(key, 'ext', ['# @s = a fire field hazard near the branded player: extended by its base life.',
                       g.field_refresh('@s', fr['rule_life']), 'scoreboard players set #aq33X mb 1',
                       f'execute at @s run {K.fx("fire_field", r=fr["rule_r"])}'])
-    g.pw(key, 'new', ['# A new fire-rule field under the player; the next one no sooner than rule_cd ticks later.',
-                      'scoreboard players operation #aq33C mb = #azClk mb', f'scoreboard players add #aq33C mb {fr["rule_cd"]}']
+    g.pw(key, 'new', ['# (after p/firefield/arm) A new fire-rule field at the branded floor point.']
          + g.field('fire', fr['rule_r'], fr['rule_life'], A.DMG['fire'], el=1, rule=True)
          + [K.fx('fire_field', r=fr['rule_r']), g.sound('item.firecharge.use', 0.8, 0.9)])
     # the fire-field ambience (every live fire field, ours or not): an after() chain while any fire field lives

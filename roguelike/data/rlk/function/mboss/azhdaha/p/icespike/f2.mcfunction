@@ -13,5 +13,5 @@ scoreboard players operation #pjEl mb = #azET mb
 execute if score #aq45M2 mb matches 1 run scoreboard players operation #hzGrp mb = #aq45G0 mb
 execute if score #aq45M2 mb matches 2 run scoreboard players operation #hzGrp mb = #aq45G1 mb
 scoreboard players operation #aq45G2 mb = #hzGrp mb
-function rlk:mboss/hz/disc {r:40,tell:54,dmg:100}
+function rlk:mboss/hz/disc {r:40,tell:54,dmg:40}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_p45

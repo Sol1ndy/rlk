@@ -1,8 +1,8 @@
 # @s = player: one DoT tick through mboss/pl_dot (non-lethal, shields absorb, no defence, i-frames ignored).
 scoreboard players set @s azBrC 20
-scoreboard players set #mbDotPct mb 30
-execute if score @s azBrE matches 4 if score @s azBrS matches 2 run scoreboard players set #mbDotPct mb 45
-execute if score @s azBrE matches 4 if score @s azBrS matches 3.. run scoreboard players set #mbDotPct mb 60
+scoreboard players set #mbDotPct mb 5
+execute if score @s azBrE matches 4 if score @s azBrS matches 2 run scoreboard players set #mbDotPct mb 7
+execute if score @s azBrE matches 4 if score @s azBrS matches 3.. run scoreboard players set #mbDotPct mb 10
 scoreboard players operation #mbDotEl mb = @s azBrE
 scoreboard players set #mbDotLethal mb 0
 function rlk:mboss/pl_dot

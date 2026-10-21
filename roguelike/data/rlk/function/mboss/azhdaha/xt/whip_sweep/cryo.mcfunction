@@ -13,7 +13,7 @@ execute if score #azCtxSide mb matches 1 run scoreboard players set #hzR0 mb 50
 execute if score #azCtxSide mb matches 1 run scoreboard players operation #hzGrp mb = #axtG mb
 execute if score #azCtxSide mb matches 1 run scoreboard players operation #hzEl mb = #azET mb
 execute if score #azCtxSide mb matches 1 run scoreboard players operation #pjEl mb = #azET mb
-execute if score #azCtxSide mb matches 1 positioned ^0.961 ^ ^0.572 rotated ~194.57 0 run function rlk:mboss/hz/sector {r:120,a:17,tell:14,dmg:80}
+execute if score #azCtxSide mb matches 1 positioned ^0.961 ^ ^0.572 rotated ~194.57 0 run function rlk:mboss/hz/sector {r:120,a:17,tell:14,dmg:71}
 execute if score #azCtxSide mb matches 1 run execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
 execute if score #azCtxSide mb matches 1 run scoreboard players set #hzKB mb 3
 execute if score #azCtxSide mb matches 1 run scoreboard players set #hzSfx mb 0
@@ -24,7 +24,7 @@ execute if score #azCtxSide mb matches 1 run scoreboard players set #hzR0 mb 50
 execute if score #azCtxSide mb matches 1 run scoreboard players operation #hzGrp mb = #axtG mb
 execute if score #azCtxSide mb matches 1 run scoreboard players operation #hzEl mb = #azET mb
 execute if score #azCtxSide mb matches 1 run scoreboard players operation #pjEl mb = #azET mb
-execute if score #azCtxSide mb matches 1 positioned ^2.475 ^ ^2.576 rotated ~228.43 0 run function rlk:mboss/hz/sector {r:120,a:20,tell:16,dmg:80}
+execute if score #azCtxSide mb matches 1 positioned ^2.475 ^ ^2.576 rotated ~228.43 0 run function rlk:mboss/hz/sector {r:120,a:20,tell:16,dmg:71}
 execute if score #azCtxSide mb matches 1 run execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
 execute if score #azCtxSide mb matches 1 run scoreboard players set #hzKB mb 3
 execute if score #azCtxSide mb matches 1 run scoreboard players set #hzSfx mb 0
@@ -35,7 +35,7 @@ execute if score #azCtxSide mb matches 1 run scoreboard players set #hzR0 mb 50
 execute if score #azCtxSide mb matches 1 run scoreboard players operation #hzGrp mb = #axtG mb
 execute if score #azCtxSide mb matches 1 run scoreboard players operation #hzEl mb = #azET mb
 execute if score #azCtxSide mb matches 1 run scoreboard players operation #pjEl mb = #azET mb
-execute if score #azCtxSide mb matches 1 positioned ^2.789 ^ ^4.821 rotated ~261.99 0 run function rlk:mboss/hz/sector {r:120,a:16,tell:18,dmg:80}
+execute if score #azCtxSide mb matches 1 positioned ^2.789 ^ ^4.821 rotated ~261.99 0 run function rlk:mboss/hz/sector {r:120,a:16,tell:18,dmg:71}
 execute if score #azCtxSide mb matches 1 run execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
 execute if score #azCtxSide mb matches 1 run scoreboard players set #hzKB mb 3
 execute if score #azCtxSide mb matches 1 run scoreboard players set #hzSfx mb 0
@@ -46,9 +46,9 @@ execute if score #azCtxSide mb matches 1 run scoreboard players set #hzR0 mb 50
 execute if score #azCtxSide mb matches 1 run scoreboard players operation #hzGrp mb = #axtG mb
 execute if score #azCtxSide mb matches 1 run scoreboard players operation #hzEl mb = #azET mb
 execute if score #azCtxSide mb matches 1 run scoreboard players operation #pjEl mb = #azET mb
-execute if score #azCtxSide mb matches 1 positioned ^2.461 ^ ^6.127 rotated ~285.06 0 run function rlk:mboss/hz/sector {r:120,a:10,tell:20,dmg:80}
+execute if score #azCtxSide mb matches 1 positioned ^2.461 ^ ^6.127 rotated ~285.06 0 run function rlk:mboss/hz/sector {r:120,a:10,tell:20,dmg:71}
 execute if score #azCtxSide mb matches 1 run execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
-execute if score #azCtxSide mb matches 1 run scoreboard players set #azAftF mb 46
+execute if score #azCtxSide mb matches 1 run scoreboard players set #azAftF mb 47
 execute if score #azCtxSide mb matches 1 run scoreboard players set #azAftD mb 20
 execute if score #azCtxSide mb matches 1 positioned ^2.406 ^ ^6.256 rotated ~293.14 0 positioned ^ ^ ^5 run function rlk:mboss/azhdaha/aft/new
 execute if score #azCtxSide mb matches -1 run scoreboard players set #hzKB mb 3
@@ -60,7 +60,7 @@ execute if score #azCtxSide mb matches -1 run scoreboard players set #hzR0 mb 50
 execute if score #azCtxSide mb matches -1 run scoreboard players operation #hzGrp mb = #axtG mb
 execute if score #azCtxSide mb matches -1 run scoreboard players operation #hzEl mb = #azET mb
 execute if score #azCtxSide mb matches -1 run scoreboard players operation #pjEl mb = #azET mb
-execute if score #azCtxSide mb matches -1 positioned ^-0.961 ^ ^0.572 rotated ~-194.57 0 run function rlk:mboss/hz/sector {r:120,a:17,tell:14,dmg:80}
+execute if score #azCtxSide mb matches -1 positioned ^-0.961 ^ ^0.572 rotated ~-194.57 0 run function rlk:mboss/hz/sector {r:120,a:17,tell:14,dmg:71}
 execute if score #azCtxSide mb matches -1 run execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
 execute if score #azCtxSide mb matches -1 run scoreboard players set #hzKB mb 3
 execute if score #azCtxSide mb matches -1 run scoreboard players set #hzSfx mb 0
@@ -71,7 +71,7 @@ execute if score #azCtxSide mb matches -1 run scoreboard players set #hzR0 mb 50
 execute if score #azCtxSide mb matches -1 run scoreboard players operation #hzGrp mb = #axtG mb
 execute if score #azCtxSide mb matches -1 run scoreboard players operation #hzEl mb = #azET mb
 execute if score #azCtxSide mb matches -1 run scoreboard players operation #pjEl mb = #azET mb
-execute if score #azCtxSide mb matches -1 positioned ^-2.475 ^ ^2.576 rotated ~-228.43 0 run function rlk:mboss/hz/sector {r:120,a:20,tell:16,dmg:80}
+execute if score #azCtxSide mb matches -1 positioned ^-2.475 ^ ^2.576 rotated ~-228.43 0 run function rlk:mboss/hz/sector {r:120,a:20,tell:16,dmg:71}
 execute if score #azCtxSide mb matches -1 run execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
 execute if score #azCtxSide mb matches -1 run scoreboard players set #hzKB mb 3
 execute if score #azCtxSide mb matches -1 run scoreboard players set #hzSfx mb 0
@@ -82,7 +82,7 @@ execute if score #azCtxSide mb matches -1 run scoreboard players set #hzR0 mb 50
 execute if score #azCtxSide mb matches -1 run scoreboard players operation #hzGrp mb = #axtG mb
 execute if score #azCtxSide mb matches -1 run scoreboard players operation #hzEl mb = #azET mb
 execute if score #azCtxSide mb matches -1 run scoreboard players operation #pjEl mb = #azET mb
-execute if score #azCtxSide mb matches -1 positioned ^-2.789 ^ ^4.821 rotated ~-261.99 0 run function rlk:mboss/hz/sector {r:120,a:16,tell:18,dmg:80}
+execute if score #azCtxSide mb matches -1 positioned ^-2.789 ^ ^4.821 rotated ~-261.99 0 run function rlk:mboss/hz/sector {r:120,a:16,tell:18,dmg:71}
 execute if score #azCtxSide mb matches -1 run execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
 execute if score #azCtxSide mb matches -1 run scoreboard players set #hzKB mb 3
 execute if score #azCtxSide mb matches -1 run scoreboard players set #hzSfx mb 0
@@ -93,8 +93,8 @@ execute if score #azCtxSide mb matches -1 run scoreboard players set #hzR0 mb 50
 execute if score #azCtxSide mb matches -1 run scoreboard players operation #hzGrp mb = #axtG mb
 execute if score #azCtxSide mb matches -1 run scoreboard players operation #hzEl mb = #azET mb
 execute if score #azCtxSide mb matches -1 run scoreboard players operation #pjEl mb = #azET mb
-execute if score #azCtxSide mb matches -1 positioned ^-2.461 ^ ^6.127 rotated ~-285.06 0 run function rlk:mboss/hz/sector {r:120,a:10,tell:20,dmg:80}
+execute if score #azCtxSide mb matches -1 positioned ^-2.461 ^ ^6.127 rotated ~-285.06 0 run function rlk:mboss/hz/sector {r:120,a:10,tell:20,dmg:71}
 execute if score #azCtxSide mb matches -1 run execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
-execute if score #azCtxSide mb matches -1 run scoreboard players set #azAftF mb 46
+execute if score #azCtxSide mb matches -1 run scoreboard players set #azAftF mb 47
 execute if score #azCtxSide mb matches -1 run scoreboard players set #azAftD mb 20
 execute if score #azCtxSide mb matches -1 positioned ^-2.406 ^ ^6.256 rotated ~-293.14 0 positioned ^ ^ ^5 run function rlk:mboss/azhdaha/aft/new

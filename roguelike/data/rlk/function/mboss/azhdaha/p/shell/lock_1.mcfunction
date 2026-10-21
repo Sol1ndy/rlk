@@ -14,7 +14,7 @@ scoreboard players set #hzNR mb 1
 scoreboard players operation #hzGrp mb = #aq44G mb
 scoreboard players operation #hzEl mb = #azET mb
 scoreboard players operation #pjEl mb = #azET mb
-execute at @e[type=minecraft:marker,tag=rlk_mb_az_p44l1,limit=1] run function rlk:mboss/hz/disc {r:24,tell:12,dmg:60}
+execute at @e[type=minecraft:marker,tag=rlk_mb_az_p44l1,limit=1] run function rlk:mboss/hz/disc {r:24,tell:12,dmg:58}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_p44
 execute at @e[type=minecraft:item_display,tag=rlk_mb_az_p44s1,limit=1] run particle minecraft:flash{color:[0.773f,0.545f,1f,1f]} ~ ~ ~ 0 0 0 0 1 force @a[tag=player]
 execute at @e[type=minecraft:item_display,tag=rlk_mb_az_p44s1,limit=1] run particle minecraft:electric_spark ~ ~ ~ 0.3 0.3 0.3 0.1 8 force @a[tag=player]

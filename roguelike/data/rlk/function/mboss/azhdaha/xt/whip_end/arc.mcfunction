@@ -33,6 +33,6 @@ execute if score #azPat mb matches 7 if score #azSide mb matches -1 if score #az
 execute if score #azPat mb matches 7 if score #azSide mb matches -1 if score #azPT mb matches 34 run function rlk:mboss/azhdaha/xt/whip_end/arc_r34
 execute if score #azPat mb matches 7 if score #azSide mb matches -1 if score #azPT mb matches 35 run function rlk:mboss/azhdaha/xt/whip_end/arc_r35
 execute if score #azPat mb matches 7 if score #azSide mb matches -1 if score #azPT mb matches 36 run function rlk:mboss/azhdaha/xt/whip_end/arc_r36
-execute if score #axtArc mb matches ..15 if score #azPat mb matches 7 run scoreboard players set #azAftF mb 48
+execute if score #axtArc mb matches ..15 if score #azPat mb matches 7 run scoreboard players set #azAftF mb 49
 execute if score #axtArc mb matches ..15 if score #azPat mb matches 7 run scoreboard players set #azAftD mb 1
 execute if score #axtArc mb matches ..15 if score #azPat mb matches 7 run function rlk:mboss/azhdaha/aft/new

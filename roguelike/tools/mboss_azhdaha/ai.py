@@ -14,12 +14,17 @@ every 4 t by ai/sample and again at every pick: PAW (within 2.8 b of a paw / foo
 mid <= 15, far), TAIL (f < -4.8: lane |s| <= 3.5, else off), FLANK (near |s| <= 9, else far). The FLANK-near test of
 the rule (#azFN) is the plan's own (3 <= |s| <= 9, -4.8 <= f < 3.6), independent of the PAW precedence. Deviations
 kept for the balance fixer: P5's flank_near 2 (paw <= 2.8) and tail_off 1 (hind <= 2.8) cannot fire (those points are
-PAW, weight 5); idle turn steps only for players beyond the near band (the flank and the tail stay the patterns'
-business, plan 4.12 FLANK rule / anti-stall).
+PAW, weight 5; 6 after the balance pass); idle turn steps only for players beyond the near band (the flank and the
+tail stay the patterns' business, plan 4.12 FLANK rule / anti-stall).
 """
 from . import api as A
 
-WEIGHT_OVERRIDE = {}           # the balance fixer: {pattern id: {phase: {zone: w}}}
+# the balance fixer: {pattern id: {phase: {zone: w}}}. FIX balance pass (Change note 5), FAIR-21's weights in phases
+# 1-3: P1 head_near 4 -> 2 and head_mid 2 -> 1, P4 head_near 2 -> 1, P5 head_near 1 -> 0 and paw 5 -> 6, P2 flank_near
+# 1 -> 2 (toward the plan 6.2 positional row; the sim still misses it, see the change note).
+_ALL = (1, 2, 3)
+WEIGHT_OVERRIDE = {1: {ph: {'head_near': 2, 'head_mid': 1} for ph in _ALL}, 4: {ph: {'head_near': 1} for ph in _ALL},
+                   5: {ph: {'head_near': 0, 'paw': 6} for ph in _ALL}, 2: {ph: {'flank_near': 2} for ph in _ALL}}
 REPEAT_HALF = {2}              # may repeat at half weight
 REPEAT_MAX = {5: 2}            # at most n in a row
 FLANK_PX = (2, 3, 4, 9, 10, 11, 12)     # proxies chest belly hips paw_l paw_r foot_l foot_r (mbPart = layout index + 1)
@@ -72,19 +77,20 @@ def emit(core):
     samp = ['# @s = body (every 4 t and at every pick): the player in the anchor frame (#mbLf / #mbLs, mb), the zone, the band,',
             '# the side, the nearest paw, the FLANK-near flag and the dwell ring, the P7 exit test, the P3 front cone, anchor8.',
             A.fw('mv/local'),
-            'function rlk:mboss/mv/dist',
-            'scoreboard players operation #azDist mb = #mbDist mb',
             'scoreboard players operation #azF mb = #mbLf mb', 'scoreboard players operation #azS mb = #mbLs mb',
             'scoreboard players operation #azAs mb = #azS mb',
             'execute if score #azAs mb matches ..-1 run scoreboard players operation #azAs mb *= #cm1 mb',
             sc('#azSide', 1), 'execute if score #azS mb matches ..-1 run scoreboard players set #azSide mb -1',
-            '# band by the anchor distance (tenths)',
-            sc('#azBand', 2),
-            f'execute if score #azDist mb matches ..{int(A.BAND_NEAR * T10)} run scoreboard players set #azBand mb 1',
-            f'execute if score #azDist mb matches {int(A.BAND_MID * T10) + 1}.. run scoreboard players set #azBand mb 3',
             '# tenths for the squares (no int overflow)',
             'scoreboard players operation #azFt mb = #azF mb', 'scoreboard players operation #azFt mb /= #c100 mb',
             'scoreboard players operation #azSt mb = #azS mb', 'scoreboard players operation #azSt mb /= #c100 mb',
+            '# (FIX perf) the squared anchor distance (tenths^2) from the anchor frame, no square root; the band by it',
+            'scoreboard players operation #azDist2 mb = #azFt mb', 'scoreboard players operation #azDist2 mb *= #azFt mb',
+            'scoreboard players operation #azX mb = #azSt mb', 'scoreboard players operation #azX mb *= #azSt mb',
+            'scoreboard players operation #azDist2 mb += #azX mb',
+            sc('#azBand', 2),
+            f'execute if score #azDist2 mb matches ..{(int(A.BAND_NEAR * T10) + 1) ** 2 - 1} run scoreboard players set #azBand mb 1',
+            f'execute if score #azDist2 mb matches {(int(A.BAND_MID * T10) + 1) ** 2}.. run scoreboard players set #azBand mb 3',
             sc('#azPawD2', 999999), sc('#azPaw', 1)]
     for k, (x, _, z) in paw.items():
         samp += [f'scoreboard players operation #azX mb = #azSt mb', f'scoreboard players remove #azX mb {int(round(x * T10))}',
@@ -175,7 +181,7 @@ def emit(core):
         'scoreboard players operation #azY mb -= #azZ mb',
         f'execute if score #azY mb matches ..{R * 10000} if score #azFt mb matches 0.. run scoreboard players set #azExit mb 1',
         '# (3) beyond the tip: the anchor distance >= tip - R',
-        'scoreboard players operation #azZ mb = #azDist mb', 'scoreboard players operation #azZ mb *= #azDist mb',
+        'scoreboard players operation #azZ mb = #azDist2 mb',
         f'execute if score #azZ mb matches {beyond2}.. run scoreboard players set #azExit mb 1',
         f'# (FIX FAIR-13) lingering fields block the exits: with >= {EXIT_FIELD_A} b2 of fields and one within {EXIT_FIELD_D} b of the',
         '# player, no exit counts (the FLANK rule then takes P8 / P2, never the undodgeable sweep into fire)',
@@ -201,7 +207,8 @@ def emit(core):
            f'execute if score #mbLock mb matches 1.. run return run {F("ai/lock")}',
            f'execute if score #azTr mb matches 1 run return run {F("tr/begin")}',
            f'execute if score #azTr mb matches 2.. run return run {F("tr/resume")}',
-           F('ai/sample'),
+           '# (FIX perf) re-sampled unless ai/sample4 ran this tick (the idle step since then is <= 3 degrees)',
+           f'execute unless score #azQ4 mb matches 0 run {F("ai/sample")}',
            f'execute if score #azTailN mb matches {ANTI_STALL}.. run return run {F("ai/stall")}',
            f'execute if score #azBand mb matches 3 if score #azA8 mb matches 1 run {F("ai/walk_try")}',
            'execute if score #azPat mb matches 1.. run return 0',

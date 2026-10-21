@@ -14,7 +14,7 @@ scoreboard players set #hzY1 mb 30
 scoreboard players operation #hzEl mb = #azET mb
 scoreboard players operation #pjEl mb = #azET mb
 scoreboard players set #hzR0 mb 32
-function rlk:mboss/hz/mask {tell:48,dmg:120}
+function rlk:mboss/hz/mask {tell:48,dmg:101}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_p42
 execute as @e[type=minecraft:marker,tag=rlk_mb_az_p42n] run scoreboard players operation @s mbHzSG = #hzLast mb
 tag @e[type=minecraft:marker,tag=rlk_mb_az_p42n] add rlk_mb_hzsafe

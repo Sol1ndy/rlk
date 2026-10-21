@@ -17,7 +17,13 @@ execute unless score #azDY mb matches -600..600 run scoreboard players set #azMo
 scoreboard players operation #azLX mb = #azX mb
 scoreboard players operation #azLZ mb = #azZ mb
 scoreboard players operation #azLY mb = #azY mb
+# (FIX perf) a tick that made hazards (#hzId moved since the last request) pushes nothing: the hit-tick work
+# and the push would stack; the next tick pushes.
+scoreboard players set #azHzNew mb 0
+execute if score #hzId mb > #azHzS mb run scoreboard players set #azHzNew mb 1
+execute if score #hzId mb matches -2147483648.. run scoreboard players operation #azHzS mb = #hzId mb
 execute unless score #azPx mb matches 0 run return 0
+execute if score #azHzNew mb matches 1 run return 0
 execute if score #azMov mb matches 1 run return 0
 execute if score #azNoPush mb matches 1 run return 0
 execute if score #azLeap mb matches 1 run return 0

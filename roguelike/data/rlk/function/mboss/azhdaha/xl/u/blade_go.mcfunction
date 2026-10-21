@@ -7,4 +7,4 @@ data merge entity @s {view_range:2f,shadow_radius:0f,transformation:{translation
 scoreboard players set #pjEl mb 2
 scoreboard players set #pjNR mb 1
 scoreboard players operation #pjGrp mb = #axlBG mb
-function rlk:mboss/pj/launch {spd:20,life:6,dmg:50,hr:16}
+function rlk:mboss/pj/launch {spd:20,life:6,dmg:90,hr:16}

@@ -1,23 +1,26 @@
 # @s = body (every 4 t and at every pick): the player in the anchor frame (#mbLf / #mbLs, mb), the zone, the band,
 # the side, the nearest paw, the FLANK-near flag and the dwell ring, the P7 exit test, the P3 front cone, anchor8.
 function rlk:mboss/mv/local
-function rlk:mboss/mv/dist
-scoreboard players operation #azDist mb = #mbDist mb
 scoreboard players operation #azF mb = #mbLf mb
 scoreboard players operation #azS mb = #mbLs mb
 scoreboard players operation #azAs mb = #azS mb
 execute if score #azAs mb matches ..-1 run scoreboard players operation #azAs mb *= #cm1 mb
 scoreboard players set #azSide mb 1
 execute if score #azS mb matches ..-1 run scoreboard players set #azSide mb -1
-# band by the anchor distance (tenths)
-scoreboard players set #azBand mb 2
-execute if score #azDist mb matches ..90 run scoreboard players set #azBand mb 1
-execute if score #azDist mb matches 151.. run scoreboard players set #azBand mb 3
 # tenths for the squares (no int overflow)
 scoreboard players operation #azFt mb = #azF mb
 scoreboard players operation #azFt mb /= #c100 mb
 scoreboard players operation #azSt mb = #azS mb
 scoreboard players operation #azSt mb /= #c100 mb
+# (FIX perf) the squared anchor distance (tenths^2) from the anchor frame, no square root; the band by it
+scoreboard players operation #azDist2 mb = #azFt mb
+scoreboard players operation #azDist2 mb *= #azFt mb
+scoreboard players operation #azX mb = #azSt mb
+scoreboard players operation #azX mb *= #azSt mb
+scoreboard players operation #azDist2 mb += #azX mb
+scoreboard players set #azBand mb 2
+execute if score #azDist2 mb matches ..8280 run scoreboard players set #azBand mb 1
+execute if score #azDist2 mb matches 22801.. run scoreboard players set #azBand mb 3
 scoreboard players set #azPawD2 mb 999999
 scoreboard players set #azPaw mb 1
 scoreboard players operation #azX mb = #azSt mb
