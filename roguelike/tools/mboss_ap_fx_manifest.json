@@ -1,0 +1,4621 @@
+{
+ "generator": "tools/build_mboss_ap_fx.py",
+ "api": "scratchpad ap/ap_fx_api.md",
+ "functions": "rlk:mboss/apep/fx/",
+ "item_models": "rlk:mboss/ap_kit/",
+ "font": "rlk:mboss_ap",
+ "font_range": [
+  "U+E900",
+  "U+E9FF"
+ ],
+ "storage": "rlk:apkit",
+ "owned": {
+  "dirs": [
+   "data/rlk/function/mboss/apep/fx/e",
+   "data/rlk/function/mboss/apep/fx/p",
+   "data/rlk/function/mboss/apep/fx/tele",
+   "data/rlk/function/mboss/apep/fx/dress",
+   "data/rlk/function/mboss/apep/fx/snd",
+   "data/rlk/function/mboss/apep/fx/hud",
+   "data/rlk/function/mboss/apep/fx/prop",
+   "data/rlk/function/mboss/apep/fx/test"
+  ],
+  "files": [
+   "data/rlk/function/mboss/apep/fx/card.mcfunction",
+   "data/rlk/function/mboss/apep/fx/cardx.mcfunction",
+   "data/rlk/function/mboss/apep/fx/look.mcfunction",
+   "data/rlk/function/mboss/apep/fx/clear.mcfunction",
+   "data/rlk/function/mboss/apep/fx/uninstall.mcfunction"
+  ],
+  "rp": [
+   "assets/rlk/textures/mboss/ap_kit",
+   "assets/rlk/models/item/mboss/ap_kit",
+   "assets/rlk/items/mboss/ap_kit",
+   "assets/rlk/font/mboss_ap.json",
+   "assets/rlk/textures/font/mboss_ap"
+  ]
+ },
+ "caps": {
+  "fx": 64,
+  "telegraph": 40,
+  "telegraph_skip_from": 34,
+  "ambient_soft": 40,
+  "dressing": 16,
+  "flood": 48
+ },
+ "objectives": [
+  "wkS",
+  "wkG",
+  "wkH",
+  "wkK",
+  "wkD"
+ ],
+ "fake_players": "#wk* (objective mb)",
+ "tags": [
+  "rlk_wk",
+  "rlk_wk_t",
+  "rlk_wk_wv<id>",
+  "rlk_wk_sr<id>",
+  "rlk_wk_mr<id>",
+  "rlk_wk_mw",
+  "rlk_wk_ws",
+  "rlk_wk_d",
+  "rlk_wk_dsw",
+  "rlk_wk_dly",
+  "rlk_wk_dp",
+  "rlk_wk_fl",
+  "rlk_wk_demo"
+ ],
+ "kinds": {
+  "leaf": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/leaf",
+   "source": "own",
+   "desc": "neutral leaf (tint pale green, black #2A2A10, gold)"
+  },
+  "leaf_blade": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/leaf_blade",
+   "source": "own",
+   "desc": "neutral glowing leaf blade (rosette petals, sweep / skim blades, spikes)"
+  },
+  "blade": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/blade",
+   "source": "own",
+   "desc": "neutral faceted crystal blade (white-gold burst blades)"
+  },
+  "pool": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/pool",
+   "source": "own",
+   "desc": "dark olive leaf pool decal (the burrow pool)"
+  },
+  "pad": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/pad",
+   "source": "own",
+   "desc": "translucent green leaf pad (the underground trail)"
+  },
+  "mound": {
+   "plane": "face",
+   "px": [
+    64,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/mound",
+   "source": "own",
+   "desc": "lime leaf mound with white spray, foot at b 0"
+  },
+  "root_chunk": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/root_chunk",
+   "source": "own",
+   "desc": "brown root chunk with gold glints"
+  },
+  "thorn_wheel": {
+   "plane": "face",
+   "px": [
+    96,
+    96
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/thorn_wheel",
+   "source": "own",
+   "desc": "pale-green carpet thorn wheel"
+  },
+  "thorn_wheel_homing": {
+   "plane": "face",
+   "px": [
+    96,
+    96
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/thorn_wheel_homing",
+   "source": "own",
+   "desc": "gold-orange homing thorn wheel with a red 4-point flare"
+  },
+  "seed_bolt": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/seed_bolt",
+   "source": "own",
+   "desc": "lime seed bolt (O2)"
+  },
+  "seed_orb": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/seed_orb",
+   "source": "own",
+   "desc": "yellow-green seed orb with a spiral glyph (Q5)"
+  },
+  "charge_ball": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/charge_ball",
+   "source": "own",
+   "desc": "Q3 light ball (#FDFBBD core, white-green halo)"
+  },
+  "beam": {
+   "plane": "cross",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/beam",
+   "source": "own",
+   "desc": "neutral light column, foot at b 0, 1 b tall at scale 1"
+  },
+  "dome_flare": {
+   "plane": "face",
+   "px": [
+    64,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/dome_flare",
+   "source": "own",
+   "desc": "neutral half-dome flare, pivot at the base"
+  },
+  "crescent": {
+   "plane": "face",
+   "px": [
+    128,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.125,
+    0.125
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/crescent",
+   "source": "own",
+   "desc": "neutral crescent trail segment (bows toward +b)"
+  },
+  "rib": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/rib",
+   "source": "own",
+   "desc": "pale rib afterimage (P1 sweep)"
+  },
+  "spiral": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/spiral",
+   "source": "own",
+   "desc": "neutral spiral wisp"
+  },
+  "splash": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/splash",
+   "source": "own",
+   "desc": "near-white water splash crown, foot at b 0"
+  },
+  "shard": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/shard",
+   "source": "own",
+   "desc": "neutral glass shard (dome pop)"
+  },
+  "wisp": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/wisp",
+   "source": "own",
+   "desc": "black twisted wisp (수호 death)"
+  },
+  "lightning": {
+   "plane": "face",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/lightning",
+   "source": "own",
+   "desc": "neutral lightning ribbon, root at b 0"
+  },
+  "water_sheet": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/water_sheet",
+   "source": "own",
+   "desc": "the lake water sheet tile (1 b at scale 1; records use 14)"
+  },
+  "lily_pad": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/lily_pad",
+   "source": "own",
+   "desc": "lily pad (1 b at scale 1)"
+  },
+  "bell_flower": {
+   "plane": "cross",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/bell_flower",
+   "source": "own",
+   "desc": "yellow bell flowers, foot at b 0"
+  },
+  "bulb_flower": {
+   "plane": "cross",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/bulb_flower",
+   "source": "own",
+   "desc": "glowing bulb flower, foot at b 0"
+  },
+  "bank_crystal": {
+   "plane": "cross",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/bank_crystal",
+   "source": "own",
+   "desc": "gold crystal spikes, foot at b 0"
+  },
+  "gate_crystal": {
+   "plane": "cross",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.75,
+    0.75,
+    0.0,
+    1.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/gate_crystal",
+   "source": "own",
+   "desc": "gold-green gate crystal, 1.5 b tall at scale 1"
+  },
+  "t_jump": {
+   "plane": "flat",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_jump",
+   "source": "own",
+   "desc": "jump chevron (nd 2)"
+  },
+  "t_crack": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/t_crack",
+   "source": "own",
+   "desc": "P2 white-gold crack line (unit length)"
+  },
+  "t_wash": {
+   "plane": "flat",
+   "px": [
+    96,
+    96
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_wash",
+   "source": "own",
+   "desc": "종말의 여파 field wash (unit radius)"
+  },
+  "t_safe": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/t_safe",
+   "source": "own",
+   "desc": "dome footprint rim (unit radius)"
+  },
+  "t_dome": {
+   "plane": "flat",
+   "px": [
+    48,
+    48
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/t_dome",
+   "source": "own",
+   "desc": "dome glyph decal"
+  },
+  "t_target": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_target",
+   "source": "own",
+   "desc": "Q3 target ring disc (unit radius)"
+  },
+  "t_wall": {
+   "plane": "flat",
+   "px": [
+    64,
+    32
+   ],
+   "extent": [
+    -0.7,
+    0.7,
+    -0.25,
+    0.25
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/t_wall",
+   "source": "own",
+   "desc": "둥지 blade footprint 1.4 x 0.5 b"
+  },
+  "d_swirl": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/d_swirl",
+   "source": "own",
+   "desc": "the Heart's gold swirl ring (unit radius)"
+  },
+  "d_ley": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/d_ley",
+   "source": "own",
+   "desc": "지맥 이상 ley-line crack strip (unit length)"
+  },
+  "fl_tile": {
+   "plane": "flat",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/fl_tile",
+   "source": "own",
+   "desc": "종말의 여파 flood tile (seamless)"
+  },
+  "t_pf2": {
+   "plane": "flat",
+   "px": [
+    16,
+    64
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pf2",
+   "source": "own",
+   "desc": "sector / wedge fill piece, 2 deg"
+  },
+  "t_pa2": {
+   "plane": "flat",
+   "px": [
+    16,
+    32
+   ],
+   "extent": [
+    -0.0625,
+    0.0625,
+    0.75,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pa2",
+   "source": "own",
+   "desc": "sector / wedge rim piece, 2 deg"
+  },
+  "t_pas2": {
+   "plane": "flat",
+   "px": [
+    16,
+    32
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0.5,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pas2",
+   "source": "own",
+   "desc": "thick sector / wedge rim piece (r <= 3.5), 2 deg"
+  },
+  "t_pe2": {
+   "plane": "flat",
+   "px": [
+    16,
+    64
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pe2",
+   "source": "own",
+   "desc": "thick one-piece sector rim with both radial edges (r <= 3.5), 2 deg"
+  },
+  "t_pf4": {
+   "plane": "flat",
+   "px": [
+    16,
+    64
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pf4",
+   "source": "own",
+   "desc": "sector / wedge fill piece, 4 deg"
+  },
+  "t_pa4": {
+   "plane": "flat",
+   "px": [
+    16,
+    32
+   ],
+   "extent": [
+    -0.0625,
+    0.0625,
+    0.75,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pa4",
+   "source": "own",
+   "desc": "sector / wedge rim piece, 4 deg"
+  },
+  "t_pas4": {
+   "plane": "flat",
+   "px": [
+    16,
+    32
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0.5,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pas4",
+   "source": "own",
+   "desc": "thick sector / wedge rim piece (r <= 3.5), 4 deg"
+  },
+  "t_pe4": {
+   "plane": "flat",
+   "px": [
+    16,
+    64
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pe4",
+   "source": "own",
+   "desc": "thick one-piece sector rim with both radial edges (r <= 3.5), 4 deg"
+  },
+  "t_pf8": {
+   "plane": "flat",
+   "px": [
+    16,
+    64
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pf8",
+   "source": "own",
+   "desc": "sector / wedge fill piece, 8 deg"
+  },
+  "t_pa8": {
+   "plane": "flat",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0.75,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pa8",
+   "source": "own",
+   "desc": "sector / wedge rim piece, 8 deg"
+  },
+  "t_pas8": {
+   "plane": "flat",
+   "px": [
+    16,
+    32
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0.5,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pas8",
+   "source": "own",
+   "desc": "thick sector / wedge rim piece (r <= 3.5), 8 deg"
+  },
+  "t_pe8": {
+   "plane": "flat",
+   "px": [
+    16,
+    64
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pe8",
+   "source": "own",
+   "desc": "thick one-piece sector rim with both radial edges (r <= 3.5), 8 deg"
+  },
+  "t_pf16": {
+   "plane": "flat",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pf16",
+   "source": "own",
+   "desc": "sector / wedge fill piece, 16 deg"
+  },
+  "t_pa16": {
+   "plane": "flat",
+   "px": [
+    48,
+    32
+   ],
+   "extent": [
+    -0.1875,
+    0.1875,
+    0.75,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pa16",
+   "source": "own",
+   "desc": "sector / wedge rim piece, 16 deg"
+  },
+  "t_pas16": {
+   "plane": "flat",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.5,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pas16",
+   "source": "own",
+   "desc": "thick sector / wedge rim piece (r <= 3.5), 16 deg"
+  },
+  "t_pe16": {
+   "plane": "flat",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pe16",
+   "source": "own",
+   "desc": "thick one-piece sector rim with both radial edges (r <= 3.5), 16 deg"
+  },
+  "t_pf22": {
+   "plane": "flat",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pf22",
+   "source": "own",
+   "desc": "sector / wedge fill piece, 22 deg"
+  },
+  "t_pa22": {
+   "plane": "flat",
+   "px": [
+    64,
+    32
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.75,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pa22",
+   "source": "own",
+   "desc": "sector / wedge rim piece, 22 deg"
+  },
+  "t_pas22": {
+   "plane": "flat",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.5,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pas22",
+   "source": "own",
+   "desc": "thick sector / wedge rim piece (r <= 3.5), 22 deg"
+  },
+  "t_pe22": {
+   "plane": "flat",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pe22",
+   "source": "own",
+   "desc": "thick one-piece sector rim with both radial edges (r <= 3.5), 22 deg"
+  },
+  "t_pf27": {
+   "plane": "flat",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pf27",
+   "source": "own",
+   "desc": "sector / wedge fill piece, 27 deg"
+  },
+  "t_pa27": {
+   "plane": "flat",
+   "px": [
+    64,
+    32
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.75,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pa27",
+   "source": "own",
+   "desc": "sector / wedge rim piece, 27 deg"
+  },
+  "t_pas27": {
+   "plane": "flat",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.5,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pas27",
+   "source": "own",
+   "desc": "thick sector / wedge rim piece (r <= 3.5), 27 deg"
+  },
+  "t_pe27": {
+   "plane": "flat",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pe27",
+   "source": "own",
+   "desc": "thick one-piece sector rim with both radial edges (r <= 3.5), 27 deg"
+  },
+  "t_pf32": {
+   "plane": "flat",
+   "px": [
+    48,
+    64
+   ],
+   "extent": [
+    -0.375,
+    0.375,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pf32",
+   "source": "own",
+   "desc": "sector / wedge fill piece, 32 deg"
+  },
+  "t_pa32": {
+   "plane": "flat",
+   "px": [
+    80,
+    32
+   ],
+   "extent": [
+    -0.3125,
+    0.3125,
+    0.75,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pa32",
+   "source": "own",
+   "desc": "sector / wedge rim piece, 32 deg"
+  },
+  "t_pas32": {
+   "plane": "flat",
+   "px": [
+    48,
+    32
+   ],
+   "extent": [
+    -0.375,
+    0.375,
+    0.5,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pas32",
+   "source": "own",
+   "desc": "thick sector / wedge rim piece (r <= 3.5), 32 deg"
+  },
+  "t_pe32": {
+   "plane": "flat",
+   "px": [
+    48,
+    64
+   ],
+   "extent": [
+    -0.375,
+    0.375,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pe32",
+   "source": "own",
+   "desc": "thick one-piece sector rim with both radial edges (r <= 3.5), 32 deg"
+  },
+  "t_pf40": {
+   "plane": "flat",
+   "px": [
+    48,
+    64
+   ],
+   "extent": [
+    -0.375,
+    0.375,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pf40",
+   "source": "own",
+   "desc": "sector / wedge fill piece, 40 deg"
+  },
+  "t_pas40": {
+   "plane": "flat",
+   "px": [
+    48,
+    48
+   ],
+   "extent": [
+    -0.375,
+    0.375,
+    0.375,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pas40",
+   "source": "own",
+   "desc": "thick sector / wedge rim piece (r <= 3.5), 40 deg"
+  },
+  "t_pe40": {
+   "plane": "flat",
+   "px": [
+    48,
+    64
+   ],
+   "extent": [
+    -0.375,
+    0.375,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pe40",
+   "source": "own",
+   "desc": "thick one-piece sector rim with both radial edges (r <= 3.5), 40 deg"
+  },
+  "t_pf48": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pf48",
+   "source": "own",
+   "desc": "sector / wedge fill piece, 48 deg"
+  },
+  "t_pas48": {
+   "plane": "flat",
+   "px": [
+    64,
+    48
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.375,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pas48",
+   "source": "own",
+   "desc": "thick sector / wedge rim piece (r <= 3.5), 48 deg"
+  },
+  "t_pe48": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pe48",
+   "source": "own",
+   "desc": "thick one-piece sector rim with both radial edges (r <= 3.5), 48 deg"
+  },
+  "t_pf56": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pf56",
+   "source": "own",
+   "desc": "sector / wedge fill piece, 56 deg"
+  },
+  "t_pas56": {
+   "plane": "flat",
+   "px": [
+    64,
+    48
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.375,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pas56",
+   "source": "own",
+   "desc": "thick sector / wedge rim piece (r <= 3.5), 56 deg"
+  },
+  "t_pe56": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pe56",
+   "source": "own",
+   "desc": "thick one-piece sector rim with both radial edges (r <= 3.5), 56 deg"
+  },
+  "t_pf64": {
+   "plane": "flat",
+   "px": [
+    80,
+    64
+   ],
+   "extent": [
+    -0.625,
+    0.625,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pf64",
+   "source": "own",
+   "desc": "sector / wedge fill piece, 64 deg"
+  },
+  "t_pas64": {
+   "plane": "flat",
+   "px": [
+    80,
+    48
+   ],
+   "extent": [
+    -0.625,
+    0.625,
+    0.375,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pas64",
+   "source": "own",
+   "desc": "thick sector / wedge rim piece (r <= 3.5), 64 deg"
+  },
+  "t_pe64": {
+   "plane": "flat",
+   "px": [
+    80,
+    64
+   ],
+   "extent": [
+    -0.625,
+    0.625,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/ap_kit/t_pe64",
+   "source": "own",
+   "desc": "thick one-piece sector rim with both radial edges (r <= 3.5), 64 deg"
+  },
+  "glow": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/glow",
+   "source": "fg kit (referenced)",
+   "desc": "soft white glow disc (tint it) (fg kit sprite)"
+  },
+  "glint": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/glint",
+   "source": "fg kit (referenced)",
+   "desc": "white 4-point glint (tint it) (fg kit sprite)"
+  },
+  "mote": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/mote",
+   "source": "fg kit (referenced)",
+   "desc": "soft mote (tint it) (fg kit sprite)"
+  },
+  "streak": {
+   "plane": "face",
+   "px": [
+    256,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.0625,
+    0.0625
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/streak",
+   "source": "fg kit (referenced)",
+   "desc": "long thin streak along a (tint it) (fg kit sprite)"
+  },
+  "ripple": {
+   "plane": "face",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/ripple",
+   "source": "fg kit (referenced)",
+   "desc": "ripple / shock ring (near white, tint it) (fg kit sprite)"
+  },
+  "spark": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/fg_kit/spark",
+   "source": "fg kit (referenced)",
+   "desc": "gold spark star (fg kit sprite)"
+  },
+  "smoke": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/fg_kit/smoke",
+   "source": "fg kit (referenced)",
+   "desc": "blue-white missile smoke puff (fg kit sprite)"
+  },
+  "t_rim": {
+   "plane": "flat",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/t_rim",
+   "source": "fg kit (referenced)",
+   "desc": "telegraph rim, unit radius (fg kit sprite)"
+  },
+  "t_rim_s": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/t_rim_s",
+   "source": "fg kit (referenced)",
+   "desc": "thick telegraph rim (r <= 2.5) (fg kit sprite)"
+  },
+  "t_ring": {
+   "plane": "flat",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/t_ring",
+   "source": "fg kit (referenced)",
+   "desc": "thin travelling wave ring (fg kit sprite)"
+  },
+  "t_fill": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/t_fill",
+   "source": "fg kit (referenced)",
+   "desc": "telegraph progress fill, unit radius (fg kit sprite)"
+  },
+  "t_bar": {
+   "plane": "flat",
+   "px": [
+    16,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/t_bar",
+   "source": "fg kit (referenced)",
+   "desc": "lane rail / cap bar (fg kit sprite)"
+  },
+  "t_lane": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/t_lane",
+   "source": "fg kit (referenced)",
+   "desc": "lane progress fill, unit length (fg kit sprite)"
+  },
+  "thorn_wheel_x": {
+   "plane": "cross",
+   "px": [
+    96,
+    96
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/ap_kit/thorn_wheel",
+   "source": "alias",
+   "desc": "the carpet thorn wheel as two crossed quads (reads from every side)"
+  }
+ },
+ "fg_references": {
+  "glow": "rlk:mboss/fg_kit/glow",
+  "glint": "rlk:mboss/fg_kit/glint",
+  "mote": "rlk:mboss/fg_kit/mote",
+  "streak": "rlk:mboss/fg_kit/streak",
+  "ripple": "rlk:mboss/fg_kit/ripple",
+  "spark": "rlk:mboss/fg_kit/spark",
+  "smoke": "rlk:mboss/fg_kit/smoke",
+  "t_rim": "rlk:mboss/fg_kit/t_rim",
+  "t_rim_s": "rlk:mboss/fg_kit/t_rim_s",
+  "t_ring": "rlk:mboss/fg_kit/t_ring",
+  "t_fill": "rlk:mboss/fg_kit/t_fill",
+  "t_bar": "rlk:mboss/fg_kit/t_bar",
+  "t_lane": "rlk:mboss/fg_kit/t_lane"
+ },
+ "atlas_px_new": 262400,
+ "atlas_budget": 350000,
+ "presets": {
+  "spark": {
+   "args": [],
+   "doc": "A small lime-gold spark burst (tells, clicks). Billboard.",
+   "cards": 1,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "flash": {
+   "args": [],
+   "doc": "A white-green glow flash (bright moments). Billboard.",
+   "cards": 1,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "leaf_splash": {
+   "args": [],
+   "doc": "Leaf + mote splash on the withered field (P1 land, P4 crash, Q3 shell 1): olive-green leaves flung up, airborne spray. At the floor point.",
+   "cards": 4,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "water_splash": {
+   "args": [],
+   "doc": "Water + leaf splash on the lush sheet (Q1, Q3s, CS t92, D t82). At the floor point.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "burrow_pool": {
+   "args": [
+    "r"
+   ],
+   "doc": "The dark olive leaf pool the boss sinks into (E t0, P1 t4, P3 t5): spreads to radius {r} (35 = 7 b across) in 10 t and lasts 40 t. At the floor point.",
+   "cards": 1,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "leaf_flakes": {
+   "args": [],
+   "doc": "Black leaf flakes rising (E, P1 sink). At the floor point.",
+   "cards": 5,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "bulb_flash": {
+   "args": [],
+   "doc": "The flash at the Heart bulb (E t60). At the bulb.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "gold_embers": {
+   "args": [],
+   "doc": "Golden leaf embers drifting around the raised hand (E t63-80, every 4 t). At the bulb.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": true,
+   "particles_only": false
+  },
+  "shadow_glide": {
+   "args": [],
+   "doc": "Underground travel (P1 t23-44, P3 t23-39, every 2 t): a dark leaf ripple and dust over the hidden body. Particles only. At the hidden anchor (floor).",
+   "cards": 0,
+   "pool_cards": 0,
+   "ambient": true,
+   "particles_only": true
+  },
+  "gold_burst": {
+   "args": [],
+   "doc": "The burst (P1 t44, P3 slams): a white-gold flash and radial crystal blades, airborne (the ground decal is the hazard's). At the floor point.",
+   "cards": 10,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "leaf_debris": {
+   "args": [],
+   "doc": "Black leaf debris and a pale ghost-leaf spray (P1 burst). At the floor point.",
+   "cards": 6,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "slash_band": {
+   "args": [
+    "len"
+   ],
+   "doc": "The lunge sweep (P1 t64): a white-gold streak band 1-2.5 b high along the lane of length {len}. At the lane start, rotated = the aim.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "spine_afterimage": {
+   "args": [
+    "len"
+   ],
+   "doc": "Pale rib afterimages along the sweep path of length {len}, 10 t (P1 sweep). At the lane start, rotated = the aim.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "root_chunks": {
+   "args": [],
+   "doc": "Brown root chunks with gold glints sinking (R t4, T1 t20 / t30). At the floor point.",
+   "cards": 5,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "emerge_motes": {
+   "args": [],
+   "doc": "White-green motes of the 4 t scale-in (R t18). At the body.",
+   "cards": 6,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "swirl_wisps": {
+   "args": [],
+   "doc": "Pale-green spirals and whirling leaves around the body (P2 t5-27, every 4 t). At the body.",
+   "cards": 4,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "plunge_flash": {
+   "args": [],
+   "doc": "The white-gold flash where the hands plunge (P2 t30). At the floor point.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "splinter_splash": {
+   "args": [],
+   "doc": "The pale-green splinter splash around the hands (P2 t30, r 3-4). At the floor point.",
+   "cards": 8,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "slam_arc": {
+   "args": [],
+   "doc": "A stalk slam (P2 slams): the arc trail over the strip, the impact flash and green splinters. At the stalk root, rotated along the strip.",
+   "cards": 6,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "gold_glow": {
+   "args": [
+    "r"
+   ],
+   "doc": "A soft gold ground glow of radius {r}, no rim (P3 t39-44: it must not read as a telegraph). At the floor point.",
+   "cards": 1,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "crown_debris": {
+   "args": [],
+   "doc": "The crown and hood emergence debris (P3 t44): dark leaves and grey dust thrown up. At the body.",
+   "cards": 8,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "spiral_wisps": {
+   "args": [],
+   "doc": "Wind-up spirals around the coiled column (P3 t94-130, every 4 t). At the body.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "blade_burst": {
+   "args": [
+    "r"
+   ],
+   "doc": "Gold blade rays to radius {r}, airborne (P3 slams, r 72). At the floor point.",
+   "cards": 12,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "wheel_carpet": {
+   "args": [
+    "r0",
+    "r1",
+    "dur"
+   ],
+   "doc": "The thorn-wheel carpet (P3 slams): 18 pale-green thorn wheels ride the carpet front from radius {r0} to {r1} in {dur} ticks (tenths / ticks, like the hazard). Call it on the tick BEFORE the slam (the fg wave_band rule): the wheels then move from the slam tick with the tele/wave front. At the floor centre.",
+   "cards": 18,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "homing_trail": {
+   "args": [],
+   "doc": "The homing wheel's gold-orange spark trail (P3, every 2 t; particles only). At the wheel; run it as the wheel (execute as <wheel> at @s) and it also turns the prop 90 degrees (the camera-facing spin).",
+   "cards": 0,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": true
+  },
+  "wheel_pop": {
+   "args": [],
+   "doc": "A thorn wheel pops (P3, end of life or hit): a gold-orange flash and sparks (r 1.5). At the prop.",
+   "cards": 5,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "spin_trails": {
+   "args": [],
+   "doc": "Spin trails white-gold -> pale green around the body (P4 t47-71, every 3 t). At the body.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "spin_flash": {
+   "args": [],
+   "doc": "The mid-spin flash (P4 t57). At the body.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "tail_tip_flash": {
+   "args": [],
+   "doc": "The white tail-tip flash: the \"dash now\" cue (P5 t23, Q4 t11). At the tail tip anchor.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "arc_trail": {
+   "args": [
+    "r",
+    "a",
+    "dir"
+   ],
+   "doc": "The white-gold arc trail over a tail swing (P5): 7 crescents on the circle of radius 0.8 {r} about the tail root from -{a} to +{a} degrees, revealed in the sweep direction {dir} (+1 clockwise from above). At the tail root, rotated = the arc's mid-bearing.",
+   "cards": 7,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "crescent_trail": {
+   "args": [
+    "r",
+    "a",
+    "dir"
+   ],
+   "doc": "The green crescent trails of a phase-3 tail swing (Q4; #A4D6AC / #BFE682 / #EBF898): 7 crescents on the circle of radius 0.8 {r} from -{a} to +{a} degrees, revealed in the sweep direction {dir}. At the tail root, rotated = the arc's mid-bearing.",
+   "cards": 7,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "arm_sweep": {
+   "args": [
+    "r",
+    "a"
+   ],
+   "doc": "The arm-sweep arc and ground furrow (P6 hit 1): 5 crescents on the circle of radius 0.75 {r} over +-{a} degrees, left to right. At the body, rotated = the aim.",
+   "cards": 5,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "slam_burst": {
+   "args": [],
+   "doc": "The double-slam radial burst (P6 hit 2): a white-gold floor flash, a shock ring, crystal blades and dark debris. At the floor point.",
+   "cards": 12,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "spin_ring": {
+   "args": [
+    "r"
+   ],
+   "doc": "The ring of gold sparks of the low spin (P6 hit 3), radius {r}. At the body.",
+   "cards": 9,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "leap_slam": {
+   "args": [],
+   "doc": "The leap slam (P6 hit 4): the biggest flash, black and gold debris. At the floor point.",
+   "cards": 17,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "spawn_marker": {
+   "args": [],
+   "doc": "An organism spawn marker: a pale wireframe dome for 20 t (T1 t116, every spawn). At the spawn point.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "org_burst": {
+   "args": [],
+   "doc": "A pale-green organism burst (basic kill, failure, CS wilt). At the organism.",
+   "cards": 5,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "heart_gain": {
+   "args": [],
+   "doc": "The Heart's gain sparkle (heart/add). At the bulb.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "heart_hit": {
+   "args": [],
+   "doc": "The Heart's loss: red-gold motes (heart/sub). At the bulb.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "crown_flare": {
+   "args": [],
+   "doc": "The basic organism's crown flare (O2 t3-12). At the crown.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "comet_trail": {
+   "args": [],
+   "doc": "The bolt's green comet trail, bowing <= 0.5 b (O2, every 2 t; particles only). At the bolt prop.",
+   "cards": 0,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": true
+  },
+  "shield_pop": {
+   "args": [],
+   "doc": "The yellow 3-leaf crown flash of a shield (O3 shields up, a pool breaking). At the basic.",
+   "cards": 4,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "guard_death": {
+   "args": [],
+   "doc": "The 수호 death: red embers and a black twisted wisp. At the 수호.",
+   "cards": 6,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "wall_motes": {
+   "args": [],
+   "doc": "A wall blade dissolves into motes (O4). At the blade.",
+   "cards": 4,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "blink_flash": {
+   "args": [],
+   "doc": "The 둥지 blink flash (O4 blink out 0 / in 3). At the 둥지.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "tether": {
+   "args": [
+    "len"
+   ],
+   "doc": "One wavy 양육 tether beam of length {len} toward the basic (O5, refresh every 2 t; particles only, dust #D4E784, the wave flips phase every 2 t). At the 양육 orb, rotated facing the basic (pitch counts).",
+   "cards": 0,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": true
+  },
+  "nurt_burst": {
+   "args": [],
+   "doc": "The 양육 self-destruct: green-yellow sparks. At the 양육.",
+   "cards": 7,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "bite_flash": {
+   "args": [],
+   "doc": "A white-yellow bite flash (O6b). At the bite point.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "pred_burst": {
+   "args": [],
+   "doc": "The 포식성 burst r 3.6 (O6a t42). At the 포식성.",
+   "cards": 12,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "fuse_pulse": {
+   "args": [],
+   "doc": "One 파괴 fuse glow pulse (O7; every 9 t, every 4 t in the last 20 t). At the 파괴 face.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "blast_dome": {
+   "args": [],
+   "doc": "The 파괴 blast: a green translucent dome r 3 for 12 t. At the 파괴.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "cradle_dust": {
+   "args": [],
+   "doc": "Root-chunk dust of the cradle rise (T1 t45-65). At the cradle.",
+   "cards": 7,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "heart_beam": {
+   "args": [],
+   "doc": "The green-gold light beam as the egg lands, 10 t (T1 t100). At the cradle.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "gold_motes": {
+   "args": [],
+   "doc": "Drifting gold motes over the phase-2 field (every 20 t). At the floor centre.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": true,
+   "particles_only": false
+  },
+  "shock_ring": {
+   "args": [],
+   "doc": "The 「소생 실패」 Dendro shock ring r 0 -> 26. At the floor centre.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "wilt_ring": {
+   "args": [],
+   "doc": "The green pulse ring r 0 -> 26 over 20 t as every organism wilts (CS t0). At the floor centre.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "gold_drip": {
+   "args": [],
+   "doc": "Gold dripping from the lifted egg (CS t0-24, every 3 t). At the egg.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": true,
+   "particles_only": false
+  },
+  "ember_arc": {
+   "args": [
+    "len",
+    "h"
+   ],
+   "doc": "The 「불씨」 ember: a spark arcs {h} high over the {len} from a bank twig into the egg (CS t64-76; 12 sparks shown one after another). At the twig, rotated facing the egg (pitch counts).",
+   "cards": 12,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "green_lightning": {
+   "args": [],
+   "doc": "Green lightning ribbons around the egg (CS t76-84). At the egg.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "revival_burst": {
+   "args": [],
+   "doc": "The leaf splash of the warden bursting out of the water (CS t92). At the floor centre.",
+   "cards": 11,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "leaf_mound": {
+   "args": [],
+   "doc": "The leaf mound and spray where the boss sinks (Q1 t8, Q3s t8). At the floor point.",
+   "cards": 4,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "leaf_pad": {
+   "args": [],
+   "doc": "One translucent 2-3 b leaf pad of the underground trail, life 30 t (Q1 t16-42, Q3s t20-36, every 4 t). At the hidden anchor (floor), rotated as the trail.",
+   "cards": 1,
+   "pool_cards": 0,
+   "ambient": true,
+   "particles_only": false
+  },
+  "rosette": {
+   "args": [],
+   "doc": "The rosette: 10 glowing leaves rising around the burst point, airborne (Q1 t32; the ground ring is tele/disc r 4.2). At the burst point.",
+   "cards": 10,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "surface_burst": {
+   "args": [],
+   "doc": "The white-lime surfacing flash and leaf spray (Q1 t44). At the burst point.",
+   "cards": 8,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "hoop_trail": {
+   "args": [],
+   "doc": "The hoop arc trail as the body vaults (Q1 t44-49). At the body.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "belly_splash": {
+   "args": [],
+   "doc": "The belly-flop splash (Q1 t61). At the floor point.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "sweep_ring": {
+   "args": [
+    "r"
+   ],
+   "doc": "The leaf-blade ring of the 360-degree tail whip, radius {r} (Q1 t69; core #E0F996, rim #A2CA6C). At the body.",
+   "cards": 13,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "light_sprouts": {
+   "args": [],
+   "doc": "Light sprouts at the rise (Q1 t71). At the body.",
+   "cards": 6,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "crouch_splash": {
+   "args": [],
+   "doc": "The splash as the boss crouches to charge (Q2 t0). At the body.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "whirl_leaves": {
+   "args": [],
+   "doc": "Whirling leaves around the body (Q2 t18-36, every 3 t; the three positions rotate each call). At the body.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "field_ring": {
+   "args": [
+    "r0",
+    "r1",
+    "dur"
+   ],
+   "doc": "The visible front of the 종말의 여파 field release: a flat translucent yellow-green wave from radius {r0} to {r1} in {dur} ticks (Q2 t40). At the floor centre.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "floor_glitter": {
+   "args": [],
+   "doc": "Glitter on the tinted 종말의 여파 floor (Q2 t80-155, every 10 t). At the floor centre.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": true,
+   "particles_only": false
+  },
+  "light_pillar": {
+   "args": [],
+   "doc": "A 10 t light-pillar tell where a dome will form (Q2 t44 / 48 / 52). At the dome centre.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "dome_rise": {
+   "args": [],
+   "doc": "The base-rim sparkle as a dome forms (Q2 t54 / 58 / 62; dome r 4.5). At the dome centre.",
+   "cards": 9,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "beam_rain": {
+   "args": [],
+   "doc": "Falling light columns over the disc (Q2 t134-156, every 4 t; the three positions rotate each call). At the floor centre.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "flood": {
+   "args": [
+    "life"
+   ],
+   "doc": "The 종말의 여파 flood: yellow tiles over the walk disc for {life} ticks, skipping every cell within 7.5 b of a live rlk_mb_ap_dome marker (the flood pool, <= 48 cards). At the floor centre.",
+   "cards": 0,
+   "pool_cards": 44,
+   "ambient": false,
+   "particles_only": false
+  },
+  "dome_pop": {
+   "args": [],
+   "doc": "A dome pops: a flash and lime shards (Q2 t189). At the dome centre.",
+   "cards": 9,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "green_burst": {
+   "args": [],
+   "doc": "A green burst at the boss (Q2 t190). At the body.",
+   "cards": 6,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "launch_flash": {
+   "args": [],
+   "doc": "The launch flash at the crown / muzzle (Q3 t35, Q3s t46). At the anchor.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "beam_column": {
+   "args": [
+    "w"
+   ],
+   "doc": "A vertical light beam column {w} wide (#FDFBBD; Q3 t45, Q3s t48, Q5 t14). At the floor point.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "spores": {
+   "args": [],
+   "doc": "Spore puffs on the water after a shell (Q3 t45). At the floor point.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": true,
+   "particles_only": false
+  },
+  "shell_streak": {
+   "args": [
+    "h"
+   ],
+   "doc": "A yellow streak falling from {h} above onto the point in 6 t (Q3 t87 / 90; call it 6 t before the impact). At the floor point.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "shell_burst": {
+   "args": [],
+   "doc": "A shell burst r 3 (Q3 t93 / 96, Q3s t48). At the floor point.",
+   "cards": 9,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "leaf_ring": {
+   "args": [],
+   "doc": "Leaf cards circling the surfacing decal (Q3s t26-36): 8 leaves on r 3.6 shown around the ring one after another. At the floor point.",
+   "cards": 8,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "surface_splash": {
+   "args": [],
+   "doc": "The surfacing splash (Q3s t36). At the floor point.",
+   "cards": 7,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "light_band": {
+   "args": [
+    "len"
+   ],
+   "doc": "The horizontal light band of the flat surfacing shot over {len} (Q3s t46). At the muzzle anchor, rotated = the shot.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "glitter_shower": {
+   "args": [],
+   "doc": "A glitter shower over the body (Q4 t53). At the body.",
+   "cards": 4,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "charge_streaks": {
+   "args": [],
+   "doc": "Charge streaks converging on the body (Q5 t10-19). At the body.",
+   "cards": 6,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "star_flare": {
+   "args": [],
+   "doc": "A 4-point star flare at the glint (Q5 t37 / t43). At the glint point.",
+   "cards": 2,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "helix_trail": {
+   "args": [],
+   "doc": "The double-helix ribbon behind a seed orb (Q5 t42-55, every tick; particles only): two sine strands, dust #E7F99F -> #8BCAAA, the phase turning 45 degrees a tick. At the orb, rotated as its flight.",
+   "cards": 0,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": true
+  },
+  "orb_impact": {
+   "args": [],
+   "doc": "A seed-orb landing: a star burst and two upthrust crystal / leaf spikes (Q5 t49 / t55). At the floor point.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "leaf_skim": {
+   "args": [
+    "len"
+   ],
+   "doc": "Two skimming pale-yellow leaf blades along the lane of length {len} (Q5 t64). At the lane start, rotated = the aim.",
+   "cards": 3,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "leaf_dissolve": {
+   "args": [],
+   "doc": "A white leaflet burst as the body dissolves (D t100-118, every 6 t). At the body.",
+   "cards": 5,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
+  "haze_withered": {
+   "args": [],
+   "doc": "The withered olive haze drift (phase 1, T1, phase 2; every 10 t; particles only). At the floor centre.",
+   "cards": 0,
+   "pool_cards": 0,
+   "ambient": true,
+   "particles_only": true
+  },
+  "haze_lush": {
+   "args": [],
+   "doc": "The lush spore and glint haze (from CS t64; every 10 t; particles only). At the floor centre.",
+   "cards": 0,
+   "pool_cards": 0,
+   "ambient": true,
+   "particles_only": true
+  }
+ },
+ "telegraphs": [
+  "disc",
+  "sector",
+  "wedge",
+  "line",
+  "crack",
+  "wave",
+  "wave_end",
+  "mask_wash",
+  "safe_rim",
+  "safe_end",
+  "mring",
+  "mring_move",
+  "mring_end",
+  "wall_spot",
+  "clear"
+ ],
+ "dress": [
+  "swirl",
+  "ley",
+  "redraw",
+  "clear"
+ ],
+ "props": {
+  "thorn_wheel_homing": "P3 homing wheel (pj, #pjNoDodge 1): gold-orange thorn wheel Ø 2 with a red 4-point flare, camera-facing; p/homing_trail run as it spins it.",
+  "thorn_wheel": "P3 carpet wheel as a prop (fallback): pale-green thorn wheel Ø 1.6, camera-facing.",
+  "seed_bolt": "O2 ranged bolt: lime seed ball Ø 0.6 with a glow, camera-facing.",
+  "seed_orb": "Q5 seed orb Ø 0.7: glowing yellow-green with a spiral glyph, camera-facing (the module moves / bobs it).",
+  "charge_ball": "Q3 light ball over the crown: #FDFBBD core, white-green halo, camera-facing, Ø 1.6.",
+  "water_sheet": "One water-sheet tile of the lush lake (theme props('lush'), 16 tiles at scale 14, y 201.005): flat, about 40 % alpha. The record sets the scale.",
+  "lily_pad": "Lily pad (lush pond dressing beyond r 22), flat; the record sets the scale.",
+  "bell_flower": "Yellow bell flowers (lush pond dressing beyond r 22), crossed quads; the record sets the scale.",
+  "bulb_flower": "Glowing bulb flower (lush pond dressing beyond r 22), crossed quads; the record sets the scale.",
+  "bank_crystal": "Gold crystal spikes on the bank r 26-29 (both looks), brightness 15; the record sets the scale.",
+  "gate_crystal": "Gold-green gate crystal of the chapter-3 entrance (≈ 1.5 b at scale 1), brightness 15, static."
+ },
+ "sounds": {
+  "e_emerge": {
+   "use": "E t0-31: the warden rises from the dark leaf pool.",
+   "layers": [
+    [
+     "entity.warden.emerge",
+     0.8,
+     0.8
+    ],
+    [
+     "block.rooted_dirt.break",
+     0.8,
+     1.0
+    ],
+    [
+     "block.rooted_dirt.break",
+     0.8,
+     1.07
+    ],
+    [
+     "block.rooted_dirt.break",
+     0.8,
+     0.94
+    ],
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "e_flash": {
+   "use": "E t60: the flash at the bulb.",
+   "layers": [
+    [
+     "block.amethyst_block.chime",
+     0.8,
+     1.0
+    ],
+    [
+     "block.beacon.power_select",
+     0.8,
+     1.5
+    ]
+   ]
+  },
+  "e_heart_up": {
+   "use": "E t70: the vine draws the Heart up.",
+   "layers": [
+    [
+     "block.vine.step",
+     0.8,
+     1.0
+    ],
+    [
+     "block.amethyst_block.resonate",
+     0.8,
+     1.2
+    ]
+   ]
+  },
+  "e_roar": {
+   "use": "E t100: crouch and roar.",
+   "layers": [
+    [
+     "entity.ravager.roar",
+     0.6,
+     1.3
+    ]
+   ]
+  },
+  "p1_dive": {
+   "use": "P1 t4, P3 t5, T1 t20: dive and sink.",
+   "layers": [
+    [
+     "entity.warden.dig",
+     0.8,
+     0.9
+    ],
+    [
+     "block.rooted_dirt.break",
+     0.8,
+     1.0
+    ],
+    [
+     "block.mud.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p1_travel": {
+   "use": "P1 every 7 t underground (quiet).",
+   "layers": [
+    [
+     "entity.warden.dig",
+     0.4,
+     1.2
+    ],
+    [
+     "block.gravel.step",
+     0.8,
+     0.5
+    ]
+   ]
+  },
+  "p1_ring": {
+   "use": "P1 t32: the gold ring locks.",
+   "layers": [
+    [
+     "block.beacon.activate",
+     0.4,
+     1.5
+    ]
+   ]
+  },
+  "p1_burst": {
+   "use": "P1 t44: the burst.",
+   "layers": [
+    [
+     "entity.warden.emerge",
+     0.8,
+     1.4
+    ],
+    [
+     "block.amethyst_cluster.break",
+     0.8,
+     1.0
+    ],
+    [
+     "entity.generic.explode",
+     0.4,
+     1.3
+    ]
+   ]
+  },
+  "p1_sweep": {
+   "use": "P1 t64: the lunge sweep.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     0.5
+    ],
+    [
+     "entity.breeze.wind_burst",
+     0.8,
+     0.6
+    ]
+   ]
+  },
+  "p1_land": {
+   "use": "P1 t77: the landing.",
+   "layers": [
+    [
+     "entity.ravager.step",
+     0.8,
+     1.0
+    ],
+    [
+     "block.moss.fall",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "r_sink": {
+   "use": "R t4: the relocate sink.",
+   "layers": [
+    [
+     "block.rooted_dirt.break",
+     0.8,
+     0.6
+    ],
+    [
+     "block.rooted_dirt.break",
+     0.8,
+     0.67
+    ],
+    [
+     "block.rooted_dirt.break",
+     0.8,
+     0.54
+    ],
+    [
+     "entity.warden.dig",
+     0.8,
+     1.1
+    ]
+   ]
+  },
+  "r_emerge": {
+   "use": "R t18: the relocate emergence.",
+   "layers": [
+    [
+     "entity.warden.emerge",
+     0.6,
+     1.3
+    ],
+    [
+     "block.azalea.place",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p2_swirl": {
+   "use": "P2 t5: the swirl starts.",
+   "layers": [
+    [
+     "entity.breeze.whirl",
+     0.8,
+     0.7
+    ],
+    [
+     "block.beacon.ambient",
+     0.8,
+     1.6
+    ]
+   ]
+  },
+  "p2_swirl_tick": {
+   "use": "P2 every 3 t, t5-27 (leaf rustle).",
+   "layers": [
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     0.8
+    ]
+   ]
+  },
+  "p2_plunge": {
+   "use": "P2 t30: the hands plunge.",
+   "layers": [
+    [
+     "entity.warden.dig",
+     0.8,
+     0.7
+    ],
+    [
+     "entity.evoker_fangs.attack",
+     0.8,
+     1.0
+    ],
+    [
+     "block.rooted_dirt.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p2_stalks": {
+   "use": "P2 t36: the stalks rise.",
+   "layers": [
+    [
+     "block.hanging_roots.break",
+     0.8,
+     1.0
+    ],
+    [
+     "entity.warden.emerge",
+     0.5,
+     1.5
+    ]
+   ]
+  },
+  "p2_lines": {
+   "use": "P2 t40: the crack lines.",
+   "layers": [
+    [
+     "block.sculk_sensor.clicking",
+     0.8,
+     1.6
+    ]
+   ]
+  },
+  "p2_slam": {
+   "use": "P2 slams.",
+   "layers": [
+    [
+     "entity.iron_golem.attack",
+     0.8,
+     0.6
+    ],
+    [
+     "entity.generic.explode",
+     0.3,
+     1.5
+    ],
+    [
+     "block.big_dripleaf.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p2_flower": {
+   "use": "P2 t118: the flower rear.",
+   "layers": [
+    [
+     "entity.ravager.roar",
+     0.6,
+     1.2
+    ],
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p2_fold": {
+   "use": "P2 t128: fold down.",
+   "layers": [
+    [
+     "entity.ravager.step",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p3_emerge": {
+   "use": "P3 t44: the crown emerges.",
+   "layers": [
+    [
+     "entity.warden.emerge",
+     0.8,
+     1.1
+    ]
+   ]
+  },
+  "p3_glow": {
+   "use": "P3 t39: the gold ground glow.",
+   "layers": [
+    [
+     "block.beacon.activate",
+     0.4,
+     1.5
+    ],
+    [
+     "block.sculk_catalyst.bloom",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p3_windup": {
+   "use": "P3 t94: the coil wind-up.",
+   "layers": [
+    [
+     "block.bamboo.break",
+     0.8,
+     0.6
+    ],
+    [
+     "entity.breeze.idle_air",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p3_slam": {
+   "use": "P3 slams.",
+   "layers": [
+    [
+     "entity.warden.attack_impact",
+     0.8,
+     1.0
+    ],
+    [
+     "entity.generic.explode",
+     0.5,
+     0.7
+    ],
+    [
+     "block.big_dripleaf.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p3_wheels": {
+   "use": "P3 each slam: the wheels spawn.",
+   "layers": [
+    [
+     "block.amethyst_cluster.place",
+     0.8,
+     1.0
+    ],
+    [
+     "block.amethyst_cluster.place",
+     0.8,
+     1.07
+    ],
+    [
+     "block.amethyst_cluster.place",
+     0.8,
+     0.94
+    ]
+   ]
+  },
+  "p3_wheel_roll": {
+   "use": "P3 every 4 t while a carpet runs.",
+   "layers": [
+    [
+     "block.azalea_leaves.step",
+     0.8,
+     0.6
+    ]
+   ]
+  },
+  "p3_wheel_hit": {
+   "use": "P3 thorn hit (#mbHitEv).",
+   "layers": [
+    [
+     "entity.player.hurt_sweet_berry_bush",
+     0.8,
+     1.0
+    ],
+    [
+     "block.amethyst_cluster.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p3_homing_loop": {
+   "use": "P3 every 10 t per homing wheel.",
+   "layers": [
+    [
+     "block.amethyst_block.resonate",
+     0.8,
+     1.6
+    ],
+    [
+     "entity.blaze.burn",
+     0.3,
+     1.8
+    ]
+   ]
+  },
+  "p4_rear": {
+   "use": "P4 t0: arms and rear.",
+   "layers": [
+    [
+     "entity.breeze.wind_burst",
+     0.5,
+     0.6
+    ],
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p4_hum": {
+   "use": "P4 t16: the disc hum.",
+   "layers": [
+    [
+     "block.beacon.ambient",
+     0.4,
+     1.4
+    ],
+    [
+     "block.sculk_sensor.clicking",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p4_spin": {
+   "use": "P4 t40: crash and spin.",
+   "layers": [
+    [
+     "entity.ravager.attack",
+     0.8,
+     0.6
+    ],
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     0.5
+    ],
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     0.57
+    ],
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     0.5
+    ],
+    [
+     "entity.generic.splash",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p5_raise": {
+   "use": "P5 t8: the tail raise.",
+   "layers": [
+    [
+     "entity.breeze.idle_air",
+     0.8,
+     0.7
+    ]
+   ]
+  },
+  "p5_cock": {
+   "use": "P5 t23: the cock cue (\"dash now\").",
+   "layers": [
+    [
+     "entity.creaking.activate",
+     0.8,
+     1.4
+    ],
+    [
+     "item.trident.riptide_1",
+     0.8,
+     0.6
+    ]
+   ]
+  },
+  "p5_swing": {
+   "use": "P5 t28 / t52: a tail swing.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     0.6
+    ],
+    [
+     "item.trident.throw",
+     0.8,
+     0.5
+    ]
+   ]
+  },
+  "p5_hit": {
+   "use": "P5 / Q4 hit (#mbHitEv).",
+   "layers": [
+    [
+     "entity.player.attack.knockback",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p6_sweep": {
+   "use": "P6 hit 1: the arm sweep.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     0.7
+    ],
+    [
+     "block.grass.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "p6_slam": {
+   "use": "P6 hits 2 / 4: the slams.",
+   "layers": [
+    [
+     "entity.warden.sonic_boom",
+     0.5,
+     1.6
+    ],
+    [
+     "entity.generic.explode",
+     0.8,
+     0.7
+    ],
+    [
+     "block.mud.break",
+     0.8,
+     1.0
+    ],
+    [
+     "block.mud.break",
+     0.8,
+     1.07
+    ],
+    [
+     "block.mud.break",
+     0.8,
+     0.94
+    ],
+    [
+     "block.mud.break",
+     0.8,
+     1.12
+    ]
+   ]
+  },
+  "p6_spin": {
+   "use": "P6 hit 3: the low spin.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     0.6
+    ],
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     0.8
+    ]
+   ]
+  },
+  "m_crawl": {
+   "use": "crawl_p1 / walk_p3 steps.",
+   "layers": [
+    [
+     "entity.camel.step",
+     0.8,
+     0.6
+    ],
+    [
+     "block.moss_carpet.step",
+     0.8,
+     1.0
+    ],
+    [
+     "block.azalea_leaves.step",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "m_walk": {
+   "use": "walk_p1 steps.",
+   "layers": [
+    [
+     "entity.warden.step",
+     0.8,
+     0.8
+    ]
+   ]
+  },
+  "o1_attack": {
+   "use": "O1 strike.",
+   "layers": [
+    [
+     "entity.slime.attack",
+     0.8,
+     1.2
+    ],
+    [
+     "block.big_dripleaf.tilt_down",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "heart_hit": {
+   "use": "every Heart loss.",
+   "layers": [
+    [
+     "block.amethyst_block.hit",
+     0.4,
+     0.6
+    ]
+   ]
+  },
+  "heart_gain": {
+   "use": "every Heart gain (the chime rises with the progress: 11 steps of #apHt).",
+   "layers": [
+    [
+     "block.amethyst_block.chime",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "o2_pivot": {
+   "use": "O2 t0.",
+   "layers": [
+    [
+     "block.big_dripleaf.tilt_up",
+     0.8,
+     1.4
+    ]
+   ]
+  },
+  "o2_charge": {
+   "use": "O2 t3.",
+   "layers": [
+    [
+     "entity.breeze.charge",
+     0.4,
+     1.6
+    ]
+   ]
+  },
+  "o2_shoot": {
+   "use": "O2 t12.",
+   "layers": [
+    [
+     "entity.breeze.shoot",
+     0.8,
+     1.3
+    ]
+   ]
+  },
+  "o2_hit": {
+   "use": "O2 bolt end.",
+   "layers": [
+    [
+     "block.moss.break",
+     0.8,
+     1.3
+    ]
+   ]
+  },
+  "o3_collapse": {
+   "use": "O3 t0 / t16.",
+   "layers": [
+    [
+     "block.bamboo.break",
+     0.5,
+     0.8
+    ],
+    [
+     "block.mangrove_roots.place",
+     0.8,
+     0.7
+    ]
+   ]
+  },
+  "o3_cast": {
+   "use": "O3 t30.",
+   "layers": [
+    [
+     "block.beacon.activate",
+     0.5,
+     1.6
+    ]
+   ]
+  },
+  "o3_pop": {
+   "use": "O3 shields up / a shield pool breaks.",
+   "layers": [
+    [
+     "block.amethyst_block.resonate",
+     0.8,
+     1.4
+    ],
+    [
+     "item.shield.block",
+     0.4,
+     1.6
+    ]
+   ]
+  },
+  "o3_death": {
+   "use": "O3 death.",
+   "layers": [
+    [
+     "block.chorus_flower.death",
+     0.8,
+     1.0
+    ],
+    [
+     "entity.slime.death",
+     0.8,
+     0.7
+    ]
+   ]
+  },
+  "shield_hit": {
+   "use": "a hit absorbed by apShd.",
+   "layers": [
+    [
+     "item.shield.block",
+     0.4,
+     1.6
+    ]
+   ]
+  },
+  "o4_rise": {
+   "use": "O4 t12: the walls rise.",
+   "layers": [
+    [
+     "block.big_dripleaf.place",
+     0.8,
+     0.7
+    ],
+    [
+     "block.big_dripleaf.place",
+     0.8,
+     0.77
+    ],
+    [
+     "block.big_dripleaf.place",
+     0.8,
+     0.64
+    ],
+    [
+     "block.azalea.place",
+     0.8,
+     1.0
+    ],
+    [
+     "block.amethyst_cluster.place",
+     0.8,
+     1.2
+    ]
+   ]
+  },
+  "o4_fade": {
+   "use": "O4 dissolve.",
+   "layers": [
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     1.0
+    ],
+    [
+     "block.beacon.deactivate",
+     0.3,
+     2.0
+    ]
+   ]
+  },
+  "o4_flap": {
+   "use": "O4 flying (every 14 t).",
+   "layers": [
+    [
+     "entity.phantom.flap",
+     0.3,
+     1.5
+    ]
+   ]
+  },
+  "o5_hum": {
+   "use": "O5 every 40 t while linked.",
+   "layers": [
+    [
+     "block.beacon.ambient",
+     0.2,
+     1.8
+    ]
+   ]
+  },
+  "o5_destruct": {
+   "use": "O5 self-destruct.",
+   "layers": [
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     1.0
+    ],
+    [
+     "entity.allay.death",
+     0.8,
+     1.3
+    ],
+    [
+     "block.amethyst_cluster.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "o6_gulp": {
+   "use": "O6a t12.",
+   "layers": [
+    [
+     "entity.generic.eat",
+     0.8,
+     0.6
+    ],
+    [
+     "entity.slime.squish",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "o6_bud": {
+   "use": "O6a t12.",
+   "layers": [
+    [
+     "block.beacon.power_select",
+     0.4,
+     1.5
+    ]
+   ]
+  },
+  "o6_inflate": {
+   "use": "O6a t32.",
+   "layers": [
+    [
+     "entity.puffer_fish.blow_up",
+     0.8,
+     0.8
+    ]
+   ]
+  },
+  "o6_burst": {
+   "use": "O6a t42.",
+   "layers": [
+    [
+     "entity.puffer_fish.blow_out",
+     0.8,
+     1.0
+    ],
+    [
+     "block.amethyst_cluster.break",
+     0.8,
+     1.4
+    ],
+    [
+     "entity.firework_rocket.blast",
+     0.5,
+     0.8
+    ]
+   ]
+  },
+  "o6_bite": {
+   "use": "O6b each bite.",
+   "layers": [
+    [
+     "entity.evoker_fangs.attack",
+     0.8,
+     1.3
+    ],
+    [
+     "entity.ravager.attack",
+     0.4,
+     1.6
+    ]
+   ]
+  },
+  "o6_bite_first": {
+   "use": "O6b the first bite of a chain.",
+   "layers": [
+    [
+     "entity.evoker_fangs.attack",
+     0.8,
+     1.3
+    ],
+    [
+     "entity.ravager.attack",
+     0.4,
+     1.6
+    ],
+    [
+     "entity.player.attack.crit",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "o6_swim": {
+   "use": "O6 swimming (every 16 t).",
+   "layers": [
+    [
+     "entity.dolphin.swim",
+     0.8,
+     1.2
+    ]
+   ]
+  },
+  "o7_roll": {
+   "use": "O7 every 8 t.",
+   "layers": [
+    [
+     "entity.armadillo.roll",
+     0.8,
+     0.8
+    ]
+   ]
+  },
+  "o7_primed": {
+   "use": "O7 contact.",
+   "layers": [
+    [
+     "entity.creeper.primed",
+     0.8,
+     1.4
+    ]
+   ]
+  },
+  "o7_suck": {
+   "use": "O7 suck-in.",
+   "layers": [
+    [
+     "entity.breeze.inhale",
+     0.8,
+     0.8
+    ]
+   ]
+  },
+  "o7_blast": {
+   "use": "O7 blast.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     0.8,
+     0.8
+    ],
+    [
+     "entity.warden.sonic_boom",
+     0.3,
+     1.6
+    ]
+   ]
+  },
+  "org_kill": {
+   "use": "basic kill.",
+   "layers": [
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     1.0
+    ],
+    [
+     "entity.slime.squish_small",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "timeout_warn": {
+   "use": "the time-out warning.",
+   "layers": [
+    [
+     "event.raid.horn",
+     0.3,
+     1.0
+    ]
+   ]
+  },
+  "fail_strike": {
+   "use": "「소생 실패」 (proposal: plan §3.4 names no sound).",
+   "layers": [
+    [
+     "block.respawn_anchor.deplete",
+     0.8,
+     0.6
+    ],
+    [
+     "block.big_dripleaf.break",
+     0.8,
+     0.5
+    ],
+    [
+     "block.sculk_shrieker.shriek",
+     0.4,
+     0.8
+    ]
+   ]
+  },
+  "t1_cradle": {
+   "use": "T1 t45: the cradle rises.",
+   "layers": [
+    [
+     "block.rooted_dirt.break",
+     0.8,
+     1.0
+    ],
+    [
+     "block.mangrove_roots.place",
+     0.8,
+     0.7
+    ]
+   ]
+  },
+  "t1_lower": {
+   "use": "T1 t50: the Heart lowers.",
+   "layers": [
+    [
+     "block.amethyst_block.resonate",
+     0.8,
+     1.2
+    ],
+    [
+     "block.spore_blossom.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "t1_land": {
+   "use": "T1 t100: the egg lands.",
+   "layers": [
+    [
+     "block.honey_block.fall",
+     0.8,
+     0.6
+    ],
+    [
+     "block.beacon.power_select",
+     0.8,
+     1.4
+    ],
+    [
+     "block.amethyst_block.chime",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "t1_hud": {
+   "use": "T1 t106: the title.",
+   "layers": [
+    [
+     "ui.toast.in",
+     0.8,
+     1.2
+    ]
+   ]
+  },
+  "spawn_marker": {
+   "use": "every spawn marker.",
+   "layers": [
+    [
+     "block.chorus_flower.grow",
+     0.8,
+     1.0
+    ],
+    [
+     "block.sculk_shrieker.place",
+     0.8,
+     1.5
+    ]
+   ]
+  },
+  "cs_complete": {
+   "use": "CS t0: the revival completes.",
+   "layers": [
+    [
+     "block.respawn_anchor.set_spawn",
+     0.8,
+     1.3
+    ],
+    [
+     "block.amethyst_block.chime",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "cs_ember": {
+   "use": "CS t64: the 「불씨」 ember.",
+   "layers": [
+    [
+     "block.fire.ambient",
+     0.3,
+     1.6
+    ]
+   ]
+  },
+  "cs_flash": {
+   "use": "CS t80: the green flash.",
+   "layers": [
+    [
+     "block.beacon.activate",
+     0.8,
+     1.0
+    ],
+    [
+     "entity.lightning_bolt.thunder",
+     0.3,
+     2.0
+    ]
+   ]
+  },
+  "cs_heal": {
+   "use": "CS t80: the heal.",
+   "layers": [
+    [
+     "block.amethyst_block.resonate",
+     0.8,
+     1.4
+    ]
+   ]
+  },
+  "cs_emerge": {
+   "use": "CS t92: the warden bursts out of the water.",
+   "layers": [
+    [
+     "entity.warden.emerge",
+     0.8,
+     0.8
+    ],
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     1.0
+    ],
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     1.07
+    ],
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     0.94
+    ],
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     1.12
+    ]
+   ]
+  },
+  "cs_reveal": {
+   "use": "CS t132: the reveal.",
+   "layers": [
+    [
+     "block.beacon.activate",
+     0.8,
+     0.7
+    ]
+   ]
+  },
+  "q1_sink": {
+   "use": "Q1 t8, Q3s t8: the sink.",
+   "layers": [
+    [
+     "entity.warden.dig",
+     0.8,
+     1.2
+    ],
+    [
+     "block.mud.break",
+     0.8,
+     1.0
+    ],
+    [
+     "entity.player.splash.high_speed",
+     0.8,
+     0.6
+    ]
+   ]
+  },
+  "q1_trail": {
+   "use": "Q1 / Q3s every 4 t underground.",
+   "layers": [
+    [
+     "block.big_dripleaf.tilt_down",
+     0.8,
+     0.8
+    ],
+    [
+     "block.lily_pad.place",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "q1_rosette": {
+   "use": "Q1 t32: the rosette.",
+   "layers": [
+    [
+     "block.flowering_azalea.place",
+     0.8,
+     1.0
+    ],
+    [
+     "block.spore_blossom.place",
+     0.8,
+     0.6
+    ]
+   ]
+  },
+  "q1_burst": {
+   "use": "Q1 t44: the burst.",
+   "layers": [
+    [
+     "entity.warden.emerge",
+     0.6,
+     1.3
+    ],
+    [
+     "entity.generic.splash",
+     0.8,
+     1.0
+    ],
+    [
+     "block.big_dripleaf.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "q1_slam": {
+   "use": "Q1 t61 / t69: the slam and the whip.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     0.4,
+     1.4
+    ],
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     0.6
+    ],
+    [
+     "entity.generic.splash",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "q1_rise": {
+   "use": "Q1 t71: the rise.",
+   "layers": [
+    [
+     "block.big_dripleaf.tilt_up",
+     0.8,
+     1.0
+    ],
+    [
+     "block.vine.step",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "q2_banner": {
+   "use": "Q2 B0: the banner.",
+   "layers": [
+    [
+     "block.respawn_anchor.set_spawn",
+     0.8,
+     0.7
+    ],
+    [
+     "entity.elder_guardian.curse",
+     0.4,
+     1.4
+    ]
+   ]
+  },
+  "q2_charge": {
+   "use": "Q2 t0: the charge.",
+   "layers": [
+    [
+     "block.conduit.activate",
+     0.8,
+     0.8
+    ],
+    [
+     "block.beacon.power_select",
+     0.8,
+     0.6
+    ]
+   ]
+  },
+  "q2_whirl": {
+   "use": "Q2 t18: the whirl.",
+   "layers": [
+    [
+     "entity.breeze.whirl",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "q2_release": {
+   "use": "Q2 t40: the field release.",
+   "layers": [
+    [
+     "entity.warden.sonic_charge",
+     0.8,
+     1.4
+    ],
+    [
+     "entity.breeze.wind_burst",
+     0.8,
+     0.6
+    ]
+   ]
+  },
+  "q2_field_loop": {
+   "use": "Q2 every 20 t, t40-156.",
+   "layers": [
+    [
+     "block.bubble_column.upwards_ambient",
+     0.8,
+     1.0
+    ],
+    [
+     "block.sculk.spread",
+     0.8,
+     1.4
+    ]
+   ]
+  },
+  "q2_tick": {
+   "use": "Q2 each landed field tick.",
+   "layers": [
+    [
+     "entity.player.hurt_sweet_berry_bush",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "q2_dome": {
+   "use": "Q2 t54 / 58 / 62: a dome forms.",
+   "layers": [
+    [
+     "block.beacon.activate",
+     0.8,
+     1.8
+    ],
+    [
+     "block.amethyst_block.chime",
+     0.8,
+     1.0
+    ],
+    [
+     "block.amethyst_block.chime",
+     0.8,
+     1.07
+    ],
+    [
+     "block.amethyst_block.chime",
+     0.8,
+     0.94
+    ],
+    [
+     "block.respawn_anchor.charge",
+     0.8,
+     1.6
+    ]
+   ]
+  },
+  "q2_rain": {
+   "use": "Q2 t134: the light rain.",
+   "layers": [
+    [
+     "block.beacon.power_select",
+     0.5,
+     1.8
+    ]
+   ]
+  },
+  "q2_blast": {
+   "use": "Q2 t156: the blast.",
+   "layers": [
+    [
+     "entity.warden.sonic_boom",
+     0.8,
+     0.8
+    ],
+    [
+     "entity.dragon_fireball.explode",
+     0.8,
+     0.7
+    ],
+    [
+     "entity.lightning_bolt.thunder",
+     0.4,
+     1.5
+    ]
+   ]
+  },
+  "q2_pop": {
+   "use": "Q2 t189: the domes pop.",
+   "layers": [
+    [
+     "block.glass.break",
+     0.5,
+     1.5
+    ],
+    [
+     "block.amethyst_cluster.break",
+     0.8,
+     1.0
+    ],
+    [
+     "block.bubble_column.bubble_pop",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "q3_charge": {
+   "use": "Q3 t14: the charge.",
+   "layers": [
+    [
+     "block.respawn_anchor.charge",
+     0.8,
+     1.5
+    ],
+    [
+     "block.beacon.ambient",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "q3_launch": {
+   "use": "Q3 t35: the launch.",
+   "layers": [
+    [
+     "entity.breeze.shoot",
+     0.8,
+     0.8
+    ],
+    [
+     "item.crossbow.shoot",
+     0.8,
+     0.5
+    ]
+   ]
+  },
+  "q3_impact1": {
+   "use": "Q3 t45: shell 1.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     0.8,
+     1.2
+    ],
+    [
+     "block.beacon.deactivate",
+     0.8,
+     1.5
+    ],
+    [
+     "block.big_dripleaf.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "q3_impact2": {
+   "use": "Q3 t93 / 96: shells 2 / 3.",
+   "layers": [
+    [
+     "entity.dragon_fireball.explode",
+     0.5,
+     1.4
+    ]
+   ]
+  },
+  "q3s_surface": {
+   "use": "Q3s t36: the surfacing.",
+   "layers": [
+    [
+     "block.mud.break",
+     0.8,
+     1.0
+    ],
+    [
+     "entity.player.splash",
+     0.8,
+     0.6
+    ],
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "q3s_charge": {
+   "use": "Q3s t36: the charge.",
+   "layers": [
+    [
+     "block.respawn_anchor.charge",
+     0.6,
+     1.5
+    ],
+    [
+     "block.amethyst_block.resonate",
+     0.8,
+     1.6
+    ]
+   ]
+  },
+  "q3s_launch": {
+   "use": "Q3s t46: the flat shot.",
+   "layers": [
+    [
+     "entity.breeze.shoot",
+     0.8,
+     0.8
+    ],
+    [
+     "item.trident.riptide_1",
+     0.5,
+     1.4
+    ]
+   ]
+  },
+  "q3s_impact": {
+   "use": "Q3s t48: the impact.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     0.5,
+     1.3
+    ],
+    [
+     "block.beacon.activate",
+     0.8,
+     1.8
+    ],
+    [
+     "block.cherry_leaves.break",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "q4_swing": {
+   "use": "Q4 t14: swing 1.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     0.6
+    ],
+    [
+     "item.trident.throw",
+     0.8,
+     0.5
+    ],
+    [
+     "block.azalea_leaves.fall",
+     0.8,
+     1.0
+    ],
+    [
+     "block.azalea_leaves.fall",
+     0.8,
+     1.07
+    ],
+    [
+     "block.azalea_leaves.fall",
+     0.8,
+     0.94
+    ]
+   ]
+  },
+  "q4_rear": {
+   "use": "Q4 t3, t36: rear / lunge.",
+   "layers": [
+    [
+     "entity.creaking.activate",
+     0.8,
+     0.6
+    ],
+    [
+     "entity.ravager.step",
+     0.8,
+     0.6
+    ]
+   ]
+  },
+  "q4_swing2": {
+   "use": "Q4 t46: swing 2.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     0.6
+    ],
+    [
+     "item.trident.throw",
+     0.8,
+     0.5
+    ],
+    [
+     "block.azalea_leaves.fall",
+     0.8,
+     1.0
+    ],
+    [
+     "block.azalea_leaves.fall",
+     0.8,
+     1.07
+    ],
+    [
+     "block.azalea_leaves.fall",
+     0.8,
+     0.94
+    ],
+    [
+     "block.amethyst_cluster.step",
+     0.8,
+     1.0
+    ],
+    [
+     "block.amethyst_cluster.step",
+     0.8,
+     1.07
+    ],
+    [
+     "block.amethyst_cluster.step",
+     0.8,
+     0.94
+    ],
+    [
+     "block.amethyst_cluster.step",
+     0.8,
+     1.12
+    ],
+    [
+     "item.bone_meal.use",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "q5_unfold": {
+   "use": "Q5 t10: the unfold.",
+   "layers": [
+    [
+     "entity.breeze.charge",
+     0.8,
+     1.2
+    ],
+    [
+     "block.big_dripleaf.tilt_up",
+     0.8,
+     0.6
+    ],
+    [
+     "block.amethyst_block.chime",
+     0.8,
+     1.0
+    ],
+    [
+     "block.amethyst_block.chime",
+     0.8,
+     1.07
+    ],
+    [
+     "block.amethyst_block.chime",
+     0.8,
+     0.94
+    ]
+   ]
+  },
+  "q5_orb": {
+   "use": "Q5 each orb (t19-32).",
+   "layers": [
+    [
+     "block.amethyst_cluster.place",
+     0.8,
+     1.0
+    ],
+    [
+     "block.beacon.ambient",
+     0.3,
+     1.8
+    ]
+   ]
+  },
+  "q5_flare": {
+   "use": "Q5 t37 / 43: the glint.",
+   "layers": [
+    [
+     "block.beacon.power_select",
+     0.5,
+     1.8
+    ]
+   ]
+  },
+  "q5_launch": {
+   "use": "Q5 t42 / 48: a volley flies.",
+   "layers": [
+    [
+     "entity.arrow.shoot",
+     0.8,
+     0.6
+    ],
+    [
+     "entity.arrow.shoot",
+     0.8,
+     0.67
+    ],
+    [
+     "entity.arrow.shoot",
+     0.8,
+     0.54
+    ],
+    [
+     "entity.arrow.shoot",
+     0.8,
+     0.72
+    ],
+    [
+     "entity.arrow.shoot",
+     0.8,
+     0.5
+    ],
+    [
+     "entity.arrow.shoot",
+     0.8,
+     0.66
+    ],
+    [
+     "item.trident.throw",
+     0.4,
+     1.4
+    ]
+   ]
+  },
+  "q5_impact": {
+   "use": "Q5 t49 / 55: the landings.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     0.3,
+     1.6
+    ],
+    [
+     "block.amethyst_cluster.break",
+     0.8,
+     0.8
+    ],
+    [
+     "block.pointed_dripstone.land",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "q5_blades": {
+   "use": "Q5 t64: the skimming blades.",
+   "layers": [
+    [
+     "entity.breeze.wind_burst",
+     0.8,
+     1.2
+    ],
+    [
+     "block.cherry_leaves.fall",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "d_droop": {
+   "use": "D t30: the droop.",
+   "layers": [
+    [
+     "block.big_dripleaf.break",
+     0.8,
+     0.5
+    ]
+   ]
+  },
+  "d_face_fade": {
+   "use": "D t30: the face fades.",
+   "layers": [
+    [
+     "block.beacon.deactivate",
+     0.8,
+     0.6
+    ]
+   ]
+  },
+  "d_leaves": {
+   "use": "D t85, 100, 110: leaf bursts.",
+   "layers": [
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     1.0
+    ],
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     1.07
+    ],
+    [
+     "block.azalea_leaves.break",
+     0.8,
+     0.94
+    ]
+   ]
+  },
+  "d_splash": {
+   "use": "D t82: the topple onto the water.",
+   "layers": [
+    [
+     "entity.generic.splash",
+     0.8,
+     1.0
+    ]
+   ]
+  },
+  "d_sink": {
+   "use": "D t100: the sink.",
+   "layers": [
+    [
+     "block.respawn_anchor.deplete",
+     0.8,
+     0.8
+    ]
+   ]
+  },
+  "d_seed": {
+   "use": "D t120: the golden seed.",
+   "layers": [
+    [
+     "block.amethyst_block.chime",
+     0.8,
+     1.0
+    ]
+   ]
+  }
+ },
+ "hud": {
+  "title": [
+   "g",
+   "t",
+   "c",
+   "s",
+   "hold"
+  ],
+  "banner_aftermath": [],
+  "banner_end": [],
+  "whiteout": [
+   "hold"
+  ],
+  "flash_white": [],
+  "flash_green": [],
+  "flash_hit": [],
+  "flash_end": [],
+  "clear": [],
+  "heart_bar": []
+ },
+ "glyphs": {
+  "apep": "U+E900",
+  "guard": "U+E901",
+  "nest": "U+E902",
+  "nurt": "U+E903",
+  "pred": "U+E904",
+  "destr": "U+E905",
+  "warn": "U+E906",
+  "fail_s": "U+E907",
+  "t_heart": "U+E910",
+  "t_warn": "U+E911",
+  "t_fail": "U+E912",
+  "t_success": "U+E913",
+  "dome": "U+E914",
+  "fl_white": "U+E920",
+  "fl_white9": "U+E921",
+  "fl_green": "U+E922",
+  "fl_edge": "U+E923",
+  "bar0": "U+E930",
+  "bar1": "U+E931",
+  "bar_l": "U+E932",
+  "bar_r": "U+E933"
+ },
+ "badges": {
+  "guard": {
+   "name": "수호",
+   "colour": "#F2D45C"
+  },
+  "nest": {
+   "name": "둥지",
+   "colour": "#C9E07A"
+  },
+  "nurt": {
+   "name": "양육",
+   "colour": "#D4E784"
+  },
+  "pred": {
+   "name": "포식성",
+   "colour": "#E07A5A"
+  },
+  "destr": {
+   "name": "파괴",
+   "colour": "#F0A040"
+  },
+  "fail": {
+   "name": "",
+   "colour": "#C36E5A"
+  }
+ },
+ "palettes": {
+  "7": [
+   "#4E8A1E",
+   "#A6D45A",
+   "#F1FFD2"
+  ],
+  "20": [
+   "#B07A1E",
+   "#EBC55A",
+   "#FFF4C8"
+  ],
+  "22": [
+   "#6FA85A",
+   "#C1E6A8",
+   "#F5FFF0"
+  ],
+  "23": [
+   "#FCF9ED",
+   "#B9B46A",
+   "#FFFFF4"
+  ],
+  "24": [
+   "#9DBA2E",
+   "#DCEB72",
+   "#FFFFD8"
+  ]
+ },
+ "nd_rim": "#C36E5A",
+ "pieces": {
+  "family": [
+   2,
+   4,
+   8,
+   16,
+   22,
+   27,
+   32,
+   40,
+   48,
+   56,
+   64
+  ],
+  "max": 32,
+  "max_small_r": 64,
+  "small_r": 3.5,
+  "k": [
+   {
+    "lo": 0,
+    "hi": 20,
+    "A": 0,
+    "B": 50000,
+    "W": 2
+   },
+   {
+    "lo": 20,
+    "hi": 40,
+    "A": -320,
+    "B": 25008,
+    "W": 4
+   },
+   {
+    "lo": 40,
+    "hi": 80,
+    "A": -1200,
+    "B": 12515,
+    "W": 8
+   },
+   {
+    "lo": 80,
+    "hi": 160,
+    "A": -4960,
+    "B": 6281,
+    "W": 16
+   },
+   {
+    "lo": 160,
+    "hi": 220,
+    "A": -15520,
+    "B": 4616,
+    "W": 22
+   },
+   {
+    "lo": 220,
+    "hi": 270,
+    "A": -27890,
+    "B": 3807,
+    "W": 27
+   },
+   {
+    "lo": 270,
+    "hi": 320,
+    "A": -41600,
+    "B": 3255,
+    "W": 32
+   },
+   {
+    "lo": 320,
+    "hi": 400,
+    "A": -60800,
+    "B": 2652,
+    "W": 40
+   },
+   {
+    "lo": 400,
+    "hi": 480,
+    "A": -94880,
+    "B": 2281,
+    "W": 48
+   },
+   {
+    "lo": 480,
+    "hi": 560,
+    "A": -138480,
+    "B": 2033,
+    "W": 56
+   },
+   {
+    "lo": 560,
+    "hi": 640,
+    "A": -192960,
+    "B": 1864,
+    "W": 64
+   }
+  ]
+ },
+ "flood_cells": 44,
+ "dome_tag": "rlk_mb_ap_dome",
+ "dome_skip": 7.5,
+ "demos": {
+  "entrance": 130,
+  "burrow": 107,
+  "relocate": 48,
+  "hands": 158,
+  "glow": 253,
+  "wither": 101,
+  "tail": 82,
+  "combo": 176,
+  "revival_start": 150,
+  "organisms": 299,
+  "failure": 30,
+  "cutscene": 214,
+  "move_strike": 101,
+  "aftermath": 220,
+  "shells": 126,
+  "surface_shot": 78,
+  "tail_p3": 83,
+  "spiral": 94,
+  "death": 150
+ }
+}
