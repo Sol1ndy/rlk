@@ -45,18 +45,11 @@ scoreboard players set #azFN mb 0
 scoreboard players set #azF45 mb 0
 scoreboard players set #azF35 mb 0
 scoreboard players set #azExit mb 0
-scoreboard players set #azHint mb 0
-scoreboard players set #azHintT mb 0
-scoreboard players set #azCue mb 0
 scoreboard players set #azLastHit mb 0
-scoreboard players set #azFlN mb 0
 scoreboard players set #azL2 mb 0
 scoreboard players set #azL39 mb 0
 scoreboard players set #azL7 mb 0
-scoreboard players set #azL7h mb 0
 scoreboard players set #azLT mb 0
-scoreboard players set #azBrHint mb 0
-scoreboard players set #azShHint mb 0
 scoreboard players set #azShCd mb 0
 scoreboard players set #azHeal mb 0
 scoreboard players set #azBrCs mb 0
@@ -184,7 +177,6 @@ scoreboard players set #azHudQ mb 1
 scoreboard players set #azYawS mb 1
 scoreboard players set #azPx mb 2
 scoreboard players set #azPxGT mb -1000000
-scoreboard players set #azFlC mb -1000000
 scoreboard players set #azBrRf mb -1000000
 scoreboard players set #azDgClk mb -1000000
 scoreboard players set #azPopC mb -1000

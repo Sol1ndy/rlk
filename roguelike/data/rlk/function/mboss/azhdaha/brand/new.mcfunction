@@ -8,4 +8,3 @@ execute if score #azBrIn mb matches 4 if score #azBrStrike mb matches 1 run scor
 scoreboard players set #azBrNew mb 1
 scoreboard players set #azHeal mb 0
 function rlk:mboss/azhdaha/fx/snd/brand_apply
-execute unless score #azBrHint mb matches 1 run function rlk:mboss/azhdaha/brand/hint

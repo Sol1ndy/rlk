@@ -12,7 +12,7 @@ also starts the B3 at a later tick through its reload (tests 25 and 61).
 
 Telegraphs (Change note 1): T1's fronts and the B3 surfacing are *none* rows: no ground decal; the landslide is read from
 the lift poses of the clip (each wave's fore lifts from the previous slam, the wave-6 rear-up hangs 20 t), the lift and
-growl sounds, the transition banner / typed lines and the "점프!" cue with its bell (HUD); the surfacing from the dust
+growl sounds, the transition banner / typed lines (no jump prompt on the HUD, user 10-21); the surfacing from the dust
 mound over the centre (B3_MOUND) and its rumble. Every hit shows its impact visual at the strike (the travelling front
 p/front, the slam impact / dust ring; the earth-spike burst). The B3 crater is decor (footage), not a hit.
 
@@ -171,10 +171,6 @@ def slide(g):
             hits += [K.snd('slide_wave')]
         tl.at(s, *hits)
         tl.at(s + 4, K.fx('rock_rain', r=8.0 if k < 6 else 14.0))
-        if k < 6:
-            tl.at(s - w['cue'], f'execute at @s if entity @a[tag=player,distance=..{int(w["r1"])}] run {F("cue")}')
-        else:
-            tl.at(s - w['cue'], F('cue'))
     # the rear-up before wave 6 (the visual wave-6 cue): a roar at the top, held 20 t
     tl.at(SLIDE_EV['rear'], g.sound('entity.ravager.roar', 1.0, 0.5), g.sound('entity.ender_dragon.growl', 0.8, 0.6))
     tl.at(SLIDE_EV['w1'], _tr('..1') + g.line(LINES_T1['w1']), _tr(2) + g.line(LINES_T2['w1']))
@@ -189,11 +185,8 @@ def slide(g):
     tl.write([f'# 20 파멸의 산사태 (S2-S; plan 5 T1): lead 0-{SLIDE_LEAD - 1} (walk / step-turn to the centre, the only turn),',
               f'# the clip at {SLIDE_LEAD} (anchor fixed); fronts {WAVES} r 4 -> 18 at 3 b/t, wave 6 {WAVE6} r 4 -> 30 at 4 b/t',
               '# (nododge, low 0.7, internal tell 20, Geo at transition 1 / the leg element + brand at transition 2; no',
-              f'# pre-strike decal: Change note 1); the jump cue at wave - 8 / - 10; end {SLIDE_END}.'],
+              f'# pre-strike decal: Change note 1; no jump prompt: the lift poses and sounds are the tell); end {SLIDE_END}.'],
              [f'# {key} tick (#azPT; the clip tick = #azPT - {SLIDE_LEAD}).'], extra_tick=extra)
-    g.pw(key, 'cue', ['# The jump cue: "점프!" on the sub-line 12 t + the bell (plan 5 T1 tells; HUD, not a telegraph).',
-                      'scoreboard players set #azCue mb 12', K.hud('cue_jump'), K.snd('jump_cue'),
-                      f'execute as @a[tag=player] at @s run {L.sound("block.note_block.bell", 0.9, 1.2, target="@s")}'])
     g.pw(key, 'cancel', ['# Fronts and the walk go (selectors only).',
                          f'execute as {BODY} run function rlk:mboss/mv/stop',
                          'scoreboard players set #mbNoLeash mb 0']
@@ -201,7 +194,7 @@ def slide(g):
     g.pw(key, 'reload', [
         '# /reload inside the landslide: the hazards are gone, the clock goes on and the next wave comes (plan 4.3). A cut',
         '# walk ends at the centre at once. (The rig respawns in idle: it cannot resume a clip mid-way, so the remaining',
-        '# waves keep their sounds, the jump cue and the bell but not the lift poses.)',
+        '# waves keep their sounds but not the lift poses.)',
         'scoreboard players set #mbNoLeash mb 1',
         f'execute if score #azPT mb matches ..{SLIDE_LEAD - 1} as {BODY} at {ARENA_M} run tp @s ~ ~ ~',
         f'execute if score #azPT mb matches ..{SLIDE_LEAD - 1} run scoreboard players set #aq20M mb 0'])
@@ -331,7 +324,7 @@ def burrow3(g):
     # t40: under (the body hidden by the clip); the hidden glide to the centre; the crater at the floor cut
     tl.at(B.B3_GLIDE[0], f'execute at {ARENA_M} run function rlk:mboss/mv/glide {{t:{B.B3_GLIDE[1] - B.B3_GLIDE[0]}}}',
           F('crater'))
-    # t58: the tail rises out of the centre (tail_only, #azBur 1, "꼬리만 공격할 수 있습니다"), the special starts
+    # t58: the tail rises out of the centre (tail_only, #azBur 1; no sub-line hint), the special starts
     tl.at(B.B3_TAILUP, g.px('tail_only'), 'scoreboard players set #azBur mb 1', g.b3_special('start'), K.snd('b3_rise'),
           *_centre([K.fx('mound')] + g.fxe('dust_ring', 'tail', r=3.0)))
     for t in H.b3_pulses():

@@ -19,14 +19,12 @@ azBrE = the brand element (#elem), azBrS = Cryo stacks 1..3, azBrC = ticks to th
    within 10 b of it, off live hazards and the body; picked up within 1.4 b: a shield of DMG shard_pm (12 %) max HP for
    15 s with the brand element (element/shield_gain; the element only when the new amount >= the current shield).
 5. Show: the kit rune over the player every 4 t, the HUD brand part (storage az.hud.br: "낙인(물) N초", the core's
-   sub-line appends it) and the ◈낙인 badge (core hud/extra); the first brand types the hint (plan 4.13).
+   sub-line appends it) and the ◈낙인 badge (core hud/extra). No hint text (user rule 10-21: no in-game tips).
 6. Rule 33: a Pyro brand applied or refreshed by a strike outside the landslide calls p/firefield/on_brand (S2-L) as
    the body at the player's floor point (#azBrNew 1 new / 0 refresh), only when that file exists.
 """
 from . import api as A
 
-HINT = '낙인 — 보호막이 막아 줍니다 · 공격을 대시로 피하거나 6% 회복하면 지워집니다 · 결정을 주우면 보호막'
-SHARD_LINE = '응결 결정 — 주우면 보호막'
 DOT_T, DOT_N = 20, 5
 REFRESH_MIN = 3
 LINGER_GAP = 20
@@ -94,10 +92,7 @@ def emit(core):
                     'execute if score #azBrIn mb matches 4 run scoreboard players set @s azBrS 1',
                     'execute if score #azBrIn mb matches 4 if score #azBrStrike mb matches 1 run scoreboard players set #azBrCs mb 1',
                     'scoreboard players set #azBrNew mb 1', 'scoreboard players set #azHeal mb 0',
-                    A.K.snd('brand_apply'),
-                    f'execute unless score #azBrHint mb matches 1 run {F("brand/hint")}'])
-    w('brand/hint', ['# The first brand of the fight: the typed hint (plan 4.13).', 'scoreboard players set #azBrHint mb 1',
-                     A.L.say(HINT, '#FFD27A', 1, 80, 1)])
+                    A.K.snd('brand_apply')])
     w('brand/refresh', [f'# The same element: remaining ticks = max(remaining, {REFRESH_MIN}); a Cryo strike +1 stack (max 3).',
                         f'execute if score @s azBrT matches ..{REFRESH_MIN - 1} run scoreboard players set @s azBrT {REFRESH_MIN}',
                         'execute if score #azBrIn mb matches 4 if score #azBrStrike mb matches 1 run scoreboard players add @s azBrS 1',
@@ -178,11 +173,7 @@ def emit(core):
       + [f'execute as @e[type=minecraft:item_display,tag=rlk_az_shnew,scores={{azS={e}}}] run {A.K.prope("shard", e)}' for e in (1, 2, 3, 4)]
       + ['tag @e[type=minecraft:item_display,tag=rlk_az_shnew] remove rlk_az_shnew',
          'scoreboard players operation #azShCd mb = #azClk mb', f'scoreboard players add #azShCd mb {SHARD_CD}',
-         A.K.snd('shard_spawn'),
-         f'execute unless score #azShHint mb matches 1 run {F("brand/shard_hint")}'])
-    w('brand/shard_hint', ['scoreboard players set #azShHint mb 1', f'scoreboard players set #azHint mb 3',
-                           'scoreboard players operation #azHintT mb = #azClk mb', 'scoreboard players add #azHintT mb 100',
-                           'scoreboard players set #azHudQ mb 1'])
+         A.K.snd('shard_spawn')])
     w('brand/shard_tick', [f'execute as @e[type=minecraft:item_display,tag=rlk_az_shard] at @s run {F("brand/shard1")}'])
     w('brand/shard1', [
         '# @s = a shard (module clock: frozen while paused): ages, sparkles, is picked up within 1.4 b.',

@@ -179,7 +179,6 @@ def ring(g, rgb, r, n, y='0.15', scale=1.0, cnt=1):
 
 
 HUM_HEX, BF_HEX = '#C8E6A0', A.LIME_HEX
-COC_HINT = f'달빛 고치 — 체력 {A.CURE_PCT}% 회복하면 해제'
 
 
 class Core:
@@ -874,7 +873,8 @@ class Core:
             f'# {A.COCOON_DMG} %, CRIT {A.COCOON_CRIT} (forced crits undone in incoming), healing received {A.COCOON_HEAL} %; a',
             '# previous 달빛 축복 받음 ends here. The cure meter restarts at 0 (user: "일정 체력 이상 회복해야 하게"; the target is',
             f'# {A.CURE_PCT} % of max HP). The kit: swirl fx and curse chime at the player, the HUD badge (coc_on, buff_off, the',
-            '# meter readout), the actionbar notice with the numbers; the typed hint (core caption).',
+            '# meter readout), the actionbar notice with the debuff\'s numbers. No typed caption (10-21 user rule: the',
+            '# game does not tell the player how to cure it).',
             'scoreboard players operation #bfX mb = @s curHealth',
             'scoreboard players operation #bfX mb *= #bfCocPct mb',
             'scoreboard players operation #bfX mb /= #c100 mb',
@@ -890,7 +890,6 @@ class Core:
             'scoreboard players add #bfCocN mb 1',
             f'execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run {F("wx/coc/fx")}',  # wing author: S2 debuff fx (seq_b.py)
             g.khud('buff_off'), g.khud('coc_on'), g.khud('ab_coc'),
-            g.say(COC_HINT, A.COC_SWIRL_HEX, 2, 50, 1),
             F('hud/refresh')])
         self.w('coc/heal_ev', [
             '# The player received heals since the last module tick (rlk:mboss/player_heal counted them and added their amounts',
@@ -930,9 +929,6 @@ class Core:
             '# reward badge.',
             sc_set('#bfCoc', 0), sc_set('#bfBuff', 1), sc_set('#bfDmgPct', 100), sc_set('#mbCritAdd', A.BUFF_CRIT),
             sc_set('#mbCritDmgAdd', A.BUFF_CRIT_DMG), sc_set('#mbHealPct', 100), sc_set('#bfCure', 0), sc_set('#bkCureP', 0),
-            f'# the hint "{COC_HINT}" still typing or held on the subtitle line goes now: its steps would blank the reward pop',
-            '# below and it would stay 3 s after the cure (review fix FX-3)',
-            f'execute if score #mbLn mb matches 1 if data storage rlk:mboss {{ln:{{t:"{COC_HINT}"}}}} run function rlk:mboss/line/clear',
             f'execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run {F("wx/cure/start")}',  # wing author: S5 cure fx (seq_b.py)
             g.khud('coc_off'), g.khud('buff_on'), g.khud('ab_buff'), g.khud('pop_buff'),
             F('hud/refresh')])
@@ -1156,7 +1152,8 @@ class Core:
             if p.form == 'b':
                 sub.append(f'execute if score #bfSt mb matches {ST["prep"]} if score #bfPick mb matches {p.id} run data modify storage rlk:mboss sub set value '
                            f'[{{text:"패턴  ",color:"#A8A8A8"}},{{text:"{p.label}",color:"{col}"}}]')
-        sub += [f'execute if score #bfSt mb matches {ST["groggy"]} run data modify storage rlk:mboss sub set value [{{text:"그로기  ",color:"#9FE8A0",bold:true}},{{text:"공격할 기회",color:"#C8E8C8"}}]',
+        # groggy: the state name only (10-21 user rule: no how-to-fight advice such as "공격할 기회" on the lines)
+        sub += [f'execute if score #bfSt mb matches {ST["groggy"]} run data modify storage rlk:mboss sub set value [{{text:"그로기",color:"#9FE8A0",bold:true}}]',
                 f'execute if score #bfSt mb matches {ST["recover"]} run data modify storage rlk:mboss sub set value [{{text:"그로기  ",color:"#9FE8A0",bold:true}},{{text:"다시 일어선다",color:"#C8E8C8"}}]',
                 g.khud('put_sub')]
         self.w('hud/sub', sub)

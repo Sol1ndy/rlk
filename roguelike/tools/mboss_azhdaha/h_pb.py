@@ -186,7 +186,8 @@ P8['half'] = dict(s0=0.05, len=round(P8['w'] / 2 - 0.05, 3), fc=round(P8['root_f
 # ---------------------------------------------------------------------------------------------------- P9 burrow charge
 # Ticks of the pattern clock (u = t - 40 underground, plan 5 P9). Rings: decision at the tick, hit + 19 (keep: the
 # chevron ring outline from the decision). Rushes: decision at the tick (dust mound / bulge / rumble at the breach
-# point, no decal), the burrow_breach clip so that its `hit` lands 20 t later, the disc r 3.0 riding the body for
+# point, no decal), the burrow_breach clock (its events time the burst and the hits; the clip itself is not played:
+# the body stays hidden underground, user 10-21) so that its `hit` lands 20 t later, the disc r 3.0 riding the body for
 # 20 t at 0.6 b/t. Final emergence: decision at u160, the mound / spires from 19 t before the burst at the clip's
 # `burst` (the clip starts at u180 = t220: 180 t underground).
 P9 = dict(dive=_A.CLIPS['burrow_dive']['events'], breach=_A.CLIPS['burrow_breach']['events'],

@@ -24,7 +24,7 @@ scoreboard players set #fgDist mb 0
 scoreboard players set #fgField mb 0
 scoreboard players set #fgFT mb 0
 scoreboard players set #fgFN mb 0
-scoreboard players set #fgHintT mb 0
+scoreboard players set #fgFirstT mb 0
 scoreboard players set #fgCruN mb 0
 scoreboard players set #fgOpen mb 0
 scoreboard players set #fgBrk mb 0

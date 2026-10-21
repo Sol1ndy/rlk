@@ -41,9 +41,7 @@ NEED = {1: 'normal', 2: 'normal', 3: 'normal', 4: 'normal', 5: 'normal', 6: 'nor
         10: 'normal', 20: 'service', 21: 'service', 22: 'service', 23: 'service', 31: 'cast', 32: 'cast', 41: 'special',
         42: 'special', 43: 'bg', 44: 'normal', 45: 'normal', 46: 'normal'}
 MSG = '야타용왕이 곧 {el} 원소의 힘을 흡수합니다…'
-SUB_B3 = '꼬리만 공격할 수 있습니다'
 SUB_LAST = '마지막 일격!'
-SUB_JUMP = '점프!'
 GOLD = A.GOLD_HEX
 
 
@@ -265,8 +263,8 @@ class Core:
                 '#azBgT', '#azBgTT', '#azBgAny', '#azCast', '#azCT', '#azCastReq', '#azCastFirst', '#azB3T', '#azB3Sp', '#azPat',
                 '#azPT', '#azPNew', '#azPEnd', '#azPMax', '#azPLen', '#azPRel', '#azPDone', '#azReq', '#azReqT', '#azPick',
                 '#azLast', '#azRepN', '#azClk', '#azSkipF', '#azTailN', '#azFront', '#azTurnK', '#azFsI', '#azDwell',
-                '#azPxHit', '#azPxF', '#azFN', '#azF45', '#azF35', '#azExit', '#azHint', '#azHintT', '#azCue',
-                '#azLastHit', '#azFlN', '#azL2', '#azL39', '#azL7', '#azL7h', '#azLT', '#azBrHint', '#azShHint', '#azShCd',
+                '#azPxHit', '#azPxF', '#azFN', '#azF45', '#azF35', '#azExit',
+                '#azLastHit', '#azL2', '#azL39', '#azL7', '#azLT', '#azShCd',
                 '#azHeal', '#azBrCs', '#azBrNew', '#azBrBan', '#azNoPush', '#azNoTurn', '#azYawC', '#azYawT', '#azYaw0',
                 '#azFlash', '#azMov', '#azAftN', '#azFldN', '#azFSeq', '#azCH', '#azArEl', '#azArT', '#azWk', '#azPx']
         zero += [f'#azFs{i}' for i in range(AI.DWELL_N)]
@@ -280,7 +278,7 @@ class Core:
         v += [self.F(f'p/{k}/vars') for k in sorted({p.key for p in self.pats} | {'firefield'}) if self.g.has(f'p/{k}/vars')]
         v += [sc('#azE', 5), sc('#azET', 5), sc('#azBand', 2), sc('#azSide', 1), sc('#azPaw', 1), sc('#azCool', 30),
               sc('#azA8', 1), sc('#azHudQ', 1), sc('#azYawS', 1), sc('#azPx', PX_ID['inv']),
-              sc('#azPxGT', -1000000), sc('#azFlC', -1000000), sc('#azBrRf', -1000000), sc('#azDgClk', -1000000),
+              sc('#azPxGT', -1000000), sc('#azBrRf', -1000000), sc('#azDgClk', -1000000),
               sc('#azPopC', -1000)]
         self.w('ai/vars', v)
 
@@ -1339,9 +1337,9 @@ class Core:
             ex.append(f'execute if entity @a[tag=player,scores={{azBrT=1..,azBrE={e}}}] run data modify storage rlk:mboss extra append '
                       f'value {K.brand_badge(e)}')
         self.w('hud/extra', ex)
-        sub = ['# The sub-line (plan 4.11), first match: intro name, "마지막 일격!", the jump cue, B3 "꼬리만 공격할 수 있습니다",',
-               '# the transition message, a hint, the running pattern; then the brand part and any pattern-provided part',
-               '# (storage az.subx, e.g. 42\'s "안전 지대 N칸").',
+        sub = ['# The sub-line (plan 4.11), first match: intro name, "마지막 일격!", the transition message, the running',
+               '# pattern; then the brand part and any pattern-provided part (storage az.subx). No advice lines (user rule',
+               '# 10-21: no in-game tips; the transition message is Genshin\'s own prompt).',
                'data modify storage rlk:mboss sub set value []',
                f'execute if score #mbSt mb matches 0 run return run data modify storage rlk:mboss sub set value [{txt(A.BOSS["sub"], "#E8E2D0", True)}]',
                f'function {NS}hud/sub_main',
@@ -1349,31 +1347,20 @@ class Core:
                'execute if data storage rlk:mboss az.hud.br run data modify storage rlk:mboss sub append from storage rlk:mboss az.hud.br[]',
                'execute if data storage rlk:mboss az.subx run data modify storage rlk:mboss sub append from storage rlk:mboss az.subx[]']
         self.w('hud/sub', sub)
-        main = [f'execute if score #azLastHit mb matches 1 run return run data modify storage rlk:mboss sub append value {txt(SUB_LAST, "#FFD27A", True)}',
-                f'execute if score #azCue mb matches 1.. run return run data modify storage rlk:mboss sub append value {txt(SUB_JUMP, "#FFFFFF", True)}']
-        for e in A.TAIL_ELS:
-            main.append(f'execute if score #azBur mb matches 1 if score #azTail mb matches {e} run return run data modify storage rlk:mboss sub '
-                        f'append value {txt(SUB_B3, A.EL_COL[e], True)}')
+        main = [f'execute if score #azLastHit mb matches 1 run return run data modify storage rlk:mboss sub append value {txt(SUB_LAST, "#FFD27A", True)}']
         for e in A.LEG_ELS:
             main.append(f'execute if score #azTr mb matches 1.. if score #azTrN mb matches 1 if score #azLeg mb matches {e} run return run data '
                         f'modify storage rlk:mboss sub append value {txt(MSG.format(el=A.EL_NAME[e]), A.EL_COL[e], True)}')
         for e in A.TAIL_ELS:
             main.append(f'execute if score #azTr mb matches 1.. if score #azTrN mb matches 2 if score #azTail mb matches {e} run return run data '
                         f'modify storage rlk:mboss sub append value {txt(MSG.format(el=A.EL_NAME[e]), A.EL_COL[e], True)}')
-        for hid, text in AI.HINTS.items():
-            main.append(f'execute if score #azHint mb matches {hid} if score #azHintT mb > #azClk mb run return run data modify storage '
-                        f'rlk:mboss sub append value {txt(text, "#FFE3A8")}')
         for p in self.pats:
             if p.kind in ('normal', 'bg') or p.id == 30:
                 main.append(f'execute if score #azPat mb matches {p.id} run return run data modify storage rlk:mboss sub set value '
                             f'[{{text:"패턴  ",color:"#A8A8A8"}},{txt(p.label, "#F2E2B0")}]')
         self.w('hud/sub_main', main)
         self.w('hud/refresh', ['# Both text lines from the current state.', F('hud/extra'), F('hud/sub'), sc('#azHudQ', 0)])
-        self.w('hud/tick', ['# @s = body: the cue clock, the hint expiry, the floor popups, the lines every 4 t or on request.',
-                            'execute if score #azCue mb matches 1.. run scoreboard players remove #azCue mb 1',
-                            'execute if score #azCue mb matches 0 if score #azHint mb matches 0 run scoreboard players set #azCue mb -1',
-                            'execute if score #azHint mb matches 1.. if score #azHintT mb <= #azClk mb run scoreboard players set #azHudQ mb 1',
-                            'execute if score #azHint mb matches 1.. if score #azHintT mb <= #azClk mb run scoreboard players set #azHint mb 0',
+        self.w('hud/tick', ['# @s = body: the floor popups, the lines every 4 t or on request.',
                             'scoreboard players remove @e[type=minecraft:text_display,tag=rlk_mb_az_pop] azT 1',
                             'kill @e[type=minecraft:text_display,tag=rlk_mb_az_pop,scores={azT=..0}]',
                             f'execute if score #azHudQ mb matches 1 run return run {F("hud/refresh")}',

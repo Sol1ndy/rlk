@@ -247,7 +247,7 @@ Item models usable outside the kit (`minecraft:item_model`): `rlk:mboss/az_kit/g
 | U+E801 | brand badge |
 | U+E802-E806 | element mini-icons Pyro, Hydro, Electro, Cryo, Geo (sub-line) |
 | U+E810-E813 | full-screen flashes white, gold, amber, violet (title line) |
-| U+E820 / U+E821 | "점프!" big cue (title line) / jump chevron |
+| U+E821 | jump chevron (the U+E820 "점프!" title cue was removed: user 10-21, no jump prompt) |
 | U+E822 | 回 mark (hint lines) |
 | U+E840 / U+E841 | banner ornaments left / right |
 | U+E8F0-E8F2 | spaces −1 / +2 / +1 |
@@ -262,9 +262,8 @@ minimap, E400 bossbar, E500 gd, E600 bf, E700 fg; Apep E900).
 | `hud/banner_ab2/<el>` (1..4) | "{번개} 원소 흡수" + "원소를 추가로 하나 더 흡수합니다" |
 | `hud/banner_brand/<el>` (1..4) | "야타용왕의 {물} 원소 공격에 맞고 보호막이 없으면 계속 {물} 원소 피해를 받습니다" |
 | `hud/banner_end` | drop a banner early |
-| `hud/cue_jump`, `hud/cue_end` | the "점프!" cue on the title line (12 t) |
 | `hud/flash_white`, `flash_gold`, `flash_amber`, `flash_violet`, `hud/flash_end` | title-line flashes |
-| `hud/clear` | every banner / cue / flash off |
+| `hud/clear` | every banner / flash off |
 
 Element names: 1 불, 2 물, 3 번개, 4 얼음, 5 바위. Python: `K.glyph(name)`, `K.badge(el, lit)` (a text-component SNBT for
 the name line: dim `#707070` until lit, then Pyro `#FF8A3D`, Hydro `#4FB8FF`, Electro `#C58BFF`, Cryo `#9FE8F5`), `K.FONT`.
@@ -282,7 +281,7 @@ the name line: dim `#707070` until lit, then Pyro `#FF8A3D`, Hydro `#4FB8FF`, El
 | `whip_raise`, `whip_sweep`, `whip_erupt` | P7 |
 | `tslam_raise`, `tslam_impact` | P8 |
 | `burrow_dive`, `burrow_loop`, `burrow_ring`, `burrow_rock`, `burrow_rush` | P9 |
-| `slide_lift`, `slide_wave`, `slide_wave6`, `jump_cue` | T1 (+ the "점프!" bell) |
+| `slide_lift`, `slide_wave`, `slide_wave6` | T1 |
 | `absorb_vortex/<el>`, `absorb_burst/<el>` (1..4), `absorb_roar`, `roar_ring`, `msg_chime` | T2, T3, the message |
 | `b3_sink`, `b3_rise`, `b3_emerge` | B3 |
 | `orb_spawn`, `orb_loop`, `orb_hit` | 31 |
@@ -768,7 +767,6 @@ Model frames the arena records rely on (S1-ARENA, `az/requests/arena.md` item 4;
 | U+E811 | `fl_gold` | 16x9 | 144 | 69 | flat #F9DFAD alpha 0.55 |
 | U+E812 | `fl_amber` | 16x9 | 144 | 69 | flat #E6A55F alpha 0.45 |
 | U+E813 | `fl_violet` | 16x9 | 144 | 69 | flat #8F64E8 alpha 0.45 |
-| U+E820 | `jump` | 128x64 | 32 | 22 | painted |
 | U+E821 | `chevron` | 36x36 | 9 | 8 | painted |
 | U+E822 | `hui` | 36x36 | 9 | 8 | painted |
 | U+E840 | `orn_l` | 64x32 | 8 | 7 | painted |
@@ -780,9 +778,6 @@ Model frames the arena records rely on (S1-ARENA, `az/requests/arena.md` item 4;
 - **Banners** `hud/banner_tr|ab|ab2|brand/<el>` (el 1..4: 불 / 물 / 번개 / 얼음): one actionbar line with the
   ornaments U+E840 / U+E841 and the element icon, held with `hudHold` 60 / 60 / 80 / 100 t so the regular actionbar HUD
   does not overwrite it. **No sound** (the caller plays `snd/msg_chime` or an absorb recipe). `hud/banner_end` drops it.
-- **Cue** `hud/cue_jump`: the "점프!" glyph (U+E820, 128 × 64 painted, height 32) on the title line for 12 t
-  (`title times 0 9 3`), with the chevron subtitle; it sets `vBig 14` so the F5 crosshair title rests meanwhile.
-  `hud/cue_end` drops it.
 - **Flashes** `hud/flash_white|gold|amber|violet`: a full-screen glyph (U+E810-E813, height 144) on the title line
   (`title times 0 2 5`); `hud/flash_end`; `hud/clear` = everything off.
 - **Name / sub lines** are the core's: `K.badge(el, lit)` → `◈물` dim `#707070` until lit, then the element colour;
@@ -827,7 +822,6 @@ per-layer minimum-volume rule; pitches 0.5-2.0; no player / villager voices. Fam
 | `snd/slide_lift` | T1 lift (fore + hind paw rise): heavy step and deepslate. | entity.ravager.step 1/0.5; block.deepslate.step 1/0.6 |
 | `snd/slide_wave` | T1 waves 1-5: a wide boom (volume 2 = heard across the arena), basalt, crystal, falling stone. | entity.generic.explode 2/0.5; block.basalt.break 1/0.6; block.amethyst_cluster.break 1/0.7; block.pointed_dripstone.land 1/0.8; block.pointed_dripstone.land 0.9/1; block.pointed_dripstone.land 0.8/0.7 |
 | `snd/slide_wave6` | T1 wave 6 (the whole arena): the wave layers + the warden emerging. | entity.generic.explode 2/0.5; block.basalt.break 1/0.6; block.amethyst_cluster.break 1/0.7; block.pointed_dripstone.land 1/0.8; entity.warden.emerge 1/0.8 |
-| `snd/jump_cue` | The "점프!" bell (wave - 8). | block.note_block.bell 1/1.2 |
 | `snd/absorb_roar` | Absorb roar (roar_rear): growl and roar. | entity.ender_dragon.growl 1/0.55; entity.ravager.roar 1/0.5 |
 | `snd/roar_ring` | One roar shock-dome ring. | entity.warden.sonic_boom 0.25/1.6 |
 | `snd/msg_chime` | The transition message: resonating bell and a charge. | block.bell.resonate 1/0.6; block.respawn_anchor.charge 1/0.5 |
@@ -926,7 +920,7 @@ constants `K.CAP 64`, `K.TCAP 40`, `K.TSKIP 6`, `K.FCAP 16`, `K.SOFT 40`, `K.FN`
 
 `/function rlk:mboss/azhdaha/fx/test/<x>` as the player (`execute as @p at @s rotated ~ 0 run …`): `kinds` (every sprite
 on a grid), `tele` (one telegraph of each shape and palette), `presets` (a clickable chat list), `sounds` (clickable),
-`hud` (banners, cue, flashes in sequence), `props` (every prop look on a row), `stage` (the demo anchor, a vanilla
+`hud` (banners and a flash in sequence), `props` (every prop look on a row), `stage` (the demo anchor, a vanilla
 marker tagged `rlk_ak_demo` 12 b ahead facing the player), `stop`, `pair {leg, tail, ph}` (the demo elements, storage
 `dm`), `demo/<name>`:
 
