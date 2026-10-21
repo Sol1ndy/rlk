@@ -4,7 +4,7 @@ strike and travelling displays, the FX cues) are written by build_raiden_hazard_
 
 Runtime entry points (all under rlk:boss/raiden/hazard/):
   new {k,a..f,tol,tell,dmg,life,ev,max,grp,dk,dl,kb,sv,snd,nd,jp,det,lf,fv}   v2 hazard here, yaw = execution yaw (pitch 0)
-  tick (as the marker; world calls it), expire (as the marker), finish (kills the non-detached hazards),
+  tick_at (as the marker, at it, rotated as it; world calls it), expire (as the marker), finish (kills the non-detached hazards),
   clear (kills every hazard and kit display), vfx_world (orphaned visuals, the FX card clock), setup (objectives)
 Per-hazard scores (milliblocks unless noted):
   rdShape 20 + rdHK · rdHK kind (raiden_kit.KINDS) · rdWind tell · rdDamage · rdHLife · rdHAge
@@ -159,12 +159,10 @@ tw += ['scoreboard players operation #rdX rd -= #rdB rd',
 write('k/to_wall_len', tw)
 
 # ------------------------------------------------------------------------------------------------ ticking
-write('tick', [
-    '# World: execute as @e[tag=rlk_rd_hazard] at @s run function ...hazard/tick',
-    f'execute at @s rotated as @s run function {H}tick_at',
-])
+# (S3 perf: world runs tick_at directly, `execute as @e[tag=rlk_rd_hazard] at @s rotated as @s`; the old one-line
+# hazard/tick wrapper is gone.)
 write('tick_at', [
-    '# @s = hazard at its origin and frozen yaw. #rdRel = ticks since the hit / launch (negative before).',
+    '# World: as each hazard at its origin and frozen yaw. #rdRel = ticks since the hit / launch (negative before).',
     'scoreboard players add @s rdHAge 1',
     f'execute if score @s rdHAge >= @s rdHLife run return run function {H}expire',
     'scoreboard players operation #rdRel rd = @s rdHAge',
@@ -201,6 +199,7 @@ write('try_every', [
 write('try', [
     'execute if score @s rdHMax matches 1.. if score @s rdHHit >= @s rdHMax run return 0',
     f'function {H}hit',
+    f'execute if score #rdHit rd matches 1 run function {H}land',
 ])
 write('snd', [
     'playsound minecraft:entity.lightning_bolt.impact hostile @a[tag=player] ~ ~ ~ 0.5 1.25 0.2',
@@ -266,24 +265,22 @@ write('r2', [
     'scoreboard players operation #rdT rd *= #rdDZ rd',
     'scoreboard players operation #rdR2 rd += #rdT rd',
 ])
-write('fs', [
-    '# Project onto the frozen forward and left axes (milliblocks).',
-    'scoreboard players operation #rdFwd rd = #rdDX rd',
-    'scoreboard players operation #rdFwd rd *= @s rdFX',
-    'scoreboard players operation #rdT rd = #rdDZ rd',
-    'scoreboard players operation #rdT rd *= @s rdFZ',
-    'scoreboard players operation #rdFwd rd += #rdT rd',
-    'scoreboard players operation #rdFwd rd /= #rdK1000 rd',
-    'scoreboard players operation #rdSide rd = #rdDX rd',
-    'scoreboard players operation #rdSide rd *= @s rdFZ',
-    'scoreboard players operation #rdT rd = #rdDZ rd',
-    'scoreboard players operation #rdT rd *= @s rdFX',
-    'scoreboard players operation #rdSide rd -= #rdT rd',
-    'scoreboard players operation #rdSide rd /= #rdK1000 rd',
-    'scoreboard players operation #rdAbsSide rd = #rdSide rd',
-    'scoreboard players set #rdNeg rd -1',
-    'execute if score #rdAbsSide rd matches ..-1 run scoreboard players operation #rdAbsSide rd *= #rdNeg rd',
-])
+FS_FWD = ['scoreboard players operation #rdFwd rd = #rdDX rd',
+          'scoreboard players operation #rdFwd rd *= @s rdFX',
+          'scoreboard players operation #rdT rd = #rdDZ rd',
+          'scoreboard players operation #rdT rd *= @s rdFZ',
+          'scoreboard players operation #rdFwd rd += #rdT rd',
+          'scoreboard players operation #rdFwd rd /= #rdK1000 rd']
+FS_SIDE = ['scoreboard players operation #rdSide rd = #rdDX rd',
+           'scoreboard players operation #rdSide rd *= @s rdFZ',
+           'scoreboard players operation #rdT rd = #rdDZ rd',
+           'scoreboard players operation #rdT rd *= @s rdFX',
+           'scoreboard players operation #rdSide rd -= #rdT rd',
+           'scoreboard players operation #rdSide rd /= #rdK1000 rd',
+           'scoreboard players operation #rdAbsSide rd = #rdSide rd',
+           'scoreboard players set #rdNeg rd -1',
+           'execute if score #rdAbsSide rd matches ..-1 run scoreboard players operation #rdAbsSide rd *= #rdNeg rd']
+write('fs', ['# Project onto the frozen forward and left axes (milliblocks).'] + FS_FWD + FS_SIDE)
 K = KINDS
 write('body', [
     '# World, once per tick before the hazards tick: the body (rlk_body) feet in milliblocks for hazard/hit.',
@@ -300,18 +297,17 @@ write('hit', [
     'scoreboard players operation #rdDZ rd = #rdBZ rd',
     'scoreboard players operation #rdDX rd -= @s rdHOX',
     'scoreboard players operation #rdDZ rd -= @s rdHOZ',
-    f'execute if score @s rdHK matches 1..2 run function {H}r2',
-    f'execute if score @s rdHK matches 5 run function {H}r2',
-    f'execute if score @s rdHK matches 8..10 run function {H}r2',
+    f'execute unless score @s rdHK matches {K["rect"]}..{K["to_wall"]} unless score @s rdHK matches {K["slab"]}..{K["orb"]} run function {H}r2',
     f'execute if score @s rdHK matches {K["safe_dome"]} run return run function {H}k/safe_dome',
     'scoreboard players operation #rdDY rd = #rdBY rd',
     'scoreboard players operation #rdDY rd -= @s rdHOY',
     'execute unless score #rdDY rd matches -500..3500 run return 0',
     'execute if entity @s[tag=rlk_rd_jump] unless score #rdDY rd matches -500..750 run return 0',
-    f'execute unless score @s rdHK matches 1 unless score @s rdHK matches 5 unless score @s rdHK matches 8..9 run function {H}fs',
-] + [f'execute if score @s rdHK matches {v} run function {H}k/{k}' for k, v in K.items() if k not in ('safe_dome', 'to_wall')] + [
-    f'execute if score @s rdHK matches {K["to_wall"]} run function {H}k/rect',
-    f'execute if score #rdHit rd matches 1 run function {H}land',
+    f'execute unless score @s rdHK matches 1 unless score @s rdHK matches 5..6 unless score @s rdHK matches 8..9 run function {H}fs',
+    '# S3 perf: one dispatch line runs (travelling kinds first, they test every tick); `try` lands the hit.',
+] + [f'execute if score @s rdHK matches {K[k]} run return run function {H}k/{k}'
+     for k in ('slab', 'orb', 'sweep', 'disk', 'annulus', 'rect', 'follow', 'field')] + [
+    f'execute if score @s rdHK matches {K["to_wall"]} run return run function {H}k/rect',
 ])
 for k in ('disk', 'follow', 'field'):
     write(f'k/{k}', ['execute if score #rdR2 rd <= @s rdHE run scoreboard players set #rdHit rd 1'])
@@ -359,15 +355,21 @@ write('k/sweep', [
 ] + [a.format(s='rdHD', c='rdHE') for a in ANGLE])
 write('k/slab', [
     '# Travelling straight front: F = d0 + v*t; forward in [F - depth - tol, F + tol], |side| <= w + tol.',
+    '# S3 perf: the forward test comes first (hazard/hit skips fs for slabs), so the ticks while the front is away from',
+    '# the body cost no side projection.',
 ] + FRONT + [
     'scoreboard players operation #rdHi rd = #rdF rd',
     'scoreboard players operation #rdHi rd += @s rdHTol',
     'scoreboard players operation #rdLo rd = #rdF rd',
     'scoreboard players operation #rdLo rd -= @s rdHD',
     'scoreboard players operation #rdLo rd -= @s rdHTol',
+] + FS_FWD + [
+    'execute if score #rdFwd rd < #rdLo rd run return 0',
+    'execute if score #rdFwd rd > #rdHi rd run return 0',
+] + FS_SIDE + [
     'scoreboard players operation #rdW rd = @s rdHC',
     'scoreboard players operation #rdW rd += @s rdHTol',
-    'execute if score #rdFwd rd >= #rdLo rd if score #rdFwd rd <= #rdHi rd if score #rdAbsSide rd <= #rdW rd run scoreboard players set #rdHit rd 1',
+    'execute if score #rdAbsSide rd <= #rdW rd run scoreboard players set #rdHit rd 1',
 ])
 write('k/orb', [
     '# Travelling disk: centre at forward F = d0 + v*t on the axis, radius r + tol (rdHD).',

@@ -21,7 +21,7 @@ from .core import (DRAIN, DRAIN_DEFAULT, DRAIN_REACTION, EXHAUST, FLOWER_BREAK, 
                    center, face, flat, obj, pattern, patterns, sound, target, write)
 from .lines import VOICE2
 
-T_LEN = 60                      # transformation length (armor_start); core.TRANSFORM_LEN (52) only scales the bar
+T_LEN = 60                      # transformation length (armor_start); core.TRANSFORM_LEN (also 60) only scales the bar
 TAGS = '"rlk_room","rlk_raiden_aux","rlk_rd_tmp","rlk_rd_tm"'
 SPOT = 'rlk_rd_tm_spot'
 AT_SPOT = f'execute at @e[tag={SPOT},limit=1] run '

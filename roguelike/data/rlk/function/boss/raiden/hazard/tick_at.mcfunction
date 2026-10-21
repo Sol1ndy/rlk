@@ -1,4 +1,4 @@
-# @s = hazard at its origin and frozen yaw. #rdRel = ticks since the hit / launch (negative before).
+# World: as each hazard at its origin and frozen yaw. #rdRel = ticks since the hit / launch (negative before).
 scoreboard players add @s rdHAge 1
 execute if score @s rdHAge >= @s rdHLife run return run function rlk:boss/raiden/hazard/expire
 scoreboard players operation #rdRel rd = @s rdHAge
