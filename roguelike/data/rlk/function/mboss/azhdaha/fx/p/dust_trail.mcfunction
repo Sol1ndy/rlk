@@ -2,5 +2,5 @@
 # P3 gallop dust (ambient, every 4 t of the run at the body): two dust puffs.
 # Ambient: skipped while 40+ fx cards live (room for the fx of the hits).
 execute if score #akN mb matches 40.. run return 0
-function rlk:mboss/azhdaha/fx/card {kind:"dust",pos:"~0.8 ~0.5 ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.8,s1:2.2,move:"0f,0.4f,0f",life:12,fade:6,col:10323288}
-function rlk:mboss/azhdaha/fx/card {kind:"dust",pos:"~-0.8 ~0.5 ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.8,s1:2,move:"0f,0.4f,0f",life:12,fade:6,col:8023897}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"dust",pos:"~0.8 ~0.5 ~",rot:"~ ~",bb:"center",s0:"0.8f,0.8f,0.8f",s1:"2.2f,2.2f,2.2f",z:"0.8f,0.8f,0.8f",off:"0f,0f,0f",move:"0f,0.4f,0f",col:10323288,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:5,f:6,life:12,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"dust",pos:"~-0.8 ~0.5 ~",rot:"~ ~",bb:"center",s0:"0.8f,0.8f,0.8f",s1:"2f,2f,2f",z:"0.8f,0.8f,0.8f",off:"0f,0f,0f",move:"0f,0.4f,0f",col:8023897,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:5,f:6,life:12,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}

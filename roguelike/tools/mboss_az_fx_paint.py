@@ -342,6 +342,102 @@ def paint_t_rim_s(a, b):
     return _band(math.hypot(a, b), RIM_BANDS_S)
 
 
+# FIX FID-4: the shaped keep outlines (Change note 1: P4 gold zig-zag crack ring, P9 gold chevron ring, the P1 Hydro
+# water-swirl field outline). Unit radius, neutral (tinted by the telegraph's element colour like t_rim).
+def _rim_poly():
+    """the P4 zig-zag crack ring: 16 teeth between r 0.84 and 0.95, jittered, plus a short inward crack at every other
+    outer tooth (v1 S 38.05 s: a gold zig-zag crack ring at each landing point)"""
+    rnd = random.Random(1604)
+    n = 16
+    ring = []
+    for k in range(2 * n + 1):
+        ang = 2 * math.pi * k / (2 * n) + (rnd.uniform(-0.05, 0.05) if k % (2 * n) else 0.0)
+        rr = (0.95 if k % 2 else 0.84) + rnd.uniform(-0.015, 0.015)
+        ring.append((rr * math.cos(ang), rr * math.sin(ang)))
+    ring[-1] = ring[0]
+    cracks = []
+    for k in range(1, 2 * n, 4):
+        ax, ay = ring[k]
+        ang = math.atan2(ay, ax)
+        r1 = 0.66 + rnd.uniform(-0.04, 0.04)
+        kink = ang + rnd.choice((-1, 1)) * 0.09
+        cracks.append([(ax, ay), (0.80 * math.cos(kink), 0.80 * math.sin(kink)), (r1 * math.cos(ang), r1 * math.sin(ang))])
+    return ring, cracks
+
+
+CRACK_RING, CRACK_LINES = _rim_poly()
+
+
+def paint_t_crack(a, b):
+    """P4 back-spike landing (keep): a zig-zag crack ring with short inward cracks; neutral, tinted (Geo gold)."""
+    r = math.hypot(a, b)
+    if r > 1 or r < 0.6:
+        return CLEAR
+    d = poly_dist(a, b, CRACK_RING)
+    for pl in CRACK_LINES:
+        d = min(d, poly_dist(a, b, pl) + 0.006)
+    return _seal_px(d, 0.022, 0.02)
+
+
+def _chev_segs():
+    """the P9 chevron ring: a thin circle at r 0.95 and 8 chevrons pointing at the centre (v2 D: a gold chevron ring
+    on the player)"""
+    segs = []
+    for k in range(8):
+        t = 2 * math.pi * k / 8
+        apex = (0.66 * math.cos(t), 0.66 * math.sin(t))
+        for s in (-1, 1):
+            u = t + s * 0.17
+            segs.append((apex, (0.86 * math.cos(u), 0.86 * math.sin(u))))
+    return segs
+
+
+CHEV_SEGS = _chev_segs()
+
+
+def paint_t_chev(a, b):
+    """P9 rock ring (keep): a thin rim and eight inward chevrons; neutral, tinted (Geo gold)."""
+    r = math.hypot(a, b)
+    if r > 1 or r < 0.55:
+        return CLEAR
+    d = abs(r - 0.95) + 0.004
+    for (ax, ay), (bx, by) in CHEV_SEGS:
+        d = min(d, seg_dist(a, b, ax, ay, bx, by))
+    return _seal_px(d, 0.024, 0.02)
+
+
+def _swirl_arms():
+    """the P1 Hydro geyser field: four spiral strokes curling in from the rim (v4 C 29.0 s: a blue water-swirl field)"""
+    arms = []
+    for k in range(4):
+        t0 = 2 * math.pi * k / 4
+        pts = []
+        for j in range(25):
+            f = j / 24
+            ang = t0 + 2.3 * f
+            rr = 0.93 - 0.55 * f ** 1.2
+            pts.append((rr * math.cos(ang), rr * math.sin(ang)))
+        arms.append(pts)
+    return arms
+
+
+SWIRL_ARMS = _swirl_arms()
+
+
+def paint_t_swirl(a, b):
+    """P1 Hydro geyser (keep): a thin rim and four spiral strokes (a water swirl); neutral, tinted (Hydro blue)."""
+    r = math.hypot(a, b)
+    if r > 1:
+        return CLEAR
+    d = abs(r - 0.955)
+    w = 0.02
+    for pts in SWIRL_ARMS:
+        da = poly_dist(a, b, pts)
+        if da < d:
+            d, w = da, 0.026 * (0.45 + 0.55 * r)
+    return _seal_px(d, w, 0.025)
+
+
 def paint_t_ring(a, b):
     """Thin travelling ring (wave fronts and band edges, the meteor halo): a narrow tinted band between dark lines."""
     return _band(math.hypot(a, b), RING_BANDS)

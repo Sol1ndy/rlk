@@ -35,7 +35,8 @@
   "telegraph": 40,
   "telegraph_skip_from": 34,
   "field": 16,
-  "ambient_skip_from": 40
+  "ambient_skip_from": 40,
+  "trail_skip_from": 36
  },
  "objectives": [
   "akS",
@@ -1064,6 +1065,51 @@
    "tint": "neutral",
    "desc": "thick telegraph rim (r <= 2.5)"
   },
+  "t_crack": {
+   "plane": "flat",
+   "px": [
+    96,
+    96
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "P4 zig-zag crack ring outline (keep)"
+  },
+  "t_chev": {
+   "plane": "flat",
+   "px": [
+    96,
+    96
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "P9 chevron ring outline (keep)"
+  },
+  "t_swirl": {
+   "plane": "flat",
+   "px": [
+    96,
+    96
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "neutral",
+   "desc": "P1 Hydro geyser water-swirl outline (keep)"
+  },
   "t_ring": {
    "plane": "flat",
    "px": [
@@ -1635,7 +1681,7 @@
    "desc": "lingering strip (cryo)"
   }
  },
- "atlas_px": 568064,
+ "atlas_px": 595712,
  "telegraphs": {
   "disc": [
    "r",
@@ -1761,6 +1807,27 @@
    "r",
    "tell",
    "el",
+   "hold"
+  ],
+  "crack_o": [
+   "r",
+   "tell",
+   "el",
+   "nd",
+   "hold"
+  ],
+  "chev_o": [
+   "r",
+   "tell",
+   "el",
+   "nd",
+   "hold"
+  ],
+  "swirl_o": [
+   "r",
+   "tell",
+   "el",
+   "nd",
    "hold"
   ],
   "hexagram_o": [
@@ -1932,13 +1999,13 @@
     "r"
    ],
    "doc": "Cryo frost burst of radius {r} (tenths; Cryo rings, 41 bursts): a ring of ice spikes, frost mist and a white flash. At the floor point.",
-   "cards": 12,
+   "cards": 10,
    "ambient": false
   },
   "ice_wall": {
    "args": [],
-   "doc": "P7 Cryo ice-wall piece (on the swept arc): three tall ice spikes in a short row along the executor's left-right axis, frost. At the floor point, rotated along the arc.",
-   "cards": 4,
+   "doc": "P7 Cryo ice-wall piece (on the swept arc): four tall ice spikes in a row along the executor's forward axis (the radial line of the piece, 5.0 .. 11.5 b from the tail root when called at 8.25 b), frost. At the floor point, rotated along the arc.",
+   "cards": 5,
    "ambient": false
   },
   "hail": {
@@ -2084,19 +2151,19 @@
   "boulders": {
    "args": [],
    "doc": "P7 boulders thrown up along the swept arc (five rocks fanning out from the point).",
-   "cards": 5,
+   "cards": 3,
    "ambient": false
   },
   "tail_lane": {
    "args": [],
    "doc": "P7 / P8 tail lane: dust and grit kicked along the tail's path (a streak and puffs along the executor's forward axis, 6 b).",
-   "cards": 4,
+   "cards": 3,
    "ambient": false
   },
   "leaf_burst": {
    "args": [],
    "doc": "P8 orange leaf burst (the tail's leaves scatter at the impact): ten leaves flung out and up.",
-   "cards": 10,
+   "cards": 6,
    "ambient": false
   },
   "cones": {
@@ -2179,7 +2246,7 @@
     "2": 7,
     "3": 7,
     "4": 10,
-    "5": 12
+    "5": 10
    },
    "ambient": false
   },

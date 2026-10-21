@@ -2,6 +2,6 @@
 # Drifting gold motes (arena ambience; ambient, every 20 t at a mote point): three slow motes.
 # Ambient: skipped while 40+ fx cards live (room for the fx of the hits).
 execute if score #akN mb matches 40.. run return 0
-function rlk:mboss/azhdaha/fx/card {kind:"mote",pos:"~0.6 ~0.5 ~0.2",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.15,s1:0.3,move:"0.3f,1.2f,0f",life:40,fade:12,col:15779936}
-function rlk:mboss/azhdaha/fx/card {kind:"mote",pos:"~-0.5 ~1.0 ~-0.4",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.15,s1:0.25,move:"-0.2f,1f,0.2f",life:40,fade:12,col:16771232}
-function rlk:mboss/azhdaha/fx/card {kind:"mote",pos:"~0.1 ~1.6 ~0.6",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.1,s1:0.2,move:"0.1f,0.8f,-0.2f",life:40,fade:12,col:15779936}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"mote",pos:"~0.6 ~0.5 ~0.2",rot:"~ ~",bb:"center",s0:"0.15f,0.15f,0.15f",s1:"0.3f,0.3f,0.3f",z:"0.15f,0.15f,0.15f",off:"0f,0f,0f",move:"0.3f,1.2f,0f",col:15779936,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:27,f:12,life:40,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"mote",pos:"~-0.5 ~1.0 ~-0.4",rot:"~ ~",bb:"center",s0:"0.15f,0.15f,0.15f",s1:"0.25f,0.25f,0.25f",z:"0.15f,0.15f,0.15f",off:"0f,0f,0f",move:"-0.2f,1f,0.2f",col:16771232,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:27,f:12,life:40,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"mote",pos:"~0.1 ~1.6 ~0.6",rot:"~ ~",bb:"center",s0:"0.1f,0.1f,0.1f",s1:"0.2f,0.2f,0.2f",z:"0.1f,0.1f,0.1f",off:"0f,0f,0f",move:"0.1f,0.8f,-0.2f",col:15779936,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:27,f:12,life:40,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}

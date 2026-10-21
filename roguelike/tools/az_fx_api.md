@@ -97,7 +97,8 @@ fg kit, with its first-tick fix). A dead or reviving player clears every card by
   families (banners, absorb sounds, shards). `test_az_fx.py` calls every dispatcher with `el` 0 and 9.
 - Caps: ≤ **64** live fx cards (further `card` calls skipped), ≤ **40** live attack-telegraph cards (telegraph calls
   skipped from 34 on, so a shape is never half drawn), **16** field-pool cards (own pool, never counted against the
-  other two), ambient presets skipped from 40 live fx cards.
+  other two), ambient presets skipped from 40 live fx cards, trail presets (`boulders`, `tail_lane`, `dust`; `K.TRAIL`) from
+  36 (`K.TSOFT`, AZ fix round STATE-14: the hit-tick impact / bolt / eruption visuals always find room under the 64 cap).
 - Pairing rule (plan rule 1): every damaging decal is called in the same tick as its framework hazard with the same
   `tell` and size (`#hzQuiet 1`, `#hzSfx 0`); the fill's leading edge reaches the rim on call + tell (the strike tick),
   where every card of the shape flashes, then stays `hold` ticks.
@@ -107,6 +108,7 @@ fg kit, with its first-tick fix). A dead or reviving player clears every card by
 | function | args | does |
 |---|---|---|
 | `fx/card` | `{kind, pos, rot, bb, roll, spin, s0, s1, move, life, fade, col}` | fg kit §2.1 |
+| `fx/e/cardf` (internal) | the fast card (AZ fix round STATE-2): `K.card` / `K.cardx` emit it whenever roll, spin, life, fade, dly, dur, hit and col2 are constants; the generator does `e/make`'s clamps and stage arithmetic, so a card costs about 25 commands instead of 63 (same entity, stages, tags and cap) | — |
 | `fx/cardx` | `card` args with vector `s0` / `s1` + `{off, dly, dur, hit, col2}` | fg kit §2.2 |
 | `fx/look` | `{kind, col}` | as `@s` (a module item_display): the kind's model + tint, full bright |
 | `fx/clear` | — | every kit card (fx, telegraphs, lanes, waves, rims, fields), counts zeroed |
@@ -118,7 +120,8 @@ fg kit, with its first-tick fix). A dead or reviving player clears every card by
 | function | args (tenths, ticks) | cards | drawn at | used by |
 |---|---|---|---|---|
 | `tele/disc` | `{r, tell, el, nd, hold}` | 2 | floor point | all |
-| `tele/disc_o` | the same arguments; outline only (the rim, no progress fill; plan Change note 1 "keep (trim)", I2 requests Rpa-2 / Rpb-1 / Rpl-3); Python `tele_disc(..., fill=0)` | 1 | floor point | P4 landing rings, P9 rock rings, the P1 Hydro geyser swirl |
+| `tele/disc_o` | the same arguments; outline only (the rim, no progress fill; plan Change note 1 "keep (trim)", I2 requests Rpa-2 / Rpb-1 / Rpl-3); Python `tele_disc(..., fill=0)` | 1 | floor point | outline-only disc rows without a footage shape |
+| `tele/crack_o`, `tele/chev_o`, `tele/swirl_o` | `tele/disc_o`'s arguments; the shaped keep outlines of plan Change note 1 (AZ fix round FID-4): the gold zig-zag crack ring (sprite `t_crack`), the gold chevron ring (`t_chev`), the water-swirl field outline (`t_swirl`); Python `tele_disc(..., fill=0, style='crack' / 'chev' / 'swirl')` | 1 | floor point | P4 landing rings, P9 rock rings, the P1 Hydro geyser |
 | `tele/ring` | `{r0, r, tell, el, nd, hold}` | 3 | floor point | P2, P5 outlines |
 | `tele/sector` | `{r, a, tell, el, nd, hold}` — `a` = half-angle 1..180, drawn in **7.5° steps** (a fan of 15° cards), `a ≥ 175` = a disc | ≤ 26 | apex, rotated = aim | P1 crack fan |
 | `tele/wedge` | `{r0, r1, a0, a1, tell, el, nd, hold}` — annular sector between `a0 < a1` (degrees relative to the executor's yaw, Minecraft sense: + = clockwise from above; `a1 − a0` ≤ 180), radii `r0..r1` | ≤ 14 | apex, rotated = reference yaw | P7 swept wedges (§3.1) |
@@ -310,7 +313,7 @@ tell, el, hold)`, `K.tele_mask_wash(r, tell, hold)`, `K.tele_safe_rim(id, r, tel
 life)`, `K.tele_strip(id, len, w, yaw, el, life)`, `K.tele_field_end(id)`; `K.fx`, `K.fxe`, `K.snd`, `K.snde`, `K.prop(name)`,
 `K.prope(name, el)`, `K.look(kind, col)`, `K.hud(name)`, `K.hude(name, el)`, `K.glyph`, `K.badge`; tables `K.KINDS`,
 `K.PRESETS`, `K.EPRESETS`, `K.SOUNDS`, `K.PROPS`, `K.GLYPHS`, `K.AMBIENT`, `K.TELE_COL`; constants `K.CAP 64`, `K.TCAP 40`,
-`K.SOFT 40`, `K.FCAP 16`, `K.FN` (= `rlk:mboss/azhdaha/fx/`), `K.FONT`, `K.OWNED_DIRS`, `K.OWNED_FILES`. Python builders
+`K.SOFT 40`, `K.TSOFT 36`, `K.FCAP 16`, `K.FN` (= `rlk:mboss/azhdaha/fx/`), `K.FONT`, `K.OWNED_DIRS`, `K.OWNED_FILES`. Python builders
 take blocks and convert to tenths; every builder asserts that its name exists. Until I1 the module's `api.K` is a no-op
 set with the same signatures (plan §1.5).
 
@@ -895,7 +898,7 @@ through unchanged (placeholders).
 
 | builder | emits |
 |---|---|
-| `K.card(kind, pos, rot, bb, roll, spin, s0, s1, move, life, fade, col)` / `K.cardx(…, dly, dur, hit, col2, off)` | `fx/card` / `fx/cardx` |
+| `K.card(kind, pos, rot, bb, roll, spin, s0, s1, move, life, fade, col)` / `K.cardx(…, dly, dur, hit, col2, off)` | `fx/e/cardf` (constant stage numbers), else `fx/card` / `fx/cardx` |
 | `K.tele_disc(r, tell, el=5, nd=0, hold=3)`, `K.tele_ring(r0, r, tell, el=5, nd=0, hold=3)`, `K.tele_sector(r, a, tell, el=5, nd=0, hold=3)` | `fx/tele/…` |
 | `K.tele_wedge(r0, r1, a0, a1, tell, el=5, nd=1, hold=3)` | `fx/tele/wedge` (note `nd=1` default: the P7 union) |
 | `K.tele_line(length, w, tell, el=5, nd=0, hold=3, back=0)`, `K.tele_lane_side(length, w, tell, el=5, hold=3, back=0)` | |

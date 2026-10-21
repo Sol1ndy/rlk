@@ -2,5 +2,5 @@
 # Hydro water-blade trail (at the blade prop, every 2 t): a short water streak and spray.
 # Ambient: skipped while 40+ fx cards live (room for the fx of the hits).
 execute if score #akN mb matches 40.. run return 0
-function rlk:mboss/azhdaha/fx/cardx {kind:"streak",pos:"~ ~ ~",rot:"~90 0",bb:"fixed",roll:0,spin:0,s0:"1f,1f,1f",s1:"1.8f,1f,1f",off:"0f,0f,0f",move:"0f,0f,0f",life:4,fade:2,col:13495295,dly:0,dur:0,hit:-1,col2:-1}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"streak",pos:"~ ~ ~",rot:"~90 0",bb:"fixed",s0:"1f,1f,1f",s1:"1.8f,1f,1f",z:"1f,1f,1f",off:"0f,0f,0f",move:"0f,0f,0f",col:13495295,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:1,f:2,life:4,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}
 particle minecraft:splash ~ ~ ~ 0.2 0.1 0.2 0.1 3 force @a[tag=player]

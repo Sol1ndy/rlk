@@ -65,6 +65,7 @@ TCAP = 40           # live attack-telegraph cards (counted apart, so busy fx nev
 TSKIP = 6           # attack-telegraph calls are skipped from TCAP - TSKIP on (no shape is ever half drawn)
 FCAP = 16           # field-pool cards (8 field ids x 2 cards), never counted against CAP / TCAP
 SOFT = 40           # ambient presets are skipped from SOFT live fx cards on (room for the hits' fx)
+TSOFT = 36           # trail presets are skipped from TSOFT live fx cards on (FIX STATE-14: 28 cards kept for the hits)
 ATLAS_BUDGET = 600_000
 OWNED_DIRS = ('e', 'p', 'tele', 'snd', 'hud', 'prop', 'test')
 OWNED_FILES = ('card', 'cardx', 'look', 'clear', 'uninstall')
@@ -224,6 +225,10 @@ for _el in range(1, 5):
 KINDS.update({
     't_rim':   ('flat', (128, 128), UNIT, BX, P.paint_t_rim, 2, True, 'telegraph rim, unit radius'),
     't_rim_s': ('flat', (64, 64), UNIT, BX, P.paint_t_rim_s, 2, True, 'thick telegraph rim (r <= 2.5)'),
+    # the shaped keep outlines (plan Change note 1; FIX FID-4): tele/crack_o, chev_o, swirl_o
+    't_crack': ('flat', (96, 96), UNIT, BX, P.paint_t_crack, 2, True, 'P4 zig-zag crack ring outline (keep)'),
+    't_chev':  ('flat', (96, 96), UNIT, BX, P.paint_t_chev, 2, True, 'P9 chevron ring outline (keep)'),
+    't_swirl': ('flat', (96, 96), UNIT, BX, P.paint_t_swirl, 2, True, 'P1 Hydro geyser water-swirl outline (keep)'),
     't_ring':  ('flat', (192, 192), UNIT, BX, P.paint_t_ring, 2, True, 'thin travelling ring (fronts, halo)'),
     't_fill':  ('flat', (128, 128), UNIT, BX, P.paint_t_fill, 2, True, 'telegraph progress fill, unit radius'),
     't_bar':   ('flat', (16, 64), LANE, (-1, 1, 0, 1), P.paint_t_bar, 2, True, 'lane rail / cap bar'),
@@ -561,6 +566,30 @@ def card(kind, pos='~ ~ ~', rot='~ ~', bb='fixed', roll=0, spin=0, s0=0.0, s1=1.
     else:
         end = tuple(move)
     mv = vec(end)
+    consts = all(isinstance(v, (int, float)) for v in (roll, spin, fade, dly, hit, col2)) and not kind.startswith('$(')
+    num_ld = isinstance(life, (int, float)) and isinstance(dur, (int, float))
+    # life and dur both macro placeholders (the fronts, recolour, vortex: the preset's own tick arguments): the main
+    # interpolation is dur, and the caller's life covers the fade (life >= fade + 2, dur >= 1: the presets' contract)
+    ph_ld = isinstance(life, str) and isinstance(dur, str) and fade >= 0
+    if consts and (num_ld or ph_ld):
+        # (FIX STATE-2, the fast path) the stage numbers are known here: e/make's clamps and stage arithmetic done by
+        # the generator, the card spawned by e/cardf (about 25 commands instead of 63; the stages are e/make's to the tick)
+        if num_ld:
+            lf = 2 if life <= 1 else int(life)
+            fd = min(max(0, int(fade)), lf - 2)
+            wd = int(dur) if dur >= 1 else lf - fd - 1
+            wd = max(1, wd)
+        else:
+            lf, fd, wd = life, int(fade), dur
+        dl = max(0, int(dly))
+        sp = max(-170, min(170, int(spin)))
+        ax = '0f,1f,0f' if KINDS[kind][0] in SPIN_Y else '0f,0f,1f'
+        z = '0f,0f,0f' if dl >= 1 else vec(s0)
+        thit = f'{TAG}_hit' if hit >= 0 and col2 >= 0 else f'{TAG}_c'
+        return (f'function {FN}e/cardf {{kind:"{kind}",pos:"{pos}",rot:"{rot}",bb:"{bb}",s0:"{vec(s0)}",s1:"{vec(s1)}",z:"{z}",'
+                f'off:"{vec(off if off is not None else (0, 0, 0))}",move:"{mv}",col:{_i(col)},col2:{_i(col2)},ax:"{ax}",'
+                f'rr:"{float(int(roll)) * 0.017453292:.8g}",sr:"{float(sp) * 0.017453292:.8g}",d:{wd},f:{fd},life:{lf},dly:{dl},'
+                f'h1:{max(0, int(hit) + 1)},tsh:"{TAG}_{"sh" if dl >= 1 else "c"}",tfd:"{TAG}_{"fd" if fd >= 1 else "c"}",thit:"{thit}"}}')
     if simple:
         return (f'function {FN}card {{kind:"{kind}",pos:"{pos}",rot:"{rot}",bb:"{bb}",roll:{_i(roll)},'
                 f'spin:{_i(spin)},s0:{_f(s0)},s1:{_f(s1)},move:"{mv}",life:{_i(life)},'
@@ -593,6 +622,8 @@ TELE_ARGS = {
     'hexagram': ('r', 'tell', 'el', 'hold'), 'starseal': ('r', 'tell', 'el', 'hold'), 'seal8': ('r', 'tell', 'el', 'hold'),
     # outline-only variants (plan Change note 1 "keep (trim)": no progress fill; requests Rpa-2 / Rpt-3), same arguments
     'disc_o': ('r', 'tell', 'el', 'nd', 'hold'), 'heptagram_o': ('r', 'tell', 'el', 'hold'),
+    # the shaped keep outlines (FIX FID-4: P4 crack ring, P9 chevron ring, the P1 Hydro geyser swirl), disc_o's arguments
+    'crack_o': ('r', 'tell', 'el', 'nd', 'hold'), 'chev_o': ('r', 'tell', 'el', 'nd', 'hold'), 'swirl_o': ('r', 'tell', 'el', 'nd', 'hold'),
     'hexagram_o': ('r', 'tell', 'el', 'hold'), 'starseal_o': ('r', 'tell', 'el', 'hold'), 'seal8_o': ('r', 'tell', 'el', 'hold'),
     'mask_wash': ('r', 'tell', 'hold'), 'safe_rim': ('id', 'r', 'tell', 'hold'), 'safe_beam': ('id',),
     'safe_end': ('id',), 'crater': ('r', 'tell', 'hold'), 'halo': ('r', 'h', 'tell', 'el', 'hold'),
@@ -615,9 +646,12 @@ def tele(shape, **args):
     return f'function {FN}tele/{shape} {{{body}}}'
 
 
-def tele_disc(r, tell, el=5, nd=0, hold=3, fill=1):
+def tele_disc(r, tell, el=5, nd=0, hold=3, fill=1, style=None):
     """Disc decal of radius r blocks; the fill reaches the rim `tell` ticks after the call (pair with hz/disc).
-    fill=0: the outline-only variant tele/disc_o (the rim alone, flashing on the hit; same arguments)."""
+    fill=0: the outline-only variant tele/disc_o (the rim alone, flashing on the hit; same arguments); style 'crack' /
+    'chev' / 'swirl': the shaped outline tele/<style>_o instead of the plain rim (FIX FID-4)."""
+    if style:
+        return tele(f'{style}_o', r=r, tell=tell, el=el, nd=nd, hold=hold)
     return tele('disc' if fill else 'disc_o', r=r, tell=tell, el=el, nd=nd, hold=hold)
 
 
@@ -1170,6 +1204,9 @@ EPRESETS = {}       # family name -> (doc, [args], {el: fn() -> lines})  (fx/p/<
 # ambient presets: skipped from SOFT live fx cards on (trails, auras, ambience)
 AMBIENT = ('blade_trail', 'lump_trail', 'icicle_trail', 'ice_sphere', 'orb_ribbon', 'hail', 'glyph_glow', 'gold_motes',
            'dust_trail', 'fire_field')
+# trail presets (FIX STATE-14): kicked-up dust, thrown boulders and grit that run over several ticks are skipped from
+# TSOFT live fx cards on, so the hit-tick visuals (impacts, bolts, eruptions) always find room under CAP
+TRAIL = ('boulders', 'tail_lane', 'dust')
 
 
 def preset(name, doc, args=()):
@@ -1225,8 +1262,8 @@ def _e_impact(el):
            card('ripple', '~ ~0.06 ~', '~ 0', spin=40, s0=0.6, s1=3.2, life=8, fade=4, dur=5, col=main)]
     rnd = random.Random(100 + el)
     if el == 5:
-        for yaw in radial(8, 11):
-            out.append(rad('blade', yaw, rnd.uniform(55, 75), 0.2, 1.1, s0=0.6, s1=rnd.uniform(1.6, 2.2), life=9,
+        for yaw in radial(6, 11):
+            out.append(rad('blade', yaw, rnd.uniform(55, 75), 0.2, 1.1, s0=0.6, s1=rnd.uniform(1.8, 2.4), life=9,
                            fade=4, col=GOLD, roll=rnd.randint(-15, 15)))
         out += [card('dust', '~0.6 ~0.4 ~', bb='center', s0=0.6, s1=1.8, move=(0, 0.4, 0), life=12, fade=6, col=DUST),
                 card('dust', '~-0.6 ~0.4 ~0.3', bb='center', s0=0.6, s1=1.7, move=(0, 0.35, 0), life=12, fade=6,
@@ -1560,22 +1597,26 @@ def _p_fire_dome():
 def _p_frost_burst():
     out = [card('glow', '~ ~0.8 ~', bb='center', s0=1.5, s1='$(r_120)', life=6, fade=3, col=CRYO_PALE),
            card('ripple', '~ ~0.07 ~', '~ 0', spin=30, s0='$(r_40)', s1='$(r)', life=9, fade=4, dur=4, col=CRYO)]
-    for k, yaw in enumerate(radial(8, 10)):
+    # (FIX STATE-14) 6 spikes, life 12: 45's three bursts 6 t apart stay inside the 64-card fx cap
+    for k, yaw in enumerate(radial(6, 10)):
         x, z = ring_xz(0.7, yaw)
         out.append(card('ice_spike', f'^$(r_{int(-x * 100)}) ^ ^$(r_{int(z * 100)})'.replace('_-', '_m'),
-                        f'~{ang(yaw)} 22', s0=0.6, s1=2.4 + 0.3 * (k % 3), life=16, fade=6, dur=3))
-    out += [card('frost', '~ ~0.8 ~', bb='center', s0=1.0, s1='$(r_60)', move=(0, 0.6, 0), life=16, fade=8),
-            card('frost', '~0.8 ~0.6 ~-0.6', bb='center', s0=1.0, s1='$(r_50)', move=(0, 0.5, 0), life=16, fade=8, dly=2)]
+                        f'~{ang(yaw)} 22', s0=0.7, s1=2.6 + 0.3 * (k % 3), life=12, fade=5, dur=3))
+    out += [card('frost', '~ ~0.8 ~', bb='center', s0=1.0, s1='$(r_60)', move=(0, 0.6, 0), life=12, fade=6),
+            card('frost', '~0.8 ~0.6 ~-0.6', bb='center', s0=1.0, s1='$(r_50)', move=(0, 0.5, 0), life=12, fade=6, dly=2)]
     return out + [part('snowflake', '~ ~1 ~', ('$(r_40)', 0.8, '$(r_40)'), 0.05, 40),
                   blockp('packed_ice', '~ ~0.5 ~', ('$(r_30)', 0.3, '$(r_30)'), 0.2, 20)]
 
 
-@preset('ice_wall', 'P7 Cryo ice-wall piece (on the swept arc): three tall ice spikes in a short row along the executor\'s '
-        'left-right axis, frost. At the floor point, rotated along the arc.')
+@preset('ice_wall', 'P7 Cryo ice-wall piece (on the swept arc): four tall ice spikes in a row along the executor\'s '
+        'forward axis (the radial line of the piece, 5.0 .. 11.5 b from the tail root when called at 8.25 b), frost. '
+        'At the floor point, rotated along the arc.')
 def _p_ice_wall():
-    return [card('ice_spike', '^-1.2 ^ ^', '~0 -12', s0=0.6, s1=3.2, life=24, fade=8, dur=3),
-            card('ice_spike', '^ ^ ^0.2', '~40 8', s0=0.6, s1=3.8, life=24, fade=8, dur=3, dly=1),
-            card('ice_spike', '^1.2 ^ ^', '~80 14', s0=0.6, s1=3.0, life=24, fade=8, dur=3, dly=2),
+    # (FIX STATE-14) one call per wall piece (was two, at 6.5 / 10 b): 5 cards, so the four pieces + the eruption fit the cap
+    return [card('ice_spike', '^-0.3 ^ ^-2.4', '~0 -12', s0=0.6, s1=3.2, life=20, fade=7, dur=3),
+            card('ice_spike', '^0.3 ^ ^-0.8', '~40 8', s0=0.6, s1=3.8, life=20, fade=7, dur=3, dly=1),
+            card('ice_spike', '^-0.2 ^ ^0.8', '~80 14', s0=0.6, s1=3.4, life=20, fade=7, dur=3, dly=1),
+            card('ice_spike', '^0.3 ^ ^2.4', '~120 -6', s0=0.6, s1=3.0, life=20, fade=7, dur=3, dly=2),
             card('frost', '~ ~0.8 ~', bb='center', s0=1.0, s1=2.6, move=(0, 0.5, 0), life=14, fade=7),
             part('snowflake', '~ ~1.5 ~', (1.2, 1, 1.2), 0.04, 14), blockp('packed_ice', '~ ~0.5 ~', (1, 0.3, 1), 0.2, 10)]
 
@@ -1789,8 +1830,8 @@ def _p_dust_wall():
 @preset('boulders', 'P7 boulders thrown up along the swept arc (five rocks fanning out from the point).')
 def _p_boulders():
     rnd = random.Random(7)
-    return [rad('boulder', yaw, rnd.uniform(35, 65), 0.3, rnd.uniform(2.5, 4.0), y=0.4, s0=0.7, s1=1.1, life=16, fade=4,
-                dur=14, roll=rnd.randint(0, 90)) for yaw in (-50, -25, 0, 25, 50)] + \
+    return [rad('boulder', yaw, rnd.uniform(35, 65), 0.3, rnd.uniform(2.5, 4.0), y=0.4, s0=0.8, s1=1.2, life=12, fade=4,
+                dur=10, roll=rnd.randint(0, 90)) for yaw in (-40, 0, 40)] + \
         [blockp('tuff', '~ ~0.5 ~', (1, 0.3, 1), 0.3, 16)]
 
 
@@ -1798,18 +1839,17 @@ def _p_boulders():
         'executor\'s forward axis, 6 b).')
 def _p_tail_lane():
     return [card('streak', '^ ^0.4 ^3', '~90 0', s0=(3, 1.5, 1), s1=(6, 1.5, 1), life=6, fade=3, col=rgb('#C8B48A')),
-            card('dust', '^ ^0.5 ^1.5', bb='center', s0=0.8, s1=2.0, move=(0, 0.4, 0), life=12, fade=6, col=DUST),
-            card('dust', '^0.3 ^0.5 ^3.5', bb='center', s0=0.8, s1=2.0, move=(0, 0.4, 0), life=12, fade=6, col=DUST, dly=1),
-            card('dust', '^-0.3 ^0.5 ^5.5', bb='center', s0=0.8, s1=1.8, move=(0, 0.4, 0), life=12, fade=6, col=DUST_KHAKI,
-                 dly=2),
+            card('dust', '^ ^0.5 ^2', bb='center', s0=0.9, s1=2.2, move=(0, 0.4, 0), life=10, fade=5, col=DUST),
+            card('dust', '^-0.3 ^0.5 ^5', bb='center', s0=0.9, s1=2.0, move=(0, 0.4, 0), life=10, fade=5, col=DUST_KHAKI,
+                 dly=1),
             dust(DUST, 1.8, '^ ^0.4 ^3', (0.4, 0.2, 2.5), 12)]
 
 
 @preset('leaf_burst', 'P8 orange leaf burst (the tail\'s leaves scatter at the impact): ten leaves flung out and up.')
 def _p_leaf_burst():
     rnd = random.Random(8)
-    return [rad('leaf', yaw, rnd.uniform(30, 70), 0.3, rnd.uniform(2.0, 3.5), y=0.8, s0=0.4, s1=0.5, life=18, fade=6,
-                dur=16, roll=rnd.randint(0, 180)) for yaw in radial(10, 5)] + \
+    return [rad('leaf', yaw, rnd.uniform(30, 70), 0.3, rnd.uniform(2.0, 3.5), y=0.8, s0=0.5, s1=0.6, life=18, fade=6,
+                dur=16, roll=rnd.randint(0, 180)) for yaw in radial(6, 5)] + \
         [part('cherry_leaves', '~ ~1 ~', (1, 0.5, 1), 0.05, 10)]
 
 
@@ -2043,6 +2083,41 @@ def engine(W):
         f'tag {SEL}_new] remove {TAG}_new',
         f'schedule function {E}world 1t replace',
     ])
+    W.w('e/cardf', [
+        '# Internal (FIX STATE-2): the fast fx card of K.card when every stage number is a constant: the generator did',
+        '# e/make\'s clamps and stage arithmetic ({kind pos rot bb s0 s1 z off move col col2 ax rr sr d f life dly h1',
+        '# tsh tfd thit}); the same entity, stages and cap as fx/card + e/make.',
+        f'execute if score #akN mb matches {CAP}.. run return 0',
+        f'execute unless score #akInit mb matches 1 run function {E}init',
+        'scoreboard players add #akN mb 1',
+        f'$function {E}spawn {{kind:"$(kind)",pos:"$(pos)",rot:"$(rot)",bb:"$(bb)",s0:"$(s0)",s1:"$(s1)",z:"$(z)",off:"$(off)",'
+        'move:"$(move)",col:$(col),col2:$(col2),ax:"$(ax)",rr:"$(rr)",sr:"$(sr)",d:$(d),f:$(f),' + DEF_A + '}',
+        'execute store result score #akNow mb run time query gametime',
+        'scoreboard players add #akNow mb 1',
+        f'$execute as {SEL}_new,limit=1] run function {E}bornf {{dly:$(dly),life:$(life),fade:$(f),h1:$(h1),tsh:"$(tsh)",'
+        'tfd:"$(tfd)",thit:"$(thit)"}',
+        f'tag {SEL}_new] remove {TAG}_new',
+        f'schedule function {E}world 1t replace',
+    ])
+    W.w('e/bornf', [
+        '# Internal (macro, as the new fast card): e/born with the constant stage numbers.',
+        'scoreboard players operation @s akS = #akNow mb',
+        '$scoreboard players add @s akS $(dly)',
+        'scoreboard players operation @s akG = @s akS',
+        'scoreboard players add @s akG 1',
+        'scoreboard players operation @s akD = @s akS',
+        '$scoreboard players add @s akD $(life)',
+        'scoreboard players operation @s akK = @s akD',
+        '$scoreboard players remove @s akK $(fade)',
+        'scoreboard players operation @s akH = #akNow mb',
+        '# akH = clock + hit: h1 = hit + 1 >= 0 (scoreboard add takes no negative; with hit -1 the hit tag is never set)',
+        '$scoreboard players add @s akH $(h1)',
+        'scoreboard players remove @s akH 1',
+        f'tag @s add {TAG}_go',
+        '$tag @s add $(tsh)',
+        '$tag @s add $(tfd)',
+        '$tag @s add $(thit)',
+    ])
     end_tr = ('translation:[$(move)],left_rotation:{angle:$(rr)f,axis:[0f,0f,1f]},scale:[$(s1)],'
               'right_rotation:{angle:$(sr)f,axis:[$(ax)]}')
     W.w('e/spawn', [
@@ -2270,6 +2345,21 @@ def telegraphs(W):
         '# Internal (macro, storage t): the static rim alone.',
         *mk('$(rim)', '~ ~0.045 ~', '$(r)f,1f,$(r)f', '$(r)f,1f,$(r)f', '$(c1)'),
     ])
+    # the shaped keep outlines (plan Change note 1 per-hazard rows; FIX FID-4): disc_o with the footage's outline shape
+    for style, sprite, what in (('crack', 't_crack', 'P4 spike landings: the gold zig-zag crack ring'),
+                                ('chev', 't_chev', 'P9 rock rings: the gold chevron ring'),
+                                ('swirl', 't_swirl', 'the P1 Hydro geyser: the water-swirl field outline')):
+        W.w(f'tele/{style}_o', [
+            f'# Shaped outline-only disc telegraph ({what}; plan Change note 1 keep): tele/disc_o\'s arguments',
+            '# {r, tell, el, nd, hold}; the static outline (+ the undodgeable card with nd) flashes on call + tell. 1 card.',
+            *head(['$scoreboard players set #akTr mb $(r)']),
+            'execute if score #akTr mb matches ..1 run scoreboard players set #akTr mb 2',
+            store('r', '#akTr', 0.1),
+            f'data modify storage {STO} t.rim set value "{sprite}"',
+            f'function {T}disc_o with storage {STO} t',
+            f'data modify storage {STO} t.gz set value 0f', *glyph_size('#akTr', 45),
+            f'execute if score #akTnd mb matches 1.. run function {T}glyph with storage {STO} t',
+        ])
     # ---- ring
     W.w('tele/ring', [
         '# Ring telegraph decal (safe hole inside r0): {r0, r (tenths), tell, el, nd, hold}. Positioned on the floor',
@@ -3083,11 +3173,14 @@ def _derived(args, lines):
     return conv
 
 
-def emit_preset(W, rel, worker, doc, args, lines, ambient, extra_doc=()):
+def emit_preset(W, rel, worker, doc, args, lines, ambient, extra_doc=(), trail=False):
     head = [f'# {doc}', *extra_doc]
     if ambient:
         head += [f'# Ambient: skipped while {SOFT}+ fx cards live (room for the fx of the hits).',
                  f'execute if score #akN mb matches {SOFT}.. run return 0']
+    elif trail:
+        head += [f'# Trail: skipped while {TSOFT}+ fx cards live (room for the hit-tick visuals).',
+                 f'execute if score #akN mb matches {TSOFT}.. run return 0']
     if not args:
         assert not any('$(' in l for l in lines), rel
         W.w(rel, head + lines)
@@ -3099,8 +3192,9 @@ def emit_preset(W, rel, worker, doc, args, lines, ambient, extra_doc=()):
 
 def presets_dp(W):
     assert set(AMBIENT) <= set(PRESETS) | set(EPRESETS), set(AMBIENT) - set(PRESETS)
+    assert set(TRAIL) <= set(PRESETS) and not set(TRAIL) & set(AMBIENT), set(TRAIL) - set(PRESETS)
     for name, (doc, args, f) in PRESETS.items():
-        emit_preset(W, f'p/{name}', f'p/e/{name}', doc, args, f(), name in AMBIENT)
+        emit_preset(W, f'p/{name}', f'p/e/{name}', doc, args, f(), name in AMBIENT, trail=name in TRAIL)
     for name, (doc, args, mem) in EPRESETS.items():
         for el, f in mem.items():
             emit_preset(W, f'p/{name}/{el}', f'p/e/{name}_{el}', doc, args, f(), name in AMBIENT,
@@ -3119,7 +3213,7 @@ def preset_cards(name, el=None):
         lines = EPRESETS[name][2][el or 5]()
     else:
         lines = PRESETS[name][2]()
-    return sum(1 for l in lines if f'{FN}card' in l)
+    return sum(1 for l in lines if f'{FN}card' in l or f'{FN}e/cardf' in l)
 
 
 # ----------------------------------------------------------------------------- tests and demos
@@ -3573,7 +3667,8 @@ def manifest():
         'owned': {'dirs': [f'{FDIR}/{d}' for d in OWNED_DIRS], 'files': [f'{FDIR}/{f}.mcfunction' for f in OWNED_FILES],
                   'rp': [f'assets/rlk/textures/{TEXDIR}', f'assets/rlk/models/item/{TEXDIR}', f'assets/rlk/items/{TEXDIR}',
                          f'assets/rlk/font/{FONT_NAME}.json', f'assets/rlk/textures/font/{FONT_NAME}']},
-        'caps': {'fx': CAP, 'telegraph': TCAP, 'telegraph_skip_from': TCAP - TSKIP, 'field': FCAP, 'ambient_skip_from': SOFT},
+        'caps': {'fx': CAP, 'telegraph': TCAP, 'telegraph_skip_from': TCAP - TSKIP, 'field': FCAP, 'ambient_skip_from': SOFT,
+                 'trail_skip_from': TSOFT},
         'objectives': list(OBJECTIVES),
         'fake_players': '#ak* (objective mb)',
         'tags': [TAG, f'{TAG}_t', f'{TAG}_fp', f'{TAG}_f<k>', f'{TAG}_ml<k>', f'{TAG}_ml<k>c', f'{TAG}_wv<k>',

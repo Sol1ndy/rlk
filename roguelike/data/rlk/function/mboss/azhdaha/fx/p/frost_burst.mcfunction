@@ -5,14 +5,19 @@ $scoreboard players set #akA_r mb $(r)
 execute store result storage rlk:azkit pr.r float 0.1 run scoreboard players get #akA_r mb
 execute store result storage rlk:azkit pr.r_12 float 0.012 run scoreboard players get #akA_r mb
 execute store result storage rlk:azkit pr.r_120 float 0.12 run scoreboard players get #akA_r mb
+execute store result storage rlk:azkit pr.r_23 float 0.023 run scoreboard players get #akA_r mb
 execute store result storage rlk:azkit pr.r_30 float 0.03 run scoreboard players get #akA_r mb
 execute store result storage rlk:azkit pr.r_40 float 0.04 run scoreboard players get #akA_r mb
+execute store result storage rlk:azkit pr.r_44 float 0.044 run scoreboard players get #akA_r mb
 execute store result storage rlk:azkit pr.r_50 float 0.05 run scoreboard players get #akA_r mb
-execute store result storage rlk:azkit pr.r_57 float 0.057 run scoreboard players get #akA_r mb
+execute store result storage rlk:azkit pr.r_53 float 0.053 run scoreboard players get #akA_r mb
 execute store result storage rlk:azkit pr.r_60 float 0.06 run scoreboard players get #akA_r mb
+execute store result storage rlk:azkit pr.r_65 float 0.065 run scoreboard players get #akA_r mb
 execute store result storage rlk:azkit pr.r_68 float 0.068 run scoreboard players get #akA_r mb
 execute store result storage rlk:azkit pr.r_m12 float -0.012 run scoreboard players get #akA_r mb
-execute store result storage rlk:azkit pr.r_m40 float -0.04 run scoreboard players get #akA_r mb
-execute store result storage rlk:azkit pr.r_m57 float -0.057 run scoreboard players get #akA_r mb
+execute store result storage rlk:azkit pr.r_m23 float -0.023 run scoreboard players get #akA_r mb
+execute store result storage rlk:azkit pr.r_m44 float -0.044 run scoreboard players get #akA_r mb
+execute store result storage rlk:azkit pr.r_m53 float -0.053 run scoreboard players get #akA_r mb
+execute store result storage rlk:azkit pr.r_m65 float -0.065 run scoreboard players get #akA_r mb
 execute store result storage rlk:azkit pr.r_m68 float -0.068 run scoreboard players get #akA_r mb
 function rlk:mboss/azhdaha/fx/p/e/frost_burst with storage rlk:azkit pr

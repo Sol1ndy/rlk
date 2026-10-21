@@ -2,6 +2,6 @@
 # Entrance stele / arrival glyph glow (ambient, every 10 t at a glyph): a soft glow and motes.
 # Ambient: skipped while 40+ fx cards live (room for the fx of the hits).
 execute if score #akN mb matches 40.. run return 0
-function rlk:mboss/azhdaha/fx/card {kind:"glow",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.8,s1:1.4,move:"0f,0f,0f",life:10,fade:5,col:16771232}
-function rlk:mboss/azhdaha/fx/card {kind:"mote",pos:"~0.2 ~0.1 ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.2,s1:0.1,move:"0f,0.6f,0f",life:10,fade:4,col:15779936}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"glow",pos:"~ ~ ~",rot:"~ ~",bb:"center",s0:"0.8f,0.8f,0.8f",s1:"1.4f,1.4f,1.4f",z:"0.8f,0.8f,0.8f",off:"0f,0f,0f",move:"0f,0f,0f",col:16771232,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:4,f:5,life:10,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"mote",pos:"~0.2 ~0.1 ~",rot:"~ ~",bb:"center",s0:"0.2f,0.2f,0.2f",s1:"0.1f,0.1f,0.1f",z:"0.2f,0.2f,0.2f",off:"0f,0f,0f",move:"0f,0.6f,0f",col:15779936,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:5,f:4,life:10,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}
 particle minecraft:end_rod ~ ~ ~ 0.15 0.2 0.15 0.01 1 force @a[tag=player]

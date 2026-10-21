@@ -2,6 +2,6 @@
 # Icicle / lance trail (at the icicle, every 2 t; 41, 43): frost motes and a pale streak.
 # Ambient: skipped while 40+ fx cards live (room for the fx of the hits).
 execute if score #akN mb matches 40.. run return 0
-function rlk:mboss/azhdaha/fx/card {kind:"mote",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.3,s1:0.15,move:"0f,0f,0f",life:6,fade:3,col:15268863}
-function rlk:mboss/azhdaha/fx/card {kind:"frost",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.3,s1:0.7,move:"0f,0f,0f",life:6,fade:3,col:16777215}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"mote",pos:"~ ~ ~",rot:"~ ~",bb:"center",s0:"0.3f,0.3f,0.3f",s1:"0.15f,0.15f,0.15f",z:"0.3f,0.3f,0.3f",off:"0f,0f,0f",move:"0f,0f,0f",col:15268863,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:2,f:3,life:6,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"frost",pos:"~ ~ ~",rot:"~ ~",bb:"center",s0:"0.3f,0.3f,0.3f",s1:"0.7f,0.7f,0.7f",z:"0.3f,0.3f,0.3f",off:"0f,0f,0f",move:"0f,0f,0f",col:16777215,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:2,f:3,life:6,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}
 particle minecraft:snowflake ~ ~ ~ 0.1 0.1 0.1 0.01 1 force @a[tag=player]

@@ -2,6 +2,6 @@
 # Pyro lump trail (at a flying lump, every 2 t): a flame lick and smoke.
 # Ambient: skipped while 40+ fx cards live (room for the fx of the hits).
 execute if score #akN mb matches 40.. run return 0
-function rlk:mboss/azhdaha/fx/card {kind:"flame",pos:"~ ~-0.2 ~",rot:"~ ~",bb:"vertical",roll:0,spin:0,s0:0.4,s1:0.9,move:"0f,0f,0f",life:4,fade:2,col:16777215}
-function rlk:mboss/azhdaha/fx/card {kind:"smoke",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.3,s1:0.8,move:"0f,0.3f,0f",life:7,fade:4,col:16777215}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"flame",pos:"~ ~-0.2 ~",rot:"~ ~",bb:"vertical",s0:"0.4f,0.4f,0.4f",s1:"0.9f,0.9f,0.9f",z:"0.4f,0.4f,0.4f",off:"0f,0f,0f",move:"0f,0f,0f",col:16777215,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:1,f:2,life:4,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"smoke",pos:"~ ~ ~",rot:"~ ~",bb:"center",s0:"0.3f,0.3f,0.3f",s1:"0.8f,0.8f,0.8f",z:"0.3f,0.3f,0.3f",off:"0f,0f,0f",move:"0f,0.3f,0f",col:16777215,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:2,f:4,life:7,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}
 particle minecraft:flame ~ ~ ~ 0.1 0.1 0.1 0.01 1 force @a[tag=player]

@@ -2,6 +2,6 @@
 # 31 orb ribbon (at an orb, every 2 t): a water ribbon streak and a drop.
 # Ambient: skipped while 40+ fx cards live (room for the fx of the hits).
 execute if score #akN mb matches 40.. run return 0
-function rlk:mboss/azhdaha/fx/cardx {kind:"streak",pos:"~ ~ ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:"1.4f,1.4f,1f",s1:"2.2f,1f,1f",off:"0f,0f,0f",move:"0f,0f,0f",life:5,fade:3,col:7988197,dly:0,dur:0,hit:-1,col2:-1}
-function rlk:mboss/azhdaha/fx/card {kind:"mote",pos:"~ ~-0.2 ~",rot:"~ ~",bb:"center",roll:0,spin:0,s0:0.35,s1:0.2,move:"0f,-0.4f,0f",life:5,fade:2,col:13495295}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"streak",pos:"~ ~ ~",rot:"~ ~",bb:"center",s0:"1.4f,1.4f,1f",s1:"2.2f,1f,1f",z:"1.4f,1.4f,1f",off:"0f,0f,0f",move:"0f,0f,0f",col:7988197,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:1,f:3,life:5,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}
+function rlk:mboss/azhdaha/fx/e/cardf {kind:"mote",pos:"~ ~-0.2 ~",rot:"~ ~",bb:"center",s0:"0.35f,0.35f,0.35f",s1:"0.2f,0.2f,0.2f",z:"0.35f,0.35f,0.35f",off:"0f,0f,0f",move:"0f,-0.4f,0f",col:13495295,col2:-1,ax:"0f,0f,1f",rr:"0",sr:"0",d:2,f:2,life:5,dly:0,h1:0,tsh:"rlk_ak_c",tfd:"rlk_ak_fd",thit:"rlk_ak_c"}
 particle minecraft:dripping_water ~ ~ ~ 0.3 0.3 0.3 0 1 force @a[tag=player]
