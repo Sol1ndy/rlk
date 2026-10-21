@@ -1,4 +1,3 @@
-# GENERATED look slice 15/24 of ap_oasis -> withered.
-fill 463 225 9 484 239 30 minecraft:pale_oak_leaves[persistent=true] replace minecraft:azalea_leaves[persistent=true]
-fill 463 225 31 484 233 52 minecraft:pale_oak_leaves[persistent=true] replace minecraft:azalea_leaves[persistent=true]
-fill 469 202 9 483 213 30 minecraft:pale_oak_leaves[persistent=true] replace minecraft:azalea_leaves[persistent=true]
+# GENERATED look slice 15/23 of ap_oasis -> withered.
+fill 474 204 31 483 214 51 minecraft:pale_oak_leaves[persistent=true] replace minecraft:azalea_leaves[persistent=true]
+fill 474 205 -35 483 224 -25 minecraft:pale_oak_leaves[persistent=true] replace minecraft:azalea_leaves[persistent=true]

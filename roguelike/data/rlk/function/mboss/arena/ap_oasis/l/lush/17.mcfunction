@@ -1,3 +1,4 @@
-# GENERATED look slice 18/24 of ap_oasis -> lush.
-fill 471 203 -13 484 213 8 minecraft:azalea_leaves[persistent=true] replace minecraft:pale_oak_leaves[persistent=true]
-fill 474 204 31 483 214 51 minecraft:azalea_leaves[persistent=true] replace minecraft:pale_oak_leaves[persistent=true]
+# GENERATED look slice 18/23 of ap_oasis -> lush.
+fill 474 215 31 484 224 51 minecraft:azalea_leaves[persistent=true] replace minecraft:pale_oak_leaves[persistent=true]
+fill 477 204 -24 484 224 -14 minecraft:azalea_leaves[persistent=true] replace minecraft:pale_oak_leaves[persistent=true]
+fill 477 214 -13 483 224 8 minecraft:azalea_leaves[persistent=true] replace minecraft:pale_oak_leaves[persistent=true]

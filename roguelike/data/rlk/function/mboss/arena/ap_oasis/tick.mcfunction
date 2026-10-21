@@ -51,7 +51,6 @@ execute if data storage rlk:mboss arjob{kind:"look",look:"withered"} if score #a
 execute if data storage rlk:mboss arjob{kind:"look",look:"withered"} if score #arI mb matches 20 run function rlk:mboss/arena/ap_oasis/l/withered/20
 execute if data storage rlk:mboss arjob{kind:"look",look:"withered"} if score #arI mb matches 21 run function rlk:mboss/arena/ap_oasis/l/withered/21
 execute if data storage rlk:mboss arjob{kind:"look",look:"withered"} if score #arI mb matches 22 run function rlk:mboss/arena/ap_oasis/l/withered/22
-execute if data storage rlk:mboss arjob{kind:"look",look:"withered"} if score #arI mb matches 23 run function rlk:mboss/arena/ap_oasis/l/withered/23
 execute if data storage rlk:mboss arjob{kind:"look",look:"lush"} if score #arI mb matches 0 run function rlk:mboss/arena/ap_oasis/l/lush/0
 execute if data storage rlk:mboss arjob{kind:"look",look:"lush"} if score #arI mb matches 1 run function rlk:mboss/arena/ap_oasis/l/lush/1
 execute if data storage rlk:mboss arjob{kind:"look",look:"lush"} if score #arI mb matches 2 run function rlk:mboss/arena/ap_oasis/l/lush/2
@@ -75,4 +74,3 @@ execute if data storage rlk:mboss arjob{kind:"look",look:"lush"} if score #arI m
 execute if data storage rlk:mboss arjob{kind:"look",look:"lush"} if score #arI mb matches 20 run function rlk:mboss/arena/ap_oasis/l/lush/20
 execute if data storage rlk:mboss arjob{kind:"look",look:"lush"} if score #arI mb matches 21 run function rlk:mboss/arena/ap_oasis/l/lush/21
 execute if data storage rlk:mboss arjob{kind:"look",look:"lush"} if score #arI mb matches 22 run function rlk:mboss/arena/ap_oasis/l/lush/22
-execute if data storage rlk:mboss arjob{kind:"look",look:"lush"} if score #arI mb matches 23 run function rlk:mboss/arena/ap_oasis/l/lush/23

@@ -2064,7 +2064,7 @@
   },
   "fuse_pulse": {
    "args": [],
-   "doc": "One 파괴 fuse glow pulse (O7; every 9 t, every 4 t in the last 20 t). At the 파괴 face.",
+   "doc": "One 파괴 fuse glow pulse (O7; every 9 t, every 4 t in the last 20 t). At the 파괴 face; the ring is on the ball.",
    "cards": 2,
    "pool_cards": 0,
    "ambient": false,

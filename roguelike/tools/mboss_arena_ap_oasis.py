@@ -176,6 +176,16 @@ PLANTS = (  # (withered, lush, weight): bank plants on dirt-tag supports
     (_p('short_dry_grass'), _p('dandelion'), 0.32),
     (_p('leaf_litter[facing=north,segment_amount=4]'), _p('moss_carpet'), 0.28),
 )
+# AP-FIX RV-08: inside the barrier ring (d <= BARRIER_D[0], reachable) the lush look keeps every plant cell free of a
+# collision box (azalea / flowering azalea are bushes: a player standing there at the swap would be inside a block, and
+# they would be edge obstacles in phase 3); same withered plants, non-colliding lush ones (not biome-tinted).
+PLANTS_IN = (
+    (_p('dead_bush'), _p('lily_of_the_valley'), 0.22),
+    (_p('tall_dry_grass'), _p('pink_petals[facing=north,flower_amount=4]'), 0.18),
+    (_p('short_dry_grass'), _p('dandelion'), 0.32),
+    (_p('leaf_litter[facing=north,segment_amount=4]'), _p('moss_carpet'), 0.28),
+)
+assert [(w, t) for w, _, t in PLANTS_IN] == [(w, t) for w, _, t in PLANTS]
 DIRT_TOPS = {_p('moss_block'), _p('rooted_dirt'), _p('pale_moss_block'), _p('podzol'), _p('coarse_dirt')}
 SPECIES = {
     'jungle': {'log': _p('jungle_log[axis=y]'), 'wood': _p('jungle_wood'), 'root': _p('jungle_wood')},
@@ -917,7 +927,7 @@ def _paint_plants(g):
             if _vnoise(x, z, 3.5, 91) + 0.35 * _mix(x, z, 92) < 0.62:
                 continue
             h = tw * _mix(x, z, 93)
-            for w_, l_, wt in PLANTS:
+            for w_, l_, wt in (PLANTS_IN if d <= BARRIER_D[0] else PLANTS):
                 if h < wt:
                     g[(x, top + 1, z)] = lk(w_, l_)
                     break
@@ -936,7 +946,7 @@ def _paint_lights(g):
 # collision box a mob could not spawn in (plants and carpets count as free: the conservative reading).
 _TRANSPARENT_SUFFIX = ('_leaves', '_stained_glass', 'mangrove_roots')
 _FREE = {'air', 'light', 'dead_bush', 'short_dry_grass', 'tall_dry_grass', 'leaf_litter', 'azalea', 'flowering_azalea',
-         'dandelion', 'moss_carpet'}
+         'dandelion', 'moss_carpet', 'lily_of_the_valley', 'pink_petals'}
 _EMIT = {'ochre_froglight': 15, 'verdant_froglight': 15, 'light': None}
 
 

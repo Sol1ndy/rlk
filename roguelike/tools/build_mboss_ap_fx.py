@@ -1563,10 +1563,12 @@ def _p_pred_burst():
     return out + [part('firework', '~ ~1 ~', (0.4, 0.4, 0.4), 0.15, 8), part('happy_villager', '~ ~1 ~', (1.2, 0.6, 1.2), 0, 10)]
 
 
-@preset('fuse_pulse', 'One 파괴 fuse glow pulse (O7; every 9 t, every 4 t in the last 20 t). At the 파괴 face.')
+@preset('fuse_pulse', 'One 파괴 fuse glow pulse (O7; every 9 t, every 4 t in the last 20 t). At the 파괴 face; the ring is on the ball.')
 def _p_fuse_pulse():
+    # AP-FIX RV-05: the ring faces the camera on the ball (it lay flat under it and read as a floor marker r 1.2, far
+    # smaller than the r 3.6 blast; the footage has no ground ring, plan 14 (10-20) O7).
     return [card('glow', bb='center', s0=0.8, s1=2.2, life=5, fade=3, col=rgb('#F0A040')),
-            card('ripple', '~ ~-0.5 ~', '~ 90', s0=0.6, s1=2.4, life=6, fade=3, col=rgb('#F0C060')),
+            card('ripple', bb='center', s0=0.6, s1=1.8, life=6, fade=3, col=rgb('#F0C060')),
             part('small_flame', '~ ~ ~', (0.2, 0.2, 0.2), 0.01, 2)]
 
 
