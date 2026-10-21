@@ -507,8 +507,8 @@ function coreP1() {
   const J = J_CORE, c = sub3(SAC.c, J);
   // lofted across (axis x): the two views that matter (the front, and from below in the rear-up) see facets, not ledges
   // AP-R3b: 12 segments (was 6): the outline from the front reads as a round bulb, not a stepped barrel with flat ends
-  const ts = [-.985, -.93, -.83, -.69, -.5, -.26, 0, .26, .5, .69, .83, .93, .985];
-  const st = ts.map(t => ({a: c[0] + t * SAC.r, r: SAC.r * Math.sqrt(1 - t * t), c: [-c[2], c[1]]}));
+  const ts = [-.985, -.93, -.83, -.69, -.5, -.3, 0, .3, .5, .69, .83, .93, .985];
+  const st = ts.map(t => ({a: c[0] + t * SAC.r, r: .985 * SAC.r * Math.sqrt(1 - t * t), c: [-c[2], c[1]]}));   // .985: off a chest facet in the rear-up
   return wrapLoft('p1_sac', 'x', st, (th, a, p) => sacPaint(nrm3(sub3(p, c))), {caps: '-+', ledgeTex: 'p1_core', seed: 531, forms: 'p1', light: false, ppb: 32});
 }
 // ---- abdomen (joint J_ABD): the rear body hull, back plates rising into spiky leaf points (v1 f720), belly scales ----------

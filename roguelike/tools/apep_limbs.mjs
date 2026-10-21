@@ -489,8 +489,8 @@ function p1(seg) {
       els.push(...shell(L, [.15], [
         [.62, R(.53, .53, .5, .53), [.02, -.01]],
         [.86, R(.56, .57, .53, .56), [.01, 0]],
-        [1.0, R(.6, .62, .57, .6), [0, 0]],
-        [1.13, R(.65, .67, .62, .65), [0, 0]],                                                 // the root base over the petal foot
+        [1.0, R(.57, .59, .54, .57), [0, 0]],
+        [1.13, R(.6, .62, .57, .6), [0, 0]],                                                   // the root base over the petal foot (AP-R3b: less flare, the petals show)
       ], LEG1, 1, rimBark, {seed: 370 + k * 10, caps: '+'}));                                  // closed under the foot
       // the knee guard on the outer side: a pointed dark leaf plate with thickness, its top standing out
       els.push(...leafPlate('x', .6 * k, {u0: -.32 * k, u1: .32 * k, v0: -.66 * k, v1: .24 * k}, ['z', -22.5, [.6 * k, -.66 * k, 0]]));
