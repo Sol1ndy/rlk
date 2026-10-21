@@ -8,6 +8,11 @@ from .core import (anim, call, center, end, event, face, flat, gated, haz, obj, 
 BAG = [1, 2, 3, 4, 5, 6, 7]
 REACH = {1: (5.5, 4), 2: (16, 13)}
 TICK_HIDE = ['execute if score @s rdPat matches 5 if score @s rdTime matches 1.. run scoreboard players set #rdHide rd 1']
+# M1 seams read by core.build() (rd/s2_notes.md §3): pattern id ranges, extra objectives, pause / finish additions.
+IDS = ['1..7']
+OBJECTIVES = []
+ON_PAUSE = []
+ON_FINISH = []
 
 
 def build():

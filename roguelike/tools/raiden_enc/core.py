@@ -90,10 +90,17 @@ def gated(lines,t,cond,*commands):
         lines.append(f'execute if score @s rdTime matches {max(1,t-lead)} {cond} at @s rotated as @s run {cmd}')
 
 
+def _rng(r): return r.replace('..', '~')
+
+
 def build(shogun, tenma):
-    """Write the core functions. shogun / tenma: the phase modules (BAG, REACH, TICK_HIDE, TICK_TAIL, CHOOSE_RULES)."""
+    """Write the core functions. shogun / tenma: the phase modules. Data they hand in (M1 seams, rd/s2_notes.md §3):
+    BAG, REACH, TICK_HIDE, TICK_TAIL, CHOOSE_RULES (tenma), IDS (pattern id ranges of the phase, e.g. ['1..7']),
+    OBJECTIVES (extra scoreboard objectives), ON_PAUSE / ON_FINISH (commands appended to pause / finish)."""
     REACH = {**shogun.REACH, **tenma.REACH}
-    write('init',[f'scoreboard objectives add {v} dummy' for v in objectives]+[
+    S_IDS, T_IDS = list(shogun.IDS), list(tenma.IDS)
+    HI = max(int(r.split('..')[-1]) for r in S_IDS + T_IDS)
+    write('init',[f'scoreboard objectives add {v} dummy' for v in objectives + shogun.OBJECTIVES + tenma.OBJECTIVES]+[
         'bossbar add rlk:narukami {text:"마가츠 미타케 나루카미노 미코토",color:"light_purple"}',
         'bossbar add rlk:narukami_state {text:"악연의 에너지",color:"light_purple"}',
         '# Resource-pack boss bar (tools/build_bossbar.py): white bars are transparent, the',
@@ -214,7 +221,7 @@ scoreboard players set @e[tag=rlk_raiden] rdPat 0
 scoreboard players set @e[tag=rlk_raiden] rdTime 0
 scoreboard players set @e[tag=rlk_raiden] rdCool 60
 scoreboard players set @e[tag=rlk_raiden] rdAnim 0
-''')
+'''+'\n'.join(shogun.ON_PAUSE+tenma.ON_PAUSE))
     write('tick',f'''
 # @s=real living boss; the invisible body owns damage, the displays own appearance.
 execute if score @s rdDeath matches 1 run return run function rlk:boss/raiden/death/tick
@@ -232,11 +239,10 @@ execute if score @s rdPhase matches 3 run function rlk:boss/raiden/exhausted_tic
 execute if score @s rdPhase matches 0 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
 execute if score @s rdPhase matches 2 if score @s rdPat matches 0 run function rlk:boss/raiden/idle
 # Close-range patterns first close the distance (rdGo); their clock waits at 0 meanwhile.
-execute if score @s rdGo matches 1.. if score @s rdPat matches 1..18 run function rlk:boss/raiden/close_in
+execute if score @s rdGo matches 1.. if score @s rdPat matches 1..{HI} run function rlk:boss/raiden/close_in
 # Timelines start on the tick after choose: rdTime 1 is every pattern's first frame.
-execute if score @s rdPat matches 1..7 if score @s rdTime matches 1.. run function rlk:boss/raiden/normal_dispatch
-execute if score @s rdPat matches 11..18 if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch
-execute if score @s rdPat matches 99 if score @s rdTime matches 60.. run function rlk:boss/raiden/finish
+'''+''.join(f'execute if score @s rdPat matches {r} if score @s rdTime matches 1.. run function rlk:boss/raiden/normal_dispatch\n' for r in S_IDS)
+   +''.join(f'execute if score @s rdPat matches {r} if score @s rdTime matches 1.. run function rlk:boss/raiden/armor_dispatch\n' for r in T_IDS)+f'''execute if score @s rdPat matches 99 if score @s rdTime matches 60.. run function rlk:boss/raiden/finish
 # Found the real illusion: a 10 s stun owned by the illusion generator.
 execute if score @s rdPat matches 98 run function rlk:boss/raiden/illusion/stun_tick
 # Keep the body on the disc without snapping: slide back toward the centre, and only
@@ -310,11 +316,8 @@ scoreboard players operation #rdTurn rd = @s rdTurns
 scoreboard players operation #rdTurn rd %= #rd4 rd
 '''+'\n'.join(tenma.CHOOSE_RULES)+'''
 # Boss test hooks (test/lock repeats, test/pattern once) only apply to the current phase.
-execute if score @s rdPhase matches 0 if score #rdLock rd matches 1..7 run scoreboard players operation @s rdPat = #rdLock rd
-execute if score @s rdPhase matches 2 if score #rdLock rd matches 11..18 run scoreboard players operation @s rdPat = #rdLock rd
-execute if score @s rdPhase matches 0 if score #rdForce rd matches 1..7 run scoreboard players operation @s rdPat = #rdForce rd
-execute if score @s rdPhase matches 2 if score #rdForce rd matches 11..18 run scoreboard players operation @s rdPat = #rdForce rd
-execute if score @s rdPat = #rdForce rd run scoreboard players set #rdForce rd 0
+'''+''.join(f'execute if score @s rdPhase matches {ph} if score #rd{h} rd matches {r} run scoreboard players operation @s rdPat = #rd{h} rd\n'
+            for h in ('Lock', 'Force') for ph, ids in ((0, S_IDS), (2, T_IDS)) for r in ids)+'''execute if score @s rdPat = #rdForce rd run scoreboard players set #rdForce rd 0
 # Whatever finally runs (bag, forced follow-up, ultimate, test hook) leaves the bag.
 '''+'\n'.join(f'execute if score @s rdPat matches {i} run scoreboard players set #rdB{i} rd 0' for i in BAGS[0]+BAGS[2])+'''
 scoreboard players operation @s rdPrev = @s rdPat
@@ -379,7 +382,7 @@ scoreboard players set @s rdAnim 0
 scoreboard players set @s rdCool 10
 function rlk:boss/raiden/object/clear
 kill @e[tag=rlk_rd_dome]
-''')
+'''+'\n'.join(shogun.ON_FINISH+tenma.ON_FINISH))
     write('bars',f'''
 function rlk:boss/raiden/line/tick
 execute if score #rdCap rd matches 1 unless entity @a[tag=player,scores={{ttlT=1..}}] run function rlk:boss/raiden/caption/expire
@@ -537,7 +540,7 @@ kill @e[tag=rlk_rd_objvisual]
     HELP=(T+'{text:"명령: ",color:"gray",bold:false},'
           +cmd_link(TEST+'start','start')+',{text:" 처음부터 · ",color:"gray",bold:false},'
           +cmd_link(TEST+'armored','armored')+',{text:" 갑주 단계 · ",color:"gray",bold:false},'
-          +cmd_link(TEST+'pattern {id:11}','pattern {id:N}')+',{text:" 다음 패턴(1~7, 11~18) · ",color:"gray",bold:false},'
+          +cmd_link(TEST+'pattern {id:11}','pattern {id:N}')+',{text:" 다음 패턴('+', '.join(_rng(r) for r in S_IDS+T_IDS)+') · ",color:"gray",bold:false},'
           +cmd_link(TEST+'lock {id:11}','lock {id:N}')+',{text:" 패턴 고정(0 해제) · ",color:"gray",bold:false},'
           +cmd_link(TEST+'level {lv:12}','level {lv:N}')+',{text:" 보스 레벨 · ",color:"gray",bold:false},'
           +cmd_link(TEST+'stop','stop')+',{text:" 종료 후 로비",color:"gray",bold:false}]')
@@ -587,7 +590,7 @@ execute unless score #rdTest rd matches 1 run return 0
 execute as @e[tag=rlk_raiden,scores={rdDeath=0},limit=1] at @s run function rlk:boss/raiden/transform_start
 tellraw @s '''+T+'{text:"바로 악요의 요고우 텐마(갑주 단계)로 변신합니다.",color:"white",bold:false}]')
     write('test/pattern','''
-# /function rlk:boss/raiden/test/pattern {id:N}: N = 1~7 (normal) or 11~18 (armored), once.
+# /function rlk:boss/raiden/test/pattern {id:N}: N = '''+'/'.join(_rng(r) for r in S_IDS)+' (normal) or '+'/'.join(_rng(r) for r in T_IDS)+''' (armored), once.
 $scoreboard players set #rdReq rd $(id)
 execute store result score #rdOk rd run function rlk:boss/raiden/test/request
 execute if score #rdOk rd matches 1 run scoreboard players operation #rdForce rd = #rdReq rd
@@ -605,9 +608,7 @@ execute if score #rdOk rd matches 1 run tellraw @s '''+T+'''{text:"패턴 고정
 # #rdReq = requested id. Starts a test if needed, aborts the current attack and switches
 # phase so the request can run next. Returns 1 when accepted.
 scoreboard players set #rdOk rd 0
-execute if score #rdReq rd matches 1..7 run scoreboard players set #rdOk rd 1
-execute if score #rdReq rd matches 11..18 run scoreboard players set #rdOk rd 1
-execute if score #rdOk rd matches 0 run tellraw @s '''+T+'''{text:"패턴 번호는 1~7(일반) 또는 11~18(갑주)입니다.",color:"red",bold:false}]
+'''+''.join(f'execute if score #rdReq rd matches {r} run scoreboard players set #rdOk rd 1\n' for r in S_IDS+T_IDS)+'''execute if score #rdOk rd matches 0 run tellraw @s '''+T+'''{text:"패턴 번호는 '''+', '.join(map(_rng, S_IDS))+'(일반) 또는 '+', '.join(map(_rng, T_IDS))+'''(갑주)입니다.",color:"red",bold:false}]
 execute if score #rdOk rd matches 0 run return 0
 execute unless entity @e[tag=rlk_raiden,scores={rdDeath=0},limit=1] run function rlk:boss/raiden/test/start
 execute unless entity @e[tag=rlk_raiden,scores={rdDeath=0},limit=1] run return 0
@@ -617,10 +618,8 @@ return 1
     write('test/apply','''
 # @s = boss. Abort the running attack (same reset as a pause), then enter the right phase.
 execute unless score @s rdPat matches 0 run function rlk:boss/raiden/pause
-execute if score #rdReq rd matches 11..18 if score @s rdPhase matches 0 run function rlk:boss/raiden/transform_start
-execute if score #rdReq rd matches 11..18 if score @s rdPhase matches 3 run function rlk:boss/raiden/transform_start
-execute if score #rdReq rd matches 1..7 if score @s rdPhase matches 1.. run function rlk:boss/raiden/test/to_normal
-scoreboard players set @s rdWalk 0
+'''+''.join(f'execute if score #rdReq rd matches {r} if score @s rdPhase matches {ph} run function rlk:boss/raiden/transform_start\n' for r in T_IDS for ph in (0, 3))
+   +''.join(f'execute if score #rdReq rd matches {r} if score @s rdPhase matches 1.. run function rlk:boss/raiden/test/to_normal\n' for r in S_IDS)+'''scoreboard players set @s rdWalk 0
 execute unless score @s rdPhase matches 1 run scoreboard players set @s rdCool 2
 ''')
     write('test/to_normal','''

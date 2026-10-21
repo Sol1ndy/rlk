@@ -25,6 +25,13 @@ CHOOSE_RULES = [
     'execute if score @s rdPhase matches 2 if score @s rdUltUsed matches 1 if score @s rdPat matches 15 run scoreboard players set @s rdPat 18',
     'execute if score @s rdPhase matches 2 if score @s rdUltUsed matches 0 if score #rdTurn rd matches 0 run scoreboard players set @s rdPat 15']
 TICK_HIDE = [f'execute if score @s rdPat matches 15 if score @s rdTime matches {ASCEND_END}.. run scoreboard players set #rdHide rd 1']
+# M1 seams read by core.build() and raiden_enc.build() (rd/s2_notes.md §3): pattern id ranges, extra objectives,
+# pause / finish additions, and voice lines (new keys, or a replacement of a Tenma-owned key of lines.LINES).
+IDS = ['11..18']
+OBJECTIVES = []
+ON_PAUSE = []
+ON_FINISH = []
+VOICE_LINES = {}
 TICK_TAIL = [
     'execute if score @s rdPat matches 15 run function rlk:boss/raiden/judgment_rig/tick',
     'execute if score @s rdPat matches 15 if score @s rdTime matches 80..173 run function rlk:boss/raiden/camera/try_start',

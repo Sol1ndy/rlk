@@ -9,6 +9,11 @@ from . import core, lines, shogun, tenma
 
 
 def build():
+    # M1 seam (rd/s2_notes.md §3): tenma.VOICE_LINES adds keys to lines.LINES or replaces a Tenma-owned entry in place
+    # (the id order of lines.LINES is kept, so the generated line ids only change for new keys).
+    lines.LINES.update(tenma.VOICE_LINES)
+    lines.LINE_IDS.clear()
+    lines.LINE_IDS.update({k: i for i, k in enumerate(lines.LINES, 1)})
     lines.build()
     core.build(shogun, tenma)
     shogun.build()
