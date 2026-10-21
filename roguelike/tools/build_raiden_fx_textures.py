@@ -1316,7 +1316,7 @@ def tex_dk_tint():
 
     def f(x, y):
         r = math.hypot(x - n / 2, y - n / 2) / (n / 2)
-        return 0.36 * smooth(1.0, 0.975, r)       # nearly hard edge: the card reaches 24.6 b, under the wall
+        return 0.36 * smooth(1.0, 0.82, r)        # soft edge: the arena has no wall any more, the card fades out over open water
     img = Img(n, n)
     img.over(TINT_FILL, sample_fn(n, n, f, 1), 1.0)
     return img

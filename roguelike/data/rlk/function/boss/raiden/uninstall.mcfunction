@@ -3,6 +3,8 @@
 function rlk:boss/raiden/cleanup
 kill @e[tag=rlk_raiden_part]
 kill @e[tag=rlk_raiden]
+schedule clear rlk:room/raiden/bg/tick
+schedule clear rlk:room/raiden/bg/spin
 bossbar remove rlk:narukami
 bossbar remove rlk:narukami_state
 data remove storage rlk:rd il

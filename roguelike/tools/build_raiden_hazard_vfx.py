@@ -738,7 +738,7 @@ def build(root, out):
         wfx(f"decal/d{dk}", [f'# State decal {kt} ({model}): {{sx, sz}} blocks, {{life}} ticks (99999 = until killed).',
                              '$' + summon, c[1], f'$scoreboard players set {VNEW} rdHLife $(life)', c[3]])
     c = card('dk_tint', 0, s0=(24.6, 1, 24.6))
-    wfx("decal/tint", ['# Whole-field tint (time stop, 만겁): a uniform 35 % violet over the arena floor (r 24.6: its edge is under the wall), {life} ticks.',
+    wfx("decal/tint", ['# Whole-field tint (time stop, 만겁): a uniform 35 % violet over the arena floor (r 24.6, soft edge over the open water), {life} ticks.',
                        '# Run it at the arena centre.',
                        c[0].replace('"rlk_rd_fx",', '"rlk_rd_fx","rlk_rd_sdecal","rlk_rd_sdecal_tint",'), c[1],
                        f'$scoreboard players set {VNEW} rdHLife $(life)', c[3]])

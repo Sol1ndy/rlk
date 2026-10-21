@@ -39,7 +39,10 @@ def main():
              f'# scoreboard objective ({len(objs)}), boss bar ({len(bars)}) and storage key (rlk:rd: {len(keys)}) the boss created.',
              'function rlk:boss/raiden/cleanup',
              'kill @e[tag=rlk_raiden_part]',
-             'kill @e[tag=rlk_raiden]']
+             'kill @e[tag=rlk_raiden]',
+             # the arena backdrop job and the vortex spin stop on their own, but not before the objectives go
+             'schedule clear rlk:room/raiden/bg/tick',
+             'schedule clear rlk:room/raiden/bg/spin']
     lines += [f'bossbar remove {b}' for b in bars]
     lines += [f'data remove storage rlk:rd {k}' for k in keys]
     lines += [f'scoreboard objectives remove {o}' for o in objs if o != 'rd'] + ['scoreboard objectives remove rd']

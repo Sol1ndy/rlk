@@ -29,6 +29,8 @@ steps = [
     # painted gradient lightning sprites (rlk:raiden/fxg/*) used by the effect generators below
     ["python3", "build_raiden_fx_textures.py", "--resourcepack", rp],
     ["python3", "build_raiden_encounter.py"],
+    # the arena's backdrop panels (stars, mist ring, vortex, wisps: rlk:raiden/arena/*); the arena imports their layout
+    ["python3", "build_raiden_backdrop.py", "--resourcepack", rp],
     ["python3", "build_raiden_arena.py"],
     ["python3", "build_raiden_cinematic.py"],
     ["python3", "build_raiden_hazards.py", "--resourcepack", rp],
