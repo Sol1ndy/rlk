@@ -1,4 +1,4 @@
-# Lump 2 (impact t54): a new hexagram under a player farther than 8 b from the current one; the lock (the
+# Lump 2 (impact t59): a new hexagram under a player farther than 8 b from the current one; the lock (the
 # player's feet), the disc r 3.0 (tell 13), the lump hovering 12 b over the lock.
 execute at @e[type=minecraft:marker,tag=rlk_mb_az_p46h,limit=1] unless entity @e[tag=rlk_body,distance=..8,limit=1] run function rlk:mboss/azhdaha/p/elspike/hex_1
 execute unless entity @e[type=minecraft:marker,tag=rlk_mb_az_p46h,limit=1] run function rlk:mboss/azhdaha/p/elspike/hex_1

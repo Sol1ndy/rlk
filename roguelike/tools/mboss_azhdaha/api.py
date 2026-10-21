@@ -450,7 +450,10 @@ class KitStub:
         return self._c('uninstall')
 
     # telegraphs (blocks in; the kit converts to tenths)
-    def tele_disc(self, r, tell, el=5, nd=0, hold=3, fill=1):
+    def tele_disc(self, r, tell, el=5, nd=0, hold=3, fill=1, style=None):
+        # style 'crack' / 'chev' / 'swirl': the shaped keep outline tele/<style>_o (FIX FID-4; plan Change note 1)
+        if style:
+            return self._c(f'tele/{style}_o', r=r, tell=tell, el=el, nd=nd)
         return self._c('tele/disc' if fill else 'tele/disc_o', r=r, tell=tell, el=el, nd=nd)
 
     def tele_ring(self, r0, r, tell, el=5, nd=0, hold=3):
@@ -1020,6 +1023,9 @@ class Gen:
             lines.append('scoreboard players operation #hzGrp mb = #azCtxGrp mb')
         lines += (self.el_ground() if el == 'ground' else self.el_tail() if el == 'tail' else self.el(el))
         lines += [L.hz_ring(0, r0, tell, dmg), self.tag_last_hz(tag)]
+        # (FIX FAIR-5) the front's first-tick advance (b/t x 1000) on its marker (objective mb): what a player reads from the
+        # slam (how fast this front travels); the fairness sim's agent plans from it instead of the first radius change
+        lines.append(f'scoreboard players set @e[type=minecraft:marker,tag={tag},limit=1] mb {int(round((radii[0] - r0) * 1000)) if radii else 0}')
         # 'none': the plain ring (nd 0: the shared undodgeable look lost its users, Change note 1 on plan rule 6)
         ring = self.ktele('wave', el, id=wid, r0=r0, r1=r1, w=band, tell=(tell if tele == 'keep' else 1), dur=n,
                           nd=((2 if nd and low else nd) if tele == 'keep' else 0), hold=3)

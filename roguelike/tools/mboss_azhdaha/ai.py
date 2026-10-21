@@ -26,6 +26,8 @@ FLANK_PX = (2, 3, 4, 9, 10, 11, 12)     # proxies chest belly hips paw_l paw_r f
 FLANK_CHANCE = 90
 DWELL_N, DWELL_MIN = 6, 4      # FLANK-near for >= 16 of the last 24 t, sampled every 4 t
 PROXY_GT = 40
+EXIT_FIELD_A, EXIT_FIELD_D = 60, 8     # FIX FAIR-13: field area (b2) and distance (b) that block the P7 exits
+RUN3_MIN = 12                          # FIX FID-7: P3 needs this run (b) toward the player inside the charge leash (api.CHARGE_R)
 # s2.md 2 gates / plan 4.7: field_area applies to every field-making pick: 32 and 45 always, P1 / P2 / P5 / P5b only
 # while their Pyro addons run (Pyro legs, phase >= 2), P8 only in phase 3 (its strip). A pattern declares the gate; these
 # conditions are added here.
@@ -124,6 +126,10 @@ def emit(core):
         'scoreboard players operation #azY mb *= #azZ mb',
         'execute if score #azFt mb matches 1.. if score #azX mb <= #azY mb run scoreboard players set #azF35 mb 1',
         F('ai/exit'),
+        f'# (FIX FID-7) the P3 run: the point {RUN3_MIN} b toward the player still inside the charge leash r {A.L.num(A.CHARGE_R)}',
+        sc('#azRun3', 0),
+        f'execute facing entity {PLAYER} feet rotated ~ 0 positioned ^ ^ ^{RUN3_MIN} positioned ~ {A.CY} ~ if entity '
+        f'{ARENA_M.replace("limit=1", f"distance=..{A.L.num(A.CHARGE_R)},limit=1")} run scoreboard players set #azRun3 mb 1',
         '# anchor8: the anchor within 8 b of the arena centre',
         sc('#azA8', 0),
         f'execute at @s positioned ~ {A.CY} ~ if entity {ARENA_M.replace("limit=1", f"distance=..{A.L.num(A.BODY_R)},limit=1")} '
@@ -170,7 +176,11 @@ def emit(core):
         f'execute if score #azY mb matches ..{R * 10000} if score #azFt mb matches 0.. run scoreboard players set #azExit mb 1',
         '# (3) beyond the tip: the anchor distance >= tip - R',
         'scoreboard players operation #azZ mb = #azDist mb', 'scoreboard players operation #azZ mb *= #azDist mb',
-        f'execute if score #azZ mb matches {beyond2}.. run scoreboard players set #azExit mb 1'])
+        f'execute if score #azZ mb matches {beyond2}.. run scoreboard players set #azExit mb 1',
+        f'# (FIX FAIR-13) lingering fields block the exits: with >= {EXIT_FIELD_A} b2 of fields and one within {EXIT_FIELD_D} b of the',
+        '# player, no exit counts (the FLANK rule then takes P8 / P2, never the undodgeable sweep into fire)',
+        f'execute if score #azExit mb matches 1 if score #azFldA mb matches {EXIT_FIELD_A}.. at {PLAYER} if entity '
+        f'@e[type=minecraft:marker,tag=rlk_mb_az_fld,distance=..{EXIT_FIELD_D}] run scoreboard players set #azExit mb 0'])
 
     # ------------------------------------------------------------------ idle: tracking, leash, turn steps, the walk
     w('ai/state', [
@@ -190,6 +200,7 @@ def emit(core):
            f'execute if score #azReq mb matches 1.. run return run {F("ai/req")}',
            f'execute if score #mbLock mb matches 1.. run return run {F("ai/lock")}',
            f'execute if score #azTr mb matches 1 run return run {F("tr/begin")}',
+           f'execute if score #azTr mb matches 2.. run return run {F("tr/resume")}',
            F('ai/sample'),
            f'execute if score #azTailN mb matches {ANTI_STALL}.. run return run {F("ai/stall")}',
            f'execute if score #azBand mb matches 3 if score #azA8 mb matches 1 run {F("ai/walk_try")}',
@@ -312,6 +323,9 @@ def emit(core):
                             f'scoreboard players set #azC{p.id} mb 0')
         if p.id == 6:
             cand.append('scoreboard players set #azC6 mb 0')
+        if p.id == 3:
+            cand.append('# (FIX FID-7) the charge only with a real run (a 4-12 b lunge is not the footage\'s charge)')
+            cand.append('execute unless score #azRun3 mb matches 1 run scoreboard players set #azC3 mb 0')
     cand += [sc('#azCn', 0)] + [f'scoreboard players operation #azCn mb += #azC{p.id} mb' for p in picks]
     w('ai/cand', cand)
     draw = ['# #azR = 0..#azCn-1 -> the candidate whose weight range holds it.', sc('#azPick', 0)]

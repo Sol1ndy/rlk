@@ -2,6 +2,6 @@
 execute as @e[type=minecraft:marker,tag=rlk_mb_az_xlwt1,limit=1] at @s run function rlk:mboss/azhdaha/xl/u/lump_land
 kill @e[tag=rlk_mb_az_xlwp1]
 kill @e[tag=rlk_mb_az_xlwt1]
-scoreboard players set #azAftF mb 11
+scoreboard players set #azAftF mb 15
 scoreboard players set #azAftD mb 1
 function rlk:mboss/azhdaha/aft/new

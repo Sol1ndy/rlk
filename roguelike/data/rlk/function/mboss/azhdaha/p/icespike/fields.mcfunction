@@ -18,8 +18,13 @@ execute as @e[type=minecraft:marker,tag=rlk_mb_az_p45f2,limit=1] store result en
 execute store result storage rlk:mboss az.p45.d int 1 run random value 6..10
 execute as @e[type=minecraft:marker,tag=rlk_mb_az_p45f2,limit=1] at @s rotated as @s run function rlk:mboss/azhdaha/p/icespike/mv with storage rlk:mboss az.p45
 execute as @e[type=minecraft:marker,tag=rlk_mb_az_p45f0,limit=1] run function rlk:mboss/azhdaha/u/clamp_w
-execute at @e[type=minecraft:marker,tag=rlk_mb_az_p45f0,limit=1] run function rlk:mboss/azhdaha/p/icespike/f0
 execute as @e[type=minecraft:marker,tag=rlk_mb_az_p45f1,limit=1] run function rlk:mboss/azhdaha/u/clamp_w
-execute at @e[type=minecraft:marker,tag=rlk_mb_az_p45f1,limit=1] run function rlk:mboss/azhdaha/p/icespike/f1
 execute as @e[type=minecraft:marker,tag=rlk_mb_az_p45f2,limit=1] run function rlk:mboss/azhdaha/u/clamp_w
+scoreboard players set #aq45M1 mb 0
+scoreboard players set #aq45M2 mb 0
+execute at @e[type=minecraft:marker,tag=rlk_mb_az_p45f1,limit=1] if entity @e[type=minecraft:marker,tag=rlk_mb_az_p45f0,distance=..4.3,limit=1] run scoreboard players set #aq45M1 mb 1
+execute at @e[type=minecraft:marker,tag=rlk_mb_az_p45f2,limit=1] if entity @e[type=minecraft:marker,tag=rlk_mb_az_p45f1,distance=..4.3,limit=1] run scoreboard players set #aq45M2 mb 2
+execute at @e[type=minecraft:marker,tag=rlk_mb_az_p45f2,limit=1] if entity @e[type=minecraft:marker,tag=rlk_mb_az_p45f0,distance=..4.3,limit=1] run scoreboard players set #aq45M2 mb 1
+execute at @e[type=minecraft:marker,tag=rlk_mb_az_p45f0,limit=1] run function rlk:mboss/azhdaha/p/icespike/f0
+execute at @e[type=minecraft:marker,tag=rlk_mb_az_p45f1,limit=1] run function rlk:mboss/azhdaha/p/icespike/f1
 execute at @e[type=minecraft:marker,tag=rlk_mb_az_p45f2,limit=1] run function rlk:mboss/azhdaha/p/icespike/f2

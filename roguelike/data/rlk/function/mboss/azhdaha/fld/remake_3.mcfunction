@@ -7,7 +7,11 @@ execute store result score #azNfF mb run data get storage rlk:mboss az.nf.fam
 execute store result score #azNfA mb run data get storage rlk:mboss az.nf.area
 execute if score #azF3 mb matches 1.. run scoreboard players operation #azFldA mb -= #azFA3 mb
 execute if score #azF3 mb matches 1.. run scoreboard players remove #azFldN mb 1
-scoreboard players set #azFG1 mb 0
-scoreboard players set #azFG2 mb 0
-scoreboard players set #azFG3 mb 0
+# (FIX STATE-15) the table keeps its sequence (oldest-first caps), start tick and base life (refresh cap)
+scoreboard players operation #azRS mb = #azFS3 mb
+scoreboard players operation #azRT mb = #azFT3 mb
+scoreboard players operation #azRB mb = #azFB3 mb
 function rlk:mboss/azhdaha/fld/remake_m with storage rlk:mboss az.f3
+scoreboard players operation #azFS3 mb = #azRS mb
+scoreboard players operation #azFT3 mb = #azRT mb
+scoreboard players operation #azFB3 mb = #azRB mb

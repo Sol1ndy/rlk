@@ -1,5 +1,0 @@
-# dispatch #azPT 3..6
-execute if score #azPT mb matches 3 run return run function rlk:mboss/azhdaha/p/whip/k/3
-execute if score #azPT mb matches 4 run return run function rlk:mboss/azhdaha/p/whip/k/4
-execute if score #azPT mb matches 5 run return run function rlk:mboss/azhdaha/p/whip/k/5
-execute if score #azPT mb matches 6 run return run function rlk:mboss/azhdaha/p/whip/k/6

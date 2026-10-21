@@ -276,6 +276,8 @@ class Core:
         zero += [f'#azFG{f}' for f in (1, 2, 3)]
         zero += [f'#azCdE{p.id}' for p in self.pats if p.cooldown]
         v += [sc(k, 0) for k in zero]
+        # FIX STATE-17: pattern-private scratch compared with #azClk (which restarts every fight) is reset by its owner
+        v += [self.F(f'p/{k}/vars') for k in sorted({p.key for p in self.pats} | {'firefield'}) if self.g.has(f'p/{k}/vars')]
         v += [sc('#azE', 5), sc('#azET', 5), sc('#azBand', 2), sc('#azSide', 1), sc('#azPaw', 1), sc('#azCool', 30),
               sc('#azA8', 1), sc('#azHudQ', 1), sc('#azYawS', 1), sc('#azPx', PX_ID['inv']),
               sc('#azPxGT', -1000000), sc('#azFlC', -1000000), sc('#azBrRf', -1000000), sc('#azDgClk', -1000000),
@@ -387,8 +389,9 @@ class Core:
             f'function {K.FN}tele/field_clear' if A.KIT else K._c('tele/field_clear'),
             K.hud('flash_end'),
             F('p/pause_d')])
-        self.w('resume', ['# Hook resume: the field decals again from the table; every active pattern\'s resume.',
-                          F('fld/redraw'), F('p/resume_d')])
+        self.w('resume', ['# Hook resume: the field decals again from the table; every active pattern\'s resume; the addon bodies\'',
+                          '# keep decals still ahead (xl/resume, xt/resume: FIX STATE-3).',
+                          F('fld/redraw'), F('p/resume_d')] + [F(r) for r in ('xl/resume', 'xt/resume') if g.has(r)])
         self.w('cleanup', [
             '# Hook cleanup (no executor; idempotent): module fake players to their defaults, the module storage, the brand',
             '# and the shards, every module entity (props, seal, pattern entities: all rlk_mb_aux, the framework kills them',
@@ -431,6 +434,8 @@ class Core:
             f'execute if score #azBgL mb matches 1.. run {F("bg/reload_l")}',
             f'execute if score #azBgT mb matches 1.. run {F("bg/reload_t")}',
             F('fld/remake'),
+            '# (FIX STATE-8) the field ambience chains (after() slots die with /reload) restart for the re-made fields',
+            *[F(f'p/{k}/reload_fld') for k in sorted({p.key for p in self.pats} | {'firefield'}) if self.g.has(f'p/{k}/reload_fld')],
             sc('#azHudQ', 1)]
         self.w('reload', rl)
         self.w('bars', ['# Hook bars (@s = body, every tick in intro / fight): the under-bar (hud/bar).', F('hud/bar')])
@@ -548,7 +553,9 @@ class Core:
             f'execute if score #mbT mb matches {INTRO_DONE}.. run {F("intro/done")}'])
         self.w('intro/done', [
             '# The intro is over: targetable, the proxies on, phase 1 (Geo, floor F1), the AI after a short cooldown.',
-            'function rlk:mboss/intro_end', g.px('normal'), g.phase(1), sc('#azCool', 20), sc('#azHudQ', 1)])
+            'function rlk:mboss/intro_end', g.px('normal'), g.phase(1), sc('#azCool', 20), sc('#azHudQ', 1),
+            '# (FIX STATE-7) an intro cut before its roar (/reload, test 99) still starts the phase-1 track',
+            f'execute unless score #mbMusPh mb matches 1.. run {g.music(1)}'])
 
     # -----------------------------------------------------------------------------------------
     def slot(self):
@@ -705,6 +712,10 @@ class Core:
         g.pw('cast_host', 'tick', [f'execute if score #azCH mb matches 1 if score #azPT mb matches {rl}.. run {g.end()}',
                                    f'execute if score #azCH mb matches 0 if score #azPT mb matches {rr}.. run {g.end()}'])
         g.pw('cast_host', 'cancel', ['# The cast slot is the core\'s (cast/cancel); nothing of the host lingers.'])
+        g.pw('cast_host', 'reload', [
+            '# /reload inside the host (FIX STATE-1): the core reload cancels the cast slot after this; the host starts again',
+            '# at PT 0 on the next tick (#azCastFirst kept, so transition 2 with live orbs is the roar_low refresh again).',
+            sc('#azPNew', 1), sc('#azPT', 0), sc('#azCH', 0)])
 
     # -----------------------------------------------------------------------------------------
     def cast_bg_b3(self):
@@ -825,7 +836,19 @@ class Core:
             f'execute if score #azTr mb matches 4 if score #azTrN mb matches 2 run return run {F("tr/to_b3")}',
             F('tr/done')])
         for name, step, pid in (('to_slide', 3, 20), ('to_abs1', 4, 21), ('to_abs2', 4, 22), ('to_b3', 5, 23)):
-            self.w(f'tr/{name}', [sc('#azTr', step), sc('#azPat', pid), sc('#azPNew', 1), sc('#azReqT', 0), sc('#azCastFirst', 0)])
+            self.w(f'tr/{name}', [sc('#azTr', step), sc('#azPat', pid), sc('#azPNew', 1), sc('#azReqT', 0), sc('#azCastFirst', 0)]
+                   # (FIX STATE-5) the B3 keeps the phase-2 hazards running: the orbs back at their normal band (plan 4.8)
+                   + ([sc('#azOrbHigh', 0)] if name == 'to_b3' else []))
+        self.w('tr/resume', [
+            '# (FIX STATE-1) A decision point inside a transition with an empty main slot (a step was lost, e.g. a service',
+            '# cancelled by /reload): the step of #azTr again (2 the leg special host, 3 the landslide, 4 the absorb, 5 the B3).',
+            f'execute if score #azTr mb matches 2 run return run {F("tr/begin2")}',
+            sc('#azPNew', 1), sc('#azReqT', 0),
+            'execute if score #azTr mb matches 3 run return run scoreboard players set #azPat mb 20',
+            'execute if score #azTr mb matches 4 if score #azTrN mb matches 1 run return run scoreboard players set #azPat mb 21',
+            'execute if score #azTr mb matches 4 run return run scoreboard players set #azPat mb 22',
+            'execute if score #azTr mb matches 5 run return run scoreboard players set #azPat mb 23',
+            sc('#azPNew', 0), F('tr/done')])
         self.w('tr/done', ['# The transition is over (phase 2 after absorb 1; phase 3 surfaced after the B3).',
                            sc('#azTr', 0), sc('#azTrN', 0), sc('#azOrbHigh', 0), sc('#azSkipF', 1), sc('#azCool', 20),
                            sc('#azCastFirst', 0), sc('#azHudQ', 1)])
@@ -1008,7 +1031,9 @@ class Core:
         self.w('fld/ext_m', [A.fw('hz/extend', '{n:$(n)}').replace('function', '$function', 1)])
         self.w('fld/redraw', ['# Every live field\'s kit card again with its remaining life (resume).']
                + [f'execute if score #azF{i} mb matches 1.. run {F(f"fld/draw_{i}")}' for i in range(N)])
-        self.w('fld/remake', ['# /reload: every live field re-made from the table (the hazard with its remaining life, the card).']
+        self.w('fld/remake', ['# /reload: every live field re-made from the table (the hazard with its remaining life, the card). The',
+                              '# family volley groups start over once here (FIX STATE-15: the remade fields of a family share one group).']
+               + [sc(f'#azFG{f}', 0) for f in (1, 2, 3)]
                + [f'execute if score #azF{i} mb matches 1.. run {F(f"fld/remake_{i}")}' for i in range(N)])
         for i in range(N):
             self.w(f'fld/remake_{i}', [
@@ -1020,8 +1045,12 @@ class Core:
                 'execute store result score #azNfA mb run data get storage rlk:mboss az.nf.area',
                 f'execute if score #azF{i} mb matches 1.. run scoreboard players operation #azFldA mb -= #azFA{i} mb',
                 f'execute if score #azF{i} mb matches 1.. run scoreboard players remove #azFldN mb 1',
-                sc(f'#azFG{1}', 0), sc(f'#azFG{2}', 0), sc(f'#azFG{3}', 0),
-                f'function {NS}fld/remake_m with storage rlk:mboss az.f{i}'])
+                '# (FIX STATE-15) the table keeps its sequence (oldest-first caps), start tick and base life (refresh cap)',
+                f'scoreboard players operation #azRS mb = #azFS{i} mb', f'scoreboard players operation #azRT mb = #azFT{i} mb',
+                f'scoreboard players operation #azRB mb = #azFB{i} mb',
+                f'function {NS}fld/remake_m with storage rlk:mboss az.f{i}',
+                f'scoreboard players operation #azFS{i} mb = #azRS mb', f'scoreboard players operation #azFT{i} mb = #azRT mb',
+                f'scoreboard players operation #azFB{i} mb = #azRB mb'])
         self.w('fld/remake_m', [f'$execute positioned $(x) $(y) $(z) rotated $(ry) 0 run function {NS}fld/remake_go {{i:$(id)}}'])
         self.w('fld/remake_go', ['$scoreboard players set #azNfI mb $(i)']
                + [f'execute if score #azNfI mb matches {i} run return run {F(f"fld/make_{i}")}' for i in range(N)])
@@ -1490,7 +1519,8 @@ class Core:
                               g.px('inv'), sc('#azPh', 0), sc('#azHudQ', 1)])
         self.w('test/fire', ['# 33: one fire field (r 4.5 / 160 t, the fire rule\'s) under the player.',
                              f'execute at {PLAYER} positioned ~ {CY} ~ rotated ~ 0 run {F("test/fire_here")}'])
-        self.w('test/fire_here', g.field('fire', 4.5, 160, A.DMG['fire'], el=1, rule=True))
+        self.w('test/fire_here', g.field('fire', 4.5, 160, A.DMG['fire'], el=1, rule=True)
+               + ([F('p/firefield/amb_on')] if g.has('p/firefield/amb_on') else []))
         self.w('test/brand', ['# 70: a strike brand of the current absorbed element (phase 1: the leg element).',
                               'scoreboard players operation #azBrIn mb = #azLeg mb',
                               'execute if score #azPh mb matches 3 run scoreboard players operation #azBrIn mb = #azTail mb',

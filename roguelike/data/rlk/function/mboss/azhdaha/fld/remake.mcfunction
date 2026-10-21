@@ -1,4 +1,8 @@
-# /reload: every live field re-made from the table (the hazard with its remaining life, the card).
+# /reload: every live field re-made from the table (the hazard with its remaining life, the card). The
+# family volley groups start over once here (FIX STATE-15: the remade fields of a family share one group).
+scoreboard players set #azFG1 mb 0
+scoreboard players set #azFG2 mb 0
+scoreboard players set #azFG3 mb 0
 execute if score #azF0 mb matches 1.. run function rlk:mboss/azhdaha/fld/remake_0
 execute if score #azF1 mb matches 1.. run function rlk:mboss/azhdaha/fld/remake_1
 execute if score #azF2 mb matches 1.. run function rlk:mboss/azhdaha/fld/remake_2

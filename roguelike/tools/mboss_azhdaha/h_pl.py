@@ -24,7 +24,7 @@ ORB = dict(
     eye_half=30.0, eye_r=11.0,                          # the head-lane eye: front +-30 deg about the facing, < 11 b
     safe_pad=3.2 + 1.3 + 0.3,                           # 42 safe circle r 3.2 + orb r + 0.3: ride high over a circle
     y_lo=1.1, y_hi=3.6,                                 # prop centre heights (2.6 b sphere) for the two bands
-    rib=2,                                              # p/orb_ribbon every 2 t
+    rib=4,                                              # p/orb_ribbon every 4 t (FIX STATE-2: was 2)
     loop=20,                                            # orb_loop sound every 20 t
 )
 
@@ -44,12 +44,14 @@ MET = dict(
 MET['end'] = MET['small'][-1]                           # 94 = R + 74: g.cast_end() after the last field
 
 # ------------------------------------------------------------------------------------------------- 33 화염 잠식 / fields
-FIRE = dict(rule_r=4.5, rule_life=160, extend_r=4.0, amb=10, snd=20)
+# rule_cd (FIX FAIR-22, plan 4.7 change note): a new rule-33 field at most every rule_cd ticks (extending stays)
+FIRE = dict(rule_r=4.5, rule_life=160, extend_r=4.0, amb=10, snd=20, rule_cd=100)
 
 # ------------------------------------------------------------------------------------------------- addon bodies (4.6)
 GEYSER = dict(r=3.0, side=(5.0, 7.0), hit=10, tell=22)  # hit E + 10, decal + hazard from the call (E - 12)
-# I2 (perf probe, plan 8.1 <= 3000 commands / tick): lump i lands `stagger` x i ticks after lump 0 (its hazard's tell is
-# its own flight), so the three fireballs + fire fields of a volley never run in one tick.
+# I2 (perf probe, plan 8.1 <= 3000 commands / tick): lump i lands `stagger` x i ticks after lump 0, so the three fireballs
+# + fire fields of a volley never run in one tick; AZ fix round (STATE-2): lump i is also launched `stagger` x i ticks
+# after lump 0 (every flight 26 t = its hazard's tell), so the launch's hazards, props and timers spread too.
 LUMP = dict(r=2.2, flight=26, field=(4.0, 160), lead=8, rnd=(7, 14), apex=5.0, stagger=1,
             launch={'chin/impact': 8, 'jump/wave2': 0, 'stomp/w3': 2, 'stomp3/s3': 2})
 BLADE = dict(n=8, r0=2.0, spd=2.0, life=6, hr=1.6, up=0.9, launch=4,

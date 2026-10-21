@@ -6,7 +6,7 @@
     43 쏟아지는 천화 (icicle)   Cryo emitter (bg slot T): tail_cast, the ice sphere over the back, 5 lances at +30 .. +174
     44 번개의 가루 (shell)      Electro shells: tail_cast, 8 shells into a hover cloud, 8 dives (r 2.4, tell 12, 0.6)
     45 천동만상 – 얼음 가시      Cryo P4: 3 star fields (bursts t68 / 74 / 80, r 4.0, 1.0 + stack), hail in F1 / F2 100 t
-    46 천동만상 – 번개 가시      Electro P4: the hexagram zone marker + 6 lumps (t44 / 54 / 64 / 74 / 98 / 122, r 3.0, 0.7)
+    46 천동만상 – 번개 가시      Electro P4: the hexagram zone marker + 6 lumps (t44 / 59 / 74 / 89 / 104 / 122, r 3.0, 0.7)
     AZ:xt/**                   the Cryo / Electro addon bodies of plan 4.6 (frost rings, bolt discs, the whip's ice wall
                                 + hail strip, the whip's end bolts + crystal line + strip, the tail-slam strips)
 
@@ -83,9 +83,11 @@ ICE_FIELDS = 26
 ICE_BURST = (68, 74, 80)
 ICE_R, ICE_HAIL = 4.0, 100
 ICE_END = ICE_BURST[-1] + 8                           # 88
-# 46: hexagram t26 at lockv 10, lumps at t44 / 54 / 64 / 74 / 98 / 122 (lock 13 t before, bolt -3, fall 5 t)
+# 46: hexagram t26 at lockv 10, lumps at t44 / 59 / 74 / 89 / 104 / 122 (lock 13 t before, bolt -3, fall 5 t)
 HEX_T, HEX_R = 26, 4.8
-LUMP_HIT = (44, 54, 64, 74, 98, 122)
+# FIX FAIR-6 (plan 0 rule 3): the four lumps locked on the player 15 t apart (was 10), so a dash covers each of them
+# (2 charges + 1 per 20 t); 5 and 6 keep their ticks' order
+LUMP_HIT = (44, 59, 74, 89, 104, 122)
 LUMP_LOCK = 13
 LUMP_GROUPS = (0, 0, 1, 1, 2, 3)
 LUMP_R = 3.0
@@ -598,14 +600,26 @@ def icespike(g):
              f'execute as {f45(2)} store result entity @s Rotation[0] float 1 run random value 0..359',
              'execute store result storage rlk:mboss az.p45.d int 1 run random value 6..10',
              f'execute as {f45(2)} at @s rotated as @s run function {NS}p/icespike/mv with storage rlk:mboss az.p45']
-    for i, b in enumerate(ICE_BURST):
-        lines += [f'execute as {f45(i)} run {g.clamp_walk()}', f'execute at {f45(i)} run {F(f"p/icespike/f{i}")}']
+    lines += [f'execute as {f45(i)} run {g.clamp_walk()}' for i in range(len(ICE_BURST))]
+    # (FIX FAIR-8) clamping pulls F2 / F3 back onto F1 near the wall: fields that end up closer than r + 0.3 (the normal F2
+    # is 5 b off F1) share the first one's volley group (#aq45M<i> = 1 + the index of the field joined), so a player
+    # standing on a pile of clamped fields takes one burst
+    near = lambda i, j: f'execute at {f45(i)} if entity {f45(j).replace("limit=1", f"distance=..{num(ICE_R + 0.3)},limit=1")}'
+    lines += [sc('#aq45M1', 0), sc('#aq45M2', 0),
+              f'{near(1, 0)} run {sc("#aq45M1", 1)}',
+              f'{near(2, 1)} run {sc("#aq45M2", 2)}',
+              f'{near(2, 0)} run {sc("#aq45M2", 1)}']
+    lines += [f'execute at {f45(i)} run {F(f"p/icespike/f{i}")}' for i in range(len(ICE_BURST))]
     g.pw(key, 'fields', lines)
     g.pw(key, 'mv', ['$tp @s ^ ^ ^$(d)'])
     for i, b in enumerate(ICE_BURST):
         tell = b - ICE_FIELDS
-        g.pw(key, f'f{i}', [f'# Positioned at F{i + 1}: the star seal (keep) and its burst disc r {ICE_R}, tell {tell}, own group.',
-                            K.tele_starseal(ICE_R, tell, el=4, hold=3, fill=0), *hz(g, V45), L.hz_disc(ICE_R, tell, DMG['o45']),
+        join = [] if i == 0 else [f'execute if score #aq45M{i} mb matches {j + 1} run scoreboard players operation #hzGrp mb = #aq45G{j} mb'
+                                  for j in range(i)]
+        g.pw(key, f'f{i}', [f'# Positioned at F{i + 1}: the star seal (keep) and its burst disc r {ICE_R}, tell {tell}, own group (or the',
+                            '# group of a field it overlaps after the wall clamp: FIX FAIR-8).',
+                            K.tele_starseal(ICE_R, tell, el=4, hold=3, fill=0), *hz(g, V45), *join,
+                            f'scoreboard players operation #aq45G{i} mb = #hzGrp mb', L.hz_disc(ICE_R, tell, DMG['o45']),
                             g.tag_last_hz('rlk_mb_az_p45')])
     g.pw(key, 'hail', [f'# Positioned at F1 / F2 1 t after its burst: the hail field (N6) r {ICE_R} / {ICE_HAIL} t (never stacks Cryo); the',
                        '# hail keeps falling in it (one ambience chain for every live 45 hail field, every 8 t).',
@@ -620,6 +634,14 @@ def icespike(g):
                            f'execute at @e[type={MK},tag=rlk_mb_az_p45h,limit=1] run {K.snd("hail")}',
                            f'execute if entity @e[type={MK},tag=rlk_mb_az_p45h,limit=1] run {sc("#aq45H", 1)}']
          + [f'execute if score #aq45H mb matches 1 run {ln}' for ln in amb])
+    # FIX STATE-8: /reload kills the hail hazards and the chain's after() slot; fld/remake re-makes the fields without the
+    # 45 tag, so the re-made hail discs are tagged again and the chain restarts (reload -> reload_fld); ai/vars -> vars.
+    g.pw(key, 'vars', ['# (ai/vars) the hail ambience chain flag back to its fight-start value.', sc('#aq45H', 0)])
+    g.pw(key, 'reload_fld', ['# (reload, after fld/remake) the re-made hail discs (45\'s; the P7 hail strip is a line) get the tag',
+                             '# again and the ambience chain restarts.', sc('#aq45H', 0)]
+         + [f'execute if score #azF{i} mb matches {A.FIELD_FAM["hail"]} if data storage rlk:mboss az.f{i}{{sh:0}} run '
+            f'tag @e[type={MK},tag=rlk_mb_az_fld{i}] add rlk_mb_az_p45h' for i in range(A.FIELD_SLOTS)]
+         + [f'execute if entity @e[type={MK},tag=rlk_mb_az_p45h,limit=1] run {F("p/icespike/hail_go")}'])
     g.pw(key, 'vis', [f'execute if score #hzEv mb matches 1 if score @s mbHzV matches {V45} run {F("p/icespike/erupt")}',
                       f'execute if score #hzEv mb matches 1 if score @s mbHzV matches {VX_WALL} run {F("xt/whip_sweep/wall_fx")}'])
     g.pw(key, 'erupt', [K.fx('frost_burst', r=ICE_R), K.snd('ice_erupt')])
@@ -800,7 +822,7 @@ def whip_sweep(g):
     g.xw('whip_sweep/hail', ['# E+8 (as the body, 5 b along the end line from the tail root, rotated along it): the hail strip.',
                              *g.field('hail', 0, 60, DMG['x_hail'], el='tail', shape='line', len=7, w=3.5)])
     g.xw('whip_sweep/wall_fx', ['# @s = a wall piece on its strike (at the tail root, rotated to the piece\'s mid angle): ice walls.',
-                                f'execute positioned ^ ^ ^6.5 run {K.fx("ice_wall")}', f'execute positioned ^ ^ ^10 run {K.fx("ice_wall")}',
+                                f'execute positioned ^ ^ ^8.25 run {K.fx("ice_wall")}',     # (FIX STATE-14) one piece, 4 spikes along r
                                 g.sound('block.glass.break', 0.8, 0.7), g.sound('block.amethyst_cluster.break', 0.8, 0.8)])
 
 

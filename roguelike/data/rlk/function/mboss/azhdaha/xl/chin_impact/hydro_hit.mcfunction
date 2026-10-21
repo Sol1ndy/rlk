@@ -1,4 +1,5 @@
 # The geyser erupts (the hit tick): column, stream ring, sounds.
+kill @e[type=minecraft:marker,tag=rlk_mb_az_xlgk]
 function rlk:mboss/azhdaha/fx/p/geyser
 function rlk:mboss/azhdaha/fx/p/dust_ring/2 {r:30}
 playsound minecraft:entity.player.splash.high_speed hostile @a[tag=player] ~ ~ ~ 1 0.8 0.33

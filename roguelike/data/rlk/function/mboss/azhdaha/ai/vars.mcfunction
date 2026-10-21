@@ -171,6 +171,8 @@ scoreboard players set #azCdE31 mb 0
 scoreboard players set #azCdE32 mb 0
 scoreboard players set #azCdE43 mb 0
 scoreboard players set #azCdE44 mb 0
+function rlk:mboss/azhdaha/p/firefield/vars
+function rlk:mboss/azhdaha/p/icespike/vars
 scoreboard players set #azE mb 5
 scoreboard players set #azET mb 5
 scoreboard players set #azBand mb 2

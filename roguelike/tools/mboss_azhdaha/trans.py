@@ -163,7 +163,10 @@ def slide(g):
             ix, iz = _pt(w['paws'][0])
         hits = [*H.at_local(ix, iz, g.fxe('impact', 'ground'))]
         if k == 6:
-            hits += g.fxe('dust_ring', 'ground', r=6.0) + [K.snd('slide_wave6'), K.fx('rock_rain', r=12.0)]
+            # (FIX STATE-2) wave 6's dust ring and first rock rain 1 t after the chest impact (one tick of the fronts' start,
+            # the impact and both presets went over 3000 commands)
+            hits += [K.snd('slide_wave6')]
+            tl.at(s + 1, *g.fxe('dust_ring', 'ground', r=6.0), K.fx('rock_rain', r=12.0))
         else:
             hits += [K.snd('slide_wave')]
         tl.at(s, *hits)
@@ -215,10 +218,12 @@ def absorb1(g):
           *_leg(lambda e: K.snde('absorb_vortex', e)))
     tl.at(24, *_leg(lambda e: K.snde('absorb_vortex', e)), *_leg(lambda e: K.fxe('sigils', e)))
     # burst: the legs look, the arena recolour wave, the push-only ring r 8 with its dome, the banner
+    # (FIX STATE-2) the dust ring 1 t and the recolour wave 2 t after the burst tick (as absorb 2's burst)
     tl.at(ABS1_BURST, g.look_legs(), g.arena_look('leg'), A.fw('push/ring', PUSH_RING), g.banner('ab'),
-          *_leg(lambda e: K.snde('absorb_burst', e)), *_leg(lambda e: K.fxe('recolour', e, r=28.0, t=20)),
-          *_leg(lambda e: K.fxe('dust_ring', e, r=8.0)), K.fx('shock_dome', r=8.0),
+          *_leg(lambda e: K.snde('absorb_burst', e)), K.fx('shock_dome', r=8.0),
           *H.at_local(0, fl[1], _leg(lambda e: K.fxe('impact', e))))
+    tl.at(ABS1_BURST + 1, *_leg(lambda e: K.fxe('dust_ring', e, r=8.0)))
+    tl.at(ABS1_BURST + 2, *_leg(lambda e: K.fxe('recolour', e, r=28.0, t=20)))
     tl.at(ABS1_EV['gold_off'], g.glow(False))
     # pawing the ground (the stamps: left fore, then right)
     for ev_, (x, z) in (('stamp1', fl), ('stamp2', fr)):
@@ -239,8 +244,17 @@ def absorb1(g):
     g.pw(key, 'cancel', ['# Immediate cleanup: the cine and the gold glow end.', g.cine(False), g.glow(False)])
     g.pw(key, 'reload', ['# /reload inside absorb 1: it finishes at once (plan 4.3): the looks, phase 2, targetable again.',
                          f'execute if score #azPT mb matches ..{ABS1 - 1} run {g.phase(2)}',
+                         '# (FIX STATE-6) the leg special that opens phase 2 (plan 5 T2) was not cast yet, or its cast part is cut by',
+                         '# the core reload (orbs not out yet): the first phase-2 decision runs it (service 30 with its own roar)',
+                         f'execute if score #azPT mb matches ..{ABS1 - 1} unless score #azBgL mb matches 31 run function {NS}p/{key}/requeue',
+                         f'execute if score #azPT mb matches {ABS1}.. if score #azCast mb matches 31..32 unless score #azBgL mb matches 31 '
+                         f'run function {NS}p/{key}/requeue',
                          g.look_legs(), g.arena_look('leg'), g.cine(False), g.glow(False), g.px('normal'), g.banner('brand'),
                          g.end()])
+    g.pw(key, 'requeue', ['# The leg special as the next pick (#azReq 30 = the cast host; #azCastReq = the rolled leg element\'s).',
+                          'execute if score #azLeg mb matches 2 run scoreboard players set #azCastReq mb 31',
+                          'execute if score #azLeg mb matches 1 run scoreboard players set #azCastReq mb 32',
+                          'scoreboard players set #azReq mb 30'])
 
 
 # ============================================================================================ 22 absorb 2
@@ -260,14 +274,18 @@ def absorb2(g):
               f'execute if score #azTail mb matches 4 run {back(K.fx("hail", r=3.0))[0]}')
     tl.at(21, *_tail(lambda e: K.snde('absorb_vortex', e)))
     # burst: the tail look, phase 3 (floor 1), the arena, the push ring, the shard rain / bolts, the flash
+    # (FIX STATE-2) the burst's visuals over four ticks (one tick of ~36 new cards + the push ring went over 3000
+    # commands): the burst tick keeps the state, the push ring, the impact, the dome, the flash and the Electro bolt;
+    # the Cryo frost burst +1, the shard rain +2 (it runs to +48 anyway), the recolour wave +3
     tl.at(ABS2_BURST, g.look_tail(), g.arena_look('tail'), g.banner('ab2'), g.line(LINE_ABS2_BURST), g.phase(3),
-          A.fw('push/ring', PUSH_RING), *_centre(_tail(lambda e: K.fxe('shard_rain', e, r=20.0, t=48))),
-          *_tail(lambda e: K.snde('absorb_burst', e)), *_tail(lambda e: K.fxe('recolour', e, r=28.0, t=20)),
+          A.fw('push/ring', PUSH_RING), *_tail(lambda e: K.snde('absorb_burst', e)),
           *H.at_local(0, fl[1], _tail(lambda e: K.fxe('impact', e))), K.fx('shock_dome', r=8.0),
           f'execute if score #azTail mb matches 3 run {back(K.fx("bolt"))[0]}',
           f'execute if score #azTail mb matches 3 run {K.hud("flash_violet")}',
-          f'execute if score #azTail mb matches 4 run {K.hud("flash_white")}',
-          f'execute if score #azTail mb matches 4 run {K.fx("frost_burst", r=6.0)}')
+          f'execute if score #azTail mb matches 4 run {K.hud("flash_white")}')
+    tl.at(ABS2_BURST + 1, f'execute if score #azTail mb matches 4 run {K.fx("frost_burst", r=6.0)}')
+    tl.at(ABS2_BURST + 2, *_centre(_tail(lambda e: K.fxe('shard_rain', e, r=20.0, t=46))))
+    tl.at(ABS2_BURST + 3, *_tail(lambda e: K.fxe('recolour', e, r=28.0, t=20)))
     tl.at(ABS2_EV['gold_off'], g.glow(False))
     tl.at(ABS2, g.play('roar_rear'))
     tl.at(R, g.line(LINE_ABS2_ROAR), K.snd('absorb_roar'), g.cine(False), g.px('normal'))
@@ -358,6 +376,19 @@ def burrow3(g):
                          '# the leg element + brand, dodgeable (step away from the surfacing spot).',
                          g.GRP_NEW] + g.hz_opts(grp=True, kb=A.KB['heavy']) + g.el_ground()
          + [L.hz_disc(5.2, B.B3_BURST - B.B3_EMERGE_HZ, A.DMG['b3_emerge']), g.tag_last_hz('rlk_mb_az_p23e')])
+    # (FIX STATE-16) /reload inside the emergence window: the hazard again with the ticks left to the burst (it strikes
+    # with the visible burst at B3_BURST, not a full tell after the reload)
+    rem = L.hz_disc(5.2, 1, A.DMG['b3_emerge']).replace('tell:1,', 'tell:$(tell),')
+    assert '$(tell)' in rem, rem
+    g.pw(key, 'emerge_r', ['# Reload re-make of the emergence: the remaining tell (B3_BURST - 1 - #azPT, at least 1).',
+                           # the reload hook runs before this tick's #azPT step, so the hazard made now strikes on (#azPT + 1) + tell
+                           f'scoreboard players set #aq23T mb {B.B3_BURST - 1}', 'scoreboard players operation #aq23T mb -= #azPT mb',
+                           'execute if score #aq23T mb matches ..0 run scoreboard players set #aq23T mb 1',
+                           'execute store result storage rlk:mboss az.p23.tell int 1 run scoreboard players get #aq23T mb',
+                           f'function {NS}p/{key}/emerge_m with storage rlk:mboss az.p23'])
+    g.pw(key, 'emerge_m', ['# Macro {tell}: the emergence burst at the centre with the given tell.', g.GRP_NEW]
+         + g.hz_opts(grp=True, kb=A.KB['heavy']) + g.el_ground()
+         + ['$' + rem if not rem.startswith('$') else rem, g.tag_last_hz('rlk_mb_az_p23e')])
     g.pw(key, 'last', ['# HP 1 at the surfacing: "마지막 일격!" (the next hit kills through the normal path); a gold glow on the',
                        '# body (the gold parts lit) and gold motes at every hit proxy.',
                        'scoreboard players set #azLastHit mb 1', 'scoreboard players set #azHudQ mb 1', g.glow(True),
@@ -373,7 +404,8 @@ def burrow3(g):
     r = ['# The B3 resumes at its frame tick #azPT (plan 4.3; tests 25 / 61 start here): the proxy state, the rig clip, the',
          '# anchor at the centre after the glide, #azBur, the special (re-made from the current B3 tick, or started), the crater.',
          'scoreboard players operation #azB3T mb = #azPT mb', 'scoreboard players set #mbNoLeash mb 1',
-         f'execute if score #azPT mb matches {B.B3_GLIDE[1]}..{B.B3_EMERGE + 37} as {BODY} at {ARENA_M} run tp @s ~ ~ ~',
+         f'execute if score #azPT mb matches {B.B3_GLIDE[0]}..{B.B3_EMERGE + 37} as {BODY} at {ARENA_M} run tp @s ~ ~ ~',
+         '# (FIX STATE-4: from the glide\'s start: the body is hidden from t40, the stopped glide would leave it off-centre)',
          f'execute if score #azPT mb matches ..{B.B3_INV - 1} run {g.px("normal")}',
          f'execute if score #azPT mb matches {B.B3_INV}..{B.B3_TAILUP - 1} run {g.px("inv")}',
          f'execute if score #azPT mb matches {B.B3_TAILUP}..{B.B3_TAILSINK - 1} run {g.px("tail_only")}',
@@ -387,7 +419,7 @@ def burrow3(g):
          f'execute if score #azPT mb matches {B.B3_TAILUP}..{B.B3_OUT - 1} run scoreboard players set #azBur mb 1',
          f'execute if score #azPT mb matches {B.B3_TAILUP}..{B.B3_BURST - 1} if score #azB3Sp mb matches 1.. run {g.b3_special("reload")}',
          f'execute if score #azPT mb matches {B.B3_TAILUP}..{B.B3_BURST - 1} unless score #azB3Sp mb matches 1.. run {g.b3_special("start")}',
-         f'execute if score #azPT mb matches {B.B3_EMERGE_HZ}..{B.B3_BURST - 1} at {ARENA_M} run {F("emerge")}',
+         f'execute if score #azPT mb matches {B.B3_EMERGE_HZ}..{B.B3_BURST - 1} at {ARENA_M} run {F("emerge_r")}',
          f'execute if score #azPT mb matches ..{B.B3_OUT - 1} run {F("crater")}']
     g.pw(key, 'reload', r)
 

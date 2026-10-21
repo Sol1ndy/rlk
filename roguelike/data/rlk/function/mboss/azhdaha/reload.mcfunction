@@ -38,4 +38,7 @@ execute if score #azCast mb matches 1.. run function rlk:mboss/azhdaha/cast/canc
 execute if score #azBgL mb matches 1.. run function rlk:mboss/azhdaha/bg/reload_l
 execute if score #azBgT mb matches 1.. run function rlk:mboss/azhdaha/bg/reload_t
 function rlk:mboss/azhdaha/fld/remake
+# (FIX STATE-8) the field ambience chains (after() slots die with /reload) restart for the re-made fields
+function rlk:mboss/azhdaha/p/firefield/reload_fld
+function rlk:mboss/azhdaha/p/icespike/reload_fld
 scoreboard players set #azHudQ mb 1

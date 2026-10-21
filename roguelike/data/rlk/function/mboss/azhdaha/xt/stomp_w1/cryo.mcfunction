@@ -14,6 +14,6 @@ function rlk:mboss/hz/ring {r0:0,r:15,tell:14,dmg:60}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_x
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_xcr
 execute as @e[type=minecraft:marker,tag=rlk_mb_az_xcr] if score @s mbHzI = #hzLast mb run scoreboard players set @s azT 0
-scoreboard players set #azAftF mb 28
+scoreboard players set #azAftF mb 45
 scoreboard players set #azAftD mb 13
 function rlk:mboss/azhdaha/aft/new

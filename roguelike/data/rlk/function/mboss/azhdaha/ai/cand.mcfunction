@@ -50,6 +50,8 @@ execute if score #azPh mb matches 3 if score #azZone mb matches 2 run scoreboard
 execute if score #azPh mb matches 3 if score #azZone mb matches 3 run scoreboard players set #azC3 mb 10
 execute unless score #azF35 mb matches 1 run scoreboard players set #azC3 mb 0
 execute if score #azLast mb matches 3 run scoreboard players set #azC3 mb 0
+# (FIX FID-7) the charge only with a real run (a 4-12 b lunge is not the footage's charge)
+execute unless score #azRun3 mb matches 1 run scoreboard players set #azC3 mb 0
 scoreboard players set #azC4 mb 0
 execute if score #azPh mb matches 1 if score #azZone mb matches 1 run scoreboard players set #azC4 mb 4
 execute if score #azPh mb matches 1 if score #azZone mb matches 2 run scoreboard players set #azC4 mb 6

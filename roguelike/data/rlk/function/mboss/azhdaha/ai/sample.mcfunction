@@ -91,6 +91,9 @@ scoreboard players set #azZ mb 7002
 scoreboard players operation #azY mb *= #azZ mb
 execute if score #azFt mb matches 1.. if score #azX mb <= #azY mb run scoreboard players set #azF35 mb 1
 function rlk:mboss/azhdaha/ai/exit
+# (FIX FID-7) the P3 run: the point 12 b toward the player still inside the charge leash r 12
+scoreboard players set #azRun3 mb 0
+execute facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 positioned ^ ^ ^12 positioned ~ 201 ~ if entity @e[type=minecraft:marker,tag=rlk_mb_arena,distance=..12,limit=1] run scoreboard players set #azRun3 mb 1
 # anchor8: the anchor within 8 b of the arena centre
 scoreboard players set #azA8 mb 0
 execute at @s positioned ~ 201 ~ if entity @e[type=minecraft:marker,tag=rlk_mb_arena,distance=..8,limit=1] run scoreboard players set #azA8 mb 1

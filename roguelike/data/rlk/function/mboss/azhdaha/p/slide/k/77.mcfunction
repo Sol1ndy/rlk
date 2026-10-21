@@ -12,3 +12,4 @@ scoreboard players operation #hzEl mb = #azE mb
 scoreboard players operation #pjEl mb = #azE mb
 function rlk:mboss/hz/ring {r0:0,r:40,tell:20,dmg:80}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_az_p20w1
+scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p20w1,limit=1] mb 3000

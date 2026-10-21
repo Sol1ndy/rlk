@@ -3,7 +3,7 @@ fire rule, p/firefield/on_brand) and the leg-element addon bodies AZ:xl/** (Hydr
 host patterns' ADDON_POINTS (plan.md 4.5-4.7, 5 rows 31-33, Change note 1; s2.md 6, 9, 10, 17, 18).
 
 Telegraphs (Change note 1, the 10-20 rule): *keep* only 32's big seal (seal8 r 5.2, tell 28) and the P1 Hydro geyser
-swirl (the outline-only tele/disc_o r 3.0, tell 22); every other hazard draws no ground decal: 31 = the orb props, 32's small meteors = the
+swirl (the outline-only tele/swirl_o r 3.0, tell 22; FIX FID-4); every other hazard draws no ground decal: 31 = the orb props, 32's small meteors = the
 air halo + the falling prop, the Pyro lumps = the lump props in flight (26 t), the Hydro blades = the blade props inside
 the host's strike group. Every hit plays its impact preset at the hit tick.
 
@@ -89,9 +89,12 @@ def utils(g):
                           'data merge entity @s {transformation:{scale:[0f,0f,0f]}}'])
     half = H.LUMP['flight'] // 2
     for i in range(3):
-        fl = H.LUMP['flight'] + H.LUMP['stagger'] * i          # lump i's own flight (I2 perf stagger)
-        g.xw(f'u/lump_hz{i}', [f'# Positioned at lump target {i}: disc r {n(lr)}, tell {fl} (its flight), Pyro, the current volley group.']
-             + g.hz_opts(el=1, grp=True) + [L.hz_disc(lr, fl, A.DMG['x_lump'])])
+        # (FIX STATE-2) every lump flies `flight` ticks; lump i is launched `stagger` x i ticks after lump 0 (was: all three
+        # launched together with flights 26 / 27 / 28), so the launch's hazards, props and timers spread over three ticks;
+        # the landings stay 1 t apart (I2 perf stagger)
+        fl = H.LUMP['flight']
+        g.xw(f'u/lump_hz{i}', [f'# Positioned at lump target {i}: disc r {n(lr)}, tell {fl} (its flight), Pyro, the volley group of lump 0 (#axlLG).']
+             + g.hz_opts(el=1, grp=True) + ['scoreboard players operation #hzGrp mb = #axlLG mb', L.hz_disc(lr, fl, A.DMG['x_lump'])])
         g.xw(f'u/lump_fly{i}', [f'# @s = lump prop {i}, at its target: glides there over {fl} t (teleport_duration) on a',
                                 f'# two-segment arc (translation up {n(H.LUMP["apex"])} b over {half} t, down at the apex call).',
                                 f'data merge entity @s {{teleport_duration:{min(59, fl)},start_interpolation:0,'
@@ -139,9 +142,23 @@ def geyser(g):
     g.xw('chin_impact/hydro_at', ['# At the geyser spot: own volley group, Hydro, the swirl decal = the hazard (r, tell).',
                                   g.GRP_NEW] + g.hz_opts(el=2, grp=True) + [
         L.hz_disc(gy['r'], gy['tell'], A.DMG['x_geyser']),
-        K.tele_disc(gy['r'], gy['tell'], el=2, nd=0, hold=3, fill=0),
-        g.sound('block.bubble_column.whirlpool_inside', 0.9, 1.1)] + g.after(gy['tell'], 'xl/chin_impact/hydro_hit'))
+        K.tele_disc(gy['r'], gy['tell'], el=2, nd=0, hold=3, fill=0, style='swirl'),
+        g.sound('block.bubble_column.whirlpool_inside', 0.9, 1.1),
+        '# (FIX STATE-3) the keep spot and its due tick stay until the hit, so a resume redraws the swirl (xl/resume)',
+        'kill @e[type=minecraft:marker,tag=rlk_mb_az_xlgk]',
+        f'summon minecraft:marker ~ ~ ~ {{Tags:{tags("rlk_mb_az_x", "rlk_mb_az_xlgk")}}}',
+        'scoreboard players operation #axlGD mb = #azClk mb', f'scoreboard players add #axlGD mb {gy["tell"]}']
+        + g.after(gy['tell'], 'xl/chin_impact/hydro_hit'))
+    rd = g.ktele('swirl_o', 2, r=gy['r'], tell=gy['tell'], nd=0, hold=3)
+    g.xw('resume', ['# (core resume hook; FIX STATE-3) the kit cleared every attack decal at the pause: a geyser still ahead gets its',
+                    '# water-swirl outline again with the ticks it has left (the module clock froze with the fight).',
+                    'execute unless entity @e[type=minecraft:marker,tag=rlk_mb_az_xlgk,limit=1] run return 0',
+                    'scoreboard players operation #axlR mb = #axlGD mb', 'scoreboard players operation #axlR mb -= #azClk mb',
+                    'execute if score #axlR mb matches ..0 run return 0']
+         + rd[:-1] + ['execute store result storage rlk:mboss az.tl.tell int 1 run scoreboard players get #axlR mb',
+                      'execute at @e[type=minecraft:marker,tag=rlk_mb_az_xlgk,limit=1] run ' + rd[-1]])
     g.xw('chin_impact/hydro_hit', ['# The geyser erupts (the hit tick): column, stream ring, sounds.',
+                                   'kill @e[type=minecraft:marker,tag=rlk_mb_az_xlgk]',
                                    K.fx('geyser'), K.fxe('dust_ring', 2, r=gy['r']),
                                    g.sound('entity.player.splash.high_speed', 1.0, 0.8),
                                    g.sound('block.bubble_column.upwards_inside', 1.0, 1.0)])
@@ -165,7 +182,7 @@ def lumps(g, point):
     go = [f'# Launch (t{launch}): one new volley group; target 0 = lockv (lead {H.LUMP["lead"]}), 1 / 2 = random {H.LUMP["rnd"][0]}-'
           f'{H.LUMP["rnd"][1]} b from here;',
           '# every target out of the clear melee points; the hazards (tell = the flight); the props fly.',
-          g.GRP_NEW,
+          g.GRP_NEW, 'scoreboard players operation #axlLG mb = #mbGrp mb',
           L.lockv(H.LUMP['lead'])]
     go += [f'tag @e[type=minecraft:marker,tag=rlk_mb_lock] add {t}' for t in ('rlk_mb_az_pat', 'rlk_mb_az_x', pre, pre + 't', pre + 't0')]
     go += ['tag @e[type=minecraft:marker,tag=rlk_mb_lock] remove rlk_mb_lock']
@@ -178,14 +195,21 @@ def lumps(g, point):
                f'tag @e[type=minecraft:marker,tag=rlk_mb_az_xnt] add {pre}t',
                'tag @e[type=minecraft:marker,tag=rlk_mb_az_xnt] remove rlk_mb_az_xnt']
     go += [f'execute as {mks(pre + "t")} run {F("xl/u/clear_lump")}']
-    go += [f'execute as {mk(f"{pre}t{i}")} at @s run {F(f"xl/u/lump_hz{i}")}' for i in range(3)]
-    go += [f'execute as {mk(f"{pre}p{i}", "item_display")} at {mk(f"{pre}t{i}")} run {F(f"xl/u/lump_fly{i}")}' for i in range(3)]
+    lump = lambda i: [f'execute as {mk(f"{pre}t{i}")} at @s run {F(f"xl/u/lump_hz{i}")}',      # noqa: E731
+                      f'execute as {mk(f"{pre}p{i}", "item_display")} at {mk(f"{pre}t{i}")} run {F(f"xl/u/lump_fly{i}")}']
+    st = H.LUMP['stagger']
+    go += lump(0)
     go += [g.sound('item.firecharge.use', 1.0, 0.7), g.sound('entity.blaze.shoot', 0.7, 0.6)]
-    go += g.after(H.LUMP['flight'] // 2, f'xl/{pk}/pyro_apex') + g.after(H.LUMP['flight'], f'xl/{pk}/pyro_land0')
+    go += g.after(st, f'xl/{pk}/pyro_go1')
     g.xw(f'{pk}/pyro_go', go)
+    for i in (1, 2):
+        # the apex / landing timers are set by the last launch (one timer per tick: an api.after() call costs ~50 commands)
+        g.xw(f'{pk}/pyro_go{i}', [f'# Lump {i} leaves {st * i} t after lump 0 (FIX STATE-2: the launch spread over three ticks).']
+             + lump(i) + [g.sound('entity.blaze.shoot', 0.6, 0.7)]
+             + (g.after(st, f'xl/{pk}/pyro_go2') if i == 1 else
+                g.after(H.LUMP['flight'] // 2 - st, f'xl/{pk}/pyro_apex') + g.after(H.LUMP['flight'] - 2 * st, f'xl/{pk}/pyro_land0')))
     g.xw(f'{pk}/pyro_apex', ['# The lumps pass their apex.']
          + [f'execute as {mk(f"{pre}p{i}", "item_display")} run {F(f"xl/u/lump_down{i}")}' for i in range(3)])
-    st = H.LUMP['stagger']
     for i in range(3):
         g.xw(f'{pk}/pyro_land{i}', [f'# Landing of lump {i} (t{land + st * i}): its fireball + fire field, then its prop and target go'
                                     + (f'; lump {i + 1} lands {st} t later (I2 perf stagger).' if i < 2 else '.'),
@@ -203,13 +227,20 @@ def blades(g, point):
     g.xw(f'{pk}/hydro', [f'# {point} Hydro (plan 4.6; call t{call}, launch t{launch}, in flight to t{end}). As the body at the context',
                          '# point rotated to the player: the host group is kept for the launch (the next addon call may move it).',
                          'scoreboard players operation #axlBG mb = #azCtxGrp mb'] + g.after(launch - call, f'xl/{pk}/hydro_go'))
-    go = [f'# Launch: {b["n"]} blades radially (blade 0 toward the player) from r {n(b["r0"])}, {n(b["up"])} b up.']
-    for k in range(b['n']):
-        go.append(f'execute rotated ~{n(360.0 * k / b["n"])} 0 positioned ^ ^{n(b["up"])} ^{n(b["r0"])} run {F("xl/u/blade")}')
+    go = [f'# Launch: {b["n"]} blades radially (blade 0 toward the player) from r {n(b["r0"])}, {n(b["up"])} b up, two opposite',
+          '# blades per tick over 4 ticks (FIX STATE-2: eight pj/launch in one tick went over 3000 commands with the orbs up).']
+    nb = b['n']
+    pairs = [(k, k + nb // 2) for k in (0, 2, 1, 3)]           # opposite blades together: 0+4, 2+6, 1+5, 3+7
+    shot = lambda ks: [f'execute rotated ~{n(360.0 * k / nb)} 0 positioned ^ ^{n(b["up"])} ^{n(b["r0"])} run {F("xl/u/blade")}'   # noqa: E731
+                       for k in ks]
+    go += shot(pairs[0])
     # I2 (perf probe): the water splash at the blades' root (the host already plays its own impact + dust ring)
     go += [K.fx('splash'), g.sound('entity.player.splash.high_speed', 0.9, 1.2),
-           g.sound('item.trident.riptide_1', 0.6, 1.5)]
+           g.sound('item.trident.riptide_1', 0.6, 1.5)] + g.after(1, f'xl/{pk}/hydro_go2')
     g.xw(f'{pk}/hydro_go', go)
+    for j in (2, 3, 4):
+        g.xw(f'{pk}/hydro_go{j}', [f'# Blade pair {j} of 4, {j - 1} t after the first (same point and facing, the host group #axlBG).']
+             + shot(pairs[j - 1]) + (g.after(1, f'xl/{pk}/hydro_go{j + 1}') if j < 4 else []))
 
 
 # =============================================================================================== 31 격류 범람
@@ -447,12 +478,14 @@ def firefield(g):
     for i in range(A.FIELD_SLOTS):
         on.append(f'execute if score #aq33X mb matches 0 if score #azF{i} mb matches {A.FIELD_FAM["fire"]} as '
                   f'@e[type=minecraft:marker,tag=rlk_mb_az_fld{i},distance=..{n(fr["extend_r"])},limit=1] run {F(f"p/{key}/ext")}')
-    on += [f'execute if score #aq33X mb matches 0 run {F(f"p/{key}/new")}', F(f'p/{key}/amb_on')]
+    on += [f'# (FIX FAIR-22) a new field at most every {fr["rule_cd"]} t (#aq33C = the module tick it may come again); extending stays',
+           f'execute if score #aq33X mb matches 0 unless score #aq33C mb > #azClk mb run {F(f"p/{key}/new")}', F(f'p/{key}/amb_on')]
     g.pw(key, 'on_brand', on)
     g.pw(key, 'ext', ['# @s = a fire field hazard near the branded player: extended by its base life.',
                       g.field_refresh('@s', fr['rule_life']), 'scoreboard players set #aq33X mb 1',
                       f'execute at @s run {K.fx("fire_field", r=fr["rule_r"])}'])
-    g.pw(key, 'new', ['# A new fire-rule field under the player.']
+    g.pw(key, 'new', ['# A new fire-rule field under the player; the next one no sooner than rule_cd ticks later.',
+                      'scoreboard players operation #aq33C mb = #azClk mb', f'scoreboard players add #aq33C mb {fr["rule_cd"]}']
          + g.field('fire', fr['rule_r'], fr['rule_life'], A.DMG['fire'], el=1, rule=True)
          + [K.fx('fire_field', r=fr['rule_r']), g.sound('item.firecharge.use', 0.8, 0.9)])
     # the fire-field ambience (every live fire field, ours or not): an after() chain while any fire field lives
@@ -473,6 +506,16 @@ def firefield(g):
             'scoreboard players set #aq33A mb 0',
             f'execute if score #aq33N mb matches 1.. run {F(f"p/{key}/amb_arm")}']
     g.pw(key, 'amb', amb)
+    # FIX STATE-17 / STATE-8: the chain flag is a module-clock tick (#azClk restarts at 0 every fight) and its after() slot
+    # dies with /reload, so the core resets it at the fight start / cleanup (ai/vars -> vars) and re-arms it after the
+    # fields are re-made (reload -> reload_fld).
+    g.pw(key, 'vars', ['# (ai/vars) Rule 33\'s scratch back to the fight start: the ambience chain flag, its sound step and the',
+                       '# new-field cooldown (all module-clock ticks; #azClk restarts at 0 every fight).',
+                       'scoreboard players set #aq33A mb 0', 'scoreboard players set #aq33S mb 0', 'scoreboard players set #aq33C mb 0'])
+    g.pw(key, 'reload_fld', ['# (reload, after fld/remake) the ambience chain again for the re-made fire fields.',
+                             'scoreboard players set #aq33A mb 0', 'scoreboard players set #aq33S mb 0']
+         + [f'execute if score #azF{i} mb matches {A.FIELD_FAM["fire"]} run return run {F(f"p/{key}/amb_on")}'
+            for i in range(A.FIELD_SLOTS)])
 
 
 # =============================================================================================== emit

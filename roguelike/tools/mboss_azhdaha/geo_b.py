@@ -119,11 +119,16 @@ def emit_stomp(g):
             sub.at(made, *hz(g, pid, L.hz_disc(c['slam_r'], c['tell'], DMG[c['dmg']]), grp='cur'))
         sub.at(strike, g.snd('stomp_wave'))
         if i == 0:                                 # the paw's crystal cluster + cracks at the slam's hit, dust at the others
-            sub.at(strike, g.fxe('impact', 'ground'), g.fxe('cracks', 'ground', r=4.5))
+            # (FIX STATE-2: the cracks spread 1 t after the impact; the contact tick also plays the slam sound + crown)
+            sub.at(strike, g.fxe('impact', 'ground'))
+            sub.at(strike + 1, g.fxe('cracks', 'ground', r=4.5))
         else:
             sub.at(strike, g.fxe('dust_ring', 'ground', r=c['slam_r']))
-    sub.at(P5_SLAM, g.snd('stomp_slam'), g.fxe('crown', 'ground'))
-    sub.at(c['ev']['lift'], g.sound('block.deepslate.step', 1.0, 0.6), g.sound('entity.ravager.step', 0.8, 0.5))
+    # (FIX FID-1) the slam sound and the crown burst on the paw's contact = the w1 strike (the clip's slam event is the
+    # downstroke start, 4 t before the paw meets the floor); (FIX FAIR-7) the lift sound 2 t before the clip's lift
+    sub.at(c['strikes'][0], g.snd('stomp_slam'))
+    sub.at(c['strikes'][0] + 1, g.fxe('crown', 'ground'))       # (FIX STATE-2) the crown rises 1 t after the contact
+    sub.at(c['ev']['lift'] - LIFT_LEAD, g.sound('block.deepslate.step', 1.0, 0.6), g.sound('entity.ravager.step', 0.8, 0.5))
     # addon points: stomp/w1 (E 17, call 5; w1's group), stomp/w3 (E 47, call 35; w3's group)
     for point, grp_var in (('stomp/w1', '#aq5G1'), ('stomp/w3', '#aq5G3')):
         d = A.ADDON_POINTS[point]
@@ -141,6 +146,7 @@ def emit_stomp(g):
 
 
 P5_SLAM = HB.P5['ev']['slam']
+LIFT_LEAD = 2          # FIX FAIR-7: the P5 lift sound this many ticks before the clip's lift (t3: 14 t before w1)
 
 
 # ========================================================================================= P5b triple stomp (id 10)
@@ -163,7 +169,7 @@ def emit_stomp3(g):
                low=HB.P5['low'], ease=HB.P5['ease'], wid=c['wid'][i], tag=f'rlk_mb_az_p10w{i + 1}')
         sub.at(made, g.tag_last_hz('rlk_mb_az_p10'), g.tag_last_hz('rlk_mb_az_p10h'), keep_grp(gvars[i]),
                *hz(g, pid, L.hz_disc(c['slam_r'], c['tell'], DMG[c['dmg']]), grp='cur'))
-        sub.at(strike - 4, g.snd('stomp_slam'))
+        sub.at(strike, g.snd('stomp_slam'))            # (FIX FID-1) on the paw's contact, with the impact
         sub.at(strike, g.fxe('impact', 'ground'), g.snd('stomp_wave'))
         # the leg-element splash wall at the ring edge (+5; Hydro: splash_wall, else the element dust ring)
         sub.at(strike + c['splash'], f'execute if score #azE mb matches 2 run {g.fx("splash_wall", r=6.5)}',
@@ -201,8 +207,14 @@ def emit_feint(g):
     # the front (nose) and back (tail root) discs, dodgeable, same group
     for f in (c['nose_f'], c['back_f']):
         start += hz(g, pid, L.hz_disc(c['end_r'], tell, DMG[c['dmg_end']]), pos=f'execute positioned {loc(0, f)}')
-    start += [g.snd('feint_sway')]
-    tl.at(c['ev']['swayback'], g.snd('feint_sway'))
+    # (FIX FAIR-11) dust shaken off both flanks with each sway (t0 and the swayback t12): a body cue readable from the
+    # first tick (the plates' roll reaches 0.5 b only at t7; the strips are #hzNoDodge, 20 t floor)
+    sway_dust = [f'execute positioned {loc(sd * 3.4, 0.0)} positioned ~ ~1.6 ~ run {g.fx("dust")}' for sd in (1, -1)] + [
+        f'execute positioned {loc(sd * 3.0, f)} positioned ~ ~2.2 ~ run '
+        + g.particle('falling_dust{block_state:"minecraft:tuff"}', delta=(0.5, 0.8, 1.2), speed=0.0, n=8)
+        for sd in (1, -1) for f in (-1.5, 1.5)]
+    start += [g.snd('feint_sway')] + sway_dust
+    tl.at(c['ev']['swayback'], g.snd('feint_sway'), *sway_dust)
     tl.at(c['ev']['drop'], g.sound('block.deepslate.break', 1.0, 0.5))
     b = c['burst']
     burst = [g.snd('feint_burst')]
@@ -214,7 +226,10 @@ def emit_feint(g):
                   for ln in A._flat([g.fxe('flank_blades', 'ground', len=st['w']), g.fx('dust_wall', len=st['w'])])]
     for f, yaw in ((c['nose_f'], 0), (c['back_f'], 180)):
         burst += [f'execute positioned {loc(0, f)} rotated ~{yaw} 0 run {ln}' for ln in A._flat([g.fxe('slab_throw', 'ground')])]
-    tl.at(b, *burst)
+    # (FIX STATE-2) the dust walls 1 t after the blades and slabs (the burst tick went over 3000 commands)
+    walls = [ln for ln in burst if 'dust_wall' in ln]
+    tl.at(b, *[ln for ln in burst if 'dust_wall' not in ln])
+    tl.at(b + 1, *walls)
     for side in (1, -1):
         yaw, f0 = (0, st['f0']) if side == 1 else (180, st['f1'])
         tl.at(b + 9, f'execute positioned {loc(side * 6.5, f0)} rotated ~{yaw} 0 run {g.fx("dust_wall", len=st["w"])}')
@@ -277,14 +292,24 @@ def emit_whip(g):
             if (w['t'] - c['sweep']) % 2 == 0:
                 sub.at(w['t'], f'execute positioned {loc(ts, tf)} run {g.fx("boulders")}',
                        f'execute positioned {loc(w["s"], w["f"])} rotated ~{w["mid"]} 0 run {g.fx("tail_lane")}')
+        # (FIX STATE-14 / STATE-2) the impact burst at the nearest point, slab throws at the other three: the eruption tick
+        # stays inside the 64-card fx cap and the 3000-command tick budget with the sweep's trail cards still alive
         er = [f'execute positioned {loc(s, f)} run {ln}' for i, (s, f) in enumerate(geo['erupt'])
-              for ln in A._flat([g.fxe('impact', 'ground') if i % 2 == 0 else g.fxe('slab_throw', 'ground')])]
+              for ln in A._flat([g.fxe('impact', 'ground') if i == 0 else g.fxe('slab_throw', 'ground')])]
         s1, f1 = geo['erupt'][1]
         sub.at(c['erupt'], *er, f'execute positioned {loc(s1, f1)} run {g.snd("whip_erupt")}')
         sub.write()
         cond = 'if' if side == -1 else 'unless'
         for t in sub.ticks():
             tl.at(t, f'execute {cond} score #aq7S mb matches -1 at {frame} rotated as {frame} run {sub.fn(t)}')
+    # (FIX FID-8) a cue a first-person player at the swept flank sees during the raise (t0-20): grit raining off the tail
+    # root and dust kicked up along the flank on the side the tail will sweep (the raised tail is above the view)
+    for t in (2, 8, 14, 20):
+        for side in (1, -1):
+            cond = 'if' if side == -1 else 'unless'
+            tl.at(t, f'execute {cond} score #aq7S mb matches -1 positioned {loc(side * 3.6, -3.0)} positioned ~ ~0.6 ~ run {g.fx("dust")}',
+                  f'execute {cond} score #aq7S mb matches -1 positioned {loc(side * 1.2, -4.6)} positioned ~ ~3.0 ~ run '
+                  + g.particle('falling_dust{block_state:"minecraft:tuff"}', delta=(0.6, 0.4, 0.6), speed=0.0, n=10))
     tl.at(c['sweep'], g.snd('whip_sweep'))
     tl.span(c['nopush'][0], c['nopush'][1], 'scoreboard players set #azNoPush mb 1')
     tl.at(c['erupt'] + 1, g.release())
@@ -335,9 +360,12 @@ def emit_tailslam(g):
         'scoreboard players operation #azCtxSide mb = #azSide mb'])
     root = f'execute positioned {loc(0, c["root_f"])} rotated ~180 0'
     tl.at(d['call'], f'{root} run {fn}')
+    # (FIX STATE-2) the impact visuals over two ticks: the hit tick keeps the impact and the lane grit; the dust ring and
+    # the leaf burst follow 1 t later (one tick of ~32 new cards went over 3000 commands)
     tl.at(c['impact'], g.snd('tslam_impact'),
-          *[f'{root} run {ln}' for ln in A._flat([g.fx('tail_lane'), g.fxe('dust_ring', 'ground', r=2.5)])],
-          *[f'execute positioned {loc(0, c["root_f"] - 6.5)} run {ln}' for ln in A._flat([g.fxe('impact', 'ground')])],
+          *[f'{root} run {ln}' for ln in A._flat([g.fx('tail_lane')])],
+          *[f'execute positioned {loc(0, c["root_f"] - 6.5)} run {ln}' for ln in A._flat([g.fxe('impact', 'ground')])])
+    tl.at(c['impact'] + 1, *[f'{root} run {ln}' for ln in A._flat([g.fxe('dust_ring', 'ground', r=2.5)])],
           f'execute positioned {loc(0, c["root_f"] - 12.0)} run {g.fx("leaf_burst")}')
     tl.at(c['spikes'], *[f'{root} run {ln}' for ln in A._flat([g.fxe('spike_line', 'ground', len=c['len']), g.fx('cones')])])
     tl.at(c['impact'] + 1, g.release())
@@ -391,7 +419,7 @@ def emit_burrow(g):
     # --- rock rings (keep: the chevron ring outline from the decision, tell 19) under lockv lead 6, own groups
     g.pw(key, 'ring_at', ['# At a ring point: the hazard r 3.4 (own group) + its kit ring outline (keep), the ring sound, the shaft']
          + hz(g, pid, L.hz_disc(c['ring_r'], c['ring_tell'], D['ring']), el=5, grp='new', extra=('rlk_mb_az_p9ring',))
-         + [K.tele_disc(c['ring_r'], c['ring_tell'], el=5, fill=0), g.snd('burrow_ring'), g.fx('light_shaft')])
+         + [K.tele_disc(c['ring_r'], c['ring_tell'], el=5, fill=0, style='chev'), g.snd('burrow_ring'), g.fx('light_shaft')])
     g.pw(key, 'ring_hit', ['# At a ring point at its hit: the rock lands', g.snd('burrow_rock')] + A._flat([g.fxe('impact', 5)])
          + [g.fx('dust')])
     for i, t in enumerate(c['ring_t']):
@@ -448,7 +476,9 @@ def emit_burrow(g):
     g.pw(key, 'rush_step', ['# @s = body: 0.6 b/t along the lane (inside the arena), the rush disc rides the body',
                             f'execute at @s positioned ^ ^ ^{c["rush_spd"]} if function rlk:mboss/mv/ok run tp @s ~ ~ ~',
                             f'execute at @s as @e[type={MK},tag=rlk_mb_az_p9rush] run tp @s ~ ~ ~',
-                            f'execute at @s run {g.fx("dust")}'])
+                            '# (FIX STATE-2 / STATE-14) the dust trail every other tick (3 cards each, life 14)',
+                            'scoreboard players operation #aq9Q mb = #azPT mb', 'scoreboard players operation #aq9Q mb %= #c2 mb',
+                            f'execute if score #aq9Q mb matches 0 at @s run {g.fx("dust")}'])
     for n, (t, tc, th, te) in enumerate(zip(c['rush_t'], c['rush_clip'], c['rush_hit'], c['rush_end']), 1):
         tl.at(t, f'scoreboard players set #aq9N mb {n}', F('rush_pick'))
         for k in range(t, tc + 8, 5):
@@ -522,7 +552,7 @@ def emit_burrow(g):
                               'execute if score #t mb matches ..0 run return 0',
                               f'data modify storage rlk:mboss az.tl set value {{r:{int(round(c["ring_r"] * 10))},el:5,nd:0,hold:3}}',
                               'execute store result storage rlk:mboss az.tl.tell int 1 run scoreboard players get #t mb',
-                              (f'function {K.FN}tele/disc_o with storage rlk:mboss az.tl' if A.KIT else K._c('tele/disc'))])
+                              (f'function {K.FN}tele/chev_o with storage rlk:mboss az.tl' if A.KIT else K._c('tele/disc'))])
     g.pw(key, 'cancel', cancel_lines(pid, [
         '# the body comes back up (fight state only: death sets its own proxy state)',
         f'execute if score #mbSt mb matches 1 run {g.px("normal")}',
