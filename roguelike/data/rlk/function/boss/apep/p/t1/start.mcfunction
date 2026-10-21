@@ -7,4 +7,3 @@ function rlk:mboss/line/say {t:"종막 오아시스 파수꾼이 땅속으로 �
 function rlk:boss/apep/svc/cine_on
 scoreboard players set #apPLen mb 136
 execute unless entity 524c4b4d-4150-4800-8000-000000000000 run function rlk:boss/apep/heart/p1_respawn
-function rlk:boss/apep/heart/tick

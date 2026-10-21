@@ -2046,6 +2046,14 @@
    "ambient": false,
    "particles_only": false
   },
+  "o1_hit": {
+   "args": [],
+   "doc": "The basic organism's melee strike (O1 t10; AP-I2, requests/ap-rev.md RREV-6): a small pale-green flash and leaf bits at the cone. At the strike point (1.6 b ahead of the basic, 0.6 b up).",
+   "cards": 1,
+   "pool_cards": 0,
+   "ambient": false,
+   "particles_only": false
+  },
   "pred_burst": {
    "args": [],
    "doc": "The 포식성 burst r 3.6 (O6a t42). At the 포식성.",
@@ -2281,6 +2289,17 @@
    "ambient": false,
    "particles_only": false
   },
+  "flood_part": {
+   "args": [
+    "life",
+    "part"
+   ],
+   "doc": "The 종말의 여파 flood sliced over three ticks (AP-I2, requests/ap-p3.md RP3-3: the whole flood in one tick passed the 3000-commands budget): part {part} = 0 / 1 / 2 draws every third cell of p/flood (part 0 also the flash), {life} ticks. Call parts 0, 1, 2 on three consecutive ticks with life 24, 23, 22. At the floor centre.",
+   "cards": 0,
+   "pool_cards": 15,
+   "ambient": false,
+   "particles_only": false
+  },
   "dome_pop": {
    "args": [],
    "doc": "A dome pops: a flash and lime shards (Q2 t189). At the dome centre.",
@@ -2444,10 +2463,12 @@
  },
  "telegraphs": [
   "disc",
+  "disc_o",
   "sector",
   "wedge",
   "line",
   "crack",
+  "crack_o",
   "wave",
   "wave_end",
   "mask_wash",

@@ -20,6 +20,7 @@ kill @e[tag=rlk_mb_ap_stalkd]
 kill @e[tag=rlk_mb_ap_seed]
 kill @e[tag=rlk_mb_ap_om]
 kill @e[tag=rlk_mb_ap_aft]
+kill @e[tag=rlk_mb_ap_burstq]
 kill @e[tag=rlk_mb_ar_ap_oasis]
 kill @e[type=minecraft:husk,tag=rlk_mb_ap_org]
 function rlk:boss/apep/ai/vars

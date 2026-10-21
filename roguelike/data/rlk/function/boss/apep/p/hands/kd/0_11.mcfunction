@@ -1,6 +1,0 @@
-# dispatch #apPT 0..11
-execute if score #apPT mb matches 0 run return run function rlk:boss/apep/p/hands/k/0
-execute if score #apPT mb matches 5 run return run function rlk:boss/apep/p/hands/k/5
-execute if score #apPT mb matches 8 run return run function rlk:boss/apep/p/hands/k/8
-execute if score #apPT mb matches 9 run return run function rlk:boss/apep/p/hands/k/9
-execute if score #apPT mb matches 11 run return run function rlk:boss/apep/p/hands/k/11

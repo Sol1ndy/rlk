@@ -617,10 +617,12 @@ def _tenths(v):
     return int(round(v * 10))
 
 
-def tele_disc(r, tell, el=7, nd=0, hold=3):
+def tele_disc(r, tell, el=7, nd=0, hold=3, fill=1):
     """Disc decal of radius r blocks; the fill reaches the rim `tell` ticks after the call (the hz/* strike tick when
-    both are made in the same tick with the same tell)."""
-    return f'function {FN}tele/disc {{r:{_tenths(r)},tell:{int(tell)},el:{int(el)},nd:{int(nd)},hold:{int(hold)}}}'
+    both are made in the same tick with the same tell). fill=0: the outline-only variant tele/disc_o (the static rim
+    alone, flashing on the hit; same arguments; AP-I2, requests/fx.md RI1-1: the keep rows Q1 / Q3 shell 1 / Q3s)."""
+    return (f'function {FN}tele/{"disc" if fill else "disc_o"} {{r:{_tenths(r)},tell:{int(tell)},el:{int(el)},'
+            f'nd:{int(nd)},hold:{int(hold)}}}')
 
 
 def tele_sector(r, a, tell, el=7, nd=0, hold=3):
@@ -643,9 +645,11 @@ def tele_line(length, w, tell, el=7, nd=0, hold=3, back=0.0):
             f'el:{int(el)},nd:{int(nd)},hold:{int(hold)}}}')
 
 
-def tele_crack(length, w, tell, nd=0, hold=3, back=0.0):
-    return (f'function {FN}tele/crack {{len:{_tenths(length)},w:{_tenths(w)},back:{_tenths(back)},tell:{int(tell)},'
-            f'nd:{int(nd)},hold:{int(hold)}}}')
+def tele_crack(length, w, tell, nd=0, hold=3, back=0.0, fill=1):
+    """fill=0: the outline-only variant tele/crack_o (the rails, the caps and the white-gold crack line at full length,
+    no lane fill; same arguments; AP-I2, requests/fx.md RI1-1: P2's strips)."""
+    return (f'function {FN}tele/{"crack" if fill else "crack_o"} {{len:{_tenths(length)},w:{_tenths(w)},'
+            f'back:{_tenths(back)},tell:{int(tell)},nd:{int(nd)},hold:{int(hold)}}}')
 
 
 def tele_wave(wid, r0, r1, w, tell, dur, el=7, nd=0, hold=2):
@@ -1540,6 +1544,13 @@ def _p_bite_flash():
             part('crit', '~ ~0.8 ~', (0.3, 0.3, 0.3), 0.2, 6)]
 
 
+@preset('o1_hit', 'The basic organism\'s melee strike (O1 t10; AP-I2, requests/ap-rev.md RREV-6): a small pale-green '
+        'flash and leaf bits at the cone. At the strike point (1.6 b ahead of the basic, 0.6 b up).')
+def _p_o1_hit():
+    return [card('glint', bb='center', spin=40, s0=0.3, s1=1.4, life=4, fade=2, col=rgb('#E6F7B0')),
+            part('composter', '~ ~ ~', (0.35, 0.25, 0.35), 0, 6), part('crit', '~ ~ ~', (0.25, 0.2, 0.25), 0.1, 4)]
+
+
 @preset('pred_burst', 'The 포식성 burst r 3.6 (O6a t42). At the 포식성.')
 def _p_pred_burst():
     rnd = RND(28)
@@ -1825,6 +1836,17 @@ def _p_flood():
         out.append(f'execute positioned ~{num(x, 2)} ~ ~{num(z, 2)} unless entity @e[tag={DOME_TAG},distance=..{DOME_SKIP}] '
                    f'run function {FN}p/e/flood_tile with storage {STO} pf')
     return out + [flash(FLOOD, '~ ~1 ~', 1.0)]
+
+
+@preset('flood_part', 'The 종말의 여파 flood sliced over three ticks (AP-I2, requests/ap-p3.md RP3-3: the whole flood in one '
+        'tick passed the 3000-commands budget): part {part} = 0 / 1 / 2 draws every third cell of p/flood (part 0 also the '
+        'flash), {life} ticks. Call parts 0, 1, 2 on three consecutive ticks with life 24, 23, 22. At the floor centre.',
+        ('life', 'part'))
+def _p_flood_part():
+    return ['$scoreboard players set #wkFl mb $(life)', 'execute if score #wkFl mb matches ..5 run scoreboard players set #wkFl mb 6',
+            f'execute store result storage {STO} pf.l int 1 run scoreboard players get #wkFl mb',
+            '$scoreboard players set #wkFp mb $(part)'] + [
+        f'execute if score #wkFp mb matches {k} run function {FN}p/e/flood_s{k}' for k in range(3)]
 
 
 @preset('dome_pop', 'A dome pops: a flash and lime shards (Q2 t189). At the dome centre.')
@@ -2379,6 +2401,22 @@ def telegraphs(W):
         *mk('t_fill', '~ ~0.035 ~', '0.02f,1f,0.02f', '$(r)f,1f,$(r)f', 'c2'),
         *mk('$(rim)', '~ ~0.045 ~', '$(r)f,1f,$(r)f', '$(r)f,1f,$(r)f', 'c1'),
     ])
+    # outline-only disc (AP-I2, requests/fx.md RI1-1; the 10-20 telegraph rule: keep decals outline-like, no fill)
+    W.w('tele/disc_o', [
+        '# Outline-only disc decal (the 10-20 telegraph rule, keep rows without a footage fill): tele/disc\'s arguments',
+        '# {r, tell, el, nd, hold}; the static rim alone flashes on call + tell. 1 card (+1 with nd 2).',
+        *head(['$scoreboard players set #wkTr mb $(r)'], need=2),
+        'execute if score #wkTr mb matches ..1 run scoreboard players set #wkTr mb 2',
+        f'execute store result storage {STO} t.r float 0.1 run scoreboard players get #wkTr mb',
+        f'data modify storage {STO} t.rim set value "t_rim"',
+        f'execute if score #wkTr mb matches ..25 run data modify storage {STO} t.rim set value "t_rim_s"',
+        f'function {T}disc_o with storage {STO} t',
+        *jump,
+    ])
+    W.w('tele/e/disc_o', [
+        '# Internal (macro, storage t): the static rim alone.',
+        *mk('$(rim)', '~ ~0.045 ~', '$(r)f,1f,$(r)f', '$(r)f,1f,$(r)f', 'c1'),
+    ])
     # --- the fan of pieces (sector, wedge)
     sel = []
     for lo, hi, a, b, w in piece_k_coeffs():
@@ -2547,6 +2585,20 @@ def telegraphs(W):
     W.w('tele/e/crack', ['# Internal (macro, storage t).', *lane_cards,
                          *mk('t_crack', '^ ^0.04 ^$(nb)', '$(w)f,1f,0.02f', '$(w)f,1f,$(lb)f', str(WHITE),
                              col2=str(WHITE))])
+    # outline-only crack strip (AP-I2, requests/fx.md RI1-1 / ap-p1.md RP1-5; plan 14 10-20: "crack strip + rails, no
+    # t_lane progress fill"): the rails and caps with the white-gold crack line at full length from the call
+    W.w('tele/crack_o', [
+        '# Outline-only 생명의 손 crack strip (P2 keep row, no lane fill): tele/crack\'s arguments {len, w, back, tell, nd,',
+        '# hold}; the two rails, the two caps and the white-gold crack line along the middle, static, flashing on the hit.',
+        '# 5 cards.',
+        *head(lhead, el=False, need=5), *line_math(),
+        f'data modify storage {STO} t merge value {{c1:{g1},c2:{g2},c3:{g3}}}',
+        f'execute if score #wkTnd mb matches 1.. run data modify storage {STO} t.c1 set value {ND_RIM}',
+        f'function {T}crack_o with storage {STO} t',
+    ])
+    W.w('tele/e/crack_o', ['# Internal (macro, storage t).', *lane_cards[2:],
+                           *mk('t_crack', '^ ^0.04 ^$(nb)', '$(w)f,1f,$(lb)f', '$(w)f,1f,$(lb)f', str(WHITE),
+                               col2=str(WHITE))])
     # --- the expanding wave ring (ids)
     W.w('tele/wave', [
         '# Expanding wave ring id 0-7: {id, r0, r1, w (tenths), tell, dur (ticks), el, nd, hold}. At the floor centre.',
@@ -2743,6 +2795,12 @@ def dress_funcs(W):
 
 
 def flood_tile(W):
+    cells = flood_cells()
+    for k in range(3):
+        W.w(f'p/e/flood_s{k}', [f'# Internal (storage pf: l = life) of p/flood_part: the flood cells i = {k} (mod 3) of p/flood\'s grid.']
+            + [f'execute positioned ~{num(x, 2)} ~ ~{num(z, 2)} unless entity @e[tag={DOME_TAG},distance=..{DOME_SKIP}] '
+               f'run function {FN}p/e/flood_tile with storage {STO} pf' for i, (x, z) in enumerate(cells) if i % 3 == k]
+            + ([flash(FLOOD, '~ ~1 ~', 1.0)] if k == 0 else []))
     W.w('p/e/flood_tile', [
         '# Internal (macro, storage pf: l = life): one 7.5 b flood tile of the flood pool, growing from its centre in 4 t.',
         f'execute if score #wkFN mb matches {FLCAP}.. run return 0',
@@ -2942,7 +3000,7 @@ def preset_cards(name):
     """fx cards a preset spawns (card / cardx lines; the flood counts its pool tiles apart: preset_pool_cards)"""
     if name in ARC_BODIES:
         return ARC_BODIES[name]['n']
-    if name == 'flood':
+    if name in ('flood', 'flood_part'):
         return 0
     lines = preset_body(name)
     n = sum(1 for l in lines if f'{FN}card' in l)
@@ -2952,11 +3010,14 @@ def preset_cards(name):
 
 
 def preset_pool_cards(name):
+    if name == 'flood_part':
+        return (len(flood_cells()) + 2) // 3
     return len(flood_cells()) if name == 'flood' else 0
 
 
 # ----------------------------------------------------------------------------- tests and demos
-TEST_ARGS = {'r': 4.2, 'len': 8.0, 'r0': 3.0, 'r1': 14.4, 'dur': 14, 'a': 60, 'dir': 1, 'w': 3.0, 'h': 3.0, 'life': 24}
+TEST_ARGS = {'r': 4.2, 'len': 8.0, 'r0': 3.0, 'r1': 14.4, 'dur': 14, 'a': 60, 'dir': 1, 'w': 3.0, 'h': 3.0, 'life': 24,
+             'part': 0}
 
 
 def test_call(name):
@@ -3045,7 +3106,7 @@ def _demos():
         *[_ev(116, f'spawn{k}', f('spawn_marker'), snd('spawn_marker')) for k in range(3)],
         *[_ev(t, 'floor', f('gold_motes')) for t in (60, 80, 100, 120)]], [])
     D['organisms'] = sum([
-        _ev(0, 'org0', tele_sector(3.1, 27, 10)), _ev(10, 'org0', snd('o1_attack')), _ev(10, 'bulbT1', f('heart_hit'), snd('heart_hit')),
+        _ev(0, 'org0', tele_sector(3.1, 27, 10)), _ev(10, 'org0', snd('o1_attack'), f('o1_hit')), _ev(10, 'bulbT1', f('heart_hit'), snd('heart_hit')),
         _ev(20, 'org1', snd('o2_pivot'), tele_line(6.0, 1.4, 12), f('spark')), _ev(23, 'org1', f('crown_flare'), snd('o2_charge')),
         _ev(32, 'org1', snd('o2_shoot')), *[_ev(t, 'bolt', f('comet_trail')) for t in range(32, 42, 2)], _ev(42, 'org1', snd('o2_hit')),
         _ev(40, 'org2', snd('o3_collapse')), _ev(56, 'org2', snd('o3_collapse')), _ev(70, 'org0', snd('o3_cast'), f('shield_pop'), snd('o3_pop')),
@@ -3093,7 +3154,8 @@ def _demos():
            *[_ev(54 + 4 * k, f'dome{k}', f('dome_rise'), snd('q2_dome')) for k in range(3)],
            *[_ev(t, 'floor', f('floor_glitter')) for t in range(80, 156, 10)], _ev(95, 'player', snd('q2_tick')),
            *[_ev(t, 'floor', f('beam_rain')) for t in range(134, 157, 4)], _ev(134, 'floor', snd('q2_rain')),
-           _ev(156, 'player', hud('flash_white'), hud('banner_end')), _ev(156, 'floor', f('flood', life=24), snd('q2_blast')),
+           _ev(156, 'player', hud('flash_white'), hud('banner_end')), _ev(156, 'floor', f('flood_part', life=24, part=0), snd('q2_blast')),
+           _ev(157, 'floor', f('flood_part', life=23, part=1)), _ev(158, 'floor', f('flood_part', life=22, part=2)),
            *[_ev(189, f'dome{k}', f('dome_pop'), snd('q2_pop'), tele_safe_end(k)) for k in range(3)],
            _ev(190, 'body', f('green_burst'))]
     D['aftermath'] = sum(ev, [])
@@ -3308,7 +3370,7 @@ def manifest():
         'atlas_px_new': atlas_px(), 'atlas_budget': ATLAS_BUDGET,
         'presets': {k: {'args': v[1], 'doc': v[0], 'cards': preset_cards(k), 'pool_cards': preset_pool_cards(k),
                         'ambient': k in AMBIENT, 'particles_only': k in PTCL} for k, v in PRESETS.items()},
-        'telegraphs': ['disc', 'sector', 'wedge', 'line', 'crack', 'wave', 'wave_end', 'mask_wash', 'safe_rim', 'safe_end',
+        'telegraphs': ['disc', 'disc_o', 'sector', 'wedge', 'line', 'crack', 'crack_o', 'wave', 'wave_end', 'mask_wash', 'safe_rim', 'safe_end',
                        'mring', 'mring_move', 'mring_end', 'wall_spot', 'clear'],
         'dress': list(DRESS),
         'props': {k: v[0] for k, v in PROPS.items()},

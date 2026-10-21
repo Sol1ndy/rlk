@@ -1,10 +1,11 @@
 # AP-REV (plan 7.5-7.7, 3.4): the revival stage.
-# @s = body (phase 2, the module tick). The stage stops while a service (fail / CS) runs. Order: the clocks, the Heart's
-# and the walls' clips, the pending spawns, the organisms, the bolts, the Heart limits (CS / failure strike), the
+# @s = body (phase 2, the module tick; the core stepped the Heart's and the walls' clips before it). The stage stops
+# while a service (fail / CS) runs. Order: the clocks, the walls' clocks, the pending spawns, the organisms, the
+# bolts, the Heart limits (CS / failure strike), the
 # waves (every 8 t: due on <= 1 alive or the wave clock; a due wave waits for the cap), the
 # time-out, the ambience.
 execute if score #apPid mb matches 1.. run return 0
-execute unless score #apStage mb matches 1 run return run function rlk:boss/apep/heart/tick
+execute unless score #apStage mb matches 1 run return 0
 scoreboard players add #apClk mb 1
 scoreboard players add #apWT mb 1
 scoreboard players operation #apClk2 mb = #apClk mb
@@ -13,7 +14,6 @@ scoreboard players operation #apClk8 mb = #apClk mb
 scoreboard players operation #apClk8 mb %= #apK8 mb
 scoreboard players operation #apClk40 mb = #apClk mb
 scoreboard players operation #apClk40 mb %= #apK40 mb
-function rlk:boss/apep/heart/tick
 function rlk:boss/apep/wall/tick
 function rlk:boss/apep/org/pend_tick
 function rlk:boss/apep/org/tick

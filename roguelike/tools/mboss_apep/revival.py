@@ -4,21 +4,19 @@ strike (service 40) and the CS (service 60). The organisms and the walls are org
 
 The Heart is the AP-ORG object (fixed UUIDs, om/heart/**; its marker rlk_mb_ap_heart is summoned by om/heart/spawn/<state>):
 - E / phase 1: heart/p1_hang (the entrance state: the upright egg in the vine hand 9 b up, the cradle under the floor),
-  heart/p1_up (E t70: drawn up into the canopy over 30 t; nothing ticks the objects outside phase 2 yet (requests/ap-rev.md
-  RREV-1), so the draw-up is one client interpolation per display to the canopy pose of om/heart/spawn/canopy),
-  heart/p1_respawn (the canopy state);
+  heart/p1_up (E t70: heart_up, drawn up into the canopy over 30 t, then the heart_hang sway), heart/p1_respawn (the
+  canopy state);
 - T1: cradle_rise t45, heart_lower t50, heart_drop t100 (land t106, the beam), then heart_idle;
 - phase 2: lying in the full cradle (om/heart/spawn/play on a reload / the test jumps), heart_gain / heart_hit on every
   progress change, heart_wither in a failure strike;
 - CS: heart_blaze 0-24, heart_lift from t24 (the white-out hides the cradle going), the 「불씨」 ember, egg_green + the
   vine hand's wrap at t76, gone at t92 (the orb fades into the Warden).
-The module ticks the Heart's clips itself while it owns the stage (T1, phase 2, the failure strike, the CS: heart/tick).
+The core steps the Heart's clips (and the walls') every module tick while they exist (AP:obj/tick, AP-I2 RREV-1).
 
 Texts: only neutral info, the real game's prompt 「마물을 처치해서 소생 진행도를 올리세요」 (v2 39.6 s, v3) and the instant-kill
 warning of the failure strike (the no-tips rule, ap_contract 2.5; no first-time hints).
 """
 import math
-import re
 
 from .api import Pattern, Gen, BODY, ORGS, K
 from . import api as A
@@ -67,21 +65,6 @@ def sc(name, v):
     return f'scoreboard players set {name} mb {int(v)}'
 
 
-def canopy_pose():
-    """{display idx: the transformation SNBT} of the canopy state (from the generated om/heart/spawn/canopy; AP-ORG's
-    output, read only)."""
-    p = A.FDIR / 'om/heart/spawn/canopy.mcfunction'
-    if not p.exists():
-        return {}
-    out = {}
-    for ln in p.read_text(encoding='utf-8').splitlines():
-        m = re.search(r'UUID:\[I;-?\d+,-?\d+,-?\d+,(\d+)\]', ln)
-        t = re.search(r'(transformation:\{translation:\[[^\]]*\],left_rotation:\[[^\]]*\],scale:\[[^\]]*\],right_rotation:\[[^\]]*\]\})', ln)
-        if m and t and ln.startswith('summon'):
-            out[int(m.group(1))] = t.group(1)
-    return out
-
-
 def emit(g):
     F = g.fn
     fx, snd = K.fx, K.snd
@@ -89,28 +72,17 @@ def emit(g):
     g.w('heart/p1_hang', [HEAD, '# E t0 (seq/entrance/setup): the Heart\'s entrance state at the centre: the upright egg (scale 0.7) held by',
                           f'# the vine hand {HANG["entrance_y"]} b up, the cradle under the floor (summons the marker rlk_mb_ap_heart too).',
                           f'execute {AT_CEN} rotated 0 0 run function {NS}om/heart/spawn/entrance'])
-    pose = canopy_pose()
-    up = [HEAD, '# E t70 (and seq/entrance/done, idempotent): the Heart drawn up into the canopy (30 t, as heart_up). Until the core',
-          '# ticks the org objects outside phase 2 (RREV-1) this is one client interpolation per display to the canopy pose',
-          '# (om/heart/spawn/canopy\'s transforms); without a Heart (reload, the test skips) the canopy state at once.',
-          f'execute unless entity {BULB} run return run {F("heart/p1_respawn")}',
-          f'execute as {BULB} if entity @s[tag=rlk_mb_ap_hup] run return 0']
-    if pose:
-        for d in A.ORG['objects']['heart']['displays']:
-            i = int(d['idx'])
-            if i in pose:
-                up.append(f'data merge entity {UU[d["name"]]} {{start_interpolation:0,interpolation_duration:30,{pose[i]}}}')
-        up.append(f'tag {BULB} add rlk_mb_ap_hup')
-    else:
-        up.append(F('heart/p1_respawn'))
-    g.w('heart/p1_up', up)
+    g.w('heart/p1_up', [HEAD, '# E t70 (and seq/entrance/done, idempotent): the Heart drawn up into the canopy (heart_up, 30 t, then the',
+                        '# heart_hang sway; the core steps the clips: obj/tick); without a Heart (reload, the test skips) the canopy',
+                        '# state at once.',
+                        f'execute unless entity {BULB} run return run {F("heart/p1_respawn")}',
+                        f'execute as {BULB} if entity @s[tag=rlk_mb_ap_hup] run return 0',
+                        f'function {NS}om/heart/play/heart_up', f'tag {BULB} add rlk_mb_ap_hup'])
     g.w('heart/p1_respawn', [HEAD, '# The Heart hanging in the canopy (phase 1; a reload in phase 1, the phase-1 test jumps).',
                              f'execute {AT_CEN} rotated 0 0 run function {NS}om/heart/spawn/canopy', f'tag {BULB} add rlk_mb_ap_hup'])
     g.w('heart/play_state', [HEAD, '# The Heart lying in the full cradle at the centre (phase 2 ready: reload, the test jumps).',
                              f'execute {AT_CEN} rotated 0 0 run function {NS}om/heart/spawn/play'])
     g.w('heart/clear', [HEAD, '# The Heart marker and every Heart display go (idempotent, any executor).', f'function {NS}om/heart/kill'])
-    g.w('heart/tick', ['# Any executor, once per tick while the stage owns the Heart: its displays\' clips (om/heart/tick).',
-                       f'execute if entity {BULB} run function {NS}om/heart/tick'])
     g.w('heart/add', [HEAD, '# Macro {v}: progress + v (clamp 10000; the stage tick starts the CS at 10000): the gain swell, the sparkle and',
                       '# the chime (its pitch rises with the progress: #apHt first, requests/fx.md RFX-2).',
                       '$scoreboard players add #apHt mb $(v)',
@@ -138,17 +110,18 @@ def emit(g):
     g.w('rev/start_t1', [HEAD, '# T1 t136: the stage starts with wave 1 (marked at T1 t116, emerging now); the stage clock from 0.',
                          sc('#apWave', 1), sc('#apWT', 0), F('org/consts')] + restart)
     g.w('rev/tick', [
-        HEAD, '# @s = body (phase 2, the module tick). The stage stops while a service (fail / CS) runs. Order: the clocks, the Heart\'s',
-        '# and the walls\' clips, the pending spawns, the organisms, the bolts, the Heart limits (CS / failure strike), the',
+        HEAD, '# @s = body (phase 2, the module tick; the core stepped the Heart\'s and the walls\' clips before it). The stage stops',
+        '# while a service (fail / CS) runs. Order: the clocks, the walls\' clocks, the pending spawns, the organisms, the',
+        '# bolts, the Heart limits (CS / failure strike), the',
         '# waves (every 8 t: due on <= 1 alive or the wave clock; a due wave waits for the cap), the',
         '# time-out, the ambience.',
         'execute if score #apPid mb matches 1.. run return 0',
-        f'execute unless score #apStage mb matches 1 run return run {F("heart/tick")}',
+        'execute unless score #apStage mb matches 1 run return 0',
         'scoreboard players add #apClk mb 1', 'scoreboard players add #apWT mb 1',
         'scoreboard players operation #apClk2 mb = #apClk mb', 'scoreboard players operation #apClk2 mb %= #apK2 mb',
         'scoreboard players operation #apClk8 mb = #apClk mb', 'scoreboard players operation #apClk8 mb %= #apK8 mb',
         'scoreboard players operation #apClk40 mb = #apClk mb', 'scoreboard players operation #apClk40 mb %= #apK40 mb',
-        F('heart/tick'), F('wall/tick'), F('org/pend_tick'),
+        F('wall/tick'), F('org/pend_tick'),
         F('org/tick'),
         F('org/bolts'),
         f'execute if score #apHt mb matches {R["win"]}.. run return run {Gen.svc("req_cs")}',
@@ -329,8 +302,8 @@ def emit(g):
                          '# t100 the drop (land t106: the beam, the Heart title, progress 2700, music 2, the ley lines); t108 the goal line,',
                          '# cine off; t116 wave 1\'s spawn markers; t136 phase 2.',
                          Gen.line(T['t1_sink'], '#E8E2D0', 60), Gen.svc('cine_on'), Gen.set_len(A.T1_LEN),
-                         f'execute unless entity {BULB} run {F("heart/p1_respawn")}', F('heart/tick')])
-    g.pw('t1', 'tick', [HEAD, F('heart/tick')] + TL1 + hz10)
+                         f'execute unless entity {BULB} run {F("heart/p1_respawn")}'])
+    g.pw('t1', 'tick', [HEAD] + TL1 + hz10)
     g.pw('t1', 'heart_on', [HEAD, '# T1 t106: the Heart objective: its title (FN-6 + the kit title line), the gold progress, music 2, the',
                             '# ley-line dressing, the stage markers.',
                             Gen.svc('title_heart'), K.hud('title', g='heart', t=T['title_heart'], c=A.HEART_HEX, s='', hold=50),
@@ -359,7 +332,7 @@ def emit(g):
                              sc('#apHt', R['fail_restart']), F('rev/start'),
                              f'execute if entity {BULB} run function {NS}om/heart/look/heart_bulb/idle',
                              f'execute if entity {BULB} run function {NS}om/heart/play/heart_idle', Gen.end()])
-    g.pw('fail', 'tick', [HEAD, F('heart/tick'),
+    g.pw('fail', 'tick', [HEAD, F('org/burst_q'),
                           Gen.at(FAIL['strike'], f'execute unless score #apq40L mb matches 1 run {F("p/fail/strike")}'),
                           f'execute if score #apPT mb matches {FAIL["end"]}.. run {F("p/fail/restart")}'])
     g.pw('fail', 'reload', [HEAD, '# /reload during the strike: the restart at once (the Heart is re-made by rev/reload).',
@@ -409,7 +382,7 @@ def emit(g):
     g.pw('cs', 'burst', [HEAD, f'# t{CS["burst"]}: the Warden bursts out of the water at the centre in a leaf splash; the egg fades into it.',
                          f'execute {AT_CEN} run {fx("revival_burst")}', f'execute {AT_CEN} run {fx("water_splash")}',
                          f'execute {AT_CEN} run {snd("cs_emerge")}', F('heart/clear')])
-    g.pw('cs', 'tick', [HEAD, F('heart/tick')] + cs)
+    g.pw('cs', 'tick', [HEAD, F('org/burst_q')] + cs)
     g.pw('cs', 'done', [HEAD, Gen.svc('phase_3'), Gen.end()])
     g.pw('cs', 'cancel', [HEAD, Gen.svc('cine_off')])
     assert t1 is TL1

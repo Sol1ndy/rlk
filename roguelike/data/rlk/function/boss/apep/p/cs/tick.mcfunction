@@ -1,5 +1,5 @@
 # AP-REV (plan 7.5-7.7, 3.4): the revival stage.
-function rlk:boss/apep/heart/tick
+function rlk:boss/apep/org/burst_q
 execute if score #apPT mb matches 3 run execute positioned 440 202.6 8 run function rlk:boss/apep/fx/p/gold_drip
 execute if score #apPT mb matches 6 run execute positioned 440 202.6 8 run function rlk:boss/apep/fx/p/gold_drip
 execute if score #apPT mb matches 9 run execute positioned 440 202.6 8 run function rlk:boss/apep/fx/p/gold_drip

@@ -234,8 +234,16 @@ def emit(g):
                       'kill @e[type=minecraft:marker,tag=rlk_mb_ap_ospawn]', 'kill @e[type=minecraft:marker,tag=rlk_mb_ap_cand]',
                       'kill @e[type=minecraft:item_display,tag=rlk_mb_ap_bolt]', 'kill @e[type=minecraft:marker,tag=rlk_mb_ap_ohz]',
                       'kill @e[type=minecraft:marker,tag=rlk_mb_ap_wlock]', sc('#apSlots', 0)])
-    g.w('org/burst_all', [HEAD, '# Every living organism bursts (a failure strike, the CS wilt; no progress): its burst fx at it.',
-                          f'execute as {ORGS} at @s positioned ~ ~0.6 ~ run {fx("org_burst")}'])
+    g.w('org/burst_all', [HEAD, '# Every living organism bursts (a failure strike, the CS wilt; no progress): its burst fx at it, two at once,',
+                          '# the rest queued (a marker each, two per tick from the service\'s tick: org/burst_q; perf, AP-I2: six bursts',
+                          '# with the strike / wilt tick passed the 3000-commands budget).',
+                          f'execute as {ORGS.replace("]", ",limit=2]")} at @s positioned ~ ~0.6 ~ run {fx("org_burst")}',
+                          f'execute as {ORGS.replace("]", ",limit=2]")} run tag @s add rlk_mb_ap_burst',
+                          f'execute as {ORGS.replace("]", ",tag=!rlk_mb_ap_burst]")} at @s run summon minecraft:marker ~ ~0.6 ~ '
+                          '{Tags:["rlk_room","rlk_mb_aux","rlk_mb_ap_burstq"]}'])
+    g.w('org/burst_q', [HEAD, '# Any executor (the failure strike and the CS ticks): two queued organism bursts.',
+                        f'execute as @e[type=minecraft:marker,tag=rlk_mb_ap_burstq,limit=2] at @s run {F("org/burst_one")}'])
+    g.w('org/burst_one', [HEAD, f'# @s = a queued burst marker, at it.', fx('org_burst'), 'kill @s'])
     g.w('org/freeze', [HEAD, '# Pause in phase 2: the organisms are NoAI husks stepped only by the module tick (off while paused). The walls',
                        '# are cleared by wall/clear; a 둥지 in its cast goes back to flying and re-casts later.',
                        f'execute as @e[type=minecraft:husk,tag=rlk_mb_ap_nest,scores={{apS=2}}] run {F("org/nest/abort")}',
@@ -349,12 +357,11 @@ def emit(g):
                            L.hz_sector(o1['r'], o1['a'], o1['tell'], o1['dmg'])])
     g.w('org/basic/m_hit', [
         '# The O1 strike: the Heart loses (a body-blocking player took the cone instead of nothing: the hazard is the framework\'s);',
-        '# the hit sound and a small hit fx at the cone (TODO(I2) RI1-1: the kit\'s O1 impact preset).',
+        '# the hit sound and the kit\'s O1 impact preset at the cone (AP-I2, RREV-6).',
         f'execute if entity @s[tag=rlk_mb_ap_buff] run function {NS}heart/sub {{v:{o1["heart_buff"]}}}',
         f'execute unless entity @s[tag=rlk_mb_ap_buff] run function {NS}heart/sub {{v:{o1["heart"]}}}',
         f'execute at @s run {snd("o1_attack")}',
-        f'execute at @s rotated as @s rotated ~ 0 positioned ^ ^0.6 ^1.6 run {Gen.particle("composter", "~ ~ ~", (0.35, 0.25, 0.35), 0, 8)}',
-        f'execute at @s rotated as @s rotated ~ 0 positioned ^ ^0.6 ^1.6 run {Gen.particle("crit", "~ ~ ~", (0.25, 0.2, 0.25), 0.1, 5)}'])
+        f'execute at @s rotated as @s rotated ~ 0 positioned ^ ^0.6 ^1.6 run {K.fx("o1_hit")}'])
     # O2 ranged
     o2 = HZ['o2']
     g.w('org/basic/lie_go', ['# A ranged basic on its ring: it lies down (basic_lie 10 t: bell -> bag), facing the Heart.',
@@ -860,9 +867,8 @@ def emit(g):
     wrise, wfade = A.org_clip('wall', 'wall_rise'), A.org_clip('wall', 'wall_fade')
     life = 40
     g.w('wall/tick', [
-        f'# Any executor, every phase-2 tick: the blade clips (om/wall/tick) and each group\'s clock: stand {life} t, then its blocks go',
-        f'# (exactly the recorded ones) and the blades dissolve ({wfade["len"]} t, motes).',
-        f'execute if entity @e[type=minecraft:item_display,tag=rlk_mb_ap_wall_blade,limit=1] run function {NS}om/wall/tick',
+        f'# Any executor, every phase-2 tick: each group\'s clock: stand {life} t, then its blocks go (exactly the recorded ones)',
+        f'# and the blades dissolve ({wfade["len"]} t, motes). The core steps the blade clips (obj/tick, AP-I2 RREV-1).',
         f'execute as @e[type=minecraft:marker,tag=rlk_mb_ap_wall] run {F("wall/group")}'])
     g.w('wall/group', ['scoreboard players add @s apT 1',
                        f'execute if score @s apT matches {life} run {F("wall/dissolve")}',

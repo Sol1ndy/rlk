@@ -89,7 +89,7 @@
       "icon": {"item": "minecraft:raw_gold_block", "model": "rlk:mboss/az_kit/gate_icon"}
     },
     {
-      "id": "apep", "n": 11, "fn": "boss/apep", "kind": "chapter", "ch": [3], "route": false, "enabled": true, "w": 0,
+      "id": "apep", "n": 11, "fn": "boss/apep", "kind": "chapter", "ch": [3], "route": true, "enabled": true, "w": 0,
       "minCh": 3, "maxCh": 3, "name": "아펩의 오아시스 파수꾼", "sub": "종막 오아시스 파수꾼", "color": "#C9C452", "el": 7,
       "hp": 290, "xp": 40, "atk": 12, "lvAdd": 0, "dmgMul": 150, "goldMul": 1, "sap": 0, "picks": 0,
       "scale": 2.0, "hit": {"w": 2.6, "h": 3.6}, "intro": 110, "death": 140, "deathSnd": false,

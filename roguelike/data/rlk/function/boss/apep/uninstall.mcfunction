@@ -19,8 +19,12 @@ kill @e[tag=rlk_mb_ap_stalkd]
 kill @e[tag=rlk_mb_ap_seed]
 kill @e[tag=rlk_mb_ap_om]
 kill @e[tag=rlk_mb_ap_aft]
+kill @e[tag=rlk_mb_ap_burstq]
 kill @e[tag=rlk_mb_ar_ap_oasis]
 kill @e[type=minecraft:husk,tag=rlk_mb_ap_org]
+# every AP-ORG display (organism models, the Heart, domes, stalks, the seed, wall
+# blades; AP-I2 RREV-4): their husks die above, so the dismounted models go by tag
+kill @e[tag=rlk_ap_om]
 kill @e[tag=rlk_mb_ap_gate]
 data remove storage rlk:mboss ap
 scoreboard objectives remove apK

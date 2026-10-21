@@ -14,7 +14,6 @@ import json
 from . import PATTERN_MODULES, SERVICE_MODULES
 from . import api as A
 from . import ai as AI
-from . import stub_rig as SR
 from .api import L, K, Gen, TL
 
 NS = A.NS
@@ -22,6 +21,8 @@ OWN_TOP = A.ROOT                      # boss/apep (registry fn)
 BODY, PLAYER, ARENA_M, HEART_M = A.BODY, A.PLAYER, A.ARENA_M, A.HEART_M
 CY = A.CY
 HUD_EVERY = 4
+Q2_BLAST, Q2_POP = A.ev('aftermath', 'blast'), A.ev('aftermath', 'pop')     # 156, 189 (the Q2 countdown, RP3-2)
+Q2_RED, Q2_GOLD = 2, 8                     # bossui under-bar codes: 2 the warm red-orange (#FF8A3D), 8 the gauge gold
 PH = A.PH
 T = A.TXT
 
@@ -69,35 +70,19 @@ def build():
             assert g.has(f'p/{p.key}/{f}'), f'{p.module}: pattern {p.key} has no {f}'
         for h in p.hooks:
             assert g.has(f'p/{p.key}/{h}'), f'{p.module}: pattern {p.key} declares {h} but writes no file'
-    SR_emit(g)
     removed = clean(out)
     normal = [p for p in pats if p.kind == 'normal']
     print(f'mboss apep: {len(g.files)} functions ({len(normal)} normal patterns, {len(pats) - len(normal)} other, modules '
-          f'{", ".join(PATTERN_MODULES + SERVICE_MODULES)} + core), {removed} stale removed; rig manifest '
-          f'{"rig" if A.REAL_MAN else "absent"} + stub ({len(A.FALLBACKS)} clip fallbacks); org manifest org.')
+          f'{", ".join(PATTERN_MODULES + SERVICE_MODULES)} + core), {removed} stale removed; rig manifest rig '
+          f'({len(A.CLIPS)} clips); org manifest org.')
     notes = []
     if A.THEME_STUBBED:
         notes.append('WARN theme ap_oasis missing (AP-ARENA unmerged): api._THEME_FALLBACK used (stub arena, no props but '
                      'the lush water tiles, no gate crystals, no look swap)')
-    if A.FALLBACKS:
-        notes.append(f'rig: {len(A.FALLBACKS)} clips from the stub manifest' + ('' if A.REAL_RIG else ', the stand-in rig rig_stub/'))
     for n in notes:
         print('  note: ' + n)
     for clip, event, default in sorted(set(A.EV_FALLBACKS)):
         print(f'  note: manifest clip {clip} has no event {event!r}; using tick {default}')
-
-
-def SR_emit(g):
-    """The stub rig manifest JSON (always: the framework reads it beside / instead of the real one) and, while needed,
-    the stand-in rig AP:rig_stub/**."""
-    from . import stub_rig_rt as RT
-    # the framework reads this file while no real manifest exists (px sets -> the rig's state functions): its rig API
-    # paths name the stand-in AP:rig_stub/** (the in-memory STUB keeps the contract's AP:rig/** names, ap_contract 0.4.9)
-    doc = json.dumps(A.STUB, ensure_ascii=False, indent=1).replace(f'"{A.NS}rig/', f'"{A.NS}rig_stub/')
-    A.STUB_MANIFEST.write_text(doc + '\n', encoding='utf-8')
-    if A.stub_rig_needed():
-        RT.emit(g, A.MAN)
-
 
 
 class KitOwned:
@@ -161,7 +146,7 @@ def txt(t, col, bold=False):
 ENTITY_OBJ = ('apK', 'apS', 'apT', 'apL', 'apShd', 'apOC', 'apOI', 'apSock', 'apTok')
 MODULE_TAGS = ('rlk_mb_ap_pat', 'rlk_mb_ap_kept', 'rlk_mb_ap_lock', 'rlk_mb_ap_pop', 'rlk_mb_ap_heart', 'rlk_mb_ap_heartd',
                'rlk_mb_ap_dome', 'rlk_mb_ap_domed', 'rlk_mb_ap_wall', 'rlk_mb_ap_wall_blade', 'rlk_mb_ap_stalk',
-               'rlk_mb_ap_stalkd', 'rlk_mb_ap_seed', 'rlk_mb_ap_om', 'rlk_mb_ap_aft')
+               'rlk_mb_ap_stalkd', 'rlk_mb_ap_seed', 'rlk_mb_ap_om', 'rlk_mb_ap_aft', 'rlk_mb_ap_burstq')
 
 
 class Core:
@@ -290,6 +275,25 @@ class Core:
                   'scoreboard players operation #apYd mb += #apYaw0 mb',
                   'execute store result entity @s Rotation[0] float 0.01 run scoreboard players get #apYd mb'])
         self.w('yaw/get', ['$execute store result score #apYd mb run data get storage rlk:mboss ap.yw.c$(c)[$(t)]'])
+        self.w('yaw/rebase', [
+            '# @s = body (Gen.yaw_rebase(); AP-I2, requests RP1-1 / RP3-1): a pattern turned the body inside a yaw clip; the',
+            '# driver keeps that facing: #apYaw0 = Rotation x 100 - sign x schedule[t], t = the tick it shows next (#apYawT + 1).',
+            'execute unless score #apYawC mb matches 1.. run return 0',
+            'execute store result score #apYaw0 mb run data get entity @s Rotation[0] 100',
+            'execute store result storage rlk:mboss ap.ya.c int 1 run scoreboard players get #apYawC mb',
+            'scoreboard players operation #apYd mb = #apYawT mb', 'scoreboard players add #apYd mb 1',
+            'execute store result storage rlk:mboss ap.ya.t int 1 run scoreboard players get #apYd mb',
+            sc('#apYd', 0), f'function {NS}yaw/get with storage rlk:mboss ap.ya',
+            'scoreboard players operation #apYd mb *= #apYawSg mb',
+            'scoreboard players operation #apYaw0 mb -= #apYd mb'])
+        objs = [('heart', 'rlk_mb_ap_heart_bulb'), ('dome', 'rlk_mb_ap_dome_shell'), ('stalk', 'rlk_mb_ap_stalk_low'),
+                ('wall', 'rlk_mb_ap_wall_blade')]
+        self.w('obj/tick', [
+            '# Any executor, once per module tick (E, phases 1-3, D; frozen while paused): every org object\'s clip step',
+            '# (om/<object>/tick; RORG-3, AP-I2 requests RP1-2 / RP3-4 / RREV-1), each object only while its displays',
+            '# exist. Before the stage and the main slot: a clip played in tick T shows its key 0 at T + 1.']
+            + [f'execute if entity @e[type=minecraft:item_display,tag={tag},limit=1] run function {NS}om/{o}/tick'
+               for o, tag in objs])
 
     # -----------------------------------------------------------------------------------------
     def px_sets(self):
@@ -353,18 +357,20 @@ class Core:
             f'execute as {BODY} at @s run {F("intro/setup")}'])
         tick = [
             '# Hook tick (@s = body, at it, fight state #mbSt 1). Order (ap_contract 1.2): clocks, the hit flash, the floor',
-            '# events, the phase-2 stage (revival), the idle AI / decision (phases 1 and 3, not in a cine), the main slot,',
-            '# the yaw driver, the push request, the HUD, the rig tick, then the px-set driver (after the rig tick).',
+            '# events, the org objects\' clips (obj/tick, AP-I2), the phase-2 stage (revival), the idle AI / decision (phases 1',
+            '# and 3, not in a cine), the main slot, the yaw driver, the push request (not in phase 2: the body is parked;',
+            '# AP-I2 RREV-5), the HUD, the rig tick, then the px-set driver (after the rig tick).',
             'scoreboard players add #apFc mb 1',
             f'execute if score #apFlash mb matches 0.. run {F("u/flash")}', sc('#apFlash', -1),
             f'execute if score #apPh mb matches 1 run {F("ev/tick")}',
             f'execute if score #apPh mb matches 1 run {F("ai/ring")}',
+            F('obj/tick'),
             f'execute if score #apPh mb matches 2 run {F("rev/tick")}',
             f'execute if score #apPid mb matches 0 unless score #mbCine mb matches 1 if score #apPh mb matches 1 run {F("ai/state")}',
             f'execute if score #apPid mb matches 0 unless score #mbCine mb matches 1 if score #apPh mb matches 3 run {F("ai/state")}',
             f'execute if score #apPid mb matches 1.. run {F("p/run")}',
             f'execute if score #apYawC mb matches 1.. run {F("yaw/tick")}',
-            F('push/req'),
+            f'execute unless score #apPh mb matches 2 run {F("push/req")}',
             F('hud/tick')]
         tick += A.rig_tick_lines()
         tick += [F('pxs/tick'), sc('#apNoPush', 0)]
@@ -411,6 +417,9 @@ class Core:
                 f'function {A.rig_fn("kill")}', f'function {A.rig_fn("uninstall")}',
                 f'function {K.FN}uninstall',
                 F('wall/clear')] + kills + [f'kill @e[tag=rlk_mb_ar_{A.AID}]', 'kill @e[type=minecraft:husk,tag=rlk_mb_ap_org]',
+                                            '# every AP-ORG display (organism models, the Heart, domes, stalks, the seed, wall',
+                                            '# blades; AP-I2 RREV-4): their husks die above, so the dismounted models go by tag',
+                                            'kill @e[tag=rlk_ap_om]',
                                             'kill @e[tag=rlk_mb_ap_gate]', 'data remove storage rlk:mboss ap']
         unin += [f'scoreboard objectives remove {o}' for o in ENTITY_OBJ]
         self.w('uninstall', unin)
@@ -497,6 +506,7 @@ class Core:
         self.w('intro_tick', [
             f'# Hook intro_tick (@s = body, #mbT 1..; untargetable): E (entrance_p1, {A.E_LEN} t; clock #apPT = #mbT - 1).',
             'scoreboard players operation #apPT mb = #mbT mb', 'scoreboard players remove #apPT mb 1',
+            F('obj/tick'),
             F('seq/entrance/tick'),
             F('hud/tick'),
             *A.rig_tick_lines(),
@@ -915,11 +925,26 @@ class Core:
             f'execute if score #apPh mb matches 2 run return run {F("rev/bars")}',
             f'execute if score #apPh mb matches 15 run return run {F("hud/bar_seq")}',
             f'execute if score #apPh mb matches 25 run return run {F("hud/bar_seq")}',
+            f'execute if score #apPid mb matches 32 if score #apq32 mb matches ..{Q2_POP - 1} run return run {F("hud/bar_q2")}',
             'scoreboard players operation #buSub bu = @s mhpC', 'scoreboard players operation #buSub bu -= #mbFloor mb',
             'scoreboard players operation #buSubMax bu = @s mhpM', 'scoreboard players operation #buSubMax bu -= #mbFloor mb',
             'execute if score #buSubMax bu matches ..0 run scoreboard players set #buSubMax bu 1',
             'execute if score #buSub bu matches ..-1 run scoreboard players set #buSub bu 0',
             bu('#buSubCol', L.ELEM_TO_BU[7])])
+        self.w('hud/bar_q2', [
+            f'# Q2 (plan 8.3 B0; AP-I2 RP3-2): the two-segment countdown: red (code {Q2_RED}) from the banner to the blast (aftermath',
+            f'# clip t{Q2_BLAST}), then gold (code {Q2_GOLD}) to the dome pop (t{Q2_POP}). #apq32 = the clip tick (negative on the',
+            '# approach), #apq32S = the pattern tick the clip starts on.',
+            f'execute if score #apq32 mb matches {Q2_BLAST}.. run return run {F("hud/bar_q2g")}',
+            bu('#buSub', Q2_BLAST), 'scoreboard players operation #buSub bu -= #apq32 mb',
+            bu('#buSubMax', Q2_BLAST), 'scoreboard players operation #buSubMax bu += #apq32S mb',
+            'execute if score #buSub bu > #buSubMax bu run scoreboard players operation #buSub bu = #buSubMax bu',
+            bu('#buSubCol', Q2_RED)])
+        self.w('hud/bar_q2g', [
+            bu('#buSub', Q2_POP), 'scoreboard players operation #buSub bu -= #apq32 mb',
+            bu('#buSubMax', Q2_POP - Q2_BLAST),
+            'execute if score #buSub bu matches ..-1 run scoreboard players set #buSub bu 0',
+            bu('#buSubCol', Q2_GOLD)])
         self.w('hud/bar_seq', ['scoreboard players operation #buSub bu = #apPT mb', 'scoreboard players operation #buSubMax bu = #apPLen mb',
                                'execute if score #buSubMax bu matches ..0 run scoreboard players set #buSubMax bu 1',
                                'execute if score #buSub bu matches ..-1 run scoreboard players set #buSub bu 0',
@@ -938,6 +963,7 @@ class Core:
         self.w('death_tick', [
             '# Hook death_tick (@s = body, #mbT 1.. until cur.death): seq/death (clock #apPT = #mbT - 1), the rig.',
             'scoreboard players operation #apPT mb = #mbT mb', 'scoreboard players remove #apPT mb 1',
+            F('obj/tick'),
             F('seq/death/tick'),
             *A.rig_tick_lines()])
 

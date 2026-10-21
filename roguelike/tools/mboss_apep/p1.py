@@ -10,7 +10,8 @@ types a part position. Hazards: the framework hz/* with the module defaults (Den
 player-side reactions kept), DMG of api.py, sizes x1.2 of the footage (plan 8.0).
 
 Telegraph rule (plan 14, 10-20; the user: a floor telegraph only where the footage shows one). keep rows: P1's burst
-(the shadow_glide preset is the marker, no ring), P2's crack strips (tele/crack, same tick / size / tell as each strip),
+(the shadow_glide preset is the marker, no ring), P2's crack strips (the outline-only tele/crack_o since AP-I2: rails and
+the crack line, no lane fill; same tick / size / tell as each strip),
 P4's disc (tele/disc el 23 with its 23-t fill). Every other hazard is quiet and draws nothing on the floor before its hit;
 the readable tell is the clip pose + sound named in the TABLE of S:ap/tests/pat_p1.py (tell_src), >= 10 t (>= 20 t for
 the big ones), and each hit shows its impact preset on the hit tick. No-tips rule: no line, title or banner here.
@@ -32,9 +33,11 @@ Decisions inside the plan's latitude (documented for AP-I2 / the review):
   wheels' 3.6-b turn radius being larger than the gap; v1 G shows them curving back onto the player).
 - P5: the swings are the rig's (swing 1 sweeps the start frame's front -61..+89 deg, swing 2 its back -94..-227 deg);
   the pre-swing turn (1-8, <= 5 deg/t, <= 40 deg) puts the tail root toward the player (a BACK player meets swing 2).
-  The swept wedges are api.wedges widened for the root's own motion (swept(), RP1-3); a second tip flash + cue at
-  cock 2 (t48) marks swing 2.
-Open requests: S:ap/requests/ap-p1.md (RP1-1 the yaw rebase, RP1-2 the org object tick, RP1-3 the wedges).
+  The swept wedges are api.wedges(..., swept=True) (widened for the root's own motion, RP1-3 at AP-I2); a second tip
+  flash + cue at cock 2 (t48) marks swing 2.
+AP-I2 applied requests/ap-p1.md: RP1-1 (P5's turn re-bases the yaw driver: Gen.yaw_rebase()), RP1-2 (the core steps the
+org objects: P2's stalks; leg_slam is played slam_lead + 1 t before each slam so its hit key still lands on the slam),
+RP1-3 (api.wedges swept), RP1-5 (P2's strips and their resume redraw use tele/crack_o).
 - P6: hit 4's disc is 7.2 b ahead of where the lunge glide (2.5 b, inside r 16) ends.
 """
 import math
@@ -129,36 +132,8 @@ def _tail_pts(t):
     return (rs, rf), A.dir_yaw(ts - rs, tf - rf)
 
 
-def swept(ws, reach):
-    """api.wedges widened for the root's own motion (TODO(I2) requests/ap-p1.md RP1-3): the root swings ~1.2 b per tick,
-    so the bare wedge about this tick's root misses slivers of the lane the tail line swept between the ticks (a standing
-    player 4-6 b out could slip between two wedges). Each wedge keeps its root and grows to every point of the previous
-    tick's tail line seen from that root from 3 b out (nearer, the hips and the 0.3-b pad cover), the radius to the
-    farthest of them (<= reach + the root step); the overlap with the previous wedge is in the same volley group."""
-    out = []
-    for w in ws:
-        (ps, pf), pa = _tail_pts(w['t'] - 1)
-        rs, rf = w['root']
-        lo, hi, r1 = w['a0'], w['a1'], reach
-        for i in range(1, 23):
-            u = reach * i / 22.0
-            qs, qf = ps + u * -math.sin(math.radians(pa)), pf + u * math.cos(math.radians(pa))
-            dd = math.hypot(qs - rs, qf - rf)
-            if dd < 3.0:
-                continue
-            a = A.dir_yaw(qs - rs, qf - rf)
-            mid = (w['a0'] + w['a1']) / 2.0
-            while a - mid > 180:
-                a -= 360
-            while a - mid < -180:
-                a += 360
-            lo, hi, r1 = min(lo, a), max(hi, a), max(r1, dd)
-        out.append(dict(w, a0=lo, a1=hi, r1=round(min(r1, reach + 1.5), 2)))
-    return out
-
-
-WEDGES1 = swept(API_WEDGES1, P5['reach'])
-WEDGES2 = swept(API_WEDGES2, P5['reach'])
+WEDGES1 = A.wedges('tail_p1x2', P5['sw1'][0], P5['sw1'][1], P5['reach'], swept=True)    # RP1-3 (AP-I2)
+WEDGES2 = A.wedges('tail_p1x2', P5['sw2'][0], P5['sw2'][1], P5['reach'], swept=True)
 assert P5['sw1'] == (28, 35) and P5['sw2'] == (52, 59) and P5['turn'][1] * P5['turn_max'] <= 40, P5
 assert A.yaw_at('tail_p1x2', P5['made'][0]) == 0 and A.yaw_at('tail_p1x2', P5['sw1'][0] - 1) == 0
 
@@ -362,12 +337,10 @@ def emit_hands(g):
     tl.at(P2['made'][0], F(f'p/{key}/strips0'))
     tl.at(P2['made'][2], F(f'p/{key}/strips1'))
     for k, t in enumerate(P2['slams']):
-        tl.at(t - P2['slam_lead'], f'function {A.NS}om/stalk/play {{i:{k},clip:"leg_slam"}}')
+        # the core steps the objects before the slot (obj/tick): a clip played at T shows key 0 at T + 1
+        tl.at(t - P2['slam_lead'] - 1, f'function {A.NS}om/stalk/play {{i:{k},clip:"leg_slam"}}')
         tl.at(t, *x(at_m(f'rlk_mb_ap_p2s{k}'), K.fx('slam_arc'), K.snd('p2_slam')))
     tl.at(P2['sink'], *[f'function {A.NS}om/stalk/play {{i:{k},clip:"leg_sink"}}' for k in range(4)])
-    # TODO(I2) requests/ap-p1.md RP1-2: the org objects tick (om/objects_tick, RORG-3) is not run by the core yet; P2
-    # steps its own stalks while they live (drop this span when the core ticks the objects).
-    tl.span(P2['legs'], P2['stalk_kill'] - 1, f'function {A.NS}om/stalk/tick')
     tl.at(P2['stalk_kill'], f'function {A.NS}om/stalk/kill_all', Gen.release())
     tl.at(P2['flower'], *x('at @s', K.snd('p2_flower')))
     tl.at(P2['fold'], *x('at @s', K.snd('p2_fold')))
@@ -389,12 +362,12 @@ def emit_hands(g):
                        'tp @s ^ ^ ^0.5', F(f'p/{key}/root')])
     for half, ks in enumerate(((0, 1), (2, 3))):
         made = P2['made'][ks[0]]
-        strips = [f'# @s = body (t{made}): crack strips {ks[0] + 1}-{ks[1] + 1} (keep rows: tele/crack, same tick / size / tell as each strip)',
+        strips = [f'# @s = body (t{made}): crack strips {ks[0] + 1}-{ks[1] + 1} (keep rows: the outline-only tele/crack_o, same tick / size / tell as each strip)',
                   f'# from the root toward the lock: len {P2["strip"]} w {P2["strip_w"]}, height 0-{P2["strip_y1"]}, tells',
                   f'# {tuple(P2["tells"][k] for k in ks)}, {DMG["p2_strip"]} % each, one volley group (<= 1 hit of the two).', Gen.GRP_NEW]
         for k in ks:
             tell = P2['tells'][k]
-            strips += x(at_m(f'rlk_mb_ap_p2s{k}'), *Gen.decal('keep', K.tele_crack(P2['strip'], P2['strip_w'], tell)))
+            strips += x(at_m(f'rlk_mb_ap_p2s{k}'), *Gen.decal('keep', K.tele_crack(P2['strip'], P2['strip_w'], tell, fill=0)))
             strips += hz(at_m(f'rlk_mb_ap_p2s{k}'), pid, dict(grp=True, y1=P2['strip_y1']),
                          Gen.hz_line(P2['strip'], P2['strip_w'], tell, DMG['p2_strip']))
         if half == 0:
@@ -412,7 +385,7 @@ def emit_hands(g):
                 f'{F(f"p/{key}/crack")} with storage rlk:mboss ap.p2']
     g.pw(key, 'resume', res)
     g.pw(key, 'crack', ['# Macro {t}: one crack strip drawn again (keep row) with t ticks to its slam.',
-                        f'$function {K.FN}tele/crack {{len:{int(round(P2["strip"] * 10))},w:{int(round(P2["strip_w"] * 10))},'
+                        f'$function {K.FN}tele/crack_o {{len:{int(round(P2["strip"] * 10))},w:{int(round(P2["strip_w"] * 10))},'
                         'back:0,tell:$(t),nd:0,hold:3}'])
     tl.write([f'# P2 생명의 손 (plan 8.1): pre-turn {P2["lead"]} t (the core), the plunge disc (0 -> {P2["plunge"]}), swirl {P2["swirl"]}-{P2["raise_"]}, lock',
               f'# {P2["lock"]}, stalks {P2["legs"]}, strips {P2["lines"]}, slams {P2["slams"]}, stalks sink {P2["sink"]}, end {P2["end"]}.',
@@ -495,9 +468,13 @@ def emit_glow(g):
         'scoreboard players operation #apq3M mb = @s mbPjT', 'scoreboard players operation #apq3M mb %= #apK10 mb',
         f'execute if score #apq3M mb matches 1 run {K.snd("p3_homing_loop")}'])
     g.pw(key, 'pj_end', [
-        '# Hook pj_end (@s = a P3 prop, #pjEv 1 wall / 2 life over / 4 hit): the wheel pops where it is (a hit: the thorn sound).',
+        '# Hook pj_end (@s = a P3 prop, #pjEv 1 wall / 2 life over / 4 hit): a hit pops the wheel where it is (wheel_pop + the',
+        '# thorn sound); a wheel that ran out fizzles (the one-card spark + gold-orange dust; perf, AP-I2: slam 1\'s wheels run out',
+        '# on t163 = slam 2\'s carpet tick, which passed 3000 commands with two full pops in the natural-fight probe).',
         f'execute if score #pjEv mb matches 4 at @s run {K.snd("p3_wheel_hit")}',
-        f'execute at @s run {K.fx("wheel_pop")}',
+        f'execute if score #pjEv mb matches 4 at @s run {K.fx("wheel_pop")}',
+        f'execute unless score #pjEv mb matches 4 at @s run {K.fx("spark")}',
+        f'execute unless score #pjEv mb matches 4 at @s run particle minecraft:dust{{color:[0.91f,0.565f,0.165f],scale:1.2}} ~ ~ ~ 0.4 0.4 0.4 0 6 force @a[tag=player]',
         'scoreboard players set #pjKeep mb 0'])
     tl.write([f'# P3 발광하는 파수꾼 (plan 8.1): dive {P3["dive"]}, hidden glide to the centre {P3["travel"]}-{P3["glow_at"]}, gold glow {P3["glow_at"]},',
               f'# emerge_crown_p1 {P3["emerge"]} (targetable 55), turn {P3["turn"]}, glow_slams {P3["slams_at"]}: slams {P3["slams"]} (+ carpets and',
@@ -598,9 +575,8 @@ def emit_tail(g):
         f'scoreboard players set #apq5M mb -{P5["turn_max"] * 100}', 'scoreboard players operation #apq5D mb > #apq5M mb',
         'scoreboard players operation #apq5Y mb += #apq5D mb',
         'execute store result entity @s Rotation[0] float 0.01 run scoreboard players get #apq5Y mb',
-        '# TODO(I2) requests/ap-p1.md RP1-1: the clip\'s yaw schedule pins Rotation to #apYaw0 every tick (core yaw/tick);',
-        '# the pre-swing turn moves that start with it (an api helper would own this line).',
-        'scoreboard players operation #apYaw0 mb = #apq5Y mb'])
+        '# the clip\'s yaw schedule pins Rotation every tick (core yaw/tick): re-base it on the turn (RP1-1, AP-I2)',
+        Gen.yaw_rebase()])
     tl.write([f'# P5 생명의 꼬리 x2 (plan 8.1): turn the back to the player 1-{P5["turn"][1]} (<= {P5["turn_max"]} deg/t), S-raise {P5["raise_"]},',
               f'# cock cue {P5["cock"]} (tip flash), swing 1 wedges {P5["sw1"]}, recoil / cock 2 {P5["cock2"]}, swing 2 wedges {P5["sw2"]}, rise, end {P5["end"]}.',
               f'kill @e[tag=rlk_mb_ap_p{pid}]'], ['# P5 tick (#apPT = the tail_p1x2 clip tick)'])

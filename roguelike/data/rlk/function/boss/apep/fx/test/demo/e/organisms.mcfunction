@@ -2,6 +2,7 @@
 # Demo "organisms" events (as the anchor; #wkDT = the demo tick).
 execute if score #wkDT mb matches 0 at @s rotated as @s rotated ~ 0 positioned ^4.35 ^0 ^5.16 run function rlk:boss/apep/fx/tele/sector {r:31,a:27,tell:10,el:7,nd:0,hold:3}
 execute if score #wkDT mb matches 10 at @s rotated as @s rotated ~ 0 positioned ^4.35 ^0 ^5.16 run function rlk:boss/apep/fx/snd/o1_attack
+execute if score #wkDT mb matches 10 at @s rotated as @s rotated ~ 0 positioned ^4.35 ^0 ^5.16 run function rlk:boss/apep/fx/p/o1_hit
 execute if score #wkDT mb matches 10 at @s rotated as @s rotated ~ 0 positioned ^0 ^2.2 ^0 run function rlk:boss/apep/fx/p/heart_hit
 execute if score #wkDT mb matches 10 at @s rotated as @s rotated ~ 0 positioned ^0 ^2.2 ^0 run function rlk:boss/apep/fx/snd/heart_hit
 execute if score #wkDT mb matches 20 at @s rotated as @s rotated ~ 0 positioned ^3.45 ^0 ^6.89 run function rlk:boss/apep/fx/snd/o2_pivot

@@ -15,6 +15,5 @@ scoreboard players set #apq5M mb -500
 scoreboard players operation #apq5D mb > #apq5M mb
 scoreboard players operation #apq5Y mb += #apq5D mb
 execute store result entity @s Rotation[0] float 0.01 run scoreboard players get #apq5Y mb
-# TODO(I2) requests/ap-p1.md RP1-1: the clip's yaw schedule pins Rotation to #apYaw0 every tick (core yaw/tick);
-# the pre-swing turn moves that start with it (an api helper would own this line).
-scoreboard players operation #apYaw0 mb = #apq5Y mb
+# the clip's yaw schedule pins Rotation every tick (core yaw/tick): re-base it on the turn (RP1-1, AP-I2)
+function rlk:boss/apep/yaw/rebase

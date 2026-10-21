@@ -5,6 +5,7 @@ execute if score #mbSt mb matches 0 run return 0
 execute if score #apPh mb matches 2 run return run function rlk:boss/apep/rev/bars
 execute if score #apPh mb matches 15 run return run function rlk:boss/apep/hud/bar_seq
 execute if score #apPh mb matches 25 run return run function rlk:boss/apep/hud/bar_seq
+execute if score #apPid mb matches 32 if score #apq32 mb matches ..188 run return run function rlk:boss/apep/hud/bar_q2
 scoreboard players operation #buSub bu = @s mhpC
 scoreboard players operation #buSub bu -= #mbFloor mb
 scoreboard players operation #buSubMax bu = @s mhpM

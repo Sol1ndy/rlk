@@ -5,5 +5,5 @@ scoreboard players set #hzKBDir mb 0
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzY1 mb 20
-function rlk:mboss/hz/sector {r:120,a:4,tell:14,dmg:160}
+function rlk:mboss/hz/sector {r:120,a:8,tell:14,dmg:160}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_ap_p34h

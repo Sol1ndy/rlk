@@ -17,8 +17,12 @@ clip tick) starts 14 t later. Q4: #apq34T = the tail_p3 tick (the crouch opener 
 farther than 8 b). Every tick below is a played clip tick read from the rig manifest (api.ev).
 
 Yaw: move_strike_p3 and tail_p3 carry yaw schedules (the core's yaw driver holds Rotation = yaw0 + schedule). Q1 turns the
-hidden body toward the player before it surfaces and re-bases the driver (TODO(I2): Gen.yaw_rebase(), requests/ap-p3.md
-RP3-1; meanwhile the one core score #apYaw0 is written here, as AP:play/<clip> does).
+hidden body toward the player before it surfaces and re-bases the driver (Gen.yaw_rebase(), requests/ap-p3.md RP3-1,
+AP-I2).
+
+AP-I2 also applied: RP3-6 / RI1-1 (the keep decals of Q1, Q3 shell 1 and Q3s are the outline-only tele/disc_o, their
+resume redraws too) and RP1-3 for Q4 (api.wedges(..., swept=True): tail_p3's root moves too, the bare wedges missed
+slivers of the swept lane).
 """
 import math
 
@@ -96,14 +100,14 @@ def prelude(g, p, clip):
 
 
 def redraw_fn(g, key, store, r, mtag, sub='redraw', pid=0):
-    """A resume hook helper: the kit disc of a pending keep hazard again with its remaining tell (the core's pause
-    hook cleared every kit telegraph). As the hazard marker (tag mtag), at it."""
+    """A resume hook helper: the outline-only kit disc (tele/disc_o, AP-I2 RP3-6) of a pending keep hazard again with its
+    remaining tell (the core's pause hook cleared every kit telegraph). As the hazard marker (tag mtag), at it."""
     g.pw(key, sub, [f'# @s = a pending keep hazard ({mtag}): its decal again (r {r}) with the ticks left to its strike.',
                     f'scoreboard players operation #apq{pid}X mb = @s mbHzW', f'scoreboard players operation #apq{pid}X mb -= @s mbHzT',
                     f'execute if score #apq{pid}X mb matches ..0 run return 0',
                     f'data modify storage rlk:mboss ap.{store} set value {{r:{int(round(r * 10))},el:7,nd:0,hold:3,tell:1}}',
                     f'execute store result storage rlk:mboss ap.{store}.tell int 1 run scoreboard players get #apq{pid}X mb',
-                    f'function {K.FN}tele/disc with storage rlk:mboss ap.{store}'])
+                    f'function {K.FN}tele/disc_o with storage rlk:mboss ap.{store}'])
 
 
 def mdist_lines(sel, out, pre):
@@ -190,7 +194,7 @@ def emit_mstrike(g, p):
         f'execute at {m1(LK)} run {g.fn(f"p/{key}/burst_hz")}'])
     g.pw(key, 'burst_hz', ['# At L: the burst (quiet hazard + the kit decal of the keep row) and the rosette.',
                            *hz(L.hz_disc(Q1['burst_r'], Q1['burst_tell'], A.DMG['q1_burst']), tag=HK),
-                           *Gen.decal('keep', K.tele_disc(Q1['burst_r'], Q1['burst_tell'])),
+                           *Gen.decal('keep', K.tele_disc(Q1['burst_r'], Q1['burst_tell'], fill=0)),
                            K.fx('rosette'), K.snd('q1_rosette')])
     roll_in = Q1['roll_len'] - BURST_F
     g.pw(key, 'place', [
@@ -205,8 +209,8 @@ def emit_mstrike(g, p):
         f'execute as {m1(EK)} run {Gen.clamp("glide")}',
         f'execute at {m1(EK)} rotated as {m1(LK)} positioned ^ ^ ^{num(SLAM_F, 3)} run {marker(pid, SK)}',
         f'execute at {m1(LK)} positioned ^ ^ ^{num(-BURST_F, 3)} run tp @s ~ {CY} ~ ~ 0',
-        '# TODO(I2): Gen.yaw_rebase() (RP3-1): the yaw driver holds the new facing (the schedule is 0 until t66)',
-        'execute store result score #apYaw0 mb run data get entity @s Rotation[0] 100'])
+        '# the yaw driver holds the new facing (RP3-1, AP-I2; the schedule is 0 until t66)',
+        Gen.yaw_rebase()])
     g.pw(key, 'burst_fx', ['# At L (t44): the surfacing flash, the water splash, the burst sounds (the impact visual).',
                            K.fx('surface_burst'), K.fx('water_splash'), K.snd('q1_burst')])
     g.pw(key, 'slam_hz', [
@@ -295,7 +299,7 @@ def emit_shells(g, p):
         f'execute at {m1(RING)} run {marker(pid, L1)}', K.tele_mring_end(0), f'kill {mall(HIST)}',
         f'execute at {m1(L1)} run {g.fn(f"p/{key}/hz1")}'])
     g.pw(key, 'hz1', [*hz(L.hz_disc(Q3['r1'], Q3['tell1'], A.DMG['q3_1']), tag=HK, kb=KB2),
-                      *Gen.decal('keep', K.tele_disc(Q3['r1'], Q3['tell1']))])
+                      *Gen.decal('keep', K.tele_disc(Q3['r1'], Q3['tell1'], fill=0))])
     g.pw(key, 'launch', [
         f'# t{Q3["launch"]}: one launch, the three shells go up from the light ball (shell 1 drops as the beam at t45; shells 2 / 3',
         '# hover high until their locks, then stand over their points: the readable tell of the none rows).',
@@ -380,7 +384,7 @@ def emit_surface(g, p):
         Gen.lockb(Q3S['dist']), *Gen.keep(SP),
         f'execute at {m1(SP)} run {g.fn(f"p/{key}/splash_hz")}'])
     g.pw(key, 'splash_hz', [*hz(L.hz_disc(Q3S['r_splash'], Q3S['splash_tell'], A.DMG['q3s_splash']), tag=HK),
-                            *Gen.decal('keep', K.tele_disc(Q3S['r_splash'], Q3S['splash_tell'])), K.fx('leaf_ring')])
+                            *Gen.decal('keep', K.tele_disc(Q3S['r_splash'], Q3S['splash_tell'], fill=0)), K.fx('leaf_ring')])
     g.pw(key, 'surface', [
         f'# @s = body (t{Q3S["surface"]}): the surfacing splash (impact visual), the charge; lock L at the player; the shell r',
         f'# {Q3S["r_shell"]} (tell {Q3S["shell_tell"]}, {A.DMG["q3s_shell"]} %) with its keep decal (the pale disc under the player); the',
@@ -394,7 +398,7 @@ def emit_surface(g, p):
         f'execute store result storage rlk:mboss ap.p{pid}.len int 1 run scoreboard players get #apq{pid}D mb'])
     g.pw(key, 'dist', ['# @s = body: #apq36D = the horizontal distance to L in tenths.'] + mdist_lines(m1(LK), f'#apq{pid}D', f'#apq{pid}'))
     g.pw(key, 'shell_hz', [*hz(L.hz_disc(Q3S['r_shell'], Q3S['shell_tell'], A.DMG['q3s_shell']), tag=f'{T_}m'),
-                           *Gen.decal('keep', K.tele_disc(Q3S['r_shell'], Q3S['shell_tell']))])
+                           *Gen.decal('keep', K.tele_disc(Q3S['r_shell'], Q3S['shell_tell'], fill=0))])
     g.pw(key, 'launch', [f'# @s = body (t{Q3S["launch"]}): the flat shot: the light band from the muzzle toward L, the launch flash.',
                          f'execute at @s rotated as @s positioned {A.loc(MUZZLE[0], MUZZLE[2], MUZZLE[1])} facing entity {m1(LK)} feet rotated ~ 0 '
                          f'run function {K.FN}p/light_band with storage rlk:mboss ap.p{pid}',
@@ -420,8 +424,8 @@ Q4 = dict(crouch=A.clip_len('crouch_p3'), walk=A.P3_WALK['max'], walk_spd=A.P3_W
           cock=ev(TP, 'cock'), s1=ev(TP, 'swing1'), coil=ev(TP, 'coil'), s2=ev(TP, 'swing2'), end=A.clip_len(TP),
           lane1=2, lane2=32, lunge=(36, 40), reach=12.0, y1_1=3.0, y1_2=2.0, tip=11, shower=53, release=54)
 assert (Q4['cock'], Q4['s1'], Q4['coil'], Q4['s2'], Q4['end'], Q4['crouch']) == (3, 14, 36, 46, 87, 8), Q4
-SW1 = A.wedges(TP, Q4['s1'], Q4['s1'] + 7, Q4['reach'])     # 8 wedges t14-21
-SW2 = A.wedges(TP, Q4['s2'], Q4['s2'] + 7, Q4['reach'])     # 8 wedges t46-53 (reverse)
+SW1 = A.wedges(TP, Q4['s1'], Q4['s1'] + 7, Q4['reach'], swept=True)     # 8 wedges t14-21 (swept: RP1-3, AP-I2)
+SW2 = A.wedges(TP, Q4['s2'], Q4['s2'] + 7, Q4['reach'], swept=True)     # 8 wedges t46-53 (reverse)
 TIP11 = A.track(TP, 'tail_tip')[Q4['tip']]
 
 

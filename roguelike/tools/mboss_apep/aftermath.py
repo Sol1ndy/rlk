@@ -136,8 +136,11 @@ def emit(g):
     tl.at(QA['rain'], f'execute {CENTRE} run {K.snd("q2_rain")}')
     for t in range(QA['rain'], QA['blast'] + 1, 4):
         tl.at(t, f'execute {CENTRE} run {K.fx("beam_rain")}')
-    tl.at(QA['blast'], K.hud('flash_white'), f'execute {CENTRE} run {K.fx("flood", life=24)}', f'execute {CENTRE} run {K.snd("q2_blast")}',
-          K.hud('banner_end'))
+    # the flood sliced over three ticks (AP-I2 RP3-3: the whole flood in the blast tick passed the 3000-commands budget)
+    tl.at(QA['blast'], K.hud('flash_white'), f'execute {CENTRE} run {K.fx("flood_part", life=24, part=0)}',
+          f'execute {CENTRE} run {K.snd("q2_blast")}', K.hud('banner_end'))
+    tl.at(QA['blast'] + 1, f'execute {CENTRE} run {K.fx("flood_part", life=23, part=1)}')
+    tl.at(QA['blast'] + 2, f'execute {CENTRE} run {K.fx("flood_part", life=22, part=2)}')
     tl.at(QA['window_end'], Gen.release(),
           f'execute if score #apAft1 mb matches 0 run {Gen.line(A.TXT["q2_lethal"], A.WARN_HEX, 60)}')
     tl.at(QA['pop'], F(f'p/{key}/pop'))
@@ -148,9 +151,8 @@ def emit(g):
     extra = ['scoreboard players operation #apq32 mb = #apPT mb', 'scoreboard players operation #apq32 mb -= #apq32S mb',
              f'execute if score #apq32 mb matches ..-1 if score #apPT mb matches {QA["crouch"]} run {Gen.play("walk_p3")}',
              f'execute if score #apq32 mb matches ..-1 if score #apPT mb matches {QA["crouch"]}.. run {F(f"p/{key}/walk")}',
-             f'execute if score #apq32 mb matches {d0[0]}..{QA["pop"] + QA["pop_clip"]} run function {NS}om/dome/tick',
              f'execute if score #apq32 mb matches {QA["end"]}.. run return run {F(f"p/{key}/done")}']
-    tl.write(start, [HEAD, '# tick: the approach (#apq32 < 0), the dome models\' clips (om/dome/tick), then the clip timeline.'],
+    tl.write(start, [HEAD, '# tick: the approach (#apq32 < 0), then the clip timeline (the core steps the dome models\' clips: obj/tick).'],
              t0=-1000, extra_tick=extra)
     g.pw(key, 'walk', ['# @s = body (the approach): one 0.4 b step toward the centre and a turn toward it (<= 12 deg/t).',
                        f'execute at @s unless entity {ARENA_M.replace("limit=1", "distance=..0.25,limit=1")} run '

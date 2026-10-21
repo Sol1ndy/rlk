@@ -1,5 +1,4 @@
 # AP-REV (plan 7.5-7.7, 3.4): the revival stage.
-function rlk:boss/apep/heart/tick
 execute if score #apPT mb matches 20 run execute at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] positioned ~ 201 ~ run function rlk:boss/apep/fx/p/root_chunks
 execute if score #apPT mb matches 20 run execute at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] positioned ~ 201 ~ run function rlk:boss/apep/fx/snd/p1_dive
 execute if score #apPT mb matches 30 run execute at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] positioned ~ 201 ~ run function rlk:boss/apep/fx/p/root_chunks

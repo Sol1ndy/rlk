@@ -51,8 +51,10 @@ execute if score #wkDT mb matches 150 at @s rotated as @s rotated ~ 0 run functi
 execute if score #wkDT mb matches 154 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/beam_rain
 execute if score #wkDT mb matches 156 at @p[tag=player] rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/hud/flash_white
 execute if score #wkDT mb matches 156 at @p[tag=player] rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/hud/banner_end
-execute if score #wkDT mb matches 156 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/flood {life:24}
+execute if score #wkDT mb matches 156 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/flood_part {life:24,part:0}
 execute if score #wkDT mb matches 156 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_blast
+execute if score #wkDT mb matches 157 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/flood_part {life:23,part:1}
+execute if score #wkDT mb matches 158 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/flood_part {life:22,part:2}
 execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/p/dome_pop
 execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/snd/q2_pop
 execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/tele/safe_end {id:0}

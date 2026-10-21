@@ -8,15 +8,10 @@ new helpers, constants or table keys go through a request (S:ap/requests/<stage>
 Units: Python helpers take blocks / ticks / degrees; the framework boundary is tenths of a block and % of the base hit
 (atk 12 x dmgMul 150 / 10000: raw = floor(0.18 x pct), plan 9.2). Elements in #elem numbering (7 = Dendro).
 
-Three parts may still be missing while the stages run in parallel; each has a marked stand-in that switches off by
-itself when the real part lands (the build prints every one in use):
-- the rig (wip/ap-rig, AP-I1 / AP-I2): the manifest is the real one ("schema": 1, "source": "rig") merged per clip with
-  the stub of stub_rig.py (FALLBACKS = the clips taken from the stub, ids >= 1000; AP-I2 asserts none); the rig API is
-  the real rig's where F:boss/apep/rig/<fn> exists, else the stand-in AP:rig_stub/** (rig_fn, play_fn);
-- the org manifest: T:mboss_apep_org_manifest.json (AP-ORG, merged at AP-I1; the stub org was dropped there);
-- the kit: K = the kit's Python API (`import build_mboss_ap_fx`, AP-FX, merged at AP-I1);
-- the arena theme (wip/ap-arena, AP-I1): mboss_arena_ap_oasis when present, else _THEME_FALLBACK (ap_contract 0.6.3
-  points; no props but the lush water tiles; the framework builds a stub arena, cm.md 6.3).
+Since AP-I2 every part is real: the rig manifest T:mboss_apep_rig_manifest.json ("schema": 1, "source": "rig"; the stub
+rig of AP-CORE and its stand-in AP:rig_stub/** were dropped at AP-I2, the build asserts every D0 clip and every rig API
+function the core names), the org manifest T:mboss_apep_org_manifest.json (AP-ORG), the kit K (build_mboss_ap_fx, AP-FX)
+and the arena theme mboss_arena_ap_oasis (AP-ARENA; _THEME_FALLBACK only while a tree lacks it).
 """
 from pathlib import Path
 import json
@@ -28,7 +23,6 @@ _TOOLS = Path(__file__).resolve().parents[1]
 if str(_TOOLS) not in sys.path:
     sys.path.insert(0, str(_TOOLS))
 import mboss_lib as L  # noqa: E402
-from . import stub_rig as SR  # noqa: E402
 
 ID = 'apep'
 # The module's function root (registry "fn", mboss_lib.fn_root; user 10-21: chapter bosses live under boss/<id>).
@@ -109,75 +103,44 @@ NURT_SPAWN = [tuple(p) for p in POINTS['nurt_spawn']]
 EMBER_TWIG = tuple(POINTS['ember_twig'])
 
 # =============================================================================================
-# The rig manifest (ap_contract 0.4): the real one (schema 1, source rig) merged per clip with the stub (ids >= 1000)
+# The rig manifest (ap_contract 0.4): the real one (schema 1, source rig; AP-R1 .. RC2 + R3b). The stub rig of AP-CORE
+# (stub_rig.py, its manifest and the stand-in AP:rig_stub/**) was dropped at AP-I2 (plan 10): no clip falls back.
 MANIFEST = _TOOLS / 'mboss_apep_rig_manifest.json'
-STUB_MANIFEST = Path(__file__).resolve().parent / 'stub_rig_manifest.json'
-_REAL_RAW = json.loads(MANIFEST.read_text(encoding='utf-8')) if MANIFEST.exists() else None
-REAL_MAN = isinstance(_REAL_RAW, dict) and _REAL_RAW.get('schema') == 1 and _REAL_RAW.get('source') == 'rig'
-STUB = SR.build_rig()
-
-
-def merge(real, stub):
-    """ap_contract 0.4.1 / cm.md 9.2: every clip of the real rig manifest, stub clips (ids >= 1000) only for the names
-    it lacks; the globals (proxies uuids states capsules runtime + every Apep extra) from the real file when present."""
-    import copy
-    if real is None:
-        m = copy.deepcopy(stub)
-        return m, [c['name'] for c in stub['clips']]
-    m = copy.deepcopy(real)
-    have = {c['name'] for c in real.get('clips', [])}
-    fb = [c for c in stub['clips'] if c['name'] not in have]
-    m['clips'] = list(m.get('clips', [])) + copy.deepcopy(fb)
-    m['fallbacks'] = [c['name'] for c in fb]
-    for k in ('stances', 'hands', 'park', 'states', 'capsules', 'proxies', 'flash_groups', 'looks', 'rest_anchors'):
-        m.setdefault(k, copy.deepcopy(stub[k]))
-    return m, [c['name'] for c in fb]
-
-
-MAN, FALLBACKS = merge(_REAL_RAW if REAL_MAN else None, STUB)
+MAN = json.loads(MANIFEST.read_text(encoding='utf-8'))
+assert MAN.get('schema') == 1 and MAN.get('source') == 'rig', f'{MANIFEST.name}: not the real rig manifest'
+REAL_MAN = True
+# The D0 clip table (ap_contract 0.4.10, the frozen names in their contract order): the real manifest has every one.
+CLIP_NAMES = ['entrance_p1', 'idle_p1', 'turn_p1', 'turn_p1_step', 'crawl_p1', 'crawl_stop_p1', 'walk_p1', 'burrow_strike',
+              'sink_p1', 'emerge_on_p1', 'burrow_in_p1', 'emerge_crown_p1', 'hands', 'glow_slams', 'rotation', 'tail_p1x2',
+              'combo_a', 'combo_b', 'combo_c', 'combo_d', 'combo_end', 'sink_revive', 'revival', 'idle_p3', 'turn_p3',
+              'walk_p3', 'crouch_p3', 'stand_p3', 'move_strike_p3', 'aftermath', 'shells', 'sink_p3', 'surface_p3',
+              'tail_p3', 'spikes', 'death']
 CLIPS = {c['name']: c for c in MAN['clips'] if not c['name'].startswith('dbg_')}
-CLIP_NAMES = [c['name'] for c in STUB['clips']]
 assert set(CLIP_NAMES) <= set(CLIPS), sorted(set(CLIP_NAMES) - set(CLIPS))
 ids = [c['id'] for c in MAN['clips']]
-assert len(set(ids)) == len(ids), 'two clips of the merged manifest share an id (cm.md 9.2)'
-REAL_CLIPS = {c['name'] for c in (_REAL_RAW or {}).get('clips', [])} if REAL_MAN else set()
+assert len(set(ids)) == len(ids), 'two clips of the rig manifest share an id (cm.md 9.2)'
+FALLBACKS = []
 EV_FALLBACKS = []
 
 RIG_DIR = FDIR / 'rig'
-REAL_RIG = (RIG_DIR / 'spawn.mcfunction').exists()
-RIG_STUBBED = set()
 
 
 def rig_fn(name):
-    """Full id of a rig API function (ap_contract 0.4.9): the real rig's when it exists, else the stand-in's."""
-    if (RIG_DIR / (name + '.mcfunction')).exists():
-        return f'{NS}rig/{name}'
-    if REAL_RIG:
-        RIG_STUBBED.add(name)
-    return f'{NS}rig_stub/{name}'
+    """Full id of a rig API function (ap_contract 0.4.9); the rig generator (node tools/build_mboss_apep_rig.mjs) runs
+    before this module, so the function must exist."""
+    assert (RIG_DIR / (name + '.mcfunction')).exists(), f'the rig has no function rig/{name} (build the rig first)'
+    return f'{NS}rig/{name}'
 
 
 def play_fn(clip):
     assert clip in CLIPS, clip
-    if clip in REAL_CLIPS and (RIG_DIR / 'play' / (clip + '.mcfunction')).exists():
-        return f'{NS}rig/play/{clip}'
-    return f'{NS}rig_stub/play/{clip}'
+    assert (RIG_DIR / 'play' / (clip + '.mcfunction')).exists(), f'the rig has no play/{clip} (build the rig first)'
+    return f'{NS}rig/play/{clip}'
 
 
 def rig_tick_lines():
-    """The rig tick (last in the module tick): the real rig's tick (+ the stand-in chain while a clip falls back), or the
-    stand-in's."""
-    if REAL_RIG:
-        return [f'function {NS}rig/tick'] + ([f'function {NS}rig_stub/chain'] if FALLBACKS else [])
-    return [f'function {NS}rig_stub/tick']
-
-
-def stub_rig_needed():
-    return (not REAL_RIG) or bool(FALLBACKS) or bool(RIG_STUBBED)
-
-
-def fallback_list():
-    return {'clips': sorted(FALLBACKS), 'events': sorted(set(EV_FALLBACKS)), 'rig_functions': sorted(RIG_STUBBED)}
+    """The rig tick (last in the module tick)."""
+    return [f'function {NS}rig/tick']
 
 
 def ev(clip, event):
@@ -629,6 +592,13 @@ class Gen:
         return f'function {NS}px/{name}'
 
     @staticmethod
+    def yaw_rebase():
+        """@s = body: re-base the running yaw schedule (AP:play/<clip>) on the body's current facing, so the core's yaw
+        driver holds a turn the pattern made inside a yaw clip (AP:yaw/rebase; AP-I2, requests RP1-1 / RP3-1): #apYaw0 =
+        Rotation x 100 - sign x schedule[the tick the driver shows next]. No-op without a running yaw clip."""
+        return f'function {NS}yaw/rebase'
+
+    @staticmethod
     def stance(target):
         """The stance change clip (crouch_p3 / stand_p3) inside a pattern: the px sets and #apStance follow the clip."""
         assert target in ('crouch', 'stand')
@@ -761,20 +731,29 @@ def loc(x, z, y=0.0, nd=3):
     return f'^{n(float(x), nd)} ^{n(float(y), nd)} ^{n(float(z), nd)}'
 
 
-def wedges(clip, t0, t1, reach):
+def wedges(clip, t0, t1, reach, swept=False, near=3.0, extra=1.5):
     """The per-tick swept wedges of a tail swing (plan 7.11 rule 3; ap_contract 0.4.5): for every played tick k of
     t0..t1, dict(t=k, root=(s, f) of the tail root in the START frame, a0 < a1 = the tail-line yaws (relative to the
     start facing, Minecraft sense) of ticks k-1 and k about that root, r1 = reach). From the manifest's tail_root /
     tail_tip tracks composed with the clip's yaw schedule. Each wedge is one hz/sector of half-angle (a1 - a0) / 2 on
-    the bisector, all in one volley group. No kit decal (the 10-20 telegraph rule: the P5 / Q4 lanes are *none*)."""
+    the bisector, all in one volley group. No kit decal (the 10-20 telegraph rule: the P5 / Q4 lanes are *none*).
+
+    swept=True (AP-I2, requests/ap-p1.md RP1-3): the wedge also covers the lane the tail line swept since the last tick
+    when the root itself moves: it keeps its root and grows to every point of the previous tick's tail line seen from
+    that root from `near` b out (nearer, the hips and the body pad cover), the radius to the farthest of them (<= reach +
+    extra). The overlap with the previous wedge is in the same volley group (still one hit per swing)."""
     root, tip = track(clip, 'tail_root'), track(clip, 'tail_tip')
 
-    def line_yaw(t):
+    def pts(t):
         t = max(0, min(len(root) - 1, t))
         d = yaw_at(clip, t)
         rs, rf = rot_local(root[t][0], root[t][2], d)
         ts, tf = rot_local(tip[t][0], tip[t][2], d)
-        return dir_yaw(ts - rs, tf - rf), (rs, rf)
+        return (rs, rf), dir_yaw(ts - rs, tf - rf)
+
+    def line_yaw(t):
+        r, a = pts(t)
+        return a, r
     out = []
     for k in range(t0, t1 + 1):
         a_prev, _ = line_yaw(k - 1)
@@ -784,7 +763,26 @@ def wedges(clip, t0, t1, reach):
         while a_now - a_prev < -180:
             a_now += 360
         a0, a1 = sorted((a_prev, a_now))
-        out.append(dict(t=k, root=r, a0=a0, a1=a1, r1=reach))
+        w = dict(t=k, root=r, a0=a0, a1=a1, r1=reach)
+        if swept:
+            (ps, pf), pa = pts(k - 1)
+            rs, rf = r
+            lo, hi, r1 = a0, a1, reach
+            mid = (a0 + a1) / 2.0
+            for i in range(1, 23):
+                u = reach * i / 22.0
+                qs, qf = ps + u * -math.sin(math.radians(pa)), pf + u * math.cos(math.radians(pa))
+                dd = math.hypot(qs - rs, qf - rf)
+                if dd < near:
+                    continue
+                a = dir_yaw(qs - rs, qf - rf)
+                while a - mid > 180:
+                    a -= 360
+                while a - mid < -180:
+                    a += 360
+                lo, hi, r1 = min(lo, a), max(hi, a), max(r1, dd)
+            w = dict(w, a0=lo, a1=hi, r1=round(min(r1, reach + extra), 2))
+        out.append(w)
     return out
 
 
