@@ -31,6 +31,7 @@ scoreboard players operation @s mbPjG = #pjGrp mb
 scoreboard players operation @s mbPjND = #pjNoDodge mb
 scoreboard players operation @s mbPjNR = #pjNR mb
 execute if score @s mbPjG matches 1.. if score @s mbPjG = #mbGrpL mb run scoreboard players set @s mbPjHit 1
+execute if score @s mbPjG matches 1.. if score @s mbPjG = #mbGrpL2 mb run scoreboard players set @s mbPjHit 1
 execute if score @s mbPjR matches 41.. run scoreboard players set @s mbPjR 40
 execute if score @s mbPjR matches ..0 run scoreboard players set @s mbPjR 1
 tp @s ~ ~ ~ ~ ~

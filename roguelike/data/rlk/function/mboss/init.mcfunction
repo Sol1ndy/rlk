@@ -126,6 +126,7 @@ execute unless score #mbHealEv mb matches 0.. run scoreboard players set #mbHeal
 execute unless score #mbHealAmt mb matches 0.. run scoreboard players set #mbHealAmt mb 0
 execute unless score #mbGrpN mb matches 0.. run scoreboard players set #mbGrpN mb 0
 execute unless score #mbGrpL mb matches 0.. run scoreboard players set #mbGrpL mb 0
+execute unless score #mbGrpL2 mb matches 0.. run scoreboard players set #mbGrpL2 mb 0
 # Low gravity requested by the running module (#mbLowG 1; mboss/main clears it every tick, the module tick sets it
 # again; rlk:tick syncs the attribute modifiers through mboss/lowg_on|off). Hazard re-arm clock (hz/all).
 execute unless score #mbLowG mb matches 0..1 run scoreboard players set #mbLowG mb 0

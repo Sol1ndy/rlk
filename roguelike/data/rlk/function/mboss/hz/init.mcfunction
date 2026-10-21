@@ -29,6 +29,8 @@ scoreboard players set @s mbHzT -1
 scoreboard players set @s mbHzHit 0
 # a member made after its volley group already landed its hit is harmless from the start (#mbGrpL, grp_mark)
 execute if score @s mbHzG matches 1.. if score @s mbHzG = #mbGrpL mb run scoreboard players set @s mbHzHit 1
+# ... also when a #hzRearm hazard's hit overwrote #mbGrpL since (#mbGrpL2 = the last group landed by a one-shot hit)
+execute if score @s mbHzG matches 1.. if score @s mbHzG = #mbGrpL2 mb run scoreboard players set @s mbHzHit 1
 scoreboard players operation @s mbHzL = @s mbHzW
 scoreboard players operation @s mbHzL += @s mbHzA
 scoreboard players operation @s mbHzL += #hzLinger mb
