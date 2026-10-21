@@ -8,8 +8,9 @@ VOICE_LINES.
 Conventions of this module
 - Timelines run on the pattern clock rdTime (choose = 0, first dispatched frame = 1). A clip is started with
   rig/start/<clip> at rdTime s, which puts clip tick e on rdTime s + e - 1; every pattern starts its clip at 1, so the
-  clip events of rd/rig_api (binding, plan §C.5) land on the §B ticks. 17 and 20 open with a short lead (4 / 7 t: the
-  voice line and a glint) before the clip, so their first big or close hit gets the R1 cue time (plan_table_tenma.json).
+  clip events of rd/rig_api (binding, plan §C.5) land on the §B ticks. 17 and 20 open with a short lead (5 / 8 t: the
+  voice line and a glint at rdTime 1) before the clip, so their first big or close hit gets the R1 cue time
+  (plan_table_src.py rows 17 / 20; S3-F moved both by one tick, review RD-R2 / RD-R3).
 - Hazards and FX come from the kit (raiden_kit.hz / fx / snd / decal). Floor decals only where the footage has one:
   the glaive bomb ring (11, 20), the 단절 band (19), the shadow pool (13) and the vajra base rings (14, state decals).
 - Every transient entity summoned here carries rlk_room, rlk_raiden_aux, rlk_rd_tmp and rlk_rd_tm; ON_FINISH removes
@@ -281,15 +282,16 @@ def p11():
 
 
 def p20():
-    # 몽상 • 초월의 악요개안 (B-14), reactive: the line and an eye flare lead the clip by 7 t (R1: the spin is a 141 b2
-    # annulus, so 20 t from the first cue); t_spin_throw: glint 0, spin 13, throw 31 -> pattern 7 / 20 / 38.
+    # 몽상 • 초월의 악요개안 (B-14), reactive: the line and an eye flare at rdTime 1 lead the clip by 8 t (R1: the spin
+    # is a 141 b2 annulus, so 20 t from the first cue; S3-F, review RD-R2: Tenma timelines start at rdTime 1, so the
+    # lead is 8, not 7); t_spin_throw: glint 0, spin 13, throw 31 -> pattern 8 / 21 / 39.
     p = pattern(20, '몽상 • 초월의 악요개안')
     ev(p, 1, call('line/foolish'), 'scoreboard players set @s rdTmCD 300', face, flat,
        'execute positioned ~ ~2.6 ~ run ' + fx('star'))
-    ev(p, 8, clip('t_spin_throw'), hz('annulus', 12, 18, r=7, rmin=2, half=180))
-    ev(p, 20, snd('glaive_sweep'))
-    throw_bomb(p, 26, 76)
-    end(p, 92)
+    ev(p, 9, clip('t_spin_throw'), hz('annulus', 12, 18, r=7, rmin=2, half=180))
+    ev(p, 21, snd('glaive_sweep'))
+    throw_bomb(p, 27, 77)
+    end(p, 93)
 
 
 def p16():
@@ -381,7 +383,9 @@ def p13():
     ev(p, 69, call('tm/shadow/grow'))
     ev(p, 72, call('tm/shadow/palm'))
     palm = 'execute as @e[tag=rlk_rd_tm_palm,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:%d,transformation:%s}'
-    for t, d, y, s in ((73, 4, 7, 3.2), (77, 4, 7.4, 3.2), (81, 3, 0.3, 3.2), (85, 2, 0.7, 3.2), (89, 6, 1.2, 0)):
+    # S3-F (review RD-F1): the palm model reaches 0.416 b below its pivot at scale 3.2 (palm down), so the contact
+    # pose sits 0.45 b up (lowest point 0.03 b above the floor) and the rebound 0.85 b; tenma_tests checks the bounds.
+    for t, d, y, s in ((73, 4, 7, 3.2), (77, 4, 7.4, 3.2), (81, 3, 0.45, 3.2), (85, 2, 0.85, 3.2), (89, 6, 1.2, 0)):
         ev(p, t, palm % (d, SLAM_POSE % (y, s, s, s)))
     ev(p, 84, AT_SPOT + fx('shadow_palm'))
     ev(p, 95, 'kill @e[tag=rlk_rd_tm_palm]')
@@ -398,7 +402,7 @@ def p13():
         'data modify entity @e[tag=rlk_rd_decal_pool,tag=rlk_rd_fxnew,limit=1] transformation.scale set value [1.5f,1f,1.5f]',
         'data modify entity @e[tag=rlk_rd_decal_pool,tag=rlk_rd_fxnew,limit=1] item.components."minecraft:custom_data".d set value 4'])
     write('tm/shadow/palm', [
-        '# @s = the boss: the pale palm appears 7 b above the grown pool (palm down, cut 0.3 b above the floor at contact).',
+        '# @s = the boss: the pale palm appears 7 b above the grown pool (palm down; at contact its lowest point is 0.03 b above the floor).',
         AT_SPOT + 'summon minecraft:item_display ~ ~ ~ {Tags:[%s,"rlk_rd_tm_palm","rlk_rd_shadow"],billboard:"fixed",item_display:"none",interpolation_duration:1,teleport_duration:0,view_range:2.5f,width:16f,height:20f,shadow_radius:0f,brightness:{block:15,sky:15},transformation:%s,item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/prop/slam_palm"}}}'
         % (TAGS, SLAM_POSE % (7, 0.01, 0.01, 0.01))])
 
@@ -494,20 +498,23 @@ def p15():
 
 
 def p17():
-    # 몽상 • 궤멸의 검기 (B-11): the line and a glint lead the clip by 4 t (R1: the slabs reach 2.5-4.3 b in < 12 t);
-    # t_waves: glint 0, swing1 8, swing2 53 -> pattern 4 / 12 / 57. Swing 1: five tall slabs in a +-30 deg fan (one hit
-    # for the set); swing 2: one low wide wave (jump it), re-aimed at 45 with its own glint. Both travel on after the end.
+    # 몽상 • 궤멸의 검기 (B-11): the line and a glint at rdTime 1 lead the clip by 5 t; t_waves: glint 0, swing1 8, swing2
+    # 53 -> pattern 5 / 13 / 58. Swing 1: five tall slabs in a +-30 deg fan (one hit for the set), launched 12 t after the
+    # first cue with their near edge 2.2 b out (front d0 3.5, depth 1, tol 0.3), so a player hugging her within 2 b is
+    # never hit (plan A.4) and one 2.2-3.8 b out is hit 12 t after the cue (S3-F, review RD-R3: they used to launch 11 t
+    # after it with the band at 1.2-2.8 b). Swing 2: one low wide wave (jump it), re-aimed at 46 with its own glint,
+    # 12 t before it launches. Both travel on after the end.
     p = pattern(17, '몽상 • 궤멸의 검기')
     ev(p, 1, call('line/goemyeol'), face, flat, 'execute positioned ^ ^2 ^1 run ' + fx('star'))
-    ev(p, 5, clip('t_waves'))
-    ev(p, 8, face, flat)
-    ev(p, 11, hz_group(), *[hz('slab', 1, 15, yawoff=a, d0=2.5, v=0.45, w=0.9, height=4.5, group=True, detached=True)
+    ev(p, 6, clip('t_waves'))
+    ev(p, 9, face, flat)
+    ev(p, 12, hz_group(), *[hz('slab', 1, 15, yawoff=a, d0=3.5, v=0.45, w=0.9, height=4.5, group=True, detached=True)
                              for a in (-30, -15, 0, 15, 30)])
-    ev(p, 12, snd('wave_slab'))
-    ev(p, 45, face, flat, 'execute positioned ^ ^1 ^1.5 run ' + fx('star'))
-    ev(p, 56, hz('sweep', 1, 20, r0=2.5, v=0.28, band=1, half=40, jump=True, detached=True))
-    ev(p, 57, snd('wave_low'))
-    end(p, 74)
+    ev(p, 13, snd('wave_slab'))
+    ev(p, 46, face, flat, 'execute positioned ^ ^1 ^1.5 run ' + fx('star'))
+    ev(p, 57, hz('sweep', 1, 20, r0=2.5, v=0.28, band=1, half=40, jump=True, detached=True))
+    ev(p, 58, snd('wave_low'))
+    end(p, 75)
 
 
 def p18():

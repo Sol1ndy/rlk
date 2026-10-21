@@ -37,7 +37,7 @@ if OUT.exists():
 OUT.mkdir(parents=True, exist_ok=True)
 NEW = '@e[tag=rlk_rd_hnew,limit=1]'
 OBJECTIVES = ['rdHK', 'rdHA', 'rdHB', 'rdHC', 'rdHD', 'rdHE', 'rdHF', 'rdHTol', 'rdHEv', 'rdHMax', 'rdHGrp', 'rdHDk',
-              'rdHDl', 'rdHKb', 'rdHSv', 'rdHSnd', 'rdHOX', 'rdHOY', 'rdHOZ']
+              'rdHDl', 'rdHKb', 'rdHSv', 'rdHSnd', 'rdHOX', 'rdHOY', 'rdHOZ', 'rdHNx']
 KIT_VERSION = 3
 
 
@@ -167,6 +167,12 @@ write('tick_at', [
     f'execute if score @s rdHAge >= @s rdHLife run return run function {H}expire',
     'scoreboard players operation #rdRel rd = @s rdHAge',
     'scoreboard players operation #rdRel rd -= @s rdWind',
+    '# S3-F perf (review RD-P1): a travelling hazard whose hit is spent (it hit, or its front passed the body) only',
+    '# waits for its expiry (post: front past `reach`); its cards fly on by interpolation.',
+    'execute if score @s rdHHit matches 1.. if score @s rdHMax matches 1.. if score @s rdHK matches 5..7 '
+    'if score @s rdHHit >= @s rdHMax if score #rdRel rd <= @s rdHF run return 0',
+    '# S3-F perf: a slab whose front is still well short of the body waits until it could reach it (k/slab_wait).',
+    'execute if score @s rdHNx > @s rdHAge if score #rdRel rd <= @s rdHF run return 0',
     f'execute if score @s rdHK matches {KINDS["follow"]} run function {H}k/follow_move',
     f'execute if score #rdRel rd matches ..-1 run return run function {H}pre',
     f'execute if score #rdRel rd matches 0 run return run function {H}fire',
@@ -349,7 +355,9 @@ write('k/sweep', [
     'scoreboard players operation #rdLo rd -= @s rdHTol',
     'execute if score #rdLo rd matches ..-1 run scoreboard players set #rdLo rd 0',
     'scoreboard players operation #rdLo rd *= #rdLo rd',
-    'execute if score #rdR2 rd < #rdLo rd run return 0',
+    '# S3-F perf (review RD-P1): the front only moves outward, so once the body is behind the band this hazard can',
+    '# never reach it: it is spent (rdHHit = rdHMax) and `try` skips it until it expires; its cards fly on.',
+    'execute if score #rdR2 rd < #rdLo rd run return run scoreboard players operation @s rdHHit > @s rdHMax',
     'execute if score @s rdHE matches ..-999 run return run scoreboard players set #rdHit rd 1',
     'function %sfs' % H,
 ] + [a.format(s='rdHD', c='rdHE') for a in ANGLE])
@@ -364,12 +372,26 @@ write('k/slab', [
     'scoreboard players operation #rdLo rd -= @s rdHD',
     'scoreboard players operation #rdLo rd -= @s rdHTol',
 ] + FS_FWD + [
-    'execute if score #rdFwd rd < #rdLo rd run return 0',
-    'execute if score #rdFwd rd > #rdHi rd run return 0',
+    '# S3-F perf (review RD-P1): the front only moves outward, so once the body is behind the band this hazard can',
+    '# never reach it: it is spent (rdHHit = rdHMax) and `try` skips it until it expires; its cards fly on.',
+    'execute if score #rdFwd rd < #rdLo rd run return run scoreboard players operation @s rdHHit > @s rdHMax',
+    'execute if score #rdFwd rd > #rdHi rd run return run function %sk/slab_wait' % H,
 ] + FS_SIDE + [
     'scoreboard players operation #rdW rd = @s rdHC',
     'scoreboard players operation #rdW rd += @s rdHTol',
     'execute if score #rdAbsSide rd <= #rdW rd run scoreboard players set #rdHit rd 1',
+])
+write('k/slab_wait', [
+    '# S3-F perf: the body is ahead of the slab front by (#rdFwd - #rdHi) mb. The gap closes at most at v + 2 b/t (the',
+    '# body dashing at it), so the slab skips its test until then (rdHNx = the age of the next test; tick_at).',
+    'scoreboard players operation #rdGap rd = #rdFwd rd',
+    'scoreboard players operation #rdGap rd -= #rdHi rd',
+    'scoreboard players operation #rdCl rd = @s rdHB',
+    'scoreboard players operation #rdCl rd /= #rdK1000 rd',
+    'scoreboard players add #rdCl rd 2000',
+    'scoreboard players operation #rdGap rd /= #rdCl rd',
+    'scoreboard players operation @s rdHNx = @s rdHAge',
+    'scoreboard players operation @s rdHNx += #rdGap rd',
 ])
 write('k/orb', [
     '# Travelling disk: centre at forward F = d0 + v*t on the axis, radius r + tol (rdHD).',

@@ -41,9 +41,12 @@ DRAIN = {1:6, 4:6, 2:3, 5:3, 6:3, 7:4}
 DRAIN_REACTION = 1
 # S3 balance pass (plan B.1): the rework's timelines are longer and quieter than the release's (R1 cue times, the 16 t
 # idle between moves, single-blast eyes, 찰나의 포영 / 몽상의 일심), so a standing player takes about half the
-# release's damage per minute at the same raw hit values. Every DODGEABLE hit of the phase is scaled by this percent
-# in `hurt` (raw table values unchanged; undodgeable hits keep their raw value so the dodger column stays bounded).
-BALANCE_PCT = {0: 170, 2: 139}
+# release's damage per minute at the same raw hit values. Every DODGEABLE pattern hit of the phase is scaled by this
+# percent in `hurt` (raw table values unchanged; undodgeable hits keep their raw value so the dodger column stays
+# bounded). S3-F (review RD-B1): phase 0 is scaled per weapon (sword {0}, polearm {1}: the sword's moves wait longer),
+# and the switch after-effects (6 field lightning, 6b blade eyes; hazards tagged rlk_rd_nobal) are never scaled, so each
+# weapon, fresh or with its after-effect, stays within about +-20 % of the release.
+BALANCE_PCT = {0: {0: 255, 1: 192}, 2: 139}
 # Malice energy: normal-phase ticks before the transformation (45 s, was 30 s).
 RAGE_MAX = 900
 # Like the original, every hit the boss lands also feeds the malice gauge (+3 s).
@@ -416,8 +419,11 @@ execute if entity @a[tag=player,scores={pkMode=1..}] run return 0
 # Boss damage multiplier (load: #bossDmgMul %) times the phase balance (S3, plan B.1: dodgeable hits only), on top of
 # the mob level scaling. Every hazard sets #cmDmg fresh before calling this.
 scoreboard players set #rdBal rd 100
-execute unless score #rdNoDodge rd matches 1 if entity @e[tag=rlk_raiden,scores={rdPhase=0},limit=1] run scoreboard players set #rdBal rd '''+str(BALANCE_PCT[0])+'''
+execute unless score #rdNoDodge rd matches 1 if entity @e[tag=rlk_raiden,scores={rdPhase=0,rdWpn=0},limit=1] run scoreboard players set #rdBal rd '''+str(BALANCE_PCT[0][0])+'''
+execute unless score #rdNoDodge rd matches 1 if entity @e[tag=rlk_raiden,scores={rdPhase=0,rdWpn=1},limit=1] run scoreboard players set #rdBal rd '''+str(BALANCE_PCT[0][1])+'''
 execute unless score #rdNoDodge rd matches 1 if entity @e[tag=rlk_raiden,scores={rdPhase=2},limit=1] run scoreboard players set #rdBal rd '''+str(BALANCE_PCT[2])+'''
+# The weapon-switch after-effects (6 / 6b, hazards tagged rlk_rd_nobal; @s = the hazard) keep their raw value.
+execute if entity @s[tag=rlk_rd_nobal] run scoreboard players set #rdBal rd 100
 scoreboard players operation #cmDmg tmp *= #bossDmgMul tmp
 scoreboard players operation #cmDmg tmp *= #rdBal rd
 scoreboard players operation #cmDmg tmp /= #rd10000 rd

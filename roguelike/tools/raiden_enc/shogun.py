@@ -90,6 +90,9 @@ FACE = [face, flat]
 EYE10 = '@e[tag=rlk_rd_object,scores={rdObjKind=1,rdObjId=10},limit=1]'
 EYES3 = '@e[tag=rlk_rd_object,scores={rdObjKind=1,rdObjId=1..3}]'
 HUD_EYE = '「마가츠의 뇌안」을 계속 공격해서 제거하세요'
+# Tag the hazard hz() just made here (age -1 until the world tick) as an after-effect: `hurt` does not scale it
+# (core.BALANCE_PCT, S3-F review RD-B1).
+NOBAL = 'tag @e[tag=rlk_rd_hazard,scores={rdHAge=-1},distance=..0.01] add rlk_rd_nobal'
 
 
 class TL:
@@ -411,7 +414,7 @@ def build_effects():
     write('sg/fx6', [
         '# 6 field lightning (A-02, sword after-effect): the pale disc under the player (locked), the bolt 20 t later.',
         'scoreboard players set @s rdSgFxT 0',
-        target + hz('disk', 20, 8, r=2.5, decal='disc_pale', strike='bolt', detached=True),
+        target + hz('disk', 20, 8, r=2.5, decal='disc_pale', strike='bolt', detached=True), target + NOBAL,
         'execute at @e[tag=rlk_body,limit=1] run playsound minecraft:block.respawn_anchor.charge hostile @a[tag=player] ~ ~ ~ 0.6 1.7 0.2'])
     write('sg/fx6b', [
         '# 6b blade eye (A-11, polearm after-effect): an eye sigil 1.5 b beside the player, glint 8, burst 12 (disk r 2).',
@@ -420,9 +423,11 @@ def build_effects():
         'execute store result score #rdSgSide rd run random value 0..1',
         'execute if score #rdSgSide rd matches 0 ' + from_player(1.5, 0)[len('execute '):] + f'function {SG}fx6b_at',
         'execute if score #rdSgSide rd matches 1 ' + from_player(-1.5, 0)[len('execute '):] + f'function {SG}fx6b_at'])
-    write('sg/fx6b_at', [up(1.0, 'function rlk:boss/raiden/rig/prop/blade_eye'),
+    # The sigil (+-0.45 b about its pivot at scale 1.2) floats low beside the player, 0.05-0.95 b up (A-11: about
+    # 0.3 b; S3-F, review RD-N3: it was 0.55-1.45 b).
+    write('sg/fx6b_at', [up(0.5, 'function rlk:boss/raiden/rig/prop/blade_eye'),
                          'tag @e[tag=rlk_rd_prop_new] add rlk_rd_sgfx', 'tag @e[tag=rlk_rd_prop_new] add rlk_rd_tmp',
-                         hz('disk', 12, 8, r=2, detached=True),
+                         hz('disk', 12, 8, r=2, detached=True), NOBAL,
                          'playsound minecraft:block.amethyst_block.chime hostile @a[tag=player] ~ ~ ~ 0.9 1.6 0.2'])
 
 
@@ -516,16 +521,25 @@ def build_patterns():
     p.at(74, call('finish'))
 
     # ---- 2 뇌전이 이끈 번개 (A-06): three discs (re-aimed at launch), then the low wave (jump it).
-    # R1: the first disc flies at 1.3 b/t (not 2.0): a player at the F range (>= 8 b) is reached >= 12 t after the
-    # star flash; the clip's flick (d1 6) is binding, so the launch tick stays.
+    # R1: the first disc flies at 1.0 b/t (not 2.0): its hit test reaches r 1.7 + tol 0.3 past the centre, so a player
+    # more than 7.5 b away is reached >= 12 t after the star flash; the clip's flick (d1 6) is binding, so the launch
+    # tick stays. S3-F (review RD-R1): a ranged move that the bag's no-fit fallback (or a test) can start at melee
+    # range, so when the player is within 10 b at its start she first blinks back to 11 b from them (toward the arena
+    # centre, so the spot is always inside) and casts 10 t later (variant near_blink); otherwise she casts at once.
+    V0, V1 = 'if score @s rdSgV matches 0 ', 'if score @s rdSgV matches 1 '
     p = TL(2)
-    p.at(0, play('disc_cast'), line('will'), up(1.2, fwd(0.6, fx('star'))))
-    for t, v in ((5, 1.3), (9, 2.0), (17, 2.0)):
-        p.at(t, *FACE, hz('orb', 1, 9, d0=0.5, v=v, r=1.7, y=0.8, reach=24))
-    p.at(26, snd('iai_charge'))
-    p.at(33, *FACE, hz('sweep', 1, 16, r0=1, v=0.8, band=1, half=22, jump=True, detached=True, reach=25))
-    p.at(34, snd('wave_low'))
-    p.at(64, call('finish'))
+    p.at(0, 'scoreboard players set @s rdSgV 0',
+         'execute if entity @e[tag=rlk_body,distance=..10,limit=1] run scoreboard players set @s rdSgV 1')
+    p.at(0, 'execute at @e[tag=rlk_body,limit=1] facing entity @e[tag=rlk_raiden_arena,limit=1] feet rotated ~ 0 '
+         'positioned ^ ^ ^11 positioned ~ 201 ~ run ' + BLINK_TO, sg('slow_line'), cond=V1)
+    for o, cond in ((0, V0), (10, V1)):
+        p.at(o, *(FACE if o else []), play('disc_cast'), line('will'), up(1.2, fwd(0.6, fx('star'))), cond=cond)
+        for t, v in ((5, 1.0), (9, 2.0), (17, 2.0)):
+            p.at(o + t, *FACE, hz('orb', 1, 9, d0=0.5, v=v, r=1.7, y=0.8, reach=24), cond=cond)
+        p.at(o + 26, snd('iai_charge'), cond=cond)
+        p.at(o + 33, *FACE, hz('sweep', 1, 16, r0=1, v=0.8, band=1, half=22, jump=True, detached=True, reach=25), cond=cond)
+        p.at(o + 34, snd('wave_low'), cond=cond)
+        p.at(o + 64, call('finish'), cond=cond)
 
     # ---- 5 찰나의 포영: build_raiden_illusions.py (illusion/tick); rdPat 5 keeps her hidden and immune.
     patterns[5] = [call('illusion/tick')]

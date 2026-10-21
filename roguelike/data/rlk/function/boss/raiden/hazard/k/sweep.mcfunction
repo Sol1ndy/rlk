@@ -12,7 +12,9 @@ scoreboard players operation #rdLo rd -= @s rdHC
 scoreboard players operation #rdLo rd -= @s rdHTol
 execute if score #rdLo rd matches ..-1 run scoreboard players set #rdLo rd 0
 scoreboard players operation #rdLo rd *= #rdLo rd
-execute if score #rdR2 rd < #rdLo rd run return 0
+# S3-F perf (review RD-P1): the front only moves outward, so once the body is behind the band this hazard can
+# never reach it: it is spent (rdHHit = rdHMax) and `try` skips it until it expires; its cards fly on.
+execute if score #rdR2 rd < #rdLo rd run return run scoreboard players operation @s rdHHit > @s rdHMax
 execute if score @s rdHE matches ..-999 run return run scoreboard players set #rdHit rd 1
 function rlk:boss/raiden/hazard/fs
 scoreboard players operation #rdT rd = #rdFwd rd
