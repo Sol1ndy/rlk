@@ -3517,7 +3517,7 @@ w('test/chelp', 'tellraw @s ' + CTT + gray('명령: ') + ',' + link('/function r
   + gray(' 챕터 보스 시험 · ') + ',' + link('/function rlk:mboss/test/chapter_ch {id:"cproto",ch:2}', 'chapter_ch {id,ch}') + ','
   + gray(' 챕터 지정 · ') + ',' + link('/function rlk:mboss/test/lose', 'lose') + ',' + gray(' 패배 경로 · kill / abort / pattern / lock / level / stop 공통') + ']')
 
-# Chapter-boss test aliases rlk:boss/test/<cmd> (user 10-22: the chapter bosses live under boss/<id>, so their test
+# Chapter-boss test aliases rlk:boss/test/<cmd> (user 10-21: the chapter bosses live under boss/<id>, so their test
 # commands read rlk:boss/test/...): each forwards its macro arguments to the engine's rlk:mboss/test/<cmd>, which stays
 # the one implementation (mid-boss and chapter-boss tests share it). boss/test is reserved in the registry (fn roots).
 BOSS_TEST_ALIASES = [('chapter', '{id:"$(id)"}'), ('chapter_ch', '{id:"$(id)",ch:$(ch)}'), ('pattern', '{id:$(id)}'),

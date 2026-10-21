@@ -51,7 +51,7 @@ const rp = arg('--resourcepack') && path.resolve(arg('--resourcepack'));
 if (!rp) throw new Error('--resourcepack <unpacked pack> is required');
 const put = (p, s) => { fs.mkdirSync(path.dirname(p), {recursive: true}); fs.writeFileSync(p, s.endsWith('\n') ? s : s + '\n'); };
 const json = (p, o) => put(p, JSON.stringify(o, null, 2));
-// The module's function root (registry "fn", as tools/mboss_lib.fn_root; user 10-22: chapter bosses live under
+// The module's function root (registry "fn", as tools/mboss_lib.fn_root; user 10-21: chapter bosses live under
 // boss/<id>). Only the functions move: tags, scores and the resource-pack paths keep their mboss names.
 const FN_ROOT = (JSON.parse(fs.readFileSync(path.join(here, 'mboss_registry.json'), 'utf8')).boss.find(b => b.id === 'azhdaha') || {}).fn || 'mboss/azhdaha';
 const NS = `rlk:${FN_ROOT}/rig`;

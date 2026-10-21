@@ -159,7 +159,7 @@ def load_registry():
 
 
 # Function roots of the boss modules (F:<root>/<hook>). A registry entry may name its own root with "fn"; without it the
-# module lives at mboss/<id> (the mid-bosses, proto, cproto). The chapter bosses live under boss/<id> (user 10-22:
+# module lives at mboss/<id> (the mid-bosses, proto, cproto). The chapter bosses live under boss/<id> (user 10-21:
 # "중간보스가 아닌데" - Azhdaha boss/azhdaha, Apep boss/apep, beside Raiden's own boss/raiden). Only the function root
 # moves: entity tags, scoreboards, storage and resource-pack paths keep their mboss names, so saved worlds keep working.
 FN_ROOT_RESERVED = {'boss/raiden', 'boss/test'}   # Raiden's own module (not a registry boss) and the test aliases

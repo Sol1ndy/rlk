@@ -54,7 +54,7 @@ if str(HERE) not in sys.path:
 import mboss_az_fx_paint as P  # noqa: E402
 import mboss_lib as L  # noqa: E402
 
-ROOT = L.fn_root_of('azhdaha')         # the module's function root (registry fn: boss/azhdaha, user 10-22)
+ROOT = L.fn_root_of('azhdaha')         # the module's function root (registry fn: boss/azhdaha, user 10-21)
 FN = f'rlk:{ROOT}/fx/'
 FDIR = f'data/rlk/function/{ROOT}/fx'
 NS_TEX = 'rlk:mboss/az_kit/'           # textures, models (rlk:item/mboss/az_kit/*) and item ids

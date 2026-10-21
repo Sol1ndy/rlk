@@ -18,7 +18,7 @@
     "shield: false = no click shield in any state (rlk_mb_noshield; default for px bosses). hit: click-shield size, default {w:1.0,h:1.0} when shield is false.",
     "arenas{}: every non-plaza arena {n (= #mbAr, unique, never reused; the plaza is 0), theme (T:mboss_arena_<theme>.py), ver, cx cy cz, r walk safe, start, box, looks (looks[0] = the default), oob {y0,y1} (default cy-3..cy+16), sweep {y0,y1} (barrier band swept by cb/won, cleanup, cb/remove)}.",
     "Boss n 11 and arena n 2 are Apep's (chapter 3: ap_oasis; scratchpad ap/ap_contract.md 0.3.6). Its entry's first line holds id n kind ch route enabled w (route false until AP-I2).",
-    "fn: the module's function root under F: (default mboss/<id>; a chapter boss may say boss/<id>, user 10-22). Only the function root moves: entity tags, scoreboards, storage and resource-pack paths keep their mboss names. Generators read it through mboss_lib.fn_root / fn_root_of; boss/raiden and boss/test are reserved (Raiden's own module, the chapter-boss test aliases rlk:boss/test/<cmd>)."
+    "fn: the module's function root under F: (default mboss/<id>; a chapter boss may say boss/<id>, user 10-21). Only the function root moves: entity tags, scoreboards, storage and resource-pack paths keep their mboss names. Generators read it through mboss_lib.fn_root / fn_root_of; boss/raiden and boss/test are reserved (Raiden's own module, the chapter-boss test aliases rlk:boss/test/<cmd>)."
   ],
   "arena": {
     "theme": "plaza",

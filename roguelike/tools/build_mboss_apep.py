@@ -15,7 +15,7 @@ tools/mboss_apep/stub_rig_manifest.json (written here), so a commit that changes
 outputs (cm.md 1.2).
 
 The generator is the package tools/mboss_apep/: api.py (the stable contract), core.py (hooks, phases, slot, services,
-HUD, tests), ai.py, stub_rig.py / stub_rig_rt.py / stub_org.py (stand-ins), the pattern modules p1.py, p3.py,
+HUD, tests), ai.py, stub_rig.py / stub_rig_rt.py (the rig stand-in, dropped at AP-I2; the stub org was dropped at AP-I1), the pattern modules p1.py, p3.py,
 aftermath.py and the service modules seq.py, revival.py, org.py.
 """
 import sys

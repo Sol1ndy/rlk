@@ -158,8 +158,8 @@ def emit(core):
         f'execute if score #apR mb matches {A.BACK_RULE_PCT}.. run return fail',
         'execute if score #apFc mb < #apCdE5 mb run return fail',
         f'return run {F("ai/back_p5")}'])
-    w('ai/back_p5', ['# The BACK rule picks P5 (the first time of the fight: the hint line).',
-                     f'execute unless score #apBackH mb matches 1 run {g.line(A.TXT["back_hint"], A.WARN_HEX, 70)}',
+    # no hint line (user 10-21 no-tips rule: no in-game advice except instant-kill warnings and the real game's prompts)
+    w('ai/back_p5', ['# The BACK rule picks P5.',
                      sc('#apBackH', 1), sc('#apBackN', 0), sc('#apPick', 5), sc('#apArg', 0), F('ai/go'), 'return 1'])
     w('ai/rim', ['# The rim rule: P1 (off cooldown, not the last) or the 180-degree crab-turn.',
                  'execute store result score #apR mb run random value 0..99',

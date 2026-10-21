@@ -15,7 +15,6 @@ from . import PATTERN_MODULES, SERVICE_MODULES
 from . import api as A
 from . import ai as AI
 from . import stub_rig as SR
-from . import stub_org as SO
 from .api import L, K, Gen, TL
 
 NS = A.NS
@@ -70,25 +69,18 @@ def build():
             assert g.has(f'p/{p.key}/{f}'), f'{p.module}: pattern {p.key} has no {f}'
         for h in p.hooks:
             assert g.has(f'p/{p.key}/{h}'), f'{p.module}: pattern {p.key} declares {h} but writes no file'
-    core.stubs()
     SR_emit(g)
-    SO_emit()
     removed = clean(out)
     normal = [p for p in pats if p.kind == 'normal']
     print(f'mboss apep: {len(g.files)} functions ({len(normal)} normal patterns, {len(pats) - len(normal)} other, modules '
           f'{", ".join(PATTERN_MODULES + SERVICE_MODULES)} + core), {removed} stale removed; rig manifest '
-          f'{"rig" if A.REAL_MAN else "absent"} + stub ({len(A.FALLBACKS)} clip fallbacks); org manifest '
-          f'{"stub" if A.ORG_STUBBED else "org"}.')
+          f'{"rig" if A.REAL_MAN else "absent"} + stub ({len(A.FALLBACKS)} clip fallbacks); org manifest org.')
     notes = []
     if A.THEME_STUBBED:
         notes.append('WARN theme ap_oasis missing (AP-ARENA unmerged): api._THEME_FALLBACK used (stub arena, no props but '
                      'the lush water tiles, no gate crystals, no look swap)')
-    if not A.KIT:
-        notes.append(f'kit (AP-FX) absent: {len(K.used)} kit calls go to kstub/')
     if A.FALLBACKS:
         notes.append(f'rig: {len(A.FALLBACKS)} clips from the stub manifest' + ('' if A.REAL_RIG else ', the stand-in rig rig_stub/'))
-    if A.ORG_STUBBED:
-        notes.append('org manifest (AP-ORG) absent: stub_org_manifest.json used (organisms as stand-in displays)')
     for n in notes:
         print('  note: ' + n)
     for clip, event, default in sorted(set(A.EV_FALLBACKS)):
@@ -106,9 +98,6 @@ def SR_emit(g):
     if A.stub_rig_needed():
         RT.emit(g, A.MAN)
 
-
-def SO_emit():
-    A.ORG_STUB_FILE.write_text(json.dumps(SO.build_org(), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
 
 
 class KitOwned:
@@ -396,7 +385,7 @@ class Core:
             '# hook, cm.md 7.2): phase 1 = 1 % of the P1 pool (svc/floor_p1), phase 3 = 0.'])
         pause = ['# Hook pause (the fight froze): the kit\'s telegraphs and overlays go; every active pattern\'s pause; phase 2:',
                  '# the walls are cleared (re-cast later) and the organisms freeze (the module tick does not run; plan 7.2).',
-                 K.tele_clear() if not A.KIT else f'function {K.FN}tele/clear', K.hud('flash_end'), K.hud('banner_end'),
+                 f'function {K.FN}tele/clear', K.hud('flash_end'), K.hud('banner_end'),
                  F('p/pause_d'),
                  f'execute if score #apPh mb matches 2 run {F("rev/pause")}']
         self.w('pause', pause)
@@ -416,11 +405,11 @@ class Core:
             F('wall/clear'), F('org/clear'), F('rev/clear'), F('dome/clear')] + kills + [
             f'kill @e[tag=rlk_mb_ar_{A.AID}]', 'kill @e[type=minecraft:husk,tag=rlk_mb_ap_org]', F('ai/vars'),
             'data remove storage rlk:mboss ap',
-            K.clear() if not A.KIT else f'function {K.FN}clear', K.hud('clear'), K.dress('clear')])
+            f'function {K.FN}clear', K.hud('clear'), K.dress('clear')])
         unin = ['# Hook uninstall (no executor; every enabled module): the rig (real or stand-in), the kit, the module entities,',
                 '# objectives and storage.',
                 f'function {A.rig_fn("kill")}', f'function {A.rig_fn("uninstall")}',
-                K.uninstall() if not A.KIT else f'function {K.FN}uninstall',
+                f'function {K.FN}uninstall',
                 F('wall/clear')] + kills + [f'kill @e[tag=rlk_mb_ar_{A.AID}]', 'kill @e[type=minecraft:husk,tag=rlk_mb_ap_org]',
                                             'kill @e[tag=rlk_mb_ap_gate]', 'data remove storage rlk:mboss ap']
         unin += [f'scoreboard objectives remove {o}' for o in ENTITY_OBJ]
@@ -445,8 +434,11 @@ class Core:
         self.w('rl/p1', ['# /reload in phase 1: the rig in the p1 look, CROUCH; the pattern cancelled; the drawn-up Heart prop; the props.',
                          F('p/cancel'), F('svc/look_p1'), f'function {A.rig_fn("stance/crouch")}', g.play('idle_p1'),
                          F('px/restate'), F('heart/p1_respawn'), F('arena/props_now'), sc('#apCool', 20), sc('#apHudQ', 1)])
-        self.w('rl/p2', ['# /reload in phase 2: the stage (revival) re-makes the Heart, clears the walls, respawns the wave; parked again.',
-                         F('p/reload_d'), F('svc/park'), F('rev/reload'), F('arena/props_now'), sc('#apHudQ', 1)])
+        cx, cy, cz = (L.num(v, 3) for v in A.CENTRE)
+        self.w('rl/p2', ['# /reload in phase 2: the stage (revival) re-makes the Heart, clears the walls, respawns the wave; parked again;',
+                         '# the kit re-makes its dressing pool (the cards died with every rlk_mb_aux; ap_fx_api 0.12) at the arena centre.',
+                         F('p/reload_d'), F('svc/park'), F('rev/reload'), F('arena/props_now'),
+                         f'execute in minecraft:overworld positioned {cx} {cy} {cz} run function {K.FN}dress/redraw', sc('#apHudQ', 1)])
         self.w('rl/p3', ['# /reload in phase 3: the rig in the p3 look, UPRIGHT; the pattern cancelled; the lush props.',
                          F('p/cancel'), F('svc/look_p3'), f'function {A.rig_fn("stance/upright")}', g.play('idle_p3'),
                          F('px/restate'), F('arena/props_now'), sc('#apCool', 20), sc('#apHudQ', 1)])
@@ -472,7 +464,7 @@ class Core:
         l1 = txt(A.BOSS['name'], A.GOLD_HEX, True)
         l2 = txt(T['gate_l2'], '#D0D0D0')
         l3 = txt(T['gate_l3'], '#A8A8A8')
-        m2 = 'rlk:mboss/ap_kit/gate_crystal' if A.KIT else 'minecraft:emerald'
+        m2 = 'rlk:mboss/ap_kit/gate_crystal'
         gate = (f'{{item:"{A.BOSS["icon"]["item"]}",model:"{A.BOSS["icon"]["model"]}",item2:"minecraft:emerald",'
                 f'model2:"{m2}",l1:{l1},l2:{l2},l3:{l3},n:{A.N}}}')
         lines = ['# Hook prep (cm.md 5.3; @s = the kind-9 zone marker, at it; once per entrance build; cb/pp/apep cleared',
@@ -783,7 +775,7 @@ class Core:
                        f'execute as {BODY} run {F("p/cancel")}', sc('#apPid', 40), sc('#apPNew', 1), sc('#apReqT', 0)])
         w('lose', ['# The second failure (plan 3.4, FN-9): the normal death path (run over / test/defeat).', 'function rlk:mboss/cb/lose'])
         w('lib_clear', ['# Every running framework library effect and the kit telegraphs (T1 t6, CS t0, tests).',
-                        'function rlk:mboss/lib_clear', K.tele_clear() if not A.KIT else f'function {K.FN}tele/clear'])
+                        'function rlk:mboss/lib_clear', f'function {K.FN}tele/clear'])
         w('targetable', ['# The body targetable (outside px inv sets).', 'tag @e[type=minecraft:husk,tag=rlk_mb_body] remove rlk_mb_inv'])
         w('untargetable', ['tag @e[type=minecraft:husk,tag=rlk_mb_body] add rlk_mb_inv'])
         w('hud_now', [sc('#apHudQ', 1)])
@@ -859,8 +851,7 @@ class Core:
             x, y, z = pr['pos'][:3]
             s = float(pr.get('scale', 1.0))
             u = int(pr['uuid']) if pr.get('uuid') is not None else 0
-            flat = pr['kind'] == 'water_sheet' and not A.KIT
-            rot = '[0.7071f,0f,0f,0.7071f]' if flat else '[0f,0f,0f,1f]'
+            rot = '[0f,0f,0f,1f]'                # the kit's water_sheet prop lays the sheet flat itself
             line = (f'execute in minecraft:overworld run summon minecraft:item_display {L.num(x, 3)} {L.num(y, 3)} {L.num(z, 3)} '
                     f'{{UUID:[I;{A.PROP_INTS[0]},{A.PROP_INTS[1]},{A.PROP_INTS[2]},{u}],'
                     f'Tags:["rlk_mb_arena_prop","rlk_mb_ar_{A.AID}","rlk_mb_ap_ar_{pr["group"]}"],'
@@ -870,7 +861,7 @@ class Core:
                     f'item:{{id:"{stand.get(pr["kind"], "minecraft:paper")}",count:1}}}}')
             uu = f'{A.PROP_BLOCK}{u:02x}'
             out = [f'execute unless entity {uu} run {line}']
-            out.append(f'execute as {uu} run {K.prop(pr["kind"]) if not A.KIT else "function " + K.FN + "prop/" + pr["kind"]}')
+            out.append(f'execute as {uu} run {K.prop(pr["kind"])}')
             return out
         by = {lk: {pr['name']: pr for pr in A.PROPS.get(lk, [])} for lk in A.LOOKS}
         for lk in A.LOOKS:
@@ -941,7 +932,7 @@ class Core:
             '# Hook death_start (@s = body; the framework cleared its libraries, hid the bars, set the proxies dead, stopped the',
             '# music): the slot, domes, walls, organisms, the kit telegraphs and HUD; the cine; the death clip and seq/death.',
             F('p/cancel'), F('dome/clear'), F('wall/clear'), F('org/clear'),
-            K.tele_clear() if not A.KIT else f'function {K.FN}tele/clear', K.hud('clear'),
+            f'function {K.FN}tele/clear', K.hud('clear'),
             F('svc/cine_on'), sc('#mbFloor', 0), sc('#apTr', 0), sc('#apPh', PH['D']), sc('#apPT', 0),
             F('u/hide_off'), g.play('death'), F('seq/death/start')])
         self.w('death_tick', [
@@ -1023,12 +1014,3 @@ class Core:
                              f'execute if score #apPh mb matches 1 run {F("svc/px_rest")}',
                              f'execute if score #apPh mb matches 3 run {F("svc/px_rest")}'])
         self.w('test/run', run)
-
-    # -----------------------------------------------------------------------------------------
-    def stubs(self):
-        """The kit stand-in files (kstub/) of every kit call used in this run (AP-I1 switches to the kit)."""
-        if not A.KIT:
-            for path, args in sorted(K.used.items()):
-                a = ', '.join(f'{k}={v}' for k, v in args.items())
-                self.w(f'kstub/{path}', [f'# LOCAL STUB of the kit call {K.FN}{path} (ap_fx_api.md 0; AP-FX, wip/ap-fx) — no-op until AP-I1.',
-                                         f'# first call: {a}' if a else '# (no args)'])

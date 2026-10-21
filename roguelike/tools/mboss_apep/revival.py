@@ -154,7 +154,7 @@ def emit(g):
     badges = []
     for k in ('guard', 'nest', 'nurt', 'pred', 'destr'):
         badges.append(f'execute if entity @e[type=minecraft:husk,tag=rlk_mb_ap_{k},limit=1] run data modify storage rlk:mboss extra '
-                      f'append value {A.K.badge(k, True)}' if not A.KIT else f'# kit badge {k}')
+                      f'append value {A.K.badge(k, True)}')
     g.w('rev/hud', [HEAD, '# @s = body (phase 2, every 4 t): line 1 extras (the specials alive, the wave), line 3 (the progress, ⚠).',
                     'data modify storage rlk:mboss extra set value []'] + badges + [
                     'data modify storage rlk:mboss extra append value {text:"  ",color:"#E8E2D0"}',
@@ -163,7 +163,8 @@ def emit(g):
                     'scoreboard players operation #apHtP mb = #apHt mb', 'scoreboard players operation #apHtP mb /= #c100 mb',
                     f'data modify storage rlk:mboss sub set value [{{text:"{T["p2_progress"]} ",color:"{A.HEART_HEX}"}},'
                     f'{{score:{{name:"#apHtP",objective:"mb"}},color:"{A.HEART_HEX}"}},{{text:"%",color:"{A.HEART_HEX}"}}]',
-                    f'execute if score #apFail mb matches 1.. run data modify storage rlk:mboss sub append value {{text:"  ⚠",color:"{A.WARN_HEX}"}}',
+                    'execute if score #apFail mb matches 1.. run data modify storage rlk:mboss sub append value {text:"  "}',
+                    f'execute if score #apFail mb matches 1.. run data modify storage rlk:mboss sub append value {A.K.badge("fail", True)}',
                     sc('#apHudQ', 0)])
 
     # ---------------------------------------------------------------- T1 (service 20, 136 t)
@@ -190,8 +191,7 @@ def emit(g):
                            f'title @a[tag=player] subtitle {{text:"{T["fail_line"]}",color:"{A.WARN_HEX}"}}',
                            Gen.set_len(A.FAIL_LEN)])
     g.pw('fail', 'strike', [HEAD, 'scoreboard players set #mbNoRx mb 1', *Gen.pl_dot(A.DMG_PM['fail1'], 7, 0)])
-    g.pw('fail', 'restart', [HEAD, sc('#apHt', R['fail_restart']), F('rev/start'), Gen.line(T['fail_hint'], A.HEART_HEX, 100),
-                             Gen.end()])
+    g.pw('fail', 'restart', [HEAD, sc('#apHt', R['fail_restart']), F('rev/start'), Gen.end()])   # no hint line (no-tips rule)
     g.pw('fail', 'tick', [HEAD, Gen.at(20, F('p/fail/strike')),
                           f'execute if score #apPT mb matches {A.FAIL_LEN}.. run {F("p/fail/restart")}'])
     g.pw('fail', 'reload', [HEAD, '# /reload during the strike: the restart at once.', F('p/fail/restart')])

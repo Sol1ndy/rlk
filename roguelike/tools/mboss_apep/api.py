@@ -13,9 +13,8 @@ itself when the real part lands (the build prints every one in use):
 - the rig (wip/ap-rig, AP-I1 / AP-I2): the manifest is the real one ("schema": 1, "source": "rig") merged per clip with
   the stub of stub_rig.py (FALLBACKS = the clips taken from the stub, ids >= 1000; AP-I2 asserts none); the rig API is
   the real rig's where F:boss/apep/rig/<fn> exists, else the stand-in AP:rig_stub/** (rig_fn, play_fn);
-- the org manifest (wip/ap-org, AP-I1): T:mboss_apep_org_manifest.json when present, else stub_org.py's;
-- the kit (wip/ap-fx, AP-I1): K = the kit's Python API (`import build_mboss_ap_fx`) when present, else KitStub with the
-  ap_fx_api.md 0.10 signatures, whose every call is an empty module-owned function AP:kstub/<kit path>;
+- the org manifest: T:mboss_apep_org_manifest.json (AP-ORG, merged at AP-I1; the stub org was dropped there);
+- the kit: K = the kit's Python API (`import build_mboss_ap_fx`, AP-FX, merged at AP-I1);
 - the arena theme (wip/ap-arena, AP-I1): mboss_arena_ap_oasis when present, else _THEME_FALLBACK (ap_contract 0.6.3
   points; no props but the lush water tiles; the framework builds a stub arena, cm.md 6.3).
 """
@@ -30,10 +29,9 @@ if str(_TOOLS) not in sys.path:
     sys.path.insert(0, str(_TOOLS))
 import mboss_lib as L  # noqa: E402
 from . import stub_rig as SR  # noqa: E402
-from . import stub_org as SO  # noqa: E402
 
 ID = 'apep'
-# The module's function root (registry "fn", mboss_lib.fn_root; user 10-22: chapter bosses live under boss/<id>).
+# The module's function root (registry "fn", mboss_lib.fn_root; user 10-21: chapter bosses live under boss/<id>).
 # Only functions move: tags, scores, storage and resource-pack paths keep their mboss / ap names.
 ROOT = L.fn_root_of(ID)
 NS = f'rlk:{ROOT}/'
@@ -274,12 +272,10 @@ HAND_SETS = tuple(MAN['hands']['ids'])
 YAW_CLIPS = tuple(c for c in CLIP_NAMES if CLIPS[c].get('yaw'))
 
 # =============================================================================================
-# The org manifest (ap_contract 0.5): real (source "org") when present, else the stub
+# The org manifest (ap_contract 0.5): the real one (AP-ORG, "source": "org"); the stub org was dropped at AP-I1
 ORG_MANIFEST = _TOOLS / 'mboss_apep_org_manifest.json'
-ORG_STUB_FILE = Path(__file__).resolve().parent / 'stub_org_manifest.json'
-_ORG_RAW = json.loads(ORG_MANIFEST.read_text(encoding='utf-8')) if ORG_MANIFEST.exists() else None
-ORG_STUBBED = not (isinstance(_ORG_RAW, dict) and _ORG_RAW.get('source') == 'org')
-ORG = SO.build_org() if ORG_STUBBED else _ORG_RAW
+ORG = json.loads(ORG_MANIFEST.read_text(encoding='utf-8'))
+assert ORG.get('source') == 'org', f'{ORG_MANIFEST.name}: not the real org manifest (source {ORG.get("source")!r})'
 KINDS = {k: v for k, v in ORG['kinds'].items()}                            # basic nurt guard nest destr pred
 KIND_ID = {k: v['id'] for k, v in KINDS.items()}                           # apK 1..6
 KIND_KEY = {v: k for k, v in KIND_ID.items()}
@@ -333,7 +329,7 @@ REV = {                                                     # plan 7.6.2 / 9.5 (
     'basic_hit': 60, 'buffed_hit': 120, 'destr_blast': 1400,
     'slots': 3, 'cap': 6, 'wave_clock': 600, 'wave_left': 1,
     'timeout': 2000, 'timeout_every': 600, 'timeout_alive': 1, 'warn_lead': 0,
-    'fail_strikes': 2, 'fail_restart': 2700, 'fail_hint_t': 400,
+    'fail_strikes': 2, 'fail_restart': 2700,
     'basic_spd': 0.12, 'melee_every': 40, 'ranged_every': 50,
     'nurt_links': 3, 'nurt_loss_pct': 40, 'nurt_relink': 80, 'shield_mult': 5, 'pyro_vs_shield_pct': 150,
     'destr_spd': 0.10, 'destr_fuse': 56, 'destr_blast_at': 61,
@@ -402,11 +398,9 @@ TXT = {
     'p2_goal': '마물을 처치해서 소생 진행도를 올리세요',
     'p2_progress': '소생 진행도',
     'fail_title': '「소생 실패」', 'fail_line': '다시 한 번 실패하면 쓰러집니다',
-    'fail_hint': '수호 → 강화된 기본 → 파괴 순서로 처치하세요',
     'warn_title': '!', 'warn_sub': '오아시스의 심장이 위험합니다', 'warn_line': '파괴의 증식 생명체가 나타납니다',
     'cs_done': '오아시스의 심장이 소생했습니다', 'cs_heal': '오아시스의 심장이 생명을 나눕니다',
     'floor_pop': '…', 'immune': '면역',
-    'back_hint': '꼬리 뒤는 위험합니다 — 정면에 서세요',
     'gate_l2': '내성: 풀 30% · 그 외 10%', 'gate_l3': '챕터 3 보스',
     'q2_lethal': '다음 종말의 여파는 치명적입니다 — 보호막 안에 머무르세요',
 }
@@ -419,125 +413,11 @@ def tell_rt(t):
 
 
 # =============================================================================================
-# The kit (AP-FX, ap_fx_api.md 0.10): its Python API when present, else KitStub (same signatures; each call = an
-# empty module-owned function AP:kstub/<kit path>, written by the core for the paths used; AP-I1 switches by merging)
-class KitStub:
-    """No-op stand-in of `import build_mboss_ap_fx as K` until AP-I1 (ap_fx_api.md 0.10). Every builder returns ONE
-    function line (valid after `execute ... run`)."""
-    STUB = True
-    FN = f'{NS}fx/'
-    FONT = 'rlk:mboss_ap'
-    STO = 'rlk:apkit'
-    CAP, TCAP, SOFT, DCAP, FLCAP = 64, 40, 40, 16, 48
-    OWNED_DIRS = ('e', 'p', 'tele', 'dress', 'snd', 'hud', 'prop', 'test')
-    OWNED_FILES = ('card', 'cardx', 'look', 'clear', 'uninstall')
-    KINDS, PRESETS, SOUNDS, PROPS, GLYPHS, AMBIENT, TELE_COL = {}, {}, {}, {}, {}, set(), {}
-    WHITE = 16777215
-    BADGE_COL = {'guard': '#F2D45C', 'nest': '#C9E07A', 'nurt': '#D4E784', 'pred': '#E07A5A', 'destr': '#F0A040',
-                 'fail': WARN_HEX}
-    BADGE_KO = {'guard': '수호', 'nest': '둥지', 'nurt': '양육', 'pred': '포식성', 'destr': '파괴', 'fail': '⚠'}
-
-    def __init__(self):
-        self.used = {}
-
-    def _c(self, path, **a):
-        path = path.strip('/')
-        self.used.setdefault(path, {k: v for k, v in a.items() if v is not None})
-        return f'function {NS}kstub/{path}'
-
-    def card(self, kind, pos='~ ~ ~', rot='~ ~', bb='fixed', roll=0, spin=0, s0=0.0, s1=1.0, move=(0, 0, 0), life=8,
-             fade=0, col=16777215, dly=0, dur=0, hit=-1, col2=-1, off=None):
-        return self._c('card', kind=kind)
-
-    def look(self, kind, col=16777215):
-        return self._c('look', kind=kind)
-
-    def clear(self):
-        return self._c('clear')
-
-    def uninstall(self):
-        return self._c('uninstall')
-
-    def tele_disc(self, r, tell, el=7, nd=0, hold=3):
-        return self._c('tele/disc', r=r, tell=tell, el=el)
-
-    def tele_sector(self, r, a, tell, el=7, nd=0, hold=3):
-        return self._c('tele/sector', r=r, a=a, tell=tell, el=el)
-
-    def tele_wedge(self, r0, r1, a0, a1, tell, el=7, nd=0, hold=3):
-        return self._c('tele/wedge', r0=r0, r1=r1, a0=a0, a1=a1, tell=tell, el=el)
-
-    def tele_line(self, length, w, tell, el=7, nd=0, hold=3, back=0.0):
-        return self._c('tele/line', len=length, w=w, tell=tell, el=el)
-
-    def tele_crack(self, length, w, tell, nd=0, hold=3, back=0.0):
-        return self._c('tele/crack', len=length, w=w, tell=tell)
-
-    def tele_wave(self, wid, r0, r1, w, tell, dur, el=7, nd=0, hold=2):
-        return self._c('tele/wave', id=wid, r0=r0, r1=r1, w=w, tell=tell, dur=dur, el=el)
-
-    def tele_wave_end(self, wid):
-        return self._c('tele/wave_end', id=wid)
-
-    def tele_mask_wash(self, r, tell, hold):
-        return self._c('tele/mask_wash', r=r, tell=tell, hold=hold)
-
-    def tele_safe_rim(self, sid, r, tell, hold):
-        return self._c('tele/safe_rim', id=sid, r=r, tell=tell, hold=hold)
-
-    def tele_safe_end(self, sid):
-        return self._c('tele/safe_end', id=sid)
-
-    def tele_mring(self, mid, r, el=22):
-        return self._c('tele/mring', id=mid, r=r, el=el)
-
-    def tele_mring_move(self, mid, t=2):
-        return self._c('tele/mring_move', id=mid, t=t)
-
-    def tele_mring_end(self, mid):
-        return self._c('tele/mring_end', id=mid)
-
-    def tele_wall_spot(self, tell, hold):
-        return self._c('tele/wall_spot', tell=tell, hold=hold)
-
-    def tele_clear(self):
-        return self._c('tele/clear')
-
-    def dress(self, name, **a):
-        return self._c(f'dress/{name}', **a)
-
-    def fx(self, name, **a):
-        return self._c(f'p/{name}', **a)
-
-    def snd(self, name):
-        return self._c(f'snd/{name}')
-
-    def prop(self, name):
-        return self._c(f'prop/{name}')
-
-    def hud(self, name, **a):
-        return self._c(f'hud/{name}', **a)
-
-    def glyph(self, name):
-        return ''
-
-    def badge(self, kind, on):
-        """◆ + the kind's Korean name (dim #707070 off, the kind colour on), as a text component (plain text here)."""
-        col = self.BADGE_COL.get(kind, '#FFFFFF') if on else DIM_HEX
-        nm = self.BADGE_KO.get(kind, kind)
-        return f'{{text:"  ◆{nm}",color:"{col}",bold:false}}'
-
-    def heart_bar(self, v, vmax=10000):
-        n = max(0, min(20, int(v * 20 // max(1, vmax))))
-        return '{text:"' + '■' * n + '□' * (20 - n) + f'",color:"{HEART_HEX}"}}'
-
-
-try:
-    import build_mboss_ap_fx as K  # noqa: E402  (AP-FX's kit; no files written on import)
-    KIT = True
-except ImportError:
-    K = KitStub()
-    KIT = False
+# The kit (AP-FX, ap_fx_api.md 0.10): K = its Python API (merged at AP-I1; the KitStub stand-in and AP:kstub/** are gone).
+# Its builders return one `function ...` line; the core calls the kit's fixed functions (clear, uninstall, tele/clear)
+# as f'function {K.FN}<path>'.
+import build_mboss_ap_fx as K  # noqa: E402  (no files written on import)
+KIT = True
 
 # =============================================================================================
 BODY = '@e[type=minecraft:husk,tag=rlk_mb_body,limit=1]'

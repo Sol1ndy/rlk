@@ -35,7 +35,7 @@ import mboss_lib as L  # noqa: E402
 from . import stub_rig as SR  # noqa: E402
 
 ID = 'azhdaha'
-# The module's function root (registry "fn", mboss_lib.fn_root; user 10-22: chapter bosses live under boss/<id>).
+# The module's function root (registry "fn", mboss_lib.fn_root; user 10-21: chapter bosses live under boss/<id>).
 # Only functions move: tags, scores, storage and resource-pack paths keep their mboss / az names.
 ROOT = L.fn_root_of(ID)
 NS = f'rlk:{ROOT}/'

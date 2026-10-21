@@ -9,7 +9,6 @@ core       the 17 hooks + prep, the phase machine (E -> P1 -> T1 -> P2 -> CS -> 
 ai         zones (mv/local), bands, facing, crawl / walk, clamps, the BACK dwell and rim rules, weights, cooldowns,
            no-repeat, chains, the Q2 schedule, anti-stall (AP-CORE)
 stub_rig   the stub rig manifest (D0, ids 1000 + k) and the stand-in rig AP:rig_stub/** (AP-CORE; dropped at AP-I2)
-stub_org   the stub org manifest (D0; dropped at AP-I1)
 p1 seq     P1-P6, R, (M sounds); E, D             (AP-P1; working frame stubs by AP-CORE until AP-I1)
 p3         Q1, Q3, Q3s, Q4, Q5                     (AP-P3; stubs)
 aftermath  Q2 종말의 여파                           (AP-P3; stub)
