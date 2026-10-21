@@ -93,8 +93,9 @@ write('start', [
     call('object/clear'),
     'scoreboard players set @s rdBlink 0',
     'kill @e[tag=rlk_rd_blink_dest]',
-    call('rig/play/blink_out'),
-    'execute at @s run ' + call('fx/blink_out'),
+    '# rd-sync: she scatters where she stands (the release\'s blink art) and stays hidden.',
+    call('rig/state/hidden'),
+    'execute at @s run ' + call('movement/depart'),
     call('line/pohyeong'),
 ])
 write('pillars', [

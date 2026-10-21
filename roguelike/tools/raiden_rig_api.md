@@ -77,8 +77,14 @@ Objectives: `rdRigC` clip id, `rdRigT` clip tick (-1 = queued), `rdRigS` state (
 | 43 | `exhausted` | 60 loop | shogun | — | |
 | 44 | `recover` | 28 | shogun | — | |
 
-Non-looping clips hold their last pose until the next `play`. The glaive is not shown while thrown
-(`t_combo3` 54-62, regrown by 70; `t_spin_throw` 31-39, regrown by 46): the encounter flies its own projectile.
+Non-looping clips hold their last pose until the next `play`. The glaive leaves her hand 3 t before its landing
+(`t_combo3` 51, hidden until 62, regrown by 70; `t_spin_throw` 28, hidden until 39, regrown by 46): the encounter flies
+it to the locked spot (tm/glaive_fly), landing on the `throw` event.
+
+Swing sync (rd-sync): every attacking clip passes its weapon through the hazard's centre line (or the player's bearing
+for a disk / ring round her) at the event tick, within 1 t, through the front (never round her back); the strike
+visual's `sm` motion (raiden_kit.hz) follows the same direction. `S/rd/sync/tools/audit.py` measures it from the
+compiled poses (`--debug-dp`).
 
 ## Model notes for pattern authors
 

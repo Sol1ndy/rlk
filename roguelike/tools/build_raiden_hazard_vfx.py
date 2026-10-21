@@ -29,7 +29,7 @@ import shutil
 import sys
 
 from build_raiden_fx_textures import catalogue, build_fx_textures, TEX_SUBDIR, NS, KIT_QEXT
-from raiden_kit import (DECALS, DECAL_INTRO, STRIKES, STRIKE_YU, STRIKE_LIFE, FLASH, AFTER_AT, AFTER_TINT, FADE_AT,
+from raiden_kit import (DECALS, DECAL_INTRO, STRIKES, STRIKE_YU, STRIKE_LIFE, SM_SWEEP, FLASH, AFTER_AT, AFTER_TINT, FADE_AT,
                         FADE_TINT, SOUNDS, SEG_DEG, KINDS)
 
 FX = {c["name"] for c in catalogue()}
@@ -396,8 +396,8 @@ def save_models(rp, M):
 
 
 # --------------------------------------------------------------------------- datapack side
-def nbt_tf(tx="0", ty="0", tz="0", sx="1", sy="1", sz="1"):
-    return (f'{{translation:[{tx}f,{ty}f,{tz}f],left_rotation:[0f,0f,0f,1f],scale:[{sx}f,{sy}f,{sz}f],'
+def nbt_tf(tx="0", ty="0", tz="0", sx="1", sy="1", sz="1", lr="[0f,0f,0f,1f]"):
+    return (f'{{translation:[{tx}f,{ty}f,{tz}f],left_rotation:{lr},scale:[{sx}f,{sy}f,{sz}f],'
             f'right_rotation:[0f,1f,0f,0f]}}')
 
 
@@ -520,8 +520,9 @@ def build(root, out):
 
     # strike: storage rlk:rd v {m, a, sx, sz, tz, sx0, sz0, d}
     st = ['# @s = hazard at its origin. The strike visual of a static hazard, sized to it (life 10: flash, flicker,',
-          '# residue, fade). Field crackle stays bound to the hazard instead.',
-          'data modify storage rlk:rd v set value {tz:0f,d:1}']
+          '# residue, fade). Field crackle stays bound to the hazard instead. rdHSm (rd-sync) starts it where the swing',
+          '# came from: swept in from one side, dropped from above, run out from the origin or grown up from the floor.',
+          'data modify storage rlk:rd v set value {tz:0f,d:1,ty0:0f,sy0:%sf,lr0:"[0f,0f,0f,1f]"}' % STRIKE_YU]
     for sv, (_, hot, after) in STRIKES.items():
         st.append(f'execute if score @s rdHSv matches {sv} run function {H}vis/sv/{sv}')
         write(f"vis/sv/{sv}", [f'data modify storage rlk:rd v.m set value "{hot}"',
@@ -536,6 +537,7 @@ def build(root, out):
         'execute store result storage rlk:rd v.sx0 float 0.00075 run scoreboard players get #rdSx rd',
         'execute store result storage rlk:rd v.sz0 float 0.00075 run scoreboard players get #rdSz rd',
         'execute if score @s rdHK matches 3..4 run function %svis/strike_full' % H,
+        f'execute if score @s rdHSm matches 1.. run function {H}vis/strike_motion',
         f'execute if score @s rdHK matches {KINDS["field"]} run function {H}vis/field_summon with storage rlk:rd v',
         f'execute unless score @s rdHK matches {KINDS["field"]} run function {H}vis/strike_summon with storage rlk:rd v',
         f'tp {VNEW} ~ ~ ~ ~ 0',
@@ -547,9 +549,20 @@ def build(root, out):
     write("vis/strike_full", ['# rect / to_wall: no expand (a slash is instant along its whole length)',
                               'data modify storage rlk:rd v.sx0 set from storage rlk:rd v.sx',
                               'data modify storage rlk:rd v.sz0 set from storage rlk:rd v.sz'])
+    half = math.radians(SM_SWEEP) / 2
+    qs = {1: f'[0f,{math.sin(half):.5f}f,0f,{math.cos(half):.5f}f]', 2: f'[0f,{-math.sin(half):.5f}f,0f,{math.cos(half):.5f}f]'}
+    write("vis/strike_motion", [
+        '# rdHSm 1 / 2: the strike starts turned SM_SWEEP deg toward her left / right (model +X = her left) and sweeps',
+        '# into place behind the blade; 3 drops 1 b; 4 runs out from the origin (rect / to_wall); 5 grows up from the floor.',
+        f"execute if score @s rdHSm matches 1 run data modify storage rlk:rd v.lr0 set value \"{qs[1]}\"",
+        f"execute if score @s rdHSm matches 2 run data modify storage rlk:rd v.lr0 set value \"{qs[2]}\"",
+        'execute if score @s rdHSm matches 3 run data modify storage rlk:rd v.ty0 set value 1.0f',
+        'execute if score @s rdHSm matches 4 store result storage rlk:rd v.sz0 float 0.00015 run scoreboard players get #rdSz rd',
+        f'execute if score @s rdHSm matches 5 run data modify storage rlk:rd v.sy0 set value {STRIKE_YU * 0.15:.2f}f',
+    ])
     write("vis/strike_summon", ['$' + display(
         ["rlk_rd_fx", "rlk_rd_strike", "rlk_rd_fxa", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew"],
-        MODEL_NS + "$(m)", nbt_tf(tz="$(tz)", sx="$(sx0)", sy=str(STRIKE_YU), sz="$(sz0)"),
+        MODEL_NS + "$(m)", nbt_tf(ty="$(ty0)", tz="$(tz)", sx="$(sx0)", sy="$(sy0)", sz="$(sz0)", lr="$(lr0)"),
         custom='{d:3,after:"' + MODEL_NS + '$(a)",fade:' + str(FADE_TINT) + ',to:' +
                nbt_tf(tz="$(tz)", sx="$(sx)", sy=str(STRIKE_YU), sz="$(sz)") + '}')])
     write("vis/field_summon", ['$' + display(

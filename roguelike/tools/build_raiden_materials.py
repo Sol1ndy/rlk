@@ -24,6 +24,8 @@ PALETTE = {
     "glow": (181, 118, 255, 30),
     "afterglow": (144, 96, 230, 64),
     "pearl": (235, 213, 255, 224),
+    # the blink scatter silhouette's blue slices (build_raiden_movement.py; restored with the release's blink art)
+    "blue": (61, 64, 199, 148),
 }
 
 
@@ -37,7 +39,7 @@ def png(path, rgba):
 
 
 # Swatches of the release's dome / judgment rig / puppet-arm models; nothing uses them since S3, so they are pruned.
-RETIRED = ("blue", "floor", "shield_glass", "shield_mist", "arm_lilac", "arm_shade", "arm_deep", "arm_tomoe", "gold_dull",
+RETIRED = ("floor", "shield_glass", "shield_mist", "arm_lilac", "arm_shade", "arm_deep", "arm_tomoe", "gold_dull",
            "blade_pale", "blade_edge", "blade_core", "grip_dark", "hand_dull", "hand_dull_dark", "nail_glow")
 
 

@@ -18,6 +18,7 @@ Per-hazard scores (milliblocks unless noted):
     orb        A d0, B v, C r, D r + tol, E height of the card, F travel ticks
   rdHGrp hit-sharing group · rdHDk decal id (raiden_kit.DECALS) · rdHDl decal life · rdHKb knock-back steps
   rdHSv strike id (raiden_kit.STRIKES) or the segment count of a sweep · rdHSnd impact sound (1, 2 = + thunder)
+  rdHSm strike motion (raiden_kit.STRIKE_MOTION: 0 expand, 1/2 sweep in from her left / right, 3 chop, 4 thrust, 5 rise)
   rdFX / rdFZ frozen forward vector · rdHId serial (rdVId of its displays) · mlv boss level
 Tags: rlk_rd_hazard + rlk_rd_quiet (no decal) / rlk_rd_nododge / rlk_rd_jump / rlk_rd_detached / rlk_rd_lift.
 The hit test runs at the tell tick for static kinds, every tick after the launch for travelling ones, and every rdHEv
@@ -37,8 +38,8 @@ if OUT.exists():
 OUT.mkdir(parents=True, exist_ok=True)
 NEW = '@e[tag=rlk_rd_hnew,limit=1]'
 OBJECTIVES = ['rdHK', 'rdHA', 'rdHB', 'rdHC', 'rdHD', 'rdHE', 'rdHF', 'rdHTol', 'rdHEv', 'rdHMax', 'rdHGrp', 'rdHDk',
-              'rdHDl', 'rdHKb', 'rdHSv', 'rdHSnd', 'rdHOX', 'rdHOY', 'rdHOZ', 'rdHNx']
-KIT_VERSION = 3
+              'rdHDl', 'rdHKb', 'rdHSv', 'rdHSnd', 'rdHOX', 'rdHOY', 'rdHOZ', 'rdHNx', 'rdHSm']
+KIT_VERSION = 4
 
 
 def write(name, lines):
@@ -60,7 +61,7 @@ write('setup', ['# Kit objectives (called by vfx/init at load and by the first h
 MACRO_KEYS = [('rdHK', 'k'), ('rdHA', 'a'), ('rdHB', 'b'), ('rdHC', 'c'), ('rdHD', 'd'), ('rdHE', 'e'), ('rdHF', 'f'),
               ('rdHTol', 'tol'), ('rdWind', 'tell'), ('rdDamage', 'dmg'), ('rdHLife', 'life'), ('rdHEv', 'ev'),
               ('rdHMax', 'max'), ('rdHGrp', 'grp'), ('rdHDk', 'dk'), ('rdHDl', 'dl'), ('rdHKb', 'kb'), ('rdHSv', 'sv'),
-              ('rdHSnd', 'snd')]
+              ('rdHSnd', 'snd'), ('rdHSm', 'sm')]
 write('new', [
     '# v2 hazard (raiden_kit.hz). Position = here, yaw = the execution yaw, pitch flattened.',
     'execute unless score #rdKitV rd matches %d run function %ssetup' % (KIT_VERSION, H),
