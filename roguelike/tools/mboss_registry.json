@@ -17,7 +17,7 @@
     "phases: pool split in % of #mbTot (phases[0] applied at spawn when < 100; the module calls mboss/repool for the later ones). px: hit-proxy boss (proxies from its rig manifest, rlk_mb_big body). pxBase: low byte of the first proxy UUID (default 65, at most 16 proxies).",
     "shield: false = no click shield in any state (rlk_mb_noshield; default for px bosses). hit: click-shield size, default {w:1.0,h:1.0} when shield is false.",
     "arenas{}: every non-plaza arena {n (= #mbAr, unique, never reused; the plaza is 0), theme (T:mboss_arena_<theme>.py), ver, cx cy cz, r walk safe, start, box, looks (looks[0] = the default), oob {y0,y1} (default cy-3..cy+16), sweep {y0,y1} (barrier band swept by cb/won, cleanup, cb/remove)}.",
-    "Reserved: boss n 11 and arena n 2 (Apep, chapter 3: ap_oasis)."
+    "Boss n 11 and arena n 2 are Apep's (chapter 3: ap_oasis; scratchpad ap/ap_contract.md 0.3.6). Its entry's first line holds id n kind ch route enabled w (route false until AP-I2)."
   ],
   "arena": {
     "theme": "plaza",
@@ -34,7 +34,11 @@
     "cp_test": {"n": 9, "theme": "cp_test", "ver": 1, "cx": 540, "cy": 201, "cz": 8, "r": 12, "walk": 11, "safe": 9,
                 "start": {"x": 540.5, "y": 201.0, "z": 17.5, "yaw": 180.0, "pitch": 0.0},
                 "box": {"x0": 524, "y0": 196, "z0": -8, "x1": 556, "y1": 216, "z1": 24},
-                "looks": ["plain", "lit"]}
+                "looks": ["plain", "lit"]},
+    "ap_oasis": {"n": 2, "theme": "ap_oasis", "ver": 1, "cx": 440, "cy": 201, "cz": 8, "r": 29, "walk": 26, "safe": 24,
+                 "start": {"x": 440.5, "y": 201.0, "z": 24.5, "yaw": 180.0, "pitch": 0.0},
+                 "box": {"x0": 396, "y0": 190, "z0": -36, "x1": 484, "y1": 250, "z1": 52},
+                 "looks": ["withered", "lush"], "oob": {"y0": 198, "y1": 217}, "sweep": {"y0": 201, "y1": 202}}
   },
   "boss": [
     {
@@ -82,6 +86,18 @@
       "arena": "az_cavern", "theme": "az_cavern", "res": {"0": 30, "5": 30, "*": 10}, "phases": [100],
       "music": {"1": {"ev": "minecraft:music.end", "len": 18090}, "2": {"ev": "minecraft:music.dragon", "len": 6883}},
       "icon": {"item": "minecraft:raw_gold_block", "model": "rlk:mboss/az_kit/gate_icon"}
+    },
+    {
+      "id": "apep", "n": 11, "kind": "chapter", "ch": [3], "route": false, "enabled": true, "w": 0,
+      "minCh": 3, "maxCh": 3, "name": "아펩의 오아시스 파수꾼", "sub": "종막 오아시스 파수꾼", "color": "#C9C452", "el": 7,
+      "hp": 290, "xp": 40, "atk": 12, "lvAdd": 0, "dmgMul": 150, "goldMul": 1, "sap": 0, "picks": 0,
+      "scale": 2.0, "hit": {"w": 2.6, "h": 3.6}, "intro": 110, "death": 140, "deathSnd": false,
+      "arena": "ap_oasis", "theme": "ap_oasis", "px": true, "pxBase": 65, "shield": true,
+      "res": {"7": 30, "*": 10}, "phases": [53, 47],
+      "music": {"1": {"ev": "minecraft:music.overworld.deep_dark", "len": 6870},
+                "2": {"ev": "minecraft:music.nether.soul_sand_valley", "len": 6376},
+                "3": {"ev": "minecraft:music.overworld.lush_caves", "len": 6881}},
+      "icon": {"item": "minecraft:pitcher_plant", "model": "minecraft:pitcher_plant"}
     }
   ]
 }

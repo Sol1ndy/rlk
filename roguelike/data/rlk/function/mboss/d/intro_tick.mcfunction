@@ -4,3 +4,4 @@ execute if score #mbId mb matches 2 run return run function rlk:mboss/butterfly/
 execute if score #mbId mb matches 3 run return run function rlk:mboss/fieldgen/intro_tick
 execute if score #mbId mb matches 99 run return run function rlk:mboss/proto/intro_tick
 execute if score #mbId mb matches 98 run return run function rlk:mboss/cproto/intro_tick
+execute if score #mbId mb matches 11 run return run function rlk:mboss/apep/intro_tick

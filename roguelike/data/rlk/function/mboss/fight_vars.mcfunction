@@ -18,6 +18,8 @@ execute if score #mbAr mb matches 0 run scoreboard players set #mbArW10 mb 210
 execute if score #mbAr mb matches 0 run scoreboard players set #mbArS10 mb 190
 execute if score #mbAr mb matches 1 run scoreboard players set #mbArW10 mb 280
 execute if score #mbAr mb matches 1 run scoreboard players set #mbArS10 mb 260
+execute if score #mbAr mb matches 2 run scoreboard players set #mbArW10 mb 260
+execute if score #mbAr mb matches 2 run scoreboard players set #mbArS10 mb 240
 execute if score #mbAr mb matches 9 run scoreboard players set #mbArW10 mb 110
 execute if score #mbAr mb matches 9 run scoreboard players set #mbArS10 mb 90
 execute store result score #mbPx mb run data get storage rlk:mboss cur.px

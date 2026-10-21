@@ -16,6 +16,7 @@ function rlk:mboss/arena/abort
 schedule clear rlk:mboss/arena/job_tick
 function rlk:mboss/music/stop
 execute in minecraft:overworld run function rlk:mboss/ar/az_cavern/fl_off
+execute in minecraft:overworld run function rlk:mboss/ar/ap_oasis/fl_off
 execute in minecraft:overworld run function rlk:mboss/ar/cp_test/fl_off
 data remove storage rlk:mboss reg
 data remove storage rlk:mboss byid
@@ -34,6 +35,8 @@ data remove storage rlk:mboss plp
 data remove storage rlk:mboss arjob
 data remove storage rlk:mboss built_az_cavern
 data remove storage rlk:mboss look_az_cavern
+data remove storage rlk:mboss built_ap_oasis
+data remove storage rlk:mboss look_ap_oasis
 data remove storage rlk:mboss built_cp_test
 data remove storage rlk:mboss look_cp_test
 scoreboard objectives remove mb

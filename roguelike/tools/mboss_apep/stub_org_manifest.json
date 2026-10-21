@@ -1,0 +1,1434 @@
+{
+ "schema": 1,
+ "boss": "apep",
+ "source": "stub",
+ "manifest": "org",
+ "runtime": {
+  "ns": "rlk:mboss/apep/om/",
+  "kind_obj": "apK",
+  "clip_obj": "apOI",
+  "tick_obj": "apOC"
+ },
+ "uuids": {
+  "block": "524c4b4d-4150-4800-8000-0000000000",
+  "ints": [
+   1380731725,
+   1095780352,
+   -2147483648
+  ]
+ },
+ "objectives": {
+  "apK": "organism kind id (kinds.<k>.id)",
+  "apS": "organism state",
+  "apT": "state clock",
+  "apL": "link id (buffed basic -> its 양육)",
+  "apShd": "shield pool",
+  "apOC": "org clip clock",
+  "apOI": "org clip id (clips[].id)",
+  "apSock": "Heart socket (0-2, -1 none)",
+  "apTok": "attack token"
+ },
+ "passenger": {
+  "ride_y": 2.0,
+  "tag_prefix": "rlk_ap_om_",
+  "tags": [
+   "rlk_room",
+   "rlk_mb_aux"
+  ],
+  "face": "rotate",
+  "key": "execute on passengers if entity @s[tag=rlk_ap_om_<display>] run data merge entity @s {..}"
+ },
+ "spawn": {
+  "marker_ticks": 20,
+  "scale_in": {
+   "ticks": 4,
+   "from": 0.85
+  },
+  "untargetable_until": "solid"
+ },
+ "kinds": {
+  "basic": {
+   "id": 1,
+   "name": "기본",
+   "tag": "rlk_mb_ap_basic",
+   "size": {
+    "h": 1.15,
+    "h_stem": 1.35,
+    "d": 0.9,
+    "bag": [
+     1.43,
+     1.31
+    ]
+   },
+   "hover_y": 0.0,
+   "hp_bar_y": 1.6,
+   "shield": {
+    "w": 1.2,
+    "h": 1.6
+   },
+   "displays": [
+    {
+     "name": "bulb",
+     "tag": "rlk_ap_om_bulb",
+     "model": "basic_bulb_bell",
+     "looks": {
+      "bell": "basic_bulb_bell",
+      "bag": "basic_bulb_bag",
+      "buffed": "basic_bulb_buffed",
+      "bag_buffed": "basic_bulb_bag_buffed",
+      "dying": "basic_bulb_dying"
+     },
+     "default_look": "bell",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false
+    },
+    {
+     "name": "crown",
+     "tag": "rlk_ap_om_crown",
+     "model": "basic_crown_closed",
+     "looks": {
+      "closed": "basic_crown_closed",
+      "open": "basic_crown_open"
+     },
+     "default_look": "closed",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false,
+     "note": "the crown glow (15) is painted emissive"
+    },
+    {
+     "name": "shield",
+     "tag": "rlk_ap_om_shield",
+     "model": "basic_shield_on",
+     "looks": {
+      "on": "basic_shield_on"
+     },
+     "default_look": "on",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": true,
+     "note": "2-4 cutout leaf panes 1.3 x 0.55 + a low-alpha bubble rim + a yellow 3-leaf crown; only while shielded"
+    }
+   ],
+   "clips": [
+    {
+     "id": 0,
+     "name": "org_spawn",
+     "len": 20,
+     "loop": false,
+     "next": "basic_bob",
+     "events": {}
+    },
+    {
+     "id": 1,
+     "name": "basic_bob",
+     "len": 24,
+     "loop": true,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 2,
+     "name": "basic_melee",
+     "len": 14,
+     "loop": false,
+     "next": "basic_bob",
+     "events": {
+      "hit": 10
+     }
+    },
+    {
+     "id": 3,
+     "name": "basic_lie",
+     "len": 10,
+     "loop": false,
+     "next": null,
+     "events": {
+      "bag": 10
+     },
+     "note": "bell -> bag"
+    },
+    {
+     "id": 4,
+     "name": "basic_ranged",
+     "len": 20,
+     "loop": false,
+     "next": null,
+     "events": {
+      "open": 0,
+      "fire": 12
+     },
+     "note": "crown open 0-12"
+    },
+    {
+     "id": 5,
+     "name": "org_die",
+     "len": 10,
+     "loop": false,
+     "next": null,
+     "events": {
+      "gone": 10
+     }
+    }
+   ],
+   "budget": {
+    "elements": 350,
+    "px": 12000
+   },
+   "elements": 0,
+   "px": 0,
+   "note": "bag_buffed added by AP-SPEC: a buffed ranged basic lies as a bag"
+  },
+  "nurt": {
+   "id": 2,
+   "name": "양육",
+   "tag": "rlk_mb_ap_nurt",
+   "size": {
+    "h": 2.4
+   },
+   "hover_y": 0.0,
+   "hp_bar_y": 2.8,
+   "shield": {
+    "w": 1.4,
+    "h": 2.6
+   },
+   "displays": [
+    {
+     "name": "stalk",
+     "tag": "rlk_ap_om_stalk",
+     "model": "nurt_stalk_idle",
+     "looks": {
+      "idle": "nurt_stalk_idle"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false,
+     "note": "S-curved dark-teal ribbon"
+    },
+    {
+     "name": "cap",
+     "tag": "rlk_ap_om_cap",
+     "model": "nurt_cap_idle",
+     "looks": {
+      "idle": "nurt_cap_idle",
+      "tilt": "nurt_cap_tilt"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false,
+     "note": "cream hood-leaf"
+    },
+    {
+     "name": "orb",
+     "tag": "rlk_ap_om_orb",
+     "model": "nurt_orb_on",
+     "looks": {
+      "on": "nurt_orb_on"
+     },
+     "default_look": "on",
+     "brightness": 15,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false,
+     "note": "pulse"
+    },
+    {
+     "name": "ring",
+     "tag": "rlk_ap_om_ring",
+     "model": "nurt_ring_on",
+     "looks": {
+      "on": "nurt_ring_on"
+     },
+     "default_look": "on",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": true,
+     "note": "translucent cylinder r 1.3, h 0.5, only while immune"
+    }
+   ],
+   "clips": [
+    {
+     "id": 6,
+     "name": "nurt_idle",
+     "len": 40,
+     "loop": true,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 7,
+     "name": "nurt_buff",
+     "len": 20,
+     "loop": false,
+     "next": "nurt_idle",
+     "events": {
+      "tilt": 0,
+      "tethers": 8
+     }
+    },
+    {
+     "id": 8,
+     "name": "nurt_die",
+     "len": 17,
+     "loop": false,
+     "next": null,
+     "events": {
+      "gone": 17
+     }
+    }
+   ],
+   "budget": {
+    "elements": 450,
+    "px": 16000
+   },
+   "elements": 0,
+   "px": 0
+  },
+  "guard": {
+   "id": 3,
+   "name": "수호",
+   "tag": "rlk_mb_ap_guard",
+   "size": {
+    "h": 4.4,
+    "bud": 2.0,
+    "orb_d": 0.4
+   },
+   "hover_y": 0.0,
+   "hp_bar_y": 3.0,
+   "shield": {
+    "w": 1.4,
+    "h": 3.0
+   },
+   "displays": [
+    {
+     "name": "spire",
+     "tag": "rlk_ap_om_spire",
+     "model": "guard_spire_spire",
+     "looks": {
+      "spire": "guard_spire_spire",
+      "bud": "guard_spire_bud",
+      "wisp": "guard_spire_wisp"
+     },
+     "default_look": "spire",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "mid",
+     "offset": [
+      0.0,
+      0.2,
+      0.0
+     ],
+     "overlay": false
+    },
+    {
+     "name": "orb",
+     "tag": "rlk_ap_om_orb",
+     "model": "guard_orb_on",
+     "looks": {
+      "on": "guard_orb_on"
+     },
+     "default_look": "on",
+     "brightness": 15,
+     "scale": 1.0,
+     "pivot": "mid",
+     "offset": [
+      0.0,
+      3.0,
+      0.0
+     ],
+     "overlay": false,
+     "note": "bob 0.6-0.8 above the tip"
+    }
+   ],
+   "clips": [
+    {
+     "id": 9,
+     "name": "guard_idle",
+     "len": 60,
+     "loop": true,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 10,
+     "name": "guard_cast",
+     "len": 30,
+     "loop": false,
+     "next": "guard_idle",
+     "events": {
+      "collapse": 0,
+      "bud": 7,
+      "regrow": 16,
+      "regrow_end": 24,
+      "shields": 30
+     }
+    },
+    {
+     "id": 11,
+     "name": "guard_die",
+     "len": 17,
+     "loop": false,
+     "next": null,
+     "events": {
+      "gone": 17
+     }
+    }
+   ],
+   "budget": {
+    "elements": 450,
+    "px": 16000
+   },
+   "elements": 0,
+   "px": 0,
+   "note": "HP bar beside the base (+3.0); the orb at about 5 b is out of reach"
+  },
+  "nest": {
+   "id": 4,
+   "name": "둥지",
+   "tag": "rlk_mb_ap_nest",
+   "size": {
+    "w": 2.2,
+    "h": 1.3
+   },
+   "hover_y": 1.0,
+   "hp_bar_y": 2.2,
+   "shield": {
+    "w": 1.6,
+    "h": 2.2
+   },
+   "displays": [
+    {
+     "name": "cap",
+     "tag": "rlk_ap_om_cap",
+     "model": "nest_cap_idle",
+     "looks": {
+      "idle": "nest_cap_idle"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false,
+     "note": "cap + the orb eye (painted emissive)"
+    },
+    {
+     "name": "wing_l",
+     "tag": "rlk_ap_om_wing_l",
+     "model": "nest_wing_l_idle",
+     "looks": {
+      "idle": "nest_wing_l_idle"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false
+    },
+    {
+     "name": "wing_r",
+     "tag": "rlk_ap_om_wing_r",
+     "model": "nest_wing_r_idle",
+     "looks": {
+      "idle": "nest_wing_r_idle"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false
+    }
+   ],
+   "clips": [
+    {
+     "id": 12,
+     "name": "nest_fly",
+     "len": 14,
+     "loop": true,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 13,
+     "name": "nest_cast",
+     "len": 12,
+     "loop": false,
+     "next": "nest_fly",
+     "events": {
+      "walls": 12
+     }
+    },
+    {
+     "id": 14,
+     "name": "nest_blink",
+     "len": 6,
+     "loop": false,
+     "next": "nest_fly",
+     "events": {
+      "out": 0,
+      "in": 3
+     }
+    },
+    {
+     "id": 15,
+     "name": "org_die",
+     "len": 12,
+     "loop": false,
+     "next": null,
+     "events": {
+      "gone": 12
+     }
+    }
+   ],
+   "budget": {
+    "elements": 400,
+    "px": 12000
+   },
+   "elements": 0,
+   "px": 0
+  },
+  "destr": {
+   "id": 5,
+   "name": "파괴",
+   "tag": "rlk_mb_ap_destr",
+   "size": {
+    "d": 1.2,
+    "spikes": 0.2,
+    "beak": 0.4
+   },
+   "hover_y": 0.0,
+   "hp_bar_y": 1.6,
+   "shield": {
+    "w": 1.3,
+    "h": 1.3
+   },
+   "displays": [
+    {
+     "name": "shell",
+     "tag": "rlk_ap_om_shell",
+     "model": "destr_shell_normal",
+     "looks": {
+      "normal": "destr_shell_normal",
+      "husk": "destr_shell_husk"
+     },
+     "default_look": "normal",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false
+    },
+    {
+     "name": "face",
+     "tag": "rlk_ap_om_face",
+     "model": "destr_face_on",
+     "looks": {
+      "on": "destr_face_on"
+     },
+     "default_look": "on",
+     "brightness": 15,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false,
+     "note": "pulse scale"
+    }
+   ],
+   "clips": [
+    {
+     "id": 16,
+     "name": "destr_roll",
+     "len": 32,
+     "loop": true,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 17,
+     "name": "destr_fuse",
+     "len": 56,
+     "loop": false,
+     "next": "destr_suck",
+     "events": {
+      "pulse_1": 0,
+      "pulse_2": 9,
+      "pulse_3": 18,
+      "pulse_4": 27,
+      "pulse_5": 36,
+      "fast": 36
+     }
+    },
+    {
+     "id": 18,
+     "name": "destr_suck",
+     "len": 5,
+     "loop": false,
+     "next": "destr_blast",
+     "events": {}
+    },
+    {
+     "id": 19,
+     "name": "destr_blast",
+     "len": 1,
+     "loop": false,
+     "next": null,
+     "events": {
+      "blast": 1
+     }
+    },
+    {
+     "id": 20,
+     "name": "org_die",
+     "len": 10,
+     "loop": false,
+     "next": null,
+     "events": {
+      "gone": 10
+     }
+    }
+   ],
+   "budget": {
+    "elements": 300,
+    "px": 8000
+   },
+   "elements": 0,
+   "px": 0
+  },
+  "pred": {
+   "id": 6,
+   "name": "포식성",
+   "tag": "rlk_mb_ap_pred",
+   "size": {
+    "fish": [
+     2.5,
+     1.3
+    ],
+    "bud": [
+     2.1,
+     1.6
+    ],
+    "pod": [
+     3.5,
+     1.8
+    ]
+   },
+   "hover_y": 1.2,
+   "hp_bar_y": 2.2,
+   "shield": {
+    "w": 1.6,
+    "h": 1.6
+   },
+   "displays": [
+    {
+     "name": "body",
+     "tag": "rlk_ap_om_body",
+     "model": "pred_body_fish",
+     "looks": {
+      "fish": "pred_body_fish",
+      "fish_flare": "pred_body_fish_flare",
+      "bud": "pred_body_bud",
+      "pod": "pred_body_pod",
+      "face": "pred_body_face"
+     },
+     "default_look": "fish",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false
+    },
+    {
+     "name": "jaw",
+     "tag": "rlk_ap_om_jaw",
+     "model": "pred_jaw_idle",
+     "looks": {
+      "idle": "pred_jaw_idle"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false
+    },
+    {
+     "name": "fin",
+     "tag": "rlk_ap_om_fin",
+     "model": "pred_fin_idle",
+     "looks": {
+      "idle": "pred_fin_idle"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false
+    },
+    {
+     "name": "core",
+     "tag": "rlk_ap_om_core",
+     "model": "pred_core_on",
+     "looks": {
+      "on": "pred_core_on"
+     },
+     "default_look": "on",
+     "brightness": 15,
+     "scale": 1.0,
+     "pivot": "feet",
+     "offset": [
+      0.0,
+      -2.0,
+      0.0
+     ],
+     "overlay": false
+    }
+   ],
+   "clips": [
+    {
+     "id": 21,
+     "name": "pred_swim",
+     "len": 16,
+     "loop": true,
+     "next": null,
+     "events": {},
+     "note": "fin yaw +-25, body +-8 with 3 t lag"
+    },
+    {
+     "id": 22,
+     "name": "pred_swallow",
+     "len": 24,
+     "loop": false,
+     "next": "pred_bud",
+     "events": {
+      "eat": 12,
+      "bud": 14
+     }
+    },
+    {
+     "id": 23,
+     "name": "pred_bud",
+     "len": 20,
+     "loop": true,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 24,
+     "name": "pred_inflate",
+     "len": 10,
+     "loop": false,
+     "next": "pred_burst",
+     "events": {}
+    },
+    {
+     "id": 25,
+     "name": "pred_burst",
+     "len": 10,
+     "loop": false,
+     "next": "pred_swim",
+     "events": {
+      "hit": 0,
+      "fish": 2
+     }
+    },
+    {
+     "id": 26,
+     "name": "pred_bite",
+     "len": 6,
+     "loop": false,
+     "next": "pred_swim",
+     "events": {
+      "open": 0,
+      "hit": 4
+     }
+    },
+    {
+     "id": 27,
+     "name": "pred_bite_chain",
+     "len": 38,
+     "loop": false,
+     "next": "pred_swim",
+     "events": {
+      "hit_1": 4,
+      "hit_2": 10,
+      "hit_3": 16,
+      "hit_4": 22
+     }
+    },
+    {
+     "id": 28,
+     "name": "org_die",
+     "len": 12,
+     "loop": false,
+     "next": null,
+     "events": {
+      "gone": 12
+     }
+    }
+   ],
+   "budget": {
+    "elements": 500,
+    "px": 20000
+   },
+   "elements": 0,
+   "px": 0
+  }
+ },
+ "objects": {
+  "heart": {
+   "kind": "single",
+   "tag": "rlk_mb_ap_heart",
+   "marker": {
+    "tags": [
+     "rlk_mb_ap_heart",
+     "rlk_room",
+     "rlk_mb_aux"
+    ],
+    "not": [
+     "rlk_mob",
+     "rlk_zmob"
+    ]
+   },
+   "displays": [
+    {
+     "name": "heart_bulb",
+     "idx": 0,
+     "uuid": "524c4b4d-4150-4800-8000-000000000000",
+     "tag": "rlk_mb_ap_heart_bulb",
+     "model": "heart_bulb_idle",
+     "looks": {
+      "idle": "heart_bulb_idle",
+      "egg_gold": "heart_bulb_egg_gold",
+      "egg_green": "heart_bulb_egg_green",
+      "withered": "heart_bulb_withered",
+      "blaze": "heart_bulb_blaze"
+     },
+     "default_look": "idle",
+     "brightness": 15,
+     "scale": 1.0,
+     "pivot": "feet",
+     "note": "translucent lemon seed 3.2 x 2.6 x 2.3, alpha ~0.85; the arrival egg = this model at scale 0.7, pitch 0 (upright)"
+    },
+    {
+     "name": "heart_cradle",
+     "idx": 1,
+     "uuid": "524c4b4d-4150-4800-8000-000000000001",
+     "tag": "rlk_mb_ap_heart_cradle",
+     "model": "heart_cradle_pedestal",
+     "looks": {
+      "pedestal": "heart_cradle_pedestal",
+      "full": "heart_cradle_full"
+     },
+     "default_look": "pedestal",
+     "brightness": 14,
+     "scale": 2.2,
+     "pivot": "mid"
+    },
+    {
+     "name": "heart_arms",
+     "idx": 2,
+     "uuid": "524c4b4d-4150-4800-8000-000000000002",
+     "tag": "rlk_mb_ap_heart_arms",
+     "model": "heart_arms_idle",
+     "looks": {
+      "idle": "heart_arms_idle"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 2.2,
+     "pivot": "mid",
+     "note": "root arms to 4.0-4.3 b"
+    },
+    {
+     "name": "heart_tips",
+     "idx": 3,
+     "uuid": "524c4b4d-4150-4800-8000-000000000003",
+     "tag": "rlk_mb_ap_heart_tips",
+     "model": "heart_tips_idle",
+     "looks": {
+      "idle": "heart_tips_idle"
+     },
+     "default_look": "idle",
+     "brightness": 15,
+     "scale": 1.0,
+     "pivot": "feet",
+     "note": "leaf-flame sprouts, swaying"
+    },
+    {
+     "name": "vine_hand",
+     "idx": 4,
+     "uuid": "524c4b4d-4150-4800-8000-000000000004",
+     "tag": "rlk_mb_ap_vine_hand",
+     "model": "vine_hand_idle",
+     "looks": {
+      "idle": "vine_hand_idle",
+      "wrap": "vine_hand_wrap"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet"
+    },
+    {
+     "name": "vine_stem_0",
+     "idx": 5,
+     "uuid": "524c4b4d-4150-4800-8000-000000000005",
+     "tag": "rlk_mb_ap_vine_stem_0",
+     "model": "vine_stem_0_idle",
+     "looks": {
+      "idle": "vine_stem_0_idle"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet"
+    },
+    {
+     "name": "vine_stem_1",
+     "idx": 6,
+     "uuid": "524c4b4d-4150-4800-8000-000000000006",
+     "tag": "rlk_mb_ap_vine_stem_1",
+     "model": "vine_stem_1_idle",
+     "looks": {
+      "idle": "vine_stem_1_idle"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet"
+    },
+    {
+     "name": "vine_stem_2",
+     "idx": 7,
+     "uuid": "524c4b4d-4150-4800-8000-000000000007",
+     "tag": "rlk_mb_ap_vine_stem_2",
+     "model": "vine_stem_2_idle",
+     "looks": {
+      "idle": "vine_stem_2_idle"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet"
+    },
+    {
+     "name": "vine_stem_3",
+     "idx": 8,
+     "uuid": "524c4b4d-4150-4800-8000-000000000008",
+     "tag": "rlk_mb_ap_vine_stem_3",
+     "model": "vine_stem_3_idle",
+     "looks": {
+      "idle": "vine_stem_3_idle"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet"
+    }
+   ],
+   "egg": {
+    "scale": 0.7,
+    "pitch": 0,
+    "land_ticks": 6
+   },
+   "clips": [
+    {
+     "id": 29,
+     "name": "heart_hang",
+     "len": 80,
+     "loop": true,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 30,
+     "name": "heart_up",
+     "len": 30,
+     "loop": false,
+     "next": "heart_hang",
+     "events": {}
+    },
+    {
+     "id": 31,
+     "name": "heart_lower",
+     "len": 50,
+     "loop": false,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 32,
+     "name": "heart_drop",
+     "len": 30,
+     "loop": false,
+     "next": "heart_idle",
+     "events": {
+      "land": 6,
+      "beam": 6,
+      "beam_end": 16
+     }
+    },
+    {
+     "id": 33,
+     "name": "heart_idle",
+     "len": 40,
+     "loop": true,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 34,
+     "name": "heart_hit",
+     "len": 6,
+     "loop": false,
+     "next": "heart_idle",
+     "events": {}
+    },
+    {
+     "id": 35,
+     "name": "heart_gain",
+     "len": 8,
+     "loop": false,
+     "next": "heart_idle",
+     "events": {}
+    },
+    {
+     "id": 36,
+     "name": "heart_wither",
+     "len": 30,
+     "loop": false,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 37,
+     "name": "heart_blaze",
+     "len": 24,
+     "loop": false,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 38,
+     "name": "heart_lift",
+     "len": 46,
+     "loop": false,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 39,
+     "name": "cradle_rise",
+     "len": 20,
+     "loop": false,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 40,
+     "name": "cradle_sink",
+     "len": 10,
+     "loop": false,
+     "next": null,
+     "events": {}
+    }
+   ],
+   "footprint": {
+    "centre": "the arena centre (cx, cz) = theme POINTS[\"heart\"]",
+    "note": "bearings are compass degrees around the centre: 0 = north (-z), 90 = east (+x), 180 = south (+z)",
+    "bulb_box": {
+     "l": 3.2,
+     "w": 2.6,
+     "h": 2.3,
+     "centre_y": 1.6,
+     "yaw": 0
+    },
+    "root_radius": 2.5,
+    "sockets": [
+     {
+      "id": 0,
+      "bearing": 0,
+      "r": 3.4
+     },
+     {
+      "id": 1,
+      "bearing": 120,
+      "r": 3.4
+     },
+     {
+      "id": 2,
+      "bearing": 240,
+      "r": 3.4
+     }
+    ],
+    "wait_ring": 4.5,
+    "destr_stop": {
+     "r": 2.6,
+     "bearings": [
+      60,
+      180,
+      300
+     ]
+    },
+    "wall_exclusion": 4.6,
+    "bolt_end": {
+     "r": 1.5,
+     "from": "bulb_box"
+    },
+    "swirl_r": 3.5,
+    "hang": {
+     "entrance_y": 9.0,
+     "canopy_y": 20.0,
+     "lowered_y": 3.0
+    }
+   },
+   "budget": {
+    "elements": 800,
+    "px": 40000
+   },
+   "elements": 0,
+   "px": 0
+  },
+  "dome": {
+   "kind": "fixed_set",
+   "count": 3,
+   "tag": "rlk_mb_ap_dome",
+   "radius": 4.5,
+   "displays": [
+    {
+     "name": "dome_shell",
+     "idxs": [
+      16,
+      18,
+      20
+     ],
+     "tag": "rlk_mb_ap_dome_shell",
+     "model": "dome_shell",
+     "looks": {
+      "idle": "dome_shell"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 3.3,
+     "pivot": "feet",
+     "note": "two-sided shell, inward lathe, alpha <= 0.35"
+    },
+    {
+     "name": "dome_decor",
+     "idxs": [
+      17,
+      19,
+      21
+     ],
+     "tag": "rlk_mb_ap_dome_decor",
+     "model": "dome_decor",
+     "looks": {
+      "idle": "dome_decor"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 3.3,
+     "pivot": "feet",
+     "note": "cutout vine / leaf-sprig pattern, bright base rim, light seam, sprout on top"
+    }
+   ],
+   "clips": [
+    {
+     "id": 41,
+     "name": "dome_rise",
+     "len": 10,
+     "loop": false,
+     "next": "dome_idle",
+     "events": {}
+    },
+    {
+     "id": 42,
+     "name": "dome_idle",
+     "len": 40,
+     "loop": true,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 43,
+     "name": "dome_pop",
+     "len": 6,
+     "loop": false,
+     "next": null,
+     "events": {}
+    }
+   ],
+   "budget": {
+    "elements": 300,
+    "px": 24000
+   },
+   "elements": 0,
+   "px": 0
+  },
+  "wall": {
+   "kind": "multi",
+   "max": 15,
+   "tag": "rlk_mb_ap_wall",
+   "displays": [
+    {
+     "name": "wall_blade",
+     "tag": "rlk_mb_ap_wall_blade",
+     "model": "wall_blade",
+     "looks": {
+      "idle": "wall_blade"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 2.0,
+     "pivot": "feet",
+     "note": "translucent yellow-green blade 2.5-3 b, darker midrib, two cutout windows"
+    }
+   ],
+   "clips": [
+    {
+     "id": 44,
+     "name": "wall_rise",
+     "len": 5,
+     "loop": false,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 45,
+     "name": "wall_fade",
+     "len": 8,
+     "loop": false,
+     "next": null,
+     "events": {}
+    }
+   ],
+   "blocks": {
+    "block": "minecraft:barrier",
+    "y": [
+     201,
+     202
+    ],
+    "place": "replace air"
+   },
+   "budget": {
+    "elements": 60,
+    "px": 8000
+   },
+   "elements": 0,
+   "px": 0
+  },
+  "stalk": {
+   "kind": "fixed_set",
+   "count": 4,
+   "tag": "rlk_mb_ap_stalk",
+   "height": [
+    5.5,
+    6.0
+   ],
+   "displays": [
+    {
+     "name": "stalk_low",
+     "idxs": [
+      32,
+      35,
+      38,
+      41
+     ],
+     "tag": "rlk_mb_ap_stalk_low",
+     "model": "stalk_low",
+     "looks": {
+      "idle": "stalk_low"
+     },
+     "default_look": "idle",
+     "brightness": 13,
+     "scale": 2.2,
+     "pivot": "feet"
+    },
+    {
+     "name": "stalk_high",
+     "idxs": [
+      33,
+      36,
+      39,
+      42
+     ],
+     "tag": "rlk_mb_ap_stalk_high",
+     "model": "stalk_high",
+     "looks": {
+      "idle": "stalk_high"
+     },
+     "default_look": "idle",
+     "brightness": 13,
+     "scale": 2.2,
+     "pivot": "feet"
+    },
+    {
+     "name": "stalk_tip",
+     "idxs": [
+      34,
+      37,
+      40,
+      43
+     ],
+     "tag": "rlk_mb_ap_stalk_tip",
+     "model": "stalk_tip",
+     "looks": {
+      "idle": "stalk_tip"
+     },
+     "default_look": "idle",
+     "brightness": 14,
+     "scale": 1.0,
+     "pivot": "feet",
+     "note": "hooked tip + small gold cone"
+    }
+   ],
+   "clips": [
+    {
+     "id": 46,
+     "name": "leg_rise",
+     "len": 10,
+     "loop": false,
+     "next": null,
+     "events": {}
+    },
+    {
+     "id": 47,
+     "name": "leg_slam",
+     "len": 6,
+     "loop": false,
+     "next": null,
+     "events": {
+      "hit": 4
+     }
+    },
+    {
+     "id": 48,
+     "name": "leg_sink",
+     "len": 10,
+     "loop": false,
+     "next": null,
+     "events": {}
+    }
+   ],
+   "budget": {
+    "elements": 240,
+    "px": 16000
+   },
+   "elements": 0,
+   "px": 0
+  },
+  "seed": {
+   "kind": "single",
+   "tag": "rlk_mb_ap_seed",
+   "displays": [
+    {
+     "name": "seed",
+     "idx": 48,
+     "uuid": "524c4b4d-4150-4800-8000-000000000030",
+     "tag": "rlk_mb_ap_seed",
+     "model": "seed_idle",
+     "looks": {
+      "idle": "seed_idle"
+     },
+     "default_look": "idle",
+     "brightness": 15,
+     "scale": 1.0,
+     "pivot": "feet",
+     "note": "glowing golden seed at the death spot"
+    }
+   ],
+   "clips": [],
+   "budget": {
+    "elements": 40,
+    "px": 2000
+   },
+   "elements": 0,
+   "px": 0
+  }
+ },
+ "budgets": {
+  "px_total": 200000,
+  "organism_elements": 500,
+  "heart_elements": 800,
+  "px": 0
+ }
+}
