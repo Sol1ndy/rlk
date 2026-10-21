@@ -59,7 +59,6 @@ scoreboard players set #apWide mb 0
 scoreboard players set #apCol mb 0
 scoreboard players set #apCFree mb 0
 scoreboard players set #apPick mb 0
-scoreboard players set #apBackN mb 0
 scoreboard players set #apCdE1 mb 0
 scoreboard players set #apCdE3 mb 0
 scoreboard players set #apCdE5 mb 0

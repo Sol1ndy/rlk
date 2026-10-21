@@ -76,7 +76,7 @@ def emit(g):
         f'execute as {ORGS} at @s run {F("org/tick")}',
         f'execute if score #apHt mb matches {R["win"]}.. run return run {Gen.svc("req_cs")}',
         f'execute if score #apHt mb matches ..0 run return run {Gen.svc("req_fail")}',
-        f'execute store result score #apAlive mb if entity {ORGS}',
+        sc('#apAlive', 0), f'execute as {ORGS} run scoreboard players add #apAlive mb 1',
         F('rev/wave_due'),
         f'execute if score #apClk mb matches {R["timeout"]}.. run {F("rev/timeout")}'])
     g.w('rev/wave_due', [HEAD, f'# The next wave: due when <= {R["wave_left"]} alive or {R["wave_clock"]} t after the last; it waits',

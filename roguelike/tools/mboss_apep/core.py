@@ -236,6 +236,7 @@ class Core:
                 '#apAs', '#apSide', '#apP1Done', '#apSeqT', '#apChainRun', '#apLastMv', '#apWide', '#apCol', '#apCFree',
                 '#apPick', '#apBackN']
         zero += [f'#apCdE{p.id}' for p in self.pats if p.cooldown]
+        zero = list(dict.fromkeys(zero))
         v = ['# Every fight-time fake player of the core back to its fight-start value (spawn, cleanup). The revival stage keeps',
              '# its own (#apHt #apWave #apClk #apTo #apFail ...: rev/clear).']
         v += [sc(k, 0) for k in zero]

@@ -18,7 +18,7 @@ PATTERNS = [
             length=Q4_LEN, recover=18, max_len=Q4_LEN + 40, last_hit=61),
     Pattern(35, 'spiral', '생명의 나선', 'normal', 'spikes', phase=3, weight=W(2, 2, 2),
             length=72, recover=20, max_len=90, last_hit=64, chain={31: 40}),
-    Pattern(36, 'surface', '수면 포격', 'chain', ['sink_p3', 'surface_p3', 'stand_p3'],
+    Pattern(36, 'surface', '수면 포격', 'chain', ['sink_p3', 'surface_p3', 'stand_p3'], phase=3,
             length=90, recover=20, max_len=110, last_hit=48),
 ]
 P = {p.key: p for p in PATTERNS}

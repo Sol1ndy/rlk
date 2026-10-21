@@ -254,6 +254,7 @@ def emit(core):
     lock = ['# #mbLock = N (test/lock): that pattern only, in its own phase (another phase\'s id idles); 0 unlocks.']
     for p in pats:
         if p.kind in ('normal', 'scheduled', 'chain'):
+            assert p.phase in (1, 3), (p.key, p.phase)
             lock.append(f'execute if score #mbLock mb matches {p.id} if score #apPh mb matches {p.phase} run return run {F("ai/lock_go")}')
     lock.append(sc('#apCool', 20))
     w('ai/lock', lock)

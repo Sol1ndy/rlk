@@ -25,6 +25,7 @@ execute if score #apTst mb matches 31 run return run function rlk:mboss/apep/tes
 execute if score #apTst mb matches 33 run return run function rlk:mboss/apep/test/p3_33
 execute if score #apTst mb matches 34 run return run function rlk:mboss/apep/test/p3_34
 execute if score #apTst mb matches 35 run return run function rlk:mboss/apep/test/p3_35
+execute if score #apTst mb matches 36 run return run function rlk:mboss/apep/test/p3_36
 execute if score #apTst mb matches 32 run return run function rlk:mboss/apep/test/p3_32
 execute if score #apTst mb matches 37 run return run function rlk:mboss/apep/test/q2_lethal
 execute if score #apTst mb matches 40 run return run function rlk:mboss/apep/test/fail1

@@ -34,12 +34,14 @@ execute if score #apPDone mb matches 31 run scoreboard players add #apP3N mb 1
 execute if score #apPDone mb matches 33 run scoreboard players add #apP3N mb 1
 execute if score #apPDone mb matches 34 run scoreboard players add #apP3N mb 1
 execute if score #apPDone mb matches 35 run scoreboard players add #apP3N mb 1
+execute if score #apPDone mb matches 36 run scoreboard players add #apP3N mb 1
 execute if score #apPDone mb matches 32 run scoreboard players add #apP3N mb 1
 # Q2 (plan 7.4): the first-cast flag, the clock, the count of other patterns since
 execute if score #apPDone mb matches 31 run scoreboard players add #apAftN mb 1
 execute if score #apPDone mb matches 33 run scoreboard players add #apAftN mb 1
 execute if score #apPDone mb matches 34 run scoreboard players add #apAftN mb 1
 execute if score #apPDone mb matches 35 run scoreboard players add #apAftN mb 1
+execute if score #apPDone mb matches 36 run scoreboard players add #apAftN mb 1
 execute if score #apPDone mb matches 32 run scoreboard players set #apAft1 mb 1
 execute if score #apPDone mb matches 32 run scoreboard players set #apAftN mb 0
 execute if score #apPDone mb matches 32 run scoreboard players operation #apAftCd mb = #apFc mb
