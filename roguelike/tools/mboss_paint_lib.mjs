@@ -278,6 +278,10 @@ export function firstHit(list, x, y, shadow = 0) {
 export function paintSpriteSet(rp, dir, sprites, idOf, only = null) {
   const out = path.join(rp, dir);
   fs.mkdirSync(out, {recursive: true});
+  // a resource path with an uppercase letter (or any char outside [a-z0-9_.-/]) makes the client reject the whole item
+  // atlas, so every custom texture renders as missing: refuse it here
+  for (const name of Object.keys(sprites)) if (!/^[a-z0-9_.\-\/]+$/.test(name) || !/^[a-z0-9_.\-]+:[a-z0-9_.\-\/]+$/.test(idOf(name)))
+    throw new Error(`invalid resource path for sprite '${name}' (${idOf(name)}): use lowercase a-z 0-9 _ . - /`);
   for (const [name, [w, h, fn, translucent, meta]] of Object.entries(sprites)) {
     if (only && !only.includes(name)) continue;
     fs.writeFileSync(path.join(out, name + '.png'), png(w, h, translucent ? paintT(w, h, fn) : paint(w, h, fn)));

@@ -13,7 +13,11 @@ import {C, clamp, smooth, mix, fbm, TRANSPARENT, paintSpriteSet} from './mboss_p
 import {registerTile, registerWrap, sdPoly, sdCircle, sdUnion, sdSub, stroke, bez} from './mboss_shape_lib.mjs';
 
 export {C, clamp, smooth, mix};
-export const spriteId = name => 'rlk:mboss/apep_om/' + name;
+// Resource paths must be lowercase ([a-z0-9_.-/]): one uppercase id makes the client reject the whole item atlas
+// (every custom texture then renders as missing). Sprite keys keep their camel-case suffixes in the generators; the
+// file name and the atlas id spell them in lowercase with an underscore (bo_stemT -> bo_stem_t).
+export const spriteFile = name => name.replace(/[A-Z]/g, c => '_' + c.toLowerCase());
+export const spriteId = name => 'rlk:mboss/apep_om/' + spriteFile(name);
 const ramp = list => { const cs = list.map(C); return t => { const x = clamp(t) * (cs.length - 1), i = Math.min(cs.length - 2, Math.floor(x)); return mix(cs[i], cs[i + 1], x - i); }; };
 const A = (c, a) => [c[0], c[1], c[2], Math.round(clamp(a) * 255)];
 const sink = (c, k) => mix(c, [14, 20, 16, 255], clamp(k));
@@ -499,5 +503,8 @@ export const orgSprites = () => Object.fromEntries(Object.entries(S).map(([k, [w
 export const spriteOwner = () => Object.fromEntries(Object.entries(S).map(([k, v]) => [k, v[4]]));
 export const spriteSizes = () => Object.fromEntries(Object.entries(S).map(([k, [w, h]]) => [k, [w, h]]));
 export function paintOrgTextures(rp, only = null) {
-  return paintSpriteSet(rp, 'assets/rlk/textures/mboss/apep_om', orgSprites(), spriteId, only);
+  const files = Object.fromEntries(Object.entries(orgSprites()).map(([k, v]) => [spriteFile(k), v]));
+  if (Object.keys(files).length !== Object.keys(orgSprites()).length) throw new Error('apep_om sprite file names collide');
+  return paintSpriteSet(rp, 'assets/rlk/textures/mboss/apep_om', files, f => 'rlk:mboss/apep_om/' + f,
+                        only && only.map(spriteFile));
 }
