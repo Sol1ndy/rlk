@@ -3168,8 +3168,8 @@ def _demos():
         _ev(14, 'crown', snd('q3_charge')),
         _ev(33, 'player', tele_mring_end(0), tele_disc(3.6, 12)), _ev(35, 'crown', f('launch_flash'), snd('q3_launch')),
         _ev(45, 'player', f('beam_column', w=3.0), f('leaf_splash'), f('spores'), snd('q3_impact1')),
-        _ev(79, 'pk0', tele_disc(3.0, 14)), _ev(82, 'pk1', tele_disc(3.0, 14)),
-        _ev(87, 'pk0', f('shell_streak', h=12.0)), _ev(90, 'pk1', f('shell_streak', h=12.0)),
+        _ev(79, 'pk0', snd('q3_lock')), _ev(82, 'pk1', snd('q3_lock')),       # AP-FIX RV-02: the lock cue, no floor decal
+        _ev(87, 'pk0', f('shell_streak', h=2.9)), _ev(90, 'pk1', f('shell_streak', h=2.9)),
         _ev(93, 'pk0', f('shell_burst'), snd('q3_impact2')), _ev(96, 'pk1', f('shell_burst'), snd('q3_impact2'))], [])
     D['surface_shot'] = sum([
         _ev(8, 'floor', f('leaf_mound'), snd('q1_sink')), *[_ev(t, 'glide', f('leaf_pad'), snd('q1_trail')) for t in range(20, 37, 4)],

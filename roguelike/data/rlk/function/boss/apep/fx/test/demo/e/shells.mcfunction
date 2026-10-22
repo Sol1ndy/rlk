@@ -21,10 +21,10 @@ execute if score #wkDT mb matches 45 at @p[tag=player] rotated as @s rotated ~ 0
 execute if score #wkDT mb matches 45 at @p[tag=player] rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/leaf_splash
 execute if score #wkDT mb matches 45 at @p[tag=player] rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/spores
 execute if score #wkDT mb matches 45 at @p[tag=player] rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q3_impact1
-execute if score #wkDT mb matches 79 at @s rotated as @s rotated ~ 0 positioned ^1.4 ^0 ^6 run function rlk:boss/apep/fx/tele/disc {r:30,tell:14,el:7,nd:0,hold:3}
-execute if score #wkDT mb matches 82 at @s rotated as @s rotated ~ 0 positioned ^-1.6 ^0 ^6.6 run function rlk:boss/apep/fx/tele/disc {r:30,tell:14,el:7,nd:0,hold:3}
-execute if score #wkDT mb matches 87 at @s rotated as @s rotated ~ 0 positioned ^1.4 ^0 ^6 run function rlk:boss/apep/fx/p/shell_streak {h:120}
-execute if score #wkDT mb matches 90 at @s rotated as @s rotated ~ 0 positioned ^-1.6 ^0 ^6.6 run function rlk:boss/apep/fx/p/shell_streak {h:120}
+execute if score #wkDT mb matches 79 at @s rotated as @s rotated ~ 0 positioned ^1.4 ^0 ^6 run function rlk:boss/apep/fx/snd/q3_lock
+execute if score #wkDT mb matches 82 at @s rotated as @s rotated ~ 0 positioned ^-1.6 ^0 ^6.6 run function rlk:boss/apep/fx/snd/q3_lock
+execute if score #wkDT mb matches 87 at @s rotated as @s rotated ~ 0 positioned ^1.4 ^0 ^6 run function rlk:boss/apep/fx/p/shell_streak {h:29}
+execute if score #wkDT mb matches 90 at @s rotated as @s rotated ~ 0 positioned ^-1.6 ^0 ^6.6 run function rlk:boss/apep/fx/p/shell_streak {h:29}
 execute if score #wkDT mb matches 93 at @s rotated as @s rotated ~ 0 positioned ^1.4 ^0 ^6 run function rlk:boss/apep/fx/p/shell_burst
 execute if score #wkDT mb matches 93 at @s rotated as @s rotated ~ 0 positioned ^1.4 ^0 ^6 run function rlk:boss/apep/fx/snd/q3_impact2
 execute if score #wkDT mb matches 96 at @s rotated as @s rotated ~ 0 positioned ^-1.6 ^0 ^6.6 run function rlk:boss/apep/fx/p/shell_burst
