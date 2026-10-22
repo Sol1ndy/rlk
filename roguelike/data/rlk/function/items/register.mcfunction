@@ -4,6 +4,8 @@ data modify storage rlk:items ids set value []
 
 # 등급 색 / 라벨 / 판매가 / 타입 라벨 매핑
 data modify storage rlk:items rarity_color set value {character:"gold",common:"green",rare:"aqua",epic:"dark_purple",legendary:"yellow",mythic:"dark_red"}
+# 강화 단계별 이름 뒤 별 (0 ☆☆☆ ~ 3 ★★★)
+data modify storage rlk:items stars set value [[{text:" "},{text:"☆☆☆",color:"#6B6B6B"}],[{text:" "},{text:"★",color:"#FFD24A"},{text:"☆☆",color:"#6B6B6B"}],[{text:" "},{text:"★★",color:"#FFD24A"},{text:"☆",color:"#6B6B6B"}],[{text:" "},{text:"★★★",color:"#FFD24A"}]]
 data modify storage rlk:items rarity_label set value {character:"CHARACTER",common:"COMMON",rare:"RARE",epic:"UNIQUE",legendary:"LEGENDARY",mythic:"MYTHIC"}
 data modify storage rlk:items rarity_kr set value {common:"일반",rare:"레어",epic:"유니크",legendary:"레전더리",mythic:"신화"}
 data modify storage rlk:items rarity_price set value {character:200,common:352,rare:422,epic:562,legendary:842,mythic:1500}

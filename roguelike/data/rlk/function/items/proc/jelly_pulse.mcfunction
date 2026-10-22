@@ -20,7 +20,10 @@ particle minecraft:dust{color:[0.31f,0.72f,1.0f],scale:1.0f} ~3.24 ~0.2 ~-2.35 0
 particle minecraft:dust{color:[0.31f,0.72f,1.0f],scale:1.0f} ~3.80 ~0.2 ~-1.24 0 0 0 0 1
 particle minecraft:splash ~ ~0.4 ~ 1.8 0.2 1.8 0.1 30
 execute unless score #k117 snd matches 1 run function rlk:snd/f125
-execute as @a[tag=player,limit=1] run function rlk:items/calc_stat {obj:"maxHealth",pm:50}
+# 피해 = 최대 체력의 #jellyPm‰ (강화 단계로 조정)
+data modify storage rlk:tune m_jellyfish.obj set value "maxHealth"
+execute store result storage rlk:tune m_jellyfish.pm int 1 run scoreboard players get #jellyPm tmp
+execute as @a[tag=player,limit=1] run function rlk:items/calc_stat with storage rlk:tune m_jellyfish
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 2

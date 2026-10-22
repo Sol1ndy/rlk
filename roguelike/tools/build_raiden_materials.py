@@ -23,11 +23,20 @@ PALETTE = {
     "violet_dense": (153, 80, 250, 184),
     "glow": (181, 118, 255, 30),
     "afterglow": (144, 96, 230, 64),
-    "floor": (110, 46, 204, 24),
     "pearl": (235, 213, 255, 224),
+    # opaque armour / katana swatches of the 만겁 arm (build_raiden_judgment_rig.mjs)
+    "arm_lilac": (201, 182, 236, 255),
+    "arm_shade": (154, 130, 207, 255),
+    "arm_deep": (75, 45, 122, 255),
+    "arm_tomoe": (58, 37, 96, 255),
+    "gold_dull": (184, 154, 94, 255),
+    "blade_pale": (215, 198, 247, 255),
+    "blade_edge": (245, 240, 255, 255),
+    "blade_core": (156, 120, 224, 255),
+    "grip_dark": (44, 30, 66, 255),
+    "nail_glow": (199, 125, 255, 255),
+    # the blink scatter silhouette's blue slices (build_raiden_movement.py; restored with the release's blink art)
     "blue": (61, 64, 199, 148),
-    "shield_glass": (115, 191, 255, 22),
-    "shield_mist": (177, 222, 255, 44),
 }
 
 
@@ -40,14 +49,22 @@ def png(path, rgba):
                      chunk(b"IDAT", zlib.compress(rows, 9)) + chunk(b"IEND", b""))
 
 
+# Swatches of the release's dome / puppet-arm models; nothing uses them since S3, so they are pruned (the judgment rig's
+# armour swatches came back with the 만겁 arm, 10-22a; "blue" came back with the release blink art).
+RETIRED = ("floor", "shield_glass", "shield_mist", "hand_dull", "hand_dull_dark")
+
+
 def build_materials(resourcepack):
     rp = Path(resourcepack)
     out = rp / "assets/rlk/textures/raiden/fx"
     out.mkdir(parents=True, exist_ok=True)
     for name, rgba in PALETTE.items():
         png(out / (name + ".png"), rgba)
+    for name in RETIRED:
+        (out / (name + ".png")).unlink(missing_ok=True)
     atlaspath = rp / "assets/minecraft/atlases/items.json"
     atlas = json.loads(atlaspath.read_text(encoding="utf-8")) if atlaspath.exists() else {"sources": []}
+    atlas["sources"] = [s for s in atlas["sources"] if s.get("resource") not in {"rlk:raiden/fx/" + n for n in RETIRED}]
     known = {s.get("sprite", s.get("resource")) for s in atlas["sources"]}
     for name in PALETTE:
         texture = "rlk:raiden/fx/" + name

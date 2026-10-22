@@ -1,30 +1,426 @@
-"""Native display meshes for all twelve Narukami hazard volumes.
+"""Display side of the Narukami hazard / FX kit v2 (plan rd/plan.md B.0, B.3, C.6, D.1; owner S1-KIT).
 
-Called by build_raiden_hazards.py. One owned display holds a whole warning or
-strike, regardless of the number of branches in its mesh. The hit generator
-remains the authority for positions, yaw, timing, and the jumpable ring radius.
+Called by build_raiden_hazards.py (build(ROOT, OUT)). Writes
+  RP   assets/rlk/models/item/raiden/fx_hazard/*  + items/raiden/fx_hazard/*   (unit-size meshes, tintable)
+  DP   boss/raiden/hazard/vis/*   hazard-bound visuals: decal, strike, travelling cards, small impacts
+       boss/raiden/hazard/vfx_world + fx_*   the display clock (orphans, one-shot interpolation, countdown frames)
+       boss/raiden/fx/*            D.1 cues (visual + vanilla sound recipe), fx/snd/*, fx/decal/* (state decals)
+
+MESHES. Every mesh is unit-size and scaled per hazard by the display transformation (no per-size models):
+  model coordinate = 8 + 16 * u for x and z (u in units: radius 1, or width 1 x length 1 along +z),
+  model y = 8 + 16 * (blocks / yu): decals and travelling cards yu = 1, strike meshes yu = 8 (display scale y = yu).
+  right_rotation [0,1,0,0] cancels the item flip, so model +z = the hazard's forward. Cards are flat (zero thickness),
+  faces on both sides, shade off, tintindex 0: the item definition tints them with minecraft:custom_model_data
+  (index 0, default white), which the frames use for flicker / residue / fade without extra models.
+  Layer heights: decal 0.02 < strike area 0.03 < floor bolts 0.07+ (>= 0.02 apart, translucent sort by centroid).
+
+DISPLAY CLOCK (vfx_world, every tick after the hazards):
+  rlk_rd_hvis   bound to a hazard (decal, travelling cards, field crackle): it sits exactly on the hazard origin, so a
+                visual with no hazard within 0.05 b is an orphan and is killed (pause / transform kill the markers).
+  rlk_rd_fx     free-running timed card (strike visuals, cues, state decals): rdHLife counts down, killed at 0; strike
+                frames by remaining life (raiden_kit.FLASH / AFTER_AT / FADE_AT).
+  rlk_rd_fxa    one-shot interpolation: the tick after its summon, transformation := custom_data.to over custom_data.d
+                ticks (travelling cards launch this way exactly on the hazard's launch tick; rings expand in).
 """
 from pathlib import Path
 import json
 import math
+import shutil
 import sys
 
-SCALE = 32
-TEXTURES = {
-    "purple": "rlk:raiden/fx/violet_dense",
-    "blue": "rlk:raiden/fx/blue",
-    "light": "rlk:raiden/fx/cyan",
-    "white": "rlk:raiden/fx/white",
-    "dark": "rlk:raiden/fx/shadow",
-    "violet": "rlk:raiden/fx/violet",
-    "lavender": "rlk:raiden/fx/lavender",
-    "glow": "rlk:raiden/fx/glow",
-    "after": "rlk:raiden/fx/afterglow",
-    "fill": "rlk:raiden/fx/floor",
-    "void": "rlk:raiden/fx/void",
-    "particle": "rlk:raiden/fx/violet_dense",
-}
-FACES = ("north", "south", "east", "west", "up", "down")
+from build_raiden_fx_textures import catalogue, build_fx_textures, TEX_SUBDIR, NS, KIT_QEXT
+from raiden_kit import (DECALS, DECAL_INTRO, STRIKES, STRIKE_YU, STRIKE_LIFE, SM_SWEEP, WAVE_R, WAVE_Y, FLASH, AFTER_AT, AFTER_TINT, FADE_AT,
+                        FADE_TINT, FX2_AT, SOUNDS, SEG_DEG, KINDS)
+
+FX = {c["name"] for c in catalogue()}
+ALLOWED = (-45.0, -22.5, 0.0, 22.5, 45.0)
+AXES = {"+x": (0, 1), "-x": (0, -1), "+y": (1, 1), "-y": (1, -1), "+z": (2, 1), "-z": (2, -1)}
+FACE_PAIR = {0: ("east", "west"), 1: ("up", "down"), 2: ("south", "north")}
+ABC = "abc"
+H = "rlk:boss/raiden/hazard/"
+F = "rlk:boss/raiden/fx/"
+MODEL_NS = "rlk:raiden/fx_hazard/"
+WHITE = 0xFFFFFF
+SEG_CHORD = 2 * math.tan(math.radians(SEG_DEG / 2)) * 1.08      # chord / radius of one ring card (8 % overlap)
+
+
+def face_corners(face, lo, hi):
+    x0, y0, z0 = lo
+    x1, y1, z1 = hi
+    return {
+        "north": [(x1, y1, z0), (x0, y1, z0), (x0, y0, z0), (x1, y0, z0)],
+        "south": [(x0, y1, z1), (x1, y1, z1), (x1, y0, z1), (x0, y0, z1)],
+        "east": [(x1, y1, z1), (x1, y1, z0), (x1, y0, z0), (x1, y0, z1)],
+        "west": [(x0, y1, z0), (x0, y1, z1), (x0, y0, z1), (x0, y0, z0)],
+        "up": [(x0, y1, z0), (x1, y1, z0), (x1, y1, z1), (x0, y1, z1)],
+        "down": [(x0, y0, z1), (x1, y0, z1), (x1, y0, z0), (x0, y0, z0)],
+    }[face]
+
+
+def solve_uv(face, lo, hi, fn):
+    """Face uv [u1,v1,u2,v2] + rotation so that every corner shows fn(corner) (vanilla FaceInfo order)."""
+    D = [fn(c) for c in face_corners(face, lo, hi)]
+    for k in range(4):
+        u = [D[(j + k) % 4] for j in range(4)]
+        if (abs(u[0][1] - u[1][1]) < 1e-6 and abs(u[1][0] - u[2][0]) < 1e-6 and
+                abs(u[2][1] - u[3][1]) < 1e-6 and abs(u[3][0] - u[0][0]) < 1e-6):
+            return [round(u[0][0], 4), round(u[0][1], 4), round(u[2][0], 4), round(u[2][1], 4)], k * 90
+    raise ValueError(f"no uv solution for {face}")
+
+
+class Model:
+    """Unit mesh: x/z in units (model 8 + 16 u), y in blocks / yu."""
+
+    def __init__(self, yu=1.0):
+        self.yu = yu
+        self.textures = {}
+        self.elements = []
+
+    def var(self, name):
+        assert name in FX, name
+        tid = NS + name
+        for k, v in self.textures.items():
+            if v == tid:
+                return k
+        k = f"t{len(self.textures)}"
+        self.textures[k] = tid
+        return k
+
+    def card(self, center, normal, uaxis, vaxis, su, sv, tex, angle=0.0, uv=(0, 0, 16, 16), origin=None):
+        """Flat card centred on center = (x units, y blocks, z units), lying across `normal`; texture u runs from uv[0]
+        at the -uaxis edge to uv[2] at the +uaxis edge (likewise v). su / sv are in units (y extents in blocks).
+        `angle` turns it about +Y around `origin` (default its centre)."""
+        n = "xyz".index(normal)
+        ua, us = AXES[uaxis]
+        va, vs = AXES[vaxis]
+        assert len({n, ua, va}) == 3, (normal, uaxis, vaxis)
+        scale = (16.0, 16.0 / self.yu, 16.0)
+        c = [8 + center[i] * scale[i] for i in range(3)]
+        half = [0.0, 0.0, 0.0]
+        half[ua] = su * scale[ua] / 2
+        half[va] = sv * scale[va] / 2
+        lo = [round(c[i] - half[i], 4) for i in range(3)]
+        hi = [round(c[i] + half[i], 4) for i in range(3)]
+        assert all(-16 <= v <= 32 for v in lo + hi), (tex, lo, hi)
+
+        def fn(p):
+            tu = (1 if p[ua] > c[ua] else -1) * us
+            tv = (1 if p[va] > c[va] else -1) * vs
+            return (uv[0] + (uv[2] - uv[0]) * (tu + 1) / 2, uv[1] + (uv[3] - uv[1]) * (tv + 1) / 2)
+        var = self.var(tex)
+        faces = {}
+        for f in FACE_PAIR[n]:
+            fuv, rot = solve_uv(f, lo, hi, fn)
+            spec = {"texture": "#" + var, "uv": fuv, "tintindex": 0}
+            if rot:
+                spec["rotation"] = rot
+            faces[f] = spec
+        el = {"from": lo, "to": hi, "shade": False, "faces": faces}
+        if angle:
+            assert angle in ALLOWED, angle
+            o = c if origin is None else [8 + origin[i] * scale[i] for i in range(3)]
+            el["rotation"] = {"origin": [round(v, 4) for v in o], "axis": "y", "angle": angle}
+        self.elements.append(el)
+
+    def json(self):
+        tex = dict(self.textures)
+        if tex:
+            tex["particle"] = next(iter(self.textures.values()))
+        return {"ambientocclusion": False, "gui_light": "front", "textures": tex, "elements": self.elements}
+
+
+def heading(theta):
+    """Direction theta (deg, from +z toward +x) -> (u axis along it, v axis across, element Y angle)."""
+    for base, ua, va in ((0, "+z", "-x"), (90, "+x", "+z"), (180, "-z", "+x"), (-90, "-x", "-z")):
+        a = (theta - base + 180) % 360 - 180
+        for al in ALLOWED:
+            if abs(a - al) < 1e-6:
+                return ua, va, al
+    return None
+
+
+def polar(r, ang):
+    return (r * math.sin(math.radians(ang)), r * math.cos(math.radians(ang)))
+
+
+def strip(m, p0, p1, width, tex, y=0.06, wall=None, uv=(0, 0, 16, 16)):
+    """Card along p0 -> p1 (x, z units; direction a multiple of 22.5 deg). wall=None: flat at height y (blocks),
+    `width` units across; wall=(y0, y1) blocks: standing on the segment (texture v top -> bottom)."""
+    dx, dz = p1[0] - p0[0], p1[1] - p0[1]
+    L = math.hypot(dx, dz)
+    theta = math.degrees(math.atan2(dx, dz))
+    q = round(theta / 22.5) * 22.5
+    assert abs(theta - q) < 1e-3, theta
+    ua, va, ang = heading(q)
+    cx, cz = (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2
+    if wall is None:
+        m.card((cx, y, cz), "y", ua, va, L, width, tex, ang, uv)
+    else:
+        y0, y1 = wall
+        m.card((cx, (y0 + y1) / 2, cz), "x" if ua in ("+z", "-z") else "z", ua, "-y", L, y1 - y0, tex, ang, uv)
+
+
+def quarters(m, tex, y, ext=KIT_QEXT, r=1.0):
+    """Quarter-texture circle (centre at texel 0,0), radius r units: 4 mirrored cards."""
+    e = ext * r
+    for sx in (1, -1):
+        for sz in (1, -1):
+            m.card((sx * e / 2, y, sz * e / 2), "y", "+x", "+z", e, e, tex, 0,
+                   (0 if sx > 0 else 16, 0 if sz > 0 else 16, 16 if sx > 0 else 0, 16 if sz > 0 else 0))
+
+
+def radial(m, size, tex, y, flip=False, x=0.0, z=0.0):
+    m.card((x, y, z), "y", "+x", "+z", size, size, tex, 0, (16, 0, 0, 16) if flip else (0, 0, 16, 16))
+
+
+def pillar(m, x, z, y0, height, width, texs, planes=4, split=2.4):
+    """Crossed vertical cards (width in units, heights in blocks); tall ones are cut at y0 + split so the low part's
+    centroid sorts after the floor cards."""
+    spec = (("+z", "x", 0.0), ("+x", "z", 0.0), ("+z", "x", 45.0), ("+z", "x", -45.0))
+    cut = y0 + split
+    for k in range(planes):
+        ua, normal, ang = spec[k]
+        uv = (16, 0, 0, 16) if k % 2 else (0, 0, 16, 16)
+        tex = texs[k % len(texs)]
+        if height <= split + 1.0:
+            m.card((x, y0 + height / 2, z), normal, ua, "-y", width, height, tex, ang, uv)
+            continue
+        vcut = 16 * (y0 + height - cut) / height
+        m.card((x, (cut + y0 + height) / 2, z), normal, ua, "-y", width, y0 + height - cut, tex, ang, (uv[0], 0, uv[2], vcut))
+        if k < 2:
+            m.card((x, (y0 + cut) / 2, z), normal, ua, "-y", width, cut - y0, tex, ang, (uv[0], vcut, uv[2], 16))
+
+
+def crescent(m, y, tex, theta=0.0, scale=1.0, crop=1.0, flip=False):
+    """Blade-light crescent lying flat: pivot at the origin, bright edge radius `scale` units toward theta (a multiple
+    of 22.5); crop < 1 keeps the central part (narrower arc)."""
+    Hh = scale / 0.94
+    base = round(theta / 90) * 90
+    rest = theta - base
+    ua_v = {0: ("+x", "-z"), 90: ("-z", "-x"), 180: ("-x", "+z"), -90: ("+z", "+x"), 270: ("+z", "+x")}[int(base) if base != -180 else 180]
+    cx, cz = polar(Hh / 2, base)
+    du = 8 * crop
+    uv = (8 - du, 0, 8 + du, 16)
+    if flip:
+        uv = (uv[2], 0, uv[0], 16)
+    m.card((cx, y, cz), "y", ua_v[0], ua_v[1], 2 * Hh * crop, Hh, tex, rest, uv, origin=(0, y, 0))
+
+
+def bolts_radial(m, angles, r0, r1, width, y, texs):
+    for i, a in enumerate(angles):
+        strip(m, polar(r0, a), polar(r1, a), width, texs[i % len(texs)], y=y,
+              uv=(16, 0, 0, 16) if i % 2 else (0, 0, 16, 16))
+
+
+def ring_walls(m, r, y0, y1, texs, n=8):
+    for i in range(n):
+        a = 360 / n * i
+        half = 180 / n
+        p0, p1 = polar(r, a - half), polar(r, a + half)
+        strip(m, p0, p1, 0, texs[i % len(texs)], wall=(y0, y1), uv=(16, 0, 0, 16) if i % 2 else (0, 0, 16, 16))
+
+
+# --------------------------------------------------------------------------- meshes
+def models():
+    M = {}
+    # ---- B.3 decals (yu 1; unit radius / unit band)
+    for name, tex in (("dk_ring", "dk_ring"), ("dk_ring_s", "dk_ring_s"), ("dk_rings3", "dk_rings3"), ("dk_disc", "dk_disc")):
+        m = Model()
+        quarters(m, tex, 0.02)
+        M[name] = m
+    m = Model()
+    m.card((0, 0.02, 0.5), "y", "+x", "+z", 1, 1, "dk_band")
+    M["dk_band"] = m
+    m = Model()
+    radial(m, 2 / 0.9, "dk_pool", 0.02)
+    M["dk_pool"] = m
+    m = Model()
+    quarters(m, "dk_ring_s", 0.02)
+    ring_walls(m, 1.0, 0.0, 0.32, ["rim_crackle_a", "rim_crackle_b"])
+    M["dk_aura"] = m
+    m = Model()
+    radial(m, 2 / 0.9, "dk_pool", 0.02)
+    quarters(m, "dk_ring_s", 0.04)
+    M["dk_stagger"] = m
+    m = Model()
+    radial(m, 2.0, "dk_tint", 0.05)
+    M["dk_tint"] = m
+
+    # ---- strike meshes (yu 8)
+    def burst(bolt):
+        m = Model(STRIKE_YU)
+        radial(m, 2 / 0.92, "shockwave", 0.03)
+        radial(m, 1.0, "flash", 0.05, flip=bolt)
+        bolts_radial(m, [45 * i for i in range(8)], 0.08, 0.95, 0.16, 0.07, ["bolt_a", "bolt_b"])
+        if bolt:
+            pillar(m, 0, 0, 0.0, 10.0, 0.5, ["vbolt_a", "vbolt_b", "vbolt_c"], 4)
+        else:
+            pillar(m, 0, 0, 0.0, 2.2, 0.4, ["vbolt_b", "vbolt_c"], 2)
+        return m
+    M["st_burst"] = burst(False)
+    M["st_bolt"] = burst(True)
+    m = Model(STRIKE_YU)
+    radial(m, 2 / 0.88 * 0.95, "scorch", 0.03)
+    bolts_radial(m, [45 * i + 22.5 for i in range(0, 8, 2)], 0.1, 0.85, 0.18, 0.07, ["bolt_after_c"])
+    M["st_burst_af"] = m
+    for name, half in (("st_arc45", 45), ("st_arc72", 72), ("st_arc112", 112.5), ("st_arc180", 180)):
+        m = Model(STRIKE_YU)
+        if half == 45:
+            crescent(m, 1.0, "crescent_b", crop=0.75)
+            crescent(m, 0.4, "crescent_a", scale=0.85, crop=0.75, flip=True)
+        elif half == 72:
+            crescent(m, 1.0, "crescent_b")
+            crescent(m, 0.4, "crescent_a", scale=0.85, flip=True)
+        elif half == 112.5:
+            for i, t in enumerate((-45.0, 45.0)):
+                crescent(m, 1.0 + 0.04 * i, "crescent_b", theta=t)
+            crescent(m, 0.4, "crescent_a", scale=0.85, flip=True)
+        else:
+            for i, t in enumerate((0, 90, 180, -90)):
+                crescent(m, 0.9 + 0.04 * i, "crescent_b" if i % 2 == 0 else "crescent_a", theta=t)
+        rays = [a for a in (-112.5, -90, -67.5, -45, -22.5, 0, 22.5, 45, 67.5, 90, 112.5) if abs(a) <= half - 10] \
+            if half < 180 else [45 * i for i in range(8)]
+        rays = rays[::2] if len(rays) > 5 else rays
+        bolts_radial(m, rays, 0.1, 0.92, 0.12, 0.07, ["bolt_a", "bolt_c"])
+        M[name] = m
+    m = Model(STRIKE_YU)                                         # rect: x in [-0.5, 0.5], z in [0, 1]
+    strip(m, (0, 0.02), (0, 0.98), 0.55, "bolt_a", y=0.07)
+    strip(m, (0, 0.03), (0, 0.97), 0, "blade_a", wall=(0.3, 2.0))
+    strip(m, (0, 0.02), (0, 0.98), 1.0, "slash_wave", y=1.1)
+    M["st_slash"] = m
+    m = Model(STRIKE_YU)
+    strip(m, (0, 0.02), (0, 0.98), 0.6, "scorch_strip", y=0.03)
+    strip(m, (0, 0.04), (0, 0.96), 0.45, "bolt_after_c", y=0.07)
+    M["st_slash_af"] = m
+    m = Model(STRIKE_YU)                                         # 단절 slam: wall of light along the band
+    strip(m, (0, 0.01), (0, 0.99), 0.6, "bolt_b", y=0.07)
+    for x in (-0.42, 0.42):
+        strip(m, (x, 0.01), (x, 0.99), 0, "slash_wave", wall=(0.0, 4.5))
+    for z in (0.15, 0.4, 0.65, 0.9):
+        pillar(m, 0, z, 0.0, 7.0, 0.5, ["vbolt_a", "vbolt_b"], 2)
+    M["st_wall"] = m
+    m = Model(STRIKE_YU)                                         # field: cracked glowing floor + low crackle rim
+    radial(m, 2 / 0.88, "scorch", 0.03)
+    ring_walls(m, 1.0, 0.0, 0.5, ["rim_crackle_a", "rim_crackle_c"])
+    bolts_radial(m, [0, 90, 180, 270], 0.15, 0.9, 0.14, 0.07, ["bolt_c", "bolt_a"])
+    M["st_field"] = m
+
+    # ---- travelling cards (yu 1)
+    for v, (cr, flip) in enumerate((("crackle_a", False), ("crackle_b", True))):
+        m = Model()                                              # x along the chord, z in [-1, 0] (front at 0)
+        m.card((0, 0.05, -0.5), "y", "+x", "-z", 1, 1, "tr_band", 0, (16, 0, 0, 16) if flip else (0, 0, 16, 16))
+        m.card((0, 0.35, -0.12), "z", "+x", "-y", 1, 0.7, cr, 0, (16, 0, 0, 16) if flip else (0, 0, 16, 16))
+        M["tr_seg_" + "ab"[v]] = m
+    m = Model()                                                  # slab: wall at z 0, footprint z in [-1, 0]; y unit = height
+    m.card((0, 0.5, 0), "z", "+x", "-y", 1, 1, "crackle_a")
+    m.card((0, 0.5, -0.02), "z", "-y", "+x", 1, 0.9, "obj_wave_band")
+    m.card((0, 0.02, -0.5), "y", "+x", "-z", 1, 1, "tr_band")
+    M["tr_slab"] = m
+    # crescent sword wave (rd-sync, 찰나의 포영): ONE crescent_a card facing the travel direction, its edge radius 1 unit
+    # with the model origin at the bright arc's centroid (0.75 of the card height above the pivot; the display rolls the
+    # crescent +-45 deg about it). Display scale = edge radius in blocks. User 10-22 ("왜 대각선 검기 한 번에 두 개가
+    # 나가는거야"): the 0.86x copy that trailed it 0.25 units (0.7 b) behind read as a second wave of the same cut; it is
+    # gone, so one cut = one wave (the real clone's X is still two cuts, 4 t apart).
+    m = Model()
+    Hc = 1 / 0.94
+    m.card((0, -0.25 * Hc, 0.0), "z", "+x", "-y", 2 * Hc, Hc, "crescent_a")
+    M["tr_wave"] = m
+    m = Model()                                                  # orb: flat electric disc radius 1
+    radial(m, 2.5, "chakra_a", 0.0)
+    radial(m, 1.0, "orb_core", 0.02)
+    m.card((0, 0, 0), "z", "+x", "-y", 1.6, 1.6, "chakra_b")
+    M["tr_orb"] = m
+
+    # ---- cue cards (fx/*)
+    m = Model()
+    m.card((0, 0, 0), "z", "+x", "-y", 1.0, 1.0, "glint")      # billboard star, 1 b
+    M["fx_star"] = m
+    m = Model()
+    radial(m, 2 / 0.92, "shockwave", 0.03)
+    M["fx_ring"] = m
+    m = Model()
+    m.card((0, 0, 0), "z", "+x", "-y", 2.5, 2.5, "chakra_b")   # billboard hoop / halo / twirl ring, radius 1
+    M["fx_hoop"] = m
+    m = Model(4)
+    radial(m, 2 / 0.92, "shockwave", 0.05)
+    for k, ang in enumerate((0.0, 45.0, -45.0)):
+        m.card((0, 2.0, 0), "x", "+z", "-y", 2.0, 4.0, "flash", ang)
+    m.card((0, 2.0, 0), "z", "+x", "-y", 2.0, 4.0, "flash")
+    m.card((0, 2.0, 0), "z", "+x", "-y", 2.0, 4.0, "chakra_b")
+    M["fx_dome"] = m
+    m = Model(8)
+    pillar(m, 0, 0, 0.0, 12.0, 2.2, ["pillar_a", "pillar_b"], 4)
+    M["fx_pillar"] = m
+    m = Model(8)                                                 # soft light shaft hanging DOWN from the pivot (y -10..0):
+    pillar(m, 0, 0, -10.0, 10.0, 2.0, ["beam_soft"], 3)          # scale y grows it down from the sky (guard break)
+    M["fx_beam"] = m
+    m = Model(8)
+    pillar(m, 0, 0, 0.0, 11.0, 1.0, ["vbolt_a", "vbolt_b", "vbolt_c"], 4)
+    radial(m, 1.2, "flash", 0.05)
+    M["fx_bolt"] = m
+    m = Model(4)                                                 # crystal line: x in [-0.5, 0.5], z in [0, 1]
+    for i in range(9):
+        z = 0.06 + 0.11 * i
+        x = (-0.2, 0.15, -0.05, 0.25, -0.25, 0.05, 0.2, -0.15, 0.0)[i]
+        h = (1.6, 2.3, 1.2, 2.0, 1.5, 2.6, 1.4, 2.1, 1.8)[i]
+        m.card((x, h / 2, z), "x", "+z", "-y", 0.09, h, "rig_shard", (22.5, -22.5, 0.0)[i % 3])
+        m.card((x, h / 2, z), "z", "+x", "-y", 0.18, h, "rig_shard")
+    M["fx_crystal_line"] = m
+    m = Model(4)
+    for i in range(12):
+        x, z = polar(1.0, 30 * i)
+        h = (1.5, 2.2, 1.2, 1.9)[i % 4]
+        m.card((x, h / 2, z), "x", "+z", "-y", 0.16, h, "rig_shard", (22.5, -22.5, 45.0, 0.0)[i % 4])
+        m.card((x, h / 2, z), "z", "+x", "-y", 0.16, h, "rig_shard")
+    M["fx_crystal_ring"] = m
+    m = Model()
+    crescent(m, 0.0, "crescent_a")
+    M["fx_crescent"] = m
+    m = Model()
+    m.card((0, 0, 0), "z", "-y", "+x", 2.4, 0.3, "rift_a")     # billboard dark vertical line (u along the height)
+    M["fx_line"] = m
+    m = Model()
+    m.card((0, 0, 0), "z", "+x", "-y", 2.0, 2.0, "impact_sparks")
+    m.card((0, 0, 0), "z", "+x", "-y", 1.4, 1.4, "flash")
+    M["fx_burst"] = m
+    m = Model()
+    m.card((0, 0, 0), "z", "+x", "-y", 1.0, 1.0, "flash")
+    M["fx_flash"] = m
+    return M
+
+
+TINTED_DEFAULT = WHITE
+
+
+def save_models(rp, M):
+    modeldir = rp / "assets/rlk/models/item/raiden/fx_hazard"
+    itemdir = rp / "assets/rlk/items/raiden/fx_hazard"
+    for d in (modeldir, itemdir):
+        if d.exists():
+            shutil.rmtree(d)        # this generator owns fx_hazard (drops the 165 v1 frames)
+        d.mkdir(parents=True, exist_ok=True)
+    for name, m in M.items():
+        (modeldir / (name + ".json")).write_text(json.dumps(m.json(), separators=(",", ":")) + "\n", encoding="utf-8")
+        node = {"type": "minecraft:model", "model": "rlk:item/raiden/fx_hazard/" + name,
+                "tints": [{"type": "minecraft:custom_model_data", "index": 0, "default": TINTED_DEFAULT}]}
+        (itemdir / (name + ".json")).write_text(json.dumps({"model": node}, separators=(",", ":")) + "\n", encoding="utf-8")
+    return len(M), max(len(m.elements) for m in M.values())
+
+
+# --------------------------------------------------------------------------- datapack side
+def nbt_tf(tx="0", ty="0", tz="0", sx="1", sy="1", sz="1", lr="[0f,0f,0f,1f]"):
+    return (f'{{translation:[{tx}f,{ty}f,{tz}f],left_rotation:{lr},scale:[{sx}f,{sy}f,{sz}f],'
+            f'right_rotation:[0f,1f,0f,0f]}}')
+
+
+def display(tags, model, tf, *, custom=None, color=WHITE, billboard="fixed", tp_dur=0, view=2):
+    comps = f'"minecraft:item_model":"{model}","minecraft:custom_model_data":{{colors:[{color}]}}'
+    if custom:
+        comps += f',"minecraft:custom_data":{custom}'
+    tl = ",".join(f'"{t}"' for t in tags)
+    return (f'summon minecraft:item_display ~ ~ ~ {{Tags:[{tl}],billboard:"{billboard}",item_display:"none",'
+            f'view_range:{view}f,width:0f,height:0f,shadow_radius:0f,brightness:{{block:15,sky:15}},interpolation_duration:0,'
+            f'teleport_duration:{tp_dur},transformation:{tf},item:{{id:"minecraft:paper",count:1,components:{{{comps}}}}}}}')
 
 
 def build(root, out):
@@ -33,416 +429,363 @@ def build(root, out):
         rp = Path(sys.argv[sys.argv.index("--resourcepack") + 1])
     from build_raiden_materials import build_materials
     build_materials(rp)
-    modeldir = rp / "assets/rlk/models/item/raiden/fx_hazard"
-    itemdir = rp / "assets/rlk/items/raiden/fx_hazard"
-    modeldir.mkdir(parents=True, exist_ok=True)
-    itemdir.mkdir(parents=True, exist_ok=True)
+    texdir = rp / TEX_SUBDIR
+    if not all((texdir / (n + ".png")).exists() for n in FX):
+        build_fx_textures(rp)
+    M = models()
+    nmodels, maxel = save_models(rp, M)
+    fxdir = root / "data/rlk/function/boss/raiden/fx"
+    if fxdir.exists():
+        shutil.rmtree(fxdir)
 
-    def write(name, lines):
-        path = out / (name + ".mcfunction")
+    def write(name, lines, base=out):
+        path = base / (name + ".mcfunction")
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    def box(mesh, a, b, color):
-        # All native elements stay inside -16..32. Model [8,8,8] is the
-        # marker origin; item-display scale32 recovers exact world units.
-        mesh.append({"shade": False,
-                     "from": [round(8 + min(a[i], b[i]) * 16/SCALE, 5) for i in range(3)],
-                     "to": [round(8 + max(a[i], b[i]) * 16/SCALE, 5) for i in range(3)],
-                     "faces": {f: {"texture": "#"+color, "uv": [0, 0, 16, 16]} for f in FACES}})
+    def wfx(name, lines):
+        write(name, lines, fxdir)
 
-    def stroke(mesh, points, width, color, thickness=None, vertical=False):
-        """Connected short cuboids: crisp voxel lightning, no illegal rotations."""
-        thickness = width if thickness is None else thickness
-        for a, b in zip(points, points[1:]):
-            n = max(1, math.ceil(math.dist(a, b)/.62))
-            for i in range(n):
-                p = tuple(a[k] + (b[k]-a[k])*i/n for k in range(3))
-                q = tuple(a[k] + (b[k]-a[k])*(i+1)/n for k in range(3))
-                pad = (width/2, width/2, thickness/2) if vertical else (width/2, thickness/2, width/2)
-                box(mesh, [min(p[k], q[k])-pad[k] for k in range(3)],
-                    [max(p[k], q[k])+pad[k] for k in range(3)], color)
+    def mid(name):
+        assert name in M, name
+        return MODEL_NS + name
 
-    def lightning(mesh, points, width=.24, residue=False, vertical=False, taper=False):
-        # True alpha shells blend with terrain and with the narrower bright
-        # center. The white filament is deliberately thin: violet inner edge,
-        # lavender halo and dark gaps supply the contrast instead of a solid bar.
-        segments = [(points,width)]
-        if taper:
-            count=max(1,len(points)-1)
-            segments=[([a,b],width*(1-.58*i/count)) for i,(a,b) in enumerate(zip(points,points[1:]))]
-        for path,w in segments:
-            if residue:
-                stroke(mesh, path, w*1.1, "after", w*.8, vertical)
-                stroke(mesh, path, w*.38, "lavender", w*.6, vertical)
-            else:
-                stroke(mesh, path, w*1.85, "glow", w*1.35, vertical)
-                stroke(mesh, path, w, "purple", w*.78, vertical)
-                stroke(mesh, path, w*.17, "white", w*.92, vertical)
+    OWN = 'scoreboard players operation #rdOwner rd = @s rdHId'
+    VNEW = '@e[tag=rlk_rd_vnew,limit=1]'
+    # ---------------------------------------------------------------- the display clock
+    write("vfx_world", [
+        '# Every tick after the hazards (and from pause / transform after killing them).',
+        f'execute if entity @e[tag=rlk_rd_hvis,limit=1] run function {H}vis/orphans',
+        f'execute if entity @e[tag=rlk_rd_fx,limit=1] run function {H}fx_tick',
+        f'execute if entity @e[tag=rlk_rd_fxa,tag=!rlk_rd_fxnew,limit=1] as @e[tag=rlk_rd_fxa,tag=!rlk_rd_fxnew] run function {H}fx_anim',
+        'tag @e[tag=rlk_rd_fxnew] remove rlk_rd_fxnew',
+    ])
+    write("vis/orphans", [
+        '# A hazard-bound display sits exactly on its hazard origin; one without a hazard there is an orphan.',
+        'tag @e[tag=rlk_rd_hvis] add rlk_rd_orph',
+        'execute as @e[tag=rlk_rd_hazard] at @s run tag @e[tag=rlk_rd_orph,distance=..0.05] remove rlk_rd_orph',
+        'kill @e[tag=rlk_rd_orph]',
+    ])
+    write("fx_anim", [
+        '# One-shot interpolation, the tick after the summon (travelling cards: exactly the launch tick).',
+        'data modify entity @s transformation set from entity @s item.components."minecraft:custom_data".to',
+        'data modify entity @s interpolation_duration set from entity @s item.components."minecraft:custom_data".d',
+        'data modify entity @s start_interpolation set value 0',
+        'tag @s remove rlk_rd_fxa',
+    ])
+    cm = 'item.components."minecraft:custom_model_data".colors[0]'
+    write("fx_tick", [
+        '# Timed cards: countdown (not on their summon tick), kill at 0, strike frames by remaining life.',
+        'scoreboard players remove @e[tag=rlk_rd_fx,tag=!rlk_rd_fxnew] rdHLife 1',
+        'kill @e[tag=rlk_rd_fx,scores={rdHLife=..0}]',
+    ] + [f'execute as @e[tag=rlk_rd_strike,tag=rlk_rd_fx,scores={{rdHLife={life}}}] run data modify entity @s {cm} set value {col}'
+         for life, col in sorted(FLASH.items(), reverse=True)] + [
+        f'execute as @e[tag=rlk_rd_strike,tag=rlk_rd_fx,scores={{rdHLife={AFTER_AT}}}] run function {H}fx_after',
+        f'execute as @e[tag=rlk_rd_fx,scores={{rdHLife={FADE_AT}}}] run function {H}fx_fade',
+        f'execute as @e[tag=rlk_rd_fxb,scores={{rdHLife={FX2_AT}}}] run function {H}fx_anim2',
+    ])
+    write("fx_anim2", [
+        f'# A card with a second stage (tag rlk_rd_fxb) at {FX2_AT} ticks of life left: its custom_data.to2 over d2 ticks.',
+        'data modify entity @s transformation set from entity @s item.components."minecraft:custom_data".to2',
+        'data modify entity @s interpolation_duration set from entity @s item.components."minecraft:custom_data".d2',
+        'data modify entity @s start_interpolation set value 0',
+        'tag @s remove rlk_rd_fxb',
+    ])
+    write("fx_after", [
+        'data modify entity @s item.components."minecraft:item_model" set from entity @s item.components."minecraft:custom_data".after',
+        f'data modify entity @s {cm} set value {AFTER_TINT}',
+    ])
+    write("fx_fade", [f'data modify entity @s {cm} set from entity @s item.components."minecraft:custom_data".fade'])
 
-    def circle(r, y=.075, start=-180, end=180, step=8):
-        n = max(3, math.ceil(abs(end-start)/step))
-        return [(r*math.sin(math.radians(start+(end-start)*i/n)), y,
-                 r*math.cos(math.radians(start+(end-start)*i/n))) for i in range(n+1)]
-
-    def rect(length, width, y=.075):
-        w = width/2
-        return [(-w,y,0), (-w,y,length), (w,y,length), (w,y,0), (-w,y,0)]
-
-    def rot(points, angle):
-        s, c = math.sin(math.radians(angle)), math.cos(math.radians(angle))
-        return [(x*c+z*s, y, z*c-x*s) for x,y,z in points]
-
-    def sector(radius, half):
-        return [(0,.075,0)] + circle(radius, .075, -half, half) + [(0,.075,0)]
-
-    def outline(shape):
-        if shape in (1,4):
-            r,a = (6,60) if shape == 1 else (12,70)
-            return [sector(r,a)]
-        if shape in (3,6,8,12):
-            return [circle({3:3,6:5,8:6,12:12}[shape])]
-        if shape == 9:
-            return [rot(rect(18,.9), a) for a in (-40,-20,0,20,40)]
-        if shape == 11:
-            return [circle(1.3),circle(2.7)]
-        length,width = {2:(12,2.2),5:(20,3.6),7:(8,8),10:(18,7)}[shape]
-        return [rect(length,width)]
-
-    def warning(shape,charge=-1):
-        mesh=[]
-        # A faint plane makes the area readable while preserving the floor.
-        # Its geometry is wholly inside the analytic hit boundary.
-        if shape in (1,4):
-            radius, half = (6,60) if shape==1 else (12,70)
-            for i in range(1,36):
-                z=radius*i/36
-                dz=radius/36
-                halfwidth=min(z*math.tan(math.radians(half)), math.sqrt(max(0,radius*radius-(z+dz)**2)))
-                if halfwidth>.04:
-                    box(mesh,(-halfwidth,.025,z),(halfwidth,.029,z+dz),"fill")
-        elif shape in (2,5,7,10):
-            length,width={2:(12,2.2),5:(20,3.6),7:(8,8),10:(18,7)}[shape]
-            box(mesh,(-width/2,.025,0),(width/2,.029,length),"fill")
-        elif shape in (3,6,8,12):
-            radius={3:3,6:5,8:6,12:12}[shape]
-            for i in range(-24,24):
-                z0,z1=radius*i/24,radius*(i+1)/24
-                halfwidth=math.sqrt(max(0,radius*radius-max(z0*z0,z1*z1)))
-                if halfwidth>.04:
-                    box(mesh,(-halfwidth,.025,z0),(halfwidth,.029,z1),"fill")
-        for path in outline(shape):
-            # Low dark edging keeps the tell legible on light gray arena floors.
-            stroke(mesh,[(x,y-.023,z) for x,y,z in path],.27,"void",.020)
-            stroke(mesh,[(x,y-.012,z) for x,y,z in path],.50,"glow",.016)
-            stroke(mesh,path,.14,"purple",.029)
-            # Smaller luminous line lies visibly above the violet border.
-            stroke(mesh,[(x,y+.023,z) for x,y,z in path],.042,"light",.017)
-            if charge>=0:
-                stroke(mesh,[(x,y+.045,z) for x,y,z in path],.105,"white",.025)
-                # Final four ticks energize the same boundary with short
-                # upward sparks. They never resemble the full attack path.
-                stride=max(1,(len(path)-1)//7)
-                for i in range(charge,len(path)-1,stride):
-                    x,y,z=path[i]
-                    cx,cz=0,0
-                    if shape in (1,4): cz=2 if shape==1 else 4
-                    if shape in (2,5,7,10): cz={2:6,5:10,7:4,10:9}[shape]
-                    dx,dz=cx-x,cz-z
-                    norm=max(.001,math.hypot(dx,dz))
-                    dx,dz=dx/norm,dz/norm
-                    lift=.28+.14*charge
-                    lightning(mesh,[(x,.12,z),(x+dx*.12,.25,z+dz*.12),
-                                    (x+dx*.36,lift,z+dz*.36)],.11,vertical=True,taper=True)
-        # Direction chevrons and sparse hatching make filled attack areas
-        # understandable without opaque carpets hiding player feet.
-        if shape in (1,4):
-            r,a = (6,60) if shape == 1 else (12,70)
-            for ang in (-a*.55,0,a*.55):
-                stroke(mesh,rot([(0,.06,1),(0,.06,r-.25)],ang),.055,"purple",.02)
-            stroke(mesh,circle(r*.57,.06,-a,a),.055,"violet",.02)
-        elif shape in (2,5,7,10):
-            length,width = {2:(12,2.2),5:(20,3.6),7:(8,8),10:(18,7)}[shape]
-            for z in range(2,length,3):
-                stroke(mesh,[(-min(.6,width*.3),.08,z-.4),(0,.08,z),
-                             (min(.6,width*.3),.08,z-.4)],.09,"light",.03)
-        elif shape == 9:
-            for a in (-40,-20,0,20,40):
-                for z in (5,11,16):
-                    stroke(mesh,rot([(-.25,.08,z-.4),(0,.08,z),(.25,.08,z-.4)],a),.07,"light",.03)
-        elif shape in (3,6,8,12):
-            r={3:3,6:5,8:6,12:12}[shape]
-            stroke(mesh,circle(r*.46,.06),.065,"violet",.02)
-            for a in (0,90,180,270):
-                stroke(mesh,rot([(0,.07,r*.67),(0,.07,r-.2)],a),.10,"light",.025)
-            stroke(mesh,[(-.5,.08,0),(.5,.08,0)],.10,"light",.025)
-            stroke(mesh,[(0,.08,-.5),(0,.08,.5)],.10,"light",.025)
-        return mesh
-
-    def forward_bolt(length, spread, y=1.2, offset=0,variant=0):
-        return [(offset+(0 if i in (0,10) else spread*((-1)**(i+variant))),
-                 y+(.18 if (i+variant)%3==1 else -.12 if (i+variant)%3==2 else 0),
-                 length*i/10) for i in range(11)]
-
-    def branch_column(mesh,x,z,height,residue=False,variant=0,width=.34):
-        flip=-1 if variant%2 else 1
-        path=[(x,.1,z),(x-.3*flip,height*.16,z+.12),
-              (x+.28*flip,height*.34,z-.12),(x-.18*flip,height*.56,z+.08),
-              (x+.45*flip,height*.78,z-.15),(x-.22*flip,height,z)]
-        lightning(mesh,path,width,residue,True,True)
-        if not residue:
-            lightning(mesh,[(x+.28*flip,height*.34,z-.12),(x+1.0*flip,height*.49,z+.25),
-                            (x+.65*flip,height*.63,z+.4)],width*.5,False,True,True)
-            lightning(mesh,[(x-.18*flip,height*.56,z+.08),(x-.85*flip,height*.67,z-.35),
-                            (x-1.1*flip,height*.83,z-.2)],width*.32,False,True,True)
-
-    def blade_crescent(mesh,radius,angle,residue,variant):
-        # A shallow folded ribbon makes the sword's cutting plane readable,
-        # with the light edge exposed above its violet body.
-        n=32
-        edge=[]
-        for i in range(n+1):
-            u=i/n
-            a=math.radians(-angle+2*angle*u)
-            r=radius*(.92+.018*math.sin(i*2.3+variant))
-            y=.70+1.15*math.sin(math.pi*u)+.045*variant
-            edge.append((r*math.sin(a),y,r*math.cos(a)))
-        for i,(a,b) in enumerate(zip(edge,edge[1:])):
-            u=(i+.5)/n
-            width=.10+.50*math.sin(math.pi*u)
-            center=math.radians(-angle+2*angle*u)
-            ox,oz=-math.sin(center)*width,-math.cos(center)*width
-            box(mesh,(min(a[0],b[0],a[0]+ox,b[0]+ox),min(a[1],b[1])-.095,
-                      min(a[2],b[2],a[2]+oz,b[2]+oz)),
-                     (max(a[0],b[0],a[0]+ox,b[0]+ox),max(a[1],b[1])+.015,
-                      max(a[2],b[2],a[2]+oz,b[2]+oz)),"after" if residue else "violet")
-        if not residue:
-            lightning(mesh,[(x,y+.075,z) for x,y,z in edge],.13,False)
-
-    def rising_cleave(mesh,length,residue,variant):
-        # The full blade-shaped rupture is present on impact. Its successive
-        # frames alter folds/forks only; no late traveling hit is implied.
-        spine=[]
-        n=28
-        for i in range(n+1):
-            u=i/n
-            x=.24*math.sin(i*1.8+variant)
-            y=.65+3.2*math.sin(math.pi*u)**.8
-            spine.append((x,y,.15+(length-.3)*u))
-        for i,(a,b) in enumerate(zip(spine,spine[1:])):
-            upper=min(a[1],b[1])
-            box(mesh,(min(a[0],b[0])-.12,.20,a[2]),
-                     (max(a[0],b[0])+.12,upper,b[2]),"after" if residue else "violet")
-            if not residue:
-                # These narrow blue faces protrude on either side of the
-                # blade sheet, enriching color without enclosing the core.
-                box(mesh,(min(a[0],b[0])-.135,max(.22,upper-.48),a[2]),
-                         (max(a[0],b[0])+.135,upper-.10,b[2]),"blue")
-        if not residue:
-            lightning(mesh,[(x,y+.06,z) for x,y,z in spine],.23,False)
-            for i in (5,11,18,24):
-                x,y,z=spine[i]
-                sign=-1 if (i+variant)%2 else 1
-                lightning(mesh,[(x,y*.65,z),(sign*.85,y*.82,z+.30),
-                                (sign*1.45,y*.55,z+.65)],.18,False,True,True)
-
-    def strike(shape,residue=False,variant=0):
-        mesh=[]
-        if shape in (1,4):
-            radius,angle=(6,60) if shape==1 else (12,70)
-            for fraction,y in ((.30,.55),(.62,1.05),(.94,1.5)):
-                path=circle(radius*fraction,y,-angle,angle,7)
-                jag=[(x*(1+(.027 if (i+variant)%2 else -.027)),h+(.18 if (i+variant)%2 else -.18),
-                      z*(1+(.027 if (i+variant)%2 else -.027))) for i,(x,h,z) in enumerate(path)]
-                lightning(mesh,jag,.24 if shape==1 else .36,residue)
-            for a in (-angle*.65,0,angle*.65):
-                lightning(mesh,rot(forward_bolt(radius-.25,.20,.8,variant=variant),a),.14,residue,taper=True)
-            blade_crescent(mesh,radius,angle,residue,variant)
-        elif shape in (3,6,8,12):
-            radius={3:3,6:5,8:6,12:12}[shape]
-            branch_column(mesh,0,0,7 if shape==3 else 9,residue,variant,.45)
-            count=4 if radius<6 else 6
-            for i in range(count):
-                angle=360*i/count
-                s,c=math.sin(math.radians(angle)),math.cos(math.radians(angle))
-                if radius>=5:
-                    branch_column(mesh,s*radius*.63,c*radius*.63,3.8,residue,(variant+i)%3,.26)
-                lightning(mesh,rot(forward_bolt(radius-.25,.30,.35,variant=variant),angle),.20,residue,taper=True)
-            lightning(mesh,circle(radius*.94,.28),.21,residue)
-        elif shape in (2,5,9,10):
-            length={2:12,5:20,9:18,10:18}[shape]
-            angles=(-40,-20,0,20,40) if shape==9 else (0,)
-            offsets=(-2.8,0,2.8) if shape==10 else (0,)
-            for a in angles:
-                for offset in offsets:
-                    lightning(mesh,rot(forward_bolt(length,.24 if shape==9 else .38,1.2,offset,variant),a),
-                              .22 if shape==9 else .32,residue,taper=True)
-                    if shape != 9:
-                        # Charged spines visibly fill the blade/energy corridor.
-                        for z in range(2,length,4):
-                            reach=.70 if shape==2 else 1.5 if shape==5 else .55
-                            lightning(mesh,[(offset-reach,.25,z-.6),(offset-.2,1.2,z),
-                                            (offset+reach,2.4 if shape==5 else 1.8,z+.6)],.19,residue,True,True)
-            if shape==5:
-                rising_cleave(mesh,length,residue,variant)
-            if shape==10:
-                for z in (3,9,15):
-                    lightning(mesh,[(-3.35,.35,z),(-2.3,1.6,z+.3),(-.8,2.0,z-.3),
-                                    (.8,1.0,z+.3),(2.3,1.6,z-.3),(3.35,.35,z)],.23,residue)
-        elif shape==7:
-            # Two inward claw/lightning walls meet in a bright central rupture.
-            for z in (1.0,3.5,6.0,7.6):
-                lightning(mesh,[(-3.8,.4,z),(-2.8,2.5,z+.2),(-1.5,1.65,z-.2),
-                                (0,1,z), (1.5,1.65,z+.2),(2.8,2.5,z-.2),(3.8,.4,z)],.32,residue)
-            branch_column(mesh,0,4,6,residue,variant,.40)
-        return mesh
-
-    def ring(frame):
-        radius=2+16*frame/31
-        mesh=[]
-        # Every active ring depicts the exact damaging +/-0.7 band. Its
-        # height stays below0.75 so jumping visibly clears the lightning.
-        for r in (radius-.7,radius+.7):
-            lightning(mesh,circle(r,.13,step=7),.10)
-        for r in (radius-.46,radius+.46):
-            stroke(mesh,circle(r,.12,step=7),.30,"glow",.06)
-        path=circle(radius,.38,step=7)
-        jag=[(x*(1+(.16/radius if i%2 else -.16/radius)),
-              .30 if i%2 else .52,z*(1+(.16/radius if i%2 else -.16/radius)))
-             for i,(x,y,z) in enumerate(path)]
-        lightning(mesh,jag,.23)
-        return mesh
-
-    def save(name,mesh,fade=False):
-        textures=dict(TEXTURES)
-        if fade:
-            textures.update(after=TEXTURES["glow"],lavender=TEXTURES["glow"])
-        model={"ambientocclusion":False,"gui_light":"front","textures":textures,"elements":mesh}
-        (modeldir/(name+".json")).write_text(json.dumps(model,separators=(",",":"))+"\n",encoding="utf-8")
-        (itemdir/(name+".json")).write_text(json.dumps({"model":{"type":"minecraft:model", "model":"rlk:item/raiden/fx_hazard/"+name}},separators=(",",":"))+"\n",encoding="utf-8")
-
-    for shape in range(1,13):
-        save(f"warning_{shape}",warning(shape))
-        for phase in (0,1):
-            save(f"charge_{shape}_{phase}",warning(shape,phase))
-        if shape !=11:
-            save(f"strike_{shape}",strike(shape))
-            save(f"strike_{shape}_1",strike(shape,False,1))
-            save(f"strike_{shape}_2",strike(shape,False,2))
-            save(f"after_{shape}",strike(shape,True))
-            save(f"after_{shape}_fade",strike(shape,True),True)
-    for frame in range(32):
-        save(f"ring_{frame:02}",ring(frame))
-
-    owned='@e[type=minecraft:item_display,tag=rlk_rd_hvfx]'
-    new='@e[tag=rlk_rd_vnew,limit=1]'
-    modelset=lambda name: 'data modify entity @s item.components."minecraft:item_model" set value "rlk:raiden/fx_hazard/'+name+'"'
-    write("vfx_init",[
-        '# One display per fixed hazard origin; all geometry is in its local coordinates.',
-        '# Native ItemDisplayRenderer applies Y=180deg after display transformations.',
-        '# Right-rotate 180deg to cancel that item-only flip: mesh +Z now equals ^ ^ ^forward.',
-        'scoreboard players add #rdHazardSerial rd 1',
-        'scoreboard players operation @s rdHId = #rdHazardSerial rd',
-        'summon minecraft:item_display ~ ~ ~ {Tags:["rlk_rd_hvfx","rlk_rd_vnew","rlk_raiden_aux","rlk_room"],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",interpolation_duration:0,teleport_duration:0,view_range:3f,width:48f,height:22f,shadow_radius:0f,brightness:{block:15,sky:15},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[32f,32f,32f],right_rotation:[0f,1f,0f,0f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/fx_hazard/warning_1"}}}',
-        f'data modify entity {new} Rotation set from entity @s Rotation',
-        f'scoreboard players operation {new} rdVId = @s rdHId',
-        f'scoreboard players operation {new} rdShape = @s rdShape',
-        f'scoreboard players set {new} rdWind 0',
-        f'scoreboard players set {new} rdHAge 0',
-        f'execute as {new} run function rlk:boss/raiden/hazard/vfx_warning',
+    # ---------------------------------------------------------------- hazard-bound visuals
+    # decal: storage rlk:rd v {m, kt, sx, sz, sx0, sz0, tz, d}
+    dec = ['# @s = hazard at its origin (rotated as it). The B.3 decal, sized to the hazard; rings open with an expand.',
+           'data modify storage rlk:rd v set value {tz:0f,d:1}']
+    for dk, (kt, model, sizing) in DECALS.items():
+        dec.append(f'execute if score @s rdHDk matches {dk} run function {H}vis/dk/{dk}')
+        write(f"vis/dk/{dk}", [f'data modify storage rlk:rd v.m set value "{model}"',
+                               f'data modify storage rlk:rd v.kt set value "{kt}"',
+                               f'data modify storage rlk:rd v.d set value {DECAL_INTRO.get(dk, 1)}'])
+    dec += [
+        '# radius: annulus = r (B); every other radial kind = A. band: width 2B x length A (rect / to_wall), offset C.',
+        'scoreboard players operation #rdSx rd = @s rdHA',
+        'execute if score @s rdHK matches 2 run scoreboard players operation #rdSx rd = @s rdHB',
+        'scoreboard players operation #rdSz rd = #rdSx rd',
+        f'execute if score @s rdHDk matches 5 run function {H}vis/decal_band',
+        'execute store result storage rlk:rd v.sx float 0.001 run scoreboard players get #rdSx rd',
+        'execute store result storage rlk:rd v.sz float 0.001 run scoreboard players get #rdSz rd',
+        'execute store result storage rlk:rd v.sx0 float 0.001 run scoreboard players get #rdSx rd',
+        'execute store result storage rlk:rd v.sz0 float 0.001 run scoreboard players get #rdSz rd',
+    ] + [f'execute if score @s rdHDk matches {dk} store result storage rlk:rd v.sx0 float 0.00025 run scoreboard players get #rdSx rd'
+         for dk in DECAL_INTRO] + [
+        f'execute if score @s rdHDk matches {dk} store result storage rlk:rd v.sz0 float 0.00025 run scoreboard players get #rdSz rd'
+        for dk in DECAL_INTRO] + [
+        f'function {H}vis/decal_summon with storage rlk:rd v',
+        f'tp {VNEW} ~ ~ ~ ~ 0',
+        f'scoreboard players operation {VNEW} rdVId = @s rdHId',
         'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew',
+    ]
+    write("vis/decal", dec)
+    write("vis/decal_band", [
+        'scoreboard players operation #rdSx rd = @s rdHB',
+        'scoreboard players operation #rdSx rd += @s rdHB',
+        'scoreboard players operation #rdSz rd = @s rdHA',
+        'execute if score @s rdHK matches 3..4 store result storage rlk:rd v.tz float 0.001 run scoreboard players get @s rdHC',
     ])
-    write("vfx_warning",[f'execute if score @s rdShape matches {s} run {modelset("warning_"+str(s))}' for s in range(1,13)])
-    write("charge",[
-        '# Four ticks before impact: charged borders, no full-path strike yet.',
-        'scoreboard players operation #rdVfxOwner rd = @s rdHId',
-        'scoreboard players set #rdChargeFrame rd 0',
-        'execute if score #rdUntil rd matches 1..2 run scoreboard players set #rdChargeFrame rd 1',
-        f'execute as {owned} if score @s rdVId = #rdVfxOwner rd run function rlk:boss/raiden/hazard/vfx_charge',
+    write("vis/decal_summon", ['$' + display(
+        ["rlk_rd_hvis", "rlk_rd_decal", "rlk_rd_decal_$(kt)", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew", "rlk_rd_fxa",
+         "rlk_rd_fxnew"], MODEL_NS + "$(m)", nbt_tf(tz="$(tz)", sx="$(sx0)", sz="$(sz0)"),
+        custom='{d:$(d),to:' + nbt_tf(tz="$(tz)", sx="$(sx)", sz="$(sz)") + '}', tp_dur=1)])
+    write("vis/decal_off", [OWN, 'execute as @e[tag=rlk_rd_decal,distance=..0.05] if score @s rdVId = #rdOwner rd run kill @s'])
+
+    # strike: storage rlk:rd v {m, a, sx, sz, tz, sx0, sz0, d}
+    st = ['# @s = hazard at its origin. The strike visual of a static hazard, sized to it (life 10: flash, flicker,',
+          '# residue, fade). Field crackle stays bound to the hazard instead. rdHSm (rd-sync) starts it where the swing',
+          '# came from: swept in from one side, dropped from above, run out from the origin or grown up from the floor.',
+          'data modify storage rlk:rd v set value {tz:0f,d:1,ty0:0f,sy0:%sf,lr0:"[0f,0f,0f,1f]"}' % STRIKE_YU]
+    for sv, (_, hot, after) in STRIKES.items():
+        st.append(f'execute if score @s rdHSv matches {sv} run function {H}vis/sv/{sv}')
+        write(f"vis/sv/{sv}", [f'data modify storage rlk:rd v.m set value "{hot}"',
+                               f'data modify storage rlk:rd v.a set value "{after}"'])
+    st += [
+        'scoreboard players operation #rdSx rd = @s rdHA',
+        'execute if score @s rdHK matches 2 run scoreboard players operation #rdSx rd = @s rdHB',
+        'scoreboard players operation #rdSz rd = #rdSx rd',
+        f'execute if score @s rdHK matches 3..4 run function {H}vis/decal_band',
+        'execute store result storage rlk:rd v.sx float 0.001 run scoreboard players get #rdSx rd',
+        'execute store result storage rlk:rd v.sz float 0.001 run scoreboard players get #rdSz rd',
+        'execute store result storage rlk:rd v.sx0 float 0.00075 run scoreboard players get #rdSx rd',
+        'execute store result storage rlk:rd v.sz0 float 0.00075 run scoreboard players get #rdSz rd',
+        'execute if score @s rdHK matches 3..4 run function %svis/strike_full' % H,
+        f'execute if score @s rdHSm matches 1.. run function {H}vis/strike_motion',
+        f'execute if score @s rdHK matches {KINDS["field"]} run function {H}vis/field_summon with storage rlk:rd v',
+        f'execute unless score @s rdHK matches {KINDS["field"]} run function {H}vis/strike_summon with storage rlk:rd v',
+        f'tp {VNEW} ~ ~ ~ ~ 0',
+        f'scoreboard players set {VNEW} rdHLife {STRIKE_LIFE}',
+        f'scoreboard players operation {VNEW} rdVId = @s rdHId',
+        'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew',
+    ]
+    write("vis/strike", st)
+    write("vis/strike_full", ['# rect / to_wall: no expand (a slash is instant along its whole length)',
+                              'data modify storage rlk:rd v.sx0 set from storage rlk:rd v.sx',
+                              'data modify storage rlk:rd v.sz0 set from storage rlk:rd v.sz'])
+    half = math.radians(SM_SWEEP) / 2
+    qs = {1: f'[0f,{math.sin(half):.5f}f,0f,{math.cos(half):.5f}f]', 2: f'[0f,{-math.sin(half):.5f}f,0f,{math.cos(half):.5f}f]'}
+    write("vis/strike_motion", [
+        '# rdHSm 1 / 2: the strike starts turned SM_SWEEP deg toward her left / right (model +X = her left) and sweeps',
+        '# into place behind the blade; 3 drops 1 b; 4 runs out from the origin (rect / to_wall); 5 grows up from the floor.',
+        f"execute if score @s rdHSm matches 1 run data modify storage rlk:rd v.lr0 set value \"{qs[1]}\"",
+        f"execute if score @s rdHSm matches 2 run data modify storage rlk:rd v.lr0 set value \"{qs[2]}\"",
+        'execute if score @s rdHSm matches 3 run data modify storage rlk:rd v.ty0 set value 1.0f',
+        'execute if score @s rdHSm matches 4 store result storage rlk:rd v.sz0 float 0.00015 run scoreboard players get #rdSz rd',
+        f'execute if score @s rdHSm matches 5 run data modify storage rlk:rd v.sy0 set value {STRIKE_YU * 0.15:.2f}f',
     ])
-    write("vfx_charge",['scoreboard players set @s rdWind 2']+[
-        f'execute if score @s rdShape matches {s} if score #rdChargeFrame rd matches {p} run {modelset(f"charge_{s}_{p}")}'
-        for s in range(1,13) for p in (0,1)
+    write("vis/strike_summon", ['$' + display(
+        ["rlk_rd_fx", "rlk_rd_strike", "rlk_rd_fxa", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew"],
+        MODEL_NS + "$(m)", nbt_tf(ty="$(ty0)", tz="$(tz)", sx="$(sx0)", sy="$(sy0)", sz="$(sz0)", lr="$(lr0)"),
+        custom='{d:3,after:"' + MODEL_NS + '$(a)",fade:' + str(FADE_TINT) + ',to:' +
+               nbt_tf(tz="$(tz)", sx="$(sx)", sy=str(STRIKE_YU), sz="$(sz)") + '}')])
+    write("vis/field_summon", ['$' + display(
+        ["rlk_rd_hvis", "rlk_rd_strike", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew"],
+        MODEL_NS + "$(m)", nbt_tf(sx="$(sx)", sy=str(STRIKE_YU), sz="$(sz)"))])
+
+    # travelling cards
+    tr = ['# @s = travelling hazard at rel rdHSp (its cards\' summon): the cards at the front of rel rdHGo, still; vis/travel_go',
+          '# gives them their ONE interpolation (to the end state over F - rdHGo ticks) at rel rdHGo, raiden_kit.TRAVEL_GAP',
+          '# ticks after this summon, so the client has ticked them before (user 10-22: else it may show the end state).',
+          'scoreboard players operation #rdD rd = @s rdHF',
+          'scoreboard players operation #rdD rd -= @s rdHGo',
+          'execute store result storage rlk:rd v.d int 1 run scoreboard players get #rdD rd',
+          'scoreboard players operation #rdR0 rd = @s rdHB',
+          'scoreboard players operation #rdR0 rd *= @s rdHGo',
+          'scoreboard players operation #rdR0 rd /= #rdK1000 rd',
+          'scoreboard players operation #rdR0 rd += @s rdHA',
+          'scoreboard players operation #rdR1 rd = @s rdHB',
+          'scoreboard players operation #rdR1 rd *= @s rdHF',
+          'scoreboard players operation #rdR1 rd /= #rdK1000 rd',
+          'scoreboard players operation #rdR1 rd += @s rdHA',
+          'execute store result storage rlk:rd v.tz0 float 0.001 run scoreboard players get #rdR0 rd',
+          'execute store result storage rlk:rd v.tz1 float 0.001 run scoreboard players get #rdR1 rd',
+          f'execute if score @s rdHK matches {KINDS["sweep"]} run function {H}vis/travel_sweep',
+          f'execute if score @s rdHK matches {KINDS["slab"]} run function {H}vis/travel_slab',
+          f'execute if score @s rdHK matches {KINDS["orb"]} run function {H}vis/travel_orb',
+          'scoreboard players operation @e[tag=rlk_rd_vown] rdVId = @s rdHId',
+          'tag @e[tag=rlk_rd_vown] remove rlk_rd_vown']
+    write("vis/travel", tr)
+    write("vis/travel_go", [
+        '# @s = travelling hazard at rel rdHGo: its still cards (summoned TRAVEL_GAP ticks ago) start their one',
+        '# interpolation now (fx_anim in vfx_world, after the hazards).',
+        OWN,
+        'execute at @s as @e[tag=rlk_rd_trv,distance=..0.05] if score @s rdVId = #rdOwner rd run tag @s add rlk_rd_fxa'])
+    chord_k = round(SEG_CHORD, 6)
+    write("vis/travel_sweep", [
+        f'execute store result storage rlk:rd v.cx0 float {chord_k / 1000:.9f} run scoreboard players get #rdR0 rd',
+        f'execute store result storage rlk:rd v.cx1 float {chord_k / 1000:.9f} run scoreboard players get #rdR1 rd',
+        'execute store result storage rlk:rd v.bz float 0.001 run scoreboard players get @s rdHC',
+    ] + [f'execute if score @s rdHSv matches {n} run function {H}vis/seg/n{n}' for n in [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 24]])
+    for n in [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 24]:
+        ks = list(range(24)) if n == 24 else list(range(-(n // 2), n // 2 + 1))
+        lines = [f'# {n} ring cards, {SEG_DEG} deg apart, centred on the yaw.']
+        for k in ks:
+            lines.append(f'execute rotated ~{k * SEG_DEG} 0 run function {H}vis/seg_{"ab"[k % 2]} with storage rlk:rd v')
+        write(f"vis/seg/n{n}", lines)
+    for v in "ab":
+        write(f"vis/seg_{v}", ['$' + display(
+            ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
+             "rlk_rd_vnew"], mid("tr_seg_" + v), nbt_tf(tz="$(tz0)", sx="$(cx0)", sz="$(bz)"),
+            custom='{d:$(d),to:' + nbt_tf(tz="$(tz1)", sx="$(cx1)", sz="$(bz)") + '}'),
+            f'tp {VNEW} ~ ~ ~ ~ 0', f'tag {VNEW} add rlk_rd_vown', 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'])
+    roll = lambda deg: f'[0f,0f,{math.sin(math.radians(deg) / 2):.5f}f,{math.cos(math.radians(deg) / 2):.5f}f]'
+    write("vis/travel_slab", [
+        'scoreboard players operation #rdSx rd = @s rdHC',
+        'scoreboard players operation #rdSx rd += @s rdHC',
+        'execute store result storage rlk:rd v.sx float 0.001 run scoreboard players get #rdSx rd',
+        'execute store result storage rlk:rd v.sy float 0.001 run scoreboard players get @s rdHE',
+        'execute store result storage rlk:rd v.sz float 0.001 run scoreboard players get @s rdHD',
+        'data modify storage rlk:rd v.m set value "tr_slab"',
+        'data modify storage rlk:rd v.ty set value 0f',
+        'data modify storage rlk:rd v.lr set value "[0f,0f,0f,1f]"',
+        '# rdHSv 2..4 (rd-sync): a crescent sword wave rolled 45 deg up to her left / right, or level, scaled to the half width',
+        'execute if score @s rdHSv matches 2.. run data modify storage rlk:rd v.m set value "tr_wave"',
+        f'execute if score @s rdHSv matches 2.. run data modify storage rlk:rd v.ty set value {WAVE_Y}f',
+        f'execute if score @s rdHSv matches 2.. store result storage rlk:rd v.sx float {WAVE_R / 1000:.6f} run scoreboard players get @s rdHC',
+        'execute if score @s rdHSv matches 2.. run data modify storage rlk:rd v.sy set from storage rlk:rd v.sx',
+        'execute if score @s rdHSv matches 2.. run data modify storage rlk:rd v.sz set from storage rlk:rd v.sx',
+        f'execute if score @s rdHSv matches 2 run data modify storage rlk:rd v.lr set value "{roll(45)}"',
+        f'execute if score @s rdHSv matches 3 run data modify storage rlk:rd v.lr set value "{roll(-45)}"',
+        f'function {H}vis/slab_summon with storage rlk:rd v',
+        f'tp {VNEW} ~ ~ ~ ~ 0', f'tag {VNEW} add rlk_rd_vown', 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'])
+    write("vis/slab_summon", ['$' + display(
+        ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
+         "rlk_rd_vnew"], MODEL_NS + "$(m)", nbt_tf(ty="$(ty)", tz="$(tz0)", sx="$(sx)", sy="$(sy)", sz="$(sz)", lr="$(lr)"),
+        custom='{d:$(d),to:' + nbt_tf(ty="$(ty)", tz="$(tz1)", sx="$(sx)", sy="$(sy)", sz="$(sz)", lr="$(lr)") + '}')])
+    write("vis/travel_orb", [
+        'execute store result storage rlk:rd v.sx float 0.001 run scoreboard players get @s rdHC',
+        'execute store result storage rlk:rd v.ty float 0.001 run scoreboard players get @s rdHE',
+        f'function {H}vis/orb_summon with storage rlk:rd v',
+        f'tp {VNEW} ~ ~ ~ ~ 0', f'tag {VNEW} add rlk_rd_vown', 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'])
+    write("vis/orb_summon", ['$' + display(
+        ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
+         "rlk_rd_vnew"], mid("tr_orb"), nbt_tf(ty="$(ty)", tz="$(tz0)", sx="$(sx)", sz="$(sx)"),
+        custom='{d:$(d),to:' + nbt_tf(ty="$(ty)", tz="$(tz1)", sx="$(sx)", sz="$(sx)") + '}')])
+    write("vis/impact", [
+        '# At the body: a travelling / follow / field hazard reached the player (dodged or not).',
+        display(["rlk_rd_fx", "rlk_rd_strike", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew"],
+                mid("fx_burst"), nbt_tf(ty="1", sx="1.4", sy="1.4", sz="1.4"), billboard="center",
+                custom='{after:"' + mid("fx_flash") + f'",fade:{FADE_TINT}}}'),
+        f'scoreboard players set {VNEW} rdHLife 6',
+        'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew',
+        'playsound minecraft:entity.lightning_bolt.impact hostile @a[tag=player] ~ ~ ~ 0.35 1.8 0.1',
     ])
-    write("warning",['# Warning display persists; no repeated particle burst or entity allocation.'])
-    for shape in range(1,13):
-        write(f"warning/s{shape}",['# Mesh: rlk:raiden/fx_hazard/warning_'+str(shape)])
-    write("strike",[
-        'scoreboard players operation #rdVfxOwner rd = @s rdHId',
-        f'execute as {owned} if score @s rdVId = #rdVfxOwner rd run function rlk:boss/raiden/hazard/vfx_strike',
-        'playsound minecraft:entity.lightning_bolt.impact hostile @a[tag=player] ~ ~ ~ 0.50 1.25 0.2',
-        'execute if score @s rdShape matches 4..8 run playsound minecraft:entity.lightning_bolt.thunder hostile @a[tag=player] ~ ~ ~ 0.60 1.35 0.25',
-        'execute if score @s rdShape matches 12 run playsound minecraft:entity.lightning_bolt.thunder hostile @a[tag=player] ~ ~ ~ 0.55 1.5 0.25',
-        'function rlk:boss/raiden/hazard/hit',
-    ])
-    write("vfx_strike",[
-        '# Whole path flashes on the exact damage tick; this is instantaneous lightning.',
-        'scoreboard players set @s rdWind 1',
-        'scoreboard players set @s rdHAge -1',
-    ]+[f'execute if score @s rdShape matches {s} run {modelset("strike_"+str(s))}' for s in range(1,13) if s!=11])
-    for phase in (1,2):
-        write(f"vfx_flash_{phase}",[
-            '# The whole area remains lit; only branch topology changes, not hit travel.',
-        ]+[f'execute if score @s rdShape matches {s} run {modelset(f"strike_{s}_{phase}")}' for s in range(1,13) if s!=11])
-    write("vfx_after",[f'execute if score @s rdShape matches {s} run {modelset("after_"+str(s))}' for s in range(1,13) if s!=11])
-    write("vfx_fade",[f'execute if score @s rdShape matches {s} run {modelset("after_"+str(s)+"_fade")}' for s in range(1,13) if s!=11])
-    for shape in range(1,13):
-        if shape!=11:
-            write(f"strike/s{shape}",['# Strike mesh is selected by vfx_strike on the owning display.'])
-    for frame in range(32):
-        write(f"ring/f{frame:02}",[
-            f'# Exact ring radius {2+16*frame/31:.6f}; visible band half-width0.7.',
-            'scoreboard players operation #rdVfxOwner rd = @s rdHId',
-            f'execute as {owned} if score @s rdVId = #rdVfxOwner rd run {modelset("ring_"+f"{frame:02}")}',
-        ])
-    write("ring_tick",[
-        'scoreboard players operation #rdElapsed rd = @s rdHAge',
-        'scoreboard players operation #rdElapsed rd -= @s rdWind',
-        'execute if score #rdElapsed rd matches 32.. run return run function rlk:boss/raiden/hazard/expire',
-        'execute unless score #rdElapsed rd matches 0..31 run return 0',
-        '# Every damage radius receives its matching model in the same tick.',
-        'function rlk:boss/raiden/hazard/ring_draw',
-        'execute if score #rdElapsed rd matches 0 run playsound minecraft:entity.lightning_bolt.impact hostile @a[tag=player] ~ ~ ~ 0.35 1.6 0.2',
-        'execute unless score @s rdHHit matches 1 run function rlk:boss/raiden/hazard/hit',
-    ])
-    write("vfx_world",[
-        '# Call after hazard updates and from pause: removes canceled/orphan effects immediately.',
-        f'execute as {owned} run function rlk:boss/raiden/hazard/vfx_tick',
-    ])
-    write("expire",[
-        '# Cancel the display and its parent together; the ring ends at frame32.',
-        'scoreboard players operation #rdVfxOwner rd = @s rdHId',
-        f'execute as {owned} if score @s rdVId = #rdVfxOwner rd run kill @s',
-        'kill @s',
-    ])
-    write("vfx_tick",[
-        'scoreboard players operation #rdVfxOwner rd = @s rdVId',
-        'scoreboard players set #rdVfxExists rd 0',
-        'execute as @e[tag=rlk_rd_hazard] if score @s rdHId = #rdVfxOwner rd run scoreboard players set #rdVfxExists rd 1',
-        'execute if score #rdVfxExists rd matches 0 run return run kill @s',
-        'execute unless score @s rdWind matches 1 run return 0',
-        'scoreboard players add @s rdHAge 1',
-        'execute if score @s rdHAge matches 1 run function rlk:boss/raiden/hazard/vfx_flash_1',
-        'execute if score @s rdHAge matches 2 run function rlk:boss/raiden/hazard/vfx_flash_2',
-        'execute if score @s rdHAge matches 3 run function rlk:boss/raiden/hazard/vfx_after',
-        'execute if score @s rdHAge matches 6 run function rlk:boss/raiden/hazard/vfx_fade',
-        'execute if score @s rdHAge matches 9.. run kill @s',
-    ])
-    # The base generator owns the damage math and lifecycle. Attach creation
-    # only after forward-axis caching, preserving its original command order.
-    initpath=out/"init.mcfunction"
-    original=initpath.read_text(encoding="utf-8")
-    original=original.replace('function rlk:boss/raiden/hazard/warning\n',
-                              'function rlk:boss/raiden/hazard/vfx_init\n')
-    initpath.write_text(original,encoding="utf-8")
-    tickpath=out/"tick_at.mcfunction"
-    original=tickpath.read_text(encoding="utf-8")
-    original=original.replace('run return run kill @s',
-                              'run return run function rlk:boss/raiden/hazard/expire')
-    original=original.replace('scoreboard players operation #rdMod rd = @s rdHAge',
-                              'scoreboard players operation #rdUntil rd = @s rdWind\n'
-                              'scoreboard players operation #rdUntil rd -= @s rdHAge\n'
-                              'execute if score #rdUntil rd matches 1..4 run function rlk:boss/raiden/hazard/charge\n'
-                              'scoreboard players operation #rdMod rd = @s rdHAge')
-    tickpath.write_text(original,encoding="utf-8")
-    print("Built 123 native display meshes: 12 layered-alpha telegraphs, 24 charge frames, 33 strike frames, 22 fading afterglows, 32 exact ring frames.")
+
+    # ---------------------------------------------------------------- D.1 cues (fx/<cue>) and sounds (fx/snd/<cue>)
+    def snd_lines(cue):
+        return [f'playsound minecraft:{ev} hostile @a[tag=player] ~ ~ ~ {vol} {pit} 0.25' for ev, vol, pit in SOUNDS[cue]]
+
+    for cue in SOUNDS:
+        wfx(f"snd/{cue}", [f'# D.1 sound recipe "{cue}" (vanilla only).'] + snd_lines(cue))
+
+    def card(model, life, *, y=0.0, s0=(1, 1, 1), s1=None, d=4, s2=None, d2=4, color=WHITE, billboard="fixed", fade=None):
+        """A timed cue card: summoned at s0, one interpolation to s1 over d ticks the tick after (fx_anim), an optional
+        second one to s2 over d2 ticks when FX2_AT ticks of its life are left (fx_anim2), killed at the end of `life`."""
+        tags = (["rlk_rd_fx", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew"] + (["rlk_rd_fxa"] if s1 else [])
+                + (["rlk_rd_fxb"] if s2 else []))
+        custom = []
+        if s1:
+            custom.append(f'd:{d},to:' + nbt_tf(ty=f"{y:g}", sx=f"{s1[0]:g}", sy=f"{s1[1]:g}", sz=f"{s1[2]:g}"))
+        if s2:
+            assert life > FX2_AT, (model, life)
+            custom.append(f'd2:{d2},to2:' + nbt_tf(ty=f"{y:g}", sx=f"{s2[0]:g}", sy=f"{s2[1]:g}", sz=f"{s2[2]:g}"))
+        if fade is not None:
+            custom.append(f'fade:{fade}')
+        return [display(tags, mid(model), nbt_tf(ty=f"{y:g}", sx=f"{s0[0]:g}", sy=f"{s0[1]:g}", sz=f"{s0[2]:g}"),
+                        custom='{' + ','.join(custom) + '}' if custom else None, color=color, billboard=billboard),
+                f'tp {VNEW} ~ ~ ~ ~ 0', f'scoreboard players set {VNEW} rdHLife {life}',
+                'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew']
+
+    DARK, GOLD, CYAN, PINK, PALE = 0x4A3270, 0xFFD27A, 0x9FE6FF, 0xFFA8E8, 0xE8E0FF
+    BEAM_GOLD = 0xFFE9B0                     # pale gold-white light (the guard-break beam; beam_soft is near-white)
+    CUES = {
+        'star': card('fx_star', 8, s0=(0.4, 0.4, 0.4), s1=(1.3, 1.3, 1.3), d=2, billboard="center")
+        + card('fx_ring', 8, s0=(0.2, 1, 0.2), s1=(1, 1, 1), d=4),
+        'blink_out': card('fx_flash', 5, y=1.0, s0=(1.6, 2.2, 1.6), s1=(0.3, 2.6, 0.3), d=4, color=0xB48CFF, billboard="center"),
+        'blink_in': card('fx_flash', 5, y=1.0, s0=(0.3, 2.6, 0.3), s1=(1.4, 1.8, 1.4), d=3, color=0xB48CFF, billboard="center"),
+        'switch_hoop': card('fx_hoop', 10, y=1.2, s0=(1.25, 1.25, 1.25), color=DARK, billboard="center"),
+        'switch_burst': card('fx_dome', 10, s0=(1, 4, 1), s1=(6, 4, 6), d=4)
+        + card('fx_ring', 10, s0=(1, 1, 1), s1=(6.5, 1, 6.5), d=5),
+        'bolt': card('fx_bolt', 7, s0=(1.2, 8, 1.2)) + card('fx_ring', 8, s0=(0.5, 1, 0.5), s1=(3, 1, 3), d=4),
+        'bolt_big': card('fx_bolt', 8, s0=(2.4, 8, 2.4)) + card('fx_ring', 10, s0=(1, 1, 1), s1=(6, 1, 6), d=5),
+        'crystal': card('fx_crystal_ring', 14, s0=(2.5, 4, 2.5), s1=(3, 4, 3), d=3),
+        'parry': card('fx_crescent', 6, y=1.0, s0=(1.2, 1, 1.2), color=GOLD),
+        'counter_cue': card('fx_line', 10, y=1.2, s0=(1, 1, 1), color=0x24123C, billboard="center"),
+        # guard break (B-06, v6@25.4-26.6): the white-violet shatter burst and a short white sphere flash at the break;
+        # 13 t later (sg/stun_tick) the soft gold light beam comes down on her and is gone 12 t after (guard_beam).
+        # Nothing stays on her for the rest of the stun (it was a 100 t gold-tinted lightning column, fx_pillar).
+        'guard_shatter': card('fx_burst', 8, y=1.2, s0=(1.5, 1.5, 1.5), s1=(3.4, 3.4, 3.4), d=4, color=0xF2E6FF,
+                              billboard="center")
+        + card('fx_flash', 5, y=1.2, s0=(3.4, 3.4, 3.4), s1=(0.6, 0.6, 0.6), d=4, billboard="center"),
+        'guard_beam': card('fx_beam', 12, y=10.5, s0=(1.5, 0.5, 1.5), s1=(1.5, 8, 1.5), d=3, s2=(0, 8, 0), d2=5,
+                           color=BEAM_GOLD)
+        + card('fx_flash', 6, y=1.1, s0=(0.4, 0.4, 0.4), s1=(2.8, 2.8, 2.8), d=4, billboard="center"),
+        'eye_spawn': card('fx_pillar', 10, s0=(0.7, 8, 0.7), color=CYAN),
+        'eye_break': card('fx_burst', 10, s0=(1, 1, 1), s1=(3.4, 3.4, 3.4), d=4, color=0xFFD6F4, billboard="center"),
+        'eye_blast': card('fx_dome', 10, s0=(2, 4, 2), s1=(5, 4, 5), d=4, color=0xD8B8FF),
+        'musou_slash': card('fx_crescent', 12, y=1.6, s0=(4, 1, 4), s1=(19, 1, 19), d=6, color=PALE)
+        + card('fx_flash', 8, y=2.0, s0=(6, 6, 6), billboard="center"),
+        'glaive_throw': card('fx_pillar', 6, s0=(0.5, 8, 0.5), color=PINK),
+        'bomb': card('fx_burst', 8, y=1.0, s0=(1.2, 1.2, 1.2), s1=(3.5, 3.5, 3.5), d=3, billboard="center")
+        + card('dk_pool', 14, s0=(1, 1, 1), s1=(3.5, 1, 3.5), d=4),
+        'iai_charge': card('fx_ring', 8, y=1.0, s0=(1.2, 1, 1.2), s1=(0.2, 1, 0.2), d=8, color=PALE),
+        'danjeol_halo': card('fx_hoop', 14, y=2.6, s0=(0.6, 0.6, 0.6), s1=(1.4, 1.4, 1.4), d=4, color=PALE, billboard="center"),
+        'danjeol_column': card('fx_pillar', 30, s0=(1.4, 8, 1.4), color=0xC8A8FF),
+        'clap_star': card('fx_star', 14, s0=(0.5, 0.5, 0.5), s1=(1.6, 1.6, 1.6), d=3, color=0xFFE8FF, billboard="center"),
+        'shadow_palm': card('dk_pool', 12, s0=(2, 1, 2), s1=(5, 1, 5), d=4)
+        + card('fx_burst', 6, y=0.8, s0=(2.5, 2.5, 2.5), color=0xB070FF, billboard="center"),
+        'vajra_pulse': card('fx_flash', 4, y=3.6, s0=(1.4, 1.4, 1.4), billboard="center"),
+        'mangeop_dome': card('fx_ring', 8, s0=(1, 1, 1), s1=(8, 1, 8), d=8, color=0xBFE8FF),
+        'mangeop_slash': card('fx_crescent', 8, y=2.5, s0=(6, 1, 6), s1=(24, 1, 24), d=6, color=PALE)
+        + card('fx_flash', 6, y=2.5, s0=(10, 10, 10), billboard="center"),
+        # the katana strikes the safe dome (user 10-22h): sparks and a star at the impact on the shell and a big white
+        # flash that shrinks into it (the rig's clash adds the scar along the rake and the ripple round the impact)
+        'mangeop_clash': card('fx_burst', 8, s0=(2, 2, 2), s1=(7, 7, 7), d=3, color=0xF4ECFF, billboard="center")
+        + card('fx_star', 8, s0=(1.5, 1.5, 1.5), s1=(5, 5, 5), d=2, color=0xFFFFFF, billboard="center")
+        + card('fx_flash', 7, s0=(9, 9, 9), s1=(2.5, 2.5, 2.5), d=5, color=0xEEE6FF, billboard="center"),
+        'transform_burst': card('fx_dome', 12, s0=(1, 4, 1), s1=(7, 4, 7), d=5),
+    }
+    for cue in SOUNDS:
+        wfx(cue, [f'# D.1 cue "{cue}": visual (if any) + sound recipe. Run it at the cue spot.'] +
+            CUES.get(cue, []) + [f'function {F}snd/{cue}'])
+    # cues with a run-time size or life (macro)
+    tw = card('fx_hoop', 0, y=1.8, s0=(0.75, 0.75, 0.75), color=0xF2E8FF, billboard="center")
+    wfx("twirl", ['# Polearm twirl: the bright vertical ring (1.5 b) for {life} ticks; call fx/snd/twirl_beat every 6 t.',
+                  tw[0], tw[1], f'$scoreboard players set {VNEW} rdHLife $(life)', tw[3], f'function {F}snd/twirl'])
+    eg = card('fx_dome', 0, s0=(1, 4, 1), color=CYAN)
+    wfx("eye_glow", ['# Cyan dome glow (danger) over a surviving eye: {r} blocks, {life} ticks.',
+                     '$' + eg[0].replace('scale:[1f,4f,1f]', 'scale:[$(r)f,4f,$(r)f]'), eg[1],
+                     f'$scoreboard players set {VNEW} rdHLife $(life)', eg[3], f'function {F}snd/eye_glow'])
+    cl = card('fx_crystal_line', 0, s0=(1.6, 4, 1))
+    wfx("crystal_line", ['# Crystal wall along the yaw: {len} blocks long, 1.6 wide (판결의 검, 26 hit 2).',
+                         '$' + cl[0].replace('scale:[1.6f,4f,1f]', 'scale:[1.6f,4f,$(len)f]'), cl[1],
+                         f'scoreboard players set {VNEW} rdHLife 16', cl[3], f'function {F}snd/crystal'])
+    cr = card('fx_crystal_ring', 0, s0=(1, 4, 1))
+    wfx("crystal_ring", ['# Crystal spikes on a circle of radius {r} (수천수만의 염원, transformation).',
+                         '$' + cr[0].replace('scale:[1f,4f,1f]', 'scale:[$(r)f,4f,$(r)f]'), cr[1],
+                         f'scoreboard players set {VNEW} rdHLife 16', cr[3], f'function {F}snd/crystal'])
+    # state decals (not hazards) and the field tint
+    for dk, (kt, model, sizing) in DECALS.items():
+        c = card(model, 0, s0=(1, 1, 1))
+        summon = c[0].replace('"rlk_rd_fx",', f'"rlk_rd_fx","rlk_rd_sdecal","rlk_rd_sdecal_{kt}",')
+        summon = summon.replace('scale:[1f,1f,1f]', 'scale:[$(sx)f,1f,$(sz)f]')
+        wfx(f"decal/d{dk}", [f'# State decal {kt} ({model}): {{sx, sz}} blocks, {{life}} ticks (99999 = until killed).',
+                             '$' + summon, c[1], f'$scoreboard players set {VNEW} rdHLife $(life)', c[3]])
+    c = card('dk_tint', 0, s0=(24.6, 1, 24.6))
+    wfx("decal/tint", ['# Whole-field tint (time stop, 만겁): a uniform 35 % violet over the arena floor (r 24.6, soft edge over the open water), {life} ticks.',
+                       '# Run it at the arena centre.',
+                       c[0].replace('"rlk_rd_fx",', '"rlk_rd_fx","rlk_rd_sdecal","rlk_rd_sdecal_tint",'), c[1],
+                       f'$scoreboard players set {VNEW} rdHLife $(life)', c[3]])
+    wfx("musou_dark", ['# Time-stop darkening: the field tint for {life} ticks + the sonic charge. Run at the arena centre.',
+                       f'$function {F}decal/tint {{life:$(life)}}', f'function {F}snd/musou_dark'])
+    wfx("mangeop_tint", ['# 만겁 arena tint for {life} ticks. Run at the arena centre.',
+                         f'$function {F}decal/tint {{life:$(life)}}', f'function {F}snd/mangeop_tint'])
+    print(f"Built {nmodels} unit display meshes (largest {maxel} cards), {len(SOUNDS)} sound recipes, "
+          f"{len(CUES) + 6} visual cues.")

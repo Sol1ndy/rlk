@@ -1,0 +1,104 @@
+{
+  "_doc": [
+    "Mid-boss registry (중간보스). Single source for tools/build_mboss_core.py, build_mboss_arena.py and every boss module generator.",
+    "n: stable numeric id used by the generated dispatchers F:mboss/d/<hook> (#mbId mb); never reuse a number.",
+    "enabled: false keeps an entry out of the game (no runtime registry line, no dispatch) until its module F:<fn root>/ exists (fn below).",
+    "w: roll weight (0 = only through #mbForce, i.e. tests). minCh/maxCh: chapter range.",
+    "hp/xp/atk: level-1 base HP, kill XP and base hit (raw damage before the hit coefficient). lvAdd: level offset over the zone formula.",
+    "dmgMul: % applied to every hit on the player. goldMul: kill gold multiplier (normal mobs x1, chapter boss x15). sap: sapphire shards on kill.",
+    "el: default element of the boss's hits (#elem numbering: 0 physical 1 pyro 2 hydro 3 electro 4 cryo 5 geo 6 anemo 7 dendro).",
+    "scale: hitbox husk scale attribute. hit: click-shield size {w,h} in blocks. intro/death: maximum intro / death-sequence ticks.",
+    "picks: item selections granted on kill (chapter rarity). icon: gate object item {item,model}. start: optional arrival override (else arena.start).",
+    "--- schema v2 (chapter bosses, AZ-CM; scratchpad az/contract/cm.md section 2) ---",
+    "kind: \"mid\" (default) or \"chapter\". Chapter entries go to rlk:mboss creg[] / cbyid.<id> (never reg[] / byid: the mid-boss roll never sees them); they need w 0, goldMul 1, sap 0, picks 0 and minCh..maxCh covering ch.",
+    "ch: chapters this chapter boss ends (routing, F:mboss/cb/route); [] = never routed (cproto). route: false = routing skips it (only #cbForce in a test reaches it).",
+    "arena: the arena id, \"plaza\" (default: the top-level arena) or a key of arenas{}. theme on a boss entry is informational only (the arena's own theme rules).",
+    "music: {ph: {ev: minecraft:music.* sound event, len: ticks (0 = play once)}}, ph = \"1\"..\"9\" (F:mboss/music/set {ph}). res: per-element RES % {\"0\"..\"8\", \"*\" = the rest} on the body (rlk_mb_resel, mbRes0..8).",
+    "phases: pool split in % of #mbTot (phases[0] applied at spawn when < 100; the module calls mboss/repool for the later ones). px: hit-proxy boss (proxies from its rig manifest, rlk_mb_big body). pxBase: low byte of the first proxy UUID (default 65, at most 16 proxies).",
+    "shield: false = no click shield in any state (rlk_mb_noshield; default for px bosses). hit: click-shield size, default {w:1.0,h:1.0} when shield is false.",
+    "arenas{}: every non-plaza arena {n (= #mbAr, unique, never reused; the plaza is 0), theme (T:mboss_arena_<theme>.py), ver, cx cy cz, r walk safe, start, box, looks (looks[0] = the default), oob {y0,y1} (default cy-3..cy+16), sweep {y0,y1} (barrier band swept by cb/won, cleanup, cb/remove)}.",
+    "Boss n 11 and arena n 2 are Apep's (chapter 3: ap_oasis; scratchpad ap/ap_contract.md 0.3.6). Its entry's first line holds id n kind ch route enabled w (route false until AP-I2).",
+    "fn: the module's function root under F: (default mboss/<id>; a chapter boss may say boss/<id>, user 10-21). Only the function root moves: entity tags, scoreboards, storage and resource-pack paths keep their mboss names. Generators read it through mboss_lib.fn_root / fn_root_of; boss/raiden and boss/test are reserved (Raiden's own module, the chapter-boss test aliases rlk:boss/test/<cmd>)."
+  ],
+  "arena": {
+    "theme": "plaza",
+    "ver": 2,
+    "cx": 200, "cy": 201, "cz": 8,
+    "r": 22, "walk": 21, "safe": 19,
+    "start": {"x": 200.5, "y": 201.0, "z": 25.5, "yaw": 180.0, "pitch": 0.0}
+  },
+  "arenas": {
+    "az_cavern": {"n": 1, "theme": "az_cavern", "ver": 2, "cx": 320, "cy": 201, "cz": 8, "r": 33, "walk": 28, "safe": 26,
+                  "start": {"x": 320.5, "y": 201.0, "z": 34.5, "yaw": 180.0, "pitch": 0.0},
+                  "box": {"x0": 280, "y0": 190, "z0": -32, "x1": 360, "y1": 240, "z1": 48},
+                  "looks": ["default"], "oob": {"y0": 198, "y1": 237}},
+    "cp_test": {"n": 9, "theme": "cp_test", "ver": 1, "cx": 540, "cy": 201, "cz": 8, "r": 12, "walk": 11, "safe": 9,
+                "start": {"x": 540.5, "y": 201.0, "z": 17.5, "yaw": 180.0, "pitch": 0.0},
+                "box": {"x0": 524, "y0": 196, "z0": -8, "x1": 556, "y1": 216, "z1": 24},
+                "looks": ["plain", "lit"]},
+    "ap_oasis": {"n": 2, "theme": "ap_oasis", "ver": 1, "cx": 440, "cy": 201, "cz": 8, "r": 29, "walk": 26, "safe": 24,
+                 "start": {"x": 440.5, "y": 201.0, "z": 24.5, "yaw": 180.0, "pitch": 0.0},
+                 "box": {"x0": 396, "y0": 190, "z0": -36, "x1": 484, "y1": 250, "z1": 52},
+                 "looks": ["withered", "lush"], "oob": {"y0": 198, "y1": 217}, "sweep": {"y0": 201, "y1": 202}}
+  },
+  "boss": [
+    {
+      "id": "guardian", "n": 1, "enabled": true, "w": 10, "minCh": 1, "maxCh": 99,
+      "name": "파수꾼・타락", "sub": "개안자 · 세계 망루의 파수꾼", "color": "#E0B84A", "el": 5,
+      "hp": 250, "xp": 30, "atk": 12, "lvAdd": 0, "dmgMul": 110, "goldMul": 5, "sap": 1, "picks": 2,
+      "scale": 1.5, "hit": {"w": 1.6, "h": 3.4}, "intro": 90, "death": 90, "deathSnd": false,
+      "icon": {"item": "minecraft:wither_skeleton_skull", "model": "minecraft:wither_skeleton_skull"}
+    },
+    {
+      "id": "butterfly", "n": 2, "enabled": true, "w": 10, "minCh": 1, "maxCh": 99,
+      "name": "달빛 환영 나비", "sub": "달빛의 화신", "color": "#B6E35A", "el": 7,
+      "hp": 240, "xp": 30, "atk": 12, "lvAdd": 0, "dmgMul": 110, "goldMul": 5, "sap": 1, "picks": 2,
+      "scale": 1.4, "hit": {"w": 1.6, "h": 3.0}, "intro": 140, "death": 100, "deathSnd": false,
+      "icon": {"item": "minecraft:verdant_froglight", "model": "minecraft:verdant_froglight"}
+    },
+    {
+      "id": "fieldgen", "n": 3, "enabled": true, "w": 10, "minCh": 1, "maxCh": 99,
+      "name": "실험성 역장 발생 장치", "sub": "브레게 프로토타입", "color": "#E8C46A", "el": 5,
+      "hp": 230, "xp": 30, "atk": 12, "lvAdd": 0, "dmgMul": 110, "goldMul": 5, "sap": 1, "picks": 2,
+      "scale": 2.4, "hit": {"w": 2.4, "h": 4.6}, "intro": 130, "death": 110, "deathSnd": false,
+      "icon": {"item": "minecraft:clock", "model": "minecraft:clock"}
+    },
+    {
+      "id": "proto", "n": 99, "enabled": true, "w": 0, "minCh": 1, "maxCh": 99,
+      "name": "시험용 강적", "sub": "중간보스 틀 점검용", "color": "#C9B27A", "el": 0,
+      "hp": 120, "xp": 20, "atk": 10, "lvAdd": 0, "dmgMul": 120, "goldMul": 5, "sap": 1, "picks": 2,
+      "scale": 1.4, "hit": {"w": 1.4, "h": 3.0}, "intro": 70, "death": 40,
+      "icon": {"item": "minecraft:husk_spawn_egg", "model": "minecraft:husk_spawn_egg"}
+    },
+    {
+      "id": "cproto", "n": 98, "kind": "chapter", "ch": [], "route": false, "enabled": true, "w": 0, "minCh": 1, "maxCh": 99,
+      "name": "시험용 수호자", "sub": "챕터 보스 틀 점검용", "color": "#9FC6E8", "el": 0,
+      "hp": 120, "xp": 20, "atk": 10, "lvAdd": 0, "dmgMul": 120, "goldMul": 1, "sap": 0, "picks": 0,
+      "scale": 0.1, "hit": {"w": 1.0, "h": 1.0}, "intro": 40, "death": 40, "deathSnd": false,
+      "arena": "cp_test", "px": true, "pxBase": 65, "res": {"0": 30, "5": 30, "*": 10}, "phases": [60, 40],
+      "music": {"1": {"ev": "minecraft:music.end", "len": 18090}, "2": {"ev": "minecraft:music.dragon", "len": 6883}},
+      "icon": {"item": "minecraft:lodestone", "model": "minecraft:lodestone"}
+    },
+    {
+      "id": "azhdaha", "n": 10, "fn": "boss/azhdaha", "kind": "chapter", "ch": [1], "route": true, "enabled": true, "w": 0,
+      "minCh": 1, "maxCh": 1, "name": "야타용왕", "sub": "봉인된 바위 용의 왕", "color": "#F2B53A", "el": 5,
+      "hp": 135, "xp": 40, "atk": 12, "lvAdd": 0, "dmgMul": 140, "goldMul": 1, "sap": 0, "picks": 0,
+      "scale": 0.1, "px": true, "pxBase": 65, "intro": 160, "death": 140, "deathSnd": false,
+      "arena": "az_cavern", "theme": "az_cavern", "res": {"0": 30, "5": 30, "*": 10}, "phases": [100],
+      "music": {"1": {"ev": "minecraft:music.end", "len": 18090}, "2": {"ev": "minecraft:music.dragon", "len": 6883}},
+      "icon": {"item": "minecraft:raw_gold_block", "model": "rlk:mboss/az_kit/gate_icon"}
+    },
+    {
+      "id": "apep", "n": 11, "fn": "boss/apep", "kind": "chapter", "ch": [3], "route": true, "enabled": true, "w": 0,
+      "minCh": 3, "maxCh": 3, "name": "아펩의 오아시스 파수꾼", "sub": "종막 오아시스 파수꾼", "color": "#C9C452", "el": 7,
+      "hp": 290, "xp": 40, "atk": 12, "lvAdd": 0, "dmgMul": 150, "goldMul": 1, "sap": 0, "picks": 0,
+      "scale": 2.0, "hit": {"w": 2.6, "h": 3.6}, "intro": 110, "death": 140, "deathSnd": false,
+      "arena": "ap_oasis", "theme": "ap_oasis", "px": true, "pxBase": 65, "shield": true,
+      "res": {"7": 30, "*": 10}, "phases": [53, 47],
+      "music": {"1": {"ev": "minecraft:music.overworld.deep_dark", "len": 6870},
+                "2": {"ev": "minecraft:music.nether.soul_sand_valley", "len": 6376},
+                "3": {"ev": "minecraft:music.overworld.lush_caves", "len": 6881}},
+      "icon": {"item": "minecraft:pitcher_plant", "model": "minecraft:pitcher_plant"}
+    }
+  ]
+}

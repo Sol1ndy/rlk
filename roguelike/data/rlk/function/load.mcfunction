@@ -38,6 +38,8 @@ scoreboard objectives add uiHash dummy
 scoreboard objectives add scanTick dummy
 scoreboard objectives add manageTick dummy
 scoreboard objectives add invDirty dummy
+# 아이템 보유 칸 수 (9 = 둘째 줄, 최대 18 = 셋째 줄까지). 인벤토리 슬롯 노드가 2칸씩 연다
+scoreboard objectives add invCap dummy
 scoreboard objectives add invEvt dummy
 scoreboard objectives add invCnt dummy
 scoreboard objectives add hudKey dummy
@@ -47,6 +49,10 @@ scoreboard objectives add hudHold dummy
 scoreboard objectives add atkCD dummy
 scoreboard objectives add comboStep dummy
 scoreboard objectives add cboIdle dummy
+# 평타 휘두르기 느려짐(player/swing/tick) · 1인칭 점프 통계(평타 사이 간격에서 뛰면 다음 평타는 1타부터)
+scoreboard objectives add swCut dummy
+scoreboard objectives add swHold dummy
+scoreboard objectives add swJump minecraft.custom:minecraft.jump
 scoreboard objectives add swungAt dummy
 scoreboard objectives add intOwner dummy
 scoreboard objectives add msid dummy
@@ -140,6 +146,11 @@ scoreboard objectives add xp dummy
 scoreboard objectives add xpNeed dummy
 scoreboard objectives add xpDrop dummy
 scoreboard objectives add sapphire dummy
+# 주사위(레벨 업 아이템 선택의 리롤권, 런마다 0) · 생명력 노드로 늘어난 최대 체력 %(런마다 0)
+scoreboard objectives add dice dummy
+scoreboard objectives add nodeHp dummy
+# 아이템 강화 단계 (가짜 플레이어 = 아이템 id, 0~3. rlk:pinv enh 와 같음)
+scoreboard objectives add enhL dummy
 
 # 방어력 · 깡/% 누산기(작업용) / 장비 보너스
 scoreboard objectives add def dummy
@@ -426,6 +437,8 @@ scoreboard objectives add nvA dummy
 scoreboard objectives add nvGap dummy
 scoreboard objectives add nvFcd dummy
 scoreboard objectives add nvGun dummy
+# 나비아: 결정 축포 발사 대기(모션의 발사 틱 전)
+scoreboard objectives add nvShot dummy
 scoreboard objectives add nvHit dummy
 scoreboard objectives add naQn dummy
 
@@ -749,10 +762,10 @@ scoreboard players set #pactAtk tmp 18
 scoreboard players set #pactDmg tmp 25
 scoreboard players set #pactDur tmp 160
 # 스커크 (뱀의 계략 수치는 pt × 100)
-#   스킬로 얻는 양 / 일곱빛 섬광 중 틱당 소모(35 = 초당 7pt) / 일곱빛 섬광 지속(틱) / 빠른 이동 지속(틱) · 그 뒤 재사용 대기(틱) · 숄더뷰 이동 속도(%)
+#   스킬로 얻는 양 / 일곱빛 섬광 중 틱당 소모(25 = 초당 5pt) / 일곱빛 섬광 지속(틱) / 빠른 이동 지속(틱) · 그 뒤 재사용 대기(틱) · 숄더뷰 이동 속도(%)
 scoreboard players set #skGain tmp 4500
-scoreboard players set #skDrain tmp 35
-scoreboard players set #skModeDur tmp 180
+scoreboard players set #skDrain tmp 25
+scoreboard players set #skModeDur tmp 240
 scoreboard players set #skDashDur tmp 60
 scoreboard players set #skDashCd tmp 160
 scoreboard players set #skDashSpd tmp 150
@@ -835,17 +848,30 @@ scoreboard players set #enNeutral tmp 270
 scoreboard players set #enOther tmp 130
 # 액션바 원소 에너지 게이지 칸 수 (char/hud_setup 과 같아야 함)
 scoreboard players set #hudEnSeg tmp 15
-# 몬스터 레벨: 레벨당 체력 증가(%) / 레벨당 공격력 증가(%)
+# 몬스터 레벨 (x = 레벨 - 1). 플레이어는 레벨이 오를수록 좋은 아이템을 얻으므로, 몹은 레벨에 따라 플레이어 기초 수치보다 빠르게 강해짐
+#  체력 = 1레벨 체력 × (100 + #mobLvHp·x + #mobLvHp2·x²/100)%
+#  공격 = 원피해 × (100 + #mobLvAtk·x + #mobLvAtk2·x²/100)%
+#  방어: 플레이어 → 몹 레벨 보정의 몹 쪽 항 = 100 + 몹 레벨 × #mobLvDef/100 (플레이어 쪽 = 100 + 플레이어 레벨)
+#  플레이어 방어 상수: 실제 피해 = 원피해 × K/(K + 방어력), K = #defK + #defKLv·(때린 몹 레벨 - 1)
 scoreboard players set #mobLvHp tmp 30
+scoreboard players set #mobLvHp2 tmp 5
 # 모든 몹의 체력 배율(%). 400 = 4배. 몹이 너무 빨리/늦게 죽으면 이 숫자 하나만 바꾸면 됨
 scoreboard players set #mobHpMul tmp 400
-scoreboard players set #mobLvAtk tmp 8
+scoreboard players set #mobLvAtk tmp 14
+scoreboard players set #mobLvAtk2 tmp 6
+scoreboard players set #mobLvDef tmp 150
+scoreboard players set #defKLv tmp 4
+# 보스(나루카미) 공격 피해 배율(%). 레벨 보정과 별개로 곱함
+scoreboard players set #bossDmgMul tmp 160
 
 # 재련 맵을 한 판에 고를 수 있는 최대 횟수
 scoreboard players set #rfMax tmp 2
 # 시점 시스템(숄더뷰): 걷는 속도(칸/틱 × 10000, 이동 속도 100% 기준) / 달리기 배율(%)
 scoreboard players set #viewWalk tmp 2159
 scoreboard players set #viewSprint tmp 130
+# 평타를 휘두르는 동안(swHold) 걷는 속도(%, 달리기 배율 없음). 숄더뷰 · F5 시점의 아바타(view/move). 1인칭은 걷기를 늦추지 않고
+# 점프만 막는다(이동 속도 속성을 낮추면 바닐라가 화면을 확대함, player/swing/tick)
+scoreboard players set #swSlow tmp 50
 # 숄더뷰 카메라: 시선 고르게 펴기 보정의 한도(각도 × 100)
 # 숄더뷰: 점프로 떠오른 높이 중 카메라가 따라가는 비율(%). 100 = 예전처럼 전부 따라감, 0 = 전혀 안 따라감
 scoreboard players set #viewJump tmp 25
@@ -919,7 +945,8 @@ scoreboard players set #berTaken tmp 20
 scoreboard players set #berSpd tmp 30
 scoreboard players set #berT tmp 60
 # 아이템 수치 (설명 글은 각 아이템 def 에 따로 적혀 있으니 같이 고칠 것. 피해 계수는 items/proc/* 의 dmg_calc)
-scoreboard players set #hourglassCd tmp 5
+# #hourglassCd: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b2)
+scoreboard players set #hourglassCd tmp 50
 scoreboard players set #slatePct tmp 30
 scoreboard players set #pouchGold tmp 1
 scoreboard players set #herbPct tmp 50
@@ -932,7 +959,8 @@ scoreboard players set #potN tmp 4
 scoreboard players set #potGap tmp 25
 scoreboard players set #flagDur tmp 160
 scoreboard players set #flagAtk tmp 20
-scoreboard players set #flagHeal tmp 2
+# #flagHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b4)
+scoreboard players set #flagHeal tmp 20
 scoreboard players set #mapleDur tmp 160
 scoreboard players set #mapleDmg tmp 25
 scoreboard players set #mapleCdT tmp 280
@@ -943,11 +971,13 @@ scoreboard players set #quillDur tmp 200
 scoreboard players set #bunnyDur tmp 100
 scoreboard players set #bunnyCdT tmp 300
 scoreboard players set #talDur tmp 160
-scoreboard players set #talHeal tmp 2
+# #talHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b8)
+scoreboard players set #talHeal tmp 20
 scoreboard players set #talCdT tmp 10
 scoreboard players set #blossomDur tmp 400
 scoreboard players set #blossomCdT tmp 40
-scoreboard players set #huntPer tmp 3
+# #huntPer: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b5)
+scoreboard players set #huntPer tmp 30
 scoreboard players set #huntMax tmp 10
 scoreboard players set #thiefGold tmp 1
 scoreboard players set #thiefCdT tmp 20
@@ -956,7 +986,8 @@ scoreboard players set #blossomHit itv 0
 scoreboard players set #basic itv 0
 # 아이템 수치 2차 (설명 글은 각 아이템 def 에 따로 적혀 있으니 같이 고칠 것. 피해 계수는 items/proc/* 의 dmg_calc · calc_stat)
 scoreboard players set #jellyDur tmp 240
-scoreboard players set #jellyHeal tmp 2
+# #jellyHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b7)
+scoreboard players set #jellyHeal tmp 20
 scoreboard players set #gflagDur tmp 200
 scoreboard players set #gflagDef tmp 25
 scoreboard players set #gflagDmg tmp 15
@@ -973,10 +1004,12 @@ scoreboard players set #chalDur tmp 160
 scoreboard players set #wispFuse tmp 30
 scoreboard players set #wispCdT tmp 80
 scoreboard players set #houndDur tmp 200
-scoreboard players set #houndHeal tmp 1
+# #houndHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b5)
+scoreboard players set #houndHeal tmp 10
 scoreboard players set #gringCost tmp 20
 scoreboard players set #gringDur tmp 240
-scoreboard players set #gringHeal tmp 2
+# #gringHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b4)
+scoreboard players set #gringHeal tmp 20
 scoreboard players set #vortexDur tmp 40
 scoreboard players set #muskAtk tmp 20
 scoreboard players set #muskDur tmp 160
@@ -1032,8 +1065,10 @@ scoreboard players set #omenDur tmp 160
 scoreboard players set #omenDmg tmp 20
 scoreboard players set #caseDur tmp 400
 scoreboard players set #seamDur tmp 280
-scoreboard players set #seamShield tmp 6
-scoreboard players set #seamHeal tmp 2
+# #seamShield: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b8)
+scoreboard players set #seamShield tmp 60
+# #seamHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b8)
+scoreboard players set #seamHeal tmp 20
 scoreboard players set #dragDur tmp 240
 scoreboard players set #dragRx tmp 25
 scoreboard players set #dragFire tmp 15
@@ -1042,14 +1077,17 @@ scoreboard players set #tenguAtk tmp 15
 scoreboard players set #operaDur tmp 240
 scoreboard players set #operaMax tmp 20
 scoreboard players set #operaPm tmp 300
-scoreboard players set #barAdd tmp 2
+# #barAdd: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b4)
+scoreboard players set #barAdd tmp 20
 scoreboard players set #barCap tmp 12
 scoreboard players set #barCdT tmp 10
-scoreboard players set #nightShield tmp 8
+# #nightShield: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b5)
+scoreboard players set #nightShield tmp 80
 scoreboard players set #nightDur tmp 240
 scoreboard players set #genieDur tmp 200
 scoreboard players set #genieEnergy tmp 400
-scoreboard players set #genieHeal tmp 2
+# #genieHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b4)
+scoreboard players set #genieHeal tmp 20
 scoreboard players set #kinDur tmp 100
 scoreboard players set #kinAtk tmp 15
 scoreboard players set #orbCdT tmp 60
@@ -1060,7 +1098,8 @@ scoreboard players set #neg1 tmp -1
 # 아이템 수치 4차 (설명 글은 각 아이템 def 에 따로 적혀 있으니 같이 고칠 것. 피해 계수·회복 계수는 items/proc/*)
 scoreboard players set #beadsHeal tmp 15
 scoreboard players set #thimbleDmg tmp 8
-scoreboard players set #bracerRes tmp 6
+# #bracerRes: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b1)
+scoreboard players set #bracerRes tmp 60
 scoreboard players set #inkBol tmp 15
 scoreboard players set #maidCdT tmp 40
 scoreboard players set #cocktailSpd tmp 10
@@ -1082,9 +1121,11 @@ scoreboard players set #pillowSpd tmp 10
 scoreboard players set #loomDur tmp 160
 scoreboard players set #loomEm tmp 150
 scoreboard players set #mechCdT tmp 60
-scoreboard players set #gourdHeal tmp 2
+# #gourdHeal: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b9)
+scoreboard players set #gourdHeal tmp 20
 scoreboard players set #gourdDmg tmp 15
-scoreboard players set #lionRes tmp 15
+# #lionRes: 천분율(‰) 단위 (아이템 강화 배율에서 값이 고르게 바뀌도록. 조정 표 = items/tune/b1)
+scoreboard players set #lionRes tmp 150
 scoreboard players set #lionCdT tmp 40
 scoreboard players set #cmoonMax tmp 45
 scoreboard players set #lilyDur tmp 240
@@ -1093,11 +1134,18 @@ scoreboard players set #lilyCdT tmp 20
 scoreboard players set #pkChoices tmp 3
 # 레벨 업 선택지 한 칸이 캐릭터일 확률(%). 한 번의 선택지 묶음에 캐릭터는 최대 하나, 지금 캐릭터는 나오지 않는다
 scoreboard players set #pkCharPct tmp 8
+# 레벨 업 아이템 선택의 리롤: 첫 번째 무료, 그 뒤로 주사위 #pkRerollDice 개씩 (#pkRerollStep/#pkRerollMax 는 예전 골드 비용, 지금은 안 씀)
+scoreboard players set #pkRerollDice tmp 1
 scoreboard players set #pkRerollStep tmp 50
 scoreboard players set #pkRerollMax tmp 200
 # 방 시스템: 돈 구역 골드(× 챕터) / 사파이어 구역 개수
 scoreboard players set #roomGold tmp 100
 scoreboard players set #roomSapphire tmp 2
+# 노드: 선택지에 노드가 2개 붙을 확률(%), 주사위 구역에서 얻는 주사위 수, 생명력 구역의 최대 체력 %, 보유 칸 구역에서 늘어나는 칸 수
+scoreboard players set #node2Pct tmp 25
+scoreboard players set #diceGain tmp 2
+scoreboard players set #hpNodePct tmp 10
+scoreboard players set #slotGain tmp 2
 
 # 원소 반응: 격변 반응의 기준 피해 = 공격력 × #reactBase%
 scoreboard players set #reactBase tmp 50
@@ -1106,6 +1154,7 @@ scoreboard players set #rxPlayerPct tmp 50
 
 # 상수
 scoreboard players set #1000 tmp 1000
+scoreboard players set #500 tmp 500
 scoreboard players set #100 tmp 100
 scoreboard players set #31 tmp 31
 scoreboard players set #neg1 tmp -1
@@ -1128,8 +1177,9 @@ scoreboard players set #st20 tmp 20
 scoreboard players set #st48 tmp 48
 scoreboard players set #st150 tmp 150
 
-# 보유 아이템 목록(획득순, 최대 9). 최초만 초기화
+# 보유 아이템 목록(획득순, 최대 invCap). 최초만 초기화
 execute unless data storage rlk:pinv order run data modify storage rlk:pinv order set value []
+execute unless data storage rlk:pinv enh run data modify storage rlk:pinv enh set value {}
 
 function rlk:element/setup
 function rlk:char/setup
@@ -1143,6 +1193,8 @@ scoreboard players set @a[tag=player] invDirty 2
 execute unless score #on view matches 0..1 run scoreboard players set #on view 1
 # 시점 종류: 1 숄더뷰 · 2 F5 위쪽 시점(처음엔 2)
 scoreboard players set #vmode view 2
+# 서버 시작·/reload 뒤 첫 틱에 시점 엔티티를 새로 만든다(view/fresh)
+scoreboard players set #vFresh view 1
 # F5 위쪽 시점: 카메라 거리(칸) · 받침 크기(1 = 머리 위 약 1칸, 0.5 = 0.5칸, 1.5 = 1.5칸)
 execute unless data storage rlk:view ride run data modify storage rlk:view ride set value {d:3.5d,s:0.5d}
 # 카메라 거리·높이 기본을 한 칸씩 당긴 판(ridev 2): 한 번만 '보통'으로 맞춤
@@ -1166,9 +1218,14 @@ team add rlk_stun
 team modify rlk_stun seeFriendlyInvisibles false
 kill @e[tag=rlk_view]
 function rlk:items/register
+function rlk:engravings/byeng_build
+# 아이템 너프 · 강화 배율(상수 기준값 잡기 + 강화 단계 반영 + 설명 숫자)
+function rlk:items/tune/register
 function rlk:char/reg_items
 # 아이템 선택 공간(검은 방)이 있는 청크는 항상 불러와 둔다
 execute in minecraft:overworld run forceload add 104 4
+# 중간보스 원형 경기장(중심 200 201 8, 청크 9개)도 항상 불러와 둔다: 몸체 소환 · 정리가 같은 틱에 되어야 함
+execute in minecraft:overworld run forceload add 176 -16 223 31
 execute unless data storage rlk:lvpick choices run data modify storage rlk:lvpick choices set value []
 kill @e[tag=rlk_pk]
 scoreboard players set @a[scores={pkMode=1..}] pkRedraw 2
@@ -1178,6 +1235,7 @@ scoreboard players add #iver tmp 1
 execute store result storage rlk:items ver int 1 run scoreboard players get #iver tmp
 function rlk:shop/register
 function rlk:room/data
+function rlk:room/node/register
 execute unless score #active room matches 0.. run scoreboard players set #active room 0
 execute unless score #combat room matches 0.. run scoreboard players set #combat room 0
 execute unless score #setup room matches 0.. run scoreboard players set #setup room 0
@@ -1189,6 +1247,8 @@ execute unless data storage rlk:room {area:"s0"} run data modify storage rlk:roo
 # 접속 중인 플레이어 초기화
 execute as @a[tag=player] unless score @s init matches 1 run function rlk:player/init
 execute as @a[tag=player] unless score @s level matches 1.. run function rlk:player/init
+# 이미 초기화된 플레이어(업데이트 전 월드)도 보유 칸 수가 있게
+execute as @a[tag=player] unless score @s invCap matches 9..18 run scoreboard players set @s invCap 9
 
 # 리로드 시 재생성: 클릭 감지 인터랙션 / 체력바 / 몹 실드
 kill @e[type=minecraft:interaction,tag=atkBlock]
@@ -1212,7 +1272,7 @@ kill @e[tag=rlk_dbtn]
 kill @e[tag=rlk_dlbl]
 data modify storage rlk:ditems records set value {}
 
-tellraw @a {"text":"[로그라이크] 시스템 로드 완료","color":"green"}
+tellraw @a [{"text":"[로그라이크] 시스템 로드 완료","color":"green"},{"text":" · 빌드 10-22j 라이덴 계수 하향","color":"gray"}]
 # 리로드 시 전원 강제 재스캔(새 objective/아이템 플래그 즉시 반영)
 execute as @a[tag=player] if score @s init matches 1 run function rlk:items/equip_scan
 scoreboard players set @a[tag=player] invDirty 2
@@ -1305,5 +1365,13 @@ kill @e[tag=rlk_melee_origin]
 
 function rlk:char/motion/install
 
+# 리소스팩 보스바(tools/build_bossbar.py)
+function rlk:bossui/init
 # Narukami encounter and rig, rebuilt without refilling an existing boss.
 function rlk:boss/raiden/init
+# 중간보스 틀(tools/build_mboss_core.py): 점수 · 보스바 · 레지스트리 · 경기장 확인, 진행 중 전투는 체력 유지
+function rlk:mboss/init
+# 화면 위 미니맵(tools/build_minimap.py)
+function rlk:minimap/init
+# 나비아 금빛 카드 효과 점수(tools/build_navia_fx_cards.py)
+function rlk:fx/nv/init

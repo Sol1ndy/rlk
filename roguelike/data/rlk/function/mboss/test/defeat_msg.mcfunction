@@ -1,0 +1,1 @@
+$tellraw @s [{text:"[중간보스 테스트] ",color:"#E0703A",bold:true},{text:"쓰러졌습니다. ",color:"gray",bold:false},{text:"[다시 하기]",color:"yellow",bold:false,click_event:{action:"suggest_command",command:'/function rlk:mboss/test/start_ch {id:"$(id)",ch:$(ch)}'}}]

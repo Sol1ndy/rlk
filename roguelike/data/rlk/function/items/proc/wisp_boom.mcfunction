@@ -1,4 +1,6 @@
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:110}
+# 반경 3.5칸에 공격력의 #wispCoef% 얼음 원소 피해
+execute store result storage rlk:tune m_star_wisp.coef int 1 run scoreboard players get #wispCoef tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_star_wisp
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 4

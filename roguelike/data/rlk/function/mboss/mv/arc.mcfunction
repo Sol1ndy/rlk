@@ -1,0 +1,11 @@
+# y += 4 h t (n - t) / n^2
+scoreboard players operation #a mb = @s mbMvN
+scoreboard players operation #a mb -= @s mbMvT
+scoreboard players operation #a mb *= @s mbMvT
+scoreboard players operation #a mb *= #c4 mb
+scoreboard players operation #n2 mb = @s mbMvN
+scoreboard players operation #n2 mb *= @s mbMvN
+scoreboard players operation #h mb = @s mbMvH
+scoreboard players operation #h mb *= #a mb
+scoreboard players operation #h mb /= #n2 mb
+scoreboard players operation #y mb += #h mb

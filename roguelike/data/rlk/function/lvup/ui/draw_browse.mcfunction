@@ -37,7 +37,9 @@ scoreboard players set @e[tag=rlk_pk_new] pkKind 3
 scoreboard players set @e[tag=rlk_pk_new] pkIdx 0
 tag @e[tag=rlk_pk_new] remove rlk_pk_new
 function rlk:lvup/rr_cost
-execute if score #pkRerollCost tmp matches 1.. run summon minecraft:text_display 109.100 194.500 9.920 {Tags:["rlk_pk"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:0,line_width:400,text:[{text:"◆ ",color:"#E0B255"},{score:{name:"#pkRerollCost",objective:"tmp"},color:"#E0B255"}],transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.75f,0.75f,0.75f]}}
+scoreboard players operation #pkDice tmp = @s dice
+execute unless score #pkDice tmp matches 0.. run scoreboard players set #pkDice tmp 0
+execute if score #pkRerollCost tmp matches 1.. run summon minecraft:text_display 109.100 194.500 9.920 {Tags:["rlk_pk"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:0,line_width:400,text:[{text:"⚄ ",color:"#F2F2F2"},{score:{name:"#pkRerollCost",objective:"tmp"},color:"#F2F2F2"},{text:"  (보유 ",color:"gray"},{score:{name:"#pkDice",objective:"tmp"},color:"gray"},{text:")",color:"gray"}],transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.75f,0.75f,0.75f]}}
 execute if score #pkRerollCost tmp matches ..0 run summon minecraft:text_display 109.100 194.500 9.920 {Tags:["rlk_pk"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:0,line_width:400,text:{text:"무료",color:"#8FD46A",bold:true},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.75f,0.75f,0.75f]}}
 summon minecraft:text_display 107.100 194.900 9.920 {Tags:["rlk_pk","rlk_pk_d","rlk_pk_new"],Rotation:[180f,0f],brightness:{sky:15,block:15},alignment:"center",background:1344282672,line_width:400,text:{text:" 넘기기 ",color:"#C9C9C9"},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.9f,0.9f,0.9f]}}
 summon minecraft:marker 107.100 195.020 9.920 {Tags:["rlk_pk","rlk_pk_el","rlk_pk_new"]}

@@ -1,0 +1,25 @@
+# Blade half width 2 b (reach 2.3 b off the line): 8 points x 3 rows, radius 0.45 b (@s = prop, at and rotated as it).
+execute positioned ^-1.85 ^-0.9 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^-1.321 ^-0.9 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^-0.793 ^-0.9 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^-0.264 ^-0.9 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^0.264 ^-0.9 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^0.793 ^-0.9 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^1.321 ^-0.9 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^1.85 ^-0.9 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^-1.85 ^-0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^-1.321 ^-0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^-0.793 ^-0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^-0.264 ^-0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^0.264 ^-0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^0.793 ^-0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^1.321 ^-0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^1.85 ^-0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^-1.85 ^0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^-1.321 ^0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^-0.793 ^0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^-0.264 ^0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^0.264 ^0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^0.793 ^0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^1.321 ^0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit
+execute positioned ^1.85 ^0.3 ^ if entity @e[tag=rlk_body,distance=..0.451,limit=1] run return run function rlk:mboss/pj/hit

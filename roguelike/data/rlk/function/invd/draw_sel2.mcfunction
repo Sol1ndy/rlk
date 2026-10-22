@@ -1,7 +1,7 @@
 $execute unless data storage rlk:pinv order[$(i)] run return run scoreboard players set @s pkSel -1
 $data modify storage rlk:io id set from storage rlk:pinv order[$(i)]
 function rlk:lvup/ui/item_load with storage rlk:io
-execute positioned 105.800 196.550 9.920 run function rlk:lvup/ui/item_big with storage rlk:io
+execute positioned 105.800 195.950 9.920 run function rlk:lvup/ui/item_big with storage rlk:io
 # 판매 가격 = 등급별 가격(rlk:items rarity_price). 보물 각인의 골드 증가는 붙지 않는다
 function rlk:ditem/sell_price2 with storage rlk:io
 scoreboard players operation #invdPrice tmp = #price tmp

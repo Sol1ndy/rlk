@@ -1,0 +1,3 @@
+data merge entity 524c4b4d-4247-4400-8000-000000000017 {start_interpolation:0,interpolation_duration:20,transformation:{translation:[-0.72f,2.5f,0.45f],left_rotation:[0.10883f,0.10656f,0.69146f,0.70617f],scale:[2.2f,2.2f,2.2f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4247-4400-8000-00000000001d {start_interpolation:0,interpolation_duration:4,transformation:{translation:[-0.2f,2.74608f,-0.01266f],left_rotation:[-0.03412f,0.20817f,0.02926f,0.97706f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data modify entity 524c4b4d-4247-4400-8000-00000000001c item.components."minecraft:item_model" set value "rlk:mboss/guardian/cubes_b_2"

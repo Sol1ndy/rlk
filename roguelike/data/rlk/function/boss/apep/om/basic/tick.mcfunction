@@ -1,0 +1,3 @@
+# Once per tick for every 기본 husk (the module's organism tick): apply tick apOC of clip apOI, then advance. @s = the husk.
+function rlk:boss/apep/om/basic/run
+scoreboard players add @s apOC 1

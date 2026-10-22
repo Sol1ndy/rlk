@@ -1,4 +1,6 @@
-function rlk:char/dmg_calc {coef:30}
+# @s = 플레이어. 가장 가까운 적(12칸)에게 공격력의 #ravenCoef 퍼센트 번개 원소 피해 (피해 계수는 강화 단계로 조정)
+execute store result storage rlk:tune m_raven_feather.coef int 1 run scoreboard players get #ravenCoef tmp
+function rlk:char/dmg_calc with storage rlk:tune m_raven_feather
 scoreboard players set #sub itv 1
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

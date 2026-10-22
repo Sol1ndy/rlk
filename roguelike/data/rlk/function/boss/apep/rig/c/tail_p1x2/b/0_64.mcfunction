@@ -1,0 +1,2 @@
+execute if score @s apRigT matches ..33 run return run function rlk:boss/apep/rig/c/tail_p1x2/b/0_33
+function rlk:boss/apep/rig/c/tail_p1x2/b/35_64

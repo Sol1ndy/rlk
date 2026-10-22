@@ -1,0 +1,10 @@
+# Ray forward 0..5.5
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^0 ^0.12 ^0 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^0 ^0.12 ^0.688 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^0 ^0.12 ^1.375 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^0 ^0.12 ^2.062 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^0 ^0.12 ^2.75 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^0 ^0.12 ^3.438 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^0 ^0.12 ^4.125 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^0 ^0.12 ^4.812 0 0 0 0 1 force @a[tag=player]
+$particle minecraft:dust{color:$(col),scale:$(sc)} ^0 ^0.12 ^5.5 0 0 0 0 1 force @a[tag=player]

@@ -1,14 +1,16 @@
 # 피격 (@s = 플레이어, at @s anchored eyes). 입력: #dmgIn = 원피해
-# 실제 피해 = 원피해 × #defK / (#defK + 방어력)
+# 실제 피해 = 원피해 × K / (K + 방어력), K = #defK + #defKLv × (때린 몹 레벨 - 1)
 scoreboard players set #dodged tmp 0
 # 대쉬 무적
 execute if score @s dashInvT matches 1.. run function rlk:player/dash_iframe
 execute if score #dodged tmp matches 1 run return 0
-# 때린 몹의 레벨: 원피해 × (100 + #mobLvAtk × (레벨 - 1))%
+# 때린 몹의 레벨: 원피해 × (100 + #mobLvAtk·x + #mobLvAtk2·x²/100)%, x = 레벨 - 1
 execute if score @s hurtLv matches 2.. run function rlk:player/hurt_lv
-scoreboard players operation #dfD tmp = #defK tmp
+scoreboard players operation #dfK tmp = #defK tmp
+execute if score @s hurtLv matches 2.. run function rlk:player/hurt_k
+scoreboard players operation #dfD tmp = #dfK tmp
 scoreboard players operation #dfD tmp += @s def
-scoreboard players operation #dmgIn tmp *= #defK tmp
+scoreboard players operation #dmgIn tmp *= #dfK tmp
 scoreboard players operation #dmgIn tmp /= #dfD tmp
 execute if score #dmgIn tmp matches ..0 run scoreboard players set #dmgIn tmp 1
 # 맞은 원소(때린 몹의 el_* 태그). 물리면 초전도 보정, 원소면 부착/반응
@@ -17,7 +19,7 @@ execute unless score #elem tmp matches 0..7 run scoreboard players set #elem tmp
 execute if score #elem tmp matches 0 if score @s scT matches 1.. run scoreboard players set #c tmp 140
 execute if score #elem tmp matches 0 if score @s scT matches 1.. run scoreboard players operation #dmgIn tmp *= #c tmp
 execute if score #elem tmp matches 0 if score @s scT matches 1.. run scoreboard players operation #dmgIn tmp /= #100 tmp
-execute if score #elem tmp matches 1.. run function rlk:element/player_hit
+execute if score #elem tmp matches 1.. unless score #mbNRNow mb matches 1 run function rlk:element/player_hit
 # (받는 피해 감소 등 피격 보정은 여기에 추가)
 function rlk:items/proc/taken
 # 각인 광전사 4개: 받는 피해 증가

@@ -1,0 +1,4 @@
+# heart clip cradle_rise (id 39) on heart_tips: 20 t, then stops. @s = the display; apOC = the tick to apply now.
+execute if score @s apOC matches 21.. run return run scoreboard players set @s apOI -1
+execute if score @s apOC matches ..7 run return run function rlk:boss/apep/om/heart/c/cradle_rise/heart_tips/b/0_7
+function rlk:boss/apep/om/heart/c/cradle_rise/heart_tips/b/8_19

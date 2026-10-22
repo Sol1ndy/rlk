@@ -200,6 +200,7 @@
     "source_start": 1,
     "source_end": 2.75,
     "weapon": "scythe",
+    "draw_fx": false,
     "blade_alignment": "Hook leads the sweep: local shaft roll 180 in the cutting phase, smoothly unwound during recovery.",
     "char": "arle",
     "name": "skill",
@@ -215,8 +216,42 @@
     "source_start": 1,
     "source_end": 4.4,
     "weapon": "spear",
+    "weapon_state": "sheathed",
     "char": "arle",
     "name": "burst",
+    "normal": false
+  },
+  {
+    "length": 10,
+    "chain_tick": 6,
+    "hit_ticks": [],
+    "source": "arle_dash",
+    "source_start": 4.225,
+    "source_end": 4.725,
+    "weapon": "spear",
+    "weapon_state": "sheathed",
+    "audio": false,
+    "char": "arle",
+    "name": "dash",
+    "normal": false
+  },
+  {
+    "length": 60,
+    "hit_ticks": [],
+    "source": "arle_putaway",
+    "source_start": 5.2,
+    "source_end": 9.93,
+    "weapon": "spear",
+    "weapon_state": "sheathe",
+    "swish_ticks": [
+      12,
+      21,
+      31
+    ],
+    "dissolve_tick": 36,
+    "reference_observation": "v8 cycle B (scythe look), right hand: raise, vertical in front of the right shoulder, flip, backward crescent loop beside the right side, crescent above the head with the shaft behind the back, tip forward-down end pose at the right hip, gold dissolve in the hand (frozen pose), back silhouette re-form. Shaft slides through the hand in the loop so the crescent clears the floor.",
+    "char": "arle",
+    "name": "sheathe",
     "normal": false
   },
   {
@@ -445,6 +480,182 @@
     "reference_observation": "User confirmed current datapack naming: Metsu is the damaging burst. Its visual source is the supplied file named 스커크 극악기 진.mp4.",
     "char": "skirk",
     "name": "burst_metsu",
+    "normal": false
+  },
+  {
+    "length": 10,
+    "weapon": "sword",
+    "weapon_state": "sheathed",
+    "source": "skirk_dash",
+    "source_start": 6.53,
+    "source_end": 7.02,
+    "hit_ticks": [],
+    "chain_tick": 6,
+    "audio": false,
+    "reference_observation": "User dash compilation 1f6c0cf5 (2026-10-13_17-37-38.mp4), Skirk segment 4.95-7.5 s; side-on dash 6.53-7.02 s: lean-forward bound, long low split glide with the near arm reaching forward and the far arm trailing, braking stance, upright recovery.",
+    "char": "skirk",
+    "name": "dash",
+    "normal": false
+  },
+  {
+    "length": 60,
+    "weapon": "sword",
+    "weapon_state": "sheathe",
+    "source": "skirk_putaway",
+    "source_start": 17.82,
+    "source_end": 20.82,
+    "hit_ticks": [],
+    "chain_tick": 60,
+    "reference_observation": "v9 PA1 (f1069 onset; identical PA2): lift and flick, point-down hold with the left foot stepping in and the body yawed to her right, one backward wrist wheel at the right hip, raise forward to shoulder height, release; the sword floats and spins on at head height in front-right while the open hand stays raised, whitens, breaks into a gold sparkle line and drifts away; a white speck at the back hilt grows into the sword silhouette across the lower back (photo 6). Downward poses lean the tip outward because the rig sword is longer than in the video.",
+    "char": "skirk",
+    "name": "sheathe",
+    "normal": false
+  },
+  {
+    "weapon": "navia_parasol_open",
+    "weapon_state": "drawn",
+    "draw_fx": false,
+    "length": 108,
+    "activation_tick": 34,
+    "hit_ticks": [
+      34
+    ],
+    "chain_tick": 50,
+    "source": "v1 rel 0 = f19 (front; cast, shoulder rest, blast 34) + v6 (back view, put-away, halberd re-form on the back), compressed | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source)",
+    "char": "navia",
+    "name": "burst",
+    "normal": false
+  },
+  {
+    "weapon": "navia_halberd",
+    "weapon_state": "sheathed",
+    "length": 12,
+    "hit_ticks": [],
+    "chain_tick": 6,
+    "source": "v7 C3 (f1163-1204) body timing; arms per plan D9 (running-start swing: right leg leads, left arm forward at chest height, right arm back and low, lean compensated)",
+    "char": "navia",
+    "name": "dash",
+    "normal": false
+  },
+  {
+    "weapon": "navia_halberd",
+    "weapon_state": "sheathe",
+    "length": 66,
+    "hit_ticks": [],
+    "chain_tick": 66,
+    "source": "v10 PA1 (f475-f628) + plan D8: lift onto the right shoulder, forward wheel beside the head, flip over the palm, hang, drop and plant point-down in front of the left hip (right hand), gold dissolve, back speck and growth",
+    "char": "navia",
+    "name": "sheathe",
+    "normal": false
+  },
+  {
+    "playback_rate": 130,
+    "weapon": "navia_halberd",
+    "weapon_state": "drawn",
+    "length": 55,
+    "hit_ticks": [
+      9
+    ],
+    "chain_tick": 14,
+    "source": "v2 f42-f87 (N1) + v3 s2 f282-f324 | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source) | D12: playback_rate 130 (attack speed +30%; ticks here stay authored ticks, the game plays them 1.3x faster)",
+    "char": "navia",
+    "name": "physical_1",
+    "normal": true
+  },
+  {
+    "playback_rate": 130,
+    "weapon": "navia_halberd",
+    "weapon_state": "drawn",
+    "length": 60,
+    "hit_ticks": [
+      7
+    ],
+    "chain_tick": 14,
+    "source": "v2 f87-f130 (N2) + v3 s2 f336-f366 | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source) | D12: playback_rate 130 (attack speed +30%; ticks here stay authored ticks, the game plays them 1.3x faster)",
+    "char": "navia",
+    "name": "physical_2",
+    "normal": true
+  },
+  {
+    "playback_rate": 130,
+    "weapon": "navia_halberd",
+    "weapon_state": "drawn",
+    "length": 38,
+    "hit_ticks": [
+      14,
+      16,
+      18
+    ],
+    "chain_tick": 19,
+    "source": "v2 f131-f192 (= v3 s2 f367-f428): drag (click 2), whip up 4-6, plant 7, release 8 (weapon_attach world), chamber 9, kick 9.5-10, thrown halberd cartwheels 2.46 ahead (hits 13/15/17), gold dissolve 18-19, re-forms on the back 20-23; CCW pirouette 11-19 | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source) | D12: playback_rate 130 (attack speed +30%; ticks here stay authored ticks, the game plays them 1.3x faster)",
+    "char": "navia",
+    "name": "physical_3",
+    "normal": true
+  },
+  {
+    "playback_rate": 130,
+    "weapon": "navia_parasol",
+    "weapon_state": "drawn",
+    "length": 62,
+    "hit_ticks": [
+      12
+    ],
+    "chain_tick": 28,
+    "source": "v2 f192-f315 (side) + v3 s2 f424-f532 (back camera, full recovery): parasol shot, backflip, float under the open parasol, land, halberd re-forms on the back | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source) | D12: playback_rate 130 (attack speed +30%; ticks here stay authored ticks, the game plays them 1.3x faster)",
+    "char": "navia",
+    "name": "physical_4",
+    "normal": true
+  },
+  {
+    "weapon": "navia_parasol",
+    "weapon_state": "drawn",
+    "draw_fx": false,
+    "basis": "body",
+    "length": 68,
+    "activation_tick": 7,
+    "hit_ticks": [
+      7
+    ],
+    "chain_tick": 20,
+    "source": "v5 f52-f250 (skill tap: draw, twirl, chamber, canopy open, shot at 7, recoil kneel, fold, the parasol left standing on its tip and dissolved; halberd re-forms on the back), recovery compressed from 66 to 34 ticks | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source)",
+    "char": "navia",
+    "name": "skill",
+    "normal": false
+  },
+  {
+    "weapon": "navia_parasol",
+    "weapon_state": "drawn",
+    "draw_fx": false,
+    "length": 16,
+    "source": "v4 f53-f100 (skill hold: pivot, parasol appears at 4, spin with a low ferrule arc, raised pose, overhead spin, drop into the aim at 16)",
+    "char": "navia",
+    "name": "skill_aim_in",
+    "normal": false
+  },
+  {
+    "weapon": "navia_parasol",
+    "weapon_state": "drawn",
+    "draw_fx": false,
+    "length": 20,
+    "loop": true,
+    "source": "v4 f100-f168 (aim hold, breathing loop; frame 0 = last frame = skill_aim_in end = skill_fire frame 0)",
+    "char": "navia",
+    "name": "skill_aim",
+    "normal": false
+  },
+  {
+    "weapon": "navia_parasol",
+    "weapon_state": "drawn",
+    "draw_fx": false,
+    "length": 70,
+    "activation_tick": 3,
+    "hit_ticks": [
+      3
+    ],
+    "chain_tick": 12,
+    "source": "v4 f168-f358 (release: canopy pops at 1, blast at 3, shield squat, rise, closed parasol hanging like a cane, dissolve; halberd re-forms on the back), recovery compressed from 63 to 24 ticks | D11 retime: Genshin cadence at playback 100 with the full recovery (dense keys from a time-warp of the authored clip, whose tick numbers the text above still uses; this JSON is now the timing source)",
+    "char": "navia",
+    "name": "skill_fire",
     "normal": false
   }
 ]

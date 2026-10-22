@@ -4,19 +4,15 @@ function rlk:room/clear
 function rlk:room/theme
 # 맵 종류 → 배치 묶음
 execute if score #mapType room matches 0 run function rlk:room/pick/first
-execute if score #mapType room matches 1..3 run function rlk:room/pick/normal
-execute if score #mapType room matches 6..7 run function rlk:room/pick/normal
-execute if score #mapType room matches 4 run function rlk:room/pick/levelup
-execute if score #mapType room matches 5 run function rlk:room/pick/root
+# 노드 맵: 레벨업 노드가 있으면 첫 구역에 경험의 샘이 있는 레벨업 배치, 아니면 일반 배치
+scoreboard players set #nLv tmp 0
+execute if score #mapType room matches 1..7 if data storage rlk:room {next:[10]} run scoreboard players set #nLv tmp 1
+execute if score #mapType room matches 1..7 if score #nLv tmp matches 1 run function rlk:room/pick/levelup
+execute if score #mapType room matches 1..7 if score #nLv tmp matches 0 run function rlk:room/pick/normal
 execute if score #mapType room matches 8 run function rlk:room/pick/boss
-# 이점 구역: 중간 구역 하나를 특수 구역으로 (돈 3, 상점 4, 사파이어 5, 재련 6, 인챈트 7)
-scoreboard players set #special tmp 0
-execute if score #mapType room matches 1 run scoreboard players set #special tmp 3
-execute if score #mapType room matches 2 run scoreboard players set #special tmp 4
-execute if score #mapType room matches 3 run scoreboard players set #special tmp 5
-execute if score #mapType room matches 6 run scoreboard players set #special tmp 6
-execute if score #mapType room matches 7 run scoreboard players set #special tmp 7
-execute if score #special tmp matches 1.. run function rlk:room/gen_special
+# 노드 맵(종류 1): 고른 선택지의 노드(rlk:room next)마다 서로 다른 중간 구역 하나를 그 노드 구역으로 + 제목
+execute if score #mapType room matches 1..7 run function rlk:room/node/place
+execute if score #mapType room matches 1..7 run function rlk:room/node/title
 # 구역/문 표식 소환
 data modify storage rlk:room q set from storage rlk:room cur.zones
 function rlk:room/gen_zones
@@ -34,3 +30,5 @@ execute as @e[tag=rlk_av] run attribute @s minecraft:step_height base set 0.6
 execute as @a[tag=player,limit=1] run function rlk:room/gen_tp with storage rlk:room cur.spawn
 execute store result storage rlk:room a.t int 1 run scoreboard players get #mapType room
 execute as @a[tag=player,limit=1] run function rlk:room/gen_title with storage rlk:room a
+# 화면 미니맵: 이 맵의 칸 → 구역 표
+function rlk:minimap/build

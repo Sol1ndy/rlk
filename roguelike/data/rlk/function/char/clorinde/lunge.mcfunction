@@ -3,6 +3,8 @@
 execute if score @s clLCd matches 1.. run return 0
 scoreboard players operation @s clLCd = #clLungeCd tmp
 function rlk:char/clorinde/auto_off
+# 권총 사격의 휘두르기는 끝난다(combat/on_skill 을 거치지 않는 스킬이라 직접)
+function rlk:player/swing/cut
 function rlk:player/bol/pct
 scoreboard players operation #clB tmp = #bolNow tmp
 execute as @e[tag=rlk_av,limit=1] run swing @s mainhand
