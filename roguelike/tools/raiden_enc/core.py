@@ -51,8 +51,8 @@ BALANCE_PCT = {0: {0: 255, 1: 192}, 2: 139}
 # the per-phase / per-weapon percent above and of the raw 100 % of the undodgeable hits and the switch after-effects
 # (both forms, every pattern, the 6 / 6b after-effects, the counters, the guard-recovery burst). `hurt` folds it into
 # #rdBal in per mille (BAL_PM), so a hit is still divided once. The 만겁 strike outside the dome (hazard/fatal) never
-# goes through `hurt`: it stays an instant kill.
-RD_DMG_SCALE = 0.8
+# goes through `hurt`: it stays an instant kill. 10-22i ("계수가 여전히 높아"): 0.8 -> 0.5.
+RD_DMG_SCALE = 0.5
 
 
 def BAL_PM(pct):
@@ -442,9 +442,12 @@ execute unless score #rdNoDodge rd matches 1 if entity @e[tag=rlk_raiden,scores=
 # The weapon-switch after-effects (6 / 6b, hazards tagged rlk_rd_nobal; @s = the hazard) keep their raw value (x the scale).
 execute if entity @s[tag=rlk_rd_nobal] run scoreboard players set #rdBal rd {BAL_PM(100)}
 scoreboard players set #rdBalDiv rd 100000
+scoreboard players operation #rdRaw rd = #cmDmg tmp
 scoreboard players operation #cmDmg tmp *= #bossDmgMul tmp
 scoreboard players operation #cmDmg tmp *= #rdBal rd
 scoreboard players operation #cmDmg tmp /= #rdBalDiv rd
+# A hit with raw damage keeps at least 1 after the scale (the 1-damage 만겁 slash inside the dome).
+execute if score #rdRaw rd matches 1.. if score #cmDmg tmp matches ..0 run scoreboard players set #cmDmg tmp 1
 '''+'''function rlk:cm/hit_pl
 # A hit that lands (not dodged) feeds the malice gauge, like the original.
 execute unless score #dodged tmp matches 1 as @e[tag=rlk_raiden,scores={rdPhase=0,rdDeath=0},limit=1] run scoreboard players add @s rdRage '''+str(RAGE_HIT)+'''
