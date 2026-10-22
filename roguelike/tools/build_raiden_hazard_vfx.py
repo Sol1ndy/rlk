@@ -30,7 +30,7 @@ import sys
 
 from build_raiden_fx_textures import catalogue, build_fx_textures, TEX_SUBDIR, NS, KIT_QEXT
 from raiden_kit import (DECALS, DECAL_INTRO, STRIKES, STRIKE_YU, STRIKE_LIFE, SM_SWEEP, WAVE_R, WAVE_Y, FLASH, AFTER_AT, AFTER_TINT, FADE_AT,
-                        FADE_TINT, SOUNDS, SEG_DEG, KINDS)
+                        FADE_TINT, FX2_AT, SOUNDS, SEG_DEG, KINDS)
 
 FX = {c["name"] for c in catalogue()}
 ALLOWED = (-45.0, -22.5, 0.0, 22.5, 45.0)
@@ -316,13 +316,14 @@ def models():
     m.card((0, 0.5, -0.02), "z", "-y", "+x", 1, 0.9, "obj_wave_band")
     m.card((0, 0.02, -0.5), "y", "+x", "-z", 1, 1, "tr_band")
     M["tr_slab"] = m
-    # crescent sword wave (rd-sync, 찰나의 포영): crescent_a facing the travel direction, its edge radius 1 unit with the
-    # model origin at the bright arc's centroid (0.75 of the card height above the pivot; the display rolls the crescent
-    # +-45 deg about it); a smaller copy 0.25 units behind trails it. Display scale = edge radius in blocks.
+    # crescent sword wave (rd-sync, 찰나의 포영): ONE crescent_a card facing the travel direction, its edge radius 1 unit
+    # with the model origin at the bright arc's centroid (0.75 of the card height above the pivot; the display rolls the
+    # crescent +-45 deg about it). Display scale = edge radius in blocks. User 10-22 ("왜 대각선 검기 한 번에 두 개가
+    # 나가는거야"): the 0.86x copy that trailed it 0.25 units (0.7 b) behind read as a second wave of the same cut; it is
+    # gone, so one cut = one wave (the real clone's X is still two cuts, 4 t apart).
     m = Model()
     Hc = 1 / 0.94
-    for k, (z, s) in enumerate(((-0.25, 0.86), (0.0, 1.0))):
-        m.card((0, -0.25 * Hc * s, z), "z", "+x", "-y", 2 * Hc * s, Hc * s, "crescent_a")
+    m.card((0, -0.25 * Hc, 0.0), "z", "+x", "-y", 2 * Hc, Hc, "crescent_a")
     M["tr_wave"] = m
     m = Model()                                                  # orb: flat electric disc radius 1
     radial(m, 2.5, "chakra_a", 0.0)
@@ -350,6 +351,9 @@ def models():
     m = Model(8)
     pillar(m, 0, 0, 0.0, 12.0, 2.2, ["pillar_a", "pillar_b"], 4)
     M["fx_pillar"] = m
+    m = Model(8)                                                 # soft light shaft hanging DOWN from the pivot (y -10..0):
+    pillar(m, 0, 0, -10.0, 10.0, 2.0, ["beam_soft"], 3)          # scale y grows it down from the sky (guard break)
+    M["fx_beam"] = m
     m = Model(8)
     pillar(m, 0, 0, 0.0, 11.0, 1.0, ["vbolt_a", "vbolt_b", "vbolt_c"], 4)
     radial(m, 1.2, "flash", 0.05)
@@ -478,6 +482,14 @@ def build(root, out):
          for life, col in sorted(FLASH.items(), reverse=True)] + [
         f'execute as @e[tag=rlk_rd_strike,tag=rlk_rd_fx,scores={{rdHLife={AFTER_AT}}}] run function {H}fx_after',
         f'execute as @e[tag=rlk_rd_fx,scores={{rdHLife={FADE_AT}}}] run function {H}fx_fade',
+        f'execute as @e[tag=rlk_rd_fxb,scores={{rdHLife={FX2_AT}}}] run function {H}fx_anim2',
+    ])
+    write("fx_anim2", [
+        f'# A card with a second stage (tag rlk_rd_fxb) at {FX2_AT} ticks of life left: its custom_data.to2 over d2 ticks.',
+        'data modify entity @s transformation set from entity @s item.components."minecraft:custom_data".to2',
+        'data modify entity @s interpolation_duration set from entity @s item.components."minecraft:custom_data".d2',
+        'data modify entity @s start_interpolation set value 0',
+        'tag @s remove rlk_rd_fxb',
     ])
     write("fx_after", [
         'data modify entity @s item.components."minecraft:item_model" set from entity @s item.components."minecraft:custom_data".after',
@@ -578,14 +590,21 @@ def build(root, out):
         MODEL_NS + "$(m)", nbt_tf(sx="$(sx)", sy=str(STRIKE_YU), sz="$(sz)"))])
 
     # travelling cards
-    tr = ['# @s = travelling hazard, one tick before its launch: summon its cards at the start state; the display clock',
-          '# gives them their ONE interpolation (to the end state over F ticks) on the launch tick.',
-          'execute store result storage rlk:rd v.d int 1 run scoreboard players get @s rdHF',
+    tr = ['# @s = travelling hazard at rel rdHSp (its cards\' summon): the cards at the front of rel rdHGo, still; vis/travel_go',
+          '# gives them their ONE interpolation (to the end state over F - rdHGo ticks) at rel rdHGo, raiden_kit.TRAVEL_GAP',
+          '# ticks after this summon, so the client has ticked them before (user 10-22: else it may show the end state).',
+          'scoreboard players operation #rdD rd = @s rdHF',
+          'scoreboard players operation #rdD rd -= @s rdHGo',
+          'execute store result storage rlk:rd v.d int 1 run scoreboard players get #rdD rd',
+          'scoreboard players operation #rdR0 rd = @s rdHB',
+          'scoreboard players operation #rdR0 rd *= @s rdHGo',
+          'scoreboard players operation #rdR0 rd /= #rdK1000 rd',
+          'scoreboard players operation #rdR0 rd += @s rdHA',
           'scoreboard players operation #rdR1 rd = @s rdHB',
           'scoreboard players operation #rdR1 rd *= @s rdHF',
           'scoreboard players operation #rdR1 rd /= #rdK1000 rd',
           'scoreboard players operation #rdR1 rd += @s rdHA',
-          'execute store result storage rlk:rd v.tz0 float 0.001 run scoreboard players get @s rdHA',
+          'execute store result storage rlk:rd v.tz0 float 0.001 run scoreboard players get #rdR0 rd',
           'execute store result storage rlk:rd v.tz1 float 0.001 run scoreboard players get #rdR1 rd',
           f'execute if score @s rdHK matches {KINDS["sweep"]} run function {H}vis/travel_sweep',
           f'execute if score @s rdHK matches {KINDS["slab"]} run function {H}vis/travel_slab',
@@ -593,9 +612,14 @@ def build(root, out):
           'scoreboard players operation @e[tag=rlk_rd_vown] rdVId = @s rdHId',
           'tag @e[tag=rlk_rd_vown] remove rlk_rd_vown']
     write("vis/travel", tr)
+    write("vis/travel_go", [
+        '# @s = travelling hazard at rel rdHGo: its still cards (summoned TRAVEL_GAP ticks ago) start their one',
+        '# interpolation now (fx_anim in vfx_world, after the hazards).',
+        OWN,
+        'execute at @s as @e[tag=rlk_rd_trv,distance=..0.05] if score @s rdVId = #rdOwner rd run tag @s add rlk_rd_fxa'])
     chord_k = round(SEG_CHORD, 6)
     write("vis/travel_sweep", [
-        f'execute store result storage rlk:rd v.cx0 float {chord_k / 1000:.9f} run scoreboard players get @s rdHA',
+        f'execute store result storage rlk:rd v.cx0 float {chord_k / 1000:.9f} run scoreboard players get #rdR0 rd',
         f'execute store result storage rlk:rd v.cx1 float {chord_k / 1000:.9f} run scoreboard players get #rdR1 rd',
         'execute store result storage rlk:rd v.bz float 0.001 run scoreboard players get @s rdHC',
     ] + [f'execute if score @s rdHSv matches {n} run function {H}vis/seg/n{n}' for n in [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 24]])
@@ -607,7 +631,7 @@ def build(root, out):
         write(f"vis/seg/n{n}", lines)
     for v in "ab":
         write(f"vis/seg_{v}", ['$' + display(
-            ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxa", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
+            ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
              "rlk_rd_vnew"], mid("tr_seg_" + v), nbt_tf(tz="$(tz0)", sx="$(cx0)", sz="$(bz)"),
             custom='{d:$(d),to:' + nbt_tf(tz="$(tz1)", sx="$(cx1)", sz="$(bz)") + '}'),
             f'tp {VNEW} ~ ~ ~ ~ 0', f'tag {VNEW} add rlk_rd_vown', 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'])
@@ -632,7 +656,7 @@ def build(root, out):
         f'function {H}vis/slab_summon with storage rlk:rd v',
         f'tp {VNEW} ~ ~ ~ ~ 0', f'tag {VNEW} add rlk_rd_vown', 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'])
     write("vis/slab_summon", ['$' + display(
-        ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxa", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
+        ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
          "rlk_rd_vnew"], MODEL_NS + "$(m)", nbt_tf(ty="$(ty)", tz="$(tz0)", sx="$(sx)", sy="$(sy)", sz="$(sz)", lr="$(lr)"),
         custom='{d:$(d),to:' + nbt_tf(ty="$(ty)", tz="$(tz1)", sx="$(sx)", sy="$(sy)", sz="$(sz)", lr="$(lr)") + '}')])
     write("vis/travel_orb", [
@@ -641,7 +665,7 @@ def build(root, out):
         f'function {H}vis/orb_summon with storage rlk:rd v',
         f'tp {VNEW} ~ ~ ~ ~ 0', f'tag {VNEW} add rlk_rd_vown', 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'])
     write("vis/orb_summon", ['$' + display(
-        ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxa", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
+        ["rlk_rd_hvis", "rlk_rd_strike", "rlk_rd_trv", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room",
          "rlk_rd_vnew"], mid("tr_orb"), nbt_tf(ty="$(ty)", tz="$(tz0)", sx="$(sx)", sz="$(sx)"),
         custom='{d:$(d),to:' + nbt_tf(ty="$(ty)", tz="$(tz1)", sx="$(sx)", sz="$(sx)") + '}')])
     write("vis/impact", [
@@ -661,11 +685,17 @@ def build(root, out):
     for cue in SOUNDS:
         wfx(f"snd/{cue}", [f'# D.1 sound recipe "{cue}" (vanilla only).'] + snd_lines(cue))
 
-    def card(model, life, *, y=0.0, s0=(1, 1, 1), s1=None, d=4, color=WHITE, billboard="fixed", fade=None):
-        tags = ["rlk_rd_fx", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew"] + (["rlk_rd_fxa"] if s1 else [])
+    def card(model, life, *, y=0.0, s0=(1, 1, 1), s1=None, d=4, s2=None, d2=4, color=WHITE, billboard="fixed", fade=None):
+        """A timed cue card: summoned at s0, one interpolation to s1 over d ticks the tick after (fx_anim), an optional
+        second one to s2 over d2 ticks when FX2_AT ticks of its life are left (fx_anim2), killed at the end of `life`."""
+        tags = (["rlk_rd_fx", "rlk_rd_fxnew", "rlk_raiden_aux", "rlk_room", "rlk_rd_vnew"] + (["rlk_rd_fxa"] if s1 else [])
+                + (["rlk_rd_fxb"] if s2 else []))
         custom = []
         if s1:
             custom.append(f'd:{d},to:' + nbt_tf(ty=f"{y:g}", sx=f"{s1[0]:g}", sy=f"{s1[1]:g}", sz=f"{s1[2]:g}"))
+        if s2:
+            assert life > FX2_AT, (model, life)
+            custom.append(f'd2:{d2},to2:' + nbt_tf(ty=f"{y:g}", sx=f"{s2[0]:g}", sy=f"{s2[1]:g}", sz=f"{s2[2]:g}"))
         if fade is not None:
             custom.append(f'fade:{fade}')
         return [display(tags, mid(model), nbt_tf(ty=f"{y:g}", sx=f"{s0[0]:g}", sy=f"{s0[1]:g}", sz=f"{s0[2]:g}"),
@@ -674,6 +704,7 @@ def build(root, out):
                 'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew']
 
     DARK, GOLD, CYAN, PINK, PALE = 0x4A3270, 0xFFD27A, 0x9FE6FF, 0xFFA8E8, 0xE8E0FF
+    BEAM_GOLD = 0xFFE9B0                     # pale gold-white light (the guard-break beam; beam_soft is near-white)
     CUES = {
         'star': card('fx_star', 8, s0=(0.4, 0.4, 0.4), s1=(1.3, 1.3, 1.3), d=2, billboard="center")
         + card('fx_ring', 8, s0=(0.2, 1, 0.2), s1=(1, 1, 1), d=4),
@@ -687,8 +718,15 @@ def build(root, out):
         'crystal': card('fx_crystal_ring', 14, s0=(2.5, 4, 2.5), s1=(3, 4, 3), d=3),
         'parry': card('fx_crescent', 6, y=1.0, s0=(1.2, 1, 1.2), color=GOLD),
         'counter_cue': card('fx_line', 10, y=1.2, s0=(1, 1, 1), color=0x24123C, billboard="center"),
-        'guard_shatter': card('fx_burst', 8, y=1.2, s0=(1.5, 1.5, 1.5), s1=(3.2, 3.2, 3.2), d=4, billboard="center")
-        + card('fx_pillar', 100, s0=(1.6, 8, 1.6), color=GOLD),
+        # guard break (B-06, v6@25.4-26.6): the white-violet shatter burst and a short white sphere flash at the break;
+        # 13 t later (sg/stun_tick) the soft gold light beam comes down on her and is gone 12 t after (guard_beam).
+        # Nothing stays on her for the rest of the stun (it was a 100 t gold-tinted lightning column, fx_pillar).
+        'guard_shatter': card('fx_burst', 8, y=1.2, s0=(1.5, 1.5, 1.5), s1=(3.4, 3.4, 3.4), d=4, color=0xF2E6FF,
+                              billboard="center")
+        + card('fx_flash', 5, y=1.2, s0=(3.4, 3.4, 3.4), s1=(0.6, 0.6, 0.6), d=4, billboard="center"),
+        'guard_beam': card('fx_beam', 12, y=10.5, s0=(1.5, 0.5, 1.5), s1=(1.5, 8, 1.5), d=3, s2=(0, 8, 0), d2=5,
+                           color=BEAM_GOLD)
+        + card('fx_flash', 6, y=1.1, s0=(0.4, 0.4, 0.4), s1=(2.8, 2.8, 2.8), d=4, billboard="center"),
         'eye_spawn': card('fx_pillar', 10, s0=(0.7, 8, 0.7), color=CYAN),
         'eye_break': card('fx_burst', 10, s0=(1, 1, 1), s1=(3.4, 3.4, 3.4), d=4, color=0xFFD6F4, billboard="center"),
         'eye_blast': card('fx_dome', 10, s0=(2, 4, 2), s1=(5, 4, 5), d=4, color=0xD8B8FF),

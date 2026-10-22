@@ -3,6 +3,8 @@ scoreboard players add @s rdHAge 1
 execute if score @s rdHAge >= @s rdHLife run return run function rlk:boss/raiden/hazard/expire
 scoreboard players operation #rdRel rd = @s rdHAge
 scoreboard players operation #rdRel rd -= @s rdWind
+# Travelling cards start to move gap ticks after their summon (rel rdHGo; raiden_kit.TRAVEL_GAP, user 10-22).
+execute if score #rdRel rd = @s rdHGo if score @s rdHK matches 5..7 run function rlk:boss/raiden/hazard/vis/travel_go
 # S3-F perf (review RD-P1): a travelling hazard whose hit is spent (it hit, or its front passed the body) only
 # waits for its expiry (post: front past `reach`); its cards fly on by interpolation.
 execute if score @s rdHHit matches 1.. if score @s rdHMax matches 1.. if score @s rdHK matches 5..7 if score @s rdHHit >= @s rdHMax if score #rdRel rd <= @s rdHF run return 0

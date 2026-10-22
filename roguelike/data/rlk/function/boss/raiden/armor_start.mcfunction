@@ -1,6 +1,7 @@
-# End of the transformation: the Tenma phase with the full armour.
+# End of the transformation: the Tenma phase with the full armour (the shield takes over from the phase-1 tag).
 attribute @s minecraft:scale base set 2.2
 scoreboard players set @s rdPhase 2
+tag @s remove rlk_rd_armoured
 scoreboard players set @s rdShield 750
 scoreboard players set @s rdUltUsed 0
 scoreboard players set @s rdPTime 0

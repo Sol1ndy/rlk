@@ -425,6 +425,17 @@
    "notes": ""
   },
   {
+   "name": "beam_soft",
+   "texture": "rlk:raiden/fxg/beam_soft",
+   "w": 64,
+   "h": 256,
+   "kind": "column",
+   "along": "v",
+   "core": "u=0.5 smooth gaussian shaft, top faded, brightest low",
+   "use": "soft light beam (guard break); near-white, tint it",
+   "notes": "no lightning, no sparks"
+  },
+  {
    "name": "dk_ring",
    "texture": "rlk:raiden/fxg/dk_ring",
    "w": 256,

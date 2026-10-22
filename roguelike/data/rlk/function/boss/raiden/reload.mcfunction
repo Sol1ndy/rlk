@@ -6,6 +6,7 @@ scoreboard players set @s rdUltUsed 0
 scoreboard players set @s rdBlink 0
 scoreboard players set @s rdWalk 0
 scoreboard players set @s rdHidden 0
+tag @s remove rlk_rd_armoured
 kill @e[tag=rlk_rd_blink_dest]
 function rlk:boss/raiden/illusion/cleanup
 attribute @s minecraft:scale base set 1.2

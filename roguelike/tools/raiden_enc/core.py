@@ -47,6 +47,19 @@ DRAIN_REACTION = 1
 # and the switch after-effects (6 field lightning, 6b blade eyes; hazards tagged rlk_rd_nobal) are never scaled, so each
 # weapon, fresh or with its after-effect, stays within about +-20 % of the release.
 BALANCE_PCT = {0: {0: 255, 1: 192}, 2: 139}
+# User request 10-22 ("라이덴 계수 좀 줄이고"): ONE global knob on every damaging hit Raiden lands on the player, on top of
+# the per-phase / per-weapon percent above and of the raw 100 % of the undodgeable hits and the switch after-effects
+# (both forms, every pattern, the 6 / 6b after-effects, the counters, the guard-recovery burst). `hurt` folds it into
+# #rdBal in per mille (BAL_PM), so a hit is still divided once. The 만겁 strike outside the dome (hazard/fatal) never
+# goes through `hurt`: it stays an instant kill.
+RD_DMG_SCALE = 0.8
+
+
+def BAL_PM(pct):
+    """#rdBal of `hurt` in per mille: the balance percent times RD_DMG_SCALE (divided by 100000 with #bossDmgMul)."""
+    return round(pct * RD_DMG_SCALE * 10)
+
+
 # Malice energy: normal-phase ticks before the transformation (45 s, was 30 s).
 RAGE_MAX = 900
 # Like the original, every hit the boss lands also feeds the malice gauge (+3 s).
@@ -111,6 +124,7 @@ scoreboard players set @s rdUltUsed 0
 scoreboard players set @s rdBlink 0
 scoreboard players set @s rdWalk 0
 scoreboard players set @s rdHidden 0
+tag @s remove rlk_rd_armoured
 kill @e[tag=rlk_rd_blink_dest]
 function rlk:boss/raiden/illusion/cleanup
 attribute @s minecraft:scale base set 1.2
@@ -396,7 +410,9 @@ execute if score #dmg tmp matches ..0 run return 0
 execute if score @s rdPhase matches 0 run function rlk:boss/raiden/sg/incoming
 execute if score @s rdPhase matches 2 run function rlk:boss/raiden/shield_hit
 execute if score @s rdPhase matches 3 run scoreboard players operation #dmg tmp += #dmg tmp
-# Guarantee the first transformation cannot be skipped by one enormous hit.
+# The first transformation's HP gate: at or below 55 % HP she transforms at the next decision point (rage full). User
+# 10-22 ("갑주 생성 전에 잡을 수도 있게"): the hit is NOT floored any more, so a burst can kill her before the Tenma
+# armour exists (combat/apply runs death/start at 0 HP in phase 0 and in the transformation until its armour beat).
 scoreboard players operation #rdFloor rd = @s mhpM
 scoreboard players set #rdPct rd 55
 scoreboard players operation #rdFloor rd *= #rdPct rd
@@ -407,9 +423,8 @@ execute if score @s rdPhase matches 0 if score @s rdCycle matches 0 if score #rd
 execute if score #dmg tmp matches 1.. run function rlk:boss/raiden/rig/flash
 ''')
     write('threshold',f'''
-scoreboard players operation #dmg tmp = @s mhpC
-scoreboard players operation #dmg tmp -= #rdFloor rd
-execute if score #dmg tmp matches ..0 run scoreboard players set #dmg tmp 0
+# The 55 % HP gate of the first cycle: rage full, so the transformation starts at the next decision point. The damage
+# lands in full (no HP floor since 10-22); at 0 HP she simply dies.
 scoreboard players set @s rdRage {RAGE_MAX}
 ''')
     write('hurt','''
@@ -417,18 +432,20 @@ scoreboard players set @s rdRage {RAGE_MAX}
 execute unless entity @a[tag=player,scores={dead=0},limit=1] run return 0
 execute if entity @a[tag=player,scores={rnDie=1..}] run return 0
 execute if entity @a[tag=player,scores={pkMode=1..}] run return 0
-# Boss damage multiplier (load: #bossDmgMul %) times the phase balance (S3, plan B.1: dodgeable hits only), on top of
-# the mob level scaling. Every hazard sets #cmDmg fresh before calling this.
-scoreboard players set #rdBal rd 100
-execute unless score #rdNoDodge rd matches 1 if entity @e[tag=rlk_raiden,scores={rdPhase=0,rdWpn=0},limit=1] run scoreboard players set #rdBal rd '''+str(BALANCE_PCT[0][0])+'''
-execute unless score #rdNoDodge rd matches 1 if entity @e[tag=rlk_raiden,scores={rdPhase=0,rdWpn=1},limit=1] run scoreboard players set #rdBal rd '''+str(BALANCE_PCT[0][1])+'''
-execute unless score #rdNoDodge rd matches 1 if entity @e[tag=rlk_raiden,scores={rdPhase=2},limit=1] run scoreboard players set #rdBal rd '''+str(BALANCE_PCT[2])+'''
-# The weapon-switch after-effects (6 / 6b, hazards tagged rlk_rd_nobal; @s = the hazard) keep their raw value.
-execute if entity @s[tag=rlk_rd_nobal] run scoreboard players set #rdBal rd 100
+# Boss damage multiplier (load: #bossDmgMul %) times the phase balance (S3, plan B.1: dodgeable hits only) times the
+# global Raiden scale (RD_DMG_SCAL'''+f'''E {RD_DMG_SCALE:g}, user 10-22), on top of the mob level scaling.
+# #rdBal is in per mille. Every hazard sets #cmDmg fresh before calling this.
+scoreboard players set #rdBal rd {BAL_PM(100)}
+execute unless score #rdNoDodge rd matches 1 if entity @e[tag=rlk_raiden,scores={{rdPhase=0,rdWpn=0}},limit=1] run scoreboard players set #rdBal rd {BAL_PM(BALANCE_PCT[0][0])}
+execute unless score #rdNoDodge rd matches 1 if entity @e[tag=rlk_raiden,scores={{rdPhase=0,rdWpn=1}},limit=1] run scoreboard players set #rdBal rd {BAL_PM(BALANCE_PCT[0][1])}
+execute unless score #rdNoDodge rd matches 1 if entity @e[tag=rlk_raiden,scores={{rdPhase=2}},limit=1] run scoreboard players set #rdBal rd {BAL_PM(BALANCE_PCT[2])}
+# The weapon-switch after-effects (6 / 6b, hazards tagged rlk_rd_nobal; @s = the hazard) keep their raw value (x the scale).
+execute if entity @s[tag=rlk_rd_nobal] run scoreboard players set #rdBal rd {BAL_PM(100)}
+scoreboard players set #rdBalDiv rd 100000
 scoreboard players operation #cmDmg tmp *= #bossDmgMul tmp
 scoreboard players operation #cmDmg tmp *= #rdBal rd
-scoreboard players operation #cmDmg tmp /= #rd10000 rd
-function rlk:cm/hit_pl
+scoreboard players operation #cmDmg tmp /= #rdBalDiv rd
+'''+'''function rlk:cm/hit_pl
 # A hit that lands (not dodged) feeds the malice gauge, like the original.
 execute unless score #dodged tmp matches 1 as @e[tag=rlk_raiden,scores={rdPhase=0,rdDeath=0},limit=1] run scoreboard players add @s rdRage '''+str(RAGE_HIT)+'''
 ''')

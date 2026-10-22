@@ -3,7 +3,7 @@ outline decals, separate strike visuals and travelling hazards. The Python API i
 strike and travelling displays, the FX cues) are written by build_raiden_hazard_vfx.build(), called at the end.
 
 Runtime entry points (all under rlk:boss/raiden/hazard/):
-  new {k,a..f,tol,tell,dmg,life,ev,max,grp,dk,dl,kb,sv,snd,nd,jp,det,lf,fv}   v2 hazard here, yaw = execution yaw (pitch 0)
+  new {k,a..f,tol,tell,dmg,life,ev,max,grp,dk,dl,kb,sv,sm,go,sp,snd,nd,jp,det,lf,fv}   v2 hazard here, yaw = execution yaw
   tick_at (as the marker, at it, rotated as it; world calls it), expire (as the marker), finish (kills the non-detached hazards),
   clear (kills every hazard and kit display), vfx_world (orphaned visuals, the FX card clock), setup (objectives)
 Per-hazard scores (milliblocks unless noted):
@@ -19,6 +19,8 @@ Per-hazard scores (milliblocks unless noted):
   rdHGrp hit-sharing group · rdHDk decal id (raiden_kit.DECALS) · rdHDl decal life · rdHKb knock-back steps
   rdHSv strike id (raiden_kit.STRIKES) or the segment count of a sweep · rdHSnd impact sound (1, 2 = + thunder)
   rdHSm strike motion (raiden_kit.STRIKE_MOTION: 0 expand, 1/2 sweep in from her left / right, 3 chop, 4 thrust, 5 rise)
+  rdHSp / rdHGo travelling kinds: the rel (ticks from the launch) of the card summon (< 0) and of the start of their
+  interpolation (>= 0), raiden_kit.TRAVEL_GAP ticks apart
   rdFX / rdFZ frozen forward vector · rdHId serial (rdVId of its displays) · mlv boss level
 Tags: rlk_rd_hazard + rlk_rd_quiet (no decal) / rlk_rd_nododge / rlk_rd_jump / rlk_rd_detached / rlk_rd_lift.
 The hit test runs at the tell tick for static kinds, every tick after the launch for travelling ones, and every rdHEv
@@ -38,8 +40,8 @@ if OUT.exists():
 OUT.mkdir(parents=True, exist_ok=True)
 NEW = '@e[tag=rlk_rd_hnew,limit=1]'
 OBJECTIVES = ['rdHK', 'rdHA', 'rdHB', 'rdHC', 'rdHD', 'rdHE', 'rdHF', 'rdHTol', 'rdHEv', 'rdHMax', 'rdHGrp', 'rdHDk',
-              'rdHDl', 'rdHKb', 'rdHSv', 'rdHSnd', 'rdHOX', 'rdHOY', 'rdHOZ', 'rdHNx', 'rdHSm']
-KIT_VERSION = 4
+              'rdHDl', 'rdHKb', 'rdHSv', 'rdHSnd', 'rdHOX', 'rdHOY', 'rdHOZ', 'rdHNx', 'rdHSm', 'rdHGo', 'rdHSp']
+KIT_VERSION = 5
 
 
 def write(name, lines):
@@ -61,7 +63,7 @@ write('setup', ['# Kit objectives (called by vfx/init at load and by the first h
 MACRO_KEYS = [('rdHK', 'k'), ('rdHA', 'a'), ('rdHB', 'b'), ('rdHC', 'c'), ('rdHD', 'd'), ('rdHE', 'e'), ('rdHF', 'f'),
               ('rdHTol', 'tol'), ('rdWind', 'tell'), ('rdDamage', 'dmg'), ('rdHLife', 'life'), ('rdHEv', 'ev'),
               ('rdHMax', 'max'), ('rdHGrp', 'grp'), ('rdHDk', 'dk'), ('rdHDl', 'dl'), ('rdHKb', 'kb'), ('rdHSv', 'sv'),
-              ('rdHSnd', 'snd'), ('rdHSm', 'sm')]
+              ('rdHSnd', 'snd'), ('rdHSm', 'sm'), ('rdHGo', 'go'), ('rdHSp', 'sp')]
 write('new', [
     '# v2 hazard (raiden_kit.hz). Position = here, yaw = the execution yaw, pitch flattened.',
     'execute unless score #rdKitV rd matches %d run function %ssetup' % (KIT_VERSION, H),
@@ -168,6 +170,8 @@ write('tick_at', [
     f'execute if score @s rdHAge >= @s rdHLife run return run function {H}expire',
     'scoreboard players operation #rdRel rd = @s rdHAge',
     'scoreboard players operation #rdRel rd -= @s rdWind',
+    '# Travelling cards start to move gap ticks after their summon (rel rdHGo; raiden_kit.TRAVEL_GAP, user 10-22).',
+    f'execute if score #rdRel rd = @s rdHGo if score @s rdHK matches 5..7 run function {H}vis/travel_go',
     '# S3-F perf (review RD-P1): a travelling hazard whose hit is spent (it hit, or its front passed the body) only',
     '# waits for its expiry (post: front past `reach`); its cards fly on by interpolation.',
     'execute if score @s rdHHit matches 1.. if score @s rdHMax matches 1.. if score @s rdHK matches 5..7 '
@@ -180,8 +184,9 @@ write('tick_at', [
     f'function {H}post',
 ])
 write('pre', [
-    '# Before the hit: travelling cards appear one tick before the launch; a decal with its own life ends.',
-    f'execute if score #rdRel rd matches -1 if score @s rdHK matches 5..7 run function {H}vis/travel',
+    '# Before the hit: travelling cards appear at rel rdHSp (min(tell, gap) ticks before the launch); a decal with its',
+    '# own life ends.',
+    f'execute if score @s rdHK matches 5..7 if score #rdRel rd = @s rdHSp run function {H}vis/travel',
     f'execute if score @s rdHDl matches 1.. if score @s rdHAge = @s rdHDl run function {H}vis/decal_off',
 ])
 write('fire', [

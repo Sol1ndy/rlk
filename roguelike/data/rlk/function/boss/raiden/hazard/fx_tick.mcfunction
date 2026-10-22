@@ -5,3 +5,4 @@ execute as @e[tag=rlk_rd_strike,tag=rlk_rd_fx,scores={rdHLife=9}] run data modif
 execute as @e[tag=rlk_rd_strike,tag=rlk_rd_fx,scores={rdHLife=8}] run data modify entity @s item.components."minecraft:custom_model_data".colors[0] set value 15590655
 execute as @e[tag=rlk_rd_strike,tag=rlk_rd_fx,scores={rdHLife=7}] run function rlk:boss/raiden/hazard/fx_after
 execute as @e[tag=rlk_rd_fx,scores={rdHLife=4}] run function rlk:boss/raiden/hazard/fx_fade
+execute as @e[tag=rlk_rd_fxb,scores={rdHLife=6}] run function rlk:boss/raiden/hazard/fx_anim2

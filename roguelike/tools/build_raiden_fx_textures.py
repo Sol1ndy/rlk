@@ -99,6 +99,8 @@ total ~2.5 Mpx after the S1-KIT reclaim: tele_* / charged_* / ringq_* and unused
   charge_spark          64x128  column  small rising spark, base at (0.5, 0.95).
   glow_soft             64x64   radial  plain soft round glow (lavender->violet).
   glow_strip            256x32  strip   plain soft beam glow along u.
+  beam_soft             64x256  column  smooth light shaft, no lightning: near-white (the card tint gives
+                                         the colour), soft sides, faded top, brightest low (guard break).
   dk_ring, dk_ring_s    quarter         kit ring decals (thin r >= 6 / bold r < 6), unit radius, faint inner fill.
   dk_rings3, dk_disc    quarter         3 concentric rings (Musou orbs) / pale disc with a brighter rim (A-02).
   dk_band 64x256, dk_pool 256, dk_tint 64, tr_band 32x256: band decal, smoky pool, field tint, ring-segment
@@ -884,6 +886,29 @@ def tex_glow_strip():
             E[y * w + x] = g
     img = Img(w, h)
     img.over(ELECTRO, E, 1.0, window(w, h, w * 0.08, 3))
+    return img
+
+
+# near-white light (the display tint gives the hue: gold for the guard-break beam); no violet halo to go muddy under a tint
+BEAMW = ramp([(0.0, (255, 248, 232, 0)), (0.05, (255, 248, 232, 0)), (0.14, (255, 246, 226, 34)),
+              (0.36, (255, 248, 234, 112)), (0.66, (255, 252, 244, 196)), (1.0, (255, 255, 255, 236))])
+
+
+def tex_beam_soft():
+    """A smooth shaft of light (guard break, footage B-06): gaussian core + wide soft sheath across u, faded top
+    (v 0..0.35), brightest near the bottom, short bottom fade. No bolts, no sparks."""
+    w, h = 64, 256
+    E = [0.0] * (w * h)
+    for y in range(h):
+        v = (y + 0.5) / h
+        lv = smooth(0.0, 0.35, v) * smooth(1.0, 0.9, v) * (0.75 + 0.25 * v)
+        for x in range(w):
+            d = x + 0.5 - w / 2
+            q1, q2 = (d / 6.5) ** 2, (d / 15.0) ** 2
+            g = (0.62 * GAUSS[int(q1 * 256)] if q1 < 9 else 0.0) + (0.42 * GAUSS[int(q2 * 256)] if q2 < 9 else 0.0)
+            E[y * w + x] = g * lv
+    img = Img(w, h)
+    img.over(BEAMW, E, 1.0, window(w, h, w * 0.12, 4))
     return img
 
 
@@ -1693,6 +1718,8 @@ def catalogue():
     C.append(entry("glint", 64, 64, "radial", "radial", "centre", "four-point star glint (armour shards)", tex_glint))
     C.append(entry("glow_soft", 64, 64, "radial", "radial", "centre", "plain soft glow", tex_glow_soft))
     C.append(entry("glow_strip", 256, 32, "strip", "u", "v=0.5", "plain soft beam glow", tex_glow_strip))
+    C.append(entry("beam_soft", 64, 256, "column", "v", "u=0.5 smooth gaussian shaft, top faded, brightest low",
+                   "soft light beam (guard break); near-white, tint it", tex_beam_soft, "no lightning, no sparks"))
     C += kit_entries()
     C.append(entry("rig_shard", 48, 128, "column", "v", "lens tips at v=0.03/0.97, widest at v~0.39, ridge u~0.5",
                    "translucent crystal splinter (death_shard_*)", lambda: tex_rig_shard(331)))

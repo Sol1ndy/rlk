@@ -1,5 +1,7 @@
 # Phase 0 -> 1 (rage full while no pattern runs, or a test). Clears every pattern entity and visual, cancels a
-# blink, then transform_tick plays the 60 t transformation (immune: combat/apply returns in phase 1).
+# blink, then transform_tick plays the 60 t transformation. Hits land (and can kill her) until the armour
+# beat 50 (tag rlk_rd_armoured: combat/apply returns in phase 1 from then on), as in phase 0.
+tag @s remove rlk_rd_armoured
 scoreboard players set @s rdGo 0
 scoreboard players set @s rdNext 0
 scoreboard players set @s rdWalk 0

@@ -1,4 +1,4 @@
-execute store result storage rlk:rd v.cx0 float 0.000284369 run scoreboard players get @s rdHA
+execute store result storage rlk:rd v.cx0 float 0.000284369 run scoreboard players get #rdR0 rd
 execute store result storage rlk:rd v.cx1 float 0.000284369 run scoreboard players get #rdR1 rd
 execute store result storage rlk:rd v.bz float 0.001 run scoreboard players get @s rdHC
 execute if score @s rdHSv matches 1 run function rlk:boss/raiden/hazard/vis/seg/n1
