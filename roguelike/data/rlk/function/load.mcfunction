@@ -1272,7 +1272,7 @@ kill @e[tag=rlk_dbtn]
 kill @e[tag=rlk_dlbl]
 data modify storage rlk:ditems records set value {}
 
-tellraw @a [{"text":"[로그라이크] 시스템 로드 완료","color":"green"},{"text":" · 빌드 10-22f 아펩 패턴 수정","color":"gray"}]
+tellraw @a [{"text":"[로그라이크] 시스템 로드 완료","color":"green"},{"text":" · 빌드 10-22g 라이덴·아펩 수정","color":"gray"}]
 # 리로드 시 전원 강제 재스캔(새 objective/아이템 플래그 즉시 반영)
 execute as @a[tag=player] if score @s init matches 1 run function rlk:items/equip_scan
 scoreboard players set @a[tag=player] invDirty 2
