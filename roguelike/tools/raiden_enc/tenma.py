@@ -463,8 +463,9 @@ def p15():
     # energy 0), the arena tints, the flower appears at the centre with the real-game prompt; 1 electro or 4 other hits
     # raise the dome (r 8). The sky tears open on the far side of the flower from the player (56: a slit that gapes into
     # a starry void by 78), a giant armoured arm draws a katana out of it (84..), holds it back to the left (146) and
-    # swings it about 210 degrees left -> right with the arm straight (147..160, user 10-22 / 10-22b): on 152 the blade
-    # crosses the player's front over the dome (the clash) while the arena-wide slash kills everyone outside it; violet
+    # swings it about 210 degrees left -> right with the arm straight (147..160, user 10-22 / 10-22b): it comes down on
+    # the dome and its blade rakes across the top (151..153, user 10-22h), striking it at the player's front on 152 (the
+    # clash: scar, flash, ripple, the heavy hit; the dome holds) while the arena-wide slash kills everyone outside; violet
     # bolts fall round the arena, the dome cracks (160) and shatters (176) as the rift collapses (178..188), she
     # reappears at the centre (184). The camera stays free (the rig faces the player instead; the release's camera lock
     # is not restored). Clips t_vanish (gone 14), t_reform (appear 0).
@@ -481,6 +482,7 @@ def p15():
     ev(p, 140, center + fx('eye_spawn'))
     ev(p, 151, call('tm/mg/strike'))
     ev(p, 152, call('tm/mg/slash'))
+    ev(p, 155, call('tm/mg/settle'))
     for t, x, z in MG_BOLTS:
         ev(p, t, center + f'execute positioned ~{x} ~ ~{z} run ' + fx('bolt_big'))
     ev(p, 160, call('tm/mg/crack'))
@@ -503,16 +505,21 @@ def p15():
         'scoreboard players set #rdCap rd 1', 'scoreboard players set #rdCapPat rd 1'])
     write('tm/mg/strike', [
         '# @s = the boss, tick 151: the slash (hit 152) as a safe dome: inside the raised dome 1 damage, anywhere else fatal;',
-        '# without a dome the safe radius is nil.',
+        '# without a dome the safe radius is nil. The katana comes down on a raised dome: the scar of light along its rake.',
         'execute at @e[tag=rlk_rd_dome,limit=1] run ' + hz('safe_dome', 1, 1, r=8, nododge=True),
-        'execute unless entity @e[tag=rlk_rd_dome,limit=1] at @e[tag=rlk_raiden_arena,limit=1] run ' + hz('safe_dome', 1, 1, r=0.001, nododge=True)])
+        'execute unless entity @e[tag=rlk_rd_dome,limit=1] at @e[tag=rlk_raiden_arena,limit=1] run ' + hz('safe_dome', 1, 1, r=0.001, nododge=True),
+        'execute if entity @e[tag=rlk_rd_dome,limit=1] run ' + call('judgment_rig/scar')])
     write('tm/mg/slash', [
-        '# @s = the boss, tick 152: the screen-wide crescent; the sweeping katana is deflected by a held dome (the clash at',
-        '# the blade), which cracks a quarter of the armour. The flower is spent.',
+        '# @s = the boss, tick 152: the screen-wide crescent; the sweeping katana strikes a held dome (the clash on the shell:',
+        '# flash, sparks, ripple, the heavy hit; the bubble swells for a tick and settles by 155) and cracks a quarter of the',
+        '# armour. The flower is spent.',
         center + fx('mangeop_slash'),
         'execute if entity @e[tag=rlk_rd_dome,limit=1] run ' + call('judgment_rig/clash'),
+        'execute as @e[tag=rlk_rd_tm_dome] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:%s}' % (ID_TF % (8.25, 8.25, 8.25)),
         f'execute if entity @e[tag=rlk_rd_dome,limit=1] run scoreboard players remove @s rdShield {FLOWER_BREAK}',
         call('object/clear')])
+    write('tm/mg/settle', ['# @s = the boss, tick 155: the dome settles after the strike.',
+                           'execute as @e[tag=rlk_rd_tm_dome] run data merge entity @s {start_interpolation:0,interpolation_duration:3,transformation:%s}' % (ID_TF % (8, 8, 8))])
     write('tm/mg/crack', ['# @s = the boss: the dome cracks under the slash (a short shudder).',
                           'execute at @e[tag=rlk_rd_dome,limit=1] run ' + snd('crystal'),
                           'execute at @e[tag=rlk_rd_dome,limit=1] run ' + snd('mangeop_crack'),

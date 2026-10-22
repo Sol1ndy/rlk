@@ -177,7 +177,9 @@ SOUNDS = {
     # the 만겁 rift and arm (build_raiden_judgment_rig.mjs; the release's calamity sounds, d765bab)
     'mangeop_rift': [('block.beacon.ambient', 0.9, 0.5), ('block.glass.break', 0.6, 0.5)],
     'mangeop_void': [('block.portal.ambient', 0.9, 0.55), ('entity.wither.ambient', 0.6, 0.5)],
-    'mangeop_clash': [('entity.player.attack.sweep', 1.0, 0.55), ('entity.iron_golem.attack', 1.0, 0.65), ('entity.generic.explode', 0.65, 0.7)],
+    # the katana strikes the dome (user 10-22h): a heavy blade-on-shield hit, the shell ringing under it
+    'mangeop_clash': [('item.shield.block', 1.0, 0.5), ('block.anvil.land', 0.8, 0.55), ('entity.iron_golem.attack', 1.0, 0.6),
+                      ('entity.generic.explode', 0.7, 0.75), ('block.amethyst_block.resonate', 0.9, 0.7)],
     'mangeop_crack': [('block.respawn_anchor.deplete', 0.6, 1.3), ('entity.iron_golem.damage', 0.6, 1.2)],
     'mangeop_close': [('block.beacon.deactivate', 0.8, 1.1)],
     'rush': [('item.trident.riptide_3', 1.0, 1.0)],

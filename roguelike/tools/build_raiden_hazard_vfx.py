@@ -745,8 +745,11 @@ def build(root, out):
         'mangeop_dome': card('fx_ring', 8, s0=(1, 1, 1), s1=(8, 1, 8), d=8, color=0xBFE8FF),
         'mangeop_slash': card('fx_crescent', 8, y=2.5, s0=(6, 1, 6), s1=(24, 1, 24), d=6, color=PALE)
         + card('fx_flash', 6, y=2.5, s0=(10, 10, 10), billboard="center"),
+        # the katana strikes the safe dome (user 10-22h): sparks and a star at the impact on the shell and a big white
+        # flash that shrinks into it (the rig's clash adds the scar along the rake and the ripple round the impact)
         'mangeop_clash': card('fx_burst', 8, s0=(2, 2, 2), s1=(7, 7, 7), d=3, color=0xF4ECFF, billboard="center")
-        + card('fx_star', 8, s0=(1.5, 1.5, 1.5), s1=(5, 5, 5), d=2, color=0xFFFFFF, billboard="center"),
+        + card('fx_star', 8, s0=(1.5, 1.5, 1.5), s1=(5, 5, 5), d=2, color=0xFFFFFF, billboard="center")
+        + card('fx_flash', 7, s0=(9, 9, 9), s1=(2.5, 2.5, 2.5), d=5, color=0xEEE6FF, billboard="center"),
         'transform_burst': card('fx_dome', 12, s0=(1, 4, 1), s1=(7, 4, 7), d=5),
     }
     for cue in SOUNDS:

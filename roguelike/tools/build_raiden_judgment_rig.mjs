@@ -16,12 +16,14 @@
 // The rig frame: +Z toward the player, -X screen-left (as the player sees it), floor y = 0, the safe dome is the sphere
 // r 8 about the origin. Rift opens T0.., the arm emerges 84.., straightens as it draws the katana back to the left and
 // holds 146, then swings it about 210 degrees left -> right in front of the player (147..160; one key frame per tick)
-// as one straight lever from the shoulder (arm, fist and blade in a line), high across the sky and over the dome as it
-// crosses the player's front on HIT (the lethal slash, the clash), follows through far to the right (160), bends and
-// withdraws slowly into the rift by 186 and the rift collapses with the dome's shatter (176 -> 188). Nothing goes below
-// the floor (hidden = scale 0 at the shoulder, never a teleport), no solid part enters the dome, the blade stays out of
-// the arena wall and the elbow stays straight through the cut, in the exact poses and in what the client shows between
-// key frames (all checked here).
+// as one straight lever from the shoulder (arm, fist and blade in a line): high across the sky, down onto the dome so
+// the blade rakes across its top (151..153) and strikes it at the player's front on HIT (the lethal slash; with the
+// dome raised the clash: tenma.py runs judgment_rig/scar on 151 and judgment_rig/clash on HIT), follows through far to
+// the right (160), bends and withdraws slowly into the rift by 186 and the rift collapses with the dome's shatter
+// (176 -> 188). Nothing goes below the floor (hidden = scale 0 at the shoulder, never a teleport), only the blade
+// reaches into the dome (at most MAX_CUT into its shell; the arm, the fist and the guard stay outside), the blade
+// meets the shell on HIT and stays on it through the rake, it stays out of the arena wall and the elbow stays straight
+// through the cut, in the exact poses and in what the client shows between key frames (all checked here).
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -187,52 +189,57 @@ function basisQuat(x,y,z){const m=[x[0],y[0],z[0],x[1],y[1],z[1],x[2],y[2],z[2]]
 // with one key frame per tick, so the client's shortest-path slerp follows the arc), high across the sky like the
 // armour of the reference video (S:rd/src/user_refs/mangeop_ref.mp4, 6.4..7.2 s), lifted over the dome as it crosses
 // the player's front on HIT (the clash), follows through far to the right (160), five afterimage cards trail the blade
-// along the arc, and only then the elbow bends as the arm withdraws slowly up into the rift (162..186). The checks below
-// run on the exact poses AND on the poses the client shows between key frames (translation / scale lerp, rotation
-// slerp).
+// along the arc, and only then the elbow bends as the arm withdraws slowly up into the rift (162..186).
+// User 10-22h ("보호막이 아니라 허공을 베는데"): lifted 4 b over the dome the blade slashed empty air. Now the shoulder sits
+// further out (PORTAL / SHOULDER) and the lever comes down on the dome: the blade grinds across its top at 9-11 degrees
+// of heading per tick (151..153, the press: 0.15 b into the shell on the keys), striking it at the player's front on
+// HIT, then the lever lifts off and the sweep runs on (22-25 degrees per tick before and after; 188 in 148..158). The checks
+// below run on the exact poses AND on the poses the client shows between key frames (translation / scale lerp, rotation
+// slerp); the afterimages follow the client's path.
 const T0=56,T_END=190,HIT=152,DOME_R=8,ARENA_R=24;
 // Sky rift: the eye-shaped void (40 x 16 model units) at scale RIFT, tilted to face down toward the dome; from the flower
-// it spans about 14..49 degrees above the horizon and 90 degrees across (the torn sky of the reference video).
-const PORTAL=[0,10.2,-16],PORTAL_TILT=60,RIFT=13;
+// it spans about 22..50 degrees above the horizon and 80 degrees across (the torn sky of the reference video).
+// User 10-22h ("보호막이 아니라 허공을 베는데"): rift and shoulder sit 4 b higher and 3.5 b further back than in 10-22b
+// (shoulder 23.4 b from the dome centre instead of 18.2), so the straight lever that grazes the dome touches it with the
+// blade (the tangent point lies 22 b out, two thirds along the blade) while the arm, the fist and the guard stay 0.9 b
+// outside the shell; nearer, the tangent point fell on the fist and the blade could only pass 4 b over the dome.
+const PORTAL=[0,14.2,-19.5],PORTAL_TILT=60,RIFT=13;
 // The arm hangs from the shoulder half a block under the rift plane (its dark root sleeve reaches back into the void).
-const SHOULDER=[0,9.6,-15.5],CAM=[0,1.6,3];
+const SHOULDER=[0,13.6,-19],CAM=[0,1.6,3];
 const ARM=5.2,L1=20/16*ARM,L2=22/16*ARM,HAND=6,SWORD=8.6;
 const GRIP_OFF=[(GRIP[0]-8)/16,0,(GRIP[1]-8)/16];
 const hullOf=name=>MODELS[name].flatMap(el=>{const P=[];for(const x of[el.from[0],el.to[0]])for(const y of[el.from[1],el.to[1]])for(const z of[el.from[2],el.to[2]])P.push([x/16-.5,y/16-.5,z/16-.5]);return P;});
 const KATANA=hullOf('katana').filter(p=>p[1]>(13-8)/16);      // the blade (above the tsuba)
 const atPose=(v,P)=>P.map(p=>add(v.t,rot(v.q,[p[0]*v.s[0],p[1]*v.s[1],p[2]*v.s[2]])));
 const bladeFrame=(heading,elev)=>{const ph=rad(heading),be=rad(elev),d=[Math.sin(ph)*Math.cos(be),Math.sin(be),Math.cos(ph)*Math.cos(be)],edge=[Math.cos(ph),0,-Math.sin(ph)];return{d,edge,q:basisQuat(times(edge,-1),d,cross(d,edge))};};
-const bladeGap=(g,th,el=0)=>Math.min(...atPose({t:g,q:bladeFrame(th,el).q,s:[SWORD,SWORD,SWORD]},KATANA).map(p=>Math.hypot(...p)))-DOME_R;
-// The dome deflects the blade: at a grip point g and heading th the elevation is raised just enough that the blade
-// passes CLEAR blocks outside the dome (CLEAR covers the chord the client cuts between two per-tick key frames).
 // Keys, forward kinematics from the shoulder (user 10-22b: "인게임의 갑주는 팔꿈치를 펴고 베는데 ... 팔꿈치를 접은 채로
 // 엉성하게 베잖아"): u = [heading, elevation] of the upper arm (heading 0 points at the player, -90 screen-left, +90
 // screen-right), b = [elbow bend, degrees], p = the side the elbow bends to (projected off the upper arm), a = [heading,
 // elevation] of the blade where the wrist is free, w = [wrist freedom]: 0 = the blade continues the forearm's line, 1 =
 // the blade points along `a`. The arm comes out of the rift bent (84..), straightens as it draws the katana back to the
 // left (136..146), and from 146 to 160 shoulder, elbow, wrist and blade are ONE straight lever (bend 0-3 degrees, w 0)
-// swung from the shoulder like the reference video's armour: high across the sky, over the dome at the player's front
-// (the lever is lifted there, LIFT), down a little toward the arena wall at the sides. It bends again only as it
-// withdraws (162..). hold = zero velocity; the other keys take Catmull-Rom tangents.
+// swung from the shoulder like the reference video's armour: high across the sky, down onto the dome at the player's
+// front (151..153 the press sets the elevation so the blade grinds along the shell), level toward the arena wall at the
+// sides. It bends again only as it withdraws (162..). hold = zero velocity; the other keys take Catmull-Rom tangents.
 const keys=[
  {t:84, u:[-60,-50],b:[110],p:[-1,.3,.4],a:[-80,80],w:[1],hold:1},
  {t:106,u:[-80,-28],b:[85], p:[-1,.3,.4],a:[-92,70],w:[1]},
  {t:124,u:[-96,-2], b:[48], p:[-1,.4,.3],a:[-100,46],w:[1]},
  {t:136,u:[-102,16],b:[18], p:[-1,.5,.2],a:[-104,28],w:[.4]},
  {t:146,u:[-102,22],b:[3],  p:[-1,.5,.2],a:[-102,22],w:[0],hold:1},
- {t:147,u:[-98,16], b:[2],  p:[-1,.5,.2],a:[-98,16], w:[0]},
- {t:148,u:[-88,6],  b:[2],  p:[-1,.5,.2],a:[-88,6],  w:[0]},
- {t:149,u:[-72,-3], b:[2],  p:[-.9,.5,.4],a:[-72,-3],w:[0]},
- {t:150,u:[-50,-2], b:[2],  p:[-.6,.5,.7],a:[-50,-2],w:[0]},
- {t:151,u:[-22,3],  b:[2],  p:[-.3,.5,.9],a:[-22,3], w:[0]},
- {t:HIT,u:[6,4],    b:[2],  p:[0,.5,1],  a:[6,4],    w:[0]},
- {t:153,u:[34,3],   b:[2],  p:[.3,.5,.9],a:[34,3],  w:[0]},
- {t:154,u:[60,-2],  b:[2],  p:[.6,.5,.7],a:[60,-2], w:[0]},
- {t:155,u:[80,-3],  b:[2],  p:[.9,.5,.4],a:[80,-3], w:[0]},
- {t:156,u:[95,1],   b:[2],  p:[1,.5,.2], a:[95,1],  w:[0]},
- {t:157,u:[105,7],  b:[2],  p:[1,.5,.2], a:[105,7], w:[0]},
- {t:158,u:[111,11], b:[2],  p:[1,.5,.2], a:[111,11],w:[0]},
- {t:160,u:[115,15], b:[2],  p:[1,.5,.2], a:[115,15],w:[0],hold:1},
+ {t:147,u:[-96,13], b:[2],  p:[-1,.5,.2],a:[-96,13], w:[0]},
+ {t:148,u:[-82,5],  b:[2],  p:[-1,.5,.2],a:[-82,5],  w:[0]},
+ {t:149,u:[-60,-4], b:[2],  p:[-.9,.5,.4],a:[-60,-4],w:[0]},
+ {t:150,u:[-35,-12],b:[2],  p:[-.6,.5,.7],a:[-35,-12],w:[0]},
+ {t:151,u:[-10,-19],b:[2],  p:[-.3,.5,.9],a:[-10,-19],w:[0]},
+ {t:HIT,u:[1,-19],  b:[2],  p:[0,.5,1],  a:[1,-19],  w:[0]},
+ {t:153,u:[10,-19], b:[2],  p:[.3,.5,.9],a:[10,-19], w:[0]},
+ {t:154,u:[34,-12], b:[2],  p:[.6,.5,.7],a:[34,-12], w:[0]},
+ {t:155,u:[58,-4],  b:[2],  p:[.9,.5,.4],a:[58,-4],  w:[0]},
+ {t:156,u:[80,3],   b:[2],  p:[1,.5,.2], a:[80,3],   w:[0]},
+ {t:157,u:[98,8],   b:[2],  p:[1,.5,.2], a:[98,8],   w:[0]},
+ {t:158,u:[108,12], b:[2],  p:[1,.5,.2], a:[108,12], w:[0]},
+ {t:160,u:[115,15], b:[2],  p:[1,.5,.2], a:[115,15], w:[0],hold:1},
  {t:163,u:[110,20], b:[20], p:[1,.5,.2], a:[114,26],w:[.4]},
  {t:166,u:[102,26], b:[45], p:[1,.5,.2], a:[108,48],w:[1]},
  {t:170,u:[94,32],  b:[70], p:[1,.4,.3], a:[100,64],w:[1]},
@@ -248,22 +255,27 @@ const angles=d=>[Math.atan2(d[0],d[2])*180/Math.PI,Math.asin(Math.max(-1,Math.mi
 // 90 degrees) projected off the bone, with a little world up where a bone points along it: continuous however the arm
 // turns, so no twist flips between key frames.
 function boneQ(a,b,X){const y=norm(sub(a,b)),off=v=>sub(v,times(y,dot(v,y)));const x=norm(add(off(X),times(off([0,1,0]),.25)));return basisQuat(x,y,cross(x,y));}
-// The lift over the dome: for every heading of the cut the lowest upper-arm elevation at which the straight lever (arm,
-// fist and katana) stays CLEAR outside the dome, dilated by +-LIFT_W degrees, so the lever the client slerps between two
-// key frames up to 30 degrees apart stays lifted all the way across. Through the cut the elevation is max(key, lift).
-const CLEAR=.45,LIFT_A=145,LIFT_B=162,LIFT_W=18;
-let NEED=null;
-function leverClear(h,e){const r=fk(h,e,0,[0,1,0],h,e,0,1);let m=1e9;for(const n of['upper','forearm','hand','sword']){const v=n==='upper'?scaled(r.upper,ARM):n==='forearm'?scaled(r.forearm,ARM):n==='hand'?scaled(r.hand,HAND):scaled(r.sword,SWORD);
- for(const p of atPose(v,LEVER_HULL[n]))m=Math.min(m,Math.hypot(...p));}return m-DOME_R;}
-const needAt=th=>{if(!NEED){NEED=new Map();for(let h=-135;h<=135;h++){let e=-12;while(leverClear(h,e)<CLEAR&&e<70)e+=.25;NEED.set(h,e);}}
- let e=-90;for(let h=Math.floor(th-LIFT_W);h<=Math.ceil(th+LIFT_W);h++)if(NEED.has(h))e=Math.max(e,NEED.get(h));return e;};
+// The press (user 10-22h: "보호막이 아니라 허공을 베는데"): from PRESS_A to PRESS_B the lever is lowered onto the dome so
+// the blade rakes across its top, the blade's nearest point CUT blocks inside the shell (the client, slerping between
+// the per-tick keys, shows it 0.15-0.4 b in), its edge turned ROLL degrees toward the shell (ramped in from RA over RD
+// ticks so the turn does not add to the cut's largest key step). Only the blade reaches the shell: the arm, the fist
+// and the guard stay outside (checked below).
+const PRESS_A=150.4,PRESS_B=153.6,CUT=.15,ROLL=18,RA=148.6,RD=2.4,RB=153.4;
+const pressW=t=>smooth((t-PRESS_A)/.6)*(1-smooth((t-(PRESS_B-.6))/.6)),rollW=t=>smooth((t-RA)/RD)*(1-smooth((t-RB)/1.2));
+const bladeMin=(h,e,roll)=>{const r=fk(h,e,2,[0,1,0],h,e,0,1,roll);return Math.min(...atPose(scaled(r.sword,SWORD),KATANA).map(p=>Math.hypot(...p)));};
+// the upper-arm elevation at heading h at which the blade's nearest point is CUT inside the dome (bisection, cached)
+const CONTACT=new Map();
+function contactElev(h,roll){const k=Math.round(h*20)+':'+Math.round(roll*20);if(CONTACT.has(k))return CONTACT.get(k);
+ let lo=-70,hi=40;for(let i=0;i<40;i++){const m=(lo+hi)/2;if(bladeMin(h,m,roll)<DOME_R-CUT)lo=m;else hi=m;}CONTACT.set(k,hi);return hi;}
 // One arm pose: upper arm (hu, eu), elbow bend (deg) toward pole, blade (ha, ea) mixed with the forearm's line by w.
-function fk(hu,eu,bend,pole,ha,ea,w,size){
+function fk(hu,eu,bend,pole,ha,ea,w,size,roll=0){
  const u=dirOf(hu,eu);let pp=sub(pole,times(u,dot(pole,u)));if(Math.hypot(...pp)<1e-3)pp=sub([0,1,0],times(u,u[1]));pp=norm(pp);
  const f=norm(add(times(u,Math.cos(rad(bend))),times(pp,Math.sin(rad(bend)))));
  const E=add(SHOULDER,times(u,L1*size)),W=add(E,times(f,L2*size));
  const d=norm(add(times(f,1-w),times(dirOf(ha,ea),w))),[heading,elev]=angles(d);
- const {edge,q:swordQ}=bladeFrame(heading,elev),swing=[Math.cos(rad(hu)),0,-Math.sin(rad(hu))];
+ const bf=bladeFrame(heading,elev),swing=[Math.cos(rad(hu)),0,-Math.sin(rad(hu))];
+ // the edge turned `roll` degrees toward the dome (away from the flat's outer normal) during the press
+ const edge=roll?norm(sub(times(bf.edge,Math.cos(rad(roll))),times(cross(d,bf.edge),Math.sin(rad(roll))))):bf.edge,swordQ=roll?basisQuat(times(edge,-1),d,cross(d,edge)):bf.q;
  // the fist: local Y along the blade, local -X (the knuckles) toward the swing (the upper arm's horizontal tangent,
  // projected off the blade): with the blade in the forearm's line the knuckles lead the cut, and the frame turns
  // smoothly through the draw-back, the cut and the withdrawal (no flip between key frames)
@@ -280,13 +292,13 @@ function rigAt(t){
 }
 function rigCore(t){
  const size=smooth((t-84)/20)*(1-smooth((t-174)/12)),tense=smooth((t-136)/8)*(1-smooth(t-145));
- // a short tense tremble while the blade is held back, a shudder through the arm as the lever passes over the dome
+ // a short tense tremble while the blade is held back, a shudder through the arm as the blade grinds over the dome
  const shake=tense*1.2+(t>HIT&&t<156?.6:0),[hk,ek]=channel('u',t);
- const hu=hk+Math.sin(t*3.7)*shake,eu0=ek+Math.sin(t*2.9)*shake*.5;
- const eu=t>=LIFT_A&&t<=LIFT_B?Math.max(eu0,needAt(hu)):eu0;
+ const hu=hk+Math.sin(t*3.7)*shake,eu0=ek+Math.sin(t*2.9)*shake*.5,pw=pressW(t),roll=ROLL*rollW(t);
+ const eu=pw>0?eu0+(contactElev(hu,roll)-eu0)*pw:eu0;
  const [ha,ea0]=channel('a',t),ea=ea0+(eu-eu0),w=clamp(channel('w',t)[0]),bend=Math.max(0,channel('b',t)[0]);
  if(size<.0001){const {d,edge,q:swordQ}=bladeFrame(ha,ea);return{size:0,upper:[SHOULDER,[0,0,0,1]],forearm:[SHOULDER,[0,0,0,1]],hand:[SHOULDER,[0,0,0,1]],sword:[SHOULDER,swordQ],d,edge,heading:ha,elev:ea,bend};}
- return fk(hu,eu,bend,norm(channel('p',t)),ha,ea,w,size);
+ return fk(hu,eu,bend,norm(channel('p',t)),ha,ea,w,size,roll);
 }
 // Five afterimages of the blade (lags in ticks), shown while the blade is fast (CUT_A .. CUT_B): they fan out behind it
 // along the arc of the cut.
@@ -294,8 +306,11 @@ const TRAILS=[[.45,'blade_trail_near'],[.9,'blade_trail_near'],[1.4,'blade_trail
 const CUT_A=147,CUT_B=158;
 const parts={rift_void:'rift_void',rift_depth:'rift_depth',rift_haze:'rift_haze',rift_edge:'rift_edge_0',rift_edge_glow:'rift_edge_glow',rift_stars:'rift_stars',rift_iris:'rift_iris',rift_fragments:'rift_fragments',upper:'upper_arm',forearm:'forearm',hand:'closed_hand',upper_veins:'upper_veins',forearm_veins:'forearm_veins',sword:'katana',blade_aura:'blade_aura',blade_haze:'blade_haze',blade_lightning:'blade_lightning_0',...Object.fromEntries(TRAILS.map(([,m],i)=>['trail'+(i+1),m]))};
 const scaled=([t,q],s)=>({t,q,s:[s,s,s]});
-const LEVER_HULL={upper:hullOf('upper_arm'),forearm:hullOf('forearm'),hand:hullOf('closed_hand'),sword:KATANA};
 function sword(t){const r=rigAt(t);return scaled(r.sword,SWORD*r.size);}
+const slim=(v,t)=>{const k=1-.55*pressW(t);return{...v,s:[v.s[0]*k,v.s[1],v.s[2]*k]};};
+// the blade as the client shows it at t (between its key frames): the afterimages follow the path the player saw
+function swordSeen(t){const ks=[T0,...KEYS,T_END];let i=0;while(i+1<ks.length&&ks[i+1]<=t)i++;if(i+1>=ks.length)return sword(T_END);
+ const A=sword(ks[i]),B=sword(ks[i+1]),u=(t-ks[i])/(ks[i+1]-ks[i]);return{t:lerp(A.t,B.t,u),q:slerp(A.q,B.q,u),s:lerp(A.s,B.s,u)};}
 function pose(t){
  // the sky splits (a thin slit T0..T0+14, then it gapes open to +22) and collapses with the dome's shatter (178..188)
  const opening=smooth((t-T0)/14),openHeight=.035+.965*smooth((t-T0-6)/16),closing=1-smooth((t-178)/10),pulse=1+.025*Math.sin(t*.34),portalQ=q([PORTAL_TILT,0,0]),o={};
@@ -311,10 +326,12 @@ function pose(t){
  o.upper=scaled(r.upper,ARM*r.size);o.forearm=scaled(r.forearm,ARM*r.size);o.hand=scaled(r.hand,HAND*r.size);
  o.upper_veins=structuredClone(o.upper);o.forearm_veins=structuredClone(o.forearm);
  o.sword=scaled(r.sword,SWORD*r.size);
- for(const n of['blade_aura','blade_haze','blade_lightning'])o[n]=structuredClone(o.sword);
+ // the blade's light hugs the blade while it grinds on the dome (45 % as wide across the blade at the full press), so
+ // no more of it than the blade reaches into the shell (user 10-22h)
+ for(const n of['blade_aura','blade_haze','blade_lightning'])o[n]=slim(structuredClone(o.sword),t);
  o.blade_lightning.model='blade_lightning_'+(Math.floor(t/2)%2);
  // afterimages: hidden (scale 0, at the blade) outside the fast part of the cut
- TRAILS.forEach(([lag],i)=>{const n='trail'+(i+1);o[n]=t>=CUT_A&&t<=CUT_B?sword(t-lag):{...sword(t),s:[0,0,0]};});
+ TRAILS.forEach(([lag],i)=>{const n='trail'+(i+1);o[n]=t>=CUT_A&&t<=CUT_B?slim(swordSeen(t-lag),t-lag):{...sword(t),s:[0,0,0]};});
  return o;
 }
 
@@ -331,21 +348,26 @@ function clientPose(t){const ks=[T0,...KEYS,T_END];let i=0;while(i+1<ks.length&&
  const k0=ks[i],k1=ks[i+1],A=i===0?poseAt(T0):poseAt(k0),B=poseAt(k1),u=i===0?0:(t-k0)/(k1-k0),o={};
  for(const n of Object.keys(parts))o[n]={t:lerp(A[n].t,B[n].t,u),q:slerp(A[n].q,B[n].q,u),s:lerp(A[n].s,B[n].s,u),model:(u<1?A:B)[n].model};return o;}
 
-// ---- checks: never below the floor, no solid part inside the dome (exact and client view), small key steps, the cut ----
+// ---- checks: never below the floor, only the blade in the dome's shell (exact and client view), small key steps, the cut
+// The solid parts (the arm, the fist, the katana's hilt and guard) stay outside the dome; the blade (KATANA) may cut into
+// its shell by at most MAX_CUT (the rake, user 10-22h), in the exact poses and in what the client shows between keys.
 const HULL=Object.fromEntries(Object.values(parts).map(m=>[m,hullOf(m)]));
-const SOLID=['upper','forearm','hand','sword'];
-let low=1e9,inDome=1e9,far=0,cLow=1e9,cInDome=1e9,tipDev=0,wallHit=0;
+const SOLID=['upper','forearm','hand','sword'],HILT=hullOf('katana').filter(p=>p[1]<=(13-8)/16),MAX_CUT=.5;
+const LIGHT=['blade_aura','blade_haze','blade_lightning',...TRAILS.map((_,i)=>'trail'+(i+1))];   // the blade's light: as deep as the blade at most
+let low=1e9,inDome=1e9,far=0,cLow=1e9,cInDome=1e9,tipDev=0,wallHit=0,bIn=1e9,cbIn=1e9;
 const scan=(p,acc)=>{for(const n of Object.keys(parts)){if(Math.max(...p[n].s)<1e-4)continue;const W=atPose(p[n],HULL[p[n].model?p[n].model.replace(/_\d$/,'_0'):parts[n]]);
-  acc.low=Math.min(acc.low,...W.map(w=>w[1]));if(SOLID.includes(n)){acc.dome=Math.min(acc.dome,...W.map(w=>Math.hypot(...w)));acc.far=Math.max(acc.far,...W.map(w=>Math.hypot(w[0],w[2])));
+  acc.low=Math.min(acc.low,...W.map(w=>w[1]));if(n==='sword'||LIGHT.includes(n))acc.blade=Math.min(acc.blade,...(n==='sword'?atPose(p[n],KATANA):W).map(w=>Math.hypot(...w)));
+  if(SOLID.includes(n)){acc.dome=Math.min(acc.dome,...(n==='sword'?atPose(p[n],HILT):W).map(w=>Math.hypot(...w)));acc.far=Math.max(acc.far,...W.map(w=>Math.hypot(w[0],w[2])));
    // the arena wall (r 24 about the arena centre = the rig origin, 6 b high): the blade may pass over it, not into it
    if(n==='sword')wallHit=Math.max(wallHit,...W.filter(w=>w[1]<6.5).map(w=>Math.hypot(w[0],w[2])));}}};
 const tipOf=v=>add(v.t,rot(v.q,[0,(BLADE.y1-8)/16*v.s[1],0]));
-for(let t=T0;t<=T_END;t++){const a={low:1e9,dome:1e9,far:0};scan(poseAt(t),a);low=Math.min(low,a.low);inDome=Math.min(inDome,a.dome);far=Math.max(far,a.far);}
-for(let t=T0;t<=T_END;t+=.25){const c={low:1e9,dome:1e9,far:0},cp=clientPose(t);scan(cp,c);cLow=Math.min(cLow,c.low);cInDome=Math.min(cInDome,c.dome);
+for(let t=T0;t<=T_END;t++){const a={low:1e9,dome:1e9,far:0,blade:1e9};scan(poseAt(t),a);low=Math.min(low,a.low);inDome=Math.min(inDome,a.dome);far=Math.max(far,a.far);bIn=Math.min(bIn,a.blade);}
+for(let t=T0;t<=T_END;t+=.25){const c={low:1e9,dome:1e9,far:0,blade:1e9},cp=clientPose(t);scan(cp,c);cLow=Math.min(cLow,c.low);cInDome=Math.min(cInDome,c.dome);cbIn=Math.min(cbIn,c.blade);
  if(t>=CUT_A-1&&t<=CUT_B+2)tipDev=Math.max(tipDev,Math.hypot(...sub(tipOf(cp.sword),tipOf(pose(t).sword))));}
 if(wallHit>23.5)throw new Error(`the katana reaches into the arena wall (r ${wallHit.toFixed(1)} below its top)`);
 if(Math.min(low,cLow)<.05)throw new Error(`a judgment part reaches y ${Math.min(low,cLow).toFixed(2)} (below the floor)`);
-if(Math.min(inDome,cInDome)<DOME_R-.1)throw new Error(`a solid judgment part enters the dome (distance ${Math.min(inDome,cInDome).toFixed(2)} < ${DOME_R}; client view ${cInDome.toFixed(2)})`);
+if(Math.min(inDome,cInDome)<DOME_R-.1)throw new Error(`the arm, the fist or the guard enters the dome (distance ${Math.min(inDome,cInDome).toFixed(2)} < ${DOME_R}; client view ${cInDome.toFixed(2)})`);
+if(Math.min(bIn,cbIn)<DOME_R-MAX_CUT)throw new Error(`the blade or its light reaches ${(DOME_R-Math.min(bIn,cbIn)).toFixed(2)} b into the dome (at most ${MAX_CUT}; client view ${(DOME_R-cbIn).toFixed(2)})`);
 let stepMax=[0,''];for(const n of Object.keys(parts)){let prev=poseAt(T0)[n];for(const k of KEYS){const p=poseAt(k===KEYS.at(-1)?T_END:KEYS[KEYS.indexOf(k)+1])[n];
  if(Math.max(...p.s)>1e-4&&Math.max(...prev.s)>1e-4){const a=2*Math.acos(Math.min(1,Math.abs(dot(p.q,prev.q))))*180/Math.PI;if(a>stepMax[0])stepMax=[a,`${n} key ${k}`];}prev=p;}}
 if(stepMax[0]>60)throw new Error(`a display turns ${stepMax[0].toFixed(1)} deg between two key frames (${stepMax[1]}): the client's shortest-path slerp would cut the arc`);
@@ -356,8 +378,36 @@ let elbowMax=0;for(let t=147;t<=160;t+=.25){const c=clientPose(t);elbowMax=Math.
 if(elbowMax>10)throw new Error(`the elbow bends ${elbowMax.toFixed(1)} deg during the cut (client view, 147..160; the arm must swing straight)`);
 const H=t=>rigAt(t).heading,sweep=H(158)-H(148),sweepAll=H(160)-H(146);
 if(sweep<150||!(H(HIT-1)<0&&H(HIT)>=0))throw new Error(`the cut is too short or misses the player's front on ${HIT} (148..158: ${sweep.toFixed(0)} deg; ${H(HIT-1).toFixed(0)} -> ${H(HIT).toFixed(0)})`);
-const hitGap=bladeGap(rigAt(HIT).sword[0],rigAt(HIT).heading,rigAt(HIT).elev);
-if(hitGap>5)throw new Error(`the blade does not pass over the dome on HIT (gap ${hitGap.toFixed(2)})`);
+// the strike (user 10-22h: "보호막이 아니라 허공을 베는데"): on HIT the blade meets the dome, its nearest point within 0.1 b
+// of the shell or in it (at most MAX_CUT, above)
+const hitGap=Math.min(...atPose(poseAt(HIT).sword,KATANA).map(p=>Math.hypot(...p)))-DOME_R;
+if(hitGap>.1)throw new Error(`the blade does not reach the dome on HIT (gap ${hitGap.toFixed(2)} b to its surface)`);
+
+// ---- the strike on the dome (user 10-22h) ----------------------------------------------------------------------------
+// Where the blade rakes the shell as the client shows it: the centre of the blade's contact patch (its hull points within
+// 0.3 b of the nearest one) every 1/8 tick while the blade is within 0.15 b of the dome, put on the shell (r SHELL). The
+// rake must be one stretch of at least 1.5 t through HIT (the client sees the blade on the shell 151..153).
+const SHELL=DOME_R+.06,tangent=(v,p)=>{const n=norm(p);return norm(sub(v,times(n,dot(v,n))));};
+const RAKE=[];for(let t=HIT-2;t<=HIT+2;t+=.125){const c=clientPose(t).sword,P=atPose(c,KATANA).map(p=>[Math.hypot(...p),p]),m=Math.min(...P.map(x=>x[0]));
+ if(m-DOME_R>.15)continue;const near=P.filter(x=>x[0]<=m+.3).map(x=>x[1]),cen=times(near.reduce((a,b)=>add(a,b),[0,0,0]),1/near.length);
+ RAKE.push({t,p:times(norm(cen),SHELL),d:rot(c.q,[0,1,0]),gap:m-DOME_R});}
+const rakeT=RAKE.map(r=>r.t),rakeLen=RAKE.length?rakeT.at(-1)-rakeT[0]:0;
+if(rakeLen<1.5||!rakeT.includes(HIT)||RAKE.some((r,i)=>i&&r.t-RAKE[i-1].t>.13))throw new Error(`the blade rakes the dome for ${rakeLen.toFixed(2)} t (${rakeT[0]}..${rakeT.at(-1)}): it must touch it in one stretch of at least 1.5 t through ${HIT}`);
+const rakeAt=t=>RAKE.find(r=>Math.abs(r.t-t)<1e-9),IMPACT=rakeAt(HIT).p,P0=RAKE[0].p,MID=RAKE[RAKE.length>>1].p;
+const rakeDist=RAKE.reduce((a,r,i)=>i?a+Math.hypot(...sub(r.p,RAKE[i-1].p)):0,0);
+// Two light models (tinted white; the kit's fade tint dims them): the scar (a bright line along the rake with two fainter
+// scratch lines 0.6 b to either side along the blade) and the ripple (two rings on the shell round the impact, 9 and 18
+// degrees out). Model unit = scale/16 b about the pivot (the rake's start / the impact point) at the model centre.
+const SCAR_S=5,RIPPLE_S=4,FADE_TINT=0x6A5A98;      // FADE_TINT: raiden_kit.py FADE_TINT (fx_fade at 4 t of life left)
+const tinted=e=>e.map(el=>({...el,faces:Object.fromEntries(Object.entries(el.faces).map(([k,v])=>[k,{...v,tintindex:0}]))}));
+const unitsAt=(p,pivot,S)=>times(sub(p,pivot),16/S);     // about the model centre (line() / centered() add the 8)
+function lightModel(name,e){model(name,tinted(e));json(path.join(assets,'items/raiden/judgment',name+'.json'),{model:{type:'minecraft:model',model:'rlk:item/raiden/judgment/'+name,tints:[{type:'minecraft:custom_model_data',index:0,default:16777215}]}});}
+{const u=p=>unitsAt(p,P0,SCAR_S),k=16/SCAR_S,mid=RAKE.map(r=>u(r.p)),side=s=>RAKE.slice(2,-2).map(r=>u(times(norm(add(r.p,times(tangent(r.d,r.p),.6*s))),SHELL)));
+ lightModel('strike_scar',[...line(mid,.8*k,'violet',.5),...line(mid,.34*k,'cyan',.5),...line(mid,.14*k,'white',.5),
+  ...[-1,1].flatMap(s=>[...line(side(s),.36*k,'violet',.6),...line(side(s),.09*k,'cyan',.6)])]);}
+{const n=norm(IMPACT),a=norm(cross(n,Math.abs(n[1])<.9?[0,1,0]:[1,0,0])),b=cross(n,a),k=16/RIPPLE_S;
+ const ring=th=>{const P=[];for(let i=0;i<=48;i++){const ph=i*Math.PI/24;P.push(unitsAt(times(add(times(n,Math.cos(rad(th))),times(add(times(a,Math.cos(ph)),times(b,Math.sin(ph))),Math.sin(rad(th)))),SHELL),IMPACT,RIPPLE_S));}return P;};
+ lightModel('strike_ripple',[9,18].flatMap((th,i)=>[...line(ring(th),(i?.5:.4)*k,'violet',1),...line(ring(th),(i?.1:.14)*k,i?'cyan':'white',1)]));}
 
 // ---- functions: start (summon on the execution yaw), key frames, tick (as the boss), cleanup ----------------------------
 const f=v=>(Math.abs(v)<.0000005?0:v).toFixed(5).replace(/\.?0+$/,'')+'f',arr=a=>'['+a.map(f).join(',')+']';
@@ -375,10 +425,23 @@ fn('start',[`# At the arena centre, facing the player (tenma.py p15, rdTime ${T0
  'function rlk:boss/raiden/judgment_rig/cleanup',
  ...Object.entries(parts).map(([n,asset])=>`summon minecraft:item_display ~ ~ ~ {Tags:[${TAGS(n)}],billboard:"fixed",item_display:"none",brightness:{block:15,sky:15},view_range:4f,shadow_radius:0f,width:0f,height:0f,teleport_duration:0,interpolation_duration:1,transformation:${nbt(first[n])},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/judgment/${asset}"}}}`),
  'execute rotated ~ 0 run tp @e[type=item_display,tag=rlk_rd_j_new] ~ ~ ~ ~ 0','tag @e[type=item_display,tag=rlk_rd_j_new] remove rlk_rd_j_new']);
-// the clash: where the blade comes nearest the dome on HIT (rig frame = ^left ^up ^forward of the parts' yaw), just outside it
-const hitPts=atPose(poseAt(HIT).sword,KATANA),touch=hitPts.reduce((a,b)=>Math.hypot(...b)<Math.hypot(...a)?b:a),CLASH=times(touch,(DOME_R+.3)/Math.hypot(...touch));
-fn('clash',[`# @s = the boss on ${HIT} with the dome raised (tenma.py tm/mg/slash): the burst where the katana is deflected over the dome.`,
- `execute at ${sel('sword')} rotated as ${sel('sword')} positioned ^${f(CLASH[0]).slice(0,-1)} ^${f(CLASH[1]).slice(0,-1)} ^${f(CLASH[2]).slice(0,-1)} run function rlk:boss/raiden/fx/mangeop_clash`]);
+// The strike, only with the dome raised (tenma.py tm/mg/strike 151 / slash 152; the rig frame is ^left ^up ^forward of
+// the parts' yaw, its origin the dome centre): kit-timed light displays (rlk_rd_fx: rdHLife, one interpolation the tick
+// after the summon (fxa), a second one at 6 t of life left (fxb), the fade tint at 4).
+//   scar (151): grows along the rake from its start as the blade crosses (152 -> 153), holds, then shrinks into its
+//     middle (159 -> 164);
+//   clash (152): the kit's clash cue (burst, star, flash and the heavy hit sound) on the shell at the impact, and the
+//     ripple: two rings on the shell round the impact that spread out (153 -> 156, then on to 1.5 x by 160).
+const STRIKE={scar:{model:'strike_scar',at:151,life:14,d:1,d2:5,v0:{t:P0,s:.04*SCAR_S},v1:{t:P0,s:SCAR_S},v2:{t:MID,s:0}},
+ ripple:{model:'strike_ripple',at:HIT,life:10,d:3,d2:4,v0:{t:IMPACT,s:.2*RIPPLE_S},v1:{t:IMPACT,s:RIPPLE_S},v2:{t:IMPACT,s:1.5*RIPPLE_S}}};
+const lightTf=v=>({t:v.t,q:[0,0,0,1],s:[v.s,v.s,v.s]});
+const atRig=`execute at ${sel('sword')} rotated as ${sel('sword')}`,VNEW='@e[tag=rlk_rd_vnew,limit=1]';
+const strikeSummon=k=>{const x=STRIKE[k];return[`${atRig} run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_rd_fx","rlk_rd_fxnew","rlk_raiden_aux","rlk_room","rlk_rd_vnew","rlk_rd_fxa","rlk_rd_fxb"],billboard:"fixed",item_display:"none",view_range:4f,width:0f,height:0f,shadow_radius:0f,brightness:{block:15,sky:15},interpolation_duration:0,teleport_duration:0,transformation:${nbt(lightTf(x.v0))},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/judgment/${x.model}","minecraft:custom_model_data":{colors:[16777215]},"minecraft:custom_data":{d:${x.d},to:${nbt(lightTf(x.v1))},d2:${x.d2},to2:${nbt(lightTf(x.v2))},fade:${FADE_TINT}}}}}`,
+ `${atRig} run tp ${VNEW} ~ ~ ~ ~ 0`,`scoreboard players set ${VNEW} rdHLife ${x.life}`,'tag @e[tag=rlk_rd_vnew] remove rlk_rd_vnew'];};
+const CLASH=times(norm(IMPACT),DOME_R+.4),rel=v=>v.map(x=>'^'+f(x).slice(0,-1)).join(' ');
+fn('scar',[`# @s = the boss on 151 with the dome raised (tenma.py tm/mg/strike): the scar of light the katana leaves as it rakes the dome (${rakeT[0]}..${rakeT.at(-1)}, ${rakeDist.toFixed(1)} b over its top).`,...strikeSummon('scar')]);
+fn('clash',[`# @s = the boss on ${HIT} with the dome raised (tenma.py tm/mg/slash): the katana strikes the dome; the clash cue on the shell at the impact and the ripple.`,
+ `${atRig} positioned ${rel(CLASH)} run function rlk:boss/raiden/fx/mangeop_clash`,...strikeSummon('ripple')]);
 // dispatcher: a guard every 6 keys keeps a tick to at most ~14 checks
 const disp=[`# @s = the boss during 만겁 (tenma.py p15, rdTime ${T0+1}..${T_END}): the key frames, then the cleanup.`,`execute if score @s rdTime matches ${T_END}.. run return run function rlk:boss/raiden/judgment_rig/cleanup`];
 KEYS.forEach((k,i)=>{if(i&&i%6===0)disp.push(`execute if score @s rdTime matches ..${k-1} run return 0`);disp.push(`execute if score @s rdTime matches ${k} run return run function rlk:boss/raiden/judgment_rig/frame/${k}`);});
@@ -387,14 +450,21 @@ for(const [n,e] of Object.entries(MODELS))if(e.length>900)throw new Error(`judgm
 const debugDp=arg('--debug-dp')&&path.resolve(arg('--debug-dp'));
 if(debugDp){
  // rd_dbg/mg/<t>: the exact pose of tick t; rd_dbg/mgc/<t>[h]: what the client shows at t (and t + 0.5) between keys
- const D=path.join(debugDp,'data/rlk/function');fs.rmSync(path.join(D,'rd_dbg/mg'),{recursive:true,force:true});fs.rmSync(path.join(D,'rd_dbg/mgc'),{recursive:true,force:true});
+ const D=path.join(debugDp,'data/rlk/function');for(const d of['mg','mgc','mgfx'])fs.rmSync(path.join(D,'rd_dbg',d),{recursive:true,force:true});
  fs.cpSync(FN_DIR,path.join(D,'boss/raiden/judgment_rig'),{recursive:true});
  const dump=(p,file)=>put(path.join(D,file),Object.keys(parts).map(n=>`data merge entity ${sel(n)} {interpolation_duration:0,start_interpolation:0,transformation:${nbt(p[n])},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/judgment/${p[n].model||parts[n]}"}}}`).join('\n'));
  const path_=[];for(let t=140;t<=190;t+=.25){const e=pose(t).sword,c=clientPose(t).sword;path_.push({t,hilt:e.t,tip:tipOf(e),ctip:tipOf(c),chilt:c.t});}
  put(path.join(debugDp,'mg_path.json'),JSON.stringify(path_));
  for(let t=T0;t<=T_END;t++){dump(poseAt(t),`rd_dbg/mg/${t}.mcfunction`);dump(clientPose(t),`rd_dbg/mgc/${t}.mcfunction`);dump(clientPose(t+.5),`rd_dbg/mgc/${t}h.mcfunction`);}
+ // rd_dbg/mgfx/<t>[h]: the strike's lights as the client shows them at t (summons at the rig origin, yaw 0); the kit
+ // timeline: the first interpolation from the tick after the summon, the second at 6 t of life left, killed at 0
+ const lightAt=(x,t)=>{const a=x.at+1,b=x.at+x.life-6,e=x.at+x.life;if(t<x.at||t>=e)return null;const L=(p,q,u)=>({t:lerp(p.t,q.t,clamp(u)),s:p.s+(q.s-p.s)*clamp(u)});
+  const v=t<b?L(x.v0,x.v1,(t-a)/x.d):L(x.v1,x.v2,(t-b)/x.d2);return{v,col:t>=x.at+x.life-4?FADE_TINT:16777215};};
+ for(let t=150;t<=166;t+=.5){const L=[];for(const x of Object.values(STRIKE)){const k=lightAt(x,t);if(k)L.push(`summon minecraft:item_display ~ ~ ~ {Tags:["rd_strike"],billboard:"fixed",item_display:"none",brightness:{block:15,sky:15},transformation:${nbt(lightTf(k.v))},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:raiden/judgment/${x.model}","minecraft:custom_model_data":{colors:[${k.col}]}}}}`);}
+  put(path.join(D,`rd_dbg/mgfx/${Math.floor(t)}${t%1?'h':''}.mcfunction`),L.join('\n')||'# nothing');}
+ put(path.join(debugDp,'mg_strike.json'),JSON.stringify({rake:RAKE,impact:IMPACT,clash:CLASH}));
 }
 const hit=rigAt(HIT),tip=add(hit.sword[0],times(hit.d,(BLADE.y1-8)/16*SWORD));
 console.log(`Built the 만겁 rift + arm: ${Object.keys(parts).length} displays, ${Object.keys(MODELS).length} models (${Object.values(MODELS).reduce((a,e)=>a+e.length,0)} elements), ${KEYS.length} key frames ${T0}..${T_END}; `+
- `the cut sweeps ${sweepAll.toFixed(0)} deg (146 -> 160; ${sweep.toFixed(0)} deg in 148..158), crosses the player's front on ${HIT} (heading ${hit.heading.toFixed(1)}, elevation ${hit.elev.toFixed(1)} deg over the dome, gap ${hitGap.toFixed(2)}; tip ${tip.map(v=>v.toFixed(2))}); `+
- `largest key step ${stepMax[0].toFixed(1)} deg (${stepMax[1]}); lowest y ${Math.min(low,cLow).toFixed(2)}, nearest solid ${inDome.toFixed(2)} b from the dome centre (client view ${cInDome.toFixed(2)}), farthest ${far.toFixed(1)} b; client tip deviation ${tipDev.toFixed(2)} b; elbow at most ${elbowMax.toFixed(1)} deg through the cut (client view 147..160).`);
+ `the cut sweeps ${sweepAll.toFixed(0)} deg (146 -> 160; ${sweep.toFixed(0)} deg in 148..158), strikes the dome at the player's front on ${HIT} (heading ${hit.heading.toFixed(1)}, elevation ${hit.elev.toFixed(1)}; blade ${(-hitGap).toFixed(2)} b into the shell, the blade and its light at most ${(DOME_R-Math.min(bIn,cbIn)).toFixed(2)} b in the client view; tip ${tip.map(v=>v.toFixed(2))}) and rakes it ${rakeT[0]}..${rakeT.at(-1)} (${rakeDist.toFixed(1)} b over its top, client view); `+
+ `largest key step ${stepMax[0].toFixed(1)} deg (${stepMax[1]}); lowest y ${Math.min(low,cLow).toFixed(2)}, arm / fist / guard at least ${inDome.toFixed(2)} b from the dome centre (client view ${cInDome.toFixed(2)}), farthest ${far.toFixed(1)} b; client tip deviation ${tipDev.toFixed(2)} b; elbow at most ${elbowMax.toFixed(1)} deg through the cut (client view 147..160).`);
