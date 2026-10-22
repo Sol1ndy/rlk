@@ -4,7 +4,7 @@ execute if score @s rdTime matches 10 at @s rotated as @s run execute at @s rota
 execute if score @s rdTime matches 10 at @s rotated as @s run function rlk:boss/raiden/rig/play/p_twirl_slam
 execute if score @s rdTime matches 10 at @s rotated as @s run function rlk:boss/raiden/line/return_dust
 execute if score @s rdTime matches 10 at @s rotated as @s run function rlk:boss/raiden/fx/twirl {life:36}
-execute if score @s rdTime matches 10 at @s rotated as @s run function rlk:boss/raiden/hazard/new {k:1,a:6500,b:0,c:0,d:0,e:46240000,f:0,tol:300,tell:40,dmg:22,life:51,ev:10,max:1,grp:0,dk:0,dl:0,kb:0,sv:1,sm:3,snd:1,nd:1,jp:0,det:0,lf:0,fv:0}
+execute if score @s rdTime matches 10 at @s rotated as @s run function rlk:boss/raiden/hazard/new {k:1,a:6500,b:0,c:0,d:0,e:46240000,f:0,tol:300,tell:40,dmg:22,life:51,ev:10,max:1,grp:0,dk:0,dl:0,kb:0,sv:1,sm:3,go:0,sp:0,snd:1,nd:1,jp:0,det:0,lf:0,fv:0}
 execute if score @s rdTime matches 16 at @s rotated as @s run function rlk:boss/raiden/fx/snd/twirl_beat
 execute if score @s rdTime matches 22 at @s rotated as @s run function rlk:boss/raiden/fx/snd/twirl_beat
 execute if score @s rdTime matches 28 at @s rotated as @s run function rlk:boss/raiden/fx/snd/twirl_beat

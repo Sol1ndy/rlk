@@ -23,6 +23,10 @@ from .core import (DRAIN, DRAIN_DEFAULT, DRAIN_REACTION, EXHAUST, FLOWER_BREAK, 
 from .lines import VOICE2
 
 T_LEN = 60                      # transformation length (armor_start); core.TRANSFORM_LEN (also 60) only scales the bar
+# The armour beat of the transformation: the clip `transform` turns her into the Tenma (event `form`, clip tick 50 =
+# rdTime 50), the burst at 46 announces it. From this tick she carries rlk_rd_armoured and combat/apply ignores hits
+# (phase 1); before it the transformation takes damage normally and she can die (user 10-22).
+ARMOR_BEAT = 50
 TAGS = '"rlk_room","rlk_raiden_aux","rlk_rd_tmp","rlk_rd_tm"'
 SPOT = 'rlk_rd_tm_spot'
 AT_SPOT = f'execute at @e[tag={SPOT},limit=1] run '
@@ -143,7 +147,9 @@ def lifecycle():
              'kill @e[tag=rlk_rd_clap]', 'kill @e[tag=rlk_rd_shadow]']
     write('transform_start', [
         '# Phase 0 -> 1 (rage full while no pattern runs, or a test). Clears every pattern entity and visual, cancels a',
-        '# blink, then transform_tick plays the 60 t transformation (immune: combat/apply returns in phase 1).',
+        '# blink, then transform_tick plays the 60 t transformation. Hits land (and can kill her) until the armour',
+        f'# beat {ARMOR_BEAT} (tag rlk_rd_armoured: combat/apply returns in phase 1 from then on), as in phase 0.',
+        'tag @s remove rlk_rd_armoured',
         'scoreboard players set @s rdGo 0', 'scoreboard players set @s rdNext 0', 'scoreboard players set @s rdWalk 0',
         'scoreboard players set @s rdBlink 0', 'kill @e[tag=rlk_rd_blink_dest]',
         call('illusion/cleanup'), call('movement/cleanup')] + clear + [
@@ -164,7 +170,7 @@ def lifecycle():
        'execute store result storage rlk:rd tm.rot int 1 run random value 0..359',
        call('tm/t/pillars') + ' with storage rlk:rd tm', snd('transform_pillars'), 'execute positioned ~ ~9 ~ run ' + fx('star'))
     ev(t, 46, fx('transform_burst'))
-    ev(t, 50, call('transform_title'), 'function rlk:room/raiden/look_tenma')
+    ev(t, ARMOR_BEAT, call('transform_title'), 'function rlk:room/raiden/look_tenma', 'tag @s add rlk_rd_armoured')
     ev(t, T_LEN, call('armor_start'))
     write('transform_tick', ['# Phase 1, as the boss: the transformation timeline on rdTime (plan B.2 row T).'] + t)
     write('tm/t/pillars', ['# The five free pillars of the transformation (r 1.5, hit 20 t later) on a fixed layout turned by {rot}.'] + [
@@ -177,8 +183,8 @@ def lifecycle():
         'scoreboard players set @a[tag=player] vBig 79', 'scoreboard players set @a[tag=player] ttlT 79',
         'scoreboard players set #rdCap rd 1', 'scoreboard players set #rdCapPat rd 0'])
     write('armor_start', [
-        '# End of the transformation: the Tenma phase with the full armour.',
-        'attribute @s minecraft:scale base set 2.2', 'scoreboard players set @s rdPhase 2',
+        '# End of the transformation: the Tenma phase with the full armour (the shield takes over from the phase-1 tag).',
+        'attribute @s minecraft:scale base set 2.2', 'scoreboard players set @s rdPhase 2', 'tag @s remove rlk_rd_armoured',
         f'scoreboard players set @s rdShield {SHIELD_MAX}', 'scoreboard players set @s rdUltUsed 0',
         'scoreboard players set @s rdPTime 0', 'scoreboard players set @s rdTurns 0', 'scoreboard players set @s rdHitCD 0',
         'scoreboard players set @s rdTmCD 0', 'scoreboard players set @s rdTmChain 0', call('finish'),
@@ -447,7 +453,7 @@ def p14():
         '$execute at @e[tag=rlk_raiden_arena,limit=1] positioned ~$(x) ~ ~$(z) run ' + decal('ring', r=2.5, life=0).replace('life:0', 'life:$(life)')])
 
 
-# 만겁 sky rift and arm (build_raiden_judgment_rig.mjs: T0 56, key frames to 190, the katana meets the dome on 152)
+# 만겁 sky rift and arm (build_raiden_judgment_rig.mjs: T0 56, key frames to 190, the sweep crosses the dome on 152)
 MG_RIFT, MG_RIG_END = 56, 190
 MG_BOLTS = [(154, 13, -9), (157, -15, 4), (161, 6, 16), (165, -9, -14)]
 
@@ -456,10 +462,10 @@ def p15():
     # 만겁 (B-17 + the user's reference video S:rd/src/user_refs/mangeop_ref.mp4): she vanishes (immune, hidden, burst
     # energy 0), the arena tints, the flower appears at the centre with the real-game prompt; 1 electro or 4 other hits
     # raise the dome (r 8). The sky tears open on the far side of the flower from the player (56: a slit that gapes into
-    # a starry void by 78), a giant armoured arm draws a katana out of it (84..), holds it back to the left (146) and cuts
-    # left -> right: on 152 the blade strikes the dome edge-first (the clash) while the arena-wide slash kills everyone
-    # outside it; violet bolts fall round the arena, the dome cracks (160) and shatters (176) as the rift collapses
-    # (178..188), she reappears at the centre (184). The camera stays free (the rig faces the player instead; the
+    # a starry void by 78), a giant armoured arm draws a katana out of it (84..), holds it back to the left (146) and
+    # sweeps it about 220 degrees left -> right (147..160, user 10-22): on 152 the blade crosses the player's front over
+    # the dome (the clash) while the arena-wide slash kills everyone outside it; violet bolts fall round the arena, the
+    # dome cracks (160) and shatters (176) as the rift collapses (178..188), she reappears at the centre (184). The camera stays free (the rig faces the player instead; the
     # release's camera lock is not restored). Clips t_vanish (gone 14), t_reform (appear 0).
     p = pattern(15, '만겁')
     ev(p, 1, clip('t_vanish'), call('line/mangeop'), 'scoreboard players set @s rdUltUsed 1', face, flat, fx('iai_charge'))
@@ -500,8 +506,8 @@ def p15():
         'execute at @e[tag=rlk_rd_dome,limit=1] run ' + hz('safe_dome', 1, 1, r=8, nododge=True),
         'execute unless entity @e[tag=rlk_rd_dome,limit=1] at @e[tag=rlk_raiden_arena,limit=1] run ' + hz('safe_dome', 1, 1, r=0.001, nododge=True)])
     write('tm/mg/slash', [
-        '# @s = the boss, tick 152: the screen-wide crescent; the katana strikes a held dome (the clash at the blade), which',
-        '# cracks a quarter of the armour. The flower is spent.',
+        '# @s = the boss, tick 152: the screen-wide crescent; the sweeping katana is deflected by a held dome (the clash at',
+        '# the blade), which cracks a quarter of the armour. The flower is spent.',
         center + fx('mangeop_slash'),
         'execute if entity @e[tag=rlk_rd_dome,limit=1] run ' + call('judgment_rig/clash'),
         f'execute if entity @e[tag=rlk_rd_dome,limit=1] run scoreboard players remove @s rdShield {FLOWER_BREAK}',

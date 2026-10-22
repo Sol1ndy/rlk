@@ -9,8 +9,9 @@ execute if entity @s[tag=rlk_rd_object] run return run function rlk:boss/raiden/
 # 챕터 보스 히트 프록시(rlk_mb_px): 같은 공격의 중복을 거르고 몸체로 넘김(숫자는 프록시 자리). 큰 몸체(rlk_mb_big)를 직접 맞힌 공격도 같은 거름
 execute if entity @s[tag=rlk_mb_px] run return run function rlk:mboss/px/hit
 execute if entity @s[tag=rlk_mb_big] unless score #pxIn mb matches 1 unless score #trueDmg tmp matches 1 unless function rlk:mboss/px/dup run return 0
-# The transformation and the hidden real body of the illusion challenge are protected.
-execute if entity @s[tag=rlk_raiden,scores={rdPhase=1}] run return 0
+# The transformation once the Tenma armour exists (Raiden tags rlk_rd_armoured at its armour beat; before it she takes
+# damage and can die) and the hidden real body of the illusion challenge are protected.
+execute if entity @s[tag=rlk_raiden,tag=rlk_rd_armoured,scores={rdPhase=1}] run return 0
 execute if entity @s[tag=rlk_raiden,scores={rdPat=5}] run return 0
 execute if entity @s[tag=rlk_raiden,scores={rdPat=15}] run return 0
 execute if entity @s[tag=rlk_raiden,scores={rdBlink=1..}] run return 0

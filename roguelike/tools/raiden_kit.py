@@ -5,8 +5,14 @@ generators (raiden_enc/*, build_raiden_illusions.py, ...) emit commands with hz(
 HAZARD API v2 (B.0). A hazard is a marker tagged rlk_rd_hazard at a floor point with a frozen yaw. It hits at its
 `tell` (rdWind) tick; it is quiet unless `decal` names a B.3 kind; at the hit a separate strike display is summoned
 (every static hazard, quiet or not) and the decal is killed. Travelling kinds (sweep / slab / orb) launch at `tell`:
-their cards are summoned one tick earlier and receive ONE interpolation (translation and scale linear in time) at the
-launch tick; the server test uses the same start tick and speed, so no per-tick visual commands run.
+their cards are summoned TRAVEL_GAP ticks before they start moving and then receive ONE interpolation (translation and
+scale linear in time); the server test uses the same speed, so no per-tick visual commands run. User 10-22 (the 7th
+금강괴멸파 volley, three rings at once, was sometimes invisible): a client that gets a display's spawn and its
+interpolated transformation before it has ticked that display once shows the END state at once (the rings sat out at
+the wall, behind it); in the busiest tick of the fight (72 ring cards) the two packets could land in one client tick.
+So the cards appear min(tell, gap) ticks before the launch and start to move gap ticks after their summon; a hazard
+created less than `gap` ticks before its launch (every tell-1 hazard) shows its cards at the front of that later tick
+(a lead of at most gap - 1 ticks, never a lag) and moves them over the rest of the travel.
 
     hz(kind, tell=.., dmg=.., <shape params>, <flags>)  ->  one command line (call it where the hazard should be:
                                                             `execute positioned .. rotated .. run ` + hz(..))
@@ -37,7 +43,9 @@ FX CUES (D.1): fx(cue) -> `function rlk:boss/raiden/fx/<cue>` plays the cue's va
 the cues below, summons timed cards (they need no cleanup; `kill @e[tag=rlk_rd_fx]` clears them):
   star (4-point star + 1 b ring flash), blink_out / blink_in, switch_hoop / switch_burst (27 / 28; the vortex is the rig prop),
   bolt / bolt_big (sky bolt + shock ring), crystal, parry (gold waist crescent), counter_cue (black line),
-  guard_shatter (burst + gold light pillar, 100 t), eye_spawn (cyan sky beam), eye_break, eye_blast, musou_slash,
+  guard_shatter (white-violet shatter burst + short white flash), guard_beam (soft gold light beam that comes down on
+  her and is gone after 12 t; sg/stun_tick plays it 13 t into the guard-break stun), eye_spawn (cyan sky beam),
+  eye_break, eye_blast, musou_slash,
   glaive_throw (pink beam), bomb (flash + ink), iai_charge, danjeol_halo, danjeol_column, clap_star, shadow_palm,
   vajra_pulse, mangeop_dome, mangeop_slash, mangeop_clash (the 만겁 katana meets the dome), transform_burst; with
   macro arguments: twirl {life} (polearm ring; call fx/snd/twirl_beat every 6 t), eye_glow {r,life} (cyan danger
@@ -63,6 +71,9 @@ SHAPE_BASE = 20                     # rdShape of a hazard = 20 + kind (1..14 wer
 TRAVEL = (5, 6, 7)
 ARENA_WALL_R = 24.0
 SEG_DEG = 15                        # one ring segment card per 15 degrees (24 per full ring)
+# ticks between a travelling hazard's card summon and their interpolation (module docstring; user 10-22): rings (24
+# cards each, up to 72 in one tick) wait 3, the single-card slabs and orbs 2
+TRAVEL_GAP = {'sweep': 3, 'slab': 2, 'orb': 2}
 
 # B.3 decal kinds: id -> (tag kind, model, sizing).  'ring' resolves to the thin or the bold sprite by radius.
 DECALS = {
@@ -105,6 +116,8 @@ WAVE_R, WAVE_Y = 1.08, 2.6
 # strike frames by remaining life (rdHLife counts down): colour (custom_model_data tint) or the after model
 FLASH = {9: 0xC8B6EA, 8: 0xEDE4FF}
 AFTER_AT, AFTER_TINT, FADE_AT, FADE_TINT = 7, 0xA898D8, 4, 0x6A5A98
+# cue cards with a second stage (card(..., s2=...), tag rlk_rd_fxb) start it with this many ticks of life left
+FX2_AT = 6
 
 
 # D.1 vanilla sound recipes: cue -> [(event, volume, pitch)] (every id is in the 26.3 sound_event registry; the kit
@@ -122,7 +135,8 @@ SOUNDS = {
     'crystal': [('block.amethyst_cluster.break', 1.0, 1.0), ('block.glass.break', 0.6, 1.3)],
     'parry': [('item.shield.block', 1.0, 1.4)],
     'counter_cue': [('block.anvil.land', 0.4, 2.0)],
-    'guard_shatter': [('block.glass.break', 1.0, 0.8), ('block.beacon.power_select', 0.9, 1.2)],
+    'guard_shatter': [('block.glass.break', 1.0, 0.8)],
+    'guard_beam': [('block.beacon.power_select', 0.9, 1.2)],
     'eye_spawn': [('block.beacon.activate', 1.0, 1.2)],
     'eye_glow': [('block.beacon.ambient', 1.0, 1.4)],
     'eye_break': [('block.amethyst_cluster.break', 1.0, 0.9)],
@@ -261,9 +275,12 @@ def hz_args(kind, tell, dmg, *, r=0.0, rmin=0.0, half=180.0, len=0.0, wid=0.0, o
             kbsteps += 1
         kbsteps += 2 if lift else 0
     assert sm is None or sm in STRIKE_MOTION, sm
+    # travelling cards: summoned at rel sp (= -min(tell, gap)), moving from rel go (= gap - min(tell, gap) >= 0)
+    lead = min(tell, TRAVEL_GAP[kind]) if travel else 0
+    sp, go = -lead, (TRAVEL_GAP[kind] - lead if travel else 0)
     return dict(k=k, a=a, b=b, c=c, d=d, e=e, f=f, tol=_mb(tol), tell=tell, dmg=dmg, life=life, ev=max(1, every),
                 max=hits, grp=1 if group else 0, dk=dk, dl=dlife, kb=kbsteps, sv=sv, sm=STRIKE_MOTION.get(sm, 0),
-                snd=1 if sound else 0,
+                go=go, sp=sp, snd=1 if sound else 0,
                 nd=1 if nododge else 0, jp=1 if jump else 0, det=1 if detached else 0, lf=1 if lift else 0,
                 fv=_f(v) if kind == 'follow' else '0')
 

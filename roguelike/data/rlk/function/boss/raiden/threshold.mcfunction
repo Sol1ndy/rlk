@@ -1,4 +1,3 @@
-scoreboard players operation #dmg tmp = @s mhpC
-scoreboard players operation #dmg tmp -= #rdFloor rd
-execute if score #dmg tmp matches ..0 run scoreboard players set #dmg tmp 0
+# The 55 % HP gate of the first cycle: rage full, so the transformation starts at the next decision point. The damage
+# lands in full (no HP floor since 10-22); at 0 HP she simply dies.
 scoreboard players set @s rdRage 900
