@@ -463,10 +463,11 @@ def p15():
     # energy 0), the arena tints, the flower appears at the centre with the real-game prompt; 1 electro or 4 other hits
     # raise the dome (r 8). The sky tears open on the far side of the flower from the player (56: a slit that gapes into
     # a starry void by 78), a giant armoured arm draws a katana out of it (84..), holds it back to the left (146) and
-    # sweeps it about 220 degrees left -> right (147..160, user 10-22): on 152 the blade crosses the player's front over
-    # the dome (the clash) while the arena-wide slash kills everyone outside it; violet bolts fall round the arena, the
-    # dome cracks (160) and shatters (176) as the rift collapses (178..188), she reappears at the centre (184). The camera stays free (the rig faces the player instead; the
-    # release's camera lock is not restored). Clips t_vanish (gone 14), t_reform (appear 0).
+    # swings it about 210 degrees left -> right with the arm straight (147..160, user 10-22 / 10-22b): on 152 the blade
+    # crosses the player's front over the dome (the clash) while the arena-wide slash kills everyone outside it; violet
+    # bolts fall round the arena, the dome cracks (160) and shatters (176) as the rift collapses (178..188), she
+    # reappears at the centre (184). The camera stays free (the rig faces the player instead; the release's camera lock
+    # is not restored). Clips t_vanish (gone 14), t_reform (appear 0).
     p = pattern(15, '만겁')
     ev(p, 1, clip('t_vanish'), call('line/mangeop'), 'scoreboard players set @s rdUltUsed 1', face, flat, fx('iai_charge'))
     ev(p, 14, call('tm/mg/vanish'))

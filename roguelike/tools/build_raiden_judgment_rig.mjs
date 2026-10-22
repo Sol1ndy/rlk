@@ -14,12 +14,14 @@
 // The parts carry rlk_rd_tmp / rlk_rd_tm, so the pattern's finish, pause, transformation and death remove them. They
 // stand on one yaw toward the player, so the cut happens in front of whoever watches the flower, with the camera free.
 // The rig frame: +Z toward the player, -X screen-left (as the player sees it), floor y = 0, the safe dome is the sphere
-// r 8 about the origin. Rift opens T0.., the arm emerges 84.., draws the katana back to the left and holds 146, sweeps it
-// about 220 degrees left -> right in front of the player (147..160; one key frame per tick), low over the arena outside
-// the dome and over the dome as it crosses the player's front on HIT (the lethal slash, the clash), follows through far
-// to the right (160), withdraws slowly into the rift by 186 and the rift collapses with the dome's shatter (176 -> 188).
-// Nothing goes below the floor (hidden = scale 0 at the shoulder, never a teleport) and no solid part enters the dome,
-// in the exact poses and in what the client shows between key frames (all checked here).
+// r 8 about the origin. Rift opens T0.., the arm emerges 84.., straightens as it draws the katana back to the left and
+// holds 146, then swings it about 210 degrees left -> right in front of the player (147..160; one key frame per tick)
+// as one straight lever from the shoulder (arm, fist and blade in a line), high across the sky and over the dome as it
+// crosses the player's front on HIT (the lethal slash, the clash), follows through far to the right (160), bends and
+// withdraws slowly into the rift by 186 and the rift collapses with the dome's shatter (176 -> 188). Nothing goes below
+// the floor (hidden = scale 0 at the shoulder, never a teleport), no solid part enters the dome, the blade stays out of
+// the arena wall and the elbow stays straight through the cut, in the exact poses and in what the client shows between
+// key frames (all checked here).
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -177,14 +179,17 @@ function basisQuat(x,y,z){const m=[x[0],y[0],z[0],x[1],y[1],z[1],x[2],y[2],z[2]]
 // User 10-22 ("갑주 팔이 나와서 베는게 아니라 그냥 톡 치고 들어가는데"): the 10-22a restoration cut only 70 degrees (from
 // heading -100 to -30, still on the player's left), stopped dead on the dome's edge, shuddered there and recoiled up and
 // back, with 4-8 t between the key frames of the recoil (forearm / hand turning 63-73 degrees per key). It read as a
-// poke. Now the arm draws the katana far back to the left (146), then sweeps it about 220 degrees left -> right in
-// front of the player (147..160; 200 degrees in 148..158, up to 31 degrees per tick with one key frame per tick, so no
-// display turns more than about 40 degrees between two keys and the client's shortest-path slerp follows the arc):
-// with the arm nearly straight, low over the arena floor outside the dome at the sides and over the dome's top as it
-// crosses the player's front on HIT (the clash; the dome lifts the blade if it would touch), then it follows through
-// far to the right and up (160), five afterimage cards trail the blade along the arc, and the arm withdraws slowly up
-// into the rift (to 186). The checks below run on the exact poses AND on the poses the client shows between key frames
-// (translation / scale lerp, rotation slerp).
+// poke. 10-22f made it a 220-degree sweep, but the arm was solved by IK onto a grip path and swung with the elbow folded
+// (user 10-22b: "인게임의 갑주는 팔꿈치를 펴고 베는데 네가 만든건 팔꿈치를 접은 채로 엉성하게 베잖아"). Now the arm is posed
+// by forward kinematics from the shoulder (keys below): it draws the katana back to the left straightening (146), then
+// swings shoulder -> elbow -> wrist -> blade as ONE straight lever (elbow 2 degrees, the blade in the forearm's line,
+// the knuckles leading) about 210 degrees left -> right (147..160; 196 degrees in 148..158, at most 28 degrees per tick
+// with one key frame per tick, so the client's shortest-path slerp follows the arc), high across the sky like the
+// armour of the reference video (S:rd/src/user_refs/mangeop_ref.mp4, 6.4..7.2 s), lifted over the dome as it crosses
+// the player's front on HIT (the clash), follows through far to the right (160), five afterimage cards trail the blade
+// along the arc, and only then the elbow bends as the arm withdraws slowly up into the rift (162..186). The checks below
+// run on the exact poses AND on the poses the client shows between key frames (translation / scale lerp, rotation
+// slerp).
 const T0=56,T_END=190,HIT=152,DOME_R=8,ARENA_R=24;
 // Sky rift: the eye-shaped void (40 x 16 model units) at scale RIFT, tilted to face down toward the dome; from the flower
 // it spans about 14..49 degrees above the horizon and 90 degrees across (the torn sky of the reference video).
@@ -200,91 +205,88 @@ const bladeFrame=(heading,elev)=>{const ph=rad(heading),be=rad(elev),d=[Math.sin
 const bladeGap=(g,th,el=0)=>Math.min(...atPose({t:g,q:bladeFrame(th,el).q,s:[SWORD,SWORD,SWORD]},KATANA).map(p=>Math.hypot(...p)))-DOME_R;
 // The dome deflects the blade: at a grip point g and heading th the elevation is raised just enough that the blade
 // passes CLEAR blocks outside the dome (CLEAR covers the chord the client cuts between two per-tick key frames).
-const CLEAR=.45,lift=(g,th,el)=>{let e=el;while(bladeGap(g,th,e)<CLEAR&&e<75)e+=.25;return e;};
-// Keys: h = grip point, a = [heading, elevation] of the blade before the lift (heading 0 points at the player, -90
-// screen-left, +90 screen-right); hold = zero velocity; the others take Catmull-Rom tangents. During the cut the grip
-// runs a wide arc with the arm nearly straight: low and far out at the sides (3.6 b up, 10-11 b off the shoulder's
-// vertical), up over the dome's front in the middle (8 b up, 6.6 b in front of the flower), so the whole arm swings with
-// the blade; the blade is cocked back at the start, in line at the middle, trailing at the end, and stays inside the
-// arena wall (or above its top) at the sides.
-const R=v=>add(SHOULDER,times(v,1.25));
-const HOLD=[-9.5,5.5,-17.5];
+// Keys, forward kinematics from the shoulder (user 10-22b: "인게임의 갑주는 팔꿈치를 펴고 베는데 ... 팔꿈치를 접은 채로
+// 엉성하게 베잖아"): u = [heading, elevation] of the upper arm (heading 0 points at the player, -90 screen-left, +90
+// screen-right), b = [elbow bend, degrees], p = the side the elbow bends to (projected off the upper arm), a = [heading,
+// elevation] of the blade where the wrist is free, w = [wrist freedom]: 0 = the blade continues the forearm's line, 1 =
+// the blade points along `a`. The arm comes out of the rift bent (84..), straightens as it draws the katana back to the
+// left (136..146), and from 146 to 160 shoulder, elbow, wrist and blade are ONE straight lever (bend 0-3 degrees, w 0)
+// swung from the shoulder like the reference video's armour: high across the sky, over the dome at the player's front
+// (the lever is lifted there, LIFT), down a little toward the arena wall at the sides. It bends again only as it
+// withdraws (162..). hold = zero velocity; the other keys take Catmull-Rom tangents.
 const keys=[
- {t:84,h:SHOULDER,a:[-80,80],p:[-1,0,.45],hold:1},
- {t:106,h:R([-3.4,-1.85,1.65]),a:[-92,70],p:[-1,0,.45]},
- {t:124,h:R([-6.0,-3.0,1.4]),a:[-100,46],p:[-1,.2,.45]},
- {t:136,h:R([-7.2,-3.4,-.6]),a:[-104,40],p:[-1,.3,.4]},
- {t:146,h:HOLD,a:[-106,38],p:[-1,.4,.3],hold:1},
- {t:147,h:[-10.4,4.4,-15.0],a:[-103,27],p:[-1,.45,.3]},
- {t:148,h:[-10.4,3.8,-12.2],a:[-90,30],p:[-1,.5,.3]},
- {t:149,h:[-9.2,3.8,-9.6],a:[-70,6],p:[-.9,.5,.5]},
- {t:150,h:[-7.0,5.6,-8.4],a:[-52,2],p:[-.7,.5,.8]},
- {t:151,h:[-3.6,8.0,-7.8],a:[-24,2],p:[-.35,.5,1]},
- {t:HIT,h:[.3,8.9,-7.8],a:[6,0],p:[0,.5,1]},
- {t:153,h:[4.0,8.0,-8.0],a:[36,2],p:[.35,.5,1]},
- {t:154,h:[7.2,5.6,-8.6],a:[62,2],p:[.7,.5,.8]},
- {t:155,h:[9.0,3.6,-10.2],a:[80,6],p:[.9,.5,.5]},
- {t:156,h:[10.6,3.6,-12.6],a:[94,28],p:[1,.5,.3]},
- {t:157,h:[10.4,4.0,-15.2],a:[104,38],p:[1,.45,.3]},
- {t:158,h:[9.9,4.6,-17.0],a:[110,44],p:[1,.4,.3]},
- {t:160,h:[9.4,5.2,-18.2],a:[114,48],p:[1,.4,.3],hold:1},
- {t:165,h:R([4.2,-2.6,1.2]),a:[108,56],p:[1,.3,.35]},
- {t:170,h:R([2.8,-1.6,1.0]),a:[100,66],p:[.9,.2,.4]},
- {t:176,h:R([1.4,-.8,.6]),a:[90,74],p:[.8,.1,.45]},
- {t:182,h:R([.4,-.2,.2]),a:[84,82],p:[.8,0,.45]},
- {t:186,h:SHOULDER,a:[80,85],p:[.8,0,.45],hold:1}];
+ {t:84, u:[-60,-50],b:[110],p:[-1,.3,.4],a:[-80,80],w:[1],hold:1},
+ {t:106,u:[-80,-28],b:[85], p:[-1,.3,.4],a:[-92,70],w:[1]},
+ {t:124,u:[-96,-2], b:[48], p:[-1,.4,.3],a:[-100,46],w:[1]},
+ {t:136,u:[-102,16],b:[18], p:[-1,.5,.2],a:[-104,28],w:[.4]},
+ {t:146,u:[-102,22],b:[3],  p:[-1,.5,.2],a:[-102,22],w:[0],hold:1},
+ {t:147,u:[-98,16], b:[2],  p:[-1,.5,.2],a:[-98,16], w:[0]},
+ {t:148,u:[-88,6],  b:[2],  p:[-1,.5,.2],a:[-88,6],  w:[0]},
+ {t:149,u:[-72,-3], b:[2],  p:[-.9,.5,.4],a:[-72,-3],w:[0]},
+ {t:150,u:[-50,-2], b:[2],  p:[-.6,.5,.7],a:[-50,-2],w:[0]},
+ {t:151,u:[-22,3],  b:[2],  p:[-.3,.5,.9],a:[-22,3], w:[0]},
+ {t:HIT,u:[6,4],    b:[2],  p:[0,.5,1],  a:[6,4],    w:[0]},
+ {t:153,u:[34,3],   b:[2],  p:[.3,.5,.9],a:[34,3],  w:[0]},
+ {t:154,u:[60,-2],  b:[2],  p:[.6,.5,.7],a:[60,-2], w:[0]},
+ {t:155,u:[80,-3],  b:[2],  p:[.9,.5,.4],a:[80,-3], w:[0]},
+ {t:156,u:[95,1],   b:[2],  p:[1,.5,.2], a:[95,1],  w:[0]},
+ {t:157,u:[105,7],  b:[2],  p:[1,.5,.2], a:[105,7], w:[0]},
+ {t:158,u:[111,11], b:[2],  p:[1,.5,.2], a:[111,11],w:[0]},
+ {t:160,u:[115,15], b:[2],  p:[1,.5,.2], a:[115,15],w:[0],hold:1},
+ {t:163,u:[110,20], b:[20], p:[1,.5,.2], a:[114,26],w:[.4]},
+ {t:166,u:[102,26], b:[45], p:[1,.5,.2], a:[108,48],w:[1]},
+ {t:170,u:[94,32],  b:[70], p:[1,.4,.3], a:[100,64],w:[1]},
+ {t:186,u:[90,40],  b:[90], p:[1,.3,.4], a:[90,80], w:[1],hold:1}];
 function channel(name,t){const n=keys.length;if(t<=keys[0].t)return keys[0][name];if(t>=keys[n-1].t)return keys[n-1][name];
  let i=0;while(keys[i+1].t<=t)i++;const A=keys[i],B=keys[i+1],T=B.t-A.t,u=(t-A.t)/T;
  const tan=k=>{const K=keys[k];if(K.hold||k===0||k===n-1)return K[name].map(()=>0);return sub(keys[k+1][name],keys[k-1][name]).map(v=>v/(keys[k+1].t-keys[k-1].t));};
  const h00=2*u*u*u-3*u*u+1,h10=u*u*u-2*u*u+u,h01=-2*u*u*u+3*u*u,h11=u*u*u-u*u,m0=tan(i),m1=tan(i+1);
  return A[name].map((v,j)=>h00*v+h10*T*m0[j]+h01*B[name][j]+h11*T*m1[j]);}
-// Two-bone arm with fixed segment lengths; the elbow bends toward the keyed pole `p` (on the player's left while the arm
-// emerges and winds up, turning over the top to the right through the cut, so the elbow trails the hand and the forearm
-// stays high over the dome while the hand passes in front of it).
-function ik(s,w,a,b,pole){const v=sub(w,s),n=norm(v),D=Math.min(Math.max(Math.hypot(...v),Math.abs(a-b)+1e-4),(a+b)*.9995),x=(a*a-b*b+D*D)/(2*D),y=Math.sqrt(Math.max(0,a*a-x*x));let p=sub(pole,times(n,dot(pole,n)));if(Math.hypot(...p)<1e-3)p=cross(n,[1,0,0]);p=norm(p);return{elbow:add(s,add(times(n,x),times(p,y))),wrist:add(s,times(n,D)),short:Math.hypot(...v)-D};}
-// Bone frame: local -Y runs from a to b, local X is the normal of the arm's bend plane (shoulder, elbow, wrist: N; it
-// points the same way for both bones), so local -Z (the tomoe discs) lies in that plane. Both bones lie in it, so the
-// frame is defined and continuous however the arm turns (a camera-facing twist flipped the upper arm whenever a bone
-// pointed at the player: 75..170 degrees between two key frames of the sweep).
-function boneQ(a,b,N){const y=norm(sub(a,b)),x=norm(sub(N,times(y,dot(N,y))));return basisQuat(x,y,cross(x,y));}
-function bendFrame(s,sol,pole){const n=norm(sub(sol.wrist,s));let o=sub(sub(sol.elbow,s),times(n,dot(sub(sol.elbow,s),n)));
- if(Math.hypot(...o)<.05)o=sub(pole,times(n,dot(pole,n)));o=norm(o);return{N:norm(cross(n,o)),out:o};}
-// The lift as a function of the heading during the cut: the elevation each heading of the sweep needs (with the grip it
-// has there), dilated by +-LIFT_W degrees, so a blade the client slerps between two key frames up to 31 degrees apart
-// stays lifted all the way across the dome (a lift sampled only at the key ticks would let the chord dip into it).
-const LIFT_A=146,LIFT_B=162,LIFT_W=18;
+const dirOf=(h,e)=>[Math.sin(rad(h))*Math.cos(rad(e)),Math.sin(rad(e)),Math.cos(rad(h))*Math.cos(rad(e))];
+const angles=d=>[Math.atan2(d[0],d[2])*180/Math.PI,Math.asin(Math.max(-1,Math.min(1,d[1])))*180/Math.PI];
+// Bone frame: local -Y runs from a to b, local X is the horizontal tangent of the swing (the upper arm's heading turned
+// 90 degrees) projected off the bone, with a little world up where a bone points along it: continuous however the arm
+// turns, so no twist flips between key frames.
+function boneQ(a,b,X){const y=norm(sub(a,b)),off=v=>sub(v,times(y,dot(v,y)));const x=norm(add(off(X),times(off([0,1,0]),.25)));return basisQuat(x,y,cross(x,y));}
+// The lift over the dome: for every heading of the cut the lowest upper-arm elevation at which the straight lever (arm,
+// fist and katana) stays CLEAR outside the dome, dilated by +-LIFT_W degrees, so the lever the client slerps between two
+// key frames up to 30 degrees apart stays lifted all the way across. Through the cut the elevation is max(key, lift).
+const CLEAR=.45,LIFT_A=145,LIFT_B=162,LIFT_W=18;
 let NEED=null;
-const needAt=th=>{if(!NEED){NEED=[];for(let t=LIFT_A;t<=LIFT_B;t+=.05){const h=channel('h',t),[hd,el]=channel('a',t);NEED.push([hd,lift(h,hd,-30)]);}}
- let e=-90;for(const [hd,el] of NEED)if(Math.abs(hd-th)<=LIFT_W)e=Math.max(e,el);return e;};
-// The withdrawal: from RET the arm keeps the pose it has there (no IK while it shrinks) and draws back into the
-// shoulder as `size` falls to 0 (174..186), drifting up into the rift; the joints cannot flip while it collapses.
+function leverClear(h,e){const r=fk(h,e,0,[0,1,0],h,e,0,1);let m=1e9;for(const n of['upper','forearm','hand','sword']){const v=n==='upper'?scaled(r.upper,ARM):n==='forearm'?scaled(r.forearm,ARM):n==='hand'?scaled(r.hand,HAND):scaled(r.sword,SWORD);
+ for(const p of atPose(v,LEVER_HULL[n]))m=Math.min(m,Math.hypot(...p));}return m-DOME_R;}
+const needAt=th=>{if(!NEED){NEED=new Map();for(let h=-135;h<=135;h++){let e=-12;while(leverClear(h,e)<CLEAR&&e<70)e+=.25;NEED.set(h,e);}}
+ let e=-90;for(let h=Math.floor(th-LIFT_W);h<=Math.ceil(th+LIFT_W);h++)if(NEED.has(h))e=Math.max(e,NEED.get(h));return e;};
+// One arm pose: upper arm (hu, eu), elbow bend (deg) toward pole, blade (ha, ea) mixed with the forearm's line by w.
+function fk(hu,eu,bend,pole,ha,ea,w,size){
+ const u=dirOf(hu,eu);let pp=sub(pole,times(u,dot(pole,u)));if(Math.hypot(...pp)<1e-3)pp=sub([0,1,0],times(u,u[1]));pp=norm(pp);
+ const f=norm(add(times(u,Math.cos(rad(bend))),times(pp,Math.sin(rad(bend)))));
+ const E=add(SHOULDER,times(u,L1*size)),W=add(E,times(f,L2*size));
+ const d=norm(add(times(f,1-w),times(dirOf(ha,ea),w))),[heading,elev]=angles(d);
+ const {edge,q:swordQ}=bladeFrame(heading,elev),swing=[Math.cos(rad(hu)),0,-Math.sin(rad(hu))];
+ // the fist: local Y along the blade, local -X (the knuckles) toward the swing (the upper arm's horizontal tangent,
+ // projected off the blade): with the blade in the forearm's line the knuckles lead the cut, and the frame turns
+ // smoothly through the draw-back, the cut and the withdrawal (no flip between key frames)
+ let F=sub(swing,times(d,dot(swing,d)));if(Math.hypot(...F)<1e-3)F=edge;F=norm(F);const X=times(F,-1),handQ=basisQuat(X,d,cross(X,d));
+ const grip=add(W,rot(handQ,times(GRIP_OFF,HAND*size)));
+ return{size,upper:[SHOULDER,boneQ(SHOULDER,E,swing)],forearm:[E,boneQ(E,W,swing)],hand:[W,handQ],sword:[grip,swordQ],d,edge,heading,elev,bend,u,f};}
+// The withdrawal: from RET the arm keeps the pose it has there and draws back into the shoulder as `size` falls to 0
+// (174..186), drifting up into the rift; the joints cannot flip while it collapses.
 const RET=170;
-let worstReach=0;
 function rigAt(t){
- if(t>RET){const r=rigCore(RET),k=(1-smooth((t-174)/12))*1,up=[0,.9*smooth((t-RET)/16),0],to=v=>add(add(SHOULDER,times(sub(v,SHOULDER),k)),times(up,1-k*0)),r2=structuredClone(r);
+ if(t>RET){const r=rigCore(RET),k=1-smooth((t-174)/12),up=[0,.9*smooth((t-RET)/16),0],to=v=>add(add(SHOULDER,times(sub(v,SHOULDER),k)),up),r2=structuredClone(r);
   r2.size=k;for(const n of['upper','forearm','hand','sword'])r2[n]=[to(r[n][0]),r[n][1]];return r2;}
  return rigCore(t);
 }
 function rigCore(t){
  const size=smooth((t-84)/20)*(1-smooth((t-174)/12)),tense=smooth((t-136)/8)*(1-smooth(t-145));
- // a short tense tremble while the blade is held back, a shudder through the arm as the dome deflects the blade
- const shake=tense*.07+(t>HIT&&t<156?.04:0);
- const h=add(channel('h',t),times([Math.sin(t*2.9),Math.sin(t*4.1+1),Math.sin(t*3.3+2)],shake));
- const heading=channel('a',t)[0]+Math.sin(t*3.7)*1.2*tense,base=channel('a',t)[1];
- const elev=size<.5?base:t>=LIFT_A&&t<=LIFT_B?Math.max(base,needAt(heading)):lift(h,heading,base);
- const {d,edge,q:swordQ}=bladeFrame(heading,elev);
- if(size<.0001)return{size:0,upper:[SHOULDER,[0,0,0,1]],forearm:[SHOULDER,[0,0,0,1]],hand:[SHOULDER,[0,0,0,1]],sword:[SHOULDER,swordQ],d,edge,heading,elev};
- // the fist's frame: local -X along the forearm, projected off the blade; through the cut it is biased toward the edge
- // (the wrist on the spine side, no flip as the blade swings round), the bias fades out after the follow-through,
- // where the withdrawing forearm arrives from the edge side and would cancel it
- const bias=.5*(1-smooth((t-158)/6));
- const pole=norm(channel('p',t)),handFrame=sol=>{let F=norm(sub(sol.wrist,sol.elbow));F=norm(add(sub(F,times(d,dot(F,d))),times(edge,bias)));const X=times(F,-1);return basisQuat(X,d,cross(X,d));};
- let wrist=add(h,[0,size,0]),sol,handQ;
- for(let it=0;it<6;it++){sol=ik(SHOULDER,wrist,L1*size,L2*size,pole);handQ=handFrame(sol);wrist=sub(h,rot(handQ,times(GRIP_OFF,HAND*size)));}
- sol=ik(SHOULDER,wrist,L1*size,L2*size,pole);handQ=handFrame(sol);if(size>.99)worstReach=Math.max(worstReach,sol.short);
- const grip=add(sol.wrist,rot(handQ,times(GRIP_OFF,HAND*size)));
- const B=bendFrame(SHOULDER,sol,pole);
- return{size,upper:[SHOULDER,boneQ(SHOULDER,sol.elbow,B.N)],forearm:[sol.elbow,boneQ(sol.elbow,sol.wrist,B.N)],hand:[sol.wrist,handQ],sword:[grip,swordQ],d,edge,heading,elev};
+ // a short tense tremble while the blade is held back, a shudder through the arm as the lever passes over the dome
+ const shake=tense*1.2+(t>HIT&&t<156?.6:0),[hk,ek]=channel('u',t);
+ const hu=hk+Math.sin(t*3.7)*shake,eu0=ek+Math.sin(t*2.9)*shake*.5;
+ const eu=t>=LIFT_A&&t<=LIFT_B?Math.max(eu0,needAt(hu)):eu0;
+ const [ha,ea0]=channel('a',t),ea=ea0+(eu-eu0),w=clamp(channel('w',t)[0]),bend=Math.max(0,channel('b',t)[0]);
+ if(size<.0001){const {d,edge,q:swordQ}=bladeFrame(ha,ea);return{size:0,upper:[SHOULDER,[0,0,0,1]],forearm:[SHOULDER,[0,0,0,1]],hand:[SHOULDER,[0,0,0,1]],sword:[SHOULDER,swordQ],d,edge,heading:ha,elev:ea,bend};}
+ return fk(hu,eu,bend,norm(channel('p',t)),ha,ea,w,size);
 }
 // Five afterimages of the blade (lags in ticks), shown while the blade is fast (CUT_A .. CUT_B): they fan out behind it
 // along the arc of the cut.
@@ -292,6 +294,7 @@ const TRAILS=[[.45,'blade_trail_near'],[.9,'blade_trail_near'],[1.4,'blade_trail
 const CUT_A=147,CUT_B=158;
 const parts={rift_void:'rift_void',rift_depth:'rift_depth',rift_haze:'rift_haze',rift_edge:'rift_edge_0',rift_edge_glow:'rift_edge_glow',rift_stars:'rift_stars',rift_iris:'rift_iris',rift_fragments:'rift_fragments',upper:'upper_arm',forearm:'forearm',hand:'closed_hand',upper_veins:'upper_veins',forearm_veins:'forearm_veins',sword:'katana',blade_aura:'blade_aura',blade_haze:'blade_haze',blade_lightning:'blade_lightning_0',...Object.fromEntries(TRAILS.map(([,m],i)=>['trail'+(i+1),m]))};
 const scaled=([t,q],s)=>({t,q,s:[s,s,s]});
+const LEVER_HULL={upper:hullOf('upper_arm'),forearm:hullOf('forearm'),hand:hullOf('closed_hand'),sword:KATANA};
 function sword(t){const r=rigAt(t);return scaled(r.sword,SWORD*r.size);}
 function pose(t){
  // the sky splits (a thin slit T0..T0+14, then it gapes open to +22) and collapses with the dome's shatter (178..188)
@@ -346,10 +349,15 @@ if(Math.min(inDome,cInDome)<DOME_R-.1)throw new Error(`a solid judgment part ent
 let stepMax=[0,''];for(const n of Object.keys(parts)){let prev=poseAt(T0)[n];for(const k of KEYS){const p=poseAt(k===KEYS.at(-1)?T_END:KEYS[KEYS.indexOf(k)+1])[n];
  if(Math.max(...p.s)>1e-4&&Math.max(...prev.s)>1e-4){const a=2*Math.acos(Math.min(1,Math.abs(dot(p.q,prev.q))))*180/Math.PI;if(a>stepMax[0])stepMax=[a,`${n} key ${k}`];}prev=p;}}
 if(stepMax[0]>60)throw new Error(`a display turns ${stepMax[0].toFixed(1)} deg between two key frames (${stepMax[1]}): the client's shortest-path slerp would cut the arc`);
+// the straight arm through the cut (user 10-22b): the angle between the upper arm and the forearm as the client shows
+// them (each bone slerped between its key frames), every quarter tick 147..160
+const boneDir=v=>rot(v.q,[0,-1,0]);
+let elbowMax=0;for(let t=147;t<=160;t+=.25){const c=clientPose(t);elbowMax=Math.max(elbowMax,Math.acos(Math.min(1,dot(boneDir(c.upper),boneDir(c.forearm))))*180/Math.PI);}
+if(elbowMax>10)throw new Error(`the elbow bends ${elbowMax.toFixed(1)} deg during the cut (client view, 147..160; the arm must swing straight)`);
 const H=t=>rigAt(t).heading,sweep=H(158)-H(148),sweepAll=H(160)-H(146);
 if(sweep<150||!(H(HIT-1)<0&&H(HIT)>=0))throw new Error(`the cut is too short or misses the player's front on ${HIT} (148..158: ${sweep.toFixed(0)} deg; ${H(HIT-1).toFixed(0)} -> ${H(HIT).toFixed(0)})`);
 const hitGap=bladeGap(rigAt(HIT).sword[0],rigAt(HIT).heading,rigAt(HIT).elev);
-if(hitGap>1.2)throw new Error(`the blade does not meet the dome on HIT (gap ${hitGap.toFixed(2)})`);
+if(hitGap>5)throw new Error(`the blade does not pass over the dome on HIT (gap ${hitGap.toFixed(2)})`);
 
 // ---- functions: start (summon on the execution yaw), key frames, tick (as the boss), cleanup ----------------------------
 const f=v=>(Math.abs(v)<.0000005?0:v).toFixed(5).replace(/\.?0+$/,'')+'f',arr=a=>'['+a.map(f).join(',')+']';
@@ -389,4 +397,4 @@ if(debugDp){
 const hit=rigAt(HIT),tip=add(hit.sword[0],times(hit.d,(BLADE.y1-8)/16*SWORD));
 console.log(`Built the 만겁 rift + arm: ${Object.keys(parts).length} displays, ${Object.keys(MODELS).length} models (${Object.values(MODELS).reduce((a,e)=>a+e.length,0)} elements), ${KEYS.length} key frames ${T0}..${T_END}; `+
  `the cut sweeps ${sweepAll.toFixed(0)} deg (146 -> 160; ${sweep.toFixed(0)} deg in 148..158), crosses the player's front on ${HIT} (heading ${hit.heading.toFixed(1)}, elevation ${hit.elev.toFixed(1)} deg over the dome, gap ${hitGap.toFixed(2)}; tip ${tip.map(v=>v.toFixed(2))}); `+
- `largest key step ${stepMax[0].toFixed(1)} deg (${stepMax[1]}); lowest y ${Math.min(low,cLow).toFixed(2)}, nearest solid ${inDome.toFixed(2)} b from the dome centre (client view ${cInDome.toFixed(2)}), farthest ${far.toFixed(1)} b; client tip deviation ${tipDev.toFixed(2)} b; arm reach shortfall ${worstReach.toFixed(3)}.`);
+ `largest key step ${stepMax[0].toFixed(1)} deg (${stepMax[1]}); lowest y ${Math.min(low,cLow).toFixed(2)}, nearest solid ${inDome.toFixed(2)} b from the dome centre (client view ${cInDome.toFixed(2)}), farthest ${far.toFixed(1)} b; client tip deviation ${tipDev.toFixed(2)} b; elbow at most ${elbowMax.toFixed(1)} deg through the cut (client view 147..160).`);
