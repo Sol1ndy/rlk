@@ -283,7 +283,7 @@ DMG = {
     'o7': 67,
 }
 DMG_PM = {                                                  # per mille of the player's max HP (FN-15 / FN-16)
-    'q2_tick': 20, 'q2_blast': 800, 'fail1': 250,              # fix 10-22f: the field ticks 2 % every 10 t (was 3 % / 15 t)
+    'q2_tick': 10, 'q2_blast': 800, 'fail1': 250,              # fix 10-22f: the field ticks 1 % every 10 t (was 3 % / 15 t)
 }
 O6_UNEMPOWERED_PCT = 70                                     # un-empowered 포식성 bites x0.7
 KB = {'default': 3, 'light': 2, 'heavy': 4, 'none': 0}
