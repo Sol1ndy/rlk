@@ -7,8 +7,8 @@ execute positioned ^ ^ ^9 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_wk_demo"
 execute as @e[type=minecraft:marker,tag=rlk_wk_demo,limit=1] at @s facing entity @p feet run tp @s ~ ~ ~ ~ 0
 execute at @e[type=minecraft:marker,tag=rlk_wk_demo,limit=1] run summon minecraft:item_display ~ ~2 ~ {Tags:["rlk_wk_demo","rlk_room","rlk_mb_aux"],item:{id:"minecraft:big_dripleaf",count:1},transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[4f,4f,4f],right_rotation:[0f,0f,0f,1f]}}
 execute as @e[type=minecraft:marker,tag=rlk_wk_demo,limit=1] at @s rotated as @s rotated ~ 0 positioned ^0 ^ ^15 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_wk_demo","rlk_mb_ap_dome","rlk_room","rlk_mb_aux"]}
-execute as @e[type=minecraft:marker,tag=rlk_wk_demo,limit=1] at @s rotated as @s rotated ~ 0 positioned ^-8 ^ ^8 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_wk_demo","rlk_mb_ap_dome","rlk_room","rlk_mb_aux"]}
-execute as @e[type=minecraft:marker,tag=rlk_wk_demo,limit=1] at @s rotated as @s rotated ~ 0 positioned ^8 ^ ^8 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_wk_demo","rlk_mb_ap_dome","rlk_room","rlk_mb_aux"]}
+execute as @e[type=minecraft:marker,tag=rlk_wk_demo,limit=1] at @s rotated as @s rotated ~ 0 positioned ^-11 ^ ^4 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_wk_demo","rlk_mb_ap_dome","rlk_room","rlk_mb_aux"]}
+execute as @e[type=minecraft:marker,tag=rlk_wk_demo,limit=1] at @s rotated as @s rotated ~ 0 positioned ^10 ^ ^2 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_wk_demo","rlk_mb_ap_dome","rlk_room","rlk_mb_aux"]}
 scoreboard players set #wkDemo mb 0
 scoreboard players set #wkDT mb 0
 schedule function rlk:boss/apep/fx/test/e/tick 1t replace

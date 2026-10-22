@@ -1857,7 +1857,7 @@
   },
   "spin_trails": {
    "args": [],
-   "doc": "Spin trails white-gold -> pale green around the body (P4 t47-71, every 3 t). At the body.",
+   "doc": "Spin trails white-gold -> pale green around the body (P4 t34-64, every 3 t: the whirl). At the body.",
    "cards": 2,
    "pool_cards": 0,
    "ambient": false,
@@ -1865,7 +1865,7 @@
   },
   "spin_flash": {
    "args": [],
-   "doc": "The mid-spin flash (P4 t57). At the body.",
+   "doc": "The mid-spin flash (P4 t52). At the body.",
    "cards": 2,
    "pool_cards": 0,
    "ambient": false,
@@ -2241,7 +2241,7 @@
     "r1",
     "dur"
    ],
-   "doc": "The visible front of the 종말의 여파 field release: a flat translucent yellow-green wave from radius {r0} to {r1} in {dur} ticks (Q2 t40). At the floor centre.",
+   "doc": "The visible front of the 종말의 여파 field release: a flat translucent yellow-green wave from radius {r0} to {r1} in {dur} ticks (Q2 B0 and t40). At the floor centre.",
    "cards": 3,
    "pool_cards": 0,
    "ambient": false,
@@ -2249,7 +2249,7 @@
   },
   "floor_glitter": {
    "args": [],
-   "doc": "Glitter on the tinted 종말의 여파 floor (Q2 t80-155, every 10 t). At the floor centre.",
+   "doc": "Glitter on the tinted 종말의 여파 floor (Q2 from B0 + 20 to the blast, every 10 t). At the floor centre.",
    "cards": 2,
    "pool_cards": 0,
    "ambient": true,
@@ -2257,7 +2257,7 @@
   },
   "light_pillar": {
    "args": [],
-   "doc": "A 10 t light-pillar tell where a dome will form (Q2 t44 / 48 / 52). At the dome centre.",
+   "doc": "A 10 t light-pillar tell where a dome will form (Q2 B0 + 24 / 28 / 32). At the dome centre.",
    "cards": 2,
    "pool_cards": 0,
    "ambient": false,
@@ -2265,7 +2265,7 @@
   },
   "dome_rise": {
    "args": [],
-   "doc": "The base-rim sparkle as a dome forms (Q2 t54 / 58 / 62; dome r 4.5). At the dome centre.",
+   "doc": "The base-rim sparkle as a dome forms (Q2 B0 + 34 / 38 / 42; dome r 4.5). At the dome centre.",
    "cards": 9,
    "pool_cards": 0,
    "ambient": false,
@@ -3871,7 +3871,7 @@
    ]
   },
   "q2_release": {
-   "use": "Q2 t40: the field release.",
+   "use": "Q2 B0 (the field laid, fix 10-22f) and t40 (the landing pulse): the field release.",
    "layers": [
     [
      "entity.warden.sonic_charge",
@@ -3911,7 +3911,7 @@
    ]
   },
   "q2_dome": {
-   "use": "Q2 t54 / 58 / 62: a dome forms.",
+   "use": "Q2 B0 + 34 / 38 / 42: a dome forms.",
    "layers": [
     [
      "block.beacon.activate",
@@ -4639,7 +4639,7 @@
   "relocate": 48,
   "hands": 158,
   "glow": 253,
-  "wither": 101,
+  "wither": 94,
   "tail": 82,
   "combo": 176,
   "revival_start": 150,

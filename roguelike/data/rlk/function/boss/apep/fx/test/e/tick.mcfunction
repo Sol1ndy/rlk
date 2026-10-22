@@ -13,7 +13,7 @@ execute if score #wkDemo mb matches 4 if score #wkDT mb matches 158.. run scoreb
 execute if score #wkDemo mb matches 5 as @e[type=minecraft:marker,tag=rlk_wk_demo,limit=1] run function rlk:boss/apep/fx/test/demo/e/glow
 execute if score #wkDemo mb matches 5 if score #wkDT mb matches 253.. run scoreboard players set #wkDemo mb 0
 execute if score #wkDemo mb matches 6 as @e[type=minecraft:marker,tag=rlk_wk_demo,limit=1] run function rlk:boss/apep/fx/test/demo/e/wither
-execute if score #wkDemo mb matches 6 if score #wkDT mb matches 101.. run scoreboard players set #wkDemo mb 0
+execute if score #wkDemo mb matches 6 if score #wkDT mb matches 94.. run scoreboard players set #wkDemo mb 0
 execute if score #wkDemo mb matches 7 as @e[type=minecraft:marker,tag=rlk_wk_demo,limit=1] run function rlk:boss/apep/fx/test/demo/e/tail
 execute if score #wkDemo mb matches 7 if score #wkDT mb matches 82.. run scoreboard players set #wkDemo mb 0
 execute if score #wkDemo mb matches 8 as @e[type=minecraft:marker,tag=rlk_wk_demo,limit=1] run function rlk:boss/apep/fx/test/demo/e/combo

@@ -126,7 +126,7 @@ sink reaches −6 b (follow_y offsets, `SINK_TABLE`), and the full follow list r
 | `sink_p1` / `emerge_on_p1` / `burrow_in_p1` / `emerge_crown_p1` | 17 / 24 / 23 / 40 | hold / rotation / hold / idle_p1 | 14-16 / 0 / 21-22 / 0-4 | — | 16.1 / 7.8 / 24.5 / 11.1 |
 | `hands` | 140 / 160 | idle_p1 | — | 5:0 27:360 | 14.6 |
 | `glow_slams` | 131 / 160 | idle_p1 | — | — | 20.9 |
-| `rotation` | 130 / 135 | idle_p1 | — | 47:0 71:360 | 12.8 |
+| `rotation` | 130 / 135 | idle_p1 | — | 32:0 34:−4 36:−14 38:−36 40:−66 56:−306 58:−330 60:−346 62:−356 64:−360 (linear; fix 10-22f) | 12.7 |
 | `tail_p1x2` | 127 / 141 | idle_p1 | — | 27:0 35:200 51:200 59:0 | 12.1 |
 | `combo_a` / `b` / `c` / `d` / `combo_end` | 29 / 44 / 20 / 77 / 20 | chained by the module | — | c 5:0 15:360 | 17.4 / 20.0 / 22.6 / 14.8 / 2.5 |
 | `sink_revive` / `revival` | 60 / 160 | hold, park / idle_p3 | 45-59 / 0-59 | — | 9.2 / 6.6 |
@@ -230,7 +230,9 @@ Keys per tick: mean 14.9 over the 36 clips (31 129 part keys; RC1 19.9, 43 946),
   values (the compiler's linear segments then fit them with a third of the keys); it runs after the P1 hand lift-off /
   touch-down keys so a lifted hand never interpolates through the water.
 - **Read fixes from the strips** (`S:ap/rigwork/rc2/strip_*.jpg`, vs `rc1`): `glow_slams` holds the second rear-up
-  52-65 (≥ 10 t before slam 2, plan §14); `rotation` lands the crash pose on its event tick 40; `combo_d` keeps the far
+  52-65 (≥ 10 t before slam 2, plan §14); `rotation` lands the crash pose on its event tick 40 (fix 10-22f: the whirl
+  starts at 32 and the right A arm, wound out at 36 (`CRASH_WIND`), sweeps down through the front onto the floor at 40,
+  15°/t: the contact = the disc's full fill = the hit; the manifest carries its `hand_a_r` track); `combo_d` keeps the far
   slam's tail root off the water; CURL / KNEEL / CRASH / SPRAWL re-seated over the R3 hull; the crawl hair (§3).
 - **Open.** 15 clips stay above 15 keys/t, mostly short fast blends (`crouch_p3` 33.9, `stand_p3` 28.1, `sink_p3` 27.8,
   `burrow_in_p1` 24.5, `move_strike_p3` 24.0); the far / soft tolerance class (0.08 b) is looser than R16's 0.03 b on

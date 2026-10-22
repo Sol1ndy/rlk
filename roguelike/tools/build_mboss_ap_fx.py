@@ -948,10 +948,11 @@ SOUNDS = {
     'q2_banner': S('Q2 B0: the banner.', L('block.respawn_anchor.set_spawn', V, 0.7), L('entity.elder_guardian.curse', 0.4, 1.4)),
     'q2_charge': S('Q2 t0: the charge.', L('block.conduit.activate', V, 0.8), L('block.beacon.power_select', V, 0.6)),
     'q2_whirl': S('Q2 t18: the whirl.', L('entity.breeze.whirl')),
-    'q2_release': S('Q2 t40: the field release.', L('entity.warden.sonic_charge', V, 1.4), L('entity.breeze.wind_burst', V, 0.6)),
+    'q2_release': S('Q2 B0 (the field laid, fix 10-22f) and t40 (the landing pulse): the field release.',
+                    L('entity.warden.sonic_charge', V, 1.4), L('entity.breeze.wind_burst', V, 0.6)),
     'q2_field_loop': S('Q2 every 20 t, t40-156.', L('block.bubble_column.upwards_ambient'), L('block.sculk.spread', V, 1.4)),
     'q2_tick': S('Q2 each landed field tick.', L('entity.player.hurt_sweet_berry_bush')),
-    'q2_dome': S('Q2 t54 / 58 / 62: a dome forms.', L('block.beacon.activate', V, 1.8), L('block.amethyst_block.chime', times=3),
+    'q2_dome': S('Q2 B0 + 34 / 38 / 42: a dome forms.', L('block.beacon.activate', V, 1.8), L('block.amethyst_block.chime', times=3),
                  L('block.respawn_anchor.charge', V, 1.6)),
     'q2_rain': S('Q2 t134: the light rain.', L('block.beacon.power_select', 0.5, 1.8)),
     'q2_blast': S('Q2 t156: the blast.', L('entity.warden.sonic_boom', V, 0.8), L('entity.dragon_fireball.explode', V, 0.7),
@@ -1304,7 +1305,7 @@ def _p_wheel_pop():
     return out + [part('crit', '~ ~ ~', (0.4, 0.4, 0.4), 0.3, 8), dust(rgb('#E8902A'), 1.2, '~ ~ ~', (0.5, 0.5, 0.5), 6)]
 
 
-@preset('spin_trails', 'Spin trails white-gold -> pale green around the body (P4 t47-71, every 3 t). At the body.')
+@preset('spin_trails', 'Spin trails white-gold -> pale green around the body (P4 t34-64, every 3 t: the whirl). At the body.')
 def _p_spin_trails():
     return [card('crescent', '^ ^1.4 ^3.0', '~ 90', s0=(5, 3, 1), s1=(6, 4, 1), life=6, fade=3, dur=2, col=GOLD_WHITE,
                  hit=3, col2=LEAF_PALE),
@@ -1313,7 +1314,7 @@ def _p_spin_trails():
             dust_fade(GOLD_WHITE, LEAF_PALE, 1.2, '~ ~1.5 ~', (2.5, 0.6, 2.5), 8)]
 
 
-@preset('spin_flash', 'The mid-spin flash (P4 t57). At the body.')
+@preset('spin_flash', 'The mid-spin flash (P4 t52). At the body.')
 def _p_spin_flash():
     return [card('glow', '~ ~2 ~', bb='center', s0=1.2, s1=5.0, life=5, fade=3, col=GOLD_WHITE),
             card('glint', '~ ~2 ~', bb='center', spin=60, s0=0.6, s1=3.6, life=5, fade=2, col=DENDRO_PALE),
@@ -1766,7 +1767,7 @@ def _p_whirl_leaves():
 
 
 @preset('field_ring', 'The visible front of the 종말의 여파 field release: a flat translucent yellow-green wave from '
-        'radius {r0} to {r1} in {dur} ticks (Q2 t40). At the floor centre.', ('r0', 'r1', 'dur'),
+        'radius {r0} to {r1} in {dur} ticks (Q2 B0 and t40). At the floor centre.', ('r0', 'r1', 'dur'),
         (('d0', 'r0', 0.2), ('d1', 'r1', 0.2), ('t', 'dur', None, 0), ('l', 'dur', None, 4)))
 def _p_field_ring():
     return [mac(card('ripple', '~ ~0.09 ~', '~ 90', spin=40, s0='$(d0)', s1='$(d1)', life='$(l)', fade=4, dur='$(t)',
@@ -1778,21 +1779,21 @@ def _p_field_ring():
             part('happy_villager', '~ ~0.4 ~', (3.0, 0.2, 3.0), 0, 10)]
 
 
-@preset('floor_glitter', 'Glitter on the tinted 종말의 여파 floor (Q2 t80-155, every 10 t). At the floor centre.')
+@preset('floor_glitter', 'Glitter on the tinted 종말의 여파 floor (Q2 from B0 + 20 to the blast, every 10 t). At the floor centre.')
 def _p_floor_glitter():
     return [card('glint', '~6.5 ~0.3 ~-4.0', bb='center', spin=60, s0=0.3, s1=0.9, life=8, fade=4, col=rgb('#E9C20E')),
             card('glint', '~-8.0 ~0.3 ~9.5', bb='center', spin=-60, s0=0.3, s1=0.8, life=8, fade=4, col=rgb('#EAF9E9'), dly=3),
             part('wax_on', '~ ~0.3 ~', (14, 0.1, 14), 0, 24), part('end_rod', '~ ~0.4 ~', (12, 0.2, 12), 0.01, 4)]
 
 
-@preset('light_pillar', 'A 10 t light-pillar tell where a dome will form (Q2 t44 / 48 / 52). At the dome centre.')
+@preset('light_pillar', 'A 10 t light-pillar tell where a dome will form (Q2 B0 + 24 / 28 / 32). At the dome centre.')
 def _p_light_pillar():
     return [card('beam', '~ ~ ~', '~ 0', s0=(0.6, 14, 0.6), s1=(1.6, 16, 1.6), life=12, fade=4, dur=4, col=rgb('#F5FFE0')),
             card('glow', '~ ~0.05 ~', '~ 90', s0=1.0, s1=3.6, life=12, fade=4, col=rgb('#E4F69D')),
             part('end_rod', '~ ~3 ~', (0.3, 3.0, 0.3), 0.02, 10)]
 
 
-@preset('dome_rise', 'The base-rim sparkle as a dome forms (Q2 t54 / 58 / 62; dome r 4.5). At the dome centre.')
+@preset('dome_rise', 'The base-rim sparkle as a dome forms (Q2 B0 + 34 / 38 / 42; dome r 4.5). At the dome centre.')
 def _p_dome_rise():
     out = [card('ripple', '~ ~0.07 ~', '~ 90', spin=40, s0=2.0, s1=9.2, life=10, fade=4, dur=5, col=rgb('#E4F69D'))]
     for k, yaw in enumerate(radial(8, 22.5)):
@@ -3085,9 +3086,9 @@ def _demos():
     ev.append(_ev(slams[0][1] + 20, 'player', snd('p3_wheel_hit')))
     D['glow'] = sum(ev, [])
     D['wither'] = sum([
-        _ev(0, 'body', snd('p4_rear')), _ev(16, 'floor', tele_disc(9.0, 24, el=23, hold=31), snd('p4_hum')),
-        _ev(40, 'body', snd('p4_spin'), f('leaf_splash')), *[_ev(t, 'body', f('spin_trails')) for t in range(47, 72, 3)],
-        _ev(57, 'body', f('spin_flash'))], [])
+        _ev(0, 'body', snd('p4_rear')), _ev(16, 'floor', tele_disc(9.0, 24, el=23, hold=24), snd('p4_hum')),
+        _ev(40, 'body', snd('p4_spin'), f('leaf_splash')), *[_ev(t, 'body', f('spin_trails')) for t in range(34, 65, 3)],
+        _ev(52, 'body', f('spin_flash'))], [])
     D['tail'] = sum([
         _ev(8, 'body', snd('p5_raise')), _wedges(11.4, 14, 14),
         _ev(23, 'tip', f('tail_tip_flash'), snd('p5_cock')),
@@ -3147,16 +3148,19 @@ def _demos():
         _ev(46, 'ahead4', tele_disc(4.2, 15)), _ev(48, 'body', tele_disc(12.0, 21)),
         _ev(61, 'ahead4', f('belly_splash'), snd('q1_slam')), _ev(69, 'body', f('sweep_ring', r=12.0), snd('q1_slam')),
         _ev(71, 'body', f('light_sprouts'), snd('q1_rise'))], [])
+    # fix 10-22f: the field from the banner (the wash and the ring reach r 26 at 20, the ticks from there), the domes on
+    # the pattern clock (pillars 24 / 28 / 32, formed 34 / 38 / 42); the demo's clip starts at 0 (no approach walk)
     ev = [_ev(0, 'player', hud('banner_aftermath')), _ev(0, 'floor', snd('q2_banner'))]
     for k in range(3):
-        ev.append(_ev(0, f'dome{k}', tele_safe_rim(k, 4.5, 54 + 4 * k, 189 - (54 + 4 * k))))
-    ev += [_ev(0, 'body', f('crouch_splash'), snd('q2_charge')), *[_ev(t, 'body', f('whirl_leaves')) for t in range(18, 37, 3)],
+        ev.append(_ev(0, f'dome{k}', tele_safe_rim(k, 4.5, 34 + 4 * k, 189 - (34 + 4 * k))))
+    ev += [_ev(0, 'floor', tele_mask_wash(26.0, 20, 156), f('field_ring', r0=3.0, r1=26.0, dur=20), snd('q2_release')),
+           _ev(0, 'body', f('crouch_splash'), snd('q2_charge')), *[_ev(t, 'body', f('whirl_leaves')) for t in range(18, 37, 3)],
            _ev(18, 'body', snd('q2_whirl')),
-           _ev(40, 'floor', tele_mask_wash(26.0, 40, 96), f('field_ring', r0=3.0, r1=26.0, dur=18), snd('q2_release')),
-           *[_ev(t, 'floor', snd('q2_field_loop')) for t in range(40, 157, 20)],
-           *[_ev(44 + 4 * k, f'dome{k}', f('light_pillar')) for k in range(3)],
-           *[_ev(54 + 4 * k, f'dome{k}', f('dome_rise'), snd('q2_dome')) for k in range(3)],
-           *[_ev(t, 'floor', f('floor_glitter')) for t in range(80, 156, 10)], _ev(95, 'player', snd('q2_tick')),
+           _ev(40, 'floor', f('field_ring', r0=3.0, r1=26.0, dur=18), snd('q2_release')),
+           *[_ev(t, 'floor', snd('q2_field_loop')) for t in range(20, 157, 20)],
+           *[_ev(24 + 4 * k, f'dome{k}', f('light_pillar')) for k in range(3)],
+           *[_ev(34 + 4 * k, f'dome{k}', f('dome_rise'), snd('q2_dome')) for k in range(3)],
+           *[_ev(t, 'floor', f('floor_glitter')) for t in range(20, 156, 10)], _ev(20, 'player', snd('q2_tick')), _ev(30, 'player', snd('q2_tick')),
            *[_ev(t, 'floor', f('beam_rain')) for t in range(134, 157, 4)], _ev(134, 'floor', snd('q2_rain')),
            _ev(156, 'player', hud('flash_white'), hud('banner_end')), _ev(156, 'floor', f('flood_part', life=24, part=0), snd('q2_blast')),
            _ev(157, 'floor', f('flood_part', life=23, part=1)), _ev(158, 'floor', f('flood_part', life=22, part=2)),
@@ -3217,7 +3221,7 @@ for _k in range(4):
     _x, _z = ring_xz(6.6, (-60, 60, -140, 140)[_k])
     DEMO_PTS[f'stalk{_k}'] = (_x, 0.0, 4.0 + _z)
 for _k in range(3):
-    DEMO_PTS[f'dome{_k}'] = ((-8.0, 0.0, 8.0) if _k == 1 else (8.0, 0.0, 8.0) if _k == 2 else (0.0, 0.0, 15.0))
+    DEMO_PTS[f'dome{_k}'] = ((-11.0, 0.0, 4.0) if _k == 1 else (10.0, 0.0, 2.0) if _k == 2 else (0.0, 0.0, 15.0))   # 15.6 / 16.4 / 21.1 apart
     DEMO_PTS[f'spawn{_k}'] = ring_xz(8.0, -45 + 45 * _k)[0], 0.0, ring_xz(8.0, -45 + 45 * _k)[1] + 4
 for _k in range(7):
     _x, _z = ring_xz(4.5, -75 + 25 * _k)

@@ -126,7 +126,7 @@ export const CLIP_TABLE = [
   {name: 'emerge_crown_p1', form: 'p1', len: 40, authored: 40, loop: false, next: 'idle_p1', events: {'glow': 0, 'crown': 5, 'hood': 10, 'targetable': 11, 'out': 21, 'end': 40}, hidden: [[0, 4]], stance: ['CROUCH', 'CROUCH'], px_sets: [[0, 'burrowed'], [11, 'p1']], look_events: [[5, 'tint', 'p1_dark'], [20, 'tint', 'none']], state: [[0, 'burrowed'], [5, 'normal']]},
   {name: 'hands', form: 'p1', len: 140, authored: 160, loop: false, next: 'idle_p1', retime: [[0, 0], [40, 30], [82, 62], [102, 82], [160, 140]], events: {'spread': 0, 'swirl': 5, 'raise': 27, 'plunge': 30, 'lock': 33, 'legs': 36, 'lines': 40, 'slam1': 62, 'slam2': 69, 'slam3': 75, 'slam4': 82, 'sink': 83, 'stand': 100, 'pull': 108, 'flower': 118, 'fold': 128, 'end': 140}, stance: ['CROUCH', 'CROUCH'], px_sets: [[0, 'p1']], anchors: {'plunge': ['impact']}, yaw: {knots: [[5, 0], [27, 360]], ease: 'smooth'}},
   {name: 'glow_slams', form: 'p1', len: 131, authored: 160, loop: false, next: 'idle_p1', retime: [[0, 0], [48, 36], [59, 47], [89, 70], [130, 101], [160, 131]], events: {'wind': 0, 'coil': 23, 'column': 36, 'slam1': 47, 'rear2': 65, 'slam2': 70, 'leap': 77, 'apex': 83, 'dive': 90, 'slam3': 101, 'settle': 121, 'end': 131}, stance: ['CROUCH', 'CROUCH'], px_sets: [[0, 'p1']], look_events: [[0, 'core_glow', 'lit'], [47, 'core_glow', 'idle']], anchors: {'slam1': ['impact'], 'slam2': ['impact'], 'slam3': ['impact']}},
-  {name: 'rotation', form: 'p1', len: 130, authored: 135, loop: false, next: 'idle_p1', retime: [[0, 0], [21, 16], [135, 130]], events: {'arms': 0, 'rear': 10, 'disc': 16, 'full': 39, 'crash': 40, 'spin': 47, 'flash': 57, 'spin_end': 71, 'rise': 85, 'stand': 100, 'end': 130}, stance: ['CROUCH', 'CROUCH'], px_sets: [[0, 'p1']], anchors: {'crash': ['impact']}, yaw: {knots: [[47, 0], [71, 360]], ease: 'smooth'}},
+  {name: 'rotation', form: 'p1', len: 130, authored: 135, loop: false, next: 'idle_p1', retime: [[0, 0], [21, 16], [135, 130]], events: {'arms': 0, 'rear': 10, 'disc': 16, 'swing': 32, 'spin': 34, 'full': 40, 'crash': 40, 'flash': 52, 'spin_end': 64, 'rise': 85, 'stand': 100, 'end': 130}, stance: ['CROUCH', 'CROUCH'], px_sets: [[0, 'p1']], anchors: {'crash': ['impact', 'hand_a_r']}, tracks: ['hand_a_r'], yaw: {knots: [[32, 0], [34, -4], [36, -14], [38, -36], [40, -66], [56, -306], [58, -330], [60, -346], [62, -356], [64, -360]], ease: 'linear'}},
   {name: 'tail_p1x2', form: 'p1', len: 127, authored: 141, loop: false, next: 'idle_p1', retime: [[0, 0], [37, 28], [46, 37], [66, 52], [73, 59], [141, 127]], events: {'turn': 0, 'raise': 8, 'cock': 23, 'swing1': 28, 'end1': 37, 'cock2': 48, 'swing2': 52, 'end2': 59, 'rise': 86, 'end': 127}, stance: ['CROUCH', 'CROUCH'], px_sets: [[0, 'p1']], anchors: {'cock': ['tail_tip'], 'swing1': ['tail_root'], 'swing2': ['tail_root']}, tracks: ['tail_root', 'tail_tip'], yaw: {knots: [[27, 0], [35, 200], [51, 200], [59, 0]], ease: 'linear'}},
   {name: 'combo_a', form: 'p1', len: 29, authored: 29, loop: false, next: null, events: {'tell': 0, 'swing': 10, 'hit': 14}, stance: ['CROUCH', 'CROUCH'], px_sets: [[0, 'p1']], anchors: {'hit': ['impact']}},
   {name: 'combo_b', form: 'p1', len: 44, authored: 48, loop: false, next: null, retime: [[0, 0], [18, 14], [48, 44]], events: {'rear': 0, 'high': 12, 'slam': 17}, stance: ['CROUCH', 'CROUCH'], px_sets: [[0, 'p1']], anchors: {'slam': ['impact']}},
@@ -407,6 +407,10 @@ const CRASH = def('CRASH', P(C0, {pelT: [0, -.55, 0], pelvis: [0, 0, 46], chest:
   ...tg('a', 2.6, 4.2, -3.2, Z), ...tgR('a', -6.2, A_PLANT, -1.8), ...tg('b', 3.0, 3.0, -2.6, Z), ...tgR('b', -3.8, .4, -3.6), ...tg('c', 3.0, 2.6, 2.2, Z), ...tgR('c', -3.6, .4, 2.6),
   mantle_l_a: [0, 0, 40], mantle_l_b: [0, 0, 20]}));
 const CRASH_B = def('CRASH_B', P(CRASH, {chest: [-8, 0, 12], tSweep: -45, tg_a_l: [3.4, 4.6, -1.6], tg_a_r: [-6.4, A_PLANT, .2]}));
+// the swing's wind (fix 10-22f): a third of the way from the lean into the crash, the right A arm raised out to the side
+// over the spot where the crash plants it, so that the whirl (rotation yaw 32-64) carries it round through the front
+// and it comes down there on the strike (the floor contact at t40 = the full disc fill = the hit)
+const CRASH_WIND = def('CRASH_WIND', mix(LEAN, CRASH, .3, {...tgR('a', -6.0, 3.6, -1.8, Z)}));
 // (the right drapes roll the same way as in the crash, so the blend from the crash stays over the floor; the guard's
 // preferred outward roll folds them into an S here)
 const SPRAWL = def('SPRAWL', P(C0, {pelT: [0, -1.1, 0], pelvis: [0, 0, 22], chest: [-3, 0, 4], ...tg('a', 5.8, A_PLANT, -1.4), ...tg('b', 3.5, .4, -3.6), ...tg('c', 3.6, .4, 2.9),
@@ -678,10 +682,13 @@ export const CLIP_KEYS = {
   glow_slams: () => [K(0, CROUCH), K(9, ARMS_LIFT, 'o'), K(23, COIL), K(36, COLUMN, 'o'), K(42, COLUMN2), K(45, COLUMN_REL, 'o'), K(47, SLAM, 'i'), K(52, SLAM), K(57, HALF, 'io'), K(65, ARMSUP, 'o'),
     K(70, SLAM, 'i'), K(73, SLAM), K(75, CROUCH_LOAD, 'io'), K(77, LEAP_UP, 'o'), K(83, AIR, 'o'), K(90, AIR), K(97, DIVEDOWN, 'i'), K(101, SLAM, 'i'), K(108, SLAM),
     K(121, CROUCH, 'o'), K(131, CROUCH)],
-  // 초목이 시든 풍경 (v2 6.75): from the hooded figure, arms up 0-8, rears over the player, sways while the disc fills,
-  // crashes sideways at 40, spins on the ground 47-71 (the anchor), sprawls, pushes up, stands
-  rotation: () => [K(0, HOODED), K(8, ARMSUP, 'o'), K(18, LEAN, 'o'), K(26, LEAN_L), K(32, LEAN_R), K(36, LEAN), K(40, CRASH, 'i'), K(47, CRASH), K(59, CRASH_B), K(71, CRASH),
-    K(80, SPRAWL, 'o'), K(92, PUSHUP), K(100, HALF, 'o'), K(115, CROUCH), K(130, CROUCH)],
+  // 초목이 시든 풍경 (v2 6.75): from the hooded figure, arms up 0-8, rears over the player, sways while the disc fills;
+  // fix 10-22f (the swing lands on the full fill): the whirl starts at 32 (yaw schedule, to its left), the right A arm
+  // winds out to the side (CRASH_WIND 36) and the crash brings it down through the front onto the floor at 40 (the
+  // contact = the disc's full fill = the hit), the whirl carries on over the ground to 64 (one whole turn), sprawls,
+  // pushes up, stands
+  rotation: () => [K(0, HOODED), K(8, ARMSUP, 'o'), K(18, LEAN, 'o'), K(26, LEAN_L), K(32, LEAN_R), K(36, CRASH_WIND, 'io'), K(40, CRASH, 'i'),
+    K(52, CRASH_B), K(64, CRASH), K(76, SPRAWL, 'o'), K(90, PUSHUP), K(100, HALF, 'o'), K(115, CROUCH), K(130, CROUCH)],
   // 생명의 꼬리 x2 (v2 15.73): brace, the tail rises into an S, cocks to the left (23), swing 1 28-35 (the anchor turns
   // +200: the tail lags, then whips through), recoil, cock to the right (48), swing 2 52-59 (reverse), sprawl, rise
   tail_p1x2: () => [K(0, CROUCH), K(8, CROUCH_LOW), K(20, TAIL_S, 'o'), K(23, TAIL_COCK), K(27, TAIL_COCK), K(31, TAIL_WHIP, 'i'), K(35, TAIL_WHIP), K(39, TAIL_FOLLOW, 'o'),

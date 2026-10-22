@@ -1,8 +1,0 @@
-# At the centre, rotated = the bearing of the player: A at 7 b; B (far: d >= 13) on the bearing at max(16, d - 5) <= 21,
-# (near) 120 degrees clockwise at 14 b; C 120 degrees the other way at 14 b. Centres >= 9 b apart, r <= 21.
-execute positioned ^ ^ ^7 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_ap_pat","rlk_mb_ap_p32","rlk_mb_ap_p32f","rlk_mb_ap_p32f0"]}
-execute if entity @e[tag=rlk_body,distance=13..,limit=1] unless entity @e[tag=rlk_body,distance=21..,limit=1] positioned ^ ^ ^16 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_ap_pat","rlk_mb_ap_p32","rlk_mb_ap_p32f","rlk_mb_ap_p32f1"]}
-execute if entity @e[tag=rlk_body,distance=21..,limit=1] unless entity @e[tag=rlk_body,distance=26..,limit=1] at @e[tag=rlk_body,limit=1] facing entity @e[type=minecraft:marker,tag=rlk_mb_arena,limit=1] feet rotated ~ 0 positioned ^ ^ ^5 positioned ~ 201 ~ run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_ap_pat","rlk_mb_ap_p32","rlk_mb_ap_p32f","rlk_mb_ap_p32f1"]}
-execute if entity @e[tag=rlk_body,distance=26..,limit=1] positioned ^ ^ ^21 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_ap_pat","rlk_mb_ap_p32","rlk_mb_ap_p32f","rlk_mb_ap_p32f1"]}
-execute unless entity @e[tag=rlk_body,distance=13..,limit=1] rotated ~120 0 positioned ^ ^ ^14 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_ap_pat","rlk_mb_ap_p32","rlk_mb_ap_p32f","rlk_mb_ap_p32f1"]}
-execute rotated ~-120 0 positioned ^ ^ ^14 run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_ap_pat","rlk_mb_ap_p32","rlk_mb_ap_p32f","rlk_mb_ap_p32f2"]}

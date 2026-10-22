@@ -2,37 +2,47 @@
 # Demo "aftermath" events (as the anchor; #wkDT = the demo tick).
 execute if score #wkDT mb matches 0 at @p[tag=player] rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/hud/banner_aftermath
 execute if score #wkDT mb matches 0 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_banner
-execute if score #wkDT mb matches 0 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/tele/safe_rim {id:0,r:45,tell:54,hold:135}
-execute if score #wkDT mb matches 0 at @s rotated as @s rotated ~ 0 positioned ^-8 ^0 ^8 run function rlk:boss/apep/fx/tele/safe_rim {id:1,r:45,tell:58,hold:131}
-execute if score #wkDT mb matches 0 at @s rotated as @s rotated ~ 0 positioned ^8 ^0 ^8 run function rlk:boss/apep/fx/tele/safe_rim {id:2,r:45,tell:62,hold:127}
+execute if score #wkDT mb matches 0 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/tele/safe_rim {id:0,r:45,tell:34,hold:155}
+execute if score #wkDT mb matches 0 at @s rotated as @s rotated ~ 0 positioned ^-11 ^0 ^4 run function rlk:boss/apep/fx/tele/safe_rim {id:1,r:45,tell:38,hold:151}
+execute if score #wkDT mb matches 0 at @s rotated as @s rotated ~ 0 positioned ^10 ^0 ^2 run function rlk:boss/apep/fx/tele/safe_rim {id:2,r:45,tell:42,hold:147}
+execute if score #wkDT mb matches 0 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/tele/mask_wash {r:260,tell:20,hold:156}
+execute if score #wkDT mb matches 0 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/field_ring {r0:30,r1:260,dur:20}
+execute if score #wkDT mb matches 0 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_release
 execute if score #wkDT mb matches 0 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/crouch_splash
 execute if score #wkDT mb matches 0 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_charge
 execute if score #wkDT mb matches 18 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/whirl_leaves
 execute if score #wkDT mb matches 18 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_whirl
+execute if score #wkDT mb matches 20 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_field_loop
+execute if score #wkDT mb matches 20 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/floor_glitter
+execute if score #wkDT mb matches 20 at @p[tag=player] rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_tick
 execute if score #wkDT mb matches 21 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/whirl_leaves
 execute if score #wkDT mb matches 24 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/whirl_leaves
+execute if score #wkDT mb matches 24 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/p/light_pillar
 execute if score #wkDT mb matches 27 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/whirl_leaves
+execute if score #wkDT mb matches 28 at @s rotated as @s rotated ~ 0 positioned ^-11 ^0 ^4 run function rlk:boss/apep/fx/p/light_pillar
 execute if score #wkDT mb matches 30 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/whirl_leaves
+execute if score #wkDT mb matches 30 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/floor_glitter
+execute if score #wkDT mb matches 30 at @p[tag=player] rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_tick
+execute if score #wkDT mb matches 32 at @s rotated as @s rotated ~ 0 positioned ^10 ^0 ^2 run function rlk:boss/apep/fx/p/light_pillar
 execute if score #wkDT mb matches 33 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/whirl_leaves
+execute if score #wkDT mb matches 34 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/p/dome_rise
+execute if score #wkDT mb matches 34 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/snd/q2_dome
 execute if score #wkDT mb matches 36 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/whirl_leaves
-execute if score #wkDT mb matches 40 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/tele/mask_wash {r:260,tell:40,hold:96}
+execute if score #wkDT mb matches 38 at @s rotated as @s rotated ~ 0 positioned ^-11 ^0 ^4 run function rlk:boss/apep/fx/p/dome_rise
+execute if score #wkDT mb matches 38 at @s rotated as @s rotated ~ 0 positioned ^-11 ^0 ^4 run function rlk:boss/apep/fx/snd/q2_dome
 execute if score #wkDT mb matches 40 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/field_ring {r0:30,r1:260,dur:18}
 execute if score #wkDT mb matches 40 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_release
 execute if score #wkDT mb matches 40 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_field_loop
-execute if score #wkDT mb matches 44 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/p/light_pillar
-execute if score #wkDT mb matches 48 at @s rotated as @s rotated ~ 0 positioned ^-8 ^0 ^8 run function rlk:boss/apep/fx/p/light_pillar
-execute if score #wkDT mb matches 52 at @s rotated as @s rotated ~ 0 positioned ^8 ^0 ^8 run function rlk:boss/apep/fx/p/light_pillar
-execute if score #wkDT mb matches 54 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/p/dome_rise
-execute if score #wkDT mb matches 54 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/snd/q2_dome
-execute if score #wkDT mb matches 58 at @s rotated as @s rotated ~ 0 positioned ^-8 ^0 ^8 run function rlk:boss/apep/fx/p/dome_rise
-execute if score #wkDT mb matches 58 at @s rotated as @s rotated ~ 0 positioned ^-8 ^0 ^8 run function rlk:boss/apep/fx/snd/q2_dome
+execute if score #wkDT mb matches 40 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/floor_glitter
+execute if score #wkDT mb matches 42 at @s rotated as @s rotated ~ 0 positioned ^10 ^0 ^2 run function rlk:boss/apep/fx/p/dome_rise
+execute if score #wkDT mb matches 42 at @s rotated as @s rotated ~ 0 positioned ^10 ^0 ^2 run function rlk:boss/apep/fx/snd/q2_dome
+execute if score #wkDT mb matches 50 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/floor_glitter
 execute if score #wkDT mb matches 60 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_field_loop
-execute if score #wkDT mb matches 62 at @s rotated as @s rotated ~ 0 positioned ^8 ^0 ^8 run function rlk:boss/apep/fx/p/dome_rise
-execute if score #wkDT mb matches 62 at @s rotated as @s rotated ~ 0 positioned ^8 ^0 ^8 run function rlk:boss/apep/fx/snd/q2_dome
+execute if score #wkDT mb matches 60 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/floor_glitter
+execute if score #wkDT mb matches 70 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/floor_glitter
 execute if score #wkDT mb matches 80 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_field_loop
 execute if score #wkDT mb matches 80 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/floor_glitter
 execute if score #wkDT mb matches 90 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/floor_glitter
-execute if score #wkDT mb matches 95 at @p[tag=player] rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_tick
 execute if score #wkDT mb matches 100 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/snd/q2_field_loop
 execute if score #wkDT mb matches 100 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/floor_glitter
 execute if score #wkDT mb matches 110 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/floor_glitter
@@ -58,10 +68,10 @@ execute if score #wkDT mb matches 158 at @s rotated as @s rotated ~ 0 run functi
 execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/p/dome_pop
 execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/snd/q2_pop
 execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^0 ^0 ^15 run function rlk:boss/apep/fx/tele/safe_end {id:0}
-execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^-8 ^0 ^8 run function rlk:boss/apep/fx/p/dome_pop
-execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^-8 ^0 ^8 run function rlk:boss/apep/fx/snd/q2_pop
-execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^-8 ^0 ^8 run function rlk:boss/apep/fx/tele/safe_end {id:1}
-execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^8 ^0 ^8 run function rlk:boss/apep/fx/p/dome_pop
-execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^8 ^0 ^8 run function rlk:boss/apep/fx/snd/q2_pop
-execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^8 ^0 ^8 run function rlk:boss/apep/fx/tele/safe_end {id:2}
+execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^-11 ^0 ^4 run function rlk:boss/apep/fx/p/dome_pop
+execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^-11 ^0 ^4 run function rlk:boss/apep/fx/snd/q2_pop
+execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^-11 ^0 ^4 run function rlk:boss/apep/fx/tele/safe_end {id:1}
+execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^10 ^0 ^2 run function rlk:boss/apep/fx/p/dome_pop
+execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^10 ^0 ^2 run function rlk:boss/apep/fx/snd/q2_pop
+execute if score #wkDT mb matches 189 at @s rotated as @s rotated ~ 0 positioned ^10 ^0 ^2 run function rlk:boss/apep/fx/tele/safe_end {id:2}
 execute if score #wkDT mb matches 190 at @s rotated as @s rotated ~ 0 run function rlk:boss/apep/fx/p/green_burst

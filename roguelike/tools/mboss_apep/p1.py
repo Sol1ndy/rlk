@@ -35,6 +35,11 @@ Decisions inside the plan's latitude (documented for AP-I2 / the review):
   the pre-swing turn (1-8, <= 5 deg/t, <= 40 deg) puts the tail root toward the player (a BACK player meets swing 2).
   The swept wedges are api.wedges(..., swept=True) (widened for the root's own motion, RP1-3 at AP-I2); a second tip
   flash + cue at cock 2 (t48) marks swing 2.
+- P4 (fix 10-22f, user: the filling disc and the swing did not match): the disc still fills t16 -> t40 and the hazard
+  still strikes at t40, but the rotation clip now swings into it: the whirl (yaw schedule, to the boss's left) starts at
+  t32, the right A arm winds out (t36) and comes down through the front onto the floor at t40 sweeping 15 deg/t (the
+  contact = the full fill = the hit, asserted from the manifest's hand_a_r track below), then whirls once over the ground
+  to t64; the hazard stays active over the whirl (24 t; was the 31-t crash + spin that started 7 t after the hit).
 AP-I2 applied requests/ap-p1.md: RP1-1 (P5's turn re-bases the yaw driver: Gen.yaw_rebase()), RP1-2 (the core steps the
 org objects: P2's stalks; leg_slam is played slam_lead + 1 t before each slam so its hit key still lands on the slam),
 RP1-3 (api.wedges swept), RP1-5 (P2's strips and their resume redraw use tele/crack_o).
@@ -107,11 +112,36 @@ CAR_RADII = [P3['car_r0'] + (P3['car_r1'] - P3['car_r0']) * k / P3['car_dur'] fo
 assert all(b - a <= P3['car_band'] + 1e-9 for a, b in zip([P3['car_r0']] + CAR_RADII, CAR_RADII))   # plan 7.11 rule 5
 assert L.pj_speed_tenths(P3['wheel_spd']) == 7 and L.pj_speed_tenths(P3['wheel_home']) == 5        # quantized (rule 6)
 
-P4 = dict(rear=ev('rotation', 'rear'), disc=ev('rotation', 'disc'), crash=ev('rotation', 'crash'), spin=ev('rotation', 'spin'),
-          flash=ev('rotation', 'flash'), spin_end=ev('rotation', 'spin_end'), end=A.clip_len('rotation'), r=9.0, y1=3.0)
-P4['tell'] = P4['crash'] - P4['disc']                                        # 24 (the fill reaches the rim at t39 / t40)
-P4['act'] = P4['spin_end'] - P4['crash']                                     # 31: active over the crash and the spin
-assert (P4['disc'], P4['crash'], P4['act']) == (16, 40, 31), P4
+P4 = dict(rear=ev('rotation', 'rear'), disc=ev('rotation', 'disc'), swing=ev('rotation', 'swing'), full=ev('rotation', 'full'),
+          crash=ev('rotation', 'crash'), spin=ev('rotation', 'spin'), flash=ev('rotation', 'flash'),
+          spin_end=ev('rotation', 'spin_end'), end=A.clip_len('rotation'), r=9.0, y1=3.0, floor_y=0.35, sweep_min=10.0)
+P4['tell'] = P4['crash'] - P4['disc']                                        # 24: the kit fill reaches the rim at t16 + 24 = t40
+P4['act'] = P4['spin_end'] - P4['crash']                                     # 24: active over the strike and the whirl
+assert (P4['disc'], P4['crash'], P4['act']) == (16, 40, 24), P4
+
+
+def p4_contact():
+    """Fix 10-22f (the swing lands on the full fill): the striking limb is the right A hand (manifest track hand_a_r,
+    local, before the yaw schedule). Returns (contact tick = the first tick from the swing at which its tip is on the
+    floor (y <= floor_y), its world bearing there (deg from the facing at tick 0, + = clockwise), its sweep speed
+    (deg/t of that bearing over the tick before), the arc it sweeps on the floor from the contact to spin_end, deg)."""
+    tr = A.track('rotation', 'hand_a_r')
+
+    def brg(t):
+        x, _, f = tr[t]
+        return math.degrees(math.atan2(-x, f)) + A.yaw_at('rotation', t)
+    c = next(t for t in range(P4['swing'], P4['spin_end']) if tr[t][1] <= P4['floor_y'])
+    arc = sum(abs(brg(t + 1) - brg(t)) for t in range(c, P4['spin_end']) if tr[t + 1][1] <= P4['floor_y'])
+    return c, brg(c), brg(c) - brg(c - 1), arc
+
+
+P4['contact'], P4['contact_b'], P4['contact_v'], P4['arc'] = p4_contact()
+# the disc fill (the kit's tele/disc: made at t16 with tell 24, the edge on the rim at t40), the hit (the hazard strike
+# t40) and the visible strike (the A hand reaching the floor while it sweeps through the front) are one tick
+assert P4['disc'] + P4['tell'] == P4['full'] == P4['crash'] and abs(P4['contact'] - P4['crash']) <= 1, P4
+# ... the hand sweeps (>= 10 deg/t) and lands in front (within 30 deg of the facing), then drags round >= 3/4 of the disc on
+# the floor by spin_end (the air swing 36-40 covers the rest of the turn)
+assert abs(P4['contact_v']) >= P4['sweep_min'] and abs(P4['contact_b']) <= 30 and P4['arc'] >= 270, P4
 
 P5 = dict(turn=(0, 8), turn_max=5, raise_=ev('tail_p1x2', 'raise'), cock=ev('tail_p1x2', 'cock'),
           sw1=(ev('tail_p1x2', 'swing1'), ev('tail_p1x2', 'end1') - 2), cock2=ev('tail_p1x2', 'cock2'),
