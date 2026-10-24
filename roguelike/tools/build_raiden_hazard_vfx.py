@@ -316,14 +316,20 @@ def models():
     m.card((0, 0.5, -0.02), "z", "-y", "+x", 1, 0.9, "obj_wave_band")
     m.card((0, 0.02, -0.5), "y", "+x", "-z", 1, 1, "tr_band")
     M["tr_slab"] = m
-    # crescent sword wave (rd-sync, 찰나의 포영): ONE crescent_a card facing the travel direction, its edge radius 1 unit
-    # with the model origin at the bright arc's centroid (0.75 of the card height above the pivot; the display rolls the
-    # crescent +-45 deg about it). Display scale = edge radius in blocks. User 10-22 ("왜 대각선 검기 한 번에 두 개가
+    # crescent sword wave (rd-sync, 찰나의 포영): ONE crescent card facing the travel direction, the chord between its tips
+    # 1.9 units, the model origin at the bright arc's centroid (the display rolls the crescent +-45 deg about it); display
+    # scale = raiden_kit.WAVE_R * the slab's half width. User 10-22 ("왜 대각선 검기 한 번에 두 개가
     # 나가는거야"): the 0.86x copy that trailed it 0.25 units (0.7 b) behind read as a second wave of the same cut; it is
     # gone, so one cut = one wave (the real clone's X is still two cuts, 4 t apart).
+    # User 10-22j ("검기가 플레이어한테 다가올 때 90도로 꺾여서 날아와 ... 'ㄴ' 자"): crescent_a is a 144-degree arch; rolled
+    # 45 deg its two halves stood at right angles, an L from the player's eye. The card is now wave_blade, a shallow
+    # crescent moon (80 degrees of arc, lens body, sharp tips; build_raiden_fx_textures.py): the chord between the tips
+    # is 1.9 units (as crescent_a's), the model origin is the arc's centroid (v 0.376 of the card), so rolled 45 deg it
+    # is one diagonal blade of light flying face-on toward the player.
     m = Model()
-    Hc = 1 / 0.94
-    m.card((0, -0.25 * Hc, 0.0), "z", "+x", "-y", 2 * Hc, Hc, "crescent_a")
+    Wb = 2.0652                                   # 320 x 112 px, the tips 294.4 px apart = 1.9 units
+    Hb = Wb * 112 / 320
+    m.card((0, -(0.5 - 0.3764) * Hb, 0.0), "z", "+x", "-y", Wb, Hb, "wave_blade")
     M["tr_wave"] = m
     m = Model()                                                  # orb: flat electric disc radius 1
     radial(m, 2.5, "chakra_a", 0.0)

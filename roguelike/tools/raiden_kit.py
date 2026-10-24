@@ -110,7 +110,8 @@ STRIKE_LIFE = 10
 STRIKE_MOTION = {'lr': 1, 'rl': 2, 'chop': 3, 'thrust': 4, 'rise': 5}
 SM_SWEEP = 50                       # degrees the sweep strikes start off their centre line
 # Crescent sword waves on slab hazards (rd-sync): rdHSv 2 / 3 / 4 = chord rising to her left (/ from the player),
-# to her right (\), level. The crescent's edge radius is WAVE_R * the slab's half width, its centre WAVE_Y up.
+# to her right (\), level. The crescent (tr_wave: the shallow wave_blade crescent, user 10-22j) is 1.9 * WAVE_R * the
+# slab's half width from tip to tip, its centroid WAVE_Y up.
 WAVES = {'/': 2, '\\': 3, '-': 4}
 WAVE_R, WAVE_Y = 1.08, 2.6
 # strike frames by remaining life (rdHLife counts down): colour (custom_model_data tint) or the after model

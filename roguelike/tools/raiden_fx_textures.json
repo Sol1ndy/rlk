@@ -6,6 +6,7 @@
   "column": "v along height: v=0 top (sky), v=1 bottom (impact), u=0.5 centre",
   "radial": "centred at (0.5,0.5)",
   "crescent": "pivot at bottom-centre (0.5,1.0); bright outer edge radius 0.94*h; +-72 deg",
+  "blade": "chord along u: tips (0.04/0.96, 0.69), outer edge apex (0.5, 0.21), arc centroid (0.5, 0.38)",
   "decal": "top view: u = local +x, v = local +z (forward)",
   "quarter": "circle centre at texture corner (0,0); mirror uv for other quadrants"
  },
@@ -280,6 +281,17 @@
    "core": "as crescent_a + bolt along the edge",
    "use": "lightning crescent slash",
    "notes": ""
+  },
+  {
+   "name": "wave_blade",
+   "texture": "rlk:raiden/fxg/wave_blade",
+   "w": 320,
+   "h": 112,
+   "kind": "blade",
+   "along": "u",
+   "core": "outer edge apex (0.5, 0.21), tips (0.04 / 0.96, 0.69), arc centroid (0.5, 0.38); edge radius 2.05*h",
+   "use": "flying crescent sword wave (\ucc30\ub098\uc758 \ud3ec\uc601 tr_wave): shallow crescent moon, 80 deg of arc",
+   "notes": "lens body under the edge, sharp tips"
   },
   {
    "name": "slash_wave",

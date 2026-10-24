@@ -44,6 +44,8 @@ UV CONVENTIONS (texture x = u = left->right, texture y = v = top->bottom):
            bright cutting edge is the outer arc of radius 0.94*h (v=0.06 at the
            apex), spanning +-72 deg around straight up; the gradient tail trails
            inward toward the pivot. Card: width 2H, depth H, H = edge radius / 0.94.
+  blade    shallow crescent (wave_blade): the chord along u, tips at (0.04 / 0.96, 0.69), the bright outer edge
+           arching up to (0.5, 0.21), +-40 deg about the circle centre (0.5, 2.26), the arc's centroid at (0.5, 0.38).
   decal    top-view floor decal; u = world +x (local left/right), v = world +z (local forward).
   quarter  ring quadrant: circle centre at the texture's top-left corner (u=0,v=0);
            mirror it (uv [16,0,0,16] etc.) for the other quadrants.
@@ -80,6 +82,8 @@ total ~2.5 Mpx after the S1-KIT reclaim: tele_* / charged_* / ringq_* and unused
   crescent_a            352x176 crescent clean blade-light crescent (bright edge,
                                          lavender->violet gradient tail inward).
   crescent_b            352x176 crescent crescent with a jagged bolt along its edge.
+  wave_blade            320x112 blade   shallow crescent moon (80 deg of arc, lens body, sharp tips): the
+                                         flying sword wave, readable rolled 45 deg as one diagonal blade.
   slash_wave            512x128 strip   straight slash wave: bright leading edge at
                                          v~0.3 (moving toward -v), lens-shaped gradient
                                          tail toward v~0.9, tapered ends.
@@ -1095,6 +1099,50 @@ def tex_crescent(seed, bolt):
     return render_bolt(w, h, paths, sp, glow=(2.0, 2.0, 0.6), halo=(4.0, 5.5, 0.3), extra=E.d)
 
 
+# The flying sword wave (찰나의 포영, user 10-22j: "검기가 ... 'ㄴ' 자로 꺾여"): crescent_a spans 144 degrees of arc, and
+# rolled 45 deg for a diagonal cut its two halves stand nearly at right angles (an L). wave_blade is a shallow crescent
+# moon: the outer edge spans +-WB_PHI around straight up (80 degrees), the body is a lens (thickest under the apex, the
+# tips sharp), so rolled 45 deg it reads as one diagonal blade of light. Same edge / glow widths as crescent_a.
+WB_W, WB_H, WB_PHI = 320, 112, 40
+WB_R = 0.46 * WB_W / math.sin(math.radians(WB_PHI))      # outer edge radius (px): the tips at u = 0.04 / 0.96
+WB_APEX = 24                                              # outer edge apex row (glow room above it)
+
+
+def tex_wave_blade(seed):
+    w, h, R = WB_W, WB_H, WB_R
+    s = CRESCENT_H / 256.0
+    cx, cy = w / 2, WB_APEX + R
+    phimax = math.radians(WB_PHI)
+    nz = WaveNoise(seed, 5, 1.0)
+    G = GAUSS
+
+    def f(x, y):
+        dx, dy = x - cx, cy - y
+        r = math.hypot(dx, dy)
+        phi = math.atan2(dx, dy)
+        u = abs(phi) / phimax
+        if u >= 1:
+            return 0.0
+        env = (1 - u * u) ** 1.2
+        thick = 3 + 30 * env
+        d = r - R
+        q = (d / ((1.6 + 2.2 * env) * s)) ** 2
+        edge = (1.05 * G[int(q * 256)] if q < 9 else 0.0) * (0.35 + 0.65 * env)
+        q = (d / ((6 + 8 * env) * s)) ** 2
+        glow = 0.4 * env * G[int(q * 256)] if q < 9 else 0.0
+        body = 0.0
+        if d < 0:
+            t = -d / thick
+            if t < 1.6:
+                streak = 0.7 + 0.3 * nz(phi * 30, r * 0.06 / s)
+                body = 0.62 * env * math.exp(-2.2 * t) * streak
+        return edge + glow + body
+    E = sample_fn(w, h, f, 1)
+    img = Img(w, h)
+    img.over(ELECTRO, E, 1.0, window(w, h, 5, 5))
+    return img
+
+
 def tex_slash_wave(seed):
     w, h = 512, 128
     nz = WaveNoise(seed, 5, 0.6)
@@ -1696,6 +1744,10 @@ def catalogue():
                    "clean sword-light crescent / slash wave", lambda: tex_crescent(191, False)))
     C.append(entry("crescent_b", CRESCENT_W, CRESCENT_H, "crescent", "arc", "as crescent_a + bolt along the edge",
                    "lightning crescent slash", lambda: tex_crescent(193, True)))
+    C.append(entry("wave_blade", WB_W, WB_H, "blade", "u",
+                   "outer edge apex (0.5, 0.21), tips (0.04 / 0.96, 0.69), arc centroid (0.5, 0.38); edge radius 2.05*h",
+                   "flying crescent sword wave (찰나의 포영 tr_wave): shallow crescent moon, 80 deg of arc",
+                   lambda: tex_wave_blade(199), "lens body under the edge, sharp tips"))
     C.append(entry("slash_wave", 512, 128, "strip", "u", "edge at v~0.30, tail toward v~0.9",
                    "straight slash wave / sword beam (travels toward -v)", lambda: tex_slash_wave(197)))
     for v, s in zip("a", (211,)):
@@ -1743,6 +1795,7 @@ def write_catalogue_json(path=CATALOGUE_JSON):
                 "column": "v along height: v=0 top (sky), v=1 bottom (impact), u=0.5 centre",
                 "radial": "centred at (0.5,0.5)",
                 "crescent": "pivot at bottom-centre (0.5,1.0); bright outer edge radius 0.94*h; +-72 deg",
+                "blade": "chord along u: tips (0.04/0.96, 0.69), outer edge apex (0.5, 0.21), arc centroid (0.5, 0.38)",
                 "decal": "top view: u = local +x, v = local +z (forward)",
                 "quarter": "circle centre at texture corner (0,0); mirror uv for other quadrants"},
             "model_rules": "flat cards (from==to on one axis), faces on both sides, shade false, uv 0..16 "
