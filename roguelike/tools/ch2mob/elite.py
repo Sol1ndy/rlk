@@ -458,8 +458,8 @@ def cc(w):
 def ci(w):
     c, f = CFG['ci'], fnw(w, 'ci')
     husk_spawn(w, 'ci', '번개 시킨 (술사가 부름; 단독 소환은 시험용)', scale=0.5, speed=0.0, xp=0,
-               extra_tags=',"rlk_lobby"', nbt=',NoAI:1b,NoGravity:1b', zmob=False)
-    # rlk_lobby: no gold / xp / heal orb for summons (the three reward functions skip that tag); no rlk_zmob, so
+               extra_tags=',"rlk_c2lite"', nbt=',NoAI:1b,NoGravity:1b', zmob=False)
+    # rlk_c2lite (+ xp 0): no gold / xp / heal orb for summons (gold_drop / heal_orb_roll skip that tag); no rlk_zmob, so
     # cicins never hold a room fight open.
     f('init', '# new cicin (@s, at @s)', 'function rlk:cm/init', 'scoreboard players set @s c2eOw 0',
       'execute store result score @s c2eA run random value 0..359', 'scoreboard players set @s c2eF 0',

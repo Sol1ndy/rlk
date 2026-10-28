@@ -1,3 +1,7 @@
+execute if entity @s[tag=rlk_cm_ci] run return run function rlk:cm/ci/rig/hurt
+execute if entity @s[tag=rlk_cm_cc] run return run function rlk:cm/cc/rig/hurt
+execute if entity @s[tag=rlk_cm_nj] run return run function rlk:cm/nj/rig/hurt
+execute if entity @s[tag=rlk_cm_kr] run return run function rlk:cm/kr/rig/hurt
 execute if entity @s[tag=rlk_c2a] run return run function rlk:cm/c2/hurt
 execute if entity @s[tag=rlk_cm_sw] run return run function rlk:cm/sw/rig/hurt
 execute if entity @s[tag=rlk_cm_ar] run return run function rlk:cm/ar/rig/hurt

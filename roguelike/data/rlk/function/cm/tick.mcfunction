@@ -18,6 +18,10 @@ execute if score #cmDown tmp matches 0 if entity @s[tag=rlk_cm_fm] run function 
 execute if score #cmDown tmp matches 0 if entity @s[tag=rlk_cm_im] run function rlk:cm/im/tick
 execute if score #cmDown tmp matches 0 if entity @s[tag=rlk_cm_sh] run function rlk:cm/sh/tick
 execute if score #cmDown tmp matches 0 if entity @s[tag=rlk_cm_cn] run function rlk:cm/cn/tick
+execute if score #cmDown tmp matches 0 if entity @s[tag=rlk_cm_ci] run function rlk:cm/ci/tick
+execute if score #cmDown tmp matches 0 if entity @s[tag=rlk_cm_cc] run function rlk:cm/cc/tick
+execute if score #cmDown tmp matches 0 if entity @s[tag=rlk_cm_nj] run function rlk:cm/nj/tick
+execute if score #cmDown tmp matches 0 if entity @s[tag=rlk_cm_kr] run function rlk:cm/kr/tick
 execute if score #cmDown tmp matches 0 if entity @s[tag=rlk_c2] run function rlk:cm/c2/tick
 # 이동 멈춤(사거리 안 · 차지 중): 넉백은 그대로 받는다
 execute if entity @s[tag=rlk_cmch] run scoreboard players set #hold tmp 1
