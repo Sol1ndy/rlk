@@ -75,6 +75,7 @@ execute if score #mobHP tmp matches 1.. if score @s rnEr matches 1.. unless enti
 execute if score #mobHP tmp matches ..0 run scoreboard players add #mobKilled tmp 1
 execute if score #mobHP tmp matches ..0 if entity @s[tag=boss] run scoreboard players set #killBoss tmp 1
 execute if score #mobHP tmp matches ..0 if entity @s[tag=miniboss] run scoreboard players set #killMini tmp 1
+execute if score #mobHP tmp matches ..0 if entity @s[tag=rlk_c2] run function rlk:cm/c2/kill_note
 execute if score #mobHP tmp matches ..0 run function rlk:combat/heal_orb_roll
 execute if score #mobHP tmp matches ..0 run function rlk:combat/kill_xp
 execute if score #mobHP tmp matches ..0 run function rlk:combat/gold_drop

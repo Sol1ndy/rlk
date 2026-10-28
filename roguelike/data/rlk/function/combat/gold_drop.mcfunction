@@ -1,5 +1,6 @@
 # 로비(튜토리얼 · 체험)의 더미 · 허수아비는 주지 않음
 execute if entity @s[tag=rlk_lobby] run return 0
+execute if entity @s[tag=rlk_c2lite] run return 0
 # 처치 시 골드 드롭 (@s = 죽는 몹, at @s). 양 = 무작위(#mobGoldMin~#mobGoldMax) × 챕터, 보스(boss 태그)는 × #bossGoldMul
 # 런 밖(챕터 값이 없을 때)은 × 1
 execute store result score #gr tmp run random value 0..9999

@@ -1,3 +1,4 @@
+function rlk:cm/c2/clean
 execute as @e[tag=rlk_sw_anchor,tag=!rlk_cmsync,tag=!rlk_sw_dying] at @s run function rlk:cm/sw/rig/die
 execute as @e[tag=rlk_sw_anchor,tag=rlk_sw_dying] at @s run function rlk:cm/sw/rig/death_tick
 execute as @e[tag=rlk_ar_anchor,tag=!rlk_cmsync,tag=!rlk_ar_dying] at @s run function rlk:cm/ar/rig/die

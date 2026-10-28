@@ -1331,6 +1331,7 @@ scoreboard players set #3 tmp 3
 scoreboard players set #35 tmp 35
 team add rlk_cmx
 team modify rlk_cmx collisionRule never
+function rlk:cm/c2/load
 
 # 지도 클릭 화면 (2026-10-10)
 scoreboard objectives add vMapL dummy

@@ -1,3 +1,4 @@
+execute if entity @s[tag=rlk_c2a] run return run function rlk:cm/c2/vis
 execute if entity @s[tag=rlk_cm_sw] run return run function rlk:cm/sw/rig/tick
 execute if entity @s[tag=rlk_cm_ar] at @s run return run function rlk:cm/ar/rig/tick
 execute if entity @s[tag=rlk_cm_fm] at @s run return run function rlk:cm/fm/rig/tick

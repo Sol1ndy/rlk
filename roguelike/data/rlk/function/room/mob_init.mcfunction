@@ -32,6 +32,7 @@ execute if entity @s[tag=rlk_m_cmsh] run scoreboard players set @s xpDrop 8
 execute if entity @s[tag=rlk_m_cmcn] run scoreboard players set #mhp tmp 16
 execute if entity @s[tag=rlk_m_cmcn] run scoreboard players set #mad tmp 0
 execute if entity @s[tag=rlk_m_cmcn] run scoreboard players set @s xpDrop 6
+execute if entity @s[tag=rlk_cmb] run function rlk:cm/c2/stats_chk
 # 레벨 = (챕터 - 1) × 6 + 이번 맵의 순서(1~6). 체력은 레벨에 따라 늘어남(mob/level_apply), 공격력은 맞을 때 레벨로 보정
 scoreboard players operation @s mlv = #chapter room
 scoreboard players remove @s mlv 1

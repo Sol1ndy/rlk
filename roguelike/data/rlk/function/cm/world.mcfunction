@@ -10,4 +10,5 @@ data modify entity @e[tag=rlk_lure,limit=1] Health set value 1024f
 # 로노바가 쓰러져 있으면 아무것도 하지 않음
 scoreboard players set #cmDown tmp 0
 execute if entity @a[tag=player,scores={rnDie=1..}] run scoreboard players set #cmDown tmp 1
+execute if entity @e[tag=rlk_c2,limit=1] run function rlk:cm/c2/world
 execute as @e[tag=rlk_cmb] at @s run function rlk:cm/tick

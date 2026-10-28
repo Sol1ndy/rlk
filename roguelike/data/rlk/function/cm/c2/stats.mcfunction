@@ -1,0 +1,19 @@
+scoreboard players set #mad tmp 0
+execute if entity @s[tag=rlk_cm_ns] run scoreboard players set #mhp tmp 8
+execute if entity @s[tag=rlk_cm_ns] run scoreboard players set @s xpDrop 2
+execute if entity @s[tag=rlk_cm_sl] run scoreboard players set #mhp tmp 14
+execute if entity @s[tag=rlk_cm_sl] run scoreboard players set @s xpDrop 4
+execute if entity @s[tag=rlk_cm_ss] run scoreboard players set #mhp tmp 3
+execute if entity @s[tag=rlk_cm_ss] run scoreboard players set @s xpDrop 1
+execute if entity @s[tag=rlk_cm_sp] run scoreboard players set #mhp tmp 10
+execute if entity @s[tag=rlk_cm_sp] run scoreboard players set @s xpDrop 3
+execute if entity @s[tag=rlk_cm_dr] run scoreboard players set #mhp tmp 20
+execute if entity @s[tag=rlk_cm_dr] run scoreboard players set @s xpDrop 5
+execute if entity @s[tag=rlk_cm_kr] run scoreboard players set #mhp tmp 70
+execute if entity @s[tag=rlk_cm_kr] run scoreboard players set @s xpDrop 12
+execute if entity @s[tag=rlk_cm_nj] run scoreboard players set #mhp tmp 45
+execute if entity @s[tag=rlk_cm_nj] run scoreboard players set @s xpDrop 9
+execute if entity @s[tag=rlk_cm_cc] run scoreboard players set #mhp tmp 50
+execute if entity @s[tag=rlk_cm_cc] run scoreboard players set @s xpDrop 10
+execute if entity @s[tag=rlk_cm_ci] run scoreboard players set #mhp tmp 2
+execute if entity @s[tag=rlk_cm_ci] run scoreboard players set @s xpDrop 0
