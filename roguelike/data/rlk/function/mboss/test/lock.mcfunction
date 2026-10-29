@@ -1,3 +1,5 @@
-# #mbLock mb = N: the module repeats pattern N (0 unlocks). Modules read it in their pattern choice.
-$scoreboard players set #mbLock mb $(id)
-$tellraw @s [{text:"[중간보스 테스트] ",color:"#E0703A",bold:true},{text:"패턴 고정: $(id) (0 = 해제)",color:"gray",bold:false}]
+# /function rlk:mboss/test/lock {id:N} -> test/lock_do. {id:"help"}: test/help_pattern. The score line lives in lock_do:
+# a macro function is instantiated whole, so this one must still parse with id = help.
+$data modify storage rlk:tmp hq set value "$(id)"
+execute if data storage rlk:tmp {hq:"help"} run return run function rlk:mboss/test/help_pattern
+$function rlk:mboss/test/lock_do {id:$(id)}

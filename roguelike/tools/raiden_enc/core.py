@@ -7,6 +7,8 @@ phase-0 AI (shogun.py, F:boss/raiden/sg/) is called through the sg/* hooks.
 """
 from pathlib import Path
 
+import help_lib as H
+
 ROOT = Path(__file__).resolve().parents[2]
 BASE = ROOT/'data/rlk/function/boss/raiden'
 def write(name, lines):
@@ -597,13 +599,25 @@ function rlk:boss/raiden/test/start
 execute unless score #rdTest rd matches 1 run return 0
 execute as @e[tag=rlk_raiden,scores={rdDeath=0},limit=1] at @s run function rlk:boss/raiden/transform_start
 tellraw @s '''+T+'{text:"바로 악요의 요고우 텐마(갑주 단계)로 변신합니다.",color:"white",bold:false}]')
-    write('test/pattern','''
+    # {id:"help"} (tools/help_lib.py): the ids with their names (shogun.NAMES, tenma.NAMES). A macro function is
+    # instantiated whole, so test/pattern and test/lock only check and forward; the score lines live in *_do.
+    NAMES = {**shogun.NAMES, **tenma.NAMES}
+    assert sorted(NAMES) == sorted(i for r in S_IDS + T_IDS for i in range(int(r.split('..')[0]), int(r.split('..')[-1]) + 1)), \
+        'shogun.NAMES / tenma.NAMES must name every pattern id'
+    for cmd, what in (('pattern', '다음 패턴'), ('lock', '패턴 고정')):
+        write('test/'+cmd, ['# /function rlk:boss/raiden/test/'+cmd+' {id:N} -> test/'+cmd+'_do. {id:"help"}: test/help_'+cmd+'.']
+              + H.check_lines('id', 'boss/raiden/test/help_'+cmd) + ['$function rlk:boss/raiden/test/'+cmd+'_do {id:$(id)}'])
+        write('test/help_'+cmd, [H.head('/function rlk:boss/raiden/test/'+cmd+' {id:…}', what+' 번호')]
+              + [H.sub('쇼군 (일반)')] + [H.row(f'{TEST}{cmd} {{id:{i}}}', i, n) for i, n in sorted(shogun.NAMES.items())]
+              + [H.sub('텐마 (갑주)')] + [H.row(f'{TEST}{cmd} {{id:{i}}}', i, n) for i, n in sorted(tenma.NAMES.items())]
+              + ([H.note('{id:0}: 고정 해제')] if cmd == 'lock' else []))
+    write('test/pattern_do','''
 # /function rlk:boss/raiden/test/pattern {id:N}: N = '''+'/'.join(_rng(r) for r in S_IDS)+' (normal) or '+'/'.join(_rng(r) for r in T_IDS)+''' (armored), once.
 $scoreboard players set #rdReq rd $(id)
 execute store result score #rdOk rd run function rlk:boss/raiden/test/request
 execute if score #rdOk rd matches 1 run scoreboard players operation #rdForce rd = #rdReq rd
 execute if score #rdOk rd matches 1 run tellraw @s '''+T+'''{text:"다음 패턴: ",color:"gray",bold:false},{score:{name:"#rdReq",objective:"rd"},color:"yellow",bold:false}]''')
-    write('test/lock','''
+    write('test/lock_do','''
 # /function rlk:boss/raiden/test/lock {id:N}: repeat pattern N whenever its phase allows; {id:0} unlocks.
 $scoreboard players set #rdReq rd $(id)
 execute if score #rdReq rd matches 0 run scoreboard players set #rdLock rd 0

@@ -66,6 +66,10 @@ CHOOSE_RULES = [
 TICK_HIDE = []
 TICK_TAIL = []
 IDS = ['11..20']
+# Pattern titles (the caption of each timeline and test/help_pattern of core).
+NAMES = {11: '몽상 • 염원이 깃든 백안지륜', 12: '흉장의 수안 · 박수', 13: '흉장의 수안 · 추적 손바닥', 14: '금강괴멸파', 15: '만겁',
+         16: '번개 신의 신속한 발도', 17: '몽상 • 궤멸의 검기', 18: '번개 신의 강력한 돌진', 19: '몽상 • 단절',
+         20: '몽상 • 초월의 악요개안'}
 OBJECTIVES = ['rdTmCD', 'rdTmChain', 'rdTmV']
 ON_PAUSE = ['kill @e[tag=rlk_rd_tmp]', call('hazard/clear'),
             'execute as @e[tag=rlk_raiden,scores={rdPhase=2,rdDeath=0}] at @s run ' + call('tm/idle')]
@@ -276,7 +280,7 @@ def throw_bomb(p, lock, bomb_decal):
 def p11():
     # 몽상 • 염원이 깃든 백안지륜 (B-09): two glaive sweeps (annulus 2.5-7.5, +-100 deg), the throw, the planted glaive
     # bursts 50 t after it landed. Clip t_combo3: raise 0, sw1 14, sw2 26, cock 42, throw 54, reform 62.
-    p = pattern(11, '몽상 • 염원이 깃든 백안지륜')
+    p = pattern(11, NAMES[11])
     ev(p, 1, clip('t_combo3'), call('line/cleave_all'), face, flat, hz('annulus', 13, 19, r=7.5, rmin=2.5, half=100, sm='rl'))
     ev(p, 14, snd('glaive_sweep'))
     ev(p, 15, face, flat, hz('annulus', 11, 19, r=7.5, rmin=2.5, half=100, sm='lr'))
@@ -308,7 +312,7 @@ def p20():
     # 몽상 • 초월의 악요개안 (B-14), reactive: the line and an eye flare at rdTime 1 lead the clip by 8 t (R1: the spin
     # is a 141 b2 annulus, so 20 t from the first cue; S3-F, review RD-R2: Tenma timelines start at rdTime 1, so the
     # lead is 8, not 7); t_spin_throw: glint 0, spin 13, throw 31 -> pattern 8 / 21 / 39.
-    p = pattern(20, '몽상 • 초월의 악요개안')
+    p = pattern(20, NAMES[20])
     ev(p, 1, call('line/foolish'), 'scoreboard players set @s rdTmCD 300', face, flat,
        'execute positioned ~ ~2.6 ~ run ' + fx('star'))
     ev(p, 9, clip('t_spin_throw'), hz('annulus', 12, 18, r=7, rmin=2, half=180, sm='rl'))
@@ -320,7 +324,7 @@ def p20():
 def p16():
     # 번개 신의 신속한 발도 (B-10): crouch charge, the orb flash 10, the 360 deg disc slash r 12 at 22 (dash i-frames
     # dodge it). Clip t_iai: crouch 0, flash 10, hit 22.
-    p = pattern(16, '번개 신의 신속한 발도')
+    p = pattern(16, NAMES[16])
     ev(p, 1, clip('t_iai'), face, flat, fx('iai_charge'), hz('disk', 21, 30, r=12, sm='rl'))
     ev(p, 10, 'execute positioned ^ ^1.2 ^1.2 run ' + fx('star'))
     ev(p, 22, snd('iai_hit'))
@@ -331,7 +335,7 @@ def p16():
 def p19():
     # 몽상 • 단절 (B-12): halo 6, sky column 16, the band to the wall through the player 24 (40 t decal), the slam 64,
     # then a weak field r 4.5 round her for 40 t (detached). Clip t_danjeol: halo 6, raise 10, band 24, slam 64.
-    p = pattern(19, '몽상 • 단절')
+    p = pattern(19, NAMES[19])
     ev(p, 1, clip('t_danjeol'), face, flat)
     ev(p, 6, fx('danjeol_halo'), call('line/sever'))
     ev(p, 16, fx('danjeol_column'))
@@ -343,7 +347,7 @@ def p19():
 def p12():
     # 흉장의 수안 · 박수 (B-13): dark sphere, an orb flies to the player, two giant hands flank them and follow at
     # 0.3 b/t, the palms flash (lock) and clap 14 t later; twice. Clip t_summon: sphere 4, throw 16.
-    p = pattern(12, '흉장의 수안 · 박수')
+    p = pattern(12, NAMES[12])
     ev(p, 1, clip('t_summon'), face, flat, call('line/prison'), fx('crystal'), snd('clap_summon'))
     ev(p, 4, call('tm/clap/sphere'))
     ev(p, 16, call('tm/clap/orb'))
@@ -394,7 +398,7 @@ def p12():
 def p13():
     # 흉장의 수안 · 추적 손바닥 (B-15): the seed, a pool follows the player (DoT every 20 t), stops and grows (dark
     # magenta disc r 4.5), the palm slams from above. Clip t_seed: twirl 0, throw 8.
-    p = pattern(13, '흉장의 수안 · 추적 손바닥')
+    p = pattern(13, NAMES[13])
     ev(p, 1, clip('t_seed'), face, flat, fx('twirl', life=8))
     ev(p, 8, call('tm/shadow/seed'))
     ev(p, 9, 'execute as @e[tag=rlk_rd_tm_seed] at @e[tag=rlk_body,limit=1] run tp @s ~ ~0.4 ~')
@@ -434,7 +438,7 @@ def p14():
     # 금강괴멸파 (B-18): three vajras, each pulses a floor ring (sweep r0 2, 0.8 b/t, jump it) in the order 1,2,3,1,2,3,
     # then all three. The current runs down the vajra 12 t before its ring, its top flashes 2 t before. Clip t_vajra:
     # hurl 6 / 12 / 18.
-    p = pattern(14, '금강괴멸파')
+    p = pattern(14, NAMES[14])
     ev(p, 1, clip('t_vajra'), face, flat, call('line/cheonsu'))
     for k, (t, (x, z)) in enumerate(zip(VAJRA_T, VAJRAS), 1):
         ev(p, t, call('tm/vajra/drive') + f' {{k:{k},x:{x},z:{z},life:{VAJRA_END - t}}}')
@@ -469,7 +473,7 @@ def p15():
     # bolts fall round the arena, the dome cracks (160) and shatters (176) as the rift collapses (178..188), she
     # reappears at the centre (184). The camera stays free (the rig faces the player instead; the release's camera lock
     # is not restored). Clips t_vanish (gone 14), t_reform (appear 0).
-    p = pattern(15, '만겁')
+    p = pattern(15, NAMES[15])
     ev(p, 1, clip('t_vanish'), call('line/mangeop'), 'scoreboard players set @s rdUltUsed 1', face, flat, fx('iai_charge'))
     ev(p, 14, call('tm/mg/vanish'))
     ev(p, 18, center + fx('mangeop_tint', life=160))
@@ -554,7 +558,7 @@ def p17():
     # never hit (plan A.4) and one 2.2-3.8 b out is hit 12 t after the cue (S3-F, review RD-R3: they used to launch 11 t
     # after it with the band at 1.2-2.8 b). Swing 2: one low wide wave (jump it), re-aimed at 46 with its own glint,
     # 12 t before it launches. Both travel on after the end.
-    p = pattern(17, '몽상 • 궤멸의 검기')
+    p = pattern(17, NAMES[17])
     ev(p, 1, call('line/goemyeol'), face, flat, 'execute positioned ^ ^2 ^1 run ' + fx('star'))
     ev(p, 6, clip('t_waves'))
     ev(p, 9, face, flat)
@@ -570,7 +574,7 @@ def p17():
 def p18():
     # 번개 신의 강력한 돌진 (B-16): glint, the orb flash locks the player's spot 13, she rushes to 1.5 b short of it
     # in 4 t (23-26), then three undodgeable bursts r 7 round the arrival (28 / 34 / 40). Clip t_rush.
-    p = pattern(18, '번개 신의 강력한 돌진')
+    p = pattern(18, NAMES[18])
     ev(p, 1, clip('t_rush'), face, flat, call('line/pierce'), 'execute positioned ^ ^1.4 ^1.5 run ' + fx('star'))
     ev(p, 13, call('tm/rush/lock'))
     span(p, 23, 26, call('tm/rush/step'))

@@ -20,6 +20,7 @@ numbering (0 physical 1 pyro 2 hydro 3 electro 4 cryo 5 geo 6 anemo 7 dendro).
 """
 import json
 import math
+import help_lib as H
 import mboss_lib as L
 
 REG = L.load_registry()
@@ -2496,6 +2497,13 @@ w('mv/dist', '\n'.join(isqrt))
 
 # =============================================================================================
 # Tests
+
+
+def hcheck(help_fn):
+    """The {id:"help"} check lines of a test command (tools/help_lib.py): help_fn runs and the command returns."""
+    return '\n'.join(H.check_lines('id', help_fn))
+
+
 HELP = (TT + gray('명령: ') + ',' + link("/function rlk:mboss/test/start {id:\"proto\"}", 'start {id}') + ',' + gray(' 시험 전투 · ') + ','
         + link("/function rlk:mboss/test/start_ch {id:\"proto\",ch:2}", 'start_ch {id,ch}') + ',' + gray(' 챕터 지정 · ') + ','
         + link('/function rlk:mboss/test/kill', 'kill') + ',' + gray(' 처치(보상) · ') + ','
@@ -2509,10 +2517,13 @@ w('test/help', 'tellraw @s ' + HELP)
 w('test/start', '''
 # /function rlk:mboss/test/start {id:"proto"}: a real node map (chapter 1, map 2) whose kind-15 zone holds
 # that mid-boss; the gate is pressed at once. Exercises roll -> gate -> arena -> fight -> won -> reward.
+# {id:"help"}: the mid-boss ids (test/help_start).
+''' + hcheck('mboss/test/help_start') + '''
 $function rlk:mboss/test/start_ch {id:"$(id)",ch:1}
 ''')
 w('test/start_ch', TT.join(['''
-# /function rlk:mboss/test/start_ch {id:"proto",ch:2}
+# /function rlk:mboss/test/start_ch {id:"proto",ch:2}  ({id:"help",ch:1}: the mid-boss ids, test/help_start_ch)
+''' + hcheck('mboss/test/help_start_ch') + '''
 execute unless entity @s[tag=player] run return run tellraw @s {text:"[중간보스 테스트] 'player' 태그가 있는 플레이어로 실행하세요.",color:"red"}
 execute unless data storage rlk:room {ready:1b} run return run tellraw @s ''', gray('던전 구역이 준비되지 않았습니다. 먼저 ') + ',' + link('/function rlk:room/setup') + ',' + gray(' 을 실행하세요.') + ''']
 execute if score #active room matches 1 unless score #mbTest mb matches 1 run return run tellraw @s ''', gray('진행 중인 런이 있습니다. ') + ',' + link('/function rlk:run/stop') + ',' + gray(' 후 다시 실행하세요.') + ''']
@@ -2573,12 +2584,19 @@ execute unless score #combat room matches 1.. run function rlk:mboss/cleanup
 tellraw @s ''', gray('중간보스를 보상 없이 없앴습니다(취소 경로).') + ''']
 ''']))
 w('test/pattern', TT.join(['''
-# Module test hook (rlk:mboss/<id>/test {id:N}); the meaning of N belongs to the module.
+# Module test hook (rlk:mboss/<id>/test {id:N}); the meaning of N belongs to the module. {id:"help"}: test/help_pattern.
+''' + hcheck('mboss/test/help_pattern') + '''
 execute unless entity @e[tag=rlk_mb_body,limit=1] run return run tellraw @s ''', gray('진행 중인 중간보스가 없습니다.') + ''']
 $function rlk:mboss/d/test {id:$(id)}
 $tellraw @s ''', gray('다음 패턴 요청: $(id)') + ''']
 ''']))
-w('test/lock', TT.join(['''
+w('test/lock', '''
+# /function rlk:mboss/test/lock {id:N} -> test/lock_do. {id:"help"}: test/help_pattern. The score line lives in lock_do:
+# a macro function is instantiated whole, so this one must still parse with id = help.
+''' + hcheck('mboss/test/help_pattern') + '''
+$function rlk:mboss/test/lock_do {id:$(id)}
+''')
+w('test/lock_do', TT.join(['''
 # #mbLock mb = N: the module repeats pattern N (0 unlocks). Modules read it in their pattern choice.
 $scoreboard players set #mbLock mb $(id)
 $tellraw @s ''', gray('패턴 고정: $(id) (0 = 해제)') + ''']
@@ -3440,7 +3458,9 @@ return 1
 # F. Chapter test commands (cm.md 5.9)
 w('test/chapter', '\n'.join(
     ['# /function rlk:mboss/test/chapter {id:"cproto"}: test/chapter_ch in the boss\'s first chapter (none: chapter 1).',
-     '$data modify storage rlk:mboss tch set value "$(id)"']
+     '# {id:"help"}: the chapter-boss ids (test/help_chapter).']
+    + H.check_lines('id', 'mboss/test/help_chapter')
+    + ['$data modify storage rlk:mboss tch set value "$(id)"']
     + [f'execute if data storage rlk:mboss {{tch:"{b["id"]}"}} run return run function rlk:mboss/test/chapter_ch {{id:"{b["id"]}",ch:{(b.get("ch") or [1])[0]}}}'
        for b in CHAPS]
     + ['$function rlk:mboss/test/chapter_ch {id:"$(id)",ch:1}']))
@@ -3448,7 +3468,8 @@ w('test/chapter_ch', CTT.join(['''
 # /function rlk:mboss/test/chapter_ch {id:"cproto",ch:2}: a real boss map (#mapIdx 5, #mapType 8) of that chapter routed
 # to the chapter boss (#cbForce, only under #mbTest 1): room/gen -> cb/route_force -> the entrance layout, the kind-9 zone
 # built (-> cb/prep: cprep, forceload, the sliced arena job), the player in front of the gate (zone_enter -> k_cboss);
-# test/cwait presses the gate as soon as no arena job runs (#cbAuto 1).
+# test/cwait presses the gate as soon as no arena job runs (#cbAuto 1). {id:"help",ch:1}: the ids (test/help_chapter_ch).
+''' + hcheck('mboss/test/help_chapter_ch') + '''
 execute unless entity @s[tag=player] run return run tellraw @s {text:"[챕터 보스 테스트] 'player' 태그가 있는 플레이어로 실행하세요.",color:"red"}
 execute unless data storage rlk:room {ready:1b} run return run tellraw @s ''', gray('던전 구역이 준비되지 않았습니다. 먼저 ') + ',' + link('/function rlk:room/setup') + ',' + gray(' 을 실행하세요.') + ''']
 execute if score #active room matches 1 unless score #mbTest mb matches 1 run return run tellraw @s ''', gray('진행 중인 런이 있습니다. ') + ',' + link('/function rlk:run/stop') + ',' + gray(' 후 다시 실행하세요.') + ''']
@@ -3522,6 +3543,38 @@ w('test/chelp', 'tellraw @s ' + CTT + gray('명령: ') + ',' + link('/function r
 # the one implementation (mid-boss and chapter-boss tests share it). boss/test is reserved in the registry (fn roots).
 BOSS_TEST_ALIASES = [('chapter', '{id:"$(id)"}'), ('chapter_ch', '{id:"$(id)",ch:$(ch)}'), ('pattern', '{id:$(id)}'),
                      ('lock', '{id:$(id)}'), ('kill', ''), ('abort', ''), ('lose', ''), ('level', '{lv:$(lv)}'), ('stop', '')]
+
+
+# {id:"help"} of the test commands (README 명령 도움말, tools/help_lib.py): the ids come from the registry (enabled entries).
+def _chs(b):
+    return '·'.join(str(c) for c in b['ch']) + '챕터' if b.get('ch') else '챕터 배정 없음(시험용)'
+
+
+def _first_ch(b):
+    return (b.get('ch') or [1])[0]
+
+
+w('test/help_start', [H.head('/function rlk:mboss/test/start {id:…}', '중간보스 id')]
+  + [H.row(f'/function rlk:mboss/test/start {{id:"{b["id"]}"}}', b['id'], b['name']) for b in MIDS])
+w('test/help_start_ch', [H.head('/function rlk:mboss/test/start_ch {id:…,ch:…}', '중간보스 id (ch = 챕터)')]
+  + [H.row(f'/function rlk:mboss/test/start_ch {{id:"{b["id"]}",ch:2}}', b['id'], b['name']) for b in MIDS])
+w('test/help_chapter', [H.head('/function rlk:mboss/test/chapter {id:…}', '챕터 보스 id (= rlk:boss/test/chapter)')]
+  + [H.row(f'/function rlk:mboss/test/chapter {{id:"{b["id"]}"}}', b['id'], f'{b["name"]} · {_chs(b)}') for b in CHAPS])
+w('test/help_chapter_ch', [H.head('/function rlk:mboss/test/chapter_ch {id:…,ch:…}', '챕터 보스 id (ch = 챕터)')]
+  + [H.row(f'/function rlk:mboss/test/chapter_ch {{id:"{b["id"]}",ch:{_first_ch(b)}}}', b['id'], f'{b["name"]} · {_chs(b)}')
+     for b in CHAPS])
+# Pattern / lock numbers belong to the module: its <fn root>/test/help (contract L.HELP_HOOKS), through mboss/d/test_help
+# while a fight runs; with none running, every boss with a link to its own list.
+w('test/help_pattern', [
+    '# {id:"help"} of test/pattern and test/lock (also the rlk:boss/test aliases): the running boss\'s own numbers.',
+    'execute if entity @e[tag=rlk_mb_body,limit=1] run return run function rlk:mboss/d/test_help',
+    H.head('/function rlk:mboss/test/pattern {id:…}', '번호는 보스마다 다릅니다(진행 중인 보스 없음) · 보스를 누르면 그 번호 목록')]
+  + [H.row(f'/function rlk:{L.fn_root(b)}/test/help', b['id'], b['name']) for b in MIDS + CHAPS])
+out.write('mboss/d/test_help', '\n'.join(
+    ['# GENERATED dispatcher: rlk:<fn root>/test/help of the running boss (#mbId mb = registry n; from test/help_pattern).']
+    + [f'execute if score #mbId mb matches {b["n"]} run return run function rlk:{L.fn_root(b)}/test/help' for b in BOSSES]
+    + [H.note('이 보스의 패턴 번호 목록이 없습니다.')]))
+
 out_bt = L.Out(owned_dirs=['boss/test'])
 for cmd, args in BOSS_TEST_ALIASES:
     out_bt.write(f'boss/test/{cmd}', [

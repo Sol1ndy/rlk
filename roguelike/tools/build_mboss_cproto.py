@@ -23,6 +23,7 @@ What it exercises (scratchpad az/contract/cm.md 15.1; plan 1.2 R15):
               extended by hz/extend
 """
 import json
+import help_lib as H
 import mboss_lib as L
 
 ID = 'cproto'
@@ -362,8 +363,18 @@ for k, lines in TESTS.items():
         test.append(f'execute if score #cpReq mb matches {k} as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run {fn(f"t/{k}")}')
 test.append('scoreboard players set #cpReq mb 0')
 w('test', test)
+# Contract test/help (L.HELP_HOOKS): /function rlk:mboss/test/pattern {id:"help"} while this boss runs (names of TESTS).
+TEST_NAMES = {1: '위험 지대(마스크)', 2: '플레이어 지속 피해', 3: '밀어내는 고리', 4: '예측 지점 내려찍기', 5: '로컬 좌표 읽기',
+              6: '대시로 못 피하는 투사체', 7: '연출 40틱', 8: '경기장 밝은 모습', 9: '경기장 기본 모습', 10: '목표 패배 경로',
+              11: '2단계로', 20: '판정 상태: 무적', 21: '판정 상태: 꼬리만', 22: '판정 상태: 보통', 23: '판정 상태: 없는 이름',
+              30: '밀어내기 캡슐 켜고 끄기', 31: '동작: 가라앉기', 32: '동작: 떠오르기', 33: '동작: 휩쓸기', 40: '이름 교체',
+              41: '음악 2단계', 42: '음악 끄기', 50: '원소별 저항이 있는 보조 개체', 60: '오래 남는 원판(hz/extend)'}
+assert list(TEST_NAMES) == list(TESTS), 'TEST_NAMES must name every test id'
+w('test/help', [H.head('/function rlk:mboss/test/pattern {id:…}', f'{B["name"]} 시험 번호')]
+  + [H.row(f'/function rlk:mboss/test/pattern {{id:{k}}}', k, v) for k, v in TEST_NAMES.items()]
+  + [H.note('lock {id:1~3}: 그 패턴만 반복(1 내려찍기 원판 · 2 밀어내는 고리 · 3 안전 원 둘인 위험 지대) · {id:0} 해제')])
 
-missing = [h for h in L.HOOKS + L.CHAPTER_HOOKS if not (L.FN / f'mboss/{ID}/{h}.mcfunction').exists()]
+missing = [h for h in L.HOOKS + L.HELP_HOOKS + L.CHAPTER_HOOKS if not (L.FN / f'mboss/{ID}/{h}.mcfunction').exists()]
 assert not missing, missing
 removed = out.clean()
 print(f'mboss {ID}: {len(out.written)} functions ({len(CLIPS)} clips, {len(MANIFEST["proxies"]["layout"])} proxies), {removed} stale removed.')

@@ -15,6 +15,11 @@ from .core import call, center, face, flat, obj, patterns, target, write
 from raiden_kit import decal, fx, hz, hz_group, snd
 
 IDS = ['1..10', '21..28']
+# Korean names of the ids (test/help_pattern: /function rlk:boss/raiden/test/pattern {id:"help"}); 6 is the sword switch's
+# after-effect and 25 / 26 / 27 / 28 are reactive or forced moves, all requestable through test/pattern.
+NAMES = {1: '원류 4단', 2: '뇌전이 이끈 번개', 3: '뇌명 돌진', 4: '마가츠의 뇌안 (광역)', 5: '찰나의 포영', 6: '낙뢰 (검 후속 효과)',
+         7: '몽상의 일심', 8: '5단 콤보', 9: '번개 배리어', 10: '마가츠의 뇌안 (단일)', 21: '수천수만의 염원', 22: '돌진 3콤보',
+         23: '번개돌진 콤보', 24: '원거리 창', 25: '판결의 검 (등 뒤 견제)', 26: '창 뒤 견제', 27: '무기 변경 – 검', 28: '무기 변경 – 창'}
 OBJECTIVES = ['rdSgFx', 'rdSgFxT', 'rdSgGs', 'rdSgGm', 'rdSgGp', 'rdSgCt', 'rdSgCk', 'rdSgCcd', 'rdSgGd', 'rdSgEye',
               'rdSgRearT', 'rdSgRearCD', 'rdSgRearQ', 'rdSgStun', 'rdSgV', 'rdSgDx']
 ON_PAUSE = []

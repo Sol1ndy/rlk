@@ -18,6 +18,7 @@ What it exercises:
   bars        sub-line (pattern name) and under-bar (pattern progress)
   death       slump, line, sink
 """
+import help_lib as H
 import mboss_lib as L
 
 ID = 'proto'
@@ -409,8 +410,14 @@ w('test', [
     'execute if score #prPat mb matches 1.. as @e[tag=rlk_mb_body,limit=1] at @s run ' + fn('finish'),
     'scoreboard players set #prCool mb 1'])
 
+# Contract test/help (L.HELP_HOOKS): /function rlk:mboss/test/pattern {id:"help"} while this boss runs.
+w('test/help', [H.head('/function rlk:mboss/test/pattern {id:…}', f'{B["name"]} 시험 번호')]
+  + [H.row(f'/function rlk:mboss/test/pattern {{id:{k}}}', k, f'{v} (다음 패턴)') for k, v in NAMES.items()]
+  + [H.row('/function rlk:mboss/test/pattern {id:90}', 90, '부술 수 있는 별 소환'),
+     H.note('lock {id:1~7}: 그 패턴만 반복 · {id:0} 해제')])
 
-missing = [h for h in L.HOOKS if not (L.FN / f'mboss/{ID}/{h}.mcfunction').exists()]
+
+missing = [h for h in L.HOOKS + L.HELP_HOOKS if not (L.FN / f'mboss/{ID}/{h}.mcfunction').exists()]
 assert not missing, missing
 removed = out.clean()
 print(f'mboss {ID}: {len(out.written)} functions ({len(PARTS)} rig parts, {len(POSES)} poses, {len(PAT)} patterns), {removed} stale removed.')

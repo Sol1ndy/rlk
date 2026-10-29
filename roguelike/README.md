@@ -157,10 +157,10 @@
   불 → 얼음·빙결 > 물 > 번개 > 풀 / 물 → 불 > 얼음 > 번개 > 풀 / 번개 → 불 > 얼음·빙결 > 물 > 활성 > 풀 /
   얼음 → 불 > 번개 > 물 / 풀 → 불 > 물 > 활성 > 번개 / 바람 → 번개 > 불 > 물 > 얼음 / 바위 → 빙결 > 번개 > 불 > 물 > 얼음
 - **원소 부여(기본공격)**: `/function rlk:element/infuse {id:"wind"}` — 다시 부르거나 `physical` 을 줄 때까지 유지.
-  시간 제한: `/function rlk:element/infuse_for {id:"fire",sec:10}`. 한글 이름(불/물/번개/얼음/바위/바람/풀/물리)도 됩니다.
+  시간 제한: `/function rlk:element/infuse_for {id:"fire",sec:10}`. 한글 이름(불/물/번개/얼음/바위/바람/풀/물리)도 됩니다. 원소 id 목록: `{id:"help"}`(`infuse_for` 는 `{id:"help",sec:0}`).
 - **몹의 원소 공격**: 몹에 `el_fire` `el_water` `el_thunder` `el_ice` `el_rock` `el_wind` `el_grass` 태그를 달면 그 몹에게 맞을 때
   플레이어에게 원소가 부착되고 같은 규칙으로 반응합니다(격변 반응은 즉시 추가 피해, 빙결은 최대 2초 이동 불가). 플레이어에 붙은 원소는 액션바에 표시.
-- 테스트: `/function rlk:element/give {id:"water"}` — 가장 가까운 몹에 피해 0 으로 원소 부착.
+- 테스트: `/function rlk:element/give {id:"water"}` — 가장 가까운 몹에 피해 0 으로 원소 부착(`{id:"help"}` = 원소 id 목록).
 - 원신과 다르게 단순화한 점: 한 번의 타격은 반응 하나만 일으킴, 빙결은 게이지 대신 시간으로 관리, 활성 중 촉진·발산 타격은 원소를 따로 부착하지 않음,
   감전은 주변으로 번지지 않음.
 
@@ -196,7 +196,7 @@
   플레이어가 주는 피해에는 위의 레벨 보정이 들어갑니다. 방 몹의 레벨 = (챕터 − 1) × 6 + 맵 순서(1~6).
 
 ### 5-1. 1챕터 커스텀 몹 (`cm/`, build/p166)
-1챕터 전투 구역의 몹은 아래 6종입니다. 2챕터는 따로 2챕터 몹(5-2절)만 나오고, **테스트 설정**으로 지금은 3챕터 이후에도 이 6종이 나옵니다(레벨·마리 수는 챕터대로 오름). 예전처럼 2챕터부터 임시 몹(허스크/스켈레톤/변명자)을 쓰려면 `/scoreboard players set #mobTmp room 1`, 되돌리려면 `/scoreboard players reset #mobTmp room`. 시험 소환: `/function rlk:cm/test {t:"sw"}` (sw 검사 · ar 궁수 · fm 불 마법사 · im 얼음 마법사 · sh 방패병 · cn 대포병, 바라보는 쪽 5칸 앞, 1레벨).
+1챕터 전투 구역의 몹은 아래 6종입니다. 2챕터는 따로 2챕터 몹(5-2절)만 나오고, **테스트 설정**으로 지금은 3챕터 이후에도 이 6종이 나옵니다(레벨·마리 수는 챕터대로 오름). 예전처럼 2챕터부터 임시 몹(허스크/스켈레톤/변명자)을 쓰려면 `/scoreboard players set #mobTmp room 1`, 되돌리려면 `/scoreboard players reset #mobTmp room`. 시험 소환: `/function rlk:cm/test {t:"sw"}` (sw 검사 · ar 궁수 · fm 불 마법사 · im 얼음 마법사 · sh 방패병 · cn 대포병, 바라보는 쪽 5칸 앞, 1레벨). 모든 챕터의 id 목록: `/function rlk:cm/test {t:"help"}`.
 
 | 몹 | 1레벨 체력 | 공격 | 피해(원피해) | 간격 |
 |---|---|---|---|---|
@@ -215,7 +215,7 @@
 - 구조: **두뇌**(투명 허스크 `rlk_cmb`: 길찾기·체력바·피격, 공격력 0) + **모습**(마네킹 `rlk_cmv`, 스킨 `rp/assets/rlk/textures/skin/mob_*.png`, 두뇌 위치로 매 틱 이동·맞으면 붉게 번쩍) + **미끼**(몸 위치의 작은 투명 마네킹 `rlk_lure`). 두뇌는 언제나 미끼만 노리므로 바닐라 근접 공격은 아무 피해도 주지 않고, 모든 공격은 `cm/*` 함수가 직접 `player/take_damage` 로 넣습니다. 몹끼리는 서로 때리지도 노리지도 않음. 연결은 `cmId` 스코어, 주인 없는 모습/부착물(궤적 선·화염구·대포 모형·방패 바)은 `cm/clean` 이 정리.
 
 ### 5-2. 2챕터 몹 (이나즈마, `cm/`, `tools/build_ch2_mobs.py`)
-2챕터 전투 구역에는 아래 몹만 나옵니다(1챕터 몹은 섞이지 않음). 무리 몹 5종은 단순한 패턴을 여럿이 함께 쓰고, 정예 몹(카이라기·뇌전 · 그림자 닌자 · 번개 시킨 술사)은 방마다 많아야 하나. **원소 면역 · 저항은 없습니다**(모든 원소가 똑같이 들어감). 시험 소환: `/function rlk:cm/test {t:"ns"}` (ns 떠돌이 무사 졸개 · sl 번개 슬라임 · ss 작은 번개 슬라임 · sp 반란군 창병 · dr 오니 북잡이 · kr · nj · cc · ci, 무리는 g_ns 졸개 4~6 · g_sp 창병 대열 3 · g_sl 슬라임 2~3).
+2챕터 전투 구역에는 아래 몹만 나옵니다(1챕터 몹은 섞이지 않음). 무리 몹 5종은 단순한 패턴을 여럿이 함께 쓰고, 정예 몹(카이라기·뇌전 · 그림자 닌자 · 번개 시킨 술사)은 방마다 많아야 하나. **원소 면역 · 저항은 없습니다**(모든 원소가 똑같이 들어감). 시험 소환: `/function rlk:cm/test {t:"ns"}` (ns 떠돌이 무사 졸개 · sl 번개 슬라임 · ss 작은 번개 슬라임 · sp 반란군 창병 · dr 오니 북잡이 · kr · nj · cc · ci, 무리는 g_ns 졸개 4~6 · g_sp 창병 대열 3 · g_sl 슬라임 2~3; 목록은 `{t:"help"}`).
 
 | 몹 | 1레벨 체력 | 공격 | 피해(원피해) | 간격 |
 |---|---|---|---|---|
@@ -284,7 +284,7 @@
      - `on_cast_skill`/`on_cast_burst` = 원소전투 스킬/원소폭발을 쓴 순간, `dmg_bonus` = 주는 피해 증가(각인과 합산: `#eb eng` 에 더함), `on_rx` = 원소 반응이 일어났을 때
      - 피해를 받는 도중에 또 피해를 주는 효과는 표식을 소환해 두고 다음 틱에 `tick_world` 에서 처리합니다(얼음 깃촉·양화 참고)
 - 초월 · 악요개안: 피해를 주면 그 자리에 협동 공격(반경 3칸, 공격력의 71% 번개 원소 피해, 쿨타임 1초 — `items/proc/eye_strike`), 원소폭발 피해 +0.3% × 원소 에너지(pt) (`items/hook/burst_dmg` — 새 캐릭터의 원소폭발도 피해 계산 직후 이 함수를 불러야 적용됨)
-- 지급 `function rlk:items/give {id:"sealed_sword"}` / 드롭 `function rlk:items/drop {id:"sealed_sword"}`
+- 지급 `function rlk:items/give {id:"sealed_sword"}` / 드롭 `function rlk:items/drop {id:"sealed_sword"}`. `{id:"help"}` 를 넣으면 아이템 id 와 이름을 등급별로(맨 끝에 캐릭터 아이템) 보여 줍니다(90줄이 넘으니 채팅 창을 열고 위로 올려 보기).
 - 아이템 모양: 기본은 바닐라 아이템 그대로. 리소스팩에 `rlk:<id>` 모델이 있으면
   `/data modify storage rlk:config use_models set value 1b` 후 `/reload`.
 
@@ -303,6 +303,26 @@
 - `/function rlk:items/debug` — 아이템 목록(클릭 드롭)
 - `/function rlk:reset` — 레벨/스탯/골드/아이템 초기화(진행 중인 런도 중단, 사파이어는 유지), `/function rlk:fix` — 내 캐릭터 재초기화
 - `/function rlk:uninstall` — 엔티티/스코어보드 정리 후 정지
+
+### 명령 도움말 (`help`)
+id 를 외워야 하는 시험 · 지급 명령은 그 인자 자리에 `"help"` 를 넣으면 실행하지 않고 쓸 수 있는 값과 한국어 이름을 채팅에 보여 줍니다(첫 줄 = 명령 모양, 그 아래 한 줄에 하나씩 `id — 이름`). 줄을 누르면 그 값으로 채운 명령이 입력창에 들어갑니다(바로 실행하지 않음). 인자가 둘인 명령은 나머지 인자도 아무 값으로 함께 적어야 합니다(매크로는 인자가 하나라도 빠지면 시작하지 못함).
+
+| 명령 | 도움말 | 목록의 출처 |
+|---|---|---|
+| `rlk:cm/test` · `rlk:cm` | `{t:"help"}` | 1챕터 `tools/help_lib.py` 의 `CM_C1`, 2챕터 `tools/ch2mob/common.py` 의 `TEST_ROWS` (챕터별 묶음) |
+| `rlk:items/give` · `items/drop` | `{id:"help"}` | 아이템 레지스트리(`rlk:items ids`, 등급별) + 캐릭터 아이템(`rlk:codex chars`) |
+| `rlk:char/select` | `{id:"help"}` | `rlk:codex chars` 의 캐릭터(이름 = `rlk:chars registry.<id>.info.name`) |
+| `rlk:element/infuse` · `element/give` · `element/infuse_for` | `{id:"help"}` · `{id:"help",sec:0}` | `element/setup` 의 `rlk:elem ids`(이름 = `byid.<id>.name`) |
+| `rlk:engravings/dev` | `{id:"help",n:0}` | 각인 레지스트리(`rlk:engravings ids`) |
+| `rlk:view/mode` | `{m:"help"}` | 1 숄더뷰 · 2 F5 위쪽 시점 |
+| `rlk:mboss/test/start` · `start_ch` | `{id:"help"}` · `{id:"help",ch:1}` | 중간보스 레지스트리(`tools/mboss_registry.json`, 켜진 것) |
+| `rlk:mboss/test/chapter` · `chapter_ch` (= `rlk:boss/test/…`) | `{id:"help"}` · `{id:"help",ch:1}` | 챕터 보스 레지스트리 |
+| `rlk:mboss/test/pattern` · `lock` (= `rlk:boss/test/…`) | `{id:"help"}` | 싸우는 중이면 그 보스 모듈의 `test/help`(번호와 이름), 아니면 보스마다 그 목록을 여는 줄 |
+| `rlk:boss/raiden/test/pattern` · `lock` | `{id:"help"}` | `tools/raiden_enc/shogun.py` · `tenma.py` 의 `NAMES` |
+
+- 매크로 함수는 줄 전체를 먼저 해석하므로, 숫자가 들어가야 하는 줄(`scoreboard players set … $(id)`)이 있는 명령은 확인만 하고 `<명령>_do` 로 넘깁니다(`mboss/test/lock_do`, `boss/raiden/test/pattern_do` · `lock_do`, `view/mode_do`). 그래서 `"help"` 를 넣어도 명령이 시작하지 못하는 일이 없습니다.
+- 생성되는 목록은 생성기의 자료에서 만듭니다(직접 고치지 않음): 공용 모양 `tools/help_lib.py`(머리 줄 · 묶음 줄은 `help/head` · `help/sub`, 레지스트리를 도는 목록은 `help/row` · `help/list`). `rlk:cm/test` 목록 `cm/test_help` 는 `help_lib.cm_test_help()` 가 1챕터 목록 + 디스크에 있는 `cm/c<N>/test_help` 마다 한 줄로 다시 씁니다. 새 챕터 몹 생성기는 `w('cm/c<N>/test_help', help_lib.cm_test_section(N, [(id, 이름), …]))` 로 자기 묶음을 쓰고 파일을 쓴 뒤 `help_lib.cm_test_help(<function 폴더>)` 를 부르면 됩니다(어느 생성기를 어떤 순서로 몇 번 돌려도 결과가 같음).
+- 중간보스 · 챕터 보스 모듈은 훅과 함께 `<fn root>/test/help`(시험 번호와 이름)를 꼭 만들어야 합니다(`mboss_lib.HELP_HOOKS`, `check_mboss_pack.py` 가 검사).
 
 ## 10. 방 시스템 (`room/`, `run/`) — 세피리아 방식
 **구성**: 챕터 = 첫 맵 1 + 맵 4 + 보스전 1. 맵 = 구역 여러 개(최대 7), 구역 = 정사각형/직사각형 방.
@@ -374,7 +394,7 @@
 - 직접 맵 넘기기(테스트): `/data modify storage rlk:room next set value [11,4]` → `/scoreboard players set #mapType room 1` → `/function rlk:run/next_map` (노드 = 구역 종류 번호)
 
 ## 11. 캐릭터 (`char/`)
-- 캐릭터는 하나를 골라 플레이합니다(교체 없음). 선택: `/function rlk:char/select {id:"lumine"}` — 지금은 기본 캐릭터 **루미네**만 있습니다.
+- 캐릭터는 하나를 골라 플레이합니다(교체 없음). 선택: `/function rlk:char/select {id:"lumine"}` — 지금은 기본 캐릭터 **루미네**만 있습니다. 캐릭터 id 목록: `{id:"help"}`.
 - 캐릭터마다 무기 타입(한손검 `sword` / 활 `bow` / 법구 `catalyst`) 하나가 고정입니다. **지금은 한손검의 기본 공격만 구현**되어 있습니다.
 - 인벤토리 0번 칸 = 캐릭터 정보(플레이어 머리, 캐릭터 스킨). 핫바 1번 = 원소전투 스킬, 2번 = 원소폭발.
 - **원소전투 스킬**: 재사용 대기로 동작. 대기 중에는 아이템이 회색 염료로 바뀌고 개수 = 남은 초.
@@ -451,7 +471,7 @@
 - **한 아이템에 각인은 두 개.** 기존 아이템의 각인은 `items/engr_assign` 에 모아 두었습니다.
 - 아이템에 달기: 아이템 def 의 registry 값에 `engravings:["guard","amplify"]` 처럼 넣습니다. 달린 각인은 아이템 설명에 "각인  수호 · 증폭" 한 줄로 나옵니다.
 - 표시(`engravings/info_build`): **인벤토리 첫 줄 3~6번 칸** = 개수가 같은 각인끼리 한 칸에 묶어 개수 많은 묶음부터 왼쪽에(아이템 개수 = 각인 개수, 이름 = "◆ 첫 각인 외 k종  n개", 설명은 묶음 안의 각인마다 켜진 효과만 밝게). **7번 칸** = 네 묶음을 넘는 나머지 각인의 이름과 개수(나머지가 없으면 가진 각인 전체 요약). 각인 아이템의 모양은 `engravings/register` 의 `icon`.
-- 시험용: `/function rlk:engravings/dev {id:"guard",n:4}` — 아이템 없이 개수를 더합니다(n:0 이면 해제).
+- 시험용: `/function rlk:engravings/dev {id:"guard",n:4}` — 아이템 없이 개수를 더합니다(n:0 이면 해제). 각인 id 목록: `{id:"help",n:0}`.
 - 수치는 `load.mcfunction` 의 "각인 수치", 설명 글은 `engravings/register` 에 있습니다(둘을 같이 고칠 것).
 - 보물의 '골드 획득 +20%'는 돈 구역 보상과 몹이 떨어뜨린 골드에 적용되고, 아이템 판매에는 적용되지 않습니다.
 - '주는 피해 증가'(수호·불굴·빙설·처형·반석·광전사)는 서로 더해서 한 번에 곱하고, 반응 피해(과부하·확산 등)에는 적용하지 않습니다. 심연의 탄환이 일으킨 반응으로는 심연의 원소가 쌓이지 않습니다.
@@ -512,8 +532,8 @@
 **테스트 명령** (`'player'` 태그 필요, `/function rlk:room/setup` 을 먼저 해 두고, 진행 중인 일반 런이 없어야 함)
 - `/function rlk:boss/raiden/test/start` — 런 없이 나루카미하고만 싸웁니다(2스테이지 보스, 레벨 12).
 - `/function rlk:boss/raiden/test/armored` — 바로 텐마로 변신합니다.
-- `/function rlk:boss/raiden/test/pattern {id:N}` — 다음 패턴을 지정합니다(1~10 · 21~28 쇼군, 11~20 텐마). 진행 중인 공격은 취소하고 필요하면 단계를 바꿉니다. 무기 전용 패턴도 지금 든 무기로 실행합니다.
-- `/function rlk:boss/raiden/test/lock {id:N}` — 그 패턴만 반복합니다(`{id:0}` 으로 해제). `test/level {lv:N}` — 레벨을 바꾸고 체력을 다시 채웁니다. `test/stop` — 전투를 정리하고 로비로 돌아갑니다.
+- `/function rlk:boss/raiden/test/pattern {id:N}` — 다음 패턴을 지정합니다(1~10 · 21~28 쇼군, 11~20 텐마; `{id:"help"}` = 번호와 패턴 이름). 진행 중인 공격은 취소하고 필요하면 단계를 바꿉니다. 무기 전용 패턴도 지금 든 무기로 실행합니다.
+- `/function rlk:boss/raiden/test/lock {id:N}` — 그 패턴만 반복합니다(`{id:0}` 으로 해제, `{id:"help"}` = 번호 목록). `test/level {lv:N}` — 레벨을 바꾸고 체력을 다시 채웁니다. `test/stop` — 전투를 정리하고 로비로 돌아갑니다.
 
 **생성기** (생성 결과는 직접 고치지 않습니다)
 - `python3 tools/build_raiden_all.py --resourcepack <리소스팩>`가 전부를 순서대로 만들고 `check_raiden_pack.py`로 검사합니다. 두 번 돌려도 결과가 같습니다.
@@ -558,7 +578,7 @@
 - 중간보스 하나 = 레지스트리 항목 하나 + 모듈 폴더 `mboss/<id>/`(자기 생성기 `tools/build_mboss_<id>.py`; 모듈 폴더는 항목의 `fn` 이 정하고 기본은 `mboss/<id>`, 챕터 보스는 `boss/<id>` — 아래 "챕터 보스"). 항목: `id` `n`(고정 번호, 디스패처용) `enabled` `w`(뽑기 가중치, 0 = 테스트 전용) `minCh/maxCh` `name/sub/color` `el`(공격 원소) `hp/xp/atk/lvAdd/dmgMul` `goldMul/sap/picks` `scale` `hit{w,h}`(클릭 판정) `intro/death`(연출 최대 틱) `deathSnd`(기본 true: 쓰러질 때 틀이 위더 죽는 소리를 냄, false 면 모듈이 자기 소리를 냄) `icon`.
 - 뽑기: 이번 판에 아직 안 만난 · 챕터 범위 안 · 가중치 1 이상 → 만난 것 허용 → 챕터 무시 → 첫 항목 순. 테스트는 `#mbForce mb`(번호)로 고정.
 - 등록된 항목: `guardian`(n 1, 가중치 10), `butterfly`(n 2, 가중치 10), `fieldgen`(n 3, 가중치 10), `proto`(n 99, 가중치 0 = 테스트 전용). 셋 다 1~99챕터라 한 판의 첫 중간보스는 셋 중 하나가 같은 확률로, 그다음은 아직 안 만난 쪽에서 나온다.
-- 모듈이 채우는 훅(전부 있어야 함, 빈 함수 가능): `spawn intro_tick tick on_hit aux_hit incoming pause resume death_start death_tick cleanup reload bars hz_vis pj_end test uninstall`. 생성된 디스패처 `mboss/d/<훅>` 이 `#mbId` 로 모듈을 부른다(`uninstall` 만은 등록된 모든 모듈을 부른다: 모듈이 만든 점수판 등을 지움). 훅마다의 호출 맥락 · 라이브러리 인자는 생성된 `mboss/*` 함수의 머리 주석에 있고, `tools/build_mboss_proto.py` 가 모든 훅을 채운 예시 모듈이다.
+- 모듈이 채우는 훅(전부 있어야 함, 빈 함수 가능): `spawn intro_tick tick on_hit aux_hit incoming pause resume death_start death_tick cleanup reload bars hz_vis pj_end test uninstall`, 그리고 `test/help`(시험 번호 목록: `mboss/test/pattern {id:"help"}` 가 `mboss/d/test_help` 로 부름, `mboss_lib.HELP_HOOKS`). 생성된 디스패처 `mboss/d/<훅>` 이 `#mbId` 로 모듈을 부른다(`uninstall` 만은 등록된 모든 모듈을 부른다: 모듈이 만든 점수판 등을 지움). 훅마다의 호출 맥락 · 라이브러리 인자는 생성된 `mboss/*` 함수의 머리 주석에 있고, `tools/build_mboss_proto.py` 가 모든 훅을 채운 예시 모듈이다.
 - 생성 · 점검(정해진 순서, 생성된 파일은 손으로 고치지 않는다):
   1. `python3 tools/build_mboss_core.py`(틀: `mboss/*.mcfunction` · `mboss/{d,hz,pj,pull,mv,aux,line,test,box}/`)
   2. `python3 tools/build_mboss_arena.py`(`mboss/arena/`: 광장 + 챕터 경기장들, 아래 "챕터 보스")
@@ -810,8 +830,8 @@
   - 시험: `pat_cruise.py` · `pat_field.py` 에 예고 규칙 검사(바닥 예고를 그리는 판정 = 감사의 남김 목록 {C1 마무리, C2, C5} · {F1}, 주인 없는 바닥 예고 없음, 맞는 순간마다 효과), 멈춤 뒤 다시 그리기는 C5 · F1 만, 효과 도구 시험에 `tele/rim` · `tele/dark` · `rim_flare` 크기, `test_fieldgen.py` 계수 × 1.5.
 
 ### 테스트 명령
-- `/function rlk:mboss/test/start {id:"proto"}` · `{id:"guardian"}` · `{id:"butterfly"}` · `{id:"fieldgen"}`(챕터 지정: `test/start_ch {id:"guardian",ch:2}`): 'player' 태그 · `room/setup` · 진행 중인 런 없음 · 난이도 쉬움 이상. 중간보스 구역이 있는 진짜 노드 맵을 만들고 문을 바로 누른다.
-- `test/kill`(처치 = 보상 경로) · `test/abort`(보상 없이 취소, 문이 다시 생김) · `test/pattern {id:N}` · `test/lock {id:N}`(0 해제) · `test/level {lv:N}` · `test/stop`(로비로) · `test/arena`(경기장 다시 짓고 보기) · `test/help`. 테스트 중 쓰러지면 캐릭터 초기화 없이 로비로("[다시 하기]" 는 그 테스트의 중간보스를 **같은 챕터로** 다시 시작한다(`rlk:mboss tlast {id, ch}`, `test/start_ch` 가 저장; 예전에는 늘 `proto`, 그다음에는 늘 1챕터). 처치 메시지의 "[다시 하기]" 도 같다).
+- `/function rlk:mboss/test/start {id:"proto"}` · `{id:"guardian"}` · `{id:"butterfly"}` · `{id:"fieldgen"}`(챕터 지정: `test/start_ch {id:"guardian",ch:2}`): 'player' 태그 · `room/setup` · 진행 중인 런 없음 · 난이도 쉬움 이상. 중간보스 구역이 있는 진짜 노드 맵을 만들고 문을 바로 누른다. 중간보스 id 목록: `test/start {id:"help"}`(`start_ch` 는 `{id:"help",ch:1}`).
+- `test/kill`(처치 = 보상 경로) · `test/abort`(보상 없이 취소, 문이 다시 생김) · `test/pattern {id:N}` · `test/lock {id:N}`(0 해제) · `test/level {lv:N}` · `test/stop`(로비로) · `test/arena`(경기장 다시 짓고 보기) · `test/help`. `test/pattern {id:"help"}` · `test/lock {id:"help"}` = 싸우는 보스의 번호와 이름(싸우는 보스가 없으면 보스마다 그 목록을 여는 줄). 테스트 중 쓰러지면 캐릭터 초기화 없이 로비로("[다시 하기]" 는 그 테스트의 중간보스를 **같은 챕터로** 다시 시작한다(`rlk:mboss tlast {id, ch}`, `test/start_ch` 가 저장; 예전에는 늘 `proto`, 그다음에는 늘 1챕터). 처치 메시지의 "[다시 하기]" 도 같다).
 - 노드 맵으로 직접: `/data modify storage rlk:room next set value [15]` → `/scoreboard players set #mapType room 1` → `/function rlk:run/next_map`(뽑을 수 있는 중간보스가 있어야 함, 없으면 `#mbForce mb` 를 99로).
 
 ### 고친 공용 파일
@@ -896,11 +916,11 @@ P1 의 그림자(위치 표시), P2 의 균열 띠(레일과 균열 선, 채움 
 - 생성 순서: 코어 → 경기장 → `build_cboss_rooms.py` → proto → cproto → 리그들(`node tools/build_mboss_apep_rig.mjs --resourcepack <팩>` 포함) → `node tools/build_mboss_apep_org.mjs --resourcepack <팩>` → guardian → … → `build_mboss_az_fx.py` → `build_mboss_azhdaha.py` → `build_mboss_ap_fx.py --resourcepack <팩>` → **`build_mboss_apep.py`** → `build_bossbar.py` → `check_mboss_pack.py`. 코어는 커밋된 리그 매니페스트를 읽어 `mboss/px/apep/**` 를 만들므로 매니페스트가 바뀌는 커밋은 그것도 다시 만들어 함께 커밋한다.
 
 ### 시험 명령
-- `/function rlk:mboss/test/chapter {id:"cproto"}`(첫 배정 챕터, 없으면 1) · `test/chapter_ch {id:"cproto",ch:2}`: 'player' 태그 · `room/setup` · 진행 중인 런 없음 · 난이도 쉬움 이상. 그 챕터의 진짜 보스 맵(`#cbForce`)을 만들고 문 앞에 세운 뒤, 경기장 작업이 끝나면 문을 자동으로 누른다(`#cbAuto`, 300틱 넘으면 "직접 누르세요"). 문을 직접 누르면(어떤 누름이든 `cb/g/<id>`) 자동 누르기는 끝난다(취소로 문이 돌아와도 대신 누르지 않음).
+- `/function rlk:mboss/test/chapter {id:"cproto"}`(첫 배정 챕터, 없으면 1) · `test/chapter_ch {id:"cproto",ch:2}`: 'player' 태그 · `room/setup` · 진행 중인 런 없음 · 난이도 쉬움 이상. 그 챕터의 진짜 보스 맵(`#cbForce`)을 만들고 문 앞에 세운 뒤, 경기장 작업이 끝나면 문을 자동으로 누른다(`#cbAuto`, 300틱 넘으면 "직접 누르세요"). 문을 직접 누르면(어떤 누름이든 `cb/g/<id>`) 자동 누르기는 끝난다(취소로 문이 돌아와도 대신 누르지 않음). 챕터 보스 id 목록: `test/chapter {id:"help"}`(`chapter_ch` 는 `{id:"help",ch:1}`).
 - 챕터 전투가 끝나면(처치든 취소든) `test/won` → `test/cwon` 이 `#cbForce` · `#cbAuto` 를 0 으로 둔다: 처치 뒤 다음 챕터 오브젝트로 계속 가는 테스트에서 다음 보스 맵은 런과 똑같이 정해지고, 취소된 문은 그대로 다시 누를 수 있다. 문구(챕터 / 중간보스)와 `[다시 하기]` 는 세션이 아니라 **방금 끝난 전투**(`cur.kind`)를 따른다(`test/won` · `test/defeat`). 챕터 테스트 중에 시작한 중간보스 테스트(`test/start_ch`)도 `#cbForce` · `#cbAuto` 를 지운다.
 - `test/lose`(패배 경로) · 공통 `test/kill` · `test/abort` · `test/pattern {id:N}`(cproto: 1 마스크, 2 지속 피해, 3 고리, 4 예측 조준, 5 좌표, 6 못 피하는 투사체, 7 연출, 8 / 9 모습 lit / plain, 10 패배, 11 2단계, 20~23 프록시 상태, 30 밀어내기, 31~33 클립, 40 제목, 41 / 42 음악, 50 보조 저항, 60 늘이기) · `test/level` · `test/stop`. `#cbForce` · `#cbAuto` · `cprep` 은 `run/start` · `run/end` · `test/stop`(→ `cb/run_reset`)이 지운다.
 - 쓰러지면 "챕터 보스 테스트 실패" + `[다시 하기]`(같은 보스 · 같은 챕터의 `test/chapter_ch`), 처치하면 다음 챕터 오브젝트 + `[다시 하기]` · `[로비로]`.
-- **챕터 보스용 별칭** `rlk:boss/test/<명령>`: `chapter {id}` · `chapter_ch {id,ch}` · `pattern {id}` · `lock {id}` · `kill` · `abort` · `lose` · `level {lv}` · `stop` 은 같은 인자를 그대로 엔진의 `rlk:mboss/test/<명령>` 으로 넘긴다(구현은 하나, 코어 생성기가 `boss/test/` 를 씀). 예: `/function rlk:boss/test/chapter {id:"apep"}`, `/function rlk:boss/test/pattern {id:31}`.
+- **챕터 보스용 별칭** `rlk:boss/test/<명령>`: `chapter {id}` · `chapter_ch {id,ch}` · `pattern {id}` · `lock {id}` · `kill` · `abort` · `lose` · `level {lv}` · `stop` 은 같은 인자를 그대로 엔진의 `rlk:mboss/test/<명령>` 으로 넘긴다(구현은 하나, 코어 생성기가 `boss/test/` 를 씀). 예: `/function rlk:boss/test/chapter {id:"apep"}`, `/function rlk:boss/test/pattern {id:31}`. `help` 도 그대로 넘어간다(`chapter {id:"help"}` = 챕터 보스 목록, `pattern {id:"help"}` = 싸우는 보스의 번호 목록).
 
 ### 고친 공용 파일 (scratchpad `az/contract/cm.md` 16절)
 | 파일 | 고친 곳 |
@@ -1086,7 +1106,7 @@ P1 의 그림자(위치 표시), P2 의 균열 띠(레일과 균열 선, 채움 
 - 게임에서 한 번 확인할 것: 문 → 경기장 → 등장 → 전환 두 번 → B3 → 처치 → 다음 챕터, 음악이 겹치지 않음, `/reload` 뒤 이어짐.
 
 ## 13. 시점 (`view/`) — 1인칭 / 숄더뷰 / F5 위쪽 시점
-설정 방의 **시점** 버튼으로 1인칭 → 숄더뷰 → F5 위쪽 시점 순서로 바뀝니다(처음엔 F5 위쪽 시점). 명령: `/function rlk:view/mode {m:1}`(숄더뷰) · `{m:2}`(F5 위쪽 시점) · `/function rlk:view/off`(1인칭).
+설정 방의 **시점** 버튼으로 1인칭 → 숄더뷰 → F5 위쪽 시점 순서로 바뀝니다(처음엔 F5 위쪽 시점). 명령: `/function rlk:view/mode {m:1}`(숄더뷰) · `{m:2}`(F5 위쪽 시점) · `/function rlk:view/off`(1인칭). 번호 목록: `{m:"help"}`.
 
 ### F5 위쪽 시점 (build/p174)
 - 진짜 플레이어를 아주 작게(크기 0.0625) · 투명하게 해서 아바타 머리 위의 받침(투명한 작은 갑옷 거치대 `rlk_vseat`)에 태웁니다. **플레이어가 F5(3인칭, 뒤에서 보기)를 직접 눌러야** 합니다(시점은 명령어로 바꿀 수 없음 — 받침이 생길 때 채팅으로 안내).
@@ -1327,7 +1347,7 @@ P1 의 그림자(위치 표시), P2 의 균열 띠(레일과 균열 선, 채움 
 **테스트 명령** (`'player'` 태그 필요, `/function rlk:room/setup` 을 먼저 해 두고, 진행 중인 일반 런이 없어야 함)
 - `/function rlk:boss/raiden/test/start` — 런 없이 나루카미하고만 싸웁니다(2스테이지 보스, 레벨 12). 다시 실행하면 처음부터 시작합니다.
 - `/function rlk:boss/raiden/test/armored` — 바로 갑주 단계로 변신합니다.
-- `/function rlk:boss/raiden/test/pattern {id:N}` — 다음 패턴을 지정합니다(1~6 일반, 11~18 갑주). 진행 중인 공격은 취소하고, 필요하면 단계를 바꿉니다.
+- `/function rlk:boss/raiden/test/pattern {id:N}` — 다음 패턴을 지정합니다(1~6 일반, 11~18 갑주; 지금 번호는 위 '테스트 명령' 또는 `{id:"help"}`). 진행 중인 공격은 취소하고, 필요하면 단계를 바꿉니다.
 - `/function rlk:boss/raiden/test/lock {id:N}` — 그 패턴만 계속 반복합니다. `{id:0}` 으로 해제합니다.
 - `/function rlk:boss/raiden/test/level {lv:N}` — 보스 레벨을 바꾸고 체력을 다시 채웁니다.
 - `/function rlk:boss/raiden/test/stop` — 전투를 정리하고 로비로 돌아갑니다.

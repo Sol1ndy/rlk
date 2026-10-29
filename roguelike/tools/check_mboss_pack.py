@@ -4,7 +4,7 @@
     python3 tools/check_mboss_pack.py
 
 - every enabled registry entry has a module F:<fn root>/ (mboss_lib.fn_root: mboss/<id>, or boss/<id> for a chapter
-  boss with "fn") with every contract hook (mboss_lib.HOOKS);
+  boss with "fn") with every contract hook (mboss_lib.HOOKS + HELP_HOOKS);
   macro hooks are macro functions, the others are not
 - every generated dispatcher F:mboss/d/<hook> calls existing module functions
 - every literal "function rlk:..." reference in F:mboss/**, the chapter-boss roots F:boss/<id>/** and the test aliases
@@ -36,7 +36,7 @@ def is_macro(rel):
 
 
 for b in L.enabled_bosses(REG):
-    hooks = L.HOOKS + (L.CHAPTER_HOOKS if b.get('kind', 'mid') == 'chapter' else [])
+    hooks = L.HOOKS + L.HELP_HOOKS + (L.CHAPTER_HOOKS if b.get('kind', 'mid') == 'chapter' else [])
     for h in hooks:
         rel = f'{L.fn_root(b)}/{h}'
         if rel not in funcs:
@@ -45,7 +45,7 @@ for b in L.enabled_bosses(REG):
         want_macro = h in L.MACRO_HOOKS
         if want_macro != is_macro(rel):
             problems.append(f'{rel}: should {"" if want_macro else "not "}be a macro function')
-for h in L.HOOKS:
+for h in L.HOOKS + [h.replace('/', '_') for h in L.HELP_HOOKS]:
     rel = f'mboss/d/{h}'
     if rel not in funcs:
         problems.append(f'missing dispatcher {rel}')

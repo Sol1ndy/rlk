@@ -22,6 +22,9 @@ HOOKS = ['spawn', 'intro_tick', 'tick', 'on_hit', 'aux_hit', 'incoming', 'pause'
          'death_start', 'death_tick', 'cleanup', 'reload', 'bars', 'hz_vis', 'pj_end', 'test', 'uninstall']
 ALL_MODULE_HOOKS = {'uninstall'}
 MACRO_HOOKS = {'test': ['id']}
+# Every module also writes F:<fn root>/test/help (no macro): its test numbers with their names, shown by
+# /function rlk:mboss/test/pattern {id:"help"} (and lock / the rlk:boss/test aliases) through mboss/d/test_help.
+HELP_HOOKS = ['test/help']
 # Chapter bosses (kind "chapter", AZ-CM) implement the 17 hooks plus these (not macros): prep = the domain entrance
 # build (@s = the kind-9 zone marker, at it): writes rlk:mboss cprep.<id>.{gate,title,sub} (scratchpad az/contract/cm.md 5.3).
 CHAPTER_HOOKS = ['prep']

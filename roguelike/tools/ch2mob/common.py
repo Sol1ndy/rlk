@@ -18,9 +18,15 @@ Every ch2 brain carries `rlk_c2` (the elite ids get it in cm/c2/stats_chk at mob
 import re
 from pathlib import Path
 
+import help_lib
+
 A_IDS = ('ns', 'sl', 'ss', 'sp', 'dr')
 B_IDS = ('kr', 'nj', 'cc', 'ci')
 GROUPS = ('g_ns', 'g_sp', 'g_sl')
+# rlk:cm/test {t:"help"} rows of chapter 2 (cm/c2/test_help, tools/help_lib.py): every spawn id with its Korean name
+TEST_ROWS = [('ns', '떠돌이 무사 졸개'), ('sl', '번개 슬라임'), ('ss', '작은 번개 슬라임'), ('sp', '반란군 창병'), ('dr', '오니 북잡이'),
+             ('kr', '카이라기·뇌전'), ('nj', '그림자 닌자'), ('cc', '번개 시킨 술사'), ('ci', '번개 시킨 (단독, 혼자 돌진)'),
+             ('g_ns', '졸개 무리 4~6'), ('g_sp', '창병 대열 3'), ('g_sl', '슬라임 무리 2~3')]
 
 # raw numbers (1st level; the existing level rules scale them)
 TUNE = {
@@ -541,6 +547,9 @@ def finish(w):
     w('cm/c2/tick', '\n'.join(tick))
     w('cm/c2/init', '\n'.join(init))
     w('cm/c2/vis', '# 무리 몹 모습 (@s = 두뇌, at @s; cm/vis 맨 앞)\n' + '\n'.join(vis))
+    # {t:"help"} of rlk:cm/test: this chapter's section of cm/test_help (patch_shared rewrites cm/test_help after the flush)
+    assert [i for i, _ in TEST_ROWS] == list(A_IDS + B_IDS + GROUPS), 'TEST_ROWS must list every chapter-2 spawn id'
+    w(help_lib.CM_SECTION.format(n=2), help_lib.cm_test_section(2, TEST_ROWS))
 
 
 def patch_shared(fn_root):
@@ -557,9 +566,8 @@ def patch_shared(fn_root):
     P.before('cm/world', 'execute as @e[tag=rlk_cmb] at @s run function rlk:cm/tick',
              'execute if entity @e[tag=rlk_c2,limit=1] run function rlk:cm/c2/world')
     P.replace_line('cm/test', '# 시험용: /function rlk:cm/test',
-                   '# 시험용: /function rlk:cm/test {t:"sw"}  (1챕터: sw 검사 · ar 궁수 · fm 불 마법사 · im 얼음 마법사 · sh 방패병 · cn 대포병 / '
-                   '2챕터: ns 떠돌이 무사 졸개 · sl 번개 슬라임 · ss 작은 번개 슬라임 · sp 반란군 창병 · dr 오니 북잡이 · kr 카이라기·뇌전 · '
-                   'nj 그림자 닌자 · cc 번개 시킨 술사 · ci 번개 시킨 / 무리: g_ns 졸개 4~6 · g_sp 창병 대열 3 · g_sl 슬라임 2~3) — 바라보는 쪽 5칸 앞에 1레벨로')
+                   '# 시험용: /function rlk:cm/test {t:"sw"} — 바라보는 쪽 5칸 앞에 1레벨로. 쓸 수 있는 id: {t:"help"} '
+                   '(cm/test_help: tools/help_lib.py 의 1챕터 목록 + 챕터마다 몹 생성기가 쓰는 cm/c<N>/test_help)')
     # combat: multi-kill note, lighter rewards for the small fry (ss, half the 졸개)
     P.before('combat/apply', 'execute if score #mobHP tmp matches ..0 run function rlk:combat/heal_orb_roll',
              'execute if score #mobHP tmp matches ..0 if entity @s[tag=rlk_c2] run function rlk:cm/c2/kill_note')
@@ -575,4 +583,7 @@ def patch_shared(fn_root):
     # load / uninstall
     P.after('load', 'team modify rlk_cmx collisionRule never', 'function rlk:cm/c2/load')
     P.after('uninstall', 'scoreboard objectives remove cmAD', 'function rlk:cm/c2/uninstall')
+    # cm/test {t:"help"}: the list from chapter 1 + every cm/c<N>/test_help on disk (any chapter generator may rewrite it)
+    if help_lib.cm_test_help(P.root):
+        P.changed.append('cm/test_help')
     return P.changed

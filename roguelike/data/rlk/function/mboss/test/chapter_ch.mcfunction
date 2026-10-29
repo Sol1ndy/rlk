@@ -1,7 +1,9 @@
 # /function rlk:mboss/test/chapter_ch {id:"cproto",ch:2}: a real boss map (#mapIdx 5, #mapType 8) of that chapter routed
 # to the chapter boss (#cbForce, only under #mbTest 1): room/gen -> cb/route_force -> the entrance layout, the kind-9 zone
 # built (-> cb/prep: cprep, forceload, the sliced arena job), the player in front of the gate (zone_enter -> k_cboss);
-# test/cwait presses the gate as soon as no arena job runs (#cbAuto 1).
+# test/cwait presses the gate as soon as no arena job runs (#cbAuto 1). {id:"help",ch:1}: the ids (test/help_chapter_ch).
+$data modify storage rlk:tmp hq set value "$(id)"
+execute if data storage rlk:tmp {hq:"help"} run return run function rlk:mboss/test/help_chapter_ch
 execute unless entity @s[tag=player] run return run tellraw @s {text:"[챕터 보스 테스트] 'player' 태그가 있는 플레이어로 실행하세요.",color:"red"}
 execute unless data storage rlk:room {ready:1b} run return run tellraw @s [{text:"[챕터 보스 테스트] ",color:"#E0703A",bold:true},{text:"던전 구역이 준비되지 않았습니다. 먼저 ",color:"gray",bold:false},{text:"/function rlk:room/setup",color:"yellow",bold:false,click_event:{action:"suggest_command",command:'/function rlk:room/setup'}},{text:" 을 실행하세요.",color:"gray",bold:false}]
 execute if score #active room matches 1 unless score #mbTest mb matches 1 run return run tellraw @s [{text:"[챕터 보스 테스트] ",color:"#E0703A",bold:true},{text:"진행 중인 런이 있습니다. ",color:"gray",bold:false},{text:"/function rlk:run/stop",color:"yellow",bold:false,click_event:{action:"suggest_command",command:'/function rlk:run/stop'}},{text:" 후 다시 실행하세요.",color:"gray",bold:false}]
