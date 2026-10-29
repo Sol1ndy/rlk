@@ -18,6 +18,9 @@
     "shield: false = no click shield in any state (rlk_mb_noshield; default for px bosses). hit: click-shield size, default {w:1.0,h:1.0} when shield is false.",
     "arenas{}: every non-plaza arena {n (= #mbAr, unique, never reused; the plaza is 0), theme (T:mboss_arena_<theme>.py), ver, cx cy cz, r walk safe, start, box, looks (looks[0] = the default), oob {y0,y1} (default cy-3..cy+16), sweep {y0,y1} (barrier band swept by cb/won, cleanup, cb/remove)}.",
     "Boss n 11 and arena n 2 are Apep's (chapter 3: ap_oasis; scratchpad ap/ap_contract.md 0.3.6). Its entry's first line holds id n kind ch route enabled w (route false until AP-I2).",
+    "--- kind special (D0 of the Tachy plan, scratchpad tk/PLAN.md §7-8, tk/contract.md) ---",
+    "kind: \"special\" = reached through a room rift (F:room/rift, F:mboss/sp), fought in chapter mode in its own arena, rewarded with lvup (0/1: one level) + picks (1..3) item boxes at the rift; w = rift roll weight among specials; no ch / route / px.",
+    "Boss n 20 and arena n 3 (tk_lift) are Tachy's. D0 keeps tachy enabled false and the arena out of arenas{} (S1 adds it, measures the basalt_deltas pool into mboss_lib.MUSIC_TRACKS and sets music 1 len); icon model becomes rlk:mboss/tk_kit/gate_icon with the kit.",
     "fn: the module's function root under F: (default mboss/<id>; a chapter boss may say boss/<id>, user 10-21). Only the function root moves: entity tags, scoreboards, storage and resource-pack paths keep their mboss names. Generators read it through mboss_lib.fn_root / fn_root_of; boss/raiden and boss/test are reserved (Raiden's own module, the chapter-boss test aliases rlk:boss/test/<cmd>)."
   ],
   "arena": {
@@ -99,6 +102,16 @@
                 "2": {"ev": "minecraft:music.nether.soul_sand_valley", "len": 6376},
                 "3": {"ev": "minecraft:music.overworld.lush_caves", "len": 6881}},
       "icon": {"item": "minecraft:pitcher_plant", "model": "minecraft:pitcher_plant"}
+    },
+    {
+      "id": "tachy", "n": 20, "fn": "boss/tachy", "kind": "special", "enabled": false, "w": 10,
+      "minCh": 1, "maxCh": 99, "name": "타키", "sub": "잠식된 제7공수대원", "color": "#F2C230", "el": 1,
+      "hp": 280, "xp": 45, "atk": 12, "lvAdd": 1, "dmgMul": 135, "goldMul": 6, "sap": 1, "picks": 3, "lvup": 1,
+      "scale": 1.25, "hit": {"w": 1.1, "h": 2.6}, "intro": 190, "death": 130, "deathSnd": false,
+      "arena": "tk_lift", "theme": "tk_lift", "res": {"*": 10}, "phases": [100],
+      "music": {"1": {"ev": "minecraft:music.nether.basalt_deltas", "len": 0},
+                "2": {"ev": "minecraft:music.dragon", "len": 6883}},
+      "icon": {"item": "minecraft:blaze_rod", "model": "minecraft:blaze_rod"}
     }
   ]
 }

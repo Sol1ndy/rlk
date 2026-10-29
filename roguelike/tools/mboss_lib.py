@@ -28,6 +28,11 @@ HELP_HOOKS = ['test/help']
 # Chapter bosses (kind "chapter", AZ-CM) implement the 17 hooks plus these (not macros): prep = the domain entrance
 # build (@s = the kind-9 zone marker, at it): writes rlk:mboss cprep.<id>.{gate,title,sub} (scratchpad az/contract/cm.md 5.3).
 CHAPTER_HOOKS = ['prep']
+# Special bosses (kind "special", D0 of the Tachy plan: scratchpad tk/PLAN.md §7-8, tk/contract.md): reached through a
+# room rift (F:room/rift, F:mboss/sp), fought in their own arena in chapter mode, rewarded with a level-up + picks boxes.
+# They implement the 17 hooks + test/help (no prep). Until S1 lands the framework, special entries must stay disabled.
+SPECIAL_HOOKS = []
+SPECIAL_PICKS_MAX = 3
 
 # #elem numbering (combat/apply): 0 physical 1 pyro 2 hydro 3 electro 4 cryo 5 geo 6 anemo 7 dendro 8 void
 ELEM_NAMES = ['물리', '불', '물', '번개', '얼음', '바위', '바람', '풀', '공허']
@@ -116,8 +121,16 @@ def load_registry():
         ids.add(b['id'])
         ns.add(b['n'])
         kind = b.get('kind', 'mid')
-        assert kind in ('mid', 'chapter'), f'{b["id"]}: kind {kind}'
-        if kind == 'chapter':
+        assert kind in ('mid', 'chapter', 'special'), f'{b["id"]}: kind {kind}'
+        if kind == 'special':
+            for k in ('ch', 'route', 'px'):
+                assert not b.get(k), f'{b["id"]}: {k} is not a special-entry field'
+            assert 1 <= int(b.get('picks', 0)) <= SPECIAL_PICKS_MAX, f'{b["id"]}: a special entry needs picks 1..{SPECIAL_PICKS_MAX}'
+            assert int(b.get('lvup', 0)) in (0, 1), f'{b["id"]}: lvup is 0 or 1'
+            aid = b.get('arena', 'plaza')
+            # a disabled special may name the arena its framework stage adds later (tk/contract.md: S1 owns arenas{})
+            assert aid != 'plaza' and (aid in arenas or not b.get('enabled', True)), f'{b["id"]}: a special entry needs its own arena ({aid})'
+        elif kind == 'chapter':
             for k, v in (('goldMul', 1), ('sap', 0), ('picks', 0), ('w', 0)):
                 assert b.get(k) == v, f'{b["id"]}: a chapter entry needs {k} {v}'
             aid = b.get('arena', 'plaza')
@@ -148,7 +161,7 @@ def load_registry():
         r = fn_root(b)
         if 'fn' in b:
             assert r in (f'mboss/{b["id"]}', f'boss/{b["id"]}'), f'{b["id"]}: fn must be mboss/<id> or boss/<id>, not {r}'
-            assert r != f'boss/{b["id"]}' or b.get('kind', 'mid') == 'chapter', f'{b["id"]}: only chapter bosses live under boss/'
+            assert r != f'boss/{b["id"]}' or b.get('kind', 'mid') in ('chapter', 'special'), f'{b["id"]}: only chapter and special bosses live under boss/'
         assert r not in FN_ROOT_RESERVED, f'{b["id"]}: fn {r} is reserved'
         assert r not in roots, f'{b["id"]}: fn {r} is also the root of {roots.get(r)}'
         roots[r] = b['id']
@@ -200,6 +213,11 @@ def mid_bosses(reg=None):
 def chapter_bosses(reg=None):
     """Enabled chapter-boss entries (kind "chapter"): rlk:mboss creg[] / cbyid, routing, the gate."""
     return [b for b in enabled_bosses(reg) if b.get('kind', 'mid') == 'chapter']
+
+
+def special_bosses(reg=None):
+    """Enabled special-boss entries (kind "special"): the rift roll (F:mboss/sp, S1 of the Tachy plan)."""
+    return [b for b in enabled_bosses(reg) if b.get('kind', 'mid') == 'special']
 
 
 def arena_of(b, reg=None):
