@@ -6,5 +6,7 @@ function rlk:mboss/arena/az_cavern/clear
 function rlk:mboss/ar/az_cavern/fl_off
 function rlk:mboss/arena/ap_oasis/clear
 function rlk:mboss/ar/ap_oasis/fl_off
+function rlk:mboss/arena/tk_lift/clear
+function rlk:mboss/ar/tk_lift/fl_off
 function rlk:mboss/arena/cp_test/clear
 function rlk:mboss/ar/cp_test/fl_off

@@ -55,6 +55,7 @@
 | `#rxPlayerPct` | 플레이어가 맞는 원소 반응의 기준 = 받은 피해 × 이 값(%) | 50 |
 | `#kirionNeed` | 봉인된 검 → 마검: 키리온 변신 처치 수 | 300 |
 | `#forbNeed` | 금단의 도서 → 데모노미콘 변신 페이지 수 | 500 |
+| `#riftPm` (room) | 전투 구역이 지어질 때 균열이 생길 확률(천분율, 한 판에 한 번, 아래 "균열") | 30 (3%) |
 
 ## 1. 스탯 / 레벨 (`player/`, `player/level/`, `items/equip_scan`, `items/stat_light`)
 - **체력·공격력·방어력은 자연수**이고 원신처럼 기초 / % / 깡(고정 수치)을 구분합니다.
@@ -356,6 +357,7 @@ id 를 외워야 하는 시험 · 지급 명령은 그 인자 자리에 `"help"`
 | `rlk:view/mode` | `{m:"help"}` | 1 숄더뷰 · 2 F5 위쪽 시점 |
 | `rlk:mboss/test/start` · `start_ch` | `{id:"help"}` · `{id:"help",ch:1}` | 중간보스 레지스트리(`tools/mboss_registry.json`, 켜진 것) |
 | `rlk:mboss/test/chapter` · `chapter_ch` (= `rlk:boss/test/…`) | `{id:"help"}` · `{id:"help",ch:1}` | 챕터 보스 레지스트리 |
+| `rlk:mboss/test/rift_id` · `special` · `special_ch` (= `rlk:boss/test/…`) | `{id:"help"}` · `{id:"help",ch:1}` | 특수 보스 레지스트리(`kind:"special"`, 켜진 것) |
 | `rlk:mboss/test/pattern` · `lock` (= `rlk:boss/test/…`) | `{id:"help"}` | 싸우는 중이면 그 보스 모듈의 `test/help`(번호와 이름), 아니면 보스마다 그 목록을 여는 줄 |
 | `rlk:boss/raiden/test/pattern` · `lock` | `{id:"help"}` | `tools/raiden_enc/shogun.py` · `tenma.py` 의 `NAMES` |
 
@@ -1143,6 +1145,61 @@ P1 의 그림자(위치 표시), P2 의 균열 띠(레일과 균열 선, 채움 
   (`player/dash_chk_*`)도 발 높이(+0.0001)에서 앞면 바깥을 봐서, 발을 꽉 찬 블록 속으로 넣는 이동은 막고 단차 오르기로 넘긴다
   (높이 0.8~1 블록 `#rlk:low_top` 은 예전처럼 +0.2 줄이 판단).
 - 게임에서 한 번 확인할 것: 문 → 경기장 → 등장 → 전환 두 번 → B3 → 처치 → 다음 챕터, 음악이 겹치지 않음, `/reload` 뒤 이어짐.
+
+## 특수 보스 (`mboss/sp/`)
+
+방에 가끔 생기는 **균열**(아래 "균열")로 들어가 싸우는 보스. 노드가 아니고, 한 판에 많아야 한 번. 중간보스 틀 위에서 **챕터 모드**(`#mbMode 1`: 자기 경기장 · 체력 바닥 · 음악 · 연출 · 원소별 저항)로 싸우고, 처치하면 **레벨 업 1번 + 아이템 상자 3개**. 첫 특수 보스는 **타키**(`tachy`, n 20, 경기장 `tk_lift`) — 모듈이 붙을 때까지 `enabled:false`. 틀 점검용 `spproto`(시험용 균열 수호자, n 97, 가중치 0, 경기장 `cp_test`)는 시험 명령으로만 나온다.
+
+### 진행
+1. 균열이 생길 때(`room/rift/arm`) `mboss/sp/roll`: 시험의 고정 id(`rlk:mboss spforce`) > 가중치(`w` ≥ 1) · 챕터 범위 · 이번 판에 안 만난 것(`spmet`) > 만난 것도 > 챕터 무시 > `sreg[0]`. 고른 id 는 구역 표식의 `data.rift.id`. 그 자리에서 `sp/prep {id}` 가 그 보스의 경기장을 고정(forceload)하고 나누어 짓기를 시작한다(방을 다 정리할 즈음엔 지어져 있음).
+2. 균열에 들어가면(걸어 들어가 10틱 머무르기, 또는 좌클릭) `sp/gate`: 평화로움이면 거절(메시지), 경기장 작업이 도는 중이면 **"균열이 아직 안정되지 않았습니다. 잠시 뒤 다시 들어가세요."**(40틱 동안 다시 안 들어감, 플레이어는 그대로), 싸우는 중 · 방이 잠긴 중이면 조용히 거절. 아니면 `sp/g/<id>`: 고정 다시 걸기 + 필요한 작업 시작, 그 구역의 전투 시작(문 잠김), `#spOn mb 1`, 이름 · 부제 제목, 균열이 플레이어를 끌어당김(`room/rift/go`, 20틱에 실명).
+3. 1.5초 뒤 `room/mob_wave` → `sp/start_zone` → `sp/start {id}`: `cur` = `sbyid.<id>`, 경기장이 다 지어졌다고 보고할 때까지 10틱마다 다시(`sp/wait`, `cb/wait` 와 같음, 60번이면 취소), 그다음 중간보스와 같은 `start_go`. 돌아올 자리는 **균열 앞**(`sp/ret_rift`: 방 가운데 쪽으로 2칸, 막혔으면 1.2칸, 방 가운데를 봄).
+4. 처치(`room/combat_clear` → `sp/clear` → `sp/won` → `sp/won_kill`): 경기장 골드를 거두고 균열 앞으로 돌아온 뒤 제목 **`<이름> 처치` / `레벨 업 · 아이템 상자 3개`**, `sp/lvup`(경험치 = 필요 경험치 − 지금 경험치 → `player/level/add_xp`: 평소 레벨 업 그대로, 아이템 선택 기회 +1), 균열이 30틱 동안 무너지고(`room/rift/close`) 그 자리에 **아이템 상자 `picks`개**(중간보스 상자와 같은 `mboss/box/drop_all`: 챕터 등급 · 아이템만, 한 줄에 −1.5 / 0 / +1.5칸). 골드 × `goldMul`(6)과 사파이어 `sap`(1)은 처치 타격에서(몸에 `miniboss` 태그). 구역 태그는 `rlk_riftdone`.
+5. 처치가 아닌 끝(`/kill`, 소환 실패, 리로드로 몸 유실, `test/abort`, 경기장 준비 실패): 보상 없음, **균열이 다시 열림**(`sp/won_cancel` → `room/rift/reopen`, 60틱 동안은 걸어 들어가도 안 들어감). 경기장 밖 · 멈춤 · 패배(`cb/lose` 포함)는 중간보스 · 챕터 보스와 같다.
+
+### 레지스트리 · 틀
+- `kind:"special"`: `picks` 1~3, `lvup` 0/1, `w` ≥ 0(균열 뽑기 가중치), 자기 경기장 필수(켜진 항목), `ch` · `route` · `px` 없음, `fn` 은 `boss/<id>` 가능(`mboss_lib.load_registry`). 저장소 `sreg[]` · `sbyid`(+ `#spN` · `#spRoll` = 가중치 1 이상인 수: 0 이면 저절로 생기는 균열 없음 — 지금 트리는 `spproto` 만 켜져 있어 0), `sprep`(준비한 보스), `spmet`(이번 판에 만남, `cb/run_reset` → `sp/run_reset`).
+- `fight_vars`: `#mbMode 1`, **`#mbKind mb`**(0 중간보스 · 1 챕터 보스 · 2 특수 보스, 글자에만 씀), `#mbAr` 과 그 반지름(`tk_lift`: W10 240 · S10 220). 받는 피해는 챕터 보스처럼 `cb/inc/<id>`(모듈 `incoming` → `mboss/floor`). 모듈은 보통 훅 17개 + `test/help`(따로 훅 없음, `mboss_lib.SPECIAL_HOOKS` 빈 목록).
+- 상자 줄 `box/drop_all` · `box/row`: 1~3개(3개 = −1.5 / 0 / +1.5칸), 4 이상은 3.
+- 음악: `music.nether.basalt_deltas` 는 곡 5개 묶음(26.3 에셋 색인 34: 5600 · 5189 · 6076 · 6376 · 4789틱, `mboss_lib.MUSIC_TRACKS`) → 타키 1단계 `len` 6376(`music_len`).
+- 경기장 `tk_lift`(n 3, x 600~680 · z −32~48, 청크 36개): 등록만 S1, 모습(테마 모듈 `tools/mboss_arena_tk_lift.py`)은 S1K. 테마가 없으면 `build_mboss_arena.py` 가 대역(`tk_lift@0:stub`)을 만든다.
+- 정리: `mboss/cleanup`(맵 이동 · 런 끝 · 사망 · `room/wipe` · `uninstall` · 시험 종료) → `sp/forget`(`#spOn` · `#spAuto` 0, `sprep`). 경기장 고정은 `cleanup` 의 모든 경기장 `fl_off` · `sp/won` 이 푼다.
+
+### 시험 명령 (`help` 는 위 "명령 도움말")
+- `/function rlk:boss/test/rift` (= `rlk:mboss/test/rift`): **다음에 지어지는 구역**(문을 열 때, 또는 새 맵의 첫 구역; 보스 9 · 중간보스 15 제외)에 확률 · 이번 판 사용 여부 · 맵 종류 · 챕터 · 시험 상태와 상관없이 균열이 생긴다. "[균열] 다음에 여는 방에 균열이 나타납니다. (보스 · 중간보스 방 제외)". `run/start` 전에 해도 된다(그 판의 첫 구역).
+- `rift_id {id:"spproto"}`: 같은데 특수 보스 지정(`{id:"help"}` = 목록, 실제 일은 `rift_id_do`).
+- `special {id}` · `special_ch {id,ch}`: 런 없이 진짜 싸움 — 그 챕터의 노드 맵(맵 2, 노드 없음)을 만들고, 시작 구역 옆 전투 구역에 그 보스의 균열을 몹 없이 바로 열어 그 앞에 세운 뒤, 경기장이 다 지어지면 저절로 들어간다(`test/swait`, 600틱 넘으면 직접 들어가라는 안내). 처치 · 취소 · 패배 메시지의 `[다시 하기]` 는 같은 보스 · 같은 챕터.
+- 기존 `kill` · `abort` · `pattern` · `lock` · `level` · `stop` · `lose` 는 특수 보스에도 그대로(`#mbId` 로 고름).
+
+## 균열 (`room/rift/`, `tools/build_rift.py`)
+
+세피리아의 균열처럼 검은 구멍 같은 틈과 하얀 · 하늘색 번개, 빛나는 바닥 갈라짐. 생성기 하나가 함수(`room/rift/**`, `room/obj/k_rift`), 공용 파일의 훅 줄, 리소스팩(`assets/rlk/{textures,models/item,items}/rift/*` + 아이템 아틀라스, 7장 24 576 px)을 쓴다: `python3 tools/build_rift.py [--resourcepack <RP>]`.
+
+- **생기는 곳 · 때**(`rift/roll`, `room/zone_build` 에서 구역이 지어질 때): 런 중, 보스 시험 아님(`#mbTest` · `#rdTest`), 이번 판에 아직 없음(`#riftUsed`), **전투 구역**(zkind 1), 보스 맵 아님, 1챕터 첫 맵 아님, 평화로움 아님, 켜진 특수 보스(가중치 1 이상) 있음 → `#riftPm`‰(30 = 3%). 한 챕터에 전투 구역이 열댓 개라 1챕터에 약 35%, 세 챕터 런 전체에 약 78%. 생기면 구역 태그 `rlk_riftz`, `data.rift.id`, `#riftUsed 1`(들어가지 않아도 그 판은 끝). **노드가 아니다**: 구역 종류 · 내용 · 맵 제목은 그대로.
+- **보이기**(`rift/show`, 그 구역에 들어갈 때 · 첫 구역): 자리를 고르고(`rift/spot/*`: 구역 칸 안 무작위 지점 24번 → 3×3 바닥이 같은 높이의 단단한 블록(무늬 · 잎 · 통나무 · 이나즈마 집 바닥 · 물 · 용암 아님) + 위로 3칸 빈 곳, 구덩이 경고 상자 밖, 벽면에서 3칸 이상, 문에서 4.5칸, 방 오브젝트에서 3.5칸, 플레이어에서 5칸(수평) 이상; 상점 구역은 가운데에서 9칸, 다른 노드 구역은 4.5칸; 못 찾으면 구역 가운데 땅, 그것도 없으면 플레이어의 안전 자리 2칸 앞) 방 가운데를 보게 세운다. 전투 구역이면 **잠든 균열**(절반 크기, 어두운 테두리, 번개 하나, 들어갈 수 없음), 그 밖의 구역(시험)이면 다음 틱에 바로 열림. 시험(54가지 배치 × 6테마 × 40번 = 73 440번): 무작위 자리 99.9%, 가운데 대체 0.1%, 규칙 위반 0.
+- **열림**: 그 방 전투를 정리하면(`room/combat_clear` → `rift/open`) 20틱 동안 자라며 번쩍 · 천둥 · 엔드 포털 소리, 그 뒤 열림(조준하면 이름 "균열" + "▶ 좌클릭", `oact 17`). 열린 균열: 번개 카드 셋(4장면, 2틱마다 장면, 4틱마다 기울기), 2틱마다 전기 불꽃 · 엔드 막대 · 먹물 · 역포털 입자, 40틱마다 리스폰 정박기 웅웅 소리(반은 번개 탁탁), 테두리가 20틱마다 숨쉬듯 커졌다 작아짐.
+- **들어가기**: 몸이 균열에서 수평 1칸 · 위아래 1.5칸 안에 10틱 연속(전투 중 · 죽음 · 선택 공간 · 지도 화면이 아닐 때, 역포털 입자가 몰려듦), 또는 좌클릭 → `rift/enter` → `mboss/sp/gate`(위 "특수 보스").
+- **남음**: 균열 엔티티는 모두 `rlk_room` 이라 다른 구역에 갔다 와도 그대로 있고, 맵이 바뀌면(`room/clear` → `rift/forget`) 사라진다. `/reload` 는 `rift/init` 이 `#riftOn` 을 다시 정하고, 무너지던 균열은 바로 끝내(상자 떨어짐) 자라던 균열은 바로 연다.
+- **상태**(표식 `rlk_rift` 의 `riftS`): 1 잠듦 · 2 열림 · 3 들어가는 중(싸움이 끝날 때까지) · 4 무너짐(30틱) · 5 자람(20틱). 부품 `rlk_rift_part`(틈 · 테두리 · 바닥 갈라짐 · 번개 셋 · 조준 묶음 `rlk_rift_obj`)은 `zid` 로 자기 구역과 묶인다. 점수 `riftS riftT riftCd riftDw riftPk riftA riftX riftY riftZ`, 가짜 플레이어 `#rift*`(room).
+
+### 고친 공용 파일 (`build_rift.py` 가 넣음, 줄마다 바로 앞에 `# rift (build_rift.py)`)
+몇 번을 돌려도, `build_ch2_mobs.py` · `build_ch3_mobs.py` 와 어떤 순서로 돌려도 같은 결과(표시된 줄을 지우고 원래 파일의 기준 줄에 다시 넣음).
+
+| 파일 | 줄 |
+|---|---|
+| `room/zone_build` | `zst 1` 다음: `function rlk:room/rift/roll` |
+| `room/zone_enter` | `zst 2` 다음(전투 시작 전): `execute if entity @s[tag=rlk_riftz] at @s run function rlk:room/rift/show` |
+| `room/zone_first` | 끝: 같은 `show` 줄 |
+| `room/combat_clear` | 챕터 보스 줄 앞: `...[tag=rlk_riftz] if score #spOn mb matches 1 run return run function rlk:mboss/sp/clear`, `...[tag=rlk_riftz] run function rlk:room/rift/open` |
+| `room/mob_wave` | 첫 명령: `...[tag=rlk_riftz] if score #spOn mb matches 1 run return run function rlk:mboss/sp/start_zone` |
+| `room/obj/click` | `oact 16` 다음: `execute if score @s oact matches 17 run return run function rlk:room/rift/click` |
+| `room/tick` | 상자 줄 다음: `execute if score #riftOn room matches 1 run function rlk:room/rift/tick` |
+| `room/clear` | `mboss/cleanup` 다음: `function rlk:room/rift/forget` |
+| `run/start` | `#mirUsed` 다음(맵 생성 전): `scoreboard players set #riftUsed room 0` |
+| `load` | 조절 지점 머리 다음: `scoreboard players set #riftPm room 30`; `mboss/init` 다음: `function rlk:room/rift/init` |
+| `uninstall` | `mboss/uninstall` 다음: `function rlk:room/rift/uninstall` |
+
+코어(`build_mboss_core.py`)가 바꾼 생성 파일: `register`(sreg · sbyid), `init`(`#spOn` · `#spAuto` · `#mbKind`), `fight_vars`, `start_cancel`, `cleanup`(→ `sp/forget`), `uninstall`, `d/*`(spproto), `box/drop_all` · `box/row`(3개), `cb/run_reset`(→ `sp/run_reset`), `test/{won,defeat,end,help_pattern}`, 새 `mboss/sp/**` · `mboss/cb/inc/<특수 보스>` · `mboss/test/{rift,rift_id,rift_id_do,special,special_ch,help_*,s*}` · `boss/test/{rift,rift_id,special,special_ch}`, 경기장 `mboss/ar/tk_lift/*`(+ 대역 `mboss/arena/tk_lift/*`). 시험: 스크래치패드 `tk/tests/`(`test_rift.py` · `test_special.py`).
 
 ## 13. 시점 (`view/`) — 1인칭 / 숄더뷰 / F5 위쪽 시점
 설정 방의 **시점** 버튼으로 1인칭 → 숄더뷰 → F5 위쪽 시점 순서로 바뀝니다(처음엔 F5 위쪽 시점). 명령: `/function rlk:view/mode {m:1}`(숄더뷰) · `{m:2}`(F5 위쪽 시점) · `/function rlk:view/off`(1인칭). 번호 목록: `{m:"help"}`.

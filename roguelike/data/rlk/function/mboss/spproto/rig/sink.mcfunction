@@ -1,0 +1,1 @@
+execute as @e[type=minecraft:block_display,tag=rlk_mb_spproto_part] run data merge entity @s {start_interpolation:0,interpolation_duration:30,transformation:{translation:[-0.45f,-2.4f,-0.45f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:[0.9f,2.2f,0.9f]}}

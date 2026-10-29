@@ -19,6 +19,12 @@
   references only as a numeric suffix family, which must be contiguous); every proxy key file
   F:mboss/px/<id>/k/<clip>/<t> is reached by its clip's dispatch tree (no orphan from an older manifest); every
   function path under F:mboss, the boss/<id> roots, F:boss/test and F:room/cboss is a valid lower-case resource location
+- special bosses (Tachy S1, scratchpad tk/PLAN.md §7-8): every enabled special has the 17 hooks + test/help (+
+  mboss_lib.SPECIAL_HOOKS), the sreg / sbyid lines of F:mboss/register and #spN / #spRoll match the enabled special entries,
+  each one has its F:mboss/sp/pp/<id>, sp/g/<id> and cb/inc/<id> (incoming through the floor) and every dispatcher
+  F:mboss/d/<hook> names it; the frozen runtime names of contract §3.1 exist; the rift F:room/rift/** + room/obj/k_rift
+  follow the same reference / macro / resource-location rules, and every shared hook line of tools/build_rift.py is in
+  its file exactly once, right after the marker comment
 Exit code 1 on any problem.
 """
 import re
@@ -36,7 +42,8 @@ def is_macro(rel):
 
 
 for b in L.enabled_bosses(REG):
-    hooks = L.HOOKS + L.HELP_HOOKS + (L.CHAPTER_HOOKS if b.get('kind', 'mid') == 'chapter' else [])
+    hooks = L.HOOKS + L.HELP_HOOKS + (L.CHAPTER_HOOKS if b.get('kind', 'mid') == 'chapter' else []) \
+        + (L.SPECIAL_HOOKS if b.get('kind', 'mid') == 'special' else [])
     for h in hooks:
         rel = f'{L.fn_root(b)}/{h}'
         if rel not in funcs:
@@ -51,7 +58,10 @@ for h in L.HOOKS + [h.replace('/', '_') for h in L.HELP_HOOKS]:
         problems.append(f'missing dispatcher {rel}')
 # every tree the framework and its modules generate: F:mboss/**, each module root outside it (boss/<id>), the aliases
 ROOTS = ['mboss'] + sorted({L.fn_root(b) for b in REG['boss'] if not L.fn_root(b).startswith('mboss/')}) + ['boss/test']
+# the rift (Tachy S1, tools/build_rift.py): its tree and its hover object
+ROOTS += ['room/rift']
 SCAN = [p for r in ROOTS if (FN / r).exists() for p in sorted((FN / r).rglob('*.mcfunction'))]
+SCAN += [FN / 'room/obj/k_rift.mcfunction'] if (FN / 'room/obj/k_rift.mcfunction').exists() else []
 for p in SCAN:
     rel = p.relative_to(FN).with_suffix('').as_posix()
     for i, line in enumerate(p.read_text(encoding='utf-8').split('\n'), 1):
@@ -124,6 +134,47 @@ for p in SCAN + sorted((FN / 'room/cboss').rglob('*.mcfunction')):
     rel = p.relative_to(FN).with_suffix('').as_posix()
     if not re.fullmatch(r'[a-z0-9_./-]+', rel):
         problems.append(f'{rel}: not a valid function resource location (lower case a-z 0-9 _ . / - only)')
+# special bosses (Tachy S1)
+specs = L.special_bosses(REG)
+m = re.search(r'^data modify storage rlk:mboss sreg set value \[(.*)\]$', reg_txt, re.M)
+ids = re.findall(r'(?:^|\},)\{id:"([^"]+)"', m.group(1)) if m and m.group(1) else []
+if sorted(ids) != sorted(b['id'] for b in specs):
+    problems.append(f'register: sreg {ids} != enabled special entries {[b["id"] for b in specs]}')
+for k, v in (('#spN', len(specs)), ('#spRoll', sum(1 for b in specs if b['w'] >= 1))):
+    if specs and f'scoreboard players set {k} mb {v}' not in reg_txt:
+        problems.append(f'register: {k} mb {v} missing')
+for b in specs:
+    if f'{b["id"]}:{{id:"{b["id"]}",n:{b["n"]},' not in reg_txt:
+        problems.append(f'register: sbyid.{b["id"]} missing or stale')
+    for f in (f'mboss/sp/pp/{b["id"]}', f'mboss/sp/g/{b["id"]}', f'mboss/cb/inc/{b["id"]}'):
+        if f not in funcs:
+            problems.append(f'special {b["id"]}: missing F:{f}')
+    for h in L.HOOKS:
+        d = FN / f'mboss/d/{h}.mcfunction'
+        if d.exists() and f'matches {b["n"]} run' not in d.read_text(encoding='utf-8') and h not in L.ALL_MODULE_HOOKS:
+            problems.append(f'special {b["id"]}: dispatcher mboss/d/{h} does not name n {b["n"]}')
+    if L.arena_of(b, REG)['aid'] == 'plaza':
+        problems.append(f'special {b["id"]}: fights in the plaza (a special needs its own arena)')
+for f in ['mboss/sp/' + n for n in ('roll', 'prep', 'gate', 'start_zone', 'start', 'wait', 'ret_rift', 'won', 'won_kill',
+                                     'won_cancel', 'clear', 'reward', 'lvup', 'forget', 'run_reset')] \
+        + ['mboss/test/' + n for n in ('rift', 'rift_id', 'rift_id_do', 'special', 'special_ch', 'help_special')] \
+        + ['boss/test/' + n for n in ('rift', 'rift_id', 'special', 'special_ch')] \
+        + ['room/rift/' + n for n in ('init', 'roll', 'arm', 'show', 'open', 'reopen', 'close', 'tick', 'enter', 'click',
+                                       'forget', 'uninstall')] + ['room/obj/k_rift']:
+    if f not in funcs:
+        problems.append(f'missing frozen runtime name F:{f} (contract 3.1)')
+try:
+    import build_rift as BR
+    for rel, _mode, _anchor, line in BR.HOOKS:
+        lines = (FN / (rel + '.mcfunction')).read_text(encoding='utf-8').split('\n')
+        at = [i for i, x in enumerate(lines) if x == line]
+        if len(at) != 1 or at[0] == 0 or lines[at[0] - 1] != BR.MARK:
+            problems.append(f'{rel}: rift hook line missing, doubled or unmarked: {line}')
+        for ref in re.findall(r'function (rlk:[a-z0-9_./-]+)', line):
+            if ref[4:] not in funcs:
+                problems.append(f'{rel}: rift hook line names a missing function {ref}')
+except ImportError as e:
+    problems.append(f'tools/build_rift.py not importable: {e}')
 A = REG['arena']
 ens = (FN / 'mboss/arena/ensure.mcfunction')
 if not ens.exists() or f'{A["theme"]}@{A["ver"]}' not in ens.read_text(encoding='utf-8'):
@@ -131,5 +182,5 @@ if not ens.exists() or f'{A["theme"]}@{A["ver"]}' not in ens.read_text(encoding=
 for p in problems:
     print('PROBLEM', p)
 print(f'check_mboss_pack: {len(L.mid_bosses(REG))} enabled mid-boss module(s), {len(chaps)} chapter boss module(s), '
-      f'{len(L.arenas(REG))} arena(s), {len(problems)} problem(s).')
+      f'{len(specs)} special boss module(s), {len(L.arenas(REG))} arena(s), {len(problems)} problem(s).')
 sys.exit(1 if problems else 0)

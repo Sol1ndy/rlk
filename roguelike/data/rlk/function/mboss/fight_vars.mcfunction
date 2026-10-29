@@ -13,6 +13,11 @@ execute store result score #mbAtk mb run data get storage rlk:mboss cur.atk
 # chapter mode (AZ-CM): #mbMode from cur.kind, the fight arena and its radii, proxies; per-fight chapter state
 scoreboard players set #mbMode mb 0
 execute if data storage rlk:mboss cur{kind:"chapter"} run scoreboard players set #mbMode mb 1
+# special bosses (Tachy S1) fight in chapter mode too; #mbKind = 0 mid, 1 chapter, 2 special (wording only)
+execute if data storage rlk:mboss cur{kind:"special"} run scoreboard players set #mbMode mb 1
+scoreboard players set #mbKind mb 0
+execute if data storage rlk:mboss cur{kind:"chapter"} run scoreboard players set #mbKind mb 1
+execute if data storage rlk:mboss cur{kind:"special"} run scoreboard players set #mbKind mb 2
 execute store result score #mbAr mb run data get storage rlk:mboss cur.ar
 execute if score #mbAr mb matches 0 run scoreboard players set #mbArW10 mb 210
 execute if score #mbAr mb matches 0 run scoreboard players set #mbArS10 mb 190
@@ -20,6 +25,8 @@ execute if score #mbAr mb matches 1 run scoreboard players set #mbArW10 mb 280
 execute if score #mbAr mb matches 1 run scoreboard players set #mbArS10 mb 260
 execute if score #mbAr mb matches 2 run scoreboard players set #mbArW10 mb 260
 execute if score #mbAr mb matches 2 run scoreboard players set #mbArS10 mb 240
+execute if score #mbAr mb matches 3 run scoreboard players set #mbArW10 mb 240
+execute if score #mbAr mb matches 3 run scoreboard players set #mbArS10 mb 220
 execute if score #mbAr mb matches 9 run scoreboard players set #mbArW10 mb 110
 execute if score #mbAr mb matches 9 run scoreboard players set #mbArS10 mb 90
 execute store result score #mbPx mb run data get storage rlk:mboss cur.px

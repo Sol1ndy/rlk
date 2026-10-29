@@ -3,6 +3,8 @@
 function rlk:boss/raiden/cleanup
 # 중간보스 전투 정리(경기장 엔티티 · 보스바 · 상태). 플레이어는 옮기지 않음
 function rlk:mboss/cleanup
+# rift (build_rift.py)
+function rlk:room/rift/forget
 execute as @e[tag=rlk_zone,scores={zst=1..}] run function rlk:room/zone_erase
 execute as @e[tag=rlk_door,scores={dst=1..}] run function rlk:room/door_erase with entity @s data
 kill @e[tag=rlk_room]

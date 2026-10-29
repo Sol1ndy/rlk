@@ -2,6 +2,8 @@ function rlk:boss/raiden/uninstall
 kill @e[tag=rlk_raiden]
 # 중간보스: 전투 정리 · 보스바 · 점수 · 경기장 청크 고정 해제
 function rlk:mboss/uninstall
+# rift (build_rift.py)
+function rlk:room/rift/uninstall
 scoreboard objectives remove lcSeen
 execute as @a[tag=player] run function rlk:char/motion/stop
 # 시스템 제거: 임시 엔티티/UI 아이템/스코어보드 정리 후 틱 처리 정지 (사용: /function rlk:uninstall)

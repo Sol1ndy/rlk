@@ -1,0 +1,2 @@
+function rlk:help/head {cmd:"/function rlk:mboss/test/special_ch {id:…,ch:…}",what:"특수 보스 id (ch = 챕터)"}
+tellraw @s [{text:"",click_event:{action:"suggest_command",command:'/function rlk:mboss/test/special_ch {id:"spproto",ch:1}'},hover_event:{action:"show_text",value:'/function rlk:mboss/test/special_ch {id:"spproto",ch:1}'}},{text:"  spproto",color:"yellow"},{text:" — ",color:"dark_gray"},{text:"시험용 균열 수호자 · 특수 보스 틀 점검용",color:"white"}]

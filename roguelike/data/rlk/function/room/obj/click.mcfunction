@@ -25,4 +25,6 @@ execute if score @s oact matches 14 run return run function rlk:mboss/gate
 execute if score @s oact matches 15 run return run function rlk:room/obj/do_mbox
 # 챕터 보스 문(oact 16, 입구 구역 한가운데): 경기장 준비가 끝났으면 구역 전투 시작 → 경기장
 execute if score @s oact matches 16 run return run function rlk:mboss/cb/gate
+# rift (build_rift.py)
+execute if score @s oact matches 17 run return run function rlk:room/rift/click
 execute if score @s oact matches 8 run return run function rlk:run/next_chapter

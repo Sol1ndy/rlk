@@ -6,3 +6,4 @@ function rlk:mboss/proto/uninstall
 function rlk:mboss/cproto/uninstall
 function rlk:boss/azhdaha/uninstall
 function rlk:boss/apep/uninstall
+function rlk:mboss/spproto/uninstall

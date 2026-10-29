@@ -2,4 +2,5 @@
 execute unless score #mbAr mb matches 1.. run return run function rlk:mboss/ar/plaza/leash
 execute if score #mbAr mb matches 1 run return run function rlk:mboss/ar/az_cavern/leash
 execute if score #mbAr mb matches 2 run return run function rlk:mboss/ar/ap_oasis/leash
+execute if score #mbAr mb matches 3 run return run function rlk:mboss/ar/tk_lift/leash
 execute if score #mbAr mb matches 9 run return run function rlk:mboss/ar/cp_test/leash

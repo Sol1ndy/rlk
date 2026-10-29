@@ -29,6 +29,8 @@ scoreboard players set #rfCount room 0
 # 노드: 다음 맵의 노드 목록, 나무뿌리 기적(한 판에 한 번)
 data modify storage rlk:room next set value []
 scoreboard players set #mirUsed room 0
+# rift (build_rift.py)
+scoreboard players set #riftUsed room 0
 data modify storage rlk:room seen set value []
 # 이번 판에 만난 중간보스(같은 중간보스가 연달아 나오지 않게)
 data modify storage rlk:mboss met set value []

@@ -5,6 +5,8 @@ execute if data entity @s data.cboss run function rlk:room/cboss/build
 execute if data entity @s data{boss_id:"narukami"} run function rlk:room/raiden/build
 execute unless data entity @s data.boss_id run function rlk:room/zb_fn with storage rlk:room zbm
 scoreboard players set @s zst 1
+# rift (build_rift.py)
+function rlk:room/rift/roll
 # 이 구역에 붙은 문을 한 단계씩 진행(숨김→닫힘→열림)
 scoreboard players operation #zb tmp = @s zid
 execute as @e[tag=rlk_door] if score @s da = #zb tmp run function rlk:room/door_step

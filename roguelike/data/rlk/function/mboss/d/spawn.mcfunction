@@ -6,3 +6,4 @@ execute if score #mbId mb matches 99 run return run function rlk:mboss/proto/spa
 execute if score #mbId mb matches 98 run return run function rlk:mboss/cproto/spawn
 execute if score #mbId mb matches 10 run return run function rlk:boss/azhdaha/spawn
 execute if score #mbId mb matches 11 run return run function rlk:boss/apep/spawn
+execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/spawn

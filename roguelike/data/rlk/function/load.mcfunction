@@ -649,6 +649,8 @@ scoreboard players set #10 tmp 10
 scoreboard objectives remove vTtl
 
 # ===== 조절 지점 =====
+# rift (build_rift.py)
+scoreboard players set #riftPm room 30
 # 로비 · 튜토리얼 · 설정 · 체험 방(lobby/): 항상 불러와 둠
 forceload add 80 14 134 64
 scoreboard players set #c2 lob 2
@@ -1373,6 +1375,8 @@ function rlk:bossui/init
 function rlk:boss/raiden/init
 # 중간보스 틀(tools/build_mboss_core.py): 점수 · 보스바 · 레지스트리 · 경기장 확인, 진행 중 전투는 체력 유지
 function rlk:mboss/init
+# rift (build_rift.py)
+function rlk:room/rift/init
 # 화면 위 미니맵(tools/build_minimap.py)
 function rlk:minimap/init
 # 나비아 금빛 카드 효과 점수(tools/build_navia_fx_cards.py)

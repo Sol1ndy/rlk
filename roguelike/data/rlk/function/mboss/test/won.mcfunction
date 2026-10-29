@@ -7,5 +7,9 @@ execute unless data storage rlk:mboss tlast.ch run data modify storage rlk:mboss
 execute if data storage rlk:mboss cur{kind:"chapter"} run data modify storage rlk:mboss tlast.cb set value 1b
 execute unless data storage rlk:mboss cur{kind:"chapter"} run data remove storage rlk:mboss tlast.cb
 execute if data storage rlk:mboss cur{kind:"chapter"} run return run function rlk:mboss/test/cwon
+# special bosses (Tachy S1): their wording and replay link (test/swon)
+execute if data storage rlk:mboss cur{kind:"special"} run data modify storage rlk:mboss tlast.sp set value 1b
+execute unless data storage rlk:mboss cur{kind:"special"} run data remove storage rlk:mboss tlast.sp
+execute if data storage rlk:mboss cur{kind:"special"} run return run function rlk:mboss/test/swon
 execute if score #mbKilled mb matches 1 run function rlk:mboss/test/won_msg with storage rlk:mboss tlast
 execute unless score #mbKilled mb matches 1 run tellraw @a[tag=player] [{text:"[중간보스 테스트] ",color:"#E0703A",bold:true},{text:"취소되었습니다(보상 없음). ",color:"gray",bold:false},{text:"[로비로]",color:"yellow",bold:false,click_event:{action:"suggest_command",command:'/function rlk:mboss/test/stop'}}]

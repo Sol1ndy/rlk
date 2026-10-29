@@ -1,5 +1,7 @@
 # 구역에 처음 들어옴 (@s = 구역 표식, at @s). 이때 비로소 적/보상이 나타난다
 scoreboard players set @s zst 2
+# rift (build_rift.py)
+execute if entity @s[tag=rlk_riftz] at @s run function rlk:room/rift/show
 function rlk:room/cells_kill
 function rlk:room/wave_start
 execute if score @s zkind matches 1 run return run function rlk:room/combat_start

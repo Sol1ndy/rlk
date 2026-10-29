@@ -17,6 +17,8 @@ execute as @e[tag=rlk_xpspot] at @s if entity @e[tag=rlk_body,distance=..8] run 
 execute as @e[tag=rlk_xpsrc] at @s run function rlk:room/xp/tick
 # 중간보스 아이템 상자(mboss/box): 떨어지는 연출 · 땅에 닿으면 오브젝트로 · 반짝임. 상자가 있을 때만(#mbBoxOn)
 execute if score #mbBoxOn mb matches 1 run function rlk:mboss/box/all
+# rift (build_rift.py)
+execute if score #riftOn room matches 1 run function rlk:room/rift/tick
 # 오브젝트 조준 표시 (주의: anchored eyes 로 시작점만 눈으로 옮기고 feet 으로 되돌려야 레이가 휘지 않음)
 tag @e[tag=rlk_ohover] remove rlk_ohover
 execute if entity @e[tag=rlk_obj,limit=1] as @a[tag=player,limit=1] at @s if entity @e[tag=rlk_obj,distance=..12] anchored eyes positioned ^ ^ ^0.01 anchored feet run function rlk:room/obj/aim

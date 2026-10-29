@@ -148,6 +148,10 @@ execute unless score #mbLost mb matches 0.. run scoreboard players set #mbLost m
 execute unless score #cbForce mb matches 0.. run scoreboard players set #cbForce mb 0
 execute unless score #cbAuto mb matches 0.. run scoreboard players set #cbAuto mb 0
 execute unless score #cbWait mb matches 0.. run scoreboard players set #cbWait mb 0
+# special bosses (Tachy S1): a running special fight (#spOn), the test auto-enter (#spAuto), the fight kind
+execute unless score #spOn mb matches 0.. run scoreboard players set #spOn mb 0
+execute unless score #spAuto mb matches 0.. run scoreboard players set #spAuto mb 0
+execute unless score #mbKind mb matches 0.. run scoreboard players set #mbKind mb 0
 execute unless score #mbMusPh mb matches 0.. run scoreboard players set #mbMusPh mb 0
 execute unless score #mbArBuild mb matches 0.. run scoreboard players set #mbArBuild mb 0
 execute unless score #mbHitEv mb matches 0.. run scoreboard players set #mbHitEv mb 0

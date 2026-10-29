@@ -30,7 +30,8 @@ HELP_HOOKS = ['test/help']
 CHAPTER_HOOKS = ['prep']
 # Special bosses (kind "special", D0 of the Tachy plan: scratchpad tk/PLAN.md §7-8, tk/contract.md): reached through a
 # room rift (F:room/rift, F:mboss/sp), fought in their own arena in chapter mode, rewarded with a level-up + picks boxes.
-# They implement the 17 hooks + test/help (no prep). Until S1 lands the framework, special entries must stay disabled.
+# They implement the 17 hooks + test/help (no prep); the framework (F:mboss/sp, tools/build_mboss_core.py) runs them in
+# chapter mode (#mbMode 1, #mbKind 2) and routes their incoming hook through the floor (mboss/cb/inc/<id>) as a chapter's.
 SPECIAL_HOOKS = []
 SPECIAL_PICKS_MAX = 3
 
@@ -77,6 +78,8 @@ MUSIC_TRACKS = {
     'minecraft:music.dragon': [6883],
     'minecraft:music.overworld.deep_dark': [6870, 6068],
     'minecraft:music.nether.soul_sand_valley': [5600, 5189, 6076, 6376, 4789],
+    # Tachy S1 (2026-10-29, the same asset index 34): the basalt deltas pool holds the same five nether tracks
+    'minecraft:music.nether.basalt_deltas': [5600, 5189, 6076, 6376, 4789],
     'minecraft:music.overworld.lush_caves': [6627, 4031, 5923, 6881, 4104, 6859, 5617, 5210, 5571, 5502, 6400, 5935, 6254,
                                              6492, 4595],
 }
@@ -127,6 +130,7 @@ def load_registry():
                 assert not b.get(k), f'{b["id"]}: {k} is not a special-entry field'
             assert 1 <= int(b.get('picks', 0)) <= SPECIAL_PICKS_MAX, f'{b["id"]}: a special entry needs picks 1..{SPECIAL_PICKS_MAX}'
             assert int(b.get('lvup', 0)) in (0, 1), f'{b["id"]}: lvup is 0 or 1'
+            assert int(b.get('w', 0)) >= 0, f'{b["id"]}: w (the rift roll weight) must be >= 0'
             aid = b.get('arena', 'plaza')
             # a disabled special may name the arena its framework stage adds later (tk/contract.md: S1 owns arenas{})
             assert aid != 'plaza' and (aid in arenas or not b.get('enabled', True)), f'{b["id"]}: a special entry needs its own arena ({aid})'
