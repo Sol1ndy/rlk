@@ -31,6 +31,7 @@ execute if entity @s[tag=rlk_mb_resel] unless score #trueDmg tmp matches 1 run f
 execute if entity @s[tag=rlk_mb_body] unless score #trueDmg tmp matches 1 run function rlk:mboss/d/on_hit
 # 피해 보정(각인 · 아이템 · 레벨 · 저항 · 보스별 받는 피해). 진짜 피해는 건너뜀
 execute unless score #trueDmg tmp matches 1 run function rlk:combat/apply_mods
+execute if entity @s[tag=rlk_c3_core] run function rlk:cm/pc/core_hit
 # 중간보스 보조 오브젝트(rlk_mb_hit, 예: 원소별): 몸체와 똑같이 보정된 피해를 모듈로 넘기고 여기서 끝(보상·처치 없음)
 execute if entity @s[tag=rlk_mb_hit] unless score #trueDmg tmp matches 1 run return run function rlk:mboss/aux_hit
 # 대미지 숫자 색 = 원소 색
