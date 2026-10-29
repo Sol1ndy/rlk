@@ -4,5 +4,5 @@ function rlk:boss/tachy/mantle/off
 scoreboard players set #pat tk 53
 scoreboard players set #pt tk 0
 scoreboard players set #done tk 0
-function rlk:boss/tachy/rig_stub/play/mantle_nova
+function rlk:boss/tachy/p/mantle/nova/start
 function rlk:boss/tachy/hud/sub

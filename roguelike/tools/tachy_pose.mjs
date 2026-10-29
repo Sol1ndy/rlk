@@ -45,7 +45,8 @@ export const SK = {
   swing: [0, .45, 0],
   // the scabbard across the lower back over the cape (chest frame): the mouth (hilt) at her right hip, the body rising
   // gently to the left past her left hip (v2 13.2-13.4: the blade comes out horizontally from behind the hips, to the right)
-  scabMouth: [-.22, -.3, .2], scabDir: [.75, 1, .12],
+  // (I1: 0.04 b closer to her back and level with it, so the holster stays under the cape that now hangs clear of her)
+  scabMouth: [-.22, -.3, .16], scabDir: [.75, 1, 0],
 };
 const D = Math.PI / 180;
 export const dirBE = (b, e = 0) => { const B = b * D, E = e * D; return [-Math.sin(B) * Math.cos(E), Math.sin(E), -Math.cos(B) * Math.cos(E)]; };
@@ -140,9 +141,12 @@ export function wingEulers(p, form, s, t) {
   if (form === 'cape') {
     const A = 2.5 + 7 * wF, fl = i => A * Math.sin(ph - i * .9 + (s > 0 ? 0 : .6));
     // wF: the cape streams back and out in a gust or a dash (v2 7.5-9.5: flung out behind her like a flag)
-    const e1 = [12 + 52 * wF + fl(0), s * 8 * wS, s * (5 + 22 * wS + 16 * wF)];
-    const e2 = [6 + 26 * wF + fl(1), 0, -s * 4 * wS];
-    const e3 = [4 + 16 * wF + fl(2), 0, -s * 3 * wS];
+    // I1: a positive pitch turns a segment's lower end FORWARD (toward her legs); the cape used to hang 7-19 deg forward
+    // through her hips and thighs. Now the top panel trails 8 deg BACK from the shoulder blades (12 deg with the stance's
+    // torso lean; clear of the hips) and the lower panels fall back to the vertical; a gust (wF) streams all three back.
+    const e1 = [-(8 + 56 * wF) + fl(0), s * 8 * wS, s * (5 + 22 * wS + 16 * wF)];
+    const e2 = [8 - 32 * wF + fl(1), 0, -s * 4 * wS];
+    const e3 = [4 - 18 * wF + fl(2), 0, -s * 3 * wS];
     return [e1, e2, e3];
   }
   // winged: the wings rest 95 % spread behind her (P2 / P3 footage: v7 0.4, v4 38.0); wS is added (-0.95 = folded)
@@ -193,8 +197,13 @@ export function solve(p, form = 'cape', hist = () => null, guardMin = {}) {
     // the wrap (wW): each segment slerps toward a target frame round her front (a cloak of feathers / the cape's panels
     // turned round her sides), chest frame; blended by smoothstep(wW)
     const ww = Math.max(0, Math.min(1, p.wW || 0)), wk = ww * ww * (3 - 2 * ww);
+    // I1: the cape follows her back while she stands (the eulers above); as her torso tips toward the horizontal (prone,
+    // on hands and knees: the intro) it falls toward the floor instead (the floor guard below then lays it out behind
+    // her as a train, v2 1.5-4.0) rather than sticking up off her back
+    const upr = Math.max(0, dot(rot(Cq, [0, -1, 0]), [0, -1, 0])), grav = form === 'cape' ? .9 * Math.pow(1 - upr, 1.5) : 0;
     for (let i = 0; i < 3; i++) {
       Q = mul(Q, q(E[i]));
+      if (grav > 1e-3) Q = slerp(Q, mul(fromTo(rot(Q, [0, -1, 0]), [0, -1, 0]), Q), grav);
       if (wk > 0) Q = slerp(Q, mul(Cq, wrapFrame(form, i, s)), wk);
       const n = `wing_${k}${i + 1}`, model = form === 'cape' ? `cape_${k}${i + 1}` : form === 'abyss' ? `wing_${k}${i + 1}_a` : `wing_${k}${i + 1}`;
       // floor guard: the cape trails back (pitch about its own X), a wing segment turns up about the body's forward axis

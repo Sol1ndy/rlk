@@ -14,4 +14,8 @@ execute if score #pat tk matches 4 run data modify storage rlk:mboss sub append 
 execute if score #pat tk matches 5 run data modify storage rlk:mboss sub append value {text:"  ·  연속기 · 블링크",color:"#E8E2D0",bold:false}
 execute if score #pat tk matches 6 run data modify storage rlk:mboss sub append value {text:"  ·  연속기 · 블링크 Ⅱ",color:"#E8E2D0",bold:false}
 execute if score #pat tk matches 7 run data modify storage rlk:mboss sub append value {text:"  ·  붉은 핵 연속기",color:"#E8E2D0",bold:false}
+execute if score #pat tk matches 8 run data modify storage rlk:mboss sub append value {text:"  ·  블링크",color:"#E8E2D0",bold:false}
+execute if score #pat tk matches 9 run data modify storage rlk:mboss sub append value {text:"  ·  지상 장풍",color:"#E8E2D0",bold:false}
+execute if score #pat tk matches 10 run data modify storage rlk:mboss sub append value {text:"  ·  공중 장풍",color:"#E8E2D0",bold:false}
+execute if score #pat tk matches 11 run data modify storage rlk:mboss sub append value {text:"  ·  착지 공격",color:"#E8E2D0",bold:false}
 execute if score #pat tk matches 50 run data modify storage rlk:mboss sub append value {text:"  ·  원소 전환",color:"#E8E2D0",bold:false}

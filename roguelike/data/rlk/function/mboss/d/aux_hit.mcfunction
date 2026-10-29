@@ -6,4 +6,5 @@ execute if score #mbId mb matches 99 run return run function rlk:mboss/proto/aux
 execute if score #mbId mb matches 98 run return run function rlk:mboss/cproto/aux_hit
 execute if score #mbId mb matches 10 run return run function rlk:boss/azhdaha/aux_hit
 execute if score #mbId mb matches 11 run return run function rlk:boss/apep/aux_hit
+execute if score #mbId mb matches 20 run return run function rlk:boss/tachy/aux_hit
 execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/aux_hit

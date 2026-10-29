@@ -7,4 +7,8 @@ execute if score #pat tk matches 4 run function rlk:boss/tachy/core/run/b3
 execute if score #pat tk matches 5 run function rlk:boss/tachy/core/run/c1
 execute if score #pat tk matches 6 run function rlk:boss/tachy/core/run/c2
 execute if score #pat tk matches 7 run function rlk:boss/tachy/core/run/c3
+execute if score #pat tk matches 8 run function rlk:boss/tachy/core/run/k
+execute if score #pat tk matches 9 run function rlk:boss/tachy/core/run/w1
+execute if score #pat tk matches 10 run function rlk:boss/tachy/core/run/w2
+execute if score #pat tk matches 11 run function rlk:boss/tachy/core/run/l
 execute if score #done tk matches 1 run function rlk:boss/tachy/core/pat_end

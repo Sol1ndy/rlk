@@ -1743,9 +1743,7 @@
    ]
   }
  },
- "sounds_beyond_api": [
-  "wave_charge"
- ],
+ "sounds_beyond_api": [],
  "hud": {
   "badge": [
    "el"

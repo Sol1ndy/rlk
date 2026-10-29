@@ -3,4 +3,5 @@
 # a chapter arena builds only on a boss map, which never rolls a rift). rlk:mboss sprep = the prepared special.
 $data modify storage rlk:mboss sprep set value "$(id)"
 $data modify storage rlk:mboss spg set value "$(id)"
+execute if data storage rlk:mboss {spg:"tachy"} run return run function rlk:mboss/sp/pp/tachy
 execute if data storage rlk:mboss {spg:"spproto"} run return run function rlk:mboss/sp/pp/spproto

@@ -117,8 +117,9 @@ SND_FALLBACK = {
     'nova_blast': [('entity.generic.explode', 1.0, 0.7), ('entity.lightning_bolt.impact', 0.8, 1.4)],
     'feather_fall': [('block.amethyst_block.chime', 0.5, 1.8), ('entity.phantom.flap', 0.3, 1.9)],
 }
-# W1's charge has no kit recipe (KIT_SOUNDS): PLAN §4.2 W1 vanilla events.
+# W1's charge: the kit recipe wave_charge (I1, S4 R3 / S1K K1); these PLAN §4.2 W1 vanilla events stand in without the kit.
 W1_CHARGE = [('block.beacon.ambient', 0.6, 1.8), ('block.respawn_anchor.charge', 0.6, 1.0)]
+SND_FALLBACK['wave_charge'] = W1_CHARGE
 STOP_SOUNDS = ('block.respawn_anchor.charge', 'block.beacon.ambient', 'entity.warden.sonic_charge',
                'block.beacon.power_select')
 
@@ -517,7 +518,7 @@ def build_w1(W):
     ch = sm.st('ch')
     ch.at(0, FACE, api.play(clip), snd('step'))
     ch.at(glow, look('chest', 'amber'), look('edge', 'yellow'), S.fx_flare(1),
-          S.placed([L.sound(e, v, p) for e, v, p in W1_CHARGE], 'at @s'))
+          snd('wave_charge'))
     ch.rng(1, waves[-1] - 1, turn(6))
     if not K.p('glint'):
         ch.rng(glow, waves[0] - 1, f'execute {AT_BODY} positioned ^0.9 ^1.1 ^0.6 run {part(GOLD, 0.6, 0.05, 0.3, 0, 2)}')

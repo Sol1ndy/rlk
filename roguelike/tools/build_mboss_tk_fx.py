@@ -669,11 +669,11 @@ SOUNDS = {
     'core_backfire': ('G3 backfire.', [('entity.generic.explode', 0.9, 0.9), ('entity.blaze.hurt', 0.7, 0.6)]),
     'stagger':      ('Stagger.', [('entity.iron_golem.damage', 0.6, 0.8), ('item.armor.equip_netherite', 0.4, 0.6)]),
     'step':         ('Armoured footstep (walk events).', [('block.chain.step', 0.4, 0.8), ('entity.iron_golem.step', 0.3, 1.4)]),
-    # beyond api.KIT_SOUNDS (request S:tk/requests/s1k.md, S4's R3): built now, callable once the lead adds the name
+    # S4's R3 (request S:tk/requests/s1k.md K1; in api.KIT_SOUNDS since I1)
     'wave_charge':  ('W1 t0-40: the gold glow grows along the edge (S4 R3).', [('block.beacon.ambient', 0.6, 1.8),
                                                                               ('block.respawn_anchor.charge', 0.6, 1.0)]),
 }
-EXTRA_SOUNDS = ('wave_charge',)
+EXTRA_SOUNDS = ()                                  # names beyond api.KIT_SOUNDS (none since I1)
 assert set(SOUNDS) == set(api.KIT_SOUNDS) | set(EXTRA_SOUNDS), set(SOUNDS) ^ set(api.KIT_SOUNDS)
 DEATH_SOUNDS = ('death_knee', 'death_ash')
 VOICE_EVENTS = ('entity.warden.', 'entity.ravager.', 'entity.blaze.ambient', 'entity.blaze.hurt', 'entity.wither.',

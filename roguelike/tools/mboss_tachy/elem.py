@@ -135,13 +135,10 @@ def build(W, ctx):
     # ---------------------------------------------------------------------------------------------- G2 mantle
     feather = ctx.has_s4('p/mantle/feather')
     nova = ctx.has_s4('p/mantle/nova/start')
-    gauge = ['# The mantle gauge on the HUD after a change (@s = body): kit gauge cells in 5 % steps, the cocoon cracks in 4.',
+    # The gauge itself is the boss-bar under-bar (hook bars -> hud/bar_gauge, as every boss); the kit's name-line gauge
+    # cells (fx/hud/gauge) are not shown (I1: one gauge only). Here: the cocoon card cracks in 4 steps.
+    gauge = ['# The mantle gauge changed (@s = body): the cocoon card of its quarter (the gauge is the boss-bar under-bar).',
              f'scoreboard players operation #hud_g {OBJ} = #sh {OBJ}']
-    for p in range(100, -1, -5):
-        lo = p - 4 if p > 0 else -1000
-        hi = p if p < 100 else 1000
-        for ln in S.hud('gauge', pct=p):
-            gauge.append(f'execute if score #sh {OBJ} matches {lo}..{hi} run {ln}')
     for lo, hi, pct in ((76, 1000, 100), (51, 75, 75), (26, 50, 50), (-1000, 25, 25)):
         for ln in S.fx_plain('cocoon', [], pos='~ ~1.2 ~', pct=pct):
             gauge.append(f'execute if score #sh {OBJ} matches {lo}..{hi} unless score #hud_c {OBJ} matches {pct} run {ln}'

@@ -6,4 +6,5 @@ execute if score #mbId mb matches 99 run return run function rlk:mboss/proto/pau
 execute if score #mbId mb matches 98 run return run function rlk:mboss/cproto/pause
 execute if score #mbId mb matches 10 run return run function rlk:boss/azhdaha/pause
 execute if score #mbId mb matches 11 run return run function rlk:boss/apep/pause
+execute if score #mbId mb matches 20 run return run function rlk:boss/tachy/pause
 execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/pause

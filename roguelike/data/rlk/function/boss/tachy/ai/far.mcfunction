@@ -2,5 +2,9 @@
 execute store result score #t tk run random value 1..100
 scoreboard players set #ai_wa1 tk 1
 execute if score #last tk matches 1 run scoreboard players set #ai_wa1 tk 0
+scoreboard players set #ai_ww1 tk 1
+execute if score #last tk matches 9 run scoreboard players set #ai_ww1 tk 0
+execute if score #t tk matches 51.. if score #ai_ww1 tk matches 1 run return run function rlk:boss/tachy/ai/go_w1
 execute if score #ai_wa1 tk matches 1 run return run function rlk:boss/tachy/ai/go_a1
+execute if score #ai_ww1 tk matches 1 run return run function rlk:boss/tachy/ai/go_w1
 return fail

@@ -70,12 +70,17 @@ plates with bevelled panel lines, the yellow tie (straps from the collar to the 
 3x3 light sockets, silver hex plates on her left flank / collar / pack / pauldron, the massive right hex pauldron with two
 yellow bands and a ring light, the bulky right gauntlet (yellow band, two orange ring lights), the slim left arm, knee
 guards with orange ring lights, yellow thigh band (right), the copper-red glossy helmet dome with the dark visor glass, a
-gold rim and temple ring lights, the glowing skull inside, a pale face with dark brows and red lips under a parted fringe,
+gold rim and temple ring lights, the glowing skull inside, the unmasked face in an anime style (I1, the user's request:
+large almond eyes with a dark lash line and catch lights, thin arched brows, a small rose mouth, a light blush; the
+face card and the fringe fold back 22.5 deg at their sides; the fringe reaches over the front of the crown with a middle
+parting and opens as curtain bangs, v2 10.5),
 long dark ash-brown hair (3 locks down the back, lagging 3 t). The long sword: grip 0.34 with gold bands, the round guard
 disc with the orange ring light, a 1.9 b blade with the serrated spine and the yellow edge band, the edge glow card.
 
-Forms: `cape` = the folded wings as a long bronze-gold feather-plate cape (3 panels a side, flutter 40 t, streams back
-with `wF`), `winged` = 3 blade-feather segments a side (0.95 / 0.95 / 0.80, resting 95 % spread behind her, flap, wrap
+Forms: `cape` = the folded wings as a long draped dark-bronze feather cape (3 panels a side, flutter 40 t, streams back
+with `wF`; I1: one layered feather field over the panels, the inner faces a dark lining, the halves overlap 0.03 b apart
+past her spine and wrap round her sides in two facets, the top panel trails 8 deg back clear of the hips and the cape
+falls toward the floor as her torso tips over: prone / on hands and knees it lies behind her as a train), `winged` = 3 blade-feather segments a side (0.95 / 0.95 / 0.80, resting 95 % spread behind her, flap, wrap
 into a feather cloak), `abyss` = the same with dark red flesh + the two tendrils. The sheath: in the intro the sword sits
 in a sheath rising from her right hip across the back under the cape (the hilt at the hip); after the draw only a short
 holster remains (the fight footage shows no scabbard; PLAN §2.1's permanent 2 b diagonal scabbard was dropped).

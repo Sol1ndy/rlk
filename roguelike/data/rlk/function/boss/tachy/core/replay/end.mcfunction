@@ -1,4 +1,4 @@
-function rlk:boss/tachy/core/sq/intro/cancel
+function rlk:boss/tachy/seq/intro/cancel
 tag @s remove rlk_mb_inv
 scoreboard players set #pat tk 0
 scoreboard players set #sq tk 0

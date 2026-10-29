@@ -18,9 +18,8 @@ scoreboard players set #hud_g tk -1
 scoreboard players set #hud_c tk -1
 tag @s remove rlk_tk_core
 tag @s add rlk_tk_mantle
-function rlk:boss/tachy/rig_stub/play/mantle_in
-execute at @s run playsound minecraft:item.elytra.flying hostile @a[tag=player] ~ ~ ~ 0.5 1.4 0.17
-execute at @s run playsound minecraft:block.beacon.ambient hostile @a[tag=player] ~ ~ ~ 0.6 1.6 0.2
-data modify storage rlk:mboss extra set value [{text:"  ◈외피",color:"#F2C230",bold:true}]
+function rlk:boss/tachy/rig/play/mantle_in
+execute at @s run function rlk:boss/tachy/fx/snd/mantle_wrap
+function rlk:boss/tachy/fx/hud/badge {el:9}
 function rlk:boss/tachy/mantle/gauge
 function rlk:boss/tachy/hud/sub

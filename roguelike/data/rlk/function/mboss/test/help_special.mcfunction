@@ -1,2 +1,3 @@
 function rlk:help/head {cmd:"/function rlk:mboss/test/special {id:…}",what:"특수 보스 id (= rlk:boss/test/special)"}
+tellraw @s [{text:"",click_event:{action:"suggest_command",command:'/function rlk:mboss/test/special {id:"tachy"}'},hover_event:{action:"show_text",value:'/function rlk:mboss/test/special {id:"tachy"}'}},{text:"  tachy",color:"yellow"},{text:" — ",color:"dark_gray"},{text:"타키 · 잠식된 제7공수대원",color:"white"}]
 tellraw @s [{text:"",click_event:{action:"suggest_command",command:'/function rlk:mboss/test/special {id:"spproto"}'},hover_event:{action:"show_text",value:'/function rlk:mboss/test/special {id:"spproto"}'}},{text:"  spproto",color:"yellow"},{text:" — ",color:"dark_gray"},{text:"시험용 균열 수호자 · 특수 보스 틀 점검용",color:"white"}]

@@ -20,7 +20,7 @@
     "Boss n 11 and arena n 2 are Apep's (chapter 3: ap_oasis; scratchpad ap/ap_contract.md 0.3.6). Its entry's first line holds id n kind ch route enabled w (route false until AP-I2).",
     "--- kind special (D0 of the Tachy plan, scratchpad tk/PLAN.md §7-8, tk/contract.md) ---",
     "kind: \"special\" = reached through a room rift (F:room/rift, F:mboss/sp), fought in chapter mode in its own arena, rewarded with lvup (0/1: one level) + picks (1..3) item boxes at the rift; w = rift roll weight among specials; no ch / route / px.",
-    "Boss n 20 and arena n 3 (tk_lift) are Tachy's (S1 added arenas.tk_lift = api.ARENA_SPEC and measured the basalt_deltas pool: music 1 len 6376 = mboss_lib.music_len; tachy stays enabled false until the lead's I1). Boss n 97 spproto is the stand-in special (w 0: only the rift tests reach it; arena cp_test; module F:mboss/spproto, tools/build_mboss_spproto.py).",
+    "Boss n 20 and arena n 3 (tk_lift) are Tachy's (S1 added arenas.tk_lift = api.ARENA_SPEC and measured the basalt_deltas pool: music 1 len 6376 = mboss_lib.music_len; enabled since I1: rift weight 10, icon = the kit gate icon rlk:mboss/tk_kit/gate_icon). Boss n 97 spproto is the stand-in special (w 0: only the rift tests reach it; arena cp_test; module F:mboss/spproto, tools/build_mboss_spproto.py).",
     "fn: the module's function root under F: (default mboss/<id>; a chapter boss may say boss/<id>, user 10-21). Only the function root moves: entity tags, scoreboards, storage and resource-pack paths keep their mboss names. Generators read it through mboss_lib.fn_root / fn_root_of; boss/raiden and boss/test are reserved (Raiden's own module, the chapter-boss test aliases rlk:boss/test/<cmd>)."
   ],
   "arena": {
@@ -108,14 +108,14 @@
       "icon": {"item": "minecraft:pitcher_plant", "model": "minecraft:pitcher_plant"}
     },
     {
-      "id": "tachy", "n": 20, "fn": "boss/tachy", "kind": "special", "enabled": false, "w": 10,
+      "id": "tachy", "n": 20, "fn": "boss/tachy", "kind": "special", "enabled": true, "w": 10,
       "minCh": 1, "maxCh": 99, "name": "타키", "sub": "잠식된 제7공수대원", "color": "#F2C230", "el": 1,
       "hp": 280, "xp": 45, "atk": 12, "lvAdd": 1, "dmgMul": 135, "goldMul": 6, "sap": 1, "picks": 3, "lvup": 1,
       "scale": 1.25, "hit": {"w": 1.1, "h": 2.6}, "intro": 190, "death": 130, "deathSnd": false,
       "arena": "tk_lift", "theme": "tk_lift", "res": {"*": 10}, "phases": [100],
       "music": {"1": {"ev": "minecraft:music.nether.basalt_deltas", "len": 6376},
                 "2": {"ev": "minecraft:music.dragon", "len": 6883}},
-      "icon": {"item": "minecraft:blaze_rod", "model": "minecraft:blaze_rod"}
+      "icon": {"item": "minecraft:netherite_sword", "model": "rlk:mboss/tk_kit/gate_icon"}
     },
     {
       "id": "spproto", "n": 97, "fn": "mboss/spproto", "kind": "special", "enabled": true, "w": 0,

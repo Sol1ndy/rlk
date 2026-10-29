@@ -5,5 +5,5 @@ scoreboard players set #pat tk 0
 scoreboard players set #done tk 0
 function rlk:boss/tachy/core/stop_move
 function rlk:boss/tachy/el/edge
-function rlk:boss/tachy/rig_stub/look/chest/off
+function rlk:boss/tachy/rig/look/chest/off
 function rlk:boss/tachy/ai/rec_start

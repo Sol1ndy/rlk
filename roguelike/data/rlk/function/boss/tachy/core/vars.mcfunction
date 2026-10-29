@@ -42,3 +42,7 @@ scoreboard players set #cd_b3 tk 0
 scoreboard players set #cd_c1 tk 0
 scoreboard players set #cd_c2 tk 0
 scoreboard players set #cd_c3 tk 0
+scoreboard players set #cd_k tk 0
+scoreboard players set #cd_w1 tk 0
+scoreboard players set #cd_w2 tk 0
+scoreboard players set #cd_l tk 0

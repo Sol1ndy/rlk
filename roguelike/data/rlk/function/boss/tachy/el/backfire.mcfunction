@@ -3,10 +3,8 @@
 scoreboard players set #core tk 1
 execute unless score #pat tk matches 1..11 run return 0
 function rlk:boss/tachy/core/cancel_pat
-execute at @s run particle minecraft:explosion_emitter ~ ~1.4 ~ 0 0 0 0 1 force @a[tag=player]
-execute at @s run particle minecraft:flame ~ ~1.4 ~ 0.3 0.3 0.3 0.2 40 force @a[tag=player]
-execute at @s run playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.9 0.9 0.3
-execute at @s run playsound minecraft:entity.blaze.hurt hostile @a[tag=player] ~ ~ ~ 0.7 0.6 0.23
+execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.4 ~ run function rlk:boss/tachy/fx/p/core_burst
+execute at @s run function rlk:boss/tachy/fx/snd/core_backfire
 scoreboard players operation #mbTrueEl mb = #el tk
 function rlk:mboss/true_pct {pct:3}
 execute unless score #mbSt mb matches 1 run return 0
@@ -14,5 +12,5 @@ execute unless score #mbSt mb matches 1 run return 0
 execute if score #mbFloor mb matches 1.. if score @s mhpC <= #mbFloor mb run scoreboard players set #mbFloorHit mb 1
 scoreboard players set #stag tk 50
 scoreboard players set #taken tk 130
-function rlk:boss/tachy/rig_stub/play/stagger
-execute at @s run playsound minecraft:entity.iron_golem.damage hostile @a[tag=player] ~ ~ ~ 0.6 0.8 0.2
+function rlk:boss/tachy/rig/play/stagger
+execute at @s run function rlk:boss/tachy/fx/snd/stagger

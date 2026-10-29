@@ -1,6 +1,5 @@
 # B3 pattern tick 76
-execute at @s rotated as @s rotated ~ 0 positioned ^ ^1.1 ^1.76 run particle minecraft:sweep_attack ~ ~ ~ 0.96 0.15 0.96 0 4 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^ ^1.0 ^1.76 run particle minecraft:flame ~ ~ ~ 0.96 0.2 0.96 0.02 16 force @a[tag=player]
-execute at @s rotated as @s rotated ~ 0 positioned ^ ^0.2 ^2 run particle minecraft:explosion ~ ~ ~ 0.2 0.1 0.2 0 1 force @a[tag=player]
-playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.6 1.2 0.2
-playsound minecraft:block.anvil.land hostile @a[tag=player] ~ ~ ~ 0.4 0.6 0.13
+execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.2 ~ run function rlk:boss/tachy/fx/p/slash_arc {r:32,yaw:0,pitch:-62,roll:90,el:1}
+execute at @s rotated as @s rotated ~ 0 positioned ^ ^0.2 ^2 run function rlk:boss/tachy/fx/p/impact {el:1}
+function rlk:boss/tachy/fx/snd/chop
+execute at @s rotated as @s rotated ~ 0 positioned ^ ^0.1 ^2 run function rlk:boss/tachy/fx/p/dust_ring {r:14}

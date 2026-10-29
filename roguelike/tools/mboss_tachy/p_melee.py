@@ -153,7 +153,10 @@ def build_b3(W):
         pb.group(b - 1)
         pb.hit(3 + 2 * i, grp=True, kb=2)
         pb.hit(4 + 2 * i, grp=True, kb=2)
-        pb.at(b, S.fx_slash(3.2, api.PYRO, pitch=80), S.fx_impact(api.PYRO, fwd=2.0), S.snd('chop'),
+        # overhead chop (I1, S1K K3 checked against the kit arc): a vertical blade plane (roll 90 = top -> bottom), the aim
+        # raised 62 deg so the 164 deg sweep runs from behind her head over the top to 20 deg below level ahead; its
+        # lowest painted point stays 0.2 b above the floor (pivot body + 1.2, reach 3.2)
+        pb.at(b, S.fx_slash(3.2, api.PYRO, roll=90, pitch=-62), S.fx_impact(api.PYRO, fwd=2.0), S.snd('chop'),
               S.fx_plain('dust_ring', [], pos='^ ^0.1 ^2', r=14))
     pb.at(bangs[-1], EDGE_BACK)
     pb.end(end)

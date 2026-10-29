@@ -6,6 +6,10 @@ execute if score #tst tk matches 4 run return run function rlk:boss/tachy/test/g
 execute if score #tst tk matches 5 run return run function rlk:boss/tachy/test/go/c1
 execute if score #tst tk matches 6 run return run function rlk:boss/tachy/test/go/c2
 execute if score #tst tk matches 7 run return run function rlk:boss/tachy/test/go/c3
+execute if score #tst tk matches 8 run return run function rlk:boss/tachy/test/go/k
+execute if score #tst tk matches 9 run return run function rlk:boss/tachy/test/go/w1
+execute if score #tst tk matches 10 run return run function rlk:boss/tachy/test/go/w2
+execute if score #tst tk matches 11 run return run function rlk:boss/tachy/test/go/l
 execute if score #tst tk matches 20 run return run function rlk:boss/tachy/test/mantle_b
 execute if score #tst tk matches 21 run return run function rlk:boss/tachy/test/mantle_f
 execute if score #tst tk matches 22 run return run function rlk:boss/tachy/test/tr1

@@ -5,13 +5,13 @@ scoreboard players set @s aFire 0
 scoreboard players set @s aThunder 0
 scoreboard players set @s dFire 0
 scoreboard players set @s dThunder 0
-function rlk:boss/tachy/rig_stub/init
-function rlk:boss/tachy/rig_stub/spawn
-function rlk:boss/tachy/rig_stub/look/form/cape
-function rlk:boss/tachy/rig_stub/look/visor/up_off
-function rlk:boss/tachy/rig_stub/look/edge/off
-function rlk:boss/tachy/rig_stub/look/hands/open
+function rlk:boss/tachy/rig/init
+function rlk:boss/tachy/rig/spawn
+function rlk:boss/tachy/rig/look/form/cape
+function rlk:boss/tachy/rig/look/visor/up_off
+function rlk:boss/tachy/rig/look/edge/off
+function rlk:boss/tachy/rig/look/hands/open
 function rlk:boss/tachy/el/set1
-function rlk:boss/tachy/rig_stub/look/visor/up_off
-function rlk:boss/tachy/rig_stub/look/edge/off
+function rlk:boss/tachy/rig/look/visor/up_off
+function rlk:boss/tachy/rig/look/edge/off
 data modify storage rlk:mboss sub set value []

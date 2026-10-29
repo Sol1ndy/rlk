@@ -14,3 +14,7 @@ scoreboard players operation #cd_b3 tk = #clk tk
 scoreboard players operation #cd_c1 tk = #clk tk
 scoreboard players operation #cd_c2 tk = #clk tk
 scoreboard players operation #cd_c3 tk = #clk tk
+scoreboard players operation #cd_k tk = #clk tk
+scoreboard players operation #cd_l tk = #clk tk
+scoreboard players operation #cd_w1 tk = #clk tk
+scoreboard players operation #cd_w2 tk = #clk tk

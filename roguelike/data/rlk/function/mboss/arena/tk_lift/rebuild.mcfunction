@@ -1,3 +1,4 @@
-# STUB (theme module tools/mboss_arena_tk_lift.py missing): nothing is built; outside a run the
-# forceload the dev view added goes again.
-execute unless score #active room matches 1 unless score #mbLive mb matches 1 run function rlk:mboss/ar/tk_lift/fl_off
+# Dev / test: drop the stamp of tk_lift and build it again (a running job of another arena blocks it).
+execute if score #mbArBuild mb matches 1.. run return fail
+data remove storage rlk:mboss built_tk_lift
+function rlk:mboss/arena/tk_lift/build

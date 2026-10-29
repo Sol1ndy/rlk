@@ -6,4 +6,5 @@ execute if score #mbId mb matches 99 run return run function rlk:mboss/proto/pj_
 execute if score #mbId mb matches 98 run return run function rlk:mboss/cproto/pj_end
 execute if score #mbId mb matches 10 run return run function rlk:boss/azhdaha/pj_end
 execute if score #mbId mb matches 11 run return run function rlk:boss/apep/pj_end
+execute if score #mbId mb matches 20 run return run function rlk:boss/tachy/pj_end
 execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/pj_end

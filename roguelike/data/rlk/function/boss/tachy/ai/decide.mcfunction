@@ -12,6 +12,10 @@ execute if score #mbLock mb matches 4 run return run function rlk:boss/tachy/cor
 execute if score #mbLock mb matches 5 run return run function rlk:boss/tachy/core/start/c1
 execute if score #mbLock mb matches 6 run return run function rlk:boss/tachy/core/start/c2
 execute if score #mbLock mb matches 7 run return run function rlk:boss/tachy/core/start/c3
+execute if score #mbLock mb matches 8 run return run function rlk:boss/tachy/core/start/k
+execute if score #mbLock mb matches 9 run return run function rlk:boss/tachy/core/start/w1
+execute if score #mbLock mb matches 10 run return run function rlk:boss/tachy/core/start/w2
+execute if score #mbLock mb matches 11 run return run function rlk:boss/tachy/core/start/l
 function rlk:boss/tachy/ai/rear_count
 execute if score #ai_rc tk matches 4.. if function rlk:boss/tachy/ai/rear run return 1
 execute if score #far tk matches 40.. if function rlk:boss/tachy/ai/far run return 1

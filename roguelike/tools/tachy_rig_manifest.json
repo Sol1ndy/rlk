@@ -1938,10 +1938,10 @@
       -0.20237
      ],
      "q": [
-      -0.06731,
-      0.04602,
-      0.04769,
-      0.99553
+      0.10659,
+      0.0536,
+      0.03898,
+      0.99209
      ],
      "s": [
       1,
@@ -1999,15 +1999,15 @@
    "rest": {
     "cape": {
      "t": [
-      0.15188,
-      1.26409,
-      -0.13367
+      0.1332,
+      1.27053,
+      -0.31668
      ],
      "q": [
-      -0.10237,
-      0.04431,
-      0.04928,
-      0.99254
+      0.05416,
+      0.05147,
+      0.04175,
+      0.99633
      ],
      "s": [
       1,
@@ -2065,15 +2065,15 @@
    "rest": {
     "cape": {
      "t": [
-      0.20854,
-      0.74778,
-      -0.02828
+      0.17434,
+      0.74549,
+      -0.37615
      ],
      "q": [
-      -0.11592,
-      0.04363,
-      0.04989,
-      0.99105
+      0.04054,
+      0.05089,
+      0.04245,
+      0.99698
      ],
      "s": [
       1,
@@ -2136,10 +2136,10 @@
       -0.17729
      ],
      "q": [
-      -0.08409,
-      0.05861,
-      -0.03786,
-      0.99401
+      0.0898,
+      0.05115,
+      -0.04746,
+      0.99351
      ],
      "s": [
       1,
@@ -2197,15 +2197,15 @@
    "rest": {
     "cape": {
      "t": [
-      -0.17508,
-      1.26546,
-      -0.08634
+      -0.19527,
+      1.26738,
+      -0.26929
      ],
      "q": [
-      -0.12962,
-      0.06029,
-      -0.03513,
-      0.98911
+      0.02671,
+      0.05405,
+      -0.04413,
+      0.99721
      ],
      "s": [
       1,
@@ -2263,15 +2263,15 @@
    "rest": {
     "cape": {
      "t": [
-      -0.20363,
-      0.75457,
-      0.05181
+      -0.24345,
+      0.7402,
+      -0.29499
      ],
      "q": [
-      -0.14402,
-      0.06079,
-      -0.03425,
-      0.98711
+      0.01217,
+      0.05469,
+      -0.04334,
+      0.99749
      ],
      "s": [
       1,
@@ -2461,15 +2461,15 @@
    "rest": {
     "cape": {
      "t": [
-      -0.24087,
-      1.12612,
-      -0.18792
+      -0.2367,
+      1.12334,
+      -0.14824
      ],
      "q": [
-      -0.3132,
-      -0.94622,
-      0.02875,
-      0.07573
+      -0.31647,
+      -0.94652,
+      -0.01654,
+      0.06066
      ],
      "s": [
       1.5,
@@ -2479,15 +2479,15 @@
     },
     "winged": {
      "t": [
-      -0.24087,
-      1.12612,
-      -0.18792
+      -0.2367,
+      1.12334,
+      -0.14824
      ],
      "q": [
-      -0.3132,
-      -0.94622,
-      0.02875,
-      0.07573
+      -0.31647,
+      -0.94652,
+      -0.01654,
+      0.06066
      ],
      "s": [
       1.5,
@@ -2497,15 +2497,15 @@
     },
     "abyss": {
      "t": [
-      -0.24087,
-      1.12612,
-      -0.18792
+      -0.2367,
+      1.12334,
+      -0.14824
      ],
      "q": [
-      -0.3132,
-      -0.94622,
-      0.02875,
-      0.07573
+      -0.31647,
+      -0.94652,
+      -0.01654,
+      0.06066
      ],
      "s": [
       1.5,
@@ -2672,7 +2672,7 @@
     "winged",
     "abyss"
    ],
-   "key_files": 36,
+   "key_files": 35,
    "keys": 138,
    "keys_per_tick": 3.4,
    "preview_form": "cape",
@@ -2716,8 +2716,8 @@
     "abyss"
    ],
    "key_files": 18,
-   "keys": 284,
-   "keys_per_tick": 13.5,
+   "keys": 285,
+   "keys_per_tick": 13.6,
    "preview_form": "cape",
    "source": "v5 / v6 circling"
   },
@@ -2792,8 +2792,8 @@
     "abyss"
    ],
    "key_files": 46,
-   "keys": 501,
-   "keys_per_tick": 9.8,
+   "keys": 484,
+   "keys_per_tick": 9.5,
    "preview_form": "cape",
    "source": "v10 3.6-4.0 (staggered by the reaction), G3 backfire"
   },
@@ -2813,8 +2813,8 @@
     "winged",
     "abyss"
    ],
-   "key_files": 86,
-   "keys": 675,
+   "key_files": 85,
+   "keys": 676,
    "keys_per_tick": 5.6,
    "preview_form": "cape",
    "source": "v11 (drop to a knee), G2 mantle break stun"
@@ -2834,8 +2834,8 @@
     "abyss"
    ],
    "key_files": 24,
-   "keys": 553,
-   "keys_per_tick": 22.1,
+   "keys": 549,
+   "keys_per_tick": 22,
    "preview_form": "cape",
    "source": "v6 / v7 blade drag + flare (G1 swap)"
   },
@@ -2854,8 +2854,8 @@
     "abyss"
    ],
    "key_files": 24,
-   "keys": 553,
-   "keys_per_tick": 22.1,
+   "keys": 549,
+   "keys_per_tick": 22,
    "preview_form": "cape",
    "source": "v6 / v7 blade drag + crackle (G1 swap)"
   },
@@ -2893,8 +2893,8 @@
     "abyss"
    ],
    "key_files": 8,
-   "keys": 159,
-   "keys_per_tick": 14.5,
+   "keys": 161,
+   "keys_per_tick": 14.6,
    "preview_form": "cape",
    "source": "v4 36.4 (reappears, wings spread, blade low)"
   },
@@ -2913,8 +2913,8 @@
     "abyss"
    ],
    "key_files": 14,
-   "keys": 418,
-   "keys_per_tick": 24.6,
+   "keys": 422,
+   "keys_per_tick": 24.8,
    "preview_form": "winged",
    "source": "v3 29-30 (leaps up for W2)"
   },
@@ -2952,8 +2952,8 @@
     "abyss"
    ],
    "key_files": 10,
-   "keys": 368,
-   "keys_per_tick": 28.3,
+   "keys": 364,
+   "keys_per_tick": 28,
    "preview_form": "winged",
    "source": "v4 13.0-13.5 (dark streak, blade down)"
   },
@@ -2971,8 +2971,8 @@
     "abyss"
    ],
    "key_files": 14,
-   "keys": 241,
-   "keys_per_tick": 14.2,
+   "keys": 253,
+   "keys_per_tick": 14.9,
    "preview_form": "winged",
    "source": "v4 13.5-14.5"
   },
@@ -2990,7 +2990,7 @@
     "abyss"
    ],
    "key_files": 14,
-   "keys": 506,
+   "keys": 507,
    "keys_per_tick": 29.8,
    "preview_form": "winged",
    "source": "v4 5.8-7 (launches high)"
@@ -3009,8 +3009,8 @@
     "winged",
     "abyss"
    ],
-   "key_files": 37,
-   "keys": 170,
+   "key_files": 36,
+   "keys": 168,
    "keys_per_tick": 4.1,
    "preview_form": "winged",
    "source": "v4 7-12 (glinting high above)"
@@ -3032,8 +3032,8 @@
     "abyss"
    ],
    "key_files": 34,
-   "keys": 802,
-   "keys_per_tick": 22.9,
+   "keys": 808,
+   "keys_per_tick": 23.1,
    "preview_form": "cape",
    "source": "v8 4.0-4.4"
   },
@@ -3079,8 +3079,8 @@
     "abyss"
    ],
    "key_files": 78,
-   "keys": 2102,
-   "keys_per_tick": 26.6,
+   "keys": 2122,
+   "keys_per_tick": 26.9,
    "preview_form": "cape",
    "source": "v5 18-30"
   },
@@ -3105,7 +3105,7 @@
     "abyss"
    ],
    "key_files": 104,
-   "keys": 2301,
+   "keys": 2300,
    "keys_per_tick": 20.4,
    "preview_form": "abyss",
    "source": "v5 30.4-40"
@@ -3130,8 +3130,8 @@
     "abyss"
    ],
    "key_files": 89,
-   "keys": 2480,
-   "keys_per_tick": 26.7,
+   "keys": 2511,
+   "keys_per_tick": 27,
    "preview_form": "cape",
    "source": "v6 14-22 (h2 = the full fire ring, glint v6 20.2)"
   },
@@ -3238,8 +3238,8 @@
     "abyss"
    ],
    "key_files": 12,
-   "keys": 402,
-   "keys_per_tick": 26.8,
+   "keys": 399,
+   "keys_per_tick": 26.6,
    "preview_form": "winged",
    "source": "v4 33.0 (leaps to the sky)"
   },
@@ -3258,8 +3258,8 @@
     "abyss"
    ],
    "key_files": 20,
-   "keys": 482,
-   "keys_per_tick": 23,
+   "keys": 473,
+   "keys_per_tick": 22.5,
    "preview_form": "winged",
    "source": "v4 33.3-33.9 (sky arcs), 34 (plunge)"
   },
@@ -3281,9 +3281,9 @@
     "winged",
     "abyss"
    ],
-   "key_files": 83,
-   "keys": 1431,
-   "keys_per_tick": 16.1,
+   "key_files": 82,
+   "keys": 1449,
+   "keys_per_tick": 16.3,
    "preview_form": "cape",
    "source": "v3 9.6-28 (charge v3 19.4, crescents v3 13.6)"
   },
@@ -3341,8 +3341,8 @@
     "abyss"
    ],
    "key_files": 17,
-   "keys": 413,
-   "keys_per_tick": 19.7,
+   "keys": 412,
+   "keys_per_tick": 19.6,
    "preview_form": "winged",
    "source": "v4 13.5-14.5 (lightning shockwave)"
   },
@@ -3422,8 +3422,8 @@
     "abyss"
    ],
    "key_files": 40,
-   "keys": 429,
-   "keys_per_tick": 9.5,
+   "keys": 442,
+   "keys_per_tick": 9.8,
    "preview_form": "cape",
    "source": "nova: the wings swell open, white-gold flash"
   },
@@ -3456,9 +3456,9 @@
    "compiled_forms": [
     "cape"
    ],
-   "key_files": 162,
-   "keys": 2229,
-   "keys_per_tick": 12,
+   "key_files": 163,
+   "keys": 2246,
+   "keys_per_tick": 12.1,
    "preview_form": "cape",
    "source": "v1 0-5 / 13-19 (hang, prone), v2 1.6-16.5 (push up, rise, cape, hair, visor, skull, draw, ignite)"
   },
@@ -3478,8 +3478,8 @@
     "cape"
    ],
    "key_files": 73,
-   "keys": 678,
-   "keys_per_tick": 8.4,
+   "keys": 674,
+   "keys_per_tick": 8.3,
    "preview_form": "cape",
    "source": "v9 0-4.8 (kneels, the cape splits into the blade-feather wings)"
   },
@@ -3500,7 +3500,7 @@
     "winged"
    ],
    "key_files": 100,
-   "keys": 981,
+   "keys": 982,
    "keys_per_tick": 8.8,
    "preview_form": "winged",
    "source": "v10 3.6-6.4 (stagger, red flare, tendrils, darkness)"
@@ -3523,9 +3523,9 @@
     "winged",
     "abyss"
    ],
-   "key_files": 122,
-   "keys": 1398,
-   "keys_per_tick": 10.7,
+   "key_files": 123,
+   "keys": 1395,
+   "keys_per_tick": 10.6,
    "preview_form": "cape",
    "source": "v11 32-39, v10 4-6"
   }
@@ -3796,21 +3796,21 @@
  },
  "view_range": 2,
  "budgets": {
-  "atlas_px": 328448,
+  "atlas_px": 343552,
   "atlas_budget": 520000,
-  "sprites": 46,
+  "sprites": 47,
   "elements_at_rest": {
-   "cape": 2932,
-   "winged": 2942,
-   "abyss": 3068
+   "cape": 3003,
+   "winged": 3007,
+   "abyss": 3133
   },
   "elements_budget": 6500,
   "parts": 40,
   "models": 59,
-  "key_files": 1770,
-  "keys": 30104,
-  "rig_functions": 2203,
-  "rig_bytes": 8460798,
+  "key_files": 1768,
+  "keys": 30179,
+  "rig_functions": 2201,
+  "rig_bytes": 8482335,
   "cull_overhang_ticks": 0
  },
  "sprites": {
@@ -3832,9 +3832,9 @@
   "chest_front": 2048,
   "abdomen_front": 2304,
   "pelvis_front": 3072,
-  "face": 2304,
+  "face": 4096,
   "hair_lock": 2048,
-  "hair_fringe": 1536,
+  "hair_fringe": 3072,
   "hair_back": 2304,
   "hair_tip": 1536,
   "ring": 1024,
@@ -3845,17 +3845,18 @@
   "edge_volt": 32768,
   "skull": 1024,
   "grid": 1024,
-  "cape_1": 10752,
+  "cape_in": 1024,
+  "cape_1": 14336,
   "wing_1": 12288,
   "wing_1b": 12288,
   "wing_a1": 12288,
   "wing_a1b": 12288,
-  "cape_2": 10752,
+  "cape_2": 14336,
   "wing_2": 12288,
   "wing_2b": 12288,
   "wing_a2": 12288,
   "wing_a2b": 12288,
-  "cape_3": 10752,
+  "cape_3": 14336,
   "wing_3": 12288,
   "wing_3b": 12288,
   "wing_a3": 12288,

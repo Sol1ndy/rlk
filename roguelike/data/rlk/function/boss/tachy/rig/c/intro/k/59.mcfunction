@@ -5,5 +5,4 @@ data merge entity 524c4b4d-544b-4900-8000-000000000010 {start_interpolation:0,in
 data merge entity 524c4b4d-544b-4900-8000-000000000012 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.23665f,0.57599f,0.50887f],left_rotation:[0.41565f,0.41616f,-0.18261f,0.78785f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-544b-4900-8000-000000000013 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.43943f,0.38791f,0.34793f],left_rotation:[-0.29964f,0.41588f,0.18325f,0.83886f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-544b-4900-8000-000000000014 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.26686f,0.15439f,0.45652f],left_rotation:[-0.29964f,0.41588f,0.18325f,0.83886f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-544b-4900-8000-00000000001f {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.21136f,0.50092f,-0.41398f],left_rotation:[0.60066f,-0.01946f,0.04666f,0.7979f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
 function rlk:boss/tachy/rig/lk/chest/restore

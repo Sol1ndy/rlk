@@ -5,11 +5,11 @@ scoreboard players operation #hzSzR mb *= #t3 tk
 scoreboard players set #t3 tk 4
 scoreboard players operation #hzSzR mb /= #t3 tk
 execute as @e[type=minecraft:marker,tag=rlk_tk_dl,tag=rlk_tk_p_c2] run function rlk:boss/tachy/core/dash/grow
-execute if score #c2_dl tk matches 0..4 if score #el tk matches 1 at @s run particle minecraft:flame ~ ~1 ~ 0.3 0.4 0.3 0.05 14 force @a[tag=player]
-execute if score #c2_dl tk matches 0..4 if score #el tk matches 3 at @s run particle minecraft:electric_spark ~ ~1 ~ 0.3 0.4 0.3 0.05 14 force @a[tag=player]
-execute if score #c2_dl tk matches 5..9 if score #el tk matches 1 at @s run particle minecraft:flame ~ ~1 ~ 0.3 0.4 0.3 0.05 14 force @a[tag=player]
-execute if score #c2_dl tk matches 5..9 if score #el tk matches 3 at @s run particle minecraft:electric_spark ~ ~1 ~ 0.3 0.4 0.3 0.05 14 force @a[tag=player]
-execute if score #c2_dl tk matches 10..14 if score #el tk matches 1 at @s run particle minecraft:flame ~ ~1 ~ 0.3 0.4 0.3 0.05 14 force @a[tag=player]
-execute if score #c2_dl tk matches 10..14 if score #el tk matches 3 at @s run particle minecraft:electric_spark ~ ~1 ~ 0.3 0.4 0.3 0.05 14 force @a[tag=player]
-playsound minecraft:item.trident.throw hostile @a[tag=player] ~ ~ ~ 1 0.7 0.33
+execute if score #c2_dl tk matches 0..4 if score #el tk matches 1 at @s rotated as @s rotated ~ 0 positioned ~ ~1.0 ~ run function rlk:boss/tachy/fx/p/thrust_trail {len:23,el:1}
+execute if score #c2_dl tk matches 0..4 if score #el tk matches 3 at @s rotated as @s rotated ~ 0 positioned ~ ~1.0 ~ run function rlk:boss/tachy/fx/p/thrust_trail {len:23,el:3}
+execute if score #c2_dl tk matches 5..9 if score #el tk matches 1 at @s rotated as @s rotated ~ 0 positioned ~ ~1.0 ~ run function rlk:boss/tachy/fx/p/thrust_trail {len:46,el:1}
+execute if score #c2_dl tk matches 5..9 if score #el tk matches 3 at @s rotated as @s rotated ~ 0 positioned ~ ~1.0 ~ run function rlk:boss/tachy/fx/p/thrust_trail {len:46,el:3}
+execute if score #c2_dl tk matches 10..14 if score #el tk matches 1 at @s rotated as @s rotated ~ 0 positioned ~ ~1.0 ~ run function rlk:boss/tachy/fx/p/thrust_trail {len:70,el:1}
+execute if score #c2_dl tk matches 10..14 if score #el tk matches 3 at @s rotated as @s rotated ~ 0 positioned ~ ~1.0 ~ run function rlk:boss/tachy/fx/p/thrust_trail {len:70,el:3}
+function rlk:boss/tachy/fx/snd/thrust
 function rlk:boss/tachy/el/edge

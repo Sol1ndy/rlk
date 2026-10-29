@@ -4,7 +4,7 @@ execute if score #ai_fp tk matches 1 store result score #rec tk run random value
 execute if score #ai_fp tk matches 2 store result score #rec tk run random value 18..26
 execute if score #ai_fp tk matches 3 store result score #rec tk run random value 12..18
 execute if score #ai_d2 tk matches 360001.. run scoreboard players set #ai_mv tk 1
-execute if score #ai_d2 tk matches 360001.. run return run function rlk:boss/tachy/rig_stub/play/walk
+execute if score #ai_d2 tk matches 360001.. run return run function rlk:boss/tachy/rig/play/walk
 execute store result score #ai_mv tk run random value 2..3
-execute if score #ai_mv tk matches 2 run function rlk:boss/tachy/rig_stub/play/strafe_l
-execute if score #ai_mv tk matches 3 run function rlk:boss/tachy/rig_stub/play/strafe_r
+execute if score #ai_mv tk matches 2 run function rlk:boss/tachy/rig/play/strafe_l
+execute if score #ai_mv tk matches 3 run function rlk:boss/tachy/rig/play/strafe_r

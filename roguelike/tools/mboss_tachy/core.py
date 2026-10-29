@@ -278,12 +278,18 @@ def build(W, ctx):
         f'scoreboard players operation #dmg tmp /= #c100 {OBJ}'])
     pause = ['# Hook pause (the fight froze): the kit cards go; patterns with a pause hook (S4).'] + \
         ([K.fixed('clear')] if K.fixed('clear') else [])
-    resume = ['# Hook resume: patterns with a resume hook (S4).']
+    resume = ['# Hook resume (@s = body): patterns with a resume hook (S4); during the mantle the cocoon card again (pause',
+              '# cleared the kit cards; the gauge redraws it), during the nova the rest of its swell (S4 p/mantle/nova/resume).']
     for k in present:
         if ctx.has_pat_file(k, 'pause'):
             pause.append(f'execute if score #pat {OBJ} matches {S.TID[k]} run {fn(f"p/{k}/pause")}')
         if ctx.has_pat_file(k, 'resume'):
             resume.append(f'execute if score #pat {OBJ} matches {S.TID[k]} run {fn(f"p/{k}/resume")}')
+    if S.fx_plain('cocoon', [], pct=100):
+        resume += [f'execute if score #pat {OBJ} matches {MANTLE_PAT} run {sset("#hud_c", -1)}',
+                   f'execute if score #pat {OBJ} matches {MANTLE_PAT} run {fn("mantle/gauge")}']
+    if ctx.has_s4('p/mantle/nova/resume'):
+        resume.append(f'execute if score #pat {OBJ} matches {NOVA_PAT} run {fn("p/mantle/nova/resume")}')
     w('pause', pause)
     w('resume', resume)
     w('core/stop_all', [
@@ -355,6 +361,8 @@ def build(W, ctx):
     for k in present:
         if ctx.has_pat_file(k, 'pj_end'):
             pj.append(f'execute if entity @s[tag={S.tag_p(k)}] run return run {fn(f"p/{k}/pj_end")}')
+    if ctx.has_s4('p/mantle/pj_end'):
+        pj.append(f'execute if entity @s[tag={S.tag_p("mantle")}] run return run {fn("p/mantle/pj_end")}')
     w('pj_end', pj)
     tests(W, ctx)
     if not api.rig_real():

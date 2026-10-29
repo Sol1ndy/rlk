@@ -315,7 +315,9 @@ KIT_SOUNDS = (
     'flare_tell', 'dash', 'slash_light', 'slash_heavy', 'spin', 'chop', 'glint', 'thrust', 'blink_out', 'blink_in',
     'leap', 'sky_arcs', 'plunge', 'charge_core', 'wave_release', 'wave_hit', 'air_swoop', 'dive', 'shock', 'high_glint',
     'swap_pyro', 'swap_electro', 'mantle_wrap', 'mantle_break', 'nova_swell', 'nova_blast', 'feather_fall',
-    'core_backfire', 'stagger', 'step')
+    'core_backfire', 'stagger', 'step',
+    # I1: S1K K1 / S4 R3 (the W1 charge)
+    'wave_charge')
 KIT_HUD = {'badge': ['el'], 'gauge': ['pct'], 'clear': []}    # badge el: 1 ◈불, 3 ◈번개, 9 ◈외피 (0 = none)
 KIT_FIXED = ('card', 'cardx', 'look', 'clear', 'uninstall')     # fx/<name> (no args)
 GATE_ICON_MODEL = 'rlk:mboss/tk_kit/gate_icon'

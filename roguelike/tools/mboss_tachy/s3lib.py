@@ -103,8 +103,64 @@ def placed(lines, pos):
 AT_BODY = 'at @s rotated as @s rotated ~ 0'
 
 
+ARC_PIVOT, ARC_FLOOR = 1.2, .05          # slash pivot over the feet; the lowest painted point stays this high (I1)
+_ARC_PTS = None
+
+
+def _arc_points():
+    """The painted points (a, b) of the kit's slash-arc frames (union, unit reach; tools/mboss_tk_fx_paint.py), or []."""
+    global _ARC_PTS
+    if _ARC_PTS is None:
+        _ARC_PTS = []
+        try:
+            import mboss_tk_fx_paint as P
+        except ImportError:
+            return _ARC_PTS
+        seen = set()
+        for k in range(4):
+            f = P.make_arc(k)
+            for i in range(64):
+                for j in range(32):
+                    a, b = -1 + 2 * (i + .5) / 64, (j + .5) / 32
+                    if f(a, b)[3] > .03 and (i, j) not in seen:
+                        seen.add((i, j))
+                        _ARC_PTS.append((a, b))
+    return _ARC_PTS
+
+
+def arc_low(r, roll, pitch, piv=ARC_PIVOT):
+    """The lowest painted point of a slash arc over the floor (blocks): card point (-a s, 0, b s), left_rotation roll about
+    the aim, then the display's rotationYXZ(yaw, pitch) (pitch > 0 looks down)."""
+    import math
+    sr, cr = math.sin(math.radians(roll)), math.cos(math.radians(roll))
+    sp, cp = math.sin(math.radians(pitch)), math.cos(math.radians(pitch))
+    return min((piv + (-a * r) * sr * cp - (b * r) * sp for a, b in _arc_points()), default=piv)
+
+
+def arc_fit(r, roll, pitch):
+    """I1 (the K3 check, applied to every slash): (roll, pitch) of an arc kept above the floor with the least change. A
+    vertical sweep (60 <= |roll| <= 120, the overhead chops) raises its aim by whole degrees, so it runs from over her head
+    down to the floor ahead; a diagonal one flattens its tilt by whole degrees (toward 0, or 180 for a backhand), so it
+    still crosses the target at chest height. Unchanged when already clear."""
+    if arc_low(r, roll, pitch) >= ARC_FLOOR:
+        return roll, pitch
+    if 60 <= abs(roll) <= 120:
+        p = pitch
+        while p > -89 and arc_low(r, roll, p) < ARC_FLOOR:
+            p -= 1
+        return roll, p
+    tgt = 0 if abs(roll) < 90 else (180 if roll > 0 else -180)
+    q = roll
+    while q != tgt and arc_low(r, q, pitch) < ARC_FLOOR:
+        q += 1 if tgt > q else -1
+    return q, pitch
+
+
 def fx_slash(r, el, roll=0, pitch=0, yaw=0):
-    """A slash arc at chest height on the body (yaw / pitch / roll = offsets from the body yaw, kit slash_arc)."""
+    """A slash arc at chest height on the body (yaw / pitch / roll = offsets from the body yaw, kit slash_arc), fitted
+    above the floor (arc_fit)."""
+    if K._on():
+        roll, pitch = arc_fit(r, roll, pitch)
     k = el_cases(el, lambda e: K.p('slash_arc', r=int(round(r * 10)), yaw=yaw, pitch=pitch, roll=roll, el=e))
     if k:
         return placed(k, AT_BODY + ' positioned ~ ~1.2 ~')

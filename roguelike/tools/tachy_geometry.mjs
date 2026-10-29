@@ -66,6 +66,19 @@ function cardZ1(sprite, z, {X0, X1, Y0, Y1}, side = 'back', {flipU = false, rot,
   if (tint) for (const f of Object.values(el.faces)) f.tintindex = 0;
   return el;
 }
+// a one-sided card whose sprite spans the global X range gx0..gx1 (a strip of a wider card, possibly turned by rot about
+// its pivot: the u of a point is read before the turn, so the strips of one sprite join without a seam)
+function cardZ1s(sprite, z, {X0, X1, Y0, Y1}, side, gx0, gx1, rot) {
+  const fn = P => { let s = (P[0] - gx0) / (gx1 - gx0); if (side === 'back') s = 1 - s; return [16 * s, 16 * (Y1 - P[1]) / (Y1 - Y0)]; };
+  return faceEl([[X0, Y0, z], [X1, Y1, z]], {[side]: {tex: sprite, fn}}, {shade: false, rot});
+}
+// a card of width gx0..gx1 folded at +-fx: the middle strip flat, the two outer strips turned back by 22.5 deg (round the
+// head): a face / fringe that reads round from three quarters
+function foldedCard(sprite, z, {X0, X1, Y0, Y1}, fx) {
+  return [cardZ1s(sprite, z, {X0: -fx, X1: fx, Y0, Y1}, 'front', X0, X1),
+    cardZ1s(sprite, z, {X0: fx, X1, Y0, Y1}, 'front', X0, X1, ['y', -22.5, [fx, 0, z]]),
+    cardZ1s(sprite, z, {X0, X1: -fx, Y0, Y1}, 'front', X0, X1, ['y', 22.5, [-fx, 0, z]])];
+}
 const tinted = els => { for (const e of els) for (const f of Object.values(e.faces)) f.tintindex = 0; return els; };
 // ring light: a small disc card facing direction ('left' = +X, 'right' = -X, 'front' = -Z, 'back' = +Z) at c, size s
 function ringLight(c, s, face) {
@@ -108,18 +121,22 @@ function neck() { return limb([[-.02, .055], [.10, .05]], 'tk_suit', {n: 8}); }
 function head() {
   // pivot = jaw / neck top (1.87): face, skull, ears hidden under the hair
   const e = limb([[0, ell(.055, .07, .055, .05), [0, .015]], [.05, ell(.085, .1, .085, .09), [0, .01]], [.13, ell(.098, .11, .098, .11)], [.21, ell(.09, .1, .09, .105)], [.26, ell(.05, .06, .05, .06)]], 'tk_skin', {n: 16});
-  e.push(cardZ1('face', -.112, {X0: -.088, X1: .088, Y0: .0, Y1: .2}, 'front'));
+  // I1: the face card folds back at its sides (rounder from three quarters)
+  e.push(...foldedCard('face', -.112, {X0: -.088, X1: .088, Y0: .0, Y1: .2}, .05));
   return e;
 }
 function hairTop() {
   // scalp cap (slightly over the skull), side locks framing the face, a parted fringe; the long hair hangs from hair_1
-  const e = limb([[.12, ell(.105, .1, .105, .125), [0, -.005]], [.2, ell(.103, .105, .103, .123)], [.25, ell(.08, .08, .08, .1)], [.285, ell(.03, .03, .03, .04)]], 'tk_hair', {n: 16});
+  // (I1: a rounder crown: the old 3-station cap read as a flat beret above the face)
+  const e = limb([[.12, ell(.105, .1, .105, .125), [0, -.005]], [.19, ell(.106, .106, .106, .124)], [.235, ell(.094, .094, .094, .11)],
+    [.265, ell(.07, .07, .07, .085)], [.283, ell(.04, .04, .04, .05)], [.292, ell(.012, .012, .012, .015)]], 'tk_hair', {n: 16});
   e.push(...limb([[.13, ell(.1, .02, .1, .12), [0, -.01]], [.03, ell(.085, .01, .085, .11), [0, -.02]]], 'tk_hair', {n: 16, caps: ''}));
   for (const s of [1, -1]) {
     e.push(cardX('hair_lock', .1 * s, {Z0: -.1, Z1: .06, Y0: -.16, Y1: .2}, {flipU: s < 0}));
     e.push(cardZ('hair_lock', -.095, {X0: s > 0 ? .055 : -.105, X1: s > 0 ? .105 : -.055, Y0: -.12, Y1: .2}, {flipU: s < 0}));
   }
-  e.push(cardZ1('hair_fringe', -.118, {X0: -.1, X1: .1, Y0: .12, Y1: .245}, 'front'));
+  // (I1: the fringe card reaches up over the front of the crown: no step between the bangs and the scalp)
+  e.push(...foldedCard('hair_fringe', -.118, {X0: -.1, X1: .1, Y0: .12, Y1: .292}, .045));
   return e;
 }
 // long hair: three flat locks hanging from the back of the head (each 0.26 wide, 0.25 long)
@@ -248,14 +265,32 @@ function foot(side) {
 }
 
 // ---- cape (folded wings, P1) and wings ------------------------------------------------------------------------------------
-// The left half; the right halves are mirror images. Segment i hangs along -Y from its joint: cape panels 0.52 / 0.52 /
-// 0.51 long, spanning X -0.36 (toward her spine) .. +0.12 (outer edge, which wraps round her side by 22.5 deg).
-const CAPE = [{L: .53, X0: -.14, X1: .32}, {L: .53, X0: -.14, X1: .34}, {L: .5, X0: -.14, X1: .36}];
-function capeSeg(i) {
-  const {L, X0, X1} = CAPE[i], s = 'cape_' + (i + 1), w = X1 - X0, sp = X0 + w * .72;
-  const e = [cardZ(s, 0, {X0, X1: sp, Y0: -L - .01, Y1: .01}, {uvr: [0, 0, .72, 1]}),
-    cardZ(s, 0, {X0: sp, X1, Y0: -L - .01, Y1: .01}, {uvr: [.72, 0, 1, 1], rot: ['y', 22.5, [sp, 0, 0]]})];
-  if (i === 0) e.push(box([-.1, -.04, -.025], [.12, .03, .025], 'tk_metal_dk'));
+// The left half; the right halves are mirror images. Segment i hangs along -Y from its joint: cape panels 0.53 / 0.53 /
+// 0.50 long. I1 (the cape read as a see-through gold grid): every panel now reaches 0.31 b toward her spine, past the
+// other half, so the two halves overlap down to the hem even while the panels flutter and spread apart (the left half
+// hangs 0.03 b outside the right one: no coplanar overlap); the outer part wraps round her side in two facets (22.5 and
+// 45 deg). Each facet is ONE element: its outer face (+Z, her back) shows the layered feather sprite cape_<i>, its inner
+// face (-Z, toward her body) the dark lining cape_in. Coverage is solid (no lining between the feathers, see
+// tachy_paint.mjs); only the hem of the last segment ends in ragged feather tips.
+export const CAPE = [{L: .53, X0: -.31, X1: .32, sp: .19}, {L: .53, X0: -.31, X1: .34, sp: .205}, {L: .5, X0: -.31, X1: .36, sp: .22}];
+export const CAPE_WRAP2 = .07;                                // the first wrap facet's width (22.5 deg); the rest turns 45 deg
+export const CAPE_OUT_Z = .03;                                // the left half's offset outward (the overlapping layer)
+function capeCard(sprite, z, X0, X1, Y0, Y1, uvr, rot) {
+  const el = cardZ(sprite, z, {X0, X1, Y0, Y1}, {uvr, rot});
+  el.faces.north = {...el.faces.north, texture: '#cape_in'};     // the inner face: the dark lining
+  return el;
+}
+function capeSeg(i, side = 1) {
+  const {L, X0, X1, sp} = CAPE[i], s = 'cape_' + (i + 1), w = X1 - X0, z = side > 0 ? CAPE_OUT_Z : 0;
+  const s2 = sp + CAPE_WRAP2, Y0 = -L - .01, Y1 = .01, u = x => (x - X0) / w;
+  const e = [capeCard(s, z, X0, sp, Y0, Y1, [0, 0, u(sp), 1]),
+    capeCard(s, z, sp, s2, Y0, Y1, [u(sp), 0, u(s2), 1], ['y', 22.5, [sp, 0, z]])];
+  // the second wrap facet starts where the first one ends (its rotated outer edge)
+  const a = 22.5 * Math.PI / 180, ex = sp + CAPE_WRAP2 * Math.cos(a), ez = z - CAPE_WRAP2 * Math.sin(a);
+  const pe = modelPoints([e[1]]).reduce((m, P) => (P[0] > m[0] ? P : m), [-9, 0, 0]);
+  if (Math.abs(pe[0] - ex) > 1e-3 || Math.abs(pe[2] - ez) > 1e-3) throw new Error(`cape wrap facet: edge ${pe} != ${[ex, ez]}`);
+  e.push(capeCard(s, ez, ex, ex + (X1 - s2), Y0, Y1, [u(s2), 0, 1, 1], ['y', 45, [ex, 0, ez]]));
+  if (i === 0) e.push(box([-.1, -.04, -.025 + z], [.12, .03, .025 + z], 'tk_metal_dk'));
   return e;
 }
 // winged: a metal arm bone along -Y (X 0..0.07) with the blade feathers fanning toward -X (down when spread); two
@@ -343,7 +378,7 @@ function blockModels() {
   M.spine_pack = spinePack(); M.tassets = tassets();
   for (const [s, k] of [[1, 'l'], [-1, 'r']]) { M['thigh_' + k] = thigh(s); M['shin_' + k] = shin(s); M['foot_' + k] = foot(s); }
   for (let i = 0; i < 3; i++) {
-    M['cape_l' + (i + 1)] = capeSeg(i); M['cape_r' + (i + 1)] = mirrorModel(capeSeg(i));
+    M['cape_l' + (i + 1)] = capeSeg(i, 1); M['cape_r' + (i + 1)] = mirrorModel(capeSeg(i, -1));
     M['wing_l' + (i + 1)] = wingSeg(i, false); M['wing_r' + (i + 1)] = mirrorModel(wingSeg(i, false));
     M['wing_l' + (i + 1) + '_a'] = wingSeg(i, true); M['wing_r' + (i + 1) + '_a'] = mirrorModel(wingSeg(i, true));
   }

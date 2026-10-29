@@ -10,7 +10,7 @@ execute if score #pt tk matches 49 run function rlk:boss/tachy/p/b3/k/49
 execute if score #pt tk matches 50 run function rlk:boss/tachy/p/b3/k/50
 execute if score #pt tk matches 59 run function rlk:boss/tachy/p/b3/k/59
 execute if score #pt tk matches 60 run function rlk:boss/tachy/p/b3/k/60
-execute if score #pt tk matches 64 run function rlk:boss/tachy/rig_stub/look/edge/glint
+execute if score #pt tk matches 64 run function rlk:boss/tachy/rig/look/edge/glint
 execute if score #pt tk matches 66 run function rlk:mboss/mv/turn {max:30}
 execute if score #pt tk matches 75 run function rlk:boss/tachy/p/b3/k/75
 execute if score #pt tk matches 76 run function rlk:boss/tachy/p/b3/k/76

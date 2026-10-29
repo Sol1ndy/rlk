@@ -8,6 +8,6 @@ scoreboard players set #sqdone tk 0
 scoreboard players set #taken tk 100
 tag @s add rlk_mb_inv
 function rlk:boss/tachy/core/stop_move
-execute if score #ph tk matches 3 run function rlk:boss/tachy/core/sq/t1/start
-execute if score #ph tk matches 6 run function rlk:boss/tachy/core/sq/t2/start
+execute if score #ph tk matches 3 run function rlk:boss/tachy/seq/t1/start
+execute if score #ph tk matches 6 run function rlk:boss/tachy/seq/t2/start
 function rlk:boss/tachy/hud/sub
