@@ -103,8 +103,11 @@ def build(W, ctx):
     w('core/floor_hit', [
         '# The framework clamped a hit at #mbFloor (#mbFloorHit 1): the phase step is reserved for the next decision',
         '# (#flnext 1 = M1 -> T1 -> P2 at 70 %, 2 = M2 -> T2 -> P3 at 35 %). The floor stays until the mantle moves it.',
+        '# R (TK-01): while M1 is only reserved (#fl 1, still P1) the floor is the 70 % one: more hits on it change nothing',
+        '# (they used to reserve the 35 % step as well, so M1 / T1 / P2 were skipped); the 35 % step counts from M1 on.',
         'scoreboard players set #mbFloorHit mb 0',
-        f'execute if score #fl {OBJ} matches 1 run return run function {NS}core/floor_2',
+        f'execute if score #fl {OBJ} matches 1 if score #ph {OBJ} matches {PH["m1"]}.. run return run function {NS}core/floor_2',
+        f'execute if score #fl {OBJ} matches 1.. run return 0',
         f'execute if score #fl {OBJ} matches 0 run {sset("#flnext", 1)}',
         f'execute if score #fl {OBJ} matches 0 run {sset("#fl", 1)}'])
     w('core/floor_2', [sset('#fl', 2), sset('#flnext', 2)])

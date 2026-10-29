@@ -60,8 +60,8 @@ def arena_look(look):
 
 # =============================================================================================
 # 2. Damage, elements, hits (PLAN §4.1-4.2)
-DMG = {'T1': 70, 'T2': 100, 'T3': 135, 'T4': 170}      # % of the base hit (mboss/hurt coefficient)
-NOVA_PM = 400                                          # pl_dot per mille, non-lethal
+DMG = {'T1': 35, 'T2': 50, 'T3': 68, 'T4': 85}      # % of the base hit (mboss/hurt coefficient)
+NOVA_PM = 250                                          # pl_dot per mille, non-lethal
 FEATHER_TIER = 'T1'
 PYRO, ELECTRO = 1, 3                                   # #elem numbering
 EL_NAME = {PYRO: '불', ELECTRO: '번개'}

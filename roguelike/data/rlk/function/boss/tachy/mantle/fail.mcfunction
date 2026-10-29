@@ -1,4 +1,4 @@
-# G2 failure (@s = body; the time ran out): the nova (S4 p/mantle/nova: 44 t tell, dash-dodgeable, pl_dot 400 per mille, non-lethal);
+# G2 failure (@s = body; the time ran out): the nova (S4 p/mantle/nova: 44 t tell, dash-dodgeable, pl_dot 250 per mille, non-lethal);
 # without S4 the clip alone (no hazard). No stun. The transition follows.
 function rlk:boss/tachy/mantle/off
 scoreboard players set #pat tk 53

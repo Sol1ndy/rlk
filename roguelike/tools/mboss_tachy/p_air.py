@@ -582,7 +582,7 @@ def build_w2(W):
         clip_, ev_, shape, dims, tier, el = hits[i]
         assert shape == 'pj_ball' and E(clip_, ev_) == t
         air.at(t, FACE, f'execute {AT_BODY} positioned ^ ^1.6 ^0.8 run {fn("p/w2/wave")}',
-               S.fx_slash(2.6, el, roll=90), snd('wave_release'))
+               S.fx_slash(2.6, el, roll=90, lift=api.HOVER_Y - api.CY), snd('wave_release'))
     air.at(pull, look('edge', 'glint'), wing_fx(), snd('air_swoop'))
     air.at(lock_t, lock_lines(key, 'rlk_tk_w2lock'), face_to('rlk_tk_w2lock'))
     air.to(go, 'dv')

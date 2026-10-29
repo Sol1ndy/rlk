@@ -41,7 +41,7 @@ export const SK = {
   shoulder: [.235, .27, .01], hipJ: [.105, -.07, 0], thigh: .48, shin: .465, ankleY: .085,
   armU: .32, foreL: .29, foreR: .31, handGrip: .06, handGripR: .072,
   pack: [0, .22, .145], wingRoot: [.12, .14, .08], tendrilRoot: [.09, .06, .07],
-  helmHinge: [0, .21, .1], hairRoot: [0, .18, .1], hairSeg: .25,
+  helmHinge: [0, .1, .12], helmUpDeg: 130, helmUpS: .55, hairRoot: [0, .18, .1], hairSeg: .25,
   swing: [0, .45, 0],
   // the scabbard across the lower back over the cape (chest frame): the mouth (hilt) at her right hip, the body rising
   // gently to the left past her left hip (v2 13.2-13.4: the blade comes out horizontally from behind the hips, to the right)
@@ -182,10 +182,13 @@ export function solve(p, form = 'cape', hist = () => null, guardMin = {}) {
   part('neck', Nb, Nq); part('collar', Nb, Cq);
   const Hb = add(Nb, rot(Nq, SK.headB));
   part('head', Hb, Hq); part('hair_top', Hb, Hq);
-  // helmet: turned about the hinge behind the crown
-  const hq = mul(Hq, q([p.helm || 0, 0, 0])), hinge = add(Hb, rot(Hq, SK.helmHinge));
-  const ht = add(hinge, rot(hq, times(SK.helmHinge, -1)));
-  part('helmet', ht, hq); part('visor_glow', ht, hq);
+  // helmet: turned about the hinge at the back of the skull and folded small as it opens (R: the open helmet of the
+  // footage is a compact shell behind the crown, v2 4.5-6.0 / 10.0-10.5, that swings forward over the head and grows to
+  // the closed dome at v2 11.0-11.5; it used to stay full size and stick out behind the head like a barrel)
+  const hu = Math.max(0, Math.min(1, -(p.helm || 0) / 100)), hs = 1 - (1 - SK.helmUpS) * hu * hu * (3 - 2 * hu);
+  const hq = mul(Hq, q([-SK.helmUpDeg * hu, 0, 0])), hinge = add(Hb, rot(Hq, SK.helmHinge));
+  const ht = add(hinge, rot(hq, times(SK.helmHinge, -hs)));
+  part('helmet', ht, hq, hs); part('visor_glow', ht, hq, hs);
   // spine pack, wings / cape, tendrils, scabbard
   const pack = add(Cb, rot(Cq, SK.pack));
   part('spine_pack', pack, Cq);

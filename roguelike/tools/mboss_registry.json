@@ -110,7 +110,7 @@
     {
       "id": "tachy", "n": 20, "fn": "boss/tachy", "kind": "special", "enabled": true, "w": 10,
       "minCh": 1, "maxCh": 99, "name": "타키", "sub": "잠식된 제7공수대원", "color": "#F2C230", "el": 1,
-      "hp": 280, "xp": 45, "atk": 12, "lvAdd": 1, "dmgMul": 135, "goldMul": 6, "sap": 1, "picks": 3, "lvup": 1,
+      "hp": 250, "xp": 0, "atk": 12, "lvAdd": 1, "dmgMul": 135, "goldMul": 6, "sap": 1, "picks": 3, "lvup": 1,
       "scale": 1.25, "hit": {"w": 1.1, "h": 2.6}, "intro": 190, "death": 130, "deathSnd": false,
       "arena": "tk_lift", "theme": "tk_lift", "res": {"*": 10}, "phases": [100],
       "music": {"1": {"ev": "minecraft:music.nether.basalt_deltas", "len": 6376},
@@ -120,7 +120,7 @@
     {
       "id": "spproto", "n": 97, "fn": "mboss/spproto", "kind": "special", "enabled": true, "w": 0,
       "minCh": 1, "maxCh": 99, "name": "시험용 균열 수호자", "sub": "특수 보스 틀 점검용", "color": "#8FD8FF", "el": 3,
-      "hp": 120, "xp": 20, "atk": 10, "lvAdd": 0, "dmgMul": 120, "goldMul": 6, "sap": 1, "picks": 3, "lvup": 1,
+      "hp": 120, "xp": 0, "atk": 10, "lvAdd": 0, "dmgMul": 120, "goldMul": 6, "sap": 1, "picks": 3, "lvup": 1,
       "scale": 1.25, "hit": {"w": 1.1, "h": 2.6}, "intro": 40, "death": 40, "deathSnd": false,
       "arena": "cp_test", "res": {"*": 10}, "phases": [100],
       "music": {"1": {"ev": "minecraft:music.end", "len": 18090}},

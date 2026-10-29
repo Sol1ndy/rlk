@@ -38,7 +38,7 @@ used unchanged.
 | `start/<clip>` | tick 0 now |
 | `face/player`, `face/track` (≤ 12°/call), `face/set {yaw}` | anchor yaw; the parts take it every tick |
 | `look/form/{cape,winged,abyss}` | the wing models (cape panels / blade feathers / + dark red flesh), tendrils shown in `abyss`; the wings and tendrils ease (4 t) to the form's rest pose until the next clip key |
-| `look/visor/{up_off,down_pyro,down_electro,down_abyss,down_off}` | the skull glow inside the visor (pyro #FFB21E, electro #FFF0A0, abyss #FF3A2A); the helmet's position is keyed by the clips (up as a hood only in `intro` 0-126) |
+| `look/visor/{up_off,down_pyro,down_electro,down_abyss,down_off}` | the skull glow inside the visor (pyro #FFB21E, electro #FFF0A0, abyss #FF3A2A); the helmet's position is keyed by the clips (open only in `intro` 0-126: folded to a 0.55-scale shell 130° back behind the crown, R TK-05; it swings over the head and grows to the closed dome 126-134) |
 | `look/edge/{off,yellow,pyro,electro,glint}` | the blade-edge glow (pyro: animated flames, electro: animated arcs) |
 | `look/chest/{off,amber,red,gold}` | the 3x3 light grid on the sternum |
 | `look/hands/{open,grip,fist}` | both hands (clips key their own hands) |

@@ -137,33 +137,44 @@ def arc_low(r, roll, pitch, piv=ARC_PIVOT):
     return min((piv + (-a * r) * sr * cp - (b * r) * sp for a, b in _arc_points()), default=piv)
 
 
-def arc_fit(r, roll, pitch):
-    """I1 (the K3 check, applied to every slash): (roll, pitch) of an arc kept above the floor with the least change. A
-    vertical sweep (60 <= |roll| <= 120, the overhead chops) raises its aim by whole degrees, so it runs from over her head
-    down to the floor ahead; a diagonal one flattens its tilt by whole degrees (toward 0, or 180 for a backhand), so it
-    still crosses the target at chest height. Unchanged when already clear."""
-    if arc_low(r, roll, pitch) >= ARC_FLOOR:
-        return roll, pitch
+ARC_DIAG_PIVOT, ARC_DIAG_SHRINK = 1.6, .85   # R (TK-06): a diagonal cut turns about her swing centre (pelvis + 0.45 b + 0.05)
+
+
+def arc_fit(r, roll, pitch, lift=0.0):
+    """(roll, pitch, pivot, r) of a slash arc kept above the floor with the least change (I1's K3 check, reworked at R).
+    `lift` = her feet above the arena floor (W2's air cuts from the hover: no fitting needed there). Unchanged when clear.
+    A vertical sweep (60 <= |roll| <= 120, the overhead chops) raises its aim by whole degrees, so it runs from over her
+    head down to the floor ahead. A diagonal one keeps its tilt as far as it can: it turns about her swing centre
+    (ARC_DIAG_PIVOT, the shoulder line the blade swings from) instead of the waist, then the drawn arc shrinks down to
+    ARC_DIAG_SHRINK of the reach, and only then flattens by whole degrees (toward 0, or 180 for a backhand). The I1 fit
+    flattened the footage's 35-45 degree cuts to 17-22 degrees; this keeps 28-40."""
+    if arc_low(r, roll, pitch, ARC_PIVOT + lift) >= ARC_FLOOR:
+        return roll, pitch, ARC_PIVOT, r
     if 60 <= abs(roll) <= 120:
         p = pitch
-        while p > -89 and arc_low(r, roll, p) < ARC_FLOOR:
+        while p > -89 and arc_low(r, roll, p, ARC_PIVOT + lift) < ARC_FLOOR:
             p -= 1
-        return roll, p
+        return roll, p, ARC_PIVOT, r
+    piv = ARC_DIAG_PIVOT
+    rr = r
+    while rr > r * ARC_DIAG_SHRINK + 1e-9 and arc_low(rr, roll, pitch, piv + lift) < ARC_FLOOR:
+        rr = round(rr - .1, 1)
     tgt = 0 if abs(roll) < 90 else (180 if roll > 0 else -180)
     q = roll
-    while q != tgt and arc_low(r, q, pitch) < ARC_FLOOR:
+    while q != tgt and arc_low(rr, q, pitch, piv + lift) < ARC_FLOOR:
         q += 1 if tgt > q else -1
-    return q, pitch
+    return q, pitch, piv, rr
 
 
-def fx_slash(r, el, roll=0, pitch=0, yaw=0):
-    """A slash arc at chest height on the body (yaw / pitch / roll = offsets from the body yaw, kit slash_arc), fitted
-    above the floor (arc_fit)."""
+def fx_slash(r, el, roll=0, pitch=0, yaw=0, lift=0.0):
+    """A slash arc on the body (yaw / pitch / roll = offsets from the body yaw, kit slash_arc), fitted above the floor
+    (arc_fit; `lift` = her feet above the arena floor at that tick)."""
+    piv = ARC_PIVOT
     if K._on():
-        roll, pitch = arc_fit(r, roll, pitch)
+        roll, pitch, piv, r = arc_fit(r, roll, pitch, lift)
     k = el_cases(el, lambda e: K.p('slash_arc', r=int(round(r * 10)), yaw=yaw, pitch=pitch, roll=roll, el=e))
     if k:
-        return placed(k, AT_BODY + ' positioned ~ ~1.2 ~')
+        return placed(k, AT_BODY + f' positioned ~ ~{L.num(piv, 2)} ~')
     f = L.num(r * 0.3, 2)
     return [f'execute {AT_BODY} positioned ^ ^1.1 ^{L.num(r * 0.55, 2)} run particle minecraft:sweep_attack ~ ~ ~ {f} 0.15 '
             f'{f} 0 4 force @a[tag=player]'] + \

@@ -4,7 +4,7 @@ function rlk:boss/tachy/core/dash/probe
 scoreboard players operation #c1_dl tk = #t2 tk
 execute positioned as @e[type=minecraft:marker,tag=rlk_tk_dp,limit=1] run function rlk:mboss/mv/glide {t:4}
 kill @e[type=minecraft:marker,tag=rlk_tk_dp]
-data modify storage rlk:tk core.dl set value {len:0,w:18,tell:1,dmg:135}
+data modify storage rlk:tk core.dl set value {len:0,w:18,tell:1,dmg:68}
 execute store result storage rlk:tk core.dl.len int 5 run scoreboard players get #c1_dl tk
 scoreboard players set #hzAct mb 4
 scoreboard players set #hzSfx mb 0

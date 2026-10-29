@@ -130,6 +130,8 @@ def load_registry():
                 assert not b.get(k), f'{b["id"]}: {k} is not a special-entry field'
             assert 1 <= int(b.get('picks', 0)) <= SPECIAL_PICKS_MAX, f'{b["id"]}: a special entry needs picks 1..{SPECIAL_PICKS_MAX}'
             assert int(b.get('lvup', 0)) in (0, 1), f'{b["id"]}: lvup is 0 or 1'
+            # the level-up is the reward: no kill XP on top of it (the kill's XP could level up once more first)
+            assert not int(b.get('lvup', 0)) or int(b.get('xp', 0)) == 0, f'{b["id"]}: a special entry with lvup 1 needs xp 0'
             assert int(b.get('w', 0)) >= 0, f'{b["id"]}: w (the rift roll weight) must be >= 0'
             aid = b.get('arena', 'plaza')
             # a disabled special may name the arena its framework stage adds later (tk/contract.md: S1 owns arenas{})

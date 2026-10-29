@@ -110,7 +110,8 @@ function chest() {
   // pivot = chest base (1.44); shoulders at +0.27, top +0.35; the bust, the yellow tie between it (chest_front card)
   const e = limb([[-.02, ell(.15, .1, .15, .11)], [.09, ell(.175, .11, .175, .12)], [.2, ell(.205, .115, .205, .13)], [.28, ell(.215, .1, .215, .13)], [.35, ell(.14, .075, .14, .09)]], 'tk_suit', {n: 16});
   e.push(cardZ1('chest_front', -.117, {X0: -.1, X1: .1, Y0: -.01, Y1: .33}, 'front'));
-  for (const s of [1, -1]) e.push(...loft('z', [{a: -.152, r: [.035, .03, .035, .04], c: [s * .085, .158]}, {a: -.138, r: [.06, .05, .06, .06], c: [s * .086, .162]}, {a: -.09, r: [.068, .058, .068, .066], c: [s * .087, .166]}], {n: 16, tex: 'tk_black', caps: '-+'}));
+  // the bust: the same carbon-weave suit as the torso, a soft rise (R: it was flat near-black and read as two black discs)
+  for (const s of [1, -1]) e.push(...loft('z', [{a: -.146, r: [.03, .026, .03, .034], c: [s * .084, .16]}, {a: -.136, r: [.055, .046, .055, .055], c: [s * .085, .163]}, {a: -.1, r: [.066, .056, .066, .064], c: [s * .086, .166]}], {n: 16, tex: 'tk_suit', caps: '-+'}));
   // side ribs: hex plates on the left side, gunmetal plates on the right
   e.push(box([.18, .02, -.07], [.215, .22, .09], 'tk_hex'), box([-.215, .02, -.05], [-.18, .22, .1], 'tk_metal'));
   // back plate under the spine pack
