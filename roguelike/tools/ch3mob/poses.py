@@ -3,6 +3,9 @@ tools/ch2mob/poses.py (-Z forward, right hand on -X, degrees; built by ch2mob/ri
 sand hatchling are small prop rigs posed directly in the display frame (+Z = the way the mob faces, y up, metres):
 each pose is {part: (t, euler, scale)}; quaternions come from rig.q.
 
+Hand props (em daggers, cw orb) use rig.humanoid's arm-sense grip angles: [0,0,0] = the business end straight on
+out of the fist along the forearm (these angles were authored +180 on x before the 10-29 grip fix; same poses).
+
 Pose ids keep the chapter-2 meaning: 0-3 idle, 10-17 walk, 20-23 tell, 24-25 strike, 30-32 recovery, 40-41 hit,
 50-51 death; mob-specific: cw 60-63 channel / 70 interrupted; sb 80-81 mound, 82 erupt, 85 sink, 90 burrowed.
 No reference motions copied.
@@ -12,10 +15,10 @@ import math
 from rig import GUARD
 
 # ---------------------------------------------------------------- 에르미타 단검 용병: low stance, a dagger in each hand
-EM_ATTACH = [('dagger_r', 'rhand', 0.0, [180, 0, 0], 1.0), ('dagger_l', 'lhand', 0.0, [180, 0, 0], 1.0),
+EM_ATTACH = [('dagger_r', 'rhand', 0.0, [0, 0, 0], 1.0), ('dagger_l', 'lhand', 0.0, [0, 0, 0], 1.0),
              ('cloak', 'back', [0, 0, 0], [6, 0, 0], 1.0)]
 EM_BASE = {'torso': [14, -6, 0], 'head': [-10, 6, 0], 'right_arm': [38, -10, -14], 'left_arm': [34, 10, 16],
-           'right_leg': [-14, 0, -6], 'left_leg': [16, 0, 6], 'dagger_r': [180, 0, 0], 'dagger_l': [180, 0, 0],
+           'right_leg': [-14, 0, -6], 'left_leg': [16, 0, 6], 'dagger_r': [0, 0, 0], 'dagger_l': [0, 0, 0],
            'cloak': [6, 0, 0], 'size': 0.96, 'ropen': 10, 'shift': [0, -0.05, 0]}
 
 
@@ -33,32 +36,32 @@ def _em():
                                          'right_leg': [s * 34, 0, -3], 'left_leg': [-s * 34, 0, 3], 'cloak': [14 + abs(s) * 8, 0, s * 3]})
     # tell 0.6 s: sink into a crouch, both blades drawn back low, then coiled (blades glint)
     P[20] = ('crouch', 4, {'shift': [0, -0.14, 0.04], 'torso': [30, -4, 0], 'head': [-26, 4, 0], 'right_arm': [-20, -6, -26], 'left_arm': [-20, 6, 26],
-                           'right_leg': [-38, 0, -8], 'left_leg': [30, 0, 8], 'dagger_r': [200, 0, 0], 'dagger_l': [200, 0, 0], 'cloak': [20, 0, 0]})
+                           'right_leg': [-38, 0, -8], 'left_leg': [30, 0, 8], 'dagger_r': [20, 0, 0], 'dagger_l': [20, 0, 0], 'cloak': [20, 0, 0]})
     P[21] = ('coiled', 6, {'shift': [0, -0.18, 0.06], 'torso': [36, -2, 0], 'head': [-32, 2, 0], 'right_arm': [-34, -8, -30], 'left_arm': [-34, 8, 30],
-                           'right_leg': [-46, 0, -9], 'left_leg': [36, 0, 9], 'dagger_r': [210, 0, 0], 'dagger_l': [210, 0, 0], 'cloak': [26, 0, 0]})
+                           'right_leg': [-46, 0, -9], 'left_leg': [36, 0, 9], 'dagger_r': [30, 0, 0], 'dagger_l': [30, 0, 0], 'cloak': [26, 0, 0]})
     # dash + stab: lunge flat out, both daggers driven forward
     P[24] = ('lunge', 1, {'shift': [0, -0.1, -0.12], 'torso': [40, 0, 0], 'head': [-36, 0, 0], 'right_arm': [50, -14, -6], 'left_arm': [46, 14, 6],
-                          'right_leg': [-50, 0, -4], 'left_leg': [44, 0, 4], 'dagger_r': [180, 0, 0], 'dagger_l': [180, 0, 0], 'cloak': [40, 0, 0]})
+                          'right_leg': [-50, 0, -4], 'left_leg': [44, 0, 4], 'dagger_r': [0, 0, 0], 'dagger_l': [0, 0, 0], 'cloak': [40, 0, 0]})
     P[25] = ('stab', 1, {'shift': [0, -0.12, -0.16], 'torso': [34, 0, 0], 'head': [-30, 0, 0], 'right_arm': [62, -20, -2], 'left_arm': [58, 20, 2],
-                         'right_leg': [-40, 0, -4], 'left_leg': [40, 0, 4], 'dagger_r': [176, 0, 0], 'dagger_l': [176, 0, 0], 'cloak': [34, 0, 0]})
+                         'right_leg': [-40, 0, -4], 'left_leg': [40, 0, 4], 'dagger_r': [-4, 0, 0], 'dagger_l': [-4, 0, 0], 'cloak': [34, 0, 0]})
     P[30] = ('skid', 3, {'shift': [0, -0.13, -0.06], 'torso': [24, 10, 4], 'head': [-20, -10, -2], 'right_arm': [56, -24, -20], 'left_arm': [70, 18, 22],
-                         'right_leg': [-28, 0, -10], 'left_leg': [30, 0, 10], 'dagger_r': [170, 0, 0], 'dagger_l': [190, 0, 0], 'cloak': [24, 0, 6]})
+                         'right_leg': [-28, 0, -10], 'left_leg': [30, 0, 10], 'dagger_r': [-10, 0, 0], 'dagger_l': [10, 0, 0], 'cloak': [24, 0, 6]})
     P[31] = ('rise', 5, {'shift': [0, -0.08, -0.02], 'torso': [18, 4, 2], 'head': [-14, -4, 0]})
     P[40] = ('hit_recoil', 2, {'shift': [0, -0.08, 0.07], 'torso': [-12, 10, -8], 'head': [14, -10, 6], 'right_arm': [20, 6, -34], 'left_arm': [16, -6, 34],
                                'right_leg': [-10, 0, -6], 'left_leg': [14, 0, 6], 'cloak': [-6, 0, -4]})
     P[41] = ('hit_recover', 3, {'shift': [0, -0.06, 0.02], 'torso': [6, 2, -2], 'head': [-2, -2, 2]})
     P[50] = ('death_buckle', 2, {'shift': [0, -0.15, 0.05], 'torso': [-24, 12, -16], 'head': [24, -10, -10], 'right_arm': [70, 10, -60], 'left_arm': [70, 10, 60],
-                                 'right_leg': [-26, 0, -14], 'left_leg': [30, 0, 14], 'dagger_r': [-30, 30, -30], 'dagger_l': [-30, -30, 30], 'cloak': [-20, 0, 0]})
+                                 'right_leg': [-26, 0, -14], 'left_leg': [30, 0, 14], 'dagger_r': [-210, 30, -30], 'dagger_l': [-210, -30, 30], 'cloak': [-20, 0, 0]})
     P[51] = ('death_fling', 3, {'root': [-38, 0, 16], 'rootShift': [0, 0.25, 0.1], 'torso': [-10, 0, 8], 'head': [16, -3, -6], 'right_arm': [100, 0, -70],
-                                'left_arm': [100, 5, 70], 'right_leg': [-30, 0, -12], 'left_leg': [24, 0, 12], 'dagger_r': [20, 40, -60], 'dagger_l': [20, -40, 60],
+                                'left_arm': [100, 5, 70], 'right_leg': [-30, 0, -12], 'left_leg': [24, 0, 12], 'dagger_r': [-160, 40, -60], 'dagger_l': [-160, -40, 60],
                                 'cloak': [-40, 0, 0]})
     return P
 
 
 # ---------------------------------------------------------------- 에르미타 맑은물 술사: upright robed mage, water orb over the left palm
-CW_ATTACH = [('robe', 'back', [0, -0.75, 0], [0, 0, 0], 1.0), ('orb', 'lhand', 0.42, [180, 0, 0], 1.0)]
+CW_ATTACH = [('robe', 'back', [0, -0.75, 0], [0, 0, 0], 1.0), ('orb', 'lhand', 0.42, [0, 0, 0], 1.0)]
 CW_BASE = {'torso': [2, 8, 0], 'head': [-2, -8, 0], 'right_arm': [10, 0, -10], 'left_arm': [62, 20, 14],
-           'right_leg': [-4, 0, -3], 'left_leg': [4, 0, 3], 'robe': [0, 0, 0], 'orb': [180, 0, 0], 'size': 1.0, 'ropen': 4}
+           'right_leg': [-4, 0, -3], 'left_leg': [4, 0, 3], 'robe': [0, 0, 0], 'orb': [0, 0, 0], 'size': 1.0, 'ropen': 4}
 
 
 def _cw():
@@ -78,7 +81,7 @@ def _cw():
         a = i * math.pi / 2
         P[60 + i] = ('channel_%d' % i, 6, {'shift': [0, 0.02 + math.sin(a) * .015, 0], 'torso': [-6 + math.sin(a) * 2, 6, math.cos(a) * 2],
                                            'head': [-10, -6, 0], 'left_arm': [168 + math.sin(a) * 4, 10, 16], 'right_arm': [70, -30 + math.cos(a) * 8, -34],
-                                           'robe': [-4 + math.sin(a) * 3, 0, math.cos(a) * 2], 'orb': [180 + math.cos(a) * 6, 0, 0]})
+                                           'robe': [-4 + math.sin(a) * 3, 0, math.cos(a) * 2], 'orb': [math.cos(a) * 6, 0, 0]})
     P[70] = ('broken_channel', 3, {'shift': [0, -0.08, 0.08], 'torso': [-16, 18, -10], 'head': [18, -12, 8], 'right_arm': [40, 10, -50], 'left_arm': [120, -10, 40],
                                    'right_leg': [-14, 0, -8], 'left_leg': [12, 0, 8], 'robe': [-10, 0, -6]})
     P[40] = ('hit_recoil', 2, {'shift': [0, -0.06, 0.06], 'torso': [-14, 10, -8], 'head': [14, -10, 5], 'right_arm': [30, 6, -30], 'left_arm': [80, -10, 30],

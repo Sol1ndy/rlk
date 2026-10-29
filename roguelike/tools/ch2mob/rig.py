@@ -26,6 +26,11 @@ def rot(a, v):
     return mul(mul(a, [v[0], v[1], v[2], 0]), [-a[0], -a[1], -a[2], a[3]])[:3]
 
 
+# A hand prop's business end is its model +Y; the arm hangs along its own -Y. Turning the prop 180 deg about its
+# own X before the authored angle makes the authored angle read like an arm angle (see humanoid(), kinds rhand/lhand).
+HAND_GRIP = [1.0, 0.0, 0.0, 0.0]
+
+
 def add(a, b):
     return [a[i] + b[i] for i in range(3)]
 
@@ -34,7 +39,12 @@ def humanoid(over, attach=()):
     """Joint transforms for one pose. over: pose parameters (see GUARD; plus shift, root, rootShift, size, ropen).
     attach: extra parts, each (name, kind, offset, euler, scale):
       kind 'rhand' / 'lhand' -> held at that hand, euler = the weapon angle on top of the arm (param key in over
-      overrides: over[name]); offset = shift along the weapon's own +Y (blocks, model axis) so the grip moves;
+      overrides: over[name]), in the ARM's sense: euler [0,0,0] points the prop's business end (model +Y: blade,
+      spear tip, stick head, orb side) straight on out of the fist along the forearm, and +x swings it forward / up
+      exactly as +x swings the arm (HAND_GRIP above turns model +Y onto the arm's -Y). Before 10-29 the raw model
+      +Y was used, so +x tipped the blade BACKWARD while the arm went forward: every ch2 swarm prop (ns katana,
+      sp yari, dr sticks) was held reversed in game; offset = shift along the prop's business-end axis (blocks)
+      so the grip moves;
       kind 'back' -> fixed to the torso, offset = authored position from the shoulder; kind 'root' -> fixed to the
       feet origin (does not follow the torso), offset = authored position."""
     p = dict(GUARD)
@@ -57,7 +67,7 @@ def humanoid(over, attach=()):
         e = p.get(name, euler)
         if kind in ('rhand', 'lhand'):
             arm = out['right_arm' if kind == 'rhand' else 'left_arm']
-            qq = mul(arm['q'], q(e))
+            qq = mul(mul(arm['q'], q(e)), HAND_GRIP)
             tt = add(arm['t'], rot(arm['q'], [0, -.535, -.015]))
             tt = add(tt, rot(qq, [0, off, 0]))
             out[name] = {'t': tt, 'q': qq, 'post': True}

@@ -1,5 +1,8 @@
 """Original keyframes of the chapter-2 swarm rigs (20 ticks/s). Authored like tools/build_swordsman.mjs: -Z forward,
-right hand on -X, angles in degrees (x = pitch forward, y = yaw, z = roll). Read by swarm.py; previewed by the
+right hand on -X, angles in degrees (x = pitch forward, y = yaw, z = roll). Hand props (katana, yari, sticks) use
+rig.humanoid's arm-sense grip angles: [0,0,0] = blade / tip / stick head straight on out of the fist along the
+forearm, +x swings it forward like the arm (10-29 grip fix: the raw-model-axis angles held every prop reversed;
+the raised-blade / raised-stick tells that had been tuned against that were re-expressed, same look). Read by swarm.py; previewed by the
 scratchpad renders. No reference motions copied.
 
 Pose ids (shared meaning across the humanoids so the AI code reads the same):
@@ -30,19 +33,19 @@ def _ns():
                                          'right_arm': [40 - s * 6, -14, -8], 'left_arm': [16 - s * 26, 0, 12], 'right_leg': [s * 32, 0, -2], 'left_leg': [-s * 32, 0, 2]})
     # tell: the whole pack raises blades together (two-stage lift, held high with the glint, then a dip before the cut)
     P[20] = ('draw_back', 3, {'shift': [0, -0.06, 0.02], 'torso': [4, 18, -5], 'head': [-2, -18, 2], 'right_arm': [100, 8, -24], 'left_arm': [36, 6, 18],
-                              'right_leg': [-12, 0, -7], 'left_leg': [18, 0, 7], 'katana': [-120, 0, -8]})
+                              'right_leg': [-12, 0, -7], 'left_leg': [18, 0, 7], 'katana': [60, 0, -8]})
     P[21] = ('blade_high', 4, {'shift': [0, -0.07, 0.025], 'torso': [-6, 28, -9], 'head': [8, -28, 4], 'right_arm': [150, 14, -30], 'left_arm': [46, -12, 26],
-                               'right_leg': [-13, 0, -8], 'left_leg': [21, 0, 8], 'katana': [180, 0, -8]})
+                               'right_leg': [-13, 0, -8], 'left_leg': [21, 0, 8], 'katana': [0, 0, -8]})
     P[22] = ('blade_loaded', 2, {'shift': [0, -0.05, 0.03], 'torso': [-9, 32, -9], 'head': [9, -32, 4], 'right_arm': [160, 12, -30], 'left_arm': [48, -14, 26],
-                                 'right_leg': [-13, 0, -7], 'left_leg': [19, 0, 7], 'katana': [155, 0, -6]})
+                                 'right_leg': [-13, 0, -7], 'left_leg': [19, 0, 7], 'katana': [-25, 0, -6]})
     P[23] = ('release', 1, {'shift': [0, -0.03, -0.01], 'torso': [-1, 24, -5], 'head': [2, -24, 1], 'right_arm': [146, -2, -23], 'left_arm': [38, -8, 24],
-                            'right_leg': [-17, 0, -4], 'left_leg': [19, 0, 4], 'katana': [-156, 0, -6]})
+                            'right_leg': [-17, 0, -4], 'left_leg': [19, 0, 4], 'katana': [24, 0, -6]})
     P[24] = ('cut', 2, {'shift': [0, -0.07, -0.06], 'torso': [18, -20, 7], 'head': [-14, 20, -4], 'right_arm': [14, -36, 32], 'left_arm': [14, 15, 23],
-                        'right_leg': [22, 0, -5], 'left_leg': [-15, 0, 5], 'katana': [78, -8, -8]})
+                        'right_leg': [22, 0, -5], 'left_leg': [-15, 0, 5], 'katana': [54, 24, -8]})
     P[30] = ('follow_through', 2, {'shift': [0, -0.08, -0.07], 'torso': [21, -30, 10], 'head': [-17, 30, -5], 'right_arm': [-20, -44, 40], 'left_arm': [8, 13, 20],
-                                   'right_leg': [22, 0, -5], 'left_leg': [-15, 0, 5], 'katana': [86, -8, -12]})
+                                   'right_leg': [22, 0, -5], 'left_leg': [-15, 0, 5], 'katana': [38, 44, -12]})
     P[31] = ('finish_low', 3, {'shift': [0, -0.075, -0.05], 'torso': [15, -22, 7], 'head': [-11, 22, -3], 'right_arm': [-12, -36, 30], 'left_arm': [10, 10, 17],
-                               'right_leg': [17, 0, -4], 'left_leg': [-11, 0, 4], 'katana': [96, -5, -10]})
+                               'right_leg': [17, 0, -4], 'left_leg': [-11, 0, 4], 'katana': [36, 40, -10]})
     P[32] = ('recover', 3, {})
     P[40] = ('hit_recoil', 2, {'shift': [0, -0.07, 0.06], 'torso': [-16, 8, -9], 'head': [16, -8, 6], 'right_arm': [30, 6, -28], 'left_arm': [44, -14, 30],
                                'right_leg': [-12, 0, -5], 'left_leg': [16, 0, 5], 'katana': [-10, 4, -6]})
@@ -76,14 +79,14 @@ def _sp():
     P[21] = ('coiled', 6, {'shift': [0, -0.11, 0.1], 'torso': [18, -46, 0], 'head': [-14, 46, 0], 'right_arm': [2, 14, -10], 'left_arm': [52, -46, 14],
                            'right_leg': [-26, 0, -6], 'left_leg': [30, 0, 6], 'yari': [88, 0, 0]})
     P[24] = ('thrust', 1, {'shift': [0, -0.06, -0.14], 'torso': [22, -8, 0], 'head': [-18, 8, 0], 'right_arm': [80, -6, -4], 'left_arm': [84, -18, 8],
-                           'right_leg': [-30, 0, -4], 'left_leg': [38, 0, 4], 'yari': [10, 0, 0]})
+                           'right_leg': [-30, 0, -4], 'left_leg': [38, 0, 4], 'yari': [-10, 0, 0]})
     P[25] = ('lunge_hold', 2, {'shift': [0, -0.08, -0.16], 'torso': [26, -6, 0], 'head': [-22, 6, 0], 'right_arm': [86, -4, -4], 'left_arm': [88, -16, 8],
-                               'right_leg': [-34, 0, -4], 'left_leg': [42, 0, 4], 'yari': [4, 0, 0]})
+                               'right_leg': [-34, 0, -4], 'left_leg': [42, 0, 4], 'yari': [-22, 0, 0]})
     P[30] = ('withdraw', 4, {'shift': [0, -0.05, -0.06], 'torso': [14, -18, 0], 'head': [-10, 18, 0], 'right_arm': [44, -2, -6], 'left_arm': [70, -26, 14],
                              'right_leg': [-16, 0, -4], 'left_leg': [20, 0, 4], 'yari': [46, 0, 0]})
     P[31] = ('settle', 4, {})
     P[40] = ('hit_recoil', 2, {'shift': [0, -0.06, 0.07], 'torso': [-14, -16, -6], 'head': [12, 16, 4], 'right_arm': [16, 4, -14], 'left_arm': [50, -20, 24],
-                               'right_leg': [-12, 0, -5], 'left_leg': [16, 0, 5], 'yari': [29, 0, 0]})
+                               'right_leg': [-12, 0, -5], 'left_leg': [16, 0, 5], 'yari': [70, 0, 0]})
     P[41] = ('hit_recover', 3, {'shift': [0, -0.03, 0.03], 'torso': [0, -22, -2], 'head': [2, 22, 1]})
     P[50] = ('death_buckle', 2, {'shift': [0, -0.15, 0.05], 'torso': [-22, -10, -16], 'head': [22, 8, -8], 'right_arm': [60, 10, -50], 'left_arm': [70, 10, 50],
                                  'right_leg': [-24, 0, -14], 'left_leg': [30, 0, 14], 'yari': [40, 30, 30]})
@@ -100,8 +103,8 @@ DR_BASE = {'torso': [8, 0, 0], 'head': [-6, 0, 0], 'right_arm': [70, 0, -10], 'l
 
 def _dr():
     P = {}
-    up = {'right_arm': [168, 6, -18], 'stick_r': [172, 0, 0]}
-    upl = {'left_arm': [168, -6, 18], 'stick_l': [172, 0, 0]}
+    up = {'right_arm': [168, 6, -18], 'stick_r': [-8, 0, 0]}
+    upl = {'left_arm': [168, -6, 18], 'stick_l': [-8, 0, 0]}
     downr = {'right_arm': [62, 0, -8], 'stick_r': [38, 0, 0]}
     downl = {'left_arm': [62, 0, 8], 'stick_l': [38, 0, 0]}
     for i in range(4):
@@ -112,7 +115,7 @@ def _dr():
     P[62] = ('raise_left', 5, dict(upl, torso=[2, 14, 0], head=[-4, -14, 0], right_arm=[84, 0, -12], stick_r=[-24, 0, 0], shift=[0, -0.02, 0]))
     P[63] = ('strike_left', 1, dict(downl, torso=[16, -10, 0], head=[-12, 10, 0], right_arm=[118, 0, -14], stick_r=[-58, 0, 0], shift=[0, -0.08, -0.02]))
     P[70] = ('stunned', 3, {'shift': [0, -0.1, 0.08], 'torso': [-12, 18, -10], 'head': [18, -12, 8], 'right_arm': [30, 10, -40], 'left_arm': [140, -20, 30],
-                            'stick_r': [60, 0, 0], 'stick_l': [170, 0, 0], 'right_leg': [-14, 0, -10], 'left_leg': [12, 0, 10]})
+                            'stick_r': [60, 0, 0], 'stick_l': [-10, 0, 0], 'right_leg': [-14, 0, -10], 'left_leg': [12, 0, 10]})
     P[40] = ('hit_recoil', 2, {'shift': [0, -0.07, 0.06], 'torso': [-14, 8, -8], 'head': [14, -8, 5], 'right_arm': [40, 6, -30], 'left_arm': [50, -10, 30]})
     P[50] = ('death_buckle', 2, {'shift': [0, -0.15, 0.06], 'torso': [-26, 10, -18], 'head': [26, -8, -10], 'right_arm': [70, 10, -60], 'left_arm': [70, 10, 60],
                                  'right_leg': [-26, 0, -14], 'left_leg': [30, 0, 14], 'stick_r': [40, 40, 30], 'stick_l': [40, -40, -30]})
