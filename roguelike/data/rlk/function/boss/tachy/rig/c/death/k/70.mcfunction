@@ -1,0 +1,4 @@
+execute if score @s tkRigForm matches 1..2 run data merge entity 524c4b4d-544b-4900-8000-00000000001f {start_interpolation:0,interpolation_duration:7,transformation:{translation:[0.89637f,0.32433f,0.1625f],left_rotation:[-0.13604f,-0.02348f,0.98984f,0.03411f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+execute if score @s tkRigForm matches 2 run data merge entity 524c4b4d-544b-4900-8000-000000000026 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.05732f,1.41319f,0.08075f],left_rotation:[0.15627f,-0.1289f,0.24646f,0.94775f],scale:[1.25f,1.25f,1.25f],right_rotation:[0f,0f,0f,1f]}}
+execute if score @s tkRigForm matches 2 run data merge entity 524c4b4d-544b-4900-8000-000000000027 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.12224f,1.40081f,0.07855f],left_rotation:[0.1812f,0.26626f,-0.236f,0.91683f],scale:[1.25f,1.25f,1.25f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:boss/tachy/rig/look/edge/off
