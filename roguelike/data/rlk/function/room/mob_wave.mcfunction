@@ -6,4 +6,5 @@ function rlk:room/mob_count with entity @s data
 scoreboard players operation #mobN tmp += #chapter room
 scoreboard players remove #mobN tmp 1
 execute if score #chapter room matches 2 unless score #mobTmp room matches 1 run function rlk:cm/c2/plan
+execute if score #chapter room matches 3 unless score #mobTmp room matches 1 run function rlk:cm/c3/plan
 function rlk:room/mob_loop

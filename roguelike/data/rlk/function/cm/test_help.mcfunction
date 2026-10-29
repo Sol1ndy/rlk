@@ -10,3 +10,4 @@ tellraw @s [{text:"",click_event:{action:"suggest_command",command:'/function rl
 tellraw @s [{text:"",click_event:{action:"suggest_command",command:'/function rlk:cm/test {t:"sh"}'},hover_event:{action:"show_text",value:'/function rlk:cm/test {t:"sh"}'}},{text:"  sh",color:"yellow"},{text:" — ",color:"dark_gray"},{text:"방패병",color:"white"}]
 tellraw @s [{text:"",click_event:{action:"suggest_command",command:'/function rlk:cm/test {t:"cn"}'},hover_event:{action:"show_text",value:'/function rlk:cm/test {t:"cn"}'}},{text:"  cn",color:"yellow"},{text:" — ",color:"dark_gray"},{text:"대포병",color:"white"}]
 function rlk:cm/c2/test_help
+function rlk:cm/c3/test_help

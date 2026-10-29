@@ -54,11 +54,13 @@ VANILLA_SOUNDS = None   # filled by the entry from tools/ch2mob/sounds.txt if pr
 class Writer:
     """w(path, text): one function under data/rlk/function/ (path without .mcfunction)."""
 
-    def __init__(self, dp):
+    def __init__(self, dp, ns='c2', groups=GROUPS):
         self.dp = Path(dp)
         self.fn = self.dp / 'data' / 'rlk' / 'function'
         self.files = {}
         self.sounds = {}
+        self.ns = ns              # shared-code folder cm/<ns>/ and sound-key prefix (chapter 3 reuses this class)
+        self.groups = tuple(groups)
 
     def __call__(self, path, text):
         if not re.fullmatch(r'[a-z0-9_./-]+', path):
@@ -75,20 +77,21 @@ class Writer:
     def snd(self, key, sound, vol=1.0, pitch=1.0):
         if key not in self.sounds:
             self.sounds[key] = (sound, vol, pitch)
-            self(f'cm/c2/snd/{key}', f'scoreboard players set #c2{key} snd 1\nplaysound {sound} hostile @a ~ ~ ~ {vol} {pitch}')
+            n = self.ns
+            self(f'cm/{n}/snd/{key}', f'scoreboard players set #{n}{key} snd 1\nplaysound {sound} hostile @a ~ ~ ~ {vol} {pitch}')
         elif self.sounds[key] != (sound, vol, pitch):
             raise ValueError('sound key reused: ' + key)
-        return f'execute unless score #c2{key} snd matches 1 run function rlk:cm/c2/snd/{key}'
+        return f'execute unless score #{self.ns}{key} snd matches 1 run function rlk:cm/{self.ns}/snd/{key}'
 
     def owned(self, ids):
         """Function files this entry owns (to delete when stale)."""
         out = set()
         base = self.fn / 'cm'
-        for d in list(ids) + ['c2']:
+        for d in list(ids) + [self.ns]:
             p = base / d
             if p.is_dir():
                 out |= {str(f.relative_to(self.fn))[:-len('.mcfunction')] for f in p.rglob('*.mcfunction')}
-        for i in list(ids) + list(GROUPS):
+        for i in list(ids) + list(self.groups):
             f = base / 'spawn' / (i + '.mcfunction')
             if f.exists():
                 out.add('cm/spawn/' + i)
@@ -222,17 +225,7 @@ attribute @s minecraft:knockback_resistance base set 0
 ''')
 
     # ---- swarm hit feel
-    w('cm/c2/hurt', f'''
-# 무리 몹이 맞음 (@s = 두뇌, at @s, combat/apply 의 cm/flash 에서): 0.25초 경직 · 멀리 밀림 · 붉게 번쩍
-scoreboard players set @s cmAH 5
-execute if score @s stunT matches 1.. run scoreboard players operation @s stunT = #c2Stun tmp
-execute if score #stunHit tmp matches 1 run function rlk:cm/c2/knock
-execute unless score #stunHit tmp matches 1 if score #basic itv matches 1 run function rlk:cm/c2/knock
-scoreboard players operation #fid tmp = @s cmId
-execute as @e[tag=rlk_c2pt,distance=..6] if score @s cmId = #fid tmp run data modify entity @s item.components."minecraft:custom_model_data" set value {{colors:[16737903]}}
-execute if entity @s[tag=rlk_cm_dr] run function rlk:cm/dr/interrupt
-execute if entity @s[tag=rlk_c2slime] run {w.snd('shurt', 'minecraft:entity.slime.hurt', 0.7, 1.3)}
-''')
+    swarm_hurt(w)
     w('cm/c2/knock', '''
 # 몸에서 멀어지는 쪽으로 #c2KB(칸/틱 x1000) + 땅에 있으면 살짝 띄움
 execute unless entity @e[tag=rlk_body,limit=1] run return 0
@@ -278,94 +271,14 @@ scoreboard players set #cmEl tmp 3
 scoreboard players operation #cmLv tmp = @s mlv
 function rlk:cm/hit_pl
 ''')
-    w('cm/c2/cancel', '''
-# 하던 공격 취소 (@s = 무리 몹 두뇌, cm/cancel 에서): 빛나는 무기 · 바닥 고리 정리
-execute as @e[tag=rlk_c2glow,distance=..6] if score @s cmId = #cid tmp run data merge entity @s {Glowing:0b}
-execute as @e[tag=rlk_c2ring,distance=..6] if score @s cmId = #cid tmp run kill @s
-scoreboard players set @s cmT 0
-''')
-    w('cm/c2/rig_frozen', '''
-# 빙결: 지금 자세 그대로, 피격 번쩍임만 풀림
-execute if score @s cmAH matches 1.. run scoreboard players remove @s cmAH 1
-tag @e[tag=rlk_c2this] remove rlk_c2this
-''')
+    swarm_cancel(w)
+    rig_frozen(w)
 
     # ---- death: fling back + pop
-    w('cm/c2/clean', '''
-# 2챕터 무리 몹 모습 정리 (cm/clean 맨 앞): 두뇌가 사라진 리그 → 날아가며 터짐. 쓰러지는 리그는 ch1 정리에서 살려 둠
-execute as @e[tag=rlk_c2root,tag=!rlk_cmsync,tag=!rlk_c2dying] at @s run function rlk:cm/c2/die
-execute as @e[tag=rlk_c2root,tag=rlk_c2dying] at @s run function rlk:cm/c2/death_tick
-execute if entity @e[tag=rlk_c2dying,limit=1] run tag @e[tag=rlk_c2dying] add rlk_cmsync
-''')
-    die = [
-        '# 두뇌가 없어진 리그(@s = 뿌리 부품, at @s): 같은 cmId 부품을 쓰러지는 모습으로, 몸 쪽을 보게 돌린 뒤 뒤로 날림',
-        'scoreboard players operation #did tmp = @s cmId',
-        'execute as @e[tag=rlk_c2pt,tag=!rlk_c2dying,distance=..6] if score @s cmId = #did tmp run tag @s add rlk_c2this',
-        'tag @e[tag=rlk_c2this] add rlk_c2dying',
-        'execute as @e[tag=rlk_c2this] run data modify entity @s item.components."minecraft:custom_model_data" set value {colors:[16777215]}',
-        'execute as @e[tag=rlk_c2this,tag=rlk_c2glow] run data merge entity @s {Glowing:0b}',
-        'execute if entity @e[tag=rlk_body,limit=1] facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 as @e[tag=rlk_c2this] run tp @s ~ ~ ~ ~ 0',
-        'scoreboard players set @s cmAD 0',
-        'scoreboard players set @s c2T2 0',
-    ]
-    for i in A_IDS:
-        die.append(f'execute if entity @s[tag=rlk_{i}_pt] run function rlk:cm/{i}/rig/die')
-    die += [w.snd('kill', 'minecraft:entity.player.attack.strong', 1.0, 0.75),
-            'tag @e[tag=rlk_c2this] remove rlk_c2this']
-    w('cm/c2/die', '\n'.join(die))
-    dt = [
-        '# 쓰러지는 리그 한 틱 (@s = 뿌리, at @s). 1~6틱: 뒤로 0.32칸씩(앞이 비었을 때만) · 포물선(올라간 만큼만 내려옴 → 처음 높이 아래로는 안 감), 8틱: 터짐',
-        'scoreboard players add @s cmAD 1',
-        'scoreboard players operation #did tmp = @s cmId',
-        'execute as @e[tag=rlk_c2dying,distance=..6] if score @s cmId = #did tmp run tag @s add rlk_c2this',
-        'scoreboard players set #c2ok tmp 0',
-        'execute if score @s cmAD matches 1..6 positioned ^ ^ ^-0.32 if block ~ ~0.2 ~ #rlk:cm_pass if block ~ ~1.2 ~ #rlk:cm_pass run scoreboard players set #c2ok tmp 1',
-        'execute if score #c2ok tmp matches 1 as @e[tag=rlk_c2this,tag=!rlk_c2still] at @s run tp @s ^ ^ ^-0.32',
-    ]
-    for t, d in ((1, 26), (2, 16), (3, 6)):
-        dt.append(f'execute if score @s cmAD matches {t} if block ~ ~2.4 ~ #rlk:cm_pass as @e[tag=rlk_c2this,tag=!rlk_c2still] at @s run tp @s ~ ~0.{d:02d} ~')
-        dt.append(f'execute if score @s cmAD matches {t} if block ~ ~2.4 ~ #rlk:cm_pass run scoreboard players add @s c2T2 {d}')
-    for t, d in ((4, 6), (5, 16), (6, 26)):
-        dt.append(f'execute if score @s cmAD matches {t} if score @s c2T2 matches {d}.. as @e[tag=rlk_c2this,tag=!rlk_c2still] at @s run tp @s ~ ~-0.{d:02d} ~')
-        dt.append(f'execute if score @s cmAD matches {t} if score @s c2T2 matches {d}.. run scoreboard players remove @s c2T2 {d}')
-    for i in A_IDS:
-        dt.append(f'execute if score @s cmAD matches 3 if entity @s[tag=rlk_{i}_pt] run function rlk:cm/{i}/rig/fling')
-    dt += ['execute if score @s cmAD matches 8.. run function rlk:cm/c2/pop',
-           'tag @e[tag=rlk_c2this] remove rlk_c2this']
-    w('cm/c2/death_tick', '\n'.join(dt))
-    w('cm/c2/pop', f'''
-# 터짐: 연기 · 번개 불꽃 · 소리, 부품 제거
-particle minecraft:poof ~ ~0.8 ~ 0.3 0.4 0.3 0.06 14 normal
-particle minecraft:electric_spark ~ ~0.8 ~ 0.35 0.45 0.35 0.35 12 normal
-particle minecraft:crit ~ ~0.9 ~ 0.3 0.4 0.3 0.4 10 normal
-{w.snd('pop', 'minecraft:entity.firework_rocket.blast', 0.7, 1.5)}
-kill @e[tag=rlk_c2this]
-''')
+    swarm_death(w)
 
     # ---- multi-kill cue (combat/apply → kill_note, @s = dying ch2 brain)
-    w('cm/c2/kill_note', '''
-# 2챕터 몹 처치 기록 (@s = 죽는 두뇌, combat/apply 에서). 10틱 안에 3마리 → 다중 처치 신호. 큰 슬라임은 분열할 레벨을 리그에 남김
-execute store result score #c2Now tmp run time query gametime
-execute if entity @s[tag=rlk_cm_sl] run function rlk:cm/sl/keep_lv
-scoreboard players operation #c2Dt tmp = #c2Now tmp
-scoreboard players operation #c2Dt tmp -= #c2K2 tmp
-scoreboard players operation #c2K2 tmp = #c2K1 tmp
-scoreboard players operation #c2K1 tmp = #c2Now tmp
-execute if score #c2Dt tmp matches ..10 run function rlk:cm/c2/multi
-''')
-    w('cm/c2/multi', f'''
-# 다중 처치: 몸 위치에 묵직한 소리 + 터지는 입자 (한 번 울리면 10틱 동안은 다시 안 울림)
-scoreboard players operation #c2Dq tmp = #c2Now tmp
-scoreboard players operation #c2Dq tmp -= #c2Kq tmp
-execute if score #c2Dq tmp matches ..10 run return 0
-scoreboard players operation #c2Kq tmp = #c2Now tmp
-scoreboard players add #c2Multi tmp 1
-execute at @e[tag=rlk_body,limit=1] run playsound minecraft:item.mace.smash_ground_heavy master @a ~ ~ ~ 1 0.8
-execute at @e[tag=rlk_body,limit=1] run playsound minecraft:entity.player.attack.crit master @a ~ ~ ~ 1 0.6
-execute at @e[tag=rlk_body,limit=1] run particle minecraft:sweep_attack ~ ~1 ~ 0.9 0.3 0.9 0 6 normal
-execute at @e[tag=rlk_body,limit=1] run particle minecraft:crit ~ ~1 ~ 0.8 0.5 0.8 0.6 30 normal
-execute at @e[tag=rlk_body,limit=1] run particle minecraft:electric_spark ~ ~1 ~ 0.9 0.5 0.9 0.5 20 normal
-''')
+    kill_cue(w)
 
     # ---- slime discharge (never the player)
     w('cm/c2/discharge', f'''
@@ -384,27 +297,7 @@ execute if score #c2zd tmp matches ..0 run scoreboard players set #c2zd tmp 1
 particle minecraft:electric_spark ~ ~0.6 ~ 0.2 0.3 0.2 0.2 8 normal
 function rlk:cm/c2/true_hit
 ''')
-    w('cm/c2/true_hit', '''
-# @s 에게 진짜 피해 #c2zd (combat/apply 경로: 처치 · 보상 · 숫자). combat/apply 안에서는 부르지 않는다(cm/clean 에서만)
-scoreboard players add #hitLanded tmp 0
-scoreboard players operation #c2SaveHL tmp = #hitLanded tmp
-scoreboard players add #basic itv 0
-scoreboard players operation #c2SaveB tmp = #basic itv
-function rlk:combat/clear_atkflags
-scoreboard players operation #dmg tmp = #c2zd tmp
-scoreboard players set #crit tmp 0
-scoreboard players set #stunHit tmp 0
-scoreboard players set #basic itv 0
-scoreboard players set #bowHit tmp 0
-scoreboard players set #elem tmp 3
-scoreboard players set #tfm tmp 1
-scoreboard players set #trueDmg tmp 1
-function rlk:combat/apply
-scoreboard players set #trueDmg tmp 0
-scoreboard players set #tfm tmp 0
-scoreboard players operation #hitLanded tmp = #c2SaveHL tmp
-scoreboard players operation #basic itv = #c2SaveB tmp
-''')
+    true_hit(w)
 
     # ---- spawning helpers
     w('cm/c2/brain_end', '''
@@ -519,6 +412,171 @@ particle minecraft:poof ~ ~1 ~ 0.6 0.6 0.6 0.02 16
 # 소환 id 를 실행 시점에 풀어 부름 (정예 id 는 다른 쪽 파일이라 직접 참조하지 않음)
 $function rlk:cm/spawn/$(id)
 ''')
+
+
+def true_hit(w, ns='c2', elem=3):
+    """cm/<ns>/true_hit: true damage #c2zd to @s through combat/apply (kill · rewards · number; no element reaction,
+    #elem only colours the number). Never call it inside combat/apply (only from cm/clean)."""
+    w(f'cm/{ns}/true_hit', '\n'.join([
+        '# @s 에게 진짜 피해 #c2zd (combat/apply 경로: 처치 · 보상 · 숫자). combat/apply 안에서는 부르지 않는다(cm/clean 에서만)',
+        'scoreboard players add #hitLanded tmp 0',
+        'scoreboard players operation #c2SaveHL tmp = #hitLanded tmp',
+        'scoreboard players add #basic itv 0',
+        'scoreboard players operation #c2SaveB tmp = #basic itv',
+        'function rlk:combat/clear_atkflags',
+        'scoreboard players operation #dmg tmp = #c2zd tmp',
+        'scoreboard players set #crit tmp 0',
+        'scoreboard players set #stunHit tmp 0',
+        'scoreboard players set #basic itv 0',
+        'scoreboard players set #bowHit tmp 0',
+        f'scoreboard players set #elem tmp {elem}',
+        'scoreboard players set #tfm tmp 1',
+        'scoreboard players set #trueDmg tmp 1',
+        'function rlk:combat/apply',
+        'scoreboard players set #trueDmg tmp 0',
+        'scoreboard players set #tfm tmp 0',
+        'scoreboard players operation #hitLanded tmp = #c2SaveHL tmp',
+        'scoreboard players operation #basic itv = #c2SaveB tmp']))
+
+
+def lint(w, label='ch2'):
+    """Generated-text checks shared by the chapter entries: no negative add/remove literal, every function reference
+    resolves (macro lines excepted), lowercase item-model ids."""
+    bad = []
+    for path, text in w.files.items():
+        for n, line in enumerate(text.split('\n'), 1):
+            if re.search(r'scoreboard players (add|remove) \S+ \S+ -\d', line):
+                bad.append(f'{path}:{n}: negative add/remove literal')
+            if line.startswith('$') or line.startswith('#'):
+                continue
+            for ref in re.findall(r'function rlk:([a-z0-9_/.-]+)', line):
+                if not w.has(ref):
+                    bad.append(f'{path}:{n}: unknown function rlk:{ref}')
+            for rid in re.findall(r'"minecraft:item_model":"([^"]+)"', line):
+                if rid != rid.lower():
+                    bad.append(f'{path}:{n}: resource id not lowercase {rid}')
+    if bad:
+        raise SystemExit(f'{label} lint failed:\n  ' + '\n  '.join(bad[:40]))
+
+
+# ---------------------------------------------------------------- swarm hit feel, death fling, multi-kill cue
+# Parametrised by the shared-code folder ns ('c2' here; tools/ch3mob calls them with 'c3'). Rig parts carry rlk_<ns>pt,
+# the root rlk_<ns>root, glowing parts rlk_<ns>glow, decals rlk_<ns>ring; knockback, impulse and the constants are the
+# chapter-2 functions/scores (cm/c2/knock, #c2Stun ...) at run time. The defaults write the chapter-2 text.
+def swarm_hurt(w, ns='c2', extra=None):
+    if extra is None:
+        extra = ['execute if entity @s[tag=rlk_cm_dr] run function rlk:cm/dr/interrupt',
+                 f"execute if entity @s[tag=rlk_c2slime] run {w.snd('shurt', 'minecraft:entity.slime.hurt', 0.7, 1.3)}"]
+    w(f'cm/{ns}/hurt', '\n'.join([
+        '# 무리 몹이 맞음 (@s = 두뇌, at @s, combat/apply 의 cm/flash 에서): 0.25초 경직 · 멀리 밀림 · 붉게 번쩍',
+        'scoreboard players set @s cmAH 5',
+        'execute if score @s stunT matches 1.. run scoreboard players operation @s stunT = #c2Stun tmp',
+        'execute if score #stunHit tmp matches 1 run function rlk:cm/c2/knock',
+        'execute unless score #stunHit tmp matches 1 if score #basic itv matches 1 run function rlk:cm/c2/knock',
+        'scoreboard players operation #fid tmp = @s cmId',
+        f'execute as @e[tag=rlk_{ns}pt,distance=..6] if score @s cmId = #fid tmp run data modify entity @s item.components."minecraft:custom_model_data" set value {{colors:[16737903]}}']
+        + list(extra)))
+
+
+def swarm_cancel(w, ns='c2', extra=()):
+    w(f'cm/{ns}/cancel', '\n'.join([
+        '# 하던 공격 취소 (@s = 무리 몹 두뇌, cm/cancel 에서): 빛나는 무기 · 바닥 고리 정리',
+        f'execute as @e[tag=rlk_{ns}glow,distance=..6] if score @s cmId = #cid tmp run data merge entity @s {{Glowing:0b}}',
+        f'execute as @e[tag=rlk_{ns}ring,distance=..6] if score @s cmId = #cid tmp run kill @s']
+        + list(extra) + ['scoreboard players set @s cmT 0']))
+
+
+def rig_frozen(w, ns='c2'):
+    w(f'cm/{ns}/rig_frozen', '\n'.join([
+        '# 빙결: 지금 자세 그대로, 피격 번쩍임만 풀림',
+        'execute if score @s cmAH matches 1.. run scoreboard players remove @s cmAH 1',
+        f'tag @e[tag=rlk_{ns}this] remove rlk_{ns}this']))
+
+
+C2_POP = ['particle minecraft:poof ~ ~0.8 ~ 0.3 0.4 0.3 0.06 14 normal',
+          'particle minecraft:electric_spark ~ ~0.8 ~ 0.35 0.45 0.35 0.35 12 normal',
+          'particle minecraft:crit ~ ~0.9 ~ 0.3 0.4 0.3 0.4 10 normal']
+
+
+def swarm_death(w, ns='c2', ids=None, label='2챕터', pop_fx=None, pop_title='# 터짐: 연기 · 번개 불꽃 · 소리, 부품 제거',
+                pop_snd=('pop', 'minecraft:entity.firework_rocket.blast', 0.7, 1.5), clean_pre=()):
+    """cm/<ns>/clean (cm/clean prefix) · die · death_tick · pop. Every id in ids has cm/<id>/rig/die and rig/fling."""
+    ids = A_IDS if ids is None else ids
+    pop_fx = C2_POP if pop_fx is None else pop_fx
+    pt, root, dying, this, still = (f'rlk_{ns}{k}' for k in ('pt', 'root', 'dying', 'this', 'still'))
+    w(f'cm/{ns}/clean', '\n'.join([
+        f'# {label} 무리 몹 모습 정리 (cm/clean 맨 앞): 두뇌가 사라진 리그 → 날아가며 터짐. 쓰러지는 리그는 ch1 정리에서 살려 둠'] + list(clean_pre) + [
+        f'execute as @e[tag={root},tag=!rlk_cmsync,tag=!{dying}] at @s run function rlk:cm/{ns}/die',
+        f'execute as @e[tag={root},tag={dying}] at @s run function rlk:cm/{ns}/death_tick',
+        f'execute if entity @e[tag={dying},limit=1] run tag @e[tag={dying}] add rlk_cmsync']))
+    die = [
+        '# 두뇌가 없어진 리그(@s = 뿌리 부품, at @s): 같은 cmId 부품을 쓰러지는 모습으로, 몸 쪽을 보게 돌린 뒤 뒤로 날림',
+        'scoreboard players operation #did tmp = @s cmId',
+        f'execute as @e[tag={pt},tag=!{dying},distance=..6] if score @s cmId = #did tmp run tag @s add {this}',
+        f'tag @e[tag={this}] add {dying}',
+        f'execute as @e[tag={this}] run data modify entity @s item.components."minecraft:custom_model_data" set value {{colors:[16777215]}}',
+        f'execute as @e[tag={this},tag=rlk_{ns}glow] run data merge entity @s {{Glowing:0b}}',
+        f'execute if entity @e[tag=rlk_body,limit=1] facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 as @e[tag={this}] run tp @s ~ ~ ~ ~ 0',
+        'scoreboard players set @s cmAD 0',
+        'scoreboard players set @s c2T2 0',
+    ]
+    for i in ids:
+        die.append(f'execute if entity @s[tag=rlk_{i}_pt] run function rlk:cm/{i}/rig/die')
+    die += [w.snd('kill', 'minecraft:entity.player.attack.strong', 1.0, 0.75),
+            f'tag @e[tag={this}] remove {this}']
+    w(f'cm/{ns}/die', '\n'.join(die))
+    dt = [
+        '# 쓰러지는 리그 한 틱 (@s = 뿌리, at @s). 1~6틱: 뒤로 0.32칸씩(앞이 비었을 때만) · 포물선(올라간 만큼만 내려옴 → 처음 높이 아래로는 안 감), 8틱: 터짐',
+        'scoreboard players add @s cmAD 1',
+        'scoreboard players operation #did tmp = @s cmId',
+        f'execute as @e[tag={dying},distance=..6] if score @s cmId = #did tmp run tag @s add {this}',
+        'scoreboard players set #c2ok tmp 0',
+        'execute if score @s cmAD matches 1..6 positioned ^ ^ ^-0.32 if block ~ ~0.2 ~ #rlk:cm_pass if block ~ ~1.2 ~ #rlk:cm_pass run scoreboard players set #c2ok tmp 1',
+        f'execute if score #c2ok tmp matches 1 as @e[tag={this},tag=!{still}] at @s run tp @s ^ ^ ^-0.32',
+    ]
+    for t, d in ((1, 26), (2, 16), (3, 6)):
+        dt.append(f'execute if score @s cmAD matches {t} if block ~ ~2.4 ~ #rlk:cm_pass as @e[tag={this},tag=!{still}] at @s run tp @s ~ ~0.{d:02d} ~')
+        dt.append(f'execute if score @s cmAD matches {t} if block ~ ~2.4 ~ #rlk:cm_pass run scoreboard players add @s c2T2 {d}')
+    for t, d in ((4, 6), (5, 16), (6, 26)):
+        dt.append(f'execute if score @s cmAD matches {t} if score @s c2T2 matches {d}.. as @e[tag={this},tag=!{still}] at @s run tp @s ~ ~-0.{d:02d} ~')
+        dt.append(f'execute if score @s cmAD matches {t} if score @s c2T2 matches {d}.. run scoreboard players remove @s c2T2 {d}')
+    for i in ids:
+        dt.append(f'execute if score @s cmAD matches 3 if entity @s[tag=rlk_{i}_pt] run function rlk:cm/{i}/rig/fling')
+    dt += [f'execute if score @s cmAD matches 8.. run function rlk:cm/{ns}/pop',
+           f'tag @e[tag={this}] remove {this}']
+    w(f'cm/{ns}/death_tick', '\n'.join(dt))
+    w(f'cm/{ns}/pop', '\n'.join([pop_title] + list(pop_fx) + [w.snd(*pop_snd), f'kill @e[tag={this}]']))
+
+
+C2_MULTI_FX = ['execute at @e[tag=rlk_body,limit=1] run particle minecraft:electric_spark ~ ~1 ~ 0.9 0.5 0.9 0.5 20 normal']
+
+
+def kill_cue(w, ns='c2', label='2챕터', pre=None, fx=None, note_title=None):
+    """cm/<ns>/kill_note (combat/apply hook, @s = the dying brain) + cm/<ns>/multi. The kill clock (#c2K1 #c2K2 #c2Kq,
+    set up by cm/c2/load) is shared, so kills of either chapter's mobs count toward one cue."""
+    pre = ['execute if entity @s[tag=rlk_cm_sl] run function rlk:cm/sl/keep_lv'] if pre is None else pre
+    fx = C2_MULTI_FX if fx is None else fx
+    note_title = note_title or f'# {label} 몹 처치 기록 (@s = 죽는 두뇌, combat/apply 에서). 10틱 안에 3마리 → 다중 처치 신호. 큰 슬라임은 분열할 레벨을 리그에 남김'
+    w(f'cm/{ns}/kill_note', '\n'.join([
+        note_title,
+        'execute store result score #c2Now tmp run time query gametime'] + list(pre) + [
+        'scoreboard players operation #c2Dt tmp = #c2Now tmp',
+        'scoreboard players operation #c2Dt tmp -= #c2K2 tmp',
+        'scoreboard players operation #c2K2 tmp = #c2K1 tmp',
+        'scoreboard players operation #c2K1 tmp = #c2Now tmp',
+        f'execute if score #c2Dt tmp matches ..10 run function rlk:cm/{ns}/multi']))
+    w(f'cm/{ns}/multi', '\n'.join([
+        '# 다중 처치: 몸 위치에 묵직한 소리 + 터지는 입자 (한 번 울리면 10틱 동안은 다시 안 울림)',
+        'scoreboard players operation #c2Dq tmp = #c2Now tmp',
+        'scoreboard players operation #c2Dq tmp -= #c2Kq tmp',
+        'execute if score #c2Dq tmp matches ..10 run return 0',
+        'scoreboard players operation #c2Kq tmp = #c2Now tmp',
+        'scoreboard players add #c2Multi tmp 1',
+        'execute at @e[tag=rlk_body,limit=1] run playsound minecraft:item.mace.smash_ground_heavy master @a ~ ~ ~ 1 0.8',
+        'execute at @e[tag=rlk_body,limit=1] run playsound minecraft:entity.player.attack.crit master @a ~ ~ ~ 1 0.6',
+        'execute at @e[tag=rlk_body,limit=1] run particle minecraft:sweep_attack ~ ~1 ~ 0.9 0.3 0.9 0 6 normal',
+        'execute at @e[tag=rlk_body,limit=1] run particle minecraft:crit ~ ~1 ~ 0.8 0.5 0.8 0.6 30 normal'] + list(fx)))
+
 
 
 # ---------------------------------------------------------------- dispatch + shared-file hooks

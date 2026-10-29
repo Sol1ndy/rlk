@@ -19,12 +19,12 @@ HUMANOID = {
 SLIME_SIZE = {'sl': 1.35, 'ss': 0.62}
 
 
-def part_summon(mob, part, model, root=False, glow=False, bright=False, h=3.6):
-    tags = ['rlk_room', 'rlk_pet', 'rlk_cmlink', 'rlk_c2pt', f'rlk_{mob}_pt', f'rlk_{mob}_{part}', 'rlk_c2new']
+def part_summon(mob, part, model, root=False, glow=False, bright=False, h=3.6, ns='c2'):
+    tags = ['rlk_room', 'rlk_pet', 'rlk_cmlink', f'rlk_{ns}pt', f'rlk_{mob}_pt', f'rlk_{mob}_{part}', f'rlk_{ns}new']
     if root:
-        tags.append('rlk_c2root')
+        tags.append(f'rlk_{ns}root')
     if glow:
-        tags.append('rlk_c2glow')
+        tags.append(f'rlk_{ns}glow')
     tg = ','.join(f'"{t}"' for t in tags)
     br = 'brightness:{sky:15,block:15},' if bright else ''
     return (f'summon minecraft:item_display ~ ~ ~ {{Tags:[{tg}],NoGravity:1b,Invulnerable:1b,billboard:"fixed",item_display:"none",'
@@ -33,40 +33,42 @@ def part_summon(mob, part, model, root=False, glow=False, bright=False, h=3.6):
             f'"minecraft:custom_model_data":{{colors:[16777215]}}}}}}}}')
 
 
-def rig_common(w, mob, parts_lines, n, pose_ids, face, pick, extra_tick=()):
-    """create / rebuild / check / tick / pose_m for one mob. parts_lines: summon lines; n = part count."""
-    w(f'cm/{mob}/rig/create', '\n'.join([f'# {mob} 리그 {n}부품 (실행 위치 = 발, 모델 중심 [8,8,8]); 새 부품은 rlk_c2this 로 남김'] + parts_lines + [
-        'scoreboard players operation @e[tag=rlk_c2new] cmId = #cid tmp',
+def rig_common(w, mob, parts_lines, n, pose_ids, face, pick, extra_tick=(), ns='c2'):
+    """create / rebuild / check / tick / pose_m for one mob. parts_lines: summon lines; n = part count.
+    ns: shared-code folder / tag family (rlk_<ns>pt · root · this · new · dying, storage rlk:<ns> p)."""
+    new, this, root, dying = (f'rlk_{ns}{k}' for k in ('new', 'this', 'root', 'dying'))
+    w(f'cm/{mob}/rig/create', '\n'.join([f'# {mob} 리그 {n}부품 (실행 위치 = 발, 모델 중심 [8,8,8]); 새 부품은 {this} 로 남김'] + parts_lines + [
+        f'scoreboard players operation @e[tag={new}] cmId = #cid tmp',
         '# 새 부품은 이번 틱 정리(cm/clean)에서 살아남게 표시(분열 · 다시 만들기는 cm/clean 안에서도 일어남)',
-        'tag @e[tag=rlk_c2new] add rlk_cmsync',
-        'tag @e[tag=rlk_c2new] add rlk_c2this',
-        'tag @e[tag=rlk_c2new] remove rlk_c2new',
+        f'tag @e[tag={new}] add rlk_cmsync',
+        f'tag @e[tag={new}] add {this}',
+        f'tag @e[tag={new}] remove {new}',
         f'function rlk:cm/{mob}/rig/pose/0']))
     w(f'cm/{mob}/rig/check', '\n'.join([
         '# 48틱마다 부품 수 확인(리로드 · 청크 문제로 빠진 부품이 있으면 다시 만듦)',
         'scoreboard players set @s cmAF 0',
-        'execute store result score #c2cnt tmp if entity @e[tag=rlk_c2this]',
+        f'execute store result score #c2cnt tmp if entity @e[tag={this}]',
         f'execute if score #c2cnt tmp matches {n} run return 0',
-        'kill @e[tag=rlk_c2this]',
+        f'kill @e[tag={this}]',
         f'function rlk:cm/{mob}/rig/create',
         'scoreboard players set @s cmAP -1']))
     w(f'cm/{mob}/rig/pose_m', f'$function rlk:cm/{mob}/rig/pose/$(n)')
     allowed = sorted(pose_ids)
     lines = [f'# {mob} 모습 한 틱 (@s = 두뇌, at @s; #cid = cmId). 내 뿌리 부품을 찾고, 나머지 부품은 뿌리와 같은 자리(모두 함께 옮김)에서만 찾음. 자세는 바뀔 때만 보냄(보간)',
-             f'execute as @e[tag=rlk_c2root,tag=rlk_{mob}_pt,tag=!rlk_c2dying,distance=..6] if score @s cmId = #cid tmp run tag @s add rlk_c2this',
-             f'execute at @e[tag=rlk_c2this,limit=1] as @e[tag=rlk_{mob}_pt,tag=!rlk_c2root,tag=!rlk_c2dying,distance=..0.01] if score @s cmId = #cid tmp run tag @s add rlk_c2this',
+             f'execute as @e[tag={root},tag=rlk_{mob}_pt,tag=!{dying},distance=..6] if score @s cmId = #cid tmp run tag @s add {this}',
+             f'execute at @e[tag={this},limit=1] as @e[tag=rlk_{mob}_pt,tag=!{root},tag=!{dying},distance=..0.01] if score @s cmId = #cid tmp run tag @s add {this}',
              'scoreboard players add @s cmAF 1',
              f'execute if score @s cmAF matches 48.. run function rlk:cm/{mob}/rig/check',
-             'tag @e[tag=rlk_c2this] add rlk_cmsync'] + list(face) + [
-             'execute if score @s cmAH matches 1 as @e[tag=rlk_c2this] run data modify entity @s item.components."minecraft:custom_model_data" set value {colors:[16777215]}'] + list(extra_tick) + [
-             'execute if score @s frzT matches 1.. run return run function rlk:cm/c2/rig_frozen',
+             f'tag @e[tag={this}] add rlk_cmsync'] + list(face) + [
+             f'execute if score @s cmAH matches 1 as @e[tag={this}] run data modify entity @s item.components."minecraft:custom_model_data" set value {{colors:[16777215]}}'] + list(extra_tick) + [
+             f'execute if score @s frzT matches 1.. run return run function rlk:cm/{ns}/rig_frozen',
              f'function rlk:cm/{mob}/rig/pick',
-             f'execute unless score @s cmAP = #pose tmp store result storage rlk:c2 p.n int 1 run scoreboard players get #pose tmp',
-             f'execute unless score @s cmAP = #pose tmp run function rlk:cm/{mob}/rig/pose_m with storage rlk:c2 p',
+             f'execute unless score @s cmAP = #pose tmp store result storage rlk:{ns} p.n int 1 run scoreboard players get #pose tmp',
+             f'execute unless score @s cmAP = #pose tmp run function rlk:cm/{mob}/rig/pose_m with storage rlk:{ns} p',
              'scoreboard players operation @s cmAP = #pose tmp',
              'execute if score @s cmAR matches 1.. run scoreboard players remove @s cmAR 1',
              'execute if score @s cmAH matches 1.. run scoreboard players remove @s cmAH 1',
-             'tag @e[tag=rlk_c2this] remove rlk_c2this']
+             f'tag @e[tag={this}] remove {this}']
     w(f'cm/{mob}/rig/tick', '\n'.join(lines))
     w(f'cm/{mob}/rig/pick', '\n'.join(pick))
     return allowed
@@ -77,15 +79,17 @@ FACE_YAW = ['execute store result entity @e[tag=rlk_cmrot,limit=1] Rotation[0] f
             'execute rotated as @e[tag=rlk_cmrot,limit=1] rotated ~ 0 as @e[tag=rlk_c2this] run tp @s ~ ~ ~ ~ 0']
 
 
-def humanoid_rig(w, mob, face, pick):
-    H = HUMANOID[mob]
-    lines = [part_summon(mob, p, f'cm/c2/{mob}/{p}', root=(p == 'body'), glow=(p in H['glow']), h=H['h']) for p in H['parts']]
+def humanoid_rig(w, mob, face, pick, H=None, ns='c2', extra_tick=()):
+    """H: {'parts', 'attach', 'poses', 'glow', 'h'} (default: this module's HUMANOID[mob]); models rlk:cm/<ns>/<mob>/<part>."""
+    H = HUMANOID[mob] if H is None else H
+    lines = [part_summon(mob, p, f'cm/{ns}/{mob}/{p}', root=(p == 'body'), glow=(p in H['glow']), bright=(p in H.get('bright', ())), h=H['h'], ns=ns)
+             for p in H['parts']]
     for pid, (name, dur, prm) in sorted(H['poses'].items()):
         r = rig.humanoid(prm, H['attach'])
         rig.plant(r)
         w(f'cm/{mob}/rig/pose/{pid}', '\n'.join([f'# {name} ({dur}틱 보간)'] + [
-            rig.merge_line(f'@e[tag=rlk_c2this,tag=rlk_{mob}_{p},limit=1]', r[p], dur) for p in H['parts']]))
-    return rig_common(w, mob, lines, len(H['parts']), H['poses'].keys(), face, pick)
+            rig.merge_line(f'@e[tag=rlk_{ns}this,tag=rlk_{mob}_{p},limit=1]', r[p], dur) for p in H['parts']]))
+    return rig_common(w, mob, lines, len(H['parts']), H['poses'].keys(), face, pick, extra_tick, ns=ns)
 
 
 def slime_pose(S, sx, sy, sz, c, lift):
@@ -106,8 +110,9 @@ def slime_rig(w, mob, pick, extra_tick):
     return rig_common(w, mob, lines, 2, poses.SLIME.keys(), FACE_AIM, pick, extra_tick)
 
 
-def spawn_fn(w, mob, title, tags, attrs):
-    tg = ','.join(f'"{t}"' for t in ['rlk_room', 'rlk_zmob', 'rlk_newmob', 'rlk_cmb', f'rlk_cm_{mob}', f'rlk_m_cm{mob}', 'rlk_cmnew', 'rlk_c2', 'rlk_c2a'] + tags)
+def spawn_fn(w, mob, title, tags, attrs, ns='c2', zmob=True):
+    base = ['rlk_room'] + (['rlk_zmob'] if zmob else []) + ['rlk_newmob', 'rlk_cmb', f'rlk_cm_{mob}', f'rlk_m_cm{mob}', 'rlk_cmnew', f'rlk_{ns}', f'rlk_{ns}a']
+    tg = ','.join(f'"{t}"' for t in base + tags)
     at = ','.join(f'{{id:"minecraft:{k}",base:{v}d}}' for k, v in attrs)
     w(f'cm/spawn/{mob}', f'# {title} 한 마리 (실행 위치 · 방향): 투명 허스크 두뇌 + cmId 로 이은 디스플레이 리그\n'
                          + HUSK.format(tags=tg, attrs=at) + '\nfunction rlk:cm/c2/brain_end')

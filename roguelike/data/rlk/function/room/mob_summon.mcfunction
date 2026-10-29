@@ -3,6 +3,7 @@
 execute if score #chapter room matches ..1 run return run function rlk:cm/summon_c1
 # 테스트 설정: 2챕터 이후에도 1챕터 커스텀 몹을 소환. 예전처럼 임시 몹을 쓰려면 /scoreboard players set #mobTmp room 1
 execute if score #chapter room matches 2 unless score #mobTmp room matches 1 run return run function rlk:cm/c2/room_slot
+execute if score #chapter room matches 3 unless score #mobTmp room matches 1 run return run function rlk:cm/c3/room_slot
 execute unless score #mobTmp room matches 1 run return run function rlk:cm/summon_c1
 execute store result score #r tmp run random value 1..100
 execute if score #r tmp matches ..55 run summon minecraft:husk ~ ~ ~ {Tags:["rlk_room","rlk_zmob","rlk_newmob","rlk_m_husk"],PersistenceRequired:1b,DeathLootTable:"minecraft:empty"}

@@ -6,6 +6,8 @@
 # 출력: #hitLanded, #mobKilled(처치 수 누적), #killBoss(boss 태그 처치), #killMini(miniboss 태그 처치)
 # Encounter objects use attack counts, before any reactions, damage procs or loot.
 execute if entity @s[tag=rlk_rd_object] run return run function rlk:boss/raiden/object/on_hit
+execute if entity @s[tag=rlk_c3pod] run return run function rlk:cm/fp/hit
+execute if entity @s[tag=rlk_c3bur] run return 0
 # 챕터 보스 히트 프록시(rlk_mb_px): 같은 공격의 중복을 거르고 몸체로 넘김(숫자는 프록시 자리). 큰 몸체(rlk_mb_big)를 직접 맞힌 공격도 같은 거름
 execute if entity @s[tag=rlk_mb_px] run return run function rlk:mboss/px/hit
 execute if entity @s[tag=rlk_mb_big] unless score #pxIn mb matches 1 unless score #trueDmg tmp matches 1 unless function rlk:mboss/px/dup run return 0
@@ -76,6 +78,7 @@ execute if score #mobHP tmp matches ..0 run scoreboard players add #mobKilled tm
 execute if score #mobHP tmp matches ..0 if entity @s[tag=boss] run scoreboard players set #killBoss tmp 1
 execute if score #mobHP tmp matches ..0 if entity @s[tag=miniboss] run scoreboard players set #killMini tmp 1
 execute if score #mobHP tmp matches ..0 if entity @s[tag=rlk_c2] run function rlk:cm/c2/kill_note
+execute if score #mobHP tmp matches ..0 if entity @s[tag=rlk_c3] run function rlk:cm/c3/kill_note
 execute if score #mobHP tmp matches ..0 run function rlk:combat/heal_orb_roll
 execute if score #mobHP tmp matches ..0 run function rlk:combat/kill_xp
 execute if score #mobHP tmp matches ..0 run function rlk:combat/gold_drop

@@ -529,6 +529,7 @@ scoreboard objectives remove cmAZ
 scoreboard objectives remove cmAP
 scoreboard objectives remove cmAD
 function rlk:cm/c2/uninstall
+function rlk:cm/c3/uninstall
 
 scoreboard objectives remove pmAtkPending
 scoreboard objectives remove pmAtkStep

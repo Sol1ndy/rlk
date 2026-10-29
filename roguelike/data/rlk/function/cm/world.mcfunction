@@ -11,4 +11,5 @@ data modify entity @e[tag=rlk_lure,limit=1] Health set value 1024f
 scoreboard players set #cmDown tmp 0
 execute if entity @a[tag=player,scores={rnDie=1..}] run scoreboard players set #cmDown tmp 1
 execute if entity @e[tag=rlk_c2,limit=1] run function rlk:cm/c2/world
+execute if entity @e[tag=rlk_c3,limit=1] run function rlk:cm/c3/world
 execute as @e[tag=rlk_cmb] at @s run function rlk:cm/tick

@@ -10,7 +10,6 @@ build(w) writes functions through w(path, text); stale files under the owned ids
 side is tools/build_ch2_swarm_rigs.mjs. Running it twice gives identical output.
 """
 import argparse
-import re
 import sys
 from pathlib import Path
 
@@ -27,24 +26,6 @@ except ImportError:
     elite = elite_lib = None
 
 
-def lint(w):
-    bad = []
-    for path, text in w.files.items():
-        for n, line in enumerate(text.split('\n'), 1):
-            if re.search(r'scoreboard players (add|remove) \S+ \S+ -\d', line):
-                bad.append(f'{path}:{n}: negative add/remove literal')
-            if line.startswith('$') or line.startswith('#'):
-                continue
-            for ref in re.findall(r'function rlk:([a-z0-9_/.-]+)', line):
-                if not w.has(ref):
-                    bad.append(f'{path}:{n}: unknown function rlk:{ref}')
-            for rid in re.findall(r'"minecraft:item_model":"([^"]+)"', line):
-                if rid != rid.lower():
-                    bad.append(f'{path}:{n}: resource id not lowercase {rid}')
-    if bad:
-        raise SystemExit('ch2 lint failed:\n  ' + '\n  '.join(bad[:40]))
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--datapack', default=str(HERE.parent))
@@ -58,7 +39,7 @@ def main():
         elite.build(w)
         owned += list(common.B_IDS)
     common.finish(w)
-    lint(w)
+    common.lint(w)
     changed, removed = w.flush(owned)
     patched = common.patch_shared(w.fn)
     hooked = elite_lib.install_hooks(w.fn) if elite_lib is not None else 0
