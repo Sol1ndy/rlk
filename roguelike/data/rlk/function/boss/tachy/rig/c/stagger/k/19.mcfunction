@@ -1,0 +1,2 @@
+data merge entity 524c4b4d-544b-4900-8000-000000000014 {start_interpolation:0,interpolation_duration:10,transformation:{translation:[-0.16882f,0.87522f,0.1936f],left_rotation:[0.43252f,-0.14166f,0.07071f,0.88761f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+execute if score @s tkRigForm matches 0 run data merge entity 524c4b4d-544b-4900-8000-000000000022 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.21104f,0.53998f,-0.0829f],left_rotation:[0.08342f,0.09121f,-0.02899f,0.99191f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
