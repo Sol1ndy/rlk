@@ -1,11 +1,14 @@
 # C3 붉은 핵 연속기: one pattern tick (#pt tk = 1..104); events in k/<t>.
-execute if score #pt tk matches 1..14 run function rlk:mboss/mv/turn {max:6}
-execute if score #pt tk matches 23..24 run function rlk:mboss/mv/turn {max:6}
-execute if score #pt tk matches 33..36 run function rlk:mboss/mv/turn {max:6}
-execute if score #pt tk matches 45..52 run function rlk:mboss/mv/turn {max:6}
-execute if score #pt tk matches 46..52 at @s unless entity @e[tag=rlk_body,distance=..3,limit=1] run function rlk:mboss/mv/step {d:0.15}
-execute if score #pt tk matches 61..62 run function rlk:mboss/mv/turn {max:6}
-execute if score #pt tk matches 62 at @s unless entity @e[tag=rlk_body,distance=..3,limit=1] run function rlk:mboss/mv/step {d:0.15}
+execute if score #pt tk matches 1..14 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt tk matches 2..20 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.3}
+execute if score #pt tk matches 23..24 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt tk matches 24..30 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.22}
+execute if score #pt tk matches 33..36 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt tk matches 34..42 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.22}
+execute if score #pt tk matches 45..52 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt tk matches 46..58 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.3}
+execute if score #pt tk matches 61..62 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt tk matches 62..68 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.3}
 execute if score #pt tk matches 21 run function rlk:boss/tachy/p/c3/k/21
 execute if score #pt tk matches 22 run function rlk:boss/tachy/p/c3/k/22
 execute if score #pt tk matches 31 run function rlk:boss/tachy/p/c3/k/31

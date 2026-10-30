@@ -8,5 +8,4 @@ execute if score @s tkRigT matches ..44 run return run function rlk:boss/tachy/r
 execute if score @s tkRigT matches ..52 run return run function rlk:boss/tachy/rig/c/t1_wings/b/45_52
 execute if score @s tkRigT matches ..61 run return run function rlk:boss/tachy/rig/c/t1_wings/b/53_61
 execute if score @s tkRigT matches ..69 run return run function rlk:boss/tachy/rig/c/t1_wings/b/62_69
-execute if score @s tkRigT matches ..78 run return run function rlk:boss/tachy/rig/c/t1_wings/b/70_78
-execute if score @s tkRigT matches ..79 run return run function rlk:boss/tachy/rig/c/t1_wings/b/79_79
+execute if score @s tkRigT matches ..79 run return run function rlk:boss/tachy/rig/c/t1_wings/b/70_79

@@ -3,7 +3,7 @@
 scoreboard players set #core tk 1
 execute unless score #pat tk matches 1..11 run return 0
 function rlk:boss/tachy/core/cancel_pat
-execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.4 ~ run function rlk:boss/tachy/fx/p/core_burst
+execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.75 ~ run function rlk:boss/tachy/fx/p/core_burst
 execute at @s run function rlk:boss/tachy/fx/snd/core_backfire
 scoreboard players operation #mbTrueEl mb = #el tk
 function rlk:mboss/true_pct {pct:3}

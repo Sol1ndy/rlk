@@ -64,7 +64,7 @@ const uuidInts = n => [...UUID_HI, NN(n)];
 const itemId = m => `rlk:mboss/tachy/${m}`;
 const TAGS = n => ['rlk_room', 'rlk_mb_aux', 'rlk_mb_part', 'rlk_tk_part', 'rlk_tk_' + n];
 const SHADOW_TAGS = ['rlk_room', 'rlk_mb_aux', 'rlk_tk_part', 'rlk_tk_shadow'];
-const CULL = {width: 8, height: 10}, VIEW_RANGE = 2;
+const CULL = {width: 10, height: 12.5}, VIEW_RANGE = 2;   // R2: x FIG (the figure 1.25 x the D0 design)
 const swap = (n, model) => `data modify entity ${uuidOf(n)} item.components."minecraft:item_model" set value "${itemId(model)}"`;
 
 // ---- resource pack: models, items, sprites, atlas ----------------------------------------------------------------------------
@@ -129,7 +129,7 @@ function cableSeg(A, B, w = CAB_W) {
 }
 let CABLES = {strands: [], lampY: LAMP_Y, recoil: RECOIL};
 function computeCables(o) {
-  const at = [o.hand_l.t, o.hand_r.t, o.upper_arm_l.t, o.upper_arm_r.t, add(o.pelvis.t, [.18, 0, .05]), add(o.pelvis.t, [-.18, 0, .05])];
+  const at = [o.hand_l.t, o.hand_r.t, o.upper_arm_l.t, o.upper_arm_r.t, add(o.pelvis.t, [.22, 0, .06]), add(o.pelvis.t, [-.22, 0, .06])];
   CABLES = {lampY: LAMP_Y, recoil: RECOIL, strands: at.map((P, i) => {
     const a = (i * 60 + 30) * Math.PI / 180, top = [1.3 * Math.sin(a), LAMP_Y, 1.3 * Math.cos(a)];
     const pts = [0, 1, 2, 3].map(j => { const u = j / 3, sag = .35 * Math.sin(Math.PI * u); return add(add(top, times(sub(P, top), u)), [sag * Math.sin(a + 1), 0, sag * Math.cos(a + 1)]); });
@@ -408,7 +408,7 @@ fn('spawn', ['# @s = the boss (the anchor), at its feet. Kills old parts, summon
   `execute unless score @s ${OBJ}G matches 0..3 run scoreboard players set @s ${OBJ}G 0`,
   `execute unless score @s ${OBJ}H matches 0..2 run scoreboard players set @s ${OBJ}H 1`,
   `scoreboard players set @s ${OBJ}S 0`, `scoreboard players set @s ${OBJ}F 0`,
-  ...PART_NAMES.map(summon), summonShadow({uuid: uuidInts('shadow'), tags: SHADOW_TAGS, item: itemId('empty'), radius: 1.1, strength: .7, viewRange: VIEW_RANGE, cull: CULL}),
+  ...PART_NAMES.map(summon), summonShadow({uuid: uuidInts('shadow'), tags: SHADOW_TAGS, item: itemId('empty'), radius: 1.4, strength: .7, viewRange: VIEW_RANGE, cull: CULL}),
   `function ${NS}/look_apply`, `function ${NS}/play/idle`, `execute rotated as @s rotated ~ 0 run function ${NS}/follow_now`]);
 fn('tick', ['# @s = the boss (the anchor), at its feet, once per game tick (the core calls it). Missing parts respawn; hidden: only the',
   '# follow runs until a clip is queued (its tick 0 shows the rig again).',

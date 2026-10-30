@@ -9,7 +9,7 @@ scoreboard objectives add tkFxD dummy
 scoreboard players set #n tkFx 0
 scoreboard players set #cn tkFx 0
 # spin axes (= the card normal) of the flat, cross and wave kinds; face kinds keep z (storage a default)
-data modify storage rlk:tk fx.ax set value {arc_0:"0f,1f,0f",arc_1:"0f,1f,0f",arc_2:"0f,1f,0f",arc_3:"0f,1f,0f",arc_e:"0f,1f,0f",crescent_h:"0f,1f,0f",crescent_v:"0f,1f,0f",spin_ring:"0f,1f,0f",shock_ring:"0f,1f,0f",bolt_0:"0f,1f,0f",bolt_1:"0f,1f,0f"}
+data modify storage rlk:tk fx.ax set value {arc_0:"0f,1f,0f",arc_1:"0f,1f,0f",arc_2:"0f,1f,0f",arc_3:"0f,1f,0f",arc_e:"0f,1f,0f",spin_ring:"0f,1f,0f",shock_ring:"0f,1f,0f",bolt_0:"0f,1f,0f",bolt_1:"0f,1f,0f"}
 data modify storage rlk:tk fx.tgc set value "rlk_tk_fx_coc"
 data modify storage rlk:tk fx.hud set value {badge:[],gauge:[]}
 data modify storage rlk:tk fx.init set value 1b

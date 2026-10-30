@@ -146,7 +146,7 @@
    "desc": "Electro crackle filaments along the slash arc"
   },
   "crescent_h": {
-   "plane": "wave",
+   "plane": "face",
    "px": [
     128,
     32
@@ -160,10 +160,10 @@
    "tint": "neutral",
    "texture": "rlk:mboss/tk_kit/crescent_h",
    "source": "own",
-   "desc": "W1 ground crescent (front + top quads)"
+   "desc": "W1 ground crescent (one standing quad facing its flight)"
   },
   "crescent_v": {
-   "plane": "cross",
+   "plane": "face",
    "px": [
     32,
     128
@@ -177,7 +177,7 @@
    "tint": "neutral",
    "texture": "rlk:mboss/tk_kit/crescent_v",
    "source": "own",
-   "desc": "W2 upright air crescent (crossed quads)"
+   "desc": "W2 upright air crescent (one quad facing its flight)"
   },
   "spin_ring": {
    "plane": "flat",
@@ -960,9 +960,9 @@
   }
  },
  "props": {
-  "crescent_h_1": "W1 ground crescent, Pyro: a 7 b wide golden-orange flame bow, 1.65 b high (front quad) and 3 b deep (top quad), centred on the display.",
+  "crescent_h_1": "W1 ground crescent, Pyro: a 7 b wide golden-orange flame bow, 1.65 b high, one standing quad facing its flight, centred on the display.",
   "crescent_h_3": "W1 ground crescent, Electro: white-gold.",
-  "crescent_v_1": "W2 air crescent, Pyro: an upright flame crescent 2.6 b (crossed quads).",
+  "crescent_v_1": "W2 air crescent, Pyro: an upright flame crescent 2.6 b (one quad facing its flight).",
   "crescent_v_3": "W2 air crescent, Electro: white-gold.",
   "feather": "Mantle feather: a glowing gold-white blade-feather 1.6 b, vertical billboard."
  },

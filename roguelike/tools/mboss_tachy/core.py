@@ -22,6 +22,13 @@ NS = api.NS
 CY = api.CY
 PH = api.PH
 SWAP_PAT, MANTLE_PAT, BREAK_PAT, NOVA_PAT, TR_PAT, REPLAY_PAT = 50, 51, 52, 53, 54, 55
+# R2 gap closer (the user: "멀리 있으면 ... 라이덴처럼 플레이어 주변으로 tp해서 반응하기 어렵게"): a melee chain started farther than
+# CLOSE_GATE b first blinks next to the player (beside / behind first): gone at CLOSE_OUT, back at CLOSE_IN (blink_in), the
+# chain begins at CLOSE_GO (its first hit >= 12 t later: >= 16 t after the reappearance).
+CLOSE_PAT = 56
+CLOSE_KEYS = ('b1', 'b2', 'c1', 'c2', 'c3')
+CLOSE_GATE, CLOSE_OUT, CLOSE_IN, CLOSE_GO = 5.5, 6, 10, 14
+CLOSE_SPOTS = [(180, 2.6), (135, 2.6), (90, 2.6), (45, 2.6), (0, 2.8), (180, 3.4), (135, 3.4), (90, 3.4), (45, 3.4), (0, 3.6)]
 INTRO_LEN = api.CLIPS['intro'][0]
 TITLE = {PH['p1']: '망토', PH['m1']: '과부하 외피', PH['t1']: '날개 전개', PH['p2']: '날개', PH['m2']: '과부하 외피',
          PH['t2']: '심연', PH['p3']: '심연'}
@@ -71,7 +78,7 @@ def build(W, ctx):
     vars_ = ['# Every module fake player to its fight-start value (spawn).']
     for k in ('#ph', '#pat', '#pt', '#done', '#swt', '#aut', '#sh', '#sht', '#shicd', '#core', '#stun', '#stag', '#last',
               '#last2', '#rear', '#far', '#dec', '#rec', '#sq', '#sqdone', '#fl', '#flnext', '#tst', '#lock', '#clk',
-              '#ai_pht', '#ai_mv', '#ai_d2', '#hud_g', '#hud_c'):
+              '#ai_pht', '#ai_mv', '#ai_d2', '#hud_g', '#hud_c', '#ai_oor', '#cl_q'):
         vars_.append(sset(k, 0))
     vars_ += [sset('#el', api.G1_START), sset('#taken', 100), sset('#kgap', 9), sset('#ai_fp', 1),
               sset('#ai_swl', api.G1_FORCE_SWAP[1]), sset('#ai_d2', 100000)]
@@ -163,6 +170,7 @@ def build(W, ctx):
         f'execute if score #pat {OBJ} matches {NOVA_PAT} run return run {fn("mantle/nova_tick")}',
         f'execute if score #pat {OBJ} matches {TR_PAT} run return run {fn("core/tr/tick")}',
         f'execute if score #pat {OBJ} matches {REPLAY_PAT} run return run {fn("core/replay/tick")}',
+        f'execute if score #pat {OBJ} matches {CLOSE_PAT} run return run {fn("core/close/tick")}',
         fn('ai/recover')]
     w('core/fight', fight)
     w('core/stag_tick', ['# G3 stagger countdown (@s = body); then the recovery.',
@@ -188,7 +196,15 @@ def build(W, ctx):
         start += [sset('#kgap', 0)] if k == 'k' else [f'scoreboard players add #kgap {OBJ} 1']
         start += cdl + [f'scoreboard players operation #cd_{k} {OBJ} = #clk {OBJ}', f'scoreboard players operation #cd_{k} {OBJ} += #t {OBJ}']
         start += E.g3_start_lines(k) + [fn('hud/sub'), fn(f'p/{k}/start')]
-        w(f'core/start/{k}', start)
+        if k in CLOSE_KEYS:
+            w(f'core/begin/{k}', start)
+            w(f'core/start/{k}', [f'# Start {k.upper()} (@s = body): farther than {CLOSE_GATE} b -> the gap closer first (core/close), else at once.',
+                                  'function rlk:mboss/mv/dist',
+                                  f'execute if score #mbDist mb matches {int(CLOSE_GATE * 10) + 1}.. run return run '
+                                  f'{fn("core/close/start")} {{q:{tid}}}',
+                                  fn(f'core/begin/{k}')])
+        else:
+            w(f'core/start/{k}', start)
         w(f'core/hz_tag/{k}', [f'# @s = a hazard of {k.upper()} just made: the pattern tags (its cancel kills it).',
                                f'tag @s add {api.TAGS["pat"]}', f'tag @s add {S.tag_p(k)}'])
     w('core/stop_move', ['# The body stops gliding / prowling (@s = body).', 'execute if entity @s[tag=rlk_mb_mv] run function rlk:mboss/mv/stop'])
@@ -205,7 +221,9 @@ def build(W, ctx):
     cd = ['# Cancel the running pattern (any executor; idempotent): its own cancel (hazards, markers, glide, looks).']
     for k in present:
         cd.append(f'execute if score #pat {OBJ} matches {S.TID[k]} run {fn(f"p/{k}/cancel")}')
+    cd.append(f'execute if score #pat {OBJ} matches {CLOSE_PAT} run {fn("core/close/cancel")}')
     w('core/cancel_d', cd)
+    close(W, ctx)
     w('core/cancel_pat', ['# Cancel the running pattern (G3 backfire, reload, tests; @s = body): recovery follows.',
                           fn('core/cancel_d'), f'tag @s remove {api.TAGS["core"]}', sset('#pat', 0), sset('#done', 0),
                           fn('core/stop_move'), fn('el/edge'), api.rig('look/chest/off'), fn('ai/rec_start')])
@@ -334,6 +352,7 @@ def build(W, ctx):
         f'execute if score #ph {OBJ} matches {PH["intro"]} run return run {fn("core/intro/reload")}',
         f'execute if score #ph {OBJ} matches {PH["death"]} run return 0',
         f'execute if score #pat {OBJ} matches 1..11 run {fn("core/cancel_pat")}',
+        f'execute if score #pat {OBJ} matches {CLOSE_PAT} run {fn("core/cancel_pat")}',
         f'execute if score #pat {OBJ} matches {SWAP_PAT} run {fn("el/swap_end")}',
         f'execute if score #pat {OBJ} matches {MANTLE_PAT}..{NOVA_PAT} run {fn("mantle/reload")}',
         f'execute if score #pat {OBJ} matches {TR_PAT} run {fn("core/tr/end")}',
@@ -370,6 +389,50 @@ def build(W, ctx):
     tests(W, ctx)
     if not api.rig_real():
         rig_stub(W)
+
+
+def close(W, ctx):
+    """The R2 gap closer (#pat CLOSE_PAT): blink out, reappear beside / behind the player, then the queued melee chain."""
+    w = W.w
+    present = ctx.present
+    keys = [k for k in CLOSE_KEYS if k in present]
+    bo = S.fx_plain('blink_out', [f'execute at @s run particle minecraft:end_rod ~ ~{S.H(1.2)} ~ 0.3 0.7 0.3 0.05 10 force @a[tag=player]'])
+    bi = S.fx_plain('blink_in', [f'execute at @s run particle minecraft:end_rod ~ ~{S.H(1.2)} ~ 0.3 0.7 0.3 0.05 10 force @a[tag=player]'])
+    w('core/close/start', ['# {q} = the queued chain (pattern id). The gap closer (@s = body): blink out (the blink_out clip, gold burst).',
+                           fn('core/stop_move'), sset('#pat', CLOSE_PAT), sset('#pt', 0), sset('#done', 0), sset('#core', 0),
+                           f'$scoreboard players set #cl_q {OBJ} $(q)',
+                           'function rlk:mboss/mv/face', api.play('blink_out')] + bo + S.snd('blink_out') + [fn('hud/sub')])
+    w('core/close/tick', [f'# The gap closer one tick (#pat {CLOSE_PAT}, @s = body): gone at {CLOSE_OUT}, back beside / behind the player at',
+                          f'# {CLOSE_IN}, the queued chain at {CLOSE_GO}.',
+                          f'scoreboard players add #pt {OBJ} 1',
+                          f'execute if score #pt {OBJ} matches {CLOSE_OUT} run {fn("core/close/out")}',
+                          f'execute if score #pt {OBJ} matches {CLOSE_IN} run {fn("core/close/in")}',
+                          f'execute if score #pt {OBJ} matches {CLOSE_IN + 1}..{CLOSE_GO - 1} run function rlk:mboss/mv/turn {{max:30}}',
+                          f'execute if score #pt {OBJ} matches {CLOSE_GO}.. run {fn("core/close/go")}'])
+    w('core/close/out', ['# Gone (@s = body): hidden, invulnerable, moved to the spot next to the player, facing the player.',
+                         'tag @s add rlk_mb_inv', api.rig('state/hidden'), fn('core/close/spot'), 'function rlk:mboss/mv/face'])
+    w('core/close/in', ['# Back (@s = body): visible, vulnerable, the blink_in clip and burst, facing the player.',
+                        'tag @s remove rlk_mb_inv', api.rig('state/normal'), 'function rlk:mboss/mv/face', api.play('blink_in')]
+      + bi + S.snd('blink_in'))
+    go = ['# The queued chain begins (@s = body); unknown id: the recovery.', sset('#pat', 0)]
+    for k in keys:
+        go.append(f'execute if score #cl_q {OBJ} matches {S.TID[k]} run return run {fn(f"core/begin/{k}")}')
+    go.append(fn('ai/rec_start'))
+    w('core/close/go', go)
+    sp = ['# The gap-closer spot (@s = body): around the player (its facing) - behind, then the back / front diagonals and the',
+          '# sides (a random side first), the front last, 2.6 b then 3.4 b; each must pass mv/ok; else she stays.',
+          f'execute store result score #cl_r {OBJ} run random value 0..1']
+    pl = '@e[tag=rlk_body,limit=1]'
+    for a, r in CLOSE_SPOTS:
+        sides = (1,) if a in (0, 180) else (1, -1)
+        for v in ((0,) if a in (0, 180) else (0, 1)):
+            for sg in (sides if v == 0 else tuple(-x for x in sides)):
+                gate = '' if a in (0, 180) else f'if score #cl_r {OBJ} matches {v} '
+                sp.append(f'execute {gate}at {pl} positioned ~ {CY} ~ rotated as {pl} rotated ~{a * sg} 0 positioned ^ ^ ^{L.num(r, 2)} '
+                          'if function rlk:mboss/mv/ok run return run tp @s ~ ~ ~')
+    w('core/close/spot', sp)
+    w('core/close/cancel', ['# The gap closer stops (any executor; idempotent): the body visible and vulnerable.',
+                            f'execute as {S.BODY} run {api.rig("state/normal")}', f'tag {S.BODY} remove rlk_mb_inv'])
 
 
 def stand_ins(W, ctx):

@@ -36,11 +36,14 @@ import {add, sub, times, len, unit, mul, q, rot, aimQ, ik, basisQ, cross, dot, p
 import {PART_NAMES, PART_SCALE, SWORD, modelPoints} from './tachy_geometry.mjs';
 
 export const HIP_Y = 1.10;
+// R2 (the user: "보스가 너무 작음"): the figure scale (api.SIZE): every solved part x FIG about the anchor
+export const FIG = 1.25;
 export const SK = {
   waist: [0, .10, 0], chestB: [0, .24, 0], neckB: [0, .345, -.005], headB: [0, .085, 0],
-  shoulder: [.235, .27, .01], hipJ: [.105, -.07, 0], thigh: .48, shin: .465, ankleY: .085,
+  // R2: broader shoulders / hips (GIRTH in tachy_geometry)
+  shoulder: [.258, .27, .01], hipJ: [.118, -.07, 0], thigh: .48, shin: .465, ankleY: .085,
   armU: .32, foreL: .29, foreR: .31, handGrip: .06, handGripR: .072,
-  pack: [0, .22, .145], wingRoot: [.12, .14, .08], tendrilRoot: [.09, .06, .07],
+  pack: [0, .22, .152], wingRoot: [.13, .14, .08], tendrilRoot: [.09, .06, .07],
   helmHinge: [0, .1, .12], helmUpDeg: 130, helmUpS: .55, hairRoot: [0, .18, .1], hairSeg: .25,
   swing: [0, .45, 0],
   // the scabbard across the lower back over the cape (chest frame): the mouth (hilt) at her right hip, the body rising
@@ -373,8 +376,11 @@ export function solve(p, form = 'cape', hist = () => null, guardMin = {}) {
     const c = add(R, [0, .2 + lift, 0]);
     for (const v of Object.values(o)) { v.t = add(c, times(sub(v.t, c), p.vis)); v.s = times(v.s, p.vis); }
   }
-  Object.defineProperty(o, '_grip', {value: add(G, [0, lift, 0]), enumerable: false});
-  Object.defineProperty(o, '_tip', {value: add(add(G, [0, lift, 0]), times(rot(SQ, [0, 1, 0]), SWORD.tip * 1)), enumerable: false});
+  // R2: the whole figure x FIG about the anchor point on the floor (2.25 b -> 2.81 b): floor contact and every
+  // relative pose are kept (y >= 0 stays >= 0); the joint bookkeeping (_prev, _hairRoot) stays in design units
+  for (const v of Object.values(o)) { v.t = times(v.t, FIG); v.s = times(v.s, FIG); }
+  Object.defineProperty(o, '_grip', {value: times(add(G, [0, lift, 0]), FIG), enumerable: false});
+  Object.defineProperty(o, '_tip', {value: times(add(add(G, [0, lift, 0]), times(rot(SQ, [0, 1, 0]), SWORD.tip * 1)), FIG), enumerable: false});
   Object.defineProperty(o, '_prev', {value: footM, enumerable: false});
   Object.defineProperty(o, '_lift', {value: lift, enumerable: false});
   Object.defineProperty(o, '_guard', {value: GUARD.used, enumerable: false});

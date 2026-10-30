@@ -58,6 +58,7 @@ import mboss_lib as L  # noqa: E402
 from mboss_tachy import api  # noqa: E402
 
 ROOT = api.ROOT                        # boss/tachy
+FIG = api.SIZE                         # R2: the figure scale; presets placed on / sized by her body use it
 FN = f'rlk:{ROOT}/fx/'
 FDIR = f'data/rlk/function/{ROOT}/fx'
 NS_TEX = 'rlk:mboss/tk_kit/'
@@ -126,8 +127,10 @@ KINDS = {
        for k in range(4)},
     'arc_e':        ('flat', (128, 64), ARC, ARC, P.paint_arc_e, 2, True, 'Electro crackle filaments along the slash arc'),
     # projectiles
-    'crescent_h':   ('wave', (128, 32), SQ, SQ, P.paint_crescent_h, 2, True, 'W1 ground crescent (front + top quads)'),
-    'crescent_v':   ('cross', (32, 128), SQ, SQ, P.paint_crescent_v, 2, True, 'W2 upright air crescent (crossed quads)'),
+    # R2 (the user: each shot showed two blades, one lying flat "facing the sky"): one face quad each, its normal along the
+    # flight, so one crescent faces the player it flies at (the W1 top quad and the W2 crossed quad are gone)
+    'crescent_h':   ('face', (128, 32), SQ, SQ, P.paint_crescent_h, 2, True, 'W1 ground crescent (one standing quad facing its flight)'),
+    'crescent_v':   ('face', (32, 128), SQ, SQ, P.paint_crescent_v, 2, True, 'W2 upright air crescent (one quad facing its flight)'),
     # rings
     'spin_ring':    ('flat', (128, 128), UNIT, UNIT, P.paint_spin_ring, 2, True, 'C1 spin fire ring (unit radius)'),
     'shock_ring':   ('flat', (128, 128), UNIT, UNIT, P.paint_shock_ring, 2, True, 'L / nova golden shock ring (unit radius)'),
@@ -818,9 +821,10 @@ def _p_spin_ring(el):
 @preset('glint', 'The gold glint on the blade before the thrust (C / K): a spinning 4-point star with a ring and a '
         'glow, 0.4 b right / 1.4 b ahead of the executor (S3: the body + 1.6, rotated as the body).')
 def _p_glint():
-    return [card('glint_star', '^-0.4 ^ ^1.4', bb='center', spin=90, s0=0.3, s1=2.4, life=10, fade=5, dur=4, col=GOLD),
-            card('glow', '^-0.4 ^ ^1.4', bb='center', s0=0.4, s1=1.8, life=9, fade=5, col=GOLD),
-            dust(GOLD_PALE, 1.2, '^-0.4 ^ ^1.4', (0.15, 0.15, 0.15), 6), part('wax_on', '^-0.4 ^ ^1.4', (0.2, 0.2, 0.2), 0, 3)]
+    g = f'^-{num(0.4 * FIG, 2)} ^ ^{num(1.4 * FIG, 2)}'
+    return [card('glint_star', g, bb='center', spin=90, s0=0.3, s1=2.4 * FIG, life=10, fade=5, dur=4, col=GOLD),
+            card('glow', g, bb='center', s0=0.4, s1=1.8 * FIG, life=9, fade=5, col=GOLD),
+            dust(GOLD_PALE, 1.2, g, (0.15, 0.15, 0.15), 6), part('wax_on', g, (0.2, 0.2, 0.2), 0, 3)]
 
 
 @preset('high_glint', 'The L high hover glint (every 30 t): a big gold star at the executor (the hovering body, '
@@ -836,11 +840,11 @@ def _p_high_glint():
         'visor, ~20 t.', conv=(('c', 'c', None),))
 def _p_core_flare():
     return ['# (the public part stores the tint in pa.col from {c})',
-            mac(card('core_flare', '^ ^ ^0.3', bb='center', spin=40, s0=0.5, s1=2.1, life=20, fade=6, dur=10, col='$(col)')),
-            mac(card('glow', '^ ^ ^0.3', bb='center', s0=0.8, s1=2.4, life=22, fade=8, col='$(col)')),
-            mac(card('core_flare', '^ ^0.55 ^0.25', bb='center', spin=-60, s0=0.2, s1=0.8, life=16, fade=5, dly=2,
+            mac(card('core_flare', f'^ ^ ^{num(0.3 * FIG, 2)}', bb='center', spin=40, s0=0.5, s1=2.1 * FIG, life=20, fade=6, dur=10, col='$(col)')),
+            mac(card('glow', f'^ ^ ^{num(0.3 * FIG, 2)}', bb='center', s0=0.8, s1=2.4 * FIG, life=22, fade=8, col='$(col)')),
+            mac(card('core_flare', f'^ ^{num(0.55 * FIG, 2)} ^{num(0.25 * FIG, 2)}', bb='center', spin=-60, s0=0.2, s1=0.8 * FIG, life=16, fade=5, dly=2,
                      dur=8, col='$(col)')),
-            mac(card('glow', '^ ^ ^0.3', bb='center', s0=1.4, s1=0.8, life=10, fade=4, dly=10, col='$(col)'))]
+            mac(card('glow', f'^ ^ ^{num(0.3 * FIG, 2)}', bb='center', s0=1.4 * FIG, s1=0.8, life=10, fade=4, dly=10, col='$(col)'))]
 
 
 @preset('core_burst', 'G3 backfire: an orange-gold explosion at the chest (the executor): a big flare, a shock ring, '
@@ -930,8 +934,8 @@ def _p_ember_burst():
         'scattering (no blue: the player\'s blink is blue-white).')
 def _p_blink_out():
     rnd = RND(13)
-    out = [card('core_flare', bb='center', spin=120, s0=2.6, s1=0.3, life=6, fade=2, dur=4, col=GOLD),
-           card('glint_star', bb='center', spin=120, s0=2.2, s1=0.2, life=6, fade=2, dur=4, col=GOLD_PALE)]
+    out = [card('core_flare', bb='center', spin=120, s0=2.6 * FIG, s1=0.3, life=6, fade=2, dur=4, col=GOLD),
+           card('glint_star', bb='center', spin=120, s0=2.2 * FIG, s1=0.2, life=6, fade=2, dur=4, col=GOLD_PALE)]
     out += [fly('spark', yaw, rnd.uniform(-20, 50), rnd.uniform(1.6, 2.6), s0=0.6, s1=1.0, life=7, fade=3)
             for yaw in radial(8, 15)]
     out += [fly('feather', yaw, rnd.uniform(-10, 40), rnd.uniform(1.0, 1.8), s0=0.8, s1=1.0, life=12, fade=6,
@@ -948,20 +952,20 @@ def _p_blink_in():
         x, z = xz(2.2, yaw)
         out.append(card('spark', '~ ~ ~', bb='center', s0=1.1, s1=0.4, off=(x, rnd.uniform(-0.6, 0.8), z),
                         move=(-x, 0, -z), life=5, fade=1, dur=4))
-    out += [card('core_flare', bb='center', spin=90, s0=0.4, s1=3.0, life=7, fade=3, dly=3, dur=2, col=GOLD),
-            card('glint_star', bb='center', spin=90, s0=0.3, s1=2.4, life=7, fade=3, dly=3, dur=2, col=GOLD_PALE)]
+    out += [card('core_flare', bb='center', spin=90, s0=0.4, s1=3.0 * FIG, life=7, fade=3, dly=3, dur=2, col=GOLD),
+            card('glint_star', bb='center', spin=90, s0=0.3, s1=2.4 * FIG, life=7, fade=3, dly=3, dur=2, col=GOLD_PALE)]
     out += [card('feather', f'~{num(x, 2)} ~0.6 ~{num(z, 2)}', f'~{yaw} 0', roll=rnd.randint(-50, 50), s0=0.9, s1=0.9,
                  move=(0, -1.0, 0), life=14, fade=6, dly=3) for x, z, yaw in ((0.8, 0.3, 30), (-0.7, -0.4, 200))]
     return out + [dust(GOLD, 1.0, '~ ~ ~', (0.5, 0.8, 0.5), 12)]
 
 
-WING_PTS = [(s * (0.9 + 0.6 * k), 0.15 + 0.32 * k, -0.45 - 0.1 * k) for k in range(4) for s in (1, -1)]
+WING_PTS = [(FIG * s * (0.9 + 0.6 * k), FIG * (0.15 + 0.32 * k), FIG * (-0.45 - 0.1 * k)) for k in range(4) for s in (1, -1)]
 
 
 @preset('wing_flare', 'The wings flare gold (B1 open, T1 flare): glints running out along both wing spans behind '
         'the executor (the body + 1.4, rotated as the body), a broad gold glow behind her, gold dust.')
 def _p_wing_flare():
-    out = [card('glow', '^ ^0.3 ^-0.6', bb='center', s0=1.5, s1=4.6, life=10, fade=5, col=GOLD)]
+    out = [card('glow', f'^ ^{num(0.3 * FIG, 2)} ^-{num(0.6 * FIG, 2)}', bb='center', s0=1.5, s1=4.6 * FIG, life=10, fade=5, col=GOLD)]
     for i, (x, y, z) in enumerate(WING_PTS):
         out.append(card('glint_star', f'^{num(x, 2)} ^{num(y, 2)} ^{num(z, 2)}', bb='center', spin=80, s0=0.2,
                         s1=1.5 + 0.2 * (i // 2), life=9, fade=4, dly=i // 2, dur=3, col=GOLD_PALE))
@@ -970,8 +974,8 @@ def _p_wing_flare():
 
 # --- mantle --------------------------------------------------------------------------------------------------------
 COC_LIFE = 420           # longer than any mantle (M1 360 t); replaced by every cocoon call, removed by crack / clear
-COC_POS = '^ ^1.1 ^'     # the cocoon centre over the executor (S3: the body + 1.2; she hovers 1.2 b in the mantle)
-COC_S = (2.2, 1.6, 1.0)
+COC_POS = f'^ ^{num(1.1 * FIG, 2)} ^'     # the cocoon centre over the executor (S3: the body + 1.2 x FIG; she hovers in the mantle)
+COC_S = (2.2 * FIG, 1.6 * FIG, 1.0)
 CRACK_TINT = {75: rgb('#7A5A38'), 50: rgb('#C09058'), 25: WHITE}
 
 
@@ -983,11 +987,11 @@ CRACK_TINT = {75: rgb('#7A5A38'), 50: rgb('#C09058'), 25: WHITE}
 def _p_cocoon():
     out = [f'kill @e[type=minecraft:item_display,tag={COC}]',
            card('cocoon', COC_POS, bb='vertical', s0=COC_S, s1=COC_S, life=COC_LIFE, pool='coc'),
-           card('glow', COC_POS, bb='center', s0=3.6, s1=3.6, life=COC_LIFE, col=rgb('#C8781E'), pool='coc')]
+           card('glow', COC_POS, bb='center', s0=3.6 * FIG, s1=3.6 * FIG, life=COC_LIFE, col=rgb('#C8781E'), pool='coc')]
     for lo, hi, pc in ((51, 75, 75), (26, 50, 50), (None, 25, 25)):
         rng = f'{lo}..{hi}' if lo is not None else f'..{hi}'
         out.append(f'execute if score #p {OBJ} matches {rng} run ' +
-                   card('cocoon_crack', COC_POS, bb='vertical', s0=(2.21, 1.61, 1.0), s1=(2.21, 1.61, 1.0),
+                   card('cocoon_crack', COC_POS, bb='vertical', s0=(2.21 * FIG, 1.61 * FIG, 1.0), s1=(2.21 * FIG, 1.61 * FIG, 1.0),
                         life=COC_LIFE, col=CRACK_TINT[pc], pool='coc'))
     out += [dust(EMBER, 1.0, '^ ^1.1 ^', (0.7, 1.2, 0.7), 10), dust(GOLD, 1.0, '^ ^1.1 ^', (0.7, 1.2, 0.7), 10)]
     return out
@@ -998,7 +1002,7 @@ def _p_cocoon():
 def _p_cocoon_crack():
     rnd = RND(21)
     out = [f'kill @e[type=minecraft:item_display,tag={COC}]',
-           card('cocoon_crack', COC_POS, bb='vertical', s0=(2.2, 1.6, 1), s1=(3.4, 2.4, 1), life=5, fade=3, dur=3),
+           card('cocoon_crack', COC_POS, bb='vertical', s0=(2.2 * FIG, 1.6 * FIG, 1), s1=(3.4 * FIG, 2.4 * FIG, 1), life=5, fade=3, dur=3),
            card('glow', COC_POS, bb='center', s0=2.0, s1=6.0, life=6, fade=3, col=GOLD_WHITE)]
     out += [fly('feather', yaw, rnd.uniform(-10, 60), rnd.uniform(2.0, 3.4), h=1.1, s0=0.7, s1=1.0, life=16, fade=6,
                 roll=rnd.randint(-80, 80)) for yaw in radial(10, rnd.uniform(0, 20))]
@@ -1040,10 +1044,10 @@ def _p_nova_flash():
 def _p_ignite_blade():
     out = []
     for k in range(5):
-        y = 0.2 + 0.45 * k
-        out.append(card('flame', f'^ ^{num(y, 2)} ^', bb='vertical', s0=(0.5, 0.3, 0.5), s1=(0.9, 1.1, 0.9), life=14,
+        y = (0.2 + 0.45 * k) * FIG
+        out.append(card('flame', f'^ ^{num(y, 2)} ^', bb='vertical', s0=(0.5, 0.3, 0.5), s1=(0.9, 1.1 * FIG, 0.9), life=14,
                         fade=5, dly=k, dur=4, col=PYRO))
-    out += [card('glow', '^ ^1.1 ^', bb='center', s0=0.6, s1=2.4, life=16, fade=6, dly=2, col=EMBER),
+    out += [card('glow', f'^ ^{num(1.1 * FIG, 2)} ^', bb='center', s0=0.6, s1=2.4 * FIG, life=16, fade=6, dly=2, col=EMBER),
             fly('ember', 0, 75, 2.0, h=1.6, s0=0.25, s1=0.35, life=12, fade=5, col=EMBER, dly=3),
             fly('ember', 120, 70, 1.8, h=1.2, s0=0.25, s1=0.35, life=12, fade=5, col=GOLD_PALE, dly=4),
             fly('ember', 240, 72, 1.9, h=2.0, s0=0.25, s1=0.35, life=12, fade=5, col=EMBER, dly=5)]
@@ -1072,16 +1076,16 @@ def _p_swap_fx(el):
     out = [card('glow', bb='center', s0=0.8, s1=3.0, life=10, fade=5, col=EL_TINT[el])]
     if el == api.PYRO:
         for k, yaw in enumerate(radial(6, 0)):
-            x, z = xz(0.7, yaw)
-            out.append(card('flame', f'^{num(x, 2)} ^-0.9 ^{num(z, 2)}', bb='vertical', s0=(0.5, 0.4, 0.5),
+            x, z = xz(0.7 * FIG, yaw)
+            out.append(card('flame', f'^{num(x, 2)} ^-{num(0.9 * FIG, 2)} ^{num(z, 2)}', bb='vertical', s0=(0.5, 0.4, 0.5),
                             s1=(0.8, 1.6, 0.8), move=(0, 0.6, 0), life=12, fade=5, dly=k % 3, dur=5, col=PYRO))
         out += [fly('ember', yaw, 60, 1.8, s0=0.25, s1=0.4, life=10, fade=4, col=EMBER, dly=2) for yaw in radial(4, 45)]
     else:
         for k, yaw in enumerate(radial(5, 10)):
-            x, z = xz(0.9, yaw)
-            out.append(card(f'sky_arc_{k % 4}', f'^{num(x, 2)} ^1.2 ^{num(z, 2)}', bb='vertical', s0=(1.0, 0.4, 1.0),
+            x, z = xz(0.9 * FIG, yaw)
+            out.append(card(f'sky_arc_{k % 4}', f'^{num(x, 2)} ^{num(1.2 * FIG, 2)} ^{num(z, 2)}', bb='vertical', s0=(1.0, 0.4, 1.0),
                             s1=(1.2, 2.2, 1.2), life=5, fade=2, dly=k % 3, dur=3, col=GOLD_WHITE))
-        out.append(card('glint_star', '^-0.4 ^0.3 ^0.8', bb='center', spin=90, s0=0.3, s1=1.4, life=7, fade=3, dly=2,
+        out.append(card('glint_star', f'^-{num(0.4 * FIG, 2)} ^{num(0.3 * FIG, 2)} ^{num(0.8 * FIG, 2)}', bb='center', spin=90, s0=0.3, s1=1.4, life=7, fade=3, dly=2,
                         col=GOLD))
     return out + el_parts(el, '~ ~ ~', (0.4, 0.7, 0.4), 20)
 
@@ -1135,10 +1139,10 @@ assert set(PRESETS) == set(api.KIT_PRESETS), set(PRESETS) ^ set(api.KIT_PRESETS)
 # ----------------------------------------------------------------------------- props (api.KIT_PROPS)
 PROPS = {
     # name -> (doc, kind, tint, billboard, scale (x, y, z), brightness)
-    'crescent_h_1': ('W1 ground crescent, Pyro: a 7 b wide golden-orange flame bow, 1.65 b high (front quad) and 3 b deep '
-                     '(top quad), centred on the display.', 'crescent_h', PYRO, 'fixed', (7.0, 1.65, 3.0), 15),
-    'crescent_h_3': ('W1 ground crescent, Electro: white-gold.', 'crescent_h', ELECTRO, 'fixed', (7.0, 1.65, 3.0), 15),
-    'crescent_v_1': ('W2 air crescent, Pyro: an upright flame crescent 2.6 b (crossed quads).', 'crescent_v', PYRO,
+    'crescent_h_1': ('W1 ground crescent, Pyro: a 7 b wide golden-orange flame bow, 1.65 b high, one standing quad facing '
+                     'its flight, centred on the display.', 'crescent_h', PYRO, 'fixed', (7.0, 1.65, 1.0), 15),
+    'crescent_h_3': ('W1 ground crescent, Electro: white-gold.', 'crescent_h', ELECTRO, 'fixed', (7.0, 1.65, 1.0), 15),
+    'crescent_v_1': ('W2 air crescent, Pyro: an upright flame crescent 2.6 b (one quad facing its flight).', 'crescent_v', PYRO,
                      'fixed', (2.6, 2.6, 2.6), 15),
     'crescent_v_3': ('W2 air crescent, Electro: white-gold.', 'crescent_v', ELECTRO, 'fixed', (2.6, 2.6, 2.6), 15),
     'feather': ('Mantle feather: a glowing gold-white blade-feather 1.6 b, vertical billboard.', 'feather_glow', WHITE,

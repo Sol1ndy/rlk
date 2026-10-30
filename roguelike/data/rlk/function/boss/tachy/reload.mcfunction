@@ -8,6 +8,7 @@ scoreboard players set #lock tk 0
 execute if score #ph tk matches 0 run return run function rlk:boss/tachy/core/intro/reload
 execute if score #ph tk matches 8 run return 0
 execute if score #pat tk matches 1..11 run function rlk:boss/tachy/core/cancel_pat
+execute if score #pat tk matches 56 run function rlk:boss/tachy/core/cancel_pat
 execute if score #pat tk matches 50 run function rlk:boss/tachy/el/swap_end
 execute if score #pat tk matches 51..53 run function rlk:boss/tachy/mantle/reload
 execute if score #pat tk matches 54 run function rlk:boss/tachy/core/tr/end

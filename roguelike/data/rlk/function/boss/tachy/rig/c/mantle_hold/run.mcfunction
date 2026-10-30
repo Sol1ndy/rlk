@@ -2,5 +2,5 @@
 execute if score @s tkRigT matches 40.. run scoreboard players set @s tkRigT 0
 execute if score @s tkRigT matches ..12 run return run function rlk:boss/tachy/rig/c/mantle_hold/b/0_12
 execute if score @s tkRigT matches ..22 run return run function rlk:boss/tachy/rig/c/mantle_hold/b/13_22
-execute if score @s tkRigT matches ..31 run return run function rlk:boss/tachy/rig/c/mantle_hold/b/23_31
-execute if score @s tkRigT matches ..39 run return run function rlk:boss/tachy/rig/c/mantle_hold/b/32_39
+execute if score @s tkRigT matches ..33 run return run function rlk:boss/tachy/rig/c/mantle_hold/b/24_33
+execute if score @s tkRigT matches ..39 run return run function rlk:boss/tachy/rig/c/mantle_hold/b/34_39

@@ -3,5 +3,5 @@ scoreboard players set #done tk 0
 function rlk:mboss/mv/face
 function rlk:boss/tachy/rig/play/c3_combo
 function rlk:boss/tachy/rig/look/chest/red
-execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.5 ~ run function rlk:boss/tachy/fx/p/core_flare {c:2}
+execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.88 ~ run function rlk:boss/tachy/fx/p/core_flare {c:2}
 function rlk:boss/tachy/fx/snd/flare_tell

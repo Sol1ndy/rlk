@@ -13,6 +13,7 @@
 //   cuts    ticks where every part takes a 1-tick key (model swaps)
 //   lines   {t: [commands]}: extra commands (the intro's cable props)
 import {accumulate as accumulateLib, sampleClip as sampleLib} from './mboss_rig_clips.mjs';
+import {FIG} from './tachy_pose.mjs';
 
 // ---- default pose: the P1 combat stance (v8 0-3, fx_a v8 6.2): weight back, the long sword low in the right hand with
 // its tip forward-right near the floor, the left arm loose, the cape hanging --------------------------------------------
@@ -325,9 +326,11 @@ C('hover_high', [K(0, HOVH), K(20, {pos: [0, .06, 0], wF: .5}), K(40, HOVH)], {s
 
 // ---- sequences: intro (PLAN §3, v1 + v2), T1 wing unfurl (v9 2.7-4.8), T2 abyss (v10 3.6-6.4), death (v11 32-39) ----------------
 {
-  // E0 hang: limp in the cables 7 b up, head down, the helmet pushed back as a hood, the sword sheathed across the lower back
-  const HANG = {...ST, hold: 0, drawn: 0, scab: 'full', hL: 'open', hR: 'open', helm: -100, hairF: 1, pos: [0, 6.7, .05], rot: [-8, 0, 2], tor: [-16, 0, 4], head: [-46, 6, 8],
-    aL: [-8, 26, .97], aR: [-4, 24, .97], fL: [.1, 6.86, .06], fR: [-.11, 6.82, .1], fpL: -55, fpR: -60, fyL: 4, fyR: 4, kL: [.1, 0, -1], kR: [-.1, 0, -1], wF: 0, wS: 0};
+  // E0 hang: limp in the cables 7 b up, head down, the helmet pushed back as a hood, the sword sheathed across the lower back.
+  // R2: the figure is x FIG; hy keeps the hang's world height (6.7 b root, the cables' length) and its relative offsets
+  const hy = y => +(y - 6.7 + 6.7 / FIG).toFixed(3);
+  const HANG = {...ST, hold: 0, drawn: 0, scab: 'full', hL: 'open', hR: 'open', helm: -100, hairF: 1, pos: [0, hy(6.7), .05], rot: [-8, 0, 2], tor: [-16, 0, 4], head: [-46, 6, 8],
+    aL: [-8, 26, .97], aR: [-4, 24, .97], fL: [.1, hy(6.86), .06], fR: [-.11, hy(6.82), .1], fpL: -55, fpR: -60, fyL: 4, fyR: 4, kL: [.1, 0, -1], kR: [-.1, 0, -1], wF: 0, wS: 0};
   // E2 prone on the floor, face down (v1 15-19, v2 1.6), the cape over the legs as a train
   const PRONE = {pos: [0, -.86, .1], rot: [-86, 0, 3], tor: [-2, 0, 0], head: [24, 16, 0], aL: [150, 30, .92], aR: [130, 34, .92],
     fL: [.13, .1, .86], fR: [-.15, .1, .9], fpL: -75, fpR: -75, fyL: 0, fyR: 0, kL: [.15, -.3, -1], kR: [-.15, -.3, -1], hairF: .5};
@@ -342,9 +345,9 @@ C('hover_high', [K(0, HOVH), K(20, {pos: [0, .06, 0], wF: .5}), K(40, HOVH)], {s
   const DRAWN0 = {hold: 1, drawn: 1, scab: 'empty', plwR: 0, gF: 0, gB: 118, gE: -48, gD: .6, cB: 0, cR: 80, th: 90, ed: 1};
   C('intro', [
     K(0, HANG), K(15, {rot: [-7, 0, -1.5], head: [-44, 4, 6]}), K(29, {rot: [-8, 0, 2], head: [-46, 6, 8]}),
-    K(30, {pos: [0, 6.55, .05], rot: [-18, 0, 4], head: [-40, 8, 10], aL: [10, 40, .97], fL: [.1, 6.7, .1]}, 'i'),
-    K(33, {pos: [0, 6.3, .06], rot: [-40, 0, -4], tor: [-20, 0, -6], head: [-30, -6, -6], aR: [20, 50, .97], fL: [.1, 6.45, .2], fR: [-.11, 6.4, .25]}, 'i'),
-    K(36, {pos: [0, 6.05, .08], rot: [-52, 0, 3], tor: [-14, 0, 2], head: [-20, 10, 4], aL: [40, 60, .97], aR: [50, 55, .97], fL: [.12, 6.2, .4], fR: [-.13, 6.15, .45]}, 'i'),
+    K(30, {pos: [0, hy(6.55), .05], rot: [-18, 0, 4], head: [-40, 8, 10], aL: [10, 40, .97], fL: [.1, hy(6.7), .1]}, 'i'),
+    K(33, {pos: [0, hy(6.3), .06], rot: [-40, 0, -4], tor: [-20, 0, -6], head: [-30, -6, -6], aR: [20, 50, .97], fL: [.1, hy(6.45), .2], fR: [-.11, hy(6.4), .25]}, 'i'),
+    K(36, {pos: [0, hy(6.05), .08], rot: [-52, 0, 3], tor: [-14, 0, 2], head: [-20, 10, 4], aL: [40, 60, .97], aR: [50, 55, .97], fL: [.12, hy(6.2), .4], fR: [-.13, hy(6.15), .45]}, 'i'),
     K(42, {...PRONE, pos: [0, -.86, .1]}, 'i'), K(44, {...PRONE, pos: [0, -.84, .1], head: [26, 18, 0]}, 'o'),
     K(52, {...PRONE, tor: [0, 0, 0]}), K(60, {...PRONE, tor: [-2, 0, 0], aL: [90, 40, .7], aR: [80, 40, .7]}),
     K(66, {pos: [0, -.72, .1], rot: [-80, 0, 0], tor: [-10, 0, 0], head: [-10, 0, 0], plL: [.22, .06, -.6], plR: [-.22, .06, -.58], plwL: 1, plwR: 1}, 'io'),

@@ -122,8 +122,42 @@ function neck() { return limb([[-.02, .055], [.10, .05]], 'tk_suit', {n: 8}); }
 function head() {
   // pivot = jaw / neck top (1.87): face, skull, ears hidden under the hair
   const e = limb([[0, ell(.055, .07, .055, .05), [0, .015]], [.05, ell(.085, .1, .085, .09), [0, .01]], [.13, ell(.098, .11, .098, .11)], [.21, ell(.09, .1, .09, .105)], [.26, ell(.05, .06, .05, .06)]], 'tk_skin', {n: 16});
-  // I1: the face card folds back at its sides (rounder from three quarters)
-  e.push(...foldedCard('face', -.112, {X0: -.088, X1: .088, Y0: .0, Y1: .2}, .05));
+  // R2 (the user: "얼굴에 굴곡이 없어서 어색함"): the face is shaped instead of one folded card (I1): a flat middle (the eyes,
+  // the mouth), cheek planes turning back in two steps (22.5, then 45 deg), the forehead above the brows and the chin
+  // under the mouth tipping back (a brow line and a tapered jaw in profile), a small nose wedge (bridge flush, tip out).
+  // The anime paint is one sprite mapped across every plane by the unfolded position, so it reads unbroken from the front.
+  e.push(...faceRelief());
+  return e;
+}
+// the face sprite coordinates of an unfolded face point: u across X -0.088..0.088 (the sprite is 0.176 x 0.2 b), v down
+// from the hairline (Y 0.2) to the chin (Y 0)
+const FX = .088, FH = .2, FZ = -.114;
+const faceUV = (gx, gy) => [16 * (gx + FX) / (2 * FX), 16 * (FH - gy) / FH];
+function faceStrip({X0, X1, Y0, Y1, z}, gmap, rot) {
+  // one card of the face in the plane z (seen from -Z), its sprite read at the unfolded position gmap(P) = [gx, gy]
+  return faceEl([[X0, Y0, z], [X1, Y1, z]], {front: {tex: 'face', fn: P => faceUV(...gmap(P))}}, {shade: false, rot});
+}
+function faceRelief() {
+  const e = [], C0 = .055, C1 = .075, YC = .03, YF = .15, c22 = Math.cos(Math.PI / 8), s22 = Math.sin(Math.PI / 8);
+  const id = P => [P[0], P[1]];
+  // the middle: eyes, nose line, mouth (flat); the forehead and the chin tip back about their fold lines
+  e.push(faceStrip({X0: -C0, X1: C0, Y0: YC, Y1: YF, z: FZ}, id));
+  e.push(faceStrip({X0: -C0, X1: C0, Y0: YF, Y1: FH, z: FZ}, id, ['x', 22.5, [0, YF, FZ]]));
+  e.push(faceStrip({X0: -C0, X1: C0, Y0: 0, Y1: YC, z: FZ}, id, ['x', -22.5, [0, YC, FZ]]));
+  for (const s of [1, -1]) {
+    // the inner cheek plane (22.5 deg back from the middle's edge) and the outer one (45 deg, from the inner one's edge)
+    const a = s > 0 ? [C0, C1] : [-C1, -C0];
+    e.push(faceStrip({X0: a[0], X1: a[1], Y0: 0, Y1: FH, z: FZ}, id, ['y', -s * 22.5, [s * C0, 0, FZ]]));
+    const ox = s * (C0 + (C1 - C0) * c22), oz = FZ + (C1 - C0) * s22, w = FX + .004 - C1;
+    const b = s > 0 ? [ox, ox + w] : [ox - w, ox];
+    e.push(faceStrip({X0: b[0], X1: b[1], Y0: 0, Y1: FH, z: oz}, P => [s * C1 + (P[0] - ox), P[1]], ['y', -s * 45, [ox, 0, oz]]));
+  }
+  // the nose: a thin wedge on the middle (the bridge between the eyes flush, the tip 0.016 b out), painted with the face
+  // sprite at its own place (the soft shade under the tip continues)
+  const nb = [[-.0075, .062, FZ - .006], [.0075, .094, FZ]];
+  e.push(faceEl(nb, {front: {tex: 'face', fn: P => faceUV(P[0], P[1])}, left: {tex: 'face', fn: P => faceUV(.004, P[1])},
+    right: {tex: 'face', fn: P => faceUV(-.004, P[1])}, down: {tex: 'face', fn: P => faceUV(P[0], .062)}},
+  {shade: false, rot: ['x', 22.5, [0, .094, FZ]]}));
   return e;
 }
 function hairTop() {
@@ -389,8 +423,28 @@ function blockModels() {
   M.skull = skull(); M.grid = grid();
   // the intro cable prop: a unit segment along +Y (display scale [w, length, w]), centred on its axis
   M.cable = [box([-.5, 0, -.5], [.5, 1, .5], 'tk_black')];
+  for (const [n, g] of Object.entries(GIRTH)) if (M[n]) M[n] = girth(M[n], g);
   return M;
 }
+// R2 (the user: "앙상해 보임"): the armour and the limbs bulk up across their axis (a strong armoured woman, not a brute;
+// the head keeps its size): [x, y, z] multipliers about the part pivot, the limb axis (y) unchanged (the joints do not move)
+export const GIRTH = {
+  pelvis: [1.15, 1, 1.1], tassets: [1.16, 1.05, 1.12], abdomen: [1.1, 1, 1.08], chest: [1.12, 1, 1.08],
+  collar: [1.15, 1.05, 1.12], spine_pack: [1.12, 1.05, 1.05], neck: [1.2, 1, 1.2],
+  shoulder_l: [1.3, 1.2, 1.25], shoulder_r: [1.25, 1.15, 1.2],
+  upper_arm_l: [1.25, 1, 1.25], upper_arm_r: [1.2, 1, 1.2], forearm_l: [1.25, 1, 1.25], forearm_r: [1.12, 1, 1.12],
+  hand_l_open: [1.1, 1.05, 1.1], hand_l_grip: [1.1, 1.05, 1.1], hand_r_open: [1.08, 1.05, 1.08], hand_r_grip: [1.08, 1.05, 1.08],
+  hand_r_fist: [1.08, 1.05, 1.08],
+  thigh_l: [1.22, 1, 1.2], thigh_r: [1.22, 1, 1.2], shin_l: [1.15, 1, 1.15], shin_r: [1.15, 1, 1.15],
+  foot_l: [1.12, 1.05, 1.05], foot_r: [1.12, 1.05, 1.05],
+  cape_l1: [1.12, 1, 1.05], cape_r1: [1.12, 1, 1.05], cape_l2: [1.1, 1, 1], cape_r2: [1.1, 1, 1], cape_l3: [1.08, 1, 1], cape_r3: [1.08, 1, 1],
+};
+// an element list scaled about the pivot (model coordinates are 8 + block offsets: m = (8 - X, 8 + Y, 8 + Z))
+function girth(els, g) {
+  const sc = v => v.map((x, i) => r4(8 + (x - 8) * g[i]));
+  return els.map(e => ({...e, from: sc(e.from), to: sc(e.to), ...(e.rotation ? {rotation: {...e.rotation, origin: sc(e.rotation.origin)}} : {})}));
+}
+const r4 = v => Math.round(v * 1e4) / 1e4;
 // the display scale a model is shown at (the part that uses it)
 export const MODEL_SCALE = {sword: 1.5, edge: 1.5, edge_p: 1.5, edge_e: 1.5, scabbard: 1.5, scabbard_full: 1.5, tendril: 1.25};
 export const TINTED_MODELS = new Set(['skull', 'grid', 'edge']);

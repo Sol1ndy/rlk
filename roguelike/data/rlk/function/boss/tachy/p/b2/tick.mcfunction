@@ -1,8 +1,13 @@
 # B2 옆걸음 4연격: one pattern tick (#pt tk = 1..78); events in k/<t>.
-execute if score #pt tk matches 18..21 at @s unless entity @e[tag=rlk_body,distance=..2.2,limit=1] run function rlk:mboss/mv/step {d:0.375}
-execute if score #pt tk matches 23..36 run function rlk:mboss/mv/turn {max:6}
-execute if score #pt tk matches 45..46 run function rlk:mboss/mv/turn {max:8}
-execute if score #pt tk matches 55..56 run function rlk:mboss/mv/turn {max:8}
+execute if score #pt tk matches 14 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt tk matches 14..16 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.3}
+execute if score #pt tk matches 18..21 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.375}
+execute if score #pt tk matches 23..36 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt tk matches 24..42 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.3}
+execute if score #pt tk matches 45..46 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt tk matches 46..52 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.3}
+execute if score #pt tk matches 55..56 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt tk matches 56..62 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.3}
 execute if score #pt tk matches 12 run function rlk:mboss/mv/face
 execute if score #pt tk matches 21 run function rlk:boss/tachy/p/b2/k/21
 execute if score #pt tk matches 22 run function rlk:boss/tachy/p/b2/k/22

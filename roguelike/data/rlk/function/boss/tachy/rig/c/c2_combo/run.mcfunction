@@ -7,5 +7,5 @@ execute if score @s tkRigT matches ..33 run return run function rlk:boss/tachy/r
 execute if score @s tkRigT matches ..41 run return run function rlk:boss/tachy/rig/c/c2_combo/b/34_41
 execute if score @s tkRigT matches ..49 run return run function rlk:boss/tachy/rig/c/c2_combo/b/42_49
 execute if score @s tkRigT matches ..58 run return run function rlk:boss/tachy/rig/c/c2_combo/b/50_58
-execute if score @s tkRigT matches ..68 run return run function rlk:boss/tachy/rig/c/c2_combo/b/60_68
-execute if score @s tkRigT matches ..73 run return run function rlk:boss/tachy/rig/c/c2_combo/b/70_73
+execute if score @s tkRigT matches ..67 run return run function rlk:boss/tachy/rig/c/c2_combo/b/59_67
+execute if score @s tkRigT matches ..73 run return run function rlk:boss/tachy/rig/c/c2_combo/b/68_73

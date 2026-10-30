@@ -1,10 +1,12 @@
 # C1 연속기 · 블링크: one pattern tick (#pt tk = 1..92); events in k/<t>.
-execute if score #pt tk matches 1..6 run function rlk:mboss/mv/turn {max:6}
-execute if score #pt tk matches 15..24 run function rlk:mboss/mv/turn {max:6}
-execute if score #pt tk matches 16..24 at @s unless entity @e[tag=rlk_body,distance=..3,limit=1] run function rlk:mboss/mv/step {d:0.15}
-execute if score #pt tk matches 33..38 run function rlk:mboss/mv/turn {max:6}
-execute if score #pt tk matches 47..50 run function rlk:mboss/mv/turn {max:6}
-execute if score #pt tk matches 48..50 at @s unless entity @e[tag=rlk_body,distance=..3,limit=1] run function rlk:mboss/mv/step {d:0.15}
+execute if score #pt tk matches 1..6 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt tk matches 2..12 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.3}
+execute if score #pt tk matches 15..24 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt tk matches 16..30 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.3}
+execute if score #pt tk matches 33..38 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt tk matches 34..44 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.22}
+execute if score #pt tk matches 47..50 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt tk matches 48..56 at @s unless entity @e[tag=rlk_body,distance=..2.4,limit=1] run function rlk:mboss/mv/step {d:0.3}
 execute if score #pt tk matches 13 run function rlk:boss/tachy/p/c1/k/13
 execute if score #pt tk matches 14 run function rlk:boss/tachy/p/c1/k/14
 execute if score #pt tk matches 31 run function rlk:boss/tachy/p/c1/k/31

@@ -19,4 +19,5 @@ execute if score #pat tk matches 52 run return run function rlk:boss/tachy/mantl
 execute if score #pat tk matches 53 run return run function rlk:boss/tachy/mantle/nova_tick
 execute if score #pat tk matches 54 run return run function rlk:boss/tachy/core/tr/tick
 execute if score #pat tk matches 55 run return run function rlk:boss/tachy/core/replay/tick
+execute if score #pat tk matches 56 run return run function rlk:boss/tachy/core/close/tick
 function rlk:boss/tachy/ai/recover

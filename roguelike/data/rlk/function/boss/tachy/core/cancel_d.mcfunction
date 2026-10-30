@@ -10,3 +10,4 @@ execute if score #pat tk matches 8 run function rlk:boss/tachy/p/k/cancel
 execute if score #pat tk matches 9 run function rlk:boss/tachy/p/w1/cancel
 execute if score #pat tk matches 10 run function rlk:boss/tachy/p/w2/cancel
 execute if score #pat tk matches 11 run function rlk:boss/tachy/p/l/cancel
+execute if score #pat tk matches 56 run function rlk:boss/tachy/core/close/cancel

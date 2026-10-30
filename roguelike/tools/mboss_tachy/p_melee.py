@@ -40,9 +40,21 @@ def strike(pb, idx, t, kind='arc', roll=0, pitch=0, yaw=0, r=None, grp=False, im
         pb.at(t, S.fx_impact(el, fwd=min(r * 0.6, 2.4)))
 
 
-def lock_track(pb, prev, t, deg=6):
-    """Track the player from prev + 1 until LOCK ticks before the hit at t."""
+def lock_track(pb, prev, t, deg=10):
+    """Track the player from prev + 1 until LOCK ticks before the hit at t (R2: 10 deg / t, was 6)."""
     pb.track(prev + 1, t - S.LOCK, deg)
+
+
+# R2 (the user: "멀리 있는데도 근접공격을 해서 피하기가 너무 쉽다"): every swing of a chain steps in toward the player first
+# (forward along her facing, mv/step: mv/ok-checked, STEP b / t, until within STOP b), so a player who stands still is in
+# reach of every hit; the aim still locks LOCK ticks before the hit (she keeps stepping along the locked line).
+STEP, STOP = 0.3, 2.4
+KB0, KB1 = api.KB_CHAIN, api.KB_FINAL
+
+
+def step_in(pb, prev, t, d=STEP, stop=STOP):
+    """Step in on prev + 2 .. t - 2 (at most (t - prev - 3) x d blocks)."""
+    pb.advance(prev + 2, t - 2, d, stop)
 
 
 # ------------------------------------------------------------------------------------------------- A1 돌진 베기
@@ -71,17 +83,17 @@ def build_b1(W):
     c = 'b1_wrap2'
     op, h1, h2, end = E(c, 'open'), E(c, 'hit1'), E(c, 'hit2'), E(c, 'end')
     pb.at(0, FACE, api.play(c), S.snd('step'))
-    # from mid range she walks in during the wrap (0.12 b/t) until 3 b
-    pb.rng(1, op - 2, 'execute at @s unless entity @e[tag=rlk_body,distance=..3,limit=1] run function rlk:mboss/mv/toward {d:0.12}')
+    # she closes in during the wrap (R2: the tracking step-in of every chain, was a 0.12 b/t walk to 3 b)
     lock_track(pb, 0, h1)
-    pb.at(op, S.fx_plain('wing_flare', [], pos='~ ~1.4 ~'))
-    pb.hit(0)
+    step_in(pb, 0, h1)
+    pb.at(op, S.fx_plain('wing_flare', [], pos=f'~ ~{S.H(1.4)} ~'))
+    pb.hit(0, kb=KB0)
     strike(pb, 0, h1, roll=0)
-    pb.advance(h1 + 2, h1 + 7, 0.17, 2.0)                    # 1 b in
+    step_in(pb, h1, h2)
     lock_track(pb, h1, h2)
     pb.group(h2 - 1)
-    pb.hit(1, grp=True)
-    pb.hit(2, grp=True)
+    pb.hit(1, grp=True, kb=KB1)
+    pb.hit(2, grp=True, kb=KB1)
     strike(pb, 1, h2, roll=-40, pitch=-20, impact=True)
     pb.end(end)
     pb.write()
@@ -105,19 +117,24 @@ def build_b2(W):
         'execute at @s rotated as @s rotated ~ 0 positioned ^3 ^ ^ if function rlk:mboss/mv/ok '
         'run return run function rlk:mboss/mv/leap {t:12,h:6}'])
     pb.at(land - 2, FACE)                                    # she lands facing the player (the turn of B2)
-    pb.advance(h1 - 4, h1 - 1, 0.375, 2.2)                   # the lunge (1.5 b)
-    pb.hit(0)
+    lock_track(pb, land - 1, h1)
+    step_in(pb, land - 2, h1 - 4)
+    pb.advance(h1 - 4, h1 - 1, 0.375, STOP)                  # the lunge (1.5 b)
+    pb.hit(0, kb=KB0)
     strike(pb, 0, h1, roll=25)
     lock_track(pb, h1, h2)
+    step_in(pb, h1, h2)
     pb.at(raise_, look('edge', 'glint'), S.snd('flare_tell'))
-    pb.hit(1)
+    pb.hit(1, kb=KB0)
     strike(pb, 1, h2, roll=90, impact=True)
     pb.at(h2, EDGE_BACK)
-    lock_track(pb, h2, h3, 8)
-    pb.hit(2)
+    lock_track(pb, h2, h3)
+    step_in(pb, h2, h3)
+    pb.hit(2, kb=KB0)
     strike(pb, 2, h3, roll=5)
-    lock_track(pb, h3, h4, 8)
-    pb.hit(3)
+    lock_track(pb, h3, h4)
+    step_in(pb, h3, h4)
+    pb.hit(3, kb=KB1)
     strike(pb, 3, h4, roll=175)
     pb.end(end)
     pb.cancel_lines.append(f'execute as {S.BODY} at @s run {EDGE_BACK}')
@@ -138,21 +155,28 @@ def build_b3(W):
     pb.at(dash - 1, FACE)
     pb.dash(dash, h1 - dash, 12.0, stop_before=2.5)          # dash-in to 2.5 b (no hit while dashing)
     pb.at(dash, S.snd('dash'))
-    pb.hit(0)
-    strike(pb, 0, h1, roll=-10, r=5.0)
+    pb.hit(0, kb=KB0)
+    strike(pb, 0, h1, roll=-10)
     lock_track(pb, h1, h2)
-    pb.hit(1)
+    step_in(pb, h1, h2)
+    pb.hit(1, kb=KB0)
     strike(pb, 1, h2, roll=170)
     lock_track(pb, h2, h3)
-    pb.hit(2)
+    step_in(pb, h2, h3)
+    pb.hit(2, kb=KB0)
     strike(pb, 2, h3, roll=10)
     pb.at(raise_, look('edge', 'glint'))
+    prev = h3
     for i, b in enumerate(bangs):
-        # re-aimed at each raise (<= 30 degrees, once, 10 t before the chop), then locked
+        # re-aimed at each raise (<= 30 degrees, once, 10 t before the chop), then locked; R2: a step in before each,
+        # only the last chop knocks back
         pb.at(b - 10, 'function rlk:mboss/mv/turn {max:30}')
+        step_in(pb, prev, b)
+        kb = KB1 if i == len(bangs) - 1 else KB0
         pb.group(b - 1)
-        pb.hit(3 + 2 * i, grp=True, kb=2)
-        pb.hit(4 + 2 * i, grp=True, kb=2)
+        pb.hit(3 + 2 * i, grp=True, kb=kb)
+        pb.hit(4 + 2 * i, grp=True, kb=kb)
+        prev = b
         # overhead chop (I1, S1K K3 checked against the kit arc): a vertical blade plane (roll 90 = top -> bottom), the aim
         # raised 62 deg so the 164 deg sweep runs from behind her head over the top to 20 deg below level ahead; its
         # lowest painted point stays 0.2 b above the floor (pivot body + 1.2, reach 3.2)
@@ -190,9 +214,8 @@ def build_c(key, W):
     for idx, ev, kind, roll, pitch, step in hits:
         t = E(clip, ev)
         lock_track(pb, prev, t)
-        if step:
-            pb.advance(prev + 2, t - S.LOCK, 0.15, 3.0)
-        pb.hit(idx)
+        step_in(pb, prev, t, d=STEP if step or prev == 0 else 0.22)
+        pb.hit(idx, kb=KB0)
         strike(pb, idx, t, kind=kind, roll=roll, pitch=pitch, impact=(kind == 'spin'))
         prev = t
     # glint: the point is locked (face the player once), the blade flashes gold; thrust 18 t later

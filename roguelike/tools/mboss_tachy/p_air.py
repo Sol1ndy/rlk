@@ -171,20 +171,20 @@ AT_BODY = 'at @s rotated as @s rotated ~ 0'
 
 def blink_out_fx():
     return fx('blink_out', [part(GOLD, 0.4, 0.8, 0.4, 0, 24), part(WHITE, 0.3, 0.7, 0.3, 0.05, 10)],
-              AT_BODY + ' positioned ~ ~1.2 ~') + snd('blink_out')
+              AT_BODY + f' positioned ~ ~{S.H(1.2)} ~') + snd('blink_out')
 
 
 def blink_in_fx():
     return fx('blink_in', [part(GOLD, 0.4, 0.8, 0.4, 0, 24), part(WHITE, 0.3, 0.7, 0.3, 0.05, 10)],
-              AT_BODY + ' positioned ~ ~1.2 ~') + snd('blink_in')
+              AT_BODY + f' positioned ~ ~{S.H(1.2)} ~') + snd('blink_in')
 
 
 def glint_fx():
-    return fx('glint', [part(WHITE, 0.05, 0.05, 0.05, 0.02, 6)], AT_BODY + ' positioned ^-0.4 ^1.6 ^1.4') + snd('glint')
+    return fx('glint', [part(WHITE, 0.05, 0.05, 0.05, 0.02, 6)], AT_BODY + f' positioned ^-{S.H(0.4)} ^{S.H(1.6)} ^{S.H(1.4)}') + snd('glint')
 
 
 def wing_fx():
-    return fx('wing_flare', [part(GOLD, 0.9, 0.5, 0.9, 0, 16)], AT_BODY + ' positioned ~ ~1.4 ~')
+    return fx('wing_flare', [part(GOLD, 0.9, 0.5, 0.9, 0, 16)], AT_BODY + f' positioned ~ ~{S.H(1.4)} ~')
 
 
 # ------------------------------------------------------------------------------------------------- hazards
@@ -366,8 +366,10 @@ K_R = 4.5
 # reappear candidates (yaw offset from the player's facing, distance): the front arc first, then the sides, behind last
 K_SPOTS = [(0, 4.5), (30, 4.5), (60, 4.5), (90, 4.5), (120, 4.5), (180, 4.5),
            (0, 3.5), (45, 3.5), (90, 3.5), (135, 3.5), (180, 3.5), (0, 5.5), (45, 5.5), (90, 5.5)]
-K_HOLD = {'p12': (20, 60), 'p3': (10, 40)}
-K_GONE = 24
+# R2 (the user: "블링크 tp하고 나서 대기가 너무 긺"): a short readable beat after the reappearance, then the glint (16 t to the
+# thrust); gone 12 t (was hold 20-60 / P3 10-40, gone 24)
+K_HOLD = {'p12': (8, 14), 'p3': (6, 10)}
+K_GONE = 12
 K_LEAP_H = 6.0
 
 
@@ -386,7 +388,7 @@ def build_k(W):
     out.at(0, FACE, api.play('blink_out'), blink_out_fx())
     out.at(gone, 'tag @s add rlk_mb_inv', api.rig('state/hidden'))
     out.to(gone + K_GONE, 'in')
-    # 2 in: reappear 4.5 b from the player (p/k/spot), blink_in, then hold 20-60 t (P3 10-40) facing the player
+    # 2 in: reappear 4.5 b from the player (p/k/spot), blink_in, then hold K_HOLD (8-14 t, P3 6-10) facing the player
     hp = K_HOLD['p12']
     h3 = K_HOLD['p3']
     inn = sm.st('in')
@@ -581,7 +583,7 @@ def build_w2(W):
     for i, t in enumerate(cs):
         clip_, ev_, shape, dims, tier, el = hits[i]
         assert shape == 'pj_ball' and E(clip_, ev_) == t
-        air.at(t, FACE, f'execute {AT_BODY} positioned ^ ^1.6 ^0.8 run {fn("p/w2/wave")}',
+        air.at(t, FACE, f'execute {AT_BODY} positioned ^ ^{S.H(1.6)} ^{S.H(0.8)} run {fn("p/w2/wave")}',
                S.fx_slash(2.6, el, roll=90, lift=api.HOVER_Y - api.CY), snd('wave_release'))
     air.at(pull, look('edge', 'glint'), wing_fx(), snd('air_swoop'))
     air.at(lock_t, lock_lines(key, 'rlk_tk_w2lock'), face_to('rlk_tk_w2lock'))
@@ -645,7 +647,9 @@ def build_w2(W):
 
 
 # ------------------------------------------------------------------------------------------------- L 착지 공격
-L_HOVER = (80, 120)
+# R2 (the user: "공중 낙하 공격은 공중 체류 시간이 과도하게 긺"): 30-45 t airborne before the dive (leap 16 + hover 14-29);
+# was hover 80-120
+L_HOVER = (14, 29)
 L_FOLLOW = 0.15
 L_GLINT_EVERY = 30
 L_INV = 8                       # rlk_mb_inv from this tick of the leap (>= 4 b up) until the dive starts
@@ -667,14 +671,14 @@ def build_l(W):
     up.at(4, f'execute at @s positioned ~ {num(api.HIGH_Y)} ~ run function rlk:mboss/mv/glide {{t:{gone_high - 4}}}')
     up.at(L_INV, 'tag @s add rlk_mb_inv')
     up.to(gone_high, 'hv')
-    # 2 hv: the small glinting silhouette follows the player (0.15 b/t), glints every 30 t, 80-120 t; the dive cue 6 t
+    # 2 hv: the small glinting silhouette follows the player (0.15 b/t), glints 4 t in and every 30 t, L_HOVER t; the dive cue 6 t
     # before the dive
     hv = sm.st('hv')
     hv.at(0, api.play('hover_high'), f'execute store result score #l_h {OBJ} run random value {L_HOVER[0]}..{L_HOVER[1]}',
           f'scoreboard players operation #l_q {OBJ} = #l_h {OBJ}', f'scoreboard players remove #l_q {OBJ} {L_CUE}',
-          sset('#l_g', L_GLINT_EVERY))
+          sset('#l_g', 4))
     glint = fx('high_glint', [part(WHITE, 0.2, 0.2, 0.2, 0.05, 8), part(GOLD, 0.3, 0.3, 0.3, 0, 6)],
-               AT_BODY + ' positioned ~ ~1.4 ~') + snd('high_glint')
+               AT_BODY + f' positioned ~ ~{S.H(1.4)} ~') + snd('high_glint')
     W.w('p/l/glint', ['# L high glint (@s = body).'] + glint)
     hv.every(fn('p/l/follow'), turn(10), f'scoreboard players remove #l_g {OBJ} 1',
              f'execute if score #l_g {OBJ} matches ..0 run {fn("p/l/glint_t")}')
@@ -723,7 +727,7 @@ def _mk(key, f):
 
 PATTERNS = [
     api.Pattern('k', S.TID['k'], ('blink_out', 'blink_in', 'k_hold', 'k_glint', 'k_leap', 'k_plunge'), _mk('k', build_k),
-                notes='vanish 24 t, reappear 4.5 b in front, hold, glint -> thrust, leap, sky arcs -> plunge; P3 K2'),
+                notes='vanish 12 t, reappear 4.5 b in front, hold 8-14 t, glint -> thrust, leap, sky arcs -> plunge; P3 K2'),
     api.Pattern('w1', S.TID['w1'], ('backstep', 'blink_out', 'blink_in', 'w1_wave'), _mk('w1', build_w1),
                 notes='blink to >= 12 b first if nearer; 40 t charge (G3 6..39), three crescents re-aimed'),
     api.Pattern('w2', S.TID['w2'], ('leap_up', 'w2_air', 'w2_dive', 'land'), _mk('w2', build_w2),

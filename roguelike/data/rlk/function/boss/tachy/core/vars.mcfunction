@@ -29,6 +29,8 @@ scoreboard players set #ai_mv tk 0
 scoreboard players set #ai_d2 tk 0
 scoreboard players set #hud_g tk 0
 scoreboard players set #hud_c tk 0
+scoreboard players set #ai_oor tk 0
+scoreboard players set #cl_q tk 0
 scoreboard players set #el tk 1
 scoreboard players set #taken tk 100
 scoreboard players set #kgap tk 9

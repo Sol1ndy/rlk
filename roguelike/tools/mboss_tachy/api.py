@@ -60,7 +60,9 @@ def arena_look(look):
 
 # =============================================================================================
 # 2. Damage, elements, hits (PLAN §4.1-4.2)
-DMG = {'T1': 35, 'T2': 50, 'T3': 68, 'T4': 85}      # % of the base hit (mboss/hurt coefficient)
+# % of the base hit (mboss/hurt coefficient). R2: x 0.83 (35 / 50 / 68 / 85 before): the chains now land on a player who
+# stands or walks in (no knockback between hits, tracking, the gap closer), so the same tiers cost about 20 % more
+DMG = {'T1': 29, 'T2': 42, 'T3': 56, 'T4': 71}
 NOVA_PM = 250                                          # pl_dot per mille, non-lethal
 FEATHER_TIER = 'T1'
 PYRO, ELECTRO = 1, 3                                   # #elem numbering
@@ -70,34 +72,44 @@ EL_U = 1000                                            # 1U per hit
 # el: 'cur' = the current blade element (G1), or a fixed element
 # HITS[pattern] = [(clip, event, shape, dims, tier, el)]; shapes: sector(r, half_deg), disc(r), line(len, w),
 # pj_blade(hr, speed, life), pj_ball(hr, speed, life), dash_line(w) (length = the dash), full()
+# R2 (10-30, the user: "보스가 너무 작음 · 앙상해 보임"): the figure is SIZE x the D0 design (2.25 b -> 2.81 b) and her
+# blade reach grows with it (REACH x every melee radius / width; the W1 / W2 crescents, the L shock and the mantle keep
+# theirs). The numbers in HITS are the scaled ones.
+SIZE = 1.25
+REACH = 1.2
+_R = lambda v: round(v * REACH, 1)   # noqa: E731
 HITS = {
-    'a1': [('a1_dash', 'go', 'dash_line', (1.6,), 'T2', 'cur'), ('a1_dash', 'hit', 'sector', (3.4, 60), 'T2', 'cur')],
-    'b1': [('b1_wrap2', 'hit1', 'sector', (3.8, 75), 'T2', 'cur'), ('b1_wrap2', 'hit2', 'sector', (3.4, 60), 'T3', 'cur'),
-           ('b1_wrap2', 'hit2', 'disc', (1.6,), 'T3', 'cur')],
-    'b2': [('b2_side4', 'hit1', 'sector', (3.6, 60), 'T2', 'cur'), ('b2_side4', 'hit2', 'line', (5.0, 1.8), 'T3', 'cur'),
-           ('b2_side4', 'hit3', 'sector', (3.2, 90), 'T1', 'cur'), ('b2_side4', 'hit4', 'sector', (3.2, 90), 'T1', 'cur')],
-    'b3': [('b3_six', 'hit1', 'sector', (5.0, 85), 'T2', 'cur'), ('b3_six', 'hit2', 'sector', (3.6, 70), 'T1', 'cur'),
-           ('b3_six', 'hit3', 'sector', (3.6, 70), 'T1', 'cur'),
-           ('b3_six', 'bang1', 'sector', (3.2, 45), 'T3', PYRO), ('b3_six', 'bang1', 'disc', (1.4,), 'T3', PYRO),
-           ('b3_six', 'bang2', 'sector', (3.2, 45), 'T3', PYRO), ('b3_six', 'bang2', 'disc', (1.4,), 'T3', PYRO),
-           ('b3_six', 'bang3', 'sector', (3.2, 45), 'T3', PYRO), ('b3_six', 'bang3', 'disc', (1.4,), 'T3', PYRO)],
-    'c1': [('c1_combo', 'h1', 'sector', (3.6, 70), 'T1', 'cur'), ('c1_combo', 'h2', 'disc', (4.2,), 'T2', 'cur'),
-           ('c1_combo', 'h3', 'sector', (3.4, 70), 'T1', 'cur'), ('c1_combo', 'h4', 'sector', (4.0, 80), 'T2', 'cur'),
-           ('c1_combo', 'thrust', 'dash_line', (1.8,), 'T3', 'cur')],
-    'c2': [('c2_combo', 'h1', 'sector', (3.4, 70), 'T1', 'cur'), ('c2_combo', 'h2', 'sector', (3.4, 70), 'T1', 'cur'),
-           ('c2_combo', 'h3', 'sector', (3.6, 70), 'T2', 'cur'), ('c2_combo', 'thrust', 'dash_line', (1.8,), 'T3', 'cur')],
-    'c3': [('c3_combo', 'h1', 'sector', (3.4, 70), 'T1', 'cur'), ('c3_combo', 'h2', 'sector', (3.4, 70), 'T1', 'cur'),
-           ('c3_combo', 'h3', 'sector', (3.4, 70), 'T1', 'cur'), ('c3_combo', 'h4', 'sector', (3.8, 75), 'T2', 'cur'),
-           ('c3_combo', 'h5', 'sector', (3.8, 75), 'T2', 'cur'), ('c3_combo', 'thrust', 'dash_line', (1.8,), 'T3', 'cur')],
-    'k': [('k_glint', 'thrust', 'dash_line', (1.8,), 'T3', 'cur'), ('k_plunge', 'hit', 'disc', (3.5,), 'T4', ELECTRO)],
+    'a1': [('a1_dash', 'go', 'dash_line', (_R(1.6),), 'T2', 'cur'), ('a1_dash', 'hit', 'sector', (_R(3.4), 60), 'T2', 'cur')],
+    'b1': [('b1_wrap2', 'hit1', 'sector', (_R(3.8), 75), 'T2', 'cur'), ('b1_wrap2', 'hit2', 'sector', (_R(3.4), 60), 'T3', 'cur'),
+           ('b1_wrap2', 'hit2', 'disc', (_R(1.6),), 'T3', 'cur')],
+    'b2': [('b2_side4', 'hit1', 'sector', (_R(3.6), 60), 'T2', 'cur'), ('b2_side4', 'hit2', 'line', (_R(5.0), _R(1.8)), 'T3', 'cur'),
+           ('b2_side4', 'hit3', 'sector', (_R(3.2), 90), 'T1', 'cur'), ('b2_side4', 'hit4', 'sector', (_R(3.2), 90), 'T1', 'cur')],
+    # R2: the three bangs T2 (were T3): all six now land on a standing player (P3 standing loss <= 1.8 x the Guardian's)
+    'b3': [('b3_six', 'hit1', 'sector', (_R(5.0), 85), 'T2', 'cur'), ('b3_six', 'hit2', 'sector', (_R(3.6), 70), 'T1', 'cur'),
+           ('b3_six', 'hit3', 'sector', (_R(3.6), 70), 'T1', 'cur'),
+           ('b3_six', 'bang1', 'sector', (_R(3.2), 45), 'T2', PYRO), ('b3_six', 'bang1', 'disc', (_R(1.4),), 'T2', PYRO),
+           ('b3_six', 'bang2', 'sector', (_R(3.2), 45), 'T2', PYRO), ('b3_six', 'bang2', 'disc', (_R(1.4),), 'T2', PYRO),
+           ('b3_six', 'bang3', 'sector', (_R(3.2), 45), 'T2', PYRO), ('b3_six', 'bang3', 'disc', (_R(1.4),), 'T2', PYRO)],
+    'c1': [('c1_combo', 'h1', 'sector', (_R(3.6), 70), 'T1', 'cur'), ('c1_combo', 'h2', 'disc', (_R(4.2),), 'T2', 'cur'),
+           ('c1_combo', 'h3', 'sector', (_R(3.4), 70), 'T1', 'cur'), ('c1_combo', 'h4', 'sector', (_R(4.0), 80), 'T2', 'cur'),
+           ('c1_combo', 'thrust', 'dash_line', (_R(1.8),), 'T3', 'cur')],
+    'c2': [('c2_combo', 'h1', 'sector', (_R(3.4), 70), 'T1', 'cur'), ('c2_combo', 'h2', 'sector', (_R(3.4), 70), 'T1', 'cur'),
+           ('c2_combo', 'h3', 'sector', (_R(3.6), 70), 'T2', 'cur'), ('c2_combo', 'thrust', 'dash_line', (_R(1.8),), 'T3', 'cur')],
+    'c3': [('c3_combo', 'h1', 'sector', (_R(3.4), 70), 'T1', 'cur'), ('c3_combo', 'h2', 'sector', (_R(3.4), 70), 'T1', 'cur'),
+           ('c3_combo', 'h3', 'sector', (_R(3.4), 70), 'T1', 'cur'), ('c3_combo', 'h4', 'sector', (_R(3.8), 75), 'T2', 'cur'),
+           ('c3_combo', 'h5', 'sector', (_R(3.8), 75), 'T2', 'cur'), ('c3_combo', 'thrust', 'dash_line', (_R(1.8),), 'T3', 'cur')],
+    'k': [('k_glint', 'thrust', 'dash_line', (_R(1.8),), 'T3', 'cur'), ('k_plunge', 'hit', 'disc', (_R(3.5),), 'T4', ELECTRO)],
     'w1': [('w1_wave', e, 'pj_blade', (3.5, 1.25, 32), 'T2', 'cur') for e in ('wave1', 'wave2', 'wave3')],
     'w2': [('w2_air', e, 'pj_ball', (1.3, 1.1, 30), 'T2', 'cur') for e in ('c1', 'c2', 'c3')]
-          + [('w2_dive', 'slash', 'sector', (4.5, 80), 'T4', 'cur')],
-    'l': [('dive', 'impact', 'disc', (1.4,), 'T2', ELECTRO), ('l_shock', 'shock', 'disc', (5.5,), 'T4', ELECTRO)],
+          + [('w2_dive', 'slash', 'sector', (_R(4.5), 80), 'T4', 'cur')],
+    'l': [('dive', 'impact', 'disc', (_R(1.4),), 'T2', ELECTRO), ('l_shock', 'shock', 'disc', (5.5,), 'T4', ELECTRO)],
     'mantle': [('mantle_hold', None, 'pj_ball', (1.8, 0.5, 16), 'T1', ELECTRO),
                ('mantle_nova', 'hit', 'full', (), 'NOVA', ELECTRO)],
 }
-DASH_LEN = {'a1': 12.0, 'c1': 7.0, 'c2': 7.0, 'c3': 7.0, 'k': 6.0, 'w2': 14.0}   # max dash lengths (b)
+# R2: only the last hit of a melee chain knocks back (#hzKB); the earlier ones stay put so the chain is not broken by its
+# own knockback (the user: "넉백때문에 공격범위에서 벗어나 마지막 2~3 번째 공격은 안 맞음")
+KB_CHAIN, KB_FINAL = 0, 3
+DASH_LEN = {'a1': 12.0, 'c1': 8.0, 'c2': 8.0, 'c3': 8.0, 'k': 7.0, 'w2': 14.0}   # max dash lengths (b)
 TELL_MIN, TELL_BIG, COMBO_GAP = 12, 20, 10       # PLAN §4.1 (first visible motion -> hit; follow-ups apart)
 NO_DECALS = True                                 # every Tachy hazard is #hzQuiet 1, no ground telegraph (PLAN §1.2)
 
@@ -130,18 +142,21 @@ REAR_DEG, REAR_DWELL = 60, (20, 30)              # rear zone half-angle; 20 of 3
 FAR_B, FAR_DWELL = 14.0, 40
 # WEIGHTS[key][fight phase 1..3] = (near, mid, far); 0 = not used
 WEIGHTS = {
-    'a1': {1: (0, 30, 45), 2: (0, 20, 30), 3: (0, 15, 25)},
+    # R2: the far column also holds the melee chains (they open with the gap-closer blink, core.CLOSE_KEYS); A1 / W1 less
+    'a1': {1: (0, 30, 35), 2: (0, 20, 25), 3: (0, 15, 20)},
     'b1': {1: (0, 0, 0), 2: (25, 10, 0), 3: (15, 5, 0)},
-    'b2': {1: (35, 15, 0), 2: (15, 10, 0), 3: (10, 5, 0)},
-    'b3': {1: (0, 0, 0), 2: (0, 0, 0), 3: (20, 20, 0)},
-    'c1': {1: (35, 20, 0), 2: (10, 5, 0), 3: (0, 0, 0)},
-    'c2': {1: (0, 0, 0), 2: (20, 15, 0), 3: (15, 10, 0)},
-    'c3': {1: (0, 0, 0), 2: (0, 0, 0), 3: (25, 15, 0)},
+    'b2': {1: (35, 15, 10), 2: (15, 10, 10), 3: (10, 5, 5)},
+    'b3': {1: (0, 0, 0), 2: (0, 0, 0), 3: (20, 20, 10)},
+    'c1': {1: (35, 20, 20), 2: (10, 5, 0), 3: (0, 0, 0)},
+    'c2': {1: (0, 0, 0), 2: (20, 15, 15), 3: (15, 10, 0)},
+    'c3': {1: (0, 0, 0), 2: (0, 0, 0), 3: (25, 15, 15)},
     'k': {1: (15, 20, 20), 2: (10, 20, 15), 3: (15, 20, 15)},
-    'w1': {1: (15, 15, 35), 2: (0, 15, 25), 3: (0, 0, 20)},
+    'w1': {1: (15, 15, 25), 2: (0, 15, 20), 3: (0, 0, 15)},
     'w2': {1: (0, 0, 0), 2: (10, 20, 25), 3: (0, 15, 20)},
     'l': {1: (0, 0, 0), 2: (5, 10, 20), 3: (0, 15, 20)},
 }
+# R2: out of reach (farther than OOR_B b) for OOR_DWELL t -> a chain with the gap closer OOR_PCT % of the decisions
+OOR_B, OOR_DWELL, OOR_PCT = 5.5, 20, 60
 COOLDOWN = {'a1': 120, 'b1': 160, 'b2': 140, 'b3': 300, 'c1': 200, 'c2': 200, 'c3': 200, 'k': 260, 'w1': 360,
             'w2': 420, 'l': 700}
 P3_COOLDOWN_PCT = 80
@@ -188,7 +203,7 @@ PARTS = ('pelvis', 'abdomen', 'chest', 'chest_glow', 'neck', 'head', 'hair_top',
          'shin_r', 'foot_r', 'wing_l1', 'wing_l2', 'wing_l3', 'wing_r1', 'wing_r2', 'wing_r3', 'sword', 'sword_edge',
          'scabbard', 'tendril_l', 'tendril_r')
 assert len(PARTS) == 40
-HEIGHT, HIP_Y = 2.25, 1.10
+HEIGHT, HIP_Y = round(2.25 * SIZE, 3), round(1.10 * SIZE, 3)
 LOOKS = {'form': ('cape', 'winged', 'abyss'), 'visor': ('up_off', 'down_pyro', 'down_electro', 'down_abyss', 'down_off'),
          'edge': ('off', 'yellow', 'pyro', 'electro', 'glint'), 'chest': ('off', 'amber', 'red', 'gold'),
          'hands': ('open', 'grip', 'fist')}

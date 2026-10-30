@@ -103,7 +103,15 @@ def placed(lines, pos):
 AT_BODY = 'at @s rotated as @s rotated ~ 0'
 
 
-ARC_PIVOT, ARC_FLOOR = 1.2, .05          # slash pivot over the feet; the lowest painted point stays this high (I1)
+ZS = api.SIZE                            # R2: the figure scale (every height on her body x ZS)
+
+
+def H(y):
+    """A body height y of the D0 design (2.25 b figure) on the scaled figure, as text."""
+    return L.num(y * ZS, 2)
+
+
+ARC_PIVOT, ARC_FLOOR = round(1.2 * ZS, 2), .05   # slash pivot over the feet; the lowest painted point stays this high (I1)
 _ARC_PTS = None
 
 
@@ -137,7 +145,7 @@ def arc_low(r, roll, pitch, piv=ARC_PIVOT):
     return min((piv + (-a * r) * sr * cp - (b * r) * sp for a, b in _arc_points()), default=piv)
 
 
-ARC_DIAG_PIVOT, ARC_DIAG_SHRINK = 1.6, .85   # R (TK-06): a diagonal cut turns about her swing centre (pelvis + 0.45 b + 0.05)
+ARC_DIAG_PIVOT, ARC_DIAG_SHRINK = round(1.6 * ZS, 2), .85   # R (TK-06): a diagonal cut turns about her swing centre
 
 
 def arc_fit(r, roll, pitch, lift=0.0):
@@ -185,7 +193,7 @@ def fx_slash(r, el, roll=0, pitch=0, yaw=0, lift=0.0):
 def fx_spin(r, el):
     k = el_cases(el, lambda e: K.p('spin_ring', r=int(round(r * 10)), el=e))
     if k:
-        return placed(k, 'at @s positioned ~ ~1.0 ~')
+        return placed(k, f'at @s positioned ~ ~{H(1.0)} ~')
     f = L.num(r * 0.45, 2)
     return placed(el_cases(el, lambda e: f'particle {EL_PART[e]} ~ ~1 ~ {f} 0.1 {f} 0.03 40 force @a[tag=player]'), 'at @s')
 
@@ -202,11 +210,12 @@ def fx_trail(preset, length_tenths, el):
     """dash_trail / thrust_trail from the body along its yaw (length in tenths, quantised by the caller)."""
     k = el_cases(el, lambda e: K.p(preset, len=length_tenths, el=e))
     if k:
-        return placed(k, AT_BODY + ' positioned ~ ~1.0 ~')
+        return placed(k, AT_BODY + f' positioned ~ ~{H(1.0)} ~')
     return placed(el_cases(el, lambda e: f'particle {EL_PART[e]} ~ ~1 ~ 0.3 0.4 0.3 0.05 14 force @a[tag=player]'), 'at @s')
 
 
-def fx_plain(preset, fallback=None, pos='~ ~1.2 ~', **a):
+def fx_plain(preset, fallback=None, pos=None, **a):
+    pos = pos or f'~ ~{H(1.2)} ~'
     k = K.p(preset, **a)
     if k:
         return placed([k], f'{AT_BODY} positioned {pos}')
@@ -216,12 +225,12 @@ def fx_plain(preset, fallback=None, pos='~ ~1.2 ~', **a):
 def fx_flare(c=2):
     """Chest + visor flare tell (core_flare; c 1 amber 2 red 3 gold)."""
     return fx_plain('core_flare', ['execute at @s run particle minecraft:dust{color:[1.0,0.25,0.1],scale:1.6} ~ ~1.5 ~ '
-                                   '0.2 0.2 0.2 0 8 force @a[tag=player]'], pos='~ ~1.5 ~', c=c)
+                                   '0.2 0.2 0.2 0 8 force @a[tag=player]'], pos=f'~ ~{H(1.5)} ~', c=c)
 
 
 def fx_glint():
-    return fx_plain('glint', [f'execute {AT_BODY} positioned ^-0.4 ^1.6 ^1.4 run particle minecraft:end_rod ~ ~ ~ 0.05 '
-                              '0.05 0.05 0.02 6 force @a[tag=player]'], pos='~ ~1.6 ~')
+    return fx_plain('glint', [f'execute {AT_BODY} positioned ^-{H(0.4)} ^{H(1.6)} ^{H(1.4)} run particle minecraft:end_rod ~ ~ ~ 0.05 '
+                              '0.05 0.05 0.02 6 force @a[tag=player]'], pos=f'~ ~{H(1.6)} ~')
 
 
 def hud(name, **a):

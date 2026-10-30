@@ -61,7 +61,7 @@ def build(W):
         'execute unless score #pjEv mb matches 1..2 run return 0']
         + fx('impact', [part(SPARK, 0.8, 0.2, 0.8, 0.15, 24), part(GOLD, 0.6, 0.1, 0.6, 0, 10)], 'at @s', el=api.ELECTRO))
     # ---------------------------------------------------------------------------------------------- nova
-    swell = fx('nova_swell', [], AT_BODY + ' positioned ~ ~1.4 ~', t=FLASH - SWELL)
+    swell = fx('nova_swell', [], AT_BODY + f' positioned ~ ~{S.H(1.4)} ~', t=FLASH - SWELL)
     W.w('p/mantle/nova/start', [
         f'# Nova (G2 failure; @s = body, #pt tk 0): {NOVA_CLIP} {api.CLIPS[NOVA_CLIP][0]} t, the wings swell {SWELL}-{FLASH}, flash {FLASH},',
         f'# the whole-arena hit at {HIT} (dash-dodgeable, {api.NOVA_PM} per mille, non-lethal, Electro).',
@@ -72,13 +72,13 @@ def build(W):
         W.w('p/mantle/nova/glow', ['# The swell stand-in (@s = body): white-gold motes gathering on the wings.',
                                    f'execute {AT_BODY} positioned ~ ~1.4 ~ run {part(WHITE, 1.2, 0.9, 1.2, 0.02, 3)}',
                                    f'execute {AT_BODY} positioned ~ ~1.4 ~ run {part(GOLD, 0.9, 0.7, 0.9, 0, 2)}'])
-    flash = fx('nova_flash', [part(WHITE, 0.6, 0.8, 0.6, 0.3, 40)], AT_BODY + ' positioned ~ ~1.4 ~')
+    flash = fx('nova_flash', [part(WHITE, 0.6, 0.8, 0.6, 0.3, 40)], AT_BODY + f' positioned ~ ~{S.H(1.4)} ~')
     W.w('p/mantle/nova/flash', ['# The flash (the last 4 t).'] + flash)
     hz = (L.hz_opts(quiet=1, sfx=0, el=api.ELECTRO, pm=api.NOVA_PM, pm_lethal=0)
           + [f'execute at @s rotated 0 0 positioned ~ {CY} ~ run {L.hz_full(1, 1)}'] + hz_tag_lines('rlk_tk_nova'))
     W.w('p/mantle/nova/hz', ['# The nova hazard (strikes next tick).'] + hz)
     blast = (fx('shock_ring', [part(GOLD, 6.0, 0.2, 6.0, 0, 120)], 'at @s positioned ~ ~0.2 ~', r=200)
-             + fx('nova_flash', [part(SPARK, 3.0, 1.5, 3.0, 0.4, 80)], AT_BODY + ' positioned ~ ~1.4 ~')
+             + fx('nova_flash', [part(SPARK, 3.0, 1.5, 3.0, 0.4, 80)], AT_BODY + f' positioned ~ ~{S.H(1.4)} ~')
              + snd('nova_blast'))
     W.w('p/mantle/nova/blast', ['# The nova hit (the hazard strikes this tick).'] + blast)
     tick += [f'execute if score #pt {OBJ} matches {FLASH} run {fn("p/mantle/nova/flash")}',
@@ -96,7 +96,7 @@ def build(W):
             f'scoreboard players operation #mantle_t {OBJ} -= #pt {OBJ}',
             f'data modify storage {api.STORAGE} air.nova set value {{t:1}}',
             f'execute store result storage {api.STORAGE} air.nova.t int 1 run scoreboard players get #mantle_t {OBJ}',
-            f'execute as {BODY} {AT_BODY} positioned ~ ~1.4 ~ run function {NS}fx/p/nova_swell with storage {api.STORAGE} air.nova'])
+            f'execute as {BODY} {AT_BODY} positioned ~ ~{S.H(1.4)} ~ run function {NS}fx/p/nova_swell with storage {api.STORAGE} air.nova'])
     W.w('p/mantle/cancel', ['# Every mantle hazard (any executor; idempotent): the feathers, their discs, the nova.',
                             f'kill @e[tag={S.tag_p(KEY)}]'] + stop_sounds())
 

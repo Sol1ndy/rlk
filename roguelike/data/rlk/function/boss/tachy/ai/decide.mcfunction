@@ -19,6 +19,7 @@ execute if score #mbLock mb matches 11 run return run function rlk:boss/tachy/co
 function rlk:boss/tachy/ai/rear_count
 execute if score #ai_rc tk matches 4.. if function rlk:boss/tachy/ai/rear run return 1
 execute if score #far tk matches 40.. if function rlk:boss/tachy/ai/far run return 1
+execute if score #ai_oor tk matches 20.. if function rlk:boss/tachy/ai/oor run return 1
 execute if score #ai_fp tk matches 1 if score #ai_d2 tk matches ..250000 run return run function rlk:boss/tachy/ai/pick/p1_near
 execute if score #ai_fp tk matches 1 if score #ai_d2 tk matches ..1440000 run return run function rlk:boss/tachy/ai/pick/p1_mid
 execute if score #ai_fp tk matches 1 run return run function rlk:boss/tachy/ai/pick/p1_far

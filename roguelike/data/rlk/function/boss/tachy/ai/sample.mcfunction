@@ -16,3 +16,5 @@ scoreboard players operation #rear tk %= #c64 tk
 execute if score #t tk matches ..-1 run function rlk:boss/tachy/ai/rear_bit
 execute if score #ai_d2 tk matches 1960001.. run scoreboard players add #far tk 5
 execute unless score #ai_d2 tk matches 1960001.. run scoreboard players set #far tk 0
+execute if score #ai_d2 tk matches 302501.. run scoreboard players add #ai_oor tk 5
+execute unless score #ai_d2 tk matches 302501.. run scoreboard players set #ai_oor tk 0

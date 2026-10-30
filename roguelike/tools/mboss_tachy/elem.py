@@ -123,7 +123,7 @@ def build(W, ctx):
         fn('core/cancel_pat')]
       + S.fx_plain('core_burst', ['execute at @s run particle minecraft:explosion_emitter ~ ~1.4 ~ 0 0 0 0 1 force @a[tag=player]',
                                   'execute at @s run particle minecraft:flame ~ ~1.4 ~ 0.3 0.3 0.3 0.2 40 force @a[tag=player]'],
-                     pos='~ ~1.4 ~')
+                     pos=f'~ ~{S.H(1.4)} ~')
       + [f'execute at @s run {x}' if not x.startswith('execute') else x for x in S.snd('core_backfire')]
       + [f'scoreboard players operation #mbTrueEl mb = #el {OBJ}',
          f'function rlk:mboss/true_pct {{pct:{api.G3_TRUE_PCT}}}',
@@ -140,7 +140,7 @@ def build(W, ctx):
     gauge = ['# The mantle gauge changed (@s = body): the cocoon card of its quarter (the gauge is the boss-bar under-bar).',
              f'scoreboard players operation #hud_g {OBJ} = #sh {OBJ}']
     for lo, hi, pct in ((76, 1000, 100), (51, 75, 75), (26, 50, 50), (-1000, 25, 25)):
-        for ln in S.fx_plain('cocoon', [], pos='~ ~1.2 ~', pct=pct):
+        for ln in S.fx_plain('cocoon', [], pos=f'~ ~{S.H(1.2)} ~', pct=pct):
             gauge.append(f'execute if score #sh {OBJ} matches {lo}..{hi} unless score #hud_c {OBJ} matches {pct} run {ln}'
                          if not ln.startswith('execute ') else
                          ln.replace('execute ', f'execute if score #sh {OBJ} matches {lo}..{hi} unless score #hud_c {OBJ} matches {pct} ', 1))

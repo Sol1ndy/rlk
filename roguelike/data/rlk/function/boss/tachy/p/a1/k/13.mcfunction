@@ -10,7 +10,7 @@ scoreboard players operation #a1_dl tk = #t2 tk
 execute positioned as @e[type=minecraft:marker,tag=rlk_tk_dp,limit=1] run function rlk:mboss/mv/glide {t:6}
 kill @e[type=minecraft:marker,tag=rlk_tk_dp]
 function rlk:mboss/grp_new
-data modify storage rlk:tk core.dl set value {len:0,w:16,tell:1,dmg:50}
+data modify storage rlk:tk core.dl set value {len:0,w:19,tell:1,dmg:42}
 execute store result storage rlk:tk core.dl.len int 5 run scoreboard players get #a1_dl tk
 scoreboard players operation #hzGrp mb = #mbGrp mb
 scoreboard players set #hzAct mb 6
