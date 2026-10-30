@@ -27,15 +27,11 @@ fill -24 205 -1 -22 205 -1 minecraft:andesite
 fill -40 210 -20 -21 210 -1 minecraft:polished_deepslate
 fill -39 210 -19 -22 210 -2 minecraft:air
 fill -37 201 -19 -37 201 -16 minecraft:podzol
-fill -34 201 -19 -33 201 -18 minecraft:podzol
-fill -33 201 -17 -22 201 -17 minecraft:podzol
 fill -36 201 -15 -36 201 -15 minecraft:podzol
 fill -35 201 -14 -35 201 -7 minecraft:podzol
 fill -38 201 -8 -36 201 -7 minecraft:podzol
 fill -38 201 -19 -38 201 -16 minecraft:dirt
 fill -38 202 -19 -38 202 -16 minecraft:podzol
-fill -32 201 -19 -22 201 -18 minecraft:dirt
-fill -32 202 -19 -22 202 -18 minecraft:podzol
 fill -37 201 -15 -37 201 -9 minecraft:dirt
 fill -37 202 -15 -37 202 -9 minecraft:podzol
 fill -36 201 -14 -36 201 -9 minecraft:dirt
@@ -55,8 +51,8 @@ fill -39 208 -9 -39 208 -7 minecraft:podzol
 execute positioned -34 201 -15 run function rlk:room/prop/i_wall_x
 execute positioned -33 201 -8 run function rlk:room/prop/i_flower
 execute positioned -25 201 -9 run function rlk:room/prop/i_grass
-execute positioned -28 203 -19 run function rlk:room/prop/i_petal
-execute positioned -25 203 -19 run function rlk:room/prop/i_flower
+execute positioned -28 201 -19 run function rlk:room/prop/i_petal
+execute positioned -25 201 -19 run function rlk:room/prop/i_flower
 execute positioned -29 201 -13 run function rlk:room/prop/i_petal
 execute positioned -28 201 -5 run function rlk:room/prop/i_petal
 execute positioned -39 201 -3 run function rlk:room/prop/i_petal

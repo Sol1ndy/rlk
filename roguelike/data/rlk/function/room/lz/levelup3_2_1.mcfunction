@@ -38,7 +38,6 @@ fill -40 210 -20 -21 210 -1 minecraft:polished_deepslate
 fill -39 210 -19 -22 210 -1 minecraft:air
 fill -40 210 0 -21 210 19 minecraft:polished_deepslate
 fill -39 210 0 -22 210 18 minecraft:air
-fill -32 201 -19 -22 201 -18 minecraft:tuff
 fill -39 201 -16 -35 201 -16 minecraft:tuff
 fill -39 201 -15 -38 201 -15 minecraft:tuff
 fill -35 201 -15 -32 201 -15 minecraft:tuff

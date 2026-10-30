@@ -298,9 +298,8 @@ def rv(w):
       'scoreboard players set #bOk tmp 0',
       'execute if score #active room matches 1 as @e[tag=rlk_zone] if score @s zid = #combat room run function rlk:cm/rv/box_zone',
       'execute if score #bOk tmp matches 1 run function rlk:cm/rv/box_set')
-    f('box_zone', '# @s = the fight zone marker: bounding box of its cells\' interiors (block coords) and its wall top',
+    f('box_zone', '# @s = the fight zone marker: bounding box of its cells\' interiors (block coords)',
       'data modify storage rlk:c2e bc set from entity @s data.cells',
-      'execute store result score #bTop tmp run data get entity @s data.by',
       'scoreboard players set #bx0 tmp 2147483647', 'scoreboard players set #bz0 tmp 2147483647',
       'scoreboard players set #bx1 tmp -2147483648', 'scoreboard players set #bz1 tmp -2147483648',
       'function rlk:cm/rv/box_cell',
@@ -315,13 +314,12 @@ def rv(w):
       'execute store result score #t1 tmp run data get storage rlk:c2e bc[0].iz0', 'scoreboard players operation #bz0 tmp < #t1 tmp',
       'execute store result score #t1 tmp run data get storage rlk:c2e bc[0].iz1', 'scoreboard players operation #bz1 tmp > #t1 tmp',
       'data remove storage rlk:c2e bc[0]', 'function rlk:cm/rv/box_cell')
-    f('box_set', '# walls stand y 201..210 + zone height: the brain\'s feet stay at or below wall top - 3 (its top 1.6 b higher)',
+    f('box_set', '# walls stand y 201..210 (every zone\'s floor is y 200): the brain\'s feet stay at or below wall top - 3 (its top 1.6 b higher)',
       'scoreboard players operation @s cmAX = #bx0 tmp', 'scoreboard players add @s cmAX 60',
       'scoreboard players operation @s cmVx = #bx1 tmp', 'scoreboard players remove @s cmVx 60',
       'scoreboard players operation @s cmAZ = #bz0 tmp', 'scoreboard players add @s cmAZ 60',
       'scoreboard players operation @s cmVz = #bz1 tmp', 'scoreboard players remove @s cmVz 60',
-      'scoreboard players set #t1 tmp 100', 'scoreboard players operation #bTop tmp *= #t1 tmp', 'scoreboard players add #bTop tmp 20700',
-      'scoreboard players operation @s cmVy < #bTop tmp')
+      'scoreboard players set #bTop tmp 20700', 'scoreboard players operation @s cmVy < #bTop tmp')
     # ---- flight
     f('fly', f'# orbit point: {c["orbit_r"]} b from the body at {c["alt"] / 100:g} b over its feet, clamped into the box and under the ceiling',
       'execute if score @s frzT matches 1.. run return 0',

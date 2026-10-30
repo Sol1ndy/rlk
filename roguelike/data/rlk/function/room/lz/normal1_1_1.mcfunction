@@ -26,15 +26,8 @@ fill 15 201 -19 17 201 -19 minecraft:tuff
 fill 14 201 -18 14 201 -18 minecraft:tuff
 fill 6 201 -17 6 201 -15 minecraft:tuff
 fill 13 201 -17 13 201 -17 minecraft:tuff
-fill 1 201 -16 2 201 -15 minecraft:tuff
 fill 12 201 -16 12 201 -15 minecraft:tuff
-fill 17 201 -16 18 201 -15 minecraft:tuff
-fill 3 201 -15 3 201 -6 minecraft:tuff
 fill 7 201 -15 11 201 -15 minecraft:tuff
-fill 16 201 -15 16 201 -6 minecraft:tuff
-fill 15 201 -14 15 201 -7 minecraft:tuff
-fill 1 201 -6 2 201 -5 minecraft:tuff
-fill 17 201 -6 18 201 -5 minecraft:tuff
 fill 7 201 -19 14 201 -19 minecraft:cobbled_deepslate
 fill 7 202 -19 14 202 -19 minecraft:tuff
 fill 7 201 -18 13 201 -18 minecraft:cobbled_deepslate
@@ -43,13 +36,9 @@ fill 7 201 -17 12 201 -17 minecraft:cobbled_deepslate
 fill 7 202 -17 12 202 -17 minecraft:tuff
 fill 7 201 -16 11 201 -16 minecraft:cobbled_deepslate
 fill 7 202 -16 11 202 -16 minecraft:tuff
-fill 1 201 -14 2 201 -7 minecraft:cobbled_deepslate
-fill 1 202 -14 2 202 -7 minecraft:tuff
-fill 17 201 -14 18 201 -7 minecraft:cobbled_deepslate
-fill 17 202 -14 18 202 -7 minecraft:tuff
 execute positioned 10 203 -19 run function rlk:room/prop/m_fence_x
 execute positioned 1 201 -4 run function rlk:room/prop/m_pebble
 execute positioned 14 201 -2 run function rlk:room/prop/m_pebble
-execute positioned 1 203 -11 run function rlk:room/prop/m_torch
+execute positioned 1 201 -11 run function rlk:room/prop/m_torch
 setblock 18 204 -15 minecraft:wall_torch[facing=west]
 setblock 3 203 -2 minecraft:wall_torch[facing=north]
