@@ -106,13 +106,10 @@ fill -42 201 -37 -41 201 -36 minecraft:podzol
 fill -39 201 -37 -39 201 -37 minecraft:podzol
 fill -36 201 -37 -36 201 -34 minecraft:podzol
 fill -28 201 -37 -28 201 -35 minecraft:podzol
-fill -24 201 -36 -22 201 -35 minecraft:podzol
 fill -34 201 -35 -29 201 -35 minecraft:podzol
-fill -25 201 -35 -25 201 -25 minecraft:podzol
 fill -52 201 -34 -52 201 -31 minecraft:podzol
 fill -35 201 -34 -35 201 -31 minecraft:podzol
 fill -46 201 -31 -44 201 -31 minecraft:podzol
-fill -24 201 -26 -22 201 -24 minecraft:podzol
 fill -40 201 -21 -38 201 -21 minecraft:podzol
 fill -39 201 -20 -39 201 -13 minecraft:podzol
 fill -30 201 -15 -30 201 -12 minecraft:podzol
@@ -155,8 +152,6 @@ fill -34 201 -37 -34 201 -36 minecraft:dirt
 fill -34 202 -37 -34 202 -36 minecraft:podzol
 fill -33 201 -36 -30 201 -36 minecraft:dirt
 fill -33 202 -36 -30 202 -36 minecraft:podzol
-fill -24 201 -34 -22 201 -27 minecraft:dirt
-fill -24 202 -34 -22 202 -27 minecraft:podzol
 fill -45 201 -32 -45 201 -32 minecraft:dirt
 fill -45 202 -32 -45 202 -32 minecraft:podzol
 fill -35 201 -11 -30 201 -11 minecraft:dirt
@@ -263,7 +258,7 @@ execute positioned -32 204 -37 run function rlk:room/prop/f_ruin_b
 execute positioned -29 202 -44 run function rlk:room/prop/f_stump
 execute positioned -29 201 -54 run function rlk:room/prop/f_log_x
 execute positioned -49 204 -33 run function rlk:room/prop/f_log_x
-execute positioned -24 203 -33 run function rlk:room/prop/f_moss
+execute positioned -24 201 -33 run function rlk:room/prop/f_moss
 execute positioned -30 201 -2 run function rlk:room/prop/f_grass
 execute positioned -26 201 -21 run function rlk:room/prop/f_petal
 execute positioned -42 202 -38 run function rlk:room/prop/f_petal

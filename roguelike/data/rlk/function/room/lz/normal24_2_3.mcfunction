@@ -22,15 +22,11 @@ fill -28 203 -1 -28 204 -1 minecraft:mossy_cobblestone
 fill -40 210 -20 -21 210 -1 minecraft:polished_deepslate
 fill -39 210 -19 -22 210 -2 minecraft:air
 fill -37 201 -19 -37 201 -16 minecraft:podzol
-fill -34 201 -19 -33 201 -18 minecraft:podzol
-fill -33 201 -17 -22 201 -17 minecraft:podzol
 fill -36 201 -15 -36 201 -15 minecraft:podzol
 fill -35 201 -14 -35 201 -7 minecraft:podzol
 fill -38 201 -8 -36 201 -7 minecraft:podzol
 fill -38 201 -19 -38 201 -16 minecraft:dirt
 fill -38 202 -19 -38 202 -16 minecraft:podzol
-fill -32 201 -19 -22 201 -18 minecraft:dirt
-fill -32 202 -19 -22 202 -18 minecraft:podzol
 fill -37 201 -15 -37 201 -9 minecraft:dirt
 fill -37 202 -15 -37 202 -9 minecraft:podzol
 fill -36 201 -14 -36 201 -9 minecraft:dirt
@@ -49,11 +45,11 @@ fill -39 201 -9 -39 207 -7 minecraft:stone
 fill -39 208 -9 -39 208 -7 minecraft:podzol
 execute positioned -23 201 -2 run function rlk:room/prop/p_boulder_s
 execute positioned -36 201 -17 run function rlk:room/prop/p_boulder_s
-execute positioned -25 202 -17 run function rlk:room/prop/p_wildflower
+execute positioned -25 201 -17 run function rlk:room/prop/p_wildflower
 execute positioned -22 201 -16 run function rlk:room/prop/p_wildflower
 execute positioned -25 201 -4 run function rlk:room/prop/p_grass
 execute positioned -29 201 -6 run function rlk:room/prop/p_dandelion
-execute positioned -29 202 -17 run function rlk:room/prop/p_wildflower
+execute positioned -29 201 -17 run function rlk:room/prop/p_wildflower
 execute positioned -29 201 -10 run function rlk:room/prop/p_grass
 setblock -39 209 -8 minecraft:short_grass keep
 setblock -39 209 -5 minecraft:short_grass keep

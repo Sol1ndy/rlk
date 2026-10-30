@@ -99,8 +99,6 @@ fill 37 201 2 37 201 2 minecraft:podzol
 fill 25 201 8 25 201 12 minecraft:podzol
 fill 24 201 13 24 201 13 minecraft:podzol
 fill 21 201 14 23 201 14 minecraft:podzol
-fill 27 201 15 38 201 16 minecraft:podzol
-fill 26 201 17 27 201 18 minecraft:podzol
 fill 40 201 -17 40 201 -17 minecraft:calcite
 fill 40 202 -17 40 202 -17 minecraft:podzol
 fill 24 201 1 24 201 1 minecraft:calcite
@@ -149,8 +147,6 @@ fill 23 201 12 23 201 13 minecraft:dirt
 fill 23 202 12 23 202 13 minecraft:podzol
 fill 21 201 13 22 201 13 minecraft:dirt
 fill 21 202 13 22 202 13 minecraft:podzol
-fill 28 201 17 38 201 18 minecraft:dirt
-fill 28 202 17 38 202 18 minecraft:podzol
 fill 41 201 -17 41 202 -17 minecraft:calcite
 fill 41 203 -17 41 203 -17 minecraft:podzol
 fill 41 201 -15 41 202 -15 minecraft:calcite
@@ -239,7 +235,7 @@ execute positioned 29 201 7 run function rlk:room/prop/fo_pipe_x
 execute positioned 47 201 -19 run function rlk:room/prop/fo_lamp2
 execute positioned 23 204 5 run function rlk:room/prop/fo_crates
 execute positioned 45 201 -2 run function rlk:room/prop/p_grass
-execute positioned 27 202 16 run function rlk:room/prop/p_grass
+execute positioned 27 201 16 run function rlk:room/prop/p_grass
 execute positioned 38 201 -17 run function rlk:room/prop/fo_flower
 execute positioned 21 201 -10 run function rlk:room/prop/fo_white
 execute positioned 25 201 -17 run function rlk:room/prop/fo_flower

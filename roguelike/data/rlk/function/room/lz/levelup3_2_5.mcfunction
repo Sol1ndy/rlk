@@ -46,7 +46,6 @@ fill -40 210 -20 -21 210 -1 minecraft:polished_deepslate
 fill -39 210 -19 -22 210 -1 minecraft:air
 fill -40 210 0 -21 210 19 minecraft:polished_deepslate
 fill -39 210 0 -22 210 18 minecraft:air
-fill -32 201 -19 -22 201 -18 minecraft:podzol
 fill -39 201 -16 -35 201 -16 minecraft:podzol
 fill -39 201 -15 -38 201 -15 minecraft:podzol
 fill -35 201 -15 -32 201 -15 minecraft:podzol
@@ -118,7 +117,7 @@ execute positioned -29 201 -14 run function rlk:room/prop/sf_mush_s
 execute positioned -28 201 6 run function rlk:room/prop/sf_mush_red
 execute positioned -27 201 11 run function rlk:room/prop/sf_lamp
 execute positioned -27 204 -9 run function rlk:room/prop/sf_flower
-execute positioned -26 202 -18 run function rlk:room/prop/sf_moss
+execute positioned -26 201 -18 run function rlk:room/prop/sf_moss
 execute positioned -31 201 -5 run function rlk:room/prop/sf_moss
 execute positioned -26 201 14 run function rlk:room/prop/sf_fern
 execute positioned -38 201 9 run function rlk:room/prop/sf_fern
@@ -127,8 +126,8 @@ execute positioned -24 201 15 run function rlk:room/prop/sf_moss
 execute positioned -30 204 -8 run function rlk:room/prop/p_litter
 execute positioned -31 201 15 run function rlk:room/prop/sf_fern
 execute positioned -38 201 8 run function rlk:room/prop/sf_fern
-execute positioned -24 202 -19 run function rlk:room/prop/sf_fern
-execute positioned -24 202 -18 run function rlk:room/prop/sf_flower
+execute positioned -24 201 -19 run function rlk:room/prop/sf_fern
+execute positioned -24 201 -18 run function rlk:room/prop/sf_flower
 execute positioned -29 201 -5 run function rlk:room/prop/sf_fern
 execute positioned -38 202 -5 run function rlk:room/prop/p_litter
 execute positioned -39 201 5 run function rlk:room/prop/sf_fern

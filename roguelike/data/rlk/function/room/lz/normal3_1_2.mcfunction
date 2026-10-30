@@ -24,15 +24,11 @@ fill 5 209 19 8 210 19 minecraft:oak_leaves[persistent=true]
 fill 5 201 19 6 201 19 minecraft:mossy_stone_bricks
 fill 0 210 0 19 210 19 minecraft:polished_deepslate
 fill 1 210 1 18 210 18 minecraft:air
-fill 7 201 1 7 201 3 minecraft:podzol
-fill 8 201 3 18 201 3 minecraft:podzol
 fill 1 201 11 5 201 11 minecraft:podzol
 fill 1 201 12 1 201 12 minecraft:podzol
 fill 5 201 12 5 201 13 minecraft:podzol
 fill 4 201 13 4 201 13 minecraft:podzol
 fill 3 201 14 3 201 18 minecraft:podzol
-fill 8 201 1 18 201 2 minecraft:dirt
-fill 8 202 1 18 202 2 minecraft:podzol
 fill 2 201 12 4 201 12 minecraft:dirt
 fill 2 202 12 4 202 12 minecraft:podzol
 fill 1 201 13 3 201 13 minecraft:dirt

@@ -26,15 +26,11 @@ fill 9 209 19 14 210 19 minecraft:terracotta
 fill 3 205 19 4 205 19 minecraft:orange_terracotta
 fill 0 210 0 19 210 19 minecraft:polished_deepslate
 fill 1 210 1 18 210 18 minecraft:air
-fill 7 201 1 7 201 3 minecraft:red_sand
-fill 8 201 3 18 201 3 minecraft:red_sand
 fill 1 201 11 5 201 11 minecraft:red_sand
 fill 1 201 12 1 201 12 minecraft:red_sand
 fill 5 201 12 5 201 13 minecraft:red_sand
 fill 4 201 13 4 201 13 minecraft:red_sand
 fill 3 201 14 3 201 18 minecraft:red_sand
-fill 8 201 1 18 201 2 minecraft:sandstone
-fill 8 202 1 18 202 2 minecraft:red_sand
 fill 2 201 12 4 201 12 minecraft:sandstone
 fill 2 202 12 4 202 12 minecraft:red_sand
 fill 1 201 13 3 201 13 minecraft:sandstone

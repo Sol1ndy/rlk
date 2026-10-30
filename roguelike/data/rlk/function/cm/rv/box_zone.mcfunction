@@ -1,6 +1,5 @@
-# @s = the fight zone marker: bounding box of its cells' interiors (block coords) and its wall top
+# @s = the fight zone marker: bounding box of its cells' interiors (block coords)
 data modify storage rlk:c2e bc set from entity @s data.cells
-execute store result score #bTop tmp run data get entity @s data.by
 scoreboard players set #bx0 tmp 2147483647
 scoreboard players set #bz0 tmp 2147483647
 scoreboard players set #bx1 tmp -2147483648

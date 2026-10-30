@@ -25,17 +25,12 @@ fill -28 204 39 -26 207 39 minecraft:smooth_red_sandstone
 fill -32 201 39 -29 203 39 minecraft:red_sandstone
 fill -40 210 20 -21 210 39 minecraft:polished_deepslate
 fill -39 210 21 -22 210 38 minecraft:air
-fill -39 201 25 -37 201 25 minecraft:red_sand
-fill -37 201 26 -37 201 34 minecraft:red_sand
 fill -25 201 30 -24 201 31 minecraft:red_sand
 fill -23 201 31 -22 201 32 minecraft:red_sand
 fill -25 201 32 -25 201 34 minecraft:red_sand
 fill -22 201 33 -22 201 33 minecraft:red_sand
-fill -39 201 34 -38 201 35 minecraft:red_sand
 fill -31 201 35 -26 201 35 minecraft:red_sand
 fill -31 201 36 -30 201 36 minecraft:red_sand
-fill -39 201 26 -38 201 33 minecraft:sandstone
-fill -39 202 26 -38 202 33 minecraft:red_sand
 fill -24 201 32 -24 201 38 minecraft:sandstone
 fill -24 202 32 -24 202 38 minecraft:red_sand
 fill -23 201 33 -23 201 38 minecraft:sandstone

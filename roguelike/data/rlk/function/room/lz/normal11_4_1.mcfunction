@@ -101,16 +101,13 @@ fill -20 201 -42 -12 201 -41 minecraft:tuff
 fill -19 201 -40 -16 201 -40 minecraft:tuff
 fill -4 201 -39 -2 201 -38 minecraft:tuff
 fill -6 201 -38 -5 201 -37 minecraft:tuff
-fill -19 201 -37 -18 201 -35 minecraft:tuff
 fill -7 201 -37 -7 201 -29 minecraft:tuff
-fill -17 201 -36 -17 201 -26 minecraft:tuff
 fill -6 201 -36 -6 201 -35 minecraft:tuff
 fill -8 201 -33 -8 201 -31 minecraft:tuff
 fill -6 201 -31 -6 201 -28 minecraft:tuff
 fill -5 201 -29 -4 201 -28 minecraft:tuff
 fill -3 201 -28 -2 201 -27 minecraft:tuff
 fill -4 201 -27 -4 201 -27 minecraft:tuff
-fill -19 201 -26 -18 201 -26 minecraft:tuff
 fill -46 201 -59 -46 201 -52 minecraft:cobbled_deepslate
 fill -46 202 -59 -46 202 -52 minecraft:tuff
 fill -44 201 -59 -43 201 -59 minecraft:cobbled_deepslate
@@ -137,8 +134,6 @@ fill -31 201 -42 -31 201 -42 minecraft:cobbled_deepslate
 fill -31 202 -42 -31 202 -42 minecraft:tuff
 fill -5 201 -36 -5 201 -30 minecraft:cobbled_deepslate
 fill -5 202 -36 -5 202 -30 minecraft:tuff
-fill -19 201 -34 -18 201 -27 minecraft:cobbled_deepslate
-fill -19 202 -34 -18 202 -27 minecraft:tuff
 fill -6 201 -34 -6 201 -32 minecraft:cobbled_deepslate
 fill -6 202 -34 -6 202 -32 minecraft:tuff
 fill -4 201 -34 -2 201 -30 minecraft:cobbled_deepslate

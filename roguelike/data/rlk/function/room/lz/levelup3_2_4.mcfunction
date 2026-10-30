@@ -42,7 +42,6 @@ fill -40 210 -20 -21 210 -1 minecraft:polished_deepslate
 fill -39 210 -19 -22 210 -1 minecraft:air
 fill -40 210 0 -21 210 19 minecraft:polished_deepslate
 fill -39 210 0 -22 210 18 minecraft:air
-fill -32 201 -19 -22 201 -18 minecraft:podzol
 fill -39 201 -16 -35 201 -16 minecraft:podzol
 fill -39 201 -15 -38 201 -15 minecraft:podzol
 fill -35 201 -15 -32 201 -15 minecraft:podzol
@@ -129,7 +128,7 @@ execute positioned -36 203 -2 run function rlk:room/prop/i_grass
 execute positioned -27 201 -16 run function rlk:room/prop/i_petal
 execute positioned -30 201 1 run function rlk:room/prop/i_petal
 execute positioned -33 201 -18 run function rlk:room/prop/i_petal
-execute positioned -25 202 -18 run function rlk:room/prop/i_petal
+execute positioned -25 201 -18 run function rlk:room/prop/i_petal
 execute positioned -37 202 -16 run function rlk:room/prop/i_grass
 execute positioned -36 202 2 run function rlk:room/prop/i_petal
 setblock -37 209 -15 minecraft:cherry_leaves[persistent=true] keep

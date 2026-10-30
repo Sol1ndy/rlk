@@ -1,91 +1,66 @@
 # 구역 건설 (levelup2_5, 테마 5 사막): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
 fill -60 200 -40 -41 200 -21 minecraft:red_sand
-fill -60 201 -40 -41 215 -21 minecraft:smooth_sandstone
-fill -59 201 -39 -42 215 -22 minecraft:air
-fill -59 214 -39 -42 214 -22 minecraft:light[level=15]
-fill -45 205 -32 -43 205 -31 minecraft:smooth_sandstone
-fill -46 205 -30 -42 205 -29 minecraft:sand
-fill -60 206 -34 -60 206 -31 minecraft:red_sandstone
-fill -60 215 -37 -60 215 -37 minecraft:chiseled_sandstone
-fill -60 208 -37 -60 209 -37 minecraft:sandstone
-fill -60 214 -28 -60 215 -23 minecraft:cut_sandstone
-fill -41 206 -30 -41 208 -25 minecraft:orange_terracotta
-fill -41 211 -39 -41 211 -34 minecraft:terracotta
-fill -41 213 -23 -41 213 -23 minecraft:orange_terracotta
-fill -48 201 -40 -43 203 -40 minecraft:terracotta
-fill -45 205 -40 -42 205 -40 minecraft:sandstone
-fill -53 203 -40 -49 205 -40 minecraft:orange_terracotta
-fill -55 203 -40 -52 206 -40 minecraft:terracotta
-fill -58 205 -40 -57 205 -40 minecraft:cut_sandstone
-fill -59 211 -21 -56 212 -21 minecraft:red_sandstone
-fill -52 212 -21 -48 213 -21 minecraft:smooth_red_sandstone
-fill -60 201 -21 -55 201 -21 minecraft:sandstone
-fill -54 211 -21 -54 213 -21 minecraft:orange_terracotta
-fill -60 215 -40 -41 215 -21 minecraft:polished_deepslate
-fill -59 215 -39 -42 215 -22 minecraft:air
-fill -59 201 -39 -55 204 -38 minecraft:sandstone
-fill -59 205 -39 -55 205 -38 minecraft:red_sand
-fill -49 201 -39 -42 204 -22 minecraft:sandstone
-fill -49 205 -39 -42 205 -22 minecraft:red_sand
-fill -59 201 -37 -57 204 -36 minecraft:sandstone
-fill -59 205 -37 -57 205 -36 minecraft:red_sand
-fill -54 201 -37 -50 204 -22 minecraft:sandstone
-fill -54 205 -37 -50 205 -22 minecraft:red_sand
-fill -55 201 -35 -55 204 -35 minecraft:sandstone
-fill -55 205 -35 -55 205 -35 minecraft:red_sand
-fill -56 201 -26 -55 204 -22 minecraft:sandstone
-fill -56 205 -26 -55 205 -22 minecraft:red_sand
-fill -59 201 -22 -57 204 -22 minecraft:sandstone
-fill -59 205 -22 -57 205 -22 minecraft:red_sand
-fill -59 201 -35 -56 205 -35 minecraft:sandstone
-fill -59 206 -35 -56 206 -35 minecraft:red_sand
-fill -56 201 -34 -55 205 -34 minecraft:sandstone
-fill -56 206 -34 -55 206 -34 minecraft:red_sand
-fill -55 201 -33 -55 205 -27 minecraft:sandstone
-fill -55 206 -33 -55 206 -27 minecraft:red_sand
-fill -56 201 -27 -56 205 -27 minecraft:sandstone
-fill -56 206 -27 -56 206 -27 minecraft:red_sand
-fill -57 201 -26 -57 205 -23 minecraft:sandstone
-fill -57 206 -26 -57 206 -23 minecraft:red_sand
-fill -59 201 -23 -58 205 -23 minecraft:sandstone
-fill -59 206 -23 -58 206 -23 minecraft:red_sand
-fill -59 201 -34 -57 206 -33 minecraft:sandstone
-fill -59 207 -34 -57 207 -33 minecraft:red_sand
-fill -56 201 -33 -56 206 -28 minecraft:sandstone
-fill -56 207 -33 -56 207 -28 minecraft:red_sand
-fill -57 201 -27 -57 206 -27 minecraft:sandstone
-fill -57 207 -27 -57 207 -27 minecraft:red_sand
-fill -58 201 -26 -58 206 -24 minecraft:sandstone
-fill -58 207 -26 -58 207 -24 minecraft:red_sand
-fill -59 201 -25 -59 206 -24 minecraft:sandstone
-fill -59 207 -25 -59 207 -24 minecraft:red_sand
-fill -59 201 -32 -57 207 -28 minecraft:sandstone
-fill -59 208 -32 -57 208 -28 minecraft:red_sand
-fill -59 201 -27 -58 207 -27 minecraft:sandstone
-fill -59 208 -27 -58 208 -27 minecraft:red_sand
-fill -59 201 -26 -59 207 -26 minecraft:sandstone
-fill -59 208 -26 -59 208 -26 minecraft:red_sand
-fill -54 201 -39 -52 210 -38 minecraft:smooth_red_sandstone
-fill -54 211 -39 -52 211 -38 minecraft:red_sand
-fill -51 201 -39 -50 210 -38 minecraft:terracotta
-fill -51 211 -39 -50 211 -38 minecraft:red_sand
-fill -56 201 -36 -55 212 -36 minecraft:smooth_red_sandstone
-fill -56 213 -36 -55 213 -36 minecraft:red_sand
-fill -56 201 -37 -55 212 -37 minecraft:terracotta
-fill -56 213 -37 -55 213 -37 minecraft:red_sand
-execute positioned -51 206 -35 run function rlk:room/prop/sd_rock_s
-execute positioned -56 208 -33 run function rlk:room/prop/sd_obelisk
-execute positioned -48 206 -36 run function rlk:room/prop/sd_bush
-execute positioned -57 206 -38 run function rlk:room/prop/sd_dry
-execute positioned -59 209 -26 run function rlk:room/prop/sd_bush
-execute positioned -58 209 -31 run function rlk:room/prop/sd_bush
-execute positioned -47 206 -31 run function rlk:room/prop/sd_bush
-execute positioned -48 206 -31 run function rlk:room/prop/sd_dry
-execute positioned -45 206 -39 run function rlk:room/prop/sd_bush
-setblock -56 214 -36 minecraft:dead_bush keep
-setblock -55 214 -37 minecraft:dead_bush keep
-setblock -53 212 -39 minecraft:dead_bush keep
-setblock -53 212 -38 minecraft:dead_bush keep
-setblock -52 212 -39 minecraft:dead_bush keep
-setblock -52 212 -38 minecraft:dead_bush keep
-setblock -50 212 -39 minecraft:dead_bush keep
+fill -60 201 -40 -41 210 -21 minecraft:smooth_sandstone
+fill -59 201 -39 -42 210 -22 minecraft:air
+fill -59 209 -39 -42 209 -22 minecraft:light[level=15]
+fill -45 200 -32 -43 200 -31 minecraft:smooth_sandstone
+fill -46 200 -30 -42 200 -29 minecraft:sand
+fill -60 201 -34 -60 201 -31 minecraft:red_sandstone
+fill -60 210 -37 -60 210 -37 minecraft:chiseled_sandstone
+fill -60 203 -37 -60 204 -37 minecraft:sandstone
+fill -60 209 -28 -60 210 -23 minecraft:cut_sandstone
+fill -41 201 -30 -41 203 -25 minecraft:orange_terracotta
+fill -41 206 -39 -41 206 -34 minecraft:terracotta
+fill -41 208 -23 -41 208 -23 minecraft:orange_terracotta
+fill -55 201 -40 -52 201 -40 minecraft:terracotta
+fill -59 206 -21 -56 207 -21 minecraft:red_sandstone
+fill -52 207 -21 -48 208 -21 minecraft:smooth_red_sandstone
+fill -54 206 -21 -54 208 -21 minecraft:orange_terracotta
+fill -60 210 -40 -41 210 -21 minecraft:polished_deepslate
+fill -59 210 -39 -42 210 -22 minecraft:air
+fill -59 201 -35 -56 201 -35 minecraft:red_sand
+fill -56 201 -34 -55 201 -34 minecraft:red_sand
+fill -55 201 -33 -55 201 -27 minecraft:red_sand
+fill -56 201 -27 -56 201 -27 minecraft:red_sand
+fill -57 201 -26 -57 201 -23 minecraft:red_sand
+fill -59 201 -23 -58 201 -23 minecraft:red_sand
+fill -59 201 -34 -57 201 -33 minecraft:sandstone
+fill -59 202 -34 -57 202 -33 minecraft:red_sand
+fill -56 201 -33 -56 201 -28 minecraft:sandstone
+fill -56 202 -33 -56 202 -28 minecraft:red_sand
+fill -57 201 -27 -57 201 -27 minecraft:sandstone
+fill -57 202 -27 -57 202 -27 minecraft:red_sand
+fill -58 201 -26 -58 201 -24 minecraft:sandstone
+fill -58 202 -26 -58 202 -24 minecraft:red_sand
+fill -59 201 -25 -59 201 -24 minecraft:sandstone
+fill -59 202 -25 -59 202 -24 minecraft:red_sand
+fill -59 201 -32 -57 202 -28 minecraft:sandstone
+fill -59 203 -32 -57 203 -28 minecraft:red_sand
+fill -59 201 -27 -58 202 -27 minecraft:sandstone
+fill -59 203 -27 -58 203 -27 minecraft:red_sand
+fill -59 201 -26 -59 202 -26 minecraft:sandstone
+fill -59 203 -26 -59 203 -26 minecraft:red_sand
+fill -54 201 -39 -52 205 -38 minecraft:smooth_red_sandstone
+fill -54 206 -39 -52 206 -38 minecraft:red_sand
+fill -51 201 -39 -50 205 -38 minecraft:terracotta
+fill -51 206 -39 -50 206 -38 minecraft:red_sand
+fill -56 201 -36 -55 207 -36 minecraft:smooth_red_sandstone
+fill -56 208 -36 -55 208 -36 minecraft:red_sand
+fill -56 201 -37 -55 207 -37 minecraft:terracotta
+fill -56 208 -37 -55 208 -37 minecraft:red_sand
+execute positioned -51 201 -35 run function rlk:room/prop/sd_rock_s
+execute positioned -56 203 -33 run function rlk:room/prop/sd_obelisk
+execute positioned -48 201 -36 run function rlk:room/prop/sd_bush
+execute positioned -57 201 -38 run function rlk:room/prop/sd_dry
+execute positioned -59 204 -26 run function rlk:room/prop/sd_bush
+execute positioned -58 204 -31 run function rlk:room/prop/sd_bush
+execute positioned -47 201 -31 run function rlk:room/prop/sd_bush
+execute positioned -48 201 -31 run function rlk:room/prop/sd_dry
+execute positioned -45 201 -39 run function rlk:room/prop/sd_bush
+setblock -56 209 -36 minecraft:dead_bush keep
+setblock -55 209 -37 minecraft:dead_bush keep
+setblock -53 207 -39 minecraft:dead_bush keep
+setblock -53 207 -38 minecraft:dead_bush keep
+setblock -52 207 -39 minecraft:dead_bush keep
+setblock -52 207 -38 minecraft:dead_bush keep
+setblock -50 207 -39 minecraft:dead_bush keep

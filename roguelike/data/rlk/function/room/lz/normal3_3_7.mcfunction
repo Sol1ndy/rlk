@@ -116,10 +116,6 @@ fill 37 201 30 38 201 30 minecraft:podzol
 fill 28 201 31 32 201 31 minecraft:podzol
 fill 34 201 31 37 201 31 minecraft:podzol
 fill 43 201 31 45 201 31 minecraft:podzol
-fill 28 201 34 58 201 35 minecraft:podzol
-fill 26 201 35 27 201 35 minecraft:podzol
-fill 26 201 36 26 201 38 minecraft:podzol
-fill 25 201 37 25 201 38 minecraft:podzol
 fill 35 201 14 35 201 14 minecraft:calcite
 fill 35 202 14 35 202 14 minecraft:podzol
 fill 43 201 10 43 201 10 minecraft:diorite
@@ -194,10 +190,6 @@ fill 28 201 30 32 201 30 minecraft:dirt
 fill 28 202 30 32 202 30 minecraft:podzol
 fill 35 201 30 36 201 30 minecraft:dirt
 fill 35 202 30 36 202 30 minecraft:podzol
-fill 27 201 36 58 201 36 minecraft:dirt
-fill 27 202 36 58 202 36 minecraft:podzol
-fill 27 201 37 27 201 38 minecraft:dirt
-fill 27 202 37 27 202 38 minecraft:podzol
 fill 43 201 9 43 202 9 minecraft:calcite
 fill 43 203 9 43 203 9 minecraft:podzol
 fill 45 201 9 45 202 9 minecraft:calcite
@@ -224,8 +216,6 @@ fill 26 201 17 26 202 17 minecraft:dirt
 fill 26 203 17 26 203 17 minecraft:podzol
 fill 24 201 18 25 202 18 minecraft:dirt
 fill 24 203 18 25 203 18 minecraft:podzol
-fill 28 201 37 58 202 38 minecraft:dirt
-fill 28 203 37 58 203 38 minecraft:podzol
 fill 45 201 5 47 203 8 minecraft:calcite
 fill 45 204 5 47 204 8 minecraft:podzol
 fill 43 201 6 44 203 8 minecraft:calcite
@@ -342,8 +332,8 @@ execute positioned 56 201 28 run function rlk:room/prop/p_grass
 execute positioned 35 204 13 run function rlk:room/prop/fo_flower
 execute positioned 25 201 28 run function rlk:room/prop/p_grass
 execute positioned 49 201 29 run function rlk:room/prop/p_grass
-execute positioned 31 204 38 run function rlk:room/prop/fo_white
-execute positioned 52 204 37 run function rlk:room/prop/p_grass
+execute positioned 31 201 38 run function rlk:room/prop/fo_white
+execute positioned 52 201 37 run function rlk:room/prop/p_grass
 execute positioned 45 201 3 run function rlk:room/prop/p_grass
 execute positioned 29 203 15 run function rlk:room/prop/p_grass
 execute positioned 51 201 19 run function rlk:room/prop/fo_flower

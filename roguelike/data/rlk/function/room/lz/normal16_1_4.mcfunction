@@ -26,20 +26,10 @@ fill 0 206 19 0 209 19 minecraft:tuff
 fill 0 210 0 19 210 19 minecraft:polished_deepslate
 fill 1 210 1 18 210 18 minecraft:air
 fill 13 201 1 14 201 5 minecraft:podzol
-fill 1 201 4 4 201 5 minecraft:podzol
-fill 4 201 6 5 201 13 minecraft:podzol
 fill 15 201 6 18 201 6 minecraft:podzol
 fill 15 201 7 16 201 7 minecraft:podzol
-fill 1 201 14 4 201 14 minecraft:podzol
-fill 1 201 15 3 201 15 minecraft:podzol
-fill 7 201 15 18 201 16 minecraft:podzol
-fill 6 201 16 6 201 18 minecraft:podzol
 fill 15 201 1 18 201 5 minecraft:dirt
 fill 15 202 1 18 202 5 minecraft:podzol
-fill 1 201 6 3 201 13 minecraft:dirt
-fill 1 202 6 3 202 13 minecraft:podzol
-fill 7 201 17 18 201 18 minecraft:dirt
-fill 7 202 17 18 202 18 minecraft:podzol
 fill 12 201 3 12 207 3 minecraft:mossy_stone_bricks
 fill 12 208 3 12 208 3 minecraft:podzol
 fill 18 201 10 18 207 10 minecraft:mossy_stone_bricks
@@ -59,8 +49,8 @@ execute positioned 17 203 2 run function rlk:room/prop/i_flower
 execute positioned 12 201 6 run function rlk:room/prop/i_grass
 execute positioned 7 201 8 run function rlk:room/prop/i_flower
 execute positioned 11 201 1 run function rlk:room/prop/i_grass
-execute positioned 11 203 17 run function rlk:room/prop/i_grass
-execute positioned 18 203 18 run function rlk:room/prop/i_petal
+execute positioned 11 201 17 run function rlk:room/prop/i_grass
+execute positioned 18 201 18 run function rlk:room/prop/i_petal
 setblock 11 209 4 minecraft:short_grass keep
 setblock 12 209 3 minecraft:cherry_leaves[persistent=true] keep
 setblock 12 209 4 minecraft:short_grass keep

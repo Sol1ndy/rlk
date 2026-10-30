@@ -22,16 +22,12 @@ fill 15 209 -1 18 210 -1 minecraft:stone
 fill 16 208 -1 19 210 -1 minecraft:moss_block
 fill 0 210 -20 19 210 -1 minecraft:polished_deepslate
 fill 1 210 -19 18 210 -2 minecraft:air
-fill 4 201 -19 5 201 -18 minecraft:podzol
-fill 5 201 -17 18 201 -17 minecraft:podzol
 fill 1 201 -10 5 201 -10 minecraft:podzol
 fill 1 201 -9 1 201 -9 minecraft:podzol
 fill 5 201 -9 5 201 -6 minecraft:podzol
 fill 6 201 -5 9 201 -5 minecraft:podzol
 fill 9 201 -4 9 201 -2 minecraft:podzol
 fill 8 201 -2 8 201 -2 minecraft:podzol
-fill 6 201 -19 18 201 -18 minecraft:dirt
-fill 6 202 -19 18 202 -18 minecraft:podzol
 fill 2 201 -9 4 201 -8 minecraft:dirt
 fill 2 202 -9 4 202 -8 minecraft:podzol
 fill 1 201 -8 1 201 -6 minecraft:dirt
@@ -61,7 +57,7 @@ fill 5 203 -4 5 203 -3 minecraft:podzol
 fill 6 201 -3 6 202 -3 minecraft:dirt
 fill 6 203 -3 6 203 -3 minecraft:podzol
 execute positioned 3 201 -14 run function rlk:room/prop/f_rock_a
-execute positioned 13 203 -19 run function rlk:room/prop/f_petal
+execute positioned 13 201 -19 run function rlk:room/prop/f_petal
 execute positioned 15 201 -2 run function rlk:room/prop/f_grass
 execute positioned 7 203 -2 run function rlk:room/prop/f_petal
-execute positioned 11 203 -19 run function rlk:room/prop/f_moss
+execute positioned 11 201 -19 run function rlk:room/prop/f_moss

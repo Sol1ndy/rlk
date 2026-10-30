@@ -26,17 +26,12 @@ fill 7 205 -21 11 206 -21 minecraft:iron_ore
 fill 14 207 -21 19 208 -21 minecraft:andesite
 fill 0 210 -40 19 210 -21 minecraft:polished_deepslate
 fill 1 210 -39 18 210 -22 minecraft:air
-fill 5 201 -39 6 201 -38 minecraft:tuff
-fill 6 201 -37 18 201 -37 minecraft:tuff
-fill 7 201 -36 18 201 -36 minecraft:tuff
 fill 15 201 -33 18 201 -32 minecraft:tuff
 fill 15 201 -31 17 201 -31 minecraft:tuff
 fill 15 201 -30 16 201 -30 minecraft:tuff
 fill 15 201 -29 15 201 -27 minecraft:tuff
 fill 16 201 -26 16 201 -22 minecraft:tuff
 fill 18 201 -22 18 201 -22 minecraft:tuff
-fill 7 201 -39 18 201 -38 minecraft:cobbled_deepslate
-fill 7 202 -39 18 202 -38 minecraft:tuff
 fill 17 201 -30 17 201 -22 minecraft:cobbled_deepslate
 fill 17 202 -30 17 202 -22 minecraft:tuff
 fill 16 201 -29 16 201 -27 minecraft:cobbled_deepslate

@@ -1,548 +1,412 @@
 # 구역 건설 (normal14_3, 테마 7): 칸(바닥 · 벽) → 바닥 · 벽 무늬 → 지형 → 낙사 구간 → 프롭. build/layouts3.py 가 만듦
 fill 0 200 -60 19 200 -41 minecraft:podzol
-fill 0 201 -60 19 212 -41 minecraft:stone
-fill 1 201 -59 19 212 -41 minecraft:air
-fill 1 211 -59 19 211 -41 minecraft:light[level=15]
+fill 0 201 -60 19 210 -41 minecraft:stone
+fill 1 201 -59 19 210 -41 minecraft:air
+fill 1 209 -59 19 209 -41 minecraft:light[level=15]
 fill 0 200 -40 19 200 -21 minecraft:podzol
-fill 0 201 -40 19 212 -21 minecraft:stone
-fill 1 201 -40 19 212 -22 minecraft:air
-fill 1 211 -40 19 211 -22 minecraft:light[level=15]
+fill 0 201 -40 19 210 -21 minecraft:stone
+fill 1 201 -40 19 210 -22 minecraft:air
+fill 1 209 -40 19 209 -22 minecraft:light[level=15]
 fill 20 200 -60 39 200 -41 minecraft:podzol
-fill 20 201 -60 39 212 -41 minecraft:stone
-fill 20 201 -59 38 212 -41 minecraft:air
-fill 20 211 -59 38 211 -41 minecraft:light[level=15]
+fill 20 201 -60 39 210 -41 minecraft:stone
+fill 20 201 -59 38 210 -41 minecraft:air
+fill 20 209 -59 38 209 -41 minecraft:light[level=15]
 fill 20 200 -40 39 200 -21 minecraft:podzol
-fill 20 201 -40 39 212 -21 minecraft:stone
-fill 20 201 -40 38 212 -22 minecraft:air
-fill 20 211 -40 38 211 -22 minecraft:light[level=15]
-fill 20 202 -43 21 202 -41 minecraft:moss_block
-fill 24 202 -38 26 202 -37 minecraft:gravel
-fill 28 202 -28 29 202 -25 minecraft:calcite
-fill 2 202 -46 3 202 -44 minecraft:coarse_dirt
-fill 4 202 -42 7 202 -41 minecraft:coarse_dirt
-fill 33 202 -46 35 202 -45 minecraft:coarse_dirt
-fill 28 202 -29 30 202 -26 minecraft:calcite
-fill 1 202 -49 3 202 -47 minecraft:coarse_dirt
-fill 7 202 -28 8 202 -25 minecraft:moss_block
-fill 14 202 -44 16 202 -41 minecraft:coarse_dirt
-fill 0 202 -50 0 202 -48 minecraft:calcite
-fill 0 207 -50 0 210 -46 minecraft:calcite
-fill 0 206 -55 0 209 -53 minecraft:moss_block
-fill 15 212 -60 16 212 -60 minecraft:birch_leaves[persistent=true]
-fill 6 210 -60 9 210 -60 minecraft:calcite
-fill 2 207 -60 2 207 -60 minecraft:calcite
-fill 1 210 -60 1 210 -60 minecraft:moss_block
-fill 0 210 -29 0 211 -29 minecraft:diorite
-fill 0 207 -31 0 208 -29 minecraft:moss_block
-fill 0 202 -32 0 202 -27 minecraft:moss_block
-fill 0 201 -29 0 202 -26 minecraft:calcite
-fill 0 210 -26 0 211 -21 minecraft:moss_block
-fill 0 209 -40 0 211 -37 minecraft:diorite
-fill 3 202 -21 7 203 -21 minecraft:calcite
-fill 15 206 -21 18 207 -21 minecraft:moss_block
-fill 14 212 -21 16 212 -21 minecraft:birch_leaves[persistent=true]
-fill 15 202 -21 16 202 -21 minecraft:calcite
-fill 10 205 -21 13 205 -21 minecraft:calcite
-fill 15 210 -21 19 212 -21 minecraft:diorite
-fill 39 211 -44 39 212 -43 minecraft:oak_leaves[persistent=true]
-fill 39 211 -57 39 212 -52 minecraft:dark_prismarine
-fill 39 212 -52 39 212 -47 minecraft:oak_leaves[persistent=true]
-fill 39 207 -57 39 209 -53 minecraft:calcite
-fill 39 211 -58 39 212 -53 minecraft:birch_leaves[persistent=true]
-fill 39 208 -56 39 208 -55 minecraft:calcite
-fill 26 206 -60 29 208 -60 minecraft:calcite
-fill 22 204 -60 26 204 -60 minecraft:calcite
-fill 24 212 -60 25 212 -60 minecraft:birch_leaves[persistent=true]
-fill 29 201 -60 29 201 -60 minecraft:prismarine
-fill 39 212 -40 39 212 -40 minecraft:birch_leaves[persistent=true]
-fill 39 212 -25 39 212 -23 minecraft:oak_leaves[persistent=true]
-fill 39 211 -32 39 211 -27 minecraft:diorite
-fill 39 211 -34 39 212 -29 minecraft:birch_leaves[persistent=true]
-fill 29 211 -21 29 212 -21 minecraft:birch_leaves[persistent=true]
-fill 32 211 -21 36 212 -21 minecraft:birch_leaves[persistent=true]
-fill 29 205 -21 33 207 -21 minecraft:dark_prismarine
-fill 37 212 -21 38 212 -21 minecraft:birch_leaves[persistent=true]
-fill 0 212 -60 19 212 -41 minecraft:polished_deepslate
-fill 1 212 -59 19 212 -41 minecraft:air
-fill 0 212 -40 19 212 -21 minecraft:polished_deepslate
-fill 1 212 -40 19 212 -22 minecraft:air
-fill 20 212 -60 39 212 -41 minecraft:polished_deepslate
-fill 20 212 -59 38 212 -41 minecraft:air
-fill 20 212 -40 39 212 -21 minecraft:polished_deepslate
-fill 20 212 -40 38 212 -22 minecraft:air
-fill 1 201 -59 8 201 -59 minecraft:dirt
-fill 1 202 -59 8 202 -59 minecraft:podzol
-fill 20 201 -59 23 201 -59 minecraft:dirt
-fill 20 202 -59 23 202 -59 minecraft:podzol
-fill 33 201 -59 38 201 -58 minecraft:dirt
-fill 33 202 -59 38 202 -58 minecraft:podzol
-fill 1 201 -58 7 201 -36 minecraft:dirt
-fill 1 202 -58 7 202 -36 minecraft:podzol
-fill 21 201 -58 23 201 -52 minecraft:dirt
-fill 21 202 -58 23 202 -52 minecraft:podzol
-fill 33 201 -57 35 201 -56 minecraft:dirt
-fill 33 202 -57 35 202 -56 minecraft:podzol
-fill 24 201 -55 24 201 -52 minecraft:dirt
-fill 24 202 -55 24 202 -52 minecraft:podzol
-fill 32 201 -55 34 201 -55 minecraft:dirt
-fill 32 202 -55 34 202 -55 minecraft:podzol
-fill 25 201 -54 25 201 -52 minecraft:dirt
-fill 25 202 -54 25 202 -52 minecraft:podzol
-fill 32 201 -54 32 201 -54 minecraft:dirt
-fill 32 202 -54 32 202 -54 minecraft:podzol
-fill 8 201 -53 8 201 -46 minecraft:dirt
-fill 8 202 -53 8 202 -46 minecraft:podzol
-fill 20 201 -53 20 201 -51 minecraft:dirt
-fill 20 202 -53 20 202 -51 minecraft:podzol
-fill 26 201 -53 29 201 -52 minecraft:dirt
-fill 26 202 -53 29 202 -52 minecraft:podzol
-fill 31 201 -53 31 201 -52 minecraft:dirt
-fill 31 202 -53 31 202 -52 minecraft:podzol
-fill 30 201 -52 30 201 -22 minecraft:dirt
-fill 30 202 -52 30 202 -22 minecraft:podzol
-fill 9 201 -51 9 201 -46 minecraft:dirt
-fill 9 202 -51 9 202 -46 minecraft:podzol
-fill 19 201 -51 19 201 -51 minecraft:dirt
-fill 19 202 -51 19 202 -51 minecraft:podzol
-fill 28 201 -51 29 201 -37 minecraft:dirt
-fill 28 202 -51 29 202 -37 minecraft:podzol
-fill 17 201 -50 18 201 -36 minecraft:dirt
-fill 17 202 -50 18 202 -36 minecraft:podzol
-fill 15 201 -49 16 201 -37 minecraft:dirt
-fill 15 202 -49 16 202 -37 minecraft:podzol
-fill 10 201 -48 14 201 -34 minecraft:dirt
-fill 10 202 -48 14 202 -34 minecraft:podzol
-fill 19 201 -47 27 201 -37 minecraft:dirt
-fill 19 202 -47 27 202 -37 minecraft:podzol
-fill 31 201 -47 37 201 -22 minecraft:dirt
-fill 31 202 -47 37 202 -22 minecraft:podzol
-fill 8 201 -43 9 201 -22 minecraft:dirt
-fill 8 202 -43 9 202 -22 minecraft:podzol
-fill 38 201 -42 38 201 -22 minecraft:dirt
-fill 38 202 -42 38 202 -22 minecraft:podzol
-fill 16 201 -36 16 201 -36 minecraft:dirt
-fill 16 202 -36 16 202 -36 minecraft:podzol
-fill 19 201 -36 26 201 -36 minecraft:dirt
-fill 19 202 -36 26 202 -36 minecraft:podzol
-fill 29 201 -36 29 201 -25 minecraft:dirt
-fill 29 202 -36 29 202 -25 minecraft:podzol
-fill 4 201 -35 7 201 -35 minecraft:dirt
-fill 4 202 -35 7 202 -35 minecraft:podzol
-fill 26 201 -35 26 201 -25 minecraft:dirt
-fill 26 202 -35 26 202 -25 minecraft:podzol
-fill 5 201 -34 7 201 -22 minecraft:dirt
-fill 5 202 -34 7 202 -22 minecraft:podzol
-fill 27 201 -34 28 201 -25 minecraft:dirt
-fill 27 202 -34 28 202 -25 minecraft:podzol
-fill 10 201 -33 12 201 -22 minecraft:dirt
-fill 10 202 -33 12 202 -22 minecraft:podzol
-fill 25 201 -30 25 201 -27 minecraft:dirt
-fill 25 202 -30 25 202 -27 minecraft:podzol
-fill 24 201 -28 24 201 -28 minecraft:dirt
-fill 24 202 -28 24 202 -28 minecraft:podzol
-fill 13 201 -27 17 201 -27 minecraft:dirt
-fill 13 202 -27 17 202 -27 minecraft:podzol
-fill 4 201 -26 4 201 -22 minecraft:dirt
-fill 4 202 -26 4 202 -22 minecraft:podzol
-fill 13 201 -26 16 201 -22 minecraft:dirt
-fill 13 202 -26 16 202 -22 minecraft:podzol
-fill 3 201 -25 3 201 -22 minecraft:dirt
-fill 3 202 -25 3 202 -22 minecraft:podzol
-fill 1 201 -24 2 201 -22 minecraft:dirt
-fill 1 202 -24 2 202 -22 minecraft:podzol
-fill 9 201 -59 10 202 -58 minecraft:dirt
-fill 9 203 -59 10 203 -58 minecraft:podzol
-fill 18 201 -59 19 202 -58 minecraft:dirt
-fill 18 203 -59 19 203 -58 minecraft:podzol
-fill 24 201 -59 25 202 -56 minecraft:dirt
-fill 24 203 -59 25 203 -56 minecraft:podzol
-fill 31 201 -59 32 202 -56 minecraft:dirt
-fill 31 203 -59 32 203 -56 minecraft:podzol
-fill 8 201 -58 8 202 -54 minecraft:dirt
-fill 8 203 -58 8 203 -54 minecraft:podzol
-fill 20 201 -58 20 202 -54 minecraft:dirt
-fill 20 203 -58 20 203 -54 minecraft:podzol
-fill 9 201 -57 9 202 -52 minecraft:dirt
-fill 9 203 -57 9 203 -52 minecraft:podzol
-fill 19 201 -57 19 202 -52 minecraft:dirt
-fill 19 203 -57 19 203 -52 minecraft:podzol
-fill 25 201 -55 29 202 -55 minecraft:dirt
-fill 25 203 -55 29 203 -55 minecraft:podzol
-fill 31 201 -55 31 202 -55 minecraft:dirt
-fill 31 203 -55 31 203 -55 minecraft:podzol
-fill 35 201 -55 35 202 -55 minecraft:dirt
-fill 35 203 -55 35 203 -55 minecraft:podzol
-fill 10 201 -54 10 202 -53 minecraft:dirt
-fill 10 203 -54 10 203 -53 minecraft:podzol
-fill 18 201 -54 18 202 -51 minecraft:dirt
-fill 18 203 -54 18 203 -51 minecraft:podzol
-fill 26 201 -54 28 202 -54 minecraft:dirt
-fill 26 203 -54 28 203 -54 minecraft:podzol
-fill 33 201 -54 34 202 -54 minecraft:dirt
-fill 33 203 -54 34 203 -54 minecraft:podzol
-fill 37 201 -54 38 202 -54 minecraft:dirt
-fill 37 203 -54 38 203 -54 minecraft:podzol
-fill 32 201 -53 33 202 -51 minecraft:dirt
-fill 32 203 -53 33 203 -51 minecraft:podzol
-fill 16 201 -52 17 202 -51 minecraft:dirt
-fill 16 203 -52 17 203 -51 minecraft:podzol
-fill 31 201 -51 31 202 -48 minecraft:dirt
-fill 31 203 -51 31 203 -48 minecraft:podzol
-fill 16 201 -50 16 202 -50 minecraft:dirt
-fill 16 203 -50 16 203 -50 minecraft:podzol
-fill 19 201 -50 19 202 -48 minecraft:dirt
-fill 19 203 -50 19 203 -48 minecraft:podzol
-fill 32 201 -50 32 202 -48 minecraft:dirt
-fill 32 203 -50 32 203 -48 minecraft:podzol
-fill 33 201 -48 37 202 -48 minecraft:dirt
-fill 33 203 -48 37 203 -48 minecraft:podzol
-fill 38 201 -47 38 202 -43 minecraft:dirt
-fill 38 203 -47 38 203 -43 minecraft:podzol
-fill 15 201 -36 15 202 -34 minecraft:dirt
-fill 15 203 -36 15 203 -34 minecraft:podzol
-fill 1 201 -35 3 202 -35 minecraft:dirt
-fill 1 203 -35 3 203 -35 minecraft:podzol
-fill 16 201 -35 25 202 -35 minecraft:dirt
-fill 16 203 -35 25 203 -35 minecraft:podzol
-fill 3 201 -34 4 202 -27 minecraft:dirt
-fill 3 203 -34 4 203 -27 minecraft:podzol
-fill 20 201 -34 25 202 -33 minecraft:dirt
-fill 20 203 -34 25 203 -33 minecraft:podzol
-fill 13 201 -33 14 202 -33 minecraft:dirt
-fill 13 203 -33 14 203 -33 minecraft:podzol
-fill 13 201 -32 13 202 -30 minecraft:dirt
-fill 13 203 -32 13 203 -30 minecraft:podzol
-fill 21 201 -32 25 202 -31 minecraft:dirt
-fill 21 203 -32 25 203 -31 minecraft:podzol
-fill 14 201 -31 14 202 -30 minecraft:dirt
-fill 14 203 -31 14 203 -30 minecraft:podzol
-fill 20 201 -31 20 202 -25 minecraft:dirt
-fill 20 203 -31 20 203 -25 minecraft:podzol
-fill 21 201 -30 24 202 -29 minecraft:dirt
-fill 21 203 -30 24 203 -29 minecraft:podzol
-fill 15 201 -29 16 202 -28 minecraft:dirt
-fill 15 203 -29 16 203 -28 minecraft:podzol
-fill 18 201 -29 19 202 -25 minecraft:dirt
-fill 18 203 -29 19 203 -25 minecraft:podzol
-fill 17 201 -28 17 202 -28 minecraft:dirt
-fill 17 203 -28 17 203 -28 minecraft:podzol
-fill 21 201 -28 23 202 -25 minecraft:dirt
-fill 21 203 -28 23 203 -25 minecraft:podzol
-fill 24 201 -27 24 202 -25 minecraft:dirt
-fill 24 203 -27 24 203 -25 minecraft:podzol
-fill 1 201 -26 3 202 -26 minecraft:dirt
-fill 1 203 -26 3 203 -26 minecraft:podzol
-fill 17 201 -26 17 202 -22 minecraft:dirt
-fill 17 203 -26 17 203 -22 minecraft:podzol
-fill 25 201 -26 25 202 -25 minecraft:dirt
-fill 25 203 -26 25 203 -25 minecraft:podzol
-fill 1 201 -25 2 202 -25 minecraft:dirt
-fill 1 203 -25 2 203 -25 minecraft:podzol
-fill 18 201 -24 18 202 -22 minecraft:dirt
-fill 18 203 -24 18 203 -22 minecraft:podzol
-fill 20 201 -50 20 203 -50 minecraft:calcite
-fill 20 204 -50 20 204 -50 minecraft:podzol
-fill 20 201 -48 20 203 -48 minecraft:calcite
-fill 20 204 -48 20 204 -48 minecraft:podzol
-fill 15 201 -50 15 203 -50 minecraft:diorite
-fill 15 204 -50 15 204 -50 minecraft:podzol
-fill 11 201 -59 17 203 -56 minecraft:dirt
-fill 11 204 -59 17 204 -56 minecraft:podzol
-fill 26 201 -59 30 203 -56 minecraft:dirt
-fill 26 204 -59 30 204 -56 minecraft:podzol
-fill 10 201 -57 10 203 -55 minecraft:dirt
-fill 10 204 -57 10 204 -55 minecraft:podzol
-fill 18 201 -57 18 203 -55 minecraft:dirt
-fill 18 204 -57 18 204 -55 minecraft:podzol
-fill 11 201 -55 11 203 -53 minecraft:dirt
-fill 11 204 -55 11 204 -53 minecraft:podzol
-fill 14 201 -55 17 203 -53 minecraft:dirt
-fill 14 204 -55 17 204 -53 minecraft:podzol
-fill 12 201 -53 13 203 -53 minecraft:dirt
-fill 12 204 -53 13 204 -53 minecraft:podzol
-fill 37 201 -53 38 203 -49 minecraft:dirt
-fill 37 204 -53 38 204 -49 minecraft:podzol
-fill 15 201 -52 15 203 -51 minecraft:dirt
-fill 15 204 -52 15 204 -51 minecraft:podzol
-fill 36 201 -52 36 203 -49 minecraft:dirt
-fill 36 204 -52 36 204 -49 minecraft:podzol
-fill 34 201 -51 35 203 -49 minecraft:dirt
-fill 34 204 -51 35 204 -49 minecraft:podzol
-fill 33 201 -50 33 203 -49 minecraft:dirt
-fill 33 204 -50 33 204 -49 minecraft:podzol
-fill 20 201 -49 20 203 -49 minecraft:dirt
-fill 20 204 -49 20 204 -49 minecraft:podzol
-fill 38 201 -48 38 203 -48 minecraft:dirt
-fill 38 204 -48 38 204 -48 minecraft:podzol
-fill 1 201 -34 2 203 -27 minecraft:dirt
-fill 1 204 -34 2 204 -27 minecraft:podzol
-fill 16 201 -34 19 203 -30 minecraft:dirt
-fill 16 204 -34 19 204 -30 minecraft:podzol
-fill 15 201 -33 15 203 -30 minecraft:dirt
-fill 15 204 -33 15 204 -30 minecraft:podzol
-fill 14 201 -32 14 203 -32 minecraft:dirt
-fill 14 204 -32 14 204 -32 minecraft:podzol
-fill 20 201 -32 20 203 -32 minecraft:dirt
-fill 20 204 -32 20 204 -32 minecraft:podzol
-fill 17 201 -29 17 203 -29 minecraft:dirt
-fill 17 204 -29 17 204 -29 minecraft:podzol
-fill 10 201 -52 11 204 -49 minecraft:calcite
-fill 10 205 -52 11 205 -49 minecraft:podzol
-fill 21 201 -51 27 204 -51 minecraft:calcite
-fill 21 205 -51 27 205 -51 minecraft:podzol
-fill 12 201 -50 14 204 -49 minecraft:calcite
-fill 12 205 -50 14 205 -49 minecraft:podzol
-fill 21 201 -50 23 204 -49 minecraft:calcite
-fill 21 205 -50 23 205 -49 minecraft:podzol
-fill 27 201 -50 27 204 -48 minecraft:calcite
-fill 27 205 -50 27 205 -48 minecraft:podzol
-fill 24 201 -48 26 204 -48 minecraft:calcite
-fill 24 205 -48 26 205 -48 minecraft:podzol
-fill 12 201 -52 14 204 -51 minecraft:diorite
-fill 12 205 -52 14 205 -51 minecraft:podzol
-fill 24 201 -50 26 204 -49 minecraft:diorite
-fill 24 205 -50 26 205 -49 minecraft:podzol
-fill 21 201 -48 23 204 -48 minecraft:diorite
-fill 21 205 -48 23 205 -48 minecraft:podzol
-fill 30 201 -55 30 208 -53 minecraft:calcite
-fill 30 209 -55 30 209 -53 minecraft:podzol
-fill 31 201 -54 31 208 -54 minecraft:calcite
-fill 31 209 -54 31 209 -54 minecraft:podzol
-fill 8 201 -44 9 208 -44 minecraft:calcite
-fill 8 209 -44 9 209 -44 minecraft:podzol
-fill 25 201 -24 26 208 -22 minecraft:calcite
-fill 25 209 -24 26 209 -22 minecraft:podzol
-fill 29 201 -54 29 208 -54 minecraft:diorite
-fill 29 209 -54 29 209 -54 minecraft:podzol
-fill 8 201 -45 9 208 -45 minecraft:diorite
-fill 8 209 -45 9 209 -45 minecraft:podzol
-fill 27 201 -24 29 208 -22 minecraft:diorite
-fill 27 209 -24 29 209 -22 minecraft:podzol
-fill 36 201 -56 38 209 -55 minecraft:calcite
-fill 36 210 -56 38 210 -55 minecraft:podzol
-fill 12 201 -55 13 209 -55 minecraft:calcite
-fill 12 210 -55 13 210 -55 minecraft:podzol
-fill 35 201 -54 36 209 -53 minecraft:calcite
-fill 35 210 -54 36 210 -53 minecraft:podzol
-fill 34 201 -53 34 209 -52 minecraft:calcite
-fill 34 210 -53 34 210 -52 minecraft:podzol
-fill 35 201 -52 35 209 -52 minecraft:calcite
-fill 35 210 -52 35 210 -52 minecraft:podzol
-fill 27 201 -36 28 209 -35 minecraft:calcite
-fill 27 210 -36 28 210 -35 minecraft:podzol
-fill 13 201 -29 14 209 -28 minecraft:calcite
-fill 13 210 -29 14 210 -28 minecraft:podzol
-fill 19 201 -24 20 209 -22 minecraft:calcite
-fill 19 210 -24 20 210 -22 minecraft:podzol
-fill 24 201 -24 24 209 -22 minecraft:calcite
-fill 24 210 -24 24 210 -22 minecraft:podzol
-fill 21 201 -22 23 209 -22 minecraft:calcite
-fill 21 210 -22 23 210 -22 minecraft:podzol
-fill 36 201 -57 38 209 -57 minecraft:diorite
-fill 36 210 -57 38 210 -57 minecraft:podzol
-fill 12 201 -54 13 209 -54 minecraft:diorite
-fill 12 210 -54 13 210 -54 minecraft:podzol
-fill 21 201 -24 23 209 -23 minecraft:diorite
-fill 21 210 -24 23 210 -23 minecraft:podzol
-fill 1 201 -57 4 201 -41 minecraft:clay
-fill 1 202 -57 4 202 -41 minecraft:water
-fill 5 201 -56 5 201 -42 minecraft:clay
-fill 5 202 -56 5 202 -42 minecraft:water
-fill 6 201 -53 7 201 -52 minecraft:clay
-fill 6 202 -53 7 202 -52 minecraft:water
-fill 35 201 -47 36 201 -41 minecraft:clay
-fill 35 202 -47 36 202 -41 minecraft:water
-fill 14 201 -46 18 201 -45 minecraft:clay
-fill 14 202 -46 18 202 -45 minecraft:water
-fill 13 201 -45 13 201 -43 minecraft:clay
-fill 13 202 -45 13 202 -43 minecraft:water
-fill 14 201 -44 15 201 -42 minecraft:clay
-fill 14 202 -44 15 202 -42 minecraft:water
-fill 25 201 -44 31 201 -41 minecraft:clay
-fill 25 202 -44 31 202 -41 minecraft:water
-fill 32 201 -43 32 201 -41 minecraft:clay
-fill 32 202 -43 32 202 -41 minecraft:water
-fill 1 201 -38 6 201 -37 minecraft:clay
-fill 1 202 -38 6 202 -37 minecraft:water
-fill 7 201 -37 7 201 -28 minecraft:clay
-fill 7 202 -37 7 202 -28 minecraft:water
-fill 5 201 -36 6 201 -36 minecraft:clay
-fill 5 202 -36 6 202 -36 minecraft:water
-fill 10 201 -36 10 201 -35 minecraft:clay
-fill 10 202 -36 10 202 -35 minecraft:water
-fill 13 201 -36 14 201 -35 minecraft:clay
-fill 13 202 -36 14 202 -35 minecraft:water
-fill 6 201 -35 6 201 -30 minecraft:clay
-fill 6 202 -35 6 202 -30 minecraft:water
-fill 11 201 -35 12 201 -34 minecraft:clay
-fill 11 202 -35 12 202 -34 minecraft:water
-fill 35 201 -33 38 201 -24 minecraft:clay
-fill 35 202 -33 38 202 -24 minecraft:water
-fill 8 201 -32 10 201 -30 minecraft:clay
-fill 8 202 -32 10 202 -30 minecraft:water
-fill 34 201 -32 34 201 -25 minecraft:clay
-fill 34 202 -32 34 202 -25 minecraft:water
-fill 8 201 -29 9 201 -28 minecraft:clay
-fill 8 202 -29 9 202 -28 minecraft:water
-fill 26 201 -28 27 201 -27 minecraft:clay
-fill 26 202 -28 27 202 -27 minecraft:water
-fill 32 201 -27 33 201 -26 minecraft:clay
-fill 32 202 -27 33 202 -26 minecraft:water
-fill 9 202 -35 9 202 -34 minecraft:spruce_planks
-fill 8 202 -34 8 202 -33 minecraft:spruce_planks
-fill 28 202 -27 30 202 -26 minecraft:spruce_planks
-fill 31 202 -26 31 202 -25 minecraft:spruce_planks
-fill 1 202 -58 5 202 -58 minecraft:sand
-fill 5 202 -57 6 202 -57 minecraft:sand
-fill 6 202 -56 6 202 -54 minecraft:sand
-fill 6 202 -51 6 202 -41 minecraft:sand
-fill 13 202 -47 16 202 -47 minecraft:sand
-fill 18 202 -47 19 202 -47 minecraft:sand
-fill 19 202 -46 19 202 -46 minecraft:sand
-fill 12 202 -45 12 202 -44 minecraft:sand
-fill 24 202 -45 32 202 -45 minecraft:sand
-fill 32 202 -44 33 202 -44 minecraft:sand
-fill 33 202 -43 33 202 -40 minecraft:sand
-fill 12 202 -42 12 202 -42 minecraft:sand
-fill 5 202 -41 5 202 -39 minecraft:sand
-fill 13 202 -41 15 202 -41 minecraft:sand
-fill 1 202 -40 4 202 -39 minecraft:sand
-fill 25 202 -40 32 202 -40 minecraft:sand
-fill 6 202 -39 7 202 -39 minecraft:sand
-fill 7 202 -38 8 202 -38 minecraft:sand
-fill 8 202 -37 8 202 -35 minecraft:sand
-fill 34 202 -34 38 202 -34 minecraft:sand
-fill 11 202 -33 11 202 -32 minecraft:sand
-fill 33 202 -33 34 202 -33 minecraft:sand
-fill 33 202 -32 33 202 -28 minecraft:sand
-fill 11 202 -30 11 202 -29 minecraft:sand
-fill 6 202 -29 6 202 -28 minecraft:sand
-fill 10 202 -29 10 202 -29 minecraft:sand
-fill 33 202 -25 33 202 -24 minecraft:sand
-fill 34 202 -24 34 202 -23 minecraft:sand
-fill 35 202 -23 38 202 -23 minecraft:sand
-setblock 1 202 -38 minecraft:seagrass
-setblock 2 202 -57 minecraft:sea_pickle[pickles=2,waterlogged=true]
-setblock 2 202 -48 minecraft:seagrass
-setblock 2 202 -38 minecraft:seagrass
-setblock 2 202 -37 minecraft:sea_pickle[pickles=1,waterlogged=true]
-setblock 3 202 -48 minecraft:seagrass
-setblock 3 202 -46 minecraft:seagrass
-setblock 4 202 -55 minecraft:sea_pickle[pickles=3,waterlogged=true]
-setblock 4 202 -49 minecraft:sea_pickle[pickles=2,waterlogged=true]
-setblock 4 202 -47 minecraft:seagrass
-setblock 4 202 -44 minecraft:seagrass
-setblock 4 202 -42 minecraft:seagrass
-setblock 5 202 -46 minecraft:seagrass
-setblock 6 202 -38 minecraft:seagrass
-setblock 8 202 -31 minecraft:seagrass
-setblock 10 202 -32 minecraft:seagrass
-setblock 18 202 -46 minecraft:seagrass
-setblock 25 202 -43 minecraft:sea_pickle[pickles=2,waterlogged=true]
-setblock 25 202 -41 minecraft:seagrass
-setblock 26 202 -43 minecraft:seagrass
-setblock 27 202 -28 minecraft:seagrass
-setblock 29 202 -44 minecraft:seagrass
-setblock 31 202 -43 minecraft:seagrass
-setblock 35 202 -30 minecraft:seagrass
-setblock 36 202 -28 minecraft:seagrass
-setblock 37 202 -31 minecraft:seagrass
-setblock 37 202 -28 minecraft:seagrass
-setblock 37 202 -24 minecraft:seagrass
-execute positioned 12 206 -51 run function rlk:room/prop/fo_lamp
-execute positioned 31 203 -36 run function rlk:room/prop/fo_pipe_z
-execute positioned 21 204 -30 run function rlk:room/prop/fo_rock
-execute positioned 12 205 -59 run function rlk:room/prop/fo_rock_s
-execute positioned 32 204 -59 run function rlk:room/prop/fo_col_a
-execute positioned 34 203 -38 run function rlk:room/prop/fo_lamp2
-execute positioned 11 203 -41 run function rlk:room/prop/fo_ruin_z
-execute positioned 31 204 -48 run function rlk:room/prop/fo_crates
-execute positioned 7 203 -41 run function rlk:room/prop/fo_rock_s
-execute positioned 21 203 -55 run function rlk:room/prop/fo_lamp
-execute positioned 9 204 -55 run function rlk:room/prop/fo_lamp
-execute positioned 18 204 -59 run function rlk:room/prop/fo_col_b
-execute positioned 32 203 -34 run function rlk:room/prop/fo_tree
-execute positioned 16 205 -57 run function rlk:room/prop/fo_lamp
-execute positioned 23 204 -34 run function rlk:room/prop/fo_crates
-execute positioned 11 205 -56 run function rlk:room/prop/p_grass
-execute positioned 24 203 -36 run function rlk:room/prop/fo_flower
-execute positioned 32 203 -29 run function rlk:room/prop/p_grass
-execute positioned 13 203 -40 run function rlk:room/prop/p_grass
-execute positioned 19 204 -48 run function rlk:room/prop/p_grass
-execute positioned 38 205 -53 run function rlk:room/prop/fo_white
-execute positioned 38 204 -44 run function rlk:room/prop/fo_flower
-execute positioned 2 203 -36 run function rlk:room/prop/fo_white
-execute positioned 37 203 -43 run function rlk:room/prop/fo_flower
-execute positioned 23 204 -33 run function rlk:room/prop/p_grass
-execute positioned 9 203 -47 run function rlk:room/prop/fo_white
-execute positioned 19 204 -57 run function rlk:room/prop/fo_flower
-execute positioned 13 203 -42 run function rlk:room/prop/p_grass
-execute positioned 11 203 -37 run function rlk:room/prop/fo_flower
-execute positioned 9 203 -35 run function rlk:room/prop/fo_flower
-execute positioned 25 203 -54 run function rlk:room/prop/fo_flower
-execute positioned 30 203 -32 run function rlk:room/prop/p_grass
-execute positioned 29 203 -49 run function rlk:room/prop/fo_flower
-execute positioned 38 203 -59 run function rlk:room/prop/p_grass
-execute positioned 36 203 -34 run function rlk:room/prop/p_grass
-execute positioned 33 203 -34 run function rlk:room/prop/fo_flower
-execute positioned 16 203 -37 run function rlk:room/prop/p_grass
-execute positioned 21 203 -39 run function rlk:room/prop/fo_flower
-execute positioned 29 205 -57 run function rlk:room/prop/p_grass
-execute positioned 23 204 -30 run function rlk:room/prop/fo_flower
-execute positioned 23 203 -59 run function rlk:room/prop/p_grass
-execute positioned 3 204 -31 run function rlk:room/prop/fo_flower
-execute positioned 28 205 -57 run function rlk:room/prop/fo_white
-execute positioned 13 203 -37 run function rlk:room/prop/p_grass
-execute positioned 25 206 -48 run function rlk:room/prop/fo_flower
-execute positioned 24 204 -29 run function rlk:room/prop/fo_white
-setblock 8 210 -45 minecraft:birch_leaves[persistent=true] keep
-setblock 8 210 -44 minecraft:birch_leaves[persistent=true] keep
-setblock 9 210 -45 minecraft:short_grass keep
-setblock 9 210 -44 minecraft:short_grass keep
-setblock 13 211 -55 minecraft:short_grass keep
-setblock 13 211 -54 minecraft:birch_leaves[persistent=true] keep
-setblock 13 211 -29 minecraft:short_grass keep
-setblock 13 211 -28 minecraft:short_grass keep
-setblock 14 211 -29 minecraft:birch_leaves[persistent=true] keep
-setblock 19 211 -24 minecraft:birch_leaves[persistent=true] keep
-setblock 19 211 -23 minecraft:short_grass keep
-setblock 20 211 -24 minecraft:short_grass keep
-setblock 20 211 -22 minecraft:short_grass keep
-setblock 21 211 -24 minecraft:birch_leaves[persistent=true] keep
-setblock 21 211 -23 minecraft:birch_leaves[persistent=true] keep
-setblock 21 211 -22 minecraft:short_grass keep
-setblock 22 211 -24 minecraft:birch_leaves[persistent=true] keep
-setblock 22 211 -22 minecraft:short_grass keep
-setblock 23 211 -24 minecraft:short_grass keep
-setblock 23 211 -22 minecraft:short_grass keep
-setblock 24 211 -24 minecraft:birch_leaves[persistent=true] keep
-setblock 24 211 -23 minecraft:birch_leaves[persistent=true] keep
-setblock 25 210 -24 minecraft:birch_leaves[persistent=true] keep
-setblock 26 210 -24 minecraft:short_grass keep
-setblock 27 211 -36 minecraft:birch_leaves[persistent=true] keep
-setblock 27 211 -35 minecraft:birch_leaves[persistent=true] keep
-setblock 27 210 -24 minecraft:short_grass keep
-setblock 27 210 -22 minecraft:birch_leaves[persistent=true] keep
-setblock 28 211 -36 minecraft:short_grass keep
-setblock 28 211 -35 minecraft:short_grass keep
-setblock 28 210 -24 minecraft:short_grass keep
-setblock 28 210 -23 minecraft:short_grass keep
-setblock 28 210 -22 minecraft:birch_leaves[persistent=true] keep
-setblock 29 210 -54 minecraft:birch_leaves[persistent=true] keep
-setblock 29 210 -24 minecraft:birch_leaves[persistent=true] keep
-setblock 29 210 -23 minecraft:birch_leaves[persistent=true] keep
-setblock 30 210 -55 minecraft:birch_leaves[persistent=true] keep
-setblock 30 210 -54 minecraft:birch_leaves[persistent=true] keep
-setblock 30 210 -53 minecraft:short_grass keep
-setblock 31 210 -54 minecraft:birch_leaves[persistent=true] keep
-setblock 34 211 -53 minecraft:short_grass keep
-setblock 34 211 -52 minecraft:short_grass keep
-setblock 35 211 -54 minecraft:short_grass keep
-setblock 35 211 -52 minecraft:birch_leaves[persistent=true] keep
-setblock 36 211 -57 minecraft:birch_leaves[persistent=true] keep
-setblock 36 211 -55 minecraft:short_grass keep
-setblock 36 211 -53 minecraft:birch_leaves[persistent=true] keep
-setblock 37 211 -56 minecraft:birch_leaves[persistent=true] keep
-setblock 37 211 -55 minecraft:short_grass keep
-setblock 38 211 -56 minecraft:birch_leaves[persistent=true] keep
-setblock 38 211 -55 minecraft:birch_leaves[persistent=true] keep
+fill 20 201 -40 39 210 -21 minecraft:stone
+fill 20 201 -40 38 210 -22 minecraft:air
+fill 20 209 -40 38 209 -22 minecraft:light[level=15]
+fill 20 200 -43 21 200 -41 minecraft:moss_block
+fill 24 200 -38 26 200 -37 minecraft:gravel
+fill 28 200 -28 29 200 -25 minecraft:calcite
+fill 2 200 -46 3 200 -44 minecraft:coarse_dirt
+fill 4 200 -42 7 200 -41 minecraft:coarse_dirt
+fill 33 200 -46 35 200 -45 minecraft:coarse_dirt
+fill 28 200 -29 30 200 -26 minecraft:calcite
+fill 1 200 -49 3 200 -47 minecraft:coarse_dirt
+fill 7 200 -28 8 200 -25 minecraft:moss_block
+fill 14 200 -44 16 200 -41 minecraft:coarse_dirt
+fill 0 205 -50 0 208 -46 minecraft:calcite
+fill 0 204 -55 0 207 -53 minecraft:moss_block
+fill 15 210 -60 16 210 -60 minecraft:birch_leaves[persistent=true]
+fill 6 208 -60 9 208 -60 minecraft:calcite
+fill 2 205 -60 2 205 -60 minecraft:calcite
+fill 1 208 -60 1 208 -60 minecraft:moss_block
+fill 0 208 -29 0 209 -29 minecraft:diorite
+fill 0 205 -31 0 206 -29 minecraft:moss_block
+fill 0 208 -26 0 209 -21 minecraft:moss_block
+fill 0 207 -40 0 209 -37 minecraft:diorite
+fill 3 201 -21 7 201 -21 minecraft:calcite
+fill 15 204 -21 18 205 -21 minecraft:moss_block
+fill 14 210 -21 16 210 -21 minecraft:birch_leaves[persistent=true]
+fill 10 203 -21 13 203 -21 minecraft:calcite
+fill 15 208 -21 19 210 -21 minecraft:diorite
+fill 39 209 -44 39 210 -43 minecraft:oak_leaves[persistent=true]
+fill 39 209 -57 39 210 -52 minecraft:dark_prismarine
+fill 39 210 -52 39 210 -47 minecraft:oak_leaves[persistent=true]
+fill 39 205 -57 39 207 -53 minecraft:calcite
+fill 39 209 -58 39 210 -53 minecraft:birch_leaves[persistent=true]
+fill 39 206 -56 39 206 -55 minecraft:calcite
+fill 26 204 -60 29 206 -60 minecraft:calcite
+fill 22 202 -60 26 202 -60 minecraft:calcite
+fill 24 210 -60 25 210 -60 minecraft:birch_leaves[persistent=true]
+fill 39 210 -40 39 210 -40 minecraft:birch_leaves[persistent=true]
+fill 39 210 -25 39 210 -23 minecraft:oak_leaves[persistent=true]
+fill 39 209 -32 39 209 -27 minecraft:diorite
+fill 39 209 -34 39 210 -29 minecraft:birch_leaves[persistent=true]
+fill 29 209 -21 29 210 -21 minecraft:birch_leaves[persistent=true]
+fill 32 209 -21 36 210 -21 minecraft:birch_leaves[persistent=true]
+fill 29 203 -21 33 205 -21 minecraft:dark_prismarine
+fill 37 210 -21 38 210 -21 minecraft:birch_leaves[persistent=true]
+fill 0 210 -60 19 210 -41 minecraft:polished_deepslate
+fill 1 210 -59 19 210 -41 minecraft:air
+fill 0 210 -40 19 210 -21 minecraft:polished_deepslate
+fill 1 210 -40 19 210 -22 minecraft:air
+fill 20 210 -60 39 210 -41 minecraft:polished_deepslate
+fill 20 210 -59 38 210 -41 minecraft:air
+fill 20 210 -40 39 210 -21 minecraft:polished_deepslate
+fill 20 210 -40 38 210 -22 minecraft:air
+fill 9 201 -59 10 201 -58 minecraft:podzol
+fill 18 201 -59 19 201 -58 minecraft:podzol
+fill 24 201 -59 25 201 -56 minecraft:podzol
+fill 31 201 -59 32 201 -56 minecraft:podzol
+fill 8 201 -58 8 201 -54 minecraft:podzol
+fill 20 201 -58 20 201 -54 minecraft:podzol
+fill 9 201 -57 9 201 -52 minecraft:podzol
+fill 19 201 -57 19 201 -52 minecraft:podzol
+fill 25 201 -55 29 201 -55 minecraft:podzol
+fill 31 201 -55 31 201 -55 minecraft:podzol
+fill 35 201 -55 35 201 -55 minecraft:podzol
+fill 10 201 -54 10 201 -53 minecraft:podzol
+fill 18 201 -54 18 201 -51 minecraft:podzol
+fill 26 201 -54 28 201 -54 minecraft:podzol
+fill 33 201 -54 34 201 -54 minecraft:podzol
+fill 37 201 -54 38 201 -54 minecraft:podzol
+fill 32 201 -53 33 201 -51 minecraft:podzol
+fill 16 201 -52 17 201 -51 minecraft:podzol
+fill 31 201 -51 31 201 -48 minecraft:podzol
+fill 16 201 -50 16 201 -50 minecraft:podzol
+fill 19 201 -50 19 201 -48 minecraft:podzol
+fill 32 201 -50 32 201 -48 minecraft:podzol
+fill 33 201 -48 37 201 -48 minecraft:podzol
+fill 38 201 -47 38 201 -43 minecraft:podzol
+fill 15 201 -36 15 201 -34 minecraft:podzol
+fill 16 201 -35 25 201 -35 minecraft:podzol
+fill 20 201 -34 25 201 -33 minecraft:podzol
+fill 13 201 -33 14 201 -33 minecraft:podzol
+fill 13 201 -32 13 201 -30 minecraft:podzol
+fill 21 201 -32 25 201 -31 minecraft:podzol
+fill 14 201 -31 14 201 -30 minecraft:podzol
+fill 20 201 -31 20 201 -25 minecraft:podzol
+fill 21 201 -30 24 201 -29 minecraft:podzol
+fill 15 201 -29 16 201 -28 minecraft:podzol
+fill 18 201 -29 19 201 -25 minecraft:podzol
+fill 17 201 -28 17 201 -28 minecraft:podzol
+fill 21 201 -28 23 201 -25 minecraft:podzol
+fill 24 201 -27 24 201 -25 minecraft:podzol
+fill 17 201 -26 17 201 -22 minecraft:podzol
+fill 25 201 -26 25 201 -25 minecraft:podzol
+fill 18 201 -24 18 201 -22 minecraft:podzol
+fill 20 201 -50 20 201 -50 minecraft:calcite
+fill 20 202 -50 20 202 -50 minecraft:podzol
+fill 20 201 -48 20 201 -48 minecraft:calcite
+fill 20 202 -48 20 202 -48 minecraft:podzol
+fill 15 201 -50 15 201 -50 minecraft:diorite
+fill 15 202 -50 15 202 -50 minecraft:podzol
+fill 11 201 -59 17 201 -56 minecraft:dirt
+fill 11 202 -59 17 202 -56 minecraft:podzol
+fill 26 201 -59 30 201 -56 minecraft:dirt
+fill 26 202 -59 30 202 -56 minecraft:podzol
+fill 10 201 -57 10 201 -55 minecraft:dirt
+fill 10 202 -57 10 202 -55 minecraft:podzol
+fill 18 201 -57 18 201 -55 minecraft:dirt
+fill 18 202 -57 18 202 -55 minecraft:podzol
+fill 11 201 -55 11 201 -53 minecraft:dirt
+fill 11 202 -55 11 202 -53 minecraft:podzol
+fill 14 201 -55 17 201 -53 minecraft:dirt
+fill 14 202 -55 17 202 -53 minecraft:podzol
+fill 12 201 -53 13 201 -53 minecraft:dirt
+fill 12 202 -53 13 202 -53 minecraft:podzol
+fill 37 201 -53 38 201 -49 minecraft:dirt
+fill 37 202 -53 38 202 -49 minecraft:podzol
+fill 15 201 -52 15 201 -51 minecraft:dirt
+fill 15 202 -52 15 202 -51 minecraft:podzol
+fill 36 201 -52 36 201 -49 minecraft:dirt
+fill 36 202 -52 36 202 -49 minecraft:podzol
+fill 34 201 -51 35 201 -49 minecraft:dirt
+fill 34 202 -51 35 202 -49 minecraft:podzol
+fill 33 201 -50 33 201 -49 minecraft:dirt
+fill 33 202 -50 33 202 -49 minecraft:podzol
+fill 20 201 -49 20 201 -49 minecraft:dirt
+fill 20 202 -49 20 202 -49 minecraft:podzol
+fill 38 201 -48 38 201 -48 minecraft:dirt
+fill 38 202 -48 38 202 -48 minecraft:podzol
+fill 16 201 -34 19 201 -30 minecraft:dirt
+fill 16 202 -34 19 202 -30 minecraft:podzol
+fill 15 201 -33 15 201 -30 minecraft:dirt
+fill 15 202 -33 15 202 -30 minecraft:podzol
+fill 14 201 -32 14 201 -32 minecraft:dirt
+fill 14 202 -32 14 202 -32 minecraft:podzol
+fill 20 201 -32 20 201 -32 minecraft:dirt
+fill 20 202 -32 20 202 -32 minecraft:podzol
+fill 17 201 -29 17 201 -29 minecraft:dirt
+fill 17 202 -29 17 202 -29 minecraft:podzol
+fill 10 201 -52 11 202 -49 minecraft:calcite
+fill 10 203 -52 11 203 -49 minecraft:podzol
+fill 21 201 -51 27 202 -51 minecraft:calcite
+fill 21 203 -51 27 203 -51 minecraft:podzol
+fill 12 201 -50 14 202 -49 minecraft:calcite
+fill 12 203 -50 14 203 -49 minecraft:podzol
+fill 21 201 -50 23 202 -49 minecraft:calcite
+fill 21 203 -50 23 203 -49 minecraft:podzol
+fill 27 201 -50 27 202 -48 minecraft:calcite
+fill 27 203 -50 27 203 -48 minecraft:podzol
+fill 24 201 -48 26 202 -48 minecraft:calcite
+fill 24 203 -48 26 203 -48 minecraft:podzol
+fill 12 201 -52 14 202 -51 minecraft:diorite
+fill 12 203 -52 14 203 -51 minecraft:podzol
+fill 24 201 -50 26 202 -49 minecraft:diorite
+fill 24 203 -50 26 203 -49 minecraft:podzol
+fill 21 201 -48 23 202 -48 minecraft:diorite
+fill 21 203 -48 23 203 -48 minecraft:podzol
+fill 30 201 -55 30 206 -53 minecraft:calcite
+fill 30 207 -55 30 207 -53 minecraft:podzol
+fill 31 201 -54 31 206 -54 minecraft:calcite
+fill 31 207 -54 31 207 -54 minecraft:podzol
+fill 8 201 -44 9 206 -44 minecraft:calcite
+fill 8 207 -44 9 207 -44 minecraft:podzol
+fill 25 201 -24 26 206 -22 minecraft:calcite
+fill 25 207 -24 26 207 -22 minecraft:podzol
+fill 29 201 -54 29 206 -54 minecraft:diorite
+fill 29 207 -54 29 207 -54 minecraft:podzol
+fill 8 201 -45 9 206 -45 minecraft:diorite
+fill 8 207 -45 9 207 -45 minecraft:podzol
+fill 27 201 -24 29 206 -22 minecraft:diorite
+fill 27 207 -24 29 207 -22 minecraft:podzol
+fill 36 201 -56 38 207 -55 minecraft:calcite
+fill 36 208 -56 38 208 -55 minecraft:podzol
+fill 12 201 -55 13 207 -55 minecraft:calcite
+fill 12 208 -55 13 208 -55 minecraft:podzol
+fill 35 201 -54 36 207 -53 minecraft:calcite
+fill 35 208 -54 36 208 -53 minecraft:podzol
+fill 34 201 -53 34 207 -52 minecraft:calcite
+fill 34 208 -53 34 208 -52 minecraft:podzol
+fill 35 201 -52 35 207 -52 minecraft:calcite
+fill 35 208 -52 35 208 -52 minecraft:podzol
+fill 27 201 -36 28 207 -35 minecraft:calcite
+fill 27 208 -36 28 208 -35 minecraft:podzol
+fill 13 201 -29 14 207 -28 minecraft:calcite
+fill 13 208 -29 14 208 -28 minecraft:podzol
+fill 19 201 -24 20 207 -22 minecraft:calcite
+fill 19 208 -24 20 208 -22 minecraft:podzol
+fill 24 201 -24 24 207 -22 minecraft:calcite
+fill 24 208 -24 24 208 -22 minecraft:podzol
+fill 21 201 -22 23 207 -22 minecraft:calcite
+fill 21 208 -22 23 208 -22 minecraft:podzol
+fill 36 201 -57 38 207 -57 minecraft:diorite
+fill 36 208 -57 38 208 -57 minecraft:podzol
+fill 12 201 -54 13 207 -54 minecraft:diorite
+fill 12 208 -54 13 208 -54 minecraft:podzol
+fill 21 201 -24 23 207 -23 minecraft:diorite
+fill 21 208 -24 23 208 -23 minecraft:podzol
+fill 1 199 -57 4 199 -41 minecraft:clay
+fill 1 200 -57 4 200 -41 minecraft:water
+fill 5 199 -56 5 199 -42 minecraft:clay
+fill 5 200 -56 5 200 -42 minecraft:water
+fill 6 199 -53 7 199 -52 minecraft:clay
+fill 6 200 -53 7 200 -52 minecraft:water
+fill 35 199 -47 36 199 -41 minecraft:clay
+fill 35 200 -47 36 200 -41 minecraft:water
+fill 14 199 -46 18 199 -45 minecraft:clay
+fill 14 200 -46 18 200 -45 minecraft:water
+fill 13 199 -45 13 199 -43 minecraft:clay
+fill 13 200 -45 13 200 -43 minecraft:water
+fill 14 199 -44 15 199 -42 minecraft:clay
+fill 14 200 -44 15 200 -42 minecraft:water
+fill 25 199 -44 31 199 -41 minecraft:clay
+fill 25 200 -44 31 200 -41 minecraft:water
+fill 32 199 -43 32 199 -41 minecraft:clay
+fill 32 200 -43 32 200 -41 minecraft:water
+fill 1 199 -38 6 199 -37 minecraft:clay
+fill 1 200 -38 6 200 -37 minecraft:water
+fill 7 199 -37 7 199 -28 minecraft:clay
+fill 7 200 -37 7 200 -28 minecraft:water
+fill 5 199 -36 6 199 -36 minecraft:clay
+fill 5 200 -36 6 200 -36 minecraft:water
+fill 10 199 -36 10 199 -35 minecraft:clay
+fill 10 200 -36 10 200 -35 minecraft:water
+fill 13 199 -36 14 199 -35 minecraft:clay
+fill 13 200 -36 14 200 -35 minecraft:water
+fill 6 199 -35 6 199 -30 minecraft:clay
+fill 6 200 -35 6 200 -30 minecraft:water
+fill 11 199 -35 12 199 -34 minecraft:clay
+fill 11 200 -35 12 200 -34 minecraft:water
+fill 35 199 -33 38 199 -24 minecraft:clay
+fill 35 200 -33 38 200 -24 minecraft:water
+fill 8 199 -32 10 199 -30 minecraft:clay
+fill 8 200 -32 10 200 -30 minecraft:water
+fill 34 199 -32 34 199 -25 minecraft:clay
+fill 34 200 -32 34 200 -25 minecraft:water
+fill 8 199 -29 9 199 -28 minecraft:clay
+fill 8 200 -29 9 200 -28 minecraft:water
+fill 26 199 -28 27 199 -27 minecraft:clay
+fill 26 200 -28 27 200 -27 minecraft:water
+fill 32 199 -27 33 199 -26 minecraft:clay
+fill 32 200 -27 33 200 -26 minecraft:water
+fill 9 200 -35 9 200 -34 minecraft:spruce_planks
+fill 8 200 -34 8 200 -33 minecraft:spruce_planks
+fill 28 200 -27 30 200 -26 minecraft:spruce_planks
+fill 31 200 -26 31 200 -25 minecraft:spruce_planks
+fill 1 200 -58 5 200 -58 minecraft:sand
+fill 5 200 -57 6 200 -57 minecraft:sand
+fill 6 200 -56 6 200 -54 minecraft:sand
+fill 6 200 -51 6 200 -41 minecraft:sand
+fill 13 200 -47 16 200 -47 minecraft:sand
+fill 18 200 -47 19 200 -47 minecraft:sand
+fill 19 200 -46 19 200 -46 minecraft:sand
+fill 12 200 -45 12 200 -44 minecraft:sand
+fill 24 200 -45 32 200 -45 minecraft:sand
+fill 32 200 -44 33 200 -44 minecraft:sand
+fill 33 200 -43 33 200 -40 minecraft:sand
+fill 12 200 -42 12 200 -42 minecraft:sand
+fill 5 200 -41 5 200 -39 minecraft:sand
+fill 13 200 -41 15 200 -41 minecraft:sand
+fill 1 200 -40 4 200 -39 minecraft:sand
+fill 25 200 -40 32 200 -40 minecraft:sand
+fill 6 200 -39 7 200 -39 minecraft:sand
+fill 7 200 -38 8 200 -38 minecraft:sand
+fill 8 200 -37 8 200 -35 minecraft:sand
+fill 34 200 -34 38 200 -34 minecraft:sand
+fill 11 200 -33 11 200 -32 minecraft:sand
+fill 33 200 -33 34 200 -33 minecraft:sand
+fill 33 200 -32 33 200 -28 minecraft:sand
+fill 11 200 -30 11 200 -29 minecraft:sand
+fill 6 200 -29 6 200 -28 minecraft:sand
+fill 10 200 -29 10 200 -29 minecraft:sand
+fill 33 200 -25 33 200 -24 minecraft:sand
+fill 34 200 -24 34 200 -23 minecraft:sand
+fill 35 200 -23 38 200 -23 minecraft:sand
+setblock 1 200 -38 minecraft:seagrass
+setblock 2 200 -57 minecraft:sea_pickle[pickles=2,waterlogged=true]
+setblock 2 200 -48 minecraft:seagrass
+setblock 2 200 -38 minecraft:seagrass
+setblock 2 200 -37 minecraft:sea_pickle[pickles=1,waterlogged=true]
+setblock 3 200 -48 minecraft:seagrass
+setblock 3 200 -46 minecraft:seagrass
+setblock 4 200 -55 minecraft:sea_pickle[pickles=3,waterlogged=true]
+setblock 4 200 -49 minecraft:sea_pickle[pickles=2,waterlogged=true]
+setblock 4 200 -47 minecraft:seagrass
+setblock 4 200 -44 minecraft:seagrass
+setblock 4 200 -42 minecraft:seagrass
+setblock 5 200 -46 minecraft:seagrass
+setblock 6 200 -38 minecraft:seagrass
+setblock 8 200 -31 minecraft:seagrass
+setblock 10 200 -32 minecraft:seagrass
+setblock 18 200 -46 minecraft:seagrass
+setblock 25 200 -43 minecraft:sea_pickle[pickles=2,waterlogged=true]
+setblock 25 200 -41 minecraft:seagrass
+setblock 26 200 -43 minecraft:seagrass
+setblock 27 200 -28 minecraft:seagrass
+setblock 29 200 -44 minecraft:seagrass
+setblock 31 200 -43 minecraft:seagrass
+setblock 35 200 -30 minecraft:seagrass
+setblock 36 200 -28 minecraft:seagrass
+setblock 37 200 -31 minecraft:seagrass
+setblock 37 200 -28 minecraft:seagrass
+setblock 37 200 -24 minecraft:seagrass
+execute positioned 12 204 -51 run function rlk:room/prop/fo_lamp
+execute positioned 31 201 -36 run function rlk:room/prop/fo_pipe_z
+execute positioned 21 202 -30 run function rlk:room/prop/fo_rock
+execute positioned 12 203 -59 run function rlk:room/prop/fo_rock_s
+execute positioned 32 202 -59 run function rlk:room/prop/fo_col_a
+execute positioned 34 201 -38 run function rlk:room/prop/fo_lamp2
+execute positioned 11 201 -41 run function rlk:room/prop/fo_ruin_z
+execute positioned 31 202 -48 run function rlk:room/prop/fo_crates
+execute positioned 7 201 -41 run function rlk:room/prop/fo_rock_s
+execute positioned 21 201 -55 run function rlk:room/prop/fo_lamp
+execute positioned 9 202 -55 run function rlk:room/prop/fo_lamp
+execute positioned 18 202 -59 run function rlk:room/prop/fo_col_b
+execute positioned 32 201 -34 run function rlk:room/prop/fo_tree
+execute positioned 16 203 -57 run function rlk:room/prop/fo_lamp
+execute positioned 23 202 -34 run function rlk:room/prop/fo_crates
+execute positioned 11 203 -56 run function rlk:room/prop/p_grass
+execute positioned 24 201 -36 run function rlk:room/prop/fo_flower
+execute positioned 32 201 -29 run function rlk:room/prop/p_grass
+execute positioned 13 201 -40 run function rlk:room/prop/p_grass
+execute positioned 19 202 -48 run function rlk:room/prop/p_grass
+execute positioned 38 203 -53 run function rlk:room/prop/fo_white
+execute positioned 38 202 -44 run function rlk:room/prop/fo_flower
+execute positioned 2 201 -36 run function rlk:room/prop/fo_white
+execute positioned 37 201 -43 run function rlk:room/prop/fo_flower
+execute positioned 23 202 -33 run function rlk:room/prop/p_grass
+execute positioned 9 201 -47 run function rlk:room/prop/fo_white
+execute positioned 19 202 -57 run function rlk:room/prop/fo_flower
+execute positioned 13 201 -42 run function rlk:room/prop/p_grass
+execute positioned 11 201 -37 run function rlk:room/prop/fo_flower
+execute positioned 9 201 -35 run function rlk:room/prop/fo_flower
+execute positioned 25 201 -54 run function rlk:room/prop/fo_flower
+execute positioned 30 201 -32 run function rlk:room/prop/p_grass
+execute positioned 29 201 -49 run function rlk:room/prop/fo_flower
+execute positioned 38 201 -59 run function rlk:room/prop/p_grass
+execute positioned 36 201 -34 run function rlk:room/prop/p_grass
+execute positioned 33 201 -34 run function rlk:room/prop/fo_flower
+execute positioned 16 201 -37 run function rlk:room/prop/p_grass
+execute positioned 21 201 -39 run function rlk:room/prop/fo_flower
+execute positioned 29 203 -57 run function rlk:room/prop/p_grass
+execute positioned 23 202 -30 run function rlk:room/prop/fo_flower
+execute positioned 23 201 -59 run function rlk:room/prop/p_grass
+execute positioned 3 201 -31 run function rlk:room/prop/fo_flower
+execute positioned 28 203 -57 run function rlk:room/prop/fo_white
+execute positioned 13 201 -37 run function rlk:room/prop/p_grass
+execute positioned 25 204 -48 run function rlk:room/prop/fo_flower
+execute positioned 24 202 -29 run function rlk:room/prop/fo_white
+setblock 8 208 -45 minecraft:birch_leaves[persistent=true] keep
+setblock 8 208 -44 minecraft:birch_leaves[persistent=true] keep
+setblock 9 208 -45 minecraft:short_grass keep
+setblock 9 208 -44 minecraft:short_grass keep
+setblock 13 209 -55 minecraft:short_grass keep
+setblock 13 209 -54 minecraft:birch_leaves[persistent=true] keep
+setblock 13 209 -29 minecraft:short_grass keep
+setblock 13 209 -28 minecraft:short_grass keep
+setblock 14 209 -29 minecraft:birch_leaves[persistent=true] keep
+setblock 19 209 -24 minecraft:birch_leaves[persistent=true] keep
+setblock 19 209 -23 minecraft:short_grass keep
+setblock 20 209 -24 minecraft:short_grass keep
+setblock 20 209 -22 minecraft:short_grass keep
+setblock 21 209 -24 minecraft:birch_leaves[persistent=true] keep
+setblock 21 209 -23 minecraft:birch_leaves[persistent=true] keep
+setblock 21 209 -22 minecraft:short_grass keep
+setblock 22 209 -24 minecraft:birch_leaves[persistent=true] keep
+setblock 22 209 -22 minecraft:short_grass keep
+setblock 23 209 -24 minecraft:short_grass keep
+setblock 23 209 -22 minecraft:short_grass keep
+setblock 24 209 -24 minecraft:birch_leaves[persistent=true] keep
+setblock 24 209 -23 minecraft:birch_leaves[persistent=true] keep
+setblock 25 208 -24 minecraft:birch_leaves[persistent=true] keep
+setblock 26 208 -24 minecraft:short_grass keep
+setblock 27 209 -36 minecraft:birch_leaves[persistent=true] keep
+setblock 27 209 -35 minecraft:birch_leaves[persistent=true] keep
+setblock 27 208 -24 minecraft:short_grass keep
+setblock 27 208 -22 minecraft:birch_leaves[persistent=true] keep
+setblock 28 209 -36 minecraft:short_grass keep
+setblock 28 209 -35 minecraft:short_grass keep
+setblock 28 208 -24 minecraft:short_grass keep
+setblock 28 208 -23 minecraft:short_grass keep
+setblock 28 208 -22 minecraft:birch_leaves[persistent=true] keep
+setblock 29 208 -54 minecraft:birch_leaves[persistent=true] keep
+setblock 29 208 -24 minecraft:birch_leaves[persistent=true] keep
+setblock 29 208 -23 minecraft:birch_leaves[persistent=true] keep
+setblock 30 208 -55 minecraft:birch_leaves[persistent=true] keep
+setblock 30 208 -54 minecraft:birch_leaves[persistent=true] keep
+setblock 30 208 -53 minecraft:short_grass keep
+setblock 31 208 -54 minecraft:birch_leaves[persistent=true] keep
+setblock 34 209 -53 minecraft:short_grass keep
+setblock 34 209 -52 minecraft:short_grass keep
+setblock 35 209 -54 minecraft:short_grass keep
+setblock 35 209 -52 minecraft:birch_leaves[persistent=true] keep
+setblock 36 209 -57 minecraft:birch_leaves[persistent=true] keep
+setblock 36 209 -55 minecraft:short_grass keep
+setblock 36 209 -53 minecraft:birch_leaves[persistent=true] keep
+setblock 37 209 -56 minecraft:birch_leaves[persistent=true] keep
+setblock 37 209 -55 minecraft:short_grass keep
+setblock 38 209 -56 minecraft:birch_leaves[persistent=true] keep
+setblock 38 209 -55 minecraft:birch_leaves[persistent=true] keep
