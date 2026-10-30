@@ -1,0 +1,1 @@
+execute if score @s tkRigForm matches 2 run data merge entity 524c4b4d-544b-4900-8000-000000000027 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.1125f,2.30085f,-0.16731f],left_rotation:[-0.20419f,0.15703f,-0.34098f,0.90409f],scale:[1.5625f,1.5625f,1.5625f],right_rotation:[0f,0f,0f,1f]}}

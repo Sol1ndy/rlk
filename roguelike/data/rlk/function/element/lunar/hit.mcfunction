@@ -1,4 +1,6 @@
 # 달 피해 한 번 (@s = 몹, at @s). 입력 #lnB(기본 피해) · #lnEl(원소 3 번개 / 7 풀 / 5 바위) · #lnT(1 달 감전 / 2 달 개화 / 3 달 결정)
+# 공격 순번(챕터 보스 히트 프록시의 중복 거름, mboss/px/hit)
+scoreboard players add #atkSeq tmp 1
 execute as @a[tag=player,limit=1] run function rlk:element/lunar/calc
 scoreboard players set #elem tmp 0
 scoreboard players operation #elem tmp = #lnEl tmp

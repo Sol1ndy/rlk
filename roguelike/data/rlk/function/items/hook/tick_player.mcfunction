@@ -87,7 +87,7 @@ execute unless score #oath itv matches 1.. run scoreboard players reset 전의 s
 execute if score #fanT itv matches 1.. run function rlk:items/proc/fan_tick
 execute unless score #fanT itv matches 1.. run scoreboard players set #fan itv 0
 scoreboard players operation #t1 itv = #seamT itv
-scoreboard players operation #t1 itv %= #st50 tmp
+scoreboard players operation #t1 itv %= #seamGap tmp
 execute if score #seamT itv matches 1.. if score #t1 itv matches 1 run function rlk:items/proc/seam_pulse
 scoreboard players operation #t1 itv = #genieT itv
 scoreboard players operation #t1 itv %= #st40 tmp

@@ -1,0 +1,3 @@
+# dash clock 16
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p3a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p3a,limit=1] rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/butterfly/fx/card {kind:"cres_lime",pos:"^ ^1.05 ^",rot:"~90 0",bb:"fixed",roll:0,spin:170,s0:6.4,s1:7,move:"0f,0f,0f",life:4,fade:2,col:11989906}
+execute at @e[type=minecraft:marker,tag=rlk_mb_bf_p3a,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_bf_p3a,limit=1] rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/butterfly/fx/card {kind:"cres_lime",pos:"^ ^1.05 ^",rot:"~270 0",bb:"fixed",roll:0,spin:170,s0:6.4,s1:7,move:"0f,0f,0f",life:4,fade:2,col:11989906}

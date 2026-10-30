@@ -1,0 +1,8 @@
+# @s = the anchor: open at once (show of a quiet room, reopen, reload).
+scoreboard players operation #riftZid room = @s zid
+execute as @e[tag=rlk_rift_void] if score @s zid = #riftZid room run data merge entity @s {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,1.45f,0f],left_rotation:[0f,0f,0f,1f],scale:[2.6f,2.6f,2.6f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[tag=rlk_rift_rim] if score @s zid = #riftZid room run data merge entity @s {start_interpolation:0,interpolation_duration:0,brightness:{sky:15,block:15},transformation:{translation:[0f,1.45f,0f],left_rotation:[0f,0f,0f,1f],scale:[3.016f,3.016f,3.016f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[tag=rlk_rift_crack] if score @s zid = #riftZid room run data merge entity @s {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,0.02f,0f],left_rotation:[0f,0f,0f,1f],scale:[3.2f,3.2f,3.2f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[tag=rlk_rift_arc0] if score @s zid = #riftZid room run data merge entity @s {start_interpolation:0,interpolation_duration:0,transformation:{translation:[-0.8f,1.9f,0.05f],left_rotation:[0f,0f,0f,1f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[tag=rlk_rift_arc1] if score @s zid = #riftZid room run data merge entity @s {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0.85f,1.1f,0.05f],left_rotation:[0f,0f,0f,1f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[tag=rlk_rift_arc2] if score @s zid = #riftZid room run data merge entity @s {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0.1f,2.7f,0.05f],left_rotation:[0f,0f,0f,1f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}

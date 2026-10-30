@@ -1,3 +1,12 @@
+execute if entity @s[tag=rlk_cm_pc] run return run function rlk:cm/pc/rig/hurt
+execute if entity @s[tag=rlk_cm_rv] run return run function rlk:cm/rv/rig/hurt
+execute if entity @s[tag=rlk_cm_cs] run return run function rlk:cm/cs/rig/hurt
+execute if entity @s[tag=rlk_c3a] run return run function rlk:cm/c3/hurt
+execute if entity @s[tag=rlk_cm_ci] run return run function rlk:cm/ci/rig/hurt
+execute if entity @s[tag=rlk_cm_cc] run return run function rlk:cm/cc/rig/hurt
+execute if entity @s[tag=rlk_cm_nj] run return run function rlk:cm/nj/rig/hurt
+execute if entity @s[tag=rlk_cm_kr] run return run function rlk:cm/kr/rig/hurt
+execute if entity @s[tag=rlk_c2a] run return run function rlk:cm/c2/hurt
 execute if entity @s[tag=rlk_cm_sw] run return run function rlk:cm/sw/rig/hurt
 execute if entity @s[tag=rlk_cm_ar] run return run function rlk:cm/ar/rig/hurt
 execute if entity @s[tag=rlk_cm_fm] run return run function rlk:cm/fm/rig/hurt

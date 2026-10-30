@@ -7,6 +7,15 @@ execute if score #diff tmp matches 0 run tellraw @s [{"text":"[런] ","color":"r
 # 돌아올 자리 기억(런을 이미 진행 중이면 유지)
 execute unless score #active room matches 1 run function rlk:run/save_pos
 function rlk:player/reset_one
+# 보스 테스트 중에 시작해도 일반 런으로 진행(테스트의 패턴 지정·고정은 버림)
+scoreboard players set #rdTest rd 0
+scoreboard players set #rdForce rd 0
+scoreboard players set #rdLock rd 0
+# 챕터 보스: 강제 라우팅 · 자동 문 누르기 · 보스 맵별 준비 저장소(cprep) 초기화
+function rlk:mboss/cb/run_reset
+scoreboard players set #mbTest mb 0
+scoreboard players set #mbForce mb 0
+scoreboard players set #mbLock mb 0
 scoreboard players set #active room 1
 scoreboard players set #chapter room 1
 scoreboard players reset #seen1 room
@@ -17,6 +26,14 @@ scoreboard players reset #seen5 room
 scoreboard players reset #seen6 room
 scoreboard players reset #seen7 room
 scoreboard players set #rfCount room 0
+# 노드: 다음 맵의 노드 목록, 나무뿌리 기적(한 판에 한 번)
+data modify storage rlk:room next set value []
+scoreboard players set #mirUsed room 0
+# rift (build_rift.py)
+scoreboard players set #riftUsed room 0
+data modify storage rlk:room seen set value []
+# 이번 판에 만난 중간보스(같은 중간보스가 연달아 나오지 않게)
+data modify storage rlk:mboss met set value []
 scoreboard players set #mapIdx room 0
 scoreboard players set #mapType room 0
 scoreboard players set #stDefer room 1

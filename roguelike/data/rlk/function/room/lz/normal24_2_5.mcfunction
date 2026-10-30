@@ -28,15 +28,11 @@ fill -27 205 -1 -23 208 -1 minecraft:mossy_cobblestone
 fill -40 210 -20 -21 210 -1 minecraft:polished_deepslate
 fill -39 210 -19 -22 210 -2 minecraft:air
 fill -37 201 -19 -37 201 -16 minecraft:podzol
-fill -34 201 -19 -33 201 -18 minecraft:podzol
-fill -33 201 -17 -22 201 -17 minecraft:podzol
 fill -36 201 -15 -36 201 -15 minecraft:podzol
 fill -35 201 -14 -35 201 -7 minecraft:podzol
 fill -38 201 -8 -36 201 -7 minecraft:podzol
 fill -38 201 -19 -38 201 -16 minecraft:dirt
 fill -38 202 -19 -38 202 -16 minecraft:podzol
-fill -32 201 -19 -22 201 -18 minecraft:dirt
-fill -32 202 -19 -22 202 -18 minecraft:podzol
 fill -37 201 -15 -37 201 -9 minecraft:dirt
 fill -37 202 -15 -37 202 -9 minecraft:podzol
 fill -36 201 -14 -36 201 -9 minecraft:dirt
@@ -64,8 +60,8 @@ execute positioned -38 202 -7 run function rlk:room/prop/sf_fern
 execute positioned -33 201 -9 run function rlk:room/prop/sf_moss
 execute positioned -29 201 -7 run function rlk:room/prop/sf_fern
 execute positioned -22 201 -6 run function rlk:room/prop/sf_moss
-execute positioned -31 203 -18 run function rlk:room/prop/sf_fern
-execute positioned -29 203 -19 run function rlk:room/prop/sf_moss
+execute positioned -31 201 -18 run function rlk:room/prop/sf_fern
+execute positioned -29 201 -19 run function rlk:room/prop/sf_moss
 setblock -39 209 -9 minecraft:fern keep
 setblock -39 209 -7 minecraft:fern keep
 setblock -39 209 -6 minecraft:jungle_leaves[persistent=true] keep

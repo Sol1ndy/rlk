@@ -44,14 +44,11 @@ fill -20 210 0 -1 210 19 minecraft:polished_deepslate
 fill -19 210 1 -1 210 18 minecraft:air
 fill 0 210 0 19 210 19 minecraft:polished_deepslate
 fill 0 210 1 18 210 18 minecraft:air
-fill -19 201 1 -17 201 2 minecraft:red_sand
 fill -7 201 1 -7 201 1 minecraft:red_sand
 fill 13 201 1 15 201 2 minecraft:red_sand
-fill -16 201 2 -16 201 15 minecraft:red_sand
 fill -8 201 2 -8 201 2 minecraft:red_sand
 fill 12 201 2 12 201 3 minecraft:red_sand
 fill 16 201 2 16 201 3 minecraft:red_sand
-fill -17 201 3 -17 201 3 minecraft:red_sand
 fill -9 201 3 -9 201 5 minecraft:red_sand
 fill 1 201 3 1 201 5 minecraft:red_sand
 fill 17 201 3 17 201 7 minecraft:red_sand
@@ -59,16 +56,13 @@ fill 18 201 4 18 201 6 minecraft:red_sand
 fill -8 201 5 -7 201 5 minecraft:red_sand
 fill -4 201 5 0 201 5 minecraft:red_sand
 fill 10 201 5 13 201 5 minecraft:red_sand
-fill -15 201 6 -15 201 13 minecraft:red_sand
 fill -6 201 6 -5 201 10 minecraft:red_sand
 fill 14 201 6 14 201 9 minecraft:red_sand
 fill 16 201 7 16 201 8 minecraft:red_sand
 fill 15 201 8 15 201 9 minecraft:red_sand
 fill -12 201 14 -8 201 14 minecraft:red_sand
-fill -17 201 15 -17 201 16 minecraft:red_sand
 fill -12 201 15 -12 201 15 minecraft:red_sand
 fill -9 201 15 -8 201 16 minecraft:red_sand
-fill -19 201 16 -18 201 17 minecraft:red_sand
 fill -13 201 16 -13 201 18 minecraft:red_sand
 fill -12 201 17 -9 201 17 minecraft:red_sand
 fill -14 201 18 -14 201 18 minecraft:red_sand
@@ -77,16 +71,12 @@ fill -6 201 1 -3 201 2 minecraft:sandstone
 fill -6 202 1 -3 202 2 minecraft:red_sand
 fill -7 201 2 -7 201 4 minecraft:sandstone
 fill -7 202 2 -7 202 4 minecraft:red_sand
-fill -19 201 3 -18 201 5 minecraft:sandstone
-fill -19 202 3 -18 202 5 minecraft:red_sand
 fill -8 201 3 -8 201 4 minecraft:sandstone
 fill -8 202 3 -8 202 4 minecraft:red_sand
 fill -1 201 3 0 201 4 minecraft:sandstone
 fill -1 202 3 0 202 4 minecraft:red_sand
 fill 13 201 3 15 201 4 minecraft:sandstone
 fill 13 202 3 15 202 4 minecraft:red_sand
-fill -17 201 4 -17 201 14 minecraft:sandstone
-fill -17 202 4 -17 202 14 minecraft:red_sand
 fill -4 201 4 -2 201 4 minecraft:sandstone
 fill -4 202 4 -2 202 4 minecraft:red_sand
 fill 12 201 4 12 201 4 minecraft:sandstone
@@ -99,8 +89,6 @@ fill 14 201 5 15 201 5 minecraft:sandstone
 fill 14 202 5 15 202 5 minecraft:red_sand
 fill 15 201 6 15 201 7 minecraft:sandstone
 fill 15 202 6 15 202 7 minecraft:red_sand
-fill -19 201 14 -18 201 15 minecraft:sandstone
-fill -19 202 14 -18 202 15 minecraft:red_sand
 fill -11 201 15 -10 201 16 minecraft:sandstone
 fill -11 202 15 -10 202 16 minecraft:red_sand
 fill -12 201 16 -12 201 16 minecraft:sandstone
@@ -109,8 +97,6 @@ fill -6 201 3 -2 202 3 minecraft:sandstone
 fill -6 203 3 -2 203 3 minecraft:red_sand
 fill -6 201 4 -5 202 4 minecraft:sandstone
 fill -6 203 4 -5 203 4 minecraft:red_sand
-fill -19 201 6 -18 202 13 minecraft:sandstone
-fill -19 203 6 -18 203 13 minecraft:red_sand
 fill 17 201 14 18 206 15 minecraft:smooth_red_sandstone
 fill 17 207 14 18 207 15 minecraft:red_sand
 fill 17 201 16 17 206 16 minecraft:smooth_red_sandstone
@@ -136,13 +122,13 @@ execute positioned 6 201 1 run function rlk:room/prop/sd_bush
 execute positioned 14 203 5 run function rlk:room/prop/sd_dry
 execute positioned -9 201 18 run function rlk:room/prop/sd_bush
 execute positioned 12 201 13 run function rlk:room/prop/sd_bush
-execute positioned -19 204 7 run function rlk:room/prop/sd_bush
+execute positioned -19 201 7 run function rlk:room/prop/sd_bush
 execute positioned 18 202 6 run function rlk:room/prop/sd_dry
 execute positioned 4 201 10 run function rlk:room/prop/sd_dry
 execute positioned 9 201 14 run function rlk:room/prop/sd_dry
 execute positioned -2 201 15 run function rlk:room/prop/sd_dry
-execute positioned -18 204 10 run function rlk:room/prop/sd_dry
-execute positioned -17 203 11 run function rlk:room/prop/sd_dry
+execute positioned -18 201 10 run function rlk:room/prop/sd_dry
+execute positioned -17 201 11 run function rlk:room/prop/sd_dry
 execute positioned 2 201 12 run function rlk:room/prop/sd_dry
 setblock -1 209 1 minecraft:dead_bush keep
 setblock 10 209 4 minecraft:dead_bush keep

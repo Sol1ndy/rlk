@@ -3,6 +3,11 @@
 execute if score #lobInf lob matches 1 run scoreboard players set @s skillCd 0
 execute if score #lobInf lob matches 1 run scoreboard players set @s burstCd 0
 execute if score #lobInf lob matches 1 run scoreboard players operation @s energy = #burstCost100 tmp
+# 더미가 4개가 아니면(청크가 늦게 불러와져 남은 것이 겹친 경우 등) 1초마다 다시 세운다
+execute store result score #dt lob run time query gametime
+scoreboard players operation #dt lob %= #c20 lob
+execute if score #dt lob matches 0 store result score #dn lob if entity @e[tag=rlk_dummy,tag=!rlk_tutE]
+execute if score #dt lob matches 0 unless score #dn lob matches 4 run function rlk:lobby/try/dummies
 # 더미 원소(2초마다)
 execute store result score #t lob run time query gametime
 scoreboard players operation #t lob %= #c40 lob

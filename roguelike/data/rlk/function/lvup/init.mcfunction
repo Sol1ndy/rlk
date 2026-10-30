@@ -10,3 +10,5 @@ scoreboard players set @s sneakT 0
 data modify storage rlk:lvpick choices set value []
 data modify storage rlk:lvpick dropq set value []
 scoreboard players set @s pkRr 0
+scoreboard players set @s pkMb 0
+data remove storage rlk:lvpick mbSet

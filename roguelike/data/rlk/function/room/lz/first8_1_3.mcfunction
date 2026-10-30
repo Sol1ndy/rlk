@@ -23,21 +23,13 @@ fill -15 210 -1 -10 210 -1 minecraft:moss_block
 fill -20 210 -20 -1 210 -1 minecraft:polished_deepslate
 fill -19 210 -19 -2 210 -2 minecraft:air
 fill -18 201 -19 -18 201 -16 minecraft:podzol
-fill -15 201 -19 -14 201 -18 minecraft:podzol
-fill -14 201 -17 -14 201 -16 minecraft:podzol
-fill -13 201 -16 -2 201 -16 minecraft:podzol
 fill -17 201 -15 -17 201 -14 minecraft:podzol
-fill -12 201 -15 -2 201 -15 minecraft:podzol
 fill -16 201 -13 -15 201 -13 minecraft:podzol
 fill -15 201 -12 -15 201 -10 minecraft:podzol
 fill -16 201 -10 -16 201 -9 minecraft:podzol
 fill -19 201 -9 -17 201 -9 minecraft:podzol
 fill -19 201 -19 -19 201 -16 minecraft:dirt
 fill -19 202 -19 -19 202 -16 minecraft:podzol
-fill -13 201 -19 -13 201 -17 minecraft:dirt
-fill -13 202 -19 -13 202 -17 minecraft:podzol
-fill -12 201 -17 -2 201 -17 minecraft:dirt
-fill -12 202 -17 -2 202 -17 minecraft:podzol
 fill -18 201 -15 -18 201 -14 minecraft:dirt
 fill -18 202 -15 -18 202 -14 minecraft:podzol
 fill -17 201 -13 -17 201 -13 minecraft:dirt
@@ -46,8 +38,6 @@ fill -16 201 -12 -16 201 -11 minecraft:dirt
 fill -16 202 -12 -16 202 -11 minecraft:podzol
 fill -19 201 -11 -17 201 -10 minecraft:dirt
 fill -19 202 -11 -17 202 -10 minecraft:podzol
-fill -12 201 -19 -2 202 -18 minecraft:dirt
-fill -12 203 -19 -2 203 -18 minecraft:podzol
 fill -19 201 -15 -19 202 -12 minecraft:dirt
 fill -19 203 -15 -19 203 -12 minecraft:podzol
 fill -18 201 -13 -18 202 -12 minecraft:dirt
@@ -66,7 +56,7 @@ execute positioned -7 201 -5 run function rlk:room/prop/p_grass
 execute positioned -5 201 -9 run function rlk:room/prop/p_grass
 execute positioned -19 201 -4 run function rlk:room/prop/p_grass
 execute positioned -10 201 -8 run function rlk:room/prop/p_wildflower
-execute positioned -8 202 -16 run function rlk:room/prop/p_wildflower
+execute positioned -8 201 -16 run function rlk:room/prop/p_wildflower
 execute positioned -15 202 -11 run function rlk:room/prop/p_wildflower
 setblock -17 208 -7 minecraft:azalea_leaves[persistent=true] keep
 setblock -17 208 -6 minecraft:short_grass keep

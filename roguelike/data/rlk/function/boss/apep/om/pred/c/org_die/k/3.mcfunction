@@ -1,0 +1,1 @@
+execute on passengers if entity @s[tag=rlk_ap_om_core] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,-0.78f,0.2f],left_rotation:[0f,0f,0f,1f],scale:[0.41481f,0.41481f,0.41481f],right_rotation:[0f,0f,0f,1f]}}

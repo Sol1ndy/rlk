@@ -1,3 +1,12 @@
+execute if entity @s[tag=rlk_cm_pc] run return run function rlk:cm/pc/rig/tick
+execute if entity @s[tag=rlk_cm_rv] run return run function rlk:cm/rv/rig/tick
+execute if entity @s[tag=rlk_cm_cs] run return run function rlk:cm/cs/rig/tick
+execute if entity @s[tag=rlk_c3a] run return run function rlk:cm/c3/vis
+execute if entity @s[tag=rlk_cm_ci] run return run function rlk:cm/ci/rig/tick
+execute if entity @s[tag=rlk_cm_cc] run return run function rlk:cm/cc/rig/tick
+execute if entity @s[tag=rlk_cm_nj] run return run function rlk:cm/nj/rig/tick
+execute if entity @s[tag=rlk_cm_kr] run return run function rlk:cm/kr/rig/tick
+execute if entity @s[tag=rlk_c2a] run return run function rlk:cm/c2/vis
 execute if entity @s[tag=rlk_cm_sw] run return run function rlk:cm/sw/rig/tick
 execute if entity @s[tag=rlk_cm_ar] at @s run return run function rlk:cm/ar/rig/tick
 execute if entity @s[tag=rlk_cm_fm] at @s run return run function rlk:cm/fm/rig/tick

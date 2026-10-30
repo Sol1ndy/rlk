@@ -6,6 +6,7 @@ execute if score @s rdCam matches 1 run scoreboard players set @s stepT 0
 execute unless score @s init matches 1 run function rlk:player/init
 # 이전 버전에서 넘어온 플레이어(레벨 없음)는 다시 초기화
 execute unless score @s level matches 1.. run function rlk:player/init
+execute unless score @s invCap matches 9..18 run scoreboard players set @s invCap 9
 
 # 상시 야간투시: 입자 없이 무한 유지. 사망/효과 해제 뒤에도 자동 복구.
 execute unless data entity @s active_effects[{id:"minecraft:night_vision",duration:-1}] run effect give @s minecraft:night_vision infinite 0 true
@@ -43,6 +44,10 @@ execute at @s run function rlk:player/hotbar/tick
 
 # 공격 쿨다운 / 콤보 유지시간
 execute if score @s uiCd matches 1.. run scoreboard players remove @s uiCd 1
+# #pmChainOpen 1 = atkCD was already 0 before this tick's decrement, so a click this tick was accepted (it arrives
+# before the tick functions). Navia's normal-attack tails end on movement only from then on, never one tick before
+# the earliest chained click (char/motion/events/navia/physical_1..4).
+execute store result score #pmChainOpen tmp unless score @s atkCD matches 1..
 execute if score @s atkCD matches 1.. run scoreboard players remove @s atkCD 1
 scoreboard players add @s cboIdle 1
 execute if score @s pmActive matches 1 if score @s atkCD matches 1.. run scoreboard players set @s cboIdle 0

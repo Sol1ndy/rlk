@@ -83,10 +83,7 @@ fill -40 210 -40 -21 210 -21 minecraft:polished_deepslate
 fill -40 210 -40 -22 210 -22 minecraft:air
 fill -39 201 -59 -36 201 -58 minecraft:podzol
 fill -37 201 -57 -36 201 -54 minecraft:podzol
-fill -24 201 -55 -22 201 -55 minecraft:podzol
 fill -38 201 -54 -38 201 -54 minecraft:podzol
-fill -24 201 -54 -24 201 -46 minecraft:podzol
-fill -23 201 -46 -22 201 -45 minecraft:podzol
 fill -32 201 -43 -28 201 -43 minecraft:podzol
 fill -33 201 -42 -31 201 -42 minecraft:podzol
 fill -29 201 -42 -27 201 -42 minecraft:podzol
@@ -117,8 +114,6 @@ fill -24 201 -28 -24 201 -28 minecraft:calcite
 fill -24 202 -28 -24 202 -28 minecraft:podzol
 fill -26 201 -28 -26 201 -28 minecraft:diorite
 fill -26 202 -28 -26 202 -28 minecraft:podzol
-fill -23 201 -54 -22 201 -47 minecraft:dirt
-fill -23 202 -54 -22 202 -47 minecraft:podzol
 fill -30 201 -42 -30 201 -38 minecraft:dirt
 fill -30 202 -42 -30 202 -38 minecraft:podzol
 fill -32 201 -41 -31 201 -37 minecraft:dirt
@@ -295,14 +290,14 @@ execute positioned -44 201 -36 run function rlk:room/prop/p_grass
 execute positioned -30 203 -41 run function rlk:room/prop/fo_flower
 execute positioned -42 202 -14 run function rlk:room/prop/p_grass
 execute positioned -46 202 -15 run function rlk:room/prop/p_grass
-execute positioned -23 203 -48 run function rlk:room/prop/fo_flower
+execute positioned -23 201 -48 run function rlk:room/prop/fo_flower
 execute positioned -59 201 -8 run function rlk:room/prop/fo_flower
 execute positioned -26 202 -27 run function rlk:room/prop/p_grass
 execute positioned -38 201 -27 run function rlk:room/prop/p_grass
 execute positioned -56 201 -9 run function rlk:room/prop/fo_flower
 execute positioned -59 201 -18 run function rlk:room/prop/fo_flower
 execute positioned -48 202 -14 run function rlk:room/prop/p_grass
-execute positioned -23 202 -45 run function rlk:room/prop/fo_white
+execute positioned -23 201 -45 run function rlk:room/prop/fo_white
 execute positioned -28 203 -39 run function rlk:room/prop/fo_flower
 setblock -59 208 -28 minecraft:birch_leaves[persistent=true] keep
 setblock -59 208 -26 minecraft:birch_leaves[persistent=true] keep

@@ -1,0 +1,19 @@
+# GENERATED: the running pattern's cancel, by #apPid.
+execute if score #apPid mb matches 1 run return run function rlk:boss/apep/p/burrow/cancel
+execute if score #apPid mb matches 2 run return run function rlk:boss/apep/p/hands/cancel
+execute if score #apPid mb matches 3 run return run function rlk:boss/apep/p/glow/cancel
+execute if score #apPid mb matches 4 run return run function rlk:boss/apep/p/wither/cancel
+execute if score #apPid mb matches 5 run return run function rlk:boss/apep/p/tail/cancel
+execute if score #apPid mb matches 6 run return run function rlk:boss/apep/p/combo/cancel
+execute if score #apPid mb matches 7 run return run function rlk:boss/apep/p/reloc/cancel
+execute if score #apPid mb matches 31 run return run function rlk:boss/apep/p/mstrike/cancel
+execute if score #apPid mb matches 33 run return run function rlk:boss/apep/p/shells/cancel
+execute if score #apPid mb matches 34 run return run function rlk:boss/apep/p/tail3/cancel
+execute if score #apPid mb matches 35 run return run function rlk:boss/apep/p/spiral/cancel
+execute if score #apPid mb matches 36 run return run function rlk:boss/apep/p/surface/cancel
+execute if score #apPid mb matches 32 run return run function rlk:boss/apep/p/aftermath/cancel
+execute if score #apPid mb matches 20 run return run function rlk:boss/apep/p/t1/cancel
+execute if score #apPid mb matches 40 run return run function rlk:boss/apep/p/fail/cancel
+execute if score #apPid mb matches 60 run return run function rlk:boss/apep/p/cs/cancel
+execute if score #apPid mb matches 10 run return run function rlk:boss/apep/p/move/cancel
+execute if score #apPid mb matches 61 run return run function rlk:boss/apep/p/stance/cancel

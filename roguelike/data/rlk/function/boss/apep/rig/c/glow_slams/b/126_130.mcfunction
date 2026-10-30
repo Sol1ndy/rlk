@@ -1,0 +1,5 @@
+execute if score @s apRigT matches 126 run return run function rlk:boss/apep/rig/c/glow_slams/k/126
+execute if score @s apRigT matches 127 run return run function rlk:boss/apep/rig/c/glow_slams/k/127
+execute if score @s apRigT matches 128 run return run function rlk:boss/apep/rig/c/glow_slams/k/128
+execute if score @s apRigT matches 129 run return run function rlk:boss/apep/rig/c/glow_slams/k/129
+execute if score @s apRigT matches 130 run return run function rlk:boss/apep/rig/c/glow_slams/k/130

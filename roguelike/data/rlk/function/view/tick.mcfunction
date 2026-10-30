@@ -1,4 +1,6 @@
 execute if score @s rdCam matches 1 run return run function rlk:boss/raiden/camera/hold
+# 서버 시작·/reload 뒤 첫 틱: 지난 접속에서 남은 아바타·받침을 정리하고 새로 만든다(개발자 모드를 켰다 끈 것과 같은 효과)
+execute if score #vFresh view matches 1 run function rlk:view/fresh
 # 시점 시스템 매 틱 (@s = 플레이어). player/tick 보다 먼저 실행된다
 # 지도 클릭 잠금/길게 누름 판정
 execute if score @s vMapH matches 1.. run scoreboard players remove @s vMapH 1

@@ -2,7 +2,7 @@
 scoreboard players remove @s life 1
 execute if score @s life matches ..0 run return run kill @s
 scoreboard players operation #t1 itv = @s life
-scoreboard players operation #t1 itv %= #st40 tmp
+scoreboard players operation #t1 itv %= #caseGap tmp
 execute unless score #t1 itv matches 0 run return 0
 particle minecraft:spore_blossom_air ~ ~0.6 ~ 0.4 0.3 0.4 0 6
 execute unless entity @e[tag=rlk_mob,distance=..10,limit=1] run return 0

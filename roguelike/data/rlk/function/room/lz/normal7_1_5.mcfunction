@@ -26,13 +26,9 @@ fill 14 203 19 17 205 19 minecraft:cut_sandstone
 fill 0 210 0 19 210 19 minecraft:polished_deepslate
 fill 1 210 1 18 210 18 minecraft:air
 fill 3 201 1 3 201 3 minecraft:red_sand
-fill 6 201 1 7 201 2 minecraft:red_sand
 fill 1 201 3 2 201 3 minecraft:red_sand
-fill 7 201 3 18 201 3 minecraft:red_sand
 fill 2 201 1 2 201 2 minecraft:sandstone
 fill 2 202 1 2 202 2 minecraft:red_sand
-fill 8 201 1 18 201 2 minecraft:sandstone
-fill 8 202 1 18 202 2 minecraft:red_sand
 fill 1 201 2 1 201 2 minecraft:sandstone
 fill 1 202 2 1 202 2 minecraft:red_sand
 fill 1 201 1 1 202 1 minecraft:sandstone
@@ -49,7 +45,7 @@ execute positioned 7 201 4 run function rlk:room/prop/sd_dry
 execute positioned 7 201 6 run function rlk:room/prop/sd_bush
 execute positioned 8 201 13 run function rlk:room/prop/sd_dry
 execute positioned 2 201 18 run function rlk:room/prop/sd_dry
-execute positioned 17 202 3 run function rlk:room/prop/sd_dry
+execute positioned 17 201 3 run function rlk:room/prop/sd_dry
 execute positioned 8 201 6 run function rlk:room/prop/sd_bush
 execute positioned 17 201 16 run function rlk:room/prop/sd_bush
 execute positioned 6 201 12 run function rlk:room/prop/sd_bush

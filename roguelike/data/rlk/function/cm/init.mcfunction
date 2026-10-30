@@ -17,3 +17,5 @@ execute if entity @s[tag=rlk_cm_fm] run function rlk:cm/fm/rig/rebuild
 execute if entity @s[tag=rlk_cm_im] run function rlk:cm/im/rig/rebuild
 
 execute if entity @s[tag=rlk_cm_sh] run function rlk:cm/sh/rig/rebuild
+execute if entity @s[tag=rlk_c3] run function rlk:cm/c3/init
+execute if entity @s[tag=rlk_c2] run function rlk:cm/c2/init

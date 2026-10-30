@@ -16,6 +16,8 @@ execute if score @s clBurst matches 1.. run scoreboard players set #lk view 1
 execute if score @s rnQ matches 1.. run scoreboard players set #lk view 1
 execute if score @s nfPT matches 1.. run scoreboard players set #lk view 1
 execute if score @s nfQ matches 1.. run scoreboard players set #lk view 1
+# 평타를 휘두르는 동안(swHold, player/swing/tick)은 걷는 방향으로 몸을 돌리지 않는다(조준선 쪽을 보고 휘두르며 걷는다)
+execute if score @s swHold matches 1 run scoreboard players set #lk view 1
 scoreboard players set #sprNow view 0
 execute if score @s pmMoveLock matches 1 run return run function rlk:view/stop_h
 execute if score @s dashMoveT matches 1.. run return 0
@@ -34,8 +36,12 @@ execute if predicate rlk:in_f run scoreboard players add #f view 1
 execute if predicate rlk:in_b run scoreboard players remove #f view 1
 execute if predicate rlk:in_l run scoreboard players add #s view 1
 execute if predicate rlk:in_r run scoreboard players remove #s view 1
-# 점프: 땅에 서 있을 때만
-execute if predicate rlk:in_jump as @e[tag=rlk_av,limit=1] if data entity @s {OnGround:1b} run data modify entity @s Motion[1] set value 0.42d
+# 점프: 땅에 서 있을 때만. 평타를 휘두르는 동안(swHold)은 뛰지 않는다. 평타 사이 간격에서 뛰면 다음 평타는 1타부터(player/swing/jump)
+scoreboard players set #vJmp view 0
+execute unless score @s swHold matches 1 if predicate rlk:in_jump as @e[tag=rlk_av,limit=1] if data entity @s {OnGround:1b} run scoreboard players set #vJmp view 1
+# 점프 세기 = 아바타 자신의 jump_strength 속성(기본 0.42, 중간보스 저중력 rlk:mb_lowg 이면 × 1.19)
+execute if score #vJmp view matches 1 as @e[tag=rlk_av,limit=1] store result entity @s Motion[1] double 0.000001 run attribute @s minecraft:jump_strength get 1000000
+execute if score #vJmp view matches 1 run function rlk:player/swing/jump
 # 입력이 없으면 그대로 둔다(마찰로 멈춤, 넉백도 그대로 받음)
 execute if score #f view matches 0 if score #s view matches 0 run return 0
 # 방향 표식을 아바타에서 1칸 떨어진 곳에: 표식 위치 - 아바타 위치 = 단위 방향 벡터
@@ -59,19 +65,23 @@ scoreboard players operation #mz view -= #az view
 scoreboard players set #inAct view 1
 scoreboard players operation #inx view = #mx view
 scoreboard players operation #inz view = #mz view
-# 달리기 시야 효과
+# 달리기 시야 효과. 휘두르는 동안에도 그대로 두어 휘두를 때마다 시야가 출렁이지 않게 한다
 scoreboard players set #sprNow view 0
 execute if score #f view matches 1 if predicate rlk:in_sprint run scoreboard players set #sprNow view 1
-# 속도(칸/틱 × 10000) = #viewWalk × 이동 속도% (달리기 ×1.3)
+# 속도(칸/틱 × 10000) = #viewWalk × 이동 속도% (달리기 ×1.3, 휘두르는 동안은 달리기 배율 없음)
 scoreboard players operation #sp view = #viewWalk tmp
 scoreboard players operation #sp view *= @s moveSpeed
 scoreboard players operation #sp view /= #100 tmp
-execute if score #f view matches 1 if predicate rlk:in_sprint run scoreboard players operation #sp view *= #viewSprint tmp
-execute if score #f view matches 1 if predicate rlk:in_sprint run scoreboard players operation #sp view /= #100 tmp
+execute if score #f view matches 1 unless score @s swHold matches 1 if predicate rlk:in_sprint run scoreboard players operation #sp view *= #viewSprint tmp
+execute if score #f view matches 1 unless score @s swHold matches 1 if predicate rlk:in_sprint run scoreboard players operation #sp view /= #100 tmp
 execute if score @s bowT matches 1.. run scoreboard players operation #sp view *= #bowSlow tmp
 execute if score @s bowT matches 1.. run scoreboard players operation #sp view /= #100 tmp
 execute if score @s skDash matches 1.. run scoreboard players operation #sp view *= #skDashSpd tmp
 execute if score @s skDash matches 1.. run scoreboard players operation #sp view /= #100 tmp
+# 평타를 휘두르는 동안(swHold, player/swing/tick): 걷는 속도 × #swSlow%(50). 걷던 속도에서 바로 줄어들고(매 틱 속도를 새로 정함),
+# 간격이 시작되는 틱부터 다시 제 속도다. 넉백 · 떨어지기는 그대로 적용된다.
+execute if score @s swHold matches 1 if score #swSlow tmp matches 0.. run scoreboard players operation #sp view *= #swSlow tmp
+execute if score @s swHold matches 1 if score #swSlow tmp matches 0.. run scoreboard players operation #sp view /= #100 tmp
 scoreboard players operation #mx view *= #sp view
 scoreboard players operation #mx view /= #1000 tmp
 scoreboard players operation #mz view *= #sp view

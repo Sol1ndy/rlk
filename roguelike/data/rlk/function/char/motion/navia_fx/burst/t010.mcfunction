@@ -1,0 +1,15 @@
+# (retimed from t010)
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.5982447386478282} ^0.708 ^1.778 ^-0.344 0 0 0 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.6284637988444715} ^0.699 ^1.094 ^-0.296 0 0 0 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.9} ^-0.347 ^0.05 ^0.08 0.02 0.04 0.02 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.78} ^-0.348 ^0.334 ^0.08 0.02 0.04 0.02 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.66} ^-0.333 ^0.618 ^0.08 0.02 0.04 0.02 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.54} ^-0.315 ^0.902 ^0.08 0.02 0.04 0.02 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.9} ^-0.437 ^0.05 ^-0.05 0.02 0.04 0.02 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.78} ^-0.438 ^0.338 ^-0.05 0.02 0.04 0.02 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.66} ^-0.423 ^0.626 ^-0.05 0.02 0.04 0.02 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.54} ^-0.405 ^0.914 ^-0.05 0.02 0.04 0.02 0 1 normal
+particle minecraft:dust{color:[1.0,0.953,0.769],scale:0.9} ^-0.287 ^0.05 ^-0.12 0.02 0.04 0.02 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.78} ^-0.288 ^0.24 ^-0.12 0.02 0.04 0.02 0 1 normal
+particle minecraft:dust{color:[0.965,0.835,0.478],scale:0.66} ^-0.273 ^0.431 ^-0.12 0.02 0.04 0.02 0 1 normal
+particle minecraft:dust{color:[0.914,0.725,0.286],scale:0.54} ^-0.255 ^0.621 ^-0.12 0.02 0.04 0.02 0 1 normal

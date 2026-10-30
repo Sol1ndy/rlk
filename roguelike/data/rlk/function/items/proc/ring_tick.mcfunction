@@ -3,5 +3,5 @@ scoreboard players operation #t1 itv = #ringT itv
 scoreboard players operation #t1 itv %= #st4 tmp
 execute if score #t1 itv matches 0 run function rlk:items/proc/ring_fx
 scoreboard players operation #t1 itv = #ringT itv
-scoreboard players operation #t1 itv %= #st40 tmp
+scoreboard players operation #t1 itv %= #ringInt tmp
 execute if score #t1 itv matches 1 if entity @e[tag=rlk_mob,distance=..3.5,limit=1] run function rlk:items/proc/ring_hit

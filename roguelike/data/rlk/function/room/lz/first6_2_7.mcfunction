@@ -57,10 +57,6 @@ fill 20 210 0 39 210 19 minecraft:polished_deepslate
 fill 21 210 0 38 210 18 minecraft:air
 fill 40 210 -20 59 210 -1 minecraft:polished_deepslate
 fill 40 210 -19 58 210 -2 minecraft:air
-fill 25 201 -19 26 201 -18 minecraft:podzol
-fill 26 201 -17 26 201 -16 minecraft:podzol
-fill 27 201 -16 58 201 -16 minecraft:podzol
-fill 28 201 -15 58 201 -15 minecraft:podzol
 fill 53 201 -12 58 201 -12 minecraft:podzol
 fill 53 201 -11 54 201 -9 minecraft:podzol
 fill 55 201 -9 58 201 -9 minecraft:podzol
@@ -79,10 +75,6 @@ fill 24 201 16 24 201 16 minecraft:calcite
 fill 24 202 16 24 202 16 minecraft:podzol
 fill 26 201 16 26 201 16 minecraft:calcite
 fill 26 202 16 26 202 16 minecraft:podzol
-fill 27 201 -19 27 201 -17 minecraft:dirt
-fill 27 202 -19 27 202 -17 minecraft:podzol
-fill 28 201 -17 58 201 -17 minecraft:dirt
-fill 28 202 -17 58 202 -17 minecraft:podzol
 fill 55 201 -11 58 201 -10 minecraft:dirt
 fill 55 202 -11 58 202 -10 minecraft:podzol
 fill 28 201 9 30 201 9 minecraft:dirt
@@ -97,8 +89,6 @@ fill 24 201 14 26 202 15 minecraft:calcite
 fill 24 203 14 26 203 15 minecraft:podzol
 fill 24 201 12 26 202 13 minecraft:diorite
 fill 24 203 12 26 203 13 minecraft:podzol
-fill 28 201 -19 58 202 -18 minecraft:dirt
-fill 28 203 -19 58 203 -18 minecraft:podzol
 fill 28 201 10 29 207 11 minecraft:calcite
 fill 28 208 10 29 208 11 minecraft:podzol
 fill 39 186 -7 46 199 -1 minecraft:stone
@@ -168,18 +158,18 @@ execute positioned 23 201 5 run function rlk:room/prop/p_grass
 execute positioned 37 201 10 run function rlk:room/prop/fo_white
 execute positioned 31 201 2 run function rlk:room/prop/fo_flower
 execute positioned 29 201 3 run function rlk:room/prop/p_grass
-execute positioned 57 203 -17 run function rlk:room/prop/p_grass
+execute positioned 57 201 -17 run function rlk:room/prop/p_grass
 execute positioned 37 201 14 run function rlk:room/prop/fo_flower
-execute positioned 33 202 -16 run function rlk:room/prop/p_grass
-execute positioned 36 204 -18 run function rlk:room/prop/p_grass
-execute positioned 32 204 -18 run function rlk:room/prop/fo_white
+execute positioned 33 201 -16 run function rlk:room/prop/p_grass
+execute positioned 36 201 -18 run function rlk:room/prop/p_grass
+execute positioned 32 201 -18 run function rlk:room/prop/fo_white
 execute positioned 38 201 9 run function rlk:room/prop/p_grass
 execute positioned 38 201 17 run function rlk:room/prop/fo_white
 execute positioned 37 201 11 run function rlk:room/prop/p_grass
-execute positioned 46 204 -18 run function rlk:room/prop/p_grass
-execute positioned 35 202 -16 run function rlk:room/prop/p_grass
-execute positioned 46 204 -18 run function rlk:room/prop/fo_flower
-execute positioned 36 203 -17 run function rlk:room/prop/fo_white
+execute positioned 46 201 -18 run function rlk:room/prop/p_grass
+execute positioned 35 201 -16 run function rlk:room/prop/p_grass
+execute positioned 46 201 -18 run function rlk:room/prop/fo_flower
+execute positioned 36 201 -17 run function rlk:room/prop/fo_white
 execute positioned 26 202 -2 run function rlk:room/prop/fo_flower
 execute positioned 33 201 -2 run function rlk:room/prop/fo_white
 setblock 28 209 10 minecraft:birch_leaves[persistent=true] keep

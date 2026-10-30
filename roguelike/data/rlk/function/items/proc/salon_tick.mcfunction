@@ -9,5 +9,5 @@ execute store result storage rlk:sal dy double 0.006 run scoreboard players get 
 function rlk:items/proc/salon_pos with storage rlk:sal
 execute at @e[tag=rlk_salon] run particle minecraft:bubble_pop ~ ~ ~ 0.15 0.15 0.15 0.005 1
 scoreboard players operation #t1 itv = #salonT itv
-scoreboard players operation #t1 itv %= #st30 tmp
+scoreboard players operation #t1 itv %= #salonInt tmp
 execute if score #t1 itv matches 1 if entity @e[tag=rlk_mob,distance=..12,limit=1] run function rlk:items/proc/salon_hit

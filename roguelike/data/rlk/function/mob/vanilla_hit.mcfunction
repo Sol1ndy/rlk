@@ -2,6 +2,8 @@
 # The boss and mechanic objects receive damage exclusively through custom combat.
 execute if entity @s[tag=rlk_raiden] run return run data modify entity @s Health set value 1024f
 execute if entity @s[tag=rlk_rd_object] run return run data modify entity @s Health set value 1024f
+execute if entity @s[tag=rlk_mb_body] run return run data modify entity @s Health set value 1024f
+execute if entity @s[tag=rlk_mb_aux] run return run data modify entity @s Health set value 1024f
 scoreboard players set #vd tmp 102400
 scoreboard players operation #vd tmp -= #vh tmp
 scoreboard players add #vd tmp 99

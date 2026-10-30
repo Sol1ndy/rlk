@@ -1,0 +1,45 @@
+# Clip burrow_dive (id 28) tick 24: the proxy columns that moved.
+data modify storage rlk:mboss px.o.head_x set value 0.792d
+data modify storage rlk:mboss px.o.head_z set value 1.635d
+data modify storage rlk:mboss px.top.head set value 0f
+data merge entity 524c4b4d-415a-4400-8000-000000000041 {height:0.1f}
+data modify storage rlk:mboss px.o.chest_x set value 0.244d
+data modify storage rlk:mboss px.o.chest_z set value 1.783d
+data modify storage rlk:mboss px.top.chest set value 0.451f
+data merge entity 524c4b4d-415a-4400-8000-000000000042 {height:0.451f}
+data modify storage rlk:mboss px.o.belly_x set value -0.074d
+data modify storage rlk:mboss px.o.belly_z set value -0.228d
+data modify storage rlk:mboss px.top.belly set value 2.068f
+data merge entity 524c4b4d-415a-4400-8000-000000000043 {height:2.068f}
+data modify storage rlk:mboss px.o.hips_x set value -0.376d
+data modify storage rlk:mboss px.o.hips_z set value -2.693d
+data modify storage rlk:mboss px.top.hips set value 3.306f
+data merge entity 524c4b4d-415a-4400-8000-000000000044 {height:3.306f}
+data modify storage rlk:mboss px.o.tail1_x set value -0.66d
+data modify storage rlk:mboss px.o.tail1_z set value -4.782d
+data modify storage rlk:mboss px.top.tail1 set value 4.752f
+data merge entity 524c4b4d-415a-4400-8000-000000000045 {height:4.752f}
+data modify storage rlk:mboss px.o.tail2_x set value -1.28d
+data modify storage rlk:mboss px.o.tail2_z set value -7.334d
+data modify storage rlk:mboss px.top.tail2 set value 7.712f
+data merge entity 524c4b4d-415a-4400-8000-000000000046 {height:7.712f}
+data modify storage rlk:mboss px.o.tail3_x set value -1.93d
+data modify storage rlk:mboss px.o.tail3_z set value -6.865d
+data modify storage rlk:mboss px.top.tail3 set value 10.922f
+data merge entity 524c4b4d-415a-4400-8000-000000000047 {height:10.922f}
+data modify storage rlk:mboss px.o.tail4_x set value -2.248d
+data modify storage rlk:mboss px.o.tail4_z set value -3.536d
+data modify storage rlk:mboss px.top.tail4 set value 12.439f
+data merge entity 524c4b4d-415a-4400-8000-000000000048 {height:12.439f}
+data modify storage rlk:mboss px.o.paw_l_x set value 3.872d
+data modify storage rlk:mboss px.o.paw_l_z set value 0.841d
+data modify storage rlk:mboss px.top.paw_l set value 0f
+data merge entity 524c4b4d-415a-4400-8000-000000000049 {height:0.1f}
+data modify storage rlk:mboss px.o.paw_r_x set value -2.31d
+data modify storage rlk:mboss px.o.paw_r_z set value 0.841d
+data modify storage rlk:mboss px.top.paw_r set value 0f
+data merge entity 524c4b4d-415a-4400-8000-00000000004a {height:0.1f}
+data modify storage rlk:mboss px.o.foot_r_x set value -2.301d
+data modify storage rlk:mboss px.o.foot_r_z set value -3.586d
+data modify storage rlk:mboss px.top.foot_r set value 1.537f
+data merge entity 524c4b4d-415a-4400-8000-00000000004c {height:1.537f}

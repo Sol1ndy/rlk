@@ -1,7 +1,7 @@
 scoreboard players operation #dandT itv = #dandDur tmp
 scoreboard players operation #heal tmp = @s atk
-scoreboard players set #t1 itv 150
-scoreboard players operation #heal tmp *= #t1 itv
+# 회복 = 공격력의 #dandHeal% (강화 단계로 조정)
+scoreboard players operation #heal tmp *= #dandHeal tmp
 scoreboard players operation #heal tmp /= #100 tmp
 execute if score #heal tmp matches ..0 run scoreboard players set #heal tmp 1
 function rlk:player/heal

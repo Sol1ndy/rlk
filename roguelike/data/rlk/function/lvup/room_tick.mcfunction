@@ -17,10 +17,8 @@ execute if score #pkK tmp = @s pkHK unless score #pkI tmp = @s pkHI run function
 # 설명 창은 조준점 옆을 따라다님 (인벤 아이템을 볼 때는 왼쪽, 그 밖에는 오른쪽: 각인 창을 가리지 않게)
 execute unless score @s pkHK matches 2 at @s anchored eyes positioned ^-1.6 ^ ^3 run tp @e[tag=rlk_pk_tip] ~ ~ ~
 execute if score @s pkHK matches 2 at @s anchored eyes positioned ^1.6 ^ ^3 run tp @e[tag=rlk_pk_tip] ~ ~ ~
-# 인벤토리 상세: 한 줄의 왼쪽 절반을 볼 때는 설명 창을 오른쪽에
-execute if score @s pkMode matches 4 if score @s pkHK matches 2 if score @s pkHI matches ..4 at @s anchored eyes positioned ^-1.6 ^ ^3 run tp @e[tag=rlk_pk_tip] ~ ~ ~
-# 인벤토리 상세: 각인 설명 창은 아이템 설명 창의 반대쪽
-execute if score @s pkMode matches 4 if score @s pkHI matches ..4 at @s anchored eyes positioned ^1.6 ^ ^3 run tp @e[tag=rlk_pk_tip2] ~ ~ ~
-execute if score @s pkMode matches 4 if score @s pkHI matches 5.. at @s anchored eyes positioned ^-1.6 ^ ^3 run tp @e[tag=rlk_pk_tip2] ~ ~ ~
+# 인벤토리 상세: 한 줄(9칸)의 왼쪽 절반을 볼 때는 설명 창을 오른쪽에, 각인 설명 창은 아이템 설명 창의 반대쪽
+execute if score @s pkMode matches 4 run function rlk:invd/tip_pos
+execute if score @s pkMode matches 8 run function rlk:invd/tip_pos
 # 아이템 도감: 설명 창은 조준한 칸의 반대쪽, 각인 설명 창은 같은 쪽 아래
 execute if score @s pkMode matches 6 run function rlk:codex/tip_pos

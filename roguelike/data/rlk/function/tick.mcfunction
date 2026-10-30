@@ -6,16 +6,26 @@ execute unless data storage rlk:config {installed:1b} run return 0
 # ===== 'player' 태그 보유자만 시스템 적용. 2명 이상이면 전원 태그 제거 (인벤/아이템 저장소가 1인 기준) =====
 execute store result score #pcount tmp if entity @a[tag=player]
 execute if score #pcount tmp matches 2.. run tellraw @a [{"text":"[로그라이크] ","color":"red","bold":true},{"text":"'player' 태그는 한 명만 가질 수 있습니다. 전원 태그를 제거합니다.","color":"red"}]
+# 태그를 잃으면 player/swing/tick 이 더 돌지 않으므로 휘두르기 느려짐(1인칭 점프 수정자)을 먼저 푼다
+execute if score #pcount tmp matches 2.. as @a[tag=player] run function rlk:player/swing/release
 execute if score #pcount tmp matches 2.. run tag @a[tag=player] remove player
 execute if score #pcount tmp matches 2.. run return 0
 
 # 시점 시스템(숄더뷰): 몸(rlk_body) 정하기 · 아바타 이동 · 카메라. 플레이어가 없으면 아바타 정리
 # 이전 틱 피격의 남은 넉백을 카메라 갱신 전에 적용
 execute as @e[tag=rlk_plkb] run function rlk:player/knockback/tick
+# 평타 휘두르기 느려짐(swHold): 이번 틱의 이동(view/move, 1인칭 점프 속성)보다 먼저 atkCD 에서 다시 구한다
+execute as @a[tag=player] run function rlk:player/swing/tick
+# 중간보스 저중력(tools/build_mboss_core.py mboss/lowg_on|off): 모듈이 이번 전투 틱에 요청했으면(#mbLowG 1) 플레이어와 아바타에 붙이고,
+# 아니면 아직 달고 있는 쪽(태그 rlk_lowg)에서 뗀다. view/tick(아바타 점프)보다 먼저
+execute if score #mbLowG mb matches 1 as @a[tag=player] run function rlk:mboss/lowg_on
+execute unless score #mbLowG mb matches 1 if entity @e[tag=rlk_lowg,limit=1] run function rlk:mboss/lowg_off
 execute as @a[tag=player] run function rlk:view/tick
 execute unless entity @a[tag=player,limit=1] if entity @e[tag=rlk_view,limit=1] run kill @e[tag=rlk_view]
 execute as @a[tag=player] run function rlk:player/tick
 function rlk:combat/text_tick
+# 화면 위 미니맵(리소스팩 글꼴, 보이지 않는 흰색 보스바 이름)
+function rlk:minimap/tick
 function rlk:ditem/tick
 function rlk:shop/tick
 # 화살(활 캐릭터)
@@ -42,6 +52,11 @@ execute if entity @e[tag=rlk_cmlink,limit=1] run function rlk:cm/clean
 # Narukami boss AI, telegraphs, combat objects and orphan cleanup.
 execute if entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/world
 execute unless entity @e[tag=rlk_raiden,limit=1] if entity @e[tag=rlk_raiden_aux,limit=1] run function rlk:boss/raiden/cleanup
+# 보스바는 서버 전체에 남으므로, 불러와진 나루카미가 없으면(런 종료·로비 복귀·청크 밖) 바로 숨긴다
+execute if score #rdBar rd matches 1 unless entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/bars_hide
+# 중간보스(tools/build_mboss_core.py): 전투가 시작된 뒤에만(#mbLive) 전투 · 공격 판정 · 보스바, 몸체가 없어지면 남은 보조 엔티티와 보스바 정리
+execute if score #mbLive mb matches 1 run function rlk:mboss/main
+execute if score #mbBar mb matches 1 unless score #mbLive mb matches 1 run function rlk:mboss/bars_hide
 # 회복구슬 / 아이템 소환물
 execute as @e[tag=rlk_healorb] at @s run function rlk:combat/healorb_tick
 execute as @e[tag=rlk_gold] at @s run function rlk:combat/gold_tick
@@ -53,6 +68,8 @@ function rlk:element/tick_world
 # 원소 입자 / 캐릭터 소환물
 execute as @e[tag=rlk_epart] at @s run function rlk:char/particle_tick
 execute as @e[tag=rlk_jav] at @s run function rlk:char/lumine/jav_tick
+# 나비아 금빛 카드 효과(tools/build_navia_fx_cards.py): 수명·보간·정리
+function rlk:fx/nv/world
 
 # 버려진 UI 아이템 제거: 바닥에 아이템 엔티티가 하나라도 있을 때만
 execute if entity @e[type=minecraft:item,limit=1] run function rlk:cleanup_grounditems

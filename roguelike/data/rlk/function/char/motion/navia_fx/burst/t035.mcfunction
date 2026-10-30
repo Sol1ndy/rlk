@@ -1,0 +1,26 @@
+# (retimed from t035)
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^-1.265 ^0.12 ^0.599 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^-0.963 ^0.12 ^1.016 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^-0.531 ^0.12 ^1.295 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^-0.027 ^0.12 ^1.4 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^0.48 ^0.12 ^1.315 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^0.923 ^0.12 ^1.053 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^1.241 ^0.12 ^0.648 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^1.391 ^0.12 ^0.156 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^1.354 ^0.12 ^-0.357 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^1.133 ^0.12 ^-0.822 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^0.76 ^0.12 ^-1.176 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^0.284 ^0.12 ^-1.371 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^-0.23 ^0.12 ^-1.381 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^-0.714 ^0.12 ^-1.204 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^-1.101 ^0.12 ^-0.865 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^-1.339 ^0.12 ^-0.409 0.08 0.06 0.08 0 1 normal
+particle minecraft:dust{color:[0.996,0.941,0.647],scale:1.4} ^-1.396 ^0.12 ^0.102 0.08 0.06 0.08 0 1 normal
+particle minecraft:poof ^-1.265 ^0.2 ^0.599 0.15 0.1 0.15 0.02 2 normal
+particle minecraft:poof ^-0.471 ^0.2 ^1.318 0.15 0.1 0.15 0.02 2 normal
+particle minecraft:poof ^0.599 ^0.2 ^1.265 0.15 0.1 0.15 0.02 2 normal
+particle minecraft:poof ^1.318 ^0.2 ^0.471 0.15 0.1 0.15 0.02 2 normal
+particle minecraft:poof ^1.265 ^0.2 ^-0.599 0.15 0.1 0.15 0.02 2 normal
+particle minecraft:poof ^0.471 ^0.2 ^-1.318 0.15 0.1 0.15 0.02 2 normal
+particle minecraft:poof ^-0.599 ^0.2 ^-1.265 0.15 0.1 0.15 0.02 2 normal
+particle minecraft:poof ^-1.318 ^0.2 ^-0.471 0.15 0.1 0.15 0.02 2 normal

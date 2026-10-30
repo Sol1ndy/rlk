@@ -1,5 +1,6 @@
-# @s = 예약 표식, at @s. 가장 가까운 적(2.5칸)에게 공격력의 30퍼센트 얼음 원소 추가 피해(원소 부착 없음)
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:45}
+# @s = 예약 표식, at @s. 가장 가까운 적(2.5칸)에게 공격력의 #quillCoef% 얼음 원소 추가 피해(원소 부착 없음, 계수는 강화 단계로 조정)
+execute store result storage rlk:tune m_ice_quill.coef int 1 run scoreboard players get #quillCoef tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_ice_quill
 scoreboard players set #sub itv 1
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

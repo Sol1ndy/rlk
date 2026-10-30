@@ -1,0 +1,42 @@
+# @s = body, #azTst = the requested test id (plan 1.7).
+execute if score #mbSt mb matches 0 run function rlk:mboss/intro_end
+execute if score #mbSt mb matches 1 if score #azPh mb matches 0 run function rlk:boss/azhdaha/intro/done
+execute if score #azTst mb matches 1 run return run function rlk:boss/azhdaha/test/req_1
+execute if score #azTst mb matches 2 run return run function rlk:boss/azhdaha/test/req_2
+execute if score #azTst mb matches 3 run return run function rlk:boss/azhdaha/test/req_3
+execute if score #azTst mb matches 4 run return run function rlk:boss/azhdaha/test/req_4
+execute if score #azTst mb matches 5 run return run function rlk:boss/azhdaha/test/req_5
+execute if score #azTst mb matches 6 run return run function rlk:boss/azhdaha/test/req_6
+execute if score #azTst mb matches 7 run return run function rlk:boss/azhdaha/test/req_7
+execute if score #azTst mb matches 8 run return run function rlk:boss/azhdaha/test/req_8
+execute if score #azTst mb matches 9 run return run function rlk:boss/azhdaha/test/req_9
+execute if score #azTst mb matches 10 run return run function rlk:boss/azhdaha/test/req_10
+execute if score #azTst mb matches 20 run return run function rlk:boss/azhdaha/test/req_20
+execute if score #azTst mb matches 21 run return run function rlk:boss/azhdaha/test/req_21
+execute if score #azTst mb matches 22 run return run function rlk:boss/azhdaha/test/req_22
+execute if score #azTst mb matches 31 run return run function rlk:boss/azhdaha/test/req_31
+execute if score #azTst mb matches 32 run return run function rlk:boss/azhdaha/test/req_32
+execute if score #azTst mb matches 43 run return run function rlk:boss/azhdaha/test/req_43
+execute if score #azTst mb matches 44 run return run function rlk:boss/azhdaha/test/req_44
+execute if score #azTst mb matches 45 run return run function rlk:boss/azhdaha/test/req_45
+execute if score #azTst mb matches 46 run return run function rlk:boss/azhdaha/test/req_46
+execute if score #azTst mb matches 23 run return run function rlk:boss/azhdaha/test/b3
+execute if score #azTst mb matches 24 run return run function rlk:boss/azhdaha/test/kill
+execute if score #azTst mb matches 25 run return run function rlk:boss/azhdaha/test/b3_sink
+execute if score #azTst mb matches 26 run return run function rlk:boss/azhdaha/test/intro
+execute if score #azTst mb matches 33 run return run function rlk:boss/azhdaha/test/fire
+execute if score #azTst mb matches 41 run return run function rlk:boss/azhdaha/test/b3_41
+execute if score #azTst mb matches 42 run return run function rlk:boss/azhdaha/test/b3_42
+execute if score #azTst mb matches 60 run return run function rlk:boss/azhdaha/test/p2
+execute if score #azTst mb matches 61 run return run function rlk:boss/azhdaha/test/p3_tail
+execute if score #azTst mb matches 62 run return run function rlk:boss/azhdaha/test/p3
+execute if score #azTst mb matches 70 run return run function rlk:boss/azhdaha/test/brand
+execute if score #azTst mb matches 71 run return run function rlk:boss/azhdaha/brand/clear_all
+execute if score #azTst mb matches 72 run return run function rlk:boss/azhdaha/test/shard
+execute if score #azTst mb matches 80 run return run function rlk:boss/azhdaha/test/floor1
+execute if score #azTst mb matches 90 run return run function rlk:boss/azhdaha/test/pair_0
+execute if score #azTst mb matches 91 run return run function rlk:boss/azhdaha/test/pair_1
+execute if score #azTst mb matches 92 run return run function rlk:boss/azhdaha/test/pair_2
+execute if score #azTst mb matches 93 run return run function rlk:boss/azhdaha/test/pair_3
+execute if score #azTst mb matches 99 run return run function rlk:boss/azhdaha/test/cut
+function rlk:boss/azhdaha/test/help

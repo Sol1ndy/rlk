@@ -26,17 +26,11 @@ fill -11 210 -1 -11 210 -1 minecraft:moss_block
 fill -17 205 -1 -15 206 -1 minecraft:andesite
 fill -20 210 -20 -1 210 -1 minecraft:polished_deepslate
 fill -19 210 -19 -2 210 -2 minecraft:air
-fill -3 201 -16 -2 201 -15 minecraft:podzol
 fill -19 201 -15 -17 201 -11 minecraft:podzol
-fill -4 201 -15 -4 201 -6 minecraft:podzol
 fill -16 201 -14 -16 201 -10 minecraft:podzol
-fill -5 201 -14 -5 201 -7 minecraft:podzol
 fill -18 201 -10 -17 201 -7 minecraft:podzol
 fill -16 201 -7 -15 201 -7 minecraft:podzol
 fill -17 201 -6 -17 201 -2 minecraft:podzol
-fill -3 201 -6 -2 201 -5 minecraft:podzol
-fill -3 201 -14 -2 201 -7 minecraft:dirt
-fill -3 202 -14 -2 202 -7 minecraft:podzol
 fill -19 201 -6 -18 201 -2 minecraft:dirt
 fill -19 202 -6 -18 202 -2 minecraft:podzol
 fill -19 201 -8 -19 207 -7 minecraft:mossy_stone_bricks

@@ -6,4 +6,5 @@ data modify storage rlk:lvpick lq set from storage rlk:eng lore
 execute if data storage rlk:lvpick lq[0] run data modify storage rlk:lvpick tip append from storage rlk:lvpick lq[0]
 execute if data storage rlk:lvpick lq[0] run data remove storage rlk:lvpick lq[0]
 function rlk:lvup/tip/lore_loop
-function rlk:invd/tip2_set with storage rlk:lvpick
+execute if data storage rlk:lvpick tip[0] run function rlk:invd/tip2_set with storage rlk:lvpick
+execute unless data storage rlk:lvpick tip[0] run data modify entity @e[tag=rlk_pk_tip2,limit=1] text set value {text:""}
