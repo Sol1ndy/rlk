@@ -3800,9 +3800,9 @@
   "atlas_budget": 520000,
   "sprites": 47,
   "elements_at_rest": {
-   "cape": 3008,
-   "winged": 3012,
-   "abyss": 3138
+   "cape": 3006,
+   "winged": 3010,
+   "abyss": 3136
   },
   "elements_budget": 6500,
   "parts": 40,

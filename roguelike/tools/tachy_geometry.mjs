@@ -122,44 +122,43 @@ function neck() { return limb([[-.02, .055], [.10, .05]], 'tk_suit', {n: 8}); }
 function head() {
   // pivot = jaw / neck top (1.87): face, skull, ears hidden under the hair
   const e = limb([[0, ell(.055, .07, .055, .05), [0, .015]], [.05, ell(.085, .1, .085, .09), [0, .01]], [.13, ell(.098, .11, .098, .11)], [.21, ell(.09, .1, .09, .105)], [.26, ell(.05, .06, .05, .06)]], 'tk_skin', {n: 16});
-  // R2 (the user: "얼굴에 굴곡이 없어서 어색함"): the face is shaped instead of one folded card (I1): a flat middle (the eyes,
-  // the mouth), cheek planes turning back in two steps (22.5, then 45 deg), the forehead above the brows and the chin
-  // under the mouth tipping back (a brow line and a tapered jaw in profile), a small nose wedge (bridge flush, tip out).
-  // The anime paint is one sprite mapped across every plane by the unfolded position, so it reads unbroken from the front.
+  // R2 (the user: "얼굴에 굴곡이 없어서 어색함"): the face is shaped instead of one flat card. R3 (the user: "이마 부분이
+  // 머리카락을 뚫고 사각형 모양으로 나와있는데"): every plane stays inside the hair - the forehead is not tilted (tilted back
+  // it sank into the skull, whose skin showed as a rectangle between the bangs), the cheeks turn back once (22.5 deg at
+  // |x| .05, as I1) and the front side locks (hairTop) hang in front of their outer band, the chin tucks back under the
+  // mouth, and the nose is a soft ridge (two planes 22.5 deg either side: lit like the face, seen only in profile / 3-4).
+  // The anime paint is one sprite mapped across every plane by the unfolded position, so it reads unbroken.
   e.push(...faceRelief());
   return e;
 }
 // the face sprite coordinates of an unfolded face point: u across X -0.088..0.088 (the sprite is 0.176 x 0.2 b), v down
 // from the hairline (Y 0.2) to the chin (Y 0)
-const FX = .088, FH = .2, FZ = -.114;
+export const FACE = {FX: .088, FH: .2, FZ: -.112, C0: .05, YC: .03, NOSE: [.062, .094], NW: .007};
+const {FX, FH, FZ} = FACE;
 const faceUV = (gx, gy) => [16 * (gx + FX) / (2 * FX), 16 * (FH - gy) / FH];
 function faceStrip({X0, X1, Y0, Y1, z}, gmap, rot) {
   // one card of the face in the plane z (seen from -Z), its sprite read at the unfolded position gmap(P) = [gx, gy]
   return faceEl([[X0, Y0, z], [X1, Y1, z]], {front: {tex: 'face', fn: P => faceUV(...gmap(P))}}, {shade: false, rot});
 }
 function faceRelief() {
-  const e = [], C0 = .055, C1 = .075, YC = .03, YF = .15, c22 = Math.cos(Math.PI / 8), s22 = Math.sin(Math.PI / 8);
-  const id = P => [P[0], P[1]];
-  // the middle: eyes, nose line, mouth (flat); the forehead and the chin tip back about their fold lines
-  e.push(faceStrip({X0: -C0, X1: C0, Y0: YC, Y1: YF, z: FZ}, id));
-  e.push(faceStrip({X0: -C0, X1: C0, Y0: YF, Y1: FH, z: FZ}, id, ['x', 22.5, [0, YF, FZ]]));
+  const {C0, YC, NOSE: [N0, N1], NW} = FACE, e = [], id = P => [P[0], P[1]];
+  // the middle (brows, eyes, mouth) flat, the chin under the mouth tucked back 22.5 deg (a tapered jaw in profile)
+  e.push(faceStrip({X0: -C0, X1: C0, Y0: YC, Y1: FH, z: FZ}, id));
   e.push(faceStrip({X0: -C0, X1: C0, Y0: 0, Y1: YC, z: FZ}, id, ['x', -22.5, [0, YC, FZ]]));
+  // the cheeks: 22.5 deg back from the middle's edges out to the sprite edge
   for (const s of [1, -1]) {
-    // the inner cheek plane (22.5 deg back from the middle's edge) and the outer one (45 deg, from the inner one's edge)
-    const a = s > 0 ? [C0, C1] : [-C1, -C0];
+    const a = s > 0 ? [C0, FX] : [-FX, -C0];
     e.push(faceStrip({X0: a[0], X1: a[1], Y0: 0, Y1: FH, z: FZ}, id, ['y', -s * 22.5, [s * C0, 0, FZ]]));
-    const ox = s * (C0 + (C1 - C0) * c22), oz = FZ + (C1 - C0) * s22, w = FX + .004 - C1;
-    const b = s > 0 ? [ox, ox + w] : [ox - w, ox];
-    e.push(faceStrip({X0: b[0], X1: b[1], Y0: 0, Y1: FH, z: oz}, P => [s * C1 + (P[0] - ox), P[1]], ['y', -s * 45, [ox, 0, oz]]));
   }
-  // the nose: a thin wedge on the middle (the bridge between the eyes flush, the tip 0.016 b out), painted with the face
-  // sprite at its own place (the soft shade under the tip continues)
-  const nb = [[-.0075, .062, FZ - .006], [.0075, .094, FZ]];
-  e.push(faceEl(nb, {front: {tex: 'face', fn: P => faceUV(P[0], P[1])}, left: {tex: 'face', fn: P => faceUV(.004, P[1])},
-    right: {tex: 'face', fn: P => faceUV(-.004, P[1])}, down: {tex: 'face', fn: P => faceUV(P[0], .062)}},
-  {shade: false, rot: ['x', 22.5, [0, .094, FZ]]}));
+  // the nose: a low ridge from between the eyes to the tip (two planes NW wide, turned 22.5 deg about their outer edge so
+  // the middle line stands 0.003 b out); their snapped light is the face's, so no dark line, only the profile
+  for (const s of [1, -1]) {
+    const a = s > 0 ? [0, NW] : [-NW, 0];
+    e.push(faceStrip({X0: a[0], X1: a[1], Y0: N0, Y1: N1, z: FZ}, id, ['y', -s * 22.5, [s * NW, 0, FZ]]));
+  }
   return e;
 }
+export const LOCK_DZ = .0022, LOCK_X0 = .066, LOCK_X1 = .116;
 function hairTop() {
   // scalp cap (slightly over the skull), side locks framing the face, a parted fringe; the long hair hangs from hair_1
   // (I1: a rounder crown: the old 3-station cap read as a flat beret above the face)
@@ -168,7 +167,10 @@ function hairTop() {
   e.push(...limb([[.13, ell(.1, .02, .1, .12), [0, -.01]], [.03, ell(.085, .01, .085, .11), [0, -.02]]], 'tk_hair', {n: 16, caps: ''}));
   for (const s of [1, -1]) {
     e.push(cardX('hair_lock', .1 * s, {Z0: -.1, Z1: .06, Y0: -.16, Y1: .2}, {flipU: s < 0}));
-    e.push(cardZ('hair_lock', -.095, {X0: s > 0 ? .055 : -.105, X1: s > 0 ? .105 : -.055, Y0: -.12, Y1: .2}, {flipU: s < 0}));
+    // R3: the front locks hang just in front of the cheek planes (the same 22.5 deg turn about |x| .05, 0.0022 b out), from
+    // the unfolded |x| .066: they cover the face's outer band in every view, so no skin shows between the face and the hair
+    e.push(cardZ('hair_lock', FZ - LOCK_DZ, {X0: s > 0 ? LOCK_X0 : -LOCK_X1, X1: s > 0 ? LOCK_X1 : -LOCK_X0, Y0: -.12, Y1: .2},
+      {flipU: s < 0, rot: ['y', -s * 22.5, [s * FACE.C0, 0, FZ - LOCK_DZ]]}));
   }
   // (I1: the fringe card reaches up over the front of the crown: no step between the bangs and the scalp)
   e.push(...foldedCard('hair_fringe', -.118, {X0: -.1, X1: .1, Y0: .12, Y1: .292}, .045));
