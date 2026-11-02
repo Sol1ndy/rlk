@@ -141,7 +141,7 @@
       "res": {"*": 10}, "phases": [64, 36],
       "music": {"1": {"ev": "minecraft:music.nether.crimson_forest", "len": 6076},
                 "2": {"ev": "minecraft:music.dragon", "len": 6883}},
-      "icon": {"item": "minecraft:netherite_hoe", "model": "minecraft:netherite_hoe"}
+      "icon": {"item": "minecraft:netherite_hoe", "model": "rlk:mboss/kn_kit/gate_icon"}
     }
   ]
 }
