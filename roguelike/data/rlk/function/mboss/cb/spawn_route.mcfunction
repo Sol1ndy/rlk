@@ -3,4 +3,5 @@
 execute if data entity @s data{boss_id:"cproto"} run return run function rlk:mboss/cb/start {id:"cproto"}
 execute if data entity @s data{boss_id:"azhdaha"} run return run function rlk:mboss/cb/start {id:"azhdaha"}
 execute if data entity @s data{boss_id:"apep"} run return run function rlk:mboss/cb/start {id:"apep"}
+execute if data entity @s data{boss_id:"arlecchino"} run return run function rlk:mboss/cb/start {id:"arlecchino"}
 function rlk:mboss/start_cancel

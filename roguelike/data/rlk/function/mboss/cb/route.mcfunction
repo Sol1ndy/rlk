@@ -3,4 +3,5 @@
 execute if score #mbTest mb matches 1 if score #cbForce mb matches 1.. run return run function rlk:mboss/cb/route_force
 execute if score #chapter room matches 1 run return run function rlk:mboss/cb/layout {id:"azhdaha"}
 execute if score #chapter room matches 3 run return run function rlk:mboss/cb/layout {id:"apep"}
+execute if score #chapter room matches 4 run return run function rlk:mboss/cb/layout {id:"arlecchino"}
 function rlk:room/raiden/layout

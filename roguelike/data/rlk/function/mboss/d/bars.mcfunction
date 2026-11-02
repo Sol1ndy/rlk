@@ -8,3 +8,4 @@ execute if score #mbId mb matches 10 run return run function rlk:boss/azhdaha/ba
 execute if score #mbId mb matches 11 run return run function rlk:boss/apep/bars
 execute if score #mbId mb matches 20 run return run function rlk:boss/tachy/bars
 execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/bars
+execute if score #mbId mb matches 12 run return run function rlk:boss/arlecchino/bars

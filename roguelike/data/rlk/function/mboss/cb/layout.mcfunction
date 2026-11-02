@@ -4,4 +4,5 @@ $data modify storage rlk:mboss cbl set value "$(id)"
 execute if data storage rlk:mboss {cbl:"cproto"} run return run function rlk:room/cboss/cproto/layout
 execute if data storage rlk:mboss {cbl:"azhdaha"} run return run function rlk:room/cboss/azhdaha/layout
 execute if data storage rlk:mboss {cbl:"apep"} run return run function rlk:room/cboss/apep/layout
+execute if data storage rlk:mboss {cbl:"arlecchino"} run return run function rlk:room/cboss/arlecchino/layout
 function rlk:room/raiden/layout

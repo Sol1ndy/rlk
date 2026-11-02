@@ -6,3 +6,4 @@ scoreboard players set #pat kn 51
 scoreboard players set #trt kn 0
 function rlk:boss/arlecchino/core/tr/end
 function rlk:boss/arlecchino/core/wisps
+function rlk:mboss/arena/fl_ruins/look/crimson

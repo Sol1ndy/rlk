@@ -2,8 +2,8 @@
 # intro -> its end; a pattern -> cancelled + recovery (E70 before its brand: reserved again); T -> finished; the
 # intro replay -> ended; a stun -> the rest of it (the clip again).
 function rlk:boss/arlecchino/init
-function rlk:boss/arlecchino/rig_stub/init
-function rlk:boss/arlecchino/rig_stub/spawn
+function rlk:boss/arlecchino/rig/init
+function rlk:boss/arlecchino/rig/spawn
 scoreboard players set #lock kn 0
 execute if score #ph kn matches 0 run return run function rlk:boss/arlecchino/core/intro/reload
 execute if score #ph kn matches 6 run return 0

@@ -1,7 +1,7 @@
 # T is over (or a reload / test finishes it; @s = body): P2, no floor; Q0 first (the decision picks it).
 execute if score #trt kn matches 0 run function rlk:mboss/title {title:"두 세계 불의 잔재",sub:"페르엘",color:"#C8102E"}
 execute if score #trt kn matches 0 run function rlk:boss/arlecchino/core/tr/title
-execute if score #pat kn matches 51 run function rlk:boss/arlecchino/core/sq/t_p2/cancel
+execute if score #pat kn matches 51 run function rlk:boss/arlecchino/seq/t_p2/cancel
 tag @s remove rlk_mb_inv
 function rlk:mboss/cine/end
 scoreboard players set #mbFloor mb 0

@@ -22,7 +22,7 @@
     "kind: \"special\" = reached through a room rift (F:room/rift, F:mboss/sp), fought in chapter mode in its own arena, rewarded with lvup (0/1: one level) + picks (1..3) item boxes at the rift; w = rift roll weight among specials; no ch / route / px.",
     "Boss n 20 and arena n 3 (tk_lift) are Tachy's (S1 added arenas.tk_lift = api.ARENA_SPEC and measured the basalt_deltas pool: music 1 len 6376 = mboss_lib.music_len; enabled since I1: rift weight 10, icon = the kit gate icon rlk:mboss/tk_kit/gate_icon). Boss n 97 spproto is the stand-in special (w 0: only the rift tests reach it; arena cp_test; module F:mboss/spproto, tools/build_mboss_spproto.py).",
     "--- chapter 4 (D0 of the Arlecchino plan, scratchpad ar/PLAN.md §8-9, ar/contract.md) ---",
-    "Boss n 12 and arena n 4 (fl_ruins) are Arlecchino's (chapter 4). D0 keeps arlecchino enabled false and route false and the arena out of arenas{} (S1 adds arenas.fl_ruins = api.ARENA_SPEC, measures the music.nether.crimson_forest pool into mboss_lib.MUSIC_TRACKS and sets music 1 len); px false + shield: one humanoid body, no hit proxies; icon model becomes rlk:mboss/kn_kit/gate_icon with the kit; the lead flips enabled and route at I1 (chapter 4 then leaves Raiden).",
+    "Boss n 12 and arena n 4 (fl_ruins) are Arlecchino's (chapter 4). I1 turned arlecchino enabled and route on (chapter 4 left Raiden). At D0 the arena was out of arenas{} (S1 added arenas.fl_ruins = api.ARENA_SPEC, measures the music.nether.crimson_forest pool into mboss_lib.MUSIC_TRACKS and set music 1 len); px false + shield: one humanoid body, no hit proxies; icon model becomes rlk:mboss/kn_kit/gate_icon with the kit; ",
     "fn: the module's function root under F: (default mboss/<id>; a chapter boss may say boss/<id>, user 10-21). Only the function root moves: entity tags, scoreboards, storage and resource-pack paths keep their mboss names. Generators read it through mboss_lib.fn_root / fn_root_of; boss/raiden and boss/test are reserved (Raiden's own module, the chapter-boss test aliases rlk:boss/test/<cmd>)."
   ],
   "arena": {
@@ -133,7 +133,7 @@
       "icon": {"item": "minecraft:echo_shard", "model": "minecraft:echo_shard"}
     },
     {
-      "id": "arlecchino", "n": 12, "fn": "boss/arlecchino", "kind": "chapter", "ch": [4], "route": false, "enabled": false, "w": 0,
+      "id": "arlecchino", "n": 12, "fn": "boss/arlecchino", "kind": "chapter", "ch": [4], "route": true, "enabled": true, "w": 0,
       "minCh": 4, "maxCh": 4, "name": "아를레키노", "sub": "우인단 집행관 서열 4위", "color": "#E0303A", "el": 1,
       "hp": 320, "xp": 40, "atk": 12, "lvAdd": 0, "dmgMul": 150, "goldMul": 1, "sap": 0, "picks": 0,
       "scale": 1.4, "hit": {"w": 1.2, "h": 2.9}, "intro": 160, "death": 110, "deathSnd": false,

@@ -1,4 +1,4 @@
-function rlk:boss/arlecchino/core/sq/intro/cancel
+function rlk:boss/arlecchino/seq/intro/cancel
 tag @s remove rlk_mb_inv
 scoreboard players set #pat kn 0
 scoreboard players set #sq kn 0

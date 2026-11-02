@@ -6,4 +6,3 @@ execute store result score #t2 kn run data get entity @e[type=minecraft:marker,t
 scoreboard players add #t2 kn 90
 data modify storage rlk:kn core.st set value {len:280,w:30,yaw:0,t:0}
 function rlk:boss/arlecchino/p/g1/cross
-function rlk:boss/arlecchino/p/g1/strips

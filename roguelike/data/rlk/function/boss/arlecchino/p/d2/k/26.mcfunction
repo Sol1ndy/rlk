@@ -5,6 +5,7 @@ scoreboard players operation #hzSzR mb *= #t3 kn
 scoreboard players set #t3 kn 4
 scoreboard players operation #hzSzR mb /= #t3 kn
 execute as @e[type=minecraft:marker,tag=rlk_kn_dl,tag=rlk_kn_p_d2] run function rlk:boss/arlecchino/core/dash/grow
-execute at @s run particle minecraft:flame ~ ~ ~ 0.4 0.5 0.4 0.06 16 force @a[tag=player]
-execute at @s run playsound minecraft:entity.blaze.shoot hostile @a[tag=player] ~ ~ ~ 0.7 1.4 0.23
-execute at @s run playsound minecraft:entity.phantom.swoop hostile @a[tag=player] ~ ~ ~ 0.5 1.6 0.17
+execute if score #d2_dl kn matches 0..9 at @s rotated as @s rotated ~ 0 positioned ~ ~1 ~ run function rlk:boss/arlecchino/fx/p/dash_trail {len:46,c:1}
+execute if score #d2_dl kn matches 10..18 at @s rotated as @s rotated ~ 0 positioned ~ ~1 ~ run function rlk:boss/arlecchino/fx/p/dash_trail {len:93,c:1}
+execute if score #d2_dl kn matches 19..28 at @s rotated as @s rotated ~ 0 positioned ~ ~1 ~ run function rlk:boss/arlecchino/fx/p/dash_trail {len:140,c:1}
+execute at @s run function rlk:boss/arlecchino/fx/snd/dash

@@ -2,3 +2,4 @@
 # banner (the one allowed instruction text: the game's own, adapted to the normal attack).
 tag @s add rlk_kn_win
 scoreboard players set #win kn 1
+function rlk:boss/arlecchino/fx/hud/banner {on:1}

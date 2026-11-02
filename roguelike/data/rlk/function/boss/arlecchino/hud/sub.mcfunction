@@ -16,4 +16,5 @@ execute if score #pat kn matches 11 run data modify storage rlk:mboss sub set va
 execute if score #pat kn matches 12 run data modify storage rlk:mboss sub set value [{text:"연옥 그림자 분신",color:"#E8E2D0",bold:true}]
 execute if score #pat kn matches 13 run data modify storage rlk:mboss sub set value [{text:"사형장으로의 초대",color:"#E8E2D0",bold:true}]
 execute if score #pat kn matches 20 run data modify storage rlk:mboss sub set value [{text:"재가 된 만상",color:"#E8E2D0",bold:true}]
-execute if score #shock kn matches 1 run data modify storage rlk:mboss sub append value {text:"  ◆선혈의 충격",color:"#FF3A4A",bold:true}
+execute if score #shock kn matches 1 run function rlk:boss/arlecchino/fx/hud/badge {on:1}
+execute unless score #shock kn matches 1 run function rlk:boss/arlecchino/fx/hud/badge {on:0}

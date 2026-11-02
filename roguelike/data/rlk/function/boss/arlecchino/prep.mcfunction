@@ -5,5 +5,5 @@ data modify storage rlk:mboss cprep.arlecchino.gate set value {item:"minecraft:n
 data modify storage rlk:mboss cprep.arlecchino.title set value {text:"「아를레키노」",color:"#E0303A",bold:true}
 data modify storage rlk:mboss cprep.arlecchino.sub set value {text:"우인단 집행관 서열 4위",color:"#E8E2D0",bold:false}
 kill @e[type=minecraft:marker,tag=rlk_kn_grave]
-summon minecraft:marker ~0 ~1.4 ~3 {Tags:["rlk_room","rlk_kn_grave"]}
+summon minecraft:marker ~0 ~4.3 ~-4.5 {Tags:["rlk_room","rlk_kn_grave"]}
 schedule function rlk:boss/arlecchino/gate/flames 10t replace

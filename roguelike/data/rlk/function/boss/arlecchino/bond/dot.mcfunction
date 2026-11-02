@@ -7,4 +7,4 @@ scoreboard players set #mbDotPct mb 10
 scoreboard players set #mbDotEl mb 1
 scoreboard players set #mbDotLethal mb 0
 function rlk:mboss/pl_dot
-execute at @e[tag=rlk_body,limit=1] run playsound minecraft:block.fire.extinguish hostile @a[tag=player] ~ ~ ~ 0.25 1.6 0
+execute at @e[tag=rlk_body,limit=1] run function rlk:boss/arlecchino/fx/snd/bond_tick

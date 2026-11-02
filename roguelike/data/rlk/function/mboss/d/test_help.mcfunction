@@ -8,4 +8,5 @@ execute if score #mbId mb matches 10 run return run function rlk:boss/azhdaha/te
 execute if score #mbId mb matches 11 run return run function rlk:boss/apep/test/help
 execute if score #mbId mb matches 20 run return run function rlk:boss/tachy/test/help
 execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/test/help
+execute if score #mbId mb matches 12 run return run function rlk:boss/arlecchino/test/help
 tellraw @s ["",{text:" 이 보스의 패턴 번호 목록이 없습니다.",color:"gray"}]

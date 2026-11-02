@@ -7,5 +7,5 @@ scoreboard players set #pt kn 0
 scoreboard players set #stun kn 1
 scoreboard players set #stun_t kn 160
 tag @s add rlk_kn_stun
-function rlk:boss/arlecchino/rig_stub/play/brk
+function rlk:boss/arlecchino/rig/play/brk
 function rlk:boss/arlecchino/hud/sub

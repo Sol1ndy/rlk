@@ -9,7 +9,7 @@ function rlk:boss/arlecchino/core/dash/probe
 scoreboard players operation #d2_dl kn = #t2 kn
 execute positioned as @e[type=minecraft:marker,tag=rlk_kn_dp,limit=1] run function rlk:mboss/mv/glide {t:4}
 kill @e[type=minecraft:marker,tag=rlk_kn_dp]
-data modify storage rlk:kn core.dl set value {len:0,w:20,tell:1,dmg:45}
+data modify storage rlk:kn core.dl set value {len:0,w:20,tell:1,dmg:36}
 execute store result storage rlk:kn core.dl.len int 5 run scoreboard players get #d2_dl kn
 scoreboard players operation #hzGrp mb = #mbGrp mb
 scoreboard players set #hzAct mb 4

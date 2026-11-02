@@ -69,7 +69,8 @@ def arena_look(look):
 # =============================================================================================
 # 2. Damage, Bond of Life hazards (FN-1), hits (PLAN §4, §5.1)
 # % of the base hit (mboss/hurt coefficient). P2 hits x P2_MUL (the wiki's P2 attack is x 1.4 of P1; tempered).
-DMG = {'T1': 32, 'T2': 45, 'T3': 62, 'T4': 80}
+# I1 (R-S3-6): D0 tiers x 0.8 (32/45/62/80 measured 1.18x / 1.55x Apep P1 for a melee walker; target ~1.1x).
+DMG = {'T1': 26, 'T2': 36, 'T3': 50, 'T4': 64}
 P2_MUL = 120
 PYRO = 1
 EL_U = 1000                                            # 1U Pyro on every hit

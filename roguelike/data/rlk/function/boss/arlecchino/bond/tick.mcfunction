@@ -1,8 +1,5 @@
 # Bond of Life, every fight tick (@s = body; contract §3.5). First the events of the last tick (hazards strike after
 # the module tick): a landed bol hit, then the bond state, the DoT, the shock hit.
-# FN-1 stand-in (removed at I1): a hit that landed on a bol strike tick (#bolw, set by the pattern) is a bol hit.
-execute if score #bolw kn matches 1 if score #mbHitEv mb matches 1.. run scoreboard players set #mbHitBol mb 6
-scoreboard players set #bolw kn 0
 scoreboard players operation #hitev kn = #mbHitEv mb
 scoreboard players set #mbHitEv mb 0
 execute if score #mbHitBol mb matches 1.. run function rlk:boss/arlecchino/bond/hit

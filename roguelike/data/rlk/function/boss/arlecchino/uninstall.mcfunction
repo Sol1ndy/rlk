@@ -1,6 +1,7 @@
 # Hook uninstall (no executor; every enabled module): the kit, the rig, the module entities, the gate flames chain,
 # objective kn, storage core.*.
-function rlk:boss/arlecchino/rig_stub/uninstall
+function rlk:boss/arlecchino/fx/uninstall
+function rlk:boss/arlecchino/rig/uninstall
 kill @e[tag=rlk_kn_p]
 kill @e[tag=rlk_kn_part]
 kill @e[tag=rlk_kn_prop]

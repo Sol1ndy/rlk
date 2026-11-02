@@ -2,4 +2,5 @@
 execute if score #cbForce mb matches 98 run return run function rlk:mboss/cb/layout {id:"cproto"}
 execute if score #cbForce mb matches 10 run return run function rlk:mboss/cb/layout {id:"azhdaha"}
 execute if score #cbForce mb matches 11 run return run function rlk:mboss/cb/layout {id:"apep"}
+execute if score #cbForce mb matches 12 run return run function rlk:mboss/cb/layout {id:"arlecchino"}
 function rlk:room/raiden/layout

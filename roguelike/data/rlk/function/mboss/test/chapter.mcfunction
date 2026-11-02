@@ -6,4 +6,5 @@ $data modify storage rlk:mboss tch set value "$(id)"
 execute if data storage rlk:mboss {tch:"cproto"} run return run function rlk:mboss/test/chapter_ch {id:"cproto",ch:1}
 execute if data storage rlk:mboss {tch:"azhdaha"} run return run function rlk:mboss/test/chapter_ch {id:"azhdaha",ch:1}
 execute if data storage rlk:mboss {tch:"apep"} run return run function rlk:mboss/test/chapter_ch {id:"apep",ch:3}
+execute if data storage rlk:mboss {tch:"arlecchino"} run return run function rlk:mboss/test/chapter_ch {id:"arlecchino",ch:4}
 $function rlk:mboss/test/chapter_ch {id:"$(id)",ch:1}

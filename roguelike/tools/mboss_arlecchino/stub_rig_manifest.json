@@ -588,17 +588,17 @@
   },
   "h1": {
    "id": 26,
-   "len": 156,
+   "len": 124,
    "loop": null,
    "events": {
     "leap": 0,
     "perch": 10,
     "clones": 20,
     "strike": 34,
-    "drop": 96,
-    "wing": 104,
-    "sweep": 112,
-    "end": 156
+    "drop": 64,
+    "wing": 72,
+    "sweep": 84,
+    "end": 124
    },
    "form": "p1"
   },

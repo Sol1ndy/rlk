@@ -10,8 +10,6 @@ scoreboard players set #t3 kn 150
 execute if score #ph kn matches 5 run scoreboard players set #t3 kn 125
 function rlk:boss/arlecchino/bond/true
 execute unless score #mbSt mb matches 1 run return 0
-execute at @s positioned ~ ~1.4 ~ run particle minecraft:dust{color:[0.72,0.04,0.12],scale:1.6} ~ ~ ~ 1 1.2 1 0 60 force @a[tag=player]
-execute at @s positioned ~ ~1.4 ~ run particle minecraft:explosion ~ ~ ~ 0.4 0.4 0.4 0 2 force @a[tag=player]
-execute at @s run playsound minecraft:entity.wither.break_block hostile @a[tag=player] ~ ~ ~ 1 0.8 0.33
-execute at @s run playsound minecraft:block.glass.break hostile @a[tag=player] ~ ~ ~ 1 0.6 0.33
+execute at @s positioned ~ ~1.4 ~ run function rlk:boss/arlecchino/fx/p/break_burst
+execute at @s run function rlk:boss/arlecchino/fx/snd/break
 function rlk:boss/arlecchino/core/stun_start

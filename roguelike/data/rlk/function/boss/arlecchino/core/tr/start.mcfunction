@@ -15,5 +15,5 @@ function rlk:mboss/cine/start
 function rlk:boss/arlecchino/core/stop_move
 function rlk:boss/arlecchino/core/ground
 function rlk:boss/arlecchino/core/looks_rest
-function rlk:boss/arlecchino/core/sq/t_p2/start
+function rlk:boss/arlecchino/seq/t_p2/start
 function rlk:boss/arlecchino/hud/sub
