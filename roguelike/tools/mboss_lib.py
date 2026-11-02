@@ -140,7 +140,10 @@ def load_registry():
             for k, v in (('goldMul', 1), ('sap', 0), ('picks', 0), ('w', 0)):
                 assert b.get(k) == v, f'{b["id"]}: a chapter entry needs {k} {v}'
             aid = b.get('arena', 'plaza')
-            assert aid == 'plaza' or aid in arenas, f'{b["id"]}: unknown arena {aid}'
+            # a disabled chapter entry may name the arena its framework stage adds later (ar/contract.md: S1 owns arenas{})
+            assert aid == 'plaza' or aid in arenas or not b.get('enabled', True), f'{b["id"]}: unknown arena {aid}'
+            assert not (b.get('route', True) and b.get('ch')) or aid == 'plaza' or aid in arenas, \
+                f'{b["id"]}: a routed chapter entry needs its arena ({aid}) in arenas{{}}'
             for c in b.get('ch', []):
                 assert b['minCh'] <= c <= b['maxCh'], f'{b["id"]}: ch {c} outside minCh..maxCh'
         else:
