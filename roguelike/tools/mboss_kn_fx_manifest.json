@@ -1,0 +1,2591 @@
+{
+ "generator": "tools/build_mboss_kn_fx.py",
+ "api": "tools/mboss_arlecchino/api.py §8; scratchpad ar/contract.md §3.3",
+ "functions": "rlk:boss/arlecchino/fx/",
+ "item_models": "rlk:mboss/kn_kit/",
+ "font": "rlk:mboss_kn",
+ "font_range": [
+  "U+EB00",
+  "U+EBFF"
+ ],
+ "storage": "rlk:kn fx.*",
+ "bossbar": "rlk:kn_banner",
+ "owned": {
+  "dirs": [
+   "data/rlk/function/boss/arlecchino/fx/e",
+   "data/rlk/function/boss/arlecchino/fx/p",
+   "data/rlk/function/boss/arlecchino/fx/prop",
+   "data/rlk/function/boss/arlecchino/fx/decal",
+   "data/rlk/function/boss/arlecchino/fx/snd",
+   "data/rlk/function/boss/arlecchino/fx/hud",
+   "data/rlk/function/boss/arlecchino/fx/test"
+  ],
+  "files": [
+   "data/rlk/function/boss/arlecchino/fx/card.mcfunction",
+   "data/rlk/function/boss/arlecchino/fx/cardx.mcfunction",
+   "data/rlk/function/boss/arlecchino/fx/look.mcfunction",
+   "data/rlk/function/boss/arlecchino/fx/clear.mcfunction",
+   "data/rlk/function/boss/arlecchino/fx/uninstall.mcfunction"
+  ],
+  "rp": [
+   "assets/rlk/textures/mboss/kn_kit",
+   "assets/rlk/models/item/mboss/kn_kit",
+   "assets/rlk/items/mboss/kn_kit",
+   "assets/rlk/font/mboss_kn.json",
+   "assets/rlk/textures/font/mboss_kn"
+  ]
+ },
+ "caps": {
+  "fx": 96,
+  "ambient_soft": 64,
+  "decals": "never capped (flood: one card, re-timed)"
+ },
+ "objectives": [
+  "knFx",
+  "knFxS",
+  "knFxG",
+  "knFxH",
+  "knFxK",
+  "knFxD",
+  "knFxL"
+ ],
+ "fake_players": "#n, #dn, #now, #wd, #c2, #roll, #spin, #life, #fade, #dly, #dur, #hit, #pool, #a, #c, #r, #r0, #t, #p, #o, #i, #j, #f, #h, #fl, #m, #b, #k, #on, #l, #lid, #at, #af, #lnW, #lnA, #demo, #dt, #c4, #c10, #c12, #c20, #c36, #c77, #c100, #c360, #c1000 (objective knFx)",
+ "tags": [
+  "rlk_kn_fx",
+  "rlk_kn_fx_c",
+  "rlk_kn_fx_d",
+  "rlk_kn_fx_fl",
+  "rlk_kn_fx_new",
+  "rlk_kn_fx_go",
+  "rlk_kn_fx_sh",
+  "rlk_kn_fx_fd",
+  "rlk_kn_fx_hit",
+  "rlk_kn_fx_t",
+  "rlk_kn_fx_nf",
+  "rlk_kn_fxa",
+  "rlk_kn_fxa_w",
+  "rlk_kn_fxa_s",
+  "rlk_kn_fxf",
+  "rlk_kn_fxl",
+  "rlk_kn_fx_demo",
+  "rlk_kn_fx_demo_mv"
+ ],
+ "floor": {
+  "decal_y": 0.02,
+  "decal_layers": [
+   0.02,
+   0.023,
+   0.026000000000000002
+  ],
+  "clamp_floor_storage": "rlk:kn fx.fl (y x 100, default 20100)",
+  "arc_bearings": 80.0
+ },
+ "kinds": {
+  "arc_p0": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/arc_p0",
+   "source": "own",
+   "desc": "Pyro slash-arc sweep frame 0 (orange-gold flame band on r 0.8)"
+  },
+  "arc_p1": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/arc_p1",
+   "source": "own",
+   "desc": "Pyro slash-arc sweep frame 1 (orange-gold flame band on r 0.8)"
+  },
+  "arc_p2": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/arc_p2",
+   "source": "own",
+   "desc": "Pyro slash-arc sweep frame 2 (orange-gold flame band on r 0.8)"
+  },
+  "arc_p3": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/arc_p3",
+   "source": "own",
+   "desc": "Pyro slash-arc sweep frame 3 (orange-gold flame band on r 0.8)"
+  },
+  "arc_c0": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/arc_c0",
+   "source": "own",
+   "desc": "crimson slash-arc sweep frame 0 (Bond of Life: crimson band, black smoke)"
+  },
+  "arc_c1": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/arc_c1",
+   "source": "own",
+   "desc": "crimson slash-arc sweep frame 1 (Bond of Life: crimson band, black smoke)"
+  },
+  "arc_c2": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/arc_c2",
+   "source": "own",
+   "desc": "crimson slash-arc sweep frame 2 (Bond of Life: crimson band, black smoke)"
+  },
+  "arc_c3": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/arc_c3",
+   "source": "own",
+   "desc": "crimson slash-arc sweep frame 3 (Bond of Life: crimson band, black smoke)"
+  },
+  "ring_p": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/ring_p",
+   "source": "own",
+   "desc": "Pyro spin ring of fire (unit radius)"
+  },
+  "ring_c": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/ring_c",
+   "source": "own",
+   "desc": "crimson ring with black smoke (unit radius)"
+  },
+  "wheel_0": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/wheel_0",
+   "source": "own",
+   "desc": "flaming scythe wheel, spin frame 0 (the scythe turned 0 deg)"
+  },
+  "wheel_1": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/wheel_1",
+   "source": "own",
+   "desc": "flaming scythe wheel, spin frame 1 (the scythe turned 90 deg)"
+  },
+  "wheel_2": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/wheel_2",
+   "source": "own",
+   "desc": "flaming scythe wheel, spin frame 2 (the scythe turned 180 deg)"
+  },
+  "wheel_3": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/wheel_3",
+   "source": "own",
+   "desc": "flaming scythe wheel, spin frame 3 (the scythe turned 270 deg)"
+  },
+  "crescent": {
+   "plane": "face",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.25,
+    0.25
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/crescent",
+   "source": "own",
+   "desc": "P2 thrown flame crescent (one quad facing its flight)"
+  },
+  "feather": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/feather",
+   "source": "own",
+   "desc": "crimson feather bolt, tip down"
+  },
+  "orb": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/orb",
+   "source": "own",
+   "desc": "crimson orb"
+  },
+  "blade": {
+   "plane": "face",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/blade",
+   "source": "own",
+   "desc": "giant crimson blade, base at b 0"
+  },
+  "clone": {
+   "plane": "face",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/clone",
+   "source": "own",
+   "desc": "crimson shadow clone, feet at b 0"
+  },
+  "wisp_0": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/kn_kit/wisp_0",
+   "source": "own",
+   "desc": "white flame spirit, frame 0 (tinted)"
+  },
+  "wisp_1": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/kn_kit/wisp_1",
+   "source": "own",
+   "desc": "white flame spirit, frame 1 (tinted)"
+  },
+  "wisp_2": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/kn_kit/wisp_2",
+   "source": "own",
+   "desc": "white flame spirit, frame 2 (tinted)"
+  },
+  "halo": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/halo",
+   "source": "own",
+   "desc": "red-moon halo ring"
+  },
+  "claw": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/claw",
+   "source": "own",
+   "desc": "crimson claw closing"
+  },
+  "thread": {
+   "plane": "face",
+   "px": [
+    16,
+    128
+   ],
+   "extent": [
+    -0.0625,
+    0.0625,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/thread",
+   "source": "own",
+   "desc": "crimson thread from the sky, base at b 0"
+  },
+  "thorn": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/thorn",
+   "source": "own",
+   "desc": "crimson thorn spike, base at b 0"
+  },
+  "web": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/web",
+   "source": "own",
+   "desc": "crimson web (H perch)"
+  },
+  "stroke": {
+   "plane": "face",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/stroke",
+   "source": "own",
+   "desc": "one carved crimson slash stroke (X halves)"
+  },
+  "brand": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/brand",
+   "source": "own",
+   "desc": "crimson sigil ring of the forced bond"
+  },
+  "reticle": {
+   "plane": "face",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/reticle",
+   "source": "own",
+   "desc": "Q4 aim reticle"
+  },
+  "beam": {
+   "plane": "lance",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/beam",
+   "source": "own",
+   "desc": "Q4 crimson beam body (along +z)"
+  },
+  "aim": {
+   "plane": "lance",
+   "px": [
+    16,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/aim",
+   "source": "own",
+   "desc": "Q4 thin red aim line (along +z)"
+  },
+  "streak": {
+   "plane": "lance",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/kn_kit/streak",
+   "source": "own",
+   "desc": "soft streak along +z (tinted)"
+  },
+  "flame": {
+   "plane": "face",
+   "px": [
+    32,
+    64
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0.0,
+    1.0
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/kn_kit/flame",
+   "source": "own",
+   "desc": "flame tongue, root at b 0 (tinted)"
+  },
+  "ember": {
+   "plane": "face",
+   "px": [
+    16,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/kn_kit/ember",
+   "source": "own",
+   "desc": "glowing ember fleck (tinted)"
+  },
+  "smoke": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/smoke",
+   "source": "own",
+   "desc": "black-crimson smoke puff"
+  },
+  "burst": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/kn_kit/burst",
+   "source": "own",
+   "desc": "starburst flash (tinted)"
+  },
+  "pillar": {
+   "plane": "cross",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0.0,
+    1.0
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/pillar",
+   "source": "own",
+   "desc": "crimson flame column, root at b 0"
+  },
+  "flood": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/flood",
+   "source": "own",
+   "desc": "F red flood / E70 pool decal"
+  },
+  "cracks": {
+   "plane": "flat",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/cracks",
+   "source": "own",
+   "desc": "F glowing crimson cracks decal"
+  },
+  "strip": {
+   "plane": "flat",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/strip",
+   "source": "own",
+   "desc": "G translucent red strip decal (unit w x len)"
+  },
+  "band": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/band",
+   "source": "own",
+   "desc": "G rim-tint annulus 0.7-1.0 decal"
+  },
+  "ring": {
+   "plane": "flat",
+   "px": [
+    256,
+    256
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/ring",
+   "source": "own",
+   "desc": "Q5A red ring outline decal"
+  },
+  "gate_icon": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/kn_kit/gate_icon",
+   "source": "own",
+   "desc": "gate label icon: a crimson scythe across a red moon"
+  },
+  "glow": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/glow",
+   "source": "fg kit (referenced)",
+   "desc": "soft white glow disc (tint it) (fg kit sprite)"
+  },
+  "mote": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/fg_kit/mote",
+   "source": "fg kit (referenced)",
+   "desc": "soft mote (tint it) (fg kit sprite)"
+  },
+  "spark": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/fg_kit/spark",
+   "source": "fg kit (referenced)",
+   "desc": "gold spark star (fg kit sprite)"
+  }
+ },
+ "fg_references": {
+  "glow": "rlk:mboss/fg_kit/glow",
+  "mote": "rlk:mboss/fg_kit/mote",
+  "spark": "rlk:mboss/fg_kit/spark"
+ },
+ "atlas_px_new": 412928,
+ "atlas_budget": 700000,
+ "presets": {
+  "slash_arc": {
+   "args": [
+    "r",
+    "yaw",
+    "pitch",
+    "roll",
+    "c"
+   ],
+   "doc": "A slash arc of reach {r} (tenths) about the executor (S3: the body + 1.4 / 1.8, rotated as the body; S2: the blade anchor): {yaw} / {pitch} offsets of the aim from the executor rotation, {roll} the blade plane about the aim (0 horizontal, 90 vertical, 180 backhand: the sweep reversed). Four sweep frames 1 tick apart (the last fades over 8 t), c 1 orange-gold flame / c 2 crimson with black smoke; particles at the arc front. An arc that would reach below the floor rises up to 1 b, then shrinks (fx/e/clamp_arc): no frame goes below the floor.",
+   "cards": 4,
+   "c_split": true,
+   "ambient": false,
+   "particles_only": false
+  },
+  "spin_ring": {
+   "args": [
+    "r",
+    "c"
+   ],
+   "doc": "A full ring of flame of radius {r} (tenths) about the executor (S3: the body + 1.0; S2: her feet, the intro floor ring), lifted 0.3 b: two counter-turning rings, embers thrown out; c 1 orange-gold, c 2 crimson with smoke.",
+   "cards": 8,
+   "c_split": true,
+   "ambient": false,
+   "particles_only": false
+  },
+  "twirl_ring": {
+   "args": [],
+   "doc": "Intro E6 (S2: at the hand anchor, rotated as the body): the crimson crescent trail closing into a full ring in the frontal plane (radius 1.3 b, less when the hand is low: the ring never reaches the floor), an orange inner ring, crimson sparks.",
+   "cards": 2,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "scythe_form": {
+   "args": [],
+   "doc": "The crimson flame vortex where a scythe forms (S2 intro E3 / T twin scythes, S3 B wheel spin: at the palm / hand anchor or the body + 1.4): six crimson flame tongues stream in to the point, a glow, crimson sparks and smoke.",
+   "cards": 8,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "embers_puff": {
+   "args": [],
+   "doc": "A small puff of red-orange embers at the executor (anchors, the body + 1.4: the cup to embers, the reach, the stance, her heal): six embers flung out, a soft glow, ash.",
+   "cards": 7,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "wheel_trail": {
+   "args": [
+    "len"
+   ],
+   "doc": "The fire trail the thrown wheel leaves on the ground (B release: the body at the floor, rotated as the body): eight flame tongues along the aim over {len} (tenths), each lit as the wheel passes it (1.5 b / t), burning out over 18 t (vertical cards standing on the floor, no floor decal).",
+   "cards": 8,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "dash_trail": {
+   "args": [
+    "len",
+    "c"
+   ],
+   "doc": "The streak of a dash along the aim over {len} (tenths) from the executor (S3: the body + 1.0, rotated as the body): a wide outer streak and a white-hot inner one at hip height, four flame tongues revealed in turn at the feet, colour particles; c 1 orange-gold, c 2 crimson.",
+   "cards": 6,
+   "c_split": true,
+   "ambient": false,
+   "particles_only": false
+  },
+  "leap_flare": {
+   "args": [],
+   "doc": "The take-off flare (C / E leaps, T launch: the body + 0.3 / + 1.4): a flaming ring bursting out, a flash, embers rising.",
+   "cards": 7,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "dive_streak": {
+   "args": [
+    "len"
+   ],
+   "doc": "The dive streak (C / E dives, Q0 fall: the body + 1, rotated as the body): a streak from the executor down-forward (50 deg) over {len} (tenths), clamped to end above the floor: a crimson outer streak and an orange-gold core, sparks at the executor.",
+   "cards": 2,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "impact_burst": {
+   "args": [
+    "r",
+    "c"
+   ],
+   "doc": "A blade landing (S3: the floor point + 0.2, the lock marker): a shock ring of radius {r} (tenths) at 0.3 b, a flash, embers low; c 2 adds crimson thorn shards and smoke.",
+   "cards": 12,
+   "c_split": true,
+   "ambient": false,
+   "particles_only": false
+  },
+  "claw": {
+   "args": [
+    "r"
+   ],
+   "doc": "B2 grab (S3: the lock + 1 at pt 92, the hit at 96): the crimson claw closing over 4 t to the reach {r} (tenths), white-hot at the close, then a crimson burst.",
+   "cards": 2,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "wing_burst": {
+   "args": [],
+   "doc": "The crimson wings burst open (C2 / H / E70 / F: the body + 1.4, rotated as the body): crimson feathers flung back and out, black smoke, crimson dust.",
+   "cards": 11,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "zig_streak": {
+   "args": [
+    "len"
+   ],
+   "doc": "An E lateral dash (S3: the body + 1.2, rotated as the body, at each dash): a red-orange streak of {len} (tenths) across her, centred on her (the dash goes either way), sparks at both ends.",
+   "cards": 2,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "brand_ring": {
+   "args": [],
+   "doc": "The crimson sigil closing on the player (F / Q5 pt 6 -> brand 22: at the player's feet): two sigil rings at 0.5 b and 1.3 b (on the player, not a floor marking) contract from r 3.2 to 0.5 over 16 t, turning, white-hot at the close.",
+   "cards": 2,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "brand_x": {
+   "args": [],
+   "doc": "The forced bond lands (bond/force: the player + 1): a red X branded on the player (two strokes), a red flash, crimson sparks.",
+   "cards": 3,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "threads": {
+   "args": [
+    "r"
+   ],
+   "doc": "Crimson threads from the sky (F hit 1: the arena centre + 0.2, r = the walk; H leap: the body + 3, r 10): up to 14 threads (0.6 b wide cards) at fixed points inside radius {r} (tenths; 4 below r 60), drawn down from 12 b to the executor's height in 3 t (vertical cards, never below the executor), fading after 14 t.",
+   "cards": 14,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "thorns": {
+   "args": [
+    "r"
+   ],
+   "doc": "Crimson thorns erupting from the floor (F hit 1, G field: the arena centre on the floor, r = the walk): up to 16 thorns at fixed points inside radius {r} (tenths; 6 below r 60), rising 2.3-3.8 b in 2 t from the floor (vertical cards standing on it), crimson chips and smoke.",
+   "cards": 16,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "blast": {
+   "args": [
+    "r"
+   ],
+   "doc": "F hit 2 / G field (the arena centre on the floor, r = the walk): a crimson blast over radius {r} (tenths): a huge glow, a shock ring at 0.6 b to the full radius, smoke thrown out, explosions across the floor.",
+   "cards": 9,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "web": {
+   "args": [],
+   "doc": "H perch (S3: the body + 0.5, perched 7 b up): the crimson web spreads under her (4 b), turning slowly, for 56 t.",
+   "cards": 1,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "clone_trail": {
+   "args": [],
+   "doc": "A clone's afterimage (at / rotated as a clone prop: its facing is its flight): a crimson streak behind it, smoke, crimson dust.",
+   "cards": 2,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "blade_rise": {
+   "args": [],
+   "doc": "G a giant blade rises (at each blade prop, on the floor): a crimson glow at its base, crimson chips and two small thorns beside it.",
+   "cards": 3,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "blade_burst": {
+   "args": [],
+   "doc": "G the blades strike (at each blade prop + 1): crimson shards flung out, a flash, smoke.",
+   "cards": 6,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "shock_gain": {
+   "args": [],
+   "doc": "선혈의 충격 armed (bond/cleared: the player + 1): crimson and gold embers spiral up around the player, a crimson glow pulse, sparkles.",
+   "cards": 7,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "shock_aura": {
+   "args": [],
+   "doc": "The crimson glow on her palm (B2 reach: at the hand anchor): a pulsing crimson glow for 20 t, crimson dust.",
+   "cards": 2,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "shock_hit": {
+   "args": [],
+   "doc": "선혈의 충격 outside a break window (bond/burst: the body + 1.4): a crimson burst, a ring, sparks.",
+   "cards": 8,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "break_burst": {
+   "args": [],
+   "doc": "The Banquet broken (core/break: the body + 1.4): a big crimson shatter: burst, two rings, crimson shards flung out like glass, smoke, a flash.",
+   "cards": 17,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "stun_motes": {
+   "args": [],
+   "doc": "The stun (core/stun_fx every 10 t: the body + 2.9): three small crimson-gold motes circling over her head for one call (11 t), at a random start angle, little crits.",
+   "cards": 3,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "pillar": {
+   "args": [
+    "r"
+   ],
+   "doc": "The crimson flame column of T (S2: her feet; pillar 24 r 12, swap 90 r 16): two crossed column cards of radius {r} (tenths), 6 b tall, rising from her feet over 10 t, burning 66 t; crimson flame dust, smoke at the top.",
+   "cards": 3,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "legs_burst": {
+   "args": [],
+   "doc": "T: a pair of blade legs unfolds (S2: the spine anchor, rotated as the body): crimson feathers and ash flung out sideways and back, a crimson glow.",
+   "cards": 7,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "moon_flare": {
+   "args": [],
+   "doc": "The red moon flares (Q6 moon: at the halo / her): the halo swelling and fading over 20 t, a big crimson glow, crimson dust.",
+   "cards": 2,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "aim_line": {
+   "args": [
+    "len"
+   ],
+   "doc": "Q4 aim (at the chest anchor, rotated toward the player, pitch counts; call every tick or every 2 t while it tracks): a thin red line over {len} (tenths), 3 t.",
+   "cards": 1,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "reticle": {
+   "args": [],
+   "doc": "Q4 the reticle growing at her chest (at the chest anchor, rotated toward the player): the red reticle 0.6 b ahead grows over 18 t, turning, white-hot from 20 t (the lock), gone at 26 t.",
+   "cards": 2,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "beam": {
+   "args": [
+    "len"
+   ],
+   "doc": "Q4 the beam (at the chest anchor, rotated toward the locked point, pitch counts): a crimson beam over {len} (tenths) swelling to 2.2 b in 2 t, a white core, a flash at the origin, crimson dust along it; 10 t.",
+   "cards": 3,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "x_mark": {
+   "args": [],
+   "doc": "Q5B the vertical red X carved in front of her (at her feet, rotated toward the player): two strokes 4.6 b long crossing 1.6 b ahead, 2.3 b up (never below 0.4 b), the second 12 t after the first, each carved in 10 t; held 72 t (to the final), white-hot from 64.",
+   "cards": 3,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "rapid_slash": {
+   "args": [],
+   "doc": "Q5B one rapid slash (S4: per slash, the body + 1.2): two flat crimson arcs of reach 5.5 b at random bearings (roll within +-10 deg: they stay above the floor), 3 t each.",
+   "cards": 2,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "final_burst": {
+   "args": [
+    "r"
+   ],
+   "doc": "A big crimson flame burst of radius {r} (tenths) at the executor (Q5B final: her feet; death gone: her feet, r 20): a flash, a shock ring at 0.4 b, crimson flames flung out low, smoke, explosions.",
+   "cards": 14,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "feather_hit": {
+   "args": [],
+   "doc": "Q6 a feather bolt lands (its landing point on the floor): a small crimson ring at 0.3 b, a flash, three small thorns, crimson chips.",
+   "cards": 5,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "orb_gather": {
+   "args": [],
+   "doc": "Q6 110: eight crimson orbs gather around her (the body): orbs flying in from 4 b to 1.6 b at 1.5 b up, a crimson glow at her.",
+   "cards": 9,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "orb_burst": {
+   "args": [
+    "r"
+   ],
+   "doc": "Q6 an orb explodes (at the orb on the floor): a crimson ring of radius {r} (tenths) at 0.3 b, a glow, four thorns, smoke.",
+   "cards": 6,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "death_flames": {
+   "args": [],
+   "doc": "Death 70: crimson flames climb her body (her feet): ten flame tongues from the feet to 2.5 b over 24 t, smoke, crimson dust.",
+   "cards": 13,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "wisp_turn": {
+   "args": [
+    "c"
+   ],
+   "doc": "A wisp turns colour (as / at a wisp: its display, or the marker a wisp prop follows): c 2 red, c 1 white again; a puff in the new colour.",
+   "cards": 5,
+   "c_split": false,
+   "ambient": false,
+   "particles_only": false
+  },
+  "gate_flames": {
+   "args": [],
+   "doc": "Crimson flames on the entrance gravestone (S3 gate/flames every 10 t: at the stone's flame point): two flame tongues, crimson spores. Ambient: skipped from SOFT live fx cards.",
+   "cards": 2,
+   "c_split": false,
+   "ambient": true,
+   "particles_only": false
+  },
+  "ambient_petals": {
+   "args": [],
+   "doc": "Arena ambience (the module, every ~10 t; at the arena centre): crimson embers and spores drifting down through the plaza (particles only). Ambient: skipped from SOFT live fx cards.",
+   "cards": 0,
+   "c_split": false,
+   "ambient": true,
+   "particles_only": true
+  }
+ },
+ "props": {
+  "wheel": {
+   "doc": "B / Q2 flaming scythe wheel: one face card 2.3 b across facing its flight (the display's rotation), the four spin frames turned every tick by the kit.",
+   "kind": "wheel_0",
+   "billboard": "fixed",
+   "scale": [
+    2.3,
+    2.3,
+    2.3
+   ],
+   "anim": "w"
+  },
+  "crescent": {
+   "doc": "P2 thrown flame crescent: one face card 2.8 b wide facing its flight.",
+   "kind": "crescent",
+   "billboard": "fixed",
+   "scale": [
+    2.8,
+    2.8,
+    2.8
+   ],
+   "anim": null
+  },
+  "feather": {
+   "doc": "Q6 crimson feather bolt: one face card 0.7 x 1.4 b facing its flight, tip toward the display's local -y.",
+   "kind": "feather",
+   "billboard": "fixed",
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ],
+   "anim": null
+  },
+  "orb": {
+   "doc": "Q6 crimson orb: one card 1.2 b, always facing the viewer (an orb is round).",
+   "kind": "orb",
+   "billboard": "center",
+   "scale": [
+    1.2,
+    1.2,
+    1.2
+   ],
+   "anim": null
+  },
+  "blade": {
+   "doc": "G giant crimson blade: one card 1.4 x 5.6 b standing on the display (its base at the display, never below it), turning about the vertical to face the viewer.",
+   "kind": "blade",
+   "billboard": "vertical",
+   "scale": [
+    5.6,
+    5.6,
+    5.6
+   ],
+   "anim": null
+  },
+  "clone": {
+   "doc": "H crimson shadow clone: one face card 1.3 x 2.6 b, feet at the display, facing the display's yaw (its flight).",
+   "kind": "clone",
+   "billboard": "fixed",
+   "scale": [
+    2.6,
+    2.6,
+    2.6
+   ],
+   "anim": null
+  },
+  "wisp": {
+   "doc": "A flame spirit {c} (1 white, 2 red): one card 0.7 b facing the viewer, three flicker frames and a slow bob by the kit.",
+   "kind": "wisp_0",
+   "billboard": "center",
+   "scale": [
+    0.7,
+    0.7,
+    0.7
+   ],
+   "anim": "s"
+  },
+  "moon_halo": {
+   "doc": "The red-moon halo: one card 7 b facing the viewer.",
+   "kind": "halo",
+   "billboard": "center",
+   "scale": [
+    7.0,
+    7.0,
+    7.0
+   ],
+   "anim": null
+  }
+ },
+ "decals": {
+  "flood": {
+   "args": [
+    "r",
+    "t"
+   ],
+   "doc": "F the red flood {r, t}: one crimson wash disc of radius r spreading from the centre over min(t - 6, 44) ticks; DECAL_FLASH ticks before t a bright overlay flashes on until the hit; it stays 14 t after t. A second call while it is shown re-times it (no second disc): it stays to the new t + 14 and flashes again."
+  },
+  "cracks": {
+   "args": [
+    "r"
+   ],
+   "doc": "F the cracks {r}: glowing crimson cracks over radius r, 36 t (cosmetic), dimming after 22 t."
+  },
+  "strip": {
+   "args": [
+    "len",
+    "w",
+    "yaw",
+    "t"
+   ],
+   "doc": "G a strip {len, w, yaw, t}: a translucent red band len x w centred on the executor along the absolute yaw, drawn out along its length in 6 t, bright from t - 6, gone at t + 3."
+  },
+  "rim_tint": {
+   "args": [
+    "r0",
+    "r",
+    "t"
+   ],
+   "doc": "G the rim tint {r0, r, t}: nested red annuli appear from radius r inward to r0 by t - 6 (the floor reddening inside the blade ring), bright from t - 6, gone at t + 3."
+  },
+  "pool": {
+   "args": [
+    "r",
+    "t"
+   ],
+   "doc": "E70 the red pool {r, t} (cosmetic): a darker crimson disc spreading to r by t - 6, bright from t - 6, lingering 20 t after t."
+  },
+  "ring_o": {
+   "args": [
+    "r",
+    "t"
+   ],
+   "doc": "Q5A a ring outline {r, t}: a thin red circle of radius r (outline only), bright from t - 6, gone at t + 3."
+  },
+  "donut_o": {
+   "args": [
+    "r0",
+    "r",
+    "t"
+   ],
+   "doc": "Q5A a donut outline {r0, r, t}: the two circles r0 and r, bright from t - 6, gone at t + 3."
+  }
+ },
+ "decal_flash": 6,
+ "sounds": {
+  "tea_sip": {
+   "use": "E0 t16: she sips the tea.",
+   "layers": [
+    [
+     "entity.generic.drink",
+     0.35,
+     1.3
+    ]
+   ]
+  },
+  "wisp_chime": {
+   "use": "E0 t4 / t20: the white flame spirits.",
+   "layers": [
+    [
+     "block.amethyst_block.chime",
+     0.3,
+     1.0
+    ]
+   ]
+  },
+  "cup_embers": {
+   "use": "E1 t34: cup and saucer burst into embers.",
+   "layers": [
+    [
+     "block.fire.extinguish",
+     0.4,
+     1.6
+    ]
+   ]
+  },
+  "wisps_flee": {
+   "use": "E1 t35: the spirits flee to the rim posts.",
+   "layers": [
+    [
+     "entity.allay.item_thrown",
+     0.4,
+     1.0
+    ]
+   ]
+  },
+  "ember_reach": {
+   "use": "E2 t44: crimson embers stream into her palm.",
+   "layers": [
+    [
+     "block.respawn_anchor.charge",
+     0.5,
+     1.4
+    ]
+   ]
+  },
+  "scythe_vortex": {
+   "use": "E3 t52: the crimson flame vortex.",
+   "layers": [
+    [
+     "item.firecharge.use",
+     0.6,
+     0.7
+    ],
+    [
+     "block.fire.ambient",
+     0.6,
+     1.0
+    ]
+   ]
+  },
+  "scythe_form": {
+   "use": "E4 t62: the haft grows out of the palm.",
+   "layers": [
+    [
+     "entity.blaze.shoot",
+     0.6,
+     0.8
+    ]
+   ]
+  },
+  "blade_ignite": {
+   "use": "E4 t70: the crescent ignites.",
+   "layers": [
+    [
+     "item.trident.return",
+     0.6,
+     1.0
+    ],
+    [
+     "item.firecharge.use",
+     0.4,
+     1.2
+    ]
+   ]
+  },
+  "intro_title": {
+   "use": "E5 t80: the title.",
+   "layers": [
+    [
+     "entity.wither.ambient",
+     0.25,
+     1.8
+    ]
+   ]
+  },
+  "twirl": {
+   "use": "E6 t94 / t100: the 360 twirl.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.6,
+     0.6
+    ]
+   ]
+  },
+  "twirl_ring": {
+   "use": "E6 t96 / t98: the ring closes, the floor ring.",
+   "layers": [
+    [
+     "item.trident.riptide_1",
+     0.5,
+     1.3
+    ]
+   ]
+  },
+  "flip": {
+   "use": "E8 t112: the scythe rolls through the hand.",
+   "layers": [
+    [
+     "item.armor.equip_netherite",
+     0.6,
+     1.0
+    ]
+   ]
+  },
+  "stance": {
+   "use": "E9 t120: the stance.",
+   "layers": [
+    [
+     "block.respawn_anchor.set_spawn",
+     0.5,
+     0.7
+    ]
+   ]
+  },
+  "heartbeat": {
+   "use": "E9 t126.",
+   "layers": [
+    [
+     "entity.warden.heartbeat",
+     0.6,
+     1.0
+    ]
+   ]
+  },
+  "t_stagger": {
+   "use": "T 0: she staggers to one knee.",
+   "layers": [
+    [
+     "entity.wither.hurt",
+     0.4,
+     1.6
+    ],
+    [
+     "item.armor.equip_netherite",
+     0.5,
+     0.7
+    ]
+   ]
+  },
+  "t_pillar": {
+   "use": "T 24: the crimson pillar builds.",
+   "layers": [
+    [
+     "block.fire.ambient",
+     0.8,
+     0.7
+    ],
+    [
+     "block.beacon.deactivate",
+     0.6,
+     1.0
+    ]
+   ]
+  },
+  "t_dark": {
+   "use": "T 50: the blackout.",
+   "layers": [
+    [
+     "entity.warden.sonic_charge",
+     0.4,
+     1.0
+    ]
+   ]
+  },
+  "t_swap": {
+   "use": "T 90: the form swap inside the pillar.",
+   "layers": [
+    [
+     "entity.blaze.ambient",
+     0.6,
+     0.5
+    ]
+   ]
+  },
+  "t_legs": {
+   "use": "T 110 / 116 / 122: a pair of blade legs unfolds.",
+   "layers": [
+    [
+     "entity.phantom.flap",
+     0.5,
+     0.8
+    ],
+    [
+     "item.elytra.flying",
+     0.3,
+     1.4
+    ]
+   ]
+  },
+  "t_scythes": {
+   "use": "T 130: the twin scythes form.",
+   "layers": [
+    [
+     "item.trident.return",
+     0.6,
+     0.9
+    ],
+    [
+     "item.trident.return",
+     0.5,
+     1.1
+    ]
+   ]
+  },
+  "t_title": {
+   "use": "T 140: the title.",
+   "layers": [
+    [
+     "entity.ender_dragon.growl",
+     0.4,
+     1.2
+    ]
+   ]
+  },
+  "t_launch": {
+   "use": "T 150: she launches up and away.",
+   "layers": [
+    [
+     "entity.phantom.swoop",
+     0.6,
+     1.0
+    ]
+   ]
+  },
+  "death_lower": {
+   "use": "Death 0-10: she lowers both scythes.",
+   "layers": [
+    [
+     "item.armor.equip_netherite",
+     0.5,
+     0.7
+    ]
+   ]
+  },
+  "death_flames": {
+   "use": "Death 70: crimson flames climb her.",
+   "layers": [
+    [
+     "block.fire.ambient",
+     0.8,
+     0.6
+    ],
+    [
+     "entity.blaze.burn",
+     0.4,
+     0.7
+    ]
+   ]
+  },
+  "death_gone": {
+   "use": "Death 96: she vanishes in a flame burst.",
+   "layers": [
+    [
+     "block.fire.extinguish",
+     0.8,
+     0.6
+    ],
+    [
+     "item.firecharge.use",
+     0.6,
+     0.5
+    ]
+   ]
+  },
+  "step": {
+   "use": "Walk events.",
+   "layers": [
+    [
+     "entity.player.attack.nodamage",
+     0.4,
+     0.6
+    ]
+   ]
+  },
+  "swing_light": {
+   "use": "T1 swings.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     1.1
+    ],
+    [
+     "item.firecharge.use",
+     0.3,
+     1.4
+    ]
+   ]
+  },
+  "swing_heavy": {
+   "use": "T2+ swings.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     1.0,
+     0.7
+    ],
+    [
+     "item.firecharge.use",
+     0.5,
+     0.9
+    ]
+   ]
+  },
+  "spin": {
+   "use": "A h3 / h5, Q1 h1 spin rings.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     1.0,
+     0.6
+    ],
+    [
+     "item.trident.riptide_1",
+     0.6,
+     1.3
+    ]
+   ]
+  },
+  "slam": {
+   "use": "A h4 overhead slam.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     0.7,
+     1.2
+    ],
+    [
+     "block.anvil.land",
+     0.4,
+     0.6
+    ]
+   ]
+  },
+  "wheel_spin": {
+   "use": "B 10: the scythe spins into a wheel.",
+   "layers": [
+    [
+     "item.trident.riptide_2",
+     0.6,
+     1.4
+    ],
+    [
+     "block.fire.ambient",
+     0.6,
+     1.0
+    ]
+   ]
+  },
+  "wheel_throw": {
+   "use": "B release.",
+   "layers": [
+    [
+     "item.trident.throw",
+     1.0,
+     0.7
+    ],
+    [
+     "entity.blaze.shoot",
+     0.5,
+     0.8
+    ]
+   ]
+  },
+  "wheel_catch": {
+   "use": "B catch.",
+   "layers": [
+    [
+     "item.trident.return",
+     0.8,
+     0.9
+    ]
+   ]
+  },
+  "claw_reach": {
+   "use": "B2 76: the reach, crimson glow on the palm.",
+   "layers": [
+    [
+     "block.respawn_anchor.charge",
+     0.6,
+     1.5
+    ]
+   ]
+  },
+  "claw_grab": {
+   "use": "B2 96: the claw closes.",
+   "layers": [
+    [
+     "entity.evoker_fangs.attack",
+     1.0,
+     0.7
+    ],
+    [
+     "entity.wither.hurt",
+     0.4,
+     1.6
+    ]
+   ]
+  },
+  "leap": {
+   "use": "C / H / E leaps.",
+   "layers": [
+    [
+     "entity.ender_dragon.flap",
+     0.7,
+     1.4
+    ],
+    [
+     "item.firecharge.use",
+     0.6,
+     0.8
+    ]
+   ]
+  },
+  "apex": {
+   "use": "C apex spin.",
+   "layers": [
+    [
+     "block.fire.ambient",
+     0.8,
+     0.7
+    ]
+   ]
+  },
+  "dive": {
+   "use": "C / E / H dives.",
+   "layers": [
+    [
+     "entity.phantom.swoop",
+     0.8,
+     1.2
+    ]
+   ]
+  },
+  "impact": {
+   "use": "C impact.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     0.9,
+     1.0
+    ],
+    [
+     "item.firecharge.use",
+     0.6,
+     0.6
+    ]
+   ]
+  },
+  "wing_burst": {
+   "use": "Wings burst open.",
+   "layers": [
+    [
+     "entity.phantom.flap",
+     0.8,
+     0.6
+    ],
+    [
+     "item.elytra.flying",
+     0.4,
+     1.6
+    ]
+   ]
+  },
+  "wing_hit": {
+   "use": "Wing strikes (Bond of Life).",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     1.0,
+     0.5
+    ],
+    [
+     "entity.wither.shoot",
+     0.4,
+     1.4
+    ]
+   ]
+  },
+  "dash_tell": {
+   "use": "D / E flare tell.",
+   "layers": [
+    [
+     "entity.ravager.roar",
+     0.4,
+     1.8
+    ],
+    [
+     "block.respawn_anchor.charge",
+     0.5,
+     1.2
+    ]
+   ]
+  },
+  "dash": {
+   "use": "D dash.",
+   "layers": [
+    [
+     "entity.blaze.shoot",
+     0.7,
+     1.4
+    ],
+    [
+     "entity.phantom.swoop",
+     0.5,
+     1.6
+    ]
+   ]
+  },
+  "follow": {
+   "use": "D2 follow-up burst.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     1.0,
+     0.8
+    ],
+    [
+     "entity.generic.explode",
+     0.5,
+     1.4
+    ]
+   ]
+  },
+  "zig": {
+   "use": "E lateral dashes.",
+   "layers": [
+    [
+     "entity.phantom.swoop",
+     0.5,
+     1.8
+    ]
+   ]
+  },
+  "sweep": {
+   "use": "Sweeps.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     1.0,
+     0.6
+    ]
+   ]
+  },
+  "brand": {
+   "use": "Forced bond: the sigil closes, the brand.",
+   "layers": [
+    [
+     "block.respawn_anchor.set_spawn",
+     0.7,
+     1.4
+    ],
+    [
+     "entity.wither.shoot",
+     0.4,
+     0.6
+    ]
+   ]
+  },
+  "bond_gain": {
+   "use": "A Bond-of-Life hit lands.",
+   "layers": [
+    [
+     "block.respawn_anchor.charge",
+     0.6,
+     0.7
+    ]
+   ]
+  },
+  "bond_tick": {
+   "use": "The bond DoT.",
+   "layers": [
+    [
+     "block.fire.extinguish",
+     0.25,
+     1.6
+    ]
+   ]
+  },
+  "orb_spawn": {
+   "use": "Heal orbs appear.",
+   "layers": [
+    [
+     "block.amethyst_block.chime",
+     0.6,
+     1.2
+    ]
+   ]
+  },
+  "flood": {
+   "use": "F / E70: the red flood / pool spreads.",
+   "layers": [
+    [
+     "block.respawn_anchor.deplete",
+     0.8,
+     0.6
+    ]
+   ]
+  },
+  "threads": {
+   "use": "F hit 1: threads and thorns.",
+   "layers": [
+    [
+     "entity.evoker_fangs.attack",
+     1.0,
+     0.8
+    ],
+    [
+     "entity.wither.shoot",
+     0.5,
+     0.6
+    ]
+   ]
+  },
+  "blast": {
+   "use": "F hit 2 / G field: the blast.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     1.0,
+     0.7
+    ],
+    [
+     "entity.wither.break_block",
+     0.4,
+     1.2
+    ]
+   ]
+  },
+  "cracks": {
+   "use": "F the cracks.",
+   "layers": [
+    [
+     "block.basalt.break",
+     0.8,
+     0.6
+    ]
+   ]
+  },
+  "blade_rise": {
+   "use": "G blades rise.",
+   "layers": [
+    [
+     "block.pointed_dripstone.place",
+     1.0,
+     0.6
+    ],
+    [
+     "item.trident.return",
+     0.5,
+     0.6
+    ]
+   ]
+  },
+  "cross_hit": {
+   "use": "G cross strikes.",
+   "layers": [
+    [
+     "entity.evoker_fangs.attack",
+     1.0,
+     1.0
+    ],
+    [
+     "entity.player.attack.sweep",
+     0.8,
+     0.6
+    ]
+   ]
+  },
+  "rim": {
+   "use": "G rim blades erupt.",
+   "layers": [
+    [
+     "block.pointed_dripstone.fall",
+     1.0,
+     0.7
+    ]
+   ]
+  },
+  "clone_launch": {
+   "use": "H clones dive.",
+   "layers": [
+    [
+     "entity.phantom.swoop",
+     0.8,
+     0.8
+    ],
+    [
+     "entity.illusioner.cast_spell",
+     0.5,
+     1.2
+    ]
+   ]
+  },
+  "clone_hit": {
+   "use": "H clone slashes.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     1.0,
+     0.9
+    ],
+    [
+     "entity.wither.shoot",
+     0.3,
+     1.6
+    ]
+   ]
+  },
+  "perch": {
+   "use": "H perch on the web.",
+   "layers": [
+    [
+     "entity.spider.ambient",
+     0.5,
+     0.6
+    ]
+   ]
+  },
+  "shock_gain": {
+   "use": "선혈의 충격 armed.",
+   "layers": [
+    [
+     "block.beacon.power_select",
+     0.8,
+     1.4
+    ],
+    [
+     "entity.wither.ambient",
+     0.25,
+     1.8
+    ]
+   ]
+  },
+  "shock_hit": {
+   "use": "선혈의 충격 outside a window.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     0.7,
+     1.4
+    ],
+    [
+     "block.respawn_anchor.deplete",
+     0.6,
+     1.4
+    ]
+   ]
+  },
+  "break": {
+   "use": "The Banquet broken.",
+   "layers": [
+    [
+     "entity.wither.break_block",
+     1.0,
+     0.8
+    ],
+    [
+     "block.glass.break",
+     1.0,
+     0.6
+    ]
+   ]
+  },
+  "stun": {
+   "use": "Stun.",
+   "layers": [
+    [
+     "entity.iron_golem.damage",
+     0.6,
+     0.6
+    ]
+   ]
+  },
+  "beam_aim": {
+   "use": "Q4 aim line + reticle.",
+   "layers": [
+    [
+     "block.beacon.ambient",
+     0.7,
+     1.8
+    ],
+    [
+     "block.respawn_anchor.charge",
+     0.5,
+     1.6
+    ]
+   ]
+  },
+  "beam_fire": {
+   "use": "Q4 the beam.",
+   "layers": [
+    [
+     "entity.warden.sonic_boom",
+     0.6,
+     1.4
+    ],
+    [
+     "entity.blaze.shoot",
+     0.6,
+     0.6
+    ]
+   ]
+  },
+  "x_carve": {
+   "use": "Q5B the red X carved.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     1.0,
+     0.5
+    ],
+    [
+     "block.respawn_anchor.set_spawn",
+     0.6,
+     0.8
+    ]
+   ]
+  },
+  "rapid": {
+   "use": "Q5B rapid slashes (each).",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     0.7,
+     1.5
+    ]
+   ]
+  },
+  "final": {
+   "use": "Q5B final burst.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     1.0,
+     0.6
+    ],
+    [
+     "entity.wither.break_block",
+     0.6,
+     0.8
+    ],
+    [
+     "block.respawn_anchor.deplete",
+     0.6,
+     0.6
+    ]
+   ]
+  },
+  "feather": {
+   "use": "Q6 a feather volley.",
+   "layers": [
+    [
+     "entity.phantom.flap",
+     0.6,
+     1.4
+    ],
+    [
+     "item.trident.throw",
+     0.5,
+     1.6
+    ]
+   ]
+  },
+  "orbs_gather": {
+   "use": "Q6 110: the orbs gather.",
+   "layers": [
+    [
+     "block.beacon.power_select",
+     0.6,
+     0.8
+    ],
+    [
+     "block.amethyst_block.resonate",
+     0.6,
+     0.6
+    ]
+   ]
+  },
+  "orbs_toss": {
+   "use": "Q6 125: the orbs fly to the rim.",
+   "layers": [
+    [
+     "entity.blaze.shoot",
+     0.6,
+     1.2
+    ],
+    [
+     "entity.phantom.swoop",
+     0.4,
+     1.6
+    ]
+   ]
+  },
+  "orb_burst": {
+   "use": "Q6 the orbs explode.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     0.9,
+     0.9
+    ],
+    [
+     "entity.wither.shoot",
+     0.4,
+     0.8
+    ]
+   ]
+  },
+  "fall_dive": {
+   "use": "Q0 the opening fall.",
+   "layers": [
+    [
+     "entity.phantom.swoop",
+     0.9,
+     0.7
+    ],
+    [
+     "item.trident.riptide_3",
+     0.6,
+     0.9
+    ]
+   ]
+  },
+  "fall_impact": {
+   "use": "Q0 impact + blade eruption.",
+   "layers": [
+    [
+     "entity.generic.explode",
+     1.0,
+     0.8
+    ],
+    [
+     "block.pointed_dripstone.fall",
+     0.8,
+     0.6
+    ]
+   ]
+  },
+  "rear_whip": {
+   "use": "Q3 she whips around.",
+   "layers": [
+    [
+     "entity.player.attack.sweep",
+     1.0,
+     0.7
+    ],
+    [
+     "entity.phantom.flap",
+     0.5,
+     1.0
+    ]
+   ]
+  },
+  "crescent_throw": {
+   "use": "Q1 / Q3 thrown crescents.",
+   "layers": [
+    [
+     "item.trident.throw",
+     0.9,
+     0.9
+    ],
+    [
+     "item.firecharge.use",
+     0.5,
+     1.2
+    ]
+   ]
+  },
+  "moon": {
+   "use": "Q6 30: the red moon flares.",
+   "layers": [
+    [
+     "block.beacon.power_select",
+     0.7,
+     0.6
+    ],
+    [
+     "entity.wither.ambient",
+     0.25,
+     1.4
+    ]
+   ]
+  }
+ },
+ "hud": {
+  "badge": [
+   "on"
+  ],
+  "banner": [
+   "on"
+  ],
+  "line": [
+   "id"
+  ],
+  "clear": []
+ },
+ "badge": {
+  "glyph": "U+EB00",
+  "text": "◆선혈의 충격",
+  "component": "{text:\"\",extra:[{text:\"  \"},{text:\"\",font:\"rlk:mboss_kn\",color:\"#FF3A4A\"},{text:\"선혈의 충격\",color:\"#FF5A64\",bold:true}]}"
+ },
+ "banner": {
+  "text": "생명의 계약을 제거하고 일반 공격으로 「붉은 피의 연회」를 중단시키세요",
+  "component": "{text:\"\",extra:[{text:\"생명의 계약을 제거하고 일반 공격\",color:\"#F07858\"},{text:\"으로 「붉은 피의 연회」를 중단시키세요\",color:\"#FFFFFF\"}]}",
+  "where": "bossbar rlk:kn_banner"
+ },
+ "lines": {
+  "1": {
+   "text": "두려운가? 아니면 두려워할 용기조차 없는 건가?",
+   "steps": 11
+  },
+  "2": {
+   "text": "피어오르는 불꽃으로.",
+   "steps": 6
+  },
+  "3": {
+   "text": "도망칠 수 없다.",
+   "steps": 5
+  },
+  "4": {
+   "text": "뭘 망설이는 거지?",
+   "steps": 5
+  },
+  "5": {
+   "text": "힘 뺄 거 없어. 도망칠 수 없을 테니.",
+   "steps": 10
+  },
+  "6": {
+   "text": "어둠이 내려앉는 순간 멸망이 도래한다.",
+   "steps": 10
+  },
+  "7": {
+   "text": "카운트 다운이 시작됐군.",
+   "steps": 7
+  },
+  "8": {
+   "text": "네가 몸을 기댈 거미줄이 있을까.",
+   "steps": 8
+  },
+  "9": {
+   "text": "도망치기 바쁜 꼴이 가엾게 떠는 짐승 같구나.",
+   "steps": 11
+  },
+  "10": {
+   "text": "연옥의 그림자를 보아라.",
+   "steps": 7
+  },
+  "11": {
+   "text": "보아라, 모든 선의를 불태울 칼날을!",
+   "steps": 10
+  },
+  "12": {
+   "text": "이제 네 본심을 볼 수 있겠군.",
+   "steps": 9
+  },
+  "13": {
+   "text": "형벌을 시작하지.",
+   "steps": 5
+  },
+  "14": {
+   "text": "일몰은 그저, 모든 것의 시작일 뿐.",
+   "steps": 9
+  },
+  "15": {
+   "text": "해와 달은 결국 지고 파멸은 계속해서 찾아오지!",
+   "steps": 11
+  },
+  "16": {
+   "text": "부질없는 저항이군!",
+   "steps": 5
+  },
+  "17": {
+   "text": "희망은 사라진지 오래다!",
+   "steps": 7
+  }
+ },
+ "glyphs": {
+  "badge": "U+EB00"
+ },
+ "gate_icon": "rlk:mboss/kn_kit/gate_icon",
+ "demos": {
+  "slash_arc": 115,
+  "spin_ring": 95,
+  "twirl_ring": 50,
+  "scythe_form": 55,
+  "embers_puff": 65,
+  "wheel_trail": 45,
+  "dash_trail": 80,
+  "leap_flare": 45,
+  "dive_streak": 65,
+  "impact_burst": 65,
+  "claw": 49,
+  "wing_burst": 45,
+  "zig_streak": 65,
+  "brand_ring": 61,
+  "brand_x": 45,
+  "threads": 65,
+  "thorns": 45,
+  "blast": 45,
+  "web": 45,
+  "clone_trail": 45,
+  "blade_rise": 45,
+  "blade_burst": 45,
+  "shock_gain": 45,
+  "shock_aura": 45,
+  "shock_hit": 45,
+  "break_burst": 45,
+  "stun_motes": 75,
+  "pillar": 80,
+  "legs_burst": 57,
+  "moon_flare": 45,
+  "aim_line": 63,
+  "reticle": 71,
+  "beam": 45,
+  "x_mark": 115,
+  "rapid_slash": 60,
+  "final_burst": 45,
+  "feather_hit": 61,
+  "orb_gather": 45,
+  "orb_burst": 45,
+  "death_flames": 75,
+  "wisp_turn": 65,
+  "gate_flames": 95,
+  "ambient_petals": 110,
+  "prop/wheel": 90,
+  "prop/crescent": 90,
+  "prop/feather": 90,
+  "prop/orb": 90,
+  "prop/blade": 90,
+  "prop/clone": 90,
+  "prop/wisp": 90,
+  "prop/moon_halo": 90,
+  "decal/flood": 130,
+  "decal/cracks": 60,
+  "decal/strip": 60,
+  "decal/rim_tint": 60,
+  "decal/pool": 60,
+  "decal/ring_o": 60,
+  "decal/donut_o": 60
+ }
+}
