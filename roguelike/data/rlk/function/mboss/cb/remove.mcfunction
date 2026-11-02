@@ -8,5 +8,7 @@ function rlk:mboss/arena/ap_oasis/clear
 function rlk:mboss/ar/ap_oasis/fl_off
 function rlk:mboss/arena/tk_lift/clear
 function rlk:mboss/ar/tk_lift/fl_off
+function rlk:mboss/arena/fl_ruins/clear
+function rlk:mboss/ar/fl_ruins/fl_off
 function rlk:mboss/arena/cp_test/clear
 function rlk:mboss/ar/cp_test/fl_off

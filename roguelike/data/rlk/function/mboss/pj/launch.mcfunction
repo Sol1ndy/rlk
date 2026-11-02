@@ -30,6 +30,8 @@ scoreboard players operation @s mbPjG = #pjGrp mb
 # chapter mode (AZ-CM): no dash dodge / no player-side reaction
 scoreboard players operation @s mbPjND = #pjNoDodge mb
 scoreboard players operation @s mbPjNR = #pjNR mb
+# ar FN-1: the Bond-of-Life option (#pjBol, spent there)
+execute if score #pjBol mb matches 1.. run function rlk:mboss/pj/init_bol
 execute if score @s mbPjG matches 1.. if score @s mbPjG = #mbGrpL mb run scoreboard players set @s mbPjHit 1
 execute if score @s mbPjG matches 1.. if score @s mbPjG = #mbGrpL2 mb run scoreboard players set @s mbPjHit 1
 execute if score @s mbPjR matches 41.. run scoreboard players set @s mbPjR 40

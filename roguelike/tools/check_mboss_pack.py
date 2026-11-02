@@ -25,6 +25,11 @@
   F:mboss/d/<hook> names it; the frozen runtime names of contract §3.1 exist; the rift F:room/rift/** + room/obj/k_rift
   follow the same reference / macro / resource-location rules, and every shared hook line of tools/build_rift.py is in
   its file exactly once, right after the marker comment
+- 아를레키노 S1 (scratchpad ar/contract.md 3.1): the FN-1 Bond-of-Life option (mboss_lib.hz_opts / pj_opts take bol; the
+  branch lines of mboss/hurt, hz/init, pj/launch, hz/hurt_pm and the hurt_bol / hz/hurt_pm_bol / hz/init_bol /
+  pj/init_bol bodies; the objective mbBol; cleanup_fight's reset; no FN-1 name is ever set outright in F:mboss); a px:false
+  chapter boss has no F:mboss/px/<id> tree; the arlecchino entry: its arena = api.ARENA_SPEC, no Pyro resistance
+  (res {"*": 10}), px false + shield true, a music pool's len = mboss_lib.music_len
 Exit code 1 on any problem.
 """
 import re
@@ -175,6 +180,54 @@ try:
                 problems.append(f'{rel}: rift hook line names a missing function {ref}')
 except ImportError as e:
     problems.append(f'tools/build_rift.py not importable: {e}')
+# 아를레키노 S1: FN-1 (the Bond-of-Life hazard option) and the chapter-4 entry
+import inspect  # noqa: E402
+for h in ('hz_opts', 'pj_opts'):
+    if 'bol' not in inspect.signature(getattr(L, h)).parameters:
+        problems.append(f'mboss_lib.{h}: no bol option (FN-1)')
+FN1_LINES = {
+    'mboss/hurt': 'execute if score @s mbBol matches 1.. run return run function rlk:mboss/hurt_bol',
+    'mboss/hz/init': 'execute if score #hzBol mb matches 1.. run function rlk:mboss/hz/init_bol',
+    'mboss/pj/launch': 'execute if score #pjBol mb matches 1.. run function rlk:mboss/pj/init_bol',
+    'mboss/hz/hurt_pm': 'execute if score @s mbBol matches 1.. run return run function rlk:mboss/hz/hurt_pm_bol',
+    'mboss/hurt_bol': 'execute if score #dodged tmp matches 0 run scoreboard players operation #mbHitBol mb = #mbBolIn mb',
+    'mboss/hz/hurt_pm_bol': 'scoreboard players operation #mbHitBol mb = #mbBolIn mb',
+    'mboss/hz/init_bol': 'scoreboard players reset #hzBol mb',
+    'mboss/pj/init_bol': 'scoreboard players reset #pjBol mb',
+    'mboss/cleanup_fight': 'execute if score #mbBolRe mb matches -2147483648.. run scoreboard players set #mbBolRe mb 100',
+    'mboss/init': 'scoreboard objectives add mbBol dummy',
+}
+for rel, line in FN1_LINES.items():
+    if rel not in funcs or line not in (FN / (rel + '.mcfunction')).read_text(encoding='utf-8').split('\n'):
+        problems.append(f'F:{rel}: FN-1 line missing: {line}')
+for p in sorted((FN / 'mboss').rglob('*.mcfunction')):
+    for i, line in enumerate(p.read_text(encoding='utf-8').split('\n'), 1):
+        if re.search(r'scoreboard players (set|add|remove) (#hzBol|#pjBol|#mbBolIn|#mbHitBol) ', line):
+            problems.append(f'{p.relative_to(FN).with_suffix("").as_posix()}:{i} sets an FN-1 one-shot name outright (mid-boss fights '
+                            'must carry none; only the bol branches copy / reset them)')
+for b in chaps:
+    if not b.get('px') and any(f.startswith(f'mboss/px/{b["id"]}/') for f in funcs):
+        problems.append(f'{b["id"]}: px false but a F:mboss/px/{b["id"]}/ tree exists (stale proxy output)')
+KN = next((b for b in REG['boss'] if b['id'] == 'arlecchino'), None)
+if KN is not None:
+    ka = REG.get('arenas', {}).get(KN.get('arena', 'plaza'))
+    try:
+        import mboss_arlecchino.api as KN_API
+        spec = KN_API.ARENA_SPEC
+    except ImportError as e:
+        spec = None
+        problems.append(f'tools/mboss_arlecchino/api.py not importable: {e}')
+    if ka is None:
+        problems.append(f'arlecchino: arena {KN.get("arena")} missing from arenas{{}}')
+    elif spec is not None and any(ka.get(k) != v for k, v in spec.items()):
+        problems.append(f'arlecchino: arenas.{KN["arena"]} differs from api.ARENA_SPEC')
+    if KN.get('res') != {'*': 10}:
+        problems.append('arlecchino: res must be {"*": 10} (no Pyro resistance, user request)')
+    if KN.get('px') or not KN.get('shield'):
+        problems.append('arlecchino: px false + shield true (one humanoid body, FN-3)')
+    for ph, mu in KN.get('music', {}).items():
+        if len(L.MUSIC_TRACKS.get(mu['ev'], [])) > 1 and int(mu['len']) != L.music_len(mu['ev']):
+            problems.append(f'arlecchino: music {ph} {mu["ev"]} len {mu["len"]} != music_len {L.music_len(mu["ev"])}')
 A = REG['arena']
 ens = (FN / 'mboss/arena/ensure.mcfunction')
 if not ens.exists() or f'{A["theme"]}@{A["ver"]}' not in ens.read_text(encoding='utf-8'):

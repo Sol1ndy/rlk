@@ -14,6 +14,8 @@ execute if score #dodged tmp matches 1 run return run function rlk:mboss/hurt_do
 scoreboard players set #mbShIn mb 0
 execute if entity @a[tag=player,scores={shieldHP=1..},limit=1] run scoreboard players set #mbShIn mb 1
 execute if entity @a[tag=player,scores={gShield=1..},limit=1] run scoreboard players set #mbShIn mb 1
+# ar FN-1: a Bond-of-Life per-mille hazard (mbBol) goes on in hz/hurt_pm_bol
+execute if score @s mbBol matches 1.. run return run function rlk:mboss/hz/hurt_pm_bol
 scoreboard players operation #mbDotPct mb = @s mbHzPm
 scoreboard players operation #mbDotEl mb = @s mbHzE
 scoreboard players operation #mbDotLethal mb = @s mbHzPmL

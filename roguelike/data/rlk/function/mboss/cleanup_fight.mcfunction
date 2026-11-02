@@ -33,6 +33,12 @@ scoreboard players set #mbLost mb 0
 scoreboard players set #cbWait mb 0
 scoreboard players set #mbNoRx mb 0
 scoreboard players reset #hzPmL mb
+# ar FN-1: the Bond-of-Life multiplier back to 100 (only when the fight set it), its event and one-shot names gone
+execute if score #mbBolRe mb matches -2147483648.. run scoreboard players set #mbBolRe mb 100
+scoreboard players reset #mbHitBol mb
+scoreboard players reset #mbBolIn mb
+scoreboard players reset #hzBol mb
+scoreboard players reset #pjBol mb
 data remove storage rlk:mboss px
 data remove storage rlk:mboss push
 data remove storage rlk:mboss lv
