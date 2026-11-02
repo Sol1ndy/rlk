@@ -16,5 +16,13 @@ execute if score #pat kn matches 11 run data modify storage rlk:mboss sub set va
 execute if score #pat kn matches 12 run data modify storage rlk:mboss sub set value [{text:"연옥 그림자 분신",color:"#E8E2D0",bold:true}]
 execute if score #pat kn matches 13 run data modify storage rlk:mboss sub set value [{text:"사형장으로의 초대",color:"#E8E2D0",bold:true}]
 execute if score #pat kn matches 20 run data modify storage rlk:mboss sub set value [{text:"재가 된 만상",color:"#E8E2D0",bold:true}]
+execute if score #pat kn matches 41 run data modify storage rlk:mboss sub set value [{text:"낙하 공격",color:"#E8E2D0",bold:true}]
+execute if score #pat kn matches 42 run data modify storage rlk:mboss sub set value [{text:"사형장으로의 초대",color:"#E8E2D0",bold:true}]
+execute if score #pat kn matches 43 run data modify storage rlk:mboss sub set value [{text:"불꽃이 타오르는 낫",color:"#E8E2D0",bold:true}]
+execute if score #pat kn matches 44 run data modify storage rlk:mboss sub set value [{text:"붉은 죽음의 무도회",color:"#E8E2D0",bold:true}]
+execute if score #pat kn matches 45 run data modify storage rlk:mboss sub set value [{text:"떠오르는 재액의 달",color:"#E8E2D0",bold:true}]
+execute if score #pat kn matches 46 run data modify storage rlk:mboss sub set value [{text:"붉은 피의 연회 · 형벌의 핏값",color:"#E8E2D0",bold:true}]
+execute if score #pat kn matches 47 run data modify storage rlk:mboss sub set value [{text:"붉은 피의 연회 · 붉은 피의 사형",color:"#E8E2D0",bold:true}]
+execute if score #pat kn matches 48 run data modify storage rlk:mboss sub set value [{text:"핏빛 연회",color:"#E8E2D0",bold:true}]
 execute if score #shock kn matches 1 run function rlk:boss/arlecchino/fx/hud/badge {on:1}
 execute unless score #shock kn matches 1 run function rlk:boss/arlecchino/fx/hud/badge {on:0}

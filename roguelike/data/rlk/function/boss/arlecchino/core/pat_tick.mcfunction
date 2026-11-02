@@ -14,4 +14,12 @@ execute if score #pat kn matches 11 run function rlk:boss/arlecchino/core/run/g1
 execute if score #pat kn matches 12 run function rlk:boss/arlecchino/core/run/h1
 execute if score #pat kn matches 13 run function rlk:boss/arlecchino/core/run/a4
 execute if score #pat kn matches 20 run function rlk:boss/arlecchino/core/run/e70
+execute if score #pat kn matches 41 run function rlk:boss/arlecchino/core/run/q0
+execute if score #pat kn matches 42 run function rlk:boss/arlecchino/core/run/q1
+execute if score #pat kn matches 43 run function rlk:boss/arlecchino/core/run/q2
+execute if score #pat kn matches 44 run function rlk:boss/arlecchino/core/run/q3
+execute if score #pat kn matches 45 run function rlk:boss/arlecchino/core/run/q4
+execute if score #pat kn matches 46 run function rlk:boss/arlecchino/core/run/q5a
+execute if score #pat kn matches 47 run function rlk:boss/arlecchino/core/run/q5b
+execute if score #pat kn matches 48 run function rlk:boss/arlecchino/core/run/q6
 execute if score #done kn matches 1 run function rlk:boss/arlecchino/core/pat_end

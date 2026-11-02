@@ -12,6 +12,14 @@ execute if score #tst kn matches 10 run return run function rlk:boss/arlecchino/
 execute if score #tst kn matches 11 run return run function rlk:boss/arlecchino/test/go/g1
 execute if score #tst kn matches 12 run return run function rlk:boss/arlecchino/test/go/h1
 execute if score #tst kn matches 13 run return run function rlk:boss/arlecchino/test/go/a4
+execute if score #tst kn matches 41 run return run function rlk:boss/arlecchino/test/go/q0
+execute if score #tst kn matches 42 run return run function rlk:boss/arlecchino/test/go/q1
+execute if score #tst kn matches 43 run return run function rlk:boss/arlecchino/test/go/q2
+execute if score #tst kn matches 44 run return run function rlk:boss/arlecchino/test/go/q3
+execute if score #tst kn matches 45 run return run function rlk:boss/arlecchino/test/go/q4
+execute if score #tst kn matches 46 run return run function rlk:boss/arlecchino/test/go/q5a
+execute if score #tst kn matches 47 run return run function rlk:boss/arlecchino/test/go/q5b
+execute if score #tst kn matches 48 run return run function rlk:boss/arlecchino/test/go/q6
 execute if score #tst kn matches 20 run return run function rlk:boss/arlecchino/test/e70
 execute if score #tst kn matches 21 run return run function rlk:boss/arlecchino/bond/force
 execute if score #tst kn matches 22 run return run function rlk:boss/arlecchino/test/heal

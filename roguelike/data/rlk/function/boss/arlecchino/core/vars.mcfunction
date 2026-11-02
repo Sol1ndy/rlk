@@ -49,3 +49,8 @@ scoreboard players set #cd_D kn 0
 scoreboard players set #cd_E kn 0
 scoreboard players set #cd_G kn 0
 scoreboard players set #cd_H kn 0
+scoreboard players set #cd_Q1 kn 0
+scoreboard players set #cd_Q2 kn 0
+scoreboard players set #cd_Q3 kn 0
+scoreboard players set #cd_Q4 kn 0
+scoreboard players set #cd_Q6 kn 0
