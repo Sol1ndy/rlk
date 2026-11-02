@@ -3,4 +3,5 @@ execute unless score #mbAr mb matches 1.. run return run function rlk:mboss/ar/p
 execute if score #mbAr mb matches 1 run return run function rlk:mboss/ar/az_cavern/fl_on
 execute if score #mbAr mb matches 2 run return run function rlk:mboss/ar/ap_oasis/fl_on
 execute if score #mbAr mb matches 3 run return run function rlk:mboss/ar/tk_lift/fl_on
+execute if score #mbAr mb matches 4 run return run function rlk:mboss/ar/fl_ruins/fl_on
 execute if score #mbAr mb matches 9 run return run function rlk:mboss/ar/cp_test/fl_on

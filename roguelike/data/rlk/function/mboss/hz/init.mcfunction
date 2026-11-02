@@ -20,6 +20,8 @@ scoreboard players set @s mbHzRT 0
 scoreboard players operation @s mbHzNR = #hzNR mb
 scoreboard players operation @s mbHzSG = #hzSafeG mb
 execute if score #hzPm mb matches 1.. run function rlk:mboss/hz/init_pm
+# ar FN-1: the Bond-of-Life option (#hzBol, spent there)
+execute if score #hzBol mb matches 1.. run function rlk:mboss/hz/init_bol
 scoreboard players operation @s mbHzCol = @s mbHzE
 execute if score #hzCol mb matches 0.. run scoreboard players operation @s mbHzCol = #hzCol mb
 execute if score #hzQuiet mb matches 1 run tag @s add rlk_mb_hzq

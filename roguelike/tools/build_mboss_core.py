@@ -105,6 +105,8 @@ PER_ENTITY = [
     'mbHzNR', 'mbHzSG', 'mbPjND', 'mbPjNR', 'mbPart',
     # AP-FW (cm.md 13.11): per-mille hazards (pl_dot per mille, lethal flag)
     'mbHzPm', 'mbHzPmL',
+    # ar FN-1 (scratchpad ar/contract.md 3.1): the Bond-of-Life option (1..100) of a hazard marker or a projectile prop
+    'mbBol',
 ]
 OBJECTIVES = ['mb', 'mres', 'pkMb'] + PER_ENTITY
 
@@ -252,6 +254,10 @@ w('init', '\n'.join(
        'execute unless score #mbPart mb matches 0.. run scoreboard players set #mbPart mb 0',
        'execute unless score #atkSeq tmp matches -2147483648.. run scoreboard players set #atkSeq tmp 0',
        'scoreboard players set #mbPushOn mb 0',
+       '# ar FN-1: the Bond-of-Life one-shot options / input are gone; the module-owned multiplier is 100 again when a fight',
+       '# ever set it (never created here: mid-boss fights carry no FN-1 name)',
+       'scoreboard players reset #hzBol mb', 'scoreboard players reset #pjBol mb', 'scoreboard players reset #mbBolIn mb',
+       'execute if score #mbBolRe mb matches -2147483648.. run scoreboard players set #mbBolRe mb 100',
        'scoreboard players set #mbNRNow mb 0',
        'scoreboard players set #mbNoRx mb 0',
        'scoreboard players set #pxIn mb 0',
@@ -986,6 +992,12 @@ scoreboard players set #mbLost mb 0
 scoreboard players set #cbWait mb 0
 scoreboard players set #mbNoRx mb 0
 scoreboard players reset #hzPmL mb
+# ar FN-1: the Bond-of-Life multiplier back to 100 (only when the fight set it), its event and one-shot names gone
+execute if score #mbBolRe mb matches -2147483648.. run scoreboard players set #mbBolRe mb 100
+scoreboard players reset #mbHitBol mb
+scoreboard players reset #mbBolIn mb
+scoreboard players reset #hzBol mb
+scoreboard players reset #pjBol mb
 data remove storage rlk:mboss px
 data remove storage rlk:mboss push
 data remove storage rlk:mboss lv
@@ -1182,6 +1194,20 @@ execute as @e[tag=rlk_mb_mv] run function rlk:mboss/mv/stop
 
 # =============================================================================================
 # Damage to the player, true damage to mobs
+HURT_TAIL = '''\
+execute if score #cmDmg tmp matches ..0 run scoreboard players set #cmDmg tmp 1
+scoreboard players operation #cmLv tmp = #mbLv mb
+scoreboard players operation #cmKB tmp = #mbKB mb
+kill @e[tag=rlk_plkb_source]
+execute if score #cmKB tmp matches 1.. run function rlk:mboss/kb_src
+execute unless score #mbNoDodge mb matches 1 as @a[tag=player,limit=1] run function rlk:cm/hit_pl2
+# #mbNoDodge mb 1 (a #hzNoDodge hazard): dash i-frames do not help this hit
+execute if score #mbNoDodge mb matches 1 as @a[tag=player,limit=1] run function rlk:mboss/hurt_nd
+scoreboard players set #mbNRNow mb 0
+kill @e[tag=rlk_plkb_source]
+scoreboard players set #mbKBDir mb 0
+function rlk:mboss/hurt_ev
+'''
 w('hurt', '''
 # Generic hit on the player. @s = the attacker (hazard marker, projectile, the body for a direct swing);
 # it is the knockback source. Inputs: #mbHitPct mb (coefficient %, 100 = registry atk), #cmEl tmp
@@ -1193,6 +1219,7 @@ w('hurt', '''
 # element/player_hit while #mbNRNow 1; hz/hurt and pj/hit copy their hazard's / prop's option into it) and #mbSrc
 # (1 hazard, 2 projectile; 0 = a direct call); refused while #mbCine 1; after a call that reached the player the hit /
 # dodge events #mbHitEv #mbHitEl #mbHitSh #mbHitRA #mbHitSrc / #mbDodgeEv #mbDodgeOk (read and cleared by the module).
+# ar FN-1: an attacker with mbBol (a hazard / prop made with the Bond-of-Life option) finishes in mboss/hurt_bol.
 scoreboard players set #dodged tmp 0
 scoreboard players operation #mbNRIn mb = #mbNoRx mb
 scoreboard players set #mbNoRx mb 0
@@ -1211,18 +1238,20 @@ scoreboard players operation #cmDmg tmp = #mbAtk mb
 scoreboard players operation #cmDmg tmp *= #mbHitPct mb
 scoreboard players operation #cmDmg tmp *= #mbDmgMul mb
 scoreboard players operation #cmDmg tmp /= #c10000 mb
-execute if score #cmDmg tmp matches ..0 run scoreboard players set #cmDmg tmp 1
-scoreboard players operation #cmLv tmp = #mbLv mb
-scoreboard players operation #cmKB tmp = #mbKB mb
-kill @e[tag=rlk_plkb_source]
-execute if score #cmKB tmp matches 1.. run function rlk:mboss/kb_src
-execute unless score #mbNoDodge mb matches 1 as @a[tag=player,limit=1] run function rlk:cm/hit_pl2
-# #mbNoDodge mb 1 (a #hzNoDodge hazard): dash i-frames do not help this hit
-execute if score #mbNoDodge mb matches 1 as @a[tag=player,limit=1] run function rlk:mboss/hurt_nd
-scoreboard players set #mbNRNow mb 0
-kill @e[tag=rlk_plkb_source]
-scoreboard players set #mbKBDir mb 0
-function rlk:mboss/hurt_ev
+# ar FN-1: a Bond-of-Life hit (@s = its hazard / prop with mbBol) goes on in mboss/hurt_bol (+1 command per hit)
+execute if score @s mbBol matches 1.. run return run function rlk:mboss/hurt_bol
+''' + HURT_TAIL)
+w('hurt_bol', '''
+# ar FN-1 (scratchpad ar/contract.md 3.1): the rest of mboss/hurt for a Bond-of-Life hit, @s = its hazard marker or
+# projectile prop (mbBol 1..100; #mbBolIn = mbBol for this call). The raw damage x #mbBolRe mb / 100 (the module's
+# multiplier, unset = 100) before the hit; after a hit that reached the player (not dodged; a refused one never gets
+# here) #mbHitBol mb = mbBol (the module reads and clears it). #mbBolIn is gone again afterwards.
+scoreboard players operation #mbBolIn mb = @s mbBol
+execute unless score #mbBolRe mb matches 0.. run scoreboard players set #mbBolRe mb 100
+scoreboard players operation #cmDmg tmp *= #mbBolRe mb
+scoreboard players operation #cmDmg tmp /= #c100 mb
+''' + HURT_TAIL + '''execute if score #dodged tmp matches 0 run scoreboard players operation #mbHitBol mb = #mbBolIn mb
+scoreboard players reset #mbBolIn mb
 ''')
 w('hurt_ev', '''
 # @s = the attacker of a mboss/hurt call that reached the player (cm.md 13.3). Landed: #mbHitEv +1 with its element,
@@ -1628,6 +1657,8 @@ scoreboard players set @s mbHzRT 0
 scoreboard players operation @s mbHzNR = #hzNR mb
 scoreboard players operation @s mbHzSG = #hzSafeG mb
 execute if score #hzPm mb matches 1.. run function rlk:mboss/hz/init_pm
+# ar FN-1: the Bond-of-Life option (#hzBol, spent there)
+execute if score #hzBol mb matches 1.. run function rlk:mboss/hz/init_bol
 scoreboard players operation @s mbHzCol = @s mbHzE
 execute if score #hzCol mb matches 0.. run scoreboard players operation @s mbHzCol = #hzCol mb
 execute if score #hzQuiet mb matches 1 run tag @s add rlk_mb_hzq
@@ -2104,6 +2135,8 @@ scoreboard players operation @s mbPjG = #pjGrp mb
 # chapter mode (AZ-CM): no dash dodge / no player-side reaction
 scoreboard players operation @s mbPjND = #pjNoDodge mb
 scoreboard players operation @s mbPjNR = #pjNR mb
+# ar FN-1: the Bond-of-Life option (#pjBol, spent there)
+execute if score #pjBol mb matches 1.. run function rlk:mboss/pj/init_bol
 execute if score @s mbPjG matches 1.. if score @s mbPjG = #mbGrpL mb run scoreboard players set @s mbPjHit 1
 execute if score @s mbPjG matches 1.. if score @s mbPjG = #mbGrpL2 mb run scoreboard players set @s mbPjHit 1
 execute if score @s mbPjR matches 41.. run scoreboard players set @s mbPjR 40
@@ -3312,6 +3345,8 @@ execute if score #dodged tmp matches 1 run return run function rlk:mboss/hurt_do
 scoreboard players set #mbShIn mb 0
 execute if entity @a[tag=player,scores={shieldHP=1..},limit=1] run scoreboard players set #mbShIn mb 1
 execute if entity @a[tag=player,scores={gShield=1..},limit=1] run scoreboard players set #mbShIn mb 1
+# ar FN-1: a Bond-of-Life per-mille hazard (mbBol) goes on in hz/hurt_pm_bol
+execute if score @s mbBol matches 1.. run return run function rlk:mboss/hz/hurt_pm_bol
 scoreboard players operation #mbDotPct mb = @s mbHzPm
 scoreboard players operation #mbDotEl mb = @s mbHzE
 scoreboard players operation #mbDotLethal mb = @s mbHzPmL
@@ -3320,6 +3355,40 @@ scoreboard players operation #cmEl tmp = @s mbHzE
 function rlk:mboss/hurt_ev
 scoreboard players operation #g mb = @s mbHzG
 execute if score #g mb matches 1.. run function rlk:mboss/grp_mark
+''')
+w('hz/hurt_pm_bol', '''
+# ar FN-1: the rest of hz/hurt_pm for a Bond-of-Life per-mille hazard (@s, mbBol 1..100; #mbBolIn = mbBol for this
+# call): the per mille x #mbBolRe mb / 100 (unset = 100, at least 1), the pl_dot, the hit event and #mbHitBol mb = mbBol
+# (the dodge returned before).
+scoreboard players operation #mbBolIn mb = @s mbBol
+execute unless score #mbBolRe mb matches 0.. run scoreboard players set #mbBolRe mb 100
+scoreboard players operation #mbDotPct mb = @s mbHzPm
+scoreboard players operation #mbDotPct mb *= #mbBolRe mb
+scoreboard players operation #mbDotPct mb /= #c100 mb
+execute if score #mbDotPct mb matches ..0 run scoreboard players set #mbDotPct mb 1
+scoreboard players operation #mbDotEl mb = @s mbHzE
+scoreboard players operation #mbDotLethal mb = @s mbHzPmL
+function rlk:mboss/pl_dot
+scoreboard players operation #cmEl tmp = @s mbHzE
+function rlk:mboss/hurt_ev
+scoreboard players operation #mbHitBol mb = #mbBolIn mb
+scoreboard players reset #mbBolIn mb
+scoreboard players operation #g mb = @s mbHzG
+execute if score #g mb matches 1.. run function rlk:mboss/grp_mark
+''')
+w('hz/init_bol', '''
+# @s = a new hazard made with #hzBol mb (ar FN-1, 1..100): mbBol carries the Bond-of-Life option into mboss/hurt (hurt_bol)
+# or the per-mille path (hz/hurt_pm_bol); the option is spent (reset: no name stays behind).
+scoreboard players operation @s mbBol = #hzBol mb
+execute if score @s mbBol matches 101.. run scoreboard players set @s mbBol 100
+scoreboard players reset #hzBol mb
+''')
+w('pj/init_bol', '''
+# @s = a prop launched with #pjBol mb (ar FN-1, 1..100): mbBol carries the Bond-of-Life option into mboss/hurt (hurt_bol);
+# the option is spent (reset).
+scoreboard players operation @s mbBol = #pjBol mb
+execute if score @s mbBol matches 101.. run scoreboard players set @s mbBol 100
+scoreboard players reset #pjBol mb
 ''')
 w('aux/shield_pre', '''
 # @s = a new aux made with #auxShW mb (aux/setup, cm.md 13.12): its click shield made now, #auxShW x #auxShH tenths of a

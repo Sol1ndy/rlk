@@ -77,6 +77,7 @@ scoreboard objectives add mbPjNR dummy
 scoreboard objectives add mbPart dummy
 scoreboard objectives add mbHzPm dummy
 scoreboard objectives add mbHzPmL dummy
+scoreboard objectives add mbBol dummy
 bossbar add rlk:mboss {text:"중간보스"}
 bossbar add rlk:mboss_state {text:""}
 bossbar add rlk:mboss_sub {text:""}
@@ -160,6 +161,12 @@ execute unless score #mbDodgeOk mb matches 0.. run scoreboard players set #mbDod
 execute unless score #mbPart mb matches 0.. run scoreboard players set #mbPart mb 0
 execute unless score #atkSeq tmp matches -2147483648.. run scoreboard players set #atkSeq tmp 0
 scoreboard players set #mbPushOn mb 0
+# ar FN-1: the Bond-of-Life one-shot options / input are gone; the module-owned multiplier is 100 again when a fight
+# ever set it (never created here: mid-boss fights carry no FN-1 name)
+scoreboard players reset #hzBol mb
+scoreboard players reset #pjBol mb
+scoreboard players reset #mbBolIn mb
+execute if score #mbBolRe mb matches -2147483648.. run scoreboard players set #mbBolRe mb 100
 scoreboard players set #mbNRNow mb 0
 scoreboard players set #mbNoRx mb 0
 scoreboard players set #pxIn mb 0

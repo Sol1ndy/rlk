@@ -8,6 +8,7 @@
 # element/player_hit while #mbNRNow 1; hz/hurt and pj/hit copy their hazard's / prop's option into it) and #mbSrc
 # (1 hazard, 2 projectile; 0 = a direct call); refused while #mbCine 1; after a call that reached the player the hit /
 # dodge events #mbHitEv #mbHitEl #mbHitSh #mbHitRA #mbHitSrc / #mbDodgeEv #mbDodgeOk (read and cleared by the module).
+# ar FN-1: an attacker with mbBol (a hazard / prop made with the Bond-of-Life option) finishes in mboss/hurt_bol.
 scoreboard players set #dodged tmp 0
 scoreboard players operation #mbNRIn mb = #mbNoRx mb
 scoreboard players set #mbNoRx mb 0
@@ -26,6 +27,8 @@ scoreboard players operation #cmDmg tmp = #mbAtk mb
 scoreboard players operation #cmDmg tmp *= #mbHitPct mb
 scoreboard players operation #cmDmg tmp *= #mbDmgMul mb
 scoreboard players operation #cmDmg tmp /= #c10000 mb
+# ar FN-1: a Bond-of-Life hit (@s = its hazard / prop with mbBol) goes on in mboss/hurt_bol (+1 command per hit)
+execute if score @s mbBol matches 1.. run return run function rlk:mboss/hurt_bol
 execute if score #cmDmg tmp matches ..0 run scoreboard players set #cmDmg tmp 1
 scoreboard players operation #cmLv tmp = #mbLv mb
 scoreboard players operation #cmKB tmp = #mbKB mb
