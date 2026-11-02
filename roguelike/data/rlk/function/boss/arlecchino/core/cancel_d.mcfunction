@@ -13,3 +13,11 @@ execute if score #pat kn matches 11 run function rlk:boss/arlecchino/p/g1/cancel
 execute if score #pat kn matches 12 run function rlk:boss/arlecchino/p/h1/cancel
 execute if score #pat kn matches 13 run function rlk:boss/arlecchino/p/a4/cancel
 execute if score #pat kn matches 20 run function rlk:boss/arlecchino/p/e70/cancel
+execute if score #pat kn matches 41 run function rlk:boss/arlecchino/p/q0/cancel
+execute if score #pat kn matches 42 run function rlk:boss/arlecchino/p/q1/cancel
+execute if score #pat kn matches 43 run function rlk:boss/arlecchino/p/q2/cancel
+execute if score #pat kn matches 44 run function rlk:boss/arlecchino/p/q3/cancel
+execute if score #pat kn matches 45 run function rlk:boss/arlecchino/p/q4/cancel
+execute if score #pat kn matches 46 run function rlk:boss/arlecchino/p/q5a/cancel
+execute if score #pat kn matches 47 run function rlk:boss/arlecchino/p/q5b/cancel
+execute if score #pat kn matches 48 run function rlk:boss/arlecchino/p/q6/cancel

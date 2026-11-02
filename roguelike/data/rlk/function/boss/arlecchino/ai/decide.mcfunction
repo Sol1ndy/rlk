@@ -18,7 +18,19 @@ execute if score #mbLock mb matches 10 run return run function rlk:boss/arlecchi
 execute if score #mbLock mb matches 11 run return run function rlk:boss/arlecchino/core/start/g1
 execute if score #mbLock mb matches 12 run return run function rlk:boss/arlecchino/core/start/h1
 execute if score #mbLock mb matches 13 run return run function rlk:boss/arlecchino/core/start/a4
+execute if score #mbLock mb matches 41 run return run function rlk:boss/arlecchino/core/start/q0
+execute if score #mbLock mb matches 42 run return run function rlk:boss/arlecchino/core/start/q1
+execute if score #mbLock mb matches 43 run return run function rlk:boss/arlecchino/core/start/q2
+execute if score #mbLock mb matches 44 run return run function rlk:boss/arlecchino/core/start/q3
+execute if score #mbLock mb matches 45 run return run function rlk:boss/arlecchino/core/start/q4
+execute if score #mbLock mb matches 46 run return run function rlk:boss/arlecchino/core/start/q5a
+execute if score #mbLock mb matches 47 run return run function rlk:boss/arlecchino/core/start/q5b
+execute if score #mbLock mb matches 48 run return run function rlk:boss/arlecchino/core/start/q6
+execute if score #ph kn matches 5 if score #q0_ok kn matches 0 run return run function rlk:boss/arlecchino/core/start/q0
 execute if score #ph kn matches 3 if score #clk kn >= #sch_f kn if score #ai_nf kn matches 3.. run return run function rlk:boss/arlecchino/ai/go_f_p1b
+execute if score #ph kn matches 5 if score #q0_ok kn matches 1.. if score #clk kn >= #sch_q5 kn if score #ai_nq kn matches 3.. run return run function rlk:boss/arlecchino/ai/go_q5_p2
+function rlk:boss/arlecchino/ai/rear_count
+execute if score #ph kn matches 5 if score #ai_rc kn matches 4.. if function rlk:boss/arlecchino/ai/rear run return 1
 execute if score #far kn matches 40.. if function rlk:boss/arlecchino/ai/far run return 1
 execute if score #ph kn matches 1 if score #ai_d2 kn matches ..202500 run return run function rlk:boss/arlecchino/ai/pick/p1a_near
 execute if score #ph kn matches 1 if score #ai_d2 kn matches ..1210000 run return run function rlk:boss/arlecchino/ai/pick/p1a_mid
@@ -26,4 +38,7 @@ execute if score #ph kn matches 1 run return run function rlk:boss/arlecchino/ai
 execute if score #ph kn matches 3 if score #ai_d2 kn matches ..202500 run return run function rlk:boss/arlecchino/ai/pick/p1b_near
 execute if score #ph kn matches 3 if score #ai_d2 kn matches ..1210000 run return run function rlk:boss/arlecchino/ai/pick/p1b_mid
 execute if score #ph kn matches 3 run return run function rlk:boss/arlecchino/ai/pick/p1b_far
+execute if score #ph kn matches 5 if score #ai_d2 kn matches ..202500 run return run function rlk:boss/arlecchino/ai/pick/p2_near
+execute if score #ph kn matches 5 if score #ai_d2 kn matches ..1210000 run return run function rlk:boss/arlecchino/ai/pick/p2_mid
+execute if score #ph kn matches 5 run return run function rlk:boss/arlecchino/ai/pick/p2_far
 function rlk:boss/arlecchino/ai/none

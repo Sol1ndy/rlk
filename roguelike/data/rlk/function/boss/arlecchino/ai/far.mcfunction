@@ -17,4 +17,12 @@ execute if score #ph kn matches 3 if score #t kn matches ..60 if score #ai_fD kn
 execute if score #ph kn matches 3 if score #ai_fC kn matches 1 run return run function rlk:boss/arlecchino/ai/go_c_p1b
 execute if score #ph kn matches 3 if score #ai_fD kn matches 1 run return run function rlk:boss/arlecchino/ai/go_d_p1b
 execute if score #ph kn matches 3 if score #ai_fC kn matches 1 run return run function rlk:boss/arlecchino/ai/go_c_p1b
+scoreboard players set #ai_fQ2 kn 1
+execute if score #last kn matches 12 run scoreboard players set #ai_fQ2 kn 0
+scoreboard players set #ai_fQ4 kn 1
+execute if score #last kn matches 14 run scoreboard players set #ai_fQ4 kn 0
+execute if score #ph kn matches 5 if score #t kn matches ..60 if score #ai_fQ2 kn matches 1 run return run function rlk:boss/arlecchino/ai/go_q2_p2
+execute if score #ph kn matches 5 if score #ai_fQ4 kn matches 1 run return run function rlk:boss/arlecchino/ai/go_q4_p2
+execute if score #ph kn matches 5 if score #ai_fQ2 kn matches 1 run return run function rlk:boss/arlecchino/ai/go_q2_p2
+execute if score #ph kn matches 5 if score #ai_fQ4 kn matches 1 run return run function rlk:boss/arlecchino/ai/go_q4_p2
 return fail
