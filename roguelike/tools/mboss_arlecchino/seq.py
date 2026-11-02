@@ -87,6 +87,14 @@ def _wisp_circle(i, t):
 
 
 def _wisp_post(i):
+    """The wisp's resting point, from her at the arena centre: over its rim post (the theme's POINTS['wisps'], S1 R5:
+    the post is solid y 201-203; she stands at the marker, summoned at the block centre CX + 0.5, CZ + 0.5). Without the
+    theme: api.WISP_POSTS at 0.7 b (S5 review AR-04: the old 0.7 b point sat inside the post)."""
+    theme = L.theme_module(api.ARENA_SPEC['theme'])
+    pts = getattr(theme, 'POINTS', {}).get('wisps') if theme else None
+    if pts:
+        x, y, z = pts[i][:3]
+        return (x - (api.CX + .5), y - api.CY, z - (api.CZ + .5))
     bearing, r = api.WISP_POSTS[i]
     b = math.radians(bearing)
     return (r * math.sin(b), .7, -r * math.cos(b))              # compass bearing: 0 north (-z), 90 east (+x)

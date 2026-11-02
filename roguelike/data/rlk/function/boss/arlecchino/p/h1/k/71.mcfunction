@@ -2,7 +2,7 @@
 function rlk:mboss/grp_new
 scoreboard players operation #hzGrp mb = #mbGrp mb
 scoreboard players set #hzEl mb 1
-scoreboard players set #hzKB mb 3
+scoreboard players set #hzKB mb 0
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
 scoreboard players set #hzBol mb 6

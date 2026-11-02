@@ -16,4 +16,3 @@ execute if score #pt kn matches 72 run function rlk:boss/arlecchino/p/h1/k/72
 execute if score #pt kn matches 83 run function rlk:boss/arlecchino/p/h1/k/83
 execute if score #pt kn matches 84 run function rlk:boss/arlecchino/p/h1/k/84
 execute if score #pt kn matches 124 run scoreboard players set #done kn 1
-execute if score #pt kn matches 140 run function rlk:boss/arlecchino/rig/look/wings/off

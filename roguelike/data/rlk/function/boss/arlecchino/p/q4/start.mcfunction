@@ -11,7 +11,7 @@ execute store result score #t2 kn run scoreboard players get @s mhpM
 scoreboard players set #t3 kn 50
 scoreboard players operation #t2 kn *= #t3 kn
 execute if score #t kn <= #t2 kn run scoreboard players set #q4_n kn 3
-execute if score #tst kn matches 45 run scoreboard players set #q4_n kn 3
-execute if score #tst kn matches 45 run scoreboard players set #tst kn 0
+execute if score #q4_t3 kn matches 1 run scoreboard players set #q4_n kn 3
+scoreboard players reset #q4_t3 kn
 execute if score #mbLock mb matches 45 run scoreboard players set #q4_n kn 3
 function rlk:boss/arlecchino/p/q4/s/up/go

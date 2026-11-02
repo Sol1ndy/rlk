@@ -1,4 +1,5 @@
 # H1 pattern tick 83
+function rlk:mboss/grp_new
 scoreboard players operation #hzGrp mb = #mbGrp mb
 scoreboard players set #hzEl mb 1
 scoreboard players set #hzKB mb 3

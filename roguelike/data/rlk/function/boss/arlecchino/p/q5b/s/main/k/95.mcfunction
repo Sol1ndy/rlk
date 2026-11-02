@@ -2,7 +2,7 @@
 scoreboard players set #hzEl mb 1
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
-scoreboard players set #hzPm mb 450
+scoreboard players set #hzPm mb 300
 scoreboard players set #hzPmL mb 0
 scoreboard players set #hzBol mb 6
 execute at @s rotated as @s rotated ~ 0 positioned ~ 201 ~ run function rlk:mboss/hz/disc {r:75,tell:1,dmg:1}

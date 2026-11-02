@@ -9,7 +9,7 @@ what she gave (#given, never more than is left), so a Clorinde / Arlecchino play
                    the DoT (BOL_DOT_PM per mille every BOL_DOT_T ticks, non-lethal, only after a bond she gave), the
                    shock hit resolve (#shk_hit, set by on_hit)
     bond/hit       a landed bol hit: + BOL_HIT % max HP to the bond, #bonded 1, her heal BOL_HEAL_PM per mille of mhpM
-    bond/force     the forced bond (E70, F, Q5; api.BOND_CALLS, any executor): + BOL_FORCE %, no damage, no dodge, the
+    bond/force     the forced bond (E70, F, Q5; api.BOND_CALLS, any executor): her part becomes BOL_FORCE % (S5), no damage, no dodge, the
                    brand; skipped while the player is dead / reviving / on a selection screen / in the map; + bond/orbs
     bond/orbs      3 existing heal orbs (combat/heal_orb_spawn, 10 % each) 6-14 b from the centre, 120 deg apart, a random
                    bearing; tagged rlk_kn_orb (+ rlk_room rlk_mb_aux); older ones removed first (<= ORB_MAX alive)
@@ -102,10 +102,13 @@ def build(W, ctx):
                         f'scoreboard players operation @s mhpC += #t {OBJ}',
                         'execute if score @s mhpC > @s mhpM run scoreboard players operation @s mhpC = @s mhpM']
       + S.fx('embers_puff', [S.part(S.DUST[2], 0.4, 0.9, 0.4, 0, 18)], pos=f'at @s positioned ~ ~{S.H(1.4)} ~'))
-    w('bond/force', ['# The forced bond (api.BOND_CALLS force; E70 / F1 / Q5 at their brand tick; any executor): '
-                     f'+{api.BOL_FORCE} % max HP, no damage, no', '# dodge; the brand X and the red flash on the player; the heal orbs.']
+    w('bond/force', ['# The forced bond (api.BOND_CALLS force; E70 / F1 / Q5 at their brand tick; any executor): her part of the',
+                     f'# bond becomes {api.BOL_FORCE} % max HP (what she gave before is taken back first: S5, so the {api.ORBS} heal orbs',
+                     '# always reach the clear and the counter; the player\'s own bond stays), no damage, no dodge; the brand X and the',
+                     '# red flash on the player; the heal orbs.']
       + list(SKIP)
-      + [f'scoreboard players set #bolPct tmp {api.BOL_FORCE}',
+      + [f'execute as {PL} run {fn("bond/remove")}', sset('#given', 0),
+         f'scoreboard players set #bolPct tmp {api.BOL_FORCE}',
          f'execute as {PL} run {fn("bond/add")}']
       + S.fx('brand_x', [S.part(S.DUST[2], 0.3, 0.5, 0.3, 0, 40), S.part('minecraft:crimson_spore', 0.4, 0.6, 0.4, 0, 30)],
              pos=f'at {S.PLAYER} positioned ~ ~1 ~')

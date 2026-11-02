@@ -109,7 +109,7 @@ def build_a(key, W):
             pb.at(t, S.fx_spin(r, PY_C), snd('spin'))
         else:
             ahead = api.HITS[key][idxs[1]][3][1]
-            pb.at(t, S.fx_slash(r, PY_C, roll=90, pitch=-50),
+            pb.at(t, S.fx_slash(r, PY_C, roll=90, pitch=-50, h=2.0),
                   S.fx_impact(2.2, PY_C, pos=f'{S.AT_BODY} positioned ^ ^0.2 ^{num(ahead, 2)}'), snd('slam'))
         prev = t
     pb.end(end)
@@ -266,7 +266,7 @@ def build_c(key, W):
     kb = KB1 if key == 'c1' else KB0
     pb.hit(0, tell_from=0, grp=g, kb=kb, pos=at_lock())
     pb.hit(1, tell_from=0, grp=g, kb=kb, pos=at_lock())
-    pb.at(impact, S.fx_impact(3.6, PY_C, pos=f'at {S.LOCK_M}'), S.fx_slash(4.0, PY_C, roll=90, pitch=-40), snd('impact'))
+    pb.at(impact, S.fx_impact(3.6, PY_C, pos=f'at {S.LOCK_M}'), S.fx_slash(4.0, PY_C, roll=90, pitch=-40, h=2.0), snd('impact'))
     if key == 'c2':
         wo, wing = E(clip, 'wing_open'), E(clip, 'wing')
         tell = wing - 12
@@ -368,7 +368,7 @@ def build_d(key, W):
         g2 = pb.group(fhit - 1)
         pb.hit(2, tell_from=hit, grp=g2, kb=KB1)
         pb.hit(3, tell_from=hit, grp=g2, kb=KB1)
-        pb.at(fhit, S.fx_impact(3.2, PY_C), S.fx_slash(4.0, PY_C, roll=100, pitch=-30), snd('slam'))
+        pb.at(fhit, S.fx_impact(3.2, PY_C), S.fx_slash(4.0, PY_C, roll=100, pitch=-30, h=2.0), snd('slam'))
     pb.end(end)
     return finish(pb, key)
 
@@ -416,7 +416,7 @@ def build_e(W):
     step_in(pb, sweep, spin)
     track_to(pb, sweep, spin, 14)
     pb.hit(1, tell_from=sweep, kb=KB1)
-    pb.at(spin, S.fx_spin(4.2, PY_C, h=1.6), S.fx_slash(4.2, PY_C, roll=90, pitch=-60), snd('spin'))
+    pb.at(spin, S.fx_spin(4.2, PY_C, h=1.6), S.fx_slash(4.2, PY_C, roll=90, pitch=-60, h=2.0), snd('spin'))
     pb.end(end)
     ground(pb, key)
     return finish(pb, key)
@@ -644,22 +644,21 @@ def build_h(W):
     pb.at(strike, S.bol_mark(), snd('clone_hit', f'at {S.LOCK_M}'), S.fx_impact(2.0, BOL_C, pos=f'at {S.LOCK_M}'))
     pb.at(strike + 2, f'kill @e[type=minecraft:item_display,tag=rlk_kn_clone,tag={S.tag_p(key)}]')
     # perched (hittable) until the wings burst open (the 14 t crimson tell), the drop, the wing (Bond of Life), the sweep;
-    # wing and sweep share one volley group (the clip has them 8 t apart: a standing player takes one, never both)
+    # since I1 the clip has them 12 t apart (>= COMBO_GAP): two hits, each re-faced, the sweep stepped in, only the sweep
+    # knocks back (S5: the one-group stand-in of R-S3-1 dropped)
     tell = wing - 14
     pb.track(strike + 1, drop, 10)
     pb.at(tell, look('wings', 'open'), look('glow', 'crimson'), S.fx('wing_burst', [part(S.DUST[2], 1.2, 1.0, 1.2, 0, 30)]),
           snd('wing_burst'))
     pb.at(drop, fn('p/h1/drop'), snd('dive'))
     pb.track(drop + 1, wing - 2, 20)
-    g = pb.group(wing - 1)
-    pb.hit(1, tell_from=tell, grp=g, kb=KB1)
+    pb.hit(1, tell_from=tell, grp=pb.group(wing - 1), kb=KB0)
     pb.at(wing, S.fx_slash(6.0, BOL_C, roll=10, h=1.8), snd('wing_hit'), look('glow', 'normal'))
     track_to(pb, wing, sweep, 14, 3)
     pb.advance(wing + 1, sweep - 2, STEP, STOP)
-    pb.hit(2, tell_from=wing, grp=g, kb=KB1)
+    pb.hit(2, tell_from=wing, grp=pb.group(sweep - 1), kb=KB1)
     pb.at(sweep, S.fx_slash(5.0, PY_C, roll=180), snd('sweep'))
-    pb.at(140, look('wings', 'off'))
-    pb.end(end)
+    pb.end(end)                                   # the wings close with the pattern's end (core/pat_end -> looks_rest)
     if api.K.prop('clone'):
         W.w('p/h1/resume', ['# H1 resume: the clone looks again (pause cleared the kit cards).',
                             f'execute as @e[type=minecraft:item_display,tag={S.tag_p(key)},tag=rlk_kn_clone] run {api.K.prop("clone")}'])

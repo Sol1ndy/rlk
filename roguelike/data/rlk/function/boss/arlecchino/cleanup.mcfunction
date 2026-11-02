@@ -14,6 +14,8 @@ kill @e[tag=rlk_kn_prop]
 kill @e[tag=rlk_kn_p]
 kill @e[type=minecraft:item,tag=rlk_kn_orb]
 kill @e[tag=rlk_kn_wisp]
+kill @e[type=minecraft:item_display,tag=rlk_kn_fxf]
 scoreboard players set #mbBolRe mb 100
 scoreboard players reset * kn
 data remove storage rlk:kn core
+data remove storage rlk:kn p2

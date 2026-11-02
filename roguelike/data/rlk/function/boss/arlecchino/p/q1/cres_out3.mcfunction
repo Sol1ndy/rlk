@@ -7,5 +7,5 @@ scoreboard players set #pjEl mb 1
 scoreboard players set #pjKB mb 3
 scoreboard players set #pjWall mb 1
 scoreboard players set #pjShape mb 1
-function rlk:mboss/pj/launch {spd:12,life:10,dmg:31,hr:10}
+function rlk:mboss/pj/launch {spd:12,life:10,dmg:26,hr:10}
 execute as @s run function rlk:boss/arlecchino/fx/prop/crescent

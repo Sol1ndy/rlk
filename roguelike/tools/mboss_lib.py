@@ -369,8 +369,9 @@ def hz_opts(act=None, el=None, kb=None, kbdir=None, y0=None, y1=None, r0=None, b
     mask hazard (#hzSafeG, 0 = its own id; 'cur' = the group of the last hz/safe_new, #mbSafeG, cm.md 13.6).
     AP-FW: pm=N: the hit takes N per mille of the player's max HP through mboss/pl_dot instead of a % of the boss hit
     (#hzPm, 1..1000); pm_lethal=0: that hit never kills (#hzPmL; default 1 = lethal; only with pm), cm.md 13.11.
-    ar FN-1 (scratchpad ar/contract.md 3.1): bol=N (1..100): a Bond-of-Life hazard (#hzBol): its raw damage (or its per
-    mille) x #mbBolRe mb / 100 (module-owned, unset = 100), and a hit that reached the player sets #mbHitBol mb N."""
+    ar FN-1 (scratchpad ar/contract.md 3.1): bol=N (1..100): a Bond-of-Life hazard (#hzBol): its raw damage x #mbBolRe
+    mb / 100 (module-owned, unset = 100; a per-mille hit keeps its per mille), and a hit that reached the player sets
+    #mbHitBol mb N."""
     out = []
     if grp:
         out.append('scoreboard players operation #hzGrp mb = #mbGrp mb')

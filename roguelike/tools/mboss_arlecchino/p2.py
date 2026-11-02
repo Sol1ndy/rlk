@@ -64,9 +64,6 @@ Q0_SPOT = (14.0, 11.0, 8.0)              # Q0: 14 b from the player (PLAN)
 SLASH_REACH = 6.0                        # Q2: the slash only when the player is this close to the dash end
 HOLD_MAX = 30                            # crescents in flight: the cast waits at most this long for their return
 TABLE = {}
-# s3lib.TID maps the api.TEST_IDS names to pattern keys, but TEST_IDS[45] is 'q4 (3 shots)': without this entry the core
-# could not wire q4 (its #pat id = the test id 45). Added here at import, before the core is built (request R-S4-1).
-S.TID.setdefault('q4', next(t for t, n in api.TEST_IDS.items() if n.split(' ')[0] == 'q4'))
 
 # Vanilla stand-ins of the kit's P2 sound recipes (api.KIT_SOUNDS) while S1K's kit is missing (s3lib has the P1 ones).
 SND2 = {
@@ -662,7 +659,7 @@ def build_q4(W):
     base, missed = api.Q4_SHOTS['base'], api.Q4_SHOTS['missed']
     low_pct, low_n = api.Q4_SHOTS['low_pct']
     tid = S.TID[key]
-    # shots: 1; 3 at <= 50 % of the P2 pool (mhpC x 100 <= mhpM x 50); the test (id 45) and its lock: 3
+    # shots: 1; 3 at <= 50 % of the P2 pool (mhpC x 100 <= mhpM x 50); the test (id 45: #q4_t3, set by test/go/q4) and its lock: 3
     sm.start += [sset('#q4_n', base), sset('#q4_k', 0),
                  f'execute store result score #t {OBJ} run scoreboard players get @s mhpC',
                  f'scoreboard players operation #t {OBJ} *= #c100 {OBJ}',
@@ -670,8 +667,8 @@ def build_q4(W):
                  f'scoreboard players set #t3 {OBJ} {low_pct}',
                  f'scoreboard players operation #t2 {OBJ} *= #t3 {OBJ}',
                  f'execute if score #t {OBJ} <= #t2 {OBJ} run {sset("#q4_n", low_n)}',
-                 f'execute if score #tst {OBJ} matches {tid} run {sset("#q4_n", low_n)}',
-                 f'execute if score #tst {OBJ} matches {tid} run {sset("#tst", 0)}',
+                 f'execute if score #q4_t3 {OBJ} matches 1 run {sset("#q4_n", low_n)}',
+                 f'scoreboard players reset #q4_t3 {OBJ}',
                  f'execute if score #mbLock mb matches {tid} run {sset("#q4_n", low_n)}']
     spot = spot_fn(sm, 'spot', PLAYER, Q4_SPOT, (0, 30, -30, 60, -60), hy, top - 4,
                    f'Q4 rise (@s = body): back off to {num(Q4_SPOT[0])} b from the player (else turned / nearer; the floor spot '
@@ -874,7 +871,7 @@ def build_q5b(W):
         kr = K.p('rapid_slash')
         st.at(t, placed([kr], f'{AT_BODY} positioned ~ ~{S.H(1.2)} ~') if kr else S.fx_slash(5.5, PY_C, roll=40 if i % 2 else -40),
               snd('rapid'))
-    # the final: the crimson aura swells 20 t before (both scythes raised from 84), pm_disc(7.5) 450 per mille, non-lethal,
+    # the final: the crimson aura swells 20 t before (both scythes raised from 84), pm_disc(7.5) per mille (api.HITS), non-lethal,
     # Bond of Life, dash-dodgeable
     tell = final - api.TELL_BIG
     st.at(tell, S.fx('shock_aura', [part(S.DUST[2], 0.8, 1.2, 0.8, 0, 40)], pos=f'at @s positioned ~ ~{S.H(1.4)} ~'), snd('brand'))
@@ -1032,7 +1029,7 @@ PATTERNS = [
     api.Pattern('q5a', S.TID['q5a'], ('q5a',), _q('q5a', build_q5a),
                 notes='forced bond, window 22-121, disc / donut / wide disc (BoL) with ring_o / donut_o outlines'),
     api.Pattern('q5b', S.TID['q5b'], ('q5b',), _q('q5b', build_q5b),
-                notes='forced bond, window 22-96, the X, rapid slashes, the non-lethal 450 per-mille final (BoL)'),
+                notes='forced bond, window 22-96, the X, rapid slashes, the non-lethal per-mille final (BoL)'),
     api.Pattern('q6', S.TID['q6'], ('q6',), _q('q6', build_q6, (('rlk_kn_fth', 'feather'), ('rlk_kn_q6o', 'orb'))),
                 notes='rise, six feather volleys, eight rim orbs, the dive + orb bursts (BoL)'),
 ]

@@ -86,10 +86,10 @@ def build(W, ctx):
       + [sset('#ai_d2', 100000), sset('#sch_f', 1000000), sset('#sch_q5', 1000000), sset('#lines', -1000)]
       + [sset(f'#cd_{g}', 0) for g in ctx.groups_all if g in api.COOLDOWN])
     # ---------------------------------------------------------------------------------------------- spawn / setup
-    w('spawn', ['# Hook spawn (@s = the arena marker at the centre of fl_ruins). The body (mboss/body: husk scale 1.4, click',
-                '# shield 1.2 x 2.9, no proxies) stands at the centre facing south (yaw 0), toward the player arriving at the',
-                '# south edge; rlk_mb_inv until the intro ends.',
-                'execute rotated 0 0 run function rlk:mboss/body',
+    w('spawn', ['# Hook spawn (@s = the arena marker at the centre of fl_ruins). The chapter body (mboss/cb/body: a boss, not a',
+                '# miniboss, so the chapter kill / reward path runs; husk scale 1.4, click shield 1.2 x 2.9, no proxies) stands at',
+                '# the centre facing south (yaw 0), toward the player arriving at the south edge; rlk_mb_inv until the intro ends.',
+                'execute rotated 0 0 run function rlk:mboss/cb/body',
                 at_body(fn('core/setup'))])
     w('core/setup', ['# @s = the new body: module state, the rig (form p1, the tea props, the scythe not yet formed).',
                      fn('init'), fn('core/vars'), api.rig('init'), api.rig('spawn'), api.rig('look/form/p1'),
@@ -406,12 +406,18 @@ def wisps(W):
     """core/wisps: the three white flame-spirits at their rim posts (api.WISP_POSTS; two red in P2), as kit props tagged
     rlk_kn_wisp. The intro sequence brings them there (S2); the core puts them back after a /reload (aux entities are gone)
     or a skipped intro / T (tests). Without the kit there is no wisp look (nothing is summoned)."""
-    lines = ['# The three wisps at their rim posts (@s any; idempotent): white, two of them red from P2 on (PLAN §8.4).']
+    lines = ['# The three wisps over their rim posts (@s any; idempotent): white, wisps 1 and 2 red from P2 on (PLAN §8.4; the',
+             '# same two seq/t_p2 turns red).']
+    theme = L.theme_module(api.ARENA_SPEC['theme'])
+    pts = getattr(theme, 'POINTS', {}).get('wisps') if theme else None
     if K.prop('wisp', c=1):
         lines.append('kill @e[type=minecraft:item_display,tag=rlk_kn_wisp]')
         for i, (bearing, r) in enumerate(api.WISP_POSTS):
-            red = i < 2
-            lines.append(f'execute at {S.ARENA_M} rotated {L.num(180 + bearing)} 0 positioned ^ ^ ^{L.num(r)} positioned ~ {CY + 1} ~ '
+            red = i in (1, 2)
+            # over the post (theme POINTS, absolute: the post itself is solid y 201-203); else the bearing at r, 1 b up
+            at = (f'positioned {L.num(pts[i][0])} {L.num(pts[i][1])} {L.num(pts[i][2])}' if pts else
+                  f'at {S.ARENA_M} rotated {L.num(180 + bearing)} 0 positioned ^ ^ ^{L.num(r)} positioned ~ {CY + 1} ~')
+            lines.append(f'execute {at} '
                          f'run summon minecraft:item_display ~ ~ ~ {{Tags:["rlk_room","rlk_mb_aux","rlk_kn_wisp","rlk_kn_wisp{i}"]}}')
             for c, cond in ((1, f'unless score #ph {OBJ} matches {PH["p2"]}' if red else ''), (2, f'if score #ph {OBJ} matches {PH["p2"]}')):
                 if c == 2 and not red:
@@ -505,15 +511,18 @@ def hooks(W, ctx):
         cl.append(fn(f'seq/{s}/cancel'))
     cl += [fn('bond/cleanup'), K.fixed('clear'), *S.hud('clear'), at_body(api.rig('kill')),
            f'kill @e[tag={api.TAGS["part"]}]', f'kill @e[tag={api.TAGS["prop"]}]', f'kill @e[tag={api.TAGS["pat"]}]',
-           f'kill @e[type=minecraft:item,tag={api.TAGS["orb"]}]', 'kill @e[tag=rlk_kn_wisp]', 'scoreboard players set #mbBolRe mb 100',
-           f'scoreboard players reset * {OBJ}', f'data remove storage {api.STORAGE} core']
+           f'kill @e[type=minecraft:item,tag={api.TAGS["orb"]}]', 'kill @e[tag=rlk_kn_wisp]',
+           # the kit's followers of the wisp / moon markers (fx/clear keeps them for a pause; the fight is over here)
+           'kill @e[type=minecraft:item_display,tag=rlk_kn_fxf]', 'scoreboard players set #mbBolRe mb 100',
+           f'scoreboard players reset * {OBJ}', f'data remove storage {api.STORAGE} core', f'data remove storage {api.STORAGE} p2']
     w('cleanup', [x for x in cl if x])
     un = ['# Hook uninstall (no executor; every enabled module): the kit, the rig, the module entities, the gate flames chain,',
           '# objective kn, storage core.*.']
     un += [K.fixed('uninstall'), api.rig('uninstall'), f'kill @e[tag={api.TAGS["pat"]}]', f'kill @e[tag={api.TAGS["part"]}]',
            f'kill @e[tag={api.TAGS["prop"]}]', f'kill @e[tag={api.TAGS["fx"]}]', f'kill @e[tag={api.TAGS["anchor"]}]',
            f'kill @e[type=minecraft:item,tag={api.TAGS["orb"]}]', 'kill @e[tag=rlk_kn_grave]', 'kill @e[tag=rlk_kn_wisp]',
-           f'schedule clear {NS}gate/flames', f'scoreboard objectives remove {OBJ}', f'data remove storage {api.STORAGE} core']
+           f'schedule clear {NS}gate/flames', f'scoreboard objectives remove {OBJ}', f'data remove storage {api.STORAGE} core',
+           f'data remove storage {api.STORAGE} p2']
     w('uninstall', [x for x in un if x])
     w('reload', [
         '# Hook reload (@s = body after /reload: the rig parts, hazards, markers, orbs and kit cards are gone; scores are kept).',
@@ -603,7 +612,8 @@ def tests(W, ctx):
             continue
         run.append(f'execute if score #tst {OBJ} matches {S.TID[k]} run return run {fn(f"test/go/{k}")}')
         need_p2 = ([f'execute if score #ph {OBJ} matches ..{PH["t"]} run {fn("test/ph2")}'] if k in P2_KEYS else [])
-        w(f'test/go/{k}', [f'execute unless function {NS}core/force run return 0'] + need_p2 + [fn(f'core/start/{k}')])
+        flag = [sset('#q4_t3', 1)] if k == 'q4' else []           # test 45 = q4 with 3 shots (p/q4/start consumes it)
+        w(f'test/go/{k}', [f'execute unless function {NS}core/force run return 0'] + need_p2 + flag + [fn(f'core/start/{k}')])
     for tid, rel in ((20, 'test/e70'), (21, 'bond/force'), (22, 'test/heal'), (23, 'test/shock'), (24, 'test/brk'),
                      (25, 'test/intro'), (26, 'test/tr'), (27, 'test/death'), (28, 'bond/orbs'), (29, 'test/stun'),
                      (30, 'test/ph1b'), (31, 'test/ph2'), (80, 'test/floor'), (99, 'test/hold')):

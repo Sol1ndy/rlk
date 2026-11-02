@@ -25,7 +25,7 @@ BODY = '@e[type=minecraft:husk,tag=rlk_mb_body,limit=1]'
 PLAYER = '@e[tag=rlk_body,limit=1]'
 ARENA_M = '@e[type=minecraft:marker,tag=rlk_mb_arena,limit=1]'
 LOCK_M = '@e[type=minecraft:marker,tag=rlk_kn_lock,limit=1]'
-TID = {k: tid for tid, k in api.TEST_IDS.items() if k in api.P1 + api.P2}      # pattern key -> test id = #pat id
+TID = {n.split(' ')[0]: tid for tid, n in api.TEST_IDS.items() if n.split(' ')[0] in api.P1 + api.P2}  # key -> test id = #pat id
 AT_BODY = 'at @s rotated as @s rotated ~ 0'
 FN1 = api.fn1_ready()
 
@@ -152,8 +152,9 @@ def kit_or(kit_line, fallback, pos):
 
 def fx_slash(r, c, roll=0, pitch=0, yaw=0, h=1.4):
     """A slash arc on the body (yaw / pitch / roll = offsets from the body yaw; kit slash_arc, c 1 Pyro / 2 BoL). The kit
-    keeps its arc above the floor (pivot at h)."""
-    k = K.p('slash_arc', r=int(round(r * 10)), yaw=int(yaw), pitch=int(pitch), roll=int(roll), c=c)
+    keeps its arc above the floor (pivot at h; S5 / K2: the vertical slashes pass h 2.0 so the clamp keeps their reach).
+    The executor is already turned by yaw, so the kit's own yaw offset is 0 (it would add the offset twice)."""
+    k = K.p('slash_arc', r=int(round(r * 10)), yaw=0, pitch=int(pitch), roll=int(roll), c=c)
     fb = [part('minecraft:sweep_attack', r * 0.3, 0.15, r * 0.3, 0, 3), part(DUST[c], r * 0.3, 0.2, r * 0.3, 0, 14),
           part(FLAME[c], r * 0.25, 0.2, r * 0.25, 0.02, 8)]
     if k:

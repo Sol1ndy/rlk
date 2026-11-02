@@ -6,6 +6,6 @@ execute if score #mbHitBol mb matches 1.. run function rlk:boss/arlecchino/bond/
 execute store result score #pbol kn run scoreboard players get @a[tag=player,limit=1] bol
 execute if score #bonded kn matches 1 if score #pbol kn matches ..0 run function rlk:boss/arlecchino/bond/cleared
 scoreboard players set #mbBolRe mb 100
-execute if score #bonded kn matches 1 if score #pbol kn matches 1.. run scoreboard players set #mbBolRe mb 250
+execute if score #bonded kn matches 1 if score #pbol kn matches 1.. run scoreboard players set #mbBolRe mb 150
 execute if score #bonded kn matches 1 if score #pbol kn matches 1.. run function rlk:boss/arlecchino/bond/dot
 execute if score #shk_hit kn matches 1 run function rlk:boss/arlecchino/bond/shock

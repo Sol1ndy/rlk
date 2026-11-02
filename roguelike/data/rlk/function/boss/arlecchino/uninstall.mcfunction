@@ -13,3 +13,4 @@ kill @e[tag=rlk_kn_wisp]
 schedule clear rlk:boss/arlecchino/gate/flames
 scoreboard objectives remove kn
 data remove storage rlk:kn core
+data remove storage rlk:kn p2

@@ -71,7 +71,7 @@ def arena_look(look):
 # % of the base hit (mboss/hurt coefficient). P2 hits x P2_MUL (the wiki's P2 attack is x 1.4 of P1; tempered).
 # I1 (R-S3-6): D0 tiers x 0.8 (32/45/62/80 measured 1.18x / 1.55x Apep P1 for a melee walker; target ~1.1x).
 DMG = {'T1': 26, 'T2': 36, 'T3': 50, 'T4': 64}
-P2_MUL = 120
+P2_MUL = 100                                           # S5: 120 -> 100 (R-S4-3 W2; with the x 0.8 tiers P2 = P1 hits)
 PYRO = 1
 EL_U = 1000                                            # 1U Pyro on every hit
 C_PYRO, C_BOL = 1, 2                                   # kit colour arg c: orange-gold Pyro / crimson Bond-of-Life look
@@ -102,14 +102,15 @@ def fn1_ready():
 # pj_burst(hr, speed, r) (wheel exploding at the locked point), pm_disc(r, per_mille) (a disc whose hit is the FN-1-aware
 # #hzPm pl_dot path, non-lethal: Q5B_FINAL_LETHAL), orb_discs(r, count, rim_r) (count discs on the rim, Q6),
 # disc_ahead(r, dist) (a disc centred dist blocks ahead of her).
+# S5 balance (FN-1 live): f1 hit1 / hit2 T3 -> T2, g1 field T2 -> T1, a4 / a5 h4 T3 -> T2, q1 h2 / h5 T2 -> T1.
 HITS = {
     'a2': [('a2', 'h1', 'sector', (4.2, 75), 'T2', 0), ('a2', 'h2', 'sector', (4.2, 75), 'T2', 0)],
     'a4': [('a4', 'h1', 'sector', (4.2, 75), 'T1', 0), ('a4', 'h2', 'sector', (4.2, 75), 'T1', 0),
-           ('a4', 'h3', 'disc', (4.6,), 'T2', 0), ('a4', 'h4', 'sector', (3.6, 40), 'T3', 0),
-           ('a4', 'h4', 'disc_ahead', (2.2, 2.6), 'T3', 0)],
+           ('a4', 'h3', 'disc', (4.6,), 'T2', 0), ('a4', 'h4', 'sector', (3.6, 40), 'T2', 0),
+           ('a4', 'h4', 'disc_ahead', (2.2, 2.6), 'T2', 0)],
     'a5': [('a5', 'h1', 'sector', (4.2, 75), 'T1', 0), ('a5', 'h2', 'sector', (4.2, 75), 'T1', 0),
-           ('a5', 'h3', 'disc', (4.6,), 'T2', 0), ('a5', 'h4', 'sector', (3.6, 40), 'T3', 0),
-           ('a5', 'h4', 'disc_ahead', (2.2, 2.6), 'T3', 0), ('a5', 'h5', 'disc', (4.8,), 'T2', 0)],
+           ('a5', 'h3', 'disc', (4.6,), 'T2', 0), ('a5', 'h4', 'sector', (3.6, 40), 'T2', 0),
+           ('a5', 'h4', 'disc_ahead', (2.2, 2.6), 'T2', 0), ('a5', 'h5', 'disc', (4.8,), 'T2', 0)],
     'b1': [('b1', 'release', 'pj_wheel', (1.1, 1.4, 16.0), 'T2', 0)],
     'b2': [('b2', 'rel1', 'pj_wheel', (1.1, 1.4, 16.0), 'T2', 0), ('b2', 'rel2', 'pj_wheel', (1.1, 1.4, 16.0), 'T2', 0),
            ('b2', 'grab', 'disc', (2.2,), 'T2', 1)],
@@ -120,28 +121,28 @@ HITS = {
     'd2': [('d2', 'go', 'dash_line', (2.0,), 'T2', 0), ('d2', 'hit', 'sector', (4.2, 70), 'T2', 0),
            ('d2', 'fhit', 'disc', (3.2,), 'T2', 0), ('d2', 'fhit', 'sector', (4.0, 60), 'T2', 0)],
     'e1': [('e1', 'sweep', 'sector', (5.2, 90), 'T2', 0), ('e1', 'spin', 'disc', (4.2,), 'T2', 0)],
-    'f1': [('f1', 'hit1', 'full', (), 'T3', 1), ('f1', 'hit2', 'full', (), 'T3', 1)],
+    'f1': [('f1', 'hit1', 'full', (), 'T2', 1), ('f1', 'hit2', 'full', (), 'T2', 1)],
     'g1': [('g1', 'cross1', 'line', (28.0, 3.0), 'T2', 1), ('g1', 'cross2', 'line', (28.0, 3.0), 'T2', 1),
-           ('g1', 'field', 'full', (), 'T2', 1)],
+           ('g1', 'field', 'full', (), 'T1', 1)],
     'h1': [('h1', 'strike', 'line', (10.0, 2.0), 'T2', 1), ('h1', 'wing', 'sector', (6.0, 80), 'T2', 1),
            ('h1', 'sweep', 'sector', (5.0, 90), 'T2', 0)],
     'e70': [],
     'q0': [('q0_dive', 'impact', 'disc', (3.0,), 'T2', 1), ('q0_dive', 'blades', 'ring', (3.0, 7.0), 'T2', 1)],
-    'q1': [('q1', 'h1', 'disc', (4.2,), 'T1', 0), ('q1', 'h2', 'sector', (4.5, 70), 'T2', 0),
+    'q1': [('q1', 'h1', 'disc', (4.2,), 'T1', 0), ('q1', 'h2', 'sector', (4.5, 70), 'T1', 0),
            ('q1', 'h3', 'pj_cres', (1.0, 1.2, 12.0), 'T1', 0), ('q1', 'h4', 'sector', (4.4, 80), 'T1', 0),
-           ('q1', 'h5', 'sector', (4.4, 80), 'T2', 0), ('q1', 'h6', 'pj_cres', (1.0, 1.2, 12.0), 'T1', 0)],
+           ('q1', 'h5', 'sector', (4.4, 80), 'T1', 0), ('q1', 'h6', 'pj_cres', (1.0, 1.2, 12.0), 'T1', 0)],
     'q2': [('q2', 'release', 'pj_burst', (1.1, 1.5, 2.2), 'T2', 0), ('q2', 'slash', 'sector', (4.5, 80), 'T2', 0)],
     'q3': [('q3', 'spin', 'disc', (4.6,), 'T2', 0)],
     'q4': [('q4_shot', 'fire', 'line', (30.0, 2.2), 'T3', 1)],
     'q5a': [('q5a', 'hit1', 'disc', (6.0,), 'T3', 1), ('q5a', 'hit2', 'ring', (6.0, 15.0), 'T3', 1),
             ('q5a', 'hit3', 'disc', (11.0,), 'T4', 1)],
-    'q5b': [('q5b', f's{i}', 'disc', (5.5,), 'T1', 0) for i in range(1, 10)] + [('q5b', 'final', 'pm_disc', (7.5, 450), 'PM', 1)],
+    'q5b': [('q5b', f's{i}', 'disc', (5.5,), 'T1', 0) for i in range(1, 10)] + [('q5b', 'final', 'pm_disc', (7.5, 300), 'PM', 1)],
     'q6': [('q6', f'v{i}', 'pj_bolt', (1.6,), 'T1', 0) for i in range(1, 7)]
           + [('q6', 'impact', 'disc', (4.0,), 'T3', 1), ('q6', 'impact', 'orb_discs', (5.0, 8, 22.0), 'T3', 1)],
 }
-Q5B_FINAL_LETHAL = False                         # 450 per mille, leaves 1 HP (PLAN §6)
+Q5B_FINAL_LETHAL = False                         # 300 per mille (S5: was 450), leaves 1 HP (PLAN §6)
 Q5B_SLASH_GROUP = 2                              # one hazard group per 2 rapid slashes (<= 5 landings)
-DASH_LEN = {'d1': 14.0, 'd2': 14.0, 'e1': 14.0, 'q2': 14.0}         # max dash lengths (b)
+DASH_LEN = {'d1': 14.0, 'd2': 14.0, 'e1': 14.0, 'q2': 20.0}         # max dash lengths (b); q2 20 (R-S4-6, accepted at I1)
 LEAP_H = {'c1': 9.0, 'c2': 9.0, 'e1': 2.5, 'h1': 7.0, 'q0': 10.0, 'q4': 4.0, 'q6': 12.0}
 TELL_MIN, TELL_BIG, COMBO_GAP = 12, 20, 10       # PLAN §5.1 (first visible motion -> hit; follow-ups apart)
 # Floor decals: only these pattern keys may draw them (PLAN §1.5), each flashing DECAL_FLASH ticks before its hit tick.
@@ -158,7 +159,7 @@ FLOOR_T = 1                                      # HP floor of P1 after E70 (T a
 RECOVER = {1: (16, 24), 2: (12, 18)}             # idle after a pattern (min, max) per fight phase (1 = P1, 2 = P2)
 BOL_HIT = 6                                      # % max HP bonded by a bol hit
 BOL_FORCE = 18                                   # % max HP of a forced bond (E70, f1, q5a / q5b)
-BOL_REHIT_PCT = 250                              # #mbBolRe while her bond is on the player
+BOL_REHIT_PCT = 150                              # #mbBolRe while her bond is on the player (S5: 250 -> 150; per-mille hits x1)
 BOL_DOT_PM, BOL_DOT_T = 10, 50                   # pl_dot per mille every T ticks while her bond is on (non-lethal)
 BOL_HEAL_PM = 10                                 # her heal per landed bol hit, per mille of mhpM
 BREAK_PM = {1: 150, 2: 125}                      # break true damage, per mille of mhpM (clamped above the floor)
@@ -195,10 +196,10 @@ WEIGHTS = {
     'C': {'p1a': (10, 30, 30), 'p1b': (10, 25, 25)},
     'D': {'p1a': (0, 25, 40), 'p1b': (0, 20, 30)},
     'E': {'p1b': (0, 20, 25)}, 'G': {'p1b': (15, 20, 15)}, 'H': {'p1b': (10, 15, 20)},
-    'Q1': {'p2': (60, 15, 0)}, 'Q2': {'p2': (10, 35, 40)}, 'Q4': {'p2': (0, 25, 40)}, 'Q6': {'p2': (10, 20, 25)},
+    'Q1': {'p2': (25, 15, 0)}, 'Q2': {'p2': (10, 35, 40)}, 'Q4': {'p2': (15, 25, 40)}, 'Q6': {'p2': (15, 20, 25)},   # S5 (R-S4-3 W3)
 }
 COOLDOWN = {'A': 60, 'B': 160, 'C': 200, 'D': 140, 'E': 260, 'G': 420, 'H': 380,
-            'Q1': 60, 'Q2': 160, 'Q3': 120, 'Q4': 300, 'Q6': 600}
+            'Q1': 240, 'Q2': 160, 'Q3': 120, 'Q4': 300, 'Q6': 600}                     # S5: Q1 60 -> 240 (>= its cast)
 SCHEDULE = {'F': {'first_after': ('e70', 240), 'every': 900, 'min_others': 3},
             'Q5': {'first_after': ('q0', 300), 'every': 900, 'min_others': 3}}
 Q6_FIRST = 400                                   # ticks into P2 before the first Q6
