@@ -1,0 +1,2 @@
+data merge entity 524c4b4d-4b4e-4100-8000-000000000007 {start_interpolation:0,interpolation_duration:4,transformation:{translation:[-0.23887f,0.57955f,0.17176f],left_rotation:[0.06021f,-0.08574f,-0.02973f,0.99405f],scale:[1.4f,1.4f,1.4f],right_rotation:[0f,0f,0f,1f]}}
+execute unless score @s knRigWr matches 2 run data merge entity 524c4b4d-4b4e-4100-8000-00000000000a {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.62028f,1.4442f,0.27227f],left_rotation:[-0.6674f,0.64721f,-0.3153f,-0.1905f],scale:[1.4f,1.4f,1.4f],right_rotation:[0f,0f,0f,1f]}}

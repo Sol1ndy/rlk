@@ -1,0 +1,3 @@
+data merge entity 524c4b4d-4b4e-4100-8000-000000000000 {start_interpolation:0,interpolation_duration:4,transformation:{translation:[-0.00383f,2.13031f,0.03644f],left_rotation:[-0.0001f,-0.00003f,0.00182f,1f],scale:[1.4f,1.4f,1.4f],right_rotation:[0f,0f,0f,1f]}}
+execute unless score @s knRigWr matches 2 run data merge entity 524c4b4d-4b4e-4100-8000-00000000000a {start_interpolation:0,interpolation_duration:3,transformation:{translation:[-0.58545f,1.41645f,0.26107f],left_rotation:[0.23459f,-0.16753f,0.86455f,0.41165f],scale:[1.4f,1.4f,1.4f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:boss/arlecchino/rig/look/wings/off
