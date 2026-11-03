@@ -2,6 +2,6 @@
 # Demo of fx/p/x_mark on the vanilla stand-in (made by test/stage when missing): the preset at its executor point with test values, next to the calls that go with it in the fight.
 execute unless entity @e[type=minecraft:armor_stand,tag=rlk_kn_fx_demo,limit=1] run function rlk:boss/arlecchino/fx/test/stage
 execute unless data storage rlk:kn fx{init:1b} run function rlk:boss/arlecchino/fx/e/init
-scoreboard players set #demo knFx 34
+scoreboard players set #demo knFx 37
 scoreboard players set #dt knFx -1
 schedule function rlk:boss/arlecchino/fx/test/e/tick 1t replace

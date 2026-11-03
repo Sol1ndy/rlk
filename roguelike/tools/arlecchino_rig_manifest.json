@@ -1617,6 +1617,10 @@
     [
      34,
      "props/none"
+    ],
+    [
+     60,
+     "weapon_r/hand"
     ]
    ],
    "source": "v5 33-39.5, v1 0.0-5.2 (ref/intro_v1_tea, _summon, _fine, _twirl, _stance)",
@@ -2017,7 +2021,12 @@
    "key_files": 121,
    "keys": 1185,
    "keys_per_tick": 6.5,
-   "looks": [],
+   "looks": [
+    [
+     130,
+     "weapon_l/hand"
+    ]
+   ],
    "source": "designed (PLAN §3.2); v4 13.5-21.4 (ref/p2_T_transition.jpg), wiki: six legs, twin scythes",
    "note": ""
   },
@@ -2456,7 +2465,7 @@
   "key_files": 2672,
   "keys": 19927,
   "rig_functions": 3244,
-  "rig_bytes": 6324182,
+  "rig_bytes": 6324286,
   "edge_warn_ticks": 289
  },
  "sprites": {

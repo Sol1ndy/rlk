@@ -166,6 +166,7 @@ KINDS = {
     'smoke':      ('face', (32, 32), SQ, BX, P.paint_smoke, 3, False, 'black-crimson smoke puff'),
     'burst':      ('face', (64, 64), SQ, BX, P.paint_burst, 2, True, 'starburst flash (tinted)'),
     'pillar':     ('cross', (32, 128), FOOT_8, FOOT_8, P.paint_pillar, 2, False, 'crimson flame column, root at b 0'),
+    'veil':       ('face', (64, 64), SQ, BX, P.paint_veil, 2, True, 'T form-swap shroud: dense flame veil, opaque core (tinted)'),
     # floor decals (flat; unit radius / unit length; at floor + 0.02)
     'flood':      ('flat', (128, 128), UNIT, UNIT, P.paint_flood, 2, False, 'F red flood / E70 pool decal'),
     'cracks':     ('flat', (256, 256), UNIT, UNIT, P.paint_cracks, 1, False, 'F glowing crimson cracks decal'),
@@ -622,6 +623,7 @@ SOUNDS = {
     'blast':        ('F hit 2 / G field: the blast.', [('entity.generic.explode', 1.0, 0.7), ('entity.wither.break_block', 0.4, 1.2)]),
     'cracks':       ('F the cracks.', [('block.basalt.break', 0.8, 0.6)]),
     'blade_rise':   ('G blades rise.', [('block.pointed_dripstone.place', 1.0, 0.6), ('item.trident.return', 0.5, 0.6)]),
+    'blade_fly':    ('G the blades fly in along the cross lines.', [('item.trident.throw', 0.9, 0.6), ('entity.phantom.swoop', 0.6, 0.7)]),
     'cross_hit':    ('G cross strikes.', [('entity.evoker_fangs.attack', 1.0, 1.0), ('entity.player.attack.sweep', 0.8, 0.6)]),
     'rim':          ('G rim blades erupt.', [('block.pointed_dripstone.fall', 1.0, 0.7)]),
     'clone_launch': ('H clones dive.', [('entity.phantom.swoop', 0.8, 0.8), ('entity.illusioner.cast_spell', 0.5, 1.2)]),
@@ -689,7 +691,10 @@ def xz(r, yaw):
 
 
 def fly(kind, yaw, el, dist, h=0.0, s0=0.5, s1=1.0, life=8, fade=3, col=WHITE, dly=0, roll=0, dur=0, pos=None):
-    """the fg radial trick: a fixed face card whose local +y points out along (yaw, elevation) flies dist outward"""
+    """the fg radial trick: a fixed face card whose local +y points out along (yaw, elevation) flies dist outward. The
+    card's pitch is 90 - el and the game clamps an entity's pitch to [-90, 90] when fx/e/spawn teleports it, so el < 0
+    (below the horizon) would fly level in game: el must be 0..90."""
+    assert 0 <= el <= 90, (kind, el)
     return card(kind, pos or f'~ ~{num(h, 2)} ~', f'~{ang(yaw)} {ang(90 - el)}', roll=roll, s0=s0, s1=s1,
                 move=(0, dist if isinstance(dist, str) else round(dist, 2), 0), life=life, fade=fade, col=col, dly=dly,
                 dur=dur)
@@ -1068,6 +1073,17 @@ def _p_blade_burst():
     return out
 
 
+
+@preset('cross_thorns', 'G a cross line erupts, one thorn per call (at its floor point on the line, the module calls 12 a '
+        'tick along the four arms, each only on the walk disc): a crimson thorn rising to {h} (tenths) in 2 t from the tick '
+        'after the call, crimson chips and dust.', conv=(('hh', 'h', 0.1),))
+def _p_cross_thorns():
+    return [mac(card('thorn', '^ ^ ^', '~ 0', bb='vertical', s0=(0.9, 0.05, 0.9), s1=(1.3, '$(hh)', 1.3), life=12, fade=5,
+                     dur=2)),
+            blockp('redstone_block', '^ ^0.3 ^', (0.35, 0.2, 0.35), 0, 4),
+            dust(DUSTC[C_BOL], 1.4, '^ ^0.7 ^', (0.3, 0.5, 0.3), 3)]
+
+
 # --- 선혈의 충격, the break, the stun ----------------------------------------------------------------------------------
 @preset('shock_gain', '선혈의 충격 armed (bond/cleared: the player + 1): crimson and gold embers spiral up around the player, '
         'a crimson glow pulse, sparkles.')
@@ -1104,7 +1120,7 @@ def _p_break_burst():
     out = [card('burst', '~ ~ ~', bb='center', spin=60, s0=0.6, s1=5.0, life=7, fade=3, col=CRIM),
            card('ring_c', '^ ^ ^', '~ 0', spin=90, s0=(0.4, 1, 0.4), s1=(4.2, 1, 4.2), life=9, fade=4, dur=5),
            card('ring_c', '^ ^ ^', '~ 90', spin=-90, s0=(0.4, 1, 0.4), s1=(3.4, 1, 3.4), life=8, fade=4, dly=1, dur=4)]
-    out += [fly('stroke', yaw, rnd.uniform(-20, 60), rnd.uniform(2.0, 3.4), s0=(0.5, 0.5, 0.5), s1=(0.8, 0.8, 0.8), life=14,
+    out += [fly('stroke', yaw, max(0.0, rnd.uniform(-20, 60)), rnd.uniform(2.0, 3.4), s0=(0.5, 0.5, 0.5), s1=(0.8, 0.8, 0.8), life=14,
                 fade=6, roll=rnd.randint(-80, 80)) for yaw in radial(10, 7)]
     out += [fly('smoke', yaw, 30, 1.6, s0=0.8, s1=1.6, life=12, fade=6) for yaw in radial(4, 45)]
     out += [part('explosion', '~ ~ ~', (0.5, 0.5, 0.5), 0, 2), dust(DUSTC[C_BOL], 1.8, '~ ~ ~', (1.2, 1.0, 1.2), 50),
@@ -1136,6 +1152,41 @@ def _p_pillar():
             mac(dust(DUSTC[C_BOL], 1.6, '~ ~2 ~', ('$(pd)', 2.0, '$(pd)'), 40)),
             part('large_smoke', '~ ~6 ~', (0.6, 0.4, 0.6), 0.02, 10), part('crimson_spore', '~ ~3 ~', (0.8, 2.0, 0.8), 0, 20)]
 
+
+
+@preset('shroud', 'T the form swap is hidden (S2: her feet, rotated as the body, 8 t before the swap; she hangs 1.3-3 b up, '
+        'her forearms up to 1.2 b out): a cocoon of crimson flame veils closes round her in 3 t (4 rings of 10 at r 1.35, '
+        '1.1-4.25 b up, facing the viewer, none below the floor) with flame tongues licking up it; the rings burn away one '
+        'by one from the bottom (fading 13-29 t after it starts) while she rises out of the top in her new form.')
+def _p_shroud():
+    rnd = RND(61)
+    out = []
+    for k, h in enumerate((1.1, 2.15, 3.2, 4.25)):
+        for i, yaw in enumerate(radial(10, 18 * (k % 2))):
+            x, z = xz(1.35, yaw)
+            out.append(card('veil', f'^{num(x, 2)} ^{num(h, 2)} ^{num(z, 2)}', bb='center', roll=rnd.randint(0, 359),
+                            spin=rnd.choice((-20, 20)), s0=0.5, s1=round(rnd.uniform(1.8, 2.1), 2), life=20 + 3 * k,
+                            fade=7, col=CRIM if (i + k) % 3 else ROSE, dur=3))
+    for yaw in radial(6, 15):
+        x, z = xz(1.5, yaw)
+        out.append(card('flame', f'^{num(x, 2)} ^0.4 ^{num(z, 2)}', bb='vertical', s0=(0.8, 0.4, 0.8), s1=(1.6, 4.6, 1.6),
+                        life=24, fade=8, col=CRIM, dur=5))
+    out += [dust(DUSTC[C_BOL], 1.8, '~ ~2.4 ~', (0.7, 1.4, 0.7), 40), part('crimson_spore', '~ ~2.4 ~', (0.9, 1.6, 0.9), 0, 30),
+            part('large_smoke', '~ ~4.6 ~', (0.5, 0.3, 0.5), 0.02, 8)]
+    return out
+
+
+@preset('shroud_burst', 'T the swap itself (S2: the chest anchor at the swap tick): a white-hot flash inside the cocoon, a crimson '
+        'glow, crimson blade shards flung out all round (as in the footage), a flash.')
+def _p_shroud_burst():
+    rnd = RND(67)
+    out = [card('burst', '~ ~ ~', bb='center', spin=60, s0=2.5, s1=5.0, life=8, fade=4),          # <= 2.5 b down: the
+           card('glow', '~ ~ ~', bb='center', s0=3.0, s1=5.5, life=10, fade=6, col=CRIM)]       # chest is ~2.9 b up
+    out += [fly('stroke', yaw, rnd.uniform(0, 50), rnd.uniform(3.5, 5.5), s0=(1.0, 1.0, 1.0), s1=(1.6, 1.6, 1.6), life=11,
+                fade=4, col=CRIM) for yaw in radial(12, 10)]
+    out += [flash((1.0, 0.35, 0.4), '~ ~ ~', 1.0), dust(DUSTC[C_BOL], 2.0, '~ ~ ~', (1.2, 1.2, 1.2), 50),
+            part('large_smoke', '~ ~ ~', (0.8, 0.8, 0.8), 0.04, 16)]
+    return out
 
 @preset('legs_burst', 'T: a pair of blade legs unfolds (S2: the spine anchor, rotated as the body): crimson feathers and ash '
         'flung out sideways and back, a crimson glow.')
@@ -2053,7 +2104,7 @@ def preset_cards(name):
 
 
 # ----------------------------------------------------------------------------- tests and demos
-TEST_ARGS = {'r': 36, 'yaw': 0, 'pitch': 0, 'roll': 0, 'c': 1, 'len': 70, 't': 30, 'r0': 0, 'w': 30, 'on': 1, 'id': 1}
+TEST_ARGS = {'r': 36, 'yaw': 0, 'pitch': 0, 'roll': 0, 'c': 1, 'len': 70, 't': 30, 'r0': 0, 'w': 30, 'on': 1, 'id': 1, 'h': 24}
 
 
 def fx(name, **args):
@@ -2118,12 +2169,16 @@ def _demos():
     D['clone_trail'] = _ev(5, 'chest', f('clone_trail'), snd('clone_launch'))
     D['blade_rise'] = _ev(5, 'spot', f('blade_rise'), snd('blade_rise'))
     D['blade_burst'] = _ev(5, 'spot1', f('blade_burst'), snd('cross_hit'))
+    D['cross_thorns'] = sum([_ev(5 + i, w, f('cross_thorns', h=h)) for i, (w, h) in
+                             enumerate((('tl0', 26), ('tl1', 19), ('tl2', 29)))], []) + _ev(8, 'spot', snd('cross_hit'))
     D['shock_gain'] = _ev(5, 'chest1', f('shock_gain'), snd('shock_gain'))
     D['shock_aura'] = _ev(5, 'hand', f('shock_aura'), snd('claw_reach'))
     D['shock_hit'] = _ev(5, 'chest', f('shock_hit'), snd('shock_hit'))
     D['break_burst'] = _ev(5, 'chest', f('break_burst'), snd('break'), snd('stun'))
     D['stun_motes'] = sum([_ev(5 + 10 * i, 'head', f('stun_motes')) for i in range(4)], [])
     D['pillar'] = _ev(5, 'body', f('pillar', r=12), snd('t_pillar')) + _ev(40, 'body', f('pillar', r=16), snd('t_swap'))
+    D['shroud'] = _ev(5, 'body', f('shroud'), snd('scythe_vortex'))
+    D['shroud_burst'] = _ev(13, 'chest', f('shroud_burst'), snd('t_swap'))
     D['legs_burst'] = sum([_ev(5 + 6 * i, 'chest', f('legs_burst'), snd('t_legs')) for i in range(3)], [])
     D['moon_flare'] = _ev(5, 'moon', f('moon_flare'), snd('moon'))
     D['aim_line'] = sum([_ev(t, 'chest', f('aim_line', len=60)) for t in range(5, 25, 2)], []) + _ev(5, 'chest', snd('beam_aim'))
@@ -2161,6 +2216,9 @@ DEMO_WHERE = {
     'high': 'at @s rotated as @s rotated ~ 0 positioned ~ ~6 ~',
     'spot': 'at @s rotated as @s rotated ~ 0 positioned ^ ^ ^4.5',
     'spot1': 'at @s rotated as @s rotated ~ 0 positioned ^ ^1 ^4.5',
+    'tl0': 'at @s rotated as @s rotated ~ 0 positioned ^-0.5 ^ ^3.35',
+    'tl1': 'at @s rotated as @s rotated ~ 0 positioned ^0.45 ^ ^4.5',
+    'tl2': 'at @s rotated as @s rotated ~ 0 positioned ^-0.05 ^ ^5.65',
     'moon': 'at @s rotated as @s rotated ~ 0 positioned ^ ^9 ^-6',
 }
 def demo_lens():

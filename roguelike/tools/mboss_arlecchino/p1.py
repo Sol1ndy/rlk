@@ -163,13 +163,14 @@ def write_wheel(key, W):
         f'execute if entity @s[tag=rlk_kn_out] run return run {fn(f"p/{key}/turn")}',
         f'execute at @s run {fn(f"p/{key}/caught")}'])
     W.w(f'p/{key}/turn', [
-        '# The outward wheel turns back (@s = it): a new returning wheel here, flying back along the same line for as many',
-        '# ticks as the outward leg flew (she does not move while it flies), a new volley group.',
+        '# The outward wheel turns back (@s = it): a new returning wheel here, flying back to her for as many ticks as the',
+        '# outward leg flew (she does not move while it flies), a new volley group. summon never takes the execute rotation (the',
+        '# new prop faces yaw 0), so the flight direction is aimed at her here: facing her feet, level.',
         f'execute store result storage {api.STORAGE} core.wb.life int 1 run scoreboard players get @s mbPjT',
-        f'execute at @s rotated as @s rotated ~180 0 run summon minecraft:item_display ~ ~ ~ '
+        f'execute at @s run summon minecraft:item_display ~ ~ ~ '
         f'{prop_nbt(key, ("rlk_kn_wheel", "rlk_kn_new"), "minecraft:fire_charge", (2.2, 2.2, 0.2))}',
-        f'execute as @e[type=minecraft:item_display,tag=rlk_kn_new] at @s rotated as @s run {fn(f"p/{key}/back")} '
-        f'with storage {api.STORAGE} core.wb'])
+        f'execute as @e[type=minecraft:item_display,tag=rlk_kn_new] at @s facing entity {S.BODY} feet rotated ~ 0 run '
+        f'{fn(f"p/{key}/back")} with storage {api.STORAGE} core.wb'])
     W.w(f'p/{key}/back', ['# $(life): the returning wheel (@s = the new prop, rotated toward her).',
                           'tag @s remove rlk_kn_new', 'tag @s add rlk_kn_ret', api.K.prop('wheel'), S.L.GRP_NEW]
         + S.L.pj_opts(el=api.PYRO, kb=0, wall=0, grp=True)
@@ -488,8 +489,19 @@ def build_f(W):
 
 
 # ================================================================================================= G 죽음의 칼날
-def blade_nbt(key):
-    return prop_nbt(key, ('rlk_kn_blade', 'rlk_kn_new'), 'minecraft:red_stained_glass_pane', (1.4, 5.0, 1.4))
+# G thorns: sideways offsets across the 3 b line (alternating sides segment by segment) and heights (tenths, foot-anchored)
+THORN_X = (-0.55, 0.5, -0.05)
+THORN_H = (26, 19, 29, 22, 17, 25, 28, 20, 24, 18, 27, 21)
+WALK_M = f'@e[type=minecraft:marker,tag=rlk_mb_arena,distance=..{num(api.WALK + 0.5)}]'
+# where a G cross blade may stand: on the walk disc (r 26 + 0.5) with free feet and head (mv/ok's block tests; mv/ok's own
+# safe disc, r 23.5, is the body's and would keep the side blades of a cross locked near the rim off the floor)
+BLADE_OK = f'if entity {WALK_M} if block ~ ~ ~ #rlk:dash_pass if block ~ ~1 ~ #rlk:dash_pass'
+BLADE_D = (14, 10.5, 7, 3.5)            # a cross blade's stand-off from the lock along its arm, outermost that passes
+
+
+def blade_nbt(key, arm=None):
+    tags = ('rlk_kn_blade', 'rlk_kn_new') if arm is None else ('rlk_kn_blade', f'rlk_kn_b{arm}', 'rlk_kn_new')
+    return prop_nbt(key, tags, 'minecraft:red_stained_glass_pane', (1.4, 5.0, 1.4))
 
 
 def write_g(W):
@@ -497,11 +509,16 @@ def write_g(W):
     dress = [f'execute as @e[type=minecraft:item_display,tag=rlk_kn_new] run {api.K.prop("blade")}'] if api.K.prop('blade') else []
     W.w('p/g1/cross', [
         '# G1 (@s = body): the four giant blades at the ends of the cross through the lock (arms 14 b, the lock marker\'s',
-        '# yaw = the cross axis), the strip decals (t = ticks to the strike in #t kn), the rise burst.',
+        '# yaw = the cross axis; an arm end off the walk disc or in a block pulls its blade in to 10.5 / 7 / 3.5 b, else',
+        '# that arm has none), each turned to face the lock (level: they fly in along their arms before the strike;',
+        '# summon never takes the execute rotation), the strip decals (t = ticks to the strike in #t kn), the rise burst.',
         f'kill @e[type=minecraft:item_display,tag=rlk_kn_blade,tag={S.tag_p(key)}]']
-        + [f'execute at {S.LOCK_M} rotated as {S.LOCK_M} rotated ~{a} 0 positioned ^ ^ ^14 positioned ~ {CY} ~ run summon '
-           f'minecraft:item_display ~ ~ ~ {blade_nbt(key)}' for a in (0, 90, 180, 270)]
-        + dress + ['tag @e[type=minecraft:item_display,tag=rlk_kn_new] remove rlk_kn_new']
+        + [f'execute {"" if i == 0 else f"unless entity @e[type=minecraft:item_display,tag=rlk_kn_b{a},tag=rlk_kn_new] "}'
+           f'at {S.LOCK_M} rotated as {S.LOCK_M} rotated ~{a} 0 positioned ^ ^ ^{num(d)} positioned ~ {CY} ~ {BLADE_OK} run '
+           f'summon minecraft:item_display ~ ~ ~ {blade_nbt(key, a)}' for a in (0, 90, 180, 270) for i, d in enumerate(BLADE_D)]
+        + dress
+        + [f'execute as @e[type=minecraft:item_display,tag=rlk_kn_new] at @s facing entity {S.LOCK_M} feet run tp @s ~ ~ ~ ~ 0',
+           'tag @e[type=minecraft:item_display,tag=rlk_kn_new] remove rlk_kn_new']
         + S.placed(S.snd('blade_rise'), f'at {S.LOCK_M}')
         + [f'execute as @e[type=minecraft:item_display,tag=rlk_kn_blade,tag={S.tag_p(key)}] at @s run {x}'
            for x in S.fx('blade_rise', [part(S.DUST[2], 0.4, 1.5, 0.4, 0, 16)], pos='positioned ~ ~ ~')]
@@ -555,10 +572,30 @@ def build_g(W):
                                                                      f'positioned ~ {CY} ~',
                                   dims=(half, h[3][1]), back=half))
             pb.hits.append(dict(t=t, idx=idx, tell=t0, grp=g, kb=KB0, bol=1, shape='line'))
+        # the strike (ref/p1_G_cross.jpg 36.2-36.6; v3 36.40-37.25: each blade sweeps its line, crimson thorns erupting
+        # behind it): the four blades leave the arm ends 4 t before the hit and close on the cross centre 3.5 b a tick
+        # (teleport_duration 1: the client slides each step over the next tick, so they meet there on the hit tick, burst
+        # and are gone). The steps are the stand-offs 10.5 / 7 / 3.5 / 0 b, each taken only where a blade may stand
+        # (BLADE_OK: a pulled-in blade stays put until its stand-off comes, the lock itself passed mv/ok). The
+        # thorns of a 3.5 b segment are called with the step across it: a kit card rises over 2 t from the tick after its
+        # call, so they stand up just behind the blade; one thorn per call, 1.15 b apart, each only on the walk disc.
+        pb.at(t - 4, snd('blade_fly', f'at {S.LOCK_M}'))
+        for k in range(4):
+            d = 14 - 3.5 * (k + 1)
+            step = f'positioned ^ ^ ^{num(-d)} ' if d else ''
+            pb.at(t - 4 + k, f'execute as @e[type=minecraft:item_display,tag=rlk_kn_blade,tag={S.tag_p(key)}] at {S.LOCK_M} '
+                             f'rotated as @s {step}positioned ~ {CY} ~ {BLADE_OK} run tp @s ~ ~ ~')
+            for arm in (0, 90, 180, 270):
+                for j, z in enumerate((0.6, 1.75, 2.9)):
+                    x = THORN_X[j] * (1 if k % 2 == 0 else -1)
+                    pos = (f'at {S.LOCK_M} rotated as {S.LOCK_M} rotated ~{arm} 0 positioned ^{num(x)} ^ '
+                           f'^{num(14 - 3.5 * k - z)} positioned ~ {CY} ~ if entity {WALK_M}')
+                    pb.at(t - 4 + k, S.fx('cross_thorns', [part(S.DUST[2], 0.3, 0.6, 0.3, 0, 3)], pos=pos,
+                                          h=THORN_H[(3 * k + j + 5 * arm // 90) % len(THORN_H)]))
         pb.at(t, S.bol_mark(), snd('cross_hit', f'at {S.LOCK_M}'),
               [f'execute as @e[type=minecraft:item_display,tag=rlk_kn_blade,tag={S.tag_p(key)}] at @s run {x}'
-               for x in S.fx('blade_burst', [part(S.DUST[2], 0.6, 1.0, 0.6, 0, 20)], pos='positioned ~ ~1 ~')])
-    pb.at(cross2 + 4, f'kill @e[type=minecraft:item_display,tag=rlk_kn_blade,tag={S.tag_p(key)}]')
+               for x in S.fx('blade_burst', [part(S.DUST[2], 0.6, 1.0, 0.6, 0, 20)], pos='positioned ~ ~1 ~')],
+              f'kill @e[type=minecraft:item_display,tag=rlk_kn_blade,tag={S.tag_p(key)}]')
     pb.at(rim, fn('p/g1/rim'))
     if not api.K._on():
         for t in range(rim, field, 4):

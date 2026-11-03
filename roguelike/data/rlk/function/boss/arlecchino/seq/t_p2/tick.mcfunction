@@ -11,8 +11,12 @@ execute if score #sq kn matches 56 as @e[type=marker,tag=rlk_kn_wisp_1,limit=1] 
 execute if score #sq kn matches 62 as @e[type=marker,tag=rlk_kn_wisp_2,limit=1] at @s run function rlk:boss/arlecchino/fx/p/wisp_turn {c:2}
 execute if score #sq kn matches 70 at @s run summon minecraft:marker ~ ~7 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_kn_prop","rlk_kn_moon"]}
 execute if score #sq kn matches 70 as @e[type=marker,tag=rlk_kn_moon,limit=1] at @s run function rlk:boss/arlecchino/fx/prop/moon_halo
+execute if score #sq kn matches 82 at @s run function rlk:boss/arlecchino/fx/snd/scythe_vortex
+execute if score #sq kn matches 82 at @s rotated as @s rotated ~ 0 run function rlk:boss/arlecchino/fx/p/shroud
 execute if score #sq kn matches 90 at @s run function rlk:boss/arlecchino/fx/snd/t_swap
 execute if score #sq kn matches 90 at @s run function rlk:boss/arlecchino/fx/p/pillar {r:16}
+execute if score #sq kn matches 90 at @s run function rlk:boss/arlecchino/rig/anchor/chest
+execute if score #sq kn matches 90 at @e[type=marker,tag=rlk_kn_anchor,limit=1] rotated as @s run function rlk:boss/arlecchino/fx/p/shroud_burst
 execute if score #sq kn matches 110 at @s run function rlk:boss/arlecchino/fx/snd/t_legs
 execute if score #sq kn matches 110 at @s run function rlk:boss/arlecchino/rig/anchor/spine
 execute if score #sq kn matches 110 at @e[type=marker,tag=rlk_kn_anchor,limit=1] rotated as @s run function rlk:boss/arlecchino/fx/p/legs_burst

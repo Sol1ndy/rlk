@@ -24,3 +24,4 @@ data merge entity 524c4b4d-4b4e-4100-8000-000000000016 {start_interpolation:0,in
 data merge entity 524c4b4d-4b4e-4100-8000-000000000017 {start_interpolation:0,interpolation_duration:90,transformation:{translation:[-0.07913f,1.67543f,-0.18464f],left_rotation:[-0.50922f,-0.61384f,-0.38514f,-0.46428f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4b4e-4100-8000-000000000018 {start_interpolation:0,interpolation_duration:90,transformation:{translation:[-0.58518f,1.43984f,0.25079f],left_rotation:[0f,-0.03141f,0f,0.99951f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4b4e-4100-8000-000000000019 {start_interpolation:0,interpolation_duration:90,transformation:{translation:[0.66147f,1.10219f,0.18713f],left_rotation:[0f,-0.03141f,0f,0.99951f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:boss/arlecchino/rig/look/weapon_r/hand

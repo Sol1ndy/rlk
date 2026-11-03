@@ -114,7 +114,7 @@ const TEA = {wR: 0, ssR: [0, 0, 0], tea: 1, sh: [.035, .0156, 0], to: [-2, 4, 2]
 const HOLD = {wR: 1, ssR: [1, 1, 1], hRw: 0, gR: [24, -18, .34], gfR: 0, spR: FR, thR: -90, edR: -1, twR: 0, slR: -.05, to: [0, 4, 0], hd: [0, -2, 0],
   fR: [-.2, 0, -.06], fL: [.17, 0, .1], kR: [.15, 0, -1], kL: [.15, 0, -1], sh: [0, .0156, 0], aL: [8, 16, 1]};
 const intro = {name: 'intro', src: 'v5 33-39.5, v1 0.0-5.2 (ref/intro_v1_tea, _summon, _fine, _twirl, _stance)', cuts: [34, 60],
-  looks: [[0, 'props/tea'], [34, 'props/none']], edgeOk: [[92, 105], [110, 117]], keys: [
+  looks: [[0, 'props/tea'], [34, 'props/none'], [60, 'weapon_r/hand']], edgeOk: [[92, 105], [110, 117]], keys: [
     K(0, TEA),
     K(8, {hd: [-8, -3, 0]}),
     K(14, {hR: [-.04, -.05, -.31], cupT: 34, hd: [8, -2, 0], pR: [.6, -.8, .1]}),          // sip
@@ -390,7 +390,7 @@ const e70 = {name: 'e70', src: 'v2 28-37.7 (ref/p1_E70_event.jpg)', looks: [[72,
 // 140 title; 150-180 she launches up and out of sight (vis 0 at 176: S4's q0 places the body at the hover spot and plays
 // q0_hover, whose tick 0 shows her again)
 const t_p2 = {name: 't_p2', src: 'designed (PLAN §3.2); v4 13.5-21.4 (ref/p2_T_transition.jpg), wiki: six legs, twin scythes', formAt: {90: 'p2'},
-  cuts: [70, 90, 110, 116, 122, 130], keys: [
+  looks: [[130, 'weapon_l/hand']], cuts: [70, 90, 110, 116, 122, 130], keys: [
     K(0, {}),
     K(6, {to: [16, 12, 6], hd: [14, -10, 0], sh: [0, -.06, .08], fL: [.18, 0, .3], aL: [50, 60, 1], gR: [44, -20, .5], thR: 152}, 'o'),
     K(20, {...KNEEL, lP: [0, 0, 0]}),                                                                    // kneel, the scythe planted

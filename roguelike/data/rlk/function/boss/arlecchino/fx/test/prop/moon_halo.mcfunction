@@ -2,6 +2,6 @@
 # Demo of fx/prop/moon_halo on the vanilla stand-in (made by test/stage when missing): one display dressed in front of it and one marker it follows.
 execute unless entity @e[type=minecraft:armor_stand,tag=rlk_kn_fx_demo,limit=1] run function rlk:boss/arlecchino/fx/test/stage
 execute unless data storage rlk:kn fx{init:1b} run function rlk:boss/arlecchino/fx/e/init
-scoreboard players set #demo knFx 51
+scoreboard players set #demo knFx 54
 scoreboard players set #dt knFx -1
 schedule function rlk:boss/arlecchino/fx/test/e/tick 1t replace

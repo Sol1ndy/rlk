@@ -2,6 +2,6 @@
 # Demo of fx/decal/rim_tint on the vanilla stand-in (made by test/stage when missing): on the floor 7 b in front of it.
 execute unless entity @e[type=minecraft:armor_stand,tag=rlk_kn_fx_demo,limit=1] run function rlk:boss/arlecchino/fx/test/stage
 execute unless data storage rlk:kn fx{init:1b} run function rlk:boss/arlecchino/fx/e/init
-scoreboard players set #demo knFx 55
+scoreboard players set #demo knFx 58
 scoreboard players set #dt knFx -1
 schedule function rlk:boss/arlecchino/fx/test/e/tick 1t replace

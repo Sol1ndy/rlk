@@ -422,8 +422,8 @@ KIT_PRESETS = {
     'slash_arc': ['r', 'yaw', 'pitch', 'roll', 'c'], 'spin_ring': ['r', 'c'], 'twirl_ring': [], 'scythe_form': [],
     'embers_puff': [], 'wheel_trail': ['len'], 'dash_trail': ['len', 'c'], 'leap_flare': [], 'dive_streak': ['len'],
     'impact_burst': ['r', 'c'], 'claw': ['r'], 'wing_burst': [], 'zig_streak': ['len'], 'brand_ring': [], 'brand_x': [],
-    'threads': ['r'], 'thorns': ['r'], 'blast': ['r'], 'web': [], 'clone_trail': [], 'blade_rise': [], 'blade_burst': [],
-    'shock_gain': [], 'shock_aura': [], 'shock_hit': [], 'break_burst': [], 'stun_motes': [], 'pillar': ['r'],
+    'threads': ['r'], 'thorns': ['r'], 'blast': ['r'], 'web': [], 'clone_trail': [], 'blade_rise': [], 'blade_burst': [], 'cross_thorns': ['h'],
+    'shock_gain': [], 'shock_aura': [], 'shock_hit': [], 'break_burst': [], 'stun_motes': [], 'pillar': ['r'], 'shroud': [], 'shroud_burst': [],
     'legs_burst': [], 'moon_flare': [], 'aim_line': ['len'], 'reticle': [], 'beam': ['len'], 'x_mark': [],
     'rapid_slash': [], 'final_burst': ['r'], 'feather_hit': [], 'orb_gather': [], 'orb_burst': ['r'],
     'death_flames': [], 'wisp_turn': ['c'], 'gate_flames': [], 'ambient_petals': [],
@@ -442,7 +442,7 @@ KIT_SOUNDS = (
     'step', 'swing_light', 'swing_heavy', 'spin', 'slam', 'wheel_spin', 'wheel_throw', 'wheel_catch', 'claw_reach',
     'claw_grab', 'leap', 'apex', 'dive', 'impact', 'wing_burst', 'wing_hit', 'dash_tell', 'dash', 'follow', 'zig',
     'sweep', 'brand', 'bond_gain', 'bond_tick', 'orb_spawn', 'flood', 'threads', 'blast', 'cracks', 'blade_rise',
-    'cross_hit', 'rim', 'clone_launch', 'clone_hit', 'perch', 'shock_gain', 'shock_hit', 'break', 'stun', 'beam_aim',
+    'blade_fly', 'cross_hit', 'rim', 'clone_launch', 'clone_hit', 'perch', 'shock_gain', 'shock_hit', 'break', 'stun', 'beam_aim',
     'beam_fire', 'x_carve', 'rapid', 'final', 'feather', 'orbs_gather', 'orbs_toss', 'orb_burst', 'fall_dive',
     'fall_impact', 'rear_whip', 'crescent_throw', 'moon')
 KIT_HUD = {'badge': ['on'], 'banner': ['on'], 'line': ['id'], 'clear': []}

@@ -157,11 +157,15 @@ def build_t_p2(W):
           (e('dark'), _snd('t_dark')), (e('dark'), 'effect give @a[tag=player] minecraft:blindness 1 0 true', None),
           (e('dark'), api.arena_look('crimson'), None),
           (e('swap'), _snd('t_swap')), (e('swap'), api.K.p('pillar', r=16)),
+          # the form swap is hidden (ref/p2_T_transition.jpg v4 19.5-20.5: a crimson-white burst with blade shards hides
+          # her): a flame cocoon closes 8 t before the swap and peels away from the bottom up after it
+          (e('swap') - 8, _snd('scythe_vortex')), (e('swap') - 8, f'execute at @s rotated as @s rotated ~ 0 run {api.K.p("shroud")}' if api.K.p('shroud') else None, None),
           (e('scythes'), _snd('t_scythes')), (e('title'), _snd('t_title')),
           (e('title'), L.title(*api.TITLE_P2, api.TITLE_COLOR[2])), (e('title'), api.K.hud('line', id=api.LINE_OF['t_p2'][0])),
           (e('launch'), _snd('t_launch')), (e('launch'), api.K.p('leap_flare')),
           (e('launch'), f'kill @e[type=marker,tag={MOON}]', None), (e('end') - 10, api.rig('look/glow/normal'))]
     ev += _fx_at(e('kneel'), 'chest', api.K.p('embers_puff'))
+    ev += _fx_at(e('swap'), 'chest', api.K.p('shroud_burst'))
     for i in (1, 2):                                               # two of the three wisps turn red (wiki)
         turn = api.K.p('wisp_turn', c=api.C_BOL)
         if turn:

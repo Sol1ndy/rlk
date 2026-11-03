@@ -659,6 +659,22 @@ def paint_smoke(a, b):
     return mix('#100406', '#4A0A12', n) + (al,)
 
 
+
+def paint_veil(a, b):
+    """T the form-swap shroud (face, BX; warm white, tinted): a dense flame veil, opaque out to r ~0.55 so overlapping
+    veils hide what is behind them, a flickering flame edge and darker smoke streaks."""
+    r = math.hypot(a, b)
+    if r > 1.0:
+        return CLEAR
+    n = fbm(a * 4 + 5, b * 4 - 3)
+    edge = r + 0.35 * (n - 0.5) - 0.12 * max(0.0, b)            # the edge licks upward
+    al = 1 - smooth(0.55, 0.95, edge)
+    if al < 0.03:
+        return CLEAR
+    c = ramp(WARM, clamp01(0.2 + 0.8 * r))
+    c = mix(c, SMOKE, 0.45 * smooth(0.55, 0.85, fbm(a * 7 - 2, b * 7 + 4)))
+    return c + (al,)
+
 def paint_burst(a, b):
     """A starburst (face, BX; warm white, tinted): a bright core and eight tapering rays."""
     r = math.hypot(a, b)

@@ -108,6 +108,7 @@ SND_FALLBACK = {
     'blast': [('entity.generic.explode', 1.0, 0.7), ('entity.wither.break_block', 0.4, 1.2)],
     'cracks': [('block.basalt.break', 0.8, 0.6)],
     'blade_rise': [('block.pointed_dripstone.place', 1.0, 0.6), ('item.trident.return', 0.5, 0.6)],
+    'blade_fly': [('item.trident.throw', 0.9, 0.6), ('entity.phantom.swoop', 0.6, 0.7)],
     'cross_hit': [('entity.evoker_fangs.attack', 1.0, 1.0), ('entity.player.attack.sweep', 0.8, 0.6)],
     'rim': [('block.pointed_dripstone.fall', 1.0, 0.7)],
     'clone_launch': [('entity.phantom.swoop', 0.8, 0.8), ('entity.illusioner.cast_spell', 0.5, 1.2)],
