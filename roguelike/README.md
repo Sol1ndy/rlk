@@ -3,6 +3,568 @@
 마인크래프트 **26.3** (데이터팩 포맷 121) 기준. 네임스페이스 `rlk`.
 이전 샘플(edrdd, 26.2)에서 필요한 기능만 옮겨 온 뼈대입니다.
 
+## 0. 인수인계 (다음 작업자용)
+
+새 세션이나 다른 에이전트가 **묻지 않고 이어서** 일할 수 있도록 지금까지의 방식 · 규칙 · 상태를 모은 장이다. 이전 세션의
+스크래치패드(계획 · 계약 · 시험 · 참고 영상 · 리소스팩 작업 사본)는 세션이 끝나면 사라지고, 남는 것은 **이 저장소**와
+**사용자에게 보낸 zip 두 개**뿐이다. 이 README 의 다른 절과 생성기 주석에 나오는 "스크래치패드 `xx/…`"(`S:xx/…`)는 그 옛 작업
+폴더이며, 시험 도구와 계획 · 계약 문서는 `tools/dev/sim/` 에 같은 경로로 옮겨 두었다(옛 `xx/…` = `tools/dev/sim/xx/…`, 0-7).
+다 옮기지는 않았다: `tools/dev/sim` 에 없는 옛 경로는 옮기지 않은 것이다(영상 · 참고 그림 · 작업 출력 · 다른 보스의 스위트 등, 0-7 끝 · 0-8).
+**릴리스할 때마다 0-1(상태) · 0-9(열린 항목) · 0-10(버전 기록)과 리소스팩 `README.md` 의 버전 기록을 함께 고친다.** 마지막 갱신: 11-03.
+
+### 0-1. 무엇이고 지금 어디까지 왔나
+- 마인크래프트 Java **26.3** 데이터팩(포맷 121, 네임스페이스 `rlk`)과 짝 리소스팩 `rlk_hud_resourcepack.zip`(포맷 97, **git 에 없음**:
+  0-4, 리소스팩 README). 게임 이름(임시) "만들고 싶은 거 다 만든 로그라이크" · Made by Solindy. 세피리아식 방 · 노드 맵 런(10절),
+  원신식 캐릭터 · 원소 반응(4 · 11절), 디스플레이 엔티티 리그로 만든 보스. 플레이어는 한 명(`player` 태그).
+- 한 챕터 = 첫 맵 + 맵 4 + 보스 맵. 보스 맵은 `room/pick/boss` → `mboss/cb/route`(레지스트리에서 생성)가 고른다.
+
+| 챕터 | 전투 구역의 잡몹 | 보스 맵 |
+|---|---|---|
+| 1 | 1챕터 커스텀 몹 6종(`cm/{sw,ar,fm,im,sh,cn}`, 5-1절) | **야타용왕** `azhdaha`(n 10, `boss/azhdaha/`, 경기장 `az_cavern`) |
+| 2 | 이나즈마 몹(무리 5 · 정예 4, 5-2절) | **나루카미**(`boss/raiden/`, 레지스트리 밖: `room/raiden/layout`) |
+| 3 | 수메르 몹(무리 4 + 포자 주머니 · 정예 3, 5-3절) | **아펩의 오아시스 파수꾼** `apep`(n 11, `boss/apep/`, `ap_oasis`) |
+| 4 | 4챕터 몹은 아직 없음 → 시험 설정으로 1챕터 6종 | **아를레키노** `arlecchino`(n 12, `boss/arlecchino/`, `fl_ruins`; 11-02 부터) |
+| 5~ | 1챕터 6종 | 나루카미 |
+
+- **중간보스**(노드 "중간보스" → 원형 광장, `mboss/<id>/`): 파수꾼・타락 `guardian`(n 1) · 달빛 환영 나비 `butterfly`(n 2) ·
+  실험성 역장 발생 장치 `fieldgen`(n 3), 가중치 10씩 · 1~99챕터. 시험용 `proto`(n 99).
+- **특수 보스**(방에 가끔 생기는 균열 `room/rift/`, 한 판에 많아야 한 번, 처치 = 레벨 업 1 + 아이템 상자 3): 타키 `tachy`(n 20,
+  `boss/tachy/`, `tk_lift`). 틀 시험용 `spproto`(n 97) · 챕터 틀 시험용 `cproto`(n 98).
+- **캐릭터 8명**(`char/setup`): 루미네(기본) · 요이미야 · 스커크 · 클로린드 · 아를레키노 · 나비아 · 로노바 · 네페르.
+- `tools/mboss_registry.json` 이 중간 · 챕터 · 특수 보스와 경기장(광장 n 0, `az_cavern` 1 · `ap_oasis` 2 · `tk_lift` 3 · `fl_ruins` 4 ·
+  `cp_test` 9)의 단일 원천이다. 번호(n)는 다시 쓰지 않는다. 나루카미만 레지스트리 밖이다.
+- 마지막 릴리스는 **11-03 「아를레키노 수정」**(0-10 맨 위; 빌드 도장 커밋 `96884f2`). 그 앞 큰 릴리스는
+  11-02 「아를레키노 · 4챕터」(`0f1368d`).
+- 아직 없는 것: 4챕터(폰타인) 잡몹(만드는 방식은 0-7b), 5챕터 이후의 고유 보스(그동안 나루카미).
+
+### 0-2. 새 세션이 처음 할 일
+1. `cd /home/user/rlk && git fetch origin && git status -sb`. 최신 작업은 원격 가지 `claude/exciting-pascal-ek1vuy`(11-03 기준)에 있다.
+   그 뒤 다른 가지에서 이어 했을 수 있으니
+   `git for-each-ref --sort=-committerdate --format='%(committerdate:short) %(refname:short)' refs/remotes/origin | head` 로 가장 최근
+   `claude/*` 가지를 찾고, 그 가지의 0-10 맨 위 줄과 맞춘다. 기본 가지 `main` 은 10-11 의 옛 `roguelike/`(이 0장 없음)뿐이니 거기서
+   시작하지 않는다(0-3). 세션 지시가 작업 가지를 따로 정해 주면 `git checkout -B <그 가지> origin/<최신 작업 가지>` 로 만들어 거기서
+   일하고 push 하며, 0-10 새 줄에 `가지 <이름>` 을 적는다(이 가지 이름 · push 재시도 · PR 금지는 이전 세션이 받은 지시였다). push 가
+   non-fast-forward 로 거부되면 강제로 덮지 말고 사용자에게 묻는다. 따로 정해 주지 않으면 `git checkout <최신 작업 가지>`. PR 은
+   사용자가 말하기 전에는 만들지 않는다. `git log --oneline -3` 이 0-10 맨 위 릴리스와 맞는지 본다.
+2. 사용자에게 먼저 물을 것(한 메시지, 한국어):
+   - ① 마지막으로 받은 `rlk_hud_resourcepack.zip` 을 올려 달라고 한다. 빈 폴더에 풀고(`mkdir -p <작업>/rp && cd <작업>/rp && unzip -q <zip>`),
+     팩 맨 위 `README.md` 6절 맨 위 줄이 0-10 맨 위 빌드와 같은지 본다. README 가 없는 zip 은 11-03 전 것(오래된 팩)이다.
+     `--resourcepack` 을 받는 생성기는 맞는 팩을 받은 다음에만 돌린다(리소스팩 README 1절).
+   - ② 로컬 시험 서버(loadcheck)를 쓰려면 Minecraft EULA(https://aka.ms/MinecraftEULA)에 동의하는지 묻는다. 동의를 받기 전에는
+     `eula.txt` 를 true 로 쓰지 않는다. 동의를 받으면 날짜를 0-8 에 적는다(이전 세션의 `eula=true` 는 동의 기록이 없다).
+   - ③ 보스를 영상과 다시 맞출 일이면 그 영상과 나무위키 페이지를 받는다. 나무위키는 Cloudflare 가 막아 직접 받을 수 없으므로(10-21),
+     저장한 HTML 이나 글로 받아 `python3 /home/user/rlk/roguelike/tools/dev/sim/ar/tools/html2txt.py <html> <txt>` 로 글로 바꾼다.
+3. 도구: Python 3.13(생성기는 표준 라이브러리만, 그림 도구는 numpy · Pillow), Node 22(리그 생성기 `*.mjs`), ffmpeg(영상 시트),
+   JDK 25 + 26.3 서버 jar(loadcheck, 0-8 "loadcheck 서버 준비"). `tools/dev/sim` 을 쓰려면 그 README 1절(옛 경로)부터.
+4. 0-6 사용자 규칙을 읽는다(모두 지킨다).
+5. 기준 확인(`cd /home/user/rlk/roguelike`): `bash tools/dev/regen_all.sh`(끝줄 `== done (failures: 0)`; 데이터팩은 스크립트 위치에서
+   찾으므로 `bash /home/user/rlk/roguelike/tools/dev/regen_all.sh` 처럼 어디서 돌려도 됨) 뒤 `git status --short` 의 출력이 비어 있어야
+   한다(생성 결과 = 커밋된 출력). 0-8 준비 뒤 `RLK_DEV=$DEV bash tools/dev/loadcheck.sh . base` → `0 function load failure(s)`,
+   `python3 -I tools/dev/rplint.py <작업>/rp` → `rplint: 0 problem(s)`. 그림 도구용 numpy · Pillow 가 없으면
+   `python3 -m pip install numpy pillow` 로 설치한다(생성기는 표준 라이브러리와 Node 기본 모듈만 써서 필요 없음).
+
+### 0-3. 저장소 지도
+- `/home/user/rlk`, 원격 `origin` = https://github.com/Sol1ndy/rlk. `origin/main` 은 10-11 처음 올린 그대로(`cffe90d`)이고 11-03 까지의
+  모든 작업은 `claude/exciting-pascal-ek1vuy` 에 있다(그 뒤의 가지는 0-2 1번). `wip/*` 단계 가지는 로컬에만 있었다(원격에 없음; 내용은
+  병합 커밋에 남음). (main 에는 작업 가지에 없는 커밋 `cffe90d` 가 있다: 사용자가 처음 올린 `resources.zip`, 다른 리소스팩
+  `assets/map_r6`. 그래서 main 을 작업 가지로 fast-forward 할 수 없다. 쓰지 않는다.)
+- `roguelike/`: `pack.mcmeta` · `README.md`(이 문서) · `engravings.md` · `items.md` · `data/`(게임이 읽는 것) · `tools/`(생성기와
+  `tools/dev/` 개발 도구 · 계획 · 계약 문서; zip 에 넣지 않음). 저장소 맨 위 `/home/user/rlk/.gitignore` 는 `__pycache__/` · `*.pyc`
+  뿐(`roguelike/` 에는 없음; + `roguelike/tools/dev/sim/.gitignore` 가 시험 출력 · 다시 만드는 입력을 막음).
+- `data/minecraft/tags/function/{load,tick}.json` → `rlk:load` · `rlk:tick`. `data/rlk/` 에는 `advancement/`(공격 · 원소 피격 ·
+  인벤토리 변화 · 우클릭 감지), `dialog/menu`, `predicate/in_*`(이동 입력), `tags/`.
+
+`data/rlk/function/`:
+
+| 폴더 | 내용 | 누가 쓰나 |
+|---|---|---|
+| `load` `tick` `uninstall` `reset` `fix` `cleanup_grounditems` | 진입점(조절 지점과 빌드 도장 줄은 `load`), 매 틱, 제거, 리셋, 캐릭터 복구 | 손(생성기가 끼워 넣은 훅 줄이 섞여 있음: 대개 주석에 생성기 이름) |
+| `player/` `combat/` `element/` `mob/` | 스탯 · 레벨 · HUD · 대시 · 생명의 계약 / 피해 계산 / 원소 반응 / 몹 공용 | 손(2 · 3챕터 몹 생성기가 `combat/apply` · `combat/gold_drop` · `combat/heal_orb_roll` 에 넣은 훅 줄이 섞여 있음) |
+| `char/` | 캐릭터 8명, `char/motion/**` 아바타 모션 · 소리 | 손 + 생성 섞임. 생성: `build_player_rig.mjs`(+ `build_player_locomotion.mjs`) = `motion/` 의 `clips/` · `loco/` · `sheath/` · `combat/config/**` · `combat/swing_clip` 과 맨 위 함수들(`event` · `event_dispatch` · `install` 빼고), `build_player_audio.py` = `audio/<캐릭터>/*`, `build_skirk_metsu_fx.py` = `skirk_fx/burst_metsu` 디스패처와 t028 이후 프레임. 손(생성기 없음): 클립 이벤트 `events/<캐릭터>/**`, 입자 연출 `arle_fx` · `navia_fx` · `skirk_fx`(위 metsu 몫 제외; metsu 충전 프레임 t000–t026 도 손), `control/**`, `combat/{request,select,first,second,third}` · `combat/config`(디스패처), `event` · `event_dispatch` · `install`, `audio/play` · `audio/stop`. `events` 의 `function rlk:char/motion/audio/<캐릭터>/<클립>` 훅 줄은 지우지 말 것(`build_player_audio.py` 가 정확히 한 줄을 요구) |
+| `items/` `ditem/` `lvup/` `engravings/` `ench/` `invd/` `codex/` `shop/` `root/` | 아이템 · 드롭 · 레벨 업 선택 · 각인 · 인챈트 · 인벤토리 상세 · 도감 · 상점 · 나무뿌리 | 손 |
+| `room/` `run/` | 방 · 런 진행 | 손; `room/data` · `room/lz/*` = 옛 `build/layouts3.py` 결과를 `tools/flatten_zones.py` 가 고친 것, `room/cboss/**` = `build_cboss_rooms.py`, `room/rift/**` · `room/obj/k_rift` = `build_rift.py`, `room/raiden/**` = 나루카미 생성기 |
+| `cm/` | 잡몹: 1챕터 `sw ar fm im sh cn`, 2챕터 `c2 ns sl ss sp dr kr nj cc ci`, 3챕터 `c3 fu fp em sb cw cs rv pc`, 공용 | 1챕터 = 손(옛 `build/p166`) + 포즈 `build_mobs.mjs` · `build_swordsman.mjs`; 2챕터 = `build_ch2_mobs.py`; 3챕터 = `build_ch3_mobs.py` |
+| `mboss/` | 보스 공용 엔진: 등록 · 디스패처 `d/` · 바닥 공격 `hz/` · 투사체 `pj/` · 이동 `mv/` · 끌기 · 보조 `aux/` · 챕터 `cb/` · 경기장별 `ar/` · 판정 프록시 `px/` · 특수 `sp/` · 음악 · 밀기 · 연출 · 상자 · 시험 `test/` | `build_mboss_core.py`(아래 두 줄 빼고 `mboss/` 전부) |
+| `mboss/arena/` | 광장 + 챕터 경기장 | `build_mboss_arena.py`(테마 `tools/mboss_arena_<theme>.py`) |
+| `mboss/{guardian,butterfly,fieldgen,proto,cproto,spproto}/` | 중간보스 · 시험 보스 모듈 | `build_mboss_<id>.py`(`rig/**` = 리그 `.mjs`, `fx/**` 의 킷 몫 = 효과 킷) |
+| `boss/{azhdaha,apep,arlecchino,tachy}/` | 챕터 · 특수 보스 모듈(레지스트리 `"fn": "boss/<id>"`) | 아래 생성기 표 |
+| `boss/raiden/` · `boss/test/` | 나루카미 · 시험 명령 별칭(`rlk:boss/test/chapter {id:…}` 등) | `build_raiden_all.py` 의 생성기들 · `build_mboss_core.py` |
+| `bossui/` `minimap/` `fx/nv/` | 글꼴 보스바 · 글꼴 미니맵 · 나비아 금빛 카드 | `build_bossbar.py` · `build_minimap.py` · `build_navia_fx_cards.py` |
+| `view/` `lobby/` | 시점(1인칭 · 숄더뷰 · F5) · 아바타 / 로비 · 튜토리얼 · 체험 방 | 손(옛 `build/p174` · `p162`) |
+| `snd/` | `f0..fN`: 같은 소리는 한 틱에 한 번(`#k<n> snd`) | 옛 `build/psnd.py` |
+| `help/` `dev/` `util/` | 명령 도움말 틀 · 개발자 모드 · 반복 호출 | 손(도움말 목록은 생성기가 `tools/help_lib.py` 로) |
+
+옛 빌드 스크립트 `build/*.py`(로비 p162 · 1챕터 몹 p166 · F5 시점 p174 · 배치 layouts3 · 소리 psnd)는 **저장소에도 컨테이너에도 없다**.
+그것이 만든 파일은 이제 손으로 관리하는 소스로 본다(배치만 `flatten_zones.py` 로 다시 처리).
+
+`tools/` 생성기(출력 폴더는 그 생성기 몫이다):
+
+| 생성기 | 데이터팩에 쓰는 곳 | 리소스팩 · 그 밖 |
+|---|---|---|
+| `build_mboss_core.py` + `mboss_lib.py` + `mboss_registry.json` | `mboss/**`(arena · 모듈 폴더 제외), `boss/test/*` | 커밋된 리그 매니페스트로 `mboss/px/<id>/**` |
+| `build_mboss_arena.py` + `mboss_arena_{az_cavern,ap_oasis,tk_lift,fl_ruins,cp_test}.py` | `mboss/arena/**` | |
+| `build_cboss_rooms.py` | `room/cboss/**`(챕터 보스 입구) | |
+| `build_mboss_proto.py` · `build_mboss_cproto.py` · `build_mboss_spproto.py` | `mboss/proto` · `cproto` · `spproto` | `mboss_cproto_rig_manifest.json` |
+| `build_mboss_guardian.py`(`mboss_guardian/`) + `build_mboss_guardian_rig.mjs` | `mboss/guardian/**` | RP `mboss/guardian`, 글꼴 `mboss_gd` |
+| `build_mboss_butterfly.py` + `build_mboss_bf_fx.py` + `build_mboss_butterfly_rig.mjs` | `mboss/butterfly/**` | RP `mboss/butterfly` · `bf_kit` |
+| `build_mboss_fieldgen.py` + `build_mboss_fg_fx.py` + `build_mboss_fieldgen_rig.mjs` | `mboss/fieldgen/**` | RP `mboss/fieldgen` · `fg_kit` |
+| `build_mboss_azhdaha.py`(`mboss_azhdaha/`) + `build_mboss_az_fx.py` + `build_mboss_azhdaha_rig.mjs` | `boss/azhdaha/**` | RP `mboss/azhdaha` · `az_kit` |
+| `build_mboss_apep.py`(`mboss_apep/`) + `build_mboss_ap_fx.py` + `build_mboss_apep_rig.mjs` + `build_mboss_apep_org.mjs` | `boss/apep/**`(`rig/` · `om/` · 킷 몫은 각자) | RP `mboss/apep` · `apep_om` · `ap_kit` |
+| `build_rift.py` | `room/rift/**` · `room/obj/k_rift` + 공용 파일의 훅 줄(줄 앞 `# rift (build_rift.py)`) | RP `rift/` |
+| `build_mboss_tachy.py`(`mboss_tachy/`) + `build_mboss_tk_fx.py` + `build_tachy_rig.mjs` | `boss/tachy/**` | RP `mboss/tachy` · `tk_kit` |
+| `build_mboss_arlecchino.py`(`mboss_arlecchino/`) + `build_mboss_kn_fx.py` + `build_arlecchino_rig.mjs` | `boss/arlecchino/**` | RP `mboss/arlecchino` · `kn_kit` |
+| `build_raiden_all.py`(→ `build_raiden_*.py` · `raiden_enc/` · `build_raiden_rig.mjs` · `build_raiden_judgment_rig.mjs` · `build_raiden_clones.mjs`, 끝에 `check_raiden_pack.py`) | `boss/raiden/**`, `room/raiden/**` | RP `raiden/` |
+| `build_ch2_mobs.py`(`ch2mob/`) · `build_ch3_mobs.py`(`ch3mob/`) | 2 · 3챕터 `cm/` 몹 + 공용 cm · room · combat · load · uninstall 의 훅 줄 | RP 는 `build_ch{2,3}_{swarm,elite}_rigs.mjs` |
+| `build_player_rig.mjs`(+ `build_player_locomotion.mjs`, `player_motion/`) · `build_player_audio.py` · `build_navia_fx_cards.py` · `build_skirk_metsu_fx.py` | `char/motion/**` 의 생성 몫(평타 타이밍 `char/motion/combat/config/**` 포함; 0-3 `char/` 줄), `fx/nv/**` | RP `player_motion/` · `navia_fx/` |
+| `build_mobs.mjs`(방패 · 마법사 · 궁수 · 대포) · `build_swordsman.mjs` | 1챕터 `cm/` 포즈 + 공용 cm 파일 패치 | RP `cm/<몹>` |
+| `build_bossbar.py` · `build_minimap.py` | `bossui/*` · `minimap/*` | RP 글꼴 |
+| `flatten_zones.py [--check]` | `room/data` · `room/lz/*` 를 제자리에서 고침 | |
+| `check_mboss_pack.py` | 검사만(훅 · 디스패처 · 레지스트리 규칙) | |
+
+### 0-4. 빌드 순서와 묶기
+- **생성된 출력은 손으로 고치지 않는다**: 생성기를 고치고 다시 만든다. 생성기는 자기 몫 경로만 쓴다.
+  - 레지스트리 Python 생성기(`regen_all.sh` 의 것) · 효과 킷 · 보스 리그 · 나루카미 생성기 대부분은 그 안의 낡은 파일도 지우므로, 입력
+    (레지스트리 · 커밋된 매니페스트)이 같으면 몇 번 · 어떤 순서로 돌려도 결과가 같다(`sim/az/tests_cm/gen_check.py` 3 이 중간보스 ·
+    챕터 틀 생성기로 확인; 아래 순서는 레지스트리를 바꿨을 때 디스패처가 먼저 생기게 하려는 관례). 나루카미 가운데
+    `build_raiden_encounter.py`(`raiden_enc/`) · `build_raiden_cinematic.py` · `build_raiden_orb.py` 는 덮어쓰기만 하고,
+    `build_raiden_object_vfx.py` · `build_raiden_materials.py` 는 코드에 적어 둔 옛 이름만 지운다: 이 다섯의 출력 이름을 바꾸거나
+    없애면 옛 파일을 손으로 지운다.
+  - 단 매니페스트를 바꾸는 생성기(리그 `.mjs`, 효과 킷, `build_mboss_cproto.py`)는 그것을 읽는 코어 · 모듈보다 먼저 돌린다(아니면
+    `regen_all.sh` 를 한 번 더).
+  - 플레이어 리그 `build_player_rig.mjs`(+ locomotion; `char/motion/**`) · 1챕터 몹 리그 `build_mobs.mjs` · `build_swordsman.mjs`
+    (`cm/<몹>/` 포즈) · 2 · 3챕터 몹 리그 `.mjs` 는 덮어쓰기만 하고 낡은 파일을 지우지 않는다: 클립 · 모델 · 파트의 이름을 바꾸거나
+    없애면 옛 파일을 손으로 지운다(리소스팩 쪽은 리소스팩 README 3절). 리소스팩 `items.json` 의 순서는 돌린 순서를 따른다(0-9).
+- **데이터팩**(레지스트리를 읽는 Python 생성기, 리소스팩 필요 없음): `bash roguelike/tools/dev/regen_all.sh roguelike [--mobs]` —
+  core → arena → cboss_rooms → proto → cproto → spproto → guardian → butterfly → fieldgen → az_fx(`--skip-rp`) → azhdaha →
+  ap_fx(`--skip-rp`) → apep → rift → tk_fx(`--skip-rp`) → tachy → kn_fx(`--skip-rp`) → arlecchino → `check_mboss_pack.py`(끝줄
+  `… 0 problem(s).`). `--mobs` 는 `build_ch2_mobs.py` · `build_ch3_mobs.py` 도 돌린다. 실패한 생성기의 로그만 보여 준다.
+  `regen_all.sh` 가 돌리지 않는 데이터팩 생성기: `python3 tools/build_skirk_metsu_fx.py`(스커크 극악기·멸 해방 검격 효과;
+  `char/motion/skirk_fx/burst_metsu/t028`~ 과 `burst_metsu.mcfunction` 만 씀, RP 필요 없음, 다른 생성기와 순서 무관; 이 파일을 고쳤을
+  때만 돌림), `python3 tools/flatten_zones.py [--check]`(배치를 바꿨을 때),
+  `python3 tools/build_player_audio.py`(아바타 소리: `char/motion/audio/<캐릭터>/*` 와 `tools/player_motion/compiled_audio.json` 만 씀,
+  RP 필요 없음; `tools/player_motion/audio_*.py` · `navia_audio/` · 클립 JSON · 손으로 쓴 `events/` 를 고쳤을 때).
+  - 리그 매니페스트(`tools/*rig_manifest.json`)가 바뀌면 코어를 다시 돌려 `mboss/px/<id>/**` 를 함께 커밋한다. 효과 킷의 매니페스트
+    (`tools/mboss_*_fx_manifest.json`)가 있어야 모듈의 `api.K` 가 켜진다(없으면 대역).
+- **리소스팩**(풀어 둔 팩을 `--resourcepack $RP` 로, **바뀐 것만**; 각 생성기는 자기 데이터팩 몫도 쓴다). `roguelike/` 에서:
+
+  ```bash
+  RP=<풀어 둔 리소스팩의 절대 경로>
+  node tools/build_arlecchino_rig.mjs --resourcepack $RP      # 리그: RP + 데이터팩 rig/** + 매니페스트
+  python3 tools/build_mboss_kn_fx.py --resourcepack $RP       # 효과 킷: RP + 데이터팩 fx/** + 매니페스트
+  #   같은 꼴: build_tachy_rig.mjs + build_mboss_tk_fx.py, build_mboss_apep_rig.mjs + build_mboss_apep_org.mjs + build_mboss_ap_fx.py,
+  #   build_mboss_azhdaha_rig.mjs + build_mboss_az_fx.py, build_mboss_{guardian,butterfly,fieldgen}_rig.mjs + build_mboss_{bf,fg}_fx.py,
+  #   build_rift.py, build_bossbar.py, build_minimap.py, build_navia_fx_cards.py
+  python3 tools/build_raiden_all.py --resourcepack $RP        # 나루카미 전부(데이터팩 + RP, 끝에 check_raiden_pack.py)
+  node tools/build_player_rig.mjs --datapack . --resourcepack $RP && python3 tools/build_player_audio.py   # 아바타
+  node tools/build_mobs.mjs --datapack . --resourcepack $RP && node tools/build_swordsman.mjs --datapack . --resourcepack $RP
+  node tools/build_ch2_swarm_rigs.mjs --resourcepack $RP && node tools/build_ch2_elite_rigs.mjs --resourcepack $RP   # → build_ch2_mobs.py
+  node tools/build_ch3_swarm_rigs.mjs --resourcepack $RP && node tools/build_ch3_elite_rigs.mjs --resourcepack $RP   # → build_ch3_mobs.py
+  ```
+
+  리그를 다시 만들었으면 `regen_all.sh` 도 다시(모듈 · 코어가 매니페스트를 읽음). 리그 생성기는 바닥 아래로 내려가는 점, 틱당 120도
+  넘는 회전, 예산 초과에서 멈춘다(`--allow-steps` 는 작성 중에만). 디버그 그림용 `--debug-dp <폴더>` 는 0-8 의 그림 도구가 읽는다.
+- **묶기**(`zip` 은 있는 파일에 덧붙이므로 먼저 지운다; 데이터팩 zip 에 `tools/` 는 넣지 않는다; `OUT` · `RP` 는 둘 다 절대 경로로:
+  블록 안에서 `cd` 를 두 번 하므로 상대 경로면 zip · unzip 이 엉뚱한 곳을 본다):
+
+  ```bash
+  OUT=<내보낼 폴더의 절대 경로>; RP=<풀어 둔 리소스팩의 절대 경로>; mkdir -p $OUT
+  cd /home/user/rlk/roguelike && rm -f $OUT/roguelike.zip && \
+    zip -qr $OUT/roguelike.zip pack.mcmeta README.md engravings.md items.md data -x '*/__pycache__/*'
+  cd $RP && rm -f $OUT/rlk_hud_resourcepack.zip && zip -qr $OUT/rlk_hud_resourcepack.zip pack.mcmeta README.md assets
+  unzip -tq $OUT/roguelike.zip && unzip -tq $OUT/rlk_hud_resourcepack.zip
+  ls -l --block-size=K $OUT/*.zip      # 11-02: roguelike.zip 29,203 KB · rlk_hud_resourcepack.zip 11,174 KB
+  ```
+
+### 0-5. 릴리스 절차와 게이트
+1. 고친 생성기로 다시 만들고(0-4) 바뀐 쪽 스위트를 돌린다(`tools/dev/sim`, 0-8). 다른 보스 · 몹의 생성 출력은 바이트 그대로여야
+   한다: `regen_all.sh` 뒤 `git status` 에 이번 변경이 소유한 파일만 보여야 한다. 옮겨 둔 다른 스위트(아를레키노 `ar/tests`, 챕터 틀
+   `az/tests_cm`)는 0-9 의 알려진 실패 말고 새 실패가 없어야 한다. 검사기(`check_refs` · `check_macro` · `check_nbtpath` · `mb/lint_mc`)는
+   직전 릴리스 트리의 결과와 비교해 새로 생긴 것이 없어야 한다. 다른 보스의 스위트는 옮기지 않았으니(0-8), 그 보스를 크게 고칠 때는
+   아를레키노 스위트를 본떠 먼저 만든다.
+2. 게이트 — 모두 통과해야 릴리스한다(`roguelike/` 에서):
+
+| 게이트 | 명령 | 통과 |
+|---|---|---|
+| 실제 서버 로드 | `RLK_DEV=$DEV bash tools/dev/loadcheck.sh . rel_<MMDD>`(`$DEV` = 0-8 의 작업 폴더; 한 번 `export RLK_DEV=…` 해 두면 됨. 새 컨테이너는 먼저 0-8 "loadcheck 서버 준비"; `RLK_DEV` 를 빼면 옛 스크래치패드의 서버 폴더를 찾다 `loadcheck: no server dir …` 로 끝남) | `loadcheck rel_<MMDD>: 0 function load failure(s)`(종료 코드 0)이고, 서버 폴더(기본 `$DEV/mcsrv`)의 `rel_<MMDD>.log` 에 `Starting minecraft server version 26.3` 과 `Done (` 가 있음 |
+| 리소스팩 린트 | `python3 -I tools/dev/rplint.py $RP` | `rplint: 0 problem(s)` |
+| 팩 검사 | `python3 tools/check_mboss_pack.py`(`regen_all.sh` 의 마지막) | `… 0 problem(s).` |
+| 아틀라스 예산 | `python3 -I tools/dev/atlas_px.py $RP` | 아이템 아틀라스 ≤ 13.2 M px(11-03: 12.63 M, 새 보스 몫은 약 0.57 M 뿐 — 0-7 3번; 클라이언트 한계 약 15.5 M) |
+| 두 번 만들기 | `regen_all.sh` 두 번, 바꾼 RP 생성기도 두 번 | 두 번째 뒤 `git status` 변화 없음; RP 해시가 같음(표 아래 명령) |
+| 정적 규칙 · 예산 | 스위트 · 검사기(0-8) | 0-6 의 게임 함정; 그 보스의 아틀라스(계획에서 정함, 아를레키노 ≤ 1.0 M) · 쉬는 자세 표시 요소 ≤ 6 500 · 싸움 한 틱 평균 명령 수 ≤ 아펩(약 830) |
+
+RP 해시(두 번 같아야 함; 빈 입력 해시 da39a3ee… 가 나오면 명령이 틀린 것): `(cd $RP && find . -type f -print0 | sort -z | xargs -0 sha1sum) | sha1sum`
+
+3. **빌드 도장**: `data/rlk/function/load.mcfunction` 의 이 줄만 고쳐 따로 커밋한다(메시지 `Build stamp <MM-DD> …`).
+   `tellraw @a [{"text":"[로그라이크] 시스템 로드 완료","color":"green"},{"text":" · 빌드 <MM-DD> <설명>","color":"gray"}]`
+   같은 날 두 번째부터는 `b` `c` `d` …(10-21 → 10-21b → 10-21c → 10-21d). 설명은 짧은 한국어(예: `아를레키노 · 4챕터` → `빌드 11-02 아를레키노 · 4챕터`).
+   같은 커밋에서 데이터팩 `pack.mcmeta` 의 설명 끝 `· 빌드 <MM-DD>` 도 맞추고, 리소스팩 `$RP/pack.mcmeta` 의 설명 끝도 같은 값으로
+   고친다(리소스팩은 git 밖이라 zip 에만 들어감; 11-03 부터 — 그 전에는 둘 다 `빌드 10-15` 에 멈춰 있었다).
+   이 세 파일은 2번 게이트 뒤에 바뀌므로 커밋 전에 `RLK_DEV=$DEV bash tools/dev/loadcheck.sh . rel_<MMDD>` 를 한 번 더 돌려
+   `0 function load failure(s)` 를 본다(도장 줄 하나가 깨져도 26.3 은 `load` 전체를 읽지 않고(0-6), `pack.mcmeta` 가 깨지면 팩을
+   통째로 건너뛴다 — loadcheck 가 둘 다 잡는다, 0-8; 10-30d · 11-02 도 도장을 고친 뒤 `rel30d` · `rel1102` 를 돌리고 커밋했다). 리소스팩
+   `pack.mcmeta` 는 어느 게이트도 읽지 않으므로(rplint 는 `assets/` 만) `python3 -I -m json.tool $RP/pack.mcmeta > /dev/null` 로 JSON 을 본다.
+4. 0-10 과 리소스팩 README 의 버전 기록에 한 줄씩 더하고, 0-1 · 0-9 도 맞춘다. 리소스팩 README 는 팩 맨 위(`$RP/README.md`)에 둔다.
+   0-10 새 줄의 대표 커밋 자리에는 3번 도장 커밋의 해시를 적는다. 도장을 먼저 커밋하고 문서 커밋을 그 뒤에 하면 바로 적을 수 있다.
+   문서를 먼저 커밋해 해시 대신 `git log --grep='Build stamp <MM-DD>'` 를 적어 두었으면, 다음 릴리스 때
+   `git log -i --grep='build stamp <MM-DD>' --format=%h` 로 해시를 채운다. 0-1 의 「마지막 릴리스」 줄도 이 릴리스로 바꾼다.
+5. 커밋(메시지 끝 trailer 는 세션이 정해 준 형식 그대로, 0-6) → `git push -u origin <작업 가지>`(0-2 1번에서 정한 가지; 11-03 까지
+   `claude/exciting-pascal-ek1vuy`). 네트워크 오류면 2 · 4 · 8 · 16초 쉬고 최대 4번 다시 한다.
+6. zip 두 개를 묶고(0-4) `unzip -t`, 크기(KB)를 잰다.
+7. 사용자에게 두 zip 과 그림(그 릴리스에서 바뀐 것: 모델 시트 · 클립 띠 · 효과 시트 · 싸움 시트, 640 px 안팎)을 보내고 **한국어로**
+   답한다: 무엇이 바뀌었나, 기본값으로 정해 둔 질문, zip 크기, 게임에서 확인해 달라고 할 것. 작업 가지가 바뀐 릴리스와, 인수인계를
+   처음 넣은 11-03 릴리스의 답에는 새 세션용 안내를 넣는다: 「새 세션을 열 때는 "Sol1ndy/rlk 의 가지 <작업 가지> 에서
+   roguelike/README.md 0장을 먼저 읽고 이어서 해" 라고 말해 주세요. 기본 가지 main 에는 10-11 의 옛 버전만 있습니다.」 main 을 최신으로
+   맞추는 일(병합)은 사용자가 원할 때만 한다.
+
+### 0-6. 사용자 규칙 (모두 지킨다)
+- 사용자에게는 항상 한국어로 답한다.
+- 커밋 메시지 끝 trailer는 세션이 정해 준 형식을 그대로 쓴다; 모델 ID는 커밋·PR·코드·문서 어디에도 쓰지 않는다.
+- git: 작업은 모두 0-2 1번에서 정한 작업 가지로 모으고, push 는 그 가지 하나에만 한다(11-03 까지 `claude/exciting-pascal-ek1vuy`; 세션 지시가 다른 가지를
+  정해 주면 그 가지). 릴리스마다 커밋 → push(0-5)한다. push 가 네트워크 오류면 2 · 4 · 8 · 16초 쉬고 최대 4번 다시 한다. PR 은
+  사용자가 말할 때만 만들고, main 에 직접 병합하지 않는다. 단계 가지 `wip/*` 는 push 하지 않는다.
+- 생성된 출력은 손으로 고치지 않는다(생성기 수정 → 재생성).
+- 소리는 바닐라 소리만(리소스팩 `sounds.json` 은 `{}`).
+- 텔레그래프 규칙(10-20): 바닥 표시(데칼)는 원작 영상에 있는 경우만(영상에 보이는 모양으로); 그 밖에는 12틱 이상(큰 공격은
+  20틱 이상, 대시로 못 피하는 공격도)의 조용한 예고(몸 동작 · 소리 · 공중에 보이는 것) + 눈에 보이는 타격. 영상이 없는 보스는
+  추측하지 말고 사용자에게 묻는다.
+- 팁 금지(10-21): "모든 보스 공통으로 즉사기를 제외하고는 어떻게 행동해라 하는 팁을 적어놓지 마" — 단, "실제 원신 인게임에서도
+  있는 안내메시지는 그대로 띄우고". 보스 · 몹 전투의 화면 글자는 이름 · 단계 제목 · 패턴 이름 · 배지 · 대사(위키) · 숫자 · 실제 게임
+  문구 · 즉사기 경고 · 시스템 안내(거절 · 대기, 예: 「경기장을 준비하는 중입니다. 잠시 뒤 다시 누르세요.」)만.
+- 특정 원소에 면역인 몹은 만들지 않는다(원소 면역/원소 게이트 보호막 없음).
+- 실제 게임 함정(모의기는 통과해도 게임에서 깨졌던 것):
+  - `scoreboard players add/remove` 에 음수 리터럴 금지 — 26.3 은 그 함수 전체를 읽지 않는다(10-21b 야타용왕 AI 멈춤).
+  - 텍스트 컴포넌트가 글리프 폰트를 상속하지 않게: 컴포넌트마다 `font` 를 적고, 글리프 뿌리 텍스트는 비우고 꾸미지 않으며, 킷 글꼴은
+    끝에 `minecraft:default` 참조(10-14 보스바 숫자 · 10-21 배너 글자가 네모로 보였다).
+  - 리소스 id 는 소문자 `[a-z0-9_.-/]` — 하나만 어겨도 클라이언트가 아틀라스 전체를 버린다(10-22e 텍스처가 모두 깨짐; `rplint`).
+  - 바닥 아래로 아무것도 안 내려가고, 블록 속으로 텔레포트 금지(목적지는 `mv/ok` · 안전 바닥 검사; 리그 생성기가 매 틱 검사).
+  - 손에 든 소품은 옆에서 봐도 올바른 방향(10-29c 창 · 북채).
+  - 큰 휘두르기는 키를 촘촘히(보간은 가까운 쪽으로 돌아 휘두르기가 찌르기처럼 보인다: 10-22 만겁).
+  - 투사체 하나당 디스플레이 카드 하나(날아가는 쪽을 봄).
+  - `summon` 은 execute 의 회전을 물려받지 않는다(새 엔티티는 yaw 0 — 방향은 소환 뒤 tp/facing 으로 준다; 11-03 돌아오는 낫이
+    남쪽으로 날던 문제).
+- 타키 플레이테스트 교훈(10-30): 긴 대기 금지, 거리 좁히기 수단(끌어오기 · 블링크), 연속기는 추적, 중간 타격 넉백 없음(마지막
+  타격만), 몇 초씩 떠 있지 않기, 너무 작거나 마르지 않게.
+- 모델: 얼굴이 머리카락을 뚫고 나오지 않게, 문은 평평하게(방의 문은 바닥 높이, 언덕 위 문 없음: 10-30c).
+- 사용량이 주 단위로 제한되므로 검사는 표적화하고(반복 중에는 바뀐 쪽 스위트만, 전체 게이트는 단계 끝에 한 번) 리뷰는 한 번에
+  묶는다.
+- 디스크는 늘 빠듯하다(11-03 이 컨테이너 `df -h /`: 남은 공간 약 2.6 GB(같은 날 3.7 GB 까지 오르내림), 쓴 37 GB 가운데 스크래치패드가
+  21 GB; 새 컨테이너에서도 먼저 `df -h /` 를 본다). 병렬 작업은 단계마다 자기 git worktree(동시에 셋까지, 각 약 250 MB)와 RP 사본
+  (`cp -r`, 하드 링크 금지, 약 50 MB)으로 한다. 병합하면 바로 `git worktree remove` 하고 사본도 지운다. 보내지 않을 그림 · 큰 출력 ·
+  옛 RP 사본도 지운다.
+- 매 릴리스마다 이 인수인계 장과 리소스팩 README의 버전 기록을 갱신한다.
+- 일하는 방식(10-19 사용자): "요청한 순서대로" 내보내되 "동시에 돌릴 수 있는 최대한" 병렬로. 사용자가 멈추라고 하면 바로 멈추고
+  어디까지 했는지 적어 둔다("계속해" 로 이어감).
+
+### 0-7. 보스 제작 파이프라인 (야타용왕 · 아펩 · 타키 · 아를레키노 때 실제로 한 방식)
+1. **이해**: 사용자가 보낸 영상(1080p60 mp4, 클립당 약 40초)과 나무위키 페이지(저장한 HTML → `html2txt.py`)를 프레임 시트로 만든다
+   — `<보스>/ref/*.jpg`(640 px 이하, 칸마다 `vN t` 표시; `tools/dev/sim/ar/tools/`: `sheet2.py` 시간 간격, `picks.py` 골라 뽑기,
+   `capat.py` · `captions.py` 자막 영역, `skinview.py` 스킨 앞뒤). 시간 `v1 2.45` = v1 의 2.45초(60 fps, 1틱 = 3프레임). 패턴마다
+   첫 동작 · 타격 틱 · 범위 · 바닥 표시가 보이는지 · 화면 문구를 적는다.
+2. **계획** `PLAN.md`: 결정 표(레지스트리 · 이름 · 사용자 변경 · 원소 · 단계 · 모델 · 패턴 · 바닥 표시 목록 · 등장 · 경기장 · 화면 글자 ·
+   예산), 사용자에게 물을 것과 기본값(답이 없으면 기본값으로 진행하고 릴리스 때 알림), 패턴 표(클립 · 이벤트 틱 · 모양 · 등급),
+   단계 · AI · 난이도 목표, 단계 분할 · 소유 · 시험 · 그림 · 게이트 · 예상치.
+3. **D0 계약 동결**(타키 · 아를레키노: 가지 `wip/<b>-d0`, 커밋 '<보스> D0: frozen contract …'(`0c8e628` · `eb0a38a`); 야타용왕 · 아펩은
+   계약 문서 `az/contract/*.md` · `ap/ap_contract.md`(+ `ap/spec/`)로 같은 일을 했다): `tools/mboss_<id>/api.py` — 1 정체 · 레지스트리 ·
+   경기장 명세, 2 피해 등급 `DMG` · `HITS`(클립 · 이벤트 · 모양 · 크기 · 등급) · 예고 상수, 3 단계 · 바닥 · 고유 메커니즘 수치, 4 AI
+   가중치 · 쿨다운 · 일정, 5 키 · 소유 `OWN` · 시험 id, 6 이름(점수 · 태그 · 저장소), 7 리그 계약 `PARTS` `LOOKS` `RIG_CALLS`
+   `CLIPS {이름: (길이, 반복, {이벤트: 틱})}` `CLIP_FORM {이름: 형태}` `check_manifest`, 8 킷 계약 `KIT_*` · 대사, 9 `Writer` · `Pattern` · `Service`. 여기서 만든 `stub_rig_manifest.json`, 빈 단계 스텁,
+   레지스트리 항목(`enabled:false` · `route:false`). 기존 출력은 바이트 그대로. 문서: `contract.md`(소유 · 이름 · 인터페이스 · 공통
+   규칙 · 게이트 · 변경 기록), `stage_briefs.md`(단계 에이전트에게 그대로 건넨 브리프).
+   새 보스의 이름 · 번호(겹치면 안 되고 다시 쓰지 않음):
+   - 레지스트리 `n` 은 관례상 그 종류의 다음 번호다: 중간 1–3 → 4, 챕터 10–12 → 13, 특수 20 → 21, 97–99 는 시험. `mboss_lib` 는
+     1–9999 안에서 고유한지만 검사한다.
+   - 경기장 `n` 은 5(0 광장 · 1–4 · 9 `cp_test`).
+   - 두 글자 접두사(점수 `<xx>` · `<xx>Rig*` · `<xx>Fx*`, 태그 `rlk_<xx>_*`, 저장소 `rlk:<xx>`, 킷 `<xx>_kit`, 글꼴 `rlk:mboss_<xx>`)는
+     아직 안 쓴 것으로 고른다. 보스가 쓴 gd bf fg az ap tk kn rd 말고도 점수판 머리글자가 많으니(mb cm pm sk cl nf rn nv eq pk …)
+     `grep -rhoE 'scoreboard objectives add [A-Za-z0-9_.]+' data | sort -u` 로 확인한다.
+   - 리그 UUID 는 `524c4b4d-<두 글자 ASCII 16진>-…-0000000000NN` 꼴이다. 쓴 것: 4150 AP · 415a AZ · 4246 BF · 4247 BG(파수꾼) ·
+     4350 CP · 4647 FG · 4b4e KN · 5244 RD · 544b TK.
+   - 킷 글꼴 코드 포인트는 다음 대역 U+EC00 을 쓴다(쓴 것 E100 · E300 · E400 · E500 … EB00, 리소스팩 README 2절).
+   - 아틀라스: 11-03 에 12.63 M / 게이트 13.2 M 이라 새 보스 몫은 약 0.57 M 뿐이다(아를레키노 계획은 ≤ 1.0 M 이었다). 계획에서 그
+     안으로 잡거나, 다른 몫을 줄이거나, 게이트를 올린다(13.2 M 은 아를레키노 계획에서 정한 값; 클라이언트 한계 약 15.5 M). 올리면
+     계획 · 0-5 표 · 릴리스 답에 적는다.
+4. **병렬 단계**: 단계마다 자기 git worktree(`git worktree add <작업>/wt_<s> -b wip/<b>-<s> <D0 커밋>`)와 자기 리소스팩 사본
+   (`cp -r`, 하드 링크 금지), **자기 소유 파일만** 쓴다. 다른 단계 · 리드에게 필요한 것은 `requests/<s>.md` 에 적는다. 아를레키노:
+   S1 틀(FN-1 생명의 계약 공격 옵션, FN-3 판정 프록시 없는 챕터 경로) + 경기장 테마 + 라우팅 · S1K 효과 · 소리 · HUD 킷 ·
+   S2 리그 + 등장 · 전환 · 사망 연출 · S3 모듈 코어 · AI · 고유 메커니즘 · 1페이즈 패턴 · S4 2페이즈 패턴(S3 가지에서). 단계마다
+   loadcheck · rplint · 두 번 생성 · 단계 스위트 · 그림을 통과하고 넘긴다. 동시에 worktree 셋까지(각 약 250 MB), 병합하면 지운다.
+   4 CPU 라 워크플로 하나에 에이전트 둘, 워크플로 여럿을 함께 돌렸다. 리그 단계가 끝나면 모델 시트(U1: 정면 · 옆 · 뒤 · 3/4)와 리그
+   그림을 릴리스 전에 먼저 사용자에게 보내, 일찍 의견을 받을 수 있게 했다.
+   브리프 틀(단계 에이전트에게 한 절씩 그대로 건넴; 원문 `tools/dev/sim/ar/stage_briefs.md` · `tk/stage_briefs.md`):
+   - ① 너는 …(프로젝트 한 줄 소개, worktree · 가지 · 경로 약어)
+   - ② 먼저 읽을 것(PLAN 절, 계약, `api.py`, README 절, 본뜰 기존 생성기)
+   - ③ 목표(번호 목록)
+   - ④ 건드리지 말 것(남의 소유, 플레이어 아바타 파일)
+   - ⑤ 시험(스위트 이름 · 검사 항목)
+   - ⑥ 그림(파일 이름 · 640 px 이하, 참고 시트 옆에)
+   - ⑦ 게이트(loadcheck · 두 번 생성 · 다른 생성기 출력 그대로 · `check_mboss_pack` · 스위트 · 0-6 규칙)
+   - ⑧ 커밋은 자기 `wip/<b>-<s>` 에 세션 trailer 로 하고 push 하지 않는다(push 는 리드가 작업 가지에만)
+   - ⑨ 보고(커밋 · 소유 파일 · 수치 · 시험 수 · 그림 경로 · `requests/<s>.md`)
+5. **I1 통합**(리드, `wip/<b>`): S1 → S1K → S2 → S3 → S4 순서로 병합, 요청 반영, `enabled` · `route` true, 전부 다시 만들기, 게이트,
+   README 절 병합.
+6. **묶은 검토 한 번 → 수정 → 균형**(S5): 상태 · 실제 게임 위험, 공정성 · 균형(탐침), 영상과의 충실도를 한 번에 보고
+   `review/findings.md`(AR-xx: 등급 · 고침 / 남김)에 적은 뒤 그 자리에서 고치고 수치를 한 번 맞춘다.
+7. **릴리스**(0-5) → 사용자의 게임 피드백 → 수정 릴리스(b, c, …).
+
+균형 목표(아이템 없는 Lv15 대 L18, 시드 3개 × 3600틱; 사람 대역 에이전트가 조용한 판정을 자세로 12틱 먼저 알아챔;
+`tools/dev/sim/ar/review/bal/`):
+- P1 근접 걷기 %최대 체력/분 ≈ 1.0~1.2 × 아펩 P1(127.7) — 계획 초안은 0.95~1.15.
+- P2 ≈ 1.0~1.3 × 아펩 P3(94.4) — 계획 초안은 ≤ 1.25; 회복구슬을 줍는 에이전트 기준.
+- 최악 40틱 창 ≤ 45 %; 서 있는 플레이어가 한 시전을 다 맞아도 ≤ 60 %; 대시로 못 피하는 몫 ≤ 25 %; 완벽한 대셔 ≤ 0.3 × 파수꾼
+  걷기; 회복 안 하는 에이전트도 연회 두 번을 버팀; 아이템 없는 칼 처치 6~7분(아펩 5.95분). 손잡이: 등급 ±20 %, `hp` ±15 %,
+  고유 수치 ±50 %.
+- 11-02 결과: P1 1.15 ×, P2(구슬) 1.00 ×(구슬 안 주우면 1.49 ×), 최악 40틱 42.9 %.
+
+계획 · 계약 문서는 옛 스크래치패드와 같은 상대 경로로 `tools/dev/sim/` 에 옮겨 두었다(zip 에 안 들어감). 그때의 기록이라 수치가
+낡았을 수 있다. 지금 값은 코드(`tools/mboss_<id>/api.py` 등)와 이 README 의 보스 절이 우선이다.
+- 아를레키노: `ar/PLAN.md`(두 페이즈 전체 — 결정 표 · 사용자 질문 셋(연회 배너 문구 · 강제 부여 때 회복구슬 3개 · 크기 × 1.4) · 영상
+  분석(클립 순서 v5 → v1 → v2 → v3 → v4 → v6 → v7, v8 무시) · 생명의 계약 규칙 · 바닥 표시 목록 §1.5 · 리그 26 파트 · 클립 표 · 등장
+  150틱 · 전환 T 180틱 · 사망 110틱 · 패턴 표 · AI · 난이도 · 경기장 · 단계 분할 · 게이트), `ar/contract.md`(D0 동결 계약: 소유표, 이름 —
+  점수 `kn` · `knRig*` · `knFx*`, 태그 `rlk_kn_*`, 저장소 `rlk:kn`, RP `rlk:mboss/arlecchino/*` · `kn_kit`, 글꼴 `rlk:mboss_kn` —
+  인터페이스, 게이트), `ar/stage_briefs.md`(단계 브리프 원문), `ar/requests/*.md`, `ar/review/findings.md`.
+- 다른 보스와 몹: 타키 `tk/`(`PLAN.md` · `contract.md` · `stage_briefs.md` · `requests/` · `review/findings.md`), 아펩 `ap/`(`plan.md` ·
+  `ap_contract.md` · `framework_needs.md` · `ap_fx_api.md` · `understand/` · `requests/*.md`), 야타용왕 `az/`(`plan.md` · `contract/*.md` ·
+  `understand/` · `requests/*.md`), 나루카미 `rd/`(`plan.md` · `s2_notes.md` · `footage/*.md`), 중간보스 틀 · 파수꾼 `mboss/`(`plan.md` ·
+  `contract.md` · `gd_contract.md` · `rig_api.md`(옛 판; 지금 판은 `tools/mboss_guardian_rig_api.md`) · `understand/*.md`), 나비
+  `mb2/`(`plan.md` · `bf_contract.md` · `bf_fx_api.md` · `spec/*.md` · `review/core_findings.json` · `understand/`), 역장 `mb3/`(`plan.md` ·
+  `fg_contract.md` · `fg_fx_api.md` · `spec/*.md` · `understand/`), 10-20 예고 규칙 감사 `tele/{gd,bf,fg}/audit.md`, 나비아
+  `navia/`(`plan.md` · `dp_sound_events.txt`), 2 · 3챕터 몹 `ch2/CONTRACT.md` · `ch3/CONTRACT.md`(0-7b). `understand/` 는 영상을 프레임
+  단위로 읽은 기록이라, 영상이 없는 지금은 영상 내용의 유일한 글 기록이다.
+- 보스 절과 생성기 주석이 수치의 근거로 드는 옛 공정성 모의도 그때의 기록으로 옮겼다(스크립트 + 결과 로그): 나비 `mb2/balance/`
+  (`bal.py` · `fsim.py`), 역장 `mb3/fgfix/sim/` · `tele/fg/sim/`(`fgfair.py`), 타키 `tk/review/bal/`(`tkfair.py`), 아펩
+  `ap/balance/`(`apfair.py` · `analysis.txt`), 그리고 `mb2/integ/vblade_check.py` · `riglib/r3_consumer_patch.py`. 옮기지 않은 스위트의
+  모의기(`mb2/tests` · `mb3/tests` · `tk/s3/lib` · `ap/tests/lib`)를 import 하므로 그대로는 돌지 않는다(지금 돌릴 수 있는 탐침은
+  `ar/review/bal/`, 0-8).
+
+이 README 와 생성기 주석의 "스크래치패드 `xx/…`" 와 `S:xx/…` 는 모두 `tools/dev/sim/xx/…` 로 읽는다. `tools/dev/sim` 에 없는 옛
+경로는 옮기지 않은 것이다(옛 스크래치패드에만 있음; 새 컨테이너에는 없음): 영상(`<보스>/src/*.mp4`, 아를레키노만 약 213 MB) · 영상
+프레임(`rd/frames`, `rd/src/user_refs`) · 저장한 위키 · 참고 시트 그림(`<보스>/ref/*.jpg`; `ar/ref` · `tk/ref` 약 12 MB 는 사용자가
+동의하면 넣을 수 있고, 그때는 `sim/.gitignore` 에 `!*/ref/*.jpg` 예외가 필요) · 작업 출력(그림 · 로그 · 렌더: `*/renders` · `*/out` ·
+`ap/arenarender` · `az/arenarender` · `ap|az|mb3/fxrender`), 리그 작업 폴더(`ap/rigwork` · `az/rigwork` · `ap/orgwork`, `riglib/` 의 나머지),
+검토 작업 폴더(`mb3/review`, `mb2/review` · `mb2/integ` · `mb3/fgfix` 의 나머지), 계획 초안 · 비평 · 원장(`ap/` · `az/` 의
+`plan_draft.md` · `plan_crit_*.md` · `plan_ledger.md`), 다른 보스의 스위트(0-8), `ap/spec/` 같은 D0 작업 도구. 같은 내용이 저장소에 있는
+것: `az/az_fx_api.md` = `tools/az_fx_api.md`, `mcsrv/loadcheck.sh`(11-03 전 판) → `tools/dev/loadcheck.sh`. P2 스킨은 `tools/arlecchino_skin_p2.mjs` 에 들어 있다. 그 보스를 영상과 다시 맞춰야 하면 사용자에게 영상을 다시
+보내 달라고 한다(아를레키노 v1–v7; 위키는 저장한 HTML, 0-2 2번 ③). 다음 보스도 같은 짜임으로 새로 쓴다.
+
+### 0-7b. 잡몹 작업 (2 · 3챕터 때 한 방식)
+- 사용자 요청(10-28, 2챕터 원문): "2스테이지 잡몹을 만들거야. 원신이나 스컬, 세피리아의 몹들을 갖고와도 되긴 하는데, 너무 쉽거나
+  그냥 단순히 숫자만 많으면 지루할 수 있어. 정예 몹으로 움직임이 빠른 몹을 몇 개 넣거나, 패턴이 단순한 몹을 많이 넣어서 한 번에
+  여러 명을 때릴 수 있도록 해 타격감을 주거나 하면 좋겠어. 몹들을 구상해봐." 이어서 "특정 원소에 면역인 몹은 빼".
+- 2챕터: 리드가 7종 안(무리 3 · 지원 1 · 정예 3, 방 구성 예시)을 보이고 세 가지를 물었다. 사용자는 "1. O, 2. 다 만들어, 3. X"(이나즈마
+  몹만 · 7종 모두 · 1챕터 몹 섞지 않음)로 답했다.
+- 3챕터(10-29, "3챕터 몹도 구상해봐. 수메르 컨셉에 맞게"): 안(우림 / 사막 비중 · 7종 · 지원 = 치유 술사)을 먼저 보이고
+  "1. O, 2. O, 3. O" 로 승인받았다.
+- 4챕터(폰타인)도 안을 먼저 보이고 정할 것을 묻는다.
+- 공통 결정:
+  - 그 챕터 지역의 몹만 쓰고, 그 챕터 방에는 다른 챕터의 몹을 섞지 않는다.
+  - 원소 면역 · 원소별 저항 · 원소 게이트 보호막 없음. 공격이 플레이어에게 원소를 묻히는 것은 된다.
+  - 모든 공격에 예고가 있다. 바닥 표시는 계약에 적은 것만.
+  - 정예는 방마다 하나(3챕터 5~6번째 맵은 둘)이고, 공격 뒤 확실한 빈틈이 있다.
+  - 무리 몹은 타격감(넉백 저항 0 · 경직 0.25초 · 처치 연출 · 다중 처치 신호).
+  - 안내 · 팁 글 없음.
+- 계약: 리드가 `CONTRACT.md` 를 쓴다(원문: `tools/dev/sim/ch2/CONTRACT.md` · `ch3/CONTRACT.md`). 내용은 요청 원문, id 표(기존
+  `sw ar fm im sh cn` · `ns sl ss sp dr kr nj cc ci` · `fu fp em sb cw cs rv pc` 와 겹치지 않게), 생성기 소유, 공통 동작, 몹 표 초안
+  수치, 방 구성 · 라우팅이다.
+- 병렬 작업: 그다음 worktree 둘로 나눈다.
+  - A = 틀(라우팅 `cm/c<N>/plan` · 생성기 입구 `build_ch<N>_mobs.py` · 공용 타격감 · 시험 소환 `cm/test {t:"<id>"}` 와 도움말
+    `cm/c<N>/test_help`) + 무리 · 지원 몹.
+  - B = 정예(`ch<N>mob/elite.py` + 자기 `elite_lib.py`). A 의 입구가 없는 동안은 임시 러너 `build_ch<N>_elite_only.py` 를 쓰고, 병합 때
+    지운다.
+  - A 는 B 의 id 를 매크로 줄(`$function rlk:cm/spawn/$(id)`)로 불러서, B 가 없는 트리도 로드된다.
+  - RP 사본은 각자 쓴다.
+  - 아틀라스 몫은 그때의 여유로 정했다(2챕터 A · B 각 ≤ 0.5 M, 3챕터 각 ≤ 0.4 M). 11-03 여유는 모두 합쳐 약 0.57 M(0-5)뿐이니
+    4챕터는 그 안에서 나눈다.
+- 생성기:
+  - 3챕터는 `tools/ch2mob` 을 import 해서 썼다(복사 금지, 2챕터 출력은 바이트 그대로).
+  - 4챕터는 `tools/ch3mob` · `build_ch3_mobs.py` · `build_ch3_{swarm,elite}_rigs.mjs` 를 본뜬다.
+  - 공유 파일(cm/tick · vis · flash · clean · combat/apply · room · load · uninstall)의 훅 줄은 생성기가 넣는다. 몹 생성기들을 어느 순서로 두 번
+    돌려도 같은 결과여야 한다.
+  - 새 생성기는 `regen_all.sh --mobs` 에 더한다.
+  - 5챕터 이후는 자기 몹이 생길 때까지 지금처럼 1챕터 6종을 쓴다(5-1절 '테스트 설정').
+- 마무리: 병합(파일이 겹치지 않음) → README 5-x 절 → 아틀라스 다시 만들기 → loadcheck · rplint → 도장(고친 뒤 loadcheck · JSON 확인 다시, 0-5 3번) → push → zip. 2 · 3챕터 시험
+  (`ch2/tests_a|b` · `ch3/tests_a|b`)은 옮기지 않았으니 같은 짜임으로 새로 쓴다.
+
+### 0-8. 시험 도구
+- `tools/dev/`(zip 에 안 들어감): `loadcheck.sh`(실제 서버 로드), `rplint.py`(리소스팩 린트), `regen_all.sh`(데이터팩 재생성),
+  `atlas_px.py`(아틀라스 크기), `sim/`(모의기 · 스위트 · 균형 탐침 · 그림 도구 · 계획 · 계약 문서; 파일마다의 설명과 옛 경로 처리는
+  `tools/dev/sim/README.md`). **스위트는 저장소의 `tools/dev/sim` 에서 바로 돌리지 않는다**: sim README 1절대로 데이터팩 밖(옛
+  스크래치패드 경로나 `<작업>`)에 사본을 두고 거기서 돌린다(시험하는 `roguelike/` 안에서 돌리면 변형 트리가 자기 `tmp/` 까지 복사하며
+  끝없이 커질 수 있었다; 11-03 에 복사에서 `tools/dev` 를 빼도록 고쳤지만 원칙은 사본).
+- **모의기**: 게임을 띄울 수 없어서 mcfunction 을 파이썬으로 해석해 싸움을 흉내 낸다 — `mcsim`(명령 해석기) ← `fgsim`(중간보스
+  틀, 엔진 바깥은 대역) ← `azsim`(`combat/apply` · 원소 반응 · 피격 · 처치 경로를 데이터팩에서 그대로) ← `cmsim`(챕터 모드: 블록
+  세계 · 청크 불림 · 변형 트리) ← `knsim`(아를레키노). **모의기가 받아도 게임은 거부할 수 있다**(음수 add/remove, 대문자 id, 글꼴
+  상속): 그래서 loadcheck · rplint 가 따로 있다. (봇 클라이언트로 실제 서버에 들어가 시험하는 것은 10-21 에 안 됐다: mineflayer
+  4.39.0 / minecraft-data 3.117.0 이 26.1 프로토콜까지다. 새 버전이 26.3 을 지원하는지 먼저 보고, 안 되면 실제 게임 확인은 사용자에게
+  부탁한다.)
+- **보스마다 `<보스>/tests/` 에 스위트를 만들어 썼다.** 옮겨 둔 것: 아를레키노 `sim/ar/tests/`(`test_cm_ar` 틀 FN-1 · FN-3 · 라우팅,
+  `test_arena_fl` 경기장, `test_kit` 효과 킷, `test_rig` 리그, `test_arlecchino` 코어 · 생명의 계약 · AI · 틱 비용, `pat_p1` · `pat_p2`
+  패턴: 타격 틱 = 클립 이벤트 · 예고 · 범위 · 끝점 · 매 틱 취소, `kit_dry`), 챕터 틀 `sim/az/tests_cm/`(라우팅 · 프록시 · 틀 도우미,
+  중간보스 행동 불변 `test_m0diff`, 생성 순서 `gen_check`, 바이트 고정 `ident`(낡음: 0-9)), 정적 검사기(`check_refs` · `check_macro` ·
+  `check_nbtpath` · `lint_mc`), 균형 탐침(`sim/ar/review/bal/`), 그림(`sim/preview/` 래스터라이저, `sim/ar/s2/` 리그 띠 ·
+  시트, `sim/ar/s1k/render/` 효과 시트), 영상 시트(`sim/ar/tools/`).
+- 옮기지 않은 것(옛 스크래치패드에만 있음; 11-03 이 컨테이너에는 아직 있지만 새 컨테이너에는 없음): 타키 `tk/tests`(`test_tachy` · `pat_melee` · `pat_air` · `test_rig` ·
+  `test_kit` · `test_arena_tk` · `test_rift` · `test_special`), 아펩 `ap/tests`(`test_apep` · `pat_p1` · `pat_p3` · `pat_rev` ·
+  `test_e2e_apep` · `test_boss_alias` · `soak_ap`) + `ap/balance`(`apfair.py`), 야타용왕 `az/tests`(`test_az_flow` · `test_wire_az`) +
+  `az/harness`(`azfair`), 나루카미 `rd/tests`(`test_raiden` 과 flow · kit · rig · shogun · tenma 시험, `--strict`; `test_kit` 이 읽는 `sound_ids.txt` 만 옮김), 중간보스
+  `mb/int_tests`(파수꾼 · 틀) · `mb2/tests`(나비) · `mb3/tests`(역장, `gen_check` · `ident`), 2 · 3챕터 몹 `ch2/tests_a|b` ·
+  `ch3/tests_a|b`, 문 높이 `doors`, 손 소품 `heldfix`, 단계 · 효과 킷 스위트(아펩 `ap/{rigtests,orgtests,fxtests,tests_arena}`, 야타용왕
+  `az/{fxtests,tests_pa,tests_pb,tests_pl,tests_ps,tests_pt,tests_rig,tests_arena,tests_mod}`, 나비 · 역장 `mb2/fxtests` · `mb3/fxtests`).
+  그 보스를 크게 고칠 때는 아를레키노 스위트를 본떠 새로 만든다.
+- 게임 안 시험 명령(런 없이): `/function rlk:boss/test/chapter {id:"arlecchino"}`(챕터 보스) · `rlk:boss/test/pattern {id:N}` ·
+  `rlk:boss/test/lock {id:N}` · `rlk:boss/test/special {id:"tachy"}` · `rlk:mboss/test/start {id:"guardian"}`(중간보스) ·
+  `rlk:boss/test/kill` / `abort`. id 를 받는 명령은 `{id:"help"}` 로 목록을 보여 준다(9절 "명령 도움말").
+
+**loadcheck 서버 준비(새 컨테이너)**:
+
+```bash
+DEV=<작업 폴더의 절대 경로>                       # 예: 새 세션의 스크래치패드(3 · 4번이 cd 한 뒤에도 씀)
+mkdir -p $DEV/mcjar $DEV/jdk $DEV/mcsrv
+# 1) 26.3 서버 jar: 버전 매니페스트 → 26.3 의 JSON → downloads.server.url
+curl -sSL https://piston-meta.mojang.com/mc/game/version_manifest_v2.json | python3 -c \
+  "import json,sys; print([v['url'] for v in json.load(sys.stdin)['versions'] if v['id']=='26.3'][0])"
+#    (11-02 때 그 JSON: https://piston-meta.mojang.com/v1/packages/11f1aefe473eefba0af62e3286c33b692807b2eb/26.3.json)
+curl -sSL -o $DEV/mcjar/server.jar https://piston-data.mojang.com/v1/objects/33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c/server.jar
+sha1sum $DEV/mcjar/server.jar                      # 33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c, 62 294 556 바이트
+# 2) JDK 25 (Temurin)
+curl -sSL -o $DEV/jdk.tgz 'https://api.adoptium.net/v3/binary/latest/25/ga/linux/x64/jdk/hotspot/normal/eclipse'
+tar -xzf $DEV/jdk.tgz -C $DEV/jdk && rm $DEV/jdk.tgz   # → $DEV/jdk/jdk-25…/bin/java (11-02: jdk-25.0.4.1+1)
+# 3) 서버 폴더 — eula=true 는 사용자가 Minecraft EULA(https://aka.ms/MinecraftEULA)에 동의했을 때만 쓴다(0-2 2번 ②, 아래 동의 기록)
+cd $DEV/mcsrv && echo 'eula=true' > eula.txt
+printf '%s\n' 'level-type=minecraft\:flat' generate-structures=false online-mode=false view-distance=4 simulation-distance=4 \
+  max-players=2 white-list=true spawn-protection=0 enable-command-block=true difficulty=easy > server.properties
+# 4) 첫 실행(월드를 만듦; 나머지 설정은 서버가 채움)
+RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk/roguelike first
+```
+
+- `loadcheck.sh` 는 **돌고 있는 java 를 모두 죽이고**(`pkill -x java`) 서버 폴더의 `world/datapacks/roguelike` 를 바꿔 넣는다. 한 번에
+  한 서버만: `<서버 폴더>/.lock` 에 `flock`(다른 에이전트가 검사 중이면 기다림). 서버 로그는 `<서버 폴더>/<tag>.log`. 환경 변수
+  `RLK_DEV`(기본: 이전 세션 스크래치패드 — 새 컨테이너에서는 꼭 준다) · `RLK_MCSRV` · `RLK_SERVER_JAR` · `RLK_JAVA`(기본
+  `$RLK_DEV/jdk/jdk-25*/bin/java`; PATH 의 java 는 쓰지 않는다).
+- 컨테이너의 기본 `java` 는 21 이다. 26.3 서버는 Java 25 가 필요하다(버전 JSON 의 `javaVersion.majorVersion` 25; 21 로 띄우면
+  `UnsupportedClassVersionError` 로 바로 끝남). 그래서 loadcheck 는 잠금 전에 `"$J" -version` 이 25 이상인지와 `eula.txt` 가 `eula=true`
+  인지 보고, 아니면 `loadcheck: … is not Java 25+ (set RLK_JAVA)` · `loadcheck: … is not eula=true` 로 끝난다(exit 2). 서버가 뜨지
+  못하면(로그에 `Done (` 없음) `loadcheck <tag>: server did not start (see …)` 로 끝난다. 11-03 전 판(옛 스크래치패드 `mcsrv/loadcheck.sh`)은
+  이때 실패를 찍지 않고 멈췄다: `echo stop > in.fifo` 가 읽는 쪽을 기다리고, 잠금을 쥔 채라 다른 호출도 줄을 선다. 그런 판이 몇 분 넘게
+  안 끝나면 끊고, 로그에서 `UnsupportedClassVersionError` · `You need to agree to the EULA` 를 찾아 `RLK_JAVA` 나 eula 를 고친다.
+- 서버가 떠도 팩을 건너뛰었거나(`pack.mcmeta` 를 못 읽음 · 기능 플래그 부족: `Failed to read pack file/roguelike metadata` ·
+  `Missing data pack file/roguelike` 등) 태그를 버렸으면(없는 id 를 가리킴: `Couldn't load tag … as it is missing following references`)
+  그 줄들과 `loadcheck <tag>: the datapack (or one of its tags) was not loaded (see …)` 를 찍고 끝난다(exit 2; 11-03 에 더함 — 그 전
+  판은 이때도 `0 function load failure(s)` 를 찍었다). 함수 로드 실패는 실패마다 `Failed to load function <id>` 와, 문법 오류면 그 다음
+  `Whilst parsing command on line <n>: …` 를 찍는다. 종료 코드: 0 = 실패 0, 1 = 함수 로드 실패, 2 = 준비 · 시작 · 팩 문제. `RLK_*`
+  경로는 상대 경로여도 된다(서버 폴더로 `cd` 하기 전에 절대 경로로 바꾼다). 11-03 에 실제 서버로 확인: 깨진 `pack.mcmeta` · 없는
+  함수를 가리키는 `tick` 태그 → exit 2, 음수 리터럴 함수 하나 → `1 function load failure(s)` · exit 1, 이 팩(상대 `RLK_DEV`) → 0 · exit 0.
+- EULA 동의 기록(0-2 2번 ②): 11-03 까지 없음(이전 세션의 서버 폴더는 동의 기록 없이 `eula=true` 였다). 동의를 받으면 여기에 날짜를 적는다.
+- 데이터팩이 정말 켜졌는지는 로그로 본다: 첫 실행은 `Found new data pack file/roguelike, loading it automatically`, 그 뒤로는
+  `Loaded 1870 advancements`(26.3 바닐라 1866 + 이 팩의 `data/rlk/advancement` 4개; 팩이 안 읽히면 1866). `Loading N persistent chunks`
+  는 월드에 저장된 고정 청크라 팩이 읽히지 않아도 찍히므로 증거가 아니다. 11-03 판 loadcheck 는 팩을 건너뛴 줄을 스스로 잡는다(위).
+
+### 0-9. 열린 항목 · 알려진 문제 (11-03)
+**사용자에게 물은 것 (답 대기; 답이 올 때까지 기본값으로 진행)**
+- (11-03) 리소스팩을 git 에 넣을까? 기본값 = 넣지 않음. 정본은 마지막으로 보낸 `rlk_hud_resourcepack.zip` 이다(0-2 2번, 리소스팩
+  README 1절). 넣기로 하면 저장소 루트 `resourcepack/` 에 그 zip 을 풀어 커밋한다(`build_raiden_all.py` 등 나루카미 생성기의
+  `--resourcepack` 기본 자리). 그 뒤로는 RP 생성기 출력도 데이터팩 출력과 같은 커밋에 넣고, 0-2 2번 · 0-4 묶기 · 리소스팩 README 1절도
+  그 폴더 기준으로 고친다.
+- (11-02) 활의 조준 사격(원신의 강공격)도 선혈의 충격을 터뜨리는 일반 공격으로 칠까? 기본값 = 아니오(`api.NORMAL_HIT_IF` 는
+  `#icd tmp 1` 을 요구하는데 조준 · 충전 사격은 `char/bow/release` 가 `#aIcd 0` 으로 쏘아 `char/bow/arrow_hit` 에서 `#icd 0` 이 되므로
+  빠진다. 바꾸려면 `core.py` on_hit 의 선혈의 충격 줄에 조준 · 풀차지 화살(`aKind` 2 · 3: `shot_aim` · `shot_full`)만 받는 갈래를 따로
+  더한다 — `#aK tmp` 는 `arrow_hit` 에서만 바뀌어 로노바 · 클로린드 타격 때는 지난 값이 남으므로, `arrow_hit` 에서 조준 · 풀차지일
+  때만 켜고 맞힌 뒤 끄는 표식을 따로 두는 편이 안전하다. `#bowHit tmp 1` 만으로 받으면 로노바 4타(`ronova/proj_hit`, `#icd 0`)까지
+  세게 되어 '세지 않음' 목록과 어긋난다).
+- (11-02) 같이 알린 것: 공중에 떠 있는 시간(AR-13)을 줄일지, 붉은 피의 사형을 근접으로 받아치기 어려운 점(AR-15). 기본값 = 그대로
+  (아래 아를레키노).
+
+**아를레키노** (11-02 검토 `findings.md` 에서 남긴 것과 결정 대기)
+- AR-13(작음, 남김): 공중에 있는 시간이 길다 — Q6 160틱, Q4 70~170틱, Q0 ≤ 80틱, H1 앉아 있기 54틱, E1 70틱(예고되고 맞힐 수
+  있음). 타키 교훈 "몇 초씩 떠 있지 않기"와 부딪치므로 피드백이 오면 먼저 볼 것.
+- AR-15(설계, 남김): 2페이즈 Q5B(붉은 피의 사형) 동안 근접으로 선혈의 충격을 넣기 어렵다(원거리 일반 공격으로는 된다).
+- AR-14(작음, 남김): 한 틱 명령 수가 튄다(G1 장판 약 6 700, crimson 모습 바꾸기 약 4 900; 평균은 P1a 445 · P1b 약 505(11-03
+  `test_arlecchino`, 십자 가시 추가 뒤; 11-02 는 494)로 아펩 약 830 보다 적음).
+- AR-16(작음, 남김): 휘두르는 틱(자루가 틱당 8도 이상 도는 틱) 가운데 낫 초승달의 끝(갈고리)이 움직이는 쪽을 앞서지 않고 뒤로 끌리는
+  틱이 289개 — `build_arlecchino_rig.mjs` 의 날 방향 검사 경고(`tools/arlecchino_rig_manifest.json` 의 `budgets.edge_warn_ticks`,
+  `tools/arlecchino_rig_api.md` 6절; 회복 동작 · 영상의 끌리는 돌리기이며 치는 프레임에는 없음).
+- 원작과 다른 점(유지 결정): 강제 부여(재가 된 만상 · 붉은 피의 연회)는 그녀가 건 계약을 거두고 18 % 로 다시 건다(플레이어 자신의
+  계약은 그대로) — 회복 수단이 없는 캐릭터도 구슬 둘로 파훼에 닿게(AR-03).
+- 계획의 기본값(사용자 확인 기록 없음): 연회 배너는 실제 게임 문구를 "일반 공격으로"로 바꿔 띄움, 강제 부여마다 회복구슬 3개(10 %씩),
+  크기 × 1.4(2.8칸).
+
+**타키**
+- TK-09(작음): 클리어 때 꺼진 균열 위에 서 있으면 약 30틱 뒤 빨려 들어간다.
+- TK-10(작음): 특수 보스 전투가 취소되면 안내가 두 줄 나온다(중간보스와 같음).
+
+**틀 · 시험**
+- `test_m0diff` 틱당 명령 예산 초과(아를레키노 S1 보고 R6): proto +6.57 · 나비 +6.70 · 역장 +6.98 > 6.5(D0 에서 이미 +6.54 /
+  +6.65 / +6.92; 파수꾼 +5.93 통과). 예산을 올릴지 비용을 줄일지 정하지 않았다.
+- 그 밖에 이미 알려진 실패(새 변경 탓 아님): `test_m0diff` B, `test_px` 4e, `gen_check` 9(원인: 복사본의 `boss/test/*` 가 하드
+  링크라 복사본에서 돈 `build_mboss_core.py` 가 시험한 트리의 그 13개 파일을 제자리에서 다시 씀 — 같은 바이트, 새 mtime. 11-03 에
+  `gen_check.py` 의 `REAL_DP` 와 세 `cmsim.variant` 의 `real` 에 `boss/test` 를 넣어 고쳤으나 아직 다시 돌려 확인하지 않음: 다음에
+  `gen_check` 를 돌려 9 가 통과하면 이 항목을 지운다), `ident`(22ba247 · S1-CM 파일 목록에 고정돼 낡음: 11-02 트리에서 10개 실패 —
+  `ident` 의 검사 1 넷 · 3a · 3b · 4a~4d; 기준을 다시 만들기 전에는 신호가 없음), 검사기 refs / macro 의 알려진 종류. 야타용왕
+  `az/tests/test_wire_az.py` 의 H2 / H3 은 1챕터만 라우팅된다고 가정해 낡았다(옮기지 않은 스위트).
+- 나루카미 시험의 `--strict` 아틀라스 예산표(`rd/tests/plan_table.json` 의 stitched 11.0 M; 원본 `plan_table_src.py` 는 12.5 M 인데
+  JSON 을 다시 만들지 않음)가 낡아 지금(12.63 M)은 `--strict` 가 실패한다. 게이트는 13.2 M(옮기지 않은 스위트).
+- `items.json` 의 소스 **순서**가 생성기를 돌린 순서에 따라 바뀐다(항목은 같음): 1 · 2 · 3챕터 몹 리그 생성기와
+  플레이어 리그의 블록 별칭은 자기 항목을 지우고 끝에 다시 붙인다. 게임에는 상관없고, RP 해시 비교는 같은 순서로 두 번 돌릴 때만
+  맞다(타키 검토에서 미룸).
+
+**이전 보스에서 남은 것**
+- 나루카미 「천수의 속박」 마지막 세 겹 고리가 가끔 안 보이던 것: 원인을 추정(카드 대기 3틱)해 고쳤으나 모의기로 재현이 안 됨 —
+  게임 확인을 부탁한 상태(10-22).
+- 아펩 공정성 표 34줄 중 5줄 미달(10-22 마지막 분석): P3 서 있는 플레이어 1.17 × 파수꾼(목표 0.72~1.08), 싸움 전체 잃는 체력
+  근접 466.5 % · 원거리 347.6 %(목표 334 · 252 이하), 정면 대 뒤 차이 12.3 %(목표 25 % 이상), 가장 센 활로 2단계 29.3초(30초 이상).
+- 야타용왕 공정성 24줄 중 3줄 미달(FAIR-21 위치에 따른 차이 없음, FAIR-16 법구 처치 시간 비율 0.61 < 0.75) — 계획 담당자 결정으로 미룸.
+
+### 0-10. 버전 기록 (최신이 위; 빌드 도장 · 대표 커밋)
+- **11-03** 아를레키노 수정 — 빌드 도장 `96884f2`(코드 `911512f`, 그 뒤 인수인계 문서 커밋):
+  죽음의 칼날의 큰 칼날 넷이 십자선을 따라 가운데로 날아와 타격 틱에 플레이어 자리에서 터지고, 지나간 자리에 진홍 가시가 솟음(전에는
+  칼날이 서 있기만 하고 피해만 들어옴; 경기장 밖에 서던 칼날은 걷는 원 안으로 당김), 등장 모션 · 2단계 전환에서 낫이 안 보이다 갑자기
+  생기던 문제(클립 look), 붉은 달의 낫이 돌아올 때 남쪽으로 날아가던 문제(summon 은 yaw 0), 2단계 모습 바꿈을 가리는 진홍 불꽃 고치
+  (`shroud` · `shroud_burst`), 효과 킷 `fly()` 가 수평 아래로 날리는 카드를 거부(게임이 pitch 를 ±90 으로 자름);
+  인수인계 문서(이 0장 · 리소스팩 README)와 `tools/dev/`(로드 검사 · 리소스팩 검사 · 재생성 · 시험 도구 · 계획 문서) 추가 — loadcheck 는
+  팩 · 태그를 건너뛴 서버도 실패로 잡고(exit 2) 함수 로드 실패면 exit 1; 문서 검토(독립 검토 넷 + 반박 검증)에서 확인된 25건을 고침
+- **11-02** 아를레키노 · 4챕터 — `0f1368d`(D0 `eb0a38a` → S1 `da5389e` · S1K `acdf924` · S2 `53a2d80` · S3 `056d1cd` · S4 `9d73abc` →
+  I1 `9245812` → S5 `f98f38b`): 4챕터 보스 아를레키노(두 페이즈, 생명의 계약 · 선혈의 충격, 경기장 `fl_ruins`), 4챕터 라우팅, 틀 FN-1 · FN-3
+- **10-30d** 타키 얼굴 수정 — `fc21fe4`(`762825d` 얼굴 면을 머리카락 안으로)
+- **10-30c** 타키 조정 · 문 높이 — `43ce51c`(`a007994` 플레이테스트 수정: 블링크 대기 · 연속기 착지 · 거리 좁히기 · 공중 시간 · 크기 ·
+  얼굴 · 초승달; `9d2f26c` 모든 구역 같은 바닥 높이, 문은 바닥 높이)
+- **10-30b** 타키 · 균열 — `c13de38`(`fb314e1` 검토 수정: 단계 건너뜀 · 균형 · 보상 레벨 · 모델 · 베기 호)
+- **10-30** 타키 · 균열(검토 전) — `ff0e359`(`d00b242` I1: 특수 보스 타키 + 균열 켬)
+- **10-29d** 균열(시험용 보스) — `f58d147`(`f17879e` 특수 보스 틀 `mboss/sp` + 방 균열 `room/rift`, 대역 `spproto`)
+- **10-29c** 무기 방향 수정 — `72ecf78`(`f0374c7` 2챕터 무리 몹의 칼 · 창 · 북채를 바로 쥠)
+- **10-29b** 3챕터 잡몹 — `3e0d4aa`(`ed097fc` 무리 · `1120ffb` 정예 · `585df16` 연결)
+- **10-29** 명령어 help — `523d842`(`7163c4c` id 를 받는 명령의 `{id:"help"}` 목록)
+- **10-28** 2챕터 잡몹 — `f109efe`(`07871b4` 무리 · `c715a14` 정예 · `65fe412` 연결)
+- **10-24** 포영 검기 모양 수정 — `a09476b`(`c1c6eb9` 검기는 대각 초승달 하나)
+- **10-22j** 라이덴 계수 하향 — `ede9f4c`(피해 배율 0.8 → 0.5)
+- **10-22i** 만겁 보호막 베기 — `d8d12b4`(`1a5cf3b` 칼이 보호막을 긁고 침)
+- **10-22h** 만겁 팔 펴서 베기 — `b03465a`(`b3bec7b`)
+- **10-22g** 라이덴 · 아펩 수정 — `c1e10b6`(`b7ad0ec` = 10-22f 아펩 P4 · Q2, `93f4714` Q2 장판 1 %/10틱, `33a0ed0` 라이덴 피해 −20 % ·
+  만겁 휩쓸기 · 가드 브레이크 빛 · 갑주 전 처치 창 · 포영 초승달 하나)
+- **10-22e** 리소스팩 텍스처 수정 — `377688c`(아펩 생명체 그림 이름 소문자; `rplint` 시작)
+- **10-22d** 아펩 · 3챕터 — `9e5c578`(가지 안 도장 10-22b `0f4c88e`; `6395bb6` 챕터 보스를 `boss/<id>/` 로, `rlk:boss/test` 별칭)
+- **10-22c** 라이덴 텐마 갑주 · 일심정토 — `4641797` + `46ae53a`(경기장 병합)
+- **10-22b** 라이덴 동작 · 순간이동 · 분신 — `e8f6595`(wip/rd-sync 병합)
+- **10-22a** 라이덴 보호막 · 만겁 수정 — `b01df2d`
+- **10-22** 라이덴 개편 — `8376be6`(영상 v1–v9 기준 새 리그 · 효과 킷 · 패턴; `fef7e90` 제거 정리)
+- **10-21d** 보스 팁 정리 — `d765bab`(중간보스 셋의 공략 문구 지움)
+- **10-21c** 야타용왕 버그 수정 — `3086d1e`(묻힌 돌진 · 가라앉는 아바타 · 점프 문구 · 팁; `6f051b4` 킷 글꼴이 기본 글꼴로 이어짐)
+- **10-21b** 야타용왕 AI 수정 — `11b0756`(음수 `remove` 리터럴 → 게임이 함수를 거부; loadcheck 시작)
+- **10-21** 야타용왕 · 1챕터 — `bcb3083`(`2a59b10` 1챕터 라우팅; 챕터 보스 틀 AZ-CM)
+- **10-20** 예고 · 계수 조정 — `22ba247`(바닥 예고는 영상에 있는 공격만, 역장 발생 장치 피해 × 1.5)
+- **10-19** 역장 발생 장치 — `99bc097`(세 번째 중간보스)
+- **10-19** 나비 조정 — `5556c79`(치명 피해 보상, 예고 약 25 % 짧게, 해제 계기 누적)
+- **10-18** 달빛 환영 나비 — `7a6dc4f`(두 번째 중간보스)
+- **10-18** 이동 · 상자 — `d467e3c`(휘두르는 동안 멈추지 않고 느려짐, 아이템 상자 수정, 2챕터 집 안 스폰 막기)
+- **10-17** 중간보스 — `002c327`(중간보스 틀 + 파수꾼・타락, 처치하면 아이템 상자 2개)
+- **10-17** 나비아 — `2af2c02`(나비아 리그 · 동작 · 금빛 카드, 무기를 등에 멤)
+- **10-16** — `85686b0`(아를레키노 5타 앞구르기, 스커크 5타)
+- **10-15b** — `c7021ae`(인벤토리 18칸, 노드 맵 선택, 주사위, 상점 · 나무뿌리 · 인챈트 노드, 강화 별, 계수 엔진)
+- **10-15** — `c52be1e`(26.3 로드 오류 · 콘솔 정리, 나루카미 체력 2/3)
+- **10-14d** — `ab14be9`(모션 2차: 스커크 일곱빛 섬광 · 대시)
+- **10-14c** — `f1926d8`(미니맵 방향 화살표 · 보스 구역 숨김, 지도 아이템 없앰)
+- **10-14b** — `911fabc`(보스바 숫자를 기본 글꼴로)
+- **10-14** — `3740784`(미니맵 왼쪽 위, 빌드 도장 시작; 10-13 리소스팩 보스바 · 글꼴 미니맵)
+- 그 전(도장 없음): 10-08 첫 커밋 `16508dd`, 10-10~13 나루카미 보스 · 밸런스 · 대쉬 · 미니맵.
+
 ## 시작하기
 1. 서버를 켜거나 `/reload` → `[로그라이크] 시스템 로드 완료` 메시지 확인
 2. 시스템을 적용할 플레이어에게 태그 부여: `/tag @s add player` (아무에게도 없으면 접속한 한 명에게 자동으로)
@@ -438,8 +1000,8 @@ id 를 외워야 하는 시험 · 지급 명령은 그 인자 자리에 `"help"`
 - 직접 맵 넘기기(테스트): `/data modify storage rlk:room next set value [11,4]` → `/scoreboard players set #mapType room 1` → `/function rlk:run/next_map` (노드 = 구역 종류 번호)
 
 ## 11. 캐릭터 (`char/`)
-- 캐릭터는 하나를 골라 플레이합니다(교체 없음). 선택: `/function rlk:char/select {id:"lumine"}` — 지금은 기본 캐릭터 **루미네**만 있습니다. 캐릭터 id 목록: `{id:"help"}`.
-- 캐릭터마다 무기 타입(한손검 `sword` / 활 `bow` / 법구 `catalyst`) 하나가 고정입니다. **지금은 한손검의 기본 공격만 구현**되어 있습니다.
+- 캐릭터는 하나를 골라 플레이합니다(교체 없음). 선택: `/function rlk:char/select {id:"lumine"}` — 등록된 캐릭터는 8명(루미네(기본) · 요이미야 · 스커크 · 클로린드 · 아를레키노 · 나비아 · 로노바 · 네페르, `char/setup`)입니다. 캐릭터 id 목록: `{id:"help"}`.
+- 캐릭터마다 무기 타입(`weaponType`) 하나가 고정입니다: 한손검 `sword`(루미네 · 스커크 · 클로린드) / 활 `bow`(요이미야) / 장병기 `polearm`(아를레키노) / 양손검 `claymore`(나비아) / 법구 `catalyst`(로노바) / `kick`(네페르: 무기 이름은 법구지만 발차기). `char/load_cur` 가 이를 `#wType`(`bow` 2 · `catalyst` 3 · 나머지 1)으로 바꾸고 `combat/on_attack` 이 평타를 나눕니다: 1 은 근접 틀 `combat/find`(스커크 · 아를레키노 · 나비아는 리그 동작 `char/motion/combat/request`, 나머지는 `combat/find_immediate` — 네페르의 발차기 · 환영극도 그 안에서 갈라짐; 클로린드는 `#clShoot 1` 인 동안 `char/clorinde/auto_toggle`), 2 는 `char/bow/*`(`na`, 조준 중이면 `release`), 3 은 `char/ronova/na`.
 - 인벤토리 0번 칸 = 캐릭터 정보(플레이어 머리, 캐릭터 스킨). 핫바 1번 = 원소전투 스킬, 2번 = 원소폭발.
 - **원소전투 스킬**: 재사용 대기로 동작. 대기 중에는 아이템이 회색 염료로 바뀌고 개수 = 남은 초.
 - **원소폭발**: 원소 에너지가 필요량만큼 차야 사용(사용하면 0). 아이템 이름 = `(이름) - [|||||||||||||||] 40/60pt`, 가득 차면 반짝임.
@@ -523,7 +1085,7 @@ id 를 외워야 하는 시험 · 지급 명령은 그 인자 자리에 `"help"`
 
 ## 나루카미 보스전 (`boss/raiden/`)
 
-- 모든 스테이지의 임시 보스를 **마가츠 미타케 나루카미노 미코토**로 통일합니다(단, **1챕터 보스 맵은 이제 야타용왕**: 아래 "챕터 보스" · "야타용왕"; 2챕터 · 4챕터 이후는 그대로 나루카미이고, 3챕터는 아펩이 들어올 때까지 나루카미). 보스방을 새로 생성할 때 중앙 `(0,201,0)`, 보행 반경 23칸의 평평한 원형 필드(아래 "경기장": 일심정토)와 남쪽 입구를 만듭니다. `boss_id:"narukami"`인 방에만 장식·지형 굴곡·중앙 무늬·바닥 변환을 생략합니다. 다른 방의 생성 규칙은 유지합니다.
+- 모든 스테이지의 임시 보스를 **마가츠 미타케 나루카미노 미코토**로 통일합니다(단, **1챕터는 야타용왕 · 3챕터는 아펩 · 4챕터는 아를레키노**: 아래 "챕터 보스"; 2챕터와 5챕터 이후는 그대로 나루카미). 보스방을 새로 생성할 때 중앙 `(0,201,0)`, 보행 반경 23칸의 평평한 원형 필드(아래 "경기장": 일심정토)와 남쪽 입구를 만듭니다. `boss_id:"narukami"`인 방에만 장식·지형 굴곡·중앙 무늬·바닥 변환을 생략합니다. 다른 방의 생성 규칙은 유지합니다.
 - **리워크(영상 v1-v9 기준)**: 모델과 패턴을 참고 영상과 위키에 맞춰 새로 만들었습니다. 예전 판(52개 디스플레이, 25개 모션 상태, 7+8 패턴, 심판 리그, 카메라 고정)은 모두 대체되었고, 아래 "2026-10-10 수정"의 나루카미 기록은 예전 판의 것입니다.
 
 **모델**
@@ -883,7 +1445,7 @@ id 를 외워야 하는 시험 · 지급 명령은 그 인자 자리에 `"help"`
 
 ## 챕터 보스 (`mboss/cb/` · `mboss/ar/` · `mboss/px/`, AZ-CM)
 
-챕터 마지막 **보스 맵**에서 나루카미 대신 나오는 **챕터 보스**의 틀. 중간보스 틀(위 "중간보스") 위에 얹혀서, 등록 · 경기장 · 문 · 보상 · 정리만 다르고 바닥 공격 · 투사체 · 이동 · 보스바 같은 라이브러리는 그대로 쓴다. 첫 챕터 보스는 **야타용왕**(`azhdaha`, 1챕터)이다. 검증(VERIFY)을 마치고 `enabled:true` · `route:true` 가 되어 **1챕터의 보스 맵은 야타용왕**으로 간다(아래 "야타용왕"). 3챕터 보스 **아펩의 오아시스 파수꾼**(`apep`, `ch [3]`)도 AP-I2 부터 `route:true` 라 **3챕터의 보스 맵은 아펩**이다(아래 "아펩"). 2챕터와 4챕터 이후의 보스 맵은 나루카미다. 4챕터 보스 **아를레키노**(`arlecchino`, n 12, `ch [4]`, `boss/arlecchino/`)는 레지스트리와 경기장(`fl_ruins`)이 들어 있지만 통합(I1)에서 `enabled` · `route` 를 켤 때까지 꺼져 있다: **I1 부터 4챕터의 보스 맵은 아를레키노**(2 · 5챕터 이후는 그대로 나루카미). 틀 점검용 **시험용 수호자**(`cproto`, 어느 챕터에도 배정되지 않음)도 테스트 명령으로만 나온다.
+챕터 마지막 **보스 맵**에서 나루카미 대신 나오는 **챕터 보스**의 틀. 중간보스 틀(위 "중간보스") 위에 얹혀서, 등록 · 경기장 · 문 · 보상 · 정리만 다르고 바닥 공격 · 투사체 · 이동 · 보스바 같은 라이브러리는 그대로 쓴다. 첫 챕터 보스는 **야타용왕**(`azhdaha`, 1챕터)이다. 검증(VERIFY)을 마치고 `enabled:true` · `route:true` 가 되어 **1챕터의 보스 맵은 야타용왕**으로 간다(아래 "야타용왕"). 3챕터 보스 **아펩의 오아시스 파수꾼**(`apep`, `ch [3]`)도 AP-I2 부터 `route:true` 라 **3챕터의 보스 맵은 아펩**이다(아래 "아펩"). 4챕터 보스 **아를레키노**(`arlecchino`, n 12, `ch [4]`, `boss/arlecchino/`, 경기장 `fl_ruins`)도 I1(11-02)부터 `enabled` · `route` 가 true 라 **4챕터의 보스 맵은 아를레키노**다. 2챕터와 5챕터 이후의 보스 맵은 나루카미다. 틀 점검용 **시험용 수호자**(`cproto`, 어느 챕터에도 배정되지 않음)도 테스트 명령으로만 나온다.
 
 
 **모듈 위치**: 챕터 보스 모듈의 함수는 `rlk:boss/<id>/`(야타용왕 `boss/azhdaha/`, 아펩 `boss/apep/`; 나루카미는 원래부터 `boss/raiden/`)에 있다. 레지스트리 항목의 `"fn": "boss/<id>"` 가 그 뿌리를 정하고(없으면 `mboss/<id>`, `tools/mboss_lib.py` 의 `fn_root` / `fn_root_of`), 코어의 디스패처 · `cb/pp` · `cb/inc` · 판정 프록시의 리그 호출 · 모듈 생성기 · 효과 도구 · 리그 / 생명체 모델 생성기 · `check_mboss_pack.py` 가 모두 그 값을 읽는다. 함수만 옮겼고 엔티티 태그 · 점수판 · 저장소 · 리소스팩 경로(`rlk:mboss/azhdaha/…` 아이템 모델 등)는 그대로라 기존 월드가 그대로 돈다. 공용 엔진(`mboss/` 코어 · `cb/` · `hz/` · `px/` · `mv/` · `test/` …)과 중간보스 셋 · `proto` · `cproto` 는 `mboss/` 에 남는다. `boss/raiden` 과 `boss/test` 는 예약(레지스트리 검사).
@@ -900,7 +1462,7 @@ id 를 외워야 하는 시험 · 지급 명령은 그 인자 자리에 `"help"`
 
 ### 레지스트리 v2 (`tools/mboss_registry.json`)
 - 항목에 `kind`("mid" 기본 / "chapter"). 챕터 항목만: `ch`(배정 챕터 목록), `route`(실제로 그 챕터를 가져갈지), `arena`(경기장 id), `music`, `res`(원소별 저항), `phases`(체력 나눔 %, 합 100), `px`(판정 프록시), `pxBase`(프록시 UUID 아래 바이트 시작), `shield`(클릭 판정 상자). 켜진 `route:true` 항목 둘이 같은 챕터를 가질 수 없다(`mboss_lib.load_registry` 가 막음).
-- `arenas{}`: 경기장마다 `n`(= `#mbAr`, 광장은 0) `theme ver cx cy cz r walk safe start box looks`(+ `oob`, `sweep`). `box` 는 청크 256개 이하이고 다른 경기장 · 던전 · 로비 · 아이템 방 · 광장의 고정 청크와 겹칠 수 없다(`mboss_lib.load_registry` 가 막음: 한쪽 고정을 풀면 다른 쪽도 풀리므로). 지금 `az_cavern`(n 1, 테마 모듈은 S1-ARENA 몫: 이 가지에는 없어 **대역 함수**만 생성) · `cp_test`(n 9, `tools/mboss_arena_cp_test.py`). `ap_oasis`(n 2, 아펩; 테마 모듈 `mboss_arena_ap_oasis.py` 는 AP-ARENA 몫이라 이 가지에는 없어 **대역 함수**만 생성). `fl_ruins`(n 4, 아를레키노, `tools/mboss_arena_fl_ruins.py`, 모습 `day` · `crimson`; 값은 `tools/mboss_arlecchino/api.py` 의 `ARENA_SPEC` 그대로).
+- `arenas{}`: 경기장마다 `n`(= `#mbAr`, 광장은 0) `theme ver cx cy cz r walk safe start box looks`(+ `oob`, `sweep`). `box` 는 청크 256개 이하이고 다른 경기장 · 던전 · 로비 · 아이템 방 · 광장의 고정 청크와 겹칠 수 없다(`mboss_lib.load_registry` 가 막음: 한쪽 고정을 풀면 다른 쪽도 풀리므로). 지금 `az_cavern`(n 1, 야타용왕, `tools/mboss_arena_az_cavern.py`) · `ap_oasis`(n 2, 아펩, `tools/mboss_arena_ap_oasis.py`) · `tk_lift`(n 3, 타키, `tools/mboss_arena_tk_lift.py`) · `cp_test`(n 9, `tools/mboss_arena_cp_test.py`)(테마 모듈이 없는 경기장은 **대역 함수**만 생성된다). `fl_ruins`(n 4, 아를레키노, `tools/mboss_arena_fl_ruins.py`, 모습 `day` · `crimson`; 값은 `tools/mboss_arlecchino/api.py` 의 `ARENA_SPEC` 그대로).
 - 저장소: 중간보스는 `reg[]` · `byid`, 챕터 보스는 `creg[]` · `cbyid`(+ `#mbCN`). 중간보스 뽑기는 챕터 보스를 절대 보지 않는다.
 
 ### 경기장 (`tools/build_mboss_arena.py` → `mboss/arena/<aid>/*`, 코어 → `mboss/ar/<aid>/*`)
@@ -939,7 +1501,7 @@ id 를 외워야 하는 시험 · 지급 명령은 그 인자 자리에 `"help"`
 머리 · 꼬리 두 프록시(`core` 폭 2 · `tail` 폭 1.2), 클립 4개(`idle` · `sweep` 꼬리 휘두르기 · `sink` 가라앉기 · `rise`), 두 단계(60% / 40%, 1단계 바닥 → 2단계 체력 · 제목 · 음악 · 20틱 연출), 패턴 셋(예측 조준 강타 · 밀어내는 고리 · 마스크). 모든 틀 기능을 한 번씩 쓰는 모듈 예시이고, 입구는 `cp_test` 의 것.
 
 ### 아펩의 오아시스 파수꾼 `apep` (`boss/apep/`, 3챕터 보스, `tools/build_mboss_apep.py`)
-원신의 아펩의 오아시스 파수꾼. 레지스트리 `apep`(n 11, `kind` chapter, `ch [3]`, **`route` true**(AP-I2): 3챕터 보스 맵이 아펩이고, 1챕터는 야타용왕, 2챕터와 4챕터 이후는 나루카미) · 경기장 `ap_oasis`(n 2) · 체력 290 · 공격 12 × 150% · 저항 풀 30% / 나머지 10%(`res {"7":30,"*":10}`; 증식 생명체는 풀 20% / 나머지 10%) · 체력 나눔 53 / 47% · 프록시 11개(`pxBase` 65) + 몸통 클릭 판정(`shield`) · 음악 세 단계(바닐라 무작위 곡 묶음: 깊은 어둠 · 영혼 모래 골짜기 · 무성한 동굴). 런 없이 바로 싸우려면 `/function rlk:boss/test/chapter {id:"apep"}`. 보상은 챕터 보스 경제(금화 × 15 × 챕터, 사파이어 조각 2개, 아이템 상자 없음)와 다음 챕터 오브젝트.
+원신의 아펩의 오아시스 파수꾼. 레지스트리 `apep`(n 11, `kind` chapter, `ch [3]`, **`route` true**(AP-I2): 3챕터 보스 맵이 아펩이고, 1챕터는 야타용왕, 4챕터는 아를레키노, 2챕터와 5챕터 이후는 나루카미) · 경기장 `ap_oasis`(n 2) · 체력 290 · 공격 12 × 150% · 저항 풀 30% / 나머지 10%(`res {"7":30,"*":10}`; 증식 생명체는 풀 20% / 나머지 10%) · 체력 나눔 53 / 47% · 프록시 11개(`pxBase` 65) + 몸통 클릭 판정(`shield`) · 음악 세 단계(바닐라 무작위 곡 묶음: 깊은 어둠 · 영혼 모래 골짜기 · 무성한 동굴). 런 없이 바로 싸우려면 `/function rlk:boss/test/chapter {id:"apep"}`. 보상은 챕터 보스 경제(금화 × 15 × 챕터, 사파이어 조각 2개, 아이템 상자 없음)와 다음 챕터 오브젝트.
 
 #### 싸움의 흐름
 - **등장 E**(110틱, 무적): 시든 오아시스의 웅덩이에서 몸이 솟고, 가운데 9칸 위에 덩굴손이 쥔 「오아시스의 심장」이 매달려 있다가 70틱에 나무 꼭대기로 끌어올려진다(그 뒤 천천히 흔들림). 30틱에 제목, 100틱에 포효.
@@ -1353,11 +1915,13 @@ R2 에서 다시 × 0.83(35 / 50 / 68 / 85 → 위 값, 충전 6연격의 내려
   멀리 있으면(14칸 밖 40틱) 돌진 / 도약으로 거리를 좁힌다(블러드 돌진 60 % / 불꽃 도약).
 
 ### 진행 (단계 · 바닥 · 전환)
-등장(150틱, `seq/intro`: 홍차 → 잔이 불씨로 · 정령들이 가장자리로 → 손바닥에서 낫이 자람 → 회전 · 자세; 80틱 이름 「아를레키노」 /
+등장(150틱, `seq/intro`: 홍차 → 잔이 불씨로 · 정령들이 가장자리로 → 60틱 손바닥에서 낫이 자람(클립 look `weapon_r/hand`) → 회전 · 자세; 80틱 이름 「아를레키노」 /
 우인단 집행관 서열 4위, 136틱 음악 1, 140틱 밀어내기 고리, 무적) → **P1a**(그 단계 체력의 70 % 바닥) → 바닥에 닿으면 다음 판단 때
 **재가 된 만상**(110틱: 떠오름 · 붉은 웅덩이 · 70틱 강제 부여 + 회복구슬 · 날개; 70틱까지 무적, 그 뒤 바닥 1) → **P1b**(≤ 70 % 패턴 추가)
 → 바닥 1 에 닿으면 다음 판단 때 **전환 T**(180틱, 무적 + 연출: 무릎 · 진홍 기둥 · 50틱 암전 동안 경기장 `crimson` · 90틱 2단계 모습 ·
-날개 다리 · 쌍낫; 140틱 전체의 36 % 로 체력 나눔 · 「두 세계 불의 잔재」 / 페르엘 · 음악 2) → **P2**(낙하 공격부터, 바닥 0) → 쓰러짐
+날개 다리 · 쌍낫; 82틱부터 진홍 불꽃 고치(`shroud`: 반지름 1.35칸에 불꽃 막 10장씩 4단, 1.1–4.25칸 높이 — 공중에 뜬 몸과 팔(축에서 1.2칸)까지 덮음)가
+몸을 감싸 90틱 모습 바꿈을 가리고(90틱 섬광 · 칼날 파편 `shroud_burst`), 95–111틱 아래 단부터 3틱 간격으로 타서 사라지는 동안 2단계 모습이 고치 위로 솟아 나옴;
+130틱 왼손 낫이 손에서 자람; 140틱 전체의 36 % 로 체력 나눔 · 「두 세계 불의 잔재」 / 페르엘 · 음악 2) → **P2**(낙하 공격부터, 바닥 0) → 쓰러짐
 (`seq/death`, 110틱, 대사 없이 낫을 거두고 불꽃으로 사라짐; 그녀가 건 계약은 회수). 바닥에 닿는 타격은 거기서 멈추고 단계 전환은 하던
 패턴이 끝난 다음 판단 때 시작한다(재가 된 만상은 한 번).
 
@@ -1365,12 +1929,12 @@ R2 에서 다시 × 0.83(35 / 50 / 68 / 85 → 위 값, 충전 6연격의 내려
 | 패턴 | 언제 | 내용 (틱 = 클립 이벤트) |
 |---|---|---|
 | A 사형장으로의 초대 | 가까이 (7칸 안) | > 70 %: 2타(14 · 24, 부채꼴 4.2칸 T2). ≤ 70 %: 4 / 5타(T1 · T1 · 44 회전 원 4.6 T2 · 64 내려찍기 + 앞 2.6칸 폭발 T2 · 84 회전 원 4.8 T2) |
-| B 붉은 달의 낫 | 중간 / 멀리 | 28틱 불꽃 바퀴(반지름 1.1, 1.5칸/틱, 16칸 갔다가 돌아옴: 가는 길 · 오는 길 따로 T2). ≤ 70 %: 두 번(두 번째는 예측 조준) 뒤 96틱 손아귀(80틱에 자리 고정, 92틱 발톱 카드, 원 2.2 T2 생명의 계약) |
+| B 붉은 달의 낫 | 중간 / 멀리 | 28틱 불꽃 바퀴(반지름 1.1, 1.5칸/틱, 16칸 갔다가 그녀를 겨눠 돌아옴: 가는 길 · 오는 길 따로 T2). ≤ 70 %: 두 번(두 번째는 예측 조준) 뒤 96틱 손아귀(80틱에 자리 고정, 92틱 발톱 카드, 원 2.2 T2 생명의 계약) |
 | C 불꽃 도약 | 중간 / 멀리 | 8틱 9칸 도약 → 꼭대기에서 다가옴 → 44틱 고정 → 54틱 착지(원 3.6 + 앞 6칸 띠 T3). ≤ 70 %: 90틱 날개 일격(부채꼴 5.6 T2 생명의 계약, 78틱 날개 펼침) |
 | D 블러드 돌진 | 중간 / 멀리 | 26틱 돌진(플레이어 자리 + 1.5칸, 최대 14칸, 지나가는 띠 + 30틱 끝 부채꼴 T2). ≤ 70 %: 맞았거나 5칸 안이면 46틱 추가타(원 3.2 + 올려베기 T2) |
 | E 와리가리 베기 | ≤ 70 % | 뒤로 10–12칸 · 2.5칸 위 → 좌우 4칸 돌진 5번 → 64 고정 → 70 내리꽂기 → 76 부채꼴 5.2 · 92 회전 원 4.2(T2) |
 | F 붉은 피의 연회 | ≤ 70 %, 일정 | 22 강제 부여 + 회복구슬, 22–159 파훼 창, 가운데로, 110 물결 → 160 경기장 전체 T2 · 196 전체 T2(둘 다 생명의 계약, 대시로 피함) |
-| G 죽음의 칼날 | ≤ 70 % | 플레이어 자리 중심 십자(팔 14칸, 큰 칼날 넷): 34 띠 28 × 3 둘 → 40 다시 고정, X 자 → 62 → 70 가장자리 칼날 12개 → 104 전체 T1(모두 생명의 계약) |
+| G 죽음의 칼날 | ≤ 70 % | 플레이어 자리 중심 십자(팔 14칸, 큰 칼날 넷 — 팔 끝이 걷는 원(반지름 26.5) 밖이거나 발 · 머리 칸이 막혔으면 10.5 / 7 / 3.5칸으로 당겨 서고, 다 안 되면 그 팔은 칼날 없음). 두 타격 모두 4틱 전부터 칼날이 십자선을 따라 틱당 3.5칸씩 가운데로 날아와(`blade_fly` 소리, 같은 검사를 지나는 자리로만) 타격 틱에 플레이어 자리에서 만나 터지고 사라지며, 지나간 자리에 진홍 가시가 1.15칸 간격으로 솟는다(`cross_thorns`, 걷는 원 안만): 34 띠 28 × 3 둘 → 40 다시 고정, X 자 → 62 → 70 가장자리 칼날 12개 → 104 전체 T1(모두 생명의 계약) |
 | H 연옥 그림자 분신 | ≤ 70 % | 뒤 6칸 · 7칸 위의 거미줄 → 20 분신 둘이 고정된 자리로 → 34 교차 베기(띠 10 × 2 둘, 생명의 계약) → 58 날개 펼침 → 64 플레이어 앞 3칸으로 → 72 날개(부채꼴 6.0, 생명의 계약) → 84 다시 겨눠 베기(5.0, 이 타만 밀침) |
 | 재가 된 만상 | 70 % 바닥 | 위 "진행" |
 | Q0 낙하 공격 | 2단계 처음 | 플레이어에게서 14칸 · 10칸 위 → 플레이어가 1.5칸 움직이거나 80틱 → 20틱 진홍 줄기로 내리꽂아 플레이어 앞 1.5칸 착지(원 3.0 T2) → 28 칼날 분출(고리 3–7 T2), 둘 다 생명의 계약 |
@@ -1400,7 +1964,7 @@ S4 `p/<P2>/`(`p2.py`), S2 `seq/`(`seq.py`); `rig/` · `fx/` 는 건드리지 않
 리그 `tools/build_arlecchino_rig.mjs`(S2) · 효과 `tools/build_mboss_kn_fx.py`(S1K) · 경기장 `tools/mboss_arena_fl_ruins.py`(S1). 없는 단계는
 대역으로 돈다(리그 → `rig_stub/**`, 효과 → 바닐라 입자 · 소리, 2단계 패턴 → 고르지 않음, 시퀀스 → `core/sq/**`). 생성 순서: 코어 → 경기장 →
 `build_cboss_rooms.py` → … → 리그 · 효과 → **`build_mboss_arlecchino.py`** → `check_mboss_pack.py`. 두 번 돌려도 같은 바이트.
-시험(스크래치패드 `ar/tests/`): `test_arlecchino.py`(훅 · 단계 순서 · 바닥 · 생명의 계약 · 선혈의 충격 · 일반 공격 판정 · 파훼 · 그로기 ·
+시험(`tools/dev/sim/ar/tests/`, 옛 스크래치패드 `ar/tests/`): `test_arlecchino.py`(훅 · 단계 순서 · 바닥 · 생명의 계약 · 선혈의 충격 · 일반 공격 판정 · 파훼 · 그로기 ·
 회복구슬 · AI · 멈춤 / 리로드 · 정리 · 틱 비용) · `pat_p1.py`(1단계 패턴의 타격 틱 = 클립 이벤트 · 예고 · 모양 · 넉백 · 바닥 표시 · 끝점 ·
 매 틱 취소) · `pat_p2.py`(2단계 같은 항목 + 빔 · 처형 · 깃털 · 낙하 조건) on `ar/s3/lib/knsim.py`; `test_rig.py` · `test_kit.py` · `test_cm_ar.py` · `test_arena_fl.py`.
 
