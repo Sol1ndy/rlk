@@ -4,5 +4,6 @@ execute if score #mbAr mb matches 1 run return run function rlk:mboss/ar/az_cave
 execute if score #mbAr mb matches 2 run return run function rlk:mboss/ar/ap_oasis/ensure
 execute if score #mbAr mb matches 3 run return run function rlk:mboss/ar/tk_lift/ensure
 execute if score #mbAr mb matches 4 run return run function rlk:mboss/ar/fl_ruins/ensure
+execute if score #mbAr mb matches 5 run return run function rlk:mboss/ar/hr_field/ensure
 execute if score #mbAr mb matches 9 run return run function rlk:mboss/ar/cp_test/ensure
 return fail

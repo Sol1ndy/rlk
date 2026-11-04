@@ -10,5 +10,6 @@ execute in minecraft:overworld run function rlk:mboss/ar/az_cavern/fl_off
 execute in minecraft:overworld run function rlk:mboss/ar/ap_oasis/fl_off
 execute in minecraft:overworld run function rlk:mboss/ar/tk_lift/fl_off
 execute in minecraft:overworld run function rlk:mboss/ar/fl_ruins/fl_off
+execute in minecraft:overworld run function rlk:mboss/ar/hr_field/fl_off
 execute in minecraft:overworld run function rlk:mboss/ar/cp_test/fl_off
 execute in minecraft:overworld run function rlk:mboss/arena/ap_oasis/sweep {y0:201,y1:202}

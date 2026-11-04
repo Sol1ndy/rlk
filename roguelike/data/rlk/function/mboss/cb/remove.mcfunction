@@ -10,5 +10,7 @@ function rlk:mboss/arena/tk_lift/clear
 function rlk:mboss/ar/tk_lift/fl_off
 function rlk:mboss/arena/fl_ruins/clear
 function rlk:mboss/ar/fl_ruins/fl_off
+function rlk:mboss/arena/hr_field/clear
+function rlk:mboss/ar/hr_field/fl_off
 function rlk:mboss/arena/cp_test/clear
 function rlk:mboss/ar/cp_test/fl_off

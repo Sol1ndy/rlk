@@ -19,6 +19,7 @@ execute in minecraft:overworld run function rlk:mboss/ar/az_cavern/fl_off
 execute in minecraft:overworld run function rlk:mboss/ar/ap_oasis/fl_off
 execute in minecraft:overworld run function rlk:mboss/ar/tk_lift/fl_off
 execute in minecraft:overworld run function rlk:mboss/ar/fl_ruins/fl_off
+execute in minecraft:overworld run function rlk:mboss/ar/hr_field/fl_off
 execute in minecraft:overworld run function rlk:mboss/ar/cp_test/fl_off
 data remove storage rlk:mboss reg
 data remove storage rlk:mboss byid
@@ -50,6 +51,8 @@ data remove storage rlk:mboss built_tk_lift
 data remove storage rlk:mboss look_tk_lift
 data remove storage rlk:mboss built_fl_ruins
 data remove storage rlk:mboss look_fl_ruins
+data remove storage rlk:mboss built_hr_field
+data remove storage rlk:mboss look_hr_field
 data remove storage rlk:mboss built_cp_test
 data remove storage rlk:mboss look_cp_test
 scoreboard objectives remove mb
