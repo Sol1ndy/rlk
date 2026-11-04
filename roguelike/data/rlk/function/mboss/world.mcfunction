@@ -23,5 +23,6 @@ execute if score #mbMode mb matches 1 run function rlk:mboss/world_cm_post
 execute if score #mbHzOn mb matches 1 run function rlk:mboss/hz/all
 execute if score #mbPjOn mb matches 1 run function rlk:mboss/pj/all
 execute if score #mbPlOn mb matches 1 run function rlk:mboss/pull/all
-execute if score #mbSt mb matches 0..1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run function rlk:mboss/bars
+# hr FN-f: while the module keeps the bars off (#mbBarOff 1: mboss/bars_off, until mboss/bars_on) they are not redrawn
+execute if score #mbSt mb matches 0..1 unless score #mbBarOff mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run function rlk:mboss/bars
 function rlk:mboss/line/tick

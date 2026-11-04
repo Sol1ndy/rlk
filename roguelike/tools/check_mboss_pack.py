@@ -30,6 +30,14 @@
   pj/init_bol bodies; the objective mbBol; cleanup_fight's reset; no FN-1 name is ever set outright in F:mboss); a px:false
   chapter boss has no F:mboss/px/<id> tree; the arlecchino entry: its arena = api.ARENA_SPEC, no Pyro resistance
   (res {"*": 10}), px false + shield true, a music pool's len = mboss_lib.music_len
+- 홍련 S1 (scratchpad hr/contract.md 3.1): an enabled special that sets an optional hook flag
+  (mboss_lib.SPECIAL_OPT_HOOKS: rwHook -> reward) has that hook (not a macro), and F:mboss/sp/reward holds exactly those
+  entries' literal hook lines (mboss_lib.special_hook_line) between the sp/lvup line and #spPk (FN-b); the guarded 처치 /
+  winWord title lines (FN-a), test/swon's winWord line and the new test/swon_msg_w; death_finish's poof only unless
+  cur{poof:0b} (FN-c); the records carry winWord / poof:0b exactly where the registry sets them; FN-f: the wrappers
+  mboss/bars_off / bars_on are exactly "flag + bars_hide / bars_show", world skips mboss/bars while #mbBarOff is 1,
+  fight_vars and cleanup_fight clear it, no other F:mboss file touches it (bars_hide / bars_show stay flag-free), and
+  mboss_lib.bars(on) returns the one wrapper line
 Exit code 1 on any problem.
 """
 import re
@@ -49,6 +57,9 @@ def is_macro(rel):
 for b in L.enabled_bosses(REG):
     hooks = L.HOOKS + L.HELP_HOOKS + (L.CHAPTER_HOOKS if b.get('kind', 'mid') == 'chapter' else []) \
         + (L.SPECIAL_HOOKS if b.get('kind', 'mid') == 'special' else [])
+    # hr FN-b: an optional special hook is required once the entry sets its flag (rwHook -> reward)
+    if b.get('kind', 'mid') == 'special':
+        hooks = hooks + [h for f, h in L.SPECIAL_OPT_HOOKS.items() if b.get(f)]
     for h in hooks:
         rel = f'{L.fn_root(b)}/{h}'
         if rel not in funcs:
@@ -162,7 +173,8 @@ for b in specs:
         problems.append(f'special {b["id"]}: fights in the plaza (a special needs its own arena)')
 for f in ['mboss/sp/' + n for n in ('roll', 'prep', 'gate', 'start_zone', 'start', 'wait', 'ret_rift', 'won', 'won_kill',
                                      'won_cancel', 'clear', 'reward', 'lvup', 'forget', 'run_reset')] \
-        + ['mboss/test/' + n for n in ('rift', 'rift_id', 'rift_id_do', 'special', 'special_ch', 'help_special')] \
+        + ['mboss/test/' + n for n in ('rift', 'rift_id', 'rift_id_do', 'special', 'special_ch', 'help_special',
+                                        'swon_msg_w')] + ['mboss/bars_off', 'mboss/bars_on'] \
         + ['boss/test/' + n for n in ('rift', 'rift_id', 'special', 'special_ch')] \
         + ['room/rift/' + n for n in ('init', 'roll', 'arm', 'show', 'open', 'reopen', 'close', 'tick', 'enter', 'click',
                                        'forget', 'uninstall')] + ['room/obj/k_rift']:
@@ -228,6 +240,86 @@ if KN is not None:
     for ph, mu in KN.get('music', {}).items():
         if len(L.MUSIC_TRACKS.get(mu['ev'], [])) > 1 and int(mu['len']) != L.music_len(mu['ev']):
             problems.append(f'arlecchino: music {ph} {mu["ev"]} len {mu["len"]} != music_len {L.music_len(mu["ev"])}')
+# hr S1 (scratchpad hr/contract.md 3.1): FN-a the reward word, FN-b the optional reward hook, FN-c no poof, FN-f the
+# module's bars-off flag
+def _fn_lines(rel):
+    p = FN / (rel + '.mcfunction')
+    return p.read_text(encoding='utf-8').split('\n') if p.exists() else []
+
+
+def _record(txt, b):
+    """The SNBT record of entry b in F:mboss/register (balanced braces from '{id:"<id>",n:<n>,'), or ''."""
+    i = txt.find(f'{{id:"{b["id"]}",n:{b["n"]},')
+    if i < 0:
+        return ''
+    depth, q = 0, False
+    for j in range(i, len(txt)):
+        c = txt[j]
+        if q:
+            q = not (c == '"' and txt[j - 1] != '\\')
+        elif c == '"':
+            q = True
+        elif c == '{':
+            depth += 1
+        elif c == '}':
+            depth -= 1
+            if depth == 0:
+                return txt[i:j + 1]
+    return ''
+
+
+HR_FN_LINES = {
+    'mboss/sp/reward': [
+        'execute unless data storage rlk:mboss cur.winWord run title @a[tag=player] title [{nbt:"cur.title",storage:"rlk:mboss",interpret:true},{text:" 처치",color:"#FFE08A",bold:true}]',
+        'execute if data storage rlk:mboss cur.winWord run title @a[tag=player] title [{nbt:"cur.title",storage:"rlk:mboss",interpret:true},{text:" "},{nbt:"cur.winWord",storage:"rlk:mboss",color:"#FFE08A",bold:true}]'],
+    'mboss/test/swon': ['execute if score #mbKilled mb matches 1 if data storage rlk:mboss cur.winWord run return run function rlk:mboss/test/swon_msg_w with storage rlk:mboss tlast'],
+    'mboss/death_finish': ['execute unless data storage rlk:mboss cur{poof:0b} at @s run particle minecraft:poof ~ ~1 ~ 0.6 1 0.6 0.02 30 force @a[tag=player]', 'kill @s'],
+    'mboss/world': ['execute if score #mbSt mb matches 0..1 unless score #mbBarOff mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run function rlk:mboss/bars'],
+    'mboss/fight_vars': ['scoreboard players set #mbBarOff mb 0'],
+    'mboss/cleanup_fight': ['scoreboard players set #mbBarOff mb 0'],
+    'mboss/bars_off': ['scoreboard players set #mbBarOff mb 1', 'function rlk:mboss/bars_hide'],
+    'mboss/bars_on': ['scoreboard players set #mbBarOff mb 0', 'function rlk:mboss/bars_show'],
+}
+for rel, want in HR_FN_LINES.items():
+    have = _fn_lines(rel)
+    for line in want:
+        if have.count(line) != 1:
+            problems.append(f'F:{rel}: hr FN line missing or doubled: {line[:110]}')
+for rel in ('mboss/bars_off', 'mboss/bars_on'):
+    cmds = [x for x in _fn_lines(rel) if x.strip() and not x.startswith('#')]
+    if cmds != HR_FN_LINES[rel]:
+        problems.append(f'F:{rel}: must be exactly {HR_FN_LINES[rel]} (hr FN-f)')
+# FN-f: only the two wrappers set the flag on / off mid-fight (fight_vars / cleanup_fight clear it); bars_hide / bars_show,
+# which every death / pause / cleanup path calls, never touch it
+for p in sorted((FN / 'mboss').rglob('*.mcfunction')):
+    rel = p.relative_to(FN).with_suffix('').as_posix()
+    for i, line in enumerate(p.read_text(encoding='utf-8').split('\n'), 1):
+        if re.search(r'#mbBarOff mb', line) and not line.startswith('#') and rel not in (
+                'mboss/bars_off', 'mboss/bars_on', 'mboss/fight_vars', 'mboss/cleanup_fight', 'mboss/world'):
+            problems.append(f'{rel}:{i} touches #mbBarOff (only bars_off / bars_on / fight_vars / cleanup_fight / world may)')
+if tuple(L.bars(i) for i in (0, 1)) != ('function rlk:mboss/bars_off', 'function rlk:mboss/bars_on'):
+    problems.append('mboss_lib.bars(on) must return the one line function rlk:mboss/bars_off / bars_on (hr FN-f)')
+# FN-b: the reward hook lines of mboss/sp/reward = exactly the enabled specials with a flag, after sp/lvup, before #spPk
+rl = _fn_lines('mboss/sp/reward')
+want = [L.special_hook_line(b, f) for b in specs for f in L.SPECIAL_OPT_HOOKS if b.get(f)]
+try:
+    i_lv = next(i for i, x in enumerate(rl) if x.endswith(' run function rlk:mboss/sp/lvup'))
+    i_c = rl.index('# hr FN-b: per-special reward hooks (registry rwHook)')
+    i_pk = next(i for i, x in enumerate(rl) if x.startswith('execute store result score #spPk mb '))
+    if not i_lv < i_c < i_pk or rl[i_c + 1:i_pk] != want:
+        problems.append(f'F:mboss/sp/reward: the hook lines after sp/lvup and before #spPk are {rl[i_c + 1:i_pk]}, want {want}')
+except (ValueError, StopIteration):
+    problems.append('F:mboss/sp/reward: sp/lvup line, the "# hr FN-b" comment or the #spPk line missing')
+# FN-a / FN-c: the record fields exactly where the registry sets them
+for b in L.enabled_bosses(REG):
+    rec = _record(reg_txt, b)
+    if not rec:
+        continue
+    ww = b.get('winWord')
+    if ('winWord:' in rec) != (ww is not None) or (ww is not None and f'winWord:{L.snbt_str(ww)}' not in rec):
+        problems.append(f'register: {b["id"]} record winWord does not match the registry ({ww!r})')
+    if ('poof:0b' in rec) != (b.get('poof') is False):
+        problems.append(f'register: {b["id"]} record poof:0b does not match the registry (poof {b.get("poof")!r})')
 A = REG['arena']
 ens = (FN / 'mboss/arena/ensure.mcfunction')
 if not ens.exists() or f'{A["theme"]}@{A["ver"]}' not in ens.read_text(encoding='utf-8'):
