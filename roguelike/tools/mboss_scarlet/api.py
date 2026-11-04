@@ -216,7 +216,9 @@ A13_SCRIPT = (
     (252, 'A8.9', 'g_dive', None),                # reappears 252 in normal colours, dives; judge at 258
     (258, 'judge', None, None),                   # success: darkness lifts, g_deflect -> CS3 270; fail: the instant death
 )
-# P2 entries cut from the gauntlets' moves (PLAN §4.4; no shield, no darkness): same row form, cuts never count.
+# P2 entries cut from the gauntlets' moves (PLAN §4.4; no shield, no darkness): same row form, cuts never count. The
+# 'solid' row is when the ghost tag (rlk_hr_ghost, hence rlk_mb_inv) goes and she is hittable again (PLAN: R1 "hittable
+# at 62", R3 "reforms 37-46"), not the g_reform clip's own visual 'solid' event (its tick 4).
 R1 = (
     (0, 'A8.T', 'g_tell', None),                  # lilac switch 0 (form ghost, rlk_mb_inv), burst 3, hidden 4
     (14, 'D1', 'g_dash', (14, 20, 27) + _T2),     # reappears 14 b front-left, dashes 20-24 to 1.5 b at the player's right
@@ -252,6 +254,7 @@ BOLTS = {'a8': (34, 102, 161, 193), 'a13': (70, 225, 245, 258)}   # deco_bolt 3-
 JUDGE_T = {'a8': 194, 'a13': 258}
 REPEL_T = {'a8': 206, 'a13': 270}                 # seq/repel {at:60 | 5} after g_deflect
 DARK_T, DARK_CALL_T, BRIM_T = -17, -18, -14       # T+ of the dark job's first slice / its call / the hand to the brim
+#                                                   in SQ1 (A8: sq1 'brim' 46); the lead-ins raise it at DARK_T (A13)
 DARK_SLICES = (-17, -14, -11, -8)                 # the `dark` job's four real slices land 3 t apart (PLAN §6.6)
 # Reappear geometry (S4's g/**), relative to the player's facing (+ = right), blocks / degrees (PLAN §4.5)
 REAPPEAR = {
@@ -459,8 +462,9 @@ RIG_CALLS = ['init', 'spawn', 'spawn_hidden', 'tick', 'kill', 'uninstall', 'flas
     + [f'anchor/{a}' for a in ANCHORS]
 RIG_MACRO_CALLS = {'face/set': ['yaw']}
 
-# CLIPS_PLAN = PLAN §2.5 as written: (len, loop (from, to) or None, {event: tick}); 'end' = the clip length. Two events
-# the table writes as one name at two ticks get numbered (walk / strafe 'step' -> step1, step2).
+# CLIPS_PLAN = PLAN §2.5 as written: (len, loop (from, to) or None, {event: tick}); 'end' = the clip length. An event
+# name the table writes at two ticks gets numbered (a dict key is unique): walk / strafe_l / strafe_r 'step 0, 12|10' ->
+# step1, step2; ending 'rise 28' stays 'rise', its 'rise 268' becomes 'rise2'.
 CLIPS_PLAN = {
     'idle': (40, (0, 40), {}),
     'idle2': (40, (0, 40), {}),
@@ -963,68 +967,102 @@ OWN = {
 }
 OWN_GEN = {'S2a': ('rig/',), 'S1K': ('fx/',)}
 # Every file / tree PLAN §9.0-9.1 names, per owner (the lead's D0 files included). Patterns: 'T:' = tools/, 'F:' =
-# data/rlk/function/ (no .mcfunction), 'RP:' = the resource pack, 'HR:' = the scratchpad hr/ (tests, fragments);
-# '**' = any depth. (pattern, excluded patterns).
+# data/rlk/function/ (no .mcfunction), 'R:' = roguelike/, 'RP:' = a resource-pack copy's assets/rlk/, 'HR:' = the
+# scratchpad hr/ (tests, scratch, renders, RP copies); '**' = any depth. (pattern, excluded patterns). Each stage owns
+# its scratch folder HR:<stage>/** (readme fragments included), its renders HR:renders/<prefix>_* and its RP copy
+# HR:rp_<stage>/**. Generated outputs belong to the stage whose generator writes them, also when an unchanged
+# generator writes them because of that stage's input (S1K's theme -> the hr_field lines of mboss/arena/{job_tick,abort}).
+# Shared by design, outside this table: the RP items atlas assets/minecraft/atlases/items.json (each RP generator adds
+# only its own entries, as every precedent) and the hand files' generator hook lines (F:load, F:uninstall: SR adds its
+# lines beside them, never edits theirs).
 _OWN_FILES = {
     'lead': (('T:mboss_scarlet/__init__.py', ()), ('T:mboss_scarlet/api.py', ()),
              ('T:mboss_scarlet/stub_rig_manifest.json', ()), ('HR:contract.md', ()), ('HR:stage_briefs.md', ()),
-             ('HR:tools/**', ())),
+             ('HR:tools/**', ()), ('T:dev/regen_all.sh', ()), ('R:README.md', ())),
     'S1': (('T:build_mboss_core.py', ()), ('T:mboss_lib.py', ()), ('T:mboss_registry.json', ()),
-           ('T:check_mboss_pack.py', ()), ('HR:tests/test_special_hr.py', ()), ('HR:s1/readme_*.md', ()),
+           ('T:check_mboss_pack.py', ()), ('HR:tests/test_special_hr.py', ()), ('HR:tests/lib/**', ()),
+           ('HR:s1/**', ()),
            ('F:mboss/**', ('F:mboss/arena/**', 'F:mboss/guardian/**', 'F:mboss/butterfly/**', 'F:mboss/fieldgen/**',
                            'F:mboss/proto/**', 'F:mboss/cproto/**', 'F:mboss/spproto/**')),
            ('F:boss/test/**', ())),
     'S1K': (('T:build_mboss_hr_fx.py', ()), ('T:mboss_hr_fx_paint.py', ()), ('T:mboss_hr_fx_manifest.json', ()),
             ('T:mboss_arena_hr_field.py', ()), ('F:boss/scarlet/fx/**', ()), ('F:mboss/arena/hr_field/**', ()),
-            ('RP:mboss/hr_kit/**', ()), ('RP:font/mboss_hr*', ()), ('HR:tests/test_kit.py', ()),
-            ('HR:tests/test_arena_hr.py', ()), ('HR:s1k/readme_*.md', ())),
+            ('F:mboss/arena/job_tick', ()), ('F:mboss/arena/abort', ()),
+            ('RP:textures/mboss/hr_kit/**', ()), ('RP:models/item/mboss/hr_kit/**', ()), ('RP:items/mboss/hr_kit/**', ()),
+            ('RP:font/mboss_hr.json', ()), ('RP:textures/font/mboss_hr/**', ()), ('HR:tests/test_kit.py', ()),
+            ('HR:tests/test_arena_hr.py', ()), ('HR:s1k/**', ()), ('HR:renders/s1k_*', ()), ('HR:rp_s1k/**', ())),
     'S2a': (('T:build_scarlet_rig.mjs', ()), ('T:scarlet_pose.mjs', ()), ('T:scarlet_geometry.mjs', ()),
             ('T:scarlet_paint.mjs', ()), ('T:scarlet_clips.mjs', ()), ('T:scarlet_rig_manifest.json', ()),
-            ('T:scarlet_rig_api.md', ()), ('F:boss/scarlet/rig/**', ()), ('RP:mboss/scarlet/**', ()),
-            ('HR:tests/test_rig.py', ()), ('HR:s2a/readme_*.md', ())),
+            ('T:scarlet_rig_api.md', ()), ('F:boss/scarlet/rig/**', ()), ('RP:textures/mboss/scarlet/**', ()),
+            ('RP:models/item/mboss/scarlet/**', ()), ('RP:items/mboss/scarlet/**', ()),
+            ('HR:tests/test_rig.py', ()), ('HR:s2a/**', ()), ('HR:renders/s2_*', ()), ('HR:rp_s2a/**', ())),
     'S2b': (('T:scarlet_cine.mjs', ()), ('T:mboss_scarlet/seq.py', ()), ('F:boss/scarlet/seq/**', ()),
-            ('HR:tests/ev_dry.py', ()), ('HR:s2b/readme_*.md', ())),
+            ('HR:tests/ev_dry.py', ()), ('HR:s2b/**', ()), ('HR:renders/s2b_*', ()), ('HR:rp_s2b/**', ())),
     'S3': (('T:build_mboss_scarlet.py', ()), ('T:mboss_scarlet/core.py', ()), ('T:mboss_scarlet/ai.py', ()),
            ('T:mboss_scarlet/shield.py', ()), ('T:mboss_scarlet/p1.py', ()), ('T:mboss_scarlet/s3lib.py', ()),
            ('T:mboss_scarlet/reward.py', ()),
            ('F:boss/scarlet/**', ('F:boss/scarlet/rig/**', 'F:boss/scarlet/fx/**', 'F:boss/scarlet/seq/**',
                                   'F:boss/scarlet/g/**', *(f'F:boss/scarlet/p/{k}/**' for k in P2))),
            ('HR:tests/test_scarlet.py', ()), ('HR:tests/pat_p1.py', ()), ('HR:tests/test_reward.py', ()),
-           ('HR:tests/lib/**', ()), ('HR:s3/readme_*.md', ())),
+           ('HR:s3/**', ()), ('HR:renders/s3_*', ())),
     'S4': (('T:mboss_scarlet/p_ghost.py', ()), ('F:boss/scarlet/g/**', ()),
-           *((f'F:boss/scarlet/p/{k}/**', ()) for k in P2), ('HR:tests/pat_ghost.py', ()), ('HR:s4/readme_*.md', ())),
+           *((f'F:boss/scarlet/p/{k}/**', ()) for k in P2), ('HR:tests/pat_ghost.py', ()), ('HR:s4/**', ()),
+           ('HR:renders/s4_*', ())),
     'SR': (('F:items/**', ()), ('F:player/take_damage', ()), ('F:player/dash_iframe', ()), ('F:player/reset_one', ()),
            ('F:player/update_item', ()), ('F:player/update_item_macro', ()), ('F:player/hr_moon/**', ()),
            ('F:codex/labels', ()), *((f'F:snd/f{i}', ()) for i in range(422, 430)), ('F:load', ()), ('F:uninstall', ()),
-           ('R:items.md', ()), ('HR:tests/test_hwamu.py', ()), ('HR:tests/test_moon.py', ()), ('HR:sr/readme_*.md', ())),
+           ('R:items.md', ()), ('HR:tests/test_hwamu.py', ()), ('HR:tests/test_moon.py', ()), ('HR:sr/**', ()),
+           ('HR:renders/sr_*', ())),
 }
 # + every stage owns its own request file HR:requests/<stage>.md (the lead applies requests at I1)
 OWN_FILES = {o: pats + (((f'HR:requests/{o.lower()}.md', ()),) if o != 'lead' else ()) for o, pats in _OWN_FILES.items()}
+# Base branch of each stage (PLAN §9.7): S3 from S1's head, S2b from S2a's, S4 from S3's; the rest from D0.
+STAGE_BASE = {'S1': 'wip/hr-d0', 'S1K': 'wip/hr-d0', 'S2a': 'wip/hr-d0', 'SR': 'wip/hr-d0', 'S3': 'wip/hr-s1',
+              'S2b': 'wip/hr-s2a', 'S4': 'wip/hr-s3'}
+# Sequential hand-overs PLAN §9.1 / §9.3 prescribe: OWN_FILES names the creator, who owns the path until its report; the
+# taker (a stage that branches from the creator's head) owns it from its own start; never both at once.
+HANDOVER = {
+    'HR:tests/lib/**': ('S1', 'S3'),               # vendored sims (unchanged, md5s in README.md) + the generic hrsim.py;
+    #                                                S3 extends hrsim.py; every other stage reads it (own helpers in HR:<s>/)
+    'HR:tests/test_rig.py': ('S2a', 'S2b'),        # S2b adds the cinematic-clip checks (PLAN §9.3)
+    'T:scarlet_rig_manifest.json': ('S2a', 'S2b'),  # S2b re-runs S2a's unchanged generator with its scarlet_cine.mjs and
+    'F:boss/scarlet/rig/**': ('S2a', 'S2b'),        # commits what that regenerates (never S2a's sources)
+    'RP:textures/mboss/scarlet/**': ('S2a', 'S2b'),
+    'RP:models/item/mboss/scarlet/**': ('S2a', 'S2b'),
+    'RP:items/mboss/scarlet/**': ('S2a', 'S2b'),
+}
 # The files / trees PLAN §9.0-9.1 name (one concrete representative path per tree): each must be owned exactly once.
 FILES_9_1 = (
     'T:mboss_scarlet/__init__.py', 'T:mboss_scarlet/api.py', 'T:mboss_scarlet/stub_rig_manifest.json', 'HR:contract.md',
-    'HR:stage_briefs.md',
+    'HR:stage_briefs.md', 'HR:tools/regen_d0.sh', 'T:dev/regen_all.sh', 'R:README.md',
     'T:build_mboss_core.py', 'T:mboss_lib.py', 'T:mboss_registry.json', 'T:check_mboss_pack.py',
-    'HR:tests/test_special_hr.py', 'HR:s1/readme_special.md', 'F:mboss/sp/reward', 'F:mboss/death_finish',
+    'HR:tests/test_special_hr.py', 'HR:tests/lib/hrsim.py', 'HR:tests/lib/cmsim.py', 'HR:s1/readme_special.md',
+    'F:mboss/sp/reward', 'F:mboss/death_finish',
     'F:mboss/world', 'F:mboss/fight_vars', 'F:mboss/cleanup_fight', 'F:mboss/test/swon', 'F:mboss/test/swon_msg_w',
-    'F:mboss/register', 'F:mboss/ar/hr_field/ok', 'F:mboss/bars_hide', 'F:mboss/bars_show', 'F:boss/test/special',
+    'F:mboss/register', 'F:mboss/ar/hr_field/ok', 'F:mboss/bars_off', 'F:mboss/bars_on', 'F:boss/test/special',
     'T:build_mboss_hr_fx.py', 'T:mboss_hr_fx_paint.py', 'T:mboss_hr_fx_manifest.json', 'T:mboss_arena_hr_field.py',
-    'F:boss/scarlet/fx/p/qi_arc', 'F:boss/scarlet/fx/p/ev_beam', 'RP:mboss/hr_kit/qi_arc', 'RP:font/mboss_hr.json',
-    'F:mboss/arena/hr_field/look/dark',
+    'F:boss/scarlet/fx/p/qi_arc', 'F:boss/scarlet/fx/p/ev_beam', 'RP:textures/mboss/hr_kit/qi_arc.png',
+    'RP:models/item/mboss/hr_kit/gate_icon.json', 'RP:items/mboss/hr_kit/gate_icon.json', 'RP:font/mboss_hr.json',
+    'RP:textures/font/mboss_hr/black.png', 'F:mboss/arena/hr_field/look/dark', 'F:mboss/arena/job_tick',
+    'F:mboss/arena/abort', 'HR:s1k/rp_readme_kit.md', 'HR:renders/s1k_sprites.jpg', 'HR:rp_s1k/pack.mcmeta',
     'T:build_scarlet_rig.mjs', 'T:scarlet_pose.mjs', 'T:scarlet_geometry.mjs', 'T:scarlet_paint.mjs',
     'T:scarlet_clips.mjs', 'T:scarlet_rig_manifest.json', 'T:scarlet_rig_api.md', 'F:boss/scarlet/rig/tick',
-    'RP:mboss/scarlet/item_sword',
-    'T:scarlet_cine.mjs', 'T:mboss_scarlet/seq.py', 'F:boss/scarlet/seq/event/start',
+    'RP:models/item/mboss/scarlet/item_sword.json', 'RP:items/mboss/scarlet/item_sword.json',
+    'RP:textures/mboss/scarlet/body.png', 'HR:tests/test_rig.py', 'HR:renders/s2_U1.jpg', 'HR:rp_s2a/pack.mcmeta',
+    'T:scarlet_cine.mjs', 'T:mboss_scarlet/seq.py', 'F:boss/scarlet/seq/event/start', 'HR:tests/ev_dry.py',
+    'HR:renders/s2b_cs1.jpg', 'HR:rp_s2b/pack.mcmeta',
     'T:build_mboss_scarlet.py', 'T:mboss_scarlet/core.py', 'T:mboss_scarlet/ai.py', 'T:mboss_scarlet/shield.py',
     'T:mboss_scarlet/p1.py', 'T:mboss_scarlet/s3lib.py', 'T:mboss_scarlet/reward.py', 'F:boss/scarlet/spawn',
     'F:boss/scarlet/test/help', 'F:boss/scarlet/init', 'F:boss/scarlet/shield/cut', 'F:boss/scarlet/ult/fatal',
     'F:boss/scarlet/ev/roll', 'F:boss/scarlet/reward', 'F:boss/scarlet/p/a1/start', 'F:boss/scarlet/rig_stub/tick',
+    'HR:renders/s3_a1.png',
     'T:mboss_scarlet/p_ghost.py', 'F:boss/scarlet/p/a8/start', 'F:boss/scarlet/p/a13/start', 'F:boss/scarlet/p/r1/start',
-    'F:boss/scarlet/p/r2/start', 'F:boss/scarlet/p/r3/start', 'F:boss/scarlet/g/cut/make',
+    'F:boss/scarlet/p/r2/start', 'F:boss/scarlet/p/r3/start', 'F:boss/scarlet/g/cut/make', 'HR:renders/s4_a8.png',
     'F:items/mythic/sword_hwamu/def', 'F:items/proc/hw_hit', 'F:items/register', 'F:player/take_damage',
     'F:player/dash_iframe', 'F:player/reset_one', 'F:player/update_item', 'F:player/update_item_macro',
     'F:player/hr_moon/apply', 'F:codex/labels', 'F:snd/f422', 'F:snd/f429', 'F:load', 'F:uninstall', 'R:items.md',
-    'HR:tests/test_hwamu.py', 'HR:tests/test_moon.py',
+    'HR:tests/test_hwamu.py', 'HR:tests/test_moon.py', 'HR:renders/sr_tooltip.txt',
+    *(f'HR:requests/{o.lower()}.md' for o in _OWN_FILES if o != 'lead'),
 )
 
 
@@ -1076,11 +1114,15 @@ def disc(kb=0):
     return f'function {NS}g/disc/throw {_macro({"kb": kb})}'
 
 
-# FN-f (S1): mboss_lib.bars(on) -> one line: 'function rlk:mboss/bars_hide' (sets #mbBarOff mb 1, hides the bars) or
-# 'function rlk:mboss/bars_show' (clears it); mboss/world skips mboss/bars while #mbBarOff is 1; fight_vars and
-# cleanup_fight zero it. The module never touches the framework-private #mbBar.
+# FN-f (S1): mboss_lib.bars(on) -> one line, BARS_FNS[on]: 'function rlk:mboss/bars_off' (NEW: sets #mbBarOff mb 1,
+# then runs the existing mboss/bars_hide) or 'function rlk:mboss/bars_on' (NEW: sets #mbBarOff mb 0, then runs the
+# existing mboss/bars_show); mboss/world skips mboss/bars while #mbBarOff is 1; fight_vars and cleanup_fight zero it.
+# The existing mboss/bars_hide / bars_show (called by death_start, pause_tick, cleanup_fight, init, main, tick, start_go,
+# mboss/bars) stay byte-identical: the flag must never be set by them, or a death pause would leave every boss's bars
+# hidden for the rest of its fight (mboss/bars, the only re-show, is skipped while the flag is 1). The module never
+# touches the framework-private #mbBar.
 BARS_FLAG = ('#mbBarOff', 'mb')
-BARS_FNS = ('function rlk:mboss/bars_hide', 'function rlk:mboss/bars_show')
+BARS_FNS = ('function rlk:mboss/bars_off', 'function rlk:mboss/bars_on')
 
 
 def bars(on):
@@ -1229,6 +1271,12 @@ def _check_contract():
             assert o1 == o2 or not (p1.startswith(p2) or p2.startswith(p1)), f'OWN overlap {o1}:{p1} / {o2}:{p2}'
     for f in FILES_9_1:
         assert len(owners_of(f)) == 1, f'{f}: owners {owners_of(f)}'
+    assert set(STAGE_BASE) == set(_OWN_FILES) - {'lead'}
+    for pat, (first, then) in HANDOVER.items():
+        assert any(p == pat for p, _ex in OWN_FILES[first]), f'hand-over {pat}: not listed under its creator {first}'
+        assert STAGE_BASE[then] == f'wip/hr-{first.lower()}', f'hand-over {pat}: {then} does not branch from {first}'
+    # FN-f: the module's bars lines are new wrappers, never the framework's own bars_hide / bars_show (PLAN FE-6)
+    assert all(f.startswith('function rlk:mboss/bars_') and not f.endswith(('/bars_hide', '/bars_show')) for f in BARS_FNS)
     assert set(KIT_SOUND_RECIPES) == set(KIT_SOUNDS) and all(
         ev_.islower() and 0 < (v or 0) <= 1.0 and 0.5 <= p <= 2.0 for r in KIT_SOUND_RECIPES.values() for ev_, v, p in r)
     assert len(KIT_PRESETS) == 50 and sum(k.startswith('ev_') for k in KIT_PRESETS) == 8
