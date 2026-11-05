@@ -1755,12 +1755,12 @@
     "kick": 102
    },
    "owner": "S2b",
-   "key_files": 1,
-   "keys": 29,
-   "keys_per_tick": 0.3,
-   "source": "",
-   "note": "placeholder (S2b: tools/scarlet_cine.mjs)",
-   "authored": false
+   "key_files": 79,
+   "keys": 1281,
+   "keys_per_tick": 12.2,
+   "source": "v2 19.72-24.95 / v3 21.10-26.25 (v2f_c1, v2f_c2, v2f_c_keys1/2, v2f_c_hat, v2f_c_throw, v3r_c_flip): lock, grab, clash on the hat, flip, back to back, throw, lying, the kick",
+   "note": "",
+   "authored": true
   },
   "down": {
    "id": 35,
@@ -1814,12 +1814,12 @@
     "brim": 65
    },
    "owner": "S2b",
-   "key_files": 1,
-   "keys": 29,
-   "keys_per_tick": 0.3,
-   "source": "",
-   "note": "placeholder (S2b: tools/scarlet_cine.mjs)",
-   "authored": false
+   "key_files": 71,
+   "keys": 753,
+   "keys_per_tick": 9.1,
+   "source": "v3 4.10-8.18 (v3r_a_kipup, cr_v3_kipup: the kip-up, the sword vertical; v3r_a_5to8: the hat at shoulder height, side steps; cr_pretell_v3: the hand to the brim)",
+   "note": "",
+   "authored": true
   },
   "lead_stand": {
    "id": 38,
@@ -1837,12 +1837,12 @@
     "brim": 53
    },
    "owner": "S2b",
-   "key_files": 1,
-   "keys": 29,
-   "keys_per_tick": 0.4,
-   "source": "",
-   "note": "placeholder (S2b: tools/scarlet_cine.mjs)",
-   "authored": false
+   "key_files": 57,
+   "keys": 492,
+   "keys_per_tick": 6.9,
+   "source": "PLAN §3.5 (the lead_down beats from standing; v3r_a_5to8, cr_pretell_v3)",
+   "note": "",
+   "authored": true
   },
   "sq1": {
    "id": 39,
@@ -1859,12 +1859,12 @@
     "brim": 46
    },
    "owner": "S2b",
-   "key_files": 1,
-   "keys": 29,
-   "keys_per_tick": 0.5,
-   "source": "",
-   "note": "placeholder (S2b: tools/scarlet_cine.mjs)",
-   "authored": false
+   "key_files": 42,
+   "keys": 277,
+   "keys_per_tick": 4.5,
+   "source": "v2 6.93-9.70 (v2f_a_boss_far_01: the re-hat; cr_pretell_hand: the hand to the brim from T0 - 14)",
+   "note": "",
+   "authored": true
   },
   "intro": {
    "id": 40,
@@ -1892,12 +1892,12 @@
     "scab_up": 510
    },
    "owner": "S2b",
-   "key_files": 1,
-   "keys": 29,
-   "keys_per_tick": 0.1,
-   "source": "",
-   "note": "placeholder (S2b: tools/scarlet_cine.mjs)",
-   "authored": false
+   "key_files": 417,
+   "keys": 2989,
+   "keys_per_tick": 5.4,
+   "source": "staged (v1s_intro_stairs: the far figure; PLAN §3.1 E0-E10); E10 v1 4.8-5.8 (v1s_intro_keys: the scabbard upright, hilt up)",
+   "note": "",
+   "authored": true
   },
   "intro_end": {
    "id": 41,
@@ -1917,12 +1917,12 @@
     "push": 82
    },
    "owner": "S2b",
-   "key_files": 1,
-   "keys": 29,
-   "keys_per_tick": 0.3,
-   "source": "",
-   "note": "placeholder (S2b: tools/scarlet_cine.mjs)",
-   "authored": false
+   "key_files": 57,
+   "keys": 632,
+   "keys_per_tick": 7.3,
+   "source": "v1 2.2-8.05 (v1s_intro_keys: smile, head down, turn away, spin; mg_v1_hands_zoom / cr_v1_stance_hand: the draw and the stance)",
+   "note": "",
+   "authored": true
   },
   "cs1": {
    "id": 42,
@@ -1955,12 +1955,12 @@
     "swirl": 183
    },
    "owner": "S2b",
-   "key_files": 1,
-   "keys": 29,
-   "keys_per_tick": 0.1,
-   "source": "",
-   "note": "placeholder (S2b: tools/scarlet_cine.mjs)",
-   "authored": false
+   "key_files": 126,
+   "keys": 1042,
+   "keys_per_tick": 4.9,
+   "source": "v1 37.28-39.2 (v1s_cs_keys: lunge, lock, apart, the hat on her back), v2 0-6.9 (v2f_cs_keys1/2, v2f_cs_hat, cr_v2_a11: the iai, 홍련일섬)",
+   "note": "",
+   "authored": true
   },
   "ending": {
    "id": 43,
@@ -2019,12 +2019,12 @@
     "eyes": 1030
    },
    "owner": "S2b",
-   "key_files": 1,
-   "keys": 29,
-   "keys_per_tick": 0,
-   "source": "",
-   "note": "placeholder (S2b: tools/scarlet_cine.mjs)",
-   "authored": false
+   "key_files": 517,
+   "keys": 4312,
+   "keys_per_tick": 4.1,
+   "source": "v3 26.27-40.3 (v3r_e_shots1-4, v3r_e_slash_2f), v4 (v4k_c*, v4k_s4_sheathe, v4k_s5_face), v5 (v5e_s1_*, v5e_s2_turn*, v5e_s3_keys1-3)",
+   "note": "",
+   "authored": true
   },
   "ev_give": {
    "id": 44,
@@ -2077,7 +2077,7 @@
    "authored": true
   }
  },
- "cine_source": "placeholder (scarlet_clips.CINE_PLACEHOLDER)",
+ "cine_source": "tools/scarlet_cine.mjs",
  "looks": {
   "form": [
    "normal",
@@ -2284,7 +2284,7 @@
  "view_range": 2,
  "storage": {
   "anchors": "rlk:hr rig.an",
-  "version": 97538294
+  "version": 3850169
  },
  "ghost_texture": "rlk:mboss/scarlet/ghost",
  "item_sword": {
@@ -2455,10 +2455,10 @@
   "elements_budget": 6500,
   "parts": 29,
   "models": 78,
-  "key_files": 751,
-  "keys": 10504,
-  "rig_functions": 1078,
-  "rig_bytes": 3414967,
+  "key_files": 2109,
+  "keys": 22050,
+  "rig_functions": 2629,
+  "rig_bytes": 6566548,
   "cull_overhang_ticks": 0
  },
  "sprites": {
