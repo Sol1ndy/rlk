@@ -103,7 +103,7 @@ export function retarget(p, clip, t) {
   // the grip distances: the lever gL x S_ARM (shoulder-relative already); the grip sphere's gD x S_ARM, moved out along the
   // same bearing / elevation where that would fold the sword arm below S2a's extension (|grip - left shoulder| / arm: the
   // avatar's wide shoulders bring a plainly scaled grip at her left side within 0.2 b of the shoulder); then the lock rule: the two-hand
-  // upright blade before her face 0.46 b out (the most a 0.594 arm reaches from a 0.375 shoulder at x 0), deterministic so
+  // upright blade before her face 0.46 b out (a 0.594 arm reaches 0.48 from a 0.34375 shoulder at x 0), deterministic so
   // every LOCK hand-over gets the same grip
   o.gD = gripDistance(p, o.pos); o.gL = (p.gL ?? .55) * S_ARM;
   const wl = ramp(p.rh || 0, .6, .9) * ramp(p.gE, -10, 0) * ramp(p.gE, 40, 20) * ramp(Math.abs(p.th - 95), 20, 10) * (1 - (p.gF || 0));
@@ -132,7 +132,7 @@ export function retarget(p, clip, t) {
 }
 
 // the sphere grip distance keeping the sword arm's extension: S2a's FK (hip 1.36, waist .14, shoulder [.25, .43, .01], swing .5,
-// arm .82) -> the extension f; the avatar's (hip HIP_Y, seam .1875, shoulder [.375, .4375, 0], swing .55, arm .594) -> the
+// arm .82) -> the extension f; the avatar's (hip HIP_Y, seam .1875, shoulder SK.shoulder, swing .55, arm .594) -> the
 // distance x along the same direction with |Cw + d x - SL| = f * .594 (the far root)
 function gripDistance(p, pos2) {
   const Ryaw = q([0, p.rot[1], 0]), Pq = mul(Ryaw, q([p.rot[0], 0, p.rot[2]])), Cq = mul(Pq, q(p.tor)), d = rot(Ryaw, dirBE(p.gB, p.gE));
@@ -161,14 +161,36 @@ const KNEEL = {pos: [0, -.29, -.02], rot: [-25, 0, 0], tor: [-55, -10, 0], head:
 // torso, and the grip comes forward with the kip (a grip left in the yaw frame would let the shoulder swing past it)
 const KNEEL_BLADE = {gF: 0, gB: -80, gE: -25, gD: .42, cB: -115, cR: 0, th: -12, ed: -1, tw: 0};
 export const IAI_DELTA = 14;
+// S2d round 2: the step aside off the seat stone. seq.py glides her root SEAT_ASIDE 1.1 b to her right over intro 226-246 (one linear
+// 20-t glide, 0.055 b/t); the clip stands still there, so the feet step with the glide: four side steps of 0.55 b (right, left, right,
+// left foot, 5 t each, the swing sole lifted <= 0.08 b) while the stance sole's target counter-moves 0.055 b/t in the rig frame: every
+// planted sole keeps its spot in the world (the feet 0.8 b apart at most). seq.py's fallback to her left (her right blocked) is
+// not stepped (the soles slide as before).
+export const ASIDE = {t0: 226, len: 20, d: 1.1, lift: .08};
+function asideFeet(o, t) {
+  const u = t - ASIDE.t0, n = ASIDE.len, st = n / 4, v = ASIDE.d / n, sl = ASIDE.d / 2;
+  if (u <= 0 || u >= n) return;
+  // the soles' steps done by u (right foot at 0-5 and 10-15, left at 5-10 and 15-20), the swing phase, the lift
+  const done = (k0) => [0, 1].reduce((a, i) => a + smooth((u - (k0 + 2 * i) * st) / st), 0);
+  const swing = k0 => [0, 1].map(i => (u - (k0 + 2 * i) * st) / st).find(x => x > 0 && x < 1);
+  for (const [ch, k0] of [['fR', 0], ['fL', 1]]) {
+    const ph = swing(k0), lift = ph === undefined ? 0 : ASIDE.lift * Math.sin(Math.PI * ph);
+    o[ch] = [o[ch][0] - sl * done(k0) + v * u, o[ch][1], o[ch][2]];
+    // the swing sole's lift: added by the solver over the planted sole's height (after its boot loop), so a crouched, inclined shin
+    // clears the floor too
+    if (lift > 0) o[ch === 'fR' ? 'fLiftR' : 'fLiftL'] = lift;
+  }
+}
 export const PATCHES = [
   {id: 'KNEEL-K', clip: 'kipup', in: [6, 8], out: [10, 12], set: KNEEL, why: 'the floor pickup of the hat on the right knee'},
   {id: 'KNEEL-K-B', clip: 'kipup', in: [3, 8], out: [10, 16], set: KNEEL_BLADE, why: 'the sword out at her left through the kneel (5- / 6-tick ramps: no whip)'},
   {id: 'KNEEL-L', clip: 'lead_down', in: [5, 7], out: [9, 11], set: KNEEL, why: 'the floor pickup of the hat on the right knee'},
-  {id: 'KNEEL-L-B', clip: 'lead_down', in: [1, 6], out: [9, 14], set: KNEEL_BLADE, why: 'the sword out at her left through the kip and the kneel (5-tick ramps: no whip)'},
+  {id: 'KNEEL-L-B', clip: 'lead_down', in: [1, 6], out: [11, 17], set: KNEEL_BLADE, why: 'the sword out at her left through the kip and the kneel (a 5-tick ramp in; out over 6 ticks after the kneel: no whip, the elbow never crosses the shoulder)'},
   {id: 'IAI', clip: 'cs1', in: [104, 106], out: [159, 161], add: {tor: [0, IAI_DELTA, 0], head: [0, -IAI_DELTA, 0]}, why: 'the cross-draw reach to the hip hilt'},
   {id: 'SIP', clip: 'intro', in: [66, 70], out: [86, 94], set: {wLip: 1}, why: 'the cup at her lips'},
   {id: 'SH0', clip: 'ending', in: [297, 297], out: [326, 326], sh0: true, why: 'the sheathe entry on the new scabbard axis (SH0\')'},
+  {id: 'ASIDE', clip: 'intro', in: [ASIDE.t0, ASIDE.t0], out: [ASIDE.t0 + ASIDE.len, ASIDE.t0 + ASIDE.len], fn: asideFeet,
+    why: 'the feet step with seq.py\'s 1.1-b glide aside off the seat stone (4 side steps of 0.55 b, the stance sole kept on its world spot)'},
 ];
 const patchW = (P, t) => (t < P.in[0] || t > P.out[1] ? 0 : t < P.in[1] ? ramp(t, P.in[0], P.in[1]) : t <= P.out[0] ? 1 : 1 - ramp(t, P.out[0], P.out[1]));
 export const patchSpans = clip => PATCHES.filter(P => P.clip === clip).map(P => [P.id, P.in[0], P.out[1]]);
@@ -186,6 +208,7 @@ export function overlay(q0, clip, t, ctx = {}) {
     if (w <= 0) continue;
     if (P.set) for (const [ch, v] of Object.entries(P.set)) o[ch] = Array.isArray(v) ? o[ch].map((x, i) => x + (v[i] - x) * w) : (o[ch] ?? 0) + (v - (o[ch] ?? 0)) * w;
     if (P.add) for (const [ch, v] of Object.entries(P.add)) o[ch] = o[ch].map((x, i) => x + v[i] * w);
+    if (P.fn) P.fn(o, t);
     if (P.id.startsWith('KNEEL') && w > 0) o.kneelHat = true;
     if (P.sh0 && ctx.sh0) {
       const S = ctx.sh0;

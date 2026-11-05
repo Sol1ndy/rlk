@@ -220,7 +220,9 @@ def stage_pt(x, z, y=None):
 # CS0 — intro (PLAN §3.1; clip intro 554 + intro_end 86 = 640) and its skip
 # S2d (11-05): she rises off the kit's seat stone (1.2 x 0.24 x 0.64 b: 0.135 b in front of her seat to 0.505 b behind it,
 # requests/s2d.md s2d-2) forward over her feet, SEAT_RISE b toward the moon over the 12-t rise, then steps SEAT_ASIDE b to her
-# right while she straightens (226-246), so the stone stays clear of her feet through the turn to the player and the walk
+# right while she straightens (226-246), so the stone stays clear of her feet through the turn to the player and the walk. The
+# rig's feet step with that one linear 20-t glide (tools/scarlet_retarget.mjs ASIDE: four 0.55-b side steps; test_rig checks
+# that ASIDE matches SEAT_ASIDE and the tick)
 SEAT_RISE, SEAT_ASIDE = 0.4, 1.1
 def build_intro(W):
     s, mv = Seq('intro'), Moves('intro')

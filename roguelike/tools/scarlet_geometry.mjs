@@ -6,22 +6,22 @@
 // 22.5 / 45 (RP README §4).
 //
 // The body (S2d, 11-05; the user's request "팔다리가 너무 기괴하게 긴데 그냥 플레이어 크기랑 똑같게해"): exactly the player
-// avatar's body (tools/build_player_rig.mjs bodyModels / skinFaces / skinBox; the classic 4-px arms of 아를레키노's P2 layout,
-// tools/arlecchino_geometry.mjs P2_SPECS) wearing the user's 64 x 64 skin (tools/scarlet_skin.mjs, texture
+// avatar's body (tools/build_player_rig.mjs bodyModels / skinFaces / skinBox, with its slim 3-px arms: the user's skin is a slim
+// skin; tools/arlecchino_geometry.mjs P1_SPECS = the avatar's own specs) wearing the user's 64 x 64 skin (tools/scarlet_skin.mjs, texture
 // rlk:mboss/scarlet/skin) at display scale 1: one skin pixel = 1/16 b; head 8 x 8 x 8 px, body 8 x 12 x 4 (split at body row 9
-// into the torso, rows 0..9, and the pelvis, rows 9..12: torso + pelvis = the avatar's body box), arms and legs 4 x 12 x 4
-// (upper arm / forearm and thigh / shin split at row 6, as the avatar's elbows and knees); the outer layers inflated as the
+// into the torso, rows 0..9, and the pelvis, rows 9..12: torso + pelvis = the avatar's body box), arms 3 x 12 x 4 (slim) and legs
+// 4 x 12 x 4 (upper arm / forearm and thigh / shin split at row 6, as the avatar's elbows and knees); the outer layers inflated as the
 // avatar's (head 0.5 px, the rest 0.25 px). Nothing is stretched. The hair, the side locks and the skirt panels are in the
 // skin already (hidden: model `empty`). What the rig makes itself keeps S2a's shapes in S2c's colours, resized to the new body:
 // the hat (a white 백립-style gat), its bead strings, the sash tails, the sword, the scabbard, the hilt, the cup and the bottle.
 //
 // Proportions (the avatar's skeleton; scarlet_pose.mjs SK): overlay soles 0, knees 0.39, hip line 0.77, seam 0.95, shoulder
 // pivots 1.39, neck 1.52, head top 2.02 (outer layer 2.05) with every angle 0; hat brim Ø 1.32 (crown Ø 0.50 x 0.30 on the
-// head); arms 0.25 + 0.34 (shoulder -> grip, the avatar's weapon point); thighs 0.375, shins 0.39 (to the overlay sole);
+// head); arms 0.25 + 0.34 (shoulder -> grip, the avatar's weapon point; shoulder pivots +-0.34375); thighs 0.375, shins 0.39 (to the overlay sole);
 // sword 1.94 (grip 0.45, guard Ø 0.20, blade 1.435), scabbard 1.52.
-import {abox, cardZ, cardX, cardY, faceEl, checkBounds, lathe, disc, r4} from './mboss_model_lib.mjs';
+import {abox, cardZ, cardX, cardY, faceEl, checkBounds, lathe, annulus, disc, r4} from './mboss_model_lib.mjs';
 import {loft, toUnits, rockBox, registerTile, registerWrap} from './mboss_shape_lib.mjs';
-import {bodyElements, P2_SPECS} from './arlecchino_geometry.mjs';
+import {bodyElements, P1_SPECS} from './arlecchino_geometry.mjs';
 
 // ---- parts (api.PARTS order) -----------------------------------------------------------------------------------------------
 // [name, default model, block brightness, display scale]; `empty` = hidden (in the skin already: the hair, the side locks, the
@@ -87,26 +87,28 @@ function card2(out, inn, z, rect, opt = {}) {
 }
 
 // ---- the body: the player avatar's boxes wearing the user's skin (S2d) ------------------------------------------------------
-// Regions of the 64 x 64 classic skin [u, v, w, h, d] (px): [base layer, outer layer] (the vanilla layout)
+// Regions of the 64 x 64 skin [u, v, w, h, d] (px): [base layer, outer layer] (the vanilla layout; SLIM arms: the user's skin
+// paints its arm columns 4 + 3 + 4 + 3 wide on the sides and 3 + 3 on the top / bottom, the last two columns of each arm region
+// transparent, as a vanilla slim skin)
 export const SKIN_REGIONS = {
   head: [[0, 0, 8, 8, 8], [32, 0, 8, 8, 8]], body: [[16, 16, 8, 12, 4], [16, 32, 8, 12, 4]],
-  arm_r: [[40, 16, 4, 12, 4], [40, 32, 4, 12, 4]], arm_l: [[32, 48, 4, 12, 4], [48, 48, 4, 12, 4]],
+  arm_r: [[40, 16, 3, 12, 4], [40, 32, 3, 12, 4]], arm_l: [[32, 48, 3, 12, 4], [48, 48, 3, 12, 4]],
   leg_r: [[0, 16, 4, 12, 4], [0, 32, 4, 12, 4]], leg_l: [[16, 48, 4, 12, 4], [0, 48, 4, 12, 4]],
 };
 // px: one skin pixel (blocks) everywhere (the avatar's 1/16 b); head0: the head box's floor at the neck pivot; torsoRows: the
 // body row the torso / pelvis split runs along; the outer layer inflated by inflHead (head) / infl (the rest) px on all six
 // sides (the avatar's skinBox)
 export const SKIN = {px: 1 / 16, headPx: 1 / 16, bodyPx: 1 / 16, head0: 0, torsoRows: 9, inflHead: .5, infl: .25};
-// The avatar's body specs (tools/build_player_rig.mjs bodyModels, classic arms = tools/arlecchino_geometry.mjs P2_SPECS); the
+// The avatar's body specs (tools/build_player_rig.mjs bodyModels = tools/arlecchino_geometry.mjs P1_SPECS, slim 3-px arms); the
 // body box split at row 9: the torso (pivot = the seam, body row 9, 3 px above the hip line) runs rows 0..9 up to the neck, the
 // pelvis (pivot = the hip line) rows 9..12 up to the seam. In the avatar's own frame (neck pivot) the torso is
 // [4, -1, 6] -> [12, 8, 10] and the pelvis [4, -4, 6] -> [12, -1, 10]: together exactly the avatar's body box.
 export const BODY_SPECS = {
-  head: P2_SPECS.head,
-  torso: {...P2_SPECS.body, from: [4, 8, 6], to: [12, 17, 10], start: 0, end: 9},
-  pelvis: {...P2_SPECS.body, from: [4, 8, 6], to: [12, 11, 10], start: 9, end: 12},
-  arm_r: P2_SPECS.right_arm, arm_l: P2_SPECS.left_arm, forearm_r: P2_SPECS.right_forearm, forearm_l: P2_SPECS.left_forearm,
-  thigh_r: P2_SPECS.right_leg, thigh_l: P2_SPECS.left_leg, shin_r: P2_SPECS.right_shin, shin_l: P2_SPECS.left_shin,
+  head: P1_SPECS.head,
+  torso: {...P1_SPECS.body, from: [4, 8, 6], to: [12, 17, 10], start: 0, end: 9},
+  pelvis: {...P1_SPECS.body, from: [4, 8, 6], to: [12, 11, 10], start: 9, end: 12},
+  arm_r: P1_SPECS.right_arm, arm_l: P1_SPECS.left_arm, forearm_r: P1_SPECS.right_forearm, forearm_l: P1_SPECS.left_forearm,
+  thigh_r: P1_SPECS.right_leg, thigh_l: P1_SPECS.left_leg, shin_r: P1_SPECS.right_shin, shin_l: P1_SPECS.left_shin,
 };
 // the 15 body models (model units, display scale 1): [base box, outer-layer box] each
 export function bodyModels() {
@@ -156,7 +158,7 @@ function sashTails(p2) {
 // band and the red-lotus knot at the back; P2 knot = brighter (hat_p2). S2c colours (matched to the skin's white cap and
 // black band): a white 백립-style weave and crown, a black band, the knot in the skin's crimson.
 // S2d: brim Ø 1.32 (in proportion to her height: 1.60 x 2.00 / 2.42), the crown on the 8-px head
-export const HAT = {R: .66, crownR: .25, crownH: .30, gap: .003, rots: [0, 22.5, 45, -22.5], band: .06};
+export const HAT = {R: .66, crownR: .25, crownH: .30, gap: .003, rots: [0, 22.5, 45, -22.5], band: .06, lidR: .17};
 function hat(p2) {
   const e = [], R = HAT.R;
   HAT.rots.forEach((a, i) => {
@@ -165,10 +167,14 @@ function hat(p2) {
     el.faces.down.tintindex = 0;
     e.push(el);
   });
-  // the crown: 16 facets (u round the drum, v top -> bottom), its top disc and the closing bottom disc
+  // the crown: 16 facets (u round the drum, v top -> bottom), its round top and the closing bottom disc. The top (S2d round 2)
+  // is the drum's own 16-gon: an annulus of 16 quads (r .17 -> crownR, matching the facets, odd quads 0.001 up) over a centre
+  // square (half-side .17, inside the annulus' inner edge, 0.001 down), so no lid corner overhangs the drum. The bottom disc
+  // (seen only from below) stays one square: its corners lie over the opaque brim ring (r > 0.20), which hides them.
   const y0 = HAT.gap * 3 + .002, y1 = y0 + HAT.crownH;
   e.push(...lathe('y', [0, 0, 0], [{a: [y0, y1], r: HAT.crownR, tex: 'crown'}], {vFrom: y1, vTo: y0, n: 16}));
-  e.push(disc('y', [0, 0, 0], y1, HAT.crownR * .995, '+', 'lacquer_w'));
+  e.push(...annulus('y', [0, 0, 0], y1, HAT.lidR, HAT.crownR, '+', 'lacquer_w', {n: 16, stagger: .001}));
+  e.push(disc('y', [0, 0, 0], y1 - .001, HAT.lidR, '+', 'lacquer_w'));
   e.push(disc('y', [0, 0, 0], y0 + .001, HAT.crownR * .995, '-', 'lacquer_w'));
   // the red-lotus knot at the back of the band (faces +Z, her back), centred behind the crown
   e.push(card1(p2 ? 'knot_p2' : 'knot_p1', HAT.crownR + .012, {X0: -.085, X1: .085, Y0: y0 - .028, Y1: y0 + .114}, 'back'));
@@ -181,6 +187,24 @@ function hat(p2) {
 // refit for the avatar's 8-px head: Z 0.044 ahead of the face layer (the hat sits level on the head: scarlet_pose.mjs SK.brim);
 // the solver eases the gravity pull where it would swing a string into the head; the strand shapes and beads stay.
 export const STRINGS = {Z: -.325, X: .30, LOOP: .535, L: .615};
+// the painted strings (S2d round 2; blocks, the strings part's frame at display scale 1): points along both strands (their centre
+// and both bead edges, every ~0.05 b from the brim down to the loop, following the sprite's convergence under the chin: scarlet_paint
+// strings), the loop centre and the short strand below it (its card turned -22.5 deg toward the chest). The solver's head guard and
+// test_rig test these, not the cards' transparent corners.
+export function stringPoints() {
+  const {X, Z, LOOP, L} = STRINGS, out = [], sm = x => { const u = Math.max(0, Math.min(1, x)); return u * u * (3 - 2 * u); };
+  const n = Math.ceil(LOOP / .05), half = 2 * X * .045 * .9;
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, y = -.01 - LOOP * t, xc = X * .91 * (1 - sm((t - .86) / .14));
+    for (const sg of [1, -1]) for (const d of [-half, 0, half]) out.push([sg * xc + d, y, Z]);
+  }
+  const a = 22.5 * Math.PI / 180;
+  for (let i = 0; i <= 4; i++) {
+    const dy = .005 - (L - LOOP + .005) * i / 4;
+    for (const d of [-.016, 0, .016]) out.push([d, -LOOP + dy * Math.cos(a), Z - dy * Math.sin(a)]);
+  }
+  return out.map(P => P.map(x => Math.round(x * 1e4) / 1e4));
+}
 function hatStrings() {
   const z = STRINGS.Z;
   const up = cardZ('strings', z, {X0: -STRINGS.X, X1: STRINGS.X, Y0: -STRINGS.LOOP - .01, Y1: -.01}, {uvr: [0, 0, 1, .75]});
@@ -261,9 +285,10 @@ function itemSword() {
   return e;
 }
 // ---- intro props (white porcelain with violet) -----------------------------------------------------------------------------
-// cup (pivot = the base centre): D 0.15 x 0.072 (S2d: it shows beside a 0.28-b box fist; S2c's sat inside its fist);
+// cup (pivot = the base centre): D 0.15 x 0.072 (S2d: it shows beside a 0.28-b box fist; S2c's sat inside its fist); its centre
+// CUP.hand 0.10 out along the forearm from the grip (S2d round 2: 0.01 further out, its rim <= 0.03 into the fist's box at every hold);
 // bottle (pivot = the base centre): 0.14 x 0.30 (S2c's profile x 1.15), a lotus-scroll belly, held by the neck
-export const CUP = {r: .074, h: .072, centre: .036, hand: .09};
+export const CUP = {r: .074, h: .072, centre: .036, hand: .10};
 export const BOTTLE = {h: .299, neck: .27};
 function cup() {
   const e = lathe('y', [0, 0, 0], [{a: [0, .06], r: .0675, tex: 'porcelain'}], {vFrom: .06, vTo: 0, n: 8});

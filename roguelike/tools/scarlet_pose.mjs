@@ -8,10 +8,10 @@
 // Quaternions [x, y, z, w]; eulers [pitch, yaw, roll] in degrees as mboss_rig_math.q (pitch + leans back / lifts the toes,
 // yaw + turns her to her right, roll + tips the top toward her right). Bearings (dirBE): 0 = forward, + = her right.
 //
-// The skeleton (S2d, 11-05) is the player avatar's (tools/build_player_rig.mjs transform(); classic arms): the hip line HIP_Y
+// The skeleton (S2d, 11-05) is the player avatar's (tools/build_player_rig.mjs transform(); slim arms): the hip line HIP_Y
 // 0.765625 above the floor at pos 0 (straight legs put the shin's outer-layer sole on the floor), the hip joints 0.125 to the
 // sides, the torso pivot at the seam (body row 9, 0.1875 above the hip line), the neck 0.5625 above it, the shoulder pivots
-// 0.4375 above it and 0.375 to the sides, the elbow 0.25 below the shoulder, the grip (the avatar's weapon point) 0.34375
+// 0.4375 above it and 0.34375 to the sides, the elbow 0.25 below the shoulder, the grip (the avatar's weapon point) 0.34375
 // below the elbow, the knee 0.375 below the hip joint and the outer-layer sole 0.390625 below the knee. Every IK target is
 // clamped to the chain's reach (no stretch).
 //
@@ -58,12 +58,12 @@
 //   derived (scarlet_retarget.mjs): wSeat (seated on the kit's stone), wLie (lying on her back), wKnee (the right knee on the
 //             floor), wLip (the cup at her lips), hatX (the hat state hand-overs), hwF (a re-anchored world-hat flight)
 import {add, sub, times, len, unit, mul, q, rot, aimQ, ik, basisQ, cross, dot, perp, slerp, armFront, steadyPerp, toDisplayT, toDisplayQ, lerp} from './mboss_rig_math.mjs';
-import {PART_NAMES, PART_SCALE, SWORD, SCAB, HAT, STRINGS, CUP, BOTTLE, HILT_OFF, modelPoints, HAND_MODELS, FACE_MODELS, PHASE_MODELS, HIDDEN} from './scarlet_geometry.mjs';
+import {PART_NAMES, PART_SCALE, SWORD, SCAB, HAT, STRINGS, CUP, BOTTLE, HILT_OFF, modelPoints, stringPoints, HAND_MODELS, FACE_MODELS, PHASE_MODELS, HIDDEN} from './scarlet_geometry.mjs';
 
 export const HIP_Y = .765625;
 const unit3 = v => { const m = Math.hypot(...v); return v.map(x => x / m); };
 export const SK = {
-  hipJ: [.125, 0, 0], waist: [0, .1875, 0], neckB: [0, .5625, 0], shoulder: [.375, .4375, 0],
+  hipJ: [.125, 0, 0], waist: [0, .1875, 0], neckB: [0, .5625, 0], shoulder: [.34375, .4375, 0],
   armU: .25, fore: .34375, thigh: .375, shin: .390625, ankleY: 0,
   brim: [0, .502, 0], brimTilt: 0, hatBack: [0, .25, .30], hatHand: HAT.R - .04,
   brimHold: {r: .44, azAdd: 50, azMin: 70, azMax: 90, dy: -.07},
@@ -75,13 +75,16 @@ export const SK = {
 };
 export const ARM_REACH = .995 * (SK.armU + SK.fore), LEG_REACH = .995 * (SK.thigh + SK.shin);
 const ARM_TURN = 85, ARM_FOLD = .15;
+// S2d round 2: an arm segment swings at most LIMB_TURN degrees per tick where another bend plane allows it; a limb segment rolls
+// about its own axis at most LIMB_ROLL degrees per tick (measured from the previous front carried along the swing)
+const LIMB_TURN = 60, LIMB_ROLL = 35;
 // the fist on the world hat's brim edge: the grip point this far above the brim (the fist's end rests on the brim)
 export const HAT_FLOOR_HOLD = .08;
 // a contact is measured (and assisted) where its weight is full
 const FULL = .999;
 // the bounds of the correction guards (their own units: degrees, or cm for the distance guards) and the plan slopes per tick
 export const GUARD_BOUND = {scab: 150, scabY: 90, scabH: 90, hat: 60, strings: 120, sash: 120, drop: 12, closeY: 30, incl: 20, tip: 15, rock: 12,
-  aHeadR: 10, aTorY: 15, aTorP: 15, aTorR: 8, bPush: 35, bTurn: 60, close: 30, hatBackZ: 15, hatPush: 100, hatClear: 30, strHead: 150, sashSeat: 120, scabArm: 60, armUp: 101};
+  aHeadR: 10, aTorY: 15, aTorP: 15, aTorR: 8, bPush: 35, bTurn: 60, close: 30, hatBackZ: 15, hatPush: 100, hatClear: 40, strHead: 150, sashSeat: 120, scabArm: 60, armUp: 101};
 export const GUARD_SLOPE = {scab: 22, scabY: 22, scabH: 22, hat: 22, strings: 22, sash: 22, drop: 1.5, closeY: 5, incl: 5, tip: 5, rock: 5,
   aHeadR: 5, aTorY: 5, aTorP: 5, aTorR: 5, bPush: 4, bTurn: 15, close: 3, hatBackZ: 3, hatPush: 15, hatClear: 15, strHead: 22, sashSeat: 22, scabArm: 5, armUp: 34};
 const D = Math.PI / 180;
@@ -161,6 +164,8 @@ export function setModels(models) {
 }
 const HCACHE = new Map();
 let HAT_VIS = null;
+// the painted bead strings (scarlet_geometry stringPoints), at the strings part's display scale
+const STR_PTS = stringPoints().map(P => P.map(x => x * PART_SCALE.hat_strings));
 export const hatVisPts = () => HAT_VIS;
 export const hullOf = (model, n) => {
   const key = model + '|' + n;
@@ -224,7 +229,9 @@ function turnClear(Q, ok, axis, maxDeg, name) {
   };
   const p1 = try1(1), p2 = try1(-1), pref = GUARD.prefer[name] || 0;
   let best = p1[0] <= p2[0] ? p1 : p2;
-  if (pref) { const [P, O] = pref > 0 ? [p1, p2] : [p2, p1]; if (P[0] <= maxDeg && P[0] <= O[0] + 30) best = P; }
+  // the previous tick's sense is kept while it costs at most 30 degrees more (the strings' head guard: 90, so a swing over her
+  // head does not flip them through it; S2d round 2)
+  if (pref) { const [P, O] = pref > 0 ? [p1, p2] : [p2, p1]; if (P[0] <= maxDeg && P[0] <= O[0] + (name === 'strHead' ? 90 : 30)) best = P; }
   if (best[0] > .5) GUARD.sense[name] = best === p1 ? 1 : -1;
   GUARD.used[name] = Math.min(best[0], maxDeg);
   return best[1];
@@ -304,7 +311,22 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
   const chestFwd = () => rot(Cq, [0, 0, -1]);
 
   // ---- 4. legs (IK clamped to the reach; seated feet; the boot loop; the kneel root; the planted-feet drop measured) ----
-  const segQ = (key, dir, front) => { const F = steadyPerp(front, unit(dir), prev['f_' + key], [0, 0, -1]); keep['f_' + key] = F; return aimQ(dir, F); };
+  // a limb segment (S2d round 2): the front kept continuous (steadyPerp), then its roll limited to LIMB_ROLL per tick against the
+  // previous front carried along the swing (a box limb never spins about itself in one tick)
+  const rollQ = (key, dir, front) => {
+    const ax = unit(dir);
+    let F = steadyPerp(front, ax, prev['f_' + key], [0, 0, -1]);
+    const pF = prev['f_' + key], pA = prev['a_' + key];
+    if (pF && pA) {
+      const P0 = perp(rot(fromTo(pA, ax), pF), ax);
+      if (len(P0) > 1e-6) {
+        const P = unit(P0), ang = Math.atan2(dot(cross(P, F), ax), dot(P, F)), lim = LIMB_ROLL * D;
+        if (Math.abs(ang) > lim) { const r = Math.sign(ang) * lim; F = unit(add(times(P, Math.cos(r)), times(cross(ax, P), Math.sin(r)))); }
+      }
+    }
+    keep['f_' + key] = F; keep['a_' + key] = ax;
+    return aimQ(dir, F);
+  };
   let legs = {};
   const solveLegs = (lfX = lf, only = null) => {
     if (!only) legs = {};
@@ -324,7 +346,8 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
       if (k === 'r' && wKnee > 0) pole = unit(lerp(unit(pole), unit(rot(Ryaw, [0, -.55, -.83])), wKnee));
       const fwd = rot(lf > .5 ? Pq : Ryaw, [0, 0, -1]);
       // the planted-feet drop: how far the hip joint must come down for the leg to reach a planted target (cm)
-      if (lf < .5 && F[1] <= .0066 && wSeat < .5 && wKnee < .5) {
+      const fLift = (k === 'l' ? p.fLiftL : p.fLiftR) || 0;
+      if (lf < .5 && F[1] <= .0066 && !fLift && wSeat < .5 && wKnee < .5) {
         const hz = Math.hypot(A[0] - H[0], A[2] - H[2]), dy = H[1] - A[1];
         if (hz < LEG_REACH) need = Math.max(need, dy - Math.sqrt(LEG_REACH * LEG_REACH - hz * hz));
       }
@@ -335,8 +358,8 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
       const solveAt = Aq => {
         sol = ikReach(H, Aq, SK.thigh, SK.shin, pole, prev['leg' + k]);
         const kv = times(sol.v, -1);
-        thQ = segQ('th' + k, sub(sol.E, H), armFront(sub(sol.E, H), kv, fwd));
-        shQ = segQ('sh' + k, sub(sol.W, sol.E), armFront(sub(sol.W, sol.E), kv, fwd));
+        thQ = rollQ('th' + k, sub(sol.E, H), armFront(sub(sol.E, H), kv, fwd));
+        shQ = rollQ('sh' + k, sub(sol.W, sol.E), armFront(sub(sol.W, sol.E), kv, fwd));
         return minY(hpts, sol.E, shQ);
       };
       const low0 = solveAt(A);
@@ -352,6 +375,8 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
         A = add(A, [0, hi, 0]);
         solveAt(A);
       }
+      // a stepping sole (retarget PATCHES 'ASIDE': fLiftL / fLiftR) lifts over its planted height
+      if (fLift > 0) { A = add(A, [0, fLift, 0]); solveAt(A); }
       part('thigh_' + k, H, thQ); part('shin_' + k, sol.E, shQ);
       keep['leg' + k] = sol.v;
       legs[k] = {H, E: sol.E, W: sol.W, short: sol.short};
@@ -454,7 +479,30 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
       const alt = ikReach(S, target, SK.armU, SK.fore, pu, null), ua = unit(sub(alt.E, S));
       if (dot(pu, ua) > dot(pu, ud)) sol = alt;
     }
-    keep['arm' + k] = sol.v; keep['ud' + k] = unit(sub(sol.E, S));
+    // S2d round 2: where the upper arm or the forearm would still swing more than LIMB_TURN degrees in one tick (a folded arm
+    // whose bend plane flips as the target passes the pole line: the elbow orbiting the shoulder), the bend plane is chosen
+    // round the shoulder -> grip line (5-degree steps) for the smallest of the two swings; the grip point is unchanged
+    const pf = prev['fd' + k];
+    if (pu && pf) {
+      const turn = (a0, b0) => Math.acos(Math.max(-1, Math.min(1, dot(a0, b0)))) / D;
+      const W = sol.W, d = sub(W, S), L = len(d);
+      if (L > 1e-4) {
+        const u = unit(d), swings = E => Math.max(turn(pu, unit(sub(E, S))), turn(pf, unit(sub(W, E))));
+        const s0 = swings(sol.E);
+        if (s0 > LIMB_TURN) {
+          const a = SK.armU, b = SK.fore, cosA = Math.max(-1, Math.min(1, (a * a + L * L - b * b) / (2 * a * L))), sinA = Math.sqrt(1 - cosA * cosA);
+          const e0 = len(perp(sol.v, u)) > 1e-6 ? unit(perp(sol.v, u)) : unit(perp([0, -1, 0], u)), e1 = cross(u, e0);
+          let best = {c: s0, E: sol.E, v: sol.v};
+          for (let ph = 5; ph < 360; ph += 5) {
+            const r = ph * D, v = add(times(e0, Math.cos(r)), times(e1, Math.sin(r)));
+            const E = add(S, add(times(u, a * cosA), times(v, a * sinA))), c = swings(E) + .02 * Math.min(ph, 360 - ph);
+            if (c < best.c) best = {c, E, v};
+          }
+          sol = {...sol, E: best.E, v: best.v};
+        }
+      }
+    }
+    keep['arm' + k] = sol.v; keep['ud' + k] = unit(sub(sol.E, S)); keep['fd' + k] = unit(sub(sol.W, sol.E));
     keep['ad' + k] = unit(sub(sol.W, S)); keep['al' + k] = len(sub(sol.W, S));
     return sol;
   };
@@ -693,8 +741,8 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
   const armSegs = () => {
     for (const [k, S, sol] of [['l', SL, solL], ['r', SR, solR]]) {
       const up = sub(sol.E, S), fo = sub(sol.W, sol.E);
-      part('arm_' + k, S, segQ('ua' + k, up, armFront(up, sol.v, chestFwd())));
-      part('forearm_' + k, sol.E, segQ('fa' + k, fo, armFront(fo, sol.v, chestFwd())));
+      part('arm_' + k, S, rollQ('ua' + k, up, armFront(up, sol.v, chestFwd())));
+      part('forearm_' + k, sol.E, rollQ('fa' + k, fo, armFront(fo, sol.v, chestFwd())));
     }
   };
   armSegs();
@@ -875,8 +923,10 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
   };
   let H = hatState(hat), hS = hat === 'gone' ? 0 : 1;
   const hatHull = hullOf('hat_p1', 'hat');
-  // the state itself clears the floor (a turn about the horizontal axis under its up axis); a hand-over blend then only lifts
-  if (hS && hat !== 'world') H = {t: H.t, q: clearFloor(H.t, H.q, hatHull, safeAxis(cross(rot(H.q, [0, 1, 0]), [0, 1, 0])), .02, GUARD_BOUND.hat, 0, 'hat')};
+  // the state itself clears the floor (a turn about the horizontal axis under its up axis); a hand-over blend then only lifts.
+  // S2d round 2: not the worn hat (a turned brim would sink into the top of her head: g_vert's flip); the support pass's lift
+  // carries a worn hat off the floor with her whole body
+  if (hS && hat !== 'world' && hat !== 'worn') H = {t: H.t, q: clearFloor(H.t, H.q, hatHull, safeAxis(cross(rot(H.q, [0, 1, 0]), [0, 1, 0])), .02, GUARD_BOUND.hat, 0, 'hat')};
   if (p.hatX && hat !== 'gone') {
     // the hand-overs: put-on / swing (hatX.to: before the switch the hat blends toward the destination state, on a line or
     // over the back of her head) and pickup (hatX.from: after the switch it blends from the solved hat of the tick before
@@ -962,10 +1012,13 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
       // the lag (half the hat's turn over 2 ticks) and the 45 % gravity pull; where they would swing a string into her head
       // (its outer layer, 0.005 clear) the pull eases, then the lag (bisection; at none the strings hang in the hat's frame,
       // clear of the worn hat's head by construction)
+      // (S2d round 2: tested on the painted strings, STR_PTS: the cards' corners lie outside the strands)
       const sHull = hullOf('hat_strings', 'hat_strings'), [hlo, hhi] = BOX.head_layer, iq = conj(Hq);
-      const inHead = Qx => { let w = -1; const Mx = qm(Qx); for (const P of sHull) { const W = [hT[0] + Mx[0][0] * P[0] + Mx[0][1] * P[1] + Mx[0][2] * P[2], hT[1] + Mx[1][0] * P[0] + Mx[1][1] * P[1] + Mx[1][2] * P[2], hT[2] + Mx[2][0] * P[0] + Mx[2][1] * P[1] + Mx[2][2] * P[2]];
+      const inHead = Qx => { let w = -1; const Mx = qm(Qx); for (const P of STR_PTS) { const W = [hT[0] + Mx[0][0] * P[0] + Mx[0][1] * P[1] + Mx[0][2] * P[2], hT[1] + Mx[1][0] * P[0] + Mx[1][1] * P[1] + Mx[1][2] * P[2], hT[2] + Mx[2][0] * P[0] + Mx[2][1] * P[1] + Mx[2][2] * P[2]];
         const L = rot(iq, sub(W, Nb)); w = Math.max(w, Math.min(L[0] - hlo[0], hhi[0] - L[0], L[1] - hlo[1], hhi[1] - L[1], L[2] - hlo[2], hhi[2] - L[2])); } return w; };
-      const strQ = (lag, pull) => { const s0 = slerp(hQ, pq, .5 * lag), down = rot(s0, [0, -1, 0]); return mul(slerp(ID, fromTo(down, [0, -1, 0]), .45 * pull * gfade(down)), s0); };
+      // (S2d round 2: the lag behind the hat at most 30 degrees: a fast spin no longer swings the strands round into her face)
+      const lagTh = 2 * Math.acos(Math.min(1, Math.abs(hQ[0] * pq[0] + hQ[1] * pq[1] + hQ[2] * pq[2] + hQ[3] * pq[3]))) / D, lagCap = lagTh > 60 ? 60 / lagTh : 1;
+      const strQ = (lag, pull) => { const s0 = slerp(hQ, pq, .5 * lag * lagCap), down = rot(s0, [0, -1, 0]); return mul(slerp(ID, fromTo(down, [0, -1, 0]), .45 * pull * gfade(down)), s0); };
       sq = strQ(1, 1);
       if (hS && inHead(sq) > -.005) {
         const ease = f => { let lo = 0, hi = 1; for (let k = 0; k < 10; k++) { const md = (lo + hi) / 2; if (inHead(f(md)) <= -.005) lo = md; else hi = md; } return lo; };
@@ -1042,7 +1095,7 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
   // planted feet stay planted: when the touch rule lifted her (a crouch's knee-end corner was the lowest point), a planted
   // foot left hovering is re-planted (that leg re-solved to its floor target from the raised hip joint)
   if (dy > .004) {
-    const hov = [['l', p.fL], ['r', p.fR]].filter(([k, F]) => lf < .5 && F[1] <= .0066 && wSeat < .5 && wKnee < .5
+    const hov = [['l', p.fL], ['r', p.fR]].filter(([k, F]) => lf < .5 && F[1] <= .0066 && !(k === 'l' ? p.fLiftL : p.fLiftR) && wSeat < .5 && wKnee < .5
       && minY(hullOf('shin_' + k, 'shin_' + k), o['shin_' + k].t, o['shin_' + k].q) > .006).map(([k]) => k);
     if (hov.length) { const R0 = R; R = add(R, [0, dy, 0]); solveLegs(lf, hov); R = R0; }
   }

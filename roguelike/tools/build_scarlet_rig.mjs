@@ -1,7 +1,7 @@
 // Display-entity rig of 홍련 (Scarlet, the special boss; S:hr/PLAN.md §2, contract S:hr/contract.md §3.2, frozen table
 // tools/mboss_scarlet/api.py §6-§7). S2c (11-05): the body wears the user's own Minecraft skin (tools/scarlet_skin.mjs, the
 // user's request "마인크래프트 스킨을 이용해서 만들라고. 아를이나 라이덴처럼"). S2d (11-05, "팔다리가 너무 기괴하게 긴데 그냥
-// 플레이어 크기랑 똑같게해"): her body is the player avatar's (scarlet_geometry.mjs: the avatar's boxes and skin faces, classic
+// 플레이어 크기랑 똑같게해"): her body is the player avatar's (scarlet_geometry.mjs: the avatar's boxes and skin faces, its slim
 // arms, display scale 1; scarlet_pose.mjs: the avatar's skeleton, head top 2.00 b) and every clip is retargeted per sample
 // (scarlet_retarget.mjs: angles kept, translations scaled, contacts kept: feet, knees, hands, the lying back, the seat). The
 // hat, the strings, the sash tails, the sword, the scabbard, the cup and the bottle stay S2a's own shapes in S2c's colours,
@@ -32,14 +32,14 @@ import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {PART_NAMES, PART_SCALE, PART_BRIGHT, DEFAULT_MODEL, HAND_MODELS, FACE_MODELS, PHASE_MODELS, BLADE_MODELS, ghostOf, TINTS, allModels,
-  ITEM_SWORD, HIDDEN, SKIN, SKIN_REGIONS, SKIN_MAP, FACE_FX, SWORD, SCAB, HAT, STRINGS, SASH, CUP, BOTTLE, MODEL_SCALE, BODY_SPECS} from './scarlet_geometry.mjs';
+  ITEM_SWORD, HIDDEN, SKIN, SKIN_REGIONS, SKIN_MAP, FACE_FX, SWORD, SCAB, HAT, STRINGS, SASH, CUP, BOTTLE, MODEL_SCALE, BODY_SPECS, stringPoints} from './scarlet_geometry.mjs';
 const SWORD_BLADE = [SWORD.bladeLo, SWORD.tip];
 import {scarletSprites, paintScarlet, spriteId, PAINT_ROLES, TEX_DIR} from './scarlet_paint.mjs';
 import {SKIN_B64, SKIN_BYTES, SKIN_SHA1} from './scarlet_skin.mjs';
-import {solve, toDisplay, fromDisplay, setModels, worldPoints, modelOn, HIP_Y, SK, GUARD_BOUND, GUARD_SLOPE, CORE, minY, hullOf, freeBlade, dirBE, bladeQ, HAT_FLOOR_HOLD,
+import {solve, toDisplay, fromDisplay, setModels, worldPoints, modelOn, boxDepth, HIP_Y, SK, GUARD_BOUND, GUARD_SLOPE, CORE, minY, hullOf, freeBlade, dirBE, bladeQ, HAT_FLOOR_HOLD,
   BOX, ARM_REACH} from './scarlet_pose.mjs';
 import {retarget, overlay, refCore, hatSwitches, bladeChannels, setHatFace, faceSpot, PATCHES, HAT_REST, HAT_FLIGHTS, SUPPORTS, S_LEG, S_ARM, S_SCAB, K_ARC,
-  IAI_DELTA, hipDirChannels} from './scarlet_retarget.mjs';
+  IAI_DELTA, ASIDE, hipDirChannels} from './scarlet_retarget.mjs';
 import {CLIPS as AUTHORED, CINE_PLACEHOLDER, accumulate, sampleClip, DEFAULT_POSE, H_POSE} from './scarlet_clips.mjs';
 import {createRigCompiler, createRigFollow, nbt, written, interp, shown, summonPart, summonShadow, cullOverhang} from './mboss_rig_compile.mjs';
 import {qAngle, len, sub, add, rot, mul, q, times, unit, cross, dot, perp, basisQ} from './mboss_rig_math.mjs';
@@ -292,7 +292,9 @@ const BODY_BOX = Object.fromEntries([...BODY_BOX_PARTS, 'forearm_r'].map(n => {
   return [n, [[Math.min(...X), (e.from[1] - 8) / 16, Math.min(...Z)], [Math.max(...X), (e.to[1] - 8) / 16, Math.max(...Z)]]];
 }));
 const conjQ = Q => [-Q[0], -Q[1], -Q[2], Q[3]];
-const bladeErrors = [];
+// the parts riding a body part (S2d round 2): keyed with it where the event check re-keys it
+const RIDERS = {head: ['face', 'hat', 'hat_strings']};
+const bladeErrors = [], wornErrors = [];
 // discrete channels the clips key: model swaps through rig/m/<part>/<value> (form-aware), stored states (bookkeeping)
 const HAND_PART = {hL: 'forearm_l', hR: 'forearm_r'};
 const STATE_STORE = {hat: 'Hat', sword: 'Sw', scab: 'Sc', cup: 'Cu', bottle: 'Bo'};
@@ -353,7 +355,7 @@ for (const c of CLIPS) {
     const vis1 = fr => (fr.q.vis ?? 1) >= .999;
     // planted: the source's foot on the floor where S2a's body touched it (refCore; an S2a foot short of its floor target
     // hovered with the body: those ticks are `air` or between)
-    const planted = (fr, k) => vis1(fr) && (fr.q.lf || 0) < .5 && fr.q[k][1] <= .0066 && (fr.q.wSeat || 0) < .5 && (fr.q.wKnee || 0) < .5 && fr.ref.low < .012;
+    const planted = (fr, k) => vis1(fr) && (fr.q.lf || 0) < .5 && fr.q[k][1] <= .0066 && !fr.q[k === 'fL' ? 'fLiftL' : 'fLiftR'] && (fr.q.wSeat || 0) < .5 && (fr.q.wKnee || 0) < .5 && fr.ref.low < .012;
     supportTable[c.name] = {
       low_ref: F.map(fr => +fr.ref.low.toFixed(3)),
       // lie: every full lying root (the body rests on the floor whatever S2a's height: its LY sat 9 cm up, its kip roll-back
@@ -394,13 +396,22 @@ for (const c of CLIPS) {
   let keys = 0;
   const compiledD = {}, dense = denseTicks(c);
   const keyLists = {}, extraSplit = Object.fromEntries(PART_NAMES.map(n => [n, new Set()]));
+  // S2d round 2: the forced blend-in ends at the first clip event from tick 2 on, and EVERY part's first key ends exactly there
+  // (f0): a one-shot clip blends the whole body in from the previous clip's pose over the same ticks, so no part (the sword at
+  // its event key, the face / the worn hat on the head) leaves another during the blend-in
+  const evT = [...new Set(Object.values(c.events))].filter(t => t >= 2 && t < c.len).sort((x, y) => x - y);
+  const f0 = Math.min(c.blend ?? 3, ...evT, c.len);
+  // no dense / event / re-key split falls inside a one-shot clip's blend-in (its ticks before f0 come from the previous clip's pose
+  // in game); a floor or planted-foot split may, and then the parts riding that part's group split with it (syncFirst)
+  const free = t => c.loop || t >= f0;
+  const syncFirst = Object.fromEntries(PART_NAMES.map(n => [n, new Set()])), firstEnd = {};
   const compilePart = n => {
     const seq = F.map(fr => fr.d[n]);
-    let segs = segmentsCut(seq, n, cuts, c.blend ?? 3);
+    let segs = segmentsCut(seq, n, cuts, f0);
     if (dense.size) {
       const W0 = seq.map(v => JSON.stringify(written(v)));
       segs = segs.flatMap(([a, b]) => {
-        const inner = [...dense].filter(k => k > a && k < b && (W0[k] !== W0[k - 1] || W0[k] !== W0[k + 1])).sort((x, y) => x - y);
+        const inner = [...dense].filter(k => k > a && k < b && free(k) && (W0[k] !== W0[k - 1] || W0[k] !== W0[k + 1])).sort((x, y) => x - y);
         const pts = [a, ...inner, b];
         return pts.slice(1).map((y, i) => [pts[i], y]);
       });
@@ -408,8 +419,8 @@ for (const c of CLIPS) {
     // the blade keys at the clip events (S2d: the hits, the clashes; the event check runs on what ships), and a body part the
     // shipped blade enters at an event keys there too (extraSplit, filled by the event check below)
     {
-      const evs = n === 'sword' || n === 'sword_glow' ? [...new Set(Object.values(c.events))].filter(t => t > 0 && t < c.len) : [];
-      const xs = [...new Set([...evs, ...extraSplit[n]])];
+      const evs = n === 'sword' || n === 'sword_glow' ? evT : [];
+      const xs = [...new Set([...[...evs, ...extraSplit[n]].filter(free), ...(f0 < c.len ? [f0] : []), ...syncFirst[n]])];
       if (xs.length) segs = segs.flatMap(([a, b]) => { const pts = [a, ...xs.filter(t => t > a && t < b).sort((x, y) => x - y), b]; return pts.slice(1).map((y, i) => [pts[i], y]); });
     }
     // a segment whose client interpolation dips below the floor is split at its lowest tick (until none dips)
@@ -467,11 +478,62 @@ for (const c of CLIPS) {
         cv[t] = d > 0 && t < k0 + d ? interp(from, tgt, (t - k0) / d) : tgt;
       }
     }
-    compiledD[n] = cv; keyLists[n] = {keyList, seq, partMotion};
+    compiledD[n] = cv; keyLists[n] = {keyList, seq, partMotion}; firstEnd[n] = segs[0][1];
   };
   for (const n of PART_NAMES) compilePart(n);
-  // the blade at the clip events (as shipped): no sample inside a body box (1 cm in); a failing event keys the blade and the
-  // part it enters at that tick (up to three rounds), then reports what is left
+  // the riders' groups end their first keys together (the earliest of the group: a floor split of one splits all)
+  const RIDE_GROUPS = [['head', 'face', 'hat', 'hat_strings'], ['arm_l', 'forearm_l', 'sword', 'sword_glow']];
+  const syncRiders = () => {
+    if (c.loop) return;
+    for (const G of RIDE_GROUPS) for (let k = 0; k < 4; k++) {
+      const m = Math.min(...G.map(n => firstEnd[n]));
+      const late = G.filter(n => firstEnd[n] > m);
+      if (!late.length) break;
+      for (const n of late) { syncFirst[n].add(m); compilePart(n); }
+    }
+  };
+  syncRiders();
+  // S2d round 2 (VB3): while the hat is worn (no hand-over blend), the shipped brim (its lowest square, the hat's pivot plane)
+  // stays >= 0.001 b above the head's top corners: a tick where the two interpolations drift closer keys head, face and hat
+  // there (the solved frames hold it 0.002 above the base head's top; a cut tick and the tick after it, which holds the snap,
+  // are exempt, and so is the blend-in before f0: in game it starts from the previous clip's pose, the three parts together)
+  const wornT = F.map((fr, t) => t >= f0 && (fr.q.hat || 'worn') === 'worn' && !fr.q.hatX && (fr.q.vis ?? 1) >= .999 && !cuts.includes(t) && !cuts.includes(t - 1));
+  const [hbLo, hbHi] = BOX.head;
+  const wornGap = t => {
+    const hv = compiledD.head[t], tv = compiledD.hat[t];
+    if (!shown(hv) || !shown(tv)) return Infinity;
+    const hd = fromDisplay('head', hv), ht = fromDisplay('hat', tv);
+    let m = Infinity;
+    for (const x of [hbLo[0], hbHi[0]]) for (const z of [hbLo[2], hbHi[2]]) m = Math.min(m, -rot(conjQ(ht.q), sub(add(hd.t, rot(hd.q, [x, hbHi[1], z])), ht.t))[1]);
+    return m;
+  };
+  // a rider check on what ships: measure(t) >= 0 on every active tick, else the parts key together at the worst tick
+  const riderSplit = (parts, active, measure) => {
+    for (let guard = 0; guard < 200; guard++) {
+      let worst = null;
+      for (let t = 0; t <= c.len; t++) if (active[t]) { const g = measure(t); if (g < 0 && (!worst || g < worst.g)) worst = {t, g}; }
+      if (!worst || parts.every(n => extraSplit[n].has(worst.t))) return worst;
+      for (const n of parts) { extraSplit[n].add(worst.t); compilePart(n); }
+    }
+    return null;
+  };
+  // the cup in her right hand (S2d round 2): no cup point more than 0.03 inside the shipped right forearm's box
+  const cupT = F.map((fr, t) => t >= f0 && fr.q.cup === 'hand' && (fr.q.vis ?? 1) >= .999 && !cuts.includes(t) && !cuts.includes(t - 1));
+  const cupFit = t => {
+    const fv = compiledD.forearm_r[t], cv = compiledD.cup[t];
+    if (!shown(fv) || !shown(cv)) return 0;
+    const fa = fromDisplay('forearm_r', fv);
+    return .03 - Math.max(...worldPoints(modelOn('cup', F[t].p), 'cup', fromDisplay('cup', cv)).map(P => boxDepth(P, fa, BOX.forearm_r)));
+  };
+  const wornSplit = () => {
+    const w = riderSplit(['head', 'face', 'hat'], wornT, t => wornGap(t) - .001);
+    riderSplit(['forearm_r', 'cup'], cupT, cupFit);
+    return w && {t: w.t, g: w.g + .001};
+  };
+  wornSplit(); syncRiders();
+  // the blade at the clip events (as shipped): no sample inside a body box (1 cm in); a failing event keys the blade, the part it
+  // enters (with the parts riding it: the face, the worn hat and its strings on the head) and the sword arm at that tick (up to
+  // three rounds), then reports what is left
   const eventFails = () => {
     const out = [];
   for (const [ev, te] of Object.entries(c.events)) {
@@ -497,11 +559,13 @@ for (const c of CLIPS) {
     const fails = eventFails();
     if (!fails.length) break;
     const redo = new Set();
-    for (const f of fails) for (const n of [f.n, 'sword', 'sword_glow']) if (!extraSplit[n].has(f.te)) { extraSplit[n].add(f.te); redo.add(n); }
+    for (const f of fails) for (const n of [f.n, ...(RIDERS[f.n] || []), 'sword', 'sword_glow', 'arm_l', 'forearm_l']) if (!extraSplit[n].has(f.te)) { extraSplit[n].add(f.te); redo.add(n); }
     if (!redo.size) break;
     for (const n of redo) compilePart(n);
+    wornSplit(); syncRiders();
   }
   for (const f of eventFails()) bladeErrors.push(f.msg);
+  { const w = wornSplit(); if (w) wornErrors.push(`${c.name} t${w.t}: the worn brim ${w.g.toFixed(4)} b over the head's top corners as shipped (< 0.001)`); }
   // per-tick checks on what ships: floor (every shown model point; the blade / scabbard tips), culling, 1-tick turns
   for (let t = 0; t <= c.len; t++) {
     for (const n of PART_NAMES) {
@@ -587,6 +651,7 @@ for (const c of CLIPS) {
 const fail = (title, list) => { if (list.length) { const m = `${title}:\n  ${list.slice(0, +(arg('--show') || 40)).join('\n  ')}${list.length > 40 ? `\n  ... ${list.length} in all` : ''}`; if (flag('--allow-steps')) console.warn(m); else throw new Error(m); } };
 fail('floor (no shown element below the feet)', floorErrors);
 fail('the blade through her body at a clip event', bladeErrors);
+fail('the worn hat on the head as shipped', wornErrors);
 fail('rotations above 120 degrees per tick or per key', motionErrors);
 fail('a correction guard at its bound (scarlet_pose.mjs GUARD_BOUND)', boundErrors);
 fail('culling box overhang', cullWarn);
@@ -625,7 +690,7 @@ const DIMS = (() => {
   const ctr = add(g.scabbard.t, rot(g.scabbard.q, [0, -ITEM_SWORD.shift, 0])), rel = rot([-yaw[0], -yaw[1], -yaw[2], yaw[3]], sub(ctr, g._anchors.hand_r));
   return {height_idle: +headTop.toFixed(4), hat_top: +F0._anchors.hat_crown[1].toFixed(4), hull_top: +hullTop.toFixed(4),
     hat: {R: HAT.R, crownR: HAT.crownR, crownH: HAT.crownH, crown_y0: +(HAT.gap * 3 + .002).toFixed(4), brim: SK.brim, tilt: SK.brimTilt, hand: SK.hatHand, back: SK.hatBack},
-    strings: STRINGS, sash: SASH.tails,
+    strings: {...STRINGS, painted: stringPoints()}, sash: SASH.tails,
     sword: {len: +(SWORD.tip - SWORD.pommel).toFixed(4), tip: SWORD.tip, blade_lo: SWORD.bladeLo, guard: SWORD.guard, pommel: SWORD.pommel, grip_lo: SWORD.gripLo, grip_hi: SWORD.gripHi,
       display_scale: PART_SCALE.sword},
     scabbard: {L: SCAB.L, display_scale: PART_SCALE.scabbard},
@@ -775,7 +840,7 @@ const manifest = {
   ghost_texture: itemId('ghost'),
   skin: {texture: SKIN_ID, file: `${TEX_DIR}/skin.png`, source: 'tools/scarlet_skin.mjs: the user\'s own skin (11-05), bytes written unchanged',
     bytes: SKIN_BYTES, sha1: SKIN_SHA1, size: [64, 64],
-    layout: 'player avatar (tools/build_player_rig.mjs bodyModels) with classic 4-px arms (tools/arlecchino_geometry.mjs P2_SPECS)',
+    layout: 'player avatar (tools/build_player_rig.mjs bodyModels = tools/arlecchino_geometry.mjs P1_SPECS) with its slim 3-px arms (the user\'s skin is a slim skin)',
     regions: SKIN_REGIONS, px: SKIN.px, body_px: SKIN.bodyPx, head0: SKIN.head0, inflate_px: {head: SKIN.inflHead, body: SKIN.infl}, inflate_ends: 'all',
     specs: BODY_SPECS, map: SKIN_MAP, hidden: HIDDEN, face_overlays: FACE_FX,
     _doc: 'map: model -> [region, row start, row end] (the base box shows the region\'s base layer, the second box its outer layer, inflated on all six sides). specs: the avatar\'s box specs (from / to in model units about the pivot [8, 8, 8], uv / over = [u, v, w, h, d], rows start..end). hidden: parts the skin already shows (model empty, scale 0). face_overlays: [col, row, cols, rows] of the 8 x 8 face painted by face_fx.'},
@@ -788,7 +853,7 @@ const manifest = {
   support: supportTable,
   retarget: {factors: {S_LEG: +S_LEG.toFixed(6), S_ARM: +S_ARM.toFixed(6), S_SCAB: +S_SCAB.toFixed(6), K_ARC: +K_ARC.toFixed(6)},
     patches: PATCHES.map(P => ({id: P.id, clip: P.clip, in: P.in, out: P.out, ...(P.set ? {set: P.set} : {}), ...(P.add ? {add: P.add} : {}), why: P.why})),
-    iai_delta: IAI_DELTA, sh0: SH0P, hip_dir: hipDirChannels(), hat_flights: HAT_FLIGHTS, bounds: GUARD_BOUND, slopes: GUARD_SLOPE, clips: retargetTable,
+    iai_delta: IAI_DELTA, sh0: SH0P, hip_dir: hipDirChannels(), hat_flights: HAT_FLIGHTS, aside: ASIDE, bounds: GUARD_BOUND, slopes: GUARD_SLOPE, clips: retargetTable,
     _doc: 'per sample: retarget (angles kept; pos x k(lf); soles about the hip joint x S_LEG; grip distances x S_ARM + the lock rule; planted hands x S_LEG; scOff x S_SCAB; world-hat spots) -> overlay (PATCHES, the hat hand-overs, the flights) -> solve. clips: per clip the solver passes, the largest value of every correction guard (degrees, or cm for drop / bPush / close / hatBackZ / hatPush / hatClear, percent for armUp; +/- = the two senses), the largest contact distance per kind, the largest IK stretch, the blade residue inside the body (b), the largest support move and lift'},
   paint_roles: PAINT_ROLES,
   budgets: {atlas_px: atlasPx, atlas_budget: ATLAS_BUDGET, sprites: Object.keys(sprites).length, elements_at_rest: ELEMENTS, elements_budget: EL_BUDGET,

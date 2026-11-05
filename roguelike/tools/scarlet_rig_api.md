@@ -3,7 +3,7 @@
 The display-entity rig of the special boss 홍련 (Scarlet; module `scarlet`, function root `boss/scarlet`) and the contract
 between the rig and its users: the module (`tools/mboss_scarlet/*`, S3 / S4) and S2b's cinematic clips and sequences.
 **S2c (11-05, the user's request "마인크래프트 스킨을 이용해서 만들라고. 아를이나 라이덴처럼"):** the body wears the user's own
-Minecraft skin (`tools/scarlet_skin.mjs`, 64 × 64 classic with the outer layers; its pixels as given); what the rig makes
+Minecraft skin (`tools/scarlet_skin.mjs`, 64 × 64 slim (3-px arms) with the outer layers; its pixels as given); what the rig makes
 itself — the hat (a white 백립-style gat), its bead strings, the sash tails, the sword, the scabbard, the hilt, the cup, the
 bottle, `item_sword` — keeps S2a's shapes in colours matched to the skin.
 **S2d (11-05, the user's request "팔다리가 너무 기괴하게 긴데 그냥 플레이어 크기랑 똑같게해"):** the body is exactly this pack's
@@ -66,18 +66,20 @@ Item displays, `billboard:"fixed"`, `view_range:2f`, culling 8 × 8, block brigh
 `sash_tails` 14 in P2), tags `rlk_room rlk_mb_aux rlk_mb_part rlk_hr_part rlk_hr_<part>` (the shadow: no `rlk_mb_part`).
 S2d: head top 2.00 b (`api.HEIGHT`; the idle-t0 head 1.98), crown top 2.30 (`api.HAT_TOP`), brim Ø 1.32 (`api.BRIM_D`: four 1.32 b
 squares at 0 / 22.5 / 45 / −22.5° stacked 0.003 b apart, each painting only its own corner wedges inside the ring of radius
-0.66: no coplanar faces, no stacked translucency; the underside tinted through the item definition), crown Ø 0.50 × 0.30;
+0.66: no coplanar faces, no stacked translucency; the underside tinted through the item definition), crown Ø 0.50 × 0.30
+(a 16-facet drum; its top the same 16-gon: an annulus of 16 quads over a centre square, S2d round 2);
 worn, the hat sits level on the head: the brim 0.502 above the neck (`SK.brim`, `SK.brimTilt` 0), the crown's bottom 0.013 over
 the head's top,
 sword 1.94 b (`api.SWORD_LEN`: the blade tip 1.60 from the grip centre, the pommel −0.34) and scabbard 1.52 b
 (`api.SCABBARD_LEN`; both at display scale 1.5). Left-handed: the sword in `forearm_l`, the scabbard at the right hip / in
-the right hand. Elements at rest 208 (ghost 208) ≤ 6 500; 62 models; the atlas 47 872 px (27 painted sprites + the 4 096-px
+the right hand. Elements at rest 224 (ghost 224) ≤ 6 500; 62 models; the atlas 47 872 px (27 painted sprites + the 4 096-px
 skin) ≤ 0.15 M. The boss entity: husk `scale 1.0`, click shield `hit {w 1.2, h 2.4}` (the idle-loop hull top 2.33 incl. the hat).
 
 **The body (S2d): the player avatar's.** One skin pixel is 1/16 b in every direction, exactly as `build_player_rig.mjs`'s
 avatar: the head 8 × 8 × 8 px (0.5 b), the body 8 × 12 × 4 split at body row 9 into the torso (rows 0-9, pivot at the seam)
-and the pelvis (rows 9-12, pivot at the hip line), classic 4-px arms (upper arm rows 0-6, forearm with the hand 6-12; the
-arms' boxes and UVs as 아를레키노 P2's) and legs (thigh 0-6, shin 6-12), each model two boxes: the base layer and the outer
+and the pelvis (rows 9-12, pivot at the hip line), the avatar's slim 3-px arms (the user's skin is slim; upper arm rows 0-6,
+forearm with the hand 6-12; `arlecchino_geometry.mjs` P1_SPECS = `build_player_rig.mjs`'s specs, S2d round 2) and legs
+(thigh 0-6, shin 6-12), each model two boxes: the base layer and the outer
 layer (0.5 px on the head, 0.25 px elsewhere, inflated on all six sides). The 15 body models equal the avatar's elements
 exactly (`test_rig.py` `body`); `skin.map` in the manifest lists every model's region and rows. Hidden (model `empty`, one
 fixed scale-0 transform keyed at a clip's tick 0): `hair_tail_1` `hair_tail_2` (the skin's own back hair reads as the
@@ -209,16 +211,21 @@ texture, the atlas > 0.15 M px, elements at rest > 6 500; S2d: a correction guar
 is neither a rest spot nor in a flight, a contract value (`api.HEIGHT` ± 0.02, `HAT_TOP` / `SWORD_LEN` / `SCABBARD_LEN` /
 `ITEM_SWORD_*` ± 0.01, `BRIM_D`, the registry hit h − the idle hull top outside [0.05, 0.12]) off the build's own measure.
 Inside a run of ≥ 4 consecutive authored key ticks (the swings, spins, draws, flips) every moving part keys each tick; a
-planted foot's shin keys where its interpolation would lift the sole > 0.006. Numbers of the S2d build: 29 parts, 47 clips,
-2 571 rig functions (5.46 MB), 17 887 keys in 2 057 key files, 62 models, 27 painted sprites + the skin (47 872 px), 208
-elements at rest (ghost 208). The suite `S:hr/tests/test_rig.py` (141 checks with the S2d sections; `--rebuild` + 3: two
+planted foot's shin keys where its interpolation would lift the sole > 0.006. S2d round 2: a one-shot clip blends in from the
+previous clip's pose over the same ticks for every part (each part's first key ends at the first clip event from tick 2, else
+at the clip's blend; no dense / event / re-key split inside it, and the riders — head / face / hat / strings, the sword arm /
+sword / glow — end their first keys together); an event re-key splits the part the blade entered with its riders and the
+sword arm; while the hat is worn, head / face / hat key together wherever the shipped brim comes within 0.001 b of the head's
+top corners (a gate), and the right forearm / the cup wherever the cup sinks > 0.03 b into the shipped fist. Numbers of the S2d build: 29 parts, 47 clips,
+2 602 rig functions (5.69 MB), 18 761 keys in 2 086 key files, 62 models, 27 painted sprites + the skin (47 872 px), 224
+elements at rest (ghost 224). The suite `S:hr/tests/test_rig.py` (146 checks with the S2d sections; `--rebuild` + 3: two
 builds byte-identical) replays the shipped key files; on a manifest without the S2d blocks the new sections are skipped.
 
 ## 9. S2d: the skeleton, the retarget, the solver
 
 ### 9.1 The skeleton (`SK`; rig frame +X her left, +Y up, −Z forward, blocks; the manifest `skeleton`)
 The hip line 0.765625 above the floor at pos 0 (the pelvis pivot; 0.74 at rest), the hip joints ±0.125 on it, the seam (the
-torso pivot) 0.1875 above it, the neck base 0.5625 above the seam (0.75 above the hip line), the shoulders (±0.375, 0.4375)
+torso pivot) 0.1875 above it, the neck base 0.5625 above the seam (0.75 above the hip line), the shoulders (±0.34375, 0.4375)
 from the seam, upper arm 0.25 + forearm 0.34375 (to the grip point), thigh 0.375 + shin 0.390625 (to the outer layer's sole).
 The IK is clamped to the reach (no stretch). The world hat's spots, the stone (top 0.24, front −0.135, back 0.505, half-width
 0.6) and its item spots are in the rig frame turned by her yaw.
@@ -230,10 +237,12 @@ equation when the plain scaling folds the grip into the shoulder) and the lock r
 S_SCAB = 0.8352; the world hat to its rest spots (side, leg, face) or a re-anchored flight (repel 60-75, ending 26-39; arc ×
 K_ARC 0.8264). Derived weights `wLie` (the DOWN / LY family), `wSeat` (the intro seat), `wKnee` / `wLip` (patches).
 Declared patches (`PATCHES`, the only angle changes; `--dump` proves it): `KNEEL-K` (kipup 6-12) and `KNEEL-L` (lead_down
-5-11) the floor pickup of the hat on the right knee, `KNEEL-K-B` (kipup 3-16) / `KNEEL-L-B` (lead_down 1-14) the sword out
-at her left through the kip and the kneel (5- / 6-tick ramps: the blade turns <= 43 deg / t), `IAI` (cs1 104-161) tor yaw
+5-11) the floor pickup of the hat on the right knee, `KNEEL-K-B` (kipup 3-16) / `KNEEL-L-B` (lead_down 1-17: out over 6
+ticks after the kneel) the sword out at her left through the kip and the kneel, `IAI` (cs1 104-161) tor yaw
 +14 / head −14 for the cross-draw reach, `SIP` (intro 66-94) the cup at her lips, `SH0` (ending 297-326) the sheathe entry
-on the scabbard's axis (the builder's probe `SH0'`). The face spot of the world hat (LY) is parallel to her face, its front
+on the scabbard's axis (the builder's probe `SH0'`), `ASIDE` (intro 226-246, round 2) the feet step with seq.py's 1.1-b
+glide aside off the seat stone (four 0.55-b side steps, the stance sole kept on its world spot, the swing sole lifted
+<= 0.08 b over its planted height: `fLiftL` / `fLiftR`). The face spot of the world hat (LY) is parallel to her face, its front
 toward her feet (as the flight that lifts it at 27: no spin), the smallest lift / tilt that clears her forearms.
 
 ### 9.3 The solver's contacts (`scarlet_pose.mjs` `solve`)
@@ -244,10 +253,14 @@ the lying rest puts the lowest of pelvis / torso / head / legs at 0.002 with the
 `armUp`); the kneel puts the right knee on the floor (one tick after the patch's full weight: the bend plane turns 40° / t; the
 hips hold their height until it lands); the planted feet's soles at 0.002-0.004 (a bisecting boot loop; a foot the touch rule
 lifted is re-planted). Hand targets: the stone items (refined with the solved forearm), the brim hold, the floor hat, the hilt,
-the throat, the lips, the hat hand-overs; the blade-body guard through draws too (and the free right forearm); the hip
+the throat, the lips, the hat hand-overs; an arm whose segment would swing > 60° in a tick takes the bend plane (round the shoulder -> grip line)
+with the smallest swing, and every limb segment rolls ≤ 35° / t about itself (round 2); the blade-body guard through draws too
+(and the free right forearm); the hip
 scabbard yaws out of the hanging right arm (`scabArm`); the hand-held hat, its hand-overs and the worn / back swings keep out
 of her head and torso (`hatClear`: pushed out along the nearest box face, the right hand following as far as it reaches), the
-strings ease their gravity pull / lag, then turn (`strHead`), out of the head; the seated sash clears the stone's top
+strings (their painted strands, the loop and the strand below it: round 2) lag the hat by ≤ 30°, ease their gravity pull /
+lag, then turn (`strHead`, its sense kept through a swing over her head), out of the head; the worn hat is not floor-turned
+(the support lift carries it with her); the seated sash clears the stone's top
 (`sashSeat`); the flying world hat is pushed out of her body; the support pass: the touch rule (weight 1 − wSeat) and the air
 rule (the airborne height × (1 − wRoot) + 0.002 × wRoot: a full lying / kneeling / seated root stays on its support), then the
 last-resort lift.

@@ -1,4 +1,4 @@
-// 홍련 (Scarlet) skin: the user's own Minecraft skin (64 x 64 RGBA, classic 4-px arms, with the outer layers), given with
+// 홍련 (Scarlet) skin: the user's own Minecraft skin (64 x 64 RGBA, a SLIM skin: 3-px arms, with the outer layers), given with
 // the request of 11-05 ("마인크래프트 스킨을 이용해서 만들라고. 아를이나 라이덴처럼"). Embedded so the rig build is self-contained
 // (no binary in git): build_scarlet_rig.mjs writes the decoded bytes unchanged to the RP as
 // assets/rlk/textures/mboss/scarlet/skin.png (item atlas id rlk:mboss/scarlet/skin). Its pixels are used as they are (never

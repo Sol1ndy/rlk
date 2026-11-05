@@ -316,9 +316,9 @@
    ],
    "rest": {
     "t": [
-     -0.37614,
+     -0.34506,
      1.36367,
-     -0.00885
+     -0.00558
     ],
     "q": [
      0.17247,
@@ -352,9 +352,9 @@
    ],
    "rest": {
     "t": [
-     -0.45327,
+     -0.42219,
      1.13623,
-     -0.07832
+     -0.07505
     ],
     "q": [
      -0.10537,
@@ -388,15 +388,15 @@
    ],
    "rest": {
     "t": [
-     0.36976,
+     0.33868,
      1.36367,
-     0.06955
+     0.06628
     ],
     "q": [
-     0.07593,
-     -0.37217,
-     -0.03004,
-     0.92456
+     0.10183,
+     -0.36379,
+     0.00671,
+     0.92587
     ],
     "s": [
      1,
@@ -424,15 +424,15 @@
    ],
    "rest": {
     "t": [
-     0.37,
-     1.117,
-     0.02886
+     0.3603,
+     1.11887,
+     0.02036
     ],
     "q": [
-     -0.46024,
-     -0.28996,
-     -0.23524,
-     0.80546
+     -0.46894,
+     -0.29641,
+     -0.21102,
+     0.8048
     ],
     "s": [
      1,
@@ -933,10 +933,10 @@
      0.18
     ],
     "q": [
-     -0.83128,
-     0.08738,
-     0.13662,
-     0.53168
+     -0.82876,
+     0.09665,
+     0.15111,
+     0.53007
     ],
     "s": [
      1.5,
@@ -969,10 +969,10 @@
      0.18
     ],
     "q": [
-     -0.83128,
-     0.08738,
-     0.13662,
-     0.53168
+     -0.82876,
+     0.09665,
+     0.15111,
+     0.53007
     ],
     "s": [
      0,
@@ -1000,9 +1000,9 @@
    ],
    "rest": {
     "t": [
-     -0.48217,
-     0.67925,
-     0.02208
+     -0.45176,
+     0.66955,
+     0.02766
     ],
     "q": [
      0,
@@ -1036,15 +1036,15 @@
    ],
    "rest": {
     "t": [
-     -0.0264,
-     0.83119,
-     0.40017
+     -0.01878,
+     0.82972,
+     0.40685
     ],
     "q": [
-     -0.46024,
-     -0.28996,
-     -0.23524,
-     0.80546
+     -0.46894,
+     -0.29641,
+     -0.21102,
+     0.8048
     ],
     "s": [
      0,
@@ -1129,8 +1129,8 @@
    "events": {},
    "owner": "S2a",
    "key_files": 18,
-   "keys": 58,
-   "keys_per_tick": 1.4,
+   "keys": 81,
+   "keys_per_tick": 2,
    "source": "v1 8.0-9.6 / v3 6.5-8.2 (the stance: blade low across her front); sway sine 40 t",
    "note": "",
    "authored": true
@@ -1144,9 +1144,9 @@
    ],
    "events": {},
    "owner": "S2a",
-   "key_files": 19,
-   "keys": 58,
-   "keys_per_tick": 1.4,
+   "key_files": 17,
+   "keys": 76,
+   "keys_per_tick": 1.9,
    "source": "P2: lower, the blade further out (PLAN §2.5)",
    "note": "",
    "authored": true
@@ -1164,8 +1164,8 @@
    },
    "owner": "S2a",
    "key_files": 22,
-   "keys": 195,
-   "keys_per_tick": 7.8,
+   "keys": 210,
+   "keys_per_tick": 8.4,
    "source": "v1 8-26 (P1 walking between attacks), v5 9-13.5 (the walk-in)",
    "note": "",
    "authored": true
@@ -1179,9 +1179,9 @@
    ],
    "events": {},
    "owner": "S2a",
-   "key_files": 6,
-   "keys": 43,
-   "keys_per_tick": 2.5,
+   "key_files": 7,
+   "keys": 64,
+   "keys_per_tick": 3.8,
    "source": "P2 walk-in (PLAN §2.5; the ghost glide D2 on foot)",
    "note": "",
    "authored": true
@@ -1199,8 +1199,8 @@
    },
    "owner": "S2a",
    "key_files": 13,
-   "keys": 123,
-   "keys_per_tick": 5.9,
+   "keys": 128,
+   "keys_per_tick": 6.1,
    "source": "circling the player (P1 / P2 recoveries)",
    "note": "",
    "authored": true
@@ -1218,8 +1218,8 @@
    },
    "owner": "S2a",
    "key_files": 16,
-   "keys": 125,
-   "keys_per_tick": 6,
+   "keys": 130,
+   "keys_per_tick": 6.2,
    "source": "circling the player",
    "note": "",
    "authored": true
@@ -1233,8 +1233,8 @@
    },
    "owner": "S2a",
    "key_files": 11,
-   "keys": 130,
-   "keys_per_tick": 10,
+   "keys": 132,
+   "keys_per_tick": 10.2,
    "source": "a hop back (recovery spacing)",
    "note": "",
    "authored": true
@@ -1246,8 +1246,8 @@
    "events": {},
    "owner": "S2a",
    "key_files": 4,
-   "keys": 59,
-   "keys_per_tick": 8.4,
+   "keys": 63,
+   "keys_per_tick": 9,
    "source": "hit reaction",
    "note": "",
    "authored": true
@@ -1265,8 +1265,8 @@
    },
    "owner": "S2a",
    "key_files": 32,
-   "keys": 382,
-   "keys_per_tick": 10.9,
+   "keys": 388,
+   "keys_per_tick": 11.1,
    "source": "v1 9.667-10.400 (cr_v1_a1, v1s_a2_*): pivot, magenta glint, rising fan, flat crescent; footage glint -> hit 6 t, stretched to 14",
    "note": "",
    "authored": true
@@ -1284,8 +1284,8 @@
    },
    "owner": "S2a",
    "key_files": 30,
-   "keys": 345,
-   "keys_per_tick": 11.1,
+   "keys": 357,
+   "keys_per_tick": 11.5,
    "source": "v1 19.050-19.500 (cr_v1_a2a6a5, v1s_a8_*): glint -> hit 4.3 t (the fastest), stretched to 12; recovery v1 19.65-19.90",
    "note": "",
    "authored": true
@@ -1309,8 +1309,8 @@
    },
    "owner": "S2a",
    "key_files": 87,
-   "keys": 925,
-   "keys_per_tick": 9.5,
+   "keys": 958,
+   "keys_per_tick": 9.9,
    "source": "v1 23.150-26.300 (cr_v1_a3_leads, v1s_a12*, v1s_combo5): gaps 16 / 15 / 12 / 12; open after hit 5",
    "note": "",
    "authored": true
@@ -1336,9 +1336,9 @@
     "land": 38
    },
    "owner": "S2a",
-   "key_files": 59,
-   "keys": 767,
-   "keys_per_tick": 12.6,
+   "key_files": 60,
+   "keys": 791,
+   "keys_per_tick": 13,
    "source": "v1 10.800-12.550 (cr_v1_a4, v1s_a3_*, v1s_a4_*): leap, apex glint, flip, the S-ribbon dive; the ring spin; apex 7 t",
    "note": "",
    "authored": true
@@ -1354,9 +1354,9 @@
     "settle": 10
    },
    "owner": "S2a",
-   "key_files": 12,
-   "keys": 88,
-   "keys_per_tick": 4.2,
+   "key_files": 13,
+   "keys": 103,
+   "keys_per_tick": 4.9,
    "source": "v1 16.233-16.367 (cr_v1_a6, v1s_a7_*): the back-blink, then line 12",
    "note": "",
    "authored": true
@@ -1378,8 +1378,8 @@
    },
    "owner": "S2a",
    "key_files": 59,
-   "keys": 511,
-   "keys_per_tick": 7.9,
+   "keys": 520,
+   "keys_per_tick": 8,
    "source": "v1 13.067-14.733 (cr_v1_a9_ring*, cr_yellow_cmp, v1s_a5_*, v1s_a6_*): spin, the ring, the yellow tell, the star, the magenta screen, the iai cut",
    "note": "",
    "authored": true
@@ -1399,8 +1399,8 @@
    },
    "owner": "S2a",
    "key_files": 50,
-   "keys": 380,
-   "keys_per_tick": 6.7,
+   "keys": 407,
+   "keys_per_tick": 7.1,
    "source": "v1 20.000-21.700 (v1s_a10_*, cr_yellow_cmp): spring, the yellow tell in the air, the dive, the radial burst",
    "note": "",
    "authored": true
@@ -1416,9 +1416,9 @@
     "settle": 14
    },
    "owner": "S2a",
-   "key_files": 14,
-   "keys": 144,
-   "keys_per_tick": 8.5,
+   "key_files": 13,
+   "keys": 158,
+   "keys_per_tick": 9.3,
    "source": "v3 14.63-15.10 (cr_v3_tell_zoom, mg_yellow_cmp): the yellow tell, the retreat",
    "note": "",
    "authored": true
@@ -1436,8 +1436,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 259,
-   "keys_per_tick": 15.2,
+   "keys": 268,
+   "keys_per_tick": 15.8,
    "source": "v3 15.10-16.90 (v3r_d1/d2/d3_*, cr_v3_disc1_gold): crouch, blade up, the crescent, the spin, the release",
    "note": "",
    "authored": true
@@ -1455,8 +1455,8 @@
    },
    "owner": "S2a",
    "key_files": 8,
-   "keys": 51,
-   "keys_per_tick": 3.4,
+   "keys": 73,
+   "keys_per_tick": 4.9,
    "source": "v2 f540-f550, v3 f440-f448 (cr_pretell_*): the hand to the brim",
    "note": "",
    "authored": true
@@ -1472,8 +1472,8 @@
    },
    "owner": "S2a",
    "key_files": 4,
-   "keys": 68,
-   "keys_per_tick": 5.2,
+   "keys": 71,
+   "keys_per_tick": 5.5,
    "source": "v2 f582-f620, v3 f492-f523 (cr_tell_T0): one-tick lilac switch, burst, ribbons",
    "note": "",
    "authored": true
@@ -1488,8 +1488,8 @@
    },
    "owner": "S2a",
    "key_files": 8,
-   "keys": 73,
-   "keys_per_tick": 6.6,
+   "keys": 78,
+   "keys_per_tick": 7.1,
    "source": "the ghost reforms (R1 / R3, A8 fail)",
    "note": "",
    "authored": true
@@ -1505,8 +1505,8 @@
    },
    "owner": "S2a",
    "key_files": 9,
-   "keys": 159,
-   "keys_per_tick": 12.2,
+   "keys": 163,
+   "keys_per_tick": 12.5,
    "source": "v2 10.433 / 15.00, v3 8.933 / 11.550 (v2f_b1_dash): far reappear, hover, straight dash",
    "note": "",
    "authored": true
@@ -1521,9 +1521,9 @@
     "stop": 9
    },
    "owner": "S2a",
-   "key_files": 9,
-   "keys": 97,
-   "keys_per_tick": 7.5,
+   "key_files": 10,
+   "keys": 110,
+   "keys_per_tick": 8.5,
    "source": "v2 13.350, v3 13.100 (v3 f810-f813): side reappear, the glide",
    "note": "",
    "authored": true
@@ -1556,9 +1556,9 @@
     "lunge": 10
    },
    "owner": "S2a",
-   "key_files": 13,
-   "keys": 160,
-   "keys_per_tick": 10.7,
+   "key_files": 12,
+   "keys": 162,
+   "keys_per_tick": 10.8,
    "source": "v3 17.667 (v3r_s7..): the run-in",
    "note": "",
    "authored": true
@@ -1574,8 +1574,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 282,
-   "keys_per_tick": 18.8,
+   "keys": 248,
+   "keys_per_tick": 16.5,
    "source": "v2 11.050, v3 9.583 (v2f_s1_1f): the ring cut",
    "note": "",
    "authored": true
@@ -1591,8 +1591,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 242,
-   "keys_per_tick": 16.1,
+   "keys": 246,
+   "keys_per_tick": 16.4,
    "source": "v2 11.683, v3 10.200 (cr_a82_windup): spin, arms up, the band",
    "note": "",
    "authored": true
@@ -1610,8 +1610,8 @@
    },
    "owner": "S2a",
    "key_files": 16,
-   "keys": 303,
-   "keys_per_tick": 15.9,
+   "keys": 314,
+   "keys_per_tick": 16.5,
    "source": "v2 12.450, v3 10.92 (v2f_s3_*): coil, the leaping cut, tumbling, vanishes",
    "note": "",
    "authored": true
@@ -1627,8 +1627,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 192,
-   "keys_per_tick": 12.8,
+   "keys": 206,
+   "keys_per_tick": 13.7,
    "source": "v2 13.700, v3 13.583 (v2f_s4_*): the low sweep, the spring",
    "note": "",
    "authored": true
@@ -1645,8 +1645,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 192,
-   "keys_per_tick": 11.3,
+   "keys": 208,
+   "keys_per_tick": 12.2,
    "source": "v2 14.317, v3 14.183 (v2f_s5_*): the X",
    "note": "",
    "authored": true
@@ -1660,9 +1660,9 @@
     "hit": 3
    },
    "owner": "S2a",
-   "key_files": 12,
-   "keys": 122,
-   "keys_per_tick": 9.4,
+   "key_files": 10,
+   "keys": 112,
+   "keys_per_tick": 8.6,
    "source": "v2 ~16.91, v3 ~18.300 (v2f_s6_*): the wrap-around",
    "note": "",
    "authored": true
@@ -1677,8 +1677,8 @@
    },
    "owner": "S2a",
    "key_files": 12,
-   "keys": 218,
-   "keys_per_tick": 16.8,
+   "keys": 206,
+   "keys_per_tick": 15.8,
    "source": "v2 ~17.36, v3 18.767 (v2f_s7_*): the spin dome",
    "note": "",
    "authored": true
@@ -1695,9 +1695,9 @@
     "gone": 18
    },
    "owner": "S2a",
-   "key_files": 19,
-   "keys": 279,
-   "keys_per_tick": 13.3,
+   "key_files": 18,
+   "keys": 297,
+   "keys_per_tick": 14.1,
    "source": "v2 ~18.11, v3 ~19.500 (mg_pink_glint): the pink glow, the rising vertical cut, rising out of view",
    "note": "",
    "authored": true
@@ -1713,8 +1713,8 @@
    },
    "owner": "S2a",
    "key_files": 10,
-   "keys": 150,
-   "keys_per_tick": 13.6,
+   "keys": 116,
+   "keys_per_tick": 10.5,
    "source": "v2 19.083, v3 20.483 (v2f_s9_dive, v3r_s10_dive_1f): the diving overhead strike, blade down",
    "note": "",
    "authored": true
@@ -1730,8 +1730,8 @@
    },
    "owner": "S2a",
    "key_files": 12,
-   "keys": 151,
-   "keys_per_tick": 11.6,
+   "keys": 168,
+   "keys_per_tick": 12.9,
    "source": "v2 19.10-19.28 (the parried dive), v2f_c1 (the lock)",
    "note": "",
    "authored": true
@@ -1755,9 +1755,9 @@
     "kick": 102
    },
    "owner": "S2b",
-   "key_files": 84,
-   "keys": 1098,
-   "keys_per_tick": 10.5,
+   "key_files": 85,
+   "keys": 1125,
+   "keys_per_tick": 10.7,
    "source": "v2 19.72-24.95 / v3 21.10-26.25 (v2f_c1, v2f_c2, v2f_c_keys1/2, v2f_c_hat, v2f_c_throw, v3r_c_flip): lock, grab, clash on the hat, flip, back to back, throw, lying, the kick",
    "note": "",
    "authored": true
@@ -1771,9 +1771,9 @@
    ],
    "events": {},
    "owner": "S2a",
-   "key_files": 4,
-   "keys": 33,
-   "keys_per_tick": 0.8,
+   "key_files": 5,
+   "keys": 54,
+   "keys_per_tick": 1.3,
    "source": "v2 24.95 -> v3 4.10 (v2f_d_*, cr_v2_down): lying on her back, the hat beside her",
    "note": "",
    "authored": true
@@ -1790,8 +1790,8 @@
    },
    "owner": "S2a",
    "key_files": 19,
-   "keys": 262,
-   "keys_per_tick": 12.5,
+   "keys": 267,
+   "keys_per_tick": 12.7,
    "source": "v3 4.10 (v3r_a_kipup, cr_v3_kipup): the kip-up; the hat picked up and put on (v3 4.7-6.5)",
    "note": "",
    "authored": true
@@ -1814,9 +1814,9 @@
     "brim": 65
    },
    "owner": "S2b",
-   "key_files": 69,
-   "keys": 568,
-   "keys_per_tick": 6.8,
+   "key_files": 70,
+   "keys": 575,
+   "keys_per_tick": 6.9,
    "source": "v3 4.10-8.18 (v3r_a_kipup, cr_v3_kipup: the kip-up, the sword vertical; v3r_a_5to8: the hat at shoulder height, side steps; cr_pretell_v3: the hand to the brim)",
    "note": "",
    "authored": true
@@ -1837,9 +1837,9 @@
     "brim": 53
    },
    "owner": "S2b",
-   "key_files": 57,
-   "keys": 382,
-   "keys_per_tick": 5.4,
+   "key_files": 56,
+   "keys": 388,
+   "keys_per_tick": 5.5,
    "source": "PLAN §3.5 (the lead_down beats from standing; v3r_a_5to8, cr_pretell_v3)",
    "note": "",
    "authored": true
@@ -1859,9 +1859,9 @@
     "brim": 46
    },
    "owner": "S2b",
-   "key_files": 42,
-   "keys": 236,
-   "keys_per_tick": 3.9,
+   "key_files": 44,
+   "keys": 269,
+   "keys_per_tick": 4.4,
    "source": "v2 6.93-9.70 (v2f_a_boss_far_01: the re-hat; cr_pretell_hand: the hand to the brim from T0 - 14)",
    "note": "",
    "authored": true
@@ -1892,9 +1892,9 @@
     "scab_up": 510
    },
    "owner": "S2b",
-   "key_files": 404,
-   "keys": 2143,
-   "keys_per_tick": 3.9,
+   "key_files": 408,
+   "keys": 2352,
+   "keys_per_tick": 4.2,
    "source": "staged (v1s_intro_stairs: the far figure; PLAN §3.1 E0-E10); E10 v1 4.8-5.8 (v1s_intro_keys: the scabbard upright, hilt up)",
    "note": "",
    "authored": true
@@ -1918,8 +1918,8 @@
    },
    "owner": "S2b",
    "key_files": 54,
-   "keys": 580,
-   "keys_per_tick": 6.7,
+   "keys": 624,
+   "keys_per_tick": 7.2,
    "source": "v1 2.2-8.05 (v1s_intro_keys: smile, head down, turn away, spin; mg_v1_hands_zoom / cr_v1_stance_hand: the draw and the stance)",
    "note": "",
    "authored": true
@@ -1955,9 +1955,9 @@
     "swirl": 183
    },
    "owner": "S2b",
-   "key_files": 129,
-   "keys": 1136,
-   "keys_per_tick": 5.3,
+   "key_files": 137,
+   "keys": 1178,
+   "keys_per_tick": 5.5,
    "source": "v1 37.28-39.2 (v1s_cs_keys: lunge, lock, apart, the hat on her back), v2 0-6.9 (v2f_cs_keys1/2, v2f_cs_hat, cr_v2_a11: the iai, 홍련일섬)",
    "note": "",
    "authored": true
@@ -2019,9 +2019,9 @@
     "eyes": 1030
    },
    "owner": "S2b",
-   "key_files": 478,
-   "keys": 3598,
-   "keys_per_tick": 3.4,
+   "key_files": 493,
+   "keys": 3749,
+   "keys_per_tick": 3.6,
    "source": "v3 26.27-40.3 (v3r_e_shots1-4, v3r_e_slash_2f), v4 (v4k_c*, v4k_s4_sheathe, v4k_s5_face), v5 (v5e_s1_*, v5e_s2_turn*, v5e_s3_keys1-3)",
    "note": "",
    "authored": true
@@ -2037,8 +2037,8 @@
    },
    "owner": "S2a",
    "key_files": 27,
-   "keys": 172,
-   "keys_per_tick": 4.9,
+   "keys": 194,
+   "keys_per_tick": 5.5,
    "source": "PLAN §7.3.2 item branch E0-E34 (lift, present, toss)",
    "note": "",
    "authored": true
@@ -2053,9 +2053,9 @@
     "offer": 30
    },
    "owner": "S2a",
-   "key_files": 19,
-   "keys": 80,
-   "keys_per_tick": 2.3,
+   "key_files": 20,
+   "keys": 102,
+   "keys_per_tick": 2.9,
    "source": "PLAN §7.3.2 buff branch E0-E34 (look, palm, offer)",
    "note": "",
    "authored": true
@@ -2070,8 +2070,8 @@
    },
    "owner": "S2a",
    "key_files": 8,
-   "keys": 103,
-   "keys_per_tick": 9.4,
+   "keys": 107,
+   "keys_per_tick": 9.7,
    "source": "PLAN §7.3.2 E34-E40 (the turn away; petals and wind hide her)",
    "note": "",
    "authored": true
@@ -2284,7 +2284,7 @@
  "view_range": 2,
  "storage": {
   "anchors": "rlk:hr rig.an",
-  "version": 23912149
+  "version": 13920498
  },
  "ghost_texture": "rlk:mboss/scarlet/ghost",
  "skin": {
@@ -2297,7 +2297,7 @@
    64,
    64
   ],
-  "layout": "player avatar (tools/build_player_rig.mjs bodyModels) with classic 4-px arms (tools/arlecchino_geometry.mjs P2_SPECS)",
+  "layout": "player avatar (tools/build_player_rig.mjs bodyModels = tools/arlecchino_geometry.mjs P1_SPECS) with its slim 3-px arms (the user's skin is a slim skin)",
   "regions": {
    "head": [
     [
@@ -2335,14 +2335,14 @@
     [
      40,
      16,
-     4,
+     3,
      12,
      4
     ],
     [
      40,
      32,
-     4,
+     3,
      12,
      4
     ]
@@ -2351,14 +2351,14 @@
     [
      32,
      48,
-     4,
+     3,
      12,
      4
     ],
     [
      48,
      48,
-     4,
+     3,
      12,
      4
     ]
@@ -2494,26 +2494,26 @@
    },
    "arm_r": {
     "from": [
-     6,
+     6.5,
      4,
      6
     ],
     "to": [
-     10,
+     9.5,
      10,
      10
     ],
     "uv": [
      40,
      16,
-     4,
+     3,
      12,
      4
     ],
     "over": [
      40,
      32,
-     4,
+     3,
      12,
      4
     ],
@@ -2523,26 +2523,26 @@
    },
    "arm_l": {
     "from": [
-     6,
+     6.5,
      4,
      6
     ],
     "to": [
-     10,
+     9.5,
      10,
      10
     ],
     "uv": [
      32,
      48,
-     4,
+     3,
      12,
      4
     ],
     "over": [
      48,
      48,
-     4,
+     3,
      12,
      4
     ],
@@ -2552,26 +2552,26 @@
    },
    "forearm_r": {
     "from": [
-     6,
+     6.5,
      2,
      6
     ],
     "to": [
-     10,
+     9.5,
      8,
      10
     ],
     "uv": [
      40,
      16,
-     4,
+     3,
      12,
      4
     ],
     "over": [
      40,
      32,
-     4,
+     3,
      12,
      4
     ],
@@ -2581,26 +2581,26 @@
    },
    "forearm_l": {
     "from": [
-     6,
+     6.5,
      2,
      6
     ],
     "to": [
-     10,
+     9.5,
      8,
      10
     ],
     "uv": [
      32,
      48,
-     4,
+     3,
      12,
      4
     ],
     "over": [
      48,
      48,
-     4,
+     3,
      12,
      4
     ],
@@ -3016,7 +3016,7 @@
    0
   ],
   "shoulder": [
-   0.375,
+   0.34375,
    0.4375,
    0
   ],
@@ -3085,7 +3085,7 @@
  "dims": {
   "height_idle": 1.9835,
   "hat_top": 2.3024,
-  "hull_top": 2.3293,
+  "hull_top": 2.329,
   "hat": {
    "R": 0.66,
    "crownR": 0.25,
@@ -3108,7 +3108,444 @@
    "Z": -0.325,
    "X": 0.3,
    "LOOP": 0.535,
-   "L": 0.615
+   "L": 0.615,
+   "painted": [
+    [
+     0.2487,
+     -0.01,
+     -0.325
+    ],
+    [
+     0.273,
+     -0.01,
+     -0.325
+    ],
+    [
+     0.2973,
+     -0.01,
+     -0.325
+    ],
+    [
+     -0.2973,
+     -0.01,
+     -0.325
+    ],
+    [
+     -0.273,
+     -0.01,
+     -0.325
+    ],
+    [
+     -0.2487,
+     -0.01,
+     -0.325
+    ],
+    [
+     0.2487,
+     -0.0586,
+     -0.325
+    ],
+    [
+     0.273,
+     -0.0586,
+     -0.325
+    ],
+    [
+     0.2973,
+     -0.0586,
+     -0.325
+    ],
+    [
+     -0.2973,
+     -0.0586,
+     -0.325
+    ],
+    [
+     -0.273,
+     -0.0586,
+     -0.325
+    ],
+    [
+     -0.2487,
+     -0.0586,
+     -0.325
+    ],
+    [
+     0.2487,
+     -0.1073,
+     -0.325
+    ],
+    [
+     0.273,
+     -0.1073,
+     -0.325
+    ],
+    [
+     0.2973,
+     -0.1073,
+     -0.325
+    ],
+    [
+     -0.2973,
+     -0.1073,
+     -0.325
+    ],
+    [
+     -0.273,
+     -0.1073,
+     -0.325
+    ],
+    [
+     -0.2487,
+     -0.1073,
+     -0.325
+    ],
+    [
+     0.2487,
+     -0.1559,
+     -0.325
+    ],
+    [
+     0.273,
+     -0.1559,
+     -0.325
+    ],
+    [
+     0.2973,
+     -0.1559,
+     -0.325
+    ],
+    [
+     -0.2973,
+     -0.1559,
+     -0.325
+    ],
+    [
+     -0.273,
+     -0.1559,
+     -0.325
+    ],
+    [
+     -0.2487,
+     -0.1559,
+     -0.325
+    ],
+    [
+     0.2487,
+     -0.2045,
+     -0.325
+    ],
+    [
+     0.273,
+     -0.2045,
+     -0.325
+    ],
+    [
+     0.2973,
+     -0.2045,
+     -0.325
+    ],
+    [
+     -0.2973,
+     -0.2045,
+     -0.325
+    ],
+    [
+     -0.273,
+     -0.2045,
+     -0.325
+    ],
+    [
+     -0.2487,
+     -0.2045,
+     -0.325
+    ],
+    [
+     0.2487,
+     -0.2532,
+     -0.325
+    ],
+    [
+     0.273,
+     -0.2532,
+     -0.325
+    ],
+    [
+     0.2973,
+     -0.2532,
+     -0.325
+    ],
+    [
+     -0.2973,
+     -0.2532,
+     -0.325
+    ],
+    [
+     -0.273,
+     -0.2532,
+     -0.325
+    ],
+    [
+     -0.2487,
+     -0.2532,
+     -0.325
+    ],
+    [
+     0.2487,
+     -0.3018,
+     -0.325
+    ],
+    [
+     0.273,
+     -0.3018,
+     -0.325
+    ],
+    [
+     0.2973,
+     -0.3018,
+     -0.325
+    ],
+    [
+     -0.2973,
+     -0.3018,
+     -0.325
+    ],
+    [
+     -0.273,
+     -0.3018,
+     -0.325
+    ],
+    [
+     -0.2487,
+     -0.3018,
+     -0.325
+    ],
+    [
+     0.2487,
+     -0.3505,
+     -0.325
+    ],
+    [
+     0.273,
+     -0.3505,
+     -0.325
+    ],
+    [
+     0.2973,
+     -0.3505,
+     -0.325
+    ],
+    [
+     -0.2973,
+     -0.3505,
+     -0.325
+    ],
+    [
+     -0.273,
+     -0.3505,
+     -0.325
+    ],
+    [
+     -0.2487,
+     -0.3505,
+     -0.325
+    ],
+    [
+     0.2487,
+     -0.3991,
+     -0.325
+    ],
+    [
+     0.273,
+     -0.3991,
+     -0.325
+    ],
+    [
+     0.2973,
+     -0.3991,
+     -0.325
+    ],
+    [
+     -0.2973,
+     -0.3991,
+     -0.325
+    ],
+    [
+     -0.273,
+     -0.3991,
+     -0.325
+    ],
+    [
+     -0.2487,
+     -0.3991,
+     -0.325
+    ],
+    [
+     0.2487,
+     -0.4477,
+     -0.325
+    ],
+    [
+     0.273,
+     -0.4477,
+     -0.325
+    ],
+    [
+     0.2973,
+     -0.4477,
+     -0.325
+    ],
+    [
+     -0.2973,
+     -0.4477,
+     -0.325
+    ],
+    [
+     -0.273,
+     -0.4477,
+     -0.325
+    ],
+    [
+     -0.2487,
+     -0.4477,
+     -0.325
+    ],
+    [
+     0.1715,
+     -0.4964,
+     -0.325
+    ],
+    [
+     0.1958,
+     -0.4964,
+     -0.325
+    ],
+    [
+     0.2201,
+     -0.4964,
+     -0.325
+    ],
+    [
+     -0.2201,
+     -0.4964,
+     -0.325
+    ],
+    [
+     -0.1958,
+     -0.4964,
+     -0.325
+    ],
+    [
+     -0.1715,
+     -0.4964,
+     -0.325
+    ],
+    [
+     -0.0243,
+     -0.545,
+     -0.325
+    ],
+    [
+     0,
+     -0.545,
+     -0.325
+    ],
+    [
+     0.0243,
+     -0.545,
+     -0.325
+    ],
+    [
+     -0.0243,
+     -0.545,
+     -0.325
+    ],
+    [
+     0,
+     -0.545,
+     -0.325
+    ],
+    [
+     0.0243,
+     -0.545,
+     -0.325
+    ],
+    [
+     -0.016,
+     -0.5304,
+     -0.3269
+    ],
+    [
+     0,
+     -0.5304,
+     -0.3269
+    ],
+    [
+     0.016,
+     -0.5304,
+     -0.3269
+    ],
+    [
+     -0.016,
+     -0.55,
+     -0.3188
+    ],
+    [
+     0,
+     -0.55,
+     -0.3188
+    ],
+    [
+     0.016,
+     -0.55,
+     -0.3188
+    ],
+    [
+     -0.016,
+     -0.5696,
+     -0.3106
+    ],
+    [
+     0,
+     -0.5696,
+     -0.3106
+    ],
+    [
+     0.016,
+     -0.5696,
+     -0.3106
+    ],
+    [
+     -0.016,
+     -0.5893,
+     -0.3025
+    ],
+    [
+     0,
+     -0.5893,
+     -0.3025
+    ],
+    [
+     0.016,
+     -0.5893,
+     -0.3025
+    ],
+    [
+     -0.016,
+     -0.6089,
+     -0.2944
+    ],
+    [
+     0,
+     -0.6089,
+     -0.2944
+    ],
+    [
+     0.016,
+     -0.6089,
+     -0.2944
+    ]
+   ]
   },
   "sash": [
    [
@@ -3185,14 +3622,14 @@
     -0.4
    ],
    "face": [
-    -0.0617,
-    0.7124,
-    0.8469
+    -0.06,
+    0.7032,
+    0.8504
    ]
   },
   "hat_face": {
    "tilt": 0,
-   "lift": 0.05
+   "lift": 0.04
   },
   "shadow_r": 0.6,
   "contacts": {
@@ -3211,7 +3648,7 @@
     0.09,
     -0.37525000000000003
    ],
-   "cup_hand": 0.09,
+   "cup_hand": 0.1,
    "cup_centre": 0.036,
    "bottle_neck": 0.27,
    "two_hand": 0.22,
@@ -6774,7 +7211,9 @@
    "cuts": [
     18
    ],
-   "lift": {},
+   "lift": {
+    "13": 0.019
+   },
    "hat_push": {},
    "contacts": []
   },
@@ -7569,8 +8008,9 @@
    "cuts": [],
    "lift": {},
    "hat_push": {
-    "13": 12.9,
-    "14": 15.4,
+    "12": 2.3,
+    "13": 18.2,
+    "14": 15.9,
     "15": 4.9
    },
    "contacts": [
@@ -7863,9 +8303,9 @@
    "cuts": [],
    "lift": {},
    "hat_push": {
-    "41": 6.4,
-    "42": 14.8,
-    "43": 14.8,
+    "41": 6.5,
+    "42": 15.5,
+    "43": 15.5,
     "44": 13.6,
     "46": 0.6
    },
@@ -8181,12 +8621,13 @@
    "lift": {},
    "hat_push": {
     "9": 5.7,
-    "10": 17.6,
-    "11": 2.6,
-    "30": 15.1,
-    "31": 15.5,
-    "32": 14.3,
-    "33": 2.9,
+    "10": 19.1,
+    "11": 4.3,
+    "29": 13.9,
+    "30": 28.9,
+    "31": 29.9,
+    "32": 17.2,
+    "33": 3.3,
     "34": 1.1
    },
    "contacts": [
@@ -8455,9 +8896,10 @@
    "lift": {},
    "hat_push": {
     "14": 4.1,
-    "15": 1,
-    "23": 3.8,
-    "24": 18.8,
+    "15": 4.1,
+    "22": 2.3,
+    "23": 6,
+    "24": 21,
     "25": 7.5
    },
    "contacts": [
@@ -9107,6 +9549,14 @@
    "feet_l": [
     [
      221,
+     231
+    ],
+    [
+     236,
+     241
+    ],
+    [
+     246,
      248
     ],
     [
@@ -9177,6 +9627,14 @@
    "feet_r": [
     [
      221,
+     226
+    ],
+    [
+     231,
+     236
+    ],
+    [
+     241,
      256
     ],
     [
@@ -13713,9 +14171,7 @@
    "cuts": [
     1
    ],
-   "lift": {
-    "26": 0.005
-   },
+   "lift": {},
    "hat_push": {},
    "contacts": [
     [
@@ -15145,8 +15601,8 @@
      6
     ],
     "out": [
-     9,
-     14
+     11,
+     17
     ],
     "set": {
      "gF": 0,
@@ -15159,7 +15615,7 @@
      "ed": -1,
      "tw": 0
     },
-    "why": "the sword out at her left through the kip and the kneel (5-tick ramps: no whip)"
+    "why": "the sword out at her left through the kip and the kneel (a 5-tick ramp in; out over 6 ticks after the kneel: no whip, the elbow never crosses the shoulder)"
    },
    {
     "id": "IAI",
@@ -15214,14 +15670,27 @@
      326
     ],
     "why": "the sheathe entry on the new scabbard axis (SH0')"
+   },
+   {
+    "id": "ASIDE",
+    "clip": "intro",
+    "in": [
+     226,
+     226
+    ],
+    "out": [
+     246,
+     246
+    ],
+    "why": "the feet step with seq.py's 1.1-b glide aside off the seat stone (4 side steps of 0.55 b, the stance sole kept on its world spot)"
    }
   ],
   "iai_delta": 14,
   "sh0": {
    "gF": 0,
-   "gB": -58.185609,
-   "gE": 28.314005,
-   "gD": 0.803347,
+   "gB": -59.471717,
+   "gE": 27.435269,
+   "gD": 0.826985,
    "cB": 90,
    "cR": 0,
    "th": -25,
@@ -15258,6 +15727,12 @@
     }
    }
   },
+  "aside": {
+   "t0": 226,
+   "len": 20,
+   "d": 1.1,
+   "lift": 0.08
+  },
   "bounds": {
    "scab": 150,
    "scabY": 90,
@@ -15279,7 +15754,7 @@
    "close": 30,
    "hatBackZ": 15,
    "hatPush": 100,
-   "hatClear": 30,
+   "hatClear": 40,
    "strHead": 150,
    "sashSeat": 120,
    "scabArm": 60,
@@ -15316,7 +15791,7 @@
    "idle": {
     "passes": 2,
     "corrections": {
-     "scabArm": 11
+     "scabArm": 9
     },
     "contacts": {},
     "stretch": 1,
@@ -15327,7 +15802,7 @@
    "idle2": {
     "passes": 2,
     "corrections": {
-     "scabArm": 15
+     "scabArm": 13
     },
     "contacts": {},
     "stretch": 1,
@@ -15377,7 +15852,7 @@
    "backstep": {
     "passes": 2,
     "corrections": {
-     "scabArm": 14
+     "scabArm": 13
     },
     "contacts": {},
     "stretch": 1,
@@ -15388,7 +15863,7 @@
    "flinch": {
     "passes": 2,
     "corrections": {
-     "scabArm": 11
+     "scabArm": 9
     },
     "contacts": {},
     "stretch": 1,
@@ -15399,23 +15874,22 @@
    "a1": {
     "passes": 3,
     "corrections": {
-     "bPush": 32.9,
-     "bTurn": 6,
+     "bPush": 33.53,
      "drop": 0.64,
-     "scabArm": 11
+     "scabArm": 9
     },
     "contacts": {},
     "stretch": 1,
-    "blade_residue": 0,
+    "blade_residue": 0.034,
     "support_dy": 0.001,
     "lift": 0
    },
    "a2": {
     "passes": 2,
     "corrections": {
-     "bPush": 17.3,
-     "bTurn": 30,
-     "scabArm": 15
+     "bPush": 15.72,
+     "bTurn": 24,
+     "scabArm": 14
     },
     "contacts": {},
     "stretch": 1,
@@ -15424,10 +15898,9 @@
     "lift": 0
    },
    "a3": {
-    "passes": 3,
+    "passes": 2,
     "corrections": {
-     "bPush": 33.99,
-     "bTurn": 6,
+     "bPush": 20.64,
      "drop": 7.83,
      "scabArm": 40
     },
@@ -15442,20 +15915,21 @@
    "a4": {
     "passes": 3,
     "corrections": {
-     "bPush": 11.33,
+     "bPush": 19.5,
+     "bTurn": 57,
      "scab": 10.03,
-     "scabArm": 11
+     "scabArm": 9
     },
     "contacts": {},
     "stretch": 1,
-    "blade_residue": 0.024,
+    "blade_residue": 0.007,
     "support_dy": 0.066,
     "lift": 0
    },
    "a6": {
     "passes": 2,
     "corrections": {
-     "scabArm": 14
+     "scabArm": 12
     },
     "contacts": {},
     "stretch": 1,
@@ -15466,7 +15940,7 @@
    "a9": {
     "passes": 3,
     "corrections": {
-     "bPush": 13.94,
+     "bPush": 13.11,
      "scab": 0.88,
      "scabArm": 30
     },
@@ -15479,7 +15953,7 @@
    "a10": {
     "passes": 3,
     "corrections": {
-     "bPush": 7.81,
+     "bPush": 9.42,
      "scab": 2.75,
      "scabArm": 40
     },
@@ -15494,7 +15968,7 @@
    "a7_tell": {
     "passes": 2,
     "corrections": {
-     "scabArm": 15
+     "scabArm": 13
     },
     "contacts": {},
     "stretch": 1,
@@ -15505,7 +15979,7 @@
    "a7_throw": {
     "passes": 3,
     "corrections": {
-     "bPush": 21.51,
+     "bPush": 21.73,
      "scabArm": 40
     },
     "contacts": {},
@@ -15539,7 +16013,7 @@
    "g_reform": {
     "passes": 2,
     "corrections": {
-     "scabArm": 15
+     "scabArm": 13
     },
     "contacts": {},
     "stretch": 1,
@@ -15548,8 +16022,10 @@
     "lift": 0
    },
    "g_dash": {
-    "passes": 1,
-    "corrections": {},
+    "passes": 2,
+    "corrections": {
+     "scabArm": 39
+    },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
@@ -15560,7 +16036,7 @@
     "passes": 2,
     "corrections": {
      "scab": 11.28,
-     "scabArm": 17
+     "scabArm": 15
     },
     "contacts": {},
     "stretch": 1,
@@ -15571,9 +16047,10 @@
    "g_drop": {
     "passes": 2,
     "corrections": {
-     "bPush": 11.08,
-     "bTurn": 30,
-     "scab": 1.5
+     "bPush": 13.48,
+     "bTurn": 18,
+     "scab": 1.5,
+     "scabArm": 25
     },
     "contacts": {},
     "stretch": 1,
@@ -15597,7 +16074,7 @@
     "passes": 2,
     "corrections": {
      "scab": 0.88,
-     "scabArm": 10
+     "scabArm": 39
     },
     "contacts": {},
     "stretch": 1,
@@ -15615,9 +16092,9 @@
     "lift": 0
    },
    "g_leap": {
-    "passes": 3,
+    "passes": 2,
     "corrections": {
-     "scabArm": 40
+     "scabArm": 35
     },
     "contacts": {},
     "stretch": 1,
@@ -15626,12 +16103,11 @@
     "lift": 0
    },
    "g_sweep": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
-     "bPush": 3.01,
-     "bTurn": 18,
+     "bPush": 3.35,
      "scab": 1.5,
-     "scabArm": 17
+     "scabArm": 14
     },
     "contacts": {},
     "stretch": 1,
@@ -15642,9 +16118,9 @@
    "g_x": {
     "passes": 3,
     "corrections": {
-     "bPush": 21.31,
+     "bPush": 19.86,
      "bTurn": 54,
-     "scabArm": 14
+     "scabArm": 13
     },
     "contacts": {},
     "stretch": 1,
@@ -15655,23 +16131,23 @@
    "g_wrap": {
     "passes": 3,
     "corrections": {
-     "bPush": 30.82,
-     "bTurn": 36,
+     "bPush": 23.34,
+     "bTurn": 42,
      "scab": 0.25,
      "scabArm": 40
     },
     "contacts": {},
     "stretch": 1,
-    "blade_residue": 0.007,
+    "blade_residue": 0,
     "support_dy": 0.001,
     "lift": 0
    },
    "g_dome": {
     "passes": 3,
     "corrections": {
-     "bPush": 14.16,
-     "bTurn": 12,
-     "scabArm": 24
+     "bPush": 9.9,
+     "bTurn": 24,
+     "scabArm": 26
     },
     "contacts": {},
     "stretch": 1,
@@ -15682,7 +16158,6 @@
    "g_vert": {
     "passes": 2,
     "corrections": {
-     "hat": 3.59,
      "scab": 2.75,
      "scabArm": 15
     },
@@ -15690,30 +16165,31 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.027,
-    "lift": 0
+    "lift": 0.019
    },
    "g_dive": {
     "passes": 3,
     "corrections": {
-     "bPush": 22.88
+     "bPush": 28.4,
+     "bTurn": 36
     },
     "contacts": {
-     "twohand": 0.086
+     "twohand": 0.062
     },
     "stretch": 1,
-    "blade_residue": 0.039,
+    "blade_residue": 0.038,
     "support_dy": 0,
     "lift": 0
    },
    "g_deflect": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
-     "bPush": 22.89,
-     "bTurn": 12,
+     "bPush": 26.76,
+     "bTurn": 18,
      "drop": 2.64
     },
     "contacts": {
-     "twohand": 0.113
+     "twohand": 0.116
     },
     "stretch": 1,
     "blade_residue": 0,
@@ -15734,11 +16210,11 @@
      "rock-": 11,
      "sash": 27.16,
      "scab": 74.53,
-     "strHead": 48.94,
+     "strHead": 108,
      "tip": 14
     },
     "contacts": {
-     "twohand": 0.07
+     "twohand": 0.053
     },
     "stretch": 1,
     "blade_residue": 0,
@@ -15764,18 +16240,18 @@
     "passes": 3,
     "corrections": {
      "aTorP+": 4,
-     "aTorR+": 4,
+     "aTorR+": 6,
      "armUp": 100,
-     "hatClear": 15.36,
+     "hatClear": 18.17,
      "incl": 19,
      "rock+": 11,
      "sash": 55.38,
      "scab": 41.81,
-     "scabArm": 11,
+     "scabArm": 22,
      "strings": 64.22
     },
     "contacts": {
-     "hatfloor": 0.02,
+     "hatfloor": 0.019,
      "hat": 0,
      "brim": 0
     },
@@ -15788,15 +16264,14 @@
     "passes": 3,
     "corrections": {
      "aTorP+": 4,
-     "aTorR+": 4,
+     "aTorR+": 6,
      "armUp": 100,
-     "bPush": 11.79,
-     "hatClear": 14.84,
+     "bPush": 1.86,
+     "hatClear": 15.5,
      "incl": 19,
      "rock+": 11,
      "sash": 55.28,
      "scab": 41.81,
-     "scabArm": 1,
      "strings": 64.22
     },
     "contacts": {
@@ -15810,10 +16285,11 @@
     "lift": 0
    },
    "lead_stand": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
-     "hatClear": 17.59,
-     "scabArm": 15
+     "hatClear": 29.9,
+     "scabArm": 13,
+     "strHead": 11.72
     },
     "contacts": {
      "hat": 0,
@@ -15828,14 +16304,14 @@
     "passes": 3,
     "corrections": {
      "hatBackZ": 10.55,
-     "hatClear": 18.78,
+     "hatClear": 21,
      "scab": 1.5,
-     "scabArm": 1,
-     "strHead": 38.34
+     "scabArm": 8,
+     "strHead": 86.19
     },
     "contacts": {
      "hat": 0,
-     "brim": 0
+     "brim": 0.002
     },
     "stretch": 1,
     "blade_residue": 0,
@@ -15849,10 +16325,10 @@
      "drop": 6.55,
      "sashSeat": 43.66,
      "scab": 6.63,
-     "scabArm": 39
+     "scabArm": 26
     },
     "contacts": {
-     "stone": 0.008,
+     "stone": 0.002,
      "lips": 0,
      "throat": 0
     },
@@ -15864,11 +16340,11 @@
    "intro_end": {
     "passes": 3,
     "corrections": {
-     "bPush": 33.73,
-     "bTurn": 36,
-     "close": 24.08,
-     "scabArm": 18,
-     "scabH": 12
+     "bPush": 33.93,
+     "bTurn": 33,
+     "close": 22.33,
+     "scabArm": 26,
+     "scabH": 13
     },
     "contacts": {
      "hilt": 0,
@@ -15886,21 +16362,21 @@
      "aTorP+": 14,
      "aTorR+": 6,
      "aTorY+": 14,
-     "bPush": 27.57,
-     "bTurn": 24,
+     "bPush": 27.96,
+     "bTurn": 30,
      "closeY-": 28,
      "drop": 3.93,
      "hatBackZ": 10.83,
      "hatClear": 4.55,
      "scab": 1.5,
      "scabArm": 40,
-     "strHead": 50.31
+     "strHead": 117.63
     },
     "contacts": {
-     "twohand": 0.044,
-     "hilt": 0.019,
+     "twohand": 0.041,
+     "hilt": 0.01,
      "throat": 0,
-     "sheathe": 0.034
+     "sheathe": 0.006
     },
     "stretch": 1,
     "blade_residue": 0,
@@ -15911,9 +16387,9 @@
     "passes": 3,
     "corrections": {
      "armUp": 100,
-     "bPush": 33.98,
-     "bTurn": 57,
-     "close": 29.18,
+     "bPush": 31.13,
+     "bTurn": 48,
+     "close": 23.58,
      "drop": 10.87,
      "hatPush": 33.55,
      "incl": 19,
@@ -15925,14 +16401,14 @@
     "contacts": {
      "hat": 0,
      "brim": 0,
-     "twohand": 0.118,
+     "twohand": 0.099,
      "throat": 0,
      "sheathe": 0
     },
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.172,
-    "lift": 0.005
+    "lift": 0
    },
    "ev_give": {
     "passes": 1,
@@ -15985,16 +16461,16 @@
   "atlas_budget": 150000,
   "sprites": 27,
   "elements_at_rest": {
-   "normal": 208,
-   "ghost": 208
+   "normal": 224,
+   "ghost": 224
   },
   "elements_budget": 6500,
   "parts": 29,
   "models": 62,
-  "key_files": 2057,
-  "keys": 17887,
-  "rig_functions": 2571,
-  "rig_bytes": 5458243,
+  "key_files": 2086,
+  "keys": 18761,
+  "rig_functions": 2602,
+  "rig_bytes": 5686712,
   "cull_overhang_ticks": 0
  },
  "sprites": {
