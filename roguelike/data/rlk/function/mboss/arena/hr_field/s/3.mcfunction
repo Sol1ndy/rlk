@@ -635,13 +635,15 @@ fill 876 200 -24 891 200 -24 minecraft:water strict
 setblock 892 200 -24 minecraft:big_dripleaf[facing=south,tilt=none,waterlogged=true] strict
 setblock 893 200 -24 minecraft:water strict
 setblock 894 200 -24 minecraft:packed_mud strict
-fill 895 200 -24 896 200 -24 minecraft:mycelium strict
+setblock 895 200 -24 minecraft:mycelium strict
+setblock 896 200 -24 minecraft:coarse_dirt strict
 fill 897 200 -24 906 200 -24 minecraft:dirt strict
 fill 907 200 -24 913 200 -24 minecraft:stone strict
 setblock 914 200 -24 minecraft:black_terracotta strict
 fill 845 200 -23 852 200 -23 minecraft:stone strict
 fill 853 200 -23 857 200 -23 minecraft:dirt strict
-fill 858 200 -23 860 200 -23 minecraft:mycelium strict
+setblock 858 200 -23 minecraft:coarse_dirt strict
+fill 859 200 -23 860 200 -23 minecraft:mycelium strict
 setblock 861 200 -23 minecraft:podzol strict
 setblock 862 200 -23 minecraft:coarse_dirt strict
 fill 863 200 -23 864 200 -23 minecraft:mud_bricks strict
@@ -654,7 +656,7 @@ fill 899 200 -23 907 200 -23 minecraft:dirt strict
 fill 908 200 -23 914 200 -23 minecraft:stone strict
 fill 844 200 -22 850 200 -22 minecraft:stone strict
 fill 851 200 -22 856 200 -22 minecraft:dirt strict
-fill 857 200 -22 858 200 -22 minecraft:mycelium strict
+fill 857 200 -22 858 200 -22 minecraft:coarse_dirt strict
 setblock 859 200 -22 minecraft:packed_mud strict
 fill 860 200 -22 892 200 -22 minecraft:water strict
 setblock 893 200 -22 minecraft:moss_block strict
@@ -667,7 +669,7 @@ fill 909 200 -22 915 200 -22 minecraft:stone strict
 fill 843 200 -21 850 200 -21 minecraft:stone strict
 fill 851 200 -21 855 200 -21 minecraft:dirt strict
 setblock 856 200 -21 minecraft:moss_block strict
-setblock 857 200 -21 minecraft:mycelium strict
+setblock 857 200 -21 minecraft:coarse_dirt strict
 setblock 858 200 -21 minecraft:packed_mud strict
 fill 859 200 -21 891 200 -21 minecraft:water strict
 setblock 892 200 -21 minecraft:moss_block strict
@@ -684,7 +686,7 @@ setblock 842 200 -20 minecraft:black_terracotta strict
 fill 843 200 -20 849 200 -20 minecraft:stone strict
 fill 850 200 -20 854 200 -20 minecraft:dirt strict
 setblock 855 200 -20 minecraft:moss_block strict
-setblock 856 200 -20 minecraft:mycelium strict
+setblock 856 200 -20 minecraft:coarse_dirt strict
 fill 857 200 -20 859 200 -20 minecraft:water strict
 fill 860 200 -20 861 200 -20 minecraft:big_dripleaf[facing=south,tilt=none,waterlogged=true] strict
 fill 862 200 -20 874 200 -20 minecraft:water strict
@@ -863,7 +865,7 @@ fill 916 200 -13 921 200 -13 minecraft:stone strict
 setblock 837 200 -12 minecraft:black_terracotta strict
 fill 838 200 -12 843 200 -12 minecraft:stone strict
 fill 844 200 -12 853 200 -12 minecraft:dirt strict
-setblock 854 200 -12 minecraft:mycelium strict
+setblock 854 200 -12 minecraft:coarse_dirt strict
 fill 855 200 -12 859 200 -12 minecraft:water strict
 setblock 860 200 -12 minecraft:packed_mud strict
 fill 861 200 -12 873 200 -12 minecraft:mycelium strict
@@ -979,7 +981,7 @@ fill 897 200 -8 898 200 -8 minecraft:pale_moss_block strict
 fill 899 200 -8 901 200 -8 minecraft:mycelium strict
 setblock 902 200 -8 minecraft:mud_bricks strict
 setblock 903 200 -8 minecraft:water strict
-setblock 904 200 -8 minecraft:mycelium strict
+setblock 904 200 -8 minecraft:coarse_dirt strict
 fill 905 200 -8 919 200 -8 minecraft:dirt strict
 fill 920 200 -8 923 200 -8 minecraft:stone strict
 setblock 835 200 -7 minecraft:black_terracotta strict
@@ -1027,7 +1029,8 @@ setblock 845 200 -6 minecraft:coarse_dirt strict
 setblock 846 200 -6 minecraft:mycelium strict
 fill 847 200 -6 853 200 -6 minecraft:dirt strict
 fill 854 200 -6 855 200 -6 minecraft:podzol strict
-fill 856 200 -6 861 200 -6 minecraft:mycelium strict
+setblock 856 200 -6 minecraft:coarse_dirt strict
+fill 857 200 -6 861 200 -6 minecraft:mycelium strict
 setblock 862 200 -6 minecraft:tuff strict
 fill 863 200 -6 864 200 -6 minecraft:coarse_dirt strict
 fill 865 200 -6 876 200 -6 minecraft:mycelium strict
@@ -1077,7 +1080,9 @@ setblock 892 200 -5 minecraft:mycelium strict
 fill 893 200 -5 894 200 -5 minecraft:coarse_dirt strict
 fill 895 200 -5 898 200 -5 minecraft:mycelium strict
 setblock 899 200 -5 minecraft:pale_moss_block strict
-fill 900 200 -5 906 200 -5 minecraft:mycelium strict
+fill 900 200 -5 903 200 -5 minecraft:mycelium strict
+fill 904 200 -5 905 200 -5 minecraft:coarse_dirt strict
+setblock 906 200 -5 minecraft:mycelium strict
 fill 907 200 -5 910 200 -5 minecraft:dirt strict
 setblock 911 200 -5 minecraft:coarse_dirt strict
 setblock 912 200 -5 minecraft:mycelium strict
@@ -1113,7 +1118,8 @@ fill 895 200 -4 901 200 -4 minecraft:mycelium strict
 setblock 902 200 -4 minecraft:coarse_dirt strict
 setblock 903 200 -4 minecraft:mycelium strict
 setblock 904 200 -4 minecraft:podzol strict
-fill 905 200 -4 906 200 -4 minecraft:mycelium strict
+setblock 905 200 -4 minecraft:coarse_dirt strict
+setblock 906 200 -4 minecraft:mycelium strict
 setblock 907 200 -4 minecraft:dirt strict
 setblock 908 200 -4 minecraft:mycelium strict
 setblock 909 200 -4 minecraft:moss_block strict
@@ -1136,7 +1142,7 @@ setblock 842 200 -3 minecraft:coarse_dirt strict
 fill 843 200 -3 844 200 -3 minecraft:podzol strict
 setblock 845 200 -3 minecraft:mycelium strict
 fill 846 200 -3 853 200 -3 minecraft:moss_block strict
-setblock 854 200 -3 minecraft:mycelium strict
+setblock 854 200 -3 minecraft:coarse_dirt strict
 setblock 855 200 -3 minecraft:pale_moss_block strict
 fill 856 200 -3 861 200 -3 minecraft:mycelium strict
 setblock 862 200 -3 minecraft:coarse_dirt strict
@@ -1151,7 +1157,9 @@ setblock 879 200 -3 minecraft:pale_moss_block strict
 fill 880 200 -3 881 200 -3 minecraft:tuff strict
 fill 882 200 -3 899 200 -3 minecraft:mycelium strict
 setblock 900 200 -3 minecraft:tuff strict
-fill 901 200 -3 908 200 -3 minecraft:mycelium strict
+fill 901 200 -3 904 200 -3 minecraft:mycelium strict
+setblock 905 200 -3 minecraft:coarse_dirt strict
+fill 906 200 -3 908 200 -3 minecraft:mycelium strict
 setblock 909 200 -3 minecraft:moss_block strict
 setblock 910 200 -3 minecraft:mycelium strict
 setblock 911 200 -3 minecraft:coarse_dirt strict
@@ -1174,7 +1182,8 @@ setblock 849 200 -2 minecraft:mycelium strict
 setblock 850 200 -2 minecraft:moss_block strict
 fill 851 200 -2 852 200 -2 minecraft:mycelium strict
 setblock 853 200 -2 minecraft:moss_block strict
-fill 854 200 -2 859 200 -2 minecraft:mycelium strict
+setblock 854 200 -2 minecraft:coarse_dirt strict
+fill 855 200 -2 859 200 -2 minecraft:mycelium strict
 fill 860 200 -2 861 200 -2 minecraft:coarse_dirt strict
 setblock 862 200 -2 minecraft:mycelium strict
 fill 863 200 -2 864 200 -2 minecraft:pale_moss_block strict
@@ -1189,8 +1198,8 @@ setblock 900 200 -2 minecraft:tuff strict
 fill 901 200 -2 902 200 -2 minecraft:mycelium strict
 setblock 903 200 -2 minecraft:coarse_dirt strict
 setblock 904 200 -2 minecraft:mycelium strict
-setblock 905 200 -2 minecraft:coarse_dirt strict
-fill 906 200 -2 910 200 -2 minecraft:mycelium strict
+fill 905 200 -2 906 200 -2 minecraft:coarse_dirt strict
+fill 907 200 -2 910 200 -2 minecraft:mycelium strict
 fill 911 200 -2 913 200 -2 minecraft:coarse_dirt strict
 setblock 914 200 -2 minecraft:mycelium strict
 fill 915 200 -2 916 200 -2 minecraft:moss_block strict
@@ -1203,11 +1212,13 @@ fill 834 200 -1 836 200 -1 minecraft:stone strict
 fill 837 200 -1 839 200 -1 minecraft:dirt strict
 setblock 840 200 -1 minecraft:coarse_dirt strict
 setblock 841 200 -1 minecraft:moss_block strict
-fill 842 200 -1 845 200 -1 minecraft:mycelium strict
+setblock 842 200 -1 minecraft:coarse_dirt strict
+fill 843 200 -1 845 200 -1 minecraft:mycelium strict
 fill 846 200 -1 847 200 -1 minecraft:moss_block strict
 fill 848 200 -1 849 200 -1 minecraft:mycelium strict
 setblock 850 200 -1 minecraft:moss_block strict
-fill 851 200 -1 853 200 -1 minecraft:mycelium strict
+fill 851 200 -1 852 200 -1 minecraft:mycelium strict
+setblock 853 200 -1 minecraft:coarse_dirt strict
 fill 854 200 -1 855 200 -1 minecraft:pale_moss_block strict
 fill 856 200 -1 863 200 -1 minecraft:mycelium strict
 fill 864 200 -1 865 200 -1 minecraft:tuff strict
@@ -1218,7 +1229,9 @@ fill 883 200 -1 884 200 -1 minecraft:coarse_dirt strict
 fill 885 200 -1 893 200 -1 minecraft:mycelium strict
 setblock 894 200 -1 minecraft:coarse_dirt strict
 setblock 895 200 -1 minecraft:tuff strict
-fill 896 200 -1 907 200 -1 minecraft:mycelium strict
+fill 896 200 -1 905 200 -1 minecraft:mycelium strict
+setblock 906 200 -1 minecraft:coarse_dirt strict
+setblock 907 200 -1 minecraft:mycelium strict
 fill 908 200 -1 909 200 -1 minecraft:coarse_dirt strict
 fill 910 200 -1 912 200 -1 minecraft:mycelium strict
 setblock 913 200 -1 minecraft:coarse_dirt strict
@@ -1234,7 +1247,8 @@ fill 837 200 0 838 200 0 minecraft:dirt strict
 fill 839 200 0 845 200 0 minecraft:moss_block strict
 fill 846 200 0 847 200 0 minecraft:mycelium strict
 fill 848 200 0 850 200 0 minecraft:moss_block strict
-fill 851 200 0 853 200 0 minecraft:mycelium strict
+fill 851 200 0 852 200 0 minecraft:mycelium strict
+setblock 853 200 0 minecraft:coarse_dirt strict
 fill 854 200 0 855 200 0 minecraft:pale_moss_block strict
 setblock 856 200 0 minecraft:mycelium strict
 fill 857 200 0 858 200 0 minecraft:pale_moss_block strict
@@ -1259,7 +1273,8 @@ setblock 899 200 0 minecraft:coarse_dirt strict
 setblock 900 200 0 minecraft:mycelium strict
 setblock 901 200 0 minecraft:pale_moss_block strict
 setblock 902 200 0 minecraft:coarse_dirt strict
-fill 903 200 0 906 200 0 minecraft:mycelium strict
+fill 903 200 0 905 200 0 minecraft:mycelium strict
+setblock 906 200 0 minecraft:coarse_dirt strict
 setblock 907 200 0 minecraft:moss_block strict
 setblock 908 200 0 minecraft:mycelium strict
 fill 909 200 0 912 200 0 minecraft:coarse_dirt strict
@@ -1273,7 +1288,8 @@ setblock 833 200 1 minecraft:black_terracotta strict
 fill 834 200 1 836 200 1 minecraft:stone strict
 fill 837 200 1 838 200 1 minecraft:dirt strict
 setblock 839 200 1 minecraft:moss_block strict
-fill 840 200 1 844 200 1 minecraft:mycelium strict
+fill 840 200 1 842 200 1 minecraft:coarse_dirt strict
+fill 843 200 1 844 200 1 minecraft:mycelium strict
 fill 845 200 1 847 200 1 minecraft:moss_block strict
 fill 848 200 1 850 200 1 minecraft:mycelium strict
 setblock 851 200 1 minecraft:coarse_dirt strict
@@ -1297,7 +1313,8 @@ setblock 896 200 1 minecraft:coarse_dirt strict
 setblock 897 200 1 minecraft:tuff strict
 setblock 898 200 1 minecraft:mycelium strict
 setblock 899 200 1 minecraft:coarse_dirt strict
-fill 900 200 1 906 200 1 minecraft:mycelium strict
+fill 900 200 1 905 200 1 minecraft:mycelium strict
+setblock 906 200 1 minecraft:coarse_dirt strict
 setblock 907 200 1 minecraft:moss_block strict
 setblock 908 200 1 minecraft:mycelium strict
 setblock 909 200 1 minecraft:coarse_dirt strict
@@ -1333,8 +1350,7 @@ fill 883 200 2 890 200 2 minecraft:mycelium strict
 setblock 891 200 2 minecraft:tuff strict
 fill 892 200 2 903 200 2 minecraft:mycelium strict
 fill 904 200 2 905 200 2 minecraft:tuff strict
-fill 906 200 2 907 200 2 minecraft:mycelium strict
-fill 908 200 2 909 200 2 minecraft:coarse_dirt strict
+fill 906 200 2 909 200 2 minecraft:coarse_dirt strict
 fill 910 200 2 911 200 2 minecraft:podzol strict
 setblock 912 200 2 minecraft:coarse_dirt strict
 setblock 913 200 2 minecraft:mycelium strict
@@ -1452,7 +1468,9 @@ setblock 881 200 5 minecraft:pale_moss_block strict
 fill 882 200 5 886 200 5 minecraft:mycelium strict
 fill 887 200 5 890 200 5 minecraft:coarse_dirt strict
 setblock 891 200 5 minecraft:tuff strict
-fill 892 200 5 908 200 5 minecraft:mycelium strict
+fill 892 200 5 906 200 5 minecraft:mycelium strict
+setblock 907 200 5 minecraft:coarse_dirt strict
+setblock 908 200 5 minecraft:mycelium strict
 setblock 909 200 5 minecraft:podzol strict
 fill 910 200 5 912 200 5 minecraft:coarse_dirt strict
 setblock 913 200 5 minecraft:mycelium strict
@@ -1493,7 +1511,9 @@ fill 887 200 6 890 200 6 minecraft:coarse_dirt strict
 fill 891 200 6 892 200 6 minecraft:tuff strict
 fill 893 200 6 900 200 6 minecraft:mycelium strict
 fill 901 200 6 904 200 6 minecraft:coarse_dirt strict
-fill 905 200 6 908 200 6 minecraft:mycelium strict
+fill 905 200 6 906 200 6 minecraft:mycelium strict
+setblock 907 200 6 minecraft:coarse_dirt strict
+setblock 908 200 6 minecraft:mycelium strict
 setblock 909 200 6 minecraft:coarse_dirt strict
 fill 910 200 6 913 200 6 minecraft:mycelium strict
 fill 914 200 6 916 200 6 minecraft:moss_block strict
@@ -1544,7 +1564,9 @@ setblock 892 200 7 minecraft:coarse_dirt strict
 setblock 893 200 7 minecraft:tuff strict
 fill 894 200 7 899 200 7 minecraft:mycelium strict
 fill 900 200 7 904 200 7 minecraft:coarse_dirt strict
-fill 905 200 7 910 200 7 minecraft:mycelium strict
+fill 905 200 7 906 200 7 minecraft:mycelium strict
+setblock 907 200 7 minecraft:coarse_dirt strict
+fill 908 200 7 910 200 7 minecraft:mycelium strict
 setblock 911 200 7 minecraft:podzol strict
 fill 912 200 7 916 200 7 minecraft:moss_block strict
 fill 917 200 7 918 200 7 minecraft:mycelium strict
@@ -1575,7 +1597,9 @@ setblock 875 200 8 minecraft:mycelium strict
 setblock 876 200 8 minecraft:tuff strict
 fill 877 200 8 887 200 8 minecraft:mycelium strict
 setblock 888 200 8 minecraft:tuff strict
-fill 889 200 8 909 200 8 minecraft:mycelium strict
+fill 889 200 8 906 200 8 minecraft:mycelium strict
+setblock 907 200 8 minecraft:coarse_dirt strict
+fill 908 200 8 909 200 8 minecraft:mycelium strict
 fill 910 200 8 911 200 8 minecraft:moss_block strict
 fill 912 200 8 913 200 8 minecraft:podzol strict
 fill 914 200 8 916 200 8 minecraft:moss_block strict
@@ -1638,7 +1662,9 @@ setblock 844 200 10 minecraft:mycelium strict
 fill 845 200 10 847 200 10 minecraft:coarse_dirt strict
 setblock 848 200 10 minecraft:moss_block strict
 fill 849 200 10 850 200 10 minecraft:coarse_dirt strict
-fill 851 200 10 853 200 10 minecraft:mycelium strict
+setblock 851 200 10 minecraft:mycelium strict
+setblock 852 200 10 minecraft:coarse_dirt strict
+setblock 853 200 10 minecraft:mycelium strict
 setblock 854 200 10 minecraft:coarse_dirt strict
 setblock 855 200 10 minecraft:pale_moss_block strict
 fill 856 200 10 857 200 10 minecraft:mycelium strict
@@ -1700,8 +1726,7 @@ setblock 901 200 11 minecraft:pale_moss_block strict
 fill 902 200 11 904 200 11 minecraft:mycelium strict
 setblock 905 200 11 minecraft:coarse_dirt strict
 setblock 906 200 11 minecraft:tuff strict
-setblock 907 200 11 minecraft:mycelium strict
-fill 908 200 11 910 200 11 minecraft:coarse_dirt strict
+fill 907 200 11 910 200 11 minecraft:coarse_dirt strict
 setblock 911 200 11 minecraft:podzol strict
 fill 912 200 11 914 200 11 minecraft:moss_block strict
 setblock 915 200 11 minecraft:podzol strict
@@ -1734,8 +1759,7 @@ fill 876 200 12 899 200 12 minecraft:mycelium strict
 fill 900 200 12 901 200 12 minecraft:pale_moss_block strict
 fill 902 200 12 905 200 12 minecraft:mycelium strict
 setblock 906 200 12 minecraft:tuff strict
-setblock 907 200 12 minecraft:mycelium strict
-setblock 908 200 12 minecraft:coarse_dirt strict
+fill 907 200 12 908 200 12 minecraft:coarse_dirt strict
 setblock 909 200 12 minecraft:podzol strict
 setblock 910 200 12 minecraft:coarse_dirt strict
 fill 911 200 12 912 200 12 minecraft:mycelium strict
@@ -1744,7 +1768,7 @@ setblock 914 200 12 minecraft:mycelium strict
 fill 915 200 12 916 200 12 minecraft:coarse_dirt strict
 setblock 917 200 12 minecraft:mycelium strict
 setblock 918 200 12 minecraft:moss_block strict
-fill 919 200 12 920 200 12 minecraft:mycelium strict
+fill 919 200 12 920 200 12 minecraft:coarse_dirt strict
 fill 921 200 12 922 200 12 minecraft:dirt strict
 fill 923 200 12 925 200 12 minecraft:stone strict
 setblock 926 200 12 minecraft:black_terracotta strict
@@ -1785,7 +1809,7 @@ setblock 914 200 13 minecraft:moss_block strict
 setblock 915 200 13 minecraft:coarse_dirt strict
 setblock 916 200 13 minecraft:podzol strict
 setblock 917 200 13 minecraft:moss_block strict
-fill 918 200 13 920 200 13 minecraft:mycelium strict
+fill 918 200 13 920 200 13 minecraft:coarse_dirt strict
 fill 921 200 13 922 200 13 minecraft:dirt strict
 fill 923 200 13 925 200 13 minecraft:stone strict
 setblock 926 200 13 minecraft:black_terracotta strict
@@ -1823,7 +1847,7 @@ fill 911 200 14 912 200 14 minecraft:mycelium strict
 setblock 913 200 14 minecraft:coarse_dirt strict
 fill 914 200 14 915 200 14 minecraft:mycelium strict
 fill 916 200 14 919 200 14 minecraft:moss_block strict
-setblock 920 200 14 minecraft:mycelium strict
+setblock 920 200 14 minecraft:coarse_dirt strict
 fill 921 200 14 922 200 14 minecraft:dirt strict
 fill 923 200 14 925 200 14 minecraft:stone strict
 setblock 926 200 14 minecraft:black_terracotta strict
@@ -1855,7 +1879,7 @@ fill 908 200 15 910 200 15 minecraft:podzol strict
 fill 911 200 15 913 200 15 minecraft:coarse_dirt strict
 setblock 914 200 15 minecraft:mycelium strict
 fill 915 200 15 917 200 15 minecraft:moss_block strict
-fill 918 200 15 920 200 15 minecraft:mycelium strict
+fill 918 200 15 920 200 15 minecraft:coarse_dirt strict
 fill 921 200 15 922 200 15 minecraft:dirt strict
 fill 923 200 15 925 200 15 minecraft:stone strict
 fill 834 200 16 837 200 16 minecraft:stone strict
@@ -1880,15 +1904,16 @@ fill 879 200 16 886 200 16 minecraft:mycelium strict
 setblock 887 200 16 minecraft:coarse_dirt strict
 fill 888 200 16 901 200 16 minecraft:mycelium strict
 setblock 902 200 16 minecraft:pale_moss_block strict
-fill 903 200 16 907 200 16 minecraft:mycelium strict
+fill 903 200 16 905 200 16 minecraft:mycelium strict
+setblock 906 200 16 minecraft:coarse_dirt strict
+setblock 907 200 16 minecraft:mycelium strict
 setblock 908 200 16 minecraft:coarse_dirt strict
 setblock 909 200 16 minecraft:podzol strict
 fill 910 200 16 913 200 16 minecraft:coarse_dirt strict
 setblock 914 200 16 minecraft:moss_block strict
 fill 915 200 16 916 200 16 minecraft:mycelium strict
 setblock 917 200 16 minecraft:moss_block strict
-setblock 918 200 16 minecraft:coarse_dirt strict
-setblock 919 200 16 minecraft:mycelium strict
+fill 918 200 16 919 200 16 minecraft:coarse_dirt strict
 fill 920 200 16 921 200 16 minecraft:dirt strict
 fill 922 200 16 925 200 16 minecraft:stone strict
 fill 834 200 17 837 200 17 minecraft:stone strict
@@ -1921,8 +1946,7 @@ setblock 913 200 17 minecraft:coarse_dirt strict
 fill 914 200 17 915 200 17 minecraft:mycelium strict
 setblock 916 200 17 minecraft:coarse_dirt strict
 setblock 917 200 17 minecraft:moss_block strict
-setblock 918 200 17 minecraft:coarse_dirt strict
-setblock 919 200 17 minecraft:mycelium strict
+fill 918 200 17 919 200 17 minecraft:coarse_dirt strict
 fill 920 200 17 921 200 17 minecraft:dirt strict
 fill 922 200 17 925 200 17 minecraft:stone strict
 setblock 834 200 18 minecraft:black_terracotta strict
@@ -1985,7 +2009,8 @@ fill 888 200 19 903 200 19 minecraft:mycelium strict
 fill 904 200 19 905 200 19 minecraft:coarse_dirt strict
 fill 906 200 19 908 200 19 minecraft:mycelium strict
 setblock 909 200 19 minecraft:moss_block strict
-fill 910 200 19 911 200 19 minecraft:mycelium strict
+setblock 910 200 19 minecraft:mycelium strict
+setblock 911 200 19 minecraft:coarse_dirt strict
 fill 912 200 19 913 200 19 minecraft:moss_block strict
 setblock 914 200 19 minecraft:mycelium strict
 setblock 915 200 19 minecraft:coarse_dirt strict
@@ -2072,14 +2097,14 @@ setblock 924 200 21 minecraft:black_terracotta strict
 setblock 835 200 22 minecraft:black_terracotta strict
 fill 836 200 22 838 200 22 minecraft:stone strict
 fill 839 200 22 841 200 22 minecraft:dirt strict
-fill 842 200 22 843 200 22 minecraft:coarse_dirt strict
-setblock 844 200 22 minecraft:mycelium strict
+fill 842 200 22 844 200 22 minecraft:coarse_dirt strict
 fill 845 200 22 850 200 22 minecraft:moss_block strict
 setblock 851 200 22 minecraft:mycelium strict
 setblock 852 200 22 minecraft:coarse_dirt strict
 setblock 853 200 22 minecraft:mycelium strict
 fill 854 200 22 855 200 22 minecraft:podzol strict
-fill 856 200 22 859 200 22 minecraft:mycelium strict
+setblock 856 200 22 minecraft:coarse_dirt strict
+fill 857 200 22 859 200 22 minecraft:mycelium strict
 setblock 860 200 22 minecraft:tuff strict
 fill 861 200 22 862 200 22 minecraft:mycelium strict
 fill 863 200 22 864 200 22 minecraft:pale_moss_block strict
@@ -2093,7 +2118,8 @@ fill 892 200 22 896 200 22 minecraft:mycelium strict
 setblock 897 200 22 minecraft:tuff strict
 fill 898 200 22 901 200 22 minecraft:mycelium strict
 setblock 902 200 22 minecraft:tuff strict
-fill 903 200 22 906 200 22 minecraft:mycelium strict
+setblock 903 200 22 minecraft:coarse_dirt strict
+fill 904 200 22 906 200 22 minecraft:mycelium strict
 setblock 907 200 22 minecraft:coarse_dirt strict
 setblock 908 200 22 minecraft:podzol strict
 setblock 909 200 22 minecraft:coarse_dirt strict
@@ -2108,15 +2134,12 @@ fill 921 200 22 923 200 22 minecraft:stone strict
 setblock 924 200 22 minecraft:black_terracotta strict
 fill 836 200 23 839 200 23 minecraft:stone strict
 fill 840 200 23 841 200 23 minecraft:dirt strict
-fill 842 200 23 843 200 23 minecraft:coarse_dirt strict
-setblock 844 200 23 minecraft:mycelium strict
+fill 842 200 23 844 200 23 minecraft:coarse_dirt strict
 fill 845 200 23 848 200 23 minecraft:moss_block strict
 setblock 849 200 23 minecraft:mycelium strict
 setblock 850 200 23 minecraft:moss_block strict
 fill 851 200 23 854 200 23 minecraft:mycelium strict
-fill 855 200 23 856 200 23 minecraft:coarse_dirt strict
-setblock 857 200 23 minecraft:mycelium strict
-setblock 858 200 23 minecraft:coarse_dirt strict
+fill 855 200 23 858 200 23 minecraft:coarse_dirt strict
 fill 859 200 23 862 200 23 minecraft:mycelium strict
 fill 863 200 23 865 200 23 minecraft:pale_moss_block strict
 setblock 866 200 23 minecraft:coarse_dirt strict
@@ -2151,9 +2174,7 @@ setblock 851 200 24 minecraft:moss_block strict
 fill 852 200 24 853 200 24 minecraft:mycelium strict
 setblock 854 200 24 minecraft:moss_block strict
 setblock 855 200 24 minecraft:mycelium strict
-setblock 856 200 24 minecraft:coarse_dirt strict
-setblock 857 200 24 minecraft:mycelium strict
-fill 858 200 24 860 200 24 minecraft:coarse_dirt strict
+fill 856 200 24 860 200 24 minecraft:coarse_dirt strict
 fill 861 200 24 863 200 24 minecraft:mycelium strict
 fill 864 200 24 865 200 24 minecraft:pale_moss_block strict
 fill 866 200 24 867 200 24 minecraft:coarse_dirt strict
@@ -2169,7 +2190,7 @@ setblock 896 200 24 minecraft:mycelium strict
 fill 897 200 24 898 200 24 minecraft:coarse_dirt strict
 setblock 899 200 24 minecraft:mycelium strict
 setblock 900 200 24 minecraft:pale_moss_block strict
-setblock 901 200 24 minecraft:mycelium strict
+setblock 901 200 24 minecraft:coarse_dirt strict
 fill 902 200 24 903 200 24 minecraft:moss_block strict
 setblock 904 200 24 minecraft:mycelium strict
 setblock 905 200 24 minecraft:coarse_dirt strict
@@ -2189,7 +2210,7 @@ setblock 923 200 24 minecraft:black_terracotta strict
 setblock 836 200 25 minecraft:black_terracotta strict
 fill 837 200 25 840 200 25 minecraft:stone strict
 fill 841 200 25 842 200 25 minecraft:dirt strict
-fill 843 200 25 844 200 25 minecraft:mycelium strict
+fill 843 200 25 844 200 25 minecraft:coarse_dirt strict
 fill 845 200 25 846 200 25 minecraft:moss_block strict
 fill 847 200 25 848 200 25 minecraft:mycelium strict
 fill 849 200 25 850 200 25 minecraft:moss_block strict
@@ -2212,7 +2233,8 @@ fill 872 200 25 885 200 25 minecraft:mycelium strict
 fill 886 200 25 888 200 25 minecraft:tuff strict
 fill 889 200 25 890 200 25 minecraft:mycelium strict
 setblock 891 200 25 minecraft:pale_moss_block strict
-fill 892 200 25 901 200 25 minecraft:mycelium strict
+fill 892 200 25 900 200 25 minecraft:mycelium strict
+setblock 901 200 25 minecraft:coarse_dirt strict
 fill 902 200 25 903 200 25 minecraft:moss_block strict
 setblock 904 200 25 minecraft:mycelium strict
 setblock 905 200 25 minecraft:moss_block strict
@@ -2235,7 +2257,9 @@ fill 849 200 26 850 200 26 minecraft:moss_block strict
 setblock 851 200 26 minecraft:mycelium strict
 setblock 852 200 26 minecraft:podzol strict
 fill 853 200 26 855 200 26 minecraft:moss_block strict
-fill 856 200 26 861 200 26 minecraft:mycelium strict
+fill 856 200 26 857 200 26 minecraft:mycelium strict
+fill 858 200 26 859 200 26 minecraft:coarse_dirt strict
+fill 860 200 26 861 200 26 minecraft:mycelium strict
 setblock 862 200 26 minecraft:pale_moss_block strict
 fill 863 200 26 876 200 26 minecraft:mycelium strict
 fill 877 200 26 878 200 26 minecraft:coarse_dirt strict
@@ -2245,7 +2269,8 @@ fill 885 200 26 886 200 26 minecraft:mycelium strict
 setblock 887 200 26 minecraft:tuff strict
 setblock 888 200 26 minecraft:mycelium strict
 fill 889 200 26 891 200 26 minecraft:tuff strict
-fill 892 200 26 901 200 26 minecraft:mycelium strict
+fill 892 200 26 899 200 26 minecraft:mycelium strict
+fill 900 200 26 901 200 26 minecraft:coarse_dirt strict
 fill 902 200 26 904 200 26 minecraft:moss_block strict
 setblock 905 200 26 minecraft:mycelium strict
 setblock 906 200 26 minecraft:podzol strict
@@ -2267,8 +2292,8 @@ setblock 850 200 27 minecraft:mycelium strict
 setblock 851 200 27 minecraft:coarse_dirt strict
 fill 852 200 27 853 200 27 minecraft:podzol strict
 fill 854 200 27 856 200 27 minecraft:mycelium strict
-fill 857 200 27 859 200 27 minecraft:coarse_dirt strict
-fill 860 200 27 861 200 27 minecraft:mycelium strict
+fill 857 200 27 860 200 27 minecraft:coarse_dirt strict
+setblock 861 200 27 minecraft:mycelium strict
 fill 862 200 27 863 200 27 minecraft:pale_moss_block strict
 fill 864 200 27 868 200 27 minecraft:mycelium strict
 fill 869 200 27 870 200 27 minecraft:tuff strict
@@ -2339,15 +2364,12 @@ fill 847 200 29 852 200 29 minecraft:moss_block strict
 fill 853 200 29 854 200 29 minecraft:coarse_dirt strict
 setblock 855 200 29 minecraft:podzol strict
 fill 856 200 29 858 200 29 minecraft:mycelium strict
-fill 859 200 29 862 200 29 minecraft:coarse_dirt strict
-setblock 863 200 29 minecraft:mycelium strict
+fill 859 200 29 863 200 29 minecraft:coarse_dirt strict
 setblock 864 200 29 minecraft:tuff strict
 fill 865 200 29 868 200 29 minecraft:mycelium strict
 fill 869 200 29 871 200 29 minecraft:tuff strict
 fill 872 200 29 893 200 29 minecraft:mycelium strict
-fill 894 200 29 895 200 29 minecraft:coarse_dirt strict
-setblock 896 200 29 minecraft:mycelium strict
-fill 897 200 29 899 200 29 minecraft:coarse_dirt strict
+fill 894 200 29 899 200 29 minecraft:coarse_dirt strict
 fill 900 200 29 901 200 29 minecraft:mycelium strict
 fill 902 200 29 904 200 29 minecraft:podzol strict
 fill 905 200 29 907 200 29 minecraft:mycelium strict
@@ -2375,9 +2397,7 @@ fill 870 200 30 873 200 30 minecraft:pale_moss_block strict
 setblock 874 200 30 minecraft:coarse_dirt strict
 setblock 875 200 30 minecraft:pale_moss_block strict
 fill 876 200 30 893 200 30 minecraft:mycelium strict
-fill 894 200 30 895 200 30 minecraft:coarse_dirt strict
-setblock 896 200 30 minecraft:mycelium strict
-fill 897 200 30 898 200 30 minecraft:coarse_dirt strict
+fill 894 200 30 898 200 30 minecraft:coarse_dirt strict
 fill 899 200 30 900 200 30 minecraft:mycelium strict
 setblock 901 200 30 minecraft:coarse_dirt strict
 fill 902 200 30 903 200 30 minecraft:podzol strict
@@ -2400,7 +2420,8 @@ setblock 856 200 31 minecraft:mycelium strict
 fill 857 200 31 858 200 31 minecraft:moss_block strict
 setblock 859 200 31 minecraft:mycelium strict
 fill 860 200 31 861 200 31 minecraft:coarse_dirt strict
-fill 862 200 31 864 200 31 minecraft:mycelium strict
+fill 862 200 31 863 200 31 minecraft:mycelium strict
+setblock 864 200 31 minecraft:coarse_dirt strict
 setblock 865 200 31 minecraft:moss_block strict
 setblock 866 200 31 minecraft:coarse_dirt strict
 setblock 867 200 31 minecraft:pale_moss_block strict
@@ -2412,8 +2433,8 @@ fill 876 200 31 877 200 31 minecraft:mycelium strict
 fill 878 200 31 879 200 31 minecraft:pale_moss_block strict
 fill 880 200 31 886 200 31 minecraft:mycelium strict
 setblock 887 200 31 minecraft:tuff strict
-fill 888 200 31 894 200 31 minecraft:mycelium strict
-fill 895 200 31 896 200 31 minecraft:coarse_dirt strict
+fill 888 200 31 892 200 31 minecraft:mycelium strict
+fill 893 200 31 896 200 31 minecraft:coarse_dirt strict
 setblock 897 200 31 minecraft:podzol strict
 fill 898 200 31 899 200 31 minecraft:coarse_dirt strict
 setblock 900 200 31 minecraft:mycelium strict
@@ -2442,15 +2463,16 @@ fill 856 200 32 857 200 32 minecraft:mycelium strict
 setblock 858 200 32 minecraft:moss_block strict
 fill 859 200 32 860 200 32 minecraft:mycelium strict
 setblock 861 200 32 minecraft:moss_block strict
-fill 862 200 32 866 200 32 minecraft:mycelium strict
+fill 862 200 32 865 200 32 minecraft:mycelium strict
+setblock 866 200 32 minecraft:coarse_dirt strict
 setblock 867 200 32 minecraft:moss_block strict
-fill 868 200 32 877 200 32 minecraft:mycelium strict
+setblock 868 200 32 minecraft:coarse_dirt strict
+fill 869 200 32 877 200 32 minecraft:mycelium strict
 setblock 878 200 32 minecraft:pale_moss_block strict
 fill 879 200 32 884 200 32 minecraft:mycelium strict
 fill 885 200 32 889 200 32 minecraft:pale_moss_block strict
 setblock 890 200 32 minecraft:mycelium strict
-fill 891 200 32 892 200 32 minecraft:coarse_dirt strict
-setblock 893 200 32 minecraft:mycelium strict
+fill 891 200 32 893 200 32 minecraft:coarse_dirt strict
 setblock 894 200 32 minecraft:moss_block strict
 setblock 895 200 32 minecraft:mycelium strict
 setblock 896 200 32 minecraft:coarse_dirt strict
@@ -2479,7 +2501,7 @@ setblock 862 200 33 minecraft:mycelium strict
 fill 863 200 33 864 200 33 minecraft:coarse_dirt strict
 setblock 865 200 33 minecraft:mycelium strict
 fill 866 200 33 867 200 33 minecraft:moss_block strict
-setblock 868 200 33 minecraft:mycelium strict
+setblock 868 200 33 minecraft:coarse_dirt strict
 fill 869 200 33 870 200 33 minecraft:podzol strict
 fill 871 200 33 872 200 33 minecraft:mycelium strict
 setblock 873 200 33 minecraft:tuff strict
@@ -2490,9 +2512,7 @@ fill 883 200 33 884 200 33 minecraft:pale_moss_block strict
 setblock 885 200 33 minecraft:mycelium strict
 setblock 886 200 33 minecraft:coarse_dirt strict
 fill 887 200 33 888 200 33 minecraft:pale_moss_block strict
-setblock 889 200 33 minecraft:mycelium strict
-setblock 890 200 33 minecraft:coarse_dirt strict
-fill 891 200 33 892 200 33 minecraft:mycelium strict
+fill 889 200 33 892 200 33 minecraft:coarse_dirt strict
 fill 893 200 33 894 200 33 minecraft:moss_block strict
 setblock 895 200 33 minecraft:mycelium strict
 setblock 896 200 33 minecraft:coarse_dirt strict
@@ -2515,27 +2535,28 @@ setblock 852 200 34 minecraft:moss_block strict
 setblock 853 200 34 minecraft:coarse_dirt strict
 fill 854 200 34 856 200 34 minecraft:mycelium strict
 setblock 857 200 34 minecraft:moss_block strict
-setblock 858 200 34 minecraft:mycelium strict
+setblock 858 200 34 minecraft:coarse_dirt strict
 fill 859 200 34 862 200 34 minecraft:moss_block strict
 fill 863 200 34 864 200 34 minecraft:coarse_dirt strict
 setblock 865 200 34 minecraft:mycelium strict
 fill 866 200 34 868 200 34 minecraft:moss_block strict
-fill 869 200 34 870 200 34 minecraft:mycelium strict
-setblock 871 200 34 minecraft:coarse_dirt strict
-setblock 872 200 34 minecraft:mycelium strict
+setblock 869 200 34 minecraft:mycelium strict
+fill 870 200 34 872 200 34 minecraft:coarse_dirt strict
 setblock 873 200 34 minecraft:moss_block strict
-fill 874 200 34 882 200 34 minecraft:mycelium strict
-fill 883 200 34 884 200 34 minecraft:coarse_dirt strict
-fill 885 200 34 886 200 34 minecraft:mycelium strict
+setblock 874 200 34 minecraft:coarse_dirt strict
+fill 875 200 34 882 200 34 minecraft:mycelium strict
+fill 883 200 34 886 200 34 minecraft:coarse_dirt strict
 setblock 887 200 34 minecraft:moss_block strict
-setblock 888 200 34 minecraft:mycelium strict
+setblock 888 200 34 minecraft:coarse_dirt strict
 setblock 889 200 34 minecraft:moss_block strict
 fill 890 200 34 892 200 34 minecraft:mycelium strict
 fill 893 200 34 895 200 34 minecraft:moss_block strict
 fill 896 200 34 897 200 34 minecraft:podzol strict
 setblock 898 200 34 minecraft:coarse_dirt strict
 fill 899 200 34 900 200 34 minecraft:moss_block strict
-fill 901 200 34 903 200 34 minecraft:mycelium strict
+setblock 901 200 34 minecraft:mycelium strict
+setblock 902 200 34 minecraft:coarse_dirt strict
+setblock 903 200 34 minecraft:mycelium strict
 setblock 904 200 34 minecraft:moss_block strict
 fill 905 200 34 909 200 34 minecraft:podzol strict
 fill 910 200 34 911 200 34 minecraft:coarse_dirt strict
@@ -2556,13 +2577,12 @@ setblock 862 200 35 minecraft:mycelium strict
 fill 863 200 35 864 200 35 minecraft:coarse_dirt strict
 fill 865 200 35 870 200 35 minecraft:mycelium strict
 fill 871 200 35 872 200 35 minecraft:moss_block strict
-setblock 873 200 35 minecraft:mycelium strict
+setblock 873 200 35 minecraft:coarse_dirt strict
 setblock 874 200 35 minecraft:moss_block strict
-setblock 875 200 35 minecraft:mycelium strict
+setblock 875 200 35 minecraft:coarse_dirt strict
 fill 876 200 35 878 200 35 minecraft:podzol strict
 setblock 879 200 35 minecraft:mycelium strict
-fill 880 200 35 882 200 35 minecraft:coarse_dirt strict
-setblock 883 200 35 minecraft:mycelium strict
+fill 880 200 35 883 200 35 minecraft:coarse_dirt strict
 fill 884 200 35 885 200 35 minecraft:podzol strict
 setblock 886 200 35 minecraft:coarse_dirt strict
 fill 887 200 35 890 200 35 minecraft:mycelium strict
@@ -2755,8 +2775,8 @@ setblock 912 200 41 minecraft:black_terracotta strict
 setblock 848 200 42 minecraft:black_terracotta strict
 fill 849 200 42 853 200 42 minecraft:stone strict
 fill 854 200 42 857 200 42 minecraft:dirt strict
-fill 858 200 42 861 200 42 minecraft:coarse_dirt strict
-fill 862 200 42 863 200 42 minecraft:mycelium strict
+fill 858 200 42 862 200 42 minecraft:coarse_dirt strict
+setblock 863 200 42 minecraft:mycelium strict
 fill 864 200 42 865 200 42 minecraft:moss_block strict
 setblock 866 200 42 minecraft:podzol strict
 fill 867 200 42 869 200 42 minecraft:coarse_dirt strict
@@ -2782,10 +2802,9 @@ fill 906 200 42 910 200 42 minecraft:stone strict
 setblock 911 200 42 minecraft:black_terracotta strict
 fill 850 200 43 854 200 43 minecraft:stone strict
 fill 855 200 43 858 200 43 minecraft:dirt strict
-setblock 859 200 43 minecraft:mycelium strict
-setblock 860 200 43 minecraft:coarse_dirt strict
+fill 859 200 43 860 200 43 minecraft:coarse_dirt strict
 setblock 861 200 43 minecraft:podzol strict
-setblock 862 200 43 minecraft:mycelium strict
+setblock 862 200 43 minecraft:coarse_dirt strict
 fill 863 200 43 865 200 43 minecraft:moss_block strict
 fill 866 200 43 867 200 43 minecraft:coarse_dirt strict
 fill 868 200 43 870 200 43 minecraft:mycelium strict
@@ -4038,7 +4057,7 @@ setblock 914 201 14 minecraft:short_dry_grass strict
 setblock 917 201 14 minecraft:andesite strict
 setblock 918 201 14 minecraft:tuff strict
 fill 919 201 14 920 201 14 minecraft:deepslate strict
-setblock 921 201 14 minecraft:mycelium strict
+setblock 921 201 14 minecraft:coarse_dirt strict
 fill 922 201 14 923 201 14 minecraft:dirt strict
 fill 924 201 14 925 201 14 minecraft:stone strict
 setblock 926 201 14 minecraft:black_terracotta strict
@@ -4096,7 +4115,7 @@ setblock 908 201 16 minecraft:short_dry_grass strict
 setblock 917 201 16 minecraft:tuff strict
 setblock 918 201 16 minecraft:cobbled_deepslate strict
 setblock 919 201 16 minecraft:deepslate strict
-setblock 920 201 16 minecraft:mycelium strict
+setblock 920 201 16 minecraft:coarse_dirt strict
 fill 921 201 16 922 201 16 minecraft:dirt strict
 fill 923 201 16 925 201 16 minecraft:stone strict
 fill 834 201 17 836 201 17 minecraft:stone strict
@@ -4793,7 +4812,7 @@ setblock 896 201 42 minecraft:short_dry_grass strict
 setblock 899 201 42 minecraft:tuff strict
 setblock 900 201 42 minecraft:cobbled_deepslate strict
 setblock 901 201 42 minecraft:tuff strict
-fill 902 201 42 903 201 42 minecraft:mycelium strict
+fill 902 201 42 903 201 42 minecraft:coarse_dirt strict
 fill 904 201 42 906 201 42 minecraft:dirt strict
 fill 907 201 42 910 201 42 minecraft:stone strict
 setblock 911 201 42 minecraft:black_terracotta strict

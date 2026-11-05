@@ -92,18 +92,26 @@ class Seq:
         return self
 
 
+# F2 (HR-29): the cutscenes the footage plays without the HUD (CS0, CS1, CS4 + the event coda; cutscenes.md §12) hold the
+# player's actionbar HUD on every tick (hudHold 2 as the skip prompt does; player/hud/tick rests while it is >= 1). CS2 / CS3,
+# SQ1 and the lead-ins keep it (the footage shows it there).
+HUD_OFF = ('intro', 'cs1', 'ending', 'event')
+HUD_HOLD = 'scoreboard players set @a[tag=player] hudHold 2'
+
+
 def write(W, name, s, head, length, start_head=(), cancel=(), macro=False):
     """seq/<name>/{start,tick,cancel} + k/<t> + b/<a>_<b>. start = its head lines, #sqdone 0, then the tick-0 lines."""
     base = f'{SEQ}/{name}'
+    hold = [HUD_HOLD] if name in HUD_OFF else []
     W.w(f'seq/{name}/start', [f'# {head}', f'# Start (@s = the body, at it; #sq {OBJ} = 0){" — macro" if macro else ""}.',
-                              *[c for c in start_head if c], f'scoreboard players set #sqdone {OBJ} 0', *s.t.get(0, [])])
+                              *[c for c in start_head if c], f'scoreboard players set #sqdone {OBJ} 0', *hold, *s.t.get(0, [])])
     ticks = sorted(t for t in s.t if t > 0)
     assert all(t <= length for t in ticks), (name, max(ticks), length)
     for t in ticks:
         W.w(f'seq/{name}/k/{t}', [f'# {name} at #sq {t} (@s = the body).', *s.t[t]])
     leaf = lambda ts: [f'{sq(t)} run return run function {base}/k/{t}' for t in ts]
     tick = [f'# {head}', f'# Tick (@s = the body; #sq {OBJ} 1.. = the clip tick shown this game tick); #sqdone at {length}.',
-            f'{sq(f"{length}..")} run scoreboard players set #sqdone {OBJ} 1']
+            f'{sq(f"{length}..")} run scoreboard players set #sqdone {OBJ} 1', *hold]
     if len(ticks) <= 12:
         tick += leaf(ticks)
     else:
@@ -143,9 +151,12 @@ def face_player_fight():
 
 
 def face_player_dying():
-    """One-shot facing while dying (the pull refuses then): tp facing her + view/sync."""
-    return [f'execute as {PL} at @s run tp @s ~ ~ ~ facing entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] eyes',
-            f'execute as {PL} run function rlk:view/sync']
+    """One-shot facing while dying (the pull refuses then). F2 (HR-02): `rotate` (no teleport: the player stays on the F5 seat
+    that rides the avatar, nothing dismounts and the avatar does not move) for the player toward her eyes (from their own eyes:
+    anchored eyes) and for the avatar (rlk_av, the F5 / shoulder-view body) toward her feet; first person has no avatar (the
+    second line selects nothing)."""
+    return [f'execute as {PL} anchored eyes run rotate @s facing entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] eyes',
+            'rotate @e[tag=rlk_av,limit=1] facing entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] feet']
 
 
 def rock(look):
@@ -176,6 +187,19 @@ def halo(bright):
 
 def line(i):
     return K.hud('line', id=i)
+
+
+FIRST_PERSON = 'if entity @a[tag=rlk_body]'        # the view system off: the player is its own body (no avatar)
+AVATAR = 'unless entity @a[tag=rlk_body]'
+
+
+def line_at_player(cmd, aim):
+    """F2 (HR-45): the 홍련일섬 line through the player's chest point (F5: the avatar's chest, the camera behind it), and in
+    first person at the eye 1.2 b toward her instead (the chest point lies on the camera's own line there: 0 px)."""
+    if not cmd:
+        return []
+    return [f'execute {AVATAR} at {PLB} positioned ~ ~1.3 ~ {aim} run {cmd}',
+            f'execute {FIRST_PERSON} at {PLB} positioned ~ ~1.62 ~ {aim} positioned ^ ^ ^1.2 run {cmd}']
 
 
 def snd(name):
@@ -236,8 +260,9 @@ def build_intro(W):
     e = lambda k, d=0: ev('intro', k, d)
     x = lambda k, d=0: api.SKIP_T + ev('intro_end', k, d)                # intro_end events on the intro clock
     # E0 (start): the rift closing behind the player, the ambient, the wind; lines 1-10 at api.LINE_AT
+    # F2 (HR-46): the wind at the player (played at her seat, 26.7 b away, its minVolume 0 sent it to no one)
     s.at(0, (f'execute at {STAGE} rotated as {STAGE} positioned ^ ^ ^-1.5 run {K.p("arrive_rift")}' if K.p('arrive_rift') else None),
-         K.p('ambient_p1'), snd('cs0_wind'))
+         K.p('ambient_p1'), (f'execute at {PL} run {snd("cs0_wind")}' if snd('cs0_wind') else None))
     for i in range(1, 11):
         assert api.LINE_AT[i][0] == 'intro'
         s.at(api.LINE_AT[i][1], line(i))
@@ -281,7 +306,7 @@ def build_intro(W):
         '# The intro skip (@s = the body; PLAN §3.1): the black falls; under it the intro is cleared (line, the wind, the rock and the',
         '# props, a walk leg in progress), she stands <= 7 b from the player facing them; the core then sets #sq to 553 and the next',
         '# tick plays intro_end from its tick 0 (E10\'s end pose) with line 11 typed on the black.',
-        *[c for c in (K.hud('clear'), K.ovl('black', 0, 20, 6), stop_wind) if c], *halo(False),
+        *[c for c in (K.hud('clear'), K.ovl('black', 0, 20, 6), stop_wind) if c], *halo(False), HUD_HOLD,
         'function rlk:mboss/mv/stop', rock_kill(), api.rig('look/props/none'), DIST, near7, api.rig('face/player')])
     mv.write(W)
 
@@ -364,7 +389,7 @@ def build_cs1(W):
     # and its halves fall; the arena turns crimson (173), the rig's P2 accents, the dark leaves, music 2, the swirl
     s.at(e('neg'), K.ovl('negative', 0, 4, 0), snd('negative')).at(e('pink'), K.ovl('pinkwhite', 0, 4, 10))
     sl = K.p('scarlet_line', len=600, yaw=90, roll=13)
-    s.at(e('slash'), (f'execute at {PLB} positioned ~ ~1.3 ~ facing entity @s feet rotated ~ 0 run {sl}' if sl else None),
+    s.at(e('slash'), line_at_player(sl, 'facing entity @s feet rotated ~ 0'),
          K.ovl('red_tint', 0, 4, 20), snd('iai_slash'), petal_look(PETAL2, 'split'))
     s.me(e('slash'), K.p('petal_burst', r=20)).me(e('slash'), K.p('clash_spark'))
     for t in range(e('slash', 1), e('slash', 21)):
@@ -419,7 +444,9 @@ def build_repel(W):
     s.me(e('land'), K.p('dust_ring', r=15), y=.1).at(e('land'), sig('hp2'), snd('land_back'))
     burst = K.p('petal_burst', r=10)
     s.at(e('petals'), gate(f'if score #sq_at {OBJ} matches 5', [(f'execute positioned ~ ~0.4 ~ run {burst}' if burst else None), snd('petal_break')]))
-    s.fx(e('kick'), 'head', K.p('kick_flash')).at(e('kick'), sig('hp3'), snd('kick'))
+    # F2 (HR-17): kept cards (the kick at 5 % kills her in this tick: death_start's fx/clear would take the flash with it)
+    s.at(e('kick'), K.fixed('keep_on')).fx(e('kick'), 'head', K.p('kick_flash')).at(e('kick'), K.fixed('keep_off'))
+    s.at(e('kick'), sig('hp3'), snd('kick'))
     mv.write(W)
     head = 'CS2 / CS3 repel {at:60|5} (PLAN §3.4): lock, grab, the clash on the hat, the half circle, back to back, the throw, the kick.'
     write(W, 'repel', s, head, api.SEQ_LEN['repel'], macro=True,
@@ -477,11 +504,17 @@ def build_lead_stand(W):
 def build_ending(W):
     s, mv = Seq('ending'), Moves('ending')
     e = lambda k, d=0: ev('ending', k, d)
-    # the start: lying where CS3 left her; the one-shot facing (tp facing + view/sync: the pull refuses while dying)
+    # the start: lying where CS3 left her; the one-shot facing (rotate, no teleport: F2 HR-02; the pull refuses while dying)
     # E1b the glint at the hat's edge, the lilac band across the player at chest height
     s.fx(e('glint'), 'hat_crown', K.p('glint', c=api.C_LILAC)).at(e('glint'), snd('band_glint'))
-    band = K.p('qi_band', len=120, yaw=0, pitch=0, roll=0)
-    s.at(e('band'), (f'execute positioned ~ ~1.1 ~ facing entity {PLB} feet rotated ~ 0 run {band}' if band else None), snd('band_sweep'))
+    # F2 (HR-32): the band sweeps her distance to the player + 1 b (storage seq.band.sw, tenths), so it passes over them
+    band = K.pw('qi_band', f'rlk:{OBJ} seq.band')
+    if band:
+        s.at(e('band'), DIST, f'scoreboard players operation #sq_bd {OBJ} = #mbDist mb', f'scoreboard players add #sq_bd {OBJ} 10',
+             f'data modify storage rlk:{OBJ} seq.band set value {{len:120,yaw:0,pitch:0,roll:0,sw:25}}',
+             f'execute store result storage rlk:{OBJ} seq.band.sw int 1 run scoreboard players get #sq_bd {OBJ}',
+             f'execute positioned ~ ~1.1 ~ facing entity {PLB} feet rotated ~ 0 run {band}')
+    s.at(e('band'), snd('band_sweep'))
     # E2 up, the hat caught and on; to 3 b before the player; the violet glow on the raised blade; the gold flash between them
     s.at(e('hat_on', -4), mv.add('e2', [cand(near(d), glide(8)) for d in (3.0, 3.6)], 'E2 to 3 b before the player'))
     s.at(e('raise'), api.rig('look/blade/violet'), snd('blade_charge'))
@@ -521,7 +554,7 @@ def build_ending(W):
     s.at(e('a2'), snd('air_clash')).at(e('white'), K.ovl('white', 0, 3, 8), snd('air_white'))
     # S4 the long arc down to 10 b from the player toward the moon (the nearest free bearing to it), the petal streaks, the landing
     mp = api.MOON_POS
-    land = mv.add('land', [cand(f'at {PLB} facing {num(mp[0])} {num(mp[1])} {num(mp[2])} rotated ~{a} 0 positioned ^ ^ ^10 {FLOOR}', leap(20, 40))
+    land = mv.add('land', [cand(f'at {PLB} facing {api.xyz(mp, 3)} rotated ~{a} 0 positioned ^ ^ ^10 {FLOOR}', leap(20, 40))
                            for a in (0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180)],
                    'S4 the landing 10 b from the player toward the moon (the nearest free bearing)')
     s.at(e('fly'), land).me(e('fly', 2), K.p('petals_wind'), y=1).at(e('land'), snd('land_far'))
@@ -547,7 +580,7 @@ def build_ending(W):
         f'# The body turns at most 12 degrees toward the moon (api.MOON_POS) this tick, yaw only (@s = the body).',
         f'execute store result score #sq_y0 {OBJ} run data get entity @s Rotation[0] 100',
         f'execute at @s run summon minecraft:marker ~ ~ ~ {{Tags:{tags(HELP_T)}}}',
-        f'execute at @s facing {num(mp[0])} {num(mp[1])} {num(mp[2])} run tp {HELP} ~ ~ ~ ~ 0',
+        f'execute at @s facing {api.xyz(mp, 3)} run tp {HELP} ~ ~ ~ ~ 0',
         f'execute store result score #sq_y1 {OBJ} run data get entity {HELP} Rotation[0] 100',
         f'kill @e[type=minecraft:marker,tag={HELP_T}]',
         f'scoreboard players operation #sq_y1 {OBJ} -= #sq_y0 {OBJ}', f'scoreboard players add #sq_y1 {OBJ} 90000',

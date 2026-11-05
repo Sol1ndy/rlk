@@ -3,7 +3,7 @@
 # @s = the item_display the caller summoned and rotated (dressed in place, idempotent; calling it
 # again with another look re-looks it); any other entity (a marker) gets one follower display the kit keeps
 # on it and removes with it.
-execute unless data storage rlk:hr fx{init:1b} run function rlk:boss/scarlet/fx/e/init
+execute unless data storage rlk:hr fx{init:2b} run function rlk:boss/scarlet/fx/e/init
 execute if entity @s[type=minecraft:item_display] run return run function rlk:boss/scarlet/fx/prop/e/disc_d
 function rlk:boss/scarlet/fx/prop/e/link
 execute at @s run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_hr_fxf","rlk_hr_fx_nf","rlk_room","rlk_mb_aux"],teleport_duration:1}

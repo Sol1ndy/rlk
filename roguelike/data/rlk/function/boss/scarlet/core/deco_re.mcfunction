@@ -1,7 +1,7 @@
 # The decor props after a /reload (aux entities are gone): the moon halo and the lotus of the phase (a
 # look request then sets them to its look, core/look/go).
 kill @e[type=minecraft:item_display,tag=rlk_hr_deco]
-execute if score #ph hr matches ..1 run summon minecraft:item_display 889 218 -33 {Tags:["rlk_room","rlk_mb_aux","rlk_hr_deco","rlk_hr_deco_moon_halo","rlk_hr_dnew"]}
+execute if score #ph hr matches ..1 run summon minecraft:item_display 889.0 218 -33.0 {Tags:["rlk_room","rlk_mb_aux","rlk_hr_deco","rlk_hr_deco_moon_halo","rlk_hr_dnew"]}
 execute if score #ph hr matches ..1 as @e[type=minecraft:item_display,tag=rlk_hr_dnew] at @s run tp @s ~ ~ ~ 12.38 0
 execute if score #ph hr matches ..1 as @e[type=minecraft:item_display,tag=rlk_hr_dnew] run function rlk:boss/scarlet/fx/prop/moon_halo {look:"p1"}
 execute if score #ph hr matches ..1 run tag @e[type=minecraft:item_display,tag=rlk_hr_dnew] remove rlk_hr_dnew
@@ -37,7 +37,7 @@ execute if score #ph hr matches ..1 run summon minecraft:item_display 890.5 200.
 execute if score #ph hr matches ..1 as @e[type=minecraft:item_display,tag=rlk_hr_dnew] at @s run tp @s ~ ~ ~ 329 0
 execute if score #ph hr matches ..1 as @e[type=minecraft:item_display,tag=rlk_hr_dnew] run function rlk:boss/scarlet/fx/prop/lotus {look:"bud"}
 execute if score #ph hr matches ..1 run tag @e[type=minecraft:item_display,tag=rlk_hr_dnew] remove rlk_hr_dnew
-execute if score #ph hr matches 2.. run summon minecraft:item_display 889 218 -33 {Tags:["rlk_room","rlk_mb_aux","rlk_hr_deco","rlk_hr_deco_moon_halo","rlk_hr_dnew"]}
+execute if score #ph hr matches 2.. run summon minecraft:item_display 889.0 218 -33.0 {Tags:["rlk_room","rlk_mb_aux","rlk_hr_deco","rlk_hr_deco_moon_halo","rlk_hr_dnew"]}
 execute if score #ph hr matches 2.. as @e[type=minecraft:item_display,tag=rlk_hr_dnew] at @s run tp @s ~ ~ ~ 12.38 0
 execute if score #ph hr matches 2.. as @e[type=minecraft:item_display,tag=rlk_hr_dnew] run function rlk:boss/scarlet/fx/prop/moon_halo {look:"p2"}
 execute if score #ph hr matches 2.. run tag @e[type=minecraft:item_display,tag=rlk_hr_dnew] remove rlk_hr_dnew

@@ -24,7 +24,11 @@
    "data/rlk/function/boss/scarlet/fx/cardx.mcfunction",
    "data/rlk/function/boss/scarlet/fx/look.mcfunction",
    "data/rlk/function/boss/scarlet/fx/clear.mcfunction",
-   "data/rlk/function/boss/scarlet/fx/uninstall.mcfunction"
+   "data/rlk/function/boss/scarlet/fx/uninstall.mcfunction",
+   "data/rlk/function/boss/scarlet/fx/keep_on.mcfunction",
+   "data/rlk/function/boss/scarlet/fx/keep_off.mcfunction",
+   "data/rlk/function/boss/scarlet/fx/follow_on.mcfunction",
+   "data/rlk/function/boss/scarlet/fx/follow_off.mcfunction"
   ],
   "rp": [
    "assets/rlk/textures/mboss/hr_kit",
@@ -48,9 +52,10 @@
   "hrFxK",
   "hrFxD",
   "hrFxL",
-  "hrFxQ"
+  "hrFxQ",
+  "hrFxY"
  ],
- "fake_players": "#n, #na, #ni, #ser, #now, #now2, #wd, #c2, #col, #roll, #spin, #life, #fade, #dly, #dur, #hit, #pool, #a, #b, #c, #k, #t, #it, #f, #h, #pt, #fl, #m, #r, #p, #o, #i, #j, #ly, #n2, #g, #on, #sk, #l, #lid, #at, #af, #lnW, #lnA, #lnE, #ovH, #ovE, #oi, #oh, #oo, #demo, #dt, #s, #d, #my, #mz, #ny, #nz, #cm1, #c3, #c4, #c26, #c90, #c10, #c20, #c36, #c100, #c115, #c360, #c1000 (objective hrFx)",
+ "fake_players": "#n, #na, #ni, #ser, #now, #now2, #wd, #c2, #col, #roll, #spin, #life, #fade, #dly, #dur, #hit, #pool, #a, #b, #c, #k, #t, #it, #f, #h, #pt, #fl, #m, #r, #p, #o, #i, #j, #ly, #n2, #g, #on, #sk, #l, #lid, #at, #af, #lnW, #lnA, #lnE, #ovH, #ovE, #oi, #oh, #oo, #demo, #dt, #s, #d, #my, #mz, #ny, #nz, #cm1, #c3, #c4, #c26, #c90, #c10, #c20, #c36, #c100, #c115, #c360, #c1000, #c104, #c5, #fm, #sw, #tx, #ty, #keep, #fol, #fy, #y, #ovS, #ovI (objective hrFx)",
  "tags": [
   "rlk_hr_fx",
   "rlk_hr_fx_c",
@@ -71,8 +76,14 @@
   "rlk_hr_fxfs",
   "rlk_hr_fxl",
   "rlk_hr_fx_demo",
-  "rlk_hr_fx_demo_mv"
+  "rlk_hr_fx_demo_mv",
+  "rlk_hr_fx_keep",
+  "rlk_hr_fx_fc"
  ],
+ "switches": {
+  "keep_on / keep_off": "cards made between carry rlk_hr_fx_keep: fx/clear (pause, death_start, the ager's dead / revive clear) leaves them; the module cleanup and fx/uninstall remove them",
+  "follow_on / follow_off": "@s = the lead: cards made between follow it every tick (its x / z, their own height over it)"
+ },
  "conventions": {
   "yaw": "+ = to the executor's right (offset from its rotation)",
   "pitch": "+ = up (elevation)",
@@ -1431,6 +1442,91 @@
    "source": "own",
    "desc": "gate label icon: a red lotus over a long blade"
   },
+  "qi_arcf_0": {
+   "plane": "face",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_arc_0",
+   "source": "own",
+   "desc": "sword-qi crescent frame 0 standing across the aim (a slanted slash, rolled in the screen plane)"
+  },
+  "qi_arcf_1": {
+   "plane": "face",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_arc_1",
+   "source": "own",
+   "desc": "sword-qi crescent frame 1 standing across the aim (a slanted slash, rolled in the screen plane)"
+  },
+  "qi_arcf_2": {
+   "plane": "face",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_arc_2",
+   "source": "own",
+   "desc": "sword-qi crescent frame 2 standing across the aim (a slanted slash, rolled in the screen plane)"
+  },
+  "qi_arcf_3": {
+   "plane": "face",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_arc_3",
+   "source": "own",
+   "desc": "sword-qi crescent frame 3 standing across the aim (a slanted slash, rolled in the screen plane)"
+  },
+  "qi_wedgef": {
+   "plane": "face",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_wedge",
+   "source": "own",
+   "desc": "sword-qi wedge standing across the aim, the point at b 1"
+  },
   "rift_void": {
    "plane": "face",
    "px": [
@@ -1555,7 +1651,7 @@
     "roll",
     "c"
    ],
-   "doc": "A sword-qi crescent of reach {r} (tenths) about the executor (S3: the body + 1.3, rotated as the body; S4: the cut spot + h, rotated as the player; S2b: at her): {yaw} / {pitch} the aim's offsets from the executor rotation (yaw + = right, pitch + = up), {roll} the blade plane about the aim (0 a flat crescent, 90 vertical). Four sweep frames 1 t apart (the last fades over 6 t): the lilac body, the white-pink cutting rim; c tints it (1 lilac .. 5 white). A crescent that would reach below the floor rises up to 1 b, then shrinks (fx/e/clamp_arc): no frame below the floor.",
+   "doc": "A sword-qi crescent of reach {r} (tenths) about the executor (S3: the body + 1.3, rotated as the body; S4: the cut spot + h, rotated as the player; S2b: at her): {yaw} / {pitch} the aim's offsets from the executor rotation (yaw + = right, pitch + = up), {roll} the blade: |roll| < 20 (or > 160) a flat crescent rolled about the aim; |roll| 20..160 (a slanted slash) the crescent stands across the aim, rolled by roll in that plane (the screen plane of a viewer behind the target: F2, HR-12), centred on the executor. Four sweep frames 1 t apart (the last fades over 6 t): the lilac body, the white-pink cutting rim; c tints it (1 lilac .. 5 white). A crescent that would reach below the floor rises up to 1 b, then shrinks (fx/e/clamp_arc): no frame below the floor.",
    "cards": 4,
    "c_split": [
     1,
@@ -1589,9 +1685,10 @@
     "len",
     "yaw",
     "pitch",
-    "roll"
+    "roll",
+    "sw"
    ],
-   "doc": "A broad sword-qi band of length {len} (tenths) across the aim, centred on the executor (S4 A8.2: the cut spot + 0.3, rotated as the player; S2b CS4 E1b: her + 1.1 facing the player): an upright sheet whose long axis runs to the aim's left and right, rising by {pitch} degrees toward its right end, {roll} leaning its top forward; {yaw} turns the aim. It sweeps 2.5 b forward along the aim over 6 t and fades (lilac, the white-pink upper rim). Near the floor it rises (fx/e/clamp_band) so no part of it reaches below the floor; under a lean the sweep stays level.",
+   "doc": "A broad sword-qi band of length {len} (tenths) across the aim, centred on the executor (S4 A8.2: the cut spot + 0.3, rotated as the player; S2b CS4 E1b: her + 1.1 facing the player): an upright sheet whose long axis runs to the aim's left and right, rising by {pitch} degrees toward its right end, {roll} leaning its top forward; {yaw} turns the aim. It sweeps {sw} (tenths; F2, HR-32: A8.2 25, CS4 E1b her distance + 1 b) forward along the aim over 6 t (its leading streak 4 % further) and fades (lilac, the white-pink upper rim). Near the floor it rises (fx/e/clamp_band) so no part of it reaches below the floor; under a lean the sweep stays level.",
    "cards": 2,
    "c_split": [],
    "ambient": false,
@@ -1623,7 +1720,7 @@
     "yaw",
     "c"
    ],
-   "doc": "A vertical sword-qi crescent of height {h} (tenths) standing on the executor (S3 A3: the body + 0.2, 1.4 ahead; S4 A8.8: the cut spot on the floor, rotated as the player): the crescent in the vertical plane along the aim (executor yaw + {yaw}), from the executor up to h, the sweep rising (four frames), and a thin glowing upright line at its foot facing the viewer; c tints it (A8.8: 2 magenta).",
+   "doc": "A vertical sword-qi crescent of height {h} (tenths) standing on the executor (S3 A3: the body + 0.2, ahead; S4 A8.8: beside the cut spot on the floor, rotated as the player): F2 (HR-12) the crescent stands ACROSS the aim (yaw 0 = the plane perpendicular to the executor's facing, its arc bulging to the executor's right; 180 = to its left; {yaw} turns the plane), from the executor up to h, the sweep rising (four frames), and a thin glowing upright line at its foot facing the viewer; c tints it (A8.8: 2 magenta). Level: the executor's pitch is ignored.",
    "cards": 5,
    "c_split": [
     1,
@@ -1640,7 +1737,7 @@
     "h",
     "c"
    ],
-   "doc": "A rising vertical fan of sword-qi of height {h} (tenths) centred on the executor (S3 A1: the body + 1.1, 1.2 b ahead; cosmetic): the four sweep frames in the vertical plane along the executor's facing, rising; c tints it (A1: 2).",
+   "doc": "A rising vertical fan of sword-qi of height {h} (tenths) centred on the executor (S3 A1: the body + 1.1, 1.2 b ahead; cosmetic): F2 (HR-12) the four sweep frames stand ACROSS the executor's facing (the plane perpendicular to it), bulging to its left (the right of a viewer facing it), rising; c tints it (A1: 2). Level.",
    "cards": 4,
    "c_split": [
     1,
@@ -1657,7 +1754,7 @@
     "r",
     "roll"
    ],
-   "doc": "A sword-qi wedge of length {r} (tenths) from the executor along its facing (S3 A3 h5: the body + 1.3; S4 A7: the body + 1.1), rolled {roll} degrees about the aim (the rising diagonal): a lilac spearhead widening behind its point, white edges; particles at the point.",
+   "doc": "A sword-qi wedge of length {r} (tenths) from the executor (S3 A3 h5: the body + 1.3; S4 A7: the body + 1.1), {roll} degrees: F2 (HR-12) |roll| 20..160 = the wedge stands across the facing, its point up and rolled by roll in that plane (the rising diagonal a viewer behind the target sees broadside); else it lies along the facing, rolled about it: a lilac spearhead widening behind its point, white edges; particles at the point. Level.",
    "cards": 1,
    "c_split": [],
    "ambient": false,
@@ -1675,7 +1772,7 @@
    "args": [
     "len"
    ],
-   "doc": "A thin straight sword-qi line of length {len} (tenths) from the executor along its full facing (pitch counts: S3 A5 the body + 1.2, 1.5 b ahead, level; S4 A8.9 the dive line: her + 1.0, rotated ~ 90 = straight down): a white core inside a lilac glow; a line pointing down is clamped to end above the floor.",
+   "doc": "A thin straight sword-qi line of length {len} (tenths) from the executor, F2 (HR-12) ACROSS its facing: the facing turned 90 deg to its right, its pitch kept (S3 A5: from her left, the body + 1.2, 1.5 b ahead, level: a horizontal slash across the view; S4 A8.9 the dive line: her + 1.0, rotated ~ 90 = straight down, unchanged): a white core inside a lilac glow; a line pointing down is clamped to end above the floor.",
    "cards": 2,
    "c_split": [],
    "ambient": false,
@@ -1797,7 +1894,7 @@
   },
   "light_column": {
    "args": [],
-   "doc": "A lilac light column from the executor (the player's spot on the floor: the deflect, the A8 fail) up 9 b: two crossed glowing quads widening, a white core, motes rising.",
+   "doc": "A lilac light column from the executor (the player's spot on the floor: the deflect, the A8 fail) up 9 b: two crossed glowing quads widening, a white core, motes rising. Upright whatever the executor's pitch (F2, HR-41: both cards at pitch 0).",
    "cards": 2,
    "c_split": [],
    "ambient": false,
@@ -1879,7 +1976,7 @@
     "yaw",
     "roll"
    ],
-   "doc": "홍련일섬's red slash line (CS1 C8, the 5 % instant death; S2b: the player's chest point, facing her): a line of length {len} (tenths) through the executor along the executor's yaw + {yaw} (90 = across a viewer looking along the executor's facing, its + end on their right), roll > 0 rises toward the player's right: CS1 C8 / the 5 % instant death: +13 deg; it opens in 2 t, darkens after 12 t, closes by 30 t.",
+   "doc": "홍련일섬's red slash line (CS1 C8, the 5 % instant death; S2b: the player's chest point, facing her): a line of length {len} (tenths) through the executor along the executor's yaw + {yaw} (90 = across a viewer looking along the executor's facing, its + end on their right), roll > 0 rises toward the player's right: CS1 C8 / the 5 % instant death: +13 deg; it opens in 2 t, darkens after 12 t, closes by 30 t. Floor-safe at any height and roll (F2, HR-44): when its low end would dip under 0.25 b over the floor it slides along its own length toward its high end (fx/e/clamp_sline), so it still crosses the executor point and stops just above the floor.",
    "cards": 1,
    "c_split": [],
    "ambient": false,
@@ -3067,153 +3164,221 @@
    "text": "꽃 속에 술 한 병 놓고,",
    "steps": 7,
    "on_screen": 40,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 86
   },
   "2": {
    "text": "벗 없이 혼자 술잔 드네.",
    "steps": 6,
    "on_screen": 40,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 90
   },
   "3": {
    "text": "잔 들어 밝은 달 맞이하니,",
    "steps": 7,
    "on_screen": 40,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 98
   },
   "4": {
    "text": "달과 나와 그림자 셋이 되었네...",
    "steps": 8,
    "on_screen": 50,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 118
   },
   "5": {
    "text": "그리고 이제 친구가 와 주었으니 월하독작이 아니라, 대작이 되겠구만.",
    "steps": 18,
    "on_screen": 100,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 260,
+   "pages": [
+    {
+     "text": "그리고 이제 친구가 와 주었으니",
+     "from": 0,
+     "to": 47,
+     "width": 120
+    },
+    {
+     "text": "월하독작이 아니라, 대작이 되겠구만.",
+     "from": 47,
+     "to": 100,
+     "width": 136
+    }
+   ]
   },
   "6": {
    "text": "낭자, 내 말하지 않았던가?",
    "steps": 7,
    "on_screen": 50,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 100
   },
   "7": {
    "text": "곧 또 보게 될 것 같다고.",
    "steps": 8,
    "on_screen": 44,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 94
   },
   "8": {
    "text": "아름다운 곳이지 않나?",
    "steps": 6,
    "on_screen": 44,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 86
   },
   "9": {
    "text": "신세진 것도 있겠다, 이 달 아래서...",
    "steps": 10,
    "on_screen": 56,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 132
   },
   "10": {
    "text": "한 수 가르침을 청하고 싶네만.",
    "steps": 9,
    "on_screen": 50,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 114
   },
   "11": {
    "text": "낭자 생각은 어떤가?",
    "steps": 6,
    "on_screen": 68,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 78
   },
   "12": {
    "text": "거기가 아닐세.",
    "steps": 5,
    "on_screen": 63,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 54
   },
   "13": {
    "text": "낭자, 대단하구만.",
    "steps": 5,
    "on_screen": 44,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 64
   },
   "14": {
    "text": "진심으로 가겠네.",
    "steps": 5,
    "on_screen": 42,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 62
   },
   "15": {
    "text": "천지만물을 벤다는 건...",
    "steps": 7,
    "on_screen": 36,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 86
   },
   "16": {
    "text": "이런 것일세.",
    "steps": 4,
    "on_screen": 40,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 46
   },
   "17": {
    "text": "낭자, 여기까지 하세.",
    "steps": 5,
    "on_screen": 60,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 76
   },
   "18": {
    "text": "대단하네, 좋은 수련이 되었어.",
    "steps": 8,
    "on_screen": 68,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 112
   },
   "19": {
    "text": "이제 정말 가야겠네.",
    "steps": 5,
    "on_screen": 45,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 74
   },
   "20": {
    "text": "다음 번에 만나면, 그땐 같이 한잔 하면 좋을 텐데...",
    "steps": 11,
    "on_screen": 119,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 192
   },
   "21": {
    "text": "달빛과 바람을 안주 삼아... 말일세.",
    "steps": 9,
    "on_screen": 130,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 128
   },
   "22": {
    "text": "어디 보자, 낭자네에선 이렇게 인사한다고 들었는데...",
-   "steps": 13,
+   "steps": 14,
    "on_screen": 130,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 196,
+   "pages": [
+    {
+     "text": "어디 보자,",
+     "from": 0,
+     "to": 26,
+     "width": 38
+    },
+    {
+     "text": "낭자네에선 이렇게 인사한다고 들었는데...",
+     "from": 26,
+     "to": 130,
+     "width": 154
+    }
+   ]
   },
   "23": {
    "text": "당신의 기억이 이어지기를.",
    "steps": 8,
    "on_screen": 90,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 98
   },
   "24": {
    "text": "조심하게. 칼자루를 쥐었다고 그 검의 주인이 되는 것은 아니니.",
    "steps": 15,
    "on_screen": 48,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 236,
+   "pages": [
+    {
+     "text": "조심하게. 칼자루를 쥐었다고",
+     "from": 0,
+     "to": 22,
+     "width": 106
+    },
+    {
+     "text": "그 검의 주인이 되는 것은 아니니.",
+     "from": 22,
+     "to": 48,
+     "width": 126
+    }
+   ]
   },
   "25": {
    "text": "한잔할 텐가? 안주는 달빛과 바람일세.",
    "steps": 10,
    "on_screen": 48,
-   "colour": "#F2D0E8"
+   "colour": "#F2D0E8",
+   "width": 144
   }
  },
+ "line_max_px": 192,
  "glyphs": {
   "black": {
    "cp": "U+EC10",
@@ -3271,6 +3436,222 @@
   },
   "vig": {
    "cp": "U+EC16",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "black_1": {
+   "cp": "U+EC20",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "black_2": {
+   "cp": "U+EC21",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "black_3": {
+   "cp": "U+EC22",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "black_4": {
+   "cp": "U+EC23",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "negative_1": {
+   "cp": "U+EC24",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "negative_2": {
+   "cp": "U+EC25",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "negative_3": {
+   "cp": "U+EC26",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "negative_4": {
+   "cp": "U+EC27",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "pinkwhite_1": {
+   "cp": "U+EC28",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "pinkwhite_2": {
+   "cp": "U+EC29",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "pinkwhite_3": {
+   "cp": "U+EC2A",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "pinkwhite_4": {
+   "cp": "U+EC2B",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "red_tint_1": {
+   "cp": "U+EC2C",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "red_tint_2": {
+   "cp": "U+EC2D",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "red_tint_3": {
+   "cp": "U+EC2E",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "red_tint_4": {
+   "cp": "U+EC2F",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "magenta_1": {
+   "cp": "U+EC30",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "magenta_2": {
+   "cp": "U+EC31",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "magenta_3": {
+   "cp": "U+EC32",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "magenta_4": {
+   "cp": "U+EC33",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "white_1": {
+   "cp": "U+EC34",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "white_2": {
+   "cp": "U+EC35",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "white_3": {
+   "cp": "U+EC36",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "white_4": {
+   "cp": "U+EC37",
    "px": [
     144,
     81

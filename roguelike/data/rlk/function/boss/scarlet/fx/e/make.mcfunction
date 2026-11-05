@@ -29,6 +29,7 @@ execute store result storage rlk:hr fx.a.f int 1 run scoreboard players get #fad
 execute store result score #col hrFx run data get storage rlk:hr fx.a.col2
 data modify storage rlk:hr fx.a.z set from storage rlk:hr fx.a.s0
 execute if score #dly hrFx matches 1.. run data modify storage rlk:hr fx.a.z set value "0f,0f,0f"
+execute if score #fol hrFx matches 1.. run data modify storage rlk:hr fx.a.tpd set value 1
 function rlk:boss/scarlet/fx/e/spawn with storage rlk:hr fx.a
 execute store result score #now hrFx run time query gametime
 scoreboard players add #now hrFx 1

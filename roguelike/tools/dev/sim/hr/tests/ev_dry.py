@@ -145,8 +145,14 @@ own_missing = sorted(r for r in refs if r.startswith(f'{api.NS}seq/') and r not 
 check('refs: every seq/** call is a written file', not own_missing, own_missing)
 # the kit calls carry their contract args
 args_bad = []
-for name, a in re.findall(r'function rlk:boss/scarlet/fx/(?:p|prop|hud)/(\w+)(?: (\{[^}]*\}))?', ALL):
-    keys = sorted(re.findall(r'(\w+):', a)) if a else []
+for name, a in re.findall(r'function rlk:boss/scarlet/fx/(?:p|prop|hud)/(\w+)(?: (\{[^}]*\}|with storage \S+ \S+))?', ALL):
+    if a.startswith('with storage'):
+        # F2 (HR-32): the compound the call reads (set in the same tick file) holds exactly the contract args
+        path = a.split()[3]
+        sets = [l for l in ALL.split('\n') if f'data modify storage {a.split()[2]} {path} set value' in l]
+        keys = sorted(re.findall(r'(\w+):', sets[0].split('set value', 1)[1])) if sets else []
+    else:
+        keys = sorted(re.findall(r'(\w+):', a)) if a else []
     want = sorted(api.KIT_PRESETS.get(name, api.KIT_HUD.get(name, list(api.KIT_PROPS.get(name, {})))))
     if keys != want:
         args_bad.append((name, keys, want))
@@ -350,7 +356,26 @@ class Sim(mcsim.Sim):
                 e.data['_merged'] = self.t
             return 1
         if c == 'rotate':
-            for e in (self.select(t[1], ctx) if t[1] != '@s' else [ctx.ex]):
+            tg = self.select(t[1], ctx) if t[1] != '@s' else [ctx.ex]
+            if t[2] == 'facing':           # F2 (HR-02): rotate <target> facing entity <e> [eyes|feet] / facing <x y z>
+                if t[3] == 'entity':
+                    e2 = (self.select(t[4], ctx) or [None])[0]
+                    if e2 is None:
+                        return 0
+                    tgt = list(e2.pos)
+                    if len(t) > 5 and t[5] == 'eyes':
+                        tgt[1] += e2.data.get('eye', 0.0)
+                else:
+                    tgt = list(self.coords(t[3:6], ctx))
+                for e in tg:
+                    org = list(e.pos)
+                    if getattr(ctx, 'anc', False):          # execute anchored eyes: from the target's own eyes
+                        org[1] += e.data.get('eye', 0.0)
+                    dx, dy, dz = (tgt[j] - org[j] for j in range(3))
+                    e.rot = [math.degrees(math.atan2(-dx, dz)), math.degrees(-math.atan2(dy, math.hypot(dx, dz)))]
+                    e.data['_rotated'] = self.t
+                return 1
+            for e in tg:
                 e.rot = [ctx.rot[0] + float(t[2][1:] or 0) if t[2].startswith('~') else float(t[2]), 0.0]
             return 1
         if c == 'tp' and len(t) > 5 and t[5] == 'facing':
@@ -642,12 +667,21 @@ check(f'halo run: the ending cancel inside the gaze puts it back (crimson: p2b a
 # ================================================================ CS4: the distance to an unmoving player, the landing, the turns
 pl0 = (C0[0] + 2.0, float(api.CY), C0[2] + 6.0)
 s, body, pl = halo_world('crimson', (pl0[0], api.CY, pl0[2] - 3.5), pl0)      # I1b round 1: + the halo (P2's crimson look)
-dist, yaw_at = {}, {}
+body.data['eye'] = 1.74
+av = mcsim.Ent('armor_stand', list(pl0), (90.0, 0.0), ['rlk_av'])            # F2 (HR-02): an F5 avatar beside the player
+pl.rot = [90.0, 20.0]
+s.ents.append(av)
+dist, yaw_at, start_view, band_at = {}, {}, {}, {}
 
 
 def each_cs4(k):
     dist[k] = math.hypot(body.pos[0] - pl.pos[0], body.pos[2] - pl.pos[2])
     yaw_at[k] = body.rot[0]
+    if k == 0:
+        start_view.update(pl=(list(pl.pos), list(pl.rot)), av=(list(av.pos), list(av.rot)), her=list(body.pos))
+    if k == api.ev('ending', 'band'):
+        band_at.update(sw=(s.storage.get('rlk:hr', {}).get('seq', {}).get('band', {}) or {}).get('sw'),
+                       dist=s.sc('#mbDist', 'mb'), d=math.hypot(body.pos[0] - pl.pos[0], body.pos[2] - pl.pos[2]))
 
 
 run_seq(s, body, 'ending', api.SEQ_LEN['ending'], each=each_cs4)
@@ -665,6 +699,41 @@ check(f'cs4: she faces the player again after the pivot 794-815 ({pl_err:.1f} de
 check('cs4: on the floor from 268 on (no float after the landing)', all(abs(body.pos[1] - api.CY) < 1e-6 for _ in [0]))
 check(f'halo run: the whole ending in the crimson look brightens the halo over the gaze ({G0} p2b, {G1} p2), nothing else',
       halo_calls(s) == [(G0, 'p2b'), (G1, 'p2')], halo_calls(s))
+
+# ================================================================ F2 review fixes (HR-02, HR-17, HR-32, HR-46, LF-02)
+# HR-02: the dying facing turns the player (toward her eyes, from their own eyes) and the avatar (toward her feet) with
+# `rotate`: nothing teleports the player (a tp would dismount the F5 seat and move the avatar), no view/sync
+tp_pl = [(r, l) for r, L in F.items() for l in L if re.search(r'as @a\[tag=player[^\]]*\][^|]* (?:tp|teleport) @s\b', l)
+         or re.search(r'\b(?:tp|teleport) @a\[tag=player', l) or 'rlk:view/sync' in l]
+check('HR-02 static: no sequence teleports the player or calls view/sync', not tp_pl, tp_pl[:3])
+(ppos, prot), (apos, arot), her = start_view['pl'], start_view['av'], start_view['her']
+want_y = math.degrees(math.atan2(-(her[0] - ppos[0]), her[2] - ppos[2]))
+want_p = math.degrees(-math.atan2(her[1] + 1.74 - (ppos[1] + 1.62), math.hypot(her[0] - ppos[0], her[2] - ppos[2])))
+check(f'HR-02: the ending start turns the player toward her eyes in place (yaw {prot[0]:.1f} / {want_y:.1f}, pitch {prot[1]:.1f} / '
+      f'{want_p:.1f})', ppos == list(pl0) and abs((prot[0] - want_y + 540) % 360 - 180) < 0.5 and abs(prot[1] - want_p) < 0.5)
+check(f'HR-02: and the avatar toward her feet in place (yaw {arot[0]:.1f})', apos == list(pl0)
+      and abs((arot[0] - math.degrees(math.atan2(-(her[0] - apos[0]), her[2] - apos[2])) + 540) % 360 - 180) < 0.5 and abs(arot[1]) < 0.5)
+# HR-32: CS4 E1b's band sweeps her distance to the player + 1 b (it passes over them), its args through storage seq.band
+band_calls = [l for r, L in F.items() if r.startswith('seq/ending/') for l in L if 'fx/p/qi_band' in l]
+check('HR-32: the E1b band reads its args from storage rlk:hr seq.band', band_calls and all('with storage rlk:hr seq.band' in l
+                                                                                         for l in band_calls), band_calls[:1])
+check(f'HR-32: the band sweeps her distance + 1 b ({band_at})', band_at.get('sw') is not None and band_at['dist'] is not None
+      and band_at['sw'] == band_at['dist'] + 10 and band_at['sw'] / 10 >= band_at['d'] + 0.9)
+# HR-46: CS0's wind at the player (at her seat, 26.7 b away, its minVolume 0 sent it to no one)
+wind = [l for l in F['seq/intro/start'] if 'fx/snd/cs0_wind' in l]
+check('HR-46: the E0 wind plays at the player', wind and all(l.startswith('execute at @a[tag=player') for l in wind), wind)
+# LF-02: the ending's moon target written exactly (x / z with a decimal point: the game block-centres a whole x / z)
+loose = [l for r, L in F.items() if r.startswith('seq/ending/') for l in L
+         for m in re.finditer(r'facing (-?\d[\d.]*) (-?\d[\d.]*) (-?\d[\d.]*)', l) if '.' not in m.group(1) or '.' not in m.group(3)]
+check('LF-02: every absolute facing of the ending keeps x / z exact (api.xyz)', not loose and api.xyz(api.MOON_POS, 3) in ALL,
+      loose[:2])
+# HR-17: CS3's kick flash is made between fx/keep_on and fx/keep_off (the kick kills her in that tick: death_start's fx/clear)
+kick = [(r, L) for r, L in F.items() if r.startswith('seq/repel/') and any('fx/p/kick_flash' in l for l in L)]
+check('HR-17: the kick flash is kept (keep_on .. kick_flash .. keep_off in its tick file)', kick and all(
+    [i for i, l in enumerate(L) if l.endswith('fx/keep_on')] and
+    max(i for i, l in enumerate(L) if l.endswith('fx/keep_on')) < min(i for i, l in enumerate(L) if 'fx/p/kick_flash' in l)
+    and any(l.endswith('fx/keep_off') for l in L[min(i for i, l in enumerate(L) if 'fx/p/kick_flash' in l):]) for r, L in kick),
+    [r for r, _ in kick])
 
 if A.v:
     print('\n'.join('ok   ' + x for x in OK))

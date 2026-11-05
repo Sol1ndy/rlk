@@ -14,7 +14,9 @@ Semantics (contract §3.6, PLAN §5.1, question 6 default PIP_RULE 'timed_dash')
 - shield/tick: run by the core every tick of a gauntlet, right after p/<g>/tick (the cut's own lock / strike already ran).
 - shield/judge (@s any): the pip windows close, the under bar goes; #gres hr = 1 (deflect: #pips 0) or 2 (fail). The
   deflect staging is played here (kit clash_gold + light_column at the player, the deflect sound, the body's g_deflect
-  clip); the fail branch is the gauntlet's (A8: ult/fail60 + g_reform; A13: the FAIL5_T staging + ult/fatal).
+  clip); the fail branch is the gauntlet's (A8: ult/fail60 + g_reform; A13: the FAIL5_T staging + ult/fatal). F2: the
+  column stands upright whatever the body's pitch (HR-41); in first person (no avatar: the player is rlk_body, the camera
+  on its own axis) the starburst sits 1.8 b out on the player's view ray and the column 1.8 b in front of them (HR-45).
 - ult/fail60 (position = the impact point): mboss/pl_dot api.FAIL60_PM per mille of the player's max HP, Electro,
   #mbDotLethal 0 (never kills), the push ring mboss_lib.push_ring(*api.FAIL60_PUSH) there in the same tick, the impact
   effects (kit dive_impact {r:30} + light_column) and the fail_impact sound.
@@ -32,6 +34,8 @@ L, K = api.L, api.K
 OBJ = api.OBJ
 PIP_T = api.TAGS['pip']
 PIP_M = f'@e[type=minecraft:marker,tag={PIP_T}]'
+# F2 (HR-45): first person = the view system off, the player is its own rlk_body (no avatar); its eye height
+FIRST_PERSON, AVATAR, EYE = 'if entity @a[tag=rlk_body]', 'unless entity @a[tag=rlk_body]', 1.62
 
 
 def build(W):
@@ -80,8 +84,10 @@ def build(W):
         f'execute if score #pips {OBJ} matches 1.. run return run {sset("#gres", 2)}',
         sset('#gres', 1)]
       + S.fx('clash_gold', [part('minecraft:end_rod', 0.4, 0.4, 0.4, 0.15, 24), part(S.DUST['yellow'], 0.3, 0.3, 0.3, 0, 12)],
-             pos=f'at {S.PLAYER} positioned ~ ~1.3 ~')
-      + S.fx('light_column', [part('minecraft:end_rod', 0.1, 1.6, 0.1, 0.02, 16)], pos=f'at {S.PLAYER}')
+             pos=f'{AVATAR} at {S.PLAYER} rotated ~ 0 positioned ~ ~1.3 ~')
+      + S.fx('clash_gold', [], pos=f'{FIRST_PERSON} at {S.PLAYER} positioned ~ ~{EYE} ~ positioned ^ ^ ^1.8')
+      + S.fx('light_column', [part('minecraft:end_rod', 0.1, 1.6, 0.1, 0.02, 16)], pos=f'{AVATAR} at {S.PLAYER} rotated ~ 0')
+      + S.fx('light_column', [], pos=f'{FIRST_PERSON} at {S.PLAYER} rotated ~ 0 positioned ^ ^ ^1.8')
       + S.snd('deflect', pos=f'at {S.PLAYER}')
       + [f'execute as {S.BODY} at @s run {api.play("g_deflect")}'])
     w('ult/fail60', [
@@ -91,7 +97,7 @@ def build(W):
       + L.pl_dot(api.FAIL60_PM, api.ELEC, 0)
       + [L.push_ring(*api.FAIL60_PUSH)]
       + S.fx('dive_impact', [part(S.DUST['lilac'], 1.2, 0.1, 1.2, 0, 30)], pos='positioned ~ ~0.1 ~', r=30)
-      + S.fx('light_column', [part('minecraft:end_rod', 0.1, 1.6, 0.1, 0.02, 16)], pos='positioned ~ ~ ~')
+      + S.fx('light_column', [part('minecraft:end_rod', 0.1, 1.6, 0.1, 0.02, 16)], pos='rotated ~ 0 positioned ~ ~ ~')
       + S.snd('fail_impact', pos='positioned ~ ~ ~'))
     w('ult/fatal', [
         '# The 5 % instant death (ULT5_LETHAL true; @s = the player; F:boss/raiden/hazard/fatal\'s model): skipped while the player',

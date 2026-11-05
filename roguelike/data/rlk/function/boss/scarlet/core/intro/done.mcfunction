@@ -1,8 +1,10 @@
 # The intro is over (its end, the framework cap, a reload or a test; @s = body): the fight state, P1 with the 60 % floor,
-# the title / music 1 (the end state of the full intro), the skip prompt gone.
+# the title / music 1 (the end state of the full intro), the skip prompt gone, the boss bars back (F2, HR-29: they fill
+# over the first 1.5 s of the fight, the bars hook).
 function rlk:mboss/intro_end
 execute unless score #ph hr matches 0 run return 0
 function rlk:boss/scarlet/core/skip_clear
+function rlk:mboss/bars_on
 scoreboard players set #ph hr 1
 scoreboard players set #sqn hr 0
 scoreboard players set #sq hr 0

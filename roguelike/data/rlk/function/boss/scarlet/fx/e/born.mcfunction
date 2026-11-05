@@ -15,3 +15,5 @@ tag @s add rlk_hr_fx_go
 execute if score #dly hrFx matches 1.. run tag @s add rlk_hr_fx_sh
 execute if score #fade hrFx matches 1.. run tag @s add rlk_hr_fx_fd
 execute if score #hit hrFx matches 0.. if score #col hrFx matches 0.. run tag @s add rlk_hr_fx_hit
+execute if score #keep hrFx matches 1 run tag @s add rlk_hr_fx_keep
+execute if score #fol hrFx matches 1.. run function rlk:boss/scarlet/fx/e/born_f

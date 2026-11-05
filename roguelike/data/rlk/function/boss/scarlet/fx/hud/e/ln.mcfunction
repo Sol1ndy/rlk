@@ -4,8 +4,9 @@
 execute unless score #lnA hrFx matches 1 run return 0
 execute if entity @a[tag=player,scores={dead=1}] run return run function rlk:boss/scarlet/fx/hud/e/ln_stop
 execute store result score #now2 hrFx run time query gametime
-execute if score #ovE hrFx = #now2 hrFx if score #lnE hrFx > #now2 hrFx unless data storage rlk:hr fx.ln.q[0] run function rlk:boss/scarlet/fx/hud/e/ln_again
+execute if score #ovE hrFx = #now2 hrFx if score #lnE hrFx > #now2 hrFx run function rlk:boss/scarlet/fx/hud/e/ln_again
 execute if data storage rlk:hr fx.ln.q[0] run scoreboard players remove #lnW hrFx 1
 execute if data storage rlk:hr fx.ln.q[0] if score #lnW hrFx matches ..0 run function rlk:boss/scarlet/fx/hud/e/ln_step
-execute if score #lnE hrFx <= #now2 hrFx run return run scoreboard players set #lnA hrFx 0
+execute if score #lnE hrFx <= #now2 hrFx run return run function rlk:boss/scarlet/fx/hud/e/ln_end
+execute if score #ovE hrFx > #now2 hrFx run function rlk:boss/scarlet/fx/hud/e/ov_tick
 schedule function rlk:boss/scarlet/fx/hud/e/ln 1t replace

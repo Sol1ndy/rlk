@@ -143,7 +143,8 @@ def rec(s):
                 php=s.sc(('e', pl.id), 'curHealth') if pl else None, alive=b is not None,
                 # I1: the ghost form (S4) and the shown clip tick of the real rig (S2a: hrRigT / hrRigC on the body)
                 ghost=bool(b and 'rlk_hr_ghost' in b.tags), rigt=s.sc(('e', b.id), 'hrRigT') if b else None,
-                rigc=s.sc(('e', b.id), 'hrRigC') if b else None)
+                rigc=s.sc(('e', b.id), 'hrRigC') if b else None,
+                hold=(s.sc(('e', pl.id), 'hudHold') or 0) if pl else None)     # F2 (HR-29): the player's HUD hold after the tick
 
 
 def run(s, n, each=None, heal=True):
@@ -962,20 +963,56 @@ def sec_ai():
 
 
 # ================================================================================================= bars
+def hud_tick(s):
+    """F2 (HR-29): the player's actionbar HUD tick before the module's (F:player/hud/tick: while hudHold >= 1 it rests and
+    counts it down; the sim does not run it): a sequence that holds the HUD sets it back to 2 each tick."""
+    pl = s.player()
+    if pl and (s.sc(('e', pl.id), 'hudHold') or 0) >= 1:
+        s.setsc(('e', pl.id), 'hudHold', s.sc(('e', pl.id), 'hudHold') - 1)
+
+
 def sec_bars():
     s, pl = world(81)
     n0 = len(s.bar_draws)
     test(s, 20)
     t0 = s.t
-    ok, R = until(s, lambda s: hr(s, '#ph') == PH['sq1'], 400)
+    ok, R = until(s, lambda s: hr(s, '#ph') == PH['sq1'], 400, each=hud_tick)
     t1 = s.t
     draws_cs1 = [t for t in s.bar_draws[n0:] if t0 < t < t1]
     check('B1 CS1: bars_off (#mbBarOff 1), no bar drawn for its 213 t', ok and not draws_cs1 and all(r['baroff'] == 1 for r in R[:-1]),
           (ok, draws_cs1[:3]))
-    R2 = run(s, 3)
+    # F2 (HR-29): the player's actionbar HUD held (hudHold >= 1 after every tick: player/hud/tick rests) through CS1
+    check('B6 CS1: the player HUD held every tick (hudHold >= 1)', ok and all(r['hold'] >= 1 for r in R[:-1]),
+          [(r['t'], r['hold']) for r in R[:-1] if r['hold'] < 1][:4])
+    R2 = run(s, 3, each=hud_tick)
     check('B2 SQ1 tick 0: bars_on (#mbBarOff 0), drawn again, the shield under bar (#buSub 5)',
           [t for t in s.bar_draws if t > t1] and mb(s, '#mbBarOff') == 0 and s.sc('#buSub', 'bu') == API.PIPS,
           (s.bar_draws[-3:], mb(s, '#mbBarOff'), s.sc('#buSub', 'bu')))
+    check('B7 SQ1: the HUD is back (no hold)', R2[-1]['hold'] == 0, R2[-1]['hold'])
+    # F2 (HR-29): CS0 shows no boss bar (bars off at the intro's start; the original's bar grows at control, f498) and holds the
+    # player HUD; at control the bars come back, the HP bar filling over its first 30 t (mboss/bars_ramp)
+    s, pl = world(83, intro=True)
+    n0 = len(s.bar_draws)
+    t0 = s.t
+    ok, R = until(s, lambda s: hr(s, '#ph') == PH['p1'], API.SEQ_LEN['intro'] + 200, each=hud_tick)
+    t1 = s.t
+    intro = [r for r in R if r['ph'] == PH['intro']]
+    draws = [t for t in s.bar_draws[n0:] if t0 <= t < t1]
+    check('B3 CS0: no boss bar drawn (#mbBarOff 1) until control', ok and len(intro) > 500 and not draws
+          and all(r['baroff'] == 1 for r in intro), (ok, len(intro), draws[:3], sorted({r['baroff'] for r in intro})))
+    check('B4 CS0: the player HUD held every tick', ok and all(r['hold'] >= 1 for r in intro),
+          [(r['t'], r['hold']) for r in intro if r['hold'] < 1][:4])
+    ramp = []
+    R3 = run(s, 32, each=lambda ss: ramp.append(ss.sc('#buHp', 'bu')))
+    hpv = [v for v in ramp[1:] if v is not None]
+    check('B5 control: the bars back (#mbBarOff 0, drawn), the HP bar filling over 30 t (mboss/bars_ramp), then full',
+          mb(s, '#mbBarOff') == 0 and [t for t in s.bar_draws if t > t1] and hpv and hpv[0] < hpv[-1]
+          and all(a <= b for a, b in zip(hpv, hpv[1:])), (mb(s, '#mbBarOff'), hpv[:4], hpv[-2:]))
+    # LF-01: the moon halo's point written exactly (x / z with a decimal point: the game block-centres a whole x / z)
+    halo = [l for f in ('core/deco', 'core/deco_re') for l in (FN / f'{f}.mcfunction').read_text(encoding='utf-8').split('\n')
+            if 'summon minecraft:item_display' in l and 'rlk_hr_deco_moon_halo' in l]
+    loose = [l for l in halo if not re.search(r'summon minecraft:item_display -?\d+\.\d+ -?[\d.]+ -?\d+\.\d+ ', l)]
+    check('LF-01: the halo summons (core/deco, core/deco_re) keep x / z exact', len(halo) == 3 and not loose, (len(halo), loose[:1]))
 
 
 # ================================================================================================= look (theme build)
@@ -1204,17 +1241,25 @@ def sec_cs4():
     s, pl = world(71)
     H.place_player(s, API.CX + 0.5, API.CZ + 6.0)
     test(s, 28)
-    ok, R = until(s, lambda s: hr(s, '#sqn') == SEQ['ending'], 900)
+    ok, R = until(s, lambda s: hr(s, '#sqn') == SEQ['ending'], 900, each=hud_tick)
     p0 = list(s.player().pos)
     dist = {}
 
     def pin(ss):
         ss.player().pos = list(p0)
+        hud_tick(ss)
         if hr(ss, '#sqn') == SEQ['ending']:
             b = body(ss)
             dist[hr(ss, '#sq')] = math.hypot(b.pos[0] - p0[0], b.pos[2] - p0[2])
 
     ok2, R2 = until(s, lambda s: hr(s, '#sqn') == SEQ['event'], API.SEQ_LEN['ending'] + 20, each=pin)
+    # F2 (HR-29): CS4 and the event coda hold the player HUD every tick; CS3 (repel) keeps it
+    ok3, R3 = until(s, lambda s: hr(s, '#sqn') != SEQ['event'], API.SEQ_LEN['event'] + 20, each=pin)
+    held = [r for r in R2 + R3 if r['sqn'] in (SEQ['ending'], SEQ['event'])]
+    rep = [r for r in R if r['sqn'] == SEQ['repel']]
+    check('C42 CS4 + the coda: the player HUD held every tick (hudHold >= 1); CS3 keeps the HUD',
+          len(held) > API.SEQ_LEN['ending'] and all(r['hold'] >= 1 for r in held) and rep and any(r['hold'] == 0 for r in rep),
+          (len(held), [(r['t'], r['sqn'], r['hold']) for r in held if r['hold'] < 1][:4], len(rep)))
     late = [dist[k] for k in range(300, API.SEQ_LEN['ending']) if k in dist]
     check(f'C41 CS4 (the full core path): her distance to an unmoving player over ending ticks 300-{API.SEQ_LEN["ending"] - 1} '
           f'stays 3.5-6 b ({min(late or [0]):.2f}-{max(late or [0]):.2f}, {len(late)} ticks)',

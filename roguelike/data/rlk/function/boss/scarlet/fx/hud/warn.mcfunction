@@ -2,7 +2,7 @@
 # {on}: the instant-death warning (PLAN §5.5) on its own line under the boss bars: bossbar rlk:hr_warn named
 # api.WARN_TEXT, white with 「즉사」 in #FF3A55 (no bar: the pack's white progress is invisible); 0 = off.
 # Only while a gauntlet whose fail is lethal runs (the callers check the switch).
-execute unless data storage rlk:hr fx{init:1b} run function rlk:boss/scarlet/fx/e/init
+execute unless data storage rlk:hr fx{init:2b} run function rlk:boss/scarlet/fx/e/init
 $scoreboard players set #on hrFx $(on)
 execute unless score #on hrFx matches 1 run return run function rlk:boss/scarlet/fx/hud/e/warn_off
 bossbar add rlk:hr_warn {text:""}

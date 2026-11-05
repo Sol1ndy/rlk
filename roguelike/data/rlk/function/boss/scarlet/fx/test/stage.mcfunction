@@ -5,7 +5,7 @@
 function rlk:boss/scarlet/fx/test/stop
 execute positioned ^ ^ ^6 run summon minecraft:armor_stand ~ ~ ~ {Tags:["rlk_hr_fx_demo","rlk_room","rlk_mb_aux"],NoGravity:1b,Invulnerable:1b,ShowArms:1b,NoBasePlate:1b,equipment:{mainhand:{id:"minecraft:iron_sword",count:1},head:{id:"minecraft:black_carpet",count:1},chest:{id:"minecraft:leather_chestplate",count:1}}}
 execute as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] at @s facing entity @p feet run tp @s ~ ~ ~ ~ 0
-execute unless data storage rlk:hr fx{init:1b} run function rlk:boss/scarlet/fx/e/init
+execute unless data storage rlk:hr fx{init:2b} run function rlk:boss/scarlet/fx/e/init
 execute store result storage rlk:hr fx.fl int 100 run data get entity @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] Pos[1]
 scoreboard players set #demo hrFx 0
 scoreboard players set #dt hrFx 0

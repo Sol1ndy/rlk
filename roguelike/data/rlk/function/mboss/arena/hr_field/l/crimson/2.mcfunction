@@ -6,29 +6,23 @@ setblock 869 200 -28 minecraft:crimson_nylium strict
 fill 872 200 -28 877 200 -28 minecraft:crimson_nylium strict
 setblock 892 200 -27 minecraft:crimson_nylium strict
 fill 865 200 -26 866 200 -26 minecraft:crimson_nylium strict
-fill 895 200 -24 896 200 -24 minecraft:crimson_nylium strict
-fill 858 200 -23 860 200 -23 minecraft:crimson_nylium strict
+setblock 895 200 -24 minecraft:crimson_nylium strict
+fill 859 200 -23 860 200 -23 minecraft:crimson_nylium strict
 fill 897 200 -23 898 200 -23 minecraft:crimson_nylium strict
-fill 857 200 -22 858 200 -22 minecraft:crimson_nylium strict
-setblock 857 200 -21 minecraft:crimson_nylium strict
 setblock 900 200 -21 minecraft:crimson_nylium strict
-setblock 856 200 -20 minecraft:crimson_nylium strict
 fill 905 200 -18 906 200 -18 minecraft:crimson_nylium strict
 setblock 853 200 -17 minecraft:crimson_nylium strict
 fill 906 200 -17 906 200 -16 minecraft:crimson_nylium strict
 setblock 905 200 -13 minecraft:crimson_nylium strict
-setblock 854 200 -12 minecraft:crimson_nylium strict
 fill 855 200 -9 855 200 -8 minecraft:crimson_nylium strict
-fill 904 200 -9 904 200 -8 minecraft:crimson_nylium strict
+setblock 904 200 -9 minecraft:crimson_nylium strict
 fill 916 200 -7 916 200 -6 minecraft:crimson_nylium strict
 fill 844 200 -6 844 200 -5 minecraft:crimson_nylium strict
 fill 846 200 -6 846 200 -5 minecraft:crimson_nylium strict
-setblock 856 200 -6 minecraft:crimson_nylium strict
-fill 905 200 -6 905 200 -3 minecraft:crimson_nylium strict
+setblock 905 200 -6 minecraft:crimson_nylium strict
 setblock 841 200 -5 minecraft:crimson_nylium strict
 fill 847 200 -5 848 200 -5 minecraft:crimson_nylium strict
-setblock 904 200 -5 minecraft:crimson_nylium strict
-fill 906 200 -5 906 200 2 minecraft:crimson_nylium strict
+fill 906 200 -5 906 200 -3 minecraft:crimson_nylium strict
 setblock 912 200 -5 minecraft:crimson_nylium strict
 fill 914 200 -5 914 200 -1 minecraft:crimson_nylium strict
 setblock 917 200 -5 minecraft:crimson_nylium strict
@@ -38,31 +32,28 @@ fill 908 200 -4 908 200 -2 minecraft:crimson_nylium strict
 fill 910 200 -4 910 200 -1 minecraft:crimson_nylium strict
 fill 916 200 -4 916 200 -3 minecraft:crimson_nylium strict
 fill 845 200 -3 845 200 -1 minecraft:crimson_nylium strict
-fill 854 200 -3 854 200 -2 minecraft:crimson_nylium strict
 fill 907 200 -3 907 200 -1 minecraft:crimson_nylium strict
 fill 849 200 -2 849 200 -1 minecraft:crimson_nylium strict
 fill 851 200 -2 852 200 0 minecraft:crimson_nylium strict
 setblock 909 200 -2 minecraft:crimson_nylium strict
 setblock 918 200 -2 minecraft:crimson_nylium strict
-fill 842 200 -1 844 200 -1 minecraft:crimson_nylium strict
+fill 843 200 -1 844 200 -1 minecraft:crimson_nylium strict
 setblock 848 200 -1 minecraft:crimson_nylium strict
-fill 853 200 -1 853 200 0 minecraft:crimson_nylium strict
 fill 911 200 -1 912 200 -1 minecraft:crimson_nylium strict
 setblock 917 200 -1 minecraft:crimson_nylium strict
 fill 846 200 0 847 200 0 minecraft:crimson_nylium strict
 fill 908 200 0 908 200 1 minecraft:crimson_nylium strict
 fill 913 200 0 913 200 2 minecraft:crimson_nylium strict
 fill 916 200 0 916 200 1 minecraft:crimson_nylium strict
-fill 840 200 1 844 200 1 minecraft:crimson_nylium strict
+fill 843 200 1 844 200 2 minecraft:crimson_nylium strict
 fill 848 200 1 850 200 1 minecraft:crimson_nylium strict
 setblock 912 200 1 minecraft:crimson_nylium strict
 fill 914 200 1 915 200 1 minecraft:crimson_nylium strict
 fill 917 200 1 917 200 8 minecraft:crimson_nylium strict
 setblock 920 200 1 minecraft:crimson_nylium strict
 fill 840 200 2 840 200 4 minecraft:crimson_nylium strict
-fill 842 200 2 844 200 2 minecraft:crimson_nylium strict
+setblock 842 200 2 minecraft:crimson_nylium strict
 fill 849 200 2 850 200 2 minecraft:crimson_nylium strict
-setblock 907 200 2 minecraft:crimson_nylium strict
 fill 839 200 3 839 200 4 minecraft:crimson_nylium strict
 fill 846 200 3 847 200 3 minecraft:crimson_nylium strict
 fill 846 200 4 846 200 5 minecraft:crimson_nylium strict
@@ -74,7 +65,6 @@ setblock 916 200 4 minecraft:crimson_nylium strict
 fill 918 200 4 918 200 5 minecraft:crimson_nylium strict
 fill 843 200 5 844 200 5 minecraft:crimson_nylium strict
 setblock 850 200 5 minecraft:crimson_nylium strict
-fill 907 200 5 907 200 8 minecraft:crimson_nylium strict
 fill 913 200 5 913 200 6 minecraft:crimson_nylium strict
 fill 919 200 5 920 200 6 minecraft:crimson_nylium strict
 fill 842 200 6 843 200 6 minecraft:crimson_nylium strict
@@ -96,7 +86,6 @@ setblock 916 200 9 minecraft:crimson_nylium strict
 fill 840 200 10 840 200 11 minecraft:crimson_nylium strict
 fill 842 200 10 842 200 12 minecraft:crimson_nylium strict
 setblock 844 200 10 minecraft:crimson_nylium strict
-setblock 852 200 10 minecraft:crimson_nylium strict
 setblock 910 200 10 minecraft:crimson_nylium strict
 fill 912 200 10 913 200 10 minecraft:crimson_nylium strict
 fill 918 200 10 919 200 10 minecraft:crimson_nylium strict
@@ -104,29 +93,24 @@ setblock 843 200 11 minecraft:crimson_nylium strict
 fill 845 200 11 845 200 13 minecraft:crimson_nylium strict
 setblock 848 200 11 minecraft:crimson_nylium strict
 fill 850 200 11 850 200 13 minecraft:crimson_nylium strict
-fill 907 200 11 907 200 12 minecraft:crimson_nylium strict
 fill 916 200 11 918 200 11 minecraft:crimson_nylium strict
-fill 920 200 11 920 200 15 minecraft:crimson_nylium strict
+setblock 920 200 11 minecraft:crimson_nylium strict
 setblock 841 200 12 minecraft:crimson_nylium strict
 fill 846 200 12 846 200 16 minecraft:crimson_nylium strict
 fill 911 200 12 912 200 14 minecraft:crimson_nylium strict
 setblock 914 200 12 minecraft:crimson_nylium strict
 setblock 917 200 12 minecraft:crimson_nylium strict
-fill 919 200 12 919 200 13 minecraft:crimson_nylium strict
 fill 847 200 13 849 200 13 minecraft:crimson_nylium strict
 setblock 908 200 13 minecraft:crimson_nylium strict
-setblock 918 200 13 minecraft:crimson_nylium strict
 setblock 840 200 14 minecraft:crimson_nylium strict
 setblock 847 200 14 minecraft:crimson_nylium strict
 fill 914 200 14 915 200 14 minecraft:crimson_nylium strict
 setblock 914 200 15 minecraft:crimson_nylium strict
-fill 918 200 15 919 200 15 minecraft:crimson_nylium strict
 setblock 840 200 16 minecraft:crimson_nylium strict
 setblock 845 200 16 minecraft:crimson_nylium strict
 fill 847 200 16 847 200 18 minecraft:crimson_nylium strict
-fill 906 200 16 907 200 16 minecraft:crimson_nylium strict
+setblock 907 200 16 minecraft:crimson_nylium strict
 fill 915 200 16 916 200 16 minecraft:crimson_nylium strict
-fill 919 200 16 919 200 17 minecraft:crimson_nylium strict
 fill 851 200 17 852 200 17 minecraft:crimson_nylium strict
 fill 909 200 17 910 200 17 minecraft:crimson_nylium strict
 fill 914 200 17 915 200 18 minecraft:crimson_nylium strict
@@ -137,9 +121,9 @@ fill 916 200 18 916 200 19 minecraft:crimson_nylium strict
 fill 845 200 19 845 200 21 minecraft:crimson_nylium strict
 fill 851 200 19 852 200 21 minecraft:crimson_nylium strict
 setblock 906 200 19 minecraft:crimson_nylium strict
-fill 910 200 19 911 200 19 minecraft:crimson_nylium strict
+setblock 910 200 19 minecraft:crimson_nylium strict
 fill 914 200 19 914 200 21 minecraft:crimson_nylium strict
-fill 844 200 20 844 200 23 minecraft:crimson_nylium strict
+fill 844 200 20 844 200 21 minecraft:crimson_nylium strict
 setblock 848 200 20 minecraft:crimson_nylium strict
 fill 908 200 20 909 200 21 minecraft:crimson_nylium strict
 setblock 913 200 20 minecraft:crimson_nylium strict
@@ -147,60 +131,51 @@ setblock 842 200 21 minecraft:crimson_nylium strict
 fill 915 200 21 916 200 21 minecraft:crimson_nylium strict
 fill 851 200 22 851 200 23 minecraft:crimson_nylium strict
 fill 853 200 22 853 200 25 minecraft:crimson_nylium strict
-setblock 856 200 22 minecraft:crimson_nylium strict
-fill 903 200 22 906 200 22 minecraft:crimson_nylium strict
+fill 904 200 22 906 200 22 minecraft:crimson_nylium strict
 fill 910 200 22 912 200 23 minecraft:crimson_nylium strict
 fill 849 200 23 849 200 24 minecraft:crimson_nylium strict
 fill 852 200 23 852 200 24 minecraft:crimson_nylium strict
 setblock 854 200 23 minecraft:crimson_nylium strict
-fill 857 200 23 857 200 26 minecraft:crimson_nylium strict
 fill 904 200 23 904 200 25 minecraft:crimson_nylium strict
 fill 917 200 23 917 200 24 minecraft:crimson_nylium strict
 fill 847 200 24 848 200 25 minecraft:crimson_nylium strict
 setblock 855 200 24 minecraft:crimson_nylium strict
-fill 901 200 24 901 200 29 minecraft:crimson_nylium strict
 fill 910 200 24 911 200 25 minecraft:crimson_nylium strict
 fill 913 200 24 913 200 25 minecraft:crimson_nylium strict
-fill 843 200 25 844 200 26 minecraft:crimson_nylium strict
 fill 851 200 25 851 200 26 minecraft:crimson_nylium strict
-fill 856 200 25 856 200 27 minecraft:crimson_nylium strict
+fill 856 200 25 857 200 26 minecraft:crimson_nylium strict
 setblock 909 200 25 minecraft:crimson_nylium strict
-fill 845 200 26 847 200 27 minecraft:crimson_nylium strict
-fill 858 200 26 859 200 26 minecraft:crimson_nylium strict
-setblock 900 200 26 minecraft:crimson_nylium strict
+fill 843 200 26 847 200 26 minecraft:crimson_nylium strict
 setblock 905 200 26 minecraft:crimson_nylium strict
 setblock 908 200 26 minecraft:crimson_nylium strict
 setblock 914 200 26 minecraft:crimson_nylium strict
-setblock 848 200 27 minecraft:crimson_nylium strict
+fill 845 200 27 848 200 27 minecraft:crimson_nylium strict
 fill 850 200 27 850 200 28 minecraft:crimson_nylium strict
-fill 854 200 27 855 200 27 minecraft:crimson_nylium strict
-setblock 860 200 27 minecraft:crimson_nylium strict
-fill 902 200 27 903 200 27 minecraft:crimson_nylium strict
+fill 854 200 27 856 200 27 minecraft:crimson_nylium strict
+fill 901 200 27 903 200 27 minecraft:crimson_nylium strict
 setblock 913 200 27 minecraft:crimson_nylium strict
 setblock 844 200 28 minecraft:crimson_nylium strict
 setblock 849 200 28 minecraft:crimson_nylium strict
 setblock 852 200 28 minecraft:crimson_nylium strict
 setblock 855 200 28 minecraft:crimson_nylium strict
-setblock 902 200 28 minecraft:crimson_nylium strict
+fill 901 200 28 902 200 28 minecraft:crimson_nylium strict
 fill 912 200 28 912 200 30 minecraft:crimson_nylium strict
 fill 856 200 29 858 200 29 minecraft:crimson_nylium strict
-setblock 863 200 29 minecraft:crimson_nylium strict
-fill 896 200 29 896 200 30 minecraft:crimson_nylium strict
-fill 900 200 29 900 200 31 minecraft:crimson_nylium strict
+fill 900 200 29 901 200 29 minecraft:crimson_nylium strict
 fill 905 200 29 907 200 29 minecraft:crimson_nylium strict
 fill 909 200 29 911 200 29 minecraft:crimson_nylium strict
 fill 845 200 30 846 200 30 minecraft:crimson_nylium strict
 setblock 853 200 30 minecraft:crimson_nylium strict
 fill 858 200 30 862 200 30 minecraft:crimson_nylium strict
-setblock 899 200 30 minecraft:crimson_nylium strict
+fill 899 200 30 900 200 30 minecraft:crimson_nylium strict
 setblock 905 200 30 minecraft:crimson_nylium strict
 fill 908 200 30 909 200 30 minecraft:crimson_nylium strict
 fill 913 200 30 913 200 31 minecraft:crimson_nylium strict
 fill 846 200 31 849 200 31 minecraft:crimson_nylium strict
 fill 856 200 31 856 200 35 minecraft:crimson_nylium strict
 fill 859 200 31 859 200 32 minecraft:crimson_nylium strict
-fill 862 200 31 864 200 32 minecraft:crimson_nylium strict
-fill 893 200 31 894 200 31 minecraft:crimson_nylium strict
+fill 862 200 31 863 200 32 minecraft:crimson_nylium strict
+setblock 900 200 31 minecraft:crimson_nylium strict
 fill 904 200 31 904 200 33 minecraft:crimson_nylium strict
 fill 906 200 31 908 200 31 minecraft:crimson_nylium strict
 setblock 910 200 31 minecraft:crimson_nylium strict
@@ -209,51 +184,39 @@ setblock 851 200 32 minecraft:crimson_nylium strict
 fill 853 200 32 853 200 33 minecraft:crimson_nylium strict
 fill 857 200 32 857 200 33 minecraft:crimson_nylium strict
 setblock 860 200 32 minecraft:crimson_nylium strict
-fill 865 200 32 866 200 32 minecraft:crimson_nylium strict
-fill 868 200 32 868 200 33 minecraft:crimson_nylium strict
-setblock 893 200 32 minecraft:crimson_nylium strict
+fill 864 200 32 865 200 32 minecraft:crimson_nylium strict
 fill 895 200 32 895 200 33 minecraft:crimson_nylium strict
 fill 899 200 32 899 200 33 minecraft:crimson_nylium strict
 setblock 902 200 32 minecraft:crimson_nylium strict
 setblock 852 200 33 minecraft:crimson_nylium strict
 setblock 862 200 33 minecraft:crimson_nylium strict
 fill 865 200 33 865 200 41 minecraft:crimson_nylium strict
-setblock 889 200 33 minecraft:crimson_nylium strict
-fill 891 200 33 892 200 34 minecraft:crimson_nylium strict
 fill 903 200 33 903 200 34 minecraft:crimson_nylium strict
 fill 850 200 34 851 200 36 minecraft:crimson_nylium strict
 fill 854 200 34 855 200 35 minecraft:crimson_nylium strict
-fill 858 200 34 858 200 35 minecraft:crimson_nylium strict
-fill 869 200 34 870 200 35 minecraft:crimson_nylium strict
-setblock 872 200 34 minecraft:crimson_nylium strict
-setblock 874 200 34 minecraft:crimson_nylium strict
-fill 885 200 34 886 200 34 minecraft:crimson_nylium strict
-fill 888 200 34 888 200 35 minecraft:crimson_nylium strict
-fill 890 200 34 890 200 35 minecraft:crimson_nylium strict
-fill 901 200 34 902 200 34 minecraft:crimson_nylium strict
-setblock 857 200 35 minecraft:crimson_nylium strict
+fill 869 200 34 869 200 37 minecraft:crimson_nylium strict
+fill 890 200 34 892 200 34 minecraft:crimson_nylium strict
+fill 901 200 34 901 200 35 minecraft:crimson_nylium strict
+fill 857 200 35 858 200 35 minecraft:crimson_nylium strict
 setblock 860 200 35 minecraft:crimson_nylium strict
 setblock 862 200 35 minecraft:crimson_nylium strict
 fill 866 200 35 868 200 37 minecraft:crimson_nylium strict
-setblock 873 200 35 minecraft:crimson_nylium strict
-fill 875 200 35 875 200 36 minecraft:crimson_nylium strict
+setblock 870 200 35 minecraft:crimson_nylium strict
 fill 879 200 35 879 200 37 minecraft:crimson_nylium strict
-fill 883 200 35 883 200 37 minecraft:crimson_nylium strict
-setblock 887 200 35 minecraft:crimson_nylium strict
-setblock 889 200 35 minecraft:crimson_nylium strict
+fill 887 200 35 890 200 35 minecraft:crimson_nylium strict
 fill 893 200 35 895 200 37 minecraft:crimson_nylium strict
 setblock 899 200 35 minecraft:crimson_nylium strict
-setblock 901 200 35 minecraft:crimson_nylium strict
 setblock 908 200 35 minecraft:crimson_nylium strict
 fill 859 200 36 859 200 41 minecraft:crimson_nylium strict
-fill 869 200 36 869 200 37 minecraft:crimson_nylium strict
-setblock 882 200 36 minecraft:crimson_nylium strict
+setblock 875 200 36 minecraft:crimson_nylium strict
+fill 882 200 36 883 200 36 minecraft:crimson_nylium strict
 fill 892 200 36 892 200 38 minecraft:crimson_nylium strict
 fill 896 200 36 896 200 38 minecraft:crimson_nylium strict
 fill 902 200 36 904 200 36 minecraft:crimson_nylium strict
 fill 851 200 37 852 200 37 minecraft:crimson_nylium strict
 fill 864 200 37 864 200 40 minecraft:crimson_nylium strict
 fill 880 200 37 880 200 38 minecraft:crimson_nylium strict
+setblock 883 200 37 minecraft:crimson_nylium strict
 fill 897 200 37 899 200 38 minecraft:crimson_nylium strict
 fill 903 200 37 904 200 38 minecraft:crimson_nylium strict
 setblock 908 200 37 minecraft:crimson_nylium strict
@@ -275,7 +238,7 @@ fill 902 200 39 903 200 39 minecraft:crimson_nylium strict
 fill 905 200 39 906 200 39 minecraft:crimson_nylium strict
 setblock 855 200 40 minecraft:crimson_nylium strict
 fill 858 200 40 858 200 41 minecraft:crimson_nylium strict
-fill 862 200 40 863 200 42 minecraft:crimson_nylium strict
+fill 862 200 40 863 200 41 minecraft:crimson_nylium strict
 setblock 867 200 40 minecraft:crimson_nylium strict
 fill 872 200 40 872 200 41 minecraft:crimson_nylium strict
 setblock 875 200 40 minecraft:crimson_nylium strict
@@ -289,6 +252,7 @@ setblock 879 200 41 minecraft:crimson_nylium strict
 fill 881 200 41 882 200 42 minecraft:crimson_nylium strict
 fill 888 200 41 889 200 42 minecraft:crimson_nylium strict
 fill 893 200 41 898 200 41 minecraft:crimson_nylium strict
+setblock 863 200 42 minecraft:crimson_nylium strict
 fill 870 200 42 870 200 46 minecraft:crimson_nylium strict
 fill 874 200 42 874 200 43 minecraft:crimson_nylium strict
 setblock 880 200 42 minecraft:crimson_nylium strict
@@ -296,8 +260,6 @@ fill 883 200 42 883 200 44 minecraft:crimson_nylium strict
 fill 890 200 42 890 200 44 minecraft:crimson_nylium strict
 fill 893 200 42 893 200 45 minecraft:crimson_nylium strict
 fill 898 200 42 898 200 43 minecraft:crimson_nylium strict
-setblock 859 200 43 minecraft:crimson_nylium strict
-setblock 862 200 43 minecraft:crimson_nylium strict
 fill 868 200 43 869 200 43 minecraft:crimson_nylium strict
 fill 875 200 43 875 200 44 minecraft:crimson_nylium strict
 setblock 891 200 43 minecraft:crimson_nylium strict
@@ -438,14 +400,12 @@ fill 844 201 14 844 201 15 minecraft:crimson_roots strict
 setblock 846 201 14 minecraft:crimson_roots strict
 setblock 848 201 14 minecraft:crimson_roots strict
 setblock 914 201 14 minecraft:crimson_roots strict
-setblock 921 201 14 minecraft:crimson_nylium strict
 fill 839 201 15 839 201 17 minecraft:crimson_nylium strict
 setblock 841 201 15 minecraft:crimson_roots strict
 setblock 843 201 15 minecraft:crimson_roots strict
 setblock 851 201 15 minecraft:crimson_roots strict
 setblock 852 201 16 minecraft:crimson_roots strict
 setblock 908 201 16 minecraft:crimson_roots strict
-setblock 920 201 16 minecraft:crimson_nylium strict
 fill 846 201 17 847 201 17 minecraft:crimson_roots strict
 setblock 907 201 17 minecraft:crimson_roots strict
 fill 912 201 17 913 201 17 minecraft:crimson_roots strict
@@ -636,7 +596,6 @@ setblock 879 201 42 minecraft:crimson_roots strict
 fill 881 201 42 881 201 43 minecraft:crimson_roots strict
 fill 885 201 42 885 201 44 minecraft:crimson_roots strict
 setblock 896 201 42 minecraft:crimson_roots strict
-fill 902 201 42 903 201 42 minecraft:crimson_nylium strict
 setblock 858 201 43 minecraft:crimson_nylium strict
 fill 865 201 43 865 201 44 minecraft:crimson_roots strict
 setblock 868 201 43 minecraft:crimson_roots strict
@@ -687,11 +646,11 @@ fill 840 202 -6 840 202 -5 minecraft:crimson_roots strict
 fill 919 202 -6 919 202 -5 minecraft:crimson_roots strict
 setblock 907 202 -5 minecraft:crimson_roots strict
 fill 920 202 -4 920 202 -3 minecraft:crimson_roots strict
-fill 837 202 -2 837 202 -1 minecraft:crimson_nylium strict
+setblock 837 202 -2 minecraft:crimson_nylium strict
 fill 921 202 -2 921 202 -1 minecraft:crimson_nylium strict
 setblock 853 202 0 minecraft:ochre_froglight[axis=y] strict
 setblock 906 202 0 minecraft:ochre_froglight[axis=y] strict
-fill 922 202 0 922 202 1 minecraft:crimson_nylium strict
+setblock 922 202 0 minecraft:crimson_nylium strict
 fill 837 202 2 837 202 3 minecraft:crimson_nylium strict
 fill 838 202 2 838 202 3 minecraft:crimson_roots strict
 setblock 921 202 3 minecraft:crimson_roots strict
@@ -736,16 +695,14 @@ setblock 852 202 40 minecraft:crimson_nylium strict
 setblock 906 202 40 minecraft:crimson_roots strict
 setblock 855 202 41 minecraft:crimson_roots strict
 setblock 905 202 42 minecraft:crimson_nylium strict
-setblock 859 202 45 minecraft:crimson_nylium strict
 setblock 900 202 45 minecraft:crimson_nylium strict
-setblock 860 202 46 minecraft:crimson_nylium strict
 setblock 894 202 46 minecraft:crimson_roots strict
 setblock 896 202 46 minecraft:crimson_roots strict
 setblock 863 202 47 minecraft:crimson_nylium strict
 setblock 865 202 47 minecraft:crimson_roots strict
 setblock 867 202 47 minecraft:crimson_roots strict
 setblock 893 202 47 minecraft:crimson_roots strict
-fill 895 202 47 896 202 47 minecraft:crimson_nylium strict
+setblock 895 202 47 minecraft:crimson_nylium strict
 setblock 865 202 48 minecraft:crimson_nylium strict
 setblock 867 202 48 minecraft:crimson_nylium strict
 fill 870 202 48 871 202 48 minecraft:crimson_roots strict

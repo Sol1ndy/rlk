@@ -20,6 +20,9 @@ copy of F:boss/scarlet) lives in ./tmp and is removed at the end.
           head, never in a block), she is on the floor at the end, no glide left
   cancel  a cancel (core/cancel_pat, the reload / test path) at every pattern tick 0..end: no rlk_hr_* entity of the
           pattern (hazards, lock, probe, A9 start marker), no glide, on the floor, #pat 0, no later hit on the player
+  fx      (F2) HR-24: A9's streak (qi_cut) reads the probed dash length (storage core.a9) = the dash line's own length, from a
+          near and a far player; HR-23: the A4 ribbon, the A6 blink bubble and the A10 yellow tell are made between
+          fx/follow_on and fx/follow_off (their cards travel with her)
 """
 import math
 import sys
@@ -32,7 +35,7 @@ import hrsim as H  # noqa: E402
 
 ARGS = sys.argv[1:]
 DP = Path(ARGS[0]).resolve()
-SECTIONS = ARGS[1:] or ['table', 'hits', 'quiet', 'ends', 'cancel']
+SECTIONS = ARGS[1:] or ['table', 'hits', 'quiet', 'ends', 'cancel', 'fx']
 sys.path.insert(0, str(DP / 'tools'))
 import mboss_scarlet.api as API  # noqa: E402
 import mboss_scarlet.p1 as P1  # noqa: E402
@@ -293,10 +296,36 @@ def sec_cancel():
               not bad, bad[:4])
 
 
+def sec_fx():
+    # F2 (HR-24): the A9 streak at the probed length (the dash line's own length), not the full reach
+    lens = {}
+    for seed, spot in ((11, (880.5, 12.0)), (12, (880.5, 20.0))):
+        s, pl = world(seed)
+        k0 = len(s.kitl)
+        r = run_pattern(s, 'a9', spot, extra=2)
+        cut = [a for t, c, a in s.kitl[k0:] if c == 'p/qi_cut']
+        line = [h for h in r['hz'] if h['kind'] == KIND['dash_line']]
+        lens[spot] = (cut[0].get('len') if cut else None, line[0]['r'] if line else None)
+        check(f'X1 A9 @ {spot}: the streak (qi_cut) as long as the probed dash line ({lens[spot]})',
+              len(cut) == 1 and len(line) == 1 and cut[0].get('len') == line[0]['r'], (cut, [h['r'] for h in line]))
+    check(f'X2 A9: the streak follows the probe (near and far lengths differ: {lens})', len({v[0] for v in lens.values()}) == 2)
+    # F2 (HR-23): the tells / trails that travel with her are made between fx/follow_on and fx/follow_off
+    for key, name in (('a4', 'qi_ribbon'), ('a6', 'blink_bubble'), ('a10', 'yellow_tell')):
+        sites = []
+        for p in sorted((FN / 'p' / key).rglob('*.mcfunction')):
+            L = [x for x in p.read_text(encoding='utf-8').split('\n') if x and not x.startswith('#')]
+            for i, x in enumerate(L):
+                if f'fx/p/{name}' in x:
+                    on = [j for j in range(i) if L[j].endswith('fx/follow_on')]
+                    off = [j for j in range(i + 1, len(L)) if L[j].endswith('fx/follow_off')]
+                    sites.append((p.name, bool(on) and bool(off)))
+        check(f'X3 {key}: {name} made between fx/follow_on and fx/follow_off ({sites})', sites and all(ok for _, ok in sites))
+
+
 def main():
     try:
         for sec in SECTIONS:
-            {'table': sec_table, 'hits': sec_hits, 'quiet': sec_quiet, 'ends': sec_ends, 'cancel': sec_cancel}[sec]()
+            {'table': sec_table, 'hits': sec_hits, 'quiet': sec_quiet, 'ends': sec_ends, 'cancel': sec_cancel, 'fx': sec_fx}[sec]()
     finally:
         if 'v' in VAR:
             H.drop_variant(VAR.pop('v'))

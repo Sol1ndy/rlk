@@ -2,6 +2,8 @@
 # {id}: her line api.LINES[id] (ids 1..25) on the subtitle slot, Raiden's letter
 # reveal (two syllables per 2 t, block.note_block.hat 0.3 each), colour #F2D0E8, held until
 # api.LINE_AT[id][2] t after it started, then gone; a new line replaces a running one. Overlay-aware: while
-# a full-screen overlay (fx/hud/ovl) is up, each step re-sends the overlay glyph as the title with its
-# remaining hold instead of view/ttl_blank, and when the overlay ends the line comes back on a blank title.
+# a full-screen overlay (fx/hud/ovl) is up the line sits on the overlay glyph, re-sent every tick at full title
+# alpha with its fade-in / fade-out as opacity steps (F2, HR-30: the title and the subtitle share one alpha, so
+# a title fade would dim the line and its end drop it); when the overlay ends the line goes on a blank title.
+# A line of api.LINE_PAGES shows as consecutive subtitles (F2, HR-16).
 $function rlk:boss/scarlet/fx/hud/l/$(id)

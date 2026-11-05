@@ -56,7 +56,7 @@ import hrsim as H  # noqa: E402
 ARGS = [a for a in sys.argv[1:] if a != '-v']
 VERBOSE = '-v' in sys.argv[1:]
 DP = Path(ARGS[0]).resolve()
-SECTIONS = ARGS[1:] or ['table', 'files', 'hits', 'follow', 'pips', 'discs', 'spots', 'ghost', 'frame', 'cancel']
+SECTIONS = ARGS[1:] or ['table', 'files', 'hits', 'follow', 'pips', 'discs', 'spots', 'ghost', 'frame', 'cancel', 'kept']
 sys.path.insert(0, str(DP / 'tools'))
 import mboss_scarlet.api as API  # noqa: E402
 import mboss_scarlet.p_ghost as PG  # noqa: E402
@@ -1044,6 +1044,51 @@ def sec_cancel():
         check(f'C1 {k}: a cancel at every tick 0..{END[k]} ({"core/g/pause" if k in GAUNT else "core/cancel_pat"} + a second cancel) '
               'leaves no entity of the pattern / cut / spot / disc / hazard, the body solid, visible, on the floor, #pat 0, no later hit',
               not bad, bad[:4])
+
+
+# ================================================================================================= kept (F2: sim, the kit running)
+def sec_kept():
+    """F2 (HR-17): the A13 instant death's 홍련일섬 line, its petals and the judge tick's bolts carry the kit's keep tag: with the
+    kit running for real (H.kit_on), the cards made in the fatal tick are alive >= 12 t after it (death_start's fx/clear and
+    the ager's dead / revive clears skip them); the A13 deflect makes none. HR-23: the A13 / R2 yellow tell between
+    fx/follow_on and fx/follow_off (its cards travel with her)."""
+    keep_t = getattr(API, 'KIT_KEEP_TAG', 'rlk_hr_fx_keep')
+    s, pl = world(78, name='kit')
+    H.kit_on(s)
+    place(s, C[0] + 0.5, C[2] + 6.0)
+    s.revive = 20
+    watched(s)
+    H.test_id(s, 29)
+    log = []
+    for _ in range(API.JUDGE_T['a13'] + 40):
+        H.heal(s) if not s.deaths else None
+        H.world_sc(s)
+        now = {e.id: e for e in s.ents if e.alive and e.etype == 'item_display' and 'rlk_hr_fx' in e.tags}
+        log.append((s.t, set(now), {i for i, e in now.items() if keep_t in e.tags}))
+    fat = [t for t, *_ in s.watch['rlk:boss/scarlet/ult/fatal']]
+    tf = fat[0] if fat else None
+    at = {t: (ids, kp) for t, ids, kp in log}
+    before = at.get(tf - 1, (set(), set()))[0] if tf else set()
+    made, kept = (at[tf][0] - before, at[tf][1] - before) if tf in at else (set(), set())
+    end = {i: s.sc(('e', i), 'hrFxD') for i in kept}
+    line = max(kept, key=lambda i: end[i] or 0) if kept else None
+    early = [i for i in kept if tf + 2 in at and (end[i] or 0) > tf + 3 and i not in at[tf + 2][0]]
+    check('K1 a13 fail (kit running): the cards of the fatal tick (the 홍련일섬 line, its petals, the bolts) carry the keep tag '
+          'and outlive the death clears; the line (the longest) is alive 12 t and 20 t after it',
+          tf is not None and len(kept) >= 2 and kept == made and line in at.get(tf + 12, (set(),))[0]
+          and line in at.get(tf + 20, (set(),))[0] and not early and (end[line] or 0) - tf >= 30,
+          (tf, len(made), len(kept), end.get(line), early[:3]))
+    check('K2 a13 fail: the kept cards end with their life (gone 40 t after)', tf is not None and tf + 40 in at
+          and not (kept & at[tf + 40][0]), len(kept & at.get((tf or 0) + 40, (set(),))[0]))
+    for key in ('a13', 'r2'):
+        sites = []
+        for p in sorted((FN / 'p' / key).rglob('*.mcfunction')):
+            L = [x for x in p.read_text(encoding='utf-8').split('\n') if x and not x.startswith('#')]
+            for i, x in enumerate(L):
+                if 'fx/p/yellow_tell' in x:
+                    sites.append((p.name, any(L[j].endswith('fx/follow_on') for j in range(i))
+                                  and any(L[j].endswith('fx/follow_off') for j in range(i + 1, len(L)))))
+        check(f'K3 {key}: the yellow tell between fx/follow_on and fx/follow_off ({sites})', sites and all(ok for _, ok in sites))
 
 
 def main():

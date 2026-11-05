@@ -4,5 +4,6 @@ execute store result score #now2 hrFx run time query gametime
 execute unless score #ovE hrFx > #now2 hrFx run return run scoreboard players set #ovE hrFx 0
 scoreboard players set #ovE hrFx 0
 scoreboard players set #ovH hrFx 0
+scoreboard players set #ovI hrFx 0
 scoreboard players set @a[tag=player] vBig 0
 title @a[tag=player] clear

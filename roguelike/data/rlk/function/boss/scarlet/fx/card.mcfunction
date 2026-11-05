@@ -5,7 +5,7 @@
 #  s0:<start size>, s1:<end size>, move:"dx,dy,dz" (end offset, display frame: +x left, +y up, +z forward),
 #  life:<ticks>, fade:<shrink-out ticks>, col:<RGB int tint, 16777215 = the painted colours>}.
 # Never skipped: the ager keeps the newest 96 fx cards (the oldest go).
-execute unless data storage rlk:hr fx{init:1b} run function rlk:boss/scarlet/fx/e/init
+execute unless data storage rlk:hr fx{init:2b} run function rlk:boss/scarlet/fx/e/init
 $data modify storage rlk:hr fx.a set value {kind:"$(kind)",pos:"$(pos)",rot:"$(rot)",bb:"$(bb)",s0:"$(s0)f,$(s0)f,$(s0)f",s1:"$(s1)f,$(s1)f,$(s1)f",off:"0f,0f,0f",move:"$(move)",col:$(col),col2:-1,ax:"0f,0f,1f",tg:"rlk_hr_fx_c",tpd:0}
 $data modify storage rlk:hr fx.a.ax set from storage rlk:hr fx.ax.$(kind)
 $scoreboard players set #roll hrFx $(roll)

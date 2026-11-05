@@ -2,6 +2,6 @@
 # CS0 her seat: a low flat stone (vanilla tuff, 1.5 x 0.75 x 1.1 b, its top 0.75 b over the display: no collision) and on it {look}: bottle = the rice-wine bottle on her left, bare = the stone alone, set = the bottle and the cup on her right (vanilla item displays the kit keeps with the stone and removes with it).
 # @s = the item_display the caller summoned at the floor point and rotated toward the moon (dressed
 # in place; calling it again re-looks it: the old items go). Any other entity: nothing.
-execute unless data storage rlk:hr fx{init:1b} run function rlk:boss/scarlet/fx/e/init
+execute unless data storage rlk:hr fx{init:2b} run function rlk:boss/scarlet/fx/e/init
 $data modify storage rlk:hr fx.lk set value "$(look)"
 execute if entity @s[type=minecraft:item_display] run function rlk:boss/scarlet/fx/prop/e/seat_rock_d

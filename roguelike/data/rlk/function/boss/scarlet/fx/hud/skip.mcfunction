@@ -2,7 +2,7 @@
 # {s}: the intro's skip prompt on the actionbar (PLAN §3.1): 「⊙ 건너뛰기」 (the original's, verbatim) at
 # brightness step s 0..4 (grey #A8A8B0 -> white while Shift is held) and the hint 「 · Shift 길게」
 # (grey); hudHold 2 (the caller sends it every tick, so the regular actionbar HUD rests); s 5 clears it.
-execute unless data storage rlk:hr fx{init:1b} run function rlk:boss/scarlet/fx/e/init
+execute unless data storage rlk:hr fx{init:2b} run function rlk:boss/scarlet/fx/e/init
 $scoreboard players set #sk hrFx $(s)
 execute if score #sk hrFx matches 5.. run return run function rlk:boss/scarlet/fx/hud/e/skip_off
 execute if score #sk hrFx matches ..0 run title @a[tag=player] actionbar {text:"",extra:[{text:"⊙ 건너뛰기",color:"#A8A8B0",font:"minecraft:default"},{text:" · Shift 길게",color:"#A8A8B0",font:"minecraft:default"}]}
