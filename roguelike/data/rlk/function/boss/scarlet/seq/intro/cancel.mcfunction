@@ -2,3 +2,4 @@
 # Cancel (no executor; idempotent): what this sequence made.
 kill @e[type=minecraft:marker,tag=rlk_hr_stage]
 kill @e[type=minecraft:marker,tag=rlk_hr_sqh]
+stopsound @a[tag=player] * minecraft:item.elytra.flying

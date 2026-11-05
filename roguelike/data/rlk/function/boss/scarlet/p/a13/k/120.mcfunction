@@ -1,3 +1,3 @@
 # A13 pattern tick 120.
-execute at @e[type=minecraft:marker,tag=rlk_hr_cut,scores={hr=120},limit=1] rotated as @a[tag=player,limit=1] rotated ~ 0 positioned ~ ~0.1 ~ run particle minecraft:dust{color:[0.79,0.49,0.87],scale:1.2} ~ ~ ~ 1.4 0.1 1.4 0 30 force @a[tag=player]
-execute at @e[type=minecraft:marker,tag=rlk_hr_cut,scores={hr=120},limit=1] rotated as @a[tag=player,limit=1] rotated ~ 0 run playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 0.7 1.2 0.23
+execute at @e[type=minecraft:marker,tag=rlk_hr_cut,scores={hr=120},limit=1] rotated as @a[tag=player,limit=1] rotated ~ 0 positioned ~ ~0.1 ~ run function rlk:boss/scarlet/fx/p/qi_x {r:25}
+execute at @e[type=minecraft:marker,tag=rlk_hr_cut,scores={hr=120},limit=1] rotated as @a[tag=player,limit=1] rotated ~ 0 run function rlk:boss/scarlet/fx/snd/g_x

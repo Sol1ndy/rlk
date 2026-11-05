@@ -4,4 +4,5 @@ kill @e[type=minecraft:marker,tag=rlk_hr_stage]
 execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_stage"]}
 execute as @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] at @s rotated as @e[tag=rlk_body,limit=1] run tp @s ~ ~ ~ ~ 0
 function rlk:boss/scarlet/rig/play/lead_down
+function rlk:boss/scarlet/fx/hud/warn {on:0}
 scoreboard players set #sqdone hr 0

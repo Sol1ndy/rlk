@@ -4,7 +4,7 @@
 # (no homing), T2 Electro, kb; one card: summoned 1 b in front of her, then rotated (pitch 0), then launched and
 # dressed (kit fx/prop/disc; else a flat purple pane). Never counts for the shield.
 kill @e[type=minecraft:item_display,tag=rlk_hr_gdn]
-execute at @s facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 positioned ^ ^ ^1 positioned ~ 201.9 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_disc","rlk_hr_gdn"],teleport_duration:1,brightness:{sky:15,block:15},item:{id:"minecraft:purple_stained_glass_pane",count:1},transformation:{left_rotation:[0.7071f,0f,0f,0.7071f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[2.8f,2.8f,0.2f]}}
+execute at @s facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 positioned ^ ^ ^1 positioned ~ 201.9 ~ run summon minecraft:item_display ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_p","rlk_hr_disc","rlk_hr_gdn"],teleport_duration:1}
 execute as @e[type=minecraft:item_display,tag=rlk_hr_gdn] at @s facing entity @e[tag=rlk_body,limit=1] feet rotated ~ 0 run tp @s ~ ~ ~ ~ ~
 execute as @e[type=minecraft:item_display,tag=rlk_hr_gdn] run function rlk:boss/scarlet/g/disc/tag
 scoreboard players set #pjEl mb 3
@@ -12,4 +12,5 @@ scoreboard players set #pjWall mb 1
 scoreboard players set #pjShape mb 1
 $scoreboard players set #pjKB mb $(kb)
 execute as @e[type=minecraft:item_display,tag=rlk_hr_gdn] at @s rotated as @s run function rlk:mboss/pj/launch {spd:17,life:16,dmg:42,hr:14}
+execute as @e[type=minecraft:item_display,tag=rlk_hr_gdn] run function rlk:boss/scarlet/fx/prop/disc
 tag @e[type=minecraft:item_display,tag=rlk_hr_gdn] remove rlk_hr_gdn

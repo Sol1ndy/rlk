@@ -7,3 +7,4 @@ scoreboard players set #fl hr 0
 scoreboard players set #ph hr 7
 function rlk:boss/scarlet/core/looks
 execute unless score #mbMusPh mb matches 2 run function rlk:mboss/music/set {ph:2}
+scoreboard players set #hrLook hr 2

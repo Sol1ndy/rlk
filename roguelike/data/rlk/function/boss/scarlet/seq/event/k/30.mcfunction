@@ -6,9 +6,11 @@ execute if score #hrEv hr matches 1 as @e[type=minecraft:item_display,tag=rlk_hr
 execute if score #hrEv hr matches 1 store result score #sq_x0 hr run data get entity @e[type=minecraft:item_display,tag=rlk_hr_ev_sword,limit=1] Pos[0] 1000
 execute if score #hrEv hr matches 1 store result score #sq_y0 hr run data get entity @e[type=minecraft:item_display,tag=rlk_hr_ev_sword,limit=1] Pos[1] 1000
 execute if score #hrEv hr matches 1 store result score #sq_z0 hr run data get entity @e[type=minecraft:item_display,tag=rlk_hr_ev_sword,limit=1] Pos[2] 1000
+execute if score #hrEv hr matches 1 run function rlk:boss/scarlet/fx/snd/ev_toss
 execute if score #hrEv hr matches 2 run kill @e[type=minecraft:marker,tag=rlk_hr_ev_orb]
 execute if score #hrEv hr matches 2 run function rlk:boss/scarlet/rig/anchor/hand_l
 execute if score #hrEv hr matches 2 at @e[type=minecraft:marker,tag=rlk_hr_anchor,limit=1] positioned ~ ~0.1 ~ run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_ev","rlk_hr_ev_orb"]}
 execute if score #hrEv hr matches 2 store result score #sq_x0 hr run data get entity @e[type=minecraft:marker,tag=rlk_hr_ev_orb,limit=1] Pos[0] 1000
 execute if score #hrEv hr matches 2 store result score #sq_y0 hr run data get entity @e[type=minecraft:marker,tag=rlk_hr_ev_orb,limit=1] Pos[1] 1000
 execute if score #hrEv hr matches 2 store result score #sq_z0 hr run data get entity @e[type=minecraft:marker,tag=rlk_hr_ev_orb,limit=1] Pos[2] 1000
+execute if score #hrEv hr matches 2 run function rlk:boss/scarlet/fx/snd/ev_toss

@@ -1,3 +1,3 @@
 # A3 pattern tick 14
-execute at @s rotated as @s rotated ~ 0 positioned ^ ^0.2 ^1.4 run particle minecraft:dust{color:[0.79,0.49,0.87],scale:1.2} ~ ~ ~ 0.2 1 0.2 0 20 force @a[tag=player]
-execute at @s run playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 0.6 1.2 0.2
+execute at @s rotated as @s rotated ~ 0 positioned ^ ^0.2 ^1.4 run function rlk:boss/scarlet/fx/p/qi_vert {h:34,yaw:0,c:1}
+execute at @s run function rlk:boss/scarlet/fx/snd/a3_h1

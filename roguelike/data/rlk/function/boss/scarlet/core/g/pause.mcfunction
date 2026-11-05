@@ -7,6 +7,8 @@ scoreboard players set #pat hr 0
 scoreboard players set #pt hr 0
 scoreboard players set #done hr 0
 function rlk:boss/scarlet/shield/off
+function rlk:boss/scarlet/fx/hud/warn {on:0}
+scoreboard players set #hrLook hr 2
 function rlk:boss/scarlet/core/stop_move
 function rlk:boss/scarlet/core/ground
 function rlk:boss/scarlet/rig/look/form/normal

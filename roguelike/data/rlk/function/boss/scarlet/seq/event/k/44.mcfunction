@@ -24,3 +24,5 @@ execute if score #hrEv hr matches 1 store result entity @e[type=minecraft:marker
 execute if score #hrEv hr matches 1 at @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] run tp @e[type=minecraft:item_display,tag=rlk_hr_ev_sword,limit=1] ~ ~ ~
 execute if score #hrEv hr matches 1 run kill @e[type=minecraft:marker,tag=rlk_hr_sqh]
 execute if score #hrEv hr matches 1 run data merge entity @e[type=minecraft:item_display,tag=rlk_hr_ev_sword,limit=1] {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0f,0f,0f],left_rotation:[-0.92388f,-0.38268f,-0f,0f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+execute if score #hrEv hr matches 1 at @e[type=minecraft:item_display,tag=rlk_hr_ev_sword,limit=1] run function rlk:boss/scarlet/fx/p/ev_beam {h:80,t:6}
+execute if score #hrEv hr matches 1 run function rlk:boss/scarlet/fx/snd/ev_beam

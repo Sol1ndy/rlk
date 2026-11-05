@@ -6,7 +6,6 @@ scoreboard players set #mbDotEl mb 3
 scoreboard players set #mbDotLethal mb 0
 function rlk:mboss/pl_dot
 function rlk:mboss/push/ring {r:25,to:30,kb:3}
-execute positioned ~ ~0.1 ~ run particle minecraft:dust{color:[0.79,0.49,0.87],scale:1.2} ~ ~ ~ 1.2 0.1 1.2 0 30 force @a[tag=player]
-execute positioned ~ ~ ~ run particle minecraft:end_rod ~ ~ ~ 0.1 1.6 0.1 0.02 16 force @a[tag=player]
-execute positioned ~ ~ ~ run playsound minecraft:entity.generic.explode hostile @a[tag=player] ~ ~ ~ 0.5 1.4 0.17
-execute positioned ~ ~ ~ run playsound minecraft:block.amethyst_block.break hostile @a[tag=player] ~ ~ ~ 0.8 1 0.27
+execute positioned ~ ~0.1 ~ run function rlk:boss/scarlet/fx/p/dive_impact {r:30}
+execute positioned ~ ~ ~ run function rlk:boss/scarlet/fx/p/light_column
+execute positioned ~ ~ ~ run function rlk:boss/scarlet/fx/snd/fail_impact

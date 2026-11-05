@@ -8,3 +8,6 @@ execute at @e[tag=rlk_body,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rl
 execute as @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] at @s facing entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] feet run tp @s ~ ~ ~ ~ 0
 function rlk:boss/scarlet/rig/play/repel
 scoreboard players set #sqdone hr 0
+function rlk:boss/scarlet/rig/anchor/blade_mid
+execute at @e[type=minecraft:marker,tag=rlk_hr_anchor,limit=1] run function rlk:boss/scarlet/fx/p/clash_spark
+function rlk:boss/scarlet/fx/snd/repel_lock

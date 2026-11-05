@@ -8,6 +8,8 @@ scoreboard players set #sqn hr 0
 scoreboard players set #inv hr 1
 tag @s add rlk_mb_inv
 function rlk:boss/scarlet/shield/off
+function rlk:boss/scarlet/fx/hud/warn {on:0}
+scoreboard players set #hrLook hr 2
 function rlk:boss/scarlet/core/stop_move
 function rlk:boss/scarlet/core/place8
 function rlk:boss/scarlet/rig/look/form/normal

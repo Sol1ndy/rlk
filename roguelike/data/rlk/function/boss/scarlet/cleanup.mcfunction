@@ -10,6 +10,9 @@ function rlk:boss/scarlet/seq/lead_down/cancel
 function rlk:boss/scarlet/seq/lead_stand/cancel
 function rlk:boss/scarlet/seq/ending/cancel
 function rlk:boss/scarlet/seq/event/cancel
+function rlk:boss/scarlet/fx/clear
+function rlk:boss/scarlet/fx/hud/clear
+function rlk:boss/scarlet/fx/hud/warn {on:0}
 execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:boss/scarlet/rig/kill
 kill @e[tag=rlk_hr_a9s]
 kill @e[tag=rlk_hr_anchor]
