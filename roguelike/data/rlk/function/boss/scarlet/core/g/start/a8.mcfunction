@@ -11,4 +11,4 @@ scoreboard players set #sqn hr 0
 scoreboard players set #inv hr 1
 tag @s add rlk_mb_inv
 scoreboard players set #warn hr 0
-function rlk:boss/scarlet/core/gs/a8/start
+function rlk:boss/scarlet/p/a8/start

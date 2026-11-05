@@ -1,0 +1,5 @@
+# A13 pattern tick 255.
+execute at @s run playsound minecraft:entity.phantom.swoop hostile @a[tag=player] ~ ~ ~ 0.7 1 0.23
+function rlk:boss/scarlet/g/spot/over
+execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] positioned ~ ~1 ~ run function rlk:mboss/mv/glide {t:3}
+kill @e[type=minecraft:marker,tag=rlk_hr_gsp]

@@ -6,6 +6,9 @@ execute if score #tst hr matches 4 run return run function rlk:boss/scarlet/test
 execute if score #tst hr matches 5 run return run function rlk:boss/scarlet/test/go/a6
 execute if score #tst hr matches 6 run return run function rlk:boss/scarlet/test/go/a9
 execute if score #tst hr matches 7 run return run function rlk:boss/scarlet/test/go/a10
+execute if score #tst hr matches 11 run return run function rlk:boss/scarlet/test/go/r1
+execute if score #tst hr matches 12 run return run function rlk:boss/scarlet/test/go/r2
+execute if score #tst hr matches 13 run return run function rlk:boss/scarlet/test/go/r3
 execute if score #tst hr matches 20 run return run function rlk:boss/scarlet/test/cs1
 execute if score #tst hr matches 21 run return run function rlk:boss/scarlet/test/a8
 execute if score #tst hr matches 22 run return run function rlk:boss/scarlet/test/a8_0

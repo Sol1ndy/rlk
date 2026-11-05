@@ -15,3 +15,6 @@ scoreboard players operation #cd_a3 hr = #clk hr
 scoreboard players operation #cd_a4 hr = #clk hr
 scoreboard players operation #cd_a6 hr = #clk hr
 scoreboard players operation #cd_a9 hr = #clk hr
+scoreboard players operation #cd_r1 hr = #clk hr
+scoreboard players operation #cd_r2 hr = #clk hr
+scoreboard players operation #cd_r3 hr = #clk hr

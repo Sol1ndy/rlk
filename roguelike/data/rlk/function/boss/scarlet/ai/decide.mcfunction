@@ -12,6 +12,9 @@ execute if score #mbLock mb matches 4 run return run function rlk:boss/scarlet/c
 execute if score #mbLock mb matches 5 run return run function rlk:boss/scarlet/core/start/a6
 execute if score #mbLock mb matches 6 run return run function rlk:boss/scarlet/core/start/a9
 execute if score #mbLock mb matches 7 run return run function rlk:boss/scarlet/core/start/a10
+execute if score #mbLock mb matches 11 run return run function rlk:boss/scarlet/core/start/r1
+execute if score #mbLock mb matches 12 run return run function rlk:boss/scarlet/core/start/r2
+execute if score #mbLock mb matches 13 run return run function rlk:boss/scarlet/core/start/r3
 execute if score #ai_nx hr matches 3 run return run function rlk:boss/scarlet/ai/next_a3
 function rlk:boss/scarlet/ai/rear_count
 execute if score #ai_rc hr matches 4.. if function rlk:boss/scarlet/ai/rear run return 1
