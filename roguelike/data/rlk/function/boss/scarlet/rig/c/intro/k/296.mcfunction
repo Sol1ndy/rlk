@@ -1,0 +1,10 @@
+data merge entity 524c4b4d-4852-4400-8000-000000000001 {start_interpolation:0,interpolation_duration:7,transformation:{translation:[0f,1.47067f,0f],left_rotation:[0.0485f,-0.05464f,0.00266f,0.99732f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000002 {start_interpolation:0,interpolation_duration:18,transformation:{translation:[0f,2.03045f,0.04315f],left_rotation:[0.0915f,0f,0f,0.9958f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000003 {start_interpolation:0,interpolation_duration:18,transformation:{translation:[0f,2.03045f,0.04315f],left_rotation:[0.0915f,0f,0f,0.9958f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000005 {start_interpolation:0,interpolation_duration:10,transformation:{translation:[-0.00041f,1.82567f,-0.11366f],left_rotation:[0.03804f,-0.02442f,-0.00212f,0.99898f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000007 {start_interpolation:0,interpolation_duration:10,transformation:{translation:[0.12454f,2.3516f,0.22648f],left_rotation:[0.04667f,-0.00606f,0.00104f,0.99889f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000009 {start_interpolation:0,interpolation_duration:3,transformation:{translation:[-0.36792f,1.59944f,-0.23828f],left_rotation:[-0.35566f,0.21645f,0.09916f,0.90378f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000a {start_interpolation:0,interpolation_duration:6,transformation:{translation:[0.24387f,1.89949f,0.06438f],left_rotation:[0.18156f,-0.33946f,0.09978f,0.91752f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000b {start_interpolation:0,interpolation_duration:6,transformation:{translation:[0.36642f,1.53382f,-0.04179f],left_rotation:[-0.04701f,-0.35353f,0.01423f,0.93413f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:boss/scarlet/rig/m/forearm_r/grip
+function rlk:boss/scarlet/rig/m/face/calm
