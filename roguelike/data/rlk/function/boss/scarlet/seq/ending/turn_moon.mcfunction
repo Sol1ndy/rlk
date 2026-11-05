@@ -1,7 +1,7 @@
 # The body turns at most 12 degrees toward the moon (api.MOON_POS) this tick, yaw only (@s = the body).
 execute store result score #sq_y0 hr run data get entity @s Rotation[0] 100
 execute at @s run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_sqh"]}
-execute at @s facing 889 218 -34 run tp @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] ~ ~ ~ ~ 0
+execute at @s facing 889.0 218 -34.0 run tp @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] ~ ~ ~ ~ 0
 execute store result score #sq_y1 hr run data get entity @e[type=minecraft:marker,tag=rlk_hr_sqh,limit=1] Rotation[0] 100
 kill @e[type=minecraft:marker,tag=rlk_hr_sqh]
 scoreboard players operation #sq_y1 hr -= #sq_y0 hr

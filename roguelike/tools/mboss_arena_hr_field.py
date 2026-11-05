@@ -1006,7 +1006,31 @@ def _base():
             c = (x, 204, z)
             if c not in g and (x, 203, z) not in g and _dome_in(*c) and (tops.get((x, z), FLOOR_Y) < 203):
                 g[c] = ('decor',)
+    # F2 (HR-43): a floor cell under a cover that blocks light fully (in any look) or under full water: mycelium / crimson
+    # nylium would turn into dirt / netherrack by random ticks there (vanilla SpreadingSnowyBlock / NyliumBlock), so the
+    # looks would drift between jobs. Such a cell gets coarse_dirt (no random tick, never a spread target), the same block
+    # in every look (it leaves the look union).
+    for (x, y, z), v in list(g.items()):
+        if isinstance(v, tuple) and v[0] == 'floor' and any(_smothers(_resolve_one(g.get((x, y + 1, z)), lk)) for lk in LOOKS):
+            g[(x, y, z)] = _p(STILL_FLOOR)
     return g, tops
+
+
+STILL_FLOOR = 'coarse_dirt'           # F2 (HR-43): the floor block under covers (no random ticks, the same in every look)
+
+
+def _resolve_one(v, look):
+    """the block of one base value in `look` (None stays None)"""
+    if v is None or not isinstance(v, tuple):
+        return v
+    return _resolve({(0, 0, 0): v}, look)[(0, 0, 0)]
+
+
+def _smothers(b):
+    """the cover kills a mycelium / nylium below it at a random tick: it blocks light fully, or it holds full water"""
+    if b is None:
+        return False
+    return _opaque(b) or _bid(b) == 'water' or 'waterlogged=true' in b
 
 
 def lotus_cells():

@@ -484,7 +484,7 @@ setblock 906 202 -2 minecraft:tuff strict
 setblock 921 202 -2 minecraft:mycelium strict
 fill 922 202 -2 925 202 -2 minecraft:dirt strict
 fill 834 202 -1 836 202 -1 minecraft:dirt strict
-setblock 837 202 -1 minecraft:mycelium strict
+setblock 837 202 -1 minecraft:coarse_dirt strict
 setblock 838 202 -1 minecraft:andesite strict
 setblock 839 202 -1 minecraft:tuff strict
 fill 840 202 -1 841 202 -1 minecraft:deepslate strict
@@ -519,7 +519,7 @@ setblock 853 202 1 minecraft:cobblestone strict
 fill 854 202 1 855 202 1 minecraft:barrier strict
 fill 904 202 1 905 202 1 minecraft:barrier strict
 fill 906 202 1 907 202 1 minecraft:moss_carpet strict
-setblock 922 202 1 minecraft:mycelium strict
+setblock 922 202 1 minecraft:coarse_dirt strict
 fill 923 202 1 925 202 1 minecraft:dirt strict
 setblock 926 202 1 minecraft:black_terracotta strict
 setblock 833 202 2 minecraft:black_terracotta strict
@@ -1080,7 +1080,7 @@ fill 901 202 44 902 202 44 minecraft:moss_block strict
 fill 903 202 44 908 202 44 minecraft:dirt strict
 setblock 852 202 45 minecraft:black_terracotta strict
 fill 853 202 45 858 202 45 minecraft:dirt strict
-setblock 859 202 45 minecraft:mycelium strict
+setblock 859 202 45 minecraft:coarse_dirt strict
 setblock 860 202 45 minecraft:tuff strict
 setblock 861 202 45 minecraft:deepslate strict
 fill 862 202 45 863 202 45 minecraft:tuff strict
@@ -1091,8 +1091,7 @@ fill 902 202 45 906 202 45 minecraft:dirt strict
 setblock 907 202 45 minecraft:black_terracotta strict
 setblock 853 202 46 minecraft:black_terracotta strict
 fill 854 202 46 859 202 46 minecraft:dirt strict
-setblock 860 202 46 minecraft:mycelium strict
-setblock 861 202 46 minecraft:coarse_dirt strict
+fill 860 202 46 861 202 46 minecraft:coarse_dirt strict
 setblock 862 202 46 minecraft:moss_block strict
 setblock 863 202 46 minecraft:tuff strict
 setblock 894 202 46 minecraft:short_dry_grass strict
@@ -1107,7 +1106,8 @@ setblock 865 202 47 minecraft:short_dry_grass strict
 setblock 867 202 47 minecraft:tall_dry_grass strict
 setblock 893 202 47 minecraft:short_dry_grass strict
 setblock 894 202 47 minecraft:coarse_dirt strict
-fill 895 202 47 896 202 47 minecraft:mycelium strict
+setblock 895 202 47 minecraft:mycelium strict
+setblock 896 202 47 minecraft:coarse_dirt strict
 fill 897 202 47 904 202 47 minecraft:dirt strict
 setblock 856 202 48 minecraft:black_terracotta strict
 fill 857 202 48 864 202 48 minecraft:dirt strict

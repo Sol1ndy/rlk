@@ -13,7 +13,7 @@ execute if score #pt hr matches 13 run function rlk:boss/scarlet/p/a4/k/13
 execute if score #pt hr matches 16 positioned as @e[type=minecraft:marker,tag=rlk_hr_lock,limit=1] run function rlk:mboss/mv/glide {t:4}
 execute if score #pt hr matches 19 run function rlk:boss/scarlet/p/a4/k/19
 execute if score #pt hr matches 20 run function rlk:boss/scarlet/p/a4/k/20
-execute if score #pt hr matches 25 at @s rotated as @s rotated ~ 0 positioned ^ ^0.95 ^1.5 run function rlk:boss/scarlet/fx/p/qi_line {len:30}
+execute if score #pt hr matches 25 at @s rotated as @s rotated ~ 0 positioned ^5 ^0.95 ^1.5 run function rlk:boss/scarlet/fx/p/qi_line {len:100}
 execute if score #pt hr matches 28 run function rlk:boss/scarlet/p/a4/k/28
 execute if score #pt hr matches 30 at @s run function rlk:boss/scarlet/fx/snd/a5_spin
 execute if score #pt hr matches 33 run function rlk:boss/scarlet/p/a4/k/33

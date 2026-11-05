@@ -135,8 +135,10 @@ def build(W, ctx):
         '# Hook spawn (@s = the arena marker at C of hr_field, rotated as it). The body (mboss/body: husk scale 1.0, click',
         f'# shield 1.2 x 2.4, miniboss economy, rlk_mb_inv in the intro) sits on her rock {api.xyz(seat)}',
         '# facing the moon, her back to the player arriving at start (PLAN §3.1). The event scores are cleared (PLAN §7.3.1).',
+        '# F2 round 1 (V2R-02): the boss bars off from her spawn on (fight_vars has just cleared #mbBarOff; with the',
+        '# framework\'s start_go show guarded by it, CS0 never shows a bar; core/intro/begin repeats it, intro/done ends it).',
         f'execute positioned {api.xyz(seat)} rotated {L.num(yaw_moon)} 0 run function rlk:mboss/body',
-        at_body(fn('core/setup'))] + [sset(k, 0) for k in api.EV_FP])
+        at_body(fn('core/setup')), api.bars(0)] + [sset(k, 0) for k in api.EV_FP])
     w('core/setup', ['# @s = the new body: module state, the floors, the rig (normal form, P1 look, the blade off), the decor props.',
                      fn('init'), fn('core/vars'), fn('core/floors'), api.rig('init'), api.rig('spawn'), fn('core/looks'),
                      fn('core/deco'), 'data modify storage rlk:mboss sub set value []'])
@@ -160,15 +162,17 @@ def build(W, ctx):
         f'execute if score #sqdone {OBJ} matches 1 run {fn("core/intro/done")}',
         f'execute if score #sq {OBJ} matches {INTRO_LEN + 2}.. run {fn("core/intro/done")}',
         fn('core/look'), api.rig('tick')])
-    w('core/intro/begin', ['# Intro tick 0 (@s = body).', sset('#ph', PH['intro']), sset('#sq', 0), sset('#sqdone', 0),
-                           sset('#sq_sig', 0), sset('#sqn', S.SEQ_ID['intro']), sset('#skip', 0), sset('#inv', 1),
+    w('core/intro/begin', ['# Intro tick 0 (@s = body). F2 (HR-29): the boss bars off for CS0 (the original shows no HUD until control;',
+                           '# core/intro/done brings them back).', sset('#ph', PH['intro']), sset('#sq', 0), sset('#sqdone', 0),
+                           sset('#sq_sig', 0), sset('#sqn', S.SEQ_ID['intro']), sset('#skip', 0), sset('#inv', 1), api.bars(0),
                            seq(ctx, 'intro', 'start')])
     w('core/intro/done', [
         '# The intro is over (its end, the framework cap, a reload or a test; @s = body): the fight state, P1 with the 60 % floor,',
-        '# the title / music 1 (the end state of the full intro), the skip prompt gone.',
+        '# the title / music 1 (the end state of the full intro), the skip prompt gone, the boss bars back (F2, HR-29: they fill',
+        '# over the first 1.5 s of the fight, the bars hook).',
         'function rlk:mboss/intro_end',
         f'execute unless score #ph {OBJ} matches {PH["intro"]} run return 0',
-        fn('core/skip_clear'),
+        fn('core/skip_clear'), api.bars(1),
         sset('#ph', PH['p1']), sset('#sqn', 0), sset('#sq', 0), sset('#sqdone', 0), sset('#pat', 0), sset('#inv', 0),
         sset('#rp', 0), L.title(*api.TITLE), music_to(1), fn('core/floors'),
         f'scoreboard players operation #mbFloor mb = #fl60 {OBJ}',
@@ -205,11 +209,11 @@ def build(W, ctx):
             f'unless score #ph {OBJ} matches {PH["lead"]} run {fn("core/amb2")}'])
         w('core/amb1', [f'# ambient_p1 at each player every {AMB_EVERY[0]} t of the module clock (#t = #clk).',
                         f'scoreboard players operation #t {OBJ} %= #c{AMB_EVERY[0]} {OBJ}',
-                        f'execute if score #t {OBJ} matches 0 at @a[tag=player] run {amb1}'])
+                        f'execute if score #t {OBJ} matches 0 at @a[tag=player] rotated ~ 0 run {amb1}'])
         w('core/amb2', [f'# ambient_p2 at each player every {AMB_EVERY[1]} t of the module clock (#t = #clk).',
                         f'scoreboard players set #t2 {OBJ} {AMB_EVERY[1]}',
                         f'scoreboard players operation #t {OBJ} %= #t2 {OBJ}',
-                        f'execute if score #t {OBJ} matches 0 at @a[tag=player] run {amb2}'])
+                        f'execute if score #t {OBJ} matches 0 at @a[tag=player] rotated ~ 0 run {amb2}'])
     w('core/state', [
         '# The state of the phase (@s = body).',
         f'execute if score #rp {OBJ} matches 1 run return run {fn("core/replay/tick")}',
@@ -313,6 +317,8 @@ def deco(W):
 
     halo = d['moon_halo']
     yaw_halo = yaw_to(halo, c)
+    # F2 (LF-01): the halo's point is whole (889 218 -33): written exactly (api.xyz), else the game puts it 0.5 b east and 0.5 b
+    # further out (1.5 b in front of the moon disc instead of 1 b)
     lotus = []
     for i, p in enumerate(d['lotus']):
         lotus += one('lotus', p, (i * 47) % 360, 'bud')
@@ -320,14 +326,14 @@ def deco(W):
     seat_l = one('seat_rock', seat, yaw_to(seat, api.MOON_POS), 'bottle', exact=True)
     kill = [f'kill @e[type=minecraft:item_display,tag={tg}]']
     W.w('core/deco', ['# The decor props at spawn (PLAN §6.7): the moon halo (p1), 8 lotus buds, the seat rock (bottle).']
-        + kill + one('moon_halo', halo, yaw_halo, 'p1') + lotus + seat_l)
+        + kill + one('moon_halo', halo, yaw_halo, 'p1', exact=True) + lotus + seat_l)
     bloom = []
     for i, p in enumerate(d['lotus']):
         bloom += one('lotus', p, (i * 47) % 360, 'bloom')
     W.w('core/deco_re', ['# The decor props after a /reload (aux entities are gone): the moon halo and the lotus of the phase (a',
                          '# look request then sets them to its look, core/look/go).']
-        + kill + [S.gate(f'if score #ph {OBJ} matches ..{PH["p1"]}', x) for x in one('moon_halo', halo, yaw_halo, 'p1') + lotus]
-        + [S.gate(f'if score #ph {OBJ} matches {PH["cs1"]}..', x) for x in one('moon_halo', halo, yaw_halo, 'p2') + bloom])
+        + kill + [S.gate(f'if score #ph {OBJ} matches ..{PH["p1"]}', x) for x in one('moon_halo', halo, yaw_halo, 'p1', exact=True) + lotus]
+        + [S.gate(f'if score #ph {OBJ} matches {PH["cs1"]}..', x) for x in one('moon_halo', halo, yaw_halo, 'p2', exact=True) + bloom])
     W.w('core/deco_seat', ['# The seat rock again (the intro replay).', 'kill @e[tag=rlk_hr_deco_seat_rock]'] + seat_l)
 
 
@@ -820,7 +826,9 @@ def hooks(W, ctx):
                        fn('core/lead/a13')])
     # bars: the under bar
     w('bars', ['# Hook bars (@s = body, every tick in intro / fight while the bars are on): the under bar = the shield (electro, 5)',
-               '# or the down timer (gold, 200); nothing while the module HUD is off (#hud 0: CS1).',
+               '# or the down timer (gold, 200); nothing while the module HUD is off (#hud 0: CS1). F2 (HR-29): the HP bar fills',
+               '# over the first 30 t of the fight (mboss/bars_ramp: its intro ramp, here at control, the bars being off in CS0).',
+               'execute if score #mbSt mb matches 1 if score #mbT mb matches ..29 run function rlk:mboss/bars_ramp',
                f'execute if score #hud {OBJ} matches 0 run return 0',
                f'execute if score #shb {OBJ} matches 1 run return run {fn("hud/bar_shield")}',
                f'execute if score #ph {OBJ} matches {PH["down"]} if score #kip {OBJ} matches 0 run {fn("hud/bar_down")}'])

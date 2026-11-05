@@ -71,7 +71,7 @@ AI_FADE = api.AFTERIMAGE_FADE          # 6
 OWNED_DIRS = ('e', 'p', 'prop', 'snd', 'hud', 'test')
 OWNED_FILES = tuple(api.KIT_FIXED)     # card cardx look clear uninstall
 OBJ = 'hrFx'                           # the kit's fake players
-OBJECTIVES = ('hrFxS', 'hrFxG', 'hrFxH', 'hrFxK', 'hrFxD', 'hrFxL', 'hrFxQ')
+OBJECTIVES = ('hrFxS', 'hrFxG', 'hrFxH', 'hrFxK', 'hrFxD', 'hrFxL', 'hrFxQ', 'hrFxY')   # F2: hrFxY a follower's height
 assert OBJ.startswith(api.KIT_OBJ_PREFIX) and all(o.startswith(api.KIT_OBJ_PREFIX) for o in OBJECTIVES)
 TAG = api.TAGS['fx']                   # rlk_hr_fx
 DEMO = f'{TAG}_demo'
@@ -79,6 +79,8 @@ ANIM = f'{TAG}a'                       # props the anim chain turns (rlk_hr_fxa 
 FOLLOW = f'{TAG}f'                     # follower displays (the seat rock's bottle and cup)
 LEAD = f'{TAG}l'                       # the entities followers stay with
 BEAM = f'{TAG}_bm'                     # the ev_beam column markers (aged by the ager)
+KEEP = api.KIT_KEEP_TAG                # F2 (HR-17): cards fx/clear leaves alone (rlk_hr_fx_keep)
+FCARD = f'{TAG}_fc'                    # F2 (HR-23): cards following a lead (fx/follow_on .. follow_off)
 WARN_BAR = api.WARN_BOSSBAR            # rlk:hr_warn
 FLOOR = api.CY                         # the arena floor top (hr_field: y 201); demos store their own in fx.fl
 MANIFEST = HERE / 'mboss_hr_fx_manifest.json'
@@ -227,6 +229,11 @@ KINDS = {
     **{f'moon_halo_{k}': ('face', f'moon_halo_{k}', SQ, False, ('white-blue halo (P1)', 'red halo (P2)')[k]) for k in range(2)},
     **{f'disc_{k}': ('flat', f'disc_{k}', UNIT, False, f'moon disc spin frame {k} (unit radius)') for k in range(2)},
     'gate_icon': ('face', 'gate_icon', SQ, False, 'gate label icon: a red lotus over a long blade'),
+    # F2 (HR-12): the slanted crescents / wedge stand across the aim (the screen plane of a viewer behind the target) and
+    # are rolled in it: the same sprites on a face quad (no new px)
+    **{f'qi_arcf_{k}': ('face', f'qi_arc_{k}', ARC_BOX, False, f'sword-qi crescent frame {k} standing across the aim '
+                        '(a slanted slash, rolled in the screen plane)') for k in range(4)},
+    'qi_wedgef': ('face', 'qi_wedge', (-0.25, 0.25, 0, 1), False, 'sword-qi wedge standing across the aim, the point at b 1'),
 }
 # The arrival tear: the dungeon rift's item models (tools/build_rift.py), referenced (no px of ours); without them in the
 # pack the item definitions fall back to the ghost flash card.
@@ -360,6 +367,26 @@ GLYPHS = {
     'vig': (api.VIG, P.glyph_vignette, OVL_PX, OVL_H, OVL_ASC),
 }
 assert {k: v[0] for k, v in GLYPHS.items() if k != 'vig'} == api.OVERLAYS and GLYPHS['vig'][0] == api.VIG
+# F2 (HR-30): each overlay at OVL_STEPS - 1 lower opacities (20 / 40 / 60 / 80 %), U+EC20.. . While her line is up, an
+# overlay's fade-in / fade-out is shown as these glyphs re-sent every tick at full title alpha (the title and the subtitle
+# share one alpha in the vanilla Gui: a title fade would dim the line, and its end would drop it).
+OVL_STEPS = 5
+STEP_CP0 = 0xEC20
+
+
+def _faded(painter, f):
+    def paint(x, y):
+        r, g, b, a = painter(x, y)
+        return r, g, b, a * f
+    return paint
+
+
+for _i, _g in enumerate(api.OVERLAYS):
+    for _k in range(1, OVL_STEPS):
+        _cp, _pt, _wh, _hh, _asc = GLYPHS[_g]
+        GLYPHS[f'{_g}_{_k}'] = (STEP_CP0 + _i * (OVL_STEPS - 1) + _k - 1, _faded(_pt, _k / OVL_STEPS), _wh, _hh, _asc)
+assert all(api.FONT_RANGE[0] <= v[0] <= api.FONT_RANGE[1] for v in GLYPHS.values())
+assert len({v[0] for v in GLYPHS.values()}) == len(GLYPHS)
 LINE_COL = api.LINE_COLOR              # #F2D0E8
 LINE_GAP = 2                           # ticks per typing step (two syllables per step, Raiden)
 LINE_FADE = 6                          # the last step fades over these ticks after its hold
@@ -563,8 +590,9 @@ def card(kind, pos='~ ~ ~', rot='~ ~', bb='fixed', roll=0, spin=0, s0=0.0, s1=1.
     card (relative to the executor; rot may be absolute), billboard, roll (left_rotation about local z), spin over the
     main interpolation, s0 -> s1 (float or (x, y, z)), off (static start translation) + move (its end translation: off
     + move), life / fade ticks, col tint, dly hidden ticks, dur main-interpolation ticks (0 = to the fade), hit / col2 the
-    second tint, pool 'fx' / 'am' (ambient) / 'ai' (afterimage). Any value may be a macro placeholder such as '$(r)'."""
-    assert kind in ALL_KINDS, kind
+    second tint, pool 'fx' / 'am' (ambient) / 'ai' (afterimage). Any value may be a macro placeholder such as '$(r)'
+    (kind too: F2, the crescent frames' flat / face kinds chosen at run time)."""
+    assert kind in ALL_KINDS or re.fullmatch(r'\$\(\w+\)', kind), kind
     assert bb in ('fixed', 'center', 'vertical', 'horizontal'), bb
     assert pool in POOLS, pool
     if all(isinstance(v, int) for v in (life, fade, dur)) and dur > life - fade - 1:
@@ -726,22 +754,59 @@ def _low_table():
 
 LOW = _low_table()
 SIN = [round(1000 * math.sin(math.radians(d))) for d in range(91)]
-# the crescents' pitch arg is an elevation (+ up): #p = - pitch (Minecraft) for the clamp, storage pa.p the card pitch
+# F2 (HR-12): a slanted crescent (|roll| 20..160) stands across the aim on the face kinds qi_arcf_<k> and is rolled in that
+# plane (the screen plane of a viewer on the aim): its point at bearing t from the bulge sits cos(t + roll) x cos(pitch) of
+# the radius above the pivot. LOWF = the lowest point per mille for the face mode, the cells as LOW (the max over the cell).
+FACE_ROLL = (20, 160)
+
+
+def arc_low_face(p, ro):
+    pr = math.radians(p)
+    return -min(0.0, min(math.cos(math.radians(-ARC_BEAR + k * (2 * ARC_BEAR) / 160 + ro)) * math.cos(pr)
+                         for k in range(0, 161)))
+
+
+def _lowf_table():
+    out = []
+    for ip in range(19):
+        for ir in range(36):
+            pc, rc = -90 + 10 * ip, -180 + 10 * ir
+            m = 0.0
+            for dp in range(-5, 6):
+                for dr in range(-5, 6):
+                    m = max(m, arc_low_face(max(-90, min(90, pc + dp)), rc + dr))
+            out.append(int(math.ceil(m * 1000)))
+    return out
+
+
+LOWF = _lowf_table()
+# the crescents' pitch arg is an elevation (+ up): #p = - pitch (Minecraft) for the clamp, storage pa.p the card pitch;
+# #fm 1 = the face mode (|roll| in FACE_ROLL), its four frame kinds in storage pa.k0 .. k3; F2 round 1 (V2R-01): then
+# fx/e/rollv puts the burst point (#bx #by #bz, the card frame) on the crescent's rim in either mode
 ARC_CLAMP = [f'$data modify storage {PA}.yaw set value $(yaw)', f'$data modify storage {PA}.roll set value $(roll)',
              '$scoreboard players set #r hrFx $(r)', '$scoreboard players set #p hrFx $(pitch)',
              'scoreboard players operation #p hrFx *= #cm1 hrFx', '$scoreboard players set #o hrFx $(roll)',
              f'execute store result storage {PA}.p int 1 run scoreboard players get #p hrFx',
-             f'function {FN}e/clamp_arc']
-QI_CONV = (('s', '#r', 0.1), ('s9', '#r', 0.09), ('f', '#r', 0.08), ('pd', '#r', 0.025), ('ly', '#ly', 0.01))
+             'scoreboard players set #fm hrFx 0',
+             f'execute if score #o hrFx matches {FACE_ROLL[0]}..{FACE_ROLL[1]} run scoreboard players set #fm hrFx 1',
+             f'execute if score #o hrFx matches -{FACE_ROLL[1]}..-{FACE_ROLL[0]} run scoreboard players set #fm hrFx 1',
+             *[f'data modify storage {PA}.k{k} set value "qi_arc_{k}"' for k in range(4)],
+             *[f'execute if score #fm hrFx matches 1 run data modify storage {PA}.k{k} set value "qi_arcf_{k}"' for k in range(4)],
+             f'function {FN}e/clamp_arc', f'function {FN}e/rollv']
+# bx / by / bz: the burst on the rim (0.8 of the reach: #r tenths x per mille x 0.00008 = 0.08 r x the unit vector)
+QI_CONV = (('s', '#r', 0.1), ('s9', '#r', 0.09), ('pd', '#r', 0.025), ('ly', '#ly', 0.01), ('bx', '#bx', 0.00008),
+           ('by', '#by', 0.00008), ('bz', '#bz', 0.00008))
 ARC_LIFE = (2, 2, 2, 8)
 
 
-def qi_frames(c, pos, rot, roll, s0, s1, flip=False, life=ARC_LIFE, fade_last=6):
-    """the four crescent sweep frames (1 t apart; the last fades), tinted for colour c"""
+def qi_frames(c, pos, rot, roll, s0, s1, flip=False, life=ARC_LIFE, fade_last=6, kinds=None):
+    """the four crescent sweep frames (1 t apart; the last fades), tinted for colour c (kinds: the four frame kinds, default
+    the flat qi_arc_<k>; F2: macro placeholders when the flat / face kind is chosen at run time)"""
     out = []
     for k in range(4):
         fr = 3 - k if flip else k
-        out.append(mac(card(f'qi_arc_{fr}', pos, rot, roll=roll, s0=s0, s1=s1, life=life[k], fade=fade_last if k == 3 else 0,
+        kd = kinds[fr] if kinds else f'qi_arc_{fr}'
+        out.append(mac(card(kd, pos, rot, roll=roll, s0=s0, s1=s1, life=life[k], fade=fade_last if k == 3 else 0,
                             dly=k, dur=2, col=QTINT[c], hit=k + 3 if k == 3 else -1, col2=QFADE[c] if k == 3 else -1)))
     return out
 
@@ -749,13 +814,18 @@ def qi_frames(c, pos, rot, roll, s0, s1, flip=False, life=ARC_LIFE, fade_last=6)
 # --- sword-qi ---------------------------------------------------------------------------------------------------------------
 @preset('qi_arc', 'A sword-qi crescent of reach {r} (tenths) about the executor (S3: the body + 1.0, rotated as the body; S4: '
         'the cut spot + h, rotated as the player; S2b: at her): {yaw} / {pitch} the aim\'s offsets from the executor rotation '
-        '(yaw + = right, pitch + = up), {roll} the blade plane about the aim (0 a flat crescent, 90 vertical). Four sweep frames '
+        '(yaw + = right, pitch + = up), {roll} the blade: |roll| < 20 (or > 160) a flat crescent rolled about the aim; '
+        '|roll| 20..160 (a slanted slash) the crescent stands across the aim, rolled by roll in that plane (the screen plane of '
+        'a viewer behind the target: F2, HR-12), centred on the executor. Four sweep frames '
         '1 t apart (the last fades over 6 t): the lilac body, the white-pink cutting rim; c tints it (1 lilac .. 5 white). '
         'A crescent that would reach below the floor rises up to 1 b, then shrinks (fx/e/clamp_arc): no frame below the floor.',
         conv=QI_CONV, split_c=True, pre=ARC_CLAMP)
 def _p_qi_arc(c):
-    out = qi_frames(c, '^ ^$(ly) ^', '~$(yaw) ~$(p)', '$(roll)', ('$(s9)', 1, '$(s9)'), ('$(s)', 1, '$(s)'))
-    front = 'positioned ^ ^$(ly) ^ rotated ~$(yaw) ~$(p) positioned ^ ^ ^$(f)'
+    # a uniform scale: the flat frame (x-z) and the face frame (x-y) take the same (s, s, s)
+    out = qi_frames(c, '^ ^$(ly) ^', '~$(yaw) ~$(p)', '$(roll)', ('$(s9)', '$(s9)', '$(s9)'), ('$(s)', '$(s)', '$(s)'),
+                    kinds=[f'$(k{k})' for k in range(4)])
+    # the burst on the rim in the card frame: flat 0.8 r along the aim, face 0.8 r up the rolled screen-plane axis (V2R-01)
+    front = 'positioned ^ ^$(ly) ^ rotated ~$(yaw) ~$(p) positioned ^$(bx) ^$(by) ^$(bz)'
     out += [mac(f'execute {front} run ' + l) for l in c_parts(c, '~ ~ ~', ('$(pd)', 0.2, '$(pd)'), 12)]
     return out
 
@@ -775,7 +845,8 @@ def _p_qi_ring(c):
 @preset('qi_band', 'A broad sword-qi band of length {len} (tenths) across the aim, centred on the executor (S4 A8.2: the cut spot '
         '+ 0.3, rotated as the player; S2b CS4 E1b: her + 1.1 facing the player): an upright sheet whose long axis runs to the '
         'aim\'s left and right, rising by {pitch} degrees toward its right end, {roll} leaning its top forward; {yaw} turns '
-        'the aim. It sweeps 2.5 b forward along the aim over 6 t and fades (lilac, the white-pink upper rim). '
+        'the aim. It sweeps {sw} (tenths; F2, HR-32: A8.2 25, CS4 E1b her distance + 1 b) forward along the aim over 6 t (its '
+        'leading streak 4 % further) and fades (lilac, the white-pink upper rim). '
         'Near the floor it rises (fx/e/clamp_band) so no part of it reaches below the floor; under a lean the sweep stays '
         'level.',
         conv=(('l', 'len', 0.1), ('hy', 'len', 0.06), ('q', 'len', 0.025), ('mq', 'len', -0.025), ('ly', '#ly', 0.01),
@@ -784,7 +855,8 @@ def _p_qi_ring(c):
              f'execute store result storage {PA}.tl int 1 run scoreboard players get #a hrFx',
              f'$data modify storage {PA}.yaw set value $(yaw)', f'$data modify storage {PA}.roll set value $(roll)',
              '$scoreboard players set #l hrFx $(len)', '$scoreboard players set #p hrFx $(pitch)',
-             '$scoreboard players set #o hrFx $(roll)', f'function {FN}e/clamp_band'])
+             '$scoreboard players set #o hrFx $(roll)', '$scoreboard players set #sw hrFx $(sw)',
+             'execute if score #sw hrFx matches ..-1 run scoreboard players set #sw hrFx 0', f'function {FN}e/clamp_band'])
 def _p_qi_band():
     return [mac(card('qi_band_0', '^ ^$(ly) ^', '~$(yaw) $(roll)', roll='$(tl)', s0=('$(l)', '$(hy)', 1),
                      s1=('$(l)', '$(hy)', 1), off=(0, 0, 0), move=(0, '$(my)', '$(mz)'), life=10, fade=4, dur=6)),
@@ -822,38 +894,52 @@ def _p_qi_dome():
             part('end_rod', '~ ~1 ~', (1.2, 0.8, 1.2), 0.02, 6)]
 
 
-@preset('qi_vert', 'A vertical sword-qi crescent of height {h} (tenths) standing on the executor (S3 A3: the body + 0.15, 1.4 '
-        'ahead; S4 A8.8: the cut spot on the floor, rotated as the player): the crescent in the vertical plane along the aim '
-        '(executor yaw + {yaw}), from the executor up to h, the sweep rising (four frames), and a thin glowing upright line '
-        'at its foot facing the viewer; c tints it (A8.8: 2 magenta).',
+@preset('qi_vert', 'A vertical sword-qi crescent of height {h} (tenths) standing on the executor (S3 A3: the body + 0.15, '
+        'ahead; S4 A8.8: beside the cut spot on the floor, rotated as the player): F2 (HR-12) the crescent stands ACROSS the '
+        'aim (yaw 0 = the plane perpendicular to the executor\'s facing, its arc bulging to the executor\'s right; 180 = to its '
+        'left; {yaw} turns the plane), from the executor up to h, the sweep rising (four frames), and a thin glowing upright '
+        'line at its foot facing the viewer; c tints it (A8.8: 2 magenta). Level: the executor\'s pitch is ignored.',
         conv=(('hh', 'h', 0.0616), ('s', 'h', 0.0625), ('s9', 'h', 0.055), ('hl', 'h', 0.1), ('pd', 'h', 0.05)), split_c=True,
-        pre=[f'$data modify storage {PA}.yaw set value $(yaw)'])
+        pre=['$scoreboard players set #a hrFx $(yaw)', 'scoreboard players add #a hrFx 90',
+             f'execute store result storage {PA}.yw int 1 run scoreboard players get #a hrFx'])
 def _p_qi_vert(c):
-    out = qi_frames(c, '^ ^$(hh) ^', '~$(yaw) 0', -90, ('$(s9)', 1, '$(s9)'), ('$(s)', 1, '$(s)'))
+    out = qi_frames(c, '^ ^$(hh) ^', '~$(yw) 0', -90, ('$(s9)', 1, '$(s9)'), ('$(s)', 1, '$(s)'))
     out.append(mac(card('col_face', '~ ~ ~', bb='vertical', s0=(2.0, '$(hl)', 2.0), s1=(3.2, '$(hl)', 3.2), life=6, fade=3,
                         dur=2, col=TINT[c] if c != 1 else LILAC_PALE)))
-    out += [mac('execute rotated ~$(yaw) 0 run ' + l) for l in c_parts(c, '^ ^$(hh) ^0.6', (0.15, '$(pd)', 0.15), 14)]
+    out += [mac('execute rotated ~$(yw) 0 run ' + l) for l in c_parts(c, '^ ^$(hh) ^0.6', (0.15, '$(pd)', 0.15), 14)]
     return out
 
 
 @preset('qi_fan', 'A rising vertical fan of sword-qi of height {h} (tenths) centred on the executor (S3 A1: the body + 0.85, 1.2 b '
-        'ahead; cosmetic): the four sweep frames in the vertical plane along the executor\'s facing, rising; c tints it (A1: 2).',
+        'ahead; cosmetic): F2 (HR-12) the four sweep frames stand ACROSS the executor\'s facing (the plane perpendicular to it), '
+        'bulging to its left (the right of a viewer facing it), rising; c tints it (A1: 2). Level.',
         conv=(('s', 'h', 0.0625), ('s9', 'h', 0.055), ('pd', 'h', 0.04)), split_c=True)
 def _p_qi_fan(c):
-    out = qi_frames(c, '^ ^ ^', '~ 0', -90, ('$(s9)', 1, '$(s9)'), ('$(s)', 1, '$(s)'), life=(2, 2, 2, 6), fade_last=4)
+    out = qi_frames(c, '^ ^ ^', '~-90 0', -90, ('$(s9)', 1, '$(s9)'), ('$(s)', 1, '$(s)'), life=(2, 2, 2, 6), fade_last=4)
     out += [mac(l) for l in c_parts(c, '^ ^ ^0.5', ('$(pd)', '$(pd)', 0.1), 10)]
     return out
 
 
-@preset('qi_wedge', 'A sword-qi wedge of length {r} (tenths) from the executor along its facing (S3 A3 h5: the body + 1.0; S4 A7: '
-        'the body + 0.85), rolled {roll} degrees about the aim (the rising diagonal): a lilac spearhead widening behind its point, '
-        'white edges; particles at the point.',
-        conv=(('s', 'r', 0.1), ('s6', 'r', 0.06), ('pd', 'r', 0.03)), pre=[f'$data modify storage {PA}.roll set value $(roll)'])
+@preset('qi_wedge', 'A sword-qi wedge of length {r} (tenths) from the executor (S3 A3 h5: the body + 1.0; S4 A7: the body + '
+        '0.85), {roll} degrees: F2 (HR-12) |roll| 20..160 = the wedge stands across the facing, its point up and rolled by roll '
+        'in that plane (the rising diagonal a viewer behind the target sees broadside); else it lies along the facing, rolled '
+        'about it: a lilac spearhead widening behind its point, white edges; particles at the point. Level.',
+        conv=(('s', 'r', 0.1), ('s6', 'r', 0.06), ('pd', 'r', 0.03), ('bx', '#bx', 0.0001), ('by', '#by', 0.0001),
+              ('bz', '#bz', 0.0001)),
+        pre=[f'$data modify storage {PA}.roll set value $(roll)', '$scoreboard players set #o hrFx $(roll)',
+             '$scoreboard players set #r hrFx $(r)', 'scoreboard players set #fm hrFx 0',
+             f'execute if score #o hrFx matches {FACE_ROLL[0]}..{FACE_ROLL[1]} run scoreboard players set #fm hrFx 1',
+             f'execute if score #o hrFx matches -{FACE_ROLL[1]}..-{FACE_ROLL[0]} run scoreboard players set #fm hrFx 1',
+             f'data modify storage {PA}.kw set value "qi_wedge"',
+             f'execute if score #fm hrFx matches 1 run data modify storage {PA}.kw set value "qi_wedgef"',
+             f'function {FN}e/rollv'])
 def _p_qi_wedge():
-    return [mac(card('qi_wedge', '^ ^ ^', '~ 0', roll='$(roll)', s0=('$(s6)', 1, '$(s6)'), s1=('$(s)', 1, '$(s)'), life=8,
+    # the particles at the point in the card frame: flat r along the facing, face r up the rolled axis (V2R-01)
+    pt = '^$(bx) ^$(by) ^$(bz)'
+    return [mac(card('$(kw)', '^ ^ ^', '~ 0', roll='$(roll)', s0=('$(s6)', '$(s6)', '$(s6)'), s1=('$(s)', '$(s)', '$(s)'), life=8,
                      fade=4, dur=2, hit=5, col2=QFADE[1])),
-            mac(dust(DUSTC[1], 1.2, '^ ^ ^$(s)', ('$(pd)', '$(pd)', '$(pd)'), 10)),
-            mac(part('electric_spark', '^ ^ ^$(s)', (0.2, 0.2, 0.2), 0.05, 4))]
+            mac(dust(DUSTC[1], 1.2, pt, ('$(pd)', '$(pd)', '$(pd)'), 10)),
+            mac(part('electric_spark', pt, (0.2, 0.2, 0.2), 0.05, 4))]
 
 
 @preset('qi_ribbon', 'A4 the sword-qi ribbon wrapping round her (S3: the body + 1.0): three lilac ribbon strips tilted at '
@@ -867,17 +953,22 @@ def _p_qi_ribbon():
 
 
 QLINE_CLAMP = [f'function {FN}e/hgt', '$scoreboard players set #r hrFx $(len)', f'function {FN}e/clamp_line']
+QLINE_LOW = 32                         # F2: hundredths; the qi_line glow is 0.6 b wide (0.3 b + a margin under it)
+# F2 (HR-44): the scarlet line's low end (its centre line) stays this far over the floor (hundredths): its strip is 0.19 b
+# wide on each side of that line at full size (the corner then 0.07 b over the floor under its 13 deg roll)
+SLINE_LOW = 25
 
 
-@preset('qi_line', 'A thin straight sword-qi line of length {len} (tenths) from the executor along its full facing (pitch '
-        'counts: S3 A5 the body + 0.95, 1.5 b ahead, level; S4 A8.9 the dive line: her + 0.8, rotated ~ 90 = straight down): a '
+@preset('qi_line', 'A thin straight sword-qi line of length {len} (tenths) from the executor, F2 (HR-12) ACROSS its facing: the '
+        'facing turned 90 deg to its right, its pitch kept (S3 A5: from her left, the body + 0.95, 1.5 b ahead, level: a '
+        'horizontal slash across the view; S4 A8.9 the dive line: her + 0.8, rotated ~ 90 = straight down, unchanged): a '
         'white core inside a lilac glow; a line pointing down is clamped to end above the floor.',
         conv=(('l', '#r', 0.1),), pre=QLINE_CLAMP)
 def _p_qi_line():
-    return [mac(card('qline', '^ ^ ^', '~ ~', s0=(0.05, 0.05, '$(l)'), s1=(0.18, 0.18, '$(l)'), life=4, fade=2, dur=1,
+    return [mac(card('qline', '^ ^ ^', '~90 ~', s0=(0.05, 0.05, '$(l)'), s1=(0.18, 0.18, '$(l)'), life=4, fade=2, dur=1,
                      col=rgb('#F6E8FF'))),
-            mac(card('qline', '^ ^ ^', '~ ~', s0=(0.25, 0.25, '$(l)'), s1=(0.6, 0.6, '$(l)'), life=4, fade=2, dur=1, col=LILAC)),
-            dust(DUSTC[5], 0.8, '^ ^ ^0.3', (0.05, 0.05, 0.05), 3)]
+            mac(card('qline', '^ ^ ^', '~90 ~', s0=(0.25, 0.25, '$(l)'), s1=(0.6, 0.6, '$(l)'), life=4, fade=2, dur=1, col=LILAC)),
+            'execute rotated ~90 ~ run ' + dust(DUSTC[5], 0.8, '^ ^ ^0.3', (0.05, 0.05, 0.05), 3)]
 
 
 @preset('qi_cut', 'A9 the iai cut along the dash: a long pink-magenta slash line of length {len} (tenths) from the executor along '
@@ -1021,9 +1112,10 @@ def _p_burst_radial():
 
 
 @preset('light_column', 'A lilac light column from the executor (the player\'s spot on the floor: the deflect, the A8 fail) up 9 b: '
-        'two crossed glowing quads widening, a white core, motes rising.')
+        'two crossed glowing quads widening, a white core, motes rising. Upright whatever the executor\'s pitch (F2, HR-41: '
+        'both cards at pitch 0).')
 def _p_light_column():
-    return [card('light_column', '~ ~ ~', bb='fixed', s0=(2.4, 2.0, 2.4), s1=(6.0, 9.0, 6.0), life=14, fade=8, dur=3,
+    return [card('light_column', '~ ~ ~', '~ 0', bb='fixed', s0=(2.4, 2.0, 2.4), s1=(6.0, 9.0, 6.0), life=14, fade=8, dur=3,
                  col=rgb('#E8C8FF')),
             card('light_column', '~ ~ ~', '~45 0', s0=(0.8, 2.0, 0.8), s1=(2.0, 9.5, 2.0), life=12, fade=6, dur=3, col=WHITE),
             part('end_rod', '~ ~1 ~', (0.2, 2.0, 0.2), 0.05, 16), dust(DUSTC[1], 1.2, '~ ~2 ~', (0.3, 2.0, 0.3), 14)]
@@ -1106,15 +1198,19 @@ def _p_deco_bolt():
 @preset('scarlet_line', '홍련일섬\'s red slash line (CS1 C8, the 5 % instant death; S2b: the player\'s chest point, facing her): a '
         'line of length {len} (tenths) through the executor along the executor\'s yaw + {yaw} (90 = across a viewer looking '
         'along the executor\'s facing, its + end on their right), ' + api.SCARLET_LINE_ROLL.replace(' (', ': ').rstrip(')') +
-        '; it opens in 2 t, darkens after 12 t, closes by 30 t.',
-        conv=(('l', 'len', 0.1),),
+        '; it opens in 2 t, darkens after 12 t, closes by 30 t. Floor-safe at any height and roll (F2, HR-44): when its low '
+        'end would dip under ' + f'{SLINE_LOW / 100:.2f}' + ' b over the floor it slides along its own length toward its high '
+        'end (fx/e/clamp_sline), so it still crosses the executor point and stops just above the floor.',
+        conv=(('l', 'len', 0.1), ('tx', '#tx', 0.01), ('ty', '#ty', 0.01)),
         pre=['$scoreboard players set #a hrFx $(yaw)', 'scoreboard players remove #a hrFx 90',
              f'execute store result storage {PA}.yy int 1 run scoreboard players get #a hrFx',
              '$scoreboard players set #a hrFx $(roll)', 'scoreboard players operation #a hrFx *= #cm1 hrFx',
-             f'execute store result storage {PA}.rr int 1 run scoreboard players get #a hrFx'])
+             f'execute store result storage {PA}.rr int 1 run scoreboard players get #a hrFx',
+             '$scoreboard players set #l hrFx $(len)', '$scoreboard players set #o hrFx $(roll)', f'function {FN}e/clamp_sline'])
 def _p_scarlet_line():
-    return [mac(card('scarlet_line', '^ ^ ^', '~$(yy) 0', roll='$(rr)', s0=('$(l)', 1.5, 1.5), s1=('$(l)', 6.0, 6.0), life=30,
-                     fade=10, dur=2, hit=12, col2=rgb('#C04050'))),
+    return [mac(card('scarlet_line', '^ ^ ^', '~$(yy) 0', roll='$(rr)', s0=('$(l)', 1.5, 1.5), s1=('$(l)', 6.0, 6.0),
+                     off=('$(tx)', '$(ty)', 0), move=('$(tx)', '$(ty)', 0), life=30, fade=10, dur=2, hit=12,
+                     col2=rgb('#C04050'))),
             dust(DUSTC[4], 1.6, '~ ~ ~', (2.0, 0.1, 2.0), 30), part('sweep_attack', '~ ~ ~', (0.6, 0.1, 0.6), 0, 2)]
 
 
@@ -1351,8 +1447,13 @@ SEL = f'@e[type=minecraft:item_display,tag={TAG}'
 FAKE = ('#n', '#na', '#ni', '#ser', '#now', '#now2', '#wd', '#c2', '#col', '#roll', '#spin', '#life', '#fade', '#dly', '#dur', '#hit',
         '#pool', '#a', '#b', '#c', '#k', '#t', '#it', '#f', '#h', '#pt', '#fl', '#m', '#r', '#p', '#o', '#i', '#j', '#ly',
         '#n2', '#g', '#on', '#sk', '#l', '#lid', '#at', '#af', '#lnW', '#lnA', '#lnE', '#ovH', '#ovE', '#oi', '#oh', '#oo',
-        '#demo', '#dt', '#s', '#d', '#my', '#mz', '#ny', '#nz', '#cm1', '#c3', '#c4', '#c26', '#c90', '#c10', '#c20', '#c36', '#c100', '#c115', '#c360', '#c1000')
-INIT = f'execute unless data storage {STO} fx{{init:1b}} run function {E}init'
+        '#demo', '#dt', '#s', '#d', '#my', '#mz', '#ny', '#nz', '#cm1', '#c3', '#c4', '#c26', '#c90', '#c10', '#c20', '#c36', '#c100', '#c115', '#c360', '#c1000',
+        '#c104', '#c5', '#fm', '#sw', '#tx', '#ty', '#keep', '#fol', '#fy', '#y', '#ovS', '#ovI',   # F2
+        '#rx', '#ry', '#rz', '#ra', '#rb', '#bx', '#by', '#bz')                                    # F2 round 1 (e/rollv)
+# F2: the init version (2: the face-mode crescent table, the overlay fade steps, the keep / follow switches, #c104): a world
+# whose storage holds an older kit's init runs e/init again at the first call (the tables are rewritten, the objectives exist)
+INIT_V = 2
+INIT = f'execute unless data storage {STO} fx{{init:{INIT_V}b}} run function {E}init'
 NEG_LIT = re.compile(r'scoreboard players (add|remove) \S+ \S+ -')
 
 
@@ -1473,6 +1574,7 @@ def engine(W):
         f'execute store result score #col {OBJ} run data get storage {STO} fx.a.col2',
         f'data modify storage {STO} fx.a.z set from storage {STO} fx.a.s0',
         f'execute if score #dly {OBJ} matches 1.. run data modify storage {STO} fx.a.z set value "0f,0f,0f"',
+        f'execute if score #fol {OBJ} matches 1.. run data modify storage {STO} fx.a.tpd set value 1',
         f'function {E}spawn with storage {STO} fx.a',
         'execute store result score #now ' + OBJ + ' run time query gametime',
         f'scoreboard players add #now {OBJ} 1',
@@ -1513,14 +1615,33 @@ def engine(W):
         f'execute if score #dly {OBJ} matches 1.. run tag @s add {TAG}_sh',
         f'execute if score #fade {OBJ} matches 1.. run tag @s add {TAG}_fd',
         f'execute if score #hit {OBJ} matches 0.. if score #col {OBJ} matches 0.. run tag @s add {TAG}_hit',
+        f'execute if score #keep {OBJ} matches 1 run tag @s add {KEEP}',
+        f'execute if score #fol {OBJ} matches 1.. run function {E}born_f',
     ])
+    W.w('e/born_f', ['# Internal (F2, HR-23), as a new card made between fx/follow_on and follow_off: it follows the lead #fol',
+                     '# (hrFxL) at its own height over it (hrFxY, hundredths).',
+                     f'tag @s add {FCARD}', f'scoreboard players operation @s hrFxL = #fol {OBJ}',
+                     'execute store result score @s hrFxY run data get entity @s Pos[1] 100',
+                     f'scoreboard players operation @s hrFxY -= #fy {OBJ}'])
+    W.w('e/fcard', ['# Internal (F2, HR-23), as a following card (each ager tick): to its lead\'s x / z at its own height over',
+                    '# it; a lead that is gone leaves the card where it is.',
+                    f'scoreboard players operation #l {OBJ} = @s hrFxL',
+                    f'execute as @e[tag={LEAD}] if score @s hrFxL = #l {OBJ} run tag @s add {TAG}_t',
+                    f'execute unless entity @e[tag={TAG}_t,limit=1] run return 0',
+                    f'execute at @e[tag={TAG}_t,limit=1] run tp @s ~ ~ ~',
+                    f'execute store result score #y {OBJ} run data get entity @e[tag={TAG}_t,limit=1] Pos[1] 100',
+                    f'scoreboard players operation #y {OBJ} += @s hrFxY',
+                    f'execute store result entity @s Pos[1] double 0.01 run scoreboard players get #y {OBJ}',
+                    f'tag @e[tag={TAG}_t] remove {TAG}_t'])
     W.w('e/world', [
         '# Ages the kit\'s cards and moonbeams once per tick while any is alive (scheduled from e/make and itself, so it runs',
         '# at the end of the server tick; no hook in rlk:tick), then keeps every pool at its cap (the oldest go). A dead or',
-        '# reviving player clears every card (fx/clear).',
+        '# reviving player clears every card (fx/clear) but the kept ones (F2, HR-17: the instant death\'s line and petals);',
+        '# the following cards (F2, HR-23) go to their lead first.',
         f'execute unless entity @e[tag={TAG},limit=1] run return run function {E}zero',
         f'execute if entity @a[tag=player,scores={{dead=1}}] run function {FN}clear',
         f'execute if entity @a[tag=player,scores={{rnDie=1..}}] run function {FN}clear',
+        f'execute as @e[type=minecraft:item_display,tag={FCARD}] run function {E}fcard',
         f'execute store result score #now {OBJ} run time query gametime',
         f'execute as {SEL}] run function {E}age',
         f'execute as @e[type=minecraft:marker,tag={BEAM}] at @s run function {E}beam',
@@ -1583,11 +1704,14 @@ def engine(W):
                    f'tag @s remove {TAG}_fd'])
     spin_y = ','.join(f'{k}:"0f,1f,0f"' for k in ALL_KINDS if kind_info(k)[0] in SPIN_Y)
     gl = ','.join(f'{k}:"{glyph(k)}"' for k in GLYPHS)
+    # F2 (HR-30): per overlay its glyphs from the faintest step to the full one (fx/hud/e/ov_tick picks [level - 1])
+    gs = ','.join(f'{g}:[' + ','.join(f'"{glyph(f"{g}_{k}")}"' for k in range(1, OVL_STEPS)) + f',"{glyph(g)}"]'
+                  for g in api.OVERLAYS)
     W.w('e/init', ['# Objectives, constants and tables of the kit (made by the first call; removed by fx/uninstall).',
                    f'scoreboard objectives add {OBJ} dummy', *[f'scoreboard objectives add {o} dummy' for o in OBJECTIVES],
-                   *[f'scoreboard players set {fp} {OBJ} 0' for fp in ('#n', '#na', '#ni', '#lnA', '#ovH', '#ovE')],
+                   *[f'scoreboard players set {fp} {OBJ} 0' for fp in ('#n', '#na', '#ni', '#lnA', '#ovH', '#ovE', '#keep', '#fol')],
                    f'execute unless score #ser {OBJ} matches 1.. run scoreboard players set #ser {OBJ} 0',
-                   *[f'scoreboard players set #c{v} {OBJ} {v}' for v in (2, 10, 20, 36, 100, 115, 360, 1000)],
+                   *[f'scoreboard players set #c{v} {OBJ} {v}' for v in (2, 5, 10, 20, 36, 100, 104, 115, 360, 1000)],
                    f'scoreboard players set #cm1 {OBJ} -1', f'scoreboard players set #c3 {OBJ} 3',
                    f'scoreboard players set #c4 {OBJ} 4', f'scoreboard players set #c26 {OBJ} 26',
                    f'scoreboard players set #c90 {OBJ} 90',
@@ -1597,12 +1721,15 @@ def engine(W):
                    f'data modify storage {STO} fx.fl set value {FLOOR * 100}',
                    '# the crescent floor clamp: the lowest point per mille per (pitch cell, roll cell), fx/e/clamp_arc',
                    f'data modify storage {STO} fx.low set value [I;{",".join(str(v) for v in LOW)}]',
-                   '# sin(0..90 deg) per mille (fx/e/sinf: the band clamp and its level sweep)',
+                   '# the same for a slanted crescent standing across the aim (the face mode, F2 HR-12)',
+                   f'data modify storage {STO} fx.lowf set value [I;{",".join(str(v) for v in LOWF)}]',
+                   '# sin(0..90 deg) per mille (fx/e/sinf: the band clamp and its level sweep, the scarlet line clamp)',
                    f'data modify storage {STO} fx.sin set value [I;{",".join(str(v) for v in SIN)}]',
-                   '# the full-screen glyphs of fx/hud/ovl (font rlk:mboss_hr)',
+                   '# the full-screen glyphs of fx/hud/ovl (font rlk:mboss_hr) and their fade steps (F2, HR-30)',
                    f'data modify storage {STO} fx.gl set value {{{gl}}}',
+                   f'data modify storage {STO} fx.gs set value {{{gs}}}',
                    f'data modify storage {STO} fx.hud set value {{warn:0b,skip:0b}}',
-                   f'data modify storage {STO} fx.init set value 1b'])
+                   f'data modify storage {STO} fx.init set value {INIT_V}b'])
     W.w('e/hgt', ['# #h = the executor\'s height over the floor in hundredths (storage fx.fl = the floor y x 100), #pt = its',
                   '# pitch (degrees, + down).',
                   f'execute summon minecraft:marker run function {E}hgt_m',
@@ -1613,9 +1740,9 @@ def engine(W):
                     f'execute store result score #h {OBJ} run data get entity @s Pos[1] 100',
                     f'execute store result score #pt {OBJ} run data get entity @s Rotation[1]', 'kill @s'])
     W.w('e/clamp_arc', [
-        '# Crescent floor clamp: #r reach (tenths), #p pitch (Minecraft), #o roll (degrees) -> #ly the lift (hundredths,',
-        '# <= ARC_LIFT) and #r = min(#r, 100 (h - 10 + ly) / LOW) so the crescent (bearings +-80 deg from the aim, unit',
-        '# radius x reach) stays above the floor; LOW per mille from the table.',
+        '# Crescent floor clamp: #r reach (tenths), #p pitch (Minecraft), #o roll (degrees), #fm the face mode -> #ly the lift',
+        '# (hundredths, <= ARC_LIFT) and #r = min(#r, 100 (h - 10 + ly) / LOW) so the crescent (bearings +-80 deg from the',
+        '# aim, unit radius x reach) stays above the floor; LOW per mille from the table (fx.lowf in the face mode).',
         f'scoreboard players operation #i {OBJ} = #p {OBJ}', f'scoreboard players add #i {OBJ} 95',
         f'scoreboard players operation #i {OBJ} /= #c10 {OBJ}',
         f'execute if score #i {OBJ} matches ..-1 run scoreboard players set #i {OBJ} 0',
@@ -1625,7 +1752,8 @@ def engine(W):
         f'scoreboard players operation #j {OBJ} %= #c360 {OBJ}', f'scoreboard players operation #j {OBJ} /= #c10 {OBJ}',
         f'scoreboard players operation #i {OBJ} *= #c36 {OBJ}', f'scoreboard players operation #i {OBJ} += #j {OBJ}',
         f'execute store result storage {STO} fx.q.i int 1 run scoreboard players get #i {OBJ}',
-        f'function {E}lowf with storage {STO} fx.q',
+        f'execute unless score #fm {OBJ} matches 1 run function {E}lowf with storage {STO} fx.q',
+        f'execute if score #fm {OBJ} matches 1 run function {E}lowg with storage {STO} fx.q',
         f'scoreboard players set #ly {OBJ} 0',
         f'execute if score #f {OBJ} matches ..0 run return 0',
         f'function {E}hgt', f'scoreboard players remove #h {OBJ} 10',
@@ -1642,9 +1770,10 @@ def engine(W):
     W.w('e/sinf', ['# Internal (macro {i}): #f = sin(i deg) per mille, i 0..90.',
                    f'$execute store result score #f {OBJ} run data get storage {STO} fx.sin[$(i)]'])
     W.w('e/clamp_band', [
-        '# qi_band clamp: #l len (tenths), #p pitch (the in-plane rise, degrees), #o roll (the lean, degrees) -> #ly the lift',
-        '# (hundredths) so the band\'s lowest point (half its length x sin |pitch| + its half height) stays 0.05 b over the',
-        '# floor; #my #mz / #ny #nz = the 2.5 / 2.6 b sweep in the leaning display frame (level in the world).',
+        '# qi_band clamp: #l len (tenths), #p pitch (the in-plane rise, degrees), #o roll (the lean, degrees), #sw the sweep',
+        '# (tenths) -> #ly the lift (hundredths) so the band\'s lowest point (half its length x sin |pitch| + its half height)',
+        '# stays 0.05 b over the floor; #my #mz / #ny #nz = the sweep / its leading streak (x 1.04) in the leaning display',
+        '# frame (level in the world; F2, HR-32: was a fixed 2.5 / 2.6 b).',
         f'scoreboard players operation #i {OBJ} = #p {OBJ}',
         f'execute if score #i {OBJ} matches ..-1 run scoreboard players operation #i {OBJ} *= #cm1 {OBJ}',
         f'execute if score #i {OBJ} matches 91.. run scoreboard players set #i {OBJ} 90',
@@ -1666,28 +1795,91 @@ def engine(W):
         f'function {E}sinf with storage {STO} fx.q',
         f'scoreboard players operation #my {OBJ} = #f {OBJ}',
         f'execute if score #o {OBJ} matches ..-1 run scoreboard players operation #my {OBJ} *= #cm1 {OBJ}',
-        f'scoreboard players operation #ny {OBJ} = #my {OBJ}',
-        f'scoreboard players operation #my {OBJ} /= #c4 {OBJ}', f'scoreboard players operation #ny {OBJ} *= #c26 {OBJ}',
+        f'scoreboard players operation #my {OBJ} *= #sw {OBJ}', f'scoreboard players operation #my {OBJ} /= #c100 {OBJ}',
+        f'scoreboard players operation #ny {OBJ} = #my {OBJ}', f'scoreboard players operation #ny {OBJ} *= #c104 {OBJ}',
         f'scoreboard players operation #ny {OBJ} /= #c100 {OBJ}',
         f'scoreboard players operation #j {OBJ} = #i {OBJ}', f'scoreboard players operation #i {OBJ} = #c90 {OBJ}',
         f'scoreboard players operation #i {OBJ} -= #j {OBJ}',
         f'execute store result storage {STO} fx.q.i int 1 run scoreboard players get #i {OBJ}',
         f'function {E}sinf with storage {STO} fx.q',
-        f'scoreboard players operation #mz {OBJ} = #f {OBJ}', f'scoreboard players operation #nz {OBJ} = #f {OBJ}',
-        f'scoreboard players operation #mz {OBJ} /= #c4 {OBJ}', f'scoreboard players operation #nz {OBJ} *= #c26 {OBJ}',
-        f'scoreboard players operation #nz {OBJ} /= #c100 {OBJ}'])
+        f'scoreboard players operation #mz {OBJ} = #f {OBJ}', f'scoreboard players operation #mz {OBJ} *= #sw {OBJ}',
+        f'scoreboard players operation #mz {OBJ} /= #c100 {OBJ}', f'scoreboard players operation #nz {OBJ} = #mz {OBJ}',
+        f'scoreboard players operation #nz {OBJ} *= #c104 {OBJ}', f'scoreboard players operation #nz {OBJ} /= #c100 {OBJ}'])
     W.w('e/lowf', ['# Internal (macro {i}): #f = the floor-clamp table entry i.',
                    f'$execute store result score #f {OBJ} run data get storage {STO} fx.low[$(i)]'])
+    W.w('e/lowg', ['# Internal (macro {i}): #f = the face-mode crescent\'s floor-clamp table entry i (F2, HR-12).',
+                   f'$execute store result score #f {OBJ} run data get storage {STO} fx.lowf[$(i)]'])
+    W.w('e/rollv', [
+        '# Internal (F2 round 1, V2R-01): the burst point of a crescent / wedge in its card frame (+x left, +y up, +z the aim),',
+        '# #r (tenths) x the unit vector per mille -> #bx #by #bz. #fm 0 (flat: the shape lies along the aim) -> (0, 0, #r);',
+        '# #fm 1 (face: the shape stands across the aim, rolled by #o about it, left_rotation about +z) -> #r (-sin o, cos o, 0).',
+        f'scoreboard players set #rx {OBJ} 0', f'scoreboard players set #ry {OBJ} 0', f'scoreboard players set #rz {OBJ} 1000',
+        f'execute if score #fm {OBJ} matches 1 run function {E}rollf',
+        f'scoreboard players operation #bx {OBJ} = #r {OBJ}', f'scoreboard players operation #bx {OBJ} *= #rx {OBJ}',
+        f'scoreboard players operation #by {OBJ} = #r {OBJ}', f'scoreboard players operation #by {OBJ} *= #ry {OBJ}',
+        f'scoreboard players operation #bz {OBJ} = #r {OBJ}', f'scoreboard players operation #bz {OBJ} *= #rz {OBJ}'])
+    W.w('e/rollf', [
+        '# Internal (e/rollv, the face mode): #rx = -sin(#o), #ry = cos(#o) per mille (#o degrees, -180..180), #rz 0.',
+        f'scoreboard players set #rz {OBJ} 0',
+        f'scoreboard players operation #ra {OBJ} = #o {OBJ}',
+        f'execute if score #ra {OBJ} matches ..-1 run scoreboard players operation #ra {OBJ} *= #cm1 {OBJ}',
+        f'execute if score #ra {OBJ} matches 181.. run scoreboard players set #ra {OBJ} 180',
+        '# sin |o| = sin min(|o|, 180 - |o|)',
+        f'scoreboard players set #rb {OBJ} 180', f'scoreboard players operation #rb {OBJ} -= #ra {OBJ}',
+        f'scoreboard players operation #rb {OBJ} < #ra {OBJ}',
+        f'execute store result storage {STO} fx.q.i int 1 run scoreboard players get #rb {OBJ}',
+        f'function {E}sinf with storage {STO} fx.q', f'scoreboard players operation #rx {OBJ} = #f {OBJ}',
+        f'execute if score #o {OBJ} matches 1.. run scoreboard players operation #rx {OBJ} *= #cm1 {OBJ}',
+        '# cos |o| = sin |90 - |o||, negative past 90',
+        f'scoreboard players set #rb {OBJ} 90', f'scoreboard players operation #rb {OBJ} -= #ra {OBJ}',
+        f'execute if score #rb {OBJ} matches ..-1 run scoreboard players operation #rb {OBJ} *= #cm1 {OBJ}',
+        f'execute store result storage {STO} fx.q.i int 1 run scoreboard players get #rb {OBJ}',
+        f'function {E}sinf with storage {STO} fx.q', f'scoreboard players operation #ry {OBJ} = #f {OBJ}',
+        f'execute if score #ra {OBJ} matches 91.. run scoreboard players operation #ry {OBJ} *= #cm1 {OBJ}'])
+    W.w('e/clamp_sline', [
+        '# scarlet_line floor clamp (F2, HR-44): #l len (tenths), #o roll (degrees) -> #tx #ty (hundredths, the card frame):',
+        f'# when the line\'s low end would sit under {SLINE_LOW / 100:.2f} b over the floor, the card slides along its own length',
+        '# toward its high end (it still crosses the executor point) until the low end is there.',
+        f'scoreboard players set #tx {OBJ} 0', f'scoreboard players set #ty {OBJ} 0',
+        f'scoreboard players operation #i {OBJ} = #o {OBJ}',
+        f'execute if score #i {OBJ} matches ..-1 run scoreboard players operation #i {OBJ} *= #cm1 {OBJ}',
+        f'execute if score #i {OBJ} matches 91.. run scoreboard players set #i {OBJ} 90',
+        f'execute store result storage {STO} fx.q.i int 1 run scoreboard players get #i {OBJ}',
+        f'function {E}sinf with storage {STO} fx.q', f'scoreboard players operation #s {OBJ} = #f {OBJ}',
+        f'execute if score #s {OBJ} matches ..0 run return 0',
+        f'scoreboard players operation #j {OBJ} = #c90 {OBJ}', f'scoreboard players operation #j {OBJ} -= #i {OBJ}',
+        f'execute store result storage {STO} fx.q.i int 1 run scoreboard players get #j {OBJ}',
+        f'function {E}sinf with storage {STO} fx.q', f'scoreboard players operation #k {OBJ} = #f {OBJ}',
+        f'function {E}hgt',
+        '# #m = half the length (hundredths); #a = the low end\'s height over the floor',
+        f'scoreboard players operation #m {OBJ} = #l {OBJ}', f'scoreboard players operation #m {OBJ} *= #c10 {OBJ}',
+        f'scoreboard players operation #m {OBJ} /= #c2 {OBJ}',
+        f'scoreboard players operation #d {OBJ} = #m {OBJ}', f'scoreboard players operation #d {OBJ} *= #s {OBJ}',
+        f'scoreboard players operation #d {OBJ} /= #c1000 {OBJ}',
+        f'scoreboard players operation #a {OBJ} = #h {OBJ}', f'scoreboard players operation #a {OBJ} -= #d {OBJ}',
+        f'execute if score #a {OBJ} matches {SLINE_LOW}.. run return 0',
+        '# the slide #a = #m - (#h - low) / sin (hundredths along the line), then its x (toward the high end) and y',
+        f'scoreboard players operation #d {OBJ} = #h {OBJ}', f'scoreboard players remove #d {OBJ} {SLINE_LOW}',
+        f'scoreboard players operation #d {OBJ} *= #c1000 {OBJ}', f'scoreboard players operation #d {OBJ} /= #s {OBJ}',
+        f'scoreboard players operation #a {OBJ} = #m {OBJ}', f'scoreboard players operation #a {OBJ} -= #d {OBJ}',
+        f'scoreboard players operation #tx {OBJ} = #a {OBJ}', f'scoreboard players operation #tx {OBJ} *= #k {OBJ}',
+        f'scoreboard players operation #tx {OBJ} /= #c1000 {OBJ}',
+        f'execute if score #o {OBJ} matches 1.. run scoreboard players operation #tx {OBJ} *= #cm1 {OBJ}',
+        f'scoreboard players operation #ty {OBJ} = #a {OBJ}', f'scoreboard players operation #ty {OBJ} *= #s {OBJ}',
+        f'scoreboard players operation #ty {OBJ} /= #c1000 {OBJ}'])
     W.w('e/clamp_line', [
-        '# qi_line clamp (after e/hgt): a line pointing down (pitch >= 30) ends 0.1 b above the floor: #r (tenths) <= the',
-        '# height over the floor / sin(pitch) (taken at the low edge of the pitch band: 30 -> x 2, 60 -> x 1.15, 80 -> x 1).',
-        f'execute if score #pt {OBJ} matches ..29 run return 0',
-        f'scoreboard players operation #m {OBJ} = #h {OBJ}', f'scoreboard players remove #m {OBJ} 10',
+        f'# qi_line clamp (after e/hgt): a line pointing down ends {QLINE_LOW / 100:.2f} b above the floor (its glow\'s half width',
+        '# under its pitch): #r (tenths) <= (the height over the floor - that) / sin(pitch), sin from fx.sin (F2: exact at every',
+        '# pitch; the old 30 / 60 / 80 bands took their low edge and sent lines at 31-59 / 61-79 deg into the floor).',
+        f'execute if score #pt {OBJ} matches ..0 run return 0',
+        f'scoreboard players operation #i {OBJ} = #pt {OBJ}',
+        f'execute if score #i {OBJ} matches 91.. run scoreboard players set #i {OBJ} 90',
+        f'execute store result storage {STO} fx.q.i int 1 run scoreboard players get #i {OBJ}',
+        f'function {E}sinf with storage {STO} fx.q',
+        f'execute if score #f {OBJ} matches ..0 run return 0',
+        f'scoreboard players operation #m {OBJ} = #h {OBJ}', f'scoreboard players remove #m {OBJ} {QLINE_LOW}',
         f'execute if score #m {OBJ} matches ..9 run scoreboard players set #m {OBJ} 10',
-        f'scoreboard players operation #m {OBJ} /= #c10 {OBJ}',
-        f'execute if score #pt {OBJ} matches 30..59 run scoreboard players operation #m {OBJ} *= #c2 {OBJ}',
-        f'execute if score #pt {OBJ} matches 60..79 run scoreboard players operation #m {OBJ} *= #c115 {OBJ}',
-        f'execute if score #pt {OBJ} matches 60..79 run scoreboard players operation #m {OBJ} /= #c100 {OBJ}',
+        f'scoreboard players operation #m {OBJ} *= #c100 {OBJ}', f'scoreboard players operation #m {OBJ} /= #f {OBJ}',
         f'scoreboard players operation #r {OBJ} < #m {OBJ}',
         f'execute if score #r {OBJ} matches ..0 run scoreboard players set #r {OBJ} 1'])
     W.w('e/beam_new', ['# Internal: as the new moonbeam marker (summoned at the beam\'s foot).', f'tag @s add {TAG}',
@@ -1711,12 +1903,28 @@ def engine(W):
                      mac(dust(DUST_SILVER, 1.4, '~ ~$(f) ~', (0.08, 0.08, 0.08), 3)),
                      mac(dust(DUST_SILVER, 1.0, '~ ~$(c) ~', (0.06, '$(d)', 0.06), 4))])
     W.w('clear', ['# Remove every kit card (all pools) and moonbeam. Safe to call any time (pause, death_start, cleanup).',
-                  '# Props (the module\'s displays and the seat rock\'s items) are not cards: they stay.',
-                  f'kill {SEL}]', f'kill @e[type=minecraft:marker,tag={BEAM}]', INIT,
-                  f'scoreboard players set #n {OBJ} 0', f'scoreboard players set #na {OBJ} 0', f'scoreboard players set #ni {OBJ} 0'])
+                  '# Props (the module\'s displays and the seat rock\'s items) are not cards: they stay. F2 (HR-17): kept cards',
+                  f'# ({KEEP}, fx/keep_on) stay and finish their life (the module\'s cleanup and fx/uninstall remove them).',
+                  f'kill {SEL},tag=!{KEEP}]', f'kill @e[type=minecraft:marker,tag={BEAM}]', INIT,
+                  f'scoreboard players set #n {OBJ} 0', f'scoreboard players set #na {OBJ} 0', f'scoreboard players set #ni {OBJ} 0',
+                  f'scoreboard players set #keep {OBJ} 0', f'scoreboard players set #fol {OBJ} 0'])
+    W.w('keep_on', ['# F2 (HR-17): the cards made from now until fx/keep_off carry ' + KEEP + ' and survive fx/clear (the pause /',
+                    '# death_start clears, the ager\'s dead / revive clear): the 5 % instant death\'s 홍련일섬 line, its petals and',
+                    '# bolts, CS3\'s kick flash. The module\'s cleanup and fx/uninstall still remove them.', INIT,
+                    f'scoreboard players set #keep {OBJ} 1'])
+    W.w('keep_off', ['# F2 (HR-17): the cards made from now on are cleared by fx/clear again.', INIT,
+                     f'scoreboard players set #keep {OBJ} 0'])
+    W.w('follow_on', ['# F2 (HR-23), @s = the lead (her body): the cards made from now until fx/follow_off follow it every tick (its',
+                      '# x / z, each card at its own height over it): the yellow tell, the blink bubble, the ribbon travel with her.',
+                      INIT, f'execute unless score @s hrFxL matches 1.. run scoreboard players add #lid {OBJ} 1',
+                      f'execute unless score @s hrFxL matches 1.. run scoreboard players operation @s hrFxL = #lid {OBJ}',
+                      f'tag @s add {LEAD}', f'scoreboard players operation #fol {OBJ} = @s hrFxL',
+                      f'execute store result score #fy {OBJ} run data get entity @s Pos[1] 100'])
+    W.w('follow_off', ['# F2 (HR-23): the cards made from now on stay where they are made again.', INIT,
+                       f'scoreboard players set #fol {OBJ} 0'])
     W.w('uninstall', ['# Remove the kit\'s cards, moonbeams, followers, demo stand-ins, the HUD lines, the warn bossbar, the',
                       '# objectives, storage rlk:hr fx (other keys kept) and the schedules (the module\'s uninstall hook).',
-                      f'execute if data storage {STO} fx{{init:1b}} run function {FN}hud/clear',
+                      f'execute if data storage {STO} fx.init run function {FN}hud/clear',
                       f'kill {SEL}]', f'kill @e[type=minecraft:marker,tag={BEAM}]',
                       f'kill @e[type=minecraft:item_display,tag={FOLLOW}]', f'kill @e[type=minecraft:item_display,tag={FOLLOW_STAY}]',
                       f'kill @e[tag={DEMO}]', f'tag @e[tag={LEAD}] remove {LEAD}',
@@ -1904,18 +2112,62 @@ def typed(text):
     return steps
 
 
+# F2 (HR-16): the default font's advances of every character of her lines (26.3 client: Hangul syllables 8 (unifont,
+# size override left 1 right 15), the space 4, ascii.png ',' '.' '!' 2, '?' 6); a subtitle is drawn at 2x and never wraps
+ADVANCE = {' ': 4, ',': 2, '.': 2, '!': 2, '?': 6}
+
+
+def text_width(s):
+    """the subtitle width in font px (scale 1) of s in the default font"""
+    w = 0
+    for ch in s:
+        if 0xAC00 <= ord(ch) <= 0xD7AF:
+            w += 8
+        else:
+            assert ch in ADVANCE, (s, ch)
+            w += ADVANCE[ch]
+    return w
+
+
+def line_pages(lid):
+    """[(page text, first tick, end tick)] of line lid: api.LINE_PAGES[lid] typed one after the other, the hold split by
+    their widths (each page's last step held >= 10 t), else the whole line"""
+    hold = api.LINE_AT[lid][2]
+    pages = api.LINE_PAGES.get(lid, (api.LINES[lid],))
+    ws = [text_width(p) for p in pages]
+    starts, acc = [], 0
+    for w in ws:
+        starts.append(round(hold * acc / sum(ws)))
+        acc += w
+    ends = starts[1:] + [hold]
+    out = list(zip(pages, starts, ends))
+    for p, a, b in out:
+        assert b - (a + LINE_GAP * (len(typed(p)) - 1)) >= 10, (lid, p, a, b)
+    return out
+
+
 def line_steps(lid):
     """[(text, stay, fade, ttl, gap)] of api.LINES[lid]: two syllables per LINE_GAP t; the full line holds until
-    api.LINE_AT[lid][2] t after the line started (its ticks on screen), then fades over LINE_FADE t"""
-    steps = typed(api.LINES[lid])
+    api.LINE_AT[lid][2] t after the line started (its ticks on screen), then fades over LINE_FADE t. F2 (HR-16): a line of
+    api.LINE_PAGES is typed page by page, each page replacing the last at its first tick (no gap, no fade between)."""
     hold = api.LINE_AT[lid][2]
     out = []
-    for k, text in enumerate(steps):
-        last = k == len(steps) - 1
-        stay = hold - LINE_GAP * k if last else LINE_GAP + 6
-        fade = LINE_FADE if last else 0
-        assert not last or stay >= 10, (lid, stay)
-        out.append((text, stay, fade, stay + fade, LINE_GAP))
+    pages = line_pages(lid)
+    for pi, (page, p0, p1) in enumerate(pages):
+        steps = typed(page)
+        for k, text in enumerate(steps):
+            last = k == len(steps) - 1
+            final = last and pi == len(pages) - 1
+            if final:
+                stay, fade, gap = hold - p0 - LINE_GAP * k, LINE_FADE, LINE_GAP
+            elif last:
+                gap = p1 - p0 - LINE_GAP * k
+                stay, fade = gap + 6, 0
+            else:
+                stay, fade, gap = LINE_GAP + 6, 0, LINE_GAP
+            assert not final or stay >= 10, (lid, stay)
+            assert text_width(text) <= api.LINE_MAX_PX, (lid, text)
+            out.append((text, stay, fade, stay + fade, gap))
     return out
 
 
@@ -1925,8 +2177,10 @@ def hud_funcs(W):
     W.w('hud/line', [f'# {{id}}: her line api.LINES[id] (ids {min(api.LINES)}..{max(api.LINES)}) on the subtitle slot, Raiden\'s letter',
                      f'# reveal (two syllables per {LINE_GAP} t, block.note_block.hat 0.3 each), colour {LINE_COL}, held until',
                      '# api.LINE_AT[id][2] t after it started, then gone; a new line replaces a running one. Overlay-aware: while',
-                     '# a full-screen overlay (fx/hud/ovl) is up, each step re-sends the overlay glyph as the title with its',
-                     '# remaining hold instead of view/ttl_blank, and when the overlay ends the line comes back on a blank title.',
+                     '# a full-screen overlay (fx/hud/ovl) is up the line sits on the overlay glyph, re-sent every tick at full title',
+                     '# alpha with its fade-in / fade-out as opacity steps (F2, HR-30: the title and the subtitle share one alpha, so',
+                     '# a title fade would dim the line and its end drop it); when the overlay ends the line goes on a blank title.',
+                     f'# A line of api.LINE_PAGES shows as consecutive subtitles (F2, HR-16).',
                      f'$function {H}l/$(id)'])
     for lid in api.LINES:
         steps = line_steps(lid)
@@ -1934,7 +2188,9 @@ def hud_funcs(W):
         for text, stay, fade, ttl, gap in steps:
             assert '"' not in text and '\\' not in text, text
             q.append(f'{{t:"{text}",s:{stay},f:{fade},n:{ttl},g:{gap}}}')
-        W.w(f'hud/l/{lid}', [f'# Line {lid}: 「{api.LINES[lid]}」 ({len(steps)} steps, {api.LINE_AT[lid][2]} t on screen).', INIT,
+        pg = api.LINE_PAGES.get(lid)
+        W.w(f'hud/l/{lid}', [f'# Line {lid}: 「{api.LINES[lid]}」 ({len(steps)} steps, {api.LINE_AT[lid][2]} t on screen'
+                             + (f'; {len(pg)} subtitles: ' + ' / '.join(f'「{p}」' for p in pg) if pg else '') + ').', INIT,
                              f'data modify storage {STO} fx.ln set value {{q:[{",".join(q)}]}}',
                              f'scoreboard players set #lnW {OBJ} 0', f'scoreboard players set #lnA {OBJ} 1',
                              f'execute store result score #lnE {OBJ} run time query gametime',
@@ -1945,12 +2201,15 @@ def hud_funcs(W):
                      f'execute unless score #lnA {OBJ} matches 1 run return 0',
                      f'execute if entity @a[tag=player,scores={{dead=1}}] run return run function {H}e/ln_stop',
                      f'execute store result score #now2 {OBJ} run time query gametime',
-                     f'execute if score #ovE {OBJ} = #now2 {OBJ} if score #lnE {OBJ} > #now2 {OBJ} unless data storage {STO} fx.ln.q[0] '
-                     f'run function {H}e/ln_again',
+                     f'execute if score #ovE {OBJ} = #now2 {OBJ} if score #lnE {OBJ} > #now2 {OBJ} run function {H}e/ln_again',
                      f'execute if data storage {STO} fx.ln.q[0] run scoreboard players remove #lnW {OBJ} 1',
                      f'execute if data storage {STO} fx.ln.q[0] if score #lnW {OBJ} matches ..0 run function {H}e/ln_step',
-                     f'execute if score #lnE {OBJ} <= #now2 {OBJ} run return run scoreboard players set #lnA {OBJ} 0',
+                     f'execute if score #lnE {OBJ} <= #now2 {OBJ} run return run function {H}e/ln_end',
+                     f'execute if score #ovE {OBJ} > #now2 {OBJ} run function {H}e/ov_tick',
                      f'schedule function {H}e/ln 1t replace'])
+    W.w('hud/e/ln_end', ['# Internal: the line\'s time is over; an overlay still up goes back to its own title fade (F2, HR-30).',
+                         f'scoreboard players set #lnA {OBJ} 0',
+                         f'execute if score #ovE {OBJ} > #now2 {OBJ} run function {H}e/ov_hand'])
     W.w('hud/e/ln_step', ['# Internal: show the first queued step and drop it.',
                           f'execute store result score #lnW {OBJ} run data get storage {STO} fx.ln.q[0].g',
                           f'data modify storage {STO} fx.ln.cur set from storage {STO} fx.ln.q[0].t',
@@ -1960,12 +2219,48 @@ def hud_funcs(W):
                           f'$title @a[tag=player] subtitle {sub}',
                           'execute as @a[tag=player] at @s run playsound minecraft:block.note_block.hat voice @s ~ ~ ~ 0.3 1 0',
                           f'execute store result score #now2 {OBJ} run time query gametime',
-                          f'execute if score #ovE {OBJ} > #now2 {OBJ} run return run function {H}e/ov_keep',
+                          '# under an overlay only the subtitle: e/ln re-sends the overlay title right after (e/ov_tick)',
+                          f'execute if score #ovE {OBJ} > #now2 {OBJ} run return 0',
                           '$title @a[tag=player] times 0 $(s) $(f)',
                           'execute as @a[tag=player] run function rlk:view/ttl_blank',
                           '$scoreboard players set @a[tag=player] ttlT $(n)'])
-    W.w('hud/e/ov_keep', ['# Internal: an overlay is up: re-send its glyph as the title with its remaining hold / fade-out (the new',
-                          '# subtitle shows on it).',
+    W.w('hud/e/ov_lvl', [
+        '# Internal (F2, HR-30): #a = the overlay\'s opacity step now (1..5: 20 % .. full; fade-in by ticks since #ovS over in,',
+        '# fade-out by ticks left to #ovE over out, rounded up) and fx.ov.cs = its glyph (fx.ov.gs = the five glyphs of g).',
+        f'scoreboard players set #a {OBJ} {OVL_STEPS}',
+        f'execute if score #now2 {OBJ} < #ovI {OBJ} run function {H}e/ov_lin',
+        f'execute if score #now2 {OBJ} >= #ovH {OBJ} run function {H}e/ov_lout',
+        f'execute if score #a {OBJ} matches ..0 run scoreboard players set #a {OBJ} 1',
+        f'execute if score #a {OBJ} matches {OVL_STEPS + 1}.. run scoreboard players set #a {OBJ} {OVL_STEPS}',
+        f'scoreboard players remove #a {OBJ} 1',
+        f'execute store result storage {STO} fx.ov.k int 1 run scoreboard players get #a {OBJ}',
+        f'function {H}e/ov_pick with storage {STO} fx.ov'])
+    W.w('hud/e/ov_lin', ['# Internal: the fade-in step ceil(5 (now - #ovS + 1) / in).',
+                         f'scoreboard players operation #b {OBJ} = #now2 {OBJ}', f'scoreboard players operation #b {OBJ} -= #ovS {OBJ}',
+                         f'scoreboard players add #b {OBJ} 1', f'scoreboard players operation #b {OBJ} *= #c{OVL_STEPS} {OBJ}',
+                         f'scoreboard players operation #c {OBJ} = #ovI {OBJ}', f'scoreboard players operation #c {OBJ} -= #ovS {OBJ}',
+                         f'execute if score #c {OBJ} matches ..0 run return 0',
+                         f'scoreboard players operation #b {OBJ} += #c {OBJ}', f'scoreboard players remove #b {OBJ} 1',
+                         f'scoreboard players operation #b {OBJ} /= #c {OBJ}', f'scoreboard players operation #a {OBJ} = #b {OBJ}'])
+    W.w('hud/e/ov_lout', ['# Internal: the fade-out step ceil(5 (#ovE - now) / out).',
+                          f'scoreboard players operation #b {OBJ} = #ovE {OBJ}', f'scoreboard players operation #b {OBJ} -= #now2 {OBJ}',
+                          f'scoreboard players operation #b {OBJ} *= #c{OVL_STEPS} {OBJ}',
+                          f'scoreboard players operation #c {OBJ} = #ovE {OBJ}', f'scoreboard players operation #c {OBJ} -= #ovH {OBJ}',
+                          f'execute if score #c {OBJ} matches ..0 run return 0',
+                          f'scoreboard players operation #b {OBJ} += #c {OBJ}', f'scoreboard players remove #b {OBJ} 1',
+                          f'scoreboard players operation #b {OBJ} /= #c {OBJ}', f'scoreboard players operation #a {OBJ} = #b {OBJ}'])
+    W.w('hud/e/ov_pick', ['# Internal (macro: k the step index): fx.ov.cs = the overlay\'s glyph at that step.',
+                          f'$data modify storage {STO} fx.ov.cs set from storage {STO} fx.ov.gs[$(k)]'])
+    W.w('hud/e/ov_tick', [
+        '# Internal (F2, HR-30), every tick of a line while an overlay is up: the overlay glyph at its opacity step as the title,',
+        '# times 0 2 0 re-sent each tick, so the title alpha (and the line on it) stays full through the overlay\'s fades.',
+        f'function {H}e/ov_lvl', 'title @a[tag=player] times 0 2 0', f'function {H}e/ov_cs with storage {STO} fx.ov',
+        f'scoreboard players operation #a {OBJ} = #ovE {OBJ}', f'scoreboard players operation #a {OBJ} -= #now2 {OBJ}',
+        f'execute store result score @a[tag=player] ttlT run scoreboard players get #a {OBJ}'])
+    W.w('hud/e/ov_cs', ['# Internal (macro: cs the glyph at its step).', f'$title @a[tag=player] title {glyph_title("$(cs)")}'])
+    W.w('hud/e/ov_hand', ['# Internal: the line ended under an overlay: the overlay at its step with its remaining hold / fade-out as a',
+                          '# vanilla title fade (the line, over, fades with it).',
+                          f'function {H}e/ov_lvl',
                           f'scoreboard players operation #a {OBJ} = #ovH {OBJ}', f'scoreboard players operation #a {OBJ} -= #now2 {OBJ}',
                           f'execute if score #a {OBJ} matches ..-1 run scoreboard players set #a {OBJ} 0',
                           f'scoreboard players operation #b {OBJ} = #ovE {OBJ}', f'scoreboard players operation #b {OBJ} -= #now2 {OBJ}',
@@ -1975,9 +2270,9 @@ def hud_funcs(W):
                           f'scoreboard players operation #a {OBJ} += #b {OBJ}',
                           f'execute store result score @a[tag=player] ttlT run scoreboard players get #a {OBJ}',
                           f'function {H}e/ov_re with storage {STO} fx.ov'])
-    W.w('hud/e/ov_re', ['# Internal (macro: ch the glyph, hl hold left, ol fade-out left).',
+    W.w('hud/e/ov_re', ['# Internal (macro: cs the glyph at its step, hl hold left, ol fade-out left).',
                         '$title @a[tag=player] times 0 $(hl) $(ol)',
-                        f'$title @a[tag=player] title {glyph_title("$(ch)")}'])
+                        f'$title @a[tag=player] title {glyph_title("$(cs)")}'])
     W.w('hud/e/ln_again', ['# Internal: the overlay just ended and the line is still up: show it again on a blank title for the rest.',
                            f'scoreboard players operation #a {OBJ} = #lnE {OBJ}', f'scoreboard players operation #a {OBJ} -= #now2 {OBJ}',
                            f'execute store result storage {STO} fx.ln.rs int 1 run scoreboard players get #a {OBJ}',
@@ -1996,26 +2291,30 @@ def hud_funcs(W):
         '# {g,in,hold,out}: a full-screen overlay glyph on the title (g = black / negative / pinkwhite / red_tint / magenta /',
         '# white; font rlk:mboss_hr, an empty unstyled root, no text shadow): fade-in in, hold, fade-out out ticks; vBig =',
         '# in + hold + out rests the F5 crosshair title meanwhile. A running line keeps its text on the overlay (else the',
-        '# subtitle is blanked first). `negative` is an approximation (titles can only paint over the screen).', INIT,
+        '# subtitle is blanked first), the overlay then fading by opacity steps (F2, HR-30). `negative` is an approximation',
+        '# (titles can only paint over the screen).', INIT,
         f'$data modify storage {STO} fx.ov set value {{g:"$(g)"}}',
         f'$data modify storage {STO} fx.ov.ch set from storage {STO} fx.gl.$(g)',
+        f'$data modify storage {STO} fx.ov.gs set from storage {STO} fx.gs.$(g)',
         f'$scoreboard players set #oi {OBJ} $(in)', f'$scoreboard players set #oh {OBJ} $(hold)',
         f'$scoreboard players set #oo {OBJ} $(out)',
-        f'execute store result score #ovH {OBJ} run time query gametime',
-        f'scoreboard players operation #ovH {OBJ} += #oi {OBJ}', f'scoreboard players operation #ovH {OBJ} += #oh {OBJ}',
+        f'execute store result score #ovS {OBJ} run time query gametime',
+        f'scoreboard players operation #ovI {OBJ} = #ovS {OBJ}', f'scoreboard players operation #ovI {OBJ} += #oi {OBJ}',
+        f'scoreboard players operation #ovH {OBJ} = #ovI {OBJ}', f'scoreboard players operation #ovH {OBJ} += #oh {OBJ}',
         f'scoreboard players operation #ovE {OBJ} = #ovH {OBJ}', f'scoreboard players operation #ovE {OBJ} += #oo {OBJ}',
         f'scoreboard players operation #a {OBJ} = #oi {OBJ}', f'scoreboard players operation #a {OBJ} += #oh {OBJ}',
         f'scoreboard players operation #a {OBJ} += #oo {OBJ}',
         f'execute store result score @a[tag=player] vBig run scoreboard players get #a {OBJ}',
         f'execute unless score #lnA {OBJ} matches 1 run title @a[tag=player] subtitle ""',
+        '# a line running: the ln chain (later this tick) sends the overlay as opacity steps at full title alpha (F2, HR-30)',
+        f'execute if score #lnA {OBJ} matches 1 run return run schedule function {H}e/ln 1t replace',
         '$title @a[tag=player] times $(in) $(hold) $(out)',
-        f'function {H}e/ov_t with storage {STO} fx.ov',
-        f'execute if score #lnA {OBJ} matches 1 run schedule function {H}e/ln 1t replace'])
+        f'function {H}e/ov_t with storage {STO} fx.ov'])
     W.w('hud/e/ov_t', ['# Internal (macro: ch the glyph).', f'$title @a[tag=player] title {glyph_title("$(ch)")}'])
     W.w('hud/e/ov_off', ['# Internal: an overlay still up goes at once (cleanup).',
                          f'execute store result score #now2 {OBJ} run time query gametime',
                          f'execute unless score #ovE {OBJ} > #now2 {OBJ} run return run scoreboard players set #ovE {OBJ} 0',
-                         f'scoreboard players set #ovE {OBJ} 0', f'scoreboard players set #ovH {OBJ} 0',
+                         f'scoreboard players set #ovE {OBJ} 0', f'scoreboard players set #ovH {OBJ} 0', f'scoreboard players set #ovI {OBJ} 0',
                          'scoreboard players set @a[tag=player] vBig 0', 'title @a[tag=player] clear'])
     W.w('hud/warn', [
         f'# {{on}}: the instant-death warning (PLAN §5.5) on its own line under the boss bars: bossbar {WAR_BAR_DOC} named',
@@ -2041,8 +2340,9 @@ def hud_funcs(W):
         skip.append(f'execute if score #sk {OBJ} matches {rng} run title @a[tag=player] actionbar {skip_component(k)}')
     skip += ['scoreboard players set @a[tag=player] hudHold 2', f'data modify storage {STO} fx.hud.skip set value 1b']
     W.w('hud/skip', skip)
-    W.w('hud/e/skip_off', ['# Internal: the skip prompt off.', 'title @a[tag=player] actionbar ""',
-                           'scoreboard players set @a[tag=player] hudHold 0', f'data modify storage {STO} fx.hud.skip set value 0b'])
+    W.w('hud/e/skip_off', ['# Internal: the skip prompt off (F2, HR-29: hudHold is left to run out: the intro holds the HUD itself every',
+                           '# tick until its end, and no tick of the actionbar HUD shows between the prompt and that hold).',
+                           'title @a[tag=player] actionbar ""', f'data modify storage {STO} fx.hud.skip set value 0b'])
     W.w('hud/clear', ['# The line, an overlay still up, the warning and the skip prompt off (cleanup, the coda, uninstall).', INIT,
                       f'function {H}e/ln_stop', f'function {H}e/ov_off', f'function {H}e/warn_off',
                       f'execute if data storage {STO} fx.hud{{skip:1b}} run function {H}e/skip_off'])
@@ -2052,11 +2352,31 @@ WAR_BAR_DOC = api.WARN_BOSSBAR
 
 
 # ----------------------------------------------------------------------------- presets -> datapack
+# F2 (HR-41 / HR-42): every preset is level, the executor's pitch ignored (a caller at the player takes the camera's pitch,
+# at the avatar its aim pitch): each card line and each line with local ^ coordinates runs `rotated ~ 0`; qi_arc's {pitch}
+# is then its absolute elevation (the floor clamp counts only it). Not qi_line (along its facing, pitch included: the A8.9
+# dive line points straight down; clamped at every pitch).
+PITCHED = ('qi_line',)
+
+
+def level_line(line):
+    if not ('^' in line or f'{FN}card' in line):
+        return line
+    mac_ = line.startswith('$')
+    body = line[1:] if mac_ else line
+    if body.startswith('execute '):
+        body = 'execute rotated ~ 0 ' + body[8:]
+    else:
+        body = 'execute rotated ~ 0 run ' + body
+    return ('$' if mac_ else '') + body
+
+
 def preset_variants(name):
     _d, _a, f, _c, split, _p = PRESETS[name]
+    lv = (lambda ls: ls) if name in PITCHED else (lambda ls: [level_line(x) for x in ls])
     if not split:
-        return {None: f()}
-    return {c: f(c) for c in SPLIT_CS.get(name, C_ALL)}
+        return {None: lv(f())}
+    return {c: lv(f(c)) for c in SPLIT_CS.get(name, C_ALL)}
 
 
 def presets_dp(W):
@@ -2125,7 +2445,7 @@ def preset_cards(name):
 
 
 # ----------------------------------------------------------------------------- tests and demos
-TEST_ARGS = {'r': 36, 'yaw': 0, 'pitch': 0, 'roll': 0, 'c': 1, 'len': 70, 't': 20, 'h': 34, 'n': 12}
+TEST_ARGS = {'r': 36, 'yaw': 0, 'pitch': 0, 'roll': 0, 'c': 1, 'len': 70, 't': 20, 'h': 34, 'n': 12, 'sw': 25}
 
 
 def fx(name, **args):
@@ -2163,8 +2483,8 @@ def _demos():
                                                              (40, 0, -35, 1, 'a3_h2'), (45, 0, -40, 1, 'g_leap_cut'),
                                                              (40, 0, 15, 4, 'g_wrap'), (18, 0, 0, 2, 'draw')))], [])
     D['qi_ring'] = _ev(5, 'waist', f('qi_ring', r=30, c=1), snd('a5_spin')) + _ev(25, 'low', f('qi_ring', r=40, c=2), snd('a9_cut'))
-    D['qi_band'] = _ev(5, 'chest1', f('qi_band', len=120, yaw=0, pitch=0, roll=0), snd('band_sweep')) + \
-        _ev(30, 'spot3', f('qi_band', len=70, yaw=0, pitch=35, roll=0), snd('g_rise'))
+    D['qi_band'] = _ev(5, 'chest1', f('qi_band', len=120, yaw=0, pitch=0, roll=0, sw=45), snd('band_sweep')) + \
+        _ev(30, 'spot3', f('qi_band', len=70, yaw=0, pitch=35, roll=0, sw=25), snd('g_rise'))
     D['qi_x'] = _ev(5, 'spotf', f('qi_x', r=25), snd('g_x'))
     D['qi_dome'] = _ev(5, 'spot', f('qi_dome', r=35), snd('g_dome'))
     D['qi_vert'] = _ev(5, 'front', f('qi_vert', h=34, yaw=0, c=1), snd('a3_h1')) + _ev(25, 'front', f('qi_vert', h=34, yaw=0, c=2),
@@ -2261,8 +2581,8 @@ def tests(W):
                        f'scoreboard players set #demo {OBJ} 0', f'scoreboard players set #dt {OBJ} 0',
                        f'schedule function {T}e/tick 1t replace'])
     W.w('test/stop', ['# Remove the demo stand-in and the test props; the floor back to the arena\'s.', f'kill @e[tag={DEMO}]',
-                      f'schedule clear {T}e/tick', f'execute if data storage {STO} fx{{init:1b}} run scoreboard players set #demo {OBJ} 0',
-                      f'execute if data storage {STO} fx{{init:1b}} run data modify storage {STO} fx.fl set value {FLOOR * 100}'])
+                      f'schedule clear {T}e/tick', f'execute if data storage {STO} fx{{init:{INIT_V}b}} run scoreboard players set #demo {OBJ} 0',
+                      f'execute if data storage {STO} fx{{init:{INIT_V}b}} run data modify storage {STO} fx.fl set value {FLOOR * 100}'])
     tick = ['# Demo ticker (scheduled): the running demo\'s events as the stand-in.',
             f'execute unless entity {STAND} run return 0',
             f'execute if score #demo {OBJ} matches 1.. run scoreboard players add #dt {OBJ} 1',
@@ -2360,7 +2680,12 @@ def manifest():
                  'rule': 'never skipped: the ager keeps the newest cards of a pool over its cap (the oldest go, hrFxQ serial)'},
         'objectives': [OBJ] + list(OBJECTIVES), 'fake_players': f'{", ".join(FAKE)} (objective {OBJ})',
         'tags': [TAG, f'{TAG}_c', f'{TAG}_a', f'{TAG}_i', f'{TAG}_new', f'{TAG}_go', f'{TAG}_sh', f'{TAG}_fd', f'{TAG}_hit',
-                 f'{TAG}_t', f'{TAG}_nf', BEAM, ANIM, f'{ANIM}_d', f'{ANIM}_p', FOLLOW, FOLLOW_STAY, LEAD, DEMO, f'{DEMO}_mv'],
+                 f'{TAG}_t', f'{TAG}_nf', BEAM, ANIM, f'{ANIM}_d', f'{ANIM}_p', FOLLOW, FOLLOW_STAY, LEAD, DEMO, f'{DEMO}_mv',
+                 KEEP, FCARD],
+        'switches': {'keep_on / keep_off': f'cards made between carry {KEEP}: fx/clear (pause, death_start, the ager\'s dead / '
+                                           'revive clear) leaves them; the module cleanup and fx/uninstall remove them',
+                     'follow_on / follow_off': '@s = the lead: cards made between follow it every tick (its x / z, their own '
+                                               'height over it)'},
         'conventions': {'yaw': '+ = to the executor\'s right (offset from its rotation)', 'pitch': '+ = up (elevation)',
                         'roll': 'about the aim (qi_arc 0 flat / 90 vertical); qi_band: lean (+ = top forward); scarlet_line: '
                                 '+ lifts the + (right) end', 'units': 'tenths of a block / degrees / ticks',
@@ -2383,8 +2708,12 @@ def manifest():
                        for k, v in SEAT.items()},
         'sounds': {k: [list(l) for l in v] for k, v in SOUNDS.items()},
         'hud': {k: list(v) for k, v in api.KIT_HUD.items()},
-        'lines': {str(k): {'text': v, 'steps': len(typed(v)), 'on_screen': api.LINE_AT[k][2], 'colour': LINE_COL}
+        'lines': {str(k): dict({'text': v, 'steps': len(line_steps(k)), 'on_screen': api.LINE_AT[k][2], 'colour': LINE_COL,
+                                'width': text_width(v)},
+                               **({'pages': [{'text': p, 'from': a, 'to': b, 'width': text_width(p)} for p, a, b in line_pages(k)]}
+                                  if k in api.LINE_PAGES else {}))
                   for k, v in api.LINES.items()},
+        'line_max_px': api.LINE_MAX_PX,
         'glyphs': {k: {'cp': f'U+{v[0]:04X}', 'px': list(v[2]), 'height': v[3], 'ascent': v[4]} for k, v in GLYPHS.items()},
         'space': f'U+{SP_NEG1:04X} (-1)',
         'warn': {'bossbar': WARN_BAR, 'text': api.WARN_TEXT, 'component': warn_component()},

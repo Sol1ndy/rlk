@@ -19,6 +19,8 @@ from . import api
 from . import s3lib as S
 from .s3lib import PB, sset, fn, num, part, placed
 
+K = api.K
+
 E = api.ev
 OBJ = api.OBJ
 CY = api.CY
@@ -72,6 +74,11 @@ def tail(pb, last_hit, end, moved=0):
     pb.motions.append((t + 1, end - 1, 'tail move'))
     TAILS[pb.key] = t
     pb.end(end)
+def follow(lines):
+    """F2 (HR-23): kit lines whose cards follow her body (fx/follow_on .. follow_off; @s = the body in a pattern tick)."""
+    lines = [x for x in lines if x]
+    on, off = api.K.fixed('follow_on'), api.K.fixed('follow_off')
+    return [on] + lines + [off] if lines and on else lines
 
 
 def at_anchor(anchor, lines):
@@ -148,16 +155,18 @@ def build_a2(W):
 
 
 # ================================================================================================= A3 오연 반월
-# per hit: (event, kit visual, roll / yaw of it) — h1 / h3 / h4 vertical crescents (qi_vert), h2 the downward diagonal
-# (qi_arc roll -35), h5 the rising wedge (qi_wedge roll 40)
-A3_FX = {'h1': ('vert', 0), 'h2': ('arc', -35), 'h3': ('vert', 0), 'h4': ('vert', 0), 'h5': ('wedge', 40)}
+# per hit: (event, kit visual, roll / yaw of it, b ahead of her) — h1 / h3 / h4 vertical crescents (qi_vert), h2 the downward
+# diagonal (qi_arc roll -35), h5 the rising wedge (qi_wedge roll 40). F2 (HR-12): the kit stands them across her aim (the
+# player's view): h1 bulging to her right (the player's LEFT, the footage's 'at Eve's left'), h3 to her left, h4 2 b out,
+# toward where its thrust line reaches (still before a player at TRACK min 2.4 b: first person sees it too)
+A3_FX = {'h1': ('vert', 0, 1.4), 'h2': ('arc', -35, 0), 'h3': ('vert', 180, 1.4), 'h4': ('vert', 0, 2.0), 'h5': ('wedge', 40, 0)}
 
 
 def a3_fx(ev_, r):
-    kind, roll = A3_FX[ev_]
+    kind, roll, ahead = A3_FX[ev_]
     if kind == 'vert':
-        return S.fx('qi_vert', [part(S.DUST['lilac'], 0.2, 1.0, 0.2, 0, 20)], pos=f'{S.AT_BODY} positioned ^ ^0.15 ^1.4',
-                    h=27, yaw=0, c=api.C_LILAC)
+        return S.fx('qi_vert', [part(S.DUST['lilac'], 0.2, 1.0, 0.2, 0, 20)], pos=f'{S.AT_BODY} positioned ^ ^0.15 ^{num(ahead, 1)}',
+                    h=27, yaw=roll, c=api.C_LILAC)
     if kind == 'arc':
         return S.fx_arc(r, api.C_LILAC, roll=roll)
     return S.fx('qi_wedge', [part(S.DUST['lilac'], 0.5, 0.7, 0.5, 0, 20)], pos=f'{S.AT_BODY} positioned ~ ~1.0 ~',
@@ -227,7 +236,8 @@ def build_a4(W):
           S.snd('a4_glint'))
     pb.track(apex, lock - 1, TRK['deg'])
     pb.at(lock, lock_fn(pb, key), f'execute at @s facing entity {S.LOCK_M} feet run tp @s ~ ~ ~ ~ 0')
-    pb.at(flip, S.fx('qi_ribbon', [part(S.DUST['lilac'], 0.4, 0.6, 0.4, 0, 16)]), S.snd('a4_flip'))
+    # F2 (HR-23): the ribbon's cards follow her (the dive 16-20 takes it down to the lock spot)
+    pb.at(flip, follow(S.fx('qi_ribbon', [part(S.DUST['lilac'], 0.4, 0.6, 0.4, 0, 16)])), S.snd('a4_flip'))
     # the dive onto the locked spot (dive .. hit), the landing disc there
     pb.at(dive, f'execute positioned as {S.LOCK_M} run function rlk:mboss/mv/glide {{t:{hit - dive}}}')
     pb.motions.append((dive, hit, 'dive'))
@@ -237,8 +247,10 @@ def build_a4(W):
                     r=26), S.snd('a4_impact', pos=f'at {S.LOCK_M}'))
     # A5: the straight slash line (cosmetic), the aim locks again (lock2), she spins ~1 b off the ground, the ring round her
     pb.track(hit + 1, lock2 - 1, TRK['deg'])
-    pb.at(slash, S.fx('qi_line', [part(S.DUST['lilac'], 0.6, 0.1, 0.6, 0, 10)], pos=f'{S.AT_BODY} positioned ^ ^0.95 ^1.5',
-                      len=30))
+    # F2 (HR-12): the kit's qi_line runs across her facing (to her right): from 5 b on her left, 10 b, 1.5 b ahead of her
+    # (the footage's long horizontal slash from the frame's left edge)
+    pb.at(slash, S.fx('qi_line', [part(S.DUST['lilac'], 0.6, 0.1, 0.6, 0, 10)], pos=f'{S.AT_BODY} positioned ^5 ^0.95 ^1.5',
+                      len=100))
     pb.at(ring, f'execute at @s positioned ~ {CY + 1} ~ run function rlk:mboss/mv/glide {{t:2}}',
           S.fx('qi_ring', [part(S.DUST['lilac'], 1.2, 0.05, 1.2, 0, 24)], pos=f'{S.AT_BODY} positioned ~ ~1.55 ~', r=30,
                c=api.C_LILAC))
@@ -284,7 +296,8 @@ def build_a6(W):
                         f'execute positioned as {S.PROBE_M} run function rlk:mboss/mv/glide {{t:{A["glide_t"]}}}',
                         f'kill @e[type=minecraft:marker,tag={S.PROBE_T}]'])
     pb.at(0, FACE, api.play(key), fn(f'p/{key}/blink'),
-          S.fx('blink_bubble', [part('minecraft:end_rod', 0.4, 0.8, 0.4, 0.02, 12)]), S.snd('a6_blink'), *afterimage(int(A['glide'] * 10)))
+          follow(S.fx('blink_bubble', [part('minecraft:end_rod', 0.4, 0.8, 0.4, 0.02, 12)])), S.snd('a6_blink'),
+          *afterimage(int(A['glide'] * 10)))
     pb.motions.append((0, A['glide_t'], 'blink'))
     pb.at(A['glide_t'], S.snd('a6_arrive'))
     pb.at(appear, FACE)
@@ -355,9 +368,10 @@ def build_a9(W):
     pb.hits.append(dict(t=cut, idx=0, tell=0, grp=g, kb=api.HITS[key][0][5], shape='dash_line', tier=api.HITS[key][0][4],
                         dims=api.HITS[key][0][3]))
     pb.hit(1, tell_from=0, grp=g, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
-    pb.at(cut, S.fx('qi_cut', [part(S.DUST['magenta'], 2.0, 0.2, 0.2, 0, 30)],
-                    pos=f'at @e[type=minecraft:marker,tag=rlk_hr_a9s,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_hr_a9s,limit=1] positioned ~ ~0.8 ~',
-                    len=int(dmax * 10)),
+    # F2 (HR-24): the streak as long as the probed dash (core.a9.len, tenths: the hazard line's own length), not dmax
+    a9s = 'at @e[type=minecraft:marker,tag=rlk_hr_a9s,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_hr_a9s,limit=1] positioned ~ ~0.8 ~'
+    pb.at(cut, placed([K.pw('qi_cut', f'{api.STORAGE} core.a9')] if K.pw('qi_cut', f'{api.STORAGE} core.a9')
+                      else [part(S.DUST['magenta'], 2.0, 0.2, 0.2, 0, 30)], a9s),
           S.fx('qi_ring', [part(S.DUST['magenta'], 1.6, 0.05, 1.6, 0, 24)], pos=f'at {S.LOCK_M} positioned ~ ~1.0 ~', r=40,
                c=api.C_MAGENTA), S.snd('a9_cut'))
     # recovery: she stands beyond the player, back turned, and turns back to them (F1 HR-14: from the cut on, the end 12 t
@@ -403,8 +417,9 @@ def build_a10(W):
     pb.rng(apex + 1, lock - 1, fn(f'p/{key}/drift'))
     pb.motions.append((apex + 1, lock - 1, 'drift'))
     pb.track(apex + 1, lock - 1, 20)
-    pb.at(yellow, S.fx('yellow_tell', [part(S.DUST['yellow'], 0.5, 0.6, 0.5, 0, 30), part('minecraft:end_rod', 1.2, 0.05, 0.05, 0, 8)],
-                       t=8), S.snd('yellow_chime'))
+    # F2 (HR-23): the tell's cards follow her through the apex drift
+    pb.at(yellow, follow(S.fx('yellow_tell', [part(S.DUST['yellow'], 0.5, 0.6, 0.5, 0, 30),
+                                               part('minecraft:end_rod', 1.2, 0.05, 0.05, 0, 8)], t=8)), S.snd('yellow_chime'))
     pb.at(lock, lock_fn(pb, key), f'execute at @s facing entity {S.LOCK_M} feet run tp @s ~ ~ ~ ~ 0')
     pb.at(dive, f'execute positioned as {S.LOCK_M} run function rlk:mboss/mv/glide {{t:{hit - dive}}}',
           S.fx('claw_streaks', [part(S.DUST['lilac'], 0.6, 2.0, 0.6, 0, 20)], pos=f'at {S.LOCK_M} positioned ~ {CY + 2} ~', r=15),

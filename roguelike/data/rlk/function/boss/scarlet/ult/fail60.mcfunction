@@ -7,5 +7,5 @@ scoreboard players set #mbDotLethal mb 0
 function rlk:mboss/pl_dot
 function rlk:mboss/push/ring {r:25,to:30,kb:3}
 execute positioned ~ ~0.1 ~ run function rlk:boss/scarlet/fx/p/dive_impact {r:30}
-execute positioned ~ ~ ~ run function rlk:boss/scarlet/fx/p/light_column
+execute rotated ~ 0 positioned ~ ~ ~ run function rlk:boss/scarlet/fx/p/light_column
 execute positioned ~ ~ ~ run function rlk:boss/scarlet/fx/snd/fail_impact

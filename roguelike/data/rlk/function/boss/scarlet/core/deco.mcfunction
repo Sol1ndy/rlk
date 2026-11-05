@@ -1,6 +1,6 @@
 # The decor props at spawn (PLAN §6.7): the moon halo (p1), 8 lotus buds, the seat rock (bottle).
 kill @e[type=minecraft:item_display,tag=rlk_hr_deco]
-summon minecraft:item_display 889 218 -33 {Tags:["rlk_room","rlk_mb_aux","rlk_hr_deco","rlk_hr_deco_moon_halo","rlk_hr_dnew"]}
+summon minecraft:item_display 889.0 218 -33.0 {Tags:["rlk_room","rlk_mb_aux","rlk_hr_deco","rlk_hr_deco_moon_halo","rlk_hr_dnew"]}
 execute as @e[type=minecraft:item_display,tag=rlk_hr_dnew] at @s run tp @s ~ ~ ~ 12.38 0
 execute as @e[type=minecraft:item_display,tag=rlk_hr_dnew] run function rlk:boss/scarlet/fx/prop/moon_halo {look:"p1"}
 tag @e[type=minecraft:item_display,tag=rlk_hr_dnew] remove rlk_hr_dnew

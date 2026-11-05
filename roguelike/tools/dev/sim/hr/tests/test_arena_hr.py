@@ -440,6 +440,28 @@ if want(7):
                                                (c[0], c[1], c[2] - 1), (c[0], c[1] - 1, c[2]))
                 if lay.get(q) is None or bid(lay.get(q)) in FREE]
         check(f'7b {lk}: the pond water ({len(water)} cells) cannot flow (water / solid round and below)', not flow, flow[:3])
+    # F2 (HR-43): no random-ticking floor block (mycelium, grass, nylium) under a cover that kills it at a random tick (an
+    # opaque block, a slab / stairs with a full bottom face, full or waterlogged water: vanilla SpreadingSnowyBlock /
+    # NyliumBlock turn it into dirt / netherrack, the look would drift); such a floor cell is the same block in every look
+    TICKS = ('grass_block', 'mycelium', 'crimson_nylium', 'warped_nylium')
+
+    def kills(b):
+        if b is None:
+            return False
+        n = bid(b)
+        return (opaque(b) or n == 'water' or 'waterlogged=true' in b or (n.endswith('_slab') and 'type=top' not in b)
+                or (n.endswith('_stairs') and 'half=top' not in b))
+    covered = set()
+    for lk in LOOKS:
+        lay = LAY[lk]
+        bad = [((x, y, z), bid(b), bid(lay.get((x, y + 1, z)))) for (x, y, z), b in lay.items()
+               if bid(b) in TICKS and kills(lay.get((x, y + 1, z)))]
+        check(f'7d {lk}: no mycelium / grass / nylium under a cover that kills it ({len(bad)})', not bad, bad[:4])
+        covered |= {(x, y, z) for (x, y, z), b in lay.items() if kills(lay.get((x, y + 1, z))) and b is not None
+                    and y == 200}
+    diff = [c for c in covered if len({LAY[lk].get(c) for lk in LOOKS}) != 1 or bid(LAY['moon'].get(c)) in TICKS]
+    check(f'7e the floor under covers ({len(covered)} cells) is one non-ticking block in every look', not diff,
+          [(c, [LAY[lk].get(c) for lk in LOOKS]) for c in diff[:2]])
     myc = [(x, z) for x, z in WALK if bid(LAY['moon'][(x, 200, z)]) == 'mycelium']
     short = sum(1 for x, z in myc if bid(LAY['moon'].get((x, 201, z))) == 'short_dry_grass')
     tall = sum(1 for x, z in myc if bid(LAY['moon'].get((x, 201, z))) == 'tall_dry_grass')

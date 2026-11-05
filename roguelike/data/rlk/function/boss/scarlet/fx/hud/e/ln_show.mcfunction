@@ -3,7 +3,8 @@
 $title @a[tag=player] subtitle {text:"$(t)",color:"#F2D0E8",font:"minecraft:default"}
 execute as @a[tag=player] at @s run playsound minecraft:block.note_block.hat voice @s ~ ~ ~ 0.3 1 0
 execute store result score #now2 hrFx run time query gametime
-execute if score #ovE hrFx > #now2 hrFx run return run function rlk:boss/scarlet/fx/hud/e/ov_keep
+# under an overlay only the subtitle: e/ln re-sends the overlay title right after (e/ov_tick)
+execute if score #ovE hrFx > #now2 hrFx run return 0
 $title @a[tag=player] times 0 $(s) $(f)
 execute as @a[tag=player] run function rlk:view/ttl_blank
 $scoreboard players set @a[tag=player] ttlT $(n)

@@ -68,6 +68,7 @@ SPOT_M = f'@e[type=minecraft:marker,tag={SPOT_T},limit=1]'
 SPOT_ALL = f'@e[type=minecraft:marker,tag={SPOT_T}]'
 KILL_SPOT = f'kill {SPOT_ALL}'
 BLOCK = 16                           # ticks per dispatch block of p/<key>/tick
+FIRST_PERSON, AVATAR = 'if entity @a[tag=rlk_body]', 'unless entity @a[tag=rlk_body]'   # F2 (HR-45): no avatar = first person
 DUST = S.DUST
 GAUNT = api.GAUNTLETS
 TABLE, EVENTS, MOVES = {}, {}, {}
@@ -429,18 +430,26 @@ def hide():
 # the sword-qi at each move's contact (PLAN §4.5 move table; kit args in tenths / degrees; contract §6: pass every arg)
 CONTACT = {
     'A8.1': ('qi_ring', dict(r=22, c=api.C_LILAC), 0.8, lambda: ring_fb(2.2), 'g_ring'),
-    'A8.2': ('qi_band', dict(len=70, yaw=0, pitch=35, roll=0), 0.3,
+    'A8.2': ('qi_band', dict(len=70, yaw=0, pitch=35, roll=0, sw=25), 0.3,
              lambda: [part(DUST['lilac'], 0.9, 1.2, 0.9, 0, 26)], 'g_rise'),
     'A8.3': ('qi_arc', dict(r=45, yaw=0, pitch=0, roll=-40, c=api.C_LILAC), 1.2,
              lambda: [part(DUST['lilac'], 1.6, 0.6, 1.6, 0, 30), part(DUST['white'], 1.2, 0.4, 1.2, 0, 10)], 'g_leap_cut'),
     'A8.4': ('qi_ring', dict(r=30, c=api.C_LILAC), 0.1, lambda: ring_fb(3.0), 'g_sweep'),
     'A8.5': ('qi_x', dict(r=25), 0.1, lambda: [part(DUST['lilac'], 1.4, 0.1, 1.4, 0, 30)], 'g_x'),
-    'A8.6': ('qi_arc', dict(r=40, yaw=0, pitch=0, roll=15, c=api.C_LILAC), 0.4,
+    'A8.6': ('qi_arc', dict(r=40, yaw=0, pitch=0, roll=15, c=api.C_LILAC), 0.8,
              lambda: [part(DUST['lilac'], 1.5, 0.3, 1.5, 0, 28)], 'g_wrap'),
     'A8.7': ('qi_dome', dict(r=35), 0.0, lambda: ring_fb(3.5) + [part(DUST['white'], 1.6, 1.4, 1.6, 0, 24)], 'g_dome'),
     'A8.8': ('qi_vert', dict(h=34, yaw=0, c=api.C_MAGENTA), 0.0,
              lambda: [part(DUST['magenta'], 0.2, 1.6, 0.2, 0, 26)], 'g_vert'),
 }
+# F2 (HR-12): where a contact's sword-qi stands from the cut spot in the player's facing frame (b to their left, b ahead): the
+# kit stands A8.3's slanted crescent and A8.8's vertical one across the facing, so on the cut spot itself (the player's own
+# plane) the first-person camera would see nothing; A8.8 'a tall crescent at the player's right' (PLAN §4.5)
+CONTACT_AT = {'A8.3': (0.0, 2.0), 'A8.8': (-1.5, 1.5)}
+# F2 (HR-12 / HR-45): A8.6's low wrap at thigh height (0.8 b, was 0.4: the floor clamp shrank it to a sliver from the
+# F5 camera); in first person (no avatar) A8.5's floor X sits this far ahead of the cut spot (b; still across it: its
+# arms reach 2.5 b), under the camera it would be out of view
+CONTACT_FP = {'A8.5': 1.2}
 APPROACH = ('D1', 'D2', 'D3', 'D4')
 TRAIL = {'D1': 125, 'D2': 65, 'D4': 105}          # ghost_trail len (tenths): the nominal dash / glide / run lengths
 HANG_UP, HANG_T = 3.0, 3                          # A8.4: she springs straight up and hangs (PLAN §4.5)
@@ -493,6 +502,11 @@ class Walk:
         g = self.gb
         name, a, h, fb, sound = CONTACT[step]
         pos = at_cut(s, h) if s in self.strikes else at_player(h)
+        if step in CONTACT_AT:
+            pos += ' positioned ^{} ^ ^{}'.format(*(num(v, 2) for v in CONTACT_AT[step]))
+        if step in CONTACT_FP:
+            g.at(s, S.fx(name, [], pos=f'{FIRST_PERSON} {pos} positioned ^ ^ ^{num(CONTACT_FP[step], 2)}', **a))
+            pos = f'{AVATAR} {pos}'
         g.fx(s, name, fb(), pos, src=('hit', step), **a)
         g.snd(s, sound, pos=at_cut(s) if s in self.strikes else at_player(), src=('hit', step))
 
@@ -660,8 +674,14 @@ class Walk:
                      '# and shields; Ronova\'s revive applies).',
                      f'# She lands 2 b in front of the player (g_reform).']
                     + [x for x in (K.ovl('pinkwhite', 0, 3, 8),) if x]
-                    + S.fx('scarlet_line', [part(DUST['crimson'], 3.0, 0.05, 0.05, 0, 60)], pos=at_player(1.3), len=600, yaw=90, roll=13)
+                    # F2 (HR-17): kept cards (ult/fatal kills the player in this tick: the kit's dead clear and the pause clear
+                    # would take them before the client draws them); HR-45: in first person the line at the eye, 1.2 b ahead
+                    + [x for x in (K.fixed('keep_on'),) if x]
+                    + S.fx('scarlet_line', [part(DUST['crimson'], 3.0, 0.05, 0.05, 0, 60)], pos=f'{AVATAR} {at_player(1.3)}',
+                           len=600, yaw=90, roll=13)
+                    + S.fx('scarlet_line', [], pos=f'{FIRST_PERSON} {at_player(1.62)} positioned ^ ^ ^1.2', len=600, yaw=90, roll=13)
                     + S.fx('petal_burst', [part('minecraft:cherry_leaves', 1.2, 0.8, 1.2, 0.05, 40)], pos=at_player(1.0), r=20)
+                    + [x for x in (K.fixed('keep_off'),) if x]
                     + S.snd('fatal_slash', pos=f'at {PLAYER}')
                     + [f'execute as {PL} at @s run {api.shield("fatal")}', api.play('g_reform'), FACE] + glide_spot('land', LAND_T))
             g.ev(jt, 'fail', 'fatal', 'JUDGE_T')
@@ -698,8 +718,11 @@ class Walk:
             g.at(ret, glide_spot('back', settle - ret))
             g.moves.append((ret, settle, 'retreat 6 b'))
             g.at(settle, FACE)
+        # F2 (HR-23): the tell's cards follow her (she retreats while it shows: the ring hugs her upper body, C49)
+        g.at(yel, K.fixed('follow_on'))
         g.fx(yel, 'yellow_tell', [part(DUST['yellow'], 0.5, 0.6, 0.5, 0, 30), part('minecraft:end_rod', 1.2, 0.05, 0.05, 0, 8)],
              at_body(1.0), src=('a7_tell', 'yellow'), t=8)
+        g.at(yel, K.fixed('follow_off'))
         g.snd(yel, 'yellow_chime', src=('a7_tell', 'yellow'))
 
     def s_a7_throw(self, t, step, kb=0, cond=None):
@@ -808,8 +831,10 @@ class Walk:
         if self.gauntlet:
             for i, bt in enumerate(api.BOLTS[key]):
                 b, d = BOLT_AT[i % len(BOLT_AT)]
-                g.at(bt, f'execute at {PLAYER} rotated as {PL} rotated ~{num(b, 1)} 0 positioned ^ ^ ^{num(d, 2)} positioned ~ {CY} ~ run '
-                     f'{fn("g/bolt")}')
+                keep = bt == api.JUDGE_T[key] and K.fixed('keep_on')     # F2 (HR-17): the fail's tick: kept with its line
+                g.at(bt, keep or None,
+                     f'execute at {PLAYER} rotated as {PL} rotated ~{num(b, 1)} 0 positioned ^ ^ ^{num(d, 2)} positioned ~ {CY} ~ run '
+                     f'{fn("g/bolt")}', (K.fixed('keep_off') if keep else None))
                 g.ev(bt, 'fx', 'deco_bolt', ('BOLTS', i))
                 g.ev(bt, 'snd', 'deco_bolt', ('BOLTS', i))
             g.cancel_lines += S.hud('warn', on=0) + [x for x in (api.arena_look('crimson'),) if x]

@@ -3,7 +3,7 @@
 # (the END translation), dly:<ticks hidden before it shows>, dur:<ticks of the main interpolation, 0 = up to
 # the fade>, hit:<ticks after the call when the tint becomes col2, -1 = never>, col2:<RGB int>, pl:<pool: 0 fx
 # (cap 96), 1 ambient (cap 48), 2 afterimage (cap 4)>, tg:<the pool tag rlk_hr_fx_c / _a / _i>.
-execute unless data storage rlk:hr fx{init:1b} run function rlk:boss/scarlet/fx/e/init
+execute unless data storage rlk:hr fx{init:2b} run function rlk:boss/scarlet/fx/e/init
 $scoreboard players set #pool hrFx $(pl)
 $data modify storage rlk:hr fx.a set value {kind:"$(kind)",pos:"$(pos)",rot:"$(rot)",bb:"$(bb)",s0:"$(s0)",s1:"$(s1)",off:"$(off)",move:"$(move)",col:$(col),col2:$(col2),ax:"0f,0f,1f",tg:"$(tg)",tpd:0}
 $data modify storage rlk:hr fx.a.ax set from storage rlk:hr fx.ax.$(kind)

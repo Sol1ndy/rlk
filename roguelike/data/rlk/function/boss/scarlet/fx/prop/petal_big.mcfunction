@@ -3,7 +3,7 @@
 # @s = the item_display the caller summoned and rotated (dressed in place, idempotent; calling it
 # again with another look re-looks it); any other entity (a marker) gets one follower display the kit keeps
 # on it and removes with it.
-execute unless data storage rlk:hr fx{init:1b} run function rlk:boss/scarlet/fx/e/init
+execute unless data storage rlk:hr fx{init:2b} run function rlk:boss/scarlet/fx/e/init
 $data modify storage rlk:hr fx.lk set value "$(look)"
 execute if entity @s[type=minecraft:item_display] run return run function rlk:boss/scarlet/fx/prop/e/petal_big_x
 function rlk:boss/scarlet/fx/prop/e/link

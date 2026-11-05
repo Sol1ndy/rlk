@@ -152,7 +152,8 @@ def rec(s):
                 php=s.sc(('e', pl.id), 'curHealth') if pl else None, alive=b is not None,
                 # I1: the ghost form (S4) and the shown clip tick of the real rig (S2a: hrRigT / hrRigC on the body)
                 ghost=bool(b and 'rlk_hr_ghost' in b.tags), rigt=s.sc(('e', b.id), 'hrRigT') if b else None,
-                rigc=s.sc(('e', b.id), 'hrRigC') if b else None, rvw=hr(s, '#rvw'))
+                rigc=s.sc(('e', b.id), 'hrRigC') if b else None, rvw=hr(s, '#rvw'),
+                hold=(s.sc(('e', pl.id), 'hudHold') or 0) if pl else None)     # F2 (HR-29): the player's HUD hold after the tick
 
 
 def run(s, n, each=None, heal=True):
@@ -971,20 +972,121 @@ def sec_ai():
 
 
 # ================================================================================================= bars
+def hud_tick(s):
+    """F2 (HR-29): the player's actionbar HUD tick before the module's (F:player/hud/tick: while hudHold >= 1 it rests and
+    counts it down; the sim does not run it): a sequence that holds the HUD sets it back to 2 each tick."""
+    pl = s.player()
+    if pl and (s.sc(('e', pl.id), 'hudHold') or 0) >= 1:
+        s.setsc(('e', pl.id), 'hudHold', s.sc(('e', pl.id), 'hudHold') - 1)
+
+
+# F2 round 1 (VF2-1-02): the HUD-off sequences blank the actionbar once at their start (the game keeps the last one ~60 t)
+HUD_OFF_SEQ = ('intro', 'cs1', 'ending', 'event')
+BLANK = '@a[tag=player] actionbar ""'
+
+
+def watch_starts(s, names=HUD_OFF_SEQ):
+    for n in names:
+        s.watch[f'rlk:boss/scarlet/seq/{n}/start'] = []
+
+
+def blank_at_start(s, name):
+    """(ok, detail): seq/<name>/start ran and the same tick sent the empty actionbar"""
+    ts = [t for t, *_ in s.watch.get(f'rlk:boss/scarlet/seq/{name}/start', [])]
+    blank = {t for t, x in s.titles if x.strip() == BLANK}
+    return bool(ts) and all(t in blank for t in ts), (name, ts, sorted(blank)[:4])
+
+
+# F2 round 1 (V2R-02): the framework shows the bars in mboss/start_go after her spawn hook; F-I guards that show with
+# #mbBarOff (f2_requests f2-8, start_go is pack-wide). Until the guard is in the tree the test emulates it, so the module's part
+# (her spawn turns the bars off) is still proven end to end; with the guard present the real file runs.
+START_GO_GUARD = 'execute unless score #mbBarOff mb matches 1 run function rlk:mboss/bars_show'
+
+
+def bar_log(s, log):
+    log.append((s.t, s.bars.get('rlk:mboss'), mb(s, '#mbBarOff')))
+
+
+def bars_intro_world(seed):
+    """world(seed, intro=True) with logs from the rift on: [(t, rlk:mboss visible, #mbBarOff)] after every tick, the
+    start_go tick and the HUD-off sequence starts; returns (s, pl, log, start_go tick, guard in the tree)"""
+    s, pl = H.setup_sc(var('base'), seed=seed)
+    lines = s.load('rlk:mboss/start_go')
+    guarded = any(START_GO_GUARD in x for x in lines)
+    if not guarded:
+        s.cache['rlk:mboss/start_go'] = [START_GO_GUARD if x.strip() == 'function rlk:mboss/bars_show' else x for x in lines]
+    s.watch['rlk:mboss/start_go'] = []
+    watch_starts(s)
+    log = []
+    z, a = H.rift_zone(s, 'scarlet')
+    s.player().pos = list(a.pos)
+    r = H.enter(s, a)
+
+    def cond(ss):
+        bar_log(ss, log)
+        return (body(ss) is not None and mb(ss, '#mbSt') == 0 and hr(ss, '#ph') == 0 and hr(ss, '#sq') >= 1)
+    ok = bool(r) and H.until_sc(s, cond, 900)
+    assert ok, 'the fight did not start'
+    s.zone_sc = z
+    sg = [t for t, *_ in s.watch['rlk:mboss/start_go']]
+    return s, pl, log, (sg[0] if sg else None), guarded
+
+
 def sec_bars():
     s, pl = world(81)
     n0 = len(s.bar_draws)
+    watch_starts(s)
     test(s, 20)
     t0 = s.t
-    ok, R = until(s, lambda s: hr(s, '#ph') == PH['sq1'], 400)
+    ok, R = until(s, lambda s: hr(s, '#ph') == PH['sq1'], 400, each=hud_tick)
     t1 = s.t
     draws_cs1 = [t for t in s.bar_draws[n0:] if t0 < t < t1]
     check('B1 CS1: bars_off (#mbBarOff 1), no bar drawn for its 213 t', ok and not draws_cs1 and all(r['baroff'] == 1 for r in R[:-1]),
           (ok, draws_cs1[:3]))
-    R2 = run(s, 3)
+    # F2 (HR-29): the player's actionbar HUD held (hudHold >= 1 after every tick: player/hud/tick rests) through CS1
+    ok6, why6 = blank_at_start(s, 'cs1')
+    check('B6 CS1: the player HUD held every tick (hudHold >= 1), the actionbar blanked at its start',
+          ok and ok6 and all(r['hold'] >= 1 for r in R[:-1]), ([(r['t'], r['hold']) for r in R[:-1] if r['hold'] < 1][:4], why6))
+    R2 = run(s, 3, each=hud_tick)
     check('B2 SQ1 tick 0: bars_on (#mbBarOff 0), drawn again, the shield under bar (#buSub 5)',
           [t for t in s.bar_draws if t > t1] and mb(s, '#mbBarOff') == 0 and s.sc('#buSub', 'bu') == API.PIPS,
           (s.bar_draws[-3:], mb(s, '#mbBarOff'), s.sc('#buSub', 'bu')))
+    check('B7 SQ1: the HUD is back (no hold)', R2[-1]['hold'] == 0, R2[-1]['hold'])
+    # F2 (HR-29): CS0 shows no boss bar (bars off at the intro's start; the original's bar grows at control, f498) and holds the
+    # player HUD; at control the bars come back, the HP bar filling over its first 30 t (mboss/bars_ramp)
+    s, pl, blog, tsg, guarded = bars_intro_world(83)
+    n0 = len(s.bar_draws)
+    t0 = s.t
+    ok, R = until(s, lambda s: (bar_log(s, blog), hr(s, '#ph') == PH['p1'])[1], API.SEQ_LEN['intro'] + 200, each=hud_tick)
+    t1 = s.t
+    intro = [r for r in R if r['ph'] == PH['intro']]
+    draws = [t for t in s.bar_draws[n0:] if t0 <= t < t1]
+    check('B3 CS0: no boss bar drawn (#mbBarOff 1) until control', ok and len(intro) > 500 and not draws
+          and all(r['baroff'] == 1 for r in intro), (ok, len(intro), draws[:3], sorted({r['baroff'] for r in intro})))
+    # V2R-02: from the start_go tick on (her spawn: bars off) the boss bar is never on screen until control (t1: P1)
+    at_sg = [(t, v, off) for t, v, off in blog if t == tsg]
+    shown = [t for t, v, _off in blog if tsg is not None and tsg <= t < t1 and v]
+    check('B3a her spawn hook turns the bars off before the framework\'s show (#mbBarOff 1 at the end of the start_go tick)',
+          tsg is not None and at_sg and at_sg[0][2] == 1, (tsg, at_sg))
+    check(f'B3b the boss bar never visible from start_go to control (start_go\'s show {"guarded" if guarded else "guard EMULATED"})',
+          tsg is not None and not shown, (tsg, shown[:4]))
+    if not guarded:
+        print('B3b: PENDING F-I (f2_requests f2-8): rlk:mboss/start_go still shows the bars unguarded; B3b ran with the guard '
+              'emulated in the sim')
+    ok4, why4 = blank_at_start(s, 'intro')
+    check('B4 CS0: the player HUD held every tick, the actionbar blanked at its start', ok and ok4
+          and all(r['hold'] >= 1 for r in intro), ([(r['t'], r['hold']) for r in intro if r['hold'] < 1][:4], why4))
+    ramp = []
+    R3 = run(s, 32, each=lambda ss: ramp.append(ss.sc('#buHp', 'bu')))
+    hpv = [v for v in ramp[1:] if v is not None]
+    check('B5 control: the bars back (#mbBarOff 0, drawn), the HP bar filling over 30 t (mboss/bars_ramp), then full',
+          mb(s, '#mbBarOff') == 0 and [t for t in s.bar_draws if t > t1] and hpv and hpv[0] < hpv[-1]
+          and all(a <= b for a, b in zip(hpv, hpv[1:])), (mb(s, '#mbBarOff'), hpv[:4], hpv[-2:]))
+    # LF-01: the moon halo's point written exactly (x / z with a decimal point: the game block-centres a whole x / z)
+    halo = [l for f in ('core/deco', 'core/deco_re') for l in (FN / f'{f}.mcfunction').read_text(encoding='utf-8').split('\n')
+            if 'summon minecraft:item_display' in l and 'rlk_hr_deco_moon_halo' in l]
+    loose = [l for l in halo if not re.search(r'summon minecraft:item_display -?\d+\.\d+ -?[\d.]+ -?\d+\.\d+ ', l)]
+    check('LF-01: the halo summons (core/deco, core/deco_re) keep x / z exact', len(halo) == 3 and not loose, (len(halo), loose[:1]))
 
 
 # ================================================================================================= look (theme build)
@@ -1212,18 +1314,29 @@ def sec_cs4():
     ending ticks 300-1042 stays 3.5-6 b (PLAN §9.3; S2b's ev_dry.py checks the same in a dry run of seq/ending alone)."""
     s, pl = world(71)
     H.place_player(s, API.CX + 0.5, API.CZ + 6.0)
+    watch_starts(s)
     test(s, 28)
-    ok, R = until(s, lambda s: hr(s, '#sqn') == SEQ['ending'], 900)
+    ok, R = until(s, lambda s: hr(s, '#sqn') == SEQ['ending'], 900, each=hud_tick)
     p0 = list(s.player().pos)
     dist = {}
 
     def pin(ss):
         ss.player().pos = list(p0)
+        hud_tick(ss)
         if hr(ss, '#sqn') == SEQ['ending']:
             b = body(ss)
             dist[hr(ss, '#sq')] = math.hypot(b.pos[0] - p0[0], b.pos[2] - p0[2])
 
     ok2, R2 = until(s, lambda s: hr(s, '#sqn') == SEQ['event'], API.SEQ_LEN['ending'] + 20, each=pin)
+    # F2 (HR-29): CS4 and the event coda hold the player HUD every tick; CS3 (repel) keeps it
+    ok3, R3 = until(s, lambda s: hr(s, '#sqn') != SEQ['event'], API.SEQ_LEN['event'] + 20, each=pin)
+    held = [r for r in R2 + R3 if r['sqn'] in (SEQ['ending'], SEQ['event'])]
+    rep = [r for r in R if r['sqn'] == SEQ['repel']]
+    oke, whye = blank_at_start(s, 'ending')
+    okv, whyv = blank_at_start(s, 'event')
+    check('C42 CS4 + the coda: the player HUD held every tick (hudHold >= 1), the actionbar blanked at each start; CS3 keeps '
+          'the HUD', len(held) > API.SEQ_LEN['ending'] and all(r['hold'] >= 1 for r in held) and rep and any(r['hold'] == 0 for r in rep)
+          and oke and okv, (len(held), [(r['t'], r['sqn'], r['hold']) for r in held if r['hold'] < 1][:4], len(rep), whye, whyv))
     late = [dist[k] for k in range(300, API.SEQ_LEN['ending']) if k in dist]
     check(f'C41 CS4 (the full core path): her distance to an unmoving player over ending ticks 300-{API.SEQ_LEN["ending"] - 1} '
           f'stays 3.5-6 b ({min(late or [0]):.2f}-{max(late or [0]):.2f}, {len(late)} ticks)',

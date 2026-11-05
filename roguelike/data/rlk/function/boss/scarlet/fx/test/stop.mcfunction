@@ -2,5 +2,5 @@
 # Remove the demo stand-in and the test props; the floor back to the arena's.
 kill @e[tag=rlk_hr_fx_demo]
 schedule clear rlk:boss/scarlet/fx/test/e/tick
-execute if data storage rlk:hr fx{init:1b} run scoreboard players set #demo hrFx 0
-execute if data storage rlk:hr fx{init:1b} run data modify storage rlk:hr fx.fl set value 20100
+execute if data storage rlk:hr fx{init:2b} run scoreboard players set #demo hrFx 0
+execute if data storage rlk:hr fx{init:2b} run data modify storage rlk:hr fx.fl set value 20100

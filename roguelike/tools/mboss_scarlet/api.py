@@ -446,6 +446,14 @@ LINE_AT = {1: ('intro', 20, 40), 2: ('intro', 62, 40), 3: ('intro', 104, 40), 4:
            17: ('ending', 300, 60), 18: ('ending', 368, 68), 19: ('ending', 448, 45), 20: ('ending', 536, 119),
            21: ('ending', 664, 130), 22: ('ending', 800, 130), 23: ('ending', 936, 90),
            24: ('event', 4, 48), 25: ('event', 4, 48)}    # 24 item branch, 25 buff branch (EVENT['lines'])
+# F2 (HR-16): a line wider than LINE_MAX_PX font px (the subtitle is drawn at 2x and never wraps: 192 px fits the Auto GUI
+# width of 1920 x 1200, 384 GUI px, and every wider one) is shown as consecutive subtitles split at its natural pause, typed
+# one after the other inside its LINE_AT hold (the hold split by the pages' widths); the pages joined with one space are the
+# line verbatim (LINES stays whole). As the footage shows its long line as two subtitles (15 / 16).
+LINE_MAX_PX = 192
+LINE_PAGES = {5: ('그리고 이제 친구가 와 주었으니', '월하독작이 아니라, 대작이 되겠구만.'),
+              22: ('어디 보자,', '낭자네에선 이렇게 인사한다고 들었는데...'),
+              24: ('조심하게. 칼자루를 쥐었다고', '그 검의 주인이 되는 것은 아니니.')}
 MUSIC_AT = {1: ('intro_end', 'music'), 2: ('cs1', 'music'), 3: ('ending', 'music')}   # api.music(ph) at these events
 
 # =============================================================================================
@@ -716,7 +724,8 @@ HITS['r2'] = [('a7_throw', 'release', 'pj_disc', (DISC['hr'], DISC['speed'], DIS
 # ticks; c per §2 (1 lilac, 2 pink-magenta, 3 yellow, 4 crimson, 5 white); look / g are names (quoted macro strings).
 KIT_MANIFEST = _TOOLS / 'mboss_hr_fx_manifest.json'
 KIT_PRESETS = {                       # fx/p/<name> (position / rotation = the effect)
-    'qi_arc': ['r', 'yaw', 'pitch', 'roll', 'c'], 'qi_ring': ['r', 'c'], 'qi_band': ['len', 'yaw', 'pitch', 'roll'],
+    # F2 (HR-32): qi_band's sw = the forward sweep (tenths; A8.2 25 = the 2.5 b it always had, CS4 E1b her distance + 1 b)
+    'qi_arc': ['r', 'yaw', 'pitch', 'roll', 'c'], 'qi_ring': ['r', 'c'], 'qi_band': ['len', 'yaw', 'pitch', 'roll', 'sw'],
     'qi_x': ['r'], 'qi_dome': ['r'], 'qi_vert': ['h', 'yaw', 'c'], 'qi_fan': ['h', 'c'], 'qi_wedge': ['r', 'roll'],
     'qi_ribbon': [], 'qi_line': ['len'], 'qi_cut': ['len'], 'glint': ['c'], 'star4': [], 'yellow_tell': ['t'],
     'ghost_burst': [], 'ghost_trail': ['len'], 'ghost_flash': [], 'afterimage': ['len'], 'blink_bubble': [],
@@ -867,6 +876,12 @@ OVERLAYS = {'black': 0xEC10, 'negative': 0xEC11, 'pinkwhite': 0xEC12, 'red_tint'
 VIG = 0xEC16                     # §7.4.5: the edge-only vignette glyph (centre clear) SR's hand-written item code titles
 OVERLAY_GLYPH = (144, 81)
 KIT_FIXED = ('card', 'cardx', 'look', 'clear', 'uninstall')     # fx/<name> (no args)
+# F2 (HR-17 / HR-23): two switches around preset calls (fx/<name>, no args). keep_on .. keep_off: the cards made meanwhile
+# carry rlk_hr_fx_keep and survive fx/clear and the ager's dead / revive clear (the instant death's line, CS3's kick); the
+# module's cleanup and fx/uninstall still remove them. follow_on (@s = the lead: her body) .. follow_off: the cards made
+# meanwhile follow the lead every tick (its x / z, their own height over it).
+KIT_FIXED += ('keep_on', 'keep_off', 'follow_on', 'follow_off')
+KIT_KEEP_TAG = 'rlk_hr_fx_keep'
 FX_CARD_CAP, AMBIENT_CARD_CAP = 96, 48                           # the 아를레키노 caps; the ager kills the oldest
 AFTERIMAGE_MAX, AFTERIMAGE_FADE = 4, 6                           # one silhouette card per frame, <= 4 alive, fades 6 t
 # Kit sprites in the items atlas (the §9.2 table): name -> ((frames, w, h), ...); the kit generator asserts its sprites
@@ -921,6 +936,12 @@ class _Kit:
 
     def p(self, name, **a):
         return self._call('p/', KIT_PRESETS, name, a)
+
+    def pw(self, name, path):
+        """fx/p/<name> with storage <path> (F2: arguments computed at run time, e.g. A9's probed streak length core.a9,
+        CS4 E1b's band sweep); the compound must hold every arg of the preset (extra keys are allowed)."""
+        assert name in KIT_PRESETS and KIT_PRESETS[name], f'kit p/{name}: no macro args'
+        return f'function {NS}fx/p/{name} with storage {path}' if self._on() else ''
 
     def prop(self, name, **a):
         assert name in KIT_PROPS, f'kit prop/{name} is not in the contract'
@@ -1332,6 +1353,7 @@ def _check_contract():
         assert key in HITS, key
     assert sorted(LINES) == list(range(1, 26)) and all(LINES.values())
     assert sorted(LINE_AT) == sorted(LINES), 'every line has a place'
+    assert all(i in LINES and len(p) >= 2 and ' '.join(p) == LINES[i] for i, p in LINE_PAGES.items()), 'LINE_PAGES verbatim'
     for i, (where, t, hold) in LINE_AT.items():
         assert i in LINES and hold > 0
         if where in CLIPS:
