@@ -12,8 +12,12 @@ lore parsed back.
           the status format = api.EV_TEXT['status'], static rules
   stat    stat_buffs adds exactly +20 ampAtk / +10 crit / +10 move when hrMoon 1, nothing when 0
   atk     final ATK = old x 1.20 (+-1) through the real stat_light (several bases / % / flat), crit and move final values
-  reset   reset_one clears it (run scope); the documented forever switch (that line removed) keeps it; uninstall removes it
-  lore    the stat-item lore line present iff on, its numbers = the constants (also changed ones), the hash changes with it
+  reset   reset_one clears it (run scope); the documented forever switch (F3, HR-11: load's #hrMoonRun 0) keeps it; uninstall
+          removes it
+  lore    the stat-item lore line present iff on, its numbers = the constants (also changed ones), its scope word from
+          #hrMoonRun ("이번 런" / "영구", F3 HR-11), the hash changes with it
+  F3 (HR-11): the scope is one switch: api.EVENT['buff_scope'] (the event texts) and load's 조절 지점 (#hrMoon* =
+  api.BUFF_VALUES[scope], #hrMoonRun 1 / 0) agree; reset_one and update_item read #hrMoonRun (no line to delete)
 """
 import copy
 import re
@@ -37,6 +41,8 @@ N = [0]
 OBJ = API.BUFF_OBJ
 FPA, FPC, FPS = API.BUFF_FP
 RUN = API.BUFF_VALUES['run']
+# F3 (HR-11): the scope words (api.BUFF_SCOPE_WORDS; the literal fallback lets the suite run on a tree before F3)
+SCOPE_WORDS = getattr(API, 'BUFF_SCOPE_WORDS', {'run': ('이번 런 동안', '이번 런'), 'forever': ('영구히', '영구')})
 
 
 def ck(name, ok, info=''):
@@ -72,7 +78,19 @@ def t_static():
     ck('uninstall: objective removed once (beside nodeHp)', un.count('scoreboard objectives remove hrMoon') == 1
        and un.index('scoreboard objectives remove hrMoon') == un.index('scoreboard objectives remove nodeHp') + 1)
     ro = lines('player/reset_one')
-    ck('reset_one: run scope line', ro.count('scoreboard players set @s hrMoon 0') == 1)
+    ck('reset_one: the scope line reads load\'s #hrMoonRun (HR-11: run unless 0)',
+       ro.count('execute unless score #hrMoonRun tmp matches 0 run scoreboard players set @s hrMoon 0') == 1
+       and 'scoreboard players set @s hrMoon 0' not in ro, [l for l in ro if 'hrMoon' in l])
+    scope = API.EVENT['buff_scope']
+    run_flag = 1 if scope == 'run' else 0
+    vals = [f'scoreboard players set {fp} tmp {v}' for fp, v in zip(API.BUFF_FP, API.BUFF_VALUES[scope])]
+    flag = f'scoreboard players set #hrMoonRun tmp {run_flag}'
+    ck(f'HR-11 one switch: load\'s 조절 지점 = api.EVENT buff_scope "{scope}" (#hrMoon* = api.BUFF_VALUES[{scope}], '
+       f'#hrMoonRun {run_flag} right after them)', flag in ld and all(v in ld for v in vals)
+       and ld.index(flag) == ld.index(vals[-1]) + 1, [l for l in ld if '#hrMoon' in l])
+    cm = ld[ld.index(vals[0]) - 3:ld.index(vals[0])]
+    ck('HR-11 load: the switch comment names #hrMoonRun 0, the forever values and api.EVENT buff_scope',
+       any('#hrMoonRun 0' in l for l in cm) and any("EVENT['buff_scope']" in l for l in cm), cm)
     sb = [l for l in lines('items/hook/stat_buffs') if 'hrMoon' in l]
     ck('stat_buffs: one line', sb == ['execute if score @s hrMoon matches 1.. run function rlk:player/hr_moon/apply'], sb)
     ap = lines('player/hr_moon/apply')
@@ -85,8 +103,12 @@ def t_static():
     m = re.search(r'set value (\{translate:"rlk\.hr_moon".*\})$', ui, re.M)
     ck('update_item: the on-line is a translate with fallback', bool(m))
     comp = S.snbt_parse(m.group(1))
-    ck('status format with the run constants = api.EV_TEXT status', S.render(dict(comp, **{'with': list(RUN)})) == API.EV_TEXT['status'],
-       S.render(dict(comp, **{'with': list(RUN)})))
+    ck('status format with the run constants = api.EV_TEXT status', S.render(dict(comp, **{'with': list(RUN) + ['이번 런']}))
+       == API.EV_TEXT['status'], S.render(dict(comp, **{'with': list(RUN) + ['이번 런']})))
+    ck('HR-11 update_item: the scope word is with[3] ("이번 런"), "영구" when #hrMoonRun 0',
+       comp.get('with', [None] * 4)[3:] == [SCOPE_WORDS['run'][1]]
+       and f'execute if score @s hrMoon matches 1.. if score #hrMoonRun tmp matches 0 run data modify storage rlk:item moon.with[3] '
+           f'set value "{SCOPE_WORDS["forever"][1]}"' in ui.split('\n'), comp.get('with'))
     ck('status line colour #DDE6FF, not italic', comp.get('color') == '#DDE6FF' and comp.get('italic') == 0)
     ck('update_item: numbers stored from the constants', all(f'run scoreboard players get {fp} tmp' in ui for fp in API.BUFF_FP))
     um = rd('player/update_item_macro')
@@ -157,8 +179,15 @@ def t_atk():
 
 
 # ================================================================================================== reset
+def load_k(s):
+    """load's 조절 지점 lines of the buff (#hrMoon* incl. #hrMoonRun) run in s."""
+    s.cache['rlk:srtest/moon_k'] = [l for l in rd('load').split('\n') if l.startswith('scoreboard players set #hrMoon')]
+    s.call('rlk:srtest/moon_k', S.C0)
+
+
 def reset_world():
     s, pl = S.world(DP)
+    load_k(s)
     for f in ('rlk:char/start_reset', 'rlk:lvup/exit', 'rlk:player/init', 'rlk:lvup/init', 'rlk:items/tune/reapply_all',
               'rlk:player/reset_stacks', 'rlk:element/infuse_end', 'rlk:items/equip_scan'):
         s.cache[f] = []                    # the heavy calls of reset_one (not this buff); its own lines run for real
@@ -173,15 +202,23 @@ def t_reset():
     s.call('rlk:player/reset_one', S.pctx(s, pl))
     ck('reset_one (run scope): hrMoon 0', s.sc(P, OBJ) == 0)
     ck('reset_one: sapphire kept (the only cross-run value)', s.sc(P, 'sapphire') == 7)
-    # the forever switch of PLAN §7.5.3 / the comment above the line: drop that line
+    # the forever switch of PLAN §7.5.3 (F3, HR-11): load's #hrMoonRun 0, nothing to delete
     src = rd('player/reset_one').split('\n')
-    ck('reset_one: the switch is documented right above the line', '영구' in src[src.index('scoreboard players set @s hrMoon 0') - 1])
+    gl = 'execute unless score #hrMoonRun tmp matches 0 run scoreboard players set @s hrMoon 0'
+    ck('reset_one: the switch is documented right above the line', gl in src and '영구' in src[src.index(gl) - 1])
     s, pl = reset_world()
     P = ('e', pl.id)
-    s.cache['rlk:player/reset_one'] = [l for l in src if l != 'scoreboard players set @s hrMoon 0']
+    s.setsc('#hrMoonRun', 'tmp', 0)
     s.setsc(P, OBJ, 1)
     s.call('rlk:player/reset_one', S.pctx(s, pl))
-    ck('forever switch (line removed): hrMoon kept', s.sc(P, OBJ) == 1)
+    ck('HR-11 forever switch (load\'s #hrMoonRun 0): hrMoon kept by reset_one', s.sc(P, OBJ) == 1)
+    s, pl = S.world(DP)
+    for f in ('rlk:char/start_reset', 'rlk:lvup/exit', 'rlk:player/init', 'rlk:lvup/init', 'rlk:items/tune/reapply_all',
+              'rlk:player/reset_stacks', 'rlk:element/infuse_end', 'rlk:items/equip_scan'):
+        s.cache[f] = []
+    s.setsc(('e', pl.id), OBJ, 1)
+    s.call('rlk:player/reset_one', S.pctx(s, pl))
+    ck('reset_one without load\'s constant (#hrMoonRun unset): the run scope (cleared)', s.sc(('e', pl.id), OBJ) == 0)
     # run start / run failure / rlk:reset reach reset_one (PLAN §7.5.2)
     callers = [p.relative_to(FN).as_posix() for p in FN.rglob('*.mcfunction') if 'function rlk:player/reset_one' in p.read_text(encoding='utf-8')]
     ck('reset_one is reached by run start / run fail / reset', all(any(c.startswith(x) for c in callers) for x in ('run/start', 'run/fail', 'reset')), callers)
@@ -237,6 +274,12 @@ def t_lore():
         s.setsc(fp, 'tmp', v)
     on2, _, _ = item_lore(s, pl)
     ck('changed constants: the line shows them', on2[-1] == '☾ 월하대작 · 최종 공격력 +25% · 치명타 확률 +12% · 이동 속도 +7% (이번 런)', on2[-1])
+    for fp, v in zip(API.BUFF_FP, API.BUFF_VALUES['forever']):
+        s.setsc(fp, 'tmp', v)
+    s.setsc('#hrMoonRun', 'tmp', 0)
+    on3, _, _ = item_lore(s, pl)
+    ck('HR-11 the forever switch (8 / 4 / 4, #hrMoonRun 0): the line shows "(영구)" and the numbers',
+       on3[-1] == '☾ 월하대작 · 최종 공격력 +8% · 치명타 확률 +4% · 이동 속도 +4% (영구)', on3[-1])
     RENDER['off'], RENDER['on'] = off, on
 
 

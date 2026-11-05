@@ -685,15 +685,24 @@ def hooks(W, ctx):
         fn('core/look'), api.rig('tick')])
     kills = [f'kill @e[tag={t}]' for t in TAGS_ALL if t != api.TAGS['ghost']] + \
         [f'tag @e[tag={api.TAGS["ghost"]}] remove {api.TAGS["ghost"]}']
-    resets = [f'scoreboard players reset {k} {OBJ}' for k in S.FP] + [f'scoreboard players reset #sq_sig {OBJ}']
+    # F3 (HR-05): every fake player of objective hr goes, not only the core's (S.FP): the patterns' #<key>_*, the ghost
+    # helpers' #g_* / #r2_*, the sequences' #sq_* (contract §2 prefixes) — the event scores api.EV_FP are kept through a
+    # save / `reset * hr` / restore (the reward hook reads them after this; tmp holders <name>K, removed again), and
+    # storage seq.* (seq.g of lead_stand) goes with core.*
+    keep = [f'scoreboard players add {k} {OBJ} 0' for k in api.EV_FP] \
+        + [f'scoreboard players operation {k}K tmp = {k} {OBJ}' for k in api.EV_FP]
+    resets = keep + [f'scoreboard players reset * {OBJ}'] \
+        + [f'scoreboard players operation {k} {OBJ} = {k}K tmp' for k in api.EV_FP] \
+        + [f'scoreboard players reset {k}K tmp' for k in api.EV_FP]
     cl = ['# Hook cleanup (no executor; idempotent; won / cancel / defeat / map change): every state, hazard and marker of the',
-          '# module, the kit cards and HUD, the rig, every rlk_hr_* entity, the core\'s scores (init / spawn make them again) and',
-          '# storage core.*. Never the event scores (api.EV_FP) nor ev.*: the reward hook reads them after this.',
+          '# module, the kit cards and HUD, the rig, every rlk_hr_* entity, every fake player of objective hr (init / spawn make',
+          '# them again) and storage core.* / seq.*. Never the event scores (api.EV_FP, saved around `reset *`) nor ev.*: the',
+          '# reward hook reads them after this.',
           fn('core/stop_all')]
     for name in api.SEQS:
         cl.append(seq(ctx, name, 'cancel'))
     cl += [x for x in (K.fixed('clear'),) if x] + S.hud('clear') + warn(0) + [at_body(api.rig('kill'))] + kills + resets \
-        + [f'data remove storage {api.STORAGE} core']
+        + [f'data remove storage {api.STORAGE} core', f'data remove storage {api.STORAGE} seq']
     w('cleanup', cl)
     un = ['# Hook uninstall (no executor; every enabled module): the kit, the rig, every rlk_hr_* entity, objective hr (incl. the',
           '# event scores), storage rlk:hr.']

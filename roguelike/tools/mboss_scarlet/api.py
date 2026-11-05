@@ -1203,12 +1203,20 @@ BUFF_NAME = '월하대작'
 BUFF_FP = ('#hrMoonAtk', '#hrMoonCrit', '#hrMoonSpd')   # objective tmp, set in load's 조절 지점 (SR)
 BUFF_VALUES = {'run': (20, 10, 10), 'forever': (8, 4, 4)}   # ampAtk / critChance / moveSpeed for each scope
 ITEM_SND = tuple(f'f{i}' for i in range(422, 430))  # F:snd/f422-f429 with keys #k352-#k359 (SR)
+# F3 (HR-33 / HR-35 / HR-11): the texts as rendered with the default constants (run scope, 20 / 10 / 10; item at ★☆☆). The
+# coda's 4x item title is the name + the item's own stars (<= 106 font px; the stars are read from rlk:items at run time) with
+# 「[ MYTHIC ]」 on the subtitle; the buff's numbers are score components of BUFF_FP: the first two on the subtitle (<= 192 font
+# px), the third on the actionbar for the same 54 t; the rift chat record names the full display name / all three numbers with
+# the scope words of EVENT['buff_scope'] (BUFF_SCOPE_WORDS; the stat line's word follows load's #hrMoonRun).
 EV_TEXT = {'line_item': '조심하게. 칼자루를 쥐었다고 그 검의 주인이 되는 것은 아니니.',
            'line_buff': '한잔할 텐가? 안주는 달빛과 바람일세.',
-           'item_title': '[ MYTHIC ] 화무십일홍 ★☆☆',
-           'item_sub': '신화 아이템을 얻었습니다',
+           'item_title': '화무십일홍 ★☆☆',
+           'item_sub': '[ MYTHIC ] 신화 아이템을 얻었습니다',
+           'item_name': '[ MYTHIC ] 화무십일홍 ★☆☆',
            'buff_title': '월하대작',
-           'buff_sub': '최종 공격력 +20% · 치명타 확률 +10% · 이동 속도 +10%',
+           'buff_stats': '최종 공격력 +20% · 치명타 확률 +10% · 이동 속도 +10%',
+           'buff_sub': '최종 공격력 +20% · 치명타 확률 +10%',
+           'buff_ab': '이동 속도 +10%',
            'return_title': '홍련 도전 성공',
            'return_sub': '레벨 업 · 아이템 상자 1개',
            'chat_item': '[월하의 선물] 신화 아이템 ',
@@ -1216,6 +1224,13 @@ EV_TEXT = {'line_item': '조심하게. 칼자루를 쥐었다고 그 검의 주�
            'chat_full': '[월하의 선물] 보유 칸이 가득 차서 화무십일홍을 발밑에 놓았습니다.',
            'chat_test': '[특수 보스 테스트] 도전 성공! 균열 자리에 아이템 상자가 떨어졌습니다(누르면 아이템 선택). [다시 하기] [로비로]',
            'status': '☾ 월하대작 · 최종 공격력 +20% · 치명타 확률 +10% · 이동 속도 +10% (이번 런)'}
+BUFF_SCOPE_WORDS = {'run': ('이번 런 동안', '이번 런'), 'forever': ('영구히', '영구')}   # (the rift chat line, the stat line)
+EV_CHAT_BUFF_HEAD = '[월하의 선물] 월하대작 — '
+assert EVENT['buff_scope'] in BUFF_SCOPE_WORDS
+assert EV_TEXT['chat_buff'] == f"{EV_CHAT_BUFF_HEAD}{BUFF_SCOPE_WORDS['run'][0]} {EV_TEXT['buff_stats']}"
+assert EV_TEXT['buff_stats'] == f"{EV_TEXT['buff_sub']} · {EV_TEXT['buff_ab']}"
+assert EV_TEXT['status'] == f"☾ {BUFF_NAME} · {EV_TEXT['buff_stats']} ({BUFF_SCOPE_WORDS['run'][1]})"
+assert EV_TEXT['item_name'] == f"[ MYTHIC ] {EV_TEXT['item_title']}" and EV_TEXT['item_title'].startswith(ITEM_NAME + ' ')
 
 
 def reward_ready():
