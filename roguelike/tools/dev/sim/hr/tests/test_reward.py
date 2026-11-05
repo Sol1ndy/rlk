@@ -21,7 +21,9 @@ tagged rlk_daura at the executor).
           full notice, the return title words); the coda lines = api.LINES 24 / 25 (kit build: fx/hud/line {id}); no
           other title / chat line of the module during the coda. F3 (HR-33): the item title and the chat record carry the
           item's own star colours (rlk:items stars, read at run time: gold ★, grey ☆); F3 (HR-35): the 4x title <= 106
-          font px, the subtitles <= 192 font px (26.3 glyph advances), the buff's third number on the actionbar
+          font px, the subtitles <= 192 font px (26.3 glyph advances), the buff's third number on the actionbar, held
+          for the title's time (VF3-1-01: a coda run with the REAL player/hud/tick each tick: ev/title at E56 leaves
+          hudHold = its `times` total 54, the HUD draws nothing and no other actionbar comes E57-E110, the HUD after)
   scope   F3 (HR-11): the buff's numbers (title subtitle / actionbar / rift chat) follow load's constants; the rift chat's
           scope words follow api.EVENT['buff_scope'] (dry build 'forever': 「영구히」 with 8 / 4 / 4)
   F3 (HR-05) in flow: at the reward hook (after cleanup) objective hr holds only the event scores (their values kept) —
@@ -599,6 +601,39 @@ def star_runs(rs):
     return [(t, c) for t, c in rs if set(t) <= {'★', '☆'}]
 
 
+def hud_run(seed=53):
+    """F3 (HR-35, VF3-1-01): the buff branch's coda once more, with the REAL player/hud/tick (the regular actionbar HUD, which
+    skips its draw and counts hudHold down while hudHold >= 1) run as the player every game tick at its place in rlk:tick:
+    in player/tick right after player/elem_tick, so before mboss/main (the coda). Returns s, ev = [(tick, #sq, the
+    actionbars it wrote, the `times` it set, the player's hudHold right after)] per ev/title run, hud = [(tick, drew an
+    actionbar)] per HUD tick; every actionbar of the run is in s.rtitles."""
+    s, pl = world(seed, name='kit', branch='buff', cap=(9, 1))
+    ev, hud = [], []
+    inner = s.call
+
+    def call(fid, ctx, macro=None):
+        if fid == 'rlk:boss/scarlet/ev/title':
+            n_t, n_r = len(s.titles), len(s.rtitles)
+            r = inner(fid, ctx, macro)
+            ev.append((s.t, hr(s, '#sq'), [x for _, k, x in s.rtitles[n_r:] if k == 'actionbar'],
+                       [x.split()[2:] for _, x in s.titles[n_t:] if x.startswith('@a[tag=player] times ')],
+                       s.sc(('e', pl.id), 'hudHold') or 0))
+            return r
+        r = inner(fid, ctx, macro)
+        if fid == 'rlk:player/elem_tick' and not s.stack:
+            n = len(s.rtitles)
+            inner('rlk:player/hud/tick', H.Ctx(pl, tuple(pl.pos), tuple(pl.rot)))
+            hud.append((s.t, any(k == 'actionbar' for _, k, _ in s.rtitles[n:])))
+        return r
+    s.call = call
+    kill(s)
+    fast_forward(s, H_END - 2)
+    H.until_sc(s, lambda s: hr(s, '#sqn') == 8, 20, each=H.heal)
+    H.until_sc(s, lambda s: (hr(s, '#sq') or 0) >= API.SEQ_LEN['event'] or hr(s, '#sqn') != 8, 200, each=H.heal)
+    H.run_sc(s, 20, each=H.heal)          # the HUD back after (merged with F2, its coda holds it a few t past E120)
+    return s, ev, hud
+
+
 def sec_words():
     item_name = T.get('item_name', T['item_title'])
     for branch in ('item', 'buff'):
@@ -636,9 +671,23 @@ def sec_words():
                   and ab == [T.get('buff_ab')] and f'{sub[0]} · {ab[0]}' == T.get('buff_stats')
                   and font_w(tt[0], bold=True) is not None and font_w(tt[0], bold=True) * 4 <= 106 * 4,
                   [(x, font_w(x)) for x in sub + ab])
-            hold = s.sc(('e', pl.id), 'hudHold')
-            check('HR-35 buff: the actionbar held for the title\'s time (hudHold set at E56)', 'hudHold' in
-                  (DP / 'data/rlk/function/boss/scarlet/ev/title.mcfunction').read_text(encoding='utf-8'), hold)
+            # VF3-1-01: the hold as behaviour (a sim run of the coda with the real HUD tick), not a substring of ev/title
+            s2, ev, hud = hud_run()
+            t1 = ev[0][0] if len(ev) == 1 else None
+            tt = sum(int(x) for x in ev[0][3][0]) if t1 is not None and len(ev[0][3]) == 1 else 0
+            check('HR-35 buff: ev/title runs once, at E56 (#sq = EV_T grant), writes the third number on the actionbar (= buff_ab) '
+                  'and leaves the player\'s hudHold = the title\'s own time (fade-in + stay + fade-out of its `times` = EV_T '
+                  'black - grant = 54)', t1 is not None and ev[0][1] == API.EV_T['grant'] and ev[0][2] == [T.get('buff_ab')]
+                  and tt == API.EV_T['black'] - API.EV_T['grant'] and ev[0][4] == tt, ev)
+            held = [d for t, d in hud if t1 is not None and t1 < t <= t1 + tt]
+            abar = [(t, x) for t, k, x in s2.rtitles if k == 'actionbar' and t1 is not None and t1 <= t <= t1 + tt]
+            back = [t for t, d in hud if t1 is not None and t > t1 + tt and d]
+            check('HR-35 buff: with the REAL player/hud/tick every game tick (before mboss/main), the regular HUD never overwrites '
+                  'that actionbar while the title shows (the next 54 HUD ticks, E57-E110, draw nothing), no other actionbar '
+                  'reaches the player from E56 to E110 (the buff\'s is the last of E56), and the HUD draws again after',
+                  tt > 0 and len(held) == tt and not any(held) and abar and abar[-1] == (t1, T.get('buff_ab'))
+                  and all(t == t1 for t, _ in abar) and bool(back),
+                  dict(t1=t1, tt=tt, held=f'{len(held)} ticks, {sum(held)} drew', abar=abar[-3:], back=back[:1]))
             check('G2 the coda line of the buff branch = api.LINES 25 (kit fx/hud/line {id:25}) at E4, once', lines == [25]
                   and API.LINES[25] == T['line_buff'], lines)
         other = [x for _, x in s.titles[n_t:] if not x.startswith(('@a[tag=player] title ', '@a[tag=player] subtitle ',
