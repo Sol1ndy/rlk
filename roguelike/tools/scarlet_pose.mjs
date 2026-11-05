@@ -65,7 +65,7 @@ const unit3 = v => { const m = Math.hypot(...v); return v.map(x => x / m); };
 export const SK = {
   hipJ: [.125, 0, 0], waist: [0, .1875, 0], neckB: [0, .5625, 0], shoulder: [.375, .4375, 0],
   armU: .25, fore: .34375, thigh: .375, shin: .390625, ankleY: 0,
-  brim: [0, .567, 0], brimTilt: -6, hatBack: [0, .25, .30], hatHand: HAT.R - .04,
+  brim: [0, .502, 0], brimTilt: 0, hatBack: [0, .25, .30], hatHand: HAT.R - .04,
   brimHold: {r: .44, azAdd: 50, azMin: 70, azMax: 90, dy: -.07},
   sashKnot: [.26, .09, -.10],
   scabHip: [-.25, .19, -.18], scabHipDir: unit3([-.45, -.42, .79]),
@@ -81,9 +81,9 @@ export const HAT_FLOOR_HOLD = .08;
 const FULL = .999;
 // the bounds of the correction guards (their own units: degrees, or cm for the distance guards) and the plan slopes per tick
 export const GUARD_BOUND = {scab: 150, scabY: 90, scabH: 90, hat: 60, strings: 120, sash: 120, drop: 12, closeY: 30, incl: 20, tip: 15, rock: 12,
-  aHeadR: 10, aTorY: 15, aTorP: 15, aTorR: 8, bPush: 35, bTurn: 60, close: 30, hatBackZ: 15, hatPush: 100};
+  aHeadR: 10, aTorY: 15, aTorP: 15, aTorR: 8, bPush: 35, bTurn: 60, close: 30, hatBackZ: 15, hatPush: 100, hatClear: 30, strHead: 150, sashSeat: 120, scabArm: 60, armUp: 101};
 export const GUARD_SLOPE = {scab: 22, scabY: 22, scabH: 22, hat: 22, strings: 22, sash: 22, drop: 1.5, closeY: 5, incl: 5, tip: 5, rock: 5,
-  aHeadR: 5, aTorY: 5, aTorP: 5, aTorR: 5, bPush: 4, bTurn: 15, close: 3, hatBackZ: 3, hatPush: 15};
+  aHeadR: 5, aTorY: 5, aTorP: 5, aTorR: 5, bPush: 4, bTurn: 15, close: 3, hatBackZ: 3, hatPush: 15, hatClear: 15, strHead: 22, sashSeat: 22, scabArm: 5, armUp: 34};
 const D = Math.PI / 180;
 export const dirBE = (b, e = 0) => { const B = b * D, E = e * D; return [-Math.sin(B) * Math.cos(E), Math.sin(E), -Math.cos(B) * Math.cos(E)]; };
 const ID = [0, 0, 0, 1];
@@ -209,6 +209,27 @@ function clearFloor(t, Q, pts, axis, clear, maxDeg = 100, sense = 1, name = null
   return best[1];
 }
 
+// turn a rotation Q about `axis` by the smallest angle (either sense; the planned minimum first) until ok(Q') holds (clearFloor's
+// search with any criterion); returns the new Q
+function turnClear(Q, ok, axis, maxDeg, name) {
+  const a0 = Math.min(GUARD.min[name] || 0, maxDeg);
+  const try1 = sg => {
+    const at = a => (a ? mul(qa(axis, sg * a), Q) : Q);
+    if (ok(at(a0))) return [a0, at(a0)];
+    let lo = a0, hi = null;
+    for (let x = a0 + 4; x <= maxDeg; x += 4) if (ok(at(x))) { hi = x; break; } else lo = x;
+    if (hi === null) return [maxDeg + 1, at(maxDeg)];
+    for (let k = 0; k < 7; k++) { const m = (lo + hi) / 2; if (ok(at(m))) hi = m; else lo = m; }
+    return [hi, at(hi)];
+  };
+  const p1 = try1(1), p2 = try1(-1), pref = GUARD.prefer[name] || 0;
+  let best = p1[0] <= p2[0] ? p1 : p2;
+  if (pref) { const [P, O] = pref > 0 ? [p1, p2] : [p2, p1]; if (P[0] <= maxDeg && P[0] <= O[0] + 30) best = P; }
+  if (best[0] > .5) GUARD.sense[name] = best === p1 ? 1 : -1;
+  GUARD.used[name] = Math.min(best[0], maxDeg);
+  return best[1];
+}
+
 // ---- the item model a part shows in a pose (for its hull; the form / phase swaps keep the geometry) ---------------------------
 export function modelOn(n, p) {
   if (HIDDEN.includes(n)) return 'empty';
@@ -298,7 +319,8 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
         A = lerp(A, add(floorP, rot(Ryaw, [Hy[0], 0, Hy[2] - .36])), wSeat);
       }
       let pole = rot(lf > .5 ? Pq : Ryaw, kp || [s * .12, 0, -1]);
-      // kneeling: the right knee bends toward its spot on the floor, down-forward of the hip joint
+      // kneeling: the right knee bends toward its spot on the floor, down-forward of the hip joint (the bend plane turns at most
+      // 40 deg / tick: the knee lands one tick after the patch's full weight; a faster swing breaks the 120 deg / tick gate)
       if (k === 'r' && wKnee > 0) pole = unit(lerp(unit(pole), unit(rot(Ryaw, [0, -.55, -.83])), wKnee));
       const fwd = rot(lf > .5 ? Pq : Ryaw, [0, 0, -1]);
       // the planted-feet drop: how far the hip joint must come down for the leg to reach a planted target (cm)
@@ -373,7 +395,10 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
       const c = Math.abs(fb - fa) > 1e-6 ? b - fb * (b - a) / (fb - fa) : b - fb;
       a = b; fa = fb; b = Math.max(y0 - .12, Math.min(y0 + .25, c)); fb = at(b);
     }
-    if (wKnee < 1) at(y0 + (b - y0) * wKnee);
+    // at full weight a knee that cannot land this tick (the bend plane still turning) leaves the root where the source has it:
+    // no dip of the hips before the knee lands
+    if (wKnee >= FULL && Math.abs(fb) > .01) b = y0;
+    if (wKnee < 1 || b === y0) at(y0 + (b - y0) * wKnee);
   }
   GUARD.used.drop = Math.min(GUARD_BOUND.drop, (drop + (needDrop > .003 ? needDrop : 0)) * 100);
   part('pelvis', R, Pq); part('torso', Wst, Cq); part('head', Nb, Hq); part('face', Nb, Hq);
@@ -548,6 +573,25 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
     }
     ctsL.length = 0;
     if (hold) {
+      // lying (the DOWN family): the sword arm rests on the floor beside her, the hand outside her hip (0.42 b out in the torso
+      // frame) and lowered until the arm's lowest point is on the floor (bisection), blended in by wLie; before she leaves the
+      // floor (a kip's launch) the arm lifts off over the 3 ticks before (guard armUp, percent, planned from the launch tick);
+      // the grip follows
+      const wRest = wLie >= .5 && shW < .5 && sw === 'hand' ? sm((wLie - .5) / .5) : 0;
+      keep.rest = wRest;
+      if ((prev.rest || 0) > .5 && wRest < .5) GUARD.used.armUp = 100;
+      const wr = Math.min(wRest, 1 - pl('armUp') / 100);
+      if (wr > 0) {
+        const Gt = rot(conj(Cq), sub(G, Wst));
+        const Gx = add(Wst, rot(Cq, [Math.max(Gt[0], .42), Gt[1], Gt[2]]));
+        const lowAt = dy => { solL = armSolve('l', SL, sub(Gx, [0, dy, 0]), poleOf(p.pL, 1)); const E = solL.E, W = solL.W;
+          const up = sub(E, SL), fo = sub(W, E);
+          const ua = aimQ(up, armFront(up, solL.v, chestFwd())), fa = aimQ(fo, armFront(fo, solL.v, chestFwd()));
+          return Math.min(minY(hullOf('arm_l', 'arm_l'), SL, ua), minY(hullOf(HAND_MODELS.forearm_l[p.hL || 'grip'], 'forearm_l'), E, fa)); };
+        let lo = 0, hi = .5;
+        if (lowAt(0) > .002) { for (let k = 0; k < 12; k++) { const md = (lo + hi) / 2; if (lowAt(md) >= .002) lo = md; else hi = md; } }
+        G = lerp(G, sub(Gx, [0, lo, 0]), wr);
+      }
       tgtL = G;
       solL = armSolve('l', SL, G, poleOf(p.pL, 1));
       gripL = solL.W;
@@ -676,7 +720,9 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
     armSegs();
     if (err < .004) break;
   }
-  const bladeDeep = (Gx, SQx, margin = .02, parts = BLADE_BODY) => {
+  // (the free right forearm too: only a hand on the scabbard / the throat / the grip / the hat holds near the blade by design)
+  const bladeParts = scab !== 'hand' && (p.hsR || 0) < .5 && (p.rh || 0) < .5 && (p.hat || 'worn') !== 'hand' ? [...BLADE_BODY, 'forearm_r'] : BLADE_BODY;
+  const bladeDeep = (Gx, SQx, margin = .02, parts = bladeParts) => {
     const ax = rot(SQx, [0, 1, 0]); let best = null;
     for (const n of parts) {
       const v = o[n]; if (!v) continue;
@@ -761,7 +807,36 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
     }
   }
   stretch.arm = Math.max(solL.stretch || 1, solR.stretch || 1);
-
+  // the hip scabbard keeps out of her free right arm hanging at her side (design risk 16: idle / idle2 / walk): it yaws about its
+  // mouth (the pelvis's up axis) by the smallest angle, either sense, that puts its hull and axis 0.01 outside the right forearm
+  // and upper arm (it may graze her hip: 0.04 into the torso / pelvis / right thigh, its own thickness), its tip >= 0.03 above
+  // the floor; inward only (its body toward straight back, away from the arm), the best turn up to 40 degrees where none
+  // clears (guard scabArm, planned; where a hand holds the hip scabbard's hilt / throat, or its floor guards turn it, at most 4
+  // degrees of the planned turn stay: the hand's contact holds)
+  if (scab === 'hip' && shW < .5) {
+    const free = (p.hsR || 0) < .5 && (p.hiL || 0) < .5 && (GUARD.used.scab || 0) < .5 && (GUARD.used.scabY || 0) < .5;
+    const ax = rot(Pq, [0, 1, 0]), a0 = Math.min(pl('scabArm'), free ? GUARD_BOUND.scabArm - 1 : 4), sg0 = 1;
+    let best = null;
+    if (free) {
+      const hull = hullOf('scabbard', 'scabbard'), pts = [...hull];
+      for (let k = 1; k <= 24; k++) pts.push([0, SCAB.L * k / 24, 0]);
+      const into = (Qx, n, mg) => { const v = o[n], [lo, hi] = BOX[n], iq = conj(v.q); let w = -1;
+        for (const P of pts) { const L = rot(iq, sub(add(scHipT, rot(Qx, P)), v.t)); w = Math.max(w, Math.min(L[0] - lo[0], hi[0] - L[0], L[1] - lo[1], hi[1] - L[1], L[2] - lo[2], hi[2] - L[2]) + mg); } return w; };
+      const bad = Qx => Math.max(into(Qx, 'forearm_r', .01), into(Qx, 'arm_r', .01), into(Qx, 'torso', -.04), into(Qx, 'pelvis', -.04), into(Qx, 'thigh_r', -.04),
+        .03 - 1e-3 - minY(hull, scHipT, Qx), 0);
+      for (let a = a0; a <= 40; a += 1) {
+        const b = bad(a ? mul(qa(ax, sg0 * a), scHipQ) : scHipQ);
+        if (!best || b < best.b - 1e-4 || (Math.abs(b - best.b) < 1e-4 && a < best.a)) best = {a, sg: sg0, b};
+        if (b <= 0) break;
+      }
+    } else if (a0 > 0) best = {a: a0, sg: sg0, b: 0};
+    if (best && best.a > 0) {
+      const Q2 = mul(qa(ax, best.sg * best.a), scHipQ);
+      if (scT === scHipT) scQ = Q2;
+      scHipQ = Q2;
+    }
+    GUARD.used.scabArm = best ? best.a : 0;
+  }
   // ---- 11. sword, glow, scabbard, sheathed hilt ----
   const swS = sw === 'hand' ? 1 : 0;
   part('sword', G, SQ, swS); part('sword_glow', G, SQ, swS);
@@ -820,6 +895,63 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
     const lo = minY(hatHull, H.t, H.q, 1);
     if (lo < floor) H = {t: add(H.t, [0, floor - lo, 0]), q: H.q};
   }
+  // the hat in her hand, the hand-overs into / out of the hand and the swings between worn and back keep out of her head and
+  // torso (guard hatClear, a vector in cm in the torso frame, planned like bPush): the hat moves out along the outward normal of
+  // the box face nearest its deepest visible point (iterated) until every visible hat point is 0.02 outside the head / torso base
+  // boxes (a player-size arm raised beside the head holds the brim's edge at the head's top corner: the source's hat raised
+  // over her head, or lifted off it, would cut it); the guard fades with the hand-over's weight (none at the worn / back end of a
+  // blend, none at either end of a swing)
+  {
+    const X = p.hatX || {}, fromH = X.from && X.from.bw < 1 ? hist(X.from.k)?.hat : null;
+    let s = 0;
+    if (hS && hat === 'hand') s = X.to && X.to.bw > 0 ? 1 - X.to.bw : fromH && fromH.s[0] > 0 ? X.from.bw : 1;
+    else if (hS && (hat === 'worn' || hat === 'back') && X.to && X.to.path === 'arc' && X.to.bw > 0) s = 4 * X.to.bw * (1 - X.to.bw);
+    if (s > 1e-3) {
+      const hp = hatVisPts(), m = .02 * s, hc = plan.hatClear;
+      const deepest = T => {
+        let best = null;
+        for (const n of ['head', 'torso']) {
+          const v = o[n], [lo, hi] = BOX[n], iq = conj(v.q);
+          for (const P0 of hp) {
+            const L = rot(iq, sub(add(T, rot(H.q, P0)), v.t));
+            let dm = Infinity, ai = 0, sg = 1;
+            for (let i = 0; i < 3; i++) { const a = L[i] - lo[i], b = hi[i] - L[i]; if (a < dm) { dm = a; ai = i; sg = -1; } if (b < dm) { dm = b; ai = i; sg = 1; } }
+            if (!best || dm > best.d) { const e = [0, 0, 0]; e[ai] = sg; best = {d: dm, n: rot(v.q, e)}; }
+          }
+        }
+        return best;
+      };
+      // (held in her hand, no hand-over blend: the right hand follows the push below as far as the arm reaches)
+      const pure = hat === 'hand' && s >= FULL && scab !== 'hand';
+      const p0 = hc && hc.v > 0 ? times(rot(Cq, hc.dir), Math.min(hc.v, GUARD_BOUND.hatClear - 1) / 100 * s) : [0, 0, 0];
+      let push = p0;
+      for (let it = 0; it < 8; it++) {
+        const b = deepest(add(H.t, push));
+        if (b.d <= -m) break;
+        push = add(push, times(b.n, b.d + m + .005));
+      }
+      // (the faces can trade the deepest point back and forth as the brim sweeps round her head: then straight away from the
+      // head's centre, the smallest distance by bisection)
+      if (deepest(add(H.t, push)).d > -m) {
+        const dir = safeAxis(sub(add(H.t, p0), add(Nb, rot(Hq, [0, .25, 0])))), ok = x => deepest(add(H.t, add(p0, times(dir, x)))).d <= -m;
+        let lo = 0, hi = .05;
+        while (!ok(hi) && hi < GUARD_BOUND.hatClear / 100) { lo = hi; hi += .05; }
+        for (let k = 0; k < 8; k++) { const md = (lo + hi) / 2; if (ok(md)) hi = md; else lo = md; }
+        push = add(p0, times(dir, hi));
+      }
+      if (len(push) > 1e-5) {
+        GUARD.used.hatClear = {v: Math.min(GUARD_BOUND.hatClear, len(push) * 100), dir: rot(conj(Cq), unit(push))};
+        // the hat held in her hand (no hand-over blend): the right hand follows the push as far as the arm reaches, so it keeps
+        // its hold on the brim
+        if (pure) {
+          const g0 = gripR;
+          solR = armSolve('r', SR, add(gripR, push), poleOf(p.pR, -1)); gripR = solR.W; tgtR = add(g0, push);
+          armSegs();
+          H = {t: add(H.t, push), q: H.q};
+        } else H = {t: add(H.t, push), q: H.q};
+      }
+    }
+  }
   const hT = H.t, hQ = H.q;
   part('hat', hT, hQ, hS);
   {
@@ -827,9 +959,22 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
     let sq = slerp(hQ, pq, .5), st = hT;
     if (hat === 'world') { sq = mul(hQ, q([90, 0, 0])); st = add(hT, rot(hQ, [0, .015, 0])); }   // lying over the brim
     else {
-      const down = rot(sq, [0, -1, 0]);
-      sq = mul(slerp(ID, fromTo(down, [0, -1, 0]), .45 * gfade(down)), sq);
-      if (hS) sq = clearFloor(hT, sq, hullOf('hat_strings', 'hat_strings'), safeAxis(rot(sq, [1, 0, 0])), .02, GUARD_BOUND.strings, 0, 'strings');
+      // the lag (half the hat's turn over 2 ticks) and the 45 % gravity pull; where they would swing a string into her head
+      // (its outer layer, 0.005 clear) the pull eases, then the lag (bisection; at none the strings hang in the hat's frame,
+      // clear of the worn hat's head by construction)
+      const sHull = hullOf('hat_strings', 'hat_strings'), [hlo, hhi] = BOX.head_layer, iq = conj(Hq);
+      const inHead = Qx => { let w = -1; const Mx = qm(Qx); for (const P of sHull) { const W = [hT[0] + Mx[0][0] * P[0] + Mx[0][1] * P[1] + Mx[0][2] * P[2], hT[1] + Mx[1][0] * P[0] + Mx[1][1] * P[1] + Mx[1][2] * P[2], hT[2] + Mx[2][0] * P[0] + Mx[2][1] * P[1] + Mx[2][2] * P[2]];
+        const L = rot(iq, sub(W, Nb)); w = Math.max(w, Math.min(L[0] - hlo[0], hhi[0] - L[0], L[1] - hlo[1], hhi[1] - L[1], L[2] - hlo[2], hhi[2] - L[2])); } return w; };
+      const strQ = (lag, pull) => { const s0 = slerp(hQ, pq, .5 * lag), down = rot(s0, [0, -1, 0]); return mul(slerp(ID, fromTo(down, [0, -1, 0]), .45 * pull * gfade(down)), s0); };
+      sq = strQ(1, 1);
+      if (hS && inHead(sq) > -.005) {
+        const ease = f => { let lo = 0, hi = 1; for (let k = 0; k < 10; k++) { const md = (lo + hi) / 2; if (inHead(f(md)) <= -.005) lo = md; else hi = md; } return lo; };
+        sq = inHead(strQ(1, 0)) <= -.005 ? strQ(1, ease(x => strQ(1, x))) : strQ(ease(x => strQ(x, 0)), 0);
+      }
+      // still inside (a hat in her hand or on its way to her back: not in the worn frame): the strings turn about the hat's
+      // left-right axis out of the head (the smallest turn, either sense; planned like the floor guards)
+      if (hS && (inHead(sq) > -.005 || pl('strHead'))) sq = turnClear(sq, Qx => inHead(Qx) <= -.005, safeAxis(rot(sq, [1, 0, 0])), GUARD_BOUND.strHead, 'strHead');
+      if (hS) sq = clearFloor(hT, sq, sHull, safeAxis(rot(sq, [1, 0, 0])), .02, GUARD_BOUND.strings, 0, 'strings');
     }
     part('hat_strings', st, sq, hS);
     Object.defineProperty(o, '_hatQ', {value: hQ, enumerable: false});
@@ -847,7 +992,16 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
     const F = steadyPerp(rot(Pq, [0, 0, -1]), dir, prev.sash, rot(Pq, [0, 0, -1]));
     keep.sash = F;
     let sq = aimQ(dir, F);
-    sq = clearFloor(kt, sq, hullOf('sash_p1', 'sash_tails'), safeAxis(cross(dir, [0, 1, 0])), .03, GUARD_BOUND.sash, 0, 'sash');
+    const sHull = hullOf('sash_p1', 'sash_tails');
+    sq = clearFloor(kt, sq, sHull, safeAxis(cross(dir, [0, 1, 0])), .03, GUARD_BOUND.sash, 0, 'sash');
+    // seated (the kit's stone under her thighs): the tails clear its top inside its footprint by 0.01 (guard sashSeat, planned)
+    if (wSeat > 0 || pl('sashSeat')) {
+      const iy = conj(Ryaw), onStone = Qx => { const Mx = qm(Qx); for (const P of sHull) {
+        const W = [kt[0] + Mx[0][0] * P[0] + Mx[0][1] * P[1] + Mx[0][2] * P[2], kt[1] + Mx[1][0] * P[0] + Mx[1][1] * P[1] + Mx[1][2] * P[2], kt[2] + Mx[2][0] * P[0] + Mx[2][1] * P[1] + Mx[2][2] * P[2]];
+        const L = rot(iy, W);
+        if (Math.abs(L[0]) < SUP.half + .01 && L[2] > SUP.front - .01 && L[2] < SUP.back + .01 && W[1] < SUP.T + .01) return false; } return true; };
+      if (wSeat > 0 && (!onStone(sq) || pl('sashSeat'))) sq = turnClear(sq, onStone, safeAxis(cross(dir, [0, 1, 0])), GUARD_BOUND.sashSeat, 'sashSeat');
+    }
     part('sash_tails', kt, sq);
     Object.defineProperty(o, '_sashKnot', {value: kt, enumerable: false});
   }
@@ -869,17 +1023,19 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
 
   // ---- 14. support: the generic floor rule (S2a's contact truth, refCore), then S2c's lift-only rule ----
   const lowOf = names => { let m = Infinity; for (const n of names) { const v = o[n]; if (!v || v.s[0] < 1e-4) continue; m = Math.min(m, minY(hullOf(modelOn(n, p), n), v.t, v.q)); } return m; };
-  // weight (1 - wSeat): the seat holds her on the stone; a lying / kneeling root does not stop the rule. Touched (S2a's
-  // lowest < 0.012): the lowest core point to 0.002 (it finishes a partial lying / kneeling root; may be negative: no float);
-  // airborne (>= 0.05): at least min(S_LEG x S2a's height, 0.12) up, never pulled down (a kip off its lying root stays up)
+  // Touched (S2a's lowest < 0.012), weight (1 - wSeat): the lowest core point to 0.002 (it finishes a partial lying /
+  // kneeling root; may be negative: no float). Airborne (>= 0.05): at least (1 - wRoot) min(S_LEG x S2a's height, 0.12) +
+  // wRoot 0.002 up (wRoot = max(wSeat, wLie, wKnee)), never pulled down: a full lying / kneeling / seated root keeps her on its
+  // support (S2a's LY sat 9 cm up and its kip roll-back lifted off the arms: the lying body rests on the floor until wLie ramps
+  // out, then the kip leaves it)
   const wRoot = Math.max(wSeat, wLie, wKnee);
   let dy = 0;
   const lowRef = ctx.ref ? ctx.ref.low : null;
   const coreLow = lowOf(CORE);
   if (lowRef !== null && (p.vis ?? 1) >= .999 && wSeat < 1) {
-    const touch = .002 - coreLow, air = Math.max(0, Math.min(SLEG * lowRef, .12) - coreLow);
+    const touch = .002 - coreLow, air = Math.max(0, (1 - wRoot) * Math.min(SLEG * lowRef, .12) + wRoot * .002 - coreLow);
     const wa = Math.max(0, Math.min(1, (lowRef - .012) / (.05 - .012)));
-    dy = ((1 - wa) * touch + wa * air) * (1 - wSeat);
+    dy = (1 - wa) * touch * (1 - wSeat) + wa * air;
   }
   const moveAll = d => { if (d) for (const [n, v] of Object.entries(o)) if (!(n === 'hat' && hat === 'world')) v.t = add(v.t, [0, d, 0]); };
   moveAll(dy);

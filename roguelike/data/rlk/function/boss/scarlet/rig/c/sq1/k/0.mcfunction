@@ -26,8 +26,8 @@ data merge entity 524c4b4d-4852-4400-8000-000000000017 {start_interpolation:0,in
 data merge entity 524c4b4d-4852-4400-8000-000000000018 {start_interpolation:0,interpolation_duration:6,transformation:{translation:[0.52328f,0.74404f,-0.21142f],left_rotation:[-0.40586f,-0.52772f,0.67546f,-0.31709f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4852-4400-8000-000000000019 {start_interpolation:0,interpolation_duration:6,transformation:{translation:[-0.25f,0.68412f,0.18f],left_rotation:[-0.80747f,0.1351f,0.21746f,0.53147f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4852-4400-8000-00000000001a {start_interpolation:0,interpolation_duration:60,transformation:{translation:[-0.25f,0.87715f,0.18f],left_rotation:[-0.81435f,0.13794f,0.21567f,0.52085f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-00000000001b {start_interpolation:0,interpolation_duration:60,transformation:{translation:[-0.42064f,1.90621f,0.31531f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-00000000001c {start_interpolation:0,interpolation_duration:60,transformation:{translation:[0.06941f,0.79039f,0.466f],left_rotation:[-0.50607f,-0.30736f,-0.21126f,0.77768f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000001b {start_interpolation:0,interpolation_duration:60,transformation:{translation:[-0.46914f,1.85088f,0.32261f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000001c {start_interpolation:0,interpolation_duration:60,transformation:{translation:[0.08918f,0.75651f,0.46027f],left_rotation:[-0.46182f,-0.33954f,-0.15719f,0.80419f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
 function rlk:boss/scarlet/rig/m/forearm_l/grip
 function rlk:boss/scarlet/rig/m/forearm_r/open
 function rlk:boss/scarlet/rig/m/face/calm

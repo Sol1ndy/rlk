@@ -1,3 +1,4 @@
+data merge entity 524c4b4d-4852-4400-8000-000000000016 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.20163f,1.07603f,-0.18174f],left_rotation:[-0.30555f,0.38321f,0.13599f,0.86099f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4852-4400-8000-000000000017 {start_interpolation:0,interpolation_duration:3,transformation:{translation:[0.52112f,0.74533f,-0.21054f],left_rotation:[-0.40586f,-0.52772f,0.67546f,-0.31709f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4852-4400-8000-000000000018 {start_interpolation:0,interpolation_duration:3,transformation:{translation:[0.52112f,0.74533f,-0.21054f],left_rotation:[-0.40586f,-0.52772f,0.67546f,-0.31709f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
 scoreboard players set @s hrRigHat 1

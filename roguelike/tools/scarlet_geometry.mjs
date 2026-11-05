@@ -177,10 +177,10 @@ function hat(p2) {
 }
 // hat strings (pivot = the brim centre, the part follows the hat with a lag): two bead strings from the brim's underside
 // hanging straight down in front of the box head's side columns (x +-0.30: 0.019 outside the head layer's sides), meeting in a
-// small loop under the chin (0.60 below the brim, 0.033 under the head), then a short strand turned toward the chest. S2d
-// refit for the avatar's 8-px head: Z 0.044 ahead of the face layer at the brim, so the -6 deg tilt and the 45 % gravity pull
-// keep the loop >= 0.005 ahead of the face; the strand shapes and beads stay.
-export const STRINGS = {Z: -.325, X: .30, LOOP: .60, L: .68};
+// small loop under the chin (0.535 below the brim, 0.033 under the head), then a short strand turned toward the chest. S2d
+// refit for the avatar's 8-px head: Z 0.044 ahead of the face layer (the hat sits level on the head: scarlet_pose.mjs SK.brim);
+// the solver eases the gravity pull where it would swing a string into the head; the strand shapes and beads stay.
+export const STRINGS = {Z: -.325, X: .30, LOOP: .535, L: .615};
 function hatStrings() {
   const z = STRINGS.Z;
   const up = cardZ('strings', z, {X0: -STRINGS.X, X1: STRINGS.X, Y0: -STRINGS.LOOP - .01, Y1: -.01}, {uvr: [0, 0, 1, .75]});

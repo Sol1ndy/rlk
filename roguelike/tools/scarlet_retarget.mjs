@@ -44,7 +44,8 @@ export const HAT_FLIGHTS = {
 };
 export function setHatFace(spot) { HAT_REST.face = spot; }
 // the face spot from probe solves of the ending (probe(t) -> {o}: LY, the hat over her face): parallel to the face at the probe
-// where the face stands highest (0 / 13 / 26), its front toward the top of her head, 0.012 off the face's outer layer; then
+// where the face stands highest (0 / 13 / 26), its front toward her feet (as the source's face hat and the flight that lifts it
+// at 27: no spin as it leaves), 0.012 off the face's outer layer; then
 // the smallest lift off the face (0.012-0.05) and tilt about its left-right axis (the chest-side rim up, whole degrees) that
 // keep the visible brim 0.01 out of every body box over the rest ticks 0-26 (her forearms lie across her chest under the
 // 1.32-b brim; the hand comes up to it before the lift at 27)
@@ -56,7 +57,7 @@ export function faceSpot(probe) {
     const n = unit(rot(o.head.q, [0, 0, -1])), fp = add(o.head.t, rot(o.head.q, [0, .25, -.28125]));
     if (!best || dot(fp, n) > dot(best.fp, best.n)) best = {fp, n, hq: o.head.q};
   }
-  const Y = best.n, Zf = unit(perp(times(rot(best.hq, [0, 1, 0]), -1), Y)), X = cross(Y, Zf), base = basisQ(X, Y, Zf);
+  const Y = best.n, Zf = unit(perp(rot(best.hq, [0, 1, 0]), Y)), X = cross(Y, Zf), base = basisQ(X, Y, Zf);
   const frames = [0, 4, 8, 12, 16, 20, 23, 24, 25, 26].map(t => probe(t).o), hp = hatVisPts();
   const deep = (T, Q) => {
     let w = -1;
@@ -161,9 +162,10 @@ const KNEEL = {pos: [0, -.29, -.02], rot: [-25, 0, 0], tor: [-55, -10, 0], head:
 const KNEEL_BLADE = {gF: 0, gB: -80, gE: -25, gD: .42, cB: -115, cR: 0, th: -12, ed: -1, tw: 0};
 export const IAI_DELTA = 14;
 export const PATCHES = [
-  {id: 'KNEEL-K', clip: 'kipup', in: [6, 8], out: [10, 12], set: {...KNEEL, ...KNEEL_BLADE}, why: 'the floor pickup of the hat on the right knee (the sword out at her left)'},
+  {id: 'KNEEL-K', clip: 'kipup', in: [6, 8], out: [10, 12], set: KNEEL, why: 'the floor pickup of the hat on the right knee'},
+  {id: 'KNEEL-K-B', clip: 'kipup', in: [3, 8], out: [10, 16], set: KNEEL_BLADE, why: 'the sword out at her left through the kneel (5- / 6-tick ramps: no whip)'},
   {id: 'KNEEL-L', clip: 'lead_down', in: [5, 7], out: [9, 11], set: KNEEL, why: 'the floor pickup of the hat on the right knee'},
-  {id: 'KNEEL-L-B', clip: 'lead_down', in: [4, 6], out: [8, 10], set: KNEEL_BLADE, why: 'the sword out at her left through the kip and the kneel (its own ramps: the sword raise from 9)'},
+  {id: 'KNEEL-L-B', clip: 'lead_down', in: [1, 6], out: [9, 14], set: KNEEL_BLADE, why: 'the sword out at her left through the kip and the kneel (5-tick ramps: no whip)'},
   {id: 'IAI', clip: 'cs1', in: [104, 106], out: [159, 161], add: {tor: [0, IAI_DELTA, 0], head: [0, -IAI_DELTA, 0]}, why: 'the cross-draw reach to the hip hilt'},
   {id: 'SIP', clip: 'intro', in: [66, 70], out: [86, 94], set: {wLip: 1}, why: 'the cup at her lips'},
   {id: 'SH0', clip: 'ending', in: [297, 297], out: [326, 326], sh0: true, why: 'the sheathe entry on the new scabbard axis (SH0\')'},

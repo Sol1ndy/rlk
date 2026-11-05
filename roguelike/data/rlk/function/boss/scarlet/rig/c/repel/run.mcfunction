@@ -9,5 +9,5 @@ execute if score @s hrRigT matches ..50 run return run function rlk:boss/scarlet
 execute if score @s hrRigT matches ..58 run return run function rlk:boss/scarlet/rig/c/repel/b/51_58
 execute if score @s hrRigT matches ..66 run return run function rlk:boss/scarlet/rig/c/repel/b/59_66
 execute if score @s hrRigT matches ..74 run return run function rlk:boss/scarlet/rig/c/repel/b/67_74
-execute if score @s hrRigT matches ..99 run return run function rlk:boss/scarlet/rig/c/repel/b/75_99
-execute if score @s hrRigT matches ..103 run return run function rlk:boss/scarlet/rig/c/repel/b/101_103
+execute if score @s hrRigT matches ..93 run return run function rlk:boss/scarlet/rig/c/repel/b/75_93
+execute if score @s hrRigT matches ..103 run return run function rlk:boss/scarlet/rig/c/repel/b/99_103

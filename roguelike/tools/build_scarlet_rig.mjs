@@ -285,7 +285,9 @@ function denseTicks(c) {
 // no blade through her body at the clip events (S2c): the base boxes of the skin parts (part frame, blocks) the blade samples
 // (guard -> tip) must stay out of, 1 cm in from every face; the hands (forearms) hold the hilt and the scabbard by design
 const BODY_BOX_PARTS = ['torso', 'pelvis', 'head', 'arm_l', 'arm_r', 'thigh_l', 'thigh_r', 'shin_l', 'shin_r'];
-const BODY_BOX = Object.fromEntries(BODY_BOX_PARTS.map(n => {
+// S2d: the right forearm too where the right hand is free (not on the scabbard, the throat, the grip or the hat)
+const freeRight = q => (q.scab || 'hip') !== 'hand' && (q.hsR || 0) < .5 && (q.rh || 0) < .5 && (q.hat || 'worn') !== 'hand';
+const BODY_BOX = Object.fromEntries([...BODY_BOX_PARTS, 'forearm_r'].map(n => {
   const e = models[DEFAULT_MODEL[n]][0], X = [(8 - e.from[0]) / 16, (8 - e.to[0]) / 16], Z = [(e.from[2] - 8) / 16, (e.to[2] - 8) / 16];
   return [n, [[Math.min(...X), (e.from[1] - 8) / 16, Math.min(...Z)], [Math.max(...X), (e.to[1] - 8) / 16, Math.max(...Z)]]];
 }));
@@ -354,20 +356,26 @@ for (const c of CLIPS) {
     const planted = (fr, k) => vis1(fr) && (fr.q.lf || 0) < .5 && fr.q[k][1] <= .0066 && (fr.q.wSeat || 0) < .5 && (fr.q.wKnee || 0) < .5 && fr.ref.low < .012;
     supportTable[c.name] = {
       low_ref: F.map(fr => +fr.ref.low.toFixed(3)),
-      // lie: a full lying root where S2a's body touched (an airborne kip off its lying root is `air`: the support pass lifts it);
-      // touch: S2a touched, no full root (a partial lying / kneeling root is finished by the support pass's touch rule);
-      // air: S2a's body >= 0.05 up, no seat / kneel
-      seat: spansOf(fl(fr => (fr.q.wSeat || 0) >= .999)), lie: spansOf(fl(fr => (fr.q.wLie || 0) >= .999 && fr.ref.low < .012)),
+      // lie: every full lying root (the body rests on the floor whatever S2a's height: its LY sat 9 cm up, its kip roll-back
+      // lifted off the arms); touch: S2a touched, no full root (a partial lying / kneeling root is finished by the support pass's
+      // touch rule); air: S2a's body >= 0.05 up, no seat / kneel / full lying root (w_root: the root weight per tick, the float
+      // test's share of the airborne height)
+      seat: spansOf(fl(fr => (fr.q.wSeat || 0) >= .999)), lie: spansOf(fl(fr => (fr.q.wLie || 0) >= .999)),
       kneel: spansOf(fl(fr => (fr.q.wKnee || 0) >= .999)),
       feet_l: spansOf(fl(fr => planted(fr, 'fL'))), feet_r: spansOf(fl(fr => planted(fr, 'fR'))),
       touch: spansOf(fl(fr => vis1(fr) && fr.ref.low < .012 && (fr.q.wSeat || 0) < .001 && (fr.q.wLie || 0) < .999 && (fr.q.wKnee || 0) < .999)),
-      air: spansOf(fl(fr => vis1(fr) && fr.ref.low >= .05 && (fr.q.wSeat || 0) < .001 && (fr.q.wKnee || 0) < .001)),
+      air: spansOf(fl(fr => vis1(fr) && fr.ref.low >= .05 && (fr.q.wSeat || 0) < .001 && (fr.q.wKnee || 0) < .001 && (fr.q.wLie || 0) < .999)),
+      w_root: F.map(fr => +Math.max(fr.q.wSeat || 0, fr.q.wLie || 0, fr.q.wKnee || 0).toFixed(3)),
       ghost: spansOf(fl(fr => !vis1(fr))),
       // held: the sword in the left hand outside a sheathe blend (its pivot = the left grip); cuts: the clip's cut ticks;
       // lift: the support pass's last-resort lift per tick (only the ticks that needed one)
       held: spansOf(fl(fr => (fr.q.sword || 'hand') === 'hand' && (fr.q.hold ?? 1) > .5 && (fr.q.shW || 0) < .5)),
+      // free_r: the right hand free (not on the scabbard, the throat, the grip or the hat): the blade keeps out of its forearm
+      free_r: spansOf(fl(fr => freeRight(fr.q))),
       cuts: [...(c.cuts || [])],
       lift: Object.fromEntries(F.map((fr, t) => [t, +fr.o._lift.toFixed(3)]).filter(([, v]) => v > 0)),
+      // hat_push: the hat moved clear of her head / torso (scarlet_pose.mjs guard hatClear, cm) where it held / handed over
+      hat_push: Object.fromEntries(F.map((fr, t) => [t, +gv(fr.o._guard.hatClear).toFixed(1)]).filter(([, v]) => v > .5)),
       contacts: F.flatMap((fr, t) => fr.o._support.cts.map(x => [t, x.kind, x.side, ...(x.az !== undefined ? [+x.az.toFixed(2)] : [])])),
     };
     const mx = {}, cts = {};
@@ -470,7 +478,7 @@ for (const c of CLIPS) {
     const sw = fromDisplay('sword', compiledD.sword[te]);
     if (!shown(compiledD.sword[te])) continue;
     const ax = rot(sw.q, [0, 1, 0]);
-    for (const n of BODY_BOX_PARTS) {
+    for (const n of freeRight(F[te].q) ? [...BODY_BOX_PARTS, 'forearm_r'] : BODY_BOX_PARTS) {
       const v = fromDisplay(n, compiledD[n][te]);
       if (Math.min(...v.s) < 1e-4) continue;
       const [lo, hi] = BODY_BOX[n];
@@ -616,7 +624,7 @@ const DIMS = (() => {
   const g = KEEP_F.ev_give[29].o, yaw = q([0, KEEP_F.ev_give[29].p.rot[1], 0]);
   const ctr = add(g.scabbard.t, rot(g.scabbard.q, [0, -ITEM_SWORD.shift, 0])), rel = rot([-yaw[0], -yaw[1], -yaw[2], yaw[3]], sub(ctr, g._anchors.hand_r));
   return {height_idle: +headTop.toFixed(4), hat_top: +F0._anchors.hat_crown[1].toFixed(4), hull_top: +hullTop.toFixed(4),
-    hat: {R: HAT.R, crownR: HAT.crownR, crownH: HAT.crownH, brim: SK.brim, tilt: SK.brimTilt, hand: SK.hatHand, back: SK.hatBack},
+    hat: {R: HAT.R, crownR: HAT.crownR, crownH: HAT.crownH, crown_y0: +(HAT.gap * 3 + .002).toFixed(4), brim: SK.brim, tilt: SK.brimTilt, hand: SK.hatHand, back: SK.hatBack},
     strings: STRINGS, sash: SASH.tails,
     sword: {len: +(SWORD.tip - SWORD.pommel).toFixed(4), tip: SWORD.tip, blade_lo: SWORD.bladeLo, guard: SWORD.guard, pommel: SWORD.pommel, grip_lo: SWORD.gripLo, grip_hi: SWORD.gripHi,
       display_scale: PART_SCALE.sword},

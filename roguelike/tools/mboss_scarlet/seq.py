@@ -218,6 +218,10 @@ def stage_pt(x, z, y=None):
 
 # =============================================================================================================================
 # CS0 — intro (PLAN §3.1; clip intro 554 + intro_end 86 = 640) and its skip
+# S2d (11-05): she rises off the kit's seat stone (1.2 x 0.24 x 0.64 b: 0.135 b in front of her seat to 0.505 b behind it,
+# requests/s2d.md s2d-2) forward over her feet, SEAT_RISE b toward the moon over the 12-t rise, then steps SEAT_ASIDE b to her
+# right while she straightens (226-246), so the stone stays clear of her feet through the turn to the player and the walk
+SEAT_RISE, SEAT_ASIDE = 0.4, 1.1
 def build_intro(W):
     s, mv = Seq('intro'), Moves('intro')
     e = lambda k, d=0: ev('intro', k, d)
@@ -235,6 +239,12 @@ def build_intro(W):
     s.at(e('sip'), snd('cs0_sip')).at(e('raise', 8), snd('cs0_moon'))
     # E5 the cup set down (rock set), rising (cloth 230), the turn to the player 248-268 (the body turned <= 12 deg / t)
     s.at(e('cup_down'), snd('cs0_cup'), rock('set')).at(e('stand', 16), snd('cloth'))
+    rise = mv.add('rise', [cand(f'at @s rotated as @s rotated ~ 0 positioned ^ ^ ^{num(SEAT_RISE)} {FLOOR}', glide(12))],
+                  f'The rise off the seat stone: {SEAT_RISE} b forward over her feet over 12 t')
+    aside = mv.add('aside', [cand(f'at @s rotated as @s rotated ~ 0 positioned ^{num(-SEAT_ASIDE)} ^ ^ {FLOOR}', glide(20)),
+                             cand(f'at @s rotated as @s rotated ~ 0 positioned ^{num(SEAT_ASIDE)} ^ ^ {FLOOR}', glide(20))],
+                   f'Beside the seat stone: {SEAT_ASIDE} b to her right (else her left) over 20 t, before the turn')
+    s.at(e('stand'), rise).at(e('stand', 12), aside)
     for t in range(e('turn'), e('turn', 21)):
         s.at(t, api.rig('face/track'))
     # E6-E7 / E9 the walks: 8-t glide legs of 1.2 b (0.15 b/t) toward the player while >= 8.2 b away (stops at <= 7 b after the
