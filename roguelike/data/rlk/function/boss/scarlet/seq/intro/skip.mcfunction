@@ -7,7 +7,7 @@ stopsound @a[tag=player] * minecraft:item.elytra.flying
 execute if data storage rlk:mboss {look_hr_field:"moon"} as @e[type=minecraft:item_display,tag=rlk_hr_deco_moon_halo] run function rlk:boss/scarlet/fx/prop/moon_halo {look:"p1"}
 execute if data storage rlk:mboss {look_hr_field:"crimson"} as @e[type=minecraft:item_display,tag=rlk_hr_deco_moon_halo] run function rlk:boss/scarlet/fx/prop/moon_halo {look:"p2"}
 function rlk:mboss/mv/stop
-execute positioned 884 201 5 run kill @e[type=minecraft:item_display,tag=rlk_hr_deco,distance=..1]
+execute positioned 884.0 201 5.0 run kill @e[type=minecraft:item_display,tag=rlk_hr_deco,distance=..1]
 function rlk:boss/scarlet/rig/look/props/none
 function rlk:mboss/mv/dist
 function rlk:boss/scarlet/seq/intro/m/near7

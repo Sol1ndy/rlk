@@ -111,9 +111,9 @@ def build(W, ctx):
     yaw_moon = yaw_to(seat, api.MOON_POS)
     w('spawn', [
         '# Hook spawn (@s = the arena marker at C of hr_field, rotated as it). The body (mboss/body: husk scale 1.35, click',
-        f'# shield 1.2 x 2.9, miniboss economy, rlk_mb_inv in the intro) sits on her rock {L.num(seat[0])} {L.num(seat[1])} {L.num(seat[2])}',
+        f'# shield 1.2 x 2.9, miniboss economy, rlk_mb_inv in the intro) sits on her rock {api.xyz(seat)}',
         '# facing the moon, her back to the player arriving at start (PLAN §3.1). The event scores are cleared (PLAN §7.3.1).',
-        f'execute positioned {L.num(seat[0])} {L.num(seat[1])} {L.num(seat[2])} rotated {L.num(yaw_moon)} 0 run function rlk:mboss/body',
+        f'execute positioned {api.xyz(seat)} rotated {L.num(yaw_moon)} 0 run function rlk:mboss/body',
         at_body(fn('core/setup'))] + [sset(k, 0) for k in api.EV_FP])
     w('core/setup', ['# @s = the new body: module state, the floors, the rig (normal form, P1 look, the blade off), the decor props.',
                      fn('init'), fn('core/vars'), fn('core/floors'), api.rig('init'), api.rig('spawn'), fn('core/looks'),
@@ -270,17 +270,20 @@ DECO_LOOK = {'moon': ('p1', 'bud'), 'crimson': ('p2', 'bloom'), 'dark': ('off', 
 def deco(W):
     """core/deco (spawn): the decor props of api.deco() through the kit (fx/prop/*), each an item_display summoned at its
     point, then rotated, then given its look; tag rlk_hr_deco + rlk_hr_deco_<name>. core/deco_re (reload): the moon halo
-    and the lotus again in the look of the phase (the seat rock only belongs to the intro). Without the kit no prop."""
+    and the lotus again in the look of the phase (the seat rock only belongs to the intro). Without the kit no prop.
+    I1b verification round 2 (m1): the seat rock is summoned at exactly api.SEAT_POS (api.xyz), the point her body spawns on
+    and the intro finds it at; the halo and the lotus keep their old form (the lotus points are never whole)."""
     d = api.deco()
     c = (api.CX, api.CY, api.CZ)
     tg = api.TAGS['deco']
 
-    def one(name, pt, yaw, look):
+    def one(name, pt, yaw, look, exact=False):
         cmd = K.prop(name, look=look)
         if not cmd:
             return []
         t = f'rlk_hr_deco_{name}'
-        return [f'summon minecraft:item_display {L.num(pt[0])} {L.num(pt[1])} {L.num(pt[2])} {{Tags:{S.tags_nbt(tg, t, "rlk_hr_dnew")}}}',
+        at = api.xyz(pt) if exact else f'{L.num(pt[0])} {L.num(pt[1])} {L.num(pt[2])}'
+        return [f'summon minecraft:item_display {at} {{Tags:{S.tags_nbt(tg, t, "rlk_hr_dnew")}}}',
                 f'execute as @e[type=minecraft:item_display,tag=rlk_hr_dnew] at @s run tp @s ~ ~ ~ {L.num(yaw)} 0',
                 f'execute as @e[type=minecraft:item_display,tag=rlk_hr_dnew] run {cmd}',
                 'tag @e[type=minecraft:item_display,tag=rlk_hr_dnew] remove rlk_hr_dnew']
@@ -291,7 +294,7 @@ def deco(W):
     for i, p in enumerate(d['lotus']):
         lotus += one('lotus', p, (i * 47) % 360, 'bud')
     seat = d['seat_rock']
-    seat_l = one('seat_rock', seat, yaw_to(seat, api.MOON_POS), 'bottle')
+    seat_l = one('seat_rock', seat, yaw_to(seat, api.MOON_POS), 'bottle', exact=True)
     kill = [f'kill @e[type=minecraft:item_display,tag={tg}]']
     W.w('core/deco', ['# The decor props at spawn (PLAN §6.7): the moon halo (p1), 8 lotus buds, the seat rock (bottle).']
         + kill + one('moon_halo', halo, yaw_halo, 'p1') + lotus + seat_l)
@@ -762,8 +765,7 @@ def hooks(W, ctx):
     # the intro replay (test 30 / 35)
     w('core/replay/start', ['# Test 30 / 35: the intro again in the fight (@s = body, invulnerable), then the fight goes on.',
                             fn('core/cancel_pat0'), fn('core/deco_seat'),
-                            f'tp @s {L.num(api.SEAT_POS[0])} {L.num(api.SEAT_POS[1])} {L.num(api.SEAT_POS[2])} '
-                            f'{L.num(yaw_to(api.SEAT_POS, api.MOON_POS))} 0',
+                            f'tp @s {api.xyz(api.SEAT_POS)} {L.num(yaw_to(api.SEAT_POS, api.MOON_POS))} 0',
                             sset('#rp', 1), sset('#inv', 1), sset('#sqn', S.SEQ_ID['intro']), sset('#sq', 0), sset('#sqdone', 0),
                             sset('#skip', 0), seq(ctx, 'intro', 'start')])
     w('core/replay/tick', [f'scoreboard players add #sq {OBJ} 1', seq(ctx, 'intro', 'tick'), sset('#sq_sig', 0), fn('core/skip'),

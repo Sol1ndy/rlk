@@ -149,16 +149,17 @@ def face_player_dying():
 
 
 def rock(look):
-    """The kit's seat_rock (S3's decor prop at api.deco()['seat_rock']) re-looked."""
+    """The kit's seat_rock (S3's decor prop at api.deco()['seat_rock']) re-looked. I1b verification round 2 (m1): the point is
+    written exactly (api.xyz), as S3 summons the rock there."""
     p = api.deco()['seat_rock']
     c = K.prop('seat_rock', look=look)
-    return (f'execute positioned {num(p[0])} {num(p[1])} {num(p[2])} as @e[type=minecraft:item_display,tag={api.TAGS["deco"]},'
+    return (f'execute positioned {api.xyz(p, 3)} as @e[type=minecraft:item_display,tag={api.TAGS["deco"]},'
             f'distance=..1,limit=1] run {c}') if c else None
 
 
 def rock_kill():
     p = api.deco()['seat_rock']
-    return f'execute positioned {num(p[0])} {num(p[1])} {num(p[2])} run kill @e[type=minecraft:item_display,tag={api.TAGS["deco"]},distance=..1]'
+    return f'execute positioned {api.xyz(p, 3)} run kill @e[type=minecraft:item_display,tag={api.TAGS["deco"]},distance=..1]'
 
 
 def halo(bright):

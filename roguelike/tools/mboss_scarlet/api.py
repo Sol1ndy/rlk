@@ -111,6 +111,17 @@ def deco():
         return d
     return DECO_DEFAULT
 
+
+def xyz(p, nd=4):
+    """An absolute point (x, y, z) for summon / tp / execute positioned / facing, written so that the game uses exactly that
+    point: x and z keep a decimal point. The game block-centres an absolute x / z written without one (+0.5; never y), while
+    mcsim / hrsim read every coordinate as written: L.num(884.0) = `884` put the seat rock and her seated start at (884.5,
+    201, 5.5) in game but at SEAT_POS in the suites (I1b verification round 2, m1)."""
+    def exact(v):
+        s = L.num(v, nd)
+        return s if '.' in s else s + '.0'
+    return f'{exact(p[0])} {L.num(p[1], nd)} {exact(p[2])}'
+
 # =============================================================================================
 # 2. Damage, shapes, hits, telegraph constants (PLAN §4.1-4.5)
 DMG = {'T1': 29, 'T2': 42, 'T3': 56, 'T4': 71}         # % of the base hit (mboss/hurt coefficient); 타키's final tiers
@@ -1309,6 +1320,7 @@ def _check_contract():
     assert all(0 < t <= JUDGE_T[g] for g in GAUNTLETS for t in BOLTS[g])
     assert DARK_SLICES[0] == DARK_T == DARK_CALL_T + 1 and DARK_SLICES == tuple(DARK_T + 3 * i for i in range(4))
     assert LOOKS['scabbard'][-1] == 'gone' and set(ARENA_LOOKS) == set(LOOK_ID)
+    assert xyz((884.0, 201.0, -5.0)) == '884.0 201 -5.0' and xyz((880.5, 200.9, 31.25)) == '880.5 200.9 31.25'
     return True
 
 

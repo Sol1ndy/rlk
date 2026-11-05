@@ -11,8 +11,10 @@ api.K / the theme forced on and the switch patched) live in ./tmp and are remove
 S2b's sequences, S4's gauntlets and S2a's rig are the real ones (the stand-ins core/sq/**, core/gs/**, rig_stub/** are gone).
 
   hooks    the 17 hooks + test/help + init + reward exist; spawn (seat, yaw to the moon, rlk_mb_inv, objective + constants,
-           event scores 0); the empty hooks (aux_hit / incoming / hz_vis / pj_end) have no command; on_hit (skill flag,
-           counter feed); test/help rows; uninstall (objective, storage, rlk_hr_*); the decor props (kit build)
+           event scores 0); the seat point written exactly in every command that places or finds it (I1b round 2: the
+           game block-centres a whole x / z, the sim does not); the empty hooks (aux_hit / incoming / hz_vis / pj_end) have
+           no command; on_hit (skill flag, counter feed); test/help rows; uninstall (objective, storage, rlk_hr_*); the
+           decor props (kit build)
   phases   the order of §4.6 with deflects (P1 -> CS1 -> SQ1 -> A8 -> CS2 -> down -> kipup -> P2 -> lead_stand -> A13 -> CS3
            -> death) and both fail branches (A8 fail -> P2 at T + 214 without a down window; A13 fail -> the instant death
            -> the revive stance -> A13 again); the floors 60 % / 5 % (never below by normal damage); the invulnerable windows
@@ -49,6 +51,7 @@ S2b's sequences, S4's gauntlets and S2a's rig are the real ones (the stand-ins c
            slice ticks (<= 5000, contract §5 gate 5)
 """
 import math
+import re
 import statistics
 import sys
 from pathlib import Path
@@ -246,6 +249,24 @@ def cmds(rel, root=None):
     return [ln for ln in (fn_lines(rel, root) or []) if ln.strip() and not ln.lstrip().startswith('#')]
 
 
+# I1b verification round 2 (m1): the game block-centres an absolute x / z written without a decimal point in summon / tp /
+# execute positioned / facing (+0.5; never y), while mcsim reads every coordinate as written. A position the sim checks
+# (K3's seat) holds in game only if the commands write its x / z with a decimal point (api.xyz).
+ABS_POINT = re.compile(r'(summon \S+|tp \S+|teleport \S+|positioned|facing) (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?) '
+                       r'(-?\d+(?:\.\d+)?)(?=\s|$)')
+
+
+def abs_points(root=None):
+    """[(function, line no, (x, y, z) as written)] of every absolute point in the commands of F:boss/scarlet."""
+    base = (root or DP) / 'data/rlk/function/boss/scarlet'
+    out = []
+    for p in sorted(base.rglob('*.mcfunction')):
+        for i, ln in enumerate(p.read_text(encoding='utf-8').split('\n'), 1):
+            if not ln.lstrip().startswith('#'):
+                out += [(p.relative_to(base).with_suffix('').as_posix(), i, m.group(2, 3, 4)) for m in ABS_POINT.finditer(ln)]
+    return out
+
+
 # ================================================================================================= hooks
 def sec_hooks():
     names = API.L.HOOKS + API.L.HELP_HOOKS + ['init', API.REWARD_HOOK]
@@ -265,6 +286,19 @@ def sec_hooks():
           and abs((b.rot[0] % 360) - yaw) < 0.05 and 'rlk_mb_inv' in b.tags and hr(s, '#c1000') == 1000
           and hr(s, '#cn1') == -1 and hr(s, '#ph') == PH['intro'],
           (b and b.pos, b and b.rot, yaw, b and sorted(b.tags)))
+    pts = abs_points()
+    seat = [(f, i, t) for f, i, t in pts if all(abs(float(v) - c) < 1e-9 for v, c in zip(t, API.SEAT_POS))]
+    need = {'spawn', 'core/deco', 'core/deco_seat', 'core/replay/start', 'seq/intro/skip'}
+    bad = [(f, i, ' '.join(t)) for f, i, t in seat if '.' not in t[0] or '.' not in t[2]]
+    check(f'K3b the seat point written exactly wherever a command places or finds it ({len(seat)} lines: x / z with a decimal '
+          'point, so the game does not block-centre them; I1b round 2)', bool(seat) and need <= {f for f, _, _ in seat} and not bad,
+          (bad, sorted(need - {f for f, _, _ in seat})))
+    whole = {}
+    for f, i, t in pts:
+        if '.' not in t[0] or '.' not in t[2]:
+            whole[' '.join(t)] = whole.get(' '.join(t), 0) + 1
+    print('  K3b other absolute points with a whole x / z (block-centred in game, not checked here): '
+          + (', '.join(f'{k} x{n}' for k, n in sorted(whole.items())) or 'none'))
     check('K4 spawn: the event scores 0 (api.EV_FP)', all(s.sc(k, 'hr') == 0 for k in API.EV_FP),
           [s.sc(k, 'hr') for k in API.EV_FP])
     run(s, 5)
@@ -666,9 +700,10 @@ def intro_world(seed, name='kit', kit=False):
 
 
 # The intro's end distance (lead decision 1, I1b): the walk keeps its 0.15 b/t legs and the seat rock sits 5 b nearer the
-# start (api.SEAT_POS 884 201 5, 26.7 b from `start`; the legs walk while she is more than 7 b away), so a player who stays at
-# `start` meets her <= 7 b away when the walk stops, as the skip stands her (PLAN §3.1, E10's pose). I2 compares every key of
-# the end state again, `near` included (I1a had left it out while the decision was open: i1_notes §10, §11 m3).
+# start (api.SEAT_POS (884.0, 201, 5.0), 26.7 b from `start`; written exactly since I1b round 2, K3b, so the game puts her
+# there too; the legs walk while she is more than 7 b away), so a player who stays at `start` meets her <= 7 b away when the
+# walk stops, as the skip stands her (PLAN §3.1, E10's pose). I2 compares every key of the end state again, `near` included
+# (I1a had left it out while the decision was open: i1_notes §10, §11 m3).
 I2_NEAR_OPEN = False
 
 
