@@ -23,6 +23,9 @@ items.md and pack.mcmeta. A file of the scope that is new, changed or gone must 
                 F:codex/labels, F:snd/f422..f429, F:load, F:uninstall, items.md
   this boss     its own generated manifests: tools/scarlet_rig_manifest.json (S2a / S2b), tools/mboss_hr_fx_manifest.json
                 (S1K, I1b), tools/mboss_scarlet/stub_rig_manifest.json (D0, api.py --write-stub)
+  F3 (review)   the pack-wide lines of the lead's decisions: F:view/{tick,ride_tick,sel_xhair} (HR-08: vBig counted down in
+                every view), F:lvup/tick (HR-34: no F5 sneak-tap during a boss intro), F:items/hook/on_dash (HR-09: the
+                sword's dash window)
 
 Prints every allow-listed file that changed (grouped) and fails on anything else (FAIL lines name the files).
 """
@@ -67,6 +70,8 @@ ALLOW = {
        'items.md'],
     'this boss\'s generated manifests': ['tools/scarlet_rig_manifest.json', 'tools/mboss_hr_fx_manifest.json',
                                          'tools/mboss_scarlet/stub_rig_manifest.json'],
+    'F3 review fixes (pack-wide lines)': [F + f'view/{n}.mcfunction' for n in ('tick', 'ride_tick', 'sel_xhair')]
+    + [F + 'lvup/tick.mcfunction', F + 'items/hook/on_dash.mcfunction'],
 }
 PATS = [(grp, re.compile(p)) for grp, ps in ALLOW.items() for p in ps]
 

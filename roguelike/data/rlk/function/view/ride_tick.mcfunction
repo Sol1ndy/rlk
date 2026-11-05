@@ -9,8 +9,7 @@ scoreboard players set #pr view 0
 execute on vehicle if entity @s[tag=rlk_vseat] run scoreboard players set #pr view 1
 execute if score #pr view matches 0 if predicate rlk:in_sneak at @e[tag=rlk_vseat,limit=1] run tp @s ~ ~0.99 ~
 execute if score #pr view matches 0 unless predicate rlk:in_sneak run function rlk:view/ride_mount
-# 조준점 표시(화면 가운데). 큰 제목(vBig)이 떠 있는 동안은 쉰다
-execute if score @s vBig matches 1.. run scoreboard players remove @s vBig 1
+# 조준점 표시(화면 가운데). 큰 제목(vBig)이 떠 있는 동안은 쉰다(vBig 은 view/tick 이 모든 시점에서 틱마다 줄임)
 # 아랫줄 안내(ttlT)가 끝나는 순간 남은 글을 지움(조준점을 다시 보낼 때 예전 안내가 따라 나오지 않게)
 execute if score @s vTtp matches 1.. unless score @s ttlT matches 1.. run title @s subtitle ""
 scoreboard players operation @s vTtp = @s ttlT

@@ -8,6 +8,9 @@ execute if score @s ttlT matches 1.. run scoreboard players remove @s ttlT 1
 # F5 위쪽 시점: 웅크리기 키를 누르는 순간 = 아이템 선택 공간 들어가기/돌아오기
 scoreboard players set #snk tmp 0
 execute if score #on view matches 1 if score #vmode view matches 2 if predicate rlk:in_sneak run scoreboard players set #snk tmp 1
+# 보스 등장 연출 중(#mbLive 1 · #mbSt 0: 홍련의 등장 건너뛰기 = Shift 길게)에는 누르는 순간을 탭으로 쓰지 않는다(전투 중 거절음 없음).
+# 누른 상태(vSnk)는 그대로 기억하므로 연출이 끝날 때까지 누르고 있어도 탭이 되지 않는다. 선택 공간 안에서는 그대로(나가기)
+execute if score #snk tmp matches 1 unless score @s vSnk matches 1 if score #mbLive mb matches 1 if score #mbSt mb matches 0 unless score @s pkMode matches 1.. run scoreboard players set @s vSnk 1
 execute if score #snk tmp matches 1 unless score @s vSnk matches 1 unless score @s dead matches 1 if score @s uiCd matches ..0 run function rlk:lvup/sneak_tap
 scoreboard players operation @s vSnk = #snk tmp
 function rlk:lvup/pick_sub

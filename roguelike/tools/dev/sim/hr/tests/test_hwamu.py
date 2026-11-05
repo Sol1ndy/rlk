@@ -20,12 +20,19 @@ run for real from the datapack in the vendored sims (HR/tests/lib, read only) th
            sidebar, the cues
   cost     HP cost 4 % of current above 50 %, none at <= 50 %, never below 1
   counter  on a landed hit (queued, never inside take_damage) and on dash_iframe, 2-s cooldown, nearest rlk_mob <= 12 b,
-           no target = no cooldown, damage = atk x coef, Electro 1U, #sub itv 1
+           no target = no cooldown, damage = atk x coef, Electro 1U, #sub itv 1; F3 (HR-09): a dodge counts only inside a
+           real dash's own i-frames (items/hook/on_dash -> hw_dash, the dash tick + 6), never burst / fall / revive i-frames,
+           a landed (killing) hit still queues; F3 (HR-39): an invulnerable body (rlk_mb_inv) is no target (no counter, no
+           cooldown; the nearest other mob instead)
   low      crit dmg + only at HP <= 60 % (exact integer threshold)
   slash    only from on_cast_burst, ICD (+ ready cue), 4-t delay, every rlk_mob <= 20 b once, crit rate only if HP <= 50 %
            at the cast (for its duration), #sub itv 1, the vig title (font, empty root) skipped while vBig >= 1 (and
            while a subtitle line is up, ttlT >= 1)
   clear    sold / dropped: stacks, hits, timers, queues, crit time, sidebar cleared once; cooldowns kept
+  run      F3 (HR-10): the per-run reset (player/reset_one -> hw_reset) clears the state AND the cooldowns: no stray ready cue
+           at the next grant, the first burst of the next run slashes
+  view     F3 (HR-08): vBig counts down once per tick in every view (view/tick, before the first-person return): the vig
+           shows in first person after a room title; F5 / the selection space still one per tick (no double count)
   perf     commands per tick while held: idle, in combat (steady), peak
 """
 import copy
@@ -42,7 +49,7 @@ import srsim as S  # noqa: E402
 ARGS = [a for a in sys.argv[1:] if a != '-v']
 VERBOSE = '-v' in sys.argv[1:]
 DP = Path(ARGS[0]).resolve()
-SECTIONS = ARGS[1:] or ['static', 'pools', 'tune', 'stacks', 'cost', 'counter', 'low', 'slash', 'clear', 'perf']
+SECTIONS = ARGS[1:] or ['static', 'pools', 'tune', 'stacks', 'cost', 'counter', 'low', 'slash', 'clear', 'run', 'view', 'perf']
 sys.path.insert(0, str(DP / 'tools'))
 import mboss_scarlet.api as API  # noqa: E402
 
@@ -132,6 +139,16 @@ def burst(s, pl):
     s.call('rlk:items/hook/on_cast_burst', S.pctx(s, pl))
 
 
+def dash(s, pl):
+    """A real dash's item hook (player/dash_go's last line: items/hook/on_dash, @s = the player, at @s); the other items'
+    lines of the hook see no item (their scores 0)."""
+    P = ('e', pl.id)
+    for o in ('it_sword_kirion', 'it_pain_despair', 'it_kinetic_scale', 'it_crane_feather'):
+        if s.sc(P, o) is None:
+            s.setsc(P, o, 0)
+    s.call('rlk:items/hook/on_dash', S.pctx(s, pl))
+
+
 def now(s):
     return s.t + S.GT0
 
@@ -216,9 +233,12 @@ def t_static():
         'items/hook/on_cast_burst': ['execute if score @s it_sword_hwamu matches 1.. unless score #hwSlCd itv matches 1.. run function rlk:items/proc/hw_slash_q'],
         'player/take_damage': ['execute if score @s it_sword_hwamu matches 1.. if score #hurtDmg tmp matches 1.. unless score #hwCtrCd itv matches 1.. run function rlk:items/proc/hw_ctr_q'],
         'player/dash_iframe': ['execute if score @s it_sword_hwamu matches 1.. unless score #hwCtrCd itv matches 1.. run function rlk:items/proc/hw_ctr_q'],
+        # F3 (HR-09): the dash's own i-frame window; F3 (HR-10): the per-run reset
+        'items/hook/on_dash': ['execute if score @s it_sword_hwamu matches 1.. run function rlk:items/proc/hw_dash'],
+        'player/reset_one': ['function rlk:items/proc/hw_reset'],
     }
     for rel, ls in want.items():
-        got = [l for l in lines(rel) if 'sword_hwamu' in l or '#hwOn' in l]
+        got = [l for l in lines(rel) if 'sword_hwamu' in l or '#hwOn' in l or 'proc/hw_' in l]
         ck(f'hook {rel}: exactly the PLAN §7.4.6 line(s)', got == ls, got)
     td = lines('player/take_damage')
     ck('take_damage: after the lion line (:37)', td[-1] == want['player/take_damage'][0] and 'lion_queue' in td[-2])
@@ -255,7 +275,7 @@ def t_static():
         added += [(p.name, l) for l in p.read_text(encoding='utf-8').split('\n')]
     for rel in ('items/register', 'items/build_rarbuckets', 'items/tune/b10', 'items/hook/on_hit', 'items/hook/stat_buffs',
                 'items/hook/tick_player', 'items/hook/on_cast_burst', 'items/enh_add', 'player/take_damage',
-                'player/dash_iframe', 'codex/labels'):
+                'player/dash_iframe', 'codex/labels', 'items/hook/on_dash', 'player/reset_one'):
         added += [(rel, l) for l in rd(rel).split('\n') if 'hw' in l or 'sword_hwamu' in l]
     neg = [(f, l) for f, l in added if re.search(r'scoreboard players (add|remove) \S+ \S+ -', l)]
     ck('no negative literal in scoreboard players add/remove', not neg, neg)
@@ -495,21 +515,24 @@ def t_counter():
     n0 = len(s.log)
     tick(s, pl)
     ck('counter again after the cooldown', len(applies(s, n0)) == 1)
-    # dash i-frames eat a hit -> counter, no HP lost
+    # dash i-frames eat a hit -> counter, no HP lost (a real dash: items/hook/on_dash, 3 ticks before)
     s, pl = S.world(DP, hp=2000)
     S.set_star(s, 3)
     m = S.mob(s, (6.5, 64.0, 0.5))
     hp0 = s.sc(('e', pl.id), 'curHealth')
+    dash(s, pl)
+    s.t += 3
     inside = hurt(s, pl, dash=3)
     ck('dash i-frames: hit dodged (no HP lost), counter queued', inside == [] and s.sc(('e', pl.id), 'curHealth') == hp0
        and s.sc('#hwCtrQ', 'itv') == 1 and s.sc('#dodged', 'tmp') == 1)
     n0 = len(s.log)
     tick(s, pl)
     ck('dash counter next tick', [x[2]['target'] for x in applies(s, n0)] == [m.id])
-    # the framework hazard path (mboss/hz/hurt_pm calls player/dash_iframe directly)
+    # the framework hazard path (mboss/hz/hurt_pm calls player/dash_iframe directly), inside a dash
     s, pl = S.world(DP, hp=2000)
     S.set_star(s, 3)
     S.mob(s, (6.5, 64.0, 0.5))
+    dash(s, pl)
     s.call('rlk:player/dash_iframe', S.pctx(s, pl))
     ck('dash_iframe alone (hazard dodge) queues the counter', s.sc('#hwCtrQ', 'itv') == 1)
     # no target within 12 b: no damage, no cooldown, queue cleared
@@ -550,6 +573,71 @@ def t_counter():
     tick(s, pl)
     ap = applies(s, n0)
     ck('★☆☆: 92 % and cooldown 48 t', ap and ap[0][2]['dmgBase'] == 92 and s.sc('#hwCtrEnd', 'itv') == now(s) + 48)
+    # F3 (HR-09): only a real dash's own i-frames count as a dodge; burst / fall / revive i-frames reuse dashInvT
+    for label, inv, dash_ago, rn, want in (
+            ('burst wind-up i-frames (dashInvT 24, no dash)', 24, None, 0, False),
+            ('void-fall i-frames (dashInvT 20, no dash)', 20, None, 0, False),
+            ('downed Ronova (rnDie 60, dashInvT 80, no dash)', 80, None, 60, False),
+            ('a dash 6 ticks ago (its last i-frame tick), burst i-frames on', 24, 6, 0, True),
+            ('a dash 7 ticks ago (its i-frames over), burst i-frames on', 24, 7, 0, False),
+            ('a dash this tick', 6, 0, 0, True)):
+        s, pl = S.world(DP, hp=2000)
+        S.set_star(s, 3)
+        S.mob(s, (4.5, 64.0, 0.5))
+        P = ('e', pl.id)
+        s.setsc(P, 'rnDie', rn)
+        if dash_ago is not None:
+            dash(s, pl)
+            s.t += dash_ago
+        hp0 = s.sc(P, 'curHealth')
+        hurt(s, pl, dash=inv)
+        q = s.sc('#hwCtrQ', 'itv') or 0
+        n0 = len(s.log)
+        tick(s, pl)
+        got = applies(s, n0)
+        ck(f'HR-09 dodge, {label}: hit eaten (no HP lost); counter {"queued + dealt" if want else "none, no cooldown"}',
+           s.sc(P, 'curHealth') == hp0 and (q == 1 and len(got) == 1 if want
+                                            else q == 0 and not got and (s.sc('#hwCtrCd', 'itv') or 0) == 0),
+           (q, len(got), s.sc('#hwCtrCd', 'itv')))
+    # the hazard path (mboss/hz/hurt_pm -> player/dash_iframe) under burst i-frames, no dash: no counter
+    s, pl = S.world(DP, hp=2000)
+    S.set_star(s, 3)
+    S.mob(s, (6.5, 64.0, 0.5))
+    s.setsc(('e', pl.id), 'dashInvT', 24)
+    s.call('rlk:player/dash_iframe', S.pctx(s, pl))
+    ck('HR-09 hazard dodge under burst i-frames (no dash): no queue', (s.sc('#hwCtrQ', 'itv') or 0) == 0)
+    # a landed hit while downed (the killing blow that downed Ronova, rnDie set by then): still queues (as designed)
+    s, pl = S.world(DP, hp=2000)
+    S.set_star(s, 3)
+    S.mob(s, (4.5, 64.0, 0.5))
+    s.setsc(('e', pl.id), 'rnDie', 60)
+    hurt(s, pl, dmg=50, dash=0)
+    n0 = len(s.log)
+    tick(s, pl)
+    ck('HR-09 a landed hit (no i-frames) still queues and counters, also while downed', len(applies(s, n0)) == 1)
+    # F3 (HR-39): an invulnerable body (rlk_mb_inv: her cutscenes / ghost / gauntlets) is no target
+    s, pl = S.world(DP, hp=2000)
+    S.set_star(s, 3)
+    boss = S.mob(s, (2.5, 64.0, 0.5), tags=('rlk_mob', 'rlk_mb_body', 'rlk_mb_inv'))
+    hurt(s, pl)
+    n0 = len(s.log)
+    tick(s, pl)
+    ck('HR-39 only an invulnerable body in range: no counter (no fx, no damage), no cooldown, queue cleared',
+       not applies(s, n0) and (s.sc('#hwCtrCd', 'itv') or 0) == 0 and s.sc('#hwCtrQ', 'itv') == 0
+       and not [l for l in s.log[n0:] if l[1] == 'call' and l[2] == 'rlk:items/proc/hw_ctr_fx'], (applies(s, n0), s.sc('#hwCtrCd', 'itv')))
+    other = S.mob(s, (7.5, 64.0, 0.5))
+    hurt(s, pl)
+    n0 = len(s.log)
+    tick(s, pl)
+    ck('HR-39 the invulnerable body nearer, a mob at 7 b: the counter hits the mob', [a[2]['target'] for a in applies(s, n0)] == [other.id],
+       [a[2]['target'] for a in applies(s, n0)])
+    boss.tags.discard('rlk_mb_inv')
+    for _ in range(60):
+        tick(s, pl)
+    hurt(s, pl)
+    n0 = len(s.log)
+    tick(s, pl)
+    ck('HR-39 the body hittable again (rlk_mb_inv gone): countered as the nearest', [a[2]['target'] for a in applies(s, n0)] == [boss.id])
 
 
 # ================================================================================================== low
@@ -724,6 +812,147 @@ def t_clear():
     tick(s, pl)
     ck('picked up after its end: released at the first tick (ready cue)', s.sc('#hwSlCd', 'itv') == 0
        and 'rlk:snd/f429' in [l[2] for l in s.log[n0:] if l[1] == 'call'])
+
+
+# ================================================================================================== run (F3, HR-10)
+def reset_one(s, pl):
+    """The real player/reset_one with its heavy calls (not this item) stubbed, as test_moon does; its own lines run."""
+    for f in ('rlk:char/start_reset', 'rlk:lvup/exit', 'rlk:player/init', 'rlk:lvup/init', 'rlk:items/tune/reapply_all',
+              'rlk:player/reset_stacks', 'rlk:element/infuse_end', 'rlk:items/equip_scan'):
+        s.cache[f] = []
+    s.call('rlk:player/reset_one', S.pctx(s, pl))
+
+
+def t_run():
+    s, pl = S.world(DP, hp=1000)
+    S.set_star(s, 3)
+    P = ('e', pl.id)
+    S.mob(s, (3.5, 64.0, 0.5))
+    s.setsc(P, 'curHealth', 400)
+    hit(s, pl, 14)
+    tick(s, pl, before=lambda: burst(s, pl))
+    hurt(s, pl)
+    tick(s, pl)
+    ck('HR-10 setup: a burst and a counter in the last seconds of a run (both cooldowns on, stacks, sidebar)',
+       s.sc('#hwSlCd', 'itv') == 1 and s.sc('#hwCtrCd', 'itv') == 1 and s.sc('#hwStk', 'itv') >= 1
+       and s.sc('육참골단', 'stacks') is not None)
+    s.setsc(P, 'it_sword_hwamu', 0)                    # the run ends: reset_one clears the inventory
+    reset_one(s, pl)
+    tick(s, pl)
+    ck('HR-10 run reset (player/reset_one): both cooldowns, stacks, hits, queues, crit time and the sidebar cleared',
+       all((s.sc(k, 'itv') or 0) == 0 for k in ('#hwSlCd', '#hwCtrCd', '#hwStk', '#hwAtk', '#hwHits', '#hwCtrQ', '#hwSlQ',
+                                                '#hwCritT', '#hwPulse', '#hwOn'))
+       and s.sc('육참골단', 'stacks') is None,
+       {k: s.sc(k, 'itv') for k in ('#hwSlCd', '#hwCtrCd', '#hwStk', '#hwOn')})
+    # (a) the next run's grant, 6000 t later: no stray ready cue on the first held tick
+    for _ in range(6000):
+        s.t += 1
+    s.setsc(P, 'it_sword_hwamu', 1)
+    n0 = len(s.log)
+    tick(s, pl)
+    ck('HR-10 the sword held again in the next run: no stray ready cue (no hw_ready, no f429)',
+       not [l for l in s.log[n0:] if l[1] == 'call' and l[2] in ('rlk:items/proc/hw_ready', 'rlk:snd/f429')])
+    # (b) the sword back soon after the reset (the lobby trial): the first burst slashes
+    s2, pl2 = S.world(DP, hp=1000, atk=100)
+    S.set_star(s2, 3)
+    S.mob(s2, (5.5, 64.0, 0.5))
+    tick(s2, pl2, before=lambda: burst(s2, pl2))
+    s2.setsc(('e', pl2.id), 'it_sword_hwamu', 0)
+    reset_one(s2, pl2)
+    for _ in range(200):
+        tick(s2, pl2)
+    s2.setsc(('e', pl2.id), 'it_sword_hwamu', 1)
+    S.set_star(s2, 3)
+    tick(s2, pl2)
+    n0 = len(s2.log)
+    tick(s2, pl2, before=lambda: burst(s2, pl2))
+    for _ in range(6):
+        tick(s2, pl2)
+    ck('HR-10 the sword back 200 t after a run reset: the first burst slashes (not swallowed by the old ICD)',
+       [l for l in s2.log[n0:] if l[1] == 'call' and l[2] == 'rlk:items/proc/hw_slash'] and applies(s2, n0))
+    # in-run drop / pick-up keeps its rule (hw_clear keeps the cooldowns): see the clear section
+
+
+# ================================================================================================== view (F3, HR-08)
+VIEW_STUBS = ('rlk:view/fresh', 'rlk:view/menu_do', 'rlk:view/burst_camera_tick', 'rlk:view/map_tick', 'rlk:view/fps_tick',
+              'rlk:view/spawn', 'rlk:view/mob_aggro', 'rlk:view/move', 'rlk:view/sprint_fov', 'rlk:view/av_tick',
+              'rlk:view/aim', 'rlk:view/rot', 'rlk:view/slow', 'rlk:view/seat_new', 'rlk:view/ride_mount', 'rlk:view/xhair',
+              'rlk:view/ride_off', 'rlk:boss/raiden/camera/hold')
+
+
+def view_world(on, vmode=2):
+    """A player with the real view/tick (and its real ride_tick / hold / sel_xhair lines); the engine calls around the vBig
+    lines are stubbed (the avatar, the camera seat, the crosshair title itself)."""
+    s, pl = S.world(DP, hp=1000)
+    S.set_star(s, 3)
+    for f in VIEW_STUBS:
+        s.cache[f] = []
+    # ride_tick's seat / mount lines (`on vehicle`, `ride`) are not in the sim: dropped; every other line runs as written
+    s.cache['rlk:view/ride_tick'] = [l for l in rd('view/ride_tick').split('\n')
+                                     if not re.search(r'\bon vehicle\b|(^|\brun )ride ', l)]
+    s.setsc('#on', 'view', on)
+    s.setsc('#vmode', 'view', vmode)
+    s.setsc('#vFresh', 'view', 0)
+    s.setsc('#bowChg', 'tmp', 1)
+    P = ('e', pl.id)
+    for o, v in (('rdCam', 0), ('vMap', 0), ('devMode', 0), ('dead', 0), ('pkMode', 0), ('rlkMenu', 0), ('vTtp', 0),
+                 ('ttlT', 0), ('vMapH', 0), ('vMapL', 0), ('vMapR', 0)):
+        s.setsc(P, o, v)
+    s.setsc('#spr', 'view', 0)
+    s.setsc('#sprNow', 'view', 0)
+    s.setsc('#t', 'view', 0)
+    return s, pl
+
+
+def view_ticks(s, pl, n):
+    for _ in range(n):
+        s.t += 1
+        S.run_line(s, 'function rlk:view/tick', S.Ctx(pl, tuple(pl.pos), tuple(pl.rot)))
+
+
+def t_view():
+    fn_all = [(p.relative_to(FN).as_posix(), l) for p in FN.rglob('*.mcfunction')
+              for l in p.read_text(encoding='utf-8').split('\n') if re.search(r'scoreboard players remove \S+ vBig 1', l)]
+    vt = rd('view/tick').split('\n')
+    dec = 'execute if score @s vBig matches 1.. run scoreboard players remove @s vBig 1'
+    first_ret = next(i for i, l in enumerate(vt) if 'return run function rlk:view/fps_tick' in l)
+    rets = [i for i, l in enumerate(vt) if ' return ' in l and 'rdCam' not in l]
+    ck('HR-08 one vBig count-down in the whole pack: view/tick, before the first-person return and every other return '
+       '(but the legacy rdCam line)', [f for f, _ in fn_all] == ['view/tick.mcfunction'] and dec in vt
+       and vt.index(dec) < first_ret and all(vt.index(dec) < i for i in rets), fn_all)
+    # first person (view off): the room title's vBig 70 runs out; the next burst shows the vig
+    s, pl = view_world(on=0)
+    P = ('e', pl.id)
+    s.setsc(P, 'vBig', 70)                               # room/gen_title2 at a new map
+    view_ticks(s, pl, 69)
+    v69 = s.sc(P, 'vBig')
+    view_ticks(s, pl, 1)
+    ck('HR-08 first person: vBig 70 -> 1 after 69 ticks, 0 after 70 (one per tick)', v69 == 1 and s.sc(P, 'vBig') == 0, (v69, s.sc(P, 'vBig')))
+    n0 = len(s.log)
+    burst(s, pl)
+    ttl = [l for l in s.log[n0:] if l[1] == 'title']
+    ck('HR-08 first person: the burst after the room title shows the vig (times + glyph), vBig 6', len(ttl) == 2 and s.sc(P, 'vBig') == 6, ttl)
+    view_ticks(s, pl, 6)
+    ck('HR-08 first person: the vig\'s own vBig 6 runs out in 6 ticks', s.sc(P, 'vBig') == 0)
+    # shoulder view (vmode 1), dead (F5): counted down too
+    for label, on, vm, dead, pk in (('shoulder view', 1, 1, 0, 0), ('F5 while dead', 1, 2, 1, 0)):
+        s, pl = view_world(on=on, vmode=vm)
+        P = ('e', pl.id)
+        s.setsc(P, 'dead', dead)
+        s.setsc(P, 'pkMode', pk)
+        s.setsc(P, 'vBig', 30)
+        view_ticks(s, pl, 10)
+        ck(f'HR-08 {label}: vBig 30 -> 20 after 10 ticks', s.sc(P, 'vBig') == 20, s.sc(P, 'vBig'))
+    # F5 (riding) and the selection space in F5: still exactly one per tick (no double count with the old ride_tick /
+    # sel_xhair lines)
+    for label, pk in (('F5', 0), ('F5 selection space (pkMode 1)', 1)):
+        s, pl = view_world(on=1, vmode=2)
+        P = ('e', pl.id)
+        s.setsc(P, 'pkMode', pk)
+        s.setsc(P, 'vBig', 30)
+        s.setsc('#xh', 'view', 0)
+        view_ticks(s, pl, 10)
+        ck(f'HR-08 {label}: vBig 30 -> 20 after 10 ticks (one per tick)', s.sc(P, 'vBig') == 20, s.sc(P, 'vBig'))
 
 
 # ================================================================================================== perf

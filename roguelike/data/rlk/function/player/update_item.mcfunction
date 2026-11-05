@@ -94,10 +94,11 @@ execute store result storage rlk:item b4 int 1 run scoreboard players get @s cry
 execute store result storage rlk:item b5 int 1 run scoreboard players get @s geoBonus
 execute store result storage rlk:item b6 int 1 run scoreboard players get @s anemoBonus
 execute store result storage rlk:item b7 int 1 run scoreboard players get @s dendroBonus
-# 월하대작(홍련 이벤트 버프): 켜져 있으면 마지막 줄에 이름 · 수치(load 의 조절 지점 #hrMoon*) · 범위, 꺼져 있으면 빈 줄
-#   (번역 키가 없는 translate 의 fallback 이 서식: %s 자리에 with 의 수, %% = %)
+# 월하대작(홍련 이벤트 버프): 켜져 있으면 마지막 줄에 이름 · 수치(load 의 조절 지점 #hrMoon*) · 범위(#hrMoonRun: 0 이면 "영구"),
+#   꺼져 있으면 빈 줄 (번역 키가 없는 translate 의 fallback 이 서식: %s 자리에 with 의 값, %% = %)
 data modify storage rlk:item moon set value {text:"",italic:false}
-execute if score @s hrMoon matches 1.. run data modify storage rlk:item moon set value {translate:"rlk.hr_moon",fallback:"☾ 월하대작 · 최종 공격력 +%s%% · 치명타 확률 +%s%% · 이동 속도 +%s%% (이번 런)",with:[0,0,0],color:"#DDE6FF",italic:false}
+execute if score @s hrMoon matches 1.. run data modify storage rlk:item moon set value {translate:"rlk.hr_moon",fallback:"☾ 월하대작 · 최종 공격력 +%s%% · 치명타 확률 +%s%% · 이동 속도 +%s%% (%s)",with:[0,0,0,"이번 런"],color:"#DDE6FF",italic:false}
+execute if score @s hrMoon matches 1.. if score #hrMoonRun tmp matches 0 run data modify storage rlk:item moon.with[3] set value "영구"
 execute if score @s hrMoon matches 1.. store result storage rlk:item moon.with[0] int 1 run scoreboard players get #hrMoonAtk tmp
 execute if score @s hrMoon matches 1.. store result storage rlk:item moon.with[1] int 1 run scoreboard players get #hrMoonCrit tmp
 execute if score @s hrMoon matches 1.. store result storage rlk:item moon.with[2] int 1 run scoreboard players get #hrMoonSpd tmp

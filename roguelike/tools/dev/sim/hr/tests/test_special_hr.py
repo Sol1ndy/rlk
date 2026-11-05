@@ -38,6 +38,10 @@ Base files come from git (read-only `git ls-tree` / `git show` of the base commi
   pack    check_mboss_pack: 0 on the tree; on variants it reports a missing / macro optional hook, a missing hook line
           in sp/reward, a flag set by bars_hide, a record without its poof:0b
   api     tools/mboss_scarlet/api.py --check green; api.bars / api.RW_HOOK_LINE / api.FN_FIELDS against mboss_lib
+  tap     F3 (HR-34, pack-wide F:lvup/tick): in the default F5 view a Shift press while a boss intro runs (#mbLive 1,
+          #mbSt 0: her intro skip is a 20-t Shift hold) is not the F5 sneak-tap (no lvup/sneak_tap, so no in-combat deny
+          sound with a pending pick), also while held to the intro's end; after the intro and outside a fight the press is
+          the tap as before; inside the selection space the press still is the tap (leave it)
 
 I1 (11-05, the lead): her entry is enabled on the merged tree (wip/hr). R2b and the ident section are skipped then
 (HR/tests/ident_hr.py checks the tree against 35b82e5 with the contract §5 allow-list), R13 disables her explicitly for
@@ -65,7 +69,7 @@ if '--base' in ARGS:
     BASE = ARGS[i + 1]
     del ARGS[i:i + 2]
 DP = Path(ARGS[0]).resolve()
-SECTIONS = ARGS[1:] or ['reg', 'music', 'ident', 'enable', 'words', 'fight', 'bars', 'pack', 'api']
+SECTIONS = ARGS[1:] or ['reg', 'music', 'ident', 'enable', 'words', 'fight', 'bars', 'pack', 'api', 'tap']
 FN = DP / 'data/rlk/function'
 TOOLS = DP / 'tools'
 sys.path.insert(0, str(TOOLS))
@@ -785,8 +789,53 @@ def sec_api():
     check('A4 api.music(1) plays the cherry-grove pool through mboss_lib.music', API.music(1) == L.music(1) == 'function rlk:mboss/music/set {ph:1}')
 
 
+def sec_tap():
+    s, pl = H.setup_sc(DP, seed=81)
+    ok = H.fight_sc(s, intro=True)
+    P = ('e', pl.id)
+    s.cache['rlk:lvup/pick_sub'] = []                 # the pick screen's own ticks (not this input line)
+    s.cache['rlk:lvup/room_tick'] = []
+    s.cache['rlk:lvup/sneak_tap'] = []                # the tap itself: recorded (s.watch), its toggle / deny not run here
+    s.watch['rlk:lvup/sneak_tap'] = []
+    s.setsc('#on', 'view', 1)
+    s.setsc('#vmode', 'view', 2)
+    for o, v in (('pkPending', 1), ('pkMode', 0), ('vSnk', 0), ('dead', 0), ('uiCd', 0), ('ttlT', 0), ('sneakT', 0)):
+        s.setsc(P, o, v)
+
+    def lv(sneak):
+        pl.data['sneak'] = sneak
+        s.call('rlk:lvup/tick', H.ctx(pl))
+        return len(s.watch['rlk:lvup/sneak_tap'])
+
+    intro = ok and H.mb(s, '#mbLive') == 1 and H.mb(s, '#mbSt') == 0
+    n1 = lv(True)
+    held = [lv(True) for _ in range(25)]
+    check('HR-34 F5, her intro running (#mbLive 1, #mbSt 0), a pending pick: the Shift press (the skip hold) is no sneak-tap, '
+          'nor while held for 25 t', intro and n1 == 0 and held[-1] == 0, (intro, n1, held[-1]))
+    H.call_sc(s, 'core/intro/done')
+    c0 = held[-1]
+    d = lv(True) - c0
+    check('HR-34 still held when the intro ends (#mbSt 1): no tap (no new press)', H.mb(s, '#mbSt') == 1 and d == 0,
+          (H.mb(s, '#mbSt'), d))
+    c0 = lv(False)
+    d = lv(True) - c0
+    check('HR-34 a new press in the fight (#mbSt 1): the sneak-tap as before (its in-combat refusal is the pack\'s)', d == 1, d)
+    lv(False)
+    s.setsc('#mbSt', 'mb', 0)
+    s.setsc(P, 'pkMode', 1)
+    c0 = lv(False)
+    d = lv(True) - c0
+    check('HR-34 inside the selection space (pkMode 1) during an intro: the press still is the tap (leaving it)', d == 1, d)
+    lv(False)
+    s.setsc(P, 'pkMode', 0)
+    s.setsc('#mbLive', 'mb', 0)
+    c0 = lv(False)
+    d = lv(True) - c0
+    check('HR-34 no fight (#mbLive 0, #mbSt 0 as after cleanup_fight): the press is the tap as before', d == 1, d)
+
+
 SEC = {'reg': sec_reg, 'music': sec_music, 'ident': sec_ident, 'enable': sec_enable, 'words': sec_words, 'fight': sec_fight,
-       'bars': sec_bars, 'pack': sec_pack, 'api': sec_api}
+       'bars': sec_bars, 'pack': sec_pack, 'api': sec_api, 'tap': sec_tap}
 try:
     for name in SECTIONS:
         print(f'== {name}')
