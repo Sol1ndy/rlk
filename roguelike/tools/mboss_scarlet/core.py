@@ -11,7 +11,7 @@ sequences core/sq/** (S2b) and the gauntlets core/gs/** (S4).
 sequence (s3lib.SEQ_ID, index of api.SEQS + 1) on the clock #sq (0 at its start, + 1 before each tick); #sqdone 1 ends it.
 #gk = the gauntlet of the current chain (1 A8 / 2 A13; the counter cinematic's repel {at} and the lead_stand {g} follow it),
 #gres its judge (1 deflect / 2 fail), #grs a gauntlet restart pending at resume (1 lead_stand {g}, 2 the revive wait, 3 the
-judged deflect goes on to the counter cinematic). #fl the reserved floor step (1 CS1, 2 the A13 lead-in), #flw the down
+judged deflect goes on to the counter cinematic; F1: 4 the judged A8 fail goes on to P2, 5 a lethal fail pending). #fl the reserved floor step (1 CS1, 2 the A13 lead-in), #flw the down
 window's 40 t wait. #inv the core's invulnerable window (rlk_mb_inv = #inv or the ghost tag or A6 ticks 0-4: core/inv).
 """
 import math
@@ -89,6 +89,28 @@ def seq_hold(grs):
     #sq = the shown clip tick) instead of running the start and its tick 1 before the first rig/tick. The /reload restarts
     of CS1 / SQ1 / the lead-ins hold it the same way (core/re/*)."""
     return [f'execute if score {grs} {OBJ} matches {v} run {sset("#sq", -1)}' for v in (1, 3)]
+
+
+# F1 (HR-01 / HR-07, lead decisions 11-05): what a paused / reloaded gauntlet goes on with besides the restart (#grs 1) and
+# the two judged windows (#grs 2 / 3): #grs 4 = the A8 fail was judged (ULT60_LETHAL false; its 500 per-mille hit landed)
+# -> P2 at once; #grs 5 = a lethal gauntlet (A13 with ULT5_LETHAL, A8 with ULT60_LETHAL) was paused after its last
+# counting cut's pip window closed (strike + 1) with pips left -> the fail stays pending and lands as soon as the player is
+# back and alive (core/g/fail_now: the fatal -> the revive path); before that strike the restart rule (PLAN §3.8 / §5.6).
+LETHAL = {g: bool(api.ULT60_LETHAL if g == 'a8' else api.ULT5_LETHAL) for g in GAUNT}
+PEND_T = {g: max(c[2] for _t, _s, _cl, c in api.SCRIPTS[g] if c) + 1 for g in GAUNT}
+PLAYER_BACK = ('if entity @a[tag=player,limit=1] unless entity @a[tag=player,scores={dead=1}] '
+               'unless entity @a[tag=player,scores={rnDie=1..}]')
+
+
+def grs_go(reload=False):
+    """The resume / reload lines of #grs 4 and 5 (a reload applies the pending fail only when the player is back and
+    alive; else #grs 5 waits for the framework's resume)."""
+    out = []
+    if not api.ULT60_LETHAL:
+        out.append(f'execute if score #grs {OBJ} matches 4 run {fn("core/p2/from_fail")}')
+    if any(LETHAL.values()):
+        out.append(f'execute if score #grs {OBJ} matches 5 {PLAYER_BACK + " " if reload else ""}run {fn("core/g/fail_now")}')
+    return out
 
 
 def music_to(ph):
@@ -218,13 +240,14 @@ def build(W, ctx):
     # ---------------------------------------------------------------------------------------------- P1 / P2
     w('core/fp', [
         '# A fight-phase tick (P1 / P2; @s = body): the phase clock, AI samples, the triggers (A6, the counter, the flinch), then',
-        '# the running pattern or the recovery.',
+        '# the running pattern or the recovery. F1 (HR-04): while a floor step is reserved (#fl) neither trigger starts a move',
+        '# (CS1 / the A13 lead-in come at the next decision; ai/phase drops the flags at the next fight phase).',
         f'scoreboard players add #ai_pht {OBJ} 1',
         f'scoreboard players operation #t {OBJ} = #clk {OBJ}',
         f'scoreboard players operation #t {OBJ} %= #c5 {OBJ}',
         f'execute if score #t {OBJ} matches 0 run {fn("ai/sample")}',
-        f'execute if score #a6q {OBJ} matches 1 if function {NS}ai/a6 run return 0',
-        f'execute if score #ctr {OBJ} matches 1 if score #pat {OBJ} matches 0 if function {NS}ai/counter run return 0',
+        f'execute if score #a6q {OBJ} matches 1 if score #fl {OBJ} matches 0 if function {NS}ai/a6 run return 0',
+        f'execute if score #ctr {OBJ} matches 1 if score #pat {OBJ} matches 0 if score #fl {OBJ} matches 0 if function {NS}ai/counter run return 0',
         f'execute if score #flq {OBJ} matches 1 run {fn("core/flinch")}',
         f'execute if score #pat {OBJ} matches 1.. run return run {fn("core/pat_tick")}',
         f'execute if score #lock {OBJ} matches 1 run return 0',
@@ -431,8 +454,9 @@ def phase_files(W, ctx):
     w('core/g/end', [
         '# The gauntlet set #done (@s = body; S4: at REPEL_T after a deflect, at FAIL60_P2_T after the A8 fail): #gres decides.',
         '# A8: deflect -> CS2 (repel {at:60}); fail -> P2 (the fail-60 hit and g_reform were the gauntlet\'s). A13: deflect -> CS3',
-        '# (repel {at:5}); fail (the instant death did not end the run) -> the revive stance -> A13 again.',
-        sset('#done', 0), sset('#pat', 0), sset('#pt', 0),
+        '# (repel {at:5}); fail (the instant death did not end the run) -> the revive stance -> A13 again. F1 (HR-06): a test\'s',
+        '# forced fail (#pipoff, tests 23 / 29) applies to this one judge only.',
+        sset('#done', 0), sset('#pat', 0), sset('#pt', 0), sset('#pipoff', 0),
         f'execute if score #gres {OBJ} matches 1 run return run {fn("core/repel/start")}',
         f'execute if score #gk {OBJ} matches {S.GK["a8"]} run return run {fn("core/p2/from_fail")}',
         fn('core/revive/start')])
@@ -634,9 +658,11 @@ def hooks(W, ctx):
     pause = ['# Hook pause (the fight froze: dead, reviving, a menu, no player; @s = body): the kit cards go; a pattern\'s own pause;',
              '# a running gauntlet is cancelled (hazards, discs, ghost, the banner off, the darkness lifted) and restarts at resume',
              '# through lead_stand {g} from T0 with 5/5 (PLAN §3.8 / §5.6); after its fatal: the revive stance; after a judged',
-             '# deflect: the counter cinematic.']
+             '# deflect: the counter cinematic; after the judged A8 fail: P2 at once (#grs 4, F1 HR-01); a lethal gauntlet paused',
+             '# past its last counting cut with pips left: its fail at the resume (#grs 5, core/g/fail_now, F1 HR-07).']
     pause += [x for x in (K.fixed('clear'),) if x]
-    resume = ['# Hook resume (@s = body): a pattern\'s own resume; a pending gauntlet restart (#grs).']
+    resume = ['# Hook resume (@s = body): a pattern\'s own resume; what a paused gauntlet left (#grs): its restart (1), the revive',
+              '# stance (2), the counter cinematic (3), P2 after the judged A8 fail (4), the pending lethal fail (5, core/g/fail_now).']
     for k in present:
         if k not in GAUNT and ctx.pat_file(W, k, 'pause'):
             pause.append(f'execute if score #pat {OBJ} matches {TID[k]} run {fn(f"p/{k}/pause")}')
@@ -647,16 +673,44 @@ def hooks(W, ctx):
                f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a13"]} run {fn("core/lead/a13")}',
                f'execute if score #grs {OBJ} matches 2 run {fn("core/revive/start")}',
                f'execute if score #grs {OBJ} matches 3 run {fn("core/repel/start")}',
-               *seq_hold('#grs'), sset('#grs', 0)]
+               *grs_go(), *seq_hold('#grs'), sset('#grs', 0)]
     w('pause', pause)
     w('resume', resume)
-    w('core/g/pause', ['# A gauntlet paused (@s = body): cancelled now; what resume does (#grs).',
-                       sset('#grs', 1),
-                       f'execute if score #gres {OBJ} matches 1 run {sset("#grs", 3)}',
-                       f'execute if score #gres {OBJ} matches 2 if score #gk {OBJ} matches {S.GK["a13"]} run {sset("#grs", 2)}',
-                       fn('core/cancel_d'), sset('#pat', 0), sset('#pt', 0), sset('#done', 0), fn('shield/off'), *warn(0),
-                       *look_req('crimson'), fn('core/stop_move'), fn('core/ground'), api.rig('look/form/normal'),
-                       f'tag @s remove {api.TAGS["ghost"]}'])
+    gp = ['# A gauntlet paused (@s = body): cancelled now; what resume does (#grs). F1: the judged A8 fail -> P2 (4, HR-01);',
+          '# a lethal gauntlet past its last counting cut with pips left -> the fail pending (5, HR-07); a test\'s forced fail',
+          '# (#pipoff) ends here (HR-06). Already cancelled (a /reload while the pause lasts: core/re/g): the first pause\'s',
+          '# #grs stands (the shield and the clock are gone by now).',
+          f'execute if score #pat {OBJ} matches 0 run return 0',
+          sset('#grs', 1),
+          f'execute if score #gres {OBJ} matches 1 run {sset("#grs", 3)}',
+          f'execute if score #gres {OBJ} matches 2 if score #gk {OBJ} matches {S.GK["a13"]} run {sset("#grs", 2)}']
+    if not api.ULT60_LETHAL:
+        gp.append(f'execute if score #gres {OBJ} matches 2 if score #gk {OBJ} matches {S.GK["a8"]} run {sset("#grs", 4)}')
+    for g in GAUNT:
+        if LETHAL[g]:
+            gp.append(f'execute if score #gres {OBJ} matches 0 if score #gk {OBJ} matches {S.GK[g]} if score {api.PIPS_FP} {OBJ} '
+                      f'matches 1.. if score #pt {OBJ} matches {PEND_T[g]}.. run {sset("#grs", 5)}')
+    w('core/g/pause', gp + [sset('#pipoff', 0),
+                            fn('core/cancel_d'), sset('#pat', 0), sset('#pt', 0), sset('#done', 0), fn('shield/off'), *warn(0),
+                            *look_req('crimson'), fn('core/stop_move'), fn('core/ground'), api.rig('look/form/normal'),
+                            f'tag @s remove {api.TAGS["ghost"]}'])
+    if any(LETHAL.values()):
+        fnow = ['# F1 (HR-07, lead decision 11-05): the pending fail of a lethal gauntlet (#grs 5: paused / reloaded after its last',
+                '# counting cut with pips left; @s = body, the player back and alive): the gauntlet\'s fail now (p/<g>/fail: the',
+                '# instant death staged, ult/fatal as the player; Ronova\'s revive applies), then what follows the fatal there: A13 ->',
+                '# the revive stance (lead_stand -> A13 again); A8 (ULT60_LETHAL) -> lead_stand {g:"a8"} (its clock held one tick).',
+                sset('#grs', 0)]
+        for g in GAUNT:
+            if not LETHAL[g]:
+                continue
+            fail = fn(f'p/{g}/fail') if ctx.pat_file(W, g, 'fail') else f'execute as {S.PL} run {api.shield("fatal")}'
+            fnow.append(S.gate(f'if score #gk {OBJ} matches {S.GK[g]}', fail))
+            if g == 'a13':
+                fnow.append(f'execute if score #gk {OBJ} matches {S.GK[g]} run return run {fn("core/revive/start")}')
+            else:
+                fnow += [f'execute if score #gk {OBJ} matches {S.GK[g]} run {fn("core/lead/a8")}',
+                         f'execute if score #gk {OBJ} matches {S.GK[g]} run {sset("#sq", -1)}']
+        w('core/g/fail_now', fnow)
     # stop everything of the fight state
     cancels = []
     for name in api.SEQS:
@@ -737,12 +791,14 @@ def hooks(W, ctx):
                       seq(ctx, 'cs1', 'cancel'), sset('#sqn', 0), music_to(2), fn('core/sq1/start'), sset('#sq', -1)])
     w('core/re/sq1', ['# /reload in SQ1: SQ1 again from tick 0 (the crimson look first).', seq(ctx, 'sq1', 'cancel'), sset('#sqn', 0),
                       fn('core/sq1/start'), sset('#sq', -1)])
-    w('core/re/g', ['# /reload in a gauntlet: as a pause (cancelled, the darkness lifted), then at once its restart.',
+    w('core/re/g', ['# /reload in a gauntlet: as a pause (cancelled, the darkness lifted), then at once its restart (F1: or P2 after',
+                    '# the judged A8 fail; a pending lethal fail lands now when the player is back and alive, else at the resume).',
                     fn('core/g/pause'),
                     f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a8"]} run {fn("core/lead/a8")}',
                     f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a13"]} run {fn("core/lead/a13")}',
                     f'execute if score #grs {OBJ} matches 2 run {fn("core/revive/start")}',
-                    f'execute if score #grs {OBJ} matches 3 run {fn("core/repel/start")}', *seq_hold('#grs'), sset('#grs', 0)])
+                    f'execute if score #grs {OBJ} matches 3 run {fn("core/repel/start")}', *grs_go(reload=True), *seq_hold('#grs'),
+                    (f'execute unless score #grs {OBJ} matches 5 run {sset("#grs", 0)}' if any(LETHAL.values()) else sset('#grs', 0))])
     rest = ['# /reload in the counter cinematic: its end (the HP steps it had not applied yet, then CS2 -> the down window, CS3 ->',
             '# the lethal hit -> CS4).', seq(ctx, 'repel', 'cancel'), sset('#sqn', 0), L.cine(False)]
     for g in GAUNT:
@@ -833,10 +889,13 @@ def tests(W, ctx):
                     fn('core/down/start')])
     w('test/lead', ['# Test 26: lead_stand {g:"a13"} -> A13.', f'execute unless function {NS}core/force run return 0', fn('test/prep'),
                     sset('#pipoff', 0), fn('core/lead/a13')])
-    w('test/intro', ['# Test 30: the intro again (invulnerable).', f'execute unless function {NS}core/force run return 0',
+    # F1 (HR-06): the replay hands the fight back to P1 / P2 only, so it refuses elsewhere (as 타키's core/force does in a
+    # mantle / transition): from CS1, a gauntlet, the down window, a lead-in it would leave the phase with nothing running
+    p12 = f'execute unless score #ph {OBJ} matches {PH["p1"]} unless score #ph {OBJ} matches {PH["p2"]} run return 0'
+    w('test/intro', ['# Test 30: the intro again (invulnerable); only in P1 / P2.', p12, f'execute unless function {NS}core/force run return 0',
                      fn('core/replay/start')])
-    w('test/skip100', [f'# Test 35: the intro again, skipped at its tick 100.', f'execute unless function {NS}core/force run return 0',
-                       fn('core/replay/start'), sset('#skp', 100)])
+    w('test/skip100', [f'# Test 35: the intro again, skipped at its tick 100; only in P1 / P2.', p12,
+                       f'execute unless function {NS}core/force run return 0', fn('core/replay/start'), sset('#skp', 100)])
     w('test/look_dark', ['# Test 31: the dark look on / off (crimson).',
                          *[S.gate(f'if score #lk {OBJ} matches {api.LOOK_ID["dark"]}', x) for x in look_req('crimson')],
                          f'execute if score #lk {OBJ} matches {api.LOOK_ID["dark"]} run return run {sset("#lk", api.LOOK_ID["crimson"])}',

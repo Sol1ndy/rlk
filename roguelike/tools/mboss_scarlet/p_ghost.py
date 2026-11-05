@@ -10,24 +10,26 @@ are the framework's (mboss/hz/disc, mboss/pj/launch), quiet (#hzQuiet 1, no outl
 
 Runtime (api.Pattern; @s = the body, at it; clock #pt hr = played ticks since start; the shown clip tick == #pt):
 - p/<key>/start (tick 0), p/<key>/tick -> the 16-tick block p/<key>/b/<i> -> the tick file p/<key>/k/<t>,
-  p/<key>/cancel (any executor, idempotent). #done hr 1 on the last tick (R1 76, R2 60, R3 60; A8 REPEL_T 206 after a
-  deflect / FAIL60_P2_T 214 after the fail; A13 270 both).
+  p/<key>/cancel (any executor, idempotent). #done hr 1 on the last tick (R1 67, R2 60, R3 49 - F1 HR-14: R1 / R3 end 12 t
+  after their last hit; A8 REPEL_T 206 after a deflect / FAIL60_P2_T 214 after the fail; A13 270 both).
 - The cut builder (PLAN §5.3): g/cut/make {s,t,dmg,kb,n} makes a quiet Electro disc hazard of api.CUT_R at the player's
   feet on the floor (hz_opts quiet 1 / sfx 0 / el 3 / act 2, kb along her -> the player: kbdir 1), tagged rlk_hr_cut +
   rlk_hr_p + rlk_hr_p_<key of #pat>, objective hr = s (its strike tick), rlk_hr_cnt when it counts; g/cut/aim {s} puts it
   on the player again (mboss/hz/aim, every tick made + 1 .. lock - 1); g/cut/lock {s} the last aim and, for a counting
   cut, shield/cut {s} as its marker at it (S3's pip window at the lock point). R1 / R3 cuts never count (n 0).
 - The moon disc (PLAN §4.5 A7): g/disc/throw {kb}: one item display card 1 b in front of her, api.DISC y 0.9 b over the
-  floor (the framework's blade rows then cover 0 .. 1.65 b: a jump does not clear it), summoned, then rotated toward the
-  player's position (pitch 0), launched (pj/launch blade, hr 1.4, life 16, wall stop, T2 Electro, kb), dressed by the kit
-  (fx/prop/disc) or a flat purple pane stand-in; no homing; never counts for the shield.
+  floor (the framework's blade rows then cover 0 .. 1.65 b: a jump does not clear it), summoned, then rotated toward its
+  lock (pitch 0; F1 HR-15: g/disc/lock put a marker at the player's feet LOCK_LEAD t before the release and turned her to
+  it), launched (pj/launch blade, hr 1.4, life 16, wall stop, T2 Electro, kb), dressed by the kit (fx/prop/disc) or a flat
+  purple pane stand-in; no homing; never counts for the shield.
 - Spots g/spot/<name> (@s = the body): a marker rlk_hr_gsp at the first candidate passing mv/ok (inside MOVE_R 22.5, feet
   and head free), the candidates relative to the player's facing (api.REAPPEAR bearings / distances and their
   fallbacks), else the guaranteed fallback: the point on the player -> C line at the move's distance (<= FALLBACK_R from
   C), walked toward the axis in 0.5 b steps until mv/ok passes (never in blocks).
 - The ghost: rlk_hr_ghost on the body + the rig look form/ghost from the lilac switch (T0); the core keeps rlk_mb_inv
   then. Gauntlets: off at the dive's reappearance (form normal, A8.9). R1 / R3: form normal at g_reform's 'solid' event,
-  the tag off at the script's 'solid' row (R1 62, R3 46: hittable again).
+  the tag off at the script's 'solid' row (R1 62, R3 46: hittable again); from that row to the end (R2: api.TAIL_MOVE t
+  after its last release) she turns to the player and moves as the recovery does (F1 HR-14: ai/tail, ai/tail_step).
 - The gauntlet frame (PLAN §5.4-5.5): the judge at api.JUDGE_T calls shield/judge (S3 plays the deflect staging), the
   darkness lifts (arena_look crimson) and the warning banner goes; deflect: she drops from 1 b above the player to the
   floor 1.2 b in front of them (JT + 2 .. JT + 10), #done at REPEL_T; the fail by the gauntlet's switch (question 6):
@@ -60,6 +62,8 @@ TAG_P, TAG_CUT, TAG_GHOST = api.TAGS['pat'], api.TAGS['cut'], api.TAGS['ghost']
 CNT_T = 'rlk_hr_cnt'                 # the hazard marker of a counting cut (g/cut/lock registers its pip window)
 SPOT_T = 'rlk_hr_gsp'                # the transient spot marker of g/spot/<name>
 DISC_T, DISC_NEW = 'rlk_hr_disc', 'rlk_hr_gdn'
+DISC_LOCK_NEW = 'rlk_hr_gln'         # F1 (HR-15): the transient tag of a new disc lock marker (g/disc/lock)
+FACE_LOCK = f'execute at @s facing entity {S.LOCK_M} feet run tp @s ~ ~ ~ ~ 0'   # she faces the disc's lock marker
 SPOT_M = f'@e[type=minecraft:marker,tag={SPOT_T},limit=1]'
 SPOT_ALL = f'@e[type=minecraft:marker,tag={SPOT_T}]'
 KILL_SPOT = f'kill {SPOT_ALL}'
@@ -116,14 +120,16 @@ SPOTS = {
              'the station at the player\'s right (1.5 b at +90): the D1 dash end, the chain cuts, the D3 / D4 landings'),
     'd2': ([('face', RE['D2']['bearing'], RE['D2']['dist']), ('face', -RE['D2']['bearing'], RE['D2']['dist']),
             ('face', 0, RE['D2']['dist']), ('face', RE['D2']['bearing'], 6.0), ('face', -RE['D2']['bearing'], 6.0)],
-           RE['D2']['dist'], 'D2 side reappear: 8 b at +80 (low, the player\'s right); else -80 / 0 / +-80 at 6 b'),
+           RE['D2']['dist'], f"D2 side reappear: {num(RE['D2']['dist'])} b at {RE['D2']['bearing']:+d} (low, the player's front-right); "
+           f"else {-RE['D2']['bearing']:+d} / 0 / +-{abs(RE['D2']['bearing'])} at 6 b"),
     'd2e': ([('face', RE['D2']['end'][1], RE['D2']['end'][0]), ('face', -RE['D2']['end'][1], RE['D2']['end'][0]),
              ('face', 0, RE['D2']['end'][0])], RE['D2']['end'][0], 'the D2 glide stop: 1.6 b at +45 (front-right)'),
     'd3': ([('face', RE['D3']['bearing'], RE['D3']['dist']), ('face', -RE['D3']['bearing'], RE['D3']['dist']),
             ('face', 0, RE['D3']['dist'])], RE['D3']['dist'], 'D3 blink: 2.5 b at +60 (up-right; the caller adds 3 b up)'),
     'd4': ([('face', RE['D4']['bearing'], RE['D4']['dist']), ('face', -RE['D4']['bearing'], RE['D4']['dist']),
             ('face', 0, RE['D4']['dist']), ('face', RE['D4']['bearing'], 8.0), ('face', -RE['D4']['bearing'], 8.0)],
-           RE['D4']['dist'], 'D4 far reappear: 12 b at -80 (the player\'s left); else +80 / 0 / +-80 at 8 b'),
+           RE['D4']['dist'], f"D4 far reappear: {num(RE['D4']['dist'])} b at {RE['D4']['bearing']:+d} (the player's front-left); "
+           f"else {-RE['D4']['bearing']:+d} / 0 / +-{abs(RE['D4']['bearing'])} at 8 b"),
     'tell': ([('face', 0, RE['tell']['dist']), ('face', 90, RE['tell']['dist']), ('face', -90, RE['tell']['dist']),
               ('face', 180, RE['tell']['dist'])], RE['tell']['dist'], 'A13: inside the yellow tell, 3 b in front of the player'),
     'far': ([('tobody', 0, RE['tell']['retreat']), ('tobody', 0, 9.0), ('tobody', 0, 6.0), ('tobody', 60, 9.0),
@@ -234,25 +240,37 @@ def disc_files(W):
     lines = [
         f'# {{kb}} (api.disc; @s = the body, at it): one A7 moon disc (PLAN §4.5): a blade projectile (#pjShape 1, half width',
         f'# {num(D["hr"], 1)} b, {num(D["speed"], 2)} b/t asked = {math.ceil(D["speed"] / 0.25 - 1e-9) * 0.25:.2f} b/t flown (0.25 b sub-steps rounded up), life {D["life"]} t, wall stop),',
-        f'# {num(y, 1)} b over the floor (the blade rows cover 0 .. 1.65 b: a jump does not clear it), aimed at the player\'s position now',
-        f'# (no homing), {D["tier"]} Electro, kb; one card: summoned 1 b in front of her, then rotated (pitch 0), then launched and',
-        '# dressed (kit fx/prop/disc; else a flat purple pane). Never counts for the shield.',
+        f'# {num(y, 1)} b over the floor (the blade rows cover 0 .. 1.65 b: a jump does not clear it), aimed at its lock (F1 HR-15:',
+        f'# g/disc/lock {api.LOCK_LEAD} t before the release; a throw without one locks now) (no homing), {D["tier"]} Electro, kb; one card:',
+        '# summoned 1 b in front of her, then rotated (pitch 0), then launched and dressed (kit fx/prop/disc; else a flat purple',
+        '# pane). Never counts for the shield. The lock marker goes after the launch.',
         f'kill {new}',
-        f'execute at @s facing entity {PLAYER} feet rotated ~ 0 positioned ^ ^ ^1 positioned ~ {num(CY + y, 2)} ~ run summon '
+        f'execute unless entity {S.LOCK_M} run {fn("g/disc/lock")}',
+        f'execute at @s facing entity {S.LOCK_M} feet rotated ~ 0 positioned ^ ^ ^1 positioned ~ {num(CY + y, 2)} ~ run summon '
         f'minecraft:item_display ~ ~ ~ {nbt}',
-        f'execute as {new} at @s facing entity {PLAYER} feet rotated ~ 0 run tp @s ~ ~ ~ ~ ~',
+        f'execute as {new} at @s facing entity {S.LOCK_M} feet rotated ~ 0 run tp @s ~ ~ ~ ~ ~',
         f'execute as {new} run {fn("g/disc/tag")}']
     lines += L.pj_opts(el=api.ELEC, wall=1, shape=D['shape'])
     lines += ['$scoreboard players set #pjKB mb $(kb)',
               f'execute as {new} at @s rotated as @s run {L.pj_launch(D["speed"], D["life"], api.DMG[D["tier"]], D["hr"])}']
     if kit:
         lines.append(f'execute as {new} run {K.prop("disc")}')
-    lines.append(f'tag {new} remove {DISC_NEW}')
+    lines += [f'tag {new} remove {DISC_NEW}', f'kill @e[type=minecraft:marker,tag={S.LOCK_T}]']
     w('g/disc/throw', lines)
-    tag = ['# @s = the new disc card: the pattern tags of the running pattern (#pat).']
+    tag = ['# @s = the new disc card / its lock marker: the pattern tags of the running pattern (#pat).']
     for k in ('r2', 'a13'):
         tag.append(f'execute if score #pat {OBJ} matches {S.TID[k]} run tag @s add {S.tag_p(k)}')
     w('g/disc/tag', tag)
+    # F1 (HR-15, lead decision 11-05): the disc's aim locks LOCK_LEAD t before its release (the rule: aims lock 6-8 t before the
+    # hit; PLAN §4.5 A7), so a player walking in still gets the lock + the flight to step out
+    w('g/disc/lock', [
+        f'# The lock of the next disc ({api.LOCK_LEAD} t before its release; @s = the body): a marker at the player\'s feet on the floor',
+        f'# ({S.LOCK_T} + the pattern tags, as p1\'s lock_fn), she faces it from now on; g/disc/throw aims at it and removes it.',
+        f'kill @e[type=minecraft:marker,tag={S.LOCK_T}]',
+        f'execute at {PLAYER} positioned ~ {CY} ~ run summon minecraft:marker ~ ~ ~ {{Tags:{S.tags_nbt(TAG_P, S.LOCK_T, DISC_LOCK_NEW)}}}',
+        f'execute as @e[type=minecraft:marker,tag={DISC_LOCK_NEW}] run {fn("g/disc/tag")}',
+        f'tag @e[type=minecraft:marker,tag={DISC_LOCK_NEW}] remove {DISC_LOCK_NEW}',
+        FACE_LOCK])
 
 
 def body_files(W):
@@ -340,7 +358,8 @@ class GB:
         line = api.disc(kb)
         self.at(t, S.gate(cond, line) if cond else line)
         self.hits.append(dict(kind='disc', t=t, kb=kb, step=step, tier=api.DISC['tier'], dmg=api.DMG[api.DISC['tier']],
-                              shape='pj_disc', dims=(api.DISC['hr'], api.DISC['speed'], api.DISC['life']), cond=cond))
+                              shape='pj_disc', dims=(api.DISC['hr'], api.DISC['speed'], api.DISC['life']), cond=cond,
+                              lock=t - api.LOCK_LEAD))
 
     def end(self, t, cond=None):
         if self.end_t is None or t > self.end_t:
@@ -703,7 +722,12 @@ class Walk:
         if step == 'disc3':
             at(sp, *S.fx('qi_wedge', [part(DUST['lilac'], 0.4, 0.4, 0.4, 0, 12)], pos=at_body(0.85), r=14, roll=30))
             g.ev(sp, 'fx', 'qi_wedge', ('a7_throw', 'spin'))
-        at(rel, FACE)
+        # F1 (HR-15): the aim locks LOCK_LEAD t before the release (g/disc/lock: the marker at the player's feet, she faces it);
+        # at the release she faces the lock (not the player), g/disc/throw aims there
+        lk = rel - api.LOCK_LEAD
+        at(lk, fn('g/disc/lock'))
+        g.ev(lk, 'lock', 'disc', ('a7_throw', 'release - LOCK_LEAD'))
+        at(rel, FACE_LOCK)
         g.disc(rel, kb, step, cond)
         at(rel, *S.snd('disc_release'), *S.snd('disc_fly'))
         g.ev(rel, 'snd', 'disc_release', ('a7_throw', 'release'))
@@ -720,14 +744,25 @@ class Walk:
         g = self.gb
         g.play(t, 'g_reform')
         g.look(t + E('g_reform', 'solid'), 'form', 'normal', ('g_reform', 'solid'))
-        g.at(t + E('g_reform', 'end'), api.play('idle2'))
-        g.ev(t + E('g_reform', 'end'), 'clip', 'idle2', ('g_reform', 'end'))
+        # F1 round 1 (HR-14): from the solid row on her tail moves her with the recovery's clip (s_solid); idle2 only when
+        # the reform clip ends before that row
+        solid = next((r[0] for r in self.rows if r[1] == 'solid'), None)
+        te = t + E('g_reform', 'end')
+        if solid is None or te < solid:
+            g.at(te, api.play('idle2'))
+            g.ev(te, 'clip', 'idle2', ('g_reform', 'end'))
 
     def s_solid(self, t, end_t):
+        """R1 / R3: hittable again; the reform tail to the end (<= 12 t after the last hit) turns her to the player and
+        (F1 round 1, HR-14 / VF1R-01) moves her as the recovery does (ai/tail at the row, ai/tail_step each later tick)."""
         g = self.gb
         g.at(t, f'tag @s remove {TAG_GHOST}')
         g.ev(t, 'tag', 'ghost-', ('script', 'solid'))
         g.rng(t, end_t - 1, f'function rlk:mboss/mv/turn {{max:{api.TRACK["deg"]}}}')
+        assert t < end_t - 1, (self.key, t, end_t)
+        g.at(t, fn('ai/tail'))
+        g.rng(t + 1, end_t - 1, fn('ai/tail_step'))
+        g.moves.append((t + 1, end_t - 1, 'tail move'))
 
     # ------------------------------------------------------------------ the whole script
     def build(self):
@@ -820,10 +855,18 @@ def build_r2(W):
             g.end(t)
     rel1 = 16 + E('a7_throw', 'release')
     rel2 = 30 + E('a7_throw', 'release')
-    g.at(rel1 + 4, S.gate(one, api.play('idle2')))
-    g.at(rel2 + 4, S.gate(two, api.play('idle2')))
-    g.rng(rel1 + 5, w.rows[-1][0] - 1, S.gate(one, f'function rlk:mboss/mv/turn {{max:{api.TRACK["deg"]}}}'))
-    g.rng(rel2 + 5, w.rows[-1][0] - 1, S.gate(two, f'function rlk:mboss/mv/turn {{max:{api.TRACK["deg"]}}}'))
+    # F1 (HR-14, lead decision 11-05: "during any tail kept and in the recovery she walks / strafes facing and tracking the
+    # player"): R2's tail after its last release is kept (its end stays); TAIL_MOVE t after it she moves as the recovery
+    # does - glides in beyond 6 b, else strafes (ai/tail, ai/tail_step; the recovery keeps the move) - turning to the player
+    # every tick
+    W.w('p/r2/step', ['# One tick of R2\'s tail (@s = the body): turn to the player, one step of the move (mv/ok-checked).',
+                      f'function rlk:mboss/mv/turn {{max:{api.TRACK["deg"]}}}', fn('ai/tail_step')])
+    tm = api.TAIL_MOVE
+    g.at(rel1 + tm, S.gate(one, fn('ai/tail')))
+    g.at(rel2 + tm, S.gate(two, fn('ai/tail')))
+    g.rng(rel1 + tm + 1, w.rows[-1][0] - 1, S.gate(one, fn('p/r2/step')))
+    g.rng(rel2 + tm + 1, w.rows[-1][0] - 1, S.gate(two, fn('p/r2/step')))
+    g.moves += [(rel1 + tm, w.rows[-1][0], 'tail move (one disc)'), (rel2 + tm, w.rows[-1][0], 'tail move (two discs)')]
     g.write('P2: the moon disc after the yellow tell')
 
 

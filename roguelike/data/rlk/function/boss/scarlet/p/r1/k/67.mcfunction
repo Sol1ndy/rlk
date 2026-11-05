@@ -1,2 +1,2 @@
 # R1 pattern tick 67.
-function rlk:mboss/mv/turn {max:10}
+scoreboard players set #done hr 1

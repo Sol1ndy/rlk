@@ -40,6 +40,13 @@ copy of F:boss/scarlet; the kit / theme sections a dry rebuild inside it with ap
           pink-white / scarlet line staging, every kit effect / sound at its EVENTS tick in the sim
   cancel  a cancel (gauntlets: S3's core/g/pause; R1-R3: core/cancel_pat) at every tick 0..end leaves nothing: no entity of
           the pattern, no cut / spot / disc, the body without the ghost tag, on the floor, no glide, #pat 0, no later hit
+  f1      F1 (the 11-05 review fixes, the lead's decisions): HR-19 the counting cuts of A8 / A13 at TC 37 (R1 / R3 keep T2 /
+          T3); HR-15 every disc's aim locks 7 t before its release (static) and hits >= 7 t after that lock for a player
+          walking in at 0.22 / 0.28 b/t from 5-9 b, for R2 at the rim and for A13's three discs; HR-27 D2 / D4 reappear
+          inside the default F5 view near its edge (A8, A13, R3); HR-14 R1 / R3 end <= 12 t after their last hit, R2's kept
+          tail moves her (the recovery's move clip) while she turns to the player; F1 round 1: R1 / R3's reform tail moves
+          her from the solid row on (static + sim, the recovery keeping the move), the g/spot/d2 / d4 headers and
+          api.disc()'s docstring match the code
 """
 import copy
 import math
@@ -56,7 +63,7 @@ import hrsim as H  # noqa: E402
 ARGS = [a for a in sys.argv[1:] if a != '-v']
 VERBOSE = '-v' in sys.argv[1:]
 DP = Path(ARGS[0]).resolve()
-SECTIONS = ARGS[1:] or ['table', 'files', 'hits', 'follow', 'pips', 'discs', 'spots', 'ghost', 'frame', 'cancel']
+SECTIONS = ARGS[1:] or ['table', 'files', 'hits', 'follow', 'pips', 'discs', 'spots', 'ghost', 'frame', 'cancel', 'f1']
 sys.path.insert(0, str(DP / 'tools'))
 import mboss_scarlet.api as API  # noqa: E402
 import mboss_scarlet.p_ghost as PG  # noqa: E402
@@ -68,7 +75,9 @@ KEYS = list(API.P2)
 GAUNT = API.GAUNTLETS
 TID = S3.TID
 PH = API.PH
-END = {'r1': 76, 'r2': 60, 'r3': 60, 'a8': API.FAIL60_P2_T, 'a13': API.REPEL_T['a13']}
+# F1 (HR-14): R1 / R3 end 12 t after their last hit (67 / 49); the ends are read from the scripts' 'end' rows
+END = {**{k: next(r[0] for r in API.SCRIPTS[k] if r[1] == 'end') for k in ('r1', 'r2', 'r3')},
+       'a8': API.FAIL60_P2_T, 'a13': API.REPEL_T['a13']}
 CUTS = {k: [r[3] for r in API.SCRIPTS[k] if r[3]] for k in KEYS}            # (made, lock, strike, tier, kb)
 STRIKES = {k: [c[2] for c in CUTS[k]] for k in KEYS}
 ROWS = {k: [r for r in API.SCRIPTS[k] if r[0] >= 0] for k in KEYS}
@@ -569,9 +578,10 @@ def sec_discs():
     for eid, pts in tr.items():
         p0, pos0, yaw0, _, pl0 = pts[0]
         rel_r = [r for r in R if r['pt'] == 28][0]
-        want = yaw_of(rel_r['pos'], rel_r['pl'])
+        lk_r = [r for r in R if r['pt'] == 28 - API.LOCK_LEAD][0]      # F1 (HR-15): the aim locks 7 t before the release
+        want = yaw_of(rel_r['pos'], lk_r['pl'])
         steps = [d2(a[1], b[1]) for a, b in zip(pts, pts[1:])]
-        check('D2 r2: aimed at the player\'s position at release (yaw), 0.9 b over the floor, never turning (no homing)',
+        check('D2 r2: aimed at the player\'s position at its lock (release - 7; yaw), 0.9 b over the floor, never turning (no homing)',
               angdiff(yaw0, want) < 1.0 and all(abs(q[1][1] - (API.CY + 0.9)) < 1e-6 for q in pts)
               and all(angdiff(q[2], yaw0) < 1e-6 for q in pts), (yaw0, want, pts[0][1]))
         fly = math.ceil(API.DISC['speed'] / 0.25 - 1e-9) * 0.25    # I1 (s4-2): the flown speed = whole 0.25 b sub-steps
@@ -634,9 +644,10 @@ def sec_discs():
     for eid, pts in tr.items():
         p0_ = pts[0][0]
         r = [x for x in R if x['pt'] == p0_][0]
-        ok.append(angdiff(pts[0][2], yaw_of(r['pos'], r['pl'])) < 1.5)
+        rl = [x for x in R if x['pt'] == p0_ - API.LOCK_LEAD][0]     # F1 (HR-15): the player's spot at the lock
+        ok.append(angdiff(pts[0][2], yaw_of(r['pos'], rl['pl'])) < 1.5)
     rels = sorted(v[0] for v in seen.values())
-    check('D6 a13: three discs (155 / 167 / 180), one card each, kb 0, each aimed at the player\'s position at its release',
+    check('D6 a13: three discs (155 / 167 / 180), one card each, kb 0, each aimed at the player\'s position at its lock (release - 7)',
           len(tr) == 3 and rels == list(API.DISC_RELEASE['a13']) and all(v[1] == 0 for v in seen.values()) and all(ok), (rels, seen, ok))
     one = all(len({x[0] for x in r['discs']}) <= 3 for r in R) and all(x[3] == 'item_display' for r in R for x in r['discs'])
     check('D7 one display card per projectile (the card is the projectile)', one)
@@ -796,7 +807,8 @@ def sec_spots():
         got = byp[t]['pos']
         if math.dist(got, want) > 0.01:
             bad.append((t, name, got, want))
-    check('S6 A8\'s reappearances at their ticks and spots (D1 14 b -40, D2 8 b +80, D3 2.5 b +60 3 up, the dive 6 b up)', not bad, bad)
+    check(f'S6 A8\'s reappearances at their ticks and spots (D1 14 b -40, D2 8 b {RX["D2"]["bearing"]:+d}, D3 2.5 b +60 3 up, the dive 6 b up)',
+          not bad, bad)
 
 
 # ================================================================================================= ghost (sim)
@@ -1044,6 +1056,247 @@ def sec_cancel():
         check(f'C1 {k}: a cancel at every tick 0..{END[k]} ({"core/g/pause" if k in GAUNT else "core/cancel_pat"} + a second cancel) '
               'leaves no entity of the pattern / cut / spot / disc / hazard, the body solid, visible, on the floor, #pat 0, no later hit',
               not bad, bad[:4])
+
+
+# ================================================================================================= F1 (11-05 review fixes)
+# The lead's decisions (HR/review/findings.md, 11-05): HR-19 the counting cuts of A8 / A13 on a tier of their own, TC 37 (raw
+# floor(12 x 37 x 135 / 10000) = 5 = 12 HP on the item-less Lv15 player: 9 cuts 40.3 % <= 45 %); HR-15 every moon disc's aim
+# locks 7 t before its release (a floor marker at the player's feet; she faces it; the throw aims at it); HR-27 the D2 / D4
+# reappearances inside the default F5 view near its edge (+-55 deg); HR-14 R1 / R3 end 12 t after their last hit, R2's kept
+# tail moves her (the recovery's walk / glide / strafe) while she turns to the player. Written to fail on the 4c81817 tree.
+TC_WANT = 37
+F5_DIST, F5_HALF = 3.5, {'16:9': 51.2, '16:10': 48.2}     # the vanilla F5 camera behind the player; FOV 70 half-widths
+BODY_HALF_W = 0.5
+
+
+def disc_ticks(s, key, R0=None, each=None, n=None):
+    """Run `key` (test id, AI held) with `each`; per world tick note the new rlk_hr_lock markers (the aims locked), the new
+    disc cards (the releases) and the player hits of the pattern. Returns (locks, releases, hits, R) in world ticks."""
+    seen_l, seen_d, locks, rels = set(), set(), [], []
+
+    def ev(ss):
+        if each:
+            each(ss)
+    H.test_id(s, TID[key])
+    H.hold(s, True)
+    p0 = len(s.phits)
+    R = [rec(s)]
+    for i in range(n or END[key] + 3):
+        H.heal(s)
+        ev(s)
+        H.world_sc(s)
+        for e in s.ents:
+            if e.alive and 'rlk_hr_lock' in e.tags and S3.tag_p(key) in e.tags and e.id not in seen_l:
+                seen_l.add(e.id)
+                locks.append(s.t)
+            if e.alive and 'rlk_hr_disc' in e.tags and e.id not in seen_d:
+                seen_d.add(e.id)
+                rels.append(s.t)
+        R.append(rec(s))
+        if i > 3 and R[-1]['pat'] != TID[key]:
+            break
+    hits = [t for t, _p, _e, pat in s.phits[p0:] if pat == TID[key]]
+    return locks, rels, hits, R
+
+
+def lock_to_hit(locks, rels, hits):
+    """[(release, its lock (else the release itself: the aim fixed at release), the first hit after the release)]"""
+    out = []
+    for i, r in enumerate(rels):
+        lk = max([t for t in locks if t <= r] or [r])
+        nxt = rels[i + 1] if i + 1 < len(rels) else 10 ** 9
+        h = [t for t in hits if r <= t < nxt]
+        out.append((r, lk, h[0] if h else None))
+    return out
+
+
+def walker_in(cx, cz, v, stop=2.5, t_from=None):
+    """A player walking straight toward her body at v b/t (from pattern tick t_from on), stopping `stop` b from her."""
+    def each(s):
+        if t_from is not None and hr(s, '#pt') < t_from:
+            return
+        b, p = H.body_of(s), s.player()
+        dx, dz = b.pos[0] - p.pos[0], b.pos[2] - p.pos[2]
+        d = math.hypot(dx, dz)
+        if d > stop:
+            p.pos = [p.pos[0] + v * dx / d, API.CY, p.pos[2] + v * dz / d]
+            H.C.moved(s)
+    return each
+
+
+def f5_angle(ppos, pyaw, her):
+    """Her horizontal angle off the default F5 camera's axis (deg), the camera F5_DIST b behind the player along their
+    facing, + her half width seen from there."""
+    f = fdir(pyaw)
+    cam = (ppos[0] - F5_DIST * f[0], 0.0, ppos[2] - F5_DIST * f[2])
+    d = math.hypot(her[0] - cam[0], her[2] - cam[2])
+    return angdiff(yaw_of(cam, her), pyaw) + math.degrees(math.atan2(BODY_HALF_W, d))
+
+
+def done_tick(key):
+    t = None
+    for rel, lines in my_files().items():
+        m = re.fullmatch(rf'p/{key}/k/(\d+)', rel)
+        if m and any('scoreboard players set #done hr 1' in ln and not ln.startswith('#') for ln in lines):
+            t = max(t or 0, int(m.group(1)))
+    return t
+
+
+def sec_f1():
+    F = my_files()
+    # HR-19: the counting cuts of A8 / A13 on their own tier TC 37; R1 / R3 keep T2 / T3
+    bad = []
+    for k in KEYS:
+        for c in CUTS[k]:
+            made = c[0]
+            mk = [ln for ln in F.get(f'p/{k}/k/{made}', []) if 'g/cut/make' in ln and f's:{c[2]},' in ln]
+            dm = [int(m) for ln in mk for m in re.findall(r'dmg:(\d+)', ln)]
+            want = TC_WANT if k in GAUNT else {'T2': 42, 'T3': 56}[c[3]]
+            if dm != [want]:
+                bad.append((k, c[2], dm, want))
+    raw = 12 * TC_WANT * 135 // 10000
+    check(f'G1 HR-19 every counting cut of A8 / A13 is made at TC {TC_WANT} % (raw {raw} = 12 HP on the Lv15 player: 9 cuts '
+          f'<= 45 % max HP); R1 / R3 cuts keep T2 42 / T3 56', not bad, bad[:4])
+    # HR-15 (static): the lock 7 t before every release; the throw aims at the lock marker
+    th = cmd_lines(F.get('g/disc/throw', []))
+    aim = [ln for ln in th if 'facing entity' in ln]
+    lk = cmd_lines(F.get('g/disc/lock', []))
+    miss = []
+    for k, rels in API.DISC_RELEASE.items():
+        for r in rels:
+            body = '\n'.join(F.get(f'p/{k}/k/{r - API.LOCK_LEAD}', []))
+            if 'g/disc/lock' not in body:
+                miss.append((k, r - API.LOCK_LEAD))
+    check(f'G2 HR-15 every disc\'s aim locks {API.LOCK_LEAD} t before its release (g/disc/lock: a marker at the player\'s feet on '
+          'the floor, she faces it); g/disc/throw aims at the lock marker, not at the player',
+          not miss and lk and any('summon minecraft:marker' in ln and 'rlk_hr_lock' in ln for ln in lk)
+          and aim and all('tag=rlk_hr_lock' in ln and 'tag=rlk_body' not in ln for ln in aim), (miss, aim[:2]))
+    # HR-15 (sim): R2 against a player walking in at 0.22 / 0.28 b/t from 5 / 7 / 9 b: each disc hits >= 7 t after the lock
+    bad, seen = [], []
+    for v in (0.22, 0.28):
+        for d0 in (5.0, 7.0, 9.0):
+            s, pl = world(81)
+            H.place_body(s, C[0], C[2] - 4)
+            place(s, C[0] + 0.5, C[2] - 4 + d0)
+            locks, rels, hits, R = disc_ticks(s, 'r2', each=walker_in(C[0], C[2], v))
+            for r, lk_, h in lock_to_hit(locks, rels, hits):
+                seen.append((v, d0, r - lk_, h - lk_ if h else None))
+                if h is None or h - lk_ < API.LOCK_LEAD:
+                    bad.append((v, d0, r, lk_, h))
+    check(f'G3 HR-15 R2, a player walking in at 0.22 / 0.28 b/t from 5 / 7 / 9 b: every disc hits >= {API.LOCK_LEAD} t after its '
+          'aim locked', not bad and len(seen) == 6, (bad[:3], seen))
+    # ... and against the rim (she at r 19, her retreat falls back to 4 b sideways), the player standing 5 / 7 / 9 b in front
+    bad, seen = [], []
+    for d0 in (5.0, 7.0, 9.0):
+        s, pl = world(82)
+        H.place_body(s, C[0], C[2] - 19)
+        place(s, C[0] + 0.5, C[2] - 19 + d0)
+        locks, rels, hits, R = disc_ticks(s, 'r2')
+        for r, lk_, h in lock_to_hit(locks, rels, hits):
+            seen.append((d0, r - lk_, h - lk_ if h else None))
+            if h is None or h - lk_ < API.LOCK_LEAD:
+                bad.append((d0, r, lk_, h))
+    check(f'G4 HR-15 R2 near the rim (her retreat cut short), a standing player at 5 / 7 / 9 b: the disc hits >= {API.LOCK_LEAD} t after '
+          'its aim locked', not bad and len(seen) == 3, (bad, seen))
+    # ... A13's three discs against a player walking in at 0.22 b/t from T+141 (stopping 3 b from her)
+    s, pl = world(83)
+    place(s, C[0] + 0.5, C[2] + 6.0)
+    locks, rels, hits, R = disc_ticks(s, 'a13', each=walker_in(C[0], C[2], 0.22, stop=3.0, t_from=141), n=200)
+    got = lock_to_hit(locks, rels, hits)
+    check(f'G5 HR-15 A13, a player walking in at 0.22 b/t from T+141: each of the 3 discs hits >= {API.LOCK_LEAD} t after its aim '
+          'locked', len(got) == 3 and all(h is not None and h - lk_ >= API.LOCK_LEAD for _r, lk_, h in got), got)
+    # HR-27: the D2 / D4 reappearances inside the default F5 view (16:9 and 16:10), near its edge (>= 30 deg off the axis)
+    rows = []
+    for k, step in (('a8', 'D2'), ('a13', 'D2'), ('a13', 'D4'), ('r3', 'D2')):
+        for t, st, _cl, _c in ROWS[k]:
+            if st == step:
+                rows.append((k, step, t))
+    bad, seen = [], []
+    for k, step, t in rows:
+        s, pl = world(84)
+        P = (C[0] + 0.5, C[2] + 6.0)
+        place(s, P[0], P[1], yaw=180.0)
+        H.place_body(s, C[0], C[2] - 4)
+        R = run_pat(s, k, n=t + 2)
+        r = [x for x in R if x['pt'] == t and x['pat'] == TID[k]]
+        if not r:
+            bad.append((k, step, t, 'not reached'))
+            continue
+        a = f5_angle((P[0], 0, P[1]), 180.0, r[0]['pos'])
+        seen.append((k, step, t, round(a, 1)))
+        if not (30.0 <= a <= F5_HALF['16:10']):
+            bad.append((k, step, t, round(a, 1)))
+    check(f'G6 HR-27 D2 / D4 reappear inside the default F5 view (FOV 70: 16:9 {F5_HALF["16:9"]} / 16:10 {F5_HALF["16:10"]} deg half-width, '
+          'her body included) near its edge (>= 30 deg)', not bad and len(seen) == 4, (bad, seen))
+    # HR-14: R1 / R3 end 12 t after their last hit; R2's kept tail moves her (a recovery move) while she turns to the player
+    for k in ('r1', 'r3'):
+        last = max(c[2] for c in CUTS[k])
+        end = done_tick(k)
+        check(f'G7 HR-14 {k}: ends at most 12 t after its last hit ({last} -> {end})', end is not None and end - last <= 12, (last, end))
+    s, pl = world(85)
+    H.place_body(s, C[0], C[2] - 4)
+    P = (C[0] + 0.5, C[2] + 4.0)
+    place(s, *P)
+    n0 = len(s.rigl)
+    R = run_pat(s, 'r2', each=lambda ss: place(ss, *P))
+    rel = API.DISC_RELEASE['r2'][0]
+    t0 = R[0]['t']
+    clips = [(t - t0, c) for t, c in s.rigl[n0:] if c.startswith('play/') and t - t0 > rel]
+    tail = [r for r in R if r['pat'] == TID['r2'] and r['pt'] > rel + 5]
+    moved = tail and d2(tail[0]['pos'], tail[-1]['pos']) >= 1.0
+    errs = [angdiff(r['yaw'], yaw_of(r['pos'], (P[0], 0, P[1]))) for r in tail]
+    check('G8 HR-14 R2\'s kept tail after its release: the recovery\'s move clip (walk / glide / strafe), she moves >= 1 b and turns '
+          'to the player', clips and clips[0][1] in ('play/walk', 'play/glide', 'play/strafe_l', 'play/strafe_r') and moved
+          and errs and errs[-1] <= 12.0, (clips[:2], round(d2(tail[0]['pos'], tail[-1]['pos']), 2) if tail else None,
+                                          [round(e) for e in errs[::5]]))
+    # HR-14 (F1 round 1, VF1R-01: "during any tail kept ... she walks / strafes facing and tracking the player"): R1 / R3's
+    # reform tail moves her too - from the solid row (hittable again, the reform over) the recovery's move and clip
+    # (ai/tail), one step each later tick to the end (ai/tail_step), no idle2 over it; the recovery keeps the move
+    F = my_files()
+    for k in ('r1', 'r3'):
+        solid = next(r[0] for r in ROWS[k] if r[1] == 'solid')
+        end = done_tick(k)
+
+        def calls(t, name):
+            return [ln for ln in F.get(f'p/{k}/k/{t}', []) if re.search(rf'function rlk:boss/scarlet/{name}$', ln)]
+        miss = ([solid] if not calls(solid, 'ai/tail') else []) + [t for t in range(solid + 1, end or 0) if not calls(t, 'ai/tail_step')]
+        idle = [t for t in range(solid, (end or 0) + 1) if any('rig/play/idle2' in ln for ln in F.get(f'p/{k}/k/{t}', []))]
+        check(f'G9 HR-14 {k}: from the solid row {solid} the recovery\'s move (ai/tail), a step each tick to the end {end} '
+              '(ai/tail_step), no idle2 over it', end is not None and not miss and not idle, (end, miss, idle))
+        s, pl = world(86)
+        H.place_body(s, C[0], C[2] - 4)
+        P = (C[0] + 0.5, C[2] + 4.0)
+        place(s, *P)
+        n0 = len(s.rigl)
+        R = run_pat(s, k, each=lambda ss: place(ss, *P))
+        t0 = R[0]['t']
+        plays = [(t - t0, c) for t, c in s.rigl[n0:] if c.startswith('play/') and t - t0 >= solid]
+        at = {r['pt']: r for r in R if r['pat'] == TID[k]}
+        moved = d2(at[solid]['pos'], at[end - 1]['pos']) if end and solid in at and end - 1 in at else 0.0
+        ok = (plays[:1] and plays[0] == (solid, plays[0][1]) and plays[0][1] in ('play/walk', 'play/glide', 'play/strafe_l', 'play/strafe_r')
+              and len(plays) == 1 and moved >= 0.08 * (end - 1 - solid))
+        check(f'G10 HR-14 {k} (sim): a move clip at the solid row {solid}, she moves in the tail (>= 0.08 b / t), no other clip to '
+              'the end and at the recovery start (the move kept)', ok, (plays[:3], round(moved, 2)))
+    # F1 round 1, VF1-03 / VF1R-03 (HR-27's comments): the g/spot/d2 / d4 headers name the bearings and distances their
+    # candidates turn to (5b8ee01 still said +-80 there while the commands turned +-55)
+    bad = []
+    for n in ('d2', 'd4'):
+        lines = F.get(f'g/spot/{n}', [])
+        cand = [(int(r), float(d)) for ln in cmd_lines(lines)
+                for r, d in re.findall(r'rotated ~(-?\d+) 0 positioned \^ \^ \^([\d.]+) if function', ln)]
+        m = re.search(r'reappear: ([\d.]+) b at ([+-]\d+) .*?; else ([+-]\d+) / 0 / \+-(\d+) at ([\d.]+) b', lines[0] if lines else '')
+        said = None
+        if m:
+            d1, b1, b2, b3, d3 = float(m.group(1)), int(m.group(2)), int(m.group(3)), int(m.group(4)), float(m.group(5))
+            sg = 1 if b1 > 0 else -1
+            said = [(b1, d1), (b2, d1), (0, d1), (sg * b3, d3), (-sg * b3, d3)]
+        if said != cand:
+            bad.append((n, said, cand))
+    check('G11 HR-27 (VF1-03): the g/spot/d2 / d4 headers name the bearings and distances their candidates use', not bad, bad)
+    # F1 round 1, VF1-04 (HR-15's comments): api.disc()'s docstring names its aim, the lock (not the player at the release)
+    doc = ' '.join((API.disc.__doc__ or '').split())
+    check('G12 HR-15 (VF1-04): api.disc()\'s docstring: the throw is rotated toward its lock (g/disc/lock)',
+          'toward its lock' in doc and 'g/disc/lock' in doc and 'position at release' not in doc, doc[:160])
 
 
 def main():

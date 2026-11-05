@@ -65,6 +65,9 @@ scoreboard players set #ai_rcd hr 0
 scoreboard players set #ai_fl hr 0
 scoreboard players set #ai_lf hr 0
 scoreboard players set #ai_ls hr 0
+scoreboard players set #ai_nn hr 0
+scoreboard players set #ai_bs hr 0
+scoreboard players set #ai_tmc hr 0
 scoreboard players set #ai_wa1 hr 0
 scoreboard players set #ai_wa2 hr 0
 scoreboard players set #ai_wa3 hr 0
