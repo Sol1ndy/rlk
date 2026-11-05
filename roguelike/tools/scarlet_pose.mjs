@@ -57,7 +57,7 @@
 //   ph                 the loop phase 0..1 (idle sway, set by the sampler)
 //   derived (scarlet_retarget.mjs): wSeat (seated on the kit's stone), wLie (lying on her back), wKnee (the right knee on the
 //             floor), wLip (the cup at her lips), hatX (the hat state hand-overs), hwF (a re-anchored world-hat flight)
-import {add, sub, times, len, unit, mul, q, rot, aimQ, ik, basisQ, cross, dot, perp, slerp, armFront, steadyPerp, toDisplayT, toDisplayQ, lerp} from './mboss_rig_math.mjs';
+import {add, sub, times, len, unit, mul, q, rot, aimQ, ik, basisQ, cross, dot, perp, slerp, armFront, steadyPerp, smoothK, toDisplayT, toDisplayQ, lerp} from './mboss_rig_math.mjs';
 import {PART_NAMES, PART_SCALE, SWORD, SCAB, HAT, STRINGS, CUP, BOTTLE, HILT_OFF, modelPoints, stringPoints, HAND_MODELS, FACE_MODELS, PHASE_MODELS, HIDDEN} from './scarlet_geometry.mjs';
 
 export const HIP_Y = .765625;
@@ -75,8 +75,9 @@ export const SK = {
 };
 export const ARM_REACH = .995 * (SK.armU + SK.fore), LEG_REACH = .995 * (SK.thigh + SK.shin);
 const ARM_TURN = 85, ARM_FOLD = .15;
-// S2d round 2: an arm segment swings at most LIMB_TURN degrees per tick where another bend plane allows it; a limb segment rolls
-// about its own axis at most LIMB_ROLL degrees per tick (measured from the previous front carried along the swing)
+// S2d round 2: an arm segment turns at most LIMB_TURN degrees per tick where another bend plane allows it; a leg segment rolls
+// about its own axis at most LIMB_ROLL degrees per tick (measured from the previous front carried along the swing); round 3: the
+// arm is a hinge (one front per arm), and its upper segment keeps its roll within LIMB_ROLL through the bend plane (armSolve)
 const LIMB_TURN = 60, LIMB_ROLL = 35;
 // the fist on the world hat's brim edge: the grip point this far above the brim (the fist's end rests on the brim)
 export const HAT_FLOOR_HOLD = .08;
@@ -327,6 +328,24 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
     keep['f_' + key] = F; keep['a_' + key] = ax;
     return aimQ(dir, F);
   };
+  // S2d round 3 (C3-2): the arm is the avatar's hinge. The upper arm's front is the inside of the elbow's bend wherever the arm
+  // bends (armFront's otherwise: a folded upper arm runs along the bend direction, where armFront falls back to the torso front),
+  // and the forearm takes that front carried through the elbow (the minimal turn from the upper axis to the forearm's): one front
+  // per arm, so the forearm box never twists about itself against the upper arm. Its continuity comes from the bend plane the arm
+  // solve picks (armSolve: the elbow keeps pointing where it pointed), not from a roll limit per segment (round 2's rollQ on both
+  // segments let their hinge axes drift apart by up to 145 deg). The legs keep rollQ (the kneel's knee lands in one tick).
+  const bendFront = (up, lo, raw, sgn = 1) => {
+    const u = unit(up), l = unit(lo), bend = Math.acos(Math.max(-1, Math.min(1, dot(u, l)))) / D, w = smoothK(8, 16, bend), i = perp(l, u);
+    if (w <= 0 || len(i) < 1e-6) return raw;
+    const F = add(times(unit(i), sgn * w), times(unit(perp(raw, u)), 1 - w));
+    return len(F) > 1e-6 ? F : raw;
+  };
+  const qAng = (a, b) => { const d = Math.abs(a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]); return 2 * Math.acos(Math.min(1, d)) / D; };
+  const hingeQ = (upDir, loDir, Fup) => { const u = unit(upDir), l = unit(loDir); return aimQ(l, rot(fromTo(u, l), Fup)); };
+  const armFrontQ = (up, fo, v) => {
+    const F = unit(perp(bendFront(up, fo, armFront(up, v, chestFwd())), unit(up)));
+    return {qu: aimQ(up, F), qf: hingeQ(up, fo, F), F};
+  };
   let legs = {};
   const solveLegs = (lfX = lf, only = null) => {
     if (!only) legs = {};
@@ -479,23 +498,34 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
       const alt = ikReach(S, target, SK.armU, SK.fore, pu, null), ua = unit(sub(alt.E, S));
       if (dot(pu, ua) > dot(pu, ud)) sol = alt;
     }
-    // S2d round 2: where the upper arm or the forearm would still swing more than LIMB_TURN degrees in one tick (a folded arm
+    // S2d round 2: where the upper arm or the forearm would still turn more than LIMB_TURN degrees in one tick (a folded arm
     // whose bend plane flips as the target passes the pole line: the elbow orbiting the shoulder), the bend plane is chosen
-    // round the shoulder -> grip line (5-degree steps) for the smallest of the two swings; the grip point is unchanged
-    const pf = prev['fd' + k];
+    // round the shoulder -> grip line (5-degree steps) for the smallest of the two turns; the grip point is unchanged.
+    // S2d round 3 (C3-2): the turn is the segment's whole turn (swing and roll: the hinge gives the arm one front, armFrontQ), and
+    // where the upper arm would roll more than LIMB_ROLL degrees about itself (a fold starting off the previous bend plane), the
+    // bend plane is chosen so the elbow keeps pointing where it pointed, as long as no segment turns past LIMB_TURN for it
+    const pf = prev['fd' + k], pF = prev['f_ua' + k], pA = prev['a_ua' + k], pQf = prev['qf' + k];
     if (pu && pf) {
       const turn = (a0, b0) => Math.acos(Math.max(-1, Math.min(1, dot(a0, b0)))) / D;
       const W = sol.W, d = sub(W, S), L = len(d);
       if (L > 1e-4) {
-        const u = unit(d), swings = E => Math.max(turn(pu, unit(sub(E, S))), turn(pf, unit(sub(W, E))));
-        const s0 = swings(sol.E);
-        if (s0 > LIMB_TURN) {
+        const u = unit(d), pQu = pF && pA ? aimQ(pA, pF) : null;
+        const measure = (E, v) => {
+          const uu = sub(E, S), ll = sub(W, E);
+          if (!pQu || !pQf) return {t: Math.max(turn(pu, unit(uu)), turn(pf, unit(ll))), r: 0};
+          const A = armFrontQ(uu, ll, v), U = unit(uu), P0 = perp(rot(fromTo(pA, U), pF), U);
+          const r = len(P0) > 1e-6 ? Math.abs(Math.atan2(dot(cross(unit(P0), A.F), U), dot(unit(P0), A.F))) / D : 0;
+          return {t: Math.max(qAng(pQu, A.qu), qAng(pQf, A.qf)), r};
+        };
+        const m0 = measure(sol.E, sol.v);
+        if (m0.t > LIMB_TURN || m0.r > LIMB_ROLL) {
           const a = SK.armU, b = SK.fore, cosA = Math.max(-1, Math.min(1, (a * a + L * L - b * b) / (2 * a * L))), sinA = Math.sqrt(1 - cosA * cosA);
           const e0 = len(perp(sol.v, u)) > 1e-6 ? unit(perp(sol.v, u)) : unit(perp([0, -1, 0], u)), e1 = cross(u, e0);
-          let best = {c: s0, E: sol.E, v: sol.v};
+          const cost = (m, ph) => (m0.t > LIMB_TURN ? m.t : 3 * Math.max(0, m.t - LIMB_TURN) + Math.max(0, m.r - LIMB_ROLL)) + .02 * ph;
+          let best = {c: cost(m0, 0), E: sol.E, v: sol.v};
           for (let ph = 5; ph < 360; ph += 5) {
             const r = ph * D, v = add(times(e0, Math.cos(r)), times(e1, Math.sin(r)));
-            const E = add(S, add(times(u, a * cosA), times(v, a * sinA))), c = swings(E) + .02 * Math.min(ph, 360 - ph);
+            const E = add(S, add(times(u, a * cosA), times(v, a * sinA))), c = cost(measure(E, v), Math.min(ph, 360 - ph));
             if (c < best.c) best = {c, E, v};
           }
           sol = {...sol, E: best.E, v: best.v};
@@ -634,7 +664,7 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
         const Gx = add(Wst, rot(Cq, [Math.max(Gt[0], .42), Gt[1], Gt[2]]));
         const lowAt = dy => { solL = armSolve('l', SL, sub(Gx, [0, dy, 0]), poleOf(p.pL, 1)); const E = solL.E, W = solL.W;
           const up = sub(E, SL), fo = sub(W, E);
-          const ua = aimQ(up, armFront(up, solL.v, chestFwd())), fa = aimQ(fo, armFront(fo, solL.v, chestFwd()));
+          const {qu: ua, qf: fa} = armFrontQ(up, fo, solL.v);
           return Math.min(minY(hullOf('arm_l', 'arm_l'), SL, ua), minY(hullOf(HAND_MODELS.forearm_l[p.hL || 'grip'], 'forearm_l'), E, fa)); };
         let lo = 0, hi = .5;
         if (lowAt(0) > .002) { for (let k = 0; k < 12; k++) { const md = (lo + hi) / 2; if (lowAt(md) >= .002) lo = md; else hi = md; } }
@@ -741,8 +771,9 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
   const armSegs = () => {
     for (const [k, S, sol] of [['l', SL, solL], ['r', SR, solR]]) {
       const up = sub(sol.E, S), fo = sub(sol.W, sol.E);
-      part('arm_' + k, S, rollQ('ua' + k, up, armFront(up, sol.v, chestFwd())));
-      part('forearm_' + k, sol.E, rollQ('fa' + k, fo, armFront(fo, sol.v, chestFwd())));
+      const A = armFrontQ(up, fo, sol.v);
+      keep['f_ua' + k] = A.F; keep['a_ua' + k] = unit(up); keep['qf' + k] = A.qf;
+      part('arm_' + k, S, A.qu); part('forearm_' + k, sol.E, A.qf);
     }
   };
   armSegs();

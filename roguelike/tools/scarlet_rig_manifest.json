@@ -1265,7 +1265,7 @@
    },
    "owner": "S2a",
    "key_files": 32,
-   "keys": 388,
+   "keys": 387,
    "keys_per_tick": 11.1,
    "source": "v1 9.667-10.400 (cr_v1_a1, v1s_a2_*): pivot, magenta glint, rising fan, flat crescent; footage glint -> hit 6 t, stretched to 14",
    "note": "",
@@ -1309,7 +1309,7 @@
    },
    "owner": "S2a",
    "key_files": 87,
-   "keys": 958,
+   "keys": 956,
    "keys_per_tick": 9.9,
    "source": "v1 23.150-26.300 (cr_v1_a3_leads, v1s_a12*, v1s_combo5): gaps 16 / 15 / 12 / 12; open after hit 5",
    "note": "",
@@ -1337,7 +1337,7 @@
    },
    "owner": "S2a",
    "key_files": 60,
-   "keys": 791,
+   "keys": 793,
    "keys_per_tick": 13,
    "source": "v1 10.800-12.550 (cr_v1_a4, v1s_a3_*, v1s_a4_*): leap, apex glint, flip, the S-ribbon dive; the ring spin; apex 7 t",
    "note": "",
@@ -1378,7 +1378,7 @@
    },
    "owner": "S2a",
    "key_files": 59,
-   "keys": 520,
+   "keys": 521,
    "keys_per_tick": 8,
    "source": "v1 13.067-14.733 (cr_v1_a9_ring*, cr_yellow_cmp, v1s_a5_*, v1s_a6_*): spin, the ring, the yellow tell, the star, the magenta screen, the iai cut",
    "note": "",
@@ -1398,9 +1398,9 @@
     "hit": 22
    },
    "owner": "S2a",
-   "key_files": 50,
-   "keys": 407,
-   "keys_per_tick": 7.1,
+   "key_files": 49,
+   "keys": 408,
+   "keys_per_tick": 7.2,
    "source": "v1 20.000-21.700 (v1s_a10_*, cr_yellow_cmp): spring, the yellow tell in the air, the dive, the radial burst",
    "note": "",
    "authored": true
@@ -1417,8 +1417,8 @@
    },
    "owner": "S2a",
    "key_files": 13,
-   "keys": 158,
-   "keys_per_tick": 9.3,
+   "keys": 160,
+   "keys_per_tick": 9.4,
    "source": "v3 14.63-15.10 (cr_v3_tell_zoom, mg_yellow_cmp): the yellow tell, the retreat",
    "note": "",
    "authored": true
@@ -1436,7 +1436,7 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 268,
+   "keys": 269,
    "keys_per_tick": 15.8,
    "source": "v3 15.10-16.90 (v3r_d1/d2/d3_*, cr_v3_disc1_gold): crouch, blade up, the crescent, the spin, the release",
    "note": "",
@@ -1504,8 +1504,8 @@
     "arrive": 10
    },
    "owner": "S2a",
-   "key_files": 9,
-   "keys": 163,
+   "key_files": 10,
+   "keys": 162,
    "keys_per_tick": 12.5,
    "source": "v2 10.433 / 15.00, v3 8.933 / 11.550 (v2f_b1_dash): far reappear, hover, straight dash",
    "note": "",
@@ -1610,8 +1610,8 @@
    },
    "owner": "S2a",
    "key_files": 16,
-   "keys": 314,
-   "keys_per_tick": 16.5,
+   "keys": 315,
+   "keys_per_tick": 16.6,
    "source": "v2 12.450, v3 10.92 (v2f_s3_*): coil, the leaping cut, tumbling, vanishes",
    "note": "",
    "authored": true
@@ -1627,8 +1627,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 206,
-   "keys_per_tick": 13.7,
+   "keys": 208,
+   "keys_per_tick": 13.9,
    "source": "v2 13.700, v3 13.583 (v2f_s4_*): the low sweep, the spring",
    "note": "",
    "authored": true
@@ -1644,8 +1644,8 @@
     "gone": 14
    },
    "owner": "S2a",
-   "key_files": 14,
-   "keys": 208,
+   "key_files": 13,
+   "keys": 207,
    "keys_per_tick": 12.2,
    "source": "v2 14.317, v3 14.183 (v2f_s5_*): the X",
    "note": "",
@@ -1677,8 +1677,8 @@
    },
    "owner": "S2a",
    "key_files": 12,
-   "keys": 206,
-   "keys_per_tick": 15.8,
+   "keys": 207,
+   "keys_per_tick": 15.9,
    "source": "v2 ~17.36, v3 18.767 (v2f_s7_*): the spin dome",
    "note": "",
    "authored": true
@@ -1713,8 +1713,8 @@
    },
    "owner": "S2a",
    "key_files": 10,
-   "keys": 116,
-   "keys_per_tick": 10.5,
+   "keys": 150,
+   "keys_per_tick": 13.6,
    "source": "v2 19.083, v3 20.483 (v2f_s9_dive, v3r_s10_dive_1f): the diving overhead strike, blade down",
    "note": "",
    "authored": true
@@ -1756,7 +1756,7 @@
    },
    "owner": "S2b",
    "key_files": 85,
-   "keys": 1125,
+   "keys": 1122,
    "keys_per_tick": 10.7,
    "source": "v2 19.72-24.95 / v3 21.10-26.25 (v2f_c1, v2f_c2, v2f_c_keys1/2, v2f_c_hat, v2f_c_throw, v3r_c_flip): lock, grab, clash on the hat, flip, back to back, throw, lying, the kick",
    "note": "",
@@ -1790,8 +1790,8 @@
    },
    "owner": "S2a",
    "key_files": 19,
-   "keys": 267,
-   "keys_per_tick": 12.7,
+   "keys": 265,
+   "keys_per_tick": 12.6,
    "source": "v3 4.10 (v3r_a_kipup, cr_v3_kipup): the kip-up; the hat picked up and put on (v3 4.7-6.5)",
    "note": "",
    "authored": true
@@ -1859,9 +1859,9 @@
     "brim": 46
    },
    "owner": "S2b",
-   "key_files": 44,
-   "keys": 269,
-   "keys_per_tick": 4.4,
+   "key_files": 43,
+   "keys": 263,
+   "keys_per_tick": 4.3,
    "source": "v2 6.93-9.70 (v2f_a_boss_far_01: the re-hat; cr_pretell_hand: the hand to the brim from T0 - 14)",
    "note": "",
    "authored": true
@@ -1892,8 +1892,8 @@
     "scab_up": 510
    },
    "owner": "S2b",
-   "key_files": 408,
-   "keys": 2352,
+   "key_files": 407,
+   "keys": 2350,
    "keys_per_tick": 4.2,
    "source": "staged (v1s_intro_stairs: the far figure; PLAN §3.1 E0-E10); E10 v1 4.8-5.8 (v1s_intro_keys: the scabbard upright, hilt up)",
    "note": "",
@@ -1956,7 +1956,7 @@
    },
    "owner": "S2b",
    "key_files": 137,
-   "keys": 1178,
+   "keys": 1185,
    "keys_per_tick": 5.5,
    "source": "v1 37.28-39.2 (v1s_cs_keys: lunge, lock, apart, the hat on her back), v2 0-6.9 (v2f_cs_keys1/2, v2f_cs_hat, cr_v2_a11: the iai, 홍련일섬)",
    "note": "",
@@ -2019,8 +2019,8 @@
     "eyes": 1030
    },
    "owner": "S2b",
-   "key_files": 493,
-   "keys": 3749,
+   "key_files": 494,
+   "keys": 3754,
    "keys_per_tick": 3.6,
    "source": "v3 26.27-40.3 (v3r_e_shots1-4, v3r_e_slash_2f), v4 (v4k_c*, v4k_s4_sheathe, v4k_s5_face), v5 (v5e_s1_*, v5e_s2_turn*, v5e_s3_keys1-3)",
    "note": "",
@@ -2284,7 +2284,7 @@
  "view_range": 2,
  "storage": {
   "anchors": "rlk:hr rig.an",
-  "version": 13920498
+  "version": 173603159
  },
  "ghost_texture": "rlk:mboss/scarlet/ghost",
  "skin": {
@@ -15915,14 +15915,14 @@
    "a4": {
     "passes": 3,
     "corrections": {
-     "bPush": 19.5,
-     "bTurn": 57,
+     "bPush": 12.55,
+     "bTurn": 42,
      "scab": 10.03,
      "scabArm": 9
     },
     "contacts": {},
     "stretch": 1,
-    "blade_residue": 0.007,
+    "blade_residue": 0,
     "support_dy": 0.066,
     "lift": 0
    },
@@ -16145,9 +16145,8 @@
    "g_dome": {
     "passes": 3,
     "corrections": {
-     "bPush": 9.9,
-     "bTurn": 24,
-     "scabArm": 26
+     "bPush": 14.03,
+     "scabArm": 25
     },
     "contacts": {},
     "stretch": 1,
@@ -16247,7 +16246,6 @@
      "rock+": 11,
      "sash": 55.38,
      "scab": 41.81,
-     "scabArm": 22,
      "strings": 64.22
     },
     "contacts": {
@@ -16306,7 +16304,6 @@
      "hatBackZ": 10.55,
      "hatClear": 21,
      "scab": 1.5,
-     "scabArm": 8,
      "strHead": 86.19
     },
     "contacts": {
@@ -16467,10 +16464,10 @@
   "elements_budget": 6500,
   "parts": 29,
   "models": 62,
-  "key_files": 2086,
-  "keys": 18761,
-  "rig_functions": 2602,
-  "rig_bytes": 5686712,
+  "key_files": 2084,
+  "keys": 18800,
+  "rig_functions": 2600,
+  "rig_bytes": 5696494,
   "cull_overhang_ticks": 0
  },
  "sprites": {

@@ -292,9 +292,19 @@ const BODY_BOX = Object.fromEntries([...BODY_BOX_PARTS, 'forearm_r'].map(n => {
   return [n, [[Math.min(...X), (e.from[1] - 8) / 16, Math.min(...Z)], [Math.max(...X), (e.to[1] - 8) / 16, Math.max(...Z)]]];
 }));
 const conjQ = Q => [-Q[0], -Q[1], -Q[2], Q[3]];
+// S2d round 3 (C3-1): what ships on a tick is near the solved frame: within TOL x 1.25 (the margin covers the 5-decimal rounding
+// of the written keys, which leaves |q| a little off 1 so qAngle of such a quaternion with itself reads up to ~0.5 deg, and the
+// boundary of the compiler's own fit); the quaternions are compared normalized
+const unitQ = v => { const m = Math.hypot(...v.q); return {...v, q: v.q.map(x => x / m)}; };
+const nearSolved = (x, y, n) => {
+  const big = Math.max(...y.s.map(Math.abs), ...x.s.map(Math.abs));
+  if (big < 1e-4) return true;
+  return len(sub(x.t, y.t)) <= 1.25 * (TOL.tp[n] ?? TOL.t) && Math.max(...x.s.map((v, i) => Math.abs(v - y.s[i]))) <= 1.25 * TOL.s * Math.max(1, big) &&
+    qAngle(unitQ(x).q, unitQ(y).q) <= 1.25 * (TOL.r[n] ?? TOL.rDefault);
+};
 // the parts riding a body part (S2d round 2): keyed with it where the event check re-keys it
 const RIDERS = {head: ['face', 'hat', 'hat_strings']};
-const bladeErrors = [], wornErrors = [];
+const bladeErrors = [], wornErrors = [], tolErrors = [];
 // discrete channels the clips key: model swaps through rig/m/<part>/<value> (form-aware), stored states (bookkeeping)
 const HAND_PART = {hL: 'forearm_l', hR: 'forearm_r'};
 const STATE_STORE = {hat: 'Hat', sword: 'Sw', scab: 'Sc', cup: 'Cu', bottle: 'Bo'};
@@ -407,7 +417,12 @@ for (const c of CLIPS) {
   const syncFirst = Object.fromEntries(PART_NAMES.map(n => [n, new Set()])), firstEnd = {};
   const compilePart = n => {
     const seq = F.map(fr => fr.d[n]);
-    let segs = segmentsCut(seq, n, cuts, f0);
+    // S2d round 3 (C3-1): a rider-group sync end m before f0 (syncFirst: a floor / planted-foot split of a part in the group) ends
+    // the first key at m and starts a fitted segmentation there (the rest of [m, f0] is checked against TOL like any other span)
+    const m0 = syncFirst[n].size ? Math.min(...syncFirst[n]) : null;
+    let segs = m0 != null && m0 < f0
+      ? [[0, m0], ...segmentsCut(seq.slice(m0), n, cuts.filter(t => t > m0).map(t => t - m0), 1).map(([x, y]) => [x + m0, y + m0])]
+      : segmentsCut(seq, n, cuts, f0);
     if (dense.size) {
       const W0 = seq.map(v => JSON.stringify(written(v)));
       segs = segs.flatMap(([a, b]) => {
@@ -420,7 +435,7 @@ for (const c of CLIPS) {
     // shipped blade enters at an event keys there too (extraSplit, filled by the event check below)
     {
       const evs = n === 'sword' || n === 'sword_glow' ? evT : [];
-      const xs = [...new Set([...[...evs, ...extraSplit[n]].filter(free), ...(f0 < c.len ? [f0] : []), ...syncFirst[n]])];
+      const xs = [...new Set([...[...evs, ...extraSplit[n]].filter(free), ...(f0 < c.len ? [f0] : [])])];
       if (xs.length) segs = segs.flatMap(([a, b]) => { const pts = [a, ...xs.filter(t => t > a && t < b).sort((x, y) => x - y), b]; return pts.slice(1).map((y, i) => [pts[i], y]); });
     }
     // a segment whose client interpolation dips below the floor is split at its lowest tick (until none dips)
@@ -448,6 +463,18 @@ for (const c of CLIPS) {
         if (!worst) break;
         segs = segs.flatMap(([a, b]) => (a === worst.a && b === worst.b ? [[a, worst.t], [worst.t, b]] : [[a, b]]));
       }
+    }
+    // S2d round 3 (C3-1): every span after the first key reproduces the solved frames within TOL: a split inside a forced or
+    // fitted span (the forced first key's floor / planted-foot split, an event or a dense tick) can leave the rest of it unfitted,
+    // and such a span is fitted again (subdivided by the compiler's own segmentation)
+    {
+      const W = seq.map(written);
+      segs = segs.flatMap(([a, b], i) => {
+        if (i === 0 || b - a < 2) return [[a, b]];
+        let ok = true;
+        for (let t = a + 1; t < b && ok; t++) ok = nearSolved(interp(W[a], W[b], (t - a) / (b - a)), W[t], n);
+        return ok ? [[a, b]] : compiler.segments(seq.slice(a, b + 1), n, 1).map(([x, y]) => [x + a, y + a]);
+      });
     }
     // the keys as shipped {at, dur, to}: a 1-tick segment ending on a cut tick and turning > 60 deg (or showing a hidden part)
     // snaps (a 0-tick key at b; the next segment starts one tick later)
@@ -566,6 +593,17 @@ for (const c of CLIPS) {
   }
   for (const f of eventFails()) bladeErrors.push(f.msg);
   { const w = wornSplit(); if (w) wornErrors.push(`${c.name} t${w.t}: the worn brim ${w.g.toFixed(4)} b over the head's top corners as shipped (< 0.001)`); }
+  // S2d round 3 (C3-1): after each part's first key (before it: the blend-in from the previous clip's pose), what ships stays
+  // near the solved frame (nearSolved: TOL x 1.25) on every tick; a cut tick and the tick after it (the snap) are exempt
+  for (const n of PART_NAMES) {
+    if (HIDDEN.includes(n)) continue;
+    const seq = keyLists[n].seq;
+    for (let t = firstEnd[n] + 1; t <= c.len; t++) {
+      if (cuts.includes(t) || cuts.includes(t - 1) || nearSolved(compiledD[n][t], written(seq[t]), n)) continue;
+      const x = compiledD[n][t], y = written(seq[t]);
+      tolErrors.push(`${c.name} ${n} t${t}: ${qAngle(x.q, y.q).toFixed(1)} deg / ${len(sub(x.t, y.t)).toFixed(3)} b off the solved frame`);
+    }
+  }
   // per-tick checks on what ships: floor (every shown model point; the blade / scabbard tips), culling, 1-tick turns
   for (let t = 0; t <= c.len; t++) {
     for (const n of PART_NAMES) {
@@ -652,6 +690,7 @@ const fail = (title, list) => { if (list.length) { const m = `${title}:\n  ${lis
 fail('floor (no shown element below the feet)', floorErrors);
 fail('the blade through her body at a clip event', bladeErrors);
 fail('the worn hat on the head as shipped', wornErrors);
+fail('what ships off the solved frame after the first key (beyond TOL x 1.25)', tolErrors);
 fail('rotations above 120 degrees per tick or per key', motionErrors);
 fail('a correction guard at its bound (scarlet_pose.mjs GUARD_BOUND)', boundErrors);
 fail('culling box overhang', cullWarn);

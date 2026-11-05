@@ -169,12 +169,13 @@ function hat(p2) {
   });
   // the crown: 16 facets (u round the drum, v top -> bottom), its round top and the closing bottom disc. The top (S2d round 2)
   // is the drum's own 16-gon: an annulus of 16 quads (r .17 -> crownR, matching the facets, odd quads 0.001 up) over a centre
-  // square (half-side .17, inside the annulus' inner edge, 0.001 down), so no lid corner overhangs the drum. The bottom disc
+  // square (half-side .175, 0.001 down: it runs 0.005 under the annulus' inner edge, so no slit shows between them at its four
+  // edges, S2d round 3; its corners at r .2475 stay inside the drum), so no lid corner overhangs the drum. The bottom disc
   // (seen only from below) stays one square: its corners lie over the opaque brim ring (r > 0.20), which hides them.
   const y0 = HAT.gap * 3 + .002, y1 = y0 + HAT.crownH;
   e.push(...lathe('y', [0, 0, 0], [{a: [y0, y1], r: HAT.crownR, tex: 'crown'}], {vFrom: y1, vTo: y0, n: 16}));
   e.push(...annulus('y', [0, 0, 0], y1, HAT.lidR, HAT.crownR, '+', 'lacquer_w', {n: 16, stagger: .001}));
-  e.push(disc('y', [0, 0, 0], y1 - .001, HAT.lidR, '+', 'lacquer_w'));
+  e.push(disc('y', [0, 0, 0], y1 - .001, HAT.lidR + .005, '+', 'lacquer_w'));
   e.push(disc('y', [0, 0, 0], y0 + .001, HAT.crownR * .995, '-', 'lacquer_w'));
   // the red-lotus knot at the back of the band (faces +Z, her back), centred behind the crown
   e.push(card1(p2 ? 'knot_p2' : 'knot_p1', HAT.crownR + .012, {X0: -.085, X1: .085, Y0: y0 - .028, Y1: y0 + .114}, 'back'));

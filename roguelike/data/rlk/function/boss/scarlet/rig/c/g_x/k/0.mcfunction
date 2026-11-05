@@ -27,7 +27,7 @@ data merge entity 524c4b4d-4852-4400-8000-000000000018 {start_interpolation:0,in
 data merge entity 524c4b4d-4852-4400-8000-000000000019 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.25f,0.82126f,0.18f],left_rotation:[-0.81972f,0.12426f,0.19428f,0.52428f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4852-4400-8000-00000000001a {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.25f,0.82126f,0.18f],left_rotation:[-0.81972f,0.12426f,0.19428f,0.52428f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
 data merge entity 524c4b4d-4852-4400-8000-00000000001b {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.68914f,0.73383f,0.08187f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-00000000001c {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.55691f,0.95308f,-0.40507f],left_rotation:[0.3048f,-0.03667f,0.21198f,0.9278f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000001c {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.51842f,0.94277f,-0.41492f],left_rotation:[0.32748f,-0.11164f,0.1073f,0.93208f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
 function rlk:boss/scarlet/rig/m/forearm_l/grip
 function rlk:boss/scarlet/rig/m/forearm_r/open
 function rlk:boss/scarlet/rig/m/face/calm

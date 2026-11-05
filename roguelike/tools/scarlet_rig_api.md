@@ -85,7 +85,11 @@ exactly (`test_rig.py` `body`); `skin.map` in the manifest lists every model's r
 fixed scale-0 transform keyed at a clip's tick 0): `hair_tail_1` `hair_tail_2` (the skin's own back hair reads as the
 player model's), `lock_r` `lock_l`, `skirt_fl` `skirt_fr` `skirt_bl` `skirt_br`. The hands are the arm's lower end (the three
 hand models are one box). Faces: `calm` shows the skin's own face (no overlay), `smile` narrows the eyes and adds a thin mouth,
-`closed` lays eyelids over both eyes (`face_fx`, 0.003 b in front of the face).
+`closed` lays eyelids over both eyes (`face_fx`, 0.003 b in front of the face). The joints are the avatar's: rigid boxes about
+their pivots, so in deep forward bends (the kneels, the iaido stance) the torso / pelvis seam opens at the lower back by up to
+~0.13 b (2 px; kipup 10, lead_down 9; the iaido stance cs1 104-161 0.06-0.09), as the avatar's elbows and knees do: accepted
+(design §1.3, risk 17). The elbow is a hinge (S2d round 3): the upper arm and the forearm share one front, so the forearm box
+never twists about itself against the upper arm (§9.3).
 
 | NN | part | parent | default model | scale | bright |
 |---|---|---|---|---|---|
@@ -216,10 +220,16 @@ previous clip's pose over the same ticks for every part (each part's first key e
 at the clip's blend; no dense / event / re-key split inside it, and the riders — head / face / hat / strings, the sword arm /
 sword / glow — end their first keys together); an event re-key splits the part the blade entered with its riders and the
 sword arm; while the hat is worn, head / face / hat key together wherever the shipped brim comes within 0.001 b of the head's
-top corners (a gate), and the right forearm / the cup wherever the cup sinks > 0.03 b into the shipped fist. Numbers of the S2d build: 29 parts, 47 clips,
-2 602 rig functions (5.69 MB), 18 761 keys in 2 086 key files, 62 models, 27 painted sprites + the skin (47 872 px), 224
-elements at rest (ghost 224). The suite `S:hr/tests/test_rig.py` (146 checks with the S2d sections; `--rebuild` + 3: two
-builds byte-identical) replays the shipped key files; on a manifest without the S2d blocks the new sections are skipped.
+top corners (a gate), and the right forearm / the cup wherever the cup sinks > 0.03 b into the shipped fist. S2d round 3: a
+rider-group sync that ends a part's first key before the blend's end starts a fitted segmentation there, every later span
+that a split left unfitted (a floor / planted-foot split inside the forced first key, an event or dense split inside a fitted
+span) is fitted again, and a gate checks that after each part's first key what ships stays within TOL × 1.25 of the solved
+frame on every tick (cut ticks and the tick after them exempt). A clip the module starts from the hidden rig has no pose to
+blend from: `g_dive` (after g_vert's 'gone') takes `blend: 1`, so the whole body shows at t1. Numbers of the S2d build: 29
+parts, 47 clips, 2 600 rig functions (5.70 MB), 18 800 keys in 2 084 key files, 62 models, 27 painted sprites + the skin
+(47 872 px), 224 elements at rest (ghost 224). The suite `S:hr/tests/test_rig.py` (149 checks with the S2d sections;
+`--rebuild` + 3: two builds byte-identical) replays the shipped key files; on a manifest without the S2d blocks the new
+sections are skipped.
 
 ## 9. S2d: the skeleton, the retarget, the solver
 
@@ -253,8 +263,13 @@ the lying rest puts the lowest of pelvis / torso / head / legs at 0.002 with the
 `armUp`); the kneel puts the right knee on the floor (one tick after the patch's full weight: the bend plane turns 40° / t; the
 hips hold their height until it lands); the planted feet's soles at 0.002-0.004 (a bisecting boot loop; a foot the touch rule
 lifted is re-planted). Hand targets: the stone items (refined with the solved forearm), the brim hold, the floor hat, the hilt,
-the throat, the lips, the hat hand-overs; an arm whose segment would swing > 60° in a tick takes the bend plane (round the shoulder -> grip line)
-with the smallest swing, and every limb segment rolls ≤ 35° / t about itself (round 2); the blade-body guard through draws too
+the throat, the lips, the hat hand-overs; an arm whose segment would turn > 60° in a tick takes the bend plane (round the shoulder -> grip line)
+with the smallest turn (round 2). The arm is a hinge (round 3): the upper arm's front is the inside of the elbow's bend (armFront's
+where the arm is nearly straight) and the forearm takes it carried through the elbow, so the two x axes (the hinge axis) agree
+on every tick (shipped: ≤ 1°); where the upper arm would roll > 35° / t the bend plane is chosen so the elbow keeps pointing
+where it pointed (as long as no segment turns past 60° for it). The leg segments keep their own roll limit (≤ 35° / t each):
+the kneel's knee lands in one tick, and there the knee's hinge axes part by up to 54° for a few ticks (lead_down 6-8,
+kipup 7-9); elsewhere ≤ 35°. The blade-body guard through draws too
 (and the free right forearm); the hip
 scabbard yaws out of the hanging right arm (`scabArm`); the hand-held hat, its hand-overs and the worn / back swings keep out
 of her head and torso (`hatClear`: pushed out along the nearest box face, the right hand following as far as it reaches), the

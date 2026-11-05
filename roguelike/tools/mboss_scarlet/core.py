@@ -962,9 +962,9 @@ def stand_in_gauntlets(W, ctx):
 
 
 # ================================================================================================== the stand-in rig
-# the built rig's idle-t0 anchors (^left ^up ^forward, rounded to 0.05; S2d: the player-size body)
-ANCHOR_OFF = {'hand_l': (0.15, 0.95, 0.25), 'hand_r': (-0.5, 0.8, 0.0), 'blade_tip': (-0.7, 0.15, 1.3),
-              'blade_mid': (-0.3, 0.5, 0.85), 'scabbard_mouth': (-0.25, 0.95, 0.2), 'hat_crown': (0.0, api.HAT_TOP, 0.2),
+# the built rig's idle-t0 anchors (^left ^up ^forward, rounded to 0.05; S2d: the player-size body, its slim arms and the level hat)
+ANCHOR_OFF = {'hand_l': (0.15, 0.95, 0.25), 'hand_r': (-0.45, 0.8, 0.0), 'blade_tip': (-0.7, 0.15, 1.3),
+              'blade_mid': (-0.3, 0.5, 0.85), 'scabbard_mouth': (-0.25, 0.95, 0.2), 'hat_crown': (0.0, api.HAT_TOP, 0.15),
               'head': (0.0, 1.75, 0.1), 'chest': (0.0, 1.2, 0.1)}
 
 
