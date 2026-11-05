@@ -2,15 +2,15 @@
 # module, the kit cards and HUD, the rig, every rlk_hr_* entity, the core's scores (init / spawn make them again) and
 # storage core.*. Never the event scores (api.EV_FP) nor ev.*: the reward hook reads them after this.
 function rlk:boss/scarlet/core/stop_all
-function rlk:boss/scarlet/core/sq/intro/cancel
-function rlk:boss/scarlet/core/sq/cs1/cancel
-function rlk:boss/scarlet/core/sq/sq1/cancel
-function rlk:boss/scarlet/core/sq/repel/cancel
-function rlk:boss/scarlet/core/sq/lead_down/cancel
-function rlk:boss/scarlet/core/sq/lead_stand/cancel
-function rlk:boss/scarlet/core/sq/ending/cancel
-function rlk:boss/scarlet/core/sq/event/cancel
-execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:boss/scarlet/rig_stub/kill
+function rlk:boss/scarlet/seq/intro/cancel
+function rlk:boss/scarlet/seq/cs1/cancel
+function rlk:boss/scarlet/seq/sq1/cancel
+function rlk:boss/scarlet/seq/repel/cancel
+function rlk:boss/scarlet/seq/lead_down/cancel
+function rlk:boss/scarlet/seq/lead_stand/cancel
+function rlk:boss/scarlet/seq/ending/cancel
+function rlk:boss/scarlet/seq/event/cancel
+execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s run function rlk:boss/scarlet/rig/kill
 kill @e[tag=rlk_hr_a9s]
 kill @e[tag=rlk_hr_anchor]
 kill @e[tag=rlk_hr_cut]

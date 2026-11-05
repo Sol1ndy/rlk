@@ -1,5 +1,5 @@
 # A8 pattern tick 14.
-function rlk:boss/scarlet/rig_stub/play/g_dash
+function rlk:boss/scarlet/rig/play/g_dash
 function rlk:boss/scarlet/g/spot/d1
 function rlk:mboss/mv/stop
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] run tp @s ~ ~ ~

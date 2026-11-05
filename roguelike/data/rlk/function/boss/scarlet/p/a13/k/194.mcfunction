@@ -3,4 +3,4 @@ execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.2 ~ run particle minecra
 execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.2 ~ run particle minecraft:end_rod ~ ~ ~ 0.25 0.6 0.25 0.04 4 force @a[tag=player]
 execute at @s rotated as @s rotated ~ 0 positioned ~ ~1 ~ run particle minecraft:dust{color:[1.0,0.95,0.98],scale:1.0} ~ ~ ~ 0.77 0.05 0.77 0 18 force @a[tag=player]
 execute at @s rotated as @s rotated ~ 0 positioned ~ ~1 ~ run particle minecraft:sweep_attack ~ ~ ~ 0.56 0.05 0.56 0 3 force @a[tag=player]
-function rlk:boss/scarlet/rig_stub/state/hidden
+function rlk:boss/scarlet/rig/state/hidden

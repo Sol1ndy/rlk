@@ -10,6 +10,6 @@ tag @s add rlk_mb_inv
 function rlk:boss/scarlet/shield/off
 function rlk:boss/scarlet/core/stop_move
 function rlk:boss/scarlet/core/place8
-function rlk:boss/scarlet/rig_stub/look/form/normal
-function rlk:boss/scarlet/rig_stub/play/idle2
+function rlk:boss/scarlet/rig/look/form/normal
+function rlk:boss/scarlet/rig/play/idle2
 scoreboard players set #rvw hr 60

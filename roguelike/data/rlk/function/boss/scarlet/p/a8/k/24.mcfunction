@@ -1,2 +1,2 @@
 # A8 pattern tick 24.
-function rlk:boss/scarlet/rig_stub/play/g_ring
+function rlk:boss/scarlet/rig/play/g_ring

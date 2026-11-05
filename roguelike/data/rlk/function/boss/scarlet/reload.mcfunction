@@ -3,8 +3,8 @@
 # pause (lead_stand {g}); CS2 / CS3 -> their end (the rest of the HP steps); down -> on with <= 100 t; a P1 / P2 pattern
 # -> cancelled + the recovery. (The death state never gets here: the framework finishes it at once.)
 function rlk:boss/scarlet/init
-function rlk:boss/scarlet/rig_stub/init
-function rlk:boss/scarlet/rig_stub/spawn
+function rlk:boss/scarlet/rig/init
+function rlk:boss/scarlet/rig/spawn
 scoreboard players set #lock hr 0
 function rlk:boss/scarlet/core/deco_re
 execute if score #ph hr matches 0 run return run function rlk:boss/scarlet/core/intro/reload

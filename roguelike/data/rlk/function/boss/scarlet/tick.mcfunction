@@ -2,4 +2,4 @@
 # the pattern / sequence clock).
 execute if score #ph hr matches 0 run function rlk:boss/scarlet/core/intro/done
 function rlk:boss/scarlet/core/fight
-function rlk:boss/scarlet/rig_stub/tick
+function rlk:boss/scarlet/rig/tick

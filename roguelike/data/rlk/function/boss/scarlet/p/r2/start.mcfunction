@@ -8,7 +8,7 @@ scoreboard players operation #r2_b hr = @s mhpM
 scoreboard players set #r2_c hr 30
 scoreboard players operation #r2_b hr *= #r2_c hr
 execute if score #r2_a hr <= #r2_b hr run scoreboard players set #r2_two hr 1
-function rlk:boss/scarlet/rig_stub/play/a7_tell
+function rlk:boss/scarlet/rig/play/a7_tell
 function rlk:mboss/mv/face
 function rlk:boss/scarlet/g/spot/back1
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] run function rlk:mboss/mv/glide {t:2}

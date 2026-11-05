@@ -3,5 +3,5 @@
 title @a[tag=player] actionbar ""
 scoreboard players set #skip hr -1
 scoreboard players set #skp hr 0
-function rlk:boss/scarlet/core/sq/intro/skip
+function rlk:boss/scarlet/seq/intro/skip
 scoreboard players set #sq hr 553

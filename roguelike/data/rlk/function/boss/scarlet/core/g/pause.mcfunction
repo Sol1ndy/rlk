@@ -9,5 +9,5 @@ scoreboard players set #done hr 0
 function rlk:boss/scarlet/shield/off
 function rlk:boss/scarlet/core/stop_move
 function rlk:boss/scarlet/core/ground
-function rlk:boss/scarlet/rig_stub/look/form/normal
+function rlk:boss/scarlet/rig/look/form/normal
 tag @s remove rlk_hr_ghost

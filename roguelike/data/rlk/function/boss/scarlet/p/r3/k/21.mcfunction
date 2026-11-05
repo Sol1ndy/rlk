@@ -1,2 +1,2 @@
 # R3 pattern tick 21.
-function rlk:boss/scarlet/rig_stub/play/g_sweep
+function rlk:boss/scarlet/rig/play/g_sweep

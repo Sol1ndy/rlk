@@ -31,6 +31,8 @@ run tools/build_mboss_tk_fx.py --skip-rp
 run tools/build_mboss_tachy.py
 [ -f tools/build_mboss_kn_fx.py ] && run tools/build_mboss_kn_fx.py --skip-rp
 [ -f tools/build_mboss_arlecchino.py ] && run tools/build_mboss_arlecchino.py
+[ -f tools/build_mboss_hr_fx.py ] && run tools/build_mboss_hr_fx.py --skip-rp
+[ -f tools/build_mboss_scarlet.py ] && run tools/build_mboss_scarlet.py
 if [ $MOBS = 1 ]; then run tools/build_ch2_mobs.py; run tools/build_ch3_mobs.py; fi
 run tools/check_mboss_pack.py
 tail -1 "$LOG"; rm -f "$LOG"

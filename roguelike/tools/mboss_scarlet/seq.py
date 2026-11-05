@@ -445,9 +445,13 @@ def build_lead_stand(W):
         W.w(f'seq/lead_stand/g/{g}', [f'# lead_stand {{g:"{g}"}}: the gauntlet it leads into.', f'scoreboard players set #sq_g {OBJ} {gid[g]}'])
     mv.write(W)
     head = 'lead_stand {g:"a8"|"a13"} (PLAN §3.5): the stagger, the hat, the side steps, the refill, the darkness + the brim (the gauntlet g at its end).'
+    # I1: the gauntlet arg is dispatched through storage to static references (check_mboss_pack resolves a $(...) function
+    # reference only as a numeric family <ref><n>; a string-valued g/$(g) was its one problem on the merged tree)
     write(W, 'lead_stand', s, head, api.SEQ_LEN['lead_stand'], macro=True,
-          start_head=[f'scoreboard players set #sq_g {OBJ} 0', f'$function {SEQ}/lead_stand/g/$(g)'] + stage()
-          + [api.play('lead_stand'), K.hud('warn', on=0)])
+          start_head=[f'scoreboard players set #sq_g {OBJ} 0', f'$data modify storage rlk:{OBJ} seq.g set value "$(g)"']
+          + [f'execute if data storage rlk:{OBJ} seq{{g:"{g}"}} run function {SEQ}/lead_stand/g/{g}'
+             for g in api.SEQ_ARGS['lead_stand']['g']]
+          + stage() + [api.play('lead_stand'), K.hud('warn', on=0)])
 
 
 # =============================================================================================================================

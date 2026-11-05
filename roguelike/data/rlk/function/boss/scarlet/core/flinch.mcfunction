@@ -2,4 +2,4 @@
 scoreboard players set #flq hr 0
 execute unless score #pat hr matches 0 run return 0
 scoreboard players set #ai_fl hr 6
-function rlk:boss/scarlet/rig_stub/play/flinch
+function rlk:boss/scarlet/rig/play/flinch

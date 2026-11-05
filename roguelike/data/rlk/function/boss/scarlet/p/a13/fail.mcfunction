@@ -8,7 +8,7 @@ execute at @e[tag=rlk_body,limit=1] run playsound minecraft:item.trident.thunder
 execute at @e[tag=rlk_body,limit=1] run playsound minecraft:entity.player.attack.sweep hostile @a[tag=player] ~ ~ ~ 1 0.5 0.33
 execute at @e[tag=rlk_body,limit=1] run playsound minecraft:block.glass.break hostile @a[tag=player] ~ ~ ~ 0.6 0.5 0.2
 execute as @a[tag=player,limit=1] at @s run function rlk:boss/scarlet/ult/fatal
-function rlk:boss/scarlet/rig_stub/play/g_reform
+function rlk:boss/scarlet/rig/play/g_reform
 function rlk:mboss/mv/face
 function rlk:boss/scarlet/g/spot/land
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] run function rlk:mboss/mv/glide {t:2}

@@ -1,6 +1,6 @@
 # A13 pattern tick 252.
-function rlk:boss/scarlet/rig_stub/play/g_dive
-function rlk:boss/scarlet/rig_stub/look/form/normal
+function rlk:boss/scarlet/rig/play/g_dive
+function rlk:boss/scarlet/rig/look/form/normal
 tag @s remove rlk_hr_ghost
 function rlk:boss/scarlet/g/spot/over
 function rlk:mboss/mv/stop

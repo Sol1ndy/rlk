@@ -1,6 +1,6 @@
 # Hook uninstall (no executor; every enabled module): the kit, the rig, every rlk_hr_* entity, objective hr (incl. the
 # event scores), storage rlk:hr.
-function rlk:boss/scarlet/rig_stub/uninstall
+function rlk:boss/scarlet/rig/uninstall
 kill @e[tag=rlk_hr_a9s]
 kill @e[tag=rlk_hr_anchor]
 kill @e[tag=rlk_hr_cut]

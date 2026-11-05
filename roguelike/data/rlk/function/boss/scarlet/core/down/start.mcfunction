@@ -8,4 +8,4 @@ scoreboard players set #down hr 200
 scoreboard players set #flw hr 0
 scoreboard players set #kip hr 0
 scoreboard players set #fl hr 0
-function rlk:boss/scarlet/rig_stub/play/down
+function rlk:boss/scarlet/rig/play/down
