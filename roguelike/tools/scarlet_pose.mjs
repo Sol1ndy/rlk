@@ -47,7 +47,7 @@
 //             hL, hR (open|grip|brim), cup, bottle (none|hand|rock)
 //   ph                 the loop phase 0..1 (idle sway, set by the sampler)
 import {add, sub, times, len, unit, mul, q, rot, aimQ, ik, basisQ, cross, dot, perp, slerp, armFront, steadyPerp, toDisplayT, toDisplayQ, lerp} from './mboss_rig_math.mjs';
-import {PART_NAMES, PART_SCALE, SWORD, SCAB, HAT, ARM, LEG, SKIRT, STRINGS, modelPoints, HAND_MODELS, FACE_MODELS, PHASE_MODELS} from './scarlet_geometry.mjs';
+import {PART_NAMES, PART_SCALE, SWORD, SCAB, HAT, ARM, LEG, SKIRT, STRINGS, modelPoints, HAND_MODELS, FACE_MODELS, PHASE_MODELS, HIDDEN} from './scarlet_geometry.mjs';
 
 export const HIP_Y = 1.36;
 export const SK = {
@@ -150,6 +150,7 @@ function clearFloor(t, Q, pts, axis, clear, maxDeg = 100, sense = 1, name = null
 
 // ---- the item model a part shows in a pose (for its hull; the form / phase swaps keep the geometry) ---------------------------
 export function modelOn(n, p) {
+  if (HIDDEN.includes(n)) return 'empty';
   if (n === 'forearm_r') return HAND_MODELS.forearm_r[p.hR || 'open'];
   if (n === 'forearm_l') return HAND_MODELS.forearm_l[p.hL || 'grip'];
   if (n === 'face') return FACE_MODELS[p.face || 'calm'];
@@ -291,19 +292,13 @@ export function solve(p, hist = () => null, guardMin = {}) {
     solL = armSolve('l', SL, freeTarget(SL, p.aL, 1, 'l'), poleOf(p.pL, 1));
     gripL = sol2grip(solL);
   }
-  // segments of both arms; the forearm frame turns its knuckles toward the held thing (the blade, the scabbard)
-  const bladeAx = rot(SQ, [0, 1, 0]);
-  for (const [k, S, sol, side] of [['l', SL, solL, 1], ['r', SR, solR, -1]]) {
+  // segments of both arms. S2c: the arms are skin boxes one pixel outward of the bone, so the forearm keeps the upper arm's
+  // roll (both framed by the bend: armFront), the elbow stays aligned; S2a's knuckle turn toward the held blade / scabbard
+  // and the free roll frL / frR (the hand shapes) have no effect on a box hand and are not applied
+  for (const [k, S, sol] of [['l', SL, solL], ['r', SR, solR]]) {
     const up = sub(sol.E, S), fo = sub(sol.W, sol.E);
     part('arm_' + k, S, segQ('ua' + k, up, armFront(up, sol.v, chestFwd)));
-    let front = armFront(fo, sol.v, chestFwd);
-    if (k === 'l' && (p.hold ?? 1) > .5) front = lerp(front, bladeAx, .85);
-    if (k === 'r' && hrold) front = lerp(front, rot(scQ, [0, 1, 0]), .85);
-    if (k === 'r' && (p.rh || 0) > .3 && (p.hold ?? 1) > .5) front = lerp(front, bladeAx, .85 * Math.min(1, p.rh));
-    let fq = segQ('fa' + k, fo, front);
-    const roll = side > 0 ? (p.frL || 0) : (p.frR || 0);
-    if (roll) fq = mul(fq, q([0, side * roll, 0]));
-    part('forearm_' + k, sol.E, fq);
+    part('forearm_' + k, sol.E, segQ('fa' + k, fo, armFront(fo, sol.v, chestFwd)));
   }
 
   // ---- sword, glow, scabbard, sheathed hilt ----
@@ -369,8 +364,14 @@ export function solve(p, hist = () => null, guardMin = {}) {
       keep['hd' + i] = d;
       const F = steadyPerp(rot(Cq, [0, 0, -1]), d, prev['hair' + i], rot(Cq, [0, 0, -1]));
       keep['hair' + i] = F;
-      part('hair_tail_' + (i + 1), t, aimQ(d, F));
-      t = add(t, times(d, L));
+      // S2c: the hair is a slab of the skin's back hair, 0.42 wide: lift it about its root, then roll it flat about its own
+      // line, until its hull clears the floor (as the post-lift floor stands); the next segment hangs from this one's end
+      const hn = 'hair_tail_' + (i + 1), hp = hullOf(hn, hn);
+      let hq = clearFloor(t, aimQ(d, F), hp, safeAxis(cross(d, [0, 1, 0])), .012 - fOff, 90, 0, 'hairP' + i);
+      const hd = rot(hq, [0, -1, 0]);
+      hq = clearFloor(t, hq, hp, hd, .012 - fOff, 60, 0, 'hairR' + i);
+      part(hn, t, hq);
+      t = add(t, times(rot(hq, [0, -1, 0]), L));
     }
     Object.defineProperty(o, '_hairRoot', {value: root, enumerable: false});
     keep.Hq = Hq;
@@ -471,6 +472,9 @@ export function solve(p, hist = () => null, guardMin = {}) {
     const c = add(R, [0, .3 + lift, 0]);
     for (const v of Object.values(o)) { v.t = add(c, times(sub(v.t, c), p.vis)); v.s = times(v.s, p.vis); }
   }
+  // the parts the skin already shows (HIDDEN: the side locks, the skirt panels) rest at scale 0 in one fixed transform, so a
+  // clip keys them once at its tick 0
+  for (const n of HIDDEN) o[n] = {t: [0, HIP_Y, 0], q: [0, 0, 0, 1], s: [0, 0, 0]};
   // anchors (rig frame, after the lift): the grips, the blade tip / middle (the left hand while the sword is hidden), the
   // scabbard's mouth, the crown top, the head centre, the chest
   const swOn = o.sword.s[0] > 1e-4;

@@ -1,8 +1,12 @@
-# 홍련 (Scarlet) rig: API (stage S2a)
+# 홍련 (Scarlet) rig: API (stages S2a, S2b; the skin S2c)
 
-The display-entity rig of the special boss 홍련 (Scarlet; module `scarlet`, function root `boss/scarlet`) — an original
-design of a Joseon wandering swordswoman with a red-lotus motif — and the contract between the rig and its users: the
-module (`tools/mboss_scarlet/*`, S3 / S4) and S2b's cinematic clips and sequences. Binding inputs: `S:hr/PLAN.md` §1.5,
+The display-entity rig of the special boss 홍련 (Scarlet; module `scarlet`, function root `boss/scarlet`) and the contract
+between the rig and its users: the module (`tools/mboss_scarlet/*`, S3 / S4) and S2b's cinematic clips and sequences.
+**S2c (11-05, the user's request "마인크래프트 스킨을 이용해서 만들라고. 아를이나 라이덴처럼"):** the body wears the user's own
+Minecraft skin (`tools/scarlet_skin.mjs`, 64 × 64 classic with the outer layers; its pixels as given) mapped onto S2a's
+skeleton the way 아를레키노 / 나루카미 wear theirs; what the rig makes itself — the hat (a white 백립-style gat), its bead
+strings, the sash tails, the sword, the scabbard, the hilt, the cup, the bottle, `item_sword` — keeps S2a's shapes in colours
+matched to the skin. Parts, skeleton (pivots, limb lengths), anchors, looks, calls and the 47 clips are unchanged. Binding inputs: `S:hr/PLAN.md` §1.5,
 §2, §4.3-§4.5, §5.4, §7.3.2; `S:hr/contract.md` §3.2; the frozen table `tools/mboss_scarlet/api.py` §6-§7 (parts, parents,
 re-parent table, looks, hands, prop states, anchors, calls, clips). Never edit `api.py` from here: requests go to
 `S:hr/requests/`.
@@ -17,9 +21,10 @@ node tools/build_scarlet_rig.mjs --resourcepack <unpacked RP> [--datapack <dp>] 
 | file | owns |
 |---|---|
 | `build_scarlet_rig.mjs` | the build: models / items / sprites / atlas, the two-pass clip solve, the compile (per-part key segments, snaps, floor splits), the gates, the API functions, the anchor table, the manifest, the debug pack |
-| `scarlet_geometry.mjs` | the 29 parts (name, default model, brightness, display scale), every item model (blocks, A-frame, `toUnits`), the hand / face / phase / blade model tables, the ghost twins (`<model>_g`), `item_sword` |
-| `scarlet_paint.mjs` | the palette (PLAN §2.2, ΔE ≥ 10 from the original's roles: `PAINT_ROLES`), the tile sprites and the unique cards (faces, hair cards, the wedge-masked brim, knot, strings, blade / glows, the 3-region ghost texture) |
-| `scarlet_pose.mjs` | the skeleton and `solve(pose, hist, guardMin)`: torso FK, IK legs (boots on the floor), IK arms (the sword lever / sphere grip, free targets, the brim / hilt / throat targets), the blade in its cutting plane, the per-tick re-parenting (hat, scabbard, cup, bottle), the chains (ponytail, locks, strings, sash, four skirt panels) with lag, gravity and floor guards, the root lift, `vis` |
+| `scarlet_skin.mjs` | S2c: the user's skin, embedded (base64, bytes, sha1; generated once from the user's PNG — do not edit); the builder writes it unchanged as `textures/mboss/scarlet/skin.png` (`rlk:mboss/scarlet/skin`) |
+| `scarlet_geometry.mjs` | the 29 parts (name, default model, brightness, display scale), every item model (blocks, A-frame, `toUnits`): the skin boxes of the body (`SKIN_REGIONS`, `SKIN`, `SKIN_MAP`), the hair slabs, the face overlays (`FACE_FX`), the hidden parts (`HIDDEN`), the props; the hand / face / phase / blade model tables, the ghost twins (`<model>_g`), `item_sword` |
+| `scarlet_paint.mjs` | the props' palette (matched to the skin; the hat and the gold keep ΔE ≥ 10 from the original's roles: `PAINT_ROLES`, the body roles `'skin'`), the tile sprites and the unique cards (the wedge-masked brim, knot, strings, sash tails, blade / glows, `face_fx`, the 3-region ghost texture); the skin is never painted here |
+| `scarlet_pose.mjs` | the skeleton and `solve(pose, hist, guardMin)`: torso FK, IK legs (boots on the floor), IK arms (the sword lever / sphere grip, free targets, the brim / hilt / throat targets; S2c: both arm segments framed by the bend so the box elbow stays aligned), the blade in its cutting plane, the per-tick re-parenting (hat, scabbard, cup, bottle), the chains (the hair slab, strings, sash; the hidden locks / skirt panels held at scale 0) with lag, gravity and floor guards, the root lift, `vis` |
 | `scarlet_clips.mjs` | `DEFAULT_POSE` (the stance), the pose families (`ST`, `ST2`, `CROUCH`, `LOW`, `AIR`, `LOCK`, `DOWN`, `H_POSE`), the helpers `K` / `B` / `SW`, the 39 S2a clips, `CINE_PLACEHOLDER` |
 | `scarlet_cine.mjs` | **S2b's** (absent until S2b writes it): the 8 cinematic clips (§6) |
 
@@ -54,10 +59,25 @@ is used unchanged. Two builds are byte-identical.
 
 Item displays, `billboard:"fixed"`, `view_range:2f`, culling 8 × 8, block brightness 13 (`sword_glow` 15; the ghost form 15;
 `sash_tails` 14 in P2), tags `rlk_room rlk_mb_aux rlk_mb_part rlk_hr_part rlk_hr_<part>` (the shadow: no `rlk_mb_part`).
-Head top 2.55 b, crown top 2.82, brim Ø 1.60 (four 1.60 b squares at 0 / 22.5 / 45 / −22.5° stacked 0.003 b apart, each
+Head top 2.42 b (the skin's box head, 0.40 b, sits 0.03 b into the neck under the brim), crown top 2.82, brim Ø 1.60 (four 1.60 b squares at 0 / 22.5 / 45 / −22.5° stacked 0.003 b apart, each
 painting only its own corner wedges: no coplanar faces, no stacked translucency; the underside tinted through the item
 definition), sword 2.10 b and scabbard 1.82 b (display scale 1.5). Left-handed: the sword in `forearm_l`, the scabbard at
-the right hip / in the right hand. Elements at rest 2 304 (ghost 2 304) ≤ 6 500; the atlas 83 712 px (48 sprites) ≤ 0.15 M.
+the right hip / in the right hand. Elements at rest 212 (ghost 212) ≤ 6 500; the atlas 47 872 px (27 painted sprites + the
+4 096-px skin) ≤ 0.15 M.
+
+**The skin (S2c).** One skin pixel is 0.0525 b across (the torso 8 × 4 px = 0.42 × 0.21, each limb 4 × 4 px = 0.21 × 0.21; the
+head 0.05 b/px, 8 px = 0.40); the rows stretch onto the bones: body rows 0-9 on the torso (neck base → 0.0275 below the
+waist) and 9-12 on the pelvis (→ the hip joints), 0.0642 b per row; arm rows 0-6 from the shoulder top (0.12 above the
+joint) to the elbow, 6-12 from the elbow to the hand's end (0.48; the grip point 0.42), the boxes one pixel outward of the
+bone as the vanilla arm; leg rows 0-6 thigh (0.60), 6-12 shin to the sole (0.68), centred on the hip joints. Each skin
+model is two boxes: the base layer and the outer layer one box out (0.5 px on the head, 0.25 px elsewhere, the cut ends of
+split limbs flush; the right leg's pants a hair wider). `skin.map` in the manifest lists every model's region and rows.
+The hair falls behind as a 1-px slab of the body back's hair (rows 0-3.43 / 3.43-11 on `hair_tail_1` / `_2`, the jacket's
+strands as its outer layer): at rest it lies over the skin's own back hair, in motion it swings (lag, gravity, floor
+guards). Hidden (model `empty`, one fixed scale-0 transform keyed at a clip's tick 0): `lock_r` `lock_l` `skirt_fl`
+`skirt_fr` `skirt_bl` `skirt_br` — the skin already shows the locks and the legs. The hands are the arm's lower end (the
+three hand models are one box). Faces: `calm` shows the skin's own face (no overlay), `smile` narrows the eyes and adds a
+thin mouth, `closed` lays eyelids over both eyes (`face_fx`, the skin's own colours, 0.003 b in front of the face).
 
 | NN | part | parent | default model | scale | bright |
 |---|---|---|---|---|---|
@@ -65,11 +85,11 @@ the right hip / in the right hand. Elements at rest 2 304 (ghost 2 304) ≤ 6 50
 | 01 | `torso` | pelvis | `torso` | 1 | 13 |
 | 02 | `head` | torso | `head` | 1 | 13 |
 | 03 | `face` | head | `face_calm` | 1 | 13 |
-| 04-05 | `hair_tail_1` / `_2` | head / hair_tail_1 | the ponytail (2 segments) | 1 | 13 |
-| 06-07 | `lock_r` / `lock_l` | head | the side locks | 1 | 13 |
+| 04-05 | `hair_tail_1` / `_2` | head / hair_tail_1 | the hair slab (2 segments, skin) | 1 | 13 |
+| 06-07 | `lock_r` / `lock_l` | head | `empty` (hidden: in the skin) | 1 | 13 |
 | 08-0b | `arm_r`, `forearm_r`, `arm_l`, `forearm_l` | torso / arm | `forearm_*_<hand>` | 1 | 13 |
 | 0c-0f | `thigh_r`, `shin_r`, `thigh_l`, `shin_l` | pelvis / thigh | the boot is in the shin | 1 | 13 |
-| 10-13 | `skirt_fl`, `skirt_fr`, `skirt_bl`, `skirt_br` | pelvis | four faceted panels | 1 | 13 |
+| 10-13 | `skirt_fl`, `skirt_fr`, `skirt_bl`, `skirt_br` | pelvis | `empty` (hidden: the skin's legs show) | 1 | 13 |
 | 14 | `sash_tails` | pelvis | `sash_p1` / `sash_p2` | 1 | 13 |
 | 15 | `hat` | head (re-parented) | `hat_p1` / `hat_p2` | 1 | 13 |
 | 16 | `hat_strings` | hat | `hat_strings` | 1 | 13 |
@@ -80,7 +100,8 @@ the right hip / in the right hand. Elements at rest 2 304 (ghost 2 304) ≤ 6 50
 | 1b | `cup` | forearm_r (re-parented) | `cup` | 1 | 13 |
 | 1c | `bottle` | forearm_l (re-parented) | `bottle` | 1 | 13 |
 
-Every model has a ghost twin `<model>_g` (same elements, every face `#ghost` = `rlk:mboss/scarlet/ghost`, no tint).
+Every model has a ghost twin `<model>_g` (same elements, every face `#ghost` = `rlk:mboss/scarlet/ghost`, no tint; a skin face
+shows the whole ghost gradient, so every box of the ghost body glows alike).
 No runtime parenting: the re-parent table of `api.REPARENT` is solved per clip tick in `scarlet_pose.mjs`.
 
 ## 3. Looks (`api.LOOKS`; stored in `hrRig*`, re-applied by `spawn`)
@@ -90,7 +111,7 @@ No runtime parenting: the re-parent table of `api.REPARENT` is solved per clip t
 | `form` | normal / ghost | module | every part → its ghost twin (one flat glowing lilac), brightness 15, `sword_glow` lilac |
 | `phase` | p1 / p2 | module | the hat knot (glowing crimson halo) and the sash tails' edge |
 | `blade` | off / lilac / pink / violet / gold | module | the glow card over the blade (`sword_glow`) |
-| `face` | calm / smile / closed | clips (the call: an override until the next clip keys it) | the face card |
+| `face` | calm / smile / closed | clips (the call: an override until the next clip keys it) | the face overlay (calm: none, the skin's face) |
 | `hat` | worn / back / hand / world / gone | clips | stores `hrRigHat` and puts the hat at that state's rest transform |
 | `sword` | hand / sheathed / gone | clips | the blade in hand / hidden with the hilt seated / hidden |
 | `scabbard` | hand / hip / gone | clips | the scabbard in the right hand / at the right hip / hidden |
@@ -170,10 +191,14 @@ from the guard, so a flight direction d needs the turn that takes (1, 1, 0)/√2
 
 The builder fails (unless `--allow-steps`) on: any shown model point, blade tip or scabbard tip below the floor at a compiled
 tick (the client's interpolation included: a dipping segment is split at its lowest tick), a part turning > 120° in a tick
-(a key > 118° is an ambiguous slerp), an element outside −16..32 or with a rotation outside {−45, −22.5, 0, 22.5, 45}, unused
-or mis-sized sprites, a ghost model with another texture, the atlas > 0.15 M px, elements at rest > 6 500. Numbers of this
-build: 29 parts, 47 clips, 1 078 rig functions (3.4 MB), 78 models, 48 sprites (83 712 px), 2 304 elements at rest (ghost
-2 304). The suite `S:hr/tests/test_rig.py` (73 checks; 76 with `--rebuild`, two builds byte-identical) replays the shipped key files.
+(a key > 118° is an ambiguous slerp), the blade more than 1 cm inside her torso / pelvis / head / upper arms / thighs / shins
+at a clip event (as shipped; the hands hold the hilt and the scabbard by design), an element outside −16..32 or with a
+rotation outside {−45, −22.5, 0, 22.5, 45}, unused or mis-sized sprites, a damaged embedded skin, a ghost model with another
+texture, the atlas > 0.15 M px, elements at rest > 6 500. Inside a run of ≥ 4 consecutive authored key ticks (the swings,
+spins, draws, flips) every moving part keys each tick. Numbers of the S2c build: 29 parts, 47 clips, 2 528 rig functions
+(5.6 MB), 18 602 keys in 2 022 key files, 66 models, 27 painted sprites + the skin (47 872 px), 212 elements at rest (ghost
+212). The suite `S:hr/tests/test_rig.py` (95 checks with the S2c skin section; `--rebuild`: two builds byte-identical)
+replays the shipped key files.
 
 Debug: `--debug-dp <dir>` writes `hr_dbg/<clip>/<t>` (every part's compiled transform and the hand / face models of that tick)
 for the offline renderer (`S:az/understand/rigtech_render.py --spawn rlk:boss/scarlet/rig/spawn --apply rlk:hr_dbg/<clip>/{t}

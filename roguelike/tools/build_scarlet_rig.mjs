@@ -1,7 +1,10 @@
 // Display-entity rig of 홍련 (Scarlet, the special boss; S:hr/PLAN.md §2, contract S:hr/contract.md §3.2, frozen table
-// tools/mboss_scarlet/api.py §6-§7). An ORIGINAL design (PLAN §1.5, §2.2). Built on the shared RIGLIB (mboss_rig_compile.mjs,
-// mboss_rig_clips.mjs, mboss_model_lib.mjs, mboss_shape_lib.mjs, mboss_paint_lib.mjs, mboss_rig_math.mjs, all unchanged).
-// API note: tools/scarlet_rig_api.md.
+// tools/mboss_scarlet/api.py §6-§7). S2c (11-05): the body wears the user's own Minecraft skin (tools/scarlet_skin.mjs, the
+// user's request "마인크래프트 스킨을 이용해서 만들라고. 아를이나 라이덴처럼"; mapped onto S2a's skeleton in scarlet_geometry.mjs);
+// the hat, the strings, the sash tails, the sword, the scabbard, the cup and the bottle stay S2a's own shapes in colours
+// matched to the skin (PLAN §1.5). Built on the shared RIGLIB (mboss_rig_compile.mjs, mboss_rig_clips.mjs,
+// mboss_model_lib.mjs, mboss_shape_lib.mjs, mboss_paint_lib.mjs, mboss_rig_math.mjs, all unchanged). API note:
+// tools/scarlet_rig_api.md.
 //
 // node tools/build_scarlet_rig.mjs --resourcepack <unpacked RP> [--datapack <dp>] [--no-paint] [--allow-steps] [--allow-missing]
 //                                  [--debug-dp <scratch dir> [--debug-clips a,b | all] [--debug-step N]]
@@ -9,23 +12,27 @@
 // Writes (owned, rebuilt from scratch on every run)
 //   DP  data/rlk/function/boss/scarlet/rig/**
 //   RP  assets/rlk/textures/mboss/scarlet/*, assets/rlk/models/item/mboss/scarlet/*, assets/rlk/items/mboss/scarlet/* and the
-//       items-atlas entries rlk:mboss/scarlet/* (filter-then-push by id); incl. the ghost texture rlk:mboss/scarlet/ghost
-//       and the item / thrown-sword model rlk:mboss/scarlet/item_sword (api.ITEM_MODEL)
+//       items-atlas entries rlk:mboss/scarlet/* (filter-then-push by id); incl. the user's skin rlk:mboss/scarlet/skin (the
+//       embedded PNG bytes, unchanged), the ghost texture rlk:mboss/scarlet/ghost and the item / thrown-sword model
+//       rlk:mboss/scarlet/item_sword (api.ITEM_MODEL)
 //   tools/scarlet_rig_manifest.json (the stub's schema + transforms, models, budgets, sprites; api.check_manifest passes)
 // Clips: the 39 owned by S2a from tools/scarlet_clips.mjs; the 8 cinematic clips from S2b's tools/scarlet_cine.mjs when it
 // exists (export CLIPS: the eight clip objects in the scarlet_clips format), else scarlet_clips.CINE_PLACEHOLDER.
-// The build throws on: a part / blade tip / scabbard tip / brim / hair / skirt below the floor at any compiled tick, a clip /
-// event / loop that differs from the contract, a rotation above 120 degrees per tick or per key, the atlas over 0.15 M px,
-// more than 6 500 elements at rest, a model outside -16..32 (--allow-steps turns the motion checks into warnings while
-// authoring; --allow-missing builds stand-ins for clips not authored yet).
+// The build throws on: a part / blade tip / scabbard tip / brim / hair below the floor at any compiled tick, a clip / event /
+// loop that differs from the contract, a rotation above 120 degrees per tick or per key, the blade inside her body at a clip
+// event (S2c: the skin boxes), the atlas over 0.15 M px, more than 6 500 elements at rest, a model outside -16..32, a damaged
+// embedded skin (--allow-steps turns the motion checks into warnings while authoring; --allow-missing builds stand-ins for
+// clips not authored yet).
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {PART_NAMES, PART_SCALE, PART_BRIGHT, DEFAULT_MODEL, HAND_MODELS, FACE_MODELS, PHASE_MODELS, BLADE_MODELS, ghostOf, TINTS, allModels,
-  ITEM_SWORD} from './scarlet_geometry.mjs';
-import {scarletSprites, paintScarlet, spriteId, PAINT_ROLES} from './scarlet_paint.mjs';
+  ITEM_SWORD, HIDDEN, SKIN, SKIN_REGIONS, SKIN_MAP, FACE_FX, SWORD} from './scarlet_geometry.mjs';
+const SWORD_BLADE = [SWORD.bladeLo, SWORD.tip];
+import {scarletSprites, paintScarlet, spriteId, PAINT_ROLES, TEX_DIR} from './scarlet_paint.mjs';
+import {SKIN_B64, SKIN_BYTES, SKIN_SHA1} from './scarlet_skin.mjs';
 import {solve, toDisplay, fromDisplay, setModels, worldPoints, modelOn, HIP_Y} from './scarlet_pose.mjs';
 import {CLIPS as AUTHORED, CINE_PLACEHOLDER, accumulate, sampleClip, DEFAULT_POSE, H_POSE} from './scarlet_clips.mjs';
 import {createRigCompiler, createRigFollow, nbt, written, interp, shown, summonPart, summonShadow, cullOverhang} from './mboss_rig_compile.mjs';
@@ -75,6 +82,21 @@ const modelDir = path.join(assets, 'models/item/mboss/scarlet'), itemDir = path.
 for (const d of [modelDir, itemDir]) fs.rmSync(d, {recursive: true, force: true});
 const sprites = scarletSprites();
 if (!flag('--no-paint')) paintScarlet(rp, sprites);
+// the user's skin: the embedded bytes unchanged (paintSpriteSet drops it with the stale files; written again here) and its
+// items-atlas entry (filter-then-push by id: removed with the stale ids above, pushed back at the end)
+const SKIN_ID = spriteId('skin');
+{
+  const bytes = Buffer.from(SKIN_B64, 'base64');
+  if (bytes.length !== SKIN_BYTES || crypto.createHash('sha1').update(bytes).digest('hex') !== SKIN_SHA1) throw new Error('scarlet_skin.mjs: the embedded skin is damaged');
+  if (bytes.readUInt32BE(16) !== 64 || bytes.readUInt32BE(20) !== 64) throw new Error('scarlet_skin.mjs: the skin is not 64 x 64');
+  fs.mkdirSync(path.join(rp, TEX_DIR), {recursive: true});
+  fs.writeFileSync(path.join(rp, TEX_DIR, 'skin.png'), bytes);
+  const atlasPath = path.join(rp, 'assets/minecraft/atlases/items.json');
+  const atlas = JSON.parse(fs.readFileSync(atlasPath, 'utf8'));
+  atlas.sources = atlas.sources.filter(s => (s.sprite || s.resource) !== SKIN_ID);
+  atlas.sources.push({type: 'minecraft:single', resource: SKIN_ID});
+  fs.writeFileSync(atlasPath, JSON.stringify(atlas, null, 2) + '\n');
+}
 // item_sword: the vanilla handheld display transforms (the model lies on the diagonal like a vanilla sword), a gui icon, flat
 // on the ground, upright in a frame; display scale 1.5 in an item_display (item_display "none") = the rig's size
 const ITEM_DISPLAY = {
@@ -91,17 +113,18 @@ const usedSprites = new Set();
 for (const [name, els] of Object.entries(models)) {
   const used = [...new Set(els.flatMap(e => Object.values(e.faces).map(f => f.texture.slice(1))))].sort();
   const tex = {};
-  for (const u of used) { if (!sprites[u]) throw new Error(`model ${name}: unknown sprite ${u}`); tex[u] = spriteId(u); usedSprites.add(u); }
-  const m = {ambientocclusion: false, textures: {...tex, particle: tex[used[0]] || spriteId('lacquer')}, elements: els};
+  for (const u of used) { if (u !== 'skin' && !sprites[u]) throw new Error(`model ${name}: unknown sprite ${u}`); tex[u] = spriteId(u); usedSprites.add(u); }
+  // a model with no faces (empty, the calm face and its twin) takes the particle of its kind (the ghost twin the ghost texture)
+  const m = {ambientocclusion: false, textures: {...tex, particle: tex[used[0]] || spriteId(name.endsWith('_g') ? 'ghost' : 'lacquer')}, elements: els};
   if (name === 'item_sword') m.display = ITEM_DISPLAY;
   json(path.join(modelDir, name + '.json'), m);
   const def = {type: 'minecraft:model', model: 'rlk:item/mboss/scarlet/' + name};
   if (TINTS[name] !== undefined) def.tints = [{type: 'minecraft:constant', value: TINTS[name]}];
   json(path.join(itemDir, name + '.json'), {model: def});
 }
-const unused = Object.keys(sprites).filter(n => !usedSprites.has(n));
+const unused = [...Object.keys(sprites), 'skin'].filter(n => !usedSprites.has(n));
 if (unused.length) throw new Error(`painted but unused sprites: ${unused.join(', ')}`);
-const ledger = {}; let atlasPx = 0;
+const ledger = {skin: 64 * 64}; let atlasPx = 64 * 64;
 for (const [n, [w, h]] of Object.entries(sprites)) {
   if (w > 512 || h > 1024 || w % 16 || h % 16) throw new Error(`sprite ${n} ${w}x${h}: sides multiples of 16`);
   ledger[n] = w * h; atlasPx += w * h;
@@ -190,6 +213,28 @@ function segmentsCut(seq, n, cuts, minFirst) {
   }
   return out;
 }
+// big swings keyed every tick (PLAN §2.5): the runs of >= 4 consecutive authored key ticks (the swings, spins, draws and flips
+// the clips author tick by tick); every part that moves there keys at each of those ticks (S2c: the hidden skirt / lock parts
+// no longer key, so the moving parts' own keys carry the run)
+function denseTicks(c) {
+  const ts = c.keys.map(k => k[0]), out = new Set();
+  let s = 0;
+  for (let i = 1; i <= ts.length; i++) {
+    if (i < ts.length && ts[i] === ts[i - 1] + 1) continue;
+    if (ts[i - 1] - ts[s] >= 3) for (let k = ts[s]; k <= ts[i - 1]; k++) out.add(k);
+    s = i;
+  }
+  return out;
+}
+// no blade through her body at the clip events (S2c): the base boxes of the skin parts (part frame, blocks) the blade samples
+// (guard -> tip) must stay out of, 1 cm in from every face; the hands (forearms) hold the hilt and the scabbard by design
+const BODY_BOX_PARTS = ['torso', 'pelvis', 'head', 'arm_l', 'arm_r', 'thigh_l', 'thigh_r', 'shin_l', 'shin_r'];
+const BODY_BOX = Object.fromEntries(BODY_BOX_PARTS.map(n => {
+  const e = models[DEFAULT_MODEL[n]][0], X = [(8 - e.from[0]) / 16, (8 - e.to[0]) / 16], Z = [(e.from[2] - 8) / 16, (e.to[2] - 8) / 16];
+  return [n, [[Math.min(...X), (e.from[1] - 8) / 16, Math.min(...Z)], [Math.max(...X), (e.to[1] - 8) / 16, Math.max(...Z)]]];
+}));
+const conjQ = Q => [-Q[0], -Q[1], -Q[2], Q[3]];
+const bladeErrors = [];
 // discrete channels the clips key: model swaps through rig/m/<part>/<value> (form-aware), stored states (bookkeeping)
 const HAND_PART = {hL: 'forearm_l', hR: 'forearm_r'};
 const STATE_STORE = {hat: 'Hat', sword: 'Sw', scab: 'Sc', cup: 'Cu', bottle: 'Bo'};
@@ -210,10 +255,18 @@ for (const c of CLIPS) {
   const cuts = [...(c.cuts || [])];
   const byTick = new Map(), add_ = (t, l) => { if (!byTick.has(t)) byTick.set(t, []); byTick.get(t).push(l); };
   let keys = 0;
-  const compiledD = {};
+  const compiledD = {}, dense = denseTicks(c);
   for (const n of PART_NAMES) {
     const seq = F.map(fr => fr.d[n]);
     let segs = segmentsCut(seq, n, cuts, c.blend ?? 3);
+    if (dense.size) {
+      const W0 = seq.map(v => JSON.stringify(written(v)));
+      segs = segs.flatMap(([a, b]) => {
+        const inner = [...dense].filter(k => k > a && k < b && (W0[k] !== W0[k - 1] || W0[k] !== W0[k + 1])).sort((x, y) => x - y);
+        const pts = [a, ...inner, b];
+        return pts.slice(1).map((y, i) => [pts[i], y]);
+      });
+    }
     // a segment whose client interpolation dips below the floor is split at its lowest tick (until none dips)
     const lowAt = (t, v) => { const P = worldPoints(modelOn(n, F[t].p), n, fromDisplay(n, v)); return P.length ? Math.min(...P.map(x => x[1])) : 1; };
     for (let guard = 0; guard < 400; guard++) {
@@ -236,6 +289,11 @@ for (const c of CLIPS) {
       if (turn > 118 && shown(seq[a]) && shown(seq[b])) motionErrors.push(`${c.name} ${n} t${a}-${b}: ${turn.toFixed(0)} degree key (ambiguous slerp)`);
       if (a === snapped) { if (b - a > 1) keyList.push({at: a + 1, dur: b - a - 1, to: b}); }
       else keyList.push({at: a, dur: b - a, to: b});
+    }
+    // S2c: a hidden part (in the skin already: one fixed scale-0 transform from the solver) keys once, at tick 0
+    if (HIDDEN.includes(n)) {
+      if (seq.some(v => JSON.stringify(written(v)) !== JSON.stringify(written(seq[0])))) throw new Error(`hidden part ${n} moves in ${c.name}`);
+      keyList.splice(0, keyList.length, {at: 0, dur: 0, to: 0});
     }
     // what the client shows each tick (the first key starts from the clip's own tick-0 pose)
     const W = seq.map(written), cv = new Array(seq.length);
@@ -266,6 +324,24 @@ for (const c of CLIPS) {
       if (t && !cuts.includes(t) && shown(compiledD[n][t - 1])) { const a = qAngle(compiledD[n][t - 1].q, v.q); if (a > 120) motionErrors.push(`${c.name} ${n} t${t - 1}->${t}: ${a.toFixed(0)} degrees`); }
     }
     for (const n of ['sword', 'scabbard']) { const P = tipOf(F[t], n); if (P && P[1] < (n === 'sword' ? .0 : 0)) floorErrors.push(`${c.name} t${t} ${n} tip ${P[1].toFixed(3)} b`); }
+  }
+  // the blade at the clip events (as shipped): no sample inside a body box (1 cm in)
+  for (const [ev, te] of Object.entries(c.events)) {
+    const sw = fromDisplay('sword', compiledD.sword[te]);
+    if (!shown(compiledD.sword[te])) continue;
+    const ax = rot(sw.q, [0, 1, 0]);
+    for (const n of BODY_BOX_PARTS) {
+      const v = fromDisplay(n, compiledD[n][te]);
+      if (Math.min(...v.s) < 1e-4) continue;
+      const [lo, hi] = BODY_BOX[n];
+      let deep = 0;
+      for (let k = 0; k <= 40; k++) {
+        const y = SWORD_BLADE[0] + (SWORD_BLADE[1] - SWORD_BLADE[0]) * k / 40, P = add(sw.t, ax.map(x => x * y * sw.s[1]));
+        const L = rot(conjQ(v.q), sub(P, v.t)).map((x, i) => x / v.s[i]);
+        deep = Math.max(deep, Math.min(...[0, 1, 2].flatMap(i => [L[i] - lo[i], hi[i] - L[i]])));
+      }
+      if (deep > .01) bladeErrors.push(`${c.name} ${ev}@${te} ${n}: the blade ${deep.toFixed(3)} b inside`);
+    }
   }
   // discrete channels: hands and face (model swaps through rig/m/*), the re-parent states (stored), at tick 0 and changes
   F.forEach((fr, t) => {
@@ -329,6 +405,7 @@ for (const c of CLIPS) {
 }
 const fail = (title, list) => { if (list.length) { const m = `${title}:\n  ${list.slice(0, +(arg('--show') || 40)).join('\n  ')}${list.length > 40 ? `\n  ... ${list.length} in all` : ''}`; if (flag('--allow-steps')) console.warn(m); else throw new Error(m); } };
 fail('floor (no shown element below the feet)', floorErrors);
+fail('the blade through her body at a clip event', bladeErrors);
 fail('rotations above 120 degrees per tick or per key', motionErrors);
 fail('culling box overhang', cullWarn);
 compiler.writeDispatch(CLIPS.map(c => ({id: c.id, name: c.name})));
@@ -478,7 +555,13 @@ const manifest = {
   stored_looks: Object.fromEntries(Object.entries(STORE).map(([k, v]) => [k, OBJ + v])),
   tags: {part: 'rlk_hr_part', anchor: 'rlk_hr_anchor', per_part: 'rlk_hr_<part>', all: ['rlk_room', 'rlk_mb_aux', 'rlk_mb_part', 'rlk_hr_part'], face_marker: 'rlk_hr_face'},
   objectives: OBJS, culling: CULL, view_range: VIEW_RANGE, storage: {anchors: 'rlk:hr rig.an', version: anVer},
-  ghost_texture: itemId('ghost'), item_sword: {model: itemId('item_sword'), length: ITEM_SWORD.len, display_scale: 1.5, display: ITEM_DISPLAY},
+  ghost_texture: itemId('ghost'),
+  skin: {texture: SKIN_ID, file: `${TEX_DIR}/skin.png`, source: 'tools/scarlet_skin.mjs: the user\'s own skin (11-05), bytes written unchanged',
+    bytes: SKIN_BYTES, sha1: SKIN_SHA1, size: [64, 64], layout: 'classic (4-px arms) with the outer layers',
+    regions: SKIN_REGIONS, px: SKIN.px, body_px: +SKIN.bodyPx.toFixed(6), head0: SKIN.head0, inflate_px: {head: SKIN.inflHead, body: SKIN.infl, leg_r: SKIN.inflLegR},
+    map: SKIN_MAP, hidden: HIDDEN, face_overlays: FACE_FX,
+    _doc: 'map: model -> [region, row start, row end] (the base box shows the region\'s base layer, the second box its outer layer; body_back = the hair slab: the body back face only). hidden: parts the skin already shows (model empty, scale 0). face_overlays: [col, row, cols, rows] of the 8 x 8 face painted by face_fx.'},
+  item_sword: {model: itemId('item_sword'), length: ITEM_SWORD.len, display_scale: 1.5, display: ITEM_DISPLAY},
   paint_roles: PAINT_ROLES,
   budgets: {atlas_px: atlasPx, atlas_budget: ATLAS_BUDGET, sprites: Object.keys(sprites).length, elements_at_rest: ELEMENTS, elements_budget: EL_BUDGET,
     parts: PART_NAMES.length, models: Object.keys(models).length, key_files: keyFiles, keys: keyLines, rig_functions: fnFiles.files, rig_bytes: fnFiles.bytes,

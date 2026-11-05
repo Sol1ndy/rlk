@@ -1,0 +1,8 @@
+execute if score @s hrRigT matches 151 run return run function rlk:boss/scarlet/rig/c/intro/k/151
+execute if score @s hrRigT matches 152 run return run function rlk:boss/scarlet/rig/c/intro/k/152
+execute if score @s hrRigT matches 153 run return run function rlk:boss/scarlet/rig/c/intro/k/153
+execute if score @s hrRigT matches 154 run return run function rlk:boss/scarlet/rig/c/intro/k/154
+execute if score @s hrRigT matches 155 run return run function rlk:boss/scarlet/rig/c/intro/k/155
+execute if score @s hrRigT matches 156 run return run function rlk:boss/scarlet/rig/c/intro/k/156
+execute if score @s hrRigT matches 157 run return run function rlk:boss/scarlet/rig/c/intro/k/157
+execute if score @s hrRigT matches 158 run return run function rlk:boss/scarlet/rig/c/intro/k/158
