@@ -56,3 +56,7 @@ execute if score #charN tmp matches 8 if score @s nfVeil matches 3.. run scorebo
 # 중간보스 전투 중 치명타 확률 · 치명타 피해 보정(#mbCritAdd: 달빛 고치 −100, 달빛 축복 받음 +15 / #mbCritDmgAdd: 달빛 축복 받음 +50). 전투가 끝나면 0
 execute if score #mbLive mb matches 1 run scoreboard players operation @s critChance += #mbCritAdd mb
 execute if score #mbLive mb matches 1 run scoreboard players operation @s critDamage += #mbCritDmgAdd mb
+# 화무십일홍: 육참골단 중첩(공격력%) · 체력 60% 이하 치명타 피해 · 홍련일섬 뒤 치명타 확률
+execute if score @s it_sword_hwamu matches 1.. run function rlk:items/proc/hw_stat
+# 월하대작(특수 보스 홍련의 이벤트 버프, 이번 런): 최종 공격력(ampAtk) · 치명타 확률 · 이동 속도(load 의 조절 지점 #hrMoon*)
+execute if score @s hrMoon matches 1.. run function rlk:player/hr_moon/apply

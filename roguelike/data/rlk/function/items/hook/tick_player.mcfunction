@@ -161,3 +161,6 @@ execute if score #cgMoonT itv matches 1.. at @e[tag=rlk_body,limit=1] run partic
 # 각인 만월 2개: 달 반응 피해
 execute if score fullmoon engN matches 2.. run scoreboard players operation #lnBuff itv += #fmDmg tmp
 execute unless score #salonT itv matches 1.. if entity @e[tag=rlk_salon,limit=1] run function rlk:items/proc/salon_end
+# 화무십일홍: 중첩 시간 · 반격 · 홍련일섬 지연 · 재사용 대기 / 팔거나 버리면 상태와 사이드바를 지운다
+execute if score @s it_sword_hwamu matches 1.. run function rlk:items/proc/hw_tick
+execute unless score @s it_sword_hwamu matches 1.. if score #hwOn itv matches 1 run function rlk:items/proc/hw_clear

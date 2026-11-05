@@ -149,6 +149,8 @@ scoreboard objectives add sapphire dummy
 # 주사위(레벨 업 아이템 선택의 리롤권, 런마다 0) · 생명력 노드로 늘어난 최대 체력 %(런마다 0)
 scoreboard objectives add dice dummy
 scoreboard objectives add nodeHp dummy
+# 월하대작(특수 보스 홍련의 이벤트 버프: 0 없음 · 1 켜짐, 런마다 0 = player/reset_one)
+scoreboard objectives add hrMoon dummy
 # 아이템 강화 단계 (가짜 플레이어 = 아이템 id, 0~3. rlk:pinv enh 와 같음)
 scoreboard objectives add enhL dummy
 
@@ -671,6 +673,11 @@ scoreboard players set #cArc tmp 36
 scoreboard players set #fmDmg tmp 15
 scoreboard players set #fmEm tmp 80
 scoreboard players set #fmDur tmp 160
+# 월하대작(특수 보스 홍련의 이벤트 버프, 이번 런): 최종 공격력 +% · 치명타 확률 +% · 이동 속도 +% (아이템이 아니라 강화와 상관없음)
+#   런이 끝나도 남게(영구) 바꾸면 8 · 4 · 4 와 player/reset_one 의 hrMoon 줄 · player/update_item 의 "(이번 런)" (계획 §7.5.3)
+scoreboard players set #hrMoonAtk tmp 20
+scoreboard players set #hrMoonCrit tmp 10
+scoreboard players set #hrMoonSpd tmp 10
 # 서리달의 은잔: 중력의 물결 시간(틱) · 피해(최대 체력 ‰) · 중력 1번 · 발동 기준 · 중력 간섭(반응 기준 %) · 월광 시간(틱) · 월광 달 피해 +%
 scoreboard players set #cgRipDur tmp 500
 scoreboard players set #cgRipPm tmp 35

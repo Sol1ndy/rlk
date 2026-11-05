@@ -9,6 +9,8 @@ function rlk:lvup/init
 scoreboard players set @s gold 0
 scoreboard players set @s dice 0
 scoreboard players set @s nodeHp 0
+# 월하대작(홍련 이벤트 버프)은 이번 런만. 영구로 바꾸려면 이 줄을 지운다(계획 §7.5.3: load 의 #hrMoon* 도 8 · 4 · 4)
+scoreboard players set @s hrMoon 0
 scoreboard players set @s invCap 9
 # 아이템 전부 제거 + 인벤 시스템 상태 초기화
 clear @s
