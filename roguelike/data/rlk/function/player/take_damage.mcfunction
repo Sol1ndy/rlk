@@ -35,3 +35,5 @@ execute if score #hurtDmg tmp matches 1.. run function rlk:player/hurt_do
 # (피격 시 발동 효과는 여기에 추가)
 # 불사자의 갈기: 맞으면 다음 틱에 화염 반격
 execute if score @s it_lion_mane matches 1.. if score #hurtDmg tmp matches 1.. unless score #lionCd itv matches 1.. run function rlk:items/proc/lion_queue
+# 화무십일홍: 맞으면 다음 틱에 반격(검신합일)
+execute if score @s it_sword_hwamu matches 1.. if score #hurtDmg tmp matches 1.. unless score #hwCtrCd itv matches 1.. run function rlk:items/proc/hw_ctr_q

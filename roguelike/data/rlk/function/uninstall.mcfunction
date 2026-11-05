@@ -447,6 +447,7 @@ scoreboard objectives remove sT
 scoreboard objectives remove sapphire
 scoreboard objectives remove dice
 scoreboard objectives remove nodeHp
+scoreboard objectives remove hrMoon
 scoreboard objectives remove enhL
 scoreboard objectives remove scT
 scoreboard objectives remove scanTick
