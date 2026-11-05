@@ -56,7 +56,8 @@ NEW_FAKE = {'#atkSeq', '#auxResEl', '#auxResElV', '#buHpCol', '#buNoNum', '#c280
             '#mbFloor', '#mbFloorHit', '#mbHitEl', '#mbHitEv', '#mbHitRA', '#mbHitSh', '#mbHitSrc', '#mbLost', '#mbMode',
             '#mbMusPh', '#mbMusT', '#mbNRIn', '#mbNRNow', '#mbNoRx', '#mbPart', '#mbPoolPct', '#mbPushOn', '#mbPx', '#mbQi',
             '#mbRamp', '#mbShIn', '#mbSrc', '#mbSrcIn', '#mbTot', '#pjNR', '#pjNoDodge', '#pxIn',
-            '#mbGrpL2'}      # AZ FIX FAIR-3: the last group landed by a one-shot hit (#mbGrpL stays M0's)
+            '#mbGrpL2',      # AZ FIX FAIR-3: the last group landed by a one-shot hit (#mbGrpL stays M0's)
+            '#mbBarOff'}     # 홍련 FN-f (S1, I1 request s1-1): the module's bars-off flag, zeroed by fight_vars / cleanup_fight
 NEW_OBJ = {'mbRes0', 'mbRes1', 'mbRes2', 'mbRes3', 'mbRes4', 'mbRes5', 'mbRes6', 'mbRes7', 'mbRes8', 'mbHzNR', 'mbHzSG',
            'mbPjND', 'mbPjNR', 'mbPart'}
 NEW_STORAGE = {'rlk:mboss': {'creg', 'cbyid'}}

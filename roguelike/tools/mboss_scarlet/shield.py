@@ -30,7 +30,7 @@ from .s3lib import sset, fn, part
 
 L, K = api.L, api.K
 OBJ = api.OBJ
-PIP_T = 'rlk_hr_pip'
+PIP_T = api.TAGS['pip']
 PIP_M = f'@e[type=minecraft:marker,tag={PIP_T}]'
 
 

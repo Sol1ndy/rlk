@@ -31,9 +31,7 @@ TID = S.TID
 GAUNT = api.GAUNTLETS
 SEQ_FIGHT = ('cs1', 'sq1', 'repel', 'lead_down', 'lead_stand')     # sequences of the fight state (#mbSt 1)
 INTRO_LEN = api.SEQ_LEN['intro']
-TAGS_ALL = sorted(set(api.TAGS.values()) | {'rlk_hr_shadow', 'rlk_hr_pip', S.LOCK_T, S.PROBE_T, 'rlk_hr_a9s',
-                                             'rlk_hr_deco_moon_halo', 'rlk_hr_deco_lotus', 'rlk_hr_deco_seat_rock',
-                                             'rlk_hr_pl8', 'rlk_hr_near'})
+TAGS_ALL = sorted(set(api.TAGS.values()))        # I1 (s3-5): S3's extra tags are in api.TAGS now
 
 
 class Ctx:
@@ -82,6 +80,15 @@ def look_req(look):
 
 def warn(on):
     return S.hud('warn', on=int(on))
+
+
+def seq_hold(grs):
+    """After the restarts of a paused / reloaded gauntlet (#grs 1 lead_stand, 3 repel; 2 = the revive stance, no sequence).
+    I1 (s3-10): a sequence (re)started outside the module tick (resume runs before it in the same game tick, /reload before
+    the next one) gets its clock held one tick (#sq -1): that module tick shows clip tick 0 at #sq 0 (the sequence contract:
+    #sq = the shown clip tick) instead of running the start and its tick 1 before the first rig/tick. The /reload restarts
+    of CS1 / SQ1 / the lead-ins hold it the same way (core/re/*)."""
+    return [f'execute if score {grs} {OBJ} matches {v} run {sset("#sq", -1)}' for v in (1, 3)]
 
 
 def music_to(ph):
@@ -600,7 +607,7 @@ def hooks(W, ctx):
                f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a13"]} run {fn("core/lead/a13")}',
                f'execute if score #grs {OBJ} matches 2 run {fn("core/revive/start")}',
                f'execute if score #grs {OBJ} matches 3 run {fn("core/repel/start")}',
-               sset('#grs', 0)]
+               *seq_hold('#grs'), sset('#grs', 0)]
     w('pause', pause)
     w('resume', resume)
     w('core/g/pause', ['# A gauntlet paused (@s = body): cancelled now; what resume does (#grs).',
@@ -678,15 +685,15 @@ def hooks(W, ctx):
     w('core/re/look', ['# After a reload from CS1 on: the crimson look requested again (a job cut by the reload is redone).']
       + look_req('crimson'))
     w('core/re/cs1', ['# /reload in CS1: its end state = SQ1 tick 0 (crimson, phase p2, music 2, the bars shown).',
-                      seq(ctx, 'cs1', 'cancel'), sset('#sqn', 0), music_to(2), fn('core/sq1/start')])
+                      seq(ctx, 'cs1', 'cancel'), sset('#sqn', 0), music_to(2), fn('core/sq1/start'), sset('#sq', -1)])
     w('core/re/sq1', ['# /reload in SQ1: SQ1 again from tick 0 (the crimson look first).', seq(ctx, 'sq1', 'cancel'), sset('#sqn', 0),
-                      fn('core/sq1/start')])
+                      fn('core/sq1/start'), sset('#sq', -1)])
     w('core/re/g', ['# /reload in a gauntlet: as a pause (cancelled, the darkness lifted), then at once its restart.',
                     fn('core/g/pause'),
                     f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a8"]} run {fn("core/lead/a8")}',
                     f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a13"]} run {fn("core/lead/a13")}',
                     f'execute if score #grs {OBJ} matches 2 run {fn("core/revive/start")}',
-                    f'execute if score #grs {OBJ} matches 3 run {fn("core/repel/start")}', sset('#grs', 0)])
+                    f'execute if score #grs {OBJ} matches 3 run {fn("core/repel/start")}', *seq_hold('#grs'), sset('#grs', 0)])
     rest = ['# /reload in the counter cinematic: its end (the HP steps it had not applied yet, then CS2 -> the down window, CS3 ->',
             '# the lethal hit -> CS4).', seq(ctx, 'repel', 'cancel'), sset('#sqn', 0), L.cine(False)]
     for g in GAUNT:
@@ -699,7 +706,9 @@ def hooks(W, ctx):
     w('core/re/down', ['# /reload in the down window: it goes on with at most 100 t left (the kipup: P2).',
                        f'execute if score #kip {OBJ} matches 1.. run return run {fn("core/p2/from_down")}',
                        f'execute if score #down {OBJ} matches 101.. run {sset("#down", 100)}', api.play('down')])
-    w('core/re/lead', ['# /reload in a lead-in / the revive stance: the lead-in again from 0 (the crimson look first).',
+    w('core/re/lead', ['# /reload in a lead-in / the revive stance: the lead-in again from 0 (the crimson look first), its clock held',
+                       '# one tick (I1, s3-10).', fn('core/re/lead_go'), sset('#sq', -1)])
+    w('core/re/lead_go', ['# /reload in a lead-in / the revive stance: which lead-in starts again.',
                        f'execute if score #rvw {OBJ} matches 1.. run return run {fn("core/lead/a13")}',
                        f'execute if score #sqn {OBJ} matches {S.SEQ_ID["lead_down"]} run return run {fn("core/lead/down")}',
                        f'execute if score #gk {OBJ} matches {S.GK["a8"]} run return run {fn("core/lead/a8")}',

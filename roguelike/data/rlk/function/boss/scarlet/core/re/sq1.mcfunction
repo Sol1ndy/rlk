@@ -2,3 +2,4 @@
 function rlk:boss/scarlet/seq/sq1/cancel
 scoreboard players set #sqn hr 0
 function rlk:boss/scarlet/core/sq1/start
+scoreboard players set #sq hr -1

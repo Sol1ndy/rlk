@@ -42,6 +42,7 @@ Runtime (api.Pattern; @s = the body, at it; clock #pt hr = played ticks since st
 TABLE[key] = the recorded hits (cuts / discs) and EVENTS[key] = (tick, kind, name, source) of every effect / sound / rig
 call for the tests (S:hr/tests/pat_ghost.py) and renders (S:hr/s4/render_ghost.py); MOVES[key] = the body moves.
 """
+import math
 from collections import defaultdict
 
 from . import api
@@ -232,7 +233,7 @@ def disc_files(W):
     y = 0.9
     lines = [
         f'# {{kb}} (api.disc; @s = the body, at it): one A7 moon disc (PLAN §4.5): a blade projectile (#pjShape 1, half width',
-        f'# {num(D["hr"], 1)} b, {num(D["speed"], 2)} b/t asked = {L.pj_speed_tenths(D["speed"]) / 10:.1f} b/t flown (0.25 b sub-steps rounded up), life {D["life"]} t, wall stop),',
+        f'# {num(D["hr"], 1)} b, {num(D["speed"], 2)} b/t asked = {math.ceil(D["speed"] / 0.25 - 1e-9) * 0.25:.2f} b/t flown (0.25 b sub-steps rounded up), life {D["life"]} t, wall stop),',
         f'# {num(y, 1)} b over the floor (the blade rows cover 0 .. 1.65 b: a jump does not clear it), aimed at the player\'s position now',
         f'# (no homing), {D["tier"]} Electro, kb; one card: summoned 1 b in front of her, then rotated (pitch 0), then launched and',
         '# dressed (kit fx/prop/disc; else a flat purple pane). Never counts for the shield.',

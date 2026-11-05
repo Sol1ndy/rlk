@@ -144,7 +144,9 @@ FALLBACK_R = 21.0         # the guaranteed last reappear / landing point: on the
 # the A7 moon disc (R2, A13): pj/launch blade shape (#pjShape 1), half width hr, height y0-y1 over the floor (a jump does
 # not clear it), speed b/t, life t, wall stop, aimed at the player's position at release (no homing), one kit card
 # (fx/prop/disc, horizontal, spinning 30 deg/t, facing its flight; summoned, then rotated), tier T2, never counts for pips
-DISC = {'hr': 1.4, 'y0': 0.2, 'y1': 2.4, 'speed': 1.8, 'life': 16, 'shape': 1, 'spin': 30, 'tier': 'T2', 'kb': 0,
+# I1 (request s4-2): speed 1.75 = exactly 7 of the framework's 0.25 b sub-steps (mboss_lib.pj_speed_tenths rounds up, so
+# the frozen 1.8 flew 8 = 2.0 b/t); PLAN's "≈ 7 t from 12 b" (12 / 1.75 = 6.9 t).
+DISC = {'hr': 1.4, 'y0': 0.2, 'y1': 2.4, 'speed': 1.75, 'life': 16, 'shape': 1, 'spin': 30, 'tier': 'T2', 'kb': 0,
         'kb_last_r2': 2}
 TRACK = {'deg': 10, 'step': 0.3, 'min': 2.4}   # chains: re-aim <= 10 deg/t + a 0.3 b step before each hit (stop at 2.4 b)
 DASH_LEN = {'a9': 12.0, 'a6': 12.0, 'cs1_lunge': 20.0}   # max dash / glide lengths (b): A9 iai dash, A6 back-blink
@@ -410,9 +412,25 @@ OBJ = 'hr'
 CORE_FP = ('#ph', '#pat', '#pt', '#done', '#clk', '#rigc', '#rigt', '#sq', '#sqdone', '#hud', '#fl', '#tst', '#lock',
            '#last', '#last2', '#rear', '#far', '#dec', '#rec', '#hits', '#a6cd', '#pips', '#gres', '#gk', '#down',
            '#skip', '#warn', '#inv', LOOK_REQ)
+# I1 (request s3-5): S3's own fake players, folded in from s3lib.FP_EXTRA in the same order (s3lib.FP = CORE_FP; cleanup resets
+# exactly these, the build refuses any other '#name hr' of S3's files): temporaries, the constants #c<n> (CORE_CONSTS), the
+# floor / sequence / shield / kipup / revive / skip state, the AI's #ai_* and its per-pattern weights / cooldowns.
+CORE_CONSTS = (2, 3, 5, 10, 64, 100, 577, 1000, 36000)
+CORE_FP += (('#t', '#t2', '#t3', '#t4', '#t5', '#cn1', '#cn1000') + tuple(f'#c{c}' for c in CORE_CONSTS)
+            + ('#fl60', '#fl5', '#flw', '#sqn', '#sqh', '#shb', '#kip', '#grs', '#rvw', '#a6q', '#ctr', '#flq', '#h1', '#h2',
+               '#h3', '#h4', '#pipoff', '#lk', '#skp', '#rp')
+            + ('#ai_d2', '#ai_mv', '#ai_pht', '#ai_sum', '#ai_r', '#ai_rc', '#ai_ff', '#ai_nx', '#ai_rcd', '#ai_fl', '#ai_lf',
+               '#ai_ls')
+            + tuple(f'#ai_w{k}' for k in P1 + P2) + tuple(f'#cd_{k}' for k in COOLDOWN))
 RIG_OBJ_PREFIX, KIT_OBJ_PREFIX = 'hrRig', 'hrFx'
 TAGS = {'part': 'rlk_hr_part', 'anchor': 'rlk_hr_anchor', 'fx': 'rlk_hr_fx', 'deco': 'rlk_hr_deco', 'pat': 'rlk_hr_p',
         'cut': 'rlk_hr_cut', 'ghost': 'rlk_hr_ghost', 'down': 'rlk_hr_down', 'stage': 'rlk_hr_stage', 'ev': 'rlk_hr_ev'}
+# I1 (request s3-5): the rig's shadow and S3's own tags, folded in (the module cleanup / uninstall kill every value but
+# 'ghost', which they remove from the body): the pip windows, the aim lock / dash probe / A9 spot markers, the P2-entry and
+# near-spot probes, the decor props by name.
+TAGS.update({'shadow': 'rlk_hr_shadow', 'pip': 'rlk_hr_pip', 'lock': 'rlk_hr_lock', 'probe': 'rlk_hr_dp', 'a9s': 'rlk_hr_a9s',
+             'pl8': 'rlk_hr_pl8', 'near': 'rlk_hr_near', 'deco_moon_halo': 'rlk_hr_deco_moon_halo',
+             'deco_lotus': 'rlk_hr_deco_lotus', 'deco_seat_rock': 'rlk_hr_deco_seat_rock'})
 #     pattern markers carry rlk_hr_p + rlk_hr_p_<key>; every part rlk_hr_<part>; everything spawned rlk_room rlk_mb_aux
 STORAGE = 'rlk:hr'
 STORAGE_KEYS = {'core': 'S3', 'rig': 'S2a', 'seq': 'S2b', 'fx': 'S1K', 'g': 'S4', 'ev': 'S3'}   # rlk:hr <key>.* owner

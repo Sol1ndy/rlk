@@ -18,9 +18,9 @@ BODY = '@e[type=minecraft:husk,tag=rlk_mb_body,limit=1]'
 PLAYER = '@e[tag=rlk_body,limit=1]'                 # the player's body (the avatar in F5 / shoulder view): hit / aim point
 PL = '@a[tag=player,limit=1]'                       # the player entity (scores: dashInvT, rnDie, curHealth, ...)
 ARENA_M = '@e[type=minecraft:marker,tag=rlk_mb_arena,limit=1]'
-LOCK_T = 'rlk_hr_lock'
+LOCK_T = api.TAGS['lock']
 LOCK_M = f'@e[type=minecraft:marker,tag={LOCK_T},limit=1]'
-PROBE_T = 'rlk_hr_dp'
+PROBE_T = api.TAGS['probe']
 PROBE_M = f'@e[type=minecraft:marker,tag={PROBE_T},limit=1]'
 ANCHOR_M = f'@e[type=minecraft:marker,tag={api.TAGS["anchor"]},limit=1]'
 AT_BODY = 'at @s rotated as @s rotated ~ 0'
@@ -47,15 +47,9 @@ AT_OF = {'a8': 60, 'a13': 5}                   # repel {at} of each gauntlet's c
 # ------------------------------------------------------------------------------------------------- the core's fake players
 # Every fake player of objective hr that S3 writes (api.CORE_FP + the S3 extras below). cleanup resets exactly these (never
 # api.EV_FP: the reward hook reads them after cleanup); the generator checks every '#name hr' S3 writes is listed here.
-CONSTS = (2, 3, 5, 10, 64, 100, 577, 1000, 36000)
-FP_EXTRA = (
-    ['#t', '#t2', '#t3', '#t4', '#t5', '#cn1', '#cn1000'] + [f'#c{c}' for c in CONSTS]
-    + ['#fl60', '#fl5', '#flw', '#sqn', '#sqh', '#shb', '#kip', '#grs', '#rvw', '#a6q', '#ctr', '#flq', '#h1', '#h2',
-       '#h3', '#h4', '#pipoff', '#lk', '#skp', '#rp']
-    + ['#ai_d2', '#ai_mv', '#ai_pht', '#ai_sum', '#ai_r', '#ai_rc', '#ai_ff', '#ai_nx', '#ai_rcd', '#ai_fl', '#ai_lf',
-       '#ai_ls']
-    + [f'#ai_w{k}' for k in api.P1 + api.P2] + [f'#cd_{k}' for k in api.COOLDOWN]
-)
+# I1 (request s3-5): the S3 extras live in the contract now (api.CORE_FP, same order; api.CORE_CONSTS).
+CONSTS = api.CORE_CONSTS
+FP_EXTRA = ()
 FP_PATTERN_PREFIXES = tuple(f'#{k}_' for k in api.P1)       # p1.py's own pattern scores (#<key>_<x>)
 FP = tuple(api.CORE_FP) + tuple(FP_EXTRA)
 assert len(FP) == len(set(FP)), 'duplicate fake player'
