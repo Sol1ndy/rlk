@@ -1,4 +1,4 @@
-# Spot d4 (@s = the body): D4 far reappear: 12 b at -80 (the player's left); else +80 / 0 / +-80 at 8 b. The first candidate passing mv/ok (MOVE_R 22.5, feet and head
+# Spot d4 (@s = the body): D4 far reappear: 12 b at -55 (the player's front-left); else +55 / 0 / +-55 at 8 b. The first candidate passing mv/ok (MOVE_R 22.5, feet and head
 # free) gets the marker rlk_hr_gsp; else the guaranteed fallback 12 b from the player toward C (at most 21 b from C), walked toward the axis until mv/ok passes.
 kill @e[type=minecraft:marker,tag=rlk_hr_gsp]
 execute at @e[tag=rlk_body,limit=1] positioned ~ 201 ~ rotated as @a[tag=player,limit=1] rotated ~-55 0 positioned ^ ^ ^12 if function rlk:mboss/mv/ok run return run function rlk:boss/scarlet/g/spot/put

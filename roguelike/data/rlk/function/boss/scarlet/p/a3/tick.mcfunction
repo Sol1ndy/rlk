@@ -11,6 +11,7 @@ execute if score #pt hr matches 47..55 at @s unless entity @e[tag=rlk_body,limit
 execute if score #pt hr matches 58..62 run function rlk:mboss/mv/turn {max:10}
 execute if score #pt hr matches 59..67 at @s unless entity @e[tag=rlk_body,limit=1,distance=..2.4] run function rlk:mboss/mv/step {d:0.3}
 execute if score #pt hr matches 70..78 run function rlk:mboss/mv/turn {max:10}
+execute if score #pt hr matches 74..78 run function rlk:boss/scarlet/ai/tail_step
 execute if score #pt hr matches 1 if score #ph hr matches 7 at @s rotated as @s rotated ~ 0 positioned ~ ~1.2 ~ run function rlk:boss/scarlet/fx/p/afterimage {len:42}
 execute if score #pt hr matches 13 run function rlk:boss/scarlet/p/a3/k/13
 execute if score #pt hr matches 14 run function rlk:boss/scarlet/p/a3/k/14
@@ -22,4 +23,5 @@ execute if score #pt hr matches 56 run function rlk:boss/scarlet/p/a3/k/56
 execute if score #pt hr matches 57 run function rlk:boss/scarlet/p/a3/k/57
 execute if score #pt hr matches 68 run function rlk:boss/scarlet/p/a3/k/68
 execute if score #pt hr matches 69 run function rlk:boss/scarlet/p/a3/k/69
+execute if score #pt hr matches 73 run function rlk:boss/scarlet/ai/tail
 execute if score #pt hr matches 79 run scoreboard players set #done hr 1

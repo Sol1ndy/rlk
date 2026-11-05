@@ -54,8 +54,10 @@ S2b's sequences, S4's gauntlets and S2a's rig are the real ones (the stand-ins c
            (then the revive path), a reload while away keeps it pending, before that cut the restart stays; HR-06 tests 30 /
            35 refused outside P1 / P2, test 23's forced fail ends with its judge; HR-04 no counter / A6 between the floor hit
            and the reserved step (P1 / P2, basic / skill); HR-13 a passive near player never sees two empty picks in a row,
-           a forced empty band -> the backstep (>= 5 b) -> the mid pick; HR-25 the move clip after a flinch; HR-26 no
-           counter from 10 b, the counter from 3 b, no rear A1 at 10 b; HR-38 A6's P2 cooldown 400
+           a forced empty band -> the backstep (>= 5 b) -> the mid pick; HR-25 the move clip after a flinch (F1 round 1:
+           the far fallback's approach glide too, P1 / P2); HR-26 no
+           counter from 10 b, the counter from 3 b, no rear A1 at 10 b; HR-38 A6's P2 cooldown 400; F1 round 1: the pause /
+           resume hook headers name #grs 4 / 5
 """
 import math
 import re
@@ -1571,6 +1573,33 @@ def sec_f1():
     after = [c for t, c in plays if fl and t > fl[0]]
     check('F13 HR-25 a flinch in the recovery: the move clip (walk / strafe) plays again when it ends', fl and after
           and after[0] in ('play/walk', 'play/strafe_l', 'play/strafe_r', 'play/glide'), plays)
+    # ... and (F1 round 1, VF1-01 / VF1R-02) during the far fallback's approach glide (ai/approach, #ai_mv 4: the player
+    # 14 b away, A3 forced next), P1 and P2: the glide clip plays again when the flinch ends and she glides on toward them
+    for ph in (PH['p1'], PH['p2']):
+        s, pl = world(373 + ph)
+        H.hold(s, False)
+        s.setsc('#ph', 'hr', ph)
+        H.place_body(s, API.CX, API.CZ, yaw=0.0)
+        H.place_player(s, API.CX, API.CZ + 14.0)
+        s.setsc('#pat', 'hr', 0)
+        s.setsc('#ai_nx', 'hr', TID['a3'])
+        H.call_sc(s, 'ai/rec_start')
+        mv = hr(s, '#ai_mv')
+        s.setsc('#flq', 'hr', 1)
+        n0 = len(s.rigl)
+        zs = []
+        def keep(s):
+            H.place_player(s, API.CX, API.CZ + 14.0)
+        for _ in range(14):
+            run(s, 1, each=keep)
+            zs.append(body(s).pos[2] - API.CZ)
+        plays = [(t, c) for t, c in s.rigl[n0:] if c.startswith('play/')]
+        fl = [t for t, c in plays if c == 'play/flinch']
+        after = [c for t, c in plays if fl and t > fl[0]]
+        check(f'F13b HR-25 a flinch during the far fallback\'s approach glide (#ai_mv 4, {"P1" if ph == PH["p1"] else "P2"}): the glide '
+              'clip plays again when it ends and she glides on (>= 1 b over the last 5 t)',
+              mv == 4 and fl and after[:1] == ['play/glide'] and zs[-1] - zs[-6] >= 1.0,
+              (mv, plays, [round(z, 2) for z in zs]))
     # HR-26: the counter / rear rules only inside the near band
     def ctr(dist):
         def f(s):
@@ -1622,6 +1651,13 @@ def sec_f1():
         run(s, 2)
         blinks.append(hr(s, '#pat') == TID['a6'])
     check('F18 HR-38 P2: a skill hit 19 s after a back-blink never starts another (20 seeds)', not any(blinks), blinks)
+    # F1 round 1, VF1-05 (HR-01 / HR-07's comments): the pause / resume hook headers name what a paused gauntlet leaves besides
+    # the restart: the judged A8 fail -> P2 at once (#grs 4) and a lethal gauntlet's pending fail (#grs 5, core/g/fail_now)
+    hd = {n: ' '.join(ln for ln in (fn_lines(n) or []) if ln.startswith('#')) for n in ('pause', 'resume')}
+    miss = [(n, w) for n in hd for w in ('judged A8 fail', 'core/g/fail_now') if w not in hd[n]]
+    miss += [(n, w) for n, w in (('pause', '#grs 4'), ('pause', '#grs 5'), ('resume', '(4)'), ('resume', '(5,')) if w not in hd[n]]
+    check('F19 HR-01 / HR-07 (VF1-05): the pause / resume hook headers name #grs 4 (the judged A8 fail -> P2 at once) and #grs 5 '
+          '(the pending lethal fail, core/g/fail_now)', not miss, miss)
 
 
 def main():

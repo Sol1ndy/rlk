@@ -26,6 +26,7 @@ FACE = 'function rlk:mboss/mv/face'
 P2 = f'if score #ph {OBJ} matches {api.PH["p2"]}'
 TABLE, MOVES = {}, {}
 TRAILS = {}                         # F1 (HR-28): key -> the pattern ticks of its trail (tests)
+TAILS = {}                          # F1 round 1 (HR-14): key -> the pattern tick her tail move starts (ai/tail; tests)
 TRK = api.TRACK
 
 
@@ -57,10 +58,19 @@ def trail(pb, ticks, length=15):
         TRAILS.setdefault(pb.key, []).append(t)
 
 
-def tail(pb, last_hit, end):
+def tail(pb, last_hit, end, moved=0):
     """F1 (HR-14, lead decision 11-05): the pattern ends PAT_END (8-12 t after its last hit); in the tail kept she turns to
-    track the player (the clip's follow-through plays on), then the AI recovery walks / strafes her (the punish window)."""
+    track the player on every tick and (F1 round 1, VF1R-01: "she walks / strafes facing and tracking the player") after
+    api.TAIL_MOVE t of the clip's follow-through (and not before `moved`: A4 lands first) moves as the recovery does
+    (ai/tail: walk / P2 glide in beyond 6 b, else a strafe, with its clip; ai/tail_step each later tick); the AI recovery
+    keeps that move (the punish window)."""
     pb.track(last_hit + 1, end - 1, TRK['deg'])
+    t = max(last_hit + api.TAIL_MOVE, moved)
+    assert last_hit < t < end - 1, (pb.key, last_hit, t, end)
+    pb.at(t, fn('ai/tail'))
+    pb.rng(t + 1, end - 1, fn('ai/tail_step'))
+    pb.motions.append((t + 1, end - 1, 'tail move'))
+    TAILS[pb.key] = t
     pb.end(end)
 
 
@@ -237,7 +247,7 @@ def build_a4(W):
     pb.hit(1, tell_from=hit)
     pb.at(hit2, f'execute at @s positioned ~ {CY} ~ run function rlk:mboss/mv/glide {{t:{land - hit2}}}')
     pb.motions.append((hit2, land, 'land'))
-    tail(pb, hit2, end)
+    tail(pb, hit2, end, moved=land)
     ground(pb)
     return finish(pb, key)
 
@@ -351,7 +361,7 @@ def build_a9(W):
           S.fx('qi_ring', [part(S.DUST['magenta'], 1.6, 0.05, 1.6, 0, 24)], pos=f'at {S.LOCK_M} positioned ~ ~1.0 ~', r=40,
                c=api.C_MAGENTA), S.snd('a9_cut'))
     # recovery: she stands beyond the player, back turned, and turns back to them (F1 HR-14: from the cut on, the end 12 t
-    # after it; the AI recovery turns her on)
+    # after it; from cut + TAIL_MOVE she moves as the recovery does, and the AI recovery turns her on)
     pb.at(cut + 1, f'kill @e[type=minecraft:marker,tag=rlk_hr_a9s]')
     tail(pb, cut, end)
     return finish(pb, key)

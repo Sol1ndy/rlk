@@ -13,6 +13,8 @@ scoreboard players set #ai_bs hr 0
 scoreboard players operation #a6cd hr = #clk hr
 scoreboard players operation #ai_rcd hr = #clk hr
 scoreboard players remove #ai_rcd hr 200
+scoreboard players operation #ai_tmc hr = #clk hr
+scoreboard players remove #ai_tmc hr 100
 scoreboard players operation #cd_a1 hr = #clk hr
 scoreboard players operation #cd_a10 hr = #clk hr
 scoreboard players operation #cd_a2 hr = #clk hr

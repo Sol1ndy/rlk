@@ -8,4 +8,5 @@ execute if score #ph hr matches 7 store result score #rec hr run random value 10
 execute unless score #ph hr matches 1 unless score #ph hr matches 7 run scoreboard players set #rec hr 10
 function rlk:boss/scarlet/ai/sample
 execute if score #ai_nx hr matches 3 run return run function rlk:boss/scarlet/ai/approach
+execute if function rlk:boss/scarlet/ai/tail_keep run return 0
 function rlk:boss/scarlet/ai/move_pick

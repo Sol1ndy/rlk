@@ -28,7 +28,8 @@ Runtime (api.Pattern; @s = the body, at it; clock #pt hr = played ticks since st
   C), walked toward the axis in 0.5 b steps until mv/ok passes (never in blocks).
 - The ghost: rlk_hr_ghost on the body + the rig look form/ghost from the lilac switch (T0); the core keeps rlk_mb_inv
   then. Gauntlets: off at the dive's reappearance (form normal, A8.9). R1 / R3: form normal at g_reform's 'solid' event,
-  the tag off at the script's 'solid' row (R1 62, R3 46: hittable again).
+  the tag off at the script's 'solid' row (R1 62, R3 46: hittable again); from that row to the end (R2: api.TAIL_MOVE t
+  after its last release) she turns to the player and moves as the recovery does (F1 HR-14: ai/tail, ai/tail_step).
 - The gauntlet frame (PLAN §5.4-5.5): the judge at api.JUDGE_T calls shield/judge (S3 plays the deflect staging), the
   darkness lifts (arena_look crimson) and the warning banner goes; deflect: she drops from 1 b above the player to the
   floor 1.2 b in front of them (JT + 2 .. JT + 10), #done at REPEL_T; the fail by the gauntlet's switch (question 6):
@@ -119,14 +120,16 @@ SPOTS = {
              'the station at the player\'s right (1.5 b at +90): the D1 dash end, the chain cuts, the D3 / D4 landings'),
     'd2': ([('face', RE['D2']['bearing'], RE['D2']['dist']), ('face', -RE['D2']['bearing'], RE['D2']['dist']),
             ('face', 0, RE['D2']['dist']), ('face', RE['D2']['bearing'], 6.0), ('face', -RE['D2']['bearing'], 6.0)],
-           RE['D2']['dist'], 'D2 side reappear: 8 b at +80 (low, the player\'s right); else -80 / 0 / +-80 at 6 b'),
+           RE['D2']['dist'], f"D2 side reappear: {num(RE['D2']['dist'])} b at {RE['D2']['bearing']:+d} (low, the player's front-right); "
+           f"else {-RE['D2']['bearing']:+d} / 0 / +-{abs(RE['D2']['bearing'])} at 6 b"),
     'd2e': ([('face', RE['D2']['end'][1], RE['D2']['end'][0]), ('face', -RE['D2']['end'][1], RE['D2']['end'][0]),
              ('face', 0, RE['D2']['end'][0])], RE['D2']['end'][0], 'the D2 glide stop: 1.6 b at +45 (front-right)'),
     'd3': ([('face', RE['D3']['bearing'], RE['D3']['dist']), ('face', -RE['D3']['bearing'], RE['D3']['dist']),
             ('face', 0, RE['D3']['dist'])], RE['D3']['dist'], 'D3 blink: 2.5 b at +60 (up-right; the caller adds 3 b up)'),
     'd4': ([('face', RE['D4']['bearing'], RE['D4']['dist']), ('face', -RE['D4']['bearing'], RE['D4']['dist']),
             ('face', 0, RE['D4']['dist']), ('face', RE['D4']['bearing'], 8.0), ('face', -RE['D4']['bearing'], 8.0)],
-           RE['D4']['dist'], 'D4 far reappear: 12 b at -80 (the player\'s left); else +80 / 0 / +-80 at 8 b'),
+           RE['D4']['dist'], f"D4 far reappear: {num(RE['D4']['dist'])} b at {RE['D4']['bearing']:+d} (the player's front-left); "
+           f"else {-RE['D4']['bearing']:+d} / 0 / +-{abs(RE['D4']['bearing'])} at 8 b"),
     'tell': ([('face', 0, RE['tell']['dist']), ('face', 90, RE['tell']['dist']), ('face', -90, RE['tell']['dist']),
               ('face', 180, RE['tell']['dist'])], RE['tell']['dist'], 'A13: inside the yellow tell, 3 b in front of the player'),
     'far': ([('tobody', 0, RE['tell']['retreat']), ('tobody', 0, 9.0), ('tobody', 0, 6.0), ('tobody', 60, 9.0),
@@ -741,14 +744,25 @@ class Walk:
         g = self.gb
         g.play(t, 'g_reform')
         g.look(t + E('g_reform', 'solid'), 'form', 'normal', ('g_reform', 'solid'))
-        g.at(t + E('g_reform', 'end'), api.play('idle2'))
-        g.ev(t + E('g_reform', 'end'), 'clip', 'idle2', ('g_reform', 'end'))
+        # F1 round 1 (HR-14): from the solid row on her tail moves her with the recovery's clip (s_solid); idle2 only when
+        # the reform clip ends before that row
+        solid = next((r[0] for r in self.rows if r[1] == 'solid'), None)
+        te = t + E('g_reform', 'end')
+        if solid is None or te < solid:
+            g.at(te, api.play('idle2'))
+            g.ev(te, 'clip', 'idle2', ('g_reform', 'end'))
 
     def s_solid(self, t, end_t):
+        """R1 / R3: hittable again; the reform tail to the end (<= 12 t after the last hit) turns her to the player and
+        (F1 round 1, HR-14 / VF1R-01) moves her as the recovery does (ai/tail at the row, ai/tail_step each later tick)."""
         g = self.gb
         g.at(t, f'tag @s remove {TAG_GHOST}')
         g.ev(t, 'tag', 'ghost-', ('script', 'solid'))
         g.rng(t, end_t - 1, f'function rlk:mboss/mv/turn {{max:{api.TRACK["deg"]}}}')
+        assert t < end_t - 1, (self.key, t, end_t)
+        g.at(t, fn('ai/tail'))
+        g.rng(t + 1, end_t - 1, fn('ai/tail_step'))
+        g.moves.append((t + 1, end_t - 1, 'tail move'))
 
     # ------------------------------------------------------------------ the whole script
     def build(self):
@@ -842,17 +856,17 @@ def build_r2(W):
     rel1 = 16 + E('a7_throw', 'release')
     rel2 = 30 + E('a7_throw', 'release')
     # F1 (HR-14, lead decision 11-05: "during any tail kept and in the recovery she walks / strafes facing and tracking the
-    # player"): R2's tail after its last release is kept (its end stays); there she moves as the recovery does - glides in
-    # beyond 6 b, else strafes (ai/move_pick, ai/step) - turning to the player every tick
-    W.w('p/r2/tail', ['# R2 after its last release (@s = the body): the recovery\'s move (glide in beyond 6 b, else a strafe) and its clip.',
-                      fn('ai/sample'), fn('ai/move_pick')])
+    # player"): R2's tail after its last release is kept (its end stays); TAIL_MOVE t after it she moves as the recovery
+    # does - glides in beyond 6 b, else strafes (ai/tail, ai/tail_step; the recovery keeps the move) - turning to the player
+    # every tick
     W.w('p/r2/step', ['# One tick of R2\'s tail (@s = the body): turn to the player, one step of the move (mv/ok-checked).',
-                      f'function rlk:mboss/mv/turn {{max:{api.TRACK["deg"]}}}', fn('ai/step')])
-    g.at(rel1 + 4, S.gate(one, fn('p/r2/tail')))
-    g.at(rel2 + 4, S.gate(two, fn('p/r2/tail')))
-    g.rng(rel1 + 5, w.rows[-1][0] - 1, S.gate(one, fn('p/r2/step')))
-    g.rng(rel2 + 5, w.rows[-1][0] - 1, S.gate(two, fn('p/r2/step')))
-    g.moves += [(rel1 + 4, w.rows[-1][0], 'tail move (one disc)'), (rel2 + 4, w.rows[-1][0], 'tail move (two discs)')]
+                      f'function rlk:mboss/mv/turn {{max:{api.TRACK["deg"]}}}', fn('ai/tail_step')])
+    tm = api.TAIL_MOVE
+    g.at(rel1 + tm, S.gate(one, fn('ai/tail')))
+    g.at(rel2 + tm, S.gate(two, fn('ai/tail')))
+    g.rng(rel1 + tm + 1, w.rows[-1][0] - 1, S.gate(one, fn('p/r2/step')))
+    g.rng(rel2 + tm + 1, w.rows[-1][0] - 1, S.gate(two, fn('p/r2/step')))
+    g.moves += [(rel1 + tm, w.rows[-1][0], 'tail move (one disc)'), (rel2 + tm, w.rows[-1][0], 'tail move (two discs)')]
     g.write('P2: the moon disc after the yellow tell')
 
 

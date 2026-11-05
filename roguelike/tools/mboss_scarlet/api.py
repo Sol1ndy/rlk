@@ -178,6 +178,11 @@ RECOVER = {1: (12, 20), 2: (10, 16)}                      # idle between pattern
 # turns to the player; the AI recovery's walk / strafe takes over: the punish window); RECOVER above = the §4.8 knob
 # (P1 16-24 -> 12-20, P2 12-18 -> 10-16). A6 (no hit) keeps A6_TRIGGER['next'].
 PAT_END = {'a1': 24, 'a2': 22, 'a3': 79, 'a4': 46, 'a9': 40, 'a10': 32}
+# F1 round 1 (HR-14, the decision's "during any tail kept ... she walks / strafes facing and tracking the player"): a kept tail
+# lets the clip's follow-through play TAIL_MOVE t after the last hit / release (A4: until it lands; R1 / R3: until the solid
+# row), then she moves as in the recovery (ai/tail: the recovery's move and clip, ai/tail_step each later tick) while she
+# turns to the player; the recovery after it keeps that move (ai/tail_keep).
+TAIL_MOVE = 4
 WALK_SPEED, GLIDE_SPEED = 0.12, 0.18                      # recovery walk / strafe (P1) and the P2 glide, b/t
 
 # =============================================================================================
@@ -460,7 +465,8 @@ CORE_FP += (('#t', '#t2', '#t3', '#t4', '#t5', '#cn1', '#cn1000') + tuple(f'#c{c
             + ('#fl60', '#fl5', '#flw', '#sqn', '#sqh', '#shb', '#kip', '#grs', '#rvw', '#a6q', '#ctr', '#flq', '#h1', '#h2',
                '#h3', '#h4', '#pipoff', '#lk', '#skp', '#rp')
             + ('#ai_d2', '#ai_mv', '#ai_pht', '#ai_sum', '#ai_r', '#ai_rc', '#ai_ff', '#ai_nx', '#ai_rcd', '#ai_fl', '#ai_lf',
-               '#ai_ls', '#ai_nn', '#ai_bs')        # F1 (HR-13): an empty pick in a row, the backstep's mid pick pending
+               '#ai_ls', '#ai_nn', '#ai_bs',        # F1 (HR-13): an empty pick in a row, the backstep's mid pick pending
+               '#ai_tmc')                           # F1 round 1 (HR-14): the module clock of a kept tail's last move tick
             + tuple(f'#ai_w{k}' for k in P1 + P2) + tuple(f'#cd_{k}' for k in COOLDOWN))
 RIG_OBJ_PREFIX, KIT_OBJ_PREFIX = 'hrRig', 'hrFx'
 TAGS = {'part': 'rlk_hr_part', 'anchor': 'rlk_hr_anchor', 'fx': 'rlk_hr_fx', 'deco': 'rlk_hr_deco', 'pat': 'rlk_hr_p',
@@ -1169,8 +1175,9 @@ def cut(made, lock, strike, tier='T2', kb=KB_CUT, count=1):
 
 
 def disc(kb=0):
-    """The one A7 moon-disc launch line (S4's g/disc/throw): @s = the body, rotated toward the player's position at
-    release; one pj/launch (DISC) + one kit card (fx/prop/disc); kb 0, or 2 for R2's last disc."""
+    """The one A7 moon-disc launch line (S4's g/disc/throw): @s = the body, rotated toward its lock (F1 HR-15: g/disc/lock,
+    the player's floor spot at DISC_LOCK = release - LOCK_LEAD; a throw without a lock locks at once); one pj/launch (DISC)
+    + one kit card (fx/prop/disc); kb 0, or 2 for R2's last disc."""
     assert int(kb) in (0, DISC['kb_last_r2'])
     return f'function {NS}g/disc/throw {_macro({"kb": kb})}'
 

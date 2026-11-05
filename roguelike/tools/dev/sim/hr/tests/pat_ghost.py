@@ -44,7 +44,9 @@ copy of F:boss/scarlet; the kit / theme sections a dry rebuild inside it with ap
           T3); HR-15 every disc's aim locks 7 t before its release (static) and hits >= 7 t after that lock for a player
           walking in at 0.22 / 0.28 b/t from 5-9 b, for R2 at the rim and for A13's three discs; HR-27 D2 / D4 reappear
           inside the default F5 view near its edge (A8, A13, R3); HR-14 R1 / R3 end <= 12 t after their last hit, R2's kept
-          tail moves her (the recovery's move clip) while she turns to the player
+          tail moves her (the recovery's move clip) while she turns to the player; F1 round 1: R1 / R3's reform tail moves
+          her from the solid row on (static + sim, the recovery keeping the move), the g/spot/d2 / d4 headers and
+          api.disc()'s docstring match the code
 """
 import copy
 import math
@@ -1247,6 +1249,54 @@ def sec_f1():
           'to the player', clips and clips[0][1] in ('play/walk', 'play/glide', 'play/strafe_l', 'play/strafe_r') and moved
           and errs and errs[-1] <= 12.0, (clips[:2], round(d2(tail[0]['pos'], tail[-1]['pos']), 2) if tail else None,
                                           [round(e) for e in errs[::5]]))
+    # HR-14 (F1 round 1, VF1R-01: "during any tail kept ... she walks / strafes facing and tracking the player"): R1 / R3's
+    # reform tail moves her too - from the solid row (hittable again, the reform over) the recovery's move and clip
+    # (ai/tail), one step each later tick to the end (ai/tail_step), no idle2 over it; the recovery keeps the move
+    F = my_files()
+    for k in ('r1', 'r3'):
+        solid = next(r[0] for r in ROWS[k] if r[1] == 'solid')
+        end = done_tick(k)
+
+        def calls(t, name):
+            return [ln for ln in F.get(f'p/{k}/k/{t}', []) if re.search(rf'function rlk:boss/scarlet/{name}$', ln)]
+        miss = ([solid] if not calls(solid, 'ai/tail') else []) + [t for t in range(solid + 1, end or 0) if not calls(t, 'ai/tail_step')]
+        idle = [t for t in range(solid, (end or 0) + 1) if any('rig/play/idle2' in ln for ln in F.get(f'p/{k}/k/{t}', []))]
+        check(f'G9 HR-14 {k}: from the solid row {solid} the recovery\'s move (ai/tail), a step each tick to the end {end} '
+              '(ai/tail_step), no idle2 over it', end is not None and not miss and not idle, (end, miss, idle))
+        s, pl = world(86)
+        H.place_body(s, C[0], C[2] - 4)
+        P = (C[0] + 0.5, C[2] + 4.0)
+        place(s, *P)
+        n0 = len(s.rigl)
+        R = run_pat(s, k, each=lambda ss: place(ss, *P))
+        t0 = R[0]['t']
+        plays = [(t - t0, c) for t, c in s.rigl[n0:] if c.startswith('play/') and t - t0 >= solid]
+        at = {r['pt']: r for r in R if r['pat'] == TID[k]}
+        moved = d2(at[solid]['pos'], at[end - 1]['pos']) if end and solid in at and end - 1 in at else 0.0
+        ok = (plays[:1] and plays[0] == (solid, plays[0][1]) and plays[0][1] in ('play/walk', 'play/glide', 'play/strafe_l', 'play/strafe_r')
+              and len(plays) == 1 and moved >= 0.08 * (end - 1 - solid))
+        check(f'G10 HR-14 {k} (sim): a move clip at the solid row {solid}, she moves in the tail (>= 0.08 b / t), no other clip to '
+              'the end and at the recovery start (the move kept)', ok, (plays[:3], round(moved, 2)))
+    # F1 round 1, VF1-03 / VF1R-03 (HR-27's comments): the g/spot/d2 / d4 headers name the bearings and distances their
+    # candidates turn to (5b8ee01 still said +-80 there while the commands turned +-55)
+    bad = []
+    for n in ('d2', 'd4'):
+        lines = F.get(f'g/spot/{n}', [])
+        cand = [(int(r), float(d)) for ln in cmd_lines(lines)
+                for r, d in re.findall(r'rotated ~(-?\d+) 0 positioned \^ \^ \^([\d.]+) if function', ln)]
+        m = re.search(r'reappear: ([\d.]+) b at ([+-]\d+) .*?; else ([+-]\d+) / 0 / \+-(\d+) at ([\d.]+) b', lines[0] if lines else '')
+        said = None
+        if m:
+            d1, b1, b2, b3, d3 = float(m.group(1)), int(m.group(2)), int(m.group(3)), int(m.group(4)), float(m.group(5))
+            sg = 1 if b1 > 0 else -1
+            said = [(b1, d1), (b2, d1), (0, d1), (sg * b3, d3), (-sg * b3, d3)]
+        if said != cand:
+            bad.append((n, said, cand))
+    check('G11 HR-27 (VF1-03): the g/spot/d2 / d4 headers name the bearings and distances their candidates use', not bad, bad)
+    # F1 round 1, VF1-04 (HR-15's comments): api.disc()'s docstring names its aim, the lock (not the player at the release)
+    doc = ' '.join((API.disc.__doc__ or '').split())
+    check('G12 HR-15 (VF1-04): api.disc()\'s docstring: the throw is rotated toward its lock (g/disc/lock)',
+          'toward its lock' in doc and 'g/disc/lock' in doc and 'position at release' not in doc, doc[:160])
 
 
 def main():

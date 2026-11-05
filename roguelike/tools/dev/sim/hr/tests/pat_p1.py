@@ -21,11 +21,13 @@ copy of F:boss/scarlet) lives in ./tmp and is removed at the end.
   cancel  a cancel (core/cancel_pat, the reload / test path) at every pattern tick 0..end: no rlk_hr_* entity of the
           pattern (hazards, lock, probe, A9 start marker), no glide, on the floor, #pat 0, no later hit on the player
   f1      F1 (11-05 review fixes, the lead's decisions): HR-14 every P1-kit pattern ends 8-12 t after its last hit (A1 24,
-          A2 22, A3 79, A4 46, A9 40, A10 32) and she turns to the player on every tick of the tail kept (static + sim);
-          HR-22 A2's lilac blade glow 6-11, off at the hit and in its cancel (static + sim); HR-28 A4's leap and A10's
-          spring / dive leave the afterimage trail along the motion in both phases (+ A10's dive line toward the lock),
-          A3 / A6 / A9's afterimage stays P2-only (static + a P1 sim); HR-13 / HR-14 / HR-18 the package's numbers in the
-          generated AI (recovery P1 12-20 / P2 10-16 t, A9 / A10 cooldowns, the P1 near pick with A1 / A2 / A10)
+          A2 22, A3 79, A4 46, A9 40, A10 32) and she turns to the player on every tick of the tail kept (static + sim)
+          and moves as the recovery does from 4 t after the last hit (A4: the landing), the recovery keeping that move
+          (F1 round 1; static + sim); HR-22 A2's lilac blade glow 6-11, off at the hit and in its cancel (static + sim);
+          HR-28 A4's leap and A10's spring / dive leave the afterimage trail along the motion in both phases (+ A10's dive
+          line toward the lock), A3 / A6 / A9's afterimage stays P2-only (static + a P1 sim); HR-13 / HR-14 / HR-18 the
+          package's numbers in the generated AI (recovery P1 12-20 / P2 10-16 t, A9 / A10 cooldowns, the P1 near pick with
+          A1 / A2 / A10)
 """
 import math
 import re
@@ -307,6 +309,10 @@ def sec_cancel():
 # A10's spring / dive leave a trail along the motion in both phases, A3 / A6 / A9's afterimage stays P2-only (HR-28).
 # Written so that they fail on the 4c81817 tree (no new api names needed).
 F1_END = {'a1': 24, 'a2': 22, 'a3': 79, 'a4': 46, 'a9': 40, 'a10': 32}
+# F1 round 1 (HR-14, VF1R-01: "during any tail kept ... she walks / strafes facing and tracking the player"): her tail move
+# starts 4 t after the last hit (A4: at its landing 38), one step each later tick to the end
+F1_TAIL = {'a1': 18, 'a2': 16, 'a3': 73, 'a4': 38, 'a9': 32, 'a10': 26}
+MOVE_CLIPS = ('play/walk', 'play/glide', 'play/strafe_l', 'play/strafe_r')
 F1_TRAIL = {'a4': [2, 4, 6], 'a10': [2, 5, 8, 20, 21]}
 F1_P2ONLY = {'a3': 1, 'a6': 0, 'a9': API.ev('a9', 'go')}
 
@@ -339,6 +345,20 @@ def calls_at(k, t, needle):
     lines = fn_lines(f'p/{k}/start') if t == 0 else (
         [ln for ln in fn_lines(f'p/{k}/tick') if re.search(rf'#pt hr matches {t}(?=\s)', ln)] + fn_lines(f'p/{k}/k/{t}'))
     return [ln for ln in lines if needle in ln and not ln.startswith('#')]
+
+
+def call_ticks(k, name):
+    """The pattern ticks whose p/<k>/tick lines (single ticks or ranges) or k/<t> files call function boss/scarlet/<name>
+    (exactly that function)."""
+    out, pat = set(), re.compile(rf'function rlk:boss/scarlet/{re.escape(name)}$')
+    for ln in fn_lines(f'p/{k}/tick'):
+        m = re.match(r'execute if score #pt hr matches (\d+)(?:\.\.(\d+))? run (.*)$', ln)
+        if m and pat.search(m.group(3)):
+            out.update(range(int(m.group(1)), int(m.group(2) or m.group(1)) + 1))
+    for t in range(1, 120):
+        if any(pat.search(ln) for ln in fn_lines(f'p/{k}/k/{t}') if not ln.startswith('#')):
+            out.add(t)
+    return out
 
 
 def p2_gated(ln):
@@ -389,6 +409,38 @@ def sec_f1():
         ok = ended == want and errs and all(y <= max(x - 5.0, 12.0) for x, y in zip(errs, errs[1:]))
         check(f'F3 HR-14 {k} (sim): over at pattern tick {want}; in the tail she tracks a player circling her (aim error shrinks '
               f'to <= 12 deg and stays)', ok, (ended, [round(e, 1) for e in errs]))
+    # HR-14 (F1 round 1, VF1R-01): in the tail she also moves as the recovery does - the recovery's move and clip at
+    # last hit + 4 (A4: the landing), one step on every later tick to the end - and the recovery keeps that move
+    for k, t0 in F1_TAIL.items():
+        end = done_tick(k)
+        st, sp = call_ticks(k, 'ai/tail'), call_ticks(k, 'ai/tail_step')
+        want = set(range(t0 + 1, end or 0))
+        check(f'F12 HR-14 {k}: the tail move: ai/tail at {t0} (the recovery\'s move + clip), ai/tail_step on {t0 + 1}..{(end or 1) - 1}',
+              end is not None and st == {t0} and sp == want, (sorted(st), sorted(sp - want), sorted(want - sp)))
+    for k, t0 in F1_TAIL.items():
+        s, pl = world(65)
+        n0 = len(s.rigl)
+        ppos = (C[0] + 3.0, C[2] + 2.5)
+        r = run_pattern(s, k, ppos, bpos=(C[0], C[2] - 1.0))
+        end = F1_END[k]
+        sn = {x['pt']: x for x in r['snaps'] if x['pat'] == S3.TID[k]}
+        plays = [(t - r['t0'], c) for t, c in s.rigl[n0:] if c.startswith('play/') and t - r['t0'] > t0 - 4]
+        mv0 = H.hr(s, '#ai_mv')
+        # the recovery after the end, the AI free: she keeps the move (no new clip) and goes on moving
+        H.hold(s, False)
+        p_end = H.body_of(s).pos[:]
+        for _ in range(3):
+            H.heal(s)
+            s.player().pos = [float(ppos[0]), 201.0, float(ppos[1])]
+            H.world_sc(s)
+        later = [(t - r['t0'], c) for t, c in s.rigl[n0:] if c.startswith('play/') and t - r['t0'] >= end]
+        moved = math.hypot(sn[end - 1]['pos'][0] - sn[t0]['pos'][0], sn[end - 1]['pos'][2] - sn[t0]['pos'][2]) \
+            if t0 in sn and end - 1 in sn else 0.0
+        on = math.hypot(H.body_of(s).pos[0] - p_end[0], H.body_of(s).pos[2] - p_end[2])
+        ok = (plays[:1] and plays[0][0] == t0 and plays[0][1] in MOVE_CLIPS and moved >= 0.08 * (end - 1 - t0)
+              and not later and H.hr(s, '#ai_mv') == mv0 and on >= 0.2)
+        check(f'F13 HR-14 {k} (sim): from {t0} a move clip and she moves in the tail (>= 0.08 b / t); the recovery keeps the move '
+              '(no new clip, still moving)', ok, (plays[:2], round(moved, 2), later[:2], mv0, H.hr(s, '#ai_mv'), round(on, 2)))
     # HR-22: A2's lilac blade glow from its 'glow' event to the hit, and off in its cancel (A6 may cancel the windup)
     glow, hit = API.ev('a2', 'glow'), API.ev('a2', 'hit')
     on = calls_at('a2', glow, 'rig/look/blade/lilac')

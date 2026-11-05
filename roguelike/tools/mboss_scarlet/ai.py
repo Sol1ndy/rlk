@@ -33,6 +33,7 @@ A6 = A = api.A6_TRIGGER
 BACKSTEP = {'until': 5.0, 'speed': 0.3, 'move_t': api.CLIPS['backstep'][2]['land']}
 BS_T = api.CLIPS['backstep'][0]
 MV_BACK = 6                                               # #ai_mv of the backstep (1 walk, 2 / 3 strafe, 4 approach, 5 glide)
+TAIL_OLD = 100                                            # ai/phase: the kept tail's move clock this far in the past
 
 
 def cooldown(key, fp):
@@ -116,7 +117,8 @@ def build(W, ctx):
                    sset('#ai_pht', 0), sset('#far', 0), sset('#rear', 0), sset('#ai_ff', 0), sset('#ai_nx', 0),
                    sset('#ctr', 0), sset('#a6q', 0), sset('#ai_nn', 0), sset('#ai_bs', 0),
                    f'scoreboard players operation #a6cd {OBJ} = #clk {OBJ}', f'scoreboard players operation #ai_rcd {OBJ} = #clk {OBJ}',
-                   f'scoreboard players remove #ai_rcd {OBJ} {api.REAR_RULE["cd_ignore_every"]}']
+                   f'scoreboard players remove #ai_rcd {OBJ} {api.REAR_RULE["cd_ignore_every"]}',
+                   f'scoreboard players operation #ai_tmc {OBJ} = #clk {OBJ}', f'scoreboard players remove #ai_tmc {OBJ} {TAIL_OLD}']
       + [f'scoreboard players operation #cd_{k} {OBJ} = #clk {OBJ}' for k in keys_cd])
     # ------------------------------------------------------------------------------------------- recovery
     lo1, hi1 = api.RECOVER[1]
@@ -130,6 +132,7 @@ def build(W, ctx):
     rs += [f'execute unless score #ph {OBJ} matches {FPS[1]} unless score #ph {OBJ} matches {FPS[2]} run {sset("#rec", api.RECOVER[2][0])}',
            fn('ai/sample'),
            f'execute if score #ai_nx {OBJ} matches {S.TID["a3"]} run return run {fn("ai/approach")}',
+           f'execute if function {api.NS}ai/tail_keep run return 0',
            fn('ai/move_pick')]
     w('ai/rec_start', rs)
     # F1 (HR-14): the move choice of the recovery, also used by a pattern's kept tail (R2: she walks / strafes facing and
@@ -141,11 +144,33 @@ def build(W, ctx):
                        f'execute if score #ai_d2 {OBJ} matches {WALK2 + 1}.. run return run {fn("ai/play_move")}',
                        f'execute store result score #ai_mv {OBJ} run random value 2..3',
                        fn('ai/play_move')])
+    # F1 round 1 (HR-14, VF1R-01: "during any tail kept and in the recovery she walks / strafes facing and tracking the
+    # player"): a pattern's kept tail moves her as the recovery does from api.TAIL_MOVE t after its last hit (the caller turns
+    # her to the player every tick); the recovery that follows keeps that move and its clip (no new pick: no strafe flip, no
+    # clip restart) when the tail moved her on the tick before
+    w('ai/tail', ['# A pattern\'s kept tail starts to move (@s = body; p1 tail(), R1 / R3 at the solid row, R2 after its last release):',
+                  '# the recovery\'s move and clip (ai/move_pick on core/fp\'s last sample, <= 4 t old: walk / P2 glide in beyond 6 b,',
+                  '# else a strafe; no extra sample, so the rear / far dwell counts stay as they are); the move clock stamp.',
+                  fn('ai/move_pick'), f'scoreboard players operation #ai_tmc {OBJ} = #clk {OBJ}'])
+    w('ai/tail_step', ['# One tick of a kept tail\'s move (@s = body; the caller turned her to the player): one step (ai/step,',
+                       '# mv/ok-checked); the move clock stamp.',
+                       fn('ai/step'), f'scoreboard players operation #ai_tmc {OBJ} = #clk {OBJ}'])
+    w('ai/tail_keep', ['# 1 when a kept tail moved her on this or the last tick (#ai_tmc) with the move ai/move_pick would choose now',
+                       '# (farther than 6 b a walk / glide in, nearer a strafe): the recovery goes on with it (no new pick, the clip plays',
+                       '# on); else fail (the recovery picks anew).',
+                       f'scoreboard players operation #t {OBJ} = #clk {OBJ}', f'scoreboard players operation #t {OBJ} -= #ai_tmc {OBJ}',
+                       f'execute unless score #t {OBJ} matches 0..1 run return fail',
+                       f'execute unless score #ai_mv {OBJ} matches 1..3 unless score #ai_mv {OBJ} matches 5 run return fail',
+                       f'execute if score #ai_d2 {OBJ} matches {WALK2 + 1}.. if score #ai_mv {OBJ} matches 2..3 run return fail',
+                       f'execute if score #ai_d2 {OBJ} matches ..{WALK2} unless score #ai_mv {OBJ} matches 2..3 run return fail',
+                       'return 1'])
     w('ai/approach', ['# The far fallback (FAR_RULE glide + A3): glide in (A3_GLIDE b/t) until within 8 b, then A3 (#ai_nx).',
                       sset('#ai_mv', 4), sset('#rec', 40), api.play('glide')])
-    w('ai/play_move', ['# The recovery clip (@s = body): walk / P2 glide in, strafe left / right, the backstep (P2 the idle2 stance between).',
+    w('ai/play_move', ['# The recovery clip (@s = body): walk / P2 glide in, the far fallback\'s glide (ai/approach; F1 round 1: also after',
+                       '# a flinch), strafe left / right, the backstep (P2 the idle2 stance between).',
                        f'execute if score #ai_mv {OBJ} matches 1 run return run {api.play("walk")}',
                        f'execute if score #ai_mv {OBJ} matches 5 run return run {api.play("glide")}',
+                       f'execute if score #ai_mv {OBJ} matches 4 run return run {api.play("glide")}',
                        f'execute if score #ai_mv {OBJ} matches 2 run return run {api.play("strafe_l")}',
                        f'execute if score #ai_mv {OBJ} matches 3 run return run {api.play("strafe_r")}',
                        f'execute if score #ai_mv {OBJ} matches {MV_BACK} run return run {api.play("backstep")}',
