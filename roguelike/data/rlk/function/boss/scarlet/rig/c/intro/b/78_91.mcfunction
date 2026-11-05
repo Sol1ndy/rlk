@@ -1,0 +1,8 @@
+execute if score @s hrRigT matches 78 run return run function rlk:boss/scarlet/rig/c/intro/k/78
+execute if score @s hrRigT matches 80 run return run function rlk:boss/scarlet/rig/c/intro/k/80
+execute if score @s hrRigT matches 86 run return run function rlk:boss/scarlet/rig/c/intro/k/86
+execute if score @s hrRigT matches 87 run return run function rlk:boss/scarlet/rig/c/intro/k/87
+execute if score @s hrRigT matches 88 run return run function rlk:boss/scarlet/rig/c/intro/k/88
+execute if score @s hrRigT matches 89 run return run function rlk:boss/scarlet/rig/c/intro/k/89
+execute if score @s hrRigT matches 90 run return run function rlk:boss/scarlet/rig/c/intro/k/90
+execute if score @s hrRigT matches 91 run return run function rlk:boss/scarlet/rig/c/intro/k/91

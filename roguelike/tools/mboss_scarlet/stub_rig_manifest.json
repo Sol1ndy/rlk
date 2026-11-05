@@ -3,9 +3,9 @@
  "id": "scarlet",
  "source": "stub",
  "_doc": "D0 stub of tools/scarlet_rig_manifest.json (S2a writes the real one with the same parts, clips, events, looks, anchors and calls; the real one adds transforms, models, budgets, sprites). Generated from tools/mboss_scarlet/api.py --write-stub: do not edit.",
- "height": 2.55,
- "hat_top": 2.82,
- "brim_d": 1.6,
+ "height": 2.0,
+ "hat_top": 2.3,
+ "brim_d": 1.32,
  "uuid": "524c4b4d-4852-4400-8000-0000000000{:02x}",
  "parts": [
   {
@@ -267,7 +267,7 @@
  "shadow": {
   "nn": 64,
   "uuid": "524c4b4d-4852-4400-8000-000000000040",
-  "radius": 0.9,
+  "radius": 0.6,
   "tags": [
    "rlk_room",
    "rlk_mb_aux",

@@ -11,6 +11,7 @@
 // lying like DOWN (the down window's clip); lead_down starts in DOWN; sq1 / lead_down / lead_stand end in g_brim's hold (the
 // gauntlet's g_tell starts from it); ending ends exactly in H_POSE (= tick 0 of ev_give / ev_toast).
 import {K, B, SW, ST, ST2, CROUCH, LOW, AIR, LOCK, DOWN, H_POSE, DEFAULT_POSE, F_ST, F_WIDE, F_LUNGE, F_TOG} from './scarlet_clips.mjs';
+import {hipDirChannels} from './scarlet_retarget.mjs';
 
 const DEG = Math.PI / 180;
 // a flip about her centre of mass (c b above the pelvis pivot): the pelvis offset keeping it in place at pitch pt; y0 lifts it
@@ -44,9 +45,9 @@ const SHEATHED = {hold: 0, sword: 'sheathed', scab: 'hip', hL: 'open'};
 const CARRY = {scab: 'hand', hR: 'grip', scB: 172, scE: -16, scR: 0, scOff: .2, aR: [14, 16, .95], hsR: 0, pR: [.55, -.35, .75]};
 // raised upright before her right shoulder (hilt up; PLAN §3.1 E10 = intro_end 0)
 const UPRIGHT = {scab: 'hand', hR: 'grip', scB: 18, scE: -68, scR: 0, scOff: .25, aR: [84, -8, .62], pR: [.6, -.4, .4], hsR: 0};
-// the hip scabbard (scarlet_pose SK.scabHipDir, edge up) as a hand bearing / elevation / roll (the hand state turns the edge
-// forward: scR -156.5 matches it within 0.4 degrees, searched with the solver): the hip <-> hand hand-over key
-const HIP_DIR = {scB: 165, scE: -38, scR: -156.5, scOff: .14};
+// the hip scabbard (scarlet_pose SK.scabHipDir, edge up) as a hand bearing / elevation / roll and the throat grip: the hip <->
+// hand hand-over key (S2d: derived from the skeleton, scarlet_retarget.mjs hipDirChannels, so the hand-overs have no jump)
+const HIP_DIR = hipDirChannels();
 // g_brim's hold (the right hand at the brim; S2a's BR) = the end pose of sq1 / lead_down / lead_stand (g_tell starts from it)
 const BRIM_R = {...ST2, hR: 'brim', bwR: 1, bzR: 30, pR: [.8, -.2, .3], head: [-8, -6, 0], hat: 'worn'};
 // the iai stance under the brim (CS1 C4-C5): the left hand on the sheathed hilt at the right hip, the right on the throat

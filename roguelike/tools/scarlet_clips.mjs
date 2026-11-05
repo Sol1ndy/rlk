@@ -350,7 +350,9 @@ const flipPos = (pt, c = .5, y0 = 0) => [0, +(y0 + c * (1 - Math.cos(pt * DEG)))
   C('g_dive', [K(0, {...ST, ...AIR, lf: .8, pos: [0, .5, 0], ...B(0, 0, 120, -1, {gL: .5}), rh: 1, tor: [6, 0, 0]}),
     K(1, {...B(0, 0, 80, -1, {gL: .5}), rot: [-15, 0, 0], pos: [0, .6, 0]}), K(2, {...B(0, 0, 15, -1, {gL: .52}), rot: [-35, 0, 0], pos: [0, .75, .05]}, 'l'),
     K(3, DV, 'l'), K(6, {...DV, rot: [-60, 0, 0], ...B(0, 0, -70, -1, {gL: .55})}), K(10, {...DV, rot: [-60, 0, 0], ...B(0, 0, -70, -1, {gL: .55})})],
-    {src: 'v2 19.083, v3 20.483 (v2f_s9_dive, v3r_s10_dive_1f): the diving overhead strike, blade down'});
+    // blend 1 (S2d round 3, C3-1): the module plays g_dive right after hiding the rig (g_vert's 'gone'), so there is no pose to
+    // blend from: the whole body shows at t1 (S2c's figure)
+    {src: 'v2 19.083, v3 20.483 (v2f_s9_dive, v3r_s10_dive_1f): the diving overhead strike, blade down', blend: 1});
   // g_deflect: halts 1 b above the player 0 (recoiling upright), falls into the blade lock 2-10 (both hands, the blade crossed
   // vertically against the player's position, leaning in) = the pose `repel` (S2b) starts from
   C('g_deflect', [K(0, {...ST, ...AIR, lf: .8, rot: [-60, 0, 0], ...B(0, 0, 60, -1, {gF: 0, gB: 0, gE: 10, gD: .5}), rh: 1, hairS: -.3}), K(2, {rot: [-10, 0, 0], tor: [10, 0, 0], ...B(0, 0, 110, -1, {gF: 0, gB: 0, gE: 30, gD: .5}), hairS: 0, pL: [.75, -.65, .1], pR: [.75, -.65, .1]}, 'o'),

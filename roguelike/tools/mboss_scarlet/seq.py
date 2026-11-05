@@ -85,7 +85,7 @@ class Seq:
             self.at(t, api.rig(f'anchor/{anchor}'), f'execute at {ANCHOR} run {cmd}')
         return self
 
-    def me(self, t, cmd, y=1.4):
+    def me(self, t, cmd, y=1.1):
         """A kit line at her (chest height), rotated as her."""
         if cmd:
             self.at(t, f'execute positioned ~ ~{num(y)} ~ rotated as @s rotated ~ 0 run {cmd}')
@@ -231,6 +231,12 @@ def stage_pt(x, z, y=None):
 
 # =============================================================================================================================
 # CS0 — intro (PLAN §3.1; clip intro 554 + intro_end 86 = 640) and its skip
+# S2d (11-05): she rises off the kit's seat stone (1.2 x 0.24 x 0.64 b: 0.135 b in front of her seat to 0.505 b behind it,
+# requests/s2d.md s2d-2) forward over her feet, SEAT_RISE b toward the moon over the 12-t rise, then steps SEAT_ASIDE b to her
+# right while she straightens (226-246), so the stone stays clear of her feet through the turn to the player and the walk. The
+# rig's feet step with that one linear 20-t glide (tools/scarlet_retarget.mjs ASIDE: four 0.55-b side steps; test_rig checks
+# that ASIDE matches SEAT_ASIDE and the tick)
+SEAT_RISE, SEAT_ASIDE = 0.4, 1.1
 def build_intro(W):
     s, mv = Seq('intro'), Moves('intro')
     e = lambda k, d=0: ev('intro', k, d)
@@ -249,6 +255,12 @@ def build_intro(W):
     s.at(e('raise', 2), halo(True)).at(e('l4'), halo(False))
     # E5 the cup set down (rock set), rising (cloth 230), the turn to the player 248-268 (the body turned <= 12 deg / t)
     s.at(e('cup_down'), snd('cs0_cup'), rock('set')).at(e('stand', 16), snd('cloth'))
+    rise = mv.add('rise', [cand(f'at @s rotated as @s rotated ~ 0 positioned ^ ^ ^{num(SEAT_RISE)} {FLOOR}', glide(12))],
+                  f'The rise off the seat stone: {SEAT_RISE} b forward over her feet over 12 t')
+    aside = mv.add('aside', [cand(f'at @s rotated as @s rotated ~ 0 positioned ^{num(-SEAT_ASIDE)} ^ ^ {FLOOR}', glide(20)),
+                             cand(f'at @s rotated as @s rotated ~ 0 positioned ^{num(SEAT_ASIDE)} ^ ^ {FLOOR}', glide(20))],
+                   f'Beside the seat stone: {SEAT_ASIDE} b to her right (else her left) over 20 t, before the turn')
+    s.at(e('stand'), rise).at(e('stand', 12), aside)
     for t in range(e('turn'), e('turn', 21)):
         s.at(t, api.rig('face/track'))
     # E6-E7 / E9 the walks: 8-t glide legs of 1.2 b (0.15 b/t) toward the player while more than 7 b away, so she stops at
@@ -267,7 +279,7 @@ def build_intro(W):
     s.at(x('l11'), api.play('intro_end'), line(11), api.rig('face/track'))
     s.at(x('spin'), api.rig('face/player')).at(x('draw', -4), snd('draw_spin'))
     s.at(x('draw'), L.title(*api.TITLE), snd('draw'))
-    s.fx(x('draw'), 'blade_tip', K.p('glint', c=api.C_WHITE)).me(x('draw'), K.p('qi_arc', r=18, yaw=0, pitch=0, roll=0, c=api.C_LILAC))
+    s.fx(x('draw'), 'blade_tip', K.p('glint', c=api.C_WHITE)).me(x('draw'), K.p('qi_arc', r=17, yaw=0, pitch=0, roll=0, c=api.C_LILAC))
     s.at(x('draw', 2), snd('draw_ring'))
     s.at(x('tuck'), snd('cloth'), rock_kill(), api.rig('look/props/none')).at(x('music'), api.music(1))
     s.at(x('push'), L.push_ring(4.0, 4))
@@ -342,15 +354,15 @@ def build_cs1(W):
     # cut line 154; line 16 from 144
     s.at(e('black'), K.ovl('black', 0, 10, 3), snd('black_drop')).at(e('l15'), line(15)).at(e('l16'), line(16))
     p0 = e('petal')
-    s.at(p0, petal_summon(PETAL1, f'at {BODY} rotated as {BODY} rotated ~ 0 positioned ^-0.7 ^2.05 ^1.0'), snd('petal_drift'))
+    s.at(p0, petal_summon(PETAL1, f'at {BODY} rotated as {BODY} rotated ~ 0 positioned ^-0.7 ^1.74 ^1.0'), snd('petal_drift'))
     for i in range(1, 21):
         t = p0 + i
         if i <= 12:
             u = i / 12
-            px, py = -0.7 + 1.4 * u, 2.05 - 0.1 * u
+            px, py = -0.7 + 1.4 * u, 1.74 - 0.125 * u
         else:
             u = (i - 12) / 8
-            px, py = 0.7 + 0.1 * u, 1.95 - 0.4 * u
+            px, py = 0.7 + 0.1 * u, 1.615 - 0.5 * u
         s.at(t, petal_move(PETAL1, f'at {BODY} rotated as {BODY} rotated ~ 0 positioned ^{num(px)} ^{num(py)} ^{num(1.0 - .1 * (i > 12))}'))
     s.at(p0 + 21, f'kill @e[type=minecraft:item_display,tag={PETAL1}]')
     p2 = e('petal2')
@@ -416,9 +428,9 @@ def build_repel(W):
     # 5 % only); R8 the kick (hp3: at 5 % the core's lethal hit)
     toss = mv.add('toss', [cand(stage_pt(0, d), leap(15, 25)) for d in (3.5, 2.5, 1.5)], 'R5 the throw to 3.5 b before the player')
     s.at(e('toss'), toss, snd('thrown'))
-    s.me(e('land'), K.p('dust_ring', r=15), y=.1).at(e('land'), sig('hp2'), snd('land_back'))
+    s.me(e('land'), K.p('dust_ring', r=12), y=.1).at(e('land'), sig('hp2'), snd('land_back'))
     burst = K.p('petal_burst', r=10)
-    s.at(e('petals'), gate(f'if score #sq_at {OBJ} matches 5', [(f'execute positioned ~ ~0.4 ~ run {burst}' if burst else None), snd('petal_break')]))
+    s.at(e('petals'), gate(f'if score #sq_at {OBJ} matches 5', [(f'execute positioned ~ ~0.3 ~ run {burst}' if burst else None), snd('petal_break')]))
     s.fx(e('kick'), 'head', K.p('kick_flash')).at(e('kick'), sig('hp3'), snd('kick'))
     mv.write(W)
     head = 'CS2 / CS3 repel {at:60|5} (PLAN §3.4): lock, grab, the clash on the hat, the half circle, back to back, the throw, the kick.'
@@ -524,7 +536,7 @@ def build_ending(W):
     land = mv.add('land', [cand(f'at {PLB} facing {num(mp[0])} {num(mp[1])} {num(mp[2])} rotated ~{a} 0 positioned ^ ^ ^10 {FLOOR}', leap(20, 40))
                            for a in (0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180)],
                    'S4 the landing 10 b from the player toward the moon (the nearest free bearing)')
-    s.at(e('fly'), land).me(e('fly', 2), K.p('petals_wind'), y=1).at(e('land'), snd('land_far'))
+    s.at(e('fly'), land).me(e('fly', 2), K.p('petals_wind'), y=.8).at(e('land'), snd('land_far'))
     # S5 the turn to the player 268-272, the walk-in to 4.5 b (272-296), the scabbard swing (296), the petal across the player's
     # view (306-314), line 17 + music 3 (300), the sheathe click (320)
     for t in range(e('rise2'), e('walk')):
@@ -581,9 +593,11 @@ SWORD = f'@e[type=minecraft:item_display,tag={SWORD_T},limit=1]'
 ORB = f'@e[type=minecraft:marker,tag={ORB_T},limit=1]'
 FLY = (api.EV_T['toss'], api.EV_T['beam'])          # E30 -> E44: the sword's flight (14 t)
 ORB_FLY = (api.EV_T['toss'], api.EV_T['arrive'])    # E30 -> E42: the orb's float (12 t)
-SWORD_R = 0.738                                      # item_sword: max radius from the model centre, b at display scale 1
+SWORD_R = round(api.ITEM_SWORD_LEN / 2 / api.ITEM_SWORD_SCALE, 3)   # item_sword: max radius from the model centre, b at display scale 1
 TH0, TH1 = 40.0, -180.0                              # the end-over-end turn: tip forward-up at the toss -> tip down (scabbard down)
-S0, S1 = 1.5, 1.0                                    # display scale: the rig's size at the hand -> the player's size
+S0 = S1 = api.ITEM_SWORD_SCALE                       # display scale: the rig's own at the hand; she is player-size, no shrink in flight
+# E30 the toss: the item's centre from her right hand (^left ^up ^forward), measured by the rig builder at the toss (S2d)
+TOSS_OFF = tuple((api.rig_manifest().get('item_sword') or {}).get('toss_offset') or (0, 0.13, 0.11))
 
 
 def _q(axis, deg):
@@ -651,10 +665,10 @@ def build_event(W):
     if api.EVENT['lines']:
         s.at(E['line'], gate(item, line(24)), gate(buff, line(25)))
         s.at(E['line_clear'], K.hud('clear'))
-    # item: E12 the glint along the scabbard; E30 the toss: the display at the hand (scale 1.5, the rig's scabbard hidden by the
-    # clip), its yaw toward the target, the end-over-end turn and the arc (apex 1.2 b) to 0.9 b before the player's chest along
-    # their facing (re-aimed every tick), never below the floor; E44 upright (scabbard down), the moonbeam, bobbing; E50-E55
-    # sinking into the player's hand (1 -> 0.15); E56 gone
+    # item: E12 the glint along the scabbard; E30 the toss: the display at the hand (scale api.ITEM_SWORD_SCALE, the rig's
+    # scabbard hidden by the clip), its yaw toward the target, the end-over-end turn and the arc (apex 1.2 b) to 0.9 b before the
+    # player's chest along their facing (re-aimed every tick), never below the floor; E44 upright (scabbard down), the moonbeam,
+    # bobbing; E50-E55 sinking into the player's hand (S1 -> 0.15); E56 gone
     glint = K.p('ev_glint')
     if glint:
         s.at(E['present'], gate(item, [api.rig('anchor/hand_r'), f'execute at {ANCHOR} run {glint}']))
@@ -666,7 +680,8 @@ def build_event(W):
                 f'brightness:{{block:13,sky:15}},transformation:{tfm(q0, S0)}}}')
     t0, t1 = FLY
     s.at(t0, gate(item, [f'kill @e[type=minecraft:item_display,tag={SWORD_T}]', api.rig('anchor/hand_r'),
-                         f'execute at {ANCHOR} rotated as @s rotated ~ 0 positioned ^ ^0.13 ^0.11 run summon minecraft:item_display ~ ~ ~ {item_nbt}',
+                         f'execute at {ANCHOR} rotated as @s rotated ~ 0 positioned {" ".join("^" + (num(v) if abs(v) > 1e-9 else "") for v in TOSS_OFF)} '
+                         f'run summon minecraft:item_display ~ ~ ~ {item_nbt}',
                          f'execute as {SWORD} at @s facing entity {PLB} feet run tp @s ~ ~ ~ ~ 0', *store_p0(SWORD), snd('ev_toss')]))
     n = t1 - t0
     for k in range(1, n + 1):
@@ -686,7 +701,7 @@ def build_event(W):
         s.at(t, gate(item, [f'execute as {SWORD} at @s run tp @s ~ ~{num(f(t) - f(t - 1))} ~']))
     s.at(hold, gate(item, store_p0(SWORD)))
     n2 = E['grant'] - hold
-    for k in range(1, n2 + 1):                            # E50-E55 sinking into the player's hand (scale 1 -> 0.15)
+    for k in range(1, n2 + 1):                            # E50-E55 sinking into the player's hand (scale S1 -> 0.15)
         sc = S1 + (.15 - S1) * k / n2
         s.at(hold + k - 1, gate(item, homing(SWORD, k, n2, 0, round((CY + SWORD_R * sc + .04) * 1000), f'at {PLB} rotated as {PLB} rotated ~ 0 positioned ^ ^1.0 ^0.35')
                                  + [f'data merge entity {SWORD} {tf(sword_rot(TH1), sc)}']))

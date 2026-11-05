@@ -3,6 +3,6 @@ scoreboard players set #done hr 0
 function rlk:mboss/mv/face
 function rlk:boss/scarlet/rig/play/a6
 function rlk:boss/scarlet/p/a6/blink
-execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.3 ~ run function rlk:boss/scarlet/fx/p/blink_bubble
+execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.0 ~ run function rlk:boss/scarlet/fx/p/blink_bubble
 execute at @s run function rlk:boss/scarlet/fx/snd/a6_blink
 execute if score #ph hr matches 7 at @s rotated as @s rotated ~ 0 positioned ~ ~1.2 ~ run function rlk:boss/scarlet/fx/p/afterimage {len:120}

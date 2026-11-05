@@ -92,8 +92,8 @@ def build_a1(W):
     pb.track(1, 3, 60)
     pb.track(4, hit - S.LOCK, TRK['deg'])
     pb.at(glint, at_anchor('blade_tip', S.fx_lines('glint', [part(S.DUST['magenta'], 0.05, 0.05, 0.05, 0, 6)], c=api.C_MAGENTA)))
-    pb.at(fan, S.fx('qi_fan', [part(S.DUST['magenta'], 0.3, 0.8, 0.3, 0, 14)], pos=f'{S.AT_BODY} positioned ^ ^1.1 ^1.2',
-                    h=16, c=api.C_MAGENTA), S.snd('a1_fan'))
+    pb.at(fan, S.fx('qi_fan', [part(S.DUST['magenta'], 0.3, 0.8, 0.3, 0, 14)], pos=f'{S.AT_BODY} positioned ^ ^0.85 ^1.2',
+                    h=13, c=api.C_MAGENTA), S.snd('a1_fan'))
     pb.hit(0, tell_from=0)
     pb.at(hit, S.fx_arc(api.HITS[key][0][3][0], api.C_LILAC), S.snd('a1_hit'))
     pb.end(end)
@@ -124,11 +124,11 @@ A3_FX = {'h1': ('vert', 0), 'h2': ('arc', -35), 'h3': ('vert', 0), 'h4': ('vert'
 def a3_fx(ev_, r):
     kind, roll = A3_FX[ev_]
     if kind == 'vert':
-        return S.fx('qi_vert', [part(S.DUST['lilac'], 0.2, 1.0, 0.2, 0, 20)], pos=f'{S.AT_BODY} positioned ^ ^0.2 ^1.4',
-                    h=34, yaw=0, c=api.C_LILAC)
+        return S.fx('qi_vert', [part(S.DUST['lilac'], 0.2, 1.0, 0.2, 0, 20)], pos=f'{S.AT_BODY} positioned ^ ^0.15 ^1.4',
+                    h=27, yaw=0, c=api.C_LILAC)
     if kind == 'arc':
         return S.fx_arc(r, api.C_LILAC, roll=roll)
-    return S.fx('qi_wedge', [part(S.DUST['lilac'], 0.5, 0.7, 0.5, 0, 20)], pos=f'{S.AT_BODY} positioned ~ ~1.3 ~',
+    return S.fx('qi_wedge', [part(S.DUST['lilac'], 0.5, 0.7, 0.5, 0, 20)], pos=f'{S.AT_BODY} positioned ~ ~1.0 ~',
                 r=int(round(r * 10)), roll=roll)
 
 
@@ -203,10 +203,10 @@ def build_a4(W):
                     r=26), S.snd('a4_impact', pos=f'at {S.LOCK_M}'))
     # A5: the straight slash line (cosmetic), the aim locks again (lock2), she spins ~1 b off the ground, the ring round her
     pb.track(hit + 1, lock2 - 1, TRK['deg'])
-    pb.at(slash, S.fx('qi_line', [part(S.DUST['lilac'], 0.6, 0.1, 0.6, 0, 10)], pos=f'{S.AT_BODY} positioned ^ ^1.2 ^1.5',
+    pb.at(slash, S.fx('qi_line', [part(S.DUST['lilac'], 0.6, 0.1, 0.6, 0, 10)], pos=f'{S.AT_BODY} positioned ^ ^0.95 ^1.5',
                       len=30))
     pb.at(ring, f'execute at @s positioned ~ {CY + 1} ~ run function rlk:mboss/mv/glide {{t:2}}',
-          S.fx('qi_ring', [part(S.DUST['lilac'], 1.2, 0.05, 1.2, 0, 24)], pos=f'{S.AT_BODY} positioned ~ ~2.0 ~', r=30,
+          S.fx('qi_ring', [part(S.DUST['lilac'], 1.2, 0.05, 1.2, 0, 24)], pos=f'{S.AT_BODY} positioned ~ ~1.55 ~', r=30,
                c=api.C_LILAC))
     pb.at(E(key, 'ring') + 2, S.snd('a5_spin'))
     pb.motions.append((ring, ring + 2, 'rise'))
@@ -271,7 +271,7 @@ def build_a9(W):
     w = api.HITS[key][0][3][0]
     pb.at(0, FACE, api.play(key))
     pb.track(1, lock - 1, TRK['deg'])
-    pb.at(ring, S.fx('qi_ring', [part(S.DUST['lilac'], 1.4, 0.05, 1.4, 0, 24)], pos=f'{S.AT_BODY} positioned ~ ~1.0 ~', r=35,
+    pb.at(ring, S.fx('qi_ring', [part(S.DUST['lilac'], 1.4, 0.05, 1.4, 0, 24)], pos=f'{S.AT_BODY} positioned ~ ~0.8 ~', r=35,
                      c=api.C_LILAC))
     pb.at(yellow, S.fx('yellow_tell', [part(S.DUST['yellow'], 0.5, 0.6, 0.5, 0, 30), part('minecraft:end_rod', 1.2, 0.05, 0.05, 0, 8)],
                        t=8), S.snd('yellow_chime'))
@@ -322,7 +322,7 @@ def build_a9(W):
                         dims=api.HITS[key][0][3]))
     pb.hit(1, tell_from=0, grp=g, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
     pb.at(cut, S.fx('qi_cut', [part(S.DUST['magenta'], 2.0, 0.2, 0.2, 0, 30)],
-                    pos=f'at @e[type=minecraft:marker,tag=rlk_hr_a9s,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_hr_a9s,limit=1] positioned ~ ~1.0 ~',
+                    pos=f'at @e[type=minecraft:marker,tag=rlk_hr_a9s,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_hr_a9s,limit=1] positioned ~ ~0.8 ~',
                     len=int(dmax * 10)),
           S.fx('qi_ring', [part(S.DUST['magenta'], 1.6, 0.05, 1.6, 0, 24)], pos=f'at {S.LOCK_M} positioned ~ ~1.0 ~', r=40,
                c=api.C_MAGENTA), S.snd('a9_cut'))

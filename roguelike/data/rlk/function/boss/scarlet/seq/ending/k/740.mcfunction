@@ -1,2 +1,2 @@
 # ending at #sq 740 (@s = the body).
-execute positioned ~ ~1.4 ~ rotated as @s rotated ~ 0 run function rlk:boss/scarlet/fx/p/petals_heart
+execute positioned ~ ~1.1 ~ rotated as @s rotated ~ 0 run function rlk:boss/scarlet/fx/p/petals_heart

@@ -1,12 +1,13 @@
 # repel: 104 t, holds the last pose. @s = rig anchor.
 execute if score @s hrRigT matches 105.. run return run scoreboard players set @s hrRigT 105
-execute if score @s hrRigT matches ..10 run return run function rlk:boss/scarlet/rig/c/repel/b/0_10
-execute if score @s hrRigT matches ..19 run return run function rlk:boss/scarlet/rig/c/repel/b/11_19
-execute if score @s hrRigT matches ..29 run return run function rlk:boss/scarlet/rig/c/repel/b/22_29
-execute if score @s hrRigT matches ..37 run return run function rlk:boss/scarlet/rig/c/repel/b/30_37
-execute if score @s hrRigT matches ..45 run return run function rlk:boss/scarlet/rig/c/repel/b/38_45
-execute if score @s hrRigT matches ..55 run return run function rlk:boss/scarlet/rig/c/repel/b/46_55
-execute if score @s hrRigT matches ..63 run return run function rlk:boss/scarlet/rig/c/repel/b/56_63
-execute if score @s hrRigT matches ..71 run return run function rlk:boss/scarlet/rig/c/repel/b/64_71
-execute if score @s hrRigT matches ..79 run return run function rlk:boss/scarlet/rig/c/repel/b/72_79
-execute if score @s hrRigT matches ..102 run return run function rlk:boss/scarlet/rig/c/repel/b/80_102
+execute if score @s hrRigT matches ..9 run return run function rlk:boss/scarlet/rig/c/repel/b/0_9
+execute if score @s hrRigT matches ..17 run return run function rlk:boss/scarlet/rig/c/repel/b/10_17
+execute if score @s hrRigT matches ..25 run return run function rlk:boss/scarlet/rig/c/repel/b/18_25
+execute if score @s hrRigT matches ..33 run return run function rlk:boss/scarlet/rig/c/repel/b/26_33
+execute if score @s hrRigT matches ..41 run return run function rlk:boss/scarlet/rig/c/repel/b/34_41
+execute if score @s hrRigT matches ..49 run return run function rlk:boss/scarlet/rig/c/repel/b/42_49
+execute if score @s hrRigT matches ..58 run return run function rlk:boss/scarlet/rig/c/repel/b/50_58
+execute if score @s hrRigT matches ..66 run return run function rlk:boss/scarlet/rig/c/repel/b/59_66
+execute if score @s hrRigT matches ..74 run return run function rlk:boss/scarlet/rig/c/repel/b/67_74
+execute if score @s hrRigT matches ..93 run return run function rlk:boss/scarlet/rig/c/repel/b/75_93
+execute if score @s hrRigT matches ..103 run return run function rlk:boss/scarlet/rig/c/repel/b/99_103
