@@ -50,8 +50,9 @@
    - ① 마지막으로 받은 `rlk_hud_resourcepack.zip` 을 올려 달라고 한다. 빈 폴더에 풀고(`mkdir -p <작업>/rp && cd <작업>/rp && unzip -q <zip>`),
      팩 맨 위 `README.md` 6절 맨 위 줄이 0-10 맨 위 빌드와 같은지 본다. README 가 없는 zip 은 11-03 전 것(오래된 팩)이다.
      `--resourcepack` 을 받는 생성기는 맞는 팩을 받은 다음에만 돌린다(리소스팩 README 1절).
-   - ② 로컬 시험 서버(loadcheck)를 쓰려면 Minecraft EULA(https://aka.ms/MinecraftEULA)에 동의하는지 묻는다. 동의를 받기 전에는
-     `eula.txt` 를 true 로 쓰지 않는다. 동의를 받으면 날짜를 0-8 에 적는다(이전 세션의 `eula=true` 는 동의 기록이 없다).
+   - ② 로컬 시험 서버(loadcheck)의 Minecraft EULA(https://aka.ms/MinecraftEULA) 동의: **2026-11-05 에 사용자가 동의했다**(0-8 동의
+     기록). 그 기록이 있으므로 새 컨테이너에서도 0-8 "loadcheck 서버 준비"대로 `eula.txt` 를 true 로 쓴다. (기록 전에는 동의하는지 묻고,
+     동의를 받기 전에는 `eula.txt` 를 true 로 쓰지 않았다. 11-03 까지 이전 세션의 `eula=true` 는 동의 기록이 없었다.)
    - ③ 보스를 영상과 다시 맞출 일이면 그 영상과 나무위키 페이지를 받는다. 나무위키는 Cloudflare 가 막아 직접 받을 수 없으므로(10-21),
      저장한 HTML 이나 글로 받아 `python3 /home/user/rlk/roguelike/tools/dev/sim/ar/tools/html2txt.py <html> <txt>` 로 글로 바꾼다.
 3. 도구: Python 3.13(생성기는 표준 라이브러리만, 그림 도구는 numpy · Pillow), Node 22(리그 생성기 `*.mjs`), ffmpeg(영상 시트),
@@ -453,7 +454,8 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
   `Whilst parsing command on line <n>: …` 를 찍는다. 종료 코드: 0 = 실패 0, 1 = 함수 로드 실패, 2 = 준비 · 시작 · 팩 문제. `RLK_*`
   경로는 상대 경로여도 된다(서버 폴더로 `cd` 하기 전에 절대 경로로 바꾼다). 11-03 에 실제 서버로 확인: 깨진 `pack.mcmeta` · 없는
   함수를 가리키는 `tick` 태그 → exit 2, 음수 리터럴 함수 하나 → `1 function load failure(s)` · exit 1, 이 팩(상대 `RLK_DEV`) → 0 · exit 0.
-- EULA 동의 기록(0-2 2번 ②): 11-03 까지 없음(이전 세션의 서버 폴더는 동의 기록 없이 `eula=true` 였다). 동의를 받으면 여기에 날짜를 적는다.
+- EULA 동의 기록(0-2 2번 ②): **2026-11-05 사용자 동의**(세션 메시지 「eula 동의」, Minecraft EULA https://aka.ms/MinecraftEULA). 그 전
+  11-03 까지는 기록이 없었다(이전 세션의 서버 폴더는 동의 기록 없이 `eula=true` 였다). 동의를 새로 받으면 날짜를 이 줄에 더한다.
 - 데이터팩이 정말 켜졌는지는 로그로 본다: 첫 실행은 `Found new data pack file/roguelike, loading it automatically`, 그 뒤로는
   `Loaded 1870 advancements`(26.3 바닐라 1866 + 이 팩의 `data/rlk/advancement` 4개; 팩이 안 읽히면 1866). `Loading N persistent chunks`
   는 월드에 저장된 고정 청크라 팩이 읽히지 않아도 찍히므로 증거가 아니다. 11-03 판 loadcheck 는 팩을 건너뛴 줄을 스스로 잡는다(위).
