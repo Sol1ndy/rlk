@@ -4,11 +4,13 @@ execute if data storage rlk:mboss arjob{aid:"az_cavern"} run data remove storage
 execute if data storage rlk:mboss arjob{aid:"ap_oasis"} run data remove storage rlk:mboss built_ap_oasis
 execute if data storage rlk:mboss arjob{aid:"tk_lift"} run data remove storage rlk:mboss built_tk_lift
 execute if data storage rlk:mboss arjob{aid:"fl_ruins"} run data remove storage rlk:mboss built_fl_ruins
+execute if data storage rlk:mboss arjob{aid:"hr_field"} run data remove storage rlk:mboss built_hr_field
 execute if data storage rlk:mboss arjob{aid:"cp_test"} run data remove storage rlk:mboss built_cp_test
 execute if data storage rlk:mboss arjob{aid:"az_cavern"} run data remove storage rlk:mboss look_az_cavern
 execute if data storage rlk:mboss arjob{aid:"ap_oasis"} run data remove storage rlk:mboss look_ap_oasis
 execute if data storage rlk:mboss arjob{aid:"tk_lift"} run data remove storage rlk:mboss look_tk_lift
 execute if data storage rlk:mboss arjob{aid:"fl_ruins"} run data remove storage rlk:mboss look_fl_ruins
+execute if data storage rlk:mboss arjob{aid:"hr_field"} run data remove storage rlk:mboss look_hr_field
 execute if data storage rlk:mboss arjob{aid:"cp_test"} run data remove storage rlk:mboss look_cp_test
 scoreboard players set #mbArBuild mb 0
 data remove storage rlk:mboss arjob
