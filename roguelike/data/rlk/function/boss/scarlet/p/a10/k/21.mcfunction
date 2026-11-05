@@ -1,4 +1,5 @@
 # A10 pattern tick 21
+execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.2 ~ run function rlk:boss/scarlet/fx/p/afterimage {len:15}
 scoreboard players set #hzEl mb 3
 scoreboard players set #hzKB mb 3
 scoreboard players set #hzSfx mb 0

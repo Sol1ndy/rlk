@@ -20,8 +20,15 @@ copy of F:boss/scarlet) lives in ./tmp and is removed at the end.
           head, never in a block), she is on the floor at the end, no glide left
   cancel  a cancel (core/cancel_pat, the reload / test path) at every pattern tick 0..end: no rlk_hr_* entity of the
           pattern (hazards, lock, probe, A9 start marker), no glide, on the floor, #pat 0, no later hit on the player
+  f1      F1 (11-05 review fixes, the lead's decisions): HR-14 every P1-kit pattern ends 8-12 t after its last hit (A1 24,
+          A2 22, A3 79, A4 46, A9 40, A10 32) and she turns to the player on every tick of the tail kept (static + sim);
+          HR-22 A2's lilac blade glow 6-11, off at the hit and in its cancel (static + sim); HR-28 A4's leap and A10's
+          spring / dive leave the afterimage trail along the motion in both phases (+ A10's dive line toward the lock),
+          A3 / A6 / A9's afterimage stays P2-only (static + a P1 sim); HR-13 / HR-14 / HR-18 the package's numbers in the
+          generated AI (recovery P1 12-20 / P2 10-16 t, A9 / A10 cooldowns, the P1 near pick with A1 / A2 / A10)
 """
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -32,7 +39,7 @@ import hrsim as H  # noqa: E402
 
 ARGS = sys.argv[1:]
 DP = Path(ARGS[0]).resolve()
-SECTIONS = ARGS[1:] or ['table', 'hits', 'quiet', 'ends', 'cancel']
+SECTIONS = ARGS[1:] or ['table', 'hits', 'quiet', 'ends', 'cancel', 'f1']
 sys.path.insert(0, str(DP / 'tools'))
 import mboss_scarlet.api as API  # noqa: E402
 import mboss_scarlet.p1 as P1  # noqa: E402
@@ -42,7 +49,8 @@ FN = DP / 'data/rlk/function/boss/scarlet'
 C = (API.CX, API.CY, API.CZ)
 KIND = {'disc': 1, 'pdisc': 1, 'sector': 3, 'line': 4, 'dash_line': 4}
 KEYS = [k for k in API.P1]
-END = {k: API.ev(k, 'end') if k != 'a6' else API.A6_TRIGGER['next'] for k in KEYS}
+# F1 (HR-14): a P1-kit pattern ends at api.PAT_END (8-12 t after its last hit), no longer at its clip's end
+END = {k: getattr(API, 'PAT_END', {}).get(k, API.ev(k, 'end')) if k != 'a6' else API.A6_TRIGGER['next'] for k in KEYS}
 
 
 class Dry:
@@ -293,10 +301,155 @@ def sec_cancel():
               not bad, bad[:4])
 
 
+# ================================================================================================= F1 (11-05 review fixes)
+# The lead's decisions (HR/review/findings.md, 11-05): every P1-kit pattern ends 8-12 t after its last hit at these ticks
+# (D5-01's ends) and she turns to the player in the tail kept (HR-14); A2's lilac blade glow 6-11 (HR-22); A4's leap and
+# A10's spring / dive leave a trail along the motion in both phases, A3 / A6 / A9's afterimage stays P2-only (HR-28).
+# Written so that they fail on the 4c81817 tree (no new api names needed).
+F1_END = {'a1': 24, 'a2': 22, 'a3': 79, 'a4': 46, 'a9': 40, 'a10': 32}
+F1_TRAIL = {'a4': [2, 4, 6], 'a10': [2, 5, 8, 20, 21]}
+F1_P2ONLY = {'a3': 1, 'a6': 0, 'a9': API.ev('a9', 'go')}
+
+
+def done_tick(k):
+    for ln in fn_lines(f'p/{k}/tick'):
+        m = re.search(r'matches (\d+) run scoreboard players set #done hr 1', ln)
+        if m:
+            return int(m.group(1))
+    return None
+
+
+def turn_ticks(k):
+    """The pattern ticks with a turn of the body (mv/turn, mv/face, a facing tp) in p/<k>/tick or its k/<t>."""
+    out = set()
+    for ln in fn_lines(f'p/{k}/tick'):
+        if 'mv/turn' in ln or 'mv/face' in ln:
+            rr = ln.split('matches ')[1].split(' ')[0]
+            a, _, b = rr.partition('..')
+            out.update(range(int(a), int(b or a) + 1))
+    for t in range(1, 120):
+        body = '\n'.join(fn_lines(f'p/{k}/k/{t}'))
+        if 'mv/turn' in body or 'mv/face' in body:
+            out.add(t)
+    return out
+
+
+def calls_at(k, t, needle):
+    """The command lines of pattern tick t of p/<k> (inline in p/<k>/tick or in k/<t>; t 0 = start) containing needle."""
+    lines = fn_lines(f'p/{k}/start') if t == 0 else (
+        [ln for ln in fn_lines(f'p/{k}/tick') if re.search(rf'#pt hr matches {t}(?=\s)', ln)] + fn_lines(f'p/{k}/k/{t}'))
+    return [ln for ln in lines if needle in ln and not ln.startswith('#')]
+
+
+def p2_gated(ln):
+    return '#ph hr matches 7' in ln.split(' run ')[0]
+
+
+def yaw_err(snap, ppos):
+    b = snap['pos']
+    want = math.degrees(math.atan2(-(ppos[0] - b[0]), ppos[1] - b[2])) % 360
+    return abs((snap['yaw'] - want + 180) % 360 - 180)
+
+
+def sec_f1():
+    # HR-14: the ends and the tail (static)
+    for k, want in F1_END.items():
+        last = max(h['t'] for h in P1.TABLE[k])
+        end = done_tick(k)
+        check(f'F1 HR-14 {k}: the pattern ends 8-12 t after its last hit, at {want} ({last} -> {end})',
+              end == want and 8 <= end - last <= 12, (last, end))
+        tr = turn_ticks(k)
+        miss = [t for t in range(last + 1, end) if t not in tr] if end else ['no #done']
+        check(f'F2 HR-14 {k}: she turns to the player on every tick of the tail kept ({last + 1}..{(end or 1) - 1})',
+              end is not None and not miss, miss)
+    # HR-14 in the sim: the pattern is over at its end tick, and in the tail she tracks a player who circles her at 0.2 b/t from
+    # her last hit on: her aim error shrinks by >= 5 deg / t until it is <= 12 deg and stays there (mv/turn 10 deg / t)
+    for k, want in F1_END.items():
+        s, pl = world(61)
+        H.place_player(s, C[0] + 3.0, C[2] + 2.5)
+        H.place_body(s, C[0], C[2] - 1.0)
+        H.start_pattern(s, S3.TID[k])
+        last = max(h['t'] for h in P1.TABLE[k])
+        errs, ended = [], None
+        for _ in range(140):
+            H.heal(s)
+            pt = H.hr(s, '#pt') or 0
+            p, b = s.player(), H.body_of(s)
+            if pt >= last:
+                d = max(2.0, math.hypot(p.pos[0] - b.pos[0], p.pos[2] - b.pos[2]))
+                a = math.atan2(p.pos[2] - b.pos[2], p.pos[0] - b.pos[0]) + 0.2 / d
+                p.pos = [b.pos[0] + d * math.cos(a), 201.0, b.pos[2] + d * math.sin(a)]
+                H.C.moved(s)
+            H.world_sc(s)
+            if (H.hr(s, '#pat') or 0) != S3.TID[k]:
+                ended = pt + 1
+                break
+            if pt + 1 > last:
+                errs.append(yaw_err(H.snap(s), (s.player().pos[0], s.player().pos[2])))
+        ok = ended == want and errs and all(y <= max(x - 5.0, 12.0) for x, y in zip(errs, errs[1:]))
+        check(f'F3 HR-14 {k} (sim): over at pattern tick {want}; in the tail she tracks a player circling her (aim error shrinks '
+              f'to <= 12 deg and stays)', ok, (ended, [round(e, 1) for e in errs]))
+    # HR-22: A2's lilac blade glow from its 'glow' event to the hit, and off in its cancel (A6 may cancel the windup)
+    glow, hit = API.ev('a2', 'glow'), API.ev('a2', 'hit')
+    on = calls_at('a2', glow, 'rig/look/blade/lilac')
+    off = calls_at('a2', hit, 'rig/look/blade/off')
+    can = [ln for ln in fn_lines('p/a2/cancel') if 'rig/look/blade/off' in ln and 'rlk_mb_body' in ln]
+    check(f'F4 HR-22 A2: rig look/blade/lilac at {glow} (the clip\'s glow event), off at the hit {hit}, off in p/a2/cancel (as the body)',
+          len(on) == 1 and len(off) == 1 and len(can) == 1, (on, off, can))
+    s, pl = world(62)
+    n0 = len(s.rigl)
+    r = run_pattern(s, 'a2', SPOTS[0], extra=0)
+    got = [(t - r['t0'], c) for t, c in s.rigl[n0:] if c.startswith('look/blade/')]
+    check('F5 HR-22 A2 (sim): the blade glows lilac from tick 6 to the hit 12', got == [(glow, 'look/blade/lilac'), (hit, 'look/blade/off')],
+          got)
+    s, pl = world(63)
+    n0 = len(s.rigl)
+    r = run_pattern(s, 'a2', SPOTS[0], cancel_at=glow + 2)
+    got = [c for t, c in s.rigl[n0:] if c.startswith('look/blade/')]
+    check('F6 HR-22 A2 cancelled while it glows (tick 8): the blade glow is turned off', got[-1:] == ['look/blade/off'] and
+          'look/blade/lilac' in got, got)
+    # HR-28: the trails (static: ungated afterimage calls at the move ticks; A10's dive line toward the lock; P2-only kept)
+    for k, ticks in F1_TRAIL.items():
+        bad = [t for t in ticks if not [ln for ln in calls_at(k, t, 'fx/p/afterimage') if not p2_gated(ln)]]
+        check(f'F7 HR-28 {k}: the afterimage trail at pattern ticks {ticks} in both phases (not gated on #ph 7)', not bad, bad)
+    dl = calls_at('a10', API.ev('a10', 'dive'), 'fx/p/qi_line')
+    check('F8 HR-28 A10: the dive trail line at its dive tick, from her toward the locked spot (facing the lock marker)',
+          len(dl) == 1 and 'facing entity @e[type=minecraft:marker,tag=rlk_hr_lock' in dl[0], dl)
+    bad = [(k, t) for k, t in F1_P2ONLY.items() if not calls_at(k, t, 'fx/p/afterimage')
+           or any(not p2_gated(ln) for ln in calls_at(k, t, 'fx/p/afterimage'))]
+    check('F9 HR-28 the afterimage of A3 (glide) / A6 (blink) / A9 (dash) stays P2-only (PLAN §4.4)', not bad, bad)
+    # HR-28 in the sim (P1): the trail calls at those ticks while her body rises (A4 leap, A10 spring) / falls (A10 dive)
+    for k, ticks in F1_TRAIL.items():
+        s, pl = world(64)
+        k0 = len(s.kitl)
+        r = run_pattern(s, k, (C[0] + 0.5, C[2] + 8.0), bpos=(C[0], C[2] - 1.0), extra=0)
+        sn = {x['pt']: x for x in r['snaps'] if x['pat'] == S3.TID[k]}
+        got = sorted({t - r['t0'] for t, sub, _a in s.kitl[k0:] if sub == 'p/afterimage'})
+        ys = [sn[t]['pos'][1] for t in ticks if t in sn]
+        rise = ys[:3]
+        ok = got == ticks and all(b > a for a, b in zip(rise, rise[1:])) and (k != 'a10' or ys[4] < ys[3])
+        check(f'F10 HR-28 {k} in P1 (sim): the afterimage at pattern ticks {ticks} along her motion (rising{", then diving" if k == "a10" else ""})',
+              ok, (got, [round(y, 2) for y in ys]))
+    # HR-13 / HR-14 / HR-18 (the package's numbers, lead decision 11-05) in the generated AI: the recovery P1 12-20 t / P2 10-16 t,
+    # A9 / A10 cooldowns 160 / 140 and 180 / 150, the P1 near pick with A1 10, A2 10 and A10 20
+    p1, p2 = API.PH['p1'], API.PH['p2']
+    want = {'ai/rec_start': [f'execute if score #ph hr matches {p1} store result score #rec hr run random value 12..20',
+                             f'execute if score #ph hr matches {p2} store result score #rec hr run random value 10..16'],
+            'core/start/a9': [f'execute if score #ph hr matches {p1} run scoreboard players add #cd_a9 hr 160',
+                              f'execute if score #ph hr matches {p2} run scoreboard players add #cd_a9 hr 140'],
+            'core/start/a10': [f'execute if score #ph hr matches {p1} run scoreboard players add #cd_a10 hr 180',
+                               f'execute if score #ph hr matches {p2} run scoreboard players add #cd_a10 hr 150'],
+            'ai/pick/p1_near': ['scoreboard players set #ai_wa1 hr 10', 'scoreboard players set #ai_wa2 hr 10',
+                                'scoreboard players set #ai_wa10 hr 20']}
+    miss = [(rel, ln) for rel, lns in want.items() for ln in lns if ln not in fn_lines(rel)]
+    check('F11 HR-13 / HR-14 / HR-18 the package in the AI: recovery P1 12-20 / P2 10-16 t, A9 160 / 140, A10 180 / 150 t, '
+          'the P1 near pick A1 10 / A2 10 / A10 20', not miss, miss[:4])
+
+
 def main():
     try:
         for sec in SECTIONS:
-            {'table': sec_table, 'hits': sec_hits, 'quiet': sec_quiet, 'ends': sec_ends, 'cancel': sec_cancel}[sec]()
+            {'table': sec_table, 'hits': sec_hits, 'quiet': sec_quiet, 'ends': sec_ends, 'cancel': sec_cancel, 'f1': sec_f1}[sec]()
     finally:
         if 'v' in VAR:
             H.drop_variant(VAR.pop('v'))

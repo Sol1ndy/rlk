@@ -25,6 +25,7 @@ CY = api.CY
 FACE = 'function rlk:mboss/mv/face'
 P2 = f'if score #ph {OBJ} matches {api.PH["p2"]}'
 TABLE, MOVES = {}, {}
+TRAILS = {}                         # F1 (HR-28): key -> the pattern ticks of its trail (tests)
 TRK = api.TRACK
 
 
@@ -45,6 +46,22 @@ def step_in(pb, prev, t):
 def afterimage(length=20):
     """The lilac afterimage of a leap / dash / blink (kit afterimage {len}); P2 only (PLAN §4.4)."""
     return [S.gate(P2, c) for c in S.fx('afterimage', pos=f'{S.AT_BODY} positioned ~ ~1.2 ~', len=int(length))]
+
+
+def trail(pb, ticks, length=15):
+    """F1 (HR-28, lead decision 11-05): the trail of a leap / spring / dive along her motion, in both phases (PLAN §4.3 A4 /
+    A10; the P2-only afterimage stays on A3 / A6 / A9, §4.4): the kit afterimage {len} at her body on each of `ticks` (the
+    move's start, middle and end: the fading silhouettes trace the path; each with a short streak)."""
+    for t in ticks:
+        pb.at(t, S.fx('afterimage', pos=f'{S.AT_BODY} positioned ~ ~1.2 ~', len=int(length)))
+        TRAILS.setdefault(pb.key, []).append(t)
+
+
+def tail(pb, last_hit, end):
+    """F1 (HR-14, lead decision 11-05): the pattern ends PAT_END (8-12 t after its last hit); in the tail kept she turns to
+    track the player (the clip's follow-through plays on), then the AI recovery walks / strafes her (the punish window)."""
+    pb.track(last_hit + 1, end - 1, TRK['deg'])
+    pb.end(end)
 
 
 def at_anchor(anchor, lines):
@@ -78,6 +95,7 @@ def finish(pb, key):
     pb.write()
     TABLE[key] = pb.hits
     MOVES[key] = pb.motions
+    TRAILS[key] = sorted(set(TRAILS.get(key, [])))
     return pb
 
 
@@ -85,7 +103,7 @@ def finish(pb, key):
 def build_a1(W):
     key = 'a1'
     pb = PB(key, W)
-    hit, glint, fan, end = E(key, 'hit'), E(key, 'glint'), E(key, 'fan'), E(key, 'end')
+    hit, glint, fan, end = E(key, 'hit'), E(key, 'glint'), E(key, 'fan'), api.PAT_END[key]
     # the pivot (0-3: the brim swings round, <= 60 deg / t toward a player beside / behind her), then the tracking until
     # the aim locks at hit - LOCK_LEAD (7 = the clip's lock event)
     pb.at(0, api.play(key), 'function rlk:mboss/mv/turn {max:60}')
@@ -96,7 +114,7 @@ def build_a1(W):
                     h=16, c=api.C_MAGENTA), S.snd('a1_fan'))
     pb.hit(0, tell_from=0)
     pb.at(hit, S.fx_arc(api.HITS[key][0][3][0], api.C_LILAC), S.snd('a1_hit'))
-    pb.end(end)
+    tail(pb, hit, end)
     return finish(pb, key)
 
 
@@ -104,14 +122,18 @@ def build_a1(W):
 def build_a2(W):
     key = 'a2'
     pb = PB(key, W)
-    hit, draw, end = E(key, 'hit'), E(key, 'draw'), E(key, 'end')
+    hit, draw, glow, end = E(key, 'hit'), E(key, 'draw'), E(key, 'glow'), api.PAT_END[key]
     pb.at(0, FACE, api.play(key),
           at_anchor('blade_mid', S.fx_lines('glint', [part(S.DUST['lilac'], 0.1, 0.1, 0.1, 0, 6)], c=api.C_LILAC)))
     track_to(pb, 0, hit)
     pb.at(draw, S.snd('a2_draw'))
+    # F1 (HR-22, lead decision 11-05): the lilac glow along the blade 6-11 (PLAN §4.3, the clip's 'glow' event; the blade look
+    # is the module's, contract §3.2), off at the hit and in the cancel (A6 may cancel the windup while it glows)
+    pb.at(glow, look('blade', 'lilac'))
+    pb.cancel_lines.append(f'execute as {S.BODY} run {look("blade", "off")}')
     pb.hit(0, tell_from=0)
-    pb.at(hit, S.fx_arc(api.HITS[key][0][3][0], api.C_LILAC, roll=35), S.snd('a2_hit'))
-    pb.end(end)
+    pb.at(hit, S.fx_arc(api.HITS[key][0][3][0], api.C_LILAC, roll=35), S.snd('a2_hit'), look('blade', 'off'))
+    tail(pb, hit, end)
     return finish(pb, key)
 
 
@@ -136,7 +158,7 @@ def build_a3(W):
     key = 'a3'
     pb = PB(key, W)
     hs = ['h1', 'h2', 'h3', 'h4', 'h5']
-    end = E(key, 'end')
+    end = api.PAT_END[key]
     reach, glide_v, glide_t = api.A3_GLIDE
     pb.at(0, FACE, api.play(key),
           at_anchor('blade_mid', S.fx_lines('glint', [part(S.DUST['lilac'], 0.1, 0.1, 0.1, 0, 6)], c=api.C_LILAC)))
@@ -160,7 +182,7 @@ def build_a3(W):
         pb.hit(i, tell_from=0 if i == 0 else prev)
         pb.at(t, a3_fx(ev_, api.HITS[key][i][3][0]), S.snd(f'a3_{ev_}'))
         prev = t
-    pb.end(end)
+    tail(pb, prev, end)
     return finish(pb, key)
 
 
@@ -169,7 +191,8 @@ def build_a4(W):
     key = 'a4'
     pb = PB(key, W)
     leap, apex, glint, lock, flip, dive, hit = (E(key, k) for k in ('leap', 'apex', 'glint', 'lock', 'flip', 'dive', 'hit'))
-    slash, lock2, ring, hit2, land, end = (E(key, k) for k in ('slash', 'lock2', 'ring', 'hit2', 'land', 'end'))
+    slash, lock2, ring, hit2, land = (E(key, k) for k in ('slash', 'lock2', 'ring', 'hit2', 'land'))
+    end = api.PAT_END[key]
     h = api.LEAP_H[key]
     pb.at(0, FACE, api.play(key))
     pb.track(1, leap - 1, TRK['deg'])
@@ -187,7 +210,8 @@ def build_a4(W):
         f'execute at @s facing entity {S.PLAYER} feet rotated ~ 0 run {fn("core/dash/probe")}',
         f'execute positioned as {S.PROBE_M} positioned ~ {CY + h} ~ run function rlk:mboss/mv/glide {{t:{apex - leap}}}',
         f'kill @e[type=minecraft:marker,tag={S.PROBE_T}]'])
-    pb.at(leap, fn(f'p/{key}/leap'), S.snd('leap'), *afterimage(int(h * 10)))
+    pb.at(leap, fn(f'p/{key}/leap'), S.snd('leap'))
+    trail(pb, (leap, (leap + apex) // 2, apex))         # F1 (HR-28): both phases, along the rise
     pb.motions.append((leap, apex, 'leap'))
     pb.at(glint, at_anchor('blade_tip', S.fx_lines('glint', [part(S.DUST['magenta'], 0.1, 0.1, 0.1, 0, 8)], c=api.C_MAGENTA)),
           S.snd('a4_glint'))
@@ -213,7 +237,7 @@ def build_a4(W):
     pb.hit(1, tell_from=hit)
     pb.at(hit2, f'execute at @s positioned ~ {CY} ~ run function rlk:mboss/mv/glide {{t:{land - hit2}}}')
     pb.motions.append((hit2, land, 'land'))
-    pb.end(end)
+    tail(pb, hit2, end)
     ground(pb)
     return finish(pb, key)
 
@@ -264,8 +288,8 @@ def build_a6(W):
 def build_a9(W):
     key = 'a9'
     pb = PB(key, W)
-    spin, ring, yellow, star, flash, go, cut, end = (E(key, k) for k in ('spin', 'ring', 'yellow', 'star', 'flash', 'go',
-                                                                       'cut', 'end'))
+    spin, ring, yellow, star, flash, go, cut = (E(key, k) for k in ('spin', 'ring', 'yellow', 'star', 'flash', 'go', 'cut'))
+    end = api.PAT_END[key]
     lock = min(E(key, 'lock'), cut - S.LOCK)
     beyond, dmax = api.A9_BEYOND, api.DASH_LEN[key]
     w = api.HITS[key][0][3][0]
@@ -326,10 +350,10 @@ def build_a9(W):
                     len=int(dmax * 10)),
           S.fx('qi_ring', [part(S.DUST['magenta'], 1.6, 0.05, 1.6, 0, 24)], pos=f'at {S.LOCK_M} positioned ~ ~1.0 ~', r=40,
                c=api.C_MAGENTA), S.snd('a9_cut'))
-    # recovery: she stands beyond the player, back turned, then turns (cut + 12 ..)
+    # recovery: she stands beyond the player, back turned, and turns back to them (F1 HR-14: from the cut on, the end 12 t
+    # after it; the AI recovery turns her on)
     pb.at(cut + 1, f'kill @e[type=minecraft:marker,tag=rlk_hr_a9s]')
-    pb.track(cut + 12, end - 1, TRK['deg'])
-    pb.end(end)
+    tail(pb, cut, end)
     return finish(pb, key)
 
 
@@ -337,7 +361,8 @@ def build_a9(W):
 def build_a10(W):
     key = 'a10'
     pb = PB(key, W)
-    spring, apex, yellow, lock, dive, hit, end = (E(key, k) for k in ('spring', 'apex', 'yellow', 'lock', 'dive', 'hit', 'end'))
+    spring, apex, yellow, lock, dive, hit = (E(key, k) for k in ('spring', 'apex', 'yellow', 'lock', 'dive', 'hit'))
+    end = api.PAT_END[key]
     h, drift = api.LEAP_H[key], api.A10_DRIFT
     rise_t = apex - spring
     pre = round(drift * rise_t, 2)
@@ -362,7 +387,8 @@ def build_a10(W):
         f'execute at @s positioned ~ {CY} ~ if entity {S.PLAYER[:-1]},distance=..1.5] run return 0',
         f'execute at @s facing entity {S.PLAYER} feet rotated ~ 0 positioned ^ ^ ^{num(drift)} positioned ~ {CY} ~ if function '
         f'rlk:mboss/mv/ok at @s facing entity {S.PLAYER} feet rotated ~ 0 positioned ^ ^ ^{num(drift)} run tp @s ~ ~ ~'])
-    pb.at(spring, fn(f'p/{key}/spring'), S.snd('leap'), *afterimage(int(h * 10)))
+    pb.at(spring, fn(f'p/{key}/spring'), S.snd('leap'))
+    trail(pb, (spring, (spring + apex) // 2, apex))     # F1 (HR-28): both phases, along the rise
     pb.motions.append((spring, apex, 'rise'))
     pb.rng(apex + 1, lock - 1, fn(f'p/{key}/drift'))
     pb.motions.append((apex + 1, lock - 1, 'drift'))
@@ -372,12 +398,17 @@ def build_a10(W):
     pb.at(lock, lock_fn(pb, key), f'execute at @s facing entity {S.LOCK_M} feet run tp @s ~ ~ ~ ~ 0')
     pb.at(dive, f'execute positioned as {S.LOCK_M} run function rlk:mboss/mv/glide {{t:{hit - dive}}}',
           S.fx('claw_streaks', [part(S.DUST['lilac'], 0.6, 2.0, 0.6, 0, 20)], pos=f'at {S.LOCK_M} positioned ~ {CY + 2} ~', r=15),
-          S.snd('a10_dive'))
+          S.snd('a10_dive'),
+          # F1 (HR-28): the dive's lilac trail (PLAN §4.3 A10 20-22): the sword-qi line from her down to the locked spot (the
+          # kit clamps a line pointing down above the floor) + the afterimage trail along the dive
+          S.fx('qi_line', [part(S.DUST['lilac'], 0.1, 0.6, 0.1, 0, 10)], pos=f'at @s positioned ~ ~1.0 ~ facing entity {S.LOCK_M} feet',
+               len=int(api.LEAP_H[key] * 10 + 10)))
+    trail(pb, (dive, dive + 1))
     pb.motions.append((dive, hit, 'dive'))
     pb.hit(0, tell_from=0, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')
     pb.at(hit, S.fx('burst_radial', [part(S.DUST['lilac'], 1.4, 0.2, 1.4, 0, 36), part('minecraft:end_rod', 0.2, 1.5, 0.2, 0.05, 10)],
                     pos=f'at {S.LOCK_M} positioned ~ {CY + 0.1} ~', r=35), S.snd('a10_impact', pos=f'at {S.LOCK_M}'))
-    pb.end(end)
+    tail(pb, hit, end)
     ground(pb)
     return finish(pb, key)
 

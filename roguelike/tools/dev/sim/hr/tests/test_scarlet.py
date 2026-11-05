@@ -49,6 +49,13 @@ S2b's sequences, S4's gauntlets and S2a's rig are the real ones (the stand-ins c
   cost     commands per fight tick (P1 + P2 + the gauntlets + the fight-state sequences) with the kit running for real
            (I1b verification round 1): average <= Apep's 830 (target <= 600), every tick <= 3000 but the arena look job's
            slice ticks (<= 5000, contract §5 gate 5)
+  f1       F1 (the 11-05 review fixes, the lead's decisions): HR-01 the judged A8 fail + a pause / reload / leave -> P2 at
+           once; HR-07 A13 past its last counting cut with pips left + a pause / reload / leave -> the instant death at once
+           (then the revive path), a reload while away keeps it pending, before that cut the restart stays; HR-06 tests 30 /
+           35 refused outside P1 / P2, test 23's forced fail ends with its judge; HR-04 no counter / A6 between the floor hit
+           and the reserved step (P1 / P2, basic / skill); HR-13 a passive near player never sees two empty picks in a row,
+           a forced empty band -> the backstep (>= 5 b) -> the mid pick; HR-25 the move clip after a flinch; HR-26 no
+           counter from 10 b, the counter from 3 b, no rear A1 at 10 b; HR-38 A6's P2 cooldown 400
 """
 import math
 import re
@@ -66,7 +73,7 @@ ARGS = [a for a in sys.argv[1:] if a != '-v']
 VERBOSE = '-v' in sys.argv[1:]
 DP = Path(ARGS[0]).resolve()
 SECTIONS = ARGS[1:] or ['hooks', 'phases', 'pips', 'judge', 'fail60', 'fatal', 'banner', 'skip', 'ai', 'bars', 'look', 'cs4',
-                        'pause', 'cleanup', 'cost']
+                        'pause', 'cleanup', 'cost', 'f1']
 sys.path.insert(0, str(DP / 'tools'))
 import mboss_scarlet.api as API  # noqa: E402
 import mboss_scarlet.s3lib as S3  # noqa: E402
@@ -143,7 +150,7 @@ def rec(s):
                 php=s.sc(('e', pl.id), 'curHealth') if pl else None, alive=b is not None,
                 # I1: the ghost form (S4) and the shown clip tick of the real rig (S2a: hrRigT / hrRigC on the body)
                 ghost=bool(b and 'rlk_hr_ghost' in b.tags), rigt=s.sc(('e', b.id), 'hrRigT') if b else None,
-                rigc=s.sc(('e', b.id), 'hrRigC') if b else None)
+                rigc=s.sc(('e', b.id), 'hrRigC') if b else None, rvw=hr(s, '#rvw'))
 
 
 def run(s, n, each=None, heal=True):
@@ -1358,6 +1365,263 @@ def sec_cost():
           '(the ambience every 10 t) and on most P1 ticks (the card ager between the calls)',
           win and min(win) > 0 and sum(1 for k in p1k if k) >= len(p1k) * 0.8, (min(win or [0]), sum(1 for k in p1k if k), len(p1k)))
     VARS['cost_rows'] = [(k, len(v), statistics.mean(x[0] for x in v), max(x[0] for x in v)) for k, v in rows]
+
+
+# ================================================================================================= F1 (11-05 review fixes)
+J8, J13 = API.JUDGE_T['a8'], API.JUDGE_T['a13']
+
+
+def leave(s, n):
+    """The player leaves for n ticks (no tagged player: the framework pause, as a disconnect), then comes back."""
+    pl = s.player()
+    pl.tags.discard('player')
+    s.setsc('#riftOn', 'room', 0)                 # sim only: the rift's own tick needs a tagged player
+    out = run(s, n, heal=False)
+    pl.tags.add('player')
+    s.setsc('#riftOn', 'room', 1)
+    return out
+
+
+def interrupt(s, how, n=10):
+    if how == 'pause':
+        return pause_for(s, n)
+    if how == 'leave':
+        return leave(s, n)
+    reload(s)
+    return [rec(s)]
+
+
+def watch(s, *fns):
+    s.watch.update({f'rlk:boss/scarlet/{f}': [] for f in fns})
+
+
+def watched(s, f):
+    return [t for t, *_r in s.watch.get(f'rlk:boss/scarlet/{f}', [])]
+
+
+def sec_f1():
+    """F1 (the 11-05 review fixes, the lead's decisions in HR/review/findings.md): HR-01 the judged A8 fail survives a pause /
+    reload (P2 at once); HR-07 a lethal gauntlet past its last counting cut with pips left: the fail is pending and lands at
+    the resume / reload (the revive path), before it the restart stays; HR-06 test 30 / 35 only in P1 / P2, a test's forced
+    fail ends with its judge; HR-04 no counter / A6 between the floor hit and the reserved step; HR-13 never two empty picks in
+    a row (the backstep + the mid pick); HR-25 the move clip after a flinch; HR-26 the counter / rear rules only in the near
+    band; HR-38 A6's P2 cooldown 400."""
+    # HR-01: the A8 fail (test 21, no dash: 5 pips -> #gres 2 at the judge), interrupted between the judge and T + 214
+    for how, at in (('pause', J8 + 1), ('pause', J8 + 12), ('reload', J8 + 6), ('leave', J8 + 18)):
+        s, pl = world(300 + at)
+        H.place_player(s, API.CX + 0.5, API.CZ + 6.0)
+        test(s, 21)
+        ok, R = until(s, lambda s: hr(s, '#ph') == PH['a8'] and hr(s, '#pt') >= at, 400)
+        g0 = hr(s, '#gres')
+        R1 = interrupt(s, how)
+        R2 = run(s, 160)
+        a8s = [r for r in R2 if r['pat'] == TID['a8']]
+        check(f'F1 HR-01 the judged A8 fail (#gres {g0}), a {how} at T+{at}: P2 at once (no lead_stand, no second A8)',
+              ok and g0 == 2 and R2[0]['ph'] == PH['p2'] and PH['lead'] not in [r['ph'] for r in R2] and not a8s,
+              (g0, phase_list(R1 + R2)[:6]))
+    # HR-07: A13 (test 27, no dash: 5 pips) after U10's pip window (strike + 1): the fatal at the resume / reload; Ronova's
+    # revive -> the stance -> lead_stand -> A13 again with 5/5
+    last13 = max(CUTS['a13'])
+    for how, at in (('pause', last13 + 6), ('reload', last13 + 12), ('leave', J13 - 1)):
+        s, pl = world(320 + at)
+        s.revive = 40
+        H.place_player(s, API.CX + 0.5, API.CZ + 6.0)
+        test(s, 27)
+        ok, R = until(s, lambda s: hr(s, '#ph') == PH['a13'] and hr(s, '#pt') >= at, 500)
+        pips, d0 = hr(s, '#pips'), len(s.deaths)
+        R1 = interrupt(s, how)
+        R2 = run(s, 2, heal=False)
+        died = len(s.deaths) > d0
+        check(f'F2 HR-07 A13 with {pips} pips past its last counting cut (strike {last13}), a {how} at T+{at}: the instant death lands '
+              'at once (no restart of A13)', ok and pips >= 1 and died and not any(r['ph'] == PH['lead'] and r['rvw'] == 0 for r in R2),
+              (pips, s.deaths[d0:], phase_list(R1 + R2)))
+        ok2, R3 = until(s, lambda s: hr(s, '#ph') == PH['a13'] and hr(s, '#pat') == TID['a13'] and 1 <= hr(s, '#pt') <= 2, 700)
+        stance = any(r['rvw'] >= 1 for r in R3)
+        check(f'F3 HR-07 ... ({how}) then Ronova\'s revive: the stance, lead_stand, A13 from T0 with 5/5', ok2 and stance
+              and hr(s, '#pips') == API.PIPS, (ok2, stance, hr(s, '#pips')))
+    # ... a /reload while the player is away keeps the fail pending; it lands when they come back
+    s, pl = world(330)
+    s.revive = 40
+    H.place_player(s, API.CX + 0.5, API.CZ + 6.0)
+    test(s, 27)
+    ok, R = until(s, lambda s: hr(s, '#ph') == PH['a13'] and hr(s, '#pt') >= last13 + 4, 500)
+    d0 = len(s.deaths)
+    pl.tags.discard('player')
+    s.setsc('#riftOn', 'room', 0)
+    run(s, 3, heal=False)
+    reload(s)
+    R1 = run(s, 10, heal=False)
+    away = len(s.deaths) == d0 and hr(s, '#grs') == 5
+    pl.tags.add('player')
+    s.setsc('#riftOn', 'room', 1)
+    run(s, 2, heal=False)
+    check('F4 HR-07 a /reload while the player is away: the fail stays pending (#grs 5, no death), it lands when they are back',
+          ok and away and len(s.deaths) > d0, (away, s.deaths[d0:], hr(s, '#grs')))
+    # before the last counting cut the restart rule (PLAN §3.8 / §5.6) stays
+    s, pl = world(331)
+    H.place_player(s, API.CX + 0.5, API.CZ + 6.0)
+    test(s, 27)
+    ok, R = until(s, lambda s: hr(s, '#ph') == PH['a13'] and hr(s, '#pt') >= last13 - 8, 500)
+    d0 = len(s.deaths)
+    pause_for(s, 10)
+    R2 = run(s, 3)
+    check(f'F5 HR-07 a pause before the last counting cut (T+{last13 - 8}): no death, lead_stand {{g:"a13"}} -> A13 from T0 (the restart)',
+          ok and len(s.deaths) == d0 and R2[-1]['ph'] == PH['lead'] and hr(s, '#sqn') == SEQ['lead_stand'], phase_list(R2))
+    # HR-06: test 30 / 35 refuse outside P1 / P2
+    for tid in (30, 35):
+        s, pl = at_phase(340 + tid, 20, lambda s: hr(s, '#ph') == PH['cs1'] and hr(s, '#sq') >= 40)
+        sq0 = hr(s, '#sq')
+        test(s, tid)
+        run(s, 5)
+        check(f'F6 HR-06 test {tid} in CS1: refused (CS1 goes on, no replay)', hr(s, '#rp') == 0 and hr(s, '#ph') == PH['cs1']
+              and hr(s, '#sqn') == SEQ['cs1'] and hr(s, '#sq') == sq0 + 5, (hr(s, '#rp'), hr(s, '#ph'), hr(s, '#sq'), sq0))
+    s, pl = at_phase(350, 21, lambda s: hr(s, '#ph') == PH['a8'] and hr(s, '#pt') >= 30)
+    pt0 = hr(s, '#pt')
+    test(s, 30)
+    run(s, 5)
+    check('F7 HR-06 test 30 in A8: refused (the gauntlet goes on)', hr(s, '#pat') == TID['a8'] and hr(s, '#pt') == pt0 + 5
+          and hr(s, '#rp') == 0, (hr(s, '#pat'), hr(s, '#pt'), pt0))
+    s, pl = world(351)
+    test(s, 30)
+    run(s, 3)
+    check('F8 HR-06 test 30 in P1: the intro replay runs (#rp 1)', hr(s, '#rp') == 1 and hr(s, '#ph') == PH['p1'], hr(s, '#rp'))
+    s, pl = at_phase(352, 23, lambda s: hr(s, '#ph') == PH['a8'] and hr(s, '#pt') >= 60)
+    pause_for(s, 10)
+    ok, R = until(s, lambda s: hr(s, '#ph') == PH['a8'] and hr(s, '#pt') >= 1, 200)
+    ok2, R2 = until(s, lambda s: hr(s, '#gres') != 0 or hr(s, '#ph') != PH['a8'], 260, each=dasher(CUTS['a8']))
+    check('F9 HR-06 test 23 (a forced fail) + a pause: the restarted A8 counts timed dashes again (0 pips -> the deflect)',
+          ok and ok2 and hr(s, '#gres') == 1, (ok, ok2, hr(s, '#gres'), hr(s, '#pips'), hr(s, '#pipoff')))
+    # HR-04: 3 small hits, then the hit reaching the floor (a basic / a skill hit), all within 40 t while she recovers in front of
+    # the player: no counter / A6 before the reserved step (CS1 in P1, the A13 lead-in in P2)
+    for phase, skill in (('p1', False), ('p1', True), ('p2', False), ('p2', True)):
+        moves = []
+        for i in range(8):
+            s, pl = world(360 + i + (20 if phase == 'p2' else 0) + (40 if skill else 0))
+            H.hold(s, True)
+            if phase == 'p2':
+                test(s, 33)
+                H.hold(s, True)
+            run(s, 3)
+            H.hold(s, False)
+            H.place_body(s, API.CX, API.CZ, yaw=0.0)
+            H.place_player(s, API.CX, API.CZ + 2.8)
+            b = body(s)
+            s.setsc(('e', b.id), 'mhpC', (FL60 if phase == 'p1' else FL5) + 40)
+            s.setsc('#pat', 'hr', 0)
+            s.setsc('#rec', 'hr', 30)
+            s.setsc('#ai_pht', 'hr', 400)
+            for _ in range(3):
+                strike(s, 5)
+                run(s, 2)
+            strike(s, skill=skill)
+            ok, R = until(s, lambda s: hr(s, '#ph') in (PH['cs1'], PH['lead']), 120)
+            moves.append([S3.KEY_OF.get(p) for p in sorted({r['pat'] for r in R if r['pat']})] if ok else ['no step'])
+        bad = [m for m in moves if m]
+        check(f'F10 HR-04 {phase.upper()}: a 4-hit flurry ending on the floor hit ({"a skill" if skill else "a basic"} hit), 8 seeds: '
+              f'{"CS1" if phase == "p1" else "the A13 lead-in"} at the next decision, no counter / A6 before it', not bad, moves)
+    # HR-13: never two empty picks in a row - a passive player near her for 1600 t (no hits): no two ai/none extensions without a
+    # pattern or a backstep between
+    s, pl = world(370)
+    H.place_player(s, API.CX + 0.5, API.CZ + 3.0)
+    watch(s, 'ai/none', 'ai/backstep', *[f'core/start/{k}' for k in API.P1])
+    run(s, 1600, each=lambda s: H.place_player(s, API.CX + 0.5, API.CZ + 3.0))
+    ev = sorted([(t, 'N') for t in watched(s, 'ai/none')] + [(t, 'B') for t in watched(s, 'ai/backstep')]
+                + [(t, 'S') for k in API.P1 for t in watched(s, f'core/start/{k}')])
+    ext = [e for i, e in enumerate(ev) if e[1] == 'N' and not (i + 1 < len(ev) and ev[i + 1] == (e[0], 'B'))]
+    seq_ = [k for t, k in ev if not (k == 'N' and (t, 'B') in ev)]
+    twice = [i for i, (a, b) in enumerate(zip(seq_, seq_[1:])) if a == b == 'N']
+    starts = sum(1 for _t, k in ev if k == 'S')
+    check(f'F11 HR-13 a passive player near her, 1600 t: never two empty picks in a row ({len(ext)} ai/none extensions, {starts} '
+          'pattern starts)', not twice and starts >= 15, (len(twice), seq_[:30]))
+    # ... forced: every near candidate cooling down -> ai/none (8 t), then the backstep (she steps away to >= 5 b), then the
+    # mid pick (A4, the one ready)
+    s, pl = world(371)
+    H.hold(s, False)
+    H.place_body(s, API.CX, API.CZ, yaw=0.0)
+    H.place_player(s, API.CX, API.CZ + 3.0)
+    clk = hr(s, '#clk')
+    for k in API.COOLDOWN:
+        s.setsc(f'#cd_{k}', 'hr', clk + (-10 if k == 'a4' else 900))
+    s.setsc('#last', 'hr', 0)
+    s.setsc('#pat', 'hr', 0)
+    s.setsc('#rec', 'hr', 1)
+    s.setsc('#ai_nn', 'hr', 0)
+    watch(s, 'ai/none', 'ai/backstep', *[f'core/start/{k}' for k in API.P1])
+    t0 = s.t
+    ok, R = until(s, lambda s: hr(s, '#pat') != 0, 80, each=lambda s: H.place_player(s, API.CX, API.CZ + 3.0))
+    bk = watched(s, 'ai/backstep')
+    d = math.hypot(body(s).pos[0] - API.CX, body(s).pos[2] - (API.CZ + 3.0))
+    played = [c for t, c in s.rigl if t > t0 and c == 'play/backstep']
+    check('F12 HR-13 the near band empty twice in a row: the backstep clip (she steps to >= 5 b), then the mid pick (A4)',
+          ok and S3.KEY_OF.get(hr(s, '#pat')) == 'a4' and len(bk) == 1 and played and d >= 4.9,
+          (S3.KEY_OF.get(hr(s, '#pat')), watched(s, 'ai/none'), bk, played[:1], round(d, 2)))
+    # HR-25: after a flinch the recovery's move clip plays again
+    s, pl = world(372)
+    H.hold(s, False)
+    H.place_body(s, API.CX, API.CZ, yaw=0.0)
+    H.place_player(s, API.CX, API.CZ + 3.0)
+    s.setsc('#pat', 'hr', 0)
+    H.call_sc(s, 'ai/rec_start')
+    s.setsc('#rec', 'hr', 40)
+    s.setsc('#flq', 'hr', 1)
+    n0 = len(s.rigl)
+    run(s, 12, each=lambda s: H.place_player(s, API.CX, API.CZ + 3.0))
+    plays = [(t, c) for t, c in s.rigl[n0:] if c.startswith('play/')]
+    fl = [t for t, c in plays if c == 'play/flinch']
+    after = [c for t, c in plays if fl and t > fl[0]]
+    check('F13 HR-25 a flinch in the recovery: the move clip (walk / strafe) plays again when it ends', fl and after
+          and after[0] in ('play/walk', 'play/strafe_l', 'play/strafe_r', 'play/glide'), plays)
+    # HR-26: the counter / rear rules only inside the near band
+    def ctr(dist):
+        def f(s):
+            H.hold(s, False)
+            H.place_body(s, API.CX, API.CZ, yaw=0.0)
+            H.place_player(s, API.CX, API.CZ + dist)
+            s.setsc('#rec', 'hr', 40)
+            s.setsc('#pat', 'hr', 0)
+            for _ in range(API.COUNTER_TRIGGER['hits']):
+                strike(s, 5)
+        return f
+    far = [ai_trial(380 + i, ctr(10.0), ticks=2)[1] for i in range(30)]
+    near = [ai_trial(420 + i, ctr(3.0), ticks=2)[1] for i in range(30)]
+    check('F14 HR-26 4 hits in 40 t from 10 b (ranged): never A1 / A2', not [k for k in far if k in ('a1', 'a2')], far)
+    check('F15 HR-26 ... from 3 b: the counter as before (seeded share)', 0.5 <= sum(k in ('a1', 'a2') for k in near) / 30 <= 0.9, near)
+
+    def rear10(s):
+        H.hold(s, False)
+        H.place_body(s, API.CX, API.CZ, yaw=0.0)
+        H.place_player(s, API.CX, API.CZ - 10.0)
+        s.setsc('#rear', 'hr', 0b111111)
+        s.setsc('#rec', 'hr', 1)
+        s.setsc('#last', 'hr', 0)
+        s.setsc('#ai_rcd', 'hr', hr(s, '#clk') - API.REAR_RULE['cd_ignore_every'])
+    ks = [ai_trial(460 + i, rear10, ticks=3)[1] for i in range(10)]
+    check('F16 HR-26 the rear rule with the player 10 b behind her: no A1 (the band pick decides)', not [k for k in ks if k == 'a1'], ks)
+    # HR-38: A6's P2 cooldown 400 (PLAN §4.8: at most one back-blink per 20 s)
+    st = cmds('core/start/a6')
+    cd2 = [ln for ln in st if f'#ph hr matches {PH["p2"]}' in ln and '#a6cd hr' in ln and 'add' in ln]
+    check('F17 HR-38 A6 in P2 sets its cooldown to 400 t (core/start/a6)', len(cd2) == 1 and cd2[0].endswith(' 400'), cd2)
+    blinks = []
+    for i in range(20):
+        s, pl = world(480 + i)
+        test(s, 33)
+        H.hold(s, True)
+        run(s, 2)
+        H.place_body(s, API.CX, API.CZ, yaw=0.0)
+        H.place_player(s, API.CX, API.CZ + 3.0)
+        H.call_sc(s, 'core/start/a6')
+        ok, R = until(s, lambda s: hr(s, '#pat') == 0, 40)
+        s.setsc('#clk', 'hr', hr(s, '#clk') + 360)      # 19 s later: a skill hit within 4.5 b while she recovers
+        s.setsc('#ai_pht', 'hr', 1000)
+        s.setsc('#pat', 'hr', 0)
+        s.setsc('#rec', 'hr', 40)
+        b = body(s)
+        H.place_player(s, b.pos[0], b.pos[2] + 3.0)
+        H.hold(s, False)
+        strike(s, 5, skill=True)
+        run(s, 2)
+        blinks.append(hr(s, '#pat') == TID['a6'])
+    check('F18 HR-38 P2: a skill hit 19 s after a back-blink never starts another (20 seeds)', not any(blinks), blinks)
 
 
 def main():

@@ -20,6 +20,7 @@ function rlk:boss/scarlet/ai/rear_count
 execute if score #ai_rc hr matches 4.. if function rlk:boss/scarlet/ai/rear run return 1
 execute if score #ai_ff hr matches 1 if function rlk:boss/scarlet/ai/after_a6 run return 1
 execute if score #far hr matches 30.. run return run function rlk:boss/scarlet/ai/far
+execute if score #ai_bs hr matches 1 run return run function rlk:boss/scarlet/ai/bs_pick
 execute if score #ph hr matches 1 if score #ai_d2 hr matches ..202500 run return run function rlk:boss/scarlet/ai/pick/p1_near
 execute if score #ph hr matches 1 if score #ai_d2 hr matches ..1210000 run return run function rlk:boss/scarlet/ai/pick/p1_mid
 execute if score #ph hr matches 1 run return run function rlk:boss/scarlet/ai/pick/p1_far

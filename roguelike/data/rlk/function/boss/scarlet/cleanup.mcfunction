@@ -111,6 +111,8 @@ scoreboard players reset #ai_rcd hr
 scoreboard players reset #ai_fl hr
 scoreboard players reset #ai_lf hr
 scoreboard players reset #ai_ls hr
+scoreboard players reset #ai_nn hr
+scoreboard players reset #ai_bs hr
 scoreboard players reset #ai_wa1 hr
 scoreboard players reset #ai_wa2 hr
 scoreboard players reset #ai_wa3 hr
