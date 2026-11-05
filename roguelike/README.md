@@ -2081,8 +2081,8 @@ R1 35 · R2 25), 쿨다운(`api.COOLDOWN`, P2 가 조금 짧음), 같은 패턴 
 ### 화면
 보스바는 CS1 동안 꺼진다(FN-f `bars_off`, SQ1 첫 틱에 `bars_on`). 아랫줄 = 실드 칸(번개색, 5칸) / 쓰러짐 남은 시간(금색, 200). 대사 25줄은
 위키 대사 그대로(`api.LINES`, 색 #F2D0E8, 효과 도구의 `fx/hud/line {id}` 만: 제목 자리에 두 글자씩 2틱마다 타자 치듯, `block.note_block.hat`
-0.3; 24 · 25 는 이벤트에서만). 필살(5 %)처럼 실패가 죽음인 연참에서만 경고 띠(보스바 `rlk:hr_warn`, `fx/hud/warn`: 흰 글씨에 「즉사」만
-#FF3A55)가 lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` false · `ULT5_LETHAL` true). 등장 건너뛰기 표시 「⊙ 건너뛰기 · Shift
+0.3; 24 · 25 는 이벤트에서만). 필살(5 %)처럼 실패가 죽음인 연참에서만 경고 띠(보스바 `rlk:hr_warn`, `fx/hud/warn`: 흰 글씨에 「즉사」만 #FF3A55)가
+lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` false · `ULT5_LETHAL` true). 등장 건너뛰기 표시 「⊙ 건너뛰기 · Shift
 길게」는 20~540틱에만(누를수록 밝아짐, `hudHold`). 전체 화면 덮개 여섯(검정 · 반전 · 분홍빛 흰색 · 붉은 기 · 자홍 · 흰색, 글꼴 `rlk:mboss_hr`)은
 장면이 고른 틱에. 안내 · 조언 문구는 없다(즉사 경고 띠만 예외).
 
