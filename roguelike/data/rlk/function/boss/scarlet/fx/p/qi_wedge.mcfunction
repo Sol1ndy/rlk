@@ -5,10 +5,17 @@ execute unless data storage rlk:hr fx{init:2b} run function rlk:boss/scarlet/fx/
 data modify storage rlk:hr fx.pa set value {}
 $data modify storage rlk:hr fx.pa.roll set value $(roll)
 $scoreboard players set #o hrFx $(roll)
+$scoreboard players set #r hrFx $(r)
+scoreboard players set #fm hrFx 0
+execute if score #o hrFx matches 20..160 run scoreboard players set #fm hrFx 1
+execute if score #o hrFx matches -160..-20 run scoreboard players set #fm hrFx 1
 data modify storage rlk:hr fx.pa.kw set value "qi_wedge"
-execute if score #o hrFx matches 20..160 run data modify storage rlk:hr fx.pa.kw set value "qi_wedgef"
-execute if score #o hrFx matches -160..-20 run data modify storage rlk:hr fx.pa.kw set value "qi_wedgef"
+execute if score #fm hrFx matches 1 run data modify storage rlk:hr fx.pa.kw set value "qi_wedgef"
+function rlk:boss/scarlet/fx/e/rollv
 $execute store result storage rlk:hr fx.pa.s float 0.1 run scoreboard players set #a hrFx $(r)
 $execute store result storage rlk:hr fx.pa.s6 float 0.06 run scoreboard players set #a hrFx $(r)
 $execute store result storage rlk:hr fx.pa.pd float 0.03 run scoreboard players set #a hrFx $(r)
+execute store result storage rlk:hr fx.pa.bx float 0.0001 run scoreboard players get #bx hrFx
+execute store result storage rlk:hr fx.pa.by float 0.0001 run scoreboard players get #by hrFx
+execute store result storage rlk:hr fx.pa.bz float 0.0001 run scoreboard players get #bz hrFx
 function rlk:boss/scarlet/fx/p/e/qi_wedge with storage rlk:hr fx.pa

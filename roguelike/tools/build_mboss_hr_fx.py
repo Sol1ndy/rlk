@@ -781,7 +781,8 @@ def _lowf_table():
 
 LOWF = _lowf_table()
 # the crescents' pitch arg is an elevation (+ up): #p = - pitch (Minecraft) for the clamp, storage pa.p the card pitch;
-# #fm 1 = the face mode (|roll| in FACE_ROLL), its four frame kinds in storage pa.k0 .. k3
+# #fm 1 = the face mode (|roll| in FACE_ROLL), its four frame kinds in storage pa.k0 .. k3; F2 round 1 (V2R-01): then
+# fx/e/rollv puts the burst point (#bx #by #bz, the card frame) on the crescent's rim in either mode
 ARC_CLAMP = [f'$data modify storage {PA}.yaw set value $(yaw)', f'$data modify storage {PA}.roll set value $(roll)',
              '$scoreboard players set #r hrFx $(r)', '$scoreboard players set #p hrFx $(pitch)',
              'scoreboard players operation #p hrFx *= #cm1 hrFx', '$scoreboard players set #o hrFx $(roll)',
@@ -791,8 +792,10 @@ ARC_CLAMP = [f'$data modify storage {PA}.yaw set value $(yaw)', f'$data modify s
              f'execute if score #o hrFx matches -{FACE_ROLL[1]}..-{FACE_ROLL[0]} run scoreboard players set #fm hrFx 1',
              *[f'data modify storage {PA}.k{k} set value "qi_arc_{k}"' for k in range(4)],
              *[f'execute if score #fm hrFx matches 1 run data modify storage {PA}.k{k} set value "qi_arcf_{k}"' for k in range(4)],
-             f'function {FN}e/clamp_arc']
-QI_CONV = (('s', '#r', 0.1), ('s9', '#r', 0.09), ('f', '#r', 0.08), ('pd', '#r', 0.025), ('ly', '#ly', 0.01))
+             f'function {FN}e/clamp_arc', f'function {FN}e/rollv']
+# bx / by / bz: the burst on the rim (0.8 of the reach: #r tenths x per mille x 0.00008 = 0.08 r x the unit vector)
+QI_CONV = (('s', '#r', 0.1), ('s9', '#r', 0.09), ('pd', '#r', 0.025), ('ly', '#ly', 0.01), ('bx', '#bx', 0.00008),
+           ('by', '#by', 0.00008), ('bz', '#bz', 0.00008))
 ARC_LIFE = (2, 2, 2, 8)
 
 
@@ -821,7 +824,8 @@ def _p_qi_arc(c):
     # a uniform scale: the flat frame (x-z) and the face frame (x-y) take the same (s, s, s)
     out = qi_frames(c, '^ ^$(ly) ^', '~$(yaw) ~$(p)', '$(roll)', ('$(s9)', '$(s9)', '$(s9)'), ('$(s)', '$(s)', '$(s)'),
                     kinds=[f'$(k{k})' for k in range(4)])
-    front = 'positioned ^ ^$(ly) ^ rotated ~$(yaw) ~$(p) positioned ^ ^ ^$(f)'
+    # the burst on the rim in the card frame: flat 0.8 r along the aim, face 0.8 r up the rolled screen-plane axis (V2R-01)
+    front = 'positioned ^ ^$(ly) ^ rotated ~$(yaw) ~$(p) positioned ^$(bx) ^$(by) ^$(bz)'
     out += [mac(f'execute {front} run ' + l) for l in c_parts(c, '~ ~ ~', ('$(pd)', 0.2, '$(pd)'), 12)]
     return out
 
@@ -920,17 +924,22 @@ def _p_qi_fan(c):
         '1.1), {roll} degrees: F2 (HR-12) |roll| 20..160 = the wedge stands across the facing, its point up and rolled by roll '
         'in that plane (the rising diagonal a viewer behind the target sees broadside); else it lies along the facing, rolled '
         'about it: a lilac spearhead widening behind its point, white edges; particles at the point. Level.',
-        conv=(('s', 'r', 0.1), ('s6', 'r', 0.06), ('pd', 'r', 0.03)),
+        conv=(('s', 'r', 0.1), ('s6', 'r', 0.06), ('pd', 'r', 0.03), ('bx', '#bx', 0.0001), ('by', '#by', 0.0001),
+              ('bz', '#bz', 0.0001)),
         pre=[f'$data modify storage {PA}.roll set value $(roll)', '$scoreboard players set #o hrFx $(roll)',
+             '$scoreboard players set #r hrFx $(r)', 'scoreboard players set #fm hrFx 0',
+             f'execute if score #o hrFx matches {FACE_ROLL[0]}..{FACE_ROLL[1]} run scoreboard players set #fm hrFx 1',
+             f'execute if score #o hrFx matches -{FACE_ROLL[1]}..-{FACE_ROLL[0]} run scoreboard players set #fm hrFx 1',
              f'data modify storage {PA}.kw set value "qi_wedge"',
-             f'execute if score #o hrFx matches {FACE_ROLL[0]}..{FACE_ROLL[1]} run data modify storage {PA}.kw set value "qi_wedgef"',
-             f'execute if score #o hrFx matches -{FACE_ROLL[1]}..-{FACE_ROLL[0]} run data modify storage {PA}.kw set value '
-             '"qi_wedgef"'])
+             f'execute if score #fm hrFx matches 1 run data modify storage {PA}.kw set value "qi_wedgef"',
+             f'function {FN}e/rollv'])
 def _p_qi_wedge():
+    # the particles at the point in the card frame: flat r along the facing, face r up the rolled axis (V2R-01)
+    pt = '^$(bx) ^$(by) ^$(bz)'
     return [mac(card('$(kw)', '^ ^ ^', '~ 0', roll='$(roll)', s0=('$(s6)', '$(s6)', '$(s6)'), s1=('$(s)', '$(s)', '$(s)'), life=8,
                      fade=4, dur=2, hit=5, col2=QFADE[1])),
-            mac(dust(DUSTC[1], 1.2, '^ ^ ^$(s)', ('$(pd)', '$(pd)', '$(pd)'), 10)),
-            mac(part('electric_spark', '^ ^ ^$(s)', (0.2, 0.2, 0.2), 0.05, 4))]
+            mac(dust(DUSTC[1], 1.2, pt, ('$(pd)', '$(pd)', '$(pd)'), 10)),
+            mac(part('electric_spark', pt, (0.2, 0.2, 0.2), 0.05, 4))]
 
 
 @preset('qi_ribbon', 'A4 the sword-qi ribbon wrapping round her (S3: the body + 1.3): three lilac ribbon strips tilted at '
@@ -1437,7 +1446,8 @@ FAKE = ('#n', '#na', '#ni', '#ser', '#now', '#now2', '#wd', '#c2', '#col', '#rol
         '#pool', '#a', '#b', '#c', '#k', '#t', '#it', '#f', '#h', '#pt', '#fl', '#m', '#r', '#p', '#o', '#i', '#j', '#ly',
         '#n2', '#g', '#on', '#sk', '#l', '#lid', '#at', '#af', '#lnW', '#lnA', '#lnE', '#ovH', '#ovE', '#oi', '#oh', '#oo',
         '#demo', '#dt', '#s', '#d', '#my', '#mz', '#ny', '#nz', '#cm1', '#c3', '#c4', '#c26', '#c90', '#c10', '#c20', '#c36', '#c100', '#c115', '#c360', '#c1000',
-        '#c104', '#c5', '#fm', '#sw', '#tx', '#ty', '#keep', '#fol', '#fy', '#y', '#ovS', '#ovI')   # F2
+        '#c104', '#c5', '#fm', '#sw', '#tx', '#ty', '#keep', '#fol', '#fy', '#y', '#ovS', '#ovI',   # F2
+        '#rx', '#ry', '#rz', '#ra', '#rb', '#bx', '#by', '#bz')                                    # F2 round 1 (e/rollv)
 # F2: the init version (2: the face-mode crescent table, the overlay fade steps, the keep / follow switches, #c104): a world
 # whose storage holds an older kit's init runs e/init again at the first call (the tables are rewritten, the objectives exist)
 INIT_V = 2
@@ -1797,6 +1807,33 @@ def engine(W):
                    f'$execute store result score #f {OBJ} run data get storage {STO} fx.low[$(i)]'])
     W.w('e/lowg', ['# Internal (macro {i}): #f = the face-mode crescent\'s floor-clamp table entry i (F2, HR-12).',
                    f'$execute store result score #f {OBJ} run data get storage {STO} fx.lowf[$(i)]'])
+    W.w('e/rollv', [
+        '# Internal (F2 round 1, V2R-01): the burst point of a crescent / wedge in its card frame (+x left, +y up, +z the aim),',
+        '# #r (tenths) x the unit vector per mille -> #bx #by #bz. #fm 0 (flat: the shape lies along the aim) -> (0, 0, #r);',
+        '# #fm 1 (face: the shape stands across the aim, rolled by #o about it, left_rotation about +z) -> #r (-sin o, cos o, 0).',
+        f'scoreboard players set #rx {OBJ} 0', f'scoreboard players set #ry {OBJ} 0', f'scoreboard players set #rz {OBJ} 1000',
+        f'execute if score #fm {OBJ} matches 1 run function {E}rollf',
+        f'scoreboard players operation #bx {OBJ} = #r {OBJ}', f'scoreboard players operation #bx {OBJ} *= #rx {OBJ}',
+        f'scoreboard players operation #by {OBJ} = #r {OBJ}', f'scoreboard players operation #by {OBJ} *= #ry {OBJ}',
+        f'scoreboard players operation #bz {OBJ} = #r {OBJ}', f'scoreboard players operation #bz {OBJ} *= #rz {OBJ}'])
+    W.w('e/rollf', [
+        '# Internal (e/rollv, the face mode): #rx = -sin(#o), #ry = cos(#o) per mille (#o degrees, -180..180), #rz 0.',
+        f'scoreboard players set #rz {OBJ} 0',
+        f'scoreboard players operation #ra {OBJ} = #o {OBJ}',
+        f'execute if score #ra {OBJ} matches ..-1 run scoreboard players operation #ra {OBJ} *= #cm1 {OBJ}',
+        f'execute if score #ra {OBJ} matches 181.. run scoreboard players set #ra {OBJ} 180',
+        '# sin |o| = sin min(|o|, 180 - |o|)',
+        f'scoreboard players set #rb {OBJ} 180', f'scoreboard players operation #rb {OBJ} -= #ra {OBJ}',
+        f'scoreboard players operation #rb {OBJ} < #ra {OBJ}',
+        f'execute store result storage {STO} fx.q.i int 1 run scoreboard players get #rb {OBJ}',
+        f'function {E}sinf with storage {STO} fx.q', f'scoreboard players operation #rx {OBJ} = #f {OBJ}',
+        f'execute if score #o {OBJ} matches 1.. run scoreboard players operation #rx {OBJ} *= #cm1 {OBJ}',
+        '# cos |o| = sin |90 - |o||, negative past 90',
+        f'scoreboard players set #rb {OBJ} 90', f'scoreboard players operation #rb {OBJ} -= #ra {OBJ}',
+        f'execute if score #rb {OBJ} matches ..-1 run scoreboard players operation #rb {OBJ} *= #cm1 {OBJ}',
+        f'execute store result storage {STO} fx.q.i int 1 run scoreboard players get #rb {OBJ}',
+        f'function {E}sinf with storage {STO} fx.q', f'scoreboard players operation #ry {OBJ} = #f {OBJ}',
+        f'execute if score #ra {OBJ} matches 91.. run scoreboard players operation #ry {OBJ} *= #cm1 {OBJ}'])
     W.w('e/clamp_sline', [
         '# scarlet_line floor clamp (F2, HR-44): #l len (tenths), #o roll (degrees) -> #tx #ty (hundredths, the card frame):',
         f'# when the line\'s low end would sit under {SLINE_LOW / 100:.2f} b over the floor, the card slides along its own length',

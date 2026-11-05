@@ -640,6 +640,123 @@ for yaw in (0, 180):
     side[yaw] = z[0]                   # executor yaw 0 faces +z: its right is -x
 check(side[0] < -0.9 and side[180] > 0.9, f'orient: qi_vert yaw 0 bulges right, 180 left ({side})')
 
+
+# ---------------------------------------------------------------- the bursts on the shape (F2 round 1, V2R-01)
+def shape_point(s, e, frac):
+    """the world point at frac of the card's own b extent (flat: local +z, face: local +y; the crescent's rim at 0.8, the
+    wedge's point at 1) at its full size (the hrG scale), rolled as the card (view_px's math)"""
+    st = tstate(s.nbt[e.id].get('transformation', {}))
+    sc = [float(v) for v in cdata(s, e)['hrG']['transformation']['scale']]
+    b = {'flat': (0, 0, 1), 'face': (0, 1, 0)}[G.kind_info(kind(s, e))[0]]
+    v = mv(rot_axis(st['lax'], st['roll']), [b[i] * sc[i] * frac for i in range(3)])
+    E = mm(rot_y(math.radians(-e.rot[0])), rot_x(math.radians(e.rot[1])))
+    w = mv(E, [st['t'][i] + v[i] for i in range(3)])
+    return tuple(e.pos[i] + w[i] for i in range(3))
+
+
+FACE_R = getattr(G, 'FACE_ROLL', (20, 160))     # |roll| of the face mode (HR-12)
+BURSTS = [('qi_arc', dict(r=40, yaw=20, pitch=0, roll=0, c=1)), ('qi_arc', dict(r=40, yaw=20, pitch=0, roll=15, c=1)),
+          ('qi_arc', dict(r=36, yaw=0, pitch=0, roll=35, c=1)), ('qi_arc', dict(r=45, yaw=0, pitch=0, roll=-40, c=1)),
+          ('qi_arc', dict(r=40, yaw=20, pitch=30, roll=90, c=2)), ('qi_arc', dict(r=40, yaw=-30, pitch=0, roll=140, c=3)),
+          ('qi_arc', dict(r=40, yaw=0, pitch=-20, roll=-150, c=1)), ('qi_wedge', dict(r=46, roll=40)),
+          ('qi_wedge', dict(r=14, roll=30)), ('qi_wedge', dict(r=30, roll=-120)), ('qi_wedge', dict(r=30, roll=0)),
+          ('qi_wedge', dict(r=30, roll=10))]
+BURSTS += [(n, dict(a)) for n in ('qi_arc', 'qi_wedge') for a in sorted(REAL.get(n, ()), key=str)]
+nb, bmax = 0, 0.0
+for name, a in BURSTS:
+    face = FACE_R[0] <= abs(a["roll"]) <= FACE_R[1]
+    for h in HEIGHT[name]:
+        s = fresh()
+        s.run(G.fx(name, **a), pos=(X0, FLOOR + h, Z0), rot=(Y0, 0.0))
+        tag = f'bursts: {name} {a} h {h}'
+        shp = [e for e in s.cards() if kind(s, e).startswith(('qi_arc', 'qi_wedge'))]
+        check(shp and all(kind(s, e).startswith(('qi_arcf_', 'qi_wedgef')) == face for e in shp),
+              f'{tag}: the {"face" if face else "flat"} kinds ({sorted({kind(s, e) for e in shp})})')
+        check(s.parts, f'{tag}: its particle burst')
+        if not shp or not s.parts:
+            continue
+        tip = shape_point(s, shp[-1], 0.8 if name == 'qi_arc' else 1.0)
+        far = max(math.dist(p, tip) for _n, p in s.parts)
+        nb += 1
+        bmax = max(bmax, far)
+        check(far <= 0.5, f'{tag}: every burst particle within 0.5 b of the {"rim" if name == "qi_arc" else "point"} '
+                          f'({far:.2f} b; the {"face" if face else "flat"} mode)')
+check(nb >= 20, f'bursts: {nb} runs')
+print(f'bursts: {nb} runs, the farthest particle {bmax:.3f} b from its rim / point')
+
+# ---------------------------------------------------------------- qi_line's direction at every module call (F2 round 1, VF2-1-01)
+# HR-12 turned qi_line ACROSS its executor's facing (the kit's +90, pitch kept). Each module call runs in the sim (@s = her,
+# yaw 0) and its line is checked by what the call is built for: `facing entity <x>` -> along the executor -> x (such a caller
+# turns by -90 first: `... facing entity <x> feet rotated ~-90 ~ run ...qi_line`); pitched straight down (`rotated ~ 90`, the
+# A8.9 / A13 dive) -> straight down; else (A4 / A5's slash) -> across her facing, level. Anything else fails here (decide).
+QL_AT = (X0 + 3.0, FLOOR, Z0 + 4.0)           # the target of a `facing entity` call: a floor spot off her aim
+
+
+def qline_axes(ln):
+    """(card origin, card axis, the facing target or None) of every qi_line card the call line makes"""
+    face_t = re.search(r'facing entity (@[aeps])(\[[^\]]*\])? (feet|eyes)', ln)
+    s = fresh()
+    s.run(f'summon minecraft:husk {X0} {FLOOR + (5.0 if face_t else 0.0)} {Z0} {{Tags:["rlk_mb_body"]}}')
+    her = [e for e in s.ents if e.etype == 'husk'][0]
+    tgt = None
+    if face_t:
+        sel = face_t.group(2) or ''
+        tags = re.findall(r'tag=([\w.+-]+)', sel)
+        if face_t.group(1) in ('@a', '@p'):
+            ent = s.player
+            ent.pos = list(QL_AT)
+            ent.tags.update(tags)
+        else:
+            ty = (re.search(r'type=(?:minecraft:)?(\w+)', sel) or [None, 'marker'])[1]
+            s.run(f'summon minecraft:{ty} {QL_AT[0]} {QL_AT[1]} {QL_AT[2]} {{Tags:{json.dumps(tags)}}}')
+            ent = [e for e in s.ents if e.etype == ty and e is not her][-1]
+        tgt = (ent.pos[0], ent.pos[1] + (ent.data.get('eye', 0.0) if face_t.group(3) == 'eyes' else 0.0), ent.pos[2])
+    s.run(COND_Q.sub('', ln), ex=her, pos=tuple(her.pos), rot=(0.0, 0.0))
+    return [(tuple(e.pos), card_axes(s, e)[1], tgt) for e in s.cards() if kind(s, e) == 'qline']
+
+
+COND_Q = re.compile(r' (?:if|unless) score \S+ \S+ matches \S+')
+
+
+def qline_verdict(ln):
+    """(ok, what) for one call line"""
+    got = qline_axes(ln)
+    if not got:
+        return False, 'no qi_line card'
+    out = []
+    for pos, z, tgt in got:
+        if tgt is not None:
+            d = [tgt[i] - pos[i] for i in range(3)]
+            n = math.sqrt(sum(v * v for v in d)) or 1.0
+            c = sum(z[i] * d[i] / n for i in range(3))
+            out.append((c > 0.98, f'along the executor -> its facing target (cos {c:.2f})'))
+        elif re.search(r'rotated \S+ 90\b', ln):
+            out.append((z[1] < -0.98, f'straight down (axis y {z[1]:+.2f})'))
+        elif re.search(r'\bfacing\b|rotated \S+ -?[1-9]', ln):
+            out.append((False, 'an unclassified aim (facing / pitched): decide what the line is for and extend this check'))
+        else:
+            out.append((abs(z[2]) < 0.05 and abs(z[1]) < 0.05, f'across her facing, level (axis {tuple(round(v, 2) for v in z)})'))
+    return all(ok for ok, _ in out), out[0][1]
+
+
+# the hand-off form for an along-the-aim caller (F1's A10 dive line after the merge: f2_requests f2-7) and the bare form
+DEMO = ('execute at @s positioned ~ ~1.0 ~ facing entity @e[type=minecraft:marker,tag=rlk_hr_lock,limit=1] feet{} run '
+        'function rlk:boss/scarlet/fx/p/qi_line {{len:60}}')
+ok, what = qline_verdict(DEMO.format(' rotated ~-90 ~'))
+check(ok, f'qline: `facing entity <x> feet rotated ~-90 ~ run qi_line` runs along the aim to x ({what})')
+ok, what = qline_verdict(DEMO.format(''))
+check(not ok, f'qline: a bare `facing entity <x> run qi_line` runs across the aim, not to x ({what})')
+if MERGED:
+    qcalls = []
+    for p in sorted(x for x in MOD.rglob('*.mcfunction') if not x.relative_to(MOD).as_posix().startswith('fx/')):
+        for ln in p.read_text(encoding='utf-8').split('\n'):
+            if 'fx/p/qi_line' in ln and not ln.startswith('#'):
+                qcalls.append((p.relative_to(MOD).as_posix(), ln))
+    check(len(qcalls) >= 3, f'qline: {len(qcalls)} module qi_line calls')
+    for rel, ln in qcalls:
+        ok, what = qline_verdict(ln)
+        check(ok, f'qline: {rel}: the line runs {what} — `{ln[:150]}`')
+
 # ---------------------------------------------------------------- qi_band's sweep (HR-32)
 for sw in (25, 45, 200):
     s = fresh()
@@ -906,11 +1023,18 @@ CAMS = {'F5': Cam((PLY[0], PLY[1] + F5_SEAT, PLY[2]), 180.0, P5, F5_BACK), 'FP':
 COND = re.compile(r' (?:if|unless) score \S+ \S+ matches \S+')
 
 
-def view_scene(first_person):
+# F2 round 1 (VF2-1-03): the deflect's judge (A13 k/255 glides her to the player's spot + 1 b): she hovers 1 b over the floor
+# 0.5 b in front of the player, who looks up at her chest; first person is checked at these look pitches
+JUDGE_HER = (PLY[0], FLOOR + 1.0, PLY[2] - 0.5)
+JUDGE_LOOKS = (-30.0, -50.0, -70.0, -85.0)
+
+
+def view_scene(first_person, look=None):
     s = fresh()
     s.player.pos = list(PLY)
-    s.player.rot = [180.0, P1 if first_person else P5]
-    s.run(f'summon minecraft:husk {HER[0]} {HER[1]} {HER[2]} {{Tags:["rlk_mb_body"]}}')
+    s.player.rot = [180.0, look if look is not None else P1 if first_person else P5]
+    her_at = JUDGE_HER if look is not None else HER
+    s.run(f'summon minecraft:husk {her_at[0]} {her_at[1]} {her_at[2]} {{Tags:["rlk_mb_body"]}}')
     her = [e for e in s.ents if e.etype == 'husk'][0]
     if first_person:
         s.player.tags.add('rlk_body')
@@ -920,9 +1044,11 @@ def view_scene(first_person):
     return s, her
 
 
-def view_of(lines, view):
-    """the most card pixels over the 7 ticks after the module's own call lines ran (@s = her) in that view's scene"""
-    s, her = view_scene(view == 'FP')
+def view_of(lines, view, look=None):
+    """the most card pixels over the 7 ticks after the module's own call lines ran (@s = her) in that view's scene (look:
+    the judge scene in first person at that look pitch)"""
+    s, her = view_scene(view == 'FP', look)
+    cam = CAMS[view] if look is None else Cam((PLY[0], PLY[1] + EYE, PLY[2]), 180.0, look)
     for ln in lines:
         m = re.search(r'tag=rlk_hr_cut,scores=\{hr=(\d+)\}', ln)
         if m and not [e for e in s.ents if 'rlk_hr_cut' in e.tags]:
@@ -932,7 +1058,7 @@ def view_of(lines, view):
     best = 0
     for _ in range(7):
         s.tick(1)
-        best = max(best, view_px(s, CAMS[view]))
+        best = max(best, view_px(s, cam))
     return best
 
 
@@ -974,10 +1100,26 @@ if MERGED:
             if m and 'at @e[tag=rlk_body,limit=1]' in ln and not ln.startswith('#'):
                 anchored.setdefault((rel, m.group(1)), []).append(ln)
     check(len(anchored) >= 4, f'view: {len(anchored)} player-anchored effects')
+    FULL = 0.9 * VW * VH                # a card sheet over the camera that fills the screen is not a visible effect
     for (rel, name), lines in sorted(anchored.items()):
+        judge = rel == 'shield/judge.mcfunction'
         for view, need in (('F5', 300), ('FP', VIEW_MIN)):
+            if judge and view == 'FP':
+                continue                 # the judge: first person in its own scene below
             px = view_of(lines, view)
-            check(px >= need, f'view: {rel} {name}: {px} card px in {view} (>= {need}; HR-45: first person)')
+            check(need <= px < FULL, f'view: {rel} {name}: {px} card px in {view} (>= {need}, < 90 % of the frame; HR-45: '
+                                     f'first person)')
+        # VF2-1-03: the judge's starburst / column in first person where the judge happens: she 1 b over the player's spot,
+        # the player looking up at her (base: 0 px at every look <= 0, or the whole screen under the leaned column)
+        seen = []
+        for look in (JUDGE_LOOKS if judge else ()):
+            px = view_of(lines, 'FP', look)
+            seen.append(f'{-look:.0f} deg {px}')
+            check(VIEW_MIN <= px < FULL, f'view: {rel} {name}: {px} card px in first person at the judge, looking up '
+                                         f'{-look:.0f} deg (>= {VIEW_MIN}, < 90 % of the frame)')
+        if seen:
+            print(f'view: the judge in first person, {name} looking up: ' + ', '.join(seen) + ' px')
+    check(sum(1 for (rel, _n) in anchored if rel == 'shield/judge.mcfunction') == 2, 'view: the judge\'s starburst and column')
 
 # ============================================================== props
 for name, (doc, looks, bb, anim) in G.PROPS.items():

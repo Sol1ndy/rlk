@@ -94,17 +94,22 @@ class Seq:
 
 # F2 (HR-29): the cutscenes the footage plays without the HUD (CS0, CS1, CS4 + the event coda; cutscenes.md §12) hold the
 # player's actionbar HUD on every tick (hudHold 2 as the skip prompt does; player/hud/tick rests while it is >= 1). CS2 / CS3,
-# SQ1 and the lead-ins keep it (the footage shows it there).
+# SQ1 and the lead-ins keep it (the footage shows it there). F2 round 1 (VF2-1-02): the hold only stops new sends, and the
+# game keeps the last actionbar on screen ~60 t, so each of these sequences also blanks it once at its start (as the skip
+# prompt's end and the other kits' banner ends do); CS0's skip prompt at 20 then replaces the blank.
 HUD_OFF = ('intro', 'cs1', 'ending', 'event')
 HUD_HOLD = 'scoreboard players set @a[tag=player] hudHold 2'
+HUD_BLANK = 'title @a[tag=player] actionbar ""'
 
 
 def write(W, name, s, head, length, start_head=(), cancel=(), macro=False):
     """seq/<name>/{start,tick,cancel} + k/<t> + b/<a>_<b>. start = its head lines, #sqdone 0, then the tick-0 lines."""
     base = f'{SEQ}/{name}'
     hold = [HUD_HOLD] if name in HUD_OFF else []
+    blank = [HUD_BLANK] if name in HUD_OFF else []
     W.w(f'seq/{name}/start', [f'# {head}', f'# Start (@s = the body, at it; #sq {OBJ} = 0){" — macro" if macro else ""}.',
-                              *[c for c in start_head if c], f'scoreboard players set #sqdone {OBJ} 0', *hold, *s.t.get(0, [])])
+                              *[c for c in start_head if c], f'scoreboard players set #sqdone {OBJ} 0', *hold, *blank,
+                              *s.t.get(0, [])])
     ticks = sorted(t for t in s.t if t > 0)
     assert all(t <= length for t in ticks), (name, max(ticks), length)
     for t in ticks:

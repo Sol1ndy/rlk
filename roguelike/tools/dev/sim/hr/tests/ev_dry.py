@@ -169,8 +169,17 @@ for r, L in F.items():
         if m and not any(f'tag={m.group(1)}' in x and ' tp @s ' in x for x in L[i + 1:i + 3]):
             unrot.append(r)
 check('static: every summoned display is rotated right after its summon (summon ignores the execute rotation)', not unrot, unrot)
-txt = [l for l in ALL.split('\n') if re.search(r'^(?:execute .* run )?(tellraw|title @|say )', l)]
-check('static: no raw on-screen text (lines, overlays, the banner only through the kit)', not txt, txt[:2])
+# F2 round 1 (VF2-1-02): the HUD-off sequences blank the actionbar once at their start (seq.HUD_BLANK, an empty actionbar:
+# no text) — the hold only stops new sends and the game keeps the last actionbar ~60 t
+BLANK = getattr(seq, 'HUD_BLANK', None)
+txt = [l for l in ALL.split('\n') if re.search(r'^(?:execute .* run )?(tellraw|title @|say )', l) and l != BLANK]
+check('static: no raw on-screen text (lines, overlays, the banner only through the kit; the empty actionbar aside)', not txt, txt[:2])
+blank_bad = {n: [l for l in F.get(f'seq/{n}/start', []) if l == 'title @a[tag=player] actionbar ""'] for n in ('intro', 'cs1', 'ending', 'event')}
+blank_bad = {n: len(v) for n, v in blank_bad.items() if len(v) != 1}
+blank_more = sorted(r for r, L in F.items() if not re.match(r'seq/(intro|cs1|ending|event)/start$', r)
+                    and any(l == 'title @a[tag=player] actionbar ""' for l in L))
+check('static: CS0 / CS1 / CS4 / the coda blank the actionbar once at their start, nowhere else (VF2-1-02)',
+      not blank_bad and not blank_more, (blank_bad, blank_more[:3]))
 korean = sorted({x for l in ALL.split('\n') for x in re.findall(r'"([^"\n]*[가-힣][^"\n]*)"', l)})
 check(f'static: the only literal on-screen words are the title / sub ({korean})', set(korean) <= {api.NAME, api.SUB})
 cam = [l for l in ALL.split('\n') if re.search(r'\b(spectate|gamemode|inputPermission|attribute .*movement_speed)\b', l)]

@@ -23,11 +23,14 @@ execute if score #fm hrFx matches 1 run data modify storage rlk:hr fx.pa.k1 set 
 execute if score #fm hrFx matches 1 run data modify storage rlk:hr fx.pa.k2 set value "qi_arcf_2"
 execute if score #fm hrFx matches 1 run data modify storage rlk:hr fx.pa.k3 set value "qi_arcf_3"
 function rlk:boss/scarlet/fx/e/clamp_arc
+function rlk:boss/scarlet/fx/e/rollv
 execute store result storage rlk:hr fx.pa.s float 0.1 run scoreboard players get #r hrFx
 execute store result storage rlk:hr fx.pa.s9 float 0.09 run scoreboard players get #r hrFx
-execute store result storage rlk:hr fx.pa.f float 0.08 run scoreboard players get #r hrFx
 execute store result storage rlk:hr fx.pa.pd float 0.025 run scoreboard players get #r hrFx
 execute store result storage rlk:hr fx.pa.ly float 0.01 run scoreboard players get #ly hrFx
+execute store result storage rlk:hr fx.pa.bx float 0.00008 run scoreboard players get #bx hrFx
+execute store result storage rlk:hr fx.pa.by float 0.00008 run scoreboard players get #by hrFx
+execute store result storage rlk:hr fx.pa.bz float 0.00008 run scoreboard players get #bz hrFx
 execute if score #c hrFx matches 2 run return run function rlk:boss/scarlet/fx/p/e/qi_arc_2 with storage rlk:hr fx.pa
 execute if score #c hrFx matches 3 run return run function rlk:boss/scarlet/fx/p/e/qi_arc_3 with storage rlk:hr fx.pa
 execute if score #c hrFx matches 4 run return run function rlk:boss/scarlet/fx/p/e/qi_arc_4 with storage rlk:hr fx.pa

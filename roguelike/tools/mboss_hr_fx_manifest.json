@@ -55,7 +55,7 @@
   "hrFxQ",
   "hrFxY"
  ],
- "fake_players": "#n, #na, #ni, #ser, #now, #now2, #wd, #c2, #col, #roll, #spin, #life, #fade, #dly, #dur, #hit, #pool, #a, #b, #c, #k, #t, #it, #f, #h, #pt, #fl, #m, #r, #p, #o, #i, #j, #ly, #n2, #g, #on, #sk, #l, #lid, #at, #af, #lnW, #lnA, #lnE, #ovH, #ovE, #oi, #oh, #oo, #demo, #dt, #s, #d, #my, #mz, #ny, #nz, #cm1, #c3, #c4, #c26, #c90, #c10, #c20, #c36, #c100, #c115, #c360, #c1000, #c104, #c5, #fm, #sw, #tx, #ty, #keep, #fol, #fy, #y, #ovS, #ovI (objective hrFx)",
+ "fake_players": "#n, #na, #ni, #ser, #now, #now2, #wd, #c2, #col, #roll, #spin, #life, #fade, #dly, #dur, #hit, #pool, #a, #b, #c, #k, #t, #it, #f, #h, #pt, #fl, #m, #r, #p, #o, #i, #j, #ly, #n2, #g, #on, #sk, #l, #lid, #at, #af, #lnW, #lnA, #lnE, #ovH, #ovE, #oi, #oh, #oo, #demo, #dt, #s, #d, #my, #mz, #ny, #nz, #cm1, #c3, #c4, #c26, #c90, #c10, #c20, #c36, #c100, #c115, #c360, #c1000, #c104, #c5, #fm, #sw, #tx, #ty, #keep, #fol, #fy, #y, #ovS, #ovI, #rx, #ry, #rz, #ra, #rb, #bx, #by, #bz (objective hrFx)",
  "tags": [
   "rlk_hr_fx",
   "rlk_hr_fx_c",

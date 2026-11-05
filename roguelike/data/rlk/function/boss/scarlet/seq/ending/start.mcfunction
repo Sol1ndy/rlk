@@ -9,3 +9,4 @@ execute as @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] at @s facing entit
 function rlk:boss/scarlet/rig/play/ending
 scoreboard players set #sqdone hr 0
 scoreboard players set @a[tag=player] hudHold 2
+title @a[tag=player] actionbar ""
