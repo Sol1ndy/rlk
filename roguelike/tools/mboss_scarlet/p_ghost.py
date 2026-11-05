@@ -636,11 +636,12 @@ class Walk:
                 g.at(black_t, S.gate(f'if score {api.PIPS_FP} {OBJ} matches 1..', black[0]))
             g.ev(black_t, 'hud', 'ovl black (pips left)', 'FAIL5_T black')
             fail = ([f'# {key.upper()} fail (#gres 2 at T + {jt}; lethal: ULT{60 if key == "a8" else 5}_LETHAL {lethal}; @s = the body): the instant death staged',
-                     '# as 홍련일섬 (PLAN §5.5): the pink-white flash, the scarlet line rising 13 deg toward the player\'s right through their',
-                     '# chest, the petal burst, the slash; ult/fatal as the player (through i-frames and shields; Ronova\'s revive applies).',
+                     '# as 홍련일섬 (PLAN §5.5): the pink-white flash, the scarlet line across the player\'s view (yaw 90, as CS1 C8) rising',
+                     '# 13 deg toward their right through their chest, the petal burst, the slash; ult/fatal as the player (through i-frames',
+                     '# and shields; Ronova\'s revive applies).',
                      f'# She lands 2 b in front of the player (g_reform).']
                     + [x for x in (K.ovl('pinkwhite', 0, 3, 8),) if x]
-                    + S.fx('scarlet_line', [part(DUST['crimson'], 3.0, 0.05, 0.05, 0, 60)], pos=at_player(1.3), len=600, yaw=0, roll=13)
+                    + S.fx('scarlet_line', [part(DUST['crimson'], 3.0, 0.05, 0.05, 0, 60)], pos=at_player(1.3), len=600, yaw=90, roll=13)
                     + S.fx('petal_burst', [part('minecraft:cherry_leaves', 1.2, 0.8, 1.2, 0.05, 40)], pos=at_player(1.0), r=20)
                     + S.snd('fatal_slash', pos=f'at {PLAYER}')
                     + [f'execute as {PL} at @s run {api.shield("fatal")}', api.play('g_reform'), FACE] + glide_spot('land', LAND_T))

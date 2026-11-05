@@ -533,7 +533,7 @@ fill 869 201 -1 869 201 1 minecraft:crimson_roots strict
 setblock 871 201 -1 minecraft:crimson_roots strict
 fill 878 201 -1 879 201 -1 minecraft:crimson_roots strict
 setblock 882 201 -1 minecraft:light[level=9] strict
-setblock 886 201 -1 minecraft:crimson_roots strict
+fill 885 201 -1 886 201 -1 minecraft:crimson_roots strict
 fill 891 201 -1 893 201 -1 minecraft:crimson_roots strict
 fill 899 201 -1 901 201 -1 minecraft:crimson_roots strict
 fill 903 201 -1 903 201 0 minecraft:crimson_roots strict
@@ -566,6 +566,7 @@ setblock 890 201 2 minecraft:crimson_roots strict
 fill 897 201 2 897 201 3 minecraft:crimson_roots strict
 fill 899 201 2 899 201 4 minecraft:crimson_roots strict
 setblock 879 201 3 minecraft:light[level=9] strict
+setblock 885 201 3 minecraft:light[level=9] strict
 setblock 896 201 3 minecraft:crimson_roots strict
 setblock 904 201 3 minecraft:light[level=9] strict
 setblock 857 201 4 minecraft:light[level=9] strict
@@ -578,7 +579,6 @@ setblock 861 201 5 minecraft:crimson_roots strict
 setblock 865 201 5 minecraft:light[level=9] strict
 setblock 867 201 5 minecraft:crimson_roots strict
 fill 876 201 5 877 201 5 minecraft:crimson_roots strict
-setblock 884 201 5 minecraft:crimson_roots strict
 setblock 890 201 5 minecraft:light[level=9] strict
 fill 892 201 5 893 201 5 minecraft:crimson_roots strict
 setblock 898 201 5 minecraft:crimson_roots strict
@@ -586,10 +586,11 @@ setblock 904 201 5 minecraft:crimson_roots strict
 fill 855 201 6 856 201 6 minecraft:crimson_roots strict
 setblock 858 201 6 minecraft:light[level=9] strict
 setblock 882 201 6 minecraft:crimson_roots strict
-setblock 883 201 6 minecraft:light[level=9] strict
 setblock 893 201 6 minecraft:crimson_roots strict
 setblock 855 201 7 minecraft:crimson_roots strict
 setblock 876 201 7 minecraft:light[level=9] strict
+setblock 882 201 7 minecraft:light[level=9] strict
+setblock 884 201 7 minecraft:light[level=9] strict
 fill 889 201 7 891 201 8 minecraft:crimson_roots strict
 setblock 894 201 7 minecraft:crimson_roots strict
 fill 897 201 7 899 201 9 minecraft:crimson_roots strict

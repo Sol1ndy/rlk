@@ -66,7 +66,7 @@ CHECK = {'n': 5, 'theme': THEME, 'ver': 1, 'cx': CX, 'cy': CY, 'cz': CZ, 'r': RA
 # copied from tools/mboss_scarlet/api.py (asserted equal by HR/tests/test_arena_hr.py)
 MOON_POS = (889.0, 218.0, -34.0)
 MOON_BEARING, MOON_ELEV, MOON_R = 12, 22, 5
-SEAT_POS = (884.5, 201.0, 0.0)
+SEAT_POS = (884.0, 201.0, 5.0)    # I1b (lead decision 1): 5 b nearer start on the same line (D0: 884.5 201 0)
 LOOK_ID = {'moon': 1, 'crimson': 2, 'dark': 3}
 DARK_SLICES = (-17, -14, -11, -8)
 DARK_LIGHT = True

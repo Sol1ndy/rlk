@@ -3,3 +3,5 @@
 execute if data storage rlk:hr fx{lk:"p1"} run return run function rlk:boss/scarlet/fx/prop/e/moon_halo_p1
 execute if data storage rlk:hr fx{lk:"p2"} run return run function rlk:boss/scarlet/fx/prop/e/moon_halo_p2
 execute if data storage rlk:hr fx{lk:"off"} run return run function rlk:boss/scarlet/fx/prop/e/moon_halo_off
+execute if data storage rlk:hr fx{lk:"p1b"} run return run function rlk:boss/scarlet/fx/prop/e/moon_halo_p1b
+execute if data storage rlk:hr fx{lk:"p2b"} run return run function rlk:boss/scarlet/fx/prop/e/moon_halo_p2b

@@ -161,14 +161,33 @@ def build(W, ctx):
                '# the pattern / sequence clock).',
                f'execute if score #ph {OBJ} matches {PH["intro"]} run {fn("core/intro/done")}',
                fn('core/fight'), api.rig('tick')])
+    amb1, amb2 = K.p('ambient_p1'), K.p('ambient_p2')
     w('core/fight', [
-        '# One fight tick (@s = body): the module clock, the look requests, the floor, the state of the phase, invulnerability.',
+        '# One fight tick (@s = body): the module clock, the look requests, the floor, the state of the phase, the arena ambience,',
+        '# invulnerability.',
         f'scoreboard players add #clk {OBJ} 1',
         fn('core/look'),
         f'execute if score #mbFloorHit mb matches 1 run {fn("core/floor_hit")}',
         f'execute if score #mbFloor mb matches 1.. if score @s mhpC <= #mbFloor mb run {fn("core/floor_hit")}',
-        fn('core/state'),
-        f'execute if score #mbSt mb matches 1 run {fn("core/inv")}'])
+        fn('core/state')]
+      + ([fn('core/amb')] if amb1 and amb2 else [])
+      + [f'execute if score #mbSt mb matches 1 run {fn("core/inv")}'])
+    if amb1 and amb2:
+        # I1b (request s1k-2; PLAN §6.3 / §6.4): the kit's arena ambience at each player on the module clock
+        w('core/amb', [
+            f'# The arena ambience (@s = body; PLAN §6.3 / §6.4): ambient_p1 every {AMB_EVERY[0]} t at each player in P1, ambient_p2',
+            f'# every {AMB_EVERY[1]} t in P2, the down window and the gauntlets; none in a sequence (it stages its own effects).',
+            f'scoreboard players operation #t {OBJ} = #clk {OBJ}',
+            f'execute if score #ph {OBJ} matches {PH["p1"]} run return run {fn("core/amb1")}',
+            f'execute if score #ph {OBJ} matches {PH["a8"]}..{PH["a13"]} unless score #ph {OBJ} matches {PH["cs2"]} '
+            f'unless score #ph {OBJ} matches {PH["lead"]} run {fn("core/amb2")}'])
+        w('core/amb1', [f'# ambient_p1 at each player every {AMB_EVERY[0]} t of the module clock (#t = #clk).',
+                        f'scoreboard players operation #t {OBJ} %= #c{AMB_EVERY[0]} {OBJ}',
+                        f'execute if score #t {OBJ} matches 0 at @a[tag=player] run {amb1}'])
+        w('core/amb2', [f'# ambient_p2 at each player every {AMB_EVERY[1]} t of the module clock (#t = #clk).',
+                        f'scoreboard players set #t2 {OBJ} {AMB_EVERY[1]}',
+                        f'scoreboard players operation #t {OBJ} %= #t2 {OBJ}',
+                        f'execute if score #t {OBJ} matches 0 at @a[tag=player] run {amb2}'])
     w('core/state', [
         '# The state of the phase (@s = body).',
         f'execute if score #rp {OBJ} matches 1 run return run {fn("core/replay/tick")}',
@@ -241,6 +260,13 @@ def build(W, ctx):
 
 
 # ================================================================================================== decor props
+# I1b (request s1k-2): the arena ambience period in P1 / in P2, the down window and the gauntlets (PLAN §6.3 / §6.4)
+AMB_EVERY = (10, 6)
+assert AMB_EVERY[0] in S.CONSTS
+# I1b: the decor props' looks per arena look (PLAN §6.3 / §6.4 / §6.5 "kit props"; core/look/go re-looks them with the job)
+DECO_LOOK = {'moon': ('p1', 'bud'), 'crimson': ('p2', 'bloom'), 'dark': ('off', 'bloom')}
+
+
 def deco(W):
     """core/deco (spawn): the decor props of api.deco() through the kit (fx/prop/*), each an item_display summoned at its
     point, then rotated, then given its look; tag rlk_hr_deco + rlk_hr_deco_<name>. core/deco_re (reload): the moon halo
@@ -269,9 +295,13 @@ def deco(W):
     kill = [f'kill @e[type=minecraft:item_display,tag={tg}]']
     W.w('core/deco', ['# The decor props at spawn (PLAN §6.7): the moon halo (p1), 8 lotus buds, the seat rock (bottle).']
         + kill + one('moon_halo', halo, yaw_halo, 'p1') + lotus + seat_l)
-    W.w('core/deco_re', ['# The decor props after a /reload (aux entities are gone): the moon halo of the phase, the lotus.']
-        + kill + [S.gate(f'if score #ph {OBJ} matches ..{PH["p1"]}', x) for x in one('moon_halo', halo, yaw_halo, 'p1')]
-        + [S.gate(f'if score #ph {OBJ} matches {PH["cs1"]}..', x) for x in one('moon_halo', halo, yaw_halo, 'p2')] + lotus)
+    bloom = []
+    for i, p in enumerate(d['lotus']):
+        bloom += one('lotus', p, (i * 47) % 360, 'bloom')
+    W.w('core/deco_re', ['# The decor props after a /reload (aux entities are gone): the moon halo and the lotus of the phase (a',
+                         '# look request then sets them to its look, core/look/go).']
+        + kill + [S.gate(f'if score #ph {OBJ} matches ..{PH["p1"]}', x) for x in one('moon_halo', halo, yaw_halo, 'p1') + lotus]
+        + [S.gate(f'if score #ph {OBJ} matches {PH["cs1"]}..', x) for x in one('moon_halo', halo, yaw_halo, 'p2') + bloom])
     W.w('core/deco_seat', ['# The seat rock again (the intro replay).', 'kill @e[tag=rlk_hr_deco_seat_rock]'] + seat_l)
 
 
@@ -525,6 +555,13 @@ def look_files(W):
         job = api.look_job(look)
         if job:
             go.append(f'execute if score #hrLook {OBJ} matches {i} in minecraft:overworld run {job}')
+    # I1b: the decor props follow the look (PLAN §6.3-6.5 "kit props"): the halo p1 / p2 / off, the lotus bud / bloom
+    for look, i in api.LOOK_ID.items():
+        for name, lk in (('moon_halo', DECO_LOOK[look][0]), ('lotus', DECO_LOOK[look][1])):
+            c = K.prop(name, look=lk)
+            if c:
+                go.append(f'execute if score #hrLook {OBJ} matches {i} as @e[type=minecraft:item_display,'
+                          f'tag={api.TAGS["deco_" + name]}] run {c}')
     go.append(sset('#hrLook', 0))
     w('core/look/go', go)
     w('core/look', ['# The look request (PLAN §6.6): started at the first tick with no arena job (#mbArBuild 0), so a pause or a',

@@ -108,7 +108,7 @@ execute if score #demo hrFx matches 51 if score #dt hrFx matches 90.. run functi
 execute if score #demo hrFx matches 52 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/petal_big
 execute if score #demo hrFx matches 52 if score #dt hrFx matches 90.. run function rlk:boss/scarlet/fx/test/e/end
 execute if score #demo hrFx matches 53 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/moon_halo
-execute if score #demo hrFx matches 53 if score #dt hrFx matches 90.. run function rlk:boss/scarlet/fx/test/e/end
+execute if score #demo hrFx matches 53 if score #dt hrFx matches 140.. run function rlk:boss/scarlet/fx/test/e/end
 execute if score #demo hrFx matches 54 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/lotus
 execute if score #demo hrFx matches 54 if score #dt hrFx matches 90.. run function rlk:boss/scarlet/fx/test/e/end
 execute if score #demo hrFx matches 55 as @e[type=minecraft:armor_stand,tag=rlk_hr_fx_demo,limit=1] run function rlk:boss/scarlet/fx/test/e/prop/seat_rock

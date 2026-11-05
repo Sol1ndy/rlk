@@ -10,7 +10,7 @@ execute if score #sq hr matches ..307 run return run function rlk:boss/scarlet/s
 execute if score #sq hr matches ..368 run return run function rlk:boss/scarlet/seq/ending/b/308_368
 execute if score #sq hr matches ..514 run return run function rlk:boss/scarlet/seq/ending/b/448_514
 execute if score #sq hr matches ..524 run return run function rlk:boss/scarlet/seq/ending/b/515_524
-execute if score #sq hr matches ..797 run return run function rlk:boss/scarlet/seq/ending/b/525_797
-execute if score #sq hr matches ..807 run return run function rlk:boss/scarlet/seq/ending/b/798_807
-execute if score #sq hr matches ..984 run return run function rlk:boss/scarlet/seq/ending/b/808_984
-execute if score #sq hr matches ..1000 run return run function rlk:boss/scarlet/seq/ending/b/1000_1000
+execute if score #sq hr matches ..795 run return run function rlk:boss/scarlet/seq/ending/b/525_795
+execute if score #sq hr matches ..805 run return run function rlk:boss/scarlet/seq/ending/b/796_805
+execute if score #sq hr matches ..815 run return run function rlk:boss/scarlet/seq/ending/b/806_815
+execute if score #sq hr matches ..1000 run return run function rlk:boss/scarlet/seq/ending/b/936_1000

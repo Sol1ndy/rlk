@@ -1,4 +1,5 @@
-# intro: the ticks 452..606.
+# intro: the ticks 444..604.
+execute if score #sq hr matches 444 run return run function rlk:boss/scarlet/seq/intro/k/444
 execute if score #sq hr matches 452 run return run function rlk:boss/scarlet/seq/intro/k/452
 execute if score #sq hr matches 460 run return run function rlk:boss/scarlet/seq/intro/k/460
 execute if score #sq hr matches 468 run return run function rlk:boss/scarlet/seq/intro/k/468
@@ -8,4 +9,3 @@ execute if score #sq hr matches 502 run return run function rlk:boss/scarlet/seq
 execute if score #sq hr matches 510 run return run function rlk:boss/scarlet/seq/intro/k/510
 execute if score #sq hr matches 554 run return run function rlk:boss/scarlet/seq/intro/k/554
 execute if score #sq hr matches 604 run return run function rlk:boss/scarlet/seq/intro/k/604
-execute if score #sq hr matches 606 run return run function rlk:boss/scarlet/seq/intro/k/606

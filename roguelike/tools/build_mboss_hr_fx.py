@@ -1306,8 +1306,13 @@ SPLIT_CS = {'ev_take': (1, 2)}         # the c variants a split preset has (defa
 # ----------------------------------------------------------------------------- props (api.KIT_PROPS)
 FOLLOW_STAY = f'{TAG}fs'               # followers that keep their own spot and go with their lead (the seat rock's items)
 DISC_SCALE = api.DISC['hr']            # the flat unit-radius disc card x 1.4 = the hazard's half width
+# I1b (requests s1k-3 / s2b-4): the halo's bright looks p1b / p2b are the same sprites HALO_BRIGHT x brighter than p1 / p2.
+# A custom_model_data tint only multiplies (white = the sprite as painted), so p1 / p2 carry the tint 1 / HALO_BRIGHT
+# (212 = 0xD4D4D4) and p1b / p2b the white one.
+HALO_BRIGHT = 1.2
+HALO_TINT = round(255 / HALO_BRIGHT) * 0x010101
 PROPS = {
-    # name -> (doc, {look: (kind or None (hidden), scale)}, billboard, anim ('d' disc spin / 'p' petal rock / None))
+    # name -> (doc, {look: (kind or None (hidden), scale[, tint])}, billboard, anim ('d' disc spin / 'p' petal rock / None))
     'disc': ('A7 moon disc (R2, A13): one flat lilac disc card on the projectile display (radius 1.4 = the hazard\'s half '
              'width), horizontal, spinning 30 deg per tick (quarter turns over 3 t), facing its flight (the display\'s yaw).',
              {None: ('disc_0', DISC_SCALE)}, 'fixed', 'd'),
@@ -1315,8 +1320,10 @@ PROPS = {
                   'whole / cut (a glowing line across) / split (the halves apart).',
                   {'whole': ('petal_big_0', 0.8), 'cut': ('petal_big_1', 0.8), 'split': ('petal_big_2', 0.8)}, 'fixed', 'p'),
     'moon_halo': ('The halo card 1 b in front of the block moon (12.4 b, facing the arena as the caller turned it; its centre '
-                  'clear, the block disc shows through): {look} p1 white-blue / p2 red / off (hidden).',
-                  {'p1': ('moon_halo_0', 12.4), 'p2': ('moon_halo_1', 12.4), 'off': (None, 0.0)}, 'fixed', None),
+                  'clear, the block disc shows through): {look} p1 white-blue / p2 red / off (hidden) / p1b, p2b = p1, p2 about '
+                  '20 % brighter (CS0 E3, the CS4 moon gaze).',
+                  {'p1': ('moon_halo_0', 12.4, HALO_TINT), 'p2': ('moon_halo_1', 12.4, HALO_TINT), 'off': (None, 0.0),
+                   'p1b': ('moon_halo_0', 12.4), 'p2b': ('moon_halo_1', 12.4)}, 'fixed', None),
     'lotus': ('A lotus flower on the pond (the water surface; 0.9 b, standing, turning to the viewer): {look} bud (closed, pale '
               'pink, P1) / bloom (open crimson, P2).', {'bud': ('lotus_0', 0.9), 'bloom': ('lotus_1', 0.9)}, 'vertical', None),
     'seat_rock': ('CS0 her seat: a low flat stone (vanilla tuff, 1.5 x 0.75 x 1.1 b, its top 0.75 b over the display: no '
@@ -1773,14 +1780,14 @@ def engine(W):
         f'tag @e[tag={TAG}_t] remove {TAG}_t'])
 
 
-def _dress(kind, sc, bb, anim=None, item='minecraft:paper', bright=True, trans=(0, 0, 0), extra=''):
-    """the data merge that dresses @s as a kit card / a vanilla item display"""
+def _dress(kind, sc, bb, anim=None, item='minecraft:paper', bright=True, trans=(0, 0, 0), extra='', tint=WHITE):
+    """the data merge that dresses @s as a kit card (tinted: white = as painted) / a vanilla item display"""
     sx, sy, sz = sc if isinstance(sc, tuple) else (sc, sc, sc)
     tr = (f'transformation:{{translation:[{num(trans[0])}f,{num(trans[1])}f,{num(trans[2])}f],left_rotation:[0f,0f,0f,1f],'
           f'scale:[{num(sx)}f,{num(sy)}f,{num(sz)}f],right_rotation:[0f,0f,0f,1f]}}')
     if kind:
         it = (f'item:{{id:"minecraft:paper",count:1,components:{{"minecraft:item_model":"{NS_TEX}{kind}",'
-              f'"minecraft:custom_model_data":{{colors:[{WHITE}]}}}}}}')
+              f'"minecraft:custom_model_data":{{colors:[{tint}]}}}}}}')
     else:
         it = f'item:{{id:"{item}",count:1{extra}}}'
     br = ',brightness:{sky:15,block:15}' if bright else ''
@@ -1819,11 +1826,11 @@ def props(W):
                                      f'function {P_}e/{name}_d', f'schedule function {E}anim 1t replace'])
             continue
         disp = []
-        for lk, (kind, sc) in looks.items():
+        for lk, (kind, sc, *tint) in looks.items():
             if kind is None:
                 body = [f'data merge entity @s {{transformation:{{scale:[0f,0f,0f]}}}}']
             else:
-                body = _dress(kind, sc, bb, anim)
+                body = _dress(kind, sc, bb, anim, tint=tint[0] if tint else WHITE)
             W.w(f'prop/e/{name}_{lk}', [f'# Internal: dress @s as {name}, look {lk}.'] + body)
             disp.append(f'execute if data storage {STO} fx{{lk:"{lk}"}} run return run function {P_}e/{name}_{lk}')
         W.w(f'prop/e/{name}_x', [f'# Internal: dress @s as {name} in the look of storage fx.lk.'] + disp)
@@ -2229,7 +2236,8 @@ DEMO_WHERE = {
 
 
 def demo_lens():
-    return dict(DEMO_LEN, **{f'prop/{p}': 90 for p in PROPS})
+    # a prop demo shows its looks 25 t apart: 90 t, longer for the halo's five looks (I1b: p1b / p2b)
+    return dict(DEMO_LEN, **{f'prop/{p}': max(90, 25 * len(PROPS[p][1]) + 15) for p in PROPS})
 
 
 def tests(W):

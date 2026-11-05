@@ -65,7 +65,9 @@ LOOK_REQ = '#hrLook'                                             # objective OBJ
 # dome wall at bearing 12, elevation 22 from C, facing south, in open sky right of the pine crown (PLAN §6.2).
 MOON_POS = (889.0, 218.0, -34.0)
 MOON_BEARING, MOON_ELEV, MOON_R = 12, 22, 5
-SEAT_POS = (884.5, 201.0, 0.0)      # CS0: her seat (kit prop seat_rock) ~8 b north of C on the start -> moon line (§3.1)
+# CS0: her seat (kit prop seat_rock) on the start -> moon line (§3.1), 26.7 b from start. I1b (lead decision 1): 5 b nearer
+# start than D0's (884.5, 201, 0), so the 0.15 b/t walk (17 legs of 1.2 b) meets a player who stays at start at <= 7 b.
+SEAT_POS = (884.0, 201.0, 5.0)
 # Decor props the module (S3) spawns at `spawn` (kit fx/prop/*, PLAN §6.7). S1K's theme may override them with a dict
 # DECO of the same shape (deco() reads it); these are the D0 defaults: the halo card 1 b in front of the moon, eight lotus
 # flowers on the pond (bearing, r) at the water surface, the seat rock.
@@ -685,7 +687,10 @@ KIT_PRESETS = {                       # fx/p/<name> (position / rotation = the e
 SCARLET_LINE_ROLL = 'roll > 0 rises toward the player\'s right (CS1 C8 / the 5 % instant death: +13 deg)'
 # fx/prop/<name> {look}: @s = the card / marker the caller summoned (summoned, then rotated); calling it again with
 # another look re-looks it
-KIT_PROPS = {'disc': {}, 'petal_big': {'look': ('whole', 'cut', 'split')}, 'moon_halo': {'look': ('p1', 'p2', 'off')},
+# I1b (requests s1k-3 / s2b-4): moon_halo p1b / p2b = p1 / p2 about 20 % brighter (the same sprite, a brighter tint), for
+# CS0 E3 (the cup raised to the moon) and the CS4 moon gaze (seq.py; back to p1 / p2 after).
+KIT_PROPS = {'disc': {}, 'petal_big': {'look': ('whole', 'cut', 'split')},
+             'moon_halo': {'look': ('p1', 'p2', 'off', 'p1b', 'p2b')},
              'lotus': {'look': ('bud', 'bloom')}, 'seat_rock': {'look': ('bottle', 'bare', 'set')}}
 # fx/snd/<name>: one recipe per sound of PLAN §3-§5 and §7 (vanilla events only, mboss_lib.sound min-volume rule). The
 # recipe the plan gives: ((event, volume, pitch), ...) layers; S1K may tune volumes by request.

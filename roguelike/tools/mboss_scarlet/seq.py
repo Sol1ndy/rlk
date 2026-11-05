@@ -161,6 +161,18 @@ def rock_kill():
     return f'execute positioned {num(p[0])} {num(p[1])} {num(p[2])} run kill @e[type=minecraft:item_display,tag={api.TAGS["deco"]},distance=..1]'
 
 
+def halo(bright):
+    """I1b (requests s1k-3 / s2b-4): S3's decor moon halo in the bright look of the arena's current look (moon -> p1b, crimson ->
+    p2b; the arena framework's record rlk:mboss look_hr_field) or back to its own (p1 / p2); in dark it stays off."""
+    out = []
+    for look, base in (('moon', 'p1'), ('crimson', 'p2')):
+        c = K.prop('moon_halo', look=base + ('b' if bright else ''))
+        if c:
+            out.append(f'execute if data storage rlk:mboss {{look_{api.AID}:"{look}"}} as @e[type=minecraft:item_display,'
+                       f'tag={api.TAGS["deco_moon_halo"]}] run {c}')
+    return out
+
+
 def line(i):
     return K.hud('line', id=i)
 
@@ -231,17 +243,19 @@ def build_intro(W):
     stop_wind = 'stopsound @a[tag=player] * minecraft:item.elytra.flying' if snd('cs0_wind') else None
     # E1 the bottle from the rock (24, rock bare), the pour sound 32, the wind stops 40, the bottle back (52, rock bottle)
     s.at(e('pour', -6), rock('bare')).at(e('pour', 2), snd('cs0_pour')).at(e('l1', 20), stop_wind).at(e('pour', 22), rock('bottle'))
-    # E2 the sip; E3 the cup to the moon (chime 118; the halo's +20 % has no kit means: requests/s2b.md)
+    # E2 the sip; E3 the cup to the moon (chime 118; I1b: the halo about 20 % brighter 112-146, requests s1k-3 / s2b-4)
     s.at(e('sip'), snd('cs0_sip')).at(e('raise', 8), snd('cs0_moon'))
+    s.at(e('raise', 2), halo(True)).at(e('l4'), halo(False))
     # E5 the cup set down (rock set), rising (cloth 230), the turn to the player 248-268 (the body turned <= 12 deg / t)
     s.at(e('cup_down'), snd('cs0_cup'), rock('set')).at(e('stand', 16), snd('cloth'))
     for t in range(e('turn'), e('turn', 21)):
         s.at(t, api.rig('face/track'))
-    # E6-E7 / E9 the walks: 8-t glide legs of 1.2 b (0.15 b/t) toward the player while >= 8.2 b away (stops at <= 7 b after the
-    # leg); a footfall sound every 8 t (the clip's 16-t cycle steps every 8 t)
-    leg = mv.add('leg', [f'execute if score #mbDist mb matches ..81 run return 0',
+    # E6-E7 / E9 the walks: 8-t glide legs of 1.2 b (0.15 b/t) toward the player while more than 7 b away, so she stops at
+    # <= 7 b (PLAN §3.1, as the skip's near7; I1b, lead decision 1: was >= 8.2 b, which stopped her at 7-8.1 b); a footfall
+    # sound every 8 t (the clip's 16-t cycle steps every 8 t)
+    leg = mv.add('leg', [f'execute if score #mbDist mb matches ..70 run return 0',
                          cand(f'at @s facing entity {PLB} feet rotated ~ 0 positioned ^ ^ ^1.2 {FLOOR}', glide(8))],
-                 'One walk leg: 1.2 b toward the player over 8 t while she is >= 8.2 b away')
+                 'One walk leg: 1.2 b toward the player over 8 t while she is more than 7 b away')
     for t0, t1 in ((e('scab_hand', 12), e('l8')), (e('l9'), e('l9', 48))):
         for t in range(t0, t1, 8):
             s.at(t, api.rig('face/track'), DIST, leg, snd('grass_step'))
@@ -257,7 +271,7 @@ def build_intro(W):
     s.at(x('tuck'), snd('cloth'), rock_kill(), api.rig('look/props/none')).at(x('music'), api.music(1))
     s.at(x('push'), L.push_ring(4.0, 4))
     head = 'CS0 intro (PLAN §3.1): seated with the cup and bottle, lines 1-10, the walk, the scabbard raised; intro_end: line 11, the draw, the stance.'
-    write(W, 'intro', s, head, api.SEQ_LEN['intro'], start_head=stage() + [api.play('intro')], cancel=[stop_wind])
+    write(W, 'intro', s, head, api.SEQ_LEN['intro'], start_head=stage() + [api.play('intro')], cancel=[stop_wind] + halo(False))
     # the skip (the core calls it after api.SKIP_HOLD t of sneak, then sets #sq to SKIP_T - 1: the next tick plays intro_end)
     near7 = mv.add('near7', [f'execute if score #mbDist mb matches ..70 run return 0']
                    + [cand(near(d), 'tp @s ~ ~ ~') for d in (6.5, 5.0, 3.5)],
@@ -266,7 +280,7 @@ def build_intro(W):
         '# The intro skip (@s = the body; PLAN §3.1): the black falls; under it the intro is cleared (line, the wind, the rock and the',
         '# props, a walk leg in progress), she stands <= 7 b from the player facing them; the core then sets #sq to 553 and the next',
         '# tick plays intro_end from its tick 0 (E10\'s end pose) with line 11 typed on the black.',
-        *[c for c in (K.hud('clear'), K.ovl('black', 0, 20, 6), stop_wind) if c],
+        *[c for c in (K.hud('clear'), K.ovl('black', 0, 20, 6), stop_wind) if c], *halo(False),
         'function rlk:mboss/mv/stop', rock_kill(), api.rig('look/props/none'), DIST, near7, api.rig('face/player')])
     mv.write(W)
 
@@ -544,6 +558,7 @@ def build_ending(W):
     # S10-C1 the moon gaze (the warm motes, the gaze chime, the heart petals); C2 the pivot back to the player 794-815 (the cloth),
     # the greeting; C3 the hat-tip (the cloth at the pull, the heart petals)
     s.me(e('l21'), K.p('motes_warm'), y=.4).at(e('gaze', 10), snd('moon_gaze')).me(e('gaze', 50), K.p('petals_heart'))
+    s.at(e('gaze'), halo(True)).at(e('gaze', 90), halo(False))     # I1b: the halo about 20 % brighter over the gaze 690-780
     for t in range(e('pivot'), e('pivot', 22)):
         s.at(t, api.rig('face/track'))
     s.at(e('pivot', 11), snd('pivot_cloth')).at(e('pull', 4), snd('cloth')).me(e('pull', 20), K.p('petals_heart'))
@@ -551,7 +566,7 @@ def build_ending(W):
     head = 'CS4 ending (PLAN §3.7 std): the ground slash, the duel, the aerial exchange, the landing, the walk-in and sheathe, lines 17-23, the hat-tip; H at its end.'
     write(W, 'ending', s, head, api.SEQ_LEN['ending'],
           start_head=[api.rig('face/player')] + face_player_dying() + stage(True) + [api.play('ending')],
-          cancel=[f'kill @e[type=minecraft:item_display,tag={PROP_T}]'])
+          cancel=[f'kill @e[type=minecraft:item_display,tag={PROP_T}]'] + halo(False))
 
 
 # =============================================================================================================================

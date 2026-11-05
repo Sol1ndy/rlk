@@ -5,3 +5,5 @@ execute if score #dt hrFx matches 1 as @e[type=minecraft:item_display,tag=rlk_hr
 execute if score #dt hrFx matches 1 as @e[type=minecraft:item_display,tag=rlk_hr_fx_demo,limit=1,sort=nearest] run function rlk:boss/scarlet/fx/prop/moon_halo {look:"p1"}
 execute if score #dt hrFx matches 26 as @e[type=minecraft:item_display,tag=rlk_hr_fx_demo,limit=1,sort=nearest] run function rlk:boss/scarlet/fx/prop/moon_halo {look:"p2"}
 execute if score #dt hrFx matches 51 as @e[type=minecraft:item_display,tag=rlk_hr_fx_demo,limit=1,sort=nearest] run function rlk:boss/scarlet/fx/prop/moon_halo {look:"off"}
+execute if score #dt hrFx matches 76 as @e[type=minecraft:item_display,tag=rlk_hr_fx_demo,limit=1,sort=nearest] run function rlk:boss/scarlet/fx/prop/moon_halo {look:"p1b"}
+execute if score #dt hrFx matches 101 as @e[type=minecraft:item_display,tag=rlk_hr_fx_demo,limit=1,sort=nearest] run function rlk:boss/scarlet/fx/prop/moon_halo {look:"p2b"}

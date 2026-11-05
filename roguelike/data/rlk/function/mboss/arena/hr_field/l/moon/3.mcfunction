@@ -555,7 +555,7 @@ setblock 893 201 -3 minecraft:tall_dry_grass strict
 fill 894 201 -3 895 201 -3 minecraft:short_dry_grass strict
 setblock 896 201 -3 minecraft:light[level=15] strict
 setblock 897 201 -3 minecraft:short_dry_grass strict
-setblock 862 201 -2 minecraft:tall_dry_grass strict
+setblock 862 201 -2 minecraft:short_dry_grass strict
 setblock 864 201 -2 minecraft:light[level=15] strict
 fill 867 201 -2 868 201 -1 minecraft:tall_dry_grass strict
 setblock 883 201 -2 minecraft:short_dry_grass strict
@@ -571,6 +571,7 @@ fill 869 201 -1 869 201 0 minecraft:tall_dry_grass strict
 setblock 871 201 -1 minecraft:tall_dry_grass strict
 fill 878 201 -1 879 201 -1 minecraft:short_dry_grass strict
 setblock 882 201 -1 minecraft:light[level=15] strict
+setblock 885 201 -1 minecraft:tall_dry_grass strict
 setblock 886 201 -1 minecraft:short_dry_grass strict
 setblock 891 201 -1 minecraft:short_dry_grass strict
 setblock 892 201 -1 minecraft:tall_dry_grass strict
@@ -617,6 +618,7 @@ fill 897 201 2 898 201 3 minecraft:short_dry_grass strict
 setblock 899 201 2 minecraft:tall_dry_grass strict
 setblock 878 201 3 minecraft:tall_dry_grass strict
 setblock 879 201 3 minecraft:light[level=15] strict
+setblock 885 201 3 minecraft:light[level=15] strict
 setblock 896 201 3 minecraft:short_dry_grass strict
 setblock 899 201 3 minecraft:short_dry_grass strict
 setblock 904 201 3 minecraft:light[level=15] strict
@@ -633,7 +635,6 @@ setblock 862 201 5 minecraft:tall_dry_grass strict
 setblock 865 201 5 minecraft:light[level=15] strict
 setblock 867 201 5 minecraft:tall_dry_grass strict
 setblock 876 201 5 minecraft:short_dry_grass strict
-setblock 884 201 5 minecraft:short_dry_grass strict
 setblock 890 201 5 minecraft:light[level=15] strict
 fill 892 201 5 893 201 5 minecraft:short_dry_grass strict
 setblock 898 201 5 minecraft:short_dry_grass strict
@@ -643,9 +644,10 @@ setblock 856 201 6 minecraft:tall_dry_grass strict
 setblock 858 201 6 minecraft:light[level=15] strict
 setblock 862 201 6 minecraft:short_dry_grass strict
 setblock 882 201 6 minecraft:short_dry_grass strict
-setblock 883 201 6 minecraft:light[level=15] strict
 setblock 893 201 6 minecraft:short_dry_grass strict
 setblock 876 201 7 minecraft:light[level=15] strict
+setblock 882 201 7 minecraft:light[level=15] strict
+setblock 884 201 7 minecraft:light[level=15] strict
 fill 889 201 7 890 201 7 minecraft:short_dry_grass strict
 fill 891 201 7 891 201 9 minecraft:tall_dry_grass strict
 setblock 894 201 7 minecraft:short_dry_grass strict

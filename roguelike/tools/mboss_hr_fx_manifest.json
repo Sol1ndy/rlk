@@ -2078,19 +2078,29 @@
    "anim": "p"
   },
   "moon_halo": {
-   "doc": "The halo card 1 b in front of the block moon (12.4 b, facing the arena as the caller turned it; its centre clear, the block disc shows through): {look} p1 white-blue / p2 red / off (hidden).",
+   "doc": "The halo card 1 b in front of the block moon (12.4 b, facing the arena as the caller turned it; its centre clear, the block disc shows through): {look} p1 white-blue / p2 red / off (hidden) / p1b, p2b = p1, p2 about 20 % brighter (CS0 E3, the CS4 moon gaze).",
    "looks": {
     "p1": [
      "moon_halo_0",
-     12.4
+     12.4,
+     13948116
     ],
     "p2": [
      "moon_halo_1",
-     12.4
+     12.4,
+     13948116
     ],
     "off": [
      null,
      0.0
+    ],
+    "p1b": [
+     "moon_halo_0",
+     12.4
+    ],
+    "p2b": [
+     "moon_halo_1",
+     12.4
     ]
    },
    "billboard": "fixed",
@@ -3340,7 +3350,7 @@
   "ev_take": 75,
   "prop/disc": 90,
   "prop/petal_big": 90,
-  "prop/moon_halo": 90,
+  "prop/moon_halo": 140,
   "prop/lotus": 90,
   "prop/seat_rock": 90
  }
