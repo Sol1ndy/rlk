@@ -1,0 +1,11 @@
+# Test 30 / 35: the intro again in the fight (@s = body, invulnerable), then the fight goes on.
+function rlk:boss/scarlet/core/cancel_pat0
+function rlk:boss/scarlet/core/deco_seat
+tp @s 884.5 201 0 187.54 0
+scoreboard players set #rp hr 1
+scoreboard players set #inv hr 1
+scoreboard players set #sqn hr 1
+scoreboard players set #sq hr 0
+scoreboard players set #sqdone hr 0
+scoreboard players set #skip hr 0
+function rlk:boss/scarlet/core/sq/intro/start
