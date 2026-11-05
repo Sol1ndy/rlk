@@ -1,2 +1,52 @@
-# STUB (theme module tools/mboss_arena_hr_field.py missing): no-op ({y0,y1} kept).
-$data modify storage rlk:mboss arsw set value {y0:$(y0),y1:$(y1)}
+# {y0,y1} (absolute y): barriers -> air in 48 row spans inside walk - 0.5 of hr_field (never a
+# rectangle: blocks outside the disc are not touched). Only while the box is loaded.
+execute unless function rlk:mboss/ar/hr_field/loaded run return fail
+$fill 873 $(y0) -16 886 $(y1) -16 minecraft:air replace minecraft:barrier
+$fill 870 $(y0) -15 889 $(y1) -15 minecraft:air replace minecraft:barrier
+$fill 868 $(y0) -14 891 $(y1) -14 minecraft:air replace minecraft:barrier
+$fill 867 $(y0) -13 892 $(y1) -13 minecraft:air replace minecraft:barrier
+$fill 865 $(y0) -12 894 $(y1) -12 minecraft:air replace minecraft:barrier
+$fill 864 $(y0) -11 895 $(y1) -11 minecraft:air replace minecraft:barrier
+$fill 863 $(y0) -10 896 $(y1) -10 minecraft:air replace minecraft:barrier
+$fill 862 $(y0) -9 897 $(y1) -9 minecraft:air replace minecraft:barrier
+$fill 861 $(y0) -8 898 $(y1) -8 minecraft:air replace minecraft:barrier
+$fill 860 $(y0) -7 899 $(y1) -7 minecraft:air replace minecraft:barrier
+$fill 860 $(y0) -6 899 $(y1) -6 minecraft:air replace minecraft:barrier
+$fill 859 $(y0) -5 900 $(y1) -5 minecraft:air replace minecraft:barrier
+$fill 858 $(y0) -4 901 $(y1) -4 minecraft:air replace minecraft:barrier
+$fill 858 $(y0) -3 901 $(y1) -3 minecraft:air replace minecraft:barrier
+$fill 857 $(y0) -2 902 $(y1) -2 minecraft:air replace minecraft:barrier
+$fill 857 $(y0) -1 902 $(y1) -1 minecraft:air replace minecraft:barrier
+$fill 857 $(y0) 0 902 $(y1) 0 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 1 903 $(y1) 1 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 2 903 $(y1) 2 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 3 903 $(y1) 3 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 4 903 $(y1) 4 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 5 903 $(y1) 5 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 6 903 $(y1) 6 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 7 903 $(y1) 7 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 8 903 $(y1) 8 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 9 903 $(y1) 9 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 10 903 $(y1) 10 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 11 903 $(y1) 11 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 12 903 $(y1) 12 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 13 903 $(y1) 13 minecraft:air replace minecraft:barrier
+$fill 856 $(y0) 14 903 $(y1) 14 minecraft:air replace minecraft:barrier
+$fill 857 $(y0) 15 902 $(y1) 15 minecraft:air replace minecraft:barrier
+$fill 857 $(y0) 16 902 $(y1) 16 minecraft:air replace minecraft:barrier
+$fill 857 $(y0) 17 902 $(y1) 17 minecraft:air replace minecraft:barrier
+$fill 858 $(y0) 18 901 $(y1) 18 minecraft:air replace minecraft:barrier
+$fill 858 $(y0) 19 901 $(y1) 19 minecraft:air replace minecraft:barrier
+$fill 859 $(y0) 20 900 $(y1) 20 minecraft:air replace minecraft:barrier
+$fill 860 $(y0) 21 899 $(y1) 21 minecraft:air replace minecraft:barrier
+$fill 860 $(y0) 22 899 $(y1) 22 minecraft:air replace minecraft:barrier
+$fill 861 $(y0) 23 898 $(y1) 23 minecraft:air replace minecraft:barrier
+$fill 862 $(y0) 24 897 $(y1) 24 minecraft:air replace minecraft:barrier
+$fill 863 $(y0) 25 896 $(y1) 25 minecraft:air replace minecraft:barrier
+$fill 864 $(y0) 26 895 $(y1) 26 minecraft:air replace minecraft:barrier
+$fill 865 $(y0) 27 894 $(y1) 27 minecraft:air replace minecraft:barrier
+$fill 867 $(y0) 28 892 $(y1) 28 minecraft:air replace minecraft:barrier
+$fill 868 $(y0) 29 891 $(y1) 29 minecraft:air replace minecraft:barrier
+$fill 870 $(y0) 30 889 $(y1) 30 minecraft:air replace minecraft:barrier
+$fill 873 $(y0) 31 886 $(y1) 31 minecraft:air replace minecraft:barrier
+return 1
