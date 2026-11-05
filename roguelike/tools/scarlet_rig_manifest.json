@@ -15967,7 +15967,7 @@
     "lift": 0
    }
   },
-  "_doc": "per sample: retarget (angles kept; pos x k(lf); soles about the hip joint x S_LEG; grip distances x S_ARM + the lock rule; planted hands x S_LEG; scOff x S_SCAB; world-hat spots) -> overlay (PATCHES, the hat hand-overs, the flights) -> solve. clips: per clip the solver passes, the largest value of every correction guard (degrees, or cm for drop / bPush / close / hatBackZ; +/- = the two senses), the largest contact distance per kind, the largest IK stretch, the blade residue inside the body (b), the largest support move and lift"
+  "_doc": "per sample: retarget (angles kept; pos x k(lf); soles about the hip joint x S_LEG; grip distances x S_ARM + the lock rule; planted hands x S_LEG; scOff x S_SCAB; world-hat spots) -> overlay (PATCHES, the hat hand-overs, the flights) -> solve. clips: per clip the solver passes, the largest value of every correction guard (degrees, or cm for drop / bPush / close / hatBackZ / hatPush / hatClear, percent for armUp; +/- = the two senses), the largest contact distance per kind, the largest IK stretch, the blade residue inside the body (b), the largest support move and lift"
  },
  "paint_roles": {
   "hat_top": [
