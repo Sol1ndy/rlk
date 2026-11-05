@@ -2098,7 +2098,7 @@ lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` fal
   `lead_stand` 의 refill 18. 코어가 `tick` 바로 뒤에 읽고 적용하고 0 으로 되돌린다.
 - **CS0 등장**: 그녀는 `start`(남쪽 테두리) → 달 선 위, 시작점에서 26.7칸 떨어진 무릎 높이 돌(`api.SEAT_POS` 884 201 5, 킷 소품 `seat_rock`:
   바닐라 응회암 1.5 × 0.75 × 1.1칸)에 등을 보이고 앉아 달을 본다(오른손에 잔, 돌 위에 병). 대사 1~10(영상에 없는 위키 대사, 시의 뜻대로 술을
-  따르고 마시고 잔을 달에 듦: E3 112~146 동안 달무리 약 20 % 밝게), 일어나 돌아서서 칼집을 오른손에 쥐고 걸어온다(12틱 다리 1.2칸, 0.15칸/틱,
+  따르고 마시고 잔을 달에 듦: E3 112~146 동안 달무리 약 20 % 밝게), 일어나 돌아서서 칼집을 오른손에 쥐고 걸어온다(8틱 다리 1.2칸, 0.15칸/틱,
   그녀가 7칸보다 멀 때만; 시작점에 서 있는 플레이어 앞 약 6.3칸에서 멈춤 — I1, 리드 결정: 돌을 D0 의 (884.5, 201, 0)에서 같은 선을 따라 5칸
   당김), 칼집을 세워 든다(510). 554 부터 `intro_end`: 웃음 · 돌아섬 · 뽑기(610, 제목 「홍련」 / 「월하곡」) · 자세, 630 음악 1 · 돌과 소품 치움,
   636 밀어내기 고리(피해 없음). **건너뛰기**: 코어가 `seq/intro/skip` 을 부르고 `#sq` 를 553 으로 — 검은 화면(0 / 20 / 6) 아래 대사 · 바람 · 돌 ·
@@ -2183,7 +2183,7 @@ lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` fal
   간격(T0 − 17 / − 14 / − 11 / − 8; 마지막 조각이 걷는 빛 층 · 발 격자를 다시 밝힘). 짓기는 21조각(조각당 4 943 명령 이하). 일이 도는 동안 온
   모습 요청은 코어가 `#hrLook` 으로 기다렸다 건다. 다음 싸움 때 `ensure` 가 `moon` 으로 되돌린다. **실제 서버로 잰 틱 시간**(11-05 I1, 26.3
   서버 콘솔, `/tick query` P99, 플레이어 없이 청크 49개 고정): 짓기 61.4 ms, `dark` 조각 하나씩 3.9 / 8.6 / 4.3 / 2.9 ms(마지막 = 빛 바꾸기),
-  `moon` 조각 3.3 / 4.1 / 2.8 / 6.9 ms, 모습 작업 통째 17–24 ms(고정 풀기 · 다시 걸기 포함) — 100 ms 를 넘는 틱이 없어 `DARK_LIGHT` 를 켜 둔다.
+  `moon` 조각 3.3 / 4.1 / 2.8 / 6.9 ms, 모습 작업 통째 4.7–23.5 ms(고정 풀기 · 다시 걸기 포함) — 100 ms 를 넘는 틱이 없어 `DARK_LIGHT` 를 켜 둔다.
   클라이언트 쪽 다시 밝히기(청크 그리기)는 서버에서 잴 수 없다: 게임에서 연참이 시작될 때 끊김이 보이면 `DARK_LIGHT = False`(`api.py` 와 테마의
   같은 상수 둘 다; `test_arena_hr` 1b 가 같은지 봄)로 바꾸고 다시 만든다.
   꾸밈 소품 자리 `DECO`(달무리 · 연꽃 8 · 앉는 돌 = `api.SEAT_POS`)는 `api.deco()` 로 코어에 감.
@@ -2212,14 +2212,17 @@ lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` fal
   `tools/scarlet_rig_manifest.json` · RP `mboss/scarlet/**`), `tools/build_mboss_hr_fx.py`(`--skip-rp` 면 데이터팩만: `fx/**` · 매니페스트),
   경기장 테마 `tools/mboss_arena_hr_field.py`(`build_mboss_arena.py` 가 읽어 `mboss/arena/hr_field/**` 53개 · `job_tick` 한 줄 · `abort` 두 줄을
   씀). 손으로 고치지 말 것: 위의 출력 전부.
-- 순서(0-4): 리소스팩이 바뀌면 `build_rift.py --resourcepack <팩>` → `build_mboss_hr_fx.py --resourcepack <팩>` → `node tools/build_scarlet_rig.mjs
-  --resourcepack <팩>`, 그다음 `regen_all.sh`(코어 → 경기장(테마 포함) → … → `build_mboss_hr_fx.py --skip-rp` → `build_mboss_scarlet.py` →
+- 순서(0-4): 리소스팩이 바뀌면 `build_rift.py --resourcepack <팩>` → `node tools/build_scarlet_rig.mjs --resourcepack <팩>` →
+  `build_mboss_hr_fx.py --resourcepack <팩>`(0-4 리소스팩 묶음의 순서: 새 팩에서는 이 순서가 `items.json` 소스 순서와 팩 해시를 정한다, 0-9),
+  그다음 `regen_all.sh`(코어 → 경기장(테마 포함) → … → `build_mboss_hr_fx.py --skip-rp` → `build_mboss_scarlet.py` →
   `check_mboss_pack.py`). 두 번 돌려도 같다(데이터팩 · 리소스팩 해시).
 - 상태: 점수판 `hr`(`init` 이 만들고 `uninstall` 이 지움), 리그 `hrRig*`, 효과 도구 `hrFx` `hrFxS` `hrFxG` `hrFxH` `hrFxK` `hrFxD` `hrFxL` `hrFxQ`
   (첫 호출이 만들고 `fx/uninstall` 이 지움), 버프 `hrMoon`(SR), 저장소 `rlk:hr`(`core.*` `rig.*` `seq.*` `fx.*` `g.*` `ev.*`), 태그 `rlk_hr_*`(정리가
-  모두 지움), 보스바 `rlk:hr_warn`. 부하(모의기, `test_scarlet.py cost`, 리그 · 장면 · 연참 · 효과 도구 · 경기장 모두 진짜): 싸움 한 틱 평균
-  438명령(최대 956; P1 441 · P2 451 · A8 438 · A13 452), 아펩(약 830)보다 적다(목표 600 이하). 경기장 모습을 바꾸는 작업의 조각 틱(이
-  측정에서 44틱)은 따로 셌다: 평균 1721 · 최대 3263명령(조각 한도 5천).
+  모두 지움), 보스바 `rlk:hr_warn`. 부하(모의기, `test_scarlet.py cost`, 리그 · 장면 · 연참 · 경기장 모두 진짜, 효과 도구도 진짜로 돌려
+  카드 · 카드 관리(`fx/e/world`, 바닐라처럼 같은 틱에) · 정리까지 셈): 싸움 한 틱 평균 505명령(그중 효과 도구 66; P1 516 · P2 489 ·
+  A8 550 · A13 571), 아펩(약 830)보다 적다(목표 600 이하). 조각 틱을 뺀 한 틱 최대 2198(CS1 의 검붉은 잎 40장을 20장씩 두 틱에 나눠
+  부름: 한 틱에 40장이면 3598, 틱당 3000 이하). 경기장 모습을 바꾸는 작업의 조각 틱(이 측정에서 44틱)은 따로 셌다: 평균 1856 · 최대
+  3442명령(조각 한도 5천).
 - 계획 · 계약 문서(`PLAN.md` · `contract.md` · 단계 브리프 · `requests/*.md` · 통합 기록)는 아직 스크래치패드 `hr/` 에 있다: 릴리스 때 다른
   보스처럼 `tools/dev/sim/hr/` 로 옮긴다(이 절과 생성기 주석의 "계획 §…" 은 그 `PLAN.md`).
 - 시험(`tools/dev/sim/hr/tests/`, 데이터팩 밖의 사본에서 돌림 — `tools/dev/sim/README.md` 1절 · 3-4): `test_special_hr.py`(S1 틀) ·

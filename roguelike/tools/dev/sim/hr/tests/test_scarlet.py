@@ -17,7 +17,9 @@ S2b's sequences, S4's gauntlets and S2a's rig are the real ones (the stand-ins c
            -> death) and both fail branches (A8 fail -> P2 at T + 214 without a down window; A13 fail -> the instant death
            -> the revive stance -> A13 again); the floors 60 % / 5 % (never below by normal damage); the invulnerable windows
            tick by tick; the CS2 / CS3 HP steps (15 / 15 / 15 per mille, 15 / 15 / the kill) at flash 24 / land 75 / kick
-           102; the down window's both exits (the timer -> kipup -> P2; the 5 % floor -> lead_down 40 t later); durations
+           102; the down window's both exits (the timer -> kipup -> P2; the 5 % floor -> lead_down 40 t later); durations;
+           the arena ambience (I1b round 1: ambient_p1 every 10 t in P1, ambient_p2 every 6 t in A8 / the down window / P2 /
+           A13, none in a sequence)
   pips     a timed dash at a counting cut's strike (dashInvT 1..6 at s, 1..5 at s + 1) removes one pip whatever its
            direction; outside the strike ticks / beyond 6.2 b / a dash started after s: nothing; one per cut; never < 0
   judge    0 pips -> #gres 1 + the deflect staging (g_deflect, the sound); >= 1 -> #gres 2
@@ -36,12 +38,15 @@ S2b's sequences, S4's gauntlets and S2a's rig are the real ones (the stand-ins c
            long fight
   bars     FN-f: no bar draw during CS1 (bars_off), the bars back at SQ1 tick 0 with the shield under bar
   look     (theme build) a look request waits while an arena job runs and survives a pause / a reload inside the job;
-           the final look is the last one requested
+           the final look is the last one requested; each job re-looks the decor props (I1b round 1: the halo p1 / p2 / off,
+           the 8 lotus bud / bloom / bloom for moon / crimson / dark)
   pause    pause -> resume and /reload in every phase and sequence (PLAN §3.8)
   cs4      (I1, s3-8) the real seq/ending through the full core path: her distance to an unmoving player over ending
            ticks 300-1042 stays 3.5-6 b
   cleanup  won / cancel / defeat leave no rlk_hr_* entity, the core scores and storage core gone, the event scores kept
-  cost     commands per fight tick (P1 + P2 + the gauntlets): average <= Apep's 830 (target <= 600)
+  cost     commands per fight tick (P1 + P2 + the gauntlets + the fight-state sequences) with the kit running for real
+           (I1b verification round 1): average <= Apep's 830 (target <= 600), every tick <= 3000 but the arena look job's
+           slice ticks (<= 5000, contract §5 gate 5)
 """
 import math
 import statistics
@@ -96,8 +101,11 @@ def var(name='base'):
     return root
 
 
-def world(seed=5, name='base', intro=False):
+def world(seed=5, name='base', intro=False, kit=False):
+    """kit: the kit runs for real (H.kit_on; I1b verification round 1, the cost section), else its calls are logged only."""
     s, pl = H.setup_sc(var(name), seed=seed)
+    if kit:
+        H.kit_on(s)
     ok = H.fight_sc(s, intro=intro)
     assert ok, 'the fight did not start'
     if not intro:
@@ -342,6 +350,35 @@ def chain(seed=11, a8='deflect', a13='deflect', revive=0, limit=6000):
     return s, recs, ok
 
 
+AMB = {'ambient_p1': (10, (PH['p1'],)), 'ambient_p2': (6, (PH['a8'], PH['down'], PH['p2'], PH['a13']))}
+
+
+def amb_cadence(s, R, need):
+    """I1b verification round 1 (m4): the arena ambience in a run (core/amb -> amb1 / amb2; PLAN §6.3 / §6.4, request s1k-2),
+    from the kit log (#ph read at each call): each preset only in its phases and once per beat (one player); within every span
+    of those phases (records R) at least 2 beats long, a call every `step` t, span // step - 1 .. + 1 of them (a beat on a span's
+    first tick can belong to the phase before); no other caller of the ambient presets but S2b's intro start (its E0 staging).
+    need: the presets that must have run. Returns (ok, the faults)."""
+    bad = {}
+    amb = (H.ROOT_SC + 'core/amb1', H.ROOT_SC + 'core/amb2')
+    for k, (step, phs) in AMB.items():
+        allc = H.kit_ex(s, f'p/{k}')
+        calls = [c for c in allc if c['caller'] in amb]
+        other = [(c['t'], c['caller']) for c in allc if c['caller'] not in amb + (H.ROOT_SC + 'seq/intro/start',)]
+        ts = [c['t'] for c in calls]
+        wrong = [(c['t'], c['ph']) for c in calls if c['ph'] not in phs]
+        short = []
+        for ph, a, b in spans(R):
+            if ph in phs and b - a + 1 >= 2 * step:
+                inside = [t for t in ts if a <= t <= b]
+                gaps = sorted({y - x for x, y in zip(inside, inside[1:])})
+                if gaps != [step] or not ((b - a + 1) // step - 1 <= len(inside) <= (b - a + 1) // step + 1):
+                    short.append((ph, a, b, len(inside), gaps))
+        if wrong or len(ts) != len(set(ts)) or short or other or (k in need and not calls):
+            bad[k] = (wrong[:4], len(ts) - len(set(ts)), short[:4], other[:4], len(calls))
+    return not bad, bad
+
+
 def sec_phases():
     s, R, ok = chain(11)
     order = phase_list(R)
@@ -383,6 +420,18 @@ def sec_phases():
     gh = [r for r in R if r['st'] == 1 and r['ghost'] and r['ph'] == PH['p2']]
     check(f'P8b the ghost form in P2 (R1 / R3, {len(gh)} ticks in this chain) is invulnerable on every tick',
           all(r['inv'] for r in gh), [(r['t'], r['pat'], r['pt']) for r in gh if not r['inv']][:5])
+    # I1b verification round 1 (m4): the arena ambience through the whole chain, then a P1 stretch
+    amb = {ph: n for ph, a, b in spans(R) for n in [b - a + 1] if ph in AMB['ambient_p2'][1]}
+    ok_a, why = amb_cadence(s, R, need=('ambient_p2',))
+    check(f'P14 the ambience (core/amb): ambient_p2 at the player every 6 t in A8, the down window, P2 and A13 ({amb} ticks), '
+          f'none in the sequences (CS1, SQ1, CS2, the lead-in, CS3, the death), ambient_p1 only in P1', ok_a, why)
+    s1, _pl = world(16)
+    H.place_player(s1, API.CX + 0.5, API.CZ + 6.0)
+    R1 = run(s1, 300)
+    ok_a, why = amb_cadence(s1, R1, need=('ambient_p1',))
+    n1 = len([c for c in H.kit_ex(s1, 'p/ambient_p1') if c['caller'] == H.ROOT_SC + 'core/amb1'])
+    check(f'P15 the ambience in P1: ambient_p1 at the player every 10 t ({n1} calls in {len(R1)} ticks), no ambient_p2',
+          ok_a and all(r['ph'] == PH['p1'] for r in R1) and not H.kit_ex(s1, 'p/ambient_p2'), why)
     # A8 fail branch
     s, R, ok = chain(12, a8='fail')
     order = phase_list(R)
@@ -607,8 +656,10 @@ def sec_banner():
 
 
 # ================================================================================================= skip (kit build)
-def intro_world(seed, name='kit'):
+def intro_world(seed, name='kit', kit=False):
     s, pl = H.setup_sc(var(name), seed=seed)
+    if kit:
+        H.kit_on(s)
     ok = H.fight_sc(s, intro=True)
     assert ok
     return s, pl
@@ -950,6 +1001,33 @@ def sec_look():
           ok and (s.sc('#LOOKOVL', 'azs') or 0) == 0 and hr(s, '#hrLook') == 0 and len(lr2) > n0, (lr2, s.sc('#LOOKOVL', 'azs')))
     check('L4 the final look = the last one requested = crimson after the A8 judge (#lk)', lr2[-1][1] == 'crimson'
           and API.LOOK_ID[lr2[-1][1]] == hr(s, '#lk'), (lr2[-1], hr(s, '#lk')))
+    # I1b verification round 1 (m4): core/look/go re-looks S3's decor props with each job (PLAN §6.3-§6.5 "kit props"): the one
+    # halo and the 8 lotus, in the tick the job starts, from look/go itself (a /reload's core/deco_re re-spawns them apart)
+    deco = {'moon': ('p1', 'bud'), 'crimson': ('p2', 'bloom'), 'dark': ('off', 'bloom')}
+    go = H.ROOT_SC + 'core/look/go'
+    halo = [c for c in H.kit_ex(s, 'prop/moon_halo') if c['caller'] == go]
+    lotus = [c for c in H.kit_ex(s, 'prop/lotus') if c['caller'] == go]
+    bad = []
+    for t, look in lr2:
+        h = [c['a'].get('look') for c in halo if c['t'] == t and API.TAGS['deco_moon_halo'] in c['tags']]
+        lo = [c['a'].get('look') for c in lotus if c['t'] == t and API.TAGS['deco_lotus'] in c['tags']]
+        if h != [deco[look][0]] or lo != [deco[look][1]] * 8:
+            bad.append((t, look, h, lo))
+    orphan = sorted({c['t'] for c in halo + lotus} - {t for t, _ in lr2})
+    # the moon row: no fight request asks for moon (the arena starts in it), so a moon request is served here directly
+    s.setsc('#mbArBuild', 'mb', 0)
+    s.storage.get('rlk:mboss', {}).pop('arjob', None)
+    s.setsc('#hrLook', 'hr', API.LOOK_ID['moon'])
+    n0 = len(s.kitl)
+    H.call_sc(s, 'core/look')
+    moon = [(c, a.get('look'), x) for (t, c, a), (x, f, ph) in list(zip(s.kitl, s.kitx))[n0:] if f == go]
+    moon_ok = (sorted(lk for c, lk, x in moon if c == 'prop/moon_halo' and API.TAGS['deco_moon_halo'] in x) == [deco['moon'][0]]
+               and [lk for c, lk, x in moon if c == 'prop/lotus' and API.TAGS['deco_lotus'] in x] == [deco['moon'][1]] * 8
+               and looks_run(s)[-1][1] == 'moon')
+    check(f'L5 each look job re-looks the decor props in its tick (core/look/go): moon -> halo p1 / lotus bud, crimson -> p2 / '
+          f'bloom, dark -> off / bloom; the halo and all 8 lotus ({len(lr2)} jobs in the fight: {[l for _, l in lr2]}, + moon)',
+          {l for _, l in lr2} >= {'crimson', 'dark'} and not bad and not orphan and moon_ok,
+          (bad[:3], orphan[:3], moon_ok, [(c, lk) for c, lk, _x in moon][:3]))
 
 
 # ================================================================================================= pause / reload (§3.8)
@@ -1138,6 +1216,8 @@ def sec_cleanup():
 
 # ================================================================================================= cost
 JOB_FN = 'rlk:mboss/arena/hr_field/tick'      # one slice of the arena's running job (S1K's theme, I1b)
+TICK_MAX, SLICE_MAX = 3000, 5000               # every fight tick (S3); a look job's slice tick (contract §5 gate 5)
+FIGHT_SEQ = ('cs1', 'sq1', 'repel', 'lead_down', 'lead_stand')
 
 
 def watch_jobs(s):
@@ -1147,100 +1227,102 @@ def watch_jobs(s):
     return s.t
 
 
-def split_jobs(s, t0, hist):
-    """(fight ticks, job-slice ticks) of a cmd_hist slice that started after tick t0 (world_sc: s.t += 1 first)."""
-    jt = {t for t, *_ in s.watch.get(JOB_FN, [])}
-    fight, job = [], []
-    for k, c in enumerate(hist):
-        (job if t0 + 1 + k in jt else fight).append(c)
-    return fight, job
+def cost_run(s, n, each=None):
+    """n world ticks of s (run()) as [(commands, the kit's own commands, slice tick?, record)]: a tick that runs a slice of
+    the arena job is marked (I1b); the kit's share = the commands run inside rlk:boss/scarlet/fx/** (I1b round 1)."""
+    t0, n0 = watch_jobs(s), len(s.cmd_hist)
+    R = run(s, n, each=each)
+    jt = {t for t, *_ in s.watch[JOB_FN]}
+    return [(c, k, t0 + 1 + i in jt, r) for i, (c, k, r) in enumerate(zip(s.cmd_hist[n0:], s.kit_hist[n0:], R))]
+
+
+def where(r, part):
+    """A tick's place for the report: the sequence and its clock, else the phase / pattern and its clock."""
+    name_of = {v: k for k, v in SEQ.items()}
+    if r is None:
+        return part
+    if r['sqn']:
+        return f'{name_of.get(r["sqn"], r["sqn"])} #sq {r["sq"]}'
+    return f'{part} #pat {S3.KEY_OF.get(r["pat"], r["pat"])} #pt {r["pt"]}'
 
 
 def sec_cost():
-    s, pl = world(131)
-    t_s = watch_jobs(s)
+    """Commands per world tick, strict count (an `execute ... run X` counts X too), in fights on the real rig, sequences,
+    gauntlets, the theme's look jobs and, since I1b verification round 1, the kit running for real (H.kit_on: the presets'
+    cards, the card ager they schedule, the cull, the HUD tickers; each module kit call costs what it costs in the kit's own
+    harness). The kit's share of each tick is reported apart."""
+    # P1 then P2 (test 33), the player circling C at 3-10 b
+    s, pl = world(131, kit=True)
+
     def mover(s, ang=[0.0]):
         ang[0] += 0.013
         r = 3.0 + 7.0 * (0.5 + 0.5 * math.sin(s.t / 83.0))
         pl = s.player()
         pl.pos = [API.CX + r * math.cos(ang[0]), 201.0, API.CZ + r * math.sin(ang[0])]
         H.C.moved(s)
-    n0 = len(s.cmd_hist)
-    run(s, 1500, each=mover)
-    p1 = s.cmd_hist[n0:]
+    parts = {}
+    parts['P1'] = cost_run(s, 1500, mover)
     test(s, 33)
-    n1 = len(s.cmd_hist)
-    run(s, 1500, each=mover)
-    p2 = s.cmd_hist[n1:]
-    fs, js = split_jobs(s, t_s, s.cmd_hist[n0:])
-    s2, pl2 = world(132)
-    H.place_player(s2, API.CX + 0.5, API.CZ + 6.0)
-    test(s2, 21)
-    t_2 = watch_jobs(s2)
-    n2 = len(s2.cmd_hist)
-    run(s2, API.JUDGE_T['a8'], each=dasher(CUTS['a8'][:5]))
-    g = s2.cmd_hist[n2:]
-    f2, j2 = split_jobs(s2, t_2, g)
-    allf = p1 + p2 + g
-    avg = statistics.mean(allf)
-    nojob, jobs = fs + f2, js + j2
-    print(f'  cost: P1 avg {statistics.mean(p1):.0f} max {max(p1)}; P2 avg {statistics.mean(p2):.0f} max {max(p2)}; '
-          f'A8 avg {statistics.mean(g):.0f} max {max(g)}; all {avg:.0f} (Apep ~830, target <= 600); without the arena job\'s '
-          f'{len(jobs)} slice ticks max {max(nojob)}, those ticks max {max(jobs or [0])}')
-    # I1b: the arena job's slice ticks (S1K's look jobs: CS1 crimson, the gauntlets' dark / crimson) are checked apart against
-    # the contract's look-job spike limit (§5 gate 5: <= 5 k); every other tick stays <= 3000
-    check('Z1 commands per fight tick: the average <= 830 (Apep) and <= 600 (target); every tick <= 3000 but the arena job\'s '
-          'slice ticks, those <= 5000 (contract §5 gate 5)',
-          avg <= 600 and max(nojob) <= 3000 and max(jobs or [0]) <= 5000, (avg, max(nojob), max(jobs or [0])))
-    VARS['cost'] = (statistics.mean(p1), max(p1), statistics.mean(p2), max(p2), statistics.mean(g), max(g), avg)
-    # I1: A13 and the sequence ticks with the real gauntlets / sequences / rig (the kit and the theme still missing: I1b)
-    s3, pl3 = world(133)
-    H.place_player(s3, API.CX + 0.5, API.CZ + 6.0)
-    test(s3, 27)
-    t_3 = watch_jobs(s3)
-    n3 = len(s3.cmd_hist)
-    run(s3, API.JUDGE_T['a13'], each=dasher(CUTS['a13'][:5]))
-    a13 = s3.cmd_hist[n3:]
-    f3, j3 = split_jobs(s3, t_3, a13)
-    nojob, jobs = nojob + f3, jobs + j3
+    parts['P2'] = cost_run(s, 1500, mover)
+    # the gauntlets with the first five cuts dashed (A8 from test 21, A13 from test 27)
+    for seed, tid, g in ((132, 21, 'a8'), (133, 27, 'a13')):
+        sg, plg = world(seed, kit=True)
+        H.place_player(sg, API.CX + 0.5, API.CZ + 6.0)
+        test(sg, tid)
+        parts[g.upper()] = cost_run(sg, API.JUDGE_T[g], dasher(CUTS[g][:5]))
+    # the sequences: CS1 -> SQ1 (test 20), repel (24), lead_stand (26), A13 deflect -> CS3 -> the kill -> CS4 -> the event (28)
     name_of = {v: k for k, v in SEQ.items()}
     seqc = {}
     for seed, tid, limit in ((134, 20, 290), (135, 24, 120), (136, 26, 90), (137, 28, 1750)):
-        sx, plx = world(seed)
+        sx, plx = world(seed, kit=True)
         H.place_player(sx, API.CX + 0.5, API.CZ + 6.0)
         sx.storage.setdefault('rlk:pinv', {}).setdefault('order', [])    # a run's inventory record (the coda's grant reads it)
         sx.setsc(('e', plx.id), 'invCap', 9)
         test(sx, tid)
-        t_x = watch_jobs(sx)
-        nx = len(sx.cmd_hist)
-        Rx = run(sx, limit)
-        jt = {t for t, *_ in sx.watch.get(JOB_FN, [])}
-        for k, (r, c) in enumerate(zip(Rx, sx.cmd_hist[nx:])):
-            if r['sqn']:
-                seqc.setdefault(name_of.get(r['sqn'], r['sqn']), []).append(c)
-                if name_of.get(r['sqn']) in ('cs1', 'sq1', 'repel', 'lead_down', 'lead_stand'):
-                    (jobs if t_x + 1 + k in jt else nojob).append(c)
-    si, pli = intro_world(138, name='base')
+        for x in cost_run(sx, limit):
+            if x[3]['sqn']:
+                seqc.setdefault(name_of.get(x[3]['sqn'], x[3]['sqn']), []).append(x)
+    si, pli = intro_world(138, name='base', kit=True)
     ni = len(si.cmd_hist)
     run_intro(si)
-    seqc['intro'] = si.cmd_hist[ni:]
-    fight_seq = [c for k in ('cs1', 'sq1', 'repel', 'lead_down', 'lead_stand') for c in seqc.get(k, [])]
-    fight_all = allf + a13 + fight_seq
-    avg2 = statistics.mean(fight_all)
-    rows = [('P1', p1), ('P2', p2), ('A8', g), ('A13', a13)] + [(k, seqc[k]) for k in
-                                                                ('intro', 'cs1', 'sq1', 'repel', 'lead_stand', 'ending', 'event') if k in seqc]
+    seqc['intro'] = [(c, k, False, None) for c, k in zip(si.cmd_hist[ni:], si.kit_hist[ni:])]
+    # the table
+    rows = [(k, parts[k]) for k in ('P1', 'P2', 'A8', 'A13')] + [(k, seqc[k]) for k in
+                                                                ('intro',) + FIGHT_SEQ + ('ending', 'event') if k in seqc]
+    print('  cost (the kit running for real)  ticks    avg   max | no slice: max | kit share: avg   max')
     for k, v in rows:
-        print(f'  cost {k:10s} ticks {len(v):5d} avg {statistics.mean(v):6.0f} max {max(v):5d}')
-    print(f'  cost fight state (P1 + P2 + A8 + A13 + cs1 / sq1 / repel / lead-ins): avg {avg2:.0f} max {max(fight_all)}; '
-          f'the intro / ending / event are the intro and death states')
-    print(f'  cost fight state without the arena job\'s slice ticks: {len(nojob)} ticks, max {max(nojob)}; the {len(jobs)} slice '
-          f'ticks avg {statistics.mean(jobs or [0]):.0f} max {max(jobs or [0])}')
-    check('Z2 I1: every fight-state tick incl. A13 and the fight-state sequences: the average <= 600 (target; Apep ~830 hard), '
-          'every tick <= 3000 but the arena job\'s slice ticks (I1b), those <= 5000',
-          avg2 <= 600 and max(nojob) <= 3000 and max(jobs or [0]) <= 5000, (avg2, max(nojob), max(jobs or [0])))
-    VARS['cost_rows'] = [(k, len(v), statistics.mean(v), max(v)) for k, v in rows] + [('fight', len(fight_all), avg2, max(fight_all)),
-                                                                                       ('fight, no job slice', len(nojob), statistics.mean(nojob), max(nojob)),
-                                                                                       ('job slice ticks', len(jobs), statistics.mean(jobs or [0]), max(jobs or [0]))]
+        ns = [x[0] for x in v if not x[2]]
+        print(f'  cost {k:10s} {len(v):27d} {statistics.mean(x[0] for x in v):6.0f} {max(x[0] for x in v):5d} | '
+              f'{max(ns or [0]):13d} | {statistics.mean(x[1] for x in v):14.0f} {max(x[1] for x in v):5d}')
+    p3 = parts['P1'] + parts['P2'] + parts['A8']
+    fight = p3 + parts['A13'] + [x for k in FIGHT_SEQ for x in seqc.get(k, [])]
+    loc = {id(x): where(x[3], k) for k, v in rows for x in v}
+    avg1, avg2 = statistics.mean(x[0] for x in p3), statistics.mean(x[0] for x in fight)
+    nojob1, nojob2 = [x for x in p3 if not x[2]], [x for x in fight if not x[2]]
+    jobs1, jobs2 = [x[0] for x in p3 if x[2]], [x[0] for x in fight if x[2]]
+    top = sorted(nojob2, key=lambda x: -x[0])[:5]
+    print(f'  cost fight state (P1 + P2 + A8 + A13 + {" / ".join(FIGHT_SEQ)}): {len(fight)} ticks, avg {avg2:.0f} '
+          f'(the kit {statistics.mean(x[1] for x in fight):.0f}), max {max(x[0] for x in fight)}; the intro / ending / event are the '
+          f'intro and death states')
+    print(f'  cost fight state without the arena job\'s slice ticks: {len(nojob2)} ticks, max {max(x[0] for x in nojob2)}; the '
+          f'{len(jobs2)} slice ticks avg {statistics.mean(jobs2 or [0]):.0f} max {max(jobs2 or [0])}')
+    print('  cost the highest ticks without a slice: ' + '; '.join(f'{x[0]} (kit {x[1]}) at {loc[id(x)]}' for x in top))
+    check(f'Z1 commands per fight tick (P1 + P2 + A8, the kit running): the average <= 830 (Apep) and <= 600 (target); every '
+          f'tick <= {TICK_MAX} but the arena job\'s slice ticks, those <= {SLICE_MAX} (contract §5 gate 5)',
+          avg1 <= 600 and max(x[0] for x in nojob1) <= TICK_MAX and max(jobs1 or [0]) <= SLICE_MAX,
+          (avg1, max(x[0] for x in nojob1), max(jobs1 or [0])))
+    check(f'Z2 I1: every fight-state tick incl. A13 and the fight-state sequences (the kit running): the average <= 600 (target; '
+          f'Apep ~830 hard), every tick <= {TICK_MAX} but the arena job\'s slice ticks (I1b), those <= {SLICE_MAX}',
+          avg2 <= 600 and max(x[0] for x in nojob2) <= TICK_MAX and max(jobs2 or [0]) <= SLICE_MAX,
+          (avg2, [(x[0], loc[id(x)]) for x in top[:3]], max(jobs2 or [0])))
+    # the kit really ran: P1's ambience (core/amb, every 10 t) puts kit commands in every 10-tick window of P1, and the card
+    # ager it schedules runs between the calls (kit commands on most P1 ticks, not only on the call ticks)
+    p1k = [x[1] for x in parts['P1']]
+    win = [sum(p1k[i:i + 10]) for i in range(0, len(p1k) - 9, 10)]
+    check('Z3 I1b round 1: the kit is counted (it runs for real in these worlds): kit commands in every 10-tick window of P1 '
+          '(the ambience every 10 t) and on most P1 ticks (the card ager between the calls)',
+          win and min(win) > 0 and sum(1 for k in p1k if k) >= len(p1k) * 0.8, (min(win or [0]), sum(1 for k in p1k if k), len(p1k)))
+    VARS['cost_rows'] = [(k, len(v), statistics.mean(x[0] for x in v), max(x[0] for x in v)) for k, v in rows]
 
 
 def main():

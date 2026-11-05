@@ -22,6 +22,9 @@ in mcsim (run from HR/tests, outside the datapack; PLAN §7.6 / §9.3, the S2b b
            (#sq 554) plays intro_end with line 11
   cs4      the ending with an unmoving player (the framework's real mv/* movers each tick): her distance over 300-1042 stays
            3.5-6 b; she lands toward the moon; she faces the moon at 526 and the player again at 815
+  halo     (I1b verification round 1) S3's decor moon halo in the bright look of the arena's look (moon p1b, crimson p2b; dark
+           none) over CS0 E3 (raise + 2 .. l4) and the CS4 gaze (gaze .. gaze + 90), back to p1 / p2 after, restored by
+           intro/skip and the intro / ending cancel: the tick files (nowhere else) and runs in the mcsim world
 """
 import argparse
 import importlib
@@ -219,6 +222,22 @@ want_looks = sorted([('cs1', api.ev('cs1', 'recolour'), str(api.LOOK_ID['crimson
 check(f'looks: crimson at cs1 recolour, dark at the sq1 / lead-in dark events ({looks})', looks == want_looks, want_looks)
 phase = [(n, t) for n in api.SEQS for t, L in T[n].items() for l in L if 'look/phase/' in l]
 check('looks: the rig P2 accents at cs1 recolour', phase == [('cs1', api.ev('cs1', 'recolour'))], phase)
+# I1b verification round 1 (m4): the decor halo's bright looks (requests s1k-3 / s2b-4, contract §7), gated on the arena's look
+# record (moon -> p1b, crimson -> p2b; dark: no line), back after, restored by the skip and the intro / ending cancel
+HALO_RE = re.compile(re.escape(f'look_{api.AID}:"') + r'(\w+)"\}' + re.escape(f' as @e[type=minecraft:item_display,tag='
+                                                                             f'{api.TAGS["deco_moon_halo"]}] run function '
+                                                                             f'{api.NS}fx/prop/moon_halo {{look:"') + r'(\w+)"\}')
+halo_at = {r: sorted(m.groups() for l in L for m in [HALO_RE.search(l)] if m) for r, L in F.items()}
+halo_at = {r: v for r, v in halo_at.items() if v}
+BRIGHT, BACK = [('crimson', 'p2b'), ('moon', 'p1b')], [('crimson', 'p2'), ('moon', 'p1')]
+H0, H1 = api.ev('intro', 'raise') + 2, api.ev('intro', 'l4')
+G0, G1 = api.ev('ending', 'gaze'), api.ev('ending', 'gaze') + 90
+want_halo = {f'seq/intro/k/{H0}': BRIGHT, f'seq/intro/k/{H1}': BACK, f'seq/ending/k/{G0}': BRIGHT, f'seq/ending/k/{G1}': BACK,
+             'seq/intro/skip': BACK, 'seq/intro/cancel': BACK, 'seq/ending/cancel': BACK}
+halo_any = sorted(r for r, L in F.items() if any('fx/prop/moon_halo' in l for l in L))
+check(f'halo: p1b / p2b by the arena look at intro {H0} and ending {G0}, p1 / p2 at {H1} and {G1}, the same restore in intro/skip and '
+      f'the intro / ending cancel, no other halo line ({halo_any})', halo_at == want_halo and halo_any == sorted(want_halo),
+      {r: (halo_at.get(r), want_halo.get(r)) for r in set(halo_at) | set(want_halo) if halo_at.get(r) != want_halo.get(r)})
 
 
 def banners(files):
@@ -580,9 +599,49 @@ s.call(f'{api.NS}seq/intro/tick', bctx(body))
 nxt = [(f, m) for t, f, m in s.log if t == 102 and (f.endswith('play/intro_end') or f.endswith('hud/line'))]
 check('skip: the next tick (#sq 554) plays intro_end with line 11', nxt == [(f'{api.NS}rig/play/intro_end', {}), (f'{api.NS}fx/hud/line', {'id': 11})], nxt)
 
+# ================================================================ the halo's bright looks in a run (I1b verification round 1, m4)
+def halo_world(record, body_at=api.SEAT_POS, pl_at=(api.ARENA_SPEC['start']['x'], api.CY, api.ARENA_SPEC['start']['z'])):
+    """world() + S3's decor halo (an item_display tagged rlk_hr_deco_moon_halo at api.deco()) + the arena's look record."""
+    s, body, pl = world(F, body_at, 0.0, pl_at, 180.0)
+    s.ents.append(mcsim.Ent('item_display', list(api.deco()['moon_halo']), (0.0, 0.0),
+                            ['rlk_room', 'rlk_mb_aux', api.TAGS['deco'], api.TAGS['deco_moon_halo']]))
+    if record:
+        s.storage.setdefault('rlk:mboss', {})[f'look_{api.AID}'] = record
+    return s, body, pl
+
+
+def halo_calls(s):
+    return [(t, m.get('look')) for t, m in kitcalls(s, 'prop/moon_halo')]
+
+
+runs = {}
+for rec_ in ('moon', 'crimson', 'dark'):
+    s, body, pl = halo_world(rec_)
+    run_seq(s, body, 'intro', H1 + 10)
+    runs[rec_] = halo_calls(s)
+want_runs = {'moon': [(H0, 'p1b'), (H1, 'p1')], 'crimson': [(H0, 'p2b'), (H1, 'p2')], 'dark': []}
+check(f'halo run: the intro brightens the halo at {H0} and puts it back at {H1} (moon p1b -> p1, crimson p2b -> p2, dark untouched)',
+      runs == want_runs, runs)
+ends = {}
+for how in ('skip', 'cancel'):
+    s, body, pl = halo_world('moon')
+    run_seq(s, body, 'intro', H0 + 8)
+    s.t = H0 + 9
+    s.call(f'{api.NS}seq/intro/{how}', bctx(body) if how == 'skip' else mcsim.Ctx(None, C0, (0.0, 0.0)))
+    ends[how] = halo_calls(s)
+check(f'halo run: the skip and the intro cancel inside the bright window put it back (p1 at {H0 + 9})',
+      all(v == [(H0, 'p1b'), (H0 + 9, 'p1')] for v in ends.values()), ends)
+PL_E = (C0[0] + 2.0, float(api.CY), C0[2] + 6.0)        # the CS4 run's positions (below)
+s, body, pl = halo_world('crimson', (PL_E[0], api.CY, PL_E[2] - 3.5), PL_E)
+run_seq(s, body, 'ending', G0 + 10)
+s.t = G0 + 11
+s.call(f'{api.NS}seq/ending/cancel', mcsim.Ctx(None, C0, (0.0, 0.0)))
+check(f'halo run: the ending cancel inside the gaze puts it back (crimson: p2b at {G0}, p2 at {G0 + 11})',
+      halo_calls(s) == [(G0, 'p2b'), (G0 + 11, 'p2')], halo_calls(s))
+
 # ================================================================ CS4: the distance to an unmoving player, the landing, the turns
 pl0 = (C0[0] + 2.0, float(api.CY), C0[2] + 6.0)
-s, body, pl = world(F, (pl0[0], api.CY, pl0[2] - 3.5), 0.0, pl0, 180.0)
+s, body, pl = halo_world('crimson', (pl0[0], api.CY, pl0[2] - 3.5), pl0)      # I1b round 1: + the halo (P2's crimson look)
 dist, yaw_at = {}, {}
 
 
@@ -604,6 +663,8 @@ check(f'cs4: she faces the moon after the turn 506-526 ({moon_err:.1f} deg off)'
 pl_err = toward(yaw_at[api.ev('ending', 'pivot') + 21], pl.pos, body.pos)
 check(f'cs4: she faces the player again after the pivot 794-815 ({pl_err:.1f} deg off)', pl_err < 2.0)
 check('cs4: on the floor from 268 on (no float after the landing)', all(abs(body.pos[1] - api.CY) < 1e-6 for _ in [0]))
+check(f'halo run: the whole ending in the crimson look brightens the halo over the gaze ({G0} p2b, {G1} p2), nothing else',
+      halo_calls(s) == [(G0, 'p2b'), (G1, 'p2')], halo_calls(s))
 
 if A.v:
     print('\n'.join('ok   ' + x for x in OK))

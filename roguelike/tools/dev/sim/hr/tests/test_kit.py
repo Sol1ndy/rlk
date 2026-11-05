@@ -397,7 +397,7 @@ VARIANTS = {'qi_arc': [{}, {'pitch': -40, 'roll': 90}, {'pitch': 35, 'roll': -35
             'qi_ring': [{'r': 30}, {'r': 22}], 'qi_dome': [{'r': 35}], 'qi_x': [{'r': 25}],
             'qi_band': [{'len': 70, 'pitch': 35}, {'len': 120}, {'roll': 30, 'pitch': -20}],
             'qi_vert': [{}, {'yaw': 90}, {'h': 24}],
-            'qi_wedge': [{}, {'roll': -40}], 'scarlet_line': [{}, {'roll': -13}, {'yaw': 0}], 'leaves_dark': [{'n': 40}]}
+            'qi_wedge': [{}, {'roll': -40}], 'scarlet_line': [{}, {'roll': -13}, {'yaw': 0}], 'leaves_dark': [{'n': 40}, {'n': -20}]}
 for name in api.KIT_PRESETS:
     cvals = [1, 2, 3, 4, 5] if 'c' in api.KIT_PRESETS[name] else [None]
     for c in cvals:
@@ -428,6 +428,22 @@ for name in api.KIT_PRESETS:
                 s.tick(130)
                 check(not s.cards() and f'{NSF}e/world' not in s.sched, f'presets: {tag}: every card expires, the ager stops')
                 check(not [e for e in s.ents if e.etype == 'marker'], f'presets: {tag}: no marker left')
+# leaves_dark: n < 0 = the last -n of the 40 (I1b verification round 1: S2b's CS1 burst is spread as {n:20} then {n:-20} on the
+# next tick); the halves are exactly the 40 cards of {n:40}, a positive n keeps the first n, n 0 makes none
+
+
+def leaf_cards(*ns):
+    s = fresh()
+    for n in ns:
+        s.run(G.fx('leaves_dark', n=n), pos=(X0, FLOOR + 6.0, Z0), rot=(30.0, 0.0))
+    return sorted((round(e.pos[0], 4), round(e.pos[1], 4), round(e.pos[2], 4), round(e.rot[0], 3), round(e.rot[1], 3), kind(s, e))
+                  for e in s.cards())
+
+
+LEAVES = leaf_cards(40)
+check(len(LEAVES) == G.LEAF_N and leaf_cards(20, -20) == LEAVES and leaf_cards(-40) == LEAVES and leaf_cards(10, -30) == LEAVES
+      and sorted(set(LEAVES) - set(leaf_cards(20))) == leaf_cards(-20) and len(leaf_cards(8)) == 8 and not leaf_cards(0),
+      'presets: leaves_dark n < 0 = the last -n leaves ({n:20} + {n:-20} = the 40 of {n:40}; n 8 -> the first 8; n 0 -> none)')
 # qi_arc: lifted / shrunk near the floor, full reach when it fits; rotation = executor + offsets (pitch + = up)
 for h, r, pitch, roll in ((1.3, 40, 0, 0), (1.3, 45, 0, -40), (0.3, 40, -40, 90), (0.1, 60, 0, 90), (1.3, 36, -60, 90),
                           (0.3, 40, 0, 15), (1.3, 40, 35, 0)):

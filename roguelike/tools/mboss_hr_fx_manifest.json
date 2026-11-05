@@ -1931,7 +1931,7 @@
    "args": [
     "n"
    ],
-   "doc": "Dark-red / black leaves blowing across the sky (S2b CS1: her + 6, rotated as her): {n} leaves (up to 40) from her left across to her right over 30 t, turning (ambient pool).",
+   "doc": "Dark-red / black leaves blowing across the sky (S2b CS1: her + 6, rotated as her): {n} leaves (up to 40; n < 0: the last -n of them, so {n:20} and then {n:-20} spread the 40 over two ticks) from her left across to her right over 30 t, turning (ambient pool).",
    "cards": 40,
    "c_split": [],
    "ambient": true,

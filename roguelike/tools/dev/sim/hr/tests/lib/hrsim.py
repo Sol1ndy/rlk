@@ -29,6 +29,7 @@ z, a, ok = H.special_fight(s, 'spproto'); H.kill(s, pl); H.finish(s).
 """
 import json
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -310,9 +311,23 @@ def record(txt, bid, n):
 # - `scoreboard players reset * <objective>`, `scoreboard objectives remove <objective>` (its scores go); per-world-tick command counts (s.cmd_hist); the rig calls of the module
 #   (s.rigl: (tick, call)); every hazard made (s.hzr: options, position, yaw, #pt / #pat / #ph of hr); every player hit
 #   (s.phits); kit calls under rlk:boss/scarlet/fx/ are stubbed and logged (s.kitl) when a dry build references them;
+# - I1b verification round 1: s.kit_real = True runs the kit (rlk:boss/scarlet/fx/**) for real instead, as azsim runs its
+#   KITS: the presets' cards, the card ager they schedule (fx/e/world, every tick while a card lives), the cull, the HUD
+#   tickers, so their commands are counted (test_scarlet `cost`); s.kitl still logs the calls from outside the kit. Two
+#   harness fixes the kit needs (as in the kit's own harness, hr/s1k/lib): typed arrays [I; ...] in SNBT values, and
+#   `execute summon <type>` (the summoned entity becomes the executor; summon takes no rotation); kit_on(s) turns it on
+#   together with vanilla's order of scheduled functions (s.sched_vanilla: world_sc runs them after the tick's functions at
+#   gametime t + 1, in the same server tick, as the overworld's tickTime does; fgsim's order runs them a world tick later;
+#   s.t and every log keep the world tick);
 # - player/die stubbed (s.deaths; dead 1 or, with s.revive set, Ronova's revive: rnDie for s.revive ticks, then alive);
 # - variant_hr(): cmsim.variant with F:boss/scarlet copied for real (a dry build may regenerate it there).
 ROOT_SC = 'rlk:boss/scarlet/'
+KIT_SC = ROOT_SC + 'fx/'
+
+
+def kit_internal(sub):
+    """A kit function the kit calls or schedules itself (fx/e/*, fx/hud/e/*, fx/p/e/*, fx/prop/e/*), not a kit API call."""
+    return sub.startswith('e/') or '/e/' in sub
 
 
 def ck(name, ok, info=''):
@@ -329,11 +344,23 @@ class ScSim(HrSim):
         self.hzr = []
         self.phits = []
         self.kitl = []
+        self.kitx = []               # I1b round 1: (executor tags, caller, #ph hr) of each s.kitl entry (same index), kit_ex()
         self.deaths = []
         self.dash_t0 = None
         self.revive = 0
         self.rn_left = 0
         self.hz_particles = []       # particles drawn inside the framework's hazard functions (outline / flash)
+        self.kit_real = False        # I1b round 1: True = the kit runs for real (see the comment above ROOT_SC)
+        self.sched_vanilla = False   # ... and True = scheduled functions run in the server tick that scheduled them 1t ahead
+        self.gt_off = 0              # 1 while they run then (gametime t + 1; s.t and the logs keep the world tick)
+        self.nkit = 0                # ... and the commands run inside the kit (per world tick in kit_hist)
+        self.kit_hist = []
+        self._kit_depth = 0
+
+    # --- typed arrays in SNBT values (the kit's ease / sine tables: `data modify storage ... set value [I; ...]`)
+    @staticmethod
+    def snbt(s):
+        return HrSim.snbt(re.sub(r'\[\s*[IBL]\s*;', '[', s))
 
     # --- the sneak predicate
     def _sneak(self, e):
@@ -358,6 +385,18 @@ class ScSim(HrSim):
                     self.ents.append(Ent('marker', [float(v) for v in t[j + 1:j + 4]], (0.0, 0.0), [key]))
                 t[j:j + 4] = ['facing', 'entity', f'@e[tag={key},limit=1]', 'feet']
             j += 1
+        # I1b round 1: `execute summon <type> ...` (the kit's height probe and beam marker): the entity is summoned at the
+        # context position with rotation 0 0 (summon takes no execute rotation) and runs the rest as the executor; after other
+        # subcommands it is the same as `... run execute summon <type> ...`
+        j = 0
+        while j < len(t) and t[j] != 'run':
+            if t[j] == 'summon' and j + 1 < len(t):
+                if j:
+                    return self.execute(t[:j] + ['run', 'execute'] + t[j:], ctx)
+                e = Ent(t[1].replace('minecraft:', ''), ctx.pos, (0.0, 0.0), [])
+                self.ents.append(e)
+                return self.execute(t[2:], ctx.copy(ex=e))
+            j += 1
         # `if|unless predicate rlk:in_sneak` at the head of the chain (after `as`, mcsim recurses with the rest)
         i = 0
         while i < len(t) and t[i] not in ('run', 'as'):
@@ -371,6 +410,15 @@ class ScSim(HrSim):
 
     def cmd(self, t, ctx):
         self.ncmd += 1
+        if self._kit_depth:
+            self.nkit += 1
+        if self.gt_off and t[0] in ('time', 'schedule'):
+            # the scheduled phase of a vanilla-ordered tick (world_sc): the gametime is t + 1 there
+            if t[:3] == ['time', 'query', 'gametime']:
+                return self.t + self.gt_off
+            if t[1] == 'function':
+                self.sched[t[2]] = self.t + self.gt_off + int(t[3].rstrip('t'))
+                return 1
         # I1: S2b's sequences use `tp <sel> <x y z> facing (entity <sel> [eyes|feet] | <x y z>)` and `rotate <sel> <yaw>
         # <pitch>` (port of S2b's ev_dry.py; mcsim's tp reads only an optional yaw / pitch, and has no rotate)
         if t[0] == 'tp' and len(t) > 6 and t[5] == 'facing':
@@ -425,9 +473,21 @@ class ScSim(HrSim):
     def call(self, fid, ctx, macro=None):
         if fid.startswith(ROOT_SC + 'rig/') or fid.startswith(ROOT_SC + 'rig_stub/'):
             self.rigl.append((self.t, fid.split('/', 3)[3]))
-        if fid.startswith(ROOT_SC + 'fx/'):
-            self.kitl.append((self.t, fid[len(ROOT_SC) + 3:], dict(macro or {})))
-            return 1
+        if fid.startswith(KIT_SC):
+            sub = fid[len(KIT_SC):]
+            # stubbed: every call is logged; I1b round 1, kit_real: the kit runs (through azsim's call) and only the calls
+            # from outside the kit are logged
+            if not self.kit_real or (not kit_internal(sub) and not (self.stack and self.stack[-1].startswith(KIT_SC))):
+                self.kitl.append((self.t, sub, dict(macro or {})))
+                self.kitx.append((frozenset(ctx.ex.tags) if ctx.ex is not None else frozenset(),
+                                  self.stack[-1] if self.stack else '', self.sc('#ph', 'hr')))
+            if not self.kit_real:
+                return 1
+            self._kit_depth += 1
+            try:
+                return super().call(fid, ctx, macro)
+            finally:
+                self._kit_depth -= 1
         if fid == 'rlk:mboss/hz/make':
             g = lambda k: self.sc(k, 'mb')  # noqa: E731
             self.hzr.append(dict(t=self.t, tell=g('#hzW'), dmg=g('#hzD'), kind=g('#hzK'), r=g('#hzR'), a=g('#hzAng'),
@@ -450,6 +510,13 @@ class ScSim(HrSim):
             return 1
         return super().call(fid, ctx, macro)
 
+    def run_sched_at(self, now):
+        """fgsim's run_sched for the events due at gametime `now` (vanilla order: now = t + 1, gt_off 1 meanwhile)."""
+        for fid, at in sorted(self.sched.items(), key=lambda x: x[1]):
+            if at <= now and fid in self.sched:
+                del self.sched[fid]
+                self.call(fid, C0)
+
     def dash(self, v0=6, at=None):
         """A dash seen by the world tick `at` (default: the next one) with dashInvT v0 there, then counting down 1 per tick
         (player/dash_go sets 6; player/tick removes 1 per tick)."""
@@ -467,7 +534,7 @@ def world_sc(s):
     """One game tick as azsim.world (rlk:tick's order) with the dash model: dashInvT is set before the player tick and
     kept through mboss/main (the module's pip check and the hazards read it); Ronova's revive counts down."""
     s.t += 1
-    n0 = s.ncmd
+    n0, k0 = s.ncmd, s.nkit
     pl = s.player()
     if pl is not None:
         v = s.dash_inv()
@@ -490,12 +557,22 @@ def world_sc(s):
     A.room_tick(s)
     if (s.sc('#mbBoxOn', 'mb') or 0) == 1:
         s.call('rlk:mboss/box/all', C0)
-    s.run_sched()
+    if not s.sched_vanilla:
+        s.run_sched()
     if (s.sc('#riftOn', 'room') or 0) == 1 and (s.sc('#active', 'room') or 0) == 1:
         s.call('rlk:room/rift/tick', C0)
+    if s.sched_vanilla:
+        # vanilla (I1b round 1, kit_on): after the tick functions the overworld's tickTime sets gametime t + 1 and runs the
+        # events due then, in the same server tick: `time query gametime` reads t + 1 there, and a `1t` made there is due at t + 2
+        s.gt_off = 1
+        try:
+            s.run_sched_at(s.t + 1)
+        finally:
+            s.gt_off = 0
     if pl is not None:
         s.setsc(('e', pl.id), 'dashInvT', 0)
     s.cmd_hist.append(s.ncmd - n0)
+    s.kit_hist.append(s.nkit - k0)
     if hasattr(s, 'max_cards'):
         s.max_cards = max(s.max_cards, len(s.kit_cards()))
 
@@ -557,6 +634,24 @@ def setup_sc(dp, seed=1018, lv=4, hp=100000, player_level=5, cls=None):
         return base_load(fid)
     s.load = load_sc
     return s, pl
+
+
+def kit_on(s, vanilla_sched=True):
+    """I1b verification round 1: the kit runs for real in s (ScSim.kit_real), with the one engine function it calls,
+    view/ttl_blank (the subtitle typer's blank title), real too instead of the engine stubs' empty body: every module kit
+    call then costs what it costs in the kit's own harness (hr/s1k/lib/hrfxsim.FxSim). vanilla_sched: scheduled functions
+    in vanilla's order (ScSim.sched_vanilla), so the card ager's pass over the cards a tick made counts in that tick, as on
+    the server (a `schedule ... 1t` made by a tick function runs before the server tick ends). Returns s."""
+    s.kit_real = True
+    s.sched_vanilla = vanilla_sched
+    s.cache.pop('rlk:view/ttl_blank', None)
+    return s
+
+
+def kit_ex(s, sub):
+    """The logged kit calls fx/<sub> as dicts t, a (macro args), tags (the executor's), caller (the calling function), ph (#ph
+    hr at the call) — I1b round 1: e.g. which decor prop a prop/moon_halo call re-looked, from where, in which phase."""
+    return [dict(t=t, a=a, tags=x, caller=f, ph=ph) for (t, c, a), (x, f, ph) in zip(s.kitl, s.kitx) if c == sub]
 
 
 def run_sc(s, n, each=None):

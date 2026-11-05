@@ -67,3 +67,14 @@ the datapack's own tag files (`data/rlk/tags/block/*.json`; the vanilla tags the
 `cmsim.block_test` lets only air and light through those tags: harmless on D0's stub arena, but S1K's `hr_field` has dry grass /
 crimson roots in the walk disc, so `mv/ok` refused every plant cell in the sim (the intro walk stopped at the first tuft) while
 the game lets them through. The suites moved with this folder to `R:tools/dev/sim/hr/tests/lib` (I1b step 5).
+
+I1b verification round 1 (11-05, the lead; the vendored four still unchanged): `kit_on(s)` makes an `ScSim` world run the kit
+(`rlk:boss/scarlet/fx/**`) for real, as `azsim` runs its KITS (`s.kit_real`; the default stays the stub that only logs
+`s.kitl`): the presets' cards, the card ager they schedule (`fx/e/world`), the cull, the HUD tickers, plus the one engine
+function the kit calls (`view/ttl_blank`, otherwise an empty engine stub). Two harness fixes the kit needs, as in its own harness
+(`hr/s1k/lib`): typed arrays `[I; …]` in SNBT values and `execute summon <type>` (the summoned entity runs the rest; no
+rotation). `kit_on` also sets `s.sched_vanilla`: `world_sc` runs the scheduled functions after the tick's functions at gametime
+t + 1 inside the same world tick (vanilla's `tickTime`; fgsim's order ran them a world tick later), with `s.t` and every log
+kept at the world tick. Every distinct static kit call of the module (243, the uninstall apart) then costs exactly what it costs in `hrfxsim.FxSim`.
+New logs: `s.kit_hist` (the kit's own commands per world tick, beside `s.cmd_hist`), `s.kitx` (executor tags, calling function,
+`#ph hr` of each `s.kitl` entry) read through `kit_ex(s, sub)`. `test_scarlet` `cost` uses `kit_on` in every world it measures.

@@ -370,7 +370,10 @@ def build_cs1(W):
         u = (t - e('slash')) / 20
         s.at(t, petal_move(PETAL2, stage_pt(0, 1.6, 1.58 - 1.3 * u * u)))
     s.at(e('slash', 21), f'kill @e[type=minecraft:item_display,tag={PETAL2}]')
-    s.me(e('slash', 2), K.p('leaves_dark', n=40), y=6).at(e('recolour'), api.arena_look('crimson'), api.rig('look/phase/p2'))
+    # the dark leaves: the 40 of the kit in two halves on consecutive ticks (the first 20, then the last 20: one burst of 40
+    # cost 3.2 k commands in one tick, above the 3000 per fight tick; I1b verification round 1)
+    s.me(e('slash', 2), K.p('leaves_dark', n=20), y=6).me(e('slash', 3), K.p('leaves_dark', n=-20), y=6)
+    s.at(e('recolour'), api.arena_look('crimson'), api.rig('look/phase/p2'))
     s.at(e('music'), api.music(2)).me(e('swirl'), K.p('leaves_swirl'))
     mv.write(W)
     head = 'CS1 (PLAN §3.2): the lunge, the blade lock, apart, the iai under the brim, the petals, 홍련일섬, the crimson field.'

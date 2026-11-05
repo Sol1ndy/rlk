@@ -1178,15 +1178,18 @@ LEAF_PTS = [(_LF.uniform(5.0, 10.0), _LF.uniform(-1.5, 3.0), _LF.uniform(-5.0, 8
             for k in range(LEAF_N)]
 
 
-@preset('leaves_dark', 'Dark-red / black leaves blowing across the sky (S2b CS1: her + 6, rotated as her): {n} leaves (up to 40) '
-        'from her left across to her right over 30 t, turning (ambient pool).',
+@preset('leaves_dark', 'Dark-red / black leaves blowing across the sky (S2b CS1: her + 6, rotated as her): {n} leaves (up to 40; '
+        'n < 0: the last -n of them, so {n:20} and then {n:-20} spread the 40 over two ticks) from her left across to her right '
+        'over 30 t, turning (ambient pool).',
         pre=['$scoreboard players set #n2 hrFx $(n)'])
 def _p_leaves_dark():
     out = []
     for k, (x, y, z, col, fr) in enumerate(LEAF_PTS):
         c = card(f'petal_{fr}', f'^{num(x, 2)} ^{num(y, 2)} ^{num(z, 2)}', f'~{(k * 37) % 360} {(k * 23) % 90 - 45}', spin=170,
                  s0=0.32, s1=0.32, move=(-14.0, -2.0, 0.5), life=30, fade=6, dly=k % 10, col=col, pool='am')
-        out.append(f'execute if score #n2 hrFx matches {k + 1}.. run {c}')
+        # leaf k (0-based) comes with the first n (n >= k + 1) or the last -n (n <= k - 40), i.e. unless n is in k - 39 .. k
+        # (I1b verification round 1: a CS1 burst of 40 in one tick cost 3.2 k commands; S2b's call is now split in two)
+        out.append(f'execute unless score #n2 hrFx matches {k - LEAF_N + 1}..{k} run {c}')
     return out
 
 
