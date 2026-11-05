@@ -1,10 +1,12 @@
 // Display-entity rig of 홍련 (Scarlet, the special boss; S:hr/PLAN.md §2, contract S:hr/contract.md §3.2, frozen table
 // tools/mboss_scarlet/api.py §6-§7). S2c (11-05): the body wears the user's own Minecraft skin (tools/scarlet_skin.mjs, the
-// user's request "마인크래프트 스킨을 이용해서 만들라고. 아를이나 라이덴처럼"; mapped onto S2a's skeleton in scarlet_geometry.mjs);
-// the hat, the strings, the sash tails, the sword, the scabbard, the cup and the bottle stay S2a's own shapes in colours
-// matched to the skin (PLAN §1.5). Built on the shared RIGLIB (mboss_rig_compile.mjs, mboss_rig_clips.mjs,
-// mboss_model_lib.mjs, mboss_shape_lib.mjs, mboss_paint_lib.mjs, mboss_rig_math.mjs, all unchanged). API note:
-// tools/scarlet_rig_api.md.
+// user's request "마인크래프트 스킨을 이용해서 만들라고. 아를이나 라이덴처럼"). S2d (11-05, "팔다리가 너무 기괴하게 긴데 그냥
+// 플레이어 크기랑 똑같게해"): her body is the player avatar's (scarlet_geometry.mjs: the avatar's boxes and skin faces, classic
+// arms, display scale 1; scarlet_pose.mjs: the avatar's skeleton, head top 2.00 b) and every clip is retargeted per sample
+// (scarlet_retarget.mjs: angles kept, translations scaled, contacts kept: feet, knees, hands, the lying back, the seat). The
+// hat, the strings, the sash tails, the sword, the scabbard, the cup and the bottle stay S2a's own shapes in S2c's colours,
+// resized to the new body. Built on the shared RIGLIB (mboss_rig_compile.mjs, mboss_rig_clips.mjs, mboss_model_lib.mjs,
+// mboss_shape_lib.mjs, mboss_paint_lib.mjs, mboss_rig_math.mjs, all unchanged). API note: tools/scarlet_rig_api.md.
 //
 // node tools/build_scarlet_rig.mjs --resourcepack <unpacked RP> [--datapack <dp>] [--no-paint] [--allow-steps] [--allow-missing]
 //                                  [--debug-dp <scratch dir> [--debug-clips a,b | all] [--debug-step N]]
@@ -18,25 +20,29 @@
 //   tools/scarlet_rig_manifest.json (the stub's schema + transforms, models, budgets, sprites; api.check_manifest passes)
 // Clips: the 39 owned by S2a from tools/scarlet_clips.mjs; the 8 cinematic clips from S2b's tools/scarlet_cine.mjs when it
 // exists (export CLIPS: the eight clip objects in the scarlet_clips format), else scarlet_clips.CINE_PLACEHOLDER.
-// The build throws on: a part / blade tip / scabbard tip / brim / hair below the floor at any compiled tick, a clip / event /
-// loop that differs from the contract, a rotation above 120 degrees per tick or per key, the blade inside her body at a clip
-// event (S2c: the skin boxes), the atlas over 0.15 M px, more than 6 500 elements at rest, a model outside -16..32, a damaged
-// embedded skin (--allow-steps turns the motion checks into warnings while authoring; --allow-missing builds stand-ins for
-// clips not authored yet).
+// The build throws on: a part / blade tip / scabbard tip / brim below the floor at any compiled tick, a clip / event / loop
+// that differs from the contract, a rotation above 120 degrees per tick or per key, the blade inside her body at a clip event,
+// a correction guard planned at its bound, a contract dimension (api HEIGHT / HAT_TOP / BRIM_D / SWORD_LEN / SCABBARD_LEN /
+// ITEM_SWORD_LEN / ITEM_SWORD_SCALE, the registry hit box) that differs from the built rig, the atlas over 0.15 M px, more than
+// 6 500 elements at rest, a model outside -16..32, a damaged embedded skin (--allow-steps turns the motion checks into warnings
+// while authoring; --allow-missing builds stand-ins for clips not authored yet).
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {PART_NAMES, PART_SCALE, PART_BRIGHT, DEFAULT_MODEL, HAND_MODELS, FACE_MODELS, PHASE_MODELS, BLADE_MODELS, ghostOf, TINTS, allModels,
-  ITEM_SWORD, HIDDEN, SKIN, SKIN_REGIONS, SKIN_MAP, FACE_FX, SWORD} from './scarlet_geometry.mjs';
+  ITEM_SWORD, HIDDEN, SKIN, SKIN_REGIONS, SKIN_MAP, FACE_FX, SWORD, SCAB, HAT, STRINGS, SASH, CUP, BOTTLE, MODEL_SCALE, BODY_SPECS} from './scarlet_geometry.mjs';
 const SWORD_BLADE = [SWORD.bladeLo, SWORD.tip];
 import {scarletSprites, paintScarlet, spriteId, PAINT_ROLES, TEX_DIR} from './scarlet_paint.mjs';
 import {SKIN_B64, SKIN_BYTES, SKIN_SHA1} from './scarlet_skin.mjs';
-import {solve, toDisplay, fromDisplay, setModels, worldPoints, modelOn, HIP_Y} from './scarlet_pose.mjs';
+import {solve, toDisplay, fromDisplay, setModels, worldPoints, modelOn, HIP_Y, SK, GUARD_BOUND, GUARD_SLOPE, CORE, minY, hullOf, freeBlade, dirBE, bladeQ, HAT_FLOOR_HOLD,
+  BOX, ARM_REACH} from './scarlet_pose.mjs';
+import {retarget, overlay, refCore, hatSwitches, bladeChannels, setHatFace, faceSpot, PATCHES, HAT_REST, HAT_FLIGHTS, SUPPORTS, S_LEG, S_ARM, S_SCAB, K_ARC,
+  IAI_DELTA, hipDirChannels} from './scarlet_retarget.mjs';
 import {CLIPS as AUTHORED, CINE_PLACEHOLDER, accumulate, sampleClip, DEFAULT_POSE, H_POSE} from './scarlet_clips.mjs';
 import {createRigCompiler, createRigFollow, nbt, written, interp, shown, summonPart, summonShadow, cullOverhang} from './mboss_rig_compile.mjs';
-import {qAngle, len, sub, add, rot} from './mboss_rig_math.mjs';
+import {qAngle, len, sub, add, rot, mul, q, times, unit, cross, dot, perp, basisQ} from './mboss_rig_math.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const arg = n => { const i = process.argv.indexOf(n); return i < 0 ? null : process.argv[i + 1]; };
@@ -55,7 +61,10 @@ const OBJ = 'hrRig';
 
 // ---- contract (api.py itself: api.stub_manifest(), the stub file's generator) -------------------------------------------------
 const STUB = JSON.parse(execFileSync('python3', ['-c', 'import json, sys; sys.path.insert(0, "tools"); from mboss_scarlet import api; ' +
-  'print(json.dumps(api.stub_manifest(), ensure_ascii=False))'], {cwd: path.join(here, '..'), encoding: 'utf8'}));
+  'm = api.stub_manifest(); m["_api"] = {k: getattr(api, k, None) for k in ("HEIGHT", "HAT_TOP", "BRIM_D", "SWORD_LEN", "SCABBARD_LEN", "SHADOW_R", ' +
+  '"ITEM_SWORD_LEN", "ITEM_SWORD_SCALE")}; m["_api"]["BOSS"] = {"scale": api.BOSS["scale"], "hit": api.BOSS["hit"]}; ' +
+  'print(json.dumps(m, ensure_ascii=False))'], {cwd: path.join(here, '..'), encoding: 'utf8'}));
+const API = STUB._api; delete STUB._api;
 if (JSON.stringify(STUB.parts.map(p => p.name)) !== JSON.stringify(PART_NAMES)) throw new Error('parts differ from the contract');
 const CONTRACT = STUB.clips;                    // {name: {id, len, loop, events, owner}}
 const CLIP_NAMES = Object.keys(CONTRACT).sort((a, b) => CONTRACT[a].id - CONTRACT[b].id);
@@ -161,35 +170,82 @@ const CLIPS = CLIP_NAMES.map(n => {
   return c;
 });
 
-// ---- per-clip solve ------------------------------------------------------------------------------------------------------------
-// two passes: the floor guards (scabbard, hat, sash, skirt panels) are planned over the whole clip so a guard angle never
-// changes faster than GUARD_SLOPE degrees per tick (a dilation of the first pass's angles), then solved again
-const GUARD_SLOPE = 22;
+// ---- per-clip solve (S2d: sample -> refCore (S2a's contact truth) -> retarget -> overlay -> solve) ---------------------------------
+// The correction guards (scarlet_pose.mjs GUARD_BOUND: the floor guards of the scabbard / hat / strings / sash, the planted-feet
+// drop, the hip scabbard's closeY, the lying incline / chin tip / rock, the reach assists, the blade push / turn, the prop
+// closure, the back hat's head clearance) are planned over the whole clip so no value changes faster than its GUARD_SLOPE per
+// tick (a dilation of the measured values, circular for loops; the vector guards keep the direction of the tick that set the
+// maximum); pass 2 applies the plan; a guard that needed more than planned re-plans from both passes (pass 3).
 const baseOf = c => c.base || DEFAULT_POSE;
+const gv = v => (v == null ? 0 : typeof v === 'number' ? v : v.v);
+function planOf(passes, c) {
+  const N = passes[0].length, loop = c.loop && c.loop[1] === c.len, period = c.len;
+  const dist = (a, b) => { const d = Math.abs(a - b); return loop ? Math.min(d, period - d) : d; };
+  const names = new Set(passes.flatMap(fr => fr.flatMap(f => Object.keys(f.o._guard))));
+  const plan = Array.from({length: N}, () => ({}));
+  for (const n of names) {
+    const slope = GUARD_SLOPE[n.replace(/[+-]$/, '')] ?? 22;
+    const vals = Array.from({length: N}, (_, t) => { let best = null; for (const fr of passes) { const v = fr[t].o._guard[n]; if (v != null && (!best || gv(v) > gv(best))) best = v; } return best; });
+    const a = vals.map(gv);
+    if (!a.some(x => x > 1e-6)) continue;
+    for (let t = 0; t < N; t++) {
+      let m = 0, arg = -1;
+      for (let k = 0; k < N; k++) { const v = a[k] - slope * dist(k, t); if (v > m + 1e-12) { m = v; arg = k; } }
+      if (m > 1e-6) plan[t][n] = typeof vals[arg] === 'object' ? {v: m, dir: vals[arg].dir} : m;
+    }
+  }
+  return plan;
+}
+// SH0': the sheathe entry's free blade on the new scabbard axis (probe: ending 304, the hand-held scabbard, sh at 304)
+let SH0P = null, HAT_FACE = null;
+const FLIGHT_SRC = {};
 function solveClip(c) {
-  const run = plan => {
-    const ks = accumulate(c, baseOf(c)), out = [];
-    const warm = c.loop && c.loop[1] === c.len ? c.len : 0;   // loops settle their secondary motion over one silent cycle
+  const base = baseOf(c), ks = accumulate(c, base);
+  const switches = hatSwitches(ks), cuts = c.cuts || [], loop = c.loop && c.loop[1] === c.len;
+  const flight = HAT_FLIGHTS[c.name];
+  const flightSrc = flight ? {A: sampleClip(c, flight.t0, ks, base).hwP, B: sampleClip(c, flight.t1, ks, base).hwP} : null;
+  const run = (plan, pass, fctx) => {
+    const out = [];
+    const warm = loop ? c.len : 0;   // loops settle their secondary motion over one silent cycle
     const hist = k => out[out.length - k]?.o || null;
+    let refPrev = {};
     for (let i = 0; i <= warm + c.len; i++) {
       const t = i - warm, tt = t < 0 ? t + c.len : t;
-      const p = sampleClip(c, tt, ks, baseOf(c));
-      const o = solve(p, hist, plan ? plan[tt] : {});
-      out.push({o, p, t: tt});
+      const p = sampleClip(c, tt, ks, base);
+      const ref = refCore(p, refPrev); refPrev = ref.prev;
+      const qq = overlay(retarget(p, c.name, tt), c.name, tt, {sh0: c.name === 'ending' ? SH0P : null, hatSwitches: switches, cuts, flight: fctx, flightSrc});
+      const o = solve(qq, hist, plan ? plan[tt] : {}, {pass, clip: c.name, t: tt, ref});
+      out.push({o, p, q: qq, t: tt, ref});
     }
     return out.slice(warm);
   };
-  let fr = run(null);
-  const names = [...new Set(fr.flatMap(f => Object.keys(f.o._guard)))];
-  if (names.some(n => fr.some(f => (f.o._guard[n] || 0) > .5))) {
-    const plan = fr.map(() => ({}));
-    for (const n of names) {
-      const a = fr.map(f => f.o._guard[n] || 0);
-      for (let t = 0; t < a.length; t++) { let m = 0; for (let k = 0; k < a.length; k++) m = Math.max(m, a[k] - GUARD_SLOPE * Math.abs(k - t)); plan[t][n] = m; }
-    }
-    fr = run(plan);
+  const flightCtx = fr => {
+    if (!flight) return null;
+    const f = flight;
+    const A = f.from.state ? fr[f.from.t].o.hat : HAT_REST[f.from.spot];
+    const B = f.to.state ? fr[f.to.t].o.hat : HAT_REST[f.to.spot];
+    return {A: A.t, Aq: A.q || null, B: B.t, Bq: B.q || null};
+  };
+  const p1 = run(null, 1, null);
+  let fr = p1, plan = null, passes = 1;
+  const big = f => Object.values(f.o._guard).some(v => gv(v) > .5);
+  if (flight || p1.some(big)) {
+    const fctx = flightCtx(p1);
+    plan = planOf([p1], c);
+    let p2 = run(plan, 2, fctx); passes = 2;
+    const over = p2.some((f, t) => Object.entries(f.o._guard).some(([n, v]) => gv(v) > gv(plan[t][n]) + .5));
+    if (over) { plan = planOf([p1, p2], c); p2 = run(plan, 3, fctx); passes = 3; }
+    fr = p2;
   }
-  return fr.map(f => ({o: f.o, p: f.p, d: Object.fromEntries(PART_NAMES.map(n => [n, toDisplay(n, f.o[n])]))}));
+  return fr.map(f => ({o: f.o, p: f.p, q: f.q, ref: f.ref, passes, d: Object.fromEntries(PART_NAMES.map(n => [n, toDisplay(n, f.o[n])]))}));
+}
+// the probes the clips need before they are solved: the world hat's face spot (LY = ending 0: the hat over her face, parallel to it,
+// 0.012 off the face layer) and SH0' (ending 304)
+function probe(name, t) {
+  const c = CLIPS.find(x => x.name === name), base = baseOf(c), ks = accumulate(c, base);
+  const p = sampleClip(c, t, ks, base);
+  const qq = overlay(retarget(p, name, t), name, t, {});
+  return {p, q: qq, o: solve(qq, () => null, {}, {pass: 1, clip: name, t, ref: refCore(p, {})})};
 }
 // ---- compile -----------------------------------------------------------------------------------------------------------------
 // tolerances (display space): translation 0.012 b (0.025-0.03 on the long / soft parts), rotation by the part's reach
@@ -246,17 +302,91 @@ const anchorTable = {};
 // the points the floor gate names (PLAN §2.1: blade tip, scabbard tip, brim, hair, skirt; every other part by its hull)
 const tipOf = (fr, n) => {
   const v = fr.o[n]; if (!v || v.s[0] < 1e-4) return null;
-  if (n === 'sword') return add(v.t, rot(v.q, [0, 1.93, 0]));
-  if (n === 'scabbard') return add(v.t, rot(v.q, [0, 1.82, 0]));
+  if (n === 'sword') return add(v.t, rot(v.q, [0, SWORD.tip, 0]));
+  if (n === 'scabbard') return add(v.t, rot(v.q, [0, SCAB.L, 0]));
   return null;
 };
+// ---- the probes (S2d): the world hat's face spot (LY), SH0' (the sheathe entry) -------------------------------------------------
+{
+  setHatFace({t: [0, .45, .5]});                         // provisional (the probe of ending 0 maps the face spot)
+  // the hat parallel to the face, 0.012 off the face layer, its front toward the top of her head, the chest-side rim tilted up
+  // over her forearms (scarlet_retarget.mjs faceSpot)
+  const fs = faceSpot(t => probe('ending', t));
+  HAT_FACE = {tilt: fs.tilt, lift: fs.lift};
+  setHatFace({t: fs.t, q: fs.q});
+}
+{
+  const {q: q304, o} = probe('ending', 304);
+  const ax = rot(o.scabbard.q, [0, 1, 0]), Ryaw = q([0, q304.rot[1], 0]), R0 = o.pelvis.t;
+  const SLp = add(o.torso.t, rot(o.torso.q, SK.shoulder));
+  let sh = q304.sh || 0;
+  const Gof = s => sub(o.scabbard.t, times(ax, SWORD.tip - s * (SWORD.tip - SWORD.guard)));
+  let G = Gof(sh);
+  const extra = {};
+  if (len(sub(G, SLp)) > ARM_REACH) { sh = .30; G = Gof(sh); extra.sh = .30; }
+  const SQ = bladeQ(ax, rot(o.scabbard.q, [0, 0, -1]));
+  SH0P = {...bladeChannels(G, SQ, R0, Ryaw), ...extra};
+  // the free blade of SH0' reproduces the on-axis frame
+  const fb = freeBlade({...q304, ...SH0P}, R0, Ryaw, SLp, add(R0, rot(Ryaw, SK.swing)));
+  const da = qAngle(fb.SQ, SQ), dg = len(sub(fb.G, G));
+  if (da > 1 || dg > .01) throw new Error(`SH0': the free blade at ending 304 is ${dg.toFixed(3)} b / ${da.toFixed(2)} deg off the scabbard axis`);
+}
+const supportTable = {}, retargetTable = {}, boundErrors = [], KEEP_F = {};
+const spansOf = flags => { const out = []; let a = -1; flags.forEach((f, t) => { if (f && a < 0) a = t; if (!f && a >= 0) { out.push([a, t - 1]); a = -1; } }); if (a >= 0) out.push([a, flags.length - 1]); return out; };
+const clipTime = {};
 for (const c of CLIPS) {
+  const tc0 = Date.now();
   const F = solveClip(c);
+  clipTime[c.name] = Date.now() - tc0;
+  // the guards' bounds (hard: a value at its bound is an error; the scabbard's first axis may give way to the second)
+  F.forEach((fr, t) => {
+    for (const [n, v] of Object.entries(fr.o._guard)) {
+      const base = n.replace(/[+-]$/, ''), b = GUARD_BOUND[base];
+      if (b !== undefined && gv(v) >= b - 1e-6 && !(base === 'scab' && gv(fr.o._guard.scabY) > 0)) boundErrors.push(`${c.name} t${t} ${n} ${gv(v).toFixed(1)} at its bound ${b}`);
+    }
+  });
+  // the support table (the tests' contact / air spans) and the retarget table (corrections, contacts, stretch)
+  {
+    const fl = (fn) => F.map((fr, t) => !!fn(fr, t));
+    const vis1 = fr => (fr.q.vis ?? 1) >= .999;
+    // planted: the source's foot on the floor where S2a's body touched it (refCore; an S2a foot short of its floor target
+    // hovered with the body: those ticks are `air` or between)
+    const planted = (fr, k) => vis1(fr) && (fr.q.lf || 0) < .5 && fr.q[k][1] <= .0066 && (fr.q.wSeat || 0) < .5 && (fr.q.wKnee || 0) < .5 && fr.ref.low < .012;
+    supportTable[c.name] = {
+      low_ref: F.map(fr => +fr.ref.low.toFixed(3)),
+      // lie: a full lying root where S2a's body touched (an airborne kip off its lying root is `air`: the support pass lifts it);
+      // touch: S2a touched, no full root (a partial lying / kneeling root is finished by the support pass's touch rule);
+      // air: S2a's body >= 0.05 up, no seat / kneel
+      seat: spansOf(fl(fr => (fr.q.wSeat || 0) >= .999)), lie: spansOf(fl(fr => (fr.q.wLie || 0) >= .999 && fr.ref.low < .012)),
+      kneel: spansOf(fl(fr => (fr.q.wKnee || 0) >= .999)),
+      feet_l: spansOf(fl(fr => planted(fr, 'fL'))), feet_r: spansOf(fl(fr => planted(fr, 'fR'))),
+      touch: spansOf(fl(fr => vis1(fr) && fr.ref.low < .012 && (fr.q.wSeat || 0) < .001 && (fr.q.wLie || 0) < .999 && (fr.q.wKnee || 0) < .999)),
+      air: spansOf(fl(fr => vis1(fr) && fr.ref.low >= .05 && (fr.q.wSeat || 0) < .001 && (fr.q.wKnee || 0) < .001)),
+      ghost: spansOf(fl(fr => !vis1(fr))),
+      // held: the sword in the left hand outside a sheathe blend (its pivot = the left grip); cuts: the clip's cut ticks;
+      // lift: the support pass's last-resort lift per tick (only the ticks that needed one)
+      held: spansOf(fl(fr => (fr.q.sword || 'hand') === 'hand' && (fr.q.hold ?? 1) > .5 && (fr.q.shW || 0) < .5)),
+      cuts: [...(c.cuts || [])],
+      lift: Object.fromEntries(F.map((fr, t) => [t, +fr.o._lift.toFixed(3)]).filter(([, v]) => v > 0)),
+      contacts: F.flatMap((fr, t) => fr.o._support.cts.map(x => [t, x.kind, x.side, ...(x.az !== undefined ? [+x.az.toFixed(2)] : [])])),
+    };
+    const mx = {}, cts = {};
+    let st = 1, res = 0, dyM = 0, liftM = 0;
+    for (const fr of F) {
+      for (const [n, v] of Object.entries(fr.o._guard)) mx[n] = Math.max(mx[n] || 0, +gv(v).toFixed(2));
+      for (const [k, v] of Object.entries(fr.o._contacts)) cts[k] = Math.max(cts[k] || 0, +v.toFixed(3));
+      st = Math.max(st, fr.o._stretch.arm, fr.o._stretch.leg); res = Math.max(res, fr.o._support.bladeResidue);
+      dyM = Math.max(dyM, Math.abs(fr.o._support.dy)); liftM = Math.max(liftM, fr.o._lift);
+    }
+    retargetTable[c.name] = {passes: F[0].passes, corrections: Object.fromEntries(Object.entries(mx).filter(([, v]) => v > 0).sort()), contacts: cts,
+      stretch: +st.toFixed(4), blade_residue: +res.toFixed(3), support_dy: +dyM.toFixed(3), lift: +liftM.toFixed(3)};
+  }
   const cuts = [...(c.cuts || [])];
   const byTick = new Map(), add_ = (t, l) => { if (!byTick.has(t)) byTick.set(t, []); byTick.get(t).push(l); };
   let keys = 0;
   const compiledD = {}, dense = denseTicks(c);
-  for (const n of PART_NAMES) {
+  const keyLists = {}, extraSplit = Object.fromEntries(PART_NAMES.map(n => [n, new Set()]));
+  const compilePart = n => {
     const seq = F.map(fr => fr.d[n]);
     let segs = segmentsCut(seq, n, cuts, c.blend ?? 3);
     if (dense.size) {
@@ -266,6 +396,13 @@ for (const c of CLIPS) {
         const pts = [a, ...inner, b];
         return pts.slice(1).map((y, i) => [pts[i], y]);
       });
+    }
+    // the blade keys at the clip events (S2d: the hits, the clashes; the event check runs on what ships), and a body part the
+    // shipped blade enters at an event keys there too (extraSplit, filled by the event check below)
+    {
+      const evs = n === 'sword' || n === 'sword_glow' ? [...new Set(Object.values(c.events))].filter(t => t > 0 && t < c.len) : [];
+      const xs = [...new Set([...evs, ...extraSplit[n]])];
+      if (xs.length) segs = segs.flatMap(([a, b]) => { const pts = [a, ...xs.filter(t => t > a && t < b).sort((x, y) => x - y), b]; return pts.slice(1).map((y, i) => [pts[i], y]); });
     }
     // a segment whose client interpolation dips below the floor is split at its lowest tick (until none dips)
     const lowAt = (t, v) => { const P = worldPoints(modelOn(n, F[t].p), n, fromDisplay(n, v)); return P.length ? Math.min(...P.map(x => x[1])) : 1; };
@@ -278,15 +415,30 @@ for (const c of CLIPS) {
       if (!worst) break;
       segs = segs.flatMap(([a, b]) => (a === worst.a && b === worst.b ? [[a, worst.t], [worst.t, b]] : [[a, b]]));
     }
+    // S2d: a planted foot's shin (the support table's feet spans) whose interpolation moves its lowest point > 0.006 off the
+    // solved one is split there too (a planted foot keeps its floor contact on what ships, not only at the keys)
+    if (n === 'shin_l' || n === 'shin_r') {
+      const plantedT = new Set(supportTable[c.name][n === 'shin_l' ? 'feet_l' : 'feet_r'].flatMap(([a, b]) => Array.from({length: b - a + 1}, (_, i) => a + i)));
+      for (let guard = 0; plantedT.size && guard < 200; guard++) {
+        const W = seq.map(written); let worst = null;
+        for (const [a, b] of segs) for (let t = a + 1; t < b; t++) {
+          if (!plantedT.has(t)) continue;
+          const e = Math.abs(lowAt(t, interp(W[a], W[b], (t - a) / (b - a))) - lowAt(t, W[t]));
+          if (e > .006 && (!worst || e > worst.e)) worst = {a, b, t, e};
+        }
+        if (!worst) break;
+        segs = segs.flatMap(([a, b]) => (a === worst.a && b === worst.b ? [[a, worst.t], [worst.t, b]] : [[a, b]]));
+      }
+    }
     // the keys as shipped {at, dur, to}: a 1-tick segment ending on a cut tick and turning > 60 deg (or showing a hidden part)
     // snaps (a 0-tick key at b; the next segment starts one tick later)
-    const snapAt = new Set(cuts), keyList = [];
+    const snapAt = new Set(cuts), keyList = [], partMotion = [];
     let snapped = -1;
     for (const [a, b] of segs) {
       const turn = qAngle(seq[a].q, seq[b].q);
       const pop = !shown(seq[a]) && shown(seq[b]);
       if (b - a === 1 && snapAt.has(b) && (turn > 60 || pop || len(sub(seq[a].t, seq[b].t)) > .25)) { keyList.push({at: b, dur: 0, to: b}); snapped = b; continue; }
-      if (turn > 118 && shown(seq[a]) && shown(seq[b])) motionErrors.push(`${c.name} ${n} t${a}-${b}: ${turn.toFixed(0)} degree key (ambiguous slerp)`);
+      if (turn > 118 && shown(seq[a]) && shown(seq[b])) partMotion.push(`${c.name} ${n} t${a}-${b}: ${turn.toFixed(0)} degree key (ambiguous slerp)`);
       if (a === snapped) { if (b - a > 1) keyList.push({at: a + 1, dur: b - a - 1, to: b}); }
       else keyList.push({at: a, dur: b - a, to: b});
     }
@@ -307,9 +459,41 @@ for (const c of CLIPS) {
         cv[t] = d > 0 && t < k0 + d ? interp(from, tgt, (t - k0) / d) : tgt;
       }
     }
-    compiledD[n] = cv;
-    for (const k of keyList) { add_(k.at, `data merge entity ${uuidOf(n)} {start_interpolation:0,interpolation_duration:${k.dur},transformation:${nbt(seq[k.to])}}`); keys++; }
+    compiledD[n] = cv; keyLists[n] = {keyList, seq, partMotion};
+  };
+  for (const n of PART_NAMES) compilePart(n);
+  // the blade at the clip events (as shipped): no sample inside a body box (1 cm in); a failing event keys the blade and the
+  // part it enters at that tick (up to three rounds), then reports what is left
+  const eventFails = () => {
+    const out = [];
+  for (const [ev, te] of Object.entries(c.events)) {
+    const sw = fromDisplay('sword', compiledD.sword[te]);
+    if (!shown(compiledD.sword[te])) continue;
+    const ax = rot(sw.q, [0, 1, 0]);
+    for (const n of BODY_BOX_PARTS) {
+      const v = fromDisplay(n, compiledD[n][te]);
+      if (Math.min(...v.s) < 1e-4) continue;
+      const [lo, hi] = BODY_BOX[n];
+      let deep = 0;
+      for (let k = 0; k <= 40; k++) {
+        const y = SWORD_BLADE[0] + (SWORD_BLADE[1] - SWORD_BLADE[0]) * k / 40, P = add(sw.t, ax.map(x => x * y * sw.s[1]));
+        const L = rot(conjQ(v.q), sub(P, v.t)).map((x, i) => x / v.s[i]);
+        deep = Math.max(deep, Math.min(...[0, 1, 2].flatMap(i => [L[i] - lo[i], hi[i] - L[i]])));
+      }
+      if (deep > .01) out.push({n, te, msg: `${c.name} ${ev}@${te} ${n}: the blade ${deep.toFixed(3)} b inside`});
+    }
   }
+    return out;
+  };
+  for (let round = 0; round < 3; round++) {
+    const fails = eventFails();
+    if (!fails.length) break;
+    const redo = new Set();
+    for (const f of fails) for (const n of [f.n, 'sword', 'sword_glow']) if (!extraSplit[n].has(f.te)) { extraSplit[n].add(f.te); redo.add(n); }
+    if (!redo.size) break;
+    for (const n of redo) compilePart(n);
+  }
+  for (const f of eventFails()) bladeErrors.push(f.msg);
   // per-tick checks on what ships: floor (every shown model point; the blade / scabbard tips), culling, 1-tick turns
   for (let t = 0; t <= c.len; t++) {
     for (const n of PART_NAMES) {
@@ -325,23 +509,11 @@ for (const c of CLIPS) {
     }
     for (const n of ['sword', 'scabbard']) { const P = tipOf(F[t], n); if (P && P[1] < (n === 'sword' ? .0 : 0)) floorErrors.push(`${c.name} t${t} ${n} tip ${P[1].toFixed(3)} b`); }
   }
-  // the blade at the clip events (as shipped): no sample inside a body box (1 cm in)
-  for (const [ev, te] of Object.entries(c.events)) {
-    const sw = fromDisplay('sword', compiledD.sword[te]);
-    if (!shown(compiledD.sword[te])) continue;
-    const ax = rot(sw.q, [0, 1, 0]);
-    for (const n of BODY_BOX_PARTS) {
-      const v = fromDisplay(n, compiledD[n][te]);
-      if (Math.min(...v.s) < 1e-4) continue;
-      const [lo, hi] = BODY_BOX[n];
-      let deep = 0;
-      for (let k = 0; k <= 40; k++) {
-        const y = SWORD_BLADE[0] + (SWORD_BLADE[1] - SWORD_BLADE[0]) * k / 40, P = add(sw.t, ax.map(x => x * y * sw.s[1]));
-        const L = rot(conjQ(v.q), sub(P, v.t)).map((x, i) => x / v.s[i]);
-        deep = Math.max(deep, Math.min(...[0, 1, 2].flatMap(i => [L[i] - lo[i], hi[i] - L[i]])));
-      }
-      if (deep > .01) bladeErrors.push(`${c.name} ${ev}@${te} ${n}: the blade ${deep.toFixed(3)} b inside`);
-    }
+  // the keys as shipped and the 1-key turn errors of the final compile of every part
+  for (const n of PART_NAMES) {
+    const {keyList, seq, partMotion} = keyLists[n];
+    motionErrors.push(...partMotion);
+    for (const k of keyList) { add_(k.at, `data merge entity ${uuidOf(n)} {start_interpolation:0,interpolation_duration:${k.dur},transformation:${nbt(seq[k.to])}}`); keys++; }
   }
   // discrete channels: hands and face (model swaps through rig/m/*), the re-parent states (stored), at tick 0 and changes
   F.forEach((fr, t) => {
@@ -393,6 +565,7 @@ for (const c of CLIPS) {
   fn(`start/${c.name}`, [`# Start clip ${c.name} now (tick 0 applied immediately). @s = rig anchor.`, `scoreboard players set @s ${OBJ}C ${c.id}`,
     `scoreboard players set @s ${OBJ}T 0`, `function ${NS}/c/${c.name}/k/0`]);
   anchorTable[c.name] = Object.fromEntries(ANCHORS.map(a => [a, [...F.map(fr => fmtA(fr.o._anchors[a])), fmtA(F[c.len].o._anchors[a])]]));
+  if (c.name === 'idle' || c.name === 'ev_give') KEEP_F[c.name] = F.map(fr => ({o: fr.o, p: fr.p, q: fr.q, d: fr.d}));
   clipInfo[c.name] = {id: c.id, len: c.len, loop: lp ? [...lp] : null, events: c.events, owner: c.owner, key_files: ticks.length, keys,
     keys_per_tick: +(keys / (c.len + 1)).toFixed(1), source: c.src || '', note: c.note || '', authored: !!byName[c.name] && !byName[c.name].placeholder};
   if (debugDp && (debugClips.includes('all') || debugClips.includes(c.name))) {
@@ -407,6 +580,7 @@ const fail = (title, list) => { if (list.length) { const m = `${title}:\n  ${lis
 fail('floor (no shown element below the feet)', floorErrors);
 fail('the blade through her body at a clip event', bladeErrors);
 fail('rotations above 120 degrees per tick or per key', motionErrors);
+fail('a correction guard at its bound (scarlet_pose.mjs GUARD_BOUND)', boundErrors);
 fail('culling box overhang', cullWarn);
 compiler.writeDispatch(CLIPS.map(c => ({id: c.id, name: c.name})));
 
@@ -431,6 +605,41 @@ const restOf = over => {
   return solveClip(c)[0];
 };
 const REST = restOf({});
+// ---- the built dimensions (S2d) and the contract asserts (api.py is the contract: S:hr/contract.md §7) ----------------------------
+const DIMS = (() => {
+  const F0 = KEEP_F.idle[0].o, worldOf = (n, fr) => worldPoints(modelOn(n, fr.p), n, fr.o[n]);
+  const headTop = add(F0.head.t, rot(F0.head.q, [0, .5, 0]))[1];      // the head's base box, its top face centre
+  let hullTop = 0;
+  for (const fr of KEEP_F.idle) for (const n of PART_NAMES) { const v = fr.o[n]; if (!v || v.s[0] < 1e-4) continue; for (const P of worldOf(n, fr)) hullTop = Math.max(hullTop, P[1]); }
+  // the thrown sword's summon offset from the right hand at the toss (seq.py S23): the item's centre in her yaw frame, measured
+  // at ev_give 29 (the last tick the scabbard is in her hand; the clip keys it gone at the toss, 30)
+  const g = KEEP_F.ev_give[29].o, yaw = q([0, KEEP_F.ev_give[29].p.rot[1], 0]);
+  const ctr = add(g.scabbard.t, rot(g.scabbard.q, [0, -ITEM_SWORD.shift, 0])), rel = rot([-yaw[0], -yaw[1], -yaw[2], yaw[3]], sub(ctr, g._anchors.hand_r));
+  return {height_idle: +headTop.toFixed(4), hat_top: +F0._anchors.hat_crown[1].toFixed(4), hull_top: +hullTop.toFixed(4),
+    hat: {R: HAT.R, crownR: HAT.crownR, crownH: HAT.crownH, brim: SK.brim, tilt: SK.brimTilt, hand: SK.hatHand, back: SK.hatBack},
+    strings: STRINGS, sash: SASH.tails,
+    sword: {len: +(SWORD.tip - SWORD.pommel).toFixed(4), tip: SWORD.tip, blade_lo: SWORD.bladeLo, guard: SWORD.guard, pommel: SWORD.pommel, grip_lo: SWORD.gripLo, grip_hi: SWORD.gripHi,
+      display_scale: PART_SCALE.sword},
+    scabbard: {L: SCAB.L, display_scale: PART_SCALE.scabbard},
+    item_sword: {len: ITEM_SWORD.len, scale: MODEL_SCALE.item_sword, units: +(ITEM_SWORD.len * 16 / MODEL_SCALE.item_sword).toFixed(2),
+      toss_offset: [+rel[0].toFixed(2), +rel[1].toFixed(2), +(-rel[2]).toFixed(2)]},
+    seat_top: SUPPORTS.stone.T, stone: SUPPORTS.stone, seat_items: {bottle: SUPPORTS.stone.bottle, cup: SUPPORTS.stone.cup},
+    hat_rest: Object.fromEntries(Object.entries(HAT_REST).map(([k, v]) => [k, v.t])), hat_face: HAT_FACE, shadow_r: STUB.shadow.radius,
+    contacts: {grip: SK.fore, brim_hold: SK.brimHold, hilt: SK.hilt, throat: SK.throat, lip_mouth: SK.lipMouth, cup_hand: CUP.hand, cup_centre: CUP.centre,
+      bottle_neck: BOTTLE.neck, two_hand: SK.twoHand, hat_floor_hold: {inset: .02, up: HAT_FLOOR_HOLD}}};
+})();
+{
+  const bad = [];
+  if (Math.abs(API.HEIGHT - DIMS.height_idle) > .02) bad.push(`api.HEIGHT ${API.HEIGHT} vs the idle-t0 head top ${DIMS.height_idle}`);
+  if (Math.abs(API.HAT_TOP - DIMS.hat_top) > .01) bad.push(`api.HAT_TOP ${API.HAT_TOP} vs the idle-t0 hat crown ${DIMS.hat_top}`);
+  if (Math.abs(API.BRIM_D - 2 * HAT.R) > 1e-9) bad.push(`api.BRIM_D ${API.BRIM_D} vs 2 x HAT.R ${2 * HAT.R}`);
+  if (Math.abs(API.SWORD_LEN - DIMS.sword.len) > .01) bad.push(`api.SWORD_LEN ${API.SWORD_LEN} vs the sword ${DIMS.sword.len}`);
+  if (Math.abs(API.SCABBARD_LEN - SCAB.L) > .01) bad.push(`api.SCABBARD_LEN ${API.SCABBARD_LEN} vs SCAB.L ${SCAB.L}`);
+  if (API.ITEM_SWORD_LEN !== ITEM_SWORD.len || API.ITEM_SWORD_SCALE !== MODEL_SCALE.item_sword) bad.push(`api.ITEM_SWORD_LEN / SCALE ${API.ITEM_SWORD_LEN} / ${API.ITEM_SWORD_SCALE} vs ${ITEM_SWORD.len} / ${MODEL_SCALE.item_sword}`);
+  const m = API.BOSS.hit.h - DIMS.hull_top;
+  if (!(m >= .05 - 1e-9 && m <= .12 + 1e-9)) bad.push(`the registry hit h ${API.BOSS.hit.h} - the idle hull top ${DIMS.hull_top} = ${m.toFixed(3)} (want 0.05..0.12)`);
+  if (bad.length) throw new Error('contract (api.py) differs from the built rig:\n  ' + bad.join('\n  '));
+}
 const REST_STATE = {
   hat: Object.fromEntries(LOOKS.hat.map(v => [v, restOf({hat: v, ...(v === 'hand' ? {aR: [80, 40, .9]} : {})})])),
   scabbard: Object.fromEntries(LOOKS.scabbard.map(v => [v, restOf({scab: v, ...(v === 'hand' ? {hR: 'grip', scE: -60} : {})})])),
@@ -557,11 +766,22 @@ const manifest = {
   objectives: OBJS, culling: CULL, view_range: VIEW_RANGE, storage: {anchors: 'rlk:hr rig.an', version: anVer},
   ghost_texture: itemId('ghost'),
   skin: {texture: SKIN_ID, file: `${TEX_DIR}/skin.png`, source: 'tools/scarlet_skin.mjs: the user\'s own skin (11-05), bytes written unchanged',
-    bytes: SKIN_BYTES, sha1: SKIN_SHA1, size: [64, 64], layout: 'classic (4-px arms) with the outer layers',
-    regions: SKIN_REGIONS, px: SKIN.px, body_px: +SKIN.bodyPx.toFixed(6), head0: SKIN.head0, inflate_px: {head: SKIN.inflHead, body: SKIN.infl, leg_r: SKIN.inflLegR},
-    map: SKIN_MAP, hidden: HIDDEN, face_overlays: FACE_FX,
-    _doc: 'map: model -> [region, row start, row end] (the base box shows the region\'s base layer, the second box its outer layer; body_back = the hair slab: the body back face only). hidden: parts the skin already shows (model empty, scale 0). face_overlays: [col, row, cols, rows] of the 8 x 8 face painted by face_fx.'},
-  item_sword: {model: itemId('item_sword'), length: ITEM_SWORD.len, display_scale: 1.5, display: ITEM_DISPLAY},
+    bytes: SKIN_BYTES, sha1: SKIN_SHA1, size: [64, 64],
+    layout: 'player avatar (tools/build_player_rig.mjs bodyModels) with classic 4-px arms (tools/arlecchino_geometry.mjs P2_SPECS)',
+    regions: SKIN_REGIONS, px: SKIN.px, body_px: SKIN.bodyPx, head0: SKIN.head0, inflate_px: {head: SKIN.inflHead, body: SKIN.infl}, inflate_ends: 'all',
+    specs: BODY_SPECS, map: SKIN_MAP, hidden: HIDDEN, face_overlays: FACE_FX,
+    _doc: 'map: model -> [region, row start, row end] (the base box shows the region\'s base layer, the second box its outer layer, inflated on all six sides). specs: the avatar\'s box specs (from / to in model units about the pivot [8, 8, 8], uv / over = [u, v, w, h, d], rows start..end). hidden: parts the skin already shows (model empty, scale 0). face_overlays: [col, row, cols, rows] of the 8 x 8 face painted by face_fx.'},
+  item_sword: {model: itemId('item_sword'), length: ITEM_SWORD.len, display_scale: MODEL_SCALE.item_sword, display: ITEM_DISPLAY, toss_offset: DIMS.item_sword.toss_offset},
+  skeleton: {hip_y: HIP_Y, hipJ: SK.hipJ, waist: SK.waist, neckB: SK.neckB, shoulder: SK.shoulder, armU: SK.armU, fore: SK.fore, thigh: SK.thigh, shin: SK.shin,
+    ankleY: SK.ankleY, swing: SK.swing, brim: SK.brim, brimTilt: SK.brimTilt, hatBack: SK.hatBack, hatHand: SK.hatHand, brimHold: SK.brimHold, sashKnot: SK.sashKnot,
+    scabHip: SK.scabHip, scabHipDir: SK.scabHipDir.map(x => +x.toFixed(6)), twoHand: SK.twoHand, hilt: SK.hilt, throat: SK.throat, anchors: SK.anchors, vis: SK.vis,
+    _doc: 'the player avatar\'s skeleton (blocks; rig frame +X her left, +Y up, -Z forward): hip_y = the hip line at pos 0; waist = the torso pivot (the seam, body row 9) from the hip line; neckB / shoulder from the seam; armU / fore = shoulder -> elbow -> grip; thigh / shin = hip joint -> knee -> the outer-layer sole'},
+  dims: DIMS,
+  support: supportTable,
+  retarget: {factors: {S_LEG: +S_LEG.toFixed(6), S_ARM: +S_ARM.toFixed(6), S_SCAB: +S_SCAB.toFixed(6), K_ARC: +K_ARC.toFixed(6)},
+    patches: PATCHES.map(P => ({id: P.id, clip: P.clip, in: P.in, out: P.out, ...(P.set ? {set: P.set} : {}), ...(P.add ? {add: P.add} : {}), why: P.why})),
+    iai_delta: IAI_DELTA, sh0: SH0P, hip_dir: hipDirChannels(), hat_flights: HAT_FLIGHTS, bounds: GUARD_BOUND, slopes: GUARD_SLOPE, clips: retargetTable,
+    _doc: 'per sample: retarget (angles kept; pos x k(lf); soles about the hip joint x S_LEG; grip distances x S_ARM + the lock rule; planted hands x S_LEG; scOff x S_SCAB; world-hat spots) -> overlay (PATCHES, the hat hand-overs, the flights) -> solve. clips: per clip the solver passes, the largest value of every correction guard (degrees, or cm for drop / bPush / close / hatBackZ; +/- = the two senses), the largest contact distance per kind, the largest IK stretch, the blade residue inside the body (b), the largest support move and lift'},
   paint_roles: PAINT_ROLES,
   budgets: {atlas_px: atlasPx, atlas_budget: ATLAS_BUDGET, sprites: Object.keys(sprites).length, elements_at_rest: ELEMENTS, elements_budget: EL_BUDGET,
     parts: PART_NAMES.length, models: Object.keys(models).length, key_files: keyFiles, keys: keyLines, rig_functions: fnFiles.files, rig_bytes: fnFiles.bytes,
@@ -569,6 +789,7 @@ const manifest = {
   sprites: ledger,
 };
 json(path.join(here, 'scarlet_rig_manifest.json'), manifest);
+if (process.env.HR_TIMES) console.log('solve ms per clip', JSON.stringify(clipTime));
 console.log(`Built the Scarlet rig: ${PART_NAMES.length} parts, ${CLIPS.length} clips (${missing.length} stand-ins; cine: ${CINE_SOURCE}), ${keyFiles} key files, ${keyLines} keys, ` +
   `${fnFiles.files} rig functions (${(fnFiles.bytes / 1e6).toFixed(2)} MB), ${Object.keys(models).length} models, ${Object.keys(sprites).length} sprites ${(atlasPx / 1e6).toFixed(3)} M px, ` +
   `elements at rest ${ELEMENTS.normal} / ghost ${ELEMENTS.ghost} [${((Date.now() - t0) / 1000).toFixed(1)} s]`);
@@ -577,6 +798,18 @@ if (debugDp) {
   fs.cpSync(rigDir, path.join(debugDp, 'data/rlk/function/boss/scarlet/rig'), {recursive: true});
   if (!fs.existsSync(path.join(debugDp, 'pack.mcmeta'))) fs.copyFileSync(path.join(dp, 'pack.mcmeta'), path.join(debugDp, 'pack.mcmeta'));
   putDebug('hr_dbg/rest', PART_NAMES.map(n => `data merge entity ${uuidOf(n)} {start_interpolation:0,interpolation_duration:0,transformation:${nbt(written(REST.d[n]))}}`));
-  putDebug('hr_dbg/player', ['summon minecraft:item_display ~1.4 ~ ~ {Tags:["hr_dbg_player"],item_display:"none",transformation:{translation:[0f,0.9f,0f],left_rotation:[0f,0f,0f,1f],scale:[0.6f,1.8f,0.3f],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"minecraft:light_blue_concrete"}}}']);
+  // the player avatar beside her (Skirk's idle frame 0 from the pack's own avatar rig: tools/player_motion/locomotion.json) and the
+  // kit's seat stone with its items (debug renders only)
+  const loco = JSON.parse(fs.readFileSync(path.join(here, 'player_motion/locomotion.json'), 'utf8'));
+  const av = (await import('./arlecchino_pose.mjs')).avatarTransform(loco.characters.skirk.idle.frames[0].pose);
+  const avNbt = v => `{translation:[${v.t.map(x => x.toFixed(5) + 'f').join(',')}],left_rotation:[${v.q.map(x => x.toFixed(5) + 'f').join(',')}],scale:[${(v.s || [1, 1, 1]).map(x => x.toFixed(5) + 'f').join(',')}],right_rotation:[0f,0f,0f,1f]}`;
+  putDebug('hr_dbg/avatar', Object.entries(av).map(([n, v]) => `summon minecraft:item_display ~1.4 ~ ~ {Tags:["hr_dbg_avatar"],item_display:"none",transformation:${avNbt(v)},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:player_motion/${n === 'weapon' ? 'weapons/sword' : 'skirk/' + n}"}}}`));
+  const st = SUPPORTS.stone, sz = [2 * st.half, st.T, st.back - st.front], ctr = [0, st.T / 2, (st.back + st.front) / 2];
+  // stand-ins of the kit's tuff stone (centred box) and its potion / bowl (base at the pivot) for the offline renderer
+  const disp = (item, P, s) => `summon minecraft:item_display ~ ~ ~ {Tags:["hr_dbg_seat"],item_display:"none",transformation:{translation:[${P[0].toFixed(4)}f,${P[1].toFixed(4)}f,${(-P[2]).toFixed(4)}f],left_rotation:[0f,0f,0f,1f],scale:[${s.map(x => x.toFixed(4) + 'f').join(',')}],right_rotation:[0f,0f,0f,1f]},item:{id:"minecraft:paper",count:1,components:{"minecraft:item_model":"rlk:hr_dbg/${item}"}}}`;
+  putDebug('hr_dbg/seat', [disp('tuff', ctr, sz), disp('potion', st.bottle, [.42, .42, .42]), disp('bowl', st.cup, [.42, .42, .42])]);
+  putDebug('hr_dbg/seat_bottle', [disp('tuff', ctr, sz), disp('potion', st.bottle, [.42, .42, .42])]);
+  putDebug('hr_dbg/seat_cup', [disp('tuff', ctr, sz), disp('bowl', st.cup, [.42, .42, .42])]);
+  putDebug('hr_dbg/seat_stone', [disp('tuff', ctr, sz)]);
 }
 void H_POSE;

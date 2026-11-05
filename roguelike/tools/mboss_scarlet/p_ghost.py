@@ -88,7 +88,7 @@ def at_player(h=0.0):
     return f'at {PLAYER} rotated as {PL} rotated ~ 0 positioned ~ {CY} ~{up}'
 
 
-def at_body(h=1.2):
+def at_body(h=0.95):
     return f'{S.AT_BODY} positioned ~ ~{num(h, 2)} ~'
 
 
@@ -465,7 +465,7 @@ class Walk:
         nxt = self.next_clip_t(t)
         tg, te = t + E(clip, gone), t + E(clip, 'end')
         if burst and (nxt is None or nxt > tg):
-            g.fx(tg, 'ghost_burst', puff_fb(), at_body(1.2), src=(clip, gone))
+            g.fx(tg, 'ghost_burst', puff_fb(), at_body(0.95), src=(clip, gone))
         if nxt is None or nxt > te:
             g.at(te, hide())
             g.ev(te, 'rig', 'state/hidden', (clip, 'end'))
@@ -491,7 +491,7 @@ class Walk:
         g.at(t, f'tag @s add {TAG_GHOST}')
         g.ev(t, 'tag', 'ghost+', ('g_tell', 'lilac'))
         g.snd(t, 'g_tell', src=('g_tell', 'lilac'))
-        g.fx(t + E('g_tell', 'burst'), 'ghost_burst', puff_fb(n=24), at_body(1.2), src=('g_tell', 'burst'))
+        g.fx(t + E('g_tell', 'burst'), 'ghost_burst', puff_fb(n=24), at_body(0.95), src=('g_tell', 'burst'))
         self.ends_vanished(t, 'g_tell', 'gone', burst=False)   # the burst is at 3 (PLAN §4.5 A8.T)
 
     def s_d1(self, t):
@@ -502,7 +502,7 @@ class Walk:
         g.moves.append((t, t, 'reappear d1'))
         g.snd(t, 'g_appear', src=('g_dash', 'appear'))
         g.at(go, FACE)
-        g.fx(go, 'ghost_trail', [part(DUST['lilac'], 0.3, 0.4, 0.3, 0, 12)], at_body(1.2), src=('g_dash', 'go'), len=TRAIL['D1'])
+        g.fx(go, 'ghost_trail', [part(DUST['lilac'], 0.3, 0.4, 0.3, 0, 12)], at_body(0.95), src=('g_dash', 'go'), len=TRAIL['D1'])
         g.at(go, glide_spot('side', arr - go))
         g.moves.append((go, arr, 'dash side'))
         g.snd(go, 'g_dash', src=('g_dash', 'go'))
@@ -515,7 +515,7 @@ class Walk:
         g.moves.append((t, t, 'reappear d2'))
         g.snd(t, 'g_appear', src=('g_glide', 'appear'))
         g.at(go, FACE)
-        g.fx(go, 'ghost_trail', [part(DUST['lilac'], 0.3, 0.2, 0.3, 0, 10)], at_body(0.6), src=('g_glide', 'go'), len=TRAIL['D2'])
+        g.fx(go, 'ghost_trail', [part(DUST['lilac'], 0.3, 0.2, 0.3, 0, 10)], at_body(0.45), src=('g_glide', 'go'), len=TRAIL['D2'])
         g.at(go, glide_spot('d2e', stop - go))
         g.moves.append((go, stop, 'glide d2e'))
         g.snd(go, 'g_dash', src=('g_glide', 'go'))
@@ -525,9 +525,9 @@ class Walk:
         gone, app, land = (t + E('g_drop', k) for k in ('gone', 'appear', 'land'))
         g.play(t, 'g_drop')
         g.fx(t, 'ghost_flash', [part(DUST['white'], 0.3, 0.8, 0.3, 0, 14), part('minecraft:electric_spark', 0.3, 0.8, 0.3, 0.1, 8)],
-             at_body(1.2), src=('g_drop', 'flash'))
+             at_body(0.95), src=('g_drop', 'flash'))
         g.snd(t, 'g_flash', src=('g_drop', 'flash'))
-        g.fx(gone, 'ghost_burst', puff_fb(c='white'), at_body(1.4), src=('g_drop', 'gone'))
+        g.fx(gone, 'ghost_burst', puff_fb(c='white'), at_body(1.1), src=('g_drop', 'gone'))
         g.at(app, tp_spot('d3', RE['D3']['up']))
         g.moves.append((app, app, 'reappear d3 (up)'))
         g.at(app, glide_spot('side', land - app))
@@ -539,9 +539,9 @@ class Walk:
         g.play(t, 'g_run')
         g.at(t, tp_spot('d4'))
         g.moves.append((t, t, 'reappear d4'))
-        g.fx(t, 'ghost_burst', puff_fb(), at_body(1.0), src=('g_run', 'appear'))
+        g.fx(t, 'ghost_burst', puff_fb(), at_body(0.8), src=('g_run', 'appear'))
         g.at(run, FACE)
-        g.fx(run, 'ghost_trail', [part(DUST['lilac'], 0.3, 0.3, 0.3, 0, 10)], at_body(1.0), src=('g_run', 'run'), len=TRAIL['D4'])
+        g.fx(run, 'ghost_trail', [part(DUST['lilac'], 0.3, 0.3, 0.3, 0, 10)], at_body(0.8), src=('g_run', 'run'), len=TRAIL['D4'])
         g.at(run, glide_spot('side', lunge - run))
         g.moves.append((run, lunge, 'run side'))
         for i in range(3):                           # footsteps x3 during the run-in
@@ -603,7 +603,7 @@ class Walk:
         g.at(dv, glide_spot('over', hit - dv, DIVE_STOP))
         g.moves.append((dv, hit, 'dive to 1 b above the player'))
         # the thin vertical blade line 1-2 t before the impact
-        g.fx(hit - 2, 'qi_line', [part(DUST['white'], 0.03, 1.2, 0.03, 0, 10)], f'at @s rotated ~ 90 positioned ~ ~1.0 ~',
+        g.fx(hit - 2, 'qi_line', [part(DUST['white'], 0.03, 1.2, 0.03, 0, 10)], f'at @s rotated ~ 90 positioned ~ ~0.8 ~',
              src=('g_dive', 'dive'), len=40)
 
     def s_judge(self, jt):
@@ -665,7 +665,7 @@ class Walk:
         g.play(t, 'a7_tell')
         if self.key == 'a13':
             # she dissolves at the X and reappears inside the yellow tell 3 b in front of the player, retreats to 12 b
-            g.fx(t + 1, 'ghost_burst', puff_fb(), at_body(1.2), src=('g_x', 'gone'))
+            g.fx(t + 1, 'ghost_burst', puff_fb(), at_body(0.95), src=('g_x', 'gone'))
             g.at(t + 1, tp_spot('tell'))
             g.moves.append((t + 1, t + 1, 'reappear in the tell (3 b)'))
             g.at(ret, glide_spot('far', settle - ret))
@@ -679,7 +679,7 @@ class Walk:
             g.moves.append((ret, settle, 'retreat 6 b'))
             g.at(settle, FACE)
         g.fx(yel, 'yellow_tell', [part(DUST['yellow'], 0.5, 0.6, 0.5, 0, 30), part('minecraft:end_rod', 1.2, 0.05, 0.05, 0, 8)],
-             at_body(1.3), src=('a7_tell', 'yellow'), t=8)
+             at_body(1.0), src=('a7_tell', 'yellow'), t=8)
         g.snd(yel, 'yellow_chime', src=('a7_tell', 'yellow'))
 
     def s_a7_throw(self, t, step, kb=0, cond=None):
@@ -690,17 +690,17 @@ class Walk:
             g.at(tt, *[S.gate(cond, x) if cond else x for x in lines if x])
         at(t, api.play('a7_throw'), FACE)
         g.ev(t, 'clip', 'a7_throw', ('a7_throw', 0))
-        at(cr, *S.fx('qi_vert', [part(DUST['lilac'], 0.2, 1.0, 0.2, 0, 16)], pos=f'{S.AT_BODY} positioned ^0.6 ^0.2 ^0.4',
-                     h=24, yaw=0, c=api.C_LILAC))
+        at(cr, *S.fx('qi_vert', [part(DUST['lilac'], 0.2, 1.0, 0.2, 0, 16)], pos=f'{S.AT_BODY} positioned ^0.6 ^0.15 ^0.4',
+                     h=19, yaw=0, c=api.C_LILAC))
         g.ev(cr, 'fx', 'qi_vert', ('a7_throw', 'crescent'))
         ring = {'disc2': 16, 'throw2': 12}.get(step, 12)
-        at(sp, *S.fx('qi_ring', ring_fb(ring / 10), pos=at_body(1.0), r=ring, c=api.C_LILAC))
+        at(sp, *S.fx('qi_ring', ring_fb(ring / 10), pos=at_body(0.8), r=ring, c=api.C_LILAC))
         g.ev(sp, 'fx', 'qi_ring', ('a7_throw', 'spin'))
         if step == 'disc1':
             g.look(sp, 'blade', 'gold', ('a7_throw', 'spin'))
             g.look(rel, 'blade', 'off', ('a7_throw', 'release'))
         if step == 'disc3':
-            at(sp, *S.fx('qi_wedge', [part(DUST['lilac'], 0.4, 0.4, 0.4, 0, 12)], pos=at_body(1.1), r=14, roll=30))
+            at(sp, *S.fx('qi_wedge', [part(DUST['lilac'], 0.4, 0.4, 0.4, 0, 12)], pos=at_body(0.85), r=14, roll=30))
             g.ev(sp, 'fx', 'qi_wedge', ('a7_throw', 'spin'))
         at(rel, FACE)
         g.disc(rel, kb, step, cond)
@@ -710,8 +710,8 @@ class Walk:
 
     def s_vanish(self, t):                            # A13 vanish 5 (purple glow + white ring)
         g = self.gb
-        g.fx(t, 'ghost_burst', puff_fb(), at_body(1.2), src=('script', 'vanish'))
-        g.fx(t, 'qi_ring', ring_fb(1.4, 'white'), at_body(1.0), src=('script', 'vanish'), r=14, c=api.C_WHITE)
+        g.fx(t, 'ghost_burst', puff_fb(), at_body(0.95), src=('script', 'vanish'))
+        g.fx(t, 'qi_ring', ring_fb(1.4, 'white'), at_body(0.8), src=('script', 'vanish'), r=14, c=api.C_WHITE)
         g.at(t, hide())
         g.ev(t, 'rig', 'state/hidden', ('script', 'vanish'))
 
@@ -766,7 +766,7 @@ class Walk:
             if c:
                 g.cut(c, 1 if self.gauntlet else 0, step)
         for t in EXTRA_VANISH.get(key, ()):
-            g.fx(t, 'ghost_burst', puff_fb(), at_body(1.2), src=('script', 'vanish'))
+            g.fx(t, 'ghost_burst', puff_fb(), at_body(0.95), src=('script', 'vanish'))
             g.at(t, hide())
             g.ev(t, 'rig', 'state/hidden', ('script', 'vanish'))
         if self.gauntlet:

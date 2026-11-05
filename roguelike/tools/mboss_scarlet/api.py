@@ -36,7 +36,7 @@ BOSS = dict(next(b for b in REG['boss'] if b['id'] == ID))
 assert BOSS['kind'] == 'special' and BOSS['n'] == N and ROOT == 'boss/scarlet', BOSS
 assert BOSS['el'] == 3 and BOSS['res'] == {'*': 10} and BOSS['phases'] == [100], 'PLAN §0: Electro, no immunity, one pool'
 assert (BOSS['picks'], BOSS['lvup'], BOSS['xp'], BOSS['intro'], BOSS['death']) == (1, 1, 0, 650, 1164), 'PLAN §8'
-assert (BOSS['scale'], BOSS['hit']) == (1.35, {'w': 1.2, 'h': 2.9}) and not BOSS.get('px'), 'PLAN §2.1: no hit proxies'
+assert (BOSS['scale'], BOSS['hit']) == (1.0, {'w': 1.2, 'h': 2.5}) and not BOSS.get('px'), 'PLAN §2.1: no hit proxies (S2d: player size)'
 NAME, SUB, COLOR = BOSS['name'], BOSS['sub'], BOSS['color']      # 홍련 / 월하곡 / #E8466A
 TITLE = (NAME, SUB, COLOR)        # mboss_lib.title(*TITLE) at the draw: clip intro_end 'draw' (CS0 610, PLAN §3.1)
 ELEC = 3                          # #elem of every hit (Electro), 1U each
@@ -450,8 +450,9 @@ for _rid in (RP_RIG, RP_KIT, FONT, WARN_BOSSBAR, GATE_ICON_MODEL, GHOST_MODEL, I
 # =============================================================================================
 # 7. Rig contract (PLAN §2; S2a implements the 39 fight / gauntlet / §7 clips, S2b the 8 cinematic clips; S3 / S4 / S2b
 # call). Item displays, billboard fixed, view range 2, culling 8 x 8, brightness 13 (sword_glow 15).
-HEIGHT, HAT_TOP, BRIM_D = 2.55, 2.82, 1.60       # head top / hat crown / brim diameter (b), sole 0
-SWORD_LEN, SCABBARD_LEN, SHADOW_R = 2.10, 1.82, 0.9
+HEIGHT, HAT_TOP, BRIM_D = 2.00, 2.36, 1.32       # head top / hat crown / brim diameter (b), sole 0 (S2d: the player avatar's body)
+SWORD_LEN, SCABBARD_LEN, SHADOW_R = 1.94, 1.52, 0.6
+ITEM_SWORD_LEN, ITEM_SWORD_SCALE = 2.03, 1.375   # item_sword: length (b) at its display scale; seq.py reads both
 PARTS = ('pelvis', 'torso', 'head', 'face', 'hair_tail_1', 'hair_tail_2', 'lock_r', 'lock_l', 'arm_r', 'forearm_r',
          'arm_l', 'forearm_l', 'thigh_r', 'shin_r', 'thigh_l', 'shin_l', 'skirt_fl', 'skirt_fr', 'skirt_bl', 'skirt_br',
          'sash_tails', 'hat', 'hat_strings', 'sword', 'sword_glow', 'scabbard', 'hilt_sheathed', 'cup', 'bottle')

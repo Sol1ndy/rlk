@@ -146,12 +146,12 @@ def fx_lines(name, fallback=(), **a):
 
 
 def fx(name, fallback=(), pos=None, **a):
-    """The kit preset fx/p/<name> {a} at pos (execute subcommands; default: the body, 1.3 b up, rotated as it), else the
+    """The kit preset fx/p/<name> {a} at pos (execute subcommands; default: the body, 1.0 b up, rotated as it), else the
     fallback lines there."""
-    return placed(fx_lines(name, fallback, **a), pos or f'{AT_BODY} positioned ~ ~1.3 ~')
+    return placed(fx_lines(name, fallback, **a), pos or f'{AT_BODY} positioned ~ ~1.0 ~')
 
 
-def fx_arc(r, c=api.C_LILAC, yaw=0, pitch=0, roll=0, h=1.3):
+def fx_arc(r, c=api.C_LILAC, yaw=0, pitch=0, roll=0, h=1.0):
     """A sword-qi crescent (kit qi_arc {r,yaw,pitch,roll,c}, r in blocks; the kit args are offsets from the executor,
     which is rotated as the body), else a lilac dust fan at the reach."""
     return fx('qi_arc', [part(DUST[C_DUST.get(c, 'lilac')], r * 0.35, 0.25, r * 0.35, 0, 18),

@@ -110,8 +110,8 @@ def build(W, ctx):
     seat = api.SEAT_POS
     yaw_moon = yaw_to(seat, api.MOON_POS)
     w('spawn', [
-        '# Hook spawn (@s = the arena marker at C of hr_field, rotated as it). The body (mboss/body: husk scale 1.35, click',
-        f'# shield 1.2 x 2.9, miniboss economy, rlk_mb_inv in the intro) sits on her rock {L.num(seat[0])} {L.num(seat[1])} {L.num(seat[2])}',
+        '# Hook spawn (@s = the arena marker at C of hr_field, rotated as it). The body (mboss/body: husk scale 1.0, click',
+        f'# shield 1.2 x 2.5, miniboss economy, rlk_mb_inv in the intro) sits on her rock {L.num(seat[0])} {L.num(seat[1])} {L.num(seat[2])}',
         '# facing the moon, her back to the player arriving at start (PLAN §3.1). The event scores are cleared (PLAN §7.3.1).',
         f'execute positioned {L.num(seat[0])} {L.num(seat[1])} {L.num(seat[2])} rotated {L.num(yaw_moon)} 0 run function rlk:mboss/body',
         at_body(fn('core/setup'))] + [sset(k, 0) for k in api.EV_FP])
@@ -962,9 +962,10 @@ def stand_in_gauntlets(W, ctx):
 
 
 # ================================================================================================== the stand-in rig
-ANCHOR_OFF = {'hand_l': (0.35, 1.15, 0.35), 'hand_r': (-0.35, 1.15, 0.35), 'blade_tip': (0.5, 1.25, 1.7),
-              'blade_mid': (0.45, 1.2, 0.95), 'scabbard_mouth': (-0.3, 1.05, 0.0), 'hat_crown': (0.0, api.HAT_TOP, 0.0),
-              'head': (0.0, 2.3, 0.0), 'chest': (0.0, 1.6, 0.2)}
+# the built rig's idle-t0 anchors (^left ^up ^forward, rounded to 0.05; S2d: the player-size body)
+ANCHOR_OFF = {'hand_l': (0.15, 0.95, 0.25), 'hand_r': (-0.5, 0.8, 0.0), 'blade_tip': (-0.7, 0.15, 1.3),
+              'blade_mid': (-0.3, 0.5, 0.85), 'scabbard_mouth': (-0.25, 0.95, 0.2), 'hat_crown': (0.0, api.HAT_TOP, 0.2),
+              'head': (0.0, 1.75, 0.1), 'chest': (0.0, 1.2, 0.1)}
 
 
 def rig_stub(W):
@@ -979,7 +980,7 @@ def rig_stub(W):
         if c == 'tick':
             w('rig_stub/tick', ['# Stand-in rig tick (@s = body): the shown clip tick #rigt hr; a faint column marks the body.',
                                 f'scoreboard players add #rigt {OBJ} 1',
-                                f'execute if score #rigt {OBJ} matches 0.. run particle {S.DUST["lilac"]} ~ ~1.4 ~ 0.14 0.6 0.14 0 2 force @a[tag=player]'])
+                                f'execute if score #rigt {OBJ} matches 0.. run particle {S.DUST["lilac"]} ~ ~1.1 ~ 0.12 0.5 0.12 0 2 force @a[tag=player]'])
         elif c == 'face/player':
             w('rig_stub/face/player', ['execute at @s facing entity @e[tag=rlk_body,limit=1] feet run tp @s ~ ~ ~ ~ 0'])
         elif c == 'face/track':

@@ -3,10 +3,10 @@
  "id": "scarlet",
  "source": "rig",
  "_doc": "Scarlet rig (tools/build_scarlet_rig.mjs, API tools/scarlet_rig_api.md): the D0 stub schema (parts, re-parent table, shadow, clips with id / len / loop / events / owner, looks, hands, prop states, anchors, calls) plus transforms, models, budgets and sprites. Generated: do not edit.",
- "height": 2.55,
- "hat_top": 2.82,
- "brim_d": 1.6,
- "hip_y": 1.36,
+ "height": 2,
+ "hat_top": 2.36,
+ "brim_d": 1.32,
+ "hip_y": 0.765625,
  "uuid": "524c4b4d-4852-4400-8000-0000000000{:02x}",
  "parts": [
   {
@@ -29,7 +29,7 @@
    "rest": {
     "t": [
      0,
-     1.32,
+     0.73973,
      0
     ],
     "q": [
@@ -65,7 +65,7 @@
    "rest": {
     "t": [
      0,
-     1.46,
+     0.92723,
      0
     ],
     "q": [
@@ -100,9 +100,9 @@
    ],
    "rest": {
     "t": [
-     -0.00401,
-     2.00866,
-     0.03816
+     -0.0041,
+     1.48836,
+     0.03902
     ],
     "q": [
      0.06962,
@@ -136,9 +136,9 @@
    ],
    "rest": {
     "t": [
-     -0.00401,
-     2.00866,
-     0.03816
+     -0.0041,
+     1.48836,
+     0.03902
     ],
     "q": [
      0.06962,
@@ -159,8 +159,8 @@
    "parent": "head",
    "uuid": "524c4b4d-4852-4400-8000-000000000004",
    "tag": "rlk_hr_hair_tail_1",
-   "model": "hair_tail_1",
-   "ghost_model": "hair_tail_1_g",
+   "model": "empty",
+   "ghost_model": "empty",
    "brightness": 13,
    "scale": 1,
    "tags": [
@@ -172,20 +172,20 @@
    ],
    "rest": {
     "t": [
-     -0.00101,
-     2.22687,
-     -0.0776
+     0,
+     0.76563,
+     0
     ],
     "q": [
-     0.06474,
-     -0.05223,
-     0.00339,
-     0.99653
+     0,
+     0,
+     0,
+     1
     ],
     "s": [
-     1,
-     1,
-     1
+     0,
+     0,
+     0
     ]
    }
   },
@@ -195,8 +195,8 @@
    "parent": "hair_tail_1",
    "uuid": "524c4b4d-4852-4400-8000-000000000005",
    "tag": "rlk_hr_hair_tail_2",
-   "model": "hair_tail_2",
-   "ghost_model": "hair_tail_2_g",
+   "model": "empty",
+   "ghost_model": "empty",
    "brightness": 13,
    "scale": 1,
    "tags": [
@@ -208,20 +208,20 @@
    ],
    "rest": {
     "t": [
-     0.00467,
-     1.8104,
-     -0.13164
+     0,
+     0.76563,
+     0
     ],
     "q": [
-     0.04483,
-     -0.05228,
-     0.00235,
-     0.99762
+     0,
+     0,
+     0,
+     1
     ],
     "s": [
-     1,
-     1,
-     1
+     0,
+     0,
+     0
     ]
    }
   },
@@ -245,7 +245,7 @@
    "rest": {
     "t": [
      0,
-     1.36,
+     0.76563,
      0
     ],
     "q": [
@@ -281,7 +281,7 @@
    "rest": {
     "t": [
      0,
-     1.36,
+     0.76563,
      0
     ],
     "q": [
@@ -316,15 +316,15 @@
    ],
    "rest": {
     "t": [
-     -0.25072,
-     1.88965,
-     -0.00622
+     -0.37614,
+     1.36367,
+     -0.00885
     ],
     "q": [
-     0.15182,
-     0.21015,
-     -0.11956,
-     0.95838
+     0.17247,
+     0.20752,
+     -0.12407,
+     0.95488
     ],
     "s": [
      1,
@@ -352,15 +352,15 @@
    ],
    "rest": {
     "t": [
-     -0.36791,
-     1.51953,
-     -0.10252
+     -0.45327,
+     1.13623,
+     -0.07832
     ],
     "q": [
-     -0.12268,
-     0.23523,
-     -0.05592,
-     0.96254
+     -0.10537,
+     0.23418,
+     -0.06013,
+     0.96459
     ],
     "s": [
      1,
@@ -388,15 +388,15 @@
    ],
    "rest": {
     "t": [
-     0.24654,
-     1.88965,
-     0.04604
+     0.36976,
+     1.36367,
+     0.06955
     ],
     "q": [
-     0.12148,
-     -0.2891,
-     0.16976,
-     0.93426
+     0.07593,
+     -0.37217,
+     -0.03004,
+     0.92456
     ],
     "s": [
      1,
@@ -424,15 +424,15 @@
    ],
    "rest": {
     "t": [
-     0.40152,
-     1.52451,
-     -0.00549
+     0.37,
+     1.117,
+     0.02886
     ],
     "q": [
-     -0.54712,
-     -0.32733,
-     -0.0725,
-     0.76698
+     -0.46024,
+     -0.28996,
+     -0.23524,
+     0.80546
     ],
     "s": [
      1,
@@ -460,15 +460,15 @@
    ],
    "rest": {
     "t": [
-     -0.105,
-     1.24,
+     -0.125,
+     0.73973,
      0
     ],
     "q": [
-     -0.16025,
-     -0.05536,
-     -0.03109,
-     0.98503
+     -0.23188,
+     -0.05256,
+     -0.03662,
+     0.97063
     ],
     "s": [
      1,
@@ -496,15 +496,15 @@
    ],
    "rest": {
     "t": [
-     -0.15239,
-     0.67198,
-     0.18736
+     -0.1608,
+     0.40606,
+     0.16736
     ],
     "q": [
-     0.25648,
-     -0.06323,
-     -0.00574,
-     0.96446
+     0.31354,
+     -0.06396,
+     -0.00348,
+     0.94741
     ],
     "s": [
      1,
@@ -532,15 +532,15 @@
    ],
    "rest": {
     "t": [
-     0.105,
-     1.24,
+     0.125,
+     0.73973,
      0
     ],
     "q": [
-     -0.23232,
-     0.05692,
-     0.01857,
-     0.9708
+     -0.26567,
+     0.05622,
+     0.02062,
+     0.9622
     ],
     "s": [
      1,
@@ -568,15 +568,15 @@
    ],
    "rest": {
     "t": [
-     0.1425,
-     0.70518,
-     0.26937
+     0.15108,
+     0.41798,
+     0.19085
     ],
     "q": [
-     0.13029,
-     0.05979,
-     -0.00302,
-     0.98967
+     0.14671,
+     0.05975,
+     -0.00391,
+     0.98736
     ],
     "s": [
      1,
@@ -605,7 +605,7 @@
    "rest": {
     "t": [
      0,
-     1.36,
+     0.76563,
      0
     ],
     "q": [
@@ -641,7 +641,7 @@
    "rest": {
     "t": [
      0,
-     1.36,
+     0.76563,
      0
     ],
     "q": [
@@ -677,7 +677,7 @@
    "rest": {
     "t": [
      0,
-     1.36,
+     0.76563,
      0
     ],
     "q": [
@@ -713,7 +713,7 @@
    "rest": {
     "t": [
      0,
-     1.36,
+     0.76563,
      0
     ],
     "q": [
@@ -748,14 +748,14 @@
    ],
    "rest": {
     "t": [
-     0.215,
-     1.39,
-     0.085
+     0.26,
+     0.82973,
+     0.1
     ],
     "q": [
-     -0.04464,
-     -0.00516,
-     0.11466,
+     -0.04359,
+     -0.00505,
+     0.11507,
      0.99239
     ],
     "s": [
@@ -784,9 +784,9 @@
    ],
    "rest": {
     "t": [
-     -0.00837,
-     2.45429,
-     0.10059
+     -0.0096,
+     2.04985,
+     0.11769
     ],
     "q": [
      0.12172,
@@ -820,9 +820,9 @@
    ],
    "rest": {
     "t": [
-     -0.00837,
-     2.45429,
-     0.10059
+     -0.0096,
+     2.04985,
+     0.11769
     ],
     "q": [
      0.06706,
@@ -856,15 +856,15 @@
    ],
    "rest": {
     "t": [
-     0.20438,
-     1.36037,
-     0.32707
+     0.14799,
+     0.95692,
+     0.23683
     ],
     "q": [
-     -0.85428,
-     0.13948,
-     -0.29417,
-     -0.40522
+     -0.82136,
+     0.16061,
+     -0.28313,
+     -0.46841
     ],
     "s": [
      1.5,
@@ -892,15 +892,15 @@
    ],
    "rest": {
     "t": [
-     0.20438,
-     1.36037,
-     0.32707
+     0.14799,
+     0.95692,
+     0.23683
     ],
     "q": [
-     -0.85428,
-     0.13948,
-     -0.29417,
-     -0.40522
+     -0.82136,
+     0.16061,
+     -0.28313,
+     -0.46841
     ],
     "s": [
      1.5,
@@ -928,15 +928,15 @@
    ],
    "rest": {
     "t": [
-     -0.2,
-     1.37,
-     0.12
+     -0.25,
+     0.92973,
+     0.18
     ],
     "q": [
-     -0.89239,
-     0.05597,
-     0.11545,
-     0.43264
+     -0.81435,
+     0.13794,
+     0.21567,
+     0.52085
     ],
     "s": [
      1.5,
@@ -964,15 +964,15 @@
    ],
    "rest": {
     "t": [
-     -0.2,
-     1.37,
-     0.12
+     -0.25,
+     0.92973,
+     0.18
     ],
     "q": [
-     -0.89239,
-     0.05597,
-     0.11545,
-     0.43264
+     -0.81435,
+     0.13794,
+     0.21567,
+     0.52085
     ],
     "s": [
      0,
@@ -1000,9 +1000,9 @@
    ],
    "rest": {
     "t": [
-     -0.38888,
-     1.11479,
-     0.00772
+     -0.48217,
+     0.67925,
+     0.02208
     ],
     "q": [
      0,
@@ -1036,15 +1036,15 @@
    ],
    "rest": {
     "t": [
-     0.20438,
-     1.36037,
-     0.32707
+     -0.0264,
+     0.83119,
+     0.40017
     ],
     "q": [
-     -0.54712,
-     -0.32733,
-     -0.0725,
-     0.76698
+     -0.46024,
+     -0.28996,
+     -0.23524,
+     0.80546
     ],
     "s": [
      0,
@@ -1109,7 +1109,7 @@
  "shadow": {
   "nn": 64,
   "uuid": "524c4b4d-4852-4400-8000-000000000040",
-  "radius": 0.9,
+  "radius": 0.6,
   "tags": [
    "rlk_room",
    "rlk_mb_aux",
@@ -1129,7 +1129,7 @@
    "events": {},
    "owner": "S2a",
    "key_files": 8,
-   "keys": 46,
+   "keys": 45,
    "keys_per_tick": 1.1,
    "source": "v1 8.0-9.6 / v3 6.5-8.2 (the stance: blade low across her front); sway sine 40 t",
    "note": "",
@@ -1144,8 +1144,8 @@
    ],
    "events": {},
    "owner": "S2a",
-   "key_files": 9,
-   "keys": 46,
+   "key_files": 11,
+   "keys": 45,
    "keys_per_tick": 1.1,
    "source": "P2: lower, the blade further out (PLAN §2.5)",
    "note": "",
@@ -1164,8 +1164,8 @@
    },
    "owner": "S2a",
    "key_files": 22,
-   "keys": 189,
-   "keys_per_tick": 7.6,
+   "keys": 192,
+   "keys_per_tick": 7.7,
    "source": "v1 8-26 (P1 walking between attacks), v5 9-13.5 (the walk-in)",
    "note": "",
    "authored": true
@@ -1179,9 +1179,9 @@
    ],
    "events": {},
    "owner": "S2a",
-   "key_files": 7,
-   "keys": 49,
-   "keys_per_tick": 2.9,
+   "key_files": 6,
+   "keys": 43,
+   "keys_per_tick": 2.5,
    "source": "P2 walk-in (PLAN §2.5; the ghost glide D2 on foot)",
    "note": "",
    "authored": true
@@ -1198,9 +1198,9 @@
     "step2": 10
    },
    "owner": "S2a",
-   "key_files": 15,
-   "keys": 131,
-   "keys_per_tick": 6.2,
+   "key_files": 13,
+   "keys": 123,
+   "keys_per_tick": 5.9,
    "source": "circling the player (P1 / P2 recoveries)",
    "note": "",
    "authored": true
@@ -1217,9 +1217,9 @@
     "step2": 10
    },
    "owner": "S2a",
-   "key_files": 15,
-   "keys": 133,
-   "keys_per_tick": 6.3,
+   "key_files": 16,
+   "keys": 125,
+   "keys_per_tick": 6,
    "source": "circling the player",
    "note": "",
    "authored": true
@@ -1232,9 +1232,9 @@
     "land": 10
    },
    "owner": "S2a",
-   "key_files": 10,
-   "keys": 142,
-   "keys_per_tick": 10.9,
+   "key_files": 11,
+   "keys": 129,
+   "keys_per_tick": 9.9,
    "source": "a hop back (recovery spacing)",
    "note": "",
    "authored": true
@@ -1246,8 +1246,8 @@
    "events": {},
    "owner": "S2a",
    "key_files": 4,
-   "keys": 63,
-   "keys_per_tick": 9,
+   "keys": 58,
+   "keys_per_tick": 8.3,
    "source": "hit reaction",
    "note": "",
    "authored": true
@@ -1265,8 +1265,8 @@
    },
    "owner": "S2a",
    "key_files": 32,
-   "keys": 413,
-   "keys_per_tick": 11.8,
+   "keys": 374,
+   "keys_per_tick": 10.7,
    "source": "v1 9.667-10.400 (cr_v1_a1, v1s_a2_*): pivot, magenta glint, rising fan, flat crescent; footage glint -> hit 6 t, stretched to 14",
    "note": "",
    "authored": true
@@ -1284,8 +1284,8 @@
    },
    "owner": "S2a",
    "key_files": 30,
-   "keys": 364,
-   "keys_per_tick": 11.7,
+   "keys": 341,
+   "keys_per_tick": 11,
    "source": "v1 19.050-19.500 (cr_v1_a2a6a5, v1s_a8_*): glint -> hit 4.3 t (the fastest), stretched to 12; recovery v1 19.65-19.90",
    "note": "",
    "authored": true
@@ -1308,9 +1308,9 @@
     "h5": 69
    },
    "owner": "S2a",
-   "key_files": 90,
-   "keys": 1030,
-   "keys_per_tick": 10.6,
+   "key_files": 87,
+   "keys": 915,
+   "keys_per_tick": 9.4,
    "source": "v1 23.150-26.300 (cr_v1_a3_leads, v1s_a12*, v1s_combo5): gaps 16 / 15 / 12 / 12; open after hit 5",
    "note": "",
    "authored": true
@@ -1336,9 +1336,9 @@
     "land": 38
    },
    "owner": "S2a",
-   "key_files": 58,
-   "keys": 856,
-   "keys_per_tick": 14,
+   "key_files": 59,
+   "keys": 764,
+   "keys_per_tick": 12.5,
    "source": "v1 10.800-12.550 (cr_v1_a4, v1s_a3_*, v1s_a4_*): leap, apex glint, flip, the S-ribbon dive; the ring spin; apex 7 t",
    "note": "",
    "authored": true
@@ -1355,8 +1355,8 @@
    },
    "owner": "S2a",
    "key_files": 12,
-   "keys": 96,
-   "keys_per_tick": 4.6,
+   "keys": 87,
+   "keys_per_tick": 4.1,
    "source": "v1 16.233-16.367 (cr_v1_a6, v1s_a7_*): the back-blink, then line 12",
    "note": "",
    "authored": true
@@ -1377,9 +1377,9 @@
     "cut": 28
    },
    "owner": "S2a",
-   "key_files": 59,
-   "keys": 565,
-   "keys_per_tick": 8.7,
+   "key_files": 58,
+   "keys": 506,
+   "keys_per_tick": 7.8,
    "source": "v1 13.067-14.733 (cr_v1_a9_ring*, cr_yellow_cmp, v1s_a5_*, v1s_a6_*): spin, the ring, the yellow tell, the star, the magenta screen, the iai cut",
    "note": "",
    "authored": true
@@ -1398,9 +1398,9 @@
     "hit": 22
    },
    "owner": "S2a",
-   "key_files": 49,
-   "keys": 395,
-   "keys_per_tick": 6.9,
+   "key_files": 50,
+   "keys": 372,
+   "keys_per_tick": 6.5,
    "source": "v1 20.000-21.700 (v1s_a10_*, cr_yellow_cmp): spring, the yellow tell in the air, the dive, the radial burst",
    "note": "",
    "authored": true
@@ -1416,9 +1416,9 @@
     "settle": 14
    },
    "owner": "S2a",
-   "key_files": 15,
-   "keys": 164,
-   "keys_per_tick": 9.6,
+   "key_files": 14,
+   "keys": 142,
+   "keys_per_tick": 8.4,
    "source": "v3 14.63-15.10 (cr_v3_tell_zoom, mg_yellow_cmp): the yellow tell, the retreat",
    "note": "",
    "authored": true
@@ -1436,8 +1436,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 281,
-   "keys_per_tick": 16.5,
+   "keys": 256,
+   "keys_per_tick": 15.1,
    "source": "v3 15.10-16.90 (v3r_d1/d2/d3_*, cr_v3_disc1_gold): crouch, blade up, the crescent, the spin, the release",
    "note": "",
    "authored": true
@@ -1455,8 +1455,8 @@
    },
    "owner": "S2a",
    "key_files": 8,
-   "keys": 52,
-   "keys_per_tick": 3.5,
+   "keys": 68,
+   "keys_per_tick": 4.5,
    "source": "v2 f540-f550, v3 f440-f448 (cr_pretell_*): the hand to the brim",
    "note": "",
    "authored": true
@@ -1472,8 +1472,8 @@
    },
    "owner": "S2a",
    "key_files": 4,
-   "keys": 72,
-   "keys_per_tick": 5.5,
+   "keys": 68,
+   "keys_per_tick": 5.2,
    "source": "v2 f582-f620, v3 f492-f523 (cr_tell_T0): one-tick lilac switch, burst, ribbons",
    "note": "",
    "authored": true
@@ -1487,9 +1487,9 @@
     "solid": 4
    },
    "owner": "S2a",
-   "key_files": 6,
-   "keys": 92,
-   "keys_per_tick": 8.4,
+   "key_files": 8,
+   "keys": 71,
+   "keys_per_tick": 6.5,
    "source": "the ghost reforms (R1 / R3, A8 fail)",
    "note": "",
    "authored": true
@@ -1504,9 +1504,9 @@
     "arrive": 10
    },
    "owner": "S2a",
-   "key_files": 9,
-   "keys": 176,
-   "keys_per_tick": 13.5,
+   "key_files": 10,
+   "keys": 161,
+   "keys_per_tick": 12.4,
    "source": "v2 10.433 / 15.00, v3 8.933 / 11.550 (v2f_b1_dash): far reappear, hover, straight dash",
    "note": "",
    "authored": true
@@ -1521,9 +1521,9 @@
     "stop": 9
    },
    "owner": "S2a",
-   "key_files": 10,
-   "keys": 96,
-   "keys_per_tick": 7.4,
+   "key_files": 9,
+   "keys": 95,
+   "keys_per_tick": 7.3,
    "source": "v2 13.350, v3 13.100 (v3 f810-f813): side reappear, the glide",
    "note": "",
    "authored": true
@@ -1540,8 +1540,8 @@
    },
    "owner": "S2a",
    "key_files": 9,
-   "keys": 181,
-   "keys_per_tick": 12.1,
+   "keys": 165,
+   "keys_per_tick": 11,
    "source": "v2 16.067-16.733 (mg_v2_blink): flash, blink, drop",
    "note": "",
    "authored": true
@@ -1556,9 +1556,9 @@
     "lunge": 10
    },
    "owner": "S2a",
-   "key_files": 12,
-   "keys": 154,
-   "keys_per_tick": 10.3,
+   "key_files": 13,
+   "keys": 160,
+   "keys_per_tick": 10.7,
    "source": "v3 17.667 (v3r_s7..): the run-in",
    "note": "",
    "authored": true
@@ -1574,8 +1574,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 302,
-   "keys_per_tick": 20.1,
+   "keys": 282,
+   "keys_per_tick": 18.8,
    "source": "v2 11.050, v3 9.583 (v2f_s1_1f): the ring cut",
    "note": "",
    "authored": true
@@ -1591,8 +1591,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 264,
-   "keys_per_tick": 17.6,
+   "keys": 242,
+   "keys_per_tick": 16.1,
    "source": "v2 11.683, v3 10.200 (cr_a82_windup): spin, arms up, the band",
    "note": "",
    "authored": true
@@ -1610,8 +1610,8 @@
    },
    "owner": "S2a",
    "key_files": 16,
-   "keys": 329,
-   "keys_per_tick": 17.3,
+   "keys": 302,
+   "keys_per_tick": 15.9,
    "source": "v2 12.450, v3 10.92 (v2f_s3_*): coil, the leaping cut, tumbling, vanishes",
    "note": "",
    "authored": true
@@ -1627,8 +1627,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 207,
-   "keys_per_tick": 13.8,
+   "keys": 191,
+   "keys_per_tick": 12.7,
    "source": "v2 13.700, v3 13.583 (v2f_s4_*): the low sweep, the spring",
    "note": "",
    "authored": true
@@ -1645,8 +1645,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 205,
-   "keys_per_tick": 12.1,
+   "keys": 192,
+   "keys_per_tick": 11.3,
    "source": "v2 14.317, v3 14.183 (v2f_s5_*): the X",
    "note": "",
    "authored": true
@@ -1660,9 +1660,9 @@
     "hit": 3
    },
    "owner": "S2a",
-   "key_files": 10,
-   "keys": 108,
-   "keys_per_tick": 8.3,
+   "key_files": 9,
+   "keys": 98,
+   "keys_per_tick": 7.5,
    "source": "v2 ~16.91, v3 ~18.300 (v2f_s6_*): the wrap-around",
    "note": "",
    "authored": true
@@ -1677,8 +1677,8 @@
    },
    "owner": "S2a",
    "key_files": 12,
-   "keys": 237,
-   "keys_per_tick": 18.2,
+   "keys": 218,
+   "keys_per_tick": 16.8,
    "source": "v2 ~17.36, v3 18.767 (v2f_s7_*): the spin dome",
    "note": "",
    "authored": true
@@ -1696,8 +1696,8 @@
    },
    "owner": "S2a",
    "key_files": 18,
-   "keys": 297,
-   "keys_per_tick": 14.1,
+   "keys": 277,
+   "keys_per_tick": 13.2,
    "source": "v2 ~18.11, v3 ~19.500 (mg_pink_glint): the pink glow, the rising vertical cut, rising out of view",
    "note": "",
    "authored": true
@@ -1712,9 +1712,9 @@
     "hit": 6
    },
    "owner": "S2a",
-   "key_files": 9,
-   "keys": 152,
-   "keys_per_tick": 13.8,
+   "key_files": 10,
+   "keys": 150,
+   "keys_per_tick": 13.6,
    "source": "v2 19.083, v3 20.483 (v2f_s9_dive, v3r_s10_dive_1f): the diving overhead strike, blade down",
    "note": "",
    "authored": true
@@ -1730,8 +1730,8 @@
    },
    "owner": "S2a",
    "key_files": 12,
-   "keys": 167,
-   "keys_per_tick": 12.8,
+   "keys": 151,
+   "keys_per_tick": 11.6,
    "source": "v2 19.10-19.28 (the parried dive), v2f_c1 (the lock)",
    "note": "",
    "authored": true
@@ -1755,9 +1755,9 @@
     "kick": 102
    },
    "owner": "S2b",
-   "key_files": 79,
-   "keys": 1158,
-   "keys_per_tick": 11,
+   "key_files": 83,
+   "keys": 1104,
+   "keys_per_tick": 10.5,
    "source": "v2 19.72-24.95 / v3 21.10-26.25 (v2f_c1, v2f_c2, v2f_c_keys1/2, v2f_c_hat, v2f_c_throw, v3r_c_flip): lock, grab, clash on the hat, flip, back to back, throw, lying, the kick",
    "note": "",
    "authored": true
@@ -1771,9 +1771,9 @@
    ],
    "events": {},
    "owner": "S2a",
-   "key_files": 6,
-   "keys": 35,
-   "keys_per_tick": 0.9,
+   "key_files": 4,
+   "keys": 33,
+   "keys_per_tick": 0.8,
    "source": "v2 24.95 -> v3 4.10 (v2f_d_*, cr_v2_down): lying on her back, the hat beside her",
    "note": "",
    "authored": true
@@ -1790,8 +1790,8 @@
    },
    "owner": "S2a",
    "key_files": 19,
-   "keys": 271,
-   "keys_per_tick": 12.9,
+   "keys": 275,
+   "keys_per_tick": 13.1,
    "source": "v3 4.10 (v3r_a_kipup, cr_v3_kipup): the kip-up; the hat picked up and put on (v3 4.7-6.5)",
    "note": "",
    "authored": true
@@ -1814,9 +1814,9 @@
     "brim": 65
    },
    "owner": "S2b",
-   "key_files": 64,
-   "keys": 567,
-   "keys_per_tick": 6.8,
+   "key_files": 68,
+   "keys": 592,
+   "keys_per_tick": 7.1,
    "source": "v3 4.10-8.18 (v3r_a_kipup, cr_v3_kipup: the kip-up, the sword vertical; v3r_a_5to8: the hat at shoulder height, side steps; cr_pretell_v3: the hand to the brim)",
    "note": "",
    "authored": true
@@ -1837,9 +1837,9 @@
     "brim": 53
    },
    "owner": "S2b",
-   "key_files": 53,
-   "keys": 378,
-   "keys_per_tick": 5.3,
+   "key_files": 54,
+   "keys": 410,
+   "keys_per_tick": 5.8,
    "source": "PLAN §3.5 (the lead_down beats from standing; v3r_a_5to8, cr_pretell_v3)",
    "note": "",
    "authored": true
@@ -1859,9 +1859,9 @@
     "brim": 46
    },
    "owner": "S2b",
-   "key_files": 41,
-   "keys": 235,
-   "keys_per_tick": 3.9,
+   "key_files": 40,
+   "keys": 266,
+   "keys_per_tick": 4.4,
    "source": "v2 6.93-9.70 (v2f_a_boss_far_01: the re-hat; cr_pretell_hand: the hand to the brim from T0 - 14)",
    "note": "",
    "authored": true
@@ -1892,9 +1892,9 @@
     "scab_up": 510
    },
    "owner": "S2b",
-   "key_files": 403,
-   "keys": 2190,
-   "keys_per_tick": 3.9,
+   "key_files": 400,
+   "keys": 2110,
+   "keys_per_tick": 3.8,
    "source": "staged (v1s_intro_stairs: the far figure; PLAN §3.1 E0-E10); E10 v1 4.8-5.8 (v1s_intro_keys: the scabbard upright, hilt up)",
    "note": "",
    "authored": true
@@ -1917,9 +1917,9 @@
     "push": 82
    },
    "owner": "S2b",
-   "key_files": 55,
-   "keys": 596,
-   "keys_per_tick": 6.9,
+   "key_files": 54,
+   "keys": 577,
+   "keys_per_tick": 6.6,
    "source": "v1 2.2-8.05 (v1s_intro_keys: smile, head down, turn away, spin; mg_v1_hands_zoom / cr_v1_stance_hand: the draw and the stance)",
    "note": "",
    "authored": true
@@ -1955,9 +1955,9 @@
     "swirl": 183
    },
    "owner": "S2b",
-   "key_files": 110,
-   "keys": 967,
-   "keys_per_tick": 4.5,
+   "key_files": 129,
+   "keys": 1128,
+   "keys_per_tick": 5.3,
    "source": "v1 37.28-39.2 (v1s_cs_keys: lunge, lock, apart, the hat on her back), v2 0-6.9 (v2f_cs_keys1/2, v2f_cs_hat, cr_v2_a11: the iai, 홍련일섬)",
    "note": "",
    "authored": true
@@ -2019,9 +2019,9 @@
     "eyes": 1030
    },
    "owner": "S2b",
-   "key_files": 496,
-   "keys": 3793,
-   "keys_per_tick": 3.6,
+   "key_files": 477,
+   "keys": 3617,
+   "keys_per_tick": 3.5,
    "source": "v3 26.27-40.3 (v3r_e_shots1-4, v3r_e_slash_2f), v4 (v4k_c*, v4k_s4_sheathe, v4k_s5_face), v5 (v5e_s1_*, v5e_s2_turn*, v5e_s3_keys1-3)",
    "note": "",
    "authored": true
@@ -2037,8 +2037,8 @@
    },
    "owner": "S2a",
    "key_files": 27,
-   "keys": 170,
-   "keys_per_tick": 4.9,
+   "keys": 175,
+   "keys_per_tick": 5,
    "source": "PLAN §7.3.2 item branch E0-E34 (lift, present, toss)",
    "note": "",
    "authored": true
@@ -2053,9 +2053,9 @@
     "offer": 30
    },
    "owner": "S2a",
-   "key_files": 21,
-   "keys": 80,
-   "keys_per_tick": 2.3,
+   "key_files": 22,
+   "keys": 88,
+   "keys_per_tick": 2.5,
    "source": "PLAN §7.3.2 buff branch E0-E34 (look, palm, offer)",
    "note": "",
    "authored": true
@@ -2070,8 +2070,8 @@
    },
    "owner": "S2a",
    "key_files": 8,
-   "keys": 108,
-   "keys_per_tick": 9.8,
+   "keys": 103,
+   "keys_per_tick": 9.4,
    "source": "PLAN §7.3.2 E34-E40 (the turn away; petals and wind hide her)",
    "note": "",
    "authored": true
@@ -2284,7 +2284,7 @@
  "view_range": 2,
  "storage": {
   "anchors": "rlk:hr rig.an",
-  "version": 103310912
+  "version": 188061387
  },
  "ghost_texture": "rlk:mboss/scarlet/ghost",
  "skin": {
@@ -2297,7 +2297,7 @@
    64,
    64
   ],
-  "layout": "classic (4-px arms) with the outer layers",
+  "layout": "player avatar (tools/build_player_rig.mjs bodyModels) with classic 4-px arms (tools/arlecchino_geometry.mjs P2_SPECS)",
   "regions": {
    "head": [
     [
@@ -2396,13 +2396,334 @@
     ]
    ]
   },
-  "px": 0.0525,
-  "body_px": 0.064167,
-  "head0": -0.03,
+  "px": 0.0625,
+  "body_px": 0.0625,
+  "head0": 0,
   "inflate_px": {
    "head": 0.5,
-   "body": 0.25,
-   "leg_r": 0.275
+   "body": 0.25
+  },
+  "inflate_ends": "all",
+  "specs": {
+   "head": {
+    "from": [
+     4,
+     8,
+     4
+    ],
+    "to": [
+     12,
+     16,
+     12
+    ],
+    "uv": [
+     0,
+     0,
+     8,
+     8,
+     8
+    ],
+    "over": [
+     32,
+     0,
+     8,
+     8,
+     8
+    ],
+    "start": 0,
+    "end": 8,
+    "inflate": 0.5
+   },
+   "torso": {
+    "from": [
+     4,
+     8,
+     6
+    ],
+    "to": [
+     12,
+     17,
+     10
+    ],
+    "uv": [
+     16,
+     16,
+     8,
+     12,
+     4
+    ],
+    "over": [
+     16,
+     32,
+     8,
+     12,
+     4
+    ],
+    "start": 0,
+    "end": 9,
+    "inflate": 0.25
+   },
+   "pelvis": {
+    "from": [
+     4,
+     8,
+     6
+    ],
+    "to": [
+     12,
+     11,
+     10
+    ],
+    "uv": [
+     16,
+     16,
+     8,
+     12,
+     4
+    ],
+    "over": [
+     16,
+     32,
+     8,
+     12,
+     4
+    ],
+    "start": 9,
+    "end": 12,
+    "inflate": 0.25
+   },
+   "arm_r": {
+    "from": [
+     6,
+     4,
+     6
+    ],
+    "to": [
+     10,
+     10,
+     10
+    ],
+    "uv": [
+     40,
+     16,
+     4,
+     12,
+     4
+    ],
+    "over": [
+     40,
+     32,
+     4,
+     12,
+     4
+    ],
+    "start": 0,
+    "end": 6,
+    "inflate": 0.25
+   },
+   "arm_l": {
+    "from": [
+     6,
+     4,
+     6
+    ],
+    "to": [
+     10,
+     10,
+     10
+    ],
+    "uv": [
+     32,
+     48,
+     4,
+     12,
+     4
+    ],
+    "over": [
+     48,
+     48,
+     4,
+     12,
+     4
+    ],
+    "start": 0,
+    "end": 6,
+    "inflate": 0.25
+   },
+   "forearm_r": {
+    "from": [
+     6,
+     2,
+     6
+    ],
+    "to": [
+     10,
+     8,
+     10
+    ],
+    "uv": [
+     40,
+     16,
+     4,
+     12,
+     4
+    ],
+    "over": [
+     40,
+     32,
+     4,
+     12,
+     4
+    ],
+    "start": 6,
+    "end": 12,
+    "inflate": 0.25
+   },
+   "forearm_l": {
+    "from": [
+     6,
+     2,
+     6
+    ],
+    "to": [
+     10,
+     8,
+     10
+    ],
+    "uv": [
+     32,
+     48,
+     4,
+     12,
+     4
+    ],
+    "over": [
+     48,
+     48,
+     4,
+     12,
+     4
+    ],
+    "start": 6,
+    "end": 12,
+    "inflate": 0.25
+   },
+   "thigh_r": {
+    "from": [
+     6,
+     2,
+     6
+    ],
+    "to": [
+     10,
+     8,
+     10
+    ],
+    "uv": [
+     0,
+     16,
+     4,
+     12,
+     4
+    ],
+    "over": [
+     0,
+     32,
+     4,
+     12,
+     4
+    ],
+    "start": 0,
+    "end": 6,
+    "inflate": 0.25
+   },
+   "thigh_l": {
+    "from": [
+     6,
+     2,
+     6
+    ],
+    "to": [
+     10,
+     8,
+     10
+    ],
+    "uv": [
+     16,
+     48,
+     4,
+     12,
+     4
+    ],
+    "over": [
+     0,
+     48,
+     4,
+     12,
+     4
+    ],
+    "start": 0,
+    "end": 6,
+    "inflate": 0.25
+   },
+   "shin_r": {
+    "from": [
+     6,
+     2,
+     6
+    ],
+    "to": [
+     10,
+     8,
+     10
+    ],
+    "uv": [
+     0,
+     16,
+     4,
+     12,
+     4
+    ],
+    "over": [
+     0,
+     32,
+     4,
+     12,
+     4
+    ],
+    "start": 6,
+    "end": 12,
+    "inflate": 0.25
+   },
+   "shin_l": {
+    "from": [
+     6,
+     2,
+     6
+    ],
+    "to": [
+     10,
+     8,
+     10
+    ],
+    "uv": [
+     16,
+     48,
+     4,
+     12,
+     4
+    ],
+    "over": [
+     0,
+     48,
+     4,
+     12,
+     4
+    ],
+    "start": 6,
+    "end": 12,
+    "inflate": 0.25
+   }
   },
   "map": {
    "head": [
@@ -2479,19 +2800,11 @@
     "leg_r",
     6,
     12
-   ],
-   "hair_tail_1": [
-    "body_back",
-    0,
-    3.4286
-   ],
-   "hair_tail_2": [
-    "body_back",
-    3.4286,
-    11
    ]
   },
   "hidden": [
+   "hair_tail_1",
+   "hair_tail_2",
    "lock_r",
    "lock_l",
    "skirt_fl",
@@ -2535,12 +2848,12 @@
     ]
    ]
   },
-  "_doc": "map: model -> [region, row start, row end] (the base box shows the region's base layer, the second box its outer layer; body_back = the hair slab: the body back face only). hidden: parts the skin already shows (model empty, scale 0). face_overlays: [col, row, cols, rows] of the 8 x 8 face painted by face_fx."
+  "_doc": "map: model -> [region, row start, row end] (the base box shows the region's base layer, the second box its outer layer, inflated on all six sides). specs: the avatar's box specs (from / to in model units about the pivot [8, 8, 8], uv / over = [u, v, w, h, d], rows start..end). hidden: parts the skin already shows (model empty, scale 0). face_overlays: [col, row, cols, rows] of the 8 x 8 face painted by face_fx."
  },
  "item_sword": {
   "model": "rlk:mboss/scarlet/item_sword",
-  "length": 2.21,
-  "display_scale": 1.5,
+  "length": 2.03,
+  "display_scale": 1.375,
   "display": {
    "thirdperson_righthand": {
     "rotation": [
@@ -2678,7 +2991,9209 @@
      1
     ]
    }
+  },
+  "toss_offset": [
+   -0.02,
+   0.02,
+   0.04
+  ]
+ },
+ "skeleton": {
+  "hip_y": 0.765625,
+  "hipJ": [
+   0.125,
+   0,
+   0
+  ],
+  "waist": [
+   0,
+   0.1875,
+   0
+  ],
+  "neckB": [
+   0,
+   0.5625,
+   0
+  ],
+  "shoulder": [
+   0.375,
+   0.4375,
+   0
+  ],
+  "armU": 0.25,
+  "fore": 0.34375,
+  "thigh": 0.375,
+  "shin": 0.390625,
+  "ankleY": 0,
+  "swing": [
+   0,
+   0.55,
+   0
+  ],
+  "brim": [
+   0,
+   0.567,
+   0
+  ],
+  "brimTilt": -6,
+  "hatBack": [
+   0,
+   0.25,
+   0.3
+  ],
+  "hatHand": 0.62,
+  "brimHold": {
+   "r": 0.44,
+   "azAdd": 50,
+   "azMin": 70,
+   "azMax": 90,
+   "dy": -0.07
+  },
+  "sashKnot": [
+   0.26,
+   0.09,
+   -0.1
+  ],
+  "scabHip": [
+   -0.25,
+   0.19,
+   -0.18
+  ],
+  "scabHipDir": [
+   -0.449327,
+   -0.419371,
+   0.788818
+  ],
+  "twoHand": 0.22,
+  "hilt": -0.165,
+  "throat": 0.16,
+  "anchors": {
+   "head": [
+    0,
+    0.25,
+    -0.02
+   ],
+   "chest": [
+    0,
+    0.3,
+    -0.06
+   ]
+  },
+  "vis": 0.3,
+  "_doc": "the player avatar's skeleton (blocks; rig frame +X her left, +Y up, -Z forward): hip_y = the hip line at pos 0; waist = the torso pivot (the seam, body row 9) from the hip line; neckB / shoulder from the seam; armU / fore = shoulder -> elbow -> grip; thigh / shin = hip joint -> knee -> the outer-layer sole"
+ },
+ "dims": {
+  "height_idle": 1.9835,
+  "hat_top": 2.3604,
+  "hull_top": 2.413,
+  "hat": {
+   "R": 0.66,
+   "crownR": 0.25,
+   "crownH": 0.3,
+   "brim": [
+    0,
+    0.567,
+    0
+   ],
+   "tilt": -6,
+   "hand": 0.62,
+   "back": [
+    0,
+    0.25,
+    0.3
+   ]
+  },
+  "strings": {
+   "Z": -0.325,
+   "X": 0.3,
+   "LOOP": 0.6,
+   "L": 0.68
+  },
+  "sash": [
+   [
+    -0.03,
+    0.32
+   ],
+   [
+    0.035,
+    0.29
+   ]
+  ],
+  "sword": {
+   "len": 1.94,
+   "tip": 1.6,
+   "blade_lo": 0.165,
+   "guard": 0.155,
+   "pommel": -0.34,
+   "grip_lo": -0.31,
+   "grip_hi": 0.14,
+   "display_scale": 1.5
+  },
+  "scabbard": {
+   "L": 1.52,
+   "display_scale": 1.5
+  },
+  "item_sword": {
+   "len": 2.03,
+   "scale": 1.375,
+   "units": 23.62,
+   "toss_offset": [
+    -0.02,
+    0.02,
+    0.04
+   ]
+  },
+  "seat_top": 0.24,
+  "stone": {
+   "T": 0.24,
+   "front": -0.135,
+   "back": 0.505,
+   "half": 0.6,
+   "bottle": [
+    0.42,
+    0.24,
+    0.15
+   ],
+   "cup": [
+    -0.42,
+    0.24,
+    0.15
+   ]
+  },
+  "seat_items": {
+   "bottle": [
+    0.42,
+    0.24,
+    0.15
+   ],
+   "cup": [
+    -0.42,
+    0.24,
+    0.15
+   ]
+  },
+  "hat_rest": {
+   "side": [
+    1,
+    0.02,
+    -0.35
+   ],
+   "leg": [
+    -1,
+    0.02,
+    -0.4
+   ],
+   "face": [
+    -0.0617,
+    0.7687,
+    0.8469
+   ]
+  },
+  "hat_face": {
+   "tilt": 9,
+   "lift": 0.05
+  },
+  "shadow_r": 0.6,
+  "contacts": {
+   "grip": 0.34375,
+   "brim_hold": {
+    "r": 0.44,
+    "azAdd": 50,
+    "azMin": 70,
+    "azMax": 90,
+    "dy": -0.07
+   },
+   "hilt": -0.165,
+   "throat": 0.16,
+   "lip_mouth": [
+    0,
+    0.09,
+    -0.37525000000000003
+   ],
+   "cup_hand": 0.09,
+   "cup_centre": 0.036,
+   "bottle_neck": 0.27,
+   "two_hand": 0.22,
+   "hat_floor_hold": {
+    "inset": 0.02,
+    "up": 0.08
+   }
   }
+ },
+ "support": {
+  "idle": {
+   "low_ref": [
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     40
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     40
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     40
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     40
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "idle2": {
+   "low_ref": [
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     40
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     40
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     40
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     40
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "walk": {
+   "low_ref": [
+    0.001,
+    0,
+    0.007,
+    0.013,
+    0.007,
+    0.003,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.001,
+    0,
+    0.007,
+    0.013,
+    0.007,
+    0.003,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.001
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     2
+    ],
+    [
+     4,
+     7
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "feet_r": [
+    [
+     12,
+     14
+    ],
+    [
+     16,
+     19
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     2
+    ],
+    [
+     4,
+     14
+    ],
+    [
+     16,
+     24
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     24
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "glide": {
+   "low_ref": [
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.006,
+    0.006,
+    0.006,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     4
+    ],
+    [
+     12,
+     16
+    ]
+   ],
+   "feet_r": [
+    [
+     4,
+     12
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     16
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     16
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "strafe_l": {
+   "low_ref": [
+    0.005,
+    0.006,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     0
+    ],
+    [
+     6,
+     20
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     10
+    ],
+    [
+     16,
+     20
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     20
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     20
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "strafe_r": {
+   "low_ref": [
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     10
+    ],
+    [
+     16,
+     20
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     0
+    ],
+    [
+     6,
+     20
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     20
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     20
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "backstep": {
+   "low_ref": [
+    0.004,
+    0.005,
+    0.005,
+    0.065,
+    0.151,
+    0.13,
+    0.087,
+    0.048,
+    0.032,
+    0.006,
+    0.006,
+    0.004,
+    0.005
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     2
+    ],
+    [
+     10,
+     12
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     2
+    ],
+    [
+     10,
+     12
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     2
+    ],
+    [
+     9,
+     12
+    ]
+   ],
+   "air": [
+    [
+     3,
+     6
+    ]
+   ],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     12
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "flinch": {
+   "low_ref": [
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     6
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     6
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     6
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     6
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "a1": {
+   "low_ref": [
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.003,
+    0.003,
+    0.004,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     34
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     34
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     34
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     34
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "a2": {
+   "low_ref": [
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.006,
+    0.006,
+    0.008,
+    0.008,
+    0.008,
+    0.007,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     30
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     30
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     30
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     30
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "a3": {
+   "low_ref": [
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.009,
+    0.009,
+    0.009,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.002,
+    0.001,
+    0.001,
+    0.001,
+    0.001,
+    0.001,
+    0.003,
+    0.005,
+    0.004,
+    0.011,
+    0.011,
+    0.01,
+    0.006,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    -0.002,
+    -0.002,
+    -0.002,
+    -0.002,
+    -0.002,
+    -0.002,
+    -0.001,
+    -0.001,
+    0,
+    0.001,
+    0.002,
+    0.002,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.002,
+    0.001,
+    0,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     96
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     96
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     96
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     96
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": [
+    [
+     53,
+     "twohand",
+     -1
+    ],
+    [
+     54,
+     "twohand",
+     -1
+    ],
+    [
+     55,
+     "twohand",
+     -1
+    ],
+    [
+     56,
+     "twohand",
+     -1
+    ],
+    [
+     57,
+     "twohand",
+     -1
+    ]
+   ]
+  },
+  "a4": {
+   "low_ref": [
+    0.004,
+    0.006,
+    0.006,
+    0.006,
+    0.06,
+    0.255,
+    0.387,
+    0.433,
+    0.443,
+    0.453,
+    0.495,
+    0.575,
+    0.616,
+    0.989,
+    1.311,
+    1.358,
+    1.775,
+    1.419,
+    0.503,
+    0.115,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.264,
+    0.259,
+    0.256,
+    0.258,
+    0.262,
+    0.264,
+    0.259,
+    0.22,
+    0.125,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.005,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     2
+    ],
+    [
+     20,
+     27
+    ],
+    [
+     38,
+     60
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     2
+    ],
+    [
+     20,
+     27
+    ],
+    [
+     38,
+     60
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     3
+    ],
+    [
+     20,
+     27
+    ],
+    [
+     37,
+     60
+    ]
+   ],
+   "air": [
+    [
+     4,
+     19
+    ],
+    [
+     28,
+     36
+    ]
+   ],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     60
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "a6": {
+   "low_ref": [
+    0.004,
+    0.006,
+    0.004,
+    0.006,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     0
+    ],
+    [
+     3,
+     20
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     20
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     20
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     20
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "a9": {
+   "low_ref": [
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.01,
+    0.01,
+    0.01,
+    0.01,
+    0.01,
+    0.01,
+    0.01,
+    0.01,
+    0.009,
+    0.009,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     64
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     64
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     64
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     64
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "a10": {
+   "low_ref": [
+    0.004,
+    0.005,
+    0.006,
+    0.006,
+    0.071,
+    0.118,
+    0.4,
+    0.629,
+    0.775,
+    0.825,
+    0.825,
+    0.827,
+    0.829,
+    0.831,
+    0.834,
+    0.836,
+    0.839,
+    0.841,
+    0.842,
+    0.843,
+    0.521,
+    0.297,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     2
+    ],
+    [
+     22,
+     56
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     2
+    ],
+    [
+     22,
+     56
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     3
+    ],
+    [
+     22,
+     56
+    ]
+   ],
+   "air": [
+    [
+     4,
+     21
+    ]
+   ],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     56
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": [
+    [
+     9,
+     "twohand",
+     -1
+    ],
+    [
+     10,
+     "twohand",
+     -1
+    ],
+    [
+     11,
+     "twohand",
+     -1
+    ],
+    [
+     12,
+     "twohand",
+     -1
+    ],
+    [
+     13,
+     "twohand",
+     -1
+    ],
+    [
+     14,
+     "twohand",
+     -1
+    ],
+    [
+     15,
+     "twohand",
+     -1
+    ],
+    [
+     16,
+     "twohand",
+     -1
+    ],
+    [
+     17,
+     "twohand",
+     -1
+    ],
+    [
+     18,
+     "twohand",
+     -1
+    ],
+    [
+     19,
+     "twohand",
+     -1
+    ],
+    [
+     20,
+     "twohand",
+     -1
+    ],
+    [
+     21,
+     "twohand",
+     -1
+    ],
+    [
+     22,
+     "twohand",
+     -1
+    ],
+    [
+     23,
+     "twohand",
+     -1
+    ],
+    [
+     24,
+     "twohand",
+     -1
+    ],
+    [
+     25,
+     "twohand",
+     -1
+    ],
+    [
+     26,
+     "twohand",
+     -1
+    ]
+   ]
+  },
+  "a7_tell": {
+   "low_ref": [
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.005
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     3
+    ],
+    [
+     15,
+     16
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     16
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     16
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     16
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "a7_throw": {
+   "low_ref": [
+    0.006,
+    0.006,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.006,
+    0.005,
+    0.005,
+    0.006,
+    0.005,
+    0.004,
+    0.006,
+    0.007,
+    0.006
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     16
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     16
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     16
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     16
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "g_brim": {
+   "low_ref": [
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     14
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     14
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     14
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     14
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": [
+    [
+     6,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     7,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     8,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     9,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     10,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     11,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     12,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     13,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     14,
+     "brim",
+     -1,
+     80
+    ]
+   ]
+  },
+  "g_tell": {
+   "low_ref": [
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     3
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     3
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     3
+    ]
+   ],
+   "air": [],
+   "ghost": [
+    [
+     4,
+     12
+    ]
+   ],
+   "held": [
+    [
+     0,
+     12
+    ]
+   ],
+   "cuts": [
+    4
+   ],
+   "lift": {},
+   "contacts": [
+    [
+     0,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     1,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     2,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     3,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     4,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     5,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     6,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     7,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     8,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     9,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     10,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     11,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     12,
+     "brim",
+     -1,
+     80
+    ]
+   ]
+  },
+  "g_reform": {
+   "low_ref": [
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.005,
+    0.005,
+    0.005
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     3,
+     10
+    ]
+   ],
+   "feet_r": [
+    [
+     3,
+     10
+    ]
+   ],
+   "touch": [
+    [
+     3,
+     10
+    ]
+   ],
+   "air": [],
+   "ghost": [
+    [
+     0,
+     2
+    ]
+   ],
+   "held": [
+    [
+     0,
+     10
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "g_dash": {
+   "low_ref": [
+    0.357,
+    0.357,
+    0.357,
+    0.357,
+    0.357,
+    0.357,
+    0.357,
+    0.365,
+    0.494,
+    0.538,
+    0.006,
+    0.006,
+    0.006
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     10,
+     12
+    ]
+   ],
+   "feet_r": [
+    [
+     10,
+     12
+    ]
+   ],
+   "touch": [
+    [
+     10,
+     12
+    ]
+   ],
+   "air": [
+    [
+     6,
+     9
+    ]
+   ],
+   "ghost": [
+    [
+     0,
+     5
+    ]
+   ],
+   "held": [
+    [
+     0,
+     12
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "g_glide": {
+   "low_ref": [
+    0.006,
+    0.004,
+    0.008,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.006,
+    0.006,
+    0.006
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     2,
+     12
+    ]
+   ],
+   "feet_r": [
+    [
+     5,
+     12
+    ]
+   ],
+   "touch": [
+    [
+     2,
+     12
+    ]
+   ],
+   "air": [],
+   "ghost": [
+    [
+     0,
+     1
+    ]
+   ],
+   "held": [
+    [
+     0,
+     12
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "g_drop": {
+   "low_ref": [
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.373,
+    0.374,
+    0.389,
+    0.448,
+    0.225,
+    0.006,
+    0.006,
+    0.006
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     0
+    ],
+    [
+     12,
+     14
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     0
+    ],
+    [
+     12,
+     14
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     0
+    ],
+    [
+     12,
+     14
+    ]
+   ],
+   "air": [
+    [
+     7,
+     11
+    ]
+   ],
+   "ghost": [
+    [
+     1,
+     6
+    ]
+   ],
+   "held": [
+    [
+     0,
+     14
+    ]
+   ],
+   "cuts": [
+    2,
+    7
+   ],
+   "lift": {},
+   "contacts": []
+  },
+  "g_run": {
+   "low_ref": [
+    0.011,
+    0.004,
+    0.005,
+    0.032,
+    0.001,
+    0.004,
+    0.005,
+    0.032,
+    0.004,
+    0.005,
+    0.006,
+    0.004,
+    0,
+    0,
+    0
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     2,
+     2
+    ],
+    [
+     8,
+     14
+    ]
+   ],
+   "feet_r": [
+    [
+     4,
+     6
+    ],
+    [
+     10,
+     14
+    ]
+   ],
+   "touch": [
+    [
+     2,
+     2
+    ],
+    [
+     4,
+     6
+    ],
+    [
+     8,
+     14
+    ]
+   ],
+   "air": [],
+   "ghost": [
+    [
+     0,
+     1
+    ]
+   ],
+   "held": [
+    [
+     0,
+     14
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "g_ring": {
+   "low_ref": [
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     14
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     14
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     14
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     14
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "g_rise": {
+   "low_ref": [
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.003,
+    0.198,
+    0.203,
+    0.207,
+    0.209,
+    0.21
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     9
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     9
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     9
+    ]
+   ],
+   "air": [
+    [
+     10,
+     14
+    ]
+   ],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     14
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "g_leap": {
+   "low_ref": [
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.193,
+    0.353,
+    0.353,
+    0.353,
+    0.513,
+    1.223,
+    1.83,
+    1.824,
+    2.041,
+    2.243,
+    1.38,
+    1.38,
+    1.38
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     5
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     5
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     5
+    ]
+   ],
+   "air": [
+    [
+     6,
+     15
+    ]
+   ],
+   "ghost": [
+    [
+     16,
+     18
+    ]
+   ],
+   "held": [
+    [
+     0,
+     18
+    ]
+   ],
+   "cuts": [
+    17
+   ],
+   "lift": {},
+   "contacts": []
+  },
+  "g_sweep": {
+   "low_ref": [
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.068,
+    0.198,
+    0.198,
+    0.198,
+    0.198,
+    0.198,
+    0.197,
+    0.195,
+    0.192,
+    0.191
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     4
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     4
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     4
+    ]
+   ],
+   "air": [
+    [
+     5,
+     14
+    ]
+   ],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     14
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "g_x": {
+   "low_ref": [
+    0.006,
+    0.006,
+    0.005,
+    0.005,
+    0.005,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     13
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     13
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     13
+    ]
+   ],
+   "air": [],
+   "ghost": [
+    [
+     14,
+     16
+    ]
+   ],
+   "held": [
+    [
+     0,
+     16
+    ]
+   ],
+   "cuts": [
+    14
+   ],
+   "lift": {},
+   "contacts": []
+  },
+  "g_wrap": {
+   "low_ref": [
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     12
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     12
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     12
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     12
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "g_dome": {
+   "low_ref": [
+    0.006,
+    0.004,
+    0.006,
+    0.006,
+    0.006,
+    0.004,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     12
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     12
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     12
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     12
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "g_vert": {
+   "low_ref": [
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.129,
+    0.329,
+    0.601,
+    0.891,
+    1.054,
+    1.278,
+    1.377,
+    1.231,
+    1.178,
+    1.236,
+    1.325,
+    1.397,
+    1.397,
+    1.397,
+    1.397
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     5
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     5
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     5
+    ]
+   ],
+   "air": [
+    [
+     6,
+     15
+    ]
+   ],
+   "ghost": [
+    [
+     16,
+     20
+    ]
+   ],
+   "held": [
+    [
+     0,
+     20
+    ]
+   ],
+   "cuts": [
+    18
+   ],
+   "lift": {},
+   "contacts": []
+  },
+  "g_dive": {
+   "low_ref": [
+    0.732,
+    0.853,
+    1.041,
+    1.496,
+    1.505,
+    1.522,
+    1.533,
+    1.533,
+    1.533,
+    1.533,
+    1.533
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [],
+   "feet_r": [],
+   "touch": [],
+   "air": [
+    [
+     0,
+     10
+    ]
+   ],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     10
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": [
+    [
+     0,
+     "twohand",
+     -1
+    ],
+    [
+     1,
+     "twohand",
+     -1
+    ],
+    [
+     2,
+     "twohand",
+     -1
+    ],
+    [
+     3,
+     "twohand",
+     -1
+    ],
+    [
+     4,
+     "twohand",
+     -1
+    ],
+    [
+     5,
+     "twohand",
+     -1
+    ],
+    [
+     6,
+     "twohand",
+     -1
+    ],
+    [
+     7,
+     "twohand",
+     -1
+    ],
+    [
+     8,
+     "twohand",
+     -1
+    ],
+    [
+     9,
+     "twohand",
+     -1
+    ],
+    [
+     10,
+     "twohand",
+     -1
+    ]
+   ]
+  },
+  "g_deflect": {
+   "low_ref": [
+    0.619,
+    0.429,
+    0.374,
+    0.329,
+    0.207,
+    0.048,
+    0.006,
+    0.006,
+    0.005,
+    0.006,
+    0.004,
+    0.006,
+    0.006
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     6,
+     12
+    ]
+   ],
+   "feet_r": [
+    [
+     6,
+     12
+    ]
+   ],
+   "touch": [
+    [
+     6,
+     12
+    ]
+   ],
+   "air": [
+    [
+     0,
+     4
+    ]
+   ],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     12
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": [
+    [
+     0,
+     "twohand",
+     -1
+    ],
+    [
+     1,
+     "twohand",
+     -1
+    ],
+    [
+     2,
+     "twohand",
+     -1
+    ],
+    [
+     3,
+     "twohand",
+     -1
+    ],
+    [
+     4,
+     "twohand",
+     -1
+    ],
+    [
+     5,
+     "twohand",
+     -1
+    ],
+    [
+     6,
+     "twohand",
+     -1
+    ],
+    [
+     7,
+     "twohand",
+     -1
+    ],
+    [
+     8,
+     "twohand",
+     -1
+    ],
+    [
+     9,
+     "twohand",
+     -1
+    ],
+    [
+     10,
+     "twohand",
+     -1
+    ],
+    [
+     11,
+     "twohand",
+     -1
+    ],
+    [
+     12,
+     "twohand",
+     -1
+    ]
+   ]
+  },
+  "repel": {
+   "low_ref": [
+    0.004,
+    0.004,
+    0.005,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.01,
+    0.01,
+    0.011,
+    0.012,
+    0.013,
+    0.014,
+    0.016,
+    0.017,
+    0.017,
+    0.011,
+    0.005,
+    0.006,
+    0.004,
+    0.005,
+    0.005,
+    0.294,
+    0.308,
+    0.382,
+    0.622,
+    1.165,
+    1.895,
+    1.599,
+    1.472,
+    1.445,
+    1.527,
+    0.999,
+    0.543,
+    0.361,
+    0.306,
+    0.294,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.048,
+    0.233,
+    0.527,
+    0.861,
+    0.529,
+    0.261,
+    0.113,
+    0.037,
+    0.004,
+    0.009,
+    0.036,
+    0.031,
+    0.014,
+    0.022,
+    0.062,
+    0.042,
+    0.022,
+    0.022,
+    0.021,
+    0.021,
+    0.02,
+    0.02,
+    0.019,
+    0.018,
+    0.018,
+    0.017,
+    0.017,
+    0.017,
+    0.017,
+    0.017,
+    0.017,
+    0.017,
+    0.018,
+    0.019,
+    0.019,
+    0.02,
+    0.021,
+    0.021,
+    0.022,
+    0.022,
+    0.011,
+    -0.002,
+    -0.004
+   ],
+   "seat": [],
+   "lie": [
+    [
+     102,
+     104
+    ]
+   ],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     9
+    ],
+    [
+     44,
+     61
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     9
+    ],
+    [
+     44,
+     61
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     17
+    ],
+    [
+     23,
+     28
+    ],
+    [
+     44,
+     61
+    ],
+    [
+     70,
+     71
+    ]
+   ],
+   "air": [
+    [
+     29,
+     43
+    ],
+    [
+     63,
+     68
+    ],
+    [
+     76,
+     76
+    ]
+   ],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     104
+    ]
+   ],
+   "cuts": [
+    60
+   ],
+   "lift": {},
+   "contacts": [
+    [
+     0,
+     "twohand",
+     -1
+    ],
+    [
+     1,
+     "twohand",
+     -1
+    ],
+    [
+     2,
+     "twohand",
+     -1
+    ],
+    [
+     3,
+     "twohand",
+     -1
+    ],
+    [
+     4,
+     "twohand",
+     -1
+    ]
+   ]
+  },
+  "down": {
+   "low_ref": [
+    0.022,
+    0.022,
+    0.022,
+    0.022,
+    0.021,
+    0.021,
+    0.021,
+    0.02,
+    0.02,
+    0.02,
+    0.019,
+    0.019,
+    0.018,
+    0.018,
+    0.018,
+    0.017,
+    0.017,
+    0.017,
+    0.017,
+    0.017,
+    0.017,
+    0.017,
+    0.017,
+    0.017,
+    0.017,
+    0.017,
+    0.018,
+    0.018,
+    0.018,
+    0.019,
+    0.019,
+    0.02,
+    0.02,
+    0.02,
+    0.021,
+    0.021,
+    0.021,
+    0.022,
+    0.022,
+    0.022,
+    0.022
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [],
+   "feet_r": [],
+   "touch": [],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     40
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  },
+  "kipup": {
+   "low_ref": [
+    0.022,
+    0.098,
+    0.139,
+    0.124,
+    0.119,
+    0.186,
+    0.112,
+    0.005,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [
+    [
+     8,
+     10
+    ]
+   ],
+   "feet_l": [
+    [
+     12,
+     20
+    ]
+   ],
+   "feet_r": [
+    [
+     12,
+     20
+    ]
+   ],
+   "touch": [
+    [
+     7,
+     7
+    ],
+    [
+     11,
+     20
+    ]
+   ],
+   "air": [
+    [
+     1,
+     6
+    ]
+   ],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     20
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": [
+    [
+     8,
+     "hatfloor",
+     -1
+    ],
+    [
+     9,
+     "hatfloor",
+     -1
+    ],
+    [
+     9,
+     "hatfloor",
+     -1
+    ],
+    [
+     10,
+     "hatfloor",
+     -1
+    ],
+    [
+     16,
+     "hat",
+     -1
+    ],
+    [
+     17,
+     "brim",
+     -1,
+     80
+    ]
+   ]
+  },
+  "lead_down": {
+   "low_ref": [
+    0.022,
+    0.121,
+    0.128,
+    0.119,
+    0.186,
+    0.112,
+    0.004,
+    0.006,
+    0.006,
+    0.006,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [
+    [
+     7,
+     9
+    ]
+   ],
+   "feet_l": [
+    [
+     11,
+     18
+    ],
+    [
+     24,
+     30
+    ],
+    [
+     36,
+     42
+    ],
+    [
+     48,
+     82
+    ]
+   ],
+   "feet_r": [
+    [
+     11,
+     12
+    ],
+    [
+     18,
+     24
+    ],
+    [
+     30,
+     36
+    ],
+    [
+     42,
+     82
+    ]
+   ],
+   "touch": [
+    [
+     6,
+     6
+    ],
+    [
+     10,
+     82
+    ]
+   ],
+   "air": [
+    [
+     1,
+     5
+    ]
+   ],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     82
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": [
+    [
+     7,
+     "hatfloor",
+     -1
+    ],
+    [
+     8,
+     "hatfloor",
+     -1
+    ],
+    [
+     8,
+     "hatfloor",
+     -1
+    ],
+    [
+     9,
+     "hatfloor",
+     -1
+    ],
+    [
+     47,
+     "hat",
+     -1
+    ],
+    [
+     48,
+     "brim",
+     -1,
+     74
+    ],
+    [
+     71,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     72,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     73,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     74,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     75,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     76,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     77,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     78,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     79,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     80,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     81,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     82,
+     "brim",
+     -1,
+     80
+    ]
+   ]
+  },
+  "lead_stand": {
+   "low_ref": [
+    0.005,
+    0.005,
+    0.006,
+    0.005,
+    0.006,
+    0.006,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     0
+    ],
+    [
+     6,
+     16
+    ],
+    [
+     22,
+     70
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     10
+    ],
+    [
+     16,
+     22
+    ],
+    [
+     28,
+     70
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     70
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     70
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": [
+    [
+     7,
+     "hat",
+     -1
+    ],
+    [
+     8,
+     "hat",
+     -1
+    ],
+    [
+     35,
+     "hat",
+     -1
+    ],
+    [
+     36,
+     "brim",
+     -1,
+     74
+    ],
+    [
+     59,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     60,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     61,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     62,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     63,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     64,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     65,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     66,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     67,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     68,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     69,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     70,
+     "brim",
+     -1,
+     80
+    ]
+   ]
+  },
+  "sq1": {
+   "low_ref": [
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     60
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     60
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     60
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     60
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": [
+    [
+     11,
+     "hat",
+     -1
+    ],
+    [
+     12,
+     "hat",
+     -1
+    ],
+    [
+     27,
+     "hat",
+     -1
+    ],
+    [
+     28,
+     "brim",
+     -1,
+     70
+    ],
+    [
+     52,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     53,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     54,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     55,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     56,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     57,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     58,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     59,
+     "brim",
+     -1,
+     80
+    ],
+    [
+     60,
+     "brim",
+     -1,
+     80
+    ]
+   ]
+  },
+  "intro": {
+   "low_ref": [
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.003,
+    0.003,
+    0.003,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.022,
+    0.003,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.002,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [
+    [
+     0,
+     214
+    ]
+   ],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     221,
+     248
+    ],
+    [
+     256,
+     318
+    ],
+    [
+     328,
+     329
+    ],
+    [
+     331,
+     334
+    ],
+    [
+     344,
+     345
+    ],
+    [
+     347,
+     350
+    ],
+    [
+     360,
+     361
+    ],
+    [
+     363,
+     366
+    ],
+    [
+     376,
+     377
+    ],
+    [
+     379,
+     382
+    ],
+    [
+     392,
+     393
+    ],
+    [
+     395,
+     450
+    ],
+    [
+     460,
+     461
+    ],
+    [
+     463,
+     466
+    ],
+    [
+     476,
+     477
+    ],
+    [
+     479,
+     482
+    ],
+    [
+     492,
+     554
+    ]
+   ],
+   "feet_r": [
+    [
+     221,
+     256
+    ],
+    [
+     264,
+     312
+    ],
+    [
+     320,
+     321
+    ],
+    [
+     323,
+     326
+    ],
+    [
+     336,
+     337
+    ],
+    [
+     339,
+     342
+    ],
+    [
+     352,
+     353
+    ],
+    [
+     355,
+     358
+    ],
+    [
+     368,
+     369
+    ],
+    [
+     371,
+     374
+    ],
+    [
+     384,
+     385
+    ],
+    [
+     387,
+     390
+    ],
+    [
+     398,
+     444
+    ],
+    [
+     452,
+     453
+    ],
+    [
+     455,
+     458
+    ],
+    [
+     468,
+     469
+    ],
+    [
+     471,
+     474
+    ],
+    [
+     484,
+     485
+    ],
+    [
+     487,
+     490
+    ],
+    [
+     493,
+     554
+    ]
+   ],
+   "touch": [
+    [
+     226,
+     321
+    ],
+    [
+     323,
+     329
+    ],
+    [
+     331,
+     337
+    ],
+    [
+     339,
+     345
+    ],
+    [
+     347,
+     353
+    ],
+    [
+     355,
+     361
+    ],
+    [
+     363,
+     369
+    ],
+    [
+     371,
+     377
+    ],
+    [
+     379,
+     385
+    ],
+    [
+     387,
+     393
+    ],
+    [
+     395,
+     453
+    ],
+    [
+     455,
+     461
+    ],
+    [
+     463,
+     469
+    ],
+    [
+     471,
+     477
+    ],
+    [
+     479,
+     485
+    ],
+    [
+     487,
+     554
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [],
+   "cuts": [],
+   "lift": {},
+   "contacts": [
+    [
+     24,
+     "stone",
+     1
+    ],
+    [
+     51,
+     "stone",
+     1
+    ],
+    [
+     52,
+     "stone",
+     1
+    ],
+    [
+     70,
+     "lips",
+     -1
+    ],
+    [
+     71,
+     "lips",
+     -1
+    ],
+    [
+     72,
+     "lips",
+     -1
+    ],
+    [
+     73,
+     "lips",
+     -1
+    ],
+    [
+     74,
+     "lips",
+     -1
+    ],
+    [
+     75,
+     "lips",
+     -1
+    ],
+    [
+     76,
+     "lips",
+     -1
+    ],
+    [
+     77,
+     "lips",
+     -1
+    ],
+    [
+     78,
+     "lips",
+     -1
+    ],
+    [
+     79,
+     "lips",
+     -1
+    ],
+    [
+     80,
+     "lips",
+     -1
+    ],
+    [
+     81,
+     "lips",
+     -1
+    ],
+    [
+     82,
+     "lips",
+     -1
+    ],
+    [
+     83,
+     "lips",
+     -1
+    ],
+    [
+     84,
+     "lips",
+     -1
+    ],
+    [
+     85,
+     "lips",
+     -1
+    ],
+    [
+     86,
+     "lips",
+     -1
+    ],
+    [
+     205,
+     "stone",
+     -1
+    ],
+    [
+     206,
+     "stone",
+     -1
+    ],
+    [
+     296,
+     "throat",
+     -1
+    ],
+    [
+     297,
+     "throat",
+     -1
+    ],
+    [
+     298,
+     "throat",
+     -1
+    ],
+    [
+     299,
+     "throat",
+     -1
+    ],
+    [
+     300,
+     "throat",
+     -1
+    ]
+   ]
+  },
+  "intro_end": {
+   "low_ref": [
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     86
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     86
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     86
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [
+    [
+     58,
+     86
+    ]
+   ],
+   "cuts": [],
+   "lift": {},
+   "contacts": [
+    [
+     55,
+     "hilt",
+     1
+    ],
+    [
+     56,
+     "sheathe",
+     1
+    ],
+    [
+     75,
+     "throat",
+     -1
+    ],
+    [
+     76,
+     "throat",
+     -1
+    ]
+   ]
+  },
+  "cs1": {
+   "low_ref": [
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.007,
+    0.011,
+    0.038,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.006,
+    0.006,
+    0.007,
+    0.007,
+    0.007,
+    0.007,
+    0.007,
+    0.008,
+    0.008,
+    0.008,
+    0.008,
+    0.006,
+    0,
+    0.006,
+    0.005,
+    0.006,
+    0.006,
+    0.057,
+    0.226,
+    0.361,
+    0.413,
+    0.405,
+    0.386,
+    0.362,
+    0.337,
+    0.318,
+    0.311,
+    0.288,
+    0.224,
+    0.132,
+    0.032,
+    0.005,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     0
+    ],
+    [
+     10,
+     36
+    ],
+    [
+     52,
+     213
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     0
+    ],
+    [
+     10,
+     36
+    ],
+    [
+     52,
+     213
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     8
+    ],
+    [
+     10,
+     36
+    ],
+    [
+     51,
+     213
+    ]
+   ],
+   "air": [
+    [
+     37,
+     49
+    ]
+   ],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     103
+    ],
+    [
+     165,
+     213
+    ]
+   ],
+   "cuts": [
+    104
+   ],
+   "lift": {},
+   "contacts": [
+    [
+     10,
+     "twohand",
+     -1
+    ],
+    [
+     11,
+     "twohand",
+     -1
+    ],
+    [
+     12,
+     "twohand",
+     -1
+    ],
+    [
+     13,
+     "twohand",
+     -1
+    ],
+    [
+     14,
+     "twohand",
+     -1
+    ],
+    [
+     15,
+     "twohand",
+     -1
+    ],
+    [
+     16,
+     "twohand",
+     -1
+    ],
+    [
+     17,
+     "twohand",
+     -1
+    ],
+    [
+     18,
+     "twohand",
+     -1
+    ],
+    [
+     19,
+     "twohand",
+     -1
+    ],
+    [
+     20,
+     "twohand",
+     -1
+    ],
+    [
+     21,
+     "twohand",
+     -1
+    ],
+    [
+     22,
+     "twohand",
+     -1
+    ],
+    [
+     23,
+     "twohand",
+     -1
+    ],
+    [
+     24,
+     "twohand",
+     -1
+    ],
+    [
+     25,
+     "twohand",
+     -1
+    ],
+    [
+     26,
+     "twohand",
+     -1
+    ],
+    [
+     27,
+     "twohand",
+     -1
+    ],
+    [
+     28,
+     "twohand",
+     -1
+    ],
+    [
+     29,
+     "twohand",
+     -1
+    ],
+    [
+     30,
+     "twohand",
+     -1
+    ],
+    [
+     104,
+     "hilt",
+     1
+    ],
+    [
+     104,
+     "throat",
+     -1
+    ],
+    [
+     105,
+     "hilt",
+     1
+    ],
+    [
+     105,
+     "throat",
+     -1
+    ],
+    [
+     106,
+     "hilt",
+     1
+    ],
+    [
+     106,
+     "throat",
+     -1
+    ],
+    [
+     107,
+     "hilt",
+     1
+    ],
+    [
+     107,
+     "throat",
+     -1
+    ],
+    [
+     108,
+     "hilt",
+     1
+    ],
+    [
+     108,
+     "throat",
+     -1
+    ],
+    [
+     109,
+     "hilt",
+     1
+    ],
+    [
+     109,
+     "throat",
+     -1
+    ],
+    [
+     110,
+     "hilt",
+     1
+    ],
+    [
+     110,
+     "throat",
+     -1
+    ],
+    [
+     111,
+     "hilt",
+     1
+    ],
+    [
+     111,
+     "throat",
+     -1
+    ],
+    [
+     112,
+     "hilt",
+     1
+    ],
+    [
+     112,
+     "throat",
+     -1
+    ],
+    [
+     113,
+     "hilt",
+     1
+    ],
+    [
+     113,
+     "throat",
+     -1
+    ],
+    [
+     114,
+     "hilt",
+     1
+    ],
+    [
+     114,
+     "throat",
+     -1
+    ],
+    [
+     115,
+     "hilt",
+     1
+    ],
+    [
+     115,
+     "throat",
+     -1
+    ],
+    [
+     116,
+     "hilt",
+     1
+    ],
+    [
+     116,
+     "throat",
+     -1
+    ],
+    [
+     117,
+     "hilt",
+     1
+    ],
+    [
+     117,
+     "throat",
+     -1
+    ],
+    [
+     118,
+     "hilt",
+     1
+    ],
+    [
+     118,
+     "throat",
+     -1
+    ],
+    [
+     119,
+     "hilt",
+     1
+    ],
+    [
+     119,
+     "throat",
+     -1
+    ],
+    [
+     120,
+     "hilt",
+     1
+    ],
+    [
+     120,
+     "throat",
+     -1
+    ],
+    [
+     121,
+     "hilt",
+     1
+    ],
+    [
+     121,
+     "throat",
+     -1
+    ],
+    [
+     122,
+     "hilt",
+     1
+    ],
+    [
+     122,
+     "throat",
+     -1
+    ],
+    [
+     123,
+     "hilt",
+     1
+    ],
+    [
+     123,
+     "throat",
+     -1
+    ],
+    [
+     124,
+     "hilt",
+     1
+    ],
+    [
+     124,
+     "throat",
+     -1
+    ],
+    [
+     125,
+     "hilt",
+     1
+    ],
+    [
+     125,
+     "throat",
+     -1
+    ],
+    [
+     126,
+     "hilt",
+     1
+    ],
+    [
+     126,
+     "throat",
+     -1
+    ],
+    [
+     127,
+     "hilt",
+     1
+    ],
+    [
+     127,
+     "throat",
+     -1
+    ],
+    [
+     128,
+     "hilt",
+     1
+    ],
+    [
+     128,
+     "throat",
+     -1
+    ],
+    [
+     129,
+     "hilt",
+     1
+    ],
+    [
+     129,
+     "throat",
+     -1
+    ],
+    [
+     130,
+     "hilt",
+     1
+    ],
+    [
+     130,
+     "throat",
+     -1
+    ],
+    [
+     131,
+     "hilt",
+     1
+    ],
+    [
+     131,
+     "throat",
+     -1
+    ],
+    [
+     132,
+     "hilt",
+     1
+    ],
+    [
+     132,
+     "throat",
+     -1
+    ],
+    [
+     133,
+     "hilt",
+     1
+    ],
+    [
+     133,
+     "throat",
+     -1
+    ],
+    [
+     134,
+     "hilt",
+     1
+    ],
+    [
+     134,
+     "throat",
+     -1
+    ],
+    [
+     135,
+     "hilt",
+     1
+    ],
+    [
+     135,
+     "throat",
+     -1
+    ],
+    [
+     136,
+     "hilt",
+     1
+    ],
+    [
+     136,
+     "throat",
+     -1
+    ],
+    [
+     137,
+     "hilt",
+     1
+    ],
+    [
+     137,
+     "throat",
+     -1
+    ],
+    [
+     138,
+     "hilt",
+     1
+    ],
+    [
+     138,
+     "throat",
+     -1
+    ],
+    [
+     139,
+     "hilt",
+     1
+    ],
+    [
+     139,
+     "throat",
+     -1
+    ],
+    [
+     140,
+     "hilt",
+     1
+    ],
+    [
+     140,
+     "throat",
+     -1
+    ],
+    [
+     141,
+     "hilt",
+     1
+    ],
+    [
+     141,
+     "throat",
+     -1
+    ],
+    [
+     142,
+     "hilt",
+     1
+    ],
+    [
+     142,
+     "throat",
+     -1
+    ],
+    [
+     143,
+     "hilt",
+     1
+    ],
+    [
+     143,
+     "throat",
+     -1
+    ],
+    [
+     144,
+     "hilt",
+     1
+    ],
+    [
+     144,
+     "throat",
+     -1
+    ],
+    [
+     145,
+     "hilt",
+     1
+    ],
+    [
+     145,
+     "throat",
+     -1
+    ],
+    [
+     146,
+     "hilt",
+     1
+    ],
+    [
+     146,
+     "throat",
+     -1
+    ],
+    [
+     147,
+     "hilt",
+     1
+    ],
+    [
+     147,
+     "throat",
+     -1
+    ],
+    [
+     148,
+     "hilt",
+     1
+    ],
+    [
+     148,
+     "throat",
+     -1
+    ],
+    [
+     149,
+     "hilt",
+     1
+    ],
+    [
+     149,
+     "throat",
+     -1
+    ],
+    [
+     150,
+     "hilt",
+     1
+    ],
+    [
+     150,
+     "throat",
+     -1
+    ],
+    [
+     151,
+     "hilt",
+     1
+    ],
+    [
+     151,
+     "throat",
+     -1
+    ],
+    [
+     152,
+     "hilt",
+     1
+    ],
+    [
+     152,
+     "throat",
+     -1
+    ],
+    [
+     153,
+     "hilt",
+     1
+    ],
+    [
+     153,
+     "throat",
+     -1
+    ],
+    [
+     154,
+     "hilt",
+     1
+    ],
+    [
+     154,
+     "throat",
+     -1
+    ],
+    [
+     155,
+     "hilt",
+     1
+    ],
+    [
+     155,
+     "throat",
+     -1
+    ],
+    [
+     156,
+     "hilt",
+     1
+    ],
+    [
+     156,
+     "throat",
+     -1
+    ],
+    [
+     157,
+     "hilt",
+     1
+    ],
+    [
+     157,
+     "throat",
+     -1
+    ],
+    [
+     158,
+     "hilt",
+     1
+    ],
+    [
+     158,
+     "throat",
+     -1
+    ],
+    [
+     159,
+     "hilt",
+     1
+    ],
+    [
+     159,
+     "throat",
+     -1
+    ],
+    [
+     160,
+     "hilt",
+     1
+    ],
+    [
+     160,
+     "throat",
+     -1
+    ],
+    [
+     161,
+     "hilt",
+     1
+    ],
+    [
+     161,
+     "throat",
+     -1
+    ],
+    [
+     162,
+     "sheathe",
+     1
+    ],
+    [
+     162,
+     "throat",
+     -1
+    ],
+    [
+     163,
+     "throat",
+     -1
+    ]
+   ]
+  },
+  "ending": {
+   "low_ref": [
+    0.09,
+    0.09,
+    0.09,
+    0.089,
+    0.089,
+    0.088,
+    0.087,
+    0.086,
+    0.085,
+    0.084,
+    0.083,
+    0.082,
+    0.081,
+    0.081,
+    0.081,
+    0.082,
+    0.086,
+    0.09,
+    0.092,
+    0.092,
+    0.085,
+    0.078,
+    0.072,
+    0.066,
+    0.06,
+    0.055,
+    0.049,
+    0.105,
+    0.165,
+    0.168,
+    0.131,
+    0.119,
+    0.148,
+    0.242,
+    0.112,
+    0.005,
+    0.006,
+    0.006,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0,
+    0.006,
+    0.006,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.006,
+    0.006,
+    0.007,
+    0.007,
+    0.007,
+    0.007,
+    0.007,
+    0.006,
+    0.006,
+    0.005,
+    0.005,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.01,
+    0.01,
+    0.009,
+    0.009,
+    0.008,
+    0.007,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.041,
+    0.043,
+    0.045,
+    0.046,
+    0.045,
+    0.043,
+    0.041,
+    0.005,
+    0.006,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.006,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0,
+    0.001,
+    0.005,
+    0.006,
+    0.026,
+    0.195,
+    0.337,
+    0.393,
+    0.37,
+    0.361,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.36,
+    0.361,
+    0.364,
+    0.368,
+    0.372,
+    0.375,
+    0.377,
+    0.382,
+    0.392,
+    0.404,
+    0.413,
+    0.419,
+    0.421,
+    0.412,
+    0.387,
+    0.352,
+    0.311,
+    0.269,
+    0.229,
+    0.195,
+    0.169,
+    0.152,
+    0.145,
+    0.117,
+    0.043,
+    0.005,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.006,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.002,
+    0.002,
+    0.002,
+    0.004,
+    0.005,
+    0.004,
+    0.002,
+    -0.001,
+    0.005,
+    0.004,
+    0.004,
+    0.005,
+    0.002,
+    0.002,
+    0.002,
+    0.004,
+    0.004,
+    0.005,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.003,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     37,
+     139
+    ],
+    [
+     149,
+     190
+    ],
+    [
+     258,
+     276
+    ],
+    [
+     284,
+     289
+    ],
+    [
+     296,
+     506
+    ],
+    [
+     514,
+     794
+    ],
+    [
+     801,
+     1042
+    ]
+   ],
+   "feet_r": [
+    [
+     37,
+     139
+    ],
+    [
+     150,
+     190
+    ],
+    [
+     258,
+     272
+    ],
+    [
+     278,
+     282
+    ],
+    [
+     290,
+     514
+    ],
+    [
+     522,
+     810
+    ],
+    [
+     815,
+     1042
+    ]
+   ],
+   "touch": [
+    [
+     35,
+     139
+    ],
+    [
+     147,
+     190
+    ],
+    [
+     257,
+     1042
+    ]
+   ],
+   "air": [
+    [
+     0,
+     25
+    ],
+    [
+     27,
+     34
+    ],
+    [
+     192,
+     255
+    ]
+   ],
+   "ghost": [],
+   "held": [
+    [
+     0,
+     304
+    ]
+   ],
+   "cuts": [
+    1
+   ],
+   "lift": {},
+   "contacts": [
+    [
+     43,
+     "hat",
+     -1
+    ],
+    [
+     44,
+     "brim",
+     -1,
+     74
+    ],
+    [
+     45,
+     "brim",
+     -1,
+     74
+    ],
+    [
+     62,
+     "twohand",
+     -1
+    ],
+    [
+     63,
+     "twohand",
+     -1
+    ],
+    [
+     64,
+     "twohand",
+     -1
+    ],
+    [
+     65,
+     "twohand",
+     -1
+    ],
+    [
+     66,
+     "twohand",
+     -1
+    ],
+    [
+     67,
+     "twohand",
+     -1
+    ],
+    [
+     68,
+     "twohand",
+     -1
+    ],
+    [
+     69,
+     "twohand",
+     -1
+    ],
+    [
+     70,
+     "twohand",
+     -1
+    ],
+    [
+     71,
+     "twohand",
+     -1
+    ],
+    [
+     72,
+     "twohand",
+     -1
+    ],
+    [
+     73,
+     "twohand",
+     -1
+    ],
+    [
+     74,
+     "twohand",
+     -1
+    ],
+    [
+     75,
+     "twohand",
+     -1
+    ],
+    [
+     76,
+     "twohand",
+     -1
+    ],
+    [
+     77,
+     "twohand",
+     -1
+    ],
+    [
+     78,
+     "twohand",
+     -1
+    ],
+    [
+     176,
+     "twohand",
+     -1
+    ],
+    [
+     177,
+     "twohand",
+     -1
+    ],
+    [
+     178,
+     "twohand",
+     -1
+    ],
+    [
+     179,
+     "twohand",
+     -1
+    ],
+    [
+     180,
+     "twohand",
+     -1
+    ],
+    [
+     181,
+     "twohand",
+     -1
+    ],
+    [
+     182,
+     "twohand",
+     -1
+    ],
+    [
+     183,
+     "twohand",
+     -1
+    ],
+    [
+     184,
+     "twohand",
+     -1
+    ],
+    [
+     185,
+     "twohand",
+     -1
+    ],
+    [
+     186,
+     "twohand",
+     -1
+    ],
+    [
+     187,
+     "twohand",
+     -1
+    ],
+    [
+     188,
+     "twohand",
+     -1
+    ],
+    [
+     189,
+     "twohand",
+     -1
+    ],
+    [
+     190,
+     "twohand",
+     -1
+    ],
+    [
+     232,
+     "twohand",
+     -1
+    ],
+    [
+     233,
+     "twohand",
+     -1
+    ],
+    [
+     234,
+     "twohand",
+     -1
+    ],
+    [
+     235,
+     "twohand",
+     -1
+    ],
+    [
+     236,
+     "twohand",
+     -1
+    ],
+    [
+     237,
+     "twohand",
+     -1
+    ],
+    [
+     238,
+     "twohand",
+     -1
+    ],
+    [
+     280,
+     "throat",
+     -1
+    ],
+    [
+     281,
+     "throat",
+     -1
+    ],
+    [
+     282,
+     "throat",
+     -1
+    ],
+    [
+     283,
+     "throat",
+     -1
+    ],
+    [
+     284,
+     "throat",
+     -1
+    ],
+    [
+     285,
+     "throat",
+     -1
+    ],
+    [
+     286,
+     "throat",
+     -1
+    ],
+    [
+     287,
+     "throat",
+     -1
+    ],
+    [
+     306,
+     "sheathe",
+     1
+    ],
+    [
+     307,
+     "sheathe",
+     1
+    ],
+    [
+     308,
+     "sheathe",
+     1
+    ],
+    [
+     309,
+     "sheathe",
+     1
+    ],
+    [
+     310,
+     "sheathe",
+     1
+    ],
+    [
+     311,
+     "sheathe",
+     1
+    ],
+    [
+     312,
+     "sheathe",
+     1
+    ],
+    [
+     313,
+     "sheathe",
+     1
+    ],
+    [
+     314,
+     "sheathe",
+     1
+    ],
+    [
+     315,
+     "sheathe",
+     1
+    ],
+    [
+     316,
+     "sheathe",
+     1
+    ],
+    [
+     317,
+     "sheathe",
+     1
+    ],
+    [
+     318,
+     "sheathe",
+     1
+    ],
+    [
+     319,
+     "sheathe",
+     1
+    ],
+    [
+     320,
+     "sheathe",
+     1
+    ],
+    [
+     944,
+     "brim",
+     1,
+     90
+    ],
+    [
+     945,
+     "brim",
+     1,
+     90
+    ],
+    [
+     946,
+     "brim",
+     1,
+     90
+    ],
+    [
+     947,
+     "brim",
+     1,
+     90
+    ],
+    [
+     948,
+     "brim",
+     1,
+     90
+    ],
+    [
+     949,
+     "brim",
+     1,
+     90
+    ],
+    [
+     950,
+     "brim",
+     1,
+     90
+    ],
+    [
+     951,
+     "brim",
+     1,
+     90
+    ],
+    [
+     952,
+     "brim",
+     1,
+     90
+    ],
+    [
+     953,
+     "brim",
+     1,
+     90
+    ],
+    [
+     954,
+     "brim",
+     1,
+     90
+    ],
+    [
+     955,
+     "brim",
+     1,
+     90
+    ],
+    [
+     956,
+     "brim",
+     1,
+     90
+    ],
+    [
+     957,
+     "brim",
+     1,
+     90
+    ],
+    [
+     958,
+     "brim",
+     1,
+     90
+    ],
+    [
+     959,
+     "brim",
+     1,
+     90
+    ],
+    [
+     960,
+     "brim",
+     1,
+     90
+    ],
+    [
+     961,
+     "brim",
+     1,
+     90
+    ],
+    [
+     962,
+     "brim",
+     1,
+     90
+    ],
+    [
+     963,
+     "brim",
+     1,
+     90
+    ],
+    [
+     964,
+     "brim",
+     1,
+     90
+    ],
+    [
+     965,
+     "brim",
+     1,
+     90
+    ],
+    [
+     966,
+     "brim",
+     1,
+     90
+    ],
+    [
+     967,
+     "brim",
+     1,
+     90
+    ],
+    [
+     968,
+     "brim",
+     1,
+     90
+    ],
+    [
+     969,
+     "brim",
+     1,
+     90
+    ],
+    [
+     970,
+     "brim",
+     1,
+     90
+    ],
+    [
+     971,
+     "brim",
+     1,
+     90
+    ],
+    [
+     972,
+     "brim",
+     1,
+     90
+    ],
+    [
+     973,
+     "brim",
+     1,
+     90
+    ],
+    [
+     974,
+     "brim",
+     1,
+     90
+    ],
+    [
+     975,
+     "brim",
+     1,
+     90
+    ],
+    [
+     976,
+     "brim",
+     1,
+     90
+    ],
+    [
+     977,
+     "brim",
+     1,
+     90
+    ],
+    [
+     978,
+     "brim",
+     1,
+     90
+    ],
+    [
+     979,
+     "brim",
+     1,
+     90
+    ],
+    [
+     980,
+     "brim",
+     1,
+     90
+    ],
+    [
+     981,
+     "brim",
+     1,
+     89.69
+    ],
+    [
+     982,
+     "brim",
+     1,
+     88.81
+    ],
+    [
+     983,
+     "brim",
+     1,
+     87.5
+    ],
+    [
+     984,
+     "brim",
+     1,
+     85.85
+    ],
+    [
+     985,
+     "brim",
+     1,
+     83.98
+    ],
+    [
+     986,
+     "brim",
+     1,
+     82
+    ],
+    [
+     987,
+     "brim",
+     1,
+     80.02
+    ],
+    [
+     988,
+     "brim",
+     1,
+     78.15
+    ],
+    [
+     989,
+     "brim",
+     1,
+     76.5
+    ],
+    [
+     990,
+     "brim",
+     1,
+     75.19
+    ],
+    [
+     991,
+     "brim",
+     1,
+     74.31
+    ],
+    [
+     992,
+     "brim",
+     1,
+     74
+    ],
+    [
+     993,
+     "brim",
+     1,
+     74
+    ],
+    [
+     994,
+     "brim",
+     1,
+     74
+    ],
+    [
+     995,
+     "brim",
+     1,
+     74
+    ],
+    [
+     996,
+     "brim",
+     1,
+     74
+    ],
+    [
+     997,
+     "brim",
+     1,
+     74
+    ],
+    [
+     998,
+     "brim",
+     1,
+     74
+    ],
+    [
+     999,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1000,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1001,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1002,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1003,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1004,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1005,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1006,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1007,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1008,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1009,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1010,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1011,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1012,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1013,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1014,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1015,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1016,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1017,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1018,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1019,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1020,
+     "brim",
+     1,
+     74
+    ],
+    [
+     1021,
+     "brim",
+     1,
+     74.45
+    ],
+    [
+     1022,
+     "brim",
+     1,
+     75.66
+    ],
+    [
+     1023,
+     "brim",
+     1,
+     77.46
+    ],
+    [
+     1024,
+     "brim",
+     1,
+     79.63
+    ],
+    [
+     1025,
+     "brim",
+     1,
+     82
+    ],
+    [
+     1026,
+     "brim",
+     1,
+     84.37
+    ],
+    [
+     1027,
+     "brim",
+     1,
+     86.54
+    ],
+    [
+     1028,
+     "brim",
+     1,
+     88.34
+    ],
+    [
+     1029,
+     "brim",
+     1,
+     89.55
+    ],
+    [
+     1030,
+     "brim",
+     1,
+     90
+    ],
+    [
+     1031,
+     "brim",
+     1,
+     90
+    ],
+    [
+     1032,
+     "brim",
+     1,
+     90
+    ],
+    [
+     1033,
+     "brim",
+     1,
+     90
+    ],
+    [
+     1034,
+     "brim",
+     1,
+     90
+    ],
+    [
+     1035,
+     "brim",
+     1,
+     90
+    ],
+    [
+     1036,
+     "brim",
+     1,
+     90
+    ],
+    [
+     1037,
+     "brim",
+     1,
+     90
+    ],
+    [
+     1038,
+     "brim",
+     1,
+     90
+    ],
+    [
+     1039,
+     "brim",
+     1,
+     90
+    ],
+    [
+     1040,
+     "brim",
+     1,
+     90
+    ],
+    [
+     1041,
+     "brim",
+     1,
+     90
+    ],
+    [
+     1042,
+     "brim",
+     1,
+     90
+    ]
+   ]
+  },
+  "ev_give": {
+   "low_ref": [
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005,
+    0.005
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     34
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     34
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     34
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [],
+   "cuts": [],
+   "lift": {},
+   "contacts": [
+    [
+     0,
+     "brim",
+     1,
+     90
+    ],
+    [
+     12,
+     "hilt",
+     1
+    ],
+    [
+     13,
+     "hilt",
+     1
+    ],
+    [
+     14,
+     "hilt",
+     1
+    ],
+    [
+     15,
+     "hilt",
+     1
+    ],
+    [
+     16,
+     "hilt",
+     1
+    ],
+    [
+     17,
+     "hilt",
+     1
+    ],
+    [
+     18,
+     "hilt",
+     1
+    ],
+    [
+     19,
+     "hilt",
+     1
+    ],
+    [
+     20,
+     "hilt",
+     1
+    ],
+    [
+     21,
+     "hilt",
+     1
+    ],
+    [
+     22,
+     "hilt",
+     1
+    ]
+   ]
+  },
+  "ev_toast": {
+   "low_ref": [
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     34
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     34
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     34
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [],
+   "cuts": [],
+   "lift": {},
+   "contacts": [
+    [
+     0,
+     "brim",
+     1,
+     90
+    ]
+   ]
+  },
+  "ev_leave": {
+   "low_ref": [
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004,
+    0.004
+   ],
+   "seat": [],
+   "lie": [],
+   "kneel": [],
+   "feet_l": [
+    [
+     0,
+     10
+    ]
+   ],
+   "feet_r": [
+    [
+     0,
+     10
+    ]
+   ],
+   "touch": [
+    [
+     0,
+     10
+    ]
+   ],
+   "air": [],
+   "ghost": [],
+   "held": [],
+   "cuts": [],
+   "lift": {},
+   "contacts": []
+  }
+ },
+ "retarget": {
+  "factors": {
+   "S_LEG": 0.648835,
+   "S_ARM": 0.724085,
+   "S_SCAB": 0.835165,
+   "K_ARC": 0.826446
+  },
+  "patches": [
+   {
+    "id": "KNEEL-K",
+    "clip": "kipup",
+    "in": [
+     6,
+     8
+    ],
+    "out": [
+     10,
+     12
+    ],
+    "set": {
+     "pos": [
+      0,
+      -0.29,
+      -0.02
+     ],
+     "rot": [
+      -25,
+      0,
+      0
+     ],
+     "tor": [
+      -55,
+      -10,
+      0
+     ],
+     "head": [
+      40,
+      10,
+      0
+     ],
+     "fL": [
+      0.15,
+      0,
+      -0.35
+     ],
+     "fR": [
+      -0.16,
+      0.15,
+      0.21
+     ],
+     "kL": [
+      0.12,
+      0.3,
+      -1
+     ],
+     "kR": [
+      -0.12,
+      -0.2,
+      -1
+     ],
+     "plR": [
+      -0.36,
+      0.1,
+      -0.4
+     ],
+     "wKnee": 1,
+     "gF": 0,
+     "gB": -80,
+     "gE": -25,
+     "gD": 0.42,
+     "cB": -115,
+     "cR": 0,
+     "th": -12,
+     "ed": -1,
+     "tw": 0
+    },
+    "why": "the floor pickup of the hat on the right knee (the sword out at her left)"
+   },
+   {
+    "id": "KNEEL-L",
+    "clip": "lead_down",
+    "in": [
+     5,
+     7
+    ],
+    "out": [
+     9,
+     11
+    ],
+    "set": {
+     "pos": [
+      0,
+      -0.29,
+      -0.02
+     ],
+     "rot": [
+      -25,
+      0,
+      0
+     ],
+     "tor": [
+      -55,
+      -10,
+      0
+     ],
+     "head": [
+      40,
+      10,
+      0
+     ],
+     "fL": [
+      0.15,
+      0,
+      -0.35
+     ],
+     "fR": [
+      -0.16,
+      0.15,
+      0.21
+     ],
+     "kL": [
+      0.12,
+      0.3,
+      -1
+     ],
+     "kR": [
+      -0.12,
+      -0.2,
+      -1
+     ],
+     "plR": [
+      -0.36,
+      0.1,
+      -0.4
+     ],
+     "wKnee": 1
+    },
+    "why": "the floor pickup of the hat on the right knee"
+   },
+   {
+    "id": "KNEEL-L-B",
+    "clip": "lead_down",
+    "in": [
+     4,
+     6
+    ],
+    "out": [
+     8,
+     10
+    ],
+    "set": {
+     "gF": 0,
+     "gB": -80,
+     "gE": -25,
+     "gD": 0.42,
+     "cB": -115,
+     "cR": 0,
+     "th": -12,
+     "ed": -1,
+     "tw": 0
+    },
+    "why": "the sword out at her left through the kip and the kneel (its own ramps: the sword raise from 9)"
+   },
+   {
+    "id": "IAI",
+    "clip": "cs1",
+    "in": [
+     104,
+     106
+    ],
+    "out": [
+     159,
+     161
+    ],
+    "add": {
+     "tor": [
+      0,
+      14,
+      0
+     ],
+     "head": [
+      0,
+      -14,
+      0
+     ]
+    },
+    "why": "the cross-draw reach to the hip hilt"
+   },
+   {
+    "id": "SIP",
+    "clip": "intro",
+    "in": [
+     66,
+     70
+    ],
+    "out": [
+     86,
+     94
+    ],
+    "set": {
+     "wLip": 1
+    },
+    "why": "the cup at her lips"
+   },
+   {
+    "id": "SH0",
+    "clip": "ending",
+    "in": [
+     297,
+     297
+    ],
+    "out": [
+     326,
+     326
+    ],
+    "why": "the sheathe entry on the new scabbard axis (SH0')"
+   }
+  ],
+  "iai_delta": 14,
+  "sh0": {
+   "gF": 0,
+   "gB": -58.185609,
+   "gE": 28.314005,
+   "gD": 0.803347,
+   "cB": 90,
+   "cR": 0,
+   "th": -25,
+   "ed": -1,
+   "tw": -90
+  },
+  "hip_dir": {
+   "scB": 150.33,
+   "scE": -24.79,
+   "scR": -126.4,
+   "scOff": 0.16
+  },
+  "hat_flights": {
+   "repel": {
+    "t0": 60,
+    "t1": 75,
+    "from": {
+     "state": "back",
+     "t": 59
+    },
+    "to": {
+     "spot": "leg"
+    }
+   },
+   "ending": {
+    "t0": 26,
+    "t1": 39,
+    "from": {
+     "spot": "face"
+    },
+    "to": {
+     "state": "hand",
+     "t": 40
+    }
+   }
+  },
+  "bounds": {
+   "scab": 150,
+   "scabY": 90,
+   "scabH": 90,
+   "hat": 60,
+   "strings": 120,
+   "sash": 120,
+   "drop": 12,
+   "closeY": 30,
+   "incl": 20,
+   "tip": 15,
+   "rock": 12,
+   "aHeadR": 10,
+   "aTorY": 15,
+   "aTorP": 15,
+   "aTorR": 8,
+   "bPush": 35,
+   "bTurn": 60,
+   "close": 30,
+   "hatBackZ": 15,
+   "hatPush": 100
+  },
+  "slopes": {
+   "scab": 22,
+   "scabY": 22,
+   "scabH": 22,
+   "hat": 22,
+   "strings": 22,
+   "sash": 22,
+   "drop": 1.5,
+   "closeY": 5,
+   "incl": 5,
+   "tip": 5,
+   "rock": 5,
+   "aHeadR": 5,
+   "aTorY": 5,
+   "aTorP": 5,
+   "aTorR": 5,
+   "bPush": 4,
+   "bTurn": 15,
+   "close": 3,
+   "hatBackZ": 3,
+   "hatPush": 15
+  },
+  "clips": {
+   "idle": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0,
+    "lift": 0
+   },
+   "idle2": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "walk": {
+    "passes": 2,
+    "corrections": {
+     "drop": 4.4
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "glide": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0,
+    "lift": 0
+   },
+   "strafe_l": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "strafe_r": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "backstep": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.04,
+    "lift": 0
+   },
+   "flinch": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0,
+    "lift": 0
+   },
+   "a1": {
+    "passes": 3,
+    "corrections": {
+     "bPush": 22.2,
+     "drop": 0.64
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "a2": {
+    "passes": 2,
+    "corrections": {
+     "bPush": 17.3,
+     "bTurn": 30
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "a3": {
+    "passes": 3,
+    "corrections": {
+     "bPush": 33.99,
+     "bTurn": 6,
+     "drop": 7.83
+    },
+    "contacts": {
+     "twohand": 0
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.002,
+    "lift": 0
+   },
+   "a4": {
+    "passes": 3,
+    "corrections": {
+     "bPush": 11.33,
+     "scab": 10.03
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0.024,
+    "support_dy": 0.066,
+    "lift": 0
+   },
+   "a6": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "a9": {
+    "passes": 2,
+    "corrections": {
+     "scab": 0.88
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "a10": {
+    "passes": 3,
+    "corrections": {
+     "bPush": 7.81,
+     "scab": 2.75
+    },
+    "contacts": {
+     "twohand": 0
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.024,
+    "lift": 0
+   },
+   "a7_tell": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "a7_throw": {
+    "passes": 3,
+    "corrections": {
+     "bPush": 21.51
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "g_brim": {
+    "passes": 2,
+    "corrections": {
+     "aTorR-": 6
+    },
+    "contacts": {
+     "brim": 0.009
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "g_tell": {
+    "passes": 2,
+    "corrections": {
+     "aHeadR+": 1,
+     "aTorR-": 6
+    },
+    "contacts": {
+     "brim": 0.009
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "g_reform": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "g_dash": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0,
+    "lift": 0
+   },
+   "g_glide": {
+    "passes": 2,
+    "corrections": {
+     "scab": 11.28
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "g_drop": {
+    "passes": 2,
+    "corrections": {
+     "bPush": 11.08,
+     "bTurn": 30,
+     "scab": 1.5
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.068,
+    "lift": 0
+   },
+   "g_run": {
+    "passes": 2,
+    "corrections": {
+     "bPush": 5.85,
+     "drop": 3.93
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.01,
+    "lift": 0
+   },
+   "g_ring": {
+    "passes": 2,
+    "corrections": {
+     "scab": 0.88
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "g_rise": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.034,
+    "lift": 0
+   },
+   "g_leap": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.049,
+    "lift": 0
+   },
+   "g_sweep": {
+    "passes": 3,
+    "corrections": {
+     "bPush": 1.38,
+     "scab": 1.5
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.042,
+    "lift": 0
+   },
+   "g_x": {
+    "passes": 3,
+    "corrections": {
+     "bPush": 21.31,
+     "bTurn": 54
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0,
+    "lift": 0
+   },
+   "g_wrap": {
+    "passes": 2,
+    "corrections": {
+     "bPush": 12.69,
+     "scab": 0.25
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "g_dome": {
+    "passes": 3,
+    "corrections": {
+     "bPush": 9.12
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0,
+    "lift": 0
+   },
+   "g_vert": {
+    "passes": 2,
+    "corrections": {
+     "hat": 1.19,
+     "scab": 2.75
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.027,
+    "lift": 0
+   },
+   "g_dive": {
+    "passes": 3,
+    "corrections": {
+     "bPush": 22.88
+    },
+    "contacts": {
+     "twohand": 0.086
+    },
+    "stretch": 1,
+    "blade_residue": 0.039,
+    "support_dy": 0,
+    "lift": 0
+   },
+   "g_deflect": {
+    "passes": 2,
+    "corrections": {
+     "bPush": 22.89,
+     "bTurn": 12,
+     "drop": 2.64
+    },
+    "contacts": {
+     "twohand": 0.113
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.074,
+    "lift": 0
+   },
+   "repel": {
+    "passes": 3,
+    "corrections": {
+     "bPush": 34,
+     "bTurn": 30,
+     "drop": 1.34,
+     "hatBackZ": 11.42,
+     "hatPush": 72.34,
+     "incl": 19,
+     "rock+": 1,
+     "rock-": 11,
+     "sash": 27.16,
+     "scab": 74.53,
+     "tip": 14
+    },
+    "contacts": {
+     "twohand": 0.07
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.713,
+    "lift": 0
+   },
+   "down": {
+    "passes": 2,
+    "corrections": {
+     "bPush": 1.68,
+     "incl": 19,
+     "rock+": 1,
+     "sash": 20.91,
+     "scab": 35.5,
+     "tip": 2
+    },
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.003,
+    "lift": 0
+   },
+   "kipup": {
+    "passes": 3,
+    "corrections": {
+     "aHeadR+": 1,
+     "aTorP+": 4,
+     "aTorR-": 6,
+     "bPush": 5.26,
+     "incl": 19,
+     "rock+": 11,
+     "sash": 55.38,
+     "scab": 41.81,
+     "strings": 66.41
+    },
+    "contacts": {
+     "hatfloor": 0.019,
+     "hat": 0,
+     "brim": 0.004
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.12,
+    "lift": 0
+   },
+   "lead_down": {
+    "passes": 3,
+    "corrections": {
+     "aTorP+": 4,
+     "aTorR+": 4,
+     "aTorR-": 6,
+     "bPush": 11.54,
+     "incl": 19,
+     "rock+": 11,
+     "sash": 55.28,
+     "scab": 41.81,
+     "strings": 66.41
+    },
+    "contacts": {
+     "hatfloor": 0.019,
+     "hat": 0,
+     "brim": 0.009
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.12,
+    "lift": 0
+   },
+   "lead_stand": {
+    "passes": 2,
+    "corrections": {
+     "aTorR-": 6
+    },
+    "contacts": {
+     "hat": 0,
+     "brim": 0.009
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "sq1": {
+    "passes": 2,
+    "corrections": {
+     "aTorR-": 6,
+     "aTorY-": 6,
+     "hatBackZ": 10.55,
+     "scab": 1.5
+    },
+    "contacts": {
+     "hat": 0.004,
+     "brim": 0.009
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "intro": {
+    "passes": 2,
+    "corrections": {
+     "aTorR+": 2,
+     "drop": 6.55,
+     "scab": 6.63
+    },
+    "contacts": {
+     "stone": 0.008,
+     "lips": 0,
+     "throat": 0
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.003,
+    "lift": 0
+   },
+   "intro_end": {
+    "passes": 3,
+    "corrections": {
+     "bPush": 33.73,
+     "bTurn": 36,
+     "close": 24.08,
+     "scabH": 12
+    },
+    "contacts": {
+     "hilt": 0,
+     "sheathe": 0,
+     "throat": 0
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0,
+    "lift": 0
+   },
+   "cs1": {
+    "passes": 3,
+    "corrections": {
+     "aTorP+": 14,
+     "aTorR+": 6,
+     "aTorY+": 14,
+     "bPush": 27.57,
+     "bTurn": 24,
+     "closeY-": 28,
+     "drop": 3.93,
+     "hatBackZ": 10.83,
+     "scab": 1.5
+    },
+    "contacts": {
+     "twohand": 0.044,
+     "hilt": 0.019,
+     "throat": 0,
+     "sheathe": 0.034
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.047,
+    "lift": 0
+   },
+   "ending": {
+    "passes": 3,
+    "corrections": {
+     "aHeadR+": 1,
+     "aTorR+": 4,
+     "aTorR-": 6,
+     "bPush": 33.98,
+     "bTurn": 57,
+     "close": 29.18,
+     "drop": 10.87,
+     "hatPush": 38.34,
+     "incl": 19,
+     "rock+": 11,
+     "sash": 55.28,
+     "scab": 41.81
+    },
+    "contacts": {
+     "hat": 0,
+     "brim": 0.01,
+     "twohand": 0.118,
+     "throat": 0,
+     "sheathe": 0
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.247,
+    "lift": 0
+   },
+   "ev_give": {
+    "passes": 2,
+    "corrections": {
+     "aTorR+": 4
+    },
+    "contacts": {
+     "brim": 0.008,
+     "hilt": 0
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "ev_toast": {
+    "passes": 2,
+    "corrections": {
+     "aTorR+": 4
+    },
+    "contacts": {
+     "brim": 0.008
+    },
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   },
+   "ev_leave": {
+    "passes": 1,
+    "corrections": {},
+    "contacts": {},
+    "stretch": 1,
+    "blade_residue": 0,
+    "support_dy": 0.001,
+    "lift": 0
+   }
+  },
+  "_doc": "per sample: retarget (angles kept; pos x k(lf); soles about the hip joint x S_LEG; grip distances x S_ARM + the lock rule; planted hands x S_LEG; scOff x S_SCAB; world-hat spots) -> overlay (PATCHES, the hat hand-overs, the flights) -> solve. clips: per clip the solver passes, the largest value of every correction guard (degrees, or cm for drop / bPush / close / hatBackZ; +/- = the two senses), the largest contact distance per kind, the largest IK stretch, the blade residue inside the body (b), the largest support move and lift"
  },
  "paint_roles": {
   "hat_top": [
@@ -2696,16 +12211,16 @@
   "atlas_budget": 150000,
   "sprites": 27,
   "elements_at_rest": {
-   "normal": 212,
-   "ghost": 212
+   "normal": 208,
+   "ghost": 208
   },
   "elements_budget": 6500,
   "parts": 29,
-  "models": 66,
-  "key_files": 2022,
-  "keys": 18602,
-  "rig_functions": 2528,
-  "rig_bytes": 5636391,
+  "models": 62,
+  "key_files": 2026,
+  "keys": 17886,
+  "rig_functions": 2533,
+  "rig_bytes": 5455373,
   "cull_overhang_ticks": 0
  },
  "sprites": {

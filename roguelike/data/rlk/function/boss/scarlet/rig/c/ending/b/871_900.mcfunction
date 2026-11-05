@@ -1,0 +1,8 @@
+execute if score @s hrRigT matches 871 run return run function rlk:boss/scarlet/rig/c/ending/k/871
+execute if score @s hrRigT matches 894 run return run function rlk:boss/scarlet/rig/c/ending/k/894
+execute if score @s hrRigT matches 895 run return run function rlk:boss/scarlet/rig/c/ending/k/895
+execute if score @s hrRigT matches 896 run return run function rlk:boss/scarlet/rig/c/ending/k/896
+execute if score @s hrRigT matches 897 run return run function rlk:boss/scarlet/rig/c/ending/k/897
+execute if score @s hrRigT matches 898 run return run function rlk:boss/scarlet/rig/c/ending/k/898
+execute if score @s hrRigT matches 899 run return run function rlk:boss/scarlet/rig/c/ending/k/899
+execute if score @s hrRigT matches 900 run return run function rlk:boss/scarlet/rig/c/ending/k/900
