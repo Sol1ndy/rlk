@@ -5,7 +5,7 @@
 (11-03; 그대로 복사했고, 고친 곳은 2절 끝 "11-03 에 고친 곳"(+ 두 스위트 README 의 메모)과 문서의 trailer 줄뿐). 같은 날 문서 검토 뒤
 생성기 주석 · 보스 절이 가리키는 문서와 옛 공정성 모의(스크립트 + 결과 로그)를 더 옮겼다: `mboss/` · `tele/` · `mb2/{spec,balance,review,integ}` ·
 `mb3/fgfix/sim` · `ap/requests` · `az/requests` · `ap/balance` · `tk/review/bal` · `navia/` · `riglib/`(파일 목록은 `roguelike/README.md` 0-7).
-`tools/dev/sim` 에 없는 옛 경로는 옮기지 않은 것이다(6절). 데이터팩 zip 에는 들어가지 않는다(zip 은
+11-05 홍련 I1 에서 그 보스의 스위트 `hr/`(3-4)를 더했다. `tools/dev/sim` 에 없는 옛 경로는 옮기지 않은 것이다(6절). 데이터팩 zip 에는 들어가지 않는다(zip 은
 `pack.mcmeta` `README.md` `engravings.md` `items.md` `data` 만). 전체 흐름 · 릴리스 게이트는 `roguelike/README.md` 의 0장을 본다.
 
 - **배치는 옛 스크래치패드 구조 그대로**다: 옛 `<S>/ar/tests/test_kit.py` → `sim/ar/tests/test_kit.py`. 스위트들이
@@ -128,11 +128,11 @@ test_arena_fl · test_kit) 돌리고 결과를 `out/<tag>_<스위트>.txt` 에 �
 | `run_all.sh` | 위 전부 + `<S>/mb3` · `<S>/mb2` · `<S>/mb/int_tests` 스위트(옮기지 않음 → 그 단계는 실패) + 검사기 |
 
 **11-02 기준 이미 알려진 실패**(S1 보고 R6, 새 변경 탓이 아님): `test_m0diff` A(틱당 명령 수: proto +6.57 · 나비 +6.70 · 역장
-+6.98 > 예산 6.5, 파수꾼 +5.93 통과; D0 에서도 +6.54 / +6.65 / +6.92) · B, `test_px` 4e, `gen_check` 9(시험한 트리의
-`boss/test/*.mcfunction` 13개가 하드 링크로 다시 쓰임 — 맨 위 '읽기만' 항목; 11-03 에 `REAL_DP` · `variant()` 를 고쳤으니 다음 실행에서
-통과해야 하고, 통과하면 이 항목과 `roguelike/README.md` 0-9 의 것을 지운다), `ident`(22ba247 · S1-CM 파일 목록에 고정돼 낡음: 11-02
++6.98 > 예산 6.5, 파수꾼 +5.93 통과; D0 에서도 +6.54 / +6.65 / +6.92) · B, `test_px` 4e, `ident`(22ba247 · S1-CM 파일 목록에 고정돼 낡음: 11-02
 트리에서 10개 실패 — `ident` 의 검사 1 넷 · 3a · 3b · 4a~4d; 기준을 다시 만들기 전에는 신호가 없음), 검사기 refs / macro 의 알려진
-종류. 기준선을 다시 박는 것은 아직 안 함.
+종류. 기준선을 다시 박는 것은 아직 안 함. (`gen_check` 9 — 시험한 트리의 `boss/test/*.mcfunction` 13개가 하드 링크로 다시 쓰이던 것,
+맨 위 '읽기만' 항목 — 는 11-03 의 `REAL_DP` · `variant()` 고침 뒤 11-05 홍련 I1 의 `run_all` 에서 통과해 이 목록과 `roguelike/README.md`
+0-9 에서 뺐다.)
 
 ### 3-3. 정적 검사기 (스크래치패드 맨 위에 있던 것)
 | 파일 | 실행 | 무엇 |
@@ -142,6 +142,30 @@ test_arena_fl · test_kit) 돌리고 결과를 `out/<tag>_<스위트>.txt` 에 �
 | `check_nbtpath.py` | `python3 check_nbtpath.py <dp>/data` | NBT 경로 인자가 게임 문법(NbtPathArgument)에 맞는지 |
 | `mb/lint_mc.py` | `python3 mb/lint_mc.py <dp> [data/rlk/function 아래 경로 …]`(경로를 안 주면 `mboss/` 만 본다; 전체는 `boss char combat …` 처럼 폴더를 준다) | 명령 모양 린터(괄호 · 따옴표 · execute 문법 · 선택자 · 좌표 · 명령별 모양, 매크로) |
 알려진 오탐이 많으므로 **릴리스 트리의 결과와 비교해 새로 생긴 것만** 본다.
+
+### 3-4. 홍련 (`hr/tests/`; 11-05 I1 에서 옮김, 그때 모두 통과)
+스크래치패드 `hr/tests/` 에서 쓰던 것을 같은 상대 경로로 옮겼다(`hr/tests/lib` = `hrsim.py` + 챕터 틀 모의기 사본, `hr/s1k/lib` = 효과 도구 ·
+경기장 모의기, `hr/s1k/vanilla/` = 경기장 시험이 읽는 26.3 바닐라 블록 태그 몇 개, `hr/sr/srsim.py` = 아이템 · 버프 도우미). 실행은 다른
+스위트처럼 데이터팩 밖의 사본에서(`cp -a <저장소>/roguelike/tools/dev/sim <작업>/sim`, 그 안의 `hr/tests` 에서). `<dp>` = 시험할
+`roguelike/`, `<rp>` = 풀어 둔 리소스팩. 경로 상수: `ev_dry.py` · `test_rig.py` 의 기본값만 옛 스크래치패드(`--dp` / `--rp` 로 준다),
+`test_special_hr.py` · `ident_hr.py` 는 기준 커밋을 `/home/user/rlk` 에서 읽는다(`git show` · `ls-tree`).
+
+| 파일 | 실행 | 무엇 (I1 결과) |
+|---|---|---|
+| `test_special_hr.py` | `<dp>` | 특수 보스 틀 FN-a `winWord` · FN-b 보상 훅 · FN-c `poof` · FN-f 보스바 끄기, 레지스트리 검사, 음악 묶음, 켜기 전 / 뒤 트리(그녀가 켜져 있으면 S1 때의 `ident` 절과 R2b 는 건너뜀 — `ident_hr.py` 가 대신) |
+| `test_rig.py` | `--dp <dp> --rp <rp> [--rebuild]` | 리그 계약(29부위 · 47클립 · 호출 · 앵커) · 소환 · 모델(유령 쌍둥이 · 갓 테) · `item_sword` · 모든 클립의 키(바닥 · 120도 · 컬링 · 소품 방향) · mcsim 실행 · 색 거리 · 영상 클립의 이벤트 상태 52곳 · 넘겨 주는 자세; `--rebuild` 는 리그 생성기를 두 번 실제로 돌려 바이트 비교 |
+| `ev_dry.py` | `--dp <dp> [-v]` | 시퀀스 8개의 가짜 Writer 빌드(효과 도구 켜고 / 끄고, 두 번 같음) · 참조 · 정적 규칙 · 틱 · 대사 · 음악 · 모습 · 경고 띠 · 신호 · mcsim 시운전(이벤트 두 갈래, 매 틱 `cancel`, 건너뛰기, CS4 거리) |
+| `test_scarlet.py` | `<dp> [절 …]` | 코어: 훅 · 단계 순서 · 바닥 · 무적 · 실드 · 판정 · 쓰러짐 · lead-in · 건너뛰기(`skip`: 끝 상태가 전체 등장과 같음, 거리 포함) · AI · 멈춤 / `/reload`(시계 `#sq -1`) · 정리 · CS4 거리(`cs4`) · 틱 비용(`cost`: 단계별 평균 · 최대) |
+| `pat_p1.py` · `pat_ghost.py` | `<dp> [key …]` | 1 · 2페이즈 패턴과 연참: 타격 틱 = 클립 이벤트, 모양 · 등급 · 넉백, 예고 ≥ 12 / 20틱, 겨눔 고정, 끝점(`mv/ok`), 유령 창, 원반(틱당 1.75칸), 베기 9번 · 대시 에이전트 · 실드 · 판정 · 스위치, 매 틱 취소 |
+| `test_reward.py` | `<dp>` | 이벤트 뽑기 · 중복 규칙 · 지급(E56) · 보상 훅 · `/reload` 한 번만; `real` 절은 SR 의 진짜 아이템 · 버프 파일로(칸이 가득하면 발밑 드롭) |
+| `test_kit.py` | `<dp> [<rp>]` | 효과 도구: 계약의 이름 · 인자, 모듈이 부르는 모든 킷 호출(합친 트리면 그 트리의 모듈, 킷만 있는 트리면 `wip/hr-s4` · `wip/hr-s2b` 를 임시로 빌드), 카드 엔진 · 풀, 프리셋 높이 · 수명 · 색, 소품(달무리 `p1b` / `p2b` 의 밝기 비 포함), 정리 · 제거, 바닐라 소리, HUD, RP 를 주면 그림 · 아틀라스 · 글꼴 |
+| `test_arena_hr.py` | `<dp>` | 경기장 `hr_field`: 명세 = 레지스트리 · 걷는 원 · 방벽 · 빛 · 식물의 받침(`hr/s1k/vanilla` 태그) · 모습 셋의 절대 채우기 · `dark` 3틱 간격 · 조각 한도 · cmsim 으로 실제 짓기 · `ensure` |
+| `test_hwamu.py` · `test_moon.py` | `<dp> [절 …]` | 아이템 화무십일홍(정의 · 등록 · 풀 밖 · ★ 표 · 세 효과 · 정리 · 틱당 명령 수) · 버프 월하대작(stat_buffs · × 1.20 · reset · uninstall · 스탯 줄). `test_hwamu` 는 계획 `PLAN.md` 와 저장한 위키 `wiki/w2.txt` 를 `$HR_DOCS` 나 스위트 옆(`hr/`)에서 찾고, 없으면 그 글과 맞추는 검사만 건너뛴다(끝에 `SKIPPED` 목록) |
+| `ident_hr.py` | `<dp> [--base 35b82e5]` | 11-03 트리 `35b82e5` 와 바이트 비교: 계약 §5 허용 목록 · SR 손 파일 · `boss/scarlet/**` · 이 보스의 매니페스트 밖은 같아야 함 |
+| `gen_check_hr.py` | `<dp> --rp <rp>` | 복사본(`tmp/`)에서 이 보스에 닿는 생성기(코어 · 경기장 · 리그 · 킷 · 모듈 · 검사)를 두 번 · 정해진 순서 / 거꾸로 · 소유 경로만 쓰는지 · 리그와 킷의 RP 쪽 두 번 |
+
+- `hr/tests/lib/hrsim.py`(I1): `#rlk:dash_pass` · `#rlk:cm_pass` 를 데이터팩의 태그 파일대로 푼다(26.3 의 `#minecraft:replaceable` 포함) —
+  사본 `cmsim.py` 는 공기와 빛만 통과시켜, 경기장의 마른 풀 · 진홍 뿌리 칸에서 `mv/ok` 가 막혔다(게임에서는 통과).
 
 ## 4. 균형 탐침 (`ar/review/bal/`, `ap/balance/azfair_core.py`)
 - `knfair5.py <dp> <mode> <policy> <dodge> <char> <seed> [n] [lv] [plv] [out.json]`: 아이템 없는 Lv15 플레이어 대 L18 보스,
