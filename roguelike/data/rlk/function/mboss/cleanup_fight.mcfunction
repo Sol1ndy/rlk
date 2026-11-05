@@ -3,6 +3,8 @@ execute if score #mbId mb matches 1.. run function rlk:mboss/d/cleanup
 function rlk:mboss/cleanup_aux
 function rlk:mboss/ar/sweep
 function rlk:mboss/bars_hide
+# hr FN-f: the module's bars-off flag ends with the fight (the next fight's bars are drawn again)
+scoreboard players set #mbBarOff mb 0
 function rlk:mboss/line/clear
 function rlk:mboss/music/stop
 scoreboard players set #mbOn mb 0

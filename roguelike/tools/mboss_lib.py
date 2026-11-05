@@ -33,7 +33,15 @@ CHAPTER_HOOKS = ['prep']
 # They implement the 17 hooks + test/help (no prep); the framework (F:mboss/sp, tools/build_mboss_core.py) runs them in
 # chapter mode (#mbMode 1, #mbKind 2) and routes their incoming hook through the floor (mboss/cb/inc/<id>) as a chapter's.
 SPECIAL_HOOKS = []
+# Optional special hooks (hr FN-b, S1 of the 홍련 plan: scratchpad hr/PLAN.md §7.1.4, hr/contract.md §3.1): registry flag ->
+# hook. Required only when an enabled special entry sets the flag (true): it then implements F:<fn root>/<hook> (no macro;
+# @s = the player, not positioned) and the core writes one literal line for it in F:mboss/sp/reward (special_hook_line),
+# so entries without the flag keep their outputs. rwHook: called once per kill after the reward title and the level-up,
+# before the rift collapse (cur and #mbId still set, #mbOn 0).
+SPECIAL_OPT_HOOKS = {'rwHook': 'reward'}
 SPECIAL_PICKS_MAX = 3
+# hr FN-a: the reward word of a special entry (winWord, shown instead of 처치): a non-empty string of at most this many chars
+WIN_WORD_MAX = 12
 
 # #elem numbering (combat/apply): 0 physical 1 pyro 2 hydro 3 electro 4 cryo 5 geo 6 anemo 7 dendro 8 void
 ELEM_NAMES = ['물리', '불', '물', '번개', '얼음', '바위', '바람', '풀', '공허']
@@ -85,6 +93,11 @@ MUSIC_TRACKS = {
     # ar S1 (2026-11-02, the same asset index 34; sounds.json 7975165a): ballad_of_the_cats, concrete_halls,
     # crimson_forest/chrysopoeia (48 kHz, 14 564 352 samples = 303.42 s), dead_voxel, warmth (the nether pool's values)
     'minecraft:music.nether.crimson_forest': [5600, 5189, 6068, 6076, 4789],
+    # hr S1 (2026-11-04, FN-e; the same asset index 34 = sha1 e787e8af, sounds.json 7975165a): the last-page granule
+    # position / the Vorbis rate of each .ogg, floored to ticks, in sounds.json order: below_and_above, bromeliad, clark,
+    # echo_in_the_wind, featherfall, home (48 kHz, 18 250 230 samples = 380.21 s), left_to_bloom, memories, minecraft,
+    # nightly, sweden (clark, echo_in_the_wind, featherfall, left_to_bloom, minecraft and sweden = the lush_caves values)
+    'minecraft:music.overworld.cherry_grove': [4247, 6245, 4031, 5923, 6881, 7604, 6859, 4905, 5210, 6042, 4595],
 }
 
 
@@ -139,6 +152,14 @@ def load_registry():
             aid = b.get('arena', 'plaza')
             # a disabled special may name the arena its framework stage adds later (tk/contract.md: S1 owns arenas{})
             assert aid != 'plaza' and (aid in arenas or not b.get('enabled', True)), f'{b["id"]}: a special entry needs its own arena ({aid})'
+            # hr FN-a (scratchpad hr/PLAN.md §7.1.3): the reward word shown instead of 처치 (sp/reward, test/swon_msg_w)
+            if 'winWord' in b:
+                ww = b['winWord']
+                assert isinstance(ww, str) and ww.strip() and ww.isprintable() and len(ww) <= WIN_WORD_MAX, \
+                    f'{b["id"]}: winWord must be a non-empty printable string of at most {WIN_WORD_MAX} chars'
+            # hr FN-b (§7.1.4): an optional hook flag is a JSON boolean
+            for f in SPECIAL_OPT_HOOKS:
+                assert f not in b or isinstance(b[f], bool), f'{b["id"]}: {f} must be true or false'
         elif kind == 'chapter':
             for k, v in (('goldMul', 1), ('sap', 0), ('picks', 0), ('w', 0)):
                 assert b.get(k) == v, f'{b["id"]}: a chapter entry needs {k} {v}'
@@ -153,6 +174,11 @@ def load_registry():
             assert not b.get('px'), f'{b["id"]}: px is for chapter entries only'
             for k in ('ch', 'route', 'phases', 'music', 'res'):
                 assert k not in b, f'{b["id"]}: {k} is a chapter-entry field'
+        if kind != 'special':
+            for k in ('winWord', *SPECIAL_OPT_HOOKS):
+                assert k not in b, f'{b["id"]}: {k} is a special-entry field'
+        # hr FN-c (§7.1.5): poof false = no poof particle at death_finish (any kind; the record then carries poof:0b)
+        assert 'poof' not in b or isinstance(b['poof'], bool), f'{b["id"]}: poof must be true or false'
         if b.get('shield', not b.get('px', False)):
             assert 'hit' in b, f'{b["id"]}: shield needs hit {{w,h}}'
         assert set(b.get('res', {})) <= RES_KEYS, f'{b["id"]}: res keys'
@@ -230,6 +256,13 @@ def chapter_bosses(reg=None):
 def special_bosses(reg=None):
     """Enabled special-boss entries (kind "special"): the rift roll (F:mboss/sp, S1 of the Tachy plan)."""
     return [b for b in enabled_bosses(reg) if b.get('kind', 'mid') == 'special']
+
+
+def special_hook_line(b, flag):
+    """hr FN-b: the literal F:mboss/sp/reward line that runs special entry b's optional hook SPECIAL_OPT_HOOKS[flag] as
+    the player (not positioned) while cur is b (written by the core only for an enabled entry with the flag true)."""
+    return (f'execute if data storage rlk:mboss cur{{id:{snbt_str(b["id"])}}} as @a[tag=player,limit=1] '
+            f'run function rlk:{fn_root(b)}/{SPECIAL_OPT_HOOKS[flag]}')
 
 
 def arena_of(b, reg=None):
@@ -558,6 +591,20 @@ def push_ring(r_blocks, kb, to_blocks=None):
 def cine(on):
     """Cine on / off: boss hits on the player (mboss/hurt, pl_dot) are refused while on."""
     return 'function rlk:mboss/cine/' + ('start' if on else 'end')
+
+
+# hr FN-f (S1 of the 홍련 plan; PLAN FE-6, hr/contract.md §3.1): a module hides the boss bars mid-fight (a cutscene) and
+# shows them again later. mboss/bars_off sets #mbBarOff mb 1 (mboss/world then skips mboss/bars, the only re-show) and
+# runs mboss/bars_hide; mboss/bars_on sets it 0 and runs mboss/bars_show. fight_vars and cleanup_fight zero the flag, so
+# it never outlives a fight; mboss/bars_hide / bars_show themselves (death_start, pause_tick, cleanup_fight, ...) never
+# touch it, so every other boss's bars behave as before.
+BARS_FNS = ('function rlk:mboss/bars_off', 'function rlk:mboss/bars_on')
+
+
+def bars(on):
+    """The one line that hides the boss bars until bars(1) (on 0) or shows them again (on 1), mid-fight."""
+    assert int(on) in (0, 1)
+    return BARS_FNS[int(on)]
 
 
 def repool(pct):

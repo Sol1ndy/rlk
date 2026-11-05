@@ -143,6 +143,13 @@ def snbt_entry(b):
     if b.get('kind') == 'special':
         # special entries only (mid-boss and chapter records keep their exact text): lvup 0/1 = one level on the kill
         parts.append(f'lvup:{int(b.get("lvup", 0))}')
+        # hr FN-a (scratchpad hr/PLAN.md §7.1.3): the reward word shown instead of 처치 (sp/reward, test/swon_msg_w);
+        # only entries that set it carry the field, so the other records keep their exact text
+        if 'winWord' in b:
+            parts.append(f'winWord:{s(b["winWord"])}')
+    # hr FN-c (§7.1.5): "poof": false = no poof particle at death_finish (any kind; only entries that set it)
+    if b.get('poof') is False:
+        parts.append('poof:0b')
     if 'res' in b:
         r = b['res']
         parts.append('res:[' + ','.join(str(int(r.get(str(k), r.get('*', 0)))) for k in range(9)) + ']')
@@ -550,6 +557,8 @@ w('fight_vars', '''
 scoreboard players set #mbKilled mb 0
 scoreboard players set #mbPause mb 0
 scoreboard players set #mbNoLeash mb 0
+# hr FN-f: no fight starts with the module's bars-off flag (mboss/bars_off / bars_on; world skips mboss/bars while it is 1)
+scoreboard players set #mbBarOff mb 0
 execute store result score #mbId mb run data get storage rlk:mboss cur.n
 execute store result score #mbDmgMul mb run data get storage rlk:mboss cur.dmgMul
 execute store result score #mbGoldMul mb run data get storage rlk:mboss cur.goldMul
@@ -962,6 +971,8 @@ execute if score #mbId mb matches 1.. run function rlk:mboss/d/cleanup
 function rlk:mboss/cleanup_aux
 function rlk:mboss/ar/sweep
 function rlk:mboss/bars_hide
+# hr FN-f: the module's bars-off flag ends with the fight (the next fight's bars are drawn again)
+scoreboard players set #mbBarOff mb 0
 function rlk:mboss/line/clear
 function rlk:mboss/music/stop
 scoreboard players set #mbOn mb 0
@@ -1083,7 +1094,8 @@ execute if score #mbMode mb matches 1 run function rlk:mboss/world_cm_post
 execute if score #mbHzOn mb matches 1 run function rlk:mboss/hz/all
 execute if score #mbPjOn mb matches 1 run function rlk:mboss/pj/all
 execute if score #mbPlOn mb matches 1 run function rlk:mboss/pull/all
-execute if score #mbSt mb matches 0..1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run function rlk:mboss/bars
+# hr FN-f: while the module keeps the bars off (#mbBarOff 1: mboss/bars_off, until mboss/bars_on) they are not redrawn
+execute if score #mbSt mb matches 0..1 unless score #mbBarOff mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run function rlk:mboss/bars
 function rlk:mboss/line/tick
 ''')
 w('mv/all', '''
@@ -1180,7 +1192,8 @@ execute if score #mbT mb >= #mbDeath mb run function rlk:mboss/death_finish
 ''')
 w('death_finish', '''
 # @s = body. Removing the last rlk_zmob lets room/combat_tick clear the zone -> mboss/won.
-execute at @s run particle minecraft:poof ~ ~1 ~ 0.6 1 0.6 0.02 30 force @a[tag=player]
+# hr FN-c: no poof for an entry with "poof": false (its record carries poof:0b; the boss left on its own, not killed)
+execute unless data storage rlk:mboss cur{poof:0b} at @s run particle minecraft:poof ~ ~1 ~ 0.6 1 0.6 0.02 30 force @a[tag=player]
 kill @s
 ''')
 w('lib_clear', '''
@@ -1435,6 +1448,20 @@ bossbar set rlk:mboss visible false
 bossbar set rlk:mboss_state visible false
 bossbar set rlk:mboss_sub visible false
 scoreboard players set #mbBar mb 0
+''')
+# hr FN-f (S1 of the 홍련 plan; PLAN FE-6, hr/contract.md §3.1): the module's mid-fight bars switch (mboss_lib.bars(on)).
+# bars_hide / bars_show above stay as they are (death_start, pause_tick, cleanup_fight, init, main, tick, start_go and
+# mboss/bars call them): only these two wrappers touch the flag that keeps mboss/world from redrawing the bars.
+w('bars_off', '''
+# hr FN-f (mboss_lib.bars(0); any executor): the boss bars go and stay hidden until bars_on (#mbBarOff 1: mboss/world
+# skips mboss/bars, the only re-show). fight_vars and cleanup_fight clear the flag.
+scoreboard players set #mbBarOff mb 1
+function rlk:mboss/bars_hide
+''')
+w('bars_on', '''
+# hr FN-f (mboss_lib.bars(1); any executor): the boss bars come back now and are redrawn every tick again.
+scoreboard players set #mbBarOff mb 0
+function rlk:mboss/bars_show
 ''')
 w('bars', '''
 # @s = body. Line 1: Lv + name + element auras on the boss + rlk:mboss extra[]. Line 2: bossui HP bar
@@ -4475,19 +4502,26 @@ execute if score #mbTest mb matches 1 if data storage rlk:mboss cur run function
 function rlk:mboss/forget
 return 1
 ''')
+# hr FN-b (S1 of the 홍련 plan, scratchpad hr/PLAN.md §7.1.4): one literal line per enabled special whose entry sets an
+# optional hook flag (mboss_lib.SPECIAL_OPT_HOOKS; the sp/gate / sp/prep technique), after the level-up, before the boxes
+SP_OPT_LINES = [L.special_hook_line(b, f) for b in SPECS for f in L.SPECIAL_OPT_HOOKS if b.get(f)]
 w('sp/reward', '''
-# @s = the rift's zone marker, at it; the player is back at the rift. The title "<name> 처치" / "레벨 업 · 아이템 상자 N개",
-# exactly one level (cur.lvup 1: sp/lvup, the normal level-up with its usual pick), then the rift collapses
-# (room/rift/close, 30 t) and cur.picks item boxes fall where it stood (room/rift/close_end -> mboss/box/drop_all,
-# chapter rarity, items-only picks). Gold x goldMul and the sapphire came with the kill (miniboss tag on the body).
+# @s = the rift's zone marker, at it; the player is back at the rift. The title "<name> 처치" ("<name> <cur.winWord>" when
+# the entry sets its own word: hr FN-a) / "레벨 업 · 아이템 상자 N개", exactly one level (cur.lvup 1: sp/lvup, the normal
+# level-up with its usual pick), the reward hook of an entry with rwHook (hr FN-b: one literal line per such enabled
+# special, run as the player), then the rift collapses (room/rift/close, 30 t) and cur.picks item boxes fall where it
+# stood (room/rift/close_end -> mboss/box/drop_all, chapter rarity, items-only picks). Gold x goldMul and the sapphire
+# came with the kill (miniboss tag on the body).
 title @a[tag=player] times 8 50 14
 execute if data storage rlk:mboss cur{lvup:1} run title @a[tag=player] subtitle [{text:"레벨 업 · 아이템 상자 ",color:"#FFE08A"},{nbt:"cur.picks",storage:"rlk:mboss",color:"#FFE08A"},{text:"개",color:"#FFE08A"}]
 execute unless data storage rlk:mboss cur{lvup:1} run title @a[tag=player] subtitle [{text:"아이템 상자 ",color:"#FFE08A"},{nbt:"cur.picks",storage:"rlk:mboss",color:"#FFE08A"},{text:"개",color:"#FFE08A"}]
-title @a[tag=player] title [{nbt:"cur.title",storage:"rlk:mboss",interpret:true},{text:" 처치",color:"#FFE08A",bold:true}]
+execute unless data storage rlk:mboss cur.winWord run title @a[tag=player] title [{nbt:"cur.title",storage:"rlk:mboss",interpret:true},{text:" 처치",color:"#FFE08A",bold:true}]
+execute if data storage rlk:mboss cur.winWord run title @a[tag=player] title [{nbt:"cur.title",storage:"rlk:mboss",interpret:true},{text:" "},{nbt:"cur.winWord",storage:"rlk:mboss",color:"#FFE08A",bold:true}]
 scoreboard players set @a[tag=player] vBig 72
 scoreboard players set @a[tag=player] ttlT 72
 execute if data storage rlk:mboss cur{lvup:1} as @a[tag=player,limit=1] run function rlk:mboss/sp/lvup
-execute store result score #spPk mb run data get storage rlk:mboss cur.picks
+# hr FN-b: per-special reward hooks (registry rwHook)
+''' + ''.join(line + '\n' for line in SP_OPT_LINES) + '''execute store result score #spPk mb run data get storage rlk:mboss cur.picks
 scoreboard players operation #spZ mb = @s zid
 tag @e[tag=rlk_sp_rk] remove rlk_sp_rk
 execute as @e[type=minecraft:marker,tag=rlk_rift] if score @s zid = #spZ mb run tag @s add rlk_sp_rk
@@ -4641,11 +4675,17 @@ tellraw @a[tag=player] ''', gray('경기장 준비 시간 초과 — 균열에 �
 ''']))
 SREPLAY = link('/function rlk:mboss/test/special_ch {id:"$(id)",ch:$(ch)}', '[다시 하기]')
 w('test/swon', '\n'.join([
-    '# From test/won after a special fight (killed or cancelled): the special wording and replay link.',
+    '# From test/won after a special fight (killed or cancelled): the special wording and replay link (a kill of an entry',
+    '# with its own reward word, cur.winWord: test/swon_msg_w, hr FN-a).',
+    'execute if score #mbKilled mb matches 1 if data storage rlk:mboss cur.winWord run return run function rlk:mboss/test/swon_msg_w with storage rlk:mboss tlast',
     'execute if score #mbKilled mb matches 1 run return run function rlk:mboss/test/swon_msg with storage rlk:mboss tlast',
     'tellraw @a[tag=player] ' + STT + gray('취소되었습니다(보상 없음). 균열이 다시 열렸습니다. ') + ','
     + link('/function rlk:mboss/test/stop', '[로비로]') + ']']))
 w('test/swon_msg', '$tellraw @a[tag=player] ' + STT + gray('처치! 균열 자리에 아이템 상자가 떨어졌습니다(누르면 아이템 선택). ') + ',' + SREPLAY
+  + ',' + gray(' ') + ',' + link('/function rlk:mboss/test/stop', '[로비로]') + ']')
+# hr FN-a: test/swon_msg with the entry's own word (cur.winWord: cur still exists here, test/won runs before forget)
+w('test/swon_msg_w', '$tellraw @a[tag=player] ' + STT + '{nbt:"cur.winWord",storage:"rlk:mboss",color:"gray",bold:false},'
+  + gray('! 균열 자리에 아이템 상자가 떨어졌습니다(누르면 아이템 선택). ') + ',' + SREPLAY
   + ',' + gray(' ') + ',' + link('/function rlk:mboss/test/stop', '[로비로]') + ']')
 w('test/sdefeat_msg', '$tellraw @s ' + STT + gray('쓰러졌습니다. ') + ',' + SREPLAY + ']')
 w('test/shelp', 'tellraw @s ' + STT + gray('명령: ') + ',' + link('/function rlk:mboss/test/rift', 'rift') + ','

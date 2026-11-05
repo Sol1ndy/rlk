@@ -1,0 +1,6 @@
+# A2 역습 일섬 (S3, p1.py): pattern tick 0 (@s = the body, at it). Clock #pt hr.
+scoreboard players set #done hr 0
+function rlk:mboss/mv/face
+function rlk:boss/scarlet/rig_stub/play/a2
+function rlk:boss/scarlet/rig_stub/anchor/blade_mid
+execute at @e[type=minecraft:marker,tag=rlk_hr_anchor,limit=1] rotated as @s run particle minecraft:dust{color:[0.79,0.49,0.87],scale:1.2} ~ ~ ~ 0.1 0.1 0.1 0 6 force @a[tag=player]
