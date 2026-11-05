@@ -380,23 +380,24 @@ check(kind(s, e) == 'afterimage' and stages(s, e.id).get('kill') == T0 + api.AFT
       f'engine: the afterimage is gone after 6 t ({stages(s, e.id)})')
 
 # ============================================================== presets
-HEIGHT = {'qi_arc': (1.3, 0.3), 'qi_ring': (1.0, 0.1), 'qi_band': (0.3, 1.1), 'qi_x': (0.1,), 'qi_dome': (0.0,),
-          'qi_vert': (0.0, 0.2), 'qi_fan': (1.1,), 'qi_wedge': (1.1, 1.3), 'qi_ribbon': (1.3,), 'qi_line': (1.2, 1.0),
-          'qi_cut': (1.0,), 'glint': (0.3, 1.5), 'star4': (1.0,), 'yellow_tell': (1.3,), 'ghost_burst': (1.0,),
-          'ghost_trail': (0.6,), 'ghost_flash': (1.0,), 'afterimage': (0.0, 1.2), 'blink_bubble': (1.3,),
-          'shield_refill': (1.4,), 'pip_break': (1.0,), 'dive_impact': (0.1,), 'light_column': (0.0,),
+# S2d (requests/s2d.md s2d-3, I2): the call heights of the player-size body (the S2a figure's x 0.78)
+HEIGHT = {'qi_arc': (1.0, 0.3), 'qi_ring': (0.8, 0.1), 'qi_band': (0.3, 1.1), 'qi_x': (0.1,), 'qi_dome': (0.0,),
+          'qi_vert': (0.0, 0.15), 'qi_fan': (0.85,), 'qi_wedge': (0.85, 1.0), 'qi_ribbon': (1.0,), 'qi_line': (0.95, 0.8),
+          'qi_cut': (0.8,), 'glint': (0.3, 1.5), 'star4': (1.0,), 'yellow_tell': (1.0,), 'ghost_burst': (0.8,),
+          'ghost_trail': (0.45,), 'ghost_flash': (0.95,), 'afterimage': (0.0, 1.2), 'blink_bubble': (1.0,),
+          'shield_refill': (1.1,), 'pip_break': (1.0,), 'dive_impact': (0.1,), 'light_column': (0.0,),
           'claw_streaks': (2.0,), 'burst_radial': (0.1,), 'dust_ring': (0.1,), 'kick_flash': (1.5,), 'clash_gold': (1.0,),
           'clash_spark': (0.5,), 'clash_arc': (1.0,), 'deco_bolt': (0.0,), 'scarlet_line': (1.3,), 'petal_burst': (0.3,),
-          'petals_drift': (1.2,), 'petals_wind': (1.0,), 'petals_heart': (1.2,), 'motes_warm': (0.4,),
-          'leaves_dark': (6.0,), 'leaves_swirl': (1.4,), 'ambient_p1': (0.0,), 'ambient_p2': (0.0,),
-          'arrive_rift': (0.0,), 'ev_glint': (1.0,), 'ev_trail': (1.0,), 'ev_petals': (1.0,), 'ev_leave': (1.2,),
+          'petals_drift': (1.1,), 'petals_wind': (0.8,), 'petals_heart': (1.1,), 'motes_warm': (0.4,),
+          'leaves_dark': (6.0,), 'leaves_swirl': (1.1,), 'ambient_p1': (0.0,), 'ambient_p2': (0.0,),
+          'arrive_rift': (0.0,), 'ev_glint': (1.0,), 'ev_trail': (1.0,), 'ev_petals': (1.0,), 'ev_leave': (1.1,),
           'ev_beam': (0.0,), 'ev_wind': (0.0,), 'ev_palm': (1.0,), 'ev_take': (1.2,)}
 assert set(HEIGHT) == set(api.KIT_PRESETS)
 VARIANTS = {'qi_arc': [{}, {'pitch': -40, 'roll': 90}, {'pitch': 35, 'roll': -35}, {'r': 60, 'roll': 180},
-                       {'r': 45, 'roll': -40}, {'r': 40, 'roll': 15}], 'qi_fan': [{'h': 16}],
+                       {'r': 45, 'roll': -40}, {'r': 40, 'roll': 15}], 'qi_fan': [{'h': 13}],
             'qi_ring': [{'r': 30}, {'r': 22}], 'qi_dome': [{'r': 35}], 'qi_x': [{'r': 25}],
             'qi_band': [{'len': 70, 'pitch': 35}, {'len': 120}, {'roll': 30, 'pitch': -20}],
-            'qi_vert': [{}, {'yaw': 90}, {'h': 24}],
+            'qi_vert': [{}, {'yaw': 90}, {'h': 19}],
             'qi_wedge': [{}, {'roll': -40}], 'scarlet_line': [{}, {'roll': -13}, {'yaw': 0}], 'leaves_dark': [{'n': 40}, {'n': -20}]}
 for name in api.KIT_PRESETS:
     cvals = [1, 2, 3, 4, 5] if 'c' in api.KIT_PRESETS[name] else [None]
@@ -503,7 +504,7 @@ for name, (doc, looks, bb, anim) in G.PROPS.items():
             check(len(items) == want, f'props: seat_rock {lk}: {len(items)} items, want {want}')
             for it in items:
                 check(s.nbt[it.id]['item']['id'] in ('minecraft:potion', 'minecraft:bowl'), 'props: seat items vanilla')
-                check(it.pos[1] >= d.pos[1] + 0.7, f'props: seat item on the stone top ({it.pos[1] - d.pos[1]:.2f})')
+                check(it.pos[1] >= d.pos[1] + 0.19, f'props: seat item on the stone top ({it.pos[1] - d.pos[1]:.2f})')   # S2d: top 0.24
         elif kd is None:
             check(nb['transformation']['scale'] == [0, 0, 0], f'props: {name} {lk} hidden')
         else:

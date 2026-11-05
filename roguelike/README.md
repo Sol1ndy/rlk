@@ -114,7 +114,7 @@
 | `build_rift.py` | `room/rift/**` · `room/obj/k_rift` + 공용 파일의 훅 줄(줄 앞 `# rift (build_rift.py)`) | RP `rift/` |
 | `build_mboss_tachy.py`(`mboss_tachy/`) + `build_mboss_tk_fx.py` + `build_tachy_rig.mjs` | `boss/tachy/**` | RP `mboss/tachy` · `tk_kit` |
 | `build_mboss_arlecchino.py`(`mboss_arlecchino/`) + `build_mboss_kn_fx.py` + `build_arlecchino_rig.mjs` | `boss/arlecchino/**` | RP `mboss/arlecchino` · `kn_kit` |
-| `build_mboss_scarlet.py`(`mboss_scarlet/`) + `build_mboss_hr_fx.py` + `build_scarlet_rig.mjs`(+ 영상 클립 `scarlet_cine.mjs`) | `boss/scarlet/**`(`rig/` · `fx/` 는 각자) | RP `mboss/scarlet` · `hr_kit`, 글꼴 `mboss_hr` |
+| `build_mboss_scarlet.py`(`mboss_scarlet/`) + `build_mboss_hr_fx.py` + `build_scarlet_rig.mjs`(+ 영상 클립 `scarlet_cine.mjs`, 스킨 `scarlet_skin.mjs`, 리타깃 `scarlet_retarget.mjs`) | `boss/scarlet/**`(`rig/` · `fx/` 는 각자) | RP `mboss/scarlet` · `hr_kit`, 글꼴 `mboss_hr` |
 | `build_raiden_all.py`(→ `build_raiden_*.py` · `raiden_enc/` · `build_raiden_rig.mjs` · `build_raiden_judgment_rig.mjs` · `build_raiden_clones.mjs`, 끝에 `check_raiden_pack.py`) | `boss/raiden/**`, `room/raiden/**` | RP `raiden/` |
 | `build_ch2_mobs.py`(`ch2mob/`) · `build_ch3_mobs.py`(`ch3mob/`) | 2 · 3챕터 `cm/` 몹 + 공용 cm · room · combat · load · uninstall 의 훅 줄 | RP 는 `build_ch{2,3}_{swarm,elite}_rigs.mjs` |
 | `build_player_rig.mjs`(+ `build_player_locomotion.mjs`, `player_motion/`) · `build_player_audio.py` · `build_navia_fx_cards.py` · `build_skirk_metsu_fx.py` | `char/motion/**` 의 생성 몫(평타 타이밍 `char/motion/combat/config/**` 포함; 0-3 `char/` 줄), `fx/nv/**` | RP `player_motion/` · `navia_fx/` |
@@ -155,6 +155,7 @@
   node tools/build_arlecchino_rig.mjs --resourcepack $RP      # 리그: RP + 데이터팩 rig/** + 매니페스트
   python3 tools/build_mboss_kn_fx.py --resourcepack $RP       # 효과 킷: RP + 데이터팩 fx/** + 매니페스트
   node tools/build_scarlet_rig.mjs --resourcepack $RP         # 홍련 리그(+ 영상 클립 scarlet_cine.mjs): RP + 데이터팩 rig/** + 매니페스트
+  #   (사용자 스킨 scarlet_skin.mjs → textures/mboss/scarlet/skin.png 그대로, 아틀라스 rlk:mboss/scarlet/skin)
   python3 tools/build_mboss_hr_fx.py --resourcepack $RP       # 홍련 효과 킷(build_rift.py 다음: 도착 균열이 rift 모델을 씀) + 데이터팩 fx/**
   #   같은 꼴: build_tachy_rig.mjs + build_mboss_tk_fx.py, build_mboss_apep_rig.mjs + build_mboss_apep_org.mjs + build_mboss_ap_fx.py,
   #   build_mboss_azhdaha_rig.mjs + build_mboss_az_fx.py, build_mboss_{guardian,butterfly,fieldgen}_rig.mjs + build_mboss_{bf,fg}_fx.py,
@@ -1994,11 +1995,12 @@ S4 `p/<P2>/`(`p2.py`), S2 `seq/`(`seq.py`); `rig/` · `fx/` 는 건드리지 않
 ## 홍련 (`boss/scarlet/`, 특수 보스 · `tools/build_mboss_scarlet.py`)
 스텔라 블레이드의 홍련(월하곡). 방에 드물게 열리는 **균열**(위 "균열")로 들어가 싸우는 **특수 보스**(레지스트리 `scarlet`, n 21, `kind`
 special, `fn` `boss/scarlet`, 경기장 `hr_field`(n 5), 가중치 10, 1~99챕터, 아이콘 `rlk:mboss/hr_kit/gate_icon`)다. 11-05 I1 에서 켰다
-(`enabled:true`; 그 전까지 `enabled:false`). 틀은 타키와 같은 챕터 모드(`#mbMode 1`)이고 몸은 허스크(크기 1.35, 클릭 판정 1.2 × 2.9,
+(`enabled:true`; 그 전까지 `enabled:false`). 틀은 타키와 같은 챕터 모드(`#mbMode 1`)이고 몸은 허스크(크기 1.0, 클릭 판정 1.2 × 2.4,
 `miniboss` 경제: 골드 × 6 · 사파이어 1), 체력 250 · 처치 경험치 0 · 공격 12 × `dmgMul` 135 · 레벨 +1 · 모든 원소 저항 10 %(면역 없음).
 모든 타격은 번개 1U. 처치하면 「홍련 도전 성공」(처치 대신 `winWord`, 펑 연기 없음) · 레벨 업 1번 · 아이템 상자 1개, 그리고 마지막 장면
-뒤의 **이벤트**(아래 "보상 · 이벤트"). 피해 단계는 타키와 같은 29 / 42 / 56 / 71 %(T1–T4). 모델 · 경기장은 원작의 분위기만 빌린 우리
-디자인이다(원작 의상 · 지형 조각을 본뜨거나 그 이름을 쓰지 않음, 계획 `PLAN.md` §1.5).
+뒤의 **이벤트**(아래 "보상 · 이벤트"). 피해 단계는 타키와 같은 29 / 42 / 56 / 71 %(T1–T4). 몸은 사용자가 준 마인크래프트 스킨을 입은 이
+팩의 플레이어 아바타 몸이고(11-05 사용자 요청, S2c · S2d; 아래 "모습 · 효과 · 경기장"), 소품 · 효과 · 경기장은 원작의 분위기만 빌린
+우리 디자인이다(원작 의상 · 지형 조각을 본뜨거나 그 이름을 쓰지 않음, 계획 `PLAN.md` §1.5).
 
 ### 플레이어용 요약 (어떻게 싸우나)
 - **바닥 예고가 없다**: 모든 판정이 조용하다(`#hzQuiet 1`, 바닥 표시 · 테두리 없음). 신호는 자세(클립 첫 틱부터), 칼날의 반짝임, 노란
@@ -2096,11 +2098,13 @@ lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` fal
   만든 것만 지운다(무대 표지 `rlk_hr_stage`, 꽃잎 카드 `rlk_hr_sqp`, 보조 `rlk_hr_sqh`, 이벤트의 `rlk_hr_ev`; 모두 `rlk_room rlk_mb_aux`).
 - **코어로 가는 신호**(코어 함수는 부르지 않음): `#sq_sig hr` = `api.SIG` — `repel` 의 hp1 24 · hp2 75 · hp3 102, `lead_down` 의 refill 29,
   `lead_stand` 의 refill 18. 코어가 `tick` 바로 뒤에 읽고 적용하고 0 으로 되돌린다.
-- **CS0 등장**: 그녀는 `start`(남쪽 테두리) → 달 선 위, 시작점에서 26.7칸 떨어진 무릎 높이 돌(`api.SEAT_POS` (884, 201, 5), 명령에는
-  `884.0 201 5.0`(`api.xyz`: 게임은 소수점 없는 x · z 를 블록 가운데로 옮긴다); 킷 소품 `seat_rock`: 바닐라 응회암 1.5 × 0.75 × 1.1칸)에 등을
+- **CS0 등장**: 그녀는 `start`(남쪽 테두리) → 달 선 위, 시작점에서 26.7칸 떨어진 낮은 돌(윗면 0.24칸; `api.SEAT_POS` (884, 201, 5), 명령에는
+  `884.0 201 5.0`(`api.xyz`: 게임은 소수점 없는 x · z 를 블록 가운데로 옮긴다); 킷 소품 `seat_rock`: 바닐라 응회암 1.2 × 0.24 × 0.64칸)에 등을
   보이고 앉아 달을 본다(오른손에 잔, 돌 위에 병). 대사 1~10(영상에 없는 위키 대사, 시의 뜻대로 술을 따르고 마시고 잔을 달에 듦: E3 112~146 동안
-  달무리 약 20 % 밝게), 일어나 돌아서서 칼집을 오른손에 쥐고 걸어온다(8틱 다리 1.2칸, 0.15칸/틱, 그녀가 7칸보다 멀 때만; 시작점에 서 있는
-  플레이어 앞 약 6.3칸에서 멈춤 — I1, 리드 결정: 돌을 D0 의 (884.5, 201, 0)에서 같은 선을 따라 5칸 당김), 칼집을 세워 든다(510). 554 부터
+  달무리 약 20 % 밝게), 일어나 달 쪽으로 0.4칸 나선 뒤 오른쪽으로 1.1칸 비켜서서(발을 옮겨 딛으며; `seq.py` `SEAT_RISE` · `SEAT_ASIDE`,
+  S2d: 발이 돌 안에 서지 않고 걸어갈 때 돌 옆을 지남) 돌아서 칼집을 오른손에 쥐고 걸어온다(8틱 다리 1.2칸, 0.15칸/틱, 그녀가 7칸보다 멀
+  때만; 시작점에 서 있는 플레이어 앞 약 6.8칸에서 멈춤 — I1, 리드 결정: 돌을 D0 의 (884.5, 201, 0)에서 같은 선을 따라 5칸 당김; 건너뛰면
+  6.5–6.8칸), 칼집을 세워 든다(510). 554 부터
   `intro_end`: 웃음 · 돌아섬 · 뽑기(610, 제목 「홍련」 / 「월하곡」) · 자세, 630 음악 1 · 돌과 소품 치움, 636 밀어내기 고리(피해 없음).
   **건너뛰기**: 코어가 `seq/intro/skip` 을 부르고 `#sq` 를 553 으로 — 검은 화면(0 / 20 / 6) 아래 대사 · 바람 · 돌 · 소품을 치우고 그녀를 플레이어
   7칸 안(6.5 / 5 / 3.5칸 후보)에 세운다. 다음 틱(554)이 `intro_end` 와 대사 11.
@@ -2115,8 +2119,9 @@ lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` fal
 - **달무리 · 연꽃**: 코어의 장식 소품(`core/deco`)은 경기장 모습을 따른다 — 모습 작업을 시작할 때(`core/look/go`) 달무리 `p1` / `p2` / `off`
   (어둠), 연꽃 `bud` / `bloom`(I1; 그 전에는 처음 모습 그대로 남았다). 장면의 밝은 달무리는 지금 모습의 밝은 쪽(`p1b` / `p2b`, 경기장 기록
   `rlk:mboss look_hr_field` 를 봄)이고 끝 · 건너뛰기 · 취소 때 되돌린다.
-- 칼 꽂기: 칼(손잡이부터 끝까지 1.93칸)이 두 팔 폭(손 사이 최대 2.14칸)보다 길어 칼끝을 입구에 댄 채 칼집 축에 올릴 수 없다. 그래서 칼끝이
-  0.38칸 들어간 자리에서 축에 올린다(304-306, 2틱; 영상 v4k_s4_sheathe 의 왼쪽 위 → 몸 앞 → 오른쪽 허리 입구 흐름은 그대로).
+- 칼 꽂기: 칼(1.94칸)이 팔이 닿는 폭보다 길어 칼끝을 입구에 댄 채 칼집 축에 올릴 수 없다. 그래서 칼끝이 조금 들어간 자리에서 축에
+  올린다(304-306; S2d 의 리타깃 패치 `SH0`: 빌드가 풀이기로 찾은 축 위 자세, ending 297-326; 영상 v4k_s4_sheathe 의 왼쪽 위 → 몸 앞 →
+  오른쪽 허리 입구 흐름은 그대로).
 
 ### 보상 · 이벤트 (`reward.py` S3 · 아이템 · 버프 SR)
 쓰러지는 순간(`death_start`) 이벤트를 고른다: 50 %(`api.EVENT['item_pm']` 500) **[ MYTHIC ] 화무십일홍**, 나머지 **월하대작**. 이미 화무십일홍을
@@ -2132,19 +2137,66 @@ lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` fal
 남아 훅이 읽는다.
 
 ### 모습 · 효과 · 경기장
-- **리그**(`tools/build_scarlet_rig.mjs` + `scarlet_{geometry,paint,pose,clips}.mjs` · 영상 클립 `scarlet_cine.mjs` → `boss/scarlet/rig/**`,
-  계약 `tools/scarlet_rig_api.md`): 아이템 디스플레이 29부위(고정 UUID `524c4b4d-4852-4400-8000-0000000000NN`) + 그림자(0x40, 반지름 0.9), 클립
-  47개(이름 · 길이 · 반복 · 이벤트는 `api.CLIPS`; 싸움 · 연참 · 쓰러짐 · 이벤트 39개는 `scarlet_clips.mjs`, 영상 8개(`intro` 554 · `intro_end` 86 ·
-  `cs1` 213 · `sq1` 60 · `repel` 104 · `lead_down` 82 · `lead_stand` 70 · `ending` 1042틱)는 `scarlet_cine.mjs`). 독창 디자인: 붉은 연꽃 모티프의
-  조선 떠돌이 검객 — 상아빛 도포와 짙은 자주 조끼, 진홍 허리띠 · 매듭 술, 네 폭으로 갈라져 다리를 따라 흔들리는 도포 자락, 짙은 바지 · 가죽
-  장화, 검은 말총 갓(테 지름 1.60칸, 아래는 보랏빛 그늘, 뒤쪽 띠에 연꽃 매듭), 긴 검은 머리 한 갈래, 백자 잔 · 병. 머리 끝 2.55칸 · 갓 꼭대기
-  2.82칸, 칼 2.10칸 · 칼집 1.82칸, 왼손잡이(칼은 왼손, 칼집은 오른쪽 허리 · 오른손). 갓 테는 정사각형 넷(0 / 22.5 / 45 / −22.5도)을 0.003칸씩
-  겹쳐 각자 자기 모서리 쐐기만 칠한다(같은 면 겹침 · 반투명 겹침 없음). 모습: 형태 `normal` / `ghost`(모든 부위가 한 장의 빛나는 연보라 유령
-  텍스처, 밝기 15), 단계 `p1` / `p2`(갓 매듭 · 띠 끝이 진홍으로 빛남), 칼 빛 `off lilac pink violet gold`, 얼굴 `calm smile closed`, 손 `open grip
-  brim`; 갓(쓰고 · 등에 · 손에 · 바닥에 · 없음) · 칼(손 · 칼집 · 없음) · 칼집(손 · 허리 · 없음) · 잔 · 병(없음 · 손 · 바위)은 클립이 매 틱 다시
-  붙인다. 원작 의상 조각은 하나도 쓰지 않고 이름은 모두 역할 이름 · `scarlet` · `hr`; 바탕색은 원작의 같은 역할 색에서 ΔE ≥ 10(`test_rig.py` 가
-  선언 색과 그림 평균 색 둘 다 봄). 빌드 검사: 어느 틱에도 바닥 아래 점 없음(칼끝 · 칼집 끝 · 갓 테 · 머리 · 치마 포함, 보간 중간 틱까지), 틱당
-  120도 이하, 그림 0.15 M px 이하(48장 0.084 M px), 쉬는 자세 요소 6 500 이하(2 304). 함수 2 629개(6.57 MB; 키 파일 2 109).
+- **리그**(`tools/build_scarlet_rig.mjs` + `scarlet_{geometry,paint,pose,retarget,clips}.mjs` + S2b 의 영상 클립 `scarlet_cine.mjs` + 스킨
+  `scarlet_skin.mjs` → `boss/scarlet/rig/**`, 계약 `tools/scarlet_rig_api.md`): 아이템 디스플레이 29부위(고정 UUID
+  `524c4b4d-4852-4400-8000-0000000000NN`) + 그림자(0x40, 반지름 0.6), 클립 47개(이름 · 길이 · 반복 · 이벤트는 `api.CLIPS`; 싸움 · 연참 ·
+  쓰러짐 · 이벤트 39개는 `scarlet_clips.mjs`, 영상 8개(`intro` 554 · `intro_end` 86 · `cs1` 213 · `sq1` 60 · `repel` 104 · `lead_down` 82 ·
+  `lead_stand` 70 · `ending` 1042틱)는 `scarlet_cine.mjs`). 11-05 사용자 요청 둘(「마인크래프트 스킨을 이용해서 만들라고. 아를이나
+  라이덴처럼」 → S2c, 「팔다리가 너무 기괴하게 긴데 그냥 플레이어 크기랑 똑같게해」 → S2d)대로 몸은 사용자의 스킨을 입은 플레이어
+  아바타 몸이다.
+  - **몸 = 플레이어 아바타의 몸**: `build_player_rig.mjs` 아바타와 같은 상자 · 같은 스킨 면(스킨 1픽셀 = 1/16칸, 크기 1;
+    아를레키노는 1.4배). 머리 8 × 8 × 8픽셀(0.5칸), 몸 8 × 12 × 4 를 9줄에서 나눠 상체(0-9줄, 이음매가 피벗) · 골반(9-12줄,
+    엉덩이 선이 피벗), 아바타와 같은 슬림 3픽셀 팔(사용자 스킨이 슬림 스킨: 팔 줄의 마지막 두 칸이 비어 있음; 위팔 0-6줄,
+    아래팔 + 손 6-12줄) · 4픽셀 다리(허벅지 0-6, 정강이 6-12), 겉 레이어(머리 0.5픽셀, 나머지 0.25픽셀). 사용자 스킨은
+    그대로(늘이지 않음, 픽셀을 고치지 않음): `tools/scarlet_skin.mjs` 에 base64 로 들어 있고(원본 PNG 4 014바이트, sha1 `7f9726be…`),
+    리그 생성기가 리소스팩 `textures/mboss/scarlet/skin.png`(아틀라스 id `rlk:mboss/scarlet/skin`)로 바이트 그대로 쓴다(바이트 수 ·
+    sha1 이 다르면 빌드 중단). 바닐라 스킨 배치 그대로(`build_player_rig.mjs` 와 같은 UV).
+  - **뼈대(플레이어와 같음)**: 엉덩이 선 0.766칸(쉬는 자세 0.74), 엉덩이 관절 ±0.125, 이음매 0.1875 위, 목은 엉덩이 선 0.75 위,
+    어깨 (±0.344, 이음매 0.4375 위), 위팔 0.25 + 아래팔 0.344(쥐는 점), 허벅지 0.375 + 정강이 0.391(발바닥). 머리 끝 2.00칸(쉬는
+    자세 1.98), 갓 꼭대기 2.30칸, 갓 테 지름 1.32칸. 쓴 갓은 머리 위에 평평하게 얹힌다(테는 목 0.502칸 위, 갓 몸통 아랫면이
+    머리 윗면 0.013칸 위; 쓴 갓의 테는 실제로 보이는 모든 틱에 머리 윗면 모서리보다 0.001칸 이상 위). 팔다리는 늘어나지 않는다
+    (IK 가 길이를 지킴); 팔 마디는 한 틱에 60도 넘게 돌지 않도록 팔꿈치 방향을 고른다. 팔꿈치는 아바타처럼 경첩이다: 위팔과
+    아래팔이 한 앞면(팔꿈치 안쪽)을 나눠 아래팔 상자가 위팔에 대해 비틀리지 않고(경첩 축 차이: 실제로 보이는 틱 모두 1도 이하),
+    위팔이 한 틱에 35도 넘게 돌아야 할 때는 팔꿈치가 가리키던 쪽을 계속 가리키도록 굽힘 면을 고른다. 다리 마디는 한 틱에
+    35도 넘게 비틀리지 않는다(무릎 꿇기에서 무릎이 한 틱에 내려앉는 몇 틱은 무릎 경첩 축이 최대 54도 어긋남 — 받아들임).
+    깊이 숙이면(무릎 꿇기 · 발도 자세) 상체와 골반 사이 등 쪽 이음매가 최대 0.13칸(2픽셀) 벌어진다 — 아바타의 팔꿈치 ·
+    무릎과 같은 방식(단단한 상자가 피벗에서 돎), 받아들임. 스킨의 머리 겉 레이어(모자 층)는 쓴 갓 테 위로 0.02칸 남짓
+    드러난다(테 안쪽 가장자리의 작은 흰 조각 — 받아들임: 플레이어 모델의 모자 층 그대로).
+  - **클립 리타깃**(`tools/scarlet_retarget.mjs`): 47개 클립(S2a · S2b 의 원래 동작)의 관절 각도는 그대로 두고 위치만 몸에 맞춰
+    줄인다(다리 0.649, 팔 0.724, 칼집 0.835배). 각도를 바꾸는 곳은 선언한 패치뿐(`KNEEL-K` · `KNEEL-L`: 무릎 꿇고 바닥의 갓
+    줍기, `KNEEL-K-B` · `KNEEL-L-B`: 그동안 칼을 왼쪽 옆으로(5-6틱에 걸쳐 천천히), `IAI`: 허리의 칼자루에 손 닿기, `SIP`: 잔을
+    입술에, `SH0`: 새 칼집 축으로 칼 넣기; 각도 대신 발 위치만 바꾸는 `ASIDE`: 등장에서 옆으로 비켜설 때 발을 옮겨 딛기). 그다음 풀이기
+    (`scarlet_pose.mjs`)가 매 틱 맞춘다: 바닥 아래로 가는 점 없음; S2a 에서 바닥에 닿았던 것(디딘 발 · 꿇은 무릎 · 짚은 손 · 누운 몸 ·
+    돌에 앉은 허벅지)은 계속 닿고, 공중이던 것은 공중에; 든 소품(칼 · 칼집 · 갓 · 잔 · 병)은 손에, 바른 방향으로; 칼날은 몸을
+    뚫지 않음(이벤트 1 cm, 매 틱 5 cm; 손이 빈 오른팔도); 갓은 머리 위. 누운 몸은 바닥에 등을 대고(공중 규칙은 눕기 · 무릎 ·
+    앉기의 무게만큼 줄어듦), 칼 든 팔은 엉덩이 옆 바닥에 놓이며 일어나기 직전 3틱에 걸쳐 든다; 손에 든 갓 · 갓을 쓰고 벗는 사이 ·
+    등으로 넘기는 사이에는 갓이 머리 · 몸통을 뚫지 않게 밀려나고(팔이 닿는 만큼 손이 따라감), 갓끈은 머리를 지나지 않음; 허리
+    칼집은 늘어뜨린 오른팔을 비켜 돈다; 앉은 동안 띠 꼬리는 돌 윗면 위로; 갓끈은 그려진 구슬 줄(양쪽 줄 · 고리 · 아래 줄)로
+    검사한다; 잔은 주먹 상자 안으로 0.03칸 넘게 들어가지 않는다. 보정(칼 밀기 · 돌리기, 상체 · 머리 보조 회전, 칼집 · 갓 ·
+    띠 바닥 회피, 날아가는 갓 밀기 등)은 두 번째 계산에서 틱당 한계 속도로 부드럽게 계획되고, 한계값에 닿으면 빌드가 멈춘다.
+  - **등장의 바위**: 앉은 자리에서 일어나며 발 위로 0.4칸 앞으로(달 쪽), 이어 오른쪽으로 1.1칸 비켜선 뒤 플레이어 쪽으로 돈다
+    (`seq.py` `SEAT_RISE` · `SEAT_ASIDE`; 비켜서는 1.1칸 동안 발을 네 번 0.55칸씩 옆으로 옮겨 딛는다 — 딛은 발은 제자리, 드는 발은
+    0.08칸 들림): 발이 바위 안에 서지 않고, 걸어갈 때 바위 옆을 지난다. 시작점에 그대로 선 플레이어 앞 약 6.8칸에서 멈춘다.
+  - **숨긴 부위**(모델 `empty`, 크기 0, 클립의 0틱에 한 번만 키): 머리카락 판 `hair_tail_1/2`(플레이어 모델처럼 보이도록; 스킨 등에
+    이미 머리카락이 있음), 옆머리 `lock_r` `lock_l`, 치마 네 폭 `skirt_*`.
+  - **소품은 우리 것(S2a 모양 · S2c 색 그대로, 크기만 몸에 맞춤; 원작 소품을 따라 하지 않음)**: 갓(테 반지름 0.66, 꼭대기 지름 0.50 ×
+    높이 0.30, 8픽셀 머리에 맞음; 윗면은 몸통과 같은 16각형; 테는 정사각형 넷(0 / 22.5 / 45 / −22.5도)을 0.003칸씩 겹쳐 각자 자기 모서리
+    쐐기만 칠한다: 같은 면 겹침 · 반투명 겹침 없음), 칼 전체 1.94칸(날 끝은 손잡이 가운데에서 1.60), 칼집 1.52칸, 갓끈 · 띠 꼬리 · 잔 · 병도
+    몸에 맞게; `item_sword` 는 2.03칸(표시 크기 1.375; 모델 길이는 S2c 와 같아 손 · 땅 · 액자 변환 그대로). 왼손잡이(칼은 왼손, 칼집은
+    오른쪽 허리 · 오른손). 원작 의상 조각은 하나도 쓰지 않고 이름은 모두 역할 이름 · `scarlet` · `hr`.
+  - **얼굴**: `calm` 은 스킨의 얼굴 그대로, `smile` · `closed` 는 작은 겹침 그림 `face_fx`(S2c 그대로).
+  - 모습: 형태 `normal` / `ghost`(모든 부위가 한 장의 빛나는 연보라 유령 텍스처, 밝기 15), 단계 `p1` / `p2`(갓 매듭 · 띠 꼬리 가장자리가
+    빛남), 칼 빛 `off lilac pink violet gold`, 얼굴 `calm smile closed`, 손 `open grip brim`; 갓(쓰고 · 등에 · 손에 · 바닥에 · 없음) · 칼 ·
+    칼집 · 잔 · 병은 클립이 매 틱 다시 붙인다(런타임 부모 없음). 바닥의 갓은 정한 자리(옆 · 다리 옆 · 얼굴 위)에 놓이고, 던져지면 몸을
+    피해 날아간다.
+  - 빌드 검사: 어느 틱에도 바닥 아래 점 없음(보간 중간 틱까지), 틱당 120도 이하, 클립 이벤트 틱에 칼날이 몸 상자 안으로 1 cm 넘게
+    들어가지 않음, 보정값이 한계 안, 큰 휘두름은 움직이는 부위마다 매 틱 키, 디딘 발의 정강이는 보간 중에도 바닥에 붙음, 쓴 갓의
+    테가 보간 중에도 머리 위, 한 번 재생 클립의 시작(앞 클립 자세에서 섞여 들어오는 틱)은 모든 부위의 첫 키가 같은 틱(첫 이벤트,
+    없으면 섞임 길이)에 끝남, 첫 키 뒤의 모든 틱에서 실제로 보이는 값이 풀린 자세와 허용치(TOL × 1.25) 안(자르기 틱과 그 다음
+    틱 제외), 그림 0.15 M px 이하(47 872 px: 그린 그림 27장 + 스킨 4 096), 쉬는 자세 요소 6 500 이하(224), 모델 62개, 스킨 바이트 ·
+    sha1 확인. 숨은 리그에서 바로 시작하는 `g_dive`(g_vert 의 'gone' 뒤)는 섞일 앞 자세가 없으므로 첫 키가 1틱: 온몸이 t1 에 함께
+    나타난다. 계약 값(`api.HEIGHT` · `HAT_TOP` · `BRIM_D` · 칼 · 칼집 · `item_sword` 길이, 등록부의 클릭 판정 높이)은 빌드가 잰 값과
+    다르면 빌드가 멈춘다. 함수 2 600개(5.70 MB; 키 18 800개 / 키 파일 2 084개).
 - **`item_sword`**(`rlk:mboss/scarlet/item_sword`): 리그의 칼집에 칼을 꽂은 한 덩어리, 리그 그림만 씀(추가 0 px). 바닐라 검처럼 대각선(손잡이
   왼쪽 아래 · 끝 오른쪽 위)에 바닐라 손 · 1인칭 · gui · 바닥 · 액자 변환. 이벤트의 던진 칼과 아이템 화무십일홍의 모양.
 - **효과 도구**(`tools/build_mboss_hr_fx.py` + `mboss_hr_fx_paint.py` → `boss/scarlet/fx/{card,cardx,look,clear,uninstall}` ·
@@ -2161,7 +2213,7 @@ lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` fal
   변형 보간만, 엔티티 회전은 건드리지 않아 날아가는 방향 그대로, `fx/clear` · 에이저가 지우지 않음), `petal_big {look}`(whole / cut / split),
   `moon_halo {look}`(p1 흰 · 파랑 / p2 붉음 / off / `p1b` · `p2b` = 같은 그림 1.2 배 밝게: 색조가 곱하기라 `p1` · `p2` 가 0xD4D4D4, 밝은 쪽이
   흰색 — I1), `lotus {look}`(bud / bloom), `seat_rock {look}`(바닐라 응회암 돌 + bottle / bare / set: 술병 · 잔은 돌을 따라다니는 바닐라 아이템,
-  돌 윗면 0.75칸 = 앉은 그녀의 골반 0.96칸 아래). 소리 104가지(`api.KIT_SOUND_RECIPES`, 바닐라 소리만, `mboss_lib.sound` 최소 음량 규칙).
+  돌 윗면 0.24칸 = 앉은 그녀의 허벅지 아랫면(골반 0.385칸)). 소리 104가지(`api.KIT_SOUND_RECIPES`, 바닐라 소리만, `mboss_lib.sound` 최소 음량 규칙).
   화면: `hud/line {id}` · `hud/ovl {g,in,hold,out}`(144 × 81, `vBig` = in + hold + out) · `hud/warn {on}` · `hud/skip {s}`(밝기 0–4, `s:5` 로
   지움) · `hud/clear`. 글리프 `vig` U+EC16(가장자리만 어두운 비네트, 가운데 절반은 투명; SR 의 아이템이 씀). 시험: `/execute as @p at @s
   rotated ~ 0 run function rlk:boss/scarlet/fx/test/stage` 다음 `fx/test/<프리셋>` · `fx/test/prop/<소품>` · `fx/test/sounds` · `fx/test/hud` ·
@@ -2206,11 +2258,16 @@ lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` fal
   배경(`core/amb`), 등장 건너뛰기, 멈춤 · `/reload` · 정리, 테스트), `ai.py`, `shield.py`(실드 · 판정 · 실패 타격), `p1.py`, `s3lib.py`(공용 도우미 ·
   패턴 작성 도구 `PB`), `reward.py`(이벤트 논리 + 보상 훅), `p_ghost.py`(S4: R1 · R2 · R3 · A8 · A13 + 공용 도우미 `g/**`: 베기 `g/cut/{make,aim,
   lock}`, 원반 `g/disc/throw {kb}`, 자리 `g/spot/*`), `seq.py`(S2b). 소유 경로마다 `api.Writer` 하나라 자기 경로의 낡은 파일만 지운다(`rig/**`
-  와 효과 도구 `fx/**` 는 건드리지 않음). 지금 모듈 1 145개(S3 275 · S4 413 · `seq/**` 457); 리그 · 효과 도구까지 `boss/scarlet/**` 4 203개.
+  와 효과 도구 `fx/**` 는 건드리지 않음). 지금 모듈 1 149개(S3 275 · S4 413 · `seq/**` 461); 리그 · 효과 도구까지 `boss/scarlet/**` 4 178개.
   단계 파일이 없으면 생성기가 대역으로 돈다(리그 `rig_stub/**`, 장면 `core/sq/**`, 연참 `core/gs/**`, 효과 · 소리 = 바닐라 입자 / 소리, 경기장
   모습 = 없음): 지금 트리에는 대역이 없다.
-- 생성기 셋 더: `tools/build_scarlet_rig.mjs`(+ `scarlet_cine.mjs`; 리소스팩 쪽, `regen_all.sh` 에 없음: `boss/scarlet/rig/**` 통째로 ·
-  `tools/scarlet_rig_manifest.json` · RP `mboss/scarlet/**`), `tools/build_mboss_hr_fx.py`(`--skip-rp` 면 데이터팩만: `fx/**` · 매니페스트),
+- 생성기 셋 더: `tools/build_scarlet_rig.mjs`(+ `scarlet_{geometry,paint,pose,retarget,clips,skin}.mjs` · `scarlet_cine.mjs`; 리소스팩 쪽,
+  `regen_all.sh` 에 없음: `boss/scarlet/rig/**` 통째로(2 600 함수, 5.70 MB; 키 18 800개 / 키 파일 2 084개) ·
+  `tools/scarlet_rig_manifest.json`(S2d 의 새 항목: `skeleton` 뼈대, `dims` 잰 크기, `support` 클립마다 닿음 · 공중 구간과 손 접촉,
+  `retarget` 배율 · 패치 · 보정 표, `item_sword.toss_offset`) · RP `mboss/scarlet/**`(그림 27장 + `skin.png` · 모델 62개(유령 쌍둥이
+  포함) + `item_sword`, 아틀라스는 `rlk:mboss/scarlet/*` 항목만 다시 넣음); 두 번 빌드하면 바이트까지 같다. `tools/scarlet_retarget.mjs` 는
+  클립 동작을 새 뼈대로 옮기는 순수 계산(빌드가 부름; `node tools/scarlet_retarget.mjs --dump all` 은 모든 틱의 원래 각도와 옮긴 각도를
+  JSON 으로 낸다: 패치 구간 밖은 같아야 함)), `tools/build_mboss_hr_fx.py`(`--skip-rp` 면 데이터팩만: `fx/**` · 매니페스트),
   경기장 테마 `tools/mboss_arena_hr_field.py`(`build_mboss_arena.py` 가 읽어 `mboss/arena/hr_field/**` 53개 · `job_tick` 한 줄 · `abort` 두 줄을
   씀). 손으로 고치지 말 것: 위의 출력 전부.
 - 순서(0-4): 리소스팩이 바뀌면 `build_rift.py --resourcepack <팩>` → `node tools/build_scarlet_rig.mjs --resourcepack <팩>` →
@@ -2220,14 +2277,17 @@ lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` fal
 - 상태: 점수판 `hr`(`init` 이 만들고 `uninstall` 이 지움), 리그 `hrRig*`, 효과 도구 `hrFx` `hrFxS` `hrFxG` `hrFxH` `hrFxK` `hrFxD` `hrFxL` `hrFxQ`
   (첫 호출이 만들고 `fx/uninstall` 이 지움), 버프 `hrMoon`(SR), 저장소 `rlk:hr`(`core.*` `rig.*` `seq.*` `fx.*` `g.*` `ev.*`), 태그 `rlk_hr_*`(정리가
   모두 지움), 보스바 `rlk:hr_warn`. 부하(모의기, `test_scarlet.py cost`, 리그 · 장면 · 연참 · 경기장 모두 진짜, 효과 도구도 진짜로 돌려
-  카드 · 카드 관리(`fx/e/world`, 바닐라처럼 같은 틱에) · 정리까지 셈): 싸움 한 틱 평균 505명령(그중 효과 도구 66; P1 516 · P2 489 ·
-  A8 550 · A13 571), 아펩(약 830)보다 적다(목표 600 이하). 조각 틱을 뺀 한 틱 최대 2198(CS1 의 검붉은 잎 40장을 20장씩 두 틱에 나눠
-  부름: 한 틱에 40장이면 3598, 틱당 3000 이하). 경기장 모습을 바꾸는 작업의 조각 틱(이 측정에서 44틱)은 따로 셌다: 평균 1856 · 최대
-  3442명령(조각 한도 5천).
+  카드 · 카드 관리(`fx/e/world`, 바닐라처럼 같은 틱에) · 정리까지 셈): 싸움 한 틱 평균 502명령(그중 효과 도구 66; P1 514 · P2 486 ·
+  A8 547 · A13 568; I2, 플레이어 크기 몸), 아펩(약 830)보다 적다(목표 600 이하). 조각 틱을 뺀 한 틱 최대 2189(CS1 의 검붉은 잎 40장을
+  20장씩 두 틱에 나눠 부름: 한 틱에 40장이면 약 3600, 틱당 3000 이하). 경기장 모습을 바꾸는 작업의 조각 틱(이 측정에서 44틱)은 따로
+  셌다: 평균 1857 · 최대 3444명령(조각 한도 5천).
 - 계획 · 계약 문서(`PLAN.md` · `contract.md` · 단계 브리프 · `requests/*.md` · 통합 기록)는 아직 스크래치패드 `hr/` 에 있다: 릴리스 때 다른
   보스처럼 `tools/dev/sim/hr/` 로 옮긴다(이 절과 생성기 주석의 "계획 §…" 은 그 `PLAN.md`).
 - 시험(`tools/dev/sim/hr/tests/`, 데이터팩 밖의 사본에서 돌림 — `tools/dev/sim/README.md` 1절 · 3-4): `test_special_hr.py`(S1 틀) ·
-  `test_rig.py`(S2a · S2b 리그 · 영상 클립) · `ev_dry.py`(S2b 시퀀스) · `test_scarlet.py` · `pat_p1.py` · `test_reward.py`(S3) · `pat_ghost.py`(S4) ·
+  `test_rig.py`(S2a · S2b 리그 · 영상 클립; S2c · S2d: 매니페스트에 S2d 항목이 있으면 **몸**(15개 몸 모델의 두 상자 · 여섯
+  면 UV = 아바타 모델, 팔 너비 = 스킨의 슬림 3픽셀, 크기 1), **뼈대**(머리 끝 2.00 ± 0.03), **계약**(api 값 = 빌드가 잰 값, 등록부 크기 1.0,
+  클릭 판정 높이 여유 0.05-0.12), 접촉 · 공중 · 칼날 매 틱 · 든 소품 · 갓 · 섞여 들어오기 · 등장의 바위 · 각도 보존(`--dump`) · 리타깃 표 ·
+  결합; `--rebuild` 면 두 번 빌드해 바이트 비교) · `ev_dry.py`(S2b 시퀀스) · `test_scarlet.py` · `pat_p1.py` · `test_reward.py`(S3) · `pat_ghost.py`(S4) ·
   `test_kit.py` · `test_arena_hr.py`(S1K) · `test_hwamu.py` · `test_moon.py`(SR) · `ident_hr.py` · `gen_check_hr.py`(I1). 모의기 `hr/tests/lib/`
   (`hrsim.py` + 챕터 틀 모의기 사본), `hr/s1k/lib/`(효과 도구 · 경기장), `hr/sr/srsim.py`(아이템 · 버프).
 

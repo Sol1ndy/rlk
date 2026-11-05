@@ -747,7 +747,7 @@ def qi_frames(c, pos, rot, roll, s0, s1, flip=False, life=ARC_LIFE, fade_last=6)
 
 
 # --- sword-qi ---------------------------------------------------------------------------------------------------------------
-@preset('qi_arc', 'A sword-qi crescent of reach {r} (tenths) about the executor (S3: the body + 1.3, rotated as the body; S4: '
+@preset('qi_arc', 'A sword-qi crescent of reach {r} (tenths) about the executor (S3: the body + 1.0, rotated as the body; S4: '
         'the cut spot + h, rotated as the player; S2b: at her): {yaw} / {pitch} the aim\'s offsets from the executor rotation '
         '(yaw + = right, pitch + = up), {roll} the blade plane about the aim (0 a flat crescent, 90 vertical). Four sweep frames '
         '1 t apart (the last fades over 6 t): the lilac body, the white-pink cutting rim; c tints it (1 lilac .. 5 white). '
@@ -760,8 +760,8 @@ def _p_qi_arc(c):
     return out
 
 
-@preset('qi_ring', 'A flat sword-qi ring of radius {r} (tenths) about the executor (S3: the body + 1.0 / 2.0; S4: the cut '
-        'spot + 0.8 / 0.1; the vanish: the body + 1.0), horizontal: the lilac ring spreading and turning, a white-pink rim ring '
+@preset('qi_ring', 'A flat sword-qi ring of radius {r} (tenths) about the executor (S3: the body + 0.8 / 1.55; S4: the cut '
+        'spot + 0.8 / 0.1; the vanish: the body + 0.8), horizontal: the lilac ring spreading and turning, a white-pink rim ring '
         'behind it, particles round its edge; c tints it.',
         conv=(('s', 'r', 0.1), ('s3', 'r', 0.035), ('s5', 'r', 0.05), ('sr', 'r', 0.108), ('pd', 'r', 0.055)), split_c=True)
 def _p_qi_ring(c):
@@ -822,7 +822,7 @@ def _p_qi_dome():
             part('end_rod', '~ ~1 ~', (1.2, 0.8, 1.2), 0.02, 6)]
 
 
-@preset('qi_vert', 'A vertical sword-qi crescent of height {h} (tenths) standing on the executor (S3 A3: the body + 0.2, 1.4 '
+@preset('qi_vert', 'A vertical sword-qi crescent of height {h} (tenths) standing on the executor (S3 A3: the body + 0.15, 1.4 '
         'ahead; S4 A8.8: the cut spot on the floor, rotated as the player): the crescent in the vertical plane along the aim '
         '(executor yaw + {yaw}), from the executor up to h, the sweep rising (four frames), and a thin glowing upright line '
         'at its foot facing the viewer; c tints it (A8.8: 2 magenta).',
@@ -836,7 +836,7 @@ def _p_qi_vert(c):
     return out
 
 
-@preset('qi_fan', 'A rising vertical fan of sword-qi of height {h} (tenths) centred on the executor (S3 A1: the body + 1.1, 1.2 b '
+@preset('qi_fan', 'A rising vertical fan of sword-qi of height {h} (tenths) centred on the executor (S3 A1: the body + 0.85, 1.2 b '
         'ahead; cosmetic): the four sweep frames in the vertical plane along the executor\'s facing, rising; c tints it (A1: 2).',
         conv=(('s', 'h', 0.0625), ('s9', 'h', 0.055), ('pd', 'h', 0.04)), split_c=True)
 def _p_qi_fan(c):
@@ -845,8 +845,8 @@ def _p_qi_fan(c):
     return out
 
 
-@preset('qi_wedge', 'A sword-qi wedge of length {r} (tenths) from the executor along its facing (S3 A3 h5: the body + 1.3; S4 A7: '
-        'the body + 1.1), rolled {roll} degrees about the aim (the rising diagonal): a lilac spearhead widening behind its point, '
+@preset('qi_wedge', 'A sword-qi wedge of length {r} (tenths) from the executor along its facing (S3 A3 h5: the body + 1.0; S4 A7: '
+        'the body + 0.85), rolled {roll} degrees about the aim (the rising diagonal): a lilac spearhead widening behind its point, '
         'white edges; particles at the point.',
         conv=(('s', 'r', 0.1), ('s6', 'r', 0.06), ('pd', 'r', 0.03)), pre=[f'$data modify storage {PA}.roll set value $(roll)'])
 def _p_qi_wedge():
@@ -856,13 +856,13 @@ def _p_qi_wedge():
             mac(part('electric_spark', '^ ^ ^$(s)', (0.2, 0.2, 0.2), 0.05, 4))]
 
 
-@preset('qi_ribbon', 'A4 the sword-qi ribbon wrapping round her (S3: the body + 1.3): three lilac ribbon strips tilted at '
+@preset('qi_ribbon', 'A4 the sword-qi ribbon wrapping round her (S3: the body + 1.0): three lilac ribbon strips tilted at '
         'different angles turning round her (one fading), lilac motes swirling.')
 def _p_qi_ribbon():
     out = []
     for k, (y, p, ro, sp, kd) in enumerate(((0, -18, 25, 170, 'qi_ribbon_0'), (120, 14, -30, -160, 'qi_ribbon_1'),
                                            (240, -6, 12, 150, 'qi_ribbon_0'))):
-        out.append(card(kd, '^ ^ ^', f'~{y} {p}', roll=ro, spin=sp, s0=1.5, s1=1.9, life=9, fade=4, dly=k, dur=5))
+        out.append(card(kd, '^ ^ ^', f'~{y} {p}', roll=ro, spin=sp, s0=1.2, s1=1.5, life=9, fade=4, dly=k, dur=5))
     return out + [dust(DUSTC[1], 1.0, '~ ~ ~', (0.9, 0.7, 0.9), 16), part('electric_spark', '~ ~ ~', (0.7, 0.6, 0.7), 0.05, 5)]
 
 
@@ -870,7 +870,7 @@ QLINE_CLAMP = [f'function {FN}e/hgt', '$scoreboard players set #r hrFx $(len)', 
 
 
 @preset('qi_line', 'A thin straight sword-qi line of length {len} (tenths) from the executor along its full facing (pitch '
-        'counts: S3 A5 the body + 1.2, 1.5 b ahead, level; S4 A8.9 the dive line: her + 1.0, rotated ~ 90 = straight down): a '
+        'counts: S3 A5 the body + 0.95, 1.5 b ahead, level; S4 A8.9 the dive line: her + 0.8, rotated ~ 90 = straight down): a '
         'white core inside a lilac glow; a line pointing down is clamped to end above the floor.',
         conv=(('l', '#r', 0.1),), pre=QLINE_CLAMP)
 def _p_qi_line():
@@ -881,7 +881,7 @@ def _p_qi_line():
 
 
 @preset('qi_cut', 'A9 the iai cut along the dash: a long pink-magenta slash line of length {len} (tenths) from the executor along '
-        'its yaw (S3: the dash start + 1.0, rotated along the dash), a white-hot core, magenta sparks along it.',
+        'its yaw (S3: the dash start + 0.8, rotated along the dash), a white-hot core, magenta sparks along it.',
         conv=(('l', 'len', 0.1), ('p1', 'len', 0.033), ('p2', 'len', 0.066), ('p3', 'len', 0.095)))
 def _p_qi_cut():
     return [mac(card('qline', '^ ^ ^', '~ 0', s0=(0.4, 0.4, '$(l)'), s1=(0.9, 0.9, '$(l)'), life=7, fade=4, dur=1,
@@ -902,15 +902,15 @@ def _p_glint(c):
         c_parts(c, '~ ~ ~', (0.08, 0.08, 0.08), 4)
 
 
-@preset('star4', 'A9 the four-point star in a thin circle at her chest (the chest anchor, facing the viewer, 1.7 b): lilac, a '
+@preset('star4', 'A9 the four-point star in a thin circle at her chest (the chest anchor, facing the viewer, 1.3 b): lilac, a '
         'white glint inside, for 6 t.')
 def _p_star4():
-    return [card('glint_1', '~ ~ ~', bb='center', spin=30, s0=0.6, s1=1.7, life=6, fade=2, col=LILAC_PALE),
+    return [card('glint_1', '~ ~ ~', bb='center', spin=30, s0=0.6, s1=1.3, life=6, fade=2, col=LILAC_PALE),
             card('glint_0', '~ ~ ~', bb='center', s0=0.3, s1=0.8, life=5, fade=2, col=WHITE),
             dust(DUSTC[1], 1.0, '~ ~ ~', (0.3, 0.3, 0.3), 6)]
 
 
-@preset('yellow_tell', 'The yellow tell for {t} ticks at the executor (S3 A9 / A10: the body + 1.3, in the air for A10; S4 A7: '
+@preset('yellow_tell', 'The yellow tell for {t} ticks at the executor (S3 A9 / A10: the body + 1.0, in the air for A10; S4 A7: '
         'her): the yellow sphere (1.6 b) and the horizontal flare line through it (4 b), yellow motes.',
         conv=(('t', 't', None),))
 def _p_yellow_tell():
@@ -920,34 +920,34 @@ def _p_yellow_tell():
 
 
 # --- the ghost ---------------------------------------------------------------------------------------------------------------
-@preset('ghost_burst', 'The lilac switch / the vanish (the body + 1.0-1.4): the body bursts into lilac-white mist (four puffs '
+@preset('ghost_burst', 'The lilac switch / the vanish (the body + 0.8-1.1): the body bursts into lilac-white mist (four puffs '
         'flung out), white-lilac ribbons tracing the silhouette rise, sparkles linger to 12 t.')
 def _p_ghost_burst():
     rnd = RND(13)
     out = [fly('ghost_burst_0', yaw, rnd.uniform(15, 45), rnd.uniform(0.7, 1.2), s0=0.7, s1=1.5, life=10, fade=5, bb='center')
            for yaw in radial(4, 20)]
-    out += [card('ghost_burst_1', '~ ~ ~', bb='center', s0=1.0, s1=2.2, move=(0, 0.6, 0), life=9, fade=5, dur=4),
-            card('ghost_burst_2', '~ ~0.2 ~', bb='center', s0=1.0, s1=2.0, life=12, fade=6, dly=2, dur=6)]
+    out += [card('ghost_burst_1', '~ ~ ~', bb='center', s0=1.0, s1=1.7, move=(0, 0.6, 0), life=9, fade=5, dur=4),
+            card('ghost_burst_2', '~ ~0.2 ~', bb='center', s0=1.0, s1=1.6, life=12, fade=6, dly=2, dur=6)]
     return out + [dust(DUSTC[1], 1.2, '~ ~ ~', (0.4, 0.8, 0.4), 20), dust(DUSTC[5], 0.9, '~ ~ ~', (0.4, 0.8, 0.4), 10),
                   part('end_rod', '~ ~ ~', (0.3, 0.7, 0.3), 0.04, 8)]
 
 
-@preset('ghost_trail', 'A ghost dash / glide / run (S4: the body + 0.6-1.2, rotated toward its target, at the move\'s start): a '
+@preset('ghost_trail', 'A ghost dash / glide / run (S4: the body + 0.45-0.95, rotated toward its target, at the move\'s start): a '
         'lilac flame trail and white speed lines along the aim over {len} (tenths), drawn out over 4 t as she passes, fading '
         'after 12 t; lilac motes along it.',
         conv=(('l', 'len', 0.1), ('l1', 'len', 0.012), ('p1', 'len', 0.033), ('p2', 'len', 0.066), ('p3', 'len', 0.1)))
 def _p_ghost_trail():
-    return [mac(card('ghost_trail_0', '^ ^ ^', '~-90 0', s0=('$(l1)', 3.6, 3.6), s1=('$(l)', 3.6, 3.6), life=12, fade=6,
+    return [mac(card('ghost_trail_0', '^ ^ ^', '~-90 0', s0=('$(l1)', 2.8, 2.8), s1=('$(l)', 2.8, 2.8), life=12, fade=6,
                      dur=4)),
-            mac(card('ghost_trail_1', '^ ^0.2 ^', '~-90 0', s0=('$(l1)', 4.0, 4.0), s1=('$(l)', 4.0, 4.0), life=8, fade=4,
+            mac(card('ghost_trail_1', '^ ^0.2 ^', '~-90 0', s0=('$(l1)', 3.1, 3.1), s1=('$(l)', 3.1, 3.1), life=8, fade=4,
                      dur=4)),
             mac(dust(DUSTC[1], 1.1, '^ ^ ^$(p1)', (0.2, 0.3, 0.2), 6)), mac(dust(DUSTC[1], 1.1, '^ ^ ^$(p2)', (0.2, 0.3, 0.2), 6)),
             mac(dust(DUSTC[1], 1.1, '^ ^ ^$(p3)', (0.2, 0.3, 0.2), 6))]
 
 
-@preset('ghost_flash', 'D3 the flash-blink (the body + 1.0): a white-violet electric flash, sparks.')
+@preset('ghost_flash', 'D3 the flash-blink (the body + 0.95): a white-violet electric flash, sparks.')
 def _p_ghost_flash():
-    return [card('ghost_flash', '~ ~ ~', bb='center', spin=40, s0=0.6, s1=2.4, life=5, fade=2, dur=2),
+    return [card('ghost_flash', '~ ~ ~', bb='center', spin=40, s0=0.6, s1=1.9, life=5, fade=2, dur=2),
             part('electric_spark', '~ ~ ~', (0.4, 0.8, 0.4), 0.1, 12), dust(DUSTC[5], 1.0, '~ ~ ~', (0.3, 0.7, 0.3), 8)]
 
 
@@ -961,21 +961,21 @@ AI_CLAMP = [f'function {FN}e/hgt', 'scoreboard players set #m hrFx -120', 'score
         'ager removes the oldest), and a lilac streak of {len} (tenths) behind her along her facing.',
         conv=(('oy', '#m', 0.01), ('sy', '#s', 0.01), ('l', 'len', 0.1)), pre=AI_CLAMP)
 def _p_afterimage():
-    return [mac(card('afterimage', '~ ~$(oy) ~', bb='vertical', s0=2.8, s1=2.8, life=api.AFTERIMAGE_FADE, fade=2, hit=3,
+    return [mac(card('afterimage', '~ ~$(oy) ~', bb='vertical', s0=2.65, s1=2.65, life=api.AFTERIMAGE_FADE, fade=2, hit=3,
                      col=WHITE, col2=rgb('#B898C8'), pool='ai')),
             mac(card('qline', '^ ^$(sy) ^', '~180 0', s0=(0.12, 0.12, '$(l)'), s1=(0.04, 0.04, '$(l)'), life=6, fade=3,
                      col=LILAC)),
             mac(dust(DUSTC[1], 1.0, '~ ~$(sy) ~', (0.25, 0.6, 0.25), 6))]
 
 
-@preset('blink_bubble', 'A6 the back-blink (the body + 1.3): a pale blue-white translucent bubble swelling and gone, white motes.')
+@preset('blink_bubble', 'A6 the back-blink (the body + 1.0): a pale blue-white translucent bubble swelling and gone, white motes.')
 def _p_blink_bubble():
-    return [card('blink_bubble', '~ ~ ~', bb='center', s0=1.8, s1=3.0, life=7, fade=3, dur=3),
+    return [card('blink_bubble', '~ ~ ~', bb='center', s0=1.4, s1=2.4, life=7, fade=3, dur=3),
             part('end_rod', '~ ~ ~', (0.6, 0.8, 0.6), 0.03, 10), part('snowflake', '~ ~ ~', (0.6, 0.8, 0.6), 0.02, 6)]
 
 
 # --- the shield --------------------------------------------------------------------------------------------------------------
-@preset('shield_refill', 'The lead-ins\' refill beat (at her, the body + 1.4): eight lilac crystal shards fly in to her and a '
+@preset('shield_refill', 'The lead-ins\' refill beat (at her, the body + 1.1): eight lilac crystal shards fly in to her and a '
         'flash closes them, a thin rim ring.')
 def _p_shield_refill():
     out = [inward('shards_0', yaw, 1.8, 0.4 * ((k % 3) - 1), 1.6, s0=0.5, s1=0.25, life=8, fade=2, col=LILAC_PALE, dly=k % 2,
@@ -1142,7 +1142,7 @@ def _p_petals_drift():
     return out + [part('cherry_leaves', '~ ~1 ~', (3.0, 1.0, 3.0), 0, 8)]
 
 
-@preset('petals_wind', 'CS4 S4 thin petal streaks in the wind (at her + 1, rotated as her): petals and two thin pink streaks '
+@preset('petals_wind', 'CS4 S4 thin petal streaks in the wind (at her + 0.8, rotated as her): petals and two thin pink streaks '
         'whipping across from her left to her right (ambient pool).')
 def _p_petals_wind():
     out = [card(f'petal_{k % 3}', f'^{num(3.5 - 0.4 * k)} ^{num(0.3 * k - 0.4)} ^{num(1.5 - 0.7 * k)}', f'~{20 * k} 10',
@@ -1193,14 +1193,14 @@ def _p_leaves_dark():
     return out
 
 
-@preset('leaves_swirl', 'Dark-red leaves swirling round her (CS1 C8 / SQ1: her + 1.4): ten leaves flung round and up, turning, '
+@preset('leaves_swirl', 'Dark-red leaves swirling round her (CS1 C8 / SQ1: her + 1.1): ten leaves flung round and up, turning, '
         'dark-red dust (ambient pool).')
 def _p_leaves_swirl():
     rnd = RND(61)
     out = [fly(f'petal_{4 + k % 3}', yaw, rnd.uniform(25, 70), rnd.uniform(1.2, 2.4), s0=0.3, s1=0.4, life=18, fade=6,
                col=LEAF_RED if k % 3 else LEAF_BLACK, spin=170, pool='am', roll=rnd.randint(-90, 90))
            for k, yaw in enumerate(radial(10, 7))]
-    return out + [dust((0.5, 0.08, 0.15), 1.2, '~ ~ ~', (1.2, 1.0, 1.2), 16)]
+    return out + [dust((0.5, 0.08, 0.15), 1.2, '~ ~ ~', (1.0, 0.8, 1.0), 16)]
 
 
 @preset('ambient_p1', 'Arena ambience, P1 (the module, every ~10 t near the player; at the player): a pink petal drifting down '
@@ -1256,10 +1256,10 @@ def _p_ev_petals():
             mac(dust(DUST_PETAL, 1.0, '~ ~ ~', (0.7, 0.6, 0.7), '$(n)'))]
 
 
-@preset('ev_leave', 'E34 she leaves in petals and wind (at her chest): 60 cherry leaves + 30 petal motes + a gust, spread 0.6 / '
-        '1.2 / 0.6.')
+@preset('ev_leave', 'E34 she leaves in petals and wind (at her chest): 60 cherry leaves + 30 petal motes + a gust, spread 0.5 / '
+        '0.95 / 0.5.')
 def _p_ev_leave():
-    return [part('cherry_leaves', '~ ~ ~', (0.6, 1.2, 0.6), 0.05, 60), dust(DUST_PETAL, 1.2, '~ ~ ~', (0.6, 1.2, 0.6), 30),
+    return [part('cherry_leaves', '~ ~ ~', (0.5, 0.95, 0.5), 0.05, 60), dust(DUST_PETAL, 1.2, '~ ~ ~', (0.5, 0.95, 0.5), 30),
             part('gust', '~ ~ ~', (0, 0, 0), 0, 1)]
 
 
@@ -1329,16 +1329,18 @@ PROPS = {
                    'p1b': ('moon_halo_0', 12.4), 'p2b': ('moon_halo_1', 12.4)}, 'fixed', None),
     'lotus': ('A lotus flower on the pond (the water surface; 0.9 b, standing, turning to the viewer): {look} bud (closed, pale '
               'pink, P1) / bloom (open crimson, P2).', {'bud': ('lotus_0', 0.9), 'bloom': ('lotus_1', 0.9)}, 'vertical', None),
-    'seat_rock': ('CS0 her seat: a low flat stone (vanilla tuff, 1.5 x 0.75 x 1.1 b, its top 0.75 b over the display: no '
-                  'collision) and on it {look}: bottle = the rice-wine bottle on her left, bare = the stone alone, set = the bottle '
+    'seat_rock': ('CS0 her seat: a low flat stone (vanilla tuff, 1.2 x 0.24 x 0.64 b, its top 0.24 b over the display (under her '
+                  'thighs, behind her heels): no collision) and on it {look}: bottle = the rice-wine bottle on her left, bare = the stone alone, set = the bottle '
                   'and the cup on her right (vanilla item displays the kit keeps with the stone and removes with it).',
                   {'bottle': ('rock', 1.0), 'bare': ('rock', 1.0), 'set': ('rock', 1.0)}, 'fixed', None),
 }
 assert set(PROPS) == set(api.KIT_PROPS) and all(set(v[1]) == set(api.KIT_PROPS[k].get('look', (None,))) or k == 'disc'
                                                 for k, v in PROPS.items())
-SEAT = {'rock': ('minecraft:tuff', (0.0, 0.375, 0.0), (1.5, 0.75, 1.1)),
-        'bottle': ('minecraft:potion', (0.45, 0.75, 0.05), 0.5),
-        'cup': ('minecraft:bowl', (-0.4, 0.75, 0.2), 0.42)}
+# S2d (request s2d-2): the stone under her thighs (top 0.24 b = their underside, hip 0.385 b), its front face 0.135 b in front
+# of her anchor (clear of her shins), its back 0.505 b behind; the bottle / cup scales match the rig's (0.30 tall, 0.15 wide)
+SEAT = {'rock': ('minecraft:tuff', (0.0, 0.12, -0.185), (1.2, 0.24, 0.64)),
+        'bottle': ('minecraft:potion', (0.42, 0.24, -0.15), 0.42),
+        'cup': ('minecraft:bowl', (-0.42, 0.24, -0.15), 0.26)}
 BOTTLE_COLOR = rgb('#E8E2D2')          # a milky rice wine (potion_contents custom_color)
 DISC_Q = ['[0f,0f,0f,1f]', '[0f,0.7071068f,0f,0.7071068f]', '[0f,1f,0f,0f]', '[0f,0.7071068f,0f,-0.7071068f]']
 

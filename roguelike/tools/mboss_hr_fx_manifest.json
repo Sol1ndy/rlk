@@ -1555,7 +1555,7 @@
     "roll",
     "c"
    ],
-   "doc": "A sword-qi crescent of reach {r} (tenths) about the executor (S3: the body + 1.3, rotated as the body; S4: the cut spot + h, rotated as the player; S2b: at her): {yaw} / {pitch} the aim's offsets from the executor rotation (yaw + = right, pitch + = up), {roll} the blade plane about the aim (0 a flat crescent, 90 vertical). Four sweep frames 1 t apart (the last fades over 6 t): the lilac body, the white-pink cutting rim; c tints it (1 lilac .. 5 white). A crescent that would reach below the floor rises up to 1 b, then shrinks (fx/e/clamp_arc): no frame below the floor.",
+   "doc": "A sword-qi crescent of reach {r} (tenths) about the executor (S3: the body + 1.0, rotated as the body; S4: the cut spot + h, rotated as the player; S2b: at her): {yaw} / {pitch} the aim's offsets from the executor rotation (yaw + = right, pitch + = up), {roll} the blade plane about the aim (0 a flat crescent, 90 vertical). Four sweep frames 1 t apart (the last fades over 6 t): the lilac body, the white-pink cutting rim; c tints it (1 lilac .. 5 white). A crescent that would reach below the floor rises up to 1 b, then shrinks (fx/e/clamp_arc): no frame below the floor.",
    "cards": 4,
    "c_split": [
     1,
@@ -1572,7 +1572,7 @@
     "r",
     "c"
    ],
-   "doc": "A flat sword-qi ring of radius {r} (tenths) about the executor (S3: the body + 1.0 / 2.0; S4: the cut spot + 0.8 / 0.1; the vanish: the body + 1.0), horizontal: the lilac ring spreading and turning, a white-pink rim ring behind it, particles round its edge; c tints it.",
+   "doc": "A flat sword-qi ring of radius {r} (tenths) about the executor (S3: the body + 0.8 / 1.55; S4: the cut spot + 0.8 / 0.1; the vanish: the body + 0.8), horizontal: the lilac ring spreading and turning, a white-pink rim ring behind it, particles round its edge; c tints it.",
    "cards": 2,
    "c_split": [
     1,
@@ -1623,7 +1623,7 @@
     "yaw",
     "c"
    ],
-   "doc": "A vertical sword-qi crescent of height {h} (tenths) standing on the executor (S3 A3: the body + 0.2, 1.4 ahead; S4 A8.8: the cut spot on the floor, rotated as the player): the crescent in the vertical plane along the aim (executor yaw + {yaw}), from the executor up to h, the sweep rising (four frames), and a thin glowing upright line at its foot facing the viewer; c tints it (A8.8: 2 magenta).",
+   "doc": "A vertical sword-qi crescent of height {h} (tenths) standing on the executor (S3 A3: the body + 0.15, 1.4 ahead; S4 A8.8: the cut spot on the floor, rotated as the player): the crescent in the vertical plane along the aim (executor yaw + {yaw}), from the executor up to h, the sweep rising (four frames), and a thin glowing upright line at its foot facing the viewer; c tints it (A8.8: 2 magenta).",
    "cards": 5,
    "c_split": [
     1,
@@ -1640,7 +1640,7 @@
     "h",
     "c"
    ],
-   "doc": "A rising vertical fan of sword-qi of height {h} (tenths) centred on the executor (S3 A1: the body + 1.1, 1.2 b ahead; cosmetic): the four sweep frames in the vertical plane along the executor's facing, rising; c tints it (A1: 2).",
+   "doc": "A rising vertical fan of sword-qi of height {h} (tenths) centred on the executor (S3 A1: the body + 0.85, 1.2 b ahead; cosmetic): the four sweep frames in the vertical plane along the executor's facing, rising; c tints it (A1: 2).",
    "cards": 4,
    "c_split": [
     1,
@@ -1657,7 +1657,7 @@
     "r",
     "roll"
    ],
-   "doc": "A sword-qi wedge of length {r} (tenths) from the executor along its facing (S3 A3 h5: the body + 1.3; S4 A7: the body + 1.1), rolled {roll} degrees about the aim (the rising diagonal): a lilac spearhead widening behind its point, white edges; particles at the point.",
+   "doc": "A sword-qi wedge of length {r} (tenths) from the executor along its facing (S3 A3 h5: the body + 1.0; S4 A7: the body + 0.85), rolled {roll} degrees about the aim (the rising diagonal): a lilac spearhead widening behind its point, white edges; particles at the point.",
    "cards": 1,
    "c_split": [],
    "ambient": false,
@@ -1665,7 +1665,7 @@
   },
   "qi_ribbon": {
    "args": [],
-   "doc": "A4 the sword-qi ribbon wrapping round her (S3: the body + 1.3): three lilac ribbon strips tilted at different angles turning round her (one fading), lilac motes swirling.",
+   "doc": "A4 the sword-qi ribbon wrapping round her (S3: the body + 1.0): three lilac ribbon strips tilted at different angles turning round her (one fading), lilac motes swirling.",
    "cards": 3,
    "c_split": [],
    "ambient": false,
@@ -1675,7 +1675,7 @@
    "args": [
     "len"
    ],
-   "doc": "A thin straight sword-qi line of length {len} (tenths) from the executor along its full facing (pitch counts: S3 A5 the body + 1.2, 1.5 b ahead, level; S4 A8.9 the dive line: her + 1.0, rotated ~ 90 = straight down): a white core inside a lilac glow; a line pointing down is clamped to end above the floor.",
+   "doc": "A thin straight sword-qi line of length {len} (tenths) from the executor along its full facing (pitch counts: S3 A5 the body + 0.95, 1.5 b ahead, level; S4 A8.9 the dive line: her + 0.8, rotated ~ 90 = straight down): a white core inside a lilac glow; a line pointing down is clamped to end above the floor.",
    "cards": 2,
    "c_split": [],
    "ambient": false,
@@ -1685,7 +1685,7 @@
    "args": [
     "len"
    ],
-   "doc": "A9 the iai cut along the dash: a long pink-magenta slash line of length {len} (tenths) from the executor along its yaw (S3: the dash start + 1.0, rotated along the dash), a white-hot core, magenta sparks along it.",
+   "doc": "A9 the iai cut along the dash: a long pink-magenta slash line of length {len} (tenths) from the executor along its yaw (S3: the dash start + 0.8, rotated along the dash), a white-hot core, magenta sparks along it.",
    "cards": 2,
    "c_split": [],
    "ambient": false,
@@ -1709,7 +1709,7 @@
   },
   "star4": {
    "args": [],
-   "doc": "A9 the four-point star in a thin circle at her chest (the chest anchor, facing the viewer, 1.7 b): lilac, a white glint inside, for 6 t.",
+   "doc": "A9 the four-point star in a thin circle at her chest (the chest anchor, facing the viewer, 1.3 b): lilac, a white glint inside, for 6 t.",
    "cards": 2,
    "c_split": [],
    "ambient": false,
@@ -1719,7 +1719,7 @@
    "args": [
     "t"
    ],
-   "doc": "The yellow tell for {t} ticks at the executor (S3 A9 / A10: the body + 1.3, in the air for A10; S4 A7: her): the yellow sphere (1.6 b) and the horizontal flare line through it (4 b), yellow motes.",
+   "doc": "The yellow tell for {t} ticks at the executor (S3 A9 / A10: the body + 1.0, in the air for A10; S4 A7: her): the yellow sphere (1.6 b) and the horizontal flare line through it (4 b), yellow motes.",
    "cards": 2,
    "c_split": [],
    "ambient": false,
@@ -1727,7 +1727,7 @@
   },
   "ghost_burst": {
    "args": [],
-   "doc": "The lilac switch / the vanish (the body + 1.0-1.4): the body bursts into lilac-white mist (four puffs flung out), white-lilac ribbons tracing the silhouette rise, sparkles linger to 12 t.",
+   "doc": "The lilac switch / the vanish (the body + 0.8-1.1): the body bursts into lilac-white mist (four puffs flung out), white-lilac ribbons tracing the silhouette rise, sparkles linger to 12 t.",
    "cards": 6,
    "c_split": [],
    "ambient": false,
@@ -1737,7 +1737,7 @@
    "args": [
     "len"
    ],
-   "doc": "A ghost dash / glide / run (S4: the body + 0.6-1.2, rotated toward its target, at the move's start): a lilac flame trail and white speed lines along the aim over {len} (tenths), drawn out over 4 t as she passes, fading after 12 t; lilac motes along it.",
+   "doc": "A ghost dash / glide / run (S4: the body + 0.45-0.95, rotated toward its target, at the move's start): a lilac flame trail and white speed lines along the aim over {len} (tenths), drawn out over 4 t as she passes, fading after 12 t; lilac motes along it.",
    "cards": 2,
    "c_split": [],
    "ambient": false,
@@ -1745,7 +1745,7 @@
   },
   "ghost_flash": {
    "args": [],
-   "doc": "D3 the flash-blink (the body + 1.0): a white-violet electric flash, sparks.",
+   "doc": "D3 the flash-blink (the body + 0.95): a white-violet electric flash, sparks.",
    "cards": 1,
    "c_split": [],
    "ambient": false,
@@ -1763,7 +1763,7 @@
   },
   "blink_bubble": {
    "args": [],
-   "doc": "A6 the back-blink (the body + 1.3): a pale blue-white translucent bubble swelling and gone, white motes.",
+   "doc": "A6 the back-blink (the body + 1.0): a pale blue-white translucent bubble swelling and gone, white motes.",
    "cards": 1,
    "c_split": [],
    "ambient": false,
@@ -1771,7 +1771,7 @@
   },
   "shield_refill": {
    "args": [],
-   "doc": "The lead-ins' refill beat (at her, the body + 1.4): eight lilac crystal shards fly in to her and a flash closes them, a thin rim ring.",
+   "doc": "The lead-ins' refill beat (at her, the body + 1.1): eight lilac crystal shards fly in to her and a flash closes them, a thin rim ring.",
    "cards": 10,
    "c_split": [],
    "ambient": false,
@@ -1905,7 +1905,7 @@
   },
   "petals_wind": {
    "args": [],
-   "doc": "CS4 S4 thin petal streaks in the wind (at her + 1, rotated as her): petals and two thin pink streaks whipping across from her left to her right (ambient pool).",
+   "doc": "CS4 S4 thin petal streaks in the wind (at her + 0.8, rotated as her): petals and two thin pink streaks whipping across from her left to her right (ambient pool).",
    "cards": 7,
    "c_split": [],
    "ambient": true,
@@ -1939,7 +1939,7 @@
   },
   "leaves_swirl": {
    "args": [],
-   "doc": "Dark-red leaves swirling round her (CS1 C8 / SQ1: her + 1.4): ten leaves flung round and up, turning, dark-red dust (ambient pool).",
+   "doc": "Dark-red leaves swirling round her (CS1 C8 / SQ1: her + 1.1): ten leaves flung round and up, turning, dark-red dust (ambient pool).",
    "cards": 10,
    "c_split": [],
    "ambient": true,
@@ -1997,7 +1997,7 @@
   },
   "ev_leave": {
    "args": [],
-   "doc": "E34 she leaves in petals and wind (at her chest): 60 cherry leaves + 30 petal motes + a gust, spread 0.6 / 1.2 / 0.6.",
+   "doc": "E34 she leaves in petals and wind (at her chest): 60 cherry leaves + 30 petal motes + a gust, spread 0.5 / 0.95 / 0.5.",
    "cards": 0,
    "c_split": [],
    "ambient": false,
@@ -2122,7 +2122,7 @@
    "anim": null
   },
   "seat_rock": {
-   "doc": "CS0 her seat: a low flat stone (vanilla tuff, 1.5 x 0.75 x 1.1 b, its top 0.75 b over the display: no collision) and on it {look}: bottle = the rice-wine bottle on her left, bare = the stone alone, set = the bottle and the cup on her right (vanilla item displays the kit keeps with the stone and removes with it).",
+   "doc": "CS0 her seat: a low flat stone (vanilla tuff, 1.2 x 0.24 x 0.64 b, its top 0.24 b over the display (under her thighs, behind her heels): no collision) and on it {look}: bottle = the rice-wine bottle on her left, bare = the stone alone, set = the bottle and the cup on her right (vanilla item displays the kit keeps with the stone and removes with it).",
    "looks": {
     "bottle": [
      "rock",
@@ -2146,32 +2146,32 @@
    "item": "minecraft:tuff",
    "at": [
     0.0,
-    0.375,
-    0.0
+    0.12,
+    -0.185
    ],
    "scale": [
-    1.5,
-    0.75,
-    1.1
+    1.2,
+    0.24,
+    0.64
    ]
   },
   "bottle": {
    "item": "minecraft:potion",
    "at": [
-    0.45,
-    0.75,
-    0.05
+    0.42,
+    0.24,
+    -0.15
    ],
-   "scale": 0.5
+   "scale": 0.42
   },
   "cup": {
    "item": "minecraft:bowl",
    "at": [
-    -0.4,
-    0.75,
-    0.2
+    -0.42,
+    0.24,
+    -0.15
    ],
-   "scale": 0.42
+   "scale": 0.26
   }
  },
  "sounds": {

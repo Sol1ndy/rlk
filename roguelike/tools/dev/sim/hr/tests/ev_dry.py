@@ -16,8 +16,10 @@ in mcsim (run from HR/tests, outside the datapack; PLAN §7.6 / §9.3, the S2b b
            + title once at E56, the black at E110 (10 / 12 / 0), ev_leave at E34, state/hidden at E40; the thrown sword
            (item_display of api.ITEM_MODEL, rlk_room rlk_mb_aux rlk_hr_ev): rotated in its summon tick, one end-over-end turn
            <= 30 deg / t, never below the floor (centre >= floor + its radius at its scale), at E44 0.9 b before the player's
-           chest along their facing, shrinking 1 -> 0.15 into the player's hand, gone at E56; the moonlight orb (marker) from
-           her left hand to the player's chest at E42; every kit call a contract name; cancel at every tick leaves nothing
+           chest along their facing, shrinking seq.S1 -> 0.15 into the player's hand, gone at E56 (S2d: the scale / radius from
+           seq.S0 / SWORD_R; the toss summon at the manifest's item_sword.toss_offset when it carries one); the moonlight orb
+           (marker) from her left hand to the player's chest at E42; every kit call a contract name; cancel at every tick
+           leaves nothing
   skip     seq/intro/skip from 30 b: the black, the rock and props gone, her <= 7 b from the player facing them; the next tick
            (#sq 554) plays intro_end with line 11
   cs4      the ending with an unmoving player (the framework's real mv/* movers each tick): her distance over 300-1042 stays
@@ -491,12 +493,12 @@ for br, code in (('item', 1), ('buff', 2)):
             prevq = None
             for k, (pos, rot, data) in fly:
                 tr = data.get('transformation', {})
-                q, sc = tr.get('left_rotation'), (tr.get('scale') or [1.5])[0]
+                q, sc = tr.get('left_rotation'), (tr.get('scale') or [seq.S0])[0]
                 if not q:
                     rot_bad.append((tag, k, 'no transformation'))
                     continue
                 tip = qrot(q, (-.7071068, .7071068, 0.0))
-                lowest = pos[1] - abs(tip[1]) * 0.737 * sc - .02
+                lowest = pos[1] - abs(tip[1]) * seq.SWORD_R * sc - .02
                 if lowest < api.CY - 1e-6:
                     floor_bad.append((tag, k, round(lowest - api.CY, 3)))
                 if prevq and qangle(prevq, q) > 30.01:
@@ -549,7 +551,17 @@ check('event: the sword never below the floor (every tick, its lowest end at its
 check('event: one end-over-end turn <= 30 deg / t', not turn_bad, turn_bad[:4])
 check('event: the sword lives E30-E55, arrives at E44 0.9 b before the player\'s chest along their facing, upright (scabbard down)',
       not arr_bad, arr_bad[:4])
-check('event: it sinks into the player\'s hand (scale 1 -> 0.15 at E55, at the hand)', not shrink_bad, shrink_bad[:3])
+check(f'event: it sinks into the player\'s hand (scale {seq.S1:g} -> 0.15 at E55, at the hand)', not shrink_bad, shrink_bad[:3])
+# S23 (S2d): the toss summon at the right hand's offset the rig builder measured (manifest item_sword.toss_offset, ^left ^up ^forward)
+_toss = (api.rig_manifest().get('item_sword') or {}).get('toss_offset')
+if _toss:
+    _summ = [l for l in F.get(f'seq/event/k/{E["toss"]}', []) if 'summon minecraft:item_display' in l and 'rlk_hr_ev_sword' in l]
+    _m = [re.search(r'positioned \^(\S*) \^(\S*) \^(\S*) run summon', l) for l in _summ]
+    _got = [[float(v or 0) for v in m.groups()] for m in _m if m]
+    check(f'event: the toss summons at the measured hand offset ^{_toss[0]} ^{_toss[1]} ^{_toss[2]} (manifest item_sword.toss_offset ± 0.02)',
+          _got and all(all(abs(a - b) <= .02 for a, b in zip(g, _toss)) for g in _got), _got)
+else:
+    print('skipped event toss offset (manifest without item_sword.toss_offset)')
 check('event: the moonlight orb E30-E42 from her left hand onto the player\'s chest (E41 one step short), above the floor', not orb_bad, orb_bad[:3])
 check('event: nothing left after E120 (rlk_hr_ev, helpers)', not left, left[:2])
 

@@ -510,38 +510,36 @@ def paint_bubble(a, b):
 
 
 # ----------------------------------------------------------------------------- the afterimage silhouette (a -0.25..0.25, b 0..1)
+AI_S = 2.65        # S2d (request s2d-1): >= HAT_TOP 2.30 + 0.05 and >= 2 x BRIM_D (the brim fits the card's half width 0.25 x AI_S)
+
+
 def paint_afterimage(a, b):
-    """afterimage: one translucent lilac silhouette of her (ORIGINAL design: the flat round brim hat, long hair, the robe
-    and its pleated skirt, the long sword held low at her side), feet at b 0, 2.8 b tall at scale 2.8."""
-    x = a * 2.8
-    y = b * 2.8
+    """afterimage: one translucent lilac silhouette of her, the player-size figure (S2d): 2.0 b to the head top, the hat crown
+    2.31, feet at b 0, 2.65 b tall at scale 2.65 (the flat round brim hat, the square head, the body and two legs, her slim
+    arms, the long sword held low at her side; ORIGINAL design)."""
+    x = a * AI_S
+    y = b * AI_S
     inside = 0.0
-    # the hat: brim (a wide flat ellipse at y 2.45) and a short crown
-    if abs(y - 2.47) < 0.05 and abs(x) < 0.62:
+    # the hat: the flat brim at y 2.00 and the crown
+    if abs(y - 2.00) < 0.035 and abs(x) < 0.66:
         inside = 1.0
-    if 2.47 <= y <= 2.74 and abs(x) < 0.17 + 0.03 * (2.74 - y) * 4:
+    if 2.00 <= y <= 2.31 and abs(x) < 0.25:
         inside = 1.0
-    # head / neck
-    if math.hypot(x / 0.16, (y - 2.28) / 0.2) < 1.0:
+    # the head (square)
+    if 1.49 <= y <= 2.02 and abs(x) < 0.28:
         inside = 1.0
-    # hair falling behind the shoulders
-    if 1.55 <= y <= 2.3 and -0.22 <= x <= 0.24 - 0.05 * (2.3 - y):
-        inside = max(inside, 0.8)
-    # torso (robe), widening to the pleated skirt
-    if 0.0 <= y <= 2.1:
-        if y > 1.25:
-            hw = 0.25 + 0.04 * (2.1 - y)
-        else:
-            hw = 0.29 + 0.17 * (1.25 - y) / 1.25
-        pleat = 0.02 * math.sin(x * 40) if y < 1.2 else 0.0
-        if abs(x) < hw + pleat:
-            inside = 1.0
-    # arms: the left arm forward with the sword (the sword a thin line down-forward to her right)
-    if seg_dist(x, y, 0.28, 1.95, 0.42, 1.25) < 0.075:
+    # the torso and the two legs
+    if 0.74 <= y <= 1.50 and abs(x) < 0.265:
         inside = 1.0
-    if seg_dist(x, y, -0.28, 1.95, -0.4, 1.3) < 0.075:
+    if 0.0 <= y <= 0.75 and 0.01 < abs(x) < 0.265:
         inside = 1.0
-    if seg_dist(x, y, 0.42, 1.25, 0.66, 0.2) < 0.022:
+    # the slim arms (3 px + the sleeve layer: 0.11 b half-width, shoulders +-0.344); the left arm (+x) forward with the sword
+    if seg_dist(x, y, -0.344, 1.40, -0.39, 0.78) < 0.11:
+        inside = 1.0
+    if seg_dist(x, y, 0.344, 1.40, 0.42, 0.86) < 0.11:
+        inside = 1.0
+    # the sword: a thin line down-forward from the left hand
+    if seg_dist(x, y, 0.42, 0.86, 0.63, 0.10) < 0.022:
         inside = max(inside, 0.9)
     if inside <= 0:
         return CLEAR
@@ -554,18 +552,18 @@ def paint_afterimage(a, b):
 
 
 def paint_inside(x, y):
-    """the silhouette mask at (x, y) in blocks (for the rim test of paint_afterimage)"""
-    if abs(y - 2.47) < 0.05 and abs(x) < 0.62:
+    """the silhouette mask at (x, y) in blocks (for the rim test of paint_afterimage; S2d: the player-size figure)"""
+    if abs(y - 2.00) < 0.035 and abs(x) < 0.66:
         return 1.0
-    if 2.47 <= y <= 2.74 and abs(x) < 0.17 + 0.03 * (2.74 - y) * 4:
+    if 2.00 <= y <= 2.31 and abs(x) < 0.25:
         return 1.0
-    if math.hypot(x / 0.16, (y - 2.28) / 0.2) < 1.0:
+    if 1.49 <= y <= 2.02 and abs(x) < 0.28:
         return 1.0
-    if 0.0 <= y <= 2.1:
-        hw = 0.25 + 0.04 * (2.1 - y) if y > 1.25 else 0.29 + 0.17 * (1.25 - y) / 1.25
-        if abs(x) < hw:
-            return 1.0
-    if seg_dist(x, y, 0.28, 1.95, 0.42, 1.25) < 0.075 or seg_dist(x, y, -0.28, 1.95, -0.4, 1.3) < 0.075:
+    if 0.74 <= y <= 1.50 and abs(x) < 0.265:
+        return 1.0
+    if 0.0 <= y <= 0.75 and 0.01 < abs(x) < 0.265:
+        return 1.0
+    if seg_dist(x, y, -0.344, 1.40, -0.39, 0.78) < 0.11 or seg_dist(x, y, 0.344, 1.40, 0.42, 0.86) < 0.11:
         return 1.0
     return 0.0
 
