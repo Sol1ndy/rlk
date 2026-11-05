@@ -9,3 +9,4 @@ execute if score #mbId mb matches 11 run return run function rlk:boss/apep/hz_vi
 execute if score #mbId mb matches 20 run return run function rlk:boss/tachy/hz_vis
 execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/hz_vis
 execute if score #mbId mb matches 12 run return run function rlk:boss/arlecchino/hz_vis
+execute if score #mbId mb matches 21 run return run function rlk:boss/scarlet/hz_vis

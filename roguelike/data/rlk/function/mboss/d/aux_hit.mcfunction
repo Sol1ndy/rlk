@@ -9,3 +9,4 @@ execute if score #mbId mb matches 11 run return run function rlk:boss/apep/aux_h
 execute if score #mbId mb matches 20 run return run function rlk:boss/tachy/aux_hit
 execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/aux_hit
 execute if score #mbId mb matches 12 run return run function rlk:boss/arlecchino/aux_hit
+execute if score #mbId mb matches 21 run return run function rlk:boss/scarlet/aux_hit

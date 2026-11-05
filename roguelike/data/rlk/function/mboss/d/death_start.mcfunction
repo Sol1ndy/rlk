@@ -9,3 +9,4 @@ execute if score #mbId mb matches 11 run return run function rlk:boss/apep/death
 execute if score #mbId mb matches 20 run return run function rlk:boss/tachy/death_start
 execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/death_start
 execute if score #mbId mb matches 12 run return run function rlk:boss/arlecchino/death_start
+execute if score #mbId mb matches 21 run return run function rlk:boss/scarlet/death_start

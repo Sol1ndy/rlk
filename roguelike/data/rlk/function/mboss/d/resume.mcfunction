@@ -9,3 +9,4 @@ execute if score #mbId mb matches 11 run return run function rlk:boss/apep/resum
 execute if score #mbId mb matches 20 run return run function rlk:boss/tachy/resume
 execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/resume
 execute if score #mbId mb matches 12 run return run function rlk:boss/arlecchino/resume
+execute if score #mbId mb matches 21 run return run function rlk:boss/scarlet/resume

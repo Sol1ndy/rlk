@@ -15,5 +15,6 @@ data modify storage rlk:mboss spg set value ""
 data modify storage rlk:mboss spg set from entity @e[tag=rlk_spz,limit=1] data.rift.id
 execute if data storage rlk:mboss {spg:"tachy"} run return run function rlk:mboss/sp/g/tachy
 execute if data storage rlk:mboss {spg:"spproto"} run return run function rlk:mboss/sp/g/spproto
+execute if data storage rlk:mboss {spg:"scarlet"} run return run function rlk:mboss/sp/g/scarlet
 tag @e[tag=rlk_spz] remove rlk_spz
 return 0

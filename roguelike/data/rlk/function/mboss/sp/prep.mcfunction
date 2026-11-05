@@ -5,3 +5,4 @@ $data modify storage rlk:mboss sprep set value "$(id)"
 $data modify storage rlk:mboss spg set value "$(id)"
 execute if data storage rlk:mboss {spg:"tachy"} run return run function rlk:mboss/sp/pp/tachy
 execute if data storage rlk:mboss {spg:"spproto"} run return run function rlk:mboss/sp/pp/spproto
+execute if data storage rlk:mboss {spg:"scarlet"} run return run function rlk:mboss/sp/pp/scarlet

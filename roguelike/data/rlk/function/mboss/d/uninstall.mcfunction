@@ -9,3 +9,4 @@ function rlk:boss/apep/uninstall
 function rlk:boss/tachy/uninstall
 function rlk:mboss/spproto/uninstall
 function rlk:boss/arlecchino/uninstall
+function rlk:boss/scarlet/uninstall

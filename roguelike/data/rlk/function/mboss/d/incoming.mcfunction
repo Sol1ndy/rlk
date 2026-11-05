@@ -9,3 +9,4 @@ execute if score #mbId mb matches 11 run return run function rlk:mboss/cb/inc/ap
 execute if score #mbId mb matches 20 run return run function rlk:mboss/cb/inc/tachy
 execute if score #mbId mb matches 97 run return run function rlk:mboss/cb/inc/spproto
 execute if score #mbId mb matches 12 run return run function rlk:mboss/cb/inc/arlecchino
+execute if score #mbId mb matches 21 run return run function rlk:mboss/cb/inc/scarlet

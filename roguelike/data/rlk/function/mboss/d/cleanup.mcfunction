@@ -9,3 +9,4 @@ execute if score #mbId mb matches 11 run return run function rlk:boss/apep/clean
 execute if score #mbId mb matches 20 run return run function rlk:boss/tachy/cleanup
 execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/cleanup
 execute if score #mbId mb matches 12 run return run function rlk:boss/arlecchino/cleanup
+execute if score #mbId mb matches 21 run return run function rlk:boss/scarlet/cleanup

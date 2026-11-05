@@ -13,6 +13,7 @@ scoreboard players set @a[tag=player] vBig 72
 scoreboard players set @a[tag=player] ttlT 72
 execute if data storage rlk:mboss cur{lvup:1} as @a[tag=player,limit=1] run function rlk:mboss/sp/lvup
 # hr FN-b: per-special reward hooks (registry rwHook)
+execute if data storage rlk:mboss cur{id:"scarlet"} as @a[tag=player,limit=1] run function rlk:boss/scarlet/reward
 execute store result score #spPk mb run data get storage rlk:mboss cur.picks
 scoreboard players operation #spZ mb = @s zid
 tag @e[tag=rlk_sp_rk] remove rlk_sp_rk

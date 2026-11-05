@@ -9,3 +9,4 @@ execute if score #mbId mb matches 11 run return run function rlk:boss/apep/pj_en
 execute if score #mbId mb matches 20 run return run function rlk:boss/tachy/pj_end
 execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/pj_end
 execute if score #mbId mb matches 12 run return run function rlk:boss/arlecchino/pj_end
+execute if score #mbId mb matches 21 run return run function rlk:boss/scarlet/pj_end
