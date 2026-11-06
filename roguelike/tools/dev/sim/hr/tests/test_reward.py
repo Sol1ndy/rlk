@@ -26,6 +26,7 @@ tagged rlk_daura at the executor).
           hudHold = its `times` total 54, the HUD draws nothing and no other actionbar comes E57-E110, the HUD after)
   scope   F3 (HR-11): the buff's numbers (title subtitle / actionbar / rift chat) follow load's constants; the rift chat's
           scope words follow api.EVENT['buff_scope'] (dry build 'forever': 「영구히」 with 8 / 4 / 4)
+  F-I: the coda's blank actionbar at its start (F2 round 1, seq.HUD_BLANK) is not counted among the buff's actionbars
   F3 (HR-05) in flow: at the reward hook (after cleanup) objective hr holds only the event scores (their values kept) —
           the other owners' leftovers (#sq_* #g_* #r2_* #a9_*) are gone — and storage rlk:hr has no core / seq
   real    (I1, requests s3-4 / sr-4: SR's files are merged) the event branches against SR's REAL files instead of the
@@ -647,7 +648,9 @@ def sec_words():
         tt = titles_of(s, t_h)
         sub = titles_of(s, t_h, 'subtitle')
         lines = [a.get('id') for t, c, a in s.kitl if c == 'hud/line' and t >= t_h]
-        ab = titles_of(s, t_h, 'actionbar')
+        # F-I: the coda's own blank at its start (F2 round 1, `seq.HUD_BLANK`: the HUD-off sequences clear the last actionbar
+        # once; ev_dry checks it) is not one of the buff's texts
+        ab = [x for x in titles_of(s, t_h, 'actionbar') if x != '']
         rr = [(k, r) for t, k, r in s.rruns if t >= t_h]
         if branch == 'item':
             check('G1 item: the title = api.EV_TEXT item_title verbatim (dark_red, the light shadow), the subtitle = item_sub',
@@ -724,7 +727,7 @@ def buff_texts(name, seed, consts):
     H.until_sc(s, lambda s: hr(s, '#sqn') == 8, 20, each=H.heal)
     t_h = s.t
     finish(s)
-    return titles_of(s, t_h, 'subtitle'), titles_of(s, t_h, 'actionbar'), tells_of(s, t_h)
+    return titles_of(s, t_h, 'subtitle'), [x for x in titles_of(s, t_h, 'actionbar') if x != ''], tells_of(s, t_h)   # F-I: no HUD_BLANK
 
 
 def sec_scope():
