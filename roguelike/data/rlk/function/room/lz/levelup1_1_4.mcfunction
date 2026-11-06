@@ -61,14 +61,11 @@ fill -2 201 3 -1 201 5 minecraft:podzol
 fill 7 201 3 8 201 5 minecraft:podzol
 fill -14 201 4 -13 201 5 minecraft:podzol
 fill -5 201 4 -4 201 5 minecraft:podzol
-fill 17 201 4 18 201 5 minecraft:podzol
 fill -12 201 5 -7 201 5 minecraft:podzol
 fill 0 201 5 4 201 5 minecraft:podzol
 fill 6 201 5 6 201 5 minecraft:podzol
-fill 16 201 5 16 201 14 minecraft:podzol
 fill -6 201 6 -5 201 8 minecraft:podzol
 fill 5 201 6 5 201 10 minecraft:podzol
-fill 15 201 6 15 201 13 minecraft:podzol
 fill -16 201 8 -15 201 9 minecraft:podzol
 fill -18 201 9 -17 201 9 minecraft:podzol
 fill -6 201 9 -6 201 9 minecraft:podzol
@@ -76,7 +73,6 @@ fill -19 201 10 -18 201 10 minecraft:podzol
 fill -15 201 10 -15 201 13 minecraft:podzol
 fill -19 201 11 -19 201 12 minecraft:podzol
 fill -14 201 14 -8 201 14 minecraft:podzol
-fill 17 201 14 18 201 14 minecraft:podzol
 fill -8 201 15 -8 201 16 minecraft:podzol
 fill -19 201 16 -19 201 18 minecraft:podzol
 fill -9 201 16 -9 201 18 minecraft:podzol
@@ -100,8 +96,6 @@ fill -6 201 4 -6 201 5 minecraft:dirt
 fill -6 202 4 -6 202 5 minecraft:podzol
 fill 5 201 5 5 201 5 minecraft:dirt
 fill 5 202 5 5 202 5 minecraft:podzol
-fill 17 201 6 18 201 13 minecraft:dirt
-fill 17 202 6 18 202 13 minecraft:podzol
 fill -17 201 10 -16 201 10 minecraft:dirt
 fill -17 202 10 -16 202 10 minecraft:podzol
 fill -18 201 11 -18 201 17 minecraft:dirt

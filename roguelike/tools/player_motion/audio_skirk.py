@@ -108,4 +108,17 @@ def timeline(name: str, clip: dict) -> list[dict]:
         add(final_hit + 3, "block.amethyst_block.resonate", 0.105, 0.63,
             "rift-crystal-tail")
 
+    elif name == "sheathe":
+        # Idle put-away: every layer sits far below the attacks (air and soft
+        # crystal only, no shattering). The dissolve itself stays nearly
+        # silent; the shimmer returns when the sword re-forms on her back.
+        add(6, "entity.breeze.slide", 0.05, 1.6, "lift-air")
+        add(11, "item.armor.equip_diamond", 0.16, 1.7, "point-down-tap")
+        add(24, "entity.player.attack.sweep", 0.16, 1.5, "wheel-whoosh")
+        add(30, "entity.breeze.slide", 0.12, 1.4, "raise-flick")
+        add(38, "block.amethyst_block.resonate", 0.07, 1.4, "float-shimmer")
+        add(40, "entity.breeze.slide", 0.06, 1.9, "float-turn")
+        add(43, "entity.breeze.slide", 0.04, 2.0, "dissolve-breath")
+        add(48, "block.enchantment_table.use", 0.12, 1.6, "back-reform-shimmer")
+
     return sorted(out, key=lambda entry: entry["tick"])

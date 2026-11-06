@@ -1,5 +1,10 @@
 execute if score @s rdCam matches 1 run return run function rlk:boss/raiden/camera/hold
+# 서버 시작·/reload 뒤 첫 틱: 지난 접속에서 남은 아바타·받침을 정리하고 새로 만든다(개발자 모드를 켰다 끈 것과 같은 효과)
+execute if score #vFresh view matches 1 run function rlk:view/fresh
 # 시점 시스템 매 틱 (@s = 플레이어). player/tick 보다 먼저 실행된다
+# 큰 제목(vBig = 제목 줄을 쓰는 남은 틱)은 모든 시점(F5 · 어깨 · 1인칭 · 지도 · 선택 공간 · 사망)에서 틱마다 준다. 읽는 곳: F5 조준점
+# (ride_tick · sel_xhair: 이 줄 뒤에 읽음), 화무십일홍의 화면 가장자리 어둠(items/proc/hw_slash_q), 중간보스 덮개의 멈춤 정리(fieldgen · butterfly pause)
+execute if score @s vBig matches 1.. run scoreboard players remove @s vBig 1
 # 지도 클릭 잠금/길게 누름 판정
 execute if score @s vMapH matches 1.. run scoreboard players remove @s vMapH 1
 execute if score @s vMapL matches 1.. run scoreboard players remove @s vMapL 1

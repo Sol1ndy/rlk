@@ -1,0 +1,11 @@
+# GENERATED dispatcher: the running pattern's tick (#bfPT -lead+1 ..), by #bfPat.
+execute if score #bfPat mb matches 1 run return run function rlk:mboss/butterfly/p/kick/tick
+execute if score #bfPat mb matches 2 run return run function rlk:mboss/butterfly/p/jump/tick
+execute if score #bfPat mb matches 3 run return run function rlk:mboss/butterfly/p/dash/tick
+execute if score #bfPat mb matches 4 run return run function rlk:mboss/butterfly/p/vacuum/tick
+execute if score #bfPat mb matches 11 run return run function rlk:mboss/butterfly/p/strike/tick
+execute if score #bfPat mb matches 12 run return run function rlk:mboss/butterfly/p/barrage/tick
+execute if score #bfPat mb matches 13 run return run function rlk:mboss/butterfly/p/sweep/tick
+execute if score #bfPat mb matches 14 run return run function rlk:mboss/butterfly/p/coco/tick
+execute if score #bfPat mb matches 15 run return run function rlk:mboss/butterfly/p/release/tick
+execute if score #bfPat mb matches 20 run return run function rlk:mboss/butterfly/p/transform/tick

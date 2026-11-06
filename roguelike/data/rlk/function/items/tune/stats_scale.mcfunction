@@ -1,0 +1,21 @@
+# 표시용 능력치 배율: io.src.stats 의 값마다 × #fA ÷ 1000 (반올림). io.src 는 registry 의 사본이라 원본은 그대로 (items/build_display)
+execute if data storage rlk:io src.stats.atkPct run function rlk:items/tune/stat_one {k:"atkPct"}
+execute if data storage rlk:io src.stats.atkFlat run function rlk:items/tune/stat_one {k:"atkFlat"}
+execute if data storage rlk:io src.stats.hpPct run function rlk:items/tune/stat_one {k:"hpPct"}
+execute if data storage rlk:io src.stats.hpFlat run function rlk:items/tune/stat_one {k:"hpFlat"}
+execute if data storage rlk:io src.stats.defPct run function rlk:items/tune/stat_one {k:"defPct"}
+execute if data storage rlk:io src.stats.defFlat run function rlk:items/tune/stat_one {k:"defFlat"}
+execute if data storage rlk:io src.stats.elemMastery run function rlk:items/tune/stat_one {k:"elemMastery"}
+execute if data storage rlk:io src.stats.critChance run function rlk:items/tune/stat_one {k:"critChance"}
+execute if data storage rlk:io src.stats.critDamage run function rlk:items/tune/stat_one {k:"critDamage"}
+execute if data storage rlk:io src.stats.moveSpeed run function rlk:items/tune/stat_one {k:"moveSpeed"}
+execute if data storage rlk:io src.stats.atkSpeed run function rlk:items/tune/stat_one {k:"atkSpeed"}
+execute if data storage rlk:io src.stats.energyRecharge run function rlk:items/tune/stat_one {k:"energyRecharge"}
+execute if data storage rlk:io src.stats.physBonus run function rlk:items/tune/stat_one {k:"physBonus"}
+execute if data storage rlk:io src.stats.pyroBonus run function rlk:items/tune/stat_one {k:"pyroBonus"}
+execute if data storage rlk:io src.stats.hydroBonus run function rlk:items/tune/stat_one {k:"hydroBonus"}
+execute if data storage rlk:io src.stats.electroBonus run function rlk:items/tune/stat_one {k:"electroBonus"}
+execute if data storage rlk:io src.stats.cryoBonus run function rlk:items/tune/stat_one {k:"cryoBonus"}
+execute if data storage rlk:io src.stats.geoBonus run function rlk:items/tune/stat_one {k:"geoBonus"}
+execute if data storage rlk:io src.stats.anemoBonus run function rlk:items/tune/stat_one {k:"anemoBonus"}
+execute if data storage rlk:io src.stats.dendroBonus run function rlk:items/tune/stat_one {k:"dendroBonus"}

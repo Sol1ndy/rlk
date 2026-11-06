@@ -2,6 +2,7 @@
 scoreboard players operation @s buT = #burstWind tmp
 execute if score #charN tmp matches 5 run scoreboard players set @s buT 40
 execute if score #charN tmp matches 3 run scoreboard players set @s buT 28
+execute if score #charN tmp matches 6 run scoreboard players set @s buT 34
 scoreboard players operation @s dashInvT = @s buT
 scoreboard players operation @s dashInvT += #burstInv tmp
 scoreboard players set @s dashMoveT 0
@@ -17,9 +18,10 @@ attribute @s minecraft:knockback_resistance modifier add rlk:burst_cast 1 add_va
 execute as @e[tag=rlk_av,limit=1] run attribute @s minecraft:knockback_resistance modifier add rlk:burst_cast 1 add_value
 function rlk:view/stop_h
 execute as @e[tag=rlk_av,limit=1] run swing @s mainhand
-execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 run execute unless score #k217 snd matches 1 run function rlk:snd/f240
-execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 run execute unless score #k218 snd matches 1 run function rlk:snd/f241
-execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 run particle minecraft:end_rod ~ ~1 ~ 0.4 0.7 0.4 0.08 20
+execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 unless score #charN tmp matches 6 run execute unless score #k217 snd matches 1 run function rlk:snd/f240
+execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 unless score #charN tmp matches 6 run execute unless score #k218 snd matches 1 run function rlk:snd/f241
+execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 unless score #charN tmp matches 6 run particle minecraft:end_rod ~ ~1 ~ 0.4 0.7 0.4 0.08 20
 
 execute if score #charN tmp matches 5 run function rlk:char/motion/start {char:"arle",clip:"burst"}
 execute if score #charN tmp matches 3 run function rlk:char/motion/start {char:"skirk",clip:"burst_metsu"}
+execute if score #charN tmp matches 6 run function rlk:char/motion/start {char:"navia",clip:"burst"}

@@ -6,6 +6,8 @@ execute if score @s pkRedraw matches 1.. run return 0
 execute if score @s pkHK matches 0 run return 0
 execute if score @s pkMode matches 4 run return run function rlk:invd/click
 execute if score @s pkMode matches 6 run return run function rlk:codex/click
+execute if score @s pkMode matches 7 run return run function rlk:root/click
+execute if score @s pkMode matches 8 run return run function rlk:ench/click
 execute if score @s pkHK matches 1 run return run function rlk:lvup/act/choose
 execute if score @s pkHK matches 3 run return run function rlk:lvup/act/reroll
 execute if score @s pkHK matches 4 run return run function rlk:lvup/act/skip

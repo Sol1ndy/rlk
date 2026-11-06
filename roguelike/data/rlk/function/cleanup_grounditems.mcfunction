@@ -5,6 +5,7 @@ kill @e[type=minecraft:item,nbt={Item:{components:{"minecraft:custom_data":{rlk_
 kill @e[type=minecraft:item,nbt={Item:{components:{"minecraft:custom_data":{rlk_eng:1b}}}}]
 kill @e[type=minecraft:item,nbt={Item:{components:{"minecraft:custom_data":{rlk_engi:1b}}}}]
 kill @e[type=minecraft:item,nbt={Item:{components:{"minecraft:custom_data":{rlk_invd:1b}}}}]
+kill @e[type=minecraft:item,nbt={Item:{components:{"minecraft:custom_data":{rlk_lock:1b}}}}]
 kill @e[type=minecraft:item,nbt={Item:{components:{"minecraft:custom_data":{rlk:{}}}}}]
 kill @e[type=minecraft:item,nbt={Item:{components:{"minecraft:custom_data":{rlk_map:1b}}}}]
 kill @e[type=minecraft:item,nbt={Item:{components:{"minecraft:custom_data":{rlk_char:1b}}}}]

@@ -119,10 +119,6 @@ fill 37 201 30 38 201 30 minecraft:tuff
 fill 28 201 31 32 201 31 minecraft:tuff
 fill 34 201 31 37 201 31 minecraft:tuff
 fill 43 201 31 45 201 31 minecraft:tuff
-fill 28 201 34 58 201 35 minecraft:tuff
-fill 26 201 35 27 201 35 minecraft:tuff
-fill 26 201 36 26 201 38 minecraft:tuff
-fill 25 201 37 25 201 38 minecraft:tuff
 fill 21 201 1 25 201 2 minecraft:cobbled_deepslate
 fill 21 202 1 25 202 2 minecraft:tuff
 fill 49 201 8 51 201 9 minecraft:cobbled_deepslate
@@ -191,10 +187,6 @@ fill 28 201 30 32 201 30 minecraft:cobbled_deepslate
 fill 28 202 30 32 202 30 minecraft:tuff
 fill 35 201 30 36 201 30 minecraft:cobbled_deepslate
 fill 35 202 30 36 202 30 minecraft:tuff
-fill 27 201 36 58 201 36 minecraft:cobbled_deepslate
-fill 27 202 36 58 202 36 minecraft:tuff
-fill 27 201 37 27 201 38 minecraft:cobbled_deepslate
-fill 27 202 37 27 202 38 minecraft:tuff
 fill 43 201 10 43 201 10 minecraft:deepslate
 fill 43 202 10 43 202 10 minecraft:tuff
 fill 37 201 14 37 201 14 minecraft:deepslate
@@ -215,8 +207,6 @@ fill 26 201 17 26 202 17 minecraft:cobbled_deepslate
 fill 26 203 17 26 203 17 minecraft:tuff
 fill 24 201 18 25 202 18 minecraft:cobbled_deepslate
 fill 24 203 18 25 203 18 minecraft:tuff
-fill 28 201 37 58 202 38 minecraft:cobbled_deepslate
-fill 28 203 37 58 203 38 minecraft:tuff
 fill 32 201 10 32 202 13 minecraft:deepslate
 fill 32 203 10 32 203 13 minecraft:tuff
 fill 36 201 12 38 202 13 minecraft:deepslate
@@ -276,7 +266,7 @@ execute positioned 54 201 4 run function rlk:room/prop/m_torch
 execute positioned 41 201 18 run function rlk:room/prop/m_pebble
 execute positioned 29 202 19 run function rlk:room/prop/m_rail_x
 execute positioned 37 201 6 run function rlk:room/prop/m_rail_z
-execute positioned 45 204 37 run function rlk:room/prop/m_rail_x
+execute positioned 45 201 37 run function rlk:room/prop/m_rail_x
 execute positioned 51 201 33 run function rlk:room/prop/m_rail_z
 execute positioned 47 201 18 run function rlk:room/prop/m_rail_x
 setblock 38 206 38 minecraft:wall_torch[facing=north]

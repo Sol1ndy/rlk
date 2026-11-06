@@ -1,0 +1,12 @@
+# GENERATED dispatcher: rlk:<fn root>/tick of the running boss (#mbId mb = registry n).
+execute if score #mbId mb matches 1 run return run function rlk:mboss/guardian/tick
+execute if score #mbId mb matches 2 run return run function rlk:mboss/butterfly/tick
+execute if score #mbId mb matches 3 run return run function rlk:mboss/fieldgen/tick
+execute if score #mbId mb matches 99 run return run function rlk:mboss/proto/tick
+execute if score #mbId mb matches 98 run return run function rlk:mboss/cproto/tick
+execute if score #mbId mb matches 10 run return run function rlk:boss/azhdaha/tick
+execute if score #mbId mb matches 11 run return run function rlk:boss/apep/tick
+execute if score #mbId mb matches 20 run return run function rlk:boss/tachy/tick
+execute if score #mbId mb matches 97 run return run function rlk:mboss/spproto/tick
+execute if score #mbId mb matches 12 run return run function rlk:boss/arlecchino/tick
+execute if score #mbId mb matches 21 run return run function rlk:boss/scarlet/tick

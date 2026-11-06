@@ -1,0 +1,16 @@
+# S5 cure fx, t 9 (at the player's body).
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~0 ~1 ~2 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~0.87 ~1 ~1.8 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~1.56 ~1 ~1.25 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~1.95 ~1 ~0.45 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~1.95 ~1 ~-0.45 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~1.56 ~1 ~-1.25 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~0.87 ~1 ~-1.8 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~0 ~1 ~-2 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~-0.87 ~1 ~-1.8 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~-1.56 ~1 ~-1.25 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~-1.95 ~1 ~-0.45 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~-1.95 ~1 ~0.45 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~-1.56 ~1 ~1.25 0 0 0 0 1 force @a[tag=player]
+particle minecraft:dust{color:[0.878f,0.867f,0.612f],scale:0.9} ~-0.87 ~1 ~1.8 0 0 0 0 1 force @a[tag=player]
+playsound minecraft:block.amethyst_block.chime hostile @a[tag=player] ~ ~ ~ 0.8 1.7 0.27

@@ -1,0 +1,40 @@
+== 타키 baseline (hrfair, same agents / seeds as 홍련)
+tachy p1 melee:dash:sword                      n 3 %max/min   24.3 w40  16.8% (no fail  16.8) deaths 0.3+0.0 hits/min 4.3 pl 1.90 hit/s 32.4 dps
+    damage share by pattern {'9': 100.0}  (wall 101 s, cmd/t 504)
+tachy p1 melee:walk:sword                      n 3 %max/min  137.2 w40  33.2% (no fail  33.2) deaths 3.3+0.0 hits/min 22.0 pl 1.88 hit/s 32.0 dps
+    damage share by pattern {'3': 31.3, '5': 29.7, '9': 26.0, '50': 11.6, '8': 1.4}  (wall 101 s, cmd/t 532)
+tachy p1 ranged:walk:bow                       n 3 %max/min   62.9 w40  24.6% (no fail  24.6) deaths 1.3+0.0 hits/min 10.6 pl 2.32 hit/s 37.5 dps
+    damage share by pattern {'5': 52.1, '3': 32.1, '50': 9.9, '9': 5.9}  (wall 105 s, cmd/t 536)
+tachy p1 stand:none:sword                      n 3 %max/min  195.9 w40  24.6% (no fail  24.6) deaths 5.0+0.0 hits/min 34.0 pl 0.00 hit/s 0.0 dps
+    damage share by pattern {'3': 41.0, '5': 35.2, '9': 14.4, '50': 7.4, '1': 2.0}  (wall 100 s, cmd/t 537)
+tachy p2 melee:dash:sword                      n 3 %max/min    0.0 w40   0.0% (no fail   0.0) deaths 0.0+0.0 hits/min 0.0 pl 1.87 hit/s 31.8 dps
+    damage share by pattern {}  (wall 99 s, cmd/t 486)
+tachy p2 melee:walk:sword                      n 3 %max/min  140.8 w40  24.6% (no fail  24.6) deaths 3.7+0.0 hits/min 20.3 pl 1.88 hit/s 32.0 dps
+    damage share by pattern {'0': 21.7, '3': 18.1, '10': 18.0, '5': 13.3, '50': 9.5, '2': 9.0, '6': 6.4, '11': 3.3}  (wall 103 s, cmd/t 527)
+tachy p2 ranged:walk:bow                       n 3 %max/min   75.6 w40  24.6% (no fail  24.6) deaths 1.7+0.0 hits/min 12.2 pl 2.28 hit/s 36.6 dps
+    damage share by pattern {'10': 29.6, '6': 25.2, '50': 15.9, '2': 11.1, '9': 7.4, '3': 3.6, '5': 3.2, '0': 3.1}  (wall 106 s, cmd/t 535)
+tachy p2 stand:none:sword                      n 3 %max/min  204.1 w40  24.6% (no fail  24.6) deaths 5.3+0.0 hits/min 31.7 pl 0.00 hit/s 0.0 dps
+    damage share by pattern {'3': 26.1, '10': 14.9, '0': 14.3, '6': 14.1, '2': 10.8, '50': 9.9, '5': 9.7, '11': 0.3}  (wall 93 s, cmd/t 523)
+tachy p3 melee:dash:sword                      n 3 %max/min    0.0 w40   0.0% (no fail   0.0) deaths 0.0+0.0 hits/min 0.0 pl 2.10 hit/s 35.7 dps
+    damage share by pattern {}  (wall 104 s, cmd/t 500)
+tachy p3 melee:walk:sword                      n 3 %max/min  109.0 w40  30.2% (no fail  30.2) deaths 2.7+0.0 hits/min 15.9 pl 2.00 hit/s 33.9 dps
+    damage share by pattern {'4': 24.5, '3': 16.6, '7': 15.6, '0': 15.3, '8': 9.9, '2': 8.4, '6': 4.7, '50': 2.6}  (wall 110 s, cmd/t 539)
+tachy p3 ranged:walk:bow                       n 3 %max/min   53.0 w40  24.6% (no fail  24.6) deaths 0.7+0.0 hits/min 8.1 pl 2.32 hit/s 38.4 dps
+    per phase p3 53 x 0   ticks/run p3 3106 x 494
+    damage share by pattern {'10': 38.3, '3': 26.7, '0': 11.1, '8': 10.2, '7': 8.1, '4': 2.2, '1': 1.4, '2': 1.4}  (wall 94 s, cmd/t 462)
+tachy p3 stand:none:sword                      n 3 %max/min  222.8 w40  32.1% (no fail  32.1) deaths 6.0+0.0 hits/min 37.0 pl 0.00 hit/s 0.0 dps
+    damage share by pattern {'4': 23.1, '7': 23.0, '0': 12.3, '3': 11.1, '6': 10.8, '8': 10.7, '2': 8.8}  (wall 105 s, cmd/t 537)
+tachy whole melee:dash:sword                   n 3 %max/min   22.5 w40  25.0% (no fail  25.0) deaths 0.0+0.0 hits/min 2.0 pl 1.84 hit/s 27.0 dps kill 208 s from start, 208 s incl. cutscenes, fighting 208 s
+    per phase m1 74 m2 87 p1 32 p2 0 p3 0 t1 0 t2 0   ticks/run m1 405 m2 345 p1 1066 p2 1194 p3 966 t1 80 t2 110
+    damage share by pattern {'53': 64.1, '9': 35.9}  (wall 114 s, cmd/t 491)
+tachy whole melee:walk:sword                   n 3 %max/min  124.0 w40  33.2% (no fail  33.2) deaths 4.0+0.0 hits/min 17.7 pl 1.81 hit/s 26.2 dps kill 214 s from start, 214 s incl. cutscenes, fighting 214 s
+    per phase m1 121 m2 142 p1 132 p2 150 p3 104 t1 0 t2 0   ticks/run m1 405 m2 345 p1 1167 p2 1143 p3 1039 t1 80 t2 110
+    damage share by pattern {'3': 15.9, '53': 12.3, '5': 11.4, '0': 11.2, '9': 9.9, '2': 7.7, '51': 6.1, '50': 5.6}  (wall 124 s, cmd/t 524)
+tachy whole ranged:walk:bow                    n 3 %max/min   68.2 w40  25.0% (no fail  25.0) deaths 0.7+0.0 hits/min 11.9 pl 2.05 hit/s 27.2 dps kill 124 s from start, 124 s incl. cutscenes, fighting 124 s
+    per phase m1 32 m2 90 p1 96 p2 53 p3 84 t1 0 t2 0   ticks/run m1 434 m2 373 p1 731 p2 349 p3 407 t1 80 t2 110
+    damage share by pattern {'5': 25.1, '51': 16.0, '53': 11.8, '3': 9.3, '9': 7.9, '10': 6.4, '6': 5.8, '2': 5.6}  (wall 73 s, cmd/t 512)
+
+타키 reference values (same tool): {"whole_melee": 124.0, "kill_s": 214.4, "kill_range": [207.15, 218.45], "w40_whole_melee": 33.2, "p1_melee": 137.2, "p1_stand": 195.9, "p1_ranged": 62.9, "p1_dash": 24.3, "p2_melee": 140.8, "p2_stand": 204.1, "p2_ranged": 75.6, "p2_dash": 0.0, "p3_melee": 109.0, "p3_stand": 222.8, "p3_ranged": 53.0, "p3_dash": 0.0, "stand_max": 222.8, "stand_mean": 207.6, "whole_ranged": 68.2, "whole_dash": 22.5, "w40_melee_max": 33.2}
+README (tkfair, Lv5 vs L6): whole 134.0 %/min, standing 216.0, worst 40 t 35.0 %, kill 202-216 s, the guardian standing 144.0
+Guardian (azfair, Lv15 vs L15): melee:walk:sword 123.1 %/min, stand:none:sword 164.0 %/min
+wrote base_tachy.json

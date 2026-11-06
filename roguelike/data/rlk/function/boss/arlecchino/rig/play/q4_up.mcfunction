@@ -1,0 +1,3 @@
+# Play clip q4_up (20 t) from its tick 0 at the next rig/tick (event e lands on the e-th rig/tick after this call). @s = rig anchor.
+scoreboard players set @s knRigC 34
+scoreboard players set @s knRigT -1

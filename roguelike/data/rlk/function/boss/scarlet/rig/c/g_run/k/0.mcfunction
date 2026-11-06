@@ -1,0 +1,38 @@
+execute if score @s hrRigS matches 1 run scoreboard players set @s hrRigS 0
+data merge entity 524c4b4d-4852-4400-8000-000000000000 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0f,0.73348f,0f],left_rotation:[0.12187f,0f,0f,0.99255f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000001 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0f,0.91541f,0.04536f],left_rotation:[0.20779f,-0.03488f,-0.00122f,0.97755f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000002 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.00681f,1.42934f,0.27392f],left_rotation:[0.13909f,-0.03471f,-0.00365f,0.98966f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000003 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.00681f,1.42934f,0.27392f],left_rotation:[0.13909f,-0.03471f,-0.00365f,0.98966f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000004 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,0.76563f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000005 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,0.76563f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000006 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,0.76563f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000007 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,0.76563f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000008 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.34821f,1.32093f,0.19986f],left_rotation:[0.66944f,0.37353f,0.04883f,0.64027f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000009 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.45761f,1.29619f,-0.02357f],left_rotation:[0.43262f,0.33892f,0.16444f,0.8191f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000a {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.33761f,1.30933f,0.24639f],left_rotation:[0.60679f,-0.63118f,-0.34776f,0.3354f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000b {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.47079f,1.30389f,0.03489f],left_rotation:[0.20752f,-0.21664f,-0.6873f,0.66153f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000c {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.125f,0.73348f,0f],left_rotation:[-0.38465f,-0.05685f,-0.01874f,0.92112f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000d {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.15435f,0.46971f,0.26493f],left_rotation:[0.177f,-0.05791f,0.01512f,0.98239f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000e {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.125f,0.73348f,0f],left_rotation:[-0.13386f,0.05551f,0.03433f,0.98885f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000f {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.15603f,0.3728f,0.09785f],left_rotation:[0.41197f,0.06527f,-0.00041f,0.90886f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000010 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,0.76563f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000011 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,0.76563f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000012 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,0.76563f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000013 {start_interpolation:0,interpolation_duration:0,transformation:{translation:[0f,0.76563f,0f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000014 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.26f,0.79661f,0.1188f],left_rotation:[-0.00871f,-0.02947f,0.11392f,0.99301f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000015 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.00804f,1.9119f,0.41225f],left_rotation:[0.13909f,-0.03471f,-0.00365f,0.98966f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000016 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.00804f,1.9119f,0.41225f],left_rotation:[0.07667f,-0.03495f,-0.00201f,0.99644f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000017 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.18911f,1.31451f,-0.16186f],left_rotation:[-0.4126f,-0.39844f,0.56903f,0.58925f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000018 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.18911f,1.31451f,-0.16186f],left_rotation:[-0.4126f,-0.39844f,0.56903f,0.58925f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000019 {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.25f,0.87429f,0.22062f],left_rotation:[-0.74481f,0.11063f,0.23087f,0.61621f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000001a {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.25f,0.87429f,0.22062f],left_rotation:[-0.74481f,0.11063f,0.23087f,0.61621f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000001b {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.4682f,1.00655f,-0.38753f],left_rotation:[0f,0f,0f,1f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000001c {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.03213f,1.32286f,-0.31639f],left_rotation:[0.20752f,-0.21664f,-0.6873f,0.66153f],scale:[0f,0f,0f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:boss/scarlet/rig/m/forearm_l/grip
+function rlk:boss/scarlet/rig/m/forearm_r/open
+function rlk:boss/scarlet/rig/m/face/calm
+scoreboard players set @s hrRigHat 0
+scoreboard players set @s hrRigSw 0
+scoreboard players set @s hrRigSc 1
+scoreboard players set @s hrRigCu 0
+scoreboard players set @s hrRigBo 0

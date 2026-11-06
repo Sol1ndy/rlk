@@ -91,8 +91,6 @@ fill 37 201 2 37 201 2 minecraft:podzol
 fill 25 201 8 25 201 12 minecraft:podzol
 fill 24 201 13 24 201 13 minecraft:podzol
 fill 21 201 14 23 201 14 minecraft:podzol
-fill 27 201 15 38 201 16 minecraft:podzol
-fill 26 201 17 27 201 18 minecraft:podzol
 fill 30 201 -17 32 201 -16 minecraft:dirt
 fill 30 202 -17 32 202 -16 minecraft:podzol
 fill 29 201 -16 29 201 -16 minecraft:dirt
@@ -135,8 +133,6 @@ fill 23 201 12 23 201 13 minecraft:dirt
 fill 23 202 12 23 202 13 minecraft:podzol
 fill 21 201 13 22 201 13 minecraft:dirt
 fill 21 202 13 22 202 13 minecraft:podzol
-fill 28 201 17 38 201 18 minecraft:dirt
-fill 28 202 17 38 202 18 minecraft:podzol
 fill 40 201 -17 40 201 -17 minecraft:mossy_cobblestone
 fill 40 202 -17 40 202 -17 minecraft:podzol
 fill 24 201 1 24 201 1 minecraft:mossy_cobblestone
@@ -232,13 +228,13 @@ execute positioned 25 202 10 run function rlk:room/prop/sf_fern
 execute positioned 51 201 -15 run function rlk:room/prop/sf_moss
 execute positioned 29 201 -13 run function rlk:room/prop/sf_moss
 execute positioned 26 201 -10 run function rlk:room/prop/sf_fern
-execute positioned 32 202 15 run function rlk:room/prop/sf_flower
-execute positioned 35 203 18 run function rlk:room/prop/sf_flower
+execute positioned 32 201 15 run function rlk:room/prop/sf_flower
+execute positioned 35 201 18 run function rlk:room/prop/sf_flower
 execute positioned 34 201 -19 run function rlk:room/prop/sf_fern
 execute positioned 24 202 0 run function rlk:room/prop/sf_fern
 execute positioned 52 201 -13 run function rlk:room/prop/sf_flower
 execute positioned 29 201 14 run function rlk:room/prop/sf_flower
-execute positioned 36 202 15 run function rlk:room/prop/sf_flower
+execute positioned 36 201 15 run function rlk:room/prop/sf_flower
 execute positioned 31 201 11 run function rlk:room/prop/sf_fern
 execute positioned 53 201 -18 run function rlk:room/prop/sf_flower
 execute positioned 35 201 11 run function rlk:room/prop/sf_flower

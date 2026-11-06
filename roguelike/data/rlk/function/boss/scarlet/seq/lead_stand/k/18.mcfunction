@@ -1,0 +1,4 @@
+# lead_stand at #sq 18 (@s = the body).
+scoreboard players set #sq_sig hr 4
+function rlk:boss/scarlet/fx/snd/shield_refill
+execute positioned ~ ~1.1 ~ rotated as @s rotated ~ 0 run function rlk:boss/scarlet/fx/p/shield_refill

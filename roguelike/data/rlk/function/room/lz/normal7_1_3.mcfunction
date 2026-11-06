@@ -24,13 +24,9 @@ fill 9 204 19 11 206 19 minecraft:cobblestone
 fill 0 210 0 19 210 19 minecraft:polished_deepslate
 fill 1 210 1 18 210 18 minecraft:air
 fill 3 201 1 3 201 3 minecraft:podzol
-fill 6 201 1 7 201 2 minecraft:podzol
 fill 1 201 3 2 201 3 minecraft:podzol
-fill 7 201 3 18 201 3 minecraft:podzol
 fill 2 201 1 2 201 2 minecraft:dirt
 fill 2 202 1 2 202 2 minecraft:podzol
-fill 8 201 1 18 201 2 minecraft:dirt
-fill 8 202 1 18 202 2 minecraft:podzol
 fill 1 201 2 1 201 2 minecraft:dirt
 fill 1 202 2 1 202 2 minecraft:podzol
 fill 1 201 1 1 202 1 minecraft:dirt
@@ -43,7 +39,7 @@ fill 17 201 10 17 207 11 minecraft:stone
 fill 17 208 10 17 208 11 minecraft:podzol
 execute positioned 17 201 14 run function rlk:room/prop/p_hay
 execute positioned 9 201 4 run function rlk:room/prop/p_crates
-execute positioned 18 203 1 run function rlk:room/prop/p_wildflower
+execute positioned 18 201 1 run function rlk:room/prop/p_wildflower
 execute positioned 18 201 13 run function rlk:room/prop/p_wildflower
 execute positioned 3 201 4 run function rlk:room/prop/p_dandelion
 execute positioned 10 201 15 run function rlk:room/prop/p_grass

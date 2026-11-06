@@ -1,0 +1,5 @@
+data merge entity 524c4b4d-4852-4400-8000-000000000001 {start_interpolation:0,interpolation_duration:28,transformation:{translation:[0f,0.87465f,0f],left_rotation:[0.07816f,-0.08689f,0.00684f,0.99312f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000008 {start_interpolation:0,interpolation_duration:11,transformation:{translation:[-0.35041f,1.30024f,0.00771f],left_rotation:[0.2127f,0.15615f,-0.14792f,0.95315f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000009 {start_interpolation:0,interpolation_duration:11,transformation:{translation:[-0.43751f,1.0838f,-0.08211f],left_rotation:[-0.09961f,0.19491f,-0.09095f,0.9715f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000b {start_interpolation:0,interpolation_duration:28,transformation:{translation:[0.42219f,1.08443f,0.06431f],left_rotation:[-0.4598f,-0.34887f,-0.12396f,0.80716f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:boss/scarlet/rig/m/forearm_r/open

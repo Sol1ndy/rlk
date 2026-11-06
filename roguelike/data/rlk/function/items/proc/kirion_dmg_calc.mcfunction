@@ -1,7 +1,6 @@
-# @s = 소유 플레이어(위치는 참격 지점). 키리온 참격 데미지(공격력의 60%) + 플래그 정리
+# @s = 소유 플레이어(위치는 참격 지점). 키리온 참격 데미지(공격력의 #kirionCoef%, 강화 단계로 조정) + 플래그 정리
 scoreboard players operation #dmg tmp = @s atk
-scoreboard players set #dc tmp 60
-scoreboard players operation #dmg tmp *= #dc tmp
+scoreboard players operation #dmg tmp *= #kirionCoef tmp
 scoreboard players operation #dmg tmp /= #100 tmp
 scoreboard players set #crit tmp 0
 scoreboard players set #stunHit tmp 0

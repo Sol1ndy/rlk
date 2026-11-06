@@ -28,12 +28,9 @@ fill -13 201 -18 -11 201 -18 minecraft:red_sand
 fill -5 201 -18 -3 201 -18 minecraft:red_sand
 fill -13 201 -17 -12 201 -15 minecraft:red_sand
 fill -4 201 -17 -3 201 -14 minecraft:red_sand
-fill -19 201 -15 -17 201 -15 minecraft:red_sand
 fill -11 201 -15 -6 201 -15 minecraft:red_sand
-fill -17 201 -14 -17 201 -6 minecraft:red_sand
 fill -5 201 -14 -5 201 -12 minecraft:red_sand
 fill -4 201 -13 -4 201 -13 minecraft:red_sand
-fill -19 201 -6 -18 201 -5 minecraft:red_sand
 fill -9 201 -19 -7 201 -16 minecraft:sandstone
 fill -9 202 -19 -7 202 -16 minecraft:red_sand
 fill -10 201 -18 -10 201 -16 minecraft:sandstone
@@ -44,12 +41,10 @@ fill -11 201 -17 -11 201 -16 minecraft:sandstone
 fill -11 202 -17 -11 202 -16 minecraft:red_sand
 fill -5 201 -17 -5 201 -15 minecraft:sandstone
 fill -5 202 -17 -5 202 -15 minecraft:red_sand
-fill -19 201 -14 -18 201 -7 minecraft:sandstone
-fill -19 202 -14 -18 202 -7 minecraft:red_sand
 execute positioned -16 201 -10 run function rlk:room/prop/sd_pots
 execute positioned -2 201 -8 run function rlk:room/prop/sd_dry
 execute positioned -10 201 -8 run function rlk:room/prop/sd_dry
-execute positioned -17 202 -13 run function rlk:room/prop/sd_dry
+execute positioned -17 201 -13 run function rlk:room/prop/sd_dry
 execute positioned -2 201 -16 run function rlk:room/prop/sd_bush
 execute positioned -12 201 -10 run function rlk:room/prop/sd_dry
 execute positioned -2 201 -2 run function rlk:room/prop/sd_bush

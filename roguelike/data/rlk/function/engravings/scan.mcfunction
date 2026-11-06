@@ -28,6 +28,8 @@ execute if score coop engDev matches 1.. run scoreboard players operation coop e
 execute if score spirit engDev matches 1.. run scoreboard players operation spirit engN += spirit engDev
 execute if score pact engDev matches 1.. run scoreboard players operation pact engN += pact engDev
 execute if score fullmoon engDev matches 1.. run scoreboard players operation fullmoon engN += fullmoon engDev
+# 세계수의 기적(나무뿌리 노드): 고른 각인 개수 +1
+execute if data storage rlk:pinv mir run function rlk:engravings/mir_add with storage rlk:pinv
 # 개수 효과: 스탯 (장비 보너스 eq* 에 더함)
 execute if score guard engN matches 2.. run scoreboard players operation @s eqDefPct += #es_guard2 tmp
 execute if score elemental engN matches 2.. run scoreboard players operation @s eqAtkPct += #es_elemental2 tmp

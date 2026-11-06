@@ -1,0 +1,10 @@
+data merge entity 524c4b4d-4852-4400-8000-000000000008 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.34802f,1.33085f,0.0416f],left_rotation:[0.2912f,-0.00589f,0.93187f,-0.21628f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000009 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.44794f,1.55744f,0.07583f],left_rotation:[0.34759f,-0.32407f,0.87373f,-0.10371f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000c {start_interpolation:0,interpolation_duration:2,transformation:{translation:[-0.125f,0.70641f,0f],left_rotation:[-0.29968f,-0.04542f,-0.05401f,0.95143f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000d {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.16533f,0.40755f,0.21627f],left_rotation:[0.30679f,-0.06397f,-0.00405f,0.94962f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000e {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.125f,0.70641f,0f],left_rotation:[-0.33478f,0.04622f,0.04786f,0.93995f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-00000000000f {start_interpolation:0,interpolation_duration:2,transformation:{translation:[0.17034f,0.41719f,0.23434f],left_rotation:[0.2663f,0.06533f,0.01259f,0.96159f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000017 {start_interpolation:0,interpolation_duration:3,transformation:{translation:[0.24212f,0.911f,0.28855f],left_rotation:[-0.77343f,0.22323f,-0.37727f,-0.45786f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4852-4400-8000-000000000018 {start_interpolation:0,interpolation_duration:3,transformation:{translation:[0.24212f,0.911f,0.28855f],left_rotation:[-0.77343f,0.22323f,-0.37727f,-0.45786f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+function rlk:boss/scarlet/rig/m/forearm_r/brim
+scoreboard players set @s hrRigHat 0

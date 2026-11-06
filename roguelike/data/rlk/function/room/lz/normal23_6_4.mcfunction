@@ -86,16 +86,13 @@ fill -19 210 -40 -2 210 -22 minecraft:air
 fill -43 201 -59 -37 201 -59 minecraft:podzol
 fill -34 201 -59 -34 201 -55 minecraft:podzol
 fill -24 201 -59 -24 201 -57 minecraft:podzol
-fill -4 201 -59 -2 201 -58 minecraft:podzol
 fill -51 201 -58 -48 201 -58 minecraft:podzol
 fill -44 201 -58 -43 201 -58 minecraft:podzol
 fill -37 201 -58 -36 201 -58 minecraft:podzol
-fill -5 201 -58 -5 201 -45 minecraft:podzol
 fill -51 201 -57 -51 201 -53 minecraft:podzol
 fill -48 201 -57 -47 201 -57 minecraft:podzol
 fill -45 201 -57 -44 201 -57 minecraft:podzol
 fill -36 201 -57 -35 201 -57 minecraft:podzol
-fill -4 201 -57 -4 201 -57 minecraft:podzol
 fill -47 201 -56 -45 201 -56 minecraft:podzol
 fill -35 201 -56 -35 201 -56 minecraft:podzol
 fill -33 201 -56 -33 201 -55 minecraft:podzol
@@ -106,7 +103,6 @@ fill -21 201 -55 -17 201 -54 minecraft:podzol
 fill -35 201 -54 -35 201 -49 minecraft:podzol
 fill -22 201 -54 -22 201 -52 minecraft:podzol
 fill -16 201 -54 -16 201 -52 minecraft:podzol
-fill -6 201 -54 -6 201 -47 minecraft:podzol
 fill -23 201 -53 -23 201 -51 minecraft:podzol
 fill -21 201 -53 -21 201 -53 minecraft:podzol
 fill -17 201 -53 -17 201 -53 minecraft:podzol
@@ -137,9 +133,7 @@ fill -11 201 -47 -9 201 -47 minecraft:podzol
 fill -58 201 -46 -57 201 -42 minecraft:podzol
 fill -22 201 -46 -22 201 -44 minecraft:podzol
 fill -9 201 -46 -9 201 -45 minecraft:podzol
-fill -4 201 -45 -4 201 -44 minecraft:podzol
 fill -8 201 -44 -8 201 -40 minecraft:podzol
-fill -3 201 -44 -2 201 -43 minecraft:podzol
 fill -59 201 -43 -59 201 -42 minecraft:podzol
 fill -7 201 -42 -7 201 -34 minecraft:podzol
 fill -6 201 -41 -6 201 -35 minecraft:podzol
@@ -164,8 +158,6 @@ fill -43 201 -57 -43 201 -55 minecraft:dirt
 fill -43 202 -57 -43 202 -55 minecraft:podzol
 fill -37 201 -57 -37 201 -57 minecraft:dirt
 fill -37 202 -57 -37 202 -57 minecraft:podzol
-fill -3 201 -57 -2 201 -55 minecraft:dirt
-fill -3 202 -57 -2 202 -55 minecraft:podzol
 fill -48 201 -56 -48 201 -52 minecraft:dirt
 fill -48 202 -56 -48 202 -52 minecraft:podzol
 fill -44 201 -56 -44 201 -50 minecraft:dirt
@@ -176,8 +168,6 @@ fill -38 201 -56 -38 201 -56 minecraft:dirt
 fill -38 202 -56 -38 202 -56 minecraft:podzol
 fill -32 201 -56 -26 201 -56 minecraft:dirt
 fill -32 202 -56 -26 202 -56 minecraft:podzol
-fill -4 201 -56 -4 201 -46 minecraft:dirt
-fill -4 202 -56 -4 202 -46 minecraft:podzol
 fill -47 201 -55 -47 201 -53 minecraft:dirt
 fill -47 202 -55 -47 202 -53 minecraft:podzol
 fill -45 201 -55 -45 201 -51 minecraft:dirt
@@ -214,8 +204,6 @@ fill -41 201 -49 -39 201 -48 minecraft:dirt
 fill -41 202 -49 -39 202 -48 minecraft:podzol
 fill -11 201 -46 -10 201 -45 minecraft:dirt
 fill -11 202 -46 -10 202 -45 minecraft:podzol
-fill -3 201 -46 -2 201 -45 minecraft:dirt
-fill -3 202 -46 -2 202 -45 minecraft:podzol
 fill -11 201 -44 -11 201 -35 minecraft:dirt
 fill -11 202 -44 -11 202 -35 minecraft:podzol
 fill -9 201 -44 -9 201 -35 minecraft:dirt
@@ -242,8 +230,6 @@ fill -42 201 -55 -42 202 -51 minecraft:dirt
 fill -42 203 -55 -42 203 -51 minecraft:podzol
 fill -43 201 -54 -43 202 -52 minecraft:dirt
 fill -43 203 -54 -43 203 -52 minecraft:podzol
-fill -3 201 -54 -2 202 -47 minecraft:dirt
-fill -3 203 -54 -2 203 -47 minecraft:podzol
 fill -38 201 -53 -37 202 -52 minecraft:dirt
 fill -38 203 -53 -37 203 -52 minecraft:podzol
 fill -38 201 -51 -38 202 -51 minecraft:dirt
@@ -306,7 +292,7 @@ execute positioned -16 201 -46 run function rlk:room/prop/i_lantern
 execute positioned -10 201 -54 run function rlk:room/prop/i_rock
 execute positioned -45 201 -47 run function rlk:room/prop/i_lantern
 execute positioned -9 201 -23 run function rlk:room/prop/i_grass
-execute positioned -4 203 -47 run function rlk:room/prop/i_flower
+execute positioned -4 201 -47 run function rlk:room/prop/i_flower
 execute positioned -10 201 -54 run function rlk:room/prop/i_grass
 execute positioned -52 201 -49 run function rlk:room/prop/i_petal
 execute positioned -9 201 -57 run function rlk:room/prop/i_grass

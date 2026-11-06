@@ -1,0 +1,4 @@
+# dispatch #azPT 51..53
+execute if score #azPT mb matches 51 run return run function rlk:boss/azhdaha/p/shell/k/51
+execute if score #azPT mb matches 52 run return run function rlk:boss/azhdaha/p/shell/k/52
+execute if score #azPT mb matches 53 run return run function rlk:boss/azhdaha/p/shell/k/53

@@ -1,4 +1,5 @@
 execute if entity @s[tag=rlk_raiden,scores={rdDeath=1}] run return 0
+execute if entity @s[tag=rlk_mb_dying] run return 0
 # @s = 몹, at @s
 # 클릭 실드 유지: 몹으로 가는 클릭을 바닐라 타격 대신 실드가 받음(빨간 플래시는 실제 데미지 때만)
 execute unless score #bowChg tmp matches 1 run function rlk:mob/shield_ensure

@@ -62,12 +62,12 @@ execute if score #naR tmp matches 1 as @e[tag=rlk_mob,distance=..5] at @s run fu
 execute if score #naR tmp matches 2 as @e[tag=rlk_mob,distance=..4.5] at @s run function rlk:combat/melee_apply
 kill @e[tag=rlk_melee_origin]
 # 효과음: 스윙(항상) + 타격 시 둔탁 추가 + 치명타 핑 추가
-execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 unless score #k23 snd matches 1 run function rlk:snd/f23
-execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 unless score #k24 snd matches 1 run function rlk:snd/f24
-# 아를/스커크는 combat/apply의 실제 피해 경로에서 타격음을 냄(헛손질/완전 방어 제외).
-execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 if score #hitLanded tmp matches 1 unless score #k25 snd matches 1 run function rlk:snd/f25
-execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 if score #hitLanded tmp matches 1 unless score #k26 snd matches 1 run function rlk:snd/f26
-execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 if score #hitLanded tmp matches 1 if score #crit tmp matches 1 unless score #k27 snd matches 1 run function rlk:snd/f27
+execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 unless score #charN tmp matches 6 unless score #k23 snd matches 1 run function rlk:snd/f23
+execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 unless score #charN tmp matches 6 unless score #k24 snd matches 1 run function rlk:snd/f24
+# 아를/스커크/나비아는 combat/apply의 실제 피해 경로에서 타격음을 냄(헛손질/완전 방어 제외). 휘두르는 소리는 모션 클립 소리.
+execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 unless score #charN tmp matches 6 if score #hitLanded tmp matches 1 unless score #k25 snd matches 1 run function rlk:snd/f25
+execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 unless score #charN tmp matches 6 if score #hitLanded tmp matches 1 unless score #k26 snd matches 1 run function rlk:snd/f26
+execute unless score #charN tmp matches 3 unless score #charN tmp matches 5 unless score #charN tmp matches 6 if score #hitLanded tmp matches 1 if score #crit tmp matches 1 unless score #k27 snd matches 1 run function rlk:snd/f27
 execute if score #hitLanded tmp matches 1 run function rlk:combat/on_hit
 execute if score #mobKilled tmp matches 1.. run function rlk:combat/on_kill
 execute if score #charN tmp matches 3 run function rlk:char/skirk/na_post

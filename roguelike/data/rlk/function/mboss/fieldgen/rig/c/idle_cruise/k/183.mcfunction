@@ -1,0 +1,2 @@
+data merge entity 524c4b4d-4647-4400-8000-000000000004 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.031f,6.23732f,0.00884f],left_rotation:[-0.00676f,0.45394f,-0.00727f,-0.89097f],scale:[1.25f,1.25f,1.25f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4647-4400-8000-00000000000e {start_interpolation:0,interpolation_duration:12,transformation:{translation:[3.59855f,4.65976f,0.00093f],left_rotation:[0.00189f,-0.00906f,0.98243f,0.18638f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}

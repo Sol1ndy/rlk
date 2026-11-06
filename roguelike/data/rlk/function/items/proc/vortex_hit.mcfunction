@@ -1,5 +1,7 @@
 execute unless score #k192 snd matches 1 run function rlk:snd/f207
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:20}
+# 피해 계수 = #vortexCoef (강화 단계로 조정)
+execute store result storage rlk:tune m_hurricane_core.coef int 1 run scoreboard players get #vortexCoef tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_hurricane_core
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0
 scoreboard players set #elem tmp 6

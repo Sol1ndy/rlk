@@ -20,6 +20,8 @@ scoreboard players operation #dmgBase tmp = #dmg tmp
 execute as @e[tag=rlk_hit] at @s run function rlk:combat/apply_reset
 # 경직 + 살짝 넉백(보스 제외): 붙자마자 맞지 않게
 execute as @e[tag=rlk_hit,tag=!boss] at @s run function rlk:char/arlecchino/skill_kb
+# 챕터 보스의 판정체(rlk_mb_px)가 맞았으면 핏값과 표식은 보스 몸에 한 번만 (mboss/px/to_body)
+execute as @e[tag=rlk_hit,tag=rlk_mb_px] run function rlk:mboss/px/to_body
 execute store result score #ynow tmp run time query gametime
 scoreboard players operation #ynow tmp += #arDirDur tmp
 scoreboard players operation @e[tag=rlk_hit] arDir = #ynow tmp

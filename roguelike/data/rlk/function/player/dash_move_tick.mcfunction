@@ -20,6 +20,4 @@ execute at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:player/dash_sub
 scoreboard players remove @s dashMoveT 1
 # 아이템 대쉬 이동 중 트리거
 function rlk:items/hook/on_dash_move
-particle minecraft:cloud ~ ~0.4 ~ 0.15 0.15 0.15 0.01 2
-execute positioned ~ ~1.62 ~ run particle minecraft:cloud ^0.45 ^-0.35 ^0.7 0.05 0.12 0.05 0.01 1
-execute positioned ~ ~1.62 ~ run particle minecraft:cloud ^-0.45 ^-0.35 ^0.7 0.05 0.12 0.05 0.01 1
+execute at @e[tag=rlk_body,limit=1] run particle minecraft:cloud ~ ~0.1 ~ 0.08 0.02 0.08 0.005 1

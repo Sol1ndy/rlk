@@ -1,7 +1,9 @@
-# @s = 플레이어, 위치 = 몸. 가장 가까운 적(7칸)에게 물의 검: 공격력의 25퍼센트 물 원소 피해. 본타격의 치명타 여부(#crit)는 보존
+# @s = 플레이어, 위치 = 몸. 가장 가까운 적(7칸)에게 물의 검: 공격력의 #rainCoef 퍼센트 물 원소 피해. 본타격의 치명타 여부(#crit)는 보존
 scoreboard players operation #rainCd itv = #rainCdT tmp
 scoreboard players operation #svCrit itv = #crit tmp
-function rlk:char/dmg_calc {coef:25}
+# 피해 계수 = #rainCoef (강화 단계로 조정)
+execute store result storage rlk:tune m_rain_sheath.coef int 1 run scoreboard players get #rainCoef tmp
+function rlk:char/dmg_calc with storage rlk:tune m_rain_sheath
 scoreboard players set #sub itv 1
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

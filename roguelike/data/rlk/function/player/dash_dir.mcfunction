@@ -17,12 +17,12 @@ execute unless score #amove tmp matches 5..250 run function rlk:player/dash_look
 execute if score #amove tmp matches 5..250 run scoreboard players operation #vx tmp = #dvx tmp
 execute if score #amove tmp matches 5..250 run scoreboard players operation #vz tmp = #dvz tmp
 function rlk:player/dash_norm
-# 틱당 스텝 ×10, 이동 4틱
+# 틱당 스텝 ×10(1칸), 이동 3틱 = 3칸
 scoreboard players operation @s dashDX = #ux tmp
 scoreboard players operation @s dashDX *= #st10 tmp
 scoreboard players operation @s dashDZ = #uz tmp
 scoreboard players operation @s dashDZ *= #st10 tmp
 scoreboard players operation @s dashUX = #ux tmp
 scoreboard players operation @s dashUZ = #uz tmp
-scoreboard players set @s dashMoveT 4
+scoreboard players set @s dashMoveT 3
 scoreboard players set @s dashUpN 0

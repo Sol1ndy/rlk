@@ -1,0 +1,10 @@
+data merge entity 524c4b4d-4150-4400-8000-00000000001b {start_interpolation:0,interpolation_duration:1,transformation:{translation:[1.23f,3.77438f,1.36227f],left_rotation:[-0.1444f,-0.11602f,0.22159f,0.95738f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000001c {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-1.23f,3.77438f,1.36227f],left_rotation:[-0.1444f,0.11602f,-0.22159f,0.95738f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000001d {start_interpolation:0,interpolation_duration:1,transformation:{translation:[1.90107f,2.29737f,1.92539f],left_rotation:[-0.14286f,0.08368f,0.09945f,0.98117f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000001e {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-1.90107f,2.29737f,1.92539f],left_rotation:[-0.14286f,-0.08368f,-0.09945f,0.98117f],scale:[1.5f,1.5f,1.5f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000001f {start_interpolation:0,interpolation_duration:1,transformation:{translation:[2.27605f,0.68938f,2.37677f],left_rotation:[0f,0f,0f,1f],scale:[1.8f,1.8f,1.8f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000020 {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-2.27605f,0.68938f,2.37677f],left_rotation:[0f,0f,0f,1f],scale:[1.8f,1.8f,1.8f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-00000000002f {start_interpolation:0,interpolation_duration:4,transformation:{translation:[1.56837f,3.86705f,1.71619f],left_rotation:[0.33383f,-0.34771f,-0.25366f,0.83864f],scale:[1.6f,1.6f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+data merge entity 524c4b4d-4150-4400-8000-000000000030 {start_interpolation:0,interpolation_duration:4,transformation:{translation:[-1.56837f,3.86705f,1.71619f],left_rotation:[0.33383f,0.34771f,0.25366f,0.83864f],scale:[1.6f,1.6f,1.6f],right_rotation:[0f,0f,0f,1f]}}
+scoreboard players set @s apRigFy 6
+scoreboard players reset @s apRigQx

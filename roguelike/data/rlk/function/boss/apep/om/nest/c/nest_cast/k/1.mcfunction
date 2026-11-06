@@ -1,0 +1,2 @@
+execute on passengers if entity @s[tag=rlk_ap_om_wing_l] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[0.17f,-0.58533f,-0.02147f],left_rotation:[-0.03299f,0.01919f,0.50246f,0.86375f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
+execute on passengers if entity @s[tag=rlk_ap_om_wing_r] run data merge entity @s {start_interpolation:0,interpolation_duration:1,transformation:{translation:[-0.17f,-0.58533f,-0.02147f],left_rotation:[-0.03299f,-0.01919f,-0.50246f,0.86375f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}

@@ -1,9 +1,11 @@
-# @s = 인형의 표식, at @s. 폭발: 반경 4칸에 공격력의 100퍼센트 불 원소 피해. 숄더뷰면 적의 시선을 다시 아바타로
+# @s = 인형의 표식, at @s. 폭발: 반경 4칸에 공격력의 #bunnyBoomCoef 퍼센트 불 원소 피해. 숄더뷰면 적의 시선을 다시 아바타로
 kill @e[tag=rlk_decoy]
 particle minecraft:explosion ~ ~0.8 ~ 0.6 0.4 0.6 0 4
 particle minecraft:flame ~ ~0.8 ~ 1.2 0.6 1.2 0.08 60
 execute unless score #k64 snd matches 1 run function rlk:snd/f122
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:100}
+# 피해 계수 = #bunnyBoomCoef (강화 단계로 조정)
+execute store result storage rlk:tune m_baron_bunny.coef int 1 run scoreboard players get #bunnyBoomCoef tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_baron_bunny
 scoreboard players set #sub itv 1
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #elem tmp 1

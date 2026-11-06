@@ -48,13 +48,9 @@ fill 0 210 -20 19 210 -1 minecraft:polished_deepslate
 fill 0 210 -19 18 210 -2 minecraft:air
 fill 4 201 -19 6 201 -18 minecraft:podzol
 fill 14 201 -19 16 201 -17 minecraft:podzol
-fill -19 201 -18 -18 201 -17 minecraft:podzol
-fill -17 201 -17 -17 201 -16 minecraft:podzol
 fill 5 201 -17 6 201 -15 minecraft:podzol
-fill -16 201 -16 -16 201 -4 minecraft:podzol
 fill 14 201 -16 15 201 -15 minecraft:podzol
 fill 7 201 -15 13 201 -15 minecraft:podzol
-fill -15 201 -14 -15 201 -7 minecraft:podzol
 fill 14 201 -14 14 201 -14 minecraft:podzol
 fill 16 201 -13 18 201 -3 minecraft:podzol
 fill 14 201 -12 15 201 -4 minecraft:podzol
@@ -62,10 +58,8 @@ fill -6 201 -10 -5 201 -7 minecraft:podzol
 fill -12 201 -6 -7 201 -6 minecraft:podzol
 fill -5 201 -6 -5 201 -6 minecraft:podzol
 fill 13 201 -6 13 201 -5 minecraft:podzol
-fill -17 201 -5 -17 201 -3 minecraft:podzol
 fill -12 201 -5 -12 201 -5 minecraft:podzol
 fill -4 201 -5 4 201 -5 minecraft:podzol
-fill -19 201 -4 -18 201 -2 minecraft:podzol
 fill -13 201 -4 -13 201 -2 minecraft:podzol
 fill 3 201 -4 4 201 -3 minecraft:podzol
 fill -7 201 -3 -6 201 -2 minecraft:podzol
@@ -74,12 +68,6 @@ fill -12 201 -2 -12 201 -2 minecraft:podzol
 fill -8 201 -2 -8 201 -2 minecraft:podzol
 fill 7 201 -19 13 201 -16 minecraft:dirt
 fill 7 202 -19 13 202 -16 minecraft:podzol
-fill -19 201 -16 -18 201 -15 minecraft:dirt
-fill -19 202 -16 -18 202 -15 minecraft:podzol
-fill -17 201 -15 -17 201 -6 minecraft:dirt
-fill -17 202 -15 -17 202 -6 minecraft:podzol
-fill -19 201 -6 -18 201 -5 minecraft:dirt
-fill -19 202 -6 -18 202 -5 minecraft:podzol
 fill -6 201 -6 -6 201 -4 minecraft:dirt
 fill -6 202 -6 -6 202 -4 minecraft:podzol
 fill -11 201 -5 -7 201 -4 minecraft:dirt
@@ -98,8 +86,6 @@ fill -11 201 -2 -9 201 -2 minecraft:dirt
 fill -11 202 -2 -9 202 -2 minecraft:podzol
 fill -4 201 -2 -2 201 -2 minecraft:dirt
 fill -4 202 -2 -2 202 -2 minecraft:podzol
-fill -19 201 -14 -18 202 -7 minecraft:dirt
-fill -19 203 -14 -18 203 -7 minecraft:podzol
 fill 3 201 -2 4 207 -2 minecraft:andesite
 fill 3 208 -2 4 208 -2 minecraft:podzol
 fill 3 201 -17 4 207 -16 minecraft:stone
@@ -115,7 +101,7 @@ execute positioned -15 201 -2 run function rlk:room/prop/p_wildflower
 execute positioned -14 201 -16 run function rlk:room/prop/p_dandelion
 execute positioned -6 202 -9 run function rlk:room/prop/p_wildflower
 execute positioned -14 201 -14 run function rlk:room/prop/p_wildflower
-execute positioned -15 202 -8 run function rlk:room/prop/p_wildflower
+execute positioned -15 201 -8 run function rlk:room/prop/p_wildflower
 execute positioned 12 201 -2 run function rlk:room/prop/p_wildflower
 execute positioned 6 202 -18 run function rlk:room/prop/p_dandelion
 execute positioned 8 201 -4 run function rlk:room/prop/p_dandelion

@@ -33,6 +33,7 @@ scoreboard players set @s eqAtkSpeed 0
 # 자원: 골드는 새로 시작할 때만 0, 사파이어는 리셋해도 유지
 execute unless score @s gold matches 0.. run scoreboard players set @s gold 0
 execute unless score @s sapphire matches 0.. run scoreboard players set @s sapphire 0
+execute unless score @s invCap matches 9..18 run scoreboard players set @s invCap 9
 
 # 내부값
 scoreboard players set @s atkCD 0

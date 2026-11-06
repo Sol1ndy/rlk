@@ -170,7 +170,8 @@ execute positioned 134.0 196.0 48.0 run function rlk:lobby/obj/make_w {item:"min
 execute positioned 134.0 196.0 52.0 run function rlk:lobby/obj/make_w {item:"minecraft:water_bucket",name:"더미 · DPS 초기화",desc:"원소 · 기록 지우기",color:"#C9C9C9",k:34,yaw:90}
 execute positioned 134.0 196.0 56.0 run function rlk:lobby/obj/make_w {item:"minecraft:lava_bucket",name:"아이템 비우기",desc:"모두 버림",color:"#E06A5A",k:35,yaw:90}
 execute positioned 122.5 196.0 45.0 run function rlk:lobby/obj/make_w {item:"minecraft:oak_door",name:"로비로",desc:"",color:"#FFD24A",k:9,yaw:0}
-function rlk:lobby/try/dummies
+# 체험 방 더미는 플레이어가 체험 방에 들어갈 때만 만든다(try/enter · try/tick). 지을 때는 남은 것만 치운다
+kill @e[tag=rlk_dummy,tag=!rlk_tutE]
 data modify storage rlk:lobby built set value 11
 function rlk:lobby/set/labels
 function rlk:lobby/try/labels

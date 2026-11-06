@@ -31,12 +31,9 @@ fill -13 201 -18 -11 201 -18 minecraft:podzol
 fill -5 201 -18 -3 201 -18 minecraft:podzol
 fill -13 201 -17 -12 201 -15 minecraft:podzol
 fill -4 201 -17 -3 201 -14 minecraft:podzol
-fill -19 201 -15 -17 201 -15 minecraft:podzol
 fill -11 201 -15 -6 201 -15 minecraft:podzol
-fill -17 201 -14 -17 201 -6 minecraft:podzol
 fill -5 201 -14 -5 201 -12 minecraft:podzol
 fill -4 201 -13 -4 201 -13 minecraft:podzol
-fill -19 201 -6 -18 201 -5 minecraft:podzol
 fill -9 201 -19 -7 201 -16 minecraft:dirt
 fill -9 202 -19 -7 202 -16 minecraft:podzol
 fill -10 201 -18 -10 201 -16 minecraft:dirt
@@ -47,8 +44,6 @@ fill -11 201 -17 -11 201 -16 minecraft:dirt
 fill -11 202 -17 -11 202 -16 minecraft:podzol
 fill -5 201 -17 -5 201 -15 minecraft:dirt
 fill -5 202 -17 -5 202 -15 minecraft:podzol
-fill -19 201 -14 -18 201 -7 minecraft:dirt
-fill -19 202 -14 -18 202 -7 minecraft:podzol
 execute positioned -6 203 -16 run function rlk:room/prop/p_pillar_ruin
 execute positioned -16 201 -13 run function rlk:room/prop/p_fence_z
 execute positioned -12 202 -17 run function rlk:room/prop/p_grass

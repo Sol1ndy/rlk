@@ -1,0 +1,3738 @@
+{
+ "generator": "tools/build_mboss_hr_fx.py",
+ "api": "tools/mboss_scarlet/api.py §8; scratchpad hr/contract.md §3.3",
+ "functions": "rlk:boss/scarlet/fx/",
+ "item_models": "rlk:mboss/hr_kit/",
+ "font": "rlk:mboss_hr",
+ "font_range": [
+  "U+EC00",
+  "U+ECFF"
+ ],
+ "storage": "rlk:hr fx.*",
+ "bossbar": "rlk:hr_warn",
+ "owned": {
+  "dirs": [
+   "data/rlk/function/boss/scarlet/fx/e",
+   "data/rlk/function/boss/scarlet/fx/p",
+   "data/rlk/function/boss/scarlet/fx/prop",
+   "data/rlk/function/boss/scarlet/fx/snd",
+   "data/rlk/function/boss/scarlet/fx/hud",
+   "data/rlk/function/boss/scarlet/fx/test"
+  ],
+  "files": [
+   "data/rlk/function/boss/scarlet/fx/card.mcfunction",
+   "data/rlk/function/boss/scarlet/fx/cardx.mcfunction",
+   "data/rlk/function/boss/scarlet/fx/look.mcfunction",
+   "data/rlk/function/boss/scarlet/fx/clear.mcfunction",
+   "data/rlk/function/boss/scarlet/fx/uninstall.mcfunction",
+   "data/rlk/function/boss/scarlet/fx/keep_on.mcfunction",
+   "data/rlk/function/boss/scarlet/fx/keep_off.mcfunction",
+   "data/rlk/function/boss/scarlet/fx/follow_on.mcfunction",
+   "data/rlk/function/boss/scarlet/fx/follow_off.mcfunction"
+  ],
+  "rp": [
+   "assets/rlk/textures/mboss/hr_kit",
+   "assets/rlk/models/item/mboss/hr_kit",
+   "assets/rlk/items/mboss/hr_kit",
+   "assets/rlk/font/mboss_hr.json",
+   "assets/rlk/textures/font/mboss_hr"
+  ]
+ },
+ "caps": {
+  "fx": 96,
+  "ambient": 48,
+  "afterimage": 4,
+  "rule": "never skipped: the ager keeps the newest cards of a pool over its cap (the oldest go, hrFxQ serial)"
+ },
+ "objectives": [
+  "hrFx",
+  "hrFxS",
+  "hrFxG",
+  "hrFxH",
+  "hrFxK",
+  "hrFxD",
+  "hrFxL",
+  "hrFxQ",
+  "hrFxY"
+ ],
+ "fake_players": "#n, #na, #ni, #ser, #now, #now2, #wd, #c2, #col, #roll, #spin, #life, #fade, #dly, #dur, #hit, #pool, #a, #b, #c, #k, #t, #it, #f, #h, #pt, #fl, #m, #r, #p, #o, #i, #j, #ly, #n2, #g, #on, #sk, #l, #lid, #at, #af, #lnW, #lnA, #lnE, #ovH, #ovE, #oi, #oh, #oo, #demo, #dt, #s, #d, #my, #mz, #ny, #nz, #cm1, #c3, #c4, #c26, #c90, #c10, #c20, #c36, #c100, #c115, #c360, #c1000, #c104, #c5, #fm, #sw, #tx, #ty, #keep, #fol, #fy, #y, #ovS, #ovI, #rx, #ry, #rz, #ra, #rb, #bx, #by, #bz (objective hrFx)",
+ "tags": [
+  "rlk_hr_fx",
+  "rlk_hr_fx_c",
+  "rlk_hr_fx_a",
+  "rlk_hr_fx_i",
+  "rlk_hr_fx_new",
+  "rlk_hr_fx_go",
+  "rlk_hr_fx_sh",
+  "rlk_hr_fx_fd",
+  "rlk_hr_fx_hit",
+  "rlk_hr_fx_t",
+  "rlk_hr_fx_nf",
+  "rlk_hr_fx_bm",
+  "rlk_hr_fxa",
+  "rlk_hr_fxa_d",
+  "rlk_hr_fxa_p",
+  "rlk_hr_fxf",
+  "rlk_hr_fxfs",
+  "rlk_hr_fxl",
+  "rlk_hr_fx_demo",
+  "rlk_hr_fx_demo_mv",
+  "rlk_hr_fx_keep",
+  "rlk_hr_fx_fc"
+ ],
+ "switches": {
+  "keep_on / keep_off": "cards made between carry rlk_hr_fx_keep: fx/clear (pause, death_start, the ager's dead / revive clear) leaves them; the module cleanup and fx/uninstall remove them",
+  "follow_on / follow_off": "@s = the lead: cards made between follow it every tick (its x / z, their own height over it)"
+ },
+ "conventions": {
+  "yaw": "+ = to the executor's right (offset from its rotation)",
+  "pitch": "+ = up (elevation)",
+  "roll": "about the aim (qi_arc 0 flat / 90 vertical); qi_band: lean (+ = top forward); scarlet_line: + lifts the + (right) end",
+  "units": "tenths of a block / degrees / ticks",
+  "c": {
+   "1": "lilac",
+   "2": "pink-magenta",
+   "3": "yellow",
+   "4": "crimson",
+   "5": "white"
+  }
+ },
+ "floor": {
+  "clamp_floor_storage": "rlk:hr fx.fl (y x 100, default 20100)",
+  "arc_bearings": 80.0,
+  "arc_lift_max": 1.0
+ },
+ "sprites": {
+  "qi_arc": [
+   [
+    4,
+    128,
+    64
+   ]
+  ],
+  "qi_ring": [
+   [
+    2,
+    128,
+    128
+   ]
+  ],
+  "qi_band": [
+   [
+    2,
+    128,
+    32
+   ]
+  ],
+  "qi_ribbon": [
+   [
+    2,
+    128,
+    32
+   ]
+  ],
+  "ghost_trail": [
+   [
+    2,
+    128,
+    32
+   ]
+  ],
+  "qi_dome": [
+   [
+    1,
+    128,
+    64
+   ]
+  ],
+  "qi_wedge": [
+   [
+    1,
+    64,
+    128
+   ]
+  ],
+  "glint": [
+   [
+    2,
+    32,
+    32
+   ]
+  ],
+  "shards": [
+   [
+    2,
+    32,
+    32
+   ]
+  ],
+  "lotus": [
+   [
+    2,
+    32,
+    32
+   ]
+  ],
+  "yellow_tell": [
+   [
+    1,
+    64,
+    64
+   ],
+   [
+    1,
+    128,
+    16
+   ]
+  ],
+  "ghost_burst": [
+   [
+    3,
+    64,
+    64
+   ]
+  ],
+  "ghost_flash": [
+   [
+    1,
+    64,
+    64
+   ]
+  ],
+  "blink_bubble": [
+   [
+    1,
+    64,
+    64
+   ]
+  ],
+  "afterimage": [
+   [
+    1,
+    64,
+    128
+   ]
+  ],
+  "dive_impact": [
+   [
+    1,
+    128,
+    128
+   ]
+  ],
+  "light_column": [
+   [
+    1,
+    32,
+    128
+   ]
+  ],
+  "claw_streaks": [
+   [
+    1,
+    32,
+    128
+   ]
+  ],
+  "deco_bolt": [
+   [
+    1,
+    32,
+    128
+   ]
+  ],
+  "clash_gold": [
+   [
+    2,
+    64,
+    64
+   ]
+  ],
+  "clash_spark": [
+   [
+    2,
+    32,
+    128
+   ]
+  ],
+  "scarlet_line": [
+   [
+    1,
+    256,
+    16
+   ]
+  ],
+  "petal_big": [
+   [
+    3,
+    64,
+    64
+   ]
+  ],
+  "petals_small": [
+   [
+    8,
+    16,
+    16
+   ]
+  ],
+  "moon_halo": [
+   [
+    2,
+    96,
+    96
+   ]
+  ],
+  "disc": [
+   [
+    2,
+    64,
+    64
+   ]
+  ],
+  "seat_rock": []
+ },
+ "textures": {
+  "qi_arc_0": [
+   128,
+   64
+  ],
+  "qi_arc_1": [
+   128,
+   64
+  ],
+  "qi_arc_2": [
+   128,
+   64
+  ],
+  "qi_arc_3": [
+   128,
+   64
+  ],
+  "qi_ring_0": [
+   128,
+   128
+  ],
+  "qi_ring_1": [
+   128,
+   128
+  ],
+  "qi_band_0": [
+   128,
+   32
+  ],
+  "qi_band_1": [
+   128,
+   32
+  ],
+  "qi_ribbon_0": [
+   128,
+   32
+  ],
+  "qi_ribbon_1": [
+   128,
+   32
+  ],
+  "ghost_trail_0": [
+   128,
+   32
+  ],
+  "ghost_trail_1": [
+   128,
+   32
+  ],
+  "qi_dome": [
+   128,
+   64
+  ],
+  "qi_wedge": [
+   64,
+   128
+  ],
+  "glint_0": [
+   32,
+   32
+  ],
+  "glint_1": [
+   32,
+   32
+  ],
+  "shards_0": [
+   32,
+   32
+  ],
+  "shards_1": [
+   32,
+   32
+  ],
+  "lotus_0": [
+   32,
+   32
+  ],
+  "lotus_1": [
+   32,
+   32
+  ],
+  "yellow_tell_0": [
+   64,
+   64
+  ],
+  "yellow_tell_1": [
+   128,
+   16
+  ],
+  "ghost_burst_0": [
+   64,
+   64
+  ],
+  "ghost_burst_1": [
+   64,
+   64
+  ],
+  "ghost_burst_2": [
+   64,
+   64
+  ],
+  "ghost_flash": [
+   64,
+   64
+  ],
+  "blink_bubble": [
+   64,
+   64
+  ],
+  "afterimage": [
+   64,
+   128
+  ],
+  "dive_impact": [
+   128,
+   128
+  ],
+  "light_column": [
+   32,
+   128
+  ],
+  "claw_streaks": [
+   32,
+   128
+  ],
+  "deco_bolt": [
+   32,
+   128
+  ],
+  "clash_gold_0": [
+   64,
+   64
+  ],
+  "clash_gold_1": [
+   64,
+   64
+  ],
+  "clash_spark_0": [
+   32,
+   128
+  ],
+  "clash_spark_1": [
+   32,
+   128
+  ],
+  "scarlet_line": [
+   256,
+   16
+  ],
+  "petal_big_0": [
+   64,
+   64
+  ],
+  "petal_big_1": [
+   64,
+   64
+  ],
+  "petal_big_2": [
+   64,
+   64
+  ],
+  "petals_small_0": [
+   16,
+   16
+  ],
+  "petals_small_1": [
+   16,
+   16
+  ],
+  "petals_small_2": [
+   16,
+   16
+  ],
+  "petals_small_3": [
+   16,
+   16
+  ],
+  "petals_small_4": [
+   16,
+   16
+  ],
+  "petals_small_5": [
+   16,
+   16
+  ],
+  "petals_small_6": [
+   16,
+   16
+  ],
+  "petals_small_7": [
+   16,
+   16
+  ],
+  "moon_halo_0": [
+   96,
+   96
+  ],
+  "moon_halo_1": [
+   96,
+   96
+  ],
+  "disc_0": [
+   64,
+   64
+  ],
+  "disc_1": [
+   64,
+   64
+  ],
+  "gate_icon": [
+   64,
+   64
+  ]
+ },
+ "kinds": {
+  "qi_arc_0": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_arc_0",
+   "source": "own",
+   "desc": "sword-qi crescent sweep frame 0 (rim at r 0.8)"
+  },
+  "qi_arc_1": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_arc_1",
+   "source": "own",
+   "desc": "sword-qi crescent sweep frame 1 (rim at r 0.8)"
+  },
+  "qi_arc_2": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_arc_2",
+   "source": "own",
+   "desc": "sword-qi crescent sweep frame 2 (rim at r 0.8)"
+  },
+  "qi_arc_3": {
+   "plane": "flat",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_arc_3",
+   "source": "own",
+   "desc": "sword-qi crescent sweep frame 3 (rim at r 0.8)"
+  },
+  "qi_ring_0": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_ring_0",
+   "source": "own",
+   "desc": "flat lilac sword-qi ring (unit radius)"
+  },
+  "qi_ring_1": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_ring_1",
+   "source": "own",
+   "desc": "thin white-pink rim ring with swirls"
+  },
+  "qi_band_0": {
+   "plane": "face",
+   "px": [
+    128,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.125,
+    0.125
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_band_0",
+   "source": "own",
+   "desc": "broad sword-qi band (length 1 along a)"
+  },
+  "qi_band_1": {
+   "plane": "face",
+   "px": [
+    128,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.125,
+    0.125
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_band_1",
+   "source": "own",
+   "desc": "the band's leading streak"
+  },
+  "qi_ribbon_0": {
+   "plane": "flat",
+   "px": [
+    128,
+    32
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.25,
+    0.25
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_ribbon_0",
+   "source": "own",
+   "desc": "sword-qi ribbon strip (centred)"
+  },
+  "qi_ribbon_1": {
+   "plane": "flat",
+   "px": [
+    128,
+    32
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.25,
+    0.25
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_ribbon_1",
+   "source": "own",
+   "desc": "fading ribbon strip"
+  },
+  "ghost_trail_0": {
+   "plane": "lancex",
+   "px": [
+    128,
+    32
+   ],
+   "extent": [
+    0,
+    1,
+    -0.125,
+    0.125
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/ghost_trail_0",
+   "source": "own",
+   "desc": "lilac flame trail (from the executor along +a)"
+  },
+  "ghost_trail_1": {
+   "plane": "lancex",
+   "px": [
+    128,
+    32
+   ],
+   "extent": [
+    0,
+    1,
+    -0.125,
+    0.125
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/ghost_trail_1",
+   "source": "own",
+   "desc": "white speed lines"
+  },
+  "qi_dome": {
+   "plane": "face",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_dome",
+   "source": "own",
+   "desc": "translucent dome silhouette (base at b 0)"
+  },
+  "qi_wedge": {
+   "plane": "flat",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_wedge",
+   "source": "own",
+   "desc": "sword-qi wedge, the point at b 1"
+  },
+  "glint_0": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/glint_0",
+   "source": "own",
+   "desc": "four-ray glint (tinted)"
+  },
+  "glint_1": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/glint_1",
+   "source": "own",
+   "desc": "four-point star in a circle (tinted)"
+  },
+  "shards_0": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/shards_0",
+   "source": "own",
+   "desc": "crystal shard (tinted)"
+  },
+  "shards_1": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/shards_1",
+   "source": "own",
+   "desc": "broken shard splinter (tinted)"
+  },
+  "lotus_0": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/lotus_0",
+   "source": "own",
+   "desc": "lotus bud on its pads, base at b 0"
+  },
+  "lotus_1": {
+   "plane": "face",
+   "px": [
+    32,
+    32
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/lotus_1",
+   "source": "own",
+   "desc": "open crimson lotus, base at b 0"
+  },
+  "yellow_tell_0": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/yellow_tell_0",
+   "source": "own",
+   "desc": "yellow tell sphere"
+  },
+  "yellow_tell_1": {
+   "plane": "face",
+   "px": [
+    128,
+    16
+   ],
+   "extent": [
+    -1,
+    1,
+    -0.125,
+    0.125
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/yellow_tell_1",
+   "source": "own",
+   "desc": "yellow tell flare line (2 b at scale 1)"
+  },
+  "ghost_burst_0": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/ghost_burst_0",
+   "source": "own",
+   "desc": "ghost mist puff"
+  },
+  "ghost_burst_1": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/ghost_burst_1",
+   "source": "own",
+   "desc": "ghost ribbons"
+  },
+  "ghost_burst_2": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/ghost_burst_2",
+   "source": "own",
+   "desc": "ghost sparkles"
+  },
+  "ghost_flash": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/ghost_flash",
+   "source": "own",
+   "desc": "white-violet electric flash"
+  },
+  "blink_bubble": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/blink_bubble",
+   "source": "own",
+   "desc": "pale blue-white bubble"
+  },
+  "afterimage": {
+   "plane": "face",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/afterimage",
+   "source": "own",
+   "desc": "lilac silhouette, feet at b 0"
+  },
+  "dive_impact": {
+   "plane": "flat",
+   "px": [
+    128,
+    128
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/dive_impact",
+   "source": "own",
+   "desc": "shock ring with radial spikes (unit radius)"
+  },
+  "light_column": {
+   "plane": "cross",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/light_column",
+   "source": "own",
+   "desc": "light column (two crossed quads, base at b 0; tinted)"
+  },
+  "col_face": {
+   "plane": "face",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/light_column",
+   "source": "own",
+   "desc": "one light-column quad (vertical billboard; tinted)"
+  },
+  "qline": {
+   "plane": "lance",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    0,
+    1
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/light_column",
+   "source": "own",
+   "desc": "thin light beam along +z (tinted)"
+  },
+  "claw_streaks": {
+   "plane": "face",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/claw_streaks",
+   "source": "own",
+   "desc": "claw streak, its point at b 0"
+  },
+  "deco_bolt": {
+   "plane": "face",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/deco_bolt",
+   "source": "own",
+   "desc": "thin yellow bolt, base at b 0"
+  },
+  "clash_gold_0": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/clash_gold_0",
+   "source": "own",
+   "desc": "gold starburst"
+  },
+  "clash_gold_1": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/clash_gold_1",
+   "source": "own",
+   "desc": "cyan-gold kick flash"
+  },
+  "clash_spark_0": {
+   "plane": "face",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/clash_spark_0",
+   "source": "own",
+   "desc": "spark streak (tinted)"
+  },
+  "clash_spark_1": {
+   "plane": "face",
+   "px": [
+    32,
+    128
+   ],
+   "extent": [
+    -0.125,
+    0.125,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/clash_spark_1",
+   "source": "own",
+   "desc": "lightning arc (tinted)"
+  },
+  "scarlet_line": {
+   "plane": "lancex",
+   "px": [
+    256,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.0312,
+    0.0312
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/scarlet_line",
+   "source": "own",
+   "desc": "the red slash line (centred, length 1)"
+  },
+  "petal_big_0": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/petal_big_0",
+   "source": "own",
+   "desc": "big red petal (whole)"
+  },
+  "petal_big_1": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/petal_big_1",
+   "source": "own",
+   "desc": "big red petal (cut)"
+  },
+  "petal_big_2": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/petal_big_2",
+   "source": "own",
+   "desc": "big red petal (split)"
+  },
+  "petal_0": {
+   "plane": "face",
+   "px": [
+    16,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/petals_small_0",
+   "source": "own",
+   "desc": "cherry petal"
+  },
+  "petal_1": {
+   "plane": "face",
+   "px": [
+    16,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/petals_small_1",
+   "source": "own",
+   "desc": "cherry petal"
+  },
+  "petal_2": {
+   "plane": "face",
+   "px": [
+    16,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/petals_small_2",
+   "source": "own",
+   "desc": "cherry petal"
+  },
+  "petal_3": {
+   "plane": "face",
+   "px": [
+    16,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/petals_small_3",
+   "source": "own",
+   "desc": "heart petal"
+  },
+  "petal_4": {
+   "plane": "face",
+   "px": [
+    16,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/petals_small_4",
+   "source": "own",
+   "desc": "leaf (tinted)"
+  },
+  "petal_5": {
+   "plane": "face",
+   "px": [
+    16,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/petals_small_5",
+   "source": "own",
+   "desc": "leaf (tinted)"
+  },
+  "petal_6": {
+   "plane": "face",
+   "px": [
+    16,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/petals_small_6",
+   "source": "own",
+   "desc": "leaf (tinted)"
+  },
+  "petal_7": {
+   "plane": "face",
+   "px": [
+    16,
+    16
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "neutral",
+   "texture": "rlk:mboss/hr_kit/petals_small_7",
+   "source": "own",
+   "desc": "mote (tinted)"
+  },
+  "moon_halo_0": {
+   "plane": "face",
+   "px": [
+    96,
+    96
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/moon_halo_0",
+   "source": "own",
+   "desc": "white-blue halo (P1)"
+  },
+  "moon_halo_1": {
+   "plane": "face",
+   "px": [
+    96,
+    96
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/moon_halo_1",
+   "source": "own",
+   "desc": "red halo (P2)"
+  },
+  "disc_0": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/disc_0",
+   "source": "own",
+   "desc": "moon disc spin frame 0 (unit radius)"
+  },
+  "disc_1": {
+   "plane": "flat",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    -1,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/disc_1",
+   "source": "own",
+   "desc": "moon disc spin frame 1 (unit radius)"
+  },
+  "gate_icon": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/gate_icon",
+   "source": "own",
+   "desc": "gate label icon: a red lotus over a long blade"
+  },
+  "qi_arcf_0": {
+   "plane": "face",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_arc_0",
+   "source": "own",
+   "desc": "sword-qi crescent frame 0 standing across the aim (a slanted slash, rolled in the screen plane)"
+  },
+  "qi_arcf_1": {
+   "plane": "face",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_arc_1",
+   "source": "own",
+   "desc": "sword-qi crescent frame 1 standing across the aim (a slanted slash, rolled in the screen plane)"
+  },
+  "qi_arcf_2": {
+   "plane": "face",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_arc_2",
+   "source": "own",
+   "desc": "sword-qi crescent frame 2 standing across the aim (a slanted slash, rolled in the screen plane)"
+  },
+  "qi_arcf_3": {
+   "plane": "face",
+   "px": [
+    128,
+    64
+   ],
+   "extent": [
+    -1,
+    1,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_arc_3",
+   "source": "own",
+   "desc": "sword-qi crescent frame 3 standing across the aim (a slanted slash, rolled in the screen plane)"
+  },
+  "qi_wedgef": {
+   "plane": "face",
+   "px": [
+    64,
+    128
+   ],
+   "extent": [
+    -0.25,
+    0.25,
+    0,
+    1
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/qi_wedge",
+   "source": "own",
+   "desc": "sword-qi wedge standing across the aim, the point at b 1"
+  },
+  "rift_void": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/ghost_flash",
+   "source": "rift (the rlk:rift model or the fallback)",
+   "desc": "arrival tear part (rift/void; fallback ghost_flash)"
+  },
+  "rift_rim": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/ghost_flash",
+   "source": "rift (the rlk:rift model or the fallback)",
+   "desc": "arrival tear part (rift/rim; fallback ghost_flash)"
+  },
+  "rift_arc0": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/ghost_flash",
+   "source": "rift (the rlk:rift model or the fallback)",
+   "desc": "arrival tear part (rift/arc_0; fallback ghost_flash)"
+  },
+  "rift_arc1": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/ghost_flash",
+   "source": "rift (the rlk:rift model or the fallback)",
+   "desc": "arrival tear part (rift/arc_1; fallback ghost_flash)"
+  },
+  "rift_arc2": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/ghost_flash",
+   "source": "rift (the rlk:rift model or the fallback)",
+   "desc": "arrival tear part (rift/arc_2; fallback ghost_flash)"
+  },
+  "rift_arc3": {
+   "plane": "face",
+   "px": [
+    64,
+    64
+   ],
+   "extent": [
+    -0.5,
+    0.5,
+    -0.5,
+    0.5
+   ],
+   "tint": "painted",
+   "texture": "rlk:mboss/hr_kit/ghost_flash",
+   "source": "rift (the rlk:rift model or the fallback)",
+   "desc": "arrival tear part (rift/arc_3; fallback ghost_flash)"
+  }
+ },
+ "rift_models": {
+  "rift_void": "rlk:item/rift/void",
+  "rift_rim": "rlk:item/rift/rim",
+  "rift_arc0": "rlk:item/rift/arc_0",
+  "rift_arc1": "rlk:item/rift/arc_1",
+  "rift_arc2": "rlk:item/rift/arc_2",
+  "rift_arc3": "rlk:item/rift/arc_3"
+ },
+ "atlas_px_new": 241664,
+ "sprite_px": 237568,
+ "sprite_cap": 260000,
+ "gate_icon_px": 4096,
+ "presets": {
+  "qi_arc": {
+   "args": [
+    "r",
+    "yaw",
+    "pitch",
+    "roll",
+    "c"
+   ],
+   "doc": "A sword-qi crescent of reach {r} (tenths) about the executor (S3: the body + 1.0, rotated as the body; S4: the cut spot + h, rotated as the player; S2b: at her): {yaw} / {pitch} the aim's offsets from the executor rotation (yaw + = right, pitch + = up), {roll} the blade: |roll| < 20 (or > 160) a flat crescent rolled about the aim; |roll| 20..160 (a slanted slash) the crescent stands across the aim, rolled by roll in that plane (the screen plane of a viewer behind the target: F2, HR-12), centred on the executor. Four sweep frames 1 t apart (the last fades over 6 t): the lilac body, the white-pink cutting rim; c tints it (1 lilac .. 5 white). A crescent that would reach below the floor rises up to 1 b, then shrinks (fx/e/clamp_arc): no frame below the floor.",
+   "cards": 4,
+   "c_split": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "ambient": false,
+   "particles_only": false
+  },
+  "qi_ring": {
+   "args": [
+    "r",
+    "c"
+   ],
+   "doc": "A flat sword-qi ring of radius {r} (tenths) about the executor (S3: the body + 0.8 / 1.55; S4: the cut spot + 0.8 / 0.1; the vanish: the body + 0.8), horizontal: the lilac ring spreading and turning, a white-pink rim ring behind it, particles round its edge; c tints it.",
+   "cards": 2,
+   "c_split": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "ambient": false,
+   "particles_only": false
+  },
+  "qi_band": {
+   "args": [
+    "len",
+    "yaw",
+    "pitch",
+    "roll",
+    "sw"
+   ],
+   "doc": "A broad sword-qi band of length {len} (tenths) across the aim, centred on the executor (S4 A8.2: the cut spot + 0.3, rotated as the player; S2b CS4 E1b: her + 1.1 facing the player): an upright sheet whose long axis runs to the aim's left and right, rising by {pitch} degrees toward its right end, {roll} leaning its top forward; {yaw} turns the aim. It sweeps {sw} (tenths; F2, HR-32: A8.2 25, CS4 E1b her distance + 1 b) forward along the aim over 6 t (its leading streak 4 % further) and fades (lilac, the white-pink upper rim). Near the floor it rises (fx/e/clamp_band) so no part of it reaches below the floor; under a lean the sweep stays level.",
+   "cards": 2,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "qi_x": {
+   "args": [
+    "r"
+   ],
+   "doc": "The X of two crossed sword-qi slashes of reach {r} (tenths) lying flat at the executor (S4 A8.5: the cut spot + 0.1, rotated as the player: a hit effect at the contact tick, never shown before it): two flattened crescents at +-45 deg crossing on the executor, lilac.",
+   "cards": 2,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "qi_dome": {
+   "args": [
+    "r"
+   ],
+   "doc": "A8.7 the spin dome of radius {r} (tenths) at the executor (S4: the cut spot on the floor): the white-pink rim ring at waist height (+0.9 b) turning out, and a translucent lilac dome that expands from the floor to radius r, turns into a thin white outline and fades.",
+   "cards": 2,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "qi_vert": {
+   "args": [
+    "h",
+    "yaw",
+    "c"
+   ],
+   "doc": "A vertical sword-qi crescent of height {h} (tenths) standing on the executor (S3 A3: the body + 0.15, ahead; S4 A8.8: beside the cut spot on the floor, rotated as the player): F2 (HR-12) the crescent stands ACROSS the aim (yaw 0 = the plane perpendicular to the executor's facing, its arc bulging to the executor's right; 180 = to its left; {yaw} turns the plane), from the executor up to h, the sweep rising (four frames), and a thin glowing upright line at its foot facing the viewer; c tints it (A8.8: 2 magenta). Level: the executor's pitch is ignored.",
+   "cards": 5,
+   "c_split": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "ambient": false,
+   "particles_only": false
+  },
+  "qi_fan": {
+   "args": [
+    "h",
+    "c"
+   ],
+   "doc": "A rising vertical fan of sword-qi of height {h} (tenths) centred on the executor (S3 A1: h 16 at the body + 1.1, 1.2 b ahead; cosmetic): F2 (HR-12) the four sweep frames stand ACROSS the executor's facing (the plane perpendicular to it), bulging to its left (the right of a viewer facing it), rising; c tints it (A1: 2). Level.",
+   "cards": 4,
+   "c_split": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "ambient": false,
+   "particles_only": false
+  },
+  "qi_wedge": {
+   "args": [
+    "r",
+    "roll"
+   ],
+   "doc": "A sword-qi wedge of length {r} (tenths) from the executor (S3 A3 h5: the body + 1.0; S4 A7: the body + 0.85), {roll} degrees: F2 (HR-12) |roll| 20..160 = the wedge stands across the facing, its point up and rolled by roll in that plane (the rising diagonal a viewer behind the target sees broadside); else it lies along the facing, rolled about it: a lilac spearhead widening behind its point, white edges; particles at the point. Level.",
+   "cards": 1,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "qi_ribbon": {
+   "args": [],
+   "doc": "A4 the sword-qi ribbon wrapping round her (S3: the body + 1.0): three lilac ribbon strips tilted at different angles turning round her (one fading), lilac motes swirling.",
+   "cards": 3,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "qi_line": {
+   "args": [
+    "len"
+   ],
+   "doc": "A thin straight sword-qi line of length {len} (tenths) from the executor, F2 (HR-12) ACROSS its facing: the facing turned 90 deg to its right, its pitch kept (S3 A5: from her left, the body + 0.95, 1.5 b ahead, level: a horizontal slash across the view; S4 A8.9 the dive line: her + 0.8, rotated ~ 90 = straight down, unchanged): a white core inside a lilac glow; a line pointing down is clamped to end above the floor.",
+   "cards": 2,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "qi_cut": {
+   "args": [
+    "len"
+   ],
+   "doc": "A9 the iai cut along the dash: a long pink-magenta slash line of length {len} (tenths) from the executor along its yaw (S3: the dash start + 0.8, rotated along the dash), a white-hot core, magenta sparks along it.",
+   "cards": 2,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "glint": {
+   "args": [
+    "c"
+   ],
+   "doc": "A blade glint at the executor (the blade_tip / hat_crown / chest anchors): a four-ray sparkle flaring and turning, a smaller one crossing it; c tints it (1 lilac, 2 pink-magenta, 3 yellow, 4 crimson, 5 white).",
+   "cards": 2,
+   "c_split": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "ambient": false,
+   "particles_only": false
+  },
+  "star4": {
+   "args": [],
+   "doc": "A9 the four-point star in a thin circle at her chest (the chest anchor, facing the viewer, 1.3 b): lilac, a white glint inside, for 6 t.",
+   "cards": 2,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "yellow_tell": {
+   "args": [
+    "t"
+   ],
+   "doc": "The yellow tell for {t} ticks at the executor (S3 A9 / A10: the body + 1.0, in the air for A10; S4 A7: her): the yellow sphere (1.6 b) and the horizontal flare line through it (4 b), yellow motes.",
+   "cards": 2,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "ghost_burst": {
+   "args": [],
+   "doc": "The lilac switch / the vanish (the body + 0.8-1.1): the body bursts into lilac-white mist (four puffs flung out), white-lilac ribbons tracing the silhouette rise, sparkles linger to 12 t.",
+   "cards": 6,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "ghost_trail": {
+   "args": [
+    "len"
+   ],
+   "doc": "A ghost dash / glide / run (S4: the body + 0.45-0.95, rotated toward its target, at the move's start): a lilac flame trail and white speed lines along the aim over {len} (tenths), drawn out over 4 t as she passes, fading after 12 t; lilac motes along it.",
+   "cards": 2,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "ghost_flash": {
+   "args": [],
+   "doc": "D3 the flash-blink (the body + 0.95): a white-violet electric flash, sparks.",
+   "cards": 1,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "afterimage": {
+   "args": [
+    "len"
+   ],
+   "doc": "One translucent lilac silhouette of her at the executor (S3: the body + 1.2; S2b: her feet: the card stands 1.2 b below the executor, never below the floor), turned to the viewer, fading over 6 t (at most 4 alive: the ager removes the oldest), and a lilac streak of {len} (tenths) behind her along her facing.",
+   "cards": 2,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "blink_bubble": {
+   "args": [],
+   "doc": "A6 the back-blink (the body + 1.0): a pale blue-white translucent bubble swelling and gone, white motes.",
+   "cards": 1,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "shield_refill": {
+   "args": [],
+   "doc": "The lead-ins' refill beat (at her, the body + 1.1): eight lilac crystal shards fly in to her and a flash closes them, a thin rim ring.",
+   "cards": 10,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "pip_break": {
+   "args": [],
+   "doc": "A pip removed (at the player's chest): lilac shards burst out, a white flash, amethyst chips, sparks.",
+   "cards": 9,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "dive_impact": {
+   "args": [
+    "r"
+   ],
+   "doc": "A dive landing of radius {r} (tenths) at the executor (S3 A4: the lock + 0.1; S4 the A8 fail: the impact point): a flat lilac shock ring with radial spikes spreading (a hit effect at the contact tick), the rim ring, a white flash, lilac dust and sparks.",
+   "cards": 3,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "light_column": {
+   "args": [],
+   "doc": "A lilac light column from the executor (the player's spot on the floor: the deflect, the A8 fail) up 9 b: two crossed glowing quads widening, a white core, motes rising. Upright whatever the executor's pitch (F2, HR-41: both cards at pitch 0).",
+   "cards": 2,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "claw_streaks": {
+   "args": [
+    "r"
+   ],
+   "doc": "A10 the claw streaks (the lock spot + 2.0): four lilac claw-like streaks inside radius {r} (tenths) fall from 5 b above the executor onto it in 2 t (their points ending at the executor), then fade.",
+   "cards": 4,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "burst_radial": {
+   "args": [
+    "r"
+   ],
+   "doc": "A10 the landing burst of radius {r} (tenths) at the executor (the lock + 0.1): the lilac shock ring turning the other way, six claw streaks flung out radially, motes rising.",
+   "cards": 7,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "dust_ring": {
+   "args": [
+    "r"
+   ],
+   "doc": "CS2 R6 the dust ring of radius {r} (tenths) where she lands on her back (at her feet + 0.1): ground chips in a ring of eight puffs, a soft cloud, grey dust (particles only).",
+   "cards": 0,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": true
+  },
+  "kick_flash": {
+   "args": [],
+   "doc": "CS2 / CS3 R8 the kick on her head (the head anchor): the cyan-gold impact flash (the only cyan-gold flash), a white glint, sparks.",
+   "cards": 2,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "clash_gold": {
+   "args": [],
+   "doc": "Blade on blade (the blade_mid / hat_crown anchors, the midpoint between them; the deflect at the player): the gold starburst, six gold sparks flung out, crits.",
+   "cards": 7,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "clash_spark": {
+   "args": [],
+   "doc": "A small blade spark (the blade_mid / blade_tip anchors, every few ticks of a blade lock): four gold-white spark streaks, pink-violet embers.",
+   "cards": 4,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "clash_arc": {
+   "args": [],
+   "doc": "CS1 C1 the orange lightning arcs between her blade and the player (the blade_mid anchor, every 2 t): two jagged arcs facing the viewer, orange dust.",
+   "cards": 2,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "deco_bolt": {
+   "args": [],
+   "doc": "A decoration bolt (the gauntlets' thin yellow lightning; no hit box) standing on the executor (a floor spot 3-6 b from the player) up 7 b: two flickering bolts, sparks.",
+   "cards": 3,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "scarlet_line": {
+   "args": [
+    "len",
+    "yaw",
+    "roll"
+   ],
+   "doc": "홍련일섬's red slash line (CS1 C8, the 5 % instant death; S2b: the player's chest point, facing her): a line of length {len} (tenths) through the executor along the executor's yaw + {yaw} (90 = across a viewer looking along the executor's facing, its + end on their right), roll > 0 rises toward the player's right: CS1 C8 / the 5 % instant death: +13 deg; it opens in 2 t, darkens after 12 t, closes by 30 t. Floor-safe at any height and roll (F2, HR-44): when its low end would dip under 0.25 b over the floor it slides along its own length toward its high end (fx/e/clamp_sline), so it still crosses the executor point and stops just above the floor.",
+   "cards": 1,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "petal_burst": {
+   "args": [
+    "r"
+   ],
+   "doc": "A burst of petals of radius {r} (tenths) at the executor (CS1 C8 at her, CS2 R7, the 5 % instant death at the player): eight pink petals flung out turning, cherry leaves, pink dust.",
+   "cards": 8,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "petals_drift": {
+   "args": [],
+   "doc": "CS0 E8 the petals drifting across the field as she sweeps her hand (at her chest, rotated as her): six pink petals drifting slowly to her right and down, turning, for 40 t; cherry leaves (ambient pool).",
+   "cards": 6,
+   "c_split": [],
+   "ambient": true,
+   "particles_only": false
+  },
+  "petals_wind": {
+   "args": [],
+   "doc": "CS4 S4 thin petal streaks in the wind (at her + 0.8, rotated as her): petals and two thin pink streaks whipping across from her left to her right (ambient pool).",
+   "cards": 7,
+   "c_split": [],
+   "ambient": true,
+   "particles_only": false
+  },
+  "petals_heart": {
+   "args": [],
+   "doc": "CS4 big pink heart-shaped petals crossing near her (at her chest, rotated as her): three slow, turning heart petals for 30 t (ambient pool), cherry leaves.",
+   "cards": 3,
+   "c_split": [],
+   "ambient": true,
+   "particles_only": false
+  },
+  "motes_warm": {
+   "args": [],
+   "doc": "CS4 warm firefly-like motes low over the grass (at her + 0.4): five small warm motes rising slowly for 40 t (ambient pool), fireflies.",
+   "cards": 5,
+   "c_split": [],
+   "ambient": true,
+   "particles_only": false
+  },
+  "leaves_dark": {
+   "args": [
+    "n"
+   ],
+   "doc": "Dark-red / black leaves blowing across the sky (S2b CS1: her + 6, rotated as her): {n} leaves (up to 40; n < 0: the last -n of them, so {n:20} and then {n:-20} spread the 40 over two ticks) from her left across to her right over 30 t, turning (ambient pool).",
+   "cards": 40,
+   "c_split": [],
+   "ambient": true,
+   "particles_only": false
+  },
+  "leaves_swirl": {
+   "args": [],
+   "doc": "Dark-red leaves swirling round her (CS1 C8 / SQ1: her + 1.1): ten leaves flung round and up, turning, dark-red dust (ambient pool).",
+   "cards": 10,
+   "c_split": [],
+   "ambient": true,
+   "particles_only": false
+  },
+  "ambient_p1": {
+   "args": [],
+   "doc": "Arena ambience, P1 (the module, every ~10 t near the player; at the player): a pink petal drifting down (ambient pool), cherry leaves, one dark ash speck further out (arena.md §5: sparse).",
+   "cards": 1,
+   "c_split": [],
+   "ambient": true,
+   "particles_only": false
+  },
+  "ambient_p2": {
+   "args": [],
+   "doc": "Arena ambience, P2 (the module, every ~6 t near the player; at the player): crimson spores, a pink mote, a firefly low over the grass about every 20 t (particles only).",
+   "cards": 0,
+   "c_split": [],
+   "ambient": true,
+   "particles_only": true
+  },
+  "arrive_rift": {
+   "args": [],
+   "doc": "The arrival tear (S2b CS0 E0: the floor point 1.5 b behind the player, facing the arena): the dungeon rift's void, rim and four lightning arcs (the rlk:rift models of tools/build_rift.py when the pack has them) shrink shut over 30 t, portal motes.",
+   "cards": 6,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "ev_glint": {
+   "args": [],
+   "doc": "E12 the glint running along the scabbard (S2b: at the hand_r anchor): three small white glints along her facing 0 / 0.4 / 0.8 b, 2 t apart, end-rod motes (the fight kit's blade glint).",
+   "cards": 3,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "ev_trail": {
+   "args": [],
+   "doc": "The thrown sword's trail (each flight tick, at the sword): 2 cherry leaves + 1 lilac mote.",
+   "cards": 0,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": true
+  },
+  "ev_petals": {
+   "args": [
+    "n"
+   ],
+   "doc": "Petals round the point (E56-E108 round the player every 4 t): {n} cherry leaves + {n} petal motes (#D55D87).",
+   "cards": 0,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": true
+  },
+  "ev_leave": {
+   "args": [],
+   "doc": "E34 she leaves in petals and wind (at her chest): 60 cherry leaves + 30 petal motes + a gust, spread 0.5 / 0.95 / 0.5.",
+   "cards": 0,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": true
+  },
+  "ev_beam": {
+   "args": [
+    "h",
+    "t"
+   ],
+   "doc": "A silver moonbeam (E44 onto the sword / E42 onto the player): a column from {h} (tenths) above the executor down to it, drawn over {t} ticks by the ager (a marker the kit ages): end rods + silver dust at the falling front, silver dust along the lit column, a flash at the point when it arrives.",
+   "cards": 0,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": true
+  },
+  "ev_wind": {
+   "args": [
+    "r"
+   ],
+   "doc": "E42 the wind round the player: a 16-point ring of small white dust of radius {r} (tenths), a gust, 6 cherry leaves.",
+   "cards": 0,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": true
+  },
+  "ev_palm": {
+   "args": [],
+   "doc": "The moonlight \"cup\" in her palm / the orb (every tick): 2 end rods + 3 silver motes at the point.",
+   "cards": 0,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": true
+  },
+  "ev_take": {
+   "args": [
+    "c"
+   ],
+   "doc": "E56 the grant (at the player's chest): 20 end rods (speed 0.15) and a 16-point ring (r 1.2) of lilac (c 1, the item) or silver (c 2, the buff) dust.",
+   "cards": 0,
+   "c_split": [
+    1,
+    2
+   ],
+   "ambient": false,
+   "particles_only": true
+  }
+ },
+ "props": {
+  "disc": {
+   "doc": "A7 moon disc (R2, A13): one flat lilac disc card on the projectile display (radius 1.4 = the hazard's half width), horizontal, spinning 30 deg per tick (quarter turns over 3 t), facing its flight (the display's yaw).",
+   "looks": {
+    "None": [
+     "disc_0",
+     1.4
+    ]
+   },
+   "billboard": "fixed",
+   "anim": "d"
+  },
+  "petal_big": {
+   "doc": "CS1 the big red petal (0.8 b, the caller turns it to face the player each tick; it rocks slowly): {look} whole / cut (a glowing line across) / split (the halves apart).",
+   "looks": {
+    "whole": [
+     "petal_big_0",
+     0.8
+    ],
+    "cut": [
+     "petal_big_1",
+     0.8
+    ],
+    "split": [
+     "petal_big_2",
+     0.8
+    ]
+   },
+   "billboard": "fixed",
+   "anim": "p"
+  },
+  "moon_halo": {
+   "doc": "The halo card 1 b in front of the block moon (12.4 b, facing the arena as the caller turned it; its centre clear, the block disc shows through): {look} p1 white-blue / p2 red / off (hidden) / p1b, p2b = p1, p2 about 20 % brighter (CS0 E3, the CS4 moon gaze).",
+   "looks": {
+    "p1": [
+     "moon_halo_0",
+     12.4,
+     13948116
+    ],
+    "p2": [
+     "moon_halo_1",
+     12.4,
+     13948116
+    ],
+    "off": [
+     null,
+     0.0
+    ],
+    "p1b": [
+     "moon_halo_0",
+     12.4
+    ],
+    "p2b": [
+     "moon_halo_1",
+     12.4
+    ]
+   },
+   "billboard": "fixed",
+   "anim": null
+  },
+  "lotus": {
+   "doc": "A lotus flower on the pond (the water surface; 0.9 b, standing, turning to the viewer): {look} bud (closed, pale pink, P1) / bloom (open crimson, P2).",
+   "looks": {
+    "bud": [
+     "lotus_0",
+     0.9
+    ],
+    "bloom": [
+     "lotus_1",
+     0.9
+    ]
+   },
+   "billboard": "vertical",
+   "anim": null
+  },
+  "seat_rock": {
+   "doc": "CS0 her seat: a low flat stone (vanilla tuff, 1.2 x 0.24 x 0.64 b, its top 0.24 b over the display (under her thighs, behind her heels): no collision) and on it {look}: bottle = the rice-wine bottle on her left, bare = the stone alone, set = the bottle and the cup on her right (vanilla item displays the kit keeps with the stone: bare drops them at once, a killed stone's go within 10 t; the module re-looks it bare before it kills it).",
+   "looks": {
+    "bottle": [
+     "rock",
+     1.0
+    ],
+    "bare": [
+     "rock",
+     1.0
+    ],
+    "set": [
+     "rock",
+     1.0
+    ]
+   },
+   "billboard": "fixed",
+   "anim": null
+  }
+ },
+ "seat_items": {
+  "rock": {
+   "item": "minecraft:tuff",
+   "at": [
+    0.0,
+    0.12,
+    -0.185
+   ],
+   "scale": [
+    1.2,
+    0.24,
+    0.64
+   ]
+  },
+  "bottle": {
+   "item": "minecraft:potion",
+   "at": [
+    0.42,
+    0.24,
+    -0.15
+   ],
+   "scale": 0.42
+  },
+  "cup": {
+   "item": "minecraft:bowl",
+   "at": [
+    -0.42,
+    0.24,
+    -0.15
+   ],
+   "scale": 0.26
+  }
+ },
+ "sounds": {
+  "cs0_wind": [
+   [
+    "item.elytra.flying",
+    0.12,
+    0.6
+   ]
+  ],
+  "cs0_pour": [
+   [
+    "item.bottle.empty",
+    0.3,
+    1.4
+   ]
+  ],
+  "cs0_sip": [
+   [
+    "entity.generic.drink",
+    0.35,
+    1.3
+   ]
+  ],
+  "cs0_moon": [
+   [
+    "block.amethyst_block.chime",
+    0.3,
+    1.2
+   ]
+  ],
+  "cs0_cup": [
+   [
+    "block.decorated_pot.insert",
+    0.3,
+    1.8
+   ]
+  ],
+  "cloth": [
+   [
+    "item.armor.equip_leather",
+    0.3,
+    1.0
+   ]
+  ],
+  "grass_step": [
+   [
+    "block.grass.step",
+    0.25,
+    1.0
+   ]
+  ],
+  "cs0_petals": [
+   [
+    "block.cherry_leaves.fall",
+    0.3,
+    1.0
+   ]
+  ],
+  "scab_raise": [
+   [
+    "item.armor.equip_chain",
+    0.3,
+    1.4
+   ]
+  ],
+  "draw_spin": [
+   [
+    "item.trident.return",
+    0.6,
+    0.9
+   ]
+  ],
+  "draw": [
+   [
+    "entity.player.attack.sweep",
+    0.6,
+    1.4
+   ]
+  ],
+  "draw_ring": [
+   [
+    "block.amethyst_block.resonate",
+    0.5,
+    1.6
+   ]
+  ],
+  "lunge": [
+   [
+    "entity.phantom.swoop",
+    0.5,
+    1.6
+   ]
+  ],
+  "blade_lock": [
+   [
+    "block.anvil.land",
+    0.35,
+    1.7
+   ],
+   [
+    "item.trident.hit",
+    0.5,
+    1.0
+   ]
+  ],
+  "arc_crackle": [
+   [
+    "entity.lightning_bolt.impact",
+    0.15,
+    2.0
+   ]
+  ],
+  "hat_swing": [
+   [
+    "item.armor.equip_leather",
+    0.5,
+    1.0
+   ]
+  ],
+  "land_grass": [
+   [
+    "block.grass.step",
+    0.6,
+    1.0
+   ]
+  ],
+  "glint_ring": [
+   [
+    "block.amethyst_block.resonate",
+    0.5,
+    1.8
+   ]
+  ],
+  "black_drop": [
+   [
+    "block.beacon.deactivate",
+    0.5,
+    0.6
+   ]
+  ],
+  "petal_drift": [
+   [
+    "block.cherry_leaves.fall",
+    0.4,
+    1.0
+   ]
+  ],
+  "petal_cut": [
+   [
+    "block.amethyst_block.chime",
+    0.6,
+    2.0
+   ]
+  ],
+  "negative": [
+   [
+    "entity.player.attack.sweep",
+    1.0,
+    0.5
+   ],
+   [
+    "item.trident.riptide_3",
+    0.6,
+    1.6
+   ]
+  ],
+  "iai_slash": [
+   [
+    "item.trident.thunder",
+    0.5,
+    1.4
+   ],
+   [
+    "entity.generic.explode",
+    0.3,
+    1.8
+   ],
+   [
+    "block.glass.break",
+    0.5,
+    0.6
+   ]
+  ],
+  "hat_on": [
+   [
+    "item.armor.equip_leather",
+    0.4,
+    1.0
+   ]
+  ],
+  "dark_fall": [
+   [
+    "block.beacon.deactivate",
+    0.7,
+    0.6
+   ]
+  ],
+  "dark_hum": [
+   [
+    "entity.warden.sonic_charge",
+    0.2,
+    1.8
+   ]
+  ],
+  "brim_ring": [
+   [
+    "block.amethyst_block.resonate",
+    0.4,
+    1.2
+   ]
+  ],
+  "shield_refill": [
+   [
+    "block.respawn_anchor.charge",
+    0.4,
+    1.6
+   ]
+  ],
+  "repel_lock": [
+   [
+    "block.anvil.land",
+    0.3,
+    1.8
+   ]
+  ],
+  "blade_tick": [
+   [
+    "item.trident.hit",
+    0.4,
+    1.0
+   ]
+  ],
+  "grabbed": [
+   [
+    "item.armor.equip_chain",
+    0.4,
+    0.8
+   ]
+  ],
+  "hat_clash": [
+   [
+    "entity.player.attack.crit",
+    0.7,
+    1.0
+   ],
+   [
+    "block.anvil.place",
+    0.3,
+    1.6
+   ]
+  ],
+  "tip_over": [
+   [
+    "entity.player.attack.sweep",
+    0.6,
+    0.7
+   ]
+  ],
+  "step_light": [
+   [
+    "block.grass.step",
+    0.4,
+    1.0
+   ]
+  ],
+  "thrown": [
+   [
+    "entity.player.attack.knockback",
+    0.6,
+    1.0
+   ]
+  ],
+  "land_back": [
+   [
+    "entity.generic.big_fall",
+    0.6,
+    1.0
+   ],
+   [
+    "block.grass.break",
+    0.5,
+    1.0
+   ]
+  ],
+  "petal_break": [
+   [
+    "block.cherry_leaves.break",
+    0.4,
+    1.0
+   ]
+  ],
+  "kick": [
+   [
+    "entity.player.attack.strong",
+    0.8,
+    1.0
+   ],
+   [
+    "block.anvil.land",
+    0.4,
+    1.2
+   ]
+  ],
+  "band_glint": [
+   [
+    "block.amethyst_block.resonate",
+    0.6,
+    1.8
+   ]
+  ],
+  "band_sweep": [
+   [
+    "entity.breeze.wind_burst",
+    0.6,
+    1.2
+   ],
+   [
+    "entity.player.attack.sweep",
+    0.7,
+    0.8
+   ]
+  ],
+  "blade_charge": [
+   [
+    "block.respawn_anchor.charge",
+    0.4,
+    1.8
+   ]
+  ],
+  "clash": [
+   [
+    "block.anvil.land",
+    0.4,
+    1.5
+   ],
+   [
+    "entity.player.attack.crit",
+    0.6,
+    1.0
+   ]
+  ],
+  "clash_big": [
+   [
+    "block.anvil.place",
+    0.3,
+    1.7
+   ],
+   [
+    "entity.player.attack.strong",
+    0.5,
+    1.0
+   ]
+  ],
+  "bolt_crackle": [
+   [
+    "entity.lightning_bolt.impact",
+    0.2,
+    1.9
+   ]
+  ],
+  "air_slash": [
+   [
+    "entity.player.attack.sweep",
+    0.6,
+    1.0
+   ]
+  ],
+  "air_clash": [
+   [
+    "block.anvil.land",
+    0.5,
+    1.3
+   ]
+  ],
+  "air_white": [
+   [
+    "item.trident.thunder",
+    0.3,
+    1.8
+   ]
+  ],
+  "land_far": [
+   [
+    "entity.generic.big_fall",
+    0.4,
+    1.0
+   ]
+  ],
+  "scab_swing": [
+   [
+    "item.armor.equip_chain",
+    0.3,
+    1.6
+   ]
+  ],
+  "sheathe_click": [
+   [
+    "block.iron_trapdoor.close",
+    0.25,
+    1.8
+   ]
+  ],
+  "moon_gaze": [
+   [
+    "block.amethyst_block.chime",
+    0.2,
+    0.8
+   ]
+  ],
+  "pivot_cloth": [
+   [
+    "item.armor.equip_leather",
+    0.2,
+    1.0
+   ]
+  ],
+  "a1_fan": [
+   [
+    "entity.player.attack.sweep",
+    0.6,
+    1.3
+   ]
+  ],
+  "a1_hit": [
+   [
+    "entity.breeze.wind_burst",
+    0.4,
+    1.5
+   ],
+   [
+    "block.amethyst_block.resonate",
+    0.5,
+    1.7
+   ]
+  ],
+  "a2_draw": [
+   [
+    "item.trident.throw",
+    0.4,
+    1.6
+   ]
+  ],
+  "a2_hit": [
+   [
+    "entity.player.attack.sweep",
+    0.7,
+    1.5
+   ]
+  ],
+  "a3_h1": [
+   [
+    "entity.player.attack.sweep",
+    0.6,
+    1.2
+   ]
+  ],
+  "a3_h2": [
+   [
+    "entity.player.attack.sweep",
+    0.6,
+    1.3
+   ]
+  ],
+  "a3_h3": [
+   [
+    "entity.player.attack.sweep",
+    0.6,
+    1.4
+   ]
+  ],
+  "a3_h4": [
+   [
+    "entity.player.attack.sweep",
+    0.6,
+    1.5
+   ]
+  ],
+  "a3_h5": [
+   [
+    "entity.player.attack.sweep",
+    0.6,
+    1.6
+   ],
+   [
+    "entity.breeze.wind_burst",
+    0.5,
+    1.0
+   ]
+  ],
+  "leap": [
+   [
+    "entity.breeze.jump",
+    0.5,
+    1.0
+   ]
+  ],
+  "a4_glint": [
+   [
+    "block.amethyst_block.resonate",
+    0.6,
+    1.9
+   ]
+  ],
+  "a4_flip": [
+   [
+    "entity.phantom.swoop",
+    0.5,
+    1.4
+   ]
+  ],
+  "a4_impact": [
+   [
+    "entity.generic.explode",
+    0.3,
+    1.7
+   ],
+   [
+    "block.amethyst_block.break",
+    0.7,
+    1.0
+   ]
+  ],
+  "a5_spin": [
+   [
+    "item.trident.riptide_1",
+    0.5,
+    1.5
+   ]
+  ],
+  "a6_blink": [
+   [
+    "entity.illusioner.mirror_move",
+    0.7,
+    1.3
+   ]
+  ],
+  "a6_arrive": [
+   [
+    "entity.enderman.teleport",
+    0.2,
+    1.8
+   ]
+  ],
+  "yellow_chime": [
+   [
+    "block.bell.use",
+    0.6,
+    1.5
+   ],
+   [
+    "block.beacon.power_select",
+    0.5,
+    1.9
+   ]
+  ],
+  "a9_star": [
+   [
+    "block.amethyst_block.chime",
+    0.8,
+    2.0
+   ]
+  ],
+  "a9_flash": [
+   [
+    "entity.illusioner.cast_spell",
+    0.6,
+    1.4
+   ]
+  ],
+  "a9_cut": [
+   [
+    "item.trident.riptide_3",
+    0.6,
+    1.6
+   ],
+   [
+    "entity.player.attack.sweep",
+    1.0,
+    0.6
+   ]
+  ],
+  "a10_dive": [
+   [
+    "entity.phantom.swoop",
+    0.6,
+    1.2
+   ]
+  ],
+  "a10_impact": [
+   [
+    "item.mace.smash_ground",
+    0.6,
+    1.0
+   ],
+   [
+    "block.amethyst_cluster.break",
+    0.7,
+    1.0
+   ]
+  ],
+  "g_tell": [
+   [
+    "entity.illusioner.prepare_mirror",
+    0.7,
+    1.0
+   ],
+   [
+    "block.amethyst_block.resonate",
+    0.7,
+    1.2
+   ]
+  ],
+  "g_appear": [
+   [
+    "entity.illusioner.mirror_move",
+    0.5,
+    1.6
+   ]
+  ],
+  "g_dash": [
+   [
+    "entity.phantom.swoop",
+    0.4,
+    1.8
+   ]
+  ],
+  "g_flash": [
+   [
+    "entity.illusioner.cast_spell",
+    0.5,
+    1.8
+   ]
+  ],
+  "g_step": [
+   [
+    "block.grass.step",
+    0.3,
+    1.0
+   ]
+  ],
+  "g_ring": [
+   [
+    "entity.player.attack.sweep",
+    0.7,
+    1.3
+   ],
+   [
+    "block.amethyst_block.resonate",
+    0.4,
+    1.0
+   ]
+  ],
+  "g_rise": [
+   [
+    "entity.player.attack.sweep",
+    0.7,
+    1.1
+   ]
+  ],
+  "g_leap": [
+   [
+    "entity.breeze.jump",
+    0.4,
+    1.0
+   ]
+  ],
+  "g_leap_cut": [
+   [
+    "entity.player.attack.sweep",
+    0.7,
+    1.0
+   ]
+  ],
+  "g_sweep": [
+   [
+    "entity.player.attack.sweep",
+    0.7,
+    0.8
+   ],
+   [
+    "item.trident.riptide_1",
+    0.4,
+    1.0
+   ]
+  ],
+  "g_x": [
+   [
+    "entity.player.attack.sweep",
+    0.7,
+    1.2
+   ]
+  ],
+  "g_wrap": [
+   [
+    "entity.player.attack.sweep",
+    0.7,
+    1.0
+   ]
+  ],
+  "g_dome": [
+   [
+    "item.trident.riptide_2",
+    0.5,
+    1.4
+   ]
+  ],
+  "g_glow": [
+   [
+    "block.amethyst_block.chime",
+    0.6,
+    1.9
+   ]
+  ],
+  "g_vert": [
+   [
+    "entity.player.attack.sweep",
+    0.7,
+    1.5
+   ]
+  ],
+  "g_dive": [
+   [
+    "entity.phantom.swoop",
+    0.7,
+    1.0
+   ]
+  ],
+  "deco_bolt": [
+   [
+    "entity.lightning_bolt.impact",
+    0.15,
+    1.9
+   ]
+  ],
+  "disc_release": [
+   [
+    "item.trident.riptide_2",
+    0.6,
+    1.7
+   ],
+   [
+    "entity.breeze.shoot",
+    0.5,
+    1.0
+   ]
+  ],
+  "disc_fly": [
+   [
+    "item.trident.throw",
+    0.3,
+    1.0
+   ]
+  ],
+  "pip_break": [
+   [
+    "block.amethyst_cluster.break",
+    0.8,
+    1.4
+   ],
+   [
+    "entity.player.attack.crit",
+    0.5,
+    1.6
+   ]
+  ],
+  "deflect": [
+   [
+    "block.anvil.land",
+    0.6,
+    1.4
+   ],
+   [
+    "entity.player.attack.crit",
+    0.8,
+    1.0
+   ]
+  ],
+  "fail_impact": [
+   [
+    "entity.generic.explode",
+    0.5,
+    1.4
+   ],
+   [
+    "block.amethyst_block.break",
+    0.8,
+    1.0
+   ]
+  ],
+  "fatal_slash": [
+   [
+    "item.trident.thunder",
+    0.7,
+    1.2
+   ],
+   [
+    "entity.player.attack.sweep",
+    1.0,
+    0.5
+   ],
+   [
+    "block.glass.break",
+    0.6,
+    0.5
+   ]
+  ],
+  "ev_lift": [
+   [
+    "item.armor.equip_chain",
+    0.6,
+    1.2
+   ]
+  ],
+  "ev_chime": [
+   [
+    "block.amethyst_block.chime",
+    0.5,
+    1.4
+   ]
+  ],
+  "ev_toss": [
+   [
+    "entity.breeze.wind_burst",
+    0.4,
+    1.6
+   ]
+  ],
+  "ev_leave": [
+   [
+    "entity.breeze.whirl",
+    0.6,
+    1.3
+   ],
+   [
+    "block.cherry_leaves.break",
+    0.5,
+    1.0
+   ]
+  ],
+  "ev_beam": [
+   [
+    "block.amethyst_block.resonate",
+    0.7,
+    0.9
+   ]
+  ],
+  "ev_take_i": [
+   [
+    "item.armor.equip_netherite",
+    0.7,
+    1.1
+   ],
+   [
+    "block.note_block.chime",
+    0.6,
+    1.5
+   ]
+  ],
+  "ev_take_b": [
+   [
+    "entity.generic.drink",
+    0.5,
+    1.2
+   ],
+   [
+    "block.amethyst_block.resonate",
+    0.7,
+    1.4
+   ]
+  ]
+ },
+ "hud": {
+  "line": [
+   "id"
+  ],
+  "ovl": [
+   "g",
+   "in",
+   "hold",
+   "out"
+  ],
+  "warn": [
+   "on"
+  ],
+  "skip": [
+   "s"
+  ],
+  "clear": []
+ },
+ "lines": {
+  "1": {
+   "text": "꽃 속에 술 한 병 놓고,",
+   "steps": 7,
+   "on_screen": 40,
+   "colour": "#F2D0E8",
+   "width": 86
+  },
+  "2": {
+   "text": "벗 없이 혼자 술잔 드네.",
+   "steps": 6,
+   "on_screen": 40,
+   "colour": "#F2D0E8",
+   "width": 90
+  },
+  "3": {
+   "text": "잔 들어 밝은 달 맞이하니,",
+   "steps": 7,
+   "on_screen": 40,
+   "colour": "#F2D0E8",
+   "width": 98
+  },
+  "4": {
+   "text": "달과 나와 그림자 셋이 되었네...",
+   "steps": 8,
+   "on_screen": 50,
+   "colour": "#F2D0E8",
+   "width": 118
+  },
+  "5": {
+   "text": "그리고 이제 친구가 와 주었으니 월하독작이 아니라, 대작이 되겠구만.",
+   "steps": 18,
+   "on_screen": 100,
+   "colour": "#F2D0E8",
+   "width": 260,
+   "pages": [
+    {
+     "text": "그리고 이제 친구가 와 주었으니",
+     "from": 0,
+     "to": 47,
+     "width": 120
+    },
+    {
+     "text": "월하독작이 아니라, 대작이 되겠구만.",
+     "from": 47,
+     "to": 100,
+     "width": 136
+    }
+   ]
+  },
+  "6": {
+   "text": "낭자, 내 말하지 않았던가?",
+   "steps": 7,
+   "on_screen": 50,
+   "colour": "#F2D0E8",
+   "width": 100
+  },
+  "7": {
+   "text": "곧 또 보게 될 것 같다고.",
+   "steps": 8,
+   "on_screen": 44,
+   "colour": "#F2D0E8",
+   "width": 94
+  },
+  "8": {
+   "text": "아름다운 곳이지 않나?",
+   "steps": 6,
+   "on_screen": 44,
+   "colour": "#F2D0E8",
+   "width": 86
+  },
+  "9": {
+   "text": "신세진 것도 있겠다, 이 달 아래서...",
+   "steps": 10,
+   "on_screen": 56,
+   "colour": "#F2D0E8",
+   "width": 132
+  },
+  "10": {
+   "text": "한 수 가르침을 청하고 싶네만.",
+   "steps": 9,
+   "on_screen": 50,
+   "colour": "#F2D0E8",
+   "width": 114
+  },
+  "11": {
+   "text": "낭자 생각은 어떤가?",
+   "steps": 6,
+   "on_screen": 68,
+   "colour": "#F2D0E8",
+   "width": 78
+  },
+  "12": {
+   "text": "거기가 아닐세.",
+   "steps": 5,
+   "on_screen": 63,
+   "colour": "#F2D0E8",
+   "width": 54
+  },
+  "13": {
+   "text": "낭자, 대단하구만.",
+   "steps": 5,
+   "on_screen": 44,
+   "colour": "#F2D0E8",
+   "width": 64
+  },
+  "14": {
+   "text": "진심으로 가겠네.",
+   "steps": 5,
+   "on_screen": 42,
+   "colour": "#F2D0E8",
+   "width": 62
+  },
+  "15": {
+   "text": "천지만물을 벤다는 건...",
+   "steps": 7,
+   "on_screen": 36,
+   "colour": "#F2D0E8",
+   "width": 86
+  },
+  "16": {
+   "text": "이런 것일세.",
+   "steps": 4,
+   "on_screen": 40,
+   "colour": "#F2D0E8",
+   "width": 46
+  },
+  "17": {
+   "text": "낭자, 여기까지 하세.",
+   "steps": 5,
+   "on_screen": 60,
+   "colour": "#F2D0E8",
+   "width": 76
+  },
+  "18": {
+   "text": "대단하네, 좋은 수련이 되었어.",
+   "steps": 8,
+   "on_screen": 68,
+   "colour": "#F2D0E8",
+   "width": 112
+  },
+  "19": {
+   "text": "이제 정말 가야겠네.",
+   "steps": 5,
+   "on_screen": 45,
+   "colour": "#F2D0E8",
+   "width": 74
+  },
+  "20": {
+   "text": "다음 번에 만나면, 그땐 같이 한잔 하면 좋을 텐데...",
+   "steps": 11,
+   "on_screen": 119,
+   "colour": "#F2D0E8",
+   "width": 192
+  },
+  "21": {
+   "text": "달빛과 바람을 안주 삼아... 말일세.",
+   "steps": 9,
+   "on_screen": 130,
+   "colour": "#F2D0E8",
+   "width": 128
+  },
+  "22": {
+   "text": "어디 보자, 낭자네에선 이렇게 인사한다고 들었는데...",
+   "steps": 14,
+   "on_screen": 130,
+   "colour": "#F2D0E8",
+   "width": 196,
+   "pages": [
+    {
+     "text": "어디 보자,",
+     "from": 0,
+     "to": 26,
+     "width": 38
+    },
+    {
+     "text": "낭자네에선 이렇게 인사한다고 들었는데...",
+     "from": 26,
+     "to": 130,
+     "width": 154
+    }
+   ]
+  },
+  "23": {
+   "text": "당신의 기억이 이어지기를.",
+   "steps": 8,
+   "on_screen": 90,
+   "colour": "#F2D0E8",
+   "width": 98
+  },
+  "24": {
+   "text": "조심하게. 칼자루를 쥐었다고 그 검의 주인이 되는 것은 아니니.",
+   "steps": 15,
+   "on_screen": 48,
+   "colour": "#F2D0E8",
+   "width": 236,
+   "pages": [
+    {
+     "text": "조심하게. 칼자루를 쥐었다고",
+     "from": 0,
+     "to": 22,
+     "width": 106
+    },
+    {
+     "text": "그 검의 주인이 되는 것은 아니니.",
+     "from": 22,
+     "to": 48,
+     "width": 126
+    }
+   ]
+  },
+  "25": {
+   "text": "한잔할 텐가? 안주는 달빛과 바람일세.",
+   "steps": 10,
+   "on_screen": 48,
+   "colour": "#F2D0E8",
+   "width": 144
+  }
+ },
+ "line_max_px": 192,
+ "glyphs": {
+  "black": {
+   "cp": "U+EC10",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "negative": {
+   "cp": "U+EC11",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "pinkwhite": {
+   "cp": "U+EC12",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "red_tint": {
+   "cp": "U+EC13",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "magenta": {
+   "cp": "U+EC14",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "white": {
+   "cp": "U+EC15",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "vig": {
+   "cp": "U+EC16",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "black_1": {
+   "cp": "U+EC20",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "black_2": {
+   "cp": "U+EC21",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "black_3": {
+   "cp": "U+EC22",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "black_4": {
+   "cp": "U+EC23",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "negative_1": {
+   "cp": "U+EC24",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "negative_2": {
+   "cp": "U+EC25",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "negative_3": {
+   "cp": "U+EC26",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "negative_4": {
+   "cp": "U+EC27",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "pinkwhite_1": {
+   "cp": "U+EC28",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "pinkwhite_2": {
+   "cp": "U+EC29",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "pinkwhite_3": {
+   "cp": "U+EC2A",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "pinkwhite_4": {
+   "cp": "U+EC2B",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "red_tint_1": {
+   "cp": "U+EC2C",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "red_tint_2": {
+   "cp": "U+EC2D",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "red_tint_3": {
+   "cp": "U+EC2E",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "red_tint_4": {
+   "cp": "U+EC2F",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "magenta_1": {
+   "cp": "U+EC30",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "magenta_2": {
+   "cp": "U+EC31",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "magenta_3": {
+   "cp": "U+EC32",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "magenta_4": {
+   "cp": "U+EC33",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "white_1": {
+   "cp": "U+EC34",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "white_2": {
+   "cp": "U+EC35",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "white_3": {
+   "cp": "U+EC36",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "white_4": {
+   "cp": "U+EC37",
+   "px": [
+    144,
+    81
+   ],
+   "height": 144,
+   "ascent": 69
+  }
+ },
+ "space": "U+EC1F (-1)",
+ "warn": {
+  "bossbar": "rlk:hr_warn",
+  "text": "대시로 베기를 아슬아슬하게 피해 실드를 모두 깎으세요 — 실드가 남으면 즉사합니다",
+  "component": "{text:\"\",extra:[{text:\"대시로 베기를 아슬아슬하게 피해 실드를 모두 깎으세요 — 실드가 남으면 \",color:\"white\",font:\"minecraft:default\"},{text:\"즉사\",color:\"#FF3A55\",bold:true,font:\"minecraft:default\"},{text:\"합니다\",color:\"white\",font:\"minecraft:default\"}]}"
+ },
+ "skip": {
+  "text": "⊙ 건너뛰기",
+  "hint": " · Shift 길게",
+  "steps": [
+   "#A8A8B0",
+   "#BEBEC5",
+   "#D3D3D9",
+   "#E9E9EC",
+   "#FFFFFF"
+  ]
+ },
+ "gate_icon": "rlk:mboss/hr_kit/gate_icon",
+ "demos": {
+  "qi_arc": 110,
+  "qi_ring": 70,
+  "qi_band": 75,
+  "qi_x": 50,
+  "qi_dome": 50,
+  "qi_vert": 70,
+  "qi_fan": 50,
+  "qi_wedge": 50,
+  "qi_ribbon": 50,
+  "qi_line": 65,
+  "qi_cut": 50,
+  "glint": 74,
+  "star4": 50,
+  "yellow_tell": 50,
+  "ghost_burst": 50,
+  "ghost_trail": 50,
+  "ghost_flash": 50,
+  "afterimage": 60,
+  "blink_bubble": 50,
+  "shield_refill": 50,
+  "pip_break": 50,
+  "dive_impact": 50,
+  "burst_radial": 50,
+  "light_column": 50,
+  "claw_streaks": 50,
+  "dust_ring": 50,
+  "kick_flash": 50,
+  "clash_gold": 50,
+  "clash_spark": 62,
+  "clash_arc": 58,
+  "deco_bolt": 50,
+  "scarlet_line": 50,
+  "petal_burst": 50,
+  "petals_drift": 50,
+  "petals_wind": 50,
+  "petals_heart": 50,
+  "motes_warm": 50,
+  "leaves_dark": 50,
+  "leaves_swirl": 50,
+  "ambient_p1": 115,
+  "ambient_p2": 123,
+  "arrive_rift": 50,
+  "ev_glint": 50,
+  "ev_trail": 59,
+  "ev_petals": 78,
+  "ev_leave": 50,
+  "ev_beam": 50,
+  "ev_wind": 50,
+  "ev_palm": 65,
+  "ev_take": 75,
+  "prop/disc": 90,
+  "prop/petal_big": 90,
+  "prop/moon_halo": 140,
+  "prop/lotus": 90,
+  "prop/seat_rock": 90
+ }
+}

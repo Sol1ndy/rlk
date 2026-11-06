@@ -1,0 +1,8 @@
+execute if score @s knRigT matches 110 run return run function rlk:boss/arlecchino/rig/c/t_p2/k/110
+execute if score @s knRigT matches 111 run return run function rlk:boss/arlecchino/rig/c/t_p2/k/111
+execute if score @s knRigT matches 112 run return run function rlk:boss/arlecchino/rig/c/t_p2/k/112
+execute if score @s knRigT matches 113 run return run function rlk:boss/arlecchino/rig/c/t_p2/k/113
+execute if score @s knRigT matches 116 run return run function rlk:boss/arlecchino/rig/c/t_p2/k/116
+execute if score @s knRigT matches 117 run return run function rlk:boss/arlecchino/rig/c/t_p2/k/117
+execute if score @s knRigT matches 118 run return run function rlk:boss/arlecchino/rig/c/t_p2/k/118
+execute if score @s knRigT matches 119 run return run function rlk:boss/arlecchino/rig/c/t_p2/k/119

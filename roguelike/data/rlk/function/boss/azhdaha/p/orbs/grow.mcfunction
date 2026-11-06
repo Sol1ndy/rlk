@@ -1,0 +1,21 @@
+# Growing out from the sides (bg clock 0..9): the orbit radius ramps to its ring (azT = r x 1000).
+execute if score #azBgLT mb matches 0 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r1] azT 2698
+execute if score #azBgLT mb matches 0 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r2] azT 4358
+execute if score #azBgLT mb matches 1 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r1] azT 3120
+execute if score #azBgLT mb matches 1 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r2] azT 5040
+execute if score #azBgLT mb matches 2 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r1] azT 3542
+execute if score #azBgLT mb matches 2 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r2] azT 5722
+execute if score #azBgLT mb matches 3 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r1] azT 3965
+execute if score #azBgLT mb matches 3 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r2] azT 6405
+execute if score #azBgLT mb matches 4 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r1] azT 4388
+execute if score #azBgLT mb matches 4 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r2] azT 7088
+execute if score #azBgLT mb matches 5 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r1] azT 4810
+execute if score #azBgLT mb matches 5 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r2] azT 7770
+execute if score #azBgLT mb matches 6 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r1] azT 5232
+execute if score #azBgLT mb matches 6 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r2] azT 8452
+execute if score #azBgLT mb matches 7 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r1] azT 5655
+execute if score #azBgLT mb matches 7 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r2] azT 9135
+execute if score #azBgLT mb matches 8 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r1] azT 6078
+execute if score #azBgLT mb matches 8 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r2] azT 9818
+execute if score #azBgLT mb matches 9 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r1] azT 6500
+execute if score #azBgLT mb matches 9 run scoreboard players set @e[type=minecraft:marker,tag=rlk_mb_az_p31r2] azT 10500

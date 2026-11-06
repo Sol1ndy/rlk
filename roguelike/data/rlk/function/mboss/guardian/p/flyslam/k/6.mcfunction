@@ -1,0 +1,4 @@
+# flyslam clip tick 6
+execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_q5c6_0,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:7,transformation:{translation:[0.342f,2.813f,-0.29f],left_rotation:[0.252f,-0.179f,-0.781f,0.543f],scale:[0.013f,0.013f,0.013f],right_rotation:[0f,0f,0f,1f]}}
+execute as @e[type=minecraft:block_display,tag=rlk_mb_gd_q5c6_1,limit=1] run data merge entity @s {start_interpolation:0,interpolation_duration:6,transformation:{translation:[0.148f,3.003f,-0.409f],left_rotation:[-0.216f,0.123f,-0.221f,0.943f],scale:[0.019f,0.019f,0.019f],right_rotation:[0f,0f,0f,1f]}}
+execute at @s rotated as @s rotated ~ 0 positioned ^-0.659 ^5.913 ^0.335 run particle minecraft:dust{color:[1f,0.96f,0.75f],scale:0.6} ~ ~ ~ 0.1 0.1 0.1 0 2 force @a[tag=player]

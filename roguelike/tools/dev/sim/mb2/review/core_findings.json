@@ -1,0 +1,315 @@
+[
+ {
+  "dim": "state",
+  "findings": [
+   {
+    "id": "S1",
+    "severity": "blocker",
+    "file": "roguelike/tools/mboss_butterfly/api.py:268-271 (Gen.keep); roguelike/tools/mboss_butterfly/core.py:685-694 (p/finish); used at human.py:55,63,85,88,104 and wing.py:60,103,178-180; contract bf_contract.md §7.5 lines 177-180",
+    "title": "Markers kept with Gen.keep are never killed when a pattern ends normally, so every later run aims at the first run's marker",
+    "scenario": "Gen.keep re-tags the fresh dest/lock marker with the pattern's tag. Nothing removes the old one: p/finish kills only rlk_mb_bf_dest and rlk_mb_bf_lock, and the contract says only to kill the tag in cancel, which does not run on a normal end. One marker per tag piles up per run. On the next run, `@e[type=marker,tag=<kept>,limit=1]` resolves in arbitrary order, which is oldest first both in game (EntityLookup is an insertion-ordered map) and in mcsim, so it picks the FIRST run's marker. From the second run on, H1 (both hits and both glides), H2 (jump and the disc lock), H3 (dash and ring), B1, B3 (fan and dive) and B5 (swoop) all use stale coordinates. Repro with lock 3 (H3), the player moved between runs: on run 2 the r 3.5 ring is placed at (206.1, 11.0), run 1's spot, while the player stands at (205.0, 4.6), 6.5 b away. The 130 % hit cannot land and the body glides back to the old spot. Normal rotation over 7000 t (no lock) leaves these markers alive: p1a 5, p1b 5, p2a 10, p2b 10, p3a 5, p11a 6, p13a 6, p15a 6, p15b 6. Only B2 is unaffected, because it kills its tag before keep. The section-9 timing cases miss this because measure() resets the body and player to the same spots for each case.",
+    "evidence": "review/state/e8_kept.py (H1: from run 2, both hazards sit at run 1's (200.2,14.8)/(200.9,14.1); H3: ring at (206.1,11.0) with the player at (205.0,4.6) / (206.1,18.0)); review/state/e8b_rotation.py (marker counts above). Fix check: review/state/v_keep (keep kills first) puts the hazards under the current player, keeps 1 marker per tag (p15b still 6, since it is summoned directly), and test_butterfly.py still passes in full.",
+    "fix": "In Gen.keep emit `kill @e[type=minecraft:marker,tag=<new_tag>]` before re-tagging (validated). Also add a shared tag (e.g. rlk_mb_bf_kept) in keep and kill `@e[type=marker,tag=rlk_mb_bf_kept]` in p/finish and p/cancel. B5's directly summoned rlk_mb_bf_p15b (wing.py:179) needs a kill before its summon. Change contract §7.5 to: kill your kept tag at your end and before re-keeping, not only in cancel. Add a timing case that runs the same pattern twice with the player moved."
+   },
+   {
+    "id": "S2",
+    "severity": "major",
+    "file": "roguelike/tools/mboss_butterfly/core.py:653-658 (ai/pat_done, line 655 `execute if score #bfPRel mb matches 1 run return 0`); api.py:245-248 (Gen.release); bf_contract.md §4 line 101",
+    "title": "g.release(), which the contract offers, freezes the AI for the rest of the fight",
+    "scenario": "The butterfly copied the Guardian's 'owner moves on at release' early return. Nothing in the butterfly core moves on at release, though. A pattern that calls g.release() sets #bfPRel 1. At its p/end, p/finish clears the slot (#bfPat 0) and ai/pat_done returns early: no ai/recover, no form/transform_done, no groggy/begin. #bfSt stays 1, and ai/state has no branch for 1, so from then on there are no decisions, attacks, tracking, locomotion or form changes. B5 is the obvious candidate ('harmless tail' after the dome). With `tl.at(B5_DET+5, g.release())`, (St, Pat, Form) becomes (1, 0, 1) at t 235 and never changes again (baseline: groggy at 235, then H2, H1, ...). With H3 releasing at 30 under lock 3, the boss is frozen after the first H3 (baseline: 9 runs in 600 t). HEAD does not call release yet, but stage-2 authors are told to use it 'as the Guardian's'.",
+    "evidence": "review/state/v_rel + e1_release.py; review/state/v_rel5 + e1b_release_b5.py. With line 655 removed, v_rel5 gives a timeline identical to the baseline.",
+    "fix": "Delete the #bfPRel early return in ai/pat_done and keep #bfPRel only to hide the pattern bar. Alternatively, remove Gen.release from api.py and from contract §4."
+   },
+   {
+    "id": "S3",
+    "severity": "minor",
+    "file": "roguelike/tools/mboss_butterfly/core.py:1060 (death_tick: shatter gated on #bfForm 2), core.py:821 (p/transform/cancel is empty), core.py:1160-1169 (test/cut), core.py:783-785 (form flips only at transform_done)",
+    "title": "Death or a test cut mid-transformation leaves the rig in butterfly form while #bfForm is 1",
+    "scenario": "The transform clip switches the rig to butterfly at clip tick 4. Both the stub manifest and the real rig manifest in wt_rig say forms.transform = [4, 'butterfly']. #bfForm and the hitbox flip only at transform_done (PT 30). (a) Kill her at transform PT 4..29, e.g. PT 10: #bfForm 1, rig form flag 2. death_tick never runs fx/death_shatter (no p/wing_shatter), so the spread wings never shatter and stay up through the kneel and dissolve until the rig kill at 100. Plan: 'the wings (if any) shatter'. (b) test 99 / 1-4 at PT 10: test/cut plays idle_h but nothing restores the rig form. The following H1/H2 runs keep the wings shown (pattern, #bfForm, rig flag) = (1,1,2), (2,1,2), ... until the next form change.",
+    "evidence": "review/state/e3_death_tf.py, which runs the stub rig for real: 'transform PT 10: #bfForm 1, stub rig form flag 2 ... wing_shatter kit calls during the death: []'; PT 2 is consistent. review/state/e3b_cut_tf.py: [(1, 1, 2), (2, 1, 2), (1, 1, 2), (2, 1, 2)]. Reload is not affected (the rig is respawned human); the release is consistent (rig and core flip together at 92).",
+    "fix": "In death_start, compute a 'wings shown' flag before p/cancel (#bfForm 2, or #bfPat 20 with #bfPT >= TR_OPEN) and gate fx/death_shatter on it. Give p/transform/cancel `execute if score #mbSt mb matches 1 as <body> run function .../form/rig_h` so test cuts restore the human rig, while death keeps the wings so they can shatter."
+   },
+   {
+    "id": "S4",
+    "severity": "minor",
+    "file": "roguelike/tools/mboss_butterfly/core.py:349-352 (reload hook)",
+    "title": "/reload while the player is still debuffed in human form loses the groggy's 달빛 이슬 for good",
+    "scenario": "The player is still under 달빛 고치 after B5, so groggy T 20 spawns one heal orb (dew/spawn1). A /reload later in that groggy, in the turn + re-form, or in the following human stretch kills the orb with every aux entity. coc/assert keeps the debuff (#mbHealPct 60, DMG x50 %), but the reload respawns orbs only when #bfForm 2, and groggy/tick spawns only at exactly T 20. The player has no cure on offer until the next transformation, about 600-900 t later. This contradicts the contract's 'reload re-asserts it from the module state' and the plan's 'one new orb appears during the groggy'.",
+    "evidence": "review/state/e4_reload_dew.py: for the groggy, recover and human phases, 'orbs before /reload 1' becomes 'after /reload: coc 1 #mbHealPct 60 orbs 0', and 'orbs offered until the next transformation: 0 still debuffed: 1' (next transformation at t 870-928).",
+    "fix": "In the reload hook, also run dew/spawn1 when #bfCoc 1, #bfForm 1 and not (#bfSt 3 with #bfT < 20). Alternatively, track a #bfDew1 flag that dew/spawn1 sets and dew/take / dew/clear clear, and respawn from it."
+   },
+   {
+    "id": "S5",
+    "severity": "minor",
+    "file": "roguelike/tools/mboss_butterfly/wing.py:33 (B1 bands), wing.py:37 (B3 bands); test_butterfly.py:180 (`allowed` dict locks the stub's bands)",
+    "title": "Butterfly range bands differ from plan.md 'Q5/Q6 butterfly bands', which is binding",
+    "scenario": "The plan says B1 melee 2 / mid 1, B3 melee 1 / mid 2, and neither in the far band (their dive covers <= 7-8 b). The stub gives B1 melee/mid/far at weight 1 and B3 melee 1 / mid 2 / far 1. Generated ai/cand_b sets #bfC11 1 and #bfC13 1 for band 3. With the player held 10 b away in butterfly form, 6000 t gave far-band picks B1 15, B2 14, B3 14, B4 14: half the far picks are patterns the plan bans there. At 3 b, B1 36 and B3 37 (plan 2:1). The suite's rotation check uses the stub's bands, so it cannot catch this.",
+    "evidence": "review/state/e6_bands.py: 'player 10.0 b away (far): band at the pick {3: 57}, picks {11: 15, 12: 14, 13: 14, 14: 14}'; 'player 3.0 b away (melee): picks {11: 36, 13: 37}'.",
+    "fix": "B1: bands=('melee','mid'), weight={'melee': 2}. B3: bands=('melee','mid'), weight={'mid': 2}. Change test_butterfly.py `allowed` to 11: {1,2}, 13: {1,2} so the rotation test locks the plan."
+   },
+   {
+    "id": "S6",
+    "severity": "minor",
+    "file": "roguelike/tools/mboss_butterfly/core.py:505-510 (ai/loco_b -> mv/toward / mv/away -> mv/ok r 18.5), core.py:236-254 (u/dest)",
+    "title": "Butterfly-form body clamp r 16.5 (plan Q9, binding) is not implemented",
+    "scenario": "In butterfly form, put her at r 15 and the player at r 13.5 on the same ray, so she is inside 5 b. ai/glide_out pushes her outward until mv/ok's 18.5 b limit and she settles at r 18.4. Her wings span about 9.3 b, so the tips reach about r 23, inside the 7-high wall ring, which is the reason for Q9. u/dest, used by the B1 and B3 dives, also stops at 18.5 in butterfly form.",
+    "evidence": "review/state/e7_bclamp.py: 'butterfly form (#bfForm 2), idle glide: body radius max 18.40 b (plan Q9 clamp 16.5)'.",
+    "fix": "Add a module check, e.g. u/ok_b = mv/ok plus `positioned ~ 201 ~ if entity @e[tag=rlk_mb_arena,distance=..16.5]`. Use it in ai/glide_in, ai/glide_out and ai/prep's back-off, and in u/dest_step while #bfForm 2. Add a 16.5 b leash in butterfly form (Q9 / spec README recommendation)."
+   },
+   {
+    "id": "S7",
+    "severity": "minor",
+    "file": "roguelike/tools/mboss_butterfly/core.py:1193 (test 42, butterfly branch)",
+    "title": "test 42 ('다음 결정에서 형태 전환') in butterfly form often does not change the form at the next decision",
+    "scenario": "In butterfly form, test 42 only sets #bfBfT to BF_T - 20 = 880. Right after the transformation (#bfCool 16), the next decision comes 16 t later with #bfBfT 896 < 900, so ai/next_b picks B1 instead of 달빛 해제. The human branch sets HumN = HumLim and switches every time.",
+    "evidence": "review/state/e2_test42.py: 'after test 42: ... BfT 880 ...', then 'next decision -> pick 11 {... Pat 11, BfT 896}'.",
+    "fix": "`scoreboard players operation #bfBfN mb = #bfBfLim mb` (mirroring the human branch), or set #bfBfT to BF_T."
+   },
+   {
+    "id": "S8",
+    "severity": "minor",
+    "file": "roguelike/tools/mboss_butterfly/core.py:1160-1169 (test/cut) with core.py:860-866 (the human stretch counters are reset only in groggy/end)",
+    "title": "Cutting the groggy with a test command goes straight into a new transformation",
+    "scenario": "During a natural groggy, the counters still hold the previous stretch (HumN 5, HumLim 5, HumTL 600). test 99 ('대기로'), or test 1-4 / 11-14 which also call test/cut, skips groggy/end. The next ai/next_h sees HumN >= HumLim and starts the transformation, with a fresh 달빛 고치, instead of the 4-pattern human rotation.",
+    "evidence": "review/state/e11_cut_groggy.py: 'in the groggy: {St 3, HumN 5, HumLim 5, HumTL 600, T 50}', then 'patterns after test 99 in the groggy: [20, 14, 13, 12]'.",
+    "fix": "Reset the human stretch counters (HumN 0, HumLim HUM_NEXT_N, HumT 0, HumTL 0) in groggy/begin, so both the reload (bfX 2/3) and test cuts see the new stretch. groggy/end keeps only the H2 request. Alternatively, have test/cut run the reset when #bfSt is 3 or 4."
+   }
+  ],
+  "verdicts": [
+   {
+    "id": "S1",
+    "real": true,
+    "severity": "blocker",
+    "reason": "Confirmed by code and in mcsim on a copy of HEAD (review/state_verify/rl). Gen.keep (api.py:268-271) only re-tags the marker. p/finish (core.py:685-694) kills only rlk_mb_bf_dest and rlk_mb_bf_lock, and nothing else in the framework kills markers during a fight (only cleanup_aux at the end). So one marker per kept tag is left behind after every run. `@e[type=marker,tag=X,limit=1]` has no sort or position, so in game it walks EntityLookup.byId (insertion order) and in mcsim the ents list: both return the OLDEST marker. Reproduced with review/state_verify/s1_kept2.py and s1_b5.py; the player stands still during each run and moves between runs. H3: runs 2-3 put the r 3.5 ring at run 1's (199.7,12.0), 5.0 b from the player; no hit; the body dashes back to the old spot. H2: the disc is locked at run 1's spot (2.6 / 3.5 b off) and the 140 % hit is lost. H1: both hazards and both glides use run 1's spots. B1: hazards at run 1's (200.0,11.4), 6.0-6.5 b off, no hit. B3: the fan stays at run 1's spot. B5: p15b is computed from the oldest p15a, and the swoop glides to the oldest p15b, so on cycles 2 and 3 she ends 12.1 / 14.6 b from the player and the r 10 dome around her body cannot reach them. The 7000 t rotation leaves p1a 5, p1b 5, p2a 10, p2b 10, p3a 5, p11a/p13a/p15a/p15b 6 alive, exactly as reported. measure() in test_butterfly section 9 resets the body and the player to the same spots, which hides the bug. I tested the fix (kill <tag> before re-tagging in Gen.keep, and kill p15b before its summon) in review/state_verify/rl_keepfix: the hazards land under the current player every run, 1 marker per tag remains, and the HEAD-era test_butterfly (tests_snap) passes all 89 checks. Note: both in-flight author branches already work around this (wt_h human.py kill_mk, wt_w wing.py kills before each keep). The core API and contract §7.5 ('kill your tag in cancel') are still wrong, and the integrated HEAD is broken from each pattern's second run."
+   },
+   {
+    "id": "S2",
+    "real": true,
+    "severity": "major (latent)",
+    "reason": "Confirmed. ai/pat_done (core.py:653-658) returns early when #bfPRel is 1. This was copied from the Guardian, where an owning state actually watches #gdPRel and moves on (chaos/fail_end, core.py:905 of mboss_guardian). No butterfly state reads #bfPRel, and ai/state has no branch for St 1. Repro on copies with a one-line pattern change (review/state_verify/rl_rel3, rl_rel5; s2_timeline.py). H3 calling g.release() at PT 30 under lock 3: one start, then (St, Pat, Form) stays (1, 0, 1) forever (HEAD: 9 runs in 600 t). B5 calling g.release() at E+5 in the natural rotation: frozen at (1, 0, 1) from t 950, with no groggy and no further patterns (HEAD continues: 2, 4, 3, 1, 20, ...). Removing the early return (rl_rel5fix) gives a pattern timeline identical to HEAD over 2000 t. Severity is latent: no pattern in HEAD, wt_h or wt_w calls g.release(). But contract §4 offers it ('as the Guardian's'), and using it freezes the fight."
+   },
+   {
+    "id": "S3",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed with the stub rig actually executing (review/state_verify/s3_tf.py). Killed at transformation PT 10: #bfForm 1, stub rig form flag 2 (wings shown since clip tick 4). There are no p/wing_shatter or snd/wing_shatter kit calls during the death, and the rig flag stays 2 at death ticks 5/10/30/60/95. Baseline death in butterfly form: wing_shatter at death tick 6. Killed at PT 2: consistent (flag 1). Test cut (test 1) at PT 10: (pattern, #bfForm, rig flag) = (1,1,2), (2,1,2), (1,1,2), (2,1,2), (1,1,2), until the next transformation. Caveat on impact: with the real rig (wt_rig manifest and generated rig), the death clip is human from tick 0 and shrinks the wings itself, and idle_h keys the wing parts to scale 0. So 'wings stay up' is a stub-only symptom. What remains with the real rig: the missing shatter shards and sound when she dies during transform PT 4..29, and a stale bfRigForm 2 after a test cut (a part respawn would come back in the butterfly pose). The proposed fixes are sound."
+   },
+   {
+    "id": "S4",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed (review/state_verify/s4_reload.py, natural rotation, player kept at the rim so no orb is picked up). Baseline: the groggy's single 달빛 이슬 appears. /reload at groggy T 50, during the turn / re-form, or in the following human stretch: 'orbs before 1, right after 0', #bfCoc 1, #mbHealPct 60, #bfDmgPct 50 kept, and 0 orbs offered until the next transformation (t 1671-1732). /reload at groggy T 10 is fine (groggy/tick still spawns at T 20). This is because the reload hook (core.py:349) respawns orbs only when #bfForm 2. Note on the suggested fix: in the reload hook the dew line runs before `groggy/begin` for #bfX 2 (St is still 1 there), so the condition must also exclude #bfX 2, or that case gets two orbs. The #bfDew1 flag variant avoids this."
+   },
+   {
+    "id": "S5",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed at HEAD. wing.py:33 gives B1 bands melee/mid/far, weight 1 each; wing.py:37 gives B3 melee 1 / mid 2 / far 1. The generated ai/cand_b sets #bfC11 1 and #bfC13 1 for band 3. plan.md Q5/Q6 (binding) says B1 2/1/–, B3 1/2/–. mcsim (review/state_verify/s5_bands.py, butterfly form held, same seed): player at 10 b gives far-band picks {11: 15, 12: 14, 13: 14, 14: 14}, so half the far picks are banned patterns; player at 3 b gives {11: 36, 13: 37} instead of 2:1. test_butterfly.py:180 `allowed` permits band 3 for 11 and 13, so the suite cannot catch this. Already corrected in the wing author's wip/bf-w (wt_w wing.py:84/88: B1 melee/mid with melee×2, B3 melee/mid with mid×2), not yet merged. The shared `allowed` dict is still unchanged there."
+   },
+   {
+    "id": "S6",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed at HEAD. HEAD's butterfly code has no 16.5 clamp: ai/glide_out goes through mv/away, then mv/ok (18.5 b), and u/dest_step also uses mv/ok. mcsim (review/state_verify/s6_clamp.py): in butterfly form with the body at r 15 and the player at r 13.5 on the same ray, the idle glide settles her at r 18.40. With decisions on and the player circling at r 13-17, the maximum is also 18.40. plan.md Q9 (binding) says r 16.5. The 'tips reach r 23' rationale comes from spec Q9: 9 b span, true when the wings point radially, about r 19 when they are tangential. The clamp is missing either way. wip/bf-w adds wx/u/btick (0.3 b/t leash at r 16.5) and okb, pending merge."
+   },
+   {
+    "id": "S7",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed (review/state_verify/s7_test42.py). Right after the transformation (Cool 16), test 42 sets only #bfBfT 880. The next decision comes at BfT 896 < 900, so ai/next_b picks 11 (B1) instead of 달빛 해제. In human form, test 42 sets HumN = HumLim and the next decision starts 20 (transformation). The bug hits whenever the next decision is less than 20 t away (idle, prep, recover). Test command only. Unchanged in wt_w."
+   },
+   {
+    "id": "S8",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed (review/state_verify/s8_cut_groggy.py, natural groggy after a natural B5). In the groggy: HumN 5, HumLim 5, HumTL 600 (the previous stretch). No command: next patterns [2, 4, 3, 2, 20], 1 debuff application. test 99: [20, 12, 14, 13, 11], so an immediate transformation with a second 달빛 고치 (#bfCocN 2). test 1: [1, 20, ...]. test 40 is fine (it re-enters groggy/begin and later groggy/end). This is because only groggy/end (core.py:860-866) resets the stretch counters and test/cut skips it. Only test commands can cut the groggy (reload is handled by bfX 3), so this is test-only."
+   }
+  ]
+ },
+ {
+  "dim": "player",
+  "findings": [
+   {
+    "id": "PL-1",
+    "severity": "minor",
+    "file": "roguelike/tools/mboss_butterfly/core.py:893 and :909 (generated roguelike/data/rlk/function/mboss/butterfly/coc/apply_pl.mcfunction:22 and coc/cure.mcfunction:9; the kit presets fx/p/coc_apply.mcfunction:4 'glow' and fx/p/cure.mcfunction:5 'cure_burst')",
+    "title": "In first-person view, the debuff and cure cards sit on the player's eyes: they fill the screen when looking down, and the cure's beam and emblem are edge-on (not seen)",
+    "scenario": "The player uses first-person view (the settings-room view button, or /function rlk:view/off; view/fps_tick.mcfunction:3 then tags the player itself as rlk_body). Both effects are spawned 'execute at @e[tag=rlk_body]', so they land at the player's own x/z.\n(1) At the transformation's light sphere, fx/p/coc_apply spawns the maroon 'glow' card: billboard center, 2.4 -> 1.0 b, 10 t, centred 0.62 b under the eye.\n(2) On the cure, fx/p/cure spawns the gold 'cure_burst' card: billboard center, 0.6 -> 3.4 b, 7 t, also 0.62 b under the eye.\nA center billboard is drawn parallel to the screen through that point, so its distance in front of the eye is 0.62 x sin(pitch). Looking down 10-45 deg puts the card 0.11-0.44 b in front of the eye, covering the screen centre: the whole view turns into a maroon or gold blob for 7-10 t.\nThe 'cure_beam' (vertical, 4 b) and 'cure_emblem' (vertical, +2.6) sit on a vertical plane through the camera, so they are edge-on and invisible. In first person the plan's 'gold beam down, gold burst, gold emblem with sparkles' therefore becomes a screen-filling burst, or nothing when looking up.\nThe project convention avoids this: the Guardian's P4 builds head-height cubes only when the shoulder-view avatar exists (tools/mboss_guardian/p34.py:501-502, README 'in first person no eye-height cubes are made').\nSeverity: minor (visual only, first-person view only).",
+    "fix": "Spawn the at-body cards only when an avatar exists. Gate core.py:893 and :909 with 'execute if entity @e[tag=rlk_av,limit=1] at @e[tag=rlk_body,limit=1] ...', the same as Guardian p34.py:502.\nIn first person, use the kit's title-line screen flashes, which are already generated and unused (fx/hud/flash_maroon at the application, fx/hud/flash_gold at the cure), and keep only the floor 'ripple'.\nAlternative: anchor the presets about 2 b in front of the eye ('anchored eyes positioned ^ ^ ^2').",
+    "evidence": "Script /tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/mb2/review/player/fp_fx.py. It runs on a copy of the datapack and records the summon NBT of every kit card on test 21 (application) and on test 22 (heal -> cure). Output, with the bfsim player as rlk_body (first person), feet y 201, eye y 202.62:\n  glow       bb=center   dx=0 dy=-0.62 size<=2.40 | pitch 10: +0.11 b ahead, covers centre True; 20: +0.21 True; 30: +0.31 True; 45: +0.44 True\n  cure_burst bb=center   dx=0 dy=-0.62 size<=3.40 | pitch 10: +0.11 b ahead, covers centre True; ... 45: +0.44 True\n  cure_beam  bb=vertical dx=0 dy=-1.62 size<=4.00 (vertical plane through the eye: edge-on)\n  cure_emblem bb=vertical dx=0 dy=+0.98 size<=1.45 (edge-on)\nThe kit's spawn (fx/e/spawn.mcfunction) uses item_display:\"none\" with translation 0, so the card is centred on the summon point."
+   },
+   {
+    "id": "PL-2",
+    "severity": "minor",
+    "file": "roguelike/tools/mboss_butterfly/core.py:841 (groggy orb) and :786-790 (form/sphere spawns 3 orbs without clearing); generated roguelike/data/rlk/function/mboss/butterfly/groggy/tick.mcfunction:3 and form/sphere.mcfunction:4",
+    "title": "The groggy-time 달빛 이슬 never goes away: it lasts through the whole human stretch and stacks with the next transformation's 3 orbs (4 live orbs)",
+    "scenario": "State: the player is still under 달빛 고치 when 달빛 해제 (B5) ends, which happens whenever they reached none of the 3 orbs and got no other heal.\n1. groggy/tick spawns one orb at groggy +20 (dew/spawn1), as the plan asks.\n2. Nothing removes it at the groggy end, the turn or the chain re-form, nor during the 4 human patterns. Only dew/clear removes orbs, and it runs at the next B5 revert, at death and at cleanup.\n3. At the next transformation, form/sphere re-applies the debuff and runs dew/spawn, adding 3 more orbs: 4 cure orbs are live, while the plan says 3 appear on application.\n4. If the player is cured some other way (any item heal) after the groggy orb appeared, it lies in the arena for the rest of the human stretch and the next butterfly form as a free 8 % max-HP heal that cures nothing.\nSeverity: minor.",
+    "fix": "Choose which lifetime the plan intends for the groggy orb.\n- If it is only for the groggy window: clear it when the groggy ends ('dew/clear' in recover/begin or groggy/end, core.py:847/860).\n- At minimum, call F('dew/clear') before F('dew/spawn') in form/sphere (core.py:786-790), so every application shows exactly 3 orbs.\n- Alternatively, make dew/spawn top up to 3 (spawn 3 - #bfDewN).",
+    "evidence": "Script /tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/mb2/review/player/dew_sim.py. It runs on a copy for 7000 t; the player stays within 1.5 b of the centre (the orbs lie 6-14 b out), never heals and has HP topped up. The live orb count over the second cycle:\n  t=5971 B5 starts with 4 orbs; t=6063 revert: 0\n  t=6067 groggy; t=6087 1 orb (groggy +20)\n  t=6367 turn; t=6409 to 6719 human patterns 2, 1, 2, 1: still 1 orb\n  t=6719 transformation; t=6725 sphere: 4 orbs\nMax 4 alive at once; the same happened in the first cycle (t=4450 onward)."
+   }
+  ],
+  "verdicts": [
+   {
+    "id": "PL-1",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed. Both effects spawn 'execute at @e[tag=rlk_body,limit=1]' (core.py:893 and :909, generated coc/apply_pl.mcfunction:22 and coc/cure.mcfunction:9). In first person (view off or devMode, view/fps_tick.mcfunction:3) rlk_body is the player itself. Only view modes 1 and 2 have the rlk_av avatar. I re-ran fp_fx.py on a fresh copy (/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/mb2/review/player_verify/rl) and got the same output. 'glow' (bb center, 2.4 -> 1.0) and 'cure_burst' (bb center, 0.6 -> 3.4) sit at dx=dz=0, dy=-0.62 from the eye. 'cure_beam' (dy -1.62) and 'cure_emblem' (dy +0.98) are vertical billboards with dx=dz=0. The RP models (rp_bf .../bf_kit/glow.json, cure_burst.json) are single 16x16 faces at z=8. With item_display 'none' the card is centred on the summon point, 1 b across at scale 1. In vanilla, CENTER billboards take the camera's yaw and pitch, so the quad is parallel to the screen at distance 0.62*sin(pitch) in front of the eye. VERTICAL takes the camera's yaw only, so a quad straight above or below the eye contains the eye: edge-on, invisible. The textures make this a real screen wash, not a hairline. Alpha where the screen centre ray lands is about 88/255 on the glow and about 150/255 on the burst at full size, and the card spans the whole view frustum (half-height about 0.22 b at 0.31 b). So in first person the maroon or gold card washes over the whole screen when looking down. Looking level or up, the burst and glow are behind or edge-on, and the beam and emblem are never visible. The project already treats this as a bug elsewhere. README.md:765 (Navia) says 'in first person (no body display) the gold cards are not drawn, because they appear right in front of the eye and cover the screen'. Guardian tools/mboss_guardian/p34.py:501-502 gates eye-height cubes on rlk_av. fx/hud/flash_maroon and flash_gold exist and nothing calls them. Suggested fix is right: gate core.py:893/909 with 'execute if entity @e[tag=rlk_av,limit=1] at @e[tag=rlk_body,limit=1] ...'. In first person, call fx/hud/flash_maroon / flash_gold and keep the floor ripple instead. Minor: visual only, first-person view only."
+   },
+   {
+    "id": "PL-2",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed by code and by two runs. groggy/tick spawns dew/spawn1 at +20 while #bfCoc=1 (core.py:841). Only dew/clear removes orbs: form/revert (B5 clock 92, core.py:793), form/now_h (tests), death_start and cleanup. coc/cure, groggy/end and recover/* do not call it. form/sphere calls dew/spawn (core.py:786-790) with no clear and no cap, so it adds 3 orbs to whatever is still alive. dew_sim.py on a fresh copy repeats the reviewer's timeline exactly: t=6087 1 orb at groggy +20, still 1 orb through the human patterns 2/1/2/1, t=6725 4 orbs at the sphere, max 4. My cured variant (/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/mb2/review/player_verify/dew_cured.py) does test 21, then test 40 (groggy, orb at +20), then a test 22 heal (coc 0, buff 1). The orb stays through the whole human stretch (t=167-785), then 4 orbs are live at the next transformation (t=791) until the B5 revert. Two caveats on the write-up. First, the title 'never goes away' is overstated: the orb does go at the next B5 revert, which matches README:591 ('remaining orbs vanish when the butterfly form ends'). Second, the 'free heal' point is not a separate defect: leftover transformation orbs are also free heals after a cure, by design. The real deviation is the stacking: 4 live orbs where the plan and contract say 3, spaced 120 degrees apart, and the stray one can land within 1.6 b of a new orb. Recommended fix: the reviewer's 'at minimum' option, F('dew/clear') before F('dew/spawn') in form/sphere, or top up to 3. Do NOT clear the orb at groggy end: a player still under 달빛 고치 would then have no cure path for the whole human stretch. Minor."
+   }
+  ]
+ },
+ {
+  "dim": "framework",
+  "findings": [
+   {
+    "id": "FW-1",
+    "severity": "major",
+    "file": "roguelike/tools/build_mboss_core.py:1664 (blade generator 1662-1673; used by roguelike/tools/mboss_butterfly/human.py:130, documented in bf_contract.md:155-159 and README.md:493)",
+    "title": "Blade hit shape reaches hr + 0.65 b, not hr: HEAD's H4 hits players standing outside its 3 b telegraph",
+    "scenario": "The blade puts its outer sample points at ±hr and gives each a 0.65 b sphere. A standing player is therefore hit up to hr + 0.65 off the centre line. Every other shape (sphere props, hz line/disc/sector) pads by +0.3. With HEAD's H4 stub (tell_line 30 x 3, hr 1.5), the line is locked on the player at clock 7. The lane is drawn ±1.5 b wide, and the framework's own line test would reach ±1.8. A player who side-steps 1.9, 2.0 or 2.1 b off the line and stands still is still hit for 120 % Dendro at clock 28; the miss starts at 2.2 b. That is 0.35 b beyond the telegraph's padded edge and about 0.8 b beyond the vblade look (x ±1.33), which breaks the plan's rule that every hit has a readable telegraph. The contract (§7.2: 'hr on each side', 'H4's vacuum blade (3 wide): hr 1.5') and the README describe hr as the half width. The human-pattern author's WIP already works around it (wt_h human.py:55: H4_HR 1.2, 'hr 1.5 would reach 2.15 b'). Any other blade user following the docs gets the over-reach. Secondary symptom of the same geometry: the two rows are 1.2 b apart, so midway between two samples (lateral 0.375 for hr 1.5) feet 0.54-0.66 b above the floor are not hit. A vanilla flat jump never lands a tick sample in that band, so this only shows with other vertical motion.",
+    "evidence": "E2E with the butterfly harness on a copy (review/framework/repro_h4.py), HEAD H4 stub, player side-steps after the clock-7 lock. Tell-line marker: dmg 0, mbHzHW 1800 (padded), mbHzC 1500 (drawn). Side-steps 1.5 / 1.8 / 1.9 / 2.0 / 2.1 b -> hits [(27-28, 120, 7)]; 2.2 b -> []. Framework-level (repro_fw.py R1), the same hr 1.5 blade against a dmg-1 copy of the w 30 line: lateral 1.9 / 2.0 / 2.1 -> line miss, blade HIT. R2 (lateral 0.375): feet 0.54..0.66 above the floor -> miss; 0.53 and 0.67 -> hit. test_pjx.py locks the over-reach in: 'player +2 b off the line -> hit', '-1.9 -> hit'.",
+    "fix": "Preferred: make the blade's reach hr + 0.3 like every other shape and close the gap. Put the outer samples at ±(hr + 0.3 - R), space samples at most 0.6 b apart, use three rows (-0.9, -0.3, +0.3) and R 0.45. A candidate generator (review/framework/fix_blade.py, applied to the copy rl_fix) gives reach 1.8 b for hr 1.5, no height gap from the floor to floor + 1.65 (jump apex 1.25), and 18 checks per sub-step. Then update test_pjx (+2.0 / -1.9 -> miss, <= 1.8 -> hit), contract §7.2/§7.5 and README:493. Tell the human author: under this fix their hr 1.2 workaround should return to hr 1.5. Alternative: keep the geometry, document 'reach = hr + 0.65', and change HEAD's H4 stub plus contract §7.2 to hr 1.2."
+   },
+   {
+    "id": "FW-2",
+    "severity": "minor",
+    "file": "roguelike/tools/mboss_lib.py:201 (pj_launch)",
+    "title": "pj_launch flies 0.75 / 1.75 / 2.75 b/t one 0.25 b sub-step too fast",
+    "scenario": "pj_launch converts spd with _tenths(), i.e. Python round(spd*10), which rounds halves to even. The runtime then rounds the tenths up to 0.25 b sub-steps: #pjN = (4V + 9) / 10. Exact quarter speeds with an odd quarter count land on a .5 tenth and round up: 0.75 -> 8 tenths -> 4 sub-steps = 1.0 b/t; 1.75 -> 18 -> 2.0 b/t; 2.75 -> 28 -> 3.0 b/t. Contract §7.2 says the framework rounds speeds up to 0.25 b/t sub-steps, and H4 is specified as 0.75 b/t. An author who writes g.pj_launch(0.75, ...) gets a 33 % faster prop, and every timing derived from 0.75 (lane fill, arrival tick) is off. Today's callers use 0.7 / 0.35 / 0.25 and are unaffected.",
+    "evidence": "review/framework/repro_spd.py (sim, one pj/all tick). 0.25 -> spd:2 -> 0.25; 0.7 -> spd:7 -> 0.75; 0.75 -> spd:8 -> 1.00 (want 0.75); 1.75 -> spd:18 -> 2.00 (want 1.75); 2.75 -> spd:28 -> 3.00 (want 2.75). The other inputs tested (0.3, 0.35, 0.5, 1.0, 1.25, 1.5) match.",
+    "fix": "Convert from the wanted sub-step count instead of rounding: n = ceil(spd / 0.25 - 1e-9); spd_tenths = int(n * 2.5), which gives 2, 5, 7, 10, 12, 15, 17, ... and maps back to exactly n sub-steps. Checked for 0.05 .. 2.75. Optionally use round-half-up instead of round() for hr (pj_launch hr 1.25 currently becomes 1.2)."
+   },
+   {
+    "id": "FW-3",
+    "severity": "minor",
+    "file": "roguelike/tools/build_mboss_core.py:2052 (test/start_ch saves tlast {id} only) and 2143-2144 (defeat_msg / WON_REPLAY link to test/start)",
+    "title": "Test replay links ([다시 하기]) restart at chapter 1, dropping the chapter of test/start_ch",
+    "scenario": "Run /function rlk:mboss/test/start_ch {id:\"butterfly\",ch:5}, die, then click [다시 하기] in the defeat message (or in the won message). The link runs test/start {id:\"butterfly\"}, which calls start_ch {...,ch:1}. #chapter room becomes 1, and room/mob_init sets the boss mlv from #chapter. The replay is a level-1 fight instead of the chapter-5 test being reproduced. The new tlast storage records only the id, so the defeat path cannot restore the chapter either.",
+    "evidence": "Static: start_ch line 2052 stores {id:\"$(id)\"} only. defeat_msg and WON_REPLAY both build '/function rlk:mboss/test/start {id:\"$(id)\"}', and test/start hard-codes ch:1 (test/start.mcfunction). room/mob_init.mcfunction:36 sets 'scoreboard players operation @s mlv = #chapter room'.",
+    "fix": "Save the chapter with the id at start_ch ($data modify storage rlk:mboss tlast set value {id:\"$(id)\",ch:$(ch)}). Point both replay links at test/start_ch {id:\"$(id)\",ch:$(ch)}. For test/won, which reads cur, read tlast instead or copy ch into cur at start."
+   },
+   {
+    "id": "FW-4",
+    "severity": "minor",
+    "file": "roguelike/tools/build_mboss_core.py:1683-1688 (grp_mark), with hz/init 1242 and pj/launch 1623",
+    "title": "Volley group: a member created after the group landed its hit is fully armed (two hits from one 'one hit per volley' group)",
+    "scenario": "grp_mark only marks members alive at the moment of the landed hit. hz/init and pj/launch never check whether the group has already landed. Contract §7.3 recommends 'B4 (an orb and its burst decal: copy the orb's group with #hzGrp = @s mbPjG)'. The default for a prop hit is #pjKeep 1 (pierce, fly on). So an orb that touches the player and then creates its burst at its life end (pj_end ev 2, or ev 1 at a wall), or any member spawned on a later tick, hits a second time. Not triggered at HEAD or in the current WIP: HEAD's B4 pops the orb on contact and creates the burst while the orb is still armed; H1, B1 and B2 create all members in one tick; B3's trail members (HEAD 34/37/40 and 43/46, WIP 34-40) all exist before the first can resolve. Every new pattern has to respect the 'create all members first' rule, and the contract does not state it.",
+    "evidence": "review/framework/repro_fw.py R3. A group-1 prop hits the player (hits 1). A disc then created with #hzGrp = 1 over the player strikes: hits = 2 (one expected per group). Control R4 (two live groups 1, 2, 1 resolving one after another): 2 hits, as intended.",
+    "fix": "Remember landed groups and pre-mark late members. Minimal version: in grp_mark also set #mbGrpL mb = #g. In hz/init add 'execute if score @s mbHzG matches 1.. if score @s mbHzG = #mbGrpL mb run scoreboard players set @s mbHzHit 1', and the same with mbPjG / mbPjHit in pj/launch. One remembered id covers the sequential volleys the patterns use. If interleaved groups are needed, use a small storage list of landed ids. Alternatively, state in contract §7.3 that every member must be created before the first one can resolve."
+   }
+  ],
+  "verdicts": [
+   {
+    "id": "FW-1",
+    "real": true,
+    "severity": "major",
+    "reason": "Confirmed in code and in the simulator. build_mboss_core.py:1662-1673 puts the outer blade samples at exactly ±hw and gives each one BLADE_R 0.65. That makes the lateral reach hr + 0.65, while the sphere (pj/h/k: k/10 + 0.3) and the hz shapes (line mbHzHW += 300, the disc/ring 0.3 pad) all pad by 0.3. Ran review/framework/repro_h4.py on my own export of b0d1697 (git archive into review/framework_verify/head, identical to the reviewer's copy): HEAD's H4 stub (human.py:127-130, tell_line 30x3 at clock 7, pj_launch(0.7,60,DMG,1.5) shape 1) hits a player standing 1.9, 2.0 or 2.1 b off the locked line, and 2.2 misses. The tell marker shows mbHzHW 1800 (padded) and mbHzC 1500 (drawn). R1: a dmg-1 copy of the same line misses at 1.9-2.1 while the blade hits. The analysis agrees: at a 2.1 lateral the distance to the x=1.5 sample is about 0.61 < 0.65. R2 also confirmed the height gap at lateral 0.375, feet 0.54-0.66 (sqrt(0.65^2-0.375^2)=0.53 from each row, rows 1.2 apart), but vanilla jump tick heights (0.42, 0.75, 1.0, ... 0.80, 0.50) never fall in it. test_pjx passes 'blade hr 1.5 +2 b -> hit' and '-1.9 b -> hit', so it locks in the over-reach. The plan's telegraph rule (plan.md:88) and the 3-wide blade (plan.md:59) are breached by up to 0.35 b beyond the padded lane. Caveats: the contract text does state 'each a 0.65 b sphere', so the reach can be derived from it, but it calls hr the half width and pairs hr 1.5 with a 3-wide blade. The later commit 47ceb5a works around it at the pattern level (H4_HR 1.2, its own comment 'hr 1.5 would reach 2.15 b'); the framework itself is unchanged there. I applied the suggested fix_blade.py to a copy (review/framework_verify/rl_blade): blade reach drops to about 1.79 b (1.8 just misses because of the 0.125 b sub-step z offset) and the R2 height gap closes."
+   },
+   {
+    "id": "FW-2",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed. mboss_lib.py:201 uses _tenths() = int(round(v*10)), and Python round is half-to-even: 0.75 -> 8, 1.75 -> 18, 2.75 -> 28, while 1.25 -> 12 and 2.25 -> 22 come out right. The runtime pj/tick computes #pjN = (4V+9)/10, giving 4, 8 and 12 sub-steps, i.e. 1.0, 2.0 and 3.0 b/t. Contract 7.2 says speeds are rounded UP to 0.25 b/t sub-steps, so an exact 0.75 should stay 0.75. repro_spd.py on my HEAD export reproduces 0.75->1.00, 1.75->2.00, 2.75->3.00, and 0.25/0.7/1.0/1.25/1.5 are correct. The issue is latent: every caller at HEAD and at 47ceb5a (H4 0.7, B4 0.35, B2 0.25) is unaffected. One part of the scenario is inaccurate: the plan specifies H4 at 0.7 b/t, not 0.75. I checked the suggested fix for 0.01..2.99 b/t (n = ceil(spd/0.25), tenths = int(n*2.5)): the runtime then always gives exactly n sub-steps. The hr half-even rounding (1.25 -> 12) is also real but cosmetic."
+   },
+   {
+    "id": "FW-3",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed with review/framework_verify/v_fw3.py, using bfsim with run/end stubbed to clear #active as the real run/end:3 does. After test/start_ch {id:\"butterfly\",ch:5}, #chapter is 5 but tlast = {id:\"butterfly\"} only (build_mboss_core.py:2052). test/defeat's link is '/function rlk:mboss/test/start {id:\"butterfly\"}' (2143). Running that link calls start_ch {...,ch:1}, and #chapter / #mbReqCh become 1. test/won's link (2144, WON_REPLAY) is the same test/start {id}, and cur carries no ch. room/mob_init.mcfunction:36 derives mlv from #chapter, (ch-1)*6+mapIdx+1, so a chapter-5 replay drops from mlv 27 to mlv 3. Only the test tooling is affected. The won link already existed at d467e3c; this diff's new tlast mechanism fixed the boss id but not the chapter. The suggested fix (store ch in tlast, link to start_ch) is sound."
+   },
+   {
+    "id": "FW-4",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed. grp_mark (build_mboss_core.py:1683-1688) only marks members that exist at that moment, and hz/init (1249) and pj/launch (1616) set mbHzHit/mbPjHit to 0 unconditionally. My own repro, review/framework_verify/v_fw4.py, follows the contract 7.3 B4 recipe: an orb in a fresh group with the default #pjKeep 1 (it pierces) whose pj_end ev 2 creates the burst disc with #hzGrp = @s mbPjG. Result: 2 hits (ticks 7 and 26) from one volley group. The control, with the burst created while the orb still flies (HEAD's order), gives 1 hit. HEAD's B4 (wing.py:135-166) and the wt_w WIP B4 avoid it: the orb pops on contact (pjKeep 0), and the burst is created while the orb is alive or after its pj has ended. So the issue is latent. One correction: the contract does say 'every other live hazard and prop', so the limit is hinted at, but it never states the 'create all members before the first can resolve' rule its own B4 recipe depends on. I verified the minimal fix on a copy (review/framework_verify/rl_grp: #mbGrpL set in grp_mark, pre-mark in hz/init and pj/launch). The late case then gives 1 hit, the reviewer's R3 gives 1, and R4 (interleaved groups 1,2,1) still gives 2."
+   }
+  ]
+ },
+ {
+  "dim": "perf",
+  "findings": [
+   {
+    "id": "perf-1",
+    "severity": "blocker",
+    "file": "roguelike/tools/mboss_butterfly/api.py:269-271 (Gen.keep); roguelike/tools/mboss_butterfly/core.py:685-694 (p/finish) -> roguelike/data/rlk/function/mboss/butterfly/p/finish.mcfunction:8-9; stub call sites human.py:55,63,85,88,104 and wing.py:60,103,178-180 (B5 also summons rlk_mb_bf_p15b at wing.py:179-180 and never kills it)",
+    "title": "Kept pattern markers are never removed at a normal pattern end: they pile up all fight, and every later run of the same pattern aims at the OLDEST marker",
+    "scenario": "Gen.keep() only re-tags the dest/lock marker (it never kills an older marker with the same tag). p/finish kills only the core's rlk_mb_bf_dest and rlk_mb_bf_lock. Each pattern's cancel kills its tags, but cancel only runs on abort, death or reload. So after every normal run of H1, H2, H3, B1, B3 and B5, one marker per kept tag stays alive (p1a, p1b, p2a, p2b, p3a, p11a, p13a, p15a, p15b). The next run resolves @e[type=marker,tag=rlk_mb_bf_p<id>x,limit=1] with no sort, which returns entities in insertion order (oldest first) in vanilla and in mcsim alike. So it glides, dashes and places its hazards at a spot from an EARLIER run. Example: in the second H2, the 140 % Dendro disc lands exactly on where the player stood during the first H2 (0.00 b from it), 2.66 b from the current player. Over a normal 9000-tick orbit fight, 134 of about 150 kept-tag lookups were stale. Median offset from the current marker: p2b 7.9 b (max 14.9), p3a 9.6, p11a 9.1, p13a 9.5, p15a 6.7, p1a 6.4. Leftover markers grow linearly: 13 at t1500, 27 at t3000, 51 at t6000, 71 at t9000, about 75 pattern-tagged markers alive at the end (one per run per tag). They are only cleared by cleanup_aux at fight end. They also inflate every @e scan of the fight (about 40-50 @e selectors per tick). Note: the newer human commit 47ceb5a and the staged wing code pre-kill their tags before keep(). That removes the stale lookups, but one marker per tag still survives between runs, and the API trap stays for any future pattern.",
+    "fix": "Fix it at the core so no pattern can regress. (1) Gen.keep(new_tag, src): emit `kill @e[type=minecraft:marker,tag=<new_tag>]` before re-tagging, and also add a shared tag (e.g. `tag @e[type=minecraft:marker,tag=<src>] add rlk_mb_bf_kept`). (2) core p/finish and p/cancel: `kill @e[type=minecraft:marker,tag=rlk_mb_bf_kept]`. (3) Markers a pattern summons itself (B5 rlk_mb_bf_p15b) should get the same shared tag, or be killed before they are summoned. Verified on a scratch copy with (1) and (2) (review/perf/rl_fix): 0 stale lookups for every keep() tag, with no leftovers except the self-summoned p15b (7). Add a test that runs the same pattern twice with the player at a different spot each time.",
+    "evidence": "review/perf/stale_markers.py (H2 twice: the run-2 disc lands at (200.0, 201.0, 10.65) = the run-1 lock, 2.66 b off the run-2 player); review/perf/stale_all.py (all six keeping patterns: every run-2 lookup resolves to the older marker, e.g. H3 dash target (200.0, 16.5) instead of (205.5, 15.5)); review/perf/stale_fight.py (normal-rotation statistics above); review/perf/census2.py (leftover counts equal the run counts: p2a 13 = 13 H2 runs, p1a/p1b 7 = 7 H1 runs, ...). All run against review/perf/rl, a copy of b0d1697."
+   },
+   {
+    "id": "perf-2",
+    "severity": "major",
+    "file": "roguelike/data/rlk/function/mboss/butterfly/fx/e/born.mcfunction:3-6 and fx/e/make.mcfunction:34 (generator roguelike/tools/build_mboss_bf_fx.py:1367 and 1386-1391; stage check fx/e/age.mcfunction:6)",
+    "title": "The kit's 1t-scheduled card ager runs at the end of the same server tick as the summon, so every card's main interpolation is merged in its spawn tick (no animation on the client) and every stage fires one tick early",
+    "scenario": "Cards are made from rlk:tick, where `time query gametime` returns G. In the vanilla server tick, ServerFunctionManager.tick() (#minecraft:tick) runs first. Then ServerLevel.tickTime() sets gametime to G+1 and runs every TimerQueue event with triggerTime <= G+1. So `schedule function fx/e/world 1t` made at G fires in the SAME server tick, and inside it `time query gametime` already returns G+1. e/born sets bkG = G + dly + 1, so for every dly-0 card the ager's `#bkNow >= bkG` test is true in the creating server tick: e/go merges `start_interpolation:0, interpolation_duration:d` plus the end transformation in the tick the entity was summoned. Both the pairing packet and the change reach the client in the same flush, before the client ever ticks the display. The display then starts from a fresh render state at the end values: it never interpolates. Navia's engine in the same pack avoids this on purpose: fx/nv/tick runs from rlk:tick with `#now > nvfxT`, i.e. 'start the main interpolation one tick after the spawn'. In a vanilla-order replay, 214/214 dly-0 cards (entrance, transformation, cure, dew pulses, groggy) had e/go in their spawn tick. Results in game: grows, moves and spins of every preset are lost; cocoon_burst shards, cure beam and glint drops, ripples and dew pulses pop at their end state. A kit telegraph's fill (tele/*) shows at full radius at once instead of growing to the rim, so the timing cue of the decals the pattern authors pair with quiet hazards is gone. tele/disc tell 10 made at tick 0: go at 0 (documented 1), flash at 9 (documented 10 = the hz strike tick), removal at 13 (documented 14). Every card lives one server tick less than `life`. The mcsim suites (bfsim.world/run_sched, fxtests FxSim.tick) run the timer queue one world() call late, so they pass while the game does not match bf_fx_api.md section 1/4.",
+    "fix": "Choose one: (a) Age from a tick function, as Navia does: call fx/e/world from rlk:tick or from the module tick and from death_tick, and keep the schedule only as a fallback. (b) Keep the schedule and offset every stage by the phase: in e/born, run `scoreboard players add #bkNow mb 1` before computing bkS/bkH (make re-reads gametime per card). Checked on a scratch copy in vanilla order: go 1, flash 10, kill 14, exactly as documented. Either way, make bfsim.world()/run_sched and fxtests FxSim.tick run the timer queue at the end of the same simulated server tick with gametime+1, so the suites model the real phase. With (b) alone, test_fx_engine reports 3 stage-tick failures, which shows that the harness, not the game, defines the current numbers.",
+    "evidence": "review/perf/ager_phase.py (same fight in bfsim order: 0/217 cards with go in their spawn tick; in vanilla order: 214/214, and the visible ticks minus life is -1 for 211 cards); review/perf/tele_phase.py (vanilla: born 0, go 0, hit 9, kill 13; bfsim: go 1, hit 10, kill 14; with the born +1 patch in review/perf/rl_fix under vanilla order: go 1, hit 10, kill 14); review/perf/fx_fix.txt (kit suite fails only on the stage-tick asserts after the patch); Navia reference: data/rlk/function/fx/nv/tick.mcfunction:4 plus tick.mcfunction:68."
+   },
+   {
+    "id": "perf-3",
+    "severity": "minor",
+    "file": "roguelike/data/rlk/function/mboss/butterfly/u/dest_step.mcfunction:3 (generator roguelike/tools/mboss_butterfly/core.py:245-254)",
+    "title": "u/dest recomputes the 89-command Newton distance (mv/dist) on every 0.5 b step; it is the dominant cost of the busiest ticks",
+    "scenario": "Each g.dest(max, keep) call walks the dest marker in 0.5 b steps (up to 12 for 6 b). Each step calls rlk:mboss/mv/dist (two NBT reads, 14 Newton iterations, about 89 commands). The marker walks straight at the player at pitch 0, so the distance only ever drops by exactly 5 tenths per step. Measured: the busiest butterfly tick (B1 strike, 2200 commands) spends 1068 commands in mv/dist and 122 in dest_step; H3 dash ticks (1739) the same 1068. Not near any limit (65536), but it is pure waste on every dest call.",
+    "fix": "In u/dest, run `function rlk:mboss/mv/dist` once as the new marker before the first step, and drop the call from dest_step (keep `scoreboard players remove #mbDist mb 5`). Verified on a scratch copy (review/perf/rl_dest): body path and player hits identical over 4000 ticks; peak tick 2200 -> 1870 commands, the dest tick about 1100 commands cheaper.",
+    "evidence": "review/perf/hot.py (per-function profile of ticks 3236 / 3086 / 7631); review/perf/cmp_dest.py (identical trace, peak and average before and after)."
+   },
+   {
+    "id": "perf-4",
+    "severity": "minor",
+    "file": "roguelike/data/rlk/function/mboss/butterfly/uninstall.mcfunction (generator core.py:320-328) with dew/one.mcfunction:2-5; roguelike/data/rlk/function/mboss/uninstall.mcfunction:11-13 (generator build_mboss_core.py) with test/start_ch.mcfunction:11",
+    "title": "Uninstall leaves storage the butterfly and the new test path created: rlk:mboss bfd (heal-orb spawn args) and rlk:mboss tlast",
+    "scenario": "After any 달빛 이슬 spawn (every transformation), dew/one writes storage rlk:mboss bfd {a, r}. After any `test/start {id:...}`, test/start_ch writes rlk:mboss tlast {id}. rlk:uninstall goes through mboss/uninstall, which removes only reg/byid/met, then butterfly/uninstall, which removes the kit storage only. Both keys survive in command_storage_rlk.dat. Everything else checked out: kit objectives bkS/bkG/bkH/bkK/bkD, the rlk:bfkit a/t/hud/ax keys, the scheduled ager, the stub rig objectives (and, after the rig merge, the real bfRig* objectives derived from the manifest), every summoned entity (all carry rlk_mb_aux), and mbHzG/mbPjK/mbPjG in the framework uninstall.",
+    "fix": "Add `data remove storage rlk:mboss bfd` to the butterfly uninstall hook (core.py uninstall lines). Add `data remove storage rlk:mboss tlast` to the framework uninstall generated by build_mboss_core.py.",
+    "evidence": "review/perf/uninst.py (mid-fight uninstall in mcsim: no entities left, rlk:bfkit {} and no schedule, but rlk:mboss still holds 'bfd'; tlast is written only by the test path and is removed nowhere: grep)."
+   },
+   {
+    "id": "perf-5",
+    "severity": "minor",
+    "file": "roguelike/data/rlk/function/mboss/butterfly/death_tick.mcfunction:17 (generator core.py:1068, `range(D_DISSOLVE, DEATH_LEN - 10, 15)`)",
+    "title": "The last death-mote burst (t85, lives 18-22 plus delays up to 8) is cut by the fight cleanup's fx/clear at death t100",
+    "scenario": "death_finish at #mbT 100 kills the body, then won and cleanup run fx/clear and kill every kit card. The t85 death_motes cards would live until about t115. In mcsim, fx/clear at death+100 found 10 live kit cards with 4-12 ticks of life left, so the final rising motes vanish mid-flight. Cosmetic.",
+    "fix": "End the last burst before the death length: e.g. bursts at 40/55/70 only (range end DEATH_LEN - 25), or cap that burst's lives so dly + life <= 100 - t. Alternatively, let the cleanup after a won fight spare fx cards (they self-expire within 30 t) and kill only the telegraph decals.",
+    "evidence": "review/perf/death_cut.py: 'fx/clear at t 268 (death +100) mbSt 2 cards alive 10 ticks of life left [4, 5, 6, 6, 6, 7, 9, 10, 11, 12]'."
+   }
+  ],
+  "verdicts": [
+   {
+    "id": "perf-1",
+    "real": true,
+    "severity": "major",
+    "reason": "Confirmed at b0d1697. Gen.keep (api.py:269-271) only re-tags. u/dest and u/lockp kill only the dest and lock tags, and p/finish:8-9 kills only those two. Cancel runs only from p/cancel while #bfPat>=1, so a pattern that ends normally never runs it. test/cut does not run it either. My own repro (review/perf_verify/scripts/v1_stale.py on review/perf_verify/b0, a git-archive of b0d1697) runs each pattern twice with the player in a different spot. Every second-run lookup resolves to the first-run marker, because mcsim and vanilla both return entities oldest first. H3: disc and dash target at the run-1 marker (199.97, 10.15), 3.16 b from the run-2 player. H2: the run-2 Dendro disc lands at (200.0, 11.15), which is 0.00 b from the run-1 player and 3.58 b from the run-2 player, so the r 2.5 disc misses her. H1, B1 and B3 show the same thing (B1 4.48 b off), and so does B5 (p15a and p15b). v1_census.py shows the leftovers grow by one per run per tag. The reviewer's stale_markers.py on my copy gave the same numbers: 2.66 b, 0.00 b, then 13/27/51/71 leftovers at t1500/3000/6000/9000. Downgraded from blocker: these are the stage-1 stubs, and at the current wip/bf HEAD f2ab515 the merged human and wing code pre-kills its tags. There, v1_census shows no growth and no stale aim. Human leaves nothing; wing leaves one marker per tag between runs. The core API trap is still there at HEAD (keep() and p/finish unchanged), so the suggested core fix (kill new_tag inside keep, plus a shared kept tag killed in p/finish and p/cancel) is still worth doing."
+   },
+   {
+    "id": "perf-2",
+    "real": true,
+    "severity": "major",
+    "reason": "Confirmed by code and by a vanilla-order replay. Card stages come from fx/e/born:3-6: bkS = Now + dly, bkG = bkS + 1. fx/e/make:31 reads Now from rlk:tick, and make:34 runs `schedule ... e/world 1t`. In vanilla, MinecraftServer.tickChildren runs #minecraft:tick first. Then ServerLevel.tickTime() sets gametime to G+1 and runs the TimerQueue for trigger <= G+1. So the ager runs at the end of the same server tick and reads G+1 >= bkG, and e/go merges the interpolation in the summon tick. The add-entity pairing and the dirty data reach the client in the same flush. A client Display with no render state yet builds a fresh one from the end values, so it never interpolates. bfsim.world (bfsim.py:133-137, 251) and fxtests FxSim.tick run the queue one world() call late, which hides this. My replay (scripts/v2_phase.py) pairs hz/disc with tele/disc at server tick 0. Vanilla order: go at 0, flash at 9 (the player is hit at 10), gone by 13. bfsim order: go at 1, flash at 10, gone by 14. A whole fight (scripts/v2_fight.py, vanilla order): 179/179 dly-0 cards had go in their spawn tick, and 292/292 lived one server tick less than dly+life. Fix (b), prepending `scoreboard players add #bkNow mb 1` to e/born, gives go 1, flash 10 (= the hit tick), gone by 14 in vanilla order. Navia's engine (fx/nv/world from rlk:tick, with `>` in fx/nv/tick:5) gets this right. The kit files are byte-identical at HEAD f2ab515."
+   },
+   {
+    "id": "perf-3",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed. u/dest_step:3 calls mv/dist (horizontal, 14 Newton iterations, 89 commands) on every 0.5 b step. The marker is yawed once toward the player and steps straight at her, so recomputing only re-derives about d - 5. scripts/v3_peak.py (6000-tick orbit fight) reproduces the numbers exactly: the busiest tick is 2200 commands at t3236 in B1, with 1068 inside mv/dist and 122 in dest_step; H3 is at 1739. mv/dist is only 1.8% of all commands, and the average is 250 commands per tick, so the gain is limited to peak ticks. Caveat on the fix: it is not bit-identical. scripts/v3_dest.py ran 4000 random u/dest calls, original against patched. 37 of them (0.9%) stop one 0.5 b step apart, because `data get Pos 10` floors and the integer sqrt rounding no longer gets re-floored each step. Neither version is exact: the original ends inside keep in 12 of those 37 cases and the patch in 6. So the behaviour change is within the existing rounding. The patch averages 208 commands per call against 882."
+   },
+   {
+    "id": "perf-4",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed. dew/one:2-4 writes storage rlk:mboss bfd, and test/start_ch:11 writes rlk:mboss tlast. mboss/uninstall removes only reg, byid and met. butterfly/uninstall removes only the kit storage (rlk:bfkit a/t/hud/ax), and nothing anywhere removes bfd or tlast. scripts/v4_uninst.py (transformation and dew, then rlk:mboss/uninstall in mcsim): no entities left, rlk:bfkit {}, no schedule, but rlk:mboss still holds bfd {a:335, r:8.7}. The same is true at HEAD f2ab515. Context: the framework already left about 10 other scratch keys at the diff base d467e3c (cos, hzc, hzp, sub, extra, aura, ln, a, pjp, hzs). bfd and tlast are the two this diff adds. Harmless hygiene, but other systems' uninstalls do remove their scratch storage (rlk:nvfx a, rlk:view cam), so the suggested `data remove` lines are appropriate."
+   },
+   {
+    "id": "perf-5",
+    "real": true,
+    "severity": "minor",
+    "reason": "Confirmed. death_tick:14-17 fires fx/p/death_motes at #mbT 40/55/70/85, with lives 18-22 and dly up to 8. death_finish at #mbT 100 leads to won/cleanup and fx/clear. scripts/v5_death.py killed the boss in human form and again in butterfly form. Both times fx/clear ran at death+100 with 10 live kit cards, all from the t85 burst, with [4,5,6,6,6,7,9,10,11,12] ticks of life left. With fade 6, cards with 7-12 ticks left are cut before their fade starts. It still happens at HEAD f2ab515, where death_tick delegates to seq_h/death/tick: 12 cards from t85/91/96 with 1-12 ticks left. Cosmetic: a few rising motes vanish at the moment the body is removed."
+   }
+  ]
+ }
+]

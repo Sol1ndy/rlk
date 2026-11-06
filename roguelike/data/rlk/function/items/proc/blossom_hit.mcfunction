@@ -1,4 +1,4 @@
-# @s = 예약 표식, at @s. 반경 3칸에 공격력의 40퍼센트 바위 원소 피해
+# @s = 예약 표식, at @s. 반경 3칸에 공격력의 #blossomCoef% 바위 원소 피해
 particle minecraft:dust{color:[0.95f,0.76f,0.31f],scale:1.3f} ~ ~0.6 ~ 1.2 0.4 1.2 0 30
 particle minecraft:block{block_state:"minecraft:yellow_terracotta"} ~ ~0.4 ~ 1.0 0.2 1.0 0.1 20
 execute unless score #k142 snd matches 1 run function rlk:snd/f150
@@ -6,7 +6,8 @@ scoreboard players set #aqE eng 5
 tag @e[tag=rlk_mob,distance=..3,sort=nearest,limit=1] add rlk_abt
 execute if entity @e[tag=rlk_abt,limit=1] at @e[tag=rlk_blossom,limit=1,sort=nearest] positioned ~ ~0.4 ~ facing entity @e[tag=rlk_abt,limit=1] eyes run function rlk:items/fx/shot
 tag @e[tag=rlk_abt] remove rlk_abt
-execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc {coef:60}
+execute store result storage rlk:tune m_sun_blossom.coef int 1 run scoreboard players get #blossomCoef tmp
+execute as @a[tag=player,limit=1] run function rlk:char/dmg_calc with storage rlk:tune m_sun_blossom
 scoreboard players set #sub itv 1
 scoreboard players set #skillDmg tmp 0
 scoreboard players set #stunHit tmp 0

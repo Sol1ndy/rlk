@@ -1,4 +1,6 @@
-# 캐릭터 선택 (@s = 플레이어). 사용: /function rlk:char/select {id:"lumine"}
+# 캐릭터 선택 (@s = 플레이어). 사용: /function rlk:char/select {id:"lumine"}  ({id:"help"}: 캐릭터 id 목록)
+$data modify storage rlk:tmp hq set value "$(id)"
+execute if data storage rlk:tmp {hq:"help"} run return run function rlk:char/select_help
 $execute unless data storage rlk:chars registry.$(id) run return run tellraw @s [{"text":"[캐릭터] ","color":"red"},{"text":"없는 캐릭터: $(id)","color":"gray"}]
 $data modify storage rlk:chars cur set value {id:"$(id)"}
 function rlk:char/load_cur with storage rlk:chars cur

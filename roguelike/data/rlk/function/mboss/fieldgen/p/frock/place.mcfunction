@@ -1,0 +1,1 @@
+$execute at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] facing entity @e[tag=rlk_body,limit=1] feet rotated ~$(a) 0 positioned ^ ^ ^$(d) run summon minecraft:marker ~ 201 ~ {Tags:["rlk_room","rlk_mb_aux","rlk_mb_fg_pat","rlk_mb_fg_p12","rlk_mb_fg_p12w"]}

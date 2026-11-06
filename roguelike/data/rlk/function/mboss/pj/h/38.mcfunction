@@ -1,0 +1,2 @@
+# Hit radius 3.8 b (+0.3 body), measured 0.9 b below the prop.
+execute positioned ~ ~-0.9 ~ if entity @e[tag=rlk_body,distance=..4.1,limit=1] run function rlk:mboss/pj/hit

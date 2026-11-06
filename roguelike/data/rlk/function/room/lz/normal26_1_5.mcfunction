@@ -36,9 +36,6 @@ fill 16 201 -15 16 201 -12 minecraft:red_sand
 fill 15 201 -14 15 201 -8 minecraft:red_sand
 fill 18 201 -14 18 201 -13 minecraft:red_sand
 fill 16 201 -8 18 201 -8 minecraft:red_sand
-fill 8 201 -5 18 201 -4 minecraft:red_sand
-fill 7 201 -4 7 201 -2 minecraft:red_sand
-fill 6 201 -3 6 201 -2 minecraft:red_sand
 fill 13 201 -19 15 201 -16 minecraft:sandstone
 fill 13 202 -19 15 202 -16 minecraft:red_sand
 fill 12 201 -18 12 201 -16 minecraft:sandstone
@@ -51,17 +48,15 @@ fill 18 201 -12 18 201 -9 minecraft:sandstone
 fill 18 202 -12 18 202 -9 minecraft:red_sand
 fill 16 201 -11 17 201 -9 minecraft:sandstone
 fill 16 202 -11 17 202 -9 minecraft:red_sand
-fill 8 201 -3 18 201 -2 minecraft:sandstone
-fill 8 202 -3 18 202 -2 minecraft:red_sand
 fill 6 201 -19 10 206 -19 minecraft:smooth_red_sandstone
 fill 6 207 -19 10 207 -19 minecraft:red_sand
 fill 5 201 -19 5 206 -19 minecraft:terracotta
 fill 5 207 -19 5 207 -19 minecraft:red_sand
 execute positioned 4 201 -6 run function rlk:room/prop/sd_bush
 execute positioned 14 201 -10 run function rlk:room/prop/sd_dry
-execute positioned 8 203 -2 run function rlk:room/prop/sd_bush
+execute positioned 8 201 -2 run function rlk:room/prop/sd_bush
 execute positioned 3 201 -8 run function rlk:room/prop/sd_bush
-execute positioned 13 203 -3 run function rlk:room/prop/sd_dry
+execute positioned 13 201 -3 run function rlk:room/prop/sd_dry
 execute positioned 10 201 -16 run function rlk:room/prop/sd_bush
 setblock 5 208 -19 minecraft:dead_bush keep
 setblock 7 208 -19 minecraft:dead_bush keep

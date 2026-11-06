@@ -65,11 +65,8 @@ fill 0 210 -40 19 210 -21 minecraft:polished_deepslate
 fill 0 210 -39 19 210 -22 minecraft:air
 fill 20 210 -40 39 210 -21 minecraft:polished_deepslate
 fill 20 210 -39 38 210 -22 minecraft:air
-fill -15 201 -39 -14 201 -38 minecraft:tuff
-fill -14 201 -37 38 201 -36 minecraft:tuff
 fill -19 201 -36 -19 201 -35 minecraft:tuff
 fill -18 201 -35 -17 201 -35 minecraft:tuff
-fill -13 201 -35 38 201 -35 minecraft:tuff
 fill -17 201 -34 -17 201 -34 minecraft:tuff
 fill -16 201 -33 -16 201 -33 minecraft:tuff
 fill -15 201 -32 -15 201 -29 minecraft:tuff
@@ -86,8 +83,6 @@ fill 4 201 -29 5 201 -27 minecraft:tuff
 fill -16 201 -28 -16 201 -22 minecraft:tuff
 fill 2 201 -27 3 201 -26 minecraft:tuff
 fill 16 201 -27 16 201 -26 minecraft:tuff
-fill -13 201 -39 38 201 -38 minecraft:cobbled_deepslate
-fill -13 202 -39 38 202 -38 minecraft:tuff
 fill -19 201 -34 -18 201 -28 minecraft:cobbled_deepslate
 fill -19 202 -34 -18 202 -28 minecraft:tuff
 fill -17 201 -33 -17 201 -22 minecraft:cobbled_deepslate
@@ -142,11 +137,11 @@ execute positioned 26 201 -32 run function rlk:room/prop/m_arch_x5
 execute positioned 19 201 -34 run function rlk:room/prop/m_rubble_a
 execute positioned -3 201 -30 run function rlk:room/prop/m_ore_a
 execute positioned -10 201 -26 run function rlk:room/prop/m_ore_a
-execute positioned 2 202 -35 run function rlk:room/prop/m_rail_x
-execute positioned 3 202 -37 run function rlk:room/prop/m_pebble
-execute positioned 12 202 -35 run function rlk:room/prop/m_pebble
+execute positioned 2 201 -35 run function rlk:room/prop/m_rail_x
+execute positioned 3 201 -37 run function rlk:room/prop/m_pebble
+execute positioned 12 201 -35 run function rlk:room/prop/m_pebble
 execute positioned -3 201 -27 run function rlk:room/prop/m_rail_z
-execute positioned 31 202 -37 run function rlk:room/prop/m_rail_x
+execute positioned 31 201 -37 run function rlk:room/prop/m_rail_x
 execute positioned -16 201 -34 run function rlk:room/prop/m_rail_z
 execute positioned 4 201 -23 run function rlk:room/prop/m_pebble
 execute positioned 17 202 -27 run function rlk:room/prop/m_torch

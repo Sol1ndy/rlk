@@ -3,6 +3,630 @@
 마인크래프트 **26.3** (데이터팩 포맷 121) 기준. 네임스페이스 `rlk`.
 이전 샘플(edrdd, 26.2)에서 필요한 기능만 옮겨 온 뼈대입니다.
 
+## 0. 인수인계 (다음 작업자용)
+
+새 세션이나 다른 에이전트가 **묻지 않고 이어서** 일할 수 있도록 지금까지의 방식 · 규칙 · 상태를 모은 장이다. 이전 세션의
+스크래치패드(계획 · 계약 · 시험 · 참고 영상 · 리소스팩 작업 사본)는 세션이 끝나면 사라지고, 남는 것은 **이 저장소**와
+**사용자에게 보낸 zip 두 개**뿐이다. 이 README 의 다른 절과 생성기 주석에 나오는 "스크래치패드 `xx/…`"(`S:xx/…`)는 그 옛 작업
+폴더이며, 시험 도구와 계획 · 계약 문서는 `tools/dev/sim/` 에 같은 경로로 옮겨 두었다(옛 `xx/…` = `tools/dev/sim/xx/…`, 0-7).
+다 옮기지는 않았다: `tools/dev/sim` 에 없는 옛 경로는 옮기지 않은 것이다(영상 · 참고 그림 · 작업 출력 · 다른 보스의 스위트 등, 0-7 끝 · 0-8).
+**릴리스할 때마다 0-1(상태) · 0-9(열린 항목) · 0-10(버전 기록)과 리소스팩 `README.md` 의 버전 기록을 함께 고친다.** 마지막 갱신: 11-06.
+
+### 0-1. 무엇이고 지금 어디까지 왔나
+- 마인크래프트 Java **26.3** 데이터팩(포맷 121, 네임스페이스 `rlk`)과 짝 리소스팩 `rlk_hud_resourcepack.zip`(포맷 97, **git 에 없음**:
+  0-4, 리소스팩 README). 게임 이름(임시) "만들고 싶은 거 다 만든 로그라이크" · Made by Solindy. 세피리아식 방 · 노드 맵 런(10절),
+  원신식 캐릭터 · 원소 반응(4 · 11절), 디스플레이 엔티티 리그로 만든 보스. 플레이어는 한 명(`player` 태그).
+- 한 챕터 = 첫 맵 + 맵 4 + 보스 맵. 보스 맵은 `room/pick/boss` → `mboss/cb/route`(레지스트리에서 생성)가 고른다.
+
+| 챕터 | 전투 구역의 잡몹 | 보스 맵 |
+|---|---|---|
+| 1 | 1챕터 커스텀 몹 6종(`cm/{sw,ar,fm,im,sh,cn}`, 5-1절) | **야타용왕** `azhdaha`(n 10, `boss/azhdaha/`, 경기장 `az_cavern`) |
+| 2 | 이나즈마 몹(무리 5 · 정예 4, 5-2절) | **나루카미**(`boss/raiden/`, 레지스트리 밖: `room/raiden/layout`) |
+| 3 | 수메르 몹(무리 4 + 포자 주머니 · 정예 3, 5-3절) | **아펩의 오아시스 파수꾼** `apep`(n 11, `boss/apep/`, `ap_oasis`) |
+| 4 | 4챕터 몹은 아직 없음 → 시험 설정으로 1챕터 6종 | **아를레키노** `arlecchino`(n 12, `boss/arlecchino/`, `fl_ruins`; 11-02 부터) |
+| 5~ | 1챕터 6종 | 나루카미 |
+
+- **중간보스**(노드 "중간보스" → 원형 광장, `mboss/<id>/`): 파수꾼・타락 `guardian`(n 1) · 달빛 환영 나비 `butterfly`(n 2) ·
+  실험성 역장 발생 장치 `fieldgen`(n 3), 가중치 10씩 · 1~99챕터. 시험용 `proto`(n 99).
+- **특수 보스**(방에 가끔 생기는 균열 `room/rift/`, 한 판에 많아야 한 번; 균열이 가중치대로 고름, 지금 10 : 10): 타키 `tachy`(n 20,
+  `boss/tachy/`, `tk_lift`; 처치 = 레벨 업 1 + 아이템 상자 3) · 홍련 `scarlet`(n 21, `boss/scarlet/`, `hr_field`; 11-06 부터; 처치 = 레벨 업 1 +
+  아이템 상자 1 + 마지막 장면 뒤 이벤트: 신화 아이템 화무십일홍 또는 런 버프 월하대작). 틀 시험용 `spproto`(n 97) · 챕터 틀 시험용 `cproto`(n 98).
+- **캐릭터 8명**(`char/setup`): 루미네(기본) · 요이미야 · 스커크 · 클로린드 · 아를레키노 · 나비아 · 로노바 · 네페르.
+- `tools/mboss_registry.json` 이 중간 · 챕터 · 특수 보스와 경기장(광장 n 0, `az_cavern` 1 · `ap_oasis` 2 · `tk_lift` 3 · `fl_ruins` 4 ·
+  `hr_field` 5 · `cp_test` 9)의 단일 원천이다. 번호(n)는 다시 쓰지 않는다. 나루카미만 레지스트리 밖이다.
+- 마지막 릴리스는 **11-06 「홍련 · 특수 보스」**(0-10 맨 위; 빌드 도장 커밋 `c77e5d1`). 그 앞 릴리스는 11-03 「아를레키노 수정」
+  (`96884f2`), 그 앞 큰 릴리스는 11-02 「아를레키노 · 4챕터」(`0f1368d`).
+- 아직 없는 것: 4챕터(폰타인) 잡몹(만드는 방식은 0-7b), 5챕터 이후의 고유 보스(그동안 나루카미).
+
+### 0-2. 새 세션이 처음 할 일
+1. `cd /home/user/rlk && git fetch origin && git status -sb`. 최신 작업은 원격 가지 `claude/exciting-pascal-ek1vuy`(11-06 기준)에 있다.
+   그 뒤 다른 가지에서 이어 했을 수 있으니
+   `git for-each-ref --sort=-committerdate --format='%(committerdate:short) %(refname:short)' refs/remotes/origin | head` 로 가장 최근
+   `claude/*` 가지를 찾고, 그 가지의 0-10 맨 위 줄과 맞춘다. 기본 가지 `main` 은 10-11 의 옛 `roguelike/`(이 0장 없음)뿐이니 거기서
+   시작하지 않는다(0-3). 세션 지시가 작업 가지를 따로 정해 주면 `git checkout -B <그 가지> origin/<최신 작업 가지>` 로 만들어 거기서
+   일하고 push 하며, 0-10 새 줄에 `가지 <이름>` 을 적는다(이 가지 이름 · push 재시도 · PR 금지는 이전 세션이 받은 지시였다). push 가
+   non-fast-forward 로 거부되면 강제로 덮지 말고 사용자에게 묻는다. 따로 정해 주지 않으면 `git checkout <최신 작업 가지>`. PR 은
+   사용자가 말하기 전에는 만들지 않는다. `git log --oneline -3` 이 0-10 맨 위 릴리스와 맞는지 본다.
+2. 사용자에게 먼저 물을 것(한 메시지, 한국어):
+   - ① 마지막으로 받은 `rlk_hud_resourcepack.zip` 을 올려 달라고 한다. 빈 폴더에 풀고(`mkdir -p <작업>/rp && cd <작업>/rp && unzip -q <zip>`),
+     팩 맨 위 `README.md` 6절 맨 위 줄이 0-10 맨 위 빌드와 같은지 본다. README 가 없는 zip 은 11-03 전 것(오래된 팩)이다.
+     `--resourcepack` 을 받는 생성기는 맞는 팩을 받은 다음에만 돌린다(리소스팩 README 1절).
+   - ② 로컬 시험 서버(loadcheck)의 Minecraft EULA(https://aka.ms/MinecraftEULA) 동의: **2026-11-05 에 사용자가 동의했다**(0-8 동의
+     기록). 그 기록이 있으므로 새 컨테이너에서도 0-8 "loadcheck 서버 준비"대로 `eula.txt` 를 true 로 쓴다. (기록 전에는 동의하는지 묻고,
+     동의를 받기 전에는 `eula.txt` 를 true 로 쓰지 않았다. 11-03 까지 이전 세션의 `eula=true` 는 동의 기록이 없었다.)
+   - ③ 보스를 영상과 다시 맞출 일이면 그 영상과 나무위키 페이지를 받는다. 나무위키는 Cloudflare 가 막아 직접 받을 수 없으므로(10-21),
+     저장한 HTML 이나 글로 받아 `python3 /home/user/rlk/roguelike/tools/dev/sim/ar/tools/html2txt.py <html> <txt>` 로 글로 바꾼다.
+3. 도구: Python 3.13(생성기는 표준 라이브러리만, 그림 도구는 numpy · Pillow), Node 22(리그 생성기 `*.mjs`), ffmpeg(영상 시트),
+   JDK 25 + 26.3 서버 jar(loadcheck, 0-8 "loadcheck 서버 준비"). `tools/dev/sim` 을 쓰려면 그 README 1절(옛 경로)부터.
+4. 0-6 사용자 규칙을 읽는다(모두 지킨다).
+5. 기준 확인(`cd /home/user/rlk/roguelike`): `bash tools/dev/regen_all.sh`(끝줄 `== done (failures: 0)`; 데이터팩은 스크립트 위치에서
+   찾으므로 `bash /home/user/rlk/roguelike/tools/dev/regen_all.sh` 처럼 어디서 돌려도 됨) 뒤 `git status --short` 의 출력이 비어 있어야
+   한다(생성 결과 = 커밋된 출력). 0-8 준비 뒤 `RLK_DEV=$DEV bash tools/dev/loadcheck.sh . base` → `0 function load failure(s)`,
+   `python3 -I tools/dev/rplint.py <작업>/rp` → `rplint: 0 problem(s)`. 그림 도구용 numpy · Pillow 가 없으면
+   `python3 -m pip install numpy pillow` 로 설치한다(생성기는 표준 라이브러리와 Node 기본 모듈만 써서 필요 없음).
+
+### 0-3. 저장소 지도
+- `/home/user/rlk`, 원격 `origin` = https://github.com/Sol1ndy/rlk. `origin/main` 은 10-11 처음 올린 그대로(`cffe90d`)이고 11-03 까지의
+  모든 작업은 `claude/exciting-pascal-ek1vuy` 에 있다(그 뒤의 가지는 0-2 1번). `wip/*` 단계 가지는 로컬에만 있었다(원격에 없음; 내용은
+  병합 커밋에 남음). (main 에는 작업 가지에 없는 커밋 `cffe90d` 가 있다: 사용자가 처음 올린 `resources.zip`, 다른 리소스팩
+  `assets/map_r6`. 그래서 main 을 작업 가지로 fast-forward 할 수 없다. 쓰지 않는다.)
+- `roguelike/`: `pack.mcmeta` · `README.md`(이 문서) · `engravings.md` · `items.md` · `data/`(게임이 읽는 것) · `tools/`(생성기와
+  `tools/dev/` 개발 도구 · 계획 · 계약 문서; zip 에 넣지 않음). 저장소 맨 위 `/home/user/rlk/.gitignore` 는 `__pycache__/` · `*.pyc`
+  뿐(`roguelike/` 에는 없음; + `roguelike/tools/dev/sim/.gitignore` 가 시험 출력 · 다시 만드는 입력을 막음).
+- `data/minecraft/tags/function/{load,tick}.json` → `rlk:load` · `rlk:tick`. `data/rlk/` 에는 `advancement/`(공격 · 원소 피격 ·
+  인벤토리 변화 · 우클릭 감지), `dialog/menu`, `predicate/in_*`(이동 입력), `tags/`.
+
+`data/rlk/function/`:
+
+| 폴더 | 내용 | 누가 쓰나 |
+|---|---|---|
+| `load` `tick` `uninstall` `reset` `fix` `cleanup_grounditems` | 진입점(조절 지점과 빌드 도장 줄은 `load`), 매 틱, 제거, 리셋, 캐릭터 복구 | 손(생성기가 끼워 넣은 훅 줄이 섞여 있음: 대개 주석에 생성기 이름) |
+| `player/` `combat/` `element/` `mob/` | 스탯 · 레벨 · HUD · 대시 · 생명의 계약 / 피해 계산 / 원소 반응 / 몹 공용 | 손(2 · 3챕터 몹 생성기가 `combat/apply` · `combat/gold_drop` · `combat/heal_orb_roll` 에 넣은 훅 줄이 섞여 있음) |
+| `char/` | 캐릭터 8명, `char/motion/**` 아바타 모션 · 소리 | 손 + 생성 섞임. 생성: `build_player_rig.mjs`(+ `build_player_locomotion.mjs`) = `motion/` 의 `clips/` · `loco/` · `sheath/` · `combat/config/**` · `combat/swing_clip` 과 맨 위 함수들(`event` · `event_dispatch` · `install` 빼고), `build_player_audio.py` = `audio/<캐릭터>/*`, `build_skirk_metsu_fx.py` = `skirk_fx/burst_metsu` 디스패처와 t028 이후 프레임. 손(생성기 없음): 클립 이벤트 `events/<캐릭터>/**`, 입자 연출 `arle_fx` · `navia_fx` · `skirk_fx`(위 metsu 몫 제외; metsu 충전 프레임 t000–t026 도 손), `control/**`, `combat/{request,select,first,second,third}` · `combat/config`(디스패처), `event` · `event_dispatch` · `install`, `audio/play` · `audio/stop`. `events` 의 `function rlk:char/motion/audio/<캐릭터>/<클립>` 훅 줄은 지우지 말 것(`build_player_audio.py` 가 정확히 한 줄을 요구) |
+| `items/` `ditem/` `lvup/` `engravings/` `ench/` `invd/` `codex/` `shop/` `root/` | 아이템 · 드롭 · 레벨 업 선택 · 각인 · 인챈트 · 인벤토리 상세 · 도감 · 상점 · 나무뿌리 | 손 |
+| `room/` `run/` | 방 · 런 진행 | 손; `room/data` · `room/lz/*` = 옛 `build/layouts3.py` 결과를 `tools/flatten_zones.py` 가 고친 것, `room/cboss/**` = `build_cboss_rooms.py`, `room/rift/**` · `room/obj/k_rift` = `build_rift.py`, `room/raiden/**` = 나루카미 생성기 |
+| `cm/` | 잡몹: 1챕터 `sw ar fm im sh cn`, 2챕터 `c2 ns sl ss sp dr kr nj cc ci`, 3챕터 `c3 fu fp em sb cw cs rv pc`, 공용 | 1챕터 = 손(옛 `build/p166`) + 포즈 `build_mobs.mjs` · `build_swordsman.mjs`; 2챕터 = `build_ch2_mobs.py`; 3챕터 = `build_ch3_mobs.py` |
+| `mboss/` | 보스 공용 엔진: 등록 · 디스패처 `d/` · 바닥 공격 `hz/` · 투사체 `pj/` · 이동 `mv/` · 끌기 · 보조 `aux/` · 챕터 `cb/` · 경기장별 `ar/` · 판정 프록시 `px/` · 특수 `sp/` · 음악 · 밀기 · 연출 · 상자 · 시험 `test/` | `build_mboss_core.py`(아래 두 줄 빼고 `mboss/` 전부) |
+| `mboss/arena/` | 광장 + 챕터 경기장 | `build_mboss_arena.py`(테마 `tools/mboss_arena_<theme>.py`) |
+| `mboss/{guardian,butterfly,fieldgen,proto,cproto,spproto}/` | 중간보스 · 시험 보스 모듈 | `build_mboss_<id>.py`(`rig/**` = 리그 `.mjs`, `fx/**` 의 킷 몫 = 효과 킷) |
+| `boss/{azhdaha,apep,arlecchino,tachy,scarlet}/` | 챕터 · 특수 보스 모듈(레지스트리 `"fn": "boss/<id>"`) | 아래 생성기 표 |
+| `boss/raiden/` · `boss/test/` | 나루카미 · 시험 명령 별칭(`rlk:boss/test/chapter {id:…}` 등) | `build_raiden_all.py` 의 생성기들 · `build_mboss_core.py` |
+| `bossui/` `minimap/` `fx/nv/` | 글꼴 보스바 · 글꼴 미니맵 · 나비아 금빛 카드 | `build_bossbar.py` · `build_minimap.py` · `build_navia_fx_cards.py` |
+| `view/` `lobby/` | 시점(1인칭 · 숄더뷰 · F5) · 아바타 / 로비 · 튜토리얼 · 체험 방 | 손(옛 `build/p174` · `p162`) |
+| `snd/` | `f0..fN`: 같은 소리는 한 틱에 한 번(`#k<n> snd`) | 옛 `build/psnd.py` |
+| `help/` `dev/` `util/` | 명령 도움말 틀 · 개발자 모드 · 반복 호출 | 손(도움말 목록은 생성기가 `tools/help_lib.py` 로) |
+
+옛 빌드 스크립트 `build/*.py`(로비 p162 · 1챕터 몹 p166 · F5 시점 p174 · 배치 layouts3 · 소리 psnd)는 **저장소에도 컨테이너에도 없다**.
+그것이 만든 파일은 이제 손으로 관리하는 소스로 본다(배치만 `flatten_zones.py` 로 다시 처리).
+
+`tools/` 생성기(출력 폴더는 그 생성기 몫이다):
+
+| 생성기 | 데이터팩에 쓰는 곳 | 리소스팩 · 그 밖 |
+|---|---|---|
+| `build_mboss_core.py` + `mboss_lib.py` + `mboss_registry.json` | `mboss/**`(arena · 모듈 폴더 제외), `boss/test/*` | 커밋된 리그 매니페스트로 `mboss/px/<id>/**` |
+| `build_mboss_arena.py` + `mboss_arena_{az_cavern,ap_oasis,tk_lift,fl_ruins,hr_field,cp_test}.py` | `mboss/arena/**` | |
+| `build_cboss_rooms.py` | `room/cboss/**`(챕터 보스 입구) | |
+| `build_mboss_proto.py` · `build_mboss_cproto.py` · `build_mboss_spproto.py` | `mboss/proto` · `cproto` · `spproto` | `mboss_cproto_rig_manifest.json` |
+| `build_mboss_guardian.py`(`mboss_guardian/`) + `build_mboss_guardian_rig.mjs` | `mboss/guardian/**` | RP `mboss/guardian`, 글꼴 `mboss_gd` |
+| `build_mboss_butterfly.py` + `build_mboss_bf_fx.py` + `build_mboss_butterfly_rig.mjs` | `mboss/butterfly/**` | RP `mboss/butterfly` · `bf_kit` |
+| `build_mboss_fieldgen.py` + `build_mboss_fg_fx.py` + `build_mboss_fieldgen_rig.mjs` | `mboss/fieldgen/**` | RP `mboss/fieldgen` · `fg_kit` |
+| `build_mboss_azhdaha.py`(`mboss_azhdaha/`) + `build_mboss_az_fx.py` + `build_mboss_azhdaha_rig.mjs` | `boss/azhdaha/**` | RP `mboss/azhdaha` · `az_kit` |
+| `build_mboss_apep.py`(`mboss_apep/`) + `build_mboss_ap_fx.py` + `build_mboss_apep_rig.mjs` + `build_mboss_apep_org.mjs` | `boss/apep/**`(`rig/` · `om/` · 킷 몫은 각자) | RP `mboss/apep` · `apep_om` · `ap_kit` |
+| `build_rift.py` | `room/rift/**` · `room/obj/k_rift` + 공용 파일의 훅 줄(줄 앞 `# rift (build_rift.py)`) | RP `rift/` |
+| `build_mboss_tachy.py`(`mboss_tachy/`) + `build_mboss_tk_fx.py` + `build_tachy_rig.mjs` | `boss/tachy/**` | RP `mboss/tachy` · `tk_kit` |
+| `build_mboss_arlecchino.py`(`mboss_arlecchino/`) + `build_mboss_kn_fx.py` + `build_arlecchino_rig.mjs` | `boss/arlecchino/**` | RP `mboss/arlecchino` · `kn_kit` |
+| `build_mboss_scarlet.py`(`mboss_scarlet/`) + `build_mboss_hr_fx.py` + `build_scarlet_rig.mjs`(+ 영상 클립 `scarlet_cine.mjs`, 스킨 `scarlet_skin.mjs`, 리타깃 `scarlet_retarget.mjs`) | `boss/scarlet/**`(`rig/` · `fx/` 는 각자) | RP `mboss/scarlet` · `hr_kit`, 글꼴 `mboss_hr` |
+| `build_raiden_all.py`(→ `build_raiden_*.py` · `raiden_enc/` · `build_raiden_rig.mjs` · `build_raiden_judgment_rig.mjs` · `build_raiden_clones.mjs`, 끝에 `check_raiden_pack.py`) | `boss/raiden/**`, `room/raiden/**` | RP `raiden/` |
+| `build_ch2_mobs.py`(`ch2mob/`) · `build_ch3_mobs.py`(`ch3mob/`) | 2 · 3챕터 `cm/` 몹 + 공용 cm · room · combat · load · uninstall 의 훅 줄 | RP 는 `build_ch{2,3}_{swarm,elite}_rigs.mjs` |
+| `build_player_rig.mjs`(+ `build_player_locomotion.mjs`, `player_motion/`) · `build_player_audio.py` · `build_navia_fx_cards.py` · `build_skirk_metsu_fx.py` | `char/motion/**` 의 생성 몫(평타 타이밍 `char/motion/combat/config/**` 포함; 0-3 `char/` 줄), `fx/nv/**` | RP `player_motion/` · `navia_fx/` |
+| `build_mobs.mjs`(방패 · 마법사 · 궁수 · 대포) · `build_swordsman.mjs` | 1챕터 `cm/` 포즈 + 공용 cm 파일 패치 | RP `cm/<몹>` |
+| `build_bossbar.py` · `build_minimap.py` | `bossui/*` · `minimap/*` | RP 글꼴 |
+| `flatten_zones.py [--check]` | `room/data` · `room/lz/*` 를 제자리에서 고침 | |
+| `check_mboss_pack.py` | 검사만(훅 · 디스패처 · 레지스트리 규칙) | |
+
+### 0-4. 빌드 순서와 묶기
+- **생성된 출력은 손으로 고치지 않는다**: 생성기를 고치고 다시 만든다. 생성기는 자기 몫 경로만 쓴다.
+  - 레지스트리 Python 생성기(`regen_all.sh` 의 것) · 효과 킷 · 보스 리그 · 나루카미 생성기 대부분은 그 안의 낡은 파일도 지우므로, 입력
+    (레지스트리 · 커밋된 매니페스트)이 같으면 몇 번 · 어떤 순서로 돌려도 결과가 같다(`sim/az/tests_cm/gen_check.py` 3 이 중간보스 ·
+    챕터 틀 생성기로 확인; 아래 순서는 레지스트리를 바꿨을 때 디스패처가 먼저 생기게 하려는 관례). 나루카미 가운데
+    `build_raiden_encounter.py`(`raiden_enc/`) · `build_raiden_cinematic.py` · `build_raiden_orb.py` 는 덮어쓰기만 하고,
+    `build_raiden_object_vfx.py` · `build_raiden_materials.py` 는 코드에 적어 둔 옛 이름만 지운다: 이 다섯의 출력 이름을 바꾸거나
+    없애면 옛 파일을 손으로 지운다.
+  - 단 매니페스트를 바꾸는 생성기(리그 `.mjs`, 효과 킷, `build_mboss_cproto.py`)는 그것을 읽는 코어 · 모듈보다 먼저 돌린다(아니면
+    `regen_all.sh` 를 한 번 더).
+  - 플레이어 리그 `build_player_rig.mjs`(+ locomotion; `char/motion/**`) · 1챕터 몹 리그 `build_mobs.mjs` · `build_swordsman.mjs`
+    (`cm/<몹>/` 포즈) · 2 · 3챕터 몹 리그 `.mjs` 는 덮어쓰기만 하고 낡은 파일을 지우지 않는다: 클립 · 모델 · 파트의 이름을 바꾸거나
+    없애면 옛 파일을 손으로 지운다(리소스팩 쪽은 리소스팩 README 3절). 리소스팩 `items.json` 의 순서는 돌린 순서를 따른다(0-9).
+- **데이터팩**(레지스트리를 읽는 Python 생성기, 리소스팩 필요 없음): `bash roguelike/tools/dev/regen_all.sh roguelike [--mobs]` —
+  core → arena → cboss_rooms → proto → cproto → spproto → guardian → butterfly → fieldgen → az_fx(`--skip-rp`) → azhdaha →
+  ap_fx(`--skip-rp`) → apep → rift → tk_fx(`--skip-rp`) → tachy → kn_fx(`--skip-rp`) → arlecchino → hr_fx(`--skip-rp`) → scarlet →
+  `check_mboss_pack.py`(끝줄 `… 0 problem(s).`). `--mobs` 는 `build_ch2_mobs.py` · `build_ch3_mobs.py` 도 돌린다. 실패한 생성기의
+  로그만 보여 준다.
+  `regen_all.sh` 가 돌리지 않는 데이터팩 생성기: `python3 tools/build_skirk_metsu_fx.py`(스커크 극악기·멸 해방 검격 효과;
+  `char/motion/skirk_fx/burst_metsu/t028`~ 과 `burst_metsu.mcfunction` 만 씀, RP 필요 없음, 다른 생성기와 순서 무관; 이 파일을 고쳤을
+  때만 돌림), `python3 tools/flatten_zones.py [--check]`(배치를 바꿨을 때),
+  `python3 tools/build_player_audio.py`(아바타 소리: `char/motion/audio/<캐릭터>/*` 와 `tools/player_motion/compiled_audio.json` 만 씀,
+  RP 필요 없음; `tools/player_motion/audio_*.py` · `navia_audio/` · 클립 JSON · 손으로 쓴 `events/` 를 고쳤을 때).
+  - 리그 매니페스트(`tools/*rig_manifest.json`)가 바뀌면 코어를 다시 돌려 `mboss/px/<id>/**` 를 함께 커밋한다. 효과 킷의 매니페스트
+    (`tools/mboss_*_fx_manifest.json`)가 있어야 모듈의 `api.K` 가 켜진다(없으면 대역).
+- **리소스팩**(풀어 둔 팩을 `--resourcepack $RP` 로, **바뀐 것만**; 각 생성기는 자기 데이터팩 몫도 쓴다). `roguelike/` 에서:
+
+  ```bash
+  RP=<풀어 둔 리소스팩의 절대 경로>
+  node tools/build_arlecchino_rig.mjs --resourcepack $RP      # 리그: RP + 데이터팩 rig/** + 매니페스트
+  python3 tools/build_mboss_kn_fx.py --resourcepack $RP       # 효과 킷: RP + 데이터팩 fx/** + 매니페스트
+  node tools/build_scarlet_rig.mjs --resourcepack $RP         # 홍련 리그(+ 영상 클립 scarlet_cine.mjs): RP + 데이터팩 rig/** + 매니페스트
+  #   (사용자 스킨 scarlet_skin.mjs → textures/mboss/scarlet/skin.png 그대로, 아틀라스 rlk:mboss/scarlet/skin)
+  python3 tools/build_mboss_hr_fx.py --resourcepack $RP       # 홍련 효과 킷(build_rift.py 다음: 도착 균열이 rift 모델을 씀) + 데이터팩 fx/**
+  #   같은 꼴: build_tachy_rig.mjs + build_mboss_tk_fx.py, build_mboss_apep_rig.mjs + build_mboss_apep_org.mjs + build_mboss_ap_fx.py,
+  #   build_mboss_azhdaha_rig.mjs + build_mboss_az_fx.py, build_mboss_{guardian,butterfly,fieldgen}_rig.mjs + build_mboss_{bf,fg}_fx.py,
+  #   build_rift.py, build_bossbar.py, build_minimap.py, build_navia_fx_cards.py
+  python3 tools/build_raiden_all.py --resourcepack $RP        # 나루카미 전부(데이터팩 + RP, 끝에 check_raiden_pack.py)
+  node tools/build_player_rig.mjs --datapack . --resourcepack $RP && python3 tools/build_player_audio.py   # 아바타
+  node tools/build_mobs.mjs --datapack . --resourcepack $RP && node tools/build_swordsman.mjs --datapack . --resourcepack $RP
+  node tools/build_ch2_swarm_rigs.mjs --resourcepack $RP && node tools/build_ch2_elite_rigs.mjs --resourcepack $RP   # → build_ch2_mobs.py
+  node tools/build_ch3_swarm_rigs.mjs --resourcepack $RP && node tools/build_ch3_elite_rigs.mjs --resourcepack $RP   # → build_ch3_mobs.py
+  ```
+
+  리그를 다시 만들었으면 `regen_all.sh` 도 다시(모듈 · 코어가 매니페스트를 읽음). 리그 생성기는 바닥 아래로 내려가는 점, 틱당 120도
+  넘는 회전, 예산 초과에서 멈춘다(`--allow-steps` 는 작성 중에만). 디버그 그림용 `--debug-dp <폴더>` 는 0-8 의 그림 도구가 읽는다.
+- **묶기**(`zip` 은 있는 파일에 덧붙이므로 먼저 지운다; 데이터팩 zip 에 `tools/` 는 넣지 않는다; `OUT` · `RP` 는 둘 다 절대 경로로:
+  블록 안에서 `cd` 를 두 번 하므로 상대 경로면 zip · unzip 이 엉뚱한 곳을 본다):
+
+  ```bash
+  OUT=<내보낼 폴더의 절대 경로>; RP=<풀어 둔 리소스팩의 절대 경로>; mkdir -p $OUT
+  cd /home/user/rlk/roguelike && rm -f $OUT/roguelike.zip && \
+    zip -qr $OUT/roguelike.zip pack.mcmeta README.md engravings.md items.md data -x '*/__pycache__/*'
+  cd $RP && rm -f $OUT/rlk_hud_resourcepack.zip && zip -qr $OUT/rlk_hud_resourcepack.zip pack.mcmeta README.md assets
+  unzip -tq $OUT/roguelike.zip && unzip -tq $OUT/rlk_hud_resourcepack.zip
+  ls -l --block-size=K $OUT/*.zip      # 11-02: roguelike.zip 29,203 KB · rlk_hud_resourcepack.zip 11,174 KB
+  ```
+
+### 0-5. 릴리스 절차와 게이트
+1. 고친 생성기로 다시 만들고(0-4) 바뀐 쪽 스위트를 돌린다(`tools/dev/sim`, 0-8). 다른 보스 · 몹의 생성 출력은 바이트 그대로여야
+   한다: `regen_all.sh` 뒤 `git status` 에 이번 변경이 소유한 파일만 보여야 한다. 옮겨 둔 다른 스위트(아를레키노 `ar/tests`, 챕터 틀
+   `az/tests_cm`)는 0-9 의 알려진 실패 말고 새 실패가 없어야 한다. 검사기(`check_refs` · `check_macro` · `check_nbtpath` · `mb/lint_mc`)는
+   직전 릴리스 트리의 결과와 비교해 새로 생긴 것이 없어야 한다. 다른 보스의 스위트는 옮기지 않았으니(0-8), 그 보스를 크게 고칠 때는
+   아를레키노 스위트를 본떠 먼저 만든다.
+2. 게이트 — 모두 통과해야 릴리스한다(`roguelike/` 에서):
+
+| 게이트 | 명령 | 통과 |
+|---|---|---|
+| 실제 서버 로드 | `RLK_DEV=$DEV bash tools/dev/loadcheck.sh . rel_<MMDD>`(`$DEV` = 0-8 의 작업 폴더; 한 번 `export RLK_DEV=…` 해 두면 됨. 새 컨테이너는 먼저 0-8 "loadcheck 서버 준비"; `RLK_DEV` 를 빼면 옛 스크래치패드의 서버 폴더를 찾다 `loadcheck: no server dir …` 로 끝남) | `loadcheck rel_<MMDD>: 0 function load failure(s)`(종료 코드 0)이고, 서버 폴더(기본 `$DEV/mcsrv`)의 `rel_<MMDD>.log` 에 `Starting minecraft server version 26.3` 과 `Done (` 가 있음 |
+| 리소스팩 린트 | `python3 -I tools/dev/rplint.py $RP` | `rplint: 0 problem(s)` |
+| 팩 검사 | `python3 tools/check_mboss_pack.py`(`regen_all.sh` 의 마지막) | `… 0 problem(s).` |
+| 아틀라스 예산 | `python3 -I tools/dev/atlas_px.py $RP` | 아이템 아틀라스 ≤ 13.2 M px(11-06: 12.919 M(홍련 0.29 M 포함), 새 보스 몫은 약 0.28 M 뿐 — 0-7 3번; 클라이언트 한계 약 15.5 M) |
+| 두 번 만들기 | `regen_all.sh` 두 번, 바꾼 RP 생성기도 두 번 | 두 번째 뒤 `git status` 변화 없음; RP 해시가 같음(표 아래 명령) |
+| 정적 규칙 · 예산 | 스위트 · 검사기(0-8) | 0-6 의 게임 함정; 그 보스의 아틀라스(계획에서 정함, 아를레키노 ≤ 1.0 M) · 쉬는 자세 표시 요소 ≤ 6 500 · 싸움 한 틱 평균 명령 수 ≤ 아펩(약 830) |
+
+RP 해시(두 번 같아야 함; 빈 입력 해시 da39a3ee… 가 나오면 명령이 틀린 것): `(cd $RP && find . -type f -print0 | sort -z | xargs -0 sha1sum) | sha1sum`
+
+3. **빌드 도장**: `data/rlk/function/load.mcfunction` 의 이 줄만 고쳐 따로 커밋한다(메시지 `Build stamp <MM-DD> …`).
+   `tellraw @a [{"text":"[로그라이크] 시스템 로드 완료","color":"green"},{"text":" · 빌드 <MM-DD> <설명>","color":"gray"}]`
+   같은 날 두 번째부터는 `b` `c` `d` …(10-21 → 10-21b → 10-21c → 10-21d). 설명은 짧은 한국어(예: `아를레키노 · 4챕터` → `빌드 11-02 아를레키노 · 4챕터`).
+   같은 커밋에서 데이터팩 `pack.mcmeta` 의 설명 끝 `· 빌드 <MM-DD>` 도 맞추고, 리소스팩 `$RP/pack.mcmeta` 의 설명 끝도 같은 값으로
+   고친다(리소스팩은 git 밖이라 zip 에만 들어감; 11-03 부터 — 그 전에는 둘 다 `빌드 10-15` 에 멈춰 있었다).
+   이 세 파일은 2번 게이트 뒤에 바뀌므로 커밋 전에 `RLK_DEV=$DEV bash tools/dev/loadcheck.sh . rel_<MMDD>` 를 한 번 더 돌려
+   `0 function load failure(s)` 를 본다(도장 줄 하나가 깨져도 26.3 은 `load` 전체를 읽지 않고(0-6), `pack.mcmeta` 가 깨지면 팩을
+   통째로 건너뛴다 — loadcheck 가 둘 다 잡는다, 0-8; 10-30d · 11-02 도 도장을 고친 뒤 `rel30d` · `rel1102` 를 돌리고 커밋했다). 리소스팩
+   `pack.mcmeta` 는 어느 게이트도 읽지 않으므로(rplint 는 `assets/` 만) `python3 -I -m json.tool $RP/pack.mcmeta > /dev/null` 로 JSON 을 본다.
+4. 0-10 과 리소스팩 README 의 버전 기록에 한 줄씩 더하고, 0-1 · 0-9 도 맞춘다. 리소스팩 README 는 팩 맨 위(`$RP/README.md`)에 둔다.
+   0-10 새 줄의 대표 커밋 자리에는 3번 도장 커밋의 해시를 적는다. 도장을 먼저 커밋하고 문서 커밋을 그 뒤에 하면 바로 적을 수 있다.
+   문서를 먼저 커밋해 해시 대신 `git log --grep='Build stamp <MM-DD>'` 를 적어 두었으면, 다음 릴리스 때
+   `git log -i --grep='build stamp <MM-DD>' --format=%h` 로 해시를 채운다. 0-1 의 「마지막 릴리스」 줄도 이 릴리스로 바꾼다.
+5. 커밋(메시지 끝 trailer 는 세션이 정해 준 형식 그대로, 0-6) → `git push -u origin <작업 가지>`(0-2 1번에서 정한 가지; 11-03 까지
+   `claude/exciting-pascal-ek1vuy`). 네트워크 오류면 2 · 4 · 8 · 16초 쉬고 최대 4번 다시 한다.
+6. zip 두 개를 묶고(0-4) `unzip -t`, 크기(KB)를 잰다.
+7. 사용자에게 두 zip 과 그림(그 릴리스에서 바뀐 것: 모델 시트 · 클립 띠 · 효과 시트 · 싸움 시트, 640 px 안팎)을 보내고 **한국어로**
+   답한다: 무엇이 바뀌었나, 기본값으로 정해 둔 질문, zip 크기, 게임에서 확인해 달라고 할 것. 작업 가지가 바뀐 릴리스와, 인수인계를
+   처음 넣은 11-03 릴리스의 답에는 새 세션용 안내를 넣는다: 「새 세션을 열 때는 "Sol1ndy/rlk 의 가지 <작업 가지> 에서
+   roguelike/README.md 0장을 먼저 읽고 이어서 해" 라고 말해 주세요. 기본 가지 main 에는 10-11 의 옛 버전만 있습니다.」 main 을 최신으로
+   맞추는 일(병합)은 사용자가 원할 때만 한다.
+
+### 0-6. 사용자 규칙 (모두 지킨다)
+- 사용자에게는 항상 한국어로 답한다.
+- 커밋 메시지 끝 trailer는 세션이 정해 준 형식을 그대로 쓴다; 모델 ID는 커밋·PR·코드·문서 어디에도 쓰지 않는다.
+- git: 작업은 모두 0-2 1번에서 정한 작업 가지로 모으고, push 는 그 가지 하나에만 한다(11-03 까지 `claude/exciting-pascal-ek1vuy`; 세션 지시가 다른 가지를
+  정해 주면 그 가지). 릴리스마다 커밋 → push(0-5)한다. push 가 네트워크 오류면 2 · 4 · 8 · 16초 쉬고 최대 4번 다시 한다. PR 은
+  사용자가 말할 때만 만들고, main 에 직접 병합하지 않는다. 단계 가지 `wip/*` 는 push 하지 않는다.
+- 생성된 출력은 손으로 고치지 않는다(생성기 수정 → 재생성).
+- 소리는 바닐라 소리만(리소스팩 `sounds.json` 은 `{}`).
+- 텔레그래프 규칙(10-20): 바닥 표시(데칼)는 원작 영상에 있는 경우만(영상에 보이는 모양으로); 그 밖에는 12틱 이상(큰 공격은
+  20틱 이상, 대시로 못 피하는 공격도)의 조용한 예고(몸 동작 · 소리 · 공중에 보이는 것) + 눈에 보이는 타격. 영상이 없는 보스는
+  추측하지 말고 사용자에게 묻는다.
+- 팁 금지(10-21): "모든 보스 공통으로 즉사기를 제외하고는 어떻게 행동해라 하는 팁을 적어놓지 마" — 단, "실제 원신 인게임에서도
+  있는 안내메시지는 그대로 띄우고". 보스 · 몹 전투의 화면 글자는 이름 · 단계 제목 · 패턴 이름 · 배지 · 대사(위키) · 숫자 · 실제 게임
+  문구 · 즉사기 경고 · 시스템 안내(거절 · 대기, 예: 「경기장을 준비하는 중입니다. 잠시 뒤 다시 누르세요.」)만.
+- 특정 원소에 면역인 몹은 만들지 않는다(원소 면역/원소 게이트 보호막 없음).
+- 실제 게임 함정(모의기는 통과해도 게임에서 깨졌던 것):
+  - `scoreboard players add/remove` 에 음수 리터럴 금지 — 26.3 은 그 함수 전체를 읽지 않는다(10-21b 야타용왕 AI 멈춤).
+  - 텍스트 컴포넌트가 글리프 폰트를 상속하지 않게: 컴포넌트마다 `font` 를 적고, 글리프 뿌리 텍스트는 비우고 꾸미지 않으며, 킷 글꼴은
+    끝에 `minecraft:default` 참조(10-14 보스바 숫자 · 10-21 배너 글자가 네모로 보였다).
+  - 리소스 id 는 소문자 `[a-z0-9_.-/]` — 하나만 어겨도 클라이언트가 아틀라스 전체를 버린다(10-22e 텍스처가 모두 깨짐; `rplint`).
+  - 바닥 아래로 아무것도 안 내려가고, 블록 속으로 텔레포트 금지(목적지는 `mv/ok` · 안전 바닥 검사; 리그 생성기가 매 틱 검사).
+  - 손에 든 소품은 옆에서 봐도 올바른 방향(10-29c 창 · 북채).
+  - 큰 휘두르기는 키를 촘촘히(보간은 가까운 쪽으로 돌아 휘두르기가 찌르기처럼 보인다: 10-22 만겁).
+  - 투사체 하나당 디스플레이 카드 하나(날아가는 쪽을 봄).
+  - `summon` 은 execute 의 회전을 물려받지 않는다(새 엔티티는 yaw 0 — 방향은 소환 뒤 tp/facing 으로 준다; 11-03 돌아오는 낫이
+    남쪽으로 날던 문제).
+- 타키 플레이테스트 교훈(10-30): 긴 대기 금지, 거리 좁히기 수단(끌어오기 · 블링크), 연속기는 추적, 중간 타격 넉백 없음(마지막
+  타격만), 몇 초씩 떠 있지 않기, 너무 작거나 마르지 않게.
+- 모델: 얼굴이 머리카락을 뚫고 나오지 않게, 문은 평평하게(방의 문은 바닥 높이, 언덕 위 문 없음: 10-30c).
+- 사용량이 주 단위로 제한되므로 검사는 표적화하고(반복 중에는 바뀐 쪽 스위트만, 전체 게이트는 단계 끝에 한 번) 리뷰는 한 번에
+  묶는다.
+- 디스크는 늘 빠듯하다(11-03 이 컨테이너 `df -h /`: 남은 공간 약 2.6 GB(같은 날 3.7 GB 까지 오르내림), 쓴 37 GB 가운데 스크래치패드가
+  21 GB; 새 컨테이너에서도 먼저 `df -h /` 를 본다). 병렬 작업은 단계마다 자기 git worktree(동시에 셋까지, 각 약 250 MB)와 RP 사본
+  (`cp -r`, 하드 링크 금지, 약 50 MB)으로 한다. 병합하면 바로 `git worktree remove` 하고 사본도 지운다. 보내지 않을 그림 · 큰 출력 ·
+  옛 RP 사본도 지운다.
+- 매 릴리스마다 이 인수인계 장과 리소스팩 README의 버전 기록을 갱신한다.
+- 일하는 방식(10-19 사용자): "요청한 순서대로" 내보내되 "동시에 돌릴 수 있는 최대한" 병렬로. 사용자가 멈추라고 하면 바로 멈추고
+  어디까지 했는지 적어 둔다("계속해" 로 이어감).
+
+### 0-7. 보스 제작 파이프라인 (야타용왕 · 아펩 · 타키 · 아를레키노 때 실제로 한 방식)
+1. **이해**: 사용자가 보낸 영상(1080p60 mp4, 클립당 약 40초)과 나무위키 페이지(저장한 HTML → `html2txt.py`)를 프레임 시트로 만든다
+   — `<보스>/ref/*.jpg`(640 px 이하, 칸마다 `vN t` 표시; `tools/dev/sim/ar/tools/`: `sheet2.py` 시간 간격, `picks.py` 골라 뽑기,
+   `capat.py` · `captions.py` 자막 영역, `skinview.py` 스킨 앞뒤). 시간 `v1 2.45` = v1 의 2.45초(60 fps, 1틱 = 3프레임). 패턴마다
+   첫 동작 · 타격 틱 · 범위 · 바닥 표시가 보이는지 · 화면 문구를 적는다.
+2. **계획** `PLAN.md`: 결정 표(레지스트리 · 이름 · 사용자 변경 · 원소 · 단계 · 모델 · 패턴 · 바닥 표시 목록 · 등장 · 경기장 · 화면 글자 ·
+   예산), 사용자에게 물을 것과 기본값(답이 없으면 기본값으로 진행하고 릴리스 때 알림), 패턴 표(클립 · 이벤트 틱 · 모양 · 등급),
+   단계 · AI · 난이도 목표, 단계 분할 · 소유 · 시험 · 그림 · 게이트 · 예상치.
+3. **D0 계약 동결**(타키 · 아를레키노: 가지 `wip/<b>-d0`, 커밋 '<보스> D0: frozen contract …'(`0c8e628` · `eb0a38a`); 야타용왕 · 아펩은
+   계약 문서 `az/contract/*.md` · `ap/ap_contract.md`(+ `ap/spec/`)로 같은 일을 했다): `tools/mboss_<id>/api.py` — 1 정체 · 레지스트리 ·
+   경기장 명세, 2 피해 등급 `DMG` · `HITS`(클립 · 이벤트 · 모양 · 크기 · 등급) · 예고 상수, 3 단계 · 바닥 · 고유 메커니즘 수치, 4 AI
+   가중치 · 쿨다운 · 일정, 5 키 · 소유 `OWN` · 시험 id, 6 이름(점수 · 태그 · 저장소), 7 리그 계약 `PARTS` `LOOKS` `RIG_CALLS`
+   `CLIPS {이름: (길이, 반복, {이벤트: 틱})}` `CLIP_FORM {이름: 형태}` `check_manifest`, 8 킷 계약 `KIT_*` · 대사, 9 `Writer` · `Pattern` · `Service`. 여기서 만든 `stub_rig_manifest.json`, 빈 단계 스텁,
+   레지스트리 항목(`enabled:false` · `route:false`). 기존 출력은 바이트 그대로. 문서: `contract.md`(소유 · 이름 · 인터페이스 · 공통
+   규칙 · 게이트 · 변경 기록), `stage_briefs.md`(단계 에이전트에게 그대로 건넨 브리프).
+   새 보스의 이름 · 번호(겹치면 안 되고 다시 쓰지 않음):
+   - 레지스트리 `n` 은 관례상 그 종류의 다음 번호다: 중간 1–3 → 4, 챕터 10–12 → 13, 특수 20 → 21, 97–99 는 시험. `mboss_lib` 는
+     1–9999 안에서 고유한지만 검사한다.
+   - 경기장 `n` 은 5(0 광장 · 1–4 · 9 `cp_test`).
+   - 두 글자 접두사(점수 `<xx>` · `<xx>Rig*` · `<xx>Fx*`, 태그 `rlk_<xx>_*`, 저장소 `rlk:<xx>`, 킷 `<xx>_kit`, 글꼴 `rlk:mboss_<xx>`)는
+     아직 안 쓴 것으로 고른다. 보스가 쓴 gd bf fg az ap tk kn rd 말고도 점수판 머리글자가 많으니(mb cm pm sk cl nf rn nv eq pk …)
+     `grep -rhoE 'scoreboard objectives add [A-Za-z0-9_.]+' data | sort -u` 로 확인한다.
+   - 리그 UUID 는 `524c4b4d-<두 글자 ASCII 16진>-…-0000000000NN` 꼴이다. 쓴 것: 4150 AP · 415a AZ · 4246 BF · 4247 BG(파수꾼) ·
+     4350 CP · 4647 FG · 4852 HR · 4b4e KN · 5244 RD · 544b TK.
+   - 킷 글꼴 코드 포인트는 다음 대역 U+ED00 을 쓴다(쓴 것 E100 · E300 · E400 · E500 … EB00 · EC00(홍련 `mboss_hr`), 리소스팩 README 2절).
+   - 아틀라스: 11-06 에 12.919 M / 게이트 13.2 M 이라 새 보스 몫은 약 0.28 M 뿐이다(11-03 의 여유 0.57 M 가운데 홍련이 0.29 M 를 씀;
+     아를레키노 계획은 ≤ 1.0 M 이었다). 계획에서 그
+     안으로 잡거나, 다른 몫을 줄이거나, 게이트를 올린다(13.2 M 은 아를레키노 계획에서 정한 값; 클라이언트 한계 약 15.5 M). 올리면
+     계획 · 0-5 표 · 릴리스 답에 적는다.
+4. **병렬 단계**: 단계마다 자기 git worktree(`git worktree add <작업>/wt_<s> -b wip/<b>-<s> <D0 커밋>`)와 자기 리소스팩 사본
+   (`cp -r`, 하드 링크 금지), **자기 소유 파일만** 쓴다. 다른 단계 · 리드에게 필요한 것은 `requests/<s>.md` 에 적는다. 아를레키노:
+   S1 틀(FN-1 생명의 계약 공격 옵션, FN-3 판정 프록시 없는 챕터 경로) + 경기장 테마 + 라우팅 · S1K 효과 · 소리 · HUD 킷 ·
+   S2 리그 + 등장 · 전환 · 사망 연출 · S3 모듈 코어 · AI · 고유 메커니즘 · 1페이즈 패턴 · S4 2페이즈 패턴(S3 가지에서). 단계마다
+   loadcheck · rplint · 두 번 생성 · 단계 스위트 · 그림을 통과하고 넘긴다. 동시에 worktree 셋까지(각 약 250 MB), 병합하면 지운다.
+   4 CPU 라 워크플로 하나에 에이전트 둘, 워크플로 여럿을 함께 돌렸다. 리그 단계가 끝나면 모델 시트(U1: 정면 · 옆 · 뒤 · 3/4)와 리그
+   그림을 릴리스 전에 먼저 사용자에게 보내, 일찍 의견을 받을 수 있게 했다.
+   브리프 틀(단계 에이전트에게 한 절씩 그대로 건넴; 원문 `tools/dev/sim/ar/stage_briefs.md` · `tk/stage_briefs.md`):
+   - ① 너는 …(프로젝트 한 줄 소개, worktree · 가지 · 경로 약어)
+   - ② 먼저 읽을 것(PLAN 절, 계약, `api.py`, README 절, 본뜰 기존 생성기)
+   - ③ 목표(번호 목록)
+   - ④ 건드리지 말 것(남의 소유, 플레이어 아바타 파일)
+   - ⑤ 시험(스위트 이름 · 검사 항목)
+   - ⑥ 그림(파일 이름 · 640 px 이하, 참고 시트 옆에)
+   - ⑦ 게이트(loadcheck · 두 번 생성 · 다른 생성기 출력 그대로 · `check_mboss_pack` · 스위트 · 0-6 규칙)
+   - ⑧ 커밋은 자기 `wip/<b>-<s>` 에 세션 trailer 로 하고 push 하지 않는다(push 는 리드가 작업 가지에만)
+   - ⑨ 보고(커밋 · 소유 파일 · 수치 · 시험 수 · 그림 경로 · `requests/<s>.md`)
+5. **I1 통합**(리드, `wip/<b>`): S1 → S1K → S2 → S3 → S4 순서로 병합, 요청 반영, `enabled` · `route` true, 전부 다시 만들기, 게이트,
+   README 절 병합.
+6. **묶은 검토 한 번 → 수정 → 균형**(S5): 상태 · 실제 게임 위험, 공정성 · 균형(탐침), 영상과의 충실도를 한 번에 보고
+   `review/findings.md`(AR-xx: 등급 · 고침 / 남김)에 적은 뒤 그 자리에서 고치고 수치를 한 번 맞춘다.
+7. **릴리스**(0-5) → 사용자의 게임 피드백 → 수정 릴리스(b, c, …).
+
+균형 목표(아이템 없는 Lv15 대 L18, 시드 3개 × 3600틱; 사람 대역 에이전트가 조용한 판정을 자세로 12틱 먼저 알아챔;
+`tools/dev/sim/ar/review/bal/`):
+- P1 근접 걷기 %최대 체력/분 ≈ 1.0~1.2 × 아펩 P1(127.7) — 계획 초안은 0.95~1.15.
+- P2 ≈ 1.0~1.3 × 아펩 P3(94.4) — 계획 초안은 ≤ 1.25; 회복구슬을 줍는 에이전트 기준.
+- 최악 40틱 창 ≤ 45 %; 서 있는 플레이어가 한 시전을 다 맞아도 ≤ 60 %; 대시로 못 피하는 몫 ≤ 25 %; 완벽한 대셔 ≤ 0.3 × 파수꾼
+  걷기; 회복 안 하는 에이전트도 연회 두 번을 버팀; 아이템 없는 칼 처치 6~7분(아펩 5.95분). 손잡이: 등급 ±20 %, `hp` ±15 %,
+  고유 수치 ±50 %.
+- 11-02 결과: P1 1.15 ×, P2(구슬) 1.00 ×(구슬 안 주우면 1.49 ×), 최악 40틱 42.9 %.
+
+계획 · 계약 문서는 옛 스크래치패드와 같은 상대 경로로 `tools/dev/sim/` 에 옮겨 두었다(zip 에 안 들어감). 그때의 기록이라 수치가
+낡았을 수 있다. 지금 값은 코드(`tools/mboss_<id>/api.py` 등)와 이 README 의 보스 절이 우선이다.
+- 아를레키노: `ar/PLAN.md`(두 페이즈 전체 — 결정 표 · 사용자 질문 셋(연회 배너 문구 · 강제 부여 때 회복구슬 3개 · 크기 × 1.4) · 영상
+  분석(클립 순서 v5 → v1 → v2 → v3 → v4 → v6 → v7, v8 무시) · 생명의 계약 규칙 · 바닥 표시 목록 §1.5 · 리그 26 파트 · 클립 표 · 등장
+  150틱 · 전환 T 180틱 · 사망 110틱 · 패턴 표 · AI · 난이도 · 경기장 · 단계 분할 · 게이트), `ar/contract.md`(D0 동결 계약: 소유표, 이름 —
+  점수 `kn` · `knRig*` · `knFx*`, 태그 `rlk_kn_*`, 저장소 `rlk:kn`, RP `rlk:mboss/arlecchino/*` · `kn_kit`, 글꼴 `rlk:mboss_kn` —
+  인터페이스, 게이트), `ar/stage_briefs.md`(단계 브리프 원문), `ar/requests/*.md`, `ar/review/findings.md`.
+- 홍련(11-06 릴리스 때 옮김): `hr/PLAN.md`(결정 표 · 영상 분석 · 몸 · 클립 · 장면 · 패턴 · 실드와 자영 연참 · 난이도 §4.8 · 경기장 ·
+  이벤트 · 아이템 · 버프 §7 · 단계 분할 · 게이트), `hr/contract.md`(D0 동결 계약과 §7 변경 기록 D0 … S5 · V-I), `hr/stage_briefs.md`,
+  `hr/requests/*.md`, `hr/review/findings.md`(검토 HR-01~HR-55 · LF-01~LF-04 와 리드 결정), `hr/review/bal/`(S5 균형 탐침의 README · 결과
+  로그; 스크립트는 옮기지 않음), `hr/i1/i1_notes.md`(통합 기록 I1a ~ F-I).
+- 다른 보스와 몹: 타키 `tk/`(`PLAN.md` · `contract.md` · `stage_briefs.md` · `requests/` · `review/findings.md`), 아펩 `ap/`(`plan.md` ·
+  `ap_contract.md` · `framework_needs.md` · `ap_fx_api.md` · `understand/` · `requests/*.md`), 야타용왕 `az/`(`plan.md` · `contract/*.md` ·
+  `understand/` · `requests/*.md`), 나루카미 `rd/`(`plan.md` · `s2_notes.md` · `footage/*.md`), 중간보스 틀 · 파수꾼 `mboss/`(`plan.md` ·
+  `contract.md` · `gd_contract.md` · `rig_api.md`(옛 판; 지금 판은 `tools/mboss_guardian_rig_api.md`) · `understand/*.md`), 나비
+  `mb2/`(`plan.md` · `bf_contract.md` · `bf_fx_api.md` · `spec/*.md` · `review/core_findings.json` · `understand/`), 역장 `mb3/`(`plan.md` ·
+  `fg_contract.md` · `fg_fx_api.md` · `spec/*.md` · `understand/`), 10-20 예고 규칙 감사 `tele/{gd,bf,fg}/audit.md`, 나비아
+  `navia/`(`plan.md` · `dp_sound_events.txt`), 2 · 3챕터 몹 `ch2/CONTRACT.md` · `ch3/CONTRACT.md`(0-7b). `understand/` 는 영상을 프레임
+  단위로 읽은 기록이라, 영상이 없는 지금은 영상 내용의 유일한 글 기록이다.
+- 보스 절과 생성기 주석이 수치의 근거로 드는 옛 공정성 모의도 그때의 기록으로 옮겼다(스크립트 + 결과 로그): 나비 `mb2/balance/`
+  (`bal.py` · `fsim.py`), 역장 `mb3/fgfix/sim/` · `tele/fg/sim/`(`fgfair.py`), 타키 `tk/review/bal/`(`tkfair.py`), 아펩
+  `ap/balance/`(`apfair.py` · `analysis.txt`), 그리고 `mb2/integ/vblade_check.py` · `riglib/r3_consumer_patch.py`. 옮기지 않은 스위트의
+  모의기(`mb2/tests` · `mb3/tests` · `tk/s3/lib` · `ap/tests/lib`)를 import 하므로 그대로는 돌지 않는다(지금 돌릴 수 있는 탐침은
+  `ar/review/bal/`, 0-8).
+
+이 README 와 생성기 주석의 "스크래치패드 `xx/…`" 와 `S:xx/…` 는 모두 `tools/dev/sim/xx/…` 로 읽는다. `tools/dev/sim` 에 없는 옛
+경로는 옮기지 않은 것이다(옛 스크래치패드에만 있음; 새 컨테이너에는 없음): 영상(`<보스>/src/*.mp4`, 아를레키노만 약 213 MB) · 영상
+프레임(`rd/frames`, `rd/src/user_refs`) · 저장한 위키 · 참고 시트 그림(`<보스>/ref/*.jpg`; `ar/ref` · `tk/ref` 약 12 MB 는 사용자가
+동의하면 넣을 수 있고, 그때는 `sim/.gitignore` 에 `!*/ref/*.jpg` 예외가 필요) · 작업 출력(그림 · 로그 · 렌더: `*/renders` · `*/out` ·
+`ap/arenarender` · `az/arenarender` · `ap|az|mb3/fxrender`), 리그 작업 폴더(`ap/rigwork` · `az/rigwork` · `ap/orgwork`, `riglib/` 의 나머지),
+검토 작업 폴더(`mb3/review`, `mb2/review` · `mb2/integ` · `mb3/fgfix` 의 나머지), 계획 초안 · 비평 · 원장(`ap/` · `az/` 의
+`plan_draft.md` · `plan_crit_*.md` · `plan_ledger.md`), 다른 보스의 스위트(0-8), `ap/spec/` 같은 D0 작업 도구. 같은 내용이 저장소에 있는
+것: `az/az_fx_api.md` = `tools/az_fx_api.md`, `mcsrv/loadcheck.sh`(11-03 전 판) → `tools/dev/loadcheck.sh`. P2 스킨은 `tools/arlecchino_skin_p2.mjs` 에 들어 있다. 그 보스를 영상과 다시 맞춰야 하면 사용자에게 영상을 다시
+보내 달라고 한다(아를레키노 v1–v7; 위키는 저장한 HTML, 0-2 2번 ③). 다음 보스도 같은 짜임으로 새로 쓴다.
+
+### 0-7b. 잡몹 작업 (2 · 3챕터 때 한 방식)
+- 사용자 요청(10-28, 2챕터 원문): "2스테이지 잡몹을 만들거야. 원신이나 스컬, 세피리아의 몹들을 갖고와도 되긴 하는데, 너무 쉽거나
+  그냥 단순히 숫자만 많으면 지루할 수 있어. 정예 몹으로 움직임이 빠른 몹을 몇 개 넣거나, 패턴이 단순한 몹을 많이 넣어서 한 번에
+  여러 명을 때릴 수 있도록 해 타격감을 주거나 하면 좋겠어. 몹들을 구상해봐." 이어서 "특정 원소에 면역인 몹은 빼".
+- 2챕터: 리드가 7종 안(무리 3 · 지원 1 · 정예 3, 방 구성 예시)을 보이고 세 가지를 물었다. 사용자는 "1. O, 2. 다 만들어, 3. X"(이나즈마
+  몹만 · 7종 모두 · 1챕터 몹 섞지 않음)로 답했다.
+- 3챕터(10-29, "3챕터 몹도 구상해봐. 수메르 컨셉에 맞게"): 안(우림 / 사막 비중 · 7종 · 지원 = 치유 술사)을 먼저 보이고
+  "1. O, 2. O, 3. O" 로 승인받았다.
+- 4챕터(폰타인)도 안을 먼저 보이고 정할 것을 묻는다.
+- 공통 결정:
+  - 그 챕터 지역의 몹만 쓰고, 그 챕터 방에는 다른 챕터의 몹을 섞지 않는다.
+  - 원소 면역 · 원소별 저항 · 원소 게이트 보호막 없음. 공격이 플레이어에게 원소를 묻히는 것은 된다.
+  - 모든 공격에 예고가 있다. 바닥 표시는 계약에 적은 것만.
+  - 정예는 방마다 하나(3챕터 5~6번째 맵은 둘)이고, 공격 뒤 확실한 빈틈이 있다.
+  - 무리 몹은 타격감(넉백 저항 0 · 경직 0.25초 · 처치 연출 · 다중 처치 신호).
+  - 안내 · 팁 글 없음.
+- 계약: 리드가 `CONTRACT.md` 를 쓴다(원문: `tools/dev/sim/ch2/CONTRACT.md` · `ch3/CONTRACT.md`). 내용은 요청 원문, id 표(기존
+  `sw ar fm im sh cn` · `ns sl ss sp dr kr nj cc ci` · `fu fp em sb cw cs rv pc` 와 겹치지 않게), 생성기 소유, 공통 동작, 몹 표 초안
+  수치, 방 구성 · 라우팅이다.
+- 병렬 작업: 그다음 worktree 둘로 나눈다.
+  - A = 틀(라우팅 `cm/c<N>/plan` · 생성기 입구 `build_ch<N>_mobs.py` · 공용 타격감 · 시험 소환 `cm/test {t:"<id>"}` 와 도움말
+    `cm/c<N>/test_help`) + 무리 · 지원 몹.
+  - B = 정예(`ch<N>mob/elite.py` + 자기 `elite_lib.py`). A 의 입구가 없는 동안은 임시 러너 `build_ch<N>_elite_only.py` 를 쓰고, 병합 때
+    지운다.
+  - A 는 B 의 id 를 매크로 줄(`$function rlk:cm/spawn/$(id)`)로 불러서, B 가 없는 트리도 로드된다.
+  - RP 사본은 각자 쓴다.
+  - 아틀라스 몫은 그때의 여유로 정했다(2챕터 A · B 각 ≤ 0.5 M, 3챕터 각 ≤ 0.4 M). 11-06 여유는 모두 합쳐 약 0.28 M(0-5)뿐이니
+    4챕터는 그 안에서 나눈다.
+- 생성기:
+  - 3챕터는 `tools/ch2mob` 을 import 해서 썼다(복사 금지, 2챕터 출력은 바이트 그대로).
+  - 4챕터는 `tools/ch3mob` · `build_ch3_mobs.py` · `build_ch3_{swarm,elite}_rigs.mjs` 를 본뜬다.
+  - 공유 파일(cm/tick · vis · flash · clean · combat/apply · room · load · uninstall)의 훅 줄은 생성기가 넣는다. 몹 생성기들을 어느 순서로 두 번
+    돌려도 같은 결과여야 한다.
+  - 새 생성기는 `regen_all.sh --mobs` 에 더한다.
+  - 5챕터 이후는 자기 몹이 생길 때까지 지금처럼 1챕터 6종을 쓴다(5-1절 '테스트 설정').
+- 마무리: 병합(파일이 겹치지 않음) → README 5-x 절 → 아틀라스 다시 만들기 → loadcheck · rplint → 도장(고친 뒤 loadcheck · JSON 확인 다시, 0-5 3번) → push → zip. 2 · 3챕터 시험
+  (`ch2/tests_a|b` · `ch3/tests_a|b`)은 옮기지 않았으니 같은 짜임으로 새로 쓴다.
+
+### 0-8. 시험 도구
+- `tools/dev/`(zip 에 안 들어감): `loadcheck.sh`(실제 서버 로드), `rplint.py`(리소스팩 린트), `regen_all.sh`(데이터팩 재생성),
+  `atlas_px.py`(아틀라스 크기), `sim/`(모의기 · 스위트 · 균형 탐침 · 그림 도구 · 계획 · 계약 문서; 파일마다의 설명과 옛 경로 처리는
+  `tools/dev/sim/README.md`). **스위트는 저장소의 `tools/dev/sim` 에서 바로 돌리지 않는다**: sim README 1절대로 데이터팩 밖(옛
+  스크래치패드 경로나 `<작업>`)에 사본을 두고 거기서 돌린다(시험하는 `roguelike/` 안에서 돌리면 변형 트리가 자기 `tmp/` 까지 복사하며
+  끝없이 커질 수 있었다; 11-03 에 복사에서 `tools/dev` 를 빼도록 고쳤지만 원칙은 사본).
+- **모의기**: 게임을 띄울 수 없어서 mcfunction 을 파이썬으로 해석해 싸움을 흉내 낸다 — `mcsim`(명령 해석기) ← `fgsim`(중간보스
+  틀, 엔진 바깥은 대역) ← `azsim`(`combat/apply` · 원소 반응 · 피격 · 처치 경로를 데이터팩에서 그대로) ← `cmsim`(챕터 모드: 블록
+  세계 · 청크 불림 · 변형 트리) ← `knsim`(아를레키노). **모의기가 받아도 게임은 거부할 수 있다**(음수 add/remove, 대문자 id, 글꼴
+  상속): 그래서 loadcheck · rplint 가 따로 있다. (봇 클라이언트로 실제 서버에 들어가 시험하는 것은 10-21 에 안 됐다: mineflayer
+  4.39.0 / minecraft-data 3.117.0 이 26.1 프로토콜까지다. 새 버전이 26.3 을 지원하는지 먼저 보고, 안 되면 실제 게임 확인은 사용자에게
+  부탁한다.)
+- **보스마다 `<보스>/tests/` 에 스위트를 만들어 썼다.** 옮겨 둔 것: 아를레키노 `sim/ar/tests/`(`test_cm_ar` 틀 FN-1 · FN-3 · 라우팅,
+  `test_arena_fl` 경기장, `test_kit` 효과 킷, `test_rig` 리그, `test_arlecchino` 코어 · 생명의 계약 · AI · 틱 비용, `pat_p1` · `pat_p2`
+  패턴: 타격 틱 = 클립 이벤트 · 예고 · 범위 · 끝점 · 매 틱 취소, `kit_dry`), 홍련 `sim/hr/tests/`(11-05 I1: `test_special_hr` 특수 보스 틀
+  FN-a~f, `test_rig` 리그 · 영상 클립, `ev_dry` 시퀀스, `test_scarlet` 코어 · 단계 · 멈춤 · 틱 비용, `pat_p1` · `pat_ghost` 패턴, `test_reward`
+  이벤트, `test_kit` 효과 킷, `test_arena_hr` 경기장, `test_hwamu` · `test_moon` 아이템 · 버프, `ident_hr` 35b82e5 와 바이트 비교, `gen_check_hr`
+  생성 순서 · 소유 경로; 모의기 `sim/hr/tests/lib` · `sim/hr/s1k/lib` · `sim/hr/sr`), 챕터 틀 `sim/az/tests_cm/`(라우팅 · 프록시 · 틀 도우미,
+  중간보스 행동 불변 `test_m0diff`, 생성 순서 `gen_check`, 바이트 고정 `ident`(낡음: 0-9)), 정적 검사기(`check_refs` · `check_macro` ·
+  `check_nbtpath` · `lint_mc`), 균형 탐침(`sim/ar/review/bal/`), 그림(`sim/preview/` 래스터라이저, `sim/ar/s2/` 리그 띠 ·
+  시트, `sim/ar/s1k/render/` 효과 시트), 영상 시트(`sim/ar/tools/`).
+- 옮기지 않은 것(옛 스크래치패드에만 있음; 11-03 이 컨테이너에는 아직 있지만 새 컨테이너에는 없음): 타키 `tk/tests`(`test_tachy` · `pat_melee` · `pat_air` · `test_rig` ·
+  `test_kit` · `test_arena_tk` · `test_rift` · `test_special`), 아펩 `ap/tests`(`test_apep` · `pat_p1` · `pat_p3` · `pat_rev` ·
+  `test_e2e_apep` · `test_boss_alias` · `soak_ap`) + `ap/balance`(`apfair.py`), 야타용왕 `az/tests`(`test_az_flow` · `test_wire_az`) +
+  `az/harness`(`azfair`), 나루카미 `rd/tests`(`test_raiden` 과 flow · kit · rig · shogun · tenma 시험, `--strict`; `test_kit` 이 읽는 `sound_ids.txt` 만 옮김), 중간보스
+  `mb/int_tests`(파수꾼 · 틀) · `mb2/tests`(나비) · `mb3/tests`(역장, `gen_check` · `ident`), 2 · 3챕터 몹 `ch2/tests_a|b` ·
+  `ch3/tests_a|b`, 문 높이 `doors`, 손 소품 `heldfix`, 단계 · 효과 킷 스위트(아펩 `ap/{rigtests,orgtests,fxtests,tests_arena}`, 야타용왕
+  `az/{fxtests,tests_pa,tests_pb,tests_pl,tests_ps,tests_pt,tests_rig,tests_arena,tests_mod}`, 나비 · 역장 `mb2/fxtests` · `mb3/fxtests`).
+  그 보스를 크게 고칠 때는 아를레키노 스위트를 본떠 새로 만든다.
+- 게임 안 시험 명령(런 없이): `/function rlk:boss/test/chapter {id:"arlecchino"}`(챕터 보스) · `rlk:boss/test/pattern {id:N}` ·
+  `rlk:boss/test/lock {id:N}` · `rlk:boss/test/special {id:"tachy"}` · `rlk:mboss/test/start {id:"guardian"}`(중간보스) ·
+  `rlk:boss/test/kill` / `abort`. id 를 받는 명령은 `{id:"help"}` 로 목록을 보여 준다(9절 "명령 도움말").
+
+**loadcheck 서버 준비(새 컨테이너)**:
+
+```bash
+DEV=<작업 폴더의 절대 경로>                       # 예: 새 세션의 스크래치패드(3 · 4번이 cd 한 뒤에도 씀)
+mkdir -p $DEV/mcjar $DEV/jdk $DEV/mcsrv
+# 1) 26.3 서버 jar: 버전 매니페스트 → 26.3 의 JSON → downloads.server.url
+curl -sSL https://piston-meta.mojang.com/mc/game/version_manifest_v2.json | python3 -c \
+  "import json,sys; print([v['url'] for v in json.load(sys.stdin)['versions'] if v['id']=='26.3'][0])"
+#    (11-02 때 그 JSON: https://piston-meta.mojang.com/v1/packages/11f1aefe473eefba0af62e3286c33b692807b2eb/26.3.json)
+curl -sSL -o $DEV/mcjar/server.jar https://piston-data.mojang.com/v1/objects/33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c/server.jar
+sha1sum $DEV/mcjar/server.jar                      # 33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c, 62 294 556 바이트
+# 2) JDK 25 (Temurin)
+curl -sSL -o $DEV/jdk.tgz 'https://api.adoptium.net/v3/binary/latest/25/ga/linux/x64/jdk/hotspot/normal/eclipse'
+tar -xzf $DEV/jdk.tgz -C $DEV/jdk && rm $DEV/jdk.tgz   # → $DEV/jdk/jdk-25…/bin/java (11-02: jdk-25.0.4.1+1)
+# 3) 서버 폴더 — eula=true 는 사용자가 Minecraft EULA(https://aka.ms/MinecraftEULA)에 동의했을 때만 쓴다(0-2 2번 ②, 아래 동의 기록)
+cd $DEV/mcsrv && echo 'eula=true' > eula.txt
+printf '%s\n' 'level-type=minecraft\:flat' generate-structures=false online-mode=false view-distance=4 simulation-distance=4 \
+  max-players=2 white-list=true spawn-protection=0 enable-command-block=true difficulty=easy > server.properties
+# 4) 첫 실행(월드를 만듦; 나머지 설정은 서버가 채움)
+RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk/roguelike first
+```
+
+- `loadcheck.sh` 는 **돌고 있는 java 를 모두 죽이고**(`pkill -x java`) 서버 폴더의 `world/datapacks/roguelike` 를 바꿔 넣는다. 한 번에
+  한 서버만: `<서버 폴더>/.lock` 에 `flock`(다른 에이전트가 검사 중이면 기다림). 서버 로그는 `<서버 폴더>/<tag>.log`. 환경 변수
+  `RLK_DEV`(기본: 이전 세션 스크래치패드 — 새 컨테이너에서는 꼭 준다) · `RLK_MCSRV` · `RLK_SERVER_JAR` · `RLK_JAVA`(기본
+  `$RLK_DEV/jdk/jdk-25*/bin/java`; PATH 의 java 는 쓰지 않는다).
+- 컨테이너의 기본 `java` 는 21 이다. 26.3 서버는 Java 25 가 필요하다(버전 JSON 의 `javaVersion.majorVersion` 25; 21 로 띄우면
+  `UnsupportedClassVersionError` 로 바로 끝남). 그래서 loadcheck 는 잠금 전에 `"$J" -version` 이 25 이상인지와 `eula.txt` 가 `eula=true`
+  인지 보고, 아니면 `loadcheck: … is not Java 25+ (set RLK_JAVA)` · `loadcheck: … is not eula=true` 로 끝난다(exit 2). 서버가 뜨지
+  못하면(로그에 `Done (` 없음) `loadcheck <tag>: server did not start (see …)` 로 끝난다. 11-03 전 판(옛 스크래치패드 `mcsrv/loadcheck.sh`)은
+  이때 실패를 찍지 않고 멈췄다: `echo stop > in.fifo` 가 읽는 쪽을 기다리고, 잠금을 쥔 채라 다른 호출도 줄을 선다. 그런 판이 몇 분 넘게
+  안 끝나면 끊고, 로그에서 `UnsupportedClassVersionError` · `You need to agree to the EULA` 를 찾아 `RLK_JAVA` 나 eula 를 고친다.
+- 서버가 떠도 팩을 건너뛰었거나(`pack.mcmeta` 를 못 읽음 · 기능 플래그 부족: `Failed to read pack file/roguelike metadata` ·
+  `Missing data pack file/roguelike` 등) 태그를 버렸으면(없는 id 를 가리킴: `Couldn't load tag … as it is missing following references`)
+  그 줄들과 `loadcheck <tag>: the datapack (or one of its tags) was not loaded (see …)` 를 찍고 끝난다(exit 2; 11-03 에 더함 — 그 전
+  판은 이때도 `0 function load failure(s)` 를 찍었다). 함수 로드 실패는 실패마다 `Failed to load function <id>` 와, 문법 오류면 그 다음
+  `Whilst parsing command on line <n>: …` 를 찍는다. 종료 코드: 0 = 실패 0, 1 = 함수 로드 실패, 2 = 준비 · 시작 · 팩 문제. `RLK_*`
+  경로는 상대 경로여도 된다(서버 폴더로 `cd` 하기 전에 절대 경로로 바꾼다). 11-03 에 실제 서버로 확인: 깨진 `pack.mcmeta` · 없는
+  함수를 가리키는 `tick` 태그 → exit 2, 음수 리터럴 함수 하나 → `1 function load failure(s)` · exit 1, 이 팩(상대 `RLK_DEV`) → 0 · exit 0.
+- EULA 동의 기록(0-2 2번 ②): **2026-11-05 사용자 동의**(세션 메시지 「eula 동의」, Minecraft EULA https://aka.ms/MinecraftEULA). 그 전
+  11-03 까지는 기록이 없었다(이전 세션의 서버 폴더는 동의 기록 없이 `eula=true` 였다). 동의를 새로 받으면 날짜를 이 줄에 더한다.
+- 데이터팩이 정말 켜졌는지는 로그로 본다: 첫 실행은 `Found new data pack file/roguelike, loading it automatically`, 그 뒤로는
+  `Loaded 1870 advancements`(26.3 바닐라 1866 + 이 팩의 `data/rlk/advancement` 4개; 팩이 안 읽히면 1866). `Loading N persistent chunks`
+  는 월드에 저장된 고정 청크라 팩이 읽히지 않아도 찍히므로 증거가 아니다. 11-03 판 loadcheck 는 팩을 건너뛴 줄을 스스로 잡는다(위).
+
+### 0-9. 열린 항목 · 알려진 문제 (11-06)
+**사용자에게 물은 것 (답 대기; 답이 올 때까지 기본값으로 진행)**
+- (11-03) 리소스팩을 git 에 넣을까? 기본값 = 넣지 않음. 정본은 마지막으로 보낸 `rlk_hud_resourcepack.zip` 이다(0-2 2번, 리소스팩
+  README 1절). 넣기로 하면 저장소 루트 `resourcepack/` 에 그 zip 을 풀어 커밋한다(`build_raiden_all.py` 등 나루카미 생성기의
+  `--resourcepack` 기본 자리). 그 뒤로는 RP 생성기 출력도 데이터팩 출력과 같은 커밋에 넣고, 0-2 2번 · 0-4 묶기 · 리소스팩 README 1절도
+  그 폴더 기준으로 고친다.
+- (11-02) 활의 조준 사격(원신의 강공격)도 선혈의 충격을 터뜨리는 일반 공격으로 칠까? 기본값 = 아니오(`api.NORMAL_HIT_IF` 는
+  `#icd tmp 1` 을 요구하는데 조준 · 충전 사격은 `char/bow/release` 가 `#aIcd 0` 으로 쏘아 `char/bow/arrow_hit` 에서 `#icd 0` 이 되므로
+  빠진다. 바꾸려면 `core.py` on_hit 의 선혈의 충격 줄에 조준 · 풀차지 화살(`aKind` 2 · 3: `shot_aim` · `shot_full`)만 받는 갈래를 따로
+  더한다 — `#aK tmp` 는 `arrow_hit` 에서만 바뀌어 로노바 · 클로린드 타격 때는 지난 값이 남으므로, `arrow_hit` 에서 조준 · 풀차지일
+  때만 켜고 맞힌 뒤 끄는 표식을 따로 두는 편이 안전하다. `#bowHit tmp 1` 만으로 받으면 로노바 4타(`ronova/proj_hit`, `#icd 0`)까지
+  세게 되어 '세지 않음' 목록과 어긋난다).
+- (11-02) 같이 알린 것: 공중에 떠 있는 시간(AR-13)을 줄일지, 붉은 피의 사형을 근접으로 받아치기 어려운 점(AR-15). 기본값 = 그대로
+  (아래 아를레키노).
+
+**아를레키노** (11-02 검토 `findings.md` 에서 남긴 것과 결정 대기)
+- AR-13(작음, 남김): 공중에 있는 시간이 길다 — Q6 160틱, Q4 70~170틱, Q0 ≤ 80틱, H1 앉아 있기 54틱, E1 70틱(예고되고 맞힐 수
+  있음). 타키 교훈 "몇 초씩 떠 있지 않기"와 부딪치므로 피드백이 오면 먼저 볼 것.
+- AR-15(설계, 남김): 2페이즈 Q5B(붉은 피의 사형) 동안 근접으로 선혈의 충격을 넣기 어렵다(원거리 일반 공격으로는 된다).
+- AR-14(작음, 남김): 한 틱 명령 수가 튄다(G1 장판 약 6 700, crimson 모습 바꾸기 약 4 900; 평균은 P1a 445 · P1b 약 505(11-03
+  `test_arlecchino`, 십자 가시 추가 뒤; 11-02 는 494)로 아펩 약 830 보다 적음).
+- AR-16(작음, 남김): 휘두르는 틱(자루가 틱당 8도 이상 도는 틱) 가운데 낫 초승달의 끝(갈고리)이 움직이는 쪽을 앞서지 않고 뒤로 끌리는
+  틱이 289개 — `build_arlecchino_rig.mjs` 의 날 방향 검사 경고(`tools/arlecchino_rig_manifest.json` 의 `budgets.edge_warn_ticks`,
+  `tools/arlecchino_rig_api.md` 6절; 회복 동작 · 영상의 끌리는 돌리기이며 치는 프레임에는 없음).
+- 원작과 다른 점(유지 결정): 강제 부여(재가 된 만상 · 붉은 피의 연회)는 그녀가 건 계약을 거두고 18 % 로 다시 건다(플레이어 자신의
+  계약은 그대로) — 회복 수단이 없는 캐릭터도 구슬 둘로 파훼에 닿게(AR-03).
+- 계획의 기본값(사용자 확인 기록 없음): 연회 배너는 실제 게임 문구를 "일반 공격으로"로 바꿔 띄움, 강제 부여마다 회복구슬 3개(10 %씩),
+  크기 × 1.4(2.8칸).
+
+**타키**
+- TK-09(작음): 클리어 때 꺼진 균열 위에 서 있으면 약 30틱 뒤 빨려 들어간다.
+- TK-10(작음): 특수 보스 전투가 취소되면 안내가 두 줄 나온다(중간보스와 같음).
+
+**틀 · 시험**
+- `test_m0diff` 틱당 명령 예산 초과(아를레키노 S1 보고 R6): proto +6.57 · 나비 +6.70 · 역장 +6.98 > 6.5(D0 에서 이미 +6.54 /
+  +6.65 / +6.92; 파수꾼 +5.93 통과). 예산을 올릴지 비용을 줄일지 정하지 않았다.
+- 그 밖에 이미 알려진 실패(새 변경 탓 아님): `test_m0diff` B, `test_px` 4e, `ident`(22ba247 · S1-CM 파일 목록에 고정돼 낡음: 11-02
+  트리에서 10개 실패 — `ident` 의 검사 1 넷 · 3a · 3b · 4a~4d; 기준을 다시 만들기 전에는 신호가 없음), 검사기 refs / macro 의 알려진
+  종류. (`gen_check` 9 — 복사본의 `boss/test/*` 가 하드 링크라 시험한 트리의 그 13개 파일이 제자리에서 다시 쓰이던 것 — 는 뺐다: 11-03 의
+  고침(`gen_check.py` 의 `REAL_DP` 와 세 `cmsim.variant` 의 `real` 에 `boss/test`) 뒤 11-05 홍련 I1 의 `run_all` 에서 다시 돌려 통과했다.)
+  야타용왕 `az/tests/test_wire_az.py` 의 H2 / H3 은 1챕터만 라우팅된다고 가정해 낡았다(옮기지 않은 스위트).
+- (11-06 홍련 V2, HR-54 / LF-04) 옮겨 둔 모의기 사본 `cmsim.py` 넷(`sim/az/tests_cm/lib` · `sim/ar/tests/lib` · `sim/ar/s3/lib` ·
+  `sim/hr/s1k/lib`; `sim/hr/tests/lib` 의 것도 같은 줄)의 `block_test` 는 `#rlk:dash_pass` · `#rlk:cm_pass` 에 공기 · 빛만 통과시킨다.
+  게임의 태그(`data/rlk/tags/block/dash_pass.json`: `#minecraft:replaceable` · `#minecraft:small_flowers` · 카펫 · 짧은 풀 · 마른 풀 …)는
+  풀 · 꽃 칸도 지나가게 하므로, 그 사본을 쓰는 다른 보스 스위트(야타용왕 챕터 틀 `az/tests_cm`, 아를레키노 `ar/tests` · `ar/s3`)의
+  걷기 · 이동(`mv/ok`) · 대시 경로 판정은 식물이 있는 칸을 막힌 칸으로 본다 — 모의기만의 차이이고 게임 동작은 태그대로다. 홍련은
+  `sim/hr/tests/lib/hrsim.py` 의 `PASS_TAGS`(I1b)가 데이터팩의 태그 파일을 풀어 게임처럼 판정한다. 고치려면 그 풀이를 공용 사본에
+  옮기고 그 스위트들을 다시 돌린다(하지 않음: 홍련 범위 밖, 리드 결정).
+- 나루카미 시험의 `--strict` 아틀라스 예산표(`rd/tests/plan_table.json` 의 stitched 11.0 M; 원본 `plan_table_src.py` 는 12.5 M 인데
+  JSON 을 다시 만들지 않음)가 낡아 지금(11-06: 12.919 M)은 `--strict` 가 실패한다. 게이트는 13.2 M(옮기지 않은 스위트).
+- `items.json` 의 소스 **순서**가 생성기를 돌린 순서에 따라 바뀐다(항목은 같음): 1 · 2 · 3챕터 몹 리그 생성기와
+  플레이어 리그의 블록 별칭은 자기 항목을 지우고 끝에 다시 붙인다. 게임에는 상관없고, RP 해시 비교는 같은 순서로 두 번 돌릴 때만
+  맞다(타키 검토에서 미룸).
+
+**홍련 — 게임에서 확인할 것** (모의기로는 볼 수 없는 클라이언트 쪽; 11-06 릴리스 답의 「게임에서 확인해 달라고 할 것」에 넣는다, 11-05 F-I · 11-06 V1 · V2)
+- 이벤트 칭호 · 균열 채팅의 별: `{nbt:"ev.sx",storage:"rlk:hr",interpret:true}` 는 저장한 컴포넌트 **목록**(rlk:items `stars[<별>]`)을
+  읽는다(26.3 은 해석하는 NBT 를 컴포넌트 코덱으로 풀어 목록 = 첫 항목 + extra). `pattern {id:91}` 뒤 `{id:28}`: 「화무십일홍 ★☆☆」가
+  금색 ★ · 회색 ☆☆ 로, 균열 채팅 줄도 같게(F3 r4, HR-33).
+- 버프 갈래(`{id:92}` 뒤 `{id:28}`): E56-E110 에 부제 「최종 공격력 +27% · 치명타 확률 +10%」와 액션바 「이동 속도 +10%」가 함께,
+  2560 × 1440 · 1920 × 1200 자동 GUI 에서 잘리지 않음(F3 r4, HR-35).
+- 1인칭에서 방 제목이 끝난 뒤 화무십일홍으로 원소 폭발: 6틱 가장자리 비네트가 보임(`vBig` 가 모든 시점에서 줄어듦, F3 HR-08).
+- 장식 달무리 · 연꽃이 경기장 모습(`moon` · `crimson` · `dark`)을 따라가고, 등장 E3 · CS4 응시 때 달무리가 밝은 모습(`p1b` / `p2b`, 기본은
+  17 % 어둡게)으로 바뀌어 보임(I1b 결정 3).
+- 1인칭(아바타 없음) 앵커: CS1 C8 · A13 즉사의 홍련일섬 선이 눈 높이 1.2칸 앞에, 튕겨내기의 금빛 별 · 빛기둥이 시선 1.8칸 앞에, A8.5 의 X 가
+  베기 자리 1.2칸 앞에 보임(F2 HR-45; F5 에서는 아바타 가슴 / 발).
+- 대사가 떠 있는 동안 화면 덮개가 사라지는 단계(20 / 40 / 60 / 80 % 글리프)가 대사를 흐리게 하지 않음(CS1 169 의 `red_tint`, F2 HR-30).
+- 화무십일홍의 슬롯 아이콘(`item_sword_icon`, 정면 조명): 인벤토리 · 핫바 · 도감 · 액자 · 바닥에 떨어진 아이템에서 굵은 칼로 보이고, 손에는
+  리그 칼(F-I HR-03).
+- CS3(5 %) 마지막 걷어차기 → CS4 첫 틱의 흰 섬광 3틱 밑에서 갓이 얼굴 위로 옮겨져, 튀는 갓이 보이지 않음(F-I HR-31).
+- 머리 위로 칼을 들던 자세(A3 · A4 · A2 11틱 · A10 공중 두손 · CS4 칼싸움 · 유령 달리기 등)가 머리 옆 · 앞의 높은 자세로 바뀌어, 주먹 ·
+  칼자루 · 코등이가 머리 · 몸통에 묻히지 않고 칼끝이 갓 꼭대기에서 솟지 않음(V1 HR-47).
+- 걷기 · 옆걸음에서 드는 발이 실제로 들리고 디딘 발이 덜 미끄러짐(V1 HR-49; 남은 미끄럼은 아래 「남긴 것」).
+- A1 회전 반월참의 보라 초승달(−25도 기울어 섬)이 1인칭에서도 보이고, 분홍 부채가 1.6칸 높이로 보임(V2 HR-48).
+
+**홍련 — 남긴 것** (리드가 받아들인 S2d · V1 의 잔여; 피드백이 오면 먼저 볼 것)
+- 무릎 꿇기의 무릎이 경첩처럼 꺾임: 아바타 몸의 다리는 한 축으로 돌아 lead_down 6-8 · kipup 7-9 틱에 정강이가 넓적다리에 47-54도로
+  꺾여 보인다(S2d; 팔꿈치는 정확한 경첩으로 고쳤고 그 대가로 팔이 한 틱에 최대 108도 돎(S2d 때 잰 값), 게이트 120 안).
+- 걷기에서 디딘 발의 미끄럼 48 %(V1 전 58 %), 옆걸음 41 %(전 92 %): 이동 속도(`api.WALK_SPEED` 0.12칸/틱)와 클립 길이를 그대로 두어
+  남은 만큼(V1 HR-49, 게이트는 55 % 이하).
+- 높은 자세(머리 옆 · 앞으로 칼을 든 자세, A10 의 공중 두손 자세)에서 칼날이 반투명한 갓 테(알파 215)를 가로지른다(V1 HR-47 의 대가;
+  칼날은 몸을 뚫지 않음).
+- 그 밖에 S2d 때부터: 스킨의 모자 겹이 갓 테 안쪽 고리 위로 0.02칸 보임, lead_down 41-43 · lead_stand 30-31 에 손에 든 갓을 머리
+  위로 넘길 때 갓이 머리를 약 7 cm 덜 비킴(C3), 무릎이 한 틱 늦게 닿음(C5).
+
+**이전 보스에서 남은 것**
+- 나루카미 「천수의 속박」 마지막 세 겹 고리가 가끔 안 보이던 것: 원인을 추정(카드 대기 3틱)해 고쳤으나 모의기로 재현이 안 됨 —
+  게임 확인을 부탁한 상태(10-22).
+- 아펩 공정성 표 34줄 중 5줄 미달(10-22 마지막 분석): P3 서 있는 플레이어 1.17 × 파수꾼(목표 0.72~1.08), 싸움 전체 잃는 체력
+  근접 466.5 % · 원거리 347.6 %(목표 334 · 252 이하), 정면 대 뒤 차이 12.3 %(목표 25 % 이상), 가장 센 활로 2단계 29.3초(30초 이상).
+- 야타용왕 공정성 24줄 중 3줄 미달(FAIR-21 위치에 따른 차이 없음, FAIR-16 법구 처치 시간 비율 0.61 < 0.75) — 계획 담당자 결정으로 미룸.
+
+### 0-10. 버전 기록 (최신이 위; 빌드 도장 · 대표 커밋)
+- **11-06** 홍련 · 특수 보스 — 빌드 도장 `c77e5d1`(D0 `52b86b9` → S1 `1945bce` · S2a `0c88e7f` · S2b `fb97b3b` · S2c `fb4c16e` ·
+  S2d `4e46cd7` · S3 `eb3e271` · S4 `d65ea28` · SR `ad912ff` · S1K `1d2e877` → I1a `66dafec` · I1b `4c81817` · I2 `f3231fe` → F1 `67504a7` ·
+  F2 `3c69fcc` · F3 `cbe4dc2` → F-I `3741fc4` → S5 `ed2e175` · `005f00a` · V1 `93ef7ae` · V2 `c12cdbc` → V-I `66f64f5` · `bb80f5c` · `aa363ae`,
+  그 뒤 문서 커밋; 단계 가지 `wip/hr` 를 작업 가지로 fast-forward):
+  균열의 두 번째 특수 보스 **홍련**(스텔라 블레이드의 월하곡; n 21, 경기장 `hr_field`, 균열이 타키와 10 : 10 으로 고름): 몸은 사용자
+  마인크래프트 스킨을 입은 플레이어 아바타 몸(2.0칸, 갓 · 칼 · 칼집), 등장(건너뛰기) · 홍련일섬 · 반격 · 마지막 장면의 영상 클립, 바닥
+  예고 없는 조용한 예고, 1페이즈 칼 패턴 · 2페이즈 유령, 대시로 실드를 깨는 자영 연참(60 % · 5 %, 5 % 실패는 즉사), 처치 뒤 이벤트(신화
+  아이템 화무십일홍 / 런 버프 월하대작); 검토 고침 F1~F3, 균형(S5: 체력 260, T3 62, 반격 쿨타임 4초, 홍련일섬 500 %, 월하대작 +27 %),
+  주먹 · 칼자루가 머리 · 몸통을 뚫지 않게 · 걸음과 옆걸음(V1), A1 초승달 · 비용 시험 · 앉은 돌 소품 · 모습 작업 한 번만(V2);
+  계획 · 계약 문서를 `tools/dev/sim/hr/` 로 옮김
+- **11-03** 아를레키노 수정 — 빌드 도장 `96884f2`(코드 `911512f`, 그 뒤 인수인계 문서 커밋):
+  죽음의 칼날의 큰 칼날 넷이 십자선을 따라 가운데로 날아와 타격 틱에 플레이어 자리에서 터지고, 지나간 자리에 진홍 가시가 솟음(전에는
+  칼날이 서 있기만 하고 피해만 들어옴; 경기장 밖에 서던 칼날은 걷는 원 안으로 당김), 등장 모션 · 2단계 전환에서 낫이 안 보이다 갑자기
+  생기던 문제(클립 look), 붉은 달의 낫이 돌아올 때 남쪽으로 날아가던 문제(summon 은 yaw 0), 2단계 모습 바꿈을 가리는 진홍 불꽃 고치
+  (`shroud` · `shroud_burst`), 효과 킷 `fly()` 가 수평 아래로 날리는 카드를 거부(게임이 pitch 를 ±90 으로 자름);
+  인수인계 문서(이 0장 · 리소스팩 README)와 `tools/dev/`(로드 검사 · 리소스팩 검사 · 재생성 · 시험 도구 · 계획 문서) 추가 — loadcheck 는
+  팩 · 태그를 건너뛴 서버도 실패로 잡고(exit 2) 함수 로드 실패면 exit 1; 문서 검토(독립 검토 넷 + 반박 검증)에서 확인된 25건을 고침
+- **11-02** 아를레키노 · 4챕터 — `0f1368d`(D0 `eb0a38a` → S1 `da5389e` · S1K `acdf924` · S2 `53a2d80` · S3 `056d1cd` · S4 `9d73abc` →
+  I1 `9245812` → S5 `f98f38b`): 4챕터 보스 아를레키노(두 페이즈, 생명의 계약 · 선혈의 충격, 경기장 `fl_ruins`), 4챕터 라우팅, 틀 FN-1 · FN-3
+- **10-30d** 타키 얼굴 수정 — `fc21fe4`(`762825d` 얼굴 면을 머리카락 안으로)
+- **10-30c** 타키 조정 · 문 높이 — `43ce51c`(`a007994` 플레이테스트 수정: 블링크 대기 · 연속기 착지 · 거리 좁히기 · 공중 시간 · 크기 ·
+  얼굴 · 초승달; `9d2f26c` 모든 구역 같은 바닥 높이, 문은 바닥 높이)
+- **10-30b** 타키 · 균열 — `c13de38`(`fb314e1` 검토 수정: 단계 건너뜀 · 균형 · 보상 레벨 · 모델 · 베기 호)
+- **10-30** 타키 · 균열(검토 전) — `ff0e359`(`d00b242` I1: 특수 보스 타키 + 균열 켬)
+- **10-29d** 균열(시험용 보스) — `f58d147`(`f17879e` 특수 보스 틀 `mboss/sp` + 방 균열 `room/rift`, 대역 `spproto`)
+- **10-29c** 무기 방향 수정 — `72ecf78`(`f0374c7` 2챕터 무리 몹의 칼 · 창 · 북채를 바로 쥠)
+- **10-29b** 3챕터 잡몹 — `3e0d4aa`(`ed097fc` 무리 · `1120ffb` 정예 · `585df16` 연결)
+- **10-29** 명령어 help — `523d842`(`7163c4c` id 를 받는 명령의 `{id:"help"}` 목록)
+- **10-28** 2챕터 잡몹 — `f109efe`(`07871b4` 무리 · `c715a14` 정예 · `65fe412` 연결)
+- **10-24** 포영 검기 모양 수정 — `a09476b`(`c1c6eb9` 검기는 대각 초승달 하나)
+- **10-22j** 라이덴 계수 하향 — `ede9f4c`(피해 배율 0.8 → 0.5)
+- **10-22i** 만겁 보호막 베기 — `d8d12b4`(`1a5cf3b` 칼이 보호막을 긁고 침)
+- **10-22h** 만겁 팔 펴서 베기 — `b03465a`(`b3bec7b`)
+- **10-22g** 라이덴 · 아펩 수정 — `c1e10b6`(`b7ad0ec` = 10-22f 아펩 P4 · Q2, `93f4714` Q2 장판 1 %/10틱, `33a0ed0` 라이덴 피해 −20 % ·
+  만겁 휩쓸기 · 가드 브레이크 빛 · 갑주 전 처치 창 · 포영 초승달 하나)
+- **10-22e** 리소스팩 텍스처 수정 — `377688c`(아펩 생명체 그림 이름 소문자; `rplint` 시작)
+- **10-22d** 아펩 · 3챕터 — `9e5c578`(가지 안 도장 10-22b `0f4c88e`; `6395bb6` 챕터 보스를 `boss/<id>/` 로, `rlk:boss/test` 별칭)
+- **10-22c** 라이덴 텐마 갑주 · 일심정토 — `4641797` + `46ae53a`(경기장 병합)
+- **10-22b** 라이덴 동작 · 순간이동 · 분신 — `e8f6595`(wip/rd-sync 병합)
+- **10-22a** 라이덴 보호막 · 만겁 수정 — `b01df2d`
+- **10-22** 라이덴 개편 — `8376be6`(영상 v1–v9 기준 새 리그 · 효과 킷 · 패턴; `fef7e90` 제거 정리)
+- **10-21d** 보스 팁 정리 — `d765bab`(중간보스 셋의 공략 문구 지움)
+- **10-21c** 야타용왕 버그 수정 — `3086d1e`(묻힌 돌진 · 가라앉는 아바타 · 점프 문구 · 팁; `6f051b4` 킷 글꼴이 기본 글꼴로 이어짐)
+- **10-21b** 야타용왕 AI 수정 — `11b0756`(음수 `remove` 리터럴 → 게임이 함수를 거부; loadcheck 시작)
+- **10-21** 야타용왕 · 1챕터 — `bcb3083`(`2a59b10` 1챕터 라우팅; 챕터 보스 틀 AZ-CM)
+- **10-20** 예고 · 계수 조정 — `22ba247`(바닥 예고는 영상에 있는 공격만, 역장 발생 장치 피해 × 1.5)
+- **10-19** 역장 발생 장치 — `99bc097`(세 번째 중간보스)
+- **10-19** 나비 조정 — `5556c79`(치명 피해 보상, 예고 약 25 % 짧게, 해제 계기 누적)
+- **10-18** 달빛 환영 나비 — `7a6dc4f`(두 번째 중간보스)
+- **10-18** 이동 · 상자 — `d467e3c`(휘두르는 동안 멈추지 않고 느려짐, 아이템 상자 수정, 2챕터 집 안 스폰 막기)
+- **10-17** 중간보스 — `002c327`(중간보스 틀 + 파수꾼・타락, 처치하면 아이템 상자 2개)
+- **10-17** 나비아 — `2af2c02`(나비아 리그 · 동작 · 금빛 카드, 무기를 등에 멤)
+- **10-16** — `85686b0`(아를레키노 5타 앞구르기, 스커크 5타)
+- **10-15b** — `c7021ae`(인벤토리 18칸, 노드 맵 선택, 주사위, 상점 · 나무뿌리 · 인챈트 노드, 강화 별, 계수 엔진)
+- **10-15** — `c52be1e`(26.3 로드 오류 · 콘솔 정리, 나루카미 체력 2/3)
+- **10-14d** — `ab14be9`(모션 2차: 스커크 일곱빛 섬광 · 대시)
+- **10-14c** — `f1926d8`(미니맵 방향 화살표 · 보스 구역 숨김, 지도 아이템 없앰)
+- **10-14b** — `911fabc`(보스바 숫자를 기본 글꼴로)
+- **10-14** — `3740784`(미니맵 왼쪽 위, 빌드 도장 시작; 10-13 리소스팩 보스바 · 글꼴 미니맵)
+- 그 전(도장 없음): 10-08 첫 커밋 `16508dd`, 10-10~13 나루카미 보스 · 밸런스 · 대쉬 · 미니맵.
+
 ## 시작하기
 1. 서버를 켜거나 `/reload` → `[로그라이크] 시스템 로드 완료` 메시지 확인
 2. 시스템을 적용할 플레이어에게 태그 부여: `/tag @s add player` (아무에게도 없으면 접속한 한 명에게 자동으로)
@@ -13,6 +637,7 @@
 ## 로비 (`lobby/`, build/p162)
 게임 이름(임시): **만들고 싶은 거 다 만든 로그라이크** · Made by Solindy · v0.0.1
 - 로비 = 석영 방(80 192 14 ~ 106 202 36, 안쪽 25 × 21 × 9칸 — 예전 92~103 × 22~32 방을 덮어 넓힘). 북쪽 벽에 제목 · Made by Solindy · v0.0.1. 시작 자리 93.5 193 32.5(북쪽을 봄)
+- 체험 방의 더미 4개는 누군가 체험 방에 있을 때만 있습니다: 들어갈 때 세우고(`lobby/try/enter`, 4개가 아니면 1초마다 다시 세움), 체험 방을 떠나거나 런을 시작·접속을 끊으면 없앱니다(`lobby/leave`, `lobby/tick`). 튜토리얼 더미(`rlk_tutE`)는 따로입니다.
 - 로비 · 튜토리얼 · 설정 · 체험 방의 버튼은 모두 벽에 붙은 패널(`lobby/obj/make_w`: 1.6 × 2칸 받침판 + 금 테 + 아이템(gui) + 이름, 조준하면 받침판이 하늘색): 로비 북쪽 = 게임 시작, 서쪽 = 튜토리얼 · 시작 전 설정, 동쪽 = 캐릭터 · 아이템 체험 · 캐릭터 선택
 - 방 높이: 튜토리얼 y 192~208(안내판이 큼), 체험 · 설정 y 192~203
 - 로비 더미 · 허수아비(`rlk_lobby` 태그 몹)는 경험치 · 골드 · 회복구슬을 주지 않고, 레벨 · 체력 숫자가 벽 너머로 보이지 않음(`lobby/hbfix`)
@@ -54,6 +679,8 @@
 | `#rxPlayerPct` | 플레이어가 맞는 원소 반응의 기준 = 받은 피해 × 이 값(%) | 50 |
 | `#kirionNeed` | 봉인된 검 → 마검: 키리온 변신 처치 수 | 300 |
 | `#forbNeed` | 금단의 도서 → 데모노미콘 변신 페이지 수 | 500 |
+| `#riftPm` (room) | 전투 구역이 지어질 때 균열이 생길 확률(천분율, 한 판에 한 번, 아래 "균열") | 30 (3%) |
+| `#hrMoonAtk` / `#hrMoonCrit` / `#hrMoonSpd` / `#hrMoonRun` | 월하대작(특수 보스 홍련의 이벤트 버프): 최종 공격력(증폭 `ampAtk`) / 치명타 확률 / 이동 속도 + (%) / 범위(1 = 이번 런: `player/reset_one` 이 끄고 스탯 줄 "(이번 런)", 0 = 영구: 끄지 않고 "(영구)"). 이벤트 제목 · 균열 채팅 · 스탯 줄의 수는 이 값을 읽는다. 영구로 바꾸려면 여기서 8 / 4 / 4 와 `#hrMoonRun` 0, 그리고 `tools/mboss_scarlet/api.py` 의 `EVENT['buff_scope']` = `'forever'`(균열 채팅의 "이번 런 동안" → "영구히", 재생성)(계획 §7.5.3). S5(11-06): 공격력 20 → 27(아이템 ★★ 와 같은 값, 계획 §7.5.4) | 27 / 10 / 10 / 1 |
 
 ## 1. 스탯 / 레벨 (`player/`, `player/level/`, `items/equip_scan`, `items/stat_light`)
 - **체력·공격력·방어력은 자연수**이고 원신처럼 기초 / % / 깡(고정 수치)을 구분합니다.
@@ -100,6 +727,29 @@
   원소(`#elem` 0~7, `#elU` 1000 = 1U 부착)를 설정하고 `execute as <몹> at @s run function rlk:combat/apply`.
 - 원소전투 스킬·원소폭발을 쓰면 `combat/on_skill` 이 호출되고, 스킬 피해는 `#skillDmg tmp` = 1 로 들어갑니다(금단의 도서/데모노미콘/고통 & 절망이 사용). 스킬 피해 계산은 `function rlk:char/dmg_calc {coef:200}` (공격력의 200%, 치명타 판정 포함).
 
+### 공격 중 이동 · 점프 규칙 (모든 캐릭터, `player/swing/`)
+- **휘두르는 동안에는 멈추지 않고 느려집니다: 걷기는 절반 속도, 점프는 막힘.** 휘두르는 동안 = 평타를 시작한 순간부터 다음 평타 입력을 받을 수 있게 되는 틱 전까지(평타 간격 `atkCD`가 남아 있는 동안). 모든 캐릭터에 같습니다. 화면 확대(시야 좁아짐)는 없습니다.
+  - 숄더뷰 · F5 위쪽 시점(기본 시점): `view/move`가 그동안 아바타를 걷는 속도의 `#swSlow`(50%, `load`의 조절 지점)로 걷게 하고 점프는 하지 않습니다. 달리기 키를 눌러도 빨라지지 않습니다(달리기 시야 효과는 그대로라 휘두를 때마다 화면이 출렁이지 않음). 걷던 속도에서 바로 절반이 되고, 간격이 시작되는 틱부터 다시 제 속도입니다. 몸을 돌리는 방식과 대쉬 방향(누르고 있는 방향)은 평소에 걸을 때와 같고, 휘두르는 동안 아바타는 조준선 쪽을 본 채 걷습니다.
+  - 1인칭: **점프만 막고 걷기는 제 속도 그대로**입니다(점프 힘 수정자 `rlk:swing_hold` ×0, 이동 속도 속성은 건드리지 않음). 화면을 확대하지 않고 1인칭 걷기를 늦추는 바닐라 방법이 없어서입니다(아래 '1인칭에서 걷기를 늦추지 않는 이유').
+  - 넉백 · 떨어지기 · 동작 안의 전진(`stepT`)은 그대로 적용됩니다(숄더뷰에서 이동 키를 누르고 있으면 평소에 걸을 때처럼 걷는 속도가 바닐라 넉백 속도를 덮어씀. 몹의 넉백 `player/knockback`은 그대로 밀림). 대쉬는 지금처럼 평타를 끊고 나가며(숄더뷰 · F5는 누르고 있는 방향, 1인칭은 걷던 방향, 둘 다 없으면 시선 방향), 스킬 · 원소폭발 · 나비아 조준 · 빙결의 이동 잠금은 바뀌지 않았습니다(그동안은 멈추고, 1인칭에서는 이동 속도 ×0이라 지금처럼 화면이 좁아짐). 휘두르는 중에 스킬 · 원소폭발을 쓰면 휘두르기는 거기서 끝납니다(`combat/on_skill` · 클로린드 밤 꿰뚫기 → `player/swing/cut`; 리그 캐릭터는 스킬 동작이 평타 동작을 바꿔서). 다음 평타 입력은 그대로 남은 간격 뒤입니다. 대쉬 · 집어넣기 · 평상시 이동 자세는 휘두르기가 아닙니다.
+- **타와 타 사이 간격**(다음 평타를 받을 수 있게 된 뒤, 콤보가 끊기기 전)에는 제 속도로 움직일 수 있고, 움직여도 콤보가 이어집니다(다음 클릭 = 다음 순서의 타). 콤보 유지 시간(`cboIdle` 20틱)은 지금과 같습니다: 리그가 없는 캐릭터는 평타를 누른 틱부터, 스커크 · 아를레키노는 다음 입력을 받게 된 틱부터, 나비아는 마무리 동작이 끝난(또는 움직여서 끊은) 틱부터 셉니다. 나비아는 움직이면 마무리 동작이 바로 끝나지만 콤보는 남습니다.
+- **간격에서 점프하면 다음 평타는 1타부터** 나갑니다(`comboStep` 0). 1인칭은 점프 통계(`swJump`, 클릭보다 먼저 뛴 점프는 그 클릭에 반영), 숄더뷰 · F5는 `view/move`의 점프로 알아냅니다. 휘두르는 동안에는 점프가 막혀 있으므로 중간 상태가 없습니다.
+- 캐릭터별 휘두르는 구간(공격 속도 100%에서 평타 입력부터 다음 평타를 받기까지의 게임틱. 공격 속도에 반비례해 짧아지고 최소 2틱. 활의 조준 사격과 네페르 환영극은 고정):
+  - 루미네(한손검, `combat/combo_after1·2`): 1타 뒤 6틱, 2타 뒤 10틱
+  - 요이미야(활): 평타 화살 8틱(`char/bow/na`, `#bowCdN`), 조준 사격을 쏜 뒤 6틱(`char/bow/release`). 활을 당기는 동안은 휘두르기가 아닙니다(지금처럼 느려지기만 함)
+  - 스커크(리그): 클립의 다음 타 틱 그대로 9 / 6 / 12 / 11 / 23틱(일곱빛 섬광 10 / 6 / 11 / 13 / 24틱)
+  - 클로린드(한손검, `char/clorinde/na_coef`의 `#naD`): 4 / 6 / 7 / 6 / 10틱. 밤 순찰의 권총은 한 발마다 7틱(`#clShotCd`)이고, 자동 연사 중에는 다음 발이 바로 이어지므로 쏘는 내내 휘두르는 중입니다: 숄더뷰 · F5는 절반 속도로 걸으며 쏘고, 1인칭은 제 속도로 걷되 뛰지 못합니다(끄려면 좌클릭, 또는 대쉬)
+  - 아를레키노(리그, 재생 150%): 6 / 7 / 8 / 10 / 8 / 14틱(붉은 가면 6 / 6 / 7 / 11 / 8 / 14틱). 6타는 다음 입력이 16틱이지만 동작이 14틱에 끝나 그때 풀립니다
+  - 나비아(리그, 재생 130%): 11 / 11 / 15 / 22틱(4타는 착지하는 틱)
+  - 로노바(법구, `#rnNaCd` · `#rnNaCd4`): 10 / 10 / 10 / 16틱
+  - 네페르(발차기, `#naD` 90%): 5 / 5 / 5 / 10틱, 환영극 20틱
+- 구조: `player/swing/tick`이 매 틱 `view/tick`보다 먼저 `atkCD`에서 `swHold`를 다시 구하고(리그 캐릭터는 그 평타 동작이 재생 중일 때만, 생성 파일 `char/motion/combat/swing_clip` · 클립 시작의 `active.normal`), 1인칭 점프 수정자를 매 틱 붙이거나 뗍니다(숄더뷰 · F5의 절반 속도는 `view/move`가 같은 틱의 `swHold`로). 이벤트에 기대지 않으므로 동작이 끝나거나 멈추거나 다른 동작으로 바뀌면, 그리고 사망 · 지도 화면 · 선택 공간 · 보스 연출 카메라에서는 바로 풀리고, 순간이동(중간보스 P4 끌어당기기 · 넉백)은 아무것도 남기지 않습니다(휘두르기는 그 간격이 끝날 때 풀림). 캐릭터 변경(`char/player_init`)은 `atkCD`도 0으로 만들고, 'player' 태그를 잃을 때(2명 이상)도 먼저 풀며(`player/swing/release`), `uninstall`은 수정자 · 태그 · 점수판을 지웁니다. 예전 판(휘두르는 동안 정지, D12)이 1인칭 이동 속도에 붙이던 `rlk:swing_hold`는 그 판에서 휘두르는 중에 저장했으면 남아 있을 수 있어, 처음 한 번 지웁니다(`player/swing/legacy`, 지운 뒤 태그 `rlk_sw13`).
+- **1인칭에서 걷기를 늦추지 않는 이유**(바닐라 26.3 기준으로 비교한 방법들. 게임 안에서는 아직 보지 않았습니다):
+  - 이동 속도 속성(수정자 · 구속 효과): 클라이언트가 시야를 (이동 속도 ÷ 걷기 속도 + 1) ÷ 2 배로 바꾸므로 절반 속도면 시야가 약 25% 좁아집니다(시야 효과 100%). 원하지 않는 화면 확대 그 자체입니다.
+  - 투명한 탈것(크기를 줄인 몹 · 디스플레이 받침)에 태워 서버가 숄더뷰 아바타처럼 절반 속도로 몰기: 시야는 그대로지만, 탈것은 서버가 움직이므로 타는 순간 클라이언트가 서버가 아는 위치로 옮겨집니다. 서버가 아는 위치는 클라이언트보다 보통 한 틱쯤 뒤라, 걸으며 평타를 누를 때마다 화면이 약 0.2칸(달리면 약 0.3칸, 서버 접속이면 핑만큼 더) 뒤로 튑니다(허용 기준 0.05칸). 탈 때 서버가 보내는 위치 맞춤 패킷에는 서버가 아는 시선 각도도 들어 있어, 마우스를 돌리던 중이면 시선이 그만큼 되돌아갑니다. 탄 동안은 이동 키 반응이 서버 왕복만큼 늦고, 바닐라 넉백이 먹지 않으며, 몸을 옮기는 순간이동(넉백 `player/knockback` · 대쉬 · 중간보스 끌어당기기)마다 탈것에서 내려져 다시 태워야 하고, 'Shift를 눌러 내리기' 안내(`mount.onboard`)도 탈 때마다 뜹니다. 휘두를 때마다 타고 내리므로 이 튐이 평타마다 생깁니다.
+  - 그 밖: 블록 속도 배율(영혼 모래 · 꿀 블록 + `movement_efficiency`)이나 거미줄 · 가루눈은 발밑에 진짜 블록을 깔아야 하고, 머리 위에 부딪히는 엔티티를 두어 웅크림을 강제하면(`sneaking_speed`) 눈높이가 0.35칸 내려가며, 매 틱 속도를 덮어쓰거나 걸은 만큼의 절반을 순간이동으로 되돌리면 화면이 떨리고, 아이템 사용 감속은 플레이어가 우클릭을 누르고 있을 때만 생겨 서버가 켤 수 없습니다.
+  - 그래서 1인칭은 점프 힘 수정자(시야와 무관)로 점프만 막습니다. 스킬 · 원소폭발 · 나비아 조준 · 빙결의 멈춤(`rlk:motion_hold` · `rlk:burst_cast` · `rlk:navia_aim` · `rlk:frozen`)도 같은 이유로 이동 속도 ×0 그대로입니다(멈춤을 탈것으로 바꿔도 시작할 때 같은 튐이 생김).
+
 ## 4. 원소 부착 / 원소 반응 (`element/`) — 원신 방식
 대미지 타입 8종: 0 물리(physical) · 1 불(fire) · 2 물(water) · 3 번개(thunder) · 4 얼음(ice) · 5 바위(rock) · 6 바람(wind) · 7 풀(grass).
 물리·바람·바위를 뺀 원소로 때리면 대상에 그 원소가 **부착**되고(머리 위 아이콘), 다른 원소가 닿으면 **반응**하며 반응 이름이 뜹니다.
@@ -133,10 +783,10 @@
   불 → 얼음·빙결 > 물 > 번개 > 풀 / 물 → 불 > 얼음 > 번개 > 풀 / 번개 → 불 > 얼음·빙결 > 물 > 활성 > 풀 /
   얼음 → 불 > 번개 > 물 / 풀 → 불 > 물 > 활성 > 번개 / 바람 → 번개 > 불 > 물 > 얼음 / 바위 → 빙결 > 번개 > 불 > 물 > 얼음
 - **원소 부여(기본공격)**: `/function rlk:element/infuse {id:"wind"}` — 다시 부르거나 `physical` 을 줄 때까지 유지.
-  시간 제한: `/function rlk:element/infuse_for {id:"fire",sec:10}`. 한글 이름(불/물/번개/얼음/바위/바람/풀/물리)도 됩니다.
+  시간 제한: `/function rlk:element/infuse_for {id:"fire",sec:10}`. 한글 이름(불/물/번개/얼음/바위/바람/풀/물리)도 됩니다. 원소 id 목록: `{id:"help"}`(`infuse_for` 는 `{id:"help",sec:0}`).
 - **몹의 원소 공격**: 몹에 `el_fire` `el_water` `el_thunder` `el_ice` `el_rock` `el_wind` `el_grass` 태그를 달면 그 몹에게 맞을 때
   플레이어에게 원소가 부착되고 같은 규칙으로 반응합니다(격변 반응은 즉시 추가 피해, 빙결은 최대 2초 이동 불가). 플레이어에 붙은 원소는 액션바에 표시.
-- 테스트: `/function rlk:element/give {id:"water"}` — 가장 가까운 몹에 피해 0 으로 원소 부착.
+- 테스트: `/function rlk:element/give {id:"water"}` — 가장 가까운 몹에 피해 0 으로 원소 부착(`{id:"help"}` = 원소 id 목록).
 - 원신과 다르게 단순화한 점: 한 번의 타격은 반응 하나만 일으킴, 빙결은 게이지 대신 시간으로 관리, 활성 중 촉진·발산 타격은 원소를 따로 부착하지 않음,
   감전은 주변으로 번지지 않음.
 
@@ -172,7 +822,7 @@
   플레이어가 주는 피해에는 위의 레벨 보정이 들어갑니다. 방 몹의 레벨 = (챕터 − 1) × 6 + 맵 순서(1~6).
 
 ### 5-1. 1챕터 커스텀 몹 (`cm/`, build/p166)
-1챕터 전투 구역의 몹은 아래 6종입니다(2챕터부터는 아직 임시 몹). 시험 소환: `/function rlk:cm/test {t:"sw"}` (sw 검사 · ar 궁수 · fm 불 마법사 · im 얼음 마법사 · sh 방패병 · cn 대포병, 바라보는 쪽 5칸 앞, 1레벨).
+1챕터 전투 구역의 몹은 아래 6종입니다. 2챕터 · 3챕터는 따로 그 챕터의 몹(5-2절 · 5-3절)만 나오고, **테스트 설정**으로 지금은 4챕터 이후에도 이 6종이 나옵니다(레벨·마리 수는 챕터대로 오름). 예전처럼 2챕터부터 임시 몹(허스크/스켈레톤/변명자)을 쓰려면 `/scoreboard players set #mobTmp room 1`, 되돌리려면 `/scoreboard players reset #mobTmp room`. 시험 소환: `/function rlk:cm/test {t:"sw"}` (sw 검사 · ar 궁수 · fm 불 마법사 · im 얼음 마법사 · sh 방패병 · cn 대포병, 바라보는 쪽 5칸 앞, 1레벨). 모든 챕터의 id 목록: `/function rlk:cm/test {t:"help"}`.
 
 | 몹 | 1레벨 체력 | 공격 | 피해(원피해) | 간격 |
 |---|---|---|---|---|
@@ -190,20 +840,107 @@
 - 수치는 load 의 `#cmD_*`(피해) · `#cmCd_*`(간격) · `#cmW_*`(선딜). 레벨 보정은 기존과 같음(플레이어 피격 = 원피해 × (100 + 8 × (레벨 − 1))%).
 - 구조: **두뇌**(투명 허스크 `rlk_cmb`: 길찾기·체력바·피격, 공격력 0) + **모습**(마네킹 `rlk_cmv`, 스킨 `rp/assets/rlk/textures/skin/mob_*.png`, 두뇌 위치로 매 틱 이동·맞으면 붉게 번쩍) + **미끼**(몸 위치의 작은 투명 마네킹 `rlk_lure`). 두뇌는 언제나 미끼만 노리므로 바닐라 근접 공격은 아무 피해도 주지 않고, 모든 공격은 `cm/*` 함수가 직접 `player/take_damage` 로 넣습니다. 몹끼리는 서로 때리지도 노리지도 않음. 연결은 `cmId` 스코어, 주인 없는 모습/부착물(궤적 선·화염구·대포 모형·방패 바)은 `cm/clean` 이 정리.
 
+### 5-2. 2챕터 몹 (이나즈마, `cm/`, `tools/build_ch2_mobs.py`)
+2챕터 전투 구역에는 아래 몹만 나옵니다(1챕터 몹은 섞이지 않음). 무리 몹 5종은 단순한 패턴을 여럿이 함께 쓰고, 정예 몹(카이라기·뇌전 · 그림자 닌자 · 번개 시킨 술사)은 방마다 많아야 하나. **원소 면역 · 저항은 없습니다**(모든 원소가 똑같이 들어감). 시험 소환: `/function rlk:cm/test {t:"ns"}` (ns 떠돌이 무사 졸개 · sl 번개 슬라임 · ss 작은 번개 슬라임 · sp 반란군 창병 · dr 오니 북잡이 · kr · nj · cc · ci, 무리는 g_ns 졸개 4~6 · g_sp 창병 대열 3 · g_sl 슬라임 2~3; 목록은 `{t:"help"}`).
+
+| 몹 | 1레벨 체력 | 공격 | 피해(원피해) | 간격 |
+|---|---|---|---|---|
+| 떠돌이 무사 졸개 | 8 | 4~6마리 무리. 무리장 곁(2.5칸)에 붙어 다니다가 한 마리라도 2.5칸 안이면 7칸 안의 무리 전체가 함께 칼을 든다(0.6초, 칼날이 빛나고 소리) → 짧은 베기(3칸). 선딜 중 경직되면 그 졸개만 취소. 같은 틱의 무리 베기는 한 번만 맞음 | 15 | 1.8초 |
+| 번개 슬라임 | 14 | 몸 쪽으로 깡충 뛰어 옴. 3.2칸 안이면 0.5초 웅크림(번개 불꽃 · 소리) → 그 순간 몸이 있던 쪽으로 도약, 착지 반경 1.9 | 12, 번개 | 2.5초 |
+| 작은 번개 슬라임 | 3 | 큰 슬라임이 죽으면 셋으로 분열. 빠르게 뛰어 와 1.7칸 안에서 달라붙음 → 바닥에 반경 1.5 보라색 고리(마지막 0.3초 번쩍) 1초 → 감전 | 6, 번개 | 2초 |
+| 반란군 창병 | 10 | 3마리가 나란히 걷는 대열. 초당 90°로만 돌아서므로 옆 · 뒤로 돌아 들어가면 안전. 앞(±45°) 4.2칸 안이면 대열 전체가 1초 창끝 빛(방향 고정) → 2칸 찌르며 돌진(벽은 못 뚫음) | 16 | 3초 |
+| 오니 북잡이 | 20 | 제자리에서 북을 침(0.4초마다 둥). 치는 동안 10칸 안의 모든 커스텀 몹이 노란 기운을 두르고 이동 +30% · 선딜/쿨타임 x1.3. 맞으면 2초 동안 북이 멈춤(가속도 바로 풀림) | — | — |
+
+- **타격감(무리 몹 5종)**: 넉백 저항 0(1챕터 0.5), 피격 경직 0.25초(1챕터 0.1초), 맞으면 몸에서 멀어지는 쪽으로 0.42칸/틱 밀림. 죽으면 몸 쪽을 본 채 뒤로 날아가며(앞이 막히면 그 자리, 처음 높이 아래로는 안 내려감) 0.4초 뒤 연기 · 번개 불꽃과 함께 터짐. 2챕터 몹이 10틱 안에 3마리 죽으면 몸 위치에 묵직한 소리(철퇴 내려찍기) + 터지는 입자.
+- **슬라임 연쇄 방전**: 슬라임이 죽으면 2칸 안의 다른 슬라임에게만 방전(작은 슬라임 = 최대 체력의 100%, 큰 슬라임 = 20%, `#c2ZapS` · `#c2ZapL`). 플레이어는 맞지 않음. 붙어 있는 작은 슬라임 무리는 하나만 잡아도 줄줄이 터짐(처치 보상 · 숫자 그대로). 분열한 작은 슬라임은 부모 레벨.
+- **보상**: 작은 슬라임과 졸개 절반(`rlk_c2lite`)은 골드 · 회복 구슬이 없음(경험치는 각각 1 · 2). 무리 몹이 많아도 방당 보상이 1챕터와 비슷하게.
+- **방 구성**(`cm/c2/plan`, 방 크기 규칙의 수 N = 기존과 같음): 1~2번째 맵 = 졸개 무리(4, N≥5 이면 5, N≥7 이면 6) + 슬라임 2(N≥6 이면 3). 3~4번째 맵 = 졸개 무리 · 슬라임(N≤4 면 둘 중 하나) + 정예 하나(카이라기 · 시킨 술사 반반) + 북잡이 35%. 5~6번째 맵 = 창병 대열 + 졸개 무리 + 정예 하나(그림자 닌자 50%, 카이라기 · 시킨 술사 25%씩) + 북잡이 60%(N≥8 이면 슬라임 2 더). 아주 작은 방(N≤2)은 무리 하나. 무리 하나 = 기존 소환 자리 하나(`room/mob_summon` → `cm/c2/room_slot`), 무리원은 그 둘레의 설 수 있는 자리(아니면 같은 자리), 몸 쪽을 보고 나옴. 정예 id 는 실행 시점에 `$function rlk:cm/spawn/$(id)` 로 부름.
+- 수치는 `cm/c2/load` 의 `#c2D_*`(피해) · `#c2W_*`(예고 틱) · `#c2Cd_*`(간격) 등(생성기 `tools/ch2mob/common.py` 의 TUNE). 레벨 보정은 1챕터와 같음.
+- 구조: 1챕터와 같은 투명 허스크 두뇌(`rlk_cmb`, 2챕터 표시 `rlk_c2`, 무리 몹 `rlk_c2a`) + `cmId` 로 이은 디스플레이 리그(부품 `rlk_c2pt`, 뿌리 `rlk_c2root`, 모델 · 스킨 `tools/build_ch2_swarm_rigs.mjs` → `rlk:cm/c2/*`, `rlk:skin/mob_c2_*`). 공용: `cm/c2/world`(매 틱 북 가속 표시 `rlk_cm_haste`), `cm/c2/tick`(가속: 10틱 중 3틱은 한 틱 더 `#c2X`, 이동 속성 `rlk:cm_haste`), `cm/c2/hurt` · `die` · `death_tick`, `cm/c2/kill_note`(combat/apply). 공유 파일(cm/tick · vis · flash · init · cancel · clean · world · test, combat/apply · gold_drop · heal_orb_roll, room/mob_summon · mob_wave · mob_init, load, uninstall)에는 생성기가 한 줄씩만 끼워 넣음. 정예 몹 파일은 `tools/ch2mob/elite.py` 가 있으면 같은 생성기가 쓰고 그 모듈의 연결 줄(`elite_lib.HOOKS`)도 넣음.
+- 생성: `python3 tools/build_ch2_mobs.py`(데이터팩) · `node tools/build_ch2_swarm_rigs.mjs --resourcepack <rp>`(리소스팩). 생성된 파일은 손으로 고치지 말 것.
+- 손에 든 소품(졸개 카타나 · 창병 창 · 북잡이 북채, 3챕터 단검 용병 단검 · 술사 물방울)의 자세 각도(`tools/ch2mob/poses.py` · `tools/ch3mob/poses.py`)는 팔과 같은 뜻: `[0,0,0]` = 칼날 · 창끝 · 채 머리가 주먹에서 팔뚝 방향으로 곧게 뻗음, x 를 키우면 팔처럼 앞 · 위로 돎(`ch2mob/rig.py` 의 `HAND_GRIP`). 10-29 이전에는 모델 +Y 를 그대로 써서 2챕터 무리 몹 셋이 모두 소품을 거꾸로(칼끝 · 창끝이 등 뒤로) 들고 있었음. 확인은 정면이 아니라 옆에서(정면에서는 뒤로 뻗은 소품이 짧아 보여 안 드러남).
+
+#### 2챕터 정예 몹 (`cm/kr` · `cm/nj` · `cc` · `ci`, 생성기 `tools/ch2mob/elite.py` · 모습 `tools/build_ch2_elite_rigs.mjs`)
+방 하나에 정예는 많아야 1마리. 빠르고 읽기 쉬운 상대: 모든 공격 앞에 예고(칼날 빛 · 자세 · 바닐라 소리)가 있고, 공격이 끝나면 확실한 빈틈이 있습니다. 원소 면역 · 원소 방어막 없음(어느 원소든 똑같이 들어감). 시험 소환: `/function rlk:cm/test {t:"kr"}` (kr 카이라기·뇌전 · nj 그림자 닌자 · cc 시킨 술사 · ci 번개 시킨 단독).
+
+| 몹 | 1레벨 체력 | 공격 | 피해(원피해) | 간격 |
+|---|---|---|---|---|
+| 카이라기·뇌전 | 70 | A: 7.5칸 안이면 지그재그 돌진 베기 3번(몸 쪽에서 +12° / −12° / +12°, 한 번에 3~6칸). 돌진마다 0.35초 예고(칼이 보랏빛으로 타오름 + 소리), 첫 예고부터 마지막 돌진까지 경직 면역. 세 번째 돌진 뒤 **1.2초 지침**(제자리, 경직됨 = 반격 시간) · B: 3.2칸 안이면 0.8초 칼날 빛(경직 면역) 뒤 회전 베기, 반경 3 | 돌진 14씩 / 회전 18(번개 부착) | A 3.2초(지침 시작부터) / B 5초 |
+| 그림자 닌자 | 45 | 10칸 안: 연기와 함께 사라짐(0.4초) → 몸 **뒤** 3칸(안전한 바닥만, 안 되면 뒤 대각선 → 옆 → 사라진 자리)에 다시 나타남 → 0.6초 칼날 빛 + 소리(이때 맞아 경직되면 베기 취소) → 짧게 파고들며(최대 1.5칸) 베기. 2번 하고 나면 **1.5초 탈진**(서서 숨을 고름, 경직됨) · 10칸보다 멀면: 0.5초 예고 뒤 수리검 3개 부채꼴(±15°, 0.9칸/틱, 벽에 막힘) | 베기 16 / 수리검 8씩 | 매복 사이 0.7초, 탈진 뒤 2초 / 수리검 3초 |
+| 우인단 번개 시킨 술사 | 50 | 7칸 안으로는 다가오지 않음. 시킨이 하나도 없으면 1초 영창(등불이 밝아짐 + 소리, 경직되면 취소) → 시킨 4마리. 시킨이 모두 죽으면 4초 뒤에야 다시 부름(최대 4마리). 몸이 3칸 안으로 오면 0.2초 반짝임 뒤 6칸 떨어진 곳으로 **점멸**(안전한 바닥만, 4칸 미만이면 안 감) → **1초 어지러움**(영창 없음, 경직됨) | (본체는 직접 공격 없음) | 점멸 5초 |
+| 번개 시킨 | 2(한 대) | 몸 주위 4칸을 날며 돎(막히면 2.5칸). 술사가 1.5초마다 **한 마리씩** 골라 보냄: 0.5초 빛남(날개를 펴고 커짐) + 소리 → 가슴을 향해 일직선 돌진(0.8칸/틱, 블록에 닿으면 멈춤) | 8(번개 부착) | 술사가 정함 |
+
+- **안전한 이동**: 돌진 착지 · 닌자 재등장 · 점멸은 모두 0.5칸씩 실제로 걸어 보며 정합니다(발·몸·머리 칸이 비어 있고 좌우 0.3칸 여유, 발밑이 단단한 바닥, 한 번에 1칸까지만 오르내림, 낙사 구간 · 물 · 용암 · 벽 · 문(철창 · 검은 콘크리트) 넘지 않음). 마지막 칸 한가운데에 섭니다. 닌자의 재등장 자리는 **몸에서부터** 걸어서 찾으므로 벽 너머로 나타나지 않습니다.
+- **반격 시간**(경직 가능): 카이라기 세 번째 돌진 뒤 1.2초, 닌자 매복 2번 뒤 1.5초, 술사 점멸 뒤 1초. 빙결은 하던 공격을 모두 취소(돌진 착지 표식도 지움). 빙결된 닌자는 사라진 중이어도 다시 보입니다.
+- **북잡이 가속**(`rlk_cm_haste`): 이동 속도 +30%(고정 id 수정자 `rlk:cm_haste`), 예고 · 지침 · 쿨타임이 1.3배 빨리 흐름(10틱 중 3틱에 한 틱 더). 술사는 가속을 자기 시킨에게도 넘겨 줌.
+- **술사가 죽으면** 시킨은 바로 사라집니다(시킨은 술사에 묶인 부착물: `rlk_cmlink`). 시킨은 방 전투를 붙잡지 않고(`rlk_zmob` 없음) 골드 · 경험치 · 회복구슬을 주지 않습니다(`rlk_c2lite`, 경험치 0). `/function rlk:cm/test {t:"ci"}` 로 따로 부른 시킨은 혼자 2.5초마다 돌진합니다(시험용).
+- 경험치: 카이라기 12 · 닌자 9 · 술사 10 · 시킨 0. 레벨 보정은 1챕터와 같음(체력 · 피해 모두).
+- 구조: 1챕터와 같은 두뇌(투명 허스크 `rlk_cmb`, 시킨은 작은 NoAI 허스크) + 디스플레이 모습(`cmId` 로 연결, 부위별 아이템 모델 `rlk:cm/<id>/<부위>`, 스킨 `rlk:skin/mob_{kr,nj,cc}`, 팔레트 `rlk:cm/c2e/pal`; 시킨은 날갯짓 프레임을 모델 교체로) + 공용 미끼. 공격은 `cm/hit_me` · `cm/hit_pl` → `player/take_damage`(회피 무적 적용). 맞으면 붉게 번쩍(빛나는 칼날 · 등불은 그대로), 죽으면 쓰러지는 모습(닌자는 연기 속으로).
+- 수치는 `tools/ch2mob/elite.py` 의 `CFG`(피해 · 틱 · 거리), 자세는 `tools/build_ch2_elite_rigs.mjs`. 생성: `node tools/build_ch2_elite_rigs.mjs --resourcepack <rp>` → `python3 tools/build_ch2_mobs.py`(2챕터 몹 전체; `ch2mob/elite.py` 를 불러 씀). 생성된 함수는 직접 고치지 말 것.
+
+### 5-3. 3챕터 몹 (수메르, `cm/`, `tools/build_ch3_mobs.py`)
+3챕터 전투 구역에는 아래 몹만 나옵니다(1 · 2챕터 몹은 섞이지 않음). 구역이 우림인지 사막인지(구역 data `sd`, 1 = 사막)에 따라 구성이 다릅니다. 무리 몹 4종(+ 버섯이 남기는 포자 주머니)은 2챕터처럼 단순한 패턴을 여럿이 함께 쓰고, 맑은물 술사는 다른 몹을 치유하며, 정예(성수 전갈 · 성수 붉은 독수리 · 원시 정령 기계·재구성자)는 아래 정예 절. **원소 면역 · 저항 · 원소에 따른 방어막은 없습니다**(모든 원소가 똑같이 들어감). 시험 소환: `/function rlk:cm/test {t:"fu"}` (fu 둥실 버섯 · em 에르미타 단검 용병 · sb 모래 전갈 새끼 · cw 에르미타 맑은물 술사 · cs · rv · pc, 무리는 g_fu 버섯 5~7 · g_em 용병 3~4 · g_sb 전갈 새끼 6~8; 목록은 `{t:"help"}`).
+
+| 몹 | 1레벨 체력 | 공격 | 피해(원피해) | 간격 |
+|---|---|---|---|---|
+| 둥실 버섯 | 6 | 5~7마리 무리. 땅에서 1칸쯤 떠서 흔들리며 다가오고, 무리장 곁(1.8칸)에 뭉쳐 다님(한 번 휘두르면 여럿이 맞게). 2.4칸 안이면 0.5초 부풀기(갓이 커지고 반점이 빛남 + 소리, 경직되면 취소) → 몸 쪽으로 툭 박치기(반경 1.5). 버섯 박치기는 한 틱에 한 번만 맞음 | 10 | 2.2초 |
+| 포자 주머니 | — | 죽은 버섯이 그 자리에 남기는 주머니(3초, 맥박치듯 부풀고 마지막 1초는 빨라짐). **플레이어의 어떤 공격이든** 닿으면 터져서 반경 3 안의 **몹에게만** 피해: 버섯 = 최대 체력 100 %(한 방에 무리째), 다른 몹 = 12 + 최대 체력 30 %(한 몹은 한 틱에 주머니 하나만). 플레이어는 맞지 않음. 방 몹이 아니고(전투를 붙잡지 않음) 보상 · 숫자 없음. 포자로 죽은 버섯은 주머니를 남기지 않음 | — | — |
+| 에르미타 단검 용병 | 10 | 3~4마리 무리. 9칸 안이면 무리가 몸 둘레 4칸을 함께 돎(무리 안의 자리 = 각도). 둘씩: 0.6초 웅크림(두 단검이 빛남 + 소리, 그 용병만 경직 취소) → 이 순간의 몸 쪽으로 돌진 찌르기(0.6칸/틱, 거리만큼 4~8틱, 벽은 못 뚫음, 돌진 중 경직 면역) → 가운데서 둘이 뭉친 채 0.8초 멈춤. 몸까지 벽 · 문 · 낭떠러지가 있으면 돌진하지 않음. 무리 전체는 다음 둘까지 1.7초 기다림 | 14 | 용병마다 4초 |
+| 모래 전갈 새끼 | 4 | **사막 구역만.** 6~8마리가 땅속에서 시작(맞힐 수 없음, 체력바 없음). 3초마다 무리 전체가 함께 몸 둘레 2.6칸 고리 자리(몸에서 그 자리까지 벽이 없고 설 수 있는 자리만)에 **모래 둔덕**(0.8초, 아직 맞힐 수 없음) → 동시에 솟구쳐 둔덕이 나올 때의 고리 가운데로 튀어 오름 → 물기(반경 1.9, 자리마다 3~5틱 뒤, 한 틱에 한 번) → 2초 동안 땅 위(반격 시간) → 다시 파고듦 | 8 | 순환 약 5.8초 |
+| 에르미타 맑은물 술사 | 22 | 직접 공격 없음. 몸과 7~10칸을 둠(7칸 안이면 물러남, 뒤가 막혔으면 그대로). 8칸 안에 다친 커스텀 몹(어느 챕터든, 정예 포함, 자기 자신 제외)이 있으면 제자리 영창(물 구슬을 머리 위로, 빛남): **2초마다 그 몹들에게 최대 체력 10 %**(최대 체력을 넘지 않음), 술사에서 각 몹까지 물줄기가 이어짐. **맞으면 3초 동안 영창이 끊김** | — | 2초 |
+
+- **타격감**: 2챕터 무리 몹과 같음(넉백 저항 0, 피격 경직 0.25초, 맞으면 0.42칸/틱 밀림, 죽으면 몸 쪽을 본 채 날아가며 연기 · 모래 · 포자와 함께 터짐). 3마리가 10틱 안에 죽으면 다중 처치 신호(2챕터와 같은 시계). 포자 주머니로 버섯 무리를 한 번에 터뜨리거나, 솟구친 전갈 새끼 고리 · 가운데로 모인 용병 둘을 한 번에 휩쓸 수 있게 짰습니다.
+- **땅속 전갈 새끼**: `rlk_c3bur` · `rlk_pet` · 무적, `rlk_mob` 이 없음 → 플레이어의 공격 · 범위 공격 · 자동 조준이 고르지 않고, combat/apply 도 피해를 받지 않음. 체력바 · 클릭 실드는 땅 위로 나올 때 몹 준비(mob/setup)가 다시 붙임. 땅속 3초 + 둔덕 0.8초가 넘게 숨어 있지 않으므로 방이 끝나지 않는 일은 없음. 바닥 아래로는 아무것도 내려가지 않음(땅속 모습 = 아주 작게 줄인 부품).
+- **포자 주머니 구조**: 투명 NoAI 허스크(`rlk_c3pod`, `rlk_mob` 을 미리 달아 체력바가 없음, `rlk_zmob` 없음) + 모습 2부품. combat/apply 맨 앞에서 표시만 하고(`cm/fp/hit`), 터짐은 같은 틱 cm/clean 에서(`cm/fp/burst` → `cm/c3/true_hit`, 진짜 피해 · 풀빛 숫자, 원소 반응 없음).
+- **방 구성**(`cm/c3/plan`, 방 크기 규칙의 수 N = 기존과 같음, 무리 크기는 N 에 따라): 1~2번째 맵 = 우림: 버섯 무리 둘 / 사막: 전갈 새끼 무리 + 용병 무리. 3~4번째 맵 = 우림: 버섯 무리 + 용병 무리 + 재구성자 / 사막: 전갈 새끼 무리 + 용병 무리 + 성수 전갈 또는 독수리(반반). 5~6번째 맵 = 3~4번째 무리 둘 + 맑은물 술사 + 정예 둘(우림: 재구성자 + 독수리 / 사막: 성수 전갈 + 독수리). 아주 작은 방(N≤2)은 무리 하나. 무리 하나 = 기존 소환 자리 하나(`room/mob_summon` → `cm/c3/room_slot`), 정예 id 는 실행 시점에 `$function rlk:cm/spawn/$(id)` 로 부름. 레벨 = 13~18(챕터 규칙 그대로).
+- **보상**: 버섯 절반 · 전갈 새끼 넷 중 셋(`rlk_c2lite`)은 골드 · 회복 구슬이 없음. 경험치: 버섯 2 · 용병 3 · 전갈 새끼 1 · 술사 6.
+- 수치는 `cm/c3/load` 의 `#c3D_*`(피해) · `#c3W_*`(예고 틱) · `#c3Cd_*`(간격) · `#c3Up_sb` · `#c3Dn_sb`(땅 위 · 땅속) · `#c3Hp_cw` · `#c3Hi_cw` · `#c3Int_cw`(치유 % · 간격 · 끊김) · `#c3PodL` · `#c3PodD` · `#c3PodPct`(주머니 수명 · 피해)(생성기 `tools/ch3mob/common.py` 의 TUNE).
+- 구조: 2챕터 틀을 그대로 씀 — 투명 허스크 두뇌(`rlk_cmb`, 3챕터 표시 `rlk_c3`, A 몹 `rlk_c3a`) + `cmId` 로 이은 디스플레이 리그(부품 `rlk_c3pt`, 뿌리 `rlk_c3root`, 모델 · 스킨 `tools/build_ch3_swarm_rigs.mjs` → `rlk:cm/c3/*`, `rlk:skin/mob_c3_{em,cw}`, `rlk:cm/c3/props`). 생성기는 `tools/ch2mob` 의 이름공간 인자를 받는 블록(맞음 · 취소 · 죽음 · 다중 처치 · 진짜 피해)과 Writer · Patcher 를 불러 쓰고, 실행 중에는 2챕터의 일반 함수(`cm/c2/impulse` · `vec` · `knock` · `safe_here` · `brain_end` · `first`)를 그대로 부름. 공유 파일(cm/tick · vis · flash · init · cancel · clean · world, combat/apply, room/mob_summon · mob_wave · mob_init, load, uninstall)에는 한 줄씩만 끼워 넣고, `cm/test_help` 는 `tools/help_lib.py` 가 장 절(`cm/c3/test_help`)들로 다시 씀. 두 생성기는 어느 순서로 몇 번 돌려도 같은 결과.
+- 생성: `python3 tools/build_ch3_mobs.py`(데이터팩, 정예 모듈 `tools/ch3mob/elite.py` 가 있으면 함께) · `node tools/build_ch3_swarm_rigs.mjs --resourcepack <rp>`(리소스팩). 생성된 파일은 손으로 고치지 말 것.
+
+#### 3챕터 정예 몹 (`cm/cs` · `cm/rv` · `cm/pc`, 생성기 `tools/ch3mob/elite.py` · 모습 `tools/build_ch3_elite_rigs.mjs`)
+수메르 정예 3종. 빠르고 읽기 쉬운 상대: 모든 공격 앞에 예고(자세 · 빛 · 바닥 표시 · 바닐라 소리)가 있고, 공격이 끝나면 확실한 빈틈이 있습니다. 원소 면역 · 원소 방어막 없음(어느 원소든 똑같이 들어감). 시험 소환: `/function rlk:cm/test {t:"cs"}` (cs 성수 전갈 · rv 성수 붉은 독수리 · pc 원시 정령 기계·재구성자).
+
+| 몹 | 1레벨 체력 | 공격 | 피해(원피해) | 간격 |
+|---|---|---|---|---|
+| 성수 전갈 | 80 | 몸에서 2.3칸 거리를 둠. **집게**: 2.7칸 안이면 0.5초 예고(집게를 벌려 듦 + 소리, 방향 고정) → 앞쪽 연속 두 번(0.3초 간격) · **꼬리**: 4.6칸 안이면 0.8초 꼬리 충전(꼬리 끝이 보랏빛으로 빛남, 마지막 0.3초는 찌를 줄이 고정돼 바닥에 보라색으로 그려짐) → 그 줄을 따라 3.5칸 찌르기(벽에 막힘) · **잠행**: 몸이 5.5칸보다 멀면 0.5초 동안 모래로 파고듦 → 땅속(공격 · 범위기 · 자동 조준 모두 안 맞음, 체력바 없음)에서 모래 자국을 남기며 몸 쪽으로 빠르게 이동(0.5칸/틱, 안전한 바닥만) → 자국이 멈추면 그 자리 모래 더미가 0.6초 흔들림(반경 1.8 모래 고리) → 솟구치며 올려치기 → **1.2초 박힘**(경직됨 = 반격 시간) | 집게 10 + 12 / 꼬리 20(번개 부착) / 올려치기 18 | 집게 · 꼬리 2.3초 / 잠행 7.5초 |
+| 성수 붉은 독수리 | 55 | 몸 위 3칸 높이에서 반경 5.5칸을 돌며 낢. **급강하**(3.5~13칸, 몸 자리까지 곧은 길이 비어 있을 때만): 0.5초 솟구치며 울음 → 0.7초 조준(바닥에 그림자 줄, 마지막 0.3초는 고정되며 붉게 바뀜) → 그 줄을 따라 곧게 내리꽂음(0.9칸/틱) → 땅에 처박혀 **1.5초 쓰러짐**(경직됨 = 반격 시간) → 다시 날아오름 · **불깃 부채**(5~14칸): 0.6초 날개를 활짝 폄(날개 끝 불꽃이 커짐) → 불타는 깃털 5개(±30°, 0.7칸/틱, 블록에 막힘) | 급강하 18 / 깃털 7씩(둘 다 불 부착) | 급강하 7초 / 부채 3.5초 |
+| 원시 정령 기계·재구성자 | 75 | 몸에서 2칸 거리를 둠. 0.4초 동안 큐브로 흩어짐 → 몸 **옆** 2칸(안전한 바닥만, 안 되면 몸 너머 대각선 → 이쪽 대각선 → 몸 너머 → 흩어진 자리)에 0.5초 큐브 빛과 함께 다시 모임 → 둘 중 하나: **망치 내려찍기** 0.7초 예고(팔을 높이 듦, 앞 1칸 중심 반경 2.5 금빛 고리) / **큐브 회전** 0.8초 예고(반경 3 하늘색 고리) · 두 번 다시 모이고 나면 **1.5초 과열**(가슴판이 열리고 핵이 붉게 드러남, 경직됨 = 반격 시간) | 내려찍기 18 / 회전 14 | 모임 사이 0.8초, 과열 뒤 2.5초 |
+
+- **핵 노출**(재구성자 과열 중, 태그 `rlk_c3_core`): 받는 피해 ×1.5(모든 공격 · 모든 원소, 피해 보정 뒤 `combat/apply` 한 줄). 과열 중에 빙결돼도 핵은 남은 시간 동안 그대로 드러나 있음.
+- **땅속 전갈**: `rlk_mob` 을 떼고 `rlk_pet` · 무적(Invulnerable)을 붙여 플레이어의 모든 공격 선택에서 빠짐(체력바도 사라짐), 표시 태그 `rlk_c3_under`. `rlk_zmob` 는 그대로라 방 전투가 끝나지 않지만 땅속에 오래 있을 수 없음: 길이 막히면 0.3초, 길어도 2.5초 뒤에는 멈추고 솟아오름. 솟을 때 다시 `rlk_mob`(다음 틱 `mob/setup` 이 체력바와 함께 붙임). 플레이어가 쓰러지거나 빙결 · 취소가 걸리면 그 자리에서 곧바로 올라옴(피해 없음).
+- **안전한 이동**: 전갈의 모래 자국은 2챕터와 같은 보행 검사로 0.5칸씩 실제로 걸어 가며(막히면 ±45°), 그 끝이 솟는 자리라 벽 너머 · 블록 속 · 낙사 구간으로 나오지 않습니다. 재구성자의 모이는 자리는 **몸의 발밑부터** 걸어서 찾으므로 벽 너머가 아님. 독수리는 방 상자 안에서만 납니다: 가로세로 = 지금 전투 구역의 칸들(안쪽, 벽에서 0.6칸), 높이 = 벽 꼭대기(y 210) − 3칸(구역이 없으면 소환 자리 ±14칸 · 7칸 위). 0.32칸씩 움직이며 매번 발 · 몸 · 머리 · 양 날개 자리가 비어 있는지 보고, 막히면 수평 → 위(천장 아래) → 아래(바닥에서 1.2칸 이상)로 비켜 감. 급강하는 시작 전과 고정 순간 두 번 착지 자리(단단한 바닥 · 상자 안)와 곧은 길(0.2칸마다 발 · 몸 · 머리)을 확인하고, 안 되면 하지 않습니다.
+- **반격 시간**(경직 가능): 전갈 솟구친 뒤 1.2초, 독수리 처박힌 뒤 1.5초, 재구성자 과열 1.5초. 예고부터 공격까지는 경직 면역, 빙결은 하던 공격을 모두 취소(조준 표식은 지움, 이미 날아간 깃털은 그대로). 빙결된 독수리는 공중에 멈춰 있다가 풀리면 다시 남.
+- 죽으면: 전갈은 배를 뒤집고 다리를 오므림, 독수리는 공중에서 죽어도 바닥까지 떨어진 뒤 쓰러짐, 재구성자는 큐브가 바닥으로 무너짐.
+- 경험치: 전갈 14 · 독수리 12 · 재구성자 14. 레벨 보정은 1챕터와 같음(체력 · 피해 모두). 북잡이 가속(`rlk_cm_haste`)도 2챕터 정예와 같게 받음.
+- 구조: 2챕터와 같은 두뇌(투명 허스크 `rlk_cmb`, 표시 `rlk_c3e`; 독수리는 NoAI · NoGravity 허스크를 함수가 날림) + 디스플레이 모습(`cmId` 로 연결, 부위별 아이템 모델 `rlk:cm/<id>/<부위>`, 팔레트 텍스처 `rlk:cm/c3e/pal` 32×32 하나; 빛나는 부위(전갈 꼬리 끝 · 독수리 날개 불꽃 · 재구성자 핵)는 최대 밝기로 맞아도 붉어지지 않고, 과열 핵은 모델 교체) + 공용 미끼. 공격은 `cm/hit_me` · `cm/hit_pl` → `player/take_damage`(회피 무적 적용). 2챕터 정예의 보행 검사 · 가속 · 첫 틱 체력은 `ch2mob/elite_lib.py` 를 그대로 불러 씀.
+- 수치는 `tools/ch3mob/elite.py` 의 `CFG`(피해 · 틱 · 거리), 자세는 `tools/build_ch3_elite_rigs.mjs`. 생성: `node tools/build_ch3_elite_rigs.mjs --resourcepack <rp>` → `python3 tools/build_ch3_mobs.py`(3챕터 몹 전체; `ch3mob/elite.py` 를 불러 쓰고 연결 줄 `elite_lib.HOOKS` 를 공유 파일 cm/tick · vis · flash · clean · combat/apply 에 넣음). 생성된 함수는 직접 고치지 말 것.
+
 ## 6. 아이템 (`items/`)
 - 아이템: 봉인된 검(`sealed_sword`) → 마검: 키리온(`sword_kirion`), 금단의 도서(`forbidden_book`) → 데모노미콘(`demonomicon`), 고통 & 절망(`pain_despair`), 초월 · 악요개안(`stormy_eye`, 신화)
 - **등급 규칙**: 원신 4성 캐릭터 기반 = common·rare / 5성 기반 = unique(epic)·legendary / 일곱 신 + 콜롬비나 기반 = mythic. **메인 딜러 기반 아이템은 만들지 않습니다**(메인 딜러는 캐릭터로 만들 예정). 서브 딜러·서포터의 스킬만 아이템으로.
+  - 예외(사용자 요청 11-04): 화무십일홍(`sword_hwamu`, 신화) — 니케 · 스텔라 블레이드 홍련의 검. 특수 보스 홍련의 이벤트로만 얻는다(상자 · 상점 · 레벨 업 · 나무뿌리에 나오지 않음).
 - **아이템 효과 피해 만들기**(3차 아이템부터의 공통 틀, `build/p47` 참고): 피해 계산 `char/dmg_calc {coef}`(공격력 계수) 또는 `items/calc_stat {obj:"maxHealth",pm:40}`(스탯 계수, 천분율) → `#skillDmg 0`, `#elem`, `#elU`, **`#sub itv 1`**(아이템 효과 표시: 각인 협동이 올려 주고 해류·금강은 빼는 기준) → 대상에 `rlk_hit` 태그 → `combat/apply_reset` → `#sub itv 0` → `char/after_hit`.
   - 몹이 피해를 받는 도중(`on_apply`·`on_rx`)에 새 피해를 주면 계산 값이 섞이므로, 표식(`rlk_iq`, 종류 `iqK`)을 소환해 `items/q/run` 에서 처리합니다.
   - 몹에 붙는 시간제 표시는 "끝나는 시각(gametime)"을 점수로 적어 둡니다(`skEnd` `mirEnd` `erodeEnd` `talEnd`).
 - common·rare·unique 아이템의 목록과 설명은 데이터팩 폴더의 `items.md` 에 있습니다(게임 안 설명과 같은 글. 정의 = `items/<등급>/<id>/def`, 효과 = `items/proc/`, 수치 = `load.mcfunction` 의 "아이템 수치"). 각인은 `engravings.md`.
-- 보유 아이템은 인벤토리 둘째 줄에 왼쪽부터 고정(최대 9). **인벤에서 클릭하면 발밑에 버려집니다.**
-- **인벤토리 상세** (`invd/`): 인벤토리 첫 줄 가운데 칸의 **◆ 인벤토리 상세** 버튼을 누르면 아이템 선택 공간과 같은 방으로 이동합니다(인벤토리 창은 E 로 닫으세요). 전투 중에는 쓸 수 없습니다.
+- 보유 아이템은 인벤토리 둘째 줄 왼쪽부터 셋째 줄로 이어서 고정됩니다(보유 칸 수 = 점수 `invCap`, 처음 9칸, 최대 18칸). 아직 열리지 않은 칸은 **방벽**(`rlk_lock`)으로 채워 두며, 나중에 인벤토리 슬롯 노드가 두 칸씩 엽니다. **인벤에서 클릭하면 발밑에 버려집니다.**
+- 인벤토리 첫 줄: 0 = 캐릭터 정보(머리), 1 = 고유 특성(종이, 캐릭터 추가 설명 포함), 2 = **◆ 인벤토리 상세** 버튼, 3~6 = 각인 칸, 7 = 나머지 각인, 8 = 스탯 정보. 다른 것을 넣으면 지워집니다(`player/inv/frame`).
+- **인벤토리 상세** (`invd/`): 인벤토리 첫 줄 3번째 칸(inventory.2)의 **◆ 인벤토리 상세** 버튼을 누르면 아이템 선택 공간과 같은 방으로 이동합니다(인벤토리 창은 E 로 닫으세요). 전투 중에는 쓸 수 없습니다.
+  - 보유 칸 18개를 인벤토리와 같은 순서로 9칸씩 두 줄에 보여 줍니다(칸 오른쪽 아래 숫자 = 순번, 잠긴 칸은 어둡게 + 방벽).
   - 아이템을 누른 뒤 다른 아이템을 누르면 두 아이템의 자리가 바뀝니다(같은 아이템을 다시 누르면 고르기 취소).
   - 아이템을 고르면 **판매** 버튼이 나옵니다. 한 번 누르면 되묻고, 한 번 더 누르면 팝니다(가격 = `rlk:items rarity_price` 의 등급별 가격, 드롭해서 파는 것과 같음).
   - 돌아가기: **돌아가기** 버튼, Shift+F, 또는 인벤토리의 버튼을 다시 누르기.
   - 구조: `pkMode` 4 로 아이템 선택 공간의 조준·클릭·설명 창·각인 창을 그대로 씁니다. 화면 = `invd/draw`, 클릭 = `invd/click`. 순서의 기준은 `storage rlk:pinv order`.
 - 낡은 석판(`old_slate`): 보유 목록에서 바로 왼쪽·오른쪽 아이템의 스탯을 `#slatePct`% 더합니다(`items/slate/scan`, 소수점 아래 버림).
+- **강화와 너프** (`items/tune/`, 인챈트 노드):
+  - 아이템마다 강화 단계 0~3(`rlk:pinv enh.<id>` · 점수 `<id> enhL`, 같은 아이템은 같은 단계, 런마다 0). 이름 뒤에 별: `[ MYTHIC ] 서리달의 은잔 ☆☆☆` → `★★☆`(`items/set_name`, 별 모양 `rlk:items stars`). 실물 아이템의 custom_data `rlk:{id,v,e}` 의 `e` 가 단계라, 단계가 바뀌면 인벤토리 정리 때 새 이름으로 다시 놓입니다.
+  - **0단계 = 크게 너프된 기본값, 3단계 = 예전(너프 전) 값.** 배율(‰, `rlk:tune fac`): 효과량 500 / 667 / 833 / 1000, 지속 시간 700 / 800 / 900 / 1000, 재사용 대기 · 반복 간격 1300 / 1200 / 1100 / 1000.
+  - 능력치(def `stats`)는 효과량 배율로 자동(합산 `items/scan_add`, 표시 `items/tune/stats_scale`, 반올림).
+  - 효과 수치: 아이템마다 조정 상수 표 `rlk:tune t.<id> = [{n:"#상수",m:"a|d|c"}]`(묶음 파일 `items/tune/b1~b10`, function tag `#rlk:tune_tables`). load 가 넣은 값을 기준값으로 잡고 단계에 맞춰 상수를 다시 계산합니다(`items/tune/register` → `capture` → `apply`). **조정 상수는 load 또는 묶음 파일에서 매번 무조건 설정돼야 합니다**(기준값을 다시 읽기 때문). 강화하면 그 아이템만 다시 계산(`items/enh_add`).
+  - 지금 조정 표: 94개 아이템 중 효과가 있는 아이템의 상수 약 190개(묶음 `b1~b10`). 작은 정수 값(회복 2% 등)은 단계마다 달라지도록 ‰ 단위로 바꿨고(load 의 해당 줄에 표시), 공용 상수(`#st20`, `#100` 등)를 쓰던 반복 간격 · 계수는 아이템 전용 상수로 나눴습니다. 동전 주머니(+1 골드)는 정수라 강화와 상관없습니다.
+  - `items.md` 의 수치는 3단계(★★★, 너프 전) 기준입니다. 게임 안 설명은 지금 단계의 값으로 나옵니다.
+  - 설명의 숫자: def `abilities` 안의 `{tk:{c:"#상수",x:1,d:1,p:0,u:"%"},color:...}` 자리표 = 지금 상수 값(× x ÷ d, 소수 p 자리, 단위 u). 3단계에서 예전 글과 같게 쓰여 있습니다. 바꾼 설명은 `rlk:items disp.<id>` 에 캐시.
 - 새 아이템 추가
   1. `items/<등급>/<id>/def.mcfunction` 작성 (기존 def 참고: `item`, `name`, `type`, `rarity`, `stats`, `abilities`, `desc`)
      - **설명 형식**: `abilities` 는 텍스트 컴포넌트 줄 목록 — 효과 서술 → 빈 줄(`{text:""}`) → `항목: 수치` 줄. 수치는 `#FFE08A`, '불 원소 범위 피해' 같은 문구는 그 원소 색(불 `#FF8A3D` 물 `#4FB8FF` 번개 `#C58BFF` 얼음 `#9FE8F5` 바위 `#F2C14E` 바람 `#6FE3C1` 풀 `#A5D94A`). 캐릭터의 스킬 설명도 같은 형식.
@@ -213,7 +950,14 @@
      - `on_cast_skill`/`on_cast_burst` = 원소전투 스킬/원소폭발을 쓴 순간, `dmg_bonus` = 주는 피해 증가(각인과 합산: `#eb eng` 에 더함), `on_rx` = 원소 반응이 일어났을 때
      - 피해를 받는 도중에 또 피해를 주는 효과는 표식을 소환해 두고 다음 틱에 `tick_world` 에서 처리합니다(얼음 깃촉·양화 참고)
 - 초월 · 악요개안: 피해를 주면 그 자리에 협동 공격(반경 3칸, 공격력의 71% 번개 원소 피해, 쿨타임 1초 — `items/proc/eye_strike`), 원소폭발 피해 +0.3% × 원소 에너지(pt) (`items/hook/burst_dmg` — 새 캐릭터의 원소폭발도 피해 계산 직후 이 함수를 불러야 적용됨)
-- 지급 `function rlk:items/give {id:"sealed_sword"}` / 드롭 `function rlk:items/drop {id:"sealed_sword"}`
+- [ MYTHIC ] 화무십일홍(`sword_hwamu`, 신화, 공격력 +25%, 각인 광전사 · 예리): 특수 보스 홍련의 이벤트 보상으로만 얻는다(`items/build_rarbuckets` 의 `box_exclude` — 상자 · 상점 · 레벨 업 선택 · 나무뿌리에 없음, 도감 신화 칸에는 있음). 모양은 리소스팩의 `rlk:mboss/scarlet/item_sword`(홍련 리그의 검; 없으면 바닐라 철 검이 아니라 모델 없음 표시이므로 리소스팩이 필요). 수치는 ★ 단계 표(`items/tune/b10`의 `t.sword_hwamu`), 효과는 `items/proc/hw_*`(손 파일, 생성기 없음):
+  - 「육참골단」 기본 공격 4번 적중마다 1중첩(최대 5, 중첩마다 공격력 +6%, 6초 · 얻을 때마다 새로 고침, 사이드바 `육참골단`) + 체력이 절반을 넘으면 현재 체력의 4% 소모(1 아래로는 안 내려감, `items/proc/hw_cost`, 살롱의 초대장과 같은 규칙)
+  - 「검신합일」 맞거나(`player/take_damage` 마지막 줄) 대쉬 무적으로 흘려내면(`player/dash_iframe`) 다음 틱에 몸에서 가장 가까운 12칸 안의 적에게 공격력의 138% 번개 원소 피해(아이템 효과 `#sub itv 1`), 재사용 대기 4초(S5: 2초 → 4초; 대상이 없으면 쓰지 않음). 흘려냄은 대쉬 자체의 무적(대쉬한 틱부터 6틱, `items/hook/on_dash` → `hw_dash`)일 때만 — 원소폭발 · 추락 · 로노바 부활의 무적은 같은 `dashInvT` 를 쓰지만 반격하지 않는다(맞은 타격은 쓰러지는 타격까지 그대로). 무적인 보스 몸체(`rlk_mb_inv`: 연출 · 유령 · 연참)는 대상이 아니다(반격도 재사용 대기도 쓰지 않음). 체력 60% 이하이면 치명타 피해 +30%
+  - 「홍련일섬」 원소폭발을 쓰면(`items/hook/on_cast_burst`, 재사용 대기 40초) 4틱 뒤 20칸 안의 모든 적에게 한 번씩 공격력의 500% 번개 원소 피해(S5: 849 → 500%). 시전 때 체력이 50% 이하이면 10초 동안 치명타 확률 +20%. 시전 때 화면 가장자리 어둠 6틱(킷 글꼴 `rlk:mboss_hr` 의 `vig` U+EC16, 큰 제목 `vBig` 이나 아랫줄 글 `ttlT` 가 떠 있으면 생략; `vBig` 은 `view/tick` 이 모든 시점에서 틱마다 줄이므로 1인칭 · 어깨 시점에서도 뜬다)
+  - 타이머는 "끝나는 시각(gametime)"을 적어 두고 다음 할 일까지 남은 틱 하나(`#hwWait`)만 매 틱 줄인다(`items/proc/hw_tick` → `hw_due`): 가지고 있는 동안 틱당 명령 약 9(쉴 때) ~ 11.5(전투, 반격 · 홍련일섬의 피해 처리 제외). 팔거나 버리면 중첩 · 예약 · 사이드바를 지우고(`hw_clear`) 재사용 대기는 남긴다(버렸다 주워도 대기가 없어지지 않음). 런이 바뀔 때(`player/reset_one` → `hw_reset`)는 재사용 대기까지 모두 지운다
+  - ★★★ 가 되는 순간 채팅 「[홍련] 화무십일홍이 한층 더 날카롭게 벼려졌네. 자, 이걸 이제 누구한테 휘두를지 지켜보게나.」(나무위키 대사 그대로, `items/enh_add`)
+  - 소리 `snd/f422`~`f429`(`#k352`~`#k359`, 바닐라 소리만)
+- 지급 `function rlk:items/give {id:"sealed_sword"}` / 드롭 `function rlk:items/drop {id:"sealed_sword"}`. `{id:"help"}` 를 넣으면 아이템 id 와 이름을 등급별로(맨 끝에 캐릭터 아이템) 보여 줍니다(90줄이 넘으니 채팅 창을 열고 위로 올려 보기).
 - 아이템 모양: 기본은 바닐라 아이템 그대로. 리소스팩에 `rlk:<id>` 모델이 있으면
   `/data modify storage rlk:config use_models set value 1b` 후 `/reload`.
 
@@ -233,6 +977,27 @@
 - `/function rlk:reset` — 레벨/스탯/골드/아이템 초기화(진행 중인 런도 중단, 사파이어는 유지), `/function rlk:fix` — 내 캐릭터 재초기화
 - `/function rlk:uninstall` — 엔티티/스코어보드 정리 후 정지
 
+### 명령 도움말 (`help`)
+id 를 외워야 하는 시험 · 지급 명령은 그 인자 자리에 `"help"` 를 넣으면 실행하지 않고 쓸 수 있는 값과 한국어 이름을 채팅에 보여 줍니다(첫 줄 = 명령 모양, 그 아래 한 줄에 하나씩 `id — 이름`). 줄을 누르면 그 값으로 채운 명령이 입력창에 들어갑니다(바로 실행하지 않음). 인자가 둘인 명령은 나머지 인자도 아무 값으로 함께 적어야 합니다(매크로는 인자가 하나라도 빠지면 시작하지 못함).
+
+| 명령 | 도움말 | 목록의 출처 |
+|---|---|---|
+| `rlk:cm/test` · `rlk:cm` | `{t:"help"}` | 1챕터 `tools/help_lib.py` 의 `CM_C1`, 2챕터 `tools/ch2mob/common.py` 의 `TEST_ROWS` (챕터별 묶음) |
+| `rlk:items/give` · `items/drop` | `{id:"help"}` | 아이템 레지스트리(`rlk:items ids`, 등급별) + 캐릭터 아이템(`rlk:codex chars`) |
+| `rlk:char/select` | `{id:"help"}` | `rlk:codex chars` 의 캐릭터(이름 = `rlk:chars registry.<id>.info.name`) |
+| `rlk:element/infuse` · `element/give` · `element/infuse_for` | `{id:"help"}` · `{id:"help",sec:0}` | `element/setup` 의 `rlk:elem ids`(이름 = `byid.<id>.name`) |
+| `rlk:engravings/dev` | `{id:"help",n:0}` | 각인 레지스트리(`rlk:engravings ids`) |
+| `rlk:view/mode` | `{m:"help"}` | 1 숄더뷰 · 2 F5 위쪽 시점 |
+| `rlk:mboss/test/start` · `start_ch` | `{id:"help"}` · `{id:"help",ch:1}` | 중간보스 레지스트리(`tools/mboss_registry.json`, 켜진 것) |
+| `rlk:mboss/test/chapter` · `chapter_ch` (= `rlk:boss/test/…`) | `{id:"help"}` · `{id:"help",ch:1}` | 챕터 보스 레지스트리 |
+| `rlk:mboss/test/rift_id` · `special` · `special_ch` (= `rlk:boss/test/…`) | `{id:"help"}` · `{id:"help",ch:1}` | 특수 보스 레지스트리(`kind:"special"`, 켜진 것) |
+| `rlk:mboss/test/pattern` · `lock` (= `rlk:boss/test/…`) | `{id:"help"}` | 싸우는 중이면 그 보스 모듈의 `test/help`(번호와 이름), 아니면 보스마다 그 목록을 여는 줄 |
+| `rlk:boss/raiden/test/pattern` · `lock` | `{id:"help"}` | `tools/raiden_enc/shogun.py` · `tenma.py` 의 `NAMES` |
+
+- 매크로 함수는 줄 전체를 먼저 해석하므로, 숫자가 들어가야 하는 줄(`scoreboard players set … $(id)`)이 있는 명령은 확인만 하고 `<명령>_do` 로 넘깁니다(`mboss/test/lock_do`, `boss/raiden/test/pattern_do` · `lock_do`, `view/mode_do`). 그래서 `"help"` 를 넣어도 명령이 시작하지 못하는 일이 없습니다.
+- 생성되는 목록은 생성기의 자료에서 만듭니다(직접 고치지 않음): 공용 모양 `tools/help_lib.py`(머리 줄 · 묶음 줄은 `help/head` · `help/sub`, 레지스트리를 도는 목록은 `help/row` · `help/list`). `rlk:cm/test` 목록 `cm/test_help` 는 `help_lib.cm_test_help()` 가 1챕터 목록 + 디스크에 있는 `cm/c<N>/test_help` 마다 한 줄로 다시 씁니다. 새 챕터 몹 생성기는 `w('cm/c<N>/test_help', help_lib.cm_test_section(N, [(id, 이름), …]))` 로 자기 묶음을 쓰고 파일을 쓴 뒤 `help_lib.cm_test_help(<function 폴더>)` 를 부르면 됩니다(어느 생성기를 어떤 순서로 몇 번 돌려도 결과가 같음).
+- 중간보스 · 챕터 보스 모듈은 훅과 함께 `<fn root>/test/help`(시험 번호와 이름)를 꼭 만들어야 합니다(`mboss_lib.HELP_HOOKS`, `check_mboss_pack.py` 가 검사).
+
 ## 10. 방 시스템 (`room/`, `run/`) — 세피리아 방식
 **구성**: 챕터 = 첫 맵 1 + 맵 4 + 보스전 1. 맵 = 구역 여러 개(최대 7), 구역 = 정사각형/직사각형 방.
 
@@ -242,52 +1007,72 @@
 2. **움직이지 말고 빈 지도를 우클릭** → 그 지도가 던전 지도로 등록됩니다. (바닐라 지도는 명령어로 새로 만들 수 없어서 이 한 번만 손으로 합니다)
 3. `/function rlk:run/start` — 캐릭터를 초기화(레벨 1, 아이템·골드 없음)하고 챕터 1의 첫 맵으로 이동. 시작한 자리는 기억해 두고, 부활 지점도 그 자리로 잡습니다(던전이 월드 스폰 위 하늘에 있어서, 부활 지점이 없는 플레이어는 죽으면 던전 바닥판 위에서 부활합니다).
 - `/function rlk:run/stop` — 런 중단, 시작했던 자리로 복귀. 죽으면 런 실패(방 정리 + 캐릭터 초기화).
-- `/function rlk:room/remove` — 던전 구역 블록 제거 + 청크 고정 해제.
+- `/function rlk:room/remove` — 던전 구역 블록 제거 + 청크 고정 해제(중간보스 원형 경기장도 지움).
 - 난이도가 '평화로움'이면 몬스터가 나오지 않습니다.
 
 ### 진행 규칙
 - 문(통로)은 높이 5칸(201~205, 위 장식 206~207). 봉인 무늬는 바닥에서 1칸 올라간 자리.
 - 맵이 시작되면 **첫 구역만** 지어져 있습니다. 다른 구역으로 가는 문은 **검은 콘크리트**(건너편을 알 수 없음)이고,
   문에 다가가면 건너편 구역이 지어지며 문이 열립니다. 이미 열린 구역끼리 다른 문으로 또 이어지는 경우는 드뭅니다(맵당 최대 1곳). 적/보상, 바닥의 구역 종류 무늬, **그 구역의 다른 통로**는 모두 **그 구역 안으로 들어가야** 나타납니다(밖에서는 빈 방으로만 보임).
-- 전투 구역: 들어가면 지나온 문(이미 열린 문)이 철창으로 잠기고(안 가 본 쪽 문은 검은 콘크리트 그대로, 적이 남아 있는 동안에는 그 문을 가로지르는 붉은 줄(가운데 마름모 장식)이 그어져 '아직 못 지나감'을 표시 — 모양은 `room/seal_*`) 1초 뒤 몹이 나옵니다(1챕터 = 커스텀 몹 6종, 그 뒤 챕터는 아직 임시 몹 허스크/스켈레톤/변명자). 전부 잡으면 문이 열립니다. 한 번 간 구역은 자유롭게 오갑니다.
-- 마지막 구역(바닥 흰색): 다음 맵을 고르는 오브젝트 **무작위 3개**(이점 설명 표시). 4번째 맵 다음은 보스전, 보스를 잡으면 다음 챕터.
+- 전투 구역: 들어가면 지나온 문(이미 열린 문)이 철창으로 잠기고(안 가 본 쪽 문은 검은 콘크리트 그대로, 적이 남아 있는 동안에는 그 문을 가로지르는 붉은 줄(가운데 마름모 장식)이 그어져 '아직 못 지나감'을 표시 — 모양은 `room/seal_*`) 1초 뒤 몹이 나옵니다(1챕터 = 커스텀 몹 6종, 2챕터 = 2챕터 몹(5-2절), 3챕터 = 3챕터 몹(5-3절, 우림 · 사막 구역마다 다름), 테스트 설정으로 4챕터부터는 1챕터 6종, `#mobTmp room` 1이면 2챕터부터 임시 몹 허스크/스켈레톤/변명자). 전부 잡으면 문이 열립니다. 한 번 간 구역은 자유롭게 오갑니다.
+- 마지막 구역(바닥 흰색): 다음 맵을 고르는 오브젝트 3개(노드 이름 · 설명 표시, 아래 "노드"). 4번째 맵 다음은 보스전, 보스를 잡으면 다음 챕터.
 - 오브젝트 상호작용: **조준(▶ 좌클릭 표시)하고 좌클릭**.
-- **왼손 지도**: 가 본 구역만 그려지고(안 가 본 곳은 검정) 내 위치가 표시됩니다. 문만 열리고 아직 들어가지 않은 구역은 바닥이 응회암 벽돌(지도에서 어두운 갈색), 들어가 본 구역은 심층암 타일(회색)입니다(들어서는 순간 선 자리에서부터 물결처럼 바뀜, 속도는 `#waveSpeed`). 벽 위의 흰 점은 문 위치, 바닥 한가운데 색은 구역 종류.
+- **던전 지도**(지금은 손에 주지 않고 G 메뉴의 지도 화면에서만 봄): 가 본 구역만 그려지고(안 가 본 곳은 검정) 내 위치가 표시됩니다. 문만 열리고 아직 들어가지 않은 구역은 바닥이 응회암 벽돌(지도에서 어두운 갈색), 들어가 본 구역은 심층암 타일(회색)입니다(들어서는 순간 선 자리에서부터 물결처럼 바뀜, 속도는 `#waveSpeed`). 벽 위의 흰 점은 문 위치, 바닥 한가운데 색은 구역 종류.
 
-| 맵 종류 | 번호 | 내용 |
+#### 노드 (`room/node/`)
+- 마지막 구역의 다음 맵 선택지 3개에는 **노드**가 1개(가끔 2개, `#node2Pct` %) 붙습니다. 노드 맵은 일반 배치(구역 5~7개)를 쓰고, 노드마다 **서로 다른 중간 구역** 하나가 그 노드 구역이 됩니다. 맵 제목은 노드 이름("골드 · 상점").
+- 세 선택지에 **같은 노드가 두 번 나오지 않습니다**(`rlk:room used`). 뽑기 가중치는 `room/node/register` 의 `nw`.
+- **한 번 고른 노드는 그 챕터에서 다시 나오지 않습니다**(`rlk:room seen`, 새 챕터·새 런에서 비움). 남은 후보가 모자랄 때만 예외로 다시 허용합니다.
+- 재련 맵 규칙(`#rfCount`)은 쓰지 않고, 맵 선택지 리롤도 없습니다.
+
+| 노드 | 구역 종류(zkind) · 바닥 | 내용 |
 |---|---|---|
-| 첫 맵 | 0 | 구역 3~4개, 전투 구역만 |
-| 돈 | 1 | 구역 5~7개 중 하나가 돈 구역(노랑): 금화 더미 → 골드 `#roomGold` × 챕터 |
-| 상점 | 2 | 하나가 상점 구역(주황): 상인 등장(거래 기능은 아직 없음) |
-| 사파이어 | 3 | 하나가 사파이어 구역(하늘색): 사파이어 2개 |
-| 레벨업 | 4 | 첫 구역이 직사각형. 반대쪽에 다가가면 '경험의 샘'이 생겨 지금 레벨의 필요 경험치만큼 쏟아냄. 통로는 스폰 때 바라보는 방향 끝에 하나뿐 |
-| 나무뿌리 | 5 | 직사각형 구역(나무뿌리, 기능은 아직 없음) + 마지막 구역. 통로는 스폰 때 바라보는 방향 끝에 하나뿐 |
-| 재련 | 6 | 하나가 재련 구역(빨강): 모루(기능은 아직 없음). 한 판에 최대 2번(`#rfMax`)만 고를 수 있음. 고르기 전까지는 선택지에 계속 나올 수 있고, 2챕터의 마지막 선택에는 (횟수가 남아 있으면) 반드시 나오며, 3챕터부터는 나오지 않음 |
-| 인챈트 | 7 | 하나가 인챈트 구역(보라): 마법 부여대(기능은 아직 없음) |
-| 보스전 | 8 | 첫 구역 + 큰 방(2×2)의 임시 보스 |
+| 골드 | 3 · 노랑 | 금화 더미 → 골드 `#roomGold` × 챕터 |
+| 상점 | 4 · 주황 | **반드시 다른 노드와 함께** 나옴. 가운데 상인 + 진열대 8개(아이템 6 · 회복 소/대). 아래 "상점 노드" |
+| 사파이어 | 5 · 하늘색 | 사파이어 `#roomSapphire` 개 |
+| 인챈트 | 7 · 보라 | 마법 부여대 → 인챈트 화면에서 가진 아이템을 2~4번 강화(별 +1, 같은 아이템 여러 번 가능) |
+| 나무뿌리 | 8 · 이끼 | 세계수의 기적: 각인 셋 중 하나 → 그 각인 개수 +1(임시 효과) + 그 각인이 달린 아이템 하나. **한 판에 한 번**(받은 뒤로는 선택지에 안 나옴, `#mirUsed`). **다른 노드와 같이 나오지 않음**(혼자만) |
+| 레벨업 | 10 · 연두 | **첫 구역**에 경험의 샘(레벨업 배치 `L.levelup`: 첫 구역이 직사각형, 샘은 스폰 반대쪽). 다가가면 지금 레벨의 필요 경험치만큼 쏟아냄. 같이 붙은 다른 노드는 중간 구역에 |
+| 주사위 | 11 · 흰색 | 주사위 `#diceGain`(2) 개. 레벨 업 아이템 선택의 리롤권 |
+| 보유 칸 | 12 · 청록 | 아이템 보유 칸 +2(최대 18). **3챕터부터**, 드물게(가중치 3), 18칸이면 안 나옴 |
+| 생명력 | 13 · 분홍 | 최대 체력 +10%(`#hpNodePct`, 런 동안, 점수 `nodeHp`) |
+| 아이템 | 14 · 파랑 | 누르면 바로 아이템 선택 화면(레벨 업 선택과 같음, Shift+F 대신 클릭으로 들어감) |
+| 중간보스 | 15 · 붉은 테라코타 | 구역 한가운데 문 오브젝트(이번에 나올 중간보스 이름). 누르면 전투 → 원형 경기장으로 이동 → 처치 시 문 자리에 아이템 상자 2개(하나 = 챕터 등급 아이템 선택 1번). 아래 "중간보스". 가중치 7, 1챕터 첫 선택지에는 안 나옴, 뽑을 수 있는 중간보스(가중치 1 이상)가 등록되어 있을 때만 나옴 |
 
-### 지형 · 테마 (build/layouts3.py)
+- 첫 맵(0)은 전투 구역만, 4번째 맵 다음은 보스전(8). 예전 판의 맵 종류 선택지(1~7)는 누르면 비슷한 노드 맵으로 바뀝니다(`room/node/legacy`).
+
+#### 상점 노드 (`room/obj/k_shop`, `shop/node/`)
+- 구역 한가운데에 상인, 앞뒤 두 줄로 진열대 8개(윤나는 안산암 + 유리). 진열대 자리는 비우고 구덩이는 메웁니다.
+- 아이템 6개: 이미 가진 아이템 제외, 챕터와 상관없이 등급 확률 일반 30 · 레어 30 · 유니크 25 · 레전더리 15(`rlk:shop nodewt`). 값(`rlk:shop nodeprice`, 임시) 일반 400 · 레어 700 · 유니크 1200 · **레전더리 2000**.
+- 회복 2개(`rlk:shop heals`): 소 = 최대 체력 30% · 150 골드, 대 = 70% · 300 골드. 체력이 가득하면 살 수 없습니다.
+- 구매는 기존 상점과 같음(가격표를 조준하고 좌클릭). 진열대 엔티티는 `rlk_room` 이라 맵이 바뀌면 사라집니다.
+
+### 지형 · 테마 (build/layouts3.py → tools/flatten_zones.py)
 - 벽 높이 10칸(y 201~210). 구역마다 고저차 지형: 완만한 언덕(1칸씩) · 절벽 대지(3~4칸) + 경사로 · 바위 기둥 · 벽에서 튀어나온 바위.
-- **구역 높이**: 구역마다 바닥 높이(`by`, 0~5)가 다르다. 문은 높은 쪽 바닥 높이에 뚫리고, 낮은 쪽 구역에는 문까지 이어지는 **언덕**(`hill_for`)이 생긴다: 문 앞(깊이 2~3, 문 폭 + 양쪽 2칸)이 문 높이로 평평하고, 벽을 따라 완만하게 · 방 안쪽으로 1칸씩 낮아짐(타원 등고선, 이웃 칸 높이 차 ≤ 1). 문 블록 · 표식 높이는 문 data 의 `y0 y1 l0 l1 my`.
+- **구역 높이 없음**: 모든 구역의 바닥이 같은 높이(바닥 블록 y 200, 서는 자리 y 201)이고, 문(통로)은 양쪽 모두 바닥 높이(y 201~205)에 뚫린다. 그래서 문 앞에는 언덕 · 경사로가 필요 없고, 어떤 구역에서도 문까지 평지로 걸어갈 수 있다. 위의 고저차 지형은 구역 **안쪽**에만 있고 문 앞(문 쪽 첫 줄)은 늘 바닥 높이다.
+  - 예전에는 구역마다 바닥 높이(`by`, 0~5)가 달라서 문이 높은 쪽 바닥에 뚫리고 낮은 쪽 구역에 문까지 오르는 언덕(`hill_for`)이 있었는데, 상점이 진열 자리를 비우며(`room/obj/k_shop`) 그 언덕을 깎으면 높은 문에 오를 길이 없어져서 기능 자체를 없앴다.
+  - 배치 · 구역 건설은 저장소 밖의 `build/layouts3.py` 가 만든 것을 `tools/flatten_zones.py` 가 평평하게 고친 결과다(`room/data` · `room/lz/*`, 손으로 고치지 말 것). 구역이 높았으면 구역 전체(벽 · 조명 · 무늬 · 지형 · 낙사 구간 · 물 · 프롭 · 횃불)를 그만큼 내리고, 문 앞 언덕(문 앞 줄에서 내리막으로만 이어지는 솟은 지형)은 지우며 그 위의 프롭은 바닥으로 내린다. 다시 돌려도 바뀌지 않는다. `build/layouts3.py` 로 배치를 다시 만들면 이 도구도 다시 돌릴 것(아니면 그 생성기에서 `by` = 0, `hill_for` 없음으로).
+  - 구역 기록의 `by` 는 항상 0, `cy` 는 201, 문 data 는 `h:0 y0:201 y1:205 l0:206 l1:207 my:201 tm:210`(기록 형식만 남김).
 - 플레이어 · 아바타는 `step_height` 0.6(1칸 단차는 점프), 대쉬는 한 번에 1칸 단차 한 번만 넘는다. 2칸 이상은 절벽.
 - 구역 건설 = 미리 만든 함수 `room/lz/<배치><번호>_<구역>_<테마>` 하나(칸 → 무늬 → 지형 → 낙사 구간 → 프롭). 몹은 그 자리의 땅 위에 나온다(`room/mob_up`).
 - 테마: 1챕터 = 평원(몬드 · 리월, `#th` 3), 2챕터 = 이나즈마(벚꽃 · 도리이 · 작은 신사 · 궁전 담장 · 벽에 등을 댄 목조 집과 가게 · 단 가장자리 나무 난간, `#th` 4), 그 뒤 홀수 = 폐광산(1), 짝수 = 숲(2). 3챕터 = 수메르(`#th` 5): 구역마다 우림(정글 거목 · 큰 버섯 · 버섯 등 · 쓰러진 통나무 · 진흙 벽돌 유적) 또는 사막(야자수 · 천막 · 데쉬레트 유적 문 · 오벨리스크 · 화석 · 항아리, 마른 풀) — 구역 data `sd`(1 = 사막). 사막 구역 바닥은 `u2`(붉은 모래) → `v2`(모래)로 바뀐다(`room/wave_fill2`). 4챕터 = 폰타인(`#th` 7): 칸마다 강(벽에서 벽까지 흐르는 폭 2~3칸 물길 + 판자 다리) · 호숫가(벽에 붙은 물 + 모래 기슭) · 연못(`gen_water`). 물은 깊이 1칸(바닥 = 점토)이라 빠져도 걸어 나올 수 있고, 걸음 검사에서는 못 지나가는 칸으로 본다. 하얀 석회암 · 석영 유적 기둥 · 분수 · 구리 파이프 아치 · 구리 전구 가로등 · 벤치, 푸른 · 흰 꽃. 낙사 구간 바닥은 물. 5챕터 테마는 추가 예정.
-- 벽 맨 위 한 겹은 모든 테마에서 어두운 블록(`WALL_CAP` = 윤나는 심층암). 문 위치는 그 벽 맨 위(y 210 + 구역 높이)에 흰 블록으로 표시(지도의 흰 점). (남은 적 위치 표시는 없앰)
+- 2챕터(`#th` 4)의 집 · 가게(`room/prop/i_house_*` · `i_shop*`) 안에는 몹이 나오지 않는다: `room/mob_up` 이 `#th` 4 일 때 발밑이 가문비나무 판자인 자리를 거른다(이 테마에서 가문비나무 판자는 집 · 가게의 실내 바닥에만 쓰임. 벽 · 문 칸은 원래 막혀서 안 나옴). 처마 밑 · 도리이 · 신사(`i_hall`) · 나무 밑은 그대로 나오고, 판자 바닥 · 다리를 쓰는 다른 테마는 바뀌지 않는다. 2챕터 프롭에 가문비나무 판자를 새로 쓰거나 집 안에 가구를 놓으면 이 검사도 같이 볼 것.
+- 벽 맨 위 한 겹은 모든 테마에서 어두운 블록(`WALL_CAP` = 윤나는 심층암). 문 위치는 그 벽 맨 위(y 210)에 흰 블록으로 표시(지도의 흰 점). (남은 적 위치 표시는 없앰)
 
 - 같은 효과음은 한 틱에 한 번만 난다: 빌드 마지막 단계 `build/psnd.py` 가 모든 playsound 를 `rlk:snd/f<n>` 로 감싸고 (소리 · 높낮이)마다 `#k<n> snd` 로 막는다(매 틱 `rlk:tick` 처음에 지움). macro 줄은 제외.
 
 ### 구조 (고칠 때 참고)
 - 배치(구역 모양·문 위치)는 미리 만들어 `room/data` 에 넣어 둔 목록에서 무작위로 고릅니다(첫 맵 12, 일반 30, 레벨업 12, 나무뿌리 8, 보스 8종). 격자 6×6, 칸 한 변 20블록.
 - 진행 상태: `room` 스코어의 `#active` `#chapter` `#mapIdx`(0 첫 맵 ~ 5 보스전) `#mapType` `#combat`(전투 중인 구역 번호).
-- 구역 표식(marker, 태그 `rlk_zone`): `zid` `zkind`(0 시작 1 전투 2 마지막 3 돈 4 상점 5 사파이어 6 재련 7 인챈트 8 나무뿌리 9 보스 10 레벨업 시작) `zst`(0 미건설 1 건설 2 진입 3 완료)
+- 구역 표식(marker, 태그 `rlk_zone`): `zid` `zkind`(0 시작 1 전투 2 마지막 3 골드 4 상점 5 사파이어 6 재련(안 씀) 7 인챈트 8 나무뿌리 9 보스 10 레벨업 11 주사위 12 보유 칸 13 생명력 14 아이템 15 중간보스) `zst`(0 미건설 1 건설 2 진입 3 완료)
 - 문 표식(`rlk_door`): `da` `db`(잇는 구역) `dst`(0 숨김 1 닫힘 2 열림) `dvis`(1 = 맞닿은 구역에 들어가 봐서 보이는 문)
-- 오브젝트(`rlk_obj`): `oact`(1 돈 2 사파이어 3 상인 4 재련 5 인챈트 6 나무뿌리 7 다음 맵 8 다음 챕터) — 기능을 붙일 곳은 `room/obj/click`.
+- 오브젝트(`rlk_obj`): `oact`(1 골드 2 사파이어 3 상인 4 재련(안 씀) 5 인챈트 6 나무뿌리 7 보스전 8 다음 챕터 9 노드 선택지(`oarg` = 선택지 번호, 노드 = `rlk:room offers[i].nodes`) 10 주사위 11 보유 칸 12 생명력 13 아이템 14 중간보스 문 15 중간보스 아이템 상자) — 기능을 붙일 곳은 `room/obj/click`. 고른 노드는 `rlk:room next`, `#mapType` 1 = 노드 맵.
 - 몹 종류/수치: `room/mob_summon`, `room/mob_init`, 보스: `room/boss_spawn`. 구역에 들어갔을 때의 처리: `room/zone_enter`.
-- 직접 맵 넘기기(테스트): `/scoreboard players set #mapType room 4` → `/function rlk:run/next_map`
+- 직접 맵 넘기기(테스트): `/data modify storage rlk:room next set value [11,4]` → `/scoreboard players set #mapType room 1` → `/function rlk:run/next_map` (노드 = 구역 종류 번호)
 
 ## 11. 캐릭터 (`char/`)
-- 캐릭터는 하나를 골라 플레이합니다(교체 없음). 선택: `/function rlk:char/select {id:"lumine"}` — 지금은 기본 캐릭터 **루미네**만 있습니다.
-- 캐릭터마다 무기 타입(한손검 `sword` / 활 `bow` / 법구 `catalyst`) 하나가 고정입니다. **지금은 한손검의 기본 공격만 구현**되어 있습니다.
+- 캐릭터는 하나를 골라 플레이합니다(교체 없음). 선택: `/function rlk:char/select {id:"lumine"}` — 등록된 캐릭터는 8명(루미네(기본) · 요이미야 · 스커크 · 클로린드 · 아를레키노 · 나비아 · 로노바 · 네페르, `char/setup`)입니다. 캐릭터 id 목록: `{id:"help"}`.
+- 캐릭터마다 무기 타입(`weaponType`) 하나가 고정입니다: 한손검 `sword`(루미네 · 스커크 · 클로린드) / 활 `bow`(요이미야) / 장병기 `polearm`(아를레키노) / 양손검 `claymore`(나비아) / 법구 `catalyst`(로노바) / `kick`(네페르: 무기 이름은 법구지만 발차기). `char/load_cur` 가 이를 `#wType`(`bow` 2 · `catalyst` 3 · 나머지 1)으로 바꾸고 `combat/on_attack` 이 평타를 나눕니다: 1 은 근접 틀 `combat/find`(스커크 · 아를레키노 · 나비아는 리그 동작 `char/motion/combat/request`, 나머지는 `combat/find_immediate` — 네페르의 발차기 · 환영극도 그 안에서 갈라짐; 클로린드는 `#clShoot 1` 인 동안 `char/clorinde/auto_toggle`), 2 는 `char/bow/*`(`na`, 조준 중이면 `release`), 3 은 `char/ronova/na`.
 - 인벤토리 0번 칸 = 캐릭터 정보(플레이어 머리, 캐릭터 스킨). 핫바 1번 = 원소전투 스킬, 2번 = 원소폭발.
 - **원소전투 스킬**: 재사용 대기로 동작. 대기 중에는 아이템이 회색 염료로 바뀌고 개수 = 남은 초.
 - **원소폭발**: 원소 에너지가 필요량만큼 차야 사용(사용하면 0). 아이템 이름 = `(이름) - [|||||||||||||||] 40/60pt`, 가득 차면 반짝임.
@@ -319,13 +1104,17 @@
 - 레벨이 오를 때마다 아이템 선택 기회가 1 쌓입니다(`pkPending`, 사이드바 '아이템선택'). 테스트: `/function rlk:lvup/add {n:1}`
 - **무기(핫바 0번)를 든 채 Shift + F** → 선택 공간(검은 방)으로 이동. 전투 중(방의 문이 잠긴 동안)에는 이동할 수 없습니다. 다시 Shift + F = 돌아가기(선택지는 그대로 남음).
   - 선택 공간: 오버월드 x 96~111, y 188~202, z 0~10 의 검은 콘크리트 상자(처음 쓸 때 자동으로 지어짐, 그 청크는 항상 불러와 둠). 플레이어는 가운데 한 칸에 서서 움직일 수 없습니다.
-- 화면(정면 벽): 왼쪽 = 선택지(3개 삼각형 / 4개 사각형 / 5개 오각형, `#pkChoices`) + 아래에 리롤(골드 `#pkRerollCost`)·넘기기, 가운데 = 보유 아이템 3×3, 오른쪽 = 각인.
-  - 조준하면 조준점 옆에 설명 창이 뜨고, 좌클릭으로 누릅니다. 선택지 → 확인 창(확인/취소) → 인벤에 자리가 있으면 획득, 9칸이 가득 찼으면 바꿀 보유 아이템을 고릅니다(바뀐 아이템은 사라짐).
+- 화면(정면 벽): 왼쪽 = 선택지(3개 삼각형 / 4개 사각형 / 5개 오각형, `#pkChoices`) + 아래에 리롤(**주사위**: 한 번 고를 때마다 첫 리롤은 무료, 그 뒤로 주사위 `#pkRerollDice` 개씩, 값이 오르지 않음. 주사위가 없으면 리롤 불가)·넘기기, 가운데 = 보유 아이템 3열 × 6줄(잠긴 칸은 어둡게) + 그 오른쪽 위에 현재 캐릭터, 오른쪽 = 각인.
+  - 조준하면 조준점 옆에 설명 창이 뜨고, 좌클릭으로 누릅니다. 선택지 → 확인 창(확인/취소) → 인벤에 자리가 있으면 획득, 열린 칸(`invCap`)이 가득 찼으면 바꿀 보유 아이템을 고릅니다(바뀐 아이템은 사라짐).
   - 선택지는 이미 가진 아이템과 겹치지 않게, 챕터별 등급 확률(`items/roll_rarity`)로 뽑습니다. 후보가 모자라면 더 적게 나옵니다.
 - **각인**: 지금은 등록된 각인이 없고 표시 틀만 있습니다. `engravings/register` 에 `registry.<id> = {name,color}` 와 `ids` 를 넣고, 아이템 def 에 `engravings:["<id>",...]` 를 달면 각인 창에 개수가 나옵니다(효과는 아직 없음).
   - 고르는 중에 보유 아이템을 조준 → 그 아이템이 가진 각인의 개수가 노란색.
   - 선택지를 조준하거나, 가득 찬 인벤에서 바꿀 아이템을 조준 → `지금 → 바뀐 뒤` 로 표시(늘어남 초록, 줄어듦 빨강).
-- 구조: 모드 `pkMode`(1 고르는 중 / 2 확인 창 / 3 바꿀 아이템 고르기), 조준 대상 `pkHK`(1 선택지 2 인벤 3 리롤 4 넘기기 5 확인 6 취소)·`pkHI`, 화면 그리기 `lvup/ui/draw*`, 클릭 처리 `lvup/act/*`, 선택지 `storage rlk:lvpick choices`.
+- **주사위**(점수 `dice`): 주사위 노드에서 2개씩 얻고 런마다 0. 액션바 골드 옆에 `⚄ N`.
+- **나무뿌리 화면**(pkMode 7, `root/`): 각인 카드 셋(가진 각인 중 무작위, 셋이 안 되면 나머지는 가지지 않은 각인). 카드마다 **함께 얻는 아이템을 미리 정해 보여 줍니다**(카드 아래 아이콘 · 이름, 조준하면 설명 창에 그 아이템 설명까지. `rlk:room rooti`, 그 각인이 달린 아이템 중 가지지 않은 것 · 다른 카드와 겹치지 않는 것에서 무작위). 고르면 `rlk:pinv mir` = 그 각인(개수 +1, `engravings/scan` · 각인 창 · 인벤토리 각인 칸에 "✦ 세계수의 기적")과 보여 준 아이템(칸이 가득하면 나갈 때 발밑에). 고르지 않고 돌아가면 나무뿌리는 남고 선택지도 같음.
+- **인챈트 화면**(pkMode 8, `ench/`): 보유 아이템 18칸(9칸씩 두 줄, 칸 아래에 별). 누를 때마다 그 아이템의 강화 단계 +1(최대 ★★★), 남은 횟수 -1(인챈트대의 `oarg` 에도 반영). 다 쓰면 인챈트대가 사라지고 돌아갑니다.
+- 노드 화면은 `lvup/enter {mode:N}` 으로 들어가고 `lvup/exit` 로 나옵니다(Shift+F 로도 나감).
+- 구조: 모드 `pkMode`(1 고르는 중 / 2 확인 창 / 3 바꿀 아이템 고르기 / 4 인벤토리 상세 / 5 교체 확인 / 6 도감 / 7 나무뿌리 / 8 인챈트), 조준 대상 `pkHK`(1 선택지 2 인벤 3 리롤 4 넘기기 5 확인 6 취소)·`pkHI`, 화면 그리기 `lvup/ui/draw*`, 클릭 처리 `lvup/act/*`, 선택지 `storage rlk:lvpick choices`.
 
 ## 12-1. 각인 (`engravings/`)
 아이템에 달린 각인을 모은 개수에 따라 효과가 단계별로 켜집니다. **각인 목록과 수치의 원본은 데이터팩 폴더의 `engravings.md`** 이고, 여기에는 구현된 것만 적습니다.
@@ -358,8 +1147,8 @@
 - 단계(필요한 개수)는 각인마다 자유롭게 정할 수 있습니다(`engravings/register` 의 tiers).
 - **한 아이템에 각인은 두 개.** 기존 아이템의 각인은 `items/engr_assign` 에 모아 두었습니다.
 - 아이템에 달기: 아이템 def 의 registry 값에 `engravings:["guard","amplify"]` 처럼 넣습니다. 달린 각인은 아이템 설명에 "각인  수호 · 증폭" 한 줄로 나옵니다.
-- 표시(`engravings/info_build`): 인벤토리 첫 줄 오른쪽에서 두 번째 칸의 **◆ 각인** 아이템 = 가진 각인의 이름과 개수만. **인벤토리 셋째 줄** = 각인마다 아이템 하나(개수 많은 순, 아이템 개수 = 각인 개수, 설명은 켜진 효과만 밝게). 9개를 넘는 나머지는 핫바 8번 칸(맨 오른쪽)에 이름과 개수만. 각인 아이템의 모양은 `engravings/register` 의 `icon`.
-- 시험용: `/function rlk:engravings/dev {id:"guard",n:4}` — 아이템 없이 개수를 더합니다(n:0 이면 해제).
+- 표시(`engravings/info_build`): **인벤토리 첫 줄 3~6번 칸** = 개수가 같은 각인끼리 한 칸에 묶어 개수 많은 묶음부터 왼쪽에(아이템 개수 = 각인 개수, 이름 = "◆ 첫 각인 외 k종  n개", 설명은 묶음 안의 각인마다 켜진 효과만 밝게). **7번 칸** = 네 묶음을 넘는 나머지 각인의 이름과 개수(나머지가 없으면 가진 각인 전체 요약). 각인 아이템의 모양은 `engravings/register` 의 `icon`.
+- 시험용: `/function rlk:engravings/dev {id:"guard",n:4}` — 아이템 없이 개수를 더합니다(n:0 이면 해제). 각인 id 목록: `{id:"help",n:0}`.
 - 수치는 `load.mcfunction` 의 "각인 수치", 설명 글은 `engravings/register` 에 있습니다(둘을 같이 고칠 것).
 - 보물의 '골드 획득 +20%'는 돈 구역 보상과 몹이 떨어뜨린 골드에 적용되고, 아이템 판매에는 적용되지 않습니다.
 - '주는 피해 증가'(수호·불굴·빙설·처형·반석·광전사)는 서로 더해서 한 번에 곱하고, 반응 피해(과부하·확산 등)에는 적용하지 않습니다. 심연의 탄환이 일으킨 반응으로는 심연의 원소가 쌓이지 않습니다.
@@ -367,32 +1156,1293 @@
 
 ## 나루카미 보스전 (`boss/raiden/`)
 
-- 모든 스테이지의 임시 보스를 **마가츠 미타케 나루카미노 미코토**로 통일합니다. 보스방을 새로 생성할 때 중앙 `(0,201,0)`, 보행 반경 23칸의 평평한 원형 필드와 남쪽 입구를 만듭니다. `boss_id:"narukami"`인 방에만 장식·지형 굴곡·중앙 무늬·바닥 변환을 생략합니다. 다른 방의 생성 규칙은 유지합니다.
-- 첨부 스킨을 그대로 사용하는 몸체와 대형 검 오른팔·받침 왼손·후방 보조 팔 한 쌍, 갑주·후광·나기나타·거대 번개 검을 29개 디스플레이로 표현합니다. 총 23개 모션 상태를 사용하며 일반 상태·변신·악요의 요구우 텐마·무력화를 구분합니다.
-- 일반 상태의 6가지 패턴: 태도 연격, 나기나타 찌르기와 검파, 순간이동 발도, 3개 뇌안, 4개 분신, 추적 낙뢰. 뇌안은 하나를 파괴하고 그 주변 빈 공간으로 이동하며, 분신은 X자 표시를 내는 진짜를 공격하면 무력화됩니다.
-- 변신 상태의 8가지 패턴: 거대 팔 연격과 번개 투척, 양손 협격, 목표 위치에 나타나는 인공팔 내려찍기, 세 말뚝의 순차·동시 확산 고리, 최종 재앙, 거검 내려베기, 다섯 갈래·가로 검파, 발도 돌진. 고리는 점프로 피할 수 있습니다.
-- 바닥의 자홍색 경계가 예고, 흰색·보라색 선이 실제 타격입니다. 조준은 예고 시작 때 고정합니다. 일반적인 선딜은 20~42틱이며 거대 손도 범위 위에서 잠시 머물다가 내려옵니다. 피해 판정은 카메라가 아닌 실제 몸의 위치를 사용합니다.
-- 약 30초의 악연 에너지 또는 첫 체력 55% 경계에서 변신합니다. 변신 중·분신 도전 중에는 본체가 보호됩니다. 갑주가 있는 동안 몸 피해는 20%만 받고, 물리 공격으로도 갑주를 깰 수 있지만 불·얼음 공격이 더 효과적입니다. 갑주는 시간에 따라서도 약해집니다.
-- 변신 중 원소 에너지가 초당 1 감소합니다(스커크의 별도 자원은 제외). 갑주 파괴 후 8초 동안 보스가 무력화되고 받는 피해가 2배가 되며 플레이어의 폭발 자원이 충전됩니다. 이후 일반 상태로 돌아옵니다.
-- 최종 재앙은 6초 안에 추억의 꽃을 **번개 1타 또는 다른 공격 4타**로 활성화하고 푸른 반경 4칸 보호막 안으로 들어가야 합니다. 성공하면 갑주도 크게 약해집니다. 밖에 남으면 대시 무적·일반 보호막과 관계없이 쓰러지며, 기존 로노바 부활 규칙은 적용됩니다.
-- 체력은 기존 보스 레벨 배율을 사용합니다. 전투 종료·방 초기화·시스템 해제 때 부품·공격·오브젝트와 보스바를 정리합니다. `/reload` 중에는 예약 공격을 취소하고 기존 체력을 보존한 채 리그를 다시 생성합니다.
-- 원본 생성기는 `tools/build_raiden_encounter.py`, `build_raiden_hazards.py`, `build_raiden_arena.py`, `build_raiden_rig.mjs`입니다. 모션 인터페이스는 `tools/raiden_rig_manifest.json`에 기록했습니다. 효과음은 마인크래프트 기본 음원만 사용합니다.
-- 참고: [사용자가 지정한 패턴 영상](https://www.youtube.com/watch?v=3VLztONXLsA). 영상의 패턴과 실루엣을 마인크래프트 전투에 맞게 새로 구현했으며, 나무위키 3.2절은 브라우저 접근 제한으로 직접 열람하지 못했습니다. 게임 안에서의 동작 확인은 아직 하지 않았습니다.
+- 모든 스테이지의 임시 보스를 **마가츠 미타케 나루카미노 미코토**로 통일합니다(단, **1챕터는 야타용왕 · 3챕터는 아펩 · 4챕터는 아를레키노**: 아래 "챕터 보스"; 2챕터와 5챕터 이후는 그대로 나루카미). 보스방을 새로 생성할 때 중앙 `(0,201,0)`, 보행 반경 23칸의 평평한 원형 필드(아래 "경기장": 일심정토)와 남쪽 입구를 만듭니다. `boss_id:"narukami"`인 방에만 장식·지형 굴곡·중앙 무늬·바닥 변환을 생략합니다. 다른 방의 생성 규칙은 유지합니다.
+- **리워크(영상 v1-v9 기준)**: 모델과 패턴을 참고 영상과 위키에 맞춰 새로 만들었습니다. 예전 판(52개 디스플레이, 25개 모션 상태, 7+8 패턴, 심판 리그, 카메라 고정)은 모두 대체되었고, 아래 "2026-10-10 수정"의 나루카미 기록은 예전 판의 것입니다.
+
+**모델**
+- 디스플레이 30개 리그(`tools/build_raiden_rig.mjs`, 공용 RIGLIB)가 두 형태를 바꿔 입습니다. **쇼군**: 키 2.0칸, 검 또는 나기나타. **텐마**: 1칸 떠 있는 본체, 오른쪽의 거대 팔과 나기나타, 왼쪽에 펼친 가는 팔 3개, 황갈색 손 2개, 문장이 있는 원반 후광. 첨부 스킨을 그대로 씁니다.
+- 클립 45개와 소품(뇌안 · 칼날 눈 · 몽상 구슬 · 금강저 · 추모의 꽃 · 보호막 · 박수 손 · 손바닥 · 꽂힌 나기나타 · 분신)은 `tools/raiden_rig_manifest.json`(v2), 호출 방법은 `tools/raiden_rig_api.md`. 패턴의 타격 틱은 클립 이벤트에서 가져옵니다. 리그 부품 · 소품 · 몸은 바닥 아래로 내려가거나 숨겨지지 않습니다(숨길 때는 `rig/state/hidden`).
+
+**경기장 — 일심정토** (`tools/build_raiden_arena.py` → `room/raiden/*`, 배경 판 `tools/build_raiden_backdrop.py`)
+- 중앙 `(0,201,0)` · 보행 반경 23칸은 그대로입니다. 돌벽 대신 보이지 않는 방벽(반경 23~24, y 201~210, 입구 부두 둘레)이 막고, 바닥은 지평선(반경 60)까지 이어지는 잔잔한 물빛입니다. 모두 미끄럽지 않은 꽉 찬 블록입니다: 하늘색 콘크리트 가루 바탕에 중심을 도는 가는 물결선(청록 콘크리트 가루 · 청록 콘크리트), 하나씩 반짝이는 프리즈머린, 소용돌이 쪽으로 물결이 줄어드는 밝은 띠와 반경 30 밖의 바다 랜턴 반짝임(보행 구역 안에는 광원 없음), 멀리는 옅은 양털 안개.
+- 하늘: 블록 돔(반경 60, 꼭대기 y 229)이 오버월드의 하늘 · 해 · 하늘빛을 가립니다. 안쪽 껍질에 붙인 빛 블록만으로 밝혀 지평선은 밝은 띠(13), 위는 어두운 청록(7, 꼭대기 8), 소용돌이 뒤는 청록 빛(최대 10)입니다. 지붕 바깥의 빛 블록 약 330개가 드러난 윗면을 모두 밝혀 지붕에 몹이 생기지 않습니다(생성기가 빛 퍼짐을 계산해 확인). 디스플레이 12개가 얹힙니다: 별(16면 고리 + 꼭대기), 지평선 안개 고리(16면, 45° 기울임), 북쪽 지평선의 청록 소용돌이(뒤 빛무리 + 2분에 한 바퀴 도는 소용돌이), 그 발치와 가장자리의 안개 자락. 배경 텍스처 5장 413,696 픽셀.
+- 빛: y 204의 빛 블록(바닥 밝기 12, 보스 이동의 공기 검사 y 201~202 위; 보행 원은 빈틈없이, 그 밖은 한 줄 걸러)과 껍질의 띠(벽은 고리, 지붕 밑은 줄로 한 칸씩 걸러 한 단계 높게: 부드러운 조명이 고르게 평균)뿐이라 바닥 전체가 밝고(생성기가 확인, 몹 생성 없음) 보행 구역에 눈부신 점이 없습니다.
+- 입구: 어두운 돌 부두와 붉은 도리이, 양옆의 영혼 등롱. 기존 문이 도리이를 채웁니다(닫힘 = 검은 문, 열림, 전투 중 창살).
+- 짓는 시점: 입구(구역 1)를 지을 때(맵 생성) 부두를 짓고 배경(약 4.4만 블록)을 20조각으로 한 틱에 하나씩 짓습니다(`room/raiden/bg/tick` · `bg/s/<i>`, 조각당 4000블록 · 명령 600개 이하; 맵이 사라지면 중단, 청크가 안 불러와지면 200틱까지 기다림; 마지막 조각이 디스플레이를 소환; 26.3 서버에서 조각당 약 4 ms). 경기장(구역 2)은 문이 열릴 때(시험 시작은 바로) 보행 사각형(바닥 · 방벽 · 빛)과 표식만 한 번에 짓고, 배경 작업이 돌지 않았으면 다시 시작합니다. 지우기는 기존 구역 지우기가 합니다(약 5 ms): 구역 1에 던전 상자 전체를 덮는 지우기 전용 띠 11개(128 × 12, x0 −64라 화면 미니맵은 무시)를 넣었고, 디스플레이는 `rlk_room` 입니다.
+- 텐마 모습: `look_tenma` / `look_shogun` 이 가까운 물(x/z −47~46, y 200)의 네 블록을 `replace … strict` 로 남색 · 보라 물로 바꾸고 되돌립니다(한 틱, 약 5.5천 블록). 먼 안개 물 · 반짝임 · 부두 · 하늘은 그대로입니다.
+
+**흐름**
+- 등장 자막 「라이덴의 이나즈마 전하」(등장 연출 없음). **쇼군**(단계 0) → 악연 에너지 900틱(보스가 맞힐 때마다 +60) 또는 첫 주기의 체력 55% → **변신**(단계 1, 60틱, 무적) → **텐마**(단계 2, 번개 갑주 750) → 갑주 0 → **무력화**(단계 3, 300틱, 받는 피해 2배, 플레이어 원소 에너지 충전, 자막 「갑주 파괴」) → 무기를 바꾸며 쇼군으로 돌아옵니다. 무적이 아닌 상태에서 체력이 0이 되면 쓰러집니다(48틱, 「그 무엇도 영원한 것은 없다.」). 처치 보상은 한 번만 지급하고 방 클리어는 쓰러짐이 끝난 뒤 진행합니다.
+- 번개 갑주는 그대로입니다: 갑주가 있는 동안 몸 피해 20%, 5틱에 한 번 원소별로 깎임(물리 · 번개 · 공허 2, 물 · 바위 · 바람 3, 풀 4, 불 · 얼음 6, 원소 반응 · 지속 피해 1), 시간이 지나면 4틱마다 1 감소, 텐마 동안 원소 에너지 초당 1 감소(스커크의 별도 자원 제외). 체력은 기존 보스 레벨 배율을 씁니다.
+
+**쇼군 (단계 0)**
+- 무기는 전투마다 검 또는 나기나타 중 무작위입니다. 무기마다 패턴 묶음이 따로 있습니다(검: 3 · 8 · 2 · 5 · 9 · 10, 나기나타: 1 · 21 · 22 · 23 · 24 · 9 · 10). 패턴마다 근거리(7칸 이하) · 중거리(6-14칸) · 원거리(8칸 이상) 표시가 있어 플레이어 거리에 맞는 패턴을 먼저 뽑습니다. 걷지 않고 순간이동(16틱, 무적)으로만 자리를 잡으며, 패턴 사이에는 16틱 쉽니다.
+- **무기 변경**: 무력화가 끝난 뒤 첫 패턴은 무기 변경입니다(나기나타 → 검 27, 검 → 나기나타 28). 바꾼 무기의 후속 효과가 다음 변신까지(무력화 포함) 이어집니다: 검은 80틱마다 플레이어 발밑 낙뢰(6), 나기나타는 60틱마다 플레이어 옆의 칼날 눈(6b). 5 · 7 중에는 멈춥니다.
+- **두 무기 공통**: 9 번개 배리어(가드: 기본 공격은 막아 ×0.1 · 게이지 +1, 그 밖의 공격은 ×0.5 · +2, 14에서 깨짐; 막을 때 35% 확률로 반격; 160틱 동안 4번 이상 막으면 카라타케), 10 마가츠의 뇌안(단일, 6타로 파괴, 140틱에 폭발) → 한 번 뒤에 반드시 4 광역 뇌안(눈 3개 각 4타, 깨진 눈의 범위는 사라짐), 등 뒤 견제(뒤에서 때린 플레이어가 등 뒤 8칸 안에 있을 때, 쿨타임 300틱; 검 25 판결의 검, 나기나타 26).
+- **검**: 3 뇌명 돌진, 8 5단 콤보, 2 뇌전이 이끈 번개(원반 3개 → 낮은 검파; 원거리 기술이라 플레이어가 10칸 안에 있으면 먼저 플레이어에게서 11칸 떨어진 곳으로 순간이동한 뒤 시전), 5 찰나의 포영(숨은 채 분신 4개가 세 번 사격; 진짜 분신을 맞히면 무력화) → 어느 쪽이든 7 몽상의 일심(중앙에서 반경 21의 구슬 8개가 차례로 폭발한 뒤, 화면이 어두워지고 반경 19 일도 단절).
+- **나기나타**: 1 원류 4단(+ 번개 밭, 멀어지면 60% 확률로 원거리 창), 21 수천수만의 염원, 22 돌진 3콤보, 23 번개돌진 콤보, 24 원거리 창(10칸 이상).
+- **무력화 100틱**: 진짜 분신 발견, 단일 뇌안 파괴(「간파했군.」), 가드 파괴(받는 피해 1.5배, 끝에 주변 반경 4.5 반격).
+
+**변신 (단계 1)** — 「이 몸이 곧 영원이다」, 중앙으로 이동해 떠오릅니다. 바닥을 따라 퍼지는 번개 고리(낮은 판정)와 하늘 기둥 6개(하나는 플레이어가 있던 자리)가 떨어진 뒤 텐마 형태와 칭호 「악요의 요고우 텐마」가 나옵니다. 경기장 바닥 모습도 텐마용으로 바뀌고, 쇼군으로 돌아올 때 되돌립니다.
+
+**텐마 (단계 2)**
+- 묶음 11 · 12 · 13 · 14 · 16 · 17 · 19. 변신마다 한 번, 네 번째 패턴 자리에 15 만겁. 플레이어가 10칸 이상 떨어져 있으면 18 돌진(연속 두 번은 없음). 등 뒤 ±60° · 9칸 안이면 20 초월의 악요개안(쿨타임 300틱). 16 뒤에는 40% 확률로 17 또는 11이 바로 이어집니다. 11 · 16 · 19는 멀면 순간이동으로 다가갑니다.
+- 11 몽상 · 염원이 깃든 백안지륜(휘두르기 2번 → 던지기 → 꽂힌 나기나타 폭발), 12 흉장의 수안 · 박수(따라오는 두 손이 두 번 박수), 13 추적 손바닥(따라오는 그림자 웅덩이 → 손바닥 내려찍기), 14 금강괴멸파(금강저 3개가 번갈아 퍼지는 고리 6번 → 세 개 동시), 16 번개 신의 신속한 발도(반경 12), 17 몽상 · 궤멸의 검기(나아가는 검기 5줄 → 낮은 검파; 검기는 2.2칸 바깥에서 출발해 2칸 안에 붙어 있으면 맞지 않음), 18 번개 신의 강력한 돌진, 19 몽상 · 단절(벽까지 이어지는 띠 → 남는 균열 지대), 20 초월의 악요개안(회전 → 던지기 → 폭발).
+- **15 만겁(영상판)**: 사라지면서(무적) 모든 캐릭터의 원소 폭발 에너지를 0으로 만들고, 경기장 색이 바뀌며 중앙에 추모의 꽃이 핍니다. 꽃에 **번개 1타 또는 다른 공격 4타**를 넣으면 반경 8 보호막이 자랍니다. 152틱의 경기장 전체 베기는 보호막 밖이면 대시 무적 · 일반 보호막과 관계없이 쓰러뜨리고(로노바 부활 규칙은 적용), 안이면 1 피해입니다. 막아 내면 갑주가 190 줄어듭니다. 카메라는 고정하지 않습니다.
+  - **공간 균열과 갑주 베기(10-22a, 예전 판 연출 복원 · 사용자 참고 영상 기준)**: 56틱에 꽃 너머(플레이어 반대편) 하늘이 가늘게 갈라져 78틱까지 별이 보이는 거대한 균열로 벌어지고, 84틱부터 연보라 갑주 팔이 균열에서 칼을 뽑아 왼쪽으로 당겼다가(146틱 정지) 왼쪽 → 오른쪽으로 벱니다. 152틱에 칼날이 보호막에 부딪혀 멈추고(섬광 · 충돌 폭발) 경기장 전체 베기 · 보라 번개가 떨어지며, 160틱 금이 간 보호막에 튕겨 물러나고 176틱 보호막이 깨질 때 균열도 닫힙니다(188틱). 균열 · 팔은 플레이어 쪽을 향해 놓이므로 카메라를 고정하지 않아도 정면에 보입니다(`tools/build_raiden_judgment_rig.mjs`, 디스플레이 20개, 바닥 아래 · 보호막 안으로 들어가지 않음).
+  - **보호막(10-22a 수정)**: 납작한 띠를 쌓아 틈과 꼭대기 구멍이 보이던 모델을, 닫힌 하나의 반투명 거품으로 바꿨습니다. 디스플레이 8개(32방위 × 4줄 + 꼭대기, 면 129개)를 안팎 양면으로 그려 안에서도 밖에서도 보이고, 옅은 청보라 바탕에 흰 구름 무늬 · 바닥 쪽이 밝은 테두리가 이어집니다(텍스처 6.1만 픽셀).
+- 대시 무적을 무시하는 공격: 18 돌진, 21 수천수만의 염원, 가드 파괴 반격, 만겁 베기. 모두 첫 동작부터 20틱 이상 뒤에 맞습니다.
+
+**예고 규칙 (10-20) 적용** — 중간보스 공용 라이브러리의 "바닥 예고 규칙"을 이제 나루카미에도 적용했습니다.
+- 바닥 예고는 영상에서 맞기 전에 바닥 표시가 보이는 공격에만, 영상에 보이는 모양으로 그립니다: 6 낙뢰(옅은 원), 7 몽상 구슬(세 겹 고리), 10 뇌안(생기는 순간의 고리) · 4 광역 뇌안(눈마다 고리), 가드 파괴 반격(고리), 11 · 20 꽂힌 나기나타 폭발(고리), 13 그림자 웅덩이, 14 금강저 발치(고리), 19 단절(띠). 9 가드 자세의 오라와 7 · 15의 화면 색조는 경고가 아닌 상태 표시입니다.
+- 나머지는 조용한 판정이고 보스의 동작 · 소리 · 소품으로 읽습니다. 첫 동작 · 소리부터 타격까지 12틱 이상, 큰 공격(넓이 100칸² 이상 또는 반경 8 이상)과 대시로 못 피하는 공격은 20틱 이상입니다. 맞는 순간에는 범위 전체에 타격 효과가 보입니다. 조준은 예고(첫 동작) 때 고정하고, 피해 판정은 카메라가 아닌 실제 몸 위치를 씁니다.
+- 게임 안 안내 문구는 실제 게임의 두 문구(뇌안: 「마가츠의 뇌안」을 계속 공격해서 제거하세요, 만겁: 「추모의 꽃다발」에 번개 원소 공격을 가해 보호막을 펼치세요)와 패턴 · 형태 이름, 단계 메시지, 대사뿐입니다.
+
+**피해와 밸런스**
+- 원래 피해 → `hurt`(× `#bossDmgMul` 160 → 레벨 보정 → `cm/hit_pl`). 리워크의 패턴은 예전보다 길고 조용해서(12/20틱 예고, 패턴 사이 16틱, 한 번 터지는 뇌안) 같은 원래 피해로는 서 있는 플레이어가 받는 분당 피해가 절반 정도였습니다. 그래서 피할 수 있는 패턴 타격만 키웁니다: 쇼군 검 ×2.55 · 나기나타 ×1.92(검의 패턴이 더 오래 기다림), 텐마 ×1.39(`tools/raiden_enc/core.py`의 `BALANCE_PCT`). 대시로 못 피하는 타격과 무기 변경 후속 효과(6 낙뢰 · 6b 칼날 눈, 판정에 `rlk_rd_nobal` 태그)는 원래 값 그대로입니다.
+- 시험 장치 기준(레벨 보정 전, 6.5칸에 서 있는 플레이어): 쇼군 검 654(−13.2%) · 나기나타 644(−14.5%) · 검 + 낙뢰 786(+4.4%) · 나기나타 + 칼날 눈 877(+16.4%), 평균 740(예전 753, −1.7%); 텐마 995(예전 1096, −9.2%). 무기 · 후속 효과 조합마다 ±20% 안, 단계 평균은 계획 기준 ±15% 안입니다. 대본대로 피하는 플레이어는 쇼군 72(예전 26), 텐마 0(예전 14)이며 쇼군의 증가분은 대시로 못 피하는 21 · 가드 파괴 반격과 후속 효과에서 옵니다. 공격 가능 시간 비율은 쇼군 0.90(예전 0.71), 텐마 0.96(같음).
+
+**정리 · 다시 불러오기**
+- 전투 종료 · 방 초기화 · 시스템 해제 · 테스트 중단 때 리그 · 소품 · 공격 · 오브젝트 · 보스바를 정리합니다. `boss/raiden/uninstall`(생성: `tools/build_raiden_uninstall.py`, `build_raiden_all.py`의 마지막 단계)은 그 정리에 더해 보스 · 리그를 지우고, 나루카미 함수가 만드는 모든 `rd*` 점수판(96개), 보스바 2개, 저장소 `rlk:rd`를 지웁니다. 공용 `rlk:uninstall`은 아직 `boss/raiden/cleanup`을 부르므로, 그 한 줄을 `boss/raiden/uninstall`로 바꾸는 것은 공용 파일 담당의 몫입니다. 단계 전환(변신 · 무력화 · 쓰러짐)과 패턴 중단 때도 그 패턴의 공격과 임시 엔티티를 지웁니다.
+- `/reload`: 예약된 공격을 취소하고 체력은 그대로 둔 채 리그를 다시 만듭니다. 텐마 · 무력화 단계였다면 경기장 바닥을 쇼군 모습으로 되돌리고 쇼군으로 돌아갑니다(들고 있던 무기와 후속 효과는 유지).
+
+**테스트 명령** (`'player'` 태그 필요, `/function rlk:room/setup` 을 먼저 해 두고, 진행 중인 일반 런이 없어야 함)
+- `/function rlk:boss/raiden/test/start` — 런 없이 나루카미하고만 싸웁니다(2스테이지 보스, 레벨 12).
+- `/function rlk:boss/raiden/test/armored` — 바로 텐마로 변신합니다.
+- `/function rlk:boss/raiden/test/pattern {id:N}` — 다음 패턴을 지정합니다(1~10 · 21~28 쇼군, 11~20 텐마; `{id:"help"}` = 번호와 패턴 이름). 진행 중인 공격은 취소하고 필요하면 단계를 바꿉니다. 무기 전용 패턴도 지금 든 무기로 실행합니다.
+- `/function rlk:boss/raiden/test/lock {id:N}` — 그 패턴만 반복합니다(`{id:0}` 으로 해제, `{id:"help"}` = 번호 목록). `test/level {lv:N}` — 레벨을 바꾸고 체력을 다시 채웁니다. `test/stop` — 전투를 정리하고 로비로 돌아갑니다.
+
+**생성기** (생성 결과는 직접 고치지 않습니다)
+- `python3 tools/build_raiden_all.py --resourcepack <리소스팩>`가 전부를 순서대로 만들고 `check_raiden_pack.py`로 검사합니다. 두 번 돌려도 결과가 같습니다.
+- 전투: `build_raiden_encounter.py`(`tools/raiden_enc/`: `core.py` 흐름 · 피해 · 밸런스, `shogun.py` 단계 0, `tenma.py` 변신 · 단계 2 · 무력화 · 쓰러짐, `lines.py` 대사), `build_raiden_illusions.py`, `build_raiden_movement.py`, `build_raiden_cinematic.py`, `build_raiden_arena.py`(+ 배경 판 `build_raiden_backdrop.py`).
+- 공격 · 효과 키트: `build_raiden_hazards.py`(+ `build_raiden_hazard_vfx.py`, 모양: 원 · 고리/부채꼴 · 직사각형 · 벽까지 · 나아가는 고리/판/구슬 · 따라오는 원 · 지속 지대 · 안전 돔; 나아가는 판 · 고리는 몸을 지나치면 그 뒤로는 검사하지 않고, 판은 앞면이 멀면 닿을 수 있는 틱까지 검사를 미룸), `raiden_kit.py`, `build_raiden_fx_textures.py`, `build_raiden_materials.py`, `build_raiden_object_vfx.py`, `build_raiden_orb.py`, `build_raiden_signature_vfx.py`. 모델: `build_raiden_rig.mjs`(`raiden_geometry.mjs` · `raiden_clips.mjs` · `raiden_paint.mjs` · 텐마 갑주 `raiden_tenma_models.mjs`), 만겁 균열 · 갑주 팔 `build_raiden_judgment_rig.mjs`, 찰나의 포영 분신 `build_raiden_clones.mjs`.
+- 해제: `build_raiden_uninstall.py`(마지막에 돌며 생성된 함수에서 점수판 · 보스바 · 저장소를 모아 `boss/raiden/uninstall`을 씀).
+- 효과음은 마인크래프트 기본 음원만 씁니다. 나루카미 텍스처는 약 2.8 M 픽셀입니다(경기장 배경 0.41 M 포함, 한도 3.0 M). `boss/raiden` 함수는 약 1300개 · 3.5 MB입니다(예전 2670개 · 32 MB; 리그만 736개이고 만겁 갑주 · 분신이 더해져 목표를 1350개로 다시 잡음).
+- 참고: [사용자가 지정한 패턴 영상](https://www.youtube.com/watch?v=3VLztONXLsA)과 리워크용 영상 v1-v9, 나무위키. 게임 안 확인은 서버 불러오기 검사와 시험 장치(전투 전체 · 일시정지 · 다시 불러오기 · 중단 · 해제)로 했고, 직접 플레이 확인은 아직 하지 않았습니다.
 
 ### 밀착 상태의 좌클릭 입력
 
 - 몹의 클릭 실드가 사라지기 전에 남은 클릭을 처리합니다. 발전 과제와 인터랙션 폴링은 실제 클릭 시각을 기준으로 중복을 제거하고 같은 공격 처리로 연결합니다.
 - 눈을 감싸던 큰 입력 실드를 눈앞 0.30칸의 작은 실드와 1.60칸의 예비 실드로 바꾸어, 입력 실드 안에 시점이 들어가지 않도록 했습니다. 대시 중에도 동일한 배치를 사용합니다.
 
+## 중간보스 (`mboss/`)
+
+노드 맵의 **중간보스 구역**(구역 종류 15)에서 원형 경기장으로 순간이동해 싸우는 강적. 여러 중간보스를 등록해 두고 무작위로 하나가 나오며, 처치하면 문이 있던 자리에 **아이템 상자 2개**가 떨어지고, 상자 하나를 열 때마다 **챕터에 맞는 등급의 아이템 선택 1번**을 받는다(상자는 그 선택을 실제로 쓸 때 사라진다). 지금 뽑히는 중간보스는 **세 명**: **파수꾼・타락**(`guardian`, 가중치 10, 아래 "파수꾼・타락 모듈"), **달빛 환영 나비**(`butterfly`, 가중치 10, 아래 "달빛 환영 나비 모듈"), **실험성 역장 발생 장치**(`fieldgen`, 가중치 10, 아래 "실험성 역장 발생 장치 모듈"). 셋은 10:10:10 으로 뽑히고 이번 판에 아직 안 만난 쪽이 먼저 나온다. 틀 점검용 `proto`(시험용 강적, 가중치 0)는 테스트 명령으로만 나온다.
+
+### 진행
+1. 마지막 구역의 선택지에 노드 **중간보스**(가중치 7)가 다른 노드처럼 붙는다. 1챕터 첫 선택지에는 안 나오고, 한 챕터에 두 번 고를 수 없다(기존 `seen` 규칙).
+2. 그 맵의 중간 구역 하나가 중간보스 구역(바닥 붉은 테라코타, 미니맵 보스 빨강)이 된다. 들어가면 한가운데 **문 오브젝트**에 이번에 나올 중간보스 이름이 보인다(들어갈 때 미리 뽑음, `mboss/roll`). 전투 전에 레벨 업 선택 등을 먼저 해도 된다.
+3. 문을 누르면 구역 문이 잠기고(일반 전투와 같음) 이름 · 부제 제목이 뜬 뒤 1.5초 뒤 **원형 경기장**으로 이동(짧은 실명 효과). 돌아올 자리는 던전에서 마지막으로 딛은 안전한 자리(`rlk_safe`).
+4. 등장 연출 동안은 무적이고 체력바가 차오른다. 전투 중에는 미니맵이 숨고, 위쪽에 보스바 3줄(이름 · 부착 원소 아이콘 / 체력바 + 아랫줄 게이지 / 보스별 정보 줄)이 뜬다.
+5. 처치하면(마지막 타격의 회복 구슬 · 경험치 · 골드는 그대로) 쓰러지는 연출 뒤 경기장의 골드를 거두고 던전으로 돌아온다. 선택 화면은 바로 열리지 않고(축하 효과음도 없음) 처치 제목(부제 "아이템 상자 2개")과 함께 **아이템 상자 2개**(`picks`)가 문이 있던 구역 한가운데로 하늘에서 떨어진다.
+   - 상자: 바닐라 상자 모양(크기 1.1)이 6칸 위에서 14틱 동안 살짝 빨라지며 4분의 1 바퀴 돌아 떨어지고(금빛 · 흰 입자), 땅에 닿으면 먼지 · 금빛 터짐 · 쿵 소리(상자 닫힘 + 나무 떨어짐 + 작은 모루 소리)와 함께 살짝 눌렸다 펴진다. 두 번째 상자는 4틱 뒤에 떨어진다. 두 상자는 구역 한가운데에서 플레이어 쪽을 잇는 선과 직각으로 1.5칸 간격으로 나란히 서고(방의 축에 맞춤), 자물쇠가 플레이어 쪽을 본다. 가만히 있는 동안 금빛으로 조금씩 반짝인다.
+   - 땅에 닿은 상자는 방 오브젝트(`oact` 15, `room/obj/k_mbox`, 이름 "아이템 상자" · 설명 "챕터 등급 아이템 선택")가 되어 조준하면 "▶ 좌클릭"이 뜬다. 닫힌 상자를 누르면(`room/obj/do_mbox`) 아이템 선택 1번(`lvup/add {n:1}`, `pkMb` +1 이라 이 묶음에는 캐릭터 카드가 나오지 않음)을 받고, 상자가 **열림**이 된 뒤(`mboss/box/open`: 묶음 전체에 태그 `rlk_mb_boxopen`, 상자에 금빛 윤곽, 글자 "아이템 상자 / (열림) / 다시 눌러 선택") 선택 화면으로 들어간다(이미 선택 화면이면 그대로). 전투 중에는 눌리지 않는다.
+   - 열린 상자는 **그 선택을 실제로 쓸 때까지 그 자리에 남는다**. 선택 화면에서 Shift 로 돌아와도 상자가 있고, 열린 상자를 다시 누르면 선택 화면만 다시 연다(기회는 늘지 않고 선택지도 그대로: 선택지는 `rlk:lvpick choices` 에 남아 있고 `lvup/toggle` 은 비었을 때만 굴리므로, 나갔다 들어와도 공짜 리롤이 되지 않음). Shift+F 로 다시 들어가도 같다. 중간보스 선택을 쓰면(아이템을 고르거나 건너뛰면: `lvup/act/resolve` 가 중간보스 묶음 `mbSet` 을 쓸 때) **열린 상자 하나가 사라진다**(`mboss/box/spend` → `box/gone`: 상자 열림 · 자수정 소리는 선택 화면에 있는 플레이어 자리에서 나고(상자 자리는 선택 공간에서 40칸 넘게 떨어져 들리지 않음), 상자 자리에 금빛 터짐 · 연기가 난 뒤 그 묶음 제거). 둘 다 열어 두었으면 고를 때마다 하나씩, 먼저 연 상자부터 사라진다(`oarg` = 연 순서, 닫힌 상자는 0).
+   - 열린 상자의 선택을 쓰지 않고 맵을 옮기면 그 선택은 그대로 남고(Shift+F 로 고름) 상자는 방과 함께 치워진다. 상태는 상자 엔티티의 태그 · 점수에만 있어(따로 세는 수 없음) 남는 것이 없다. 중간보스 선택을 쓸 때 열린 상자가 없으면 아무것도 지우지 않고, 닫힌 상자는 어떤 선택으로도 지워지지 않는다(레벨 업 선택 묶음을 써도 상자는 그대로). 늘 열린 상자 수 ≤ `pkMb` ≤ `pkPending`.
+   - 등급 확률은 레벨 업 선택과 같은 챕터 표(`items/roll_rarity`). 골드는 일반 몹의 × `goldMul`(5), 사파이어 조각 `sap`(1)개. 상자는 다른 방 오브젝트처럼 `rlk_room` 이라 맵 이동 · 런 종료 · `room/wipe` · `uninstall` 때 사라진다(열지 않은 상자는 맵을 옮기면 없어짐). 처치한 뒤에는 문이 다시 나타나지 않고 구역은 정리된 채(문 열림)로 남는다.
+   - 생성: 떨어지는 연출은 `tools/build_mboss_core.py` 의 `mboss/box/*`(`drop_all` → `row` → `drop`, 매 틱 `room/tick` → `box/all`(상자가 있을 때만, `#mbBoxOn mb`) → `fall` → `land` → `room/obj/k_mbox`)와 열기 · 지우기 `box/{open,spend,gone}`, 오브젝트와 클릭은 손으로 쓴 `room/obj/{k_mbox,do_mbox}`, 선택을 쓸 때의 연결은 `lvup/act/resolve`.
+6. 처치가 아닌 이유로 몸체가 사라지면(`/kill`, 소환 3번 실패, 리로드로 몸체 유실) **보상 없이 취소**되고 던전으로 돌아오며 문이 다시 나타난다. 경기장 청크가 불려 있지 않으면 고정을 다시 걸고 0.5초마다 다시 시도하며, 3초가 지나도 안 되면 같은 방식으로 취소한다(문이 잠긴 채 멈추지 않음).
+- 플레이어가 쓰러진 동안 · 로노바 부활 중 · 선택 화면에서, 그리고 'player' 태그를 가진 플레이어가 없는 동안(접속이 끊김 등)에는 **모든 것이 멈춘다**(패턴 시계 · 바닥 공격 · 투사체; 모듈의 멈춤 훅이 돌아 바닥 예고가 지워지고 다시 시작할 때 남은 예고 시간으로 다시 그려진다). 경기장 밖으로 벗어나면(벽 넘기 · 이상한 넉백) 처음 자리로 돌려놓는다. 보스는 경기장 가장자리에서 안쪽으로 끌려 돌아온다.
+- 정리: 처치 · 취소 · 런 종료 · 사망 · 맵 이동 · `room/wipe` · `/reload`(진행 중 전투는 체력 유지, 보조 엔티티만 다시 만듦) · `uninstall` 모두 경기장 엔티티 · 보스바 · 상태를 지운다.
+- 부하: `rlk:tick` 은 전투가 시작된 뒤(`#mbLive mb` 1, `mboss/start` · `/reload` 가 켜고 정리 · 몸체가 사라진 첫 틱에 끔)에만 `mboss/main` → `mboss/world` 를 돌린다. 전투 밖에서는 중간보스 엔티티를 찾는 선택자가 하나도 돌지 않는다. 바닥 공격 · 투사체 · 끌어당기기 · 이동도 각각 살아 있는 것이 있을 때만(`#mbHzOn` `#mbPjOn` `#mbPlOn` `#mbMvOn`) 엔티티를 훑는다.
+
+### 원형 경기장 (`tools/build_mboss_arena.py` → `mboss/arena/*`)
+- 오버월드 중심 **(200, 201, 8)**(블록 모서리), 바닥 반지름 22 · 걸을 수 있는 반지름 21(그 밖은 높이 7의 흰 대리석 벽), 벽 위 y 208~215 배리어(이동기로 넘어가지 못함), y 206 빛 블록 층(밤에도 몹이 자연 스폰되지 않음). 청크 9개(x 176~223, z −16~31)를 `load` · `room/setup` 에서 **항상 고정**(forceload, `room/remove` 가 풀고 `room/setup` 이 다시 건다. 전투 시작 때 빠져 있으면 `mboss/start` 도 다시 건다).
+- 바닥(영상 m2 의 광장): 옅은 대리석(방해석 + 매끄러운 석영 얼룩), 한가운데 **장미색 네 갈래 별**(길고 가는 끝, 얇은 진홍 테두리, 밝은 가운데), 별을 둘러 소용돌이치는 **가는 장미색 날개 8개**(진홍 테두리 + 연분홍 속, 별과 떨어져 있고 양 끝이 가늘며 35도 정도만 휘어서 꺾인 팔 모양이 생기지 않음), 옅게 새긴 원 3겹(흰 콘크리트, 한 칸 너비), 바깥 원의 램프 앞 금 박힘, 벽에 금 기둥 램프 12개(황토 개구리불 + 엔드 막대 별).
+- `mboss/arena/ensure` 가 판 번호(`rlk:mboss built` = `"plaza@2"`)와 가운데 블록을 보고 다를 때만 다시 짓는다(전투 시작 때 · `room/setup` 이 된 뒤 `/reload` 때). 강제로 다시 짓기: `/execute in minecraft:overworld run function rlk:mboss/arena/rebuild`, 보러 가기: `/function rlk:mboss/test/arena`(런 밖에서).
+
+### 등록 · 모듈 (`tools/mboss_registry.json`)
+- 중간보스 하나 = 레지스트리 항목 하나 + 모듈 폴더 `mboss/<id>/`(자기 생성기 `tools/build_mboss_<id>.py`; 모듈 폴더는 항목의 `fn` 이 정하고 기본은 `mboss/<id>`, 챕터 보스는 `boss/<id>` — 아래 "챕터 보스"). 항목: `id` `n`(고정 번호, 디스패처용) `enabled` `w`(뽑기 가중치, 0 = 테스트 전용) `minCh/maxCh` `name/sub/color` `el`(공격 원소) `hp/xp/atk/lvAdd/dmgMul` `goldMul/sap/picks` `scale` `hit{w,h}`(클릭 판정) `intro/death`(연출 최대 틱) `deathSnd`(기본 true: 쓰러질 때 틀이 위더 죽는 소리를 냄, false 면 모듈이 자기 소리를 냄) `icon`.
+- 뽑기: 이번 판에 아직 안 만난 · 챕터 범위 안 · 가중치 1 이상 → 만난 것 허용 → 챕터 무시 → 첫 항목 순. 테스트는 `#mbForce mb`(번호)로 고정.
+- 등록된 항목: `guardian`(n 1, 가중치 10), `butterfly`(n 2, 가중치 10), `fieldgen`(n 3, 가중치 10), `proto`(n 99, 가중치 0 = 테스트 전용). 셋 다 1~99챕터라 한 판의 첫 중간보스는 셋 중 하나가 같은 확률로, 그다음은 아직 안 만난 쪽에서 나온다.
+- 모듈이 채우는 훅(전부 있어야 함, 빈 함수 가능): `spawn intro_tick tick on_hit aux_hit incoming pause resume death_start death_tick cleanup reload bars hz_vis pj_end test uninstall`, 그리고 `test/help`(시험 번호 목록: `mboss/test/pattern {id:"help"}` 가 `mboss/d/test_help` 로 부름, `mboss_lib.HELP_HOOKS`). 생성된 디스패처 `mboss/d/<훅>` 이 `#mbId` 로 모듈을 부른다(`uninstall` 만은 등록된 모든 모듈을 부른다: 모듈이 만든 점수판 등을 지움). 훅마다의 호출 맥락 · 라이브러리 인자는 생성된 `mboss/*` 함수의 머리 주석에 있고, `tools/build_mboss_proto.py` 가 모든 훅을 채운 예시 모듈이다.
+- 생성 · 점검(정해진 순서, 생성된 파일은 손으로 고치지 않는다):
+  1. `python3 tools/build_mboss_core.py`(틀: `mboss/*.mcfunction` · `mboss/{d,hz,pj,pull,mv,aux,line,test,box}/`)
+  2. `python3 tools/build_mboss_arena.py`(`mboss/arena/`: 광장 + 챕터 경기장들, 아래 "챕터 보스")
+  - 2-1. `python3 tools/build_cboss_rooms.py`(챕터 보스 입구 `room/cboss/`)
+  3. `python3 tools/build_mboss_proto.py`(`mboss/proto/`)
+  - 3-1. `python3 tools/build_mboss_cproto.py`(챕터 시험 보스 `mboss/cproto/` + `tools/mboss_cproto_rig_manifest.json`)
+  4. 리그(따로, 리소스팩이 필요): `node tools/build_mboss_guardian_rig.mjs --resourcepack <RP>`(`mboss/guardian/rig/`), `node tools/build_mboss_butterfly_rig.mjs --resourcepack <RP>`(`mboss/butterfly/rig/` + `tools/mboss_butterfly_rig_manifest.json`; 나비 모듈이 읽으므로 7번보다 먼저), `node tools/build_mboss_fieldgen_rig.mjs --resourcepack <RP>`(`mboss/fieldgen/rig/` + `tools/mboss_fieldgen_rig_manifest.json`, 약 4초; 역장 효과 도구 · 역장 모듈이 읽으므로 8번보다 먼저)
+  5. `python3 tools/build_mboss_guardian.py`(`mboss/guardian/` 중 `rig/` 밖)
+  6. `python3 tools/build_mboss_bf_fx.py --resourcepack <RP>`(나비 효과 도구: `mboss/butterfly/fx/{card,cardx,look,clear,uninstall}` · `fx/{e,p,tele,snd,hud,prop,test}/` + 리소스팩, 데이터팩만이면 `--skip-rp`)
+  7. `python3 tools/build_mboss_butterfly.py`(`mboss/butterfly/` 중 `rig/` 와 효과 도구 몫 밖)
+  8. `python3 tools/build_mboss_fg_fx.py --resourcepack <RP>`(역장 효과 도구: `mboss/fieldgen/fx/{card,cardx,look,clear,uninstall}` · `fx/{e,p,tele,snd,hud,prop,test}/`(리그 매니페스트가 없을 때만 대역 리그 `fx/rig_stub/`) + 리소스팩 `mboss/fg_kit/*` · 글꼴 `rlk:mboss_fg`, 데이터팩만이면 `--skip-rp`. 약 17초. 리그 매니페스트가 바뀌면 다시 돌린다: 계기의 금 단계가 부르는 리그가 그것으로 정해진다)
+  9. `python3 tools/build_mboss_fieldgen.py`(`mboss/fieldgen/` 중 `rig/` 와 효과 도구 몫 밖)
+  10. `python3 tools/check_mboss_pack.py`
+  - 생성기마다 **자기 몫의 경로만** 쓰고 지운다(위 괄호). 그래서 어떤 순서로 돌려도, 두 번 돌려도 결과가 같다(스크래치패드 `mb3/tests/gen_check.py` 가 문서 순서 · 두 번째 · 거꾸로 · 나비 폴더와 역장 폴더를 지우고 코어 → 효과 도구, 효과 도구 → 코어로 다시 만들기 · 두 효과 도구의 리소스팩 두 번 만들기를 바이트 단위로 비교한다). 순서는 레지스트리를 바꿨을 때 틀이 먼저 디스패처를 만들게 하려는 관례일 뿐이다(모듈 코어는 효과 도구의 Python 호출 도우미를 가져다 쓰고 그 매니페스트 `owned` 로 지우지 않을 경로를 알기 때문에 효과 도구를 앞에 둔다).
+
+### 공용 라이브러리 (모듈이 쓰는 것)
+- **바닥 공격** `mboss/hz/{disc,ring,sector,line,full}`: 예고(입자 윤곽 + 맞는 순간 테두리에 닿는 진행 윤곽) → 판정(몸 위치 기준, 0.3칸 여유, 공격 하나에 한 번, 대시 무적으로 피함). 원 · 고리 · 부채꼴/호(반각 180 = 360도 휘두르기) · 직선 · 경기장 전체(안전한 원 하나). 원소 · 넉백(`#hzKBDir` −1 = 모양 기본값(직선은 겨눈 방향, 나머지는 중심에서 바깥), 0 = 중심에서 바깥, 1 = 겨눈 방향, 직선도 0 을 고를 수 있음) · 높이 · 지속 · 소리 · 모듈 장식(`hz_vis`, 취소될 때도 바닥 공격의 방향 그대로) 옵션. 거리 단위는 0.1칸.
+- **바닥 예고 규칙 (10-20, 사용자 결정, 중간보스 셋 공통)**: 적용 범위는 이 문서의 중간보스 셋(파수꾼 · 나비 · 역장 발생 장치)이다. 챕터 보스(야타용왕 · 아펩)는 각자의 계획에 같은 규칙을 넣었고, 나루카미(`boss/raiden/`)도 이제 이 규칙을 적용한다(리워크: 영상 v1-v9 의 공격별 감사, 첫 동작부터 12틱 이상 · 큰 공격과 대시로 못 피하는 공격은 20틱 이상; 위 "나루카미 보스전"의 "예고 규칙"). 바닥 예고는 영상에서 맞기 전에 바닥에 표시가 보이는 공격에만, 영상에 보이는 모양으로 줄여서 그린다. 나머지 공격은 조용한 판정(`#hzQuiet 1`: 틀의 윤곽 · 진행 윤곽 · 타격 섬광 없음)이고 바닥 그림 없이 보스의 동작 · 소리로 읽는다. 첫 동작 · 소리부터 타격까지 10틱 이상이고, 맞는 순간에는 모듈의 타격 효과가 범위를 보여 준다. 바닥 예고가 남은 공격: 파수꾼 P3 내려찍기 · P5 하늘을 심판하는 자 · 혼돈 실패 창, 나비 B3 불꽃 자국의 불씨 줄, 역장 발생 장치 C5 지면 충격(테두리 + 어두운 원) · C1 마무리와 C2 내려찍기(기둥 발치 섬광만) · F1 감소 영역(어두운 원, 처음부터 제 크기). 남은 바닥 예고는 멈춤(쓰러짐 · 부활 · 선택 화면) 뒤 남은 시간으로 다시 그린다(C5 · F1 · 나비 B3 불씨 줄). 자세한 것은 각 모듈의 "예고 규칙".
+- **플레이어 피해** `mboss/hurt`: 계수(%) × 레지스트리 `atk` × `dmgMul` → 기존 `cm/hit_pl2` → `player/take_damage`(대시 무적 · 방어 · 레벨 보정 · 원소 · 보호막).
+- **투사체 소품** `mboss/pj/launch`(0.25칸 단위 이동: 속도는 0.25칸 걸음 수로 올림해서 0.75 · 1.75 칸/틱은 정확히 3 · 7걸음(예전에는 한 걸음 더 빨랐음, 가디언의 속도는 그대로), 벽 · 수명, 몸에 닿으면 피해, 돌아오기), **끌어당기기** `mboss/pull/start`(대시로 못 피함, 사망 · 부활 · 선택 화면에서는 거부), **이동** `mboss/mv/*`(직선 · 포물선 이동, 바라보기 · 천천히 돌기, 걸음, 가장자리 끌어오기, 거리).
+  - 투사체 끝 알림 `pj_end`(`#pjEv` 1 벽 · 2 수명 · 3 돌아옴 · 4 플레이어 적중): `#pjKeep` 에 기본값이 미리 들어 있고 모듈이 바꿀 수 있다. 적중은 기본으로 관통(한 번만 맞힘, 0 이면 그 자리에서 사라짐), 돌아오는 소품은 벽 · 수명 때도 알림을 받고(0 이면 사라짐) 몸의 눈을 향해 날아와 **몸 판정 상자에 닿으면** 3번. 돌아오는 시간은 나간 시간 + 2초가 최대라 보스가 멀리 날아가도 소품이 남지 않는다. 돌아오는 길에는 피해가 없다.
+  - 보스가 쓰러지는 중(`#mbSt` 2)에는 바닥 공격 · 투사체 · 끌어당기기를 새로 만들지 않는다(`hz` 는 `#hzLast` 0, `pj` 는 소품을 지움, `pull` 은 실패).
+- **보조 오브젝트**(원소별 등) `mboss/aux/spawn` + 태그 `rlk_mb_hit`: 플레이어 타격이 원소 반응과 **몸체와 똑같은 피해 보정**(각인 · 아이템 · 레벨 보정 · 로노바 · 자기 저항, `combat/apply_mods`)을 거친 뒤 모듈(`aux_hit`)로 간다(자기 체력 · 면역, 처치 보상 없음). 체력은 `#auxHpPct mb`(보스 최대 체력의 %, 1~100, 레벨 · 챕터에 맞춰 커짐, 권장) 또는 `#auxHp mb`(고정값). 같은 보정을 받으므로 P% 짜리 별은 보스 처치 시간의 P% 안에 깨진다(저항 차이만큼 보정: 저항 80% 별은 × 1/0.238).
+- **유도 · 칼날 · 한 번만 맞는 묶음 · 예고만 하는 바닥 공격**(달빛 환영 나비 때 추가):
+  - `mboss/pj/steer {max}`: 살아 있는 투사체를 플레이어 가슴(발 + 0.9칸) 쪽으로 이번 틱에 좌우 · 위아래 각각 최대 `max`도 돌린다(가까운 쪽으로, 위아래는 ±60도까지). 모듈의 `tick` 은 `pj/all` 보다 먼저 돌므로 거기서 부른다.
+  - 칼날 판정 `#pjShape 1`: 투사체의 판정이 공 대신 비행 방향과 직각인 선(양쪽으로 `hr`, 최대 4칸)이 된다. 선에서 **`hr` + 0.3칸**(다른 모양 · 예고와 같은 몸 여유)까지 정확히 맞는다: 반지름 0.45칸 점을 0.6칸 이하 간격으로 세 줄(투사체 0.9칸 아래 · 0.3칸 아래 · 0.3칸 위, 바닥에서 1.65칸까지 빈틈없음 = 뛰어올라도 맞음). 0.25칸 걸음마다 쓸고 지나간다. (예전에는 점 두 줄 · 0.65칸이라 `hr` + 0.65칸까지 맞고 높이에 빈틈이 있었다.)
+  - 묶음 `mboss/grp_new` → `#hzGrp mb` / `#pjGrp mb` 에 `#mbGrp` 를 넣고 만들면, 그 묶음의 바닥 공격 · 투사체 중 **처음으로 맞은 한 번**(대시로 피한 것은 제외)이 나머지를 모두 무해하게 만든다(`mboss/grp_mark`; 모습과 비행은 계속). 날개탄 한 번에 초승달 다섯 개라도 한 번만 맞는다. 묶음이 이미 맞힌 **뒤에** 만든 구성원(예: 투사체 수명 끝의 폭발)도 처음부터 무해하다(`#mbGrpL`, 예전에는 한 묶음에서 두 번 맞을 수 있었음).
+  - `dmg:0` 바닥 공격 = **예고만**(윤곽 · 진행 · 타격 섬광 · 모듈 장식은 그대로, 판정 없음). 예전에는 0 이어도 1 피해와 넉백이 있었다.
+  - Python: `mboss_lib.pj_opts(shape, grp, ...)`, `pj_launch(spd, life, dmg, hr)`(칸 단위), `pj_steer(max)`, `hz_opts(grp=True)`, `tell_line(len, w, tell)`, `GRP_NEW`.
+- **대시로 못 피하는 공격 · 다시 겨누기 · 크기 바꾸기 · 다시 맞기 · 저중력**(실험성 역장 발생 장치 때 추가). 모두 켤 때만 동작해서 다른 보스의 생성 결과는 바이트 단위로 그대로다(스크래치패드 `mb3/tests/ident.py`).
+  - `#hzNoDodge 1`(한 번만 쓰는 옵션): 그 바닥 공격은 대시 무적으로 못 피한다. 맞는 순간에만 `dashInvT` 를 0 으로 두었다가 되돌리므로(`mboss/hurt_nd`) 다음 공격에는 무적이 남는다.
+  - `mboss/hz/aim`: 살아 있는 바닥 공격(그 마커로 실행)을 실행 위치 · 방향으로 옮기고 판정 축을 다시 계산한다(돌아가는 레이저). 모듈 `tick` 에서 부르면 그 틱의 판정에 바로 쓰인다.
+  - `mboss/hz/resize {r,r0,w}`(0.1칸 단위, 매크로 없는 점수 형태 `hz/resize_s`): 살아 있는 바닥 공격의 바깥 · 안쪽 반지름(직선은 길이 · 뒤쪽)과 직선 폭을 바꾼다(퍼지는 파면). 반지름은 0~40칸으로 자른다.
+  - `#hzRearm N`: 남아 있는 바닥 공격이 한 번 맞히면(대시로 피해도) N틱 뒤에 다시 맞힐 수 있다. 그 시계 `#mbHzClk` 는 전투가 멈추면 같이 멈추고, 같은 묶음은 함께 다시 켜진다.
+  - **저중력** `#mbLowG mb`: `mboss/main` 이 매 틱 0 으로 지우고, 모듈이 원하는 동안 매 틱 1 로 다시 켠다. `rlk:tick` 의 두 줄이 1 이면 플레이어와 숄더뷰 아바타에 `mboss/lowg_on`(수정자 `rlk:mb_lowg`: 중력 × 0.5, 점프 힘 × 1.19, 안전 낙하 거리 +4, 태그 `rlk_lowg`), 아니면 붙어 있는 쪽에서 `mboss/lowg_off` 를 부른다. 곱하는 수정자라 중력이 0 인 숄더뷰 카메라 플레이어는 그대로이고, 휘두르는 동안 점프 금지(× 0)도 그대로 이긴다. 멈춤 · 전투 끝 · 사망 · 재접속 · 아바타 다시 만들기 · `uninstall` 에서 모두 풀리거나 다시 붙는다.
+  - 숄더뷰 아바타의 점프(`view/move`)는 아바타 자기 `jump_strength` 를 읽는다(보통 0.42 그대로, 저중력 0.4998).
+  - Python: `hz_opts(nododge=1, rearm=N)`, `hz_aim()`, `hz_resize(r, r0, w)`(칸 단위). 시험: 스크래치패드 `mb3/tests/test_fwopts.py`.
+- **플레이어 쪽 전투 보정**(모듈이 정하고 틀이 지움): `#mbHealPct mb`(받는 치유 %, 기본 100) · `#mbCritAdd mb`(치명타 확률 더하기, 기본 0) · `#mbCritDmgAdd mb`(치명타 피해 더하기, 기본 0) · `#mbHealEv mb`(전투 중 받은 치유 횟수, 모듈이 읽고 지움) · `#mbHealAmt mb`(그 치유량의 합: 보정 뒤, 넘친 치유 포함, 모듈이 읽고 지움). `items/hook/on_heal` 첫 줄이 전투 중(`#mbLive` 1) 치유량 1 이상이면 `mboss/player_heal` 을 부르고(횟수 +1, 치유 × `#mbHealPct`%(반올림), 적어도 1, 그 양을 `#mbHealAmt` 에 더함; 캐릭터 변환보다 먼저), `items/hook/stat_buffs` 마지막 두 줄이 전투 중 치명타 확률에 `#mbCritAdd`, 치명타 피해에 `#mbCritDmgAdd` 를 더한다. 전투 시작(`fight_vars`) · 정리(`cleanup_fight`)에서 `mboss/player_reset` 으로 기본값.
+- **진짜 피해** `mboss/true_hit` · `true_pct {pct}`(보정 없이 `combat/apply` 를 거쳐 처치 · 보상 · 쓰러짐 그대로). 마지막 한 방이면 돌아오기 **전에** 쓰러짐(`death_start`)이 실행되므로, 모듈의 `tick` 안에서 불렀다면 바로 다음 줄에서 `#mbSt mb` 가 1이 아니면 그 틱을 끝내야 한다(`proto/tick` 참고).
+- **저항** `mres`(몹 공용 점수, %): 원신 공식(80% → 피해 × 0.238). `combat/apply_mods` 에서 레벨 보정 뒤에 적용.
+- **대사** `mboss/line/say {t,c,gap,hold,snd}`: 두 글자씩 타자 치듯 나오는 자막 + 작은 효과음(바닐라 소리만).
+- **소리** `mboss_lib.sound(event, vol, pitch)`: `hostile` 소리, 최소 음량(16칸 × 음량 밖에서 들리는 크기)은 층마다 음량의 1/3(최대 0.4), 0.25 이하의 작은 층은 0. 라이덴처럼 큰 타격은 멀리서도 들리고 작은 층은 멀리서 사라진다(예전의 고정 0.3 은 16칸 밖에서 모든 층을 같은 크기로 만들고 12~16칸의 타격이 17칸보다 작게 들렸다). 틀의 바닥 공격 타격 소리도 같은 규칙.
+
+### 시험용 강적 `proto`
+블록 디스플레이 9개짜리 허스크 모양 몸, 하늘에서 떨어지는 등장, 패턴 7개(강타 · 찌르기 · 휘두르기(먼저 다가감) · 파문 · 투창(돌아오는 창) · 끌어당겨 회전베기 · 전역 강타(안전한 원 하나))로 모든 라이브러리를 한 번씩 쓴다. `test/pattern {id:90}` 은 부술 수 있는 별(체력 = 보스 최대 체력의 3%, 저항 80%, 불 면역, 부수면 보스 최대 체력 10% 진짜 피해).
+
+### 파수꾼・타락 모듈 (`mboss/guardian/`, `tools/build_mboss_guardian.py`)
+원신의 개안자 파수꾼・타락(영상 m1~m4, 공략 PDF 기준). 레지스트리 `guardian`(n 1, 바위, 1레벨 체력 250, 기본 공격 12 × `dmgMul` 110%, 등장 90틱 · 사망 90틱, `deathSnd` false). 모델과 동작은 아래 "중간보스 파수꾼・타락 모델과 리그"의 리그를 쓴다.
+- **피해 수치**: `mboss/hurt` 는 계수 × 12 × 1.10 을 그대로 `cm/hit_pl2` 에 넘긴다(라이덴의 보스 배율 ×1.6 은 없음). 원래 피해(방어 · 레벨 보정 전): 1.0배 = 13, P1 1.15배 = 15, P2 1.3배 = 17, P3 1.6배 = 21, P4 1.2배 = 15, P5 1.8배 = 23, 금빛 휘두르기 1.65배 = 21, 실패 창 2.2배 = 29, 원소 휘두르기 2.5배 = 33. 같은 레벨의 아이템 없는 캐릭터 기준(레벨 보정 · 방어 후) 1.0배는 최대 체력의 약 11%(1챕터 Lv4 15/136, 2챕터 24, 3챕터 32, 4챕터 42), 가장 센 원소 휘두르기는 약 29~30%(40 · 62 · 84 · 107), 두 레벨 뒤처져도 약 38%. 한 방에 쓰러지지 않고 같은 틱에 두 번 맞지 않는다. 1.0배는 1챕터 불 마법사의 화염구(원래 8~22) 정도, 라이덴의 가장 센 공격(×1.6 후)의 약 1/2.6.
+- **생성기 구조**: `tools/build_mboss_guardian.py` → 패키지 `tools/mboss_guardian/`. `core.py`(훅 17개 · 인공지능 · 순환 · 파수 모드 · 혼돈 · 그로기 · 등장 · 사망 · 보스바 · 대사 · 테스트 · 패턴 분배기), `api.py`(패턴 쪽이 쓰는 고정 API: 피해 계수, 거리 구간, 색, 리그 클립 표와 사건 틱), 패턴 묶음마다 파일 하나: `p12.py`(P1 · P2), `p34.py` + `p34_fx.py`(P3 · P4), `p56.py` + `p56_fx.py`(P5, 파수 모드 휘두르기 둘, 혼돈 실패 창). 패턴 작성자는 자기 파일만 고치고 `mboss/guardian/p/<이름>/**`(`start` · `tick` · `cancel`, 필요하면 `vis` · `pj_end` · `pause`)만 만든다. 바쁜 틱의 명령은 `p/<이름>/k/<틱>` 파일에 모여 있어 한 틱에 점수 비교 몇 번만 한다. `mboss/guardian/rig/` 는 리그 생성기 몫이라 이 생성기가 건드리지 않는다.
+- **창 위치표**: 효과가 창날을 따라가도록 `p12_spear.json` · `p56_spear.json`(클립 틱마다 창 손잡이 · 끝 · 날 뿌리 · 끝장식, 골반)을 리그의 디버그 자세에서 잰다. 리그 클립을 바꾸면 `node tools/build_mboss_guardian_rig.mjs --resourcepack <RP> --datapack <임시 폴더> --no-paint --debug-dp <폴더>` → `python3 tools/mboss_guardian/p12_measure.py <폴더>` · `p56_measure.py <폴더>` 로 다시 잰다(P3 · P4 의 창끝 각도는 `p34.py` 안의 표).
+- **패턴 시계**: 코어가 패턴을 고른 틱에 `start`(시계 0, 첫 클립 재생), 다음 틱부터 `tick`(`#gdPT` = 클립 틱). 끝낼 때 `function rlk:mboss/guardian/p/end`. 테스트 · 사망 · 리로드 때는 `cancel`(태그로 자기 것을 모두 지움). 플레이어가 쓰러지거나 부활하는 동안 싸움이 멈추면 `pause` 가 한 번 불린다(P4 는 화면 효과 제목을 지움). 패턴 쪽 도구: `g.release()`(위험한 부분이 끝남: 주인 상태가 먼저 다음으로 넘어가고 패턴은 남은 꼬리를 슬롯에서 마저 함, 실패 창), `g.set_len(t)`(실제 끝 틱을 정했을 때 보스바 진행 막대용). 보스바 아랫줄 패턴 진행은 패턴의 실제 끝(`Pattern.length`, 기본 = 클립 길이)을 기준으로 줄어 끝 틱에 비어 있다.
+- **등장**: 숨은 채로 나타나 16틱에 꽂힐 자리 7칸 위 하늘에 빛(차임 · 신호기 소리), 20틱부터 창이 7칸 위에서 금빛 꼬리와 휘파람 소리를 내며 떨어져 34틱에 꽂힘(반지름 3.6, 피해 1.0배) + "통찰하여, 나의 마음을 보아라.", 60틱부터 전투. 원본(PDF: "어떤 표시도 남기지 않은 상태에서" 나타남)처럼 바닥 표식은 없고, 하늘의 빛에서 꽂힘까지 18틱(선딜 조정 전 24틱)이며 꽂히는 순간의 폭발 · 금빛 바닥 고리 · 파편이 범위를 보여 준다. 플레이어는 꽂히는 자리에서 17.5칸 떨어진 곳에 도착한다.
+- **순환**: 보통 패턴 3~4개(거리 구간으로 거른 섞인 주머니, 같은 패턴 연속 없음: 근접 4칸 이하 P1 · P3 · P4, 중거리 P1 · P2 · P4, 원거리 8칸 이상 P2 · P4 · P5, P3 는 3칸까지 먼저 다가감) → 파수 모드 I → 파수 모드 II → 혼돈 → 그로기 또는 실패 → 보통 패턴 4~5개 → … 체력 단계는 없다. 거리 구간(4칸 · 8칸)과 P3 의 다가가기(3칸)는 범위를 키운 뒤에도 그대로다: P3 는 3칸 안에서 시작해 앞 3.5칸 중심 반지름 6칸 원 안에 플레이어를 두고(빗나가지 않음), 예고 13틱 동안 대시 한 번 + 달리기로 빠질 수 있으며, 원거리 구간은 그녀가 패턴 사이에 8~9칸까지 다가오는 거리에서도 P5 가 나오도록 8칸에 둔다.
+  - 주머니는 가중치로 뽑는다(`Pattern.weight`): 근접에서 P1 · P3 는 2, P4 는 1, 중거리에서 P1 · P2 · P4 가 1씩, 원거리에서 P4 · P5 는 3, P2 는 1. 섞인 주머니는 한 바퀴 동안 그 거리 구간의 후보를 하나씩 모두 뽑으므로 가중치는 뽑는 순서만 정한다: 멀리 있으면 끌어당기기와 하늘 심판이 투창보다 먼저 나오기 쉽고, 근접에서는 P4 가 바퀴의 뒤쪽에 오기 쉽다. 한 거리 구간에 계속 머무르면 그 구간의 세 패턴은 거의 같은 빈도로 나온다(명령 시뮬레이터: 3칸 근접 P1 · P3 · P4, 10칸 원거리 P2 · P4 · P5 가 각각 약 1/3).
+  - **끌어당기기 보장**: 보통 패턴 묶음(파수 모드 쌍 사이)의 마지막 패턴을 고를 때 그 묶음에 아직 P4 가 없으면 거리와 상관없이 P4 를 고른다(`ai/pity`). 그래서 근접해서 싸우는 캐릭터에게도 P4 가 묶음마다 적어도 한 번 나온다(예전에는 근접 4칸 이하에서 이 보장이 걸리지 않아, 계속 붙어 있는 플레이어에게는 127묶음 중 0번이었다).
+  - **뒤로 물러나기**: P4 를 고를 때 플레이어가 5칸보다 가까우면 그녀가 먼저 12틱 동안 플레이어에게서 6.5칸 떨어진 곳으로 깡충 물러난다(리그 클립 `backstep`: 웅크렸다 약 1칸 떠오르며 날개를 펼치고 내려앉음, 출발과 착지에 먼지 · 금빛 입자, 날갯짓 · 방해석 소리). 자리는 플레이어에서 그녀를 지나는 직선 위이고, 등 뒤가 벽이면 플레이어 둘레로 ±40 · ±80 · ±120 · 180도 돌려 안전 원(18.5칸) 안에 드는 첫 자리(벽을 따라 옆으로, 그다음 중앙 쪽)로 간다. 내려앉으면 평소의 P4(예고 → 끌어당기기 → 휘두르기 둘)가 이어진다.
+
+#### 보통 패턴
+- **바닥 예고 규칙 (10-20)**: 영상에서 맞기 전에 바닥 표식이 보이는 공격만 바닥 예고를 남긴다. **P3 내려찍기**(얇은 금빛 고리 + 옅은 호박색 바닥), **P5 하늘을 심판하는 자**(금빛 테두리 막대 · 반투명 호박색 바닥 · 가운데 금빛 네 갈래 별), **파괴 실패 창**(붉은 오목 네 갈래 별 · 분홍 빛줄기) 셋뿐이고, 셋 모두 영상에 없는 틀의 윤곽 · 진행 윤곽 · 타격 섬광과 진행 원 · 피해 원은 뺐다. 나머지(등장의 꽂힘, P1 찌르기 둘, P2 투창, P4 휘두르기 둘, 파수 모드의 금빛 · 원소 휘두르기)는 바닥 표식 없이(조용한 판정 `#hzQuiet 1`, 모듈 바닥 표식 없음) 그녀의 동작 · 소리 · 몸과 창의 효과를 보고 피한다. 알아볼 수 있는 동작이 시작되는 순간부터 판정까지는 10틱 이상(P1 두 번째 찌르기 · 등장은 12틱 이상)이고, 맞는 순간의 효과가 범위를 알려 준다. P4 끌어당기기의 큐브 감옥 · 화면 효과는 영상에 있는 장치 표식이라 그대로다.
+- 조준은 그녀가 몸 돌리기를 멈추는 순간 고정된다(P1 11틱 · 34틱, P2 17틱, P3 7틱; P5 고리와 실패 창은 플레이어 발밑에 고정). 대시 무적으로 모두 피할 수 있다(P4 의 끌어당기기만 못 피하지만 피해가 없다). 효과는 금빛 바위 카드 · 입자 · 블록 디스플레이 조각과 붉은 · 검은 큐브, 소리는 바닐라 소리를 영상의 시점에 맞춰 겹쳤다.
+- **선딜 · 범위 조정**("공격 선딜 좀 짧게 하고 공격 범위를 좀 늘려봐"): 피해를 주는 모든 공격의 선딜(예고 또는 동작 시작부터 판정까지)을 약 25% 줄이고(예고 최소 10틱, 피할 수 없는 끌어당기기의 예고는 20틱 이상), 맞는 범위를 약 20% 넓혔다. 계수와 별 40% 내성은 그대로다. 동작은 원래 영상 시간표로 만든 클립을 리그 생성기가 다시 재생 시간표로 옮긴다(`guardian_clips.mjs` 의 `RETIME`: 빠른 타격 · 회전 키는 1:1 구간에 두어 속도가 그대로이고 선딜만 줄어듦, 타격 뒤 회복은 줄이지 않고 앞당김). 패턴 쪽의 효과 · 소리 틱도 같은 표로 옮기고(`api.rt`), 창 위치표는 새 클립에서 다시 쟀다. 남은 바닥 표식(P3 · P5 고리, 실패 창 별)과 효과 크기는 새 범위에 정확히 맞췄고, 플레이어 발밑에 고정되는 P5 고리와 실패 창 원은 걸어 다닐 수 있는 반지름 21칸 안에 들도록 중심을 경기장 안쪽으로 당긴다(벽에 붙은 플레이어도 그대로 맞음).
+- **P1 공간 찌르기**(근접 · 중거리, 79틱): 휘두르기 · 급류 소리와 함께 자세를 잡으면 3틱부터 창자루를 따라 금빛 번개가 차오르고(반짝이는 소리 · 차임), 11틱에 몸 돌리기를 멈춰 조준이 고정된다(바닥 궤적 표시 없음). 14틱 창끝 반짝임 · 차임 뒤 창끝이 그 지점에 꽂히도록 물러났다가 3칸 돌진한다(21틱, 9.3×2.9칸, 1.0배, 창끝 폭발 반지름 1.8칸). 이어서 31틱에 날갯짓하며 날아올라 플레이어 둘레 75° 방향(벽 가까이면 반대쪽)으로 6.6칸 떨어진 새 자리로 34~42틱 동안 고정된 지점을 바라보며 미끄러져 간 뒤, 창을 따라 금빛이 모이고(39틱부터) 6칸 급강하 돌진한다(46틱, 8.4×2.7칸, 1.15배, 강한 넉백). 바닥 예고는 없다: 자세 · 창의 빛 · 날아오름을 보고 옆으로 빠지거나 대시한다(자세 → 첫 타격 21틱, 날아오름 → 둘째 15틱).
+- **P2 공간 투창**(중거리 · 원거리, 67틱): 창을 회전시킨 뒤 사라지게 하고, 오른쪽 앞 가슴 높이에 회전하며 줄어드는 금빛 4각 문양을 공중에 띄운다(10~19틱, 공명 · 차임 소리). 17틱에 몸 돌리기를 멈춰 문양 지점부터 경기장 끝까지 폭 1.2칸 궤적이 고정되고(바닥 표시 없음, 영상처럼 공중의 문양과 빛기둥이 예고), 20틱 수직 빛기둥 · 22틱 창이 손에 다시 생김 · 26틱 폭발과 함께 던져 27틱에 판정한다(1.3배, 2틱, 문양 → 판정 17틱). 판정 순간 궤적 전체에 금빛 줄기와 파편이 튄다. 날아가는 창(틱당 5칸)은 연출용으로 피해가 없고, 벽 앞에서 기다렸다가 49틱에 끝장식부터 돌아와 54틱에 잡힌다.
+- **P3 공간을 집행하는 시련**(근접, 64틱): 창을 머리 위로 들면 앞 3.5칸을 중심으로 얇은 금빛 고리와 옅은 호박색 바닥이 그려지고(7틱, 조준 고정; 영상처럼 40% 크기로 나타나 5틱 만에 반지름 6칸까지 커짐, 진행 윤곽 · 틀의 윤곽 · 타격 섬광은 없음) 13틱 뒤 창을 내리꽂는다(20틱, 1.6배). 꽂힌 자리에서 금빛 기둥과 섬광이 솟고, 결정 칼날 11개가 사방으로 돋으며 금빛 · 검은 조각이 튄다. 고리가 나타날 때 원 밖으로 빠지거나(대시 한 번 + 달리기) 내리꽂는 순간 대시한다.
+- **P4 어둠 속에서 퍼지는 공간**(모든 거리 · 근접에서는 먼저 뒤로 물러남, 끌어당기기 32틱 + 휘두르기 46틱): 붉은 안개와 진홍빛 호가 피어오르고, 붉은 테의 검은 큐브가 플레이어를 감싼다(7~23틱, 1인칭이면 눈높이 큐브는 생기지 않음). 화면에 붉은 마름모 비네트가 닫히고(14~19) → 흰 섬광(20~21) → 주황 화면과 네 갈래 별(22) → 붉은 마름모(23)가 이어진 뒤, 24틱에 플레이어가 그녀 앞 1칸 바닥으로 끌려와 그녀를 바라보고(회피 불가, 시작 후 24틱) 비네트가 다시 열린다(24~30). 화면 효과는 리소스팩 글꼴 `rlk:mboss_gd`(U+E500~, 다른 글꼴과 겹치지 않음)의 글리프 타일 2×2 를 제목으로 띄운 것이라 카메라에 붙어 1인칭 · F5 위쪽 시점(받침 뒤 3.5~6칸 카메라) 어디서나 화면 전체에 같은 모습이다(GUI 배율 2 이상, 1080p 기준). 그동안 F5 조준점 제목은 쉰다(`vBig`). 19틱에 그녀의 가슴에서 플레이어 눈까지 막힘을 본다(거리 제한 없음, 경기장의 빛 블록 층 · 배리어는 통과, 바닥 · 벽만 막음 — 경기장 안에서는 늘 통과). 막혀 있거나 24틱에 도착 자리가 막혀 옮겨지지 않으면 감옥이 깨지고(붉은 · 검은 조각, 유리 소리) 화면이 걷히며 그녀는 제자리에서 휘두르기를 한다(패턴이 사라지지 않고 끝까지 감). 플레이어가 쓰러짐 · 부활 · 선택 화면 · 지도 중이라 끌려갈 수 없으면 32틱에 끝난다. 끌려온 뒤 12틱에 휘두르기 자세(창을 어깨 뒤로 눕히고 날개를 듦, 급류 소리), 41틱 창끝 반짝임 · 차임 · 신호기 소리, 판정 2틱 전 급류 · 넉백 소리가 나고 반지름 6.8칸 360도 휘두르기를 두 번 한다(51 · 64틱, 각 1.2배, 자세 → 첫 휘두르기 15틱). 바닥 고리는 없다(영상에도 없음): 자세와 소리를 보고 피한다. 금빛 초승달이 창끝을 따라 돌고 먼지 고리가 범위를 보여 주며, 두 번째는 기울어진 두 겹이다. 끌려온 직후 바로 바깥으로 달리면(1칸 → 첫 휘두르기 때 8칸) 맞지 않고, 대시로도 피한다.
+- **P5 하늘을 심판하는 자**(원거리, 91틱): 창을 세우면 검은 큐브가 자루를 타고 오르고 금빛 나선과 빛기둥 뒤 하늘로 솟는다(14틱, 공격 대사). 이륙 1틱 뒤 플레이어 발밑에 반지름 5.5칸 금빛 고리가 고정되어(금빛 테두리 막대 28개가 5틱 만에 퍼지고 반투명 호박색 바닥 · 가운데 금빛 네 갈래 별, 영상처럼 진행 원은 없음; 따라오지 않음, 고리 전체가 경기장 안에 들도록 중심을 축에서 15.5칸 안으로 당김) 15틱 뒤 31틱에 내리꽂는다(1.8배). 날아 있는 동안(16~30틱)은 공격받지 않고, 착지하면 금빛 결정 가시가 고리처럼 솟는다(반지름 5.6칸까지). 고리 밖으로 나가려면 대시가 필요하다(달리기만으로는 15틱에 4.2칸).
+
+#### 파수 모드와 원소 기록
+- 진입 50틱(지휘봉 돌리기 · 세로 원반 · 바닥 고리, 피해 없음, "기록하여 판결할 지어다.") 뒤 100틱 동안 금빛 기운을 두르고 플레이어 쪽으로 천천히(초당 1칸) 다가오며 원소를 기록한다.
+- **기록 규칙**: 몸에 맞은 불 · 물 · 번개 · 얼음 타격만, 원소마다 8틱에 한 번만 센다. 반응 피해 · 바위 · 물리 · 진입 회전 중의 타격은 세지 않는다. 새 원소는 3회, 파수 모드 I 에서 기록한 원소를 II 에서 다시 기록하려면 9회. 먼저 다 센 원소가 기록된다.
+- **금빛 기운**: 기록 창이 열리면 창이 금빛(`rig/spear/gold`)이 되고 몸 전체에 금빛 윤곽선(`rig/glow/gold`, 맞을 때의 흰 섬광 뒤 다시 금빛)이 둘리며, 틱마다 금빛 입자 3개 · 2틱마다 옅은 네모 조각과 창끝 반짝임. 기록되면(원소 창) 또는 금빛 휘두르기가 끝나면 사라진다.
+- **휘두르기**: 기록되면 창이 그 원소로 물들고 바로 원소 휘두르기, 시간이 다 되면 금빛 휘두르기. 둘 다 전방 200도 · 반지름 6 호를 리그의 칼날이 지나가는 틱에 맞춰 조각마다 벤다(그녀의 왼쪽부터). 금빛은 15~19틱(정면 17틱, 1.65배, 호를 따라 수정 가시), 원소는 16~22틱(정면 18틱, 2.5배 + 그 원소, 강한 넉백, 번개 · 불 · 물 · 얼음 효과)이고, 한 번 휘두르기에 한 번만 맞는다. 바닥 예고는 없다(영상 m2 에도 없음): 금빛은 파수 모드가 끝나기 11틱 전 금빛이 부풀고 4틱 전 가슴의 큰 금빛 문양 · 신호기 소리, 이어서 창을 오른쪽 어깨 뒤로 젖히는 동작과 9틱 급류 소리(문양 → 첫 조각 19틱, 동작 → 15틱), 원소는 기록 순간의 별빛 폭발 · 3틱 마법 부여 선과 허리 고리(신호기 · 짧은 음파 충전 소리) · 창의 원소 빛(동작 → 첫 조각 16틱)을 보고 호 밖으로 빠지거나 대시한다. 칼날이 지나간 자리에 남는 초승달 판 · 리본 · 가시와 원소 효과가 범위를 보여 준다.
+- 파수 모드 I → II 사이는 휘두르기가 끝나고 20틱(타격 후 약 43틱, m2 와 같음), 파수 모드 II → 혼돈 도약은 휘두르기 클립이 끝나자마자(마지막 칼날 조각 후 약 20틱, m2).
+- I 의 결과가 칸 A, II 의 결과가 칸 B(시간 초과면 빈 칸). 혼돈이 끝나면(그로기 끝 · 실패 끝) 두 칸을 비운다.
+
+#### 혼돈과 원소별
+- 중앙으로 도약(6칸 이상 떨어져 있으면) 또는 미끄러져 착지 → 창을 겨누고 30틱 충전 → 3칸 위로 떠오름 → **17.5초** 안에 원소별 둘을 부숴야 한다. 별은 떠 있는 그녀의 앞 아래쪽 4.2칸, 정면에서 ±24도로 서로 3.4칸 떨어져 있다(칸 A 는 플레이어가 보기에 왼쪽; 한 번의 범위 공격으로 둘을 함께 칠 수 있음).
+- 별 모습: 세워진 네 갈래 수정(면이 깎인 카드 두 장을 엇갈려 어느 쪽에서 봐도 두께가 있고, 가운데에 흰 빛 심이 45도로 엇갈림, 별 종류마다 밝음 · 중간 · 어둠 3색). 8틱에 1.15칸으로 생겨 타이머 동안 2.1칸까지 자라며 천천히 돈다(`item_display`, 리그 생성기의 `rlk:mboss/guardian/star_<종류>` 모델, 실패 때 흰 섬광 → 어두운 붉은색으로 쪼그라듦).
+- 기록된 칸은 **활성 원소별**(그 원소가 늘 부착, **그 원소에 40% 내성** = 그 원소 피해 × 0.6, 적어도 1, 다른 원소 · 물리는 그대로, 체력 = 보스 최대 체력의 4.2%), 빈 칸은 **타성 원소별**(A 금색 · B 파랑, 모든 저항 80% = 피해 × 0.238, 체력 1.7%). 별에는 0 피해 표시가 뜨지 않는다(내성 뒤에도 적어도 1, 시간 밖 · 0이 된 타격은 숫자 없이 조용히 무시). 혼돈 동안 보스바 셋째 줄에 "기록 원소 별: 같은 원소 40% 내성". 별에 맞는 피해는 몸에 맞는 것과 같은 보정을 받고, 시간 밖의 타격은 아무 일도 하지 않는다.
+- 별 체력 맞춤(`core.py` `STAR_PM` · `KILL_S`, 생성 때 검사): 몸을 스킬 위주가 아닌 평범한 딜로 약 75초에 잡는 캐릭터가 자기 원소로 치면 활성 별 75 × 4.2% ÷ 0.6 ≈ 5.3초, 타성 별 75 × 1.7% ÷ 0.238 ≈ 5.4초라 둘을 약 10.5~10.7초에 부순다(활성 둘 · 타성 둘도 같음, 17.5초 안). 다른 원소로 치면 활성 별은 약 3.2초.
+- 붉은 십자 문양, 경기장 가장자리의 진홍 안개, 날아다니는 **큐브 줄기**(피해 없음, 동시에 최대 3줄): 금빛 머리 큐브(0.62칸) 뒤로 붉게 빛나는 테두리의 검은 반투명 큐브가 이어진 8~12개짜리 뱀 사슬(뒤로 갈수록 0.52 → 0.3칸, 큐브마다 다른 기울기). 머리가 그녀 어깨 위에서 나와 10틱 바깥으로 날다가 플레이어 발밑으로 소용돌이치며 내려가고, 바닥에 닿으면 사라지고 뒤따르던 큐브가 한 틱에 하나씩 그 자리로 들어가 붉은 · 검은 조각으로 터진다.
+- 첫 별을 부수면 5틱 뒤 보스 최대 체력 6%, 둘째는 18%의 진짜 피해(마지막 한 방이면 그대로 쓰러짐) + 그로기.
+- **파괴 실패 창**: 시간이 다 되면 별이 번쩍이며 사라지고(실패 순서 전체가 m4 시간표의 0.75배), 남은 별 하나마다 23틱 간격으로 플레이어 위에 금빛 큐브 기둥(17틱, 위치 고정; 원 전체가 경기장 안에 들도록 중심을 축에서 17.6칸 안으로 당김) → 붉은 거대한 창과 붉은 네 갈래 별 표식(19틱, 옆 팔이 ±3.2칸에서 ±11.4칸으로 열림) → 별 색으로 바뀜(28틱, 파랑은 보라를 거침) → 37틱에 1틱 만에 떨어져 반지름 3.4칸 원기둥을 친다(2.2배, 그 별의 원소, 대시로 피함, 예고 18틱). 빛 기둥 · X자 광선 · 가시밭이나 얼음물 · 불꽃이 튀고 창은 30틱 뒤 위로 흩어진다. 표식은 영상(m4)처럼 진홍 콘크리트 별에 검은 테두리와 분홍 빛줄기뿐이다(분홍 중앙 별과 흰 대리석 위 모두에서 보임; 영상에 없는 피해 원 · 틀의 윤곽 · 진행 · 타격 섬광은 없음). 별은 약 23칸으로 실제 범위(반지름 3.4)보다 크므로, 떨어지는 순간(37틱)과 폭발(39틱)에 반지름 3.4칸 바닥에 별 색 고리가 생겨 맞는 범위를 알려 준다(예고가 아닌 타격 효과). 마지막 창이 꽂히고 10틱 뒤(창 둘이면 실패 시작 +70, m4 +90) 창이 아직 서 있는 동안 그녀가 중앙을 떠나 다가오고(남은 창의 흩어짐은 그대로 이어짐) 보통 패턴 4~5개.
+
+#### 그로기 · 사망
+- **그로기 220틱**: 떨어짐 → 축 처짐 → 136틱 방패를 앞으로 → 170틱 일어남, "나의 주인님이시여...!". 공격하지 않고 추가 피해 보정은 없다. 끝나면 보통 패턴 4~5개.
+- **사망**: "시련은... 끝났다..." → 축 처짐 → 큐브 꼬리를 끌며 날아올라 사라짐(리그 80틱, 몸체 90틱) → 경기장의 골드를 거두고 던전으로 돌아와 문 자리에 아이템 상자 2개. 소리는 목소리 없이 자막의 작은 효과음 + 자수정 깨짐 · 신호기 꺼짐, 날아오를 때 날갯짓 · 삼지창 급류(위더 소리 없음, `deathSnd` false).
+- **등장 소리**: 창이 꽂힐 때 모듈의 폭발 · 자수정 · 삼지창 천둥만(틀의 바닥 공격 타격 소리는 끔, 두 번 겹치지 않음).
+
+#### 보스바 · 대사
+- **보스바**: 이름 줄 = `Lv.N 파수꾼・타락` + 부착 원소 + `기록 ◇◆`(칸 A/B, 기록된 원소 색) + 상태(파수 모드 · 혼돈 · 그로기). 아랫줄 게이지 = 패턴 진행(금색), 파수 모드는 가장 많이 센 원소의 기록 진행(그 원소 색, 아직 없으면 남은 시간 금색), 혼돈 시간(불 색), 그로기 남은 시간(초록). 셋째 줄 = 패턴 이름 / 원소별 `불 1/3 물 0/3 …` / 별과 남은 초 / "그로기"(10-21 사용자 규칙: "공격할 기회" 같은 조언 문구는 없다).
+- **대사**(타자 치듯 나오는 자막 + 작은 효과음, 목소리 없음): 등장 "통찰하여, 나의 마음을 보아라." · 파수 모드 "기록하여 판결할 지어다."(두 번의 파수 모드에 한 번) · 공격 "처결하노라!" / "사라져라 마땅한 존재여!"(P2 던질 때 · P4 시전 · P5 이륙 · 실패 창 1, 20초에 한 번) · 그로기 "나의 주인님이시여...!" · 사망 "시련은... 끝났다...".
+
+#### 싸우는 법
+- 바닥 예고는 영상에 있는 셋(P3 고리 · P5 고리 · 실패 창 별)뿐이다. 그 밖의 공격은 그녀를 보고 피한다: 창에 금빛 번개가 차오르면 찌르기(조준이 멈춘 방향의 옆으로), 날아올라 옆으로 미끄러지면 급강하 찌르기, 공중에 문양이 뜨면 투창(빛기둥 뒤 바로 옆으로), 끌려온 뒤 창을 어깨 뒤로 눕히면 360도 휘두르기 둘(원 밖으로 달리거나 대시), 파수 모드 끝의 가슴 문양 · 기록 순간의 별빛 폭발이면 전방 휘두르기(뒤나 옆으로). 선딜이 짧아지고 범위가 넓어져 내려찍기(반지름 6, 13틱)와 하늘 심판(반지름 5.5, 15틱)은 달리기만으로는 빠지기 어렵고 대시 한 번이 필요하다.
+- 붙어서 싸워도 묶음마다 P4 가 나온다: 그녀가 뒤로 깡충 물러나 붉은 안개를 피우면 곧 끌려오므로, 끌려온 뒤 바로 바깥으로 달리거나 휘두르기에 맞춰 대시할 수 있게 대시를 남겨 둔다.
+- 파수 모드에서는 원하는 원소로 꾸준히 때려 기록하거나(8틱에 한 번 세므로 오래 이어서), 기록을 피하려면 그 100틱 동안 원소 타격을 멈춘다. 기록된 원소는 그 혼돈의 활성 별이 되어 그 원소에 40% 내성을 가지므로(그 원소로는 1.7배쯤 오래 걸림), 혼돈에서 쓸 원소를 생각해 고른다.
+- 혼돈에서는 활성 별을 다른 원소나 물리로 치면 빠르고(같은 원소도 들어가지만 40% 덜), 타성 별은 단단하니 오래 때린다. 두 별이 3.4칸 붙어 있어 범위 공격으로 함께 칠 수 있다. 둘 다 부수면 큰 피해와 그로기, 못 부수면 거대한 창이 떨어지니 남은 시간을 보고 대시를 아껴 둔다.
+
+#### 테스트 · 생성
+- **테스트**: `/function rlk:mboss/test/start {id:"guardian"}` 뒤 `/function rlk:mboss/test/pattern {id:N}` — 1~5 다음 보통 패턴(P3 는 먼저 다가감), 11 금빛 휘두르기, 12 원소(번개) 휘두르기, 13 실패 창 둘(타성 별 둘), 20 파수 모드 I, 21 파수 모드 II(칸 A = 번개, 다시 기록 9회), 30~33 혼돈(지금 칸 / 번개 둘 / 타성 둘 / 불 + 얼음), 40 그로기, 41 별 하나 부수기, 42 혼돈 1초 남기기, 91~94 불 · 물 · 번개 · 얼음 타격 기록 흉내(8틱 제한 그대로), 99 대기, 그 밖의 번호는 도움말. `test/lock {id:N}`: 1~5 그 패턴만, 6 파수 모드 둘 + 혼돈만, 0 해제. P4 화면 효과는 F5 위쪽 시점과 1인칭 둘 다로 보는 것이 좋다(리소스팩에 `rlk:mboss_gd` 글꼴이 있어야 함).
+- **생성**: 위 "등록 · 모듈"의 순서대로(`build_mboss_core.py`(레지스트리를 바꿨을 때) → … → `build_mboss_guardian.py` → … → `check_mboss_pack.py`). 리그는 따로 `node tools/build_mboss_guardian_rig.mjs --resourcepack <RP>`.
+- **지금 상태**: 코어와 다섯 패턴 · 휘두르기 둘 · 실패 창 모두 효과 · 소리까지 완성. 오프라인 명령 시뮬레이터로 판정 틱 · 계수 · 회피 · 정리와 처음부터 끝까지의 싸움(문 → 경기장 → 등장 → 보통 패턴 → 파수 모드 둘 → 혼돈 → 별 둘 부수기 → 그로기 → 처치 → 보상, 실패 창 경로 포함)을 확인했고, 게임 안에서는 아직 보지 않았다(카드 크기 · 입자 밀도 · 화면 효과 글리프의 위치와 크기 · 26.3 의 블록 디스플레이 형식). 리뷰 수정(별 40% 내성 · 별 간격 · 수정 별 · 큐브 사슬 · 금빛 윤곽 · 휘두르기 테두리 · 실패 표식 · P4 빈도와 화면 효과 · 소리)은 실제 경기장 바닥을 깐 오프라인 렌더와 명령 시뮬레이터로 확인했다. 선딜 · 범위 조정과 근접 P4 는 명령 시뮬레이터로 판정 틱 · 크기 · 회피(끌려온 뒤 달려서 빠지기, 대시) · 뒤로 물러나기(벽 앞 포함)를 확인했고, 30000틱 싸움 시뮬레이션에서 3칸 · 2.5칸에 붙어 있는 플레이어, 들락날락하는 근접 플레이어, 원거리 플레이어 모두 보통 패턴 묶음마다 P4 가 나왔다(조정 전 근접 0/127묶음). 바닥 예고 규칙(10-20)은 명령 시뮬레이터로 확인했다: 바닥 예고를 그리는 판정(틀의 윤곽 · 섬광, `hz_vis` 표식, 모듈 바닥 표식, 바닥에 눕힌 카드, 바닥 높이 입자)은 P3 · P5 · 실패 창뿐이고 모든 판정이 조용하며, 판정 틱 · 계수 · 크기는 그대로다.
+
+### 달빛 환영 나비 모듈 (`mboss/butterfly/`, `tools/build_mboss_butterfly.py`)
+원신의 달빛 환영 나비(칭호 **달빛의 화신**, 영상 v1~v4, 공략 PDF 기준). 레지스트리 `butterfly`(n 2, 가중치 10, 풀, 1레벨 체력 240, 기본 공격 12 × `dmgMul` 110%, 금화 × 5, 사파이어 1, 아이템 상자 2개, 몸 크기 1.4 · 클릭 판정 1.6 × 3.0, 등장 최대 140틱 · 사망 100틱, `deathSnd` false, 문 아이콘 초록 개구리불). 사람 모양(인간형)과 나비 모양(나비형)을 오가며 싸우고, 나비형으로 바뀔 때 플레이어에게 **달빛 고치**를 건다.
+- **원소 내성 없음**(사용자 결정 "기본적으로 있는 불, 풀 내성은 없애줘"): 원신에서는 불 · 풀 내성이 높지만 여기서는 `mres` 0, 원소에 따른 보정이 하나도 없다(모든 원소 · 물리 같은 피해, 시뮬레이터 시험으로 고정).
+- **연소 약점**(PDF): 나비형일 때 플레이어의 불 또는 풀 타격 한 번(반응 피해 제외)이면 다른 원소가 없어도 그녀가 **연소**한다(불 · 풀 부착 + 기존 연소 반응 10: 0.5초마다 반응 기준의 50% 불 피해, "연소" 글자). 인간형은 보통 반응 규칙.
+- **피해 수치**(방어 · 레벨 보정 전): 1.0배 = 13. H1 0.55 / 0.7배, H2 0.45 / 0.7배, H3 1.3배, H4 1.2배, B1 0.7배, B2 초승달 0.35배(날개 한 번에 한 번만), B3 0.8배 + 불꽃 자국 0.2배(최대 2번), B4 구슬마다 1.0배(구슬 하나에 한 번), B5 1.3배(약 17). 인간형 발차기와 B1 · B4 · B5 는 풀, B2 · B3 은 불.
+  - **균형**(리뷰 수정): 리뷰의 싸움 시뮬레이터(스크래치패드 `mb2/balance/bal.py`, 4레벨 아이템 없는 플레이어, 시드 3개 × 3분)로 같은 플레이어가 1분에 받는 피해를 가디언의 ±20% 안으로 맞췄다. 나비형 전체 × 0.7 에서 시작해, 휘두르는 근접 플레이어를 가장 많이 맞히는 H1 · H2 를 더 줄이고 원거리 플레이어에게 닿는 B4 를 1.2배로 되올렸다. 그녀의 불 · 풀 번갈이로 플레이어에게 생기는 연소는 의도한 것이고 아래 수치에 들어 있다.
+
+    | 1분 피해 | 전(b98f833) | 리뷰 수정 뒤 | 가디언 |
+    |---|---|---|---|
+    | 서 있기 | 368.1 (1.70배) | 243.6 (1.12배) | 217.1 |
+    | 근접 걷기 | 326.1 (2.06배) | 184.4 (1.16배) | 158.3 |
+    | 원거리 걷기 | 261.0 (2.00배) | 112.9 (0.86배) | 130.6 |
+
+  - **선딜 조정 뒤 다시 맞춤**(사용자 피드백 "선딜 좀 줄이고"): 선딜이 짧아져 1분에 나오는 패턴이 늘고(특히 근접 걷기에서 H1 · H2 가 두 배 가까이) 근접 걷기가 가디언의 1.39배가 되어, H1 0.7 / 0.9 → 0.55 / 0.7, H2 0.6 / 0.9 → 0.45 / 0.7, B1 0.8 → 0.7, B3 0.9 → 0.8, B4 1.2 → 1.0, B5 1.5 → 1.3 으로 내렸다(같은 시뮬레이터, 같은 시드; 회복 계기와 치명타 피해 축복도 들어간 상태).
+
+    | 1분 피해 | 출시본(7a6dc4f) | 선딜만 줄임 | 계수까지 맞춤 | 가디언 |
+    |---|---|---|---|---|
+    | 서 있기 | 243.6 (1.12배) | 251.9 (1.16배) | 217.3 (1.00배) | 217.1 |
+    | 근접 걷기 | 184.4 (1.16배) | 219.7 (1.39배) | 181.8 (1.15배) | 158.3 |
+    | 원거리 걷기 | 112.9 (0.86배) | 141.9 (1.09배) | 127.3 (0.98배) | 130.6 |
+- **선딜 조정**(사용자 피드백 "선딜 좀 줄이고", 가디언과 같은 방식): 피해를 주는 모든 공격의 선딜(패턴 시작이나 앞 타격부터 판정까지)을 약 25% 줄였다. 동작은 예전처럼 사양 시간표로 만든 클립을 리그 생성기가 재생 시간표로 옮긴다(`butterfly_clips.mjs` 의 `RETIME`: 조각 직선 매듭 [작성 틱, 재생 틱], 키가 겹치지 않게 매듭을 키 틱에 둠; 타격과 그 뒤 동작은 1:1 구간이라 속도가 그대로이고 사건 틱에 맞음, 마지막 타격 뒤 회복은 앞당겨질 뿐). H2 나선 점프의 회전은 부위가 한 틱에 120도를 넘게 돌지 않도록(리그 컴파일러의 검사) 1:1 로 두었고, B5 의 짧은 급강하(작성 5~9틱)도 타격처럼 1:1 이다. 매니페스트에 `retime` · `authoredLen` 이 들어가고 모듈은 사건 틱을 매니페스트에서 읽으므로 판정 · 효과 · 소리가 같이 움직이며, 사건이 아닌 사양 틱은 `api.rt` 로 옮긴다. 10틱보다 긴 예고(조준 고정 · 판정 생성 → 타격)는 약 25% 줄이되 10틱 밑으로는 안 내린다(`api.tell_rt`). 아래 표의 "예고"는 그 시간이다: 10-20 예고 규칙 뒤로는 바닥 그림 없이 판정만 그 시간 전에 생긴다(아래 "예고 규칙").
+
+    | 공격 | 선딜 전 → 후(틱) | 예고 전 → 후 |
+    |---|---|---|
+    | H1 첫 타(시작 → 8틱) | 10 → 10(예고 하한) | 10 → 10 |
+    | H1 둘째 타(첫 타 → 둘째 타) | 32 → 24 | 14 → 11 |
+    | H2 휘돌려차기 | 13 → 10 | 10 → 10 |
+    | H2 원판(휘돌려차기 → 충돌) | 42 → 32 | 12 → 10 |
+    | H3 발차기 | 15 → 11 | 12 → 10(고리 16 → 14) |
+    | H4 칼날 발사 | 17 → 13 | 빛 → 발사 8 → 8(+비행; 4칸 앞도 11틱) |
+    | 변신의 달빛 고치 | 6 → 5(키 간격 1틱이 한계) | (피할 수 없는 디버프) |
+    | B1 타격 | 15 → 11 | 12 → 10 |
+    | B2 휘두르기(첫 / 사이) | 5 → 4 / 26 · 38 · 25 → 20 · 28 · 20 | 휘두르기 → 착지 14~60틱 그대로 |
+    | B3 불꽃 부채 | 28 → 21 | 12 → 10 |
+    | B4 구슬(첫 / 사이) | 19 → 14 / 27 → 20 | 멈춤 → 터짐 10 그대로 |
+    | B5 돔 | 53 → 40 | 22 → 17 |
+
+    클립 길이: kick_combo 51 → 43, kick_jump 65 → 52, dash_kick 50 → 46, vacuum 41 → 37, transform 30 → 29, wing_strike 55 → 51, wing_barrage 117 → 95, flap_dive 59 → 52, coco 76 → 64, release 96 → 83. B5 의 급강하 창이 13 → 11틱이라 급강하 속도 상한은 1.0 → 1.2칸/틱이다.
+
+#### 예고 규칙 (10-20)
+사용자 규칙 "보스의 모든 공격에 바닥의 예고를 보여줄 필요는 없어. 영상에 없다면 그냥 보스의 동작을 보고 회피해야 하는 거니까": **영상에 바닥 예고가 있는 공격만 바닥 예고**를 그린다. 영상 v1~v4 의 모든 공격을 확인한 감사(스크래치패드 `tele/bf/audit.md`, 공격마다 프레임 시각과 증거 그림)에서 그녀의 영상에는 **바닥 예고가 하나도 없다**: 땅의 빛은 맞는 순간의 공격 자체이거나 그녀 발밑의 빛이다.
+- **바닥 예고를 남기는 공격**: B3 날개 휩쓸개의 **불꽃 자국**만(다듬음: 그녀가 미끄러지며 바닥에 남기는 검붉은 불씨 줄 = 영상 v3 13.30~13.68초의 불꽃 줄, 10틱 뒤 타오름; 줄은 타오르는 틱까지만 남음(11틱, 영상의 줄도 6~8틱이면 사라짐); 그 위의 원 예고는 지움; 멈춤 뒤에는 살아 있는 자국마다 남은 시간으로 다시 깔림). 달빛 고치(변신의 빛 구)는 피할 수 없는 디버프라 그대로(예고 없음).
+- **동작과 소리로 읽는 공격**(바닥 그림 · 틀 윤곽 · 예고만 하는 길 · 바닥 표시를 모두 지움): H1 두 타, H2 휘돌려차기 · 원판(무릎 높이 점 고리와 목표 위 표시도), H3(돌진 길도), H4(벽까지의 칼날 길도), B1, B2(착지 원), B3 불꽃 부채, B4 구슬(바닥의 그림자 고리)과 터짐, B5 돔(안전선 고리도). 판정은 모두 조용한 판정(`#hzQuiet 1`: 윤곽 · 타격 섬광 없음, `#hzSfx 0`)이고, 처음 알아볼 수 있는 동작 · 소리부터 타격까지 10틱 이상이며, 맞는 틱에 공격 자체의 효과(초승달 · 터짐 · 파동 · 고리 · 돔)가 그 자리를 보여 준다. 일시정지 뒤 바닥 예고를 다시 그리던 코어 `u/redraw` 와 B2 의 `resume` · `redraw` 는 지웠다. B3 만 `p/sweep/pause` · `resume` · `ember` 로 불씨 줄을 지우고 다시 깐다(효과 카드는 게임 시간으로 나이를 먹어 멈춘 동안 사라지므로). 영상에는 불꽃 줄 뒤에 따로 타오르는 장면이 없다: 10틱 뒤의 타오름은 설계로 더한 것이다(감사 표시 5).
+- **읽기 보강**: H1 첫 타는 달려 듦이 타격 8틱 전에야 시작해서, 클립보다 2틱 먼저(−2틱) 발차기 바람 소리(효과 도구 `snd/kick_whoosh`)와 차는 발의 연두 빛 · 반짝임을 넣어 10틱을 맞췄다(시간 · 범위 · 피해는 그대로). 나머지는 이미 있는 동작으로 10틱 이상: H2 원판은 머리 위 구슬 · 38틱 별빛 · 떨어지는 원판, B2 는 날아오는 초승달, B4 터짐은 멈춰 맥동하는 구슬과 신호기 소리(모두 영상에 있는 것).
+- **시험**: 스크래치패드 `mb2/tests/tele_rule.py`(`test_butterfly.py` 11절): 패턴마다 바닥 예고를 그리는 판정의 모음 = 감사의 남김 · 다듬음 모음({B3 불꽃 자국}), 판정마다 10틱 이상과 맞는 틱의 효과, H1 의 몸 예고, 생성된 함수에 예고 그림 · 예고만 하는 판정 · 지운 표시가 없음.
+
+#### 형태와 순환
+- **등장(고치)**: 빛나는 연두 바닥 원 위에 떠 있는 고치(흰 · 청록 바람 줄기) → 58틱 부제 "달빛의 화신" → 62틱부터 빛이 차오르고 72틱 하얗게 번쩍 → **80틱 흰 · 청록 · 민트 수정 조각으로 터지며** 연두 초승달 둘 → 약 4칸 위에서 떨어져 91틱 착지 → 107틱 일어섬, 108틱부터 전투. 피해 없음, 그동안 무적.
+  - 연출(2단계, `seq_h.py` → `mboss/butterfly/seq_h/entrance/*`, 틱은 등장 클립 기준 = 등장 시계 − 1): 0틱 연두 바닥 원(효과 도구 `cocoon_disc`, 터질 때까지)과 옅은 테두리(20틱마다 새로), 은은한 울림 · 4틱마다 바닥 고리 티끌과 흰 → 청록 바람 줄기 · 8틱마다 감기는 흰 바람 줄 카드 · 0 · 20 · 40틱 달빛 티끌 → 57틱 고치 끝의 별빛과 울림 → 61틱 빛이 차오름(`cocoon_glow`, 부드러운 충전 소리)과 2틱마다 이음매의 빛줄기 → **69틱 차오르는 유리 울림**(영상 3.48초, 휘장보다 2틱 앞) → 71틱 하얀 빛 덩이 + 화면 흰 섬광 → 75틱 여섯 갈래 빛살 → 79틱 수정 조각 폭발(`cocoon_burst`, 흰 · 하늘색 유리 조각) → 청록 바람 → 82 · 85 · 88틱 반짝임 · 떨어지는 잎 · 내려가는 차임 → 90틱 착지(민트 물결, 연두 고리, 이끼 소리) → 일어설 때까지 잎이 떨어진다. 코어는 클립 · 고치 소품 · 부제 · 무적 · 시작 시각만 맡는다.
+- **인간형**: 땅에 붙어 움직인다(7칸보다 멀면 걸어오고, 2.2칸 안이면 걸음 속도로 물러나고, 그 사이에서는 40틱마다 16틱씩 옆걸음). 거리 구간(근접 4칸 이하 · 중거리 · 원거리 8칸 이상)으로 거른 섞인 주머니에서 같은 패턴 연속 없이 고른다. 근접 패턴은 먼저 빠르게 달려 붙는다(0.7칸/틱, 최대 12틱).
+  - H1 **달빛 발차기**(근접 ×2 · 중거리, 43틱, 클립보다 2틱 먼저 시작): −2틱에 플레이어 쪽 줄 위 A(최대 4.5칸, 플레이어 1.5칸 앞)를 정하고 **좁은 세로 띠**(A 뒤 0.5칸부터 길이 4.5 · 폭 2.4) + A 앞 1.2칸 반지름 1.5 원(한 묶음, 판정은 10틱 전에 생김, 바닥 그림 없음)과 몸 예고(발차기 바람 소리 · 차는 발의 연두 빛과 반짝임) → 0~5틱 A까지 달려 듦 → **8틱 솟아오르는 발차기 초승달**(0.55배, 잎 칼날) → 1.2칸 뒤로 공중제비 · 16틱 착지 → 19 · 22틱 옆으로 0.75칸씩 양쪽 깡충 → 21틱 다시 플레이어를 겨눠 도약 착지점 B(최대 3.5칸, 1.2칸 앞)와 **반원(반지름 5) + 바닥 파동 6 × 2칸**(한 묶음, 11틱 전; 17틱부터 발이 빛나고 깡충 · 도약으로 읽음) → 25틱 B로 도약, 28틱 발끝 소용돌이 → **32틱 내려찍기 초승달 + 칼날 파동**(0.7배) → 36틱 착지. 묶음마다 최대 한 번(합쳐 1.25배). 옆으로 1.5칸 넘게 비키면 첫 타를, B 뒤쪽 반은 둘째 타를 피한다.
+  - H2 **달빛 점프**(근접 · 중거리, 3칸까지 달려 붙음, 52틱): 0틱 팔 사슬이 연두로 빛남(그녀 둘레 반지름 3 판정, 바닥 그림 · 무릎 높이 고리 없음) → **10~13틱 360도 낮은 휘돌려차기**(0.45배, 발 높이 1.0칸까지만 맞음 = 점프로 넘김) → 22틱 플레이어 쪽(최대 3.5칸, 0.8칸 앞)으로 나선 점프 → **충돌 10틱 전에 플레이어 발밑 고정**(걷는 원 r 20.3 안으로만 당김: 벽에 붙어도 덮음), 반지름 2.5 판정(바닥 그림 · 위의 표시 없음, 그 자리의 작은 울림 소리만) → 발끝 구슬 → 별빛(영상의 별) → 내려차기 → 원판이 떨어져 **충돌**(0.7배, 강한 밀침) → 착지. 두 판정은 따로(최대 1.15배). 리그 이벤트 orb 34 · kick 39 · impact 42 · land 46(선딜 조정 전 45 · 52 · 55 · 59).
+  - H3 **달빛 돌진**(중거리 · 원거리 ×2, 46틱): 0~5틱 달빛 티끌이 모여드는 충전(바닥 빛, 차임이 올라감) → **1틱 조준 고정**: D(최대 7칸, 플레이어 1.5칸 앞), D 너머 1.2칸 **발차기 원(반지름 1.5, 10틱 전)** + D 둘레 **고리(반지름 3.5, 14틱 전, 3틱 지속)** 한 묶음(바닥 그림 · 돌진 길 없음: 영상에는 충전 때 그녀 발밑의 빛뿐) → 6~8틱 D로 돌진(빛줄기, 잔상) → 11틱 발차기 → 15틱 사방 고리 베기. 먼저 맞은 하나만(1.3배): 발차기만 대시로 피하면 고리가 아직 맞는다(뒤로 대시 또는 걸어서 물러나기).
+  - H4 **광폭한 진공**(원거리 ×2 · 중거리, 37틱): 0~4틱 웅크리며 다리가 빛나고 플레이어를 따라 돈다 → **5틱 빛에 방향 고정**(바닥의 길 예고 없음: 영상에는 칼날 뒤의 흔적뿐) → 8~10틱 0.3칸 물러섬 → 12틱 발 구르기 → **13틱 세로 초승달 칼날**(효과 도구 `vblade`, 바닥에서 3틱에 솟음)이 **0.75칸/틱으로 곧게** 날아감(투사체 칼날 판정 반폭 1.5: 줄에서 1.8칸 = 폭 3칸 칼날 + 몸 여유 0.3칸까지 맞음, 점프로 못 피함, 유도 없음, 벽 또는 60틱에서 부서짐, 한 번 맞히면 그대로 지나감; 1.2배) → 14~30틱 뒤로 2.5칸 공중제비 → 34틱 착지. 4칸 앞의 플레이어도 빛에서 맞기까지 11틱. 칼날은 패턴이 끝나도 날아가고 코어 틱의 훅 한 줄이 그 자국 효과와 지나가는 소리를 이어 준다.
+  - 만드는 방식(2단계, `human.py`): 모든 피해 판정은 틀의 `hz/*`(조용히 `#hzQuiet 1`, 틀 소리 끔 `#hzSfx 0`)이고 바닥 그림은 없다(예고 규칙): 첫 동작 · 소리부터 타격까지 적어도 10틱. 효과는 효과 도구 프리셋(`kick_rise` · `kick_axe` · `ground_wave` · `shard_tell` · `sweep` · `spiral_jump` · `orb_star` · `orb_kick` · `disc_fall` · `disc_impact` · `dash_charge` · `dash_streak` · `kick_burst` · `vac_*` · `land` · `glint`) + 카드 몇 장, 소리는 효과 도구 레시피 + 영상 소리 표의 바닐라 소리 한 겹씩. 리그 이벤트와 부위 위치는 매니페스트에서 읽는다(`ev_or`, `api.h_anchor`). 패턴 표시(A · B · D · L)는 시작과 끝에 지운다. 시험: 스크래치패드 `mb2/tests/pat_human.py`(판정 틱 · 계수 · 원소 · 모양 · 묶음 · 조용한 판정과 바닥 그림 없음 · H1 의 몸 예고 · 효과 이벤트 · 칼날 경로), `test_human.py`(옆으로 피하기 · 점프 · 대시 · 칼날 폭 · 벽 · 일시정지 · 사망 · 취소 · 중단 정리 · 긴 싸움의 예고 규칙 · 등장 · 그로기 · 사망 연출), 그림 `mb2/renders/human_*.png`.
+- **변신**(인간형 → 나비형): 처음에는 전투 600틱 또는 인간형 패턴 5개 중 먼저 오는 쪽, 그로기 뒤에는 인간형 패턴 4개가 끝난 패턴 경계에서. 29틱: 경기장 가운데에서 16.5칸 밖이면 처음 3틱 동안 그 안으로 미끄러져 들어오고(날개 끝이 벽에 닿지 않게), 고치가 빛나고 접힌 날개가 3~11틱에 펼쳐지며 5틱 반지름 2.5의 빛 구 → **달빛 고치**와 **달빛 이슬** 3개 → 반지름 3~5의 물결 고리 → 날개가 다 펴진다.
+- **나비형**: 늘 떠 있고(발끝 +1.2칸, 리그가 높이를 맡음) 8칸보다 멀면 0.25칸/틱으로 다가오고 **3.5칸 안이면** 0.2칸/틱으로 물러난다(예전 5칸: 근접 플레이어가 거의 닿지 못했음). 패턴 사이에는 18틱마다 작은 날갯짓 소리. 몸은 경기장 가운데에서 **16.5칸 안**에만 있다(날개 끝이 벽에 닿지 않게: 다가가기 · 물러나기 · 패턴의 이동 목표 · 이동 목표를 찾는 걸음을 모두 그 안으로 당기고, 밖에 있으면 틱당 0.3칸씩 돌아옴). 패턴마다 그 원소로 날개 색이 **8틱 먼저 1틱에 바뀐다**(풀 = 연두 · 오팔, 불 = 주황 금빛 + 자홍 테두리; 불 패턴 전에는 6칸 밖으로 물러남: 날개가 이미 불이어도, 최대 8틱. 달빛 해제 전에는 8칸보다 멀면 0.4칸/틱으로 최대 10틱 다가옴): 바뀌는 틱에 짧은 빛(불은 자홍 테두리 빛 · 금빛 날개폭 빛, 풀은 연두 빛 · 날개 끝 옅은 빛; 카드 3장 · 입자 12개 이하)과 소리, 불 날개인 동안 6틱마다 앞날개 끝에 작은 불티. 패턴 4~5개 또는 나비형 900틱 뒤 **달빛 해제**. 거리 구간(근접 4칸 이하 · 중거리 · 원거리 8칸 이상)마다 뽑는 패턴: B1 근접 ×2 · 중거리, B2 중거리 · 원거리 ×2, B3 근접 · 중거리 ×2, B4 중거리 · 원거리.
+  - 공통(날개 패턴 담당 `wing.py` + `seq_b.py`): 모든 바닥 판정은 조용한 판정(틀의 입자 예고와 타격음은 끄고 패턴이 소리를 직접 냄)이고 바닥 그림은 없다(예고 규칙; B3 불꽃 자국의 불씨 줄만 남음). 날갯짓 · 급강하 · 자막 · 구슬로 최소 10틱 먼저 읽는다. 플레이어 발밑에 고정하는 목표는 **걷는 원(가운데에서 20.3칸)** 안으로만 당겨서 벽에 붙은 플레이어도 덮는다. 효과 · 소리는 모두 효과 도구(카드 · 묶음 · 바닐라 소리 조합)로 그린다.
+  - B1 **우아한 날개**(풀, 51틱): 0~3틱 기울며 조금 다가옴 → **1틱 조준 고정**: 플레이어 발밑 L, 그녀 → L 방향, 활강 끝점 H(L 너머 2칸, 그녀 오른쪽 1.2칸) → 그녀 자리에서 L 방향 **띠 10 × 3.5칸 + L 앞 부채꼴(반지름 4, ±60도)**, 둘이 한 묶음(한 번만 맞음), 판정은 10틱 전(바닥 그림 없음: 영상의 바닥 베기 띠는 맞을 때부터) → 4~11틱 H 까지 급강하 활강(뒤로 연두 줄기) → **11틱 날개 가장자리 타격**(B1 계수, 넉백 3): 짙은 청록 위 밝은 연두 날개 호, L 에 연두 터짐과 잎 → 12~13틱 지나간 길의 바닥 베기 띠 · 바닥 호 → 15틱 H 에 세로 초승달 → 상승 · 날갯짓 뒤 다시 플레이어를 본다. 피하기: 고정 뒤 옆으로 2.1칸(띠 · 부채꼴 밖) 또는 11틱 대시.
+  - B2 **화염 날개의 습격**(불, 95틱 + 마지막 초승달이 떨어질 때까지): 날개 휘두르기 4번(리그 사건 swing1~4 = 4 · 24 · 52 · 72틱, 각각 4틱 앞에 몸을 틀어 날개를 젖힘; 선딜 조정 전 5 · 31 · 69 · 94틱). 휘두르기 사이가 짧아져 앞 휘두르기의 마지막 초승달이 다음 휘두르기 뒤에 떨어지기도 한다(묶음은 휘두르기마다 따로). 휘두를 때 플레이어 자리 L 을 고정하고 목표 5곳을 정한다: 홀수 번째는 조준과 가로로, 짝수 번째는 조준 방향 세로로 1.8칸 간격 한 줄. 목표에는 아무것도 그리지 않는다(예고 규칙: 영상에서도 바닥은 착지까지 비어 있고 날아오는 초승달이 예고). 휘두를 때 불꽃 판(홀수 대각선, 짝수 가로 + 흰 바람 줄기). i번째(0~4) **진짜 투사체 불꽃 초승달**(틀의 투사체, 불꽃 갈퀴 모양)이 2+i틱에 날개 뿌리에서 나와 5틱 동안 부채꼴로 퍼지며 0.6칸/틱으로 올라갔다가, **D틱** 동안 휘어진 궤적으로 내리꽂혀 자기 목표(가운데 → ±1.8 → ±3.6)에 떨어진다. D 는 휘두르는 틱에 게임 안에서 잰 거리로 정한다: 퍼진 끝점에서 목표까지 곧은 거리 L 에 대해 D = (L + 4 × 0.4) / 0.7, 7~60틱(어느 거리에서도 내리꽂힘이 0.7칸/틱 이하; 예전에는 정해진 7틱이라 멀면 3.5칸/틱). 착지 틱(목표 표시의 `mbT`) · 내리꽂힘 · 착지 · 투사체 수명이 모두 같은 D 를 쓴다. 날아가는 동안 실제 비행 방향을 따라 1~2칸의 불꽃 꼬리가 남는다(갈퀴 자체는 어느 쪽에서도 읽히게 화면을 봄). 휘두르기 사이에 9칸보다 멀면 0.3칸/틱으로 다가온다. 날아가는 동안은 해가 없고 떨어지는 틱에 바닥 반지름 1.2(+몸 0.3)를 맞힌다: 0.35배 불, 넉백 2, 휘두르기 하나의 다섯 개가 한 묶음 = 휘두르기마다 최대 한 번(대시로 피한 것은 묶음을 쓰지 않음). 떨어질 때 불 튀김 · 2.5칸 불기둥 · 그을음 · 터지는 소리. 피하기: 가로줄이면 앞뒤로, 세로줄이면 옆으로 1.5칸.
+  - B3 **날개 휩쓸개**(불, 52틱): 날개를 V로 들고 큰 날갯짓 두 번 · 상승(날개 끝 불티, 금빛 테 빛) → **11틱 고정**: 내려칠 자리 P(플레이어 쪽으로 최대 3칸, 플레이어 2.5칸 앞) · 플레이어 쪽 조준 → **앞 180도 불꽃 부채**(반지름 4.5, 높이 2.5, 21~25틱 판정, B3 계수 불, 넉백 3), 판정은 10틱 전(바닥 그림 없음) → 13~19틱 머리부터 P 로 급강하(리그의 dive 13 → slam 19) → 19틱 내려침(날개 끝 세로 불꽃 초승달) → 21틱 분출(불꽃 부채 · 그을린 바닥 · 불티) → 26~36틱(리그의 glide 26부터) 오른쪽으로 4.5칸 낮게 미끄러지며 27 · 29 · 31 · 33틱에 발밑 **불꽃 자국**(반지름 1, 바닥에 남는 검붉은 불씨 줄이 유일한 바닥 예고 = 영상의 불꽃 줄, 타오르는 틱까지 11틱 남음, 10틱 뒤 8틱 동안 타오름, 0.2배 불, 넉백 없음, 앞 둘 · 뒤 둘이 각각 한 묶음 = 최대 2번) → 다시 6칸 밖으로. P 의 뒤쪽은 안전.
+  - B4 **달빛 축복**(풀, 86틱까지): 3틱 날개로 감싸 가슴에 연두 핵을 모음 → 14틱 구슬 1(가슴 앞), 22~30틱 고치 공(플레이어 쪽으로 천천히, 5칸 안으로는 안 감; 리그의 감싼 날개 고치 `prop/pod` 가 22틱에 가슴 빛 자리(리그 앵커 core)에 생겨 그녀와 함께 움직이고 30틱 ball_open 에 사라짐), 23틱 다시 모으기, 34틱 구슬 2(오른쪽 옆구리). 구슬은 **틀의 투사체**(보이지 않는 운반체에 리그의 구슬 소품 `prop/orb`: 1.7칸 연두 유리 구 + 자이로 고리 둘): 0.25칸/틱(걷는 속도)으로 날며 40틱 동안 틱당 9도까지 플레이어 가슴 쪽으로 꺾는다. 닿으면 1.0배 풀(넉백 2)로 터지고, 40틱이 지나면 멈춰 맥동하고(신호기 소리, 바닥 그림 · 날 때의 그림자 고리 없음) **10틱 뒤 그 아래 반지름 2.8 방사형 바닥 칼날**(1.0배, 넉백 3, 그 구슬과 한 묶음 = 구슬마다 최대 한 번). 대시로 지나치면 해 없이 터진다(뒤의 칼날도 없음). 두 구슬이 다 사라지면 64틱 뒤 바로 끝난다.
+  - B5 **달빛 해제**(풀, 83틱, 자막 "달빛 해제"): 0틱 자리 **R = 플레이어 자리에서 경기장 가운데 반대쪽으로 4칸**(가운데에 서 있으면 그녀 반대쪽, 가운데에서 16칸 안; 그 자리가 16칸 밖이면(플레이어가 가운데에서 약 12칸 밖) 끌어당기지 않고 플레이어 자리에서 벽을 따라 그녀 반대쪽으로 4칸 옆 = 돔 밖까지 걸어서 언제나 6.5칸 이하) · 날개를 접음(연두 나비 무늬) → 3틱부터 8~11틱 동안(거리 / 1.2칸/틱; 선딜 조정 전 1.0칸/틱 9~13틱, 그 전에는 늘 9틱이라 최대 3.5칸/틱) 플레이어를 스쳐 R 로 → 14~22틱 휘돌기(오른쪽의 연두 네 갈래 별 · 베기 줄기) → **23틱 날개를 앞으로 오므림: R 중심 반지름 10 돔 판정(17틱 전, 바닥 그림 · 안전선 없음: 반지름은 자막 · 오므림 · R 밑 바닥 섬광으로 읽고 돔에서 배움)** → 26틱 바닥 섬광(영상에 있음, 그녀 밑 = 중심) · 28틱 청록 X 빛과 자이로 고리 우리(30틱 한 번 더) → 33틱 고치(핵이 커짐, 리그의 `prop/pod` 가 가슴 빛 자리에서 39틱 snap 까지) · 37틱 음파 충전 → **40틱 흰 섬광 · 반지름 10 연두 돔**(B5 계수 풀, 넉백 4, 화면 흰 번쩍임 → 연두) → 47틱 덩굴 줄기 · 50 · 62틱 호박빛 잎 → 74틱 날개가 평평한 연두로(날개 끝 조각) → 78틱 부서짐 → 79틱 인간형(클릭 판정 되돌림, 남은 달빛 이슬 사라짐) → 83틱 착지. 피하기: 23틱부터 가운데 쪽으로 R 에서 10.3칸 밖, 또는 40틱 대시.
+- **그로기 300틱**(15초): 달빛 해제 뒤 플레이어에게 등을 돌린 채 가만히 서 있다(따라 돌지 않고 공격하지 않음, 받는 피해 보정 없음, 연두 빛 조각). 아직 달빛 고치가 있으면 20틱에 회복 계기를 마저 채울 만큼의 달빛 이슬이 새로 생긴다: 하나로 계기가 차면 1개, 아니면 서로 반대편에 2개(예전에는 늘 1개; 가져가거나, 다음 변신의 빛 구(그때는 늘 정확히 3개로 다시 놓음) 또는 다음 나비형이 끝날 때까지 남고, `/reload` 뒤에도 남은 수만큼 다시 생김). 끝나면 24틱 동안 돌아서고 18틱 동안 초승달 사슬이 다시 모인 뒤 **달빛 점프부터** 인간형 순환을 다시 시작한다(다음 인간형 패턴 수는 그로기 시작에서 세므로 테스트 명령으로 그로기를 끊어도 바로 변신하지 않음). 체력 단계는 없다.
+  - 연출(2단계, `seq_h/revert` · `groggy/*` · `recover/*`): 달빛 해제 79틱(인간형으로 돌아옴)에 부서진 날개 조각이 주위에 흩날리고, 그로기 시작에 기운 빠지는 소리, 10틱마다 어깨 위 연두 티끌, 40틱마다 달빛 티끌, 100 · 200틱 발밑의 옅은 연두 고리(아직 멍함), 280틱 어깨 조각이 반짝이며 깨어남, 300틱 돌아서는 바람 소리. 돌아선 뒤 남색 초승달 판 4개가 왼쪽 옆으로 날아와 사슬로 쌓이고(효과 도구 `chain_reform`) 6틱 뒤 쇠사슬 · 자수정 소리. 달빛 해제 74 · 78 · 83틱(줄어듦 · 부서짐 · 착지)의 효과는 B5 몫.
+- **클릭 판정**: 인간형 1.6 × 3.0(몸 크기 1.4), 나비형 2.2 × 4.4(몸 크기 1.8). 변신이 끝날 때와 인간형으로 돌아올 때 바뀌고(`cur.hit` 도 바꿔 다시 생긴 클릭 판정도 같은 크기), 몸은 늘 바닥에 있다.
+
+#### 달빛 고치와 달빛 축복 받음
+- **걸릴 때**(변신의 빛 구, 플레이어가 쓰러져 있거나 부활 중 · 선택 화면이면 건너뜀): **현재 체력의 20%** 피해(원소 없음, 대시 · 방어 · 보호막 무시, 체력이 1 밑으로는 안 내려감 = 죽지 않음, 영상 17% 와 PDF 40% 의 중간), 발밑에서 닫히는 연어색 소용돌이 고리 · 몸을 감아 오르는 적갈색 · 연어색 입자 나선 · 머리 위 배지 빛, 저주 소리. 1인칭(숄더뷰 아바타 없음)에서는 화면을 보는 카드가 눈앞을 덮지 않도록 바닥 고리 · 입자 나선 · 소리 · 보스바만(풀릴 때도 금빛 바닥 고리 · 소리 · 보스바 · 큰 배지만).
+- **걸려 있는 동안**: 그녀에게 주는 피해 **−50%**(반응 피해 포함), **치명타 확률 −100**(각인의 확정 치명타 · 빙설 치명타도 보통 타격으로 되돌림), **받는 치유 −40%**.
+- **풀리는 법**(사용자 피드백 "일정 체력 이상 회복해야 하게. 하나만 먹어도 기믹 처리되는건 너무 쉬운 것 같아"; 예전에는 어떤 치유든 한 번이면 풀렸다): 걸려 있는 동안 받은 치유마다 **실제로 받은 양**(−40% 뒤, 꽉 찬 체력에서 넘친 치유도 셈: 체력이 거의 찬 플레이어가 막히지 않게)이 **회복 계기**에 쌓이고, 계기가 **최대 체력의 15%** 에 닿으면 풀린다. 달빛 이슬 · 아이템 · 캐릭터 치유가 모두 들어가고 클로린드가 생명의 계약으로 바꾸는 치유도 센다(틀이 캐릭터 변환보다 먼저 양을 더함). 계기는 걸릴 때마다 0 부터 다시 센다. 치유마다(아직 덜 찼으면) 작은 종소리 · 발밑의 연어색 · 금빛 입자와 행동 표시줄 "달빛 고치 — 회복 9/15%". 풀리면 20틱 동안: 금빛 빛줄기가 6.5칸 위에서 내려오고(1~6틱) → 금빛 터짐과 고리, 1.5 → 2.5칸으로 퍼지는 금빛 입자 고리(7~11틱) → 금빛 문장과 반짝이 비(12~20틱), 신호기 · 레벨 업 · 종소리(0 · 1 · 3 · 7 · 9 · 12 · 14틱), 그리고 **달빛 축복 받음**: 치명타 확률 **+15**, **치명타 피해 +50%**(사용자 피드백 "피해 +50%가 아니라 치명타 피해 +50%야": 예전에는 주는 피해 +50%; 이제 주는 피해 보정은 없고 `items/hook/stat_buffs` 의 `#mbCritAdd` / `#mbCritDmgAdd` 로 플레이어 스탯에 더함). 다음 달빛 고치가 걸리거나 싸움이 끝날 때까지.
+- **달빛 이슬**: 치유하는 캐릭터가 적어서, 걸릴 때 경기장 가운데에서 6~14칸 떨어진 곳(120도 간격)에 빛나는 연두 이슬 구슬 3개가 생긴다. 닿으면(1.6칸) 최대 체력의 **13%**(올림) 회복(고치 중에는 × 0.6 = 7.8%, 붉은 약초 적용) → **하나로는 모자라고 둘을 먹어야** 계기(15%)가 차서 고치가 풀린다(올림과 틀의 반올림으로 어떤 최대 체력에서도 둘이면 참). 남은 구슬은 나비형이 끝날 때(달빛 해제) 사라진다.
+- **보스바**: 이름 줄 끝에 `인간형`/`나비형` · `그로기` · 효과 도구의 배지 글리프(달빛 고치: 적갈색 #8C525C 원에 연어색 소용돌이 / 축복: 금빛 별과 초승달), 셋째 줄에 지금 패턴과 "[배지] 달빛 고치 — 회복 9/15% [이슬 아이콘]"(회복 계기: 최대 체력에 대한 %, 효과 도구의 점수 글자 `#bkCureP` / `#bkCureT` 라 보스바가 매 틱 다시 읽음) / "[배지] 달빛 축복 받음 (치명타 +15% · 치명타 피해 +50%)". 걸릴 때와 풀릴 때 행동 표시줄에 이름과 수치(피해 −50% · 치명타 −100% · 받는 치유 −40% / 치명타 +15% · 치명타 피해 +50%), 덜 찬 치유마다 "회복 9/15%"(`hud/ab_cure`), 풀릴 때 큰 축복 배지가 잠깐 뜬다. 조언 문구는 없다(10-21 사용자 규칙: 고치를 푸는 법 안내 · "공격할 기회" 없음; 그로기 셋째 줄은 "그로기" / "그로기  다시 일어선다"). 아랫줄 게이지 = 패턴 진행(원소 색), 그로기 · 일어서기(초록), 나비형 남은 시간(풀), 첫 인간형 남은 시간(금색).
+- **정리**: 처치 · 취소 · 플레이어 사망(또는 로노바 부활) · 런 종료 · 맵 이동 · `room/wipe` · `uninstall` 에서 고치 · 축복 · 회복 계기 · 받는 치유 보정 · 치명타 확률 · 치명타 피해 보정을 모두 끈다(`/reload` 는 모듈 상태에서 다시 세우고 계기는 그대로 둔다). 공용 파일은 `items/hook/on_heal` 한 줄 · `items/hook/stat_buffs` 두 줄만 고쳤다.
+
+#### 사망 · 효과 · 생성
+- **사망**(영상에 없음): 비틀거림 → 나비형이면(변신 중 날개가 펴진 뒤 포함) 10틱 날개가 연두 · 오팔 조각으로 부서짐 → 30틱 무릎 꿇음 → 50틱부터 달빛 티끌과 흰 · 청록 수정 조각으로 흩어지며 사라짐(100틱). 목소리 없음(위더 소리 끔). 그 뒤 던전으로 돌아와 아이템 상자 2개.
+  - 연출(2단계, `seq_h/death/*`, 틱은 리그 이벤트): 0틱 리그 번쩍임 · 가슴의 하얀 터짐 · 섬광(효과 도구 `snd/death`) → 4틱 금 간 빛줄기 셋 → 부서짐(나비형: 날개 조각 `wing_shatter` + 연두 · 흰 유리 조각, 인간형: 손의 남색 초승달 판이 금 가며 깨짐) → 무릎 꿇기 10틱 전 무릎 꺾이는 울림 → 무릎 꿇음(이끼 먼지 · 연두 고리 · 이끼 소리) → 흩어지기부터 2틱마다 티끌 · 15틱마다 달빛 티끌(`death_motes`) · 6틱마다 떠오르는 수정 조각, 내려가는 차임 세 번 → 끝 8틱 전 마지막 티끌이 솟음(달빛 티끌은 끝 30틱 전, 수정 조각은 끝 10틱 전까지만 만들어 100틱의 정리 전에 다 사라짐).
+- **효과 도구**(`tools/build_mboss_bf_fx.py` + 그림 `tools/mboss_bf_fx_paint.py`, 함수 `mboss/butterfly/fx/…`, 매니페스트 `tools/mboss_bf_fx_manifest.json`, API 는 스크래치패드 `mb2/bf_fx_api.md`): 나비의 **유일한 효과 엔진**. 그림 카드(영상 색을 그대로 그린 초승달 · 불꽃 부채 · 돔 조각 · 금빛 문장 등과 색을 입히는 빛 · 반짝임 · 물결 등 27종, 아이템 `custom_model_data` 색), 바닥 예고 그림(원 · 고리 · 부채꼴 · 띠: 테두리 + 맞는 틱에 테두리에 닿는 진행 채움 + 번쩍임, 풀 · 불 · 물리 색; 10-20 예고 규칙 뒤로 패턴은 쓰지 않음), 바닐라 소리 조합 50개(`fx/snd/*`, 목소리 없음), 사건마다의 효과 묶음 60개(`fx/p/*`), 투사체 모양(`fx/prop/*`: 진공 칼날 · 불꽃 초승달 · 구슬 · 이슬), 보스바 글리프(글꼴 `rlk:mboss_bf` U+E600~: 달빛 고치 배지 · 축복 배지 · 큰 배지 · 이슬 아이콘 · 화면 번쩍임). 카드는 스스로 예약한 함수가 나이를 먹이고(공용 틱 훅 없음; 그 함수는 같은 서버 틱 끝, 게임 시간이 이미 +1 인 때 돌므로 거기서부터 세어 소환 다음 틱에 움직임이 시작되고 예고의 번쩍임도 맞는 틱에 옴) 동시에 효과 64장 · 예고 40장까지(꽉 차면 장식인 이슬 숨쉬기 빛은 48장부터 쉬어서 착지 · 풀림 효과가 자리를 지킴; 긴 싸움에서 최대 53장, 거절 0). 코어는 등장 · 변신 · 날개 색 바꾸기 · 고치 · 해제(축복) · 이슬 · 그로기 · 사슬 · 사망을 이 도구로 그리고, 훅을 잇는다: `uninstall` → `fx/uninstall`, `cleanup` → `fx/clear` + `fx/hud/clear`, `pause` → `fx/tele/clear`(안전망) + `fx/hud/flash_end`(화면 번쩍임이 떠 있을 때만, `vBig`), `resume` → 효과 도구의 바닥 예고는 다시 그리지 않음(10-20 예고 규칙: 예전의 `u/redraw` 와 B2 의 다시 그리기는 지움), 달리는 패턴의 `p/<key>/resume` 만(B3 불꽃 자국의 불씨 줄), `death_start` → `fx/tele/clear`(안전망), 보스바 두 줄 끝에 `fx/hud/put_extra` · `put_sub`, 배지는 `#bfCoc` / `#bfBuff` 가 바뀌는 곳마다 `hud/coc_on|off` · `buff_on|off`. 연두 #B6E35A · 오팔 · 청록, 불은 #FAD77C → #C680A2. 리소스팩: `python3 tools/build_mboss_bf_fx.py --resourcepack <RP>`(그림 40장, 약 83만 픽셀, 약 16초). 예전 코어의 작은 색 카드 엔진(`cards.py`, `mboss/butterfly/tc/`, 리소스팩 `mboss/bf_fx/`)은 이 도구로 옮기고 지웠다.
+- **생성기 구조**: `tools/build_mboss_butterfly.py` → 패키지 `tools/mboss_butterfly/`: `core.py`(훅 17개 · 형태 상태 기계 · 순환 · 변신 · 그로기 · 고치 · 이슬 · 연소 약점 · 등장 · 사망 · 보스바 · 테스트), `api.py`(패턴 쪽 고정 API: 피해 계수, 거리 구간, 색, 리그 클립 표, `Gen` · `TL`), `human.py`(H1~H4) + `seq_h.py`(등장 · 되돌림 · 그로기 · 사망 연출 S1 / S3 / S4 → `mboss/butterfly/seq_h/`), `wing.py`(B1~B5) + `seq_b.py`(변신 · 고치 · 풀림 · 날개 색 바꾸기 연출 S2 / S5 / S6과 날개 쪽 도우미 → `mboss/butterfly/wx/`). `api.py` 끝에는 두 패턴 담당의 공용 도우미 묶음이 따로 있다(인간형 `H_WALK_R` · `h_anchor` · `h_lock_walk` · `h_ring_dust`, 날개 `WALK_R` · `anchor` · `rest_anchor` · `lockw` · `clamp_*` · `bstep`). 코어의 훅 줄은 담당 표시("human author" · "wing author")가 붙은 한 줄씩이다. 효과는 효과 도구를 `api.K` / `Gen.fx` · `snd` · `kcard` · `tele_*` · `kprop` · `khud` 로 부른다. 코어의 `clean()` 은 `rig/` 와 효과 도구 몫(매니페스트 `owned`)을 건드리지 않는다. 패턴 쪽 약속은 스크래치패드 `mb2/bf_contract.md`. 가디언 생성기는 건드리지 않고 복사해 이름만 `#bf*` 로 바꿨다.
+- **리그**(`tools/build_mboss_butterfly_rig.mjs` + `butterfly_paint.mjs` · `butterfly_geometry.mjs` · `butterfly_pose.mjs` · `butterfly_clips.mjs`, 가디언과 함께 쓰는 `mboss_rig_*` · `mboss_paint_lib` · `mboss_model_lib` · `mboss_screen_lib` 위에 만듦, API `tools/mboss_butterfly_rig_api.md`): 두 형태를 다 담은 item_display 30개(한도 34, 고정 UUID), 인간형에서는 날개 · 덮개 빛 · 리본 · 가슴 빛이 크기 0. 모델 57개 · 그림 72장(약 133만 픽셀, 앞날개의 무지갯빛 덮개는 8장짜리 움직이는 그림), 날개 모습 `dendro` · `pyro` · `flat`, 소품 `prop/cocoon`(등장 고치, 중심에서 소환: 바닥 2.15칸 위) · `prop/pod`(감싼 날개 고치) · `prop/orb`(달빛 축복 구슬), 클립 22개(영상 v1~v4 기준, 몸의 가로 이동은 모듈 몫이라 클립에는 없음). 모듈은 리그 API `rlk:mboss/butterfly/rig/…`(`init spawn spawn_hidden tick kill play/<클립> look/* form/* face/{player,track} flash prop/*`)를 부르고 클립 · 사건 틱 · 효과 앵커 · 소품을 매니페스트 `tools/mboss_butterfly_rig_manifest.json` 에서 읽는다(사건 틱이 바뀌면 모듈을 다시 만들면 따라감). 등장은 `spawn_hidden`(모든 부품 크기 0에서 시작) + `play/entrance` + 고치 소품. 예전의 대역 리그(`stub_rig.py`, `mboss/butterfly/rig_stub/`)는 지웠다. 리소스팩: `node tools/build_mboss_butterfly_rig.mjs --resourcepack <RP>`(약 70초).
+- **테스트**: `/function rlk:mboss/test/start {id:"butterfly"}`(= `#mbForce mb 2`; 노드 맵으로는 `/scoreboard players set #mbForce mb 2` 뒤 위 "테스트 명령"의 노드 경로) 뒤 `/function rlk:mboss/test/pattern {id:N}` — 1~4 인간형 패턴, 11~14 나비형 패턴(바로 나비형, 고치 없음), 15 또는 30 달빛 해제, 20 변신(고치 + 이슬), 21 달빛 고치만, 22 최대 체력 25% 회복(고치 중 15% → 풀림 → 축복), 23 달빛 이슬 3개, 24 고치 · 축복 끄기, 40 그로기, 42 다음 결정에서 형태 바꾸기, 91 나비형 연소 약점(불 타격 흉내), 99 대기. `test/lock {id:N}`: 1~4 · 11~14(변신 뒤) 그 패턴만, 16 변신 · 해제만 반복, 0 해제.
+- **생성**: 위 "등록 · 모듈"의 순서대로: `build_mboss_core.py`(레지스트리를 바꿨을 때) → `build_mboss_arena.py` → `build_mboss_proto.py` → 리그 `node tools/build_mboss_guardian_rig.mjs --resourcepack <RP>` · `node tools/build_mboss_butterfly_rig.mjs --resourcepack <RP>` → `build_mboss_guardian.py` → `python3 tools/build_mboss_bf_fx.py --resourcepack <RP>` → `python3 tools/build_mboss_butterfly.py` → `python3 tools/check_mboss_pack.py`. 생성기마다 자기 파일만 쓰고 지워서 순서를 바꿔도, 두 번 돌려도 결과가 같다(나비 리그는 `mboss/butterfly/rig/` 와 매니페스트만, 효과 도구는 자기 몫만, 모듈은 그 밖의 `mboss/butterfly/` 전부).
+- **시험**: 스크래치패드 `mb2/tests/run_all.sh <데이터팩 폴더>` 가 나비 시험(`test_butterfly.py` · `test_e2e_butterfly.py` · `test_pjx.py` · 인간형 장면 시험 `test_human.py` · 리뷰 수정마다의 회귀 시험 `test_fixes.py`), 효과 도구 시험(`mb2/fxtests/test_fx_engine.py`), 틀 · 가디언 시험(`mb/int_tests/`), 생성기 순서 시험(`gen_check.py`), 검사기 다섯 개를 돌린다. 패턴마다의 판정 틱 시험은 패턴 파일마다 하나(`pat_human.py` · `pat_wing.py`, 형식은 `pat_case.py`).
+- **지금 상태**: 코어(형태 · 순환 · 변신 · 고치 · 이슬 · 연소 약점 · 그로기 · 등장 · 사망 · 보스바 · 테스트)는 완성, 패턴 9개(H1~H4 · B1~B5)와 연출(S1~S6)은 2단계까지 들어왔다(효과 도구의 효과 · 소리, 판정은 틀의 `hz/*` · 투사체; 바닥 예고는 10-20 예고 규칙으로 B3 불꽃 자국의 불씨 줄만). 진짜 리그(`wip/bf-rig`: 모델 · 클립 22개 · 클립 검토 수정, `wip/bf-rig-polish`: 몸 · 머리 · 소품 다듬기)와 다듬은 효과 도구(`wip/bf-fxpolish`: 그림 · 효과 묶음 · 소리)가 합쳐졌고, 모든 패턴이 진짜 리그의 사건 틱으로 만들어진다(가디언 출력은 바이트 단위로 그대로). 오프라인 명령 시뮬레이터로 순환 · 형태 시간 · 고치 · 이슬 · 연소 · 같은 원소 피해 · 판정 틱 · 처음부터 끝까지의 싸움(뽑기 → 문 → 경기장 → 등장 → 싸움 → 처치 → 상자)을 확인했다(게임 안에서는 아직 확인하지 않음). 출시(10-18) 뒤 사용자 피드백 세 가지(축복은 치명타 피해 +50%, 선딜 약 25% 단축, 회복 계기 15%)를 반영했다: 회귀 시험은 `mb2/tests/test_fixes.py` 의 UF-1~3, 회복 계기의 싸움 시험(이슬 하나로는 안 풀림 · 둘이면 풀림 · 아이템 · 캐릭터 치유 · 꽉 찬 체력의 넘친 치유 · 걸릴 때마다 계기 초기화 · 그로기의 1~2개)은 `test_butterfly.py` 4 · 5절.
+- **리뷰 수정**(상태 · 플레이어 · 틀 · 성능 · 패턴 충실도 · 공정성 · 효과 소리 리뷰): 패턴이 남긴 표시가 쌓여 다음 실행이 첫 실행의 자리를 겨누던 것(이제 패턴이 끝나거나 취소되면 `rlk_mb_bf_kept` 를 모두 지움), `g.release()` 뒤 AI 가 멈추던 것, 변신 중 사망 · 테스트 끊기의 리그 형태, `/reload` 뒤 그로기 이슬, 나비형 16.5칸 경계, 테스트 42, 그로기 끊기 뒤 바로 변신, 1인칭 고치 카드, 그로기 이슬 겹침, 틀의 칼날 판정 범위 · 투사체 속도 · 묶음의 늦은 구성원 · "[다시 하기]" 챕터, 카드 움직임이 소환 틱에 합쳐지던 것, 이동 목표 걸음마다 다시 재던 거리, `uninstall` 이 남기던 저장소, 사망 티끌이 정리에 잘리던 것, B2 내리꽂힘 속도와 꼬리, 변신 · B5 의 위치와 속도, 불 패턴 전 물러나기, 일시정지 뒤 예고(10-20 예고 규칙으로 바닥 예고가 없어져 지움), 효과 카드 한도, 풀림 자막, 같은 사건의 겹친 소리 층, 나비형의 날갯짓 소리, 시험 시뮬레이터의 예약 함수 순서를 고쳤다. 수정마다 회귀 시험이 `mb2/tests/test_fixes.py` 에 있다(이름에 리뷰 번호). 가디언 모듈 출력(`mboss/guardian/`)은 바이트 단위로 그대로다(틀의 칼날 · 묶음 · 속도 수정은 가디언이 쓰지 않는 경로이거나 같은 결과이고, "[다시 하기]" 챕터는 가디언 테스트에도 고쳐짐).
+
+### 실험성 역장 발생 장치 모듈 (`mboss/fieldgen/`, `tools/build_mboss_fieldgen.py`)
+원신의 실험성 역장 발생 장치(이름표 **브레게 프로토타입**, 영상 v1~v4, 공략 PDF 기준). 레지스트리 `fieldgen`(n 3, 가중치 10, 바위, 1레벨 체력 230, 기본 공격 12 × `dmgMul` 110%, 금화 × 5, 사파이어 1, 아이템 상자 2개, 몸 크기 2.4 · 클릭 판정 2.4 × 4.6, 등장 최대 130틱 · 사망 110틱, `deathSnd` false, 문 아이콘 시계). 떠다니는 금빛 고리 기계다. 순항 형태로 패턴을 쓰다가 경기장 한가운데에 **역장**을 펼치고(저중력), 역장이 펼쳐진 동안 **20번 맞으면** 역장이 깨지며 그로기가 된다.
+- **프뉴마 · 우시아 대신 타수**(사용자 결정 "프뉴마 우시아는 구현되지 않았으니 타수를 채워야 해결되도록 해. 한 20타정도?"): 원신의 "우시아 충전 → 코어에 프뉴마 공격 3번 → 그로기" 를 **역장이 펼쳐진 동안 20타**로 바꿨다.
+- **원소 내성 없음**: `mres` 0 이라 모든 원소가 같은 피해를 준다. 역장이 펼쳐진 동안에만 받는 피해가 **× 0.6** 이다(원신 자막의 "모든 저항 증가", 반응 피해 포함, 적어도 1).
+- **피해 수치**(방어 · 레벨 보정 전, 1.0배 = 13, 모두 바위; 10-20 사용자 결정 "역장 발생 장치의 계수를 많이 올려야될 것 같아"로 모두 × 1.5): C1 폭탄 1.5배(4개 묶음마다 한 번) · 마무리 내려찍기 2.7배, C2 2.7배, C3 빔 0.75배(닿을 때마다, 10틱마다 다시 맞을 수 있음), C4 미사일 1.65배(5개 묶음 둘), C5 3.3배, C6 바닥 폭발 2.25배 · 날아오는 판석 1.8배, F1 0.75배(분출 한 번에 한 번), F2 1.05 / 1.2배, 「인력 충격파」 0.75배(파면마다). 그 전(수정 라운드의 균형 맞춤 값)은 1.0 / 1.8, 1.8, 0.5, 1.1, 2.2, 1.5 / 1.2, 0.5, 0.7 / 0.8, 0.5, 그보다 전 값(0.8 / 1.4, 1.4, 0.9, 1.3 / 1.1, 1.2, 1.3 / 1.1, 1.2)은 가만히 선 플레이어에게 가디언의 1.54배, 걸어 다니는 근접 · 원거리 플레이어에게 0.27배 · 0.59배였다(아래 "수정 라운드").
+- **예고 규칙(10-20, 사용자 결정 "보스의 모든 공격에 바닥의 예고를 보여줄 필요는 없어. 영상에 없다면 그냥 보스의 동작을 보고 회피해야")**: 바닥 예고는 영상에서 맞기 전에 바닥에 표시가 보이는 공격에만 있다. **C5 지면 충격**(최종 반지름의 얇은 연금색 테두리 `tele/rim` + 그 테두리까지 자라는 어두운 원 `tele/dark`, 진행 채움은 없앰), **F1 감소 영역**(얇은 호박색 테두리의 어두운 원 `tele/dark`, 보라 예고는 없앰), **C1 마무리 · C2 내려찍기**(리그의 금빛 기둥 발치에 늦은 섬광 `column_base` 하나, 반지름 5 예고와 바닥 빛은 없앰). 나머지(C1 폭탄, C3 레이저 띠, C4 미사일, C6 · F2 바닥 폭발과 판석 던질 선, 「인력 충격파」의 충전 원과 고리)는 바닥 예고 없이 장치의 동작 · 소리(떨어지는 폭탄, 조준선과 빔, 내리꽂히는 미사일, 다가오는 폭발 사슬과 공명음, 던지기 10틱 전 판석 자체의 번쩍임 `slab_glint`, 충전 구 · 맥동 · 쉿 소리 · 불꽃 띠)를 보고 피한다. 판정은 모두 그대로(크기 · 틱 · 10틱 이상 전에 만들어짐)이고, 맞는 순간에는 늘 효과(폭발 · 충격 고리 등)가 보인다. 감사 자료 스크래치패드 `tele/fg/audit.md`.
+
+#### 순항과 역장
+- **등장**(`seq_c.py`, 효과 도구의 묶음 · 바닐라 소리 조합; 틱은 리그 `entrance` 클립(110틱)의 사건): 접힌 채 바닥에 놓인 기계(응회암 먼지, 리스폰 정박기의 낮은 울림) → 13틱 신호기 소리 → 16틱 철컥 깨어남(깨어남 묶음, 21 · 25틱 불꽃) → 20틱 드릴 포드가 펼쳐짐(28틱 피스톤) → 30 · 38틱 고리 왕관이 빛남, 40 · 46 · 49틱 톱니 소리 → 60틱 눈이 뜨이며(눈 위치에서 금고 소리) 부제 "브레게 프로토타입", 숫돌 소리와 함께 돎 → 64틱부터 떠오름(바닥 바람, 78틱 한 번 더) → 94틱 떠오름이 끝나며 금빛 섬광 · 신호기 켜짐 → 95틱 플레이어 쪽으로 돌며 전투 시작. 그때까지 무적이고 피해도 없다(레지스트리 `intro` 130 은 상한).
+- **순항**: 틱당 4도씩 플레이어를 따라 돌며 6~10칸 거리를 지킨다(다가올 때 0.18칸/틱, 물러날 때 0.15칸/틱). 몸은 경기장 가운데에서 **16.5칸 안**에만 있다(가시 끝이 벽 고리에 닿지 않게: 밖이면 틱당 0.3칸씩 돌아옴). 거리 구간(근접 4칸 이하 · 중거리 · 원거리 8칸 이상)으로 거른 섞인 주머니에서 같은 패턴을 연달아 고르지 않는다: C1 근접 · 중거리 · 원거리 ×2, C2 근접 ×2 · 중거리, C3 중거리 ×2 만, C4 원거리 ×3 만, C5 중거리만, C6 근접 · 중거리 ×2 · 원거리(수정 라운드: 근접에서는 C3 메달 밑이 안전하고 C5 는 점프로 넘으니 둘은 중거리 패턴이 되고, C1 · C6 이 근접 구간에 들어왔다). 순항 패턴이 끝나면 12틱 쉰다(예전 20틱).
+  - C1 **중력 시스템·일점 상쇄**(폭격, 94틱 = `bomb_run` 57틱 + `slam` 37틱): 0틱 플레이어 발밑을 지나는 비행 경로를 고정(45틱 × 0.55칸 = 24.75칸, 끝점은 16.5칸 안으로 당김)하고 9틱까지 플레이어 쪽으로 돈다 → 10틱 포트가 빛나며 몸을 경로 쪽으로 맞춤 → 12틱부터 45틱 동안 경로를 미끄러지며 12~54틱에 폭탄 20개(평균 2.25틱마다, 리그 매니페스트의 앞쪽 포트 `port_0` · `port_7` 에서: 축에서 앞으로 2.25칸 · 옆으로 1.05칸 · 높이 3.48칸, 왼쪽 · 오른쪽 · 그 사이 차례로). 10틱에 리그의 포트 8개 앵커마다 금빛 빛 카드. 폭탄마다 떨어질 자리에 반지름 1.3 판정(떨어뜨리기 4틱 전부터 10틱, 바닥 예고 없음: 예고 규칙) → 효과 도구의 폭탄이 포트에서 6틱 동안 떨어져 18~60틱에 터짐(약한 밀침, 4개씩 다섯 묶음이라 최대 5번) → 57틱 마무리(`slam` 클립): 플레이어 발밑을 다시 고정하고 그쪽으로 최대 6칸을 10틱 동안 미끄러짐(금빛 기둥은 미끄러지는 리그 밑에서 리그가 그림, 반지름 5 바닥 예고 없음), 69틱 기둥 발치의 섬광(`column_base`) → 70틱 내리꽂힘 → **74틱 반지름 5 내려찍기**(높이 2칸, 강한 밀침) → 79틱 다시 떠오름, 94틱 끝.
+  - C2 **내려찍기**(37틱): 0틱 플레이어 쪽으로 돌며 발밑을 고정(16.5칸 안, 판정은 17틱 뒤, 바닥 예고 없음) → 10틱 동안 그 위로 미끄러지며(리그의 금빛 기둥이 함께 움직임) · 신호기 소리(8틱) → 12틱 기둥 발치의 섬광(`column_base`) → 13틱 내리꽂힘 → **17틱 반지름 5 내려찍기**(높이 2칸, 강한 밀침) → 22틱 떠오름. 대시로 피한다.
+  - C3 **중력 시스템·코어**(레이저, 165틱): 0틱 메달 둘이 코어 양옆으로 내려와 4~21틱 충전, 20틱 조준선 → **22틱 발사**: 몸 왼쪽(눈 메달)과 오른쪽(톱니 메달)에서 바닥으로 41도 기운 빔이 몸 둘레의 띠(가운데에서 3.0~5.8칸)를 쓸며 서로 반대로 틱당 5도씩 돈다(발사 18틱 뒤 앞에서, 그 36틱 뒤 뒤에서 만남 = 40 · 76 · 112 · 148틱, 만날 때 불꽃; 시작 방위 · 빠르기 · 구간 22~155틱은 리그 매니페스트의 `orbit`). 폭 1.0(발사 뒤 3틱) → 0.6. 155틱 꺼지며 메달이 돌아감(165틱 끝). 빔은 리그가 그린다(바닥의 레이저 띠 예고는 없음: 예고 규칙, 영상처럼 조준선과 빔 · 바닥의 그을린 점만). 높이 −0.5~2칸, 약한 밀침, 두 빔이 한 묶음이라 10틱에 한 번까지(`#hzRearm`). 몸은 돌지 않는다. 안전한 곳: 2.7칸 안(메달 밑) · 6.1칸 밖.
+  - C4 **중력 시스템·바위 폭탄**(미사일, 원거리만, 66틱): 0틱 가시 끝 빛, 8틱 배출구 빛기둥 → 23~37틱 드릴 미사일 10개가 좌우 배출구에서 번갈아 나감 → 하나하나 7칸 솟고(1~7틱) 플레이어까지의 중간쯤 16칸 위, 나온 배출구 반대쪽으로 3칸 비킨 꼭짓점까지 호를 그림(8~14틱, 엇갈리는 호) → **나간 지 14틱에** 그때의 플레이어 발밑을 고정(반지름 1.5 판정 14틱, 바닥 예고 없음: 내리꽂히는 미사일을 보고 피함) → 13틱 동안 내리꽂혀 나간 지 28틱(51~65틱)에 터짐. 늦게 고정하는 약한 유도라 달리면 뒤에 떨어지고 서 있으면 맞는다. 5개씩 두 묶음이라 최대 2번.
+  - C5 **중력 시스템·지면 충격**(130틱): 0틱 코어 불꽃, 1틱 코어가 뒤집힘 → **3틱 몸 둘레 반지름 12 의 얇은 연금색 테두리**(45틱, `tele/rim`: 영상의 바닥 표시) → 5틱 코어가 떠오르며 금빛 섬광, 7틱부터 어두운 원(`tele/dark`)이 반지름 3.5 → 12칸으로 테두리까지 자람 → 29틱 위로 빛줄기, 36틱 가장자리가 빛남 → 41틱 기둥이 내려와 44틱 바닥을 침 → **48틱 원 전체 폭발**(높이 0.5칸까지만 맞음 = 점프로 넘김, 대시 무적으로도 피함, 강한 밀침) → 판석이 떠다님 → 81틱 가라앉음, 100틱 제작기 · 사슬. 원 밖으로 나가거나 점프 · 대시.
+  - C6 **중력 시스템·파쇄**(158틱 = 클립 155틱 + 마지막 판석이 떨어질 때까지): 0틱 기울며 플레이어 쪽으로 굴러듦(5칸보다 멀면 0.2칸/틱, 11틱까지) → 12틱 배출구 불꽃 → 20틱 탑 형태(26 · 32틱 톱니 소리) → 38 · 47틱 불꽃 띠(44틱 충전 소리) → 55틱부터 6틱마다 바닥 폭발 8개(반지름 1.8, 10틱 전 판정 · 그 자리의 공명음, 바닥 예고 없음, 높이 1.2칸까지 = 점프로 넘김, 강한 밀침). 자리는 플레이어까지의 거리(2.5~18칸)의 호 위에서 각도가 90도 → 0도로 좁혀져 몸 앞을 가로질러 플레이어 발밑에서 끝난다(쓰는 쪽은 판마다 무작위). 7 · 8번째는 한 묶음 → 폭발마다 판석이 뜯겨 솟음(4~6칸, 12틱) → 100 ~ 132틱에 8틱마다 판석 1~5번을 그때 고정한 플레이어 발밑으로 던짐(10틱 전 발밑을 고정할 때 판석 자체가 번쩍이고 사슬 소리, 바닥의 던질 선 예고는 없음; 1.5칸/틱 칼날 투사체, 닿는 거리 1.5칸). **판석은 한 판에 2번까지만 맞고** 그 뒤의 판석은 던지지 않고 부서진다 → 140틱 되돌아가며 남은 판석이 무너짐. 폭발 · 던지기 틱은 리그 매니페스트의 `bursts` · `throws`.
+  - **공통**(순항 패턴 2단계, `cruise.py`): 피해를 주는 판정은 모두 조용한 판정(`quiet`, 소리 0)이고 맞기 10틱 이상 전에 만들어진다. 바닥 예고는 위 예고 규칙대로 C5 (테두리 · 어두운 원)와 마무리 · C2 (기둥 발치 섬광)에만 있다. 효과 · 소리는 효과 도구의 묶음(`fx/p/*`) · 바닐라 소리 조합(`fx/snd/*`) · 투사체 모양(`fx/prop/*`: 폭탄 · 미사일 · 판석)이고, 틱은 진짜 리그 클립의 사건에서 읽는다. 멈춤(쓰러짐 · 부활 · 선택 화면) 동안 코어가 바닥 예고를 지우므로 C5 는 다시 시작한 첫 틱에 테두리와 어두운 원(그때 크기에서 계속 자람)을 남은 시간으로 다시 그린다. 패턴이 끝나거나 테스트로 끊기거나 보스가 쓰러지거나 싸움이 취소되면 남겨 둔 표시 · 미사일 · 판석 · 빔이 모두 사라진다. 판석 도우미 `api.c_rocks`(+ `c_blade_hr` · `c_clip` · `c_anchor` · `c_bf`)는 `api.py` 끝에 있어 F2 도 쓸 수 있다. 시험: 스크래치패드 `mb3/tests/pat_cruise.py`(77개, 순항 작성자의 `tests_cruise` 에서 옮김: 판정 틱 · 예고 시간 · 범위 · 수 · 묶음 · 카드 한도 · 멈춤 뒤 다시 그리기 · 끊기 · 사망 · 취소 정리 · 등장 · 사망 연출), 그림 `mb3/renders/cruise_*.png`(`mb3/fxrender/render_cruise.py`).
+- **역장 생성**(순항 패턴 5개 뒤, 그 뒤로는 4개마다, 패턴 경계에서): 0~11틱 헤일로가 뒤집힘 → 12틱 순간이동 섬광(리그가 사라짐) → 13틱 한가운데로 옮겨짐(무적, 보이지 않음, 옛 자리에 보라 잡음) → 34틱 경기장 한가운데에 나타남 → **35틱 역장 형태로 펼침**: 다시 맞을 수 있고, **20타 계기**가 0/20 으로 열리고, 받는 피해 × 0.6 → **56틱 안내 "중력이 감소하고 점프 능력이 향상됩니다"와 저중력**.
+- **저중력**(역장이 깨지거나 접히거나 보스가 쓰러질 때까지): 플레이어와 숄더뷰 아바타에 수정자 `rlk:mb_lowg`(중력 × 0.5, 점프 힘 × 1.19 = 꼭대기 약 3칸 · 체공 약 25틱, 안전 낙하 거리 +4, 위 "공용 라이브러리"). 플레이어 발밑에 떠오르는 자갈 입자가 보인다. 휘두르는 동안 점프 금지(공용 규칙)는 그대로다. 멈춤(쓰러짐 · 부활 · 선택 화면) 동안 바로 풀리고 다시 시작하면 돌아온다.
+- **역장 순서**: 「인력 충격파」 ×3 → 약 400틱 동안 역장 패턴(F1 · F2, 한가운데에서 틱당 3도씩 돎) → 깨지지 않았으면 마무리 「인력 충격파」 ×3 → **접기**(70틱: 떠오름 · 20틱 창 · 32틱 가로 · 40틱 말아 접기 · 58틱 닻 내림. 0틱에 계기 · 저중력 · 피해 감소가 끝나고 그로기는 없음) → 순항(다음 역장까지 4개).
+  - 「인력 충격파」 ×3(시작 212틱, 마무리 219틱, 세 겹이면 224틱): 코어의 충전 구(24 · 24 · 40틱) → 1틱 빔 · 빛 돔 → 경기장 전체로 퍼지는 고리 파면(0.55칸/틱, 두께 2.5칸). 맞는 높이가 0~0.7칸이라 **점프로 넘고**, **대시 무적으로는 못 피한다**(`#hzNoDodge`). 충격은 24 · 92 · 175틱(간격 68 · 83). 체력이 50% 밑이면 세 번째가 **6틱** 간격의 파면 셋이다(명세 Q2: 저중력 점프 한 번으로 셋 모두 넘음). 자세한 것은 아래 "역장 패턴과 연출".
+  - F1 **중력 시스템·감소 영역**(260틱): 22틱 활성 → 영상의 틱대로 11~50틱 간격으로 분출 9번(예고 22 · 72 · 102 · 120 · 141 · 170 · 181 · 220 · 231틱). 매번 플레이어에게서 2~8칸 떨어진 어두운 원 1~4개(첫 원은 2~3칸, 반지름 2.8, 15틱 전에 나타나는 영상의 바닥 표시) → 금빛 분출. 분출 한 번에 한 번만 맞는다. 206틱에 연결 빔이 꺼지는 소리와 함께 리그가 `field_idle` 로 돌아가고(영상 Z+204~208), 마지막 두 분출은 빔이 꺼진 채 온다.
+  - F2 **중력 시스템·파쇄**(110틱): 탑 형태 없이 배출구 불꽃 · 불꽃 띠 뒤, 플레이어 쪽으로 호를 그리며 다가오는 바닥 폭발 8개(25틱부터 6틱마다, 7 · 8번째는 한 묶음)와 판석 던지기 5개(65틱부터 8틱마다, 한 번에 판석은 최대 2번만 맞음).
+- **20타 계기**: 역장이 펼쳐진 동안만 센다(펼침부터 깨짐 또는 접기까지). 반응 피해 · 지속 피해 · 아이템 발동은 세지 않고, 6틱에 한 번까지만 센다(여러 번 맞히는 공격은 한 번). 셀 때마다 코어에 금빛 금과 작은 종소리가 나고 새 칸이 4틱 반짝인다. 5 · 10 · 15타에 코어 거품의 금이 한 단계씩 커진다(리그 `crack/1~3`).
+- **역장 붕괴**(20타): 바로 다음 틱에 진행 중인 패턴(충격파 포함) · 바닥 공격 · 투사체가 모두 사라지고, 저중력 · 피해 감소가 끝나며 자막 "역장 붕괴" → 5틱 거품이 터짐(`crack/4`, 금빛 섬광 · 바닥 고리) → 기울며 흔들리다 가라앉음(40틱) → **그로기 200틱**(10초: 내려앉아 따라 돌지 않고 공격하지 않음, 받는 피해 보정 없음, 40틱마다 불꽃) → 15틱 동안 다시 서고 코어가 뒤집힘 → 순항(다음 역장까지 4개).
+- **클릭 판정**: 순항 2.4 × 4.6(몸 크기 2.4), 역장 2.8 × 5.2(2.6), 그로기 2.6 × 3.6(2.0). `cur.hit` 도 바꿔 다시 생긴 클릭 판정도 같은 크기다.
+
+#### 역장 패턴과 연출 (2단계: `field.py` · `seq_f.py`, 명세 `mb3/spec/{W,F1,F2,S1,S2,S3,S5}*.md`)
+- **공통**: 역장 공격은 모두 조용한(`#hzQuiet 1`) 무음(`#hzSfx 0`) 판정이다(피해는 모두 바위). 바닥 예고는 예고 규칙대로 F1 의 어두운 원(`tele/dark`, 같은 틱 · 같은 예고 시간)뿐이고, F2 와 「인력 충격파」는 장치의 동작 · 소리를 보고 피한다. 소리는 효과 도구 조합(`fx/snd/*`)과 명세의 바닐라 한 겹(같은 사건에 둘을 겹치지 않음). 장치는 한가운데에서 틱당 3도씩 플레이어 쪽으로 돈다. 클립 틱은 모두 리그 매니페스트에서 읽는다(`ev_or` · `clip_len`; 진짜 리그의 값). 멈춤(쓰러짐 · 선택 화면) 동안 코어가 바닥 예고를 지우므로, 다시 시작한 첫 틱에 F1 의 살아 있는 원마다 **남은 시간으로 어두운 원을 다시 그리고**, 퍼지고 있는 충격파는 불꽃 띠를 다시 그린다(나비 검토 FX-1).
+- **「인력 충격파」**: 파면마다 충전 시작에 판정(`hz/ring` 반지름 0→2.5, 높이 0.7칸, 36틱, 0.6칸 밀침)을 만든다(바닥의 충전 원 · 고리 예고는 없음: 예고 규칙, 영상의 장치 밑 바닥에는 문양과 그림자뿐이고 고리는 빔 · 폭발과 함께 불타는 띠로 나타남). 충전 구 · 8틱마다 맥동 · 충격 10틱 전 높아지는 쉿 소리 → 충격 1틱 전 금빛 불꽃 띠(`p/wave_band`, 16조각, 판정과 똑같이 2.5 → 21.2칸을 34틱 = 0.55칸/틱) → 충격에 빔, 다음 틱 빛 돔 → 3틱마다 파면의 불길과 플레이어에게 가장 가까운 파면 지점의 울림. 세 번째 파는 리그에 클립이 있으면 시작 때 `wave_long`, 마무리 때 `wave_drop`(내려앉는 소리 · 떠오름 섬광), 없으면 `wave` 와 40틱 충전. 세 겹일 때 더해지는 두 파면은 10틱 전 코어의 맥동과 높아지는 쉿 소리. 점프 창(저중력, 발이 0.7칸 위에 있는 때 = 누른 뒤 2~22틱): 파면이 닿는 틱 T 에 대해 **T−17 ~ T−2 에 누르면 넘고**, 세 겹은 T−5 ~ T−2. 서 있으면 파면마다 한 번(0.75배), 세 겹이면 다섯 번.
+- **감소 영역(F1)**: 0틱 두 메달에 불꽃 · 신호기 · 전달체 · 제작기 소리 → 12틱 사슬 → 22틱 코어 섬광. 사건마다 원 1~4개를 한 틱에 한 묶음으로 만들고, 원마다 어두운 원(`tele/dark`, 처음 틱부터 제 크기 반지름 2.8 로 나타나 분출까지 남음(영상의 원도 1~2프레임 만에 제 크기), 얇은 호박색 테두리) + 어두운 먼지(`p/erupt_tell`) → 15틱 뒤 금빛 분출 더미(`p/erupt`) → 떠다니는 돌(`p/debris`). 예고 · 분출 소리는 사건마다 한 번, 25틱 뒤 돌 떨어지는 소리. 높이 3.5칸까지라 저중력 점프로도 못 넘는다(첫 원에서 0.1~1.2칸 비켜서면 됨).
+- **파쇄(F2)**: 0틱 배출구 불꽃(6.5칸 위) → 8 · 16틱 고리 밑 불꽃 띠 → 바닥 폭발마다 그때 플레이어와의 거리(2.5~18칸)에서 플레이어 쪽 방향을 90 · 77 · 64 · 51 · 39 · 26 · 13 · 0도 돌린 자리(방향은 한 번 정함), 반지름 1.8, 10틱 전 판정 · 공명음(바닥 예고 없음), 높이 1.2칸(저중력이면 폭발 21~3틱 전에 누른 점프로 넘음), 강한 밀침, 1.05배. 폭발 2틱 뒤 판석(효과 도구 `prop/slab`)이 4~6칸 솟는다. 던지기 10틱 전 플레이어 발밑을 고정하고 판석 자체가 번쩍임(`p/slab_glint`) · 사슬 소리(바닥의 던질 선 예고는 없음) → 칼날 투사체 1.5칸/틱(반폭 1.2 = 사거리 1.5칸: 틀의 칼날은 반폭 + 0.3칸까지 맞음, 1.2배, 판석마다 한 묶음). 판석에 두 번 맞으면 남은 던지기는 판석이 부서진다. 100틱에 남은 판석이 부서지고 110틱 끝. 서 있으면 최대 3.45배(폭발 한 번 + 판석 두 번), 계속 걸으면 폭발은 맞지 않는다.
+- **역장 생성 연출**: 0틱 헤일로가 뒤집힘(소용돌이 금빛 줄) → **12틱(리그가 사라지는 틱) 흰 · 청록 순간이동 기둥**(8칸 안 플레이어 화면에 흰 번쩍임) → 14 · 19 · 24 · 29틱 옛 자리에 보라 잡음 → 34틱 한가운데에 나타남(빛 · 기둥) → 35틱 펼침(보라 기둥 · 촉수) → 39 · 43 · 47틱 코어 밑 보라 지직임 → 51틱 두 메달에 불꽃 → 56틱 안내 띠와 함께 플레이어 발밑에 자갈이 떠오름. 펼침 뒤 **40틱 고요**(명세 Q10)에 70 · 85틱 바닥에서 금빛 줄기가 솟고, 그 뒤 시작 충격파. 역장 동안 20틱마다 발밑 자갈(충격파 동안은 쉼: 불꽃 띠 셋이 카드 64장 한도 안에 들도록), 20틱마다 코어 밑 지직임(충격파 동안은 쉼), 40틱마다 낮은 울림. 첫 역장에서는 안내 띠가 끝나는 136틱에 "중력 감소 — 점프 강화 · 낙하 피해 감소" 한 번.
+- **접기 연출**: 0틱 떠오르는 울림(역장의 떠오름 섬광은 마무리 세 번째 파 `wave_drop` 의 63틱 것 하나) → 20틱 창이 펼쳐지기 시작할 때 기계 소리 → 32틱 가로로 누울 때 양쪽 메달(5.6칸, 높이 5.45칸, 매니페스트 `horiz` 앵커)에 불꽃과 사슬 → 40틱 말아 접을 때 불꽃 · 뒤집힘 소리 → **58틱 닻을 내릴 때(dock) 순항 모양새(`look/idle`)로 바뀜**(명세 Q14: 보라가 접기와 함께 사라짐) · 접히는 소리 → 70틱 다 접히면 제작기 소리.
+- **붕괴 연출**: 0틱 금 간 거품이 하얗게 빛남(4.1칸; 마무리 `wave_drop` 으로 바닥에 내려앉아 있거나 낮게 떠오르는 중이면 리그의 `break_low` 로 그 자리 1.3칸에서) → 5틱 터짐(유리 조각 · 바닥 금빛 고리 · 화면 위 거품 아이콘 · 금빛 번쩍임) → 14틱 신음 소리 → 24틱 불꽃과 사슬 → 40틱(그로기 시작) 가라앉는 먼지와 꺼지는 소리 → 그로기 동안 40틱마다(20 · 60 · 100 · 140 · 180) 축 처진 코어(2.5칸)에서 불꽃이 떨어지고 40 · 120틱 삐걱임 → 다시 설 때 금빛 고리 빛과 태엽 소리, 6틱 코어가 뒤집히며 불꽃.
+- **시험**: 스크래치패드 `mb3/tests/pat_field.py`(82개, 역장 작성자의 `tests_field` 에서 옮김: 충격파의 판정 틱 · 예고 짝 · 매 틱 파면 일치 · 거리별 닿는 틱 · 저중력 점프 창 · 세 겹 · 대시 무시 · 멈춤 뒤 다시 그리기 · 충격파 중 20타 붕괴, F1 의 사건 틱 · 묶음 · 원 위치 · 한 걸음 비키기, F2 의 호 · 묶음 · 저중력 점프 · 걷기 · 판석 상한 · 옆걸음 · 정리, 연출의 틱과 위치, 카드 한도)와 `run_all.sh`. 그림 `mb3/renders/field_{waves,f1,f2,open,break}.png`.
+
+#### 보스바 · 사망 · 생성
+- **보스바**: 이름 줄 끝에 순항 중 `순항`, 순간이동 · 접기 중 `역장`, 계기가 열린 동안 효과 도구의 ` · 역장` + 배지(+ 저중력 아이콘), 붕괴 · 그로기 · 회복 중 효과 도구의 ` · 그로기`(같은 말이 두 번 나오지 않음). 셋째 줄은 `순항` / `역장` / `패턴  <이름>`이고, 역장 동안 지금 패턴 이름 뒤에 효과 도구의 계기 `[배지] 역장  [20칸, 5칸마다 틈]  [n/20 숫자 글리프]`가 붙는다(`put_sub`, 글꼴 `rlk:mboss_fg`: 배지 U+E700, 칸 E701 빈칸 · E702 찬 칸 · E703 방금 찬 칸, 붕괴 E704, 틈 E7F1, 숫자 E720~E72A). 붕괴 때는 `[E704] 역장 붕괴`, 그 뒤 "그로기" / "그로기  다시 떠오른다". 조언 문구는 없다(10-21 사용자 규칙: 코어를 치라는 안내 · 충격파를 점프로 피하라는 말 · "공격할 기회" 없음; 원신이 띄우는 "중력이 감소하고 점프 능력이 향상됩니다" 띠는 그대로). 아랫줄 게이지 = 역장 동안 계기(보라, n/20), 붕괴 중 가득, 그로기 남은 시간 · 일어서기(초록), 패턴 진행(바위 색), 순항에서는 다음 역장까지(금색).
+- **사망**(`seq_c.py`): 0틱 이음매 빛이 깜빡이며 기계 소리(0 · 6 · 12틱 깜빡임, 신호기 꺼지는 소리, 12틱 눈 꺼짐) → 20틱 헤일로와 드릴 포드가 떨어짐(먼지, 사슬 · 구리 소리) → 40틱 고리가 기울며 가라앉음(모루 · 사슬) → 62틱 바닥에 닿음(먼지 고리) → 80틱부터 줄어들며 사라짐(그때 금빛 티끌이 흩어짐) → 110틱 리그 정리(`death` 클립 110틱 = 레지스트리 `death`). 기계 소리만 난다(위더 소리 끔). 그 뒤 던전으로 돌아와 아이템 상자 2개.
+- **소리 · 효과**: 바닐라 소리만(모루 · 사슬 · 피스톤 · 신호기 · 리스폰 정박기 · 자수정 · 시련의 생성기 · 금고 · 브리즈 · 제작기 · 응회암).
+- **효과 도구**(`tools/build_mboss_fg_fx.py` + 그림 `tools/mboss_fg_fx_paint.py` + 리그 매니페스트가 없을 때만 쓰는 대역 리그 `tools/mboss_fg_fx_stub_rig.py`(진짜 리그가 합쳐져 지금은 쓰지 않음), 함수 `mboss/fieldgen/fx/…`, 매니페스트 `tools/mboss_fg_fx_manifest.json`, API 는 스크래치패드 `mb3/fg_fx_api.md`): 역장 발생 장치의 **효과 엔진**. 그림 카드 55종(폭탄 · 드릴 미사일 · 금빛 기둥 · 레이저 · 충격파 띠 · 분출 · 판석 · 거품 금 등, 아이템 `custom_model_data` 색), 바닥 예고 그림(원 · 고리 · 부채꼴 · 띠 · 퍼지는 충격파 고리 · 돌아가는 레이저 띠 · 테두리만 있는 원 `tele/rim` · 어두운 원 `tele/dark`, 바위 · 역장 보라 · 물리 · 연금색; 모듈은 예고 규칙대로 `tele/rim` · `tele/dark` 만 쓴다), 바닐라 소리 조합 65개(`fx/snd/*`, 기계 소리만), 사건마다의 효과 묶음 76개(`fx/p/*`), 투사체 모양(`fx/prop/*`), 보스바 글리프(글꼴 `rlk:mboss_fg` U+E700~: 역장 배지 · 계기 칸 · `n/20` 숫자 · 저중력 아이콘 · 붕괴 배지 · 화면 번쩍임). 카드는 스스로 예약한 함수가 나이를 먹이고(공용 틱 훅 없음) 동시에 효과 64장 · 예고 40장까지. 나비 효과 도구의 첫 틱 문제(perf-2)는 여기서 고쳤다. 코어가 잇는 훅: `uninstall` → `fx/uninstall`, `cleanup` → `fx/clear` + `fx/hud/clear`(+ 아직 떠 있으면 안내 띠 끄기), `pause` → `fx/tele/clear` + `fx/hud/flash_end`(화면 번쩍임이 떠 있을 때만, `vBig`), `death_start` · 역장 붕괴 · 테스트 끊기 → `fx/tele/clear`(+ 모든 깃발 끄기), 펼침 → `hud/meter_open`, 안내 틱 → `hud/banner_field` + `hud/lowg_on`, 셀 때마다 `#fkM` = 타수 → 몸을 실행자로 역장 코어 높이(4.1칸, 리그 매니페스트의 field 형태 코어 앵커)에서 `hud/meter_hit`(새 칸 4틱 하양 · 금 반짝임 · 종소리 · 5 · 10 · 15타 거품 금: 효과 도구가 진짜 리그의 `rig/crack/1~3` 을 몸을 실행자로 부르고, 코어는 효과 도구가 건너뛴 단계(테스트 31 · 리로드)만 부른다 = `core.KIT_CRACKS`), 접기 · 붕괴 → 계기 · 저중력 아이콘 · 안내 끄기, 붕괴부터 회복 끝까지 `hud/groggy_on` … `groggy_off`. 보스바 두 줄 끝에 `fx/hud/put_extra` · `put_sub` 를 붙이고, 효과 도구가 줄을 다시 만들면(`#fkHudV`, 새 칸 반짝임이 예약으로 끝날 때) 코어도 다음 틱에 다시 그린다. 코어의 일반 글자 계기(`n/20` 글자 · 칸 함수 42개)와 셀 때 · 금 · 안내 띠의 바닐라 효과는 지웠다. 등장 · 사망 연출과 순항 패턴 C1~C6(`seq_c.py` · `cruise.py`), 역장 생성 · 접기 · 붕괴 · 그로기 · 회복 연출과 역장 패턴 F1 · F2 · 충격파(`seq_f.py` · `field.py`)는 2단계 설명서(스크래치패드 `mb3/spec/`)대로 효과 도구의 묶음으로 바꿨다. 리소스팩: `python3 tools/build_mboss_fg_fx.py --resourcepack <RP>`(그림 55장, 약 93만 픽셀). 효과 도구의 리소스팩이 없으면 글리프는 빈 네모로 보인다.
+- **생성기 구조**: `tools/build_mboss_fieldgen.py` → 패키지 `tools/mboss_fieldgen/`: `core.py`(훅 17개, 상태 기계, 거리 주머니, 역장 순서(코어 서비스 패턴 20 생성 · 22 접기), 20타 계기, 붕괴 · 그로기, 피해 감소, 저중력 요청, 16.5칸 제한, 형태별 판정, 등장, 사망, 보스바와 효과 도구 연결, 테스트), `api.py`(패턴 쪽 고정 API: 피해 계수, 거리 구간, 반지름, 색, 글리프 표, 리그 클립 표(진짜 리그 매니페스트가 꼭 있어야 함), `Gen` · `TL`, 파쇄 공용 도우미 `rocks`, 순항 쪽 도우미 `c_*`(판석 파쇄 `c_rocks`, 멈춤 뒤 예고 다시 그리기 `c_redraw` 등), 효과 도구 `api.K` 와 `Gen.fx` · `snd` · `kcard` · `kprop` · `klook` · `khud` · `tele_*`), `cruise.py`(C1~C6), `seq_c.py`(등장 · 사망 연출, `mboss/fieldgen/seq_c/`), `field.py`(F1 · F2 · 「인력 충격파」), `seq_f.py`(역장 생성 · 역장 동안 · 접기 · 붕괴 · 그로기 · 회복 연출, `mboss/fieldgen/seq_f/`; 역장 쪽 도우미 `f_clip_anchor` · `f_body_pos` 는 `api.py` 끝). 코어의 `clean()` 은 `rig/` 와 효과 도구 몫(매니페스트 `owned`)을 건드리지 않는다. 나비 코어를 복사해 이름을 `#fg*` / `rlk_mb_fg_*` 로 바꿨고, 나비 검토에서 나온 코어 버그는 옮기지 않았다(남겨 둔 표시는 패턴과 함께 사라짐, `g.release` 는 AI 를 멈추지 않음, 몸 제한이 실제로 걸림, 테스트 · 리로드가 상태에서 리그 형태와 수를 다시 셈, 칼날 투사체 사거리 = 반폭 + 0.65). 패턴 쪽 약속은 스크래치패드 `mb3/fg_contract.md`.
+- **리그**(`tools/build_mboss_fieldgen_rig.mjs` + `fieldgen_paint.mjs` · `fieldgen_geometry.mjs` · `fieldgen_pose.mjs` · `fieldgen_clips.mjs`, 공용 리그 라이브러리 `mboss_rig_*` · `mboss_model_lib` · `mboss_paint_lib` 위에; API 는 `tools/mboss_fieldgen_rig_api.md`): 부품 29개(예산 32, 고정 UUID), 형태 7개(dormant · cruise · field · coreup · tower · laser · deployed), 모양새 5개(idle · charge · field · groggy · off), 거품 금 0~4, 영상에서 저작한 클립 29개(수정 라운드의 `break_low` 포함), 그림 106장(약 45만 픽셀) · 아이템 모델 47개. 모듈은 리그 API `rlk:mboss/fieldgen/rig/…`(`init spawn tick kill play/<클립> form/<형태> look/<모양새> crack/{0..4} face/{player,track} flash prop/clear`)와 매니페스트 `tools/mboss_fieldgen_rig_manifest.json` 의 클립 길이 · 사건 틱 · 형태 바뀜 · 숨는 구간 · 앵커(포트 · 배출구 · 메달 · 코어 높이) · 레이저 공전(`orbit`) · 파쇄 틱(`bursts` · `throws`)을 읽는다. 모듈이 읽는 사건이 매니페스트에 없으면 빌드가 알림을 찍는다(지금은 하나도 없음). F1 은 끝(260틱)에, F2 는 `frock` 이 끝날 때(110틱) `field_idle` 을 틀고, 세 번째 충격파는 시작 때 `wave_long`, 마무리 때 `wave_drop`(내려앉았다 63틱에 떠오름), 접기는 닻을 내리는 58틱에 `look/idle`. 첫 단계의 대역 리그(`tools/mboss_fieldgen/stub_rig.py` · `stub_rig_manifest.json` · `mboss/fieldgen/rig_stub/`)는 지웠다. C1 · C4 의 폭탄 · 미사일은 효과 도구의 모양(`fx/p/bomb_*`, `fx/prop/missile`)이고 리그의 `prop/bomb` · `prop/missile` 은 쓰지 않는다.
+- **테스트**: `/function rlk:mboss/test/start {id:"fieldgen"}`(= `#mbForce mb 3`) 뒤 `/function rlk:mboss/test/pattern {id:N}` — 1~6 순항 패턴(바로 순항), 11~12 역장 패턴(바로 역장), 20 역장 생성, 21 시작 충격파, 22 마무리 충격파 → 접기, 23 접기만, 30 역장 붕괴, 31 계기 +5, 40 그로기, 41 저중력 켜고 끄기, 42 세 겹 충격파 켜고 끄기, 99 대기. `test/lock {id:N}`: 1~6 그 순항 패턴만, 11~12 (역장 안에서) 그 역장 패턴만, 17 역장 순환만, 0 해제.
+- **생성 · 시험**: 위 "등록 · 모듈"의 순서대로(`build_mboss_core.py` → … → 리그 셋(`node tools/build_mboss_*_rig.mjs --resourcepack <RP>`) → … → `build_mboss_fg_fx.py --resourcepack <RP>` → `build_mboss_fieldgen.py` → `check_mboss_pack.py`; 두 번 돌려도 바뀌는 파일이 없다). 스크래치패드 `mb3/tests/run_all.sh <데이터팩 폴더>`(`RP=<리소스팩>` 이면 두 효과 도구의 리소스팩도 두 번 만들어 비교) 가 역장 시험(`test_fieldgen.py`: 0절이 진짜 리그, 11절이 효과 도구 연결 · 순항 패턴 `pat_cruise.py` · 역장 패턴 `pat_field.py` · `test_e2e_fieldgen.py` · 틀 옵션 `test_fwopts.py`), 역장 효과 도구 시험(`mb3/fxtests/test_fg_fx.py`), 나비 · 나비 효과 도구 · 틀 · 가디언 시험, 생성기 순서 시험(`gen_check.py`), 다른 모듈의 바이트 동일 확인(`ident.py`: 릴리스 줄과 합친 뒤에는 가디언 · 시험용 보스 · 나비(소스 · 리그 · 생성된 파일 전부)가 릴리스 줄 5556c79 와 바이트 단위로 같다), 검사기 다섯 개를 돌린다. 진짜 리그 위의 장면 그림은 스크래치패드 `mb3/renders/integ_*.png`(`mb3/fxrender/render_integ.py`: 리그의 디버그 자세 + 효과 도구).
+- **지금 상태**: 코어 · 효과 도구 · 진짜 리그가 모두 합쳐졌다. 순항 패턴 6개(C1~C6) · 역장 패턴 3개(F1 · F2 · 충격파)와 등장 · 역장 생성 · 접기 · 붕괴 · 그로기 · 사망 연출이 2단계(효과 도구의 효과 · 바닥 예고 · 소리)이고, 모든 틱은 진짜 리그의 클립 사건에서 읽는다. 패턴별 시험(`pat_cruise.py` 77개 · `pat_field.py` 82개 · `test_fieldgen.py` 9절)을 진짜 리그의 사건으로 다시 돌려 모두 통과했다(바뀐 틱: C1 94 · C2 37 · C3 165(발사 22) · C4 66 · C5 130 · C6 158 · 등장 95 · 접기 70 · 붕괴 40 · 사망 110). 릴리스 줄(나비 최종판 · 10-19 피드백)과 합쳤다(`wip/merge-fg`): 나비는 릴리스 그대로이고, 틀은 두 쪽의 기능을 모두 가진다. 틀의 칼날 판정이 "반폭 + 0.3칸"(나비 검토 고침 FW-1)이 되어 C6 · F2 판석의 반폭은 1.2칸(틀이 반폭을 0.1칸 단위로 올림: 사거리 1.5칸 = 폭 2.4 판석 판정 + 0.3칸, 예전 1.45칸)이다. 합친 뒤 같은 공정성 모의 실험(아래 "수정 라운드"): 서 있기 250.9 · 근접하며 걷기 139.3(가디언의 0.86배) · 원거리에서 걷기 113.1(0.83배), 목표 ±20% 안. 오프라인 명령 시뮬레이터로 순환 · 역장 · 계기 · 붕괴 · 저중력과 그 정리 · 충격파 · 판정 틱 · 처음부터 끝까지의 싸움(뽑기 → 문 → 경기장 → 등장 → 역장 → 20타 → 그로기 → 처치 → 상자)을 확인했다(게임 안에서는 아직 확인하지 않음). 부하는 리그를 뺀 평균 약 340명령/틱(효과 도구 포함, 게임과 같은 예약 순서; 대역 리그 때 잰 값)이고, 가장 바쁜 틱은 C6 이 되돌아가며 판석이 무너지는 틱의 약 2.6천이다. 리그는 틱마다 부품 29개의 `tp` 와 그 틱에 시작하는 키만 더한다.
+- **수정 라운드**(상태 · 충실도 검토 `mb3/review/{state,fidelity}` 의 진짜 문제 12개, 스크래치패드 `mb3/fg_contract.md` 19절):
+  - 상태: 20타째가 들어간 뒤 모듈 틱 전에 `/reload` 하면 계기가 20/20 에 멈춰 붕괴가 오지 않던 것(리로드가 계기에서 붕괴를 다시 셈) · 펼친 뒤 역장 생성 중 리로드나 열린 역장에서의 테스트 요청이 역장을 다시 열어 계기 · 역장 번호를 되돌리던 것(`field/open` 이 두 번째에는 모양새 · 판정만, 안내 띠는 역장마다 한 번) · 'player' 태그를 가진 플레이어가 없으면 싸움이 멈춤 훅 없이 얼어붙던 것(틀: 이제 멈춤으로 다룸, 가디언 · 나비도 같은 틀이라 함께 고쳐짐).
+  - 충실도: 마무리 `wave_drop` 으로 바닥에 내려앉은 채 20타째를 맞으면 리그의 새 클립 `break_low` 로 그 자리에서 터지고 기울어 그로기로(예전엔 3.4칸 위로 튀어 올랐다가 터짐) · C1 폭탄이 리그의 앞쪽 포트에서 떨어짐 · 포트 빛이 리그의 포트 8개 위(4틱: 움직이지 않는 카드라서 장치가 경로를 미끄러지기 시작하고 2틱 뒤에는 사라짐) · 그때 계기 반짝임이 바닥의 코어 높이 · C1 · C2 고정점에 기둥 카드 없이 바닥 빛만 · F1 이 206틱에 `field_idle` · 마무리 세 겹 충격파의 빔 · 맥동 · 충전 구가 내려앉는 코어를 따름(모든 빔은 리그의 빔 틱에) · 사망의 빛 흩어짐이 80틱 하나 · 접기 불꽃이 32틱 메달 위.
+  - 균형(검토의 공정성 모의 실험, Lv4 아이템 없음, 3시드 × 3분, 같은 틀의 가디언과 비교: 분당 잃는 체력): 가만히 서 있기 217.1(가디언) / 335.2 → **250.9**(1.16배), 근접하며 걸어서 피하기 162.9 / 43.9 → **150.3**(0.92배), 원거리에서 걸어서 피하기 137.0 / 81.2 → **116.1**(0.85배). 걷는 플레이어는 시작 충격파(점프로 넘음) 동안 역장을 깨므로 역장 패턴은 깨지 못한 플레이어만 맞는다: 역장 쪽 계수를 낮추고, 걸어서 다 피하기 어려운 순항 패턴(폭격 · 내려찍기 · 미사일 · 파쇄)을 올리고, 거리 구간과 쉬는 시간을 바꿨다(위 "피해 수치" · "순항").
+  - 시험: `test_fieldgen.py` 12절(새로), `test_fwopts.py`(태그 없는 플레이어 = 멈춤, 세 보스 모두), `pat_cruise.py` · `pat_field.py`. 리그 렌더 `mb3/fgfix/out/c_break_low.png`.
+- **10-20 예고 규칙 · 계수 × 1.5**(사용자 결정, 감사 스크래치패드 `tele/fg/audit.md`, `mb3/fg_contract.md` 21절): 위 "예고 규칙" 과 "피해 수치".
+  - 남긴 바닥 예고(영상에 있는 것만, 모양 · 틱은 영상대로): C5 의 얇은 연금색 테두리(`tele/rim`, 팔레트 6) + 테두리까지 자라는 어두운 원(`tele/dark`), F1 의 어두운 원(`tele/dark`, 6틱에 나타나 분출까지), C1 마무리 · C2 의 기둥 발치 섬광(`column_base`, 12틱; 15틱 바닥 빛과 끝 막대 입자는 뺌). 어두운 원 그림은 1칸 크기 카드라 예전 `dark_disc` · `erupt_tell` 은 반지름의 절반(1.4 · 6칸)으로 그려졌다: `tele/dark` 는 판정 반지름 그대로 그린다. C5 의 가장자리 번쩍임(`rim_flare`)도 같은 이유로 반지름 6칸에 그려지던 것을 12칸 테두리 위로 옮겼다. 두 어두운 원은 이제 예고 카드라 멈춤 때 지워지고 다시 시작한 첫 틱에 남은 시간으로 다시 그려진다(C5 는 그때 크기에서 계속 자람).
+  - 없앤 바닥 예고: C1 폭탄 원 · 마무리 반지름 5 원, C2 반지름 5 원, C3 돌아가는 레이저 띠, C4 미사일 원, C6 · F2 바닥 폭발 원과 판석 던질 선(피해 0 선 판정도 함께), 「인력 충격파」의 충전 원 · 고리(세 겹 포함), F1 의 보라 예고. 판정은 모두 그대로 조용한(`#hzQuiet 1`) 판정이고 크기 · 틱은 바뀌지 않았다. 판석 던지기만 10틱 전 신호가 작은 사슬 소리뿐이라 판석 자체가 번쩍이는 효과(`p/slab_glint`, 바닥 표시 아님)를 더했다. 쓰지 않던 옛 도우미 `api.rocks` 와 다시 그리기 도우미 `api.c_redraw` 는 지웠다.
+  - 균형(같은 공정성 모의 실험, 같은 시드 · 같은 플레이어 모형, 스크래치패드 `tele/fg/sim`): 분당 잃는 체력 / 죽는 횟수가 가만히 서 있기 250.9 / 1.67 → **376.0 / 2.33**(가디언 217.1 / 1.33 의 1.73배), 근접하며 걷기 139.3 / 0.78 → **211.8 / 1.33**(가디언 162.9 / 1.00 의 1.30배), 원거리에서 걷기 113.1 / 0.56 → **177.7 / 1.00**(가디언 137.0 / 0.78 의 1.30배). 걷는 플레이어가 맞는 횟수는 그대로(분당 6.1 · 5.6, 릴리스 6.1 · 5.4)라 오른 몫은 × 1.5 뿐이다. 이 숫자는 판석의 번쩍임과 겨눔을 보고 옆으로 비키는 플레이어 모형의 값이고, 판석을 읽지 못하는 모형은 C6 판석에 분당 40번 맞아(릴리스 9 · 11번) 근접 312.9 · 원거리 247.8 이 된다.
+  - 시험: `pat_cruise.py` · `pat_field.py` 에 예고 규칙 검사(바닥 예고를 그리는 판정 = 감사의 남김 목록 {C1 마무리, C2, C5} · {F1}, 주인 없는 바닥 예고 없음, 맞는 순간마다 효과), 멈춤 뒤 다시 그리기는 C5 · F1 만, 효과 도구 시험에 `tele/rim` · `tele/dark` · `rim_flare` 크기, `test_fieldgen.py` 계수 × 1.5.
+
+### 테스트 명령
+- `/function rlk:mboss/test/start {id:"proto"}` · `{id:"guardian"}` · `{id:"butterfly"}` · `{id:"fieldgen"}`(챕터 지정: `test/start_ch {id:"guardian",ch:2}`): 'player' 태그 · `room/setup` · 진행 중인 런 없음 · 난이도 쉬움 이상. 중간보스 구역이 있는 진짜 노드 맵을 만들고 문을 바로 누른다. 중간보스 id 목록: `test/start {id:"help"}`(`start_ch` 는 `{id:"help",ch:1}`).
+- `test/kill`(처치 = 보상 경로) · `test/abort`(보상 없이 취소, 문이 다시 생김) · `test/pattern {id:N}` · `test/lock {id:N}`(0 해제) · `test/level {lv:N}` · `test/stop`(로비로) · `test/arena`(경기장 다시 짓고 보기) · `test/help`. `test/pattern {id:"help"}` · `test/lock {id:"help"}` = 싸우는 보스의 번호와 이름(싸우는 보스가 없으면 보스마다 그 목록을 여는 줄). 테스트 중 쓰러지면 캐릭터 초기화 없이 로비로("[다시 하기]" 는 그 테스트의 중간보스를 **같은 챕터로** 다시 시작한다(`rlk:mboss tlast {id, ch}`, `test/start_ch` 가 저장; 예전에는 늘 `proto`, 그다음에는 늘 1챕터). 처치 메시지의 "[다시 하기]" 도 같다).
+- 노드 맵으로 직접: `/data modify storage rlk:room next set value [15]` → `/scoreboard players set #mapType room 1` → `/function rlk:run/next_map`(뽑을 수 있는 중간보스가 있어야 함, 없으면 `#mbForce mb` 를 99로).
+
+### 고친 공용 파일
+`combat/apply`(쓰러지는 중 · 무적 · 진짜 피해 · 보조 오브젝트 경로 · 몸체 원소 훅 · 쓰러짐), `combat/apply_mods`(새로: 기존 보정 묶음 + 저항 + 보스별 받는 피해), `combat/res*`, `combat/gold_drop`(boss + miniboss 는 중간보스 배율), `combat/clear_atkflags`, `mob/{setup,shield_ensure,vanilla_hit,knock,tick}`, `room/{mob_init,zone_enter,mob_wave,combat_clear,zone_patch,clear,wipe,remove,setup}`, `room/obj/{click,k_mboss,k_mbox,do_mbox}`(상자 `oact` 15), `room/tick`(상자 연출), `room/node/{register,cand_loop}`, `run/{start,end}`, `player/hook_respawn`, `items/hook/on_heal`(첫 줄: 중간보스 전투 중 치유 기록 · 받는 치유 보정, `mboss/player_heal`), `items/hook/stat_buffs`(마지막 두 줄: 전투 중 치명타 확률 + `#mbCritAdd`, 치명타 피해 + `#mbCritDmgAdd`), `lvup/{roll,init,act/resolve}`(`pkMb`, 선택을 쓰면 열린 상자 하나를 지우는 `mboss/box/spend`), `tick`(역장 발생 장치 때 저중력 두 줄 `mboss/lowg_on` · `lowg_off` 추가), `view/move`(역장 발생 장치 때: 숄더뷰 아바타의 점프가 아바타의 `jump_strength` 를 읽음), `load`, `uninstall`, 미니맵(`tools/build_minimap.py` 로 다시 생성). 나루카미 코드는 건드리지 않았다.
+
+## 챕터 보스 (`mboss/cb/` · `mboss/ar/` · `mboss/px/`, AZ-CM)
+
+챕터 마지막 **보스 맵**에서 나루카미 대신 나오는 **챕터 보스**의 틀. 중간보스 틀(위 "중간보스") 위에 얹혀서, 등록 · 경기장 · 문 · 보상 · 정리만 다르고 바닥 공격 · 투사체 · 이동 · 보스바 같은 라이브러리는 그대로 쓴다. 첫 챕터 보스는 **야타용왕**(`azhdaha`, 1챕터)이다. 검증(VERIFY)을 마치고 `enabled:true` · `route:true` 가 되어 **1챕터의 보스 맵은 야타용왕**으로 간다(아래 "야타용왕"). 3챕터 보스 **아펩의 오아시스 파수꾼**(`apep`, `ch [3]`)도 AP-I2 부터 `route:true` 라 **3챕터의 보스 맵은 아펩**이다(아래 "아펩"). 4챕터 보스 **아를레키노**(`arlecchino`, n 12, `ch [4]`, `boss/arlecchino/`, 경기장 `fl_ruins`)도 I1(11-02)부터 `enabled` · `route` 가 true 라 **4챕터의 보스 맵은 아를레키노**다. 2챕터와 5챕터 이후의 보스 맵은 나루카미다. 틀 점검용 **시험용 수호자**(`cproto`, 어느 챕터에도 배정되지 않음)도 테스트 명령으로만 나온다.
+
+
+**모듈 위치**: 챕터 보스 모듈의 함수는 `rlk:boss/<id>/`(야타용왕 `boss/azhdaha/`, 아펩 `boss/apep/`; 나루카미는 원래부터 `boss/raiden/`)에 있다. 레지스트리 항목의 `"fn": "boss/<id>"` 가 그 뿌리를 정하고(없으면 `mboss/<id>`, `tools/mboss_lib.py` 의 `fn_root` / `fn_root_of`), 코어의 디스패처 · `cb/pp` · `cb/inc` · 판정 프록시의 리그 호출 · 모듈 생성기 · 효과 도구 · 리그 / 생명체 모델 생성기 · `check_mboss_pack.py` 가 모두 그 값을 읽는다. 함수만 옮겼고 엔티티 태그 · 점수판 · 저장소 · 리소스팩 경로(`rlk:mboss/azhdaha/…` 아이템 모델 등)는 그대로라 기존 월드가 그대로 돈다. 공용 엔진(`mboss/` 코어 · `cb/` · `hz/` · `px/` · `mv/` · `test/` …)과 중간보스 셋 · `proto` · `cproto` 는 `mboss/` 에 남는다. `boss/raiden` 과 `boss/test` 는 예약(레지스트리 검사).
+
+### 진행
+1. 보스 맵을 만들 때 `room/pick/boss` → `mboss/cb/route`: 레지스트리에서 그 챕터에 배정된(`ch`) **켜진 + `route:true`** 챕터 보스가 있으면 그 보스의 입구 배치(`room/cboss/<id>/layout`), 없으면 나루카미(`room/raiden/layout`). 테스트는 `#cbForce mb`(레지스트리 번호, `#mbTest 1` 일 때만)로 고정하고, 어느 경로도 `#mbForce` 를 건드리지 않는다.
+2. 입구: 구역 1(현관) + 구역 2(종류 9 = 보스 구역, 가운데에 문). 보스 구역을 지을 때(`room/cboss/<id>/build`) `mboss/cb/prep` → `cb/pp/<id>`: 맵마다 새 `rlk:mboss cprep.<id>`(문 글자 · 제목 · 모듈의 맵별 상태), 그 보스 경기장의 청크 고정(forceload), 나누어 짓기 작업 시작(아래 "경기장"), 그리고 모듈의 `prep` 훅(문 글자, 비석 장식 등).
+3. 보스 구역에 들어가면(`room/zone_enter` → `cb/enter`) 구역은 바로 정리 상태(zst 3)가 되고 가운데에 **문 오브젝트**(`room/obj/k_cboss`, `oact` 16, 아이콘 두 개 + 이름표 세 줄 = `cprep.<id>.gate`; 저장소가 없으면 레지스트리의 문 기록으로 세움). 문을 누르면(`room/obj/click` → `cb/gate`): 평화로움이면 거절, 경기장 작업이 도는 중이면 **"경기장을 준비하는 중입니다. 잠시 뒤 다시 누르세요."**(문은 그대로), 아니면 그 보스의 문(`cb/g/<id>`): 고정 다시 걸기, 문 치우기, 구역 전투 시작, 1.5초(30틱) 뒤 소환, 제목 · 부제(`cprep`), 종소리 · 심장 소리.
+4. 소환(`room/boss_spawn` → `cb/spawn_route` → `cb/start {id}`): 뽑기 없음 · 만난 목록 추가 없음 · `#mbForce` 없음. 경기장이 다 지어졌다고 보고할 때까지(`ar/<aid>/ensure` 가 1) 10틱마다 다시 시도(`cb/wait`, 작업이 도는 동안은 무한, 작업 없이 7번 · 모두 60번 실패하면 취소). 그다음은 중간보스와 같은 `start_go`(경기장 표식, 몸 소환, 체력 나눔, 돌아올 자리).
+5. 처치(`room/combat_clear` → `cb/clear` → `cb/won`): 경기장에 남은 골드를 거두고 던전으로 돌아오고, 경기장 고정을 풀고, **다음 챕터 오브젝트**(`room/obj/k_chapter`). 보상은 나루카미와 같은 **보스 경제**: 골드 = 무작위(`#mobGoldMin`~`#mobGoldMax`) × 챕터 × **15**(`#bossGoldMul`), 사파이어 조각 **2개**(`#bossSapphire`), **아이템 상자 없음**. 몸에 `miniboss` 태그가 없어서 `combat/gold_drop` 의 중간보스 배율(`#mbGoldMul` · `#mbSap`)은 타지 않는다.
+6. 처치가 아닌 끝(`/kill`, 소환 실패, 리로드로 몸 유실, `test/abort`): 보상 없이 취소되고 **같은 `cprep`** 으로 문이 다시 선다(문 글자 · 맵별 굴림 그대로). 다시 누르면 다시 싸운다.
+7. 패배 경로 `mboss/cb/lose`(모듈이 부르는 목표 실패): `#mbLost 1` 후 플레이어 체력 0 = 일반 사망 경로(런 실패, 테스트면 `test/defeat`). 로노바 부활은 그대로 적용된다.
+- 멈춤 · 경기장 밖 · 정리는 중간보스와 같다. 정리(`cleanup_fight`)는 `#mbMode 0` · 바닥 · 연출 · 밀어내기 · 체력 나눔 · 이벤트 · 음악 · `px` / `push` / `lv` 저장소까지 지우고, 경기장 고정은 `cb/won` · `mboss/cleanup`(맵 이동 · 런 끝 · `room/wipe`) · `cb/remove`(`room/remove`) · `mboss/uninstall` 이 푼다. 그 경기장의 나누어 짓기 작업(모듈의 모습 바꾸기 · 다시 짓기)이 도는 중에 고정을 풀면 챕터 경기장의 `ar/<aid>/fl_off` 가 고정을 풀기 **전에** 그 경기장의 작업을 멈춘다(`arena/abort`; `cb/won` · `mboss/cleanup` · 직접 부른 `ar/fl_off` 어느 쪽이든. 청크 없이 200틱 기다리며 문을 "준비 중"으로 막다가 버려지던 일이 없음. 다른 경기장의 작업은 그대로). 다음에 문을 누르면 `ensure` 가 고정을 다시 걸고 다시 짓는다.
+
+### 레지스트리 v2 (`tools/mboss_registry.json`)
+- 항목에 `kind`("mid" 기본 / "chapter"). 챕터 항목만: `ch`(배정 챕터 목록), `route`(실제로 그 챕터를 가져갈지), `arena`(경기장 id), `music`, `res`(원소별 저항), `phases`(체력 나눔 %, 합 100), `px`(판정 프록시), `pxBase`(프록시 UUID 아래 바이트 시작), `shield`(클릭 판정 상자). 켜진 `route:true` 항목 둘이 같은 챕터를 가질 수 없다(`mboss_lib.load_registry` 가 막음).
+- `arenas{}`: 경기장마다 `n`(= `#mbAr`, 광장은 0) `theme ver cx cy cz r walk safe start box looks`(+ `oob`, `sweep`). `box` 는 청크 256개 이하이고 다른 경기장 · 던전 · 로비 · 아이템 방 · 광장의 고정 청크와 겹칠 수 없다(`mboss_lib.load_registry` 가 막음: 한쪽 고정을 풀면 다른 쪽도 풀리므로). 지금 `az_cavern`(n 1, 야타용왕, `tools/mboss_arena_az_cavern.py`) · `ap_oasis`(n 2, 아펩, `tools/mboss_arena_ap_oasis.py`) · `tk_lift`(n 3, 타키, `tools/mboss_arena_tk_lift.py`) · `cp_test`(n 9, `tools/mboss_arena_cp_test.py`)(테마 모듈이 없는 경기장은 **대역 함수**만 생성된다). `fl_ruins`(n 4, 아를레키노, `tools/mboss_arena_fl_ruins.py`, 모습 `day` · `crimson`; 값은 `tools/mboss_arlecchino/api.py` 의 `ARENA_SPEC` 그대로).
+- 저장소: 중간보스는 `reg[]` · `byid`, 챕터 보스는 `creg[]` · `cbyid`(+ `#mbCN`). 중간보스 뽑기는 챕터 보스를 절대 보지 않는다.
+
+### 경기장 (`tools/build_mboss_arena.py` → `mboss/arena/<aid>/*`, 코어 → `mboss/ar/<aid>/*`)
+- 예전에 상수로 박혀 있던 경기장 함수(경기장 밖 판정 · 쓸기 · 걷기 판정 · 끌어오기 · 고정 · 불림 확인 등)는 경기장마다 `mboss/ar/<aid>/<fn>` 이 되고 `mboss/ar/<fn>` 이 `#mbAr` 로 고른다. **광장 쪽은 M0 의 글자 그대로**라(`loaded` 도 M0 `start` 의 가운데 한 점 검사 그대로, 챕터 경기장은 상자의 모든 청크: 고정 청크는 순서 없이 불리므로 반쯤 불린 상자에서 작업을 시작하지 않음) 중간보스 전투는 바뀌지 않는다(시험 `ident.py` 2b). 매 틱 · 자주 부르는 것은 디스패처를 거치지 않는다: `mboss/world` 는 광장의 `ar/plaza/oob` 를 바로 부르고, `mv/leash` · `mv/ok` · `mv/clamp` 는 첫 줄(`#mbAr` 1 이상이면 `ar/<fn>` 으로) 뒤에 광장 줄을 그대로 품는다(`ident.py` 2c).
+- 챕터 경기장은 **나누어 짓는다**: 한 번에 하나의 작업(`#mbArBuild` = 남은 조각 수, `rlk:mboss arjob`), 틱마다 한 조각(`arena/job_tick`, `schedule 1t replace`, 청크가 안 불렸으면 기다리고 200틱 넘으면 포기), 조각 ≤ 40 · fill 하나 ≤ 32 768 블록 · 조각 하나 ≤ 8 000 명령. 끝나면 도장 `built_<aid>` = `"<aid>@<ver>:<모습>"` + 표지 블록 확인.
+- `ensure` 는 작업이 없고 · 청크가 불렸고 · 도장이 기본 모습이고 · 표지 블록이 맞을 때만 1. 아니면 실패하면서 필요한 작업을 건다(판 번호가 다르면 다 짓기, 모습만 다르면 기본 모습으로 바꾸는 작업, 불리지 않았으면 확인 작업). 모듈은 전투 중에 `arena/<aid>/look/<모습>` 으로 모습을 바꿀 수 있다(바뀐 블록만).
+- `cp_test`: 지름 25 의 둥근 시험장(매끄러운 돌 바닥 · 돌벽돌 담), 모습 두 개 `plain`(기본) · `lit`(바닥 고리가 금 블록, 빛 층 9 → 15). 입구는 나루카미의 현관 크기 + 문 방 하나.
+- `fl_ruins` "영락한 폐허"(아를레키노, 가운데 (760, 201, 8), 걷기 26 · 안전 24 · 반지름 30, 상자 x 712..808 · y 190..250 · z -40..56): 폰타인 폐허의 둥근 광장. 걷는 원(반지름 26) 안 y 200 은 평평한 통블록(연한 돌 타일 · 새긴 동심원 r 3.5 · 6.5 · 10/11.5 · 16 · 22/23.5 · 30°마다 바큇살 · 가운데 별, 금 간 타일과 이음매의 이끼), 그 위 y 226 아래에는 빛 층(y 206, 15)뿐. 가장자리(26 < d ≤ 27.6)는 연석 + 군데군데 끊긴 난간(돌벽돌 · 섬록암 담, 석영 기둥) + 보이지 않는 방벽(y 201..216), 반지름 28 에 정령 셋의 받침(방위 0 · 150 · 210). 그 밖은 풀밭과 보라 · 흰 꽃, 둥근 창 벽 · 아치 · 탑 터 · 기둥 무리(돌벽돌 · 석영 벽돌 · 윤나는 심층암 띠 · 녹슨 구리 머리), 가문비 · 짙은 참나무, 북서쪽은 솟는 바위 비탈, 남동쪽은 절벽 아래 바다(y 190). 하늘은 블록 돔(반지름 44, 꼭대기 y 248: 흰 지평선 · 옅은 파랑 · 파랑 · 꼭대기 섞임, 흰 양털 구름, 남동쪽 아래 산 · 바다 그림)을 안쪽 빛 블록으로 밝혀 하늘빛 · 시간과 무관. 블록 빛: 걷는 바닥 10(y 206 층의 최대), 돔 안 다른 스폰 칸 12 이상, 돔 지붕 바깥 1 이상. 모습 `crimson`(2페이즈, 전환 T 의 'dark' 에 모듈이 `arena/fl_ruins/look/crimson`): 돔 띠 → 분홍 콘크리트 · 자홍 테라코타 · 빨강 콘크리트 · 짙은 진홍 꼭대기, 구름 · 산 · 바다 → 어두운 테라코타, 북쪽 돔 벽의 붉은 달(반지름 6, 빨강 콘크리트 · 레드스톤 테두리 · 버섯불 고리), 풀밭 몇 군데 → 빨강 테라코타, 둥근 창 몇 칸 → 빨강 색유리; 걷는 바닥은 그대로. 모습 작업 = 8×8 기둥 칸마다 `fill … replace`(한 쌍 = 한 블록 → 한 블록) 3조각 + 나머지(달 · 풀밭 · 창) 칸 1조각, 약 17 300칸, 다음 전투의 `ensure` 가 `day` 로 되돌림. 입구(4챕터 던전의 종류 9 구역): 풀 덮인 폐허 마당과 북쪽의 **비석**(윤나는 심층암 판 · 깎은 흑암 받침과 머리; 모듈 `prep` 이 판 위 불꽃 자리(`entrance_layout()['stele_glow']`, 문 구역 표식 기준 `GRAVE` = (0, 4.3, -4.5))에서 진홍 불꽃을 피움).
+- 장식 소품(`rlk_mb_arena_prop`)은 모듈이 전투 시작 · 모습을 바꿀 때 소환하고 틀이 `cleanup_aux` · `mboss/init` 에서 지운다.
+- 개발용 보기 `/function rlk:mboss/ar/<aid>/test`(런 밖): 고정을 걸고 다시 지은 뒤, 작업이 끝나면(`arena/<aid>/done` · `vdone`, `#active room` · `#mbLive` 가 1 이 아닐 때) 고정을 스스로 푼다(로비로 돌아가도 청크가 붙잡혀 있지 않음). 런 안의 입구 준비 고정은 그대로 전투까지 간다.
+
+### 틀 기능 (챕터 보스용, 중간보스에는 꺼짐)
+- **체력 나눔** `mboss/repool {pct}`: 전체 체력 `#mbTot` 중 `pct`% 를 지금 단계의 체력으로(넘침 없는 곱, 30틱 동안 보스바가 차오름). 첫 단계는 `phases[0]`, `test/level` 은 새 `#mbTot` 에 지금 나눔을 다시 적용. **바닥** `#mbFloor`(모듈이 정하는 체력 바닥, `cb/inc/<id>` → 모듈 `incoming` → `mboss/floor`): 바닥까지만 깎이고 `#mbFloorHit 1`(바닥 이하가 되는 타격), `#mbFloorRaw` = 잘리기 전 피해. 진짜 피해는 바닥을 무시. **제목 바꾸기** `mboss/title {title,sub,color}`.
+- **원소별 저항** `res`(`{"0":30,"5":30,"*":10}` 꼴): 몸(`rlk_mb_resel`, `mbRes0..8`)과 보조 오브젝트(`#auxResEl` · `#auxResElV`)에서 `combat/apply` 가 타격 원소의 값을 `mres` 로(`mboss/res_pre`). 중간보스는 그대로 `mres` 하나.
+- **판정 프록시**(`px:true`): 보스 모양을 따라 다니는 interaction 최대 16개(고정 UUID = 보스 블록 + `pxBase + k`, 태그 `rlk_mb_px`, 살아 있을 때만 `rlk_mob`, 숨긴 것은 8칸 아래). 리그 매니페스트(스키마 1: 진짜 리그 것이 있으면 그것, 없으면 모듈의 대역 매니페스트; cproto 는 고정 파일 `tools/mboss_cproto_rig_manifest.json`; 합친 클립의 id 가 겹치면 생성 실패)의 클립 · 키에서 `mboss/px/<id>/**` 가 생성되어, 리그가 보여 주는 클립 · 틱에 맞춰 0.15칸 넘게 움직인 기둥만 옮기고 높이를 바꾼다. 상태 묶음 `px/state {set:"<이름>"}`(매니페스트의 `states`; `inv` · `dead` 는 꼭 있음, 시작은 `inv`, 쓰러질 때 `dead`, 모르는 이름은 경고만). 몸은 크기 0.1 허스크(`rlk_mb_big` · `rlk_mb_noshield`). 프록시를 맞히면 `px/hit` 가 그 자리에서 몸에 대한 `combat/apply` 로 바꾸고(숫자는 프록시 자리에 뜸, `#mbPart` = 맞은 프록시), **공격 하나 = 몸에 한 번**(`#atkSeq tmp` + 게임 시간: 범위 공격이 프록시 여럿과 몸을 함께 잡아도 한 번, 같은 틱의 원소 반응 · 지속 피해 · 달 반응은 각자 한 번). 프록시 클릭은 매 틱 읽고 멈춘 동안은 버린다.
+- **음악** `mboss/music/set {ph}`: 레지스트리 `music."<ph>"` 의 바닐라 `music.*` 이벤트를 `record` 분류로 플레이어 자리에서(입체 음향 아님). `len`(틱)마다 처음부터 다시, 100틱마다 바닐라 배경 음악 끄기, 단계가 바뀌면 앞 곡을 끄고 새 곡(겹치지 않음), 멈추면 끄고(단계는 기억) 다시 시작하면 처음부터, 쓰러짐 · 정리 · `uninstall` 에서 끔. 길이는 26.3 의 에셋 색인(34)에서 잼: `music.end` = `the_end.ogg` 39 889 699 샘플 / 44 100 Hz = 904.53초 → **18 090틱**, `music.dragon` = `boss.ogg` 15 177 058 샘플 → 344.15초 → **6 883틱**.
+- **보스바** 옵션(`tools/build_bossbar.py`): `#buHpCol bu`(0 = 기본 #E0484B, 1~9 = 아랫줄 색 번호, 10 = 금 #EDCF63) · `#buNoNum bu`(1 = 숫자 없음). 챕터 전투에서는 `mboss/bars` 가 `d/bars` 앞에서 0 으로 두고(`mboss/bars_cm`, 체력 나눔 차오름과 함께 `#mbMode 1` 일 때만), `bossui/draw` 는 그릴 때마다 끝에 0 으로 되돌리므로 옵션을 쓰지 않는 나루카미 · 중간보스의 줄은 M0 와 바이트 단위로 같다. 색은 검사 한 번(`1..10` 이 아니면 기본 색, 맞으면 `bossui/hp_col` 의 열 줄)이라 옵션을 안 쓰는 쪽은 그리기마다 M0 보다 명령 6개(모의기 셈: 색 검사 · 숫자 호출 · 되돌리기 둘)만 더 든다.
+- **중간보스가 내는 비용**: 챕터 전용 매 틱 줄은 `mboss/world` 의 두 문(`#mbMode 1` 이면 `world_cm_pre`: 챕터 경기장 밖 판정 · `#mbPushOn` 지우기 · 예측 조준 기록 · 프록시 클릭, 몸 틱 뒤 `world_cm_post`: 프록시 따라가기 · 밀어내기 캡슐 · 음악 시계) 뒤에 있고, `mboss/main` 은 M0 글자 그대로다. 모의기(같은 시드, 1200틱, 6틱마다 타격)에서 중간보스 한 틱은 M0 보다 명령 약 5개(약 2%)를 더 쓴다(전에는 16~18개): `world` 의 문 둘, `bars` 의 문 하나, `mv/leash` 의 `#mbAr` 검사 하나, 타격마다 `combat/apply` 의 자기 태그 검사 셋. 그 밖에 몹마다 매 틱 `mob/shield_ensure` 의 `rlk_mb_noshield` 검사 하나, 공격마다 `#atkSeq` 더하기 하나(다섯 곳), 나비아 장미탄 한 발마다 명령 둘(`pellet_go`). 행동은 바뀌지 않는다(`test_m0diff.py`).
+- **플레이어 쪽 도우미**(`mboss_lib` 호출 도우미가 함께 있음): 마스크 바닥 공격 `hz/mask {tell,dmg}`(종류 6: 안전한 원(`rlk_mb_hzsafe`, `#hzR0` + 0.3칸, 수평) 밖 전부, 반지름 제한 없음, 안전 묶음 `#hzSafeG`) · 맞음 / 피함 이벤트(`#mbHitEv` `#mbHitEl` `#mbHitSh` `#mbHitRA` `#mbHitSrc`, `#mbDodgeEv` `#mbDodgeOk`: 한 번 치는 12틱 이상 예고 · 투사체만) · 지속 피해 `mboss/pl_dot`(최대 체력의 ‰, 방어 무시, 대시 무적 무시, 수호 → 원소 보호막(같은 원소 250%), 기본은 1 남김, 반응이 없으므로 호출 전에 세운 `#mbNoRx` 도 여기서 써 버림) · 반응 없음(`#hzNR` `#pjNR` `#mbNoRx` → `player/take_damage` 가 `element/player_hit` 를 건너뜀) · 몸 밀어내기 캡슐(`#mbPushOn`, 0.6칸/틱, 대시 · 사망 · 선택 · 지도 중 안 함) · 밀어내는 고리 `push/ring {r,to,kb}`(0.1칸 단위, `r` ≤ 320 · `to` ≤ 600 으로 자르고 x · z 로 32칸 넘게 떨어진 플레이어는 밖, 피해 없음, 바닥 공격 위로는 안 밂) · 예측 조준 `mv/lockv {lead}`(5틱 속도, 대시 틱 건너뜀, 280 mb/틱 상한, 걷는 반지름 안으로) · 몸 기준 좌표 `mv/local` · 연출 `cine/start|end`(그동안 플레이어 피해 거부) · `hz/extend {n}` · `#pjNoDodge`. 플레이어 몸 위치는 `mv/plpos` 가 한 틱에 한 번만 NBT 로 읽어 `#mbPX` / `#mbPZ`(mb)에 두고 `mv/lv_sample` · `mv/local` · `mv/lockv` · `push/capsule` · `push/ring` · `hz/hit_mask` 가 함께 쓴다(플레이어 NBT 읽기는 플레이어 전체 저장이라 비쌈: 밀어내기가 켜진 틱에 6번 → 1번). 챕터 런타임이 그 틱에 플레이어를 옮기면(`push/capsule` 이 밀었을 때, 챕터 경기장의 `tp_in`) `#mbPlG -1` 로 다음 호출이 다시 읽는다.
+- **AP-FW 보충**(아펩의 요구 목록 FN-1~32 중 AZ-CM 이 남긴 틀 기능, `wip/cm-ap`; cm.md 22):
+  - **최대 체력 ‰ 바닥 공격** `#hzPm N`(1~1000‰) · `#hzPmL 0`(죽이지 않음; 없으면 1 = 죽일 수 있음, `L.hz_opts(pm=, pm_lethal=)`): 맞으면 `mboss/hurt` 대신 `mboss/pl_dot`(방어 · 레벨 보정 · 플레이어 반응 · 넉백 없음, 바닥 공격의 원소로 보호막), `#hzNoDodge` 가 없으면 대시 무적으로 피함. 맞음 / 피함 이벤트 · 묶음 · 재무장은 다른 바닥 공격과 같다. 두 옵션은 `scoreboard players reset` 으로 지우므로 중간보스 전투에는 이름이 남지 않는다.
+  - **안전 묶음 번호** `mboss/hz/safe_new` → `#mbSafeG`(-1, -2, …: 1 이상인 바닥 공격 번호와 절대 겹치지 않음, `L.hz_safe_new()`). 여러 마스크가 같은 돔을 쓰면 그 번호를 `#hzSafeG` 에(`L.hz_opts(safe_g='cur')`), 돔 표지의 `mbHzSG` 에 넣고, 표지는 모듈이 지운다. `#hzSafeG 0`(자기 번호) · 양수(예전 방식)는 그대로.
+  - **경기장 모습 기록** `rlk:mboss look_<aid>`: 지금 모습, 또는 돌고 있는 작업이 만드는 모습(지을 때 · 모습 작업을 시작할 때 쓰고 끝나도 그대로, 중단 · 지우기 · `uninstall` 에서 사라짐). 작업 중에는 도장(`built_<aid>`)이 없으므로 모듈은 이것을 읽는다.
+  - **연출 중 거부, 소모 없음**: `#mbCine 1` 이면 바닥 공격 · 투사체 · 묶음이 맞히지 않고 쓰이지도 않아, 연출이 끝나면 아직 살아 있는 것은 다시 맞힐 수 있다.
+  - **음악 묶음**: 아펩의 세 이벤트(`music.overworld.deep_dark` 2곡 · `music.nether.soul_sand_valley` 5곡 · `music.overworld.lush_caves` 15곡)는 바닐라의 무작위 곡 묶음이라 정해진 `len` 으로 이어 붙일 수 없다. `mboss_lib.MUSIC_TRACKS`(곡 길이, 26.3 에셋 색인 34 의 .ogg 에서 잼)를 보고 `load_registry` 는 묶음의 `len` 을 0(한 번) 또는 가장 긴 곡 이상(다시 고르는 주기: 6 870 · 6 376 · 6 881틱 = `L.music_len`)만 받는다. 짧은 곡 뒤에는 바닐라처럼 쉼이 생긴다.
+  - **대역 클립 번호**: 진짜 리그 매니페스트 옆에서 빈 클립을 메우는 대역 클립의 id 는 1000 이상이어야 한다(아니면 생성 실패; 겹치는 id 도 실패).
+  - **보조 오브젝트 표시 옵션**(`aux/spawn` 의 일회성 옵션, `L.aux_opts`): `#auxShW` / `#auxShH`(클릭 실드 크기, 0.1칸; 바로 만들어 `mob/shield_ensure` 가 그대로 둠) · `#auxHbY`(머리 위 체력바 높이, 0.1칸). **평지 걸음** `mv/step_flat {spd}`(`L.step_flat`: 바라보는 쪽으로 한 걸음, 높이는 경기장 바닥, 걷는 반지름 안으로).
+  - 중간보스 비용: 바닥 공격 하나 만들 때 명령 2개, 맞을 때 2개, 투사체가 맞을 때 1개, 보조 오브젝트 하나 만들 때 5개(모의기: 역장 발생 장치 +6.08 → +6.20/틱, 예산 6.5). 행동은 그대로(`test_m0diff.py`).
+- **아를레키노 보충**(4챕터, 스크래치패드 `ar/contract.md` 3.1, S1):
+  - **생명의 계약 공격(FN-1)** `L.hz_opts(bol=N)` · `L.pj_opts(bol=N)`(N 1~100 = 최대 체력 %, 일회성 `#hzBol` / `#pjBol`, 바닥 공격 · 투사체 · ‰ 바닥 공격 모두): 만들 때 표식 / 투사체의 `mbBol` 로 옮기고 옵션은 `scoreboard players reset`. 맞으면 `mboss/hurt` 가 원래 피해(방어 전) × `#mbBolRe mb` / 100(모듈 몫, 없으면 100)으로 `mboss/hurt_bol` 에서 마저 치고, ‰ 바닥 공격은 `hz/hurt_pm_bol` 이 만든 ‰ 그대로(`#mbBolRe` 를 곱하지 않음 — 정해진 비율의 처형 타격); 플레이어에게 닿은 타격(대시로 피하지 않음, 연출 중 거부 아님)이면 같은 틱에 `#mbHitBol mb` = N(모듈이 읽고 지움), 그 한 번의 호출 동안 `#mbBolIn` = N. `cleanup_fight` 는 `#mbBolRe` 가 있으면 100 으로, `#mbHitBol` · `#mbBolIn` · `#hzBol` · `#pjBol` 은 지움. 중간보스 전투에는 이 이름들이 하나도 생기지 않는다(`test_m0diff.py`); 비용은 타격마다 명령 1개(`mboss/hurt` 의 `mbBol` 검사), 바닥 공격 · 투사체를 만들 때 1개.
+  - **판정 프록시 없는 챕터 보스**(`px:false` + `shield:true`, FN-3): 몸 하나(허스크, `rlk_mb_big` 없음, 클릭 판정 상자 `hit`)로 진행 · 문 · 소환 · `cb/inc/<id>` · 바닥 · 체력 나눔 · 보스바 · 처치 / 취소 / 패배 · 시험 명령이 그대로 돈다(`#mbPx 0`, `mboss/px/<id>` 없음; `check_mboss_pack.py` 가 검사).
+  - **음악**: `music.nether.crimson_forest` 는 5곡 묶음(ballad_of_the_cats 5 600 · concrete_halls 5 189 · crimson_forest/chrysopoeia 6 068 · dead_voxel 6 076 · warmth 4 789틱, 26.3 에셋 색인 34)이라 1페이즈 `len` = 6 076(`L.music_len`).
+- 생성 순서: 코어 → 경기장(광장 + 모든 `arenas{}`; 테마 모듈이 없으면 대역) → `build_cboss_rooms.py`(`room/cboss/**`, 테마의 `entrance_layout()`) → proto → **`build_mboss_cproto.py`**(`mboss/cproto/**` + 대역 매니페스트) → 리그들 → guardian → … → `check_mboss_pack.py`. 코어는 커밋된 리그 매니페스트를 읽으므로 매니페스트가 바뀌는 커밋은 다시 만든 `mboss/px/**` 도 함께 커밋한다(두 번째 생성이 다르면 `gen_check.py` 가 실패).
+
+### 시험용 수호자 `cproto` (`tools/build_mboss_cproto.py`)
+머리 · 꼬리 두 프록시(`core` 폭 2 · `tail` 폭 1.2), 클립 4개(`idle` · `sweep` 꼬리 휘두르기 · `sink` 가라앉기 · `rise`), 두 단계(60% / 40%, 1단계 바닥 → 2단계 체력 · 제목 · 음악 · 20틱 연출), 패턴 셋(예측 조준 강타 · 밀어내는 고리 · 마스크). 모든 틀 기능을 한 번씩 쓰는 모듈 예시이고, 입구는 `cp_test` 의 것.
+
+### 아펩의 오아시스 파수꾼 `apep` (`boss/apep/`, 3챕터 보스, `tools/build_mboss_apep.py`)
+원신의 아펩의 오아시스 파수꾼. 레지스트리 `apep`(n 11, `kind` chapter, `ch [3]`, **`route` true**(AP-I2): 3챕터 보스 맵이 아펩이고, 1챕터는 야타용왕, 4챕터는 아를레키노, 2챕터와 5챕터 이후는 나루카미) · 경기장 `ap_oasis`(n 2) · 체력 290 · 공격 12 × 150% · 저항 풀 30% / 나머지 10%(`res {"7":30,"*":10}`; 증식 생명체는 풀 20% / 나머지 10%) · 체력 나눔 53 / 47% · 프록시 11개(`pxBase` 65) + 몸통 클릭 판정(`shield`) · 음악 세 단계(바닐라 무작위 곡 묶음: 깊은 어둠 · 영혼 모래 골짜기 · 무성한 동굴). 런 없이 바로 싸우려면 `/function rlk:boss/test/chapter {id:"apep"}`. 보상은 챕터 보스 경제(금화 × 15 × 챕터, 사파이어 조각 2개, 아이템 상자 없음)와 다음 챕터 오브젝트.
+
+#### 싸움의 흐름
+- **등장 E**(110틱, 무적): 시든 오아시스의 웅덩이에서 몸이 솟고, 가운데 9칸 위에 덩굴손이 쥔 「오아시스의 심장」이 매달려 있다가 70틱에 나무 꼭대기로 끌어올려진다(그 뒤 천천히 흔들림). 30틱에 제목, 100틱에 포효.
+- **1단계 종막 오아시스 파수꾼**(전체 체력의 53%, 바닥 1%): 바닥에 닿으면 다음 결정 때 **T1 소생 단계 진입**(136틱): 땅속으로 가라앉아 경기장 30칸 위에 숨고(`parked`), 가운데에서 받침이 솟고 심장이 내려와 놓인다. 심장 제목, 진행도 27%, 음악 2, 실제 게임의 문구 「마물을 처치해서 소생 진행도를 올리세요」.
+- **2단계 소생 단계**(보스는 맞지 않음): 증식 생명체가 물결로 나온다(나올 자리에 20틱 표시, 10틱 동안 솟으며 무적). 1물결 기본 4(근접 2 · 원거리 2), 2~5물결 기본 4 + 수호 · 둥지 · 양육 · 포식성, 6물결부터 특수 하나 / 7물결부터 둘(섞은 주머니에서). 동시에 심장을 공격하는 것은 3마리, 최대 6마리, 30초마다 또는 1마리 이하일 때 다음 물결. 처치하면 진행도 +3%(기본) / +13%(특수), 심장이 맞으면 −0.54%(강화 −1.08%), 100초 뒤에는 경고와 함께 30초마다 파괴 생명체(폭발 −14%, 한 번에 하나). 0% 가 되면 「소생 실패」: 첫 번째는 최대 체력 25% 를 잃고(죽지 않음) 27% 1물결부터 다시, 두 번째는 패배. 100% 가 되면 CS.
+- **CS**(192틱): 모든 생명체가 시들고, 흰 화면 속에 경기장이 무성한 모습으로 바뀌며(24틱에 걸친 모습 바꾸기) 「불씨」가 심장으로 날아들고, 80틱에 최대 체력 25% 회복, 92틱에 물속에서 기원 오아시스 파수꾼이 솟는다. 132틱에 제목 · 음악 3, 150틱부터 맞음.
+- **3단계 기원 오아시스 파수꾼**(전체 체력의 47%, 바닥 0): 선 자세(UPRIGHT)와 엎드린 자세(CROUCH)를 오간다. 쓰러지면 D(120틱, 소리와 물보라, 쓰러진 자리에 씨앗) → `cb/won`.
+
+#### 패턴 (모든 피해는 풀 원소)
+- 1단계: **P1 잠복 돌진**(가라앉아 땅속의 그림자가 미끄러져 와 멈춘 자리에서 솟는 폭발 r 4.2, 이어서 몸을 돌려 휩쓸기), **P2 생명의 손**(두 손을 박는 r 4.2, 줄기 넷이 솟아 오른쪽 · 왼쪽 · 왼쪽 · 오른쪽 차례로 띠를 내려침), **P3 발광하는 파수꾼**(빛나는 세 번 내려찍기 r 5.4, 가시 바퀴 융단과 따라오는 금빛 바퀴 둘), **P4 초목이 시든 풍경**(r 9 원이 차오른 뒤 회전), **P5 생명의 꼬리**(등을 돌리고 꼬리를 두 번 휘두름), **P6 근접 콤보**(2~4타), **R 잠복 이동**(P4 앞, 9칸보다 멀 때), 기어가기 · 옆걸음.
+- 2단계 생명체: 기본(근접은 심장에 붙어 기대어 공격, 원거리는 고리 자리에 누워 빛나는 탄), 수호(근처 생명체에 보호막), 둥지(가시 벽을 세움: 막힌 칸은 40틱 뒤 사라짐), 양육(기본과 연결되어 있는 동안 피해를 받지 않음; 연결된 기본이 죽을 때마다 −40%), 포식성(기본을 삼켜 강해지고 물기 연타), 파괴(시간 초과 뒤 심장으로 굴러가 폭발).
+- 3단계: **Q1 이동 돌진**(가라앉아 잎 길을 따라 이동, 솟아오른 뒤 몸을 날려 내려찍고 꼬리로 한 바퀴), **Q2 종말의 여파**(일정에 따라: 실제 게임의 띠 「소생의 찬가 보호막 안으로 들어가서 종말의 여파를 막아내세요」, 가운데로 가서 몸을 말고, 보호막 셋이 생기고, 바닥 전체에 15틱마다 최대 체력 3%, 156틱에 최대 체력 80% 의 폭발(첫 시전은 죽지 않고 뒤에 즉사 경고), 189틱에 보호막이 터짐; 보호막 안은 피해가 없고 20틱마다 최대 체력 1% 회복; 아래 막대가 두 구간으로 줄어듦: 붉은 구간 = 폭발까지, 금빛 구간 = 보호막이 사라질 때까지), **Q3 증폭의 풀**(포탄 셋, 첫 발이 가장 빠름; 둘째 · 셋째 포탄은 조준이 잠기는 순간 그 자리에서 소리가 나고, 그 위 5칸으로 옮겨 간 뒤 떨어짐), **Q3s 수면 포격**(Q3 뒤 30%), **Q4 생명의 꼬리**(두 번; 몸을 돌려 플레이어 쪽으로 몸을 날린 뒤 두 번째 꼬리가 앞을 가로질러 휩쓺), **Q5 생명의 나선**(가시 12개가 두 번에 나뉘어 날아오고 잎 칼날 둘).
+
+#### 바닥 예고 (영상에 있는 공격만, 모두 테두리 모양)
+P1 의 그림자(위치 표시), P2 의 균열 띠(레일과 균열 선, 채움 없음), P4 의 원(영상처럼 23틱에 걸쳐 차오름), Q1 의 잎 고리, Q3 첫 포탄의 표적 고리와 원, Q3s 의 잎 고리와 표적 원, 그리고 Q2 의 보호막 자리(메커니즘 표시)만 바닥에 그림이 나온다. 나머지 공격은 몸 동작 · 소리 · 공중에 보이는 투사체가 신호이고(첫 신호에서 맞는 순간까지 10~12틱 이상, 큰 공격과 대시로 못 피하는 공격은 20틱 이상), 맞는 순간에 효과가 보인다. 화면 문구는 이름 · 단계 제목 · 진행도 · 물결 수 · 배지 · 실제 게임의 문구 두 개와 즉사 경고뿐이다(안내 문구 없음).
+
+#### 시험 · 구성
+- 패턴 id = 시험 id(`rlk:boss/test/pattern {id:N}`, 필요한 단계로 먼저 넘어감): 1~6 P1~P6, 8 R + P4, 9 P6 4타, 20 T1, 21 / 22 심장 ±25%, 23 기본 4마리, 24~28 수호 · 둥지 · 양육 · 포식성 · 파괴, 29 시간 초과, 30 CS 거쳐 3단계, 31~35 Q1~Q5(32 = 종말의 여파 첫 시전, 37 = 치명적인 나중 시전), 36 수면 포격, 40 / 41 소생 실패 1 / 2, 60 CS 만, 61 자세 바꾸기, 99 대기, 그 밖은 도움말.
+- AI: 몸 기준 구역(정면 · 옆 · 아래 · 뒤)과 거리대(1단계 7.5 / 14칸, 3단계 6 / 14칸)별 가중치, 쿨다운 · 첫 사용 조건 · 바로 반복 없음, 4번은 9칸보다 멀면 잠복 이동(R)을 먼저, 뒤에 30틱 중 20틱 머물면 75% 꼬리(P5; 안내 문구 없음), 뒤에서 버티면 180° 게걸음 돌기, 3단계 연계(Q5 → Q1 40%, Q3 → 수면 포격 30%, 연달아 둘은 없음)와 종말의 여파 일정(첫 3단계 패턴 뒤, 그다음 900틱 + 다른 패턴 3번마다; 멈춤 · 리로드로 끊기면 300틱 뒤).
+- 리로드 · 멈춤 · 정리는 단계마다(계획 7.2): E → E 끝, 1단계 → 리그 다시 · 패턴 취소, T1 → 2단계 준비, 2단계 → 진행도 · 물결 · 시계 · 실패 횟수 유지하고 심장 · 물결 다시, CS → 3단계 준비, 3단계 + 종말의 여파 → 취소(300틱).
+- 구성(AP-I2, 2026-10-21): 진짜 리그(`build_mboss_apep_rig.mjs`, 49 파트 · 클립 36개, `tools/mboss_apep_rig_manifest.json`; 대역 리그와 대역 매니페스트는 AP-I2 에서 지움), 효과 도구(`build_mboss_ap_fx.py`, `boss/apep/fx/**`, 글꼴 `rlk:mboss_ap` 은 끝에 기본 글꼴 참조; 테두리만 그리는 `tele/disc_o` · `tele/crack_o`, 세 틱에 나눠 그리는 `p/flood_part`), 생명체 · 심장 · 돔 · 줄기 · 씨앗 모델(`build_mboss_apep_org.mjs`, `boss/apep/om/**`; 코어의 `obj/tick` 이 매 틱 모델 클립을 진행), 경기장 테마 `ap_oasis`(`tools/mboss_arena_ap_oasis.py`: 시든 / 무성한 모습, 입구의 수메르 문), 패턴(`p1.py` P1~P6 · R, `p3.py` Q1 · Q3 · Q3s · Q4 · Q5, `aftermath.py` Q2 + 보호막, `seq.py` E · D), 소생 단계(`revival.py` T1 · 심장 · 물결 · 실패 · CS, `org.py` 생명체 · 가시 벽). 훅: `uninstall` → `fx/uninstall` + 모든 생명체 · 오브젝트 모델(`rlk_ap_om`), `cleanup` → `fx/clear` + `fx/hud/clear` + `fx/dress/clear`, `pause` → `fx/tele/clear` + `fx/hud/flash_end` + `fx/hud/banner_end`, `death_start` → `fx/tele/clear` + `fx/hud/clear`, 2단계 리로드 → 경기장 가운데에서 `fx/dress/redraw`.
+- 고친 점 · 균형(AP-FIX, 2026-10-22): 입구 문의 두 수정이 효과 도구의 `gate_crystal` 모습, CS 의 흰 화면 동안 보스 리그를 32틱까지 숨김, CS 중 멈춤 뒤 흰 화면 다시 그림 · CS 중 리로드 때 25% 회복, 두 번째 「소생 실패」(패배)는 제목만, 파괴 생명체의 도화선 고리는 공 위(바닥 표시 아님), 무성한 모습에서 장벽 안쪽 풀은 충돌 없는 꽃(은방울꽃 · 분홍 꽃잎). 계수(`api.DMG`, 계수 × 100): P1 108 / 125, P2 67 / 85, P3 그대로, P4 85, P5 그대로, P6 55 / 67 / 50 / 77, Q1 56 / 60, Q3 52 / 45, Q3s 32 / 52, Q4 52 / 56, Q5 48 / 24, 생명체 그대로. 소생 진행도(`api.REV`): 기본 처치 +3%, 특수 처치 +13%, 심장 피격 −0.54%(강화 −1.08%). 공정성 모의(`S:ap/balance`, 결과 `analysis.txt`)로 맞춘 값이다.
+- 생성 순서: 코어 → 경기장 → `build_cboss_rooms.py` → proto → cproto → 리그들(`node tools/build_mboss_apep_rig.mjs --resourcepack <팩>` 포함) → `node tools/build_mboss_apep_org.mjs --resourcepack <팩>` → guardian → … → `build_mboss_az_fx.py` → `build_mboss_azhdaha.py` → `build_mboss_ap_fx.py --resourcepack <팩>` → **`build_mboss_apep.py`** → `build_bossbar.py` → `check_mboss_pack.py`. 코어는 커밋된 리그 매니페스트를 읽어 `mboss/px/apep/**` 를 만들므로 매니페스트가 바뀌는 커밋은 그것도 다시 만들어 함께 커밋한다.
+
+### 시험 명령
+- `/function rlk:mboss/test/chapter {id:"cproto"}`(첫 배정 챕터, 없으면 1) · `test/chapter_ch {id:"cproto",ch:2}`: 'player' 태그 · `room/setup` · 진행 중인 런 없음 · 난이도 쉬움 이상. 그 챕터의 진짜 보스 맵(`#cbForce`)을 만들고 문 앞에 세운 뒤, 경기장 작업이 끝나면 문을 자동으로 누른다(`#cbAuto`, 300틱 넘으면 "직접 누르세요"). 문을 직접 누르면(어떤 누름이든 `cb/g/<id>`) 자동 누르기는 끝난다(취소로 문이 돌아와도 대신 누르지 않음). 챕터 보스 id 목록: `test/chapter {id:"help"}`(`chapter_ch` 는 `{id:"help",ch:1}`).
+- 챕터 전투가 끝나면(처치든 취소든) `test/won` → `test/cwon` 이 `#cbForce` · `#cbAuto` 를 0 으로 둔다: 처치 뒤 다음 챕터 오브젝트로 계속 가는 테스트에서 다음 보스 맵은 런과 똑같이 정해지고, 취소된 문은 그대로 다시 누를 수 있다. 문구(챕터 / 중간보스)와 `[다시 하기]` 는 세션이 아니라 **방금 끝난 전투**(`cur.kind`)를 따른다(`test/won` · `test/defeat`). 챕터 테스트 중에 시작한 중간보스 테스트(`test/start_ch`)도 `#cbForce` · `#cbAuto` 를 지운다.
+- `test/lose`(패배 경로) · 공통 `test/kill` · `test/abort` · `test/pattern {id:N}`(cproto: 1 마스크, 2 지속 피해, 3 고리, 4 예측 조준, 5 좌표, 6 못 피하는 투사체, 7 연출, 8 / 9 모습 lit / plain, 10 패배, 11 2단계, 20~23 프록시 상태, 30 밀어내기, 31~33 클립, 40 제목, 41 / 42 음악, 50 보조 저항, 60 늘이기) · `test/level` · `test/stop`. `#cbForce` · `#cbAuto` · `cprep` 은 `run/start` · `run/end` · `test/stop`(→ `cb/run_reset`)이 지운다.
+- 쓰러지면 "챕터 보스 테스트 실패" + `[다시 하기]`(같은 보스 · 같은 챕터의 `test/chapter_ch`), 처치하면 다음 챕터 오브젝트 + `[다시 하기]` · `[로비로]`.
+- **챕터 보스용 별칭** `rlk:boss/test/<명령>`: `chapter {id}` · `chapter_ch {id,ch}` · `pattern {id}` · `lock {id}` · `kill` · `abort` · `lose` · `level {lv}` · `stop` 은 같은 인자를 그대로 엔진의 `rlk:mboss/test/<명령>` 으로 넘긴다(구현은 하나, 코어 생성기가 `boss/test/` 를 씀). 예: `/function rlk:boss/test/chapter {id:"apep"}`, `/function rlk:boss/test/pattern {id:31}`. `help` 도 그대로 넘어간다(`chapter {id:"help"}` = 챕터 보스 목록, `pattern {id:"help"}` = 싸우는 보스의 번호 목록).
+
+### 고친 공용 파일 (scratchpad `az/contract/cm.md` 16절)
+| 파일 | 고친 곳 |
+|---|---|
+| `room/pick/boss` | `room/raiden/layout` → `mboss/cb/route` |
+| `room/boss_spawn` | 첫 줄: `data.cboss` 이면 `mboss/cb/spawn_route` |
+| `room/zone_build` | `data.cboss` 이면 `room/cboss/build`, 일반 건설은 `data.boss_id` 가 없을 때만 |
+| `room/zone_patch` · `zone_floor` · `wave_start` | `data{boss_id:"narukami"}` → `data.boss_id` |
+| `room/zone_enter` | 종류 9 + `data.cboss` 이면 `mboss/cb/enter` |
+| `room/obj/click` | `oact` 16 → `mboss/cb/gate` |
+| `room/obj/k_cboss` · `k_cboss2` · `k_cboss3` · `k_cboss_fb` | 새 파일(문 오브젝트) |
+| `room/combat_clear` | 종류 9 + `data.cboss` 이면 `mboss/cb/clear` |
+| `combat/gold_drop` | 중간보스 배율 줄 `@s[tag=rlk_mb_body]` → `@s[tag=rlk_mb_body,tag=miniboss]` |
+| `combat/apply` | Raiden 오브젝트 줄 다음(8번 줄 뒤): 프록시 → `mboss/px/hit`, 큰 몸 → `mboss/px/dup`; 원소 훅 앞: `rlk_mb_resel` → `mboss/res_pre` |
+| `combat/melee_begin` · `clear_atkflags` · `element/rx_run` · `element/lunar/hit` · `element/dot` | 맨 앞 `#atkSeq tmp` +1 |
+| `player/take_damage` | `element/player_hit` 줄에 `unless score #mbNRNow mb matches 1` |
+| `mob/shield_ensure` | `rlk_mb_noshield` 이면 방패 없음 |
+| `char/navia/pellet_go` | 탄 한 발이 끝난 뒤(발수 세기 앞) 두 줄: 프록시에 닿았으면 몸에 한 번, 프록시는 세지 않음(`char/navia/pellet` 은 M0 그대로) |
+| `room/map_mobs` | 미니맵에서 프록시 제외 |
+| `room/remove` | `mboss/cb/remove` |
+| `run/start` · `run/end` | `mboss/cb/run_reset` |
+| `char/arlecchino/skill_hit` | 대상 쪽 기록 감사(아래): 피해 뒤 프록시의 `rlk_hit` 를 몸으로(`mboss/px/to_body`) |
+| `bossui/draw` · `bossui/nums` · `bossui/hp_col` | `tools/build_bossbar.py` 로 다시 생성(`#buHpCol` · `#buNoNum`) |
+
+이 표의 고친 줄은 글자 그대로 `az/tests_cm/baseline/shared_edits.diff` 에 고정되어 있다(`ident.py` 4d: M0 대비 0줄 문맥 diff 가 다르면 실패, 표를 바꾼 뒤에만 `--save`).
+
+### 대상 쪽 기록 감사 (프록시에 남는 상태, cm.md 9.6절)
+`combat/apply` 밖에서 `@e[tag=rlk_hit]` · 거리 선택자 · 조준한 몹에 쓰는 상태는 몸이 아닌 프록시에 남는다. 모두 찾아 몸으로 옮기거나 받아들였다(`test_px.py` 10절 · 5절이 확인).
+
+| 위치 | 상태 | 처리 |
+|---|---|---|
+| `char/arlecchino/skill_hit` | 핏값 `arDir` · 표식(`mk_spawn`, `rlk_armd`) | 옮김: 피해 뒤 `mboss/px/to_body` 로 맞은 프록시 대신 몸에 한 번(프록시마다 핏값이 쌓이지 않음) |
+| `char/yoimiya/rocket_boom` · `aur_move` | 유금화광 `aurEnd` | 옮김: `mboss/px/db`(매 프록시 틱, 몸 = 큰 쪽, 프록시는 0) |
+| `char/ronova/echo_boom` | 잔향 금지 `rnNoE` | 옮김: `px/db`(+ `elAct 1`, 몸의 `element/tick` 이 셈) |
+| `element/run/supercond` | 초전도 `scT` | 옮김: `px/db`(+ `elAct 1`) |
+| `items/proc/mirror` | 받는 피해 증가 `mirEnd` | 옮김: `px/db` |
+| `char/ronova/na_aim_hit` | 유도 대상 `rnId` | 받아들임: 유도탄이 조준한 프록시로 날아가 맞고, 그 타격이 몸으로 감 |
+| `items/proc/*` 의 `rlk_abt` · `raven_hit` · `abyss/fire` | 조준 표시(효과 방향) · 한 대상 `combat/apply` | 받아들임: 효과는 프록시 쪽, 피해는 몸으로 |
+| `char/navia/burst` · `char/nefer/dash_hit` · `arlecchino/mark_fx` | 입자 | 받아들임(겉모습만) |
+| `char/ronova/rev_wave` · `arlecchino/skill_kb` | 넉백 · 경직 | 해당 없음(`tag=!boss`, 프록시는 `boss`) |
+| `items/proc/case_tick` | 가장 가까운 몹의 `aFire` 읽기 | 받아들임: 프록시가 가까우면 조건이 안 맞을 수 있음(아이템 효과 하나) |
+
+### 결정 · 계약과 다른 점
+- 레지스트리 기록의 정수 목록(`res` 등)은 `[I;..]` 대신 보통 목록 `[..]`(NBT 비교 · 시험 모의기에서 같게 읽힘).
+- 대상 쪽 기록은 거리 선택자로 쓰는 것이 많아 줄마다 고치는 대신 생성 함수 `px/db` 한 곳에서 옮긴다(공용 파일 수정은 아를레키노 한 줄).
+- `push/cap_one` 은 `pq[0]{px:""}` 가 바닐라 NBT 경로가 아니어서(검사기 `check_nbtpath`) 캡슐을 `pc` 로 복사해 비교한다.
+- 문 오브젝트는 `cprep` 이 없어도 레지스트리 기록으로 선다(`k_cboss_fb`, 보스 맵에 문이 없는 일이 없음).
+- 검토 뒤 고친 점(scratchpad `az/contract/cm.md` 20절 변경 기록 1~12): 위의 테스트 상태 · 끝난 전투의 작업 멈춤 · 자동 누르기 · 개발용 보기 고정 · `uninstall` 이 `cbg` · `tch` · `pxq` · `arsw` 도 지움 · 매 틱 비용 · 보스바 색 검사 · 광장 `loaded` · 나비아 줄 위치 · 공용 파일 표(`combat/apply` 자리, 아를레키노 · `k_cboss_fb` 줄)와 아펩이 그대로 돌릴 수 있는 `test_chapter.py`(레지스트리에서 기대값을 읽음). 재검토(변경 기록 13~18): `pl_dot` 이 `#mbNoRx` 를 씀 · `cleanup_fight` 가 지움, `push/ring` 의 int32 넘침(먼 플레이어가 밀리던 일), 합친 매니페스트의 클립 id 중복 검사, 경기장 상자 고정 청크 검사, 챕터 경기장 `loaded` 가 모든 청크를 봄.
+- 테마 모듈이 없는 경기장(`az_cavern`, 이 가지)은 대역 함수만 만들고 도장 `"<aid>@0:stub"`.
+- 선택 사항(cm.md 5.10): `mboss/cb/peek`(그 챕터의 보스 맵이 갈 챕터 보스를 `cbpeek` 에)은 생성하지만, `room/end_boss` · `room/gen_title` 은 고치지 않았다("보스전" 표시 그대로).
+- 입구 장식처럼 전투 밖에서 움직이는 것은 모듈 `prep` 이 시작하는 스스로 다시 예약하는 함수 사슬(cproto: `cproto/glow`, 10틱, 소품이 없어지면 멈춤, 모듈 `uninstall` 이 `schedule clear`).
+- 판정 프록시 상태의 리그 보이기 함수(`states.<이름>.vis`)는 늘 그대로 부른다(생성 순서와 무관한 출력). 없으면 `check_mboss_pack` 이 알린다.
+- M0 의 `room/wipe` 에는 64 × 20 × 64 = 81 920 블록짜리 fill(y 211~230)이 있어 바닐라 한도(32 768)를 넘어 실패한다(그 높이가 지워지지 않음). 챕터 보스와는 무관해 고치지 않았다(`room/wipe` 는 공용 파일 표 밖).
+
+### 게임 안에서 한 번 확인할 것
+음악: 경기장 어디에서나 소리 크기가 같은지(`record` 분류, 입체 음향 아님) · 18 090 / 6 883틱 뒤 끊김 없이 처음부터 다시 나오는지 · 바닐라 배경 음악이 끼어들지 않는지. 안 되면(계약의 대안) `music_disc.*` 를 음량 4 로 다시 고정하며 틀기.
+
+### 시험 (스크래치패드 `az/tests_cm/`)
+`run_all.sh <worktree>/roguelike` 가 챕터 보스 시험 셋(`test_chapter.py` 라우팅 · 입구 · 문 · 소환 · 보상 · 취소 · 패배 · 체력 나눔 · 시험 명령 · 음악 · 모습 · 정리 · 나루카미 · 검토 뒤 고친 점, 모든 기대값을 시험하는 트리의 레지스트리에서 읽어 아펩 가지에서도 그대로 돔; `test_px.py` 판정 프록시, `test_fw_az.py` 도우미), M0 시험(`mb/int_tests` · `mb2/tests` · `mb2/fxtests` · `mb3/tests`), `gen_check.py`(생성 순서 · 두 번 · 거꾸로 · 소유 경로), `ident.py`(가디언 · 나비 · 역장 · proto 출력과 광장이 M0 039b911 과 같음, 공용 파일 수정의 내용 고정), `test_m0diff.py`(M0 묶음과 이 트리에서 같은 시드로 중간보스 넷의 싸움 · 처치 · 취소 · 멈춤 · 리로드를 돌려 틱마다 기록 · 로그 · 끝 상태가 같은지, 틱당 명령 증가 한도, 보스바 줄), 검사기 다섯 개(`baseline/` 대비 새 발견만 실패)를 돌린다.
+
+## 야타용왕 (`boss/azhdaha/`, 챕터 1 보스 · `tools/build_mboss_azhdaha.py`)
+원신의 야타용왕(아즈다하). 챕터 모드(AZ-CM)의 첫 챕터 보스로, 레지스트리 `azhdaha`(n 10, `kind` chapter, `ch [1]`,
+경기장 `az_cavern`, 1레벨 체력 135(FIX 밸런스: 1챕터 L6 에서 약 1355, 세 구간 약 452씩), 기본 공격 12 × `dmgMul` 140%, 몸 크기 0.1(큰 몸은 판정 기둥 `px` 12개, `pxBase`
+65), 등장 상한 160틱 · 사망 140틱, `deathSnd` false, `enabled` true, **`route` true**: 1챕터 보스 맵이 야타용왕이다). 런 없이 바로
+싸우려면 `/function rlk:boss/test/chapter {id:"azhdaha"}`(= `rlk:mboss/test/chapter`). 보상은 챕터 보스 경제(금화 × `#bossGoldMul` × 챕터,
+사파이어 조각 2개, 아이템 상자 없음).
+
+#### 플레이어용 요약 (어떻게 싸우나)
+- **어디서**: 1챕터 마지막 보스 맵. 입구 방 가운데의 문(아이콘 두 개 + 글 세 줄)을 누르면 「복룡목」 아래 동굴 경기장으로
+  들어간다. 경기장을 짓는 중이면 "경기장을 준비하는 중입니다" 가 뜨니 잠시 뒤 다시 누른다.
+- **원소 두 개를 굴린다**: 입구 방이 만들어질 때 **불 / 물 중 하나(다리 · 2페이즈)** 와 **얼음 / 번개 중 하나(꼬리 ·
+  3페이즈)** 가 정해진다(불·번개, 물·얼음, 불·얼음, 물·번개). 문 글자 두 번째 줄과 입구 비석의 문양 두 개(위 = 꼬리, 아래 =
+  다리)로 미리 볼 수 있고, 포기했다가 다시 들어가도 같은 조합이다.
+- **내성**: 처음부터 **물리 30% · 바위 30% · 굴린 두 원소 30%**, 나머지 원소(바람 · 풀 · 굴리지 않은 원소 등)는 10%. 굴리지 않은
+  원소로 때리는 쪽이 유리하다.
+- **때리는 곳**: 몸이 커서 머리 · 가슴 · 앞발 · 뒷발 · 꼬리 마디의 판정 기둥을 친다. 옆구리에 오래 붙어 있으면 응징 패턴
+  (성동격서 → 교활한 통수 · 꼬리찍기)이 나오니 **머리 정면이나 꼬리 끝**에서 싸운다.
+- **페이즈**: 1페이즈 바위(체력 2/3 까지) → 전환 1(파멸의 산사태: 파도 6번, 앞발을 내려찍을 때 뛰어넘는다 → 다리 원소 흡수)
+  → 2페이즈 다리 원소(체력 1/3 까지; 불이면 낙인 자리에 불 장판 · 운석, 물이면 도는 물 구체) → 전환 2(다리 특수기 · 산사태 ·
+  꼬리 원소 흡수) → **B3**(땅속으로 숨고 꼬리 기둥만 남는다: 꼬리만 때릴 수 있고, 얼음이면 서리 습격 · 번개면 벼락 습격,
+  이 동안은 죽지 않는다) → 3페이즈 두 원소(천동만상이 얼음 가시 / 번개 가시로, 앞발 3연타 발구르기, 꼬리 원소 탄막) → 처치.
+- **바닥 예고는 영상에 있는 공격만**: 천동만상 가시 착지(금빛 균열 고리), 잠복 돌진의 바위 고리(화살 고리), 물 간헐천(물 소용돌이),
+  큰 운석(여덟 갈래 봉인), 서리 습격(칠각 문양), 벼락 습격(보라 바닥 + 초록 안전 원), 얼음 가시(별 봉인), 번개 가시(육각 문양
+  = 구역 표시)만 바닥에 그림이 나온다. **나머지는 보스의 동작과 소리가 신호**다: 첫 동작에서 맞는 순간까지 최소 0.6초(12틱),
+  대시로 못 피하는 공격은 1초(20틱) 이상이고, 맞는 순간에는 범위 효과가 보인다.
+- **대시로 못 피하는 공격**(빠져나가야 함): 성동격서의 양옆 띠(좌우로 흔들 때 앞이나 뒤로), 교활한 통수의 꼬리 휩쓸기(꼬리를
+  들어 올리면 머리 쪽이나 꼬리 끝 바깥으로), 산사태 파도(점프), 벼락 습격(초록 안전 원 안).
+- **낙인**: 흡수한 원소의 공격에 맞으면 낙인(1초마다 5번, 최대 체력의 0.5%, 최소 1; 얼음은 겹칠수록 ×1.5 / ×2). 보호막이 먼저
+  막고, 공격을 대시로 완벽히 피하거나 체력을 6% 회복하면 지워진다. 보호막 없이 낙인을 받으면 근처에 **응결 결정**이 떨어지고,
+  주우면 최대 체력 12% 보호막.
+- **처치 시간**: 아이템 없는 Lv5 검 기준 약 3분 20초(시뮬레이션 199초, 전환 · B3 포함). 보상은 나루카미와 같은 보스 경제(골드 ×
+  15 × 챕터, 사파이어 조각 2개, 아이템 상자 없음)와 다음 챕터 오브젝트.
+
+#### 원소 조합 · 내성
+- **입구에서 굴린다**(`azhdaha/prep`, 입구 구역을 지을 때 한 번): 0 불 / 번개, 1 물 / 얼음, 2 불 / 얼음, 3 물 / 번개 중 하나
+  (다리 원소 = 2페이즈, 꼬리 원소 = 3페이즈). 결과는 `rlk:mboss cprep.azhdaha.pair`(+ 구역 표식 `data.az_pair`)에 남아,
+  포기하고 다시 문을 눌러도 같은 조합이다(죽거나 새 지도면 새로 굴림). 문 오브젝트의 두 줄째가 "흡수 원소: 물 (다리 ·
+  2페이즈) · 번개 (꼬리 · 3페이즈)", 세 줄째가 내성, 제목 부제가 "봉인된 바위 용의 왕 · 물 / 번개" 이다. 테마가 있으면
+  입구 비석에 원소 문양 두 개(위 = 꼬리, 아래 = 다리)가 서고 10틱마다 빛난다.
+- **내성**(`mbRes0..8`, 원소별): 물리 · 바위와 굴린 두 원소 30%, 나머지 10%(반응 피해는 그 원소로).
+
+#### 진행 (페이즈 · 바닥 · 전환)
+- **등장**(150틱 클립, `seq/intro`): 봉인 비석 6개 · 금빛 프리즘 · 바닥 문양 원 → 50 · 70틱 비석이 깨짐 → 112틱 봉인이
+  깨지며 흰 섬광 → 120틱 포효와 대사 "인간 주제에, 선을 넘지 마라!", 1페이즈 음악 → 130틱 밀어내기 고리(피해 없음) →
+  151틱 전투. 그때까지 맞지 않는다.
+- **1페이즈(바위)**: 체력 바닥 `#mbFloor` = 최대 체력의 2/3(올림). 바닥에 닿는 타격은 거기서 멈추고 머리 위에 "흡수 중
+  (원래 피해)" 가 뜬다(10틱에 한 번). 그 순간 전환이 **예약**되고, 하던 패턴이 끝나는(또는 위험한 부분을 끝낸) 다음 결정
+  시점에 시작한다.
+- **전환 1**: 메시지 "야타용왕이 곧 〈다리 원소〉 원소의 힘을 흡수합니다…" → 산사태(서비스 20: 가운데로 걸어가 파도 6번) →
+  흡수 1(서비스 21: 컷신 0-113틱, 47틱 폭발 때 다리 모습 · 경기장 색 · 밀어내기, 94틱 2페이즈 + 포효 + 다리 특수기).
+- **2페이즈(다리 원소)**: 바닥 = 최대 체력의 1/3. 지면 공격에 다리 원소가 실리고 낙인이 시작된다.
+- **전환 2**: 다리 특수기 먼저(서비스 30: 물이면 물 구체 31, 불이면 운석 32; 물 구체가 살아 있으면 새로 쏘지 않고 수명만
+  채움) → 산사태 → 흡수 2(서비스 22: 컷신 0-71틱, 42틱 꼬리 모습 · 3페이즈) → **B3**(서비스 23, 433틱).
+- **B3**: 0틱 땅파기, 8틱부터 무적, 40-56틱 숨어서 가운데로, **58틱 꼬리 기둥**(꼬리 판정만, `#azBur 1`, 꼬리 특수기
+  시작: 얼음 41 서리 습격 / 번개 42 벼락 습격), 335틱 꼬리가 가라앉음, 353-380틱 흙 둔덕(바닥 표시 없음),
+  388틱 분출(특수기 멈춤), **418틱 등장**(바닥 0, 체력이 1이면 "마지막 일격!"), 433틱 끝. B3 동안 바닥은 1이라 죽지 않는다.
+- **3페이즈(두 원소)**: 바닥 없음. 천동만상(P4)은 꼬리 원소판(45 얼음 / 46 번개)으로, 앞발 발구르기는 3연타(P5b)로 바뀐다.
+- **사망**(`seq/death`): "난… 사라지지 않아!" → 80틱 "모…락스…!" → 96틱 봉인이 다시 생기며 석화 → 120-140틱 사라짐 →
+  구역 정리 → 다음 챕터 오브젝트.
+
+#### 패턴 · 판단 (`ai.py`, 계획 4.12)
+- 플레이어 위치를 앵커(본체) 기준으로 4틱마다 나눈다: 머리 앞(가까움 ≤ 9 · 중간 ≤ 15 · 멂), 옆구리(가까움 |s| ≤ 9 · 멂),
+  꼬리 줄(|s| ≤ 3.5) · 꼬리 밖, 발밑(발 2.8칸 안 또는 몸 아래). 구역마다 가중치 표(패턴 파일의 `Pattern`)에서 고르고,
+  바로 같은 패턴은 다시 고르지 않는다(P2 는 절반 가중치, P5 는 2번까지). 쿨다운 · 조건(앵커가 가운데 8칸 안, P3 정면 35도,
+  P7 탈출로, 장판 면적 150 b² 이상이면 장판 패턴 금지, 3페이즈 배경 발사체 하나) · 페이즈 교체를 거친다.
+- **옆구리 규칙**: 옆구리 가까이에 24틱 중 16틱 넘게 있거나 40틱 안에 옆구리 판정을 쳤으면 90%로 응징(성동격서 P6 → 다음엔
+  교활한 통수 P7(탈출로가 있을 때) · 꼬리찍기 P8 · P2). 화면에 안내 문구는 띄우지 않는다(10-21 사용자 규칙: 조작 · 위치
+  조언 문구 없음). P2 · P7 · P8 · P9 · 등장 · 전환 다음 한 번은 건너뛴다. 꼬리 줄에서 3번 결정하는 동안 꼬리 패턴이 없으면 뒤돌기.
+- 평소에는 ±45도 안이면 틱당 3도씩 따라 돌고, 멀면(15칸 밖) 25%로 걸어온다. 본체는 가운데 8칸 원 안에 머문다.
+- **잠복 돌진(P9)**: 땅을 파고 들어가(40틱) 등장(220틱)할 때까지 몸 전체가 땅속에 숨어 있다. 두 번의 돌진도 땅속에서
+  하며 흙먼지 · 흙 파편이 지나가는 길을 보여 준다(10-21c: 머리 · 가슴만 내민 채 반쯤 묻힌 모습은 없앰). 솟아오를 때는
+  부위들이 숨은 채로 먼저 본체 자리로 옮겨진 뒤 보인다(옛 자리에서 잠깐 솟았다 미끄러지는 일 없음).
+- 패턴 본체는 `geo_a.py`(P1-P4) · `geo_b.py`(P5-P9) · `leg.py`(31-33, 다리 부가 효과) · `tail.py`(41-46, 꼬리 부가 효과) ·
+  `trans.py`(20-23) · `seq.py`(등장 · 사망) 담당 작업자의 파일이다. 모든 패턴 · 전환 · B3 · 등장 · 사망이 들어 있고(I2), 계수는 FIX 밸런스(`api.DMG`)
+  값이다.
+
+#### 낙인 · 응결 결정
+- 흡수한 원소(2페이즈 다리, 3페이즈 다리 + 꼬리)의 **타격**이 맞으면 낙인: 20틱마다 5번, 최대 체력의 0.5%(`DMG brand_pm` 5, 최소 1; 얼음은
+  겹침 1-3 = ×1 / ×1.5 / ×2), 죽이지 않고 보호막이 먼저 막는다. 같은 원소면 남은 횟수 = max(남은, 3), 남는 장판은 20틱에 한 번만.
+  누적 회복 6% 또는 완벽 회피(12틱 이상 예고된 한 방짜리 · 투사체를 대시로 피함, 40틱에 한 번)로 풀린다. 이름 줄에 ◈낙인,
+  부제에 "낙인(불) 5초".
+- 보호막 없이 낙인을 받으면 **응결 결정** 하나(300틱 쿨다운, 하나만, 200틱 동안): 플레이어에게서 5칸, 본체 반대쪽.
+  1.4칸 안에 들어가면 최대 체력 12% 보호막(그 원소; 더 큰 보호막이 있으면 그대로). 일시정지 동안 시간이 멈춘다.
+
+#### 화면
+- 이름 줄 뒤 배지: ◈〈다리〉 ◈〈꼬리〉(흡수 전 회색 #707070, 흡수 뒤 원소 색), 낙인 중 ◈낙인(낙인 원소 색).
+- 부제 우선순위: 등장 중 "봉인된 바위 용의 왕" → "마지막 일격!" → 전환 메시지 → "패턴 〈이름〉"; 그 뒤에 낙인 부분.
+  **조언 문구는 없다**(10-21 사용자 규칙: 어떻게 싸우라는 안내 · 힌트 · "점프!" 신호는 띄우지 않음. 원신이 직접 띄우는
+  전환 메시지 "야타용왕이 곧 … 원소의 힘을 흡수합니다…"와 낙인 안내 띠는 그대로).
+- 보스바 아래 줄: 전투 중 이번 페이즈의 남은 체력(바위 → 다리 → 꼬리 색), 전환 중 단계 진행(금색), B3 꼬리 창 남은 시간.
+
+#### 테스트 명령 (`/function rlk:boss/test/pattern {id:N}`)
+1-9 P1-P9 · 10 P5b · 20 산사태 · 21 흡수 1 · 22 흡수 2 · 23 B3 · 24 처치 · 25 B3 꼬리 하강부터 · 26 등장 다시 · 31 / 32 물 구체 /
+운석 · 33 불 장판 · 41 / 42 서리 / 벼락(B3, 꼬리 원소 바꿈) · 43-46 꼬리 패턴 · 60 2페이즈 · 61 3페이즈(꼬리 기둥) · 62 3페이즈 ·
+70 낙인 · 71 낙인 해제 · 72 결정 · 80 체력 = 바닥 + 1 · 90-93 원소 조합 고정 · 99 멈춤. `test/lock {id}` 는 그 패턴만.
+
+#### 파일 · 생성 순서
+- `tools/build_mboss_azhdaha.py` → 패키지 `tools/mboss_azhdaha/`: `api.py`(공용 상수 · 매니페스트 합치기 · 패턴 작성 도구
+  `Gen` / `Pattern` / `TL`), `core.py`(훅 · 판단 호스트 · 슬롯 · 서비스 · 장판 표 · 궤도 · 타이머 · 부가 효과 분배 · 화면 ·
+  테스트), `ai.py`, `brand.py`, `h_core.py`, `stub_rig.py`(대역 리그와 v1 대역 매니페스트) 와 패턴 파일들. 계약은 작업 폴더의
+  `az/contract/s2.md` · `manifest.md` · `cm.md` · `fx.md` · `theme.md`.
+- 순서: `build_mboss_core.py` → `build_mboss_arena.py` → `build_cboss_rooms.py` → (리그 · 리소스팩) → `build_mboss_az_fx.py` →
+  `build_mboss_azhdaha.py` → `check_mboss_pack.py`. 코어가 `tools/mboss_azhdaha/stub_rig_manifest.json` 을 읽으므로 그 파일은
+  커밋한다. 두 번 돌려도, 모듈을 먼저 돌려도 결과가 같다.
+- **통합(I1, wip/az)**: 진짜 리그(R3a: 47개 부위 · 41개 클립 · 매니페스트 v1), 효과 도구(`build_mboss_az_fx.py`),
+  테마(`mboss_arena_az_cavern.py`)를 쓴다. 빌드가 마지막 줄에 "리그에 없는 것"(클립 · 이벤트 · 리그 함수)을 찍는데 지금은
+  모두 없음이라 대역 리그 `rig_stub/` 는 만들지 않는다(빠진 것이 생기면 그 부분만 다시 대역으로 간다; I2b 에서 빈 목록을
+  확인). 대역 매니페스트 `tools/mboss_azhdaha/stub_rig_manifest.json` 은 계속 커밋한다(코어가 클립별로 합쳐 읽음; 판정 기둥
+  점 · `rest_pose` 는 리그와 같은 값). 판정 기둥 12개(`mboss/px/azhdaha/**`)는 코어가 진짜 매니페스트로 만든다.
+  효과 도구 연결: 정리 → `fx/clear` + `fx/hud/clear`, 멈춤 → `fx/tele/clear` + 장판 지움(다시 시작할 때 장판 표에서 다시
+  그림), 사망 → `fx/tele/clear`, 제거 → `fx/uninstall`. 이름 줄 배지는 효과 도구의 글꼴(`rlk:mboss_az`).
+- **바닥 예고 규칙(10-20)**: 모듈 도우미의 파도(`g.wave`)는 기본이 예고 없음(`tele='none'`: 타격 직전 1틱에 움직이는 고리만),
+  산사태에는 테두리 고리가 없고, B3 분출 자리 표시도 없다(353-380틱 흙 둔덕과 진동이 신호; `api.B3_EMERGE_DECAL` 폐지,
+  판정은 그대로 360틱에 만들어진다). 패턴 작성자는 계획의 변경 메모 1 표에서 *keep* 인 공격에만 바닥 그림을 쓴다.
+- 생성 순서(통합 뒤): 코어 → 경기장 → `build_cboss_rooms.py` → proto → cproto → 리그들(`node tools/build_mboss_<id>_rig.mjs
+  --resourcepack <팩>`, 야타용왕 포함) → guardian → 나비 도구 → 나비 → 역장 도구 → 역장 → `build_mboss_az_fx.py
+  --resourcepack <팩>` → `build_mboss_azhdaha.py` → `build_bossbar.py` → `check_mboss_pack.py`. 두 번 돌려도 바뀌지 않는다.
+- **경기장 바닥은 꽉 찬 블록만**(10-21c): 진흙(충돌 높이 14/16)은 그 위에 선 몸의 발이 바닥면보다 0.125 낮아서, 옆의 꽉 찬
+  블록으로 대시하면 발이 그 블록 속에 들어가 몸이 한 칸 가라앉았다(다리가 바닥에 묻히고 F5 카메라도 낮아짐). 어두운 진흙
+  자리는 진흙투성이 맹그로브 뿌리로 바꾸고 경기장 판을 `az_cavern@2` 로 올려 이미 지어진 경기장도 다시 짓는다. 대시 검사
+  (`player/dash_chk_*`)도 발 높이(+0.0001)에서 앞면 바깥을 봐서, 발을 꽉 찬 블록 속으로 넣는 이동은 막고 단차 오르기로 넘긴다
+  (높이 0.8~1 블록 `#rlk:low_top` 은 예전처럼 +0.2 줄이 판단).
+- 게임에서 한 번 확인할 것: 문 → 경기장 → 등장 → 전환 두 번 → B3 → 처치 → 다음 챕터, 음악이 겹치지 않음, `/reload` 뒤 이어짐.
+
+## 특수 보스 (`mboss/sp/`)
+
+방에 가끔 생기는 **균열**(아래 "균열")로 들어가 싸우는 보스. 노드가 아니고, 한 판에 많아야 한 번. 중간보스 틀 위에서 **챕터 모드**(`#mbMode 1`: 자기 경기장 · 체력 바닥 · 음악 · 연출 · 원소별 저항)로 싸우고, 처치하면 **레벨 업 1번 + 아이템 상자 `picks`개**(타키 3 · 홍련 1). 특수 보스는 **타키**(`tachy`, n 20, 경기장 `tk_lift`, 아래 "타키")와 **홍련**(`scarlet`, n 21, 경기장 `hr_field`, 아래 "홍련"; 11-05 I1 부터) — 둘 다 켜져 있고(가중치 10씩) 저절로 생기는 균열은 가중치대로 둘 중 하나로 이어진다. 틀 점검용 `spproto`(시험용 균열 수호자, n 97, 가중치 0, 경기장 `cp_test`)는 시험 명령(`rift_id {id:"spproto"}` · `special {id:"spproto"}`)으로만 나온다.
+
+### 진행
+1. 균열이 생길 때(`room/rift/arm`) `mboss/sp/roll`: 시험의 고정 id(`rlk:mboss spforce`) > 가중치(`w` ≥ 1) · 챕터 범위 · 이번 판에 안 만난 것(`spmet`) > 만난 것도 > 챕터 무시 > `sreg[0]`. 고른 id 는 구역 표식의 `data.rift.id`. 그 자리에서 `sp/prep {id}` 가 그 보스의 경기장을 고정(forceload)하고 나누어 짓기를 시작한다(방을 다 정리할 즈음엔 지어져 있음).
+2. 균열에 들어가면(걸어 들어가 10틱 머무르기, 또는 좌클릭) `sp/gate`: 평화로움이면 거절(메시지), 경기장 작업이 도는 중이면 **"균열이 아직 안정되지 않았습니다. 잠시 뒤 다시 들어가세요."**(40틱 동안 다시 안 들어감, 플레이어는 그대로), 싸우는 중 · 방이 잠긴 중이면 조용히 거절. 아니면 `sp/g/<id>`: 고정 다시 걸기 + 필요한 작업 시작, 그 구역의 전투 시작(문 잠김), `#spOn mb 1`, 이름 · 부제 제목, 균열이 플레이어를 끌어당김(`room/rift/go`, 20틱에 실명).
+3. 1.5초 뒤 `room/mob_wave` → `sp/start_zone` → `sp/start {id}`: `cur` = `sbyid.<id>`, 경기장이 다 지어졌다고 보고할 때까지 10틱마다 다시(`sp/wait`, `cb/wait` 와 같음, 60번이면 취소), 그다음 중간보스와 같은 `start_go`. 돌아올 자리는 **균열 앞**(`sp/ret_rift`: 방 가운데 쪽으로 2칸, 막혔으면 1.2칸, 방 가운데를 봄).
+4. 처치(`room/combat_clear` → `sp/clear` → `sp/won` → `sp/won_kill`): 경기장 골드를 거두고 균열 앞으로 돌아온 뒤 제목 **`<이름> 처치`**(항목에 `winWord` 가 있으면 `<이름> <winWord>`: 「홍련 도전 성공」) / **`레벨 업 · 아이템 상자 <picks>개`**, `sp/lvup`(경험치 = 필요 경험치 − 지금 경험치 → `player/level/add_xp`: 평소 레벨 업 그대로, 아이템 선택 기회 +1; 처치 경험치는 없다 — `lvup` 1 인 특수 보스는 `xp` 0 이어야 하며(`mboss_lib` 검사), 처치 경험치가 먼저 레벨을 올려 두 번 오르는 일이 없다), 균열이 30틱 동안 무너지고(`room/rift/close`) 그 자리에 **아이템 상자 `picks`개**(중간보스 상자와 같은 `mboss/box/drop_all`: 챕터 등급 · 아이템만, 한 줄에 −1.5 / 0 / +1.5칸). 골드 × `goldMul`(6)과 사파이어 `sap`(1)은 처치 타격에서(몸에 `miniboss` 태그). 구역 태그는 `rlk_riftdone`.
+5. 처치가 아닌 끝(`/kill`, 소환 실패, 리로드로 몸 유실, `test/abort`, 경기장 준비 실패): 보상 없음, **균열이 다시 열림**(`sp/won_cancel` → `room/rift/reopen`, 60틱 동안은 걸어 들어가도 안 들어감). 경기장 밖 · 멈춤 · 패배(`cb/lose` 포함)는 중간보스 · 챕터 보스와 같다.
+
+### 레지스트리 · 틀
+- `kind:"special"`: `picks` 1~3, `lvup` 0/1, `w` ≥ 0(균열 뽑기 가중치), 자기 경기장 필수(켜진 항목), `ch` · `route` · `px` 없음, `fn` 은 `boss/<id>` 가능(`mboss_lib.load_registry`). 저장소 `sreg[]` · `sbyid`(+ `#spN` · `#spRoll` = 가중치 1 이상인 수: 0 이면 저절로 생기는 균열 없음 — 지금 트리는 타키 · 홍련(가중치 10씩)과 `spproto`(0)가 켜져 있어 `#spN` 3 · `#spRoll` 2), `sprep`(준비한 보스), `spmet`(이번 판에 만남, `cb/run_reset` → `sp/run_reset`).
+- **보상 문구 `winWord`**(특수 보스 항목만, 비어 있지 않은 12자 이하의 글자; `mboss_lib.load_registry` 가 검사): 그 항목의 기록에만 `winWord:"…"` 가 들어가고(다른 기록 글자는 그대로), 처치 제목이 `<이름> 처치` 대신 `<이름> <winWord>`(`sp/reward`: 예전 「처치」 줄은 `cur.winWord` 가 없을 때만), 시험 처치 메시지는 `test/swon_msg_w`. 홍련 = `"도전 성공"`(원작 결과 화면의 문구) → 「홍련 도전 성공」 / 「레벨 업 · 아이템 상자 1개」. 타키는 그대로 「타키 처치」.
+- **보상 훅 `rwHook`**(특수 보스 항목만, `true` / `false`; `mboss_lib.SPECIAL_OPT_HOOKS = {'rwHook': 'reward'}`): `true` 인 **켜진** 항목마다 코어가 `sp/reward` 의 `sp/lvup` 줄 다음 · `#spPk` 앞에 주석 `# hr FN-b: …` 와 글자 그대로의 줄 하나 `execute if data storage rlk:mboss cur{id:"<id>"} as @a[tag=player,limit=1] run function rlk:<fn>/reward` 를 쓴다(`sp/gate` · `sp/prep` 와 같은 방식). 훅 `<fn>/reward`(매크로 아님, @s = 플레이어, 위치는 균열 구역 표식): 처치 한 번에 한 번, 보상 제목과 레벨 업 뒤 · 균열 붕괴와 상자 전, `cur` · `#mbId` 는 그대로, `#mbOn 0`(전투 틱이 없으니 그 뒤 일은 `schedule`). 제목 칸(`vBig` · `ttlT` 72)은 보상 제목 몫. 그 항목은 이 훅이 있어야 한다(`check_mboss_pack`). 취소 · 다른 보스에서는 안 불림.
+- **`poof`**(모든 종류, `true` / `false`): `false` 면 기록에 `poof:0b` 가 들어가고 `death_finish` 가 몸을 지울 때 `poof` 입자를 내지 않는다(쓰러지지 않고 떠나는 보스; 사망 중 `/reload` 로 바로 끝나도 같음). 홍련 `false`.
+- **모듈의 보스바 끄기**(전투 중 연출 동안; 모듈은 `mboss_lib.bars(on)` = 한 줄만 씀): `function rlk:mboss/bars_off`(= `#mbBarOff mb 1` + `bars_hide`) 뒤로는 `mboss/world` 가 `mboss/bars` 를 부르지 않아(모듈의 `bars` 훅도 안 불림) 멈춤 · 사망 멈춤 · 부활 뒤에도 숨은 채이고, `function rlk:mboss/bars_on`(= `#mbBarOff mb 0` + `bars_show`)이 바로 다시 띄운다. `fight_vars`(전투 시작) · `cleanup_fight`(전투 끝)가 `#mbBarOff` 를 0 으로 두므로 다음 전투로 넘어가지 않는다. `bars_hide` · `bars_show`(사망 · 멈춤 · 정리가 부름)는 그대로라, 이 두 함수를 안 쓰는 보스의 보스바는 예전과 같다.
+- `fight_vars`: `#mbMode 1`, **`#mbKind mb`**(0 중간보스 · 1 챕터 보스 · 2 특수 보스, 글자에만 씀), `#mbAr` 과 그 반지름(`tk_lift`: W10 240 · S10 220). 받는 피해는 챕터 보스처럼 `cb/inc/<id>`(모듈 `incoming` → `mboss/floor`). 모듈은 보통 훅 17개 + `test/help`(따로 훅 없음, `mboss_lib.SPECIAL_HOOKS` 빈 목록).
+- 상자 줄 `box/drop_all` · `box/row`: 1~3개(3개 = −1.5 / 0 / +1.5칸), 4 이상은 3.
+- 음악: `music.nether.basalt_deltas` 는 곡 5개 묶음(26.3 에셋 색인 34: 5600 · 5189 · 6076 · 6376 · 4789틱, `mboss_lib.MUSIC_TRACKS`) → 타키 1단계 `len` 6376(`music_len`). `music.overworld.cherry_grove` 는 곡 11개 묶음(26.3 에셋 색인 34: 4247 · 6245 · 4031 · 5923 · 6881 · 7604 · 6859 · 4905 · 5210 · 6042 · 4595틱, 가장 긴 곡 home 380.2초) → 홍련 1단계 `len` 7604(`music_len`), 끝 연출(3)은 `len 0`(한 번).
+- 경기장 `tk_lift`(n 3, x 600~680 · z −32~48, 청크 36개): 등록만 S1, 모습(테마 모듈 `tools/mboss_arena_tk_lift.py`)은 S1K. 테마가 없으면 `build_mboss_arena.py` 가 대역(`tk_lift@0:stub`)을 만든다.
+- 정리: `mboss/cleanup`(맵 이동 · 런 끝 · 사망 · `room/wipe` · `uninstall` · 시험 종료) → `sp/forget`(`#spOn` · `#spAuto` 0, `sprep`). 경기장 고정은 `cleanup` 의 모든 경기장 `fl_off` · `sp/won` 이 푼다.
+
+### 시험 명령 (`help` 는 위 "명령 도움말")
+- `/function rlk:boss/test/rift` (= `rlk:mboss/test/rift`): **다음에 지어지는 구역**(문을 열 때, 또는 새 맵의 첫 구역; 보스 9 · 중간보스 15 제외)에 확률 · 이번 판 사용 여부 · 맵 종류 · 챕터 · 시험 상태와 상관없이 균열이 생긴다. "[균열] 다음에 여는 방에 균열이 나타납니다. (보스 · 중간보스 방 제외)". `run/start` 전에 해도 된다(그 판의 첫 구역).
+- `rift_id {id:"tachy"}` · `rift_id {id:"scarlet"}` · `rift_id {id:"spproto"}`: 같은데 특수 보스 지정(`{id:"help"}` = 목록, 실제 일은 `rift_id_do`). 가중치 1 이상인 특수 보스가 타키 · 홍련이라 `rift` 만 하면 둘 중 하나의 균열이 생긴다.
+- `special {id}` · `special_ch {id,ch}`(예: `/function rlk:boss/test/special {id:"tachy"}`): 런 없이 진짜 싸움 — 그 챕터의 노드 맵(맵 2, 노드 없음)을 만들고, 시작 구역 옆 전투 구역에 그 보스의 균열을 몹 없이 바로 열어 그 앞에 세운 뒤, 경기장이 다 지어지면 저절로 들어간다(`test/swait`, 600틱 넘으면 직접 들어가라는 안내). 처치 · 취소 · 패배 메시지의 `[다시 하기]` 는 같은 보스 · 같은 챕터.
+- 기존 `kill` · `abort` · `pattern` · `lock` · `level` · `stop` · `lose` 는 특수 보스에도 그대로(`#mbId` 로 고름).
+- `winWord` 가 있는 특수 보스를 시험 전투에서 처치하면(`test/won` → `test/swon` → `test/swon_msg_w`) 「[특수 보스 테스트] 도전 성공! 균열 자리에 아이템 상자가 떨어졌습니다(누르면 아이템 선택). [다시 하기] [로비로]」(문구 = 그 항목의 `winWord`).
+
+## 균열 (`room/rift/`, `tools/build_rift.py`)
+
+세피리아의 균열처럼 검은 구멍 같은 틈과 하얀 · 하늘색 번개, 빛나는 바닥 갈라짐. 생성기 하나가 함수(`room/rift/**`, `room/obj/k_rift`), 공용 파일의 훅 줄, 리소스팩(`assets/rlk/{textures,models/item,items}/rift/*` + 아이템 아틀라스, 7장 24 576 px)을 쓴다: `python3 tools/build_rift.py [--resourcepack <RP>]`.
+
+- **생기는 곳 · 때**(`rift/roll`, `room/zone_build` 에서 구역이 지어질 때): 런 중, 보스 시험 아님(`#mbTest` · `#rdTest`), 이번 판에 아직 없음(`#riftUsed`), **전투 구역**(zkind 1), 보스 맵 아님, 1챕터 첫 맵 아님, 평화로움 아님, 켜진 특수 보스(가중치 1 이상) 있음 → `#riftPm`‰(30 = 3%). **켜진 특수 보스**: 타키 · 홍련(가중치 10씩, 1~99챕터) — 저절로 생긴 균열은 가중치대로 둘 중 하나로 간다(`spproto` 는 가중치 0 이라 시험으로만). 한 챕터에 전투 구역이 열댓 개라 1챕터에 약 35%, 세 챕터 런 전체에 약 78%. 생기면 구역 태그 `rlk_riftz`, `data.rift.id`, `#riftUsed 1`(들어가지 않아도 그 판은 끝). **노드가 아니다**: 구역 종류 · 내용 · 맵 제목은 그대로.
+- **보이기**(`rift/show`, 그 구역에 들어갈 때 · 첫 구역): 자리를 고르고(`rift/spot/*`: 구역 칸 안 무작위 지점 24번 → 3×3 바닥이 같은 높이의 단단한 블록(무늬 · 잎 · 통나무 · 이나즈마 집 바닥 · 물 · 용암 아님) + 위로 3칸 빈 곳, 구덩이 경고 상자 밖, 벽면에서 3칸 이상, 문에서 4.5칸, 방 오브젝트에서 3.5칸, 플레이어에서 5칸(수평) 이상; 상점 구역은 가운데에서 9칸, 다른 노드 구역은 4.5칸; 못 찾으면 구역 가운데 땅, 그것도 없으면 플레이어의 안전 자리 2칸 앞) 방 가운데를 보게 세운다. 전투 구역이면 **잠든 균열**(절반 크기, 어두운 테두리, 번개 하나, 들어갈 수 없음), 그 밖의 구역(시험)이면 다음 틱에 바로 열림. 시험(54가지 배치 × 6테마 × 40번 = 73 440번): 무작위 자리 99.9%, 가운데 대체 0.1%, 규칙 위반 0.
+- **열림**: 그 방 전투를 정리하면(`room/combat_clear` → `rift/open`) 20틱 동안 자라며 번쩍 · 천둥 · 엔드 포털 소리, 그 뒤 열림(조준하면 이름 "균열" + "▶ 좌클릭", `oact 17`). 열린 균열: 번개 카드 셋(4장면, 2틱마다 장면, 4틱마다 기울기), 2틱마다 전기 불꽃 · 엔드 막대 · 먹물 · 역포털 입자, 40틱마다 리스폰 정박기 웅웅 소리(반은 번개 탁탁), 테두리가 20틱마다 숨쉬듯 커졌다 작아짐.
+- **들어가기**: 몸이 균열에서 수평 1칸 · 위아래 1.5칸 안에 10틱 연속(전투 중 · 죽음 · 선택 공간 · 지도 화면이 아닐 때, 역포털 입자가 몰려듦), 또는 좌클릭 → `rift/enter` → `mboss/sp/gate`(위 "특수 보스").
+- **남음**: 균열 엔티티는 모두 `rlk_room` 이라 다른 구역에 갔다 와도 그대로 있고, 맵이 바뀌면(`room/clear` → `rift/forget`) 사라진다. `/reload` 는 `rift/init` 이 `#riftOn` 을 다시 정하고, 무너지던 균열은 바로 끝내(상자 떨어짐) 자라던 균열은 바로 연다.
+- **상태**(표식 `rlk_rift` 의 `riftS`): 1 잠듦 · 2 열림 · 3 들어가는 중(싸움이 끝날 때까지) · 4 무너짐(30틱) · 5 자람(20틱). 부품 `rlk_rift_part`(틈 · 테두리 · 바닥 갈라짐 · 번개 셋 · 조준 묶음 `rlk_rift_obj`)은 `zid` 로 자기 구역과 묶인다. 점수 `riftS riftT riftCd riftDw riftPk riftA riftX riftY riftZ`, 가짜 플레이어 `#rift*`(room).
+
+### 고친 공용 파일 (`build_rift.py` 가 넣음, 줄마다 바로 앞에 `# rift (build_rift.py)`)
+몇 번을 돌려도, `build_ch2_mobs.py` · `build_ch3_mobs.py` 와 어떤 순서로 돌려도 같은 결과(표시된 줄을 지우고 원래 파일의 기준 줄에 다시 넣음).
+
+| 파일 | 줄 |
+|---|---|
+| `room/zone_build` | `zst 1` 다음: `function rlk:room/rift/roll` |
+| `room/zone_enter` | `zst 2` 다음(전투 시작 전): `execute if entity @s[tag=rlk_riftz] at @s run function rlk:room/rift/show` |
+| `room/zone_first` | 끝: 같은 `show` 줄 |
+| `room/combat_clear` | 챕터 보스 줄 앞: `...[tag=rlk_riftz] if score #spOn mb matches 1 run return run function rlk:mboss/sp/clear`, `...[tag=rlk_riftz] run function rlk:room/rift/open` |
+| `room/mob_wave` | 첫 명령: `...[tag=rlk_riftz] if score #spOn mb matches 1 run return run function rlk:mboss/sp/start_zone` |
+| `room/obj/click` | `oact 16` 다음: `execute if score @s oact matches 17 run return run function rlk:room/rift/click` |
+| `room/tick` | 상자 줄 다음: `execute if score #riftOn room matches 1 run function rlk:room/rift/tick` |
+| `room/clear` | `mboss/cleanup` 다음: `function rlk:room/rift/forget` |
+| `run/start` | `#mirUsed` 다음(맵 생성 전): `scoreboard players set #riftUsed room 0` |
+| `load` | 조절 지점 머리 다음: `scoreboard players set #riftPm room 30`; `mboss/init` 다음: `function rlk:room/rift/init` |
+| `uninstall` | `mboss/uninstall` 다음: `function rlk:room/rift/uninstall` |
+
+코어(`build_mboss_core.py`)가 바꾼 생성 파일: `register`(sreg · sbyid), `init`(`#spOn` · `#spAuto` · `#mbKind`), `fight_vars`, `start_cancel`, `cleanup`(→ `sp/forget`), `uninstall`, `d/*`(tachy · spproto), `box/drop_all` · `box/row`(3개), `cb/run_reset`(→ `sp/run_reset`), `test/{won,defeat,end,help_pattern}`, 새 `mboss/sp/**` · `mboss/cb/inc/<특수 보스>` · `mboss/test/{rift,rift_id,rift_id_do,special,special_ch,help_*,s*}` · `boss/test/{rift,rift_id,special,special_ch}`, 경기장 `mboss/ar/tk_lift/*`(+ 대역 `mboss/arena/tk_lift/*`). 시험: 스크래치패드 `tk/tests/`(`test_rift.py` · `test_special.py`).
+홍련 S1(11-04, 특수 보스 틀 FN-a · b · c · f)이 더 바꾼 생성 파일: `sp/reward`(처치 문구 · 보상 훅 줄), `death_finish`(`poof`), `world` · `fight_vars` · `cleanup_fight` 와 새 `bars_off` · `bars_on`(보스바 끄기), `test/swon` 과 새 `test/swon_msg_w`. 시험: `tools/dev/sim/hr/tests/test_special_hr.py`.
+
+## 타키 (`boss/tachy/`, 특수 보스 · `tools/build_mboss_tachy.py`)
+스텔라 블레이드의 타키(잠식된 제7공수대원). 방에 드물게 열리는 **균열**(위 "균열")로 들어가 싸우는 **특수 보스**(레지스트리 `tachy`,
+n 20, `kind` special, `fn` `boss/tachy`, 경기장 `tk_lift`, 가중치 10, 1~99챕터, 아이콘 `rlk:mboss/tk_kit/gate_icon`)다. 틀은 챕터
+모드(`#mbMode 1`: 경기장 · 체력 바닥 · 음악 · 연출)를 그대로 쓰고 몸은 중간보스와 같은 허스크(크기 1.45, 클릭 판정 1.4 × 3.25 — R2 에서 모델과 함께 키움,
+`miniboss` 경제: 골드 × 6 · 사파이어 1)다. 난이도는 중간보스보다 조금 세고 챕터 보스에 가깝게(체력 250 · 처치 경험치 0 · 공격 12 × `dmgMul` 135
+· 레벨 +1 · 모든 원소 저항 10 %, 면역 없음). 처치하면 레벨 업 1번 + 아이템 상자 3개(틀의 몫). 모델 · 패턴은 영상(v1–v11)에서 가져왔고
+패링은 없다. 피해 단계는 기본 타격의 29 / 42 / 56 / 71 %(T1–T4; 검토 R 에서 절반으로: 처음 값 70 / 100 / 135 / 170 % 는 공정성 모의(스크래치패드
+`tk/review/bal/`, 아즈다하 · 수호자와 같은 행동 모델)에서 걷는 근접 플레이어가 분당 최대 체력의 250–330 %(수호자 109 %, 아즈다하 88 %)를 잃었다.
+R2 에서 다시 × 0.83(35 / 50 / 68 / 85 → 위 값, 충전 6연격의 내려찍기 T3 → T2): 연속기가 서 있거나 걸어 들어오는 플레이어에게 끝까지 들어가고 틈 메우기
+블링크가 생긴 만큼. 지금은 전체 싸움 134 %/분(수호자의 1.23 배, 원거리 78 %), 서 있기 216 %/분(단계마다 210–251 %: 수호자 서 있기 144 % 의 1.8 배
+이하), 40틱 최악 묶음 35 %(단계 안에서는 22–28 %), 처치 202–216초(외피를 못 깨는 물리 한손검 기준, 아즈다하 199초)).
+
+### 플레이어용 요약 (어떻게 싸우나)
+- **바닥 예고가 없다**: 영상의 어떤 공격에도 바닥 표시가 없어서 모든 판정이 조용한 판정이다. 신호는 자세(클립 첫 틱부터), 칼날
+  색 · 금빛 반짝임, 가슴 · 투구의 붉은 빛, 하늘의 금빛 번개, 소리다. 첫 동작에서 맞는 순간까지 12틱 이상(큰 공격 20틱 이상), 연속기의
+  다음 타는 10틱 이상 뒤, 겨누기는 타격 8틱 전에 굳는다.
+- **칼날 원소가 늘 몸에 붙어 있다**(G1 쌍극 칼날): 불 / 번개 중 하나가 1U 로 붙어 있어 어떤 원소로 때려도 반응이 난다. 때때로 칼날을
+  손바닥에 긁어 원소를 바꾼다(24틱 제자리: 때릴 틈, 블링크 뒤에는 늘, 연속기 뒤에는 반쯤). 그녀의 타격도 같은 원소다(하늘 번개 ·
+  착지 충격 · 외피 깃털은 늘 번개, 충전 6연격의 내려찍기는 늘 불).
+- **70 % · 35 %**: 체력이 바닥에 닿으면 그 다음 판단 때 날개로 몸을 감싸는 **과부하 외피**(G2)를 두른다. 외피는 받는 피해 20 %,
+  보스바 아랫줄 = 외피 게이지 100(금색). 반응 한 번 −12, 감전 · 연소 틱 −4, 그 밖의 타격 −1(5틱에 한 번). 그동안 36틱마다 빛나는
+  깃털이 플레이어 자리에 떨어진다(16틱, 반지름 1.8칸). 게이지를 비우면 외피가 깨지며 쓰러져 120틱 기절(받는 피해 150 %, 원소
+  에너지 +15), 시간(360 / 300틱) 안에 못 깨면 폭발(44틱 기모음, 40틱의 번쩍임 뒤 4틱에 터짐, 대시로 피함, 최대 체력의 25 %, 죽지 않음). 어느 쪽이든 변신으로 이어진다.
+- **연속기는 서 있는 플레이어에게 끝까지 들어간다**(R2: 서 있어도 밀려나 마지막 2–3타가 빗나갔고, 멀리서도 근접 공격을 해서 피하기
+  쉬웠다): 중간 타격은 밀치지 않고(넉백 0) 마지막 타만 밀친다(넉백 3, 0.6칸). 매 타 전에 다시 겨누고(틱당 10도) 0.3칸씩(막히면 멈춤,
+  플레이어 2.4칸 앞까지) 다가선다. 근접 판정은 모델과 함께 1.2배.
+- **틈 메우기 블링크**(R2, 라이덴처럼): 플레이어가 5.5칸 밖에 20틱 머물면 60 % 로 이 단계의 근접 연속기(P1 C1 · B2, P2 C2 · B1 ·
+  B2, P3 C3 · B2 · C2, 쿨다운 · 연속 금지 지킴)를 고른다. B1 · B2 · C1–C3 은(AI 가 어떻게 골랐든) 시작 때 플레이어가 5.6칸 밖이면 먼저 금빛
+  불꽃과 함께 사라졌다가(6–9틱 무적) 10틱에 플레이어의 뒤 · 뒤 대각선 · 옆(무작위 쪽 먼저) · 앞 2.6칸(막히면 3.4칸, `mv/ok`)에 나타나
+  플레이어를 보고, 14틱에 그 연속기를 시작한다(나타난 뒤 첫 타까지 12틱 이상).
+- **불안정한 핵**(G3): 가슴 · 투구가 붉게(지상 장풍은 노랗게) 빛나는 동안(돌진 베기 · 충전 6연격 · 붉은 핵 연속기 · 지상 장풍의
+  기모으기) 반응을 일으키면 공격이 끊기고 가슴이 터져 최대 체력 3 % 의 진짜 피해 + 50틱 휘청임(받는 피해 130 %). 패턴마다 한 번.
+
+### 진행 (단계 · 바닥 · 전환)
+등장(184틱, `seq/intro`: 경기장 한가운데 위 7칸에 케이블에 매달려 있다가 떨어져 엎드림 → 일어나 망토를 펄럭 → 머리를 쓸어 넘김 →
+투구를 내려 닫고 해골이 빛남 → 등 뒤에서 칼을 뽑아 불을 붙임(156틱 이름 · 부제) → 자세, 176틱 음악 1단계, 178틱 밀어내기 고리(피해
+없음); 카메라는 잡지 않는다) → **P1 망토**(바닥 70 %) → M1 과부하 외피 → **T1 날개 전개**(80틱, 무적, 망토가 갈라져 칼날 깃털
+날개로, 50틱 밀어내기 고리) → **P2 날개**(바닥 35 %) → M2 과부하 외피(바닥 1) → **T2 심연**(110틱, 무적, 투구가 붉게, 촉수, 50틱에
+1초 실명 동안 경기장이 `abyss` 모습으로, 60틱 음악 2단계) → **P3 심연**(바닥 없음) → 쓰러짐(`seq/death`, 130틱: 무릎 · 칼 꽂기 ·
+투구 빛 꺼짐 · 날개 처짐 · 재) → 특수 보스 승리 경로. 바닥에 닿는 타격은 거기서 멈추고 단계 전환은 하던 패턴이 끝난 다음 판단 때 시작한다(그 사이 바닥에 또 닿는 타격은
+아무것도 바꾸지 않는다: 35 % 단계는 M1 이 시작된 뒤에만 잡힌다 — 검토 R 이전에는 두 번째 타격이 P2 를 건너뛰게 했다).
+
+### 패턴 (`p_melee.py` S3 · `p_air.py` / `p_mantle.py` S4)
+| 패턴 | 언제 | 내용 (틱 = 클립 이벤트) |
+|---|---|---|
+| A1 돌진 베기 | 멀 때 · 중간 | 가슴 · 투구 붉은 빛(0–14, G3), 14틱 12칸 돌진(플레이어 2칸 앞까지, 지나간 길이 판정), 20틱 끝 베기(한 묶음 = 한 번) |
+| B1 날개 가리기 2연격 | P2+, 가까이 | 날개로 앞을 가리고(중간 거리면 걸어 들어옴) 22틱 펼침, 24틱 가로 베기, 40틱 올려 베기 + 발밑 |
+| B2 옆걸음 4연격 | 가까이 · 중간 · 뒤에 있을 때 | 3칸 옆으로 뛰어 플레이어를 보고 착지, 22 찌르기 · 44 내려치기(직선 6칸) · 54 · 64 휩쓸기 |
+| B3 충전 6연격 | P3 | 기모으기(0–30, G3), 2.5칸 앞까지 돌진, 40 · 50 · 60 베기, 76 · 88 · 100 머리 위에서 내려찍기 셋("펑", 불, 매번 최대 30도 다시 겨눔) |
+| C1 · C2 · C3 연속기 · 블링크 | P1 / P2 / P3 | 3–5타 연속기 뒤 칼끝의 금빛 반짝임(겨눈 점 고정) → 18틱 뒤 8칸 찌르기 돌진. C1 은 회전 베기(원 5칸), C3 은 붉은 핵(0–22, G3) |
+| K 블링크 | 모든 단계 | 금빛 불꽃과 함께 사라짐(12틱 무적) → 플레이어 4.5칸 앞(막히면 옆)에 날개를 펴고 나타나 8–14틱(P3 6–10; R2: 20–60 은 너무 길었다) 버팀 → 반짝임 16틱 뒤 7칸 찌르기 → 6칸 뛰어올라 16틱 동안 겨눈 자리 위 하늘에 금빛 번개가 기어 내려옴 → 내리꽂기(원 4.2칸, 번개, T4). P3 은 한 번 더 사라졌다 나타나 찌르기. 연속기 바로 뒤 · 두 패턴 안에 두 번은 안 함 |
+| W1 지상 장풍 | 멀 때(12칸 안이면 먼저 뒤로 물러나 반대편으로 블링크) | 칼을 옆으로 눕히고 금빛이 차오름(6–40, G3) → 46 · 58 · 70틱 가로 초승달 셋(폭 7칸, 높이 0–1.65칸: 뛰어도 맞음, 1.25칸/틱, 한 번씩 다시 겨눔, 벽에서 멈춤; 한 발 = 날아가는 쪽을 보는 카드 한 장 — R2 전에는 하늘을 보는 둘째 카드가 겹쳐 있었다) |
+| W2 공중 장풍 + 강하 | P2+ | 6칸 떠올라 14 · 28 · 42틱 세로 초승달 셋(플레이어 가슴으로, 1.1칸/틱, 한 발 = 카드 한 장) → 칼을 뒤로 당김(46–66) → 겨눈 자리로 6틱 강하, 10틱 큰 베기(부채꼴 5.4칸 80도, T4) → 착지 |
+| L 착지 공격 | P2+ (P2 200틱 뒤부터, 쿨다운 700 / P3 560) | 13칸 높이로 사라짐(무적, 높은 곳의 반짝임이 4틱째와 그 뒤 30틱마다, 플레이어를 0.15칸/틱으로 따라옴; 도약 16틱 + 14–29틱 = 강하까지 30–45틱, R2: 80–120틱은 너무 길었다) → 강하 시작 때 겨눈 자리로 12틱 강하, 착지 원 1.7칸(T2) → 강하 20틱 뒤 충격 원 5.5칸(번개, T4) |
+
+판단(`ai.py`): 거리(가까움 ≤ 5 · 중간 ≤ 12 · 멂) × 단계의 가중치(`api.WEIGHTS`), 쿨다운(`api.COOLDOWN`, P3 × 0.8), 같은 패턴
+연속 없음, 뒤쪽 ±60도에 30틱 중 20틱 → B2 70 % / K 30 %, 14칸 밖에 40틱 → 셋에 하나씩 틈 메우기 연속기 / W1 / A1, 5.5칸 밖에 20틱 → 60 % 틈 메우기 연속기(위). 패턴 사이 18–26틱(P3 12–18틱)은 천천히 걷거나
+옆걸음하며 플레이어를 본다(때릴 틈). 600틱(P3 400틱) 동안 원소를 안 바꾸면 바꾼다. 모든 끝점(나타나기 · 착지 · 돌진 끝 ·
+물러나기)은 틀의 `mv/ok`(경기장 안전 원 − 0.5칸) 안이라 블록 속이나 경기장 밖으로 가지 않는다.
+
+### 화면
+보스바 이름 줄 뒤 배지 ◈불 / ◈번개 / ◈외피(효과 도구의 글꼴 `rlk:mboss_tk`, 뿌리 텍스트는 빈 무스타일), 부제 줄 = 단계 이름(망토 ·
+과부하 외피 · 날개 전개 · 날개 · 심연) + 지금 패턴 이름, 아랫줄 = 외피 게이지(금색) / 기절 남은 시간(다른 보스와 같은 `bossui`
+아랫줄. 효과 도구의 이름 줄 게이지 칸 `fx/hud/gauge` 는 I1 에서 뺐다: 게이지는 한 곳에만). 안내 · 조언 문구는 없다.
+
+### 모습 · 효과 · 경기장
+- **리그**(`tools/build_tachy_rig.mjs` + `tachy_{geometry,paint,materials,pose,clips}.mjs` → `boss/tachy/rig/**`, 계약 `tools/tachy_rig_api.md`):
+  아이템 디스플레이 40부위(고정 UUID `524c4b4d-544b-4900-8000-0000000000NN`), 클립 41개(이름 · 길이 · 이벤트는 `api.CLIPS`), 키는
+  2.81칸(R2: "보스가 너무 작음 · 앙상해 보임" → 2.25칸 × 1.25(`api.SIZE`, `tachy_pose.FIG`), 어깨 · 엉덩이를 넓히고 몸통 · 어깨 보호대 · 팔다리를 1.1–1.3배 두껍게(`tachy_geometry.GIRTH`); 등장 때 매다는 높이 · 케이블은 그대로, 그림자 1.4 · 시야 상자 10 × 12.5). 모습 셋: `cape`(P1: 어깨에서 무릎 아래까지 늘어진 짙은 청동빛 깃털 망토 — 겹겹이 겹친 긴 깃털, 안쪽 · 아래로 갈수록 어두움,
+  안감은 검은 갈색, 좌우 자락이 등 가운데에서 겹쳐 비치는 틈이 없음; 엎드리면 바닥에 끌림), `winged`(칼날 깃털 날개 3마디씩, 펴면
+  약 5.8칸), `abyss`(+ 붉은 살 · 촉수 둘). 투구를 올린 동안(등장 126틱 전) 투구는 뒤통수 뒤의 작은 껍데기로 접혀 있다가(크기 0.55, 130도 뒤로; v2 4.5–10.5 처럼 얼굴 둘레에 아무것도 없음) 126–134틱에 머리 위로 넘어오며 커져 닫힌다(v2 11.0–11.5). 맨얼굴은 애니메이션풍(큰 눈 · 가는 눈썹 · 작은 입 · 볼 터치; R2: 평평한 카드 한 장이라 어색했다 → 얼굴에 굴곡; R3: 뒤로 꺾은 이마가 두개골 속으로 들어가 앞머리 사이에 네모로 보였다 → 이마는 평평하게 앞머리 밑, 볼은 한 번(22.5도) 뒤로 꺾이고 그 바깥 띠는 얼굴 0.002칸 앞에 늘어진 옆머리가 덮음, 입 아래 턱은 22.5도 뒤로, 코는 낮은 콧날(양쪽 22.5도 두 면, 0.003칸: 얼굴과 같은 빛이라 선이 없고 옆에서만 보임); 그림 한 장이 펼친 자리대로 이어짐; `test_rig` 이 모든 얼굴 점이 옆머리 안 · 앞머리 뒤 · 두개골 앞에 있는지 본다,
+  가운데 가르마 앞머리와 긴 짙은 갈색 머리); 싸울 때는 투구가 닫히고 해골이 원소 색으로 빛난다. 칼은 노란 날 → 불꽃 / 번개 날.
+- **효과 도구**(`tools/build_mboss_tk_fx.py` + `mboss_tk_fx_paint.py` → `boss/tachy/fx/{card,cardx,look,clear,uninstall}` ·
+  `fx/{e,p,snd,hud,prop,test}/**`, 리소스팩 `mboss/tk_kit/*` 26장 0.14 M px · 글꼴 `rlk:mboss_tk`): 베기 궤적(불 / 번개) · 회전 고리 ·
+  찌르기 / 돌진 꼬리 · 반짝임 · 핵 빛 · 초승달 · 하늘 번개 · 충격 고리 · 고치 · 폭발 · 도착 균열 등 25가지, 소리 조합 53가지(바닐라
+  소리만), 투사체 모습 5가지, 배지. 베기 궤적은 바닥 아래로 들어가지 않는다(`s3lib.arc_fit`: 세로 내려베기는 겨눔을 올려 머리 위에서 앞쪽 바닥까지(충전 6연격의 내려찍기 셋이 그 예); 대각선 베기는 영상의 30–45도 기울기를 지키려고 먼저 휘두르는 중심(발 위 1.6칸, 허리 1.2칸 대신)에서 돌고, 그래도 닿으면 그린 궤적을 0.85 배까지 줄이고, 그다음에만 기울기를 줄임(28–40도로 남음); 공중 장풍의 베기는 떠 있는 높이(6칸)를 넣어 맞추므로 그대로 세로). 도착 균열 `arrive_rift` 는 균열의 모델(`rlk:rift/*`)을 쓰므로 리소스팩에서 `build_rift.py` 다음에 만든다.
+- **경기장 `tk_lift`**(`tools/mboss_arena_tk_lift.py`, n 3, x 600~680 · z −32~48): 모래에 반쯤 묻힌 둥근 승강기 바닥(걷는 원 24칸, 꽉 찬
+  블록만, 홈 · 구리 원판 · 해치), 벽 고리와 쇠창살 창 · 살덩이, 바깥의 철골 탑, 머리 위 26~40칸의 램프 기계와 늘어진 케이블(등장 때
+  매달린 곳). 모습 `dust`(P1 · P2, 따뜻한 주황 안개) → T2 의 `abyss`(심층암 타일 · 붉은 맥 · 빛 노드, 2조각 작업). 다음 싸움에서 `dust` 로 돌아온다.
+
+### 시험 명령
+- 균열로: `/function rlk:boss/test/rift`(다음에 여는 방에 균열, 지금은 타키) · `/function rlk:boss/test/rift_id {id:"tachy"}`.
+- 바로 싸우기: `/function rlk:boss/test/special {id:"tachy"}`(런 없이 1챕터 노드 맵(맵 2)의 균열 앞에 서서 경기장이 지어지면 저절로 들어감) ·
+  `special_ch {id:"tachy",ch:3}`. 끝나면 `[다시 하기]`.
+- 싸우는 중 `/function rlk:boss/test/pattern {id:N}`(목록 `{id:"help"}`): 1 A1 · 2 B1 · 3 B2 · 4 B3 · 5 C1 · 6 C2 · 7 C3 · 8 K ·
+  9 W1 · 10 W2 · 11 L · 20 외피(게이지 1) · 21 외피(시간 끝 → 폭발) · 22 날개 전개 · 23 심연 · 24 원소 전환 · 25 불안정한 핵(돌진 베기
+  + 반응) · 26 등장 다시(무적) · 27 쓰러짐 · 30 2단계로 · 31 3단계로 · 40 / 41 불 / 번개 칼날 · 80 체력 = 다음 바닥 + 1 · 99 멈춤(다시
+  누르면 풀림). `test/lock {id:1~11}` 은 그 패턴만, `kill` · `abort` · `level` · `stop` 은 다른 보스와 같다.
+
+### 파일 · 생성 순서
+- `tools/build_mboss_tachy.py` → 패키지 `tools/mboss_tachy/`: `api.py`(D0 계약, 리드만 고침), `core.py`(훅 17개 + `test/help`, `init`,
+  단계 기계, 바닥, 받는 피해 배율, 화면, 음악, 멈춤 · `/reload` · 정리, 테스트), `ai.py`, `elem.py`(G1 · G2 `mantle/**` · G3), `p_melee.py`,
+  `s3lib.py`(공용 도우미 · 패턴 작성 도구 `PB`), `p_air.py` · `p_mantle.py`(S4), `seq.py`(S2, 등장 · 쓰러짐 · T1 · T2). 소유 경로마다
+  `api.Writer` 하나라 자기 경로의 낡은 파일만 지운다(`rig/**` 와 효과 도구 `fx/**` 는 건드리지 않음).
+- 순서(전체): `build_mboss_core.py` → `build_mboss_arena.py`(테마 `mboss_arena_tk_lift.py` 포함) → `build_cboss_rooms.py` → proto →
+  cproto → `build_mboss_spproto.py` → (다른 보스들) → `build_rift.py --resourcepack <팩>` → `build_mboss_tk_fx.py --resourcepack <팩>` →
+  `node tools/build_tachy_rig.mjs --resourcepack <팩>` → `build_mboss_tachy.py` → `build_mboss_kn_fx.py --resourcepack <팩>` → `node tools/build_arlecchino_rig.mjs --resourcepack <팩>` →
+  `build_mboss_arlecchino.py` → `build_ch2_mobs.py` · `build_ch3_mobs.py` →
+  `build_bossbar.py --resourcepack <팩>` → `check_mboss_pack.py`. 두 번 돌려도, 2 · 3챕터 몹 생성기를 바꿔 돌려도 같다.
+- 상태: 점수판 `tk`(`init` 이 만들고 `uninstall` 이 지움), 리그 `tkRig*`, 효과 도구 `tkFx*`, 저장소 `rlk:tk`(`core.*` `rig.*` `fx.*`
+  `air.*`), 태그 `rlk_tk_*`. 부하: 싸움 한 틱 평균 약 480명령(최대 약 2000, 모의기), 아펩(약 830)보다 적다.
+- 시험(스크래치패드 `tk/tests/`): `test_tachy.py` · `pat_melee.py` · `pat_air.py` · `test_rig.py` · `test_kit.py` · `test_arena_tk.py` ·
+  `test_rift.py` · `test_special.py`.
+
+## 아를레키노 (`boss/arlecchino/`, 4챕터 보스 · `tools/build_mboss_arlecchino.py`)
+원신의 「아를레키노」(우인단 집행관 서열 4위) — 비경 「추억: 빛과 그림자의 결별」. 레지스트리 `arlecchino`(n 12, `kind` chapter, `ch [4]`,
+`fn` `boss/arlecchino`, 경기장 `fl_ruins` "영락한 폐허", 체력 320 · 공격 12 × `dmgMul` 150 · **모든 원소 저항 10 %**, 체력 나눔 64 / 36 %,
+프록시 없음 + 몸통 클릭 판정 1.2 × 2.9, 크기 1.4). 모델은 플레이어 아를레키노 아바타를 그대로(1단계), 2단계는 새 스킨(`skin_33`). 런 없이
+바로 싸우려면 `/function rlk:boss/test/chapter {id:"arlecchino"}`. 보상은 챕터 보스 경제.
+
+**사용자 변경 셋** (원작과 다른 점)
+1. **원거리 면역 없음**: 원작의 「원거리 면역」(패턴 밖에서 투사체를 모두 피함)은 어떤 형태로도 없다(회피 · 투사체 거름 · 무적 창 없음).
+   무적은 등장 · 재가 된 만상(낙인 전까지) · 2단계 전환 · 쓰러짐뿐.
+2. **불 원소 내성 없음**: 원작 70 % → 모든 원소 10 %(`res {"*":10}`).
+3. **선혈의 충격은 다음 일반 공격으로**: 원작은 생명의 계약을 지운 뒤 *강공격*으로 연회를 끊는다. 여기서는 계약을 지우면 얻는
+   **선혈의 충격**을 다음 **일반 공격**이 싣는다(아래).
+
+### 플레이어용 요약 (어떻게 싸우나)
+- **생명의 계약**: 진홍색 공격(생명의 계약 피해)에 맞으면 플레이어에게 생명의 계약(최대 체력의 6 %, 기존 `bol` · 액션바
+  「생명의 계약 N%」)이 붙고 그녀는 체력의 1 % 를 회복한다. **계약이 붙은 채 다시 맞으면 150 %** 피해(최대 체력 ‰ 로 치는 처형 타격은 그대로). 계약이 남아 있는 동안 50틱마다 최대
+  체력 1 %(불, 죽지 않음; 그녀가 건 계약일 때만 — 클로린드 · 아를레키노의 자기 계약만으로는 없음). 회복(아이템 · 캐릭터 · 회복구슬)이
+  계약부터 깎는다.
+- **강제 부여**: 재가 된 만상 · 붉은 피의 연회(2단계는 형벌의 핏값 / 붉은 피의 사형)는 시작 때 그녀의 계약을 최대 체력 18 % 로 강제로 건다
+  (앞서 그녀가 건 계약은 거두고 18 % 로 — 회복구슬 둘이면 지워진다; 플레이어 자신의 계약은 그대로; 붉은 문양이 플레이어에게
+  조여들고 X 낙인, 피해 · 회피 없음; 죽어 있음 · 부활 중 · 선택 화면 · 지도 중에는 건너뜀). 그때마다
+  경기장 가운데에서 6–14칸, 120도 간격으로 **회복구슬 3개**(10 %씩: 18 % 를 지우려면 둘)가 나온다(최대 3개, 이전 것은 사라짐).
+- **선혈의 충격**: 그녀가 건 계약이 0 이 되면 무장(보스바 셋째 줄 `◆선혈의 충격`). 다음 **일반 공격** 적중이 쓴다:
+  - **파훼 창 안**(붉은 피의 연회 22–159틱, 2단계 형벌의 핏값 22–121 · 붉은 피의 사형 22–96, 창 동안 실제 게임의 문구
+    「생명의 계약을 제거하고 일반 공격으로 「붉은 피의 연회」를 중단시키세요」): 연회가 끊기고 그 단계 체력의 **15 %**(2단계 12.5 %)
+    진짜 피해 → 20틱 휘청임 + **140틱 그로기**(아랫줄이 줄어듦, 받는 피해 보정 없음), 연회 일정은 그로기가 끝난 때부터 다시.
+  - 창 밖: 진홍 폭발 + 체력 2 % 진짜 피해.
+  - 진짜 피해는 바닥(70 % / 1)을 넘지 않는다: 재가 된 만상 · 2단계 전환을 건너뛰지 않고, 파훼로 죽지도 않는다.
+  - 일반 공격 = `#icd 1` 이고 스킬 · 반응 · 아이템 효과 · 진짜 피해가 아닌 타격(나루카미 `guard_hit` 규칙). 캐릭터별: 한손검 · 낫 ·
+    창 · 발차기의 평타와 그 추가타(루미네 · 스커크 · 클로린드 · 아를레키노 · 나비아 · 네페르), 네페르 환영극의 자기 타격, 클로린드의 권총
+    평타, 요이미야의 평타 화살(염초 화살 포함), 로노바 붉은 시선 1–3타. **세지 않음**: 활의 조준 / 충전 사격, 로노바 4타(부착 쿨 없음),
+    연격 6개의 두 번째 타, 아이템 효과, 반응, 스킬 · 원소폭발(루미네 얼음 결정 · 투창 포함).
+- **바닥 표시는 영상에 있는 것만**: 연회의 붉은 물결(타격 6틱 전 번쩍임) · 균열, 죽음의 칼날의 십자 띠 · 가장자리 붉어짐, 재가 된 만상의
+  붉은 웅덩이(피해 없음). 나머지는 자세 · 불꽃 색(주황 = 불, 진홍 = 생명의 계약) · 소품 · 소리. 첫 동작에서 맞는 순간까지 12틱 이상
+  (큰 공격 20틱 이상), 연속기의 다음 타는 10틱 이상 뒤, 겨누기는 타격 6–8틱 전에 굳는다.
+- **연속기는 서 있는 플레이어에게 끝까지 들어간다**: 매 타 전에 다시 겨누고 0.3칸씩(막히면 멈춤, 2.6칸 앞까지) 다가서며, 중간 타격은
+  밀치지 않고 마지막 타만 밀친다. 평타(사형장으로의 초대)는 플레이어가 7칸 안일 때만(4.5–7칸이면 들어 올리는 동안 걸어 들어옴).
+  멀리 있으면(14칸 밖 40틱) 돌진 / 도약으로 거리를 좁힌다(블러드 돌진 60 % / 불꽃 도약).
+
+### 진행 (단계 · 바닥 · 전환)
+등장(150틱, `seq/intro`: 홍차 → 잔이 불씨로 · 정령들이 가장자리로 → 60틱 손바닥에서 낫이 자람(클립 look `weapon_r/hand`) → 회전 · 자세; 80틱 이름 「아를레키노」 /
+우인단 집행관 서열 4위, 136틱 음악 1, 140틱 밀어내기 고리, 무적) → **P1a**(그 단계 체력의 70 % 바닥) → 바닥에 닿으면 다음 판단 때
+**재가 된 만상**(110틱: 떠오름 · 붉은 웅덩이 · 70틱 강제 부여 + 회복구슬 · 날개; 70틱까지 무적, 그 뒤 바닥 1) → **P1b**(≤ 70 % 패턴 추가)
+→ 바닥 1 에 닿으면 다음 판단 때 **전환 T**(180틱, 무적 + 연출: 무릎 · 진홍 기둥 · 50틱 암전 동안 경기장 `crimson` · 90틱 2단계 모습 ·
+날개 다리 · 쌍낫; 82틱부터 진홍 불꽃 고치(`shroud`: 반지름 1.35칸에 불꽃 막 10장씩 4단, 1.1–4.25칸 높이 — 공중에 뜬 몸과 팔(축에서 1.2칸)까지 덮음)가
+몸을 감싸 90틱 모습 바꿈을 가리고(90틱 섬광 · 칼날 파편 `shroud_burst`), 95–111틱 아래 단부터 3틱 간격으로 타서 사라지는 동안 2단계 모습이 고치 위로 솟아 나옴;
+130틱 왼손 낫이 손에서 자람; 140틱 전체의 36 % 로 체력 나눔 · 「두 세계 불의 잔재」 / 페르엘 · 음악 2) → **P2**(낙하 공격부터, 바닥 0) → 쓰러짐
+(`seq/death`, 110틱, 대사 없이 낫을 거두고 불꽃으로 사라짐; 그녀가 건 계약은 회수). 바닥에 닿는 타격은 거기서 멈추고 단계 전환은 하던
+패턴이 끝난 다음 판단 때 시작한다(재가 된 만상은 한 번).
+
+### 패턴 (`p1.py` S3 · `p2.py` S4; 피해 = 기본 타격의 T1 26 / T2 36 / T3 50 / T4 64 %, 2단계도 같은 배율, 모두 불 1U)
+| 패턴 | 언제 | 내용 (틱 = 클립 이벤트) |
+|---|---|---|
+| A 사형장으로의 초대 | 가까이 (7칸 안) | > 70 %: 2타(14 · 24, 부채꼴 4.2칸 T2). ≤ 70 %: 4 / 5타(T1 · T1 · 44 회전 원 4.6 T2 · 64 내려찍기 + 앞 2.6칸 폭발 T2 · 84 회전 원 4.8 T2) |
+| B 붉은 달의 낫 | 중간 / 멀리 | 28틱 불꽃 바퀴(반지름 1.1, 1.5칸/틱, 16칸 갔다가 그녀를 겨눠 돌아옴: 가는 길 · 오는 길 따로 T2). ≤ 70 %: 두 번(두 번째는 예측 조준) 뒤 96틱 손아귀(80틱에 자리 고정, 92틱 발톱 카드, 원 2.2 T2 생명의 계약) |
+| C 불꽃 도약 | 중간 / 멀리 | 8틱 9칸 도약 → 꼭대기에서 다가옴 → 44틱 고정 → 54틱 착지(원 3.6 + 앞 6칸 띠 T3). ≤ 70 %: 90틱 날개 일격(부채꼴 5.6 T2 생명의 계약, 78틱 날개 펼침) |
+| D 블러드 돌진 | 중간 / 멀리 | 26틱 돌진(플레이어 자리 + 1.5칸, 최대 14칸, 지나가는 띠 + 30틱 끝 부채꼴 T2). ≤ 70 %: 맞았거나 5칸 안이면 46틱 추가타(원 3.2 + 올려베기 T2) |
+| E 와리가리 베기 | ≤ 70 % | 뒤로 10–12칸 · 2.5칸 위 → 좌우 4칸 돌진 5번 → 64 고정 → 70 내리꽂기 → 76 부채꼴 5.2 · 92 회전 원 4.2(T2) |
+| F 붉은 피의 연회 | ≤ 70 %, 일정 | 22 강제 부여 + 회복구슬, 22–159 파훼 창, 가운데로, 110 물결 → 160 경기장 전체 T2 · 196 전체 T2(둘 다 생명의 계약, 대시로 피함) |
+| G 죽음의 칼날 | ≤ 70 % | 플레이어 자리 중심 십자(팔 14칸, 큰 칼날 넷 — 팔 끝이 걷는 원(반지름 26.5) 밖이거나 발 · 머리 칸이 막혔으면 10.5 / 7 / 3.5칸으로 당겨 서고, 다 안 되면 그 팔은 칼날 없음). 두 타격 모두 4틱 전부터 칼날이 십자선을 따라 틱당 3.5칸씩 가운데로 날아와(`blade_fly` 소리, 같은 검사를 지나는 자리로만) 타격 틱에 플레이어 자리에서 만나 터지고 사라지며, 지나간 자리에 진홍 가시가 1.15칸 간격으로 솟는다(`cross_thorns`, 걷는 원 안만): 34 띠 28 × 3 둘 → 40 다시 고정, X 자 → 62 → 70 가장자리 칼날 12개 → 104 전체 T1(모두 생명의 계약) |
+| H 연옥 그림자 분신 | ≤ 70 % | 뒤 6칸 · 7칸 위의 거미줄 → 20 분신 둘이 고정된 자리로 → 34 교차 베기(띠 10 × 2 둘, 생명의 계약) → 58 날개 펼침 → 64 플레이어 앞 3칸으로 → 72 날개(부채꼴 6.0, 생명의 계약) → 84 다시 겨눠 베기(5.0, 이 타만 밀침) |
+| 재가 된 만상 | 70 % 바닥 | 위 "진행" |
+| Q0 낙하 공격 | 2단계 처음 | 플레이어에게서 14칸 · 10칸 위 → 플레이어가 1.5칸 움직이거나 80틱 → 20틱 진홍 줄기로 내리꽂아 플레이어 앞 1.5칸 착지(원 3.0 T2) → 28 칼날 분출(고리 3–7 T2), 둘 다 생명의 계약 |
+| Q1 사형장으로의 초대 | 가까이 / 중간 | 4.5칸 밖이면 미끄러지듯 다가섬 → 14 회전 원 4.2 · 30 교차 베기 · 46 초승달 던지기(돌아옴, 같은 묶음) · 66 · 82 휩쓸기 · 100 초승달 둘(±15°), 모두 T1; 플레이어가 7칸 밖이면 3 / 5타에서 끝 |
+| Q2 불꽃이 타오르는 낫 | 중간 / 멀리 | 20 불꽃 바퀴(고정 지점에 닿으면 폭발, 원 2.2 T2) → 34 그 뒤로 돌진(플레이어 앞 1.5칸, 최대 20칸) → 42 부채꼴 4.5 T2(6칸 밖이면 생략) |
+| Q3 붉은 죽음의 무도회 | 등 뒤 ±60° 에 30틱 중 20틱 | 14 회전 원 4.6 T2 → 가까우면 Q1 1–3타, 멀면 초승달 둘(±6°) |
+| Q4 떠오르는 재액의 달 | 중간 / 멀리 | 4칸 위 · 10–14칸 물러남 → 발마다 가슴에서 플레이어로 겨눔선, 20 고정 · 26 빔(띠 30 × 2.2 T3, 생명의 계약); 1발, 첫 발이 빗나가면 2발, 2단계 체력 50 % 이하면 3발(50틱 간격) |
+| Q5 붉은 피의 연회 | 일정(낙하 공격 300틱 뒤, 그다음 900틱 + 다른 패턴 3번) | 22 강제 부여 + 회복구슬. A 형벌의 핏값(창 22–121): 60 원 테두리 → 95 원 6 T3 · 100 고리 테두리 → 121 고리 6–15 T3 · 130 넓은 원 테두리 → 158 원 11 T4(모두 생명의 계약). B 붉은 피의 사형(창 22–96): 26 세로 X 자 → 56–80 연속 베기(원 5.5 T1, 둘씩 한 묶음) → 76 진홍 기운 → 96 원 7.5 안 최대 체력 30 %(죽지 않음, 생명의 계약, 대시로 피함) |
+| Q6 핏빛 연회 | 중간 / 멀리(2단계 400틱 뒤부터) | 북쪽 12칸 위로 → 50–100 깃털 6발(14틱 보이고 원 1.6 T1) → 110 구슬 여덟 → 125 가장자리(반지름 22)로 → 140 고정 → 160 내리꽂기 → 168 착지 원 4.0 + 구슬마다 원 5.0 T3(생명의 계약; 구슬과 착지 사이가 안전) |
+일정 · 판단(`ai.py`): 가까이 ≤ 4.5 · 중간 ≤ 11 · 멀리, 단계별 가중치 · 쿨다운(A 60 · B 160 · C 200 · D 140 · E 260 · G 420 · H 380 · Q1 240 · Q2 160 · Q3 120 · Q4 300 · Q6 600틱), 같은 무리
+연속 없음, 연회는 재가 된 만상 240틱 뒤 처음, 그다음 900틱 + 다른 패턴 3번마다(파훼되면 그로기가 끝난 때부터), 멈춤 · 리로드는 일정 시계를
+멈춘다. 패턴 사이 16–24틱은 플레이어를 보며 걷기(6칸 밖) / 옆걸음 — 반격할 틈. 대사(위키의 패턴 대사)는 시전마다(80틱 안에 다른 대사가
+나왔으면 건너뜀; 만상 · 연회는 늘).
+
+### 화면
+보스바 이름 「아를레키노」(2단계 두 세계 불의 잔재), 셋째 줄 = 부제(우인단 집행관 서열 4위 / 페르엘) 또는 지금 패턴 이름, 무장한 동안
+`◆선혈의 충격`. 아랫줄 = 그로기 남은 시간. 문구는 이름 · 단계 제목 · 패턴 이름 · 배지 · 위키 대사 · 실제 게임의 연회 문구 하나뿐.
+
+### 시험 명령 (`/function rlk:boss/test/pattern {id:N}`, `{id:"help"}` 목록, `lock {id:1~13, 41~48}`)
+1 2타 · 13 4타 · 2 5타 · 3 붉은 달의 낫 · 4 (손아귀) · 5 불꽃 도약 · 6 (날개) · 7 블러드 돌진 · 8 (추가타) · 9 와리가리 · 10 연회 · 11 죽음의 칼날 ·
+12 그림자 분신 · 20 재가 된 만상 · 21 강제 부여 · 22 체력 30 % 회복 · 23 선혈의 충격 얻기 · 24 연회 파훼(지금) · 25 등장 다시 · 26 2단계 전환 ·
+27 쓰러짐 · 28 회복구슬 · 29 그로기 · 30 P1b 로 · 31 P2 로(전환 생략) · 41–48 2단계 패턴 · 80 체력 = 다음 바닥 + 1 · 99 멈춤 / 풀기.
+
+### 파일 · 생성 순서
+`tools/build_mboss_arlecchino.py`(S3, 위 모두를 씀: `api.OWN` 의 세 몫 — S3 훅 · `core/ ai/ bond/ hud/ test/ gate/` · `p/<P1>/`,
+S4 `p/<P2>/`(`p2.py`), S2 `seq/`(`seq.py`); `rig/` · `fx/` 는 건드리지 않음) · `tools/mboss_arlecchino/{api,core,ai,bond,p1,p2,seq,s3lib}.py` ·
+리그 `tools/build_arlecchino_rig.mjs`(S2) · 효과 `tools/build_mboss_kn_fx.py`(S1K) · 경기장 `tools/mboss_arena_fl_ruins.py`(S1). 없는 단계는
+대역으로 돈다(리그 → `rig_stub/**`, 효과 → 바닐라 입자 · 소리, 2단계 패턴 → 고르지 않음, 시퀀스 → `core/sq/**`). 생성 순서: 코어 → 경기장 →
+`build_cboss_rooms.py` → … → 리그 · 효과 → **`build_mboss_arlecchino.py`** → `check_mboss_pack.py`. 두 번 돌려도 같은 바이트.
+시험(`tools/dev/sim/ar/tests/`, 옛 스크래치패드 `ar/tests/`): `test_arlecchino.py`(훅 · 단계 순서 · 바닥 · 생명의 계약 · 선혈의 충격 · 일반 공격 판정 · 파훼 · 그로기 ·
+회복구슬 · AI · 멈춤 / 리로드 · 정리 · 틱 비용) · `pat_p1.py`(1단계 패턴의 타격 틱 = 클립 이벤트 · 예고 · 모양 · 넉백 · 바닥 표시 · 끝점 ·
+매 틱 취소) · `pat_p2.py`(2단계 같은 항목 + 빔 · 처형 · 깃털 · 낙하 조건) on `ar/s3/lib/knsim.py`; `test_rig.py` · `test_kit.py` · `test_cm_ar.py` · `test_arena_fl.py`.
+
+## 홍련 (`boss/scarlet/`, 특수 보스 · `tools/build_mboss_scarlet.py`)
+스텔라 블레이드의 홍련(월하곡). 방에 드물게 열리는 **균열**(위 "균열")로 들어가 싸우는 **특수 보스**(레지스트리 `scarlet`, n 21, `kind`
+special, `fn` `boss/scarlet`, 경기장 `hr_field`(n 5), 가중치 10, 1~99챕터, 아이콘 `rlk:mboss/hr_kit/gate_icon`)다. 11-05 I1 에서 켰다
+(`enabled:true`; 그 전까지 `enabled:false`). 틀은 타키와 같은 챕터 모드(`#mbMode 1`)이고 몸은 허스크(크기 1.0, 클릭 판정 1.2 × 2.4,
+`miniboss` 경제: 골드 × 6 · 사파이어 1), 체력 260(타키 250 + 4 %, S5) · 처치 경험치 0 · 공격 12 × `dmgMul` 135 · 레벨 +1 · 모든 원소 저항 10 %(면역 없음).
+모든 타격은 번개 1U. 처치하면 「홍련 도전 성공」(처치 대신 `winWord`, 펑 연기 없음) · 레벨 업 1번 · 아이템 상자 1개, 그리고 마지막 장면
+뒤의 **이벤트**(아래 "보상 · 이벤트"). 피해 단계는 29 / 42 / 62 / 71 %(T1–T4; 타키의 값에서 T3 만 56 → 62, S5), 자영 연참의 베기만 따로 37 %(TC). 몸은 사용자가 준 마인크래프트 스킨을 입은 이
+팩의 플레이어 아바타 몸이고(11-05 사용자 요청, S2c · S2d; 아래 "모습 · 효과 · 경기장"), 소품 · 효과 · 경기장은 원작의 분위기만 빌린
+우리 디자인이다(원작 의상 · 지형 조각을 본뜨거나 그 이름을 쓰지 않음, 계획 `PLAN.md` §1.5).
+
+### 플레이어용 요약 (어떻게 싸우나)
+- **바닥 예고가 없다**: 모든 판정이 조용하다(`#hzQuiet 1`, 바닥 표시 · 테두리 없음). 신호는 자세(클립 첫 틱부터), 칼날의 반짝임, 노란
+  예고빛(A9 · A10 · R2), 소리, 맞는 순간의 검기다. 첫 동작에서 맞는 순간까지 12틱 이상(T3 큰 공격 20틱 이상), 연속기의 다음 타는 10틱 이상 뒤,
+  겨누기(몸의 방향 · 찍어 둔 자리)는 타격 7틱 전에 굳는다.
+- **연속기는 따라온다**: 매 타 전에 틱당 10도씩 다시 겨누고 0.3칸씩(플레이어 2.4칸 앞까지) 다가선다. 마지막 타만 밀친다(넉백 3).
+- **반격**: 쉬고 있는 그녀를 40틱 안에 4번 때리면 70 % 로 반격한다(4.5칸 안에 있을 때만) — 옆 · 뒤에 있으면 A1 회전 반월참, 앞이면 A2 역습 일섬. 스킬 · 폭발로
+  4.5칸 안에서 때리면(단계 시작 200틱 뒤, 쿨다운 400틱) 60 % 로 A6 후방 섬보(12칸 뒤로 사라졌다 나타나 「거기가 아닐세.」). 바닥(60 % · 5 %)에
+  닿아 다음 장면이 잡혀 있으면 반격도 A6 도 시작하지 않는다.
+- **2페이즈의 유령**: R1 · R3 · 연참 동안 그녀는 온몸이 보랏빛 유령(무적)이 되어 흩어졌다가 다른 자리에 나타나 벤다. 제 색으로 돌아온
+  뒤부터 맞는다(R1 62틱 · R3 46틱부터).
+- **실드 5칸과 자영 연참**(60 % · 5 %): 어둠 속에서 보랏빛 잔상이 9번 베어 들어온다. 베기가 닿는 틱에 **대시 무적이 켜져 있으면**(방향 상관없음,
+  그 베기가 겨눈 자리에서 6.2칸 안) 실드가 한 칸 깨진다(베기마다 한 칸, 0 아래로는 안 감). 마지막 내리꽂기 때 실드가 0이면 **튕겨내기** →
+  반격 장면(최대 체력 15 / 15 / 15 ‰, 5 % 때는 15 / 15 / 처치). 남아 있으면 실패: 60 % 때는 최대 체력의 50 %(죽지 않음) + 밀쳐짐, 바로 2페이즈;
+  5 % 때는 **즉사**(대시 무적 · 보호막 무시, 경고 띠가 미리 뜸). 로노바의 부활로 살아나면 그녀는 8칸 앞에서 자세를 잡고 60틱 뒤 다시 필살을 건다.
+- **쓰러짐**: 60 % 튕겨내기 뒤 200틱 동안 등을 대고 누워 있다(보통 피해, 보스바 아랫줄 = 남은 시간). 그 사이 5 % 에 닿으면 40틱 뒤 필살로
+  이어지고, 시간이 다 되면 20틱 동안 튀어 일어나(무적) 12틱 뒤 2페이즈.
+
+### 진행 (단계 · 바닥 · 전환)
+등장 CS0(640틱; 20~540틱 사이에 Shift 를 20틱 누르고 있으면 「⊙ 건너뛰기」: 검은 화면 → 554틱(그녀의 대사 11)으로 건너뛰고 끝 상태는 같다,
+떼면 다시 0부터) → **P1**(바닥 60 %) → 바닥에 닿은 다음 판단 때 **CS1** 홍련일섬(213틱, 무적, 연출 중 보스바 꺼짐, 경기장이 붉은 들판으로)
+→ **SQ1**(60틱, 보스바 + 실드 5칸, 어둠) → **A8 자영 연참** → 튕겨내기: **CS2** 반격(104틱) → 쓰러짐 200틱 → 튀어 일어나기 20틱 → **P2** /
+실패: 50 % 타격 + 밀침, T+214 에 **P2**(쓰러짐 없음) → P2 바닥 5 % 에 닿은 다음 판단 때(쓰러짐 중이면 40틱 뒤) **lead_stand**(70틱) /
+**lead_down**(82틱) → **A13 필살 · 자영 연참** → 튕겨내기: **CS3**(15 / 15 ‰ 뒤 처치) → **CS4** 마지막 장면(1042틱) + 이벤트(120틱) /
+실패: 즉사 → (부활하면) 자세 60틱 → lead_stand → A13 다시. 무적은 CS1 부터 CS2 끝(또는 A8 실패)까지, 튀어 일어나기, 필살 앞 연결부터 CS4
+까지(그리고 A6 의 0~4틱, 유령인 동안). 바닥은 보통 피해만 멈추고(`#mbFloor`), 반격 장면의 단계 피해는 진짜 피해다. 레지스트리 `intro` 650 ·
+`death` 1164(= CS4 1042 + 이벤트 120 + 2). 멈춤 · `/reload` 는 진행 중인 장면을 그 자리에서 다시 시작하거나 끝 상태로 건너뛴다(장면 시계는
+다시 시작한 틱에 한 번 멈춰(`#sq -1`), 보이는 클립 틱과 장면 틱이 늘 같다).
+
+### 패턴 (`p1.py` S3 · `p_ghost.py` S4)
+| 패턴 | 언제 | 내용 (틱 = 클립 이벤트) |
+|---|---|---|
+| A1 회전 반월참 | 반격(옆 · 뒤) · 뒤에 오래 있을 때(둘 다 4.5칸 안) · P1 가까움 | 0~3틱 틱당 60도까지 돌아섬, 7틱 겨눔 고정, 14틱 부채꼴 4칸 ±80도(T2, 넉백 2), 분홍 반짝임 · 10틱 분홍 부채(높이 1.6칸) · 14틱 보라 초승달(겨눈 쪽을 가로질러 −25도 기울어 섬: 1인칭에서도 보임, V2 HR-48), 24틱 끝 |
+| A2 역습 일섬 | 반격(앞, 4.5칸 안) · P1 가까움 | 6~11틱 칼날 연보라빛, 12틱 부채꼴 3.6칸 ±70도(T2, 넉백 2), 22틱 끝 |
+| A3 오연 반월 | 가까이 · 중간(8칸까지) · 먼 거리 대체 | 0~14틱 틱당 0.3칸 미끄러져 들어옴, 14 · 30 · 45틱 부채꼴(4.2 / 4 / 4칸), 57틱 직선 5 × 1.8칸, 69틱 부채꼴 4.6칸 ±70도(T2, 넉백 3); 앞 넷은 T1 넉백 0; 79틱 끝 |
+| A4 월하 낙참 + A5 공중 원륜 | 중간 · 멂 · 먼 거리 규칙 | 2틱 플레이어 쪽(10칸까지, 2칸 앞) 6칸 위로 도약(잔상 2 · 4 · 6틱), 12틱 자리 찍기, 16틱 강하 → 20틱 그 자리 원 2.6칸(T3), 34틱 1칸 떠서 돌며 원 3칸(T1, 넉백 2), 46틱 끝 |
+| A6 후방 섬보 | 스킬 반격 | 12칸 뒤로(막히면 8~10칸 옆) 3틱 미끄러짐, 12틱 대사 12, 16틱 바로 다음 판단(멀면 먼 거리 규칙) |
+| A9 황광 원참 | 가까이(7칸까지) | 노란 예고빛 · 분홍 번쩍임, 21틱 자리 찍기, 26틱 그 자리 3칸 너머까지(최대 12칸) 일섬 돌진 → 28틱 돌진 길(폭 2.4칸) + 찍은 자리 원 4칸(한 묶음 = 한 번, T3, 넉백 3), 29틱부터 돌아서 40틱 끝 |
+| A10 황광 낙참 | P1 가까움 · 중간 · 멂 · 먼 거리 규칙 | 2틱 5칸 떠올라 틱당 0.4칸 다가오며(잔상 2 · 5 · 8틱) 10틱 노란 예고빛, 14틱 자리 찍기, 20틱 찍은 자리로 연보라 선 · 강하(잔상 20 · 21틱) → 22틱 그 자리 원 3.5칸(T3, 넉백 3), 32틱 끝 |
+| R1 자영 돌격 | P2 중간 · 멂 · 먼 거리 규칙 | 0틱 온몸이 보랏빛으로(유령: 무적) 3틱 흩어짐 → 14틱 플레이어 앞 왼쪽 14칸에 나타나 20~24틱 플레이어 오른쪽 1.5칸으로 돌진 → 27 · 40 · 55틱 플레이어 자리의 원 3.2칸 베기 셋(T2 · T2 · T3, 마지막만 넉백 3; 각각 7틱 전까지 플레이어를 따라오다 고정) → 49~55틱 플레이어를 넘어 3칸 너머에 착지, 59틱 제 색, 62틱부터 맞고 걷거나 옆걸음, 67틱 끝 |
+| R2 월륜 일섬 | P2 중간 · 멂 · 먼 거리 규칙 | 0틱 한 걸음 물러나 2틱 노란 예고빛, 4~14틱 6칸 뒤로 미끄러짐, 28틱 달 원반 하나(폭 2.8칸 칼날 투사체, 바닥 위 0.9칸: 뛰어도 맞음, 틱당 1.75칸, 놓기 7틱 전(21틱)에 찍은 플레이어 발 자리로 곧게(찍은 뒤로 그쪽을 봄), 유도 없음, 벽에서 멈춤, T2, 넉백 2); 그녀 체력 30 % 이하면 35틱에 다시 찍어 42틱에 하나 더(첫 원반 넉백 0). 마지막 원반 뒤 60틱까지는 쉴 때처럼 플레이어를 보며 걷거나 옆걸음. 유령이 아니라 내내 맞음 |
+| R3 자영 활강 | P2 가까이 · 중간 | 0틱 보랏빛(무적) → 10틱 앞 오른쪽(55도) 8칸 낮게 나타나 12~19틱 앞 오른쪽 1.6칸으로 미끄러짐 → 24틱 원 3.2칸(T2), 3칸 솟아 매달림 → 31틱 오른쪽으로 내려와 37틱 X 베기 원 3.2칸(T3, 넉백 3), 41틱 제 색, 46틱부터 맞고 걷거나 옆걸음, 49틱 끝 |
+| A8 자영 연참 | 60 % (SQ1 다음) | 아래 「자영 연참」: 베기 9번 · 판정 194틱 |
+| A13 필살 · 자영 연참 | 5 % (lead-in 다음) | 아래 「자영 연참」: 베기 9번 + 달 원반 3개 · 판정 258틱 |
+
+판단(`ai.py`): 거리(가까움 ≤ 4.5 · 중간 ≤ 11 · 멂) × 단계의 가중치(`api.WEIGHTS`: P1 가까움 A1 10 · A2 10 · A3 50 · A9 40 · A10 40, 중간 A3 15 · A4 35 · A9 10 · A10 25,
+멂 A4 40 · A10 35; P2 가까움 A3 35 · A9 20 · R3 20, 중간 A3 10 · A4 20 · A9 10 · A10 15 · R1 20 · R2 15 · R3 25, 멂 A4 20 · A10 20 ·
+R1 35 · R2 25), 쿨다운(`api.COOLDOWN`, P2 가 조금 짧음: A9 160 / 140 · A10 120 / 100틱, A6 은 둘 다 400틱), 같은 패턴 연속 없음, A3 는 8칸 · A9 는 7칸 밖 중간
+거리에서 빠짐. 8칸 밖에 30틱 → 먼 거리 규칙(P1 A4 60 · A10 40; 둘 다 쿨다운이면 미끄러져 들어와 A3), 등 뒤 ±60도 · 4.5칸 안에 30틱 중 20틱 → A1(쿨다운은
+200틱에 한 번 무시; 더 멀면 거리대로 고름). 패턴은 마지막 타격 8~12틱 뒤에 끝나고(`api.PAT_END`, 그동안 플레이어 쪽으로 돌며 마지막 타격 4틱 뒤부터
+쉴 때처럼 걷거나 옆걸음하고, 이어지는 쉼도 그 걸음을 그대로 잇는다) 패턴 사이 P1 8~16틱 ·
+P2 10~16틱은 플레이어를 보며 걷거나(6칸 밖, P1 0.12 · P2 0.18칸/틱) 옆걸음한다(때릴 틈; 움찔이 끝나면 다시 걷거나 미끄러져 들어옴). 고를 패턴이 없는 판단이 두 번
+이어지면 12틱 뒷걸음(5칸 밖까지 곧게 물러남) 뒤 중간 거리로 고른다. 모든
+끝점(착지 · 돌진 끝 · 사라졌다 나타나기)은 `mv/ok`(경기장 안전 원 22.5칸, 발 · 머리 빈칸 — 마른 풀 · 진홍 뿌리는 `#rlk:dash_pass` 라 빈칸)
+안이다.
+
+### 자영 연참 (A8 · A13, `p_ghost.py` S4)
+- **모습**: 어둠(T−17, SQ1 / lead-in 의 몫) 속에서 0틱 갓까지 온몸이 한 틱에 보랏빛 유령이 되고(`rlk_hr_ghost`: 무적) 3틱 안개로 흩어진다.
+  유령은 한 번에 하나: 멀리 나타나 곧게 돌진(D1: 앞 왼쪽 14칸 → 오른쪽 1.5칸, 6틱 머문 뒤 4틱), 낮게 미끄러져 옴(D2: 앞 오른쪽(55도) 8칸 → 앞 오른쪽
+  1.6칸), 하얀 번쩍임 뒤 위 오른쪽 2.5칸 · 3칸 위에서 떨어짐(D3, A8), 앞 왼쪽(−55도) 12칸에서 달려 들어옴(D4, A13; D2 · D4 는 기본 F5 시야 안). 나타날 자리는 모두 `mv/ok` 를 거치고,
+  막히면 다른 방향 · 거리, 끝내는 플레이어 → 경기장 중심 선 위의 자리(중심에서 21칸 안, 막히면 중심 쪽으로 걸어 들어감)라 벽 속이나 경기장
+  밖에 나타나지 않는다. 사라진 동안 몸은 마지막 자리에 머문다.
+- **베기 9번**(실드를 깎는 베기): 매번 플레이어 발밑의 원 3.2칸(보이는 검기는 약 2.2칸). 맞기 12틱 이상 전에 생기고, 맞기 7틱 전까지 플레이어를
+  따라오다 그 자리에 고정된다. 조용한 판정, TC 37 %(아이템 없는 15레벨이 아홉 번 다 맞으면 최대 체력의 약 40 %) · 넉백 0 · 번개, 맞는 틱과 그다음 틱 동안 판정. 검기 모양은 맞는 틱에만(고리 · 띠 · 사선 · 바닥
+  고리 · X · 감아베기 · 돔 · 분홍 세로 초승달). 맞기 5틱 전부터 맞는 틱 사이에 시작한 대시는 무적으로 피하고(어느 방향이든) 실드 한 칸을 깬다.
+- **A8 틱표**(T0 = SQ1 끝): 베기 27 · 40 · 55 · 82 · 94 · 121 · 147 · 159 · 174, 장식 번개 34 · 102 · 161 · 193(판정 없음), 170틱 칼날 분홍빛,
+  175~187틱 8칸 솟아 사라짐, 188틱 제 색으로 플레이어 6칸 위에 나타나 191~194틱 내리꽂기 → **194틱 판정**.
+- **A13 틱표**(T0 = lead-in 끝): 베기 27 · 40 · 55 · 80 · 108 · 120 · 211 · 223 · 238, 128틱 플레이어 앞 3칸에 나타나 129틱 노란 예고빛, 131~141틱
+  12칸 물러남, **달 원반 155 · 167 · 180**(첫 원반은 150틱부터 칼날 금빛; 놓기 7틱 전 148 · 160 · 173 에 찍은 플레이어 발 자리로, 대시로 피함, 실드와 무관, T2 넉백 0), 194틱
+  사라짐, 198틱 앞 왼쪽 12칸에서 달려 들어옴, 234틱 칼날 분홍빛, 252틱 제 색으로 나타나 255~258틱 내리꽂기 → **258틱 판정**. 장식 번개 70 · 225 ·
+  245 · 258.
+- **판정**: 실드 0 → 튕겨내기(S3: 금빛 별 · 빛기둥 · 소리 · `g_deflect`), 어둠이 걷히고(붉은 들판 요청) 경고 띠가 꺼지며, 그녀는 플레이어
+  1칸 위에서 앞 1.2칸으로 내려와 칼을 맞댄다 → 206 / 270틱 반격 장면. 실드가 남으면 실패: **A8** = 플레이어 자리에 최대 체력 50 % 타격(죽지
+  않음, 그 자리에서 약 3칸 밀쳐짐), 그녀는 그 자리에 내려앉아 다시 모습을 갖추고 214틱 2페이즈. **A13** = 255틱 검은 화면, 258틱 분홍빛 섬광 ·
+  플레이어의 시선을 가로질러 가슴을 지나는 진홍 일섬(`scarlet_line {yaw:90}`, 오른쪽 끝이 13도 오름 — CS1 의 홍련일섬과 같은 선) · 꽃잎 · 즉사
+  (`ult/fatal`: 대시 무적 · 보호막 무시, 로노바 부활은 적용), 그녀는 플레이어 앞 2칸에 내려앉음 → (부활하면) 자세 60틱 → lead_stand → A13 다시.
+  일섬 · 꽃잎 · 그 틱의 번개 장식은 킷의 보존 표지(`fx/keep_on` … `keep_off`, `rlk_hr_fx_keep`)를 달아 죽음 · 부활의 효과 정리에 지워지지 않고
+  제 수명대로 보인다(CS3 걷어차기 번쩍임도 같음; F2 HR-17). 1인칭(아바타 없음)에서는 일섬이 눈 1.2칸 앞을, 튕겨내기의 금빛 별은 시선 1.8칸
+  앞을, 빛기둥은 1.8칸 앞에 선다(F2 HR-45).
+  스위치(계획 §0.1 질문 6): `ULT60_LETHAL` true 면 A8 실패도 같은 즉사 연출(검은 화면은 191틱), `ULT5_LETHAL` false 면 A13 실패는 50 % 타격
+  (죽지 않음) 뒤 자세 → A13 다시.
+- **멈춤 · `/reload` · 정리**: 연참은 그 자리에서 취소된다(베기 · 원반 · 자리 표시 · 유령 상태 모두 지우고, 경고 띠 끄고, 어둠 걷기 요청; 몸은
+  제 색으로 바닥에). 다시 시작은 S3 의 `lead_stand {g}`(T0 부터, 실드 5칸). 다만 판정이 이미 났으면 그 결과대로 간다(튕겨내기 → 반격 장면,
+  A8 실패 → 바로 2페이즈, 즉사 실패 → 부활 자세), 즉사 연참(A13)이 마지막 베기 뒤(T+239)에 실드가 남은 채 멈추면 실패가 남아 플레이어가
+  돌아와 살아 있는 첫 틱에 즉사한다(`/reload` 해도 같음, `#grs` 5).
+- **대시 경제**: 2칸 · 한 칸에 20틱(차례로) · 대시 뒤 5틱 자체 쿨에서, 베기마다 맞기 4~0틱 전에 대시해도 아홉 번 모두 칸이 남는다(가장 빠듯한
+  곳: 베기 1~3, 13 / 15틱 간격).
+
+### 난이도 · 균형 (S5, 11-06)
+균형 탐침(`HR/review/bal`, 스크래치패드 — 데이터팩에 들어가지 않음: hrfair 1.2 · 같은 모의기로 잰 타키 기준 `base_tachy.json` · 아이템 없는
+15레벨 플레이어 대 그녀 16레벨, 씨앗 11 / 22 / 33, 단계마다 3 600틱, 108번)으로 계획 §4.8 의 목표를 쟀다. 3741fc4(F-I)에서는 1단계 근접
+걷는 플레이어가 받는 피해가 타키의 0.81배(목표 1.00~1.10)였고 T9 가 5레벨에서 229.6초(목표 230~270)로 모자랐다. 리드가 정한 순서대로
+판단 가중치 · 쿨다운(A9 · A10 가까움 40 · 40, A10 120 / 100틱) → 쉼(P1 8~16틱) → (추적 30도/틱은 오히려 0.86배라 버림) → 피해 단계 T3
+56 → 62(±20 % 안, 원피해 9 → 10) → 체력 250 → 260(+4 %)으로 맞췄다:
+
+| 목표(계획 §4.8) | 3741fc4 | S5 | 범위 |
+|---|---|---|---|
+| T1 1단계 근접 걷기 %최대체력/분 ÷ 타키 124.0 | 99.9 = 0.81배 | 130.6 = **1.05배** | 1.00~1.10 |
+| T2 2단계 근접 걷기 | 1.06배 | **1.11배** | ≤ 1.25 |
+| T3 서 있기(1 · 2단계 중 큰 쪽) ÷ 파수꾼 서 있기 164.0 | 1.44배 | **1.49배** | ≤ 1.8 |
+| T4 근접 걷기의 가장 나쁜 40틱(A8 실패 타격 빼고) | 19.8 % | **20.5 %** | ≤ 40 % |
+| T5 / T5b 서 있는 대상의 베기 9번 | 40.3 / 40.3 % | **40.3 / 40.3 %** | ≤ 45 % |
+| T6 대시 시험 여섯(서서 · 밖 · 옆 · 안 0.22 / 0.28칸/틱): 제때 대시가 칸을 깸 / 실드를 다 깸 | 100 / 100 % | **100 / 100 %** | ≥ 90 % |
+| T7 아무 때나 대시(± 8틱) 실드를 다 깸 | 29 % | **29 %** | ≤ 50 % |
+| T8 400틱 안의 A6 | 1 | **1** | ≤ 1 |
+| T9 아이템 없이 검으로 처치(연출 포함) 5 / 10 / 15레벨 | 229.6 / 234.9 / 240.8초 | **240.7 / 242.8 / 245.4초** | 230~270초 |
+
+화무십일홍 · 월하대작(계획 §7.4.7 · §7.5.4, `reward_ev.py`): 보스 싸움의 측정값(기본 공격 1.64번/초, 육참골단 4.7중첩, 체력 60 % 이하
+0.73, 무적인 그녀에게는 반격하지 않음)과 붐비는 방(`room/roomfair.py`: 1~3챕터 몹 8~14마리를 진짜 두뇌 · 공격으로, 맞는 수 1.09번/초 ·
+홍련일섬 대상 20칸 안 5~11마리)으로 쟀다. 반격 쿨타임 2초 → **4초**(`#hwCtrCdT` 80), 홍련일섬 849 → **500 %**(`#hwSlCoef`), 월하대작
+최종 공격력 20 → **27 %**(`#hrMoonAtk`): G1 ★★★ = 불씨의 맹약 × 0.972 / 0.964(중반 / 후반, ±10 % 안), G2 ★★★ 가 방 + 보스의 90번째
+백분위 · 반격 상한 × 홍련일섬 1 · 2마리 × 보스 · 방의 공격 빈도 여덟 가지 모두 키리온 이하(가장 빠듯한 것: 후반 · 방 빈도 · 상한 · 2마리
+57.5 대 58.8 %), G3 월하대작 = 화무십일홍 ★★ 순값 × 0.976 / 1.032(±5 % 안). 그녀의 몸(허스크)은 기본 F5 시점에서 플레이어를 밀어내지
+않는다(아바타가 카메라 받침을 태우고 있어 바닐라 밀치기가 적용되지 않음; 1인칭에서만 살짝 밀림). 위 표는 S5 머리 `005f00a` 에서 잰
+값이고 릴리스 값이다: 그 뒤의 V1 · V2 는 싸움 수치(피해 · 체력 · 가중치 · 쿨다운 · 클립 길이 · 이벤트 · 이동 속도)를 바꾸지 않았다.
+
+### 화면
+보스바는 CS0 과 CS1 동안 꺼진다(FN-f `bars_off`: CS0 은 그녀가 나타나는 스폰 훅과 `core/intro/begin` 에서 끄고 조종이 넘어오는
+`core/intro/done` 에서 켜며 HP 바가 첫 30틱에 걸쳐 차오름(`mboss/bars_ramp`), CS1 은 SQ1 첫 틱에 `bars_on`; F2 HR-29). 스폰 틱에도 안
+보이도록 프레임워크의 `mboss/start_go` 는 `#mbBarOff` 가 1 이면 끝의 `bars_show` 를 건너뛴다(`build_mboss_core.py` 한 줄,
+`check_mboss_pack` FN-f 가 그 줄을 고정; F-I, F2 요청 f2-8 — 다른 보스는 `fight_vars` 가 막 0 으로 둔 값이라 그대로). 플레이어의
+액션바 HUD 는 CS0 · CS1 · CS4 · 이벤트 동안 매 틱 `hudHold 2` 로 쉬고, 이 네 장면은 첫 틱에 액션바를 한 번 비운다(`title … actionbar ""`:
+게임은 마지막 액션바를 약 3초 남기므로; CS0 은 20틱에 건너뛰기 안내가 그 자리를 잇는다). CS2 · CS3 · SQ1 · lead-in 은 HUD 그대로. 아랫줄 = 실드 칸(번개색, 5칸) / 쓰러짐 남은 시간(금색, 200). 대사 25줄은
+위키 대사 그대로(`api.LINES`, 색 #F2D0E8, 효과 도구의 `fx/hud/line {id}` 만: 제목 자리에 두 글자씩 2틱마다 타자 치듯, `block.note_block.hat`
+0.3; 24 · 25 는 이벤트에서만). 자막은 2배로 그려지고 줄바꿈이 없어, 192 font px(1920 × 1200 의 자동 GUI 폭)보다 넓은 대사 5 · 22 · 24 는
+자연스러운 쉼에서 나눈 자막 둘(`api.LINE_PAGES`, 한 칸 띄어 이으면 원문 그대로)로 같은 시간 안에 이어 친다(F2 HR-16). 필살(5 %)처럼 실패가 죽음인 연참에서만 경고 띠(보스바 `rlk:hr_warn`, `fx/hud/warn`: 흰 글씨에 「즉사」만 #FF3A55)가
+lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` false · `ULT5_LETHAL` true). 등장 건너뛰기 표시 「⊙ 건너뛰기 · Shift
+길게」는 20~540틱에만(누를수록 밝아짐, `hudHold`). 전체 화면 덮개 여섯(검정 · 반전 · 분홍빛 흰색 · 붉은 기 · 자홍 · 흰색, 글꼴 `rlk:mboss_hr`)은
+장면이 고른 틱에. 대사가 떠 있는 동안 덮개의 들고 나는 페이드는 불투명도 단계 글리프(20 / 40 / 60 / 80 %, U+EC20~)를 매 틱 꽉 찬 제목
+알파로 다시 보내 그린다(제목과 자막은 알파 하나를 같이 써서 바닐라 페이드면 대사가 흐려지고 끝에서 끊긴다; F2 HR-30). 안내 · 조언 문구는
+없다(즉사 경고 띠만 예외).
+
+### 연출 · 시퀀스 (`seq.py` S2b)
+- **시퀀스 8개**(`tools/mboss_scarlet/seq.py` 의 `SERVICES`; `build_mboss_scarlet.py` 가 `boss/scarlet/seq/<name>/**` 에 씀): `intro` · `cs1` ·
+  `sq1` · `repel {at:60|5}` · `lead_down` · `lead_stand {g:"a8"|"a13"}` · `ending` · `event`. 진입점 `start` / `tick` / `cancel`(+ `seq/intro/skip`,
+  `seq/lead_stand/g/{a8,a13}` — `g` 는 저장소 `rlk:hr seq.g` 를 거친 정적 호출 둘: `check_mboss_pack` 이 숫자 아닌 동적 참조를 못 풀어서, I1);
+  안쪽은 틱 파일 `k/<t>` 과 나눔 통 `b/<a>_<b>`, 이동 `m/<key>`.
+- **시계**: 코어가 `#sq hr` 를 0 으로 두고 `start`(@s = 몸, 그 자리) → 매 틱 `#sq` +1 → `tick` → `rig/tick`. 그래서 `#sq` = e 일 때 클립 틱 e 가
+  보이고 모든 장면이 클립 이벤트(`api.ev`)에 앉는다. 길이(`api.SEQ_LEN`)에서 `#sqdone hr 1`. `cancel` 은 실행자 없이, 여러 번 불러도 같고, 자기가
+  만든 것만 지운다(무대 표지 `rlk_hr_stage`, 꽃잎 카드 `rlk_hr_sqp`, 보조 `rlk_hr_sqh`, 이벤트의 `rlk_hr_ev`; 모두 `rlk_room rlk_mb_aux`).
+- **코어로 가는 신호**(코어 함수는 부르지 않음): `#sq_sig hr` = `api.SIG` — `repel` 의 hp1 24 · hp2 75 · hp3 102, `lead_down` 의 refill 29,
+  `lead_stand` 의 refill 18. 코어가 `tick` 바로 뒤에 읽고 적용하고 0 으로 되돌린다.
+- **CS0 등장**: 그녀는 `start`(남쪽 테두리) → 달 선 위, 시작점에서 26.7칸 떨어진 낮은 돌(윗면 0.24칸; `api.SEAT_POS` (884, 201, 5), 명령에는
+  `884.0 201 5.0`(`api.xyz`: 게임은 소수점 없는 x · z 를 블록 가운데로 옮긴다); 킷 소품 `seat_rock`: 바닐라 응회암 1.2 × 0.24 × 0.64칸)에 등을
+  보이고 앉아 달을 본다(오른손에 잔, 돌 위에 병). 대사 1~10(영상에 없는 위키 대사, 시의 뜻대로 술을 따르고 마시고 잔을 달에 듦: E3 112~146 동안
+  달무리 약 20 % 밝게; 바람 소리는 플레이어 자리에서 — F2 HR-46), 일어나 달 쪽으로 0.4칸 나선 뒤 오른쪽으로 1.1칸 비켜서서(발을 옮겨 딛으며; `seq.py` `SEAT_RISE` · `SEAT_ASIDE`,
+  S2d: 발이 돌 안에 서지 않고 걸어갈 때 돌 옆을 지남) 돌아서 칼집을 오른손에 쥐고 걸어온다(8틱 다리 1.2칸, 0.15칸/틱, 그녀가 7칸보다 멀
+  때만; 시작점에 서 있는 플레이어 앞 약 6.8칸에서 멈춤 — I1, 리드 결정: 돌을 D0 의 (884.5, 201, 0)에서 같은 선을 따라 5칸 당김; 건너뛰면
+  6.5–6.8칸), 칼집을 세워 든다(510). 554 부터
+  `intro_end`: 웃음 · 돌아섬 · 뽑기(610, 제목 「홍련」 / 「월하곡」) · 자세, 630 음악 1 · 돌과 소품 치움, 636 밀어내기 고리(피해 없음).
+  **건너뛰기**: 코어가 `seq/intro/skip` 을 부르고 `#sq` 를 553 으로 — 검은 화면(0 / 20 / 6) 아래 대사 · 바람 · 돌 · 소품을 치우고 그녀를 플레이어
+  7칸 안(6.5 / 5 / 3.5칸 후보)에 세운다. 다음 틱(554)이 `intro_end` 와 대사 11.
+- **CS1 · SQ1 · 반격 · lead-in**: CS1 은 돌진 · 칼 맞댐 · 6칸 뒤로 · 거합 · 꽃잎 둘 · 홍련일섬(169, 시선을 가로지르는 진홍 선; 1인칭은 눈 1.2칸 앞) · 173 에 붉은
+  들판 요청 · 179 음악 2. SQ1 은 갓을 고쳐 쓰고 42 에 어둠, 60 에 연참. 반격(`repel`)은 칼 맞댐 → 갓 위의 부딪침 → 던짐 · 공중제비 · 등 맞댐 →
+  착지 · 누움 → 걷어차기(102)의 체력 단계 셋. `lead_down` 은 누운 자리에서 일어나 바닥의 갓을 쓰고, `lead_stand` 는 서서 같은 줄기(어둠은
+  64 / 52).
+- **CS4 · 이벤트**: `ending` 1042틱(0틱에 원작의 하드 컷처럼 흰 섬광 3틱 — `ovl white` 0 / 2 / 1, `seq.SEAM_CUT`: 그 밑에서 갓이 그녀
+  옆(5 % 튕겨내기의 끝)에서 얼굴 위로 옮겨짐, F-I HR-31; 시작의 한 번 돌아보기는 `rotate`: 플레이어는 그녀의 눈, F5 아바타는 발 — 순간이동 없음, F2 HR-02; E1b 의
+  연보라 띠는 그녀와 플레이어 거리 + 1칸을 쓸고 지나감, HR-32) = 바닥 베기 · 결투(모든 타격은 플레이어 앞에서 멈춤) · 공중 교차 · 착지(10칸) · 걸어 들어옴(4.5칸; 300~1041틱
+  동안 가만히 선 플레이어와 3.5–6칸) · 칼을 꽂음(306-318) · 달 쪽으로 돌기 · 달 바라보기(690~780 달무리 약 20 % 밝게) · 다시 플레이어 쪽 · 갓
+  테 당겨 인사, 300 에 음악 3, 1042 에 `#sqdone` → 코어가 같은 틱에 `seq/event`(120틱, 두 갈래: 던진 칼 / 달빛 구슬; 대사 24 / 25, E56 지급 ·
+  칭호, E110 검은 화면).
+- **달무리 · 연꽃**: 코어의 장식 소품(`core/deco`)은 경기장 모습을 따른다 — 모습 작업을 시작할 때(`core/look/go`) 달무리 `p1` / `p2` / `off`
+  (어둠), 연꽃 `bud` / `bloom`(I1; 그 전에는 처음 모습 그대로 남았다). 장면의 밝은 달무리는 지금 모습의 밝은 쪽(`p1b` / `p2b`, 경기장 기록
+  `rlk:mboss look_hr_field` 를 봄)이고 끝 · 건너뛰기 · 취소 때 되돌린다.
+- 칼 꽂기: 칼(1.94칸)이 팔이 닿는 폭보다 길어 칼끝을 입구에 댄 채 칼집 축에 올릴 수 없다. 그래서 칼끝이 조금 들어간 자리에서 축에
+  올린다(304-306; S2d 의 리타깃 패치 `SH0`: 빌드가 풀이기로 찾은 축 위 자세, ending 297-326; 영상 v4k_s4_sheathe 의 왼쪽 위 → 몸 앞 →
+  오른쪽 허리 입구 흐름은 그대로).
+
+### 보상 · 이벤트 (`reward.py` S3 · 아이템 · 버프 SR)
+쓰러지는 순간(`death_start`) 이벤트를 고른다: 50 %(`api.EVENT['item_pm']` 500) **[ MYTHIC ] 화무십일홍**, 나머지 **월하대작**. 이미 화무십일홍을
+들고 있으면 늘 월하대작, 월하대작이 이미 켜져 있으면 늘 화무십일홍. 마지막 장면(1042틱) 뒤 이벤트 장면 E56 에 지급:
+
+| 이벤트 | 지급 |
+|---|---|
+| 아이템 | `[ MYTHIC ] 화무십일홍` ★☆☆ 로(`items/enh_add` 로 ★ 1 → `items/give`; 보유 칸이 가득하면 균열이 닫힐 때 발밑 드롭 + 「[월하의 선물] 보유 칸이 가득 차서 화무십일홍을 발밑에 놓았습니다.」). 효과는 6절 「아이템」 화무십일홍 줄 |
+| 버프 | 「월하대작」 = 점수 `hrMoon` 1(플레이어별, 이번 런: 조절 지점 `#hrMoonRun` 1 이면 `player/reset_one` 이 0 으로, `uninstall` 이 목표 삭제). `items/hook/stat_buffs` → `player/hr_moon/apply`: 최종 공격력 +27 %(`ampAtk`, 모든 공격력 % 뒤에 곱함) · 치명타 확률 +10 % · 이동 속도 +10 %(수치는 조절 지점 `#hrMoon*`). 인벤토리 ◆ 스탯 정보 맨 끝 줄 「☾ 월하대작 · 최종 공격력 +27% · 치명타 확률 +10% · 이동 속도 +10% (이번 런)」(켜져 있을 때만) |
+
+제목은 E56~E110: 화무십일홍은 4배 제목 「화무십일홍 ★☆☆」(진홍 이름 + 아이템 자신의 별 색: `rlk:items` 의 별을 그때 읽음, 밝은
+그림자) / 부제목 「[ MYTHIC ] 신화 아이템을 얻었습니다」, 월하대작은 제목 「월하대작」 / 부제목 「최종 공격력 +27% · 치명타 확률 +10%」 + 같은
+54틱 동안 액션바 「이동 속도 +10%」(수는 조절 지점 점수를 읽음; 4배 제목 106 · 부제목 192 글꼴 px 이하라 1920 × 1200 까지 화면 밖으로
+나가지 않음). 틀의 보상(레벨 업 · 상자) 뒤 보상 훅 `boss/scarlet/reward`(FN-b `rwHook`)가 못 한 지급을
+마저 하고(장면 중 `/reload` 해도 한 번만) 채팅에 기록(아이템 이름은 아이템 자신의 색 「[ MYTHIC ] 화무십일홍 ★☆☆」, 버프는 범위 말
+`api.EVENT['buff_scope']` 「이번 런 동안」 / 「영구히」와 조절 지점의 수)을 남긴 뒤 이벤트 상태를 지운다. 정리(`cleanup`)는 목표 `hr` 의
+모든 가짜 플레이어(코어 · 패턴 · 유령 도우미 · 시퀀스)와 저장소 `core` · `seq` 를 지우되 이벤트 점수 `#hrEv #hrEvDone #hrEvDrop` 만 남겨
+훅이 읽는다(F3, 11-05).
+
+### 모습 · 효과 · 경기장
+- **리그**(`tools/build_scarlet_rig.mjs` + `scarlet_{geometry,paint,pose,retarget,clips}.mjs` + S2b 의 영상 클립 `scarlet_cine.mjs` + 스킨
+  `scarlet_skin.mjs` → `boss/scarlet/rig/**`, 계약 `tools/scarlet_rig_api.md`): 아이템 디스플레이 29부위(고정 UUID
+  `524c4b4d-4852-4400-8000-0000000000NN`) + 그림자(0x40, 반지름 0.6), 클립 47개(이름 · 길이 · 반복 · 이벤트는 `api.CLIPS`; 싸움 · 연참 ·
+  쓰러짐 · 이벤트 39개는 `scarlet_clips.mjs`, 영상 8개(`intro` 554 · `intro_end` 86 · `cs1` 213 · `sq1` 60 · `repel` 104 · `lead_down` 82 ·
+  `lead_stand` 70 · `ending` 1042틱)는 `scarlet_cine.mjs`). 11-05 사용자 요청 둘(「마인크래프트 스킨을 이용해서 만들라고. 아를이나
+  라이덴처럼」 → S2c, 「팔다리가 너무 기괴하게 긴데 그냥 플레이어 크기랑 똑같게해」 → S2d)대로 몸은 사용자의 스킨을 입은 플레이어
+  아바타 몸이다.
+  - **몸 = 플레이어 아바타의 몸**: `build_player_rig.mjs` 아바타와 같은 상자 · 같은 스킨 면(스킨 1픽셀 = 1/16칸, 크기 1;
+    아를레키노는 1.4배). 머리 8 × 8 × 8픽셀(0.5칸), 몸 8 × 12 × 4 를 9줄에서 나눠 상체(0-9줄, 이음매가 피벗) · 골반(9-12줄,
+    엉덩이 선이 피벗), 아바타와 같은 슬림 3픽셀 팔(사용자 스킨이 슬림 스킨: 팔 줄의 마지막 두 칸이 비어 있음; 위팔 0-6줄,
+    아래팔 + 손 6-12줄) · 4픽셀 다리(허벅지 0-6, 정강이 6-12), 겉 레이어(머리 0.5픽셀, 나머지 0.25픽셀). 사용자 스킨은
+    그대로(늘이지 않음, 픽셀을 고치지 않음): `tools/scarlet_skin.mjs` 에 base64 로 들어 있고(원본 PNG 4 014바이트, sha1 `7f9726be…`),
+    리그 생성기가 리소스팩 `textures/mboss/scarlet/skin.png`(아틀라스 id `rlk:mboss/scarlet/skin`)로 바이트 그대로 쓴다(바이트 수 ·
+    sha1 이 다르면 빌드 중단). 바닐라 스킨 배치 그대로(`build_player_rig.mjs` 와 같은 UV).
+  - **뼈대(플레이어와 같음)**: 엉덩이 선 0.766칸(쉬는 자세 0.74), 엉덩이 관절 ±0.125, 이음매 0.1875 위, 목은 엉덩이 선 0.75 위,
+    어깨 (±0.344, 이음매 0.4375 위), 위팔 0.25 + 아래팔 0.344(쥐는 점), 허벅지 0.375 + 정강이 0.391(발바닥). 머리 끝 2.00칸(쉬는
+    자세 1.98), 갓 꼭대기 2.30칸, 갓 테 지름 1.32칸. 쓴 갓은 머리 위에 평평하게 얹힌다(테는 목 0.502칸 위, 갓 몸통 아랫면이
+    머리 윗면 0.013칸 위; 쓴 갓의 테는 실제로 보이는 모든 틱에 머리 윗면 모서리보다 0.001칸 이상 위). 팔다리는 늘어나지 않는다
+    (IK 가 길이를 지킴); 팔 마디는 한 틱에 60도 넘게 돌지 않도록 팔꿈치 방향을 고른다. 팔꿈치는 아바타처럼 경첩이다: 위팔과
+    아래팔이 한 앞면(팔꿈치 안쪽)을 나눠 아래팔 상자가 위팔에 대해 비틀리지 않고(경첩 축 차이: 실제로 보이는 틱 모두 1도 이하),
+    위팔이 한 틱에 35도 넘게 돌아야 할 때는 팔꿈치가 가리키던 쪽을 계속 가리키도록 굽힘 면을 고른다. 다리 마디는 한 틱에
+    35도 넘게 비틀리지 않는다(무릎 꿇기에서 무릎이 한 틱에 내려앉는 몇 틱은 무릎 경첩 축이 최대 54도 어긋남 — 받아들임).
+    깊이 숙이면(무릎 꿇기 · 발도 자세) 상체와 골반 사이 등 쪽 이음매가 최대 0.13칸(2픽셀) 벌어진다 — 아바타의 팔꿈치 ·
+    무릎과 같은 방식(단단한 상자가 피벗에서 돎), 받아들임. 스킨의 머리 겉 레이어(모자 층)는 쓴 갓 테 위로 0.02칸 남짓
+    드러난다(테 안쪽 가장자리의 작은 흰 조각 — 받아들임: 플레이어 모델의 모자 층 그대로).
+  - **클립 리타깃**(`tools/scarlet_retarget.mjs`): 47개 클립(S2a · S2b 의 원래 동작)의 관절 각도는 그대로 두고 위치만 몸에 맞춰
+    줄인다(다리 0.649, 팔 0.724, 칼집 0.835배). 각도를 바꾸는 곳은 선언한 패치뿐(`KNEEL-K` · `KNEEL-L`: 무릎 꿇고 바닥의 갓
+    줍기, `KNEEL-K-B` · `KNEEL-L-B`: 그동안 칼을 왼쪽 옆으로(5-6틱에 걸쳐 천천히), `IAI`: 허리의 칼자루에 손 닿기, `SIP`: 잔을
+    입술에, `SH0`: 새 칼집 축으로 칼 넣기; 각도 대신 발 위치만 바꾸는 `ASIDE`: 등장에서 옆으로 비켜설 때 발을 옮겨 딛기; 11-06 V1:
+    `A10-HIGH`: A10 의 공중 두손 자세를 칼을 머리 뒤로 눕히는 대신 얼굴 앞에 세워 든 높은 자세로(플레이어 크기 팔은 머리 위로 못 감음),
+    `DRAW-E`: CS0 끝의 발도에서 오른손 칼집을 가슴 앞 아래로 가로질러 들기(칼자루를 쥔 왼주먹이 몸통 · 머리에 묻히지 않게),
+    `IAI` 를 발도(CS1 162)까지 늘림, `WALK`: 걸음 보폭을 늘림(디딘 발이 0.38칸 앞에서 0.76칸 뒤로 고르게 쓸리고, 드는 발은 0.08칸 들림,
+    엉덩이가 함께 오르내림), `STRAFE-L` · `STRAFE-R`: `ASIDE` 처럼 들어 옮기는 옆걸음(한 주기에 네 걸음, 두 발 0.26 → 0.97칸, 0.10칸
+    낮춘 자세); 클립 길이 · 이벤트 · 이동 속도는 그대로). 그다음 풀이기
+    (`scarlet_pose.mjs`)가 매 틱 맞춘다: 바닥 아래로 가는 점 없음; S2a 에서 바닥에 닿았던 것(디딘 발 · 꿇은 무릎 · 짚은 손 · 누운 몸 ·
+    돌에 앉은 허벅지)은 계속 닿고, 공중이던 것은 공중에; 든 소품(칼 · 칼집 · 갓 · 잔 · 병)은 손에, 바른 방향으로; 칼날은 몸을
+    뚫지 않음(이벤트 1 cm, 매 틱 5 cm; 손이 빈 오른팔도); 갓은 머리 위. 누운 몸은 바닥에 등을 대고(공중 규칙은 눕기 · 무릎 ·
+    앉기의 무게만큼 줄어듦), 칼 든 팔은 엉덩이 옆 바닥에 놓이며 일어나기 직전 3틱에 걸쳐 든다; 손에 든 갓 · 갓을 쓰고 벗는 사이 ·
+    등으로 넘기는 사이에는 갓이 머리 · 몸통을 뚫지 않게 밀려나고(팔이 닿는 만큼 손이 따라감), 갓끈은 머리를 지나지 않음; 허리
+    칼집은 늘어뜨린 오른팔을 비켜 돈다; 앉은 동안 띠 꼬리는 돌 윗면 위로; 갓끈은 그려진 구슬 줄(양쪽 줄 · 고리 · 아래 줄)로
+    검사한다; 잔은 주먹 상자 안으로 0.03칸 넘게 들어가지 않는다. 11-06 V1(HR-47): 주먹 · 칼자루 · 코등이가 머리 · 몸통 상자 밖
+    (칼 쥔 자리를 옆 · 앞으로 옮기고 칼날 방향(공격 방향)은 그대로, `gripClear`; 빈 손 · 두손 쥔 오른주먹 · 손에 든 칼집도 함께,
+    `handClearL` · `handClearR`; 발도 중에는 허리 칼집 입구를 앞으로, `scabFwd`): 머리 위로 칼을 든 자세는 머리 옆 · 앞의 높은 자세가
+    되고, 칼끝이 갓 꼭대기에서 솟던 모습이 없어졌다. 방향은 클립 전체에서 한 길로 고른다(머리 한쪽으로 돌던 손이 머리를 지나 반대쪽으로
+    뛰지 않음). 보정(칼 밀기 · 돌리기, 상체 · 머리 보조 회전, 칼집 · 갓 ·
+    띠 바닥 회피, 날아가는 갓 밀기 등)은 두 번째 계산에서 틱당 한계 속도로 부드럽게 계획되고, 한계값에 닿으면 빌드가 멈춘다.
+  - **등장의 바위**: 앉은 자리에서 일어나며 발 위로 0.4칸 앞으로(달 쪽), 이어 오른쪽으로 1.1칸 비켜선 뒤 플레이어 쪽으로 돈다
+    (`seq.py` `SEAT_RISE` · `SEAT_ASIDE`; 비켜서는 1.1칸 동안 발을 네 번 0.55칸씩 옆으로 옮겨 딛는다 — 딛은 발은 제자리, 드는 발은
+    0.08칸 들림): 발이 바위 안에 서지 않고, 걸어갈 때 바위 옆을 지난다. 시작점에 그대로 선 플레이어 앞 약 6.8칸에서 멈춘다.
+  - **숨긴 부위**(모델 `empty`, 크기 0, 클립의 0틱에 한 번만 키): 머리카락 판 `hair_tail_1/2`(플레이어 모델처럼 보이도록; 스킨 등에
+    이미 머리카락이 있음), 옆머리 `lock_r` `lock_l`, 치마 네 폭 `skirt_*`.
+  - **소품은 우리 것(S2a 모양 · S2c 색 그대로, 크기만 몸에 맞춤; 원작 소품을 따라 하지 않음)**: 갓(테 반지름 0.66, 꼭대기 지름 0.50 ×
+    높이 0.30, 8픽셀 머리에 맞음; 윗면은 몸통과 같은 16각형; 테는 정사각형 넷(0 / 22.5 / 45 / −22.5도)을 0.003칸씩 겹쳐 각자 자기 모서리
+    쐐기만 칠한다: 같은 면 겹침 · 반투명 겹침 없음), 칼 전체 1.94칸(날 끝은 손잡이 가운데에서 1.60), 칼집 1.52칸, 갓끈 · 띠 꼬리 · 잔 · 병도
+    몸에 맞게; `item_sword` 는 2.03칸(표시 크기 1.375; 모델 길이는 S2c 와 같아 손 · 땅 · 액자 변환 그대로). 왼손잡이(칼은 왼손, 칼집은
+    오른쪽 허리 · 오른손). 원작 의상 조각은 하나도 쓰지 않고 이름은 모두 역할 이름 · `scarlet` · `hr`.
+  - **얼굴**: `calm` 은 스킨의 얼굴 그대로, `smile` · `closed` 는 작은 겹침 그림 `face_fx`(S2c 그대로).
+  - 모습: 형태 `normal` / `ghost`(모든 부위가 한 장의 빛나는 연보라 유령 텍스처, 밝기 15), 단계 `p1` / `p2`(갓 매듭 · 띠 꼬리 가장자리가
+    빛남), 칼 빛 `off lilac pink violet gold`, 얼굴 `calm smile closed`, 손 `open grip brim`; 갓(쓰고 · 등에 · 손에 · 바닥에 · 없음) · 칼 ·
+    칼집 · 잔 · 병은 클립이 매 틱 다시 붙인다(런타임 부모 없음). 바닥의 갓은 정한 자리(옆 · 다리 옆 · 얼굴 위)에 놓이고, 던져지면 몸을
+    피해 날아간다.
+  - 빌드 검사: 어느 틱에도 바닥 아래 점 없음(보간 중간 틱까지), 틱당 120도 이하, 클립 이벤트 틱에 칼날이 몸 상자 안으로 1 cm 넘게
+    들어가지 않음, 보정값이 한계 안, 큰 휘두름은 움직이는 부위마다 매 틱 키, 디딘 발의 정강이는 보간 중에도 바닥에 붙음, 쓴 갓의
+    테가 보간 중에도 머리 위, 한 번 재생 클립의 시작(앞 클립 자세에서 섞여 들어오는 틱)은 모든 부위의 첫 키가 같은 틱(첫 이벤트,
+    없으면 섞임 길이)에 끝남, 첫 키 뒤의 모든 틱에서 실제로 보이는 값이 풀린 자세와 허용치(TOL × 1.25) 안(자르기 틱과 그 다음
+    틱 제외), 주먹 · 칼자루 · 코등이의 표본이 머리 · 몸통 상자 안으로 0.01칸 이상 들어가는 틱 없음(V1, 섞여 들어오는 틱 · 자르기 틱 제외),
+    그림 0.15 M px 이하(47 872 px: 그린 그림 27장 + 스킨 4 096), 쉬는 자세 요소 6 500 이하(224), 모델 63개(F-I: 슬롯 아이콘 하나 더), 스킨 바이트 ·
+    sha1 확인. 숨은 리그에서 바로 시작하는 `g_dive`(g_vert 의 'gone' 뒤)는 섞일 앞 자세가 없으므로 첫 키가 1틱: 온몸이 t1 에 함께
+    나타난다. 계약 값(`api.HEIGHT` · `HAT_TOP` · `BRIM_D` · 칼 · 칼집 · `item_sword` 길이, 등록부의 클릭 판정 높이)은 빌드가 잰 값과
+    다르면 빌드가 멈춘다. 함수 2 640개(5.72 MB; 키 18 881개 / 키 파일 2 119개).
+- **`item_sword`**(`rlk:mboss/scarlet/item_sword`): 리그의 칼집에 칼을 꽂은 한 덩어리, 리그 그림만 씀(추가 0 px). 바닐라 검처럼 대각선(손잡이
+  왼쪽 아래 · 끝 오른쪽 위)에 바닐라 손 · 1인칭 · gui · 바닥 · 액자 변환. 이벤트의 던진 칼과 아이템 화무십일홍의 모양. 아이템 정의는
+  `display_context` 로 고른다(F-I HR-03): 슬롯 · 도감 · 고르기 화면(gui) · 액자(fixed) · 바닥(ground)에서는 슬롯 아이콘
+  `item_sword_icon`(같은 칼집 칼을 GUI 픽셀로 다시 그림: 슬롯 대각선 20 px, 칼집 2.4 · 손잡이 2.0 GUI px 폭, 코등이 5.2 px 막대, 놋쇠
+  장식 · 붉은 끈, 칼집 정면에 무늬 그림; 리그 그림만, 정면 조명 `gui_light front`, 바닐라 아이템의 액자 · 바닥 변환), 손과 던진 칼
+  (`item_display` none)은 이 모델(슬롯에서는 0.38 GUI px 실선이었음). 코등이 무늬 카드는 코등이 판 위에(전에는 칼집 0.51칸 위에 떠
+  있었음). 그림 `HR/renders/fi_icon.jpg`(16 / 32 / 64 px).
+- **효과 도구**(`tools/build_mboss_hr_fx.py` + `mboss_hr_fx_paint.py` → `boss/scarlet/fx/{card,cardx,look,clear,uninstall}` ·
+  `fx/{e,p,prop,snd,hud,test}/**` 447개, 리소스팩 `mboss/hr_kit/*` 그림 53장 0.242 M px(스프라이트 237 568 = `api.KIT_SPRITES` + 게이트 아이콘
+  4 096) · 글꼴 `rlk:mboss_hr`, 매니페스트 `tools/mboss_hr_fx_manifest.json`): 프리셋 50가지(`api.KIT_PRESETS`) — 검기 초승달 `qi_arc`(네 장면
+  1틱 간격, 바닥에 닿으면 1칸까지 들어 올리고 그다음 줄임; `roll` 20~160도의 비스듬한 베기는 겨눈 방향을 가로지르는 화면 면에 서서 그 안에서
+  기울어짐, F2 HR-12; 입자는 어느 쪽이든 초승달 테두리 · 쐐기 끝에서 터짐, `fx/e/rollv`) · 고리 · 띠(`qi_band`: 겨눈 방향을 가로지르는 세운 띠, 오른쪽 끝이 `pitch` 만큼 올라가고 `sw`(0.1칸; A8.2 25, CS4 E1b 는
+  그녀와 플레이어 거리 + 1칸 — HR-32)만큼 앞으로 쓸고 지나감) · X · 돔 · 세로 초승달 · 부채 · 쐐기 · 리본 · 선(세로 초승달 · 부채 · 선은 겨눈
+  방향을 가로질러 섬: HR-12; 그래서 겨눈 쪽으로 그을 선은 `facing … rotated ~-90 ~` 로 부른다) · 이아이 베기 · 반짝임 · 별 · 노란 예고빛 · 유령 터짐 /
+  꼬리 / 번쩍임 · 잔상(한 장씩, 4장까지, 6틱) · 뒤 순간이동 거품 · 실드 채우기 / 깨짐 · 낙하 충격 · 빛기둥 · 발톱 줄기 · 착지 폭발 · 먼지 고리 ·
+  발차기 번쩍임 · 칼끼리 부딪힘(금빛) · 불꽃 · 번개 장식 · 홍련일섬의 붉은 선(`scarlet_line`: `yaw` · `roll` 은 실행 방향에서 잼, `roll` > 0
+  이면 보는 사람의 오른쪽 끝이 올라감; 낮은 끝이 바닥 0.25칸 위에 오도록 제 길이 방향으로 밀림, HR-44) · 꽃잎 / 잎 / 반딧불 · 경기장 배경(`ambient_p1` / `ambient_p2`: 코어 `core/amb` 가 P1 에 10틱마다,
+  P2 · 쓰러짐 · 연참에 6틱마다 플레이어 자리에서 부름, I1) · 도착 균열(`arrive_rift`, 방 균열 모델) · 이벤트 장면 8가지(`ev_*`). 모든 값은
+  0.1칸 · 도 · 틱, 색 `c` 1 연보라 2 분홍 · 자홍 3 노랑 4 진홍 5 흰색. 모든 프리셋은 실행 방향의 피치를 무시하고 수평(빛기둥은 곧게 섬,
+  배경 꽃잎은 바닥 위; `qi_line` 만 피치를 따르고 sin 표로 바닥 0.32칸 위에서 멈춤 — F2 HR-41 / HR-42). 스위치 `fx/keep_on` / `keep_off`(그
+  사이에 만든 카드는 `fx/clear` 와 죽음 · 부활 정리에 남고 제 수명대로 끝남; 정리 · `fx/uninstall` 은 지움, HR-17) · `fx/follow_on` /
+  `follow_off`(@s = 앞장: 그 사이에 만든 카드는 매 틱 그 x · z 를 따라감 — 노란 예고빛 · 순간이동 거품 · 리본, HR-23). 카드 풀 셋: 효과 96장 · 배경 48장 · 잔상 4장(넘으면 가장 오래된 것부터
+  지움, 건너뛰지 않음; 에이저 `fx/e/world` 가 1틱 예약으로 스스로 돈다). 소품 5가지: `disc`(투사체 카드 그 자체를 꾸밈: 틱당 30도 도는 모습은
+  변형 보간만, 엔티티 회전은 건드리지 않아 날아가는 방향 그대로, `fx/clear` · 에이저가 지우지 않음), `petal_big {look}`(whole / cut / split),
+  `moon_halo {look}`(p1 흰 · 파랑 / p2 붉음 / off / `p1b` · `p2b` = 같은 그림 1.2 배 밝게: 색조가 곱하기라 `p1` · `p2` 가 0xD4D4D4, 밝은 쪽이
+  흰색 — I1), `lotus {look}`(bud / bloom), `seat_rock {look}`(바닐라 응회암 돌 + bottle / bare / set: 술병 · 잔은 돌을 따라다니는 바닐라 아이템,
+  돌 윗면 0.24칸 = 앉은 그녀의 허벅지 아랫면(골반 0.385칸); V2 HR-52: 둘은 틱마다 도는 소품 사슬 `fx/e/anim` 에 들지 않고 10틱마다
+  `fx/e/stay_t` 가 돌이 남았는지 봄 — `bare` 면 바로, 돌이 죽으면 10틱 안에 사라지고, 모듈은 돌을 없애기 전에 `bare` 로 바꿈). 소리 104가지(`api.KIT_SOUND_RECIPES`, 바닐라 소리만, `mboss_lib.sound` 최소 음량 규칙).
+  화면: `hud/line {id}` · `hud/ovl {g,in,hold,out}`(144 × 81, `vBig` = in + hold + out) · `hud/warn {on}` · `hud/skip {s}`(밝기 0–4, `s:5` 로
+  지움) · `hud/clear`. 글리프 `vig` U+EC16(가장자리만 어두운 비네트, 가운데 절반은 투명; SR 의 아이템이 씀). 시험: `/execute as @p at @s
+  rotated ~ 0 run function rlk:boss/scarlet/fx/test/stage` 다음 `fx/test/<프리셋>` · `fx/test/prop/<소품>` · `fx/test/sounds` · `fx/test/hud` ·
+  `fx/test/kinds` · `fx/test/stop`(바닐라 갑옷 거치대가 그녀 대신).
+- **경기장 `hr_field` 「달빛 억새밭」**(`tools/mboss_arena_hr_field.py`, n 5, x 832~928 · z −40~56(청크 49개), 가운데 (880, 201, 8)): 영상의
+  분위기(달빛 은억새 들판, 낮게 뜬 달, 석등, 대나무, 벚꽃)를 우리 식의 비대칭 구도로. 걷는 원 25칸은 꽉 찬 블록만(균사체 70 % · 창백한 이끼
+  12 % · 거친 흙 10 % · 응회암 8 %), 균사체 칸의 25 % 에 짧은 마른 풀 · 12 % 에 긴 마른 풀(부딪히지 않음, `#rlk:dash_pass`; 앉는 돌 둘레 1.8칸은
+  비움), 머리 위에는 y 206 빛 층뿐(그리고 발 높이 y 201 의 보이지 않는 빛 격자: 바닥 빛 12 이상, 어둠에서 6 이상). 방벽 고리 r 26–27(y 201–215).
+  북쪽(300°–60°)은 넓은 연못 r 27–37(물 1칸 · 진흙 바닥 · 진흙 벽돌 둑 · 연잎 · 큰 흘림잎; 연꽃 8송이는 킷 소품), 28° · r 31 의 바위섬에 연화
+  석등(6칸), 건너편 둑(이끼 낀 응회암 바위 · 마른 풀), 322° · r 38 바위 위의 늙은 소나무 하나(14칸, 물 위로 달 쪽으로 기울고, 납작한 구름
+  모양 가지는 353° 에서 끝남). 옆과 남쪽은 낮은 돌담(r 27–28)과 30도마다 작은 석등(황토 개구리불), 도착 자리에 3칸 틈, 대나무 숲 r 30–37,
+  벚나무 여섯 그루(70 · 110 · 140 · 220 · 250 · 290°). 바깥(r 38–46)은 응회암 · 심층암 바위와 어두운 나무 덩어리(달 방향 ±25° 밖에만). 하늘은
+  블록 돔(r 46, 꼭대기 y 250; 안쪽 줄무늬 빛, 시간과 무관): 지평선 연하늘 테라코타 · 몸통 파랑 테라코타 · 꼭대기 점점이 검정, 밑동에 산줄기와
+  안개. 달: 반지름 5 블록 원판, 가운데 `api.MOON_POS`(889, 218, −34), 방위 12° · 고도 22°, 남쪽을 봄, 소나무 왼쪽 하늘에 C 와 시작점에서 통째로
+  보임(앞 1칸에 킷 `moon_halo`). 계단 · 달을 감싸는 큰 덩어리 한 쌍 · 글리프 · 비석 없음.
+  모습 셋: `moon`(P1, 기본) → `crimson`(P2: 마른 풀 → 진홍 뿌리, 균사체 → 진홍 나일리움, 창백한 이끼 → 네더 사마귀 블록, 돔 → 진홍 판자 ·
+  보라 테라코타, 달 → 분홍 · 붉은 바다, 벚꽃 → 네더 사마귀 블록) → `dark`(자영 연참: crimson 에서 돔 · 달 · 석등 불이 검정, 걷는 빛 층 6 · 발
+  격자 9 · 장식 빛 0; `api.DARK_LIGHT` false 면 돔 · 달 · 석등만 = 대체안 B). 덮인 바닥(불투명 블록 · 물 아래)은 모든 모습에서 거친 흙(무작위 틱이
+  없어 균사체 · 나일리움처럼 흙 · 네더랙으로 변하지 않음; F2 HR-43). 모습 바꾸기는 어느 모습에서든 블록 하나까지 같게 되는 절대 채우기
+  4조각(바뀌는 칸 23 280개, 명령 moon 7 052 · crimson 7 221 · dark 6 650, 조각당 2 518 이하), `dark` 는 조각 사이에 빈 조각 둘씩 넣어 3틱
+  간격(T0 − 17 / − 14 / − 11 / − 8; 마지막 조각이 걷는 빛 층 · 발 격자를 다시 밝힘). 짓기는 21조각(조각당 4 962 명령 이하). 일이 도는 동안 온
+  모습 요청은 코어가 `#hrLook` 으로 기다렸다 건다. 다음 싸움 때 `ensure` 가 `moon` 으로 되돌린다. **실제 서버로 잰 틱 시간**(11-05 I1, 26.3
+  서버 콘솔, `/tick query` P99, 플레이어 없이 청크 49개 고정): 짓기 61.4 ms, `dark` 조각 하나씩 3.9 / 8.6 / 4.3 / 2.9 ms(마지막 = 빛 바꾸기),
+  `moon` 조각 3.3 / 4.1 / 2.8 / 6.9 ms, 모습 작업 통째 4.7–23.5 ms(고정 풀기 · 다시 걸기 포함) — 100 ms 를 넘는 틱이 없어 `DARK_LIGHT` 를 켜 둔다.
+  클라이언트 쪽 다시 밝히기(청크 그리기)는 서버에서 잴 수 없다: 게임에서 연참이 시작될 때 끊김이 보이면 `DARK_LIGHT = False`(`api.py` 와 테마의
+  같은 상수 둘 다; `test_arena_hr` 1b 가 같은지 봄)로 바꾸고 다시 만든다.
+  꾸밈 소품 자리 `DECO`(달무리 · 연꽃 8 · 앉는 돌 = `api.SEAT_POS`)는 `api.deco()` 로 코어에 감.
+
+### 시험 명령
+- 균열로: `/function rlk:boss/test/rift_id {id:"scarlet"}` · 바로 싸우기 `/function rlk:boss/test/special {id:"scarlet"}`(타키와 같음). 저절로 생기는
+  균열은 이제 타키와 홍련을 가중치대로(10 : 10) 고른다.
+- 싸우는 중 `/function rlk:boss/test/pattern {id:N}`(목록 `{id:"help"}`): 1 A1 · 2 A2 · 3 A3 · 4 A4 + A5 · 5 A6 · 6 A9 · 7 A10 · 11 R1 · 12 R2 ·
+  13 R3(2페이즈가 아니면 먼저 2페이즈로) · 20 60 % 컷신 → 자영 연참 · 21 자영 연참(실드 5칸) · 22 자영 연참(실드 0칸 → 반격) · 23 자영 연참 실패(그 연참의 판정만) ·
+  24 반격 장면 · 25 쓰러짐 · 26 5 % 이어짐 + 필살 · 27 필살 · 28 필살(실드 0칸 → 엔딩) · 29 필살 실패(즉사; 시험이면 `mboss/test/defeat`) · 30 등장
+  다시(1 · 2페이즈에서만) · 31 어둠 켜기 / 끄기 · 32 붉은 들판 · 33 2페이즈로 · 34 체력 = 5 % + 1 · 35 등장 건너뛰기(100틱, 1 · 2페이즈에서만) · 80 체력 = 다음 바닥 + 1 · 90 / 91 / 92
+  다음 이벤트 무작위 / 화무십일홍 / 월하대작 · 99 멈춤(다시 누르면 풀림). `test/lock {id:1~7, 11~13}` 은 그 패턴만, `kill` · `abort` · `level` ·
+  `stop` 은 다른 보스와 같다.
+- 효과 도구 시험은 위 "모습 · 효과 · 경기장"(`fx/test/*`).
+
+### 파일 · 생성 순서
+- `tools/build_mboss_scarlet.py` → 패키지 `tools/mboss_scarlet/`: `api.py`(D0 계약, 리드만 고침), `core.py`(훅 17개 + `test/help`, `init`, 단계 기계,
+  바닥, 무적, 실드 차례 · 반격 장면의 단계 피해(`#sq_sig`), 쓰러짐, 경기장 모습 요청 `#hrLook`(작업이 없는 첫 틱에 시작) · 장식 소품과 그 모습,
+  배경(`core/amb`), 등장 건너뛰기, 멈춤 · `/reload` · 정리, 테스트), `ai.py`, `shield.py`(실드 · 판정 · 실패 타격), `p1.py`, `s3lib.py`(공용 도우미 ·
+  패턴 작성 도구 `PB`), `reward.py`(이벤트 논리 + 보상 훅), `p_ghost.py`(S4: R1 · R2 · R3 · A8 · A13 + 공용 도우미 `g/**`: 베기 `g/cut/{make,aim,
+  lock}`, 원반 `g/disc/throw {kb}`, 자리 `g/spot/*`), `seq.py`(S2b). 소유 경로마다 `api.Writer` 하나라 자기 경로의 낡은 파일만 지운다(`rig/**`
+  와 효과 도구 `fx/**` 는 건드리지 않음). 지금 모듈 1 144개(S3 284 · S4 399 · `seq/**` 461; 11-05 F-I: 검토 고침 F1 · F2 · F3 를 합친 뒤); 리그 · 효과 도구까지
+  `boss/scarlet/**` 4 231개(11-06 V1: 리그 함수 2 640; V2: 효과 도구 `fx/e/stay_t` 하나 더).
+  단계 파일이 없으면 생성기가 대역으로 돈다(리그 `rig_stub/**`, 장면 `core/sq/**`, 연참 `core/gs/**`, 효과 · 소리 = 바닐라 입자 / 소리, 경기장
+  모습 = 없음): 지금 트리에는 대역이 없다.
+- 생성기 셋 더: `tools/build_scarlet_rig.mjs`(+ `scarlet_{geometry,paint,pose,retarget,clips,skin}.mjs` · `scarlet_cine.mjs`; 리소스팩 쪽,
+  `regen_all.sh` 에 없음: `boss/scarlet/rig/**` 통째로(2 640 함수, 5.72 MB; 키 18 881개 / 키 파일 2 119개) ·
+  `tools/scarlet_rig_manifest.json`(S2d 의 새 항목: `skeleton` 뼈대, `dims` 잰 크기, `support` 클립마다 닿음 · 공중 구간과 손 접촉,
+  `retarget` 배율 · 패치 · 보정 표, `item_sword.toss_offset`) · RP `mboss/scarlet/**`(그림 27장 + `skin.png` · 모델 63개(유령 쌍둥이
+  포함) + `item_sword` · 슬롯 아이콘 `item_sword_icon`, 아틀라스는 `rlk:mboss/scarlet/*` 항목만 다시 넣음); 두 번 빌드하면 바이트까지 같다. `tools/scarlet_retarget.mjs` 는
+  클립 동작을 새 뼈대로 옮기는 순수 계산(빌드가 부름; `node tools/scarlet_retarget.mjs --dump all` 은 모든 틱의 원래 각도와 옮긴 각도를
+  JSON 으로 낸다: 패치 구간 밖은 같아야 함)), `tools/build_mboss_hr_fx.py`(`--skip-rp` 면 데이터팩만: `fx/**` · 매니페스트),
+  경기장 테마 `tools/mboss_arena_hr_field.py`(`build_mboss_arena.py` 가 읽어 `mboss/arena/hr_field/**` 53개 · `job_tick` 한 줄 · `abort` 두 줄을
+  씀). 손으로 고치지 말 것: 위의 출력 전부.
+- 순서(0-4): 리소스팩이 바뀌면 `build_rift.py --resourcepack <팩>` → `node tools/build_scarlet_rig.mjs --resourcepack <팩>` →
+  `build_mboss_hr_fx.py --resourcepack <팩>`(0-4 리소스팩 묶음의 순서: 새 팩에서는 이 순서가 `items.json` 소스 순서와 팩 해시를 정한다, 0-9),
+  그다음 `regen_all.sh`(코어 → 경기장(테마 포함) → … → `build_mboss_hr_fx.py --skip-rp` → `build_mboss_scarlet.py` →
+  `check_mboss_pack.py`). 두 번 돌려도 같다(데이터팩 · 리소스팩 해시).
+- 상태: 점수판 `hr`(`init` 이 만들고 `uninstall` 이 지움), 리그 `hrRig*`, 효과 도구 `hrFx` `hrFxS` `hrFxG` `hrFxH` `hrFxK` `hrFxD` `hrFxL` `hrFxQ` `hrFxY`
+  (첫 호출이 만들고 `fx/uninstall` 이 지움), 버프 `hrMoon`(SR), 저장소 `rlk:hr`(`core.*` `rig.*` `seq.*` `fx.*` `g.*` `ev.*`), 태그 `rlk_hr_*`(정리가
+  모두 지움), 보스바 `rlk:hr_warn`. 부하(모의기, `test_scarlet.py cost`, 리그 · 장면 · 연참 · 경기장 모두 진짜, 효과 도구도 진짜로 돌려
+  카드 · 카드 관리(`fx/e/world`, 바닐라처럼 같은 틱에) · 정리까지 셈; 11-06 V2(HR-50)부터 쓰러짐(타이머로 끝까지 · 5 % 바닥 → lead_down),
+  A8 · A13 실패 갈래(즉사 → 되살아남 → 자세 → lead_stand → A13 다시), 20틱 멈춤과 `/reload`(A8 판정 바로 뒤 · P2 · 쓰러짐; `/reload` 자체의
+  명령도 한 틱으로)까지; 11-06 릴리스 게이트 = S5 · V1 · V2 를 합친 트리): 싸움 5 834틱 한 틱 평균 500명령(그중 효과 도구 68; P1 563 ·
+  P2 521 · A8 553 · A13 574 · A8 실패 531 · A13 실패 489 · 쓰러짐 315 · lead_down 461 · 멈춤 360 · `/reload` 420; 11-05 F-I 의 535 는 이
+  상태들을 빼고 잰 값), 아펩(약 830)보다 적다(목표 600 이하).
+  조각 틱을 뺀 한 틱 최대 2279(CS1 #sq 172; CS1 의 검붉은 잎 40장을 20장씩 두 틱에 나눠 부름: 한 틱에 40장이면 약 3600, 틱당 3000 이하;
+  `/reload` 자체는 최대 2068). 경기장 모습을 바꾸는 작업의 조각 틱(이 측정에서 82틱)은 따로 셌다: 평균 1765 · 최대 3474명령(CS1 #sq 174;
+  조각 한도 5천). 이미 그 모습인 경기장(도장 `built_hr_field`)에는 모습 작업을 다시 걸지 않는다(V2 HR-51: 전에는 A8 판정 뒤 멈췄다
+  돌아오거나 2단계에서 `/reload` 하면 crimson 작업이 한 번 더 돌아 최대 3642 — 싸움에서 가장 무거운 틱이었음). 등장(CS0) 동안 효과 도구의
+  틱마다 도는 소품 사슬은 돌지 않는다(V2 HR-52: 앉는 돌의 술병 · 잔 때문에 639틱 중 602틱, 틱당 약 39명령; 등장 평균 325 → 287).
+- **릴리스 게이트**(11-06 V-I, 합친 트리 `bb80f5c`, README 0-5): 두 번 만들기 같음(데이터팩 트리 · 리소스팩 해시, 다른 보스 · 몹의 출력은
+  바이트 그대로), `check_mboss_pack` 0, 쉬는 자세 표시 요소 224(유령 224) ≤ 6 500, 아이템 아틀라스 12.919 M px(소스 1 458; 홍련 0.29 M:
+  리그 0.048 + 킷 0.242) ≤ 13.2 M, `boss/scarlet/**` 함수 4 231개(모듈 1 144 · 리그 2 640 · 효과 도구 447), 리그 키 18 881개 / 키 파일
+  2 119개, 싸움 한 틱 평균 500명령(위), 스위트 모두 통과(`test_rig --rebuild` 164 · `ev_dry` 78 · `test_special_hr` 98 · `test_scarlet` 192 ·
+  `pat_p1` 387 · `pat_ghost` 205 · `test_reward` 61 · `test_hwamu` 283 · `test_moon` 55 · `test_kit` 13 585 · `test_arena_hr` 94 · `ident_hr` ·
+  `gen_check_hr` 28), `run_all` 은 0-9 의 알려진 실패뿐, `ar/tests` 모두 통과, 검사기 새 종류 0, `rplint` 0, loadcheck `rel_1106` ·
+  도장 뒤 `rel_1106b` 0. 리소스팩 해시: 게이트 때(도장 전) `27d6ae57b4d3dce641b34dfe246a0008715778a4`(두 번 같음), 릴리스 팩(`pack.mcmeta`
+  빌드 11-06 · README 6절 줄) `b3df6a5f0476cb71426fad61e8c5d3878aac4878`(파일 4 769개).
+- 계획 · 계약 문서는 11-06 릴리스 때 다른 보스처럼 `tools/dev/sim/hr/` 로 옮겼다(0-7): `PLAN.md` · `contract.md` · `stage_briefs.md` ·
+  `requests/*.md` · `review/findings.md` · `review/bal/`(README · S5 결과 로그) · `i1/i1_notes.md`(통합 기록). 이 절과 생성기 주석의 "계획 §…"
+  은 그 `PLAN.md` 다. 그때의 기록이라 경로(`HR/…` = 옛 스크래치패드 `hr/…`)와 수치가 낡았을 수 있다: 지금 값은 코드와 이 절이 우선.
+- 시험(`tools/dev/sim/hr/tests/`, 데이터팩 밖의 사본에서 돌림 — `tools/dev/sim/README.md` 1절 · 3-4): `test_special_hr.py`(S1 틀) ·
+  `test_rig.py`(S2a · S2b 리그 · 영상 클립; S2c · S2d: 매니페스트에 S2d 항목이 있으면 **몸**(15개 몸 모델의 두 상자 · 여섯
+  면 UV = 아바타 모델, 팔 너비 = 스킨의 슬림 3픽셀, 크기 1), **뼈대**(머리 끝 2.00 ± 0.03), **계약**(api 값 = 빌드가 잰 값, 등록부 크기 1.0,
+  클릭 판정 높이 여유 0.05-0.12), 접촉 · 공중 · 칼날 매 틱 · 주먹 · 칼자루 · 코등이 매 틱(V1) · 걸음 · 옆걸음의 발(V1) · 든 소품 · 갓 · 섞여 들어오기 · 등장의 바위 · 각도 보존(`--dump`) · 리타깃 표 ·
+  결합; `--rebuild` 면 두 번 빌드해 바이트 비교) · `ev_dry.py`(S2b 시퀀스) · `test_scarlet.py` · `pat_p1.py` · `test_reward.py`(S3) · `pat_ghost.py`(S4) ·
+  `test_kit.py` · `test_arena_hr.py`(S1K) · `test_hwamu.py` · `test_moon.py`(SR) · `ident_hr.py` · `gen_check_hr.py`(I1). 모의기 `hr/tests/lib/`
+  (`hrsim.py` + 챕터 틀 모의기 사본), `hr/s1k/lib/`(효과 도구 · 경기장), `hr/sr/srsim.py`(아이템 · 버프).
+
 ## 13. 시점 (`view/`) — 1인칭 / 숄더뷰 / F5 위쪽 시점
-설정 방의 **시점** 버튼으로 1인칭 → 숄더뷰 → F5 위쪽 시점 순서로 바뀝니다(처음엔 F5 위쪽 시점). 명령: `/function rlk:view/mode {m:1}`(숄더뷰) · `{m:2}`(F5 위쪽 시점) · `/function rlk:view/off`(1인칭).
+설정 방의 **시점** 버튼으로 1인칭 → 숄더뷰 → F5 위쪽 시점 순서로 바뀝니다(처음엔 F5 위쪽 시점). 명령: `/function rlk:view/mode {m:1}`(숄더뷰) · `{m:2}`(F5 위쪽 시점) · `/function rlk:view/off`(1인칭). 번호 목록: `{m:"help"}`.
 
 ### F5 위쪽 시점 (build/p174)
 - 진짜 플레이어를 아주 작게(크기 0.0625) · 투명하게 해서 아바타 머리 위의 받침(투명한 작은 갑옷 거치대 `rlk_vseat`)에 태웁니다. **플레이어가 F5(3인칭, 뒤에서 보기)를 직접 눌러야** 합니다(시점은 명령어로 바꿀 수 없음 — 받침이 생길 때 채팅으로 안내).
 - 카메라는 바닐라 3인칭 카메라라 클라이언트가 직접 돌립니다 → 서버가 카메라를 옮기지 않아 매끄럽고, 벽에 닿으면 바닐라가 당겨 줍니다. 탈것 기준 거리 = 받침의 `camera_distance` 속성.
 - 카메라 거리 · 높이: 설정 방의 카메라 거리(3.5 / 4.5 / 6칸) · 카메라 높이(머리 위 0.5 / 1 / 1.5칸) 버튼, 또는 `/function rlk:view/ride_set {d:4.5,s:1.0}` (d = 거리, s = 받침 크기 ≈ 머리 위 높이). 받침 크기가 1이 아니면 바닐라가 거리에 받침 크기를 곱한다고 보고 속성 = d ÷ s 로 넣습니다.
 - 궁극기 시전 중에는 숄더뷰·F5 카메라 거리를 최대 30% 늘려 이동 잠금으로 인한 확대를 완화합니다. 5틱(0.25초)에 걸쳐 적용·복귀하며 기본 카메라 설정과 이동 제한은 유지합니다. 배율은 `view/burst_camera_scale`, 적용 구간은 `view/burst_camera_tick`에서 조정합니다.
-- 3인칭에는 바닐라 조준선이 없어서, 리소스팩 글꼴(`rlk:hud`, 글자 U+E100)을 제목으로 띄워 화면 정가운데에 조준점을 그립니다(0.5초마다 다시 보냄). 아랫줄 안내(빈 제목 + subtitle)는 빈 제목 대신 조준점을 써서 함께 보이고(`view/ttl_blank`), 큰 제목(방 이름·런 실패) 동안(`vBig`)만 쉽니다.
+- 3인칭에는 바닐라 조준선이 없어서, 리소스팩 글꼴(`rlk:hud`, 글자 U+E100)을 제목으로 띄워 화면 정가운데에 조준점을 그립니다(0.5초마다 다시 보냄). 아이템 선택 공간·인벤토리 상세·도감(`pkMode` 1~)에서도 F5 시점이면 같은 조준점을 띄웁니다(`view/sel_xhair`). 아랫줄 안내(빈 제목 + subtitle)는 빈 제목 대신 조준점을 써서 함께 보이고(`view/ttl_blank`), 큰 제목(방 이름·런 실패) 동안(`vBig`)만 쉽니다. `vBig`(제목 줄을 쓰는 남은 틱)은 `view/tick` 첫머리에서 모든 시점(1인칭 · 어깨 · 지도 · 선택 공간 · 사망 포함)에 틱마다 줄어듭니다(11-05 홍련 F3: 전에는 F5 에서만 줄어 1인칭에서는 첫 방 제목 뒤로 계속 남았음).
 - 웅크리면 바닐라가 탈것에서 내려 버리므로, 웅크린 동안은 받침 자리로 직접 옮기고 떼면 다시 태웁니다. 순간이동으로 내려져도 다음 틱에 다시 태움.
 - 이동 · 조준 · 피격은 숄더뷰와 같은 아바타 시스템(조준은 플레이어 눈 = 받침 위에서 시선 방향).
 - **기본 시점**이고, 설정 방의 시점 버튼은 1인칭 ↔ 3인칭(F5 위쪽 시점)만 오갑니다. 숄더뷰 코드는 남아 있음(`/function rlk:view/mode {m:1}`, 다음 /reload 때 F5 시점으로 돌아옴). 기본 거리 3.5칸 · 머리 위 0.5칸.
@@ -400,7 +2450,7 @@
 - 아이템 선택: 탄 채로는 웅크림 통계가 잡히지 않아 Shift+F 대신 **웅크리기 키를 한 번 누르면** 선택 공간에 들어가고/돌아옵니다(키 설정에서 웅크리기를 다른 키로 바꿔도 됨).
 - 우클릭: 탄 채로 인터랙션 우클릭이 안 들어오는 경우를 대비해, 핫바 0~2번 아이템에 '사용' 속성(consumable, 사실상 끝나지 않음)을 붙이고 사용 중(using_item 발전과제)이면 4틱마다 우클릭으로 처리합니다.
 - 몸 위치에서 실행하는 효과는 `anchored eyes`(실행자 = 작아진 플레이어의 눈 높이 ≈ 0.1) 대신 `positioned ~ ~1.62 ~` 를 씁니다(build/p178 이 일괄 치환: 플레이어 자신의 조준선·UI 인 `at @s … anchored eyes` 와 상점·드롭·선택 공간·도감·로비만 그대로). **새로 만드는 효과도 몸 기준이면 `positioned ~ ~1.62 ~` 로.**
-- **지도 화면**: 던전에서는 왼손에 실제 지도가, **핫바 4번**에는 지도 버튼이 있습니다. 4번 칸을 선택한 뒤 **좌클릭 또는 우클릭**하면 열리고, 지도 화면에서 다시 좌/우클릭하면 닫힙니다. 슬롯 선택만으로는 열리지 않으며 G 메뉴도 열기/닫기를 지원합니다. **전투 중에는 열 수 없습니다.** 지도 화면에서는 위치와 시선을 액자 정면으로 고정하고, 금색 ◆로 던전에 남아 있는 몸의 현재 위치를 표시합니다. 1인칭/F5 모두 지원하며 닫을 때 원래 위치·시선·게임 모드·크기·카메라 속성을 복구합니다. 모험 모드의 별도 화면이라 클릭 입력을 계속 받을 수 있습니다.
+- **지도 화면**: **G 메뉴의 [지도 보기]**로 열고, 지도 화면에서 좌/우클릭하거나 G 메뉴로 닫습니다. 왼손 지도와 핫바 3번 칸 지도 버튼은 없앴습니다(화면 미니맵이 대신하고, 예전 판에서 받은 것은 던전에서 자동으로 치움). 지도 화면의 액자에는 `room/map_frame`이 이번 던전 지도를 직접 넣습니다. **전투 중에는 열 수 없습니다.** 지도 화면에서는 위치와 시선을 액자 정면으로 고정하고, 금색 ◆로 던전에 남아 있는 몸의 현재 위치를 표시합니다. 1인칭/F5 모두 지원하며 닫을 때 원래 위치·시선·게임 모드·크기·카메라 속성을 복구합니다. 모험 모드의 별도 화면이라 클릭 입력을 계속 받을 수 있습니다.
 - **G 키(빠른 동작) 메뉴**: 대화창 `rlk:menu`(`#minecraft:quick_actions`). [지도 보기] · [아이템 선택] 버튼이 `/trigger rlkMenu` 로 동작. 대화창은 데이터팩 레지스트리라 **서버를 다시 켜야** 반영됩니다(/reload 로는 안 됨).
 
 ## 13-1. 숄더뷰 시점
@@ -412,7 +2462,7 @@
 - 달리기(달리기 키를 누른 채 이동) 중에는 1인칭처럼 시야가 넓어집니다(진짜 플레이어에게 이동 속도 +30% 수정자를 붙여서 클라이언트의 시야 효과를 냄).
 - 드롭 아이템의 [회수]/[판매]: 숄더뷰에서는 조준해서 글씨가 커진 버튼을 좌클릭합니다(아바타에서 8칸 안의 아이템만).
 - 바닐라 3인칭(F5): 키 자체는 막을 수 없어서, 숄더뷰 동안 3인칭 카메라 거리 속성(`camera_distance`)을 0으로 둡니다(눌러도 카메라가 뒤로 빠지지 않음).
-- 이동: WASD·점프·달리기 입력을 읽어 아바타를 움직입니다(방향 기준 = 카메라가 보는 쪽). 걷는 속도 `#viewWalk`, 달리기 배율 `#viewSprint` (load 의 조절 지점)
+- 이동: WASD·점프·달리기 입력을 읽어 아바타를 움직입니다(방향 기준 = 카메라가 보는 쪽). 평타를 휘두르는 동안(`swHold`)은 절반 속도로 걷고(`#swSlow`, 달리기 배율 없음) 뛰지 않으며, 타와 타 사이에 뛰면 다음 평타는 1타부터입니다(3절 '공격 중 이동 · 점프 규칙'). 걷는 속도 `#viewWalk`, 달리기 배율 `#viewSprint` (load 의 조절 지점)
 - 조준: 조준선이 가리키는 곳(벽·바닥·몹)을 찾아 아바타가 그곳을 바라봅니다. 공격·스킬은 아바타 눈에서 그 방향으로 나갑니다.
 - 피격: 몹은 아바타를 노리고, 아바타가 맞으면 플레이어의 체력이 깎입니다. 진짜 플레이어(카메라)가 받은 피해는 무시합니다.
 - 공격 모션: 기본 공격·스킬·폭발 때 아바타가 `/swing` 으로 팔을 휘두릅니다. 아바타 손의 무기는 핫바 1번 칸의 무기입니다.
@@ -456,7 +2506,7 @@
 
 ### 아를레키노·스커크 전투 모션 (영상 10종 기준)
 
-- 아를레키노: 물리·불 부여 6타 콤보, 사라졌다가 나타나 베는 스킬, 붉은 균열을 펼치는 원소폭발. 스커크: 물리·얼음 부여 5타 콤보, 좌클릭 강화 진입, 우클릭 이동 시작·반복·종료, 원소폭발 2종. 총 30개 클립입니다.
+- 아를레키노: 물리·불 부여 6타 콤보, 사라졌다가 나타나 베는 스킬, 붉은 균열을 펼치는 원소폭발. 스커크: 물리·얼음 부여 5타 콤보, 좌클릭 강화 진입, 우클릭 이동 시작·반복·종료, 원소폭발 2종. 총 30개 전투 클립이며, 두 캐릭터의 대쉬·집어넣기 4개와 나비아 11개를 더해 리그 클립은 모두 45개입니다.
 - 원소폭발의 역할은 기존 데이터팩 설명을 따릅니다. **극악기·멸 = 큰 균열을 펼치는 연속 공격**, **극악기·진 = 짧은 공중제비와 강화 동작**입니다. 첨부 영상의 파일명과 역할이 반대인 두 폭발 영상은 이에 맞춰 연결했습니다.
 - 숄더뷰에서 기존 스킨을 입힌 머리·몸통·상하완·허벅지·종아리·무기의 11개 디스플레이를 움직입니다. 모션 중 아바타 본체와 기존 손 무기를 숨기며, 종료하면 복원합니다. 1인칭에서는 파티클·효과음·타격 시점을 적용하며 자기 몸 디스플레이는 생성하지 않습니다.
 - 일반 공격의 피해 시점과 연속 입력 간격은 모션 프레임을 따르고 공격 속도에 맞춰 재생됩니다. 기존 전방 판정, 치명타, 원소 부착, 아이템·각인 효과를 유지합니다. 폭발은 시전 시작 방향으로 표시와 피해 방향을 함께 고정합니다.
@@ -467,19 +2517,115 @@
 - 아를레키노는 낮은 검풍과 창날 절삭음을 사용하고 불부여 시 낮은 화염과 짧은 잔향을 더합니다. 4타의 두 번 베기는 강약을 구분하며 스킬은 진입 베기와 지연 분출, 궁은 축적 후 한 번의 큰 화염 폭발로 구성합니다.
 - 스커크는 날카로운 검풍에 얼음 부여 시 짧고 낮은 바람을 더합니다. 유리·자수정 파열음은 사용하지 않습니다. 진은 짧게 응축했다 퍼지는 강화음, 멸은 짧은 연속 절단음과 마지막 큰 균열음으로 구분합니다.
 - 아를레키노와 스커크의 둔탁한 접촉음은 `combat/confirmed_hit_sound`에서 실제 체력 피해가 발생했을 때만 재생합니다. 방패로 완전히 막힌 공격·헛손질·반응 지속 피해에는 재생하지 않고, 추가 참격·스킬·궁의 직접 명중에도 적용합니다. 여러 몹을 동시에 때려도 한 틱에 한 번만 재생하며 숄더 카메라 거리와 무관하게 들립니다. 치명타는 높은 벨·하프 대신 낮은 충격을 더합니다.
-- 두 캐릭터의 29개 동작은 마인크래프트 기본 소리만 사용합니다. 검풍·마법 연출음은 애니메이션 시계, 명중음은 실제 피해 처리에 연결됩니다. 이동 반복 동작은 무음입니다.
-- 효과음 원본은 `tools/player_motion/audio_arle.py`, `audio_skirk.py`입니다. `python tools/build_player_audio.py`로 다시 생성할 수 있으며 `compiled_audio.json`에 프레임별 구성이 기록됩니다. 리소스팩이나 녹음 파일을 추가할 필요가 없습니다.
+- 아를레키노·스커크·나비아의 42개 동작(아를레키노 15 · 스커크 16 · 나비아 11)은 마인크래프트 기본 소리만 사용합니다. 검풍·마법 연출음은 애니메이션 시계, 명중음은 실제 피해 처리에 연결됩니다. 이동 반복 동작은 무음입니다.
+- 효과음 원본은 `tools/player_motion/audio_arle.py`, `audio_skirk.py`, `audio_navia.py`(+ 클립별 `navia_audio/<클립>.py`)입니다. `python tools/build_player_audio.py`로 다시 생성할 수 있으며 `compiled_audio.json`에 프레임별 구성이 기록됩니다. 리소스팩이나 녹음 파일을 추가할 필요가 없습니다.
 - 사망·지도·선택 화면·캐릭터 변경·리로드 시 진행 중인 모션과 미발동 타격을 정리합니다. 강화 진입을 취소하면 아직 발동하지 않은 에너지 획득도 취소됩니다.
-- 자세 원본: `tools/player_motion/arle.json`, `skirk.json`. 생성: `node tools/build_player_rig.mjs --datapack <데이터팩 폴더> --resourcepack <압축을 푼 리소스팩 폴더>`. 게임플레이 연결과 효과 함수는 `data/rlk/function/char/motion/`에 있습니다. 재생성 후 리소스팩은 별도로 ZIP으로 묶습니다.
+- 자세 원본: `tools/player_motion/arle.json`, `skirk.json`, `navia.json`(+ 클립 조각 `navia/*.json`). 생성: `node tools/build_player_rig.mjs --datapack <데이터팩 폴더> --resourcepack <압축을 푼 리소스팩 폴더>`. 게임플레이 연결과 효과 함수는 `data/rlk/function/char/motion/`에 있습니다. 재생성 후 리소스팩은 별도로 ZIP으로 묶습니다.
 - 적용: 데이터팩 `/reload`, 리소스팩 `F3+T`. 전체 몸 동작은 `/function rlk:view/on`으로 숄더뷰를 켜서 볼 수 있습니다.
 
 ### 평상시 이동과 콤보 복귀
 
-- 아를레키노와 스커크는 숄더뷰에서 평상시에도 같은 11개 디스플레이를 사용합니다. 캐릭터마다 대기 호흡, 걷기, 달리기, 공중 자세의 4개 반복 모션이 있습니다. 자세 원본은 `tools/player_motion/locomotion.json`입니다.
+- 아를레키노·스커크·나비아는 숄더뷰에서 평상시에도 같은 11개 디스플레이를 사용합니다. 캐릭터마다 대기 호흡, 걷기, 달리기, 공중 자세의 4개 반복 모션이 무기를 쥔 상태와 등에 멘 상태(`_s`)로 한 벌씩 있습니다. 자세 원본은 `tools/player_motion/locomotion.json`입니다.
 - 이동 모션은 아바타의 실제 이동 거리와 이동 입력을 함께 읽습니다. 벽에 막히면 제자리 걷기를 멈추며, 이동 속도에 맞춰 보폭 주기를 조절합니다. 몸 방향은 기존 이동 방향 전환을 따릅니다.
 - 공격 종료와 콤보 중단 때 디스플레이를 삭제하지 않습니다. 마지막 자세에서 대기 자세까지 6틱(0.3초), 이동 자세까지 4틱(0.2초) 동안 회전·위치를 보간합니다. 이 복귀 동작 중에도 다음 공격이나 대시를 바로 시작할 수 있으며, 공격 쿨다운과 타격 시점은 유지됩니다.
 - 대기·걷기·달리기 전환, 점프·착지에도 같은 보간을 적용합니다. 다음 공격을 입력하면 현재 표시 중인 자세에서 공격 첫 자세로 이어집니다. 사망·지도·선택 화면·시점 전환에서는 즉시 정리합니다.
 - 이동 런타임은 `tools/build_player_locomotion.mjs`에 있으며 기존 `build_player_rig.mjs` 명령에서 함께 생성됩니다. `pmActive`는 전투 동작, `pmVisible`은 평상시를 포함한 디스플레이 표시 상태입니다.
+
+### 무기 집어넣기·꺼내기
+
+- 아를레키노·스커크·나비아는 평소 무기를 등에 멥니다(참고 사진 5·6·7: 아를레키노는 낫 머리가 오른쪽 어깨 위, 자루 끝이 왼발 옆 / 스커크는 칼자루가 오른쪽 허리, 칼날이 허리 뒤를 가로질러 왼쪽 아래 / 나비아는 할버드 손잡이 끝이 오른쪽 어깨 위, 날 머리가 왼발 옆). 숄더뷰에 처음 나타날 때도 등에 멘 상태입니다.
+- 일반 공격·스킬·원소폭발을 시작하면 그 틱에 바로 손에 쥡니다. 등에서 손으로 날아오는 보간 없이 즉시 옮겨지며 손에 작은 금색 반짝임이 생깁니다. 집어넣는 동작 도중(무기가 사라졌거나 공중에 떠 있을 때 포함)에 공격해도 같은 반짝임과 함께 손에 쥡니다. 아를레키노 스킬(사라졌다가 나타나 베기)은 반짝임 없이 꺼냅니다.
+- 무기를 쓰는 마지막 동작이 끝나고 **5초(100틱)** 가 지나면 다시 넣습니다. 동작이 재생되는 동안에는 시간이 흐르지 않으며, 공격을 이어 가면 계속 손에 쥔 상태입니다.
+  - 제자리에 서 있으면 캐릭터의 집어넣기 동작(`clips.sheathe`)을 재생합니다. 동작 도중 공격하면 바로 다시 꺼내고, 움직이면 빠른 수납으로 마칩니다.
+  - 집어넣기 동작이 없는 캐릭터이거나 걷기·달리기·공중·1인칭일 때는 빠른 수납입니다. 무기가 있던 자리(달리는 중의 손, 스커크가 띄운 칼 등)에서 금색 반짝임과 함께 사라졌다가 약 0.3초 뒤 등에서 다시 나타납니다. 아를레키노의 낫은 날이 머리를 통과하지 않도록 가는 실루엣으로 길이가 먼저 자란 뒤 한 번에 날이 펼쳐지며, 집어넣기 동작의 끝도 같은 방식입니다.
+  - 1인칭에서는 상태만 바뀌며 손에 든 아이템은 그대로입니다.
+- 대쉬는 무기를 등에 멘 채 재생합니다(손에 쥐고 있었다면 빠른 수납 후). 아를레키노 원소폭발도 낫을 등에 멘 채 맨손으로 시전합니다. 스커크의 극악기·멸은 기존처럼 동작 안에서 칼을 숨겼다가 다시 쥡니다. 스커크 일곱빛 섬광 중에도 5초 규칙은 같으며 등에는 결정검이, 아를레키노 가면 중에는 붉은 낫이 걸립니다.
+- 사망·지도·선택 화면·시점 전환·캐릭터 변경·리로드 뒤에는 등에 멘 상태로 돌아갑니다.
+- 등에 멘 상태의 이동 자세(`idle_s` / `walk_s` / `run_s` / `air_s`)는 맨손입니다. 오른팔이 왼팔과 대칭으로 엇갈려 흔들리고, 등의 무기와 겹치지 않도록 스커크의 팔 흔들림(칼자루·칼끝 쪽)과 아를레키노의 왼다리 뒤차기(자루 끝 쪽)를 조금 줄였습니다.
+- 데이터 필드:
+  - `tools/player_motion/<캐릭터>.json`의 `sheath`: 등 장착 위치. `offset`(목 기준 몸통 좌표, 블록), `euler`(몸통 기준 XYZ 각도), `scale`, `delay`(꺼낸 뒤 넣기까지 틱, 기본값은 `#pmShDelay tmp` 100), 빠른 수납 때 등에서 다시 나타나는 단계 `grow`(틱마다 등 장착 크기에 곱할 `[x,y,z]`, 또는 보간 없이 바로 바꾸는 `{"scale":[x,y,z],"snap":true}`; 기본값 `[[0.4,0.4,0.4],[0.75,0.75,0.75]]`), 무기 모델별 덮어쓰기 `weapons:{모델:{offset,euler,scale}}`. 덮어쓰기는 일반 동작이 이름으로 지정해 등에 거는 모델에 적용됩니다. 평상시 이동 자세·빠른 수납·등에 멘 채 재생하는 동작은 `locoWeapons`의 무기(창/낫, 칼/결정검)를 실행 중에 골라 기본 무기의 위치에 걸므로, 이 무기들에 서로 다른 위치를 주면 생성기가 오류를 냅니다.
+  - 클립의 `weapon_state`: `"drawn"`(기본, 시작하면 꺼냄) / `"sheathed"`(등에 멘 채 재생: 대쉬, 아를레키노 원소폭발) / `"sheathe"`(집어넣기 동작: 손에 쥔 채 시작해 `weapon_attach:"back"`으로 끝나야 함, 아바타 방향 고정). `draw_fx:false`는 꺼낼 때 반짝임을 생략합니다.
+  - 프레임의 `weapon_attach`: `"hand"`(오른손, 기존) / `"back"`(등, `sheath` 위치; `weapon`·`weapon_shift`는 무시, `weapon_scale`은 적용) / `"world"`(손을 떠난 무기: 클립 기준 발밑 원점과 몸 방향에서 `weapon_shift` 위치, `weapon` 각도. `shift`·`root`·몸통 회전의 영향을 받지 않음. 이 값을 한 프레임이라도 쓰는 클립은 시작 방향으로 고정되어 카메라를 돌려도 날아간 무기·효과·타격이 따라 돌지 않음. 클립의 `"locked_yaw": true`로도 고정 가능). `hidden`처럼 다음 프레임까지 유지됩니다. 값이 바뀌는 틱에는 무기가 보간 없이 즉시 옮겨지고, 동작 중 `"back"`이 되면 넣은 상태, `"hand"`가 되면 꺼낸 상태가 됩니다. 위치가 다른 두 키 사이의 틱에서는 몸만 보간하고 무기 값(`weapon`·`weapon_shift`·`weapon_scale`)은 앞 키를 유지합니다.
+  - 프레임의 `weapon_snap:true`: 그 틱에만 무기를 보간 없이 바로 옮깁니다(유지되지 않음). 아를레키노 집어넣기 54틱에서 날이 한 번에 펼쳐질 때 씁니다.
+  - `tools/player_motion/locomotion.json`의 `<동작>_s`: 등에 멘 상태의 이동 자세. 없으면 무기를 쥔 자세를 그대로 쓰고 무기만 등에 겁니다.
+  - `tools/build_player_rig.mjs`의 `characters`: `id`, `skin`, `weapon`, `weaponScale`(클립·이동·등·손을 떠난 무기의 모든 `weapon_scale`에 곱하는 캐릭터별 무기 크기), `scytheLoco`, `glow`(밝게 보이는 무기 모델), `locoWeapons`(평상시와 등에 보일 무기와 그 조건). 런타임의 캐릭터별 분기(`motion/tick`, `loco/context`, `loco/weapon`, `sheath/*`)는 모두 이 표에서 생성되므로 새 캐릭터는 이 항목과 json 데이터만 추가하면 됩니다.
+- 런타임: `data/rlk/function/char/motion/sheath/`(생성 파일). 점수 `pmSheath`(0 꺼냄 · 1 넣음 · 2 넣는 중), `pmShT`(남은 틱), `pmLocS`(이동 자세가 시작된 상태), `pmShFx`(빠른 수납 연출), `pmWAt`(표시 중인 무기 위치 0 손 · 1 등 · 2 손을 떠남). 집어넣기 동작의 이벤트·효과 파일 자리는 `events/<캐릭터>/sheathe`, `<캐릭터>_fx/sheathe`입니다.
+- 생성: `node tools/build_player_rig.mjs --datapack <데이터팩 폴더> --resourcepack <압축을 푼 리소스팩 폴더>`, 이어서 `python tools/build_player_audio.py`. 적용은 데이터팩 `/reload`, 리소스팩 `F3+T`.
+
+### 나비아 전투 모션 (영상 기준 동작 · 효과 · 소리)
+
+- 나비아(캐릭터 6, 바위 · 양손검)도 숄더뷰에서 11개 디스플레이 리그로 움직입니다. 조작은 그대로입니다: 좌클릭 4타 평타, 스킬 아이템 좌클릭 = 바로 발사, 우클릭을 누르고 있으면 조준 후 떼면 발사, 원소폭발, 대쉬. 11개 클립(`physical_1`~`physical_4`, `skill`, `skill_aim_in`, `skill_aim`(반복), `skill_fire`, `burst`, `dash`, `sheathe`)은 모두 참고 영상을 기준으로 만든 최종 동작입니다.
+- 무기: 평타 1~3타와 평상시는 할버드(미늘창, `navia_halberd`, 나비아 무기 크기 ×1.25), 4타·스킬·원소폭발은 우산(`navia_parasol` 접힘 / `navia_parasol_open` 펼침)으로 프레임마다 바꿔 듭니다.
+- **무기는 평소 등에 멥니다**(참고 사진 7): 손잡이 끝이 오른쪽 어깨 위(머리 바깥), 날 머리가 왼발 옆, 수직에서 약 28도 기울어 큰 초승달 날이 바깥(왼쪽)을 향합니다. 자루는 등 표면에서 약 0.14~0.17칸 뒤에 붙어 있고(전에는 0.24~0.27칸 떠 있었음), 더 붙이면 달리기·걷기 다리가 왼발 옆 날 머리를 차고 대쉬 숙임에서 자루 끝이 머리에 닿아 이 정도로 둡니다. 크기는 0.88배입니다(`tools/player_motion/navia.json`의 `sheath`).
+  - 평타·스킬·원소폭발을 시작하면 그 틱에 바로 손에 쥡니다(등에서 날아오는 보간 없음, 손에 금빛 반짝임). 손에 든 무기와 모델이 다른 동작(할버드 → 우산, 4타 우산 → 1타 할버드)도 시작 틱에 바로 바뀌어 손에 붙고 금빛 반짝임이 납니다(한 모델이 다른 모델 자리에서 미끄러져 오지 않음). 동작 도중 모델이 바뀌는 틱(우산 펼침·접힘)도 같은 방식으로 바로 바뀝니다. 대쉬는 등에 멘 채 맨손으로 합니다.
+  - 3타·4타·스킬(두 가지)·원소폭발은 끝에 할버드가 등에서 금빛 실루엣으로 다시 자라나 멘 상태로 끝납니다.
+  - 1·2타가 마무리 동작까지 끝난 뒤(또는 움직여서 끊은 뒤) 5초(100틱)가 지나면 제자리에서는 집어넣기 동작, 걷기·달리기·공중·1인칭에서는 빠른 수납입니다.
+- 평상시 이동: 꺼낸 상태는 오른손으로 할버드를 앞 위로 비스듬히 세워 들어 양 끝이 바닥에 닿지 않고, 넣은 상태(`_s`)는 맨손으로 곧게 서서 가볍게 걷고 달립니다. 다리 뒤차기는 등의 할버드에 닿지 않게 줄였습니다.
+
+#### 동작
+
+- **박자(원신 박자의 1.3배)**: 평타는 원신의 박자를 1.3배 빠르게 재생합니다(재생 속도 130%: 공격 속도 100%에서 게임 1틱에 클립 1.3틱. 이 절의 동작 설명에 나오는 틱은 클립 틱이고, 게임틱은 1.3으로 나눈 값입니다). 대검답게 휘두르기 전에 잠깐 버티고, 빠르게 내려친 뒤 절반 속도로 따라 넘기고, 끝 자세에서 멈칫했다가 천천히 대기 자세로 돌아옵니다. 다음 타를 누르지 않으면 이 마무리 동작이 끝까지 이어집니다(공격 속도 100%: 1타 약 2.1초, 2타 약 2.3초, 3타 약 1.5초, 4타 약 2.4초). 다음 타는 원신처럼 일찍 이어집니다(클립 1·2타 14틱, 3타 19틱, 4타 착지하는 28틱 = 공격 속도 100%에서 11 / 11 / 15 / 22게임틱). 그때까지는 휘두르는 중이라 절반 속도로만 걷고(숄더뷰 · F5, 1인칭은 제 속도) 뛸 수 없습니다(3절의 '공격 중 이동 · 점프 규칙'). 마무리 동작 중 어느 때 눌러도 콤보가 이어지고(다음 순서의 타가 나감), 다음 타를 낼 수 있는 틱부터 움직이거나 뛰면 마무리가 바로 끝나 이동 자세로 넘어갑니다(1·2타는 꺼낸 채, 3·4타는 할버드를 등에 멘 채). 뛰어서 끊었다면 다음 평타는 1타부터입니다.
+- 1타(`physical_1`): 오른쪽으로 몸을 틀며 할버드를 오른쪽 허리 앞에서 쥐고(왼손이 그 앞으로 뻗음) 날을 오른쪽 옆구리 바깥으로 뒤를 향해 낮게 겨눈 뒤(창대가 몸을 뚫지 않음), 뒤쪽 아래에서 오른쪽 옆구리를 타고 올라가 머리 높이로 앞을 가르는 큰 원형 베기입니다(타격 9틱). 손은 얼굴 앞·머리 오른쪽 위로 지나 모자를 뚫지 않고, 왼쪽 위로 넘겨 15틱에 할버드 머리로 바닥을 찍고 28틱까지 그대로 버틴 뒤, 천천히 몸을 돌려 할버드를 오른쪽으로 되가져와 55틱에 대기 자세가 됩니다.
+- 2타(`physical_2`): 처음 0~2틱은 할버드를 오른쪽 등 뒤로 비스듬히 든 자세이고 3틱에 등 뒤로 낮게 내려 재장전합니다. 다음 타는 지금 보이는 자세에서 1틱 보간으로 넘어가는데(디스플레이마다 가장 짧은 회전), 1타의 바닥 찍기·버티기·천천히 돌아서기 중 어느 틱에서 눌러도, 이동 자세에서 눌러도 할버드가 바닥을 뚫지 않고 몸 오른쪽으로 돌아 들어가도록 이 첫 틱들의 무기 방향을 골랐습니다(공격 속도 100% 미만은 0틱, 100~199%는 1틱, 200%는 2틱이 첫 화면). 깊이 웅크렸다가 무릎~허리 높이 왼쪽 앞으로 사선 올려베기를 합니다(타격 7틱). 앞쪽 바닥에서 금빛 결정 가시가 솟고, 할버드를 머리 오른쪽 위로 세운 채(손이 모자 바깥) 한 바퀴 돌며 가볍게 뛰어오른 뒤 14틱에 낮게 착지해 29틱까지 버티고, 천천히 앞으로 돌아서 60틱에 대기 자세가 됩니다.
+- 3타(`physical_3`): 미늘창 끝을 바닥에 긁으며 끌고 들어가 오른쪽으로 크게 들어 올린 뒤, 창끝을 바닥에 꽂아 세우고 무릎을 접어 걷어찹니다. 걷어찬 미늘창은 약 2.5블록 앞에서 세로로 회전하며 금빛 고리와 초승달 궤적을 그리고 3회 타격(14/16/18틱, 걷어차기는 11틱)한 뒤 금빛으로 흩어지며, 나비아는 그 사이 왼발로 한 바퀴 돌아 23틱에 두 팔을 벌린 마무리 자세로 멈추고, 30틱까지 버틴 뒤 36틱까지 천천히 대기 자세로 돌아옵니다. 26틱부터 미늘창이 등 뒤에서 다시 자라나 38틱에 무기를 집어넣은 대기 자세로 끝납니다.
+- 4타(`physical_4`, 62틱): 접힌 우산을 오른쪽 허리에서 꺼내 오른쪽 어깨 위로 눕혀 장전하고(우산대가 머리 오른쪽 바깥으로 지나감), 앞에서 세웠다가 왼쪽 어깨 위로 젖힌 뒤 소총처럼 겨눠 쏩니다(12틱 명중). 과녁에 금빛 별 폭발과 고리가 생깁니다. 이어서 14~15틱에 금빛 결정 분출과 거대한 초승달 궤적 속에서 뒤로 공중제비를 돌아 18~19틱에 정점(약 1.4칸)에 이르고, 접힌 우산을 머리 오른쪽 위로 곧게 든 뒤(손은 모자 바깥) 21틱에 같은 방향 그대로 우산을 펼쳐 금빛 꽃잎 사이로 7틱 동안 천천히 내려와(틱당 최대 0.22칸) 28틱에 왼발로 착지합니다. 공중제비는 리그의 틱당 회전 한계(85도) 때문에 원신(약 3.3틱)보다 긴 6틱이라 우산은 21틱에 펼쳐지고, 재생 속도 130%에서는 16게임틱입니다(연타 중에도 다음 1타까지 6게임틱 보임). 공중제비는 제자리에서 위로만 솟고 숄더뷰 카메라 쪽(뒤)으로 다가오지 않으며, 펼친 우산은 1.25배(전에는 1.7배)라 화면 위쪽을 가리지 않습니다. 착지하면서 우산을 든 오른팔은 얼굴 앞을 가로지르지 않고 오른쪽 바깥으로 내려옵니다. 오른발을 뒤로 차올리고 우산을 돌리며 35틱까지 펼친 채 두었다가(펼친 시간 15틱) 36틱에 접고, 43틱에 금빛으로 흩어지면 할버드가 등에서 다시 생겨나(50틱에 다 자람) 62틱에 무기를 멘 대기 자세로 끝납니다. 다음 공격은 착지하는 28틱부터 가능해 공중에서 끊기지 않습니다(공격 속도 100%에서 22게임틱. 착지 자세는 그 한 틱 전에 보임).
+- 스킬 바로 발사(`skill`, 68틱): 우산을 꺼내 앞으로 휘두르고 허리에서 장전한 뒤 가슴 앞에서 펼쳐 7틱에 쏘고, 반동으로 무릎을 꿇은 채 50틱까지 버티다 일어나 우산을 접어(58틱) 세워 두면 금빛으로 사라지고 63틱에 할버드가 등에 다시 생깁니다.
+- 스킬 길게 누르기(`skill_aim_in` → `skill_aim` 반복 → `skill_fire`): 오른쪽으로 돌며 우산이 나타나(4틱) 낮게 한 바퀴·머리 오른쪽 앞 위로 한 바퀴(우산과 팔이 머리를 뚫지 않음) 돈 뒤 낮은 사격 자세로 조준을 유지하고, 떼면 우산이 펼쳐지며 3틱에 발사해 방패처럼 웅크린 채 45틱까지 버티다 일어나 57틱에 우산을 접고, 접은 우산이 손에서 사라지면 64틱에 할버드가 등에 돌아옵니다(`skill_fire`, 70틱). 발사 순간 우산 앞에서 금빛 결정 가시 장미가 퍼집니다(시선 높낮이를 따름).
+  - 조준 진입 동작(16틱) 중에 일찍 떼면 조준 자세에 닿은 뒤(16틱) 발사합니다. 돌던 몸이 발사 자세로 2틱 만에 확 꺾이지 않게 하기 위해서이며, 짧게 쏘려면 스킬 아이템 좌클릭(바로 발사)을 씁니다.
+- 원소폭발(`burst`): 오른손에 펼친 우산이 나타나 오른쪽 옆으로 크게 펼쳐지고, 한 바퀴 돌려 위로 휘두른 뒤 오른쪽 어깨에 걸칩니다(왼손은 허리). 그대로 서서 34틱에 포격이 터지고 살짝 반동이 옵니다(몸은 돌지 않음). 82틱까지 우산을 어깨에 걸친 채 서 있다가 어깨에서 내려 접고(92틱) 지팡이처럼 바닥을 한 번 짚은 뒤(94틱) 금빛 입자로 흩어지며, 101틱부터 할버드가 금빛 실루엣과 함께 등에 다시 생겨 108틱에 넣은 상태로 끝납니다. 잠금이 풀린 45틱부터 움직이거나 뛰면 바로 빠른 수납으로 끝납니다.
+- 대쉬(`dash`, 12틱): 오른발을 내딛으며 상체를 약 50도 숙이고, 달리기를 시작하듯 왼팔은 팔꿈치를 굽혀 가슴 높이 앞으로, 오른팔은 뒤 아래로 흔듭니다(팔을 머리 위로 들거나 권투 자세를 하지 않음). 미늘창은 등에 멘 채이고, 허리 뒤 금빛 섬광과 금장미, 옷자락에서 이어지는 빛 리본, 꽃잎·별빛이 따라옵니다.
+- 무기 집어넣기(`sheathe`, 66틱): 미늘창을 오른 어깨에 올렸다 세워 머리 오른쪽에서 앞으로 한 바퀴 돌리고, 손바닥 위로 넘겨 높이 쥔 뒤 창대를 손 안으로 미끄러뜨려 왼발 앞에 창끝을 꽂습니다(창끝은 바닥에 닿기만 함). 42틱에 금빛으로 녹아 사라지고, 48틱에 등 뒤 빛점에서 실루엣이 아래로 자라나 66틱에 등에 멘 대기 자세로 끝납니다. 움직이면 빠른 수납으로 끝나고, 도중에 공격하면 바로 다시 꺼냅니다.
+
+#### 방향 고정 (3타 · 스킬 바로 발사)
+
+- 손을 떠난 무기(`weapon_attach:"world"`)를 한 프레임이라도 쓰는 클립은 시작할 때 바라본 방향으로 몸이 고정됩니다(원소폭발·대쉬·집어넣기와 같은 방식, `"locked_yaw": true`로 다른 클립도 지정 가능). 3타의 걷어찬 미늘창, 스킬 바로 발사 끝에 세워 두는 우산, 스커크 집어넣기의 떠 있는 칼이 여기에 해당합니다. **카메라를 돌려도 날아간 무기·이펙트·타격이 따라 돌지 않습니다.**
+- 3타의 세 번 타격(14/16/18틱)의 전방 판정과 효과·카드는 이 고정 방향을 기준으로 나갑니다.
+- 스킬 바로 발사의 고정 방향은 누른 순간 아바타가 조준점(조준선이 가리키는 곳)을 바라본 방향입니다(클립 `"basis":"body"`). 장미탄·피해·총구 효과는 아바타 눈 높이에서 이 방향과 아바타의 높낮이로 나가므로, 카메라가 몸에서 옆으로 0.9칸 떨어져 있어도 탄이 조준선과 나란히 비껴가지 않고 조준선이 가리킨 곳으로 모입니다. 7틱 사이에 카메라를 돌려도 몸 옆으로 쏘는 일은 없습니다. 조준 후 발사도 아바타(뗄 때부터 발사까지 조준점을 계속 봄)가 보는 방향으로 쏘고, 1인칭은 블록 우산총처럼 시선 방향입니다(`char/navia/fire_dir`).
+
+#### 효과와 소리
+
+- 효과: 금빛 바위 원소 색(`#F6D57A` · `#E9B949`, 가운데 `#FFF3C4`)의 입자를 클립 틱마다 그리고(`char/motion/navia_fx/<클립>/tNNN`, 할버드·우산 끝을 따라가는 궤적 포함), 입자로는 모양이 안 나오는 장미 문장·별빛 섬광·초승달 베기 궤적·꽃잎·결정 가시·고리·빛무리는 금빛 카드 효과(`fx/nv/`, 다음 절)로 그립니다. 고유 특성(nvP) 중에는 금빛 결정 가시와 반짝임 강조가 더해집니다. 옛 파티클 궤적(효과 80~97번)과 그 소리는 나비아에서 꺼져 있습니다. 장미탄(스킬 발사)에 맞은 적에는 회색 바닐라 타격 입자(`crit` · `sweep_attack`)를 그리지 않고 금빛 효과만 보입니다(`char/navia/fire`가 `#noHitFx`를 세운 동안 `combat/apply`가 건너뜀, 다른 캐릭터와 나비아 평타는 그대로).
+- 총구 효과(`char/navia/fire` → `muzzle_rig` / `muzzle_fp`): 금빛 별 섬광·빛무리·원뿔 끝 고리 카드와 폭발·반짝임 입자가 숄더뷰에서는 몸 디스플레이의 우산 끝(펼친 덮개 둘레로 섬광이 삐져나옴), 1인칭에서는 블록 우산총 끝에서 터집니다. 고리는 시선 높낮이를 따라 탄이 나가는 방향을 보여 주며 숄더뷰에서는 반지름 약 2칸까지 퍼집니다. 조준 후 발사는 결정 가시 장미(`char/navia/shard_rose`, 카드 5장)가 더해집니다.
+- 1인칭(몸 디스플레이가 없을 때)에는 동작 효과의 금빛 카드를 그리지 않습니다(눈 바로 앞에 생겨 화면을 가리므로). 입자는 그대로이고, 1인칭 전용 총구 카드(`muzzle_fp`)는 그대로 나옵니다. 동작 효과 호출(`char/motion/apply`, 클립 시작) 동안 `#pmFxFP tmp`가 1이면 `rlk:fx/nv/card`가 건너뜁니다.
+- 소리는 마인크래프트 기본 소리만 씁니다. 클립 소리(`navia_audio`)는 휘두름·창날 울림·바닥 찍기·결정 파열·발차기·날아가는 할버드·우산(나타남·돌림·펼침·접힘·사라짐)·원소폭발 장전음과 연출용 초기 포탄·등에서 다시 생기는 소리를 맡습니다. 게임 쪽은 조준 시작, 스킬 발사음(폭죽 폭발·폭발·자수정 깨짐에 낮은 바람 폭발을 더해 무게감), 원소폭발 폭음, 지원 포격, 대쉬, 충전, 실제 체력 피해 때의 둔탁한 명중음을 냅니다. 같은 소리를 양쪽에서 두 번 내지 않습니다. 조준 후 발사의 우산 펼침과 접힘은 영상처럼 거의 소리가 없습니다(아주 작은 천 소리만, 발사 직전은 조용한 한 박자).
+
+#### 게임 연결
+
+- 평타는 모션 프레임에 맞춰 맞고(재생 속도 130% = 원신 박자의 1.3배, 공격 속도 반영) 다음 타 입력 간격도 모션을 따릅니다(클립 14 / 14 / 19 / 28틱 = 공격 속도 100%에서 11 / 11 / 15 / 22게임틱, `ceil(100 × 클립 틱 / 130)`). 타격 · 소리 · 효과 · 이벤트는 모두 클립 틱에 묶여 있어 재생 속도와 공격 속도가 바뀌어도 함께 움직입니다(금빛 카드의 수명과 떨어지는 꽃잎만 게임틱). 리그는 게임 1틱에 클립 2틱까지는 모든 회전을 바르게 보여 주므로 공격 속도 약 153%까지는 그대로이고, 그보다 빠르면 1·2타의 가장 빠른 휘두름과 4타 공중제비가 한 틱 거꾸로 돌아 보일 수 있습니다(재생 속도 100%였을 때는 200% 초과부터). 3타는 94%×3이 모두 들어가도록 한 클립 안의 세 번째 타격 칸(`pmThird`)을 씁니다.
+- 평타 계수는 197% / 184% / 72% ×3 / 282%입니다(`char/navia/na_coef`). 공격 속도를 30% 올리면서(재생 속도 130%, 연타 한 바퀴 75 → 59게임틱) 바로 앞 계수(256 / 239 / 94×3 / 366%)를 1.3으로 나눠 평타 초당 피해를 거의 그대로 두었습니다(한 바퀴가 게임틱 단위로 올림되어 약 2% 낮음). 바로 앞 계수는 사용자 영상의 빌드(ed3f05b: 150 / 140 / 55×3 / 215%, 연타 한 바퀴 44게임틱)와 초당 피해가 같도록 75/44배 한 값입니다. 고유 특성(바위 원소 +40%)과 치명타 계산은 그대로입니다.
+- 마무리 동작(평타 클립의 다음 타 틱 뒤)은 공격을 막지 않습니다: 클립이 재생되는 동안 콤보 유지 시간(`cboIdle`)이 0으로 유지되어 언제 눌러도 다음 순서의 타가 나가고, 콤보 초기화(20틱)는 클립이 끝난 뒤부터 셉니다. 다음 타 클릭을 받을 수 있게 된 게임틱부터(시작 후 11 / 11 / 15 / 22게임틱, 공격 속도에 맞춰 줄어듦) 움직이거나 뛰면(숄더뷰) 1·2타는 `char/motion/finish`로, 3·4타는 `sheath/abort`(빠른 수납)로 바로 끝납니다. 그 전에는 휘두르는 중이라 걸어도 절반 속도일 뿐 마무리가 끊기지 않고 뛸 수도 없으며(`player/swing`), 이 틱부터 뛰면 다음 평타는 1타부터입니다. 이 판정은 그 틱의 클릭보다 늦게 하므로(`player/tick`의 `#pmChainOpen`), 움직이면서 연타해도 다음 타가 먼저 나가고 한 틱 동안 이동 자세로 바뀌거나 무기를 넣었다 꺼내는 일이 없습니다. 무기를 넣는 5초 대기도 클립이 끝난 뒤부터 셉니다.
+- 스킬: 누른 순간 충전을 쓰고, 실제 발사(장미탄 · 피해 · 결정 파편 소모 · 고유 특성)는 바로 발사 7틱째, 조준 후 발사 3틱째에 나갑니다. 발사 전까지는 이동·평타·대쉬가 잠기고, 조준 중에도 잠깁니다. 발사 전에 동작이 끊기면 그 자리에서 바로 발사합니다.
+- 스킬 뒤 회복(바로 발사 9틱부터 무릎 꿇기, 조준 후 발사 5틱부터 웅크리기) 중에 움직이거나 뛰면 미끄러지지 않고 빠른 수납으로 끝납니다: 우산이 금빛으로 사라지고 할버드가 등에 돌아오며 이동 자세로 이어집니다.
+- 원소폭발: 시전 34틱 뒤 발동하며(기존 공통 16틱), 시전을 시작한 방향으로 포격합니다. 몸은 돌지 않고, 44틱까지 잠금·무적입니다.
+- 블록 디스플레이 우산총은 몸 디스플레이가 없을 때(1인칭)만 보입니다. 숄더뷰에서는 리그의 우산 모델이 대신합니다.
+- 동작 도중 리그를 다시 만들면(1인칭에서 숄더뷰로 전환, 아바타 재생성 등) 그 틱에 쓰는 무기 모델(할버드 · 접힌 우산 · 펼친 우산)로 복원됩니다. 동작 중에 모델을 바꾸는 클립마다 `clips/<캐릭터>/<클립>/model`이 생성되고, 표시 중인 모델은 `pmWModel`에 기록됩니다.
+
+#### 작업 파일
+
+- 클립: `tools/player_motion/navia/{na12,na3,na4,skill,burst,dash_sheathe}.json`. 평타 4개·스킬 두 가지(`skill`, `skill_fire`)·원소폭발은 원신 박자에 맞춰 시간을 다시 늘인(리타이밍) 틱마다의 키가 들어 있고, 이 JSON과 `navia_audio`의 `LAYERS` 목록, `navia_fx` 틱 파일이 이제 타이밍의 원본입니다. 평타 4개는 `playback_rate` 130으로 1.3배 빠르게 재생합니다(틱 숫자는 그대로 클립 틱). 처음 이 클립들을 만든 작업용 스크립트는 예전 150% 박자를 내므로 더 쓰지 않습니다(직접 JSON을 고칩니다). `build_player_rig.mjs`가 `navia.json`과 합치며 같은 클립 이름이 두 번 나오면 멈춥니다. 다른 캐릭터도 `tools/player_motion/<캐릭터>/*.json` 조각을 쓸 수 있습니다.
+- 소리: `tools/player_motion/navia_audio/<클립>.py` → `audio_navia.py` → `build_player_audio.py`.
+- 이벤트·효과: `data/rlk/function/char/motion/events/navia/<클립>`, `navia_fx/<클립>`(+ `tNNN`). 스킬 발사·방향·총구 효과는 `char/navia/{fire,fire_dir,muzzle_rig,muzzle_fp}`.
+- 평타 타이밍 `char/motion/combat/config/<캐릭터>/<클립>`은 모든 캐릭터에서 클립의 `hit_ticks`/`chain_tick`으로 생성됩니다.
+- 생성: `node tools/build_player_rig.mjs --datapack <데이터팩 폴더> --resourcepack <압축을 푼 리소스팩 폴더>`, 이어서 `python tools/build_player_audio.py`, 카드 그림이 바뀌었으면 `python3 tools/build_navia_fx_cards.py --resourcepack <리소스팩 폴더>`. 적용은 데이터팩 `/reload`, 리소스팩 `F3+T`. 시험: `/function rlk:char/select {id:"navia"}`, `/function rlk:view/on`, `/function rlk:char/motion/start {char:"navia",clip:"physical_3"}`.
+
+### 나비아 금빛 카드 효과 (`fx/nv/`)
+
+- 입자로는 모양이 잘 안 나오는 나비아의 금빛 바위 원소 효과(장미 문장, 별빛 섬광, 초승달 베기 궤적 등)를 잠깐 떠 있다 사라지는 납작한 `item_display` 카드로 그립니다. 나루카미 카드 효과와는 경로·태그·정리가 모두 따로입니다(태그 `rlk_nvfx`).
+- 카드 종류(`kind`): `rose`(장미 문장) · `star`(네 갈래 반짝임) · `burst`(흰 금빛 별 섬광) · `crescent`(굵은 초승달 베기 궤적, 휘두르는 면에 눕는 카드) · `petal`(금빛 꽃잎) · `shard`(바위 결정 가시, 뿌리 기준) · `ring`(얇은 고리·충격파) · `glow`(부드러운 금빛 빛무리). 모두 밝기 15로 스스로 빛납니다.
+- 부르기(모든 키 필수, 각도·틱은 정수):
+  `function rlk:fx/nv/card {kind:"crescent",pos:"^0 ^1.15 ^0.1",rot:"~ ~",bb:"fixed",roll:0,spin:45,s0:3.8,s1:4.4,move:"0f,0f,0f",life:6,fade:2}`
+  - `pos`: 실행 위치 기준 좌표(`^x`=왼쪽, `^y`=위, `^z`=앞). 초승달은 휘두르는 중심, 가시는 뿌리, 나머지는 가운데.
+  - `rot`: 고정 카드의 방향(`"~ ~"`=실행 방향, `"~ 90"`=바닥에 눕힘). `bb`: `fixed`(3차원 방향 유지) / `center`(항상 카메라를 봄) / `vertical` / `horizontal`.
+  - `roll`: 앞쪽 축으로 돌린 각도. 초승달은 0이면 오른쪽→왼쪽 수평 베기, 180이면 왼쪽→오른쪽, -40 정도면 오른쪽 위에서 왼쪽 아래로 내려 베기, 90/-90이면 세로(뒤에서 보면 옆면만 보이므로 `rot:"~-20 ~"`처럼 조금 비틉니다).
+  - `spin`: 수명 동안 카드 면 안에서 더 도는 각도(-170~170). 초승달은 양수면 휘두르는 방향으로 쓸려 나갑니다.
+  - `s0`→`s1`: 시작·끝 크기(블록, 초승달은 휘두르는 지름). `move`: 끝 위치 이동(`"0f,0.3f,0f"`). `life`: 수명 틱. `fade`: 마지막 몇 틱 동안 작아지며 사라짐.
+  - 0틱에 `s0`로 생기고, 1틱에 한 번의 보간으로 끝 상태로 가며, `life-fade`틱부터 크기 0으로 줄어든 뒤 `life`틱에 지워집니다. 게임 틱 기준이라 공격 속도와 무관합니다.
+- 짧은 형태: `rlk:fx/nv/p/<이름> {pos:"..."}` — `rose_trail`(대쉬 뒤 장미), `rose_pop`, `glint`, `hit_star`, `muzzle_burst`, `flash_glow`, `hit_ring`, `ground_ring`, `slash_h`, `petal`.
+- 주의: 동작 효과 프레임(`navia_fx`) 안의 실행 방향은 몸 방향(방향 고정 클립은 시작 방향)·**피치 0**이라 `rot:"~ ~"`는 항상 수평입니다. 카드는 생긴 자리에 머무르므로 따라오는 꼬리는 몇 틱마다 다시 만듭니다. 먼지·반짝이 무리·무기 끝 궤적처럼 많은 것은 계속 입자로 그립니다. 살아 있는 카드가 48장이면 새 카드는 건너뜁니다.
+- 정리: 수명이 끝나면 지워지고, 플레이어 사망·런 사망 연출·`run/field_clear`(런 종료·다음 필드)·방 치우기(`rlk_room`)·`uninstall`에서도 지워집니다. `uninstall`은 엔진의 점수판(`nvfx` · `nvfxT` · `nvfxD` · `nvfxK`)과 저장소 `rlk:nvfx`도 지웁니다.
+- 1인칭: 동작 효과(`navia_fx`) 안에서 부른 카드는 몸 디스플레이가 없으면(`#pmFxFP tmp` = 1) 그려지지 않습니다. 게임 쪽에서 부른 카드(1인칭 총구 `muzzle_fp`)는 그대로입니다. 연결은 `rlk:tick`의 `function rlk:fx/nv/world`, `rlk:load`의 `function rlk:fx/nv/init`, `run/field_clear`의 한 줄뿐입니다.
+- 게임 안 확인: `/execute as @p at @s rotated ~ 0 run function rlk:fx/nv/test/all`(종류별 3초), `.../test/slashes`(초승달 방향).
+- 생성: `python3 tools/build_navia_fx_cards.py --resourcepack <압축을 푼 리소스팩 폴더>`(그림·모델·아틀라스 + `data/rlk/function/fx/nv/` 함수, 약 4초). 다른 생성기는 `from build_navia_fx_cards import card_call`로 명령 줄을 만들 수 있습니다. 적용은 `/reload`와 `F3+T`.
 
 ### 아를레키노 낫 방향·공격 속도 보정
 
@@ -502,6 +2648,8 @@
 
 ### 나루카미 보스 공격 속도와 디스플레이 번개
 
+> 이 절부터 "나루카미 조정"까지는 리워크 이전 판의 기록입니다. 지금 전투는 위 "나루카미 보스전" 절을 따릅니다.
+
 - 연격 사이의 기다림과 후딜을 줄이고, 패턴 사이 대기는 28틱에서 12틱으로 단축했습니다. 보스는 준비 자세를 빠르게 잡고 잠깐 유지한 뒤, 일반 타격은 3틱, 무거운 내려찍기는 4틱에 걸쳐 실제 접촉 자세에 도달합니다. 몸과 무기 자세는 매 틱 갱신하고 1틱 보간합니다.
 - 바닥 공격 예고 12종은 고정된 `item_display` 모델입니다. 방향 화살표와 내부 선을 사용하고, 피해 시점에는 같은 위치·방향의 입체 번개 모델로 즉시 바뀝니다. 예고만 남거나 효과가 나중에 도착하지 않도록 기존 피해 판정 시계와 연결합니다.
 - 태도·나기나타·거검에는 흰 중심선과 보라색 가지로 만든 디스플레이 번개가 붙습니다. 베기에는 실제 무기 위치·회전에서 계산한 짧은 번개 잔상이 생깁니다. 바닥의 번개 칼날, 낙뢰 기둥, 양손 협격, 다섯 갈래 검파와 점프로 피하는 고리도 디스플레이로 표현합니다.
@@ -523,7 +2671,232 @@
 - 갑주 파괴 시 46틱 동안 무릎을 꿇고, 회복 구간 끝 28틱 동안 일어섭니다. 처치 시에는 48틱 동안 휘청이고 주저앉은 뒤 보라색 조각으로 사라집니다. 처치 보상은 한 번만 지급하며 방 클리어는 쓰러짐이 끝난 뒤 진행됩니다.
 - 추가 생성 원본: `build_raiden_materials.py`, `build_raiden_movement.py`, `build_raiden_orb.py`, `build_raiden_judgment_rig.mjs`, `build_raiden_cinematic.py`. 원본 영상의 음원은 사용하지 않습니다.
 
+### 나루카미 2차 수정 (갑주 · 선딜 · 분신 · 궁극기 · 테스트)
+
+**테스트 명령** (`'player'` 태그 필요, `/function rlk:room/setup` 을 먼저 해 두고, 진행 중인 일반 런이 없어야 함)
+- `/function rlk:boss/raiden/test/start` — 런 없이 나루카미하고만 싸웁니다(2스테이지 보스, 레벨 12). 다시 실행하면 처음부터 시작합니다.
+- `/function rlk:boss/raiden/test/armored` — 바로 갑주 단계로 변신합니다.
+- `/function rlk:boss/raiden/test/pattern {id:N}` — 다음 패턴을 지정합니다(1~6 일반, 11~18 갑주; 지금 번호는 위 '테스트 명령' 또는 `{id:"help"}`). 진행 중인 공격은 취소하고, 필요하면 단계를 바꿉니다.
+- `/function rlk:boss/raiden/test/lock {id:N}` — 그 패턴만 계속 반복합니다. `{id:0}` 으로 해제합니다.
+- `/function rlk:boss/raiden/test/level {lv:N}` — 보스 레벨을 바꾸고 체력을 다시 채웁니다.
+- `/function rlk:boss/raiden/test/stop` — 전투를 정리하고 로비로 돌아갑니다.
+- 지금 캐릭터 · 레벨 · 아이템을 그대로 씁니다. 쓰러지면 캐릭터를 초기화하지 않고 로비로 돌아갑니다(런 실패로 치지 않음). 보스를 처치하면 다음 챕터 오브젝트 대신 '다시 하기 / 로비로' 안내가 나옵니다.
+
+**번개 갑주 내구도** (`build_raiden_encounter.py` 맨 위의 `SHIELD_MAX` · `SHIELD_CD` · `FLOWER_BREAK` · `DRAIN`)
+- 300 → 750. 깎는 판정은 5틱에 한 번(초당 최대 4회)이라 여러 번 맞는 공격 · 지속 피해도 이 횟수를 넘지 못합니다. 시간이 지나면 4틱마다 1씩 줄고(초당 5), 최종 재앙 중에는 줄지 않습니다.
+- 한 번에 깎는 양: 물리 · 번개 · 공허 2, 물 · 바위 · 바람 3, 풀 4, 불 · 얼음 6, 원소 반응 · 지속 피해 1.
+- 쉬지 않고 공격할 때 파괴까지: 물리 약 58초, 물 · 바위 · 바람 약 44초, 풀 약 36초, 불 · 얼음 약 26초, 공격하지 않으면 150초. 최종 재앙을 막아 내면 190(25%) 줄어듭니다.
+
+**선딜(예고 틱, 20틱 = 1초)**: 태도 연격 8 · 회전 베기 9 · 나기나타 찌르기 8 · 검파 10 · 순간이동 발도 8/8 · 뇌안 18 · 낙뢰 9 · 거대 팔 연격 11 · 투척 낙뢰 10 · 양손 협격 12 · 내려찍기 12 · 거검 13 · 검파 연사 10/10 · 발도 돌진 10/9. 타격 뒤 4~7틱 후 다음 동작으로 넘어갑니다. 번개 고리와 최종 재앙(꽃 대응 6초)의 시간은 그대로입니다. 준비 자세 클립(베기·찌르기·시전·거대 팔·거검)도 이 선딜 안에 끝나도록 빨라졌습니다. 패턴 사이 대기 12→10틱, 변신 직후 18→14틱, 무력화 회복 후 28→20틱.
+
+**보스바**: 플레이어가 쓰러지면 바로 숨기고, 런 실패 · 중단 · 종료 · 맵 정리 · 로비 복귀 때도 숨깁니다(`room/clear` → `boss/raiden/cleanup`). 불러와진 나루카미가 없으면(청크 밖 포함) 매 틱 확인해 숨깁니다. 보스를 처치하는 순간 두 바 모두 사라집니다. 로노바 부활 중 · 레벨업 선택 중에는 그대로 보입니다.
+
+**순간이동 정리**: 보스의 모든 위치 이동은 흩어짐 → 다시 모임 연출 뒤에서 일어납니다.
+- 악연의 에너지가 가득 차도(또는 체력 55% 경계) 진행 중인 패턴을 끝까지 마친 뒤, 중앙으로 옮기지 않고 **그 자리에서** 변신합니다(변신 52틱). 기다리는 동안 첫 변신 전에는 체력이 55% 아래로 내려가지 않습니다.
+- 필드 경계를 넘으면 중앙으로 순간이동하지 않고 중앙 쪽으로 천천히 밀려 들어옵니다(반경 26칸을 넘으면 흩어져서 돌아옴). 접근 · 발도 돌진도 경계 앞에서 멈춥니다.
+- 순간이동 도착 자리가 필드 밖이면 플레이어에게서 중앙 쪽으로 5칸 떨어진 곳에 나타납니다. 다시 나타날 때 몸 부품이 바닥 아래에서 미끄러져 올라오지 않습니다.
+- 임의 위치로의 흩어짐 이동: 보스로서 목적지에서 `function rlk:boss/raiden/movement/blink_to`.
+
+**분신 패턴(일반 5번, `tools/build_raiden_illusions.py` → `boss/raiden/illusion/`)**
+- 보스가 제자리에서 흩어지고 맵 중앙에서 다시 모였다가 네 분신으로 갈라집니다. 분신들은 대각선 네 방향으로 달려 나가 중앙에서 **14칸** 떨어진 자리를 잡습니다(달리기 4프레임, 0.7초).
+- 자리를 잡으면 모두 맵 중앙을 바라보고, **네 분신이 동시에** 같은 예고(바닥 직선 10틱 + 칼날 번쩍임)를 한 뒤 맵 중앙을 향해 벱니다. **가짜는 한 번, 진짜는 X자로 두 번(사삭)** — 대각선 두 줄기가 X를 그리고, 두 번째 검격 줄기는 3틱 뒤에 살짝 비껴서 떨어집니다. 검격은 중앙을 지나는 길이 22칸 · 폭 2.4칸 직선(위험 모양 13), 피해 10.
+- 이 동시 검격을 **3번** 하는 동안 진짜를 찾지 못하면 패턴이 끝나고, 보스는 진짜가 있던 자리에서 다시 모습을 드러냅니다(실패 낙뢰 없음).
+- 자리를 잡은 뒤 진짜를 공격하면 성공: 다른 분신은 흩어지고, 보스가 그 자리에서 모여 **10초 동안 무력화**(쓰러짐 → 무릎 → 일어남), 악연의 에너지 −120. 달려 나가는 동안은 공격이 통하지 않고, 가짜를 때리면 그 분신만 부서집니다.
+- 조절 값: 생성기 맨 위의 `RUN_TICKS`·`RUN_STEP`(거리), `VOLLEYS`(횟수), `TELL`(선딜), `XGAP`(X 두 번째 검격 간격), `STUN`(무력화 틱).
+
+**갑주 디자인 (`build_raiden_rig.mjs`)**
+- 옅은 보라색 거대 칼을 쥔 큰 팔 1개(연보라 판금, 짙은 보라 관절, 탁한 금 테두리, 미츠도모에 원판), 어깨 뒤로 펼쳐진 보조 팔 4개(위 한 쌍은 편 손, 아래 한 쌍은 갈퀴 손), 아래에서 라이덴을 받치는 탁한 회갈색 큰 손 2개(보랏빛 손톱).
+- 갑주가 절반 이상 형성되면 라이덴 본체와 리본이 탁한 색(고정 색조 `DULL_TINT`)으로 바뀌고, 붕괴 · 사망 연출에서 원래 색으로 돌아옵니다.
+- 거대 칼의 날(흰 줄, 모델 −X 쪽)은 항상 베는 방향을 향합니다. 일반 형태의 태도 베기 · 회전 베기도 날이 앞장섭니다.
+- 양손 협격은 받치던 두 손이 올라와 앞에서 맞부딪치고, 내려찍기는 왼쪽 받침 손이 합니다. 원격으로 떨어지는 손도 같은 모델이며 예고 12틱째에 땅에 닿습니다(`build_raiden_rig.mjs` 의 `SLAM_CONTACT`).
+
+**최종 재앙 궁극기 (`build_raiden_judgment_rig.mjs`)**: 칼등으로 내려치던 모션을 플레이어 시점 **왼쪽 → 오른쪽 수평 베기**로 바꿨습니다. 팔이 균열에서 나와 칼을 왼쪽으로 수평하게 당겨 잠깐 멈췄다가, 보호막 높이를 날을 앞세워 가로로 벱니다. 타격 120틱 · 전체 176틱은 그대로. 팔 · 칼도 같은 연보라 · 옅은 보라 팔레트로 바꿨습니다.
+
+**재생성**: `python tools/build_raiden_all.py --resourcepack <압축을 푼 리소스팩 폴더>` 로 모든 나루카미 생성기를 순서대로 실행합니다(기본값은 데이터팩 옆의 `resourcepack` 폴더). 아이템 아틀라스는 덮어쓰지 않고 합칩니다. 적용은 `/reload` 와 `F3+T`.
+
+### 나루카미 원본 맞춤 (패턴 · 변신)
+원본 영상은 이 작업 환경에서 열 수 없어, 공략 자료(나무위키 · 인벤 · KQM · Game8 등)에 정리된 원본 패턴 설명을 기준으로 맞췄습니다.
+- **변신**: 악연의 에너지가 가득 차도 진행 중인 패턴을 끝까지 마친 뒤 그 자리에서 변신합니다. 에너지는 시간(45초)뿐 아니라 **보스 공격이 플레이어에게 맞을 때마다 +3초분**(`RAGE_HIT` 60) 오릅니다(대시로 피하면 오르지 않음).
+- **4연격(일반 1)**: 가로 베기 3번 → 나기나타를 바닥에 찍어 주변(반경 6)과 플레이어 자리에 낙뢰 → 절반 확률로 날아가는 검기가 이어집니다(끝까지 보스를 보세요).
+- **회전 참격(일반 2)**: 제자리에서 돌며 빠른 번개 칼날 3개를 플레이어에게 던지고(예고 6틱), 마지막에 넓은 초승달 검기(18×7)를 날립니다.
+- **뇌광 결계(일반 7, 새 패턴)**: 주변을 밀쳐 내고, 보스 둘레 10칸에 번개 씨앗 6개가 차례로 떨어진 뒤, 보스 반경 12칸 안을 크게 강타합니다. 씨앗 고리 바깥으로 빠져나가야 합니다.
+- **양손 협격(갑주 12)**: 탁한 두 손이 플레이어 양옆에 나타나 천천히 따라오다가(0.3칸/틱) 멈추고, 10틱 뒤 그 사이(8×8)를 맞부딪칩니다.
+- **그림자 손(갑주 13)**: 바닥의 그림자가 플레이어를 0.26칸/틱으로 쫓아오며, 덮고 있는 동안 0.4초마다 작은 피해를 줍니다(걷기로는 못 피하고 달리기·대시로 떨칠 수 있음). 1.8초 뒤 그 자리에 거대한 손이 내려찍습니다.
+- **번개 고리(갑주 14)**: 세 말뚝이 필드 **중앙**에 모여 서고, 거기서 고리가 퍼집니다(점프로 회피).
+- **거검 발도(갑주 16)**: 세로 내려베기 대신 거대 칼을 가로로 크게 발도합니다(앞쪽 부채꼴 반경 12 + 18×7 검기). 타격 4틱 전 보스 가슴에서 하얀 섬광이 터지면 회피하세요.
+- **발도 돌진(갑주 18)**: 돌진 뒤 넓은 베기를 두 번 연속으로 이어 갑니다.
+- **갑주 파괴 무력화**: 8초 → 15초.
+- 테스트 패턴 번호는 이제 1~7(일반), 11~18(갑주)입니다.
+
+### 나루카미 번개 그라데이션 리디자인
+- 보스의 번개 효과를 작은 정육면체를 계단처럼 이은 방식(단색 16×16 텍스처)에서, **그라데이션을 직접 칠한 고해상도 반투명 텍스처 카드**로 바꿨습니다. 흰 중심 → 연보라 → 보라 → 짙은 보라 → 투명으로 부드럽게 이어지고, 여러 갈래로 갈라지는 번개, 은은한 빛번짐, 흩어지는 잔광이 텍스처에 그려져 있습니다. 가까이서도 계단이 보이지 않도록 블록당 약 32텍셀 이상으로 칠했습니다.
+- 바뀐 효과: 바닥 공격 예고·충전·타격·잔광·점프 고리(13종), 태도·나기나타·거대 칼 번개와 잔상, 손바닥 충전·방출, 후광(차크라), 쓰러질 때의 결정 조각, 뇌안·말뚝 전류, 분신 칼날 번쩍임·검격 호·날아가는 검기·X자 검격, 오브젝트 파괴, 최종 재앙의 가로 검격·날개·잔광, 필드 경계 예고, 변신 폭발, 순간이동 균열, 갑주 파괴 조각, 최종 재앙 칼의 빛·잔상·번개.
+- 그대로 둔 것: 보호막 돔(유리), 꽃 구슬, 순간이동 때 몸이 흩어지는 조각.
+- 텍스처 생성기 `tools/build_raiden_fx_textures.py` 가 표준 라이브러리만으로 그림 99장을 `assets/rlk/textures/raiden/fxg/` 에 그리고 아이템 아틀라스에 **추가**합니다(기존 항목은 그대로). 목록과 UV 규칙은 `tools/raiden_fx_textures.json`. 카드 모델 도우미는 `tools/raiden_obj_cards.py`.
+- 모델 이름 · 프레임 순서 · 피해 판정은 그대로라 데이터팩 함수는 거의 바뀌지 않았습니다. 재생성은 `python tools/build_raiden_all.py --resourcepack <압축을 푼 리소스팩 폴더>`(텍스처 단계 약 30초 포함), 적용은 `F3+T`.
+
+### 나루카미 텍스처 깨짐 수정 · 필살기 진입 · 대사
+- **텍스처 깨짐(보라·검정 격자)**: 몸체 리그와 최종 재앙 리그의 카드 모델 일부가 면 UV를 0~16 밖(예: 16.03, -0.02)으로 적고 있었고, 마인크래프트는 이런 모델을 통째로 버리고 '모델 없음' 텍스처를 그립니다. 생성기에서 UV를 0~16으로 잘라 쓰도록 고쳤습니다.
+- 검사기 `tools/check_raiden_pack.py` 를 추가해 `build_raiden_all.py` 마지막에 자동으로 돌립니다. 나루카미·플레이어 무기 모델의 아틀라스 등록, 텍스처 파일, 좌표 범위(-16~32), 회전 각(±22.5/45), UV 범위, 정의 안 된 텍스처 변수, 데이터팩이 부르는 모델 이름을 확인하고 하나라도 틀리면 빌드를 실패시킵니다. 이전 배포본에서는 67건이 걸렸고 지금은 0건입니다.
+- **필살기(무상의 일태도) 진입**: 순간이동으로 바로 사라지지 않고, 그 자리에서 번개 기둥에 감싸여 약 1.3초 동안 공중으로 떠오릅니다. 그동안 필드 곳곳에 하늘에서 번개가 6번 내리꽂히고, 꼭대기에서 몸이 흩어진 뒤 최종 재앙이 시작됩니다. 안내 문구(꽃 공격 → 보호막)는 그 뒤에 나옵니다.
+- **대사**: 나무위키 「마가츠 미타케 나루카미노 미코토」 패턴 대사를 자막으로 띄웁니다. 한두 글자씩 늘어나며(예: 그 → 그 끝은 → 그 끝은 만겁 → 그 끝은 만겁일지니 → 그 끝은 만겁일지니...) 글자가 늘 때마다 충전음·자수정 소리가, 완성되면 신호음(무거운 대사는 천둥까지)이 납니다.
+  - 회전 참격 「뇌전은 인간의 의지 따위로 변하지 않아」, 뇌명 「뇌명.」, 뇌안 「뇌광이 영원의 땅을 비추는구나.」, 낙뢰 「번개여, 나의 호령을 따르라.」, 몽상의 일심 「무념 무상, 천하가 고요하리.」 → 큰 베기 순간 「무념 무상, 일도 단절.」, 분신 「찰나의... 포영!」 / 간파 「간파했군.」
+  - 변신 「이 몸이 곧 영원이다」 뒤에 '악요의 요고우 텐마' 타이틀, 갑주 패턴 「방해는 모두 베겠노라」 「감옥으로 만들어 주지」 「천수의 속박!」 「단절!」 「궤멸하라!」 「뚫려라!」, 필살기 「그 끝은 만겁일지니...」, 쓰러질 때 「그 무엇도 영원한 것은 없다.」
+  - 대사 표는 `tools/build_raiden_encounter.py` 의 `LINES`(글자 간격·색·유지 시간). 패턴이 끝나면 대사도 함께 지워집니다.
+- 변신 타이틀 표기를 '악요의 요구우 텐마' → **'악요의 요고우 텐마'** 로 고쳤습니다.
+
+### 나루카미 조정 (선딜 · 접근 · 분신 · 금강괴멸파 · 원본 패턴)
+- **대사 효과음**: 한 글자씩 늘어날 때마다 같은 높이의 작고 담백한 '틱' 소리 하나만 납니다(음성 카테고리). 완성음·천둥은 뺐습니다.
+- **선딜**: 예고가 있는 모든 공격의 선딜을 0.2초(4틱) 늘렸고 최소 0.6초(12틱)입니다. 가장 빠르던 0.4초 공격은 0.6초가 됐고, 타격 뒤 다음 공격까지의 간격은 그대로입니다. 인공팔 협격의 합장도 0.5→0.7초. 뇌안·그림자 손·최종 재앙 같은 기믹은 그대로.
+- **근거리 기술은 다가와서 사용**: 근거리 패턴(4연격, 회전 참격, 거대 팔 연격, 거검 발도/단절, 검파 연사, 발도 돌진)을 골랐는데 플레이어가 사거리 밖이면, 먼저 질주해서 다가간 뒤 시작합니다. 18칸보다 멀거나, 벽 쪽에 막혀 더 못 다가가거나, 2초 넘게 따라잡지 못하면 몸이 흩어지는 순간이동으로 플레이어 앞에 나타난 뒤 시작합니다. 원거리 패턴(뇌명 돌진, 낙뢰, 뇌안, 몽상의 일심, 협격·그림자 손, 금강괴멸파)은 그 자리에서 씁니다. 표는 `tools/build_raiden_encounter.py` 의 `REACH`.
+- **분신(찰나의 포영)**: 검격이 4번, 선딜 0.7초, 검격 사이 간격 약 1.7초(이전 3번 · 0.5초 · 1초). 진짜를 못 찾고 끝나면 원작처럼 다음 패턴은 반드시 **몽상의 일심**입니다(찾아서 무력화하면 이어지지 않음).
+- **금강괴멸파(천수의 속박)**: 금강괴 셋을 중앙에서 9칸 떨어진 삼각형으로 벌렸고, 고리는 반지름 2→32칸까지 퍼져 맵 끝 벽까지 닿습니다(속도는 비슷, 58틱). 원작처럼 하나씩 차례로 두 바퀴 방출한 뒤 셋이 동시에 방출합니다.
+- **몽상 · 단절**: 거검 발도(16)는 반반 확률로 둘 중 하나가 나옵니다. ① 신속한 발도: 이전과 같은 가로 발도. ② 단절: 거검을 치켜들면 앞쪽 바닥에 일직선 범위가 나타나고, 주변에 약한 장판이 터진 뒤 "단절!"과 함께 그 선을 따라 수직으로 내려칩니다.
+- **몽상의 일심**: 맵 중앙으로 순간이동한 뒤 가장자리(반지름 21칸)에 번개 구슬 8개를 떨어뜨리고, 시간이 멈춘 듯한 정적 뒤 반지름 19칸 전체를 벱니다. 구슬도 같은 순간 터지므로 벽 근처의 **구슬 사이 틈**만 안전합니다. 새 위험 범위 14번(반지름 19 원)을 추가했습니다.
+
+### 밸런스 · 대쉬 · 미니맵 (2026-10-13)
+- **몹 레벨 보정**: 플레이어는 레벨이 오를수록 좋은 아이템을 얻으므로, 몹은 플레이어 기초 수치보다 빠르게 강해집니다(x = 레벨 - 1).
+  - 체력 = 1레벨 체력 × (100 + 30x + 0.05x²)% × `#mobHpMul`
+  - 공격 = 원피해 × (100 + 14x + 0.06x²)% (이전 100 + 8x)
+  - 플레이어 방어 공식 K/(K+방어력)의 K = 100 + 4x(때린 몹의 레벨): 높은 레벨의 몹일수록 같은 방어력으로 덜 막습니다.
+  - 플레이어 → 몹 레벨 보정의 몹 쪽 항 = 100 + 1.5 × 몹 레벨(이전 100 + 레벨)
+  - 상수: `load` 의 `#mobLvHp/#mobLvHp2/#mobLvAtk/#mobLvAtk2/#mobLvDef/#defKLv`.
+- **나루카미**: 보스 피해 배율 `#bossDmgMul` 160%(레벨 보정과 별도). 2스테이지 보스(레벨 12) 기준으로, 9~10레벨 플레이어가 큰 공격 2~3번이면 쓰러질 정도입니다. `test/start` 도 2스테이지 자리(레벨 12)로 시작합니다. 더 어렵게 하려면 `#bossDmgMul` 을 올리세요.
+- **기술 반복 줄이기**: 보스는 단계마다 기술을 '주머니'에서 하나씩 뽑습니다. 모든 기술이 한 번씩 나오기 전에는 같은 기술이 다시 나오지 않고, 새 주머니의 첫 기술은 방금 쓴 기술이 아닙니다(궁극기는 기존처럼 4번째 갑주 기술).
+- **대쉬**: 이동 3틱 · 3칸(이전 4틱 · 4칸), 무적 6틱(이전 9틱), 입자는 발밑에 조금만. 대쉬 중에는 평타가 나가지 않고, 평타 도중 대쉬하면 그 평타(아직 안 들어간 타격 포함)는 취소되고 다음 평타는 1타부터 나갑니다. 캐릭터에 `dash` 동작이 있으면 `char/motion/dash` 가 재생합니다.
+- **원소전투 스킬 조작 불가 시간**: 아를레키노 스킬 21 → 15틱, 스커크 좌클릭 강화 진입 14 → 9틱, 우클릭 이동 종료 8 → 4틱.
+- **화면 미니맵**: 던전에서 화면 왼쪽 위에 6×6 칸 지도(칸 20px)를 띄웁니다. 위치는 `/function rlk:minimap/left` · `/function rlk:minimap/right` (10칸씩) 또는 `/function rlk:minimap/pos {x:-364}` (화면 가운데로부터 지도 왼쪽 끝까지의 GUI 픽셀, 음수 = 왼쪽)로 바꿀 수 있습니다. 보스바 글자는 화면 가운데 기준이라, 화면 크기·GUI 배율이 다르면 이 값으로 맞춥니다. 맵이 이 기능보다 먼저 만들어졌어도 다음 틱에 칸 표를 다시 만듭니다. 리소스팩 글꼴(`rlk:minimap`)로 그린 글자를 보이지 않는 흰색 보스바(`rlk:minimap`)의 이름으로 씁니다. 위치는 양수 공백만 씁니다: 행들이 제자리로 돌아오므로 x < 0이면 행 뒤에 2|x|, x > 0이면 행 앞에 2x 공백을 붙여 글자 전체 폭을 늘 양수로 둡니다.
+  - 지도가 화면 가운데에서 시작하고 왼쪽에 `▯`가 보이면 이전 데이터팩(가운데 기준 위치 글자 `U+E3F3`을 쓰던 판)이 아직 켜져 있는 것입니다. `/datapack list`로 확인해 예전 zip을 지우고 `roguelike.zip`만 둔 뒤 `/reload` 하세요. 로드 메시지 끝의 `빌드 MM-DD`로 켜진 판을 확인할 수 있습니다.
+  - 색: 들어가 본 방 회색 · 문만 열린 방 어두운 회색 · 지금 있는 방 금색 · 특수 방은 맵 색(돈 노랑, 상점 초록, 사파이어 파랑, 재련 빨강, 인챈트 보라, 나무뿌리 갈색, 다음 맵 흰색, 보스 붉은색). 열린 문은 흰 선, 아직 안 가 본 쪽 문은 회색 선. 내 위치는 **바라보는 방향을 가리키는 화살표**(카메라 시선 기준 8방향, 지도 위쪽 = 북쪽)입니다.
+  - 맵이 바뀌면 칸 → 구역 표를 만들고(`minimap/build`), 0.1초마다 상태를 보고 바뀌었을 때만 다시 그립니다. 방향만 바뀌면 지도 줄(`rlk:mm base`)은 그대로 두고 화살표만 다시 붙입니다(`minimap/arrow`). 런 밖 · **보스 구역에 들어간 뒤**(구역 종류 9) · 나루카미가 있는 동안(경기장 · 테스트 포함) · 지도 화면 · 선택 공간 · 사망 중에는 숨깁니다.
+  - 생성: `python3 tools/build_minimap.py --resourcepack <리소스팩>` (글꼴·글자 그림·투명 흰색 보스바 + 데이터팩 함수). 기본 위치는 `DEFAULT_X`.
+
+### 리소스팩 보스바
+- 보스바를 리소스팩 글꼴로 새로 그립니다(바닐라 막대는 흰색으로 지정해 투명 처리). 윗줄: **Lv.레벨 + 이름**(갑주 중에는 '· 번개 갑주', 무력화 중에는 '· 갑주 파괴'). 아랫줄: 200px 체력바 위에 **현재 체력/최대 체력** 숫자.
+- 체력이 깎이면 깎인 만큼은 **흰색**으로 남아 있다가, 0.8초 동안 피해가 들어오지 않으면 흰색이 줄어듭니다.
+- 체력바 바로 밑의 얇은 바: 갑주(보호막) = 원소 색(번개 보라), 평상시 = 악연의 에너지(금색), 변신 중 = 갑주 형성(보라), 무력화 = 회복까지 남은 시간(초록).
+- 생성: `python3 tools/build_bossbar.py --resourcepack <리소스팩>`. 다른 보스도 `#buHp #buMax #buSub #buSubMax #buSubCol` 를 채우고 `function rlk:bossui/draw` 뒤 보스바 이름을 `{nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""}` 로 두면 같은 바를 씁니다(색 번호: 1 번개 2 불 3 물 4 얼음 5 바위 6 바람 7 풀 8 금색 게이지 9 초록). 줄에 넣는 글자마다 글꼴을 적어야 합니다: nbt 텍스트는 목록의 2번째부터를 1번째(막대 조각, `rlk:bossbar` 글꼴)의 자식으로 붙이므로, 글꼴이 없으면 막대 글꼴을 물려받아 숫자가 네모로 나옵니다(체력 숫자는 `minecraft:default`).
+- 서버를 껐다 켜거나 다시 접속하면 첫 틱에 시점 엔티티(아바타·받침)를 새로 만듭니다(`view/fresh`). 재접속 직후 방향키가 로비 시작 버튼 쪽으로 붙던 문제 수정.
+
+### 스커크 · 아를레키노 전용 무기 디자인
+- **창백한 섬광(스커크)**: "새벽별처럼 희었으나 깊고 어두운 푸른빛으로 물든 검". 은백색 날, 짙은 남색~인디고 몸체, 가운데를 따라 흐르는 새벽빛 흰 홈과 별빛, 아직 흰빛이 남은 칼밑, 스커크가 쥐면 손잡이 쪽에 날개가 생긴다는 설정대로 깃털을 겹친 날개 가드, 별 보석 손잡이·폼멜. 얼음 부여 상태는 더 밝고 차가운 색.
+- **붉은 달의 형상(아를레키노)**: 아를레키노가 휘두르는 검붉은 대낫. 검은 옻칠 자루에 붉은 세로줄, 머리에는 금테 안의 일식처럼 가려진 붉은 달과 그 주위로 뻗은 8개의 진홍 칼날(붉은 해 모양), 금빛 창끝과 뒤로 휜 금 가시, 새긴 문양이 있는 검은 등에서 진홍 몸체를 거쳐 선홍빛 날로 이어지는 큰 초승달 날. 불 부여 상태는 더 크고 날이 주황·금빛으로 타오릅니다.
+- 날·날개·초승달·왕관의 윤곽은 계단식 상자가 아니라 **매끄럽게 칠한 투명 컷 카드**로 그립니다(두께는 얇은 심 상자와 겹친 카드). 손에 쥐는 위치·방향은 그대로라 모션은 바뀌지 않습니다.
+- **나비아 할버드·우산총**: 참고 이미지(4.png)를 따라 그린 금색·남색 할버드(`navia_halberd`). 플뢰르 문양 창끝, 옅은 금빛 큰 초승달 도끼날(모델 -X), 보라 보석이 박힌 뒷날, 하늘색 수정을 감싼 C/S 소용돌이 장식, 금장미 장식, 남색·라벤더 자루, 아래로 뻗은 가시가 달린 각진 금 슬리브, 진주 박힌 어두운 손잡이. 손은 아래 금고리 바로 밑(`[8,8,8]`)을 쥡니다. 우산총은 접힌 모양(`navia_parasol`, 길이 약 18: 금 자루, 묶음보다 넓은 금 러플 장미 장식, 끝으로 갈수록 가늘어지는 검은 주름 묶음, 작은 금 끝)과 펼친 모양(`navia_parasol_open`, 지름 약 18: 파란 보석을 품은 금 마름모 문장과 금 덩굴무늬가 있는 둥근 검은 돔, 두 겹으로 늘어진 금 러플, 가는 금 꼭지)을 프레임마다 바꿔 씁니다. 페이즐리 무늬 금 안감, 금 장식 손잡이와 톱니.
+- 생성: `tools/weapon_paint.mjs`(그림), `tools/weapon_faces.mjs`(카드/상자 UV), `tools/skirk_weapon_geometry.mjs`, `tools/scythe_geometry.mjs`, `tools/navia_weapon_paint.mjs`, `tools/navia_weapon_geometry.mjs`. 적용은 `node tools/build_player_rig.mjs --resourcepack <리소스팩>`.
+
 ### 스커크 입력 제한과 극악기 멸 확대
 
 - 우클릭 스킬의 빠른 이동이 지속되는 동안 일반 공격과 대시 입력을 차단합니다. 막힌 입력은 대시 횟수를 소비하지 않습니다.
 - 극악기 멸의 서로 다른 14개 직선 검격은 길이 약 1.62배, 높이 약 1.25배로 확대하고 중심선과 입자 밀도를 높였습니다. 기존 피해 범위와 6회 타격 시점은 유지합니다.
+
+### 참고 영상 기반 모션 수정 (2026-10-14)
+
+실제 인게임 영상을 프레임 단위로 보고 키프레임을 다시 잡았습니다. 길이·타격 틱·연결 틱·효과·효과음 시점은 그대로라 게임 판정은 바뀌지 않습니다.
+
+- **아를레키노 스킬(재가 된 만상)**: 짧게 몸을 낮춘 뒤 사라지고(4~6틱), 낮게 웅크린 자세로 나타나 낫을 **오른쪽에서 왼쪽으로** 허리 높이로 휘두릅니다. 이전에는 날이 반대 방향으로 돌아 이펙트 궤적과 어긋났습니다. 이어 낮은 날로 한 바퀴 돌고, 한 발로 서서 낫을 가슴 높이로 왼쪽에 수평으로 든 자세(초승달이 아래로 늘어진 모습)로 마무리합니다.
+- **스커크 평타 1~5타(물리)**:
+  - 1타: 제자리 회전 베기.
+  - 2타: 아래에서 위로 올려 베기.
+  - 3타: 웅크렸다 뛰어 옆으로 눕는 공중 베기.
+  - 4타: 낮게 끌었다가 허리 높이로 넓게 휩쓸기.
+  - 5타: 뛰어올라 내려찍고 착지 후 수평 베기.
+  
+  칼끝이 바닥을 뚫거나 머리를 지나던 자세를 없앴고, 마지막 키가 대기 자세와 같아 복귀할 때 칼이 비틀리지 않습니다.
+- **스커크 극악기·진**: 몸을 오른쪽으로 돌려 옆에서 보이는 공중제비로 바꿨습니다. 칼이 머리 위를 넘어가는 궤적에 맞춰 0~9틱 이펙트(`skirk_fx/burst_jin/t000~t009`)도 90도 돌리고 0.25칸 왼쪽으로 옮겼습니다.
+- **스커크 극악기·멸**: 웅크렸다가 칼을 앞세워 떠 있는 자세로 시작해, 왼쪽 허리로 칼을 끌어 수평으로 한 번 베고 낮게 돌진합니다. 균열이 터지는 동안(28~42틱) 칼을 거두고 손을 펼쳤다가 43~49틱에 다시 꺼냅니다.
+- **스커크 우클릭 빠른 이동**:
+  - 시작: 짧게 뛰어 베고 앞으로 뛰어듭니다.
+  - 반복: 앞으로 숙인 달리기 대신, 바닥에서 조금 떠서 양팔과 칼을 날개처럼 아래로 펼친 활공입니다.
+  - 종료: 내려앉아 두 걸음 디딘 뒤 준비 자세로 돌아옵니다.
+- **아를레키노 평타 1~6타(물리)**: 이전 동작 중 1·3·4·6타는 낫이 자기 이펙트 궤적과 반대로 돌았습니다. 6타 모두 이펙트 궤적·영상에 맞췄습니다.
+  - 1타: 오른쪽에서 왼쪽으로 가슴 높이 휩쓸기.
+  - 2타: 오른쪽 아래에서 머리 위를 넘어 왼쪽으로 내리는 원호.
+  - 3타: 왼쪽에서 오른쪽으로 낮은 역베기.
+  - 4타: 몸을 낮춰 반시계로 두 바퀴 베기.
+  - 5타: 낫을 땅에 꽂고 옆으로 재주넘기. 이전에는 앞으로 다이빙하며 낫이 땅에 박혔습니다.
+  - 6타: 몸을 감았다가 시계 방향으로 낮게 한 바퀴.
+  
+  연결·복귀 때 낫이 크게 뒤집히던 것(최대 174도)을 110도 안쪽으로 줄였습니다.
+- **아를레키노 강화 평타 1~6타(피의 대가)**:
+  - 1타: 오른쪽 위에서 왼쪽 아래로 사선 베기.
+  - 2타: 앞에서 세로로 올려 베기.
+  - 3타: 등 뒤로 자루를 찌른 뒤 낮게 시계 방향 휩쓸기.
+  - 4타: 반시계 두 바퀴 고리 베기.
+  - 5타: 낫을 짚고 옆으로 재주넘기.
+  - 6타: 낫을 뽑아 낮게 한 바퀴.
+  
+  150% 재생에서 두 틱씩 건너뛸 때 낫이 거꾸로 돌던 구간을 고쳤습니다.
+- **아를레키노 원소폭발**: 팔짱 낀 채 힘을 모은 뒤 팔을 펼치고 오른손으로 입가를 가리는 자세를 취합니다. 처음부터 끝까지 정면(시전 방향)을 봅니다(영상처럼 카메라 쪽으로 돌아서지 않음). 손 위 불꽃 이펙트는 정면 기준 오른손 위치 그대로입니다.
+- **스커크 좌클릭 강화 진입(칠상 섬광)**: 시계 방향으로 한 바퀴 돌며 칼을 왼쪽 허리로 끌었다가 세로로 올려 베고 내려베기. 이어서 팔을 펼쳐 터뜨리고 준비 자세로 끝납니다. 첫 회전 뒤로는 끝까지 정면(시전 방향)을 봅니다(영상처럼 카메라 쪽으로 돌아서지 않음).
+- **스커크 강화 평타 1~5타(칠상 섬광)**:
+  - 1타: 뛰어들며 수평 베기.
+  - 2타: 올려 베고 한 바퀴 돌아 겨누기.
+  - 3타: 뛰어오르며 올려 베고 뒤로 공중제비하며 한 번 더.
+  - 4타: 낮게 한 바퀴 휩쓸고 몸을 기울였다가 역으로 올려 베기.
+  - 5타: 돌아서 뛰어 칼을 머리 위로 넘겨 찌르고, 칼끝을 낮춘 채 잔심.
+  
+  각 타의 첫 자세가 앞 타의 연결 자세와 같아 콤보가 끊기지 않습니다.
+- **대쉬 모션(새로 추가)**: 두 캐릭터 모두 `clips.dash`(10틱 = 0.5초). 대쉬 이동(3틱)이 끝나는 3틱째에 앞발이 닿고 4~7틱은 미끄러지며 멈추고, 10틱째에 대기 자세가 됩니다. 몸을 앞으로 길게 숙이고, 팔은 달리기를 시작할 때처럼 팔꿈치를 굽혀 한쪽은 앞으로, 다른 쪽은 뒤로 흔듭니다(앞으로 나간 발의 반대쪽 팔이 앞). 무기는 등에 멘 채라 손은 비어 있습니다.
+  - 아를레키노: 낫 손잡이를 자루 끝으로 밀어 쥐고 머리를 뒤로 끌며 뛰어나갑니다. 스커크: 칼을 뒤로 젖힌 채 낮게 다리를 벌려 미끄러지고, 멈추며 칼을 바깥으로 돌려 앞에 둡니다.
+  - 대쉬 방향(이동 입력, 없으면 시선)을 향해 재생합니다(`char/motion/dash_face`). 무기는 등에 멘 채로 대쉬합니다. 손에 쥐고 있었다면 먼저 빠른 수납(손에서 사라졌다가 등에서 다시 나타남)을 합니다. 강화 상태의 낫 · 결정검은 등에서도 유지됩니다(아래 「무기 집어넣기·꺼내기」). 효과음·입자는 기존 대쉬 것만 씁니다. 대쉬 이동이 끝나면(3틱 뒤) 공격으로 바로 끊을 수 있습니다.
+- 키프레임 원본은 `tools/player_motion/arle.json`, `skirk.json`이고 `node tools/build_player_rig.mjs --resourcepack <리소스팩>`으로 다시 생성합니다. 일부 무기 각도는 ±180도를 넘는데, 보간이 짧은 쪽으로 돌도록 일부러 고른 값이니 정규화하지 마세요.
+
+### 5타 모션 (2026-10-16)
+- 아를레키노 5타(일반 · 강화): 옆이 아니라 **앞으로 한 바퀴 구르고**(공중제비) 낫을 뒤에서 머리 위를 넘겨 앞쪽 바닥에 내리찍은 뒤 일어섭니다. 낫 자루가 팔을, 왼팔이 몸통을 뚫던 자세를 고쳤습니다.
+- 스커크 5타(일반): 내려벤 뒤 칼을 머리 위로 들어 올리던 자세(내려칠 것처럼 보이던 부분)를 없애고, 옆베기를 위해 칼을 옆으로 당기는 자세로 이어지게 했습니다. 강화 5타도 머리 위에서 내려치던 궤적을 효과(앞으로 찌르는 선)와 맞게 고쳤습니다.
+- 원본: `tools/player_motion/arle.json`, `skirk.json` (생성: `node tools/build_player_rig.mjs`).
+
+### 콘솔 오류 정리 · 라이덴 체력 (2026-10-15)
+
+- 리로드할 때 로드에 실패하던 함수 3개를 고쳤습니다.
+  - `boss/raiden/vfx/judgment_bolt`: 즉석 조건의 키가 이 버전에서 `type`입니다(`{type:"minecraft:random_chance",chance:0.5}`).
+  - `char/motion/arle_fx/burst/40`: `minecraft:flash` 입자에 색이 필요합니다(`flash{color:[...]}`).
+  - `minimap/left`: `scoreboard players add`에는 음수를 쓸 수 없어 `remove 10`으로 바꿨습니다.
+- 평상시 콘솔을 채우던 `Failed to decode value '{extra:[],text:""}'`: 선택 화면 설명 창(`rlk_pk_tip`, `rlk_pk_tip2`)이 아무것도 조준하지 않을 때 빈 목록으로 글자를 만들던 것이 원인입니다. 비어 있으면 빈 글자로 둡니다(`lvup/tip/update`, `invd/tip2`, `codex/tip2`). 각인이 없는 아이템의 설명 줄도 같은 방식으로 막았습니다(`items/lore/engr`).
+- 라이덴(나루카미) 1레벨 기준 체력 400 → 267(2/3). 레벨에 따른 증가율은 그대로입니다(`room/mob_init`, 태그 `rlk_m_boss`).
+
+
+## 중간보스 파수꾼・타락 모델과 리그 (`mboss/guardian/rig/`)
+
+원신의 개안자 "파수꾼・타락"을 참고 영상 4편(m1~m4)과 공식 렌더(ref.png, 공략 PDF)를 기준으로 29개 `item_display` 부품으로 만든 모델과 동작입니다. 패턴·판정·효과·소리는 이 리그를 부르는 쪽(중간보스 모듈)이 맡고, 리그는 몸의 움직임만 담당합니다.
+
+### 외형
+
+- 크기: 발끝~볏 꼭대기 3.0칸(BH), 평소 0.35칸 떠 있고 후광 끝까지 약 3.75칸입니다. 창은 4.35칸(1.45 BH)으로 **오른손**(붉게 타락한 복셀 팔)에 쥡니다. 금빛 날개 견갑(눈 방패)과 하나뿐인 흰 날개는 **왼쪽**입니다.
+- 부품(고정 UUID `524c4b4d-4247-4400-8000-0000000000NN`, 매니페스트 순서):
+  - 몸: 골반(금빛 V 왕관 허리띠 · 붉은 4각별), 앞 치마(붉은 별 셋 + 긴 깃털 두 폭, 찢긴 홈, 두 폭 사이의 트임으로 검붉은 복셀 다리가 보임), 바깥 치마(엉덩이에서 곧게 내려와 아랫단에서만 바깥으로 벌어지는 깃털, 끝이 발 아래 약 ±1칸), 허리띠 양 끝에서 위·바깥으로 뻗는 엉덩이 깃털, 가운데가 트인 뒤 치마, 왼쪽 엉덩이의 S자 꼬리 깃, 복셀 다리 둘(원본처럼 한 줄로 부서진 불규칙한 큐브 더미: 큰 덩어리와 작은 조각, 큐브마다 다른 3D 기울기, 대칭 없음, 오른쪽으로 튀어나온 판, 소용돌이 룬의 마름모 발, 검붉은 면의 빛나는 균열 무늬, 큐브마다 앞뒤 깊이도 달라 옆에서 봐도 곧은 기둥이 아님), 몸통(붉은·검은 가슴, 금 장식, 오른쪽 흰 깃 칼라, 왼쪽 붉은 고리 보석), 머리(얼굴 없음: 흰 뿔 깃 둘 · 옆 날개 둘이 붉은 마름모와 눈 하나를 감쌈), 후광(금빛 고리 · 긴 위쪽 가시 · 짧은 아래 가시 둘 · 가는 빛살)과 후광 빛무리;
+  - 팔: 타락한 오른팔 3마디(진홍 복셀 상자 밖으로 비스듬히 튀어나온 파편 판, 0.2칸 넘는 붉은 발톱이 부채꼴로 벌어진 손, 쥔 손 / 편 손), 왼팔 3마디(둥글게 깎은 가는 금 갑옷: 둥근 어깨·팔꿈치 공, 테두리가 젖혀진 어깨 판 아래 팔꿈치 쪽으로 가늘어지는 금 소매, 대부분의 시점에서 보이는 쪽이 주황빛으로 빛나고 금 덩굴 무늬와 금 테가 있는 건틀릿, 검붉은 손목 띠와 금 소맷부리; 손은 마디 혹 넷과 작은 호박색 보석이 있는 금 손등 판, 가는 마디 셋으로 손바닥 쪽으로 굽어 휜 금 발톱으로 끝나는 손가락 넷(바깥 둘은 부채꼴로 벌어짐)과 엄지), 어깨에서 방패까지의 받침(어깨를 덮는 둥근 금 견갑에서 매끈하게 이어지는 가는 금 막대, 방패 테두리의 경첩 원판, 막대 위로 휘어 오르는 금 날개 판과 그 아래 검은 4각별을 단 가시);
+  - 방패(아몬드 눈 테두리 · 4각별 틀 · 위로 뻗은 긴 가시 · 뒷날 깃 가시)와 눈(4각별 틀 안의 호박빛 금색 바탕과 작은 흰 보석, 가는 적갈색 초승달 두 줄, 바깥쪽 호박색 홍채; 원소별로 색 교체), 날개 3단(크림색 덮깃 · 둘째깃 · 둘씩 짝지어 간격이 고르지 않은 긴 첫째깃, 대기 때 끝이 바닥 위 약 0.8칸);
+  - 창(잎 모양 날 · 뒤로 젖힌 미늘 · 속이 뚫린 타원 고리 안의 붉은 4각별 보석 · 칼라 · 손잡이 쪽으로 휘어 내려와 끝이 안으로 굽는 초승달 날개 둘 · 금빛 자루 · 붉은 별 끝장식 · 떠 있는 작은 별), 날과 초승달을 둘러싼 부드러운 금빛 빛무리(대기 때 날 둘레 약 0.4칸), 휘두를 때의 잔상 2개, 떠다니는 붉은·검은 큐브 무리 3개(오른쪽 어깨 · 발 아래 · 목). 발 아래 무리는 다리 흔들림을 따라가고, 표류 모양 8개를 클립이 5틱마다 바꿔 끼워 큐브마다 다른 위상으로 떠다니며, 떨어지는 큐브는 돌며 작아졌다가 위에서 다시 생깁니다.
+- 그림: 깃털·패널·날·방패·후광은 투명 컷아웃 스프라이트 카드(`guardian_paint.mjs`, 벡터 모양 + 4배 슈퍼샘플링)이고, 창 머리·후광·방패·날개 단은 비스듬히 볼 때 윤곽이 겹쳐 보이지 않도록 한 장(양면)씩입니다. 왼팔·어깨와 팔꿈치 공·견갑·받침 막대는 축 둘레로 16면을 돌려 세운 깎은 형태(면마다 한 장짜리 카드)라 어느 쪽에서 봐도 윤곽이 둥글고 모서리가 없습니다. 면들은 감싸는 그림 하나(가로 = 둘레 각도, 세로 = 축 방향)를 나눠 쓰고 금속 빛을 그림에 넣어(`shade:false`) 게임의 어두운 옆면 음영 대신 금빛을 유지하며, 굵기가 줄어드는 작은 턱은 옆 면과 같은 색으로 칠한 원판으로 막아 보이지 않습니다(갑옷 판의 실제 턱만 음영이 있는 금 원판). 손가락은 가는 상자 세 마디와 그린 발톱 카드입니다. 오른팔·다리·큐브·금속은 그린 텍스처의 상자입니다. 아이템 모델의 상자는 한 축으로만 돌릴 수 있으므로, 다리 · 발 아래 큐브 부품은 고정된 복합 회전을 하나씩 갖고 큐브마다 한 축 회전을 더해 제각각 3D로 기울어집니다(배치표와 시드는 `guardian_geometry.mjs`의 `LEG_R` · `LEG_L` · `TRAIL`, 앞 · 옆 · 뒤 치마 깃털을 뚫지 않게 깊이를 맞춤). 다리가 대기 때보다 더 앞(뒤)으로 흔들리면 앞 치마(바깥 · 뒤 치마와 꼬리 깃)가 그만큼 함께 밀려 큐브가 깃털을 뚫지 않습니다(`guardian_pose.mjs`). 카드는 음영을 그림에 넣었으므로 `shade:false`입니다.
+- 빛: 머리(눈)·후광·건틀릿·방패 눈·창·빛무리·잔상은 밝기 15, 나머지는 12~13입니다.
+- 원소 모습(`eye/<원소>` · `spear/<원소>` · `tint/<원소>`): 기본 바위(금빛 창, 주황 보석 눈), 불 `#FF8A4C`, 물 `#5CC8FF`, 번개 `#E484FC`, 얼음 `#A2FEFD`, 수호 모드 금빛 `#FCE484`, 혼돈 붉은색 `#E03A3A`. 눈은 색을 입힌 보석 위에 흰 중심을 남기고, 창은 날을 그 원소 색으로 바꾸고 빛무리 색을 맞춥니다.
+
+### 동작 클립 (26개, 20틱/초)
+
+클립 키는 영상 시간표로 적고, `guardian_clips.mjs` 의 `RETIME` 표(조각 직선 매듭 [작성 틱, 재생 틱])가 피해를 주는 동작의 선딜을 약 25% 줄인 재생 시간표로 옮깁니다. 빠른 타격 · 회전 키는 1:1 구간에 있어 속도가 그대로이고 타격이 사건 틱에 맞으며, 줄어드는 것은 선딜(그리고 P5 의 공중 대기, P4 휘두르기 전 자세, 실패 상승)뿐이고 마지막 타격 뒤 회복은 앞당겨질 뿐 줄지 않습니다. 매듭은 매니페스트의 `retime` · `authoredLen` 에도 들어가 패턴 생성기가 자기 효과 틱을 같은 표로 옮깁니다(`api.rt`). 아래 틱은 재생 시간표입니다.
+
+- 대기 `idle`(반복, 위아래 0.05칸 · 날개 숨쉬기 · 치마 흔들림 · 두 다리가 엇박자로 흔들림 · 큐브 떠다님; 타락한 오른팔을 오른쪽 아래로 뻗어 초승달 날개 사이를 쥐고, 창끝장식 별은 얼굴과 떨어진 왼쪽 후광 가장자리에 옴), 이동 `glide`(반복).
+- 공간 찌르기 `thrust`(79틱, 타격 21 · 46; 작성 91틱 · 28 · 58), 공간 투창 `javelin`(67틱, 4~8틱에 창을 몸 둘레로 한 바퀴 돌림, 9~22와 27~54틱 동안 손의 창 숨김, 날아가는 창은 `prop/spear`, 27틱 발사), 근접 내려찍기 `slam`(64틱, 고리 7, 착탄 20, 20~42틱 창 꽂힘), 끌어당기기 `pull`(32틱, 24틱 이동) → 두 번의 360도 회전 베기 `swing`(46틱, 15~19 · 28~34), 하늘 심판 `flyslam`(91틱, 14~18틱 8칸 상승, 31틱 착탄, 31~61틱 창 꽂힘). 근접에서 P4 를 고르면 그 전에 뒤로 깡충 물러나기 `backstep`(12틱, 웅크렸다가 약 1칸 떠올라 몸을 젖히고 날개를 펼친 채 다리를 앞으로 끌며 내려앉음, 창은 대기 자세로 쥠; 수평 이동은 패턴 쪽이 본체를 6.5칸 미끄러뜨림).
+- 수호 모드: 진입 `guard_entry`(50틱, 지휘봉 돌리기 → 세로 원반 → 바닥 고리 → 자세) → `guard`(반복), 금빛 휘두르기 `sweep`(39틱, 칼날 15~19), 원소 휘두르기 `sweep_e`(45틱, 칼날 16~22).
+- 혼돈: `chaos_leap`(32틱) → `chaos_charge`(36틱) → `chaos_hover`(반복, 발 3칸 위 · 창을 어깨 뒤에 가로로), 실패 `chaos_fail`(30틱, 실패 순서 전체를 0.75배로) → 25틱에 `chaos_land`(26틱, 실패 창 1 착탄(+37)과 창 2(+60) 사이인 +47에 바닥에 내려서서 창을 어깨에 걸친 채 멈춤) → 창 2가 있으면 +54에 `chaos_raise`(24틱, 떨어지기 직전 0.3초에 창을 머리 위로 세움), 성공 `chaos_fall`(20틱) → 그로기 `groggy_a`(반복, 창을 머리 쪽이 아래로 꽂고 축 처짐, 후광 밝아짐) → `groggy_b`(34틱, 방패를 몸 앞으로) → `getup`(40틱, 날개를 가장 넓게 펼치며 일어남).
+- 등장 `entrance`(60틱, 7칸 위에서 창이 떨어져 14틱에 꽂히고 그 옆에 나타나 뽑아 듦), 사망 `death`(80틱, 축 처졌다가 날아올라 사라짐), 공식 렌더 자세 `pose_ref`(반복).
+- 생성기 검사(통과하지 못하면 생성을 멈춤): 어떤 부품도 한 틱 사이나 한 보간 구간 안에서 120도 넘게 돌지 않습니다(클라이언트의 최단 경로 보간이 180도 가까이에서 방향을 못 정해 팔꿈치·손목이 몸을 뚫고 튀는 것을 막음). 모든 클립의 모든 틱에서 붉은 창끝장식 별이 얼굴 마름모 앞을 가리지 않습니다. 한 틱에 45도 넘게 도는 곳은 반 틱 자세도 풀어 보고, 클라이언트 경로가 35도 넘게 벗어나면 경고합니다. 자세 풀이기는 팔꿈치 굽힘 면, 창을 쥔 주먹의 회전, 팔 마디의 비틀림을 틱마다 이어 받아 한 틱에 40~55도까지만 돌립니다.
+- 각 클립의 사건 틱(타격 · 발사 · 착지 등)은 `tools/mboss_guardian_rig_manifest.json`의 `events`에 있고, 패턴 쪽은 이 틱에 맞춰 판정·효과·소리를 냅니다. 수평 이동(돌진 · 비행 목표 · 중앙으로 도약)은 본체(앵커)를 움직여서 하고, 높이·기울기·팔다리·창은 클립이 맡습니다. 창이 꽂혀 있는 구간에는 본체를 움직이지 않습니다.
+
+### 쓰는 법 (모든 함수는 `rlk:mboss/guardian/rig/…`, 실행자 = 앵커인 보스 본체)
+
+- `spawn`: 앵커 위치·방향에 부품을 소환하고, 다음 `tick`에서 `idle`을 0틱부터 시작합니다(목표 처음 한 번). `spawn_hidden`: 같지만 모든 부품이 크기 0으로 나타나 보이지 않으므로, 같은 틱에 `play/entrance`를 부르면 등장 전에 모습이 한 틱도 보이지 않습니다. `tick`: 매 틱 `execute as <본체> at @s run function rlk:mboss/guardian/rig/tick` — 부품이 본체 위치·방향을 따라가고 클립이 진행됩니다(부품이 없으면 다시 소환하며, 이때 클립은 `idle`로 돌아갑니다).
+- `play/<클립>`: 다음 `tick`에서 그 클립의 0틱부터 재생합니다(같은 게임 틱에 `tick`이 뒤에 오면 그 틱부터). 현재 자세에서 최소 3틱 섞여 들어가고, 끝나면 정해진 다음 클립(대부분 `idle`)으로 이어집니다.
+- 방향: `face/player`(가장 가까운 플레이어 쪽으로 즉시), `face/track`(호출마다 최대 12도, 두 방향을 [-180, 180)으로 맞춘 뒤 비교하므로 플레이어가 몇 바퀴를 돌아도 짧은 쪽으로 돎), `face/set {yaw:…}`. 원소 모습: `eye/<원소>`, `spear/<원소>`(창 머리 · 빛무리 · 잔상 2개를 함께 바꿈), `tint/<원소>`. 피격 표시: `flash`(3틱 흰 윤곽선, 끝나면 지금 빛 모습으로). 빛 모습: `glow/gold`(몸 전체 금빛 윤곽선 `#FCD84C`, 파수 모드), `glow/off`(점수 `gdRigGl`, 다시 소환해도 유지). 정리: `kill`(부품), `prop/clear`(창 소품), `uninstall`(부품 · 소품 · 점수판).
+- 부품 태그: `rlk_room` `rlk_mb_aux` `rlk_mb_part` `rlk_mb_guardian_part` `rlk_mb_gp_<부품>`. 매 틱 명령은 고정 UUID로 부품을 바로 지정하므로 선택자 검색이 없습니다. 클립은 부품마다 "클라이언트 보간이 원래 자세에서 0.012칸 / 0.5~2도 / 1.5% 넘게 벗어나는 틱"에만 키를 넣어 26개 클립이 키 파일 약 940개, 부품 키 약 10,100개(약 2.8MB, 라이덴 32MB)입니다.
+- 자세한 계약(클립 표 · 사건 틱 · 본체 이동 · 혼돈 실패 순서 · 생성기 검사 · 원소 색 값)은 `tools/mboss_guardian_rig_api.md`에 있습니다.
+
+### 작업 파일 · 생성
+
+- `tools/build_mboss_guardian_rig.mjs`(부품 · 클립 컴파일 · 함수 · 매니페스트), `guardian_clips.mjs`(클립 키, 영상 시간표 기준), `guardian_pose.mjs`(관절 · 팔 IK), `guardian_geometry.mjs`(부품 모델), `guardian_paint.mjs` · `guardian_paint_lib.mjs`(그림), `guardian_rig_math.mjs`.
+- 중간보스 리그 공용 라이브러리(나비 리그와 함께 씀): `mboss_rig_math.mjs`(수학) · `mboss_paint_lib.mjs`(그림, SDF `Grid` 화가) · `mboss_model_lib.mjs`(모델 도우미) · `mboss_rig_clips.mjs`(클립 시간 바꾸기 · 표본) · `mboss_rig_compile.mjs`(리그 컴파일러) · `mboss_screen_lib.mjs`(화면 글꼴 엔진). `guardian_rig_math.mjs` · `guardian_paint_lib.mjs` 는 이것을 다시 내보내는 얇은 파일이고, 옮긴 뒤에도 가디언의 데이터팩 · 리소스팩 출력은 바이트 단위로 그대로다.
+- 생성: `node tools/build_mboss_guardian_rig.mjs --resourcepack <압축을 푼 리소스팩 폴더>` (그림까지 약 45초, 그림을 건너뛰려면 `--no-paint`; 동작을 다듬는 동안 검사를 경고로만 보려면 `--allow-steps` · `--allow-butt`). `data/rlk/function/mboss/guardian/rig/`는 생성기가 통째로 다시 쓰므로 직접 고치지 않습니다.
+- 리소스팩에는 `assets/rlk/{textures,models/item,items}/mboss/guardian/`와 아이템 아틀라스 항목이 추가됩니다. 리그 부품이 아닌 혼돈 원소별 수정 모델 `star_1`~`star_6` · `star_flash` · `star_dark`(그림 `gd_star_<종류>` · `gd_star_core`)도 여기서 만들고, P4 화면 효과 글꼴 `assets/rlk/font/mboss_gd.json` + `textures/font/mboss_gd/*`(`tools/guardian_screen.mjs`: 프레임마다 256×144 타일 4장, 섬광은 단색 글리프 하나, 되돌리는 공백 둘; 다른 글꼴과 글자 번호가 겹치면 생성 중단)도 씁니다. 프레임 제목 문자열은 매니페스트 `screen` 에 들어가 `p34.py` 가 씁니다. 적용은 `/reload`와 `F3+T`.
+- 게임 안에서의 동작 확인은 아직 하지 않았습니다(오프라인 렌더로 확인).

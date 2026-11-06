@@ -61,10 +61,6 @@ fill 6 201 -5 8 201 -5 minecraft:podzol
 fill 14 201 7 18 201 8 minecraft:podzol
 fill 14 201 9 14 201 11 minecraft:podzol
 fill 15 201 11 18 201 11 minecraft:podzol
-fill 7 201 14 18 201 15 minecraft:podzol
-fill 5 201 15 6 201 15 minecraft:podzol
-fill 5 201 16 5 201 18 minecraft:podzol
-fill 4 201 17 4 201 18 minecraft:podzol
 fill 7 201 -19 11 201 -18 minecraft:dirt
 fill 7 202 -19 11 202 -18 minecraft:podzol
 fill 6 201 -18 6 201 -16 minecraft:dirt
@@ -79,14 +75,8 @@ fill 7 201 -16 11 201 -16 minecraft:dirt
 fill 7 202 -16 11 202 -16 minecraft:podzol
 fill 15 201 9 18 201 10 minecraft:dirt
 fill 15 202 9 18 202 10 minecraft:podzol
-fill 6 201 16 18 201 16 minecraft:dirt
-fill 6 202 16 18 202 16 minecraft:podzol
-fill 6 201 17 6 201 18 minecraft:dirt
-fill 6 202 17 6 202 18 minecraft:podzol
 fill 7 201 -17 11 202 -17 minecraft:dirt
 fill 7 203 -17 11 203 -17 minecraft:podzol
-fill 7 201 17 18 202 18 minecraft:dirt
-fill 7 203 17 18 203 18 minecraft:podzol
 fill 3 201 6 4 205 7 minecraft:stone
 fill 3 206 6 4 206 7 minecraft:podzol
 fill 18 201 -19 18 207 -19 minecraft:mossy_cobblestone
@@ -105,4 +95,4 @@ execute positioned 3 201 -18 run function rlk:room/prop/f_moss
 execute positioned 2 201 -15 run function rlk:room/prop/f_grass
 execute positioned 2 202 -4 run function rlk:room/prop/f_grass
 execute positioned 11 204 -17 run function rlk:room/prop/f_moss
-execute positioned 16 204 17 run function rlk:room/prop/f_grass
+execute positioned 16 201 17 run function rlk:room/prop/f_grass
