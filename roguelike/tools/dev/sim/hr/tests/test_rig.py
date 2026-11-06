@@ -59,6 +59,13 @@ datapack; S2b takes it over with the manifest, api.HANDOVER).
   float      air spans stay up (core lowest >= min(0.5 S_LEG lowRef, 0.05)); the last-resort lift <= 0.005 on contact ticks;
              ghost ticks exempt
   blade      every tick: no blade sample > 0.05 b inside head / torso / pelvis (the ticks > 0.01 counted)
+  clear      (V1, HR-47) every tick of every clip (a one-shot clip's blend-in, cut ticks and the tick after them aside; ghost ticks at
+             their scale): no fist sample (the forearm's centre line over the lower half of its base box), hilt sample (the
+             sword's axis pommel -> guard) or guard sample (its disc: the centre and 8 rim points, r 0.10) 0.01 b or more inside
+             the head or torso base box (the deepest per kind printed)
+  gait       (V1, HR-49) walk / strafe_l / strafe_r (the loop's second cycle): each sole lifts > 0.04 b in its swing, no sole on
+             the floor skates against the ground (> 0.01 b in a tick), the stance slide (1 - the planted sole's speed with the
+             ground / api.WALK_SPEED) <= 55 % (reported)
   held       the held sword's pivot at the left grip; sheathe ticks on the scabbard axis; the hat in hand 0.62 from the right
              grip; the cup under the right fist; the bottle's neck in the left fist; hilt_sheathed == the scabbard pivot
   hats       worn on the head axis, back clear of head / torso, world clear of the body and the floor, no jump > 0.15 b at a
@@ -1214,7 +1221,17 @@ if SUPT and DIMS and SKEL:
         return [v[0] * c + v[2] * s, v[1], -v[0] * s + v[2] * c]
     bad = {k: [] for k in ('feet', 'lie', 'seat', 'stone', 'kneel', 'touch', 'items', 'hatfloor', 'brim', 'hilt', 'throat', 'lips',
                            'twohand', 'air', 'lift', 'held', 'sheathe', 'hat_hand', 'cup', 'bottle', 'hilt_pivot', 'worn', 'back',
-                           'world', 'jump', 'blade', 'hat_clear', 'strings', 'brim_head', 'first_key', 'hinge_arm', 'hinge_leg')}
+                           'world', 'jump', 'blade', 'hat_clear', 'strings', 'brim_head', 'first_key', 'hinge_arm', 'hinge_leg', 'clear')}
+    # V1 (HR-47): the samples that keep out of her head / torso base boxes (scarlet_pose.mjs FIST_AXIS / HILT_AXIS / GUARD_RIM): the
+    # fist = the forearm's centre line over the lower half of its base box, the hilt = the sword's axis from the pommel to the guard,
+    # the guard = its disc (the centre and 8 rim points, r 0.10); in the display frame of the key files (the sword at its display scale)
+    _flo, _fhi = box_of(PART['forearm_l']['model'])
+    FIST_AX = [((_flo[0] + _fhi[0]) / 2, _flo[1] + (_fhi[1] - _flo[1]) * .5 * j / 6, (_flo[2] + _fhi[2]) / 2) for j in range(7)]
+    _SD = DIMS['sword']
+    HILT_AX = [(0, (_SD['pommel'] + (_SD['guard'] - _SD['pommel']) * j / 12) / SW_DS, 0) for j in range(13)]
+    GUARD_RM = [(0, _SD['guard'] / SW_DS, 0)] + [(.10 * math.cos(i * math.pi / 4) / SW_DS, _SD['guard'] / SW_DS, .10 * math.sin(i * math.pi / 4) / SW_DS)
+                                                 for i in range(8)]
+    CLEAR_W = {}
     worst = {}
 
     def note(k, v):
@@ -1250,6 +1267,30 @@ if SUPT and DIMS and SKEL:
                 note(key, hg)
                 if hg > lim:
                     bad[key].append(f'{clip} t{t} {b_} {hg:.0f} deg at a {bend:.0f}-deg bend')
+        # V1 (HR-47): every shown tick (the blend-in from the previous clip, cut ticks and the tick after them aside; the ghost ticks
+        # at their scale): no fist / hilt / guard sample 0.01 b or more inside the head or the torso base box
+        for t in range(len(frames)):
+            if t in blend or t in cut_set:
+                continue
+            fr = frames[t][0]
+            pts = {}
+            for k_ in ('l', 'r'):
+                v = shown_v(fr, 'forearm_' + k_)
+                if v:
+                    pts['hand_' + k_] = [world(v, P) for P in FIST_AX]
+            sv = shown_v(fr, 'sword')
+            if sv:
+                pts['hilt'], pts['guard'] = [world(sv, P) for P in HILT_AX], [world(sv, P) for P in GUARD_RM]
+            for bn in ('head', 'torso'):
+                bv = shown_v(fr, bn)
+                if not bv:
+                    continue
+                for kind, P_ in pts.items():
+                    d = max(depth_in(P, bv, BB[bn]) for P in P_)
+                    key = f'{kind}.{bn}'
+                    CLEAR_W[key] = max(CLEAR_W.get(key, (-9, '')), (d, f'{clip} t{t}'))
+                    if d >= .01:
+                        bad['clear'].append(f'{clip} t{t} {key} {d:.3f}')
         # planted feet: that side's shin hull lowest within ±0.012
         for side, key in ((1, 'feet_l'), (-1, 'feet_r')):
             for t in ticks(sp[key]):
@@ -1527,6 +1568,9 @@ if SUPT and DIMS and SKEL:
     check(f'float: the last-resort lift <= 0.005 on every contact tick (worst {W_("lift")})', not bad['lift'], lst('lift'))
     check(f'blade: every tick, no blade sample > 0.05 b inside her head / torso / pelvis (worst {W_("blade")}; {blade_soft} of {n_blade} '
           'ticks with the blade out > 0.01)', not bad['blade'], lst('blade'))
+    _cw = ', '.join(f'{k} {v[0]:.3f} ({v[1]})' for k, v in sorted(CLEAR_W.items()))
+    check(f'clear (V1, HR-47): no fist / hilt / guard sample >= 0.01 b inside her head or torso base box on any tick of any clip '
+          f'(deepest: {_cw}; {len(bad["clear"])} sample-ticks over)', not bad['clear'], lst('clear'))
     check(f'held: the held sword\'s pivot at the left grip (<= 0.03; worst {W_("held")})', not bad['held'], lst('held'))
     check('held: sheathing: the blade on the scabbard axis (<= 3 deg / 0.02 b), the pivot within 0.04 of the left grip', not bad['sheathe'], lst('sheathe'))
     check(f'held: the hat in hand {DIMS["hat"]["hand"]} ± 0.03 from the right grip (worst {W_("hat_hand")}; where it was pushed clear of her '
@@ -1659,6 +1703,48 @@ else:
     skipped('contacts / float / held / hats / strings / blade-every-tick', 'support / dims / skeleton')
 
 # ---------------------------------------------------------------- angles kept (the retarget changes no source angle)
+# ---------------------------------------------------------------- V1 (HR-49): the walk and the strafes step (the module glides her root
+# api.WALK_SPEED b/t: forward in walk, to her left / right in strafe_l / strafe_r). On the replay (the loop's second cycle): each foot
+# lifts its sole (the shin's lowest point) > 0.04 b in its swing; no foot on the floor (lowest < 0.012 on two ticks in a row) moves
+# against the ground by more than 0.01 b in a tick (a sole skating the wrong way: the strafe's pops); the stance slide (1 - the
+# planted sole's speed with the ground / the move speed, the sole = the shin's end) reported, failing above 55 % (the frozen cadence:
+# a player-size leg sweeps <= ~0.75 b a 12-t stance)
+if SKEL and DIMS:
+    _sp = api.WALK_SPEED
+    _shin = SKEL.get('shin', .390625) if isinstance(SKEL, dict) else .390625
+    gait_bad, gait_rep = [], []
+    for clip, ax, gdir in (('walk', 2, -1), ('strafe_l', 0, -1), ('strafe_r', 0, 1)):
+        frames, _bl = steady(clip)
+        rows = []
+        for fr, mdl, _ in frames:
+            r = {}
+            for k_ in ('l', 'r'):
+                v = shown_v(fr, 'shin_' + k_)
+                r[k_] = (low_of(fr, mdl, ['shin_' + k_]), at(v, [0, -_shin, 0])[ax]) if v else (9.0, 0.0)
+            rows.append(r)
+        lift = {'l': 0.0, 'r': 0.0}
+        st_s, st_n, drag, pop = 0.0, 0, 0, 0.0
+        for t in range(1, len(rows)):
+            for k_ in ('l', 'r'):
+                (lo0, x0), (lo1, x1) = rows[t - 1][k_], rows[t][k_]
+                lift[k_] = max(lift[k_], lo1)
+                if lo0 < .012 and lo1 < .012:
+                    g = gdir * (x1 - x0)
+                    if g < -.01:
+                        drag += 1
+                        gait_bad.append(f'{clip} t{t} {k_} {x1 - x0:+.3f} b against the ground')
+                    else:
+                        st_s += 1 - min(1, g / _sp); st_n += 1
+                    pop = max(pop, abs(x1 - x0))
+        slide = st_s / max(1, st_n)
+        gait_rep.append(f'{clip} slide {100 * slide:.0f} % lift {lift["l"]:.3f}/{lift["r"]:.3f}')
+        if min(lift.values()) <= .04:
+            gait_bad.append(f'{clip}: a foot never lifts > 0.04 (L {lift["l"]:.3f}, R {lift["r"]:.3f})')
+        if slide > .55:
+            gait_bad.append(f'{clip}: stance slide {100 * slide:.0f} %')
+    check(f'gait (V1, HR-49): the walk / strafes step (each swing lifts > 0.04, no sole on the floor skates against the ground, '
+          f'stance slide <= 55 %: {"; ".join(gait_rep)})', not gait_bad, '; '.join(gait_bad[:6]) + f' ({len(gait_bad)})')
+
 if RET:
     _r = subprocess.run(['node', 'tools/scarlet_retarget.mjs', '--dump', 'all'], cwd=DP, capture_output=True, text=True)
     try:

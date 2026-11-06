@@ -393,10 +393,10 @@
      0.06628
     ],
     "q": [
-     0.10183,
-     -0.36379,
-     0.00671,
-     0.92587
+     0.07697,
+     -0.34946,
+     0.03776,
+     0.93302
     ],
     "s": [
      1,
@@ -424,15 +424,15 @@
    ],
    "rest": {
     "t": [
-     0.3603,
-     1.11887,
-     0.02036
+     0.36974,
+     1.11734,
+     0.03697
     ],
     "q": [
-     -0.46894,
-     -0.29641,
-     -0.21102,
-     0.8048
+     -0.4834,
+     -0.30551,
+     -0.17381,
+     0.80174
     ],
     "s": [
      1,
@@ -856,15 +856,15 @@
    ],
    "rest": {
     "t": [
-     0.14799,
-     0.95692,
-     0.23683
+     0.17241,
+     0.95501,
+     0.26691
     ],
     "q": [
-     -0.82136,
-     0.16061,
-     -0.28313,
-     -0.46841
+     -0.82103,
+     0.1608,
+     -0.28302,
+     -0.46898
     ],
     "s": [
      1.5,
@@ -892,15 +892,15 @@
    ],
    "rest": {
     "t": [
-     0.14799,
-     0.95692,
-     0.23683
+     0.17241,
+     0.95501,
+     0.26691
     ],
     "q": [
-     -0.82136,
-     0.16061,
-     -0.28313,
-     -0.46841
+     -0.82103,
+     0.1608,
+     -0.28302,
+     -0.46898
     ],
     "s": [
      1.5,
@@ -1036,15 +1036,15 @@
    ],
    "rest": {
     "t": [
-     -0.01878,
-     0.82972,
-     0.40685
+     0.01741,
+     0.8275,
+     0.44752
     ],
     "q": [
-     -0.46894,
-     -0.29641,
-     -0.21102,
-     0.8048
+     -0.4834,
+     -0.30551,
+     -0.17381,
+     0.80174
     ],
     "s": [
      0,
@@ -1128,7 +1128,7 @@
    ],
    "events": {},
    "owner": "S2a",
-   "key_files": 18,
+   "key_files": 20,
    "keys": 81,
    "keys_per_tick": 2,
    "source": "v1 8.0-9.6 / v3 6.5-8.2 (the stance: blade low across her front); sway sine 40 t",
@@ -1163,9 +1163,9 @@
     "step2": 12
    },
    "owner": "S2a",
-   "key_files": 22,
-   "keys": 210,
-   "keys_per_tick": 8.4,
+   "key_files": 23,
+   "keys": 199,
+   "keys_per_tick": 8,
    "source": "v1 8-26 (P1 walking between attacks), v5 9-13.5 (the walk-in)",
    "note": "",
    "authored": true
@@ -1179,7 +1179,7 @@
    ],
    "events": {},
    "owner": "S2a",
-   "key_files": 7,
+   "key_files": 6,
    "keys": 64,
    "keys_per_tick": 3.8,
    "source": "P2 walk-in (PLAN §2.5; the ghost glide D2 on foot)",
@@ -1198,9 +1198,9 @@
     "step2": 10
    },
    "owner": "S2a",
-   "key_files": 13,
-   "keys": 128,
-   "keys_per_tick": 6.1,
+   "key_files": 19,
+   "keys": 103,
+   "keys_per_tick": 4.9,
    "source": "circling the player (P1 / P2 recoveries)",
    "note": "",
    "authored": true
@@ -1217,9 +1217,9 @@
     "step2": 10
    },
    "owner": "S2a",
-   "key_files": 16,
-   "keys": 130,
-   "keys_per_tick": 6.2,
+   "key_files": 19,
+   "keys": 104,
+   "keys_per_tick": 5,
    "source": "circling the player",
    "note": "",
    "authored": true
@@ -1246,8 +1246,8 @@
    "events": {},
    "owner": "S2a",
    "key_files": 4,
-   "keys": 63,
-   "keys_per_tick": 9,
+   "keys": 65,
+   "keys_per_tick": 9.3,
    "source": "hit reaction",
    "note": "",
    "authored": true
@@ -1264,7 +1264,7 @@
     "hit": 14
    },
    "owner": "S2a",
-   "key_files": 32,
+   "key_files": 31,
    "keys": 387,
    "keys_per_tick": 11.1,
    "source": "v1 9.667-10.400 (cr_v1_a1, v1s_a2_*): pivot, magenta glint, rising fan, flat crescent; footage glint -> hit 6 t, stretched to 14",
@@ -1284,7 +1284,7 @@
    },
    "owner": "S2a",
    "key_files": 30,
-   "keys": 357,
+   "keys": 358,
    "keys_per_tick": 11.5,
    "source": "v1 19.050-19.500 (cr_v1_a2a6a5, v1s_a8_*): glint -> hit 4.3 t (the fastest), stretched to 12; recovery v1 19.65-19.90",
    "note": "",
@@ -1308,9 +1308,9 @@
     "h5": 69
    },
    "owner": "S2a",
-   "key_files": 87,
-   "keys": 956,
-   "keys_per_tick": 9.9,
+   "key_files": 92,
+   "keys": 974,
+   "keys_per_tick": 10,
    "source": "v1 23.150-26.300 (cr_v1_a3_leads, v1s_a12*, v1s_combo5): gaps 16 / 15 / 12 / 12; open after hit 5",
    "note": "",
    "authored": true
@@ -1337,8 +1337,8 @@
    },
    "owner": "S2a",
    "key_files": 60,
-   "keys": 793,
-   "keys_per_tick": 13,
+   "keys": 785,
+   "keys_per_tick": 12.9,
    "source": "v1 10.800-12.550 (cr_v1_a4, v1s_a3_*, v1s_a4_*): leap, apex glint, flip, the S-ribbon dive; the ring spin; apex 7 t",
    "note": "",
    "authored": true
@@ -1355,8 +1355,8 @@
    },
    "owner": "S2a",
    "key_files": 13,
-   "keys": 103,
-   "keys_per_tick": 4.9,
+   "keys": 113,
+   "keys_per_tick": 5.4,
    "source": "v1 16.233-16.367 (cr_v1_a6, v1s_a7_*): the back-blink, then line 12",
    "note": "",
    "authored": true
@@ -1378,8 +1378,8 @@
    },
    "owner": "S2a",
    "key_files": 59,
-   "keys": 521,
-   "keys_per_tick": 8,
+   "keys": 529,
+   "keys_per_tick": 8.1,
    "source": "v1 13.067-14.733 (cr_v1_a9_ring*, cr_yellow_cmp, v1s_a5_*, v1s_a6_*): spin, the ring, the yellow tell, the star, the magenta screen, the iai cut",
    "note": "",
    "authored": true
@@ -1398,9 +1398,9 @@
     "hit": 22
    },
    "owner": "S2a",
-   "key_files": 49,
-   "keys": 408,
-   "keys_per_tick": 7.2,
+   "key_files": 53,
+   "keys": 435,
+   "keys_per_tick": 7.6,
    "source": "v1 20.000-21.700 (v1s_a10_*, cr_yellow_cmp): spring, the yellow tell in the air, the dive, the radial burst",
    "note": "",
    "authored": true
@@ -1417,8 +1417,8 @@
    },
    "owner": "S2a",
    "key_files": 13,
-   "keys": 160,
-   "keys_per_tick": 9.4,
+   "keys": 158,
+   "keys_per_tick": 9.3,
    "source": "v3 14.63-15.10 (cr_v3_tell_zoom, mg_yellow_cmp): the yellow tell, the retreat",
    "note": "",
    "authored": true
@@ -1436,8 +1436,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 269,
-   "keys_per_tick": 15.8,
+   "keys": 267,
+   "keys_per_tick": 15.7,
    "source": "v3 15.10-16.90 (v3r_d1/d2/d3_*, cr_v3_disc1_gold): crouch, blade up, the crescent, the spin, the release",
    "note": "",
    "authored": true
@@ -1540,8 +1540,8 @@
    },
    "owner": "S2a",
    "key_files": 9,
-   "keys": 165,
-   "keys_per_tick": 11,
+   "keys": 167,
+   "keys_per_tick": 11.1,
    "source": "v2 16.067-16.733 (mg_v2_blink): flash, blink, drop",
    "note": "",
    "authored": true
@@ -1556,9 +1556,9 @@
     "lunge": 10
    },
    "owner": "S2a",
-   "key_files": 12,
-   "keys": 162,
-   "keys_per_tick": 10.8,
+   "key_files": 13,
+   "keys": 173,
+   "keys_per_tick": 11.5,
    "source": "v3 17.667 (v3r_s7..): the run-in",
    "note": "",
    "authored": true
@@ -1574,8 +1574,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 248,
-   "keys_per_tick": 16.5,
+   "keys": 249,
+   "keys_per_tick": 16.6,
    "source": "v2 11.050, v3 9.583 (v2f_s1_1f): the ring cut",
    "note": "",
    "authored": true
@@ -1591,8 +1591,8 @@
    },
    "owner": "S2a",
    "key_files": 14,
-   "keys": 246,
-   "keys_per_tick": 16.4,
+   "keys": 245,
+   "keys_per_tick": 16.3,
    "source": "v2 11.683, v3 10.200 (cr_a82_windup): spin, arms up, the band",
    "note": "",
    "authored": true
@@ -1610,8 +1610,8 @@
    },
    "owner": "S2a",
    "key_files": 16,
-   "keys": 315,
-   "keys_per_tick": 16.6,
+   "keys": 314,
+   "keys_per_tick": 16.5,
    "source": "v2 12.450, v3 10.92 (v2f_s3_*): coil, the leaping cut, tumbling, vanishes",
    "note": "",
    "authored": true
@@ -1644,8 +1644,8 @@
     "gone": 14
    },
    "owner": "S2a",
-   "key_files": 13,
-   "keys": 207,
+   "key_files": 15,
+   "keys": 208,
    "keys_per_tick": 12.2,
    "source": "v2 14.317, v3 14.183 (v2f_s5_*): the X",
    "note": "",
@@ -1660,9 +1660,9 @@
     "hit": 3
    },
    "owner": "S2a",
-   "key_files": 10,
-   "keys": 112,
-   "keys_per_tick": 8.6,
+   "key_files": 11,
+   "keys": 110,
+   "keys_per_tick": 8.5,
    "source": "v2 ~16.91, v3 ~18.300 (v2f_s6_*): the wrap-around",
    "note": "",
    "authored": true
@@ -1677,8 +1677,8 @@
    },
    "owner": "S2a",
    "key_files": 12,
-   "keys": 207,
-   "keys_per_tick": 15.9,
+   "keys": 210,
+   "keys_per_tick": 16.2,
    "source": "v2 ~17.36, v3 18.767 (v2f_s7_*): the spin dome",
    "note": "",
    "authored": true
@@ -1712,9 +1712,9 @@
     "hit": 6
    },
    "owner": "S2a",
-   "key_files": 10,
-   "keys": 150,
-   "keys_per_tick": 13.6,
+   "key_files": 9,
+   "keys": 145,
+   "keys_per_tick": 13.2,
    "source": "v2 19.083, v3 20.483 (v2f_s9_dive, v3r_s10_dive_1f): the diving overhead strike, blade down",
    "note": "",
    "authored": true
@@ -1730,8 +1730,8 @@
    },
    "owner": "S2a",
    "key_files": 12,
-   "keys": 168,
-   "keys_per_tick": 12.9,
+   "keys": 171,
+   "keys_per_tick": 13.2,
    "source": "v2 19.10-19.28 (the parried dive), v2f_c1 (the lock)",
    "note": "",
    "authored": true
@@ -1755,9 +1755,9 @@
     "kick": 102
    },
    "owner": "S2b",
-   "key_files": 85,
-   "keys": 1122,
-   "keys_per_tick": 10.7,
+   "key_files": 84,
+   "keys": 1101,
+   "keys_per_tick": 10.5,
    "source": "v2 19.72-24.95 / v3 21.10-26.25 (v2f_c1, v2f_c2, v2f_c_keys1/2, v2f_c_hat, v2f_c_throw, v3r_c_flip): lock, grab, clash on the hat, flip, back to back, throw, lying, the kick",
    "note": "",
    "authored": true
@@ -1790,8 +1790,8 @@
    },
    "owner": "S2a",
    "key_files": 19,
-   "keys": 265,
-   "keys_per_tick": 12.6,
+   "keys": 267,
+   "keys_per_tick": 12.7,
    "source": "v3 4.10 (v3r_a_kipup, cr_v3_kipup): the kip-up; the hat picked up and put on (v3 4.7-6.5)",
    "note": "",
    "authored": true
@@ -1815,8 +1815,8 @@
    },
    "owner": "S2b",
    "key_files": 70,
-   "keys": 575,
-   "keys_per_tick": 6.9,
+   "keys": 577,
+   "keys_per_tick": 7,
    "source": "v3 4.10-8.18 (v3r_a_kipup, cr_v3_kipup: the kip-up, the sword vertical; v3r_a_5to8: the hat at shoulder height, side steps; cr_pretell_v3: the hand to the brim)",
    "note": "",
    "authored": true
@@ -1892,9 +1892,9 @@
     "scab_up": 510
    },
    "owner": "S2b",
-   "key_files": 407,
-   "keys": 2350,
-   "keys_per_tick": 4.2,
+   "key_files": 412,
+   "keys": 2372,
+   "keys_per_tick": 4.3,
    "source": "staged (v1s_intro_stairs: the far figure; PLAN §3.1 E0-E10); E10 v1 4.8-5.8 (v1s_intro_keys: the scabbard upright, hilt up)",
    "note": "",
    "authored": true
@@ -1917,9 +1917,9 @@
     "push": 82
    },
    "owner": "S2b",
-   "key_files": 54,
-   "keys": 624,
-   "keys_per_tick": 7.2,
+   "key_files": 59,
+   "keys": 622,
+   "keys_per_tick": 7.1,
    "source": "v1 2.2-8.05 (v1s_intro_keys: smile, head down, turn away, spin; mg_v1_hands_zoom / cr_v1_stance_hand: the draw and the stance)",
    "note": "",
    "authored": true
@@ -1955,9 +1955,9 @@
     "swirl": 183
    },
    "owner": "S2b",
-   "key_files": 137,
-   "keys": 1185,
-   "keys_per_tick": 5.5,
+   "key_files": 136,
+   "keys": 1191,
+   "keys_per_tick": 5.6,
    "source": "v1 37.28-39.2 (v1s_cs_keys: lunge, lock, apart, the hat on her back), v2 0-6.9 (v2f_cs_keys1/2, v2f_cs_hat, cr_v2_a11: the iai, 홍련일섬)",
    "note": "",
    "authored": true
@@ -2019,9 +2019,9 @@
     "eyes": 1030
    },
    "owner": "S2b",
-   "key_files": 494,
-   "keys": 3754,
-   "keys_per_tick": 3.6,
+   "key_files": 499,
+   "keys": 3822,
+   "keys_per_tick": 3.7,
    "source": "v3 26.27-40.3 (v3r_e_shots1-4, v3r_e_slash_2f), v4 (v4k_c*, v4k_s4_sheathe, v4k_s5_face), v5 (v5e_s1_*, v5e_s2_turn*, v5e_s3_keys1-3)",
    "note": "",
    "authored": true
@@ -2284,7 +2284,7 @@
  "view_range": 2,
  "storage": {
   "anchors": "rlk:hr rig.an",
-  "version": 173603159
+  "version": 65889928
  },
  "ghost_texture": "rlk:mboss/scarlet/ghost",
  "skin": {
@@ -4022,7 +4022,7 @@
     ],
     [
      4,
-     7
+     12
     ],
     [
      24,
@@ -4031,12 +4031,16 @@
    ],
    "feet_r": [
     [
+     0,
+     0
+    ],
+    [
      12,
      14
     ],
     [
      16,
-     19
+     24
     ]
    ],
    "touch": [
@@ -4215,17 +4219,25 @@
      0
     ],
     [
-     6,
+     5,
+     10
+    ],
+    [
+     15,
      20
     ]
    ],
    "feet_r": [
     [
      0,
-     10
+     5
     ],
     [
-     16,
+     10,
+     15
+    ],
+    [
+     20,
      20
     ]
    ],
@@ -4307,10 +4319,14 @@
    "feet_l": [
     [
      0,
-     10
+     5
     ],
     [
-     16,
+     10,
+     15
+    ],
+    [
+     20,
      20
     ]
    ],
@@ -4320,7 +4336,11 @@
      0
     ],
     [
-     6,
+     5,
+     10
+    ],
+    [
+     15,
      20
     ]
    ],
@@ -8374,9 +8394,8 @@
    "cuts": [],
    "lift": {},
    "hat_push": {
-    "41": 6.5,
-    "42": 15.5,
-    "43": 15.5,
+    "42": 12.5,
+    "43": 14.2,
     "44": 13.6,
     "46": 0.6
    },
@@ -8694,11 +8713,10 @@
     "9": 5.7,
     "10": 19.1,
     "11": 4.3,
-    "29": 13.9,
-    "30": 28.9,
-    "31": 29.9,
-    "32": 17.2,
-    "33": 3.3,
+    "30": 14.6,
+    "31": 15.2,
+    "32": 14.4,
+    "33": 2.9,
     "34": 1.1
    },
    "contacts": [
@@ -8968,7 +8986,7 @@
    "hat_push": {
     "14": 4.1,
     "15": 4.1,
-    "22": 2.3,
+    "22": 1.5,
     "23": 6,
     "24": 21,
     "25": 7.5
@@ -15696,8 +15714,8 @@
      106
     ],
     "out": [
-     159,
-     161
+     161,
+     164
     ],
     "add": {
      "tor": [
@@ -15711,7 +15729,7 @@
       0
      ]
     },
-    "why": "the cross-draw reach to the hip hilt"
+    "why": "the cross-draw reach to the hip hilt (V1: held through the draw at 162, so the turning torso does not sweep over the hilt)"
    },
    {
     "id": "SIP",
@@ -15741,6 +15759,87 @@
      326
     ],
     "why": "the sheathe entry on the new scabbard axis (SH0')"
+   },
+   {
+    "id": "A10-HIGH",
+    "clip": "a10",
+    "in": [
+     4,
+     8
+    ],
+    "out": [
+     19,
+     20
+    ],
+    "set": {
+     "gF": 0,
+     "gB": 0,
+     "gE": 25,
+     "gD": 0.55,
+     "th": 95
+    },
+    "why": "V1 (HR-47): the airborne two-hand guard held as a high guard before her face (the player-size arms cannot hold the blade laid back over her head)"
+   },
+   {
+    "id": "DRAW-E",
+    "clip": "intro_end",
+    "in": [
+     47,
+     51
+    ],
+    "out": [
+     57,
+     60
+    ],
+    "set": {
+     "aR": [
+      40,
+      -15,
+      0.9
+     ],
+     "scB": 90,
+     "scE": -45
+    },
+    "why": "V1 (HR-47): the scabbard held further out before her chest for the cross-draw (the fist off her torso and head)"
+   },
+   {
+    "id": "WALK",
+    "clip": "walk",
+    "in": [
+     0,
+     0
+    ],
+    "out": [
+     24,
+     24
+    ],
+    "why": "V1 (HR-49): a longer stride (each sole planted 0.38 b ahead, swept steadily 0.76 b back over its 12-t stance, swung forward lifted), the hips bobbing with it"
+   },
+   {
+    "id": "STRAFE-L",
+    "clip": "strafe_l",
+    "in": [
+     0,
+     0
+    ],
+    "out": [
+     20,
+     20
+    ],
+    "why": "V1 (HR-49): ASIDE-like lifted side steps at the strafe speed (four a cycle, the feet 0.26 -> 0.97 b apart, the hips 0.10 b down)"
+   },
+   {
+    "id": "STRAFE-R",
+    "clip": "strafe_r",
+    "in": [
+     0,
+     0
+    ],
+    "out": [
+     20,
+     20
+    ],
+    "why": "V1 (HR-49): ASIDE-like lifted side steps at the strafe speed (four a cycle, the feet 0.26 -> 0.97 b apart, the hips 0.10 b down)"
    },
    {
     "id": "ASIDE",
@@ -15829,7 +15928,11 @@
    "strHead": 150,
    "sashSeat": 120,
    "scabArm": 60,
-   "armUp": 101
+   "armUp": 101,
+   "gripClear": 75,
+   "handClearL": 50,
+   "handClearR": 50,
+   "scabFwd": 15
   },
   "slopes": {
    "scab": 22,
@@ -15856,19 +15959,34 @@
    "strHead": 22,
    "sashSeat": 22,
    "scabArm": 5,
-   "armUp": 34
+   "armUp": 34,
+   "gripClear": 12,
+   "handClearL": 12,
+   "handClearR": 12,
+   "scabFwd": 3
   },
   "clips": {
    "idle": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
+     "gripClear": 5.44,
      "scabArm": 9
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.455,
+     "guard.torso": -0.178,
+     "hand_l.head": -0.431,
+     "hand_l.torso": -0.028,
+     "hand_r.head": -0.528,
+     "hand_r.torso": -0.186,
+     "hilt.head": -0.361,
+     "hilt.torso": -0.02
+    }
    },
    "idle2": {
     "passes": 2,
@@ -15879,115 +15997,229 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.442,
+     "guard.torso": -0.156,
+     "hand_l.head": -0.427,
+     "hand_l.torso": -0.062,
+     "hand_r.head": -0.523,
+     "hand_r.torso": -0.186,
+     "hilt.head": -0.377,
+     "hilt.torso": -0.072
+    }
    },
    "walk": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
-     "drop": 4.4,
+     "drop": 0.54,
+     "gripClear": 4.88,
      "scabArm": 25
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
-    "support_dy": 0.001,
-    "lift": 0
+    "support_dy": 0.002,
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.453,
+     "guard.torso": -0.163,
+     "hand_l.head": -0.438,
+     "hand_l.torso": -0.02,
+     "hand_r.head": -0.525,
+     "hand_r.torso": -0.184,
+     "hilt.head": -0.359,
+     "hilt.torso": -0.017
+    }
    },
    "glide": {
-    "passes": 1,
-    "corrections": {},
+    "passes": 2,
+    "corrections": {
+     "gripClear": 10.5
+    },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.527,
+     "guard.torso": -0.161,
+     "hand_l.head": -0.384,
+     "hand_l.torso": -0.157,
+     "hand_r.head": -0.429,
+     "hand_r.torso": -0.228,
+     "hilt.head": -0.369,
+     "hilt.torso": -0.02
+    }
    },
    "strafe_l": {
-    "passes": 1,
-    "corrections": {},
+    "passes": 3,
+    "corrections": {
+     "gripClear": 5.5
+    },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.443,
+     "guard.torso": -0.196,
+     "hand_l.head": -0.444,
+     "hand_l.torso": -0.03,
+     "hand_r.head": -0.485,
+     "hand_r.torso": -0.239,
+     "hilt.head": -0.382,
+     "hilt.torso": -0.02
+    }
    },
    "strafe_r": {
-    "passes": 1,
-    "corrections": {},
+    "passes": 3,
+    "corrections": {
+     "gripClear": 4.37
+    },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.436,
+     "guard.torso": -0.189,
+     "hand_l.head": -0.423,
+     "hand_l.torso": -0.026,
+     "hand_r.head": -0.536,
+     "hand_r.torso": -0.239,
+     "hilt.head": -0.378,
+     "hilt.torso": -0.02
+    }
    },
    "backstep": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
+     "gripClear": 5.44,
      "scabArm": 13
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.04,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.395,
+     "guard.torso": -0.169,
+     "hand_l.head": -0.419,
+     "hand_l.torso": -0.022,
+     "hand_r.head": -0.437,
+     "hand_r.torso": -0.288,
+     "hilt.head": -0.339,
+     "hilt.torso": -0.02
+    }
    },
    "flinch": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
+     "gripClear": 5.56,
      "scabArm": 9
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.472,
+     "guard.torso": -0.135,
+     "hand_l.head": -0.44,
+     "hand_l.torso": -0.02,
+     "hand_r.head": -0.413,
+     "hand_r.torso": -0.186,
+     "hilt.head": -0.362,
+     "hilt.torso": -0.022
+    }
    },
    "a1": {
     "passes": 3,
     "corrections": {
-     "bPush": 33.53,
+     "bPush": 14.04,
+     "bTurn": 6,
      "drop": 0.64,
+     "gripClear": 62.07,
      "scabArm": 9
     },
     "contacts": {},
     "stretch": 1,
-    "blade_residue": 0.034,
+    "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.041,
+     "guard.torso": -0.135,
+     "hand_l.head": -0.113,
+     "hand_l.torso": -0.027,
+     "hand_r.head": -0.404,
+     "hand_r.torso": -0.186,
+     "hilt.head": -0.097,
+     "hilt.torso": -0.017
+    }
    },
    "a2": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
-     "bPush": 15.72,
-     "bTurn": 24,
+     "bPush": 22.65,
+     "bTurn": 12,
+     "gripClear": 33.25,
      "scabArm": 14
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.019,
+     "guard.torso": -0.055,
+     "hand_l.head": -0.077,
+     "hand_l.torso": -0.026,
+     "hand_r.head": -0.445,
+     "hand_r.torso": -0.186,
+     "hilt.head": -0.071,
+     "hilt.torso": -0.017
+    }
    },
    "a3": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
-     "bPush": 20.64,
+     "bPush": 11.13,
+     "bTurn": 18,
      "drop": 7.83,
+     "gripClear": 64.66,
+     "handClearR": 10.58,
      "scabArm": 40
     },
     "contacts": {
-     "twohand": 0
+     "twohand": 0.099
     },
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.002,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.02,
+     "guard.torso": -0.165,
+     "hand_l.head": -0.086,
+     "hand_l.torso": -0.027,
+     "hand_r.head": -0.083,
+     "hand_r.torso": -0.021,
+     "hilt.head": -0.071,
+     "hilt.torso": -0.02
+    }
    },
    "a4": {
     "passes": 3,
     "corrections": {
-     "bPush": 12.55,
-     "bTurn": 42,
+     "gripClear": 56.63,
      "scab": 10.03,
      "scabArm": 9
     },
@@ -15995,23 +16227,45 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.066,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.02,
+     "guard.torso": -0.048,
+     "hand_l.head": -0.082,
+     "hand_l.torso": -0.022,
+     "hand_r.head": -0.126,
+     "hand_r.torso": -0.112,
+     "hilt.head": -0.058,
+     "hilt.torso": -0.02
+    }
    },
    "a6": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
+     "gripClear": 6.38,
      "scabArm": 12
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.44,
+     "guard.torso": -0.143,
+     "hand_l.head": -0.432,
+     "hand_l.torso": -0.025,
+     "hand_r.head": -0.477,
+     "hand_r.torso": -0.186,
+     "hilt.head": -0.361,
+     "hilt.torso": -0.017
+    }
    },
    "a9": {
     "passes": 3,
     "corrections": {
-     "bPush": 13.11,
+     "bPush": 21.48,
+     "gripClear": 39.59,
      "scab": 0.88,
      "scabArm": 30
     },
@@ -16019,45 +16273,87 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.132,
+     "guard.torso": -0.02,
+     "hand_l.head": -0.171,
+     "hand_l.torso": -0.025,
+     "hand_r.head": -0.344,
+     "hand_r.torso": -0.129,
+     "hilt.head": -0.114,
+     "hilt.torso": -0.016
+    }
    },
    "a10": {
     "passes": 3,
     "corrections": {
-     "bPush": 9.42,
+     "gripClear": 70.88,
      "scab": 2.75,
      "scabArm": 40
     },
     "contacts": {
-     "twohand": 0
+     "twohand": 0.1
     },
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.024,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.043,
+     "guard.torso": -0.143,
+     "hand_l.head": -0.077,
+     "hand_l.torso": -0.025,
+     "hand_r.head": -0.113,
+     "hand_r.torso": -0.047,
+     "hilt.head": -0.06,
+     "hilt.torso": -0.013
+    }
    },
    "a7_tell": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
+     "gripClear": 28.13,
      "scabArm": 13
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.087,
+     "guard.torso": -0.157,
+     "hand_l.head": -0.099,
+     "hand_l.torso": -0.045,
+     "hand_r.head": -0.467,
+     "hand_r.torso": -0.186,
+     "hilt.head": -0.048,
+     "hilt.torso": -0.032
+    }
    },
    "a7_throw": {
     "passes": 3,
     "corrections": {
      "bPush": 21.73,
+     "gripClear": 29.63,
      "scabArm": 40
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.02,
+     "guard.torso": -0.219,
+     "hand_l.head": -0.115,
+     "hand_l.torso": -0.149,
+     "hand_r.head": -0.526,
+     "hand_r.torso": -0.131,
+     "hilt.head": -0.066,
+     "hilt.torso": -0.063
+    }
    },
    "g_brim": {
     "passes": 1,
@@ -16068,7 +16364,17 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.396,
+     "guard.torso": -0.157,
+     "hand_l.head": -0.403,
+     "hand_l.torso": -0.065,
+     "hand_r.head": -0.176,
+     "hand_r.torso": -0.166,
+     "hilt.head": -0.362,
+     "hilt.torso": -0.075
+    }
    },
    "g_tell": {
     "passes": 1,
@@ -16079,7 +16385,17 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.452,
+     "guard.torso": -0.16,
+     "hand_l.head": -0.428,
+     "hand_l.torso": -0.062,
+     "hand_r.head": -0.183,
+     "hand_r.torso": -0.272,
+     "hilt.head": -0.356,
+     "hilt.torso": -0.079
+    }
    },
    "g_reform": {
     "passes": 2,
@@ -16090,22 +16406,44 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.389,
+     "guard.torso": -0.157,
+     "hand_l.head": -0.412,
+     "hand_l.torso": -0.063,
+     "hand_r.head": -0.535,
+     "hand_r.torso": -0.185,
+     "hilt.head": -0.377,
+     "hilt.torso": -0.075
+    }
    },
    "g_dash": {
     "passes": 2,
     "corrections": {
+     "gripClear": 3.06,
      "scabArm": 39
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.159,
+     "guard.torso": -0.119,
+     "hand_l.head": -0.191,
+     "hand_l.torso": -0.099,
+     "hand_r.head": -0.372,
+     "hand_r.torso": -0.169,
+     "hilt.head": -0.127,
+     "hilt.torso": -0.018
+    }
    },
    "g_glide": {
     "passes": 2,
     "corrections": {
+     "gripClear": 4,
      "scab": 11.28,
      "scabArm": 15
     },
@@ -16113,37 +16451,72 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.164,
+     "guard.torso": -0.256,
+     "hand_l.head": -0.131,
+     "hand_l.torso": -0.148,
+     "hand_r.head": -0.516,
+     "hand_r.torso": -0.185,
+     "hilt.head": -0.129,
+     "hilt.torso": -0.02
+    }
    },
    "g_drop": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
-     "bPush": 13.48,
      "bTurn": 18,
+     "gripClear": 45.95,
+     "handClearR": 3.81,
      "scab": 1.5,
-     "scabArm": 25
+     "scabArm": 21
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.068,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.082,
+     "guard.torso": -0.206,
+     "hand_l.head": -0.109,
+     "hand_l.torso": -0.122,
+     "hand_r.head": -0.388,
+     "hand_r.torso": -0.02,
+     "hilt.head": -0.097,
+     "hilt.torso": -0.02
+    }
    },
    "g_run": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
-     "bPush": 5.85,
-     "drop": 3.93
+     "bPush": 1.29,
+     "bTurn": 12,
+     "drop": 3.93,
+     "gripClear": 71.14,
+     "handClearR": 2.62
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.01,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.03,
+     "guard.torso": -0.166,
+     "hand_l.head": -0.059,
+     "hand_l.torso": -0.149,
+     "hand_r.head": -0.13,
+     "hand_r.torso": -0.019,
+     "hilt.head": -0.098,
+     "hilt.torso": -0.023
+    }
    },
    "g_ring": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
+     "gripClear": 24.31,
      "scab": 0.88,
      "scabArm": 39
     },
@@ -16151,32 +16524,68 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.272,
+     "guard.torso": -0.076,
+     "hand_l.head": -0.257,
+     "hand_l.torso": -0.022,
+     "hand_r.head": -0.535,
+     "hand_r.torso": -0.186,
+     "hilt.head": -0.293,
+     "hilt.torso": -0.018
+    }
    },
    "g_rise": {
-    "passes": 1,
-    "corrections": {},
+    "passes": 2,
+    "corrections": {
+     "gripClear": 31.13
+    },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.034,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.274,
+     "guard.torso": -0.051,
+     "hand_l.head": -0.209,
+     "hand_l.torso": -0.074,
+     "hand_r.head": -0.293,
+     "hand_r.torso": -0.203,
+     "hilt.head": -0.15,
+     "hilt.torso": -0.02
+    }
    },
    "g_leap": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
-     "scabArm": 35
+     "gripClear": 5.94,
+     "handClearR": 17.19,
+     "scabArm": 19
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.049,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.071,
+     "guard.torso": -0.074,
+     "hand_l.head": -0.055,
+     "hand_l.torso": -0.043,
+     "hand_r.head": -0.152,
+     "hand_r.torso": -0.026,
+     "hilt.head": -0.043,
+     "hilt.torso": -0.02
+    }
    },
    "g_sweep": {
     "passes": 3,
     "corrections": {
-     "bPush": 3.35,
+     "bPush": 22.47,
+     "bTurn": 30,
+     "gripClear": 26.75,
      "scab": 1.5,
      "scabArm": 14
     },
@@ -16184,50 +16593,91 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.042,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.353,
+     "guard.torso": -0.17,
+     "hand_l.head": -0.314,
+     "hand_l.torso": -0.089,
+     "hand_r.head": -0.523,
+     "hand_r.torso": -0.181,
+     "hilt.head": -0.234,
+     "hilt.torso": -0.02
+    }
    },
    "g_x": {
     "passes": 3,
     "corrections": {
-     "bPush": 19.86,
-     "bTurn": 54,
+     "bPush": 10.22,
+     "gripClear": 34.38,
      "scabArm": 13
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.039,
+     "guard.torso": -0.089,
+     "hand_l.head": -0.067,
+     "hand_l.torso": -0.046,
+     "hand_r.head": -0.368,
+     "hand_r.torso": -0.294,
+     "hilt.head": -0.111,
+     "hilt.torso": -0.118
+    }
    },
    "g_wrap": {
     "passes": 3,
     "corrections": {
-     "bPush": 23.34,
-     "bTurn": 42,
+     "bPush": 5.73,
+     "gripClear": 30.5,
      "scab": 0.25,
      "scabArm": 40
     },
     "contacts": {},
     "stretch": 1,
-    "blade_residue": 0,
+    "blade_residue": 0.009,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.255,
+     "guard.torso": -0.021,
+     "hand_l.head": -0.122,
+     "hand_l.torso": -0.032,
+     "hand_r.head": -0.535,
+     "hand_r.torso": -0.185,
+     "hilt.head": -0.068,
+     "hilt.torso": -0.021
+    }
    },
    "g_dome": {
     "passes": 3,
     "corrections": {
-     "bPush": 14.03,
+     "gripClear": 20.94,
      "scabArm": 25
     },
     "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.212,
+     "guard.torso": -0.02,
+     "hand_l.head": -0.247,
+     "hand_l.torso": -0.064,
+     "hand_r.head": -0.524,
+     "hand_r.torso": -0.129,
+     "hilt.head": -0.243,
+     "hilt.torso": -0.016
+    }
    },
    "g_vert": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
+     "gripClear": 11.81,
      "scab": 2.75,
      "scabArm": 15
     },
@@ -16235,43 +16685,78 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.027,
-    "lift": 0.019
+    "lift": 0.019,
+    "clear": {
+     "guard.head": -0.045,
+     "guard.torso": -0.161,
+     "hand_l.head": -0.055,
+     "hand_l.torso": -0.066,
+     "hand_r.head": -0.209,
+     "hand_r.torso": -0.074,
+     "hilt.head": -0.051,
+     "hilt.torso": -0.038
+    }
    },
    "g_dive": {
     "passes": 3,
     "corrections": {
-     "bPush": 28.4,
-     "bTurn": 36
+     "bPush": 8.92,
+     "bTurn": 27,
+     "gripClear": 73.41,
+     "handClearR": 6.38
     },
     "contacts": {
-     "twohand": 0.062
+     "twohand": 0.096
     },
     "stretch": 1,
-    "blade_residue": 0.038,
+    "blade_residue": 0,
     "support_dy": 0,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.132,
+     "guard.torso": -0.27,
+     "hand_l.head": -0.112,
+     "hand_l.torso": -0.19,
+     "hand_r.head": -0.114,
+     "hand_r.torso": -0.025,
+     "hilt.head": -0.123,
+     "hilt.torso": 0
+    }
    },
    "g_deflect": {
     "passes": 3,
     "corrections": {
      "bPush": 26.76,
      "bTurn": 18,
-     "drop": 2.64
+     "drop": 2.64,
+     "gripClear": 43.56
     },
     "contacts": {
-     "twohand": 0.116
+     "twohand": 0.099
     },
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.074,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.019,
+     "guard.torso": -0.141,
+     "hand_l.head": -0.024,
+     "hand_l.torso": -0.131,
+     "hand_r.head": -0.132,
+     "hand_r.torso": -0.114,
+     "hilt.head": -0.118,
+     "hilt.torso": -0.241
+    }
    },
    "repel": {
     "passes": 3,
     "corrections": {
-     "bPush": 34,
-     "bTurn": 30,
+     "bPush": 18.25,
+     "bTurn": 24,
      "drop": 1.34,
+     "gripClear": 39.69,
+     "handClearR": 5.38,
      "hatBackZ": 11.42,
      "hatClear": 4.03,
      "hatPush": 72.34,
@@ -16289,7 +16774,17 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.713,
-    "lift": 0.001
+    "lift": 0.001,
+    "clear": {
+     "guard.head": -0.011,
+     "guard.torso": -0.109,
+     "hand_l.head": -0.076,
+     "hand_l.torso": -0.078,
+     "hand_r.head": -0.065,
+     "hand_r.torso": -0.12,
+     "hilt.head": -0.047,
+     "hilt.torso": -0.044
+    }
    },
    "down": {
     "passes": 2,
@@ -16304,7 +16799,17 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.798,
+     "guard.torso": -0.261,
+     "hand_l.head": -0.569,
+     "hand_l.torso": -0.154,
+     "hand_r.head": -0.448,
+     "hand_r.torso": -0.275,
+     "hilt.head": -0.419,
+     "hilt.torso": -0.131
+    }
    },
    "kipup": {
     "passes": 3,
@@ -16312,6 +16817,7 @@
      "aTorP+": 4,
      "aTorR+": 6,
      "armUp": 100,
+     "gripClear": 25.75,
      "hatClear": 18.17,
      "incl": 19,
      "rock+": 11,
@@ -16327,7 +16833,17 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.12,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.297,
+     "guard.torso": -0.147,
+     "hand_l.head": -0.152,
+     "hand_l.torso": -0.022,
+     "hand_r.head": -0.026,
+     "hand_r.torso": -0.125,
+     "hilt.head": -0.178,
+     "hilt.torso": -0.02
+    }
    },
    "lead_down": {
     "passes": 3,
@@ -16335,8 +16851,9 @@
      "aTorP+": 4,
      "aTorR+": 6,
      "armUp": 100,
-     "bPush": 1.86,
-     "hatClear": 15.5,
+     "gripClear": 28.38,
+     "handClearR": 30.63,
+     "hatClear": 14.18,
      "incl": 19,
      "rock+": 11,
      "sash": 55.28,
@@ -16351,12 +16868,23 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.12,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.099,
+     "guard.torso": -0.156,
+     "hand_l.head": -0.1,
+     "hand_l.torso": -0.057,
+     "hand_r.head": -0.021,
+     "hand_r.torso": -0.163,
+     "hilt.head": -0.065,
+     "hilt.torso": -0.02
+    }
    },
    "lead_stand": {
     "passes": 3,
     "corrections": {
-     "hatClear": 29.9,
+     "handClearR": 25.94,
+     "hatClear": 19.1,
      "scabArm": 13,
      "strHead": 11.72
     },
@@ -16367,11 +16895,23 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.398,
+     "guard.torso": -0.143,
+     "hand_l.head": -0.403,
+     "hand_l.torso": -0.059,
+     "hand_r.head": 0.003,
+     "hand_r.torso": -0.154,
+     "hilt.head": -0.361,
+     "hilt.torso": -0.075
+    }
    },
    "sq1": {
     "passes": 3,
     "corrections": {
+     "gripClear": 7.75,
+     "handClearR": 6.25,
      "hatBackZ": 10.55,
      "hatClear": 21,
      "scab": 1.5,
@@ -16384,13 +16924,24 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.361,
+     "guard.torso": -0.157,
+     "hand_l.head": -0.359,
+     "hand_l.torso": -0.065,
+     "hand_r.head": -0.077,
+     "hand_r.torso": -0.162,
+     "hilt.head": -0.363,
+     "hilt.torso": -0.02
+    }
    },
    "intro": {
-    "passes": 2,
+    "passes": 3,
     "corrections": {
      "aTorR+": 2,
      "drop": 6.55,
+     "handClearR": 20.06,
      "sashSeat": 43.66,
      "scab": 6.63,
      "scabArm": 26
@@ -16403,16 +16954,23 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.003,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "hand_l.head": -0.114,
+     "hand_l.torso": -0.095,
+     "hand_r.head": -0.03,
+     "hand_r.torso": -0.062
+    }
    },
    "intro_end": {
     "passes": 3,
     "corrections": {
-     "bPush": 33.93,
-     "bTurn": 33,
-     "close": 22.33,
+     "bPush": 5.91,
+     "close": 0.73,
+     "gripClear": 24.56,
+     "handClearR": 37.56,
      "scabArm": 26,
-     "scabH": 13
+     "scabH": 6
     },
     "contacts": {
      "hilt": 0,
@@ -16422,7 +16980,17 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.018,
+     "guard.torso": -0.075,
+     "hand_l.head": -0.114,
+     "hand_l.torso": -0.021,
+     "hand_r.head": -0.149,
+     "hand_r.torso": -0.055,
+     "hilt.head": -0.02,
+     "hilt.torso": -0.02
+    }
    },
    "cs1": {
     "passes": 3,
@@ -16434,31 +17002,47 @@
      "bTurn": 30,
      "closeY-": 28,
      "drop": 3.93,
+     "gripClear": 47.04,
+     "handClearR": 14.25,
      "hatBackZ": 10.83,
      "hatClear": 4.55,
      "scab": 1.5,
      "scabArm": 40,
+     "scabFwd": 13.9,
      "strHead": 117.63
     },
     "contacts": {
-     "twohand": 0.041,
+     "twohand": 0.098,
      "hilt": 0.01,
      "throat": 0,
-     "sheathe": 0.006
+     "sheathe": 0
     },
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.047,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.01,
+     "guard.torso": -0.017,
+     "hand_l.head": -0.063,
+     "hand_l.torso": -0.001,
+     "hand_r.head": -0.143,
+     "hand_r.torso": -0.021,
+     "hilt.head": -0.027,
+     "hilt.torso": -0.017
+    }
    },
    "ending": {
     "passes": 3,
     "corrections": {
      "armUp": 100,
-     "bPush": 31.13,
-     "bTurn": 48,
+     "bPush": 29.69,
+     "bTurn": 30,
      "close": 23.58,
      "drop": 10.87,
+     "gripClear": 72,
+     "handClearL": 6.62,
+     "handClearR": 35.88,
      "hatPush": 33.55,
      "incl": 19,
      "rock+": 11,
@@ -16476,30 +17060,51 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.172,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "guard.head": -0.02,
+     "guard.torso": -0.02,
+     "hand_l.head": -0.05,
+     "hand_l.torso": -0.019,
+     "hand_r.head": -0.005,
+     "hand_r.torso": -0.006,
+     "hilt.head": -0.028,
+     "hilt.torso": -0.018
+    }
    },
    "ev_give": {
-    "passes": 1,
-    "corrections": {},
+    "passes": 3,
+    "corrections": {
+     "handClearR": 22.56
+    },
     "contacts": {
-     "brim": 0,
      "hilt": 0
     },
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "hand_l.head": -0.273,
+     "hand_l.torso": -0.055,
+     "hand_r.head": -0.208,
+     "hand_r.torso": -0.153
+    }
    },
    "ev_toast": {
     "passes": 1,
     "corrections": {},
-    "contacts": {
-     "brim": 0
-    },
+    "contacts": {},
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "hand_l.head": -0.176,
+     "hand_l.torso": -0.159,
+     "hand_r.head": -0.514,
+     "hand_r.torso": -0.213
+    }
    },
    "ev_leave": {
     "passes": 1,
@@ -16508,10 +17113,16 @@
     "stretch": 1,
     "blade_residue": 0,
     "support_dy": 0.001,
-    "lift": 0
+    "lift": 0,
+    "clear": {
+     "hand_l.head": -0.499,
+     "hand_l.torso": -0.228,
+     "hand_r.head": -0.513,
+     "hand_r.torso": -0.212
+    }
    }
   },
-  "_doc": "per sample: retarget (angles kept; pos x k(lf); soles about the hip joint x S_LEG; grip distances x S_ARM + the lock rule; planted hands x S_LEG; scOff x S_SCAB; world-hat spots) -> overlay (PATCHES, the hat hand-overs, the flights) -> solve. clips: per clip the solver passes, the largest value of every correction guard (degrees, or cm for drop / bPush / close / hatBackZ / hatPush / hatClear, percent for armUp; +/- = the two senses), the largest contact distance per kind, the largest IK stretch, the blade residue inside the body (b), the largest support move and lift"
+  "_doc": "per sample: retarget (angles kept; pos x k(lf); soles about the hip joint x S_LEG; grip distances x S_ARM + the lock rule; planted hands x S_LEG; scOff x S_SCAB; world-hat spots) -> overlay (PATCHES, the hat hand-overs, the flights) -> solve. clips: per clip the solver passes, the largest value of every correction guard (degrees, or cm for drop / bPush / close / hatBackZ / hatPush / hatClear / gripClear / handClearL / handClearR / scabFwd, percent for armUp; +/- = the two senses), the largest contact distance per kind, the largest IK stretch, the blade residue inside the body (b), the largest support move and lift; clear (V1, HR-47): the deepest fist / hilt / guard sample in the head / torso base box as shipped (b; < 0 outside; the build fails at >= 0.01)"
  },
  "paint_roles": {
   "hat_top": [
@@ -16535,10 +17146,10 @@
   "elements_budget": 6500,
   "parts": 29,
   "models": 63,
-  "key_files": 2084,
-  "keys": 18800,
-  "rig_functions": 2600,
-  "rig_bytes": 5696494,
+  "key_files": 2119,
+  "keys": 18881,
+  "rig_functions": 2640,
+  "rig_bytes": 5721308,
   "cull_overhang_ticks": 0
  },
  "sprites": {

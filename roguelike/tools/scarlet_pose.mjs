@@ -85,9 +85,20 @@ export const HAT_FLOOR_HOLD = .08;
 const FULL = .999;
 // the bounds of the correction guards (their own units: degrees, or cm for the distance guards) and the plan slopes per tick
 export const GUARD_BOUND = {scab: 150, scabY: 90, scabH: 90, hat: 60, strings: 120, sash: 120, drop: 12, closeY: 30, incl: 20, tip: 15, rock: 12,
-  aHeadR: 10, aTorY: 15, aTorP: 15, aTorR: 8, bPush: 35, bTurn: 60, close: 30, hatBackZ: 15, hatPush: 100, hatClear: 40, strHead: 150, sashSeat: 120, scabArm: 60, armUp: 101};
+  aHeadR: 10, aTorY: 15, aTorP: 15, aTorR: 8, bPush: 35, bTurn: 60, close: 30, hatBackZ: 15, hatPush: 100, hatClear: 40, strHead: 150, sashSeat: 120, scabArm: 60, armUp: 101,
+  gripClear: 75, handClearL: 50, handClearR: 50, scabFwd: 15};
 export const GUARD_SLOPE = {scab: 22, scabY: 22, scabH: 22, hat: 22, strings: 22, sash: 22, drop: 1.5, closeY: 5, incl: 5, tip: 5, rock: 5,
-  aHeadR: 5, aTorY: 5, aTorP: 5, aTorR: 5, bPush: 4, bTurn: 15, close: 3, hatBackZ: 3, hatPush: 15, hatClear: 15, strHead: 22, sashSeat: 22, scabArm: 5, armUp: 34};
+  aHeadR: 5, aTorY: 5, aTorP: 5, aTorR: 5, bPush: 4, bTurn: 15, close: 3, hatBackZ: 3, hatPush: 15, hatClear: 15, strHead: 22, sashSeat: 22, scabArm: 5, armUp: 34,
+  gripClear: 12, handClearL: 12, handClearR: 12, scabFwd: 3};
+// V1 (HR-47, the lead's decision 11-06): the samples that keep out of her head and torso base boxes (the clear guards gripClear,
+// handClearL, handClearR in solve 9b; planned with one direction per span, CLEAR_GUARDS, the builder's gate, test_rig): the fist = the forearm's centre line over its lower half (the hand,
+// 0.1875-0.375 below the elbow; the grip point 0.34375), the hilt = the sword's axis from the pommel to the guard, the guard = its
+// disc (the centre and 8 rim points, r 0.10); a sample counts inside at a depth >= CLEAR_GATE. The guards clear them by CLEAR_M,
+// and in the head also the fist's own box (its lower half: the hand's skin never shows inside the head)
+export const CLEAR_GATE = .01, CLEAR_M = .02, CLEAR_GUARDS = ['gripClear', 'handClearL', 'handClearR'];
+export const FIST_AXIS = Array.from({length: 7}, (_, j) => [0, -(.1875 + .1875 * j / 6), 0]);
+export const HILT_AXIS = Array.from({length: 13}, (_, j) => [0, SWORD.pommel + (SWORD.guard - SWORD.pommel) * j / 12, 0]);
+export const GUARD_RIM = [[0, SWORD.guard, 0], ...Array.from({length: 8}, (_, i) => [.10 * Math.cos(i * Math.PI / 4), SWORD.guard, .10 * Math.sin(i * Math.PI / 4)])];
 const D = Math.PI / 180;
 export const dirBE = (b, e = 0) => { const B = b * D, E = e * D; return [-Math.sin(B) * Math.cos(E), Math.sin(E), -Math.cos(B) * Math.cos(E)]; };
 const ID = [0, 0, 0, 1];
@@ -448,7 +459,7 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
   part('pelvis', R, Pq); part('torso', Wst, Cq); part('head', Nb, Hq); part('face', Nb, Hq);
 
   // ---- 5. the hip scabbard (closeY toward the left hand at the iai grip; the two-axis floor guard) ----
-  const scHipT = add(R, rot(Pq, SK.scabHip));
+  let scHipT = add(R, rot(Pq, SK.scabHip));
   const sh0 = p.scHip || [0, 0];
   const hipQ = cy => mul(Pq, mul(q([sh0[0], sh0[1] + cy, 0]), bladeQ(SK.scabHipDir, [0, 1, 0])));
   let closeY = pls('closeY');
@@ -467,6 +478,26 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
   const scHull = hullOf('scabbard', 'scabbard');
   scHipQ = clearFloor(scHipT, scHipQ, scHull, rot(Pq, [1, 0, 0]), .03, GUARD_BOUND.scab, 0, 'scab');
   if (minY(scHull, scHipT, scHipQ) < .03 - 1e-3 || pl('scabY')) scHipQ = clearFloor(scHipT, scHipQ, scHull, rot(Pq, [0, 1, 0]), .03, GUARD_BOUND.scabY, 0, 'scabY');
+  // V1 (HR-47): the sword drawn along the hip scabbard's axis (its hilt and guard where the seated hilt sat) and the left fist on it
+  // keep out of her torso (a bowed / turned torso sweeps its front over the hilt at her right hip: cs1's iai draw, 162): the hip
+  // scabbard's mouth moves forward along the pelvis's front by the least that clears the hilt's axis / guard and the fist's centre
+  // line (toward her left shoulder) by CLEAR_M (guard scabFwd, cm, planned; only through the draw / sheathe blend)
+  {
+    let f = pl('scabFwd') / 100;
+    if (!ctx.pre && (p.scab || 'hip') === 'hip' && (p.sword || 'hand') === 'hand' && (p.shW || 0) > 0) {   // (blend-in: the plan only)
+      const fwd = rot(Pq, [0, 0, -1]), g = rot(scHipQ, [0, SK.hilt, 0]), pts = [...HILT_AXIS, ...GUARD_RIM].map(P => rot(scHipQ, [P[0], P[1] + SK.hilt, P[2]]));
+      { const toS = unit(sub(SL0(), add(scHipT, g))); for (const P of FIST_AXIS) pts.push(add(g, times(toS, -P[1] - SK.fore))); }
+      const need = x => { const T = add(scHipT, times(fwd, x)); let w = -Infinity; for (const P of pts) w = Math.max(w, boxDepth(add(T, P), o.torso, BOX.torso) + CLEAR_M); return w; };
+      const top = GUARD_BOUND.scabFwd / 100 - .011;
+      if (need(f) > 0) {
+        let lo = f, hi = Math.min(top, f + .01);
+        while (need(hi) > 0 && hi < top) { lo = hi; hi = Math.min(top, hi + .01); }
+        for (let k = 0; k < 6; k++) { const m = (lo + hi) / 2; if (need(m) <= 0) hi = m; else lo = m; }
+        f = hi;
+      }
+    }
+    if (f > 0) { scHipT = add(scHipT, times(rot(Pq, [0, 0, -1]), f)); GUARD.used.scabFwd = f * 100; }
+  }
   let scT = null, scQ = null;
   const hiltOf = () => add(scT || scHipT, rot(scQ || scHipQ, [0, SK.hilt, 0]));
   const throatOf = () => add(scHipT, rot(scHipQ, [0, SK.throat, 0]));
@@ -767,6 +798,232 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
     }
     setS('aTorY', assist.y); setS('aTorP', assist.p); setS('aTorR', assist.r); setS('aHeadR', assist.hr);
   }
+  // ---- 9b. (V1, HR-47) the fists, the hilt and the guard out of her head and torso ----
+  // S2a's overhead / high grips, retargeted onto the player-size arm (0.59 b from a 1.39-b shoulder), put the sword fist, the grip
+  // and the guard inside the 8-px head (the blade grew out of the hat crown), and the held hilt's pommel sits in her torso in most
+  // sword stances. Like hatClear, the sword grip (guard gripClear: the blade translated with it, its rotation = the attack direction
+  // kept) and a free hand's target (handClearL / handClearR) move out of the head and torso base boxes: a vector in cm in the torso
+  // frame, planned with ONE direction per span of ticks that need it (the builder's planOf: the direction of the span's largest
+  // push, its size dilated by the slope: a hand pushed round her head one way never swaps to the other way through it), the planned
+  // push first, then further along its direction, then what this tick still needs. Only horizontal moves in the torso frame (down
+  // out of the head is into the torso, up out of the torso into the head, down out of the torso into the pelvis): of 16 directions
+  // the smallest move that clears with the samples moved rigidly, ranked with a preference for the front, then the hand's own side
+  // (the overhead guard becomes a high guard in front of or beside her head: the player-size arm cannot reach over it; a two-hand
+  // grip raised with the blade laid back comes forward of her face, the blade guard below then stands the blade up out of her
+  // head), behind or across her head only where nothing else holds, and for the direction of the tick before; the best few
+  // verified with the arms solved (a two-hand right fist within 0.08 of its spot on the hilt). The fist's centre line, the hilt's
+  // axis and the guard disc clear by CLEAR_M, in the head also the fist's box (the lower half of the forearm). Stage 2 runs after
+  // the blade-body guard (a blade turned about the grip swings the pommel; the grip only moves on, never the blade deeper into her)
+  const clearAcc = {gripClear: [0, 0, 0], handClearL: [0, 0, 0], handClearR: [0, 0, 0]}, clearTab = {}, clearBad = {};
+  const twoH = hold && (p.rh || 0) >= .5 && scab !== 'hand';
+  const clearHands = stage => {
+    const iC = conj(Cq), boxes = [[o.head, BOX.head, true], [o.torso, BOX.torso, false]];
+    const [flo, fhi] = BOX.forearm_l, FIST_BOX = [];
+    for (let i = 0; i <= 2; i++) for (let j = 0; j <= 3; j++) for (let k = 0; k <= 2; k++)
+      FIST_BOX.push([flo[0] + (fhi[0] - flo[0]) * i / 2, flo[1] + (fhi[1] - flo[1]) * .5 * j / 3, flo[2] + (fhi[2] - flo[2]) * k / 2]);
+    // the samples of a solved arm (forearm frame) and of the sword at a grip: {ax: world points, hd: world points (the head only)}
+    const fistPts = (S, sol, into) => {
+      const up = sub(sol.E, S), fo = sub(sol.W, sol.E), qf = armFrontQ(up, fo, sol.v).qf;
+      for (const P of FIST_AXIS) into.ax.push(add(sol.E, rot(qf, P)));
+      for (const P of FIST_BOX) into.hd.push(add(sol.E, rot(qf, P)));
+    };
+    const swordPts = (g, into) => { for (const P of [...HILT_AXIS, ...GUARD_RIM]) into.ax.push(add(g, rot(SQ, P))); };
+    // the violation of a sample set moved by s along d (> 0: inside): the axis samples' depth + CLEAR_M, the fist box's in the head
+    // + 0.005, the extra term (a two-hand right fist off its spot by more than 0.08; stage 2: the blade deeper in her body)
+    const prep = pts => ({extra: pts.extra ?? -Infinity, b: boxes.map(([v, box, isHead]) => { const iq = conj(v.q);
+      return {box, iq, ax: pts.ax.map(P => rot(iq, sub(P, v.t))), hd: isHead ? pts.hd.map(P => rot(iq, sub(P, v.t))) : []}; })});
+    const viol = (pp, d = null, s = 0) => {
+      let w = d ? -Infinity : pp.extra;
+      for (const b of pp.b) {
+        const [lo, hi] = b.box, m = d ? times(rot(b.iq, d), s) : [0, 0, 0];
+        const dep = L => { const x = L[0] + m[0], y = L[1] + m[1], z = L[2] + m[2]; return Math.min(x - lo[0], hi[0] - x, y - lo[1], hi[1] - y, z - lo[2], hi[2] - z); };
+        for (const L of b.ax) { const v = dep(L) + CLEAR_M; if (v > w) w = v; }
+        for (const L of b.hd) { const v = dep(L) + .005; if (v > w) w = v; }
+      }
+      return w;
+    };
+    // the push of one guard at this stage; tryAt(push) re-solves and returns the sample set; side = +1 the left hand (her left,
+    // +x), -1 the right; returns this stage's push (world)
+    // the rigid move along a direction from an origin that clears a sample set (bisected to 1/16 cm), or null within the bound
+    const rigidS = (pp, d, o, base, bound) => {
+      let s = null;
+      for (let x = .01; len(add(add(base, o), times(d, x))) <= bound; x += .01) if (viol(pp, d, x) <= 0) { s = x; break; }
+      if (s === null) return null;
+      let lo = s - .01, hi = s;
+      for (let k = 0; k < 4; k++) { const m = (lo + hi) / 2; if (viol(pp, d, m) <= 0) hi = m; else lo = m; }
+      return hi;
+    };
+    // the push of one guard at this stage; tryAt(push) re-solves and returns the sample set; side = +1 the left hand (her left,
+    // +x), -1 the right; returns this stage's push (world). Stage 1 also reports, for the builder's planner (planOf: one direction
+    // per tick by least cost over the clip), the rigid move from none along each of the 16 directions with its preference cost
+    // (clearTab) and whether the planned push failed to clear (clearBad)
+    const clearPush = (name, side, tryAt) => {
+      const bound = GUARD_BOUND[name] / 100 - .011, base = clearAcc[name], pc = stage === 1 ? plan[name] : null;
+      const p0 = pc && pc.v > 0 ? times(rot(Cq, pc.dir), Math.min(pc.v / 100, bound)) : [0, 0, 0];
+      const tw = name === 'gripClear' && twoH;
+      // the preference cost of a direction (b): the front first, then the hand's own side (a two-hand grip: its right hand cannot
+      // follow to her left), behind her head or across it dearest, off the floor while she lies on her sword arm's rest
+      const penOf = (sa, ca) => (tw ? .15 : name === 'gripClear' ? 0 : .03) * Math.max(0, sa) + (sa < -1e-6 ? .18 * -sa + .03 : 0) + (ca < -1e-6 ? (tw ? 1 : .35) * -ca : 0)
+        + (name === 'gripClear' ? .5 * Math.abs(ca) * (keep.rest || 0) : 0);
+      const D16 = Array.from({length: 16}, (_, i) => { const a = i * Math.PI / 8, sa = Math.sin(a), ca = Math.cos(a); return {dl: [side * sa, 0, -ca], pen: penOf(sa, ca)}; });
+      const pts0 = prep(tryAt([0, 0, 0]));
+      if (stage === 1 && viol(pts0) > 0) clearTab[name] = D16.map(({dl, pen}) => [+(rigidS(pts0, rot(Cq, dl), [0, 0, 0], base, bound) ?? -1).toFixed(4), +pen.toFixed(3), +dl[0].toFixed(4), +dl[2].toFixed(4)]);
+      let pts = len(p0) > 1e-6 ? prep(tryAt(p0)) : pts0;
+      const v0 = viol(pts), c0 = pts.extra;
+      // (a one-shot clip's blend-in ticks, never shown: only the planned push, continuous with the ticks after them)
+      if (v0 <= 0 || ctx.pre) return p0;
+      if (stage === 1 && len(p0) > 1e-6) clearBad[name] = rot(iC, unit(p0));
+      // the candidates: the planned direction (further along it) or stage 1's, then the 16 horizontal ones from the planned push,
+      // and (where a push was planned) the 16 from none: a planned push that no longer holds gives way to a move from where the hand
+      // is (dearer by 0.15 x its distance from the plan)
+      const pd = prev['gc_' + name], cands = [];
+      const lead = len(p0) > 1e-6 ? unit(rot(iC, p0)) : len(base) > 1e-6 ? unit(rot(iC, base)) : null;
+      const origins = [{o: p0, pts}];
+      if (len(p0) > 1e-6) origins.push({o: [0, 0, 0], pts: pts0});
+      for (const org of origins) {
+        const dirs = lead && org.o === p0 ? [{dl: lead, pen: -1}, ...D16] : D16;
+        for (const {dl, pen} of dirs) {
+          const d = rot(Cq, dl), hi = rigidS(org.pts, d, org.o, base, bound);
+          if (hi === null) continue;
+          const push = add(org.o, times(d, hi));
+          const cont = pd && dot(pd, dl) > .86 ? -.06 : 0, away = org.o === p0 ? 0 : .15 * len(sub(push, p0));
+          cands.push({c: hi + pen + cont + away, d, dl, s: hi, push});
+        }
+      }
+      cands.sort((x, y) => x.c - y.c);
+      // verify with the arms solved (a target the arm falls short of moves further along its direction, <= 0.05): the planned
+      // direction further on first, then (a planned push the arm cannot reach: the plan's ramps round a push it needs) the largest
+      // share of the planned push that clears, then the best few others; where none clears, the move that keeps the hand's other
+      // terms (the extra: a two-hand right fist on its spot, the left hand on the scabbard's hilt, the blade no deeper, the floor,
+      // the held scabbard pointing away) and of those the least violation (within 0.005 the smaller move; the planned push itself is
+      // a candidate)
+      let best = {v: v0, c: c0, push: p0};
+      const better = (a, b) => ((a.v <= 0) !== (b.v <= 0) ? a.v <= 0 : (a.c <= 0) !== (b.c <= 0) ? a.c <= 0
+        : a.v < b.v - .005 || (a.v < b.v + .005 && len(a.push) < len(b.push)));
+      const verify = (push, d) => {
+        let pp = prep(tryAt(push)), v = viol(pp);
+        for (let k = 0; d && k < 5 && v > 0; k++) {
+          const P2 = add(push, times(d, .01));
+          if (len(add(base, P2)) > bound) break;
+          push = P2; pp = prep(tryAt(push)); v = viol(pp);
+        }
+        const r = {v, c: pp.extra, push};
+        if (better(r, best)) best = r;
+        return v <= 0;
+      };
+      const leadC = cands.find(cd => cd.c < -.5);
+      if (leadC && verify(leadC.push, leadC.d)) return best.push;
+      if (len(p0) > 1e-6) for (const f of [.85, .7, .55, .4, .25, .1]) if (verify(times(p0, f), null)) return best.push;
+      for (const cd of cands.filter(cd => cd !== leadC).slice(0, 10)) if (verify(cd.push, cd.d)) break;
+      return best.push;
+    };
+    const clV = GUARD.used.close ? rot(Ryaw, times(GUARD.used.close.dir, GUARD.used.close.v / 100)) : [0, 0, 0];
+    // the sword grip (stage 1: the blade free in her left hand, not in a sheathe blend; stage 2: also a draw / sheathe blend that
+    // the blade guard moved, the blade not yet on the scabbard's axis)
+    if (swordFree || (stage === 2 && hold && sw === 'hand' && shW < .999)) {
+      const G0 = G;
+      // stage 2: the blade may not go deeper into her body than the blade guard left it
+      const swPts = hullOf('sword', 'sword'), lowSw = g => g[1] + Math.min(...swPts.map(P => rot(SQ, P)[1]));
+      const bd = g => (bladeDeep(g, SQ, 0)?.d || 0), bd0 = bd(G0), fl0 = stage === 2 ? Math.min(lowSw(G0), swordClear) : 0;
+      const tryG = pv => {
+        G = add(G0, pv); tgtL = G;
+        solL = armSolve('l', SL, G, poleOf(p.pL, 1)); gripL = solL.W;
+        if (len(sub(gripL, G)) > .002) G = gripL;
+        if (twoH) solveRight(clV);
+        const pts = {ax: [], hd: []};
+        fistPts(SL, solL, pts); swordPts(G, pts);
+        if (twoH) { fistPts(SR, solR, pts); pts.extra = len(sub(gripR, tgtR)) - .10; }
+        if (stage === 2) pts.extra = Math.max(pts.extra ?? -Infinity, bd(G) - bd0 - .002, fl0 - .002 - lowSw(G));
+        else pts.extra = Math.max(pts.extra ?? -Infinity, bd(G) - Math.max(bd0, 0) - .02);
+        return pts;
+      };
+      const push = clearPush('gripClear', 1, tryG);
+      let pp = prep(tryG(push));
+      // stage 2, where no move clears the hilt / guard (a two-hand grip beside her head: the right arm reaches no further) and
+      // not at a clip event (the attack direction there is the hazard's): the smallest turn of the blade about the grip (3-degree
+      // steps, <= 21 deg, about the two axes across it), added to the blade guard's turn (bTurn, planned with it)
+      if (stage === 2 && viol(pp) > 0 && !ctx.ev && !ctx.pre) {
+        const SQ0 = SQ, ax0 = rot(SQ0, [0, 1, 0]), e1 = safeAxis(perp(rot(Cq, [1, 0, 0]), ax0)), e2 = safeAxis(cross(ax0, e1));
+        let tilt = null;
+        for (let a = 3; a <= 30 && !tilt; a += 3) for (const axis of [e1, times(e1, -1), e2, times(e2, -1)]) {
+          SQ = mul(qa(axis, a), SQ0);
+          if (viol(prep(tryG(push))) <= 0) { tilt = {a, axis}; break; }
+        }
+        SQ = tilt ? mul(qa(tilt.axis, tilt.a), SQ0) : SQ0;
+        tryG(push);
+        if (tilt) {
+          const T = mul(qa(tilt.axis, tilt.a), turnA > 0 && turnAx ? qa(unit(turnAx), turnA) : ID), w = Math.min(1, Math.abs(T[3]));
+          const ang = 2 * Math.acos(w) / D, axv = times([T[0], T[1], T[2]], Math.sign(T[3]) || 1);
+          if (len(axv) > 1e-9) { turnA = ang; turnAx = unit(axv); GUARD.used.bTurn = {v: turnA, dir: rot(conj(Cq), turnAx)}; }
+        }
+      }
+      clearAcc.gripClear = add(clearAcc.gripClear, push);
+      // a two-hand right fist the grip's move left inside her (the right arm's reach, its turn per tick): the right hand's own
+      // target moves out (guard handClearR), off its spot on the hilt by at most 0.11 (the suite's two-hand limit 0.12)
+      if (twoH) {
+        const spot = tgtR, R0 = {ax: [], hd: []};
+        fistPts(SR, solR, R0);
+        if (viol(prep(R0)) > 0) {
+          const tryR2 = pv => { solveRight(add(clV, add(clearAcc.handClearR, pv))); const pts = {ax: [], hd: []}; fistPts(SR, solR, pts); pts.extra = len(sub(gripR, spot)) - .11; return pts; };
+          const pr = clearPush('handClearR', -1, tryR2);
+          tryR2(pr);
+          clearAcc.handClearR = add(clearAcc.handClearR, pr);
+        }
+      }
+    }
+    if (stage === 2) return;
+    // the scabbard in her right hand with the left hand on its hilt, drawing or sheathing from it (intro_end's draw): the right
+    // hand's target moves, the scabbard and the left hand follow (the closure: the left hand's target is on the scabbard)
+    if (leftOnScab) {
+      const Gs = G, SQs = SQ;
+      const tryS = pv => {
+        G = Gs; SQ = SQs; sheathe = null;
+        solveRight(add(clV, pv)); solveLeft();
+        const pts = {ax: [], hd: [], extra: len(sub(gripL, tgtL)) - .03};
+        fistPts(SR, solR, pts); fistPts(SL, solL, pts);
+        if (sw === 'hand') swordPts(G, pts);
+        else if (sw === 'sheathed') for (const P of [...HILT_AXIS, ...GUARD_RIM]) pts.ax.push(add(scT, rot(scQ, [P[0], P[1] + SK.hilt, P[2]])));
+        return pts;
+      };
+      const push = clearPush('handClearR', -1, tryS);
+      tryS(push);
+      clearAcc.handClearR = push;
+    }
+    // a free hand (no contact, not on the grip, not holding the sword): its target
+    const freeHand = side => {
+      if ((side > 0 ? ctsL : ctsR).length) return false;
+      if (side > 0) return !hold && !(p.plwL > 0) && !(p.bwL > 0) && !(p.hiL > 0);
+      return !twoH && !(p.plwR > 0) && !(p.bwR > 0) && !(p.hsR > 0) && !(wLip > 0) && !(p.hatX && p.hatX.hold) && !leftOnScab;
+    };
+    if (freeHand(-1)) {
+      // (the scabbard in her right hand with the sword sheathed: its seated hilt keeps out of her head and torso too)
+      const tryR = pv => {
+        solveRight(add(clV, pv)); const pts = {ax: [], hd: []}; fistPts(SR, solR, pts);
+        if (scab === 'hand' && sw === 'sheathed') for (const P of [...HILT_AXIS, ...GUARD_RIM]) pts.ax.push(add(scT, rot(scQ, [P[0], P[1] + SK.hilt, P[2]])));
+        // (the hand-held scabbard keeps pointing away from her forearm: its tip >= 0.55 of its length farther from the elbow
+        // than its mouth, the suite's held-props rule, with 0.01 to spare)
+        if (scab === 'hand') pts.extra = len(sub(scT, solR.E)) + .55 * SCAB.L + .01 - len(sub(add(scT, rot(scQ, [0, SCAB.L, 0])), solR.E));
+        return pts;
+      };
+      const push = clearPush('handClearR', -1, tryR);
+      tryR(push);
+      clearAcc.handClearR = push;
+    }
+    if (freeHand(1)) {
+      const T0 = tgtL;
+      const tryL = pv => { tgtL = add(T0, pv); solL = armSolve('l', SL, tgtL, poleOf(p.pL, 1)); gripL = solL.W; const pts = {ax: [], hd: []}; fistPts(SL, solL, pts); return pts; };
+      const push = clearPush('handClearL', 1, tryL);
+      tryL(push);
+      clearAcc.handClearL = push;
+    }
+  };
+  const clearRecord = () => {
+    for (const [name, push] of Object.entries(clearAcc)) if (len(push) > 1e-5 || clearTab[name]) {
+      GUARD.used[name] = {v: Math.min(GUARD_BOUND[name], len(push) * 100), dir: len(push) > 1e-5 ? rot(conj(Cq), unit(push)) : [0, 0, -1],
+        ...(clearTab[name] ? {tab: clearTab[name]} : {}), ...(clearBad[name] ? {bad: clearBad[name]} : {})};
+      if (len(push) > 1e-5) keep['gc_' + name] = unit(rot(conj(Cq), push));
+    }
+  };
   // ---- 10. the blade-body guard (sword in hand): push the grip out of her body, then turn the blade; then groundSword ----
   const armSegs = () => {
     for (const [k, S, sol] of [['l', SL, solL], ['r', SR, solR]]) {
@@ -776,6 +1033,24 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
       part('arm_' + k, S, A.qu); part('forearm_' + k, sol.E, A.qf);
     }
   };
+  // (the free right forearm too: only a hand on the scabbard / the throat / the grip / the hat holds near the blade by design)
+  const bladeParts = scab !== 'hand' && (p.hsR || 0) < .5 && (p.rh || 0) < .5 && (p.hat || 'worn') !== 'hand' ? [...BLADE_BODY, 'forearm_r'] : BLADE_BODY;
+  const bladeDeep = (Gx, SQx, margin = .02, parts = bladeParts) => {
+    const ax = rot(SQx, [0, 1, 0]); let best = null;
+    for (const n of parts) {
+      const v = o[n]; if (!v) continue;
+      const [lo, hi] = BOX[n], iq = conj(v.q);
+      for (let k = 0; k <= 24; k++) {
+        const y = SWORD.bladeLo + (SWORD.tip - SWORD.bladeLo) * k / 24, P = add(Gx, times(ax, y));
+        const L = rot(iq, sub(P, v.t));
+        let dm = Infinity, ai = 0, sg = 1;
+        for (let i = 0; i < 3; i++) { const a = L[i] - lo[i], b = hi[i] - L[i]; if (a < dm) { dm = a; ai = i; sg = -1; } if (b < dm) { dm = b; ai = i; sg = 1; } }
+        if (dm > -margin && (!best || dm > best.d)) { const e = [0, 0, 0]; e[ai] = sg; best = {d: dm, n: rot(v.q, e), part: n, y}; }
+      }
+    }
+    return best;
+  };
+  clearHands(1);
   armSegs();
   // the stone rule with this tick's forearms: the targets above used the previous tick's frames; the refinements put the
   // bottle's base / the cup's base on its spot (the item swaps in or out of the hand there; a relaxed fixed point, <= 8
@@ -799,23 +1074,6 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
     armSegs();
     if (err < .004) break;
   }
-  // (the free right forearm too: only a hand on the scabbard / the throat / the grip / the hat holds near the blade by design)
-  const bladeParts = scab !== 'hand' && (p.hsR || 0) < .5 && (p.rh || 0) < .5 && (p.hat || 'worn') !== 'hand' ? [...BLADE_BODY, 'forearm_r'] : BLADE_BODY;
-  const bladeDeep = (Gx, SQx, margin = .02, parts = bladeParts) => {
-    const ax = rot(SQx, [0, 1, 0]); let best = null;
-    for (const n of parts) {
-      const v = o[n]; if (!v) continue;
-      const [lo, hi] = BOX[n], iq = conj(v.q);
-      for (let k = 0; k <= 24; k++) {
-        const y = SWORD.bladeLo + (SWORD.tip - SWORD.bladeLo) * k / 24, P = add(Gx, times(ax, y));
-        const L = rot(iq, sub(P, v.t));
-        let dm = Infinity, ai = 0, sg = 1;
-        for (let i = 0; i < 3; i++) { const a = L[i] - lo[i], b = hi[i] - L[i]; if (a < dm) { dm = a; ai = i; sg = -1; } if (b < dm) { dm = b; ai = i; sg = 1; } }
-        if (dm > -margin && (!best || dm > best.d)) { const e = [0, 0, 0]; e[ai] = sg; best = {d: dm, n: rot(v.q, e), part: n, y}; }
-      }
-    }
-    return best;
-  };
   const swordClear = .10 + (.03 - .10) * wLie;
   let pushV = bp && swordFree && bp.v > 0 ? times(rot(Cq, bp.dir), bp.v / 100) : [0, 0, 0];
   let turnA = bt && swordFree && bt.v > 0 ? bt.v : 0, turnAx = bt && bt.v > 0 ? rot(Cq, bt.dir) : null;
@@ -863,6 +1121,9 @@ export function solve(p, hist = () => null, plan = {}, ctx = {}) {
   if (len(pushV) > 1e-5) GUARD.used.bPush = {v: len(pushV) * 100, dir: rot(conj(Cq), unit(pushV))};
   if (turnA > 0 && turnAx) GUARD.used.bTurn = {v: turnA, dir: rot(conj(Cq), unit(turnAx))};
   if (sw === 'hand' && shW < .999) SQ = groundSword(G, SQ, rot(Ryaw, [0, 0, -1]), swordClear);
+  clearHands(2);
+  clearRecord();
+  armSegs();
   const bladeResidue = sw === 'hand' && shW < .999 && hold ? (bladeDeep(G, SQ, 0)?.d || 0) : 0;
 
   // ---- limb floor guard: an arm whose hull dips below 0.002 raises its target by the deficit ----
