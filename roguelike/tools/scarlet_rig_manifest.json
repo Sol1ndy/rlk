@@ -2996,7 +2996,78 @@
    -0.02,
    0.02,
    0.04
-  ]
+  ],
+  "icon": {
+   "model": "rlk:mboss/scarlet/item_sword_icon",
+   "contexts": [
+    "gui",
+    "fixed",
+    "ground"
+   ],
+   "display": {
+    "gui": {
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "translation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    },
+    "fixed": {
+     "rotation": [
+      0,
+      180,
+      0
+     ],
+     "translation": [
+      0,
+      0,
+      0
+     ],
+     "scale": [
+      1,
+      1,
+      1
+     ]
+    },
+    "ground": {
+     "rotation": [
+      0,
+      0,
+      0
+     ],
+     "translation": [
+      0,
+      2,
+      0
+     ],
+     "scale": [
+      0.5,
+      0.5,
+      0.5
+     ]
+    }
+   },
+   "dims": {
+    "len": 20,
+    "scab": 2.4,
+    "grip": 2,
+    "pommel": 2.4,
+    "guard": 5.2,
+    "fit": 2.8,
+    "depth": 1.6
+   },
+   "_doc": "F-I (HR-03): items/item_sword.json selects on display_context: these contexts show the icon model (drawn in GUI px), every other one (the hands, item_display none) the rig model"
+  }
  },
  "skeleton": {
   "hip_y": 0.765625,
@@ -16463,7 +16534,7 @@
   },
   "elements_budget": 6500,
   "parts": 29,
-  "models": 62,
+  "models": 63,
   "key_files": 2084,
   "keys": 18800,
   "rig_functions": 2600,

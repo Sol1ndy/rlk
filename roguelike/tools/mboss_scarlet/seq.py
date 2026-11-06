@@ -518,10 +518,18 @@ def build_lead_stand(W):
 
 # =============================================================================================================================
 # CS4 — the ending (PLAN §3.7 std; clip ending 1042 = H); the event coda follows (the core starts seq/event at #sqdone)
+SEAM_CUT = ('white', 0, 2, 1)      # F-I (HR-31): CS4's opening cut (ovl g, in, hold, out): fully white over ticks 0-1, out at 2
+
+
 def build_ending(W):
     s, mv = Seq('ending'), Moves('ending')
     e = lambda k, d=0: ev('ending', k, d)
     # the start: lying where CS3 left her; the one-shot facing (rotate, no teleport: F2 HR-02; the pull refuses while dying)
+    # F-I (HR-31, lead decision 11-05): the hard cut of the original (v3 26.267: CS3's kick -> the low close shot of her lying,
+    # the hat over her face) as a 3-t white flash at tick 0 (the lethal kick's impact; SEAM_CUT): under it the hat goes from
+    # beside her (the repel's DOWN, 1.87 b away) over her face in the clip's 1-t interpolation; nothing else of the ending
+    # (the glint 16, the band 20, line 17 at 300) runs under it
+    s.at(0, K.ovl(*SEAM_CUT))
     # E1b the glint at the hat's edge, the lilac band across the player at chest height
     s.fx(e('glint'), 'hat_crown', K.p('glint', c=api.C_LILAC)).at(e('glint'), snd('band_glint'))
     # F2 (HR-32): the band sweeps her distance to the player + 1 b (storage seq.band.sw, tenths), so it passes over them

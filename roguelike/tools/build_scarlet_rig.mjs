@@ -32,7 +32,7 @@ import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {PART_NAMES, PART_SCALE, PART_BRIGHT, DEFAULT_MODEL, HAND_MODELS, FACE_MODELS, PHASE_MODELS, BLADE_MODELS, ghostOf, TINTS, allModels,
-  ITEM_SWORD, HIDDEN, SKIN, SKIN_REGIONS, SKIN_MAP, FACE_FX, SWORD, SCAB, HAT, STRINGS, SASH, CUP, BOTTLE, MODEL_SCALE, BODY_SPECS, stringPoints} from './scarlet_geometry.mjs';
+  ITEM_SWORD, ICON, HIDDEN, SKIN, SKIN_REGIONS, SKIN_MAP, FACE_FX, SWORD, SCAB, HAT, STRINGS, SASH, CUP, BOTTLE, MODEL_SCALE, BODY_SPECS, stringPoints} from './scarlet_geometry.mjs';
 const SWORD_BLADE = [SWORD.bladeLo, SWORD.tip];
 import {scarletSprites, paintScarlet, spriteId, PAINT_ROLES, TEX_DIR} from './scarlet_paint.mjs';
 import {SKIN_B64, SKIN_BYTES, SKIN_SHA1} from './scarlet_skin.mjs';
@@ -118,6 +118,16 @@ const ITEM_DISPLAY = {
   fixed: {rotation: [0, 180, 0], translation: [0, 0, 0], scale: [.9, .9, .9]},
   head: {rotation: [0, 180, 0], translation: [0, 13, 7], scale: [1, 1, 1]},
 };
+// F-I (HR-03): the slot icon item_sword_icon (scarlet_geometry ICON, drawn in GUI px) and the contexts that show it instead of
+// the rig model: the inventory / hotbar / codex screens (gui), an item frame (fixed) and the dropped item (ground) - the
+// vanilla generated item's transforms (gui as drawn, upright in a frame, half size and bobbing on the ground); the hands and
+// the coda's thrown prop (item_display "none") keep item_sword
+const ICON_CONTEXTS = ['gui', 'fixed', 'ground'];
+const ICON_DISPLAY = {
+  gui: {rotation: [0, 0, 0], translation: [0, 0, 0], scale: [1, 1, 1]},
+  fixed: {rotation: [0, 180, 0], translation: [0, 0, 0], scale: [1, 1, 1]},
+  ground: {rotation: [0, 0, 0], translation: [0, 2, 0], scale: [.5, .5, .5]},
+};
 const usedSprites = new Set();
 for (const [name, els] of Object.entries(models)) {
   const used = [...new Set(els.flatMap(e => Object.values(e.faces).map(f => f.texture.slice(1))))].sort();
@@ -126,9 +136,12 @@ for (const [name, els] of Object.entries(models)) {
   // a model with no faces (empty, the calm face and its twin) takes the particle of its kind (the ghost twin the ghost texture)
   const m = {ambientocclusion: false, textures: {...tex, particle: tex[used[0]] || spriteId(name.endsWith('_g') ? 'ghost' : 'lacquer')}, elements: els};
   if (name === 'item_sword') m.display = ITEM_DISPLAY;
+  if (name === 'item_sword_icon') { m.display = ICON_DISPLAY; m.gui_light = 'front'; }     // lit flat in the slot like a vanilla item
   json(path.join(modelDir, name + '.json'), m);
-  const def = {type: 'minecraft:model', model: 'rlk:item/mboss/scarlet/' + name};
+  let def = {type: 'minecraft:model', model: 'rlk:item/mboss/scarlet/' + name};
   if (TINTS[name] !== undefined) def.tints = [{type: 'minecraft:constant', value: TINTS[name]}];
+  if (name === 'item_sword') def = {type: 'minecraft:select', property: 'minecraft:display_context',
+    cases: [{when: ICON_CONTEXTS, model: {type: 'minecraft:model', model: 'rlk:item/mboss/scarlet/item_sword_icon'}}], fallback: def};
   json(path.join(itemDir, name + '.json'), {model: def});
 }
 const unused = [...Object.keys(sprites), 'skin'].filter(n => !usedSprites.has(n));
@@ -883,7 +896,9 @@ const manifest = {
     regions: SKIN_REGIONS, px: SKIN.px, body_px: SKIN.bodyPx, head0: SKIN.head0, inflate_px: {head: SKIN.inflHead, body: SKIN.infl}, inflate_ends: 'all',
     specs: BODY_SPECS, map: SKIN_MAP, hidden: HIDDEN, face_overlays: FACE_FX,
     _doc: 'map: model -> [region, row start, row end] (the base box shows the region\'s base layer, the second box its outer layer, inflated on all six sides). specs: the avatar\'s box specs (from / to in model units about the pivot [8, 8, 8], uv / over = [u, v, w, h, d], rows start..end). hidden: parts the skin already shows (model empty, scale 0). face_overlays: [col, row, cols, rows] of the 8 x 8 face painted by face_fx.'},
-  item_sword: {model: itemId('item_sword'), length: ITEM_SWORD.len, display_scale: MODEL_SCALE.item_sword, display: ITEM_DISPLAY, toss_offset: DIMS.item_sword.toss_offset},
+  item_sword: {model: itemId('item_sword'), length: ITEM_SWORD.len, display_scale: MODEL_SCALE.item_sword, display: ITEM_DISPLAY, toss_offset: DIMS.item_sword.toss_offset,
+    icon: {model: itemId('item_sword_icon'), contexts: ICON_CONTEXTS, display: ICON_DISPLAY, dims: ICON,
+      _doc: 'F-I (HR-03): items/item_sword.json selects on display_context: these contexts show the icon model (drawn in GUI px), every other one (the hands, item_display none) the rig model'}},
   skeleton: {hip_y: HIP_Y, hipJ: SK.hipJ, waist: SK.waist, neckB: SK.neckB, shoulder: SK.shoulder, armU: SK.armU, fore: SK.fore, thigh: SK.thigh, shin: SK.shin,
     ankleY: SK.ankleY, swing: SK.swing, brim: SK.brim, brimTilt: SK.brimTilt, hatBack: SK.hatBack, hatHand: SK.hatHand, brimHold: SK.brimHold, sashKnot: SK.sashKnot,
     scabHip: SK.scabHip, scabHipDir: SK.scabHipDir.map(x => +x.toFixed(6)), twoHand: SK.twoHand, hilt: SK.hilt, throat: SK.throat, anchors: SK.anchors, vis: SK.vis,

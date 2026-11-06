@@ -125,7 +125,7 @@ export const SKIN_MAP = {
   ...Object.fromEntries(['open', 'grip', 'brim'].flatMap(k => [[`forearm_l_${k}`, ['arm_l', 6, 12]], [`forearm_r_${k}`, ['arm_r', 6, 12]]])),
   thigh_l: ['leg_l', 0, 6], thigh_r: ['leg_r', 0, 6], shin_l: ['leg_l', 6, 12], shin_r: ['leg_r', 6, 12],
 };
-const IN_UNITS = new Set(Object.keys(SKIN_MAP));
+const IN_UNITS = new Set([...Object.keys(SKIN_MAP), 'item_sword_icon']);   // F-I: the slot icon is drawn in GUI px (HR-03)
 // face overlays (part face, the head's frame): calm = none (the skin's own face); smile = the eyes narrowed (the upper lash
 // row lowered onto the iris row, the amber row kept) and a small closed-lip mouth; closed = eyelids over both eyes and a lash
 // line on their lower row. One sprite face_fx (32 x 16: the 8 x 8 face at 2 x 2 px per skin pixel, closed | smile), cards
@@ -281,8 +281,37 @@ function itemSword() {
   e.push(bx([-.022, off + SWORD.gripLo, -.022], [.022, off + SWORD.gripHi, .022], 'grip'));
   e.push(bx([-.026, off + SWORD.pommel, -.026], [.026, off + SWORD.gripLo, .026], 'brass'));
   e.push(bx([-.06, off + SWORD.guard - .008, -.06], [.06, off + SWORD.guard + .008, .06], 'iron'));
-  e.push(cardY('guard', off + SWORD.guard + .0085, {X0: -.10, X1: .10, Z0: -.10, Z1: .10}));
+  // F-I (HR-03, the D7 verifier's note): the guard's lotus card on the guard plate's top face (the item's shift s like every
+  // box here; without it the card stood 0.51 b up the scabbard, a stray square plate beside its middle band)
+  e.push(cardY('guard', off + SWORD.guard + .0085 + s, {X0: -.10, X1: .10, Z0: -.10, Z1: .10}));
   e[e.length - 1].rotation = {origin: [8, 8, 8], axis: 'z', angle: -45};
+  return e;
+}
+// F-I (HR-03, lead decision 11-05): the item's slot icon (RP items/item_sword.json selects it on display_context gui / fixed /
+// ground; the hands and the thrown prop keep item_sword above). The same sheathed sword drawn for slot resolution, in model px
+// = GUI px (its display gui scale 1): along the 16 x 16 slot's diagonal like a vanilla sword (the pommel lower left, the chape
+// upper right; ICON.len px along the diagonal, about 14.1 px across each way), every long part >= 2 GUI px wide (the
+// scabbard ICON.scab, the grip ICON.grip: a readable bar at GUI x 2, not the 0.4-px hairline of the rig model), the guard a
+// dark bar ICON.guard px across, brass fittings a little wider than the scabbard, a crimson cord; the scabbard's front face
+// shows the rig's scab sprite. Rig sprites only (0 new atlas px); its own item definition too (unused by the game).
+export const ICON = {len: 20, scab: 2.4, grip: 2.0, pommel: 2.4, guard: 5.2, fit: 2.8, depth: 1.6};
+function itemSwordIcon() {
+  const rot = {origin: [8, 8, 8], axis: 'z', angle: -45}, y0 = 8 - ICON.len / 2, e = [];
+  // a box w x (y0 + a .. y0 + b) x d about the slot's centre line; `front` = the face toward the GUI camera (south)
+  const bar = (w, a, b, side, front = side, d = ICON.depth) => {
+    const faces = {};
+    for (const k of ['north', 'east', 'west', 'up', 'down', 'south']) faces[k] = {texture: '#' + (k === 'south' ? front : side), uv: [0, 0, 16, 16]};
+    return {from: [8 - w / 2, y0 + a, 8 - d / 2].map(r4), to: [8 + w / 2, y0 + b, 8 + d / 2].map(r4), rotation: rot, faces};
+  };
+  // the two ends no wider than 2.6 px, so their corners stay inside the 16 x 16 slot on the diagonal
+  e.push(bar(ICON.pommel, 0, 1.0, 'brass'));                       // the pommel
+  e.push(bar(ICON.grip, 1.0, 5.2, 'grip'));                        // the corded grip
+  e.push(bar(ICON.guard, 5.2, 6.3, 'iron', 'iron', 2.4));          // the guard plate, edge-on to the slot
+  e.push(bar(ICON.fit, 6.3, 7.4, 'brass'));                        // the mouth collar
+  e.push(bar(ICON.scab, 7.4, 18.9, 'lacquer', 'scab'));            // the lacquered scabbard (its decorated face toward the camera)
+  e.push(bar(ICON.fit, 9.6, 10.3, 'crimson', 'crimson', 1.8));     // the cord at the upper hanger
+  e.push(bar(ICON.fit, 12.8, 13.5, 'brass', 'brass', 1.8));        // the middle band
+  e.push(bar(ICON.scab + .2, 18.9, ICON.len, 'brass'));            // the chape
   return e;
 }
 // ---- intro props (white porcelain with violet) -----------------------------------------------------------------------------
@@ -314,7 +343,7 @@ function blockModels() {
   for (const [k, m] of Object.entries(FACE_MODELS)) M[m] = faceOverlay(k);
   M.sash_p1 = sashTails(false); M.sash_p2 = sashTails(true);
   M.hat_p1 = hat(false); M.hat_p2 = hat(true); M.hat_strings = hatStrings();
-  M.sword = sword(); M.scabbard = scabbard(); M.hilt = hiltSheathed(); M.item_sword = itemSword();
+  M.sword = sword(); M.scabbard = scabbard(); M.hilt = hiltSheathed(); M.item_sword = itemSword(); M.item_sword_icon = itemSwordIcon();
   for (const g of ['lilac', 'pink', 'violet', 'gold']) M['glow_' + g] = glow('glow_' + g);
   M.cup = cup(); M.bottle = bottle();
   return M;
@@ -322,7 +351,7 @@ function blockModels() {
 // the display scale a model is shown at (the part that uses it); item_sword: the event's thrown display and the reward item
 export const MODEL_SCALE = {sword: 1.5, scabbard: 1.5, hilt: 1.5, item_sword: 1.375, glow_lilac: 1.5, glow_pink: 1.5, glow_violet: 1.5, glow_gold: 1.5};
 // models with no ghost twin (glows, the item, empty)
-const NO_GHOST = new Set(['empty', 'item_sword', 'glow_lilac', 'glow_pink', 'glow_violet', 'glow_gold']);
+const NO_GHOST = new Set(['empty', 'item_sword', 'item_sword_icon', 'glow_lilac', 'glow_pink', 'glow_violet', 'glow_gold']);
 // the ghost texture's three regions (scarlet_paint ghost): u 0..16/3 the body gradient, 16/3..32/3 the brim mask, 32/3..16 the
 // bead strings' mask. A tile / card face maps its own UV into the region; a skin face (a few pixels of the skin) shows the
 // whole gradient, so every box face of the ghost body glows the same (core in the middle, rim at the edges)

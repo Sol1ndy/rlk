@@ -20,6 +20,8 @@ in mcsim (run from HR/tests, outside the datapack; PLAN §7.6 / §9.3, the S2b b
            seq.S0 / SWORD_R; the toss summon at the manifest's item_sword.toss_offset when it carries one); the moonlight orb
            (marker) from her left hand to the player's chest at E42; every kit call a contract name; cancel at every tick
            leaves nothing
+  seam     (F-I, HR-31) CS4's tick 0 opens with the hard cut seq.SEAM_CUT (ovl white / black, in 0, hold >= 2): the hat's move
+           from the repel (5 %) over her face runs under it; no other effect in its first ticks
   skip     seq/intro/skip from 30 b: the black, the rock and props gone, her <= 7 b from the player facing them; the next tick
            (#sq 554) plays intro_end with line 11
   cs4      the ending with an unmoving player (the framework's real mv/* movers each tick): her distance over 300-1042 stays
@@ -287,6 +289,14 @@ check('signal: no call into the core (only #sq_sig)', not core, core[:2])
 blk = [l for l in F['seq/event/k/' + str(api.EV_T['black'])] if 'ovl' in l]
 check('event: the black at E110 = ovl black in 10 hold 12 out 0', any('{g:"black",in:10,hold:12,out:0}' in l for l in blk), blk)
 nl = build(True, {'lines': False})[1]
+# F-I (HR-31, lead decision 11-05): CS4 opens with the original's hard cut (v3 26.267) as a 2-3 t flash at its tick 0 (the lethal
+# kick at repel 102 starts it the same tick): seq.SEAM_CUT, white / black, in 0, hold >= 2 (the hat's 1-t move from beside her
+# to over her face runs under it), nothing else of the sequence's own staging in those ticks
+cut = [l for l in T['ending'][0] if 'fx/hud/ovl' in l]
+early = sorted(t for t in T['ending'] if 0 < t <= 3 and any('fx/' in l for l in T['ending'][t]))
+check(f'seam: CS3 (5 %) -> CS4: the ending opens with a hard cut at tick 0 ({cut}), no other effect before it ends ({early})',
+      len(cut) == 1 and re.search(r'\{g:"(white|black)",in:0,hold:([2-9]|\d\d+),out:[0-3]\}', cut[0]) is not None
+      and tuple(seq.SEAM_CUT[1:3]) == (0, int(re.search(r'hold:(\d+)', cut[0]).group(1))) and not early, (cut, early))
 check('event: EVENT[lines] off -> no line 24 / 25 (a wordless coda)', not re.search(r'line \{id:2[45]\}', '\n'.join(l for L in nl.values() for l in L)))
 
 

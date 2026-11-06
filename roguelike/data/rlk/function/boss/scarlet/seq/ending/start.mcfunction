@@ -10,3 +10,4 @@ function rlk:boss/scarlet/rig/play/ending
 scoreboard players set #sqdone hr 0
 scoreboard players set @a[tag=player] hudHold 2
 title @a[tag=player] actionbar ""
+function rlk:boss/scarlet/fx/hud/ovl {g:"white",in:0,hold:2,out:1}

@@ -13,7 +13,12 @@ datapack; S2b takes it over with the manifest, api.HANDOVER).
              0.003 b apart (not coplanar) at four distinct turns mod 90, its sprite painting only its own corner wedges (the
              four turns cover the ring once); atlas entries for every sprite
   item       rlk:mboss/scarlet/item_sword: rig textures only (0 extra px), the gui / hand / ground / fixed transforms, points
-             like a vanilla sword in the gui (hilt lower left, tip upper right), lies flat on the ground above the floor
+             like a vanilla sword in the gui (hilt lower left, tip upper right), lies flat on the ground above the floor; F-I
+             (HR-03): the guard card on the guard plate; the item definition selects on display_context (gui / fixed / ground
+             -> the slot icon item_sword_icon, the hands / item_display none -> the rig model); the icon: rig sprites only, the
+             manifest's transforms, lit front; at GUI x 2 every lit row but the two end corners >= 2 px, >= 100 px, one piece
+             (the rig model's hairline printed for comparison); inside the 16 x 16 slot and spanning it; long parts >= 2 GUI
+             px wide; points like a vanilla sword; dropped: upright, half size, over the floor
   shipped    every clip replayed from its key files (data merge with interpolation; the hand / face swaps it keys): no shown
              model point below the floor at any tick (blade and scabbard tips, the brim, the hair, the skirt panels and every
              other part, hulls from the RP's models), no part turning more than 120 degrees in a tick (a 0-tick snap excepted),
@@ -61,6 +66,8 @@ datapack; S2b takes it over with the manifest, api.HANDOVER).
   angles     node tools/scarlet_retarget.mjs --dump all: every angle channel == the source outside the declared patches
   retarget   every correction within its bound, IK stretch <= 1.0005, contact shortfalls per kind (the per-clip table printed)
   couplings  the cs1 petal path follows the built head anchor; seq.S0 / SWORD_R == api / manifest
+  cine seam  (F-I, HR-31) CS3 at 5 % -> CS4 (repel 102 -> ending 0): the body's anchors meet (the head <= 0.25 b), the hat
+             moves only under the ending's tick-0 hard cut (seq/ending/start: ovl white / black, in 0, hold >= 2)
   --rebuild  runs the builder twice: the rig functions, the RP mboss/scarlet files, the atlas and the manifest byte-identical
 """
 import argparse
@@ -210,10 +217,13 @@ check('spawn: every part spawns with its default model', all(f'rlk:mboss/scarlet
 
 
 # ================================================================ models
-def item_model(item_id):
+def item_model(item_id, context=None):
+    """the model an item definition shows (a display_context select: the case holding `context`, else its fallback)"""
     ns, path = item_id.split(':')
-    it = json.loads((RP / f'assets/{ns}/items/{path}.json').read_text())
-    mid = it['model']['model']
+    it = json.loads((RP / f'assets/{ns}/items/{path}.json').read_text())['model']
+    if it.get('type') == 'minecraft:select':
+        it = next((c['model'] for c in it['cases'] if context in c['when']), it['fallback'])
+    mid = it['model']
     mns, mpath = mid.split(':')
     return json.loads((RP / f'assets/{mns}/models/{mpath}.json').read_text())
 
@@ -456,6 +466,111 @@ low = min(p[1] * sy + gd.get('translation', [0, 0, 0])[1] for p in pts) / 16 + .
 check(f'item: on the ground it lies flat (rotation x 90) above the floor (lowest {low:.3f} b over the bob)', abs(abs(gd.get('rotation', [0])[0]) - 90) < 1e-6 and low >= 0)
 fx = D_.get('fixed', {})
 check('item: the fixed (frame) transform turns it to face the frame and fits (scale <= 1)', max(fx.get('scale', [9])) <= 1)
+# F-I (HR-03, the D7 verifier's note): the guard's lotus card lies on the guard plate (the item's shift applied to it too)
+_plate = [e for e in IS['elements'] if any(f['texture'] == '#iron' for f in e['faces'].values())]
+_card = [e for e in IS['elements'] if any(f['texture'] == '#guard' for f in e['faces'].values())]
+check('item: the guard card sits on the guard plate\'s top face (not up the scabbard: HR-03)', len(_plate) == 1 and len(_card) == 1
+      and _plate[0]['to'][1] - 1e-3 <= _card[0]['from'][1] <= _plate[0]['to'][1] + .1,
+      (_plate[0]['from'][1], _plate[0]['to'][1], _card[0]['from'][1]) if _plate and _card else (_plate, _card))
+
+# ---------------------------------------------------------------- F-I (HR-03): the slot icon
+# The lead's decision (11-05): items/item_sword.json selects on display_context; gui / fixed / ground show a dedicated chunky
+# icon (our sword's silhouette, its long parts >= 2 GUI px wide at 16 x 16, readable at x 2), the hands keep the rig sword
+_def = json.loads((ASSETS / 'items/mboss/scarlet/item_sword.json').read_text())['model']
+_icon_id = MAN['item_sword'].get('icon', {}).get('model', '')
+check('item: items/item_sword.json selects on display_context: gui / fixed / ground -> the icon model, the hands / item_display '
+      'none (the fallback) -> the rig model', _def.get('type') == 'minecraft:select' and _def.get('property') == 'minecraft:display_context'
+      and len(_def.get('cases', [])) == 1 and sorted(_def['cases'][0]['when']) == ['fixed', 'ground', 'gui']
+      and _def['cases'][0]['model'].get('model') == 'rlk:item/mboss/scarlet/item_sword_icon' == 'rlk:item/' + _icon_id.split(':')[1]
+      and _def.get('fallback', {}).get('model') == 'rlk:item/mboss/scarlet/item_sword', json.dumps(_def)[:200])
+ICO = item_model(api.ITEM_MODEL, 'gui')
+check('item: the icon\'s textures are rig sprites also used by the rig\'s own models (0 extra px)',
+      set(ICO['textures'].values()) <= rig_tex & other_tex, str(set(ICO['textures'].values()) - (rig_tex & other_tex)))
+check('item: the icon = the manifest\'s icon block (contexts, display transforms); gui lit front, as drawn (scale 1)',
+      ICO.get('display') == MAN['item_sword']['icon']['display'] and ICO.get('gui_light') == 'front'
+      and ICO['display'].get('gui', {}).get('scale') == [1, 1, 1] and ICO['display'].get('gui', {}).get('rotation') == [0, 0, 0])
+
+
+def slot_raster(m, scale):
+    """the model's gui context at GUI x `scale` (16 x scale px square, pixel centres, no AA: the GUI's item drawing); every
+    face of every element (rotation, then display.gui about the centre); returns the lit-pixel rows"""
+    g = m['display']['gui']
+    n = 16 * scale
+    lit = [[False] * n for _ in range(n)]
+    for e in m['elements']:
+        P = [rotp([(p[i] - 8) * g.get('scale', [1, 1, 1])[i] for i in range(3)], g.get('rotation', [0, 0, 0])) for p in el_pts(e)]
+        Q = [(p[0] + 8 + g.get('translation', [0, 0, 0])[0], 8 - p[1] - g.get('translation', [0, 0, 0])[1]) for p in P]
+        # the element's outline seen along z: the convex hull of its 8 projected corners
+        pts = sorted(set((round(x, 6), round(y, 6)) for x, y in Q))
+        def cross(o, a, b):
+            return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+        lo, hi = [], []
+        for p in pts:
+            while len(lo) >= 2 and cross(lo[-2], lo[-1], p) <= 0:
+                lo.pop()
+            lo.append(p)
+        for p in reversed(pts):
+            while len(hi) >= 2 and cross(hi[-2], hi[-1], p) <= 0:
+                hi.pop()
+            hi.append(p)
+        hull_ = lo[:-1] + hi[:-1]
+        if len(hull_) < 3:
+            continue
+        for j in range(n):
+            for i in range(n):
+                x, y = (i + .5) / scale, (j + .5) / scale
+                if all(cross(hull_[k], hull_[(k + 1) % len(hull_)], (x, y)) >= 0 for k in range(len(hull_))):
+                    lit[j][i] = True
+    return lit
+
+
+def pieces(lit):
+    n, seen, cnt = len(lit), set(), 0
+    for j in range(n):
+        for i in range(n):
+            if lit[j][i] and (j, i) not in seen:
+                cnt += 1
+                st = [(j, i)]
+                seen.add((j, i))
+                while st:
+                    a, b = st.pop()
+                    for da in (-1, 0, 1):
+                        for db in (-1, 0, 1):
+                            u, v = a + da, b + db
+                            if 0 <= u < n and 0 <= v < n and lit[u][v] and (u, v) not in seen:
+                                seen.add((u, v))
+                                st.append((u, v))
+    return cnt
+
+
+for _nm, _m in (('icon', ICO), ('rig model (the hands)', IS)):
+    _L = slot_raster(_m, 2)
+    _rows = [sum(r) for r in _L if any(r)]
+    _mid = _rows[1:-1]          # the two end rows cut a corner of the diagonal (1 px, as a vanilla sword's tip)
+    _ok = len(_rows) >= 3 and min(_mid) >= 2 and sum(_rows) >= 100 and pieces(_L) == 1
+    msg = (f'item: {_nm} at GUI x 2 (32 x 32): {sum(_rows)} lit px in {len(_rows)} rows, the thinnest row between the two end '
+           f'corners {min(_mid) if _mid else 0} px, {pieces(_L)} piece(s)')
+    if _nm == 'icon':
+        check(msg + ' (every lit row but the two end corners >= 2 px, >= 100 px, one piece: HR-03)', _ok)
+    else:
+        print('     (info) ' + msg + ' - the hairline the icon replaces in the slot')
+_x1 = slot_raster(ICO, 1)
+check('item: the icon fits the 16 x 16 slot (nothing drawn outside it) and spans it (>= 14 px each way)',
+      all(0 <= (p[0] - 8) * 1 + 8 <= 16 and 0 <= 8 - (p[1] - 8) <= 16 for e in ICO['elements'] for p in el_pts(e))
+      and sum(1 for i in range(16) if any(_x1[j][i] for j in range(16))) >= 14 and sum(1 for r in _x1 if any(r)) >= 14)
+_long = [e for e in ICO['elements'] if e['to'][1] - e['from'][1] >= 3]
+check('item: the icon\'s long parts (the scabbard, the grip) are >= 2 GUI px wide (HR-03: the rig model\'s 0.38)',
+      _long and all((e['to'][0] - e['from'][0]) * ICO['display']['gui']['scale'][0] >= 2 for e in _long),
+      [(e['to'][0] - e['from'][0], e['to'][1] - e['from'][1]) for e in _long])
+_g = [P for e in ICO['elements'] if any(f['texture'] == '#grip' for f in e['faces'].values()) for P in el_pts(e)]
+_s = [P for e in ICO['elements'] if any(f['texture'] == '#scab' for f in e['faces'].values()) for P in el_pts(e)]
+_gc, _sc = ([sum(c) / len(c) for c in zip(*X)] for X in (_g, _s))
+check('item: the icon points like a vanilla sword (the grip lower left, the scabbard tip upper right)', _gc[0] < _sc[0] and _gc[1] < _sc[1])
+_gd = ICO['display'].get('ground', {})
+_low = min(p[1] * _gd['scale'][1] + _gd['translation'][1] for e in ICO['elements'] for p in
+           (rotp([P[i] - 8 for i in range(3)], _gd.get('rotation', [0, 0, 0])) for P in el_pts(e))) / 16 + .25 * _gd['scale'][1]
+check(f'item: the dropped icon stands upright at the vanilla item\'s size (half) and stays over the floor (lowest {_low:.3f} b over the bob)',
+      _gd.get('rotation') == [0, 0, 0] and _gd.get('scale') == [.5, .5, .5] and _low >= 0)
 
 # ================================================================ shipped clips (replay of the key files)
 def qmul(a, b):
@@ -757,6 +872,20 @@ for a, ta, b, tb in HANDOVER:
     if over_:
         ho_bad.append((f'{a}[{ta}] -> {b}[{tb}]', over_))
 check(f'cine: the hand-over poses meet (anchors within 0.06-0.25 b: {", ".join(f"{a}->{b}" for a, _, b, _ in HANDOVER)})', not ho_bad, ho_bad)
+# F-I (HR-31, lead decision 11-05): CS3 at 5 % -> CS4 (the lethal kick at repel 102 starts the ending in the same tick). Her
+# body meets; the hat goes from beside her (the repel's DOWN) over her face only under CS4's opening hard cut (seq.SEAM_CUT:
+# a full-screen flash from the ending's tick 0, fully on while the hat's 1-t interpolation runs); under it the head settles
+# 0.15 b into LY's chin-up rest (allowed up to 0.25 b there: a settle, not a jump), every other anchor within its TOL
+SEAM = {('repel', 102, 'ending', 0): {'hat_crown': None, 'head': .25}}
+for (a, ta, b, tb), cut in SEAM.items():
+    A_, B_ = anchors_at(a, ta), anchors_at(b, tb)
+    d = {k: round(math.dist(A_[k], B_[k]), 3) for k in api.ANCHORS}
+    over_ = {k: v for k, v in d.items() if v > (cut[k] if k in cut and cut[k] is not None else 9e9 if k in cut else TOL[k])}
+    st = (DP / f'data/rlk/function/boss/scarlet/seq/{b}/start.mcfunction')
+    m_ = re.search(r'fx/hud/ovl \{g:"(white|black)",in:0,hold:(\d+),out:\d+\}', st.read_text() if st.exists() else '')
+    check(f'cine: the seam {a}[{ta}] -> {b}[{tb}]: the body meets (anchors within 0.06-0.25 b, the head <= 0.25), the hat '
+          f'({", ".join(f"{k} {d[k]} b" for k in cut)}) moves under a hard cut at {b} tick 0 (ovl white / black in 0, hold >= 2: '
+          f'{m_.group(0) if m_ else None})', not over_ and m_ is not None and int(m_.group(2)) >= 2, over_)
 # the ending ends in H_POSE's states (= ev_give / ev_toast tick 0) and the sq1 / lead-in ends in g_brim's hold (the right hand at the brim)
 h_bad = [k for k in ('Hat', 'Sw', 'Sc', 'face') if ST_['ending'][1042].get(k) != ST_['ev_give'][0].get(k)]
 check('cine: ending 1042 = ev_give / ev_toast 0 states (hat worn, sword sheathed, scabbard in hand, face calm)', not h_bad, h_bad)
