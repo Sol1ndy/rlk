@@ -91,11 +91,15 @@ e9ccb446; cmsim 셋은 11-03 에 고쳐 아래 "11-03 에 고친 곳" 의 값).
   트리의 `boss/test/*.mcfunction` 13개를 같은 바이트로 다시 써 mtime 만 바꿨다. 고친 `variant()` · `light_copy()` 를 거치는
   나머지 가운데 `az/tests_cm` 의 `test_chapter` · `test_fw_ap` · `test_px` · `gen_check` 는 11-05 홍련 I1 의 `run_all`(I1a · I1b · I1b
   검증 1차, 1절대로 데이터팩 밖 사본에서)에서 돌았다: `test_chapter` · `test_fw_ap` · `gen_check` 통과, `test_px` 는 알려진 4e 하나만
-  실패(3-2). 아직 돌리지 않은 것은 `ar/tests/test_arena_fl.py` 하나다(다음 릴리스 게이트에서 돌린다).
+  실패(3-2). 마지막까지 돌리지 않았던 `ar/tests/test_arena_fl.py` 는 11-06 홍련 릴리스 게이트(V-I)에서 돌았다: 46 통과 · 실패 0(같은 때
+`ar/tests` 의 나머지도 모두 통과, 3-1).
 
 ## 3. 스위트
 
-### 3-1. 아를레키노 (`ar/tests/`; 11-02 릴리스 때 S5 검토 기록상 모두 통과)
+### 3-1. 아를레키노 (`ar/tests/`; 11-02 릴리스 때 S5 검토 기록상 모두 통과, 11-06 홍련 릴리스 게이트에서 다시 모두 통과)
+11-06 결과(1절 B 의 사본에서, `<dp>` = 홍련을 합친 트리): `run_all.sh` 의 `test_cm_ar` 65 · `test_arena_fl` 46 · `test_kit` 8 928 통과
+(`run_all.sh` 의 요약 줄은 `^ok ` 줄만 세어 `test_kit` 를 "0 ok" 로 적는다: 결과는 그 출력의 끝줄 `test_kit: 8928/8928 passed`),
+`test_arlecchino` · `pat_p1` · `pat_p2` · `kit_dry` 모두 통과, `test_rig --rp <지금 팩> --ref-rp <타키 릴리스 팩>` 67 통과.
 실행: 스크래치패드에서 `python3 <스위트> <작업 트리>/roguelike …`. `./run_all.sh <dp> [tag]` 는 **S1 셋만**(test_cm_ar ·
 test_arena_fl · test_kit) 돌리고 결과를 `out/<tag>_<스위트>.txt` 에 쓴다. 나머지는 하나씩 돌린다. `test_arlecchino` · `pat_p1` ·
 `pat_p2` 의 `<dp>` 는 `/` 가 든 경로로 준다(`./roguelike` 나 절대 경로; `/` 가 없으면 절 · 키 이름으로 읽혀 아무것도 돌지 않는다).
@@ -150,6 +154,10 @@ test_arena_fl · test_kit) 돌리고 결과를 `out/<tag>_<스위트>.txt` 에 �
 스위트처럼 데이터팩 밖의 사본에서(`cp -a <저장소>/roguelike/tools/dev/sim <작업>/sim`, 그 안의 `hr/tests` 에서). `<dp>` = 시험할
 `roguelike/`, `<rp>` = 풀어 둔 리소스팩. 경로 상수: `ev_dry.py` · `test_rig.py` 의 기본값만 옛 스크래치패드(`--dp` / `--rp` 로 준다),
 `test_special_hr.py` · `ident_hr.py` 는 기준 커밋을 `/home/user/rlk` 에서 읽는다(`git show` · `ls-tree`).
+11-06 릴리스 게이트(V-I)에서 모두 다시 통과(개수는 `roguelike/README.md` 「홍련」 절의 「릴리스 게이트」 줄; `ident_hr` 는 이때부터 릴리스
+도장이 바꾸는 `pack.mcmeta` 를 허용 목록에 둔다). 이 보스의 계획 · 계약 · 단계 브리프 · 요청 · 검토 문서(`hr/PLAN.md` · `hr/contract.md` ·
+`hr/stage_briefs.md` · `hr/requests/` · `hr/review/findings.md` · `hr/review/bal/` 의 README 와 S5 결과 로그 · `hr/i1/i1_notes.md`)도 11-06 에
+같은 상대 경로로 옮겼다(그 안의 `HR/…` = 옛 스크래치패드 `hr/…`; 균형 탐침의 스크립트 · 모의기는 옮기지 않음).
 
 | 파일 | 실행 | 무엇 (I1 결과) |
 |---|---|---|
