@@ -1151,12 +1151,12 @@ def sec_f1():
             made = c[0]
             mk = [ln for ln in F.get(f'p/{k}/k/{made}', []) if 'g/cut/make' in ln and f's:{c[2]},' in ln]
             dm = [int(m) for ln in mk for m in re.findall(r'dmg:(\d+)', ln)]
-            want = TC_WANT if k in GAUNT else {'T2': 42, 'T3': 56}[c[3]]
+            want = TC_WANT if k in GAUNT else {'T2': 42, 'T3': 62}[c[3]]      # S5 (11-06): T3 56 -> 62
             if dm != [want]:
                 bad.append((k, c[2], dm, want))
     raw = 12 * TC_WANT * 135 // 10000
     check(f'G1 HR-19 every counting cut of A8 / A13 is made at TC {TC_WANT} % (raw {raw} = 12 HP on the Lv15 player: 9 cuts '
-          f'<= 45 % max HP); R1 / R3 cuts keep T2 42 / T3 56', not bad, bad[:4])
+          f'<= 45 % max HP); R1 / R3 cuts keep T2 42 / T3 62 (S5)', not bad, bad[:4])
     # HR-15 (static): the lock 7 t before every release; the throw aims at the lock marker
     th = cmd_lines(F.get('g/disc/throw', []))
     aim = [ln for ln in th if 'facing entity' in ln]

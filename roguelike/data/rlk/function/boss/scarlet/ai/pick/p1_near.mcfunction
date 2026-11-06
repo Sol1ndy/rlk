@@ -12,11 +12,11 @@ scoreboard players set #ai_wa3 hr 50
 execute if score #cd_a3 hr > #clk hr run scoreboard players set #ai_wa3 hr 0
 execute if score #last hr matches 3 run scoreboard players set #ai_wa3 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa3 hr
-scoreboard players set #ai_wa9 hr 25
+scoreboard players set #ai_wa9 hr 40
 execute if score #cd_a9 hr > #clk hr run scoreboard players set #ai_wa9 hr 0
 execute if score #last hr matches 6 run scoreboard players set #ai_wa9 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa9 hr
-scoreboard players set #ai_wa10 hr 20
+scoreboard players set #ai_wa10 hr 40
 execute if score #cd_a10 hr > #clk hr run scoreboard players set #ai_wa10 hr 0
 execute if score #last hr matches 7 run scoreboard players set #ai_wa10 hr 0
 scoreboard players operation #ai_sum hr += #ai_wa10 hr

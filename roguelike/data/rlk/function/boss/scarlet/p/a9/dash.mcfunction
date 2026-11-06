@@ -12,5 +12,5 @@ execute as @e[type=minecraft:marker,tag=rlk_hr_dp,limit=1] at @s run function rl
 scoreboard players operation #a9_n hr = #t2 hr
 execute positioned as @e[type=minecraft:marker,tag=rlk_hr_dp,limit=1] run function rlk:mboss/mv/glide {t:2}
 kill @e[type=minecraft:marker,tag=rlk_hr_dp]
-data modify storage rlk:hr core.a9 set value {len:0,w:24,tell:1,dmg:56}
+data modify storage rlk:hr core.a9 set value {len:0,w:24,tell:1,dmg:62}
 execute store result storage rlk:hr core.a9.len int 5 run scoreboard players get #a9_n hr

@@ -26,8 +26,8 @@ copy of F:boss/scarlet) lives in ./tmp and is removed at the end.
           (F1 round 1; static + sim); HR-22 A2's lilac blade glow 6-11, off at the hit and in its cancel (static + sim);
           HR-28 A4's leap and A10's spring / dive leave the afterimage trail along the motion in both phases (+ A10's dive
           line toward the lock), A3 / A6 / A9's afterimage stays P2-only (static + a P1 sim); HR-13 / HR-14 / HR-18 the
-          package's numbers in the generated AI (recovery P1 12-20 / P2 10-16 t, A9 / A10 cooldowns, the P1 near pick with
-          A1 / A2 / A10)
+          package's numbers in the generated AI (S5's values: recovery P1 8-16 / P2 10-16 t, A9 / A10 cooldowns, the P1
+          near pick with A1 / A2 / A9 / A10)
   fx      (F2) HR-24: A9's streak (qi_cut) reads the probed dash length (storage core.a9) = the dash line's own length, from a
           near and a far player; HR-23: the A4 ribbon, the A6 blink bubble and the A10 yellow tell are made between
           fx/follow_on and fx/follow_off (their cards travel with her)
@@ -485,20 +485,21 @@ def sec_f1():
         ok = got == ticks and all(b > a for a, b in zip(rise, rise[1:])) and (k != 'a10' or ys[4] < ys[3])
         check(f'F10 HR-28 {k} in P1 (sim): the afterimage at pattern ticks {ticks} along her motion (rising{", then diving" if k == "a10" else ""})',
               ok, (got, [round(y, 2) for y in ys]))
-    # HR-13 / HR-14 / HR-18 (the package's numbers, lead decision 11-05) in the generated AI: the recovery P1 12-20 t / P2 10-16 t,
-    # A9 / A10 cooldowns 160 / 140 and 180 / 150, the P1 near pick with A1 10, A2 10 and A10 20
+    # HR-13 / HR-14 / HR-18 (the package's numbers, lead decision 11-05; S5's measured values 11-06) in the generated AI: the
+    # recovery P1 8-16 t / P2 10-16 t, A9 / A10 cooldowns 160 / 140 and 120 / 100, the P1 near pick with A1 10, A2 10, A9 40
+    # and A10 40
     p1, p2 = API.PH['p1'], API.PH['p2']
-    want = {'ai/rec_start': [f'execute if score #ph hr matches {p1} store result score #rec hr run random value 12..20',
+    want = {'ai/rec_start': [f'execute if score #ph hr matches {p1} store result score #rec hr run random value 8..16',
                              f'execute if score #ph hr matches {p2} store result score #rec hr run random value 10..16'],
             'core/start/a9': [f'execute if score #ph hr matches {p1} run scoreboard players add #cd_a9 hr 160',
                               f'execute if score #ph hr matches {p2} run scoreboard players add #cd_a9 hr 140'],
-            'core/start/a10': [f'execute if score #ph hr matches {p1} run scoreboard players add #cd_a10 hr 180',
-                               f'execute if score #ph hr matches {p2} run scoreboard players add #cd_a10 hr 150'],
+            'core/start/a10': [f'execute if score #ph hr matches {p1} run scoreboard players add #cd_a10 hr 120',
+                               f'execute if score #ph hr matches {p2} run scoreboard players add #cd_a10 hr 100'],
             'ai/pick/p1_near': ['scoreboard players set #ai_wa1 hr 10', 'scoreboard players set #ai_wa2 hr 10',
-                                'scoreboard players set #ai_wa10 hr 20']}
+                                'scoreboard players set #ai_wa9 hr 40', 'scoreboard players set #ai_wa10 hr 40']}
     miss = [(rel, ln) for rel, lns in want.items() for ln in lns if ln not in fn_lines(rel)]
-    check('F11 HR-13 / HR-14 / HR-18 the package in the AI: recovery P1 12-20 / P2 10-16 t, A9 160 / 140, A10 180 / 150 t, '
-          'the P1 near pick A1 10 / A2 10 / A10 20', not miss, miss[:4])
+    check('F11 HR-13 / HR-14 / HR-18 the package in the AI (S5 values): recovery P1 8-16 / P2 10-16 t, A9 160 / 140, A10 '
+          '120 / 100 t, the P1 near pick A1 10 / A2 10 / A9 40 / A10 40', not miss, miss[:4])
 
 
 def sec_fx():

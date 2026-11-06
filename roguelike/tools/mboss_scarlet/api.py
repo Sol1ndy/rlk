@@ -124,7 +124,9 @@ def xyz(p, nd=4):
 
 # =============================================================================================
 # 2. Damage, shapes, hits, telegraph constants (PLAN §4.1-4.5)
-DMG = {'T1': 29, 'T2': 42, 'T3': 56, 'T4': 71}         # % of the base hit (mboss/hurt coefficient); 타키's final tiers
+DMG = {'T1': 29, 'T2': 42, 'T3': 62, 'T4': 71}         # % of the base hit (mboss/hurt coefficient); 타키's final tiers
+# S5 (11-06, the balance pass; PLAN §4.8's tier knob +-20 %): T3 56 -> 62 (+10.7 %: mboss/hurt's raw hit 9 -> 10, 23 -> 25 HP
+# on the item-less Lv15 player) - the tier of A4's dive, A9, A10, R1's third and R3's second cut; T1 / T2 / T4 as 타키.
 # F1 (HR-19, lead decision 11-05): the counting cuts of A8 / A13 on a tier of their own (raw 5 = 12 HP on the item-less
 # Lv15 player: 9 cuts 40.3 % <= PLAN §4.8's 45 %, so A8's 50 % fail hit leaves HP without the #mbDotLethal clamp); R1 / R3
 # and every other T2 hit keep T2. Coefficients 31-37 all give raw 5 (mboss/hurt floors 12 x coef x 135 / 10000).
@@ -172,11 +174,12 @@ LEAP_H = {'a4': 6.0, 'a10': 5.0}                         # leap heights (b): A4 
 A4_TRAVEL, A10_DRIFT = 10.0, 0.4                          # A4 travels <= 10 b toward the player; A10 drifts <= 0.4 b/t
 A9_BEYOND = 3.0                                           # A9 dashes through the locked point to 3 b beyond (<= 12 b)
 A3_GLIDE = (8.0, 0.3, 14)                                 # A3 from 4.5-8 b: glides in 0.3 b/t during ticks 0-14
-RECOVER = {1: (12, 20), 2: (10, 16)}                      # idle between patterns (min, max) per fight phase P1 / P2
+RECOVER = {1: (8, 16), 2: (10, 16)}                       # idle between patterns (min, max) per fight phase P1 / P2
 # F1 (HR-13 / HR-14 / HR-18, the P1 pressure package, lead decision 11-05; PLAN §4.1 wins over §4.3's clip tails): every
 # P1-kit pattern ends 8-12 t after its last hit instead of at its clip's end (the clip's follow-through plays on while she
 # turns to the player; the AI recovery's walk / strafe takes over: the punish window); RECOVER above = the §4.8 knob
-# (P1 16-24 -> 12-20, P2 12-18 -> 10-16). A6 (no hit) keeps A6_TRIGGER['next'].
+# (P1 16-24 -> 12-20, P2 12-18 -> 10-16); S5 (11-06, the measured balance pass): P1 12-20 -> 8-16 (the knob's -4 t; T1).
+# A6 (no hit) keeps A6_TRIGGER['next'].
 PAT_END = {'a1': 24, 'a2': 22, 'a3': 79, 'a4': 46, 'a9': 40, 'a10': 32}
 # F1 round 1 (HR-14, the decision's "during any tail kept ... she walks / strafes facing and tracking the player"): a kept tail
 # lets the clip's follow-through play TAIL_MOVE t after the last hit / release (A4: until it lands; R1 / R3: until the solid
@@ -347,21 +350,24 @@ MID_MAX = {'a3': 8.0, 'a9': 7.0}                 # these use their mid weight on
 # F1 (HR-13 / HR-18, the P1 pressure package, lead decision 11-05): no empty band - the P1 near band gets A10 (20, the
 # yellow plunge on the locked spot) and small A1 / A2 weights (their 100-t cooldowns), so her near decision always has a
 # move; a band still empty twice in a row -> the 12-t backstep, then the mid pick (ai/none, ai/backstep).
+# S5 (11-06, the measured balance pass, HR-13/14/18 point 5's lever order): P1 near A9 25 -> 40 and A10 20 -> 40 (the two
+# player-centred lock discs a walking player cannot side-step; T1).
 WEIGHTS = {
     'a1': {1: (10, 0, 0)},
     'a2': {1: (10, 0, 0)},
     'a3': {1: (50, 15, 0), 2: (35, 10, 0)},
     'a4': {1: (0, 35, 40), 2: (0, 20, 20)},
-    'a9': {1: (25, 10, 0), 2: (20, 10, 0)},
-    'a10': {1: (20, 25, 35), 2: (0, 15, 20)},
+    'a9': {1: (40, 10, 0), 2: (20, 10, 0)},
+    'a10': {1: (40, 25, 35), 2: (0, 15, 20)},
     'r1': {2: (0, 20, 35)},
     'r2': {2: (0, 15, 25)},
     'r3': {2: (20, 25, 0)},
 }
 # F1 (lead decision 11-05): A9 P1 300 -> 160 (one full-screen flash per >= 8 s), A10 P1 260 -> 180, P2 = P1 x 0.85 rounded
-# to 10 t as the other entries (A9 140, A10 150); A6 400 in both phases (HR-38).
+# to 10 t as the other entries (A9 140, A10 150); A6 400 in both phases (HR-38). S5 (11-06): A10 P1 180 -> 120, P2 = x0.85
+# -> 100 (A9 stays 160 / 140: one full-screen flash per >= 8 s, the lead's floor).
 COOLDOWN = {'a1': {1: 100, 2: 85}, 'a2': {1: 100, 2: 85}, 'a3': {1: 120, 2: 100}, 'a4': {1: 160, 2: 140},
-            'a6': {1: 400, 2: 400}, 'a9': {1: 160, 2: 140}, 'a10': {1: 180, 2: 150}, 'r1': {2: 220}, 'r2': {2: 260},
+            'a6': {1: 400, 2: 400}, 'a9': {1: 160, 2: 140}, 'a10': {1: 120, 2: 100}, 'r1': {2: 220}, 'r2': {2: 260},
             'r3': {2: 200}}
 TRIGGER_ONLY = ('a6',)                           # never picked by weight: the skill trigger (A1 / A2: the counter trigger,
 #                                                  the rear rule and, F1, small P1 near weights)
