@@ -19,4 +19,5 @@ scoreboard players set #mbOn mb 1
 scoreboard players set #mbSt mb 0
 scoreboard players set #mbT mb 0
 execute as @a[tag=player,limit=1] run function rlk:mboss/tp_in
-function rlk:mboss/bars_show
+# 홍련 F-I (f2-8): a spawn hook that hid the bars (mboss_lib.bars(0): #mbBarOff 1; fight_vars cleared it above) keeps them hidden
+execute unless score #mbBarOff mb matches 1 run function rlk:mboss/bars_show

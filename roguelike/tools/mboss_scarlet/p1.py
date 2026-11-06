@@ -425,9 +425,11 @@ def build_a10(W):
           S.fx('claw_streaks', [part(S.DUST['lilac'], 0.6, 2.0, 0.6, 0, 20)], pos=f'at {S.LOCK_M} positioned ~ {CY + 2} ~', r=15),
           S.snd('a10_dive'),
           # F1 (HR-28): the dive's lilac trail (PLAN §4.3 A10 20-22): the sword-qi line from her down to the locked spot (the
-          # kit clamps a line pointing down above the floor) + the afterimage trail along the dive
-          S.fx('qi_line', [part(S.DUST['lilac'], 0.1, 0.6, 0.1, 0, 10)], pos=f'at @s positioned ~ ~1.0 ~ facing entity {S.LOCK_M} feet',
-               len=int(api.LEAP_H[key] * 10 + 10)))
+          # kit clamps a line pointing down above the floor) + the afterimage trail along the dive. F-I (f2-7, F1 request 2):
+          # the kit's qi_line runs across its executor's facing since HR-12 (turned +90, pitch kept), so the aim is turned -90
+          # first and the line lands on the lock; from her body + 0.8 (S2d's 2.00-b body: the A9 / A8.9 lines' 1.0 -> 0.8)
+          S.fx('qi_line', [part(S.DUST['lilac'], 0.1, 0.6, 0.1, 0, 10)],
+               pos=f'at @s positioned ~ ~0.8 ~ facing entity {S.LOCK_M} feet rotated ~-90 ~', len=int(api.LEAP_H[key] * 10 + 10)))
     trail(pb, (dive, dive + 1))
     pb.motions.append((dive, hit, 'dive'))
     pb.hit(0, tell_from=0, pos=f'at {S.LOCK_M} rotated as @s positioned ~ {CY} ~')

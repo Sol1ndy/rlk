@@ -72,6 +72,8 @@ ALLOW = {
                                          'tools/mboss_scarlet/stub_rig_manifest.json'],
     'F3 review fixes (pack-wide lines)': [F + f'view/{n}.mcfunction' for n in ('tick', 'ride_tick', 'sel_xhair')]
     + [F + 'lvup/tick.mcfunction', F + 'items/hook/on_dash.mcfunction'],
+    # F-I (f2-8, V2R-02): start_go shows the bars only while the spawn hook left them on (#mbBarOff; build_mboss_core.py)
+    'F-I review fixes (pack-wide lines)': [F + 'mboss/start_go.mcfunction'],
 }
 PATS = [(grp, re.compile(p)) for grp, ps in ALLOW.items() for p in ps]
 

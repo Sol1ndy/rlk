@@ -45,7 +45,8 @@ S2b's sequences, S4's gauntlets and S2a's rig are the real ones (the stand-ins c
   pause    pause -> resume and /reload in every phase and sequence (PLAN §3.8)
   cs4      (I1, s3-8) the real seq/ending through the full core path: her distance to an unmoving player over ending
            ticks 300-1042 stays 3.5-6 b
-  cleanup  won / cancel / defeat leave no rlk_hr_* entity, the core scores and storage core gone, the event scores kept
+  cleanup  won / cancel / defeat leave no rlk_hr_* entity, the core scores and storage core gone, the event scores kept;
+           F-I (f3_requests r5, HR-05): objective hr holds nothing but the event scores (api.EV_FP), storage rlk:hr no seq
   cost     commands per fight tick (P1 + P2 + the gauntlets + the fight-state sequences) with the kit running for real
            (I1b verification round 1): average <= Apep's 830 (target <= 600), every tick <= 3000 but the arena look job's
            slice ticks (<= 5000, contract §5 gate 5)
@@ -1369,6 +1370,11 @@ def sec_cleanup():
               ok and not left and not fp and 'core' not in s.storage.get('rlk:hr', {}), (ok, left[:3], fp[:5], s.storage.get('rlk:hr')))
         if how != 'won':
             check(f'C2 {how}: the event scores untouched by the cleanup (#hrEv kept)', s.sc('#hrEv', 'hr') == 2, s.sc('#hrEv', 'hr'))
+        # F-I (f3_requests r5, F3's HR-05: save the event scores, `scoreboard players reset * hr`, restore): no other owner's
+        # fake player (patterns, ghost helpers, sequences) nor any entity score is left in objective hr, nor storage seq
+        held = sorted(str(k[0]) for k, v in s.scores.items() if k[1] == 'hr' and v is not None and k[0] not in API.EV_FP)
+        check(f'C3 {how}: objective hr holds only the event scores (api.EV_FP), storage rlk:hr has no seq',
+              ok and not held and 'seq' not in s.storage.get('rlk:hr', {}), (held[:6], sorted(s.storage.get('rlk:hr', {}))))
 
 
 # ================================================================================================= cost

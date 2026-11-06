@@ -36,7 +36,8 @@
   winWord title lines (FN-a), test/swon's winWord line and the new test/swon_msg_w; death_finish's poof only unless
   cur{poof:0b} (FN-c); the records carry winWord / poof:0b exactly where the registry sets them; FN-f: the wrappers
   mboss/bars_off / bars_on are exactly "flag + bars_hide / bars_show", world skips mboss/bars while #mbBarOff is 1,
-  fight_vars and cleanup_fight clear it, no other F:mboss file touches it (bars_hide / bars_show stay flag-free), and
+  fight_vars and cleanup_fight clear it, start_go's closing bars_show is skipped while it is 1 (홍련 F-I, f2-8: a spawn
+  hook's bars(0) holds), no other F:mboss file touches it (bars_hide / bars_show stay flag-free), and
   mboss_lib.bars(on) returns the one wrapper line
 Exit code 1 on any problem.
 """
@@ -279,6 +280,8 @@ HR_FN_LINES = {
     'mboss/cleanup_fight': ['scoreboard players set #mbBarOff mb 0'],
     'mboss/bars_off': ['scoreboard players set #mbBarOff mb 1', 'function rlk:mboss/bars_hide'],
     'mboss/bars_on': ['scoreboard players set #mbBarOff mb 0', 'function rlk:mboss/bars_show'],
+    # 홍련 F-I (f2-8): the framework's start shows the bars only while the spawn hook left them on (her spawn hook's bars(0))
+    'mboss/start_go': ['execute unless score #mbBarOff mb matches 1 run function rlk:mboss/bars_show'],
 }
 for rel, want in HR_FN_LINES.items():
     have = _fn_lines(rel)
@@ -289,14 +292,18 @@ for rel in ('mboss/bars_off', 'mboss/bars_on'):
     cmds = [x for x in _fn_lines(rel) if x.strip() and not x.startswith('#')]
     if cmds != HR_FN_LINES[rel]:
         problems.append(f'F:{rel}: must be exactly {HR_FN_LINES[rel]} (hr FN-f)')
-# FN-f: only the two wrappers set the flag on / off mid-fight (fight_vars / cleanup_fight clear it); bars_hide / bars_show,
-# which every death / pause / cleanup path calls, never touch it
+# FN-f: only the two wrappers set the flag on / off mid-fight (fight_vars / cleanup_fight clear it; world and start_go read it,
+# their pinned lines above); bars_hide / bars_show, which every death / pause / cleanup path calls, never touch it
 for p in sorted((FN / 'mboss').rglob('*.mcfunction')):
     rel = p.relative_to(FN).with_suffix('').as_posix()
     for i, line in enumerate(p.read_text(encoding='utf-8').split('\n'), 1):
         if re.search(r'#mbBarOff mb', line) and not line.startswith('#') and rel not in (
-                'mboss/bars_off', 'mboss/bars_on', 'mboss/fight_vars', 'mboss/cleanup_fight', 'mboss/world'):
-            problems.append(f'{rel}:{i} touches #mbBarOff (only bars_off / bars_on / fight_vars / cleanup_fight / world may)')
+                'mboss/bars_off', 'mboss/bars_on', 'mboss/fight_vars', 'mboss/cleanup_fight', 'mboss/world', 'mboss/start_go'):
+            problems.append(f'{rel}:{i} touches #mbBarOff (only bars_off / bars_on / fight_vars / cleanup_fight / world / '
+                            'start_go may)')
+        elif rel == 'mboss/start_go' and re.search(r'#mbBarOff mb', line) and not line.startswith('#') \
+                and line != HR_FN_LINES['mboss/start_go'][0]:
+            problems.append(f'{rel}:{i} touches #mbBarOff other than its pinned guard line (hr FN-f, F-I f2-8)')
 if tuple(L.bars(i) for i in (0, 1)) != ('function rlk:mboss/bars_off', 'function rlk:mboss/bars_on'):
     problems.append('mboss_lib.bars(on) must return the one line function rlk:mboss/bars_off / bars_on (hr FN-f)')
 # FN-b: the reward hook lines of mboss/sp/reward = exactly the enabled specials with a flag, after sp/lvup, before #spPk

@@ -429,7 +429,7 @@ VARIANTS = {'qi_arc': [{}, {'pitch': -40, 'roll': 90}, {'pitch': 35, 'roll': -35
             'qi_ring': [{'r': 30}, {'r': 22}], 'qi_dome': [{'r': 35}], 'qi_x': [{'r': 25}],
             'qi_band': [{'len': 70, 'pitch': 35}, {'len': 120}, {'roll': 30, 'pitch': -20}, {'len': 120, 'sw': 200}],
             'qi_vert': [{}, {'yaw': 90}, {'h': 19}, {'yaw': 180}],
-            'qi_wedge': [{}, {'roll': -40}, {'roll': 10}, {'roll': 90}],
+            'qi_wedge': [{}, {'roll': -40}, {'roll': 10}, {'roll': 90, 'r': 28}],     # F-I: roll 90's reach x 0.78 (S2d's body)
             'scarlet_line': [{}, {'roll': -13}, {'yaw': 0}, {'len': 600, 'yaw': 90, 'roll': 13}, {'len': 600, 'yaw': 90, 'roll': -13},
                              {'len': 600, 'yaw': 0, 'roll': 13}], 'leaves_dark': [{'n': 40}, {'n': -20}]}
 for name in api.KIT_PRESETS:
@@ -1018,8 +1018,11 @@ def view_px(s, cam):
 
 HER = (X0, FLOOR, Z0)                 # she faces +z (yaw 0) at the player standing GAP b away on her aim
 PLY = (X0, FLOOR, Z0 + GAP)
-P5 = math.degrees(math.atan2(F5_SEAT - 1.3, GAP))      # the look at her chest: F5 (from the seat) 22.6, first person 7.6
-P1 = math.degrees(math.atan2(EYE - 1.3, GAP))
+# F-I (the body change): her chest = the module's default effect height at her body (s3lib.fx / fx_arc: 1.3 on S2a's 2.55-b
+# body, F2's figure; 1.0 on S2d's 2.00-b player-size body, S2d's x 0.78 of every call height)
+CHEST = 1.0
+P5 = math.degrees(math.atan2(F5_SEAT - CHEST, GAP))    # the look at her chest: F5 (from the seat) 28.4, first person 14.5
+P1 = math.degrees(math.atan2(EYE - CHEST, GAP))       # (S2a's body: 22.6 / 7.6)
 CAMS = {'F5': Cam((PLY[0], PLY[1] + F5_SEAT, PLY[2]), 180.0, P5, F5_BACK), 'FP': Cam((PLY[0], PLY[1] + EYE, PLY[2]), 180.0, P1)}
 COND = re.compile(r' (?:if|unless) score \S+ \S+ matches \S+')
 
@@ -1085,9 +1088,11 @@ if MERGED:
     check(len(sites) >= 15, f'view: {len(sites)} contact effects found in the module')
     for key, lines in sorted(sites.values()):
         fan = 'qi_fan' in key          # A1's swing fan (4 t before the hit; a 1-bh fan 4.7 b from the F5 camera)
+        # F-I: F2's F5 floor 250 px was for S2a's 1.6-b fan (h 16); S2d's player-size body calls it 1.3 b tall (h 13, s2d-3),
+        # so the floor scales with its area: 250 x (13 / 16)^2 = 165
         for view in ('F5', 'FP'):
             px = view_of(lines, view)
-            need = 250 if fan and view == 'F5' else VIEW_MIN
+            need = 165 if fan and view == 'F5' else VIEW_MIN
             check(px >= need, f'view: {key[:110]}: {px} card px in {view} (>= {need})')
     # HR-45: the player-anchored effects (the 홍련일섬 line of CS1 C8 and of the instant deaths, the deflect's gold starburst
     # and light column) from the F5 camera and in first person (no avatar: the camera on the player's own axis)
