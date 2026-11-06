@@ -82,6 +82,14 @@ def warn(on):
     return S.hud('warn', on=int(on))
 
 
+def seat_gone():
+    """The seat stone goes (V2, HR-52): re-looked `bare` first, so its bottle / cup (the kit's staying items) go with it in the
+    same tick; the kit itself only checks for them every 10 t (they left its per-tick prop chain)."""
+    tg = api.TAGS['deco_seat_rock']
+    bare = K.prop('seat_rock', look='bare')
+    return ([f'execute as @e[type=minecraft:item_display,tag={tg}] run {bare}'] if bare else []) + [f'kill @e[tag={tg}]']
+
+
 def seq_hold(grs):
     """After the restarts of a paused / reloaded gauntlet (#grs 1 lead_stand, 3 repel; 2 = the revive stance, no sequence).
     I1 (s3-10): a sequence (re)started outside the module tick (resume runs before it in the same game tick, /reload before
@@ -176,7 +184,7 @@ def build(W, ctx):
         sset('#ph', PH['p1']), sset('#sqn', 0), sset('#sq', 0), sset('#sqdone', 0), sset('#pat', 0), sset('#inv', 0),
         sset('#rp', 0), L.title(*api.TITLE), music_to(1), fn('core/floors'),
         f'scoreboard players operation #mbFloor mb = #fl60 {OBJ}',
-        f'kill @e[tag=rlk_hr_deco_seat_rock]',
+        *seat_gone(),
         fn('ai/phase'), fn('core/looks'), fn('ai/rec_start'), sset('#rec', 20)])
     w('core/intro/reload', ['# /reload during the intro: straight to the end of E12 (standing, the sword drawn, the rock gone,',
                             '# the title shown, music 1).',
@@ -334,7 +342,7 @@ def deco(W):
                          '# look request then sets them to its look, core/look/go).']
         + kill + [S.gate(f'if score #ph {OBJ} matches ..{PH["p1"]}', x) for x in one('moon_halo', halo, yaw_halo, 'p1', exact=True) + lotus]
         + [S.gate(f'if score #ph {OBJ} matches {PH["cs1"]}..', x) for x in one('moon_halo', halo, yaw_halo, 'p2', exact=True) + bloom])
-    W.w('core/deco_seat', ['# The seat rock again (the intro replay).', 'kill @e[tag=rlk_hr_deco_seat_rock]'] + seat_l)
+    W.w('core/deco_seat', ['# The seat rock again (the intro replay).'] + seat_gone() + seat_l)
 
 
 # ================================================================================================== the skip
@@ -582,12 +590,17 @@ def seq_runner(W, ctx):
 # ================================================================================================== look requests
 def look_files(W):
     w = W.w
-    go = ['# A pending look request (#hrLook = api.LOOK_ID; @s any): the arena\'s look job now (no job is running).',
+    go = ['# A pending look request (#hrLook = api.LOOK_ID; @s any): the arena\'s look job now (no job is running), unless the',
+          '# arena already stands in that look (its stamp; a job drops the stamp when it starts, so a cut one runs again).',
           f'scoreboard players operation #lk {OBJ} = #hrLook {OBJ}']
     for look, i in api.LOOK_ID.items():
         job = api.look_job(look)
         if job:
-            go.append(f'execute if score #hrLook {OBJ} matches {i} in minecraft:overworld run {job}')
+            # V2 (HR-51, D6-02): a pause after a deflect judge / a /reload from CS1 on asked for crimson again on a crimson arena
+            # and rewrote it cell for cell (4 slices, ~7.2 k commands); the decor re-look below stays unconditional
+            stamp = f'{api.AID}@{api.ARENA["ver"]}:{look}'
+            go.append(f'execute if score #hrLook {OBJ} matches {i} unless data storage rlk:mboss {{built_{api.AID}:"{stamp}"}} '
+                      f'in minecraft:overworld run {job}')
     # I1b: the decor props follow the look (PLAN §6.3-6.5 "kit props"): the halo p1 / p2 / off, the lotus bud / bloom
     for look, i in api.LOOK_ID.items():
         for name, lk in (('moon_halo', DECO_LOOK[look][0]), ('lotus', DECO_LOOK[look][1])):
@@ -845,7 +858,7 @@ def hooks(W, ctx):
                            f'execute if score #sqdone {OBJ} matches 1 run return run {fn("core/replay/end")}',
                            f'execute if score #sq {OBJ} matches {INTRO_LEN + 2}.. run {fn("core/replay/end")}'])
     w('core/replay/end', [seq(ctx, 'intro', 'cancel'), fn('core/skip_clear'), sset('#rp', 0), sset('#sqn', 0), sset('#sq', 0),
-                          sset('#sqdone', 0), sset('#skp', 0), 'kill @e[tag=rlk_hr_deco_seat_rock]',
+                          sset('#sqdone', 0), sset('#skp', 0), *seat_gone(),
                           f'execute if score #ph {OBJ} matches {PH["p1"]} run {sset("#inv", 0)}',
                           f'execute if score #ph {OBJ} matches {PH["p2"]} run {sset("#inv", 0)}',
                           fn('core/looks'), fn('ai/rec_start')])

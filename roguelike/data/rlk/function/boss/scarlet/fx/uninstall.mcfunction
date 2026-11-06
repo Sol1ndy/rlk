@@ -24,6 +24,7 @@ scoreboard objectives remove hrFxY
 data remove storage rlk:hr fx
 schedule clear rlk:boss/scarlet/fx/e/world
 schedule clear rlk:boss/scarlet/fx/e/anim
+schedule clear rlk:boss/scarlet/fx/e/stay_t
 schedule clear rlk:boss/scarlet/fx/hud/e/ln
 schedule clear rlk:boss/scarlet/fx/test/e/tick
 schedule clear rlk:boss/scarlet/fx/test/e/hud2

@@ -910,8 +910,8 @@ def _p_qi_vert(c):
     return out
 
 
-@preset('qi_fan', 'A rising vertical fan of sword-qi of height {h} (tenths) centred on the executor (S3 A1: the body + 0.85, 1.2 b '
-        'ahead; cosmetic): F2 (HR-12) the four sweep frames stand ACROSS the executor\'s facing (the plane perpendicular to it), '
+@preset('qi_fan', 'A rising vertical fan of sword-qi of height {h} (tenths) centred on the executor (S3 A1: h 16 at the body + 1.1, '
+        '1.2 b ahead; cosmetic): F2 (HR-12) the four sweep frames stand ACROSS the executor\'s facing (the plane perpendicular to it), '
         'bulging to its left (the right of a viewer facing it), rising; c tints it (A1: 2). Level.',
         conv=(('s', 'h', 0.0625), ('s9', 'h', 0.055), ('pd', 'h', 0.04)), split_c=True)
 def _p_qi_fan(c):
@@ -1404,6 +1404,7 @@ SPLIT_CS = {'ev_take': (1, 2)}         # the c variants a split preset has (defa
 
 # ----------------------------------------------------------------------------- props (api.KIT_PROPS)
 FOLLOW_STAY = f'{TAG}fs'               # followers that keep their own spot and go with their lead (the seat rock's items)
+STAY_EVERY = 10                        # V2 (HR-52): their check's period (e/stay_t; not in the per-tick prop chain)
 DISC_SCALE = api.DISC['hr']            # the flat unit-radius disc card x 1.4 = the hazard's half width
 # I1b (requests s1k-3 / s2b-4): the halo's bright looks p1b / p2b are the same sprites HALO_BRIGHT x brighter than p1 / p2.
 # A custom_model_data tint only multiplies (white = the sprite as painted), so p1 / p2 carry the tint 1 / HALO_BRIGHT
@@ -1427,7 +1428,8 @@ PROPS = {
               'pink, P1) / bloom (open crimson, P2).', {'bud': ('lotus_0', 0.9), 'bloom': ('lotus_1', 0.9)}, 'vertical', None),
     'seat_rock': ('CS0 her seat: a low flat stone (vanilla tuff, 1.2 x 0.24 x 0.64 b, its top 0.24 b over the display (under her '
                   'thighs, behind her heels): no collision) and on it {look}: bottle = the rice-wine bottle on her left, bare = the stone alone, set = the bottle '
-                  'and the cup on her right (vanilla item displays the kit keeps with the stone and removes with it).',
+                  'and the cup on her right (vanilla item displays the kit keeps with the stone: bare drops them at once, a killed stone\'s '
+                  f'go within {STAY_EVERY} t; the module re-looks it bare before it kills it).',
                   {'bottle': ('rock', 1.0), 'bare': ('rock', 1.0), 'set': ('rock', 1.0)}, 'fixed', None),
 }
 assert set(PROPS) == set(api.KIT_PROPS) and all(set(v[1]) == set(api.KIT_PROPS[k].get('look', (None,))) or k == 'disc'
@@ -1932,7 +1934,8 @@ def engine(W):
                       f'bossbar remove {WARN_BAR}',
                       f'scoreboard objectives remove {OBJ}', *[f'scoreboard objectives remove {o}' for o in OBJECTIVES],
                       f'data remove storage {STO} fx',
-                      f'schedule clear {E}world', f'schedule clear {E}anim', f'schedule clear {FN}hud/e/ln',
+                      f'schedule clear {E}world', f'schedule clear {E}anim', f'schedule clear {E}stay_t',
+                      f'schedule clear {FN}hud/e/ln',
                       f'schedule clear {FN}test/e/tick', f'schedule clear {FN}test/e/hud2', f'schedule clear {FN}test/e/hud3'])
     W.w('look', [
         '# Dress @s (an item_display the module owns) as a kit sprite: {kind, col:<RGB int>}. Full bright; the caller',
@@ -1950,22 +1953,23 @@ def engine(W):
     rock = [f'execute if score #af {OBJ} matches {t} as @e[type=minecraft:item_display,tag={ANIM}_p] run data merge entity @s '
             f'{{start_interpolation:0,interpolation_duration:20,transformation:{{left_rotation:{{angle:{a}f,axis:[0f,0f,1f]}}}}}}'
             for t, a in ((0, '0.17'), (20, '-0.17'))]
+    # V2 (HR-52, D6-03): the staying followers (the seat stone's bottle / cup, motionless) left this per-tick chain (~39 commands /
+    # t through CS0 only to see whether their stone still stood): their own check e/stay_t every STAY_EVERY t, and the module
+    # re-looks the stone `bare` (its items go at once) before it kills it
     W.w('e/anim', [
         '# The prop chain (scheduled every tick while a kit-animated prop or a follower exists; no hook in rlk:tick):',
-        '# followers stay on their lead (or keep their spot) and go with it, the discs turn a quarter every 3 t (30 deg / t)',
-        '# swapping their two frames, the big petals rock slowly.',
+        '# followers stay on their lead and go with it, the discs turn a quarter every 3 t (30 deg / t) swapping their two',
+        '# frames, the big petals rock slowly. (The seat stone\'s staying items: e/stay_t.)',
         f'execute unless entity @e[type=minecraft:item_display,tag={ANIM},limit=1] unless entity @e[type=minecraft:item_display,'
-        f'tag={FOLLOW},limit=1] unless entity @e[type=minecraft:item_display,tag={FOLLOW_STAY},limit=1] run return 0',
+        f'tag={FOLLOW},limit=1] run return 0',
         f'scoreboard players add #at {OBJ} 1',
         f'execute as @e[type=minecraft:item_display,tag={FOLLOW}] run function {E}follow',
-        f'execute as @e[type=minecraft:item_display,tag={FOLLOW_STAY}] run function {E}stay',
         f'function {E}anim_d',
         *spin,
         f'function {E}anim_p',
         *rock,
         f'execute if entity @e[type=minecraft:item_display,tag={ANIM},limit=1] run schedule function {E}anim 1t replace',
-        f'execute if entity @e[type=minecraft:item_display,tag={FOLLOW},limit=1] run schedule function {E}anim 1t replace',
-        f'execute if entity @e[type=minecraft:item_display,tag={FOLLOW_STAY},limit=1] run schedule function {E}anim 1t replace'])
+        f'execute if entity @e[type=minecraft:item_display,tag={FOLLOW},limit=1] run schedule function {E}anim 1t replace'])
     W.w('e/anim_d', [
         '# Internal: #af = the disc quarter turn (#at / 3) % 4 on the ticks with #at % 3 = 0, else -1 (no change).',
         f'scoreboard players operation #g {OBJ} = #at {OBJ}', f'scoreboard players set #k {OBJ} 3',
@@ -1985,6 +1989,13 @@ def engine(W):
         f'execute unless entity @e[tag={TAG}_t,limit=1] run return run kill @s',
         f'execute at @e[tag={TAG}_t,limit=1] run tp @s ~ ~ ~',
         f'tag @e[tag={TAG}_t] remove {TAG}_t'])
+    W.w('e/stay_t', [
+        f'# The staying followers\' check (scheduled every {STAY_EVERY} t while one exists; V2, HR-52): each keeps its spot and goes',
+        f'# within {STAY_EVERY} t of its lead (the module re-looks the seat stone `bare` before it kills it: the items go at once).',
+        f'execute unless entity @e[type=minecraft:item_display,tag={FOLLOW_STAY},limit=1] run return 0',
+        f'execute as @e[type=minecraft:item_display,tag={FOLLOW_STAY}] run function {E}stay',
+        f'execute if entity @e[type=minecraft:item_display,tag={FOLLOW_STAY},limit=1] run schedule function {E}stay_t '
+        f'{STAY_EVERY}t replace'])
     W.w('e/stay', [
         '# As a staying follower (the seat rock\'s bottle / cup): it keeps its spot and goes when its lead is gone.',
         f'scoreboard players operation #l {OBJ} = @s hrFxL',
@@ -2065,7 +2076,7 @@ def props(W):
            f'execute if data storage {STO} fx{{lk:"bottle"}} at @s rotated as @s rotated ~ 0 run function {P_}e/seat_bottle',
            f'execute if data storage {STO} fx{{lk:"set"}} at @s rotated as @s rotated ~ 0 run function {P_}e/seat_bottle',
            f'execute if data storage {STO} fx{{lk:"set"}} at @s rotated as @s rotated ~ 0 run function {P_}e/seat_cup',
-           f'schedule function {E}anim 1t replace'])
+           f'schedule function {E}stay_t {STAY_EVERY}t replace'])
     for part_, (it, (x, y, z), sc) in (('bottle', SEAT['bottle']), ('cup', SEAT['cup'])):
         extra = (f',components:{{"minecraft:potion_contents":{{custom_color:{BOTTLE_COLOR}}}}}' if part_ == 'bottle' else '')
         W.w(f'prop/e/seat_{part_}', [

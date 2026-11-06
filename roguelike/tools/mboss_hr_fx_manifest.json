@@ -1737,7 +1737,7 @@
     "h",
     "c"
    ],
-   "doc": "A rising vertical fan of sword-qi of height {h} (tenths) centred on the executor (S3 A1: the body + 0.85, 1.2 b ahead; cosmetic): F2 (HR-12) the four sweep frames stand ACROSS the executor's facing (the plane perpendicular to it), bulging to its left (the right of a viewer facing it), rising; c tints it (A1: 2). Level.",
+   "doc": "A rising vertical fan of sword-qi of height {h} (tenths) centred on the executor (S3 A1: h 16 at the body + 1.1, 1.2 b ahead; cosmetic): F2 (HR-12) the four sweep frames stand ACROSS the executor's facing (the plane perpendicular to it), bulging to its left (the right of a viewer facing it), rising; c tints it (A1: 2). Level.",
    "cards": 4,
    "c_split": [
     1,
@@ -2219,7 +2219,7 @@
    "anim": null
   },
   "seat_rock": {
-   "doc": "CS0 her seat: a low flat stone (vanilla tuff, 1.2 x 0.24 x 0.64 b, its top 0.24 b over the display (under her thighs, behind her heels): no collision) and on it {look}: bottle = the rice-wine bottle on her left, bare = the stone alone, set = the bottle and the cup on her right (vanilla item displays the kit keeps with the stone and removes with it).",
+   "doc": "CS0 her seat: a low flat stone (vanilla tuff, 1.2 x 0.24 x 0.64 b, its top 0.24 b over the display (under her thighs, behind her heels): no collision) and on it {look}: bottle = the rice-wine bottle on her left, bare = the stone alone, set = the bottle and the cup on her right (vanilla item displays the kit keeps with the stone: bare drops them at once, a killed stone's go within 10 t; the module re-looks it bare before it kills it).",
    "looks": {
     "bottle": [
      "rock",

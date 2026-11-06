@@ -117,6 +117,9 @@ def finish(pb, key):
 
 
 # ================================================================================================= A1 회전 반월참
+A1_ROLL = -25        # V2 (HR-48): the hit crescent's roll (A2 35, A3 h2 -35); -25 = the flattest that stands across the aim
+
+
 def build_a1(W):
     key = 'a1'
     pb = PB(key, W)
@@ -127,10 +130,14 @@ def build_a1(W):
     pb.track(1, 3, 60)
     pb.track(4, hit - S.LOCK, TRK['deg'])
     pb.at(glint, at_anchor('blade_tip', S.fx_lines('glint', [part(S.DUST['magenta'], 0.05, 0.05, 0.05, 0, 6)], c=api.C_MAGENTA)))
-    pb.at(fan, S.fx('qi_fan', [part(S.DUST['magenta'], 0.3, 0.8, 0.3, 0, 14)], pos=f'{S.AT_BODY} positioned ^ ^0.85 ^1.2',
-                    h=13, c=api.C_MAGENTA), S.snd('a1_fan'))
+    # V2 (HR-48, D4-02 / DF-01): the fan back at S2a's h 16 (toward the footage's ~ 1-body-height fan; S2d's x 0.78 made it
+    # 13: 189 card px from the default F5 camera), centred at the body + 1.1 so its foot stays 0.3 b over the floor
+    pb.at(fan, S.fx('qi_fan', [part(S.DUST['magenta'], 0.3, 0.8, 0.3, 0, 14)], pos=f'{S.AT_BODY} positioned ^ ^1.1 ^1.2',
+                    h=16, c=api.C_MAGENTA), S.snd('a1_fan'))
     pb.hit(0, tell_from=0)
-    pb.at(hit, S.fx_arc(api.HITS[key][0][3][0], api.C_LILAC), S.snd('a1_hit'))
+    # V2 (HR-48): the crescent rolled A1_ROLL (it stands across her aim, as A2's): flat at the body + 1.0 it lay 0.62 b under
+    # the first-person eye and wrapped round the player, >= 1 500 card px on one tick of seven in first person
+    pb.at(hit, S.fx_arc(api.HITS[key][0][3][0], api.C_LILAC, roll=A1_ROLL), S.snd('a1_hit'))
     tail(pb, hit, end)
     return finish(pb, key)
 
