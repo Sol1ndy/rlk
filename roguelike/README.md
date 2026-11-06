@@ -509,6 +509,13 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
   종류. (`gen_check` 9 — 복사본의 `boss/test/*` 가 하드 링크라 시험한 트리의 그 13개 파일이 제자리에서 다시 쓰이던 것 — 는 뺐다: 11-03 의
   고침(`gen_check.py` 의 `REAL_DP` 와 세 `cmsim.variant` 의 `real` 에 `boss/test`) 뒤 11-05 홍련 I1 의 `run_all` 에서 다시 돌려 통과했다.)
   야타용왕 `az/tests/test_wire_az.py` 의 H2 / H3 은 1챕터만 라우팅된다고 가정해 낡았다(옮기지 않은 스위트).
+- (11-06 홍련 V2, HR-54 / LF-04) 옮겨 둔 모의기 사본 `cmsim.py` 넷(`sim/az/tests_cm/lib` · `sim/ar/tests/lib` · `sim/ar/s3/lib` ·
+  `sim/hr/s1k/lib`; `sim/hr/tests/lib` 의 것도 같은 줄)의 `block_test` 는 `#rlk:dash_pass` · `#rlk:cm_pass` 에 공기 · 빛만 통과시킨다.
+  게임의 태그(`data/rlk/tags/block/dash_pass.json`: `#minecraft:replaceable` · `#minecraft:small_flowers` · 카펫 · 짧은 풀 · 마른 풀 …)는
+  풀 · 꽃 칸도 지나가게 하므로, 그 사본을 쓰는 다른 보스 스위트(야타용왕 챕터 틀 `az/tests_cm`, 아를레키노 `ar/tests` · `ar/s3`)의
+  걷기 · 이동(`mv/ok`) · 대시 경로 판정은 식물이 있는 칸을 막힌 칸으로 본다 — 모의기만의 차이이고 게임 동작은 태그대로다. 홍련은
+  `sim/hr/tests/lib/hrsim.py` 의 `PASS_TAGS`(I1b)가 데이터팩의 태그 파일을 풀어 게임처럼 판정한다. 고치려면 그 풀이를 공용 사본에
+  옮기고 그 스위트들을 다시 돌린다(하지 않음: 홍련 범위 밖, 리드 결정).
 - 나루카미 시험의 `--strict` 아틀라스 예산표(`rd/tests/plan_table.json` 의 stitched 11.0 M; 원본 `plan_table_src.py` 는 12.5 M 인데
   JSON 을 다시 만들지 않음)가 낡아 지금(12.63 M)은 `--strict` 가 실패한다. 게이트는 13.2 M(옮기지 않은 스위트).
 - `items.json` 의 소스 **순서**가 생성기를 돌린 순서에 따라 바뀐다(항목은 같음): 1 · 2 · 3챕터 몹 리그 생성기와
@@ -2049,7 +2056,7 @@ special, `fn` `boss/scarlet`, 경기장 `hr_field`(n 5), 가중치 10, 1~99챕�
 ### 패턴 (`p1.py` S3 · `p_ghost.py` S4)
 | 패턴 | 언제 | 내용 (틱 = 클립 이벤트) |
 |---|---|---|
-| A1 회전 반월참 | 반격(옆 · 뒤) · 뒤에 오래 있을 때(둘 다 4.5칸 안) · P1 가까움 | 0~3틱 틱당 60도까지 돌아섬, 7틱 겨눔 고정, 14틱 부채꼴 4칸 ±80도(T2, 넉백 2), 분홍 반짝임 · 부채, 24틱 끝 |
+| A1 회전 반월참 | 반격(옆 · 뒤) · 뒤에 오래 있을 때(둘 다 4.5칸 안) · P1 가까움 | 0~3틱 틱당 60도까지 돌아섬, 7틱 겨눔 고정, 14틱 부채꼴 4칸 ±80도(T2, 넉백 2), 분홍 반짝임 · 10틱 분홍 부채(높이 1.6칸) · 14틱 보라 초승달(겨눈 쪽을 가로질러 −25도 기울어 섬: 1인칭에서도 보임, V2 HR-48), 24틱 끝 |
 | A2 역습 일섬 | 반격(앞, 4.5칸 안) · P1 가까움 | 6~11틱 칼날 연보라빛, 12틱 부채꼴 3.6칸 ±70도(T2, 넉백 2), 22틱 끝 |
 | A3 오연 반월 | 가까이 · 중간(8칸까지) · 먼 거리 대체 | 0~14틱 틱당 0.3칸 미끄러져 들어옴, 14 · 30 · 45틱 부채꼴(4.2 / 4 / 4칸), 57틱 직선 5 × 1.8칸, 69틱 부채꼴 4.6칸 ±70도(T2, 넉백 3); 앞 넷은 T1 넉백 0; 79틱 끝 |
 | A4 월하 낙참 + A5 공중 원륜 | 중간 · 멂 · 먼 거리 규칙 | 2틱 플레이어 쪽(10칸까지, 2칸 앞) 6칸 위로 도약(잔상 2 · 4 · 6틱), 12틱 자리 찍기, 16틱 강하 → 20틱 그 자리 원 2.6칸(T3), 34틱 1칸 떠서 돌며 원 3칸(T1, 넉백 2), 46틱 끝 |
@@ -2245,7 +2252,7 @@ lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` fal
   (`item_display` none)은 이 모델(슬롯에서는 0.38 GUI px 실선이었음). 코등이 무늬 카드는 코등이 판 위에(전에는 칼집 0.51칸 위에 떠
   있었음). 그림 `HR/renders/fi_icon.jpg`(16 / 32 / 64 px).
 - **효과 도구**(`tools/build_mboss_hr_fx.py` + `mboss_hr_fx_paint.py` → `boss/scarlet/fx/{card,cardx,look,clear,uninstall}` ·
-  `fx/{e,p,prop,snd,hud,test}/**` 446개, 리소스팩 `mboss/hr_kit/*` 그림 53장 0.242 M px(스프라이트 237 568 = `api.KIT_SPRITES` + 게이트 아이콘
+  `fx/{e,p,prop,snd,hud,test}/**` 447개, 리소스팩 `mboss/hr_kit/*` 그림 53장 0.242 M px(스프라이트 237 568 = `api.KIT_SPRITES` + 게이트 아이콘
   4 096) · 글꼴 `rlk:mboss_hr`, 매니페스트 `tools/mboss_hr_fx_manifest.json`): 프리셋 50가지(`api.KIT_PRESETS`) — 검기 초승달 `qi_arc`(네 장면
   1틱 간격, 바닥에 닿으면 1칸까지 들어 올리고 그다음 줄임; `roll` 20~160도의 비스듬한 베기는 겨눈 방향을 가로지르는 화면 면에 서서 그 안에서
   기울어짐, F2 HR-12; 입자는 어느 쪽이든 초승달 테두리 · 쐐기 끝에서 터짐, `fx/e/rollv`) · 고리 · 띠(`qi_band`: 겨눈 방향을 가로지르는 세운 띠, 오른쪽 끝이 `pitch` 만큼 올라가고 `sw`(0.1칸; A8.2 25, CS4 E1b 는
@@ -2263,7 +2270,8 @@ lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` fal
   변형 보간만, 엔티티 회전은 건드리지 않아 날아가는 방향 그대로, `fx/clear` · 에이저가 지우지 않음), `petal_big {look}`(whole / cut / split),
   `moon_halo {look}`(p1 흰 · 파랑 / p2 붉음 / off / `p1b` · `p2b` = 같은 그림 1.2 배 밝게: 색조가 곱하기라 `p1` · `p2` 가 0xD4D4D4, 밝은 쪽이
   흰색 — I1), `lotus {look}`(bud / bloom), `seat_rock {look}`(바닐라 응회암 돌 + bottle / bare / set: 술병 · 잔은 돌을 따라다니는 바닐라 아이템,
-  돌 윗면 0.24칸 = 앉은 그녀의 허벅지 아랫면(골반 0.385칸)). 소리 104가지(`api.KIT_SOUND_RECIPES`, 바닐라 소리만, `mboss_lib.sound` 최소 음량 규칙).
+  돌 윗면 0.24칸 = 앉은 그녀의 허벅지 아랫면(골반 0.385칸); V2 HR-52: 둘은 틱마다 도는 소품 사슬 `fx/e/anim` 에 들지 않고 10틱마다
+  `fx/e/stay_t` 가 돌이 남았는지 봄 — `bare` 면 바로, 돌이 죽으면 10틱 안에 사라지고, 모듈은 돌을 없애기 전에 `bare` 로 바꿈). 소리 104가지(`api.KIT_SOUND_RECIPES`, 바닐라 소리만, `mboss_lib.sound` 최소 음량 규칙).
   화면: `hud/line {id}` · `hud/ovl {g,in,hold,out}`(144 × 81, `vBig` = in + hold + out) · `hud/warn {on}` · `hud/skip {s}`(밝기 0–4, `s:5` 로
   지움) · `hud/clear`. 글리프 `vig` U+EC16(가장자리만 어두운 비네트, 가운데 절반은 투명; SR 의 아이템이 씀). 시험: `/execute as @p at @s
   rotated ~ 0 run function rlk:boss/scarlet/fx/test/stage` 다음 `fx/test/<프리셋>` · `fx/test/prop/<소품>` · `fx/test/sounds` · `fx/test/hud` ·
@@ -2310,7 +2318,7 @@ lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` fal
   패턴 작성 도구 `PB`), `reward.py`(이벤트 논리 + 보상 훅), `p_ghost.py`(S4: R1 · R2 · R3 · A8 · A13 + 공용 도우미 `g/**`: 베기 `g/cut/{make,aim,
   lock}`, 원반 `g/disc/throw {kb}`, 자리 `g/spot/*`), `seq.py`(S2b). 소유 경로마다 `api.Writer` 하나라 자기 경로의 낡은 파일만 지운다(`rig/**`
   와 효과 도구 `fx/**` 는 건드리지 않음). 지금 모듈 1 144개(S3 284 · S4 399 · `seq/**` 461; 11-05 F-I: 검토 고침 F1 · F2 · F3 를 합친 뒤); 리그 · 효과 도구까지
-  `boss/scarlet/**` 4 190개.
+  `boss/scarlet/**` 4 191개(11-06 V2: 효과 도구 `fx/e/stay_t` 하나 더).
   단계 파일이 없으면 생성기가 대역으로 돈다(리그 `rig_stub/**`, 장면 `core/sq/**`, 연참 `core/gs/**`, 효과 · 소리 = 바닐라 입자 / 소리, 경기장
   모습 = 없음): 지금 트리에는 대역이 없다.
 - 생성기 셋 더: `tools/build_scarlet_rig.mjs`(+ `scarlet_{geometry,paint,pose,retarget,clips,skin}.mjs` · `scarlet_cine.mjs`; 리소스팩 쪽,
@@ -2329,11 +2337,15 @@ lead-in 의 어두워지는 틱부터 판정까지 뜬다(`api.ULT60_LETHAL` fal
 - 상태: 점수판 `hr`(`init` 이 만들고 `uninstall` 이 지움), 리그 `hrRig*`, 효과 도구 `hrFx` `hrFxS` `hrFxG` `hrFxH` `hrFxK` `hrFxD` `hrFxL` `hrFxQ` `hrFxY`
   (첫 호출이 만들고 `fx/uninstall` 이 지움), 버프 `hrMoon`(SR), 저장소 `rlk:hr`(`core.*` `rig.*` `seq.*` `fx.*` `g.*` `ev.*`), 태그 `rlk_hr_*`(정리가
   모두 지움), 보스바 `rlk:hr_warn`. 부하(모의기, `test_scarlet.py cost`, 리그 · 장면 · 연참 · 경기장 모두 진짜, 효과 도구도 진짜로 돌려
-  카드 · 카드 관리(`fx/e/world`, 바닐라처럼 같은 틱에) · 정리까지 셈): 싸움 한 틱 평균 535명령(그중 효과 도구 81; P1 559 · P2 524 ·
-  A8 552 · A13 574; 11-05 F-I: I2 의 플레이어 크기 몸 + 검토 고침 F1 의 짧은 꼬리 · 꼬리 걸음 · 잔상, F2 의 따라오는 카드 · 덮개 단계 ·
-  버스트 자리, F3 의 정리 — I2 는 502), 아펩(약 830)보다 적다(목표 600 이하). 조각 틱을 뺀 한 틱 최대 2282(CS1 #sq 172; CS1 의 검붉은 잎
-  40장을 20장씩 두 틱에 나눠 부름: 한 틱에 40장이면 약 3600, 틱당 3000 이하). 경기장 모습을 바꾸는 작업의 조각 틱(이 측정에서 44틱)은
-  따로 셌다: 평균 1846 · 최대 3477명령(조각 한도 5천).
+  카드 · 카드 관리(`fx/e/world`, 바닐라처럼 같은 틱에) · 정리까지 셈; 11-06 V2(HR-50)부터 쓰러짐(타이머로 끝까지 · 5 % 바닥 → lead_down),
+  A8 · A13 실패 갈래(즉사 → 되살아남 → 자세 → lead_stand → A13 다시), 20틱 멈춤과 `/reload`(A8 판정 바로 뒤 · P2 · 쓰러짐; `/reload` 자체의
+  명령도 한 틱으로)까지): 싸움 한 틱 평균 500명령(그중 효과 도구 67; P1 559 · P2 524 · A8 553 · A13 574 · A8 실패 531 · A13 실패 489 ·
+  쓰러짐 315 · lead_down 461 · 멈춤 361 · `/reload` 420; 11-05 F-I 의 535 는 이 상태들을 빼고 잰 값), 아펩(약 830)보다 적다(목표 600 이하).
+  조각 틱을 뺀 한 틱 최대 2278(CS1 #sq 172; CS1 의 검붉은 잎 40장을 20장씩 두 틱에 나눠 부름: 한 틱에 40장이면 약 3600, 틱당 3000 이하;
+  `/reload` 자체는 최대 2068). 경기장 모습을 바꾸는 작업의 조각 틱(이 측정에서 82틱)은 따로 셌다: 평균 1765 · 최대 3475명령(CS1 #sq 174;
+  조각 한도 5천). 이미 그 모습인 경기장(도장 `built_hr_field`)에는 모습 작업을 다시 걸지 않는다(V2 HR-51: 전에는 A8 판정 뒤 멈췄다
+  돌아오거나 2단계에서 `/reload` 하면 crimson 작업이 한 번 더 돌아 최대 3642 — 싸움에서 가장 무거운 틱이었음). 등장(CS0) 동안 효과 도구의
+  틱마다 도는 소품 사슬은 돌지 않는다(V2 HR-52: 앉는 돌의 술병 · 잔 때문에 639틱 중 602틱, 틱당 약 39명령; 등장 평균 325 → 287).
 - 계획 · 계약 문서(`PLAN.md` · `contract.md` · 단계 브리프 · `requests/*.md` · 통합 기록)는 아직 스크래치패드 `hr/` 에 있다: 릴리스 때 다른
   보스처럼 `tools/dev/sim/hr/` 로 옮긴다(이 절과 생성기 주석의 "계획 §…" 은 그 `PLAN.md`).
 - 시험(`tools/dev/sim/hr/tests/`, 데이터팩 밖의 사본에서 돌림 — `tools/dev/sim/README.md` 1절 · 3-4): `test_special_hr.py`(S1 틀) ·

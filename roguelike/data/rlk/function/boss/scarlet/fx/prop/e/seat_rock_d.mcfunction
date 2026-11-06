@@ -5,4 +5,4 @@ function rlk:boss/scarlet/fx/prop/e/link
 execute if data storage rlk:hr fx{lk:"bottle"} at @s rotated as @s rotated ~ 0 run function rlk:boss/scarlet/fx/prop/e/seat_bottle
 execute if data storage rlk:hr fx{lk:"set"} at @s rotated as @s rotated ~ 0 run function rlk:boss/scarlet/fx/prop/e/seat_bottle
 execute if data storage rlk:hr fx{lk:"set"} at @s rotated as @s rotated ~ 0 run function rlk:boss/scarlet/fx/prop/e/seat_cup
-schedule function rlk:boss/scarlet/fx/e/anim 1t replace
+schedule function rlk:boss/scarlet/fx/e/stay_t 10t replace

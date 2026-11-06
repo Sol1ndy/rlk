@@ -41,7 +41,8 @@ S2b's sequences, S4's gauntlets and S2a's rig are the real ones (the stand-ins c
   bars     FN-f: no bar draw during CS1 (bars_off), the bars back at SQ1 tick 0 with the shield under bar
   look     (theme build) a look request waits while an arena job runs and survives a pause / a reload inside the job;
            the final look is the last one requested; each job re-looks the decor props (I1b round 1: the halo p1 / p2 / off,
-           the 8 lotus bud / bloom / bloom for moon / crimson / dark)
+           the 8 lotus bud / bloom / bloom for moon / crimson / dark); V2 (HR-51): no job when the arena's stamp already
+           reads the requested look (the decor re-looked, the request served all the same)
   pause    pause -> resume and /reload in every phase and sequence (PLAN §3.8)
   cs4      (I1, s3-8) the real seq/ending through the full core path: her distance to an unmoving player over ending
            ticks 300-1042 stays 3.5-6 b
@@ -49,7 +50,10 @@ S2b's sequences, S4's gauntlets and S2a's rig are the real ones (the stand-ins c
            F-I (f3_requests r5, HR-05): objective hr holds nothing but the event scores (api.EV_FP), storage rlk:hr no seq
   cost     commands per fight tick (P1 + P2 + the gauntlets + the fight-state sequences) with the kit running for real
            (I1b verification round 1): average <= Apep's 830 (target <= 600), every tick <= 3000 but the arena look job's
-           slice ticks (<= 5000, contract §5 gate 5)
+           slice ticks (<= 5000, contract §5 gate 5); V2 (HR-50): also the down window (by its timer; a 5 % floor hit in
+           it -> lead_down), the A8 fail -> P2, the A13 instant death -> the revive -> lead_stand -> A13, a 20-t pause and
+           a /reload (its chain counted as a tick) right after A8's judge / in P2 / in the down window (Z5: all reached);
+           Z4 (HR-51) no look job on an arena already in that look; Z6 (HR-52) the kit's prop chain idle through CS0
   f1       F1 (the 11-05 review fixes, the lead's decisions): HR-01 the judged A8 fail + a pause / reload / leave -> P2 at
            once; HR-07 A13 past its last counting cut with pips left + a pause / reload / leave -> the instant death at once
            (then the revive path), a reload while away keeps it pending, before that cut the restart stays; HR-06 tests 30 /
@@ -1115,6 +1119,11 @@ def job_tick(s):
             s.storage.get('rlk:mboss', {}).pop('arjob', None)
 
 
+def look_stamp(look):
+    """The arena's stamp once a job of that look is done (framework arena/<aid>/done: built_<aid> = "<aid>@<ver>:<look>")."""
+    return f'{API.AID}@{API.ARENA["ver"]}:{look}'
+
+
 def looks_run(s):
     out = []
     for look in API.LOOK_ID:
@@ -1164,6 +1173,8 @@ def sec_look():
     # the moon row: no fight request asks for moon (the arena starts in it), so a moon request is served here directly
     s.setsc('#mbArBuild', 'mb', 0)
     s.storage.get('rlk:mboss', {}).pop('arjob', None)
+    # (V2, HR-51: the stub jobs leave the fight's first stamp, moon; the real crimson job of the A8 judge stamped crimson)
+    s.storage.setdefault('rlk:mboss', {})[f'built_{API.AID}'] = look_stamp('crimson')
     s.setsc('#hrLook', 'hr', API.LOOK_ID['moon'])
     n0 = len(s.kitl)
     H.call_sc(s, 'core/look')
@@ -1175,6 +1186,27 @@ def sec_look():
           f'bloom, dark -> off / bloom; the halo and all 8 lotus ({len(lr2)} jobs in the fight: {[l for _, l in lr2]}, + moon)',
           {l for _, l in lr2} >= {'crimson', 'dark'} and not bad and not orphan and moon_ok,
           (bad[:3], orphan[:3], moon_ok, [(c, lk) for c, lk, _x in moon][:3]))
+    # V2 (HR-51, D6-02): a request for the look the arena already stands in (its stamp built_hr_field = "hr_field@<ver>:<look>",
+    # written by the job's last slice, dropped when a job starts) starts no job; the decor props are re-looked all the same and
+    # the request is served (#hrLook 0, #lk); another look's stamp or none (a job cut by a reload) -> the job runs
+    rows = []
+    for have, want in (('crimson', 'crimson'), ('dark', 'dark'), ('moon', 'moon'), ('moon', 'crimson'), (None, 'crimson'),
+                       ('crimson', 'dark'), ('dark', 'crimson')):
+        st = s.storage.setdefault('rlk:mboss', {})
+        s.setsc('#mbArBuild', 'mb', 0)
+        st.pop('arjob', None)
+        st.pop(f'built_{API.AID}', None)
+        if have:
+            st[f'built_{API.AID}'] = look_stamp(have)
+        s.setsc('#hrLook', 'hr', API.LOOK_ID[want])
+        n0, k0 = len(looks_run(s)), len(s.kitl)
+        H.call_sc(s, 'core/look')
+        halo = [a.get('look') for (t, c, a), (x, f, ph) in list(zip(s.kitl, s.kitx))[k0:] if f == go and c == 'prop/moon_halo']
+        rows.append((have, want, len(looks_run(s)) - n0, halo, hr(s, '#hrLook'), hr(s, '#lk')))
+    check('L6 V2 (HR-51): no look job when the arena already stands in the requested look (the stamp), the decor re-looked and '
+          'the request served all the same; another look\'s stamp or none -> the job',
+          all((n == 0) == (have == want) and n <= 1 and halo == [deco[want][0]] and lk0 == 0 and lk == API.LOOK_ID[want]
+              for have, want, n, halo, lk0, lk in rows), rows)
 
 
 # ================================================================================================= pause / reload (§3.8)
@@ -1381,6 +1413,12 @@ def sec_cleanup():
 JOB_FN = 'rlk:mboss/arena/hr_field/tick'      # one slice of the arena's running job (S1K's theme, I1b)
 TICK_MAX, SLICE_MAX = 3000, 5000               # every fight tick (S3); a look job's slice tick (contract §5 gate 5)
 FIGHT_SEQ = ('cs1', 'sq1', 'repel', 'lead_down', 'lead_stand')
+# V2 (HR-50, D6-01): the fight-state rows of the table — the sequences, the down window (phase, no sequence), the A8 / A13 fail
+# branches, the pause / resume and the /reload samples
+FIGHT_ROWS = ('A8 fail', 'A13 fail') + FIGHT_SEQ[:3] + ('down',) + FIGHT_SEQ[3:] + ('pause', 'reload')
+LOOK_FN = f'rlk:mboss/arena/{API.AID}/look/'   # the start of an arena look job (V2, HR-51)
+ANIM_FN = 'rlk:boss/scarlet/fx/e/anim'         # the kit's per-tick prop chain (V2, HR-52)
+KIPUP = 20                                     # the down window's kipup after its 200 t (sec_phases P3)
 
 
 def watch_jobs(s):
@@ -1388,6 +1426,18 @@ def watch_jobs(s):
     look-job spikes up to 5 k), so the per-tick limit of the fight is checked without them and they are checked apart."""
     s.watch.setdefault(JOB_FN, [])
     return s.t
+
+
+def log_looks(s, log):
+    """V2 (HR-51): log every start of an arena look job (look/<look>) as (t, look, the arena's stamp at that moment)."""
+    orig = s.call
+
+    def call(fid, ctx, macro=None):
+        if fid.startswith(LOOK_FN):
+            log.append((s.t, fid[len(LOOK_FN):], (s.storage.get('rlk:mboss') or {}).get(f'built_{API.AID}')))
+        return orig(fid, ctx, macro)
+    s.call = call
+    return s
 
 
 def cost_run(s, n, each=None):
@@ -1413,9 +1463,16 @@ def sec_cost():
     """Commands per world tick, strict count (an `execute ... run X` counts X too), in fights on the real rig, sequences,
     gauntlets, the theme's look jobs and, since I1b verification round 1, the kit running for real (H.kit_on: the presets'
     cards, the card ager they schedule, the cull, the HUD tickers; each module kit call costs what it costs in the kit's own
-    harness). The kit's share of each tick is reported apart."""
+    harness). The kit's share of each tick is reported apart. V2 (HR-50, D6-01): also the down window (by its timer and with
+    the 5 % floor hit -> lead_down), the A8 / A13 fail branches (the revive path), a pause and a /reload at three points."""
+    looks = []
+
+    def cworld(seed):
+        s, pl = world(seed, kit=True)
+        log_looks(s, looks)
+        return s, pl
     # P1 then P2 (test 33), the player circling C at 3-10 b
-    s, pl = world(131, kit=True)
+    s, pl = cworld(131)
 
     def mover(s, ang=[0.0]):
         ang[0] += 0.013
@@ -1429,15 +1486,30 @@ def sec_cost():
     parts['P2'] = cost_run(s, 1500, mover)
     # the gauntlets with the first five cuts dashed (A8 from test 21, A13 from test 27)
     for seed, tid, g in ((132, 21, 'a8'), (133, 27, 'a13')):
-        sg, plg = world(seed, kit=True)
+        sg, plg = cworld(seed)
         H.place_player(sg, API.CX + 0.5, API.CZ + 6.0)
         test(sg, tid)
         parts[g.upper()] = cost_run(sg, API.JUDGE_T[g], dasher(CUTS[g][:5]))
-    # the sequences: CS1 -> SQ1 (test 20), repel (24), lead_stand (26), A13 deflect -> CS3 -> the kill -> CS4 -> the event (28)
+    # V2 (HR-50): the fail branches, nothing dashed — A8 (test 21): the fail hit and P2 at T + FAIL60_P2_T; A13 (test 27): the
+    # instant death, Ronova's revive (40 t), the stance, lead_stand and A13 again from T0
+    sg, plg = cworld(140)
+    H.place_player(sg, API.CX + 0.5, API.CZ + 6.0)
+    test(sg, 21)
+    parts['A8 fail'] = cost_run(sg, API.FAIL60_P2_T + 10)
+    sg, plg = cworld(141)
+    sg.revive = 40
+    H.place_player(sg, API.CX + 0.5, API.CZ + 6.0)
+    test(sg, 27)
+    parts['A13 fail'] = cost_run(sg, API.JUDGE_T['a13'] + sg.revive + API.REVIVE['wait'] + API.SEQ_LEN['lead_stand'] + 30)
+    deaths13 = len(sg.deaths)
+    # the sequences: CS1 -> SQ1 (test 20), repel and (V2) the down window after it by its timer, the kipup included (24),
+    # lead_stand (26), A13 deflect -> CS3 -> the kill -> CS4 -> the event (28)
     name_of = {v: k for k, v in SEQ.items()}
     seqc = {}
-    for seed, tid, limit in ((134, 20, 290), (135, 24, 120), (136, 26, 90), (137, 28, 1750)):
-        sx, plx = world(seed, kit=True)
+    down24 = 0
+    for seed, tid, limit in ((134, 20, 290), (135, 24, API.SEQ_LEN['repel'] + API.DOWN_T + KIPUP + 10), (136, 26, 90),
+                             (137, 28, 1750)):
+        sx, plx = cworld(seed)
         H.place_player(sx, API.CX + 0.5, API.CZ + 6.0)
         sx.storage.setdefault('rlk:pinv', {}).setdefault('order', [])    # a run's inventory record (the coda's grant reads it)
         sx.setsc(('e', plx.id), 'invCap', 9)
@@ -1445,37 +1517,92 @@ def sec_cost():
         for x in cost_run(sx, limit):
             if x[3]['sqn']:
                 seqc.setdefault(name_of.get(x[3]['sqn'], x[3]['sqn']), []).append(x)
+            elif x[3]['ph'] == PH['down']:
+                seqc.setdefault('down', []).append(x)
+                down24 += tid == 24
+    # V2 (HR-50): a hit reaching the 5 % floor 30 t into the down window (test 25) -> lead_down 40 t later -> A13
+    sx, plx = cworld(139)
+    H.place_player(sx, API.CX + 0.5, API.CZ + 6.0)
+    test(sx, 25)
+    hit = []
+
+    def floor_hit(s):
+        if not hit and hr(s, '#ph') == PH['down'] and hr(s, '#down') <= API.DOWN_T - 30:
+            hit.append(s.t)
+            to_floor(s)
+    for x in cost_run(sx, 30 + API.DOWN_FLOOR_WAIT + API.SEQ_LEN['lead_down'] + 10, floor_hit):
+        k = name_of.get(x[3]['sqn'], x[3]['sqn']) if x[3]['sqn'] else 'down' if x[3]['ph'] == PH['down'] else None
+        if k:
+            seqc.setdefault(k, []).append(x)
+    # V2 (HR-50): a 20-t pause (pkMode; then 120 t) and a /reload (its own chain, rlk:mboss/init, counted as one tick; then
+    # 120 t) right after A8's deflect judge (from CS1, test 20: the A8 in the dark look, the judge's crimson job running), in P2
+    # with a pattern running and in the down window
+    d8 = dasher(CUTS['a8'][:5])
+    points = (('the A8 judge', 20, lambda s: hr(s, '#ph') == PH['a8'] and hr(s, '#pt') >= API.JUDGE_T['a8'] + 1),
+              ('P2', 33, lambda s: hr(s, '#ph') == PH['p2'] and hr(s, '#pat') != 0 and hr(s, '#pt') >= 5),
+              ('the down window', 25, lambda s: hr(s, '#ph') == PH['down'] and hr(s, '#down') <= API.DOWN_T - 50))
+    reached, after = [], {}
+    for i, (at, tid, cond) in enumerate(points):
+        for how in ('pause', 'reload'):
+            sp, plp = cworld(150 + 2 * i + (how == 'reload'))
+            H.place_player(sp, API.CX + 0.5, API.CZ + 6.0)
+            test(sp, tid)
+            ok, _R = until(sp, cond, 900, each=d8)
+            reached.append((at, how, ok))
+            n_look = len(looks)
+            if how == 'pause':
+                sp.setsc(('e', plp.id), 'pkMode', 1)
+                rows_ = cost_run(sp, 20)
+                sp.setsc(('e', plp.id), 'pkMode', 0)
+            else:
+                n0, k0 = sp.ncmd, sp.nkit
+                reload(sp)
+                rows_ = [(sp.ncmd - n0, sp.nkit - k0, False, rec(sp))]
+            rows_ += cost_run(sp, 120, d8)
+            parts.setdefault(how, []).extend(rows_)
+            after[(at, how)] = (looks[n_look:], max(x[0] for x in rows_), [x[0] for x in rows_ if x[2]])
+    # the intro (CS0); V2 (HR-52): the kit's per-tick prop chain watched through it
     si, pli = intro_world(138, name='base', kit=True)
+    si.watch[ANIM_FN] = []
     ni = len(si.cmd_hist)
     run_intro(si)
     seqc['intro'] = [(c, k, False, None) for c, k in zip(si.cmd_hist[ni:], si.kit_hist[ni:])]
+    anim_cs0 = sorted({t for t, *_ in si.watch[ANIM_FN]})
+    seat_left = [tg for _e, tg in H.ents_tagged(si, 'rlk_hr_') if 'rlk_hr_deco_seat_rock' in tg or 'rlk_hr_fxfs' in tg]
     # the table
-    rows = [(k, parts[k]) for k in ('P1', 'P2', 'A8', 'A13')] + [(k, seqc[k]) for k in
-                                                                ('intro',) + FIGHT_SEQ + ('ending', 'event') if k in seqc]
+    rows = [(k, parts[k]) for k in ('P1', 'P2', 'A8', 'A13', 'A8 fail', 'A13 fail')] + \
+           [(k, seqc[k]) for k in ('intro',) + FIGHT_SEQ[:3] + ('down',) + FIGHT_SEQ[3:] + ('ending', 'event') if k in seqc] + \
+           [(k, parts[k]) for k in ('pause', 'reload')]
     print('  cost (the kit running for real)  ticks    avg   max | no slice: max | kit share: avg   max')
     for k, v in rows:
         ns = [x[0] for x in v if not x[2]]
         print(f'  cost {k:10s} {len(v):27d} {statistics.mean(x[0] for x in v):6.0f} {max(x[0] for x in v):5d} | '
               f'{max(ns or [0]):13d} | {statistics.mean(x[1] for x in v):14.0f} {max(x[1] for x in v):5d}')
     p3 = parts['P1'] + parts['P2'] + parts['A8']
-    fight = p3 + parts['A13'] + [x for k in FIGHT_SEQ for x in seqc.get(k, [])]
+    fight = p3 + parts['A13'] + [x for k, v in rows if k in FIGHT_ROWS for x in v]
     loc = {id(x): where(x[3], k) for k, v in rows for x in v}
     avg1, avg2 = statistics.mean(x[0] for x in p3), statistics.mean(x[0] for x in fight)
     nojob1, nojob2 = [x for x in p3 if not x[2]], [x for x in fight if not x[2]]
     jobs1, jobs2 = [x[0] for x in p3 if x[2]], [x[0] for x in fight if x[2]]
     top = sorted(nojob2, key=lambda x: -x[0])[:5]
-    print(f'  cost fight state (P1 + P2 + A8 + A13 + {" / ".join(FIGHT_SEQ)}): {len(fight)} ticks, avg {avg2:.0f} '
+    topj = sorted([x for x in fight if x[2]], key=lambda x: -x[0])[:3]
+    print(f'  cost fight state (P1 + P2 + A8 + A13 + {" / ".join(FIGHT_ROWS)}): {len(fight)} ticks, avg {avg2:.0f} '
           f'(the kit {statistics.mean(x[1] for x in fight):.0f}), max {max(x[0] for x in fight)}; the intro / ending / event are the '
           f'intro and death states')
     print(f'  cost fight state without the arena job\'s slice ticks: {len(nojob2)} ticks, max {max(x[0] for x in nojob2)}; the '
           f'{len(jobs2)} slice ticks avg {statistics.mean(jobs2 or [0]):.0f} max {max(jobs2 or [0])}')
     print('  cost the highest ticks without a slice: ' + '; '.join(f'{x[0]} (kit {x[1]}) at {loc[id(x)]}' for x in top))
+    print('  cost the highest slice ticks: ' + '; '.join(f'{x[0]} (kit {x[1]}) at {loc[id(x)]}' for x in topj))
+    print('  cost after a pause / a /reload (max tick incl. the reload chain; look jobs started; slice ticks): '
+          + '; '.join(f'{how} at {at}: {mx}, {[lk for _t, lk, _st in lj]}, {sl}' for (at, how), (lj, mx, sl) in after.items()))
+    print(f'  cost CS0: the kit\'s prop chain ran on {len(anim_cs0)} of {len(seqc["intro"])} intro ticks')
     check(f'Z1 commands per fight tick (P1 + P2 + A8, the kit running): the average <= 830 (Apep) and <= 600 (target); every '
           f'tick <= {TICK_MAX} but the arena job\'s slice ticks, those <= {SLICE_MAX} (contract §5 gate 5)',
           avg1 <= 600 and max(x[0] for x in nojob1) <= TICK_MAX and max(jobs1 or [0]) <= SLICE_MAX,
           (avg1, max(x[0] for x in nojob1), max(jobs1 or [0])))
-    check(f'Z2 I1: every fight-state tick incl. A13 and the fight-state sequences (the kit running): the average <= 600 (target; '
-          f'Apep ~830 hard), every tick <= {TICK_MAX} but the arena job\'s slice ticks (I1b), those <= {SLICE_MAX}',
+    check(f'Z2 I1 / V2 (HR-50): every fight-state tick incl. A13, the fail branches, the fight-state sequences, the down window, '
+          f'the pauses and the reloads (the kit running): the average <= 600 (target; Apep ~830 hard), every tick (and each '
+          f'/reload chain) <= {TICK_MAX} but the arena job\'s slice ticks (I1b), those <= {SLICE_MAX}',
           avg2 <= 600 and max(x[0] for x in nojob2) <= TICK_MAX and max(jobs2 or [0]) <= SLICE_MAX,
           (avg2, [(x[0], loc[id(x)]) for x in top[:3]], max(jobs2 or [0])))
     # the kit really ran: P1's ambience (core/amb, every 10 t) puts kit commands in every 10-tick window of P1, and the card
@@ -1485,6 +1612,33 @@ def sec_cost():
     check('Z3 I1b round 1: the kit is counted (it runs for real in these worlds): kit commands in every 10-tick window of P1 '
           '(the ambience every 10 t) and on most P1 ticks (the card ager between the calls)',
           win and min(win) > 0 and sum(1 for k in p1k if k) >= len(p1k) * 0.8, (min(win or [0]), sum(1 for k in p1k if k), len(p1k)))
+    # V2 (HR-51, D6-02): no arena look job starts on an arena that already stands in that look (the stamp) in any of these
+    # worlds — after a pause / a /reload right after A8's judge (the judge's own crimson job runs on through them and stamps)
+    # and a /reload in P2 / the down window, crimson was asked for again on the crimson arena and rewrote it (4 slices; at the
+    # resume after the judge the fight's heaviest tick)
+    dup = [x for x in looks if x[2] == look_stamp(x[1])]
+    check(f'Z4 V2 (HR-51): no look job on an arena already in that look ({len(looks)} jobs started in the cost worlds; none '
+          f'after the pauses / reloads, the arena crimson)', looks and not dup and not any(v[0] for v in after.values()),
+          (dup[:4], {k: [lk for _t, lk, _s in v[0]] for k, v in after.items()}))
+    # V2 (HR-50): the gate reaches every fight state it now lists
+    a8f = phase_list([x[3] for x in parts['A8 fail']])
+    a13f = phase_list([x[3] for x in parts['A13 fail']])
+    rev = any(a13f[j:j + 3] == [PH['a13'], PH['lead'], PH['a13']] for j in range(len(a13f)))
+    cov = dict(down_by_timer=down24, lead_down=len(seqc.get('lead_down', [])), floor_hit=bool(hit),
+               a8_fail=a8f, a13_fail=a13f, deaths=deaths13, reached=[r for r in reached if not r[2]])
+    check(f'Z5 V2 (HR-50): the cost runs reach every fight state they list — the down window by its timer with the kipup '
+          f'({API.DOWN_T} + {KIPUP} t), a 5 % floor hit in it -> lead_down ({API.SEQ_LEN["lead_down"]} t), the A8 fail -> P2 '
+          f'(no CS2), the A13 instant death -> the revive -> lead_stand -> A13 again, a pause and a /reload right after A8\'s '
+          f'judge / in P2 / in the down window',
+          down24 >= API.DOWN_T + KIPUP and abs(len(seqc.get('lead_down', [])) - API.SEQ_LEN['lead_down']) <= 1 and hit
+          and any(a8f[j:j + 2] == [PH['a8'], PH['p2']] for j in range(len(a8f))) and PH['cs2'] not in a8f and deaths13 >= 1
+          and rev and all(r[2] for r in reached),
+          cov)
+    # V2 (HR-52, D6-03): through CS0 the kit's per-tick prop chain no longer runs for the seat stone's motionless bottle / cup
+    # (e/anim ~39 commands on every CS0 tick before); the stone and its items are gone at the intro's end
+    check(f'Z6 V2 (HR-52): the kit\'s per-tick prop chain (fx/e/anim) runs on no CS0 tick ({len(anim_cs0)} of '
+          f'{len(seqc["intro"])}); the seat stone and its items gone at the intro\'s end', not anim_cs0 and not seat_left,
+          (anim_cs0[:5], seat_left))
     VARS['cost_rows'] = [(k, len(v), statistics.mean(x[0] for x in v), max(x[0] for x in v)) for k, v in rows]
 
 

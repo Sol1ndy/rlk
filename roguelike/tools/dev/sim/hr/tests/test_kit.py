@@ -412,7 +412,7 @@ check(kind(s, e) == 'afterimage' and stages(s, e.id).get('kill') == T0 + api.AFT
 # ============================================================== presets
 # S2d (requests/s2d.md s2d-3, I2): the call heights of the player-size body (the S2a figure's x 0.78)
 HEIGHT = {'qi_arc': (1.0, 0.3), 'qi_ring': (0.8, 0.1), 'qi_band': (0.3, 1.1), 'qi_x': (0.1,), 'qi_dome': (0.0,),
-          'qi_vert': (0.0, 0.15), 'qi_fan': (0.85,), 'qi_wedge': (0.85, 1.0), 'qi_ribbon': (1.0,), 'qi_line': (0.95, 0.8),
+          'qi_vert': (0.0, 0.15), 'qi_fan': (1.1,), 'qi_wedge': (0.85, 1.0), 'qi_ribbon': (1.0,), 'qi_line': (0.95, 0.8),
           'qi_cut': (0.8,), 'glint': (0.3, 1.5), 'star4': (1.0,), 'yellow_tell': (1.0,), 'ghost_burst': (0.8,),
           'ghost_trail': (0.45,), 'ghost_flash': (0.95,), 'afterimage': (0.0, 1.2), 'blink_bubble': (1.0,),
           'shield_refill': (1.1,), 'pip_break': (1.0,), 'dive_impact': (0.1,), 'light_column': (0.0,),
@@ -425,7 +425,7 @@ HEIGHT = {'qi_arc': (1.0, 0.3), 'qi_ring': (0.8, 0.1), 'qi_band': (0.3, 1.1), 'q
 assert set(HEIGHT) == set(api.KIT_PRESETS)
 VARIANTS = {'qi_arc': [{}, {'pitch': -40, 'roll': 90}, {'pitch': 35, 'roll': -35}, {'r': 60, 'roll': 180},
                        {'r': 45, 'roll': -40}, {'r': 40, 'roll': 15}, {'r': 45, 'roll': 20}, {'r': 45, 'roll': -160},
-                       {'r': 40, 'pitch': -30, 'roll': 35}], 'qi_fan': [{'h': 13}],
+                       {'r': 40, 'pitch': -30, 'roll': 35}, {'r': 40, 'roll': -25}], 'qi_fan': [{'h': 16}],   # V2 (HR-48): A1's
             'qi_ring': [{'r': 30}, {'r': 22}], 'qi_dome': [{'r': 35}], 'qi_x': [{'r': 25}],
             'qi_band': [{'len': 70, 'pitch': 35}, {'len': 120}, {'roll': 30, 'pitch': -20}, {'len': 120, 'sw': 200}],
             'qi_vert': [{}, {'yaw': 90}, {'h': 19}, {'yaw': 180}],
@@ -612,6 +612,7 @@ for name, a, kinds, mode in (('qi_vert', dict(h=34, yaw=0, c=1), 'qi_arc_', 'acr
                              ('qi_fan', dict(h=16, c=2), 'qi_arc_', 'across'),
                              ('qi_arc', dict(r=40, yaw=0, pitch=0, roll=35, c=1), 'qi_arcf_', 'across'),
                              ('qi_arc', dict(r=45, yaw=0, pitch=0, roll=-40, c=1), 'qi_arcf_', 'across'),
+                             ('qi_arc', dict(r=40, yaw=0, pitch=0, roll=-25, c=1), 'qi_arcf_', 'across'),    # V2: A1
                              ('qi_wedge', dict(r=46, roll=40), 'qi_wedge', 'across'),
                              ('qi_arc', dict(r=40, yaw=0, pitch=0, roll=0, c=1), 'qi_arc_', 'flat'),
                              ('qi_arc', dict(r=40, yaw=0, pitch=0, roll=15, c=1), 'qi_arc_', 'flat'),
@@ -865,6 +866,11 @@ if (FX / 'follow_on.mcfunction').exists():
 
 # ---------------------------------------------------------------- view (HR-12 / HR-45): card pixels at 320 x 180, fov 70
 VW, VH, VFOV, ALPHA_MIN, VIEW_MIN = 320, 180, 70.0, 0.05, 1500
+# V2 (HR-48, D4-02 / DF-01; lead decision 11-06): A1's effects (p/a1/**) read when they cover VIEW_MIN on >= VIEW_TICKS of the 7
+# ticks in both views (the maximum let its flat crescent pass on one transient tick in first person); its pre-hit fan from the
+# default F5 camera: FAN_F5 on >= VIEW_TICKS ticks (F2's floor, back with the fan's h 16; F-I had scaled it to 165 for S2d's
+# h 13). The other contact effects keep the maximum (open: A3 h1 / h3 reach 1 500 on 2 ticks in F5, A4's line on 1)
+VIEW_TICKS, FAN_F5 = 3, 250
 KF = (VH / 2) / math.tan(math.radians(VFOV / 2))
 F5_SEAT, F5_BACK, EYE, GAP = 2.3, 3.5, 1.62, 2.4    # README 13: the F5 seat 0.5 b over the avatar's head, camera 3.5 b back
 
@@ -1051,6 +1057,11 @@ def view_scene(first_person, look=None):
 def view_of(lines, view, look=None):
     """the most card pixels over the 7 ticks after the module's own call lines ran (@s = her) in that view's scene (look:
     the judge scene in first person at that look pitch)"""
+    return max(view_ticks(lines, view, look))
+
+
+def view_ticks(lines, view, look=None):
+    """the card pixels on each of the 7 ticks after the module's own call lines ran (view_of's scene; V2, HR-48)"""
     s, her = view_scene(view == 'FP', look)
     cam = CAMS[view] if look is None else Cam((PLY[0], PLY[1] + EYE, PLY[2]), 180.0, look)
     for ln in lines:
@@ -1059,11 +1070,11 @@ def view_of(lines, view, look=None):
             s.run(f'summon minecraft:marker {PLY[0]} {PLY[1]} {PLY[2]} {{Tags:["rlk_hr_cut"]}}')
             s.setsc(('e', [e for e in s.ents if 'rlk_hr_cut' in e.tags][0].id), 'hr', int(m.group(1)))
         s.run(COND.sub('', ln), ex=her, pos=tuple(her.pos), rot=(0.0, 0.0))
-    best = 0
+    out = []
     for _ in range(7):
         s.tick(1)
-        best = max(best, view_px(s, cam))
-    return best
+        out.append(view_px(s, cam))
+    return out
 
 
 if MERGED:
@@ -1086,14 +1097,21 @@ if MERGED:
         sig = tuple(sorted(re.sub(r',scores=\{hr=\d+\}', '', COND.sub('', x)) for x in lines))
         sites.setdefault(sig, (f'{call} ({rel})', lines))
     check(len(sites) >= 15, f'view: {len(sites)} contact effects found in the module')
+    n_a1 = 0
     for key, lines in sorted(sites.values()):
-        fan = 'qi_fan' in key          # A1's swing fan (4 t before the hit; a 1-bh fan 4.7 b from the F5 camera)
-        # F-I: F2's F5 floor 250 px was for S2a's 1.6-b fan (h 16); S2d's player-size body calls it 1.3 b tall (h 13, s2d-3),
-        # so the floor scales with its area: 250 x (13 / 16)^2 = 165
+        fan = 'qi_fan' in key          # A1's swing fan (4 t before the hit; a 1.6-b fan 4.7 b from the F5 camera)
+        a1 = '(p/a1/' in key
+        n_a1 += a1
         for view in ('F5', 'FP'):
-            px = view_of(lines, view)
-            need = 165 if fan and view == 'F5' else VIEW_MIN
-            check(px >= need, f'view: {key[:110]}: {px} card px in {view} (>= {need})')
+            px = view_ticks(lines, view)
+            need = FAN_F5 if fan and view == 'F5' else VIEW_MIN
+            n = sum(1 for x in px if x >= need)
+            if a1:
+                check(n >= VIEW_TICKS, f'view: {key[:110]}: >= {need} card px on {n} of {len(px)} ticks in {view} (>= '
+                                       f'{VIEW_TICKS}, V2 HR-48; {px})')
+            else:
+                check(max(px) >= need, f'view: {key[:110]}: {max(px)} card px in {view} (>= {need})')
+    check(n_a1 == 2, f'view: A1\'s two contact effects (the fan, the crescent) found ({n_a1})')
     # HR-45: the player-anchored effects (the 홍련일섬 line of CS1 C8 and of the instant deaths, the deflect's gold starburst
     # and light column) from the F5 camera and in first person (no avatar: the camera on the player's own axis)
     anchored = {}
@@ -1214,10 +1232,37 @@ s.run(api.K.prop('seat_rock', look='set'), ex=d, pos=tuple(d.pos))
 check(len(s.cards(G.FOLLOW_STAY)) == 2, 'props: seat set = bottle + cup')
 s.run(api.K.prop('seat_rock', look='bottle'), ex=d, pos=tuple(d.pos))
 check(len(s.cards(G.FOLLOW_STAY)) == 1, 'props: seat re-look bottle: the cup goes')
+# V2 (HR-52, D6-03): the motionless seat items are not in the per-tick prop chain (e/anim ran ~39 commands / t through CS0 for
+# them): no e/anim scheduled, their own check e/stay_t every G.STAY_EVERY t; re-look bare drops them at once (the module does
+# that before it kills the stone), a killed stone's items go within STAY_EVERY t
+STAY_EVERY = getattr(G, 'STAY_EVERY', 10)      # (a kit before V2 has none: the checks below then fail, not crash)
+check(f'{NSF}e/anim' not in s.sched and f'{NSF}e/stay_t' in s.sched,
+      f'props: V2 (HR-52) the seat items: e/stay_t every {STAY_EVERY} t, no per-tick e/anim ({sorted(k for k in s.sched if "fx/e/" in k)})')
+na = [0]
+_orig_call = s.call
+
+
+def _count_anim(fid, ctx, macro=None):
+    if fid == f'{NSF}e/anim':
+        na[0] += 1
+    return _orig_call(fid, ctx, macro)
+
+
+s.call = _count_anim
+s.tick(30)
+s.call = _orig_call
+check(na[0] == 0 and len(s.cards(G.FOLLOW_STAY)) == 1, f'props: V2 (HR-52) 30 t with the seat items: e/anim ran {na[0]} times, the '
+                                                       f'bottle kept')
 d.alive = False
 s.ents = [e for e in s.ents if e.alive]
-s.tick(2)
-check(not s.cards(G.FOLLOW_STAY), 'props: the seat items go with the stone')
+s.tick(STAY_EVERY + 1)
+check(not s.cards(G.FOLLOW_STAY), f'props: the seat items go with the stone (within {STAY_EVERY} t)')
+s = fresh()
+s.run(f'summon minecraft:item_display {api.SEAT_POS[0]} {api.SEAT_POS[1]} {api.SEAT_POS[2]} {{Tags:["rlk_hr_seat"]}}')
+d = [e for e in s.ents if e.etype == 'item_display'][0]
+s.run(api.K.prop('seat_rock', look='set'), ex=d, pos=tuple(d.pos))
+s.run(api.K.prop('seat_rock', look='bare'), ex=d, pos=tuple(d.pos))
+check(not s.cards(G.FOLLOW_STAY), 'props: V2 (HR-52) seat re-look bare: bottle and cup gone at once')
 
 # ============================================================== clear (pause / death_start / cleanup)
 s = fresh()

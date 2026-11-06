@@ -4,7 +4,8 @@
     python3 test_arena_hr.py <worktree>/roguelike [section ...]
 
  1. registry = api.ARENA_SPEC = the theme CHECK; the constants the theme copies = api's; the theme names; deterministic (a
-    second interpreter gives the same layouts / look jobs / DECO)
+    second interpreter gives the same layouts / look jobs / DECO); that interpreter runs with -B (V2, HR-55: it writes no
+    bytecode into the tested tree, whatever the caller's environment)
  2. the walk disc (d <= 25): y 200 flat full opaque blocks in every look (the moon palette shares); at y 201 only
     #rlk:dash_pass plants and light; nothing else above it below y 226 but the light layer (y 206); solid below
  3. the barrier is closed: at every y 201..215 no passable cell joins the walk disc to d > 27 (4-connected flood); every
@@ -31,6 +32,7 @@
 import hashlib
 import json
 import math
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -237,9 +239,16 @@ if want(1):
             '    h.update(json.dumps(sorted(T.arena_layout(lk).items())).encode())\n'
             '    h.update(json.dumps(T.look_lines(lk)).encode())\n'
             'h.update(json.dumps(T.DECO, sort_keys=True).encode())\n'
-            'print(h.hexdigest())')
-    other = subprocess.run([sys.executable, '-c', code, str(DP / 'tools')], capture_output=True, text=True).stdout.strip()
+            'print(h.hexdigest(), int(sys.dont_write_bytecode))')
+    # V2 (HR-55, D6 note): -B, and the caller's PYTHONDONTWRITEBYTECODE kept out of the child, so 1f sees -B alone (the 3741fc4
+    # call had no -B: run without that variable it wrote tools/__pycache__/*.pyc into the tested tree)
+    env = {k: v for k, v in os.environ.items() if k != 'PYTHONDONTWRITEBYTECODE'}
+    out = subprocess.run([sys.executable, '-B', '-c', code, str(DP / 'tools')], capture_output=True, text=True,
+                         env=env).stdout.split()
+    other, nobc = (out + ['', ''])[:2]
     check('1e deterministic: a second interpreter gives the same layouts, look jobs and DECO', other == digest(), other)
+    check('1f V2 (HR-55): that interpreter writes no bytecode into the tested tree (-B: sys.dont_write_bytecode there)',
+          nobc == '1', out)
 
 # ================================================================================================== 2
 if want(2):

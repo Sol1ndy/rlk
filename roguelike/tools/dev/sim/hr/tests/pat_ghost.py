@@ -950,9 +950,14 @@ def sec_frame():
         if k in GAUNT:
             jt = API.JUDGE_T[k]
             warn = [(p, a.get('on')) for p, c, a in kl if c == 'hud/warn']
-            check(f'J7 {k}: the darkness ticks: crimson requested at the judge {jt} (the job the next tick), never dark; the banner off there',
-                  reqs == [jt] and ('dark' not in [x for _, x in looks]) and (jt + 1, 'crimson') in looks and warn == [(jt, 0)],
-                  (reqs, looks, warn))
+            # V2 (HR-51): the test id starts the gauntlet without the darkness and its own crimson job (pattern tick <= 1) stamps
+            # the arena crimson, so the judge's crimson request starts no second job (before: a crimson job at jt + 1 rewrote the
+            # crimson arena); the job after a dark gauntlet's judge: test_scarlet cost (test 20)
+            first = [(P.get(t), f.rsplit('/', 1)[1]) for f in WATCH[3:] for t, *_ in s.watch[f] if (P.get(t) or 0) <= 1]
+            check(f'J7 {k}: the darkness ticks: crimson requested at the judge {jt}, never dark (the arena crimson since the test\'s '
+                  f'start: no second job, V2 HR-51); the banner off there',
+                  reqs == [jt] and ('dark' not in [x for _, x in looks]) and first == [(1, 'crimson')]
+                  and not [x for x in looks if x[1] == 'crimson'] and warn == [(jt, 0)], (reqs, first, looks, warn))
         else:
             check(f'J7 {k}: no look request, no banner (no darkness in P2 entries)',
                   not reqs and not looks and not [c for _, c, _ in kl if c == 'hud/warn'], (reqs, looks))
