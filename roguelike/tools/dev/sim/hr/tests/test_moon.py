@@ -10,8 +10,8 @@ lore parsed back.
   static  load (objective beside nodeHp, the 조절 지점 constants = api.BUFF_VALUES['run'] under api.BUFF_FP), uninstall,
           reset_one, the stat_buffs line, hr_moon/apply, update_item (hash, $(moon)), update_item_macro (`,$(moon)` last),
           the status format = api.EV_TEXT['status'], static rules
-  stat    stat_buffs adds exactly +20 ampAtk / +10 crit / +10 move when hrMoon 1, nothing when 0
-  atk     final ATK = old x 1.20 (+-1) through the real stat_light (several bases / % / flat), crit and move final values
+  stat    stat_buffs adds exactly api.BUFF_VALUES run ampAtk / crit / move when hrMoon 1, nothing when 0
+  atk     final ATK = old x (1 + ampAtk %) (+-1) through the real stat_light (several bases / % / flat), crit and move final values
   reset   reset_one clears it (run scope); the documented forever switch (F3, HR-11: load's #hrMoonRun 0) keeps it; uninstall
           removes it
   lore    the stat-item lore line present iff on, its numbers = the constants (also changed ones), its scope word from
@@ -139,12 +139,12 @@ def t_stat():
     off = stat_once(s, pl, 0)
     on = stat_once(s, pl, 1)
     ck('off: nothing added, apply not called', off[:4] == (100, 5, 100, 0) and not off[4], off)
-    ck('on: ampAtk +20 / crit +10 / move +10 exactly', on[:4] == (100 + RUN[0], 5 + RUN[1], 100 + RUN[2], 0) and len(on[4]) == 1, on)
+    ck(f'on: ampAtk +{RUN[0]} / crit +{RUN[1]} / move +{RUN[2]} exactly', on[:4] == (100 + RUN[0], 5 + RUN[1], 100 + RUN[2], 0) and len(on[4]) == 1, on)
     # with the sword held too (both rolls cannot happen in one run, but a lobby copy can be held with the buff)
     s.setsc(('e', pl.id), 'it_sword_hwamu', 1)
     S.set_star(s, 3)
     on2 = stat_once(s, pl, 1, atkpct=10)
-    ck('with the sword: the buff adds the same, atkPct untouched by it', on2[:3] == (120, 15, 110) and on2[3] == 10, on2)
+    ck('with the sword: the buff adds the same, atkPct untouched by it', on2[:3] == (100 + RUN[0], 15, 110) and on2[3] == 10, on2)
     # changed constants follow (조절 지점)
     for fp, v in zip(API.BUFF_FP, (25, 12, 7)):
         s.setsc(fp, 'tmp', v)
@@ -172,9 +172,9 @@ def t_atk():
             s.call('rlk:items/stat_light', S.pctx(s, pl))
             out[moon] = (s.sc(P, 'atk'), s.sc(P, 'critChance'), s.sc(P, 'moveSpeed'))
         old, new = out[0][0], out[1][0]
-        ck(f'Lv {lv} +{pct}% +{flat}: ATK {old} -> {new} = x1.20 (+-1)', abs(new - old * 120 / 100) <= 1, (old, new))
+        ck(f'Lv {lv} +{pct}% +{flat}: ATK {old} -> {new} = x{(100 + RUN[0]) / 100:.2f} (+-1)', abs(new - old * (100 + RUN[0]) / 100) <= 1, (old, new))
         ck(f'Lv {lv}: crit +{RUN[1]}, move +{RUN[2]}', out[1][1] - out[0][1] == RUN[1] and out[1][2] - out[0][2] == RUN[2], out)
-    # the multiplier comes after every atkPct (not diluted by item ATK %): +100 % items -> still x1.20 of the total
+    # the multiplier comes after every atkPct (not diluted by item ATK %): +100 % items -> still x(1 + RUN[0] %) of the total
     ck('ampAtk is applied after atkPct and flat (stat_light:47-48)', 'scoreboard players operation @s atk *= @s ampAtk' in rd('items/stat_light'))
 
 

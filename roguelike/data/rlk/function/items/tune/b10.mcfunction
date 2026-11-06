@@ -33,12 +33,13 @@ scoreboard players set #eyeRate tmp 30
 # 화무십일홍(sword_hwamu, 특수 보스 홍련의 이벤트 보상): 기준값 = ★★★ (아래 조정 표가 강화 단계에 맞춰 다시 계산, 계획 §7.4.3)
 #   육참골단 중첩당 공격력 % · 중첩 시간(틱) / 검신합일 반격 피해(공격력의 %) · 반격 재사용 대기(틱) · 체력 60% 이하 치명타 피해 +%
 #   / 홍련일섬 피해(공격력의 %) · 재사용 대기(틱) · 체력 50% 이하에서 썼을 때 치명타 확률 +% · 그 시간(틱)
+#   S5(11-06, 측정한 균형 · 계획 §7.4.7): 반격 재사용 대기 40 → 80틱 · 홍련일섬 849 → 500% (붐비는 방에서 키리온 이하)
 scoreboard players set #hwStkAtk tmp 6
 scoreboard players set #hwStkDur tmp 120
 scoreboard players set #hwCtrCoef tmp 138
-scoreboard players set #hwCtrCdT tmp 40
+scoreboard players set #hwCtrCdT tmp 80
 scoreboard players set #hwLowCd tmp 30
-scoreboard players set #hwSlCoef tmp 849
+scoreboard players set #hwSlCoef tmp 500
 scoreboard players set #hwSlCdT tmp 800
 scoreboard players set #hwSlCrit tmp 20
 scoreboard players set #hwSlCritDur tmp 200

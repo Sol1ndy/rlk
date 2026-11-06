@@ -89,6 +89,11 @@ def rd(rel):
     return (FN / (rel + '.mcfunction')).read_text(encoding='utf-8')
 
 
+def b10(name):
+    """A ★★★ base constant of F:items/tune/b10 (S5 retunes #hwCtrCdT / #hwSlCoef there; the checks follow it)."""
+    return int(re.search(rf'scoreboard players set {name} tmp (\d+)', rd('items/tune/b10')).group(1))
+
+
 def lines(rel):
     return [l for l in rd(rel).split('\n') if l.strip() and not l.lstrip().startswith('#')]
 
@@ -490,7 +495,8 @@ def t_counter():
     ck('counter: Electro 1U, item damage (#sub itv 1), not a skill / stun hit',
        (a['elem'], a['elU'], a['sub'], a['skill'], a['stun'], a['icd']) == (3, 1000, 1, 0, 0, 1), a)
     ck('#sub itv back to 0', s.sc('#sub', 'itv') == 0)
-    ck('cooldown = #hwCtrCdT (2 s): flag 1 until now + 40', s.sc('#hwCtrCd', 'itv') == 1 and s.sc('#hwCtrEnd', 'itv') == now(s) + 40)
+    cdt = b10('#hwCtrCdT')        # S5: the b10 base (★★★)
+    ck(f'cooldown = #hwCtrCdT ({cdt} t): flag 1 until now + {cdt}', s.sc('#hwCtrCd', 'itv') == 1 and s.sc('#hwCtrEnd', 'itv') == now(s) + cdt)
     snd = [l[2] for l in s.log[n0:] if l[1] == 'call' and l[2].startswith('rlk:snd/')]
     ck('counter sounds f424 + f425', snd == ['rlk:snd/f424', 'rlk:snd/f425'], snd)
     w = s.log[n0:]
@@ -501,16 +507,16 @@ def t_counter():
        [f[0].split('{')[0] for f in fx] == ['minecraft:sweep_attack'] + ['minecraft:dust'] * 6 + ['minecraft:electric_spark']
        and all(abs(f[1][0] - near.pos[0]) < 0.01 for f in fx), fx)
     # cooldown: hits during it queue nothing; after it, again
-    for k in range(40):
+    for k in range(cdt):
         hurt(s, pl)
-        if k in (0, 39):
+        if k in (0, cdt - 1):
             ck(f'no queue during the cooldown (tick {k + 1})', s.sc('#hwCtrQ', 'itv') == 0)
         n0 = len(s.log)
         tick(s, pl)
         if applies(s, n0):
             ck('no counter during the cooldown', False, s.t)
             break
-    ck('cooldown over after 40 ticks', s.sc('#hwCtrCd', 'itv') == 0)
+    ck(f'cooldown over after {cdt} ticks', s.sc('#hwCtrCd', 'itv') == 0)
     hurt(s, pl)
     n0 = len(s.log)
     tick(s, pl)
@@ -572,7 +578,8 @@ def t_counter():
     n0 = len(s.log)
     tick(s, pl)
     ap = applies(s, n0)
-    ck('★☆☆: 92 % and cooldown 48 t', ap and ap[0][2]['dmgBase'] == 92 and s.sc('#hwCtrEnd', 'itv') == now(s) + 48)
+    cd1 = (b10('#hwCtrCdT') * 1200 + 500) // 1000        # ★☆☆: the c factor 1.2 (F:items/tune/register), S5: 96 t
+    ck(f'★☆☆: 92 % and cooldown {cd1} t', ap and ap[0][2]['dmgBase'] == 92 and s.sc('#hwCtrEnd', 'itv') == now(s) + cd1)
     # F3 (HR-09): only a real dash's own i-frames count as a dodge; burst / fall / revive i-frames reuse dashInvT
     for label, inv, dash_ago, rn, want in (
             ('burst wind-up i-frames (dashInvT 24, no dash)', 24, None, 0, False),
@@ -632,7 +639,7 @@ def t_counter():
     ck('HR-39 the invulnerable body nearer, a mob at 7 b: the counter hits the mob', [a[2]['target'] for a in applies(s, n0)] == [other.id],
        [a[2]['target'] for a in applies(s, n0)])
     boss.tags.discard('rlk_mb_inv')
-    for _ in range(60):
+    for _ in range(b10('#hwCtrCdT') + 20):        # past the counter's cooldown (S5: 80 t at ★★★)
         tick(s, pl)
     hurt(s, pl)
     n0 = len(s.log)
@@ -701,7 +708,8 @@ def t_slash():
     ck('slash 4 t after the cast', hit_t == 4, hit_t)
     tg = sorted(a[2]['target'] for a in hits)
     ck('every rlk_mob <= 20 b once (5 / 15 / 19.9 b), none beyond, no non-mob', tg == sorted(m.id for m in ms.values()), tg)
-    ck('slash: atk x 849 % (one roll for all)', all(a[2]['dmgBase'] == 849 for a in hits) and len({a[2]['crit'] for a in hits}) == 1)
+    slc = b10('#hwSlCoef')        # S5: the b10 base (★★★)
+    ck(f'slash: atk x {slc} % (one roll for all)', all(a[2]['dmgBase'] == slc for a in hits) and len({a[2]['crit'] for a in hits}) == 1)
     ck('slash: Electro 1U, item damage (#sub itv 1)', all((a[2]['elem'], a[2]['elU'], a[2]['sub'], a[2]['skill']) == (3, 1000, 1, 0) for a in hits))
     ck('#sub itv back to 0', s.sc('#sub', 'itv') == 0)
     ck('far mobs untouched', all(s.sc(('e', m.id), 'mhpC') == 100000 for m in far) and s.sc(('e', deco.id), 'mhpC') == 100000)

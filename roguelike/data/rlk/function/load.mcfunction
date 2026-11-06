@@ -676,7 +676,7 @@ scoreboard players set #fmDur tmp 160
 # 월하대작(특수 보스 홍련의 이벤트 버프): 최종 공격력 +% · 치명타 확률 +% · 이동 속도 +% (아이템이 아니라 강화와 상관없음) · 범위
 #   #hrMoonRun 1 = 이번 런(player/reset_one 이 끄고 스탯 줄 "(이번 런)") / 0 = 영구(끄지 않고 "(영구)"). 영구로 바꾸려면 여기서
 #   8 · 4 · 4 와 #hrMoonRun 0, 그리고 tools/mboss_scarlet/api.py 의 EVENT['buff_scope'] = 'forever'(균열 채팅 문구; 재생성) (계획 §7.5.3)
-scoreboard players set #hrMoonAtk tmp 20
+scoreboard players set #hrMoonAtk tmp 27
 scoreboard players set #hrMoonCrit tmp 10
 scoreboard players set #hrMoonSpd tmp 10
 scoreboard players set #hrMoonRun tmp 1
