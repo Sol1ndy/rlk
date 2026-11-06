@@ -6,4 +6,3 @@ execute if score @s hrRigT matches 8 run return run function rlk:boss/scarlet/ri
 execute if score @s hrRigT matches 9 run return run function rlk:boss/scarlet/rig/c/glide/k/9
 execute if score @s hrRigT matches 10 run return run function rlk:boss/scarlet/rig/c/glide/k/10
 execute if score @s hrRigT matches 11 run return run function rlk:boss/scarlet/rig/c/glide/k/11
-execute if score @s hrRigT matches 12 run return run function rlk:boss/scarlet/rig/c/glide/k/12

@@ -161,6 +161,15 @@ const KNEEL = {pos: [0, -.29, -.02], rot: [-25, 0, 0], tor: [-55, -10, 0], head:
 // torso, and the grip comes forward with the kip (a grip left in the yaw frame would let the shoulder swing past it)
 const KNEEL_BLADE = {gF: 0, gB: -80, gE: -25, gD: .42, cB: -115, cR: 0, th: -12, ed: -1, tw: 0};
 export const IAI_DELTA = 14;
+// V1 (HR-47): a10's airborne crouch (9-19, both hands on the grip, the torso bowed 24 deg) raised S2a's blade laid back over the
+// head (th 120): the player-size arms put the fists behind and in the head, and the dive strike at 20-21 had to bring them through
+// it. Held instead as a high guard before her face: the grip on the swing sphere ahead of her chin, the blade upright (S2a units)
+const A10_HIGH = {gF: 0, gB: 0, gE: 25, gD: .55, th: 95};
+// V1 (HR-47): intro_end's cross-draw (the left hand to the hilt of the scabbard her right hand holds upright before her right
+// shoulder, 52-56, drawn at 56): the player-size left arm crossed her chest to a hilt at her chin and the fist sank into her torso
+// and head. The right hand holds the scabbard lower and further out before her chest instead (S2a units: aR pitch / roll / reach; the scabbard across her front, its body toward her right and down, the hilt up to
+// her left: the cross-draw pulls the blade out to her left)
+const DRAW_E = {aR: [40, -15, .9], scB: 90, scE: -45};
 // S2d round 2: the step aside off the seat stone. seq.py glides her root SEAT_ASIDE 1.1 b to her right over intro 226-246 (one linear
 // 20-t glide, 0.055 b/t); the clip stands still there, so the feet step with the glide: four side steps of 0.55 b (right, left, right,
 // left foot, 5 t each, the swing sole lifted <= 0.08 b) while the stance sole's target counter-moves 0.055 b/t in the rig frame: every
@@ -181,14 +190,66 @@ function asideFeet(o, t) {
     if (lift > 0) o[ch === 'fR' ? 'fLiftR' : 'fLiftL'] = lift;
   }
 }
+// V1 (HR-49): the walk and the strafes (api.WALK_SPEED 0.12 b/t, the module's root glide; clip timing frozen: the walk's contacts at
+// 0 / 12, the strafe's steps at 0 / 10). S2a's feet, scaled by S_LEG, swept 0.4 b per stance (the walk's planted foot slid ~58 %,
+// jittering) and the strafe never lifted a foot (both soles skated, a 0.11-b pop four times a cycle).
+// WALK: a longer stride, each sole planted 0.38 b ahead of the hip joint at its contact and swept back steadily to 0.38 behind over
+// its 12-t stance (0.063 b/t: the player-size leg reaches no further with the hips dipped 0.10 b at the contacts; holding the full
+// 0.12 b/t would need 6-t steps), then swung forward lifted <= 0.08 b over the 12 t to its next contact; the hips bob 0.10 -> 0.045 b
+// down (contacts -> mid-stance)
+export const WALK = {len: 24, Z: .38, lift: .08, dip: [.10, .045]};
+function walkFeet(o, t) {
+  const {len: n, Z, lift, dip} = WALK, h = n / 2;
+  for (const [ch, c] of [['fL', 0], ['fR', h]]) {
+    const u = (((t - c) % n) + n) % n;
+    let z, l = 0;
+    if (u < h) z = -Z + 2 * Z * u / h;
+    else { const w = (u - h) / h; z = Z - 2 * Z * smooth(w); l = lift * Math.sin(Math.PI * w); }
+    o[ch] = [o[ch][0], 0, z];
+    if (l > 0) o[ch === 'fL' ? 'fLiftL' : 'fLiftR'] = l;
+  }
+  o.pos = [o.pos[0], -(dip[0] + dip[1]) / 2 - (dip[0] - dip[1]) / 2 * Math.cos(2 * Math.PI * t / h), o.pos[2]];
+}
+// STRAFE-L / STRAFE-R: ASIDE's side steps at the strafe's speed, four a cycle (5 t each: the leading foot out, the trailing foot in,
+// as step1 @ 0 and step2 @ 10 open each half): the feet from 0.13 b off the centre (closed, the legs side by side) to 0.485 (wide,
+// the hips 0.10 b down: the lateral reach), the stance sole swept in steadily over its 5 t (0.071 b/t), the swing sole lifted
+// <= 0.08 b over its planted height; the source's fore-aft foot offsets kept
+export const STRAFE = {len: 20, step: 5, xin: .13, xout: .485, lift: .08, dip: .10};
+const strafeFeet = sd => (o, t) => {
+  const {len: n, step: st, xin, xout, lift, dip} = STRAFE;
+  // the leading foot (sd +1: her left) swings out over [0, 5) and [10, 15), the trailing foot in over [5, 10) and [15, 20)
+  const lead = sd > 0 ? 'fL' : 'fR', trail = sd > 0 ? 'fR' : 'fL', u = ((t % n) + n) % n, ph = u % (2 * st);
+  for (const [ch, sgn, swingFirst] of [[lead, sd, true], [trail, -sd, false]]) {
+    // swing first: out during [0, st) (in -> out), stance [st, 2 st) (out -> in); the trailing foot the other way round
+    let x, l = 0;
+    const inSwing = swingFirst ? ph < st : ph >= st, w = (swingFirst ? ph : ph - st) / st;
+    if (swingFirst) x = inSwing ? xin + (xout - xin) * smooth(w) : xout - (xout - xin) * ((ph - st) / st);
+    else x = inSwing ? xout - (xout - xin) * smooth(w) : xin + (xout - xin) * (ph / st);
+    if (inSwing) l = lift * Math.sin(Math.PI * w);
+    o[ch] = [sgn * x, 0, o[ch][2]];
+    if (l > 0) o[ch === 'fL' ? 'fLiftL' : 'fLiftR'] = l;
+  }
+  o.pos = [o.pos[0], -dip, o.pos[2]];
+};
 export const PATCHES = [
   {id: 'KNEEL-K', clip: 'kipup', in: [6, 8], out: [10, 12], set: KNEEL, why: 'the floor pickup of the hat on the right knee'},
   {id: 'KNEEL-K-B', clip: 'kipup', in: [3, 8], out: [10, 16], set: KNEEL_BLADE, why: 'the sword out at her left through the kneel (5- / 6-tick ramps: no whip)'},
   {id: 'KNEEL-L', clip: 'lead_down', in: [5, 7], out: [9, 11], set: KNEEL, why: 'the floor pickup of the hat on the right knee'},
   {id: 'KNEEL-L-B', clip: 'lead_down', in: [1, 6], out: [11, 17], set: KNEEL_BLADE, why: 'the sword out at her left through the kip and the kneel (a 5-tick ramp in; out over 6 ticks after the kneel: no whip, the elbow never crosses the shoulder)'},
-  {id: 'IAI', clip: 'cs1', in: [104, 106], out: [159, 161], add: {tor: [0, IAI_DELTA, 0], head: [0, -IAI_DELTA, 0]}, why: 'the cross-draw reach to the hip hilt'},
+  {id: 'IAI', clip: 'cs1', in: [104, 106], out: [161, 164], add: {tor: [0, IAI_DELTA, 0], head: [0, -IAI_DELTA, 0]},
+    why: 'the cross-draw reach to the hip hilt (V1: held through the draw at 162, so the turning torso does not sweep over the hilt)'},
   {id: 'SIP', clip: 'intro', in: [66, 70], out: [86, 94], set: {wLip: 1}, why: 'the cup at her lips'},
   {id: 'SH0', clip: 'ending', in: [297, 297], out: [326, 326], sh0: true, why: 'the sheathe entry on the new scabbard axis (SH0\')'},
+  {id: 'A10-HIGH', clip: 'a10', in: [4, 8], out: [19, 20], set: A10_HIGH,
+    why: 'V1 (HR-47): the airborne two-hand guard held as a high guard before her face (the player-size arms cannot hold the blade laid back over her head)'},
+  {id: 'DRAW-E', clip: 'intro_end', in: [47, 51], out: [57, 60], set: DRAW_E,
+    why: 'V1 (HR-47): the scabbard held further out before her chest for the cross-draw (the fist off her torso and head)'},
+  {id: 'WALK', clip: 'walk', in: [0, 0], out: [24, 24], fn: walkFeet,
+    why: 'V1 (HR-49): a longer stride (each sole planted 0.38 b ahead, swept steadily 0.76 b back over its 12-t stance, swung forward lifted), the hips bobbing with it'},
+  {id: 'STRAFE-L', clip: 'strafe_l', in: [0, 0], out: [20, 20], fn: strafeFeet(1),
+    why: 'V1 (HR-49): ASIDE-like lifted side steps at the strafe speed (four a cycle, the feet 0.26 -> 0.97 b apart, the hips 0.10 b down)'},
+  {id: 'STRAFE-R', clip: 'strafe_r', in: [0, 0], out: [20, 20], fn: strafeFeet(-1),
+    why: 'V1 (HR-49): ASIDE-like lifted side steps at the strafe speed (four a cycle, the feet 0.26 -> 0.97 b apart, the hips 0.10 b down)'},
   {id: 'ASIDE', clip: 'intro', in: [ASIDE.t0, ASIDE.t0], out: [ASIDE.t0 + ASIDE.len, ASIDE.t0 + ASIDE.len], fn: asideFeet,
     why: 'the feet step with seq.py\'s 1.1-b glide aside off the seat stone (4 side steps of 0.55 b, the stance sole kept on its world spot)'},
 ];

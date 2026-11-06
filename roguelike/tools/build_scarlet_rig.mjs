@@ -37,6 +37,7 @@ const SWORD_BLADE = [SWORD.bladeLo, SWORD.tip];
 import {scarletSprites, paintScarlet, spriteId, PAINT_ROLES, TEX_DIR} from './scarlet_paint.mjs';
 import {SKIN_B64, SKIN_BYTES, SKIN_SHA1} from './scarlet_skin.mjs';
 import {solve, toDisplay, fromDisplay, setModels, worldPoints, modelOn, boxDepth, HIP_Y, SK, GUARD_BOUND, GUARD_SLOPE, CORE, minY, hullOf, freeBlade, dirBE, bladeQ, HAT_FLOOR_HOLD,
+  CLEAR_GUARDS, CLEAR_GATE, FIST_AXIS, HILT_AXIS, GUARD_RIM,
   BOX, ARM_REACH} from './scarlet_pose.mjs';
 import {retarget, overlay, refCore, hatSwitches, bladeChannels, setHatFace, faceSpot, PATCHES, HAT_REST, HAT_FLIGHTS, SUPPORTS, S_LEG, S_ARM, S_SCAB, K_ARC,
   IAI_DELTA, ASIDE, hipDirChannels} from './scarlet_retarget.mjs';
@@ -201,10 +202,37 @@ function planOf(passes, c) {
     const vals = Array.from({length: N}, (_, t) => { let best = null; for (const fr of passes) { const v = fr[t].o._guard[n]; if (v != null && (!best || gv(v) > gv(best))) best = v; } return best; });
     const a = vals.map(gv);
     if (!a.some(x => x > 1e-6)) continue;
+    const m = new Array(N).fill(0), arg = new Array(N).fill(-1);
     for (let t = 0; t < N; t++) {
-      let m = 0, arg = -1;
-      for (let k = 0; k < N; k++) { const v = a[k] - slope * dist(k, t); if (v > m + 1e-12) { m = v; arg = k; } }
-      if (m > 1e-6) plan[t][n] = typeof vals[arg] === 'object' ? {v: m, dir: vals[arg].dir} : m;
+      for (let k = 0; k < N; k++) { const v = a[k] - slope * dist(k, t); if (v > m[t] + 1e-12) { m[t] = v; arg[t] = k; } }
+      if (m[t] > 1e-6) plan[t][n] = typeof vals[arg[t]] === 'object' ? {v: m[t], dir: vals[arg[t]].dir} : m[t];
+    }
+    // V1 (HR-47): the clear guards (scarlet_pose.mjs 9b) are planned as one direction per tick, chosen over the whole clip by least
+    // cost (Viterbi): each tick's rigid move from none along each of 16 directions (the solver's table `tab`, b; -1 = none within
+    // the bound), each direction's move dilated by the slope (so it grows and shrinks smoothly), its preference cost (the front
+    // first, behind her head dearest), + 0.5 b + the bound where the direction cannot clear (its move not spread), +0.6 b where a pass's planned push along it failed
+    // (`bad`), and 2 x the change of the push between ticks (cm in the torso frame): the hand takes one way round her head and keeps
+    // it while it holds, and changes way only where it must (a jodan held behind the head, then the strike in front of it)
+    if (CLEAR_GUARDS.includes(n)) {
+      for (let t = 0; t < N; t++) delete plan[t][n];
+      const rows = Array.from({length: N}, (_, t) => { for (let k = passes.length - 1; k >= 0; k--) { const v = passes[k][t].o._guard[n]; if (v && v.tab) return v.tab; } return null; });
+      const ref = rows.find(r => r);
+      if (!ref) continue;
+      const K = ref.length, B = GUARD_BOUND[n.replace(/[+-]$/, '')], need = rows.map(r => (r ? r.map(x => (x[0] < 0 ? 0 : x[0] * 100)) : new Array(K).fill(0)));
+      const bad = Array.from({length: N}, (_, t) => passes.slice(1).map(fr => fr[t].o._guard[n]?.bad).filter(Boolean));
+      const MAG = Array.from({length: N}, () => new Array(K).fill(0));
+      for (let i = 0; i < K; i++) for (let t = 0; t < N; t++) { let m = 0; for (let k = 0; k < N; k++) { const v = need[k][i] - slope * dist(k, t); if (v > m) m = v; } MAG[t][i] = m; }
+      const dl = ref.map(x => [x[2], 0, x[3]]), pen = t => (rows[t] || ref).map(x => x[1] * 100);
+      const unary = (t, i) => { const r = rows[t]; let c = MAG[t][i] + (MAG[t][i] > .5 ? pen(t)[i] : 0); if (r && r[i][0] < 0) c += 50 + B; for (const b of bad[t]) if (dot(b, dl[i]) > .86) c += 60; return c; };
+      const PV = (t, i) => times(dl[i], MAG[t][i]);
+      let cost = Array.from({length: K}, (_, i) => unary(0, i)), back = [];
+      for (let t = 1; t < N; t++) {
+        const nc = new Array(K), bk = new Array(K);
+        for (let i = 0; i < K; i++) { let bv = Infinity, bj = 0; const Pi = PV(t, i); for (let j = 0; j < K; j++) { const v = cost[j] + 2 * len(sub(Pi, PV(t - 1, j))); if (v < bv) { bv = v; bj = j; } } nc[i] = bv + unary(t, i); bk[i] = bj; }
+        cost = nc; back.push(bk);
+      }
+      let i = cost.indexOf(Math.min(...cost));
+      for (let t = N - 1; t >= 0; t--) { if (MAG[t][i] > 1e-6) plan[t][n] = {v: Math.min(MAG[t][i], B - 1.2), dir: dl[i]}; if (t) i = back[t - 1][i]; }
     }
   }
   return plan;
@@ -217,6 +245,10 @@ function solveClip(c) {
   const switches = hatSwitches(ks), cuts = c.cuts || [], loop = c.loop && c.loop[1] === c.len;
   const flight = HAT_FLIGHTS[c.name];
   const flightSrc = flight ? {A: sampleClip(c, flight.t0, ks, base).hwP, B: sampleClip(c, flight.t1, ks, base).hwP} : null;
+  const evTicks = new Set(Object.values(c.events));   // (the solver turns no blade at a clip event: V1 clear guard)
+  // (V1: a one-shot clip's blend-in ticks, before its first key ends at f0 (the compile below): never shown, the rig blends there from
+  // the previous clip's pose; the clear guards leave them as they are)
+  const evT2 = [...evTicks].filter(t => t >= 2 && t < c.len), pre0 = c.loop ? 0 : Math.min(c.blend ?? 3, ...evT2, c.len);
   const run = (plan, pass, fctx) => {
     const out = [];
     const warm = loop ? c.len : 0;   // loops settle their secondary motion over one silent cycle
@@ -227,7 +259,7 @@ function solveClip(c) {
       const p = sampleClip(c, tt, ks, base);
       const ref = refCore(p, refPrev); refPrev = ref.prev;
       const qq = overlay(retarget(p, c.name, tt), c.name, tt, {sh0: c.name === 'ending' ? SH0P : null, hatSwitches: switches, cuts, flight: fctx, flightSrc});
-      const o = solve(qq, hist, plan ? plan[tt] : {}, {pass, clip: c.name, t: tt, ref});
+      const o = solve(qq, hist, plan ? plan[tt] : {}, {pass, clip: c.name, t: tt, ref, ev: evTicks.has(tt), pre: t >= 0 && tt < pre0});
       out.push({o, p, q: qq, t: tt, ref});
     }
     return out.slice(warm);
@@ -246,7 +278,9 @@ function solveClip(c) {
     const fctx = flightCtx(p1);
     plan = planOf([p1], c);
     let p2 = run(plan, 2, fctx); passes = 2;
-    const over = p2.some((f, t) => Object.entries(f.o._guard).some(([n, v]) => gv(v) > gv(plan[t][n]) + .5));
+    // (V1: a clear guard that had to leave its planned direction re-plans too)
+    const turned = (n, v, pv) => CLEAR_GUARDS.includes(n) && pv && pv.dir && v.dir && gv(v) > .5 && dot(v.dir, pv.dir) < .5;
+    const over = p2.some((f, t) => Object.entries(f.o._guard).some(([n, v]) => gv(v) > gv(plan[t][n]) + .5 || turned(n, v, plan[t][n])));
     if (over) { plan = planOf([p1, p2], c); p2 = run(plan, 3, fctx); passes = 3; }
     fr = p2;
   }
@@ -317,7 +351,22 @@ const nearSolved = (x, y, n) => {
 };
 // the parts riding a body part (S2d round 2): keyed with it where the event check re-keys it
 const RIDERS = {head: ['face', 'hat', 'hat_strings']};
-const bladeErrors = [], wornErrors = [], tolErrors = [];
+const bladeErrors = [], wornErrors = [], tolErrors = [], clearErrors = [];
+// V1 (HR-47): no fist / hilt / guard sample (scarlet_pose.mjs FIST_AXIS on each forearm, HILT_AXIS + GUARD_RIM on the shown sword)
+// CLEAR_GATE or more inside her head / torso base box on what ships (the depth at the parts' scale); the parts keyed at a tick where
+// the interpolation brings one in. CLEAR_WORST: the deepest sample per clip and sample kind (the manifest's retarget table)
+const CLEAR_PARTS = ['arm_l', 'forearm_l', 'sword', 'sword_glow', 'arm_r', 'forearm_r', 'head', 'face', 'hat', 'hat_strings', 'torso'];
+const sDepth = (W, v, [lo, hi]) => { const L = rot(conjQ(v.q), sub(W, v.t)).map((x, i) => x / v.s[i]); return Math.min(L[0] - lo[0], hi[0] - L[0], L[1] - lo[1], hi[1] - L[1], L[2] - lo[2], hi[2] - L[2]) * Math.min(...v.s); };
+function clearDepths(get) {
+  const out = {}, hd = get('head'), to = get('torso');
+  const at = (v, P) => add(v.t, rot(v.q, P.map((x, i) => x * v.s[i])));
+  const deep = (pts, key) => { for (const [bn, bv, box] of [['head', hd, BOX.head], ['torso', to, BOX.torso]]) { if (!bv) continue; let d = -1; for (const W of pts) d = Math.max(d, sDepth(W, bv, box)); out[key + '.' + bn] = d; } };
+  for (const k of ['l', 'r']) { const v = get('forearm_' + k); if (v) deep(FIST_AXIS.map(P => at(v, P)), 'hand_' + k); }
+  const sw = get('sword');
+  if (sw) { deep(HILT_AXIS.map(P => at(sw, P)), 'hilt'); deep(GUARD_RIM.map(P => at(sw, P)), 'guard'); }
+  return out;
+}
+const CLEAR_WORST = {};
 // discrete channels the clips key: model swaps through rig/m/<part>/<value> (form-aware), stored states (bookkeeping)
 const HAND_PART = {hL: 'forearm_l', hR: 'forearm_r'};
 const STATE_STORE = {hat: 'Hat', sword: 'Sw', scab: 'Sc', cup: 'Cu', bottle: 'Bo'};
@@ -405,9 +454,12 @@ for (const c of CLIPS) {
     };
     const mx = {}, cts = {};
     let st = 1, res = 0, dyM = 0, liftM = 0;
-    for (const fr of F) {
+    // (V1: the contacts of a one-shot clip's blend-in ticks, before its first key ends, are not shown in game: the rig blends there
+    // from the previous clip's pose; the gates exempt them too)
+    const evT0 = [...new Set(Object.values(c.events))].filter(t => t >= 2 && t < c.len), f0c = c.loop ? 0 : Math.min(c.blend ?? 3, ...evT0, c.len);
+    for (const [t, fr] of F.entries()) {
       for (const [n, v] of Object.entries(fr.o._guard)) mx[n] = Math.max(mx[n] || 0, +gv(v).toFixed(2));
-      for (const [k, v] of Object.entries(fr.o._contacts)) cts[k] = Math.max(cts[k] || 0, +v.toFixed(3));
+      if (t >= f0c) for (const [k, v] of Object.entries(fr.o._contacts)) cts[k] = Math.max(cts[k] || 0, +v.toFixed(3));
       st = Math.max(st, fr.o._stretch.arm, fr.o._stretch.leg); res = Math.max(res, fr.o._support.bladeResidue);
       dyM = Math.max(dyM, Math.abs(fr.o._support.dy)); liftM = Math.max(liftM, fr.o._lift);
     }
@@ -604,6 +656,36 @@ for (const c of CLIPS) {
     for (const n of redo) compilePart(n);
     wornSplit(); syncRiders();
   }
+  // V1 (HR-47): the fists, the hilt and the guard out of her head / torso as shipped (after the blend-in; cut ticks and the tick
+  // after them exempt): a tick where the interpolation brings a sample in keys the arms, the sword and the head / torso there
+  {
+    const clearT = F.map((fr, t) => free(t) && !cuts.includes(t) && !cuts.includes(t - 1));
+    const shipped = t => n => { const v = compiledD[n][t]; return shown(v) ? fromDisplay(n, v) : null; };
+    const worstAt = t => Math.max(-1, ...Object.values(clearDepths(shipped(t))));
+    for (let k = 0; k < 2; k++) { riderSplit(CLEAR_PARTS, clearT, t => CLEAR_GATE - .002 - worstAt(t)); syncRiders(); }
+    wornSplit();
+    const W = {};
+    F.forEach((fr, t) => {
+      if (!clearT[t]) return;
+      const d = clearDepths(shipped(t));
+      for (const [k, v] of Object.entries(d)) { if (!(k in W) || v > W[k]) W[k] = v; if (v >= CLEAR_GATE) clearErrors.push(`${c.name} t${t} ${k} ${v.toFixed(3)} b inside`); }
+    });
+    CLEAR_WORST[c.name] = Object.fromEntries(Object.entries(W).map(([k, v]) => [k, +v.toFixed(3)]).sort());
+    retargetTable[c.name].clear = CLEAR_WORST[c.name];
+  }
+  // V1: a part whose shipped frame drifts beyond TOL x 1.25 after its first key (a span starting the tick after a reveal snap holds
+  // the snap's value one tick: the scabbard moved by scabFwd under the seated hilt's reveal, cs1 104) keys at that tick too
+  for (const n of PART_NAMES) {
+    if (HIDDEN.includes(n)) continue;
+    for (let guard = 0; guard < 20; guard++) {
+      const seq = keyLists[n].seq;
+      let bad = -1;
+      for (let t = firstEnd[n] + 1; t <= c.len && bad < 0; t++) if (free(t) && !cuts.includes(t) && !cuts.includes(t - 1) && !nearSolved(compiledD[n][t], written(seq[t]), n)) bad = t;
+      if (bad < 0 || extraSplit[n].has(bad)) break;
+      // (the scabbard and its seated hilt, the sword and its glow share one transform: they key together)
+      for (const m of [n, ...({scabbard: ['hilt_sheathed'], hilt_sheathed: ['scabbard'], sword: ['sword_glow'], sword_glow: ['sword']}[n] || [])]) { extraSplit[m].add(bad); compilePart(m); }
+    }
+  }
   for (const f of eventFails()) bladeErrors.push(f.msg);
   { const w = wornSplit(); if (w) wornErrors.push(`${c.name} t${w.t}: the worn brim ${w.g.toFixed(4)} b over the head's top corners as shipped (< 0.001)`); }
   // S2d round 3 (C3-1): after each part's first key (before it: the blend-in from the previous clip's pose), what ships stays
@@ -703,6 +785,7 @@ const fail = (title, list) => { if (list.length) { const m = `${title}:\n  ${lis
 fail('floor (no shown element below the feet)', floorErrors);
 fail('the blade through her body at a clip event', bladeErrors);
 fail('the worn hat on the head as shipped', wornErrors);
+fail('a fist / hilt / guard sample inside her head or torso as shipped (V1, HR-47)', clearErrors);
 fail('what ships off the solved frame after the first key (beyond TOL x 1.25)', tolErrors);
 fail('rotations above 120 degrees per tick or per key', motionErrors);
 fail('a correction guard at its bound (scarlet_pose.mjs GUARD_BOUND)', boundErrors);
@@ -908,7 +991,7 @@ const manifest = {
   retarget: {factors: {S_LEG: +S_LEG.toFixed(6), S_ARM: +S_ARM.toFixed(6), S_SCAB: +S_SCAB.toFixed(6), K_ARC: +K_ARC.toFixed(6)},
     patches: PATCHES.map(P => ({id: P.id, clip: P.clip, in: P.in, out: P.out, ...(P.set ? {set: P.set} : {}), ...(P.add ? {add: P.add} : {}), why: P.why})),
     iai_delta: IAI_DELTA, sh0: SH0P, hip_dir: hipDirChannels(), hat_flights: HAT_FLIGHTS, aside: ASIDE, bounds: GUARD_BOUND, slopes: GUARD_SLOPE, clips: retargetTable,
-    _doc: 'per sample: retarget (angles kept; pos x k(lf); soles about the hip joint x S_LEG; grip distances x S_ARM + the lock rule; planted hands x S_LEG; scOff x S_SCAB; world-hat spots) -> overlay (PATCHES, the hat hand-overs, the flights) -> solve. clips: per clip the solver passes, the largest value of every correction guard (degrees, or cm for drop / bPush / close / hatBackZ / hatPush / hatClear, percent for armUp; +/- = the two senses), the largest contact distance per kind, the largest IK stretch, the blade residue inside the body (b), the largest support move and lift'},
+    _doc: 'per sample: retarget (angles kept; pos x k(lf); soles about the hip joint x S_LEG; grip distances x S_ARM + the lock rule; planted hands x S_LEG; scOff x S_SCAB; world-hat spots) -> overlay (PATCHES, the hat hand-overs, the flights) -> solve. clips: per clip the solver passes, the largest value of every correction guard (degrees, or cm for drop / bPush / close / hatBackZ / hatPush / hatClear / gripClear / handClearL / handClearR / scabFwd, percent for armUp; +/- = the two senses), the largest contact distance per kind, the largest IK stretch, the blade residue inside the body (b), the largest support move and lift; clear (V1, HR-47): the deepest fist / hilt / guard sample in the head / torso base box as shipped (b; < 0 outside; the build fails at >= 0.01)'},
   paint_roles: PAINT_ROLES,
   budgets: {atlas_px: atlasPx, atlas_budget: ATLAS_BUDGET, sprites: Object.keys(sprites).length, elements_at_rest: ELEMENTS, elements_budget: EL_BUDGET,
     parts: PART_NAMES.length, models: Object.keys(models).length, key_files: keyFiles, keys: keyLines, rig_functions: fnFiles.files, rig_bytes: fnFiles.bytes,

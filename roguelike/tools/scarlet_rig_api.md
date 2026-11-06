@@ -225,11 +225,17 @@ rider-group sync that ends a part's first key before the blend's end starts a fi
 that a split left unfitted (a floor / planted-foot split inside the forced first key, an event or dense split inside a fitted
 span) is fitted again, and a gate checks that after each part's first key what ships stays within TOL × 1.25 of the solved
 frame on every tick (cut ticks and the tick after them exempt). A clip the module starts from the hidden rig has no pose to
-blend from: `g_dive` (after g_vert's 'gone') takes `blend: 1`, so the whole body shows at t1. Numbers of the S2d build: 29
-parts, 47 clips, 2 600 rig functions (5.70 MB), 18 800 keys in 2 084 key files, 62 models, 27 painted sprites + the skin
-(47 872 px), 224 elements at rest (ghost 224). The suite `S:hr/tests/test_rig.py` (149 checks with the S2d sections;
-`--rebuild` + 3: two builds byte-identical) replays the shipped key files; on a manifest without the S2d blocks the new
-sections are skipped.
+blend from: `g_dive` (after g_vert's 'gone') takes `blend: 1`, so the whole body shows at t1. V1 (HR-47, 11-06): a gate fails
+the build where a fist, hilt or guard sample (§9.3: `FIST_AXIS`, `HILT_AXIS`, `GUARD_RIM`) lies `CLEAR_GATE` (0.01 b) or more
+inside her head or torso base box on what ships, on every tick after a one-shot clip's blend-in (cut ticks and the tick after
+them exempt; ghost ticks at their scale); before reporting, the arms, the sword and the head / torso key at a tick where the
+interpolation brings a sample in (the deepest per clip and kind: the manifest's `retarget.clips[*].clear`); and a part whose
+shipped frame drifts beyond TOL × 1.25 after its first key keys at that tick (the scabbard with its seated hilt, the sword with
+its glow). The manifest's per-clip contact maxima leave out a one-shot clip's blend-in ticks (never shown in game: the rig blends
+there from the previous clip's pose). Numbers of the V1 build: 29 parts, 47 clips, 2 640 rig functions (5.72 MB), 18 881 keys in
+2 119 key files, 63 models, 27 painted sprites + the skin (47 872 px), 224 elements at rest (ghost 224). The suite
+`S:hr/tests/test_rig.py` (161 checks with the S2d sections and V1's `clear` / `gait`; `--rebuild` + 3: two builds byte-identical)
+replays the shipped key files; on a manifest without the S2d blocks the new sections are skipped.
 
 ## 9. S2d: the skeleton, the retarget, the solver
 
@@ -252,7 +258,14 @@ ticks after the kneel) the sword out at her left through the kip and the kneel, 
 +14 / head −14 for the cross-draw reach, `SIP` (intro 66-94) the cup at her lips, `SH0` (ending 297-326) the sheathe entry
 on the scabbard's axis (the builder's probe `SH0'`), `ASIDE` (intro 226-246, round 2) the feet step with seq.py's 1.1-b
 glide aside off the seat stone (four 0.55-b side steps, the stance sole kept on its world spot, the swing sole lifted
-<= 0.08 b over its planted height: `fLiftL` / `fLiftR`). The face spot of the world hat (LY) is parallel to her face, its front
+<= 0.08 b over its planted height: `fLiftL` / `fLiftR`). V1 (11-06): `A10-HIGH` (a10 4-20) a10's airborne two-hand guard
+held upright before her face (the player-size arms cannot hold S2a's blade laid back over her head, and the dive strike had to
+bring the fists through it); `DRAW-E` (intro_end 47-60) the scabbard of the cross-draw held lower and out across her front, its
+body toward her right and down, the hilt to her left (the fist on it off her torso and head); `IAI` now ramps out over cs1
+161-164, through the draw at 162; `WALK` (walk, HR-49) a longer stride: each sole planted 0.38 b ahead of its hip joint at its
+contact (0 / 12) and swept steadily 0.76 b back over its 12-t stance, swung forward lifted <= 0.08 b, the hips bobbing 0.10 ->
+0.045 b down; `STRAFE-L` / `STRAFE-R` ASIDE's lifted side steps at the strafe speed, four a cycle, the feet 0.26 -> 0.97 b apart
+in a 0.10-b crouch (the stance sole swept in at 0.071 b/t; the walk / strafe timing, events and api.WALK_SPEED unchanged). The face spot of the world hat (LY) is parallel to her face, its front
 toward her feet (as the flight that lifts it at 27: no spin), the smallest lift / tilt that clears her forearms.
 
 ### 9.3 The solver's contacts (`scarlet_pose.mjs` `solve`)
@@ -276,18 +289,35 @@ of her head and torso (`hatClear`: pushed out along the nearest box face, the ri
 strings (their painted strands, the loop and the strand below it: round 2) lag the hat by ≤ 30°, ease their gravity pull /
 lag, then turn (`strHead`, its sense kept through a swing over her head), out of the head; the worn hat is not floor-turned
 (the support lift carries it with her); the seated sash clears the stone's top
-(`sashSeat`); the flying world hat is pushed out of her body; the support pass: the touch rule (weight 1 − wSeat) and the air
+(`sashSeat`); the flying world hat is pushed out of her body; V1 (HR-47): the fists, the hilt and the guard keep out of her head and torso base boxes (step 9b, the guards `gripClear` —
+the sword grip, the blade translated with it, its rotation (the attack direction) kept — and `handClearL` / `handClearR` — a free
+hand's target, a two-hand right fist's own move, the hand-held scabbard with the left hand on its hilt): a vector in cm in the
+torso frame, horizontal there only, cleared by `CLEAR_M` 0.02 for the fist's centre line (`FIST_AXIS`, the lower half of the
+forearm), the hilt's axis (`HILT_AXIS`, pommel -> guard) and the guard disc (`GUARD_RIM`, r 0.10), in the head also the fist's
+box; candidates of 16 directions moved rigidly, then verified with the arms solved, keeping the hand's other terms (a two-hand
+right fist within 0.10 / 0.11 b of its spot, the left hand on the scabbard's hilt, the blade no deeper into her body, its floor
+clearance, the held scabbard pointing away); a stage 2 after the blade-body guard and `groundSword` (a blade turned about the
+grip swings the pommel), and where no move clears there (not at a clip event) a turn of the blade about the grip <= 30°, added to
+`bTurn`; the hip scabbard's mouth moves forward through a draw / sheathe blend (`scabFwd`); a one-shot clip's blend-in ticks
+take only the planned push. The support pass: the touch rule (weight 1 − wSeat) and the air
 rule (the airborne height × (1 − wRoot) + 0.002 × wRoot: a full lying / kneeling / seated root stays on its support), then the
 last-resort lift.
 
 ### 9.4 Correction guards and planning (`GUARD_BOUND`, `GUARD_SLOPE`; the manifest `retarget.bounds` / `slopes`)
 Pass 1 measures every guard; pass 2 (and 3 when a guard outgrows its plan) applies the plan = the per-tick values dilated by
-the guard's slope (degrees / t, or cm / t for drop, bPush, close, hatBackZ, hatPush, hatClear; percent / t for armUp; loops
-dilate circularly; the vector guards keep the direction of their largest tick). A planned value at its bound is a build error.
+the guard's slope (degrees / t, or cm / t for drop, bPush, close, hatBackZ, hatPush, hatClear, gripClear, handClearL, handClearR,
+scabFwd; percent / t for armUp; loops
+dilate circularly; the vector guards keep the direction of their largest tick). V1: the clear guards (`gripClear`,
+`handClearL`, `handClearR`) are planned one direction per tick over the whole clip by least cost (Viterbi over 16 horizontal
+directions in the torso frame: each tick's rigid move from none along each, reported by the solver as `tab`, dilated by the slope
+per direction; the preference cost — the front, then the hand's side, behind or across her head dearest; + 0.5 b + the bound where
+a direction cannot clear; + 0.6 b where a pass's planned push along it failed, `bad`; and 2 x the change of the push between
+ticks), so a hand pushed round her head one way keeps that way while it holds; a clear guard that left its planned direction
+re-plans (pass 3). A planned value at its bound is a build error.
 The manifest `support` (per clip: `low_ref`, the root weight `w_root`, the seat / lie (every full lying root) / kneel / feet /
 touch / air / ghost / held / free_r spans, cuts, lifts, `hat_push`, the hand contacts) and
-`retarget.clips` (passes, the largest correction per guard, contact distance per kind, stretch, blade residue, support moves)
-are the suites' inputs.
+`retarget.clips` (passes, the largest correction per guard, contact distance per kind, stretch, blade residue, support moves; V1:
+`clear`, the deepest fist / hilt / guard sample in the head / torso as shipped) are the suites' inputs.
 
 Debug: `--debug-dp <dir>` writes `hr_dbg/<clip>/<t>` (every part's compiled transform and the hand / face models of that tick)
 for the offline renderer (`S:az/understand/rigtech_render.py --spawn rlk:boss/scarlet/rig/spawn --apply rlk:hr_dbg/<clip>/{t}
