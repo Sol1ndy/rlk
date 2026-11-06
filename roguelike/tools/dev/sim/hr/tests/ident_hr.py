@@ -26,6 +26,7 @@ items.md and pack.mcmeta. A file of the scope that is new, changed or gone must 
   F3 (review)   the pack-wide lines of the lead's decisions: F:view/{tick,ride_tick,sel_xhair} (HR-08: vBig counted down in
                 every view), F:lvup/tick (HR-34: no F5 sneak-tap during a boss intro), F:items/hook/on_dash (HR-09: the
                 sword's dash window)
+  release       pack.mcmeta: the build stamp at the end of its description (README 0-5 step 3; V-I, 11-06)
 
 Prints every allow-listed file that changed (grouped) and fails on anything else (FAIL lines name the files).
 """
@@ -74,6 +75,8 @@ ALLOW = {
     + [F + 'lvup/tick.mcfunction', F + 'items/hook/on_dash.mcfunction'],
     # F-I (f2-8, V2R-02): start_go shows the bars only while the spawn hook left them on (#mbBarOff; build_mboss_core.py)
     'F-I review fixes (pack-wide lines)': [F + 'mboss/start_go.mcfunction'],
+    # V-I (11-06): every release re-stamps the datapack's pack.mcmeta description (README 0-5 step 3)
+    'release build stamp (README 0-5 step 3)': ['pack.mcmeta'],
 }
 PATS = [(grp, re.compile(p)) for grp, ps in ALLOW.items() for p in ps]
 
