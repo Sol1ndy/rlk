@@ -405,6 +405,7 @@ if (process.argv[1] && process.argv[1].endsWith('scarlet_retarget.mjs') && proce
     'print(json.dumps({n: {"len": c[0]} for n, c in api.CLIPS.items()}))'], {cwd: new URL('..', import.meta.url).pathname, encoding: 'utf8'}));
   for (const c of [...C.CLIPS, ...cine]) {
     if (which !== 'all' && c.name !== which) continue;
+    if (!api[c.name]) continue;      // (lane H1c, 11-11) a clip outside the contract (a cinematic row the rebuilt contract dropped) is not built either
     const L = api[c.name].len, cc = {...c, len: L}, base = c.base || C.DEFAULT_POSE, ks = C.accumulate(cc, base);
     const rows = [];
     for (let t = 0; t <= L; t++) {

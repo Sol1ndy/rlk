@@ -1,7 +1,7 @@
 # lane H1c (홍련 rebuild: what the fight looks like) — progress
 
 Branch `wip/combat-hr1c` (from `origin/wip/combat` c7dcc4fbf; merged: `origin/wip/combat` 6522feef5 and
-`origin/wip/combat-hr1` d4befffdd = lane H1's build 2 with its interface commit 15fad96a9), worktree `<S>/cb/wt_hr1c`, pack
+`origin/wip/combat-hr1` c1e53b116 = lane H1's finished fight core with its interface commit 15fad96a9), worktree `<S>/cb/wt_hr1c`, pack
 copy `<S>/rp_hr1c` (`<S>` = the scratchpad of `h_common.md`). Contract: `hr_design.md` §2.1-§2.3, §5.4, §8.2-§8.6. Owner of
 the 12 new fight clips in `tools/scarlet_clips.mjs` and of the H1 block of `tools/build_mboss_hr_fx.py`.
 
@@ -22,7 +22,7 @@ the 12 new fight clips in `tools/scarlet_clips.mjs` and of the H1 block of `tool
   | `kcut` | sprinter's crouch, the blade hidden behind her (tip over her back); flat whip from behind her left across her front 19-22 (cut 22), up to her right 23, a return cut down across 25-29 |
   | `mx` | low crouch, the blade low behind her left; the X in two strokes round its tick: rising lower left → upper right 13-15, turned over above her 16, falling upper left → lower right 17-20; swirl up over her right (cue 21), one turn to her left with the blade flat (dome 28) |
   | `nb` | hangs bowed over the player; b1 from her upper right down to her left front (its plane 30° left of her aim), b2 from her upper left down to her right front (30° right), b3 a straight two-handed chop; lands low 46 |
-  | `q_grab` | sinks, the open right hand reaching out (the blade low at her left); flies flat with the arm stretched ahead 16-19; the hand closes before her (grab 20); 20-34 = the miss (snatches at air, straightens) |
+  | `q_grab` | sinks, the open right hand reaching out (the blade low at her left); flies flat with the arm stretched ahead 16-19; the hand closes before her (grab 20) and holds 21 (the module branches at `api.Q_AIR_T0` = 21: `q_air` 0 is this pose); 21-34 = the miss (snatches at air, straightens) |
   | `q_air` | both arms heave up (throw 0-2), diagonal cut from her upper right (beam 22), rises a little with the blade reversed straight down before her chest in both hands (cue 31), comes down behind it (hit 38, land 40); second leap: the blade thrust straight up, the free arm spread (52-71), brought down to point at the player (pillar 74), lands 84 |
 - **`tools/scarlet_retarget.mjs`**: one line, `HAT_FLIGHTS.grog_in` (the hat's flight 6-10 from her head to DOWN's leg spot).
   The file has no owner in §8.3 and the declared flights live there; the line stands apart from the `HAT_FLIGHTS` literal so
@@ -39,8 +39,8 @@ the 12 new fight clips in `tools/scarlet_clips.mjs` and of the H1 block of `tool
     `qi_ring` needs nothing new (rendered at r 26 / 30 chest height and r 45 c 2 knee height).
   - sounds `parry_cue flash_blue ult_cut1 ult_cut2 sky_pillar` (+ H1's `kcut_go`): recipes are `api.KIT_SOUND_RECIPES`
     (equal to §2.1-§2.2); the kit writes `fx/snd/<name>`.
-- **Fitted to lane H1's calls** (its build 2, merged here; `pat_p1` / `pat_p2` / `pat_ghost` / `test_scarlet` pass on the
-  merged tree):
+- **Fitted to lane H1's calls** (its finished core, merged here; `pat_p1` / `pat_p2` / `pat_ghost` / `test_scarlet` /
+  `test_gauge` pass on the merged tree):
   - `ult_web` / `ult_burst` are laid over the floor whatever the caller's height (H1 calls them at her body, 1.2 b up);
     `ult_web` draws the world only, the `web` overlay is the module's `fx/hud/ovl` call (H1 calls it beside the preset).
   - `qi_beam` has three forms by the call: aimed (P-q: `facing` the lock from the air → along the facing), level from
@@ -51,6 +51,8 @@ the 12 new fight clips in `tools/scarlet_clips.mjs` and of the H1 block of `tool
   - `tests/test_clips_h1c.py` (new): the 12 clips as shipped — contract, joins with the stance clips / `q_grab` → `q_air` /
     `grog_in` → `down`, no root motion, airborne spans (§8.5), the blade at every hit tick against its hazard's shape, the
     blade readable from the F5 lens at every cue / flash tick.
+  - `tests/test_rig.py`: the clip count of the rebuilt contract (59). `tools/scarlet_retarget.mjs --dump all` skips a
+    clip outside the contract.
   - `tests/test_kit.py`: counts for the rebuilt contract (50 + 6 presets, 104 + 5 sounds + `kcut_go` once declared),
     heights / variants for the six presets, the `web` glyph size, a new section `hr1c` (the yellow sizes, the cue,
     flash_blue's timing, the web lines at any caller height, the burst, the sky mark = lines only, the pillar, the beam's
@@ -58,14 +60,21 @@ the 12 new fight clips in `tools/scarlet_clips.mjs` and of the H1 block of `tool
     them); the pitch section knows the aimed beam.
   - `s1k/render/render_hr.py` (new): effect strips of the kit from the F5 camera (the hr kit had no renderer in the repo).
 
-## Gates (the merged tree, 11-10)
+## Gates (the merged tree = H1's final head + this lane, 11-11)
 - Builds: rig 59 clips, 0 stand-ins, 8 cinematic placeholders (H2c's); kit 56 presets, 110 sounds, 36 glyphs;
   `regen_all.sh` 0 failures; `check_mboss_pack.py` 0 problems; `api.py --check` ok.
-- `test_clips_h1c.py` 296 / 296. `test_kit.py` 15 062 / 15 072: the 10 failures are other lanes' (see Requests).
-- `test_rig.py` (run statement by statement: it stops at its 11-06 cinematic section): 140 passed, 13 failed, none in
-  the 12 fight clips (the 47-clip count, the 8 cinematic placeholders × 6, `seq.py`, the intro seat × 2, the skin file
-  that is not in the container, `scarlet_retarget --dump all` on the stale cinematic rows).
-- Lane H1's suites on the merged tree: `pat_p1` 529 / 529, `pat_p2` 67 / 67, `pat_ghost` 65 / 65, `test_scarlet` 47 / 47.
+- `test_clips_h1c.py` 297 / 297.
+- `test_kit.py` 15 074 / 15 082. Its pins of the 11-06 fight are rebased on the rebuilt module (the sound count, the
+  flashes between `follow_on` / `follow_off`, the dash streaks on `core.dash`, tri's thrust streak, kcut's three lines
+  through the lock at `api.KCUT_YAW`, the deflect's effects found in the repel sequence's start). The 8 failures left
+  are one finding, not a pin: see Requests (the deflect in first person).
+- `test_rig.py` (run statement by statement: its cinematic section raises on the 11-06 rows): 142 passed, 12 failed, none
+  in the 12 fight clips: the 8 cinematic placeholders (× 6 checks), `seq.py` (`lead60`), the intro seat (× 2), the skin
+  file that is not in the container, the dump's clip count 56 of 59 (`lead60 lead5 lead_re` have no source yet). Its clip
+  count is 59 now; `scarlet_retarget.mjs --dump all` skips a clip the contract dropped (it raised on `sq1`).
+- Lane H1's suites on the merged tree: `pat_p1` 529 / 529, `pat_p2` 67 / 67, `pat_ghost` 65 / 65, `test_scarlet` 47 / 47,
+  `test_gauge` 22 / 22. `ident_hr` passes.
+- `gen_check_hr.py --rp` (run to its end, about an hour: seven rig builds): see the final report for its result.
 - Real server: `loadcheck.sh` 0 function load failures. Pack: `rplint.py` 0, `atlas_px.py` 12 919 040 px (unchanged).
 
 ## Decisions / deviations
@@ -87,17 +96,18 @@ the 12 new fight clips in `tools/scarlet_clips.mjs` and of the H1 block of `tool
   the clip's floor; the pelvis stays on the anchor's axis, so no root motion in the plane).
 
 ## Requests to other lanes
-- **H1**: (1) kcut's big yellow: `api.FLASH` gives every yellow `yellow_tell {t:6}`; kcut's is `{t:106}` (Ø 2.0, §2.2).
-  (2) `rings` in P1 has four rings: play the next clip by clip tick 49 — the fifth turn starts there (`RINGS_END[1] = 54`
-  shows 5 ticks of it; `ULT_AFTER 6` = tick 50 blends from the coil, fine). (3) `test_kit.py`'s `calls` / `qline` sections
-  still describe the 11-06 module: `follow_on .. follow_off` wants ≥ 4 wrapped tells (a13 / r2 are gone: 3), A9's `qi_cut`
-  with `core.a9` (now `core.dash`), kcut's three `qi_line` at markers (the harness has no lock marker), tri's `qi_line`
-  axis: 7 failures, H1's module or the suite's expectations. (4) `test_rig.py` still holds the 47-clip contract and the
-  11-06 cinematic events.
+- **H1 (core)**: (1) kcut's big yellow: the size rides on `{t}`: pass `yellow_tell {t:110}` (100 + the ticks; today
+  `{t:10}` = the plain Ø 1.6). No contract change. (2) `rings` in P1 has four rings but plays on to `RINGS_END[1]` = 54:
+  the clip's fifth turn starts at 49, so 5 ticks of a ring-less spin show. Play the stance at clip tick 49 in P1 (the
+  `ult` start at 50 already blends from the coil). (3) The deflect in first person: the 11-06 judge drew its gold
+  starburst and light column twice (`unless entity @a[tag=rlk_body]` at the body; `if entity …` 1.8 b before the eyes);
+  the repel stand-in of `core.py` (1173-1175) has only the first form: in first person the starburst is 1462 / 626 / 0 /
+  0 px and the column 0 px at looks up 30-85° (`test_kit`'s 8 failures; HR-45 / VF2-1-03). H1's stand-in or H2's real
+  repel sequence needs the first-person lines back.
 - **H2 / H2c**: the `gold` glyph goes next to part 1 of the H1 block (after the `GLYPHS` literal, before its assert); both
-  blocks add one `GLYPHS[...]` line there, so the merge may ask to keep both lines. `test_kit.py`'s 3 other failures wait
-  for the real sequences (`keep_on .. keep_off` round CS3's kick flash, the 3 player-anchored effects, the repel column /
-  the judge's starburst in first person).
+  blocks add one `GLYPHS[...]` line there, so the merge may ask to keep both lines. `test_rig.py`'s cinematic section
+  (the `WANT` / `HANDOVER` rows with `sq1`, `lead_down`, `lead_stand`) is theirs to rebase with the 8 cinematic clips;
+  `test_kit.py` checks CS3's kick flash between `keep_on` / `keep_off` once a sequence calls it.
 
 ## Pack files (added / changed in `<S>/rp_hr1c`; all regenerated by the two generators)
 - `assets/rlk/font/mboss_hr.json` (5 providers more), `assets/rlk/textures/font/mboss_hr/web.png`, `web_1.png` … `web_4.png`.
