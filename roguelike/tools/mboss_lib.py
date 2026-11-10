@@ -623,6 +623,43 @@ def bars(on):
     return BARS_FNS[int(on)]
 
 
+# FN-cam (홍련 rebuild, lane H2; tools/dev/plan/combat/hr_design.md §3.0 / §5.2): the cinematic lock. A module asks for it
+# every tick of a locked sequence with cam_req(live): #mbCam mb 1 (mboss/main zeroes it at its top, so a paused fight, a
+# missing player or body and every exit path drop the request by themselves) and #mbCamId mb = the live camera stand (1 =
+# rlk_mb_cam1, 2 = rlk_mb_cam2). rlk:tick reads the request right after mboss/main: 1 -> mboss/cam/hold (the player in
+# spectator mode on the live stand, `spectate` issued again every tick because sneaking leaves a spectated entity), else
+# mboss/cam/release for a player still carrying the hold tag. The stands are marker armour stands (a LivingEntity, so
+# camera_distance 0 holds in F5; eye height 0: ArmorStand.MARKER_DIMENSIONS = fixed(0, 0), so a stand's position is the
+# eye point), tagged rlk_room rlk_mb_aux (they go with the fight's helper entities) and rlk_pet (rlk:tick's mob setup
+# skips them). A hard cut = the other stand made live; a move = one tp per tick on the live stand. The module spawns them
+# with cam('spawn') (idempotent, at the execution position) and removes them with cam('kill').
+CAM_REQ, CAM_ID = ('#mbCam', 'mb'), ('#mbCamId', 'mb')
+CAM_TAG, CAM_TAGS, CAM_HOLD_TAG = 'rlk_mb_cam', {1: 'rlk_mb_cam1', 2: 'rlk_mb_cam2'}, 'rlk_mb_camh'
+CAM_GM_TAGS = {'survival': 'rlk_mb_cgS', 'creative': 'rlk_mb_cgC'}    # the game mode to give back (neither: adventure)
+CAM_EYE = 0.0                                                          # the stand's eye above its position (b)
+CAM_FNS = ('spawn', 'hold', 'release', 'kill')
+
+
+def cam_sel(i):
+    """The selector of camera stand i (1 = A, 2 = B)."""
+    return f'@e[type=minecraft:armor_stand,tag={CAM_TAGS[int(i)]},limit=1]'
+
+
+def cam_req(live=None):
+    """The lock request lines of one tick: #mbCam mb 1 and, when given, the live stand (#mbCamId mb 1 | 2)."""
+    out = [f'scoreboard players set {CAM_REQ[0]} {CAM_REQ[1]} 1']
+    if live is not None:
+        assert int(live) in CAM_TAGS, live
+        out.append(f'scoreboard players set {CAM_ID[0]} {CAM_ID[1]} {int(live)}')
+    return out
+
+
+def cam(call):
+    """function rlk:mboss/cam/<spawn | kill | release> (hold is rlk:tick's; release: @s = a player, idempotent)."""
+    assert call in CAM_FNS and call != 'hold', call
+    return f'function rlk:mboss/cam/{call}'
+
+
 def repool(pct):
     """Pool split: the body's max HP = #mbTot x pct / 100, full, the bar refills over 30 t."""
     assert 1 <= int(pct) <= 100

@@ -50,7 +50,7 @@ is used unchanged. Two builds are byte-identical.
 | `play/<clip>` | queues the clip: the next `tick` runs its tick 0 (`hrRigT` −1 → 0). Called before `tick` in the same game tick, event e runs e game ticks later |
 | `start/<clip>` | applies tick 0 now (`hrRigT` 0) |
 | `face/set {yaw}` | macro: `rotate @s $(yaw) 0` |
-| `face/player` / `face/track` | turn to the nearest player (at once / ≤ 12° per call) |
+| `face/player` / `face/track` | turn to the player's body `@e[tag=rlk_body,limit=1]` (at once / ≤ 12° per call; H2: the RIGLIB look target, because her cutscenes hold the player on a camera stand as a spectator) |
 | `flash` | hit feedback: every body part glows white-pink 3 ticks |
 | `state/hidden` / `state/normal` | every part at scale 0 where it stands (no clip runs, the follow continues) / visible again (the current clip restarts from tick 0); any `play` / `start` also shows the rig |
 | `look/<channel>/<value>` | §3 |

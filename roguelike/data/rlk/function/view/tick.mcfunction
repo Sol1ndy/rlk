@@ -13,6 +13,9 @@ execute if score @s vMapR matches 1.. run scoreboard players remove @s vMapR 1
 scoreboard players enable @s rlkMenu
 execute if score @s rlkMenu matches 1.. run function rlk:view/menu_do
 function rlk:view/burst_camera_tick
+# 연출 카메라 잠금(FN-cam, mboss/cam/hold: 태그 rlk_mb_camh, 관전 모드로 카메라 거치대를 보는 중): 아바타 이동 · 조준 · 받침 다시 태우기를
+# 쉰다(아바타는 그 자리에 남고, 풀릴 때 mboss/cam/release 가 플레이어를 아바타 자리로 돌려 다시 태움)
+execute if entity @s[tag=rlk_mb_camh] run return 0
 execute if score @s vMap matches 1 run return run function rlk:view/map_tick
 # 시점은 F5 위쪽 시점 하나(1인칭 · 숄더뷰는 11-10 에 없앰). 개발자 모드만 아바타 없이 플레이어가 몸(view/fps_tick)
 scoreboard players set #eff view 0

@@ -44,10 +44,13 @@ TOK = {
     '@SAFEP@': L.num(SAFE - 0.5), '@WALKP@': L.num(WALK - 0.7),
     # forceloaded chunk box of the arena (load, room/setup, mboss/start; released by uninstall, room/remove)
     '@FL@': f'{BX0} {BZ0} {BX0 + 47} {BZ0 + 47}',
+    # FN-cam: the hold tag of a player locked on a camera stand, the two stands, the boss body
+    '@CAMH@': L.CAM_HOLD_TAG, '@CAM1@': L.cam_sel(1), '@CAM2@': L.cam_sel(2),
+    '@BODY@': '@e[type=minecraft:husk,tag=rlk_mb_body,limit=1]',
 }
 out = L.Out(owned_dirs=['mboss/d', 'mboss/hz', 'mboss/pj', 'mboss/pull', 'mboss/mv', 'mboss/aux',
                         'mboss/line', 'mboss/test', 'mboss/box', 'mboss/cb', 'mboss/ar', 'mboss/px', 'mboss/music',
-                        'mboss/push', 'mboss/cine', 'mboss/sp'],
+                        'mboss/push', 'mboss/cine', 'mboss/sp', 'mboss/cam'],
             owned_files=[])
 CORE_TOP = set()
 
@@ -234,6 +237,12 @@ w('init', '\n'.join(
        '# again; rlk:tick syncs the attribute modifiers through mboss/lowg_on|off). Hazard re-arm clock (hz/all).',
        'execute unless score #mbLowG mb matches 0..1 run scoreboard players set #mbLowG mb 0',
        'execute unless score #mbHzClk mb matches 0.. run scoreboard players set #mbHzClk mb 0',
+       '# FN-cam: the cinematic lock is a per-tick request too (#mbCam 1 + the live stand #mbCamId 1 | 2; rlk:tick ->',
+       '# mboss/cam/hold | release). A /reload ends a lock: the request is off and a held player is released here, before',
+       '# the stands die with the other helper entities below (the module reload hook never resumes a locked sequence).',
+       'scoreboard players set #mbCam mb 0',
+       'execute unless score #mbCamId mb matches 1..2 run scoreboard players set #mbCamId mb 1',
+       f'execute as @a[tag={L.CAM_HOLD_TAG}] run function rlk:mboss/cam/release',
        'scoreboard players set #mbNoDodge mb 0',
        'scoreboard players set #mbNoParry mb 0',
        '# combat overhaul C: the unparriable-attack glint spacing (np_glint) and a module that draws its own warnings (#mbNpOwn 1)',
@@ -342,6 +351,7 @@ data remove storage rlk:mboss spmet
 data remove storage rlk:mboss spforce
 data remove storage rlk:mboss spid
 data remove storage rlk:mboss spg
+data remove storage rlk:mboss camret
 ''' + ''.join(f'data remove storage rlk:mboss built_{aid}\ndata remove storage rlk:mboss look_{aid}\n' for aid, _ in ARENAS if aid != 'plaza')
   + '\n'.join(f'scoreboard objectives remove {o}' for o in OBJECTIVES))
 
@@ -979,6 +989,10 @@ kill @e[tag=rlk_mb_body]
 ''')
 w('cleanup_fight', '''
 # End of a fight without forgetting cur/ret (won reads them afterwards).
+# FN-cam: a held player is released first (before the module cleanup, the stands and the body go, and before the
+# callers move the player: mboss/won -> tp_out), and the request ends with the fight
+execute as @a[tag=@CAMH@] run function rlk:mboss/cam/release
+scoreboard players set #mbCam mb 0
 execute if score #mbId mb matches 1.. run function rlk:mboss/d/cleanup
 function rlk:mboss/cleanup_aux
 function rlk:mboss/ar/sweep
@@ -1075,6 +1089,9 @@ w('main', '''
 # Low gravity is a per-tick request: cleared here, set again by the running module's tick (#mbLowG mb 1), so a
 # paused fight, a missing player or body, the intro, the death sequence and every exit path drop it at once.
 scoreboard players set #mbLowG mb 0
+# FN-cam: the cinematic lock is the same kind of request (#mbCam mb 1 from the module's tick; rlk:tick holds or releases
+# right after this function), so a pause, a missing player or body and every exit path release the player at once.
+scoreboard players set #mbCam mb 0
 execute if entity @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] run return run function rlk:mboss/world
 function rlk:mboss/cleanup_aux
 function rlk:mboss/bars_hide
@@ -3305,6 +3322,100 @@ scoreboard players set #mbCine mb 1
 ''')
 w('cine/end', '''
 scoreboard players set #mbCine mb 0
+''')
+# ---------------------------------------------------------------------------------------------
+# FN-cam (홍련 rebuild, lane H2; hr_design.md §3.0 / §5.2, hr_brief.md 「조작 잠금 · 카메라」): the cinematic lock.
+# Facts it stands on (26.3 server jar): `spectate <entity>` needs the player in spectator mode and an entity type with a
+# client tracking range (a marker entity has none); a spectating player's position and rotation are snapped to the camera
+# entity every tick, input and clicks are refused by the engine; ServerPlayer.tick ends the spectating when the player
+# sneaks (wantsToStopRiding) or the camera entity is dead, so the hold issues `spectate` again every tick; leaving
+# spectator mode resets the camera to the player; switching to spectator mode dismounts (the F5 seat). The camera = a
+# marker armour stand (LivingEntity: camera_distance 0 keeps an F5 client from backing away; MARKER_DIMENSIONS fixed(0, 0):
+# its position is the eye), two of them: a hard cut = the other stand made live (#mbCamId), a move = one tp per tick.
+CAM_NBT = ('{Tags:["rlk_room","rlk_mb_aux","rlk_pet","%s","%s"],Marker:1b,Invisible:1b,NoGravity:1b,Invulnerable:1b,Silent:1b,'
+           'NoBasePlate:1b,DisabledSlots:4144959,attributes:[{id:"minecraft:camera_distance",base:0d}]}')
+w('cam/spawn', [
+    '# FN-cam: the two camera stands at the execution position (idempotent: a stand that exists is left where it is).',
+    '# Marker armour stands: no hitbox, no gravity, invisible, eye = position, camera_distance 0; rlk_mb_aux: they go with',
+    '# the fight\'s helper entities (cleanup_aux, a /reload); rlk_pet: rlk:tick\'s mob setup leaves them alone.',
+    *[f'execute unless entity {L.cam_sel(i)} run summon minecraft:armor_stand ~ ~ ~ {CAM_NBT % (L.CAM_TAG, L.CAM_TAGS[i])}'
+      for i in (1, 2)]])
+w('cam/kill', f"""
+# FN-cam: the camera stands gone (a module's sequence end / cancel / cleanup). A player still spectating one falls back
+# to their own view by the game itself; rlk:tick's release (the request has stopped) puts them back in their body.
+kill @e[type=minecraft:armor_stand,tag={L.CAM_TAG}]
+""")
+w('cam/hold', """
+# FN-cam, from rlk:tick right after mboss/main while #mbCam mb is 1 (@s = the tagged player): the player watches the
+# live camera stand (#mbCamId mb 1 = rlk_mb_cam1, 2 = rlk_mb_cam2) in spectator mode. `spectate` is issued every tick: a
+# sneaking player leaves a spectated entity (ServerPlayer.tick), the next tick takes them back.
+# No fight any more (the request outlived it): the request is dropped and the player released.
+execute unless score #mbLive mb matches 1 run scoreboard players set #mbCam mb 0
+execute unless score #mbLive mb matches 1 run return run function rlk:mboss/cam/release
+# The player is their own body (developer mode: no avatar to leave behind): never locked.
+execute if entity @s[tag=rlk_body] run return 0
+execute unless entity @e[tag=rlk_av,limit=1] run return 0
+# The live stand is gone (killed): the player is not left a free spectator; the lock comes back with the stand.
+execute if score #mbCamId mb matches 2 unless entity @CAM2@ run return run function rlk:mboss/cam/release
+execute unless score #mbCamId mb matches 2 unless entity @CAM1@ run return run function rlk:mboss/cam/release
+execute unless entity @s[tag=@CAMH@] run function rlk:mboss/cam/hold_in
+execute if score #mbCamId mb matches 2 run return run spectate @CAM2@
+spectate @CAM1@
+""")
+w('cam/hold_in', f"""
+# FN-cam: the first held tick (@s = the player): the hold tag (view/tick rests while it is on: no avatar move, no aim,
+# no re-seat), the game mode to give back (a tag: survival / creative; neither = adventure), the place to return to (the
+# avatar's, kept in storage because a /reload removes the avatar), the sprint FOV modifier off, the F5 crosshair title
+# blanked (unless an overlay title is up: vBig), then spectator mode (which dismounts the player from the F5 seat).
+tag @s add @CAMH@
+tag @s remove {L.CAM_GM_TAGS['survival']}
+tag @s remove {L.CAM_GM_TAGS['creative']}
+execute if entity @s[gamemode=survival] run tag @s add {L.CAM_GM_TAGS['survival']}
+execute if entity @s[gamemode=creative] run tag @s add {L.CAM_GM_TAGS['creative']}
+data remove storage rlk:mboss camret
+execute store result storage rlk:mboss camret.x double 0.01 run data get entity @e[tag=rlk_av,limit=1] Pos[0] 100
+execute store result storage rlk:mboss camret.y double 0.01 run data get entity @e[tag=rlk_av,limit=1] Pos[1] 100
+execute store result storage rlk:mboss camret.z double 0.01 run data get entity @e[tag=rlk_av,limit=1] Pos[2] 100
+execute if score #spr view matches 1 run attribute @s minecraft:movement_speed modifier remove rlk:view_sprint
+scoreboard players set #spr view 0
+execute unless score @s vBig matches 1.. run title @s title {{text:""}}
+gamemode spectator @s
+""")
+CINE_STOP = (L.FN / 'char/cine/stop.mcfunction').exists()     # lane H3's actor (F:char/cine/**); absent until it lands
+w('cam/release', f"""
+# FN-cam: the hand-back (@s = a player; a no-op unless they carry the hold tag, so it is idempotent). Called by rlk:tick
+# when the request has stopped (a sequence's end / cancel / skip to an unlocked state, a pause: death, Ronova's revive,
+# the selection screen, a missing player or body), by mboss/cam/hold (no fight, the live stand gone), by cleanup_fight
+# (won, cancelled, cleanup, abort, the tests, uninstall) and by mboss/init (/reload); a player who logged out held is
+# released by rlk:tick in their first tick back. Un-spectate, the stored game mode, back to the avatar's place facing
+# the boss, on the F5 seat again; the cinematic actor goes and the avatar shows (char/cine/stop, when lane H3's exists).
+execute unless entity @s[tag=@CAMH@] run return 0
+tag @s remove @CAMH@
+execute if entity @s[gamemode=spectator] run spectate
+execute if entity @s[tag={L.CAM_GM_TAGS['survival']}] run gamemode survival @s
+execute if entity @s[tag={L.CAM_GM_TAGS['creative']}] run gamemode creative @s
+execute unless entity @s[tag={L.CAM_GM_TAGS['survival']}] unless entity @s[tag={L.CAM_GM_TAGS['creative']}] run gamemode adventure @s
+tag @s remove {L.CAM_GM_TAGS['survival']}
+tag @s remove {L.CAM_GM_TAGS['creative']}
+# dead / in the selection space: those own the player's place (as view/teardown)
+execute unless score @s pkMode matches 1.. unless score @s dead matches 1 run function rlk:mboss/cam/back
+data remove storage rlk:mboss camret
+""" + ('function rlk:char/cine/stop\n' if CINE_STOP else ''))
+w('cam/back', """
+# FN-cam: @s = the released player. To the avatar's place (no avatar: a /reload or a relog removed it -> the place stored
+# at the hold; view/tick then makes the new avatar there), turned to the boss as seen from the F5 seat (2.4 b up), the
+# avatar turned to her too, and seated again at once when the seat is there and the player is not sneaking (else
+# view/ride_tick seats them: its own sneak rule).
+execute at @e[tag=rlk_av,limit=1] run tp @s ~ ~ ~
+execute unless entity @e[tag=rlk_av,limit=1] if data storage rlk:mboss camret.x run function rlk:mboss/cam/ret with storage rlk:mboss camret
+execute at @s positioned ~ ~2.4 ~ facing entity @BODY@ eyes run rotate @s ~ ~
+execute as @e[tag=rlk_av,limit=1] at @s facing entity @BODY@ feet run rotate @s ~ 0
+execute if entity @e[tag=rlk_vseat,limit=1] unless predicate rlk:in_sneak run function rlk:view/ride_mount
+""")
+w('cam/ret', '''
+# FN-cam: {x,y,z} = rlk:mboss camret (hundredths, rounded down). Written as offsets from the origin: an absolute x / z
+# without a decimal point would be block-centred by the game (+0.5); 0.02 b up so the rounding never ends inside the floor.
+$execute in minecraft:overworld positioned 0.0 0.02 0.0 run tp @s ~$(x) ~$(y) ~$(z)
 ''')
 w('music/set', '''
 # {ph} (int 0..9): play the registry track cur.music."<ph>" (record category, at each player, non-positional stereo

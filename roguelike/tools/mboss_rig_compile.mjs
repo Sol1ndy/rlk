@@ -38,6 +38,9 @@ export const arr = a => '[' + a.map(f6).join(',') + ']';
 export const nbt = v => `{translation:${arr(v.t)},left_rotation:${arr(v.q)},scale:${arr(v.s)},right_rotation:[0f,0f,0f,1f]}`;
 export function interp(a, b, u) { return {t: lerp(a.t, b.t, u), q: slerp(a.q, b.q, u), s: lerp(a.s, b.s, u)}; }
 
+// The default look target of face/player and face/track (writeFace): the nearest player who is not a spectator.
+export const FACE_TARGET = '@p[gamemode=!spectator]';
+
 export function createRigCompiler({ns, obj, fn, parts, uuidOf, tol, skipStep = () => false, modelOf = {}, swapLine, debug = null,
   maxStepDeg = 120, maxSegDeg = 120, subTol = 35}) {
   for (const n of Object.keys(tol.tp || {})) if (!parts.includes(n)) throw new Error(`tol.tp: unknown part ${n}`);
@@ -144,11 +147,16 @@ export function createRigCompiler({ns, obj, fn, parts, uuidOf, tol, skipStep = (
   }
   // Facing helpers (the parts take the anchor's yaw every tick): face/player, face/track (at most maxDeg per
   // call, both yaws normalised into [-180, 180) first), face/set {yaw}. marker = the temporary marker's tag.
-  function writeFace({marker, maxDeg = 12}) {
+  // target = the look target, one entity selector (default FACE_TARGET: the nearest player who is not a spectator,
+  // every rig's output as before). A rig whose fight locks the player on a cinematic camera (FN-cam: the player is a
+  // spectator far from their body meanwhile) passes the player's body instead, '@e[tag=rlk_body,limit=1]' (홍련).
+  function writeFace({marker, maxDeg = 12, target = FACE_TARGET}) {
+    if (!/^@[pe]\[[^\s]*\]$/.test(target)) throw new Error(`writeFace: the look target must be one @p[...] / @e[...] selector: ${target}`);
     const Y = `${obj}Y`, cap = Math.round(maxDeg * 100);
-    fn('face/player', ['# Turn the anchor to face the nearest player (yaw only). @s = rig anchor.',
-      'execute facing entity @p[gamemode=!spectator] feet run rotate @s ~ 0']);
-    fn('face/track', [`# Turn the anchor toward the nearest player by at most ${maxDeg} degrees per call. @s = rig anchor.`,
+    const who = target === FACE_TARGET ? 'the nearest player' : `the look target ${target}`;
+    fn('face/player', [`# Turn the anchor to face ${who} (yaw only). @s = rig anchor.`,
+      `execute facing entity ${target} feet run rotate @s ~ 0`]);
+    fn('face/track', [`# Turn the anchor toward ${who} by at most ${maxDeg} degrees per call. @s = rig anchor.`,
       '# Both yaws are normalised into [-180, 180) first, so the stored yaw never drifts past one turn.',
       `scoreboard players set #c36000 ${Y} 36000`,
       `execute store result score #yaw ${Y} run data get entity @s Rotation[0] 100`,
@@ -156,8 +164,8 @@ export function createRigCompiler({ns, obj, fn, parts, uuidOf, tol, skipStep = (
       `scoreboard players operation #yaw ${Y} %= #c36000 ${Y}`,
       `execute if score #yaw ${Y} matches ..-1 run scoreboard players add #yaw ${Y} 36000`,
       `scoreboard players remove #yaw ${Y} 18000`,
-      `execute facing entity @p[gamemode=!spectator] feet run summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_aux","${marker}"]}`,
-      `execute as @e[type=marker,tag=${marker},limit=1] at @s facing entity @p[gamemode=!spectator] feet run rotate @s ~ 0`,
+      `execute facing entity ${target} feet run summon minecraft:marker ~ ~ ~ {Tags:["rlk_mb_aux","${marker}"]}`,
+      `execute as @e[type=marker,tag=${marker},limit=1] at @s facing entity ${target} feet run rotate @s ~ 0`,
       `execute store result score #yawT ${Y} run data get entity @e[type=marker,tag=${marker},limit=1] Rotation[0] 100`,
       `kill @e[type=marker,tag=${marker}]`,
       `scoreboard players operation #yawT ${Y} -= #yaw ${Y}`,
