@@ -12,7 +12,7 @@ RP 사본: `<S>/rp_c`(원본 `<S>/rp_base` 는 읽기 전용, 11-06 릴리스 b3
 - [x] 병합 origin/wip/combat(레인 B 균형치, 58c6c13f1) → b0f712ddc: bal/hit 대역을 B 의 파일로, README · ident_hr 는 양쪽 다 둠; regen 변화 없음
 - [x] C5 test_cb 의 `bal` 묶음(퍼펙트 패링 = 공격자의 균형치 정확히 한 칸; 217/217) · README 대역 설명 고침
 - [x] C6 test_m0diff: 병합 트리에서 잰 레인 C 몫(주석 · README 0-9), 레인 C 가 넣고 뺀 가짜 플레이어 이름 목록
-- [ ] 게이트 전체(병합 트리의 새 스냅숏 `<S>/cb/c/snap5` 에서 hr ar az bal, 출력 `<S>/cb/c/out/c5`) → push
+- [x] 게이트 전체(병합 트리의 스냅숏 `<S>/cb/c/snap5` = 770c45a61 에서 hr ar az bal, 출력 `<S>/cb/c/out/c5`) → push(origin/wip/combat-core)
 
 ## 설계 (구현됨)
 - 입력: rlk:tick 맨 앞 `player/def/input`(F → player/f_key = 패링 입력, 눈앞 · 몹 실드의 우클릭, F5 rc_hold) + `#now cb`, `#dgOpen cb`.
@@ -40,3 +40,7 @@ RP 사본: `<S>/rp_c`(원본 `<S>/rp_base` 는 읽기 전용, 11-06 릴리스 b3
   refs 새 8(레인 C 것 하나: `player/def/fx/g/title -> g/t_` 매크로 이름, 알려진 종류), 옮기지 않은 mb / mb2 / mb3 스위트와 baseline/macro.txt 없음(환경).
   m0diff A(틱당 명령, 기준 58c6c13f1 → 병합): proto 6.40 → 7.14, 파수꾼 5.75 → 6.24, 나비 6.51 → 7.29, 역장 6.80 → 7.88.
 - RP 확인: rp_c 에 레인 B 의 build_balance.py --resourcepack 을 함께 넣은 사본에서 rplint 0 · 아틀라스 12.919 M; 글꼴 코드 겹침 없음(bal U+ED00-ED22, cb U+EE00-EE04 · EE0F).
+- 11-10 스위트 c5 끝(병합 트리): hr 전부 통과(test_special_hr · test_scarlet · pat_p1 · pat_ghost · test_reward · test_kit 13362 · test_arena_hr 94 ·
+  test_hwamu 283 · test_moon 55 · ev_dry 78 · gen_check_hr 28; test_rig 160/161 = 사용자 스킨 원본이 없는 환경 탓 하나; ident_hr 은 작업 트리에서 통과),
+  ar 다섯 · bal 둘 · test_cb 217 · test_rm 72 통과. az run_all 을 기준(origin/wip/combat 58c6c13f1)에도 돌려 단계별로 비교: 같은 상태, 다른 것은
+  m0diff 37 → 38(역장 예산 하나)과 refs 새 7 → 8(매크로로 만든 이름 `player/def/fx/g/t_$(g)`)뿐. fw_az · fw_ap 는 레인 C 의미로 고친 시험이라 기준에서는 실패, 병합에서 통과.
