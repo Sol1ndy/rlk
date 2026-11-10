@@ -31,7 +31,8 @@
 - **특수 보스**(방에 가끔 생기는 균열 `room/rift/`, 한 판에 많아야 한 번; 균열이 가중치대로 고름, 지금 10 : 10): 타키 `tachy`(n 20,
   `boss/tachy/`, `tk_lift`; 처치 = 레벨 업 1 + 아이템 상자 3) · 홍련 `scarlet`(n 21, `boss/scarlet/`, `hr_field`; 11-06 부터; 처치 = 레벨 업 1 +
   아이템 상자 1 + 마지막 장면 뒤 이벤트: 신화 아이템 화무십일홍 또는 런 버프 월하대작). 틀 시험용 `spproto`(n 97) · 챕터 틀 시험용 `cproto`(n 98).
-- **캐릭터 8명**(`char/setup`): 루미네(기본) · 요이미야 · 스커크 · 클로린드 · 아를레키노 · 나비아 · 로노바 · 네페르.
+- **캐릭터 7명**(`char/setup`): 루미네(기본) · 스커크 · 클로린드 · 아를레키노 · 나비아 · 로노바 · 네페르. (활 캐릭터 요이미야와 활 무기는
+  11-10 전투 개편에서 없앴다: 그녀로 저장된 월드는 루미네로 옮겨진다 — 11절.)
 - `tools/mboss_registry.json` 이 중간 · 챕터 · 특수 보스와 경기장(광장 n 0, `az_cavern` 1 · `ap_oasis` 2 · `tk_lift` 3 · `fl_ruins` 4 ·
   `hr_field` 5 · `cp_test` 9)의 단일 원천이다. 번호(n)는 다시 쓰지 않는다. 나루카미만 레지스트리 밖이다.
 - 마지막 릴리스는 **11-06 「홍련 · 특수 보스」**(0-10 맨 위; 빌드 도장 커밋 `c77e5d1`). 그 앞 릴리스는 11-03 「아를레키노 수정」
@@ -82,7 +83,7 @@
 |---|---|---|
 | `load` `tick` `uninstall` `reset` `fix` `cleanup_grounditems` | 진입점(조절 지점과 빌드 도장 줄은 `load`), 매 틱, 제거, 리셋, 캐릭터 복구 | 손(생성기가 끼워 넣은 훅 줄이 섞여 있음: 대개 주석에 생성기 이름) |
 | `player/` `combat/` `element/` `mob/` | 스탯 · 레벨 · HUD · 대시 · 생명의 계약 / 피해 계산 / 원소 반응 / 몹 공용 | 손(2 · 3챕터 몹 생성기가 `combat/apply` · `combat/gold_drop` · `combat/heal_orb_roll` 에 넣은 훅 줄이 섞여 있음) |
-| `char/` | 캐릭터 8명, `char/motion/**` 아바타 모션 · 소리 | 손 + 생성 섞임. 생성: `build_player_rig.mjs`(+ `build_player_locomotion.mjs`) = `motion/` 의 `clips/` · `loco/` · `sheath/` · `combat/config/**` · `combat/swing_clip` 과 맨 위 함수들(`event` · `event_dispatch` · `install` 빼고), `build_player_audio.py` = `audio/<캐릭터>/*`, `build_skirk_metsu_fx.py` = `skirk_fx/burst_metsu` 디스패처와 t028 이후 프레임. 손(생성기 없음): 클립 이벤트 `events/<캐릭터>/**`, 입자 연출 `arle_fx` · `navia_fx` · `skirk_fx`(위 metsu 몫 제외; metsu 충전 프레임 t000–t026 도 손), `control/**`, `combat/{request,select,first,second,third}` · `combat/config`(디스패처), `event` · `event_dispatch` · `install`, `audio/play` · `audio/stop`. `events` 의 `function rlk:char/motion/audio/<캐릭터>/<클립>` 훅 줄은 지우지 말 것(`build_player_audio.py` 가 정확히 한 줄을 요구) |
+| `char/` | 캐릭터 7명, `char/motion/**` 아바타 모션 · 소리 | 손 + 생성 섞임. 생성: `build_player_rig.mjs`(+ `build_player_locomotion.mjs`) = `motion/` 의 `clips/` · `loco/` · `sheath/` · `combat/config/**` · `combat/swing_clip` 과 맨 위 함수들(`event` · `event_dispatch` · `install` 빼고), `build_player_audio.py` = `audio/<캐릭터>/*`, `build_skirk_metsu_fx.py` = `skirk_fx/burst_metsu` 디스패처와 t028 이후 프레임. 손(생성기 없음): 클립 이벤트 `events/<캐릭터>/**`, 입자 연출 `arle_fx` · `navia_fx` · `skirk_fx`(위 metsu 몫 제외; metsu 충전 프레임 t000–t026 도 손), `control/**`, `combat/{request,select,first,second,third}` · `combat/config`(디스패처), `event` · `event_dispatch` · `install`, `audio/play` · `audio/stop`. `events` 의 `function rlk:char/motion/audio/<캐릭터>/<클립>` 훅 줄은 지우지 말 것(`build_player_audio.py` 가 정확히 한 줄을 요구) |
 | `items/` `ditem/` `lvup/` `engravings/` `ench/` `invd/` `codex/` `shop/` `root/` | 아이템 · 드롭 · 레벨 업 선택 · 각인 · 인챈트 · 인벤토리 상세 · 도감 · 상점 · 나무뿌리 | 손 |
 | `room/` `run/` | 방 · 런 진행 | 손; `room/data` · `room/lz/*` = 옛 `build/layouts3.py` 결과를 `tools/flatten_zones.py` 가 고친 것, `room/cboss/**` = `build_cboss_rooms.py`, `room/rift/**` · `room/obj/k_rift` = `build_rift.py`, `room/raiden/**` = 나루카미 생성기 |
 | `cm/` | 잡몹: 1챕터 `sw ar fm im sh cn`, 2챕터 `c2 ns sl ss sp dr kr nj cc ci`, 3챕터 `c3 fu fp em sb cw cs rv pc`, 공용 | 1챕터 = 손(옛 `build/p166`) + 포즈 `build_mobs.mjs` · `build_swordsman.mjs`; 2챕터 = `build_ch2_mobs.py`; 3챕터 = `build_ch3_mobs.py` |
@@ -480,12 +481,6 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
   README 1절). 넣기로 하면 저장소 루트 `resourcepack/` 에 그 zip 을 풀어 커밋한다(`build_raiden_all.py` 등 나루카미 생성기의
   `--resourcepack` 기본 자리). 그 뒤로는 RP 생성기 출력도 데이터팩 출력과 같은 커밋에 넣고, 0-2 2번 · 0-4 묶기 · 리소스팩 README 1절도
   그 폴더 기준으로 고친다.
-- (11-02) 활의 조준 사격(원신의 강공격)도 선혈의 충격을 터뜨리는 일반 공격으로 칠까? 기본값 = 아니오(`api.NORMAL_HIT_IF` 는
-  `#icd tmp 1` 을 요구하는데 조준 · 충전 사격은 `char/bow/release` 가 `#aIcd 0` 으로 쏘아 `char/bow/arrow_hit` 에서 `#icd 0` 이 되므로
-  빠진다. 바꾸려면 `core.py` on_hit 의 선혈의 충격 줄에 조준 · 풀차지 화살(`aKind` 2 · 3: `shot_aim` · `shot_full`)만 받는 갈래를 따로
-  더한다 — `#aK tmp` 는 `arrow_hit` 에서만 바뀌어 로노바 · 클로린드 타격 때는 지난 값이 남으므로, `arrow_hit` 에서 조준 · 풀차지일
-  때만 켜고 맞힌 뒤 끄는 표식을 따로 두는 편이 안전하다. `#bowHit tmp 1` 만으로 받으면 로노바 4타(`ronova/proj_hit`, `#icd 0`)까지
-  세게 되어 '세지 않음' 목록과 어긋난다).
 - (11-02) 같이 알린 것: 공중에 떠 있는 시간(AR-13)을 줄일지, 붉은 피의 사형을 근접으로 받아치기 어려운 점(AR-15). 기본값 = 그대로
   (아래 아를레키노).
 
@@ -696,7 +691,7 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
 - **체력**: 실제 체력은 `curHealth` / `maxHealth` 스코어이고 **액션바의 HP 바**로 표시합니다.
   바닐라 체력은 1024(상한)로 고정해 두고 "맞았는지 감지"하는 데만 씁니다(깎인 양 × `#mobDmgMul` = 원피해 → 방어력 적용 → `curHealth` 차감 → 바닐라 체력 즉시 복구).
   `curHealth` 가 0 이 되면 사망 처리. 회복은 `#heal tmp` 설정 후 `function rlk:player/heal`.
-  ※ **리소스팩 `rlk_hud_resourcepack.zip` 필수**: 바닐라 하트(512칸)·허기·방어구 표시를 가립니다. 없으면 화면이 하트로 덮입니다. 활 캐릭터의 숄더뷰 아바타가 드는 "당긴 활" 모델(`rlk:bow_pull_0~2`)도 여기에 들어 있습니다(없으면 당기는 동안 아바타 손에 보라색 상자가 보임).
+  ※ **리소스팩 `rlk_hud_resourcepack.zip` 필수**: 바닐라 하트(512칸)·허기·방어구 표시를 가립니다. 없으면 화면이 하트로 덮입니다.
   한 방에 바닐라 피해 1024 이상이 아니면 즉사하지 않으므로 몹 공격력에 사실상 제한이 없습니다.
 - 방어력: 실제 피해 = 원피해 × 100 / (100 + 방어력). (방어력 100 = 피해 절반)
 - 자원: `gold`(골드), `sapphire`(사파이어 — 리셋·런 실패에도 유지. 사용처는 아직 없음)
@@ -734,9 +729,8 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
   - 넉백 · 떨어지기 · 동작 안의 전진(`stepT`)은 그대로 적용됩니다(숄더뷰에서 이동 키를 누르고 있으면 평소에 걸을 때처럼 걷는 속도가 바닐라 넉백 속도를 덮어씀. 몹의 넉백 `player/knockback`은 그대로 밀림). 대쉬는 지금처럼 평타를 끊고 나가며(숄더뷰 · F5는 누르고 있는 방향, 1인칭은 걷던 방향, 둘 다 없으면 시선 방향), 스킬 · 원소폭발 · 나비아 조준 · 빙결의 이동 잠금은 바뀌지 않았습니다(그동안은 멈추고, 1인칭에서는 이동 속도 ×0이라 지금처럼 화면이 좁아짐). 휘두르는 중에 스킬 · 원소폭발을 쓰면 휘두르기는 거기서 끝납니다(`combat/on_skill` · 클로린드 밤 꿰뚫기 → `player/swing/cut`; 리그 캐릭터는 스킬 동작이 평타 동작을 바꿔서). 다음 평타 입력은 그대로 남은 간격 뒤입니다. 대쉬 · 집어넣기 · 평상시 이동 자세는 휘두르기가 아닙니다.
 - **타와 타 사이 간격**(다음 평타를 받을 수 있게 된 뒤, 콤보가 끊기기 전)에는 제 속도로 움직일 수 있고, 움직여도 콤보가 이어집니다(다음 클릭 = 다음 순서의 타). 콤보 유지 시간(`cboIdle` 20틱)은 지금과 같습니다: 리그가 없는 캐릭터는 평타를 누른 틱부터, 스커크 · 아를레키노는 다음 입력을 받게 된 틱부터, 나비아는 마무리 동작이 끝난(또는 움직여서 끊은) 틱부터 셉니다. 나비아는 움직이면 마무리 동작이 바로 끝나지만 콤보는 남습니다.
 - **간격에서 점프하면 다음 평타는 1타부터** 나갑니다(`comboStep` 0). 1인칭은 점프 통계(`swJump`, 클릭보다 먼저 뛴 점프는 그 클릭에 반영), 숄더뷰 · F5는 `view/move`의 점프로 알아냅니다. 휘두르는 동안에는 점프가 막혀 있으므로 중간 상태가 없습니다.
-- 캐릭터별 휘두르는 구간(공격 속도 100%에서 평타 입력부터 다음 평타를 받기까지의 게임틱. 공격 속도에 반비례해 짧아지고 최소 2틱. 활의 조준 사격과 네페르 환영극은 고정):
+- 캐릭터별 휘두르는 구간(공격 속도 100%에서 평타 입력부터 다음 평타를 받기까지의 게임틱. 공격 속도에 반비례해 짧아지고 최소 2틱. 네페르 환영극은 고정):
   - 루미네(한손검, `combat/combo_after1·2`): 1타 뒤 6틱, 2타 뒤 10틱
-  - 요이미야(활): 평타 화살 8틱(`char/bow/na`, `#bowCdN`), 조준 사격을 쏜 뒤 6틱(`char/bow/release`). 활을 당기는 동안은 휘두르기가 아닙니다(지금처럼 느려지기만 함)
   - 스커크(리그): 클립의 다음 타 틱 그대로 9 / 6 / 12 / 11 / 23틱(일곱빛 섬광 10 / 6 / 11 / 13 / 24틱)
   - 클로린드(한손검, `char/clorinde/na_coef`의 `#naD`): 4 / 6 / 7 / 6 / 10틱. 밤 순찰의 권총은 한 발마다 7틱(`#clShotCd`)이고, 자동 연사 중에는 다음 발이 바로 이어지므로 쏘는 내내 휘두르는 중입니다: 숄더뷰 · F5는 절반 속도로 걸으며 쏘고, 1인칭은 제 속도로 걷되 뛰지 못합니다(끄려면 좌클릭, 또는 대쉬)
   - 아를레키노(리그, 재생 150%): 6 / 7 / 8 / 10 / 8 / 14틱(붉은 가면 6 / 6 / 7 / 11 / 8 / 14틱). 6타는 다음 입력이 16틱이지만 동작이 14틱에 끝나 그때 풀립니다
@@ -1071,8 +1065,14 @@ id 를 외워야 하는 시험 · 지급 명령은 그 인자 자리에 `"help"`
 - 직접 맵 넘기기(테스트): `/data modify storage rlk:room next set value [11,4]` → `/scoreboard players set #mapType room 1` → `/function rlk:run/next_map` (노드 = 구역 종류 번호)
 
 ## 11. 캐릭터 (`char/`)
-- 캐릭터는 하나를 골라 플레이합니다(교체 없음). 선택: `/function rlk:char/select {id:"lumine"}` — 등록된 캐릭터는 8명(루미네(기본) · 요이미야 · 스커크 · 클로린드 · 아를레키노 · 나비아 · 로노바 · 네페르, `char/setup`)입니다. 캐릭터 id 목록: `{id:"help"}`.
-- 캐릭터마다 무기 타입(`weaponType`) 하나가 고정입니다: 한손검 `sword`(루미네 · 스커크 · 클로린드) / 활 `bow`(요이미야) / 장병기 `polearm`(아를레키노) / 양손검 `claymore`(나비아) / 법구 `catalyst`(로노바) / `kick`(네페르: 무기 이름은 법구지만 발차기). `char/load_cur` 가 이를 `#wType`(`bow` 2 · `catalyst` 3 · 나머지 1)으로 바꾸고 `combat/on_attack` 이 평타를 나눕니다: 1 은 근접 틀 `combat/find`(스커크 · 아를레키노 · 나비아는 리그 동작 `char/motion/combat/request`, 나머지는 `combat/find_immediate` — 네페르의 발차기 · 환영극도 그 안에서 갈라짐; 클로린드는 `#clShoot 1` 인 동안 `char/clorinde/auto_toggle`), 2 는 `char/bow/*`(`na`, 조준 중이면 `release`), 3 은 `char/ronova/na`.
+- 캐릭터는 하나를 골라 플레이합니다(교체 없음). 선택: `/function rlk:char/select {id:"lumine"}` — 등록된 캐릭터는 7명(루미네(기본) · 스커크 · 클로린드 · 아를레키노 · 나비아 · 로노바 · 네페르, `char/setup`)입니다. 캐릭터 id 목록: `{id:"help"}`.
+- (11-10) 활 캐릭터 요이미야와 활 무기를 없앴다(전투 개편). 그녀로 저장된 월드: `load` 의 `char/setup` 이 지금 캐릭터 · 시작 캐릭터
+  (`rlk:config start_char`)를 루미네로 바꾸고 남은 레벨 업 선택지 · 떨굴 목록(`rlk:lvpick choices` · `dropq`)에서 그녀의 카드 `char_yoimiya` 를
+  뺀다(`char/migrate_yoi_load`; 바닥의 카드는 `load` 가 드롭 아이템과 함께 치움). 접속한 플레이어는 다음 틱에 한 번 루미네를 다시 고른다
+  (`player/tick` → `char/migrate_yoi`: 옛 활 무기 · 정보 아이템을 지우고 다시 만듦, 아바타 스킨, 활 조준 감속 `rlk:bow_aim` · 남은 화살 ·
+  사이드바 줄 정리). 로노바 · 클로린드가 쓰는 투사체 틀(`char/bow/arrow_*` · `assist` · `calc`)과 원거리 타격 표시 `#bowHit` 는 이름 그대로 남겼다.
+  리소스팩의 그녀 몫(스킨 `skin/yoimiya`, 모델 `rlk:bow_pull_0~2` · `rlk:h/bow` · `rlk:h/bow_pull_0~2`)은 다음 RP 릴리스에서 지운다.
+- 캐릭터마다 무기 타입(`weaponType`) 하나가 고정입니다: 한손검 `sword`(루미네 · 스커크 · 클로린드) / 장병기 `polearm`(아를레키노) / 양손검 `claymore`(나비아) / 법구 `catalyst`(로노바) / `kick`(네페르: 무기 이름은 법구지만 발차기). `char/load_cur` 가 이를 `#wType`(`catalyst` 3 · 나머지 1; 2 는 없앤 활)으로 바꾸고 `combat/on_attack` 이 평타를 나눕니다: 1 은 근접 틀 `combat/find`(스커크 · 아를레키노 · 나비아는 리그 동작 `char/motion/combat/request`, 나머지는 `combat/find_immediate` — 네페르의 발차기 · 환영극도 그 안에서 갈라짐; 클로린드는 `#clShoot 1` 인 동안 `char/clorinde/auto_toggle`), 3 은 `char/ronova/na`.
 - 인벤토리 0번 칸 = 캐릭터 정보(플레이어 머리, 캐릭터 스킨). 핫바 1번 = 원소전투 스킬, 2번 = 원소폭발.
 - **원소전투 스킬**: 재사용 대기로 동작. 대기 중에는 아이템이 회색 염료로 바뀌고 개수 = 남은 초.
 - **원소폭발**: 원소 에너지가 필요량만큼 차야 사용(사용하면 0). 아이템 이름 = `(이름) - [|||||||||||||||] 40/60pt`, 가득 차면 반짝임.
@@ -1084,7 +1084,7 @@ id 를 외워야 하는 시험 · 지급 명령은 그 인자 자리에 `"help"`
   - 고유 특성 **예리한 얼음**: 원소전투 스킬 발동 후 8초 동안 기본 공격이 얼음 원소 피해로 바뀌고(원소 부여보다 우선) 공격력의 80%만큼 피해 증가. 남은 시간은 사이드바에 표시 (`char/lumine/na_passive`)
   - 원소폭발 **얼음 투창**(원소 에너지 60pt, 대기 15초): 바라보는 방향으로 투창 3개를 차례로 던짐(각 공격력의 130% 얼음 원소 피해, 맞은 적 주변 2칸). 판정은 투창 주변 ±1칸, 앞쪽의 적을 향해 틱당 최대 약 7도 휨. 차가운 별빛을 모두 소모해 스택당 피해 +6.5%, 8스택이면 투창 5개
 - **로노바** (법구 · 공허, n = 7, `char/ronova/`) — 원신 7.0~7.1 의 로노바를 본뜸
-  - 일반 공격 **붉은 시선**: 적을 쫓는 구체 4타(72/66/90/120%, 공허. 간격 0.5초, 4타 뒤 0.8초). 4타는 부착 쿨 없이 공허를 묻힘. 구체는 화살 틀(`char/bow/arrow_*`, aKind 7)을 씀
+  - 일반 공격 **붉은 시선**: 적을 쫓는 구체 4타(72/66/90/120%, 공허. 간격 0.5초, 4타 뒤 0.8초). 4타는 부착 쿨 없이 공허를 묻힘. 구체는 투사체 틀(`char/bow/arrow_*`: 없앤 활의 화살 틀에서 로노바 몫만 남긴 것, aKind 7 · 잔향 8)을 씀
   - 원소전투 스킬 좌클릭 **사형 선고**(대기 10초): 조준한 적 하나에 220% + 잠식 15%. 그 적이 죽으면 근처 6칸 적에게 잠식의 절반
   - 원소전투 스킬 우클릭 **재연**(2초 간격): 잔향(`rnE1~3`, 1~8 = 원소, 9 = 만개 잔향) 하나를 160% 그 원소 탄(반경 2.5칸, aKind 8)으로 발사. 만개 잔향은 다음 잔향과 두 발.
     잔향은 공허 반응이 일어날 때 그 원소로 쌓이고(얻은 뒤 2초 동안은 더 얻지 못함 `rnEcd`·`#rnEcdT`, 부활 충격파의 3칸은 예외)(재연이 일으킨 반응은 제외: `#rnNoEcho`, 몹의 `rnNoE`), 소멸시킬 때도 1칸. 숄더뷰에서 카메라 기준 왼쪽에 마름모로, 스킬 아이템 개수로도 보임
@@ -1635,7 +1635,6 @@ P1 의 그림자(위치 표시), P2 의 균열 띠(레일과 균열 선, 채움 
 | 위치 | 상태 | 처리 |
 |---|---|---|
 | `char/arlecchino/skill_hit` | 핏값 `arDir` · 표식(`mk_spawn`, `rlk_armd`) | 옮김: 피해 뒤 `mboss/px/to_body` 로 맞은 프록시 대신 몸에 한 번(프록시마다 핏값이 쌓이지 않음) |
-| `char/yoimiya/rocket_boom` · `aur_move` | 유금화광 `aurEnd` | 옮김: `mboss/px/db`(매 프록시 틱, 몸 = 큰 쪽, 프록시는 0) |
 | `char/ronova/echo_boom` | 잔향 금지 `rnNoE` | 옮김: `px/db`(+ `elAct 1`, 몸의 `element/tick` 이 셈) |
 | `element/run/supercond` | 초전도 `scT` | 옮김: `px/db`(+ `elAct 1`) |
 | `items/proc/mirror` | 받는 피해 증가 `mirEnd` | 옮김: `px/db` |
@@ -1982,7 +1981,7 @@ R2 에서 다시 × 0.83(35 / 50 / 68 / 85 → 위 값, 충전 6연격의 내려
   - 진짜 피해는 바닥(70 % / 1)을 넘지 않는다: 재가 된 만상 · 2단계 전환을 건너뛰지 않고, 파훼로 죽지도 않는다.
   - 일반 공격 = `#icd 1` 이고 스킬 · 반응 · 아이템 효과 · 진짜 피해가 아닌 타격(나루카미 `guard_hit` 규칙). 캐릭터별: 한손검 · 낫 ·
     창 · 발차기의 평타와 그 추가타(루미네 · 스커크 · 클로린드 · 아를레키노 · 나비아 · 네페르), 네페르 환영극의 자기 타격, 클로린드의 권총
-    평타, 요이미야의 평타 화살(염초 화살 포함), 로노바 붉은 시선 1–3타. **세지 않음**: 활의 조준 / 충전 사격, 로노바 4타(부착 쿨 없음),
+    평타, 로노바 붉은 시선 1–3타. **세지 않음**: 로노바 4타(부착 쿨 없음),
     연격 6개의 두 번째 타, 아이템 효과, 반응, 스킬 · 원소폭발(루미네 얼음 결정 · 투창 포함).
 - **바닥 표시는 영상에 있는 것만**: 연회의 붉은 물결(타격 6틱 전 번쩍임) · 균열, 죽음의 칼날의 십자 띠 · 가장자리 붉어짐, 재가 된 만상의
   붉은 웅덩이(피해 없음). 나머지는 자세 · 불꽃 색(주황 = 불, 진홍 = 생명의 계약) · 소품 · 소리. 첫 동작에서 맞는 순간까지 12틱 이상

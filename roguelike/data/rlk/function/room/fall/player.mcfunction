@@ -7,7 +7,6 @@ scoreboard players operation @s curHealth -= #t1 tmp
 execute if score @s curHealth matches ..0 run scoreboard players set @s curHealth 1
 scoreboard players set @s dashMoveT 0
 scoreboard players set @s stepT 0
-execute if score @s bowT matches 1.. run function rlk:char/bow/cancel
 execute at @e[tag=rlk_safe,limit=1] run tp @s ~ ~ ~
 function rlk:view/sync
 # 돌아온 직후 잠깐 무적

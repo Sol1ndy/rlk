@@ -13,6 +13,8 @@ execute unless data entity @s active_effects[{id:"minecraft:night_vision",durati
 
 # 이름이 바뀐 아이템(페보니우스 활 → 비전) 교체
 execute if items entity @s container.* *[minecraft:custom_data~{rlk:{id:"favonius_bow"}}] run function rlk:items/migrate_p
+# 없앤 캐릭터(요이미야, 11-10)로 저장된 플레이어: 한 번 루미네로 다시 고름(char/migrate_yoi)
+execute if data storage rlk:mig {yoi:1b} run function rlk:char/migrate_yoi
 # ===== 인벤 변화 감지(dirty): 인벤 정렬·장비 스캔은 변화 시에만 =====
 # 프로브: rlk 아이템 총 개수. 변하면 dirty (클릭→커서 이동도 개수 변화로 감지됨)
 execute store result score #ic tmp if items entity @s inventory.* *[minecraft:custom_data~{rlk:{}}]

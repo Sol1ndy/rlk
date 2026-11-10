@@ -101,4 +101,3 @@ data modify storage rlk:codex lab.char_lumine set value {t:"루미네",dy:"-0.63
 data modify storage rlk:codex lab.char_navia set value {t:"나비아",dy:"-0.632"}
 data modify storage rlk:codex lab.char_ronova set value {t:"로노바",dy:"-0.632"}
 data modify storage rlk:codex lab.char_skirk set value {t:"스커크",dy:"-0.632"}
-data modify storage rlk:codex lab.char_yoimiya set value {t:"요이미야",dy:"-0.632"}

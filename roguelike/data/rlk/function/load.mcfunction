@@ -343,34 +343,12 @@ scoreboard objectives add eqDendroBonus dummy
 # 레벨 업 선택: 이번 선택에서 리롤한 횟수
 scoreboard objectives add pkRr dummy
 
-# 활: 당긴 시간 / 신호 끊긴 틱 / 아이템 사용 시작됨 / 사용 중 / 우클릭 신호 / 발사 뒤 대기 / 예약 화살 · 계수 / 연격 화살 / 염초 화살 수 / 풀차지 도달 / 아바타 활 모양
-scoreboard objectives add bowT dummy
-scoreboard objectives add bowGap dummy
-scoreboard objectives add bowSeen dummy
-scoreboard objectives add bowUse dummy
-scoreboard objectives add bowRc dummy
-scoreboard objectives add bowCd dummy
-scoreboard objectives add bowQ dummy
-scoreboard objectives add bowQc dummy
-scoreboard objectives add bowF dummy
-scoreboard objectives add bowK dummy
-scoreboard objectives add bowSt dummy
-scoreboard objectives add bowPm dummy
-
-# 화살: 종류 / 원소 / 틱당 이동 횟수 / 수명 / 부착 쿨
+# 투사체(로노바의 구체 · 잔향, char/bow/arrow_*): 종류 / 원소 / 틱당 이동 횟수 / 수명 / 부착 쿨
 scoreboard objectives add aKind dummy
 scoreboard objectives add aEl dummy
 scoreboard objectives add aSub dummy
 scoreboard objectives add aLife dummy
 scoreboard objectives add aIcd dummy
-
-# 요이미야: 스킬 남은 틱 / 원소 입자 쿨 · 횟수 / 소매불 스택 · 남은 틱 / 유금화광 끝나는 시각(몹)
-scoreboard objectives add yoiSk dummy
-scoreboard objectives add yoiPcCd dummy
-scoreboard objectives add yoiPcN dummy
-scoreboard objectives add yoiP dummy
-scoreboard objectives add yoiPT dummy
-scoreboard objectives add aurEnd dummy
 
 # 스커크: 일곱빛 섬광 남은 틱 / 빠른 이동 남은 틱 / 고갈 남은 횟수 · 피해 증가% · 간격 / 3타의 두 번째 참격 예약 / 멸 진행 틱 · 초과한 뱀의 계략(pt)
 scoreboard objectives add skM dummy
@@ -409,9 +387,8 @@ scoreboard objectives add fxId dummy
 scoreboard objectives add fxT dummy
 scoreboard objectives add bolKey dummy
 
-# 아를레키노 스킬 대기 / 두 번째 화살이 나가는 자리
+# 아를레키노 스킬 대기
 scoreboard objectives add arSk dummy
-scoreboard objectives add bowQo dummy
 
 # 살짝 전진 남은 틱
 scoreboard objectives add stepT dummy
@@ -788,21 +765,6 @@ scoreboard players set #skRiftLife tmp 300
 scoreboard players set #skBurstMin tmp 5000
 scoreboard players set #skPtBonus tmp 3478
 scoreboard players set #skPtMax tmp 12
-# 활: 기본 공격 사이 간격(공격 속도 100% 기준 틱×100) / 두 발짜리 타의 두 번째 화살까지(틱) / 풀차지까지(틱) / 짧게 눌렀을 때 발사까지 기다리는 틱 / 조준 중 숄더뷰 이동 속도(%)
-scoreboard players set #bowCdN tmp 800
-scoreboard players set #bowQGap tmp 3
-scoreboard players set #bowT1 tmp 20
-scoreboard players set #bowTap tmp 6
-scoreboard players set #bowSlow tmp 40
-# 요이미야: 염초 화살 하나가 더 생기기까지(틱, 풀차지 뒤부터) / 염초 정화의 춤 지속(틱) · 기본 공격 피해 배율(%) / 유금화광 지속(틱) · 폭발 쿨타임(틱) / 소매불 스택당 불 원소 피해 보너스(%) · 최대 스택 · 지속(틱)
-scoreboard players set #yoiKGap tmp 12
-scoreboard players set #yoiSkDur tmp 200
-scoreboard players set #yoiSkMul tmp 160
-scoreboard players set #yoiAurDur tmp 200
-scoreboard players set #yoiBoomCdT tmp 40
-scoreboard players set #yoiPPer tmp 2
-scoreboard players set #yoiPMax tmp 10
-scoreboard players set #yoiPDur tmp 60
 # 기본 공격에 맞은 몹: 경직 시간(틱) / 밀려나는 세기(칸/틱 × 1000. 바닐라 넉백 = 400, 0 이면 안 밀림)
 scoreboard players set #stunBasic tmp 2
 scoreboard players set #kbBasic tmp 180

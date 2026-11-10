@@ -24,9 +24,9 @@ execute if score @s pkMode matches 1.. run return run function rlk:view/hold
 execute unless entity @e[tag=rlk_av,limit=1] at @s run function rlk:view/spawn
 tag @s remove rlk_body
 # 아바타 클릭 실드: 없으면 만들고, 아바타 자리로 옮기고, 이번 틱에도 주인이 있다고 표시(표시가 없으면 combat/mshield_tick 이 지움)
-execute unless score #bowChg tmp matches 1 unless entity @e[tag=rlk_avsh,limit=1] at @e[tag=rlk_av,limit=1] run summon minecraft:interaction ~ ~ ~ {Tags:["rlk_view","rlk_mshield","rlk_avsh"],width:1.3f,height:2.2f,response:false}
-execute unless score #bowChg tmp matches 1 at @e[tag=rlk_av,limit=1] run tp @e[tag=rlk_avsh,limit=1] ~ ~-0.1 ~
-execute unless score #bowChg tmp matches 1 run tag @e[tag=rlk_avsh] add rlk_msync
+execute unless entity @e[tag=rlk_avsh,limit=1] at @e[tag=rlk_av,limit=1] run summon minecraft:interaction ~ ~ ~ {Tags:["rlk_view","rlk_mshield","rlk_avsh"],width:1.3f,height:2.2f,response:false}
+execute at @e[tag=rlk_av,limit=1] run tp @e[tag=rlk_avsh,limit=1] ~ ~-0.1 ~
+tag @e[tag=rlk_avsh] add rlk_msync
 # 지난 틱에 생긴 몹이 아바타를 노리게
 execute as @e[tag=rlk_agq] run function rlk:view/mob_aggro
 # 입력 → 아바타 이동 / 아바타가 맞았는지 / 조준점 / 카메라

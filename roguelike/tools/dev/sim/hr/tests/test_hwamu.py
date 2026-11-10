@@ -901,7 +901,6 @@ def view_world(on, vmode=2):
     s.setsc('#on', 'view', on)
     s.setsc('#vmode', 'view', vmode)
     s.setsc('#vFresh', 'view', 0)
-    s.setsc('#bowChg', 'tmp', 1)
     P = ('e', pl.id)
     for o, v in (('rdCam', 0), ('vMap', 0), ('devMode', 0), ('dead', 0), ('pkMode', 0), ('rlkMenu', 0), ('vTtp', 0),
                  ('ttlT', 0), ('vMapH', 0), ('vMapL', 0), ('vMapR', 0)):
