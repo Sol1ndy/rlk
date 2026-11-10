@@ -222,8 +222,8 @@ const C = (name, keys, extra = {}) => clips.push({name, keys: keys.done(CONTRACT
 // =================================================================================================================================
 // The post-slash poses of 홍련일섬 (CS1 S13): SLASHED (the twisted crouch at the slash, the blade swept out low to her left; shared
 // pieces) and SLASH_UP, the half-risen pose cs1 ends in at 720 (= lead60 0: she is still coming up from it)
-const SLASH_UP = {...SLASHED, pos: [0, -.26, 0], tor: [-14, -26, 0], head: [-4, 18, 0], fL: [.28, .1, -.3], fR: [-.26, .1, .3], gB: -96, gE: -34, gD: .72, cB: -100,
-  th: -18, aR: [28, 34, .92], hat: 'worn'};
+const SLASH_UP = {...SLASHED, pos: [0, -.26, 0], tor: [-14, -26, 0], head: [-4, 18, 0], fL: [.28, .1, -.3], fR: [-.26, .1, .3], gB: -96, gE: -34, gD: .86, cB: -80,
+  th: -18, aR: [28, 34, .92], hat: 'worn'};      // (the grip 0.86 out, the blade forward of her left: clear of her body without a guard)
 
 // =================================================================================================================================
 // lead60 (56 t; §3.3: after CS1, in the open fight, 9 b from the player): from the half-risen post-slash pose (rise 0) she
@@ -487,7 +487,7 @@ const cs1Lock = (t, G = K1_G[t]) => xLock('cs1', t, 'K1', G, K1_POS[t], {tor: [t
     gB: +lerp(20, -100, u).toFixed(1), gE: -26, gD: +lerp(.55, .7, u).toFixed(2), cB: +lerp(110, -110, u).toFixed(1), th: -12,
     tor: [-22, +lerp(-24, -40, u).toFixed(1), 0], pos: [0, +lerp(-.32, -.4, u).toFixed(3), 0], hsR: +lerp(1, 0, u).toFixed(2)})));
   k.k(650, {...SLASHED, hat: 'worn', shW: 0, sh: 0, gN: 0}, 'o').k(656, {tor: [-24, -48, 0]}).k(670, {pos: [0, -.41, 0], tor: [-23, -46, 0], head: [-2, 32, 0]})
-    .k(700, {pos: [0, -.42, 0], tor: [-24, -44, 0], head: [-4, 30, 0]}).k(720, {...SLASH_UP}, 'io');
+    .k(700, {pos: [0, -.42, 0], tor: [-24, -44, 0], head: [-4, 30, 0]}).k(720, FULL(SLASH_UP), 'io');
   C('cs1', k, {cuts: [200], src: 'v 160.5-203.0 (ref/cs1_60pct.jpg; hr_design §3.2): the lunge and the blade lock, shoved apart, the hat swing, the bottle offered and drunk, the mouth wiped, the iai, 홍련일섬'});
 }
 
@@ -610,7 +610,7 @@ const hookPose = (t, H = t === 68 ? HOOK.H68 : HOOK.H) => { const [pos, pitch, t
     // far as it can), let go, flung wide past her head, down beside her as she lands
     const w = sm((t - 85) / 7), w2 = sm((t - 92) / 8), wb = sm((t - 78) / 6);
     const pullG = toRig(rootAt('repel', t), t <= 82 ? lerp3([.26, 1.6, 1.74], [.28, 1.33, 2.07], (t - 78) / 4) : lerp3([.28, 1.33, 2.07], [.31, .87, 2.49], (t - 82) / 4));
-    const pull = t <= 85 ? blade([pullG[0], Math.max(.45, pullG[1]), pullG[2]], [.45, .45, .77], {pos, yaw: 0}) : null;
+    const pull = t <= 85 ? blade([pullG[0], Math.max(.45, pullG[1]), pullG[2]], [.8, .15, .58], {pos, yaw: 0}) : null;
     k.k(t, {rot: [+pt.toFixed(1), 0, 0], pos: pos.map(x => +x.toFixed(4)), lf, tor: [+lerp(17, lerp(-4, 2, w2), wb).toFixed(1), +lerp(-4, 0, wb).toFixed(1), +lerp(30, 0, wb).toFixed(1)],
       head: [+lerp(12, lerp(-14, -10, w2), wb).toFixed(1), +lerp(8, lerp(0, -18, w2), wb).toFixed(1), +lerp(12, 0, wb).toFixed(1)],
       fL: [.15, +lerp(.1, .62, fly).toFixed(3), +lerp(-.06, -.34, fly).toFixed(3)], fR: [-.15, +lerp(.1, .4, fly).toFixed(3), +lerp(-.02, -.12, fly).toFixed(3)],
@@ -654,7 +654,9 @@ const hookPose = (t, H = t === 68 ? HOOK.H68 : HOOK.H) => { const [pos, pitch, t
       hhB: 40, hhE: 16, hhN: [20, 78], ...KIP_BLADE, scHip: [0, 0], skG: 0, skIB: 0, hairF: 0}, 'l')
     .k(137, {rot: [0, 0, 0], lf: 0, pos: [0, -.44, 0], tor: [-26, -4, 0], head: [6, 4, 0], fL: [.25, .1, -.22], fR: [-.25, .1, .2], aR: [150, 20, .9], hhB: 10, hhE: 26, hhN: [0, 74], ...mixB(KIP_BLADE, UP_BLADE, .33)}, 'l')
     .k(138, {pos: [0, -.3, 0], tor: [-18, 4, 0], head: [0, -4, 0], aR: [150, 20, .9], hhB: 0, hhE: 15, hhN: [0, 88], ...mixB(KIP_BLADE, UP_BLADE, .66)}, 'l')
-    .k(139, {...ST2, pos: [0, -.18, 0], tor: [-12, 8, 0], hat: 'worn', hR: 'brim', bwR: 1, bzR: 24, aR: [120, 30, .9], gN: 0}, 'l')
+    // (hat_on 139 and the idle2 pose at 140 are one tick apart: the hand leaves the brim as the hat settles and is still on its
+    // way down at 140; the next clip's 3-tick blend carries it)
+    .k(139, {...ST2, pos: [0, -.14, 0], tor: [-10, 9, 0], hat: 'worn', hR: 'open', bwR: 0, aR: [70, 24, .9], gN: 0}, 'l')
     .k(140, {...FULL(ST2), hat: 'worn'}, 'o');
   C('repel', k, {src: 'v 215.6-222.6 (ref/hr_repel_5fps.jpg, gauntlet_repel.jpg; hr_design §3.4): the deflected dive, the lock, the seized wrist, the hilt on the hat, two cuts, back to back, the shoulder throw, the kick, up again'});
 }
@@ -747,7 +749,7 @@ const kaPose = (t, G = KA_G[t]) => ({...AIRP, ...airCut(t, {228: 'KA1', 262: 'KA
     ...blade([-.1, .95, -.4], [.7, 0, -.7], {pos: [0, -.14, 0], yaw: 30}), aR: [20, 40, .8], hairS: -.3, skW: .3}, 'l');
   for (const t of [190, 197, 204]) k.k(t, {...ke5Lock(t), hairS: 0, skW: 0}, t === 190 ? 'l' : 'io');
   // E6: springs up 204-216 into the tuck; the three cuts and the lock (every tick into each contact)
-  const HANGB = airBlade([.36, .8, -.2], [.4, .78, -.48]);
+  const HANGB = airBlade([.36, .8, -.2], [.55, .6, -.58]);
   k.k(207, {...CROUCH, rot: [0, 20, 0], pos: [0, -.3, 0], tor: [-16, 6, 0], lf: 0}, 'io').k(211, {...AIRP, ...HANGB, pos: [0, -.1, 0], aR: [60, 60, .9], hairS: .4, skW: -.5}, 'o')
     .k(216, {...AIRP, ...HANGB, aR: [70, 60, .9], hairS: .2, skW: -.3}, 'io');
   const CUT = (t, wind, follow) => {             // wind / follow: [G, dir] 6 t before and 4 t after the contact tick t

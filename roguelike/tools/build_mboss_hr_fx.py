@@ -366,6 +366,32 @@ GLYPHS = {
     'white': (api.OVERLAYS['white'], P.glyph_flat('#FFFFFF', 0.92), OVL_PX, OVL_H, OVL_ASC),
     'vig': (api.VIG, P.glyph_vignette, OVL_PX, OVL_H, OVL_ASC),
 }
+
+
+# ---- H2c block (11-11): the `gold` overlay ------------------------------------------------------------------------------------
+# hr_design.md §3.0 (the repel's cut mask `gold` 0 / 4 / 3 = the deflect's wash; the clash flashes of CS1 S2 and the ending E2 /
+# E5 / E6) and §5.1 (api.OVERLAYS + gold 0xEC17, its opacity steps U+EC38-EC3B: the step loop below gives the 7th overlay exactly
+# those). The video's deflect frame (v 215.60, 290.00: ref/hr_repel_5fps.jpg): a white-hot core on a gold field, a bright level
+# flare across the middle, the corners a deeper amber. The block is inert until api.py (H1's) lists the overlay.
+GOLD_CP = 0xEC17
+
+
+def glyph_gold(x, y):
+    """the gold wash: white-hot at the centre, gold toward the edges, a level flare through the middle; nearly opaque."""
+    e = math.hypot(x * 0.8, y)
+    col = P.mix(P.hexc('#FFF9E2'), P.hexc('#FFC93C'), P.smooth(0.05, 0.95, e))
+    col = P.mix(col, P.hexc('#E08A12'), P.smooth(0.85, 1.45, e) * 0.7)
+    flare = P.glow(abs(y), 0.10, 1.0) * (1.0 - 0.35 * P.smooth(0.3, 1.0, abs(x)))
+    col = P.mix(col, P.hexc('#FFFFFF'), flare * 0.8)
+    return col + (0.93,)
+
+
+if 'gold' in api.OVERLAYS:
+    assert api.OVERLAYS['gold'] == GOLD_CP, 'the gold overlay is U+EC17 (hr_design.md §5.1)'
+    _vig = GLYPHS.pop('vig')
+    GLYPHS['gold'] = (GOLD_CP, glyph_gold, OVL_PX, OVL_H, OVL_ASC)
+    GLYPHS['vig'] = _vig
+# ---- end of the H2c block -----------------------------------------------------------------------------------------------------
 assert {k: v[0] for k, v in GLYPHS.items() if k != 'vig'} == api.OVERLAYS and GLYPHS['vig'][0] == api.VIG
 # F2 (HR-30): each overlay at OVL_STEPS - 1 lower opacities (20 / 40 / 60 / 80 %), U+EC20.. . While her line is up, an
 # overlay's fade-in / fade-out is shown as these glyphs re-sent every tick at full title alpha (the title and the subtitle

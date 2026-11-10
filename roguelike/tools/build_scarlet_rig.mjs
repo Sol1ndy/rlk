@@ -95,7 +95,7 @@ function cineContract(clips) {
   const got = new Set(rows.map(r => r[0]));
   for (const n of names) if (!got.has(n)) rows.push([n, {id: 0, len: want[n].len, loop: null, events: {...want[n].events}, owner: 'S2b'}]);
   rows.forEach(([, c], i) => { c.id = i; });
-  CINE_STANDIN = true;
+  CINE_STANDIN = Object.entries(OLD);
   console.warn('STAND-IN (H2c): api.py still carries the 11-06 cinematic clip table; building the cinematic clips to scarlet_cine.mjs CONTRACT (hr_design.md §4.1)');
   return Object.fromEntries(rows);
 }
@@ -888,6 +888,10 @@ if (cineMod && cineMod.rootAt) {
 function toRig(R, S) { const a = R.yaw * Math.PI / 180, c = Math.cos(a), s_ = Math.sin(a), dr = S[0] - R.p[0], df = S[2] - R.p[2]; return [-dr * c + df * s_, S[1] - R.p[1], -dr * s_ - df * c]; }
 fail('a cutscene contact off its stage point (hr_design.md §4.3, her side)', contactErrors);
 compiler.writeDispatch(CLIPS.map(c => ({id: c.id, name: c.name})));
+// STAND-IN (H2c): replaced at the merge. While api.py still lists the 11-06 lead-ins, the module (H1 / H2 rebuild it) still calls
+// their play / start: each plays the lead-in that replaced it, so the pack keeps loading without a missing function
+if (CINE_STANDIN) for (const [oldN, newN] of CINE_STANDIN) for (const k of ['play', 'start'])
+  fn(`${k}/${oldN}`, [`# STAND-IN (H2c): replaced at the merge. The 11-06 clip ${oldN} is gone (hr_design.md §4.1): ${k}s ${newN}.`, `function ${NS}/${k}/${newN}`]);
 
 // ---- follow, init, spawn, tick, kill, uninstall, state, flash, face -----------------------------------------------------------
 const follow = createRigFollow({ns: NS, obj: OBJ, fn, uuidOf, lists: {all: PART_NAMES}, fixed: ['shadow'], staticSkip: true,
