@@ -68,39 +68,17 @@ const STUB = JSON.parse(execFileSync('python3', ['-c', 'import json, sys; sys.pa
 const API = STUB._api; delete STUB._api;
 if (JSON.stringify(STUB.parts.map(p => p.name)) !== JSON.stringify(PART_NAMES)) throw new Error('parts differ from the contract');
 // the cinematic clips (H2c's tools/scarlet_cine.mjs; the 11-11 rebuild, hr_design.md §4.1): the module states the contract it was
-// authored to (CONTRACT: name -> {len, events}) and the builder cross-checks it against api.py. While api.py still carries the
-// 11-06 cinematic table (H1's interface commit not merged yet) the module's table stands in for those rows (STAND-IN (H2c):
-// replaced at the merge - api.py is H1's and wins whole; then this is only the cross-check).
+// authored to (CONTRACT: name -> {len, events}) and the builder cross-checks it against api.py's rows (H1's): a clip authored to
+// another length or another event tick is an error here, not a silent placeholder
 const CINE_FILE = path.join(here, 'scarlet_cine.mjs');
 const cineMod = fs.existsSync(CINE_FILE) ? await import('./scarlet_cine.mjs') : null;
-const CINE_OWNERS = ['S2b', 'H2', 'H2c'], FIGHT_OWNERS = ['S2a', 'H1', 'H1c'];
-let CINE_STANDIN = false;
-function cineContract(clips) {
-  const want = cineMod && cineMod.CONTRACT;
-  if (!want) return clips;
-  const names = Object.keys(want), have = names.filter(n => clips[n]);
-  const same = n => clips[n] && clips[n].len === want[n].len && JSON.stringify(clips[n].events) === JSON.stringify(want[n].events);
-  if (have.length === names.length) {
-    const bad = names.filter(n => !same(n));
-    if (!bad.length) return clips;
-    // api.py has every clip of the new table but some rows differ: with the 11-06 lead-ins gone it is the new contract (an error);
-    // with them still there it is the 11-06 table (the stand-in below)
-    if (!['sq1', 'lead_down', 'lead_stand'].some(n => clips[n])) throw new Error(`scarlet_cine.mjs CONTRACT differs from api.py: ${bad.map(n => `${n} (cine ${want[n].len} t ${JSON.stringify(want[n].events)} / api ${clips[n].len} t ${JSON.stringify(clips[n].events)})`).join('; ')}`);
-  }
-  const OLD = {sq1: 'lead60', lead_down: 'lead5', lead_stand: 'lead_re'};
-  const rows = Object.entries(clips).sort((a, b) => a[1].id - b[1].id).map(([n, c]) => {
-    const m = OLD[n] || n;
-    return want[m] ? [m, {...c, len: want[m].len, loop: null, events: {...want[m].events}, owner: 'S2b'}] : [n, c];
-  });
-  const got = new Set(rows.map(r => r[0]));
-  for (const n of names) if (!got.has(n)) rows.push([n, {id: 0, len: want[n].len, loop: null, events: {...want[n].events}, owner: 'S2b'}]);
-  rows.forEach(([, c], i) => { c.id = i; });
-  CINE_STANDIN = Object.entries(OLD);
-  console.warn('STAND-IN (H2c): api.py still carries the 11-06 cinematic clip table; building the cinematic clips to scarlet_cine.mjs CONTRACT (hr_design.md §4.1)');
-  return Object.fromEntries(rows);
+const FIGHT_OWNERS = ['S2a', 'H1'], CINE_OWNERS = ['S2b', 'H2'];
+const CONTRACT = STUB.clips;                    // {name: {id, len, loop, events, owner}}
+if (cineMod && cineMod.CONTRACT) {
+  const evs = e => JSON.stringify(Object.entries(e).sort((x, y) => (x[0] < y[0] ? -1 : 1)));
+  const bad = Object.entries(cineMod.CONTRACT).filter(([n, w]) => !CONTRACT[n] || CONTRACT[n].len !== w.len || evs(CONTRACT[n].events) !== evs(w.events) || !CINE_OWNERS.includes(CONTRACT[n].owner));
+  if (bad.length) throw new Error(`scarlet_cine.mjs CONTRACT differs from api.py: ${bad.map(([n, w]) => `${n} (cine ${w.len} t ${JSON.stringify(w.events)} / api ${CONTRACT[n] ? `${CONTRACT[n].len} t ${JSON.stringify(CONTRACT[n].events)} owner ${CONTRACT[n].owner}` : 'no such clip'})`).join('; ')}`);
 }
-const CONTRACT = cineContract(STUB.clips);      // {name: {id, len, loop, events, owner}}
-STUB.clips = CONTRACT;
 const CLIP_NAMES = Object.keys(CONTRACT).sort((a, b) => CONTRACT[a].id - CONTRACT[b].id);
 const LOOKS = STUB.looks;
 const ANCHORS = STUB.anchors;
@@ -197,15 +175,27 @@ const EL_BUDGET = 6500;
 for (const [f, n] of Object.entries(ELEMENTS)) if (n > EL_BUDGET) throw new Error(`form ${f}: ${n} elements at rest > ${EL_BUDGET}`);
 
 // ---- clips: contract + authored motion (S2a) + the cinematic clips (S2b's scarlet_cine.mjs, else the placeholder) -----------
-const CINE = cineMod ? cineMod.CLIPS : CINE_PLACEHOLDER;
-const CINE_SOURCE = cineMod ? 'tools/scarlet_cine.mjs' : 'placeholder (scarlet_clips.CINE_PLACEHOLDER)';
-const cineNames = cineMod && cineMod.CONTRACT ? Object.keys(cineMod.CONTRACT) : Object.keys(CONTRACT).filter(n => CINE_OWNERS.includes(CONTRACT[n].owner));
+// HR rebuild (11-11, hr_design §5.1 / §8.3): the contract's owners 'S2a' / 'H1' are the fight clips of scarlet_clips.mjs (lane
+// H1c authors the 12 new ones), 'S2b' / 'H2' the cinematic clips of scarlet_cine.mjs (lane H2c). While a lane's clips have not
+// landed, a cinematic clip the file does not author at the contract's length (a stale 11-06 clip, a missing one) is built
+// from scarlet_clips.CINE_PLACEHOLDER (a static pose of the contract length) and a cinematic clip the contract no longer has
+// is ignored; both are printed and the manifest marks every placeholder clip.
+const cineNames = Object.keys(CONTRACT).filter(n => CINE_OWNERS.includes(CONTRACT[n].owner));
+const lastKey = c => c.keys[c.keys.length - 1][0];
+const cineAuthored = (cineMod ? cineMod.CLIPS : []).filter(c => c);
+const CINE_STALE = cineAuthored.filter(c => !cineNames.includes(c.name) || (!c.placeholder && lastKey(c) !== CONTRACT[c.name].len)).map(c => c.name);
+const cineOk = cineAuthored.filter(c => !CINE_STALE.includes(c.name));
+const CINE_FALLBACK = CINE_PLACEHOLDER.filter(c => cineNames.includes(c.name) && !cineOk.some(a => a.name === c.name));
+const CINE = [...cineOk, ...CINE_FALLBACK];
+const CINE_SOURCE = cineMod ? 'tools/scarlet_cine.mjs' + (CINE_FALLBACK.length ? ` + ${CINE_FALLBACK.length} placeholder(s)` : '') : 'placeholder (scarlet_clips.CINE_PLACEHOLDER)';
+if (CINE_STALE.length) console.log(`note: cinematic clips of scarlet_cine.mjs not used (not in the contract, or not its length): ${CINE_STALE.join(', ')}`);
 if (JSON.stringify(CINE.map(c => c.name).sort()) !== JSON.stringify([...cineNames].sort())) throw new Error(`cinematic clips ${CINE.map(c => c.name)} != the contract's cinematic clips ${cineNames}`);
-for (const n of cineNames) if (!CONTRACT[n] || !CINE_OWNERS.includes(CONTRACT[n].owner)) throw new Error(`cinematic clip ${n}: not a cinematic clip of the contract (owner ${CONTRACT[n]?.owner})`);
-for (const c of AUTHORED) if (!CONTRACT[c.name] || !FIGHT_OWNERS.includes(CONTRACT[c.name].owner)) throw new Error(`clip ${c.name}: not a fight clip of the contract`);
+for (const c of AUTHORED) if (!FIGHT_OWNERS.includes(CONTRACT[c.name]?.owner)) throw new Error(`clip ${c.name}: not a fight clip of the contract (owner S2a / H1)`);
 const byName = Object.fromEntries([...AUTHORED, ...CINE].map(c => [c.name, c]));
 const missing = CLIP_NAMES.filter(n => !byName[n]);
 if (missing.length && !flag('--allow-missing')) throw new Error(`clips not authored: ${missing.join(', ')}`);
+const PLACEHOLDERS = CLIP_NAMES.filter(n => byName[n]?.placeholder);
+if (PLACEHOLDERS.length) console.log(`note: placeholder clips (a static pose of the contract length): ${PLACEHOLDERS.join(', ')}`);
 const CLIPS = CLIP_NAMES.map(n => {
   const k = CONTRACT[n], a = byName[n] || {keys: [[0, {}], [k.len, {}]], note: 'stand-in (not authored)'};
   const keys = a.placeholder ? [[0, a.keys[0][1], 'io'], [k.len, a.keys[0][1], 'io']] : a.keys;
@@ -824,7 +814,7 @@ for (const c of CLIPS) {
   anchorTable[c.name] = Object.fromEntries(ANCHORS.map(a => [a, [...F.map(fr => fmtA(fr.o._anchors[a])), fmtA(F[c.len].o._anchors[a])]]));
   if (c.name === 'idle' || c.name === 'ev_give') KEEP_F[c.name] = F.map(fr => ({o: fr.o, p: fr.p, q: fr.q, d: fr.d}));
   clipInfo[c.name] = {id: c.id, len: c.len, loop: lp ? [...lp] : null, events: c.events, owner: c.owner, key_files: ticks.length, keys,
-    keys_per_tick: +(keys / (c.len + 1)).toFixed(1), source: c.src || '', note: c.note || '', authored: !!byName[c.name] && !byName[c.name].placeholder};
+    keys_per_tick: +(keys / (c.len + 1)).toFixed(1), source: c.src || '', note: c.note || '', authored: !!byName[c.name] && !byName[c.name].placeholder, ...(byName[c.name]?.placeholder ? {placeholder: true} : {})};
   if (debugDp && (debugClips.includes('all') || debugClips.includes(c.name))) {
     for (let t = 0; t <= c.len; t += debugStep) {
       const p = F[t].p;
@@ -888,10 +878,6 @@ if (cineMod && cineMod.rootAt) {
 function toRig(R, S) { const a = R.yaw * Math.PI / 180, c = Math.cos(a), s_ = Math.sin(a), dr = S[0] - R.p[0], df = S[2] - R.p[2]; return [-dr * c + df * s_, S[1] - R.p[1], -dr * s_ - df * c]; }
 fail('a cutscene contact off its stage point (hr_design.md §4.3, her side)', contactErrors);
 compiler.writeDispatch(CLIPS.map(c => ({id: c.id, name: c.name})));
-// STAND-IN (H2c): replaced at the merge. While api.py still lists the 11-06 lead-ins, the module (H1 / H2 rebuild it) still calls
-// their play / start: each plays the lead-in that replaced it, so the pack keeps loading without a missing function
-if (CINE_STANDIN) for (const [oldN, newN] of CINE_STANDIN) for (const k of ['play', 'start'])
-  fn(`${k}/${oldN}`, [`# STAND-IN (H2c): replaced at the merge. The 11-06 clip ${oldN} is gone (hr_design.md §4.1): ${k}s ${newN}.`, `function ${NS}/${k}/${newN}`]);
 
 // ---- follow, init, spawn, tick, kill, uninstall, state, flash, face -----------------------------------------------------------
 const follow = createRigFollow({ns: NS, obj: OBJ, fn, uuidOf, lists: {all: PART_NAMES}, fixed: ['shadow'], staticSkip: true,

@@ -8,6 +8,27 @@ Importing has no side effects (no files written); it asserts the contract's own 
 inside their clips, HITS / scripts / LINE_AT against CLIPS, the §9.1 ownership exactly once, the kit sprite budget).
 Units: Python helpers take blocks / ticks / degrees; the framework boundary is tenths of a block and % of the base hit
 (atk 12 x dmgMul 135: raw = floor(0.162 x pct)).
+HR rebuild on the new combat (11-11; design tools/dev/plan/combat/hr_design.md, §5.1 = this file, owner lane H1; §8 wins).
+The H1 interface commit landed additively (the 11-06 module kept building):
+  final at once   the new names (GAUGE, BAL, PP_FLINCH, CUE_*, FLASH, PURPLE_LEAD, NP_OWN, BAL_OFF, STAGE_FMAX, CS0_*, SKIP,
+                  CONTACT, ACTOR_*, actor / actor_ready / cam_req, the kit names of lanes H1c / H2c), the 12 new fight clips
+                  (CLIP_OWNER 'H1') and the whole sequence / cinematic contract of lane H2 / H2c: SEQS, SEQ_LEN, SEQ_ARGS,
+                  SEQ_CLIPS, SEQ_EXTRA, LINE_AT, MUSIC_AT, SKIP_T / SKIP_WINDOW, END_H, COUNTER_EV, the 8 cinematic rows of
+                  CLIPS_PLAN (CLIP_OWNER 'H2'), the registry numbers intro 1450 / death 1494, WARN_TEXT.
+  with H1's build the pattern side (H1-internal: HITS, WEIGHTS, COOLDOWN, MID_MAX, FAR_RULE, PAT_END, the gauntlet scripts,
+                  CUT_IDS, BOLTS, JUDGE_T / REPEL_T, FAIL*_T, P1 / P2, PH, TEST_IDS, PIP_RULE, the removed names).
+Other lanes' parts are picked up when they land, never required before:
+  seq.py          its SERVICES are used once the file declares `CONTRACT = 2` (= api.SEQ_CONTRACT) on a line of its own;
+                  until then every sequence runs as the core stand-in core/sq/<name> (wait the length, the signals at their
+                  events). tools/build_mboss_scarlet.py reads the marker before importing the file.
+  scarlet_cine.mjs / scarlet_clips.mjs   a contract clip the files do not author with the contract's length is built as a
+                  static placeholder (build_scarlet_rig.mjs prints them; the manifest marks them `placeholder`).
+  the kit         KIT_PRESETS / OVERLAYS / KIT_SPRITES hold a new H-lane name once tools/build_mboss_hr_fx.py declares it
+                  (kit_declares: `@preset('<name>'`, `api.OVERLAYS['<name>']`, a sprite group `'<name>': [`); the full plan is
+                  KIT_PRESETS_PLAN / OVERLAYS_PLAN, and api.K returns '' for a planned name the kit manifest lacks.
+  the actor       api.actor() lines are '' until tools/player_motion/cine/manifest.json exists (actor_ready()).
+  the camera      api.cam_req() is '' until the framework has FN-cam (tools/build_mboss_core.py writes #mbCam).
+
     python3 tools/mboss_scarlet/api.py --write-stub   (lead only) regenerates stub_rig_manifest.json from this file
     python3 tools/mboss_scarlet/api.py --check        every self-check + check_manifest on the stub and on the manifest
                                                      in use + the vanilla sound ids (R:tools/dev/sim/rd/tests)
@@ -35,7 +56,7 @@ REG = L.load_registry()
 BOSS = dict(next(b for b in REG['boss'] if b['id'] == ID))
 assert BOSS['kind'] == 'special' and BOSS['n'] == N and ROOT == 'boss/scarlet', BOSS
 assert BOSS['el'] == 3 and BOSS['res'] == {'*': 10} and BOSS['phases'] == [100], 'PLAN §0: Electro, no immunity, one pool'
-assert (BOSS['picks'], BOSS['lvup'], BOSS['xp'], BOSS['intro'], BOSS['death']) == (1, 1, 0, 650, 1164), 'PLAN §8'
+assert (BOSS['picks'], BOSS['lvup'], BOSS['xp'], BOSS['intro'], BOSS['death']) == (1, 1, 0, 1450, 1494), 'hr_design §3.6'
 assert (BOSS['scale'], BOSS['hit']) == (1.0, {'w': 1.2, 'h': 2.4}) and not BOSS.get('px'), 'PLAN §2.1: no hit proxies (S2d: player size)'
 NAME, SUB, COLOR = BOSS['name'], BOSS['sub'], BOSS['color']      # 홍련 / 월하곡 / #E8466A
 TITLE = (NAME, SUB, COLOR)        # mboss_lib.title(*TITLE) at the draw: clip intro_end 'draw' (CS0 610, PLAN §3.1)
@@ -194,10 +215,31 @@ PAT_END = {'a1': 24, 'a2': 22, 'a3': 79, 'a4': 46, 'a9': 40, 'a10': 32}
 TAIL_MOVE = 4
 WALK_SPEED, GLIDE_SPEED = 0.12, 0.18                      # recovery walk / strafe (P1) and the P2 glide, b/t
 
+# ---------------------------------------------------------------------------------------------
+# 2b. HR rebuild (hr_design §1.2-1.5, §2.1; lane H1): the 5-segment gauge, balance, the parry cue, the unparriable flashes
+GAUGE = {'max': 50, 'seg': 10, 'pat': 3, 'hit': 5}   # #gau hr in tenths of a segment: +pat at a pattern's end (not A6 / U),
+#                                                      +hit per hit of hers that lands (tier 1-2 parries land; PP / PD do not),
+#                                                      -seg per perfect-parried gauntlet cut; U is armed at max
+GAUGE_FP = '#gau'                                    # objective OBJ; the under bar #buSub = #gau / seg, #buSubMax 5, BU_SHIELD
+BAL = {'after_repel': 3, 'floor_min': 3, 'grog_in': 12, 'kip': 20}   # balance pips back after repel {at:60}; bal after a floor
+#                                                      step that met a break; the grog_in clip; the kip-up's ticks left
+PP_FLINCH = 6             # a perfect parry on a pattern's last / single hit: clip flinch, the pattern ends this many t later
+CUE_LEAD = 7              # the parry cue: exactly this many t before every parryable hit (= LOCK_LEAD, the aim-lock tick)
+CUE_KIT = ('glint', {'c': 2})          # the pink sparkle glint at rig anchor blade_mid
+CUE_SND = 'parry_cue'                  # KIT_SOUND_RECIPES: block.amethyst_block.chime 0.6 pitch 1.9
+# the module's own unparriable flashes on her chest (anchor chest; #mbNpOwn mb 1 for the whole fight): (kit preset, args)
+FLASH = {'yellow': ('yellow_tell', {'t': 6}), 'purple': ('star4', {}), 'blue': ('flash_blue', {'t': 15})}
+FLASH_SND = {'yellow': 'yellow_chime', 'purple': 'a9_star', 'blue': 'flash_blue'}
+PURPLE_LEAD = 12          # the purple star: exactly this many t before its cut
+YELLOW_MIN = 12           # the yellow flash: at least this many t before its hit
+NP_OWN = ('#mbNpOwn', 'mb')            # set 1 at spawn, cleared by cleanup: the framework's np_glint stays off
+BAL_OFF = ('#mbBalOff', 'mb')          # FN-bal: 1 = bal/boss/may refuses balance damage (the lead-ins and the gauntlets)
+assert CUE_LEAD == LOCK_LEAD
+
 # =============================================================================================
 # 3. Phases, floors, pips, the gauntlet scripts, switches (PLAN §3, §4.4-4.6, §5)
-PH = {'intro': 0, 'p1': 1, 'cs1': 2, 'sq1': 3, 'a8': 4, 'cs2': 5, 'down': 6, 'p2': 7, 'lead': 8, 'a13': 9, 'cs3': 10,
-      'death': 11}        # #ph hr (S3 may keep finer state in its own fake players)
+PH = {'intro': 0, 'p1': 1, 'cs1': 2, 'lead60': 3, 'a8': 4, 'cs2': 5, 'down': 6, 'p2': 7, 'lead': 8, 'a13': 9, 'cs3': 10,
+      'death': 11}        # #ph hr; 3 = lead60 (was sq1); 6 = the removed down window (reserved; gone with H1's build)
 FLOOR_P1 = 600            # per mille of mhpM: the hit reaching it stops there; CS1 at the next decision
 FLOOR_ULT = 50            # per mille: the 5 % floor (set at CS1 0); A13 at the next decision (40 t later from the down)
 PIPS = 5
@@ -322,7 +364,7 @@ KIPUP_T, KIPUP_RECOVER = 20, 12   # the down's natural end: kipup (invulnerable)
 # 'kick'. PLAN §3.4 / §4.6 / §4.8 give 15, 15 at 5 % (-3 %, the footage 5.2 -> 2.3 %); §9.0's "(10, 10, 'kill')" is
 # superseded (contract change log).
 COUNTER_PM = {60: (15, 15, 15), 5: (15, 15, 'kill')}
-COUNTER_EV = ('flash', 'land', 'kick')            # repel 24 / 75 / 102
+COUNTER_EV = ('strike', 'land', 'kick')           # repel 49 / 101 / 129 (hr_design §3.4)
 FAIL60_PM = 500           # A8 fail (ULT60_LETHAL false): pl_dot 500 per mille, #mbDotLethal 0 (cannot kill) + a push
 FAIL60_PUSH = (2.5, 3)    # mboss_lib.push_ring(2.5, 3) at the impact point, the same tick
 FAIL60_REFORM_T, FAIL60_P2_T = 194, 214           # g_reform 194-204 (she lands 2 b from the player), P2 decision at 214
@@ -333,12 +375,15 @@ REVIVE = {'dist': 8.0, 'wait': 60}                # after a Ronova revive: she s
 ULT60_LETHAL = False      # A8 fail = the 500 per-mille hit (True: the instant death + the banner)
 ULT5_LETHAL = True        # A13 fail = the instant death (ult/fatal; Ronova's revive applies) + the banner
 DARK_LIGHT = True         # the `dark` look dims the walk light layer (False: fallback B, dome / moon / lanterns only)
-WARN_TEXT = '베기를 퍼펙트 닷지 · 퍼펙트 패링으로 넘겨 실드를 모두 깎으세요 — 실드가 남으면 즉사합니다'   # combat overhaul C (was 대시)
+WARN_TEXT = '베기를 완벽하게 패링해 실드를 모두 깎으세요 — 실드가 남으면 즉사합니다'   # hr_design §2.4 (the perfect-parry rule)
 WARN_HL = ('즉사', '#FF3A55')   # bossbar rlk:hr_warn: white text, this word crimson; only while a lethal gauntlet runs
 END_PROFILE = 'std'       # CS4 profile (question 7); only std is built: short (~600 t) / full (~1500 t) = a request
-END_H = {'std': 1042}     # CS4 length H (= clip `ending`); registry death = H + EVENT['len'] + 2
+END_H = {'std': 1372}     # the ending's length H (= clip `ending`, hr_design §3.5); registry death = H + EVENT['len'] + 2
 INTRO_SKIP = True         # hold sneak SKIP_HOLD t at any tick in SKIP_WINDOW -> black -> jump to SKIP_T (intro_end)
-SKIP_HOLD, SKIP_T, SKIP_WINDOW = 20, 554, (20, 540)
+SKIP_HOLD, SKIP_T, SKIP_WINDOW = 20, 1290, (20, 1270)
+# hr_design §3.0 / §3.2: CS0 and CS1 may be skipped (sneak held SKIP_HOLD t inside the window -> ovl black, the jump to `to`)
+SKIP = {'intro': {'window': (20, 1270), 'to': 1290}, 'cs1': {'window': (40, 560), 'to': 566}}
+assert SKIP['intro'] == {'window': SKIP_WINDOW, 'to': SKIP_T}
 SKIP_TEXT = '⊙ 건너뛰기'      # the original's prompt, verbatim (actionbar, hudHold)
 SKIP_HINT = ' · Shift 길게'      # the pack's control hint after it
 SKIP_COLOR, SKIP_STEPS = '#A8A8B0', 4    # grey; brightens in four 5-t steps while held (fx/hud/skip {s:0..4}, s 5 clears)
@@ -389,19 +434,48 @@ NO_REPEAT = True                                 # no immediate repeat of an ent
 # 5. Keys, sequences, ownership, test ids, lines (PLAN §3.0, §9.0-9.2)
 P1 = ('a1', 'a2', 'a3', 'a4', 'a6', 'a9', 'a10')    # S3: tools/mboss_scarlet/p1.py -> p/<key>/** (a4 includes A5)
 P2 = ('r1', 'r2', 'r3', 'a8', 'a13')                # S4: tools/mboss_scarlet/p_ghost.py -> p/<key>/**
-SEQS = ('intro', 'cs1', 'sq1', 'repel', 'lead_down', 'lead_stand', 'ending', 'event')   # S2b: seq.py -> seq/<name>/**
-SEQ_CLIPS = {'intro': ('intro', 'intro_end'), 'cs1': ('cs1',), 'sq1': ('sq1',), 'repel': ('repel',),
-             'lead_down': ('lead_down',), 'lead_stand': ('lead_stand',), 'ending': ('ending',),
+SEQS = ('intro', 'cs1', 'lead60', 'repel', 'lead5', 'lead_re', 'ending', 'event')   # H2: seq.py -> seq/<name>/**
+SEQ_CONTRACT = 2          # seq.py declares `CONTRACT = 2` once it implements this table (else: the core stand-ins)
+SEQ_CLIPS = {'intro': ('intro', 'intro_end'), 'cs1': ('cs1',), 'lead60': ('lead60',), 'repel': ('repel',),
+             'lead5': ('lead5',), 'lead_re': ('lead_re',), 'ending': ('ending',),
              'event': ('ev_give', 'ev_toast', 'ev_leave')}
-SEQ_ARGS = {'repel': {'at': (60, 5)}, 'lead_stand': {'g': ('a8', 'a13')}}   # macro args of seq/<name>/start
-SEQ_EXTRA = {'intro': ('skip',)}                 # seq/intro/skip: the core calls it after SKIP_HOLD t of sneak
+SEQ_ARGS = {'repel': {'at': (60, 5)}, 'lead_re': {'g': ('a8', 'a13')}}   # macro args of seq/<name>/start
+SEQ_EXTRA = {'intro': ('skip',), 'cs1': ('skip',)}   # seq/<name>/skip: the core calls it after SKIP_HOLD t of sneak (SKIP)
 # A sequence never calls core functions: it signals the core through the score SEQ_SIGNAL (objective OBJ, S2b's #sq_
 # prefix) = a SIG value in the tick of the beat; the core reads it right after seq/<name>/tick, applies it (an HP step:
 # COUNTER_PM[at][i - 1] via mboss/true_hit, 'kill' = true_pct 100; refill: shield/arm) and resets it to 0.
 SEQ_SIGNAL = '#sq_sig'
-SIG = {'hp1': 1, 'hp2': 2, 'hp3': 3, 'refill': 4}   # repel: hp1-hp3 at COUNTER_EV; lead_down / lead_stand: refill
-SEQ_LEN = {'intro': 640, 'cs1': 213, 'sq1': 60, 'repel': 104, 'lead_down': 82, 'lead_stand': 70, 'ending': 1042,
+SIG = {'hp1': 1, 'hp2': 2, 'hp3': 3, 'refill': 4}   # repel: hp1-hp3 at COUNTER_EV; lead60 (tick 0) / lead5 / lead_re: refill
+SEQ_LEN = {'intro': 1440, 'cs1': 720, 'lead60': 56, 'repel': 140, 'lead5': 116, 'lead_re': 60, 'ending': 1372,
            'event': 120}
+# hr_design §3.0-3.5 (lane H2): the stage, CS0's fixed stage, the contacts (stage frame ST(r, u, f), blocks), the actor
+STAGE_FMAX = {'cs1': 10, 'repel': 10, 'ending': 12}    # the stage's forward must pass mv/ok this far, else it faces C
+CS0_P0 = (881.28, 201.0, 25.55)                         # CS0 stage origin: start + CS0_WALK_BACK b toward SEAT_POS
+CS0_BEARING, CS0_WALK_BACK, CS0_END_DIST = 7.5, 6.0, 6.5
+CONTACT = {                                             # id: (sequence, (tick from, tick to), ST(r, u, f), what meets)
+    'K1': ('cs1', (10, 30), (0, 1.45, 0.75), 'blade lock (X); she stands at f 1.5'),
+    'KR': ('repel', (0, 26), (0, 1.55, 0.65), 'her blade pressing down on the actor\'s high guard'),
+    'KW': ('repel', (36, 48), (0.15, 1.95, 0.85), 'the actor\'s left hand on her sword wrist (her anchor hand_l)'),
+    'KH': ('repel', (49, 49), (0, 2.20, 1.10), 'the actor\'s hilt on her hat crown (her anchor hat_crown)'),
+    'KS': ('repel', (70, 78), (0.20, 1.50, 1.60), 'her sword forearm over the actor\'s right shoulder'),
+    'KT1': ('repel', (88, 88), (0, 2.95, 1.9), 'her pelvis over the top'),
+    'KT2': ('repel', (101, 101), (0, 0.25, 3.0), 'her pelvis on the ground (head toward +f)'),
+    'KK': ('repel', (129, 129), (0, 0.35, 2.7), 'the actor\'s right foot on her flank'),
+    'KG': ('ending', (52, 52), (0, 2.05, 2.35), 'the actor\'s blade tip on the near edge of her brim'),
+    'KE2': ('ending', (56, 80), (0, 1.5, 2.1), 'blade lock (X)'),
+    'KE5': ('ending', (190, 204), (0, 1.5, 3.25), 'blade lock (X)'),
+    'KA1': ('ending', (228, 228), (0, 6.9, 2.55), 'passing cuts, edge on edge'),
+    'KA2': ('ending', (262, 262), (0, 7.3, 2.6), 'her overhead cut on the actor\'s horizontal guard'),
+    'KA3': ('ending', (286, 286), (0, 6.8, 2.5), 'cut on cut (the big flash)'),
+    'KA4': ('ending', (298, 304), (0, 6.9, 2.6), 'blade lock (X), then both push off'),
+}
+CONTACT_TOL = {'blade': 0.08, 'body': 0.12}             # b: blades; hands and feet
+ACTOR_CLIPS = {'cs0': 1440, 'cs1': 720, 'repel': 140, 'ending': 1372, 'coda': 120}   # H3: tools/player_motion/cine/<id>.json
+ACTOR_LIMIT = {'fwd': 2.5, 'back': 1.5, 'side': 1.5, 'cs0_back': 6.0, 'air': 7.0}   # the actor's displacement from the stage origin
+ACTOR_MANIFEST = _TOOLS / 'player_motion/cine/manifest.json'                      # H3 writes it
+ACTOR_CALLS = {'spawn': [], 'play': ['clip'], 'tick': [], 'face': ['yaw'], 'stop': []}   # function rlk:char/cine/<call>
+ACTOR_CLOCK = ('#cavT', 'cine')                         # the clip tick to show: the module writes #sq hr into it every tick
+CAM_REQ, CAM_ID = ('#mbCam', 'mb'), ('#mbCamId', 'mb')  # FN-cam (H2): the lock request (1 every tick) and the live camera 1 / 2
 PATTERN_NAMES = {'a1': '회전 반월참', 'a2': '역습 일섬', 'a3': '오연 반월', 'a4': '월하 낙참 · 공중 원륜',
                  'a6': '후방 섬보', 'a9': '황광 원참', 'a10': '황광 낙참', 'r1': '자영 돌격', 'r2': '월륜 일섬',
                  'r3': '자영 활강', 'a8': '자영 연참', 'a13': '필살 · 자영 연참'}    # test/help only: no pattern
@@ -454,13 +528,13 @@ LINES = {1: '꽃 속에 술 한 병 놓고,',
 LINE_COLOR = '#F2D0E8'
 # LINE_AT[id] = (where, tick, ticks on screen): where = a clip (its played tick; the sequence / pattern playing it calls
 # the line at that tick) or 'event' (the §7 coda, E-tick); the clip event l<id> sits at the same tick.
-LINE_AT = {1: ('intro', 20, 40), 2: ('intro', 62, 40), 3: ('intro', 104, 40), 4: ('intro', 146, 50),
-           5: ('intro', 198, 100), 6: ('intro', 300, 50), 7: ('intro', 352, 44), 8: ('intro', 398, 44),
-           9: ('intro', 444, 56), 10: ('intro', 502, 50), 11: ('intro_end', 0, 68), 12: ('a6', 12, 63),
-           13: ('cs1', 12, 44), 14: ('cs1', 58, 42), 15: ('cs1', 104, 36), 16: ('cs1', 144, 40),
-           17: ('ending', 300, 60), 18: ('ending', 368, 68), 19: ('ending', 448, 45), 20: ('ending', 536, 119),
-           21: ('ending', 664, 130), 22: ('ending', 800, 130), 23: ('ending', 936, 90),
-           24: ('event', 4, 48), 25: ('event', 4, 48)}    # 24 item branch, 25 buff branch (EVENT['lines'])
+LINE_AT = {1: ('intro', 258, 54), 2: ('intro', 340, 60), 3: ('intro', 462, 60), 4: ('intro', 540, 84),
+           5: ('intro', 690, 130), 6: ('intro', 838, 64), 7: ('intro', 906, 44), 8: ('intro', 980, 44),
+           9: ('intro', 1044, 90), 10: ('intro', 1140, 70), 11: ('intro_end', 4, 62), 12: ('a6', 12, 63),
+           13: ('cs1', 110, 52), 14: ('cs1', 232, 40), 15: ('cs1', 578, 36), 16: ('cs1', 618, 36),
+           17: ('ending', 420, 58), 18: ('ending', 486, 66), 19: ('ending', 628, 42), 20: ('ending', 716, 118),
+           21: ('ending', 910, 128), 22: ('ending', 1082, 128), 23: ('ending', 1230, 88),
+           24: ('event', 4, 48), 25: ('event', 4, 48)}    # hr_design §3 (24 item branch, 25 buff branch: EVENT['lines'])
 # F2 (HR-16): a line wider than LINE_MAX_PX font px (the subtitle is drawn at 2x and never wraps: 192 px fits the Auto GUI
 # width of 1920 x 1200, 384 GUI px, and every wider one) is shown as consecutive subtitles split at its natural pause, typed
 # one after the other inside its LINE_AT hold (the hold split by the pages' widths); the pages joined with one space are the
@@ -489,7 +563,8 @@ CORE_FP += (('#t', '#t2', '#t3', '#t4', '#t5', '#cn1', '#cn1000') + tuple(f'#c{c
                '#h3', '#h4', '#pipoff', '#lk', '#skp', '#rp')
             + ('#ai_d2', '#ai_mv', '#ai_pht', '#ai_sum', '#ai_r', '#ai_rc', '#ai_ff', '#ai_nx', '#ai_rcd', '#ai_fl', '#ai_lf',
                '#ai_ls', '#ai_nn', '#ai_bs',        # F1 (HR-13): an empty pick in a row, the backstep's mid pick pending
-               '#ai_tmc')                           # F1 round 1 (HR-14): the module clock of a kept tail's last move tick
+               '#ai_tmc',                           # F1 round 1 (HR-14): the module clock of a kept tail's last move tick
+               GAUGE_FP)                            # hr_design §1.2: the 5-segment gauge (tenths of a segment)
             + tuple(f'#ai_w{k}' for k in P1 + P2) + tuple(f'#cd_{k}' for k in COOLDOWN))
 RIG_OBJ_PREFIX, KIT_OBJ_PREFIX = 'hrRig', 'hrFx'
 TAGS = {'part': 'rlk_hr_part', 'anchor': 'rlk_hr_anchor', 'fx': 'rlk_hr_fx', 'deco': 'rlk_hr_deco', 'pat': 'rlk_hr_p',
@@ -572,6 +647,26 @@ CLIPS_PLAN = {
     'a9': (64, None, {'turn': 0, 'spin': 3, 'ring': 4, 'yellow': 8, 'star': 17, 'lock': 22, 'flash': 24, 'go': 26,
                       'cut': 28, 'end': 64}),
     'a10': (56, None, {'crouch': 0, 'spring': 2, 'apex': 8, 'yellow': 10, 'lock': 14, 'dive': 20, 'hit': 22, 'end': 56}),
+    # hr_design §2.3 (lane H1; motion: H1c in scarlet_clips.mjs): the 12 new fight clips; q_grab per §8.2 (the grab is
+    # unparriable: purple star at 8, no parry cue)
+    'grog_in': (12, None, {'hit': 0, 'buckle': 3, 'hat_off': 6, 'land': 10, 'end': 12}),
+    'd4': (80, None, {'glint': 0, 'lock1': 7, 'h1': 14, 'lock2': 27, 'h2': 34, 'lock3': 37, 'h3': 44, 'lock4': 47, 'h4': 54,
+                      'end': 80}),
+    'tri': (84, None, {'glint': 0, 'lock0': 7, 'go': 12, 'h0': 14, 'lock1': 31, 'h1': 38, 'lock2': 41, 'h2': 48, 'lock3': 53,
+                       'h3': 60, 'end': 84}),
+    'rings': (78, None, {'glint': 0, 'lock1': 7, 'r1': 14, 'lock2': 17, 'r2': 24, 'lock3': 27, 'r3': 34, 'lock4': 37, 'r4': 44,
+                         'lock5': 47, 'r5': 54, 'end': 78}),
+    'ult': (86, None, {'yellow': 0, 'star1': 12, 'cut1': 24, 'web': 26, 'star2': 34, 'cut2': 46, 'settle': 56, 'end': 86}),
+    'hcut': (52, None, {'yellow': 2, 'sparkle': 8, 'lock': 19, 'go': 24, 'cut': 26, 'end': 52}),
+    'blue': (46, None, {'yellow': 0, 'blue': 4, 'lock': 15, 'go': 20, 'hit': 22, 'end': 46}),
+    'kcut': (50, None, {'crouch': 0, 'yellow': 3, 'sparkle': 9, 'glow': 12, 'lock': 15, 'go': 20, 'cut': 22, 'end': 50}),
+    'mx': (60, None, {'crouch': 0, 'star': 4, 'lock': 9, 'go': 14, 'x': 16, 'lock2': 21, 'dome': 28, 'end': 60}),
+    'nb': (66, None, {'crouch': 0, 'leap': 2, 'apex': 8, 'lock1': 13, 'b1': 20, 'lock2': 23, 'b2': 30, 'lock3': 33, 'b3': 40,
+                      'land': 46, 'end': 66}),
+    'q_grab': (40, None, {'glint': 0, 'ghost': 4, 'star': 8, 'lock': 13, 'go': 16, 'grab': 20, 'end': 40}),
+    'q_air': (96, None, {'throw': 0, 'rise': 2, 'apex': 10, 'lock1': 15, 'beam': 22, 'lock2': 31, 'dive': 34, 'hit': 38,
+                         'land': 40, 'leap': 46, 'apex2': 52, 'star': 62, 'lock3': 67, 'pillar': 74, 'drop': 78, 'land2': 84,
+                         'end': 96}),
     'a7_tell': (16, None, {'back': 0, 'yellow': 2, 'retreat': 4, 'settle': 14, 'end': 16}),
     'a7_throw': (16, None, {'crouch': 0, 'up': 4, 'crescent': 6, 'spin': 7, 'release': 12, 'end': 16}),
     'g_brim': (14, (6, 14), {'raise': 0, 'hold': 6, 'end': 14}),
@@ -591,33 +686,33 @@ CLIPS_PLAN = {
     'g_vert': (20, None, {'crouch': 0, 'glow': 1, 'hit': 5, 'rise': 6, 'gone': 18, 'end': 20}),
     'g_dive': (10, None, {'appear': 0, 'dive': 3, 'hit': 6, 'end': 10}),
     'g_deflect': (12, None, {'stop': 0, 'fall': 2, 'lock': 10, 'end': 12}),
-    'repel': (104, None, {'lock': 0, 'grab': 8, 'hat_back': 8, 'flash': 24, 'throw': 28, 'b2b': 44, 'toss': 58,
-                          'hat_off': 60, 'land': 75, 'lie': 78, 'petals': 80, 'kick': 102, 'end': 104}),
+    'repel': (140, None, {'lock': 0, 'heave': 22, 'wide': 26, 'grab': 36, 'strike': 49, 'cut1': 56, 'cut2': 62, 'hook': 70,
+                          'throw': 78, 'hat_off': 84, 'over': 88, 'land': 101, 'lie': 104, 'kick': 129, 'roll': 133,
+                          'hat_on': 139, 'end': 140}),
     'down': (40, (0, 40), {}),
     'kipup': (20, None, {'legs': 0, 'up': 8, 'crouch': 10, 'raise': 14, 'end': 20}),
-    'lead_down': (82, None, {'legs': 0, 'up': 7, 'sword_up': 10, 'hat_hand': 12, 'walk': 12, 'refill': 29,
-                             'hat_over': 42, 'hat_on': 48, 'glow': 56, 'dark': 64, 'brim': 65, 'end': 82}),
-    'lead_stand': (70, None, {'stagger': 0, 'hat_hand': 8, 'walk': 10, 'refill': 18, 'hat_over': 30, 'hat_on': 36,
-                              'glow': 44, 'dark': 52, 'brim': 53, 'end': 70}),
-    'sq1': (60, None, {'crouch': 0, 'rise': 6, 'rehat': 10, 'hat_hand': 12, 'hat_on': 28, 'standoff': 30, 'dark': 42,
-                       'brim': 46, 'end': 60}),
-    'intro': (554, None, {'l1': 20, 'pour': 30, 'l2': 62, 'sip': 80, 'l3': 104, 'raise': 110, 'l4': 146, 'l5': 198,
-                          'cup_down': 206, 'stand': 214, 'turn': 248, 'l6': 300, 'scab_hand': 300, 'l7': 352,
-                          'l8': 398, 'gesture': 402, 'l9': 444, 'l10': 502, 'scab_up': 510, 'end': 554}),
-    'intro_end': (86, None, {'l11': 0, 'smile': 2, 'head_down': 36, 'turn_away': 44, 'spin': 50, 'draw': 56,
-                             'stance': 60, 'brim': 62, 'tuck': 76, 'music': 76, 'push': 82, 'end': 86}),
-    'cs1': (213, None, {'lunge': 0, 'lock': 10, 'l13': 12, 'push': 32, 'leap': 36, 'hat_back': 40, 'land': 52,
-                        'l14': 58, 'glint': 96, 'black': 100, 'sheathe': 104, 'hat_on': 104, 'l15': 104, 'petal': 114,
-                        'petal2': 128, 'l16': 144, 'cut': 154, 'neg': 161, 'pink': 165, 'slash': 169, 'recolour': 173,
-                        'hat_back2': 176, 'music': 179, 'swirl': 183, 'end': 213}),
-    'ending': (1042, None, {'glint': 16, 'band': 20, 'rise': 28, 'hat_on': 44, 'raise': 48, 'clash1': 58, 'lock': 62,
-                            'back': 80, 'lunge': 92, 'clash2': 96, 'x1': 108, 'x2': 116, 'x3': 124, 'pass': 140,
-                            'strike': 143, 'return': 170, 'clash3': 174, 'flash2': 188, 'leap': 190, 'a1': 204,
-                            'a2': 216, 'a3': 228, 'white': 232, 'fly': 238, 'land': 258, 'rise2': 268, 'walk': 272,
-                            'scab_up': 284, 'swing': 296, 'l17': 300, 'music': 300, 'seated': 320, 'l18': 368,
-                            'l19': 448, 'head_down': 494, 'turn': 506, 'l20': 536, 'profile': 600, 'hand': 612,
-                            'l21': 664, 'gaze': 690, 'dip': 786, 'pivot': 794, 'l22': 800, 'gesture': 860,
-                            'smile': 920, 'l23': 936, 'brim': 936, 'pull': 980, 'eyes': 1030, 'end': 1042}),
+    # hr_design §4.1 (lane H2 / H2c, scarlet_cine.mjs): the three lead-ins (sq1 / lead_down / lead_stand are gone) and the
+    # cinematic clips at their new lengths
+    'lead60': (56, None, {'rise': 0, 'stand': 20, 'brim': 40, 'end': 56}),
+    'lead5': (116, None, {'stagger': 0, 'back': 8, 'refill': 60, 'glow': 84, 'brim': 100, 'end': 116}),
+    'lead_re': (60, None, {'refill': 10, 'brim': 44, 'end': 60}),
+    'intro': (1290, None, {'l1': 258, 'take_bottle': 326, 'pour': 352, 'l2': 340, 'bottle_down': 414, 'l3': 462, 'raise': 470,
+                           'l4': 540, 'drink': 600, 'l5': 690, 'cup_down': 700, 'grip': 756, 'glint': 764, 'stand': 792,
+                           'l6': 838, 'turn': 840, 'l7': 906, 'smile': 912, 'l8': 980, 'off_rock': 1040, 'l9': 1044,
+                           'walk': 1052, 'l10': 1140, 'stop': 1148, 'tip': 1160, 'crouch': 1230, 'leap': 1234, 'land': 1258,
+                           'end': 1290}),
+    'intro_end': (150, None, {'l11': 4, 'brim': 40, 'smile': 60, 'draw': 66, 'stance': 90, 'music': 130, 'end': 150}),
+    'cs1': (720, None, {'lunge': 6, 'lock': 10, 'push': 30, 'leap': 34, 'land': 50, 'l13': 110, 'sheathe': 200, 'bottle': 216,
+                        'l14': 232, 'hat_off': 240, 'hat_on': 258, 'smile': 280, 'raise': 300, 'offer': 404, 'drink': 458,
+                        'props_off': 500, 'wipe': 506, 'l15': 578, 'iai': 610, 'l16': 618, 'draw': 642, 'slash': 650,
+                        'recolour': 660, 'music': 676, 'end': 720}),
+    'ending': (1372, None, {'up': 6, 'hat_on': 20, 'raise': 28, 'lunge': 50, 'graze': 52, 'lock': 56, 'burst': 70, 'shove': 80,
+                            'back': 116, 'run': 150, 'clash': 190, 'rise': 204, 'a1': 228, 'a2': 262, 'a3': 286, 'a4': 298,
+                            'off': 304, 'fly': 314, 'land': 334, 'scab_up': 388, 'swing': 398, 'l17': 420, 'music': 420,
+                            'sheathe': 426, 'sheathed': 452, 'l18': 486, 'l19': 628, 'head_down': 640, 'turn': 650,
+                            'l20': 716, 'look_back': 760, 'hand': 800, 'l21': 910, 'gaze': 990, 'pivot': 1072, 'l22': 1082,
+                            'walk': 1094, 'stop': 1154, 'gesture': 1160, 'brim': 1216, 'l23': 1230, 'eyes': 1240,
+                            'pull': 1290, 'open': 1360, 'end': 1372}),
     'ev_give': (34, None, {'lift': 0, 'present': 12, 'toss': 30, 'end': 34}),
     'ev_toast': (34, None, {'look': 0, 'palm': 14, 'offer': 30, 'end': 34}),
     'ev_leave': (10, None, {'turn': 0, 'gone': 6, 'end': 10}),
@@ -629,10 +724,15 @@ for _k, (_ln, _lp, _ev) in CLIPS_PLAN.items():
 # order) = the index in CLIP_ORDER.
 CLIPS = {k: (ln, lp, {e: t for e, t in ev_.items() if e != 'end'}) for k, (ln, lp, ev_) in CLIPS_PLAN.items()}
 CLIP_ORDER = tuple(CLIPS)
-assert len(CLIPS) == 47
-CINE_CLIPS = ('intro', 'intro_end', 'cs1', 'sq1', 'repel', 'lead_down', 'lead_stand', 'ending')   # S2b (scarlet_cine.mjs)
+assert len(CLIPS) == 59                 # hr_design §5.1: 47 - 3 (sq1, lead_down, lead_stand) + 3 lead-ins + 12 fight clips
+CINE_CLIPS = ('intro', 'intro_end', 'cs1', 'lead60', 'lead5', 'lead_re', 'repel', 'ending')   # H2 / H2c (scarlet_cine.mjs)
 EV_CLIPS = ('ev_give', 'ev_toast', 'ev_leave')                                                    # S2a (§7)
-CLIP_OWNER = {k: ('S2b' if k in CINE_CLIPS else 'S2a') for k in CLIPS}
+NEW_FIGHT_CLIPS = ('grog_in', 'd4', 'tri', 'rings', 'ult', 'hcut', 'blue', 'kcut', 'mx', 'nb', 'q_grab', 'q_air')   # H1 / H1c
+UNUSED_CLIPS = ('a7_tell', 'a7_throw', 'g_deflect')     # kept in the rig, never played from H1's build on (hr_design §2.3)
+# the rig generator takes owners 'S2b' / 'H2' from scarlet_cine.mjs and 'S2a' / 'H1' from scarlet_clips.mjs
+CLIP_OWNER = {k: ('H2' if k in CINE_CLIPS else 'H1' if k in NEW_FIGHT_CLIPS else 'S2a') for k in CLIPS}
+CLIP_SOURCE = {'S2a': 'scarlet_clips.mjs', 'H1': 'scarlet_clips.mjs', 'S2b': 'scarlet_cine.mjs', 'H2': 'scarlet_cine.mjs'}
+assert all(k in CLIPS for k in CINE_CLIPS + NEW_FIGHT_CLIPS + UNUSED_CLIPS + EV_CLIPS)
 
 REAL_MANIFEST = _TOOLS / 'scarlet_rig_manifest.json'                          # S2a writes it
 STUB_MANIFEST = Path(__file__).resolve().parent / 'stub_rig_manifest.json'   # D0
@@ -753,6 +853,39 @@ KIT_PRESETS = {                       # fx/p/<name> (position / rotation = the e
     'ev_glint': [], 'ev_trail': [], 'ev_petals': ['n'], 'ev_leave': [], 'ev_beam': ['h', 't'], 'ev_wind': ['r'],
     'ev_palm': [], 'ev_take': ['c'],
 }
+KIT_BASE_PRESETS = len(KIT_PRESETS)   # 50: the 11-06 kit
+# hr_design §2.1-2.2 / §5.1 (lane H1c's block of build_mboss_hr_fx.py): the kit holds a name once its generator declares it
+# (kit_declares); KIT_PRESETS_PLAN is the whole contract (api.K checks names / args against it and returns '' for a preset
+# the kit manifest does not have yet).
+KIT_PRESETS_HR = {
+    'flash_blue': ['t'],      # the blue unparriable flash on her chest: a yellow ring 4 t that turns into a translucent blue
+    #                           sphere (diameter 1.8) round her for t ticks (blue: 15)
+    'ult_web': ['t'],         # U cut1: 12 long qi_line cards through the arena + the `web` overlay glyph, t ticks (20)
+    'ult_burst': [],          # U cut2: the web's lines fly outward
+    'sky_mark': [],           # q: a thin vertical light line from 12 b up to the lock point + a 2-b pink flash line at the feet,
+    #                           7 t (a line, never an area on the floor: hr_design §8.6)
+    'sky_pillar': ['r'],      # q: the pink-white light column at the lock point (r tenths: 24)
+    'qi_beam': ['len'],       # q / nb: the diagonal sword-qi band (the qi_band sprite pitched 35 deg), len tenths (140 / 160)
+}
+
+
+def _kit_src():
+    f = _TOOLS / 'build_mboss_hr_fx.py'
+    return f.read_text(encoding='utf-8') if f.exists() else ''
+
+
+_KIT_SRC = _kit_src()
+
+
+def kit_declares(kind, name):
+    """True once tools/build_mboss_hr_fx.py declares the H-lane kit name: kind 'preset' = `@preset('<name>'`, 'ovl' =
+    `api.OVERLAYS['<name>']`, 'sprite' = a sprite group `'<name>': [`."""
+    pat = {'preset': f"@preset('{name}'", 'ovl': f"api.OVERLAYS['{name}']", 'sprite': f"'{name}': ["}[kind]
+    return pat in _KIT_SRC
+
+
+KIT_PRESETS_PLAN = {**KIT_PRESETS, **KIT_PRESETS_HR}
+KIT_PRESETS.update({k: v for k, v in KIT_PRESETS_HR.items() if kit_declares('preset', k)})
 SCARLET_LINE_ROLL = 'roll > 0 rises toward the player\'s right (CS1 C8 / the 5 % instant death: +13 deg)'
 # fx/prop/<name> {look}: @s = the card / marker the caller summoned (summoned, then rotated); calling it again with
 # another look re-looks it
@@ -879,6 +1012,12 @@ KIT_SOUND_RECIPES = {
     'ev_beam': (('block.amethyst_block.resonate', 0.7, 0.9),),
     'ev_take_i': (('item.armor.equip_netherite', 0.7, 1.1), ('block.note_block.chime', 0.6, 1.5)),
     'ev_take_b': (('entity.generic.drink', 0.5, 1.2), ('block.amethyst_block.resonate', 0.7, 1.4)),
+    # hr_design §2.1-2.2 (lane H1 / H1c; the kit generator writes fx/snd/<name> for every recipe of this table)
+    'parry_cue': (('block.amethyst_block.chime', 0.6, 1.9),),             # CUE_SND: h - 7 of every parryable hit
+    'flash_blue': (('block.beacon.activate', 0.5, 1.8),),                 # the blue flash
+    'ult_cut1': (('item.trident.thunder', 0.6, 1.6), ('block.glass.break', 0.7, 0.6)),       # U 24
+    'ult_cut2': (('entity.generic.explode', 0.4, 1.6), ('block.glass.break', 0.8, 0.5)),     # U 46
+    'sky_pillar': (('item.trident.thunder', 0.5, 1.9),),                  # q pillar 74
 }
 KIT_SOUNDS = tuple(KIT_SOUND_RECIPES)
 # fx/hud/<name>: line {id} (LINES 1-25, letter reveal, overlay-aware), ovl {g,in,hold,out} (a full-screen title glyph;
@@ -889,6 +1028,12 @@ KIT_HUD = {'line': ['id'], 'ovl': ['g', 'in', 'hold', 'out'], 'warn': ['on'], 's
 OVERLAYS = {'black': 0xEC10, 'negative': 0xEC11, 'pinkwhite': 0xEC12, 'red_tint': 0xEC13, 'magenta': 0xEC14,
             'white': 0xEC15}     # ~144 x 81 glyphs sized as Apep's; `negative` is an approximation (PLAN §3.0)
 VIG = 0xEC16                     # §7.4.5: the edge-only vignette glyph (centre clear) SR's hand-written item code titles
+OVERLAYS_BASE = tuple(OVERLAYS)
+# hr_design §3.0 / §2.2: `gold` (lane H2c: the deflect / clash wash) and `web` (lane H1c: U's shattered glass); in OVERLAYS once
+# the kit generator declares them (kit_declares 'ovl'); their opacity steps follow the base six's (U+EC38-EC3F)
+OVERLAYS_HR = {'gold': 0xEC17, 'web': 0xEC18}
+OVERLAYS_PLAN = {**OVERLAYS, **OVERLAYS_HR}
+OVERLAYS.update({k: v for k, v in OVERLAYS_HR.items() if kit_declares('ovl', k)})
 OVERLAY_GLYPH = (144, 81)
 KIT_FIXED = ('card', 'cardx', 'look', 'clear', 'uninstall')     # fx/<name> (no args)
 # F2 (HR-17 / HR-23): two switches around preset calls (fx/<name>, no args). keep_on .. keep_off: the cards made meanwhile
@@ -923,8 +1068,12 @@ KIT_SPRITES = {
     'seat_rock': (),                                 # vanilla block textures
 }
 KIT_SPRITE_CAP = 260_000
+# hr_design §5.4: 22 432 px were left; the one planned new sprite group (lane H1c), counted once the kit generator declares it
+KIT_SPRITES_HR = {'flash_blue': ((1, 64, 64),)}       # the translucent blue sphere (<= 4 096 px); everything else reuses sprites
+KIT_SPRITES.update({k: v for k, v in KIT_SPRITES_HR.items() if kit_declares('sprite', k)})
 KIT_SPRITE_PX = sum(f * w * h for rows in KIT_SPRITES.values() for f, w, h in rows)
-assert KIT_SPRITE_PX == 237_568 and KIT_SPRITE_PX <= KIT_SPRITE_CAP, KIT_SPRITE_PX
+assert KIT_SPRITE_PX == 237_568 + sum(f * w * h for k, rows in KIT_SPRITES_HR.items() if k in KIT_SPRITES for f, w, h in rows) \
+    and KIT_SPRITE_PX <= KIT_SPRITE_CAP, KIT_SPRITE_PX
 ATLAS_CAP = {'rig': 150_000, 'kit': KIT_SPRITE_CAP, 'gate_icon': 5_000, 'event': 0, 'boss': 430_000}   # PLAN §9.5
 GATE_ICON_PX_CAP = ATLAS_CAP['gate_icon']
 
@@ -939,8 +1088,19 @@ class _Kit:
     """Kit call lines. Empty while the kit manifest is missing, so S2b / S3 / S4 build and load without S1K's files (the
     Apep / Tachy / Arlecchino 'api.K stand-in' rule); names / args are checked against the contract either way."""
 
+    _mf = None
+
     def _on(self):
         return KIT_MANIFEST.exists()
+
+    def has(self, kind, name):
+        """True when the kit manifest in use has the name (kind 'presets' / 'sounds' / 'glyphs'): a planned H-lane name
+        (KIT_PRESETS_PLAN, OVERLAYS_PLAN) gives '' lines until its lane's kit block has landed and the kit was regenerated."""
+        if not self._on():
+            return False
+        if _Kit._mf is None:
+            _Kit._mf = json.loads(KIT_MANIFEST.read_text(encoding='utf-8'))
+        return name in _Kit._mf.get(kind, {})
 
     def _call(self, sub, table, name, a):
         assert name in table, f'kit {sub}{name} is not in the contract'
@@ -950,12 +1110,17 @@ class _Kit:
         return f'function {NS}fx/{sub}{name}' + (f' {_macro(a)}' if a else '')
 
     def p(self, name, **a):
-        return self._call('p/', KIT_PRESETS, name, a)
+        if name in KIT_PRESETS_HR and not self.has('presets', name):
+            assert sorted(a) == sorted(KIT_PRESETS_HR[name]), f'kit p/{name} takes {KIT_PRESETS_HR[name]}'
+            return ''
+        return self._call('p/', KIT_PRESETS_PLAN, name, a)
 
     def pw(self, name, path):
         """fx/p/<name> with storage <path> (F2: arguments computed at run time, e.g. A9's probed streak length core.a9,
         CS4 E1b's band sweep); the compound must hold every arg of the preset (extra keys are allowed)."""
-        assert name in KIT_PRESETS and KIT_PRESETS[name], f'kit p/{name}: no macro args'
+        assert name in KIT_PRESETS_PLAN and KIT_PRESETS_PLAN[name], f'kit p/{name}: no macro args'
+        if name in KIT_PRESETS_HR and not self.has('presets', name):
+            return ''
         return f'function {NS}fx/p/{name} with storage {path}' if self._on() else ''
 
     def prop(self, name, **a):
@@ -969,7 +1134,9 @@ class _Kit:
         if name == 'line':
             assert a.get('id') in LINES, a
         if name == 'ovl':
-            assert a.get('g') in OVERLAYS, a
+            assert a.get('g') in OVERLAYS_PLAN, a
+            if a['g'] in OVERLAYS_HR and not self.has('glyphs', a['g']):
+                return ''
         if name == 'skip':
             assert 0 <= int(a.get('s', -1)) <= 5, a
         return self._call('hud/', KIT_HUD, name, a)
@@ -980,7 +1147,7 @@ class _Kit:
 
     def snd(self, name):
         assert name in KIT_SOUNDS, name
-        return f'function {NS}fx/snd/{name}' if self._on() else ''
+        return f'function {NS}fx/snd/{name}' if self.has('sounds', name) else ''
 
     def fixed(self, name):
         assert name in KIT_FIXED, name
@@ -1047,8 +1214,8 @@ class Pattern:
 class Service:
     """A sequence body (S2b's seq.py, written by S3's generator with Writer('S2b', OWN['S2b'])):
     seq/<name>/{start,tick,cancel} on clock #sq hr (0 at start, +1 before tick); sets #sqdone hr 1 at its end; cancel is
-    idempotent. start takes SEQ_ARGS[name] as macro args (repel {at:60|5}, lead_stand {g:"a8"|"a13"}); intro also has
-    seq/intro/skip (SEQ_EXTRA). The core owns invulnerability, cine, the phase switch, floors, the death finish, when a
+    idempotent. start takes SEQ_ARGS[name] as macro args (repel {at:60|5}, lead_re {g:"a8"|"a13"}); intro and cs1 also have
+    seq/<name>/skip (SEQ_EXTRA, SKIP). The core owns invulnerability, cine, the phase switch, floors, the death finish, when a
     sequence starts, the HP steps (the sequence marks COUNTER_EV, the core applies them) and the intro skip input; a
     sequence owns its clips, sounds, kit effects / props, lines (K.hud('line')), titles, overlays, push rings, the look
     requests (arena_look), the body moves (mboss/mv/* + mv/ok) and the music line of its music event (music(ph)). The
@@ -1235,6 +1402,44 @@ def bars(on):
     return L.bars(int(on)) if hasattr(L, 'bars') else ''
 
 
+def actor_ready():
+    """True once lane H3's actor exists (tools/player_motion/cine/manifest.json): then the actor lines are real."""
+    return ACTOR_MANIFEST.exists()
+
+
+def actor(call, **macro):
+    """An actor line of hr_design §5.3 (`function rlk:char/cine/<call>` + its macro args; spawn / tick run as the player),
+    '' until actor_ready(). play takes clip=<an ACTOR_CLIPS id>, face takes yaw=<degrees>."""
+    assert call in ACTOR_CALLS and sorted(macro) == sorted(ACTOR_CALLS[call]), (call, macro)
+    if call == 'play':
+        assert macro['clip'] in ACTOR_CLIPS, macro
+    if not actor_ready():
+        return ''
+    args = ('{' + ','.join(f'{k}:"{v}"' if isinstance(v, str) else f'{k}:{L.num(v)}' for k, v in macro.items()) + '}') if macro else ''
+    return f'function rlk:char/cine/{call}' + (f' {args}' if args else '')
+
+
+def actor_clock():
+    """The line that hands the sequence clock to the actor (`#cavT cine` = `#sq hr`); '' until actor_ready()."""
+    return f'scoreboard players operation {ACTOR_CLOCK[0]} {ACTOR_CLOCK[1]} = #sq {OBJ}' if actor_ready() else ''
+
+
+def cam_ready():
+    """True once the framework has FN-cam (lane H2: tools/build_mboss_core.py reads #mbCam)."""
+    f = _TOOLS / 'build_mboss_core.py'
+    return f.exists() and CAM_REQ[0] in f.read_text(encoding='utf-8')
+
+
+def cam_req(cam=None):
+    """The camera-lock request of this tick (`#mbCam mb 1`; with cam 1 / 2 also the live camera `#mbCamId mb`); '' until
+    cam_ready()."""
+    assert cam in (None, 1, 2), cam
+    if not cam_ready():
+        return ''
+    out = f'scoreboard players set {CAM_REQ[0]} {CAM_REQ[1]} 1'
+    return out if cam is None else [out, f'scoreboard players set {CAM_ID[0]} {CAM_ID[1]} {cam}']
+
+
 def music(ph):
     """The registry music of phase ph (1 P1, 2 P2, 3 the ending; 0 stops): mboss_lib.music."""
     assert int(ph) == 0 or str(int(ph)) in BOSS['music'], ph
@@ -1389,9 +1594,24 @@ def _check_contract():
     assert set(SEQ_CLIPS) == set(SEQS) == set(SEQ_LEN) and all(c in CLIPS for cs in SEQ_CLIPS.values() for c in cs)
     assert SEQ_LEN['intro'] == CLIPS['intro'][0] + CLIPS['intro_end'][0] <= BOSS['intro'] and SKIP_T == CLIPS['intro'][0]
     assert SEQ_LEN['ending'] == CLIPS['ending'][0] == END_H['std'] and SEQ_LEN['event'] == EVENT['len']
-    for s in ('cs1', 'sq1', 'repel', 'lead_down', 'lead_stand'):
+    for s in ('cs1', 'lead60', 'repel', 'lead5', 'lead_re'):
         assert SEQ_LEN[s] == CLIPS[s][0], s
     assert len(CINE_CLIPS) == 8 and len(EV_CLIPS) == 3 and sum(o == 'S2a' for o in CLIP_OWNER.values()) == 39
+    assert sum(o == 'H1' for o in CLIP_OWNER.values()) == 12 and sum(o == 'H2' for o in CLIP_OWNER.values()) == 8
+    # hr_design §3: the skips, the counter events, the contacts and the actor clips against the sequence table
+    for name, sk in SKIP.items():
+        assert name in SEQ_EXTRA and 'skip' in SEQ_EXTRA[name] and 0 < sk['window'][0] < sk['window'][1] < sk['to'] < SEQ_LEN[name]
+    assert [ev('repel', e) for e in COUNTER_EV] == [49, 101, 129]
+    assert SEQ_LEN['intro'] + 10 == BOSS['intro'] and set(STAGE_FMAX) <= set(SEQS)
+    for cid, (sq, (t0, t1), pt, _what) in CONTACT.items():
+        assert sq in SEQS and 0 <= t0 <= t1 <= SEQ_LEN[sq] and len(pt) == 3, cid
+    assert ACTOR_CLIPS == {'cs0': SEQ_LEN['intro'], 'cs1': SEQ_LEN['cs1'], 'repel': SEQ_LEN['repel'],
+                           'ending': SEQ_LEN['ending'], 'coda': SEQ_LEN['event']}
+    # the new-combat constants (hr_design §1.2, §2.1)
+    assert GAUGE['max'] == PIPS * GAUGE['seg'] and FLASH_SND.keys() == FLASH.keys()
+    for _name, (_kit, _a) in list(FLASH.items()) + [('cue', CUE_KIT)]:
+        assert sorted(_a) == sorted(KIT_PRESETS_PLAN[_kit]), _name
+    assert CUE_SND in KIT_SOUND_RECIPES and all(v in KIT_SOUND_RECIPES for v in FLASH_SND.values())
     # ownership: output prefixes disjoint across stages; every §9.0-9.1 file exactly once
     flat = [(o, p) for o, ps in list(OWN.items()) + list(OWN_GEN.items()) for p in ps]
     for o1, p1 in flat:
@@ -1407,10 +1627,12 @@ def _check_contract():
     assert all(f.startswith('function rlk:mboss/bars_') and not f.endswith(('/bars_hide', '/bars_show')) for f in BARS_FNS)
     assert set(KIT_SOUND_RECIPES) == set(KIT_SOUNDS) and all(
         ev_.islower() and 0 < (v or 0) <= 1.0 and 0.5 <= p <= 2.0 for r in KIT_SOUND_RECIPES.values() for ev_, v, p in r)
-    assert len(KIT_PRESETS) == 50 and sum(k.startswith('ev_') for k in KIT_PRESETS) == 8
+    assert KIT_BASE_PRESETS == 50 and len(KIT_PRESETS_PLAN) == 56 and sum(k.startswith('ev_') for k in KIT_PRESETS) == 8
+    assert set(KIT_PRESETS) <= set(KIT_PRESETS_PLAN) and not set(KIT_PRESETS_HR) & set(list(KIT_PRESETS_PLAN)[:KIT_BASE_PRESETS])
     assert sum(k.startswith('ev_') for k in KIT_SOUNDS) == 7
-    assert sorted(OVERLAYS.values()) == list(range(0xEC10, 0xEC16)) and VIG == 0xEC16
-    assert all(FONT_RANGE[0] <= c <= FONT_RANGE[1] for c in list(OVERLAYS.values()) + [VIG])
+    assert sorted(OVERLAYS[k] for k in OVERLAYS_BASE) == list(range(0xEC10, 0xEC16)) and VIG == 0xEC16
+    assert sorted(OVERLAYS_HR.values()) == [0xEC17, 0xEC18] and list(OVERLAYS_PLAN)[-2:] == ['gold', 'web']
+    assert all(FONT_RANGE[0] <= c <= FONT_RANGE[1] for c in list(OVERLAYS_PLAN.values()) + [VIG])
     assert all(0 < t <= JUDGE_T[g] for g in GAUNTLETS for t in BOLTS[g])
     assert DARK_SLICES[0] == DARK_T == DARK_CALL_T + 1 and DARK_SLICES == tuple(DARK_T + 3 * i for i in range(4))
     assert LOOKS['scabbard'][-1] == 'gone' and set(ARENA_LOOKS) == set(LOOK_ID)

@@ -3,4 +3,4 @@ scoreboard players set #sqn hr 2
 scoreboard players set #sq hr 0
 scoreboard players set #sqdone hr 0
 scoreboard players set #sq_sig hr 0
-function rlk:boss/scarlet/seq/cs1/start
+function rlk:boss/scarlet/core/sq/cs1/start

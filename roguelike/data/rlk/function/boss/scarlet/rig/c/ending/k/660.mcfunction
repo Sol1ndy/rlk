@@ -1,5 +1,0 @@
-data merge entity 524c4b4d-4852-4400-8000-000000000002 {start_interpolation:0,interpolation_duration:8,transformation:{translation:[0f,1.50282f,0.01963f],left_rotation:[0.02327f,0f,0f,0.99973f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000003 {start_interpolation:0,interpolation_duration:8,transformation:{translation:[0f,1.50282f,0.01963f],left_rotation:[0.02327f,0f,0f,0.99973f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-00000000000b {start_interpolation:0,interpolation_duration:128,transformation:{translation:[0.43412f,1.15139f,-0.01915f],left_rotation:[-0.07728f,-0.39489f,0.04843f,0.91419f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-data merge entity 524c4b4d-4852-4400-8000-000000000015 {start_interpolation:0,interpolation_duration:8,transformation:{translation:[0f,2.00428f,0.04299f],left_rotation:[0.02327f,0f,0f,0.99973f],scale:[1f,1f,1f],right_rotation:[0f,0f,0f,1f]}}
-function rlk:boss/scarlet/rig/m/face/calm

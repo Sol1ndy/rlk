@@ -1,5 +1,5 @@
 # The instant death was survived (Ronova's revive; @s = body): the darkness lifted, she stands 8 b from
-# the player in her stance; 60 t later lead_stand {g:"a13"} -> A13 again (shield 5/5, the banner).
+# the player in her stance; 60 t later lead_re {g:"a13"} -> A13 again (shield 5/5, the banner).
 function rlk:boss/scarlet/core/cancel_d
 scoreboard players set #pat hr 0
 scoreboard players set #ph hr 8
