@@ -30,7 +30,8 @@ items.md and pack.mcmeta. A file of the scope that is new, changed or gone must 
   combat P      the late-game lag fixes (11-10): F:player/{tick,hotbar/place,hotbar/wrap,inv/sync,inv/manage,
                 inv/order_count2}, F:items/{equip_scan,scan_*,scan_s/*}, F:engravings/info_{build,bucket*,pass*}
 
-Prints every allow-listed file that changed (grouped) and fails on anything else (FAIL lines name the files).
+Prints every allow-listed file that changed (grouped) and fails on anything else (FAIL lines name the files). A gone
+file passes only in a group named in ALLOW_GONE.
 """
 import hashlib
 import re
@@ -88,6 +89,8 @@ ALLOW = {
     + [F + 'items/equip_scan.mcfunction', F + r'items/scan_[a-z_]+\.mcfunction', F + r'items/scan_s/[a-z_]+\.mcfunction']
     + [F + r'engravings/info_(build|bucket|bucket_loop|bucket_put|pass|pass_one)\.mcfunction'],
 }
+# groups whose files may also be gone (removed on purpose; every other gone file fails)
+ALLOW_GONE = {'combat P late-game lag (11-10)'}   # engravings/info_pass(_one), items/scan_add: replaced by B3 / B4
 PATS = [(grp, re.compile(p)) for grp, ps in ALLOW.items() for p in ps]
 
 
@@ -130,7 +133,7 @@ def main():
     for kind, lst in (('changed', changed), ('new', new), ('gone', gone)):
         for rel in lst:
             g = allowed(rel)
-            if g and kind != 'gone':
+            if g and (kind != 'gone' or g in ALLOW_GONE):
                 groups.setdefault(g, {}).setdefault(kind, []).append(rel)
             else:
                 bad.append((kind, rel))

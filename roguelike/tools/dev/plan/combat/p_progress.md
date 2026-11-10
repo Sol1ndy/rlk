@@ -13,7 +13,7 @@
 - [x] B3 scan_add 매크로 없이
 - [x] B4 각인 정렬 한 번에(묶음)
 - [ ] B5 (선택) 같은 서명이면 다시 만들지 않음 — 하지 않음: info_build 는 정렬 결과 말고도 첫 줄 3~7번 칸의 실물을 다시 놓는다(플레이어가 각인 칸끼리 바꿔 놓은 것도 고침); 건너뛰면 그 경우 동작이 달라짐
-- [ ] 게이트: check_mboss_pack 0 · run_all · ar/tests · az/tests_cm · hr/** · loadcheck cb_p
+- [x] 게이트: check_mboss_pack 0 · run_all · ar/tests · az/tests_cm · hr/** · loadcheck cb_p (아래 「게이트 결과」)
 
 ## 기록
 - 커밋(로컬): A a0f59f2 · B1 2d67ae4 · B2/B3 e816b8b · B4 c9a64ce (아직 push 전 — 게이트 뒤).
@@ -43,3 +43,14 @@
 - 최종 트리(e3bed04): loadcheck cb_p 0(exit 0, Done, 1870 advancements), check_mboss_pack 0.
 - 스위트(최종): ar 은 고치기 전 트리에서 모두 통과(test_cm_ar 65 · arena_fl 46 · test_kit 8928 · arlecchino · pat_p1 · pat_p2 · kit_dry),
   hr · az 는 최종 트리에서 진행 중(`p_sim/out_final/summary_{hr,az}.txt`). 30분 배경 한도에 한 번 끊겨 2시간 한도로 다시.
+
+## 게이트 결과 (최종 트리 = #c2 고침 뒤)
+- loadcheck cb_p: 0 function load failure(s), exit 0 (26.3, Done, Loaded 1870 advancements). check_mboss_pack: 0 problem(s).
+- 생성기는 고치지 않음(두 번 만들기 해당 없음; az gen_check 는 base · final 모두 통과).
+- ar/tests: run_all(test_cm_ar 65 · test_arena_fl 46 · test_kit 8928/8928) · test_arlecchino · pat_p1 · pat_p2 · kit_dry 모두 통과.
+- az/tests_cm/run_all.sh: base 와 같은 결과(0-9 의 알려진 것만): test_m0diff 40 FAILED(+6.59/+5.94/+6.71/+6.99, base 와 같은 수),
+  test_px 4e, ident 10, mb3/mb2/mb 스위트 없음(옮기지 않음), vcheck macro/lint 기준선 없음. 검사기 원출력 base 대비: refs 함수 수만,
+  nbt 0 invalid, lint 같음, macro 는 「with storage 를 모르는 called without args」 같은 종류가 자리만 옮김(+1).
+- hr/tests: test_special_hr · test_scarlet · pat_p1 · pat_ghost · test_reward · test_kit 13362 · test_arena_hr 94 · test_hwamu 280 ·
+  test_moon 55 · ev_dry 78 · ident_hr 통과(허용 목록에 「combat P」 + 지운 세 파일은 ALLOW_GONE). test_rig · gen_check_hr 는 풀어 둔
+  리소스팩이 컨테이너에 없어 못 돎(--rp 필요; base 도 같음).
