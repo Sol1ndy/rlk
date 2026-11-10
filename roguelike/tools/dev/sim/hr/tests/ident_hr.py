@@ -30,9 +30,12 @@ items.md and pack.mcmeta. A file of the scope that is new, changed or gone must 
   lane R        the combat overhaul's removals (11-10, wip/combat-rm): 요이미야 / the bow (char/yoimiya/**, char/bow/**,
                 the migration char/migrate_yoi*, the hand files that called them, mboss/px/db), the first-person mode and the
                 shoulder view (view/**, lobby/** settings and tutorial texts, char/{ronova,nefer}/def texts), the pick subtitle
-                (lvup/pick_sub); the only group whose files may also be gone
+                (lvup/pick_sub)
+  combat P      the late-game lag fixes (11-10): F:player/{tick,hotbar/place,hotbar/wrap,inv/sync,inv/manage,
+                inv/order_count2}, F:items/{equip_scan,scan_*,scan_s/*}, F:engravings/info_{build,bucket*,pass*}
 
-Prints every allow-listed file that changed (grouped) and fails on anything else (FAIL lines name the files).
+Prints every allow-listed file that changed (grouped) and fails on anything else (FAIL lines name the files). A gone
+file passes only in a group named in ALLOW_GONE.
 """
 import hashlib
 import re
@@ -81,6 +84,14 @@ ALLOW = {
     'F-I review fixes (pack-wide lines)': [F + 'mboss/start_go.mcfunction'],
     # V-I (11-06): every release re-stamps the datapack's pack.mcmeta description (README 0-5 step 3)
     'release build stamp (README 0-5 step 3)': ['pack.mcmeta'],
+    # combat lane P (11-10, wip/combat-perf; plan/combat/research_misc.md §4): the late-game lag fixes — rebuilt hotbar items
+    # finished inside player/tick, the F-swap event, the inventory sync / equipment scan / engraving sort fast paths;
+    # order_count2's temporaries no longer overwrite load's constant #c2 tmp
+    # (items/enh_add, load, uninstall are already on the SR list)
+    'combat P late-game lag (11-10)': [F + f'player/{n}.mcfunction' for n in ('tick', 'hotbar/place', 'hotbar/wrap', 'inv/sync',
+                                                                               'inv/manage', 'inv/order_count2')]
+    + [F + 'items/equip_scan.mcfunction', F + r'items/scan_[a-z_]+\.mcfunction', F + r'items/scan_s/[a-z_]+\.mcfunction']
+    + [F + r'engravings/info_(build|bucket|bucket_loop|bucket_put|pass|pass_one)\.mcfunction'],
 }
 # 11-10 combat overhaul, lane R (wip/combat-rm; tools/dev/plan/combat/r_progress.md): the files it changes, adds and removes
 # on purpose (요이미야 and the bow, the first-person mode and the shoulder view, the pick subtitle in combat). Its removals
@@ -100,7 +111,9 @@ ALLOW[LANE_R] = (
                                              'rays', 'slow', 'spawn', 'sync', 'ttl_blank')]
     + [F + n for n in ('items/q/run.mcfunction', 'lvup/pick_sub.mcfunction', 'mob/tick.mcfunction', 'room/fall/mob_reward.mcfunction',
                        'room/fall/player.mcfunction', 'tick.mcfunction')])
-GONE_OK = {LANE_R}
+# groups whose files may also be gone (removed on purpose; every other gone file fails)
+ALLOW_GONE = {LANE_R,                               # lane R's removals
+              'combat P late-game lag (11-10)'}     # engravings/info_pass(_one), items/scan_add: replaced by B3 / B4
 PATS = [(grp, re.compile(p)) for grp, ps in ALLOW.items() for p in ps]
 
 
@@ -143,7 +156,7 @@ def main():
     for kind, lst in (('changed', changed), ('new', new), ('gone', gone)):
         for rel in lst:
             g = allowed(rel)
-            if g and (kind != 'gone' or g in GONE_OK):
+            if g and (kind != 'gone' or g in ALLOW_GONE):
                 groups.setdefault(g, {}).setdefault(kind, []).append(rel)
             else:
                 bad.append((kind, rel))

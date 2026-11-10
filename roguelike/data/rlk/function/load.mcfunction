@@ -42,7 +42,8 @@ scoreboard objectives add invDirty dummy
 scoreboard objectives add invCap dummy
 scoreboard objectives add invEvt dummy
 scoreboard objectives add invCnt dummy
-
+# 장비 스캔의 빠른 길: 플레이어 = 마지막 스캔 번호, #scEp = 전체 스캔 번호(items/equip_scan · items/scan_fast)
+scoreboard objectives add eqEp dummy
 scoreboard objectives add hudHold dummy
 
 # 전투/조작

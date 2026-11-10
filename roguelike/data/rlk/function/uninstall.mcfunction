@@ -289,6 +289,7 @@ scoreboard objectives remove eqDendroBonus
 scoreboard objectives remove eqElectroBonus
 scoreboard objectives remove eqElemMastery
 scoreboard objectives remove eqEnergyRecharge
+scoreboard objectives remove eqEp
 scoreboard objectives remove eqGeoBonus
 scoreboard objectives remove eqHpFlat
 scoreboard objectives remove eqHpPct

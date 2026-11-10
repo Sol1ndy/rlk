@@ -10,6 +10,11 @@
 - 공용 서버 검사: `RLK_DEV=/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad bash <wt>/roguelike/tools/dev/loadcheck.sh <wt>/roguelike <tag>`
   (서버 · JDK 25 준비됨; 한 번에 한 서버, 잠금이 줄 세움).
 
+## 리소스팩
+- 리소스팩은 git 밖이다. 11-06 릴리스 RP 는 고아 가지 `wip/rp-snapshot`(`rlk_hud_resourcepack_1106.zip`, 풀면 sha1 b3df6a5f…)에
+  있고, 이 컨테이너에는 `/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/rp_base` 에 풀어 두었다(읽기 전용으로 쓰고,
+  RP 를 고치는 레인은 자기 사본 `cp -r rp_base rp_<lane>` 에서 만든다).
+
 ## 단계 (lane)
 | lane | 가지 | 내용 | 먼저 끝나야 하는 것 |
 |---|---|---|---|
@@ -34,3 +39,6 @@ README 0-6 의 사용자 규칙 전부(팁 문구 금지 · 바닐라 소리 · 
 스위트 · `run_all.sh`(0-9 의 알려진 실패만) · `check_mboss_pack` 0 · loadcheck 0. 커밋 끝 두 줄은 정확히
 `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` / `Claude-Session: https://claude.ai/code/session_019wi9c7roqDDkFi2TvFWw6G`.
 컨테이너가 다시 시작될 수 있으니 진행 기록(`<lane>_progress.md`, 이 폴더)을 늘 최신으로 두고, 검사를 통과한 단계마다 커밋 · 푸시.
+
+## 정기 보고
+- 사용자 11-10: 「중간중간 2~3시간마다 얼마나 남았는지 알려줘」 → 예약 작업 「전투 개편 진행 보고」(trig_01PmTgvoDpBSDggLqhpeSkyU, 3시간마다, 이 세션으로). 릴리스까지 끝나면 삭제.
