@@ -43,6 +43,7 @@ W=<work>; cp -a roguelike/tools/dev/sim $W/sim     # + the path rewrite of sim R
 cd $W/sim/cb/tests
 python3 hzlog.py <roguelike> <boss> pat --out=$W/out/<tag>_<boss>_pat.json            # every pattern (test ids)
 python3 hzlog.py <roguelike> <boss> pat --dodge --out=$W/out/<tag>_<boss>_dodge.json  # a perfect dodge on every tick
+python3 hzlog.py <roguelike> <boss> pat --dodge --stand --out=$W/out/<tag>_<boss>_stand.json   # + standing inside every U hazard
 python3 hzlog.py <roguelike> <boss> fight --ticks=3000 --out=$W/out/<tag>_<boss>_fight.json   # passive player, healed
 python3 np_table.py $W/out <tag> [boss ...] [--cmp=<other tag>]                       # the table below; the fight log compared
 python3 test_np.py <roguelike> [fw b08 b09 mobs table] [--logs=$W/out --tag=<tag>]    # the checks (fail on 6522feef5)
@@ -52,7 +53,7 @@ Never regenerate a tree while a harness reads it (use a copy: `snap.sh`).
 ## Steps
 - [x] baseline: harness logs + suites on 6522feef5 (`out/base_*`, `sim/out_base`)
 - [x] core + lib + registry, the seven modules, Raiden, mobs, balance, Tachy grounding
-- [x] `test_np.py` (84 `table` checks + fw 19 / b08 4 / b09 5 / mobs 6 pass on the tree; on the base: `table` 29 fail, the others 14 fail)
+- [x] `test_np.py` (91 `table` checks + fw 19 / b08 4 / b09 5 / mobs 6 pass on the tree; on the base: `table` 29 fail, the others 14 fail)
 - [x] README (section 3, 0-8, 0-9, framework + boss sections, mob rows), `tools/dev/sim/README.md` 3-6
 - [x] harness on the tree: the table and the fight comparison below
 - [x] gates on the committed tree (suites from a copy of `tools/dev/sim`, the tree = a plain copy of the worktree):
@@ -60,7 +61,7 @@ Never regenerate a tree while a harness reads it (use a copy: `snap.sh`).
     hash stays b3df6a5f... (= `rp_base`: no pack file changes; `rplint` 0, atlas 12.919 M); `check_mboss_pack` 0 problems
   - loadcheck `fb2` (26.3 server): `0 function load failure(s)`, `Starting minecraft server version 26.3`, `Done (`
   - `test_bal` 117/117, `test_bal_boss` 129/129 (scarlet 6a follows B-09: an untargetable body takes no pips), `test_cb` 217/217,
-    `test_rm` all, `test_np` 34 + 84 (`table` on the harness logs)
+    `test_rm` all, `test_np` 34 + 91 (`table` on the harness logs)
   - `az/tests_cm/run_all`: the base's statuses — `test_chapter` / `test_fw_az` / `test_fw_ap` / `gen_check` pass; known failures
     unchanged: `test_m0diff` 38 (A: proto +7.03, Guardian +6.16, butterfly +7.26, fieldgen +7.76 per tick; before +7.14 / +6.24 /
     +7.29 / +7.88), `test_px` 4e, `ident` 10, refs 8 known kinds; `check_refs` / `check_macro` / `check_nbtpath` / `lint_mc`
@@ -231,11 +232,14 @@ hovers); 나비 4.9 b (the rig's core anchor in the whirl); 역장 4.5 b (the co
 ahead (registry: thorax / head); 타키 노바 1.75 b · 착지 공격 at her chest while still high (14.75 b above the floor); 아를레키노 the
 rig's chest anchor of the clip tick (1.5-2.8 b above her feet; Q4 5.9 b and Q6 13.8 b above the floor: she is in the air).
 
-Not unanswerable (test_np `table` 9-11): with a perfect dodge on every tick every U hit is avoided and no U-ND hit is; two U
-strikes that a dodge must answer are never closer than 10 t (the least a 12-t cooldown allows): the nearest are 아펩's two
-tail swings (>= 17 t for one standing spot), 타키's landing (the parryable impact 10 t before the shock: F, then the dodge),
-아를레키노 Q5A 26 / 37 t, F 36 t, 파수꾼's two failure spears 23 t, 야타용왕's frost circles 34 t (the last one 24 t before the
-emergence).
+Not unanswerable (test_np `table` 9-12): with a perfect dodge on every tick every U hit is avoided and no U-ND hit is. A
+standing player is out of some of these hazards, so a third run (`pat --dodge --stand`) puts the player inside every U
+hazard while it winds up (the one that strikes first): all strikes are judged and avoided — 파수꾼 3, 나비 1, 역장 1, 야타용왕 21,
+아펩 21 (7 answers: a tail swing's eight wedges are one), 타키 2, 아를레키노 19 (11 answers). The smallest gap between two
+unparriable hits in those runs is 23 t (파수꾼's two failure spears; 아펩's slams 23 / 31 t), 24 t (아펩's two tail swings at one
+spot; 야타용왕's last frost circle and the emergence; her frost circles 34 t), 26 / 37 t (아를레키노 Q5A; F 36 t): above the 18-t
+cooldown of a dodge that avoided nothing, so each can be answered with its own perfect dodge. 타키's landing has the parryable
+impact 10 t before the shock: F for the impact (or leave its r 1.7), the dodge for the shock.
 
 ## Decided here (say so if it should be otherwise)
 - **Raiden** (B-04 + B-11): every unparriable hazard of hers is no-dodge or a field / safe dome, so `hazard/new` flashes no

@@ -2,7 +2,7 @@
 """hzlog.py — the hazard / projectile / glint log of one boss in simulated fights (combat overhaul, fix lane FB; the
 reviewer's harness of review B rebuilt from the `repro` fields of tools/dev/plan/combat/review/findings_B.json).
 
-    python3 hzlog.py <roguelike dir> <boss> pat   [--ids=1,2,..] [--ticks=N] [--dodge] [--out=<file.json>]
+    python3 hzlog.py <roguelike dir> <boss> pat   [--ids=1,2,..] [--ticks=N] [--dodge] [--stand] [--out=<file.json>]
     python3 hzlog.py <roguelike dir> <boss> fight [--ticks=3000] [--seed=N] [--out=<file.json>]
 
 Run it from a copy of tools/dev/sim outside the datapack (sim README 1 B). One boss per process: the vendored sims of
@@ -20,7 +20,8 @@ What is recorded (the real framework and modules run; every score is read from t
   cmd    commands per world tick (every command the interpreter runs, sub-commands of execute included)
 
 `pat`: a fresh fight per test id (rlk:mboss/test/pattern {id:N}); with --dodge the player's dodge stamp is refreshed every
-tick (a perfect dodge on every tick), which shows what a perfect dodge avoids. `fight`: the AI's own fight against a passive
+tick (a perfect dodge on every tick), which shows what a perfect dodge avoids; --stand also puts the player inside every
+unparriable-and-dodgeable hazard while it winds up. `fight`: the AI's own fight against a passive
 player who is healed every tick (the fight never pauses), N fight ticks.
 """
 import json
@@ -196,8 +197,32 @@ def heal(s):
     s.setsc(('e', pl.id), 'dead', 0)
 
 
+def stand_in(s):
+    """--stand: the player is put on the floor inside the live unparriable-and-dodgeable hazard that strikes next, before every tick (a
+    disc: 1 b from its centre; a ring: the middle of its band; a sector / line: 2 b along its aim; the full arena: where she
+    stands), so the pattern runs with --dodge also judge the strikes a player standing still would be out of."""
+    import math
+    hz = [e for e in s.ents if e.alive and 'rlk_mb_hz' in e.tags and e.id in s.hl_hz
+          and s.hl_hz[e.id]['NP'] and not s.hl_hz[e.id]['ND'] and not s.hl_hz[e.id]['RA']
+          and (s.hl_hz[e.id]['D'] or s.hl_hz[e.id]['PM']) and 'strike' not in s.hl_hz[e.id]]
+    if not hz:
+        return
+    e = min(hz, key=lambda x: s.hl_hz[x.id]['t'] + s.hl_hz[x.id]['W'])      # the one that strikes first
+    r = s.hl_hz[e.id]
+    if r['K'] in (5, 6):
+        return
+    d = 1.0 if r['K'] == 1 else (r['R0'] + r['R']) / 2000.0 if r['K'] == 2 else 2.0
+    d = min(d, max(0.0, r['R'] / 1000.0 - 0.5))
+    yaw = math.radians(e.rot[0])
+    pl = s.player()
+    pl.pos = [e.pos[0] - math.sin(yaw) * d, e.pos[1], e.pos[2] + math.cos(yaw) * d]
+    s.setsc('#mbPlG', 'mb', -1)                 # mv/plpos caches the body position per game tick (cmsim.moved)
+
+
 def tick(s, world, dodge=False):
     heal(s)
+    if 'stand' in OPT:
+        stand_in(s)
     if dodge:
         pl = s.player()
         for o in ('parAt', 'parLk', 'parHit', 'dgRw'):

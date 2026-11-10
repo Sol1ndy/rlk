@@ -15,12 +15,13 @@ Run it from a copy of tools/dev/sim outside the datapack (sim README 1 B). Secti
   b09    아펩: no pips while the body is parked (untargetable); pips again when it is back
   mobs   (child process, bal/tests/lib) B-06 the archer's arrow carries its owner: the hit context names the archer; B-07 the
          conjurer's cicins: no new ram while she is groggy, a ram is judged as hers
-  table  hzlog.py `pat` and `pat --dodge` of the seven bosses (child processes; --logs / --tag reuse existing logs): the
+  table  hzlog.py `pat`, `pat --dodge` and `pat --dodge --stand` of the seven bosses (child processes; --logs / --tag reuse existing logs): the
          unparriable patterns per boss are exactly the ruled list; every unparriable hazard that can be dodged has its glint
          >= 12 t before the strike (the module list >= 20 t), no glint belongs to a parryable / no-dodge / lingering hazard,
          every glint is >= 1 b above the floor; no volley group and no strike mixes parryable and unparriable hazards; with a
          perfect dodge on every tick every such hit is avoided and no no-dodge hit is; unparriable strikes a perfect dodge
-         has to answer are never closer than the dodge cooldown allows.
+         has to answer are never closer than the dodge cooldown allows; with the player standing inside every such hazard
+         (`pat --dodge --stand`, <tag>_<boss>_stand.json) each strike is judged and avoided.
 """
 import json
 import subprocess
@@ -473,15 +474,17 @@ def t_table():
         logs, tag = Path(OPT['logs']), OPT.get('tag', 'new')
     else:
         logs, tag = Path(tempfile.mkdtemp(prefix='np_')), 't'
-        jobs = [(b, m) for m in ('pat', 'dodge') for b in bosses]
+        jobs = [(b, m) for m in ('pat', 'dodge', 'stand') for b in bosses]
         running = []
         maxj = int(OPT.get('jobs', 3))
         while jobs or running:
             while jobs and len(running) < maxj:
                 b, m = jobs.pop(0)
                 cmd = [sys.executable, str(HERE / 'hzlog.py'), str(DP), b, 'pat', f'--out={logs}/{tag}_{b}_{m}.json']
-                if m == 'dodge':
+                if m in ('dodge', 'stand'):
                     cmd.append('--dodge')
+                if m == 'stand':
+                    cmd.append('--stand')
                 running.append((b, m, subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)))
             b, m, p = running.pop(0)
             err = p.communicate()[1]
@@ -565,6 +568,23 @@ def t_table():
         ck(f'table {b} 10 ... and no no-dodge hit (those keep their own tells, no glint)', not nd_dodged, nd_dodged[:6])
         ck(f'table {b} 11 two unparriable strikes a dodge must answer are never closer than {DODGE_GAP} t (the dodge cooldown)',
            not seq, seq[:6])
+        stand = T.load(logs, tag, b, 'stand')
+        if stand is None:
+            print(f'     table {b} 12 skipped: no {tag}_{b}_stand.json (hzlog.py pat --dodge --stand)')
+            continue
+        # the player stood inside every unparriable-and-dodgeable hazard: each one that struck was judged - itself or, for a
+        # volley, a member of its group - and the perfect dodge avoided it
+        missed, n = [], 0
+        for tid, v in stand.items():
+            ok_hz = {h['hz'] for h in v['hits'] if h.get('hz') is not None and h['dodged']}
+            ok_grp = {v['hz'][i]['G'] for i in ok_hz if v['hz'][i]['G']}
+            for h in v['hz']:
+                if (h['D'] or h['PM']) and T.state_of(h) == 'U' and h.get('strike') is not None:
+                    n += 1
+                    if h['i'] not in ok_hz and h['G'] not in ok_grp:
+                        missed.append((tid, h['src'], h['t']))
+        ck(f'table {b} 12 standing inside every unparriable hazard that can be dodged ({n} strikes): each is judged and the perfect '
+           'dodge avoids it', n >= 1 and not missed, (n, missed[:6]))
 
 
 if __name__ == '__main__':
