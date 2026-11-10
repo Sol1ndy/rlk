@@ -1,5 +1,8 @@
 # A8 pattern tick 130.
-function rlk:boss/scarlet/rig/play/g_drop
-execute at @s rotated as @s rotated ~ 0 positioned ~ ~0.95 ~ run function rlk:boss/scarlet/fx/p/ghost_flash
-execute at @s run function rlk:boss/scarlet/fx/snd/g_flash
-function rlk:boss/scarlet/g/cut/make {s:147,t:17,dmg:37,kb:0,n:1}
+function rlk:mboss/mv/face
+execute at @s rotated as @s rotated ~ 0 positioned ~ ~0.95 ~ run function rlk:boss/scarlet/fx/p/ghost_trail {len:125}
+function rlk:boss/scarlet/g/spot/side
+execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] run function rlk:mboss/mv/glide {t:4}
+kill @e[type=minecraft:marker,tag=rlk_hr_gsp]
+execute at @s run function rlk:boss/scarlet/fx/snd/g_dash
+function rlk:boss/scarlet/g/cut/aim {s:138}

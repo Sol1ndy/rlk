@@ -8,9 +8,10 @@ frame, #ai_lf / #ai_ls cm, #ai_d2 cm^2; a 6-bit rear history #rear = the last 30
 than FAR_RULE dist); ai/recover each idle tick; ai/decide when the recovery ran out. Cooldowns are ready times on the
 module clock #clk (#cd_<key> = #clk + cooldown at the start; A6 #a6cd); the clock stops while the fight is paused and a
 reload keeps the scores. Only patterns present in p1.PATTERNS + p_ghost.PATTERNS are ever picked (S4's may be missing).
-The decision order: the test hold (99), the reserved phase step (#fl: CS1 in P1, the A13 lead-in in P2), the test lock
-(#mbLock mb), a forced next entry (#ai_nx: A3 after the far fallback's approach), the rear rule, the far rule (also right
-after A6), the weighted pick of the band.
+The decision order: the test hold (99), the reserved phase step (#fl: CS1 in P1, lead5 in P2), the test lock (#mbLock
+mb), a forced next entry (#ai_nx: A3s after the far fallback's approach), the full gauge (hr_design §1.2: #gau = 50 and the
+player in the near / mid band -> rings with ult to follow, core/ult_go; from far she closes first), the rear rule, the far
+rule (also right after A6), the weighted pick of the band (api.WEIGHTS, cooldowns, no immediate repeat, MID_MAX / MID_MIN).
 """
 from . import api
 from . import s3lib as S
@@ -33,6 +34,8 @@ A6 = A = api.A6_TRIGGER
 BACKSTEP = {'until': 5.0, 'speed': 0.3, 'move_t': api.CLIPS['backstep'][2]['land']}
 BS_T = api.CLIPS['backstep'][0]
 MV_BACK = 6                                               # #ai_mv of the backstep (1 walk, 2 / 3 strafe, 4 approach, 5 glide)
+FB = api.FAR_RULE['fallback'][1]                          # the far fallback's entry after the glide in (a3s)
+GAU = api.GAUGE_FP
 TAIL_OLD = 100                                            # ai/phase: the kept tail's move clock this far in the past
 
 
@@ -49,6 +52,8 @@ def allowed(key, var, fp, check_cd=True, mid_max=False):
         out.append(f'execute if score #last {OBJ} matches {S.TID[key]} run {sset(var, 0)}')
     if mid_max and key in api.MID_MAX:
         out.append(f'execute if score #ai_d2 {OBJ} matches {CM2(api.MID_MAX[key]) + 1}.. run {sset(var, 0)}')
+    if mid_max and key in api.MID_MIN:
+        out.append(f'execute if score #ai_d2 {OBJ} matches ..{CM2(api.MID_MIN[key]) - 1} run {sset(var, 0)}')
     return out
 
 
@@ -131,7 +136,7 @@ def build(W, ctx):
         rs.append(f'execute if score #ph {OBJ} matches {ph} store result score #rec {OBJ} run random value {lo}..{hi}')
     rs += [f'execute unless score #ph {OBJ} matches {FPS[1]} unless score #ph {OBJ} matches {FPS[2]} run {sset("#rec", api.RECOVER[2][0])}',
            fn('ai/sample'),
-           f'execute if score #ai_nx {OBJ} matches {S.TID["a3"]} run return run {fn("ai/approach")}',
+           f'execute if score #ai_nx {OBJ} matches {S.TID[FB]} run return run {fn("ai/approach")}',
            f'execute if function {api.NS}ai/tail_keep run return 0',
            fn('ai/move_pick')]
     w('ai/rec_start', rs)
@@ -164,7 +169,7 @@ def build(W, ctx):
                        f'execute if score #ai_d2 {OBJ} matches {WALK2 + 1}.. if score #ai_mv {OBJ} matches 2..3 run return fail',
                        f'execute if score #ai_d2 {OBJ} matches ..{WALK2} unless score #ai_mv {OBJ} matches 2..3 run return fail',
                        'return 1'])
-    w('ai/approach', ['# The far fallback (FAR_RULE glide + A3): glide in (A3_GLIDE b/t) until within 8 b, then A3 (#ai_nx).',
+    w('ai/approach', [f'# The far fallback (FAR_RULE glide + {FB.upper()}): glide in (A3_GLIDE b/t) until within 8 b, then {FB.upper()} (#ai_nx).',
                       sset('#ai_mv', 4), sset('#rec', 40), api.play('glide')])
     w('ai/play_move', ['# The recovery clip (@s = body): walk / P2 glide in, the far fallback\'s glide (ai/approach; F1 round 1: also after',
                        '# a flinch), strafe left / right, the backstep (P2 the idle2 stance between).',
@@ -211,9 +216,14 @@ def build(W, ctx):
            fn('ai/sample')]
     for k in sorted(present, key=lambda k: S.TID[k]):
         if S.TID[k] in api.LOCK_IDS:
-            dec.append(f'execute if score #mbLock mb matches {S.TID[k]} run return run {fn(f"core/start/{k}")}')
-    dec += [f'execute if score #ai_nx {OBJ} matches {S.TID["a3"]} run return run {fn("ai/next_a3")}',
-            fn('ai/rear_count'),
+            go = 'core/ult_go' if k == 'ult' else f'core/start/{k}'
+            dec.append(f'execute if score #mbLock mb matches {S.TID[k]} run return run {fn(go)}')
+    dec.append(f'execute if score #ai_nx {OBJ} matches {S.TID[FB]} run return run {fn("ai/next_fb")}')
+    if 'rings' in present and 'ult' in present:
+        # hr_design §1.2 / §2.2: a full gauge overrides the weights in the near / mid band (rings' cooldown ignored)
+        dec.append(f'execute if score {GAU} {OBJ} matches {api.GAUGE["max"]}.. if score #ai_d2 {OBJ} matches ..{MID2} run return run '
+                   f'{fn("core/ult_go")}')
+    dec += [fn('ai/rear_count'),
             f'execute if score #ai_rc {OBJ} matches {REAR_N}.. if function {api.NS}ai/rear run return 1',
             f'execute if score #ai_ff {OBJ} matches 1 if function {api.NS}ai/after_a6 run return 1',
             f'execute if score #far {OBJ} matches {api.FAR_RULE["dwell"]}.. run return run {fn("ai/far")}',
@@ -225,9 +235,9 @@ def build(W, ctx):
             dec.append(f'execute {cond} run return run {fn(f"ai/pick/p{fp}_{band}")}')
     dec.append(fn('ai/none'))
     w('ai/decide', dec)
-    w('ai/next_a3', ['# The far fallback\'s approach ended: A3 (its cooldown and the no-repeat rule kept; else the normal pick).',
-                     sset('#ai_nx', 0), sset('#ai_wa3', 1)] + allowed('a3', '#ai_wa3', 1)
-      + [f'execute if score #ai_wa3 {OBJ} matches 1 run return run {fn("core/start/a3")}', fn('ai/decide')])
+    w('ai/next_fb', [f'# The far fallback\'s approach ended: {FB.upper()} (its cooldown and the no-repeat rule kept; else the normal pick).',
+                     sset('#ai_nx', 0), sset(f'#ai_w{FB}', 1)] + allowed(FB, f'#ai_w{FB}', 1)
+      + [f'execute if score #ai_w{FB} {OBJ} matches 1 run return run {fn(f"core/start/{FB}")}', fn('ai/decide')])
     w('ai/none', ['# Nothing may run now (every candidate cooling down): the recovery goes on a little longer (8 t); F1 (HR-13): a',
                   '# second empty pick in a row (no pattern between) -> the backstep, then the mid pick.',
                   f'execute if score #ai_nn {OBJ} matches 1.. run return run {fn("ai/backstep")}',
@@ -259,14 +269,14 @@ def build(W, ctx):
     w('ai/rear_go', [f'# The rear rule starts {rk.upper()}.', fn(f'core/start/{rk}'), 'return 1'])
     # the far rule: per fight phase, weighted, cooldowns respected; fallback glide in + A3
     far = [f'# The player stayed farther than {api.L.num(api.FAR_RULE["dist"])} b for {api.FAR_RULE["dwell"]} t (or right after A6): the gap',
-           '# closer of the fight phase (FAR_RULE weights; cooldowns and no-repeat kept); none may run -> glide in + A3.']
+           f'# closer of the fight phase (FAR_RULE weights; cooldowns and no-repeat kept); none may run -> glide in + {FB.upper()}.']
     for fp, ph in FPS.items():
         cands = [(k, wt) for k, wt in api.FAR_RULE[fp].items() if k in present]
         far.append(f'execute if score #ph {OBJ} matches {ph} run return run {fn(f"ai/far_p{fp}")}')
         w(f'ai/far_p{fp}', [f'# The far rule, P{fp}.'] + weighted(cands, var, fp, none_fn='ai/far_none'))
     far.append(fn('ai/far_none'))
     w('ai/far', far)
-    w('ai/far_none', ['# The far fallback (FAR_RULE fallback glide + A3).', sset('#far', 0), sset('#ai_nx', S.TID['a3']), fn('ai/approach')])
+    w('ai/far_none', [f'# The far fallback (FAR_RULE fallback glide + {FB.upper()}).', sset('#far', 0), sset('#ai_nx', S.TID[FB]), fn('ai/approach')])
     # weighted picks per fight phase and band
     for fp in FPS:
         for bi, band in enumerate(BANDS):

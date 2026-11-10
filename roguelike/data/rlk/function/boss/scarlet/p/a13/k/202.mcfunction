@@ -1,3 +1,2 @@
 # A13 pattern tick 202.
-execute at @s run function rlk:boss/scarlet/fx/snd/g_step
-function rlk:boss/scarlet/g/cut/aim {s:211}
+function rlk:boss/scarlet/g/cut/aim {s:216}

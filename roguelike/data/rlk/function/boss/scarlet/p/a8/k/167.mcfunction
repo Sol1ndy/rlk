@@ -1,6 +1,2 @@
 # A8 pattern tick 167.
-function rlk:boss/scarlet/g/cut/lock {s:174}
-function rlk:mboss/mv/face
-function rlk:boss/scarlet/g/spot/side
-execute positioned as @e[type=minecraft:marker,tag=rlk_hr_gsp,limit=1] run function rlk:mboss/mv/glide {t:3}
-kill @e[type=minecraft:marker,tag=rlk_hr_gsp]
+function rlk:boss/scarlet/g/cut/aim {s:180}

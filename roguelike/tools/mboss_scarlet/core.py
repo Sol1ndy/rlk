@@ -1,18 +1,21 @@
-"""Core of the 홍련 (Scarlet) module (OWNER: S3; plan S:hr/PLAN.md §3.0, §3.8, §4.6, §5, §6.6-6.7, §7.3; contract
-S:hr/contract.md §3): the 17 hooks + test/help, init (objective hr), the phase machine intro -> P1 -> CS1 -> SQ1 -> A8 ->
-(deflect) CS2 -> down -> kipup -> P2 | (fail) fail-60 -> P2 -> (5 %) lead_stand / lead_down -> A13 -> (deflect) CS3 ->
-the kill -> death (CS4 + the event coda) | (fail) the instant death -> (revive) A13 again; the floors, the invulnerable
-windows, the counter cinematic's HP steps (#sq_sig), the down window, the look requests (#hrLook), the decor props, the
-HUD (the under bar, the intro's skip prompt + input), pause / resume / reload / cleanup per PLAN §3.8 / §5.6, the kit
-wiring (contract §3.3), the tests; the stand-ins while another stage's files are missing: rig_stub/** (S2a), the
-sequences core/sq/** (S2b) and the gauntlets core/gs/** (S4).
+"""Core of the 홍련 (Scarlet) module on the new combat (hr_design §1; lane H1): the 17 hooks + test/help, init (objective
+hr), the phase machine intro (CS0) -> P1 -> CS1 -> lead60 -> G1 (a8) -> (gauge 0) repel {at:60} -> P2 | (fail) fail-60 -> P2
+-> (5 %) lead5 -> G2 (a13) -> (gauge 0) repel {at:5} -> the kill -> death (the ending + the event coda) | (fail) the instant
+death -> (revive) lead_re -> G2 again; the floors, the invulnerable windows, the repel's HP steps (#sq_sig), the 5-segment
+gauge (charge, the forced rings -> ult, the under bar), the balance adapter (bal_ok / bal_on / bal_tick / bal_off: the groggy
+= grog_in -> down -> kipup; #mbBalOff through the lead-ins and the gauntlets), the perfect-parry flinch, the decor props,
+the skip prompt + input of CS0 and CS1, pause / resume / reload / cleanup (hr_design §1.5, §3.6), the kit wiring, the tests;
+the stand-ins while another lane's files are missing: rig_stub/**, the sequences core/sq/** (lane H2) and the gauntlets
+core/gs/**.
 
-#ph = api.PH. #pat = a running pattern (s3lib.TID: P1 1-7, R1-R3 11-13, the gauntlets 21 / 27), else 0. #sqn = the running
-sequence (s3lib.SEQ_ID, index of api.SEQS + 1) on the clock #sq (0 at its start, + 1 before each tick); #sqdone 1 ends it.
-#gk = the gauntlet of the current chain (1 A8 / 2 A13; the counter cinematic's repel {at} and the lead_stand {g} follow it),
-#gres its judge (1 deflect / 2 fail), #grs a gauntlet restart pending at resume (1 lead_stand {g}, 2 the revive wait, 3 the
-judged deflect goes on to the counter cinematic; F1: 4 the judged A8 fail goes on to P2, 5 a lethal fail pending). #fl the reserved floor step (1 CS1, 2 the A13 lead-in), #flw the down
-window's 40 t wait. #inv the core's invulnerable window (rlk_mb_inv = #inv or the ghost tag or A6 ticks 0-4: core/inv).
+#ph = api.PH. #pat = a running pattern (s3lib.TID), else 0. #sqn = the running sequence (s3lib.SEQ_ID) on the clock #sq (0
+at its start, + 1 before each tick); #sqdone 1 ends it. #gk = the gauntlet of the current chain (1 G1 / 2 G2; the repel {at}
+and lead_re {g} follow it), #gres its judge (1 deflect / 2 fail), #grs what resume does after a pause (1 lead_re {g}, 2 the
+revive wait, 3 the judged deflect goes on to the repel, 4 the judged G1 fail goes on to P2, 5 a lethal fail pending, 6 CS1 ->
+its end state, 7 the repel -> its end state, 8 a lead-in again from 0, 9 CS0 -> its end state). #fl the reserved floor step
+(1 CS1, 2 lead5). #inv the core's invulnerable window (rlk_mb_inv = #inv or the ghost tag or A6 ticks 0-4: core/inv).
+#gau the gauge (tenths of a segment). #pp a perfect parry seen this tick, #ppf the flinch it started, #ultq ult follows the
+running rings, #hpp her hits that landed since the last tick.
 """
 import math
 
@@ -105,7 +108,7 @@ def seq_hold(grs):
 # counting cut's pip window closed (strike + 1) with pips left -> the fail stays pending and lands as soon as the player is
 # back and alive (core/g/fail_now: the fatal -> the revive path); before that strike the restart rule (PLAN §3.8 / §5.6).
 LETHAL = {g: bool(api.ULT60_LETHAL if g == 'a8' else api.ULT5_LETHAL) for g in GAUNT}
-PEND_T = {g: max(c[2] for _t, _s, _cl, c in api.SCRIPTS[g] if c) + 1 for g in GAUNT}
+PEND_T = {g: max(c[2] for _t, _s, _cl, c in api.SCRIPTS[g] if c) + 3 for g in GAUNT}   # the last cut's segment window is over
 PLAYER_BACK = ('if entity @a[tag=player,limit=1] unless entity @a[tag=player,scores={dead=1}] '
                'unless entity @a[tag=player,scores={rnDie=1..}]')
 
@@ -135,7 +138,7 @@ def build(W, ctx):
       + [sset(f'#c{c}', c) for c in S.CONSTS] + [sset('#cn1', -1), sset('#cn1000', -1000)])
     consts = {f'#c{c}' for c in S.CONSTS} | {'#cn1', '#cn1000'}
     w('core/vars', ['# Every core fake player to its fight-start value (spawn; never the event scores api.EV_FP).']
-      + [sset(k, 0) for k in S.FP if k not in consts] + [sset('#skip', 0), sset('#hud', 1)])
+      + [sset(k, 0) for k in S.FP if k not in consts] + [sset('#skip', 0), sset('#hud', 1), sset('#mx_rep', 0)])
     # ---------------------------------------------------------------------------------------------- spawn / setup
     seat = api.SEAT_POS
     yaw_moon = yaw_to(seat, api.MOON_POS)
@@ -148,8 +151,9 @@ def build(W, ctx):
         f'execute positioned {api.xyz(seat)} rotated {L.num(yaw_moon)} 0 run function rlk:mboss/body',
         at_body(fn('core/setup')), api.bars(0)] + [sset(k, 0) for k in api.EV_FP])
     w('core/setup', ['# @s = the new body: module state, the floors, the rig (normal form, P1 look, the blade off), the decor props;',
-                     '# she draws her own yellow warning tells: the framework\'s unparriable glint is off (#mbNpOwn mb 1, combat overhaul C).',
-                     'scoreboard players set #mbNpOwn mb 1', fn('init'), fn('core/vars'), fn('core/floors'), api.rig('init'), api.rig('spawn'), fn('core/looks'),
+                     '# she draws her own unparriable flashes (yellow / purple / blue): the framework\'s glint is off for the whole fight',
+                     '# (#mbNpOwn mb 1; the cleanup hook clears it).',
+                     f'scoreboard players set {api.NP_OWN[0]} {api.NP_OWN[1]} 1', fn('init'), fn('core/vars'), fn('core/floors'), api.rig('init'), api.rig('spawn'), fn('core/looks'),
                      fn('core/deco'), 'data modify storage rlk:mboss sub set value []'])
     w('core/looks', ['# The rig looks the module owns (form, phase, blade, state) for the current phase (@s = body; reload, tests).',
                      api.rig('look/form/normal'),
@@ -186,11 +190,12 @@ def build(W, ctx):
         sset('#rp', 0), L.title(*api.TITLE), music_to(1), fn('core/floors'),
         f'scoreboard players operation #mbFloor mb = #fl60 {OBJ}',
         *seat_gone(),
-        fn('ai/phase'), fn('core/looks'), fn('ai/rec_start'), sset('#rec', 20)])
+        fn('core/ev0'), fn('ai/phase'), fn('core/looks'), fn('ai/rec_start'), sset('#rec', 20)])
     w('core/intro/reload', ['# /reload during the intro: straight to the end of E12 (standing, the sword drawn, the rock gone,',
                             '# the title shown, music 1).',
                             seq(ctx, 'intro', 'cancel'), fn('core/intro/done')])
     skip_files(W, ctx)
+    gauge_files(W)
     # ---------------------------------------------------------------------------------------------- the fight tick
     w('tick', ['# Hook tick (@s = body, at it, fight state #mbSt 1): the phase machine, then the rig tick (the shown clip tick ==',
                '# the pattern / sequence clock).',
@@ -211,7 +216,7 @@ def build(W, ctx):
         # I1b (request s1k-2; PLAN §6.3 / §6.4): the kit's arena ambience at each player on the module clock
         w('core/amb', [
             f'# The arena ambience (@s = body; PLAN §6.3 / §6.4): ambient_p1 every {AMB_EVERY[0]} t at each player in P1, ambient_p2',
-            f'# every {AMB_EVERY[1]} t in P2, the down window and the gauntlets; none in a sequence (it stages its own effects).',
+            f'# every {AMB_EVERY[1]} t in P2 and the gauntlets; none in a sequence (it stages its own effects).',
             f'scoreboard players operation #t {OBJ} = #clk {OBJ}',
             f'execute if score #ph {OBJ} matches {PH["p1"]} run return run {fn("core/amb1")}',
             f'execute if score #ph {OBJ} matches {PH["a8"]}..{PH["a13"]} unless score #ph {OBJ} matches {PH["cs2"]} '
@@ -230,12 +235,12 @@ def build(W, ctx):
         f'execute if score #ph {OBJ} matches {PH["p2"]} run return run {fn("core/fp")}',
         f'execute if score #ph {OBJ} matches {PH["a8"]} run return run {fn("core/g/tick")}',
         f'execute if score #ph {OBJ} matches {PH["a13"]} run return run {fn("core/g/tick")}',
-        f'execute if score #ph {OBJ} matches {PH["down"]} run return run {fn("core/down/tick")}',
         f'execute if score #rvw {OBJ} matches 1.. run return run {fn("core/revive/tick")}',
         f'execute if score #sqn {OBJ} matches 1.. run return run {fn("core/seq/tick")}'])
     w('core/inv', [
-        '# rlk_mb_inv of the body (@s = body, after the state): the core window (#inv: CS1 -> CS2 / the A8 fail, the kipup, the',
-        '# lead-ins -> CS4, the intro replay), the ghost form (rlk_hr_ghost, S4), A6 ticks 0-4; else hittable.',
+        '# rlk_mb_inv of the body (@s = body, after the state): the core window (#inv: CS1 -> the end of the repel / the G1',
+        '# fail, lead5 -> the ending, the intro replay), the ghost form (rlk_hr_ghost), A6 ticks 0-4; else hittable (the',
+        '# balance groggy and its kip-up too).',
         f'execute if score #inv {OBJ} matches 1.. run return run tag @s add rlk_mb_inv',
         f'execute if entity @s[tag={api.TAGS["ghost"]}] run return run tag @s add rlk_mb_inv',
         f'execute if score #pat {OBJ} matches {TID["a6"]} if score #pt {OBJ} matches {api.A6_TRIGGER["inv"][0]}..{api.A6_TRIGGER["inv"][1]} '
@@ -243,18 +248,17 @@ def build(W, ctx):
         'tag @s remove rlk_mb_inv'])
     w('core/floor_hit', [
         '# A hit reached the floor (#mbFloorHit, framework) or her HP sits on it (@s = body): the step is reserved for the next',
-        '# decision (#fl 1 CS1 in P1, 2 the A13 lead-in in P2); in the down window lead_down follows 40 t later (#flw).',
+        '# decision (#fl 1 CS1 in P1, 2 lead5 in P2); a running pattern finishes first, a groggy is cut to its kip-up (bal_tick).',
         'scoreboard players set #mbFloorHit mb 0',
         f'execute unless score #fl {OBJ} matches 0 run return 0',
         f'execute if score #ph {OBJ} matches {PH["p1"]} run return run {sset("#fl", 1)}',
-        f'execute if score #ph {OBJ} matches {PH["down"]} if score #kip {OBJ} matches 0 run {sset("#flw", api.DOWN_FLOOR_WAIT)}',
-        f'execute if score #ph {OBJ} matches {PH["down"]} run return run {sset("#fl", 2)}',
         f'execute if score #ph {OBJ} matches {PH["p2"]} run {sset("#fl", 2)}'])
     # ---------------------------------------------------------------------------------------------- P1 / P2
     w('core/fp', [
         '# A fight-phase tick (P1 / P2; @s = body): the phase clock, AI samples, the triggers (A6, the counter, the flinch), then',
         '# the running pattern or the recovery. F1 (HR-04): while a floor step is reserved (#fl) neither trigger starts a move',
         '# (CS1 / the A13 lead-in come at the next decision; ai/phase drops the flags at the next fight phase).',
+        fn('core/ev'),
         f'scoreboard players add #ai_pht {OBJ} 1',
         f'scoreboard players operation #t {OBJ} = #clk {OBJ}',
         f'scoreboard players operation #t {OBJ} %= #c5 {OBJ}',
@@ -348,8 +352,8 @@ def deco(W):
 
 # ================================================================================================== the skip
 def skip_files(W, ctx):
+    """The skip prompt + input of CS0 (core/skip, every intro tick) and CS1 (core/skip_cs1, every CS1 tick): api.SKIP."""
     w = W.w
-    lo, hi = api.SKIP_WINDOW
     prompt = []
     for s in range(api.SKIP_STEPS + 1):
         k = K.hud('skip', s=s)
@@ -366,21 +370,24 @@ def skip_files(W, ctx):
     for s, lines in prompt:
         a, b = (0, 0) if s == 0 else ((s - 1) * 5 + 1, s * 5 if s < api.SKIP_STEPS else api.SKIP_HOLD - 1)
         rows += [S.gate(f'if score #skip {OBJ} matches {a}..{b}', x) for x in lines]
-    w('core/skip', [
-        f'# The intro skip input (@s = body, every intro tick; PLAN §3.1): from {lo} to {hi} the prompt {api.SKIP_TEXT}{api.SKIP_HINT}',
-        f'# (hudHold); holding sneak (rlk:in_sneak) brightens it in {api.SKIP_STEPS} steps of 5 t, a release resets the count;',
-        f'# {api.SKIP_HOLD} t held -> the skip (seq/intro/skip, then #sq = {api.SKIP_T - 1}: the next tick plays intro_end from 0).',
-        f'execute if score #skip {OBJ} matches ..-1 run return 0',
-        f'execute if score #skp {OBJ} matches 1.. if score #sq {OBJ} = #skp {OBJ} run return run {fn("core/skip_go")}',
-        f'execute if score #sq {OBJ} matches {hi + 1}.. run return run {fn("core/skip_clear")}',
-        f'execute unless score #sq {OBJ} matches {lo}..{hi} run return 0',
-        f'execute as {S.PL} if predicate rlk:in_sneak run scoreboard players add #skip {OBJ} 1',
-        f'execute as {S.PL} unless predicate rlk:in_sneak run {sset("#skip", 0)}',
-        f'execute if score #skip {OBJ} matches {api.SKIP_HOLD}.. run return run {fn("core/skip_go")}'] + rows)
-    w('core/skip_go', ['# The skip (@s = body): the prompt gone, the sequence\'s skip (the black, the intro cleared, her E10 pose ≤ 7 b',
-                       f'# from the player), then the clock jumps: the next tick is {api.SKIP_T} (intro_end 0, line 11).',
-                       clear, sset('#skip', -1), sset('#skp', 0), seq(ctx, 'intro', 'skip'), sset('#sq', api.SKIP_T - 1)])
-    w('core/skip_clear', ['# The skip prompt off for good (the window ended, the skip, the intro end).',
+    for name, rel in (('intro', 'core/skip'), ('cs1', 'core/skip_cs1')):
+        (lo, hi), to = api.SKIP[name]['window'], api.SKIP[name]['to']
+        go = f'{rel}_go'
+        w(rel, [
+            f'# The {name} skip input (@s = body, every tick of the sequence; hr_design §3.0): from {lo} to {hi} the prompt',
+            f'# {api.SKIP_TEXT}{api.SKIP_HINT} (hudHold); holding sneak (rlk:in_sneak) brightens it in {api.SKIP_STEPS} steps of 5 t, a release',
+            f'# resets the count; {api.SKIP_HOLD} t held -> the skip (seq/{name}/skip, then #sq = {to - 1}: the next tick is {to}).',
+            f'execute if score #skip {OBJ} matches ..-1 run return 0',
+            f'execute if score #skp {OBJ} matches 1.. if score #sq {OBJ} = #skp {OBJ} run return run {fn(go)}',
+            f'execute if score #sq {OBJ} matches {hi + 1}.. run return run {fn("core/skip_clear")}',
+            f'execute unless score #sq {OBJ} matches {lo}..{hi} run return 0',
+            f'execute as {S.PL} if predicate rlk:in_sneak run scoreboard players add #skip {OBJ} 1',
+            f'execute as {S.PL} unless predicate rlk:in_sneak run {sset("#skip", 0)}',
+            f'execute if score #skip {OBJ} matches {api.SKIP_HOLD}.. run return run {fn(go)}'] + rows)
+        w(go, [f'# The {name} skip (@s = body): the prompt gone, the sequence\'s skip (the black, its state at tick {to}), then the',
+               f'# clock jumps: the next tick is {to}.',
+               clear, sset('#skip', -1), sset('#skp', 0), seq(ctx, name, 'skip'), sset('#sq', to - 1)])
+    w('core/skip_clear', ['# The skip prompt off for good (the window ended, the skip, the sequence\'s end).',
                           f'execute if score #skip {OBJ} matches ..-1 run return 0', clear, sset('#skip', -1)])
 
 
@@ -389,7 +396,8 @@ def pattern_files(W, ctx):
     w = W.w
     present = ctx.present
     singles = [k for k in present if k not in GAUNT]
-    pt = ['# The running pattern of a fight phase (@s = body): #pt + 1, p/<key>/tick, its end.', f'scoreboard players add #pt {OBJ} 1']
+    pt = ['# The running pattern of a fight phase (@s = body): #pt + 1, p/<key>/tick (or the perfect-parry flinch), its end.',
+          f'scoreboard players add #pt {OBJ} 1', f'execute if score #ppf {OBJ} matches 1.. run return run {fn("core/ppf")}']
     for k in singles:
         pt.append(f'execute if score #pat {OBJ} matches {TID[k]} run {fn(f"p/{k}/tick")}')
     pt.append(f'execute if score #done {OBJ} matches 1 run {fn("core/pat_end")}')
@@ -397,6 +405,7 @@ def pattern_files(W, ctx):
     for k in singles:
         start = [f'# Start {k.upper()} {api.PATTERN_NAMES[k]} (@s = body; the AI, the triggers, tests): the clock, the no-repeat memory, the',
                  '# cooldown of the fight phase.', fn('core/stop_move'), sset('#pat', TID[k]), sset('#pt', 0), sset('#done', 0),
+                 sset('#ppf', 0), sset('#ultq', 0),
                  sset('#hits', 0), f'scoreboard players operation #last2 {OBJ} = #last {OBJ}', sset('#last', TID[k])]
         for fp, ph in ((1, PH['p1']), (2, PH['p2'])):
             cd = api.COOLDOWN.get(k, {}).get(fp)
@@ -413,14 +422,46 @@ def pattern_files(W, ctx):
     for k in present:
         w(f'core/hz_tag/{k}', [f'# @s = a hazard of {k.upper()} just made: the pattern tags (its cancel kills it).',
                                f'tag @s add {api.TAGS["pat"]}', f'tag @s add {S.tag_p(k)}'])
-    w('core/pat_end', [
-        '# The pattern set #done (@s = body): the lock marker gone, on the floor, then the recovery (after A6: the decision',
-        f'# at once, {api.A6_TRIGGER["next"]} t after the blink, with the far rule; PLAN §4.3).',
-        sset('#done', 0), f'scoreboard players operation #dec {OBJ} = #pat {OBJ}', sset('#pat', 0), sset('#pt', 0),
-        f'kill @e[type=minecraft:marker,tag={S.LOCK_T}]', fn('core/ground'),
-        f'execute if score #dec {OBJ} matches {TID["a6"]} run {sset("#ai_ff", 1)}',
-        f'execute if score #dec {OBJ} matches {TID["a6"]} run return run {fn("ai/decide")}',
-        fn('ai/rec_start')])
+    pe = ['# The pattern set #done (@s = body): the lock marker gone, on the floor; the gauge + 3 (not A6, not U); rings at a full',
+          '# gauge -> ult at once; mx may repeat once at <= 30 % HP; after A6 the decision at once with the far rule; else the',
+          '# recovery.',
+          sset('#done', 0), f'scoreboard players operation #dec {OBJ} = #pat {OBJ}', sset('#pat', 0), sset('#pt', 0), sset('#ppf', 0),
+          f'kill @e[type=minecraft:marker,tag={S.LOCK_T}]', fn('core/ground'),
+          f'execute unless score #dec {OBJ} matches {TID["a6"]} unless score #dec {OBJ} matches {TID["ult"]} run {fn("core/gauge/pat")}']
+    if 'rings' in present and 'ult' in present:
+        pe.append(f'execute if score #dec {OBJ} matches {TID["rings"]} if score #ultq {OBJ} matches 1 run return run {fn("core/start/ult")}')
+    pe.append(sset('#ultq', 0))
+    if 'mx' in present:
+        pe.append(f'execute if score #dec {OBJ} matches {TID["mx"]} if function {NS}core/mx_rep run return 1')
+        R = api.MX_REPEAT
+        w('core/mx_rep', [
+            f'# MX ended (@s = body): at <= {R["hp_pct"]} % of her HP it repeats once at once, {R["chance"]} % (the video\'s second X; the',
+            '# no-repeat rule does not apply). Returns 1 when it started again.',
+            f'scoreboard players operation #t4 {OBJ} = #mx_rep {OBJ}', sset('#mx_rep', 0),
+            f'execute if score #t4 {OBJ} matches 1 run return fail',
+            f'execute if score #fl {OBJ} matches 1.. run return fail',
+            f'execute if score #lock {OBJ} matches 1 run return fail',
+            f'scoreboard players operation #t {OBJ} = @s mhpC', f'scoreboard players operation #t {OBJ} *= #c100 {OBJ}',
+            f'scoreboard players operation #t2 {OBJ} = @s mhpM', sset('#t3', R['hp_pct']),
+            f'scoreboard players operation #t2 {OBJ} *= #t3 {OBJ}',
+            f'execute if score #t {OBJ} > #t2 {OBJ} run return fail',
+            f'execute store result score #t {OBJ} run random value 1..100',
+            f'execute if score #t {OBJ} matches {R["chance"] + 1}.. run return fail',
+            fn('core/start/mx'), sset('#mx_rep', 1), 'return 1'])
+        # the first run's flag: a repeat keeps it at 1 until its own end clears it (above)
+    pe += [f'execute if score #dec {OBJ} matches {TID["a6"]} run {sset("#ai_ff", 1)}',
+           f'execute if score #dec {OBJ} matches {TID["a6"]} run return run {fn("ai/decide")}',
+           fn('ai/rec_start')]
+    w('core/pat_end', pe)
+    w('core/pp', [
+        f'# hr_design §1.5: a perfect parry on the running pattern\'s last / single hit (@s = body; the pattern\'s PP window): she',
+        f'# flinches (clip flinch) and the pattern ends {api.PP_FLINCH} t later (core/ppf instead of its tick).',
+        f'execute if score #ppf {OBJ} matches 1.. run return 0',
+        sset('#ppf', api.PP_FLINCH), fn('core/stop_move'), api.play('flinch')])
+    w('core/ppf', ['# One tick of the perfect-parry flinch (@s = body): she turns to the player; at its end the pattern ends.',
+                   f'function rlk:mboss/mv/turn {{max:{api.TRACK["deg"]}}}',
+                   f'scoreboard players remove #ppf {OBJ} 1',
+                   f'execute if score #ppf {OBJ} matches ..0 run {fn("core/pat_end")}'])
     cd = ['# Cancel the running pattern / gauntlet (any executor; idempotent): its own cancel (hazards, markers, props, glide).']
     for k in present:
         cd.append(f'execute if score #pat {OBJ} matches {TID[k]} run {fn(f"p/{k}/cancel")}')
@@ -428,19 +469,32 @@ def pattern_files(W, ctx):
         if g not in ctx.pats:
             cd.append(f'execute if score #pat {OBJ} matches {TID[g]} run {gcall(ctx, g, "cancel")}')
     w('core/cancel_d', cd)
-    w('core/cancel_pat0', ['# Cancel the running pattern, no recovery (A6 interrupts a windup; @s = body).',
-                           fn('core/cancel_d'), sset('#pat', 0), sset('#done', 0), sset('#pt', 0), fn('core/stop_move'),
+    w('core/cancel_pat0', ['# Cancel the running pattern, no recovery (A6 interrupts a windup, the groggy; @s = body).',
+                           fn('core/cancel_d'), sset('#pat', 0), sset('#done', 0), sset('#pt', 0), sset('#ppf', 0), sset('#ultq', 0),
+                           fn('core/stop_move'),
                            f'kill @e[type=minecraft:marker,tag={S.LOCK_T}]', fn('core/ground')])
     w('core/cancel_pat', ['# Cancel the running pattern, then the recovery (reload, tests; @s = body).', fn('core/cancel_pat0'),
                           fn('ai/rec_start')])
-    # Balance gauge (combat overhaul lane B, mboss_lib.BAL_HOOKS, registry "bal"; lane H rebuilds her on the new combat and
-    # may replace this): the 100 t balance groggy knocks her on her back (clip down) and she kips up (kipup) in the last
-    # KIPUP t, hittable all along (no #inv), then the recovery. Only in the fight phases (P1 / P2) from idle or a pattern
-    # outside A6 (the blink) and the ghost forms; never with a floor step reserved, in a cutscene / sequence / replay /
-    # revival wait, a gauntlet (A8 / A13), the down window, while invulnerable.
-    kip = 20
-    bal_pats = [0, 1, 2, 3, 4, 6, 7, 11, 12, 13]
-    w('bal_ok', ['# @s = body: may the balance groggy start now?',
+    # Balance (hr_design §1.3-1.4; lane B's hooks mboss_lib.BAL_HOOKS, registry "bal"): 12 pips, taken only in P1 / P2 (the
+    # lead-ins and the gauntlets hold #mbBalOff mb 1; the cutscenes are covered by #mbSt / #mbBarOff / #mbCine). The groggy
+    # (100 t, damage taken x 1.30): grog_in 12 t (she is smashed onto her back) -> down (loop) -> kipup in its last 20 t,
+    # hittable all along -> 12 t recovery -> the AI.
+    kip, gin = api.BAL['kip'], api.BAL['grog_in']
+    GRG = 100
+    air = []                                # (pattern, the #pt ticks she is out of reach or mid-strike: no break may start)
+    E_ = api.ev
+    for k, a, b in (('a4', E_('a4', 'leap'), E_('a4', 'hit')), ('a10', E_('a10', 'spring'), E_('a10', 'hit')),
+                    ('nb', E_('nb', 'leap'), E_('nb', 'land')), ('q', E_('q_grab', 'go'), None),
+                    ('hcut', E_('hcut', 'go'), E_('hcut', 'cut')), ('a9', E_('a9', 'go'), E_('a9', 'cut')),
+                    ('kcut', E_('kcut', 'go'), E_('kcut', 'cut')), ('blue', E_('blue', 'go'), E_('blue', 'hit')),
+                    ('ult', E_('ult', 'cut1'), E_('ult', 'cut2')), ('mx', E_('mx', 'go'), E_('mx', 'x')),
+                    ('a6', api.A6_TRIGGER['inv'][0], api.A6_TRIGGER['inv'][1])):
+        if k in present:
+            air.append((k, a, b))
+    BAL_REFUSE.clear()
+    BAL_REFUSE.update({k: (a, b) for k, a, b in air})
+    w('bal_ok', ['# @s = body: may the balance groggy start now? (hr_design §1.3; a refused break stays pending: lane B starts it at',
+                 '# the first allowed tick.)',
                  f'execute unless score #ph {OBJ} matches {PH["p1"]} unless score #ph {OBJ} matches {PH["p2"]} run return fail',
                  f'execute if score #rp {OBJ} matches 1.. run return fail',
                  f'execute if score #sqn {OBJ} matches 1.. run return fail',
@@ -449,120 +503,167 @@ def pattern_files(W, ctx):
                  f'execute if score #fl {OBJ} matches 1.. run return fail',
                  'execute if entity @s[tag=rlk_hr_ghost] run return fail',
                  'execute if entity @s[tag=rlk_mb_inv] run return fail']
-      + [f'execute if score #pat {OBJ} matches {i} run return 1' for i in bal_pats] + ['return fail'])
-    w('bal_on', ['# @s = body: the pattern goes (no recovery yet), she falls on her back.',
-                 fn('core/cancel_pat0'), api.play('down')])
-    w('bal_tick', ['# @s = body, instead of the hook tick while groggy: the clock, the looks, the ambience, the rig (kipup at the end).',
-                   f'scoreboard players add #clk {OBJ} 1', fn('core/look'), fn('core/amb'), fn('core/inv'),
-                   f'execute if score @s grgT matches {kip} run {api.play("kipup")}',
-                   api.rig('tick')])
-    w('bal_off', ['# @s = body: the balance groggy is over: the recovery, then the AI.', fn('ai/rec_start')])
+      + [f'execute if score #pat {OBJ} matches {TID[k]} if score #pt {OBJ} matches {a}..{b if b is not None else ""} run return fail'
+         for k, a, b in air]
+      + ([f'execute if score #pat {OBJ} matches {TID["mx"]} if score #mx_pre {OBJ} matches 1.. run return fail'] if 'mx' in present else [])
+      + ['return 1'])
+    w('bal_on', ['# @s = body: the break. The pattern goes (hazards, locks, the ghost state, the blade look; an airborne body is put',
+                 f'# on the floor), the gauge stays; clip grog_in ({gin} t: the guard is smashed open, she falls onto her back).',
+                 fn('core/cancel_pat0'), sset('#ai_fl', 0), api.play('grog_in')])
+    w('bal_tick', ['# @s = body, instead of the hook tick while groggy: the clock, the looks, the ambience; a floor reached now is',
+                   f'# reserved and cuts the groggy to its kip-up (grgT {kip}); down (loop) once grog_in ended, kipup in the last {kip} t;',
+                   '# hittable all along. Her hits\' events are dropped (no gauge charge while groggy).',
+                   f'scoreboard players add #clk {OBJ} 1', fn('core/look'),
+                   f'execute if score #mbFloorHit mb matches 1 run {fn("core/floor_hit")}',
+                   f'execute if score #mbFloor mb matches 1.. if score @s mhpC <= #mbFloor mb run {fn("core/floor_hit")}',
+                   f'execute if score #fl {OBJ} matches 1.. if score @s grgT matches {kip + 1}.. run scoreboard players set @s grgT {kip}']
+      + ([fn('core/amb')] if api.K.p('ambient_p1') and api.K.p('ambient_p2') else [])
+      + [fn('core/inv'), fn('core/ev0'),
+         f'execute if score @s grgT matches {GRG - gin} run {api.play("down")}',
+         f'execute if score @s grgT matches {kip} run {api.play("kipup")}',
+         api.rig('tick')])
+    w('bal_off', [f'# @s = body: the balance groggy is over: a {api.GROGGY_RECOVER}-t recovery, then the AI.', fn('core/ev0'),
+                  fn('ai/rec_start'), sset('#rec', api.GROGGY_RECOVER)])
+    w('core/bal/floor', [
+        f'# hr_design §1.3: CS1 / lead5 starts with a break pending (@s = body): the pending break is dropped and she keeps',
+        f'# {api.BAL["floor_min"]} pips (she is not broken inside a cutscene and does not come out of it full).',
+        'tag @s remove rlk_bal_pend',
+        f'scoreboard players set @s bal {api.BAL["floor_min"]}',
+        'scoreboard players operation @s balT = #rd3 bal', 'scoreboard players set @s balF 0', 'function rlk:bal/ui/draw'])
+    w('core/bal/repel', [
+        f'# hr_design §1.3: after repel {{at:60}} (@s = body): balance + {api.BAL["after_repel"]} pips (at most her maximum; the video\'s',
+        '# single refill). Nothing while a groggy runs or without a gauge.',
+        'execute unless score @s balMax matches 1.. run return 0',
+        'execute if score @s grgT matches 1.. run return 0',
+        f'scoreboard players add @s bal {api.BAL["after_repel"]}',
+        'execute if score @s bal > @s balMax run scoreboard players operation @s bal = @s balMax',
+        'execute if score @s bal >= @s balMax run scoreboard players set @s balT 0',
+        'function rlk:bal/ui/draw'])
+
+
+BAL_REFUSE = {}          # pattern -> (first, last #pt tick) bal_ok refuses (tests)
 
 
 # ================================================================================================== phases
 def phase_files(W, ctx):
     w = W.w
-    # CS1 -> SQ1
+    BOFF = lambda v: f'scoreboard players set {api.BAL_OFF[0]} {api.BAL_OFF[1]} {v}'      # noqa: E731
+    pend = f'execute if entity @s[tag=rlk_bal_pend] run {fn("core/bal/floor")}'
+    # CS1 -> lead60
     w('core/cs1/start', [
-        '# CS1 (the next decision after the 60 % floor hit; @s = body): invulnerable until the end of CS2 / the A8 fail, cine',
-        '# (every boss hit on the player refused) 0-213, the P1 hazards cancelled, the boss bars off (FN-f; the bars hook draws',
-        '# nothing while #hud 0), the floor -> 5 %; the sequence cs1.',
+        '# CS1 (the next decision after the 60 % floor hit; @s = body): invulnerable until the end of the repel / the G1 fail,',
+        f'# cine (every boss hit on the player refused) 0-{api.SEQ_LEN["cs1"]}, the P1 hazards cancelled, the boss bars off (the bars hook',
+        '# draws nothing while #hud 0), the floor -> 5 %; a pending break is dropped (bal 3); the sequence cs1 (skippable).',
         fn('core/cancel_d'), f'kill @e[tag={api.TAGS["pat"]}]', sset('#pat', 0), sset('#fl', 0), sset('#ph', PH['cs1']),
-        sset('#inv', 1), 'tag @s add rlk_mb_inv', L.cine(True), api.bars(0), sset('#hud', 0),
+        sset('#inv', 1), 'tag @s add rlk_mb_inv', L.cine(True), api.bars(0), sset('#hud', 0), pend, sset('#skip', 0),
         f'scoreboard players operation #mbFloor mb = #fl5 {OBJ}', fn('core/stop_move'), fn('core/ground'),
         fn('core/seq/cs1')])
     w('core/lead60/start', [
-        '# lead60 tick 0 (CS1 ended, a reload in CS1 / lead60, tests; @s = body): cine off, the bars back with the shield 5/5',
-        '# under them, the A8 chain (#gk 1; its fail is lethal only with ULT60_LETHAL: #warn).',
+        '# lead60 tick 0 (CS1 ended, a reload / pause in CS1 or lead60, tests; @s = body): cine off, the bars back with the gauge',
+        '# 5/5 under them (the refill of its tick 0), no balance damage until P2 (#mbBalOff), the G1 chain (#gk 1; its fail is',
+        '# lethal only with ULT60_LETHAL: #warn).',
         L.cine(False), api.bars(1), sset('#hud', 1), fn('shield/arm'), sset('#ph', PH['lead60']), sset('#inv', 1),
+        'tag @s add rlk_mb_inv', BOFF(1), fn('core/skip_clear'),
         sset('#gk', S.GK['a8']), sset('#warn', int(api.ULT60_LETHAL)), fn('core/looks'), fn('core/seq/lead60')])
     # the gauntlets
     for g in GAUNT:
         w(f'core/g/start/{g}', [
-            f'# {g.upper()} {api.PATTERN_NAMES[g]} from T0 (@s = body; SQ1 / a lead-in ended, tests): the gauntlet clock #pt, its judge',
-            '# result cleared; invulnerable (the ghost body; only the scripted true damage passes).',
+            f'# {g.upper()} {api.PATTERN_NAMES[g]} from T0 (@s = body; a lead-in ended, tests): the gauntlet clock #pt, its judge',
+            '# result cleared; invulnerable (the ghost body; only the scripted true damage passes); no balance damage.',
             fn('core/stop_move'), sset('#ph', PH[g]), sset('#gk', S.GK[g]), sset('#pat', TID[g]), sset('#pt', 0), sset('#done', 0),
-            sset('#gres', 0), sset('#sqn', 0), sset('#inv', 1), 'tag @s add rlk_mb_inv',
+            sset('#gres', 0), sset('#sqn', 0), sset('#inv', 1), 'tag @s add rlk_mb_inv', BOFF(1), fn('core/ev0'),
             sset('#warn', int(api.ULT60_LETHAL if g == 'a8' else api.ULT5_LETHAL)), gcall(ctx, g, 'start')])
-    gt = ['# A gauntlet tick (@s = body): #pt + 1, p/<g>/tick (or the stand-in), the pip windows (shield/tick), its end.',
+    gt = ['# A gauntlet tick (@s = body): #pt + 1, p/<g>/tick (or the stand-in), the segment check (shield/tick), its end.',
           f'scoreboard players add #pt {OBJ} 1']
     for g in GAUNT:
         gt.append(f'execute if score #pat {OBJ} matches {TID[g]} run {gcall(ctx, g, "tick")}')
-    gt += [fn('shield/tick'), f'execute if score #done {OBJ} matches 1 run {fn("core/g/end")}']
+    gt += [fn('shield/tick'), 'scoreboard players set #mbHitEv mb 0',
+           f'execute if score #done {OBJ} matches 1 run {fn("core/g/end")}']
     w('core/g/tick', gt)
     w('core/g/end', [
-        '# The gauntlet set #done (@s = body; S4: at REPEL_T after a deflect, at FAIL60_P2_T after the A8 fail): #gres decides.',
-        '# A8: deflect -> CS2 (repel {at:60}); fail -> P2 (the fail-60 hit and g_reform were the gauntlet\'s). A13: deflect -> CS3',
-        '# (repel {at:5}); fail (the instant death did not end the run) -> the revive stance -> A13 again. F1 (HR-06): a test\'s',
-        '# forced fail (#pipoff, tests 23 / 29) applies to this one judge only.',
+        '# The gauntlet set #done (@s = body; at the judge with the gauge at 0, at FAIL60_P2_T after the G1 fail, 12 t after a',
+        '# survived G2 fail): #gres decides. Gauge 0 -> the repel {at:60} (G1) / {at:5} (G2), started in this tick. G1 fail -> P2',
+        '# (the fail-60 hit and g_reform were the gauntlet\'s). G2 fail (the instant death did not end the run) -> the revive',
+        '# stance -> G2 again. A test\'s forced fail (#pipoff, tests 23 / 29) applies to this one judge only.',
         sset('#done', 0), sset('#pat', 0), sset('#pt', 0), sset('#pipoff', 0),
         f'execute if score #gres {OBJ} matches 1 run return run {fn("core/repel/start")}',
         f'execute if score #gk {OBJ} matches {S.GK["a8"]} run return run {fn("core/p2/from_fail")}',
         fn('core/revive/start')])
-    # the counter cinematic (CS2 / CS3)
+    # the repel counter (after either gauntlet)
     w('core/repel/start', [
-        '# The counter cinematic (the judged deflect; @s = body): cine, invulnerable (only its scripted true damage passes), the',
-        '# sequence repel {at:60} after A8 (CS2) / {at:5} after A13 (CS3); its HP steps come through #sq_sig.',
+        '# The repel counter (the judge with the gauge at 0; @s = body): cine (her hits refused, no balance damage), invulnerable',
+        '# (only its scripted true damage passes), the boss bars stay on; the sequence repel {at:60} after G1 / {at:5} after G2;',
+        '# its HP steps come through #sq_sig.',
         fn('core/stop_move'), sset('#ph', PH['cs2']), f'execute if score #gk {OBJ} matches {S.GK["a13"]} run {sset("#ph", PH["cs3"])}',
         sset('#inv', 1), 'tag @s add rlk_mb_inv', L.cine(True), sset('#sqh', 0), sset('#gres', 0), fn('shield/off'),
+        api.rig('look/form/normal'), f'tag @s remove {api.TAGS["ghost"]}',
         fn('core/seq/repel')])
     w('core/repel/end', [
-        '# The counter cinematic ended (@s = body): cine off; CS2 -> the down window; CS3 -> the lethal true hit if its kick did',
-        '# not land (it normally kills at 102: death_start took over before this).',
+        f'# The repel ended (@s = body): cine off. After G1: balance + {api.BAL["after_repel"]}, P2 at once (first decision after',
+        f'# {api.P2_RECOVER} t; no down window). After G2: the lethal true hit if its kick did not land (it normally kills at',
+        f'# {api.ev("repel", "kick")}: death_start took over before this).',
         L.cine(False),
         f'execute if score #ph {OBJ} matches {PH["cs3"]} run return run {fn("core/kill")}',
-        fn('core/down/start')])
-    w('core/kill', ['# The scripted kill (@s = body): true damage of her whole HP (Electro number): the kill -> death_start (CS4).',
+        fn('core/bal/repel'), fn('core/p2/from_repel')])
+    w('core/kill', ['# The scripted kill (@s = body): true damage of her whole HP (Electro number): the kill -> death_start (the ending).',
                     f'scoreboard players set #mbTrueEl mb {api.ELEC}', 'function rlk:mboss/true_pct {pct:100}'])
-    # the down window
-    w('core/down/start', [
-        f'# The down window after CS2 (@s = body): {api.DOWN_T} t on her back (clip down), normal damage, the under bar = the ticks',
-        f'# left (gold); at its end the kipup ({api.KIPUP_T} t, invulnerable) -> P2 after {api.KIPUP_RECOVER} t; a hit reaching the',
-        f'# 5 % floor -> lead_down {api.DOWN_FLOOR_WAIT} t later.',
-        sset('#ph', PH['down']), sset('#sqn', 0), sset('#inv', 0), sset('#down', api.DOWN_T), sset('#flw', 0), sset('#kip', 0),
-        sset('#fl', 0), api.play('down'),
-        '# balance gauge (combat overhaul lane B): the down window refills it (a pending balance groggy is dropped)',
-        'function rlk:bal/refill'])
-    w('core/down/tick', [
-        '# A down-window tick (@s = body): the kipup, the floor wait (lead_down at 0) or the timer.',
-        f'execute if score #kip {OBJ} matches 1.. run return run {fn("core/kip/tick")}',
-        f'execute if score #flw {OBJ} matches 1.. run scoreboard players remove #flw {OBJ} 1',
-        f'execute if score #fl {OBJ} matches 2 if score #flw {OBJ} matches ..0 run return run {fn("core/lead/down")}',
-        f'execute if score #fl {OBJ} matches 2 run return 0',
-        f'scoreboard players remove #down {OBJ} 1',
-        f'execute if score #down {OBJ} matches ..0 run {fn("core/kip/start")}'])
-    w('core/kip/start', ['# The kipup (@s = body): invulnerable, the clip.', sset('#kip', api.KIPUP_T), sset('#down', 0),
-                         sset('#inv', 1), 'tag @s add rlk_mb_inv', api.play('kipup')])
-    w('core/kip/tick', [f'scoreboard players remove #kip {OBJ} 1',
-                        f'execute if score #kip {OBJ} matches ..0 run {fn("core/p2/from_down")}'])
     # P2
-    p2 = [sset('#ph', PH['p2']), sset('#sqn', 0), sset('#inv', 0), sset('#kip', 0), sset('#down', 0), sset('#flw', 0),
-          sset('#pat', 0), sset('#gres', 0), fn('core/looks'), fn('ai/phase')]
-    w('core/p2/from_down', ['# P2 after the kipup (@s = body): the P1 kit with the P2 recoveries + R1-R3, the 5 % floor kept.']
-      + p2 + [fn('ai/rec_start'), sset('#rec', api.KIPUP_RECOVER)])
-    w('core/p2/from_fail', [f'# P2 after the A8 fail (T + {api.FAIL60_P2_T}; @s = body): her HP unchanged, no counter, no down window.']
+    p2 = [sset('#ph', PH['p2']), sset('#sqn', 0), sset('#inv', 0), sset('#pat', 0), sset('#gres', 0), sset(api.GAUGE_FP, 0),
+          BOFF(0), fn('core/ev0'), fn('core/looks'), fn('ai/phase')]
+    w('core/p2/from_repel', ['# P2 after the repel {at:60} (@s = body): the P1 kit with the P2 recoveries + mx / nb / q, the 5 % floor kept;',
+                             '# the gauge starts empty and charges again.']
+      + p2 + [fn('ai/rec_start'), sset('#rec', api.P2_RECOVER)])
+    w('core/p2/from_fail', [f'# P2 after the G1 fail (T + {api.FAIL60_P2_T}; @s = body): her HP unchanged, no repel.']
       + p2 + [fn('ai/rec_start'), sset('#rec', 1)])
     # the lead-ins
-    for name, g, what in (('down', 'a13', 'lead5 (the 5 % floor reached in the down window)'), ('a13', 'a13', 'lead5 (the 5 % floor reached in P2)'),
-                          ('re_a8', 'a8', 'lead_re {g:"a8"} (an A8 restart)'), ('re_a13', 'a13', 'lead_re {g:"a13"} (an A13 restart)')):
+    for name, g, what in (('a13', 'a13', 'lead5 (the 5 % floor reached in P2)'),
+                          ('re_a8', 'a8', 'lead_re {g:"a8"} (a G1 restart)'), ('re_a13', 'a13', 'lead_re {g:"a13"} (a G2 restart)')):
         sq = 'lead_re' if name.startswith('re_') else 'lead5'
         w(f'core/lead/{name}', [
-            f'# The {what} -> {g.upper()} (@s = body): invulnerable to CS4 (A13) / CS2 (A8); the shield off until the refill beat',
-            '# (#sq_sig refill -> shield/arm); the warning banner belongs to the sequence (when #warn: the gauntlet\'s fail is lethal).',
+            f'# The {what} -> {g.upper()} (@s = body): invulnerable to the ending (G2) / the repel (G1), no balance damage; the gauge',
+            '# is refilled at the sequence\'s refill beat (#sq_sig refill -> shield/arm); the warning banner belongs to the sequence',
+            '# (when #warn: the gauntlet\'s fail is lethal).' + (' A pending break is dropped (bal 3).' if sq == 'lead5' else ''),
             fn('core/cancel_d'), f'kill @e[tag={api.TAGS["pat"]}]', sset('#pat', 0), fn('core/stop_move'), fn('core/ground'),
-            sset('#ph', PH['lead']), sset('#gk', S.GK[g]), sset('#fl', 0), sset('#flw', 0), sset('#rvw', 0), sset('#kip', 0),
-            sset('#inv', 1), 'tag @s add rlk_mb_inv', fn('shield/off'), L.cine(False),
-            sset('#warn', int(api.ULT60_LETHAL if g == 'a8' else api.ULT5_LETHAL)),
-            fn(f'core/seq/{sq}' + ('' if sq == 'lead5' else f'_{g}'))])
+            sset('#ph', PH['lead']), sset('#gk', S.GK[g]), sset('#fl', 0), sset('#rvw', 0),
+            sset('#inv', 1), 'tag @s add rlk_mb_inv', BOFF(1), L.cine(False)]
+          + ([pend] if sq == 'lead5' else [fn('shield/off')])
+          + [sset('#warn', int(api.ULT60_LETHAL if g == 'a8' else api.ULT5_LETHAL)),
+             fn(f'core/seq/{sq}' + ('' if sq == 'lead5' else f'_{g}'))])
     w('core/revive/start', [
-        f'# The instant death was survived (Ronova\'s revive; @s = body): the darkness lifted, she stands {L.num(api.REVIVE["dist"])} b from',
-        f'# the player in her stance; {api.REVIVE["wait"]} t later lead_re {{g:"a13"}} -> A13 again (shield 5/5, the banner).',
+        f'# The instant death was survived (Ronova\'s revive; @s = body): she stands {L.num(api.REVIVE["dist"])} b from',
+        f'# the player in her stance; {api.REVIVE["wait"]} t later lead_re {{g:"a13"}} -> G2 again (gauge 5/5, the banner).',
         fn('core/cancel_d'), sset('#pat', 0), sset('#ph', PH['lead']), sset('#gk', S.GK['a13']), sset('#sqn', 0), sset('#inv', 1),
-        'tag @s add rlk_mb_inv', fn('shield/off'), *warn(0), *look_req('crimson'), fn('core/stop_move'), fn('core/place8'),
+        'tag @s add rlk_mb_inv', BOFF(1), fn('shield/off'), *warn(0), fn('core/stop_move'), fn('core/place8'),
         api.rig('look/form/normal'), api.play('idle2'), sset('#rvw', api.REVIVE['wait'])])
     w('core/revive/tick', ['# The revive stance (@s = body): she faces the player; lead_re {g:"a13"} when the wait ran out.',
                            'function rlk:mboss/mv/turn {max:10}', f'scoreboard players remove #rvw {OBJ} 1',
                            f'execute if score #rvw {OBJ} matches ..0 run {fn("core/lead/re_a13")}'])
+
+
+# ================================================================================================== the gauge, her hit events
+def gauge_files(W):
+    w = W.w
+    G = api.GAUGE
+    GAU = api.GAUGE_FP
+    cap = f'execute if score {GAU} {OBJ} matches {G["max"] + 1}.. run {sset(GAU, G["max"])}'
+    w('core/ev', [
+        '# Her hit events of the last tick (@s = body; the first line of a fight-phase tick; the framework\'s mboss/hurt_ev):',
+        '# #hpp = her hits that landed (a tier 1 / 2 parry is a landed hit), each charges the gauge; #pp = a perfect parry',
+        '# (#mbDodgeOk with #parT tmp 3; a perfect dodge is #parT 0). The events are cleared.',
+        f'scoreboard players operation #hpp {OBJ} = #mbHitEv mb',
+        f'execute unless score #hpp {OBJ} matches 1.. run {sset("#hpp", 0)}',
+        sset('#pp', 0),
+        f'execute if score #mbDodgeOk mb matches 1 if score #parT tmp matches 3 run {sset("#pp", 1)}',
+        'scoreboard players set #mbHitEv mb 0', 'scoreboard players set #mbDodgeEv mb 0', 'scoreboard players set #mbDodgeOk mb 0',
+        f'execute if score #hpp {OBJ} matches 1.. run {fn("core/gauge/hit")}'])
+    w('core/ev0', ['# Drop her pending hit events (a phase start, the groggy, a gauntlet start): nothing of them charges the gauge.',
+                   sset('#hpp', 0), sset('#pp', 0), 'scoreboard players set #mbHitEv mb 0', 'scoreboard players set #mbDodgeEv mb 0',
+                   'scoreboard players set #mbDodgeOk mb 0'])
+    w('core/gauge/hit', [f'# The gauge + {G["hit"]} per hit of hers that landed (#hpp), at most {G["max"]} (hr_design §1.2).',
+                         f'scoreboard players operation #t {OBJ} = #hpp {OBJ}', f'scoreboard players operation #t {OBJ} *= #c{G["hit"]} {OBJ}',
+                         f'scoreboard players operation {GAU} {OBJ} += #t {OBJ}', cap])
+    w('core/gauge/pat', [f'# The gauge + {G["pat"]} when a pattern ends (not A6, not U), at most {G["max"]}.',
+                         f'scoreboard players add {GAU} {OBJ} {G["pat"]}', cap])
 
 
 # ================================================================================================== sequences
@@ -584,7 +685,8 @@ def seq_runner(W, ctx):
           '# tick), its end (#sqdone).', f'scoreboard players add #sq {OBJ} 1']
     for name in SEQ_FIGHT:
         tk.append(f'execute if score #sqn {OBJ} matches {S.SEQ_ID[name]} run {seq(ctx, name, "tick")}')
-    tk += [f'execute if score #sq_sig {OBJ} matches 1.. run {fn("core/sig")}',
+    tk += [f'execute if score #sqn {OBJ} matches {S.SEQ_ID["cs1"]} run {fn("core/skip_cs1")}',
+           f'execute if score #sq_sig {OBJ} matches 1.. run {fn("core/sig")}',
            'execute unless score #mbSt mb matches 1 run return 0',
            f'execute if score #sqdone {OBJ} matches 1 run {fn("core/seq/end")}']
     w('core/seq/tick', tk)
@@ -596,7 +698,8 @@ def seq_runner(W, ctx):
                        f'execute if score #gk {OBJ} matches {S.GK["a8"]} run return run {fn("core/g/start/a8")}',
                        fn('core/g/start/a13')])
     sig = ['# The sequence signal (@s = body, right after the tick that set it; api.SIG): repel hp1..hp3 -> the HP step of the',
-           '# chain (api.COUNTER_PM per mille of mhpM, true damage; kill = true_pct 100), refill -> shield/arm. Reset to 0.',
+           '# chain (api.COUNTER_PM per mille of mhpM, true damage; kill = true_pct 100), refill -> shield/arm (the gauge 5/5).',
+           '# Reset to 0.',
            f'scoreboard players operation #t {OBJ} = #sq_sig {OBJ}', sset('#sq_sig', 0),
            f'execute if score #t {OBJ} matches {api.SIG["refill"]} run return run {fn("shield/arm")}',
            f'execute unless score #sqn {OBJ} matches {S.SEQ_ID["repel"]} run return 0',
@@ -702,24 +805,42 @@ def hooks(W, ctx):
     w('pj_end', pj)
     # pause / resume
     pause = ['# Hook pause (the fight froze: dead, reviving, a menu, no player; @s = body): the kit cards go; a pattern\'s own pause;',
-             '# a running gauntlet is cancelled (hazards, discs, ghost, the banner off, the darkness lifted) and restarts at resume',
-             '# through lead_stand {g} from T0 with 5/5 (PLAN §3.8 / §5.6); after its fatal: the revive stance; after a judged',
-             '# deflect: the counter cinematic; after the judged A8 fail: P2 at once (#grs 4, F1 HR-01); a lethal gauntlet paused',
-             '# past its last counting cut with pips left: its fail at the resume (#grs 5, core/g/fail_now, F1 HR-07).']
+             '# a running gauntlet is cancelled (hazards, ghost, the banner off) and restarts at resume through lead_re {g} from T0',
+             '# with the gauge 5/5 (hr_design §1.5); a judged result is kept: after its fatal the revive stance, after the judged',
+             '# deflect the repel, after the judged G1 fail P2 at once (#grs 4), a lethal gauntlet paused past its last cut with',
+             '# segments left: its fail at the resume (#grs 5). A locked cutscene never resumes in the middle (§3.6; the lock is',
+             '# released by the framework, no module tick requests it): CS0 / CS1 / the repel go to their end state at resume,',
+             '# a lead-in restarts from 0 (#grs 6-9, core/seq/pause).']
     pause += [x for x in (K.fixed('clear'),) if x]
-    resume = ['# Hook resume (@s = body): a pattern\'s own resume; what a paused gauntlet left (#grs): its restart (1), the revive',
-              '# stance (2), the counter cinematic (3), P2 after the judged A8 fail (4), the pending lethal fail (5, core/g/fail_now).']
+    resume = ['# Hook resume (@s = body): a pattern\'s own resume; what the pause left (#grs): the gauntlet\'s restart (1), the revive',
+              '# stance (2), the repel (3), P2 after the judged G1 fail (4), the pending lethal fail (5), CS1\'s end state (6), the',
+              '# repel\'s end state (7), the lead-in again (8), CS0\'s end state (9).']
     for k in present:
         if k not in GAUNT and ctx.pat_file(W, k, 'pause'):
             pause.append(f'execute if score #pat {OBJ} matches {TID[k]} run {fn(f"p/{k}/pause")}')
         if k not in GAUNT and ctx.pat_file(W, k, 'resume'):
             resume.append(f'execute if score #pat {OBJ} matches {TID[k]} run {fn(f"p/{k}/resume")}')
     pause.append(f'execute if score #pat {OBJ} matches {min(TID[g] for g in GAUNT)}.. run {fn("core/g/pause")}')
+    pause.append(f'execute if score #sqn {OBJ} matches 1.. if score #grs {OBJ} matches 0 run {fn("core/seq/pause")}')
     resume += [f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a8"]} run {fn("core/lead/re_a8")}',
                f'execute if score #grs {OBJ} matches 1 if score #gk {OBJ} matches {S.GK["a13"]} run {fn("core/lead/re_a13")}',
                f'execute if score #grs {OBJ} matches 2 run {fn("core/revive/start")}',
                f'execute if score #grs {OBJ} matches 3 run {fn("core/repel/start")}',
-               *grs_go(), *seq_hold('#grs'), sset('#grs', 0)]
+               *grs_go(), *seq_hold('#grs'),
+               f'execute if score #grs {OBJ} matches 6 run {fn("core/re/cs1")}',
+               f'execute if score #grs {OBJ} matches 7 run {fn("core/re/repel")}',
+               f'execute if score #grs {OBJ} matches 8 run {fn("core/re/lead")}',
+               f'execute if score #grs {OBJ} matches 9 run {fn("core/intro/reload")}',
+               sset('#grs', 0)]
+    w('core/seq/pause', [
+        '# A sequence was running when the fight froze (@s = body): what resume does (#grs). CS0 (also its replay) -> 9;',
+        '# CS1 -> 6; the repel -> 7; a lead-in -> 8.',
+        f'execute if score #sqn {OBJ} matches {S.SEQ_ID["intro"]} run return run {sset("#grs", 9)}',
+        f'execute if score #sqn {OBJ} matches {S.SEQ_ID["cs1"]} run return run {sset("#grs", 6)}',
+        f'execute if score #sqn {OBJ} matches {S.SEQ_ID["repel"]} run return run {sset("#grs", 7)}',
+        f'execute if score #sqn {OBJ} matches {S.SEQ_ID["lead60"]} run return run {sset("#grs", 8)}',
+        f'execute if score #sqn {OBJ} matches {S.SEQ_ID["lead5"]} run return run {sset("#grs", 8)}',
+        f'execute if score #sqn {OBJ} matches {S.SEQ_ID["lead_re"]} run return run {sset("#grs", 8)}'])
     w('pause', pause)
     w('resume', resume)
     gp = ['# A gauntlet paused (@s = body): cancelled now; what resume does (#grs). F1: the judged A8 fail -> P2 (4, HR-01);',
@@ -738,7 +859,7 @@ def hooks(W, ctx):
                       f'matches 1.. if score #pt {OBJ} matches {PEND_T[g]}.. run {sset("#grs", 5)}')
     w('core/g/pause', gp + [sset('#pipoff', 0),
                             fn('core/cancel_d'), sset('#pat', 0), sset('#pt', 0), sset('#done', 0), fn('shield/off'), *warn(0),
-                            *look_req('crimson'), fn('core/stop_move'), fn('core/ground'), api.rig('look/form/normal'),
+                            fn('core/stop_move'), fn('core/ground'), api.rig('look/form/normal'),
                             f'tag @s remove {api.TAGS["ghost"]}'])
     if any(LETHAL.values()):
         fnow = ['# F1 (HR-07, lead decision 11-05): the pending fail of a lethal gauntlet (#grs 5: paused / reloaded after its last',
@@ -762,16 +883,16 @@ def hooks(W, ctx):
     for name in api.SEQS:
         cancels.append(f'execute if score #sqn {OBJ} matches {S.SEQ_ID[name]} run {seq(ctx, name, "cancel")}')
     w('core/stop_all', ['# Every state of the fight stops (death, cleanup, tests; any executor): the pattern / gauntlet, the running',
-                        '# sequence, the shield, the pattern hazards and markers, the glide.',
+                        '# sequence, the pattern hazards and markers, the glide (the gauge is kept: death_start / cleanup empty it).',
                         fn('core/cancel_d')] + cancels
       + [sset('#pat', 0), sset('#pt', 0), sset('#done', 0), sset('#sqn', 0), sset('#sqdone', 0), sset('#sq_sig', 0),
-         sset('#rvw', 0), sset('#kip', 0), sset('#flw', 0), sset('#grs', 0), sset('#rp', 0), fn('shield/off'),
+         sset('#rvw', 0), sset('#grs', 0), sset('#rp', 0), sset('#ppf', 0), sset('#ultq', 0),
          f'kill @e[tag={api.TAGS["pat"]}]', f'kill @e[tag={api.TAGS["cut"]}]', f'kill @e[type=minecraft:marker,tag={S.LOCK_T}]',
          f'execute as {S.BODY[:-1]},tag=rlk_mb_mv] run function rlk:mboss/mv/stop'])
     w('death_start', [
         '# Hook death_start (@s = body; the lethal hit: the framework cleared its libraries, hid the bars, stopped the music):',
         '# every fight state stops, the kit cards go, cine off, the event roll (PLAN §7.3.1), the ending CS4 (seq/ending).',
-        fn('core/stop_all')] + [x for x in (K.fixed('clear'),) if x] + [
+        fn('core/stop_all'), fn('shield/off')] + [x for x in (K.fixed('clear'),) if x] + [
         *warn(0), L.cine(False), 'scoreboard players set #mbFloor mb 0', sset('#ph', PH['death']), sset('#hud', 0),
         fn('ev/roll'), fn('core/stop_move'), fn('core/ground'), fn('core/seq/ending')])
     w('death_tick', [
@@ -797,8 +918,10 @@ def hooks(W, ctx):
     cl = ['# Hook cleanup (no executor; idempotent; won / cancel / defeat / map change): every state, hazard and marker of the',
           '# module, the kit cards and HUD, the rig, every rlk_hr_* entity, every fake player of objective hr (init / spawn make',
           '# them again) and storage core.* / seq.*. Never the event scores (api.EV_FP, saved around `reset *`) nor ev.*: the',
-          '# reward hook reads them after this.',
-          fn('core/stop_all')]
+          '# reward hook reads them after this. The framework flags of the module go too: #mbNpOwn (her own flashes) and',
+          '# #mbBalOff (FN-bal).',
+          fn('core/stop_all'), f'scoreboard players set {api.NP_OWN[0]} {api.NP_OWN[1]} 0',
+          f'scoreboard players set {api.BAL_OFF[0]} {api.BAL_OFF[1]} 0']
     for name in api.SEQS:
         cl.append(seq(ctx, name, 'cancel'))
     cl += [x for x in (K.fixed('clear'),) if x] + S.hud('clear') + warn(0) + [at_body(api.rig('kill'))] + kills + resets \
@@ -812,9 +935,9 @@ def hooks(W, ctx):
     # reload
     w('reload', [
         '# Hook reload (@s = body after /reload: the rig parts, hazards, markers, props and kit cards are gone; scores are kept).',
-        '# PLAN §3.8: intro -> its end; CS1 -> SQ1 tick 0; SQ1 / a lead-in -> restarted from 0 (crimson first); a gauntlet -> as',
-        '# pause (lead_stand {g}); CS2 / CS3 -> their end (the rest of the HP steps); down -> on with <= 100 t; a P1 / P2 pattern',
-        '# -> cancelled + the recovery. (The death state never gets here: the framework finishes it at once.)',
+        '# hr_design §3.6: CS0 -> its end; CS1 -> its end state -> lead60 from 0; a lead-in -> restarted from 0; a gauntlet -> as',
+        '# pause (lead_re {g}); the repel -> its end (the rest of the HP steps, then P2 / the kill); a P1 / P2 pattern ->',
+        '# cancelled + the recovery. (The death state never gets here: the framework finishes it at once.)',
         fn('init'), api.rig('init'), api.rig('spawn'), sset('#lock', 0), fn('core/deco_re'),
         f'execute if score #ph {OBJ} matches {PH["intro"]} run return run {fn("core/intro/reload")}',
         f'execute if score #ph {OBJ} matches {PH["death"]} run return 0',
@@ -824,19 +947,17 @@ def hooks(W, ctx):
         f'execute if score #ph {OBJ} matches {PH["p2"]} if score #pat {OBJ} matches 1.. run {fn("core/cancel_pat")}',
         f'execute if score #ph {OBJ} matches {PH["cs1"]}.. run {fn("core/re/look")}',
         f'execute if score #ph {OBJ} matches {PH["cs1"]} run return run {fn("core/re/cs1")}',
-        f'execute if score #ph {OBJ} matches {PH["lead60"]} run return run {fn("core/re/lead60")}',
+        f'execute if score #ph {OBJ} matches {PH["lead60"]} run return run {fn("core/re/lead")}',
         f'execute if score #ph {OBJ} matches {PH["a8"]} run return run {fn("core/re/g")}',
         f'execute if score #ph {OBJ} matches {PH["a13"]} run return run {fn("core/re/g")}',
         f'execute if score #ph {OBJ} matches {PH["cs2"]} run return run {fn("core/re/repel")}',
         f'execute if score #ph {OBJ} matches {PH["cs3"]} run return run {fn("core/re/repel")}',
-        f'execute if score #ph {OBJ} matches {PH["down"]} run return run {fn("core/re/down")}',
         f'execute if score #ph {OBJ} matches {PH["lead"]} run return run {fn("core/re/lead")}'])
     w('core/re/look', ['# After a reload from CS1 on: the crimson look requested again (a job cut by the reload is redone).']
       + look_req('crimson'))
-    w('core/re/cs1', ['# /reload in CS1: its end state = lead60 tick 0 (crimson, phase p2, music 2, the bars shown).',
-                      seq(ctx, 'cs1', 'cancel'), sset('#sqn', 0), music_to(2), fn('core/lead60/start'), sset('#sq', -1)])
-    w('core/re/lead60', ['# /reload in lead60: lead60 again from tick 0 (the crimson look first).', seq(ctx, 'lead60', 'cancel'), sset('#sqn', 0),
-                         fn('core/lead60/start'), sset('#sq', -1)])
+    w('core/re/cs1', ['# /reload or a pause in CS1: its end state (crimson, phase p2, music 2, the bars shown) = lead60 from tick 0.',
+                      seq(ctx, 'cs1', 'cancel'), sset('#sqn', 0), api.rig('look/phase/p2'), *look_req('crimson'), music_to(2),
+                      fn('core/lead60/start'), sset('#sq', -1)])
     w('core/re/g', ['# /reload in a gauntlet: as a pause (cancelled, the darkness lifted), then at once its restart (F1: or P2 after',
                     '# the judged A8 fail; a pending lethal fail lands now when the player is back and alive, else at the resume).',
                     fn('core/g/pause'),
@@ -845,36 +966,32 @@ def hooks(W, ctx):
                     f'execute if score #grs {OBJ} matches 2 run {fn("core/revive/start")}',
                     f'execute if score #grs {OBJ} matches 3 run {fn("core/repel/start")}', *grs_go(reload=True), *seq_hold('#grs'),
                     (f'execute unless score #grs {OBJ} matches 5 run {sset("#grs", 0)}' if any(LETHAL.values()) else sset('#grs', 0))])
-    rest = ['# /reload in the counter cinematic: its end (the HP steps it had not applied yet, then CS2 -> the down window, CS3 ->',
-            '# the lethal hit -> CS4).', seq(ctx, 'repel', 'cancel'), sset('#sqn', 0), L.cine(False)]
+    rest = ['# /reload or a pause in the repel: its end state (the HP steps it had not applied yet, then after G1: balance + 3,',
+            '# P2; after G2: the lethal hit -> the ending).', seq(ctx, 'repel', 'cancel'), sset('#sqn', 0), L.cine(False)]
     for g in GAUNT:
         for i, v in enumerate(api.COUNTER_PM[S.AT_OF[g]]):
             if v == 'kill':
                 continue
             rest.append(f'execute if score #gk {OBJ} matches {S.GK[g]} if score #sqh {OBJ} matches ..{i} run {fn(f"core/hp/pm{v}")}')
-    rest += [f'execute if score #ph {OBJ} matches {PH["cs3"]} run return run {fn("core/kill")}', fn('core/down/start')]
+    rest += [f'execute if score #ph {OBJ} matches {PH["cs3"]} run return run {fn("core/kill")}', fn('core/bal/repel'),
+             fn('core/p2/from_repel')]
     w('core/re/repel', rest)
-    w('core/re/down', ['# /reload in the down window: it goes on with at most 100 t left (the kipup: P2).',
-                       f'execute if score #kip {OBJ} matches 1.. run return run {fn("core/p2/from_down")}',
-                       f'execute if score #down {OBJ} matches 101.. run {sset("#down", 100)}', api.play('down')])
-    w('core/re/lead', ['# /reload in a lead-in / the revive stance: the lead-in again from 0 (the crimson look first), its clock held',
-                       '# one tick (I1, s3-10).', fn('core/re/lead_go'), sset('#sq', -1)])
-    w('core/re/lead_go', ['# /reload in a lead-in / the revive stance: which lead-in starts again.',
-                       f'execute if score #rvw {OBJ} matches 1.. run return run {fn("core/lead/re_a13")}',
-                       f'execute if score #sqn {OBJ} matches {S.SEQ_ID["lead5"]} run return run {fn("core/lead/a13")}',
-                       f'execute if score #gk {OBJ} matches {S.GK["a8"]} run return run {fn("core/lead/re_a8")}',
-                       fn('core/lead/re_a13')])
+    w('core/re/lead', ['# /reload or a pause in a lead-in / the revive stance: the lead-in again from 0, its clock held one tick.',
+                       fn('core/re/lead_go'), sset('#sq', -1)])
+    w('core/re/lead_go', ['# Which lead-in starts again (@s = body).',
+                          f'execute if score #rvw {OBJ} matches 1.. run return run {fn("core/lead/re_a13")}',
+                          f'execute if score #ph {OBJ} matches {PH["lead60"]} run return run {fn("core/re/lead60")}',
+                          f'execute if score #sqn {OBJ} matches {S.SEQ_ID["lead5"]} run return run {fn("core/lead/a13")}',
+                          f'execute if score #gk {OBJ} matches {S.GK["a8"]} run return run {fn("core/lead/re_a8")}',
+                          fn('core/lead/re_a13')])
+    w('core/re/lead60', ['# lead60 again from tick 0.', seq(ctx, 'lead60', 'cancel'), sset('#sqn', 0), fn('core/lead60/start')])
     # bars: the under bar
-    w('bars', ['# Hook bars (@s = body, every tick in intro / fight while the bars are on): the under bar = the shield (electro, 5)',
-               '# or the down timer (gold, 200); nothing while the module HUD is off (#hud 0: CS1). F2 (HR-29): the HP bar fills',
-               '# over the first 30 t of the fight (mboss/bars_ramp: its intro ramp, here at control, the bars being off in CS0).',
+    w('bars', ['# Hook bars (@s = body, every tick in intro / fight while the bars are on): the under bar = the 5-segment gauge',
+               '# (electro) from control to the ending; nothing while the module HUD is off (#hud 0: CS1). The HP bar fills over the',
+               '# first 30 t of the fight (mboss/bars_ramp: its intro ramp, here at control, the bars being off in CS0).',
                'execute if score #mbSt mb matches 1 if score #mbT mb matches ..29 run function rlk:mboss/bars_ramp',
                f'execute if score #hud {OBJ} matches 0 run return 0',
-               f'execute if score #shb {OBJ} matches 1 run return run {fn("hud/bar_shield")}',
-               f'execute if score #ph {OBJ} matches {PH["down"]} if score #kip {OBJ} matches 0 run {fn("hud/bar_down")}'])
-    w('hud/bar_down', ['# The under bar = the down window\'s ticks left (gold, max api.DOWN_T).',
-                       f'scoreboard players operation #buSub bu = #down {OBJ}', f'scoreboard players set #buSubMax bu {api.DOWN_T}',
-                       f'scoreboard players set #buSubCol bu {api.BU_DOWN}'])
+               f'execute if score #mbSt mb matches 1 run {fn("hud/bar_shield")}'])
     # the intro replay (test 30 / 35)
     w('core/replay/start', ['# Test 30 / 35: the intro again in the fight (@s = body, invulnerable), then the fight goes on.',
                             fn('core/cancel_pat0'), fn('core/deco_seat'),
@@ -898,59 +1015,73 @@ def tests(W, ctx):
     w('test', ['# Hook test {id:N} (as the player, /function rlk:boss/test/pattern {id:N}); the list: test/help.',
                f'$scoreboard players set #tst {OBJ} $(id)', at_body(fn('test/run'))])
     run = ['# @s = body: the test #tst (api.TEST_IDS).']
+    GAU = api.GAUGE_FP
     for k in present:
         if k in GAUNT:
             continue
         run.append(f'execute if score #tst {OBJ} matches {TID[k]} run return run {fn(f"test/go/{k}")}')
         need_p2 = [f'execute unless score #ph {OBJ} matches {PH["p2"]} run {fn("test/p2")}'] if k in api.P2 else []
+        if k == 'ult':
+            # test 12: the gauge full, rings now, ult follows (ult is never started alone)
+            w(f'test/go/{k}', [f'# Test {TID[k]}: the gauge full, RINGS now, ULT follows.', f'execute unless function {NS}core/force run return 0',
+                               fn('core/ult_go')])
+            continue
         w(f'test/go/{k}', [f'# Test {TID[k]}: {k.upper()} now.', f'execute unless function {NS}core/force run return 0']
           + need_p2 + [fn(f'core/start/{k}')])
-    table = {20: 'test/cs1', 21: 'test/a8', 22: 'test/a8_0', 23: 'test/a8_fail', 24: 'test/cs2', 25: 'test/down', 26: 'test/lead',
-             27: 'test/a13', 28: 'test/a13_0', 29: 'test/a13_fail', 30: 'test/intro', 31: 'test/look_dark', 32: 'test/look_crimson',
-             33: 'test/p2', 34: 'test/hp5', 35: 'test/skip100', 80: 'test/floor', 90: 'test/ev90', 91: 'test/ev91', 92: 'test/ev92',
-             99: 'test/hold'}
-    assert set(table) | {TID[k] for k in api.P1 + api.P2 if k not in GAUNT} == set(api.TEST_IDS), sorted(set(api.TEST_IDS) - set(table))
+    w('core/ult_go', [f'# The gauge is full (or a test / lock): RINGS now with ULT to follow (@s = body; #ultq).',
+                      sset(GAU, api.GAUGE['max']), fn('core/start/rings'), sset('#ultq', 1)])
+    table = {19: 'test/groggy', 20: 'test/cs1', 21: 'test/a8', 22: 'test/a8_0', 23: 'test/a8_fail', 24: 'test/repel', 26: 'test/lead',
+             27: 'test/a13', 28: 'test/a13_0', 29: 'test/a13_fail', 30: 'test/intro', 32: 'test/look_crimson',
+             33: 'test/p2', 34: 'test/hp5', 35: 'test/skip100', 36: 'test/cs1_skip', 37: 'test/gauge', 38: 'test/bal1',
+             80: 'test/floor', 90: 'test/ev90', 91: 'test/ev91', 92: 'test/ev92', 99: 'test/hold'}
+    assert set(table) | {TID[k] for k in api.P1 + api.P2 if k not in GAUNT} == set(api.TEST_IDS), sorted(set(api.TEST_IDS) ^ (set(table) | {TID[k] for k in api.P1 + api.P2 if k not in GAUNT}))
     for tid, rel in table.items():
         run.append(f'execute if score #tst {OBJ} matches {tid} run return run {fn(rel)}')
     w('test/run', run)
     w('core/force', [
         '# Tests: make the fight state ready for a forced step (@s = body): the intro ends, whatever runs stops (pattern,',
-        '# gauntlet, sequence, replay), cine off. Returns 1.',
+        '# gauntlet, sequence, replay), cine off, balance damage on again. Returns 1.',
         f'execute if score #mbSt mb matches 0 run {fn("core/intro/done")}',
-        fn('core/stop_all'), L.cine(False), fn('core/stop_move'), fn('core/ground'), sset('#lock', 0), 'return 1'])
+        fn('core/stop_all'), L.cine(False), f'scoreboard players set {api.BAL_OFF[0]} {api.BAL_OFF[1]} 0',
+        fn('core/stop_move'), fn('core/ground'), sset('#lock', 0),
+        f'execute if score #ph {OBJ} matches {PH["p1"]} run {sset("#inv", 0)}',
+        f'execute if score #ph {OBJ} matches {PH["p2"]} run {sset("#inv", 0)}', 'return 1'])
     prep = ['# The chain context from P2 on (tests; @s = body): the 5 % floor, the bars and the module HUD on, phase p2 looks,',
             '# music 2, the crimson look.', f'scoreboard players operation #mbFloor mb = #fl5 {OBJ}', api.bars(1), sset('#hud', 1),
             sset('#fl', 0), sset('#ph', PH['p2']), fn('core/looks'), music_to(2)] + look_req('crimson')
     w('test/prep', prep)
-    w('test/cs1', ['# Test 20: CS1 -> SQ1 -> A8 now.', f'execute unless function {NS}core/force run return 0', sset('#fl', 0),
+    w('test/groggy', ['# Test 19: the balance groggy now (her 12 pips taken at once; pending when bal_ok refuses).',
+                      'function rlk:bal/hit {n:12}'])
+    w('test/cs1', ['# Test 20: CS1 -> lead60 -> G1 now.', f'execute unless function {NS}core/force run return 0', sset('#fl', 0),
                    fn('core/cs1/start')])
-    for tid, g, pips, off in ((21, 'a8', None, 0), (22, 'a8', 0, 0), (23, 'a8', None, 1), (27, 'a13', None, 0), (28, 'a13', 0, 0),
-                              (29, 'a13', None, 1)):
-        name = {None: g, 0: f'{g}_0'}[pips] if not off else f'{g}_fail'
-        what = {None: '5/5', 0: 'with 0 pips (the deflect)'}[pips] if not off else 'that fails (no pip can go)'
+    w('test/cs1_skip', ['# Test 36: CS1 now, skipped at its tick 100.', f'execute unless function {NS}core/force run return 0', sset('#fl', 0),
+                        fn('core/cs1/start'), sset('#skp', 100)])
+    for tid, g, gz, off in ((21, 'a8', None, 0), (22, 'a8', 0, 0), (23, 'a8', None, 1), (27, 'a13', None, 0), (28, 'a13', 0, 0),
+                            (29, 'a13', None, 1)):
+        name = {None: g, 0: f'{g}_0'}[gz] if not off else f'{g}_fail'
+        what = {None: '5/5', 0: 'with the gauge at 0 (the deflect)'}[gz] if not off else 'that fails (no segment can go)'
         w(f'test/{name}', [f'# Test {tid}: {g.upper()} now, {what}.', f'execute unless function {NS}core/force run return 0',
-                           fn('test/prep'), fn('shield/arm')] + ([sset('#pips', 0)] if pips == 0 else [])
+                           fn('test/prep'), fn('shield/arm')] + ([sset(GAU, 0)] if gz == 0 else [])
           + [sset('#pipoff', off), sset('#gk', S.GK[g]), fn(f'core/g/start/{g}')])
-    w('test/cs2', ['# Test 24: the counter cinematic CS2 now (then the down window).', f'execute unless function {NS}core/force run return 0',
-                   fn('test/prep'), sset('#gk', S.GK['a8']), fn('core/repel/start')])
-    w('test/down', ['# Test 25: the down window now.', f'execute unless function {NS}core/force run return 0', fn('test/prep'),
-                    fn('core/down/start')])
-    w('test/lead', ['# Test 26: lead_stand {g:"a13"} -> A13.', f'execute unless function {NS}core/force run return 0', fn('test/prep'),
+    w('test/repel', ['# Test 24: the repel {at:60} now (then P2).', f'execute unless function {NS}core/force run return 0',
+                     fn('test/prep'), sset('#gk', S.GK['a8']), fn('core/repel/start')])
+    w('test/lead', ['# Test 26: lead5 -> G2.', f'execute unless function {NS}core/force run return 0', fn('test/prep'),
                     sset('#pipoff', 0), fn('core/lead/a13')])
-    # F1 (HR-06): the replay hands the fight back to P1 / P2 only, so it refuses elsewhere (as 타키's core/force does in a
-    # mantle / transition): from CS1, a gauntlet, the down window, a lead-in it would leave the phase with nothing running
+    # the replay hands the fight back to P1 / P2 only, so it refuses elsewhere
     p12 = f'execute unless score #ph {OBJ} matches {PH["p1"]} unless score #ph {OBJ} matches {PH["p2"]} run return 0'
     w('test/intro', ['# Test 30: the intro again (invulnerable); only in P1 / P2.', p12, f'execute unless function {NS}core/force run return 0',
                      fn('core/replay/start')])
     w('test/skip100', [f'# Test 35: the intro again, skipped at its tick 100; only in P1 / P2.', p12,
                        f'execute unless function {NS}core/force run return 0', fn('core/replay/start'), sset('#skp', 100)])
-    w('test/look_dark', ['# Test 31: the dark look on / off (crimson).',
-                         *[S.gate(f'if score #lk {OBJ} matches {api.LOOK_ID["dark"]}', x) for x in look_req('crimson')],
-                         f'execute if score #lk {OBJ} matches {api.LOOK_ID["dark"]} run return run {sset("#lk", api.LOOK_ID["crimson"])}',
-                         *look_req('dark'), sset('#lk', api.LOOK_ID['dark'])])
     w('test/look_crimson', ['# Test 32: the crimson look.', *look_req('crimson'), sset('#lk', api.LOOK_ID['crimson'])])
-    w('test/p2', ['# Test 33: P2 now (CS1 / A8 skipped).', f'execute unless function {NS}core/force run return 0', fn('test/prep'),
+    w('test/p2', ['# Test 33: P2 now (CS1 / G1 skipped).', f'execute unless function {NS}core/force run return 0', fn('test/prep'),
                   fn('core/p2/from_fail')])
+    w('test/gauge', [f'# Test 37: the gauge full ({api.GAUGE["max"]}): the next near / mid decision is RINGS -> ULT.',
+                     f'execute if score #mbSt mb matches 0 run {fn("core/intro/done")}', sset(GAU, api.GAUGE['max'])])
+    w('test/bal1', ['# Test 38: her balance = 1 pip (the next perfect parry / burst hit breaks her).',
+                    f'execute if score #mbSt mb matches 0 run {fn("core/intro/done")}',
+                    'execute if score @s grgT matches 1.. run return 0', 'tag @s remove rlk_bal_pend',
+                    'scoreboard players set @s bal 1', 'scoreboard players operation @s balT = #rd3 bal', 'function rlk:bal/ui/draw'])
     w('test/hp5', ['# Test 34: HP = the 5 % floor + 1.', f'execute if score #mbSt mb matches 0 run {fn("core/intro/done")}',
                    f'scoreboard players operation @s mhpC = #fl5 {OBJ}', 'scoreboard players add @s mhpC 1'])
     w('test/floor', ['# Test 80: HP = the next floor + 1 (P1: 60 %, later 5 %).', f'execute if score #mbSt mb matches 0 run {fn("core/intro/done")}',
@@ -982,6 +1113,11 @@ def stand_in_seqs(W, ctx):
     w = W.w
     E = api.ev
 
+    def refill_fx():
+        """The refill beat's effect + sound (the sequence's; here for the stand-ins): the shards fly in round her chest."""
+        return S.fx('shield_refill', [part(S.DUST['lilac'], 0.5, 0.6, 0.5, 0.05, 20)], pos=f'{S.AT_BODY} positioned ~ ~1.1 ~') \
+            + S.snd('shield_refill')
+
     def evs_of(name):
         d = {}
         if name == 'intro':
@@ -996,14 +1132,14 @@ def stand_in_seqs(W, ctx):
             d[E('cs1', 'recolour')] = [api.rig('look/phase/p2')] + look_req('crimson')
             d[E('cs1', 'music')] = [music_to(2)]
         elif name == 'lead60':
-            if api.ULT60_LETHAL:
-                d[1] = warn(1)
+            d[1] = refill_fx() + (warn(1) if api.ULT60_LETHAL else [])
         elif name == 'repel':
             for i, e in enumerate(api.COUNTER_EV):
                 d[E('repel', e)] = [sset('#sq_sig', api.SIG[f'hp{i + 1}'])]
         elif name in ('lead5', 'lead_re'):
             # hr_design §3.3: the refill beat (gauge 5/5) + the warning banner while the gauntlet's fail is lethal (#warn)
-            d[E(name, 'refill')] = [sset('#sq_sig', api.SIG['refill'])] + [S.gate(f'if score #warn {OBJ} matches 1', x) for x in warn(1)]
+            d[E(name, 'refill')] = [sset('#sq_sig', api.SIG['refill'])] + refill_fx() \
+                + [S.gate(f'if score #warn {OBJ} matches 1', x) for x in warn(1)]
         elif name == 'ending':
             d[E('ending', 'music')] = [api.music(3)]
         elif name == 'event':
@@ -1032,6 +1168,12 @@ def stand_in_seqs(W, ctx):
                       f'execute unless score #hrEv {OBJ} matches 1 run {api.play("ev_toast")}']
         else:
             start.append(api.play(api.SEQ_CLIPS[name][0]))
+        if name == 'repel':
+            # the gold deflect of its first frames (the judge no longer stages it): the starburst + the light column + the sound
+            start += S.fx('clash_gold', [part('minecraft:end_rod', 0.4, 0.4, 0.4, 0.15, 24), part(S.DUST['yellow'], 0.3, 0.3, 0.3, 0, 12)],
+                          pos=f'at {S.PLAYER} rotated ~ 0 positioned ~ ~1.3 ~') \
+                + S.fx('light_column', [part('minecraft:end_rod', 0.1, 1.6, 0.1, 0.02, 16)], pos=f'at {S.PLAYER} rotated ~ 0') \
+                + S.snd('deflect', pos=f'at {S.PLAYER}') + ['function rlk:mboss/mv/face']
         w(f'core/sq/{name}/start', start)
         tick = [f'# Stand-in {name} tick (#sq hr 1..{ln}).']
         for t, cmds in sorted(evs_of(name).items()):
@@ -1043,6 +1185,9 @@ def stand_in_seqs(W, ctx):
         tick.append(f'execute if score #sq {OBJ} matches {ln}.. run {sset("#sqdone", 1)}')
         w(f'core/sq/{name}/tick', tick)
         w(f'core/sq/{name}/cancel', [f'# Stand-in {name} cancel (idempotent).'])
+        if name == 'cs1':
+            w('core/sq/cs1/skip', ['# Stand-in CS1 skip (the core counted the hold): the black; the core then jumps the clock.',
+                                   *[x for x in (K.ovl('black', 0, 20, 6),) if x]])
         if name == 'intro':
             w('core/sq/intro/walk', [
                 '# Stand-in intro (E6-E9): a 12-t glide leg of 1.8 b toward the player while farther than 7 b (mv/ok-checked).',
@@ -1063,55 +1208,43 @@ def stand_in_seqs(W, ctx):
 
 # ================================================================================================== stand-ins: gauntlets
 def stand_in_gauntlets(W, ctx):
-    """core/gs/<g>/{start,tick,cancel} while S4's p_ghost.PATTERNS lacks the gauntlet: its clips at their script rows, no
-    hazard (S4 owns the cuts), each counting cut's pip window at its lock (a marker rlk_hr_cut at the player's feet ->
-    shield/cut {s}), the judge at JUDGE_T, then the branch: deflect -> #done at REPEL_T; A8 fail -> ult/fail60 at the
-    player + g_reform, #done at FAIL60_P2_T; A13 fail -> ult/fatal on the player, #done 12 t later (a survived death)."""
+    """core/gs/<g>/{start,tick,cancel} while p_ghost.PATTERNS lacks the gauntlet: its clips at their script rows, no hazard
+    (so no segment can go), the judge at JUDGE_T, then the branch: gauge 0 -> #done in the judge tick; G1 fail -> ult/fail60
+    at the player + g_reform, #done at FAIL60_P2_T; G2 fail -> ult/fatal on the player, #done 12 t later (a survived death)."""
     w = W.w
     for g in GAUNT:
         if g in ctx.pats:
             continue
         rows = api.SCRIPTS[g]
-        jt, rt = api.JUDGE_T[g], api.REPEL_T[g]
+        jt = api.JUDGE_T[g]
         evs = {}
         for t, step, clip, c in rows:
-            if t < 0:
-                continue
             if clip:
                 evs.setdefault(t, []).append(api.play(clip))
-            if c:
-                made, lock, strike, tier, kb = c
-                evs.setdefault(lock, []).append(fn(f'core/gs/cut') + f' {{s:{strike}}}')
         evs.setdefault(jt, []).append(fn(f'core/gs/{g}/judge'))
-        evs.setdefault(rt, []).append(f'execute if score #gres {OBJ} matches 1 run {sset("#done", 1)}')
         fail_done = api.FAIL60_P2_T if g == 'a8' else jt + 12
         evs.setdefault(fail_done, []).append(f'execute if score #gres {OBJ} matches 2 run {sset("#done", 1)}')
-        w(f'core/gs/{g}/start', [f'# Stand-in gauntlet {g.upper()} (S4\'s p_ghost.py has none yet): T0.', api.play('g_tell')])
+        w(f'core/gs/{g}/start', [f'# Stand-in gauntlet {g.upper()} (p_ghost.py has none yet): T0.', api.play('g_tell')])
         tick = [f'# Stand-in {g.upper()} tick (#pt hr 1..).']
         for t, cmds in sorted(evs.items()):
+            if t == 0:
+                continue
             if len(cmds) == 1:
                 tick.append(S.gate(f'if score #pt {OBJ} matches {t}', cmds[0]))
             else:
                 w(f'core/gs/{g}/k/{t}', [f'# Stand-in {g.upper()} tick {t}.'] + cmds)
                 tick.append(f'execute if score #pt {OBJ} matches {t} run {fn(f"core/gs/{g}/k/{t}")}')
         w(f'core/gs/{g}/tick', tick)
-        judge = [f'# Stand-in {g.upper()} judge (T + {jt}): shield/judge; the darkness lifts and the banner goes; a fail runs its branch.',
-                 fn('shield/judge'), *look_req('crimson'), *warn(0)]
+        judge = [f'# Stand-in {g.upper()} judge (T + {jt}): shield/judge; the banner goes; gauge 0 -> #done now; a fail runs its branch.',
+                 fn('shield/judge'), *warn(0), f'execute if score #gres {OBJ} matches 1 run {sset("#done", 1)}']
         if g == 'a8':
             judge += [f'execute if score #gres {OBJ} matches 2 at {S.PLAYER} run {fn("ult/fail60")}',
                       f'execute if score #gres {OBJ} matches 2 run {api.play("g_reform")}']
         else:
             judge += [f'execute if score #gres {OBJ} matches 2 as {S.PL} run {fn("ult/fatal")}']
         w(f'core/gs/{g}/judge', judge)
-        w(f'core/gs/{g}/cancel', [f'# Stand-in {g.upper()} cancel (idempotent): its cut markers, the pip windows, the banner.',
-                                  f'kill @e[tag={S.tag_p(g)}]', f'kill @e[type=minecraft:marker,tag={api.TAGS["cut"]}]',
-                                  'kill @e[type=minecraft:marker,tag=rlk_hr_pip]', *warn(0)])
-    if any(g not in ctx.pats for g in GAUNT):
-        w('core/gs/cut', ['# {s}: the stand-in cut at its lock (@s = body): a marker rlk_hr_cut at the player\'s feet registers the pip',
-                          '# window of strike s (shield/cut as the marker, at it); it goes 2 t after the strike.',
-                          f'execute at {S.PLAYER} run summon minecraft:marker ~ ~ ~ {{Tags:{S.tags_nbt(api.TAGS["pat"], api.TAGS["cut"], "rlk_hr_gsnew")}}}',
-                          f'$execute as @e[type=minecraft:marker,tag=rlk_hr_gsnew,limit=1] at @s run function {NS}shield/cut {{s:$(s)}}',
-                          'tag @e[type=minecraft:marker,tag=rlk_hr_gsnew] remove rlk_hr_gsnew'])
+        w(f'core/gs/{g}/cancel', [f'# Stand-in {g.upper()} cancel (idempotent): its markers, the banner.',
+                                  f'kill @e[tag={S.tag_p(g)}]', f'kill @e[type=minecraft:marker,tag={api.TAGS["cut"]}]', *warn(0)])
 
 
 # ================================================================================================== the stand-in rig
