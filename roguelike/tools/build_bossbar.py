@@ -28,6 +28,9 @@ Options (the chapter-boss mode, scratchpad az/contract/cm.md 11), both read by o
 a caller that never sets them (Raiden, the mid-bosses) always gets the M0 line:
   #buHpCol bu   0 = the HP colour #E0484B; 1..9 = the under-bar colour codes (SUB_COLORS); 10 = #EDCF63 (gold)
   #buNoNum bu   1 = no "hp/max" numbers (bossui/nums is skipped; the cursor is already at the bar end)
+  #buPip bu     1 = the balance-gauge pips (combat overhaul lane B): the row component in storage rlk:bal brow (font
+                rlk:bal, tools/build_balance.py; exactly BAR px wide, glyphs under the under-bar) is drawn from the
+                bar's left end (bossui/pips); set by mboss/bars and boss/raiden/bars for a boss with balMax >= 1
 """
 import argparse
 import json
@@ -232,9 +235,12 @@ nums += ['scoreboard players operation #n bu += #nh bu',
 write('nums', nums)
 draw += ['# Under bar (shield in its element colour, or a gauge).',
          'execute if score #buSubCol bu matches 1.. if score #buSubMax bu matches 1.. run function rlk:bossui/sub',
+         '# Balance pips (#buPip 1): the BAR-wide row from storage rlk:bal brow, from the bar\'s left end.',
+         'execute if score #buPip bu matches 1 run function rlk:bossui/pips',
          '# The options hold for this draw only.',
          'scoreboard players set #buHpCol bu 0',
-         'scoreboard players set #buNoNum bu 0']
+         'scoreboard players set #buNoNum bu 0',
+         'scoreboard players set #buPip bu 0']
 write('draw', draw)
 sub = ['# Thin bar under the HP bar: #buSub / #buSubMax in colour #buSubCol.',
        f'scoreboard players set #len bu {BAR}',
@@ -253,5 +259,9 @@ for code, col in SUB_COLORS.items():
 sub += ['scoreboard players operation #len bu = #se bu',
         f'function rlk:bossui/run_sub {{col:"{SUB_EMPTY}"}}']
 write('sub', sub)
+write('pips', ['# Balance pips (tools/build_balance.py): back to the bar start, the row (exactly BAR px, so the cursor ends at the bar end).',
+               f'scoreboard players set #len bu {BAR}',
+               'function rlk:bossui/space_neg',
+               'data modify storage rlk:bu line append from storage rlk:bal brow'])
 print(f'Boss bar: {BAR} px HP bar + under bar, {len(providers)} font providers, {len(SUB_COLORS)} under-bar colours; '
       f'functions in {FN.relative_to(ROOT)}.')

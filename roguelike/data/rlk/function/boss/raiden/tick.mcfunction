@@ -1,5 +1,7 @@
 # @s=real living boss; the invisible body owns damage, the displays own appearance.
 execute if score @s rdDeath matches 1 run return run function rlk:boss/raiden/death/tick
+# balance gauge (tools/build_balance.py): regen / groggy clock / pending groggy (the groggy itself is her stun, bal_on)
+execute if score @s balT matches 1.. run function rlk:bal/boss/tick
 data merge entity @s {Motion:[0d,0d,0d],Fire:-1s}
 execute if score @s rdHitCD matches 1.. run scoreboard players remove @s rdHitCD 1
 execute if score @s rdCool matches 1.. run scoreboard players remove @s rdCool 1

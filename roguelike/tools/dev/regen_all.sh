@@ -34,6 +34,8 @@ run tools/build_mboss_tachy.py
 [ -f tools/build_mboss_hr_fx.py ] && run tools/build_mboss_hr_fx.py --skip-rp
 [ -f tools/build_mboss_scarlet.py ] && run tools/build_mboss_scarlet.py
 if [ $MOBS = 1 ]; then run tools/build_ch2_mobs.py; run tools/build_ch3_mobs.py; fi
+# balance gauge (combat overhaul lane B): rlk:bal/** (datapack only here; the font with --resourcepack, README 0-4)
+run tools/build_balance.py
 run tools/check_mboss_pack.py
 tail -1 "$LOG"; rm -f "$LOG"
 echo "== done (failures: $fail)"; exit $fail

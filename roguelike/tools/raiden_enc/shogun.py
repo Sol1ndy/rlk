@@ -194,7 +194,10 @@ def build_state():
         'kill @e[tag=rlk_rd_sg]',
         'scoreboard players set @s rdSgGs 0', 'scoreboard players set @s rdSgCt 0',
         'scoreboard players set @s rdPat 98', 'scoreboard players set @s rdTime 0', 'scoreboard players set @s rdGo 0',
-        'execute if entity @a[tag=player,scores={hudHold=1..}] run scoreboard players set @a[tag=player] hudHold 0'])
+        'execute if entity @a[tag=player,scores={hudHold=1..}] run scoreboard players set @a[tag=player] hudHold 0',
+        '# balance gauge (combat overhaul lane B): her stuns refill it (a pending balance groggy is dropped; no-op in the',
+        '# balance stun itself)',
+        'function rlk:bal/refill'])
     write('sg/stun_tick', [
         '# core tick, rdPat 98: stagger (dark stagger disc r 2.5 for the clone / eye stun, A-08; the guard break has the',
         '# shatter at the break and the soft gold light beam coming down on her at 13, B-06), the guard recovery burst at',
@@ -204,7 +207,29 @@ def build_state():
         'execute if score @s rdTime matches 1 unless score @s rdSgStun matches 3 at @s run ' + decal('stagger', r=2.5, life=99),
         'execute if score @s rdTime matches 72 unless score @s rdSgStun matches 3 run function rlk:boss/raiden/rig/play/recover',
         'execute if score @s rdTime matches 76 if score @s rdSgStun matches 3 at @s run function rlk:boss/raiden/sg/recover_burst',
-        f'execute if score @s rdTime matches {STUN}.. run function rlk:boss/raiden/sg/stun_end'])
+        f'execute if score @s rdTime matches {STUN}.. unless score @s rdSgStun matches 4 run function rlk:boss/raiden/sg/stun_end'])
+    # Balance gauge (combat overhaul lane B, tools/build_balance.py rlk:bal/**): the groggy is this stun with rdSgStun 4
+    # (the clone / eye look: stagger clip, dark stagger disc, recover clip at 72); rlk:bal ends it (bal_off) when its
+    # clock (100 t for a boss = STUN) runs out. Only in the Shogun phase (bal/boss/may), never in 찰나의 포영 (5),
+    # 몽상의 일심 (7), the forced follow-ups (rdNext 7, a broken single eye's multi eye), a stun, the finish, a blink.
+    write('bal_ok', [
+        '# rlk:bal/boss/ok, as the boss: may the balance groggy start now?',
+        'execute unless score @s rdPhase matches 0 run return fail',
+        'execute if score @s rdDeath matches 1.. run return fail',
+        'execute if score @s rdBlink matches 1.. run return fail',
+        'execute if score @s rdPat matches 5 run return fail',
+        'execute if score @s rdPat matches 7 run return fail',
+        'execute if score @s rdPat matches 98..99 run return fail',
+        'execute if score @s rdNext matches 7 run return fail',
+        'execute if score @s rdSgEye matches 1.. run return fail',
+        'return 1'])
+    write('bal_on', [
+        '# rlk:bal/grog/start, as the boss at itself: the balance break is the stagger stun (rdSgStun 4)',
+        'scoreboard players set @s rdSgStun 4',
+        sg('stun_begin')])
+    write('bal_off', [
+        '# rlk:bal/grog/end, as the boss: the balance stun ends with the gauge clock (pattern finish, the AI resumes)',
+        'execute if score @s rdPat matches 98 if score @s rdSgStun matches 4 run function rlk:boss/raiden/sg/stun_end'])
     write('sg/recover_burst', [
         '# Guard-break recovery (B-07, wiki 카운터 어택): the glowing ring r 4.5 for 24 t, then a nododge burst that pushes.',
         play('stun_recover'), line('absurd'),

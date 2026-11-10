@@ -1165,6 +1165,17 @@ scoreboard players set #mbSt mb 1
 scoreboard players set #mbT mb 0
 ''')
 w('fight_tick', '''
+# balance gauge (tools/build_balance.py): balT >= 1 while pips are missing, groggy or pending -> fight_bal (one test
+# per tick otherwise; a paused fight runs neither, so the gauge clocks stop too)
+execute if score @s balT matches 1.. run return run function rlk:mboss/fight_bal
+function rlk:mboss/d/tick
+execute if score #mbSt mb matches 1 unless score #mbNoLeash mb matches 1 run function rlk:mboss/mv/leash
+''')
+w('fight_bal', '''
+# fight_tick of a boss whose gauge is not idle: regen / groggy clock / pending groggy, then the module's bal_tick
+# INSTEAD of its tick while groggy (mboss_lib.BAL_HOOKS), else the usual tick and leash.
+function rlk:bal/boss/tick
+execute if score @s grgT matches 1.. run return run function rlk:mboss/d/bal_tick
 function rlk:mboss/d/tick
 execute if score #mbSt mb matches 1 unless score #mbNoLeash mb matches 1 run function rlk:mboss/mv/leash
 ''')
@@ -1483,6 +1494,8 @@ scoreboard players set #buSub bu 0
 scoreboard players set #buSubMax bu 1
 scoreboard players set #buSubCol bu 0
 function rlk:mboss/d/bars
+# balance gauge: the 12 pips under the HP bar (storage rlk:bal brow, kept by rlk:bal/ui/draw)
+execute if score @s balMax matches 1.. run scoreboard players set #buPip bu 1
 function rlk:bossui/draw
 bossbar set rlk:mboss_state name {nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""}
 bossbar set rlk:mboss_sub name {nbt:"sub[]",storage:"rlk:mboss",interpret:true,separator:""}
@@ -1616,6 +1629,18 @@ for hook in L.HOOKS:
     if args:
         lines.append('$scoreboard players set #mbReqT mb $(' + args[0] + ')')
     out.write('mboss/d/' + hook, '\n'.join(lines))
+
+# Balance gauge hooks (mboss_lib.BAL_HOOKS): dispatchers over the enabled entries with the registry flag "bal" only;
+# bal_has answers rlk:bal/init (a gauge for this boss?), the others fail for an unflagged boss (never reached).
+BAL_BOSSES = [b for b in BOSSES if b.get('bal')]
+out.write('mboss/d/bal_has', '\n'.join(
+    ['# GENERATED: return 1 when the running boss (#mbId mb) has the balance gauge (registry "bal", rlk:bal/init).']
+    + [f'execute if score #mbId mb matches {b["n"]} run return 1' for b in BAL_BOSSES] + ['return fail']))
+for hook in L.BAL_HOOKS:
+    out.write('mboss/d/' + hook, '\n'.join(
+        [f'# GENERATED dispatcher: rlk:<fn root>/{hook} of the running boss with the balance gauge (registry "bal").']
+        + [f'execute if score #mbId mb matches {b["n"]} run return run function rlk:{L.fn_root(b)}/{hook}' for b in BAL_BOSSES]
+        + ['return fail']))
 
 # =============================================================================================
 # Hazard library (hz)

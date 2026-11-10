@@ -8,3 +8,6 @@ scoreboard players set @s rdPat 98
 scoreboard players set @s rdTime 0
 scoreboard players set @s rdGo 0
 execute if entity @a[tag=player,scores={hudHold=1..}] run scoreboard players set @a[tag=player] hudHold 0
+# balance gauge (combat overhaul lane B): her stuns refill it (a pending balance groggy is dropped; no-op in the
+# balance stun itself)
+function rlk:bal/refill

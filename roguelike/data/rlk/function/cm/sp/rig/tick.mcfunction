@@ -8,6 +8,7 @@ execute store result entity @e[tag=rlk_cmrot,limit=1] Rotation[0] float 0.01 run
 execute rotated as @e[tag=rlk_cmrot,limit=1] rotated ~ 0 as @e[tag=rlk_c2this] run tp @s ~ ~ ~ ~ 0
 execute if score @s cmAH matches 1 as @e[tag=rlk_c2this] run data modify entity @s item.components."minecraft:custom_model_data" set value {colors:[16777215]}
 execute if score @s frzT matches 1.. run return run function rlk:cm/c2/rig_frozen
+execute if score @s grgT matches 1.. run return run function rlk:cm/c2/rig_frozen
 function rlk:cm/sp/rig/pick
 execute unless score @s cmAP = #pose tmp store result storage rlk:c2 p.n int 1 run scoreboard players get #pose tmp
 execute unless score @s cmAP = #pose tmp run function rlk:cm/sp/rig/pose_m with storage rlk:c2 p

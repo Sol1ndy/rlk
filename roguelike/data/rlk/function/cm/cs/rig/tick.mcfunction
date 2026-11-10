@@ -5,6 +5,7 @@ execute unless score #c2n tmp matches 16 run function rlk:cm/cs/rig/rebuild
 tag @e[tag=rlk_cs_this] add rlk_cmsync
 function rlk:cm/cs/rig/face
 execute if score @s frzT matches 1.. run return run function rlk:cm/cs/rig/frozen
+execute if score @s grgT matches 1.. run return run function rlk:cm/cs/rig/frozen
 function rlk:cm/cs/rig/choose
 execute unless score @s cmAP = #c2p tmp run function rlk:cm/cs/rig/apply
 scoreboard players operation @s cmAP = #c2p tmp

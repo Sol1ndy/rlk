@@ -9,6 +9,7 @@ execute if score @s cmAH matches 1 as @e[tag=rlk_c3this] run data modify entity 
 execute if entity @s[tag=rlk_c3moved] at @s run tp @e[tag=rlk_c3this] ~ ~ ~
 tag @s remove rlk_c3moved
 execute if score @s frzT matches 1.. run return run function rlk:cm/c3/rig_frozen
+execute if score @s grgT matches 1.. run return run function rlk:cm/c3/rig_frozen
 function rlk:cm/sb/rig/pick
 execute unless score @s cmAP = #pose tmp store result storage rlk:c3 p.n int 1 run scoreboard players get #pose tmp
 execute unless score @s cmAP = #pose tmp run function rlk:cm/sb/rig/pose_m with storage rlk:c3 p

@@ -39,6 +39,8 @@
   fight_vars and cleanup_fight clear it, start_go's closing bars_show is skipped while it is 1 (홍련 F-I, f2-8: a spawn
   hook's bars(0) holds), no other F:mboss file touches it (bars_hide / bars_show stay flag-free), and
   mboss_lib.bars(on) returns the one wrapper line
+- balance gauge (combat overhaul lane B): an enabled entry with "bal" true has mboss_lib.BAL_HOOKS (not macros), and
+  mboss/d/bal_has + mboss/d/<BAL_HOOKS> dispatch exactly the flagged entries
 Exit code 1 on any problem.
 """
 import re
@@ -61,6 +63,9 @@ for b in L.enabled_bosses(REG):
     # hr FN-b: an optional special hook is required once the entry sets its flag (rwHook -> reward)
     if b.get('kind', 'mid') == 'special':
         hooks = hooks + [h for f, h in L.SPECIAL_OPT_HOOKS.items() if b.get(f)]
+    # combat overhaul lane B: the balance hooks are required once the entry sets "bal"
+    if b.get('bal'):
+        hooks = hooks + L.BAL_HOOKS
     for h in hooks:
         rel = f'{L.fn_root(b)}/{h}'
         if rel not in funcs:
@@ -73,6 +78,16 @@ for h in L.HOOKS + [h.replace('/', '_') for h in L.HELP_HOOKS]:
     rel = f'mboss/d/{h}'
     if rel not in funcs:
         problems.append(f'missing dispatcher {rel}')
+# combat overhaul lane B: the balance dispatchers name exactly the flagged entries
+_bal = sorted(b['n'] for b in L.enabled_bosses(REG) if b.get('bal'))
+for h in ['bal_has'] + L.BAL_HOOKS:
+    rel = f'mboss/d/{h}'
+    if rel not in funcs:
+        problems.append(f'missing dispatcher {rel}')
+        continue
+    got = sorted(int(m) for m in re.findall(r'#mbId mb matches (\d+) ', (FN / (rel + '.mcfunction')).read_text(encoding='utf-8')))
+    if got != _bal:
+        problems.append(f'{rel}: dispatches {got}, the registry flags bal on {_bal}')
 # every tree the framework and its modules generate: F:mboss/**, each module root outside it (boss/<id>), the aliases
 ROOTS = ['mboss'] + sorted({L.fn_root(b) for b in REG['boss'] if not L.fn_root(b).startswith('mboss/')}) + ['boss/test']
 # the rift (Tachy S1, tools/build_rift.py): its tree and its hover object
