@@ -39,3 +39,6 @@ README 0-6 의 사용자 규칙 전부(팁 문구 금지 · 바닐라 소리 · 
 스위트 · `run_all.sh`(0-9 의 알려진 실패만) · `check_mboss_pack` 0 · loadcheck 0. 커밋 끝 두 줄은 정확히
 `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` / `Claude-Session: https://claude.ai/code/session_019wi9c7roqDDkFi2TvFWw6G`.
 컨테이너가 다시 시작될 수 있으니 진행 기록(`<lane>_progress.md`, 이 폴더)을 늘 최신으로 두고, 검사를 통과한 단계마다 커밋 · 푸시.
+
+## 정기 보고
+- 사용자 11-10: 「중간중간 2~3시간마다 얼마나 남았는지 알려줘」 → 예약 작업 「전투 개편 진행 보고」(trig_01PmTgvoDpBSDggLqhpeSkyU, 3시간마다, 이 세션으로). 릴리스까지 끝나면 삭제.
