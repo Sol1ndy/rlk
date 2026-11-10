@@ -129,7 +129,7 @@ def world():
 def full(s):
     pl = s.player
     s.setsc(('e', pl.id), 'curHealth', s.sc(('e', pl.id), 'maxHealth') or 1000)
-    for o in ('shieldHP', 'gShield', 'dead', 'buT', 'rnDie', 'pkMode', 'vMap', 'rdCam'):
+    for o in ('shieldHP', 'gShield', 'dead', 'buT', 'rnDie', 'pkMode', 'vMap', 'rdCam', 'pmMoveLock'):
         s.setsc(('e', pl.id), o, 0)
 
 
@@ -304,7 +304,7 @@ def t_input():
     s.gt += 40
     f()
     ck('input: after a pause longer than the lock, F is accepted again', P(s, 'parAt') == s.gt)
-    for o, v in (('vMap', 1), ('pkMode', 1), ('dead', 1), ('buT', 5), ('rnDie', 3), ('rdCam', 1)):
+    for o, v in (('vMap', 1), ('pkMode', 1), ('dead', 1), ('buT', 5), ('rnDie', 3), ('rdCam', 1), ('pmMoveLock', 1)):
         s.gt += 40
         P(s, o, v)
         before = P(s, 'parAt')
