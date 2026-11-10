@@ -70,8 +70,8 @@ Never regenerate a tree while a harness reads it (use a copy: `snap.sh`).
     main checkout has no such branch, so `run_all.sh` stops there on the base too), `test_arlecchino`, `pat_p1`, `pat_p2`, `kit_dry` all pass
   - `hr/tests` (her module's output is byte-identical; these check the framework under her): `test_special_hr` all (E9: the
     generated glint table lives in `mboss/d/` beside the dispatchers), `ident_hr` (allow-list group "fix B"), `ev_dry` 78,
-    `test_moon` 55, `test_hwamu` 283, `test_arena_hr` 94, `test_kit` 13362, `test_scarlet`, `pat_p1`, `pat_ghost`, `test_reward` all pass (`test_rig` needs her skin source and
-    `gen_check_hr` the resource pack: not part of this lane's change)
+    `test_moon` 55, `test_hwamu` 283, `test_arena_hr` 94, `test_kit` 13362, `test_scarlet`, `pat_p1`, `pat_ghost`, `test_reward` all pass, `gen_check_hr --rp <copy>` 28/28 (`test_rig` needs her
+    skin source: not run)
 - [x] push `wip/combat-fix-b`
 
 ## Counts (pattern groups with an unparriable part / all; in brackets: those with the glint = unparriable and dodgeable)
