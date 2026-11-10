@@ -44,6 +44,8 @@ def new_sim(dp, seat=True, char=None):
 def tick(s, after=None, ride=True):
     s.t += 1
     c = pctx(s)
+    # lane C (11-10): rlk:tick's input pre-pass runs first (F = the parry press, right-clicks); a tree without it: no-op
+    s.call('rlk:player/def/input', c)
     if ride:
         s.call('rlk:perf/ride_items', c)
     s.call('rlk:player/tick', c)
