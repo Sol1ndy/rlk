@@ -145,6 +145,7 @@ _LANE_C_FN = (
     'view/av_tick', 'view/dash_dir', 'view/move', 'view/ride_tick')
 ALLOW[LANE_C] = ([F + f'{n}.mcfunction' for n in _LANE_C_FN]
                  + [F + r'player/def/.+\.mcfunction', F + r'char/motion/clips/(?:arle|skirk|navia)/guard/.+\.mcfunction',
+                    F + r'char/motion/(?:arle_fx|skirk_fx|navia_fx|events/arle|events/skirk|events/navia)/guard\.mcfunction',
                     'items.md'])
 # groups whose files may also be gone (removed on purpose; every other gone file fails)
 ALLOW_GONE = {LANE_R,                               # lane R's removals
