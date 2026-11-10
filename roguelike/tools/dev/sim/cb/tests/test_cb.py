@@ -3,7 +3,7 @@
 datapack root (read only).
 
     python3 test_cb.py <datapack root> [section ...]
-      sections: static input judge tiers dodge context energy cd boss near raiden readers fx cost   (default: all)
+      sections: static input judge tiers dodge context energy cd bal boss near raiden readers fx cost   (default: all)
 
   static   the dash charges / HUD gauge / dash_iframe / hurt_nd are gone; dashInvT is written only by the non-dodge
            i-frames; the tick order (the input pre-pass before view/tick, player/tick, the cm worlds, Raiden, the bosses;
@@ -25,6 +25,9 @@ datapack root (read only).
            in 일곱빛 섬광 gets none
   cd       char/cd_cut: -20 t on skillCd (clamped at 0), 나비아 / 네페르 advance the charge timer (nvCT / nfCT) only while
            a charge is missing; a perfect parry calls it once per press and rlk:bal/hit {n:1} on the attacker
+  bal      lane B's real gauge: a perfect parry on a strike takes exactly one pip from the attacker (cm brain, a
+           projectile's owner, an elite, a boss body), once per press; tiers 1-2 / a dodge / an unparriable attack take
+           none; a groggy enemy or a boss that refuses balance keeps its pips while the parry still works
   boss     hz/np_def per shape and option, pj/launch's no-parry, hurt_dodge's #mbDodgeOk (perfect dodge / perfect parry
            only), hz/hurt_pm through the judge (a perfect dodge avoids; a parry does not), np_glint spacing / #mbNpOwn
   near     the perfect-window re-test at the dodge's start: a disc hazard that misses the moved body but covers the dodge
@@ -266,7 +269,9 @@ def t_static():
     ck('static: Raiden land sets the context, land_nd = #hcND 1 without dashInvT, try re-tests at the dodge start',
        '#hcNP tmp 1' in fns['boss/raiden/hazard/land'] and 'dashInvT' not in fns['boss/raiden/hazard/land_nd']
        and '#hcND tmp 1' in fns['boss/raiden/hazard/land_nd'] and 'hazard/try_near' in fns['boss/raiden/hazard/try'])
-    ck('static: rlk:bal/hit exists (lane B interface; a stub until the merge)', 'bal/hit' in fns)
+    ck('static: rlk:bal/hit is lane B\'s (takes #n bal through bal/take) and the perfect parry calls it as the attacker',
+       'function rlk:bal/take' in fns.get('bal/hit', '')
+       and 'execute as @e[tag=rlk_hc_atk,limit=1] run function rlk:bal/hit {n:1}' in fns['player/def/par3_go'])
     ck('static: the guard clip exists for the three rig characters', all(f'char/motion/clips/{c}/guard/start' in fns
        for c in ('arle', 'skirk', 'navia')) and fns.get('char/motion/guard', '').count('clip:"guard"') == 3)
     gl = fns.get('player/def/fx/g/glint', '') + fns.get('player/def/fx/g/t_streak', '')
@@ -591,6 +596,119 @@ def t_cd():
     ck('cd: a tier-2 parry neither cuts the skill nor takes balance', not s.calls('rlk:bal/hit') and not s.calls('rlk:char/cd_cut'))
 
 
+# ================================================================================================== balance (lane B's gauge)
+def gauge(s, e):
+    """the enemy's gauge as mob/setup makes it (rlk:bal/init as the new mob) -> (bal, balMax, balC)"""
+    s.call('rlk:bal/init', Ctx(e, tuple(e.pos), tuple(e.rot)))
+    return bal(s, e), s.sc(('e', e.id), 'balMax'), s.sc(('e', e.id), 'balC')
+
+
+def bal(s, e):
+    return s.sc(('e', e.id), 'bal')
+
+
+def t_bal():
+    s, pl = world()
+    e = brain(s)
+    b0, mx, c = gauge(s, e)
+    ck('bal: a cm brain gets lane B\'s normal gauge (balC 1, full)', c == 1 and mx >= 2 and b0 == mx, (b0, mx, c))
+    nopress(s)
+    press(s, 1)
+    lost = cm_hit(s, e, 30)
+    ck('bal: a perfect parry on a strike takes exactly one pip from the attacker (and no damage)', bal(s, e) == mx - 1 and lost == 0,
+       (bal(s, e), mx, lost))
+    cm_hit(s, e, 30)
+    ck('bal: a second hit in the same tick (the same press) takes no second pip', bal(s, e) == mx - 1, bal(s, e))
+    s.gt += 1
+    l2 = cm_hit(s, e, 30)
+    ck('bal: the press is spent: the next tick\'s hit lands and takes no pip', bal(s, e) == mx - 1 and l2 > 0, (bal(s, e), l2))
+    for ago, tier in ((4, 2), (7, 1)):
+        nopress(s)
+        press(s, ago)
+        cm_hit(s, e, 30)
+        ck(f'bal: a tier-{tier} parry takes no pip', bal(s, e) == mx - 1 and G(s, '#parT') == tier, (bal(s, e), G(s, '#parT')))
+    nopress(s)
+    dodge(s, 1)
+    cm_hit(s, e, 30)
+    ck('bal: a perfect dodge takes no pip', bal(s, e) == mx - 1, bal(s, e))
+    nopress(s)
+    s.gt += 40
+    press(s, 0)
+    cm_hit(s, e, 30)
+    ck('bal: a new press, a new perfect parry: one more pip', bal(s, e) == mx - 2, bal(s, e))
+    # a projectile: the pip comes off its owner, not off another brain
+    other = brain(s, (), pos=(4.5, 64.0, 0.5), cid=12)
+    gauge(s, other)
+    pj = Ent('block_display', (1.5, 65.0, 0.5), (0.0, 0.0), ['rlk_cmp', 'rlk_cmp_ar'])
+    s.ents.append(pj)
+    s.setsc(('e', pj.id), 'cmId', 7)
+    nopress(s)
+    s.gt += 40
+    press(s, 2)
+    full(s)
+    s.setsc('#hcK', 'tmp', 0)
+    s.setsc('#dmgIn', 'tmp', 30)
+    s.setsc('#cmDmg', 'tmp', 30)
+    before = (bal(s, e), bal(s, other))
+    hp0 = P(s, 'curHealth')
+    s.call('rlk:cm/hit_pl', Ctx(pj, tuple(pj.pos), tuple(pj.rot)))
+    ck('bal: a perfectly parried projectile takes one pip from its owner brain only',
+       (bal(s, e), bal(s, other)) == (before[0] - 1, before[1]) and P(s, 'curHealth') == hp0, (before, bal(s, e), bal(s, other)))
+    # an elite: one pip of its larger gauge
+    el = brain(s, ('rlk_c2e',), pos=(3.5, 64.0, 2.5), cid=21)
+    eb, emx, ec = gauge(s, el)
+    nopress(s)
+    s.gt += 40
+    press(s, 1)
+    cm_hit(s, el, 30)
+    ck('bal: an elite (balC 2): one pip of its gauge', ec == 2 and emx > mx and bal(s, el) == emx - 1, (eb, emx, ec, bal(s, el)))
+    # a groggy attacker refuses balance damage: the parry itself still works
+    s.setsc(('e', el.id), 'grgT', 40)
+    nopress(s)
+    s.gt += 40
+    press(s, 1)
+    P(s, 'skillCd', 100)
+    lost = cm_hit(s, el, 30)
+    ck('bal: a groggy attacker keeps its pips (rlk:bal/hit fails), the perfect parry still nullifies and cuts the skill',
+       bal(s, el) == emx - 1 and lost == 0 and P(s, 'skillCd') == 80, (bal(s, el), lost, P(s, 'skillCd')))
+    # a registry boss body in the fight state (bal/boss/may): one pip of the boss gauge
+    body = Ent('husk', (8.5, 64.0, 0.5), (0.0, 0.0), ['rlk_mb_body', 'rlk_mob', 'boss'])
+    s.ents.append(body)
+    for o, v in (('balMax', 12), ('bal', 12), ('balC', 3), ('grgT', 0), ('balT', 0)):
+        s.setsc(('e', body.id), o, v)
+    for o, v in (('#mbSt', 1), ('#mbCine', 0), ('#mbBarOff', 0), ('#mbAtk', 100), ('#mbDmgMul', 100), ('#mbKB', 0), ('#mbLv', 1)):
+        s.setsc(o, 'mb', v)
+
+    def boss_hit(np=0):
+        """a real framework strike: mboss/hurt as the body (#mbHitPct 100 -> hurt_ctx -> cm/hit_pl2 -> take_damage)"""
+        nopress(s)
+        s.gt += 40
+        press(s, 1)
+        full(s)
+        for o, v in (('#mbHitPct', 100), ('#mbNoParry', np), ('#mbNoDodge', 0), ('#mbSrc', 0), ('#mbNoRx', 0)):
+            s.setsc(o, 'mb', v)
+        hp0 = P(s, 'curHealth')
+        s.call('rlk:mboss/hurt', Ctx(body, tuple(body.pos), (0, 0)))
+        return hp0 - P(s, 'curHealth')
+
+    lost = boss_hit()
+    ck('bal: boss body (balC 3), a perfectly parried strike: exactly one pip, no damage', bal(s, body) == 11 and lost == 0,
+       (bal(s, body), lost))
+    lost = boss_hit(np=1)
+    ck('bal: boss body, an unparriable attack: the press does nothing (damage lands, no pip)', bal(s, body) == 11 and lost > 0,
+       (bal(s, body), lost))
+    s.setsc('#mbBarOff', 'mb', 1)
+    lost = boss_hit()
+    ck('bal: a boss with hidden bars refuses the pip (bal/boss/may); the parry still nullifies', bal(s, body) == 11 and lost == 0,
+       (bal(s, body), lost))
+    s.setsc('#mbBarOff', 'mb', 0)
+    s.setsc(('e', body.id), 'bal', 1)
+    lost = boss_hit()
+    ck('bal: the last pip by a perfect parry empties the gauge (lane B\'s groggy takes over: grgT or pending)',
+       bal(s, body) == 0 and lost == 0 and ((s.sc(('e', body.id), 'grgT') or 0) >= 1 or 'rlk_bal_pend' in body.tags),
+       (bal(s, body), s.sc(('e', body.id), 'grgT'), sorted(body.tags)))
+
+
 # ================================================================================================== boss framework
 def hzm(s, K, R=2000, ND=0, Pm=None, RA=0, opt=-1, D=100):
     m = Ent('marker', (2.5, 64.0, 0.5), (0.0, 0.0), ['rlk_mb_hz'])
@@ -830,7 +948,7 @@ def t_cost():
 
 
 SECTIONS = [('static', t_static), ('input', t_input), ('judge', t_judge), ('tiers', t_tiers), ('dodge', t_dodge),
-            ('context', t_context), ('energy', t_energy), ('cd', t_cd), ('boss', t_boss), ('near', t_near), ('raiden', t_raiden),
+            ('context', t_context), ('energy', t_energy), ('cd', t_cd), ('bal', t_bal), ('boss', t_boss), ('near', t_near), ('raiden', t_raiden),
             ('readers', t_readers), ('fx', t_fx), ('cost', t_cost)]
 for name, fn in SECTIONS:
     if run(name):

@@ -9,7 +9,9 @@ RP 사본: `<S>/rp_c`(원본 `<S>/rp_base` 는 읽기 전용, 11-06 릴리스 b3
 - [x] 병합 origin/wip/combat(레인 P, 4163e8f2f) → 0477aacb7; C3 (75e58e9c3) ident_hr 레인 C 묶음 · test_rm · pworld 앞 단계
 - [x] C3b-d (4b0c5addf · 38bec12c8 · 0fecbba9a · 4b8181765) 가드 클립 빈 함수 · 우두머리 대리 우클릭 · 동작 잠금 · test_cm_ar
 - [x] C4 근접 재판정을 rlk:tick 한 곳(mboss/near_all)으로 · judge 빠른 길(judge2 / end) · np_def 이른 반환 · m0diff / fw_az / fw_ap 갱신
-- [ ] 게이트 전체(새 스냅숏에서 hr ar az) → push
+- [x] 병합 origin/wip/combat(레인 B 균형치, 58c6c13f1) → b0f712ddc: bal/hit 대역을 B 의 파일로, README · ident_hr 는 양쪽 다 둠; regen 변화 없음
+- [x] C5 test_cb 의 `bal` 묶음(퍼펙트 패링 = 공격자의 균형치 정확히 한 칸; 217/217) · README 대역 설명 고침
+- [ ] 게이트 전체(병합 트리의 새 스냅숏에서 hr ar az bal) → push
 
 ## 설계 (구현됨)
 - 입력: rlk:tick 맨 앞 `player/def/input`(F → player/f_key = 패링 입력, 눈앞 · 몹 실드의 우클릭, F5 rc_hold) + `#now cb`, `#dgOpen cb`.
@@ -29,3 +31,5 @@ RP 사본: `<S>/rp_c`(원본 `<S>/rp_base` 는 읽기 전용, 11-06 릴리스 b3
 - 커밋 trailer 는 C2 부터 조정자 지시대로, C4 부터 실행 환경이 주는 표기대로.
 - 11-10 C4: m0diff 의 레인 C 몫 — 틱당 비용(근접 재판정 · 입력 앞 단계)을 LANE_C_CMD 1.2 로 예산에 더함, 효과 개체 · 새 objective 는 비교에서 뺌.
   fw_az / fw_ap: #mbDodgeOk 는 이제 퍼펙트 닷지 · 3단계 패링만(무적 · 넓은 닷지 · 1-2단계는 아님).
+- 11-10 병합 전 트리(7d06a6649)의 스위트 c4(중간에 멈춤: 병합 트리에서 다시 돎): hr 12개 중 통과 10 + ident_hr(스냅숏이 git 이 아니라 실패; 작업 트리에서 따로 통과) +
+  test_rig 1(사용자 스킨 원본이 없는 환경 탓), ar run_all · test_arlecchino · pat_p1 통과. regen 두 번 같음, check_mboss_pack 0, loadcheck cb_c 0, test_lag 통과.
