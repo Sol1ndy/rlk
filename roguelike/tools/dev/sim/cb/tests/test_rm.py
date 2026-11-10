@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """test_rm.py: the combat overhaul's lane R (removals) against one datapack root (read only).
 
-    python3 test_rm.py <datapack root> [section ...]        sections: static yoi view (default: all)
+    python3 test_rm.py <datapack root> [section ...]        sections: static yoi view picksub (default: all)
 
   static  요이미야 / the bow are gone (files, calls, objectives, the generated px/db row, the codex label), the projectile
           frame that 로노바 / 클로린드 use is kept and serves only their kinds, plain F (player/f_key) no longer toggles a
@@ -16,6 +16,10 @@
           (mboss/guardian/p/pull/scr_end), no hand file branches on them any more; a world saved in first person (#on 0) or
           the shoulder view (#vmode 1) loads into F5 (the old camera storage removed) and its player's next view ticks take
           the avatar path (fresh -> spawn, rlk_body moves off the player, ride_tick); developer mode keeps view/fps_tick
+  picksub 「고를 아이템 N개 …」 (lvup/pick_sub, the real file) never shows in combat: room combat (#active room 1 and
+          #combat room 1..) or a live boss engine (#mbLive mb 1); the line on screen goes at once (subtitle "", the F5
+          crosshair title stays), it comes back within 20 ticks after the fight, a level-up during the fight shows nothing
+          until it ends, a stale #combat with #active 0 does not hide it, and the old rules hold (pkMode, dead, ttlT)
 
 Harness: lib/psim.py + lib/mcsim.py = the research harness of the overhaul (tools/dev/plan/combat/perf_harness, mcsim =
 ar/tests/lib/mcsim.py with unset source scores read as 0), vendored so later edits there cannot move this suite. Prints
@@ -319,7 +323,7 @@ def t_view():
     ck('view: the UI ray lengths are the third-person ones, unconditionally',
        rays == ['scoreboard players set #rObj view 27', 'scoreboard players set #rDit view 21', 'scoreboard players set #rDitB view 23',
                 'scoreboard players set #rShop view 28', 'scoreboard players set #rShopB view 27'], rays)
-    ps = [l for l in code_lines(fns['lvup/pick_sub']) if 'title @s subtitle' in l]
+    ps = [l for l in code_lines(fns['lvup/pick_sub']) if 'title @s subtitle' in l and '고를 아이템' in l]
     ck('view: the pick subtitle has one form (웅크리기), no Shift + F variant',
        len(ps) == 1 and '웅크리기(Shift)' in ps[0] and 'Shift + F' not in ps[0], ps)
     vis = re.compile(r'"[^"]*(?:1인칭|숄더뷰)[^"]*"')
@@ -365,7 +369,62 @@ def t_view():
                and s.ncall['rlk:view/ride_tick'] - c0.get('rlk:view/ride_tick', 0) == 0)
 
 
-SECTIONS = {'static': t_static, 'yoi': t_yoi, 'view': t_view}
+# ================================================================================================== picksub
+def pick_run(script, n=130, pending=2, base=None):
+    """The real lvup/pick_sub (+ the real view/ttl_blank) once per tick for a player with pick(s) waiting. script =
+    [(tick, holder, objective, value)], holder '@p' = the player. Returns {tick: [title args]} of the player."""
+    s, pl = lworld()
+    P = ('e', pl.id)
+    for o, v in (('pkPending', pending), ('pkMode', 0), ('dead', 0), ('ttlT', 0), ('pkSubT', 0), ('devMode', 0)):
+        s.setsc(P, o, v)
+    for k, o, v in (base or (('#active', 'room', 1), ('#combat', 'room', 0), ('#mbLive', 'mb', 0))):
+        s.setsc(k, o, v)
+    out = {}
+    for tk in range(1, n + 1):
+        s.t = tk
+        for at, k, o, v in script:
+            if at == tk:
+                s.setsc(P if k == '@p' else k, o, v)
+        n0 = len(s.log)
+        s.call('rlk:lvup/pick_sub', pctx(s))
+        out[tk] = [a for _, kind, who, a in s.log[n0:] if kind == 'title' and who == pl.id]
+    return out
+
+
+def subs(out, lo=1, hi=10 ** 6):
+    return [tk for tk, ts in out.items() if lo <= tk <= hi and any('subtitle' in a and '고를 아이템' in a for a in ts)]
+
+
+def t_picksub():
+    out = pick_run([(30, '#combat', 'room', 3), (70, '#combat', 'room', 0), (90, '#mbLive', 'mb', 1), (110, '#mbLive', 'mb', 0)])
+    s_all = subs(out)
+    ck('picksub: out of combat it shows and is refreshed every 20 ticks (1, 21)', subs(out, 1, 29) == [1, 21], s_all)
+    ck('picksub: never during room combat (#active room 1, #combat room 3: ticks 30-69)', not subs(out, 30, 69), s_all)
+    ck('picksub: the line on screen goes at once when the fight starts (subtitle "" at 30, no title clear: the F5 crosshair stays)',
+       any(a.strip() == '@s subtitle ""' for a in out[30]) and not [1 for tk in range(1, 131) for a in out[tk] if a.strip().endswith('clear')],
+       out[30])
+    ck('picksub: it comes back within 20 ticks after the fight (70-89)', bool(subs(out, 70, 89)), s_all)
+    ck('picksub: never while a boss engine is live (#mbLive mb 1: ticks 90-109), even out of a room fight', not subs(out, 90, 109), s_all)
+    ck('picksub: back after the boss engine stops (110-130)', bool(subs(out, 110, 130)), s_all)
+    out2 = pick_run([(40, '@p', 'pkPending', 1), (80, '#combat', 'room', 0)], pending=0,
+                    base=(('#active', 'room', 1), ('#combat', 'room', 5), ('#mbLive', 'mb', 0)))
+    ck('picksub: a level-up during the fight (pkPending 0 -> 1 at 40) shows nothing until the fight ends (80), then it shows',
+       not subs(out2, 1, 79) and bool(subs(out2, 80, 100)), subs(out2))
+    out3 = pick_run([], base=(('#active', 'room', 0), ('#combat', 'room', 4), ('#mbLive', 'mb', 0)), n=30)
+    ck('picksub: a stale #combat with #active room 0 (no room run) does not hide it', subs(out3) == [1, 21], subs(out3))
+    out4 = pick_run([(10, '@p', 'pkMode', 1), (30, '@p', 'pkMode', 0), (50, '@p', 'dead', 1), (70, '@p', 'dead', 0),
+                     (90, '@p', 'ttlT', 30)], n=125)
+    ck('picksub: the old rules hold: nothing in the selection space (pkMode 10-29), while dead (50-69), under another title (ttlT)',
+       not subs(out4, 10, 29) and not subs(out4, 50, 69) and not subs(out4, 90, 119) and bool(subs(out4, 30, 49))
+       and bool(subs(out4, 70, 89)), subs(out4))
+    fl = code_lines(rd('lvup/pick_sub'))
+    ck('picksub: the gate reads the combat states the pack\'s refusals use (lvup/toggle: #active room 1 + #combat room 1..) and #mbLive',
+       'execute if score #active room matches 1 if score #combat room matches 1.. run scoreboard players set #ps tmp 0' in fl
+       and 'execute if score #mbLive mb matches 1 run scoreboard players set #ps tmp 0' in fl
+       and 'if score #active room matches 1 if score #combat room matches 1..' in rd('lvup/toggle'))
+
+
+SECTIONS = {'static': t_static, 'yoi': t_yoi, 'view': t_view, 'picksub': t_picksub}
 for name, fn in SECTIONS.items():
     if not ONLY or name in ONLY:
         print(f'== {name}')

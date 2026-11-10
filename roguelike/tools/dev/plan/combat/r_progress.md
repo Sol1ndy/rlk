@@ -6,7 +6,7 @@
 ## 단계
 - [x] R1 요이미야 · 활 삭제 + 저장 월드 이전 (커밋 R1; 시험 `tools/dev/sim/cb/tests/test_rm.py` static · yoi)
 - [x] R2 1인칭 · 숄더뷰 삭제(F5 만) (커밋 R2; test_rm view)
-- [ ] R3 전투 중 「고를 아이템」 안내 숨김 + 시험
+- [x] R3 전투 중 「고를 아이템」 안내 숨김 + 시험 (커밋 R3; test_rm picksub: 기준선 5 실패 → 0)
 - [ ] 게이트(재생성 두 번 · check_mboss_pack · 스위트 · run_all · ar/tests · az/tests_cm · hr 전부 · loadcheck cb_r)
 
 ## 기록
@@ -21,3 +21,5 @@
   rlk:view cam/opt/optv/st/pr 지움. 로비 built 12, 「시점」 버튼 없음. README 13절 새로 씀(13-1 없앰), 0-9 에 보스 1인칭 갈래 목록.
   test_hwamu view(개발자 모드 · F5 · 사망 · 선택 공간 7/7). 게이트: regen 두 번 변화 없음 · check_mboss_pack 0 · loadcheck cb_r 0 ·
   test_rm 62/62 · test_special_hr 통과 · 검사기 새 것 없음(줄 이동만).
+- R3: lvup/pick_sub 에 두 줄(#active room 1 + #combat room 1.. / #mbLive mb 1 → #ps 0), 떠 있던 줄은 title clear 대신 subtitle ""
+  (F5 조준점 유지). README 12절. 게이트: loadcheck cb_r 0 · test_rm 72/72.
