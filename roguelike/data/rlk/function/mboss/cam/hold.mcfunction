@@ -4,9 +4,10 @@
 # No fight any more (the request outlived it): the request is dropped and the player released.
 execute unless score #mbLive mb matches 1 run scoreboard players set #mbCam mb 0
 execute unless score #mbLive mb matches 1 run return run function rlk:mboss/cam/release
-# The player is their own body (developer mode: no avatar to leave behind): never locked.
-execute if entity @s[tag=rlk_body] run return 0
-execute unless entity @e[tag=rlk_av,limit=1] run return 0
+# The player is their own body (developer mode; the tick after a relog or a /reload rebuilt the view: no avatar to
+# leave behind): never locked, and a player who still carries the hold from before is released.
+execute if entity @s[tag=rlk_body] run return run function rlk:mboss/cam/release
+execute unless entity @e[tag=rlk_av,limit=1] run return run function rlk:mboss/cam/release
 # The live stand is gone (killed): the player is not left a free spectator; the lock comes back with the stand.
 execute if score #mbCamId mb matches 2 unless entity @e[type=minecraft:armor_stand,tag=rlk_mb_cam2,limit=1] run return run function rlk:mboss/cam/release
 execute unless score #mbCamId mb matches 2 unless entity @e[type=minecraft:armor_stand,tag=rlk_mb_cam1,limit=1] run return run function rlk:mboss/cam/release

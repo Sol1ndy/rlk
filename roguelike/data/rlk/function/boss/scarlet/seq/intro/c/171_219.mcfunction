@@ -1,0 +1,2 @@
+# intro: the camera at #sq 171..219 (@s = the body).
+execute at @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] rotated ~ 0 run rotate @e[type=minecraft:armor_stand,tag=rlk_mb_cam2,limit=1] facing ^-0.25 ^0.62 ^0.35

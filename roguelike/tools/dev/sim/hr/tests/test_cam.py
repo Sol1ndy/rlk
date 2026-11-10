@@ -337,6 +337,21 @@ def paths():
     ck('P7 relog: ... at the stored return point', _near(pl.pos, av0), f'{pl.pos} {av0}')
     CS.run(s, 2)
     ck_clean('P7 relog: the new avatar and the seat', s, gm0='creative', stands=True)
+    # relog while the module goes on asking (a core that resumes its sequence): the rebuilt view makes the player the body
+    # for a tick; the hold releases instead of leaving a tagged free spectator
+    s, pl = held_world(gm='survival')
+    av0 = list(s.avatar().pos)
+    s.ents.remove(pl)
+    CS.run(s, 3)
+    s.st(pl)['cam'] = None
+    s.ents.append(pl)
+    s.setsc('#vFresh', 'view', 1)
+    CS.world(s)
+    ck_clean('P7b relog, the module still asking: released in the first tick back', s, gm0='survival', stands=True, seat=False, req=False)
+    ck('P7b ... at the stored return point', _near(pl.pos, av0), f'{pl.pos} {av0}')
+    s.cam_req = None                               # (a real sequence sees the release and stops asking: test_seq)
+    CS.run(s, 2)
+    ck_clean('P7b ... the new avatar and the seat', s, gm0='survival', stands=True)
     # cleanup (room/clear, run end, test stop)
     s, pl = held_world()
     s.call('rlk:mboss/cleanup', C0)
@@ -491,6 +506,10 @@ def cost():
 # ============================================================================================================ ident
 SHARED = ('mboss/main', 'mboss/cleanup_fight', 'mboss/init', 'mboss/uninstall', 'tick', 'view/tick', 'lvup/tick')
 CAM_WORDS = ('mbCam', 'mboss/cam/', 'camret', 'rlk_mb_camh')
+# the other H lanes' shared lines on a merged tree: lane H1's FN-bal (#mbBalOff: bal/boss/may, fight_vars, cleanup_fight)
+# and her registry record (intro 1450 / death 1494)
+H1_FILES = ('bal/boss/may', 'mboss/fight_vars', 'mboss/register')
+H1_WORDS = ('mbBalOff', 'id:"scarlet"')
 
 
 def ident():
@@ -502,20 +521,29 @@ def ident():
         return
     names = git('diff', '--name-status', base, '--', 'roguelike/data').stdout.split('\n')
     names += [f'A\t{p}' for p in git('ls-files', '--others', '--exclude-standard', '--', 'roguelike/data').stdout.split('\n') if p]
-    other = [n for n in names if n.strip() and '\troguelike/data/rlk/function/boss/scarlet/' not in n
-             and '\troguelike/data/rlk/function/mboss/cam/' not in n and '\troguelike/data/rlk/function/char/cine/' not in n]
-    exp = sorted(f'M\troguelike/data/rlk/function/{n}.mcfunction' for n in SHARED)
-    ck(f'D1 against {base[:9]}: outside F:boss/scarlet, F:mboss/cam (and lane H3\'s F:char/cine) only the shared files change',
-       sorted(other) == exp, str(sorted(set(other) ^ set(exp))))
-    new = [n for n in names if '\troguelike/data/rlk/function/mboss/cam/' in n]
+    pre = '\troguelike/data/rlk/function/'
+    other = [n for n in names if n.strip() and pre + 'boss/scarlet/' not in n and pre + 'mboss/cam/' not in n
+             and pre + 'char/cine/' not in n]
+    mine = sorted(f'M{pre}{n}.mcfunction' for n in SHARED)
+    h1 = sorted(f'M{pre}{n}.mcfunction' for n in H1_FILES)
+    extra = sorted(set(other) - set(mine) - set(h1))
+    ck(f'D1 against {base[:9]}: outside F:boss/scarlet, F:mboss/cam (and lane H3\'s F:char/cine) only the shared files change '
+       f'(FN-cam\'s seven; lane H1\'s FN-bal / registry three on a merged tree)', set(mine) <= set(other) and not extra, str(extra))
+    new = [n for n in names if pre + 'mboss/cam/' in n]
     ck('D1 F:mboss/cam/** is new', new and all(n.startswith('A\t') for n in new), str(new))
-    for n in SHARED:
+    for n in SHARED + tuple(x for x in H1_FILES if f'M{pre}{x}.mcfunction' in other):
         d = git('diff', '-U0', base, '--', f'roguelike/data/rlk/function/{n}.mcfunction').stdout.split('\n')
         rem = [l for l in d if l.startswith('-') and not l.startswith('---')]
         add = [l[1:] for l in d if l.startswith('+') and not l.startswith('+++')]
         code = [l for l in add if l.strip() and not l.startswith('#')]
-        ck(f'D2 {n}: added lines only, every added command a FN-cam line',
-           not rem and code and all(any(w in l for w in CAM_WORDS) for l in code), f'removed {rem} added {code}')
+        if n in H1_FILES:
+            ck(f'D2 {n} (lane H1): every changed command is a FN-bal line or her registry record',
+               all(any(w in l for w in H1_WORDS) for l in code + [l[1:] for l in rem if not l[1:].startswith('#')]), f'{rem} {code}')
+            continue
+        cam = [l for l in code if any(w in l for w in CAM_WORDS)]
+        rest = [l for l in code if l not in cam]
+        ck(f'D2 {n}: added lines only, every added command a FN-cam line (or lane H1\'s #mbBalOff)',
+           not rem and cam and all(any(w in l for w in H1_WORDS) for l in rest), f'removed {rem} added {code}')
 
 
 SECTIONS = [('static', static), ('hold', hold), ('paths', paths), ('stand', stand), ('idem', idem), ('cost', cost), ('ident', ident)]

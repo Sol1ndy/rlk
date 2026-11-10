@@ -171,6 +171,8 @@ class CamSim(H.ScSim):
             self.ncmd += 1
             self.attr_log.append((self.t, ' '.join(t[1:])))
             return 1
+        if c == 'data' and len(t) > 3 and t[1] == 'get' and t[2] == 'entity' and not self._targets(t[3], ctx):
+            return 0                                   # no such entity: the command fails (mcsim indexes the empty selection)
         if c == 'tp':
             # a teleported player leaves its vehicle and its camera (TeleportCommand: resetCamera)
             for e in self._targets(t[1], ctx):
