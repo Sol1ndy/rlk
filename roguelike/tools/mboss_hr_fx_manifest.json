@@ -1792,8 +1792,8 @@
    "args": [
     "c"
    ],
-   "doc": "A blade glint at the executor (the blade_tip / hat_crown / chest anchors): a four-ray sparkle flaring and turning, a smaller one crossing it; c tints it (1 lilac, 2 pink-magenta, 3 yellow, 4 crimson, 5 white).",
-   "cards": 2,
+   "doc": "A blade glint at the executor (the blade_tip / hat_crown / chest anchors): a four-ray sparkle flaring and turning, a smaller one crossing it; c tints it (1 lilac, 2 pink-magenta, 3 yellow, 4 crimson, 5 white). HR rebuild: c 2 is the parry cue at blade_mid (api.CUE_KIT): larger (1.8 b) and fuller, three crossed sparkles for 7 t.",
+   "cards": 3,
    "c_split": [
     1,
     2,
@@ -1816,7 +1816,7 @@
    "args": [
     "t"
    ],
-   "doc": "The yellow tell for {t} ticks at the executor (S3 A9 / A10: the body + 1.0, in the air for A10; S4 A7: her): the yellow sphere (1.6 b) and the horizontal flare line through it (4 b), yellow motes.",
+   "doc": "The yellow tell for {t} ticks at the executor (S3 A9 / A10: the body + 1.0, in the air for A10; S4 A7: her): the yellow sphere (1.6 b) and the horizontal flare line through it (4 b), yellow motes. HR rebuild (kcut): t >= 100 is the big tell for t - 100 ticks (the sphere 2.0 b, the flare 5 b), e.g. {t:106}.",
    "cards": 2,
    "c_split": [],
    "ambient": false,
@@ -2141,6 +2141,62 @@
    ],
    "ambient": false,
    "particles_only": true
+  },
+  "flash_blue": {
+   "args": [
+    "t"
+   ],
+   "doc": "The blue unparriable flash (P-blue; at her chest anchor, between follow_on / follow_off so it stays on her): the yellow tell's sphere and flare for 4 t, then a translucent blue sphere (1.8 b, two rims laid together) round her for {t} ticks that swells once more over its last 5 t (the lunge follows); blue motes.",
+   "cards": 6,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "ult_web": {
+   "args": [
+    "t"
+   ],
+   "doc": "U cut1, the \"shattered glass\" (at the floor point the cuts cross: the player's spot; the executor's level = the floor): 12 long pink-white cut lines (30-40 b, 0.16 b wide, four in a magenta glow) shoot through the arena round the executor in 2 t, low and nearly level (0.5-2.4 b up where they pass it: under the F5 camera; none dips under the floor), and stay {t} ticks (20: to cut2, where ult_burst takes them over); with them the screen overlay `web` (fx/hud/ovl, in 0, out 3) for the same {t} ticks.",
+   "cards": 16,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "ult_burst": {
+   "args": [],
+   "doc": "U cut2 (the same floor point as ult_web, as its {t} ends): the 12 cut lines fly apart, each thrown 7-10 b sideways off the executor and upward while it thins and fades (8 t), twelve glass shards flung out, a white glint; the white overlay and burst_radial are the caller's.",
+   "cards": 25,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "sky_mark": {
+   "args": [],
+   "doc": "P-q the sky mark (video 257.00, the one ground mark of the footage; at the lock point on the floor, rotated as the aim): a thin vertical light line from 12 b up down to the point (a white core in a pink glow) and a 2-b pink flash line across the aim at the feet (0.15 b over the floor), 7 t. Lines only: never an area on the floor (hr_design §8.6).",
+   "cards": 5,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "sky_pillar": {
+   "args": [
+    "r"
+   ],
+   "doc": "P-q the sky pillar of radius {r} (tenths; at the lock point on the floor, the hit tick): a pink-white light column 16 b tall (two crossed quads widening to 1.25 r in 2 t round a white core of 0.4 r: it lands on the player, 3.5 b before the F5 lens), a pink shock ring of radius r on the floor (a hit effect at the contact tick), a white glint, motes rising. Upright whatever the executor's pitch.",
+   "cards": 4,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
+  },
+  "qi_beam": {
+   "args": [
+    "len"
+   ],
+   "doc": "P-q / P-n the diagonal sword-qi beam of length {len} (tenths; at her blade or chest in the air, rotated toward the lock): a broad magenta beam (2.6 b) round a pink-white one and a white core shoots from the executor (0.4 of its length at the call, all of it 2 t later), fades by 9 t; sparks along it. It runs along the executor's facing when that looks down 10 deg or more (the caller aimed it); a level call from 2.5 b or more over the floor is drawn 35 deg down. The length is cut where the beam's body would reach the floor (fx/e/clamp_line); a call lower than 1.35 b over the floor narrows the body to twice that height.",
+   "cards": 3,
+   "c_split": [],
+   "ambient": false,
+   "particles_only": false
   }
  },
  "props": {
@@ -3488,6 +3544,15 @@
    "height": 144,
    "ascent": 69
   },
+  "web": {
+   "cp": "U+EC18",
+   "px": [
+    256,
+    144
+   ],
+   "height": 144,
+   "ascent": 69
+  },
   "black_1": {
    "cp": "U+EC20",
    "px": [
@@ -3703,6 +3768,42 @@
    ],
    "height": 144,
    "ascent": 69
+  },
+  "web_1": {
+   "cp": "U+EC38",
+   "px": [
+    256,
+    144
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "web_2": {
+   "cp": "U+EC39",
+   "px": [
+    256,
+    144
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "web_3": {
+   "cp": "U+EC3A",
+   "px": [
+    256,
+    144
+   ],
+   "height": 144,
+   "ascent": 69
+  },
+  "web_4": {
+   "cp": "U+EC3B",
+   "px": [
+    256,
+    144
+   ],
+   "height": 144,
+   "ascent": 69
   }
  },
  "space": "U+EC1F (-1)",
@@ -3737,7 +3838,7 @@
   "qi_cut": 50,
   "glint": 74,
   "star4": 50,
-  "yellow_tell": 50,
+  "yellow_tell": 75,
   "ghost_burst": 50,
   "ghost_trail": 50,
   "ghost_flash": 50,
@@ -3774,6 +3875,12 @@
   "ev_wind": 50,
   "ev_palm": 65,
   "ev_take": 75,
+  "flash_blue": 54,
+  "ult_web": 70,
+  "ult_burst": 50,
+  "sky_mark": 57,
+  "sky_pillar": 50,
+  "qi_beam": 70,
   "prop/disc": 90,
   "prop/petal_big": 90,
   "prop/moon_halo": 140,

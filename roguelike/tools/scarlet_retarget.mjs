@@ -43,6 +43,9 @@ export const HAT_FLIGHTS = {
   ending: {t0: 26, t1: 39, from: {spot: 'face'}, to: {state: 'hand', t: 40}},
 };
 export function setHatFace(spot) { HAT_REST.face = spot; }
+// lane H1c (11-11): grog_in, the balance break (hr_design.md §1.4): the hat leaves her head as she topples backward (6) and lands on
+// DOWN's spot beside her right leg (10), where `down` and `kipup` expect it
+HAT_FLIGHTS.grog_in = {t0: 6, t1: 10, from: {state: 'worn', t: 5}, to: {spot: 'leg'}};
 // the face spot from probe solves of the ending (probe(t) -> {o}: LY, the hat over her face): parallel to the face at the probe
 // where the face stands highest (0 / 13 / 26), its front toward her feet (as the source's face hat and the flight that lifts it
 // at 27: no spin as it leaves), 0.012 off the face's outer layer; then

@@ -253,13 +253,18 @@ check(api.K.ovl('black', 0, 10, 3).split()[1] == f'{NSF}hud/ovl', 'names: api.K.
 for name in api.KIT_SOUNDS:
     check((FX / f'snd/{name}.mcfunction').exists(), f'names: snd/{name}')
     check(api.K.snd(name) == f'function {NSF}snd/{name}', f'names: api.K.snd {name}')
-check(tuple(G.SOUNDS) == tuple(api.KIT_SOUNDS) and len(api.KIT_SOUNDS) == 104, 'names: 104 sound recipes = api.KIT_SOUNDS')
+# HR rebuild (hr_design §5.1): the 11-06 kit (50 presets, 104 sounds, six overlays) + the H-lane names the kit declares
+HR_SOUNDS = ('parry_cue', 'flash_blue', 'ult_cut1', 'ult_cut2', 'sky_pillar', 'kcut_go')   # (kcut_go: lane H1's build 2, counted once its api declares it)
+HR_PRESETS = [k for k in getattr(api, 'KIT_PRESETS_HR', {}) if k in api.KIT_PRESETS]
+N_SOUNDS = 104 + sum(k in api.KIT_SOUNDS for k in HR_SOUNDS)
+check(tuple(G.SOUNDS) == tuple(api.KIT_SOUNDS) and len(api.KIT_SOUNDS) == N_SOUNDS, f'names: {N_SOUNDS} sound recipes = api.KIT_SOUNDS')
 for name in api.KIT_FIXED:
     check((FX / f'{name}.mcfunction').exists(), f'names: fx/{name}')
     check(api.K.fixed(name) == f'function {NSF}{name}', f'names: api.K.fixed {name}')
 check(set(MAN['presets']) == set(api.KIT_PRESETS) and set(MAN['props']) == set(api.KIT_PROPS)
       and set(MAN['sounds']) == set(api.KIT_SOUNDS) and set(MAN['hud']) == set(api.KIT_HUD), 'names: manifest lists')
-check(len(api.KIT_PRESETS) == 50 and len(api.KIT_PROPS) == 5 and len(api.KIT_HUD) == 5, 'names: 50 presets, 5 props, 5 hud')
+check(len(api.KIT_PRESETS) == 50 + len(HR_PRESETS) and len(api.KIT_PROPS) == 5 and len(api.KIT_HUD) == 5,
+      f'names: {50 + len(HR_PRESETS)} presets, 5 props, 5 hud')
 for name in api.KIT_PRESETS:
     check((FX / f'test/{name}.mcfunction').exists(), f'names: demo test/{name}')
 for name in api.KIT_PROPS:
@@ -273,7 +278,9 @@ TMP = HR / 's1k/tmp/calls_test'
 ncalls, calls_by = 0, {}
 # I1: on the merged tree the module is already built with the kit (S3 + S4 + S2b + S1K): its own boss/scarlet tree is
 # scanned (no temp build from the stage branches); a kit-only tree (S1K's branch) still builds them in a temp copy.
-MERGED = (WT / 'data/rlk/function/boss/scarlet/core').is_dir() and (WT / 'data/rlk/function/boss/scarlet/seq').is_dir()
+# (HR rebuild: the module's core alone marks the merged tree; while lane H2's sequences are stand-ins under core/sq the counts of
+# seq calls below - the kept kick flash, the 300 calls, the player-anchored effects - are short)
+MERGED = (WT / 'data/rlk/function/boss/scarlet/core').is_dir()
 if MERGED or (shutil.which('git') and subprocess.run(['git', '-C', '/home/user/rlk', 'rev-parse', '--verify', '-q',
                                                       'wip/hr-s4'], capture_output=True).returncode == 0):
     if MERGED:
@@ -422,6 +429,10 @@ HEIGHT = {'qi_arc': (1.0, 0.3), 'qi_ring': (0.8, 0.1), 'qi_band': (0.3, 1.1), 'q
           'leaves_dark': (6.0,), 'leaves_swirl': (1.1,), 'ambient_p1': (0.0,), 'ambient_p2': (0.0,),
           'arrive_rift': (0.0,), 'ev_glint': (1.0,), 'ev_trail': (1.0,), 'ev_petals': (1.0,), 'ev_leave': (1.1,),
           'ev_beam': (0.0,), 'ev_wind': (0.0,), 'ev_palm': (1.0,), 'ev_take': (1.2,)}
+# H1c: the rebuilt fight's presets (flash_blue at her chest; the web / the sky mark / the pillar at the lock point on the floor; the
+# beam from her blade in the air and from a low executor)
+HEIGHT.update({k: v for k, v in {'flash_blue': (1.2,), 'ult_web': (0.0,), 'ult_burst': (0.0,), 'sky_mark': (0.0,),
+                                 'sky_pillar': (0.0,), 'qi_beam': (6.3, 2.5, 1.2, 0.4)}.items() if k in api.KIT_PRESETS})
 assert set(HEIGHT) == set(api.KIT_PRESETS)
 VARIANTS = {'qi_arc': [{}, {'pitch': -40, 'roll': 90}, {'pitch': 35, 'roll': -35}, {'r': 60, 'roll': 180},
                        {'r': 45, 'roll': -40}, {'r': 40, 'roll': 15}, {'r': 45, 'roll': 20}, {'r': 45, 'roll': -160},
@@ -431,7 +442,9 @@ VARIANTS = {'qi_arc': [{}, {'pitch': -40, 'roll': 90}, {'pitch': 35, 'roll': -35
             'qi_vert': [{}, {'yaw': 90}, {'h': 19}, {'yaw': 180}],
             'qi_wedge': [{}, {'roll': -40}, {'roll': 10}, {'roll': 90, 'r': 28}],     # F-I: roll 90's reach x 0.78 (S2d's body)
             'scarlet_line': [{}, {'roll': -13}, {'yaw': 0}, {'len': 600, 'yaw': 90, 'roll': 13}, {'len': 600, 'yaw': 90, 'roll': -13},
-                             {'len': 600, 'yaw': 0, 'roll': 13}], 'leaves_dark': [{'n': 40}, {'n': -20}]}
+                             {'len': 600, 'yaw': 0, 'roll': 13}], 'leaves_dark': [{'n': 40}, {'n': -20}],
+            'yellow_tell': [{}, {'t': 106}], 'flash_blue': [{'t': 15}, {'t': 4}], 'ult_web': [{'t': 20}, {'t': 2}],
+            'sky_pillar': [{'r': 24}, {'r': 40}], 'qi_beam': [{'len': 140}, {'len': 160}, {'len': 30}]}
 for name in api.KIT_PRESETS:
     cvals = [1, 2, 3, 4, 5] if 'c' in api.KIT_PRESETS[name] else [None]
     for c in cvals:
@@ -1145,6 +1158,160 @@ if MERGED:
             print(f'view: the judge in first person, {name} looking up: ' + ', '.join(seen) + ' px')
     check(sum(1 for (rel, _n) in anchored if rel == 'shield/judge.mcfunction') == 2, 'view: the judge\'s starburst and column')
 
+# ============================================================== H1 block (lane H1c; hr_design §2.1-§2.2, §5.1, §5.4)
+def end_scale(s_, e_):
+    return [float(v) for v in cdata(s_, e_)['hrG']['transformation']['scale']]
+
+
+def killed(s_, e_):
+    return stages(s_, e_.id).get('kill')
+
+
+if HR_PRESETS:
+    check(HR_PRESETS == list(api.KIT_PRESETS_HR), f'hr1c: the kit declares every preset of api.KIT_PRESETS_HR ({HR_PRESETS})')
+    check(api.OVERLAYS.get('web') == 0xEC18 and 'web' in G.GLYPHS and all(f'web_{k}' in G.GLYPHS for k in range(1, G.OVL_STEPS)),
+          'hr1c: the web overlay U+EC18 and its opacity steps')
+    check(G.SPRITE_PX == 237_568 and 'flash_blue' not in G.SPRITES and G.atlas_px() == 237_568 + G.GATE_PX,
+          f'hr1c: no new sprite (the items atlas does not grow: {G.SPRITE_PX})')
+    want_snd = {'parry_cue': (('block.amethyst_block.chime', 0.6, 1.9),), 'flash_blue': (('block.beacon.activate', 0.5, 1.8),),
+                'ult_cut1': (('item.trident.thunder', 0.6, 1.6), ('block.glass.break', 0.7, 0.6)),
+                'ult_cut2': (('entity.generic.explode', 0.4, 1.6), ('block.glass.break', 0.8, 0.5)),
+                'sky_pillar': (('item.trident.thunder', 0.5, 1.9),)}
+    for k, v in want_snd.items():
+        check(tuple(tuple(x) for x in G.SOUNDS.get(k, ())) == v and (FX / f'snd/{k}.mcfunction').exists(), f'hr1c: sound {k} = the design\'s recipe')
+    # ---- a particle that takes options is written with them (26.x: `flash` without a colour does not parse; the real-server
+    #      load found one in the pillar)
+    NEEDS_OPT = {'flash', 'dust', 'dust_color_transition', 'dust_pillar', 'block', 'block_marker', 'block_crumble', 'falling_dust',
+                 'item', 'entity_effect', 'tinted_leaves', 'trail', 'sculk_charge', 'shriek', 'vibration', 'effect',
+                 'instant_effect', 'dragon_breath'}
+    bare = sorted({f'{f.relative_to(FX).as_posix()}: {m.group(1)}' for f in FX.rglob('*.mcfunction')
+                   for m in re.finditer(r'\bparticle (?:minecraft:)?([a-z_]+)(?=[ \n])', f.read_text(encoding='utf-8'))
+                   if m.group(1) in NEEDS_OPT})
+    check(not bare, f'hr1c: no particle that needs options is written without them {bare[:4]}')
+    # ---- the yellow tell: plain (1.6 b, flare 4 b) and big (t >= 100: 2.0 b, flare 5 b), each for its ticks
+    for t_arg, d_want, life in ((6, 1.6, 6), (12, 1.6, 12), (106, 2.0, 6), (112, 2.0, 12)):
+        s = fresh()
+        T0 = s.gt
+        s.run(G.fx('yellow_tell', t=t_arg), pos=(X0, FLOOR + 1.2, Z0))
+        cs = {kind(s, e): e for e in s.cards()}
+        check(set(cs) == {'yellow_tell_0', 'yellow_tell_1'}, f'hr1c: yellow_tell t {t_arg}: sphere + flare')
+        sp, fl = end_scale(s, cs['yellow_tell_0']), end_scale(s, cs['yellow_tell_1'])
+        check(abs(sp[0] - d_want) < 1e-3 and abs(sp[1] - d_want) < 1e-3, f'hr1c: yellow_tell t {t_arg}: sphere {sp[0]} b (want {d_want})')
+        check(abs(fl[0] * 2 - d_want * 2.5) < 1e-3, f'hr1c: yellow_tell t {t_arg}: flare {fl[0] * 2} b (want {d_want * 2.5})')
+        s.tick(20)
+        check(all(killed(s, e) == T0 + life + 1 for e in cs.values()), f'hr1c: yellow_tell t {t_arg} lasts {life} t')
+    # ---- the parry cue: glint c 2 is larger and fuller than the other glints, a sparkle only (no ring, no star, no flare)
+    s = fresh()
+    T0 = s.gt
+    s.run(G.fx(*[api.CUE_KIT[0]], **api.CUE_KIT[1]), pos=(X0, FLOOR + 1.5, Z0))
+    cue = s.cards()
+    s2 = fresh()
+    s2.run(G.fx('glint', c=1), pos=(X0, FLOOR + 1.5, Z0))
+    plain = max(end_scale(s2, e)[0] for e in s2.cards())
+    big = max(end_scale(s, e)[0] for e in cue)
+    check(len(cue) == 3 and {kind(s, e) for e in cue} == {'glint_0'}, f'hr1c: the parry cue is three sparkles ({[kind(s, e) for e in cue]})')
+    check(big >= 1.5 * plain and big >= 1.7, f'hr1c: the parry cue reaches {big} b (a plain glint {plain})')
+    check(tint(s, max(cue, key=lambda e: end_scale(s, e)[0])) == G.TINT[2], 'hr1c: the parry cue is pink-magenta')
+    s.tick(12)
+    check(max(killed(s, e) for e in cue) == T0 + 8, 'hr1c: the parry cue lasts 7 t (hit - 7 .. hit)')
+    # ---- flash_blue {t}: the yellow tell 4 t, then the blue sphere 1.8 b for t ticks
+    for t_arg in (15, 20):
+        s = fresh()
+        T0 = s.gt
+        s.run(G.fx('flash_blue', t=t_arg), pos=(X0, FLOOR + 1.2, Z0))
+        cs = s.cards()
+        yel = [e for e in cs if kind(s, e).startswith('yellow_tell')]
+        blue = [e for e in cs if kind(s, e) == 'blink_bubble']
+        check(len(yel) == 2 and len(blue) == 3, f'hr1c: flash_blue: yellow sphere + flare, three bubbles ({len(yel)}, {len(blue)})')
+        check(all(s.nbt[e.id].get('billboard') == 'center' for e in cs), 'hr1c: flash_blue faces the viewer')
+        main = [e for e in blue if abs(end_scale(s, e)[0] - 1.8) < 0.07]
+        check(len(main) == 2 and all((tint(s, e) & 255) > 2 * (tint(s, e) >> 16 & 255) for e in main)
+              and all((tint(s, e) & 255) > (tint(s, e) >> 16 & 255) for e in blue), 'hr1c: flash_blue: the sphere is 1.8 b, blue')
+        s.tick(t_arg + 12)
+        check(all(killed(s, e) <= T0 + G.FLASH_YELLOW_T + 2 for e in yel), f'hr1c: flash_blue: the yellow is gone after {G.FLASH_YELLOW_T} t')
+        check(all(stages(s, e.id).get('hrS') == T0 + G.FLASH_YELLOW_T + 1 for e in main), 'hr1c: flash_blue: the sphere shows at tick 4')
+        check(all(killed(s, e) == T0 + G.FLASH_YELLOW_T + t_arg + 1 for e in main), f'hr1c: flash_blue: the sphere lasts t = {t_arg}')
+        check(max(killed(s, e) for e in cs) <= T0 + G.FLASH_YELLOW_T + t_arg + 2, 'hr1c: flash_blue: nothing outlives the sphere')
+    # ---- ult_web {t} / ult_burst: 12 lines (+ 4 glows) for t ticks with the web overlay; the burst takes them over
+    s = fresh()
+    T0 = s.gt
+    s.run(G.fx('ult_web', t=20), pos=(X0, FLOOR, Z0), rot=(0.0, 0.0))
+    cs = s.cards()
+    check(len(cs) == 16 and {kind(s, e) for e in cs} == {'qline'}, f'hr1c: ult_web: 12 lines + 4 glows ({len(cs)})')
+    core = [e for e in cs if end_scale(s, e)[0] < 0.3]
+    check(len(core) == 12 and all(30 <= end_scale(s, e)[2] <= 40 for e in cs), 'hr1c: ult_web: 12 cores, every line 30-40 b long')
+    check(all(0.15 <= end_scale(s, e)[0] <= 0.5 for e in cs), 'hr1c: ult_web: lines 0.16 b / glows 0.45 b wide (seen, not screen-wide)')
+    mid = []
+    for e in core:      # the height where the line passes the executor (its midpoint): under the F5 camera
+        ln, pt = end_scale(s, e)[2], -e.rot[1]
+        mid.append(e.pos[1] - FLOOR + ln / 2 * math.sin(math.radians(pt)))
+        check(pt >= -1e-6 and e.pos[1] - FLOOR >= 0.5 - 1e-6, f'hr1c: ult_web: a line starts >= 0.5 b up and climbs ({e.pos[1] - FLOOR:.2f}, {pt:.1f})')
+        check(1.5 <= math.hypot(e.pos[0] + ln / 2 * -math.sin(math.radians(e.rot[0])) * math.cos(math.radians(pt)) - X0,
+                                e.pos[2] + ln / 2 * math.cos(math.radians(e.rot[0])) * math.cos(math.radians(pt)) - Z0) <= 6.6,
+              'hr1c: ult_web: a line passes 1.5-6.5 b beside the executor')
+    check(max(mid) <= 2.5 and min(mid) >= 0.5, f'hr1c: ult_web: the lines pass the executor 0.5-2.5 b up ({min(mid):.2f}..{max(mid):.2f})')
+    tt = [t for _g, t in s.titles if t.startswith('title {')]
+    check(tt and chr(api.OVERLAYS['web']) in tt[-1], 'hr1c: ult_web shows the web overlay')
+    check(s.sc(('e', s.player.id), 'vBig') == 20, 'hr1c: ult_web: the overlay lasts t (vBig 20)')
+    s.tick(19)
+    check(len(s.cards()) == 16, 'hr1c: ult_web: the lines stay to t')
+    s.run(G.fx('ult_burst'), pos=(X0, FLOOR, Z0), rot=(0.0, 0.0))
+    s.tick(2)
+    left = s.cards()
+    check(not [e for e in left if e in cs], 'hr1c: ult_web: its lines are gone as ult_burst takes over (t + 1)')
+    lines = [e for e in left if kind(s, e) == 'qline']
+    check(len(lines) == 12 and len([e for e in left if kind(s, e).startswith('shards_')]) == 12, f'hr1c: ult_burst: 12 lines, 12 shards ({len(left)})')
+    web_pos = sorted((round(e.pos[0], 2), round(e.pos[1], 2), round(e.pos[2], 2)) for e in core)
+    check(sorted((round(e.pos[0], 2), round(e.pos[1], 2), round(e.pos[2], 2)) for e in lines) == web_pos, 'hr1c: ult_burst: the same 12 lines')
+    check(all(abs(cdata(s, e)['hrG']['transformation']['translation'][0]) >= 7 for e in lines), 'hr1c: ult_burst: every line is thrown >= 7 b aside')
+    s.tick(14)
+    check(not s.cards(), 'hr1c: ult_burst is over in 12 t')
+    # ---- sky_mark: lines only (never an area on the floor), 7 t; sky_pillar {r}
+    s = fresh()
+    T0 = s.gt
+    s.run(G.fx('sky_mark'), pos=(X0, FLOOR, Z0), rot=(0.0, 0.0))
+    cs = s.cards()
+    check({kind(s, e) for e in cs} == {'col_face', 'qline', 'glint_0'}, f'hr1c: sky_mark: a light line, a foot line, a glint ({sorted({kind(s, e) for e in cs})})')
+    check(not [e for e in cs if G.kind_info(kind(s, e))[0] == 'flat'], 'hr1c: sky_mark: no flat card (no area on the floor)')
+    col = [e for e in cs if kind(s, e) == 'col_face']
+    check(all(abs(end_scale(s, e)[1] - 12) < 1e-6 and end_scale(s, e)[0] * 0.25 <= 0.36 for e in col), 'hr1c: sky_mark: a 12-b line no wider than 0.35 b')
+    ft = [e for e in cs if kind(s, e) == 'qline']
+    check(ft and all(abs(end_scale(s, e)[2] - 2.0) < 1e-6 and abs(e.pos[1] - FLOOR - 0.15) < 1e-6 and end_scale(s, e)[0] <= 0.27 for e in ft),
+          'hr1c: sky_mark: the 2-b flash line 0.15 b over the floor, <= 0.26 b wide')
+    check(all(abs((e.pos[0] - X0) ** 2 + (e.pos[2] - Z0) ** 2 - 1.0) < 1e-6 for e in ft), 'hr1c: sky_mark: the foot line is centred on the lock')
+    s.tick(12)
+    check(max(killed(s, e) for e in cs) == T0 + 8, 'hr1c: sky_mark lasts 7 t')
+    for r in (24, 30):
+        s = fresh()
+        s.run(G.fx('sky_pillar', r=r), pos=(X0, FLOOR, Z0), rot=(20.0, 30.0))
+        cs = s.cards()
+        cols = sorted((e for e in cs if kind(s, e) == 'light_column'), key=lambda e: -end_scale(s, e)[0])
+        ring = [e for e in cs if kind(s, e) == 'dive_impact']
+        check(len(cols) == 2 and len(ring) == 1, f'hr1c: sky_pillar r {r}: two columns and the shock ring')
+        check(abs(end_scale(s, cols[0])[0] * 0.25 - r / 10 * 1.25) < 1e-3 and end_scale(s, cols[0])[1] >= 16, f'hr1c: sky_pillar r {r}: the column is 1.25 r wide, 16 b tall')
+        check(abs(end_scale(s, ring[0])[0] - r / 10) < 1e-3, f'hr1c: sky_pillar r {r}: the ring has radius r')
+        check(all(abs(e.rot[1]) < 1e-6 for e in cols + ring), 'hr1c: sky_pillar is upright whatever the executor\'s pitch')
+    # ---- qi_beam {len}: along an aimed executor, 35 deg down from a level one in the air, level when low; never into the floor
+    for h, pitch, want_p, tag in ((6.3, 40.0, 40, 'aimed'), (6.3, 0.0, G.BEAM_PITCH, 'level in the air'), (6.3, 5.0, G.BEAM_PITCH, 'nearly level'),
+                                  (1.2, 0.0, 0, 'level and low'), (2.0, 60.0, 60, 'aimed steeply from low'), (6.3, -30.0, G.BEAM_PITCH, 'looking up')):
+        for ln in (140, 160):
+            s = fresh()
+            s.run(G.fx('qi_beam', len=ln), pos=(X0, FLOOR + h, Z0), rot=(0.0, pitch))
+            cs = s.cards()
+            check(len(cs) == 3 and {kind(s, e) for e in cs} == {'qline'}, f'hr1c: qi_beam {tag}: body, inner beam, core')
+            check(all(abs(e.rot[1] - want_p) < 1e-6 for e in cs), f'hr1c: qi_beam {tag}: pitch {want_p} ({cs[0].rot[1]})')
+            body = max(cs, key=lambda e: end_scale(s, e)[0])
+            w, lg = end_scale(s, body)[0], end_scale(s, body)[2]
+            check(abs(w - min(2.6, max(0.6, 2 * (h - 0.05)))) < 0.11, f'hr1c: qi_beam {tag}: the body is {w} b wide')
+            end_y = h - lg * math.sin(math.radians(want_p))
+            check(lg <= ln / 10 + 1e-6 and (end_y >= 1.3 or want_p == 0), f'hr1c: qi_beam {tag} len {ln}: {lg:.1f} b long, ends {end_y:.2f} b up')
+            if want_p and h > 3:
+                check(lg >= min(ln / 10, (h - 1.4) / math.sin(math.radians(want_p))) - 0.25, f'hr1c: qi_beam {tag}: not shorter than the floor asks ({lg:.1f})')
+            check(all(abs(end_scale(s, e)[2] - lg) < 1e-6 for e in cs), 'hr1c: qi_beam: the three beams share the length')
+            s.tick(2)
+            check(all(stages(s, e.id).get('hrG') is not None for e in cs), 'hr1c: qi_beam is at full length 2 t after the call')
+
+
 # ============================================================== props
 for name, (doc, looks, bb, anim) in G.PROPS.items():
     spec = api.KIT_PROPS[name]
@@ -1625,7 +1792,10 @@ if RP:
     for p_ in font['providers']:
         if p_.get('type') == 'bitmap':
             fp = RP / ('assets/rlk/textures/' + p_['file'].split(':', 1)[1])
-            check(fp.exists() and png_size(fp) == api.OVERLAY_GLYPH, f'rp: glyph texture {fp.name} {api.OVERLAY_GLYPH}')
+            want = tuple(G.GLYPHS[fp.stem][2]) if fp.stem in G.GLYPHS else api.OVERLAY_GLYPH
+            # (H1c: `web` and its opacity steps are 256 x 144, the same 16:9 at the same on-screen height)
+            check(want in (api.OVERLAY_GLYPH, (256, 144)) and want[0] * 9 == want[1] * 16 and max(want) <= 256, f'rp: glyph size {fp.name} {want}')
+            check(fp.exists() and png_size(fp) == want, f'rp: glyph texture {fp.name} {want}')
     other = set()
     for fj in (RP / 'assets').rglob('font/*.json'):
         if fj.name == 'mboss_hr.json':
