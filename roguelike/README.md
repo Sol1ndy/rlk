@@ -416,7 +416,8 @@ RP 해시(두 번 같아야 함; 빈 입력 해시 da39a3ee… 가 나오면 명
   이벤트, `test_kit` 효과 킷, `test_arena_hr` 경기장, `test_hwamu` · `test_moon` 아이템 · 버프, `ident_hr` 35b82e5 와 바이트 비교, `gen_check_hr`
   생성 순서 · 소유 경로; 모의기 `sim/hr/tests/lib` · `sim/hr/s1k/lib` · `sim/hr/sr`), 챕터 틀 `sim/az/tests_cm/`(라우팅 · 프록시 · 틀 도우미,
   중간보스 행동 불변 `test_m0diff`, 생성 순서 `gen_check`, 바이트 고정 `ident`(낡음: 0-9)), 정적 검사기(`check_refs` · `check_macro` ·
-  `check_nbtpath` · `lint_mc`), 균형 탐침(`sim/ar/review/bal/`), 그림(`sim/preview/` 래스터라이저, `sim/ar/s2/` 리그 띠 ·
+  `check_nbtpath` · `lint_mc`), 전투 개편 lane R `sim/cb/tests/`(`test_rm`: 요이미야 · 활 삭제와 저장 월드 이전 · F5 하나 · 전투 중 선택 안내, 11-10),
+  균형 탐침(`sim/ar/review/bal/`), 그림(`sim/preview/` 래스터라이저, `sim/ar/s2/` 리그 띠 ·
   시트, `sim/ar/s1k/render/` 효과 시트), 영상 시트(`sim/ar/tools/`).
 - 옮기지 않은 것(옛 스크래치패드에만 있음; 11-03 이 컨테이너에는 아직 있지만 새 컨테이너에는 없음): 타키 `tk/tests`(`test_tachy` · `pat_melee` · `pat_air` · `test_rig` ·
   `test_kit` · `test_arena_tk` · `test_rift` · `test_special`), 아펩 `ap/tests`(`test_apep` · `pat_p1` · `pat_p3` · `pat_rev` ·
@@ -719,7 +720,9 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
   - 원소 에너지: 대쉬와 골드 사이에 `[|||||||||||||||] 현재/필요` (15칸, 캐릭터 원소 색, 가득 차면 흰색).
   - 대쉬 게이지: 칸 하나가 대쉬 1개, 청록 = 충전 완료, 금색 = 충전 중(차오름), 회색 = 빈 칸. 한 칸은 8조각이며 색/조각 모양은 `player/hud/setup` 에서 바꿉니다.
   골드 부족 같은 다른 액션바 안내가 뜨면 2초간 HUD 를 멈춥니다. 새 안내를 추가할 때는 `scoreboard players operation @s hudHold = #hudHoldT tmp` 를 함께 실행하세요.
-- F(양손 바꾸기)는 아무 동작도 하지 않습니다(아이템만 제자리로 복귀). 단, 무기를 든 채 Shift + F = 레벨 업 아이템 선택(12번).
+- F(양손 바꾸기) = 대쉬(`player/hotbar/tick` → `player/f_key` → `player/dash`; 넘어간 아이템은 제자리로 복귀). 11-10 에 활의 조준 켜기/끄기를
+  뺐다(요이미야 삭제). 전투 개편에서 F 는 패링이 된다(C 단계). 무기를 든 채 Shift + F = 레벨 업 아이템 선택(개발자 모드; F5 시점은 웅크리기
+  키 한 번, 12번).
 
 ## 3. 전투 (`combat/`)
 - 기본공격 데미지 = 공격력 × 계수(캐릭터의 1타/2타 계수, 루미네 100% / 120%) (치명타 시 × 치명타 피해%), 사거리 3.5 범위 타격.
