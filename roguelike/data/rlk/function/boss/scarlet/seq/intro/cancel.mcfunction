@@ -4,6 +4,7 @@ kill @e[type=minecraft:marker,tag=rlk_hr_stage]
 kill @e[type=minecraft:marker,tag=rlk_hr_stage2]
 kill @e[type=minecraft:marker,tag=rlk_hr_sqh]
 function rlk:mboss/cam/kill
+function rlk:char/cine/stop
 scoreboard players set #sq_cx hr 0
 scoreboard players set #sq_h hr 0
 stopsound @a[tag=player] * minecraft:item.elytra.flying

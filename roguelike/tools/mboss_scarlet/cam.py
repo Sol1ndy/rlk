@@ -116,13 +116,16 @@ class Track:
 
     # ---- the table --------------------------------------------------------------------------------------------------
     def cut(self, t, cam, eye, look, name='', sub=(), clamp=None):
+        """A hard cut to stand `cam`. sub: what the shot must show (the shot sheets check it): 'her', 'actor', 'moon';
+        'actor?' = the actor as foreground of a shot from behind it, which a stage with the wall behind the actor cannot
+        give (the clamp, `over`): required only where the eye is not clamped."""
         assert cam in (1, 2) and eye[0] in FRAMES and look[0] in FRAMES + ('ENT',), (self.seq, t, eye, look)
         if self.shots:
             p = self.shots[-1]
             assert t > p.t and p.cam != cam, f'{self.seq} {t}: consecutive shots must alternate the camera (a cut on one stand glides)'
             assert not p.moves or p.moves[-1][1] < t, f'{self.seq} {t}: a move of the shot before runs past the cut'
             p.end = t
-        assert all(x in ('her', 'actor', 'moon') for x in sub), sub
+        assert all(x in ('her', 'actor', 'moon', 'actor?') for x in sub), sub
         s = Shot(t, cam, eye, look, name, self.clamp if clamp is None else clamp, sub)
         s.end = self.t_end
         self.shots.append(s)

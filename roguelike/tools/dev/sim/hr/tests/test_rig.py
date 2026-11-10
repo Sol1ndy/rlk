@@ -176,6 +176,15 @@ calls = list(api.RIG_CALLS) + [f'play/{c}' for c in api.CLIPS] + [f'start/{c}' f
 missing = [c for c in calls if not (RIG / f'{c}.mcfunction').exists()]
 check(f'functions: every rig call exists (api.RIG_CALLS, play / start for the 47 clips, face/set) ({len(calls)})', not missing, ', '.join(missing[:10]))
 check('functions: face/set is a macro with $(yaw)', '$(yaw)' in (RIG / 'face/set.mcfunction').read_text())
+# lane H2 (hr_design §5.4): the rig's look target is the player's body (the avatar; the player itself in developer mode), an
+# option of the rig library (mboss_rig_compile.mjs writeFace {target}); its default stays the nearest non-spectator player
+_ft = {n: (RIG / f'face/{n}.mcfunction').read_text() for n in ('track', 'player')}
+check('functions: face/track and face/player look at the player\'s body @e[tag=rlk_body,limit=1], never at a player selector '
+      '(a player held by the cinematic lock is a spectator at the camera)',
+      all('@e[tag=rlk_body,limit=1]' in v and '@p' not in v and '@a[' not in v for v in _ft.values()), str({n: v[:120] for n, v in _ft.items()}))
+_lib = (DP / 'tools/mboss_rig_compile.mjs').read_text(encoding='utf-8')
+check('functions: the rig library\'s default look target is unchanged (@p[gamemode=!spectator]: every other rig is byte-identical, ident_hr)',
+      "export const FACE_TARGET = '@p[gamemode=!spectator]';" in _lib and 'target = FACE_TARGET' in _lib)
 allfn = {str(p.relative_to(RIG))[:-11]: p.read_text() for p in RIG.rglob('*.mcfunction')}
 refs = set(re.findall(r'function (rlk:[a-z0-9_/.-]+)', '\n'.join(allfn.values())))
 bad = [r for r in refs if r.startswith(NS + '/') and r[len(NS) + 1:] not in allfn]

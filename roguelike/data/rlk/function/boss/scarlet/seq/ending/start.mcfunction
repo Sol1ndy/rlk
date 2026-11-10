@@ -6,6 +6,8 @@ function rlk:boss/scarlet/seq/ending/m/lie
 execute rotated as @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run rotate @s ~180 0
 function rlk:mboss/cam/kill
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run function rlk:mboss/cam/spawn
+execute as @a[tag=player,limit=1] unless entity @s[tag=rlk_body] unless entity @e[type=minecraft:marker,tag=rlk_cine_root,limit=1] at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run function rlk:char/cine/spawn
+function rlk:char/cine/play {clip:"ending"}
 function rlk:boss/scarlet/rig/play/ending
 scoreboard players set #sqdone hr 0
 scoreboard players set #sq_cx hr 0

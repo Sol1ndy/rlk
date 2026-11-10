@@ -368,6 +368,10 @@ def run():
                 if abs(got - d) > 0.12:
                     dd.append((t, d, round(got, 2)))
             ck(f'R5 {tag}: the distances her <-> the actor of the design {[d for _t, d in DIST.get(sn, [])]}', not dd, str(dd))
+            if sn in LOCK:
+                sp = CAM.slow_pans(TR[sn], lambda t: frames_of(by[min(t, max(by))]))
+                for _s, nm, t0, t1, dps, _d in sp:
+                    print(f'   slow pan (in-game check: rotation is sent in 1.4-degree steps): {tag} {nm} {t0}-{t1}: {dps:.2f} deg / t')
             cm = [r['cmds'] for r in by.values()]
             print(f'   {tag}: {len(by)} ticks, commands per tick avg {sum(cm) / len(cm):.0f} / max {max(cm)} (the sequence\'s own files)')
             ck(f'R6 {tag}: at most 400 commands of its own in a tick', max(cm) <= 400, str(max(cm)))
@@ -706,68 +710,137 @@ def life():
 
 # ============================================================================================================ actor
 def actor():
-    def edit(reg):
-        return None
-    root = H.variant_hr(DP, edit, label='h2actor', gens=())
-    try:
+    """The actor wiring (hr_design §5.3; lane H3's functions are stubbed and logged by the sim: its own suite is
+    test_actor.py). Without H3's manifest: a dry build with the actor lines on."""
+    root, dry = DP, False
+    if not api.actor_ready():
+        root, dry = H.variant_hr(DP, lambda reg: None, label='h2actor', gens=()), True
         H.dry_build(root, patch='api.actor_ready = lambda: True')
-        global F, SQ
-        for key in ('intro', 'cs1', 'repel60', 'ending'):
-            name = seq_of(key)
-            s, pl = Q.setup(root)
-            assert Q.fight(s)
-            import sheets
-            if key == 'intro':
-                b = H.body_of(s)
-                b.pos = list(api.SEAT_POS)
-                st = api.ARENA['start']
-                s.avatar().pos = [st['x'], st['y'], st['z']]
-            else:
-                Q.place(s, *sheets.STAGES['c'])
-            t_start = s.t + 1
-            rec = Q.play(s, name, args=ARGS_OF.get(key), then=('event', None) if key == 'ending' else None)
-            log = s.actor_log
-            sp = [x for x in log if x[1] == 'spawn']
-            st0 = rec[0]['stage']
-            clip = {'intro': 'cs0', 'cs1': 'cs1', 'repel': 'repel', 'ending': 'ending'}[name]
-            ck(f'A1 {key}: spawn once in the first tick, as the player, at the stage and rotated as it',
-               len(sp) == (2 if key == 'ending' else 1) and sp[0][0] == t_start and sp[0][2] == 'player' and near(sp[0][3], st0[0], 0.01)
-               and ang(sp[0][4][0], st0[1]) < 0.01, str(sp[:2]))
-            pls = [x[5].get('clip') for x in log if x[1] == 'play']
-            ck(f'A2 {key}: play {clip}{" then coda" if key == "ending" else ""}', pls == [clip] + (['coda'] if key == 'ending' else []), str(pls))
-            tk = [x for x in log if x[1] == 'tick']
-            span = LOCK[name][1] + (LOCK['event'][1] if key == 'ending' else 0)
-            ck(f'A3 {key}: tick as the player on every locked tick ({span}), #cavT cine = #sq',
-               len(tk) == span and all(x[2] == 'player' for x in tk) and [x[6] for x in tk][:LOCK[name][1]] == list(range(LOCK[name][1])),
-               f'{len(tk)} {[x[6] for x in tk][:5]}')
-            stops = [x for x in log if x[1] == 'stop']
-            ck(f'A4 {key}: stop at the end; the actor is gone', len(stops) >= 1 and not s.actor_on, str(len(stops)))
-            if key == 'ending':
-                fc = [x for x in log if x[1] == 'face']
-                st2 = next(r['stage2'] for r in rec if r['seq'] == 'ending' and r['sq'] == 338)
-                ck('A5 ending: face at 338 with ST2\'s yaw (the ending\'s turn to her landing mark)',
-                   len(fc) == 1 and fc[0][0] == t_start + 338 and abs(float(fc[0][5]['yaw']) - round(st2[1], 2)) < 0.02, str(fc))
-            # interrupted: the actor is stopped by the unlock (and by the framework's release)
-            s, pl = Q.setup(root)
-            assert Q.fight(s)
-            if key != 'intro':
-                Q.place(s, *sheets.STAGES['c'])
-            else:
-                H.body_of(s).pos = list(api.SEAT_POS)
-            Q.play(s, name, args=ARGS_OF.get(key), until=lambda s: (s.sc('#sq', 'hr') or 0) >= 40)
-            s.setsc(('e', pl.id), 'rnDie', 5)
-            CS.world(s)
-            s.setsc(('e', pl.id), 'rnDie', 0)
-            n0 = len(s.actor_log)
-            CS.run(s, 6)
-            ck(f'A6 {key} interrupted: the actor stopped, no actor tick afterwards',
-               not s.actor_on and not any(x[1] in ('tick', 'spawn') for x in s.actor_log[n0 + 1:]), str(s.actor_log[n0:n0 + 4]))
-            Q.stop(s)
-        rel = (root / 'data/rlk/function/mboss/cam/release.mcfunction').read_text(encoding='utf-8')
-        ck('A7 without lane H3\'s files the framework\'s release does not call char/cine/stop (it does once they exist)',
-           'char/cine/stop' not in rel or (root / 'data/rlk/function/char/cine/stop.mcfunction').exists())
+    try:
+        _actor(root)
     finally:
-        H.drop_variant(root) if hasattr(H, 'drop_variant') else shutil.rmtree(root.parent if root.name == 'roguelike' else root, ignore_errors=True)
+        if dry:
+            shutil.rmtree(root, ignore_errors=True)
+
+
+def _actor(root):
+    import sheets
+    FR = root / 'data/rlk/function'
+    man = SEQ.actor_man()
+    if man:
+        ck('A0 lane H3\'s manifest: the five clips with the sequences\' lengths; every call of the wiring exists as a function',
+           {c: man['clips'][c]['len'] for c in man['clips']} == {'cs0': 1440, 'cs1': 720, 'repel': 140, 'ending': 1372, 'coda': 120}
+           and all((FR / f'char/cine/{c}.mcfunction').exists() for c in ('spawn', 'play', 'tick', 'face', 'stop')))
+        ck('A0 the skip targets and every clip end are sync ticks of the actor (a #cavT jump is exact there)',
+           1290 in man['clips']['cs0']['sync'] and 566 in man['clips']['cs1']['sync']
+           and all(man['clips'][c]['len'] in man['clips'][c]['sync'] and 0 in man['clips'][c]['sync'] for c in man['clips']))
+        st = [t for t, ls in tick_files('intro').items() if any('grass_step' in ln and 'rlk_hr_stage' in ln for ln in ls)]
+        ck('A0 CS0: the actor\'s step sounds on the manifest\'s footfalls', sorted(st) == sorted(man['clips']['cs0']['steps']), str(sorted(st)))
+    clip_of = {'intro': 'cs0', 'cs1': 'cs1', 'repel': 'repel', 'ending': 'ending'}
+
+    def stage(s, key):
+        del s.actor_log[:]                           # (the setup ran the core's own intro start and its end)
+        if key == 'intro':
+            H.body_of(s).pos = list(api.SEAT_POS)
+            st = api.ARENA['start']
+            s.avatar().pos = [st['x'], st['y'], st['z']]
+        else:
+            Q.place(s, *sheets.STAGES['c'])
+
+    for key in ('intro', 'cs1', 'repel60', 'ending'):
+        name = seq_of(key)
+        s, pl = Q.setup(root)
+        assert Q.fight(s)
+        stage(s, key)
+        t_start = s.t + 1
+        rec = Q.play(s, name, args=ARGS_OF.get(key), then=('event', None) if key == 'ending' else None)
+        log = s.actor_log
+        sp = [x for x in log if x[1] == 'spawn']
+        st0 = rec[0]['stage']
+        ck(f'A1 {key}: spawn once, in the first tick, as the player, at the stage and rotated as it',
+           len(sp) == 1 and sp[0][0] == t_start and sp[0][2] == 'player' and near(sp[0][3], st0[0], 0.01)
+           and ang(sp[0][4][0], st0[1]) < 0.01, str(sp[:2]))
+        pls = [x[5].get('clip') for x in log if x[1] == 'play']
+        ck(f'A2 {key}: play {clip_of[name]}{" then coda (no new spawn: ending 1372 = coda 0)" if key == "ending" else ""}',
+           pls == [clip_of[name]] + (['coda'] if key == 'ending' else []), str(pls))
+        tk = [x for x in log if x[1] == 'tick']
+        span = LOCK[name][1] + (LOCK['event'][1] if key == 'ending' else 0)
+        ck(f'A3 {key}: tick as the player on every locked tick ({span}), #cavT cine = #sq',
+           len(tk) == span and all(x[2] == 'player' for x in tk) and [x[6] for x in tk][:LOCK[name][1]] == list(range(LOCK[name][1])),
+           f'{len(tk)} {[x[6] for x in tk][:5]}')
+        stops = [x for x in log if x[1] == 'stop']
+        ck(f'A4 {key}: stop at the end; the actor is gone', len(stops) >= 1 and not s.actor_on and stops[0][0] >= t_start + LOCK[name][1] - 1, str(stops[:2]))
+        if key == 'ending':
+            fc = [x for x in log if x[1] == 'face']
+            st2 = next(r['stage2'] for r in rec if r['seq'] == 'ending' and r['sq'] == 338)
+            ck('A5 ending: face at 338 with ST2\'s absolute yaw (the turn to her landing mark)',
+               len(fc) == 1 and fc[0][0] == t_start + 338 and abs((float(fc[0][5]['yaw']) - st2[1] + 180) % 360 - 180) < 0.02, str(fc))
+        # interrupted: the actor is stopped by the unlock (and by the framework's release), never ticked again
+        s, pl = Q.setup(root)
+        assert Q.fight(s)
+        stage(s, key)
+        Q.play(s, name, args=ARGS_OF.get(key), then=('event', None) if key == 'ending' else None, until=lambda s: (s.sc('#sq', 'hr') or 0) >= 40)
+        s.setsc(('e', pl.id), 'rnDie', 5)
+        CS.world(s)
+        s.setsc(('e', pl.id), 'rnDie', 0)
+        n0 = len(s.actor_log)
+        while s.drive is not None:
+            CS.world(s)
+        ck(f'A6 {key} interrupted at 40: the actor stopped by the release; to the sequence\'s end no spawn, play or tick',
+           not s.actor_on and not any(x[1] in ('tick', 'spawn', 'play') for x in s.actor_log[n0:]),
+           str([x[:3] for x in s.actor_log[n0:] if x[1] != 'stop'][:4]))
+        Q.go(s, 2)
+        ck(f'A6 {key} ... nothing left', not Q.leftovers(s), str(Q.leftovers(s)))
+    # the lethal repel -> the ending, as the core does it: at the kick (129, signal 3) death_start in the same tick
+    # (core/stop_all cancels the repel, core/seq/ending starts the ending). Lane H3: no new spawn, play ending.
+    s, pl = Q.setup(root)
+    assert Q.fight(s)
+    stage(s, 'repel5')
+    Q.play(s, 'repel', args={'at': 5}, until=lambda s: (s.sc('#sq', 'hr') or 0) >= 129)
+    root_e = s.actor_root()
+    ck('A7 repel {at:5} at the kick: locked, the actor stands', CS.held(s) and root_e is not None and s.sigs[-1][1:] == (129, 3), str(s.sigs[-1:]))
+    n0 = len(s.actor_log)
+    s.setsc('#sqn', 'hr', 4)                         # the core's id of the running repel (core/stop_all cancels by it)
+    b = H.body_of(s)
+    s.call(f'{H.ROOT_SC}death_start', Ctx(b, tuple(b.pos), tuple(b.rot)))
+    new = [(x[1], x[5].get('clip')) for x in s.actor_log[n0:]]
+    ck('A7 death_start in that tick: the repel\'s cancel leaves the actor, the ending plays its clip on the same actor (no stop, no spawn)',
+       new == [('play', 'ending'), ('tick', None)] and s.actor_root() is root_e and (s.sc('#sq_keep', 'hr') or 0) == 0, str(new))
+    s.drive = dict(name='ending', args=None, t=0, then=('event', None))     # the driver takes the ending over from its tick 0
+    Q.park_core(s)
+    k0 = len(s.rec)
+    CS.run(s, 6)
+    ck('A7 ... the lock never drops over the hand-over (held every tick, the request on), the actor on the ending\'s clock from 1',
+       all(r['held'] and r['req'] for r in s.rec[k0:]) and [x[6] for x in s.actor_log if x[1] == 'tick'][-6:] == [1, 2, 3, 4, 5, 6],
+       str([(r['sq'], r['held'], r['req']) for r in s.rec[k0:]]))
+    while s.drive is not None:
+        CS.world(s)
+    Q.go(s, 2)
+    ck('A7 ... to the coda\'s end: one spawn in all, released, nothing left',
+       len([x for x in s.actor_log if x[1] == 'spawn']) == 1 and not [k for k, v in CS.clean(s).items() if not v] and not Q.leftovers(s),
+       f'{[k for k, v in CS.clean(s).items() if not v]} {Q.leftovers(s)}')
+    # a repel cancelled at its kick with no ending after it: the framework's release stops the actor in the next tick
+    s, pl = Q.setup(root)
+    assert Q.fight(s)
+    stage(s, 'repel5')
+    Q.play(s, 'repel', args={'at': 5}, until=lambda s: (s.sc('#sq', 'hr') or 0) >= 129)
+    Q.stop(s)
+    s.call(f'{H.ROOT_SC}seq/repel/cancel', C0)
+    kept = s.actor_on
+    CS.world(s)
+    rel = (FR / 'mboss/cam/release.mcfunction').read_text(encoding='utf-8')
+    ck('A8 the kept actor without an ending: the framework\'s release (which calls char/cine/stop) removes it in the next tick',
+       kept and not s.actor_on and not Q.leftovers(s) and 'function rlk:char/cine/stop' in rel, f'{kept} {Q.leftovers(s)}')
+    # the coda by itself (a test, a core that cancelled the ending): its own stage, stands and actor
+    s, pl = Q.setup(root)
+    assert Q.fight(s)
+    stage(s, 'ending')
+    rec = Q.play(s, 'event')
+    sp = [x for x in s.actor_log if x[1] == 'spawn']
+    ck('A9 the coda started alone: locked, its own actor (spawn once, play coda), 118 ticks, then nothing left',
+       len(sp) == 1 and [x[5].get('clip') for x in s.actor_log if x[1] == 'play'] == ['coda']
+       and len([x for x in s.actor_log if x[1] == 'tick']) == LOCK['event'][1] and all(r['held'] for r in rec if 1 <= r['sq'] < LOCK['event'][1])
+       and not Q.leftovers(s), f'{len(sp)} {len([x for x in s.actor_log if x[1] == "tick"])} {Q.leftovers(s)}')
 
 
 # ============================================================================================================ frames

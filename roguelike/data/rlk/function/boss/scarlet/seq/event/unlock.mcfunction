@@ -3,3 +3,4 @@
 # player and showed the avatar); the sequence plays on unlocked.
 scoreboard players set #sq_cx hr 1
 function rlk:mboss/cam/kill
+function rlk:char/cine/stop

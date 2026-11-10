@@ -9,4 +9,6 @@ execute if entity @a[tag=player,tag=rlk_mb_camh] run scoreboard players set #sq_
 execute if score #sq_h hr matches 1 unless entity @a[tag=player,tag=rlk_mb_camh] unless entity @a[tag=player,tag=rlk_body] run return run function rlk:boss/scarlet/seq/intro/unlock
 execute if score #sq hr matches 3.. unless score #sq_h hr matches 1 unless entity @a[tag=player,tag=rlk_body] run return run function rlk:boss/scarlet/seq/intro/unlock
 scoreboard players set #mbCam mb 1
+scoreboard players operation #cavT cine = #sq hr
+execute as @a[tag=player,limit=1] run function rlk:char/cine/tick
 function rlk:boss/scarlet/seq/intro/cam

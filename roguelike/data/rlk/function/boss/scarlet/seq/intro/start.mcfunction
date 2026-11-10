@@ -11,6 +11,8 @@ execute as @a[tag=player,limit=1] run function rlk:view/sync
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run tp @e[tag=rlk_safe,limit=1] ~ ~ ~
 function rlk:mboss/cam/kill
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run function rlk:mboss/cam/spawn
+execute as @a[tag=player,limit=1] unless entity @s[tag=rlk_body] at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run function rlk:char/cine/spawn
+function rlk:char/cine/play {clip:"cs0"}
 function rlk:boss/scarlet/rig/play/intro
 scoreboard players set #sqdone hr 0
 scoreboard players set #sq_cx hr 0

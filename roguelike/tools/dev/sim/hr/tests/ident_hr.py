@@ -171,6 +171,10 @@ LANE_H2 = '홍련 rebuild H2 (11-11): the cinematic lock FN-cam'
 ALLOW[LANE_H2] = ([F + r'mboss/cam/.+\.mcfunction']
                   + [F + f'{n}.mcfunction' for n in ('mboss/main', 'mboss/cleanup_fight', 'mboss/init', 'mboss/uninstall', 'tick',
                                                      'view/tick', 'lvup/tick')])
+# 11-11 홍련 rebuild, lane H3 (wip/combat-hr3; tools/dev/plan/combat/h3_progress.md): the cutscene actor — the generated
+# rlk:char/cine/** and its manifest (tools/build_player_cine.mjs, run by build_player_rig.mjs). It changes and removes nothing.
+LANE_H3 = 'scarlet rebuild H3 (11-11): the cutscene actor'
+ALLOW[LANE_H3] = [F + r'char/cine/.+', r'tools/player_motion/cine/manifest\.json']
 # groups whose files may also be gone (removed on purpose; every other gone file fails)
 ALLOW_GONE = {LANE_R,                               # lane R's removals
               LANE_C,                               # lane C: the dash charges / gauge / i-frames, hurt_nd, hw_dash

@@ -13,7 +13,10 @@ it reports (frames.json; test_seq.py asserts on it):
            the frame its stand-in fills, and what hides its head from the lens (None = nothing)
 Stage placements: `c` the avatar 12 b south of the centre facing her at the centre (CS0 has its own fixed stage); n / e /
 s / w: the avatar at radius 24 on that bearing with her 6 b further along the wall (the stage then faces the centre).
-The stand-ins: her posture per beat and the actor's displacement are the design's tables (§3, §4.2), written out below.
+The stand-ins: her posture per beat is the design's table (§3), written out below; the actor's figure (root, head, sword)
+comes per tick from lane H3's manifest (tools/player_motion/cine/manifest.json), from the design's displacement table
+(§4.2) without it. Per frame also `near`: the distance from the lens to the nearest figure (never inside one), and
+`look_hidden`: the first solid block between the lens and the shot's look point.
 """
 import json
 import math
@@ -100,6 +103,56 @@ def actor_state(seq_name, rec):
     return world_of(st, r, u, f), st[1], pose_of(ACTOR_POSE, key, t)
 
 
+CLIP_OF = {'intro': 'cs0', 'cs1': 'cs1', 'repel': 'repel', 'ending': 'ending', 'event': 'coda'}
+FACE2_AT = 344              # ending: the actor's root is turned to ST2 over 338-350 (char/cine/face)
+_MAN = {}
+
+
+def manifest(dp):
+    """Lane H3's actor manifest of the tested tree (None without it)."""
+    if dp not in _MAN:
+        f = Path(dp) / 'tools/player_motion/cine/manifest.json'
+        _MAN[dp] = json.loads(f.read_text(encoding='utf-8')) if f.exists() else None
+    return _MAN[dp]
+
+
+def actor_frame(key, rec):
+    st = rec['stage']
+    if key == 'ending' and rec['sq'] >= FACE2_AT and rec['stage2']:
+        st = rec['stage2']
+    if key == 'event' and rec['stage2']:
+        st = rec['stage2']
+    return st
+
+
+def actor_fig(dp, seq_name, rec):
+    """(stand-in boxes, the head point, the root's floor point) of the actor at a recorded tick; ([], None, None) without a
+    stage. With the manifest: the root's shift, the head and the sword of that clip tick; else the design's table."""
+    key = {'repel60': 'repel', 'repel5': 'repel'}.get(seq_name, seq_name)
+    st = actor_frame(key, rec)
+    if st is None:
+        return [], None, None
+    man = manifest(dp)
+    if not man:
+        pos, yaw, pose = actor_state(seq_name, rec)
+        return SH.fig_boxes('actor', pos, yaw, pose), head_of(pos, yaw, pose), pos
+    tk = man['clips'][CLIP_OF[key]]['tick']
+    i = max(0, min(rec['sq'], len(tk['head']) - 1))
+    W = lambda p: world_of(st, *p)                                    # noqa: E731
+    head, sh = W(tk['head'][i]), tk['shift'][i]
+    root = W(sh)
+    lo = st[0][1] + min(tk['foot_r'][i][1], tk['foot_l'][i][1], sh[1] + 0.0)
+    hi = head[1] - 0.25
+    cx, cz = (root[0] + head[0]) / 2, (root[2] + head[2]) / 2
+    boxes = [SH.box((cx, (lo + hi) / 2, cz), (0.55, max(0.2, hi - lo), 0.3), st[1], (214, 196, 150), 'actor'),
+             SH.box(head, (0.5, 0.5, 0.5), st[1], (240, 214, 190), 'actor_head')]
+    hilt, tip = W(tk['hilt'][i]), W(tk['tip'][i])
+    for k in range(6):
+        u = (k + 0.5) / 6
+        boxes.append(SH.box(tuple(a + (b - a) * u for a, b in zip(hilt, tip)), (0.1, 0.1, 0.1), st[1], (230, 230, 240), 'sword'))
+    return boxes, head, root
+
+
 def her_state(seq_name, rec):
     key = {'repel60': 'repel', 'repel5': 'repel'}.get(seq_name, seq_name)
     pos, yaw = rec['body']
@@ -114,11 +167,20 @@ def head_of(pos, yaw, posture):
 
 
 VIS_MIN = 0.5               # a subject's stand-in must show at least half of what it would with nothing before it
+NEAR_MIN = 0.3              # the lens is never nearer than this to a figure
+FIELD_PLANTS = ('minecraft:short_dry_grass', 'minecraft:tall_dry_grass', 'minecraft:crimson_roots')
+PLANT_NEAR = 0.5            # a plant of the field nearer than this to the lens always counts as hiding
 
 
 def flagged(v):
-    """A subject entry of a frame that fails: off screen, its head hidden, or less than VIS_MIN of its figure showing."""
-    return bool(v['hidden'] or v['sx'] is None or abs(v['sx']) > 1 or abs(v['sy']) > 1 or (v['vis'] is not None and v['vis'] < VIS_MIN))
+    """A subject entry of a frame that fails: off screen, its head hidden, or less than VIS_MIN of its figure showing. The
+    field's own floor plants (1 b sprites, 20-30 % of its floor cells) before a figure low on the floor are not a hiding
+    block when they are not right at the lens: the renderer draws them half transparent, a figure standing in them shows
+    45 % and more through them."""
+    hid = v['hidden']
+    if hid and hid[0] == 'block' and hid[1] in FIELD_PLANTS and hid[2] >= PLANT_NEAR:
+        return bool(v['sx'] is None or abs(v['sx']) > 1 or abs(v['sy']) > 1 or (v['vis'] is not None and v['vis'] < VIS_MIN - 0.05))
+    return bool(hid or v['sx'] is None or abs(v['sx']) > 1 or abs(v['sy']) > 1 or (v['vis'] is not None and v['vis'] < VIS_MIN))
 
 
 STAGES = {
@@ -178,7 +240,7 @@ def run(dp, name, stage='c'):
 
 def frames_of(dp, name, stage, arenas, img=True, w=320):
     sys.path.insert(0, str(Path(dp) / 'tools'))
-    from mboss_scarlet import seq as SEQ, api
+    from mboss_scarlet import seq as SEQ, api, cam as CAM
     s, by = run(dp, name, stage)
     out, pics = [], []
     seqs = [PLAN[name][0]] + ([PLAN[name][2][0]] if PLAN[name][2] else [])
@@ -195,28 +257,37 @@ def frames_of(dp, name, stage, arenas, img=True, w=320):
             ar = arenas[look]
             hp, hy, hpose = her_state(sn, rec)
             boxes = SH.fig_boxes('her', hp, hy, hpose)
-            act = actor_state(sn, rec)
-            if act:
-                boxes += SH.fig_boxes('actor', *act)
+            aboxes, ahead, _aroot = actor_fig(dp, sn, rec)
+            boxes += aboxes
+            near = min(SH.box_dist(eye, b) for b in boxes)
             if sn == 'intro' and t < ROCK_UNTIL:
                 sp = api.SEAT_POS
                 boxes.append(SH.box((sp[0], sp[1] + 0.12, sp[2]), (1.2, 0.24, 0.64), hy, (120, 118, 112), 'rock'))
             cell, cls = ar.cell(eye)
+            fr = {'ENT': {SEQ.BODY: (hp[0], hp[1] + Q.HUSK_EYE, hp[2])}, 'HR': (hp, hy)}
+            for k, v in (('ST', rec['stage']), ('ST2', rec['stage2'])):
+                if v:
+                    fr[k] = v
+            _e, lk = shot.at(t)
+            ok_lk = lk[0] == 'W' or (lk[0] == 'ENT' and lk[1] in fr['ENT']) or (lk[0] != 'ENT' and lk[0] in fr)
+            lw = CAM.to_world(lk, fr) if ok_lk else None
+            lh = SH.ray_clear(ar, eye, lw, (), margin=0.5, solid_only=True) if lw else None
             row = dict(seq=name, sq=t, shot=shot.name, cam=shot.cam, stage=stage, eye=[round(v, 3) for v in eye],
-                       rot=[round(v, 2) for v in rot], cell=cell, cell_ok=cls == SH.AIR,
+                       rot=[round(v, 2) for v in rot], cell=cell, cell_ok=cls == SH.AIR, near=round(near, 3), look_hidden=lh,
                        height=round(eye[1] - CY, 3), radius=round(math.hypot(eye[0] - 880.0, eye[2] - 8.0), 2), sub={})
             rgb = depth = who = None
             if img or shot.sub:
                 rgb, depth, who = SH.render(ar, eye, rot[0], rot[1], boxes, w=w, h=round(w * 9 / 16))
-            for sub in shot.sub:
+            for sub0 in shot.sub:
+                sub = sub0.rstrip('?')
                 if sub == 'moon':                      # the disc against the sky: a figure may stand before it (I12)
                     pt, own, tagset = api.MOON_POS, tuple(b['tag'] for b in boxes), ()
                 elif sub == 'her':
                     pt, own, tagset = head_of(hp, hy, hpose), ('her', 'her_head', 'her_hat'), ('her', 'her_head', 'her_hat')
                 else:
-                    if not act:
+                    if ahead is None:
                         continue
-                    pt, own, tagset = head_of(*act), ('actor', 'actor_head', 'sword'), ('actor', 'actor_head')
+                    pt, own, tagset = ahead, ('actor', 'actor_head', 'sword'), ('actor', 'actor_head')
                 sx, sy, z = SH.project(eye, rot[0], rot[1], pt)
                 hid = SH.ray_clear(ar, eye, pt, boxes, skip_tags=own, margin=0.3) if z > 0 else ('behind', '', 0)
                 frac = vis = None
@@ -224,11 +295,11 @@ def frames_of(dp, name, stage, arenas, img=True, w=320):
                     frac = SH.visible_fraction(who, boxes, tagset)
                     alone = SH.alone_fraction(eye, rot[0], rot[1], [b for b in boxes if b['tag'] in tagset], w, round(w * 9 / 16))
                     vis = round(frac / alone, 3) if alone > 0 else 0.0
-                row['sub'][sub] = dict(sx=None if sx is None else round(sx, 3), sy=None if sy is None else round(sy, 3),
+                row['sub'][sub] = dict(opt=sub0.endswith('?'), sx=None if sx is None else round(sx, 3), sy=None if sy is None else round(sy, 3),
                                        dist=round(z, 2), hidden=hid, frac=None if frac is None else round(frac, 4), vis=vis)
             out.append(row)
             if img:
-                bad = (not row['cell_ok']) or any(flagged(v) for v in row['sub'].values())
+                bad = (not row['cell_ok']) or near < NEAR_MIN or any(flagged(v) for v in row['sub'].values())
                 label = ''.join(ch for ch in shot.name if ord(ch) < 128).strip()
                 pics.append((f'{"! " if bad else ""}{name} {t} {label}', rgb))
     return out, pics
@@ -262,23 +333,27 @@ def main():
     eye_bad, sub_bad = verdict(rows)
     print(f'{len(rows)} frames; lens problems {len(eye_bad)}; shots with a subject never shown {len(sub_bad)}')
     for r in eye_bad:
-        print('  LENS', r['seq'], r['stage'], r['sq'], r['shot'], 'cell', r['cell'], 'h', r['height'], 'r', r['radius'])
+        print('  LENS', r['seq'], r['stage'], r['sq'], r['shot'], 'cell', r['cell'], 'h', r['height'], 'r', r['radius'], 'near', r.get('near'))
+    for r in rows:
+        if r.get('look_hidden'):
+            print('  LOOK', r['seq'], r['stage'], r['sq'], r['shot'], r['look_hidden'])
     for (seq, stage, shot, sub), frames in sub_bad.items():
         print('  SUBJECT', seq, stage, shot, sub, [(t, v['sx'], v['sy'], v['hidden'], v['vis']) for t, v in frames])
 
 
 def verdict(rows):
-    """(frames whose lens is in a block / plant, under 0.2 b over the floor or beyond the walk disc; {(seq, stage, shot,
+    """(frames whose lens is in a block / plant, under 0.2 b over the floor, beyond the walk disc or nearer than NEAR_MIN to
+    a figure; {(seq, stage, shot,
     subject): [(tick, entry)]} of the shots that never show a subject: on screen, its head unhidden, >= VIS_MIN of it)."""
-    eye_bad = [r for r in rows if not r['cell_ok'] or r['height'] < 0.2 or r['radius'] > 25.0]
+    eye_bad = [r for r in rows if not r['cell_ok'] or r['height'] < 0.2 or r['radius'] > 25.0 or r.get('near', 9) < NEAR_MIN]
     seen, never = {}, {}
     for r in rows:
         for sub, v in r['sub'].items():
             k = (r['seq'], r['stage'], r['shot'], sub)
             seen.setdefault(k, []).append((r['sq'], v))
     for k, frames in seen.items():
-        if all(flagged(v) for _t, v in frames):
-            never[k] = frames
+        if all(flagged(v) for _t, v in frames) and not (k[1] != 'c' and frames[0][1].get('opt')):
+            never[k] = frames               # (an optional foreground figure, cam.Track.cut: required on the centre stage only)
     return eye_bad, never
 
 

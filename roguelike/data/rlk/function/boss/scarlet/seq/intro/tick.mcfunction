@@ -3,11 +3,11 @@
 execute if score #sq hr matches 1440.. run scoreboard players set #sqdone hr 1
 scoreboard players set @a[tag=player] hudHold 2
 execute if score #sq hr matches ..1439 unless score #sq_cx hr matches 1 run function rlk:boss/scarlet/seq/intro/lock
-execute if score #sq hr matches 20..153 run return run function rlk:boss/scarlet/seq/intro/kb/20_153
-execute if score #sq hr matches 154..165 run return run function rlk:boss/scarlet/seq/intro/kb/154_165
-execute if score #sq hr matches 166..182 run return run function rlk:boss/scarlet/seq/intro/kb/166_182
-execute if score #sq hr matches 183..210 run return run function rlk:boss/scarlet/seq/intro/kb/183_210
-execute if score #sq hr matches 211..462 run return run function rlk:boss/scarlet/seq/intro/kb/211_462
-execute if score #sq hr matches 474..880 run return run function rlk:boss/scarlet/seq/intro/kb/474_880
-execute if score #sq hr matches 906..1124 run return run function rlk:boss/scarlet/seq/intro/kb/906_1124
-execute if score #sq hr matches 1136..1440 run return run function rlk:boss/scarlet/seq/intro/kb/1136_1440
+execute if score #sq hr matches 24..151 run return run function rlk:boss/scarlet/seq/intro/kb/24_151
+execute if score #sq hr matches 152..165 run return run function rlk:boss/scarlet/seq/intro/kb/152_165
+execute if score #sq hr matches 166..184 run return run function rlk:boss/scarlet/seq/intro/kb/166_184
+execute if score #sq hr matches 185..214 run return run function rlk:boss/scarlet/seq/intro/kb/185_214
+execute if score #sq hr matches 215..690 run return run function rlk:boss/scarlet/seq/intro/kb/215_690
+execute if score #sq hr matches 712..1076 run return run function rlk:boss/scarlet/seq/intro/kb/712_1076
+execute if score #sq hr matches 1088..1294 run return run function rlk:boss/scarlet/seq/intro/kb/1088_1294
+execute if score #sq hr matches 1352..1440 run return run function rlk:boss/scarlet/seq/intro/kb/1352_1440

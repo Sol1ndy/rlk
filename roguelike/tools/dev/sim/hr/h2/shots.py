@@ -162,6 +162,15 @@ def fig_boxes(kind, pos, yaw, posture='stand'):
     return out
 
 
+def box_dist(eye, b):
+    """The distance from a point to an oriented box (0 inside it)."""
+    a = math.radians(b['yaw'])
+    ca, sa = math.cos(a), math.sin(a)
+    o = np.array(eye, dtype=float) - b['c']
+    q = np.array([o[0] * ca + o[2] * sa, o[1], -o[0] * sa + o[2] * ca])
+    return float(np.linalg.norm(np.maximum(np.abs(q) - b['s'], 0.0)))
+
+
 def hit_boxes(eye, D, boxes):
     """Nearest box hit per ray: (t, index) with t = inf where none."""
     n = len(D)
@@ -256,7 +265,7 @@ def alone_fraction(eye, yaw, pitch, boxes, w, h):
     return float(np.isfinite(tb).mean())
 
 
-def ray_clear(arena, eye, target, boxes=(), skip_tags=(), margin=0.25):
+def ray_clear(arena, eye, target, boxes=(), skip_tags=(), margin=0.25, solid_only=False):
     """What a ray from the eye meets before `target`: None when clear, else ('block', name, distance) / ('box', tag, distance).
     The last `margin` blocks before the target are not counted (the target's own surface)."""
     eye = np.array(eye, dtype=float)
@@ -270,7 +279,7 @@ def ray_clear(arena, eye, target, boxes=(), skip_tags=(), margin=0.25):
         P = eye[None, :] + d[None, :] * ts[:, None]
         m = arena.sample(P)
         cls = np.where(m >= 0, arena.cls[np.maximum(m, 0)], SOLID)
-        bad = np.nonzero((cls == SOLID) | (cls == PLANT) | (cls == WATER))[0]
+        bad = np.nonzero((cls == SOLID) if solid_only else ((cls == SOLID) | (cls == PLANT) | (cls == WATER)))[0]
         if len(bad):
             i = bad[0]
             return ('block', arena.names[m[i]] if m[i] >= 0 else 'outside', round(float(ts[i]), 2))

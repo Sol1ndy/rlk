@@ -37,6 +37,7 @@ where the design names it (the stage's forward, her CS1 mark, the ending's landi
 World entities a sequence makes: the stage markers, a one-tick helper marker, the kit prop cards (petals: rlk_hr_sqp), the
 event's thrown sword / moonlight orb, the camera stands (the framework's, mboss/cam/spawn), all tagged rlk_room rlk_mb_aux.
 """
+import json
 import math
 
 from . import api
@@ -75,6 +76,8 @@ CAM = {1: L.cam_sel(1), 2: L.cam_sel(2)}
 CX_FP = '#sq_cx'                                                     # 1: this run of a locked sequence lost its lock
 HELD_FP = '#sq_h'                                                    # 1: this run of a locked sequence has seen the player held
 GRANT_BY = 3                                                         # a run never held by this tick gives the lock up
+KEEP_FP = '#sq_keep'                                                 # 1: the repel's actor is handed to the ending (the lethal kick)
+ACTOR_ROOT = '@e[type=minecraft:marker,tag=rlk_cine_root,limit=1]'    # lane H3's actor (its manifest's tags.root)
 RIG_T = f'{api.RIG_OBJ_PREFIX}T'                                     # the rig's clip tick (S2a's objective, tools/scarlet_rig_api.md)
 A, B = 1, 2                                                          # camera A = rlk_mb_cam1, B = rlk_mb_cam2
 ST, ST2, HR, WP, ENT = C.ST, C.ST2, C.HR, C.W, C.ENT
@@ -205,20 +208,49 @@ def actor_lines(call, **macro):
     return [a] if a else []
 
 
-def actor_spawn(clip):
+def actor_man():
+    """Lane H3's actor manifest (tools/player_motion/cine/manifest.json: per clip its length, footfall ticks `steps` and per
+    tick the root's `shift` and the hands / head / sword points in the stage frame), None until it exists."""
+    if not api.actor_ready():
+        return None
+    m = json.loads(api.ACTOR_MANIFEST.read_text(encoding='utf-8'))
+    assert m['tags']['root'] in ACTOR_ROOT and m['calls']['spawn'] == 'rlk:char/cine/spawn', (m['tags'], m['calls'])
+    assert all(m['clips'][c]['len'] == n for c, n in (('cs0', api.SEQ_LEN['intro']), ('cs1', api.SEQ_LEN['cs1']), ('repel', api.SEQ_LEN['repel']),
+                                                       ('ending', api.SEQ_LEN['ending']), ('coda', api.SEQ_LEN['event']))), 'actor clip lengths'
+    return m
+
+
+def actor_steps(clip, lo, hi, fallback):
+    """[(tick, the root's f)] of the actor's footfalls in lo..hi: the manifest's `steps` of `clip` (H3), else `fallback`."""
+    m = actor_man()
+    if not m:
+        return list(fallback)
+    c = m['clips'][clip]
+    return [(t, c['tick']['shift'][t][2]) for t in c['steps'] if lo <= t <= hi]
+
+
+def actor_spawn(clip, carry=False, chained=False):
     """The actor at the stage, rotated as it, playing `clip` (spawn runs as the player; never in developer mode: the player
-    is the body there and nothing is hidden)."""
+    is the body there and nothing is hidden). `carry`: the sequence before hands its actor over (the ending after the repel's
+    lethal kick, the coda after the ending: H3's clips meet pose-exact, repel 129 = ending 0, ending 1372 = coda 0): no new
+    spawn while it stands. `chained`: the start inherits the lock state (write(chain=True)): no actor for a run whose lock
+    was already lost."""
     sp = api.actor('spawn')
     if not sp:
         return []
-    return [f'execute as {PL} unless entity @s[tag=rlk_body] at {STAGE} run {sp}', *actor_lines('play', clip=clip)]
+    cx = f'unless score {CX_FP} {OBJ} matches 1 ' if chained else ''
+    root = f'unless entity {ACTOR_ROOT} ' if carry else ''
+    return [f'execute {cx}as {PL} unless entity @s[tag=rlk_body] {root}at {STAGE} run {sp}',
+            *[(f'execute {cx}run {x}' if cx else x) for x in actor_lines('play', clip=clip)]]
 
 
-def write(W, name, s, head, length, start_head=(), cancel=(), macro=False, track=None, chain=False, fin=True):
+def write(W, name, s, head, length, start_head=(), cancel=(), macro=False, track=None, chain=False, fin=True, keep=False):
     """seq/<name>/{start,tick,cancel} + k/<t> + kb/<a>_<b>; for a locked sequence (LOCK) also lock / unlock / fin / cam +
     c/<t> + cb/<a>_<b>. start = its head lines, #sqdone 0, the lock of tick 0, then the tick-0 lines. `chain`: the lock is
     inherited from the sequence before (the coda after the ending): the interrupt flag is not reset. `fin`: the stands,
-    the actor and the stage go at the first tick without the lock (False: the next sequence takes them over)."""
+    the actor and the stage go at the first tick without the lock (False: the next sequence takes them over). `keep`: a
+    cancel while KEEP_FP is 1 leaves the actor standing for the sequence the core starts in the same tick (the repel's
+    lethal kick -> death_start -> core/stop_all -> the ending); the framework's release stops it if none follows."""
     base = f'{SEQ}/{name}'
     hold = [HUD_HOLD] if name in HUD_OFF else []
     blank = [HUD_BLANK] if name in HUD_OFF else []
@@ -259,12 +291,15 @@ def write(W, name, s, head, length, start_head=(), cancel=(), macro=False, track
             f'# {head}',
             '# The first tick without the lock (the framework releases the player in this tick): the stands, the actor and the',
             '# stage go.', L.cam('kill'), *actor_lines('stop'), f'kill @e[type=minecraft:marker,tag={STAGE_T}]',
-            f'kill @e[type=minecraft:marker,tag={STAGE2_T}]', *leash_off])
+            f'kill @e[type=minecraft:marker,tag={STAGE2_T}]', sset(HELD_FP, 0), *leash_off])
         call = f'execute unless score {CX_FP} {OBJ} matches 1 run function {base}/lock'
         lock0 = [call]
         lockn = [f'execute if score #sq {OBJ} matches ..{t1 - 1} unless score {CX_FP} {OBJ} matches 1 run function {base}/lock']
         if fin:
             s.at(t1, f'function {base}/fin')
+    stop_lines = actor_lines('stop')
+    if keep and stop_lines:
+        stop_lines = [f'execute unless score {KEEP_FP} {OBJ} matches 1 run {x}' for x in stop_lines] + [sset(KEEP_FP, 0)]
     W.w(f'seq/{name}/start', [f'# {head}', f'# Start (@s = the body, at it; #sq {OBJ} = 0){" — macro" if macro else ""}.',
                               *[c for c in start_head if c], sset('#sqdone', 0),
                               *([sset(CX_FP, 0), sset(HELD_FP, 0)] if lock and not chain else []), *hold, *blank, *lock0, *s.t.get(0, [])])
@@ -277,7 +312,7 @@ def write(W, name, s, head, length, start_head=(), cancel=(), macro=False, track
     W.w(f'seq/{name}/cancel', [f'# {head}', '# Cancel (no executor; idempotent): what this sequence made.',
                                f'kill @e[type=minecraft:marker,tag={STAGE_T}]', f'kill @e[type=minecraft:marker,tag={STAGE2_T}]',
                                f'kill @e[type=minecraft:marker,tag={HELP_T}]',
-                               *([L.cam('kill'), *actor_lines('stop'), sset(CX_FP, 0), sset(HELD_FP, 0)] if lock else []), *leash_off,
+                               *([L.cam('kill'), *stop_lines, sset(CX_FP, 0), sset(HELD_FP, 0)] if lock else []), *leash_off,
                                *[c for c in cancel if c]])
 
 
@@ -311,9 +346,10 @@ class Moves:
     """Helper functions seq/<name>/m/<key> (@s = the body): candidate destinations tried in order (return at the first)."""
 
     def __init__(self, name):
-        self.name, self.files = name, {}
+        self.name, self.files, self.done = name, {}, set()
 
     def add(self, key, lines, head):
+        assert key not in self.files, (self.name, key)
         self.files[key] = [f'# {head} (@s = the body).'] + [x for x in lines if x]
         return f'function {SEQ}/{self.name}/m/{key}'
 
@@ -321,8 +357,11 @@ class Moves:
         return f'function {SEQ}/{self.name}/m/{key}'
 
     def write(self, W):
+        """Write the helpers added since the last call (a sequence with a skip adds more after its timeline is written)."""
         for k, v in self.files.items():
-            W.w(f'seq/{self.name}/m/{k}', v)
+            if k not in self.done:
+                W.w(f'seq/{self.name}/m/{k}', v)
+                self.done.add(k)
 
     def stage(self, fmax):
         """m/stage: the stage marker at the avatar's feet on the floor, forward toward her (the avatar's own facing when she
@@ -521,14 +560,14 @@ def build_intro(W):
     TRACKS['intro'] = tr
     STAGED['intro'] = [(0, 'ST', SEAT_F, 'seated'), (1148, 'ST', WALK_F, 'the walk ends'), (1258, 'ST', END_F, 'the landing'),
                        (1440, 'ST', END_F, 'control')]
-    # ---- I1-I2: the rift closing behind the actor, the ambient, the wind (2 s), the actor's steps (20-100, every 12 t)
+    # ---- I1-I2: the rift closing behind the actor, the ambient, the wind (2 s), the actor's steps (its clip's footfalls)
     rift = K.p('arrive_rift')
     s.st(0, ST(0, 0, -api.CS0_WALK_BACK - 1.5), rift)
     s.at(0, K.p('ambient_p1'), (f'execute at {STAGE} run {snd("cs0_wind")}' if snd('cs0_wind') else None))
     stop_wind = 'stopsound @a[tag=player] * minecraft:item.elytra.flying' if snd('cs0_wind') else None
     s.at(60, stop_wind)
-    for t in range(20, 100, 12):
-        s.st(t, ST(0, 0, -api.CS0_WALK_BACK + 0.075 * (t - 20)), snd('grass_step'))
+    for t, f in actor_steps('cs0', 0, api.SEQ_LEN['intro'], [(t, -api.CS0_WALK_BACK + 0.075 * (t - 20)) for t in range(20, 100, 12)]):
+        s.st(t, ST(0, 0, round(f, 2)), snd('grass_step'))     # the actor's footfalls (lane H3's manifest; the design's 12 t without it)
     # ---- lines 1-10 at api.LINE_AT (their clip events l1..l10)
     for i in range(1, 11):
         assert api.LINE_AT[i][0] == 'intro' and api.LINE_AT[i][1] == e(f'l{i}'), i
@@ -639,16 +678,18 @@ def build_cs1(W):
     tr.cut(6, B, ST(-2.6, 1.3, 0.8), K1, 'S2 clash', ('her', 'actor'))
     tr.move(10, 22, eye=ST(-1.3, 1.4, 0.8))
     tr.cut(34, A, ST(-13.0, 3.0, 4.0), ST(0, 1.0, 4.0), 'S3 pushed apart', ('her', 'actor'))
-    tr.cut(84, B, ST(0.55, 1.75, -1.3), ST(0, 1.4, 9.0), 'S4 over the shoulder', ('her', 'actor'))
+    tr.cut(84, B, ST(0.55, 1.75, -1.3), ST(0, 1.4, 9.0), 'S4 over the shoulder', ('her', 'actor?'))
     tr.cut(180, A, ST(0, 5.0, 4.5), ST(0, 0, 4.55), 'S5 the grass', ())   # straight down, screen-up = the stage's forward
     tr.cut(220, B, HR(0.5, 1.6, -1.6), ST(0, 1.2, 0), 'S6 hat swing', ('her', 'actor'))
     tr.cut(276, A, HR(0.2, 1.45, 1.9), HR(0, 1.45, 0), 'S7 the bottle', ('her',))
-    tr.cut(340, B, ST(0.5, 1.5, 1.8), ST(0, 1.45, 0), 'S8 the actor', ('actor',))
+    # S8: on the actor's left (the design's ST(0.5, 1.5, 1.8) is where the point of its blade comes up in the half guard
+    # 350-370: 0.15 b from the lens by lane H3's manifest)
+    tr.cut(340, B, ST(-0.7, 1.5, 2.1), ST(0, 1.45, 0), 'S8 the actor', ('actor',))
     tr.cut(380, A, HR(-0.3, 1.5, 1.5), HR(0, 1.5, 0), 'S9 offer, drink', ('her',))
     tr.cut(500, B, HR(0.1, 1.38, 0.95), HR(0, 1.6, 0), 'S10 under the brim', ('her',))
     tr.cut(610, A, ST(0.3, 1.5, 2.0), ST(0.3, 1.5, 2.9), 'S11 the petal', ())
     # (the design's eye r 0.4 hides her behind the actor: 1.2 b to the right shows both, the actor near, her beyond)
-    tr.cut(648, B, ST(1.2, 2.1, -4.2), ST(0.2, 1.2, 4.0), 'S13 홍련일섬', ('her', 'actor'))
+    tr.cut(648, B, ST(1.2, 2.1, -4.2), ST(0.2, 1.2, 4.0), 'S13 홍련일섬', ('her', 'actor?'))
     TRACKS['cs1'] = tr
     STAGED['cs1'] = [(0, 'ST', HER_F, 'S1 apart'), (10, 'ST', 1.5, 'the lock'), (50, 'ST', HER_F, 'landed'),
                      (720, 'ST', HER_F, 'the end')]
@@ -818,11 +859,17 @@ def build_repel(W):
     tr = C.Track('repel', {'ST': STAGE, 'HR': BODY}, LOCK['repel'][1], lift=LIFT, over=OVER)
     tr.cut(0, A, ST(-1.2, 0.9, 0.65), KR, 'R0 deflect / R1 blade lock', ('her', 'actor'))
     tr.move(4, 26 - 1, eye=ST(-1.0, 1.0, 0.65))
-    tr.cut(26, B, ST(1.9, 1.5, -0.4), ST(0, 1.3, 0.8), 'R2 grab / R3 hat strike', ('her', 'actor'))
+    # R2 / R3: further round to the actor's right than the design's ST(1.9, 1.5, -0.4): from there the actor, stepping in to
+    # f 0.5, stands before her (shot sheet); here the seized wrist and the hilt on her hat are between the two heads
+    tr.cut(26, B, ST(2.2, 1.5, 0.1), ST(0, 1.4, 0.8), 'R2 grab / R3 hat strike', ('her', 'actor'))
     tr.cut(52, A, ST(-2.2, 1.2, 2.4), ST(0, 1.2, 0.8), 'R4 two cuts', ('her', 'actor'))
     # (the design's eye on the axis has the actor cover her whole: 1.4 b to the side shows her at its back)
-    tr.cut(68, B, ST(1.4, 1.6, 3.3), ST(0, 1.3, 1.5), 'R5 back to back', ('her', 'actor'))
-    tr.cut(78, A, ST(-2.8, 0.7, 1.8), ST(0, 1.2, 2.0), 'R6 the throw', ('her', 'actor'))
+    # R5: three-quarter from the actor's right (the design's head-on ST(0, 1.6, 3.6) has the actor's head before hers: she
+    # stands behind it; from here her head and the hooked arm over the right shoulder are beside the actor's)
+    tr.cut(68, B, ST(2.1, 1.6, 2.7), ST(0, 1.3, 1.5), 'R5 back to back', ('her', 'actor'))
+    # R6: a step back and the look higher than the design's ST(-2.8, 0.7, 1.8) -> ST(0, 1.2, 2.0): her arc over the actor's
+    # shoulder (2.2 b up at 88) left the top of that frame (shot sheet)
+    tr.cut(78, A, ST(-3.6, 0.8, 2.2), ST(0, 1.7, 2.2), 'R6 the throw', ('her', 'actor'))
     tr.cut(102, B, ST(1.6, 1.2, 4.6), ST(0, 0.6, 2.6), 'R7 over her', ('her', 'actor'))
     tr.cut(128, A, ST(-2.4, 0.8, 2.6), ST(0, 0.5, 2.8), 'R8 the kick', ('her',))
     tr.cut(132, B, ST(-5.0, 2.4, -2.0), ST(0, 1.0, 4.0), 'R9 apart (60 % only)', ('her', 'actor'))
@@ -860,6 +907,10 @@ def build_repel(W):
     s.at(e('kick'), K.fixed('keep_on')).fx(e('kick'), 'chest', K.p('kick_flash')).at(e('kick'), K.fixed('keep_off'))
     slide = mv.add('slide', [cand(floor_pt(d), glide(6)) for d in (8.0, 7.0, 6.0)], 'R8 kicked away: she slides to f 8.0 by 135 (60 %)')
     s.at(e('kick'), snd('kick'), gate(at60, slide), sig('hp3'))
+    # the lethal kick (5 %): the core kills her on hp3 in this tick (death_start -> core/stop_all -> this cancel -> the
+    # ending's start): the actor is kept for the ending (lane H3: repel 129 = ending 0, no new spawn)
+    if api.actor_ready():
+        s.at(e('kick'), f'execute {at5} unless score {CX_FP} {OBJ} matches 1 run {sset(KEEP_FP, 1)}')
     # ---- R9 (60 % only): she rolls to her feet and stands at f 9.0 (135-140), the actor lands 139
     up = mv.add('up', [cand(floor_pt(d), glide(5), ok) for d, ok in ((HER_F, OK), (HER_F, OKW), (8.0, OKW))],
                 'R9 to her feet at f 9.0 (135-140)')
@@ -868,8 +919,8 @@ def build_repel(W):
     mv.write(W)
     head = ('repel {at:60|5} (hr_design §3.4): the deflect, the blade lock, the grab, the hilt on her hat, two cuts, back to back, '
             'the throw, the kick; HP steps at 49 / 101 / 129; locked 0-140, the bars on.')
-    write(W, 'repel', s, head, api.SEQ_LEN['repel'], macro=True, track=tr,
-          start_head=[f'$scoreboard players set #sq_at {OBJ} $(at)', mv.ref('stage'), 'scoreboard players set #mbNoLeash mb 1', STOP,
+    write(W, 'repel', s, head, api.SEQ_LEN['repel'], macro=True, track=tr, keep=True,
+          start_head=[f'$scoreboard players set #sq_at {OBJ} $(at)', sset(KEEP_FP, 0), mv.ref('stage'), 'scoreboard players set #mbNoLeash mb 1', STOP,
                       drop, FACE_ACTOR, land, L.cam('kill'), f'execute at {STAGE} run {L.cam("spawn")}', *actor_spawn('repel'),
                       api.play('repel')],
           cancel=[KILL_PROPS])
@@ -907,7 +958,7 @@ def build_ending(W):
     tr.cut(616, A, HR(0.5, 1.4, 2.4), HR(0, 1.35, 0), 'E12 turning away', ('her',))
     tr.cut(700, B, ST2(-0.8, 1.5, 7.2), HR(0, 1.4, 0), 'E12 her back', ('her',))
     tr.cut(846, A, ST2(-0.4, 1.5, 1.6), ST2(0, 1.45, 0), 'E13 the actor', ('actor',))
-    tr.cut(882, B, ST2(-2.2, 1.6, -2.6), ST2(1.2, 1.2, 9.0), 'E14 the two', ('her', 'actor'))
+    tr.cut(882, B, ST2(-2.2, 1.6, -2.6), ST2(1.2, 1.2, 9.0), 'E14 the two', ('her', 'actor?'))
     # E15: over her right shoulder to the moon. In her own frame (she has faced the moon since 700, wherever ST2 points); the
     # design's ST2(0.5, 1.6, 8.0) sat 1 b behind her head: the brim hid the moon (shot sheet)
     tr.cut(972, A, HR(1.3, 1.5, -2.2), MOON, 'E15 the moon', ('her', 'moon'))
@@ -1013,7 +1064,7 @@ def build_ending(W):
             'tip; H at its end; locked from tick 0 into the coda.')
     write(W, 'ending', s, head, api.SEQ_LEN['ending'], track=tr, fin=False,
           start_head=[mv.ref('stage'), STOP, lie, FACE_ACTOR, L.cam('kill'), f'execute at {STAGE} run {L.cam("spawn")}',
-                      *actor_spawn('ending'), api.play('ending')],
+                      *actor_spawn('ending', carry=True), api.play('ending')],
           cancel=[KILL_PROPS] + halo(False))
 
 
@@ -1100,7 +1151,7 @@ def build_event(W):
     alone = mv.add('alone', [mv.stage(api.STAGE_FMAX['ending']),
                              f'execute at {STAGE} run summon minecraft:marker ~ ~ ~ {{Tags:{tags(STAGE2_T)}}}',
                              f'execute as {STAGE2} at @s rotated as {STAGE} run tp @s ~ ~ ~ ~ 0',
-                             sset(CX_FP, 0), L.cam('kill'), f'execute at {STAGE} run {L.cam("spawn")}',
+                             sset(CX_FP, 0), sset(HELD_FP, 0), L.cam('kill'), f'execute at {STAGE} run {L.cam("spawn")}',
                              *tr.place_aim(A, coda_eye, coda_look, True),
                              f'scoreboard players set {L.CAM_ID[0]} {L.CAM_ID[1]} {A}'],
                    'The coda without the ending before it: its own stage (ST2 = ST) and stands, camera A on its shot')
@@ -1186,7 +1237,7 @@ def build_event(W):
     head = ('The event coda (PLAN §7.3.2): item 「검을 건네다」 (the thrown sword) / buff 「월하대작」 (the moonlight orb), the leave, '
             'the grant at E56, the black at E110; under the ending\'s lock until E118.')
     write(W, 'event', s, head, api.SEQ_LEN['event'], track=tr, chain=True,
-          start_head=[f'execute unless entity {STAGE2} run {alone}', STOP, *actor_spawn('coda')],
+          start_head=[f'execute unless entity {STAGE2} run {alone}', STOP, *actor_spawn('coda', carry=True, chained=True)],
           cancel=[f'kill @e[tag={EV_T}]'])
 
 

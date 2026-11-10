@@ -18,7 +18,7 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / 'tests' / 'lib'))
 import hrsim as H  # noqa: E402
 import camsim as CS  # noqa: E402
-from mcsim import Ctx  # noqa: E402
+from mcsim import Ctx, split  # noqa: E402
 
 C0 = H.C0
 ROOT = H.ROOT_SC
@@ -35,8 +35,7 @@ class SeqSim(CS.CamSim):
         self.rec = []
         self.sigs = []              # (sequence, #sq, signal)
         self.done = []              # (sequence, #sq at #sqdone)
-        self.actor_log = []         # (world tick, call, executor etype, pos, rot, macro) of rlk:char/cine/* (a dry build)
-        self.actor_on = False       # the actor exists (spawn .. stop) in a dry build with the actor lines on
+        self.actor_log = []         # (world tick, call, executor etype, pos, rot, macro, #cavT) of rlk:char/cine/*
         self.titles_log = []
 
     def call(self, fid, ctx, macro=None):
@@ -51,6 +50,13 @@ class SeqSim(CS.CamSim):
             TRACE.pop()
         return r
 
+    def actor_root(self):
+        return next((e for e in self.ents if e.alive and 'rlk_cine_root' in e.tags), None)
+
+    @property
+    def actor_on(self):
+        return self.actor_root() is not None
+
     def call2(self, fid, ctx, macro=None):
         if fid == 'rlk:mboss/d/tick' and self.drive:
             self.step()
@@ -59,10 +65,19 @@ class SeqSim(CS.CamSim):
             ex = ctx.ex
             self.actor_log.append((self.t, call, ex.etype if ex is not None else None, tuple(ctx.pos), tuple(ctx.rot), dict(macro or {}),
                                    self.sc('#cavT', 'cine')))
+            # lane H3's actor as far as the sequences see it (its own suite is hr/tests/test_actor.py): spawn makes the root
+            # marker (once; called again it moves it), stop removes it; the root dies with the framework's helper sweeps
             if call == 'spawn':
-                self.actor_on = True
+                root = self.actor_root()
+                if root is None:
+                    self.cmd(split('summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_cine_root"]}'), ctx)
+                    root = self.actor_root()
+                root.pos, root.rot = list(ctx.pos), [ctx.rot[0], 0.0]
             elif call == 'stop':
-                self.actor_on = False
+                for e in self.ents:
+                    if 'rlk_cine_root' in e.tags:
+                        e.alive = False
+                self.ents = [e for e in self.ents if e.alive]
             return 1
         return super().call(fid, ctx, macro)
 

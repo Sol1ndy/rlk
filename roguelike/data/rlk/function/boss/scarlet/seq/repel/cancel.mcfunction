@@ -4,6 +4,8 @@ kill @e[type=minecraft:marker,tag=rlk_hr_stage]
 kill @e[type=minecraft:marker,tag=rlk_hr_stage2]
 kill @e[type=minecraft:marker,tag=rlk_hr_sqh]
 function rlk:mboss/cam/kill
+execute unless score #sq_keep hr matches 1 run function rlk:char/cine/stop
+scoreboard players set #sq_keep hr 0
 scoreboard players set #sq_cx hr 0
 scoreboard players set #sq_h hr 0
 scoreboard players set #mbNoLeash mb 0

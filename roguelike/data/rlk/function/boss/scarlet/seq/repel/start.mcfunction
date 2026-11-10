@@ -1,6 +1,7 @@
 # repel {at:60|5} (hr_design §3.4): the deflect, the blade lock, the grab, the hilt on her hat, two cuts, back to back, the throw, the kick; HP steps at 49 / 101 / 129; locked 0-140, the bars on.
 # Start (@s = the body, at it; #sq hr = 0) — macro.
 $scoreboard players set #sq_at hr $(at)
+scoreboard players set #sq_keep hr 0
 function rlk:boss/scarlet/seq/repel/m/stage
 scoreboard players set #mbNoLeash mb 1
 function rlk:mboss/mv/stop
@@ -9,6 +10,8 @@ execute rotated as @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run rotate
 function rlk:boss/scarlet/seq/repel/m/land
 function rlk:mboss/cam/kill
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run function rlk:mboss/cam/spawn
+execute as @a[tag=player,limit=1] unless entity @s[tag=rlk_body] at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run function rlk:char/cine/spawn
+function rlk:char/cine/play {clip:"repel"}
 function rlk:boss/scarlet/rig/play/repel
 scoreboard players set #sqdone hr 0
 scoreboard players set #sq_cx hr 0

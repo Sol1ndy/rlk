@@ -3,6 +3,7 @@ function rlk:boss/scarlet/seq/event/m/stage
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["rlk_room","rlk_mb_aux","rlk_hr_stage2"]}
 execute as @e[type=minecraft:marker,tag=rlk_hr_stage2,limit=1] at @s rotated as @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run tp @s ~ ~ ~ ~ 0
 scoreboard players set #sq_cx hr 0
+scoreboard players set #sq_h hr 0
 function rlk:mboss/cam/kill
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage,limit=1] run function rlk:mboss/cam/spawn
 execute at @e[type=minecraft:marker,tag=rlk_hr_stage2,limit=1] run tp @e[type=minecraft:armor_stand,tag=rlk_mb_cam1,limit=1] ^-0.55 ^1.75 ^-1.3

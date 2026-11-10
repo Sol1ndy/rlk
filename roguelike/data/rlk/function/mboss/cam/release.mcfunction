@@ -15,3 +15,4 @@ tag @s remove rlk_mb_cgC
 # dead / in the selection space: those own the player's place (as view/teardown)
 execute unless score @s pkMode matches 1.. unless score @s dead matches 1 run function rlk:mboss/cam/back
 data remove storage rlk:mboss camret
+function rlk:char/cine/stop
