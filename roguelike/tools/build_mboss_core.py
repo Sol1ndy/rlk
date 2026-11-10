@@ -1120,6 +1120,14 @@ scoreboard players set #mbHzOn mb 0
 scoreboard players add #mbHzClk mb 1
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] at @s rotated as @s run function rlk:mboss/hz/tick
 ''')
+w('near_all', '''
+# Combat overhaul C (rlk:tick right after mboss/main, only while the perfect-dodge window is open and the fight is live and
+# not paused: #dgOpen cb 1, the dodge started this tick or the 2 before, so the body has already moved 1-3 b): every dodgeable hazard in its active window that did not hit and
+# every dodgeable prop that did not hit is tested once more at the dodge's start (hz/near, pj/near): a contact there is
+# judged as a perfect dodge (never damage).
+execute if score #mbHzOn mb matches 1 as @e[type=minecraft:marker,tag=rlk_mb_hz] at @s rotated as @s run function rlk:mboss/hz/near
+execute if score #mbPjOn mb matches 1 as @e[tag=rlk_mb_pj] at @s rotated as @s run function rlk:mboss/pj/near
+''')
 w('pj/all', '''
 scoreboard players set #mbPjOn mb 0
 execute as @e[tag=rlk_mb_pj] at @s rotated as @s run function rlk:mboss/pj/tick
@@ -1297,10 +1305,13 @@ execute if score #mbSrcIn mb matches 1..2 run scoreboard players operation #mbHi
 ''')
 w('hurt_dodge', '''
 # A hit that did not land (#dodged 1): #mbDodgeEv +1; #mbDodgeOk 1 (the "perfect" event, e.g. Azhdaha's brand cleanse) only
-# for a perfect dodge (#pdg tmp 1) or a perfect parry (#parT tmp 3) - not for i-frames (burst, revive, fall).
+# for a perfect dodge (#pdg tmp 1) or a perfect parry (#parT tmp 3) - not for i-frames (burst, revive, fall) - of a real
+# attack: not of a re-arming (lingering) hazard. (Before combat overhaul C: a dash-dodged projectile or one-shot hazard
+# with a tell >= 12 t; the timing judge replaces the tell rule.)
 scoreboard players add #mbDodgeEv mb 1
-execute if score #pdg tmp matches 1 run scoreboard players set #mbDodgeOk mb 1
-execute if score #parT tmp matches 3 run scoreboard players set #mbDodgeOk mb 1
+execute unless score #pdg tmp matches 1 unless score #parT tmp matches 3 run return 0
+execute if score #mbSrcIn mb matches 1 if score @s mbHzRA matches 1.. run return 0
+scoreboard players set #mbDodgeOk mb 1
 ''')
 w('hurt_ctx', '''
 # @s = the attacker of a mboss/hurt call (hazard marker, prop, body). The one-shot hit context of player/def/judge.
@@ -1947,23 +1958,23 @@ execute if score @s mbHzK matches 4 run function rlk:mboss/hz/draw_line
 execute if score @s mbHzK matches 1..3 run particle minecraft:explosion ~ ~0.3 ~ 0.6 0.1 0.6 0 2 force @a[tag=player]
 execute if score @s mbHzK matches 5 run particle minecraft:explosion_emitter ~ ~1 ~ 0 0 0 0 1 force @a[tag=player]
 ''')
-w('hz/hit', '''
-# @s = hazard marker, at @s, inside its active window. Body feet only (never the camera): hz/hit1. Combat overhaul C: while
-# the perfect-dodge window is open (#dgOpen cb 1: the dodge started this tick or the 2 before, so the body has already moved
-# 1-3 b), a hazard that missed the body is tested once more at the dodge's start (hz/hit_near): a contact there is judged
-# as a perfect dodge (never damage). Not for a no-dodge hazard (it would have hit the body that stayed).
-function rlk:mboss/hz/hit1
-execute if score #hzHit mb matches 0 if score #dgOpen cb matches 1 if score @s mbHzND matches 0 run function rlk:mboss/hz/hit_near
-''')
-w('hz/hit_near', '''
-# @s = a dodgeable hazard that missed the body in the perfect-dodge window: the same test with the body mark on the dodge's
-# start (player/def/ghost_on: the rlk_dgo box; nothing when it is gone).
+w('hz/near', '''
+# @s = a hazard marker, at / rotated as it (mboss/near_all, only while the perfect-dodge window is open). A dodgeable hazard in its
+# active window that has not hit (this tick's hz/tick test missed the moved body) runs the same test with the body mark on
+# the dodge's start (player/def/ghost_on: the rlk_dgo box; nothing when it is gone). Not for a no-dodge hazard.
+execute unless score @s mbHzHit matches 0 run return 0
+execute unless score @s mbHzD matches 1.. run return 0
+execute unless score @s mbHzND matches 0 run return 0
+execute if score @s mbHzT < @s mbHzW run return 0
+scoreboard players operation #hzEnd mb = @s mbHzW
+scoreboard players operation #hzEnd mb += @s mbHzA
+execute if score @s mbHzT >= #hzEnd mb run return 0
 function rlk:player/def/ghost_on
-execute if score #gh cb matches 1 run function rlk:mboss/hz/hit1
+execute if score #gh cb matches 1 run function rlk:mboss/hz/hit
 function rlk:player/def/ghost_off
 ''')
-w('hz/hit1', '''
-# @s = hazard marker, at @s (hz/hit). The hit test on the body mark rlk_body.
+w('hz/hit', '''
+# @s = hazard marker, at @s, inside its active window. Body feet only (never the camera).
 scoreboard players set #hzHit mb 0
 execute unless entity @e[tag=rlk_body,limit=1] run return 0
 execute store result score #dy mb run data get entity @e[tag=rlk_body,limit=1] Pos[1] 1000
@@ -2051,14 +2062,12 @@ w('hz/np_def', '''
 # unparriable - area attacks and grabs). Unparriable by default: no-dodge (#hzNoDodge), per mille (#hzPm), re-arming
 # (#hzRearm: a lingering field), ring (a wave), full arena, mask; a disc of radius >= 4.5 b; a sector or a line reaching
 # >= 8 b. Parryable: the smaller one-shot disc / sector / line (the weapon strikes, sword-qi), and every projectile.
-scoreboard players set @s mbHzNP 0
-execute if score @s mbHzND matches 1 run scoreboard players set @s mbHzNP 1
-execute if score @s mbHzPm matches 1.. run scoreboard players set @s mbHzNP 1
-execute if score @s mbHzRA matches 1.. run scoreboard players set @s mbHzNP 1
-execute if score @s mbHzK matches 2 run scoreboard players set @s mbHzNP 1
-execute if score @s mbHzK matches 5..6 run scoreboard players set @s mbHzNP 1
-execute if score @s mbHzK matches 1 if score @s mbHzR matches 4500.. run scoreboard players set @s mbHzNP 1
-execute if score @s mbHzK matches 3..4 if score @s mbHzR matches 8000.. run scoreboard players set @s mbHzNP 1
+scoreboard players set @s mbHzNP 1
+execute if score @s mbHzND matches 1 run return 0
+execute if score @s mbHzPm matches 1.. run return 0
+execute if score @s mbHzRA matches 1.. run return 0
+execute if score @s mbHzK matches 1 if score @s mbHzR matches ..4499 run return run scoreboard players set @s mbHzNP 0
+execute if score @s mbHzK matches 3..4 if score @s mbHzR matches ..7999 run return run scoreboard players set @s mbHzNP 0
 ''')
 w('np_glint', '''
 # The unparriable-attack warning (combat overhaul C; the original's yellow flash, video_notes 1.6): a gold sphere-ring with a
@@ -2259,9 +2268,7 @@ scoreboard players operation #pjN mb /= #c10 mb
 execute if score #pjN mb matches ..0 run scoreboard players set #pjN mb 1
 scoreboard players set #pjStop mb 0
 execute store result storage rlk:mboss pjp.hr int 1 run scoreboard players get @s mbPjR
-# combat overhaul C: in the perfect-dodge window each sub-step also tests the dodge's start (pj/step_n)
-execute unless score #dgOpen cb matches 1 run function rlk:mboss/pj/step
-execute if score #dgOpen cb matches 1 run function rlk:mboss/pj/step_n
+function rlk:mboss/pj/step
 execute if score #pjStop mb matches 1 run function rlk:mboss/pj/stop {ev:1}
 # The hook ended the flight on a player hit (#pjKeep 0 at event 4).
 execute if score #pjStop mb matches 2 run kill @s
@@ -2275,24 +2282,20 @@ execute if score #pjStop mb matches 2 run return 0
 scoreboard players remove #pjN mb 1
 execute if score #pjN mb matches 1.. at @s rotated as @s run function rlk:mboss/pj/step
 ''')
-w('pj/step_n', '''
-# pj/step while the perfect-dodge window is open (combat overhaul C): a dodgeable prop that missed the body is tested once
-# more against the dodge's start (pj/near; a contact there is judged as a perfect dodge).
-execute if score @s mbPjW matches 1 unless block ^ ^ ^0.25 #rlk:cm_pass run return run scoreboard players set #pjStop mb 1
-tp @s ^ ^ ^0.25
-execute if score @s mbPjHit matches 0 if score @s mbPjD matches 1.. if score @s mbPjK matches 1 at @s run function rlk:mboss/pj/br with storage rlk:mboss pjp
-execute if score @s mbPjHit matches 0 if score @s mbPjD matches 1.. unless score @s mbPjK matches 1 at @s run function rlk:mboss/pj/hr with storage rlk:mboss pjp
-execute if score @s mbPjHit matches 0 if score @s mbPjD matches 1.. if score @s mbPjND matches 0 at @s run function rlk:mboss/pj/near
-execute if score #pjStop mb matches 2 run return 0
-scoreboard players remove #pjN mb 1
-execute if score #pjN mb matches 1.. at @s rotated as @s run function rlk:mboss/pj/step_n
-''')
 w('pj/near', '''
-# @s = a dodgeable prop in the perfect-dodge window, at it: its hit shape against the dodge's start (player/def/ghost_on).
+# @s = a prop, at / rotated as it (mboss/near_all, only while the perfect-dodge window is open, after every prop moved this tick):
+# a dodgeable prop that has not hit is tested at its position against the dodge's start (player/def/ghost_on; a contact
+# there is judged as a perfect dodge; its pj_end hook runs as on any hit).
+execute unless score @s mbPjHit matches 0 run return 0
+execute unless score @s mbPjD matches 1.. run return 0
+execute unless score @s mbPjND matches 0 run return 0
+execute store result storage rlk:mboss pjp.hr int 1 run scoreboard players get @s mbPjR
+scoreboard players set #pjStop mb 0
 function rlk:player/def/ghost_on
 execute if score #gh cb matches 1 if score @s mbPjK matches 1 run function rlk:mboss/pj/br with storage rlk:mboss pjp
 execute if score #gh cb matches 1 unless score @s mbPjK matches 1 run function rlk:mboss/pj/hr with storage rlk:mboss pjp
 function rlk:player/def/ghost_off
+execute if score #pjStop mb matches 2 run kill @s
 ''')
 w('pj/hr', '$function rlk:mboss/pj/h/$(hr)')
 for k in range(1, 41):

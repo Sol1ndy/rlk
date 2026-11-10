@@ -4,4 +4,3 @@ scoreboard players set #dodged tmp 1
 scoreboard players set #pdg tmp 1
 execute unless score @s dgRw = @s dgAt run function rlk:player/def/pd_go
 execute if score @s it_sword_hwamu matches 1.. unless score #hwCtrCd itv matches 1.. run function rlk:items/proc/hw_ctr_q
-tag @e[tag=rlk_hc_atk] remove rlk_hc_atk

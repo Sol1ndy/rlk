@@ -65,6 +65,8 @@ execute unless entity @e[tag=rlk_raiden,limit=1] if entity @e[tag=rlk_raiden_aux
 execute if score #rdBar rd matches 1 unless entity @e[tag=rlk_raiden,limit=1] run function rlk:boss/raiden/bars_hide
 # 중간보스(tools/build_mboss_core.py): 전투가 시작된 뒤에만(#mbLive) 전투 · 공격 판정 · 보스바, 몸체가 없어지면 남은 보조 엔티티와 보스바 정리
 execute if score #mbLive mb matches 1 run function rlk:mboss/main
+# 전투 개편 C: 퍼펙트 닷지 창 동안 보스의 위험 지대 · 투사체를 닷지를 시작한 자리에서 한 번 더 판정(mboss/near_all; 몸이 이미 빠져나간 퍼펙트 닷지)
+execute if score #dgOpen cb matches 1 if score #mbLive mb matches 1 unless score #mbPause mb matches 1 run function rlk:mboss/near_all
 execute if score #mbBar mb matches 1 unless score #mbLive mb matches 1 run function rlk:mboss/bars_hide
 # 회복구슬 / 아이템 소환물
 execute as @e[tag=rlk_healorb] at @s run function rlk:combat/healorb_tick

@@ -790,8 +790,8 @@ RLK_DEV=$DEV bash /home/user/rlk/roguelike/tools/dev/loadcheck.sh /home/user/rlk
   바닐라 `view/av_tick` · `element/on_player_hurt`(→ `ctx_va`: `boss` · `miniboss` 태그면 보스). 커스텀 몹의 공격은 모두 패링할 수 있다.
 - **몸이 이미 빠져나간 퍼펙트 닷지**(연구 7.6): 닷지는 시작 틱에 몸을 1칸 옮기므로, 창이 열린 동안(`#dgOpen cb`: 지금 ≤ `#dgEnd` = 시작 + 2)은 시작한
   자리의 몸 크기 상자 `rlk_dgo`(interaction 0.6 × 1.8, 다음 틱에 지움)를 몸으로도 판정한다(`player/def/ghost_on` · `ghost_off`: 태그 `rlk_body` 를 잠깐
-  옮김): 커스텀 몹(`cm/world` · `cm/pj/world` 동안 통째로), 보스의 위험 지대(`mboss/hz/hit` 가 몸을 못 맞힌 뒤 `hz/hit_near`) · 투사체(`pj/step_n` →
-  `pj/near`), 나루카미(`hazard/try_near`). 그 자리에 닿은 공격은 창 안이므로 언제나 퍼펙트 닷지다(피해 없음). 닷지 불가 공격은 다시 판정하지 않는다.
+  옮김): 커스텀 몹(`cm/world` · `cm/pj/world` 동안 통째로), 보스의 위험 지대 · 투사체(`rlk:tick` 이 `mboss/main` 바로 뒤에, 창 안 · 싸움 중 · 멈춤 아님일 때만
+  `mboss/near_all` → 활성 지대 `hz/near` · 움직인 뒤의 투사체 `pj/near`; 틀의 틱 비용은 그대로), 나루카미(`hazard/try_near`). 그 자리에 닿은 공격은 창 안이므로 언제나 퍼펙트 닷지다(피해 없음). 닷지 불가 공격은 다시 판정하지 않는다.
 - **효과**(바닐라 소리, 글리프는 리소스팩 글꼴 `rlk:cb` U+EE00~EE04, `tools/build_combat_fx.py`):
   - 3단계: 접점(아바타 가슴에서 적 쪽 0.55칸)에 금백색 별빛(글리프 `star`, text_display 가 2틱 커졌다 2틱 사라짐) · 금빛 섬광 · 불꽃, 화면을 가로지르는
     가는 금주황 줄(제목 덮개 `streak`, 6틱), 발밑을 기어가는 노란 번개 10틱, 화면이 1틱 짧게 튐(시점 1.5도). 서버를 멈추거나 느리게 하지 않는다.

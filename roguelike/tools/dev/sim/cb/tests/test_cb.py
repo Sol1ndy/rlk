@@ -243,9 +243,10 @@ def t_static():
     # generated framework lines
     npd = fns.get('mboss/hz/np_def', '')
     ck('static: hz/np_def: no-dodge, per mille, re-arm, ring, full / mask, disc >= 4.5 b, sector / line >= 8 b',
-       all(x in npd for x in ('mbHzND matches 1', 'mbHzPm matches 1..', 'mbHzRA matches 1..', 'mbHzK matches 2 ',
-                              'mbHzK matches 5..6', 'mbHzK matches 1 if score @s mbHzR matches 4500..',
-                              'mbHzK matches 3..4 if score @s mbHzR matches 8000..')))
+       all(x in npd for x in ('mbHzND matches 1 run return 0', 'mbHzPm matches 1.. run return 0', 'mbHzRA matches 1.. run return 0',
+                              'mbHzK matches 1 if score @s mbHzR matches ..4499 run return run scoreboard players set @s mbHzNP 0',
+                              'mbHzK matches 3..4 if score @s mbHzR matches ..7999 run return run scoreboard players set @s mbHzNP 0'))
+       and npd.split('\n').index('scoreboard players set @s mbHzNP 1') < npd.split('\n').index('execute if score @s mbHzND matches 1 run return 0'))
     ck('static: hz/init sets mbHzNP from #hzNoParry or np_def and flashes np_glint for a real hit',
        'mbHzNP = #hzNoParry mb' in fns['mboss/hz/init'] and 'mboss/np_glint' in fns['mboss/hz/init'])
     ck('static: opts_reset resets #hzNoParry / #pjNoParry to -1', 'set #hzNoParry mb -1' in fns['mboss/opts_reset']
@@ -254,9 +255,14 @@ def t_static():
        'function rlk:mboss/hurt_ctx' in fns['mboss/hurt'] and 'hurt_nd' not in fns['mboss/hurt'] and 'dashInvT' not in fns['mboss/hurt'])
     ck('static: hz/hurt_pm calls the judge (no own dash check)', 'player/def/judge' in fns['mboss/hz/hurt_pm']
        and 'dashInvT' not in fns['mboss/hz/hurt_pm'])
-    ck('static: hz/hit = hit1 + the near re-test (dodgeable only); pj/tick -> step_n in the window',
-       'mboss/hz/hit_near' in fns['mboss/hz/hit'] and 'mbHzND matches 0' in fns['mboss/hz/hit']
-       and 'mboss/pj/step_n' in fns['mboss/pj/tick'] and 'mboss/pj/near' in fns['mboss/pj/step_n'])
+    near = [l for l in tick if 'mboss/near_all' in l]
+    ck('static: rlk:tick runs mboss/near_all right after mboss/main, only in the window (live, not paused); hz/near and pj/near '
+       'are dodgeable-only; mboss/world, hz/all, pj/all and pj/tick carry no lane C line',
+       len(near) == 1 and tick.index(near[0]) == i_mb + 1 and '#dgOpen cb matches 1' in near[0] and '#mbPause mb matches 1' in near[0]
+       and 'mboss/hz/near' in fns['mboss/near_all'] and 'mboss/pj/near' in fns['mboss/near_all']
+       and 'unless score @s mbHzND matches 0 run return 0' in fns['mboss/hz/near']
+       and 'unless score @s mbPjND matches 0 run return 0' in fns['mboss/pj/near']
+       and not any(x in fns[f] for f in ('mboss/world', 'mboss/hz/all', 'mboss/pj/all', 'mboss/pj/tick') for x in ('dgOpen', 'near')))
     ck('static: Raiden land sets the context, land_nd = #hcND 1 without dashInvT, try re-tests at the dodge start',
        '#hcNP tmp 1' in fns['boss/raiden/hazard/land'] and 'dashInvT' not in fns['boss/raiden/hazard/land_nd']
        and '#hcND tmp 1' in fns['boss/raiden/hazard/land_nd'] and 'hazard/try_near' in fns['boss/raiden/hazard/try'])
@@ -696,7 +702,12 @@ def t_near():
             s.setsc('#dgOpen', 'cb', 0)
         m = hazard(ND)
         hp0 = P(s, 'curHealth')
-        s.call('rlk:mboss/hz/hit', Ctx(m, tuple(m.pos), (0, 0)))
+        s.setsc(('e', m.id), 'mbHzT', 5)
+        s.setsc(('e', m.id), 'mbHzW', 5)
+        s.setsc(('e', m.id), 'mbHzA', 1)
+        s.call('rlk:mboss/hz/hit', Ctx(m, tuple(m.pos), (0, 0)))           # hz/tick's own test (misses the moved body)
+        if (G(s, '#dgOpen', 'cb') or 0) == 1:
+            s.call('rlk:mboss/hz/near', Ctx(m, tuple(m.pos), (0, 0)))      # hz/all's pass in the window
         return hp0 - P(s, 'curHealth'), s.sc(('e', m.id), 'mbHzHit'), G(s, '#pdg')
     lost, used, pdg = go(1)
     ck('near: a disc that misses the moved body but covers the dodge start (1 t ago) = a perfect dodge (no damage, +10 pt)',

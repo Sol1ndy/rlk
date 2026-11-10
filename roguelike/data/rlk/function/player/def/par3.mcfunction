@@ -5,4 +5,3 @@ scoreboard players set #parT tmp 3
 execute unless score @s parHit = #now cb run function rlk:player/def/par3_go
 function rlk:player/def/par_use
 execute if score @s it_sword_hwamu matches 1.. unless score #hwCtrCd itv matches 1.. run function rlk:items/proc/hw_ctr_q
-tag @e[tag=rlk_hc_atk] remove rlk_hc_atk

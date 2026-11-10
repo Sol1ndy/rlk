@@ -2,4 +2,3 @@
 scoreboard players set #parT tmp 1
 execute unless score @s parHit = #now cb run function rlk:player/def/fx/p1
 function rlk:player/def/par_use
-tag @e[tag=rlk_hc_atk] remove rlk_hc_atk
