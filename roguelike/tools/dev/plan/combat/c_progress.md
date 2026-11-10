@@ -11,7 +11,8 @@ RP 사본: `<S>/rp_c`(원본 `<S>/rp_base` 는 읽기 전용, 11-06 릴리스 b3
 - [x] C4 근접 재판정을 rlk:tick 한 곳(mboss/near_all)으로 · judge 빠른 길(judge2 / end) · np_def 이른 반환 · m0diff / fw_az / fw_ap 갱신
 - [x] 병합 origin/wip/combat(레인 B 균형치, 58c6c13f1) → b0f712ddc: bal/hit 대역을 B 의 파일로, README · ident_hr 는 양쪽 다 둠; regen 변화 없음
 - [x] C5 test_cb 의 `bal` 묶음(퍼펙트 패링 = 공격자의 균형치 정확히 한 칸; 217/217) · README 대역 설명 고침
-- [ ] 게이트 전체(병합 트리의 새 스냅숏에서 hr ar az bal) → push
+- [x] C6 test_m0diff: 병합 트리에서 잰 레인 C 몫(주석 · README 0-9), 레인 C 가 넣고 뺀 가짜 플레이어 이름 목록
+- [ ] 게이트 전체(병합 트리의 새 스냅숏 `<S>/cb/c/snap5` 에서 hr ar az bal, 출력 `<S>/cb/c/out/c5`) → push
 
 ## 설계 (구현됨)
 - 입력: rlk:tick 맨 앞 `player/def/input`(F → player/f_key = 패링 입력, 눈앞 · 몹 실드의 우클릭, F5 rc_hold) + `#now cb`, `#dgOpen cb`.
@@ -33,3 +34,9 @@ RP 사본: `<S>/rp_c`(원본 `<S>/rp_base` 는 읽기 전용, 11-06 릴리스 b3
   fw_az / fw_ap: #mbDodgeOk 는 이제 퍼펙트 닷지 · 3단계 패링만(무적 · 넓은 닷지 · 1-2단계는 아님).
 - 11-10 병합 전 트리(7d06a6649)의 스위트 c4(중간에 멈춤: 병합 트리에서 다시 돎): hr 12개 중 통과 10 + ident_hr(스냅숏이 git 이 아니라 실패; 작업 트리에서 따로 통과) +
   test_rig 1(사용자 스킨 원본이 없는 환경 탓), ar run_all · test_arlecchino · pat_p1 통과. regen 두 번 같음, check_mboss_pack 0, loadcheck cb_c 0, test_lag 통과.
+- 11-10 병합 트리(770c45a61) 게이트: regen_all --mobs 두 번 + raiden / combat_fx / player_rig 다시 = 변화 없음, check_mboss_pack 0, loadcheck cb_c 0,
+  test_lag 통과, test_cb 217/217, test_rm 72/72, test_bal 117/117, test_bal_boss 통과, ident_hr 통과(작업 트리에서), ar 전부 통과.
+  az run_all: m0diff(A 역장 예산 · A 나비 says · B = 기준과 같은 종류, 기준 58c6c13f1 은 37개 / 병합 38개: 더해진 하나가 역장 예산), px 4e, ident 10,
+  refs 새 8(레인 C 것 하나: `player/def/fx/g/title -> g/t_` 매크로 이름, 알려진 종류), 옮기지 않은 mb / mb2 / mb3 스위트와 baseline/macro.txt 없음(환경).
+  m0diff A(틱당 명령, 기준 58c6c13f1 → 병합): proto 6.40 → 7.14, 파수꾼 5.75 → 6.24, 나비 6.51 → 7.29, 역장 6.80 → 7.88.
+- RP 확인: rp_c 에 레인 B 의 build_balance.py --resourcepack 을 함께 넣은 사본에서 rplint 0 · 아틀라스 12.919 M; 글꼴 코드 겹침 없음(bal U+ED00-ED22, cb U+EE00-EE04 · EE0F).

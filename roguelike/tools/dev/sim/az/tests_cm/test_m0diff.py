@@ -51,8 +51,11 @@ CMD_BUDGET = 6.5        # extra commands per mid-boss fight tick (sim count; +15
 # combat overhaul C (11-10): its own allowance on top, kept apart so the older overrun stays visible: the parry / dodge judge
 # and the hit context per player hit (player/def/judge fast path, mboss/hurt_ctx), the no-parry rule per hazard and the
 # warning glint per unparriable hazard (hz/np_def, np_glint), the no-parry options (opts_reset, hz/hurt, pj/hit, pj/launch).
-# Measured on the merged tree (lane R + P + C) against lane R's numbers: proto +0.76, Guardian +0.50, butterfly +0.79,
-# fieldgen +1.14 per tick.
+# It is a cost per event, not per tick: about 11 commands per hazard made (np_def 7, hz/init 4; + the glint when unparriable)
+# and about 28 per player hit (judge 12, hurt_ctx 9, end 5, hit_pl2 2). Measured on the merged tree (lanes R + P + B + C)
+# against origin/wip/combat 58c6c13f1 (R + P + B: proto +6.40, Guardian +5.75, butterfly +6.51, fieldgen +6.80): lane C adds
+# proto +0.74, Guardian +0.49, butterfly +0.78, fieldgen +1.08 per tick (totals +7.14 / +6.24 / +7.29 / +7.88; fieldgen's
+# older overrun of +0.30 keeps its check failing, as on the base).
 LANE_C_CMD = 1.2
 DRAW_BUDGET = 6         # extra commands per bossui/draw with the options unset (sim count: the colour test, the nums
                         # call, the two resets; measured +6, was +15 before the fix round)
@@ -67,7 +70,14 @@ NEW_FAKE = {'#atkSeq', '#auxResEl', '#auxResElV', '#buHpCol', '#buNoNum', '#c280
             # combat overhaul C (11-10): the one-shot hit context / judge scratch (player/def/judge), the no-parry one-shot and
             # the warning glint's clock / owner flag of the framework
             '#hcK', '#hcC', '#hcNP', '#hcND', '#jK', '#jC', '#jNP', '#jND', '#jd', '#jp', '#jpv', '#parT', '#pdg',
-            '#mbNoParry', '#mbNpAt', '#mbNpOwn', '#npNow'}
+            '#mbNoParry', '#mbNpAt', '#mbNpOwn', '#npNow', '#hcId', '#hzNoParry', '#pjNoParry',
+            # ... and its tunables set by rlk:load (README 3 「패링 · 닷지」)
+            '#dashCoolBase', '#dgPW', '#dgLW', '#dgLooseC', '#dgEn', '#parW3', '#parW2', '#parW1', '#parGap', '#parRe',
+            '#parChain', '#parKeep2', '#parKeep1', '#parCut', '#npGap'}
+# fake-player scores of the base whose value changed on purpose: the dash's cooldown constant is now the dodge's (5 -> 12 t)
+CHANGED_FAKE = {'#dashCoolT'}
+# ... and the ones lane C removed with the dash charges / gauge
+GONE_FAKE = {'#dashMaxBase', '#dashRegenBase', '#dashMax', '#dashRegenT', '#hudSeg', '#dashEngMax'}
 NEW_OBJ = {'mbRes0', 'mbRes1', 'mbRes2', 'mbRes3', 'mbRes4', 'mbRes5', 'mbRes6', 'mbRes7', 'mbRes8', 'mbHzNR', 'mbHzSG',
            'mbPjND', 'mbPjNR', 'mbPart',
            # combat overhaul C (11-10): the player's parry / dodge stamps, lane C's globals (cb), hazard / prop no-parry
@@ -188,8 +198,8 @@ def norm_rec(a, b):
 def compare_end(label, r0, r1):
     f0, e0, l0, st0 = end_state(r0['s'])
     f1, e1, l1, st1 = end_state(r1['s'])
-    gone = sorted(str(k) for k in f0 if k not in f1)
-    diff = sorted(f'{k}: {f0[k]} -> {f1[k]}' for k in f0 if k in f1 and f0[k] != f1[k])
+    gone = sorted(str(k) for k in f0 if k not in f1 and k[0] not in GONE_FAKE)
+    diff = sorted(f'{k}: {f0[k]} -> {f1[k]}' for k in f0 if k in f1 and f0[k] != f1[k] and k[0] not in CHANGED_FAKE)
     extra = sorted(str(k) for k in f1 if k not in f0 and k[0] not in NEW_FAKE and k[1] not in NEW_OBJ)
     check(f'{label}: fake-player scores of the base equal on the tree (new ones only chapter-mode names)',
           not gone and not diff and not extra, (gone[:5], diff[:5], extra[:8]))
