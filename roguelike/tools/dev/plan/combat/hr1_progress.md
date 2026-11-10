@@ -1,7 +1,7 @@
 # lane H1 (홍련 rebuild: the fight) — progress
 
 Branch `wip/combat-hr1` (from `origin/wip/combat` c7dcc4fbf; merged 6522feef5), worktree `<S>/cb/wt_hr1`, pack copy
-`<S>/rp_hr1`, sim copy `<S>/cb/hr1_sim` (`<S>` = the scratchpad of `h_common.md`). Contract: `hr_design.md` (§8 wins).
+`<S>/rp_hr1` (`<S>` = the scratchpad of `h_common.md`; the scratch sim copy and run logs were deleted at the end). Contract: `hr_design.md` (§8 wins).
 Owner of `tools/mboss_scarlet/{api,ai,p1,p_ghost,core,shield,s3lib}.py`, `tools/build_mboss_scarlet.py`, FN-bal, the
 pattern / gauntlet / gauge / balance suites and `hrfair` 2.0.
 
@@ -16,16 +16,18 @@ pattern / gauntlet / gauge / balance suites and `hrfair` 2.0.
 
 ## How to run
 ```bash
-S=<scratchpad>; cd $S/cb/wt_hr1/roguelike
+S=<scratchpad>; WT=$S/cb/wt_hr1/roguelike; cd $WT
 bash tools/dev/regen_all.sh .                       # datapack (the kit with --skip-rp, the module, bal, the pack check)
 node tools/build_scarlet_rig.mjs --resourcepack $S/rp_hr1 && python3 tools/build_mboss_hr_fx.py --resourcepack $S/rp_hr1
-RLK_DEV=$S bash tools/dev/loadcheck.sh $PWD hr1
-bash $S/cb/hr1_run.sh <tag> pat_p1 pat_p2 pat_ghost test_gauge test_bal_hr test_scarlet    # sync + run in the sim copy
-cd $S/cb/hr1_sim/hr/review/bal && python3 hrfair2.py $S/cb/wt_hr1/roguelike --out <dir> [--quick] [--only p1,p2,g,kill,chain]
+RLK_DEV=$S bash tools/dev/loadcheck.sh $WT hr1
+# the suites never run inside the tested tree: a sim copy with the old scratchpad path rewritten (sim README 1-B)
+SIM=$S/cb/hr1_sim; rm -rf $SIM; cp -a $WT/tools/dev/sim $SIM; (cd $SIM && grep -rl --exclude='*.md' --exclude='*.json' \
+  2f5e7b47-ba2f-58bc-b880-1598991e2f8e . | xargs sed -i "s|/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad|$SIM|g")
+cd $SIM/hr/tests && for t in pat_p1 pat_p2 pat_ghost test_gauge test_bal_hr test_scarlet; do PYTHONDONTWRITEBYTECODE=1 python3 $t.py $WT | tail -1; done
+cd $SIM/hr/review/bal && python3 hrfair2.py $WT --out <dir> [--quick] [--only p1,p2,g,kill,chain]   # ~50 min full, 4 processes
 ```
-The sim copy is `cp -a tools/dev/sim $S/cb/hr1_sim` with the old scratchpad path rewritten (sim README 1-B);
-`$S/cb/hr1_sync.sh` copies `hr/tests` and `hr/review/bal` into it. Stale outputs of removed pattern keys are not swept by
-the generator (it owns `p/<current key>/` only): `p/r1 p/r2 p/r3` were deleted by hand once.
+After editing a suite in the worktree copy `hr/tests` and `hr/review/bal` into the sim copy again. Stale outputs of removed
+pattern keys are not swept by the generator (it owns `p/<current key>/` only): `p/r1 p/r2 p/r3` were deleted by hand once.
 
 ## What is built (by design section)
 - §1.1 state machine: CS0 (1440, skip → 1290) → P1 → CS1 (720, skip 40-560 → 566, cine, bars off) → `lead60` (56,
