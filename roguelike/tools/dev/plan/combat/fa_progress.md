@@ -20,7 +20,7 @@
 | A-06 | `player/def/dodge_stamp` | 상자 `rlk_dgo` 에 몸의 yaw(`rotate`) |
 | A-07 | `player/def/dodge_stamp`(도장 없는 플레이어는 쓰기 전에 reset) · `rlk:tick` 18줄 → `player/def/box_end`(새; `#dgBox cb`, 지금 >= `#dgKill`, 200틱 뒤 포기) | |
 | A-08 | `combat/rclick_do` → `combat/rclick_off`(새) | 오른손이 비고 왼손에 `rlk_ui` 아이템(웅크리지 않음)이면 왼손의 것으로 같은 동작 |
-| A-09 | `view/tick` → `view/big_dec`(새) | `vBig` 가 0 이 되는 틱에 `#xh view` 9 → 같은 틱에 조준점 |
+| A-09 | `view/tick`(줄 하나 더함; `vBig` 를 줄이는 줄은 그대로: test_hwamu HR-08 이 그 줄을 고정) | `vBig` 가 1 → 0 이 되는 틱에 `#xh view` 9 → 같은 틱에 조준점 |
 | A-12 | `load`(`#dashCoolBase` 18 · `#dashCoolHitBase` 12) · `player/def/dg_refund`(새; `pd` · `loose` 가 부름, `#dgRf cb`) · `engravings/scan_more` · `dash/regen`(반올림: 14 / 10) · 무기 설명문 7개 · 튜토리얼 1단계 | |
 | B-05 | `player/def/par3_go` | `execute as <적> at @s run function rlk:bal/hit {n:1}` |
 | A-11 | `tools/dev/sim/cb/tests/test_cb.py`(묶음 `lock` · `cool` · `bossloop` 새로, `input` · `fx` · `static` · `bal` 보강) · `bossloop_cb.py`(새) | 모의기 보강: `rotate` · `kill` 의 결과 수 · `data merge` 의 Glowing · `x_rotation` · interaction 의 진짜 클릭 자료 · `rlk:tick` 의 앞 단계 줄을 그대로 실행 |

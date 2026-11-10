@@ -322,7 +322,7 @@ def fresh(s):
 def no_errors(s, name):
     # (fx/t_star stores an entity's transformation: psim has no entity NBT store)
     bad = {k: v for k, v in s.errors.items() if k[0].startswith(('rlk:player/def', 'rlk:player/f_key', 'rlk:player/dash',
-                                                                  'rlk:combat/rc', 'rlk:view/big_dec', 'rlk:engravings/'))
+                                                                  'rlk:combat/rc', 'rlk:engravings/'))
            and k[0] != 'rlk:player/def/fx/t_star'}
     ck(f'{name}: the simulator ran every command of the parry / dodge functions (no swallowed error)', not bad, list(bad)[:4])
 
@@ -376,9 +376,10 @@ def t_static():
        < code(fns['player/def/fx/tick']).index(next(l for l in code(fns['player/def/fx/tick']) if 'run kill @s' in l))
        and all(x in fns['player/def/fx/ghost_out'] for x in ('Glowing:0b', 'in minecraft:overworld run tp @s 1000000.5 400 1000000.5'))
        and 'forceload add 1000000 1000000' in fns['load'])
-    ck('static: view/tick lowers vBig through view/big_dec, which re-arms the crosshair on the tick it ends (review A-09)',
-       'if score @s vBig matches 1.. run function rlk:view/big_dec' in fns['view/tick']
-       and 'execute if score @s vBig matches 0 run scoreboard players set #xh view 9' in fns.get('view/big_dec', ''))
+    vt = code(fns['view/tick'])
+    arm, dec = 'execute if score @s vBig matches 1 run scoreboard players set #xh view 9', 'execute if score @s vBig matches 1.. run scoreboard players remove @s vBig 1'
+    ck('static: view/tick re-arms the crosshair (#xh view 9) on the tick vBig ends, right before its one count-down line (review A-09)',
+       arm in vt and dec in vt and vt.index(arm) + 1 == vt.index(dec))
     hud = fns['player/hud/tick']
     ck('static: the HUD actionbar has no dash gauge', 'line[]' not in hud and 'dashRegen' not in hud)
     lores = [k for k in fns if re.match(r'char/[a-z]+/def$', k)]
@@ -1403,6 +1404,27 @@ def t_readers():
         r0 = s.call('rlk:player/def/q_pf0', Ctx(None, (0, 0, 0), (0, 0)))
         r1 = s.call('rlk:player/def/q_pf1', Ctx(None, (0, 0, 0), (0, 0)))
         ck(f'readers: 홍련 pip window, {label}: q_pf0 {w0} / q_pf1 {w1}', (bool(r0), bool(r1)) == (bool(w0), bool(w1)), (r0, r1))
+    # a perfect-window pass asked through q_pf0 / q_pf1 (no judge call) is an avoided attack for the dodge cooldown too
+    fresh(s)
+    prepass(s, rc=True)
+    c0 = P(s, 'dashCool')
+    r0 = s.call('rlk:player/def/q_pf0', Ctx(None, (0, 0, 0), (0, 0)))
+    c1 = P(s, 'dashCool')
+    s.gt += 1
+    r1 = s.call('rlk:player/def/q_pf1', Ctx(None, (0, 0, 0), (0, 0)))
+    ck('readers: 홍련 pip query in the dodge window refunds the dodge cooldown once (18 -> 12: her 12-t chain stays doable with '
+       'dodges alone)', bool(r0) and bool(r1) and (c0, c1, P(s, 'dashCool')) == (G(s, '#dashCoolT'), G(s, '#dashCoolHitT'), G(s, '#dashCoolHitT')),
+       (r0, r1, c0, c1, P(s, 'dashCool')))
+    fresh(s)
+    P(s, 'dashCool', 7)
+    press(s, 0)
+    r0 = s.call('rlk:player/def/q_pf0', Ctx(None, (0, 0, 0), (0, 0)))
+    ck('readers: ... an F window answers the query without touching the dodge cooldown', bool(r0) and P(s, 'dashCool') == 7)
+    for g_ in list(s.select('@e[tag=rlk_dgo]', pctx(s))):
+        g_.alive = False
+    s.ents = [x for x in s.ents if x.alive]
+    nopress(s)
+    P(s, 'dashCool', 0)
     pip = rd('boss/scarlet/shield/pip')
     ck('readers: 홍련 shield/pip reads q_pf0 at s and q_pf1 at s + 1 (no dashInvT)', 'q_pf0' in pip and 'q_pf1' in pip and 'dashInvT' not in pip)
     ck('readers: the shield rush contact ends on a perfect parry', 'execute if score #parT tmp matches 3 run tag @s add rlk_sh_rhit' in rd('cm/sh/rcontact'))
@@ -1551,7 +1573,7 @@ def t_fx():
        and [k[2] for k in s.killed if k[0] == 'mannequin'] == [FAR, FAR], [k[2] for k in s.killed if k[0] == 'mannequin'])
     pl.rot = [0.0, 0.0]
     # review A-09: the crosshair comes back in the tick the overlay ends (view/tick's vBig line, then view/ride_tick's lines)
-    vb = next(l for l in code(rd('view/tick')) if 'vBig matches 1..' in l)
+    vb = [l for l in code(rd('view/tick')) if 'score @s vBig matches' in l]
     xh = [l for l in code(rd('view/ride_tick')) if '#xh view' in l]
     nopress(s)
     s.gt += 30
@@ -1562,7 +1584,7 @@ def t_fx():
     s.log.clear()
     sent = []
     for k in range(1, 9):                                    # the view ticks after the parry tick
-        for l in [vb] + xh:
+        for l in vb + xh:
             s.cmd(split(l), pctx(s))
         if s.calls('rlk:view/xhair'):
             sent.append(k)

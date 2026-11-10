@@ -38,6 +38,8 @@ items.md and pack.mcmeta. A file of the scope that is new, changed or gone must 
                 inv/order_count2}, F:items/{equip_scan,scan_*,scan_s/*}, F:engravings/info_{build,bucket*,pass*}
   combat B      the balance gauge / groggy (11-10, wip/combat-bal): F:bal/**, the bosses' bal_{ok,on,tick,off} hooks and their
                 own groggies' refill lines, the mob / cm / combat / burst hook lines, the cm rig ticks, Raiden's balance stun
+  fix A         review A (player side) and B-05 (11-11, wip/combat-fix-a): F:combat/rclick_off (F and a right-click in one
+                tick); the rest of its changes are files of lane C / F3 (view/tick: the crosshair after an overlay)
 
 Prints every allow-listed file that changed (grouped) and fails on anything else (FAIL lines name the files). A gone
 file passes only in a group named in ALLOW_GONE.
@@ -148,6 +150,9 @@ ALLOW[LANE_C] = ([F + f'{n}.mcfunction' for n in _LANE_C_FN]
                  + [F + r'player/def/.+\.mcfunction', F + r'char/motion/clips/(?:arle|skirk|navia)/guard/.+\.mcfunction',
                     F + r'char/motion/(?:arle_fx|skirk_fx|navia_fx|events/arle|events/skirk|events/navia)/guard\.mcfunction',
                     'items.md'])
+# 11-11 combat overhaul, fix lane A (wip/combat-fix-a; tools/dev/plan/combat/fa_progress.md): review A (player side) and B-05.
+# Its other files are lane C's (player/def/**, player/dash*, f_key, the lores, load, tick ...) and F3's view/tick; new here:
+ALLOW['combat fix A (11-11): review A (player side), B-05'] = [F + 'combat/rclick_off.mcfunction']
 # 11-10 combat overhaul, lane B (wip/combat-bal; tools/dev/plan/combat/b_progress.md): the balance gauge and groggy —
 # the generated rlk:bal/** (tools/build_balance.py), the boss modules' balance hooks (mboss_lib.BAL_HOOKS) and the lines that
 # call / refill it (their own groggies), the mob / cm / combat hook lines, the cm rig ticks' groggy branch, Raiden's
