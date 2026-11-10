@@ -1632,16 +1632,29 @@ BEAM_MIN_H = 250                       # hundredths: ... and the executor is at 
 BEAM_LOW = 105                         # hundredths more than qi_line's margin (0.32): the beam's centre line ends 1.37 b up, its
 #                                        2.6-b body over the floor at any pitch
 BEAM_W = 26                            # tenths: the body's width; narrower where the executor is lower than half of it
+BAND_Y = 135                           # hundredths: the ground band's centre line over the floor (half of BEAM_W + 0.05)
 
 
-@preset('qi_beam', 'P-q / P-n the diagonal sword-qi beam of length {len} (tenths; at her blade or chest in the air, rotated '
-        f'toward the lock): a broad magenta beam (2.6 b) round a pink-white one and a white core shoots from the executor (0.4 '
-        f'of its length at the call, all of it 2 t later), fades by 9 t; sparks along it. It runs along the executor\'s facing when that looks down 10 deg or more (the '
-        f'caller aimed it); a level call from {BEAM_MIN_H / 100:.1f} b or more over the floor is drawn {BEAM_PITCH} deg down. '
-        'The length is cut where the beam\'s body would reach the floor (fx/e/clamp_line); a call lower than 1.35 b over '
-        'the floor narrows the body to twice that height.',
+@preset('qi_beam', 'P-q / P-n the sword-qi beam of length {len} (tenths): a broad magenta beam (2.6 b) round a pink-white '
+        'one and a white core (0.4 of its length at the call, all of it 2 t later), fades by 9 t; sparks along it. Three '
+        'forms by the call. (1) Aimed (P-q: at her blade or chest in the air, `facing` the lock, looking down 10 deg or more): '
+        f'from the executor along its facing. (2) Level from {BEAM_MIN_H / 100:.1f} b or more over the floor: from the '
+        f'executor, drawn {BEAM_PITCH} deg down. In both the length is cut where the body would reach the floor '
+        f'(fx/e/clamp_line). (3) Level from lower (P-n: at the lock point, turned along the band): the band on the ground, '
+        f'CENTRED on the executor ({{len}} / 2 each way: a line hazard through the lock), laid {BAND_Y / 100:.2f} b over the '
+        'floor at full width whatever the call\'s height, shot from its near end to its far end.',
         conv=(('l', '#r', 0.1), ('l1', '#r', 0.04), ('p1', '#r', 0.033), ('p2', '#r', 0.066), ('p3', '#r', 0.095)),
         pre=[f'function {FN}e/hgt',
+             # form 3, the ground band: #b = len / 2 back (twentieths below), the executor's height taken as BAND_Y (dy lifts
+             # / lowers the cards there; the width rule below then gives the full BEAM_W)
+             '$scoreboard players set #b hrFx $(len)', f'scoreboard players set #a hrFx {BAND_Y}',
+             'scoreboard players operation #a hrFx -= #h hrFx',
+             f'execute unless score #pt hrFx matches ..9 run scoreboard players set #b hrFx 0',
+             f'execute if score #h hrFx matches {BEAM_MIN_H}.. run scoreboard players set #b hrFx 0',
+             'execute if score #b hrFx matches 0 run scoreboard players set #a hrFx 0',
+             f'execute unless score #b hrFx matches 0 run scoreboard players set #h hrFx {BAND_Y}',
+             f'execute store result storage {PA}.dy double 0.01 run scoreboard players get #a hrFx',
+             f'execute store result storage {PA}.bk double 0.05 run scoreboard players get #b hrFx',
              # #m = the body's width (tenths): 2 (h - 0.05), at most BEAM_W (a level beam called low keeps over the floor)
              'scoreboard players operation #m hrFx = #h hrFx', 'scoreboard players remove #m hrFx 5',
              'scoreboard players operation #m hrFx *= #c2 hrFx', 'scoreboard players operation #m hrFx /= #c10 hrFx',
@@ -1658,12 +1671,17 @@ BEAM_W = 26                            # tenths: the body's width; narrower wher
              f'function {FN}e/clamp_line'])
 def _p_qi_beam():
     rot = '~ $(pt)'
-    aim = 'execute rotated ~ $(pt) run '
-    return [mac(card('qline', '^ ^ ^', rot, s0=('$(w0)', '$(w0)', '$(l1)'), s1=('$(w)', '$(w)', '$(l)'), life=9, fade=4, dur=1,
-                     col=MAGENTA)),
-            mac(card('qline', '^ ^ ^', rot, s0=('$(wi0)', '$(wi0)', '$(l1)'), s1=('$(wi)', '$(wi)', '$(l)'), life=8, fade=4, dur=1,
-                     col=rgb('#FFC8EA'))),
-            mac(card('qline', '^ ^ ^', rot, s0=(0.15, 0.15, '$(l1)'), s1=(0.36, 0.36, '$(l)'), life=7, fade=3, dur=1, col=WHITE)),
+    org = 'execute positioned ~ ~$(dy) ~ positioned ^ ^ ^-$(bk) '       # (the context is levelled: the band's near end)
+    aim = org + 'rotated ~ $(pt) run '
+
+    def at(line):
+        return org + 'run ' + line
+    return [mac(at(card('qline', '^ ^ ^', rot, s0=('$(w0)', '$(w0)', '$(l1)'), s1=('$(w)', '$(w)', '$(l)'), life=9, fade=4, dur=1,
+                        col=MAGENTA))),
+            mac(at(card('qline', '^ ^ ^', rot, s0=('$(wi0)', '$(wi0)', '$(l1)'), s1=('$(wi)', '$(wi)', '$(l)'), life=8, fade=4,
+                        dur=1, col=rgb('#FFC8EA')))),
+            mac(at(card('qline', '^ ^ ^', rot, s0=(0.15, 0.15, '$(l1)'), s1=(0.36, 0.36, '$(l)'), life=7, fade=3, dur=1,
+                        col=WHITE))),
             mac(aim + dust(DUSTC[2], 1.5, '^ ^ ^$(p1)', (0.5, 0.5, 0.5), 10)),
             mac(aim + dust(DUSTC[2], 1.5, '^ ^ ^$(p2)', (0.5, 0.5, 0.5), 10)),
             mac(aim + dust(DUSTC[1], 1.5, '^ ^ ^$(p3)', (0.6, 0.6, 0.6), 12)),
@@ -2828,7 +2846,9 @@ def _demos():
     D['ult_burst'] = _ev(5, 'chest', f('ult_burst'), snd('ult_cut2'))
     D['sky_mark'] = _ev(5, 'spotg', f('sky_mark')) + _ev(12, 'spotg', f('sky_pillar', r=24), snd('sky_pillar'))
     D['sky_pillar'] = _ev(5, 'spotg', f('sky_pillar', r=24), snd('sky_pillar'))
-    D['qi_beam'] = _ev(5, 'air', f('qi_beam', len=140), snd('band_sweep')) + _ev(25, 'air', f('qi_beam', len=160), snd('band_sweep'))
+    # (P-q's beam from the air; P-n's band as the module calls it: at a floor point, level, 0.6 b up)
+    D['qi_beam'] = (_ev(5, 'air', f('qi_beam', len=140), snd('band_sweep'))
+                    + _ev(25, 'spotg', 'execute positioned ~ ~0.6 ~ run ' + f('qi_beam', len=160), snd('band_sweep')))
     assert set(D) == set(PRESETS), set(D) ^ set(PRESETS)
     return D
 

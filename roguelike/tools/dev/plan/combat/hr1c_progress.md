@@ -1,9 +1,9 @@
 # lane H1c (홍련 rebuild: what the fight looks like) — progress
 
-Branch `wip/combat-hr1c` (from `origin/wip/combat` c7dcc4fbf, merged `origin/wip/combat-hr1` 15fad96a9 = the H1 interface
-commit), worktree `<S>/cb/wt_hr1c`, pack copy `<S>/rp_hr1c` (`<S>` = the scratchpad of `h_common.md`). Contract:
-`hr_design.md` §2.1-§2.3, §5.4, §8.2-§8.6. Owner of the 12 new fight clips in `tools/scarlet_clips.mjs` and of the H1 block
-of `tools/build_mboss_hr_fx.py`.
+Branch `wip/combat-hr1c` (from `origin/wip/combat` c7dcc4fbf; merged: `origin/wip/combat` 6522feef5 and
+`origin/wip/combat-hr1` d4befffdd = lane H1's build 2 with its interface commit 15fad96a9), worktree `<S>/cb/wt_hr1c`, pack
+copy `<S>/rp_hr1c` (`<S>` = the scratchpad of `h_common.md`). Contract: `hr_design.md` §2.1-§2.3, §5.4, §8.2-§8.6. Owner of
+the 12 new fight clips in `tools/scarlet_clips.mjs` and of the H1 block of `tools/build_mboss_hr_fx.py`.
 
 ## Done
 - **The 12 fight clips** (`tools/scarlet_clips.mjs`, section "the rebuilt fight kit"; H1's `PF(...)` stand-in block removed,
@@ -12,7 +12,7 @@ of `tools/build_mboss_hr_fx.py`.
   What each swing is, for H1's effects (her frame: + = her right):
   | clip | motion at the hit ticks |
   |---|---|
-  | `grog_in` | arms flung wide 2, knees buckle 3, topples backward, the hat leaves her head 6 and lands on DOWN's spot 10, `DOWN` 12 (= `down` 0); `blend 2` (the snap out of any pose is the hit) |
+  | `grog_in` | arms flung wide 2, knees buckle 3, topples backward with the feet still down, the hat leaves her head 6, arcs up at her right and lands on DOWN's spot 10, `DOWN` 10-12 (= `down` 0); `blend 2` (the snap out of any pose is the hit) |
   | `d4` | coil right, one turn to her left with the blade flat at chest height 9-15 (h1 14); rising vertical fan 32-35 (h2 34); two-handed vertical cut 42-45 (h3 44); flat forehand left → right across her front 52-56 (h4 54) |
   | `tri` | thrust at full reach (h0 14); three descending crescents: upper right → lower left (h1 38), upper left → lower right (h2 48), upper right → lower left with a lunging step (h3 60). Planes tilted 58° / 58° / 52° from the vertical |
   | `rings` | one body turn per ring with the blade flat at chest height, alternating: r1 to her left, r2 to her right, r3 left, r4 right, r5 left. A turn runs h − 5 … h + 1, the coil for the next ring is reached at h + 4 |
@@ -23,7 +23,7 @@ of `tools/build_mboss_hr_fx.py`.
   | `mx` | low crouch, the blade low behind her left; the X in two strokes round its tick: rising lower left → upper right 13-15, turned over above her 16, falling upper left → lower right 17-20; swirl up over her right (cue 21), one turn to her left with the blade flat (dome 28) |
   | `nb` | hangs bowed over the player; b1 from her upper right down to her left front (its plane 30° left of her aim), b2 from her upper left down to her right front (30° right), b3 a straight two-handed chop; lands low 46 |
   | `q_grab` | sinks, the open right hand reaching out (the blade low at her left); flies flat with the arm stretched ahead 16-19; the hand closes before her (grab 20); 20-34 = the miss (snatches at air, straightens) |
-  | `q_air` | both arms heave up (throw 0-2), diagonal cut from her upper right (beam 22), the blade reversed point down before her in both hands (cue 31), comes down behind it (hit 38, land 40); second leap: the blade thrust straight up, the free arm spread (52-71), brought down to point at the player (pillar 74), lands 84 |
+  | `q_air` | both arms heave up (throw 0-2), diagonal cut from her upper right (beam 22), rises a little with the blade reversed straight down before her chest in both hands (cue 31), comes down behind it (hit 38, land 40); second leap: the blade thrust straight up, the free arm spread (52-71), brought down to point at the player (pillar 74), lands 84 |
 - **`tools/scarlet_retarget.mjs`**: one line, `HAT_FLIGHTS.grog_in` (the hat's flight 6-10 from her head to DOWN's leg spot).
   The file has no owner in §8.3 and the declared flights live there; the line stands apart from the `HAT_FLIGHTS` literal so
   H2c's edits of the `repel` / `ending` rows merge cleanly.
@@ -37,47 +37,67 @@ of `tools/build_mboss_hr_fx.py`.
   - existing presets at new sizes: `yellow_tell {t}` with **t ≥ 100 = the big tell** (Ø 2.0 b, flare 5 b) for t − 100 ticks
     (kcut: `{t:106}`); `glint {c:2}` = the parry cue: three crossed sparkles to 1.8 b for 7 t (the other colours unchanged);
     `qi_ring` needs nothing new (rendered at r 26 / 30 chest height and r 45 c 2 knee height).
-  - sounds `parry_cue flash_blue ult_cut1 ult_cut2 sky_pillar`: recipes are in `api.KIT_SOUND_RECIPES` (H1's interface
-    commit, equal to §2.1-§2.2); the kit writes `fx/snd/<name>`.
+  - sounds `parry_cue flash_blue ult_cut1 ult_cut2 sky_pillar` (+ H1's `kcut_go`): recipes are `api.KIT_SOUND_RECIPES`
+    (equal to §2.1-§2.2); the kit writes `fx/snd/<name>`.
+- **Fitted to lane H1's calls** (its build 2, merged here; `pat_p1` / `pat_p2` / `pat_ghost` / `test_scarlet` pass on the
+  merged tree):
+  - `ult_web` / `ult_burst` are laid over the floor whatever the caller's height (H1 calls them at her body, 1.2 b up);
+    `ult_web` draws the world only, the `web` overlay is the module's `fx/hud/ovl` call (H1 calls it beside the preset).
+  - `qi_beam` has three forms by the call: aimed (P-q: `facing` the lock from the air → along the facing), level from
+    ≥ 2.5 b (35° down), and level from lower = **the ground band of P-n, centred on the executor** (H1 calls it at the lock
+    point 0.6 b up, turned along the band; the hazard line runs len / 2 each way through the lock), laid 1.35 b over the
+    floor at full width.
 - **Tools / suites** (new or changed, all under `tools/dev/sim/hr/`):
   - `tests/test_clips_h1c.py` (new): the 12 clips as shipped — contract, joins with the stance clips / `q_grab` → `q_air` /
     `grog_in` → `down`, no root motion, airborne spans (§8.5), the blade at every hit tick against its hazard's shape, the
     blade readable from the F5 lens at every cue / flash tick.
-  - `tests/test_kit.py`: counts for the rebuilt contract (50 + 6 presets, 104 + 5 sounds), heights / variants for the six
-    presets, the `web` glyph size, a new section `hr1c` (the yellow sizes, the cue, flash_blue's timing, the web lines and
-    overlay, the burst, the sky mark = lines only, the pillar, the beam's pitch rule and floor clamp, the sound recipes, no
-    new sprite px); the module scan runs whenever `boss/scarlet/core` exists.
+  - `tests/test_kit.py`: counts for the rebuilt contract (50 + 6 presets, 104 + 5 sounds + `kcut_go` once declared),
+    heights / variants for the six presets, the `web` glyph size, a new section `hr1c` (the yellow sizes, the cue,
+    flash_blue's timing, the web lines at any caller height, the burst, the sky mark = lines only, the pillar, the beam's
+    three forms and floor clamp, the sound recipes, no new sprite px, no particle that needs options written without
+    them); the pitch section knows the aimed beam.
   - `s1k/render/render_hr.py` (new): effect strips of the kit from the F5 camera (the hr kit had no renderer in the repo).
+
+## Gates (the merged tree, 11-10)
+- Builds: rig 59 clips, 0 stand-ins, 8 cinematic placeholders (H2c's); kit 56 presets, 110 sounds, 36 glyphs;
+  `regen_all.sh` 0 failures; `check_mboss_pack.py` 0 problems; `api.py --check` ok.
+- `test_clips_h1c.py` 296 / 296. `test_kit.py` 15 062 / 15 072: the 10 failures are other lanes' (see Requests).
+- `test_rig.py` (run statement by statement: it stops at its 11-06 cinematic section): 140 passed, 13 failed, none in
+  the 12 fight clips (the 47-clip count, the 8 cinematic placeholders × 6, `seq.py`, the intro seat × 2, the skin file
+  that is not in the container, `scarlet_retarget --dump all` on the stale cinematic rows).
+- Lane H1's suites on the merged tree: `pat_p1` 529 / 529, `pat_p2` 67 / 67, `pat_ghost` 65 / 65, `test_scarlet` 47 / 47.
+- Real server: `loadcheck.sh` 0 function load failures. Pack: `rplint.py` 0, `atlas_px.py` 12 919 040 px (unchanged).
 
 ## Decisions / deviations
 - `yellow_tell` at Ø 2.0: the size rides on `{t}` (t ≥ 100) so `api.KIT_PRESETS['yellow_tell'] = ['t']` and every existing
   call stay valid; no API change needed from H1.
-- `qi_beam`: the design says "pitched 35°". The preset follows the executor's rotation when it looks down ≥ 10° (a caller
-  that aims it with `facing`), and draws 35° down when called level from ≥ 2.5 b over the floor; its length is cut so the
-  2.6-b body ends over the floor. Built on the `light_column` sprite (crossed quads, seen from every side) instead of the
-  `qi_band` sprite (a single sheet: edge-on to the player it is aimed at).
-- `ult_web`: the 12 world lines are kept low and thin (0.5-2.4 b up where they pass the executor, 0.16 b wide): a line near
-  the F5 lens would fill the screen; the screen-space web is the overlay.
+- `qi_beam`: the design says "the `qi_band` sprite, pitched 35°". Built on the `light_column` sprite (crossed quads, seen
+  from every side; `qi_band` is a single sheet, edge-on to the player it is aimed at); the pitch follows the caller's aim,
+  35° only for a level call in the air; the P-n band is the centred ground form (above).
+- `ult_web`: the 12 world lines are kept low and thin (0.5-2.4 b over the floor where they pass the executor, 0.16 b
+  wide): a line near the F5 lens would fill the screen; the screen-space web is the overlay.
 - `sky_pillar {r}`: the column is 1.25 r wide (3 b at r 24), the shock ring on the floor has radius r: the pillar lands on
-  the player, 3.5 b before the lens.
+  the player, 3.5 b before the lens. No `flash` particle (26.x wants a colour, and a flash at the player whites the view).
 - "iai stance" of `ult` / `mx`: the blade is laid along the hip scabbard, not sheathed (the fight clips' `a9` convention);
   a real sheathe / draw needs the cinematic clips' patches.
 - `kcut`: the right hand reaches down but does not touch the floor (the player-size arm is 0.3 b short from that crouch).
 - `blue`: the blade is presented high and out to her left (not upright before her face: there it crosses the brim).
 - `mx`: the two strokes of the X fall on ticks 13-15 and 17-20 round `x 16` (≤ 120°/t does not allow both inside 14-16).
+- `q_air` 30-35: she hangs 0.3 b higher in the clip while the blade points straight down (the rig keeps every blade over
+  the clip's floor; the pelvis stays on the anchor's axis, so no root motion in the plane).
 
 ## Requests to other lanes
-- **H1**: (1) kcut's big yellow: `K.p('yellow_tell', t=106)`. (2) `rings` in P1 has four rings: play the next clip (the
-  stance or `ult`) by clip tick 49 — the fifth turn starts there (the clip's 47-49 is the coil, so a start of `ult` at 50
-  blends from it). (3) `qi_beam`: call it at her blade / chest in the air, either rotated `facing` the lock or level.
-  (4) `ult_web {t:20}` / `ult_burst` / `sky_mark` / `sky_pillar` take the floor point (the lock) as executor; `sky_mark`
-  lies across the executor's facing. (5) `flash_blue {t:15}` at clip tick 0 between `follow_on` / `follow_off`: yellow 0-4,
-  blue 4-19. (6) `test_rig.py` still holds the 47-clip contract and the 11-06 cinematic events (it stops at its cine
-  section): H1 / H2 update it; until then `tests/test_clips_h1c.py` covers the new fight clips.
-- **H2c**: the `gold` glyph goes next to part 1 of the H1 block (after the `GLYPHS` literal, before its assert); both
-  blocks add one `GLYPHS[...]` line there, so the merge may ask to keep both lines.
-- **lead**: `test_kit.py` fails 3 checks only because H2's sequences are stand-ins (`calls: … kick flash kept`, `calls: 300
-  kit calls`, `view: 3 player-anchored effects`).
+- **H1**: (1) kcut's big yellow: `api.FLASH` gives every yellow `yellow_tell {t:6}`; kcut's is `{t:106}` (Ø 2.0, §2.2).
+  (2) `rings` in P1 has four rings: play the next clip by clip tick 49 — the fifth turn starts there (`RINGS_END[1] = 54`
+  shows 5 ticks of it; `ULT_AFTER 6` = tick 50 blends from the coil, fine). (3) `test_kit.py`'s `calls` / `qline` sections
+  still describe the 11-06 module: `follow_on .. follow_off` wants ≥ 4 wrapped tells (a13 / r2 are gone: 3), A9's `qi_cut`
+  with `core.a9` (now `core.dash`), kcut's three `qi_line` at markers (the harness has no lock marker), tri's `qi_line`
+  axis: 7 failures, H1's module or the suite's expectations. (4) `test_rig.py` still holds the 47-clip contract and the
+  11-06 cinematic events.
+- **H2 / H2c**: the `gold` glyph goes next to part 1 of the H1 block (after the `GLYPHS` literal, before its assert); both
+  blocks add one `GLYPHS[...]` line there, so the merge may ask to keep both lines. `test_kit.py`'s 3 other failures wait
+  for the real sequences (`keep_on .. keep_off` round CS3's kick flash, the 3 player-anchored effects, the repel column /
+  the judge's starburst in first person).
 
 ## Pack files (added / changed in `<S>/rp_hr1c`; all regenerated by the two generators)
 - `assets/rlk/font/mboss_hr.json` (5 providers more), `assets/rlk/textures/font/mboss_hr/web.png`, `web_1.png` … `web_4.png`.

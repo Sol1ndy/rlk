@@ -1,7 +1,7 @@
-# The gauntlet set #done (@s = body; S4: at REPEL_T after a deflect, at FAIL60_P2_T after the A8 fail): #gres decides.
-# A8: deflect -> CS2 (repel {at:60}); fail -> P2 (the fail-60 hit and g_reform were the gauntlet's). A13: deflect -> CS3
-# (repel {at:5}); fail (the instant death did not end the run) -> the revive stance -> A13 again. F1 (HR-06): a test's
-# forced fail (#pipoff, tests 23 / 29) applies to this one judge only.
+# The gauntlet set #done (@s = body; at the judge with the gauge at 0, at FAIL60_P2_T after the G1 fail, 12 t after a
+# survived G2 fail): #gres decides. Gauge 0 -> the repel {at:60} (G1) / {at:5} (G2), started in this tick. G1 fail -> P2
+# (the fail-60 hit and g_reform were the gauntlet's). G2 fail (the instant death did not end the run) -> the revive
+# stance -> G2 again. A test's forced fail (#pipoff, tests 23 / 29) applies to this one judge only.
 scoreboard players set #done hr 0
 scoreboard players set #pat hr 0
 scoreboard players set #pt hr 0

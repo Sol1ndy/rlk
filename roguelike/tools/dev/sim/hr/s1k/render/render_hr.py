@@ -377,14 +377,16 @@ STRIPS = {
     'rings': ('qi_ring {r:26,c:1} at chest height (y + 1.1) / {r:30} / {r:45,c:2} at knee height (y + 0.7)', 6, 0,
               [(0, 'y1.1', fx('qi_ring', r=26, c=1)), (10, 'y1.1', fx('qi_ring', r=30, c=1)), (20, 'y0.7', fx('qi_ring', r=45, c=2))],
               (2, 5, 12, 15, 22, 25), None),
-    'ult_web': ('ult_web {t:20} at the lock (with the overlay web), then ult_burst', 7, 0,
-                [(0, 'lock', fx('ult_web', t=20)), (20, 'lock', fx('ult_burst'))], (1, 3, 10, 19, 21, 24), 'web'),
+    'ult_web': ('ult_web {t:22} at her body 1.2 b up as the module calls it (with the overlay web 20 t), then ult_burst', 7, 0,
+                [(0, 'chest', fx('ult_web', t=22)), (22, 'chest', fx('ult_burst'))], (1, 3, 10, 19, 23, 26), 'web'),
     'sky': ('sky_mark at the lock, 7 t later sky_pillar {r:24}', 8, 5, [(0, 'lock', fx('sky_mark')), (7, 'lock', fx('sky_pillar', r=24))],
             (1, 3, 6, 8, 10, 14), None),
     'sky_level': ('the same with her on the ground 10 b away (the camera level: the flash line at the feet)', 10, 0,
                   [(0, 'lock', fx('sky_mark')), (7, 'lock', fx('sky_pillar', r=24))], (1, 3, 6, 8, 10, 14), None),
     'qi_beam': ('qi_beam {len:140} from her blade 5 b up, aimed at the lock; then {len:160} called level', 7, 5,
                 [(0, 'aim', fx('qi_beam', len=140)), (12, 'blade', fx('qi_beam', len=160))], (1, 2, 5, 13, 14, 17), None),
+    'nb_band': ('qi_beam {len:160} as P-n calls it: at the lock point 0.6 b up, level, 30 deg off her aim (her 5 b up, 7 b away): '
+                'the band through the lock', 7, 5, [(0, 'band', fx('qi_beam', len=160))], (1, 2, 3, 5, 7, 9), None),
 }
 
 
@@ -398,7 +400,7 @@ def run_strip(key, pw=560, ph=315):
     her = BOSS + np.array((0, up, 0))
     ply = BOSS + np.array((0, 0, dist))
     where = {'chest': her + (0, 1.2, 0), 'blade': her + (0.6, 1.5, 0.4), 'feet': her, 'y1.1': her + (0, 1.1, 0), 'y0.7': her + (0, 0.7, 0),
-             'lock': ply, 'pchest': ply + (0, 1.1, 0), 'aim': her + (0.3, 1.3, 0.4)}
+             'lock': ply, 'pchest': ply + (0, 1.1, 0), 'aim': her + (0.3, 1.3, 0.4), 'band': ply + (0, 0.6, 0)}
     # the F5 camera: 3.5 b from the seat 0.5 b over the avatar's head (2.5 b up), looking 14 deg down past it (her feet show
     # over the avatar's head from about 5 b); raised toward her when she is in the air
     eye = ply + np.array((0, 2.5 + 3.5 * math.sin(math.radians(14)), 3.5 * math.cos(math.radians(14))))
@@ -413,7 +415,7 @@ def run_strip(key, pw=560, ph=315):
         for tk, wh, line in calls:
             if tk == k:
                 pos = where[wh]
-                rot = (0.0, 0.0)
+                rot = (-30.0, 0.0) if wh == 'band' else (0.0, 0.0)
                 if wh == 'aim':
                     d = ply + (0, 1.0, 0) - pos
                     rot = (0.0, -math.degrees(math.atan2(d[1], math.hypot(d[0], d[2]))))

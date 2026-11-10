@@ -1,6 +1,7 @@
 # A fight-phase tick (P1 / P2; @s = body): the phase clock, AI samples, the triggers (A6, the counter, the flinch), then
 # the running pattern or the recovery. F1 (HR-04): while a floor step is reserved (#fl) neither trigger starts a move
 # (CS1 / the A13 lead-in come at the next decision; ai/phase drops the flags at the next fight phase).
+function rlk:boss/scarlet/core/ev
 scoreboard players add #ai_pht hr 1
 scoreboard players operation #t hr = #clk hr
 scoreboard players operation #t hr %= #c5 hr

@@ -2192,7 +2192,7 @@
    "args": [
     "len"
    ],
-   "doc": "P-q / P-n the diagonal sword-qi beam of length {len} (tenths; at her blade or chest in the air, rotated toward the lock): a broad magenta beam (2.6 b) round a pink-white one and a white core shoots from the executor (0.4 of its length at the call, all of it 2 t later), fades by 9 t; sparks along it. It runs along the executor's facing when that looks down 10 deg or more (the caller aimed it); a level call from 2.5 b or more over the floor is drawn 35 deg down. The length is cut where the beam's body would reach the floor (fx/e/clamp_line); a call lower than 1.35 b over the floor narrows the body to twice that height.",
+   "doc": "P-q / P-n the sword-qi beam of length {len} (tenths): a broad magenta beam (2.6 b) round a pink-white one and a white core (0.4 of its length at the call, all of it 2 t later), fades by 9 t; sparks along it. Three forms by the call. (1) Aimed (P-q: at her blade or chest in the air, `facing` the lock, looking down 10 deg or more): from the executor along its facing. (2) Level from 2.5 b or more over the floor: from the executor, drawn 35 deg down. In both the length is cut where the body would reach the floor (fx/e/clamp_line). (3) Level from lower (P-n: at the lock point, turned along the band): the band on the ground, CENTRED on the executor ({len} / 2 each way: a line hazard through the lock), laid 1.35 b over the floor at full width whatever the call's height, shot from its near end to its far end.",
    "cards": 3,
    "c_split": [],
    "ambient": false,
@@ -3239,6 +3239,13 @@
     "item.trident.thunder",
     0.5,
     1.9
+   ]
+  ],
+  "kcut_go": [
+   [
+    "item.trident.riptide_3",
+    0.6,
+    1.4
    ]
   ]
  },

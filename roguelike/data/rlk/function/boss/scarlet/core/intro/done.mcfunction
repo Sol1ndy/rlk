@@ -18,6 +18,7 @@ function rlk:boss/scarlet/core/floors
 scoreboard players operation #mbFloor mb = #fl60 hr
 execute as @e[type=minecraft:item_display,tag=rlk_hr_deco_seat_rock] run function rlk:boss/scarlet/fx/prop/seat_rock {look:"bare"}
 kill @e[tag=rlk_hr_deco_seat_rock]
+function rlk:boss/scarlet/core/ev0
 function rlk:boss/scarlet/ai/phase
 function rlk:boss/scarlet/core/looks
 function rlk:boss/scarlet/ai/rec_start

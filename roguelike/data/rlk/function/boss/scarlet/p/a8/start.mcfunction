@@ -1,4 +1,4 @@
-# A8 자영 연참 (the 60 % gauntlet; S4, p_ghost.py): pattern tick 0 (@s = the body, at it; clock #pt hr).
+# A8 자영 연참 (G1: the 60 % gauntlet; S4, p_ghost.py): pattern tick 0 (@s = the body, at it; clock #pt hr).
 scoreboard players set #done hr 0
 function rlk:boss/scarlet/rig/play/g_tell
 function rlk:boss/scarlet/rig/look/form/ghost

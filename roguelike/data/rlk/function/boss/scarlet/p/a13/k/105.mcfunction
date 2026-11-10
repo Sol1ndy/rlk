@@ -1,2 +1,2 @@
 # A13 pattern tick 105.
-function rlk:boss/scarlet/rig/play/g_sweep
+function rlk:boss/scarlet/g/cut/aim {s:114}

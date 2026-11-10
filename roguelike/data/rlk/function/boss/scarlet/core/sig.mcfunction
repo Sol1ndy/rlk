@@ -1,5 +1,6 @@
 # The sequence signal (@s = body, right after the tick that set it; api.SIG): repel hp1..hp3 -> the HP step of the
-# chain (api.COUNTER_PM per mille of mhpM, true damage; kill = true_pct 100), refill -> shield/arm. Reset to 0.
+# chain (api.COUNTER_PM per mille of mhpM, true damage; kill = true_pct 100), refill -> shield/arm (the gauge 5/5).
+# Reset to 0.
 scoreboard players operation #t hr = #sq_sig hr
 scoreboard players set #sq_sig hr 0
 execute if score #t hr matches 4 run return run function rlk:boss/scarlet/shield/arm

@@ -1,5 +1,6 @@
 # A10 pattern tick 10
 function rlk:boss/scarlet/fx/follow_on
-execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.0 ~ run function rlk:boss/scarlet/fx/p/yellow_tell {t:8}
+function rlk:boss/scarlet/rig/anchor/chest
+execute at @e[type=minecraft:marker,tag=rlk_hr_anchor,limit=1] rotated as @s run function rlk:boss/scarlet/fx/p/yellow_tell {t:6}
 function rlk:boss/scarlet/fx/follow_off
 execute at @s run function rlk:boss/scarlet/fx/snd/yellow_chime

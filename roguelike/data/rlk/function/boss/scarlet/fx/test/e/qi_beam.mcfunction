@@ -2,5 +2,5 @@
 # Demo "qi_beam" events (as the stand-in; #dt = the demo tick).
 execute if score #dt hrFx matches 5 at @s rotated as @s rotated ~ 0 positioned ~ ~6 ~ run function rlk:boss/scarlet/fx/p/qi_beam {len:140}
 execute if score #dt hrFx matches 5 at @s rotated as @s rotated ~ 0 positioned ~ ~6 ~ run function rlk:boss/scarlet/fx/snd/band_sweep
-execute if score #dt hrFx matches 25 at @s rotated as @s rotated ~ 0 positioned ~ ~6 ~ run function rlk:boss/scarlet/fx/p/qi_beam {len:160}
-execute if score #dt hrFx matches 25 at @s rotated as @s rotated ~ 0 positioned ~ ~6 ~ run function rlk:boss/scarlet/fx/snd/band_sweep
+execute if score #dt hrFx matches 25 at @s rotated as @s rotated ~ 0 positioned ^ ^ ^3 run execute positioned ~ ~0.6 ~ run function rlk:boss/scarlet/fx/p/qi_beam {len:160}
+execute if score #dt hrFx matches 25 at @s rotated as @s rotated ~ 0 positioned ^ ^ ^3 run function rlk:boss/scarlet/fx/snd/band_sweep

@@ -563,6 +563,7 @@ for name, a in (('qi_cut', {'len': 40}), ('qi_cut', {'len': 120}), ('qi_band', d
         REAL.setdefault(name, set()).add(tuple(sorted(a.items())))
 check(len(REAL) >= 30, f'pitch: the module calls {len(REAL)} presets with real arguments')
 npitch = 0
+PITCH_AIMED = {'qi_beam'}
 for name in sorted(REAL):
     for args in sorted(REAL[name], key=str):
         a = dict(args)
@@ -584,6 +585,11 @@ for name in sorted(REAL):
                     check(low is None or low >= FLOOR - 1e-3, f'{tag}: {kind(s, e)} {(low or 0) - FLOOR:.2f} b below the floor')
                 if pitch == 0.0:
                     ref = snap
+                elif name in PITCH_AIMED:
+                    # (lane H1c) the beam is aimed by the caller's downward look (`facing` the lock from the air): only an
+                    # upward look is drawn as the level call; the section "H1 block" checks its pitch rule
+                    if pitch < 0:
+                        check(snap == ref, f'{tag}: an upward look is drawn like the level call')
                 elif name not in PITCHED:
                     check(snap == ref, f'{tag}: not level (the executor pitch moved / tilted its cards)')
 check(npitch > 200, f'pitch: {npitch} runs')
@@ -1300,9 +1306,12 @@ if HR_PRESETS:
         check(abs(end_scale(s, cols[0])[0] * 0.25 - r / 10 * 1.25) < 1e-3 and end_scale(s, cols[0])[1] >= 16, f'hr1c: sky_pillar r {r}: the column is 1.25 r wide, 16 b tall')
         check(abs(end_scale(s, ring[0])[0] - r / 10) < 1e-3, f'hr1c: sky_pillar r {r}: the ring has radius r')
         check(all(abs(e.rot[1]) < 1e-6 for e in cols + ring), 'hr1c: sky_pillar is upright whatever the executor\'s pitch')
-    # ---- qi_beam {len}: along an aimed executor, 35 deg down from a level one in the air, level when low; never into the floor
+    # ---- qi_beam {len}: along an aimed executor, 35 deg down from a level one in the air (never into the floor); a level call
+    #      from under 2.5 b = the ground band of P-n: centred on the executor, 1.35 b over the floor, full width (lane H1 calls
+    #      it at the lock point, 0.6 b up)
     for h, pitch, want_p, tag in ((6.3, 40.0, 40, 'aimed'), (6.3, 0.0, G.BEAM_PITCH, 'level in the air'), (6.3, 5.0, G.BEAM_PITCH, 'nearly level'),
-                                  (1.2, 0.0, 0, 'level and low'), (2.0, 60.0, 60, 'aimed steeply from low'), (6.3, -30.0, G.BEAM_PITCH, 'looking up')):
+                                  (1.2, 0.0, 0, 'level and low'), (0.6, 0.0, 0, 'the band at the lock'), (0.0, -20.0, 0, 'the band, looking up'),
+                                  (2.0, 60.0, 60, 'aimed steeply from low'), (6.3, -30.0, G.BEAM_PITCH, 'looking up')):
         for ln in (140, 160):
             s = fresh()
             s.run(G.fx('qi_beam', len=ln), pos=(X0, FLOOR + h, Z0), rot=(0.0, pitch))
@@ -1311,7 +1320,16 @@ if HR_PRESETS:
             check(all(abs(e.rot[1] - want_p) < 1e-6 for e in cs), f'hr1c: qi_beam {tag}: pitch {want_p} ({cs[0].rot[1]})')
             body = max(cs, key=lambda e: end_scale(s, e)[0])
             w, lg = end_scale(s, body)[0], end_scale(s, body)[2]
-            check(abs(w - min(2.6, max(0.6, 2 * (h - 0.05)))) < 0.11, f'hr1c: qi_beam {tag}: the body is {w} b wide')
+            band = want_p == 0
+            if band:      # rot yaw 0 = +z: the band starts len / 2 before the executor and ends len / 2 beyond it
+                check(all(abs(e.pos[0] - X0) < 1e-6 and abs(e.pos[2] - (Z0 - ln / 20)) < 1e-6 and abs(e.pos[1] - FLOOR - G.BAND_Y / 100) < 1e-6
+                          for e in cs) and abs(lg - ln / 10) < 1e-6,
+                      f'hr1c: qi_beam {tag} len {ln}: centred on the executor, {G.BAND_Y / 100} b over the floor ({cs[0].pos}, {lg})')
+                check(abs(w - G.BEAM_W / 10) < 1e-6, f'hr1c: qi_beam {tag}: the band has the full width ({w})')
+            else:
+                check(all(math.dist(e.pos, (X0, FLOOR + h, Z0)) < 1e-6 for e in cs), f'hr1c: qi_beam {tag}: from the executor')
+                check(abs(w - min(2.6, max(0.6, 2 * (h - 0.05)))) < 0.11, f'hr1c: qi_beam {tag}: the body is {w} b wide')
+            h = G.BAND_Y / 100 if band else h
             end_y = h - lg * math.sin(math.radians(want_p))
             check(lg <= ln / 10 + 1e-6 and (end_y >= 1.3 or want_p == 0), f'hr1c: qi_beam {tag} len {ln}: {lg:.1f} b long, ends {end_y:.2f} b up')
             if want_p and h > 3:

@@ -1,5 +1,5 @@
-# The skip (@s = body): the prompt gone, the sequence's skip (the black, the intro cleared, her E10 pose ≤ 7 b
-# from the player), then the clock jumps: the next tick is 1290 (intro_end 0, line 11).
+# The intro skip (@s = body): the prompt gone, the sequence's skip (the black, its state at tick 1290), then the
+# clock jumps: the next tick is 1290.
 function rlk:boss/scarlet/fx/hud/skip {s:5}
 scoreboard players set #skip hr -1
 scoreboard players set #skp hr 0
