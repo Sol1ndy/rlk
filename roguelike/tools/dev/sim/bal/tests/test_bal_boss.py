@@ -168,7 +168,8 @@ BOSSES = {
     'arlecchino': dict(kind='kn', pat='#pat', po='kn', grog=('#pat', 'kn', 50), prot=10, refill=29, free=None, free_wait=500),
     'spproto': dict(kind='special', pat='#spPat'),
     'tachy': dict(kind='special', pat='#pat', po='tk', grog=('#stag', 'tk', 100), prot=20, refill='strike'),
-    'scarlet': dict(kind='sc', pat='#pat', po='hr', prot=21, refill=25),
+    # 홍련: her rows live in hr/tests/test_bal_hr.py since the rebuild on the new combat (hr_design §6.1: the groggy is
+    # grog_in -> down -> kipup, no module groggy of her own to refill it, the gauntlets hold #mbBalOff)
 }
 
 
