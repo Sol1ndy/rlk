@@ -20,8 +20,11 @@ execute store result score #ic2 tmp if items entity @s hotbar.* *[minecraft:cust
 scoreboard players operation #ic tmp += #ic2 tmp
 execute unless score #ic tmp = @s invCnt run scoreboard players set @s invDirty 2
 scoreboard players operation @s invCnt = #ic tmp
-# 발전과제 이벤트(inventory_changed) → dirty
-execute if score @s invEvt matches 1.. run scoreboard players set @s invDirty 2
+# 발전과제 이벤트(inventory_changed) → dirty. 단 F(양손 바꾸기)로 무기 · 스킬 · 폭발(UI) 아이템이 왼손에 와 있으면 그 이벤트는
+# 이 틱 hotbar/tick 이 되돌리는 UI 이동이라 정렬할 것이 없다(같은 틱에 rlk 아이템 수가 바뀌었으면 위의 프로브가 잡음). 지도(vMap)
+# 중에는 hotbar/tick 이 왼손을 비우지 않으므로 그대로 dirty
+execute if score @s invEvt matches 1.. unless items entity @s weapon.offhand *[minecraft:custom_data~{rlk_ui:{}}] run scoreboard players set @s invDirty 2
+execute if score @s invEvt matches 1.. if score @s vMap matches 1 run scoreboard players set @s invDirty 2
 # 폴백: 10초마다 강제 1회
 scoreboard players remove @s manageTick 1
 execute if score @s manageTick matches ..0 run scoreboard players set @s invDirty 2
