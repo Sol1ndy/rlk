@@ -12,7 +12,7 @@ floor, a turn above 120 deg per tick, the blade in her body at an event, a fist 
   contract  names / lengths / events = api.CLIPS, owner H1, authored (no placeholder), a footage source, the sword held in
             her left hand all through, every correction guard inside its bound, two-hand contacts <= 0.12 b
   joins     tick 0 and the last tick = the stance (idle; idle2 for the P2 clips) within the anchor tolerances of test_rig;
-            q_air 0 = q_grab 20 (the grab hands over), grog_in 12 = `down` 0 (the hat on DOWN's spot)
+            q_air 0 = q_grab 20 = q_grab 21 (the grab hands over; the module branches at 21), grog_in 12 = `down` 0 (the hat on DOWN's spot)
   root      no root motion: the pelvis stays within 0.16 b of the anchor's axis at every tick
   air       airborne spans: nb one span <= 44 t, q_air two spans <= 38 t each (§8.5), none in the ground clips
   hits      per hazard of §2.2 the blade does what the hazard's shape needs at its hit tick: a forward cut crosses her
@@ -162,8 +162,9 @@ for c in NEW:
     ln = api.CLIPS[c][0]
     st = 'idle2' if c in P2 else 'idle'
     if c == 'q_air':
-        bad = meets(c, 0, 'q_grab', api.ev('q_grab', 'grab'))
-        check(not bad, 'joins: q_air 0 = q_grab 20 (the grab hands over to the throw)', str(bad))
+        for tg in (api.ev('q_grab', 'grab'), getattr(api, 'Q_AIR_T0', 21)):      # (the module takes the branch at Q_AIR_T0)
+            bad = meets(c, 0, 'q_grab', tg)
+            check(not bad, f'joins: q_air 0 = q_grab {tg} (the grab hands over to the throw)', str(bad))
     elif c != 'grog_in':            # (grog_in starts from any pose: blend 2)
         bad = meets(c, 0, st, 0)
         check(not bad, f'joins: {c} 0 = {st} 0', str(bad))

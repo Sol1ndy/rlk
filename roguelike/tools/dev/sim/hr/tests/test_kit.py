@@ -327,6 +327,7 @@ if MERGED or (shutil.which('git') and subprocess.run(['git', '-C', '/home/user/r
         def between(lines, i, on, off):
             return any(x.endswith(on) for x in lines[:i]) and any(x.endswith(off) for x in lines[i + 1:])
         kept, follow, a9 = [], [], []
+        DASHES = ('p/a9/', 'p/hcut/', 'p/kcut/', 'p/blue/')
         for p in sorted(x for x in MOD.rglob('*.mcfunction') if not x.relative_to(MOD).as_posix().startswith('fx/')):
             rel = p.relative_to(MOD).as_posix()
             LL = [x for x in p.read_text(encoding='utf-8').split('\n') if x and not x.startswith('#')]
@@ -334,20 +335,22 @@ if MERGED or (shutil.which('git') and subprocess.run(['git', '-C', '/home/user/r
             for i, x in enumerate(LL):
                 if (fatal and i < fatal[0] and re.search(r'fx/p/(scarlet_line|petal_burst)\b', x)) or 'fx/p/kick_flash' in x:
                     kept.append((rel, between(LL, i, 'fx/keep_on', 'fx/keep_off')))
-                # HR-23's list: the A13 / R2 / A10 yellow tells, A6's blink bubble, A4's ribbon (A9's tell stands before its dash)
-                if re.search(r'fx/p/(yellow_tell|blink_bubble|qi_ribbon)\b', x) and rel.startswith(('p/a4/', 'p/a6/', 'p/a10/',
-                                                                                                       'p/a13/', 'p/r2/')):
+                # HR-23 on the rebuilt fight (hr_design §2.1): every flash on her chest (api.FLASH: yellow_tell, star4, flash_blue),
+                # A6's blink bubble and A4's ribbon travel with her
+                if re.search(r'fx/p/(yellow_tell|flash_blue|star4|blink_bubble|qi_ribbon)\b', x) and rel.startswith('p/'):
                     follow.append((rel, between(LL, i, 'fx/follow_on', 'fx/follow_off')))
-                if 'fx/p/qi_cut' in x and rel.startswith('p/a9/'):
-                    a9.append((rel, x.endswith('with storage rlk:hr core.a9')))
-        check(len(kept) >= 4 and all(ok for _, ok in kept), f'calls: the instant deaths\' line / petals and CS3\'s kick flash are kept '
+                if 'fx/p/qi_cut' in x and rel.startswith(DASHES):
+                    a9.append((rel, x.endswith('with storage rlk:hr core.dash')))
+        # (the rebuilt module: the instant death of p/a13/fail; CS3's kick flash is checked once lane H2's sequence calls it)
+        check(len(kept) >= 3 and all(ok for _, ok in kept), f'calls: the instant deaths\' line / petals (and a kick flash) are kept '
                                                             f'(keep_on .. keep_off) {kept}')
-        check(len(follow) >= 4 and all(ok for _, ok in follow), f'calls: the yellow tells, the blink bubble and the A4 ribbon follow '
-                                                                f'her (follow_on .. follow_off) {follow}')
-        hz9 = [x for p in (MOD / 'p/a9').rglob('*.mcfunction') for x in p.read_text(encoding='utf-8').split('\n')
-               if 'mboss/hz/line with storage rlk:hr core.a9' in x]
-        check(a9 and all(ok for _, ok in a9) and hz9, f'calls: A9\'s streak (qi_cut) reads the probed dash length, the hazard line\'s '
-                                                      f'compound core.a9 {a9}')
+        check(len(follow) >= 10 and all(ok for _, ok in follow), f'calls: the flashes on her chest, the blink bubble and the A4 '
+                                                                 f'ribbon follow her (follow_on .. follow_off) {follow}')
+        hz9 = {p.relative_to(MOD).parts[1] for d in DASHES for p in (MOD / d).rglob('*.mcfunction')
+               if 'mboss/hz/line with storage rlk:hr core.dash' in p.read_text(encoding='utf-8')}
+        check(len(a9) == len(DASHES) and all(ok for _, ok in a9) and len(hz9) == len(DASHES),
+              f'calls: the dash streaks (qi_cut of a9 / hcut / kcut / blue) read the probed dash length, the hazard line\'s '
+              f'compound core.dash {a9} {sorted(hz9)}')
     if not MERGED:
         shutil.rmtree(TMP, ignore_errors=True)
     check(ncalls > 300, f'calls: {ncalls} kit calls checked')
@@ -755,6 +758,10 @@ def qline_verdict(ln):
             out.append((z[1] < -0.98, f'straight down (axis y {z[1]:+.2f})'))
         elif re.search(r'\bfacing\b|rotated \S+ -?[1-9]', ln):
             out.append((False, 'an unclassified aim (facing / pitched): decide what the line is for and extend this check'))
+        elif re.search(r'positioned \^ \^\S+ \^-\d\S* rotated ~-90 0 run ', ln):
+            # the rebuilt fight (tri's thrust, hr_design §2.2): the streak of a lunge, from behind her along her facing
+            out.append((z[2] > 0.98 and abs(z[1]) < 0.05 and pos[2] < Z0 - 1.0,
+                        f'along her facing, level, from behind her (axis {tuple(round(v, 2) for v in z)}, start {pos[2] - Z0:+.1f})'))
         else:
             out.append((abs(z[2]) < 0.05 and abs(z[1]) < 0.05, f'across her facing, level (axis {tuple(round(v, 2) for v in z)})'))
     return all(ok for ok, _ in out), out[0][1]
@@ -774,9 +781,39 @@ if MERGED:
             if 'fx/p/qi_line' in ln and not ln.startswith('#'):
                 qcalls.append((p.relative_to(MOD).as_posix(), ln))
     check(len(qcalls) >= 3, f'qline: {len(qcalls)} module qi_line calls')
+    kc = []
     for rel, ln in qcalls:
+        if rel.startswith('p/kcut/'):
+            kc.append(ln)
+            continue
         ok, what = qline_verdict(ln)
         check(ok, f'qline: {rel}: the line runs {what} — `{ln[:150]}`')
+    # kcut (hr_design §2.2, api.KCUT_YAW): three lines through the lock marker, each centred on it, level, at 0 / +55 / -55
+    # degrees from the dash direction (the dash-start marker's facing); the scene has both markers
+    DASH_YAW = 30.0
+    LOCK = (QL_AT[0], FLOOR, QL_AT[2])
+    yaws = []
+    for ln in kc:
+        s = fresh()
+        s.run(f'summon minecraft:husk {X0} {FLOOR} {Z0} {{Tags:["rlk_mb_body"]}}')
+        her = [e for e in s.ents if e.etype == 'husk'][0]
+        for tag, at in (('rlk_hr_lock', LOCK), ('rlk_hr_a9s', (X0, FLOOR, Z0))):
+            s.run(f'summon minecraft:marker {at[0]} {at[1]} {at[2]} {{Tags:["{tag}"]}}')
+            mk = [e for e in s.ents if e.etype == 'marker' and tag in e.tags][-1]
+            mk.rot = [DASH_YAW, 0.0]
+        s.run(COND_Q.sub('', ln), ex=her, pos=tuple(her.pos), rot=(0.0, 0.0))
+        got = [(tuple(e.pos), card_axes(s, e)[1], float(cdata(s, e)['hrG']['transformation']['scale'][2])) for e in s.cards()
+               if kind(s, e) == 'qline']
+        check(bool(got), f'qline: kcut: the line makes its cards with the lock and the dash-start markers in the scene — `{ln[:120]}`')
+        for pos, z, lg in got[:1]:
+            mid = [pos[i] + z[i] * lg / 2 for i in range(3)]
+            check(math.hypot(mid[0] - LOCK[0], mid[2] - LOCK[2]) < 0.1 and abs(z[1]) < 0.05 and abs(lg - 12.0) < 0.6,
+                  f'qline: kcut: the line is centred on the lock, level, 12 b long (centre {[round(v, 2) for v in mid]}, {lg:.1f} b)')
+            head = math.degrees(math.atan2(-z[0], z[2]))          # the game's yaw of the line's direction
+            d = (head - DASH_YAW + 180.0) % 360.0 - 180.0
+            yaws.append(round(d if abs(d) <= 90 else (d + 360.0) % 360.0 - 180.0))
+    check(sorted(yaws) == sorted(getattr(api, 'KCUT_YAW', (0, 55, -55))) or sorted(-y for y in yaws) == sorted(getattr(api, 'KCUT_YAW', ())),
+          f'qline: kcut\'s three lines cross the lock at api.KCUT_YAW from the dash direction ({sorted(yaws)})')
 
 # ---------------------------------------------------------------- qi_band's sweep (HR-32)
 for sw in (25, 45, 200):
@@ -1142,10 +1179,13 @@ if MERGED:
             m = re.search(r'fx/p/(scarlet_line|clash_gold|light_column)\b', ln)
             if m and 'at @e[tag=rlk_body,limit=1]' in ln and not ln.startswith('#'):
                 anchored.setdefault((rel, m.group(1)), []).append(ln)
-    check(len(anchored) >= 4, f'view: {len(anchored)} player-anchored effects')
+    # (the rebuilt fight: the 홍련일섬 line of the instant death + the deflect's starburst and column, which moved from the
+    # judge to the repel sequence's start; found by what the file calls, wherever lane H2's sequence puts it)
+    DEFLECT = {r for (r, n_) in anchored if n_ == 'clash_gold'} & {r for (r, n_) in anchored if n_ == 'light_column'}
+    check(len(anchored) >= 3, f'view: {len(anchored)} player-anchored effects')
     FULL = 0.9 * VW * VH                # a card sheet over the camera that fills the screen is not a visible effect
     for (rel, name), lines in sorted(anchored.items()):
-        judge = rel == 'shield/judge.mcfunction'
+        judge = rel in DEFLECT
         for view, need in (('F5', 300), ('FP', VIEW_MIN)):
             if judge and view == 'FP':
                 continue                 # the judge: first person in its own scene below
@@ -1162,7 +1202,8 @@ if MERGED:
                                          f'{-look:.0f} deg (>= {VIEW_MIN}, < 90 % of the frame)')
         if seen:
             print(f'view: the judge in first person, {name} looking up: ' + ', '.join(seen) + ' px')
-    check(sum(1 for (rel, _n) in anchored if rel == 'shield/judge.mcfunction') == 2, 'view: the judge\'s starburst and column')
+    check(len(DEFLECT) == 1 and sum(1 for (rel, _n) in anchored if rel in DEFLECT) == 2,
+          f'view: the deflect\'s starburst and column ({sorted(DEFLECT)})')
 
 # ============================================================== H1 block (lane H1c; hr_design §2.1-§2.2, §5.1, §5.4)
 def end_scale(s_, e_):

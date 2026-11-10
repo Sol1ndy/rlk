@@ -239,7 +239,9 @@ AIR_MAX = 44                                              # hr_design §8.5: no 
 A4_TRAVEL, A10_DRIFT = 10.0, 0.4                          # A4 travels <= 10 b toward the player; A10 drifts <= 0.4 b/t
 A9_BEYOND = 3.0                                           # A9 dashes through the locked point to 3 b beyond (<= 12 b)
 A3_GLIDE = (8.0, 0.3, 14)                                 # A3 from 4.5-8 b: glides in 0.3 b/t during ticks 0-14
-RECOVER = {1: (8, 16), 2: (10, 16)}                       # idle between patterns (min, max) per fight phase P1 / P2
+# hrfair 2.0, first pass (H1, 11-11; hr_design §6.4's recovery knob + 4): P1 8-16 -> 12-20, P2 10-16 -> 14-20 (the new kit has
+# ~20 patterns / min and 1.8 groggies / min for an average parrier with the old values: T10's band is 0.8-1.3).
+RECOVER = {1: (12, 20), 2: (14, 20)}                      # idle between patterns (min, max) per fight phase P1 / P2
 # F1 (HR-13 / HR-14 / HR-18, the P1 pressure package, lead decision 11-05; PLAN §4.1 wins over §4.3's clip tails): every
 # P1-kit pattern ends 8-12 t after its last hit instead of at its clip's end (the clip's follow-through plays on while she
 # turns to the player; the AI recovery's walk / strafe takes over: the punish window); RECOVER above = the §4.8 knob
@@ -256,7 +258,9 @@ WALK_SPEED, GLIDE_SPEED = 0.12, 0.18                      # recovery walk / stra
 
 # ---------------------------------------------------------------------------------------------
 # 2b. HR rebuild (hr_design §1.2-1.5, §2.1; lane H1): the 5-segment gauge, balance, the parry cue, the unparriable flashes
-GAUGE = {'max': 50, 'seg': 10, 'pat': 3, 'hit': 5}   # #gau hr in tenths of a segment: +pat at a pattern's end (not A6 / U),
+# hrfair 2.0, first pass (H1, 11-11): hit 5 -> 2. With the design's start value a player who is hit by everything filled it
+# every ~16 s (U 3.2 / min, T11's band 0.8-1.5); 2 keeps "full after ~60 s of clean play, ~35 s when hit every 6 s".
+GAUGE = {'max': 50, 'seg': 10, 'pat': 3, 'hit': 2}   # #gau hr in tenths of a segment: +pat at a pattern's end (not A6 / U),
 #                                                      +hit per hit of hers that lands (tier 1-2 parries land; PP / PD do not),
 #                                                      -seg per perfect-parried gauntlet cut; U is armed at max
 GAUGE_FP = '#gau'                                    # objective OBJ; the under bar #buSub = #gau / seg, #buSubMax 5, BU_SHIELD
@@ -1328,8 +1332,8 @@ FILES_9_1 = (
     'F:boss/scarlet/test/help', 'F:boss/scarlet/init', 'F:boss/scarlet/shield/cut', 'F:boss/scarlet/ult/fatal',
     'F:boss/scarlet/ev/roll', 'F:boss/scarlet/reward', 'F:boss/scarlet/p/a1/start', 'F:boss/scarlet/rig_stub/tick',
     'HR:renders/s3_a1.png',
-    'T:mboss_scarlet/p_ghost.py', 'F:boss/scarlet/p/a8/start', 'F:boss/scarlet/p/a13/start', 'F:boss/scarlet/p/r1/start',
-    'F:boss/scarlet/p/r2/start', 'F:boss/scarlet/p/r3/start', 'F:boss/scarlet/g/cut/make', 'HR:renders/s4_a8.png',
+    'T:mboss_scarlet/p_ghost.py', 'F:boss/scarlet/p/a8/start', 'F:boss/scarlet/p/a13/start', 'F:boss/scarlet/p/mx/start',
+    'F:boss/scarlet/p/nb/start', 'F:boss/scarlet/p/q/start', 'F:boss/scarlet/g/cut/make', 'HR:renders/s4_a8.png',
     'F:items/mythic/sword_hwamu/def', 'F:items/proc/hw_hit', 'F:items/register', 'F:player/take_damage',
     'F:player/def/judge', 'F:player/reset_one', 'F:player/update_item', 'F:player/update_item_macro',
     'F:player/hr_moon/apply', 'F:codex/labels', 'F:snd/f422', 'F:snd/f429', 'F:load', 'F:uninstall', 'R:items.md',

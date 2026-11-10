@@ -647,8 +647,8 @@ const cut = (t0, n, cB, cR, th0, th1, ed, gl, x = () => ({})) => Array.from({len
 {
   // q_grab (P-q, v 247.00-247.60; ref hr_grab_4fps): from far: the glint 0, she sinks, the blade trailing behind her left, the open
   // right hand reaching out at the player (the ghost form 4 and the purple star 8 are the module's; lock 13), the ghost lunge 16-20
-  // (the module, <= 14 b): flat out, the arm stretched ahead; the hand closes at the player's chest (grab 20). From 20 the miss
-  // (landed -> q_air at 20): she snatches at the air, pulls the empty fist in, straightens, the P2 stance at 34
+  // (the module, <= 14 b): flat out, the arm stretched ahead; the hand closes at the player's chest (grab 20), held 21. From 21
+  // the miss (landed -> q_air at 21): she snatches at the air, pulls the empty fist in, straightens, the P2 stance at 34
   const REACH = {...ST2, pos: [0, -.34, .04], rot: [-6, 0, 0], tor: [-18, -30, 0], head: [8, 26, 0], fL: [.2, .1, .36], fR: [-.2, .1, -.44], ...SWr(-116, 22, -100, -44, .6), rh: 0,
     hR: 'open', aR: [118, -10, .86], pR: [.3, -.6, .4]};
   const FLY = {rot: [-44, 0, 0], pos: [0, .03, 0], lf: .8, tor: [-8, -8, 0], head: [34, 6, 0], fL: [.13, .55, .1], fR: [-.13, .5, .22], ...SWr(-165, 4, -140, -30, .62), aR: [150, -6, 1],
@@ -658,6 +658,7 @@ const cut = (t0, n, cB, cR, th0, th1, ed, gl, x = () => ({})) => Array.from({len
     K(15, {...REACH, pos: [0, -.42, .08], rot: [-12, 0, 0], tor: [-20, -36, 0], aR: [124, -8, 1]}),
     K(16, {...FLY, rot: [-30, 0, 0], lf: .4, pos: [0, -.14, 0], fL: [.16, .2, -.1], fR: [-.16, .3, .3]}, 'i'), K(17, FLY, 'l'), K(19, {...FLY, rot: [-40, 0, 0], aR: [146, -4, 1]}),
     K(20, {rot: [-8, 0, 0], lf: 0, pos: [0, -.2, -.08], ...F_LUNGE_R, tor: [-12, -26, 0], head: [2, 22, 0], ...SWr(-140, 14, -116, -40, .6), aR: [98, -18, .74], hR: 'grip', hairS: -.2, skW: .3}, 'i'),
+    K(21, {}),      // (held: the module takes the landed branch at 21 = api.Q_AIR_T0; q_air 0 is this pose)
     K(22, {pos: [0, -.22, -.08], tor: [-13, -22, 0], aR: [92, -22, .6], hairS: 0, skW: 0}), K(26, {rot: [-2, 0, 0], pos: [0, -.16, -.04], tor: [-8, -10, 0], head: [-2, 2, 0], aR: [70, -10, .5], hR: 'open'}),
     K(34, {...ST2, pos: [0, -.13, 0]}), K(40, ST2)],
     {src: 'v 247.00-247.60 (P-q; ref hr_grab_4fps 246.80-247.55): the far lilac glint, the lilac ghost lunge = the grab'});
@@ -669,7 +670,7 @@ const cut = (t0, n, cB, cR, th0, th1, ed, gl, x = () => ({})) => Array.from({len
   // landing low 40; the second leap 46, at the apex 52 the blade thrust straight up at the sky, the free arm spread (the purple
   // star 62, lock 67), brought down to point at the player 72-74 (the pillar 74); she drops 78, lands 84, the P2 stance
   const G0 = {...ST2, rot: [-8, 0, 0], lf: 0, pos: [0, -.2, -.08], ...F_LUNGE_R, tor: [-12, -26, 0], head: [2, 22, 0], ...SWr(-140, 14, -116, -40, .6), rh: 0, aR: [98, -18, .74],
-    hR: 'grip'};     // (= q_grab 20)
+    hR: 'grip'};     // (= q_grab 20-21)
   const HANG = {...ST2, ...AIR, rot: [-14, 0, 0], lf: 1, pos: [0, .34, 0], tor: [-10, 34, 0], head: [-14, -28, 0], fL: [.14, .72, -.28], fR: [-.13, .6, -.04], ...Bz(0, -42, 108, -1, {gL: .52}),
     rh: 0, aR: [40, 60, .9], hR: 'open', hairS: .2, skW: -.2};
   // (the dive's wind-up: the blade reversed, point down before her in both hands, the fists before her brow: a plunging stab)

@@ -140,7 +140,22 @@ class Agent:
             if s.t % ATK_EVERY == 0:
                 H.A.strike(s, b, atk * 11 // 10)
             elif s.t % SKILL_EVERY == 5:
-                H.A.strike(s, b, atk * 2, basic=False)
+                skill_strike(s, b, atk * 2)
+
+
+def skill_strike(s, b, dmg):
+    """A skill hit through the REAL combat/apply with #skillDmg tmp 1 (what on_hit's A6 trigger reads)."""
+    pl = s.player()
+    s.call('rlk:combat/clear_atkflags', H.Ctx(pl, tuple(pl.pos), tuple(pl.rot)))
+    for k, v in (('#dmg', dmg), ('#elem', 0), ('#elU', 0), ('#icd', 0), ('#crit', 0), ('#stunHit', 0), ('#hitLanded', 0), ('#bowHit', 0),
+                 ('#lunar', 0), ('#tfm', 0), ('#trueDmg', 0), ('#skillDmg', 1)):
+        s.setsc(k, 'tmp', v)
+    s.stack.append('rlk:azsim/strike')
+    try:
+        s.call('rlk:combat/apply', H.Ctx(b, tuple(b.pos), tuple(b.rot)))
+    finally:
+        s.stack.pop()
+    s.setsc('#skillDmg', 'tmp', 0)
 
 
 class Meter:

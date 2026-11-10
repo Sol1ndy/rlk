@@ -660,7 +660,7 @@ def gauge_files(W):
                    sset('#hpp', 0), sset('#pp', 0), 'scoreboard players set #mbHitEv mb 0', 'scoreboard players set #mbDodgeEv mb 0',
                    'scoreboard players set #mbDodgeOk mb 0'])
     w('core/gauge/hit', [f'# The gauge + {G["hit"]} per hit of hers that landed (#hpp), at most {G["max"]} (hr_design §1.2).',
-                         f'scoreboard players operation #t {OBJ} = #hpp {OBJ}', f'scoreboard players operation #t {OBJ} *= #c{G["hit"]} {OBJ}',
+                         f'scoreboard players operation #t {OBJ} = #hpp {OBJ}', sset('#t2', G['hit']), f'scoreboard players operation #t {OBJ} *= #t2 {OBJ}',
                          f'scoreboard players operation {GAU} {OBJ} += #t {OBJ}', cap])
     w('core/gauge/pat', [f'# The gauge + {G["pat"]} when a pattern ends (not A6, not U), at most {G["max"]}.',
                          f'scoreboard players add {GAU} {OBJ} {G["pat"]}', cap])
