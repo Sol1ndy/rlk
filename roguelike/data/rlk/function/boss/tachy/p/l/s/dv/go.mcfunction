@@ -11,3 +11,4 @@ function rlk:boss/tachy/rig/play/dive
 execute at @s facing entity @e[type=minecraft:marker,tag=rlk_tk_llock,limit=1] feet run tp @s ~ ~ ~ ~ 0
 execute positioned as @e[type=minecraft:marker,tag=rlk_tk_llock,limit=1] run function rlk:mboss/mv/glide {t:10}
 execute at @s run function rlk:boss/tachy/fx/snd/dive
+execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.75 ~ run function rlk:mboss/np_glint_here

@@ -5,6 +5,7 @@ scoreboard players set #hzKB mb 3
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzLinger mb 2
 scoreboard players set #hzQuiet mb 1
+scoreboard players set #hzNoParry mb 2
 execute if score #gp13K0 mb matches 1 run scoreboard players set #hzEl mb 1
 execute if score #gp13K0 mb matches 1 run scoreboard players set #hzCol mb 1
 execute if score #gp13K0 mb matches 2 run scoreboard players set #hzEl mb 2

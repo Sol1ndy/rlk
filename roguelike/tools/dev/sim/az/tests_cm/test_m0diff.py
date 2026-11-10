@@ -71,6 +71,7 @@ NEW_FAKE = {'#atkSeq', '#auxResEl', '#auxResElV', '#buHpCol', '#buNoNum', '#c280
             # the warning glint's clock / owner flag of the framework
             '#hcK', '#hcC', '#hcNP', '#hcND', '#jK', '#jC', '#jNP', '#jND', '#jd', '#jp', '#jpv', '#parT', '#pdg',
             '#mbNoParry', '#mbNpAt', '#mbNpOwn', '#npNow', '#hcId', '#hzNoParry', '#pjNoParry',
+            '#npOk',         # fix lane FB (11-11, review B): the glint gate's answer (mboss/np_gate)
             # ... and its tunables set by rlk:load (README 3 「패링 · 닷지」)
             '#dashCoolBase', '#dgPW', '#dgLW', '#dgLooseC', '#dgEn', '#parW3', '#parW2', '#parW1', '#parGap', '#parRe',
             '#parChain', '#parKeep2', '#parKeep1', '#parCut', '#npGap'}

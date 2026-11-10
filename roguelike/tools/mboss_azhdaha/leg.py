@@ -387,13 +387,16 @@ def meteor(g):
     key = 'meteor'
     tl = A.TL(g, key, clock='#azCT', sub='ck')
     big = 'rlk_mb_az_p32b'
+    assert M['big'] - M['seal'] >= L.NP_LEAD_BIG
     tl.at(0, 'kill @e[tag=rlk_mb_az_p32]', 'scoreboard players set #aq32G mb 0')
     # the big meteor: seal + hazard under the player (locked) at R + 7, impact R + 35
     tl.at(M['seal'], f'execute at {PLAYER} run summon minecraft:marker ~ {CY} ~ {{Tags:{tags("rlk_mb_az_p32", big)}}}',
           f'execute as {mk(big)} run {g.clamp_walk()}', f'execute at {mk(big)} run {F(f"p/{key}/big_hz")}')
     g.pw(key, 'big_hz', [f'# At the lock: own group, Pyro, KB {A.KB["o32_big"]}; the seal8 decal = the hazard (keep, r {n(M["big_r"])}, '
                          f'tell {M["big"] - M["seal"]}).', g.GRP_NEW]
-         + g.hz_opts(el=1, kb=A.KB['o32_big'], grp=True)
+         # combat overhaul (ruling B-01): the big meteor is one of her three unparriable hits (the six small ones are not);
+         # its wind-up is the tell, so the framework flashes the glint at her glint point (hz/np_auto)
+         + g.hz_opts(el=1, kb=A.KB['o32_big'], grp=True, noparry=1)
          + [L.hz_disc(M['big_r'], M['big'] - M['seal'], A.DMG['o32_big']), g.tag_last_hz('rlk_mb_az_p32h'),
             K.tele_seal8(M['big_r'], M['big'] - M['seal'], el=1, hold=3, fill=0), K.snd('meteor_glyph')])
     tl.at(M['big'] - M['big_fall'], f'execute at {mk(big)} run {K.fx("meteor_big", h=M["big_h"])}',

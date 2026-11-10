@@ -376,7 +376,8 @@ def cc(w):
       'scoreboard players operation #eStep tmp = #c2es tmp',
       'execute if score #ccN tmp matches 0 if score @s c2eF matches 1 run function rlk:cm/cc/flock_gone',
       'execute if score @s cmD matches 1.. run scoreboard players operation @s cmD -= #eStep tmp',
-      'execute if score #ccR tmp matches 0 if score @s cmD matches ..0 if entity @e[tag=rlk_ci_idle,limit=1] run function rlk:cm/cc/flock_ram',
+      '# (combat overhaul, review B-07: no new ram while the caster is groggy - her cicins wait, a ram already flying goes on)',
+      'execute if score #ccR tmp matches 0 if score @s cmD matches ..0 unless score @s grgT matches 1.. if entity @e[tag=rlk_ci_idle,limit=1] run function rlk:cm/cc/flock_ram',
       'tag @e[tag=rlk_ci_idle] remove rlk_ci_idle')
     f('flock_one', 'scoreboard players add #ccN tmp 1',
       'execute if score #c2hs tmp matches 1 run tag @s add rlk_cm_haste', 'execute if score #c2hs tmp matches 0 run tag @s remove rlk_cm_haste',
@@ -513,7 +514,16 @@ def ci(w):
       'execute at @s positioned ~ ~0.45 ~ if entity @e[tag=rlk_cmaim,distance=..0.9] run return run function rlk:cm/ci/r_hit',
       'scoreboard players remove #c2s tmp 1', 'execute if score #c2s tmp matches 1.. run function rlk:cm/ci/r_step')
     f('r_hit', f'scoreboard players set #cmDmg tmp {c["ram_dmg"]}', 'scoreboard players set #cmEl tmp 3',
-      'scoreboard players operation #cmLv tmp = @s mlv', 'function rlk:cm/hit_pl',
+      'scoreboard players operation #cmLv tmp = @s mlv',
+      '# combat overhaul (review B-07): an owned cicin (c2eOw = its caster\'s cmId; no brain and no gauge of its own) hits as its',
+      '# caster\'s projectile, so a perfect parry of the ram takes the pip from her (r_hit_own)',
+      'execute if score @s c2eOw matches 1.. run return run function rlk:cm/ci/r_hit_own',
+      'function rlk:cm/hit_pl',
+      'execute at @s run particle minecraft:electric_spark ~ ~0.45 ~ 0.3 0.3 0.3 0.1 12', 'function rlk:cm/ci/r_end')
+    f('r_hit_own', '# @s = an owned cicin whose ram reached the body: the hit context resolves a non-brain attacker by its cmId',
+      '# (player/def/ctx_cm -> ctx_owner: the brain with that id), so the hit is made with the caster\'s id and the own id is put back.',
+      'scoreboard players operation #ciId tmp = @s cmId', 'scoreboard players operation @s cmId = @s c2eOw',
+      'function rlk:cm/hit_pl', 'scoreboard players operation @s cmId = #ciId tmp',
       'execute at @s run particle minecraft:electric_spark ~ ~0.45 ~ 0.3 0.3 0.3 0.1 12', 'function rlk:cm/ci/r_end')
     f('r_end', 'scoreboard players set @s cmS 3', 'scoreboard players set @s cmT 12')
     f('r_back', 'scoreboard players operation @s cmT -= #eStep tmp', 'execute if score @s cmT matches ..0 run function rlk:cm/ci/idle')

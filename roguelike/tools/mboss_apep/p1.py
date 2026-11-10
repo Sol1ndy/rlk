@@ -49,6 +49,7 @@ import math
 
 from .api import Pattern, Gen, TL, K, R_FAR, PLAYER, BODY, LOCK, ARENA_M
 from . import api as A
+import mboss_lib as ML
 
 L = A.L
 n = L.num
@@ -450,6 +451,7 @@ def emit_glow(g):
     for t in range(P3['windup'][0], P3['windup'][1] + 1, 4):
         tl.at(t, *x(AT_BODY, K.fx('spiral_wisps')))
     for k, (made, slam, tell) in enumerate(zip(P3['made'], P3['slams'], P3['tells'])):
+        assert tell >= ML.NP_LEAD_BIG
         tl.at(made, F(f'p/{key}/hz{k}'))
         tl.at(slam - 1, *x(at_m('rlk_mb_ap_p3c'), K.fx('wheel_carpet', r0=P3['car_r0'], r1=P3['car_r1'], dur=P3['car_dur'])))
         tl.at(slam, *x(at_m('rlk_mb_ap_p3c'), K.fx('gold_burst'), K.snd('p3_slam'), K.snd('p3_wheels')), F(f'p/{key}/wheels{k}'))
@@ -465,7 +467,9 @@ def emit_glow(g):
             f'# {P3["slam_r"]} at the slam point, height 0-{n(P3["slam_y1"])}, {DMG[f"p3_slam{k + 1}"]} %; the thorn-wheel carpet: a ring front',
             f'# {P3["car_r0"]} -> {P3["car_r1"]} b in {P3["car_dur"]} t ({n((P3["car_r1"] - P3["car_r0"]) / P3["car_dur"], 3)} b/t), band {P3["car_band"]} b,',
             f'# jumpable (#hzY1 {int(P3["car_y1"] * 10)}), {DMG["p3_carpet"]} %, in a new volley group with homing wheel 1 (#apq3G).',
-            *hz(at_m('rlk_mb_ap_p3c'), pid, dict(y1=P3['slam_y1']), Gen.hz_disc(P3['slam_r'], tell, DMG[f'p3_slam{k + 1}'])),
+            '# combat overhaul (ruling B-01): the slam disc is unparriable (its wind-up is the tell: the framework\'s warning glint,',
+            '# hz/np_auto); the carpet ring is a separate, parryable / jumpable hit.',
+            *hz(at_m('rlk_mb_ap_p3c'), pid, dict(y1=P3['slam_y1'], noparry=1), Gen.hz_disc(P3['slam_r'], tell, DMG[f'p3_slam{k + 1}'])),
             Gen.GRP_NEW, 'scoreboard players operation #apq3G mb = #mbGrp mb',
             *hz(at_m('rlk_mb_ap_p3c'), pid, dict(grp=True, act=P3['car_dur'] + 1, y1=P3['car_y1']),
                 Gen.hz_ring(P3['car_r0'] - P3['car_band'], P3['car_r0'], tell, DMG['p3_carpet']), f'rlk_mb_ap_p3c{k}')])
@@ -520,10 +524,13 @@ def emit_wither(g):
     F = g.fn
     tl = TL(g, key)
     disc = [K.tele_disc(P4['r'], P4['tell'], el=23, hold=P4['act'])]
+    assert P4['tell'] >= ML.NP_LEAD_BIG
     tl.at(P4['rear'] - 10, *x('at @s', K.snd('p4_rear')))
     tl.at(P4['disc'], *marker('at @s', pid, 'rlk_mb_ap_p4d'),
           *x(f'at @s positioned ~ {CY} ~', *Gen.decal('keep', *disc)),
-          *hz(f'at @s positioned ~ {CY} ~', pid, dict(act=P4['act'], kb=KB['heavy'], kbdir=0, y1=P4['y1']),
+          # combat overhaul (ruling B-01): the withering disc is unparriable; its wind-up (the fill) is the tell: the
+          # framework's warning glint at her glint point (hz/np_auto)
+          *hz(f'at @s positioned ~ {CY} ~', pid, dict(act=P4['act'], kb=KB['heavy'], kbdir=0, y1=P4['y1'], noparry=1),
               Gen.hz_disc(P4['r'], P4['tell'], DMG['p4'])),
           *x('at @s', K.snd('p4_hum')))
     tl.at(P4['crash'], *x(f'at @s positioned ~ {CY} ~', K.fx('leaf_splash'), K.snd('p4_spin')))
@@ -573,7 +580,7 @@ def emit_tail(g):
             half = (w['a1'] - w['a0']) / 2.0
             mid = (w['a1'] + w['a0']) / 2.0
             lines += hz(f'{at_m("rlk_mb_ap_p5f")} positioned {A.loc(w["root"][0], w["root"][1])} rotated ~{n(mid, 2)} 0', pid,
-                        dict(grp=True, kb=KB['heavy'], y1=P5['y1']),
+                        dict(grp=True, kb=KB['heavy'], y1=P5['y1'], noparry=1, glint=False),
                         Gen.hz_sector(w['r1'], max(1, math.ceil(half)), w['t'] - made, DMG[dmg]))
         g.pw(key, f'swing{k + 1}', [
             f'# @s = body (t{made}): swing {k + 1}\'s {len(ws)} swept wedges (plan 7.11 rule 3; api.wedges of the manifest\'s tail track x',
@@ -582,6 +589,12 @@ def emit_tail(g):
             '# lane decal): the S-raise / cock cue / tip flash / recoil are the tell.'] + lines)
         tl.at(made, F(f'p/{key}/swing{k + 1}'))
         s0, s1 = (P5['sw1'], P5['sw2'])[k]
+        # combat overhaul (rulings B-01 / B-02 / B-10): the tail swing is unparriable, all its wedges alike (one swing = one
+        # volley group = one answer: a perfect dodge of one wedge disarms the rest); the warning glint at her glint point when
+        # the swing's tell starts: the S-raise for swing 1, the recoil right after swing 1's last wedge for swing 2
+        np_t = P5['raise_'] if k == 0 else P5['sw1'][1] + 1
+        assert s0 - np_t >= (ML.NP_LEAD_BIG if k == 0 else ML.NP_LEAD) and np_t <= made
+        tl.at(np_t, ML.np_warn())
         mid_arc = (ac[0] + ac[1]) / 2.0
         tl.at(s0, *x(f'{at_m("rlk_mb_ap_p5f")} rotated ~{n(mid_arc, 1)} 0',
                      K.fx('arc_trail', r=P5['reach'], a=int(round(abs(ac[1] - ac[0]) / 2.0)), dir=d)),

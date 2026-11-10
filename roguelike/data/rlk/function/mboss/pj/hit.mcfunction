@@ -15,7 +15,7 @@ function rlk:mboss/hurt
 scoreboard players set #mbNoDodge mb 0
 scoreboard players set #mbNoParry mb 0
 scoreboard players operation #g mb = @s mbPjG
-execute if score #dodged tmp matches 0 if score #g mb matches 1.. run function rlk:mboss/grp_mark
+execute if score #g mb matches 1.. run function rlk:mboss/grp_hit
 scoreboard players set #pjEv mb 4
 scoreboard players set #pjKeep mb 1
 function rlk:mboss/d/pj_end

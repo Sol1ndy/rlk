@@ -306,6 +306,9 @@ def absorb2(g):
 
 
 # ============================================================================================ 23 the B3 frame
+B3_GLINT_H = 2.5            # the emergence's warning glint: this high above the dust mound at the arena centre
+
+
 def burrow3(g):
     key = 'burrow3'
     tl = TL(g, key)
@@ -335,6 +338,10 @@ def burrow3(g):
     for t in H.b3_mounds():
         tl.at(t, *_centre([K.fx('mound'), K.snd('burrow_loop'),
                            L.sound('entity.ravager.step', 0.8, 0.5), L.sound('block.gravel.break', 0.7, 0.5)]))
+    # combat overhaul (rulings B-01 / B-02 / B-03): the emergence is unparriable; the warning glint with the first dust
+    # mound (the tell of the surfacing), above the mound at the centre - she is under the floor, nothing is drawn below it
+    assert B.B3_BURST - B.B3_MOUND[0] >= L.NP_LEAD_BIG
+    tl.at(B.B3_MOUND[0], L.np_warn(at=f'~ ~{L.num(B3_GLINT_H)} ~', pre=f'at {ARENA_M}'))
     tl.at(B.B3_EMERGE_HZ, f'execute at {ARENA_M} run {F("emerge")}')
     tl.at(B.B3_EMERGE, g.play('burrow_emerge'))
     # t388: the emergence burst (the special stops): the earth-spike cluster, boulders, the impact
@@ -367,7 +374,7 @@ def burrow3(g):
     g.pw(key, 'emerge', [f'# The emergence burst at the centre: disc r 5.2, internal tell {B.B3_BURST - B.B3_EMERGE_HZ}, no decal',
                          '# (plan Change note 1: the dust mound of B3_MOUND is the tell),',
                          '# the leg element + brand, dodgeable (step away from the surfacing spot).',
-                         g.GRP_NEW] + g.hz_opts(grp=True, kb=A.KB['heavy']) + g.el_ground()
+                         g.GRP_NEW] + g.hz_opts(grp=True, kb=A.KB['heavy'], noparry=1, glint=False) + g.el_ground()
          + [L.hz_disc(5.2, B.B3_BURST - B.B3_EMERGE_HZ, A.DMG['b3_emerge']), g.tag_last_hz('rlk_mb_az_p23e')])
     # (FIX STATE-16) /reload inside the emergence window: the hazard again with the ticks left to the burst (it strikes
     # with the visible burst at B3_BURST, not a full tell after the reload)
@@ -380,7 +387,7 @@ def burrow3(g):
                            'execute store result storage rlk:mboss az.p23.tell int 1 run scoreboard players get #aq23T mb',
                            f'function {NS}p/{key}/emerge_m with storage rlk:mboss az.p23'])
     g.pw(key, 'emerge_m', ['# Macro {tell}: the emergence burst at the centre with the given tell.', g.GRP_NEW]
-         + g.hz_opts(grp=True, kb=A.KB['heavy']) + g.el_ground()
+         + g.hz_opts(grp=True, kb=A.KB['heavy'], noparry=1, glint=False) + g.el_ground()
          + ['$' + rem if not rem.startswith('$') else rem, g.tag_last_hz('rlk_mb_az_p23e')])
     g.pw(key, 'last', ['# HP 1 at the surfacing: "마지막 일격!" (the next hit kills through the normal path); a gold glow on the',
                        '# body (the gold parts lit) and gold motes at every hit proxy.',
