@@ -1442,6 +1442,34 @@ class Core:
             f'execute if score #azPh mb matches 1 run {F("svc/floor_f1")}', f'execute if score #azPh mb matches 2 run {F("svc/floor_f2")}',
             f'execute if score #azPh mb matches 3 run {F("svc/floor_0")}',
             g.px('normal'), g.play('idle'), sc('#azCool', 10), sc('#azHudQ', 1)])
+        # Balance gauge (combat overhaul lane B, mboss_lib.BAL_HOOKS, registry "bal"): the 100 t balance groggy. The rig has
+        # no stagger clip (a new one needs build_mboss_azhdaha_rig.mjs + the resource pack): the slots and their lingering
+        # effects are cut like test/cut (the phase, floor, transition queue and proxies stay), the idle pose is shown and
+        # held (the module tick, the rig tick included, does not run), then the usual decisions. Only from the idle AI /
+        # a pattern (1-10, 41-46) / a turn or walk (27-28); never in a transition, a reserved floor step, burrowed (B3),
+        # the slide / landslide, an absorb, a cutscene or while invulnerable.
+        self.w('bal_ok', ['# @s = body: may the balance groggy start now?',
+                          'execute unless score #azPh mb matches 1..3 run return fail',
+                          'execute if score #azTr mb matches 1.. run return fail',
+                          'execute if score #azBur mb matches 1.. run return fail',
+                          'execute if score #mbFloorHit mb matches 1 run return fail',
+                          'execute if score #mbCine mb matches 1 run return fail',
+                          'execute if entity @s[tag=rlk_mb_inv] run return fail',
+                          'execute if score #azPat mb matches 0..10 run return 1',
+                          'execute if score #azPat mb matches 27..28 run return 1',
+                          'execute if score #azPat mb matches 41..46 run return 1',
+                          'return fail'])
+        self.w('bal_on', ['# @s = body: every slot and its lingering effects cut, the idle pose shown once (then held).',
+                          'function rlk:mboss/lib_clear', F('p/cancel'), F('cast/cancel'), F('bg/cancel_l'), F('bg/cancel_t'),
+                          F('fld/clear'), 'kill @e[tag=rlk_mb_az_orb]', 'kill @e[tag=rlk_mb_az_orbc]', F('aft/clear'),
+                          f'function {K.FN}tele/clear' if A.KIT else K._c('tele/clear'),
+                          g.glow(False), sc('#azOrbHigh', 0), sc('#mbNoLeash', 0), sc('#azYawC', 0),
+                          g.play('idle'), F('rig/tick'), sc('#azHudQ', 1)])
+        self.w('bal_tick', ['# @s = body, instead of the hook tick while groggy: the clock, the hit flash, the HUD (the pose holds).',
+                            'scoreboard players add #azClk mb 1',
+                            f'execute if score #azFlash mb matches 1.. run {F("u/flash")}', sc('#azFlash', 0),
+                            F('hud/tick')])
+        self.w('bal_off', ['# @s = body: the balance groggy is over: the usual decisions.', sc('#azCool', 10), sc('#azHudQ', 1)])
         run = ['# @s = body, #azTst = the requested test id (plan 1.7).', 'execute if score #mbSt mb matches 0 run function rlk:mboss/intro_end',
                f'execute if score #mbSt mb matches 1 if score #azPh mb matches 0 run {F("intro/done")}']
         req_ids = sorted({p.id for p in self.pats if p.kind in ('normal', 'cast', 'bg')} | {20, 21, 22})

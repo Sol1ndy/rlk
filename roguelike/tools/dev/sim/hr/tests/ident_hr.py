@@ -36,6 +36,8 @@ items.md and pack.mcmeta. A file of the scope that is new, changed or gone must 
                 hazard land, 홍련's pips and yellow-flag marks, the item / engraving / character texts, the guard clips
   combat P      the late-game lag fixes (11-10): F:player/{tick,hotbar/place,hotbar/wrap,inv/sync,inv/manage,
                 inv/order_count2}, F:items/{equip_scan,scan_*,scan_s/*}, F:engravings/info_{build,bucket*,pass*}
+  combat B      the balance gauge / groggy (11-10, wip/combat-bal): F:bal/**, the bosses' bal_{ok,on,tick,off} hooks and their
+                own groggies' refill lines, the mob / cm / combat / burst hook lines, the cm rig ticks, Raiden's balance stun
 
 Prints every allow-listed file that changed (grouped) and fails on anything else (FAIL lines name the files). A gone
 file passes only in a group named in ALLOW_GONE.
@@ -119,7 +121,7 @@ ALLOW[LANE_R] = (
 # framework's no-parry / near re-test / glint, Raiden's hazard land, 홍련's pips and yellow-flag marks, the readers, lores
 LANE_C = 'combat overhaul C (11-10): parry, dodge, damage context, unparriable attacks'
 _LANE_C_FN = (
-    'bal/hit', 'boss/apep/org/pj_end', 'boss/raiden/hazard/land', 'boss/raiden/hazard/land_nd',
+    'boss/apep/org/pj_end', 'boss/raiden/hazard/land', 'boss/raiden/hazard/land_nd',
     'boss/raiden/hazard/new', 'boss/raiden/hazard/try', 'boss/raiden/hazard/try_near', 'boss/scarlet/core/setup',
     'boss/scarlet/fx/hud/warn', 'boss/scarlet/g/disc/throw', 'boss/scarlet/p/a10/k/21', 'boss/scarlet/p/a9/k/27',
     'boss/scarlet/shield/pip', 'char/arlecchino/def', 'char/cd_cut', 'char/clorinde/auto_tick', 'char/clorinde/def',
@@ -146,6 +148,20 @@ ALLOW[LANE_C] = ([F + f'{n}.mcfunction' for n in _LANE_C_FN]
                  + [F + r'player/def/.+\.mcfunction', F + r'char/motion/clips/(?:arle|skirk|navia)/guard/.+\.mcfunction',
                     F + r'char/motion/(?:arle_fx|skirk_fx|navia_fx|events/arle|events/skirk|events/navia)/guard\.mcfunction',
                     'items.md'])
+# 11-10 combat overhaul, lane B (wip/combat-bal; tools/dev/plan/combat/b_progress.md): the balance gauge and groggy —
+# the generated rlk:bal/** (tools/build_balance.py), the boss modules' balance hooks (mboss_lib.BAL_HOOKS) and the lines that
+# call / refill it (their own groggies), the mob / cm / combat hook lines, the cm rig ticks' groggy branch, Raiden's
+# balance stun, the boss bars' pip row. It removes nothing.
+LANE_B = 'combat overhaul B (11-10): balance gauge / groggy'
+ALLOW[LANE_B] = (
+    [F + r'bal/.+', F + r'(?:mboss|boss)/[a-z]+/bal_(?:ok|on|tick|off)\.mcfunction', F + r'cm/[a-z]{2}/rig/tick\.mcfunction']
+    + [F + f'{n}.mcfunction' for n in (
+        'mob/setup', 'mob/tick', 'mob/hb_cleanup', 'cm/tick', 'cm/sb/tick', 'combat/apply', 'combat/apply_mods',
+        'combat/clear_atkflags', 'char/after_hit', 'char/lumine/jav_spawn', 'char/lumine/jav_hit', 'items/hook/burst_dmg',
+        'element/frz_end', 'mboss/bars', 'mboss/guardian/groggy/begin', 'mboss/butterfly/groggy/begin',
+        'mboss/fieldgen/groggy/begin', 'boss/arlecchino/core/stun_start', 'boss/arlecchino/hud/bar_stun',
+        'boss/tachy/el/backfire', 'boss/tachy/mantle/break', 'boss/raiden/bars', 'boss/raiden/tick',
+        'boss/raiden/exhausted_start', 'boss/raiden/sg/stun_begin', 'boss/raiden/sg/stun_tick')])
 # groups whose files may also be gone (removed on purpose; every other gone file fails)
 ALLOW_GONE = {LANE_R,                               # lane R's removals
               LANE_C,                               # lane C: the dash charges / gauge / i-frames, hurt_nd, hw_dash

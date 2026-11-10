@@ -416,6 +416,7 @@ data merge entity @s {Invulnerable:0b}
 # 걷지 않음(자리 이동은 솟을 때 한 번). 빙결 중에는 순환이 멈춤(땅 위에서만 얼 수 있음)
 scoreboard players set #hold tmp 1
 execute if score @s frzT matches 1.. run return 0
+execute if score @s grgT matches 1.. run return 0
 scoreboard players remove @s c2T 1
 execute if score @s c3B matches 0 run return run function rlk:cm/sb/under
 execute if score @s c3B matches 1 run return run function rlk:cm/sb/mound

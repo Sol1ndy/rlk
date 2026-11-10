@@ -241,6 +241,26 @@ scoreboard players set #prGo mb 0
 {fn("pose/rest")} {{d:6}}
 data modify storage rlk:mboss sub set value [{{text:"대기",color:"#8A8A8A"}}]
 ''')
+# Balance gauge (combat overhaul lane B, mboss_lib.BAL_HOOKS; registry "bal"): any fight state may break; the groggy cuts the
+# pattern (library effects too), sinks the stand-in and holds it (the module tick does not run), then rests and waits.
+w('bal_ok', ['return 1'])
+w('bal_on', f'''
+function rlk:mboss/lib_clear
+execute if score #prPat mb matches 1.. run {fn("finish")}
+{fn("pose/sink")} {{d:8}}
+data modify storage rlk:mboss sub set value [{{text:"그로기",color:"#FFD23F",bold:true}}]
+''')
+w('bal_tick', f'''
+{fn("rig/follow")}
+execute if score #prFlash mb matches 1.. run scoreboard players remove #prFlash mb 1
+execute if score #prFlash mb matches 0 run {fn("rig/unglow")}
+execute if score #prFlash mb matches 0 run scoreboard players set #prFlash mb -1
+''')
+w('bal_off', f'''
+{fn("pose/rest")} {{d:8}}
+scoreboard players set #prCool mb 20
+data modify storage rlk:mboss sub set value [{{text:"대기",color:"#8A8A8A"}}]
+''')
 w('close_in', '''
 # Melee pattern chosen from afar: dash toward the player (0.45 b/t) up to 30 ticks, then start.
 scoreboard players add #prGoT mb 1

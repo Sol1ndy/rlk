@@ -14,3 +14,5 @@ scoreboard players set #stag tk 50
 scoreboard players set #taken tk 130
 function rlk:boss/tachy/rig/play/stagger
 execute at @s run function rlk:boss/tachy/fx/snd/stagger
+# balance gauge (combat overhaul lane B): her stagger refills it (a pending balance groggy is dropped)
+function rlk:bal/refill

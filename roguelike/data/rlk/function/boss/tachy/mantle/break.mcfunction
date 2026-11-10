@@ -10,3 +10,5 @@ execute at @s rotated as @s rotated ~ 0 positioned ~ ~1.5 ~ run function rlk:bos
 scoreboard players set #enAdd tmp 1500
 execute as @a[tag=player,limit=1] run function rlk:char/energy_add
 function rlk:boss/tachy/hud/sub
+# balance gauge (combat overhaul lane B): the mantle break stun refills it (a pending balance groggy is dropped)
+function rlk:bal/refill

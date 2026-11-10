@@ -10,6 +10,8 @@ execute if score @s frzT matches 1.. run scoreboard players set #free tmp 0
 scoreboard players set #hold tmp 0
 # 빙결: 차지·선딜·조준 모두 초기화(모은 화염구 · 궤적 선 · 숨긴 포탄과 떨어질 자리 표시도 지움)
 execute if score @s frzT matches 1.. if score @s cmS matches 1.. run function rlk:cm/cancel
+# 균형치 그로기: 빙결처럼 멈춤(취소 · 붙잡기 · 쿨 유지)
+execute if score @s grgT matches 1.. run function rlk:bal/fam/cm_tick
 execute if score #cmDown tmp matches 1 run function rlk:cm/down
 execute if score #cmDown tmp matches 0 run function rlk:cm/aggro
 execute if score #cmDown tmp matches 0 if entity @s[tag=rlk_cm_sw] run function rlk:cm/sw/tick

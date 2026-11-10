@@ -102,6 +102,7 @@ def rig(w, m, *, tp_dur=1, glow=(), death=None, death_fx='', die_fx='', frozen_e
         f'tag @e[tag={this}] add rlk_cmsync',
         f'function rlk:cm/{m}/rig/face',
         f'execute if score @s frzT matches 1.. run return run function rlk:cm/{m}/rig/frozen',
+        f'execute if score @s grgT matches 1.. run return run function rlk:cm/{m}/rig/frozen',
         f'function rlk:cm/{m}/rig/choose',
         f'execute unless score @s cmAP = #c2p tmp run function rlk:cm/{m}/rig/apply',
         'scoreboard players operation @s cmAP = #c2p tmp',

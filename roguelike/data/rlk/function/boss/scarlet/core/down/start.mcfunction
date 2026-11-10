@@ -9,3 +9,5 @@ scoreboard players set #flw hr 0
 scoreboard players set #kip hr 0
 scoreboard players set #fl hr 0
 function rlk:boss/scarlet/rig/play/down
+# balance gauge (combat overhaul lane B): the down window refills it (a pending balance groggy is dropped)
+function rlk:bal/refill

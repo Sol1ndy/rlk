@@ -17,5 +17,7 @@ execute unless score @s mlv matches 1.. run scoreboard players set @s mlv 1
 # 체력 스코어 준비(이미 정해진 몹은 그대로)
 execute unless score @s mhpM matches 1.. run function rlk:mob/hp_init
 tag @s add rlk_mob
+# 균형치(tools/build_balance.py): 등급 · 가득 찬 게이지 · 머리 위 마름모 줄
+function rlk:bal/init
 # 숄더뷰: 아바타를 노리게
 execute if entity @e[tag=rlk_av,limit=1] run function rlk:view/mob_join

@@ -155,6 +155,7 @@ class Core:
         self.chaos()
         self.stars()
         self.groggy()
+        self.balance()
         self.voice()
         self.hud()
         self.looks()
@@ -1192,7 +1193,9 @@ class Core:
             f'# @s = body, after chaos_fall: {GROGGY} t without attacks (K13): fall 20, pose A to {gb}, pose B {gb}-170,',
             '# get-up 170-210, stance to 220. No damage bonus.',
             sc_set('#gdSt', ST['groggy']), sc_set('#gdT', 0), sc_set('#mbNoLeash', 0),
-            F('hud/sub_groggy')])
+            F('hud/sub_groggy'),
+            '# balance gauge (combat overhaul lane B): this groggy refills it (a pending balance groggy is dropped)',
+            'function rlk:bal/refill'])
         pool = ['# Crimson pool around her (ripples and a thin ring at about 5.4 b).',
                 g.dust((0.74, 0.10, 0.15), 1.6, '~ ~0.12 ~', (1.4, 0.02, 1.4), 8)]
         for a in range(0, 360, 30):
@@ -1216,6 +1219,43 @@ class Core:
             '# Groggy over: slots reset (K22), 4-5 normal patterns before the next guard pair.',
             F('chaos/reset'),
             f'execute store result score #gdLeft mb run random value {NEXT_AFTER_CHAOS[0]}..{NEXT_AFTER_CHAOS[1]}',
+            sc_set('#gdCool', 20),
+            F('ai/enter')])
+
+    # -----------------------------------------------------------------------------------------
+    def balance(self):
+        """Balance gauge (combat overhaul lane B, mboss_lib.BAL_HOOKS, registry "bal"): the 100 t balance groggy on the
+        ground — only from the plain states (idle, close, approach, back-step), never in the guard mode, the chaos or
+        her own groggy; the slot pattern is cut like test/cut but the guard / chaos cycle is kept, she kneels
+        (groggy_a), folds and gets up (groggy_b) in the last 34 t, then idles; no bonus of her own (rlk:bal adds its %)."""
+        F, R, g = self.F, self.R, self.g
+        normal = sorted(p.id for p in self.normal)
+        self.w('bal_ok', ['# @s = body: may the balance groggy start now? (a normal pattern in the slot is cut; never the',
+                          '# guard-mode swings / the failure spear, the guard mode, the chaos, her own groggy)']
+               + [f'execute if score #gdSt mb matches {ST[k]} run return 1' for k in ('idle', 'close', 'approach', 'back')]
+               + [f'execute if score #gdSt mb matches {ST["pattern"]} if score #gdPat mb matches {normal[0]}..{normal[-1]} run return 1',
+                  'return fail'])
+        self.w('bal_on', [
+            '# @s = body: cut the slot pattern and the library effects (the guard / chaos counters stay), kneel.',
+            'function rlk:mboss/lib_clear',
+            'kill @e[type=minecraft:marker,tag=rlk_mb_gd_bk]',
+            F('p/cancel'),
+            R('spear/geo'), R('eye/geo'), R('glow/off'),
+            g.play('groggy_a'),
+            sc_set('#gdT', 0), sc_set('#mbNoLeash', 0),
+            g.sound('block.amethyst_block.fall', 0.9, 0.8),
+            F('hud/sub_groggy')])
+        gb = clip_len('groggy_b')
+        self.w('bal_tick', [
+            '# @s = body, instead of the hook tick while groggy (grgT = ticks left): the rig and the hit flash only.',
+            'scoreboard players add #gdT mb 1',
+            f'execute if score @s grgT matches {gb} run {g.play("groggy_b")}',
+            f'execute if score #gdFlash mb matches 1 unless score @s gdRigF matches 1.. run {R("flash")}',
+            sc_set('#gdFlash', 0),
+            R('tick')])
+        self.w('bal_off', [
+            '# @s = body: the balance groggy is over: idle, then the usual decisions.',
+            g.play('idle'),
             sc_set('#gdCool', 20),
             F('ai/enter')])
 
