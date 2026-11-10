@@ -6,6 +6,8 @@ execute if score #pj tmp matches 1 run scoreboard players set #ok tmp 1
 execute if score #pj tmp matches 2 positioned ~ ~0.4 ~ if entity @e[tag=rlk_body,distance=..2.3] run scoreboard players set #ok tmp 1
 scoreboard players operation #cmEl tmp = @s cmEl
 scoreboard players operation #cmLv tmp = @s cmLv
+# 바닥 폭발은 범위 공격(피해 문맥 #hcK 3; 직격은 투사체)
+execute if score #ok tmp matches 1 if score #pj tmp matches 2 run scoreboard players set #hcK tmp 3
 execute if score #ok tmp matches 1 run function rlk:cm/hit_pl
 particle minecraft:block{block_state:"minecraft:packed_ice"} ~ ~0.4 ~ 0.9 0.3 0.9 0.1 40
 particle minecraft:snowflake ~ ~0.5 ~ 1.2 0.3 1.2 0.06 30

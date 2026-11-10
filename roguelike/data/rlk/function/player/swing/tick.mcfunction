@@ -4,9 +4,9 @@
 #   속도(숄더뷰 · F5, #swSlow)이고 점프는 막힌다. 1인칭은 점프만 막는다(아래).
 #   평타 간격 atkCD 가 남아 있으면 휘두르는 중이다. atkCD 는 평타만 정한다: 근접 combat/combo_after1·2(루미네 · 클로린드 · 네페르),
 #   클로린드 권총 char/clorinde/shoot, 로노바 char/ronova/na, 네페르 환영극, 리그 캐릭터(스커크 ·
-#   아를레키노 · 나비아) char/motion/combat/request. 대쉬(player/dash_go)는 atkCD 를 0으로 만들어 바로 풀린다.
+#   아를레키노 · 나비아) char/motion/combat/request. 닷지(player/dash_go)는 atkCD 를 0으로 만들어 바로 풀린다.
 #   리그 캐릭터는 그 평타 동작이 재생 중일 때만(char/motion/combat/swing_clip): 동작이 끝나거나 멈추거나(사망 · 지도 · 선택 화면 ·
-#   캐릭터 변경 · 시점 전환) 다른 동작(대쉬 · 스킬 · 폭발 · 집어넣기)으로 바뀌면 풀린다.
+#   캐릭터 변경 · 시점 전환) 다른 동작(닷지 · 스킬 · 폭발 · 집어넣기)으로 바뀌면 풀린다.
 # 이벤트에 기대지 않고 매 틱 다시 구하므로, 놓친 이벤트나 사라진(또는 남은) 수정자가 있어도 다음 틱에 맞춰진다.
 scoreboard players set #swHold tmp 0
 execute if score @s atkCD matches 1.. run scoreboard players set #swHold tmp 1

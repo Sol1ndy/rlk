@@ -2,6 +2,7 @@
 particle minecraft:explosion ~ ~0.3 ~ 0.4 0.2 0.4 0 3
 particle minecraft:large_smoke ~ ~0.5 ~ 0.7 0.3 0.7 0.03 14
 execute unless score #k87 snd matches 1 run function rlk:snd/f94
+execute positioned ~ ~0.2 ~ if entity @e[tag=rlk_body,distance=..2.2] run scoreboard players set #hcK tmp 3
 execute positioned ~ ~0.2 ~ if entity @e[tag=rlk_body,distance=..2.2] run function rlk:cm/hit_pj
 function rlk:cm/brk_here {r:1,yl:-1,yh:1}
 function rlk:cm/wd_kill

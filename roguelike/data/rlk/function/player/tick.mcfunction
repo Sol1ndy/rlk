@@ -55,12 +55,11 @@ scoreboard players add @s cboIdle 1
 execute if score @s pmActive matches 1 if score @s atkCD matches 1.. run scoreboard players set @s cboIdle 0
 execute if score @s cboIdle matches 20.. run scoreboard players set @s comboStep 0
 
-# 대쉬: 자체 쿨 / 충전 / 무적 / 이동
+# 닷지: 재사용 대기 / 이동. 무적(dashInvT)은 닷지가 아닌 것(원소폭발 시전 · 로노바 부활 · 추락 뒤)만 쓴다
 execute if score @s dashCool matches 1.. run scoreboard players remove @s dashCool 1
-execute if score @s dashCharge < #dashMax tmp run function rlk:player/dash_regen
 execute if score @s dashInvT matches 1.. run scoreboard players remove @s dashInvT 1
 execute if score @s dashMoveT matches 1.. at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:player/dash_move_tick
-# 살짝 전진(찌르기 등). 대쉬가 시작되면 멈춘다
+# 살짝 전진(찌르기 등). 닷지가 시작되면 멈춘다
 execute if score @s dashMoveT matches 1.. run scoreboard players set @s stepT 0
 execute if score @s stepT matches 1.. at @e[tag=rlk_body,limit=1] rotated ~ 0 run function rlk:player/step_move_tick
 
@@ -77,7 +76,7 @@ function rlk:char/tick
 function rlk:player/bol/tick
 # 원소(부여 시간·방어막·부착/반응)
 function rlk:player/elem_tick
-# 액션바 HUD (대쉬 충전 게이지, 항상 표시)
+# 액션바 HUD (HP · 원소 에너지 · 골드, 항상 표시)
 function rlk:player/hud/tick
 
 # 아이템 틱(타이머/변신/사이드바)

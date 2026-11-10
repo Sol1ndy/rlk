@@ -1,4 +1,5 @@
+# A hit that did not land (#dodged 1): #mbDodgeEv +1; #mbDodgeOk 1 (the "perfect" event, e.g. Azhdaha's brand cleanse) only
+# for a perfect dodge (#pdg tmp 1) or a perfect parry (#parT tmp 3) - not for i-frames (burst, revive, fall).
 scoreboard players add #mbDodgeEv mb 1
-execute if score #mbSrcIn mb matches 2 run return run scoreboard players set #mbDodgeOk mb 1
-execute unless score #mbSrcIn mb matches 1 run return 0
-execute if score @s mbHzRA matches 0 if score @s mbHzW matches 12.. if score @s mbHzND matches 0 run scoreboard players set #mbDodgeOk mb 1
+execute if score #pdg tmp matches 1 run scoreboard players set #mbDodgeOk mb 1
+execute if score #parT tmp matches 3 run scoreboard players set #mbDodgeOk mb 1

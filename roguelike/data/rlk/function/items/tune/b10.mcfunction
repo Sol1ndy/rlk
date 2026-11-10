@@ -7,7 +7,7 @@ scoreboard players set #salonInt tmp 30
 scoreboard players set #cgRipInt tmp 40
 # ember_oath: 반복 간격(틱, 공용 #st40 대신 이 아이템만)
 scoreboard players set #ringInt tmp 40
-# 마검 키리온: 평타 참격 피해 = 공격력의 % (kirion_dmg_calc 의 고정값 60 대신. 대쉬 참격은 이 값 ÷ 2)
+# 마검 키리온: 평타 참격 피해 = 공격력의 % (kirion_dmg_calc 의 고정값 60 대신. 닷지 참격은 이 값 ÷ 2)
 scoreboard players set #kirionCoef tmp 60
 # 수련의 무희: 물 범위 피해 = 최대 체력의 ‰ (lily_boom 의 pm 대신)
 scoreboard players set #lilyPm tmp 40
@@ -53,7 +53,7 @@ scoreboard players set #hwFloor tmp 50
 scoreboard players set #hwLowHp tmp 60
 scoreboard players set #hwSlHp tmp 50
 scoreboard players set #hwSlDelay tmp 4
-# 마검 키리온: 참격 피해 계수 (대쉬 참격은 ÷2 라 같이 바뀜). 반경 3.5 · 3칸, 대쉬 참격 지연 6틱 · 마커 2틱 간격은 고정
+# 마검 키리온: 참격 피해 계수 (닷지 참격은 ÷2 라 같이 바뀜). 반경 3.5 · 3칸, 닷지 참격 지연 6틱 · 마커 2틱 간격은 고정
 data modify storage rlk:tune t.sword_kirion set value [{n:"#kirionCoef",m:"a"}]
 data modify storage rlk:tune ids append value "sword_kirion"
 # 수련의 무희: 피해 ‰ · 스킬 뒤 유효 시간(틱) · 재사용 대기(틱). 반경 4칸은 고정

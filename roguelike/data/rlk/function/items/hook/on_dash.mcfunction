@@ -1,17 +1,15 @@
-# 대쉬 발동 시 아이템 효과 (@s = 플레이어, at @s)
-# 마검 키리온: 대쉬 시작 지점에 지연 참격 (개수만큼)
+# 닷지(옛 대쉬와 같은 이동) 발동 시 아이템 효과 (@s = 플레이어, at @s). 퍼펙트 닷지 · 패링은 on_pdodge · on_parry · on_parry_press
+# 마검 키리온: 닷지 시작 지점에 지연 참격 (개수만큼)
 scoreboard players operation #repN tmp = @s it_sword_kirion
 data modify storage rlk:rep fn set value "items/proc/kirion_dash_mark"
 execute if score #repN tmp matches 1.. at @e[tag=rlk_body,limit=1] run function rlk:util/rep_call with storage rlk:rep
-# 고통 & 절망: 대쉬 시 공속/이속 스택
+# 고통 & 절망: 닷지 시 공속/이속 스택
 execute if score @s it_pain_despair matches 1.. run function rlk:items/proc/pd_gain
-# 각인 질주 4개: 이번 대쉬에서 이미 맞은 적 표시 초기화
+# 각인 질주 4개: 이번 닷지에서 이미 맞은 적 표시 초기화
 tag @e[tag=rlk_dhit] remove rlk_dhit
-# 열혈 저울: 대쉬하면 공격력 증가
+# 열혈 저울: 닷지하면 공격력 증가
 execute if score @s it_kinetic_scale matches 1.. run scoreboard players operation #kinT itv = #kinDur tmp
-# 선학의 깃: 대쉬 뒤의 첫 기본 공격
+# 선학의 깃: 닷지 뒤의 첫 기본 공격
 execute if score @s it_crane_feather matches 1.. run scoreboard players operation #craneT itv = #craneDur tmp
-# 화무십일홍: 대쉬 자체의 무적이 남는 동안만 검신합일의 "대쉬로 흘려냄"을 센다(hw_dash)
-execute if score @s it_sword_hwamu matches 1.. run function rlk:items/proc/hw_dash
-# 튜토리얼 1단계: 대쉬 횟수
+# 튜토리얼 1단계: 닷지 · 패링 횟수(패링은 on_parry_press)
 execute if score #tutS lob matches 1 if score @s lobRoom matches 2 run scoreboard players add #tutC lob 1

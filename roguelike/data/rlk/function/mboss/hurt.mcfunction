@@ -1,9 +1,11 @@
 # Generic hit on the player. @s = the attacker (hazard marker, projectile, the body for a direct swing);
 # it is the knockback source. Inputs: #mbHitPct mb (coefficient %, 100 = registry atk), #cmEl tmp
 # (element), #mbKB mb (knockback steps, 0 none), #mbKBDir mb (0 away from @s, 1 along @s's yaw).
-# Goes through cm/hit_pl2 -> player/take_damage: dash i-frames, defence, level scaling, element, shields.
-# Output: #dodged tmp 1 when the dash i-frames ate the hit. #mbNoDodge mb 1 (set around the call by hz/hurt for a
-# #hzNoDodge hazard): the dash i-frames are ignored for this one hit (the player keeps them for the next).
+# Goes through cm/hit_pl2 -> player/take_damage: the parry / dodge judge (player/def/judge), defence, level scaling,
+# element, shields. Output: #dodged tmp 1 when the hit was avoided (i-frames, a perfect dodge, a perfect parry), #parT tmp
+# the parry tier, #pdg tmp 1 a perfect dodge. One-shot inputs set around the call (hz/hurt, pj/hit, or the module before a
+# direct call): #mbNoDodge mb 1 = no dodge and no i-frames for this hit (a #hzNoDodge hazard / #pjNoDodge prop),
+# #mbNoParry mb 1 = unparriable (a hazard / prop marked so, mbHzNP / mbPjNP); both 0 again after the call.
 # Chapter mode (AZ-CM, cm.md 13.3 / 13.4): one-shot inputs #mbNoRx (no player-side reaction: F:player/take_damage skips
 # element/player_hit while #mbNRNow 1; hz/hurt and pj/hit copy their hazard's / prop's option into it) and #mbSrc
 # (1 hazard, 2 projectile; 0 = a direct call); refused while #mbCine 1; after a call that reached the player the hit /
@@ -34,9 +36,11 @@ scoreboard players operation #cmLv tmp = #mbLv mb
 scoreboard players operation #cmKB tmp = #mbKB mb
 kill @e[tag=rlk_plkb_source]
 execute if score #cmKB tmp matches 1.. run function rlk:mboss/kb_src
-execute unless score #mbNoDodge mb matches 1 as @a[tag=player,limit=1] run function rlk:cm/hit_pl2
-# #mbNoDodge mb 1 (a #hzNoDodge hazard): dash i-frames do not help this hit
-execute if score #mbNoDodge mb matches 1 as @a[tag=player,limit=1] run function rlk:mboss/hurt_nd
+# combat overhaul C: the hit context for player/def/judge (boss class; kind 1 direct / sector / line / disc, 2 projectile,
+# 3 ring / full / mask; #mbNoDodge = no dodge and no i-frames, #mbNoParry = unparriable), the attacker = the boss body
+function rlk:mboss/hurt_ctx
+execute as @a[tag=player,limit=1] run function rlk:cm/hit_pl2
+scoreboard players set #mbNoParry mb 0
 scoreboard players set #mbNRNow mb 0
 kill @e[tag=rlk_plkb_source]
 scoreboard players set #mbKBDir mb 0

@@ -46,7 +46,7 @@ execute if score berserk engN matches 2.. run scoreboard players operation @s eq
 execute if score tide engN matches 2.. run scoreboard players operation @s eqHpPct += #es_tide2 tmp
 execute if score vajra engN matches 2.. run scoreboard players operation @s eqDefPct += #es_vajra2 tmp
 execute if score erode engN matches 2.. run scoreboard players operation @s eqElemMastery += #es_erode2 tmp
-# 그 밖에 개수에 따라 바뀌는 값(대쉬 충전 등)
+# 그 밖에 개수에 따라 바뀌는 값(닷지 충전 등)
 function rlk:engravings/scan_more
 # 각인 정보 아이템 새로 만들기
 function rlk:engravings/info_build

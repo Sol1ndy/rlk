@@ -1,4 +1,4 @@
-# @s = 플레이어, 위치 = 몸. 대쉬가 끝남: 실이 감긴 모든 적에게 최대 체력의 #lifelinePm‰ 물 원소 피해 (강화 단계로 조정)
+# @s = 플레이어, 위치 = 몸. 닷지가 끝남: 실이 감긴 모든 적에게 최대 체력의 #lifelinePm‰ 물 원소 피해 (강화 단계로 조정)
 execute at @e[tag=rlk_llm] run particle minecraft:dust{color:[0.31f,0.72f,1.0f],scale:1.1f} ~ ~1.1 ~ 0.3 0.6 0.3 0 14
 execute at @e[tag=rlk_llm] run particle minecraft:splash ~ ~1 ~ 0.3 0.3 0.3 0.1 12
 execute unless score #k116 snd matches 1 run function rlk:snd/f124

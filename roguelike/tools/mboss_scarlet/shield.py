@@ -2,13 +2,14 @@
 api.shield()): shield/arm, shield/cut {s}, shield/tick (the core's per-tick pip check), shield/judge, ult/fail60,
 ult/fatal, shield/off, and the under bar (hud/bar_shield: #buSub = pips, #buSubMax 5, colour api.BU_SHIELD).
 
-Semantics (contract §3.6, PLAN §5.1, question 6 default PIP_RULE 'timed_dash'):
+Semantics (contract §3.6, PLAN §5.1; combat overhaul C PIP_RULE 'perfect', was 'timed_dash'):
 - shield/arm (any executor): #pips hr = api.PIPS (5), the under bar on (#shb 1), #gres 0, every pending pip window gone.
   The core calls it at SQ1 tick 0 and at a lead-in's refill beat (#sq_sig refill); a gauntlet never needs to.
 - shield/cut {s} (@s / position = the cut marker at its lock): registers one counting cut whose strike is pattern tick s
   (#pt hr of the running gauntlet) and stores its lock point: a marker rlk_hr_pip there (objective hr = s). At #pt = s a
-  pip goes when the player's dashInvT is 1..6, at #pt = s + 1 when it is 1..5 (api.PIP_DASH: a dash started by s), and
-  the player's feet are within api.PIP_R (6.2 b) of the lock point; whatever the dash direction; one pip per cut; never
+  pip goes when the player's perfect window covers this tick (api.PIP_Q[0] = player/def/q_pf0: a dodge or an F press 0..2 t
+  ago), at #pt = s + 1 when it covered the tick before (api.PIP_Q[1]), and the player's feet are within api.PIP_R (6.2 b)
+  of the lock point; whatever the dodge direction; one pip per cut; never
   below 0; kit pip_break at the player + its sound. The window closes after s + 1. Discs, the dive and uncounted cuts
   (api.cut count 0) never call it.
 - shield/tick: run by the core every tick of a gauntlet, right after p/<g>/tick (the cut's own lock / strike already ran).
@@ -40,7 +41,7 @@ FIRST_PERSON, AVATAR, EYE = 'if entity @a[tag=rlk_body]', 'unless entity @a[tag=
 
 def build(W):
     w = W.w
-    d0, d1 = api.PIP_DASH[0], api.PIP_DASH[1]
+    q0, q1 = api.PIP_Q[0], api.PIP_Q[1]
     r = L.num(api.PIP_R, 2)
     w('shield/arm', ['# The shield full (api.PIPS) and its under bar on; pending pip windows and the last judge result gone.',
                      sset('#pips', api.PIPS), sset('#shb', 1), sset('#gres', 0), f'kill {PIP_M}'])
@@ -56,17 +57,17 @@ def build(W):
     w('shield/tick', ['# Every gauntlet tick after p/<g>/tick (the core): each open pip window (@s = its marker, at the lock point).',
                       f'execute as {PIP_M} at @s run {fn("shield/pip")}'])
     w('shield/pip', [
-        f'# @s = a pip window (objective hr = its strike tick s), at its lock point. #pt = s: dashInvT {d0[0]}..{d0[1]}; #pt = s + 1:',
-        f'# dashInvT {d1[0]}..{d1[1]} (a dash started by s); the player\'s feet within {r} b. One pip per cut; closed after s + 1.',
+        '# @s = a pip window (objective hr = its strike tick s), at its lock point. #pt = s: a perfect dodge / parry window open',
+        f'# now ({q0}); #pt = s + 1: open one tick ago ({q1}); the player\'s feet within {r} b. One pip per cut; closed after s + 1.',
         f'scoreboard players operation #t {OBJ} = @s {OBJ}',
         f'scoreboard players operation #t {OBJ} -= #pt {OBJ}',
         f'execute if score #t {OBJ} matches 1.. run return 0',
         f'execute if score #t {OBJ} matches ..-2 run return run kill @s',
         f'execute if score #pipoff {OBJ} matches 1 if score #t {OBJ} matches -1 run return run kill @s',
         f'execute if score #pipoff {OBJ} matches 1 run return 0',
-        f'execute if score #t {OBJ} matches 0 if entity @a[tag=player,scores={{dashInvT={d0[0]}..{d0[1]}}},limit=1] if entity '
+        f'execute if score #t {OBJ} matches 0 if function {q0} if entity '
         f'{S.PLAYER[:-1]},distance=..{r}] run return run {fn("shield/take")}',
-        f'execute if score #t {OBJ} matches -1 if entity @a[tag=player,scores={{dashInvT={d1[0]}..{d1[1]}}},limit=1] if entity '
+        f'execute if score #t {OBJ} matches -1 if function {q1} if entity '
         f'{S.PLAYER[:-1]},distance=..{r}] run return run {fn("shield/take")}',
         f'execute if score #t {OBJ} matches -1 run kill @s'])
     w('shield/take', ['# A pip goes (@s = the window, closed now): one segment of the under bar, the shards and the crack at the player.',

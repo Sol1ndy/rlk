@@ -10,7 +10,7 @@ execute if score #want tmp matches 0 as @e[tag=atkBlock] if score @s intOwner = 
 execute if score #want tmp matches 0 as @e[tag=atkStrike] if score @s intOwner = #mypid tmp run kill @s
 execute if score #want tmp matches 0 run return 0
 # 가까운 실드: 0.32 정육면체의 중심을 눈앞 0.30에 둔다. 어떤 시선 각도에서도 눈이 내부에 들어가지 않는다.
-# 기존 5×3 실드가 눈/몹 몸과 함께 겹쳐 선택되는 상황을 없앤다. 대쉬 중에도 앞쪽 거리를 바꾸지 않는다.
+# 기존 5×3 실드가 눈/몹 몸과 함께 겹쳐 선택되는 상황을 없앤다. 닷지 중에도 앞쪽 거리를 바꾸지 않는다.
 scoreboard players set #has tmp 0
 execute as @e[tag=atkBlock] if score @s intOwner = #mypid tmp run scoreboard players set #has tmp 1
 execute as @e[tag=atkBlock] if score @s intOwner = #mypid tmp unless data entity @s {width:0.32f,height:0.32f} run data merge entity @s {width:0.32f,height:0.32f}

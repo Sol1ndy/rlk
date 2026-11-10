@@ -77,5 +77,9 @@ scoreboard players operation @s mbHzFX -= #ox mb
 scoreboard players operation @s mbHzFZ -= #oz mb
 kill @e[tag=rlk_mb_hzax]
 function rlk:mboss/hz/init_draw
+# combat overhaul C: unparriable (#hzNoParry, else the default rule) and, for a real hit, the warning glint at the boss
+scoreboard players operation @s mbHzNP = #hzNoParry mb
+execute unless score @s mbHzNP matches 0..1 run function rlk:mboss/hz/np_def
+execute if score @s mbHzNP matches 1 if score @s mbHzD matches 1.. run function rlk:mboss/np_glint
 execute if score @s mbHzV matches 1.. run scoreboard players set #hzEv mb 0
 execute if score @s mbHzV matches 1.. run function rlk:mboss/d/hz_vis

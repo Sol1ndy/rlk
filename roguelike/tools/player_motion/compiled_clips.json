@@ -255,6 +255,14 @@
     "normal": false
   },
   {
+    "length": 8,
+    "weapon": "spear",
+    "note": "Combat overhaul C (lane C): the guard / parry pose on a plain F press (player/def/guard -> char/motion/guard). Reuses physical_1 (ready tick 0, raised tick 1), held 4 ticks; no hits, no audio, no fx.",
+    "char": "arle",
+    "name": "guard",
+    "normal": false
+  },
+  {
     "length": 13,
     "weapon": "sword",
     "source": "skirk_physical",
@@ -512,6 +520,14 @@
     "normal": false
   },
   {
+    "length": 8,
+    "weapon": "sword",
+    "note": "Combat overhaul C (lane C): the guard / parry pose on a plain F press (player/def/guard -> char/motion/guard). Reuses physical_1 (ready tick 0, raised tick 1), held 4 ticks; no hits, no audio, no fx.",
+    "char": "skirk",
+    "name": "guard",
+    "normal": false
+  },
+  {
     "weapon": "navia_parasol_open",
     "weapon_state": "drawn",
     "draw_fx": false,
@@ -546,6 +562,14 @@
     "source": "v10 PA1 (f475-f628) + plan D8: lift onto the right shoulder, forward wheel beside the head, flip over the palm, hang, drop and plant point-down in front of the left hip (right hand), gold dissolve, back speck and growth",
     "char": "navia",
     "name": "sheathe",
+    "normal": false
+  },
+  {
+    "length": 8,
+    "weapon": "navia_halberd",
+    "note": "Combat overhaul C (lane C): the guard / parry pose on a plain F press (player/def/guard -> char/motion/guard). Reuses physical_1 (ready tick 0, raised tick 1), held 4 ticks; no hits, no audio, no fx.",
+    "char": "navia",
+    "name": "guard",
     "normal": false
   },
   {

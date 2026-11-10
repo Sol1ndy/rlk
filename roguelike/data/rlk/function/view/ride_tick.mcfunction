@@ -23,7 +23,5 @@ function rlk:view/hand_wrap
 execute if items entity @s hotbar.0 *[minecraft:custom_data~{rlk_ui:{}}] unless items entity @s hotbar.0 *[minecraft:consumable] run item modify entity @s hotbar.0 {type:"minecraft:set_components",components:{"minecraft:consumable":{consume_seconds:1000000f,animation:"none",sound:"minecraft:intentionally_empty",has_consume_particles:false}}}
 execute if items entity @s hotbar.1 *[minecraft:custom_data~{rlk_ui:{}}] unless items entity @s hotbar.1 *[minecraft:consumable] run item modify entity @s hotbar.1 {type:"minecraft:set_components",components:{"minecraft:consumable":{consume_seconds:1000000f,animation:"none",sound:"minecraft:intentionally_empty",has_consume_particles:false}}}
 execute if items entity @s hotbar.2 *[minecraft:custom_data~{rlk_ui:{}}] unless items entity @s hotbar.2 *[minecraft:consumable] run item modify entity @s hotbar.2 {type:"minecraft:set_components",components:{"minecraft:consumable":{consume_seconds:1000000f,animation:"none",sound:"minecraft:intentionally_empty",has_consume_particles:false}}}
-execute if score @s rcU matches 1 run function rlk:combat/rc_hold
-execute unless score @s rcU matches 1 run scoreboard players set @s rcT 0
-scoreboard players set @s rcU 0
+# 우클릭 누름(rcU · rcT → combat/rc_hold)은 rlk:tick 맨 앞의 player/def/input 이 받는다(전투 개편 C: 이번 틱의 피격보다 먼저)
 # 지도는 슬롯 선택으로 열리지 않고 combat/on_attack·rclick_do의 클릭으로 연다.

@@ -10,7 +10,9 @@ scoreboard players operation #pjN mb /= #c10 mb
 execute if score #pjN mb matches ..0 run scoreboard players set #pjN mb 1
 scoreboard players set #pjStop mb 0
 execute store result storage rlk:mboss pjp.hr int 1 run scoreboard players get @s mbPjR
-function rlk:mboss/pj/step
+# combat overhaul C: in the perfect-dodge window each sub-step also tests the dodge's start (pj/step_n)
+execute unless score #dgOpen cb matches 1 run function rlk:mboss/pj/step
+execute if score #dgOpen cb matches 1 run function rlk:mboss/pj/step_n
 execute if score #pjStop mb matches 1 run function rlk:mboss/pj/stop {ev:1}
 # The hook ended the flight on a player hit (#pjKeep 0 at event 4).
 execute if score #pjStop mb matches 2 run kill @s

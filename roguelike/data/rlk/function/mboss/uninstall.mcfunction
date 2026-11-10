@@ -130,6 +130,8 @@ scoreboard objectives remove mbHzSG
 scoreboard objectives remove mbPjND
 scoreboard objectives remove mbPjNR
 scoreboard objectives remove mbPart
+scoreboard objectives remove mbHzNP
+scoreboard objectives remove mbPjNP
 scoreboard objectives remove mbHzPm
 scoreboard objectives remove mbHzPmL
 scoreboard objectives remove mbBol

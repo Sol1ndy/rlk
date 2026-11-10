@@ -453,6 +453,9 @@ fn('dash',['# @s = player, from player/dash_go: play the character dash clip whe
  'execute store result storage rlk:player_motion face.dx double 0.01 run scoreboard players get @s dashUX',
  'execute store result storage rlk:player_motion face.dz double 0.01 run scoreboard players get @s dashUZ',
  'function rlk:char/motion/dash_face with storage rlk:player_motion face'].join('\n'));
+// Guard (combat overhaul C): player/def/guard calls this on a plain F press (a parry); a character with a "guard" clip
+// plays it (tools/player_motion/<char>/guard.json: the ready / raised frames of physical_1, held).
+fn('guard',['# @s = player, from player/def/guard (a parry press): play the character guard clip when it has one.',...Object.entries(characters).filter(([c])=>motionData[c].clips.guard).map(([c,info])=>`execute if score #charN tmp matches ${info.id} run function rlk:char/motion/start {char:"${c}",clip:"guard"}`)].join('\n'));
 fn('dash_face',['# Turn the dash clip basis (and the rig) toward the dash direction.',
  '$execute as @e[tag=rlk_pm_basis,limit=1] at @s run tp @s ~ ~ ~ facing ~$(dx) ~ ~$(dz)',
  'execute at @e[tag=rlk_av,limit=1] rotated as @e[tag=rlk_pm_basis,limit=1] rotated ~ 0 run tp @e[tag=rlk_pm] ~ ~ ~ ~ 0'].join('\n'));

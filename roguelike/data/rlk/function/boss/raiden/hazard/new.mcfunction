@@ -28,6 +28,8 @@ scoreboard players operation @e[tag=rlk_rd_hnew,limit=1] rdShape = @e[tag=rlk_rd
 scoreboard players add @e[tag=rlk_rd_hnew,limit=1] rdShape 20
 $scoreboard players set #rdFlag rd $(nd)
 execute if score #rdFlag rd matches 1 run tag @e[tag=rlk_rd_hnew,limit=1] add rlk_rd_nododge
+# combat overhaul C: an unparriable hit (nododge) flashes the warning glint on Raiden (player/def/fx/rd_glint, spaced)
+execute if score #rdFlag rd matches 1 if score @e[tag=rlk_rd_hnew,limit=1] rdDamage matches 1.. run function rlk:player/def/fx/rd_glint
 $scoreboard players set #rdFlag rd $(jp)
 execute if score #rdFlag rd matches 1 run tag @e[tag=rlk_rd_hnew,limit=1] add rlk_rd_jump
 $scoreboard players set #rdFlag rd $(det)

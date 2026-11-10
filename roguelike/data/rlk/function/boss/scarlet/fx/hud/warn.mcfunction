@@ -6,7 +6,7 @@ execute unless data storage rlk:hr fx{init:2b} run function rlk:boss/scarlet/fx/
 $scoreboard players set #on hrFx $(on)
 execute unless score #on hrFx matches 1 run return run function rlk:boss/scarlet/fx/hud/e/warn_off
 bossbar add rlk:hr_warn {text:""}
-bossbar set rlk:hr_warn name {text:"",extra:[{text:"대시로 베기를 아슬아슬하게 피해 실드를 모두 깎으세요 — 실드가 남으면 ",color:"white",font:"minecraft:default"},{text:"즉사",color:"#FF3A55",bold:true,font:"minecraft:default"},{text:"합니다",color:"white",font:"minecraft:default"}]}
+bossbar set rlk:hr_warn name {text:"",extra:[{text:"베기를 퍼펙트 닷지 · 퍼펙트 패링으로 넘겨 실드를 모두 깎으세요 — 실드가 남으면 ",color:"white",font:"minecraft:default"},{text:"즉사",color:"#FF3A55",bold:true,font:"minecraft:default"},{text:"합니다",color:"white",font:"minecraft:default"}]}
 bossbar set rlk:hr_warn color white
 bossbar set rlk:hr_warn style progress
 bossbar set rlk:hr_warn max 1

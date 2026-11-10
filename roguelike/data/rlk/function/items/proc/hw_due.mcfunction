@@ -1,7 +1,7 @@
 # 화무십일홍의 할 일 (@s = 플레이어, hw_tick: 기다림 #hwWait 이 0): 지금 시각에 때가 된 것을 모두 처리하고 다음 시각(#hwNext)과
 # 그때까지 남은 틱(#hwWait)을 다시 잡는다
 execute store result score #hwNow itv run time query gametime
-# 반격 예약(맞거나 대쉬로 흘려낸 다음 처리: 피해 계산 도중에 새 피해를 주지 않음)
+# 반격 예약(맞거나 닷지로 흘려낸 다음 처리: 피해 계산 도중에 새 피해를 주지 않음)
 execute if score #hwCtrQ itv matches 1 at @e[tag=rlk_body,limit=1] run function rlk:items/proc/hw_ctr
 # 육참골단 중첩 시간이 끝남 · 반격 재사용 대기 끝
 execute if score #hwStk itv matches 1.. if score #hwNow itv >= #hwTEnd itv run function rlk:items/proc/hw_stk_end
