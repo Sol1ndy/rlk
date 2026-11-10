@@ -2,9 +2,12 @@
 # 5.4 at the slam point, height 0-4, 130 %; the thorn-wheel carpet: a ring front
 # 3.0 -> 14.4 b in 14 t (0.814 b/t), band 1.0 b,
 # jumpable (#hzY1 7), 30 %, in a new volley group with homing wheel 1 (#apq3G).
+# combat overhaul (ruling B-01): the slam disc is unparriable (its wind-up is the tell: the framework's warning glint,
+# hz/np_auto); the carpet ring is a separate, parryable / jumpable hit.
 scoreboard players set #hzEl mb 7
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
+scoreboard players set #hzNoParry mb 1
 scoreboard players set #hzY1 mb 40
 execute at @e[type=minecraft:marker,tag=rlk_mb_ap_p3c,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_ap_p3c,limit=1] run function rlk:mboss/hz/disc {r:54,tell:31,dmg:130}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_ap_p3

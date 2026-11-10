@@ -76,6 +76,7 @@ from pathlib import Path
 
 from .api import (Pattern, ev, clip_len, rt, inv, DMG, KB, CY, NS, GOLD, GOLD_PALE, GOLD_DEEP, RED_EDGE, CRIMSON,
                   CRIMSON_DARK, STAR_HZCOL)
+import mboss_lib as ML
 from . import p56_fx as X
 from .p56_fx import n3, loc, polar, lerp, add, sub, mul, tf, tags, qaxis, qrot
 
@@ -177,6 +178,10 @@ def flyslam(g):
           f'execute {BODY} run ' + g.card('glow', loc(gl), bb='center', s0=0.4, s1=1.2, life=5, fade=3),
           f'execute {BODY} positioned {loc(gl)} run ' + g.particle('end_rod', '~ ~ ~', (0.08, 0.08, 0.08), 0.05, 6),
           g.sound('block.amethyst_block.chime', 0.9, 2.0), g.sound('block.beacon.power_select', 0.3, 1.9))
+    # combat overhaul (rulings B-01 / B-02): the dive is one of her two unparriable hits; its warning glint comes with the
+    # clip's own spear glint, on her chest (she still stands), imp - glint ticks before the impact
+    assert imp - glint >= ML.NP_LEAD_BIG
+    tl.at(glint, ML.np_warn())
     for t in range(glint + 1, W(12), 2):
         tl.at(t, f'execute {BODY} positioned {loc(sp(k, t))} run ' + g.dust(GOLD_PALE, 0.6, '~ ~ ~', (0.1, 0.1, 0.1), 2))
 
@@ -247,7 +252,7 @@ def flyslam(g):
 
     # -- ring: the hazard (disc r R, strikes at the clip impact) and the rim growth; untargetable
     grow = [f'# @s = body (clip tick {ring}): hazard + ring growth r 1 -> {R} over 5 t (m1 27.48-27.73 s).',
-            *g.hz_opts(sfx=0, quiet=1, kb=KB['default'], linger=2),
+            *g.hz_opts(sfx=0, quiet=1, kb=KB['default'], linger=2, noparry=1, glint=False),
             f'execute {ATM} run {g.hz_disc(R, imp - ring, DMG["p5"])}',
             *hz_tag(pid, 'rlk_mb_gd_p5h'),
             'tag @s add rlk_mb_inv']
@@ -792,6 +797,10 @@ def fail(g):
            + [f'execute {ATT} run ' + g.particle(GOLD_BLK, '~ ~7 ~', (0.3, 1.0, 0.3), 0.05, 10),
               g.sound('block.respawn_anchor.charge', 0.6, 0.9)])
         at(FAIL_COL, J('lock'))
+        # combat overhaul (rulings B-01 / B-02): the failure spear is unparriable; the warning glint with the column, on her
+        # chest (the chain's origin below: she hovers at 6 b for spear 1 and has come down to 3 b for spear 2)
+        assert FAIL_HIT - FAIL_COL >= ML.NP_LEAD_BIG
+        at(FAIL_COL, ML.np_warn(at=f'~ ~{"6.0" if j == 0 else "3.0"} ~', pre='at @s'))
         # chain from her chest to the column top
         pw('chain', ['# A gold chain step from her chest toward the column top (recursive, <= 30 steps).',
                      'scoreboard players add #gp13D mb 1',
@@ -817,7 +826,7 @@ def fail(g):
         dec = [f'# Spear {j + 1} (T0+{FAIL_DECAL + b}): the hazard (disc r {FAIL_R}, {DMG["fail"]} %, the star\'s element; quiet), the red',
                '# concave 4-point star decal on the player (front arm toward the arena centre: the only ground telegraph, as',
                '# in m4, rule 10-20) and the giant red spear growing out of the column, point down, its tip 3.8 b above the target.',
-               *g.hz_opts(sfx=0, kb=KB['default'], linger=2, quiet=1)]
+               *g.hz_opts(sfx=0, kb=KB['default'], linger=2, quiet=1, noparry=1, glint=False)]
         for kind in range(1, 7):
             if kind <= 4:
                 dec.append(f'execute if score {KS} mb matches {kind} run scoreboard players set #hzEl mb {kind}')

@@ -549,8 +549,11 @@ def burst(g):
     floor = f'execute at @s positioned ~ {CY} ~ rotated ~ 0 run '
     tl.at(C5_SPARK, at_body(C5_CORE, g.fx('core_spark')), at_body(C5_CORE, g.snd('core_spark')))
     tl.at(C5_EYE, at_body(C5_CORE, g.snd('core_flip')))
-    tl.at(C5_RIM, *g.hz_opts(kb=KB['heavy'], y1=0.5, vis=51, quiet=1, sfx=0),
+    # combat overhaul (rulings B-01 / B-02): 지면 충격 is its one unparriable hit; the warning glint at the rim tick, on the
+    # core (the rig's core anchor: the visible body), C5_BLAST - C5_RIM ticks before the blast
+    tl.at(C5_RIM, *g.hz_opts(kb=KB['heavy'], y1=0.5, vis=51, quiet=1, sfx=0, noparry=1, glint=False),
           f'execute at @s positioned ~ {CY} ~ run ' + g.hz_disc(C5_R, C5_BLAST - C5_RIM, DMG['c5']),
+          at_body(C5_CORE, 'function rlk:mboss/np_glint_here'),
           floor + g.tele_rim(C5_R, C5_BLAST - C5_RIM),
           # the marker read (spec: respawn_anchor.set_spawn 0.6/0.6, but core_lift plays that sample 2 t later: FX-4)
           floor + g.sound('block.trial_spawner.about_to_spawn_item', 0.6, 0.7))

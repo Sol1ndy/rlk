@@ -8,6 +8,7 @@ scoreboard players set #hzEl mb 7
 scoreboard players set #hzKB mb 4
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
+scoreboard players set #hzNoParry mb 2
 scoreboard players set #hzY1 mb 30
 execute at @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] positioned ^-0.017 ^0 ^2.903 rotated ~-98.79 0 run function rlk:mboss/hz/sector {r:114,a:5,tell:13,dmg:140}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_ap_p5
@@ -16,6 +17,7 @@ scoreboard players set #hzEl mb 7
 scoreboard players set #hzKB mb 4
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
+scoreboard players set #hzNoParry mb 2
 scoreboard players set #hzY1 mb 30
 execute at @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] positioned ^1.259 ^0 ^2.621 rotated ~-109.02 0 run function rlk:mboss/hz/sector {r:114,a:6,tell:14,dmg:140}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_ap_p5
@@ -24,6 +26,7 @@ scoreboard players set #hzEl mb 7
 scoreboard players set #hzKB mb 4
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
+scoreboard players set #hzNoParry mb 2
 scoreboard players set #hzY1 mb 30
 execute at @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] positioned ^2.361 ^0 ^1.702 rotated ~-111.13 0 run function rlk:mboss/hz/sector {r:114,a:4,tell:15,dmg:140}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_ap_p5
@@ -32,6 +35,7 @@ scoreboard players set #hzEl mb 7
 scoreboard players set #hzKB mb 4
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
+scoreboard players set #hzNoParry mb 2
 scoreboard players set #hzY1 mb 30
 execute at @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] positioned ^2.888 ^0 ^0.377 rotated ~-111.28 0 run function rlk:mboss/hz/sector {r:114,a:16,tell:16,dmg:140}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_ap_p5
@@ -40,6 +44,7 @@ scoreboard players set #hzEl mb 7
 scoreboard players set #hzKB mb 4
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
+scoreboard players set #hzNoParry mb 2
 scoreboard players set #hzY1 mb 30
 execute at @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] positioned ^2.777 ^0 ^-0.879 rotated ~-129.65 0 run function rlk:mboss/hz/sector {r:114,a:23,tell:17,dmg:140}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_ap_p5
@@ -48,6 +53,7 @@ scoreboard players set #hzEl mb 7
 scoreboard players set #hzKB mb 4
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
+scoreboard players set #hzNoParry mb 2
 scoreboard players set #hzY1 mb 30
 execute at @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] positioned ^2.146 ^0 ^-1.97 rotated ~-154.65 0 run function rlk:mboss/hz/sector {r:114,a:23,tell:18,dmg:140}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_ap_p5
@@ -56,6 +62,7 @@ scoreboard players set #hzEl mb 7
 scoreboard players set #hzKB mb 4
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
+scoreboard players set #hzNoParry mb 2
 scoreboard players set #hzY1 mb 30
 execute at @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] positioned ^1.112 ^0 ^-2.692 rotated ~-179.65 0 run function rlk:mboss/hz/sector {r:114,a:23,tell:19,dmg:140}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_ap_p5
@@ -64,6 +71,7 @@ scoreboard players set #hzEl mb 7
 scoreboard players set #hzKB mb 4
 scoreboard players set #hzSfx mb 0
 scoreboard players set #hzQuiet mb 1
+scoreboard players set #hzNoParry mb 2
 scoreboard players set #hzY1 mb 30
 execute at @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] rotated as @e[type=minecraft:marker,tag=rlk_mb_ap_p5f,limit=1] positioned ^-0.13 ^0 ^-2.91 rotated ~155.35 0 run function rlk:mboss/hz/sector {r:114,a:23,tell:20,dmg:140}
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run tag @s add rlk_mb_ap_p5

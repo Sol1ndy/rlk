@@ -8,3 +8,4 @@ execute at @s rotated as @s rotated ~ 0 positioned ~ 201 ~ run function rlk:mbos
 execute as @e[type=minecraft:marker,tag=rlk_mb_hz] if score @s mbHzI = #hzLast mb run function rlk:boss/arlecchino/core/hz_tag/q5b
 execute at @s positioned ~ ~1.4 ~ run function rlk:boss/arlecchino/fx/p/shock_aura
 execute at @s run function rlk:boss/arlecchino/fx/snd/brand
+function rlk:boss/arlecchino/core/np

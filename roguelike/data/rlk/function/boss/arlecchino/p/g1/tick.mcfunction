@@ -12,7 +12,7 @@ execute if score #pt kn matches 59 run function rlk:boss/arlecchino/p/g1/k/59
 execute if score #pt kn matches 60 run function rlk:boss/arlecchino/p/g1/k/60
 execute if score #pt kn matches 61 run function rlk:boss/arlecchino/p/g1/k/61
 execute if score #pt kn matches 62 run function rlk:boss/arlecchino/p/g1/k/62
-execute if score #pt kn matches 70 run function rlk:boss/arlecchino/p/g1/rim
+execute if score #pt kn matches 70 run function rlk:boss/arlecchino/p/g1/k/70
 execute if score #pt kn matches 103 run function rlk:boss/arlecchino/p/g1/k/103
 execute if score #pt kn matches 104 run function rlk:boss/arlecchino/p/g1/k/104
 execute if score #pt kn matches 112 run kill @e[type=minecraft:item_display,tag=rlk_kn_blade,tag=rlk_kn_p_g1]

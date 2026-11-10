@@ -7,3 +7,4 @@ function rlk:boss/arlecchino/rig/look/glow/crimson
 execute at @s run function rlk:boss/arlecchino/fx/snd/beam_aim
 function rlk:boss/arlecchino/p/q4/f/reticle
 function rlk:boss/arlecchino/p/q4/f/aim
+function rlk:boss/arlecchino/core/np

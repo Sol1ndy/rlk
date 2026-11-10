@@ -1,5 +1,6 @@
 """parse.py <probe log>: the storage dump of probe.sh as tables (fix lane FA, real 26.3 server)."""
 import re, sys
+sys.dont_write_bytecode = True
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / 'sim/cb/tests/lib'))   # the SNBT reader of psim
 from psim import snbt_parse

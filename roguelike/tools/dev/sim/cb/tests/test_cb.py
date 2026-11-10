@@ -397,13 +397,17 @@ def t_static():
     ck('static: 화무십일홍 lore: 닷지 · 패링으로 흘려내면', '닷지 · 패링으로 흘려내면' in fns['items/mythic/sword_hwamu/def'])
     # generated framework lines
     npd = fns.get('mboss/hz/np_def', '')
-    ck('static: hz/np_def: no-dodge, per mille, re-arm, ring, full / mask, disc >= 4.5 b, sector / line >= 8 b',
-       all(x in npd for x in ('mbHzND matches 1 run return 0', 'mbHzPm matches 1.. run return 0', 'mbHzRA matches 1.. run return 0',
-                              'mbHzK matches 1 if score @s mbHzR matches ..4499 run return run scoreboard players set @s mbHzNP 0',
-                              'mbHzK matches 3..4 if score @s mbHzR matches ..7999 run return run scoreboard players set @s mbHzNP 0'))
-       and npd.split('\n').index('scoreboard players set @s mbHzNP 1') < npd.split('\n').index('execute if score @s mbHzND matches 1 run return 0'))
-    ck('static: hz/init sets mbHzNP from #hzNoParry or np_def and flashes np_glint for a real hit',
-       'mbHzNP = #hzNoParry mb' in fns['mboss/hz/init'] and 'mboss/np_glint' in fns['mboss/hz/init'])
+    # (review B-01, fix lane FB: no size thresholds any more; the details are test_np.py's)
+    ck('static: hz/np_def: unparriable by default only no-dodge, per mille, re-arm, full / mask (no size threshold)',
+       all(x in npd for x in ('mbHzND matches 1 run return run scoreboard players set @s mbHzNP 1',
+                              'mbHzPm matches 1.. run return run scoreboard players set @s mbHzNP 1',
+                              'mbHzRA matches 1.. run return run scoreboard players set @s mbHzNP 1',
+                              'mbHzK matches 5..6 run scoreboard players set @s mbHzNP 1'))
+       and 'mbHzR ' not in npd
+       and npd.split('\n').index('scoreboard players set @s mbHzNP 0') < npd.split('\n').index('execute if score @s mbHzND matches 1 run return run scoreboard players set @s mbHzNP 1'))
+    ck('static: hz/init sets mbHzNP from #hzNoParry or np_def; the glint is hz/np_auto\'s (unparriable, dodgeable, tell >= 12)',
+       'mbHzNP = #hzNoParry mb' in fns['mboss/hz/init'] and 'mboss/hz/np_auto' in fns['mboss/hz/init']
+       and 'function rlk:mboss/np_glint' in fns.get('mboss/hz/np_auto', ''))
     ck('static: opts_reset resets #hzNoParry / #pjNoParry to -1', 'set #hzNoParry mb -1' in fns['mboss/opts_reset']
        and 'set #pjNoParry mb -1' in fns['mboss/opts_reset'])
     ck('static: mboss/hurt -> hurt_ctx -> cm/hit_pl2 (one path; no zero-and-restore of dashInvT)',
@@ -1240,9 +1244,9 @@ def hzm(s, K, R=2000, ND=0, Pm=None, RA=0, opt=-1, D=100):
 
 def t_boss():
     s, pl = world()
-    cases = [('disc r 3.2', dict(K=1, R=3200), 0), ('disc r 4.5', dict(K=1, R=4500), 1), ('sector r 6', dict(K=3, R=6000), 0),
-             ('sector r 12', dict(K=3, R=12000), 1), ('line 5 b', dict(K=4, R=5000), 0), ('line 14 b', dict(K=4, R=14000), 1),
-             ('ring', dict(K=2, R=3000), 1), ('full', dict(K=5, R=20000), 1), ('mask', dict(K=6, R=0), 1),
+    cases = [('disc r 3.2', dict(K=1, R=3200), 0), ('disc r 4.5', dict(K=1, R=4500), 0), ('sector r 6', dict(K=3, R=6000), 0),
+             ('sector r 12', dict(K=3, R=12000), 0), ('line 5 b', dict(K=4, R=5000), 0), ('line 14 b', dict(K=4, R=14000), 0),
+             ('ring', dict(K=2, R=3000), 0), ('full', dict(K=5, R=20000), 1), ('mask', dict(K=6, R=0), 1),
              ('no-dodge disc r 2', dict(K=1, R=2000, ND=1), 1), ('per-mille disc', dict(K=1, R=2000, Pm=250), 1),
              ('re-arm disc', dict(K=1, R=2000, RA=10), 1)]
     for name, kw, want in cases:
@@ -1251,8 +1255,8 @@ def t_boss():
     body = Ent('husk', (8.5, 64.0, 0.5), (0.0, 0.0), ['rlk_mb_body', 'boss'])
     s.ents.append(body)
     init = rd('mboss/hz/init')
-    ck('boss: hz/init: #hzNoParry 0 / 1 overrides the rule (only -1 runs np_def)',
-       'execute unless score @s mbHzNP matches 0..1 run function rlk:mboss/hz/np_def' in init)
+    ck('boss: hz/init: #hzNoParry 0 / 1 / 2 overrides the rule (only -1 runs np_def)',
+       'execute unless score @s mbHzNP matches 0..2 run function rlk:mboss/hz/np_def' in init)
     launch = rd('mboss/pj/launch')
     ck('boss: pj/launch: props parryable unless no-dodge (or #pjNoParry)', 'mbPjNP = #pjNoParry mb' in launch
        and 'unless score @s mbPjNP matches 0..1 run scoreboard players operation @s mbPjNP = @s mbPjND' in launch)
@@ -1366,16 +1370,12 @@ def t_raiden():
        land.split('function rlk:boss/raiden/hurt')[-1] for k in ('#hcK', '#hcNP', '#hcND')))
     ck('raiden: land: no knockback when dodged or parried', 'unless score #dodged tmp matches 1 unless score #parT tmp matches 1..' in land)
     new = rd('boss/raiden/hazard/new')
-    ck('raiden: a damaging nododge hazard flashes the glint on Raiden (spaced, fx/rd_glint)', 'player/def/fx/rd_glint' in new)
-    s, pl = world()
-    rai = Ent('husk', (6.5, 64.0, 0.5), (0.0, 0.0), ['rlk_raiden'])
-    s.ents.append(rai)
-    s.setsc('#rdNpAt', 'cb', -1000000)
-    s.log.clear()
-    m = Ent('marker', (2.5, 64.0, 0.5), (0.0, 0.0), [])
-    s.call('rlk:player/def/fx/rd_glint', Ctx(m, tuple(m.pos), (0, 0)))
-    s.call('rlk:player/def/fx/rd_glint', Ctx(m, tuple(m.pos), (0, 0)))
-    ck('raiden: rd_glint at most once per #npGap', len(s.calls('rlk:player/def/fx/glint')) == 1)
+    # (reviews B-04 / B-11, fix lane FB: the glint means "cannot be parried: dodge it"; every unparriable hazard of hers is
+    # no-dodge or a field / safe dome, so hazard/new flashes none)
+    ck('raiden: no hazard flashes the warning glint (her unparriable ones are no-dodge / fields: B-04, B-11)',
+       not any('glint' in l for l in new.split('\n') if l and not l.startswith('#')))
+    left = [p.relative_to(FN).as_posix() for p in FN.rglob('*.mcfunction') if 'rd_glint' in p.read_text(encoding='utf-8') or p.stem == 'rd_glint']
+    ck('raiden: the unused player/def/fx/rd_glint is gone and nothing names it', not left, left)
 
 
 # ================================================================================================== readers
