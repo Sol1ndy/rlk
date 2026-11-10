@@ -556,7 +556,7 @@ class Service:
 OWN = {
     'S3': ('spawn', 'intro_tick', 'tick', 'on_hit', 'aux_hit', 'incoming', 'pause', 'resume', 'death_start',
            'death_tick', 'cleanup', 'reload', 'bars', 'hz_vis', 'pj_end', 'test', 'uninstall', 'prep', 'init',
-           'core/', 'ai/', 'bond/', 'hud/', 'test/', 'rig_stub/', 'gate/') + tuple(f'p/{k}/' for k in P1),
+           'core/', 'ai/', 'bond/', 'hud/', 'test/', 'rig_stub/', 'gate/', 'bal_') + tuple(f'p/{k}/' for k in P1),
     'S4': tuple(f'p/{k}/' for k in P2),
     'S2seq': ('seq/',),
 }

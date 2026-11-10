@@ -8,6 +8,7 @@ execute facing entity @e[tag=rlk_cmaim,limit=1] feet rotated ~ 0 as @e[tag=rlk_c
 execute if score @s cmAH matches 1 as @e[tag=rlk_c3this] run data modify entity @s item.components."minecraft:custom_model_data" set value {colors:[16777215]}
 execute if score @s cmS matches 1 if score @s c3H matches 2..40 at @e[tag=rlk_cw_orb,tag=rlk_c3this,limit=1] run particle minecraft:dripping_water ~ ~2.35 ~ 0.2 0.1 0.2 0 1 normal
 execute if score @s frzT matches 1.. run return run function rlk:cm/c3/rig_frozen
+execute if score @s grgT matches 1.. run return run function rlk:cm/c3/rig_frozen
 function rlk:cm/cw/rig/pick
 execute unless score @s cmAP = #pose tmp store result storage rlk:c3 p.n int 1 run scoreboard players get #pose tmp
 execute unless score @s cmAP = #pose tmp run function rlk:cm/cw/rig/pose_m with storage rlk:c3 p

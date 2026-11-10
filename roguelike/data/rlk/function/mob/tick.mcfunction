@@ -5,6 +5,8 @@ execute if entity @s[tag=rlk_mb_dying] run return 0
 function rlk:mob/shield_ensure
 execute if score @s stunT matches 1.. run scoreboard players remove @s stunT 1
 execute if score @s stunT matches 0 run function rlk:mob/unstun
+# 균형치: 회복 · 그로기 시간(레지스트리 보스는 전투가 멈추면 멈춤, 나루카미는 자기 틱에서)
+execute if score @s balT matches 1.. unless entity @s[tag=rlk_raiden] run function rlk:bal/tick
 # 체력/최대체력 (스코어 mhpC / mhpM)
 execute unless score @s mhpM matches 1.. run function rlk:mob/hp_init
 # 바닐라 피해 감지(바닐라 체력은 1024 고정)

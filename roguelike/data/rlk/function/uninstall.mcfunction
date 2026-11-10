@@ -4,6 +4,8 @@ kill @e[tag=rlk_raiden]
 function rlk:mboss/uninstall
 # rift (build_rift.py)
 function rlk:room/rift/uninstall
+# 균형치(tools/build_balance.py): 그로기 몹의 AI · 마름모 줄 · 점수
+function rlk:bal/uninstall
 scoreboard objectives remove lcSeen
 execute as @a[tag=player] run function rlk:char/motion/stop
 # 시스템 제거: 임시 엔티티/UI 아이템/스코어보드 정리 후 틱 처리 정지 (사용: /function rlk:uninstall)

@@ -361,7 +361,28 @@ def build(W, ctx):
     w('core/stun_start', [f'# The stun (@s = body): brk then stun / stun2 ({api.STUN_T} t), hittable, the under-bar counts down.',
                           fn('core/stop_move'), fn('core/ground'), fn('core/looks_rest'),
                           sset('#pat', STUN_PAT), sset('#pt', 0), sset('#stun', 1), sset('#stun_t', api.STUN_T + BRK_LEN),
-                          f'tag @s add {api.TAGS["stun"]}', api.play('brk'), fn('hud/sub')])
+                          f'tag @s add {api.TAGS["stun"]}', api.play('brk'), fn('hud/sub'),
+                          '# balance gauge (combat overhaul lane B): her stun refills it (a pending balance groggy is dropped)',
+                          'function rlk:bal/refill'])
+    # Balance gauge (combat overhaul lane B, mboss_lib.BAL_HOOKS, registry "bal"): the balance groggy is her stun (brk, then
+    # stun / stun2) for BAL_STUN t, entered like the break (the running pattern cancelled, no true damage, no Banquet
+    # reschedule); her tick runs it (bal_tick = the hook tick) and rlk:bal ends it with its clock (bal_off). Never in the
+    # Banquet (F1) / E70 / Q5a / Q5b, an open break window, her stun, the transition, the replay or the intro.
+    BAL_STUN = 100
+    bal_ids = sorted(S.TID[k] for k in ctx.present if k not in ('f1', 'e70', 'q5a', 'q5b'))
+    w('bal_ok', ['# @s = body: may the balance groggy start now?',
+                 f'execute unless score #ph {OBJ} matches 1..5 run return fail',
+                 f'execute if entity @s[tag={api.TAGS["win"]}] run return fail',
+                 f'execute if score #stun {OBJ} matches 1 run return fail',
+                 f'execute if score #pat {OBJ} matches 0 run return 1']
+      + [f'execute if score #pat {OBJ} matches {i} run return 1' for i in bal_ids] + ['return fail'])
+    w('bal_on', ['# @s = body: the running pattern goes (like the break, without its damage), then her stun for the balance clock.',
+                 f'execute if score #pat {OBJ} matches 1..49 run {fn("core/cancel_d")}',
+                 fn('core/win_off'), sset('#pat', 0), sset('#done', 0), sset('#brk', 0),
+                 fn('core/stun_start'), sset('#stun_t', BAL_STUN)])
+    w('bal_tick', ['# @s = body: her own tick runs the stun (#pat ' + str(STUN_PAT) + ').', fn('tick')])
+    w('bal_off', ['# @s = body: the balance clock is over: her stun ends now if it still runs (recovery, the AI).',
+                  f'execute if score #pat {OBJ} matches {STUN_PAT} if score #stun {OBJ} matches 1 run {fn("core/stun_end")}'])
     w('core/stun_tick', [
         f'# Stun tick (#pat {STUN_PAT}, @s = body): the stun clip after the stagger, motes, the countdown.',
         f'scoreboard players add #pt {OBJ} 1',
@@ -568,7 +589,9 @@ def hud_files(W, ctx):
                    f'{{text:"  {api.BADGE}",color:"{BADGE_HEX}",bold:true}}')
     w('hud/sub', sub)
     w('hud/bar_stun', [f'scoreboard players operation #buSub bu = #stun_t {OBJ}',
-                       f'scoreboard players set #buSubMax bu {api.STUN_T + BRK_LEN}', 'scoreboard players set #buSubCol bu 2'])
+                       f'scoreboard players set #buSubMax bu {api.STUN_T + BRK_LEN}', 'scoreboard players set #buSubCol bu 2',
+                       '# the balance groggy (combat overhaul lane B) is a 100 t stun',
+                       'execute if score @s grgT matches 1.. run scoreboard players set #buSubMax bu 100'])
 
 
 def gate_files(W):

@@ -10,6 +10,8 @@ execute unless score #tfm tmp matches 1 run function rlk:combat/lv_mult
 # 몹 저항(mres, %): 원신 저항 공식. 격변 반응에도 적용
 execute if score @s mres matches 1.. if score #dmg tmp matches 1.. run function rlk:combat/res
 execute if score @s mres matches ..-1 if score #dmg tmp matches 1.. run function rlk:combat/res
+# 균형치(tools/build_balance.py): 그로기면 받는 피해 증가, 아니면 원소폭발 적중 · 강한 원소 반응이 칸을 깎음(보스의 incoming · 체력 바닥보다 먼저)
+execute if score @s balMax matches 1.. run function rlk:bal/mods
 # Apply boss armor/exhaustion before the displayed damage value is stored.
 execute if entity @s[tag=rlk_raiden] run function rlk:boss/raiden/incoming
 # 중간보스별 받는 피해 보정(그로기 등)

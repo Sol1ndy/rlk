@@ -62,6 +62,7 @@ def rig_common(w, mob, parts_lines, n, pose_ids, face, pick, extra_tick=(), ns='
              f'tag @e[tag={this}] add rlk_cmsync'] + list(face) + [
              f'execute if score @s cmAH matches 1 as @e[tag={this}] run data modify entity @s item.components."minecraft:custom_model_data" set value {{colors:[16777215]}}'] + list(extra_tick) + [
              f'execute if score @s frzT matches 1.. run return run function rlk:cm/{ns}/rig_frozen',
+             f'execute if score @s grgT matches 1.. run return run function rlk:cm/{ns}/rig_frozen',
              f'function rlk:cm/{mob}/rig/pick',
              f'execute unless score @s cmAP = #pose tmp store result storage rlk:{ns} p.n int 1 run scoreboard players get #pose tmp',
              f'execute unless score @s cmAP = #pose tmp run function rlk:cm/{mob}/rig/pose_m with storage rlk:{ns} p',

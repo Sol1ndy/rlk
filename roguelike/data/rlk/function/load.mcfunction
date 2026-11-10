@@ -1350,6 +1350,8 @@ function rlk:boss/raiden/init
 function rlk:mboss/init
 # rift (build_rift.py)
 function rlk:room/rift/init
+# 균형치 · 그로기(tools/build_balance.py): 점수 · 조절값 · 마름모 줄 표
+function rlk:bal/load
 # 화면 위 미니맵(tools/build_minimap.py)
 function rlk:minimap/init
 # 나비아 금빛 카드 효과 점수(tools/build_navia_fx_cards.py)

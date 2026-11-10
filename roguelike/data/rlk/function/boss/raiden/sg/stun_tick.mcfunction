@@ -6,4 +6,4 @@ execute if score @s rdTime matches 13 if score @s rdSgStun matches 3 at @s run f
 execute if score @s rdTime matches 1 unless score @s rdSgStun matches 3 at @s run function rlk:boss/raiden/fx/decal/d8 {sx:2.5,sz:2.5,life:99}
 execute if score @s rdTime matches 72 unless score @s rdSgStun matches 3 run function rlk:boss/raiden/rig/play/recover
 execute if score @s rdTime matches 76 if score @s rdSgStun matches 3 at @s run function rlk:boss/raiden/sg/recover_burst
-execute if score @s rdTime matches 100.. run function rlk:boss/raiden/sg/stun_end
+execute if score @s rdTime matches 100.. unless score @s rdSgStun matches 4 run function rlk:boss/raiden/sg/stun_end

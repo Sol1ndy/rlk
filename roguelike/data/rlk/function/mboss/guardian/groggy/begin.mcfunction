@@ -4,3 +4,5 @@ scoreboard players set #gdSt mb 5
 scoreboard players set #gdT mb 0
 scoreboard players set #mbNoLeash mb 0
 function rlk:mboss/guardian/hud/sub_groggy
+# balance gauge (combat overhaul lane B): this groggy refills it (a pending balance groggy is dropped)
+function rlk:bal/refill

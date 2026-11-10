@@ -218,7 +218,9 @@ execute unless score @s rdPat matches 15 if score @s rdShield matches ..0 run fu
         'execute as @a[tag=player] run function rlk:view/ttl_blank', 'scoreboard players set @a[tag=player] ttlT 65',
         'scoreboard players set #rdCap rd 1',
         'playsound minecraft:entity.iron_golem.death hostile @a[tag=player] ~ ~ ~ 0.8 0.72 0.3',
-        'execute at @s run function rlk:boss/raiden/vfx/armor_break'] + clip('t_collapse'))
+        'execute at @s run function rlk:boss/raiden/vfx/armor_break',
+        '# balance gauge (combat overhaul lane B): the collapse refills it (a pending balance groggy is dropped)',
+        'function rlk:bal/refill'] + clip('t_collapse'))
     write('exhausted_tick', ['# Phase 3, as the boss: kneel loop after the collapse, stand up, then the Shogun returns.']
           + [at('46', x) for x in clip('exhausted')] + [at(str(EXHAUST - 28), x) for x in clip('recover')]
           + [at(str(EXHAUST), call('normal_return'))])

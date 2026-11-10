@@ -432,6 +432,30 @@ def pattern_files(W, ctx):
                            f'kill @e[type=minecraft:marker,tag={S.LOCK_T}]', fn('core/ground')])
     w('core/cancel_pat', ['# Cancel the running pattern, then the recovery (reload, tests; @s = body).', fn('core/cancel_pat0'),
                           fn('ai/rec_start')])
+    # Balance gauge (combat overhaul lane B, mboss_lib.BAL_HOOKS, registry "bal"; lane H rebuilds her on the new combat and
+    # may replace this): the 100 t balance groggy knocks her on her back (clip down) and she kips up (kipup) in the last
+    # KIPUP t, hittable all along (no #inv), then the recovery. Only in the fight phases (P1 / P2) from idle or a pattern
+    # outside A6 (the blink) and the ghost forms; never with a floor step reserved, in a cutscene / sequence / replay /
+    # revival wait, a gauntlet (A8 / A13), the down window, while invulnerable.
+    kip = 20
+    bal_pats = [0, 1, 2, 3, 4, 6, 7, 11, 12, 13]
+    w('bal_ok', ['# @s = body: may the balance groggy start now?',
+                 f'execute unless score #ph {OBJ} matches {PH["p1"]} unless score #ph {OBJ} matches {PH["p2"]} run return fail',
+                 f'execute if score #rp {OBJ} matches 1.. run return fail',
+                 f'execute if score #sqn {OBJ} matches 1.. run return fail',
+                 f'execute if score #rvw {OBJ} matches 1.. run return fail',
+                 f'execute if score #inv {OBJ} matches 1.. run return fail',
+                 f'execute if score #fl {OBJ} matches 1.. run return fail',
+                 'execute if entity @s[tag=rlk_hr_ghost] run return fail',
+                 'execute if entity @s[tag=rlk_mb_inv] run return fail']
+      + [f'execute if score #pat {OBJ} matches {i} run return 1' for i in bal_pats] + ['return fail'])
+    w('bal_on', ['# @s = body: the pattern goes (no recovery yet), she falls on her back.',
+                 fn('core/cancel_pat0'), api.play('down')])
+    w('bal_tick', ['# @s = body, instead of the hook tick while groggy: the clock, the looks, the ambience, the rig (kipup at the end).',
+                   f'scoreboard players add #clk {OBJ} 1', fn('core/look'), fn('core/amb'), fn('core/inv'),
+                   f'execute if score @s grgT matches {kip} run {api.play("kipup")}',
+                   api.rig('tick')])
+    w('bal_off', ['# @s = body: the balance groggy is over: the recovery, then the AI.', fn('ai/rec_start')])
 
 
 # ================================================================================================== phases
@@ -495,7 +519,9 @@ def phase_files(W, ctx):
         f'# left (gold); at its end the kipup ({api.KIPUP_T} t, invulnerable) -> P2 after {api.KIPUP_RECOVER} t; a hit reaching the',
         f'# 5 % floor -> lead_down {api.DOWN_FLOOR_WAIT} t later.',
         sset('#ph', PH['down']), sset('#sqn', 0), sset('#inv', 0), sset('#down', api.DOWN_T), sset('#flw', 0), sset('#kip', 0),
-        sset('#fl', 0), api.play('down')])
+        sset('#fl', 0), api.play('down'),
+        '# balance gauge (combat overhaul lane B): the down window refills it (a pending balance groggy is dropped)',
+        'function rlk:bal/refill'])
     w('core/down/tick', [
         '# A down-window tick (@s = body): the kipup, the floor wait (lead_down at 0) or the timer.',
         f'execute if score #kip {OBJ} matches 1.. run return run {fn("core/kip/tick")}',

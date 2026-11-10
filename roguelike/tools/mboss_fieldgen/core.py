@@ -224,6 +224,7 @@ class Core:
         self.field()
         self.meter()
         self.groggy()
+        self.balance()
         self.forms()
         self.death()
         self.hud()
@@ -869,7 +870,9 @@ class Core:
             F('hud/groggy_on'),
             F('groggy/rig'),
             F('seq_f/groggy/begin'),  # [seq_f: field author]
-            F('hud/refresh')])
+            F('hud/refresh'),
+            '# balance gauge (combat overhaul lane B): this groggy refills it (a pending balance groggy is dropped)',
+            'function rlk:bal/refill'])
         self.w('groggy/rig', ['# The groggy rig (clip, look) and hitbox.', g.form('cruise'), g.play('groggy'), g.look('groggy'),
                               F('form/hitbox_g')])
         self.w('groggy/tick', [
@@ -884,6 +887,37 @@ class Core:
                                 f'execute if score #fgT mb matches {REC_FLIP} run {F("seq_f/recover/flip")}',  # [seq_f: field author]
                                 f'execute if score #fgT mb matches {REC_LEN}.. run {F("recover/end")}'])
         self.w('recover/end', ['# Back to the cruise rotation.', F('form/hitbox_c'), g.look('idle'), sc_set('#fgCool', 16), F('ai/enter')])
+
+    # -----------------------------------------------------------------------------------------
+    def balance(self):
+        """Balance gauge (combat overhaul lane B, mboss_lib.BAL_HOOKS, registry "bal"): the 100 t balance groggy only in the
+        cruise (no field stage: the field has its own 20-hit break, whose groggy refills the gauge), from idle or a cruise
+        pattern. Cut like test/cut, slumped like her groggy (groggy/rig), then her recovery (recover/begin: re-level, the
+        core flips up) back into the cruise rotation."""
+        F, R, g = self.F, self.R, self.g
+        cru = sorted(p.id for p in self.pats if p.kind == 'normal' and p.state == 'c')
+        self.w('bal_ok', ['# @s = body: may the balance groggy start now? (cruise only)',
+                          'execute unless score #fgField mb matches 0 run return fail',
+                          f'execute if score #fgSt mb matches {ST["idle"]} run return 1']
+               + [f'execute if score #fgSt mb matches {ST["pattern"]} if score #fgPat mb matches {i} run return 1' for i in cru]
+               + ['return fail'])
+        self.w('bal_on', [
+            '# @s = body: cut what runs, slump.',
+            'function rlk:mboss/lib_clear',
+            F('p/cancel'),
+            R('prop/clear'),
+            F('fx/tele/clear'),
+            F('hud/banner_cut'),
+            sc_set('#fgMv', 0), sc_set('#mbNoLeash', 0), sc_set('#fgT', 0),
+            F('groggy/rig'),
+            'data modify storage rlk:mboss sub set value [{text:"그로기",color:"#FFD23F",bold:true}]'])
+        self.w('bal_tick', [
+            '# @s = body, instead of the hook tick while groggy: clock, flash, the rig.',
+            'scoreboard players add #fgClk mb 1',
+            f'execute if score #fgFlash mb matches 1 run {R("flash")}',
+            sc_set('#fgFlash', 0),
+            R('tick')])
+        self.w('bal_off', ['# @s = body: the balance groggy is over: her recovery, then the cruise rotation.', F('recover/begin')])
 
     # -----------------------------------------------------------------------------------------
     def forms(self):

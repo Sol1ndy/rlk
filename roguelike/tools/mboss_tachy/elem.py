@@ -131,7 +131,9 @@ def build(W, ctx):
          '# true damage skips the HP floor: a backfire below it still reserves the phase step',
          'execute if score #mbFloor mb matches 1.. if score @s mhpC <= #mbFloor mb run scoreboard players set #mbFloorHit mb 1',
          sset('#stag', api.G3_STAGGER_T), sset('#taken', api.G3_STAGGER_TAKEN_PCT), api.play('stagger')]
-      + [f'execute at @s run {x}' if not x.startswith('execute') else x for x in S.snd('stagger')])
+      + [f'execute at @s run {x}' if not x.startswith('execute') else x for x in S.snd('stagger')]
+      + ['# balance gauge (combat overhaul lane B): her stagger refills it (a pending balance groggy is dropped)',
+         'function rlk:bal/refill'])
     # ---------------------------------------------------------------------------------------------- G2 mantle
     feather = ctx.has_s4('p/mantle/feather')
     nova = ctx.has_s4('p/mantle/nova/start')
@@ -200,7 +202,9 @@ def build(W, ctx):
       + [f'execute at @s run {x}' if not x.startswith('execute') else x for x in S.snd('mantle_break')]
       + S.fx_plain('cocoon_crack', ['execute at @s run particle minecraft:end_rod ~ ~1.2 ~ 0.6 0.8 0.6 0.1 40 force @a[tag=player]'])
       + [f'scoreboard players set #enAdd tmp {api.G2_ENERGY * 100}',
-         'execute as @a[tag=player,limit=1] run function rlk:char/energy_add', fn('hud/sub')])
+         'execute as @a[tag=player,limit=1] run function rlk:char/energy_add', fn('hud/sub'),
+         '# balance gauge (combat overhaul lane B): the mantle break stun refills it (a pending balance groggy is dropped)',
+         'function rlk:bal/refill'])
     w('mantle/break_tick', [
         f'# G2 break + stun (#pat {BREAK_PAT}): clip, then the stun clip from {BREAK_LEN}; the transition at {STUN_END}.',
         f'scoreboard players add #pt {OBJ} 1',

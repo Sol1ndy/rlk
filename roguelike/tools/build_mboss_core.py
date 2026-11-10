@@ -1484,7 +1484,9 @@ scoreboard players set #buSubMax bu 1
 scoreboard players set #buSubCol bu 0
 function rlk:mboss/d/bars
 function rlk:bossui/draw
-bossbar set rlk:mboss_state name {nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""}
+# + the balance gauge row (tools/build_balance.py: storage rlk:bal brow, written when it changes; it moves back the bar
+# width itself, so the line keeps its width; no brow = nothing)
+bossbar set rlk:mboss_state name [{nbt:"line[]",storage:"rlk:bu",interpret:true,separator:""},{nbt:"brow",storage:"rlk:bal",interpret:true}]
 bossbar set rlk:mboss_sub name {nbt:"sub[]",storage:"rlk:mboss",interpret:true,separator:""}
 ''')
 w('bars_cm', '''
@@ -1604,8 +1606,13 @@ for hook in L.HOOKS:
         out.write('mboss/d/' + hook, '\n'.join(lines))
         continue
     lines = [f'# GENERATED dispatcher: rlk:<fn root>/{hook} of the running boss (#mbId mb = registry n).']
+    if hook == 'tick':
+        lines.append('# balance gauge (registry "bal", mboss_lib.BAL_HOOKS): a groggy body (@s grgT >= 1) runs its bal_tick instead (last '
+                     'line: no extra command otherwise)')
     for b in BOSSES:
-        if args:
+        if hook == 'tick' and b.get('bal'):
+            lines.append(f'execute if score #mbId mb matches {b["n"]} unless score @s grgT matches 1.. run return run function rlk:{L.fn_root(b)}/tick')
+        elif args:
             argtxt = '{' + ','.join(f'{a}:$({a})' for a in args) + '}'
             lines.append(f'$execute if score #mbId mb matches {b["n"]} run return run function rlk:{L.fn_root(b)}/{hook} {argtxt}')
         elif hook == 'incoming' and b.get('kind', 'mid') in ('chapter', 'special'):
@@ -1615,7 +1622,21 @@ for hook in L.HOOKS:
             lines.append(f'execute if score #mbId mb matches {b["n"]} run return run function rlk:{L.fn_root(b)}/{hook}')
     if args:
         lines.append('$scoreboard players set #mbReqT mb $(' + args[0] + ')')
+    if hook == 'tick':
+        lines.append('execute if score @s grgT matches 1.. run return run function rlk:mboss/d/bal_tick')
     out.write('mboss/d/' + hook, '\n'.join(lines))
+
+# Balance gauge hooks (mboss_lib.BAL_HOOKS): dispatchers over the enabled entries with the registry flag "bal" only;
+# bal_has answers rlk:bal/init (a gauge for this boss?), the others fail for an unflagged boss (never reached).
+BAL_BOSSES = [b for b in BOSSES if b.get('bal')]
+out.write('mboss/d/bal_has', '\n'.join(
+    ['# GENERATED: return 1 when the running boss (#mbId mb) has the balance gauge (registry "bal", rlk:bal/init).']
+    + [f'execute if score #mbId mb matches {b["n"]} run return 1' for b in BAL_BOSSES] + ['return fail']))
+for hook in L.BAL_HOOKS:
+    out.write('mboss/d/' + hook, '\n'.join(
+        [f'# GENERATED dispatcher: rlk:<fn root>/{hook} of the running boss with the balance gauge (registry "bal").']
+        + [f'execute if score #mbId mb matches {b["n"]} run return run function rlk:{L.fn_root(b)}/{hook}' for b in BAL_BOSSES]
+        + ['return fail']))
 
 # =============================================================================================
 # Hazard library (hz)

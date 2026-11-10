@@ -1056,7 +1056,7 @@ class Service:
 # their own generators (OWN_GEN).
 OWN = {
     'S3': tuple(L.HOOKS) + tuple(L.HELP_HOOKS) + ('init', 'reward', 'core/', 'ai/', 'shield/', 'ult/', 'hud/', 'ev/',
-                                                 'test/', 'rig_stub/') + tuple(f'p/{k}/' for k in P1),
+                                                 'test/', 'rig_stub/', 'bal_') + tuple(f'p/{k}/' for k in P1),
     'S4': tuple(f'p/{k}/' for k in P2) + ('g/',),
     'S2b': ('seq/',),
 }
