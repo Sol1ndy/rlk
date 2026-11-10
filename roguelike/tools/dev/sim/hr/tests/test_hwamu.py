@@ -31,8 +31,9 @@ run for real from the datapack in the vendored sims (HR/tests/lib, read only) th
   clear    sold / dropped: stacks, hits, timers, queues, crit time, sidebar cleared once; cooldowns kept
   run      F3 (HR-10): the per-run reset (player/reset_one -> hw_reset) clears the state AND the cooldowns: no stray ready cue
            at the next grant, the first burst of the next run slashes
-  view     F3 (HR-08): vBig counts down once per tick in every view (view/tick, before the first-person return): the vig
-           shows in first person after a room title; F5 / the selection space still one per tick (no double count)
+  view     F3 (HR-08): vBig counts down once per tick in every state (view/tick, before the developer-mode return): the vig
+           shows in developer mode (no avatar; the first-person mode is gone since 11-10) after a room title; F5 / the
+           selection space / dead still one per tick (no double count)
   perf     commands per tick while held: idle, in combat (steady), peak
 """
 import copy
@@ -884,13 +885,15 @@ def t_run():
 # ================================================================================================== view (F3, HR-08)
 VIEW_STUBS = ('rlk:view/fresh', 'rlk:view/menu_do', 'rlk:view/burst_camera_tick', 'rlk:view/map_tick', 'rlk:view/fps_tick',
               'rlk:view/spawn', 'rlk:view/mob_aggro', 'rlk:view/move', 'rlk:view/sprint_fov', 'rlk:view/av_tick',
-              'rlk:view/aim', 'rlk:view/rot', 'rlk:view/slow', 'rlk:view/seat_new', 'rlk:view/ride_mount', 'rlk:view/xhair',
+              'rlk:view/aim', 'rlk:view/slow', 'rlk:view/seat_new', 'rlk:view/ride_mount', 'rlk:view/xhair',
               'rlk:view/ride_off', 'rlk:boss/raiden/camera/hold')
 
 
-def view_world(on, vmode=2):
+def view_world(dev=0):
     """A player with the real view/tick (and its real ride_tick / hold / sel_xhair lines); the engine calls around the vBig
-    lines are stubbed (the avatar, the camera seat, the crosshair title itself)."""
+    lines are stubbed (the avatar, the camera seat, the crosshair title itself). The F5 view is the only view since the
+    combat overhaul (11-10, lane R: no first-person mode, no shoulder view); dev=1 = developer mode, the no-avatar path
+    (view/fps_tick). #on view 1 / #vmode view 2 are the constants load sets."""
     s, pl = S.world(DP, hp=1000)
     S.set_star(s, 3)
     for f in VIEW_STUBS:
@@ -898,11 +901,11 @@ def view_world(on, vmode=2):
     # ride_tick's seat / mount lines (`on vehicle`, `ride`) are not in the sim: dropped; every other line runs as written
     s.cache['rlk:view/ride_tick'] = [l for l in rd('view/ride_tick').split('\n')
                                      if not re.search(r'\bon vehicle\b|(^|\brun )ride ', l)]
-    s.setsc('#on', 'view', on)
-    s.setsc('#vmode', 'view', vmode)
+    s.setsc('#on', 'view', 1)
+    s.setsc('#vmode', 'view', 2)
     s.setsc('#vFresh', 'view', 0)
     P = ('e', pl.id)
-    for o, v in (('rdCam', 0), ('vMap', 0), ('devMode', 0), ('dead', 0), ('pkMode', 0), ('rlkMenu', 0), ('vTtp', 0),
+    for o, v in (('rdCam', 0), ('vMap', 0), ('devMode', dev), ('dead', 0), ('pkMode', 0), ('rlkMenu', 0), ('vTtp', 0),
                  ('ttlT', 0), ('vMapH', 0), ('vMapL', 0), ('vMapR', 0)):
         s.setsc(P, o, v)
     s.setsc('#spr', 'view', 0)
@@ -924,26 +927,26 @@ def t_view():
     dec = 'execute if score @s vBig matches 1.. run scoreboard players remove @s vBig 1'
     first_ret = next(i for i, l in enumerate(vt) if 'return run function rlk:view/fps_tick' in l)
     rets = [i for i, l in enumerate(vt) if ' return ' in l and 'rdCam' not in l]
-    ck('HR-08 one vBig count-down in the whole pack: view/tick, before the first-person return and every other return '
+    ck('HR-08 one vBig count-down in the whole pack: view/tick, before the developer-mode (no avatar) return and every other return '
        '(but the legacy rdCam line)', [f for f, _ in fn_all] == ['view/tick.mcfunction'] and dec in vt
        and vt.index(dec) < first_ret and all(vt.index(dec) < i for i in rets), fn_all)
-    # first person (view off): the room title's vBig 70 runs out; the next burst shows the vig
-    s, pl = view_world(on=0)
+    # developer mode (no avatar: the first-person path that is left): the room title's vBig 70 runs out; the next burst shows the vig
+    s, pl = view_world(dev=1)
     P = ('e', pl.id)
     s.setsc(P, 'vBig', 70)                               # room/gen_title2 at a new map
     view_ticks(s, pl, 69)
     v69 = s.sc(P, 'vBig')
     view_ticks(s, pl, 1)
-    ck('HR-08 first person: vBig 70 -> 1 after 69 ticks, 0 after 70 (one per tick)', v69 == 1 and s.sc(P, 'vBig') == 0, (v69, s.sc(P, 'vBig')))
+    ck('HR-08 developer mode: vBig 70 -> 1 after 69 ticks, 0 after 70 (one per tick)', v69 == 1 and s.sc(P, 'vBig') == 0, (v69, s.sc(P, 'vBig')))
     n0 = len(s.log)
     burst(s, pl)
     ttl = [l for l in s.log[n0:] if l[1] == 'title']
-    ck('HR-08 first person: the burst after the room title shows the vig (times + glyph), vBig 6', len(ttl) == 2 and s.sc(P, 'vBig') == 6, ttl)
+    ck('HR-08 developer mode: the burst after the room title shows the vig (times + glyph), vBig 6', len(ttl) == 2 and s.sc(P, 'vBig') == 6, ttl)
     view_ticks(s, pl, 6)
-    ck('HR-08 first person: the vig\'s own vBig 6 runs out in 6 ticks', s.sc(P, 'vBig') == 0)
-    # shoulder view (vmode 1), dead (F5): counted down too
-    for label, on, vm, dead, pk in (('shoulder view', 1, 1, 0, 0), ('F5 while dead', 1, 2, 1, 0)):
-        s, pl = view_world(on=on, vmode=vm)
+    ck('HR-08 developer mode: the vig\'s own vBig 6 runs out in 6 ticks', s.sc(P, 'vBig') == 0)
+    # dead (F5): counted down too (the shoulder-view case went with the shoulder view, 11-10)
+    for label, dead, pk in (('F5 while dead', 1, 0),):
+        s, pl = view_world()
         P = ('e', pl.id)
         s.setsc(P, 'dead', dead)
         s.setsc(P, 'pkMode', pk)
@@ -953,7 +956,7 @@ def t_view():
     # F5 (riding) and the selection space in F5: still exactly one per tick (no double count with the old ride_tick /
     # sel_xhair lines)
     for label, pk in (('F5', 0), ('F5 selection space (pkMode 1)', 1)):
-        s, pl = view_world(on=1, vmode=2)
+        s, pl = view_world()
         P = ('e', pl.id)
         s.setsc(P, 'pkMode', pk)
         s.setsc(P, 'vBig', 30)

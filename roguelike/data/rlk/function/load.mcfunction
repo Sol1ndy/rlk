@@ -1162,9 +1162,10 @@ scoreboard players set #abyssHit tmp 0
 execute unless score #abStack eng matches 0.. run scoreboard players set #abStack eng 0
 execute unless score #aqN eng matches 0.. run scoreboard players set #aqN eng 0
 scoreboard players set @a[tag=player] invDirty 2
-# 시점 시스템: 처음이면 켜 둠 / 카메라 위치 기본값(아바타 머리에서 오른쪽 0.9, 위 0.3, 뒤 3.3)
-execute unless score #on view matches 0..1 run scoreboard players set #on view 1
-# 시점 종류: 1 숄더뷰 · 2 F5 위쪽 시점(처음엔 2)
+# 시점 시스템: F5 위쪽 시점 하나(1인칭 · 숄더뷰는 11-10 에 없앰; 개발자 모드만 아바타 없이 view/fps_tick). #on view 1 · #vmode view 2 는
+# 고정값으로 남긴다(읽는 곳: 생성된 mboss/guardian/p/pull/scr_end). 1인칭(#on 0) · 숄더뷰(#vmode 1)로 저장된 월드도 여기서 F5 가 되고,
+# 아바타 · 받침은 다음 틱의 view/fresh → view/tick 이 새로 만든다
+scoreboard players set #on view 1
 scoreboard players set #vmode view 2
 # 서버 시작·/reload 뒤 첫 틱에 시점 엔티티를 새로 만든다(view/fresh)
 scoreboard players set #vFresh view 1
@@ -1175,14 +1176,13 @@ execute unless data storage rlk:view {ridev:2} run data modify storage rlk:lobby
 execute unless data storage rlk:view {ridev:2} run data modify storage rlk:view ride set value {d:3.5d,s:0.5d}
 data modify storage rlk:view ridev set value 2
 execute unless score #avId view matches 0.. run scoreboard players set #avId view 0
-execute unless data storage rlk:view cam run data modify storage rlk:view cam set value {right:0.9d,up:0.3d,back:3.3d}
-function rlk:view/cam_calc
-# 카메라 따라오기: 보간 1틱, 회전 예측 없음(기본)
-# 기본값이 바뀌었으면(판 번호 optv) 새 기본값으로: 보간 2틱, 회전 예측 없음
-execute unless data storage rlk:view {optv:2} run data modify storage rlk:view opt set value {smooth:2,lead:0}
-data modify storage rlk:view optv set value 2
+# 없앤 숄더뷰 카메라의 저장값(위치 · 따라오기 · 작업 칸)
+data remove storage rlk:view cam
+data remove storage rlk:view opt
+data remove storage rlk:view optv
+data remove storage rlk:view st
+data remove storage rlk:view pr
 execute unless score #spr view matches 0..1 run scoreboard players set #spr view 0
-function rlk:view/tune_apply
 function rlk:view/rays
 team add rlk_cam
 team modify rlk_cam seeFriendlyInvisibles false

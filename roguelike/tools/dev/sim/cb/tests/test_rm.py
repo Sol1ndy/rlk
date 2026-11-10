@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """test_rm.py: the combat overhaul's lane R (removals) against one datapack root (read only).
 
-    python3 test_rm.py <datapack root> [section ...]        sections: static yoi (default: all)
+    python3 test_rm.py <datapack root> [section ...]        sections: static yoi view (default: all)
 
   static  요이미야 / the bow are gone (files, calls, objectives, the generated px/db row, the codex label), the projectile
           frame that 로노바 / 클로린드 use is kept and serves only their kinds, plain F (player/f_key) no longer toggles a
@@ -11,6 +11,11 @@
           and the drop queue (dropq), and the player who joins after the restart gets 루미네's weapon (the old bow item
           gone), the bow-aim modifier removed, her arrows killed, once; a world saved as another
           character only loses her card from the lists
+  view    the F5 view is the only view: the mode switch, the shoulder camera, the lobby 「시점」 button and its set files are
+          gone, the lobby rebuilds (built 12), #on view 1 / #vmode view 2 stay as load's constants for the generated readers
+          (mboss/guardian/p/pull/scr_end), no hand file branches on them any more; a world saved in first person (#on 0) or
+          the shoulder view (#vmode 1) loads into F5 (the old camera storage removed) and its player's next view ticks take
+          the avatar path (fresh -> spawn, rlk_body moves off the player, ride_tick); developer mode keeps view/fps_tick
 
 Harness: lib/psim.py + lib/mcsim.py = the research harness of the overhaul (tools/dev/plan/combat/perf_harness, mcsim =
 ar/tests/lib/mcsim.py with unset source scores read as 0), vendored so later edits there cannot move this suite. Prints
@@ -270,7 +275,97 @@ def t_yoi():
     ck('yoi: the migration functions ran without a sim error', not errs, errs)
 
 
-SECTIONS = {'static': t_static, 'yoi': t_yoi}
+# ================================================================================================== view
+VIEW_GONE = ('mode', 'mode_do', 'mode_help', 'on', 'off', 'ride', 'rot', 'rot_lead', 'cam_go', 'cam_step', 'cam_put', 'cam_y',
+             'cam_calc', 'dur_set', 'dur_set2', 'set', 'tune', 'tune_apply')
+
+
+def t_view():
+    fns = all_fn()
+    ck('view: the mode switch and the shoulder camera are gone (18 view files)', not [n for n in VIEW_GONE if f'view/{n}' in fns],
+       [n for n in VIEW_GONE if f'view/{n}' in fns])
+    ck('view: the lobby set files of the view / side / smooth / lead buttons are gone (s20 s22 s24 s25)',
+       not [n for n in ('s20', 's22', 's24', 's25') if f'lobby/set/{n}' in fns])
+    gone = re.compile(r'rlk:view/(?:' + '|'.join(VIEW_GONE) + r')\b|rlk:lobby/set/s2[0245]\b|rlk_camv')
+    bad = sorted({k for k, v in fns.items() if gone.search('\n'.join(code_lines(v)))})
+    ck('view: nothing calls them or touches the camera mount rlk_camv', not bad, bad)
+    rd_ = re.compile(r'#on view|#vmode view')
+    readers = sorted(k for k, v in fns.items() if rd_.search('\n'.join(code_lines(v))))
+    ck('view: #on view / #vmode view are read only by the generated guardian line and set only in load',
+       readers == ['load', 'mboss/guardian/p/pull/scr_end'], readers)
+    ld = code_lines(fns['load'])
+    ck('view: load sets them as constants (#on view 1, #vmode view 2; no 0..1 keep of a saved first-person 0)',
+       'scoreboard players set #on view 1' in ld and 'scoreboard players set #vmode view 2' in ld
+       and not [l for l in ld if '#on view' in l and l != 'scoreboard players set #on view 1'], [l for l in ld if '#on view' in l])
+    ck('view: the generated reader still needs both values (no regeneration)',
+       'if score #on view matches 1 if score #vmode view matches 2' in fns['mboss/guardian/p/pull/scr_end'])
+    ck('view: load drops the shoulder camera storage (cam, opt, optv, st, pr)',
+       all(f'data remove storage rlk:view {k}' in ld for k in ('cam', 'opt', 'optv', 'st', 'pr')))
+    vt = code_lines(fns['view/tick'])
+    ck('view: view/tick: developer mode -> view/fps_tick, everything else the avatar and ride_tick (no rot)',
+       'execute unless score @s devMode matches 1 run scoreboard players set #eff view 1' in vt
+       and 'execute if score #eff view matches 0 run return run function rlk:view/fps_tick' in vt
+       and 'function rlk:view/ride_tick' in vt and not [l for l in vt if 'view/rot' in l], vt)
+    lb = fns['lobby/build']
+    ck('view: the lobby has no 「시점」 button (k 20) and the settings door says 카메라',
+       'name:"시점"' not in lb and 'k:20' not in lb and 'name:"시작 전 설정",desc:"카메라"' in lb)
+    ck('view: the lobby build version is bumped to 12 (build + tick), so saved worlds rebuild without the button',
+       'data modify storage rlk:lobby built set value 12' in lb and 'unless data storage rlk:lobby {built:12}' in fns['lobby/tick'])
+    ck('view: lobby/act has no handlers 20 / 22 / 24 / 25; the labels have no lk20 / 22 / 24 / 25',
+       not re.search(r'matches 2[0245] ', fns['lobby/act']) and not re.search(r'rlk_lk2[0245]', fns['lobby/set/labels']))
+    ck('view: lobby/set/cam sets only the F5 seat (ride.d / ride.s)',
+       'rlk:view cam' not in fns['lobby/set/cam'] and 'ride.d' in fns['lobby/set/cam'] and 'ride.s' in fns['lobby/set/cam'])
+    rays = code_lines(fns['view/rays'])
+    ck('view: the UI ray lengths are the third-person ones, unconditionally',
+       rays == ['scoreboard players set #rObj view 27', 'scoreboard players set #rDit view 21', 'scoreboard players set #rDitB view 23',
+                'scoreboard players set #rShop view 28', 'scoreboard players set #rShopB view 27'], rays)
+    ps = [l for l in code_lines(fns['lvup/pick_sub']) if 'title @s subtitle' in l]
+    ck('view: the pick subtitle has one form (웅크리기), no Shift + F variant',
+       len(ps) == 1 and '웅크리기(Shift)' in ps[0] and 'Shift + F' not in ps[0], ps)
+    vis = re.compile(r'"[^"]*(?:1인칭|숄더뷰)[^"]*"')
+    bad = sorted({k for k, v in fns.items() if not k.startswith(('boss/', 'mboss/', 'char/motion/'))
+                  and vis.search('\n'.join(code_lines(v)))})
+    ck('view: no player-facing text of the hand files names 1인칭 / 숄더뷰', not bad, bad)
+    # ---- a world saved in first person / the shoulder view loads into F5
+    for label, on, vm in (('first person', 0, 2), ('the shoulder view', 1, 1)):
+        s, pl = lworld()
+        s.setsc('#on', 'view', on)
+        s.setsc('#vmode', 'view', vm)
+        s.storage.setdefault('rlk:view', {}).update({'cam': {'right': 0.9, 'up': 0.3, 'back': 3.3}, 'opt': {'smooth': 2, 'lead': 0},
+                                                     'optv': 2, 'st': {'x': 1}, 'pr': {'d': 2}})
+        restart(s, pl)
+        vw = s.storage['rlk:view']
+        ck(f'view: a world saved in {label} loads with #on view 1 · #vmode view 2 and without the shoulder camera storage',
+           s.sc('#on', 'view') == 1 and s.sc('#vmode', 'view') == 2 and not [k for k in ('cam', 'opt', 'optv', 'st', 'pr') if k in vw]
+           and 'ride' in vw, (s.sc('#on', 'view'), s.sc('#vmode', 'view'), sorted(vw)))
+        # its player's next view ticks: the avatar path (the avatar / seat builders are stubbed: no world in the sim)
+        if label == 'first person':
+            pl.tags.add('rlk_body')
+            for f in ('rlk:view/spawn', 'rlk:view/ride_tick', 'rlk:view/move', 'rlk:view/av_tick', 'rlk:view/aim', 'rlk:view/slow',
+                      'rlk:view/sprint_fov', 'rlk:view/mob_aggro', 'rlk:view/burst_camera_tick', 'rlk:view/menu_do',
+                      'rlk:view/teardown'):
+                s.cache[f] = []                    # empty bodies (PSim.stub would hide the calls from ncall)
+            P = ('e', pl.id)
+            for o, v in (('rdCam', 0), ('vMap', 0), ('devMode', 0), ('dead', 0), ('pkMode', 0), ('rlkMenu', 0)):
+                s.setsc(P, o, v)
+            c0 = dict(s.ncall)
+            for _ in range(2):
+                s.t += 1
+                s.call('rlk:view/tick', pctx(s))
+            d = {k: s.ncall[k] - c0.get(k, 0) for k in ('rlk:view/fresh', 'rlk:view/spawn', 'rlk:view/ride_tick', 'rlk:view/fps_tick')}
+            ck('view: ... its player\'s next view ticks: fresh once, then the avatar path (spawn, ride_tick), never fps_tick; '
+               'rlk_body leaves the player', d['rlk:view/fresh'] == 1 and d['rlk:view/spawn'] >= 1 and d['rlk:view/ride_tick'] >= 1
+               and d['rlk:view/fps_tick'] == 0 and 'rlk_body' not in pl.tags, (d, sorted(pl.tags)))
+            s.setsc(P, 'devMode', 1)
+            c0 = dict(s.ncall)
+            s.t += 1
+            s.call('rlk:view/tick', pctx(s))
+            ck('view: developer mode still takes the no-avatar path (view/fps_tick, the player is the body)',
+               s.ncall['rlk:view/fps_tick'] - c0.get('rlk:view/fps_tick', 0) == 1 and 'rlk_body' in pl.tags
+               and s.ncall['rlk:view/ride_tick'] - c0.get('rlk:view/ride_tick', 0) == 0)
+
+
+SECTIONS = {'static': t_static, 'yoi': t_yoi, 'view': t_view}
 for name, fn in SECTIONS.items():
     if not ONLY or name in ONLY:
         print(f'== {name}')
