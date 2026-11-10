@@ -1,11 +1,8 @@
 # The unparriable-attack warning (combat overhaul C; the original's yellow flash, video_notes 1.6): a gold sphere-ring with a
-# long horizontal flare on the boss's chest, bright then fading (player/def/fx/glint), and a chime. Once per #npGap tmp ticks
-# (a volley warns once); never while a cutscene runs; a module that draws its own warnings sets #mbNpOwn mb 1.
-execute if score #mbNpOwn mb matches 1 run return 0
-execute if score #mbCine mb matches 1 run return 0
-execute store result score #npNow mb run time query gametime
-scoreboard players operation #t mb = #npNow mb
-scoreboard players operation #t mb -= #mbNpAt mb
-execute if score #t mb < #npGap tmp run return 0
-scoreboard players operation #mbNpAt mb = #npNow mb
-execute as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s anchored eyes positioned ^ ^-0.35 ^ run function rlk:player/def/fx/glint
+# long horizontal flare, bright then fading (player/def/fx/glint), and a chime: "this attack cannot be parried: dodge it".
+# Drawn on the visible body: the running boss's glint point (mboss/d/np_at: the chest / head of its rig above the body
+# anchor, registry "glint"; never the hit-box husk's eyes - a px boss's husk is 0.2 b tall - and never under the floor).
+# Called by hz/np_auto (a hazard whose wind-up is the tell) and by the modules at the tell tick of an attack whose hazard
+# is made at the strike frame (mboss_lib.np_warn). Any executor. Gate: np_gate.
+function rlk:mboss/np_gate
+execute if score #npOk mb matches 1 as @e[type=minecraft:husk,tag=rlk_mb_body,limit=1] at @s rotated ~ 0 run function rlk:mboss/d/np_at

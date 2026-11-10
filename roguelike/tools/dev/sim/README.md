@@ -193,6 +193,15 @@ test_arena_fl · test_kit) 돌리고 결과를 `out/<tag>_<스위트>.txt` 에 �
 | `view` | F5 하나: 모드 · 숄더뷰 파일 없음, 로비 「시점」 버튼 없음 · `built` 12, `#on view 1` · `#vmode view 2` 는 load 의 고정값(생성된 파수꾼 줄만 읽음), 1인칭 · 숄더뷰로 저장된 월드 → F5(옛 카메라 저장값 지움, 다음 틱 아바타 길), 개발자 모드는 `view/fps_tick` |
 | `picksub` | 「고를 아이템 N개」가 방 전투(`#active room 1` + `#combat room 1..`) · 보스 엔진(`#mbLive mb 1`) 동안 안 뜸, 싸움이 시작되면 바로 지움(아랫줄만), 끝나면 20틱 안에 다시 뜸, 싸움 중 레벨 업, 예전 규칙(선택 공간 · 사망 · `ttlT`) — 바꾸기 전 트리에서는 5개 실패 |
 
+### 3-6. 전투 개편 검토 B 의 고침 (`cb/tests/`; 11-11, 가지 `wip/combat-fix-b`; `tools/dev/plan/combat/fb_progress.md`)
+데이터팩 밖 사본에서. 보스 쪽은 `hr/tests/lib`(아를레키노는 `ar/s3/lib`), 몹 쪽은 `bal/tests/lib` 의 모의기를 읽기만 한다.
+
+| 파일 | 실행 | 무엇 |
+|---|---|---|
+| `hzlog.py` | `<dp> <보스> pat [--ids=..] [--dodge] [--out=f.json]` · `<dp> <보스> fight [--ticks=3000] [--out=f.json]` | 하네스(검토 B 의 `hzlog.py` 를 `repro` 대로 다시 만든 것): 보스 하나(guardian butterfly fieldgen azhdaha apep tachy arlecchino)를 실제 틀 · 모듈로 싸우게 하고 위험 지대(`hz/init` 뒤의 종류 · 닿는 거리 · 예고 · 피해 · 닷지 불가 · ‰ · 다시 맞기 · 패링 불가 · 묶음 · 만든 함수 · 타격 틱), 투사체, 모듈의 직접 타격, 경고 섬광(틱 · 자리 · 바닥 위 높이), 판정에 닿은 타격(피함 · 잃은 체력), 틱당 명령 수를 JSON 으로. `pat` = 시험 번호마다 새 싸움, `--dodge` = 매 틱 퍼펙트 닷지, `fight` = 매 틱 회복되는 가만히 선 플레이어 |
+| `np_table.py` | `<기록 폴더> <tag> [보스 …] [--cmp=<다른 tag>] [--json=f]` | 그 기록(`<tag>_<보스>_{pat,dodge,fight}.json`)으로 보스별 표(패턴마다 모양 · 상태 P / U / U-ND / U-field · 섬광에서 타격까지 틱 · 매 틱 닷지로 피한 수), `--cmp` 는 두 tag 의 `fight` 기록 비교(패링 불가 표시 말고는 같아야 함) |
+| `test_np.py` | `<dp> [fw b08 b09 mobs table] [--logs=<폴더> --tag=<tag>] [--jobs=N]` | 고침의 검사(6522feef5 에서는 실패): `fw` 기본 규칙 · 옵션 · `np_auto` · 문 · 섬광 자리 · 묶음의 답, `b08` 타키 그로기 바닥, `b09` 아펩 치워 둔 몸, `mobs` 궁수 화살 · 시킨(자식 프로세스), `table` 일곱 보스의 `hzlog` 기록(직접 돌리거나 `--logs` 로 재사용: 패링 불가 패턴 = 판정 목록, 섬광 ≥ 20틱 전 · 바닥 위 1칸 이상 · 닷지 불가 / 장판에는 없음, 한 묶음 · 한 타격에 답 하나, 매 틱 닷지로 모두 피함, 연달아 닷지해야 하는 불가 타격의 간격) |
+
 ## 4. 균형 탐침 (`ar/review/bal/`, `ap/balance/azfair_core.py`)
 - `knfair5.py <dp> <mode> <policy> <dodge> <char> <seed> [n] [lv] [plv] [out.json]`: 아이템 없는 Lv15 플레이어 대 L18 보스,
   `mode` = `p1a` / `p1b` / `p2`(10만 체력 보스로 그 단계만 n틱) / `whole`(진짜 체력으로 끝까지), `policy` · `dodge` 는

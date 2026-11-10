@@ -9,5 +9,6 @@ execute as @e[tag=rlk_cm_ci] if score @s c2eOw = #cid tmp at @s run function rlk
 scoreboard players operation #eStep tmp = #c2es tmp
 execute if score #ccN tmp matches 0 if score @s c2eF matches 1 run function rlk:cm/cc/flock_gone
 execute if score @s cmD matches 1.. run scoreboard players operation @s cmD -= #eStep tmp
-execute if score #ccR tmp matches 0 if score @s cmD matches ..0 if entity @e[tag=rlk_ci_idle,limit=1] run function rlk:cm/cc/flock_ram
+# (combat overhaul, review B-07: no new ram while the caster is groggy - her cicins wait, a ram already flying goes on)
+execute if score #ccR tmp matches 0 if score @s cmD matches ..0 unless score @s grgT matches 1.. if entity @e[tag=rlk_ci_idle,limit=1] run function rlk:cm/cc/flock_ram
 tag @e[tag=rlk_ci_idle] remove rlk_ci_idle
