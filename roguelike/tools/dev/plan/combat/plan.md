@@ -10,6 +10,11 @@
 - 공용 서버 검사: `RLK_DEV=/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad bash <wt>/roguelike/tools/dev/loadcheck.sh <wt>/roguelike <tag>`
   (서버 · JDK 25 준비됨; 한 번에 한 서버, 잠금이 줄 세움).
 
+## 리소스팩
+- 리소스팩은 git 밖이다. 11-06 릴리스 RP 는 고아 가지 `wip/rp-snapshot`(`rlk_hud_resourcepack_1106.zip`, 풀면 sha1 b3df6a5f…)에
+  있고, 이 컨테이너에는 `/tmp/claude-0/-home-user-rlk/2f5e7b47-ba2f-58bc-b880-1598991e2f8e/scratchpad/rp_base` 에 풀어 두었다(읽기 전용으로 쓰고,
+  RP 를 고치는 레인은 자기 사본 `cp -r rp_base rp_<lane>` 에서 만든다).
+
 ## 단계 (lane)
 | lane | 가지 | 내용 | 먼저 끝나야 하는 것 |
 |---|---|---|---|
