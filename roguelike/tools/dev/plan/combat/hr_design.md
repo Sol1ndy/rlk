@@ -56,7 +56,7 @@ Conventions
 | `intro` 0 | CS0 640 t, no lock | **change** | CS0 1440 t, locked, actor (§3.1); registry `intro` 650 → **1450**; the skip jumps to `#sq` 1290 |
 | `p1` 1 | A1-A10 kit, floor 60 % | **change** | the new P1 kit (§2), gauge charge, balance, `#mbNpOwn mb 1` |
 | `cs1` 2 | 213 t, `cine`, bars off | **change** | 720 t, locked, actor (§3.2); starts at the next decision after the floor hit, as now |
-| `sq1` 3 | 60 t, re-hat, darkness | **replace** → `lead` 3 | sequence `lead60` 56 t (§3.3): not locked, bars on, gauge 5/5 at its tick 0, no darkness |
+| `sq1` 3 | 60 t, re-hat, darkness | **replace** → `lead60` 3 | sequence `lead60` 56 t (§3.3): not locked, bars on, gauge 5/5 at its tick 0, no darkness |
 | `a8` 4 | 9 dash-timed cuts, judge 194 | **change** | G1: 9 parry cuts, judge 220 (§2.4) |
 | `cs2` 5 | repel 104 t, then `down` | **change** | repel 140 t, locked, bars **on**, three true-damage steps 15 / 15 / 15 ‰; then P2 (recovery 20 t), balance +3 |
 | `down` 6 | 200 t on her back, kip-up | **remove** | the id stays reserved (unused); `core/down/**`, `DOWN_T`, `DOWN_FLOOR_WAIT`, `KIPUP_RECOVER`, the gold under bar go. Clips `down` / `kipup` stay: the balance groggy uses them |
@@ -264,8 +264,8 @@ Unparriable: `ult` 2, `a9`, `a10`, `hcut`, `blue`, `kcut`, `mx` X, `q` pillar. H
   never teleported (CS0 is the one exception, §3.1). She is moved by the sequence (`mv/glide|leap`, every end point
   through `mv/ok`).
 - **Actor**: `char/cine/spawn` at the stage (rotated as the stage), one clip per sequence (`cs0`, `cs1`, `repel`,
-  `ending`, `coda`), the module copies `#sq hr` into `#cavT cine` and calls `char/cine/tick` each tick, so her clip tick
-  and the actor's are the same number. The actor's root = the stage origin + the clip's `shift`, yaw = the stage yaw +
+  `ending`, `coda`), the module copies `#sq hr` into `#cavT cine` and calls `char/cine/tick` each tick, so the actor runs on
+  the sequence clock like every beat of hers (her `intro_end` restarts her clip at `#sq` 1290; the actor's `cs0` does not). The actor's root = the stage origin + the clip's `shift`, yaw = the stage yaw +
   the clip's root yaw. **Displacement limits** (every clip): forward ≤ 2.5 b, backward ≤ 1.5 b (CS0's walk-in alone: 6.0 b), sideways ≤ 1.5 b, up
   0 except the ending's aerial duel (≤ 7.0 b); `shift` is (0, 0, 0) with the feet on the floor at every hand-back tick.
 - **Cut masks** (they hide the game-mode switch, the actor's spawn and her placement): CS0 the framework's 1-s arrival
@@ -390,7 +390,9 @@ up"). Distances: 1.3 (lock) → 0.6 (grab) → back to back 0.6 → she lies 1.2
 ### 3.5 The ending (`seq/ending`, H = 1372 t; video 296.5-373.1 = 1532 t, 0.90 ×) and the coda
 Trigger: the repel's lethal kick → `death_start` (`#mbSt 2`, bars off, `ev/roll`) → `seq/ending`. The lock, the cameras,
 the stage and the actor continue from the repel (the actor is not respawned: `char/cine/play {clip:"ending"}`, whose
-tick 0 is the repel clip's tick 129 pose at shift f 1.8). From E8 on the stage is **ST2**: same origin, forward = the
+tick 0 is the repel clip's tick 129 pose at shift f 1.8). When the ending starts without a repel before it (`boss/test/kill`,
+a reload inside the 5 % repel) it makes the stage itself (FMAX 12), puts her on her back at `ST(0, 0, 4.2)` and spawns the
+actor under its white mask. From E8 on the stage is **ST2**: same origin, forward = the
 bearing to her landing mark (9.0 b from the origin toward `MOON_POS` when that passes `mv/ok`, else along ST); the
 actor is turned to it by `char/cine/face` during E8.
 
